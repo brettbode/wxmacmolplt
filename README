@@ -1,3 +1,6 @@
-This is a placeholder file. This directory will contain the MacMolPlt port to
-wxWidgets.
+wxMolPlt is a wxWidgets rewrite of MacMolPlt by Brett Bode.
+
+Most files contained here are presently placeholders, or for development and
+testing purposes only.  Don't expect anything to work, even if it looks like
+it should.
 
