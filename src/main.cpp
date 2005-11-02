@@ -36,8 +36,7 @@ bool MpApp::OnInit() {
     }
 
     // TODO:  Create main wxFrame
-    // SetTopWindow();
-    // SetExitOnFrameDelete(true);
+    SetExitOnFrameDelete(false);
 
     return true;
 }
@@ -51,11 +50,12 @@ bool MpApp::OnInit() {
  * Args:
  *
  * Returns:
- *     int - Is ignored.  Perhaps someday wxWidgets will define a purpose for
+ *     int - Ignored.  Perhaps wxWidgets will eventually define a purpose for
  *           it.
 *******************/
 int MpApp::OnExit() {
     delete mpInstanceChecker;
+
     return 0;
 }
 
