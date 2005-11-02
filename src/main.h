@@ -19,7 +19,7 @@
 *******************/
 class MpApp : public wxApp {
     private:
-        wxSingleInstanceChecker *mpInstanceChecker;
+        wxSingleInstanceChecker *m_InstanceChecker;
         // TODO: define main wxFrame pointer
 
     public:
