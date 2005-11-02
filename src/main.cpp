@@ -19,15 +19,24 @@
  *     bool - true for success, false for error/failure.
 *******************/
 bool MpApp::OnInit() {
+    // TODO:  Handle command line arguments.  See wxApp documentation
+    // TODO:  Start logging stuff.
+    // TODO:  Figure out what to do about Mac.  wxGetOsVersion may be useful
     const wxString appName = wxString::Format("wxMacMolPlt-%s", wxGetUserId().c_str());
-    mpInstanceChecker = new wxSingleInstanceChecker(appName);
+    mpInstanceChecker = new wxSingleInstanceChecker();
+
+    if(mpInstanceChecker.Create(name) == false) {
+        // TODO:  Do something intelligent here
+    }
 
     if(mpInstanceChecker->IsAnotherRunning()) {
-        // TODO: Handle this appropriately
+        // TODO:  Handle this appropriately
         return false;
     }
 
-    // TODO: Create main wxFrame
+    // TODO:  Create main wxFrame
+    // SetTopWindow();
+    // SetExitOnFrameDelete(true);
 
     return true;
 }
@@ -41,7 +50,8 @@ bool MpApp::OnInit() {
  * Args:
  *
  * Returns:
- *     int -
+ *     int - Is ignored.  Perhaps someday wxWidgets will define a purpose for
+ *           it.
 *******************/
 int MpApp::OnExit() {
     delete mpInstanceChecker;
