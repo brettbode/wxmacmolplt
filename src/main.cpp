@@ -56,7 +56,6 @@ bool MpApp::OnInit() {
 *******************/
 int MpApp::OnExit() {
     delete mpInstanceChecker;
-
     return 0;
 }
 
