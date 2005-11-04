@@ -1,5 +1,6 @@
 #Boilerplate
 AC_INIT(src/main.cpp)
+AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE(wxMacMolPlt, 0.0.1)
 #AC_CONFIG_HEADER
 #AC_REVISION
@@ -8,6 +9,7 @@ AM_INIT_AUTOMAKE(wxMacMolPlt, 0.0.1)
 
 #Programs
 AC_PROG_CXX
+AC_PROG_CC
 
 #Libraries
 #INTI_REQUIRED_VERSION=1.0.7
@@ -22,4 +24,5 @@ AC_PROG_CXX
 #Functions
 
 #Output
+AC_SUBST(ac_aux_dir)
 AC_OUTPUT(Makefile src/Makefile)

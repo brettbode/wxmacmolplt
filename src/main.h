@@ -8,6 +8,9 @@
  * Last Modified: 11-02-2005  Steven Schulteis
 ***************************************/
 
+#ifndef MAIN_H
+#define MAIN_H 1
+
 #include "wx/wx.h"
 
 /*******************
@@ -26,4 +29,6 @@ class MpApp : public wxApp {
         bool OnInit();
         int  OnExit();
 };
+
+#endif /* #ifndef MAIN_H */
 
