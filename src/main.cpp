@@ -23,11 +23,11 @@ bool MpApp::OnInit() {
     // TODO:  Start logging stuff.
     // TODO:  Figure out what to do about Mac.  wxGetOsVersion may be useful
 
-    const wxString appName = wxString::Format("wxMacMolPlt-%s", wxGetUserId().c_str());
+    const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
 
     m_InstanceChecker = new wxSingleInstanceChecker();
 
-    if(m_InstanceChecker->Create(name) == false) {
+    if(m_InstanceChecker->Create(appName) == false) {
         // TODO:  Do something intelligent here
     }
     if(m_InstanceChecker->IsAnotherRunning()) {
@@ -54,7 +54,7 @@ bool MpApp::OnInit() {
  *           it.
 *******************/
 int MpApp::OnExit() {
-    delete mpInstanceChecker;
+    delete m_InstanceChecker;
 
     return 0;
 }
