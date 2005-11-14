@@ -154,9 +154,6 @@ void MpMainFrame::menuEditClear(wxCommandEvent &event) {
 void MpMainFrame::menuEditSelect_all(wxCommandEvent &event) {
 }
 
-void MpMainFrame::menuEditDefault_preferences(wxCommandEvent &event) {
-}
-
 /* Help menu */
 void MpMainFrame::menuHelpAbout(wxCommandEvent &event) {
 }
