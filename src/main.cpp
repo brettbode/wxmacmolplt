@@ -2,22 +2,11 @@
  * main.cpp
  *
  * Created:       10-31-2005  Steven Schulteis
- * Last Modified: 11-02-2005  Steven Schulteis
+ * Last Modified: 11-14-2005  Steven Schulteis
 ***************************************/
 
 #include "main.h"
 
-/*******************
- * OnInit
- *
- * Overloads OnInit defined in the wxApp class.  This is where program
- * execution begins (as far as we're concerned).
- *
- * Args:
- *     
- * Returns:
- *     bool - true for success, false for error/failure.
-*******************/
 bool MpApp::OnInit() {
     // TODO:  Handle command line arguments.  See wxApp documentation
     // TODO:  Start logging stuff.
@@ -42,22 +31,19 @@ bool MpApp::OnInit() {
     return true;
 }
 
-/*******************
- * OnExit
- *
- * Overloads OnExit defined in the wxApp class.  This function is called just
- * before the program exits.
- *
- * Args:
- *
- * Returns:
- *     int - Ignored.  Perhaps wxWidgets will eventually define a purpose for
- *           it.
-*******************/
 int MpApp::OnExit() {
     delete m_InstanceChecker;
 
     return 0;
+}
+
+void MpApp::createMainFrame(wxString &file) {
+    // TODO:  Create and store new MpMainFrame
+}
+
+void MpApp::destroyMainFrame(MpMainFrame *frame) {
+    // TODO:  Close frame and remove it from storage
+    // frame->Destroy();
 }
 
 // Tell wxWidgets to start the program:
