@@ -81,7 +81,7 @@ void MpMainFrame::createMenuBar() {
     menuEdit->AppendSeparator();
     menuEdit->Append(wxID_CUT, wxT("Cu&t\tCtrl+X"));
     menuEdit->Append(wxID_COPY, wxT("&Copy\tCtrl+C"));
-    menuEdit->Append(,wxT("Copy Coordinates"));
+    //menuEdit->Append(,wxT("Copy Coordinates"));
     menuEdit->Append(wxID_PASTE, wxT("&Paste\tCtrl+V"));
     menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
     menuEdit->AppendSeparator();
