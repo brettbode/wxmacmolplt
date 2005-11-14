@@ -14,6 +14,8 @@
 #include "wx/wx.h"
 #include "wx/snglinst.h"
 
+#include "mpMainFrame.h"
+
 /*******************
  * This header file lacks documentation for the following reason:
  *   It is useless without the source in the associated .cpp file.  It doesn't
@@ -24,7 +26,8 @@
 class MpApp : public wxApp {
     private:
         wxSingleInstanceChecker *m_InstanceChecker;
-        // TODO: define main wxFrame pointer
+
+        MpMainFrame m_Frame;
 
     public:
         bool OnInit();
