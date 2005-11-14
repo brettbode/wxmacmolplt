@@ -23,6 +23,7 @@ MpMainFrame::MpMainFrame(const wxString &title,
     menuFile = new wxMenu;
     menuEdit = new wxMenu;
     menuView = new wxMenu;
+    menuMolecule = new wxMenu;
     menuWindow = new wxMenu;
     menuHelp = new wxMenu;
 
