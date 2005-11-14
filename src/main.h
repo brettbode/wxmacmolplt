@@ -27,7 +27,7 @@ class MpApp : public wxApp {
     private:
         wxSingleInstanceChecker *m_InstanceChecker;
 
-        MpMainFrame m_Frame;
+        MpMainFrame *m_Frame;
 
     public:
         bool OnInit();
