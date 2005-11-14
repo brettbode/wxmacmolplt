@@ -19,10 +19,13 @@ class MpMainFrame : public wxFrame {
         wxMenu    *menuFile;
         wxMenu    *menuEdit;
         wxMenu    *menuView;
-        wxMenu    *menuViewRotate;
+          wxMenu    *menuViewDisplay_frequency;
+          wxMenu    *menuViewRotate;
         wxMenu    *menuMolecule;
         wxMenu    *menuWindow;
         wxMenu    *menuHelp;
+
+        void createMenuBar();
 
         DECLARE_EVENT_TABLE()
 
@@ -38,33 +41,32 @@ class MpMainFrame : public wxFrame {
         // Below are the event handler functions for the menu.  The initial
         // list was taken from the original MacMolPlt menus.
 
-        //void menuFileNew(wxCommandEvent &event);
-        //void menuFileAppend_new_frame(wxCommandEvent &event);
+        void menuFileNew(wxCommandEvent &event);
         void menuFileOpen(wxCommandEvent &event);
-        //void menuFileAdd_frames_from_file(wxCommandEvent &event);
+        void menuFileSave(wxCommandEvent &event);
+        void menuFileSave_as(wxCommandEvent &event);
         void menuFileClose(wxCommandEvent &event);
+        //void menuFileAppend_new_frame(wxCommandEvent &event);
+        //void menuFileAdd_frames_from_file(wxCommandEvent &event);
         //void menuFileDelete_frame(wxCommandEvent &event);
-        //void menuFileSave(wxCommandEvent &event);
-        //void menuFileSave_as(wxCommandEvent &event);
         //void menuFileImport(wxCommandEvent &event);
         //void menuFileExport(wxCommandEvent &event);
-        //void menuFilePage_setup(wxCommandEvent &event);
-        //void menuFilePrint_preview(wxCommandEvent &event);
-        //void menuFilePrint(wxCommandEvent &event);
+        void menuFilePage_setup(wxCommandEvent &event);
+        void menuFilePrint_preview(wxCommandEvent &event);
+        void menuFilePrint(wxCommandEvent &event);
+        void menuFileQuit(wxCommandEvent &event);
         
-        //void menuEditUndo(wxCommandEvent &event);
-        //void menuEditCut(wxCommandEvent &event);
-        //void menuEditCopy(wxCommandEvent &event);
+        void menuEditUndo(wxCommandEvent &event);
+        void menuEditCut(wxCommandEvent &event);
+        void menuEditCopy(wxCommandEvent &event);
         //void menuEditCopy_coordinates(wxCommandEvent &event);
-        //void menuEditPaste(wxCommandEvent &event);
-        //void menuEditClear(wxCommandEvent &event);
-        //void menuEditSelect_all(wxCommandEvent &event);
+        void menuEditPaste(wxCommandEvent &event);
+        void menuEditClear(wxCommandEvent &event);
+        void menuEditSelect_all(wxCommandEvent &event);
         //void menuEditDefault_preferences(wxCommandEvent &event);
 
         //void menuViewShow_normal_mode(wxCommandEvent &event);
-        //     vv Should be a sub-menu vv
-        //void menuViewDisplay_frequency(wxCommandEvent &event);
-        //     ^^                      ^^
+          // void menuViewDisplay_frequencyDOSTUFF(wxCommandEvent &event);
         //void menuViewOffset_along_mode(wxCommandEvent &event);
         //void menuViewAnimate_mode(wxCommandEvent &event);
         //void menuViewAnimate_frames(wxCommandEvent &event);
@@ -107,6 +109,8 @@ class MpMainFrame : public wxFrame {
         //void menuWindowSurfaces(wxCommandEvent &event);
         //void menuWindowPreferences(wxCommandEvent &event);
         */
+
+        void menuHelpAbout(wxCommandEvent &event);
 };
 
 #endif /* #ifndef MP_MAIN_FRAME_H */
