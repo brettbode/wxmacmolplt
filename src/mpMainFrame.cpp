@@ -1,5 +1,8 @@
 #include "mpMainFrame.h"
 
+BEGIN_EVENT_TABLE(MpMainFrame, wxFrame)
+END_EVENT_TABLE()
+
 MpMainFrame::MpMainFrame(const wxString &title,
                          const wxPoint  &position,
                          const wxSize   &size,
