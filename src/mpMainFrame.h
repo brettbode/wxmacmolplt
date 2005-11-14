@@ -20,7 +20,7 @@ class MpMainFrame : public wxFrame {
                     const wxSize   &size     = wxDefaultSize,
                     long            style    = wxDEFAULT_FRAME_STYLE,
                     const wxString &name     = wxT("MpMainFrame"));
-}
+};
 
 #endif /* #ifndef MP_MAIN_FRAME_H */
 
