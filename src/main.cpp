@@ -37,7 +37,7 @@ int MpApp::OnExit() {
     return 0;
 }
 
-void MpApp::createMainFrame(wxString &file) {
+void MpApp::createMainFrame(const wxString &file) {
     // TODO:  Create and store new MpMainFrame
 }
 
