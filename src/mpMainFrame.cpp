@@ -46,7 +46,7 @@ MpMainFrame::~MpMainFrame() {
     // TODO:  Destroy any dialogs that are still in existence.
 }
 
-void MpMainFrame::createMenuBar() {
+void MpMainFrame::createMenuBar(void) {
     menuBar = new wxMenuBar;
 
     menuFile = new wxMenu;

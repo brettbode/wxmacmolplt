@@ -25,7 +25,7 @@ class MpMainFrame : public wxFrame {
         wxMenu    *menuWindow;
         wxMenu    *menuHelp;
 
-        void createMenuBar();
+        void createMenuBar(void);
 
         DECLARE_EVENT_TABLE()
 
