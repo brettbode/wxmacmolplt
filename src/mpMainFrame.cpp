@@ -66,10 +66,10 @@ void MpMainFrame::createMenuBar() {
     //menuFile->Append(, wxT("Append New Frame"));
     //menuFile->Append(, wxT("Add Frames from File ..."));
     //menuFile->Append(, wxT("Delete Frame"));
-    menuFile->AppendSeparator();
+    //menuFile->AppendSeparator();
     //menuFile->Append(, wxT("Import"));
     //menuFile->Append(, wxT("Export"));
-    menuFile->AppendSeparator();
+    //menuFile->AppendSeparator();
     menuFile->Append(wxID_PRINT_SETUP, wxT("Page Set&up ..."));
     menuFile->Append(wxID_PREVIEW, wxT("Print Pre&view\tCtrl+Shift+P"));
     menuFile->Append(wxID_PRINT, wxT("&Print ...\tCtrl+P"));
