@@ -1,6 +1,5 @@
 wxMolPlt is a wxWidgets rewrite of MacMolPlt by Brett Bode.
 
-Most files contained here are presently placeholders, or for development and
-testing purposes only.  Don't expect anything to work, even if it looks like
-it should.
+This is still under heavy development.  Don't expect anything to work, even if
+it looks like it should.
 
