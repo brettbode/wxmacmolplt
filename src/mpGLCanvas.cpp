@@ -24,7 +24,7 @@ void MpGLCanvas::initGL(void) {
 
 void MpGLCanvas::render(void) {
     // TODO:  Test for previous initialization of the GL context
-    if( /* init */ ) {
+    if( 1/* init */ ) {
         initGL();
         // Clear init flag
     }
@@ -69,7 +69,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
     EVT_SIZE             (MpGLCanvas::eventSize)
     EVT_PAINT            (MpGLCanvas::eventPaint)
-    EVT_ERASE_BACKGROUND (MpGLCavnas::eventErase)
+    EVT_ERASE_BACKGROUND (MpGLCanvas::eventErase)
     EVT_MOUSE_EVENTS     (MpGLCanvas::eventMouse)
 END_EVENT_TABLE()
 
