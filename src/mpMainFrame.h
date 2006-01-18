@@ -13,6 +13,8 @@
 
 #include "wx/wx.h"
 
+#include "mpGLCanvas.h"
+
 class MpMainFrame : public wxFrame {
     private:
         wxMenuBar *menuBar;
@@ -24,6 +26,8 @@ class MpMainFrame : public wxFrame {
         wxMenu    *menuMolecule;
         wxMenu    *menuWindow;
         wxMenu    *menuHelp;
+
+        MpGLCanvas *glCanvas;
 
         void createMenuBar(void);
 

@@ -39,6 +39,9 @@ MpMainFrame::MpMainFrame(const wxString &title,
     createMenuBar();
     SetMenuBar(menuBar);
 
+    // TODO:  Make room for other controls (Frame picker, etc.)
+    glCanvas = new MpGLCanvas(this);
+
     Show(true);
 }
 
