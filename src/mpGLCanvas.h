@@ -11,25 +11,42 @@
 #define MPGLCANVAS_H 1
 
 #include "wx/wx.h"
-
-#include "mpMolData.h"
+#include "wx/glcanvas.h"
 
 struct GLWorldData {
 };
 
-class MpGLCanvas {
+class MpGLCanvas : public wxGLCanvas {
     private:
-        MpMolData   *molData;
+        // TODO:  Define data pointer
+        // Type   *molData;
         GLWorldData  worldData;
 
         void initGL(void);
         void render(void);
 
-    public:
-        MpGLCanvas(void);
+        DECLARE_EVENT_TABLE()
 
+    public:
+        MpGLCanvas(wxWindow       *parent,
+                   wxWindowID      id       = wxID_ANY,
+                   const wxPoint  &position = wxDefaultPosition,
+                   const wxSize   &size     = wxDefaultSize,
+                   long            style    = wxSUNKEN_BORDER,
+                   const wxString &name     = wxT("DemoGLCanvas"));
+
+        // TODO:  Define function to reset data pointer
         // Call setMolData(NULL) before deleting the MpMolData object
-        void setMolData(const MpMolData *molData);
+        // void setMolData(const Type *newMolData);
+        
+        // TODO:  Make this function:
+        //wxImage *getImage(const int width, const int height);
+        
+        // Event Handlers
+        void eventSize(wxSizeEvent &event);
+        void eventPaint(wxPaintEvent &event);
+        void eventErase(wxEraseEvent &event);
+        void eventMouse(wxMouseEvent &event);
 };
 
 #endif

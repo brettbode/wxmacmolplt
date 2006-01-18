@@ -27,6 +27,7 @@ class MpApp : public wxApp {
     private:
         wxSingleInstanceChecker *m_InstanceChecker;
 
+        // TODO:  Maybe use STL Vectors or something...
         MpMainFrame *m_Frame;
 
     public:
