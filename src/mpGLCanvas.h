@@ -13,14 +13,15 @@
 #include "wx/wx.h"
 #include "wx/glcanvas.h"
 
+#include "MoleculeData.h"
+
 struct GLWorldData {
 };
 
 class MpGLCanvas : public wxGLCanvas {
     private:
-        // TODO:  Define data pointer
-        // Type   *molData;
-        GLWorldData  worldData;
+        MoleculeData *molData;
+        GLWorldData   worldData;
 
         void initGL(void);
         void render(void);
@@ -35,9 +36,8 @@ class MpGLCanvas : public wxGLCanvas {
                    long            style    = wxSUNKEN_BORDER,
                    const wxString &name     = wxT("DemoGLCanvas"));
 
-        // TODO:  Define function to reset data pointer
         // Call setMolData(NULL) before deleting the MpMolData object
-        // void setMolData(const Type *newMolData);
+        void setMolData(const MoleculeData *newMolData);
         
         // TODO:  Make this function:
         //wxImage *getImage(const int width, const int height);

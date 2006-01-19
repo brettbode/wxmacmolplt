@@ -15,7 +15,7 @@ MpGLCanvas::MpGLCanvas(wxWindow       *parent,
                        const wxString &name)
            :wxGLCanvas(parent, id, position, size,
                        style|wxFULL_REPAINT_ON_RESIZE, name) {
-    // molData = NULL;
+    molData = NULL;
 }
 
 void MpGLCanvas::initGL(void) {
@@ -26,10 +26,14 @@ void MpGLCanvas::render(void) {
     // TODO:  Test for previous initialization of the GL context
     if( 1/* init */ ) {
         initGL();
-        // Clear init flag
+        // TODO: Clear init flag
     }
 
     // Do your OpenGL stuff for rendering the scene here.
+}
+
+void setMolData(const MoleculeData *newMolData) {
+    molData = newMolData;
 }
 
 void MpGLCanvas::eventSize(wxSizeEvent &event) {
@@ -53,7 +57,12 @@ void MpGLCanvas::eventPaint(wxPaintEvent &event) {
     }
 
     SetCurrent();
-    render();
+    if(molData != NULL) {
+        render();
+    }
+    else {
+        // TODO:  Blank the context
+    }
     SwapBuffers();
 }
 
@@ -63,7 +72,7 @@ void MpGLCanvas::eventErase(wxEraseEvent &event) {
 }
 
 void MpGLCanvas::eventMouse(wxMouseEvent &event) {
-    // Do stuff for rotation, etc. here
+    // Do stuff for rotation, menus, etc. here
 }
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
