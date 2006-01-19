@@ -2,7 +2,7 @@
  * mpMainFrame.cpp
  *
  * Created:       11-02-2005  Steven Schulteis
- * Last Modified: 01-18-2006  Steven Schulteis
+ * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
 #include "mpMainFrame.h"
@@ -40,6 +40,7 @@ MpMainFrame::MpMainFrame(const wxString &title,
     SetMenuBar(menuBar);
 
     // TODO:  Make room for other controls (Frame picker, etc.)
+    molData = NULL;
     glCanvas = new MpGLCanvas(this);
 
     Show(true);
@@ -47,6 +48,11 @@ MpMainFrame::MpMainFrame(const wxString &title,
 
 MpMainFrame::~MpMainFrame() {
     // TODO:  Destroy any dialogs that are still in existence.
+
+    if(molData != NULL) {
+        glCanvas->setMolData(NULL);
+        delete molData;
+    }
 }
 
 void MpMainFrame::createMenuBar(void) {
@@ -123,6 +129,8 @@ void MpMainFrame::menuFileSave_as(wxCommandEvent &event) {
 }
 
 void MpMainFrame::menuFileClose(wxCommandEvent &event) {
+    // This should leave the current window open, but close the file
+    // associated with it, leaving an "empty" window.
 }
 
 void MpMainFrame::menuFilePage_setup(wxCommandEvent &event) {
@@ -135,6 +143,7 @@ void MpMainFrame::menuFilePrint(wxCommandEvent &event) {
 }
 
 void MpMainFrame::menuFileQuit(wxCommandEvent &event) {
+    // This should close the entire window.
 }
 
 /* Edit menu */

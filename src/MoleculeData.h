@@ -20,9 +20,7 @@
 #ifndef __MoleculeData__
 #define __MoleculeData__
 
-#ifndef __MyTypes__
 #include "MyTypes.h"
-#endif
 
 typedef class AtomTypeList AtomTypeList;
 

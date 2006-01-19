@@ -5,7 +5,7 @@
  * the document window(s).
  *
  * Created:       11-02-2005  Steven Schulteis
- * Last Modified: 01-18-2006  Steven Schulteis
+ * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
 #ifndef MP_MAIN_FRAME_H
@@ -14,6 +14,7 @@
 #include "wx/wx.h"
 
 #include "mpGLCanvas.h"
+#include "MoleculeData.h"
 
 class MpMainFrame : public wxFrame {
     private:
@@ -27,7 +28,8 @@ class MpMainFrame : public wxFrame {
         wxMenu    *menuWindow;
         wxMenu    *menuHelp;
 
-        MpGLCanvas *glCanvas;
+        MoleculeData *molData;
+        MpGLCanvas   *glCanvas;
 
         void createMenuBar(void);
 
