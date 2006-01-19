@@ -2,7 +2,7 @@
  * mpGLCanvas.cpp
  *
  * Created:       01-09-2006  Steven Schulteis
- * Last Modified: 01-11-2006  Steven Schulteis
+ * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
 #include "mpGLCanvas.h"

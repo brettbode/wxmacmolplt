@@ -4,7 +4,7 @@
  * Description goes here.
  *
  * Created:       01-09-2006  Steven Schulteis
- * Last Modified: 01-09-2006  Steven Schulteis
+ * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
 #ifndef MPGLCANVAS_H

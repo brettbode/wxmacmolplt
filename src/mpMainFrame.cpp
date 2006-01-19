@@ -2,7 +2,7 @@
  * mpMainFrame.cpp
  *
  * Created:       11-02-2005  Steven Schulteis
- * Last Modified: 11-14-2005  Steven Schulteis
+ * Last Modified: 01-18-2006  Steven Schulteis
  ***************************************/
 
 #include "mpMainFrame.h"

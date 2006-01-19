@@ -5,7 +5,7 @@
  * the document window(s).
  *
  * Created:       11-02-2005  Steven Schulteis
- * Last Modified: 11-14-2005  Steven Schulteis
+ * Last Modified: 01-18-2006  Steven Schulteis
  ***************************************/
 
 #ifndef MP_MAIN_FRAME_H
