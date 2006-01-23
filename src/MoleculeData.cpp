@@ -45,6 +45,7 @@ MoleculeData::MoleculeData(void) {
     DrawMode = 0;
     DrawLabels = 0;
 }
+
 MoleculeData::~MoleculeData(void) {
     while (Frames) {
         cFrame = Frames->GetNextFrame();
@@ -58,6 +59,7 @@ MoleculeData::~MoleculeData(void) {
     if (Basis) delete Basis;
     if (InputOptions) delete InputOptions;
 }
+
 Boolean MoleculeData::SetupFrameMemory(long NumAtoms, long NumBonds) {
     if (NumAtoms < cFrame->AtomAllocation) NumAtoms = cFrame->AtomAllocation;
     if (NumBonds < cFrame->BondAllocation) NumBonds = cFrame->BondAllocation;
@@ -112,6 +114,7 @@ Boolean MoleculeData::SetupFrameMemory(long NumAtoms, long NumBonds) {
     }
     return true;
 }
+
 /*Call to position a frame in the frame list according to the xcoord (time or IRC value)
   routine returns a new empty frame ptr in the frame list*/
 Frame * MoleculeData::LocateNewFrame(float XPosition)
@@ -158,6 +161,7 @@ Frame * MoleculeData::LocateNewFrame(float XPosition)
     NumFrames ++;
     return lNewFrame;
 } /*LocateNewFrame*/
+
 Frame * MoleculeData::AddFrame(long NumAtoms, long NumBonds) {
     Frame * temp = new Frame;
     if (!temp) throw MemoryError();
@@ -174,6 +178,7 @@ Frame * MoleculeData::AddFrame(long NumAtoms, long NumBonds) {
     CurrentFrame++;
     return temp;
 }
+
 void MoleculeData::DeleteFrame(void) {
     if (!cFrame->NextFrame && !cFrame->PreviousFrame) return;
     Frame * temp = cFrame;
@@ -191,6 +196,7 @@ void MoleculeData::DeleteFrame(void) {
     delete temp;
     NumFrames--;
 }
+
 void MoleculeData::GetRotationMatrix(Matrix4D copy) {
     CopyMatrix(TotalRotation, copy);
 }
@@ -239,6 +245,7 @@ void MoleculeData::CenterModelWindow(void) {
     TotalRotation[3][1] = -NewCenter.y;
     TotalRotation[3][2] = -NewCenter.z;
 }   /*CenterModelWindow*/
+
 void MoleculeData::ResetRotation(void) {
     if (cFrame->NumAtoms > MaxAtoms) {
         if (RotCoords != NULL) {
@@ -260,6 +267,7 @@ void MoleculeData::ResetRotation(void) {
         //Now sort the Z Buffer
     SortzBuffer(RotCoords, zBuffer, cFrame->NumAtoms);
 }
+
 // Stick the coordinates by moving the rotated coordinates to the file coordinates
 // being careful to invalidate any orbital info
 void MoleculeData::StickCoordinates(void) {
@@ -294,6 +302,7 @@ void MoleculeData::StickCoordinates(void) {
     }
     InitRotationMatrix(TotalRotation);
 }
+
 void MoleculeData::NewAtom(void) {
     if (cFrame->NumAtoms>=cFrame->AtomAllocation) {
         Atom * temp = new Atom[cFrame->NumAtoms+10];
@@ -329,12 +338,14 @@ void MoleculeData::NewAtom(void) {
     }
     ResetRotation();
 }
+
 void MoleculeData::SetDescription(char * NewLabel) {
     if (Description) delete [] Description;
     long LineLength = strlen(NewLabel);
     Description = new char[LineLength+1];
     if (Description) strcpy(Description, NewLabel);
 }
+
 void MoleculeData::InvertMode(void) {
     if (!cFrame->Vibs) return;
     
@@ -343,6 +354,7 @@ void MoleculeData::InvertMode(void) {
         Freq[iatm] *= -1.0;
     }
 }   /*InvertMode*/
+
 void MoleculeData::UnitConversion(Boolean AtoB) {
     float       factor;
 //Choose the correct factor
@@ -364,6 +376,7 @@ void MoleculeData::UnitConversion(Boolean AtoB) {
     MaxSize *= factor;
     WindowSize *= factor;
 } /*UnitConversion*/
+
 //Rotate the molecule by 180 degrees about either the horizontal or vertical axis
 //Pass in 0 to flip about the horizontal axis, 1 for vertical
 void MoleculeData::FlipRotation(short theItem) {
@@ -410,6 +423,7 @@ void MoleculeData::FlipRotation(short theItem) {
     TotalRotation[3][1] = FinalTrans.y;
     TotalRotation[3][2] = FinalTrans.z;
 }   /*FlipRotation*/
+
 // Sets the plane of the screen to that defined by the three points provided
 Boolean MoleculeData::SetScreenPlane(CPoint3D *Points) {
     CPoint3D    Vector1, Vector2, Vector3;
@@ -463,6 +477,7 @@ Boolean MoleculeData::SetScreenPlane(CPoint3D *Points) {
     ResetRotation();
     return true;
 }
+
 //Linear Least Squares fit:  minimize the sum of squares of the differences between each
 //frame. This will "fix" a series of frames to give a nice, smooth animation.
 void MoleculeData::LinearLeastSquaresFit(Progress * lProgress) {
@@ -612,11 +627,13 @@ FrameIncorrect:     //Incorrect frame list for this routine: throw up an error a
     GetIndString(errmsg, kerrstrings, 33);
     MessageAlert(errmsg);
 }   /*LinearLeastSquaresFit*/
+
 Boolean MoleculeData::OrbSurfacePossible(void) {
     Boolean result = false;
     if (Basis) result = true;
     return result;
 }
+
 Boolean MoleculeData::TotalDensityPossible(void) {
     Boolean result = false;
     if (Basis) {
@@ -633,6 +650,7 @@ Boolean MoleculeData::TotalDensityPossible(void) {
     }
     return result;
 }
+
 //Read in a general basis set from a GAMESS log file
 void MoleculeData::ParseGAMESSBasisSet(BufferFile * Buffer) {
 
@@ -647,6 +665,7 @@ void MoleculeData::ParseGAMESSBasisSet(BufferFile * Buffer) {
         }
     }
 }   /*ParseGAMESSBasisSet*/
+
 void MoleculeData::GetModelCenter(CPoint3D * center) {
         CPoint3D    temp;
     temp.x = -TotalRotation[3][0];
@@ -654,6 +673,7 @@ void MoleculeData::GetModelCenter(CPoint3D * center) {
     temp.z = -TotalRotation[3][2];
     BackRotate3DOffset(TotalRotation, &temp, center);
 }
+
 void MoleculeData::SetModelCenter(CPoint3D * center) {
         CPoint3D    temp;
     Rotate3DOffset(TotalRotation, *center, &temp);
@@ -661,15 +681,18 @@ void MoleculeData::SetModelCenter(CPoint3D * center) {
     TotalRotation[3][1] = -temp.y;
     TotalRotation[3][2] = -temp.z;
 }
+
 void MoleculeData::GetModelRotation(float * Psi, float * Phi, float * Theta) {
     MatrixToEulerAngles(TotalRotation, Psi, Phi, Theta);
 }
+
 void MoleculeData::SetModelRotation(float Psi, float Phi, float Theta) {
     CPoint3D    Center;
     GetModelCenter(&Center);    //Retrieve off the old center
     EulerAnglesToMatrix(TotalRotation, Psi, Phi, Theta);
     SetModelCenter(&Center);
 }
+
 void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
     Frame * NewFrame, * NewFrame2;
     
@@ -705,6 +728,7 @@ void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
     }
     delete [] offset;
 } /*CreateLLM*/
+
 
 //CreateInternalLLM creates a linear least motion path based on the internal
 //coordinates of the two frames. In general this will result is a lower energy
@@ -803,6 +827,7 @@ void MoleculeData::CreateInternalLLM(long NumPts, WinPrefs * Prefs) {
 void MoleculeData::AdvanceFrame(void) {
     if (cFrame->NextFrame) cFrame = cFrame->NextFrame;
 }
+
 void MoleculeData::SetCurrentFrame(long FrameNum) {
     if ((FrameNum>NumFrames)||(FrameNum<1)) return;
     if (FrameNum < CurrentFrame) {
@@ -814,21 +839,27 @@ void MoleculeData::SetCurrentFrame(long FrameNum) {
         CurrentFrame++;
     }
 }
+
 Boolean MoleculeData::SurfaceExportPossible(void) {
     return cFrame->SurfaceExportPossible();
 }
+
 Boolean MoleculeData::ModeVisible(void) {
     return ((cFrame->Vibs)&&GetDrawMode());
 }
+
 long MoleculeData::GetNumBonds(void) {
     return cFrame->GetNumBonds();
 }
+
 void MoleculeData::DeleteAtom(long AtomNum) {
     cFrame->DeleteAtom(AtomNum);
     ResetRotation();
 }
+
 Boolean MoleculeData::ValidAtom(long AtomNum) {
     return ((AtomNum>=0)&&(AtomNum<cFrame->NumAtoms));
 }
+
 AtomTypeList * MoleculeData::GetAtomTypes(void) {return cFrame->GetAtomTypes();}
 
