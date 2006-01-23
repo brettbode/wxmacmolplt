@@ -53,7 +53,11 @@ class MoleculeData {
                                                 bit 4 for plotting KE rather than Total E
                                                 bit 5 for plotting PE */
         char        DrawLabels;             // Flag for label drawing (both #'s and atomic labels) bit3 deactivates labeling H atoms
+
     public:
+        // Commented out inline kewords until the original intention behind
+        // their use is determined.  It should be implied in all of these cases
+        // anyway.
         MoleculeData();
         ~MoleculeData(void);
         long UnPackOldData(BufferFile *Buffer);
@@ -67,8 +71,8 @@ class MoleculeData {
         long ReadMORec48(BufferFile *Buffer, const long & NumBasisFuncs, const long & ByteCount);
         void ReadBasisOptions(BufferFile * Buffer);
         void ReadControlOptions(BufferFile * Buffer);
-        inline float GetMoleculeSize(void) {return WindowSize;};
-        inline void SetMoleculeSize(float newVal) {if (newVal > 0.0) WindowSize = newVal;};
+        /* inline */ float GetMoleculeSize(void) {return WindowSize;};
+        /* inline */ void SetMoleculeSize(float newVal) {if (newVal > 0.0) WindowSize = newVal;};
         void GetModelCenter(CPoint3D * center);
         void SetModelCenter(CPoint3D * center);
         void GetModelRotation(float * Psi, float * Phi, float * Theta);
@@ -77,16 +81,16 @@ class MoleculeData {
         void SetCurrentFrame(long FrameNum);
         long PackData(short Amount, BufferFile * Buffer);
         long UnPackData(BufferFile * Buffer);
-        inline Boolean GetFrameMode(void) {return (DrawMode & (1<<3));};
+        /* inline */ Boolean GetFrameMode(void) {return (DrawMode & (1<<3));};
         AtomTypeList * GetAtomTypes(void);
         Boolean SurfaceExportPossible(void);
-        inline long GetCurrentFrame(void) {return CurrentFrame;};
-        inline Frame* GetCurrentFramePtr(void) {return cFrame;};
-        inline Frame * GetFirstFrame(void) {return Frames;};
+        /* inline */ long GetCurrentFrame(void) {return CurrentFrame;};
+        /* inline */ Frame* GetCurrentFramePtr(void) {return cFrame;};
+        /* inline */ Frame * GetFirstFrame(void) {return Frames;};
         void ParseGAMESSBasisSet(BufferFile * Buffer);
         long ParseECPotentials(BufferFile * Buffer);
-        inline BasisSet * GetBasisSet(void) {return Basis;};
-        inline long GetNumFrames(void) {return NumFrames;};
+        /* inline */ BasisSet * GetBasisSet(void) {return Basis;};
+        /* inline */ long GetNumFrames(void) {return NumFrames;};
         Boolean OrbSurfacePossible(void);
         Boolean TotalDensityPossible(void);
         void ResetRotation(void);
@@ -102,20 +106,20 @@ class MoleculeData {
         void DeleteFrame(void);
         Boolean SetupFrameMemory(long NumAtoms, long NumBonds);
         Frame * LocateNewFrame(float XPosition);
-        inline Boolean DrawAtomLabels(void) {return (DrawLabels & 1);};
-        inline Boolean DrawHLabels(void) {return ((DrawLabels & 4) == 0);};
-        inline void SetHLabelMode(Boolean State) {DrawLabels = (DrawLabels & 0xFB) + (State ? 0: 4);};
-        inline void SetAtomLabelDrawMode(Boolean State) {if (DrawLabels&1) DrawLabels--; if (State) DrawLabels++;};
-        inline Boolean DrawAtomNumbers(void) {return ((DrawLabels & 2)!=0);};
-        inline void SetAtomNumbersDrawMode(Boolean State) {if (DrawLabels&2) DrawLabels-=2; if (State) DrawLabels+=2;};
+        /* inline */ Boolean DrawAtomLabels(void) {return (DrawLabels & 1);};
+        /* inline */ Boolean DrawHLabels(void) {return ((DrawLabels & 4) == 0);};
+        /* inline */ void SetHLabelMode(Boolean State) {DrawLabels = (DrawLabels & 0xFB) + (State ? 0: 4);};
+        /* inline */ void SetAtomLabelDrawMode(Boolean State) {if (DrawLabels&1) DrawLabels--; if (State) DrawLabels++;};
+        /* inline */ Boolean DrawAtomNumbers(void) {return ((DrawLabels & 2)!=0);};
+        /* inline */ void SetAtomNumbersDrawMode(Boolean State) {if (DrawLabels&2) DrawLabels-=2; if (State) DrawLabels+=2;};
         Boolean ModeVisible(void);
         void SetDescription(char * NewLabel);
-        inline Boolean SetSpecialAtomDrawMode(Boolean State) {if (DrawMode&2) DrawMode-=2; if (State) DrawMode+=2; return State;};
-        inline Boolean GetSpecialAtomDrawMode(void) {return ((DrawMode & 2)!=0);};
-        inline Boolean SetDrawMode(Boolean State) {if (DrawMode&1) DrawMode--; if (State) DrawMode++; return State;};
-        inline Boolean GetDrawMode(void) {return (DrawMode & 1);};
-        inline Boolean ShowAxis(void) {return ((DrawMode & 0x40) != 0);};
-        inline void SetShowAxis(Boolean newState) {DrawMode = (DrawMode & 0xBF) + (newState ? 0x40 : 0);};
+        /* inline */ Boolean SetSpecialAtomDrawMode(Boolean State) {if (DrawMode&2) DrawMode-=2; if (State) DrawMode+=2; return State;};
+        /* inline */ Boolean GetSpecialAtomDrawMode(void) {return ((DrawMode & 2)!=0);};
+        /* inline */ Boolean SetDrawMode(Boolean State) {if (DrawMode&1) DrawMode--; if (State) DrawMode++; return State;};
+        /* inline */ Boolean GetDrawMode(void) {return (DrawMode & 1);};
+        /* inline */ Boolean ShowAxis(void) {return ((DrawMode & 0x40) != 0);};
+        /* inline */ void SetShowAxis(Boolean newState) {DrawMode = (DrawMode & 0xBF) + (newState ? 0x40 : 0);};
         long GetNumBonds(void);
         long GetNumElectrons(void);
         short GetMultiplicity(void);
@@ -124,7 +128,7 @@ class MoleculeData {
         InputData * SetInputData(InputData * NewData);
         void NewAtom(void);
         void StickCoordinates(void);
-        inline Internals * GetInternalCoordinates(void) {return IntCoords;};
+        /* inline */ Internals * GetInternalCoordinates(void) {return IntCoords;};
         void DeleteAtom(long AtomNum);
         Boolean ValidAtom(long AtomNum);
         void GetRotationMatrix(Matrix4D copy);
