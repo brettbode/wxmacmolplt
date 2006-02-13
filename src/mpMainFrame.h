@@ -16,6 +16,11 @@
 #include "mpGLCanvas.h"
 #include "MoleculeData.h"
 
+/**
+ * Subclasses wxFrame to define the main application window.  This is a
+ * document window.  There can be multiple instances of the window in the
+ * application, and each main window owns its dialogs.
+ */
 class MpMainFrame : public wxFrame {
     private:
         wxMenuBar *menuBar;
@@ -36,12 +41,23 @@ class MpMainFrame : public wxFrame {
         DECLARE_EVENT_TABLE()
 
     public:
+        /* Constructor that provides some useful default values.
+         * @param title The text that will be displayed in the new window's title bar.
+         * @param position The initial position of the new window.
+         * @param size The initial size of the new window.
+         * @param style The style of the new window.  See wxFrame class docs.
+         * @param name The name of the new window.
+         */
         MpMainFrame(const wxString &title,
                     const wxPoint  &position = wxDefaultPosition,
                     const wxSize   &size     = wxDefaultSize,
                     long            style    = wxDEFAULT_FRAME_STYLE,
                     const wxString &name     = wxT("MpMainFrame"));
 
+        /**
+         * Destructor, mostly for cleaning up data that we've allocated
+         * independently of wxWidgets.
+         */
         ~MpMainFrame();
 
         // Below are the event handler functions for the menu.  The initial

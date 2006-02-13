@@ -38,6 +38,11 @@ void setMolData(const MoleculeData *newMolData) {
     molData = newMolData;
 }
 
+wxImage *getImage(const int width, const int height) {
+    // TODO:  Make this function do what it is supposed to.
+    return NULL;
+}
+
 void MpGLCanvas::eventSize(wxSizeEvent &event) {
     int width, height;
 

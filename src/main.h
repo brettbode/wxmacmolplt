@@ -15,13 +15,9 @@
 
 #include "mpMainFrame.h"
 
-/*******************
- * This header file lacks documentation for the following reason:
- *   It is useless without the source in the associated .cpp file.  It doesn't
- *   define or do anything that would be useful outside of the context of
- *   the program that it is part of.  Look at the .cpp file if you want
- *   to know what's happening here.
-*******************/
+/**
+ * Subclasses wxApp to define an application's data and operations.
+ */
 class MpApp : public wxApp {
     private:
         wxSingleInstanceChecker *m_InstanceChecker;
@@ -34,13 +30,16 @@ class MpApp : public wxApp {
          * Overloads OnInit defined in the wxApp class.  This is where program
          * execution begins (as far as we're concerned).
          *
-         * @return true for success, false for error/failure.
+         * @return true for success/continue, false for failure/exit.
          */
         bool OnInit();
 
         /**
          * Overloads OnExit defined in the wxApp class.  This function is
-         * called just before the program exits.
+         * called just before the program exits.  From the wxWidgets
+         * documentation:  OnExit is called after destroying all application
+         * windows and controls, but before wxWidgets cleanup. Note that it is
+         * not called at all if OnInit failed.
          *
          * @return Ignored.  Perhaps wxWidgets will eventually define a purpose
          *         for it.
@@ -55,7 +54,7 @@ class MpApp : public wxApp {
         void createMainFrame(const wxString &file = wxT(""));
 
         /**
-         * Destroys a document window and removes it from storage.
+         * Removes a document window from storage and destroys it. 
          *
          * @param frame A pointer to the frame to be destroyed.
          */
