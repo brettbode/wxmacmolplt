@@ -1,3 +1,8 @@
+/*
+ * (c) 2005 Iowa State University
+ *     see the LICENSE file in the top level directory
+ */
+
 /***************************************
  * main.h
  *
