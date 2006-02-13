@@ -7,6 +7,8 @@
 
 #include "mpGLCanvas.h"
 
+#include "wx/glcanvas.h"
+
 MpGLCanvas::MpGLCanvas(wxWindow       *parent,
                        wxWindowID      id,
                        const wxPoint  &position,

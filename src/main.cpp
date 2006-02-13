@@ -7,6 +7,8 @@
 
 #include "main.h"
 
+#include "wx/snglinst.h"
+
 bool MpApp::OnInit() {
     // TODO:  Handle command line arguments.  See wxApp documentation
     // TODO:  Start logging stuff.
