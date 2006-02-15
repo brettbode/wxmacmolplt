@@ -64,7 +64,7 @@ class MpGLCanvas : public wxGLCanvas {
          * data structure.
          * @param newMolData A pointer to the molecule data that the canvas should use.
          */
-        void setMolData(const MoleculeData *newMolData);
+        void setMolData(MoleculeData *newMolData);
         
         /**
          * Creates an image of the canvas for purposes such as printing or
