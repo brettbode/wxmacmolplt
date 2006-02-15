@@ -15,6 +15,8 @@
 #define __BFILE__
 #include <stdio.h>
 
+typedef bool Boolean;
+
 #define	kBufferSize		65536		//default file buffer size
 #define kMaxLineLength	180			//arbitrary Max line length (should handle 132 col lines)
  
