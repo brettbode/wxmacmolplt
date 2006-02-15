@@ -321,7 +321,8 @@ class Surface {
 		inline void SetVisibility(bool state) {Visible = (state!=0);};
 		inline long GetSurfaceID(void) const {return ID;};
 		inline long SetSurfaceID(long NewID) {ID = NewID; return ID;};
-		inline long SetSurfaceID(void) {ID = TickCount(); return ID;};
+		inline long SetSurfaceID(void) {/*ID = TickCount(); return ID;*/
+                                        static long ID = 0; return ++ID;};
 		virtual void RotateEvent(MoleculeData * MainData);
 		virtual long GetSize(BufferFile * Buffer);
 		virtual long Write(BufferFile * Buffer)=0;
