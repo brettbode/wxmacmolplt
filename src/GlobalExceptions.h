@@ -36,7 +36,8 @@ class FileError {
 	public:
 		OSErr	Error;
 		FileError(void) {
-			Error = noErr;
+            // TODO:  Make this more than a no-op
+			//Error = noErr;
 		};
 		FileError(OSErr	err) {
 			Error = err;
