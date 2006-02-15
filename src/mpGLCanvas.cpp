@@ -37,7 +37,7 @@ void MpGLCanvas::render(void) {
     // Do your OpenGL stuff for rendering the scene here.
 }
 
-void setMolData(const MoleculeData *newMolData) {
+void MpGLCanvas::setMolData(const MoleculeData *newMolData) {
     molData = newMolData;
 }
 

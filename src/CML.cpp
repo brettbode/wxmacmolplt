@@ -1156,7 +1156,7 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
     return true;
 }
 void Frame::ParseAtomArray(XMLElement * arrayXML, std::vector<char *> & idList) {
-    //The atom information can be in the form of Atom subelements or (gross) string attributes.
+    //The atom information can be in the form of mpAtom subelements or (gross) string attributes.
     const char * etype = NULL, *xcoord = NULL, *ycoord = NULL, *zcoord=NULL, *idresult=NULL;
     //Parse the subelements
     XMLElementList * children = arrayXML->getChildren();
@@ -2436,11 +2436,11 @@ const char * CML_convert(MMP_MetadataNamespace t)
         case MMP_ShowAxis:
             return "Show Axis";
         case MMP_ShowAtomLabels:
-            return "Show Atom Labels";
+            return "Show mpAtom Labels";
         case MMP_LabelHAtoms:
             return "Label Hydrogen Atoms";
         case MMP_ShowAtomNumbers:
-            return "Show Atom Numbers";
+            return "Show mpAtom Numbers";
         case MMP_InternalCoordinates:
             return "InternalCoordinates";
         case MMP_BasisSet:

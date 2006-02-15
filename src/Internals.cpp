@@ -286,7 +286,7 @@ void MOPacInternals::InternalsToCartesians(MoleculeData * MainData, WinPrefs * P
 	double DegToRad = acos(-1.0)/180.0;
 
 	if (lFrame->NumAtoms>1) {
-		Atom * tempAtoms = new Atom[lFrame->NumAtoms];
+	 mpAtom * tempAtoms = new Atom[lFrame->NumAtoms];
 		if (tempAtoms) {
 				long i;
 			for (i=0; i<lFrame->NumAtoms; i++) tempAtoms[i].Type = lFrame->Atoms[i].Type;

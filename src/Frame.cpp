@@ -191,7 +191,7 @@ void Frame::SetPreviousFrame(Frame * previous) { PreviousFrame = previous; }
 Frame * Frame::GetNextFrame(void) { return NextFrame; }
 Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
 Atom * Frame::AddAtom(long AtomType, CPoint3D AtomPosition) {
-		Atom * result = NULL;
+	 mpAtom * result = NULL;
 	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(10);
 	if (NumAtoms<AtomAllocation) {
 		Atoms[NumAtoms].Type = AtomType;
@@ -204,7 +204,7 @@ Atom * Frame::AddAtom(long AtomType, CPoint3D AtomPosition) {
 }
 bool Frame::IncreaseAtomAllocation(long NumAdditional) {
 	if (AtomAllocation+NumAdditional < NumAtoms) return false;
-	Atom * temp = new Atom[AtomAllocation+NumAdditional];
+ mpAtom * temp = new Atom[AtomAllocation+NumAdditional];
 	if (temp) {
 		if (Atoms != NULL) {
 			BlockMoveData(Atoms, temp, NumAtoms*sizeof(Atom));

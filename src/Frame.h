@@ -49,7 +49,7 @@ class Frame {
 		double		MP2Energy;
 		float		time;
 		long		IRCPt;
-		Atom *		Atoms;
+	 mpAtom *		Atoms;
 		Bond *		Bonds;
 		long		NumAtoms;
 		long		AtomAllocation;
@@ -88,7 +88,7 @@ class Frame {
 		void ChangeBond(long TheBond, short WhichPart, long TheAtom);
 		long GetBondAtom(long WhichBond, short ThePart);
 		short GetAtomType(long theAtom);
-		Atom * AddAtom(long AtomType, CPoint3D AtomPosition);
+	 mpAtom * AddAtom(long AtomType, CPoint3D AtomPosition);
 		bool IncreaseAtomAllocation(long NumAdditional);
 			//BondExists returns the id of the bond, -1 otherwise
 		long BondExists(long atom1, long atom2);

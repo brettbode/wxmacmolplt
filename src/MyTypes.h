@@ -56,7 +56,7 @@ enum TypeOfPointGroup {
 	O, Oh
 };
 
-class Atom {
+class mpAtom {
 	public:
 		CPoint3D	Position;
 		short		Type;	//Low byte stores normal atom type, high byte store special bits
@@ -349,8 +349,8 @@ class Surface {
 
 void ApplyRotation(Matrix4D RotMat, long Axis, float AngleDegrees);
 void CalculateCenterOfMass(Atom * AtomList, long NumAtoms, float * AtomMasses, CPoint3D * Center);
-void MinimizeDifferences(Atom * FixedAtoms, Atom * targetAtoms, long NumAtoms,
+void MinimizeDifferences(Atom * FixedAtoms, mpAtom * targetAtoms, long NumAtoms,
 		WinPrefs * Prefs, long NumOptAtoms);
-float CalculateSquaresValue(long NumOptAtoms, Atom CoordSetA[], CPoint3D CoordSet[]);
+float CalculateSquaresValue(long NumOptAtoms, mpAtom CoordSetA[], CPoint3D CoordSet[]);
 
 #endif

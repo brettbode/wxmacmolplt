@@ -882,7 +882,7 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms) {
 		nTotFuncs += Basis->Shells[ishell].GetNumFuncs(false);
 		Basis->NumShells++;
 		if (iscanerr<3) {//Found next atom label so tidy up the current atom
-			Buffer->SkipnLines(2);	//Skip Atom label and blank line
+			Buffer->SkipnLines(2);	//Skip mpAtom label and blank line
 			long nGotShells = ishell-ShellStart+1;
 			long nMappedAtoms = (fShell-fShellStart-nGotShells)/nGotShells + 1;
 			Basis->NumFuncs += nMappedAtoms*nTotFuncs;

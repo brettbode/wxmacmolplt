@@ -59,7 +59,7 @@ bool MoleculeData::SetupFrameMemory(long NumAtoms, long NumBonds) {
 	if (NumBonds < cFrame->BondAllocation) NumBonds = cFrame->BondAllocation;
 	if ((NumAtoms == cFrame->AtomAllocation)&&
 		(NumBonds == cFrame->BondAllocation)) return true;//no need to resize
-	Atom * tempAtoms=NULL;
+ mpAtom * tempAtoms=NULL;
 	Bond * tempBonds=NULL;
 	try {
 		tempAtoms = new Atom[NumAtoms];
@@ -292,7 +292,7 @@ void MoleculeData::StickCoordinates(void) {
 }
 void MoleculeData::NewAtom(void) {
 	if (cFrame->NumAtoms>=cFrame->AtomAllocation) {
-		Atom * temp = new Atom[cFrame->NumAtoms+10];
+	 mpAtom * temp = new Atom[cFrame->NumAtoms+10];
 		if (temp) {
 			BlockMoveData(cFrame->Atoms, temp, cFrame->NumAtoms*sizeof(Atom));
 			if (cFrame->Atoms) delete [] cFrame->Atoms;
