@@ -1,0 +1,3521 @@
+/*
+ *  (c) 2004 Iowa State University
+ *      see the LICENSE file in the top level directory
+ */
+
+/*	еееееееееееееееееееееееееееееееееееееееее
+	InputData.cpp
+
+	Class member functions related to InputData
+	Brett Bode - February 1996
+	Changed InputeFileData uses to BufferFile calls 8-97
+*/
+#define		kBasisSetStrings	303
+#define		kMaxBasisSets		16
+#define		kPGroupStrings		305
+#define		kMaxPGroups			15
+#define		kECPPotStrings		309
+#define		kMaxECPPotStrings	4
+#define		kDFTGridFunctionalStrings		311
+#define		kDFTGridFunctionalMaxStrings	21
+#define		kDFTGridFreeFunctionalStrings		312
+#define		kDFTGridFreeFunctionalMaxStrings	21
+
+#include "Globals.h"
+#include "InputData.h"
+#include "MoleculeData.h"
+#include "Frame.h"
+#include "myFiles.h"
+#include "GlobalExceptions.h"
+#include "BasisSet.h"
+#include "Internals.h"
+#include "Prefs.h"
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+#include "XML.hpp"
+#include "CML.h"
+
+#pragma segment IData
+	//InputData functions
+InputData::InputData(void) {
+	//Always create Control, System, Basis, and Data groups
+	Control = new ControlGroup;
+	System = new SystemGroup;
+	Basis = new BasisGroup;
+	Data = new DataGroup;
+	StatPt = new StatPtGroup;
+	Guess = new GuessGroup;
+	SCF = NULL;
+	MP2 = NULL;
+	Hessian = NULL;
+	DFT = NULL;
+}
+InputData::InputData(InputData *Copy) {
+	//Always create Control, System, Basis, and Data groups
+	Control = new ControlGroup(Copy->Control);	//Create the new group and copy over the data
+	System = new SystemGroup(Copy->System);
+	Basis = new BasisGroup(Copy->Basis);
+	Data = new DataGroup(Copy->Data);
+	StatPt = new StatPtGroup(Copy->StatPt);
+	if (Copy->Guess) Guess = new GuessGroup(Copy->Guess);
+	else Guess = NULL;
+	if (Copy->SCF) SCF = new SCFGroup(Copy->SCF);
+	else SCF = NULL;
+	if (Copy->MP2) MP2 = new MP2Group(Copy->MP2);
+	else MP2 = NULL;
+	if (Copy->Hessian) Hessian = new HessianGroup(Copy->Hessian);
+	else Hessian = NULL;
+	DFT = NULL;
+	if (Copy->DFT) DFT = new DFTGroup(Copy->DFT);
+}
+InputData::~InputData(void) {	//destructor
+	if (Control) delete Control;	//simply delete all groups present
+	if (System) delete System;
+	if (Basis) delete Basis;
+	if (Data) delete Data;
+	if (Guess) delete Guess;
+	if (SCF) delete SCF;
+	if (MP2) delete MP2;
+	if (Hessian) delete Hessian;
+	if (StatPt) delete StatPt;
+	if (DFT) delete DFT;
+}
+long InputData::GetSize(BufferFile *Buffer) {
+	Boolean	cState = Buffer->GetOutput();
+	Buffer->SetOutput(false);
+	long size = WriteToBuffer(Buffer);
+	Buffer->SetOutput(cState);
+	return size;
+}
+long InputData::WriteToBuffer(BufferFile *Buffer) {
+	long Pos, length=sizeof(InputData);
+
+	Pos = Buffer->Write((Ptr) &length, sizeof(long));
+	Pos += Buffer->Write((Ptr) this, length);
+
+	if (Control) {
+		length = 1;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = Control->GetSize(Buffer);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += Control->WriteToBuffer(Buffer);
+	}
+	if (System) {
+		length = 2;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = System->GetSize(Buffer);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += System->WriteToBuffer(Buffer);
+	}
+	if (Basis) {
+		length = 3;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = Basis->GetSize(Buffer);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += Basis->WriteToBuffer(Buffer);
+	}
+	if (Data) {
+		length = 4;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = Data->GetSize(Buffer);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += Data->WriteToBuffer(Buffer);
+	}
+	if (Guess) {
+		length = 5;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = Guess->GetSize(Buffer);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += Guess->WriteToBuffer(Buffer);
+	}
+	if (SCF) {
+		length = 6;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = SCF->GetSize(Buffer);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += SCF->WriteToBuffer(Buffer);
+	}
+	if (MP2) {
+		length = 7;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = MP2->GetSize(Buffer);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += MP2->WriteToBuffer(Buffer);
+	}
+	if (Hessian) {
+		length = 8;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = Hessian->GetSize(Buffer);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += Hessian->WriteToBuffer(Buffer);
+	}
+	if (StatPt) {
+		length = 9;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = StatPt->GetSize(Buffer);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += StatPt->WriteToBuffer(Buffer);
+	}
+	if (DFT) {
+		length = 10;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = DFT->GetSize(Buffer);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += DFT->WriteToBuffer(Buffer);
+	}
+		
+	return Pos;
+}
+void InputData::WriteXML(XMLElement * parent) const {
+	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_InputOptionsElement));
+	
+	if (Control) {
+		Control->WriteXML(Ele);
+	}
+	if (System) {
+		System->WriteXML(Ele);
+	}
+	if (Basis) {
+		Basis->WriteXML(Ele);
+	}
+	if (Data) {
+		Data->WriteXML(Ele);
+	}
+	if (Guess) {
+		Guess->WriteXML(Ele);
+	}
+	if (SCF) {
+		SCF->WriteXML(Ele);
+	}
+	if (MP2) {
+		MP2->WriteXML(Ele);
+	}
+	if (Hessian) {
+		Hessian->WriteXML(Ele);
+	}
+	if (StatPt) {
+		StatPt->WriteXML(Ele);
+	}
+	if (DFT) {
+		DFT->WriteXML(Ele);
+	}
+}
+void InputData::ReadXML(XMLElement * parent) {
+	XMLElementList * ipxml = parent->getChildren();
+	if (ipxml) {
+		if (ipxml->length() > 0) {
+			XMLElement * ipx = ipxml->item(0);
+			if (ipx) {
+				if (!strcmp(ipx->getName(),CML_convert(MMP_InputOptionsElement))) {
+					XMLElementList * children = ipx->getChildren();
+					if (children) {
+						for (int i=0; i<children->length(); i++) {
+							XMLElement * child = children->item(i);
+							MMP_InputOptionsNS IOchild;
+							if (CML_convert(child->getName(), IOchild)) {
+								switch (IOchild) {
+									case MMP_IOControlGroupElement:
+										if (Control == NULL) Control = new ControlGroup;
+										if (Control) Control->ReadXML(child);
+										break;
+									case MMP_IOSystemGroupElement:
+										if (System == NULL) System = new SystemGroup;
+										if (System) System->ReadXML(child);
+										break;
+									case MMP_IOBasisGroupElement:
+										if (Basis == NULL) Basis = new BasisGroup;
+										if (Basis) Basis->ReadXML(child);
+										break;
+									case MMP_IODataGroupElement:
+										if (Data == NULL) Data = new DataGroup;
+										if (Data) Data->ReadXML(child);
+										break;
+									case MMP_IOGuessGroupElement:
+										if (Guess == NULL) Guess = new GuessGroup;
+										if (Guess) Guess->ReadXML(child);
+										break;
+									case MMP_IOSCFGroupElement:
+										if (SCF == NULL) SCF = new SCFGroup;
+										if (SCF) SCF->ReadXML(child);
+										break;
+									case MMP_IOMP2GroupElement:
+										if (MP2 == NULL) MP2 = new MP2Group;
+										if (MP2) MP2->ReadXML(child);
+										break;
+									case MMP_IOHessianGroupElement:
+										if (Hessian == NULL) Hessian = new HessianGroup;
+										if (Hessian) Hessian->ReadXML(child);
+										break;
+									case MMP_IOStatPtGroupElement:
+										if (StatPt == NULL) StatPt = new StatPtGroup;
+										if (StatPt) StatPt->ReadXML(child);
+										break;
+									case MMP_IODFTGroupElement:
+										if (DFT == NULL) DFT = new DFTGroup;
+										if (DFT) DFT->ReadXML(child);
+										break;
+								}
+							}
+						}
+						delete children;
+					}
+				}
+			}
+		}
+		delete ipxml;
+	}
+}
+
+void InputData::ReadFromBuffer(BufferFile *Buffer, long length) {
+	long lPos, code, objectLength;
+
+	lPos = Buffer->Read((Ptr) &objectLength, sizeof(long));
+	lPos += Buffer->BufferSkip(objectLength);
+		
+	while (lPos<length) {
+		lPos += Buffer->Read((Ptr) &code, sizeof(long));
+		lPos += Buffer->Read((Ptr) &objectLength, sizeof(long));
+		long blockStart = Buffer->GetFilePos();
+		switch (code) {
+			case 1:	//control group
+				if (Control==nil) Control = new ControlGroup;
+				if (Control) Control->ReadFromBuffer(Buffer, objectLength);
+				else throw MemoryError();
+			break;
+			case 2: //system
+				if (System == nil) System = new SystemGroup;
+				if (System) {
+					code = System->ReadFromBuffer(Buffer);
+//					if (code != objectLength) throw DataError();
+				} else throw MemoryError();
+			break;
+			case 3:
+				if (Basis == nil) Basis = new BasisGroup;
+				if (Basis) {
+					code = Basis->ReadFromBuffer(Buffer);
+//					if (code != objectLength) throw DataError();
+				} else throw MemoryError();
+			break;
+			case 4:
+				if (Data == nil) Data = new DataGroup;
+				if (Data) Data->ReadFromBuffer(Buffer, objectLength);
+				else throw MemoryError();
+			break;
+			case 5:
+				if (Guess == nil) Guess = new GuessGroup;
+				if (Guess) {
+					code = Guess->ReadFromBuffer(Buffer);
+	//				if (code != objectLength) throw DataError();
+				} else throw MemoryError();
+			break;
+			case 6:
+				if (SCF == nil) SCF = new SCFGroup;
+				if (SCF) {
+					code = SCF->ReadFromBuffer(Buffer);
+//					if (code != objectLength) throw DataError();
+				} else throw MemoryError();
+			break;
+			case 7:
+				if (MP2 == nil) MP2 = new MP2Group;
+				if (MP2) {
+					code = MP2->ReadFromBuffer(Buffer);
+//					if (code != objectLength) throw DataError();
+				} else throw MemoryError();
+			break;
+			case 8:
+				if (Hessian == nil) Hessian = new HessianGroup;
+				if (Hessian) {
+					code = Hessian->ReadFromBuffer(Buffer);
+//					if (code != objectLength) throw DataError();
+				} else throw MemoryError();
+			break;
+			case 9:
+				if (StatPt == nil) StatPt = new StatPtGroup;
+				if (StatPt) {
+					code = StatPt->ReadFromBuffer(Buffer);
+//					if (code != objectLength) throw DataError();
+				} else throw MemoryError();
+			break;
+			case 10:
+				if (DFT == NULL) DFT = new DFTGroup;
+				if (DFT) {
+					code = DFT->ReadFromBuffer(Buffer);
+//					if (code != objectLength) throw DataError();
+				} else throw MemoryError();
+			break;
+			default:
+				Buffer->BufferSkip(objectLength);	//unknown group just skip it
+		}
+		Buffer->SetFilePos(blockStart+objectLength);
+		lPos += objectLength;
+	}
+}
+
+#pragma segment Control
+	//ControlGroup functions
+ControlGroup::ControlGroup(void) {
+	ExeType = nil;
+	Options=0;
+	InitControlPaneData();
+	InitProgPaneData();
+	NPrint=ITol=ICut=0;
+}
+ControlGroup::ControlGroup(ControlGroup *Copy) {
+	if (Copy == nil) return;
+	*this = *Copy;
+	ExeType = nil;
+	if (Copy->ExeType) {
+		ExeType = new char[1+strlen(Copy->ExeType)];
+		if (ExeType) strcpy(ExeType, Copy->ExeType);
+	}
+}
+ControlGroup::~ControlGroup(void) {
+	if (ExeType) delete [] ExeType;
+}
+void ControlGroup::InitControlPaneData(void) {
+	if (ExeType) {
+		delete [] ExeType;
+		ExeType = nil;
+	}
+	SCFType=GAMESSDefaultSCFType;
+	MPLevelCIType=MaxIt=Charge=Multiplicity=0;
+	Local=GAMESS_No_Localization;
+	RunType=InvalidRunType;
+	CCType = CC_None;
+}
+void ControlGroup::InitProgPaneData(void) {
+	Friend=Friend_None;
+	SetMolPlot(false);
+	SetPlotOrb(false);
+	SetAIMPAC(false);
+	SetRPAC(false);
+}
+GAMESS_SCFType ControlGroup::SetSCFType(GAMESS_SCFType NewSCFType) {
+	if ((NewSCFType >= GAMESSDefaultSCFType)||(NewSCFType<NumGAMESSSCFTypes))
+		SCFType = NewSCFType;
+	return SCFType;
+}
+const char * ControlGroup::GAMESSSCFTypeToText(GAMESS_SCFType t) {
+	switch (t) {
+		case GAMESS_RHF:
+			return "RHF";
+		case GAMESS_UHF:
+			return "UHF";
+		case GAMESS_ROHF:
+			return "ROHF";
+		case GAMESS_GVB:
+			return "GVB";
+		case GAMESS_MCSCF:
+			return "MCSCF";
+		case GAMESS_NO_SCF:
+			return "NONE";
+	}
+	return "invalid";
+}
+GAMESS_SCFType ControlGroup::SetSCFType(const char *SCFText) {
+	GAMESS_SCFType temp = GAMESS_Invalid_SCFType;
+	for (int i=1; i<=NumGAMESSSCFTypes; i++) {
+		if (!strcasecmp(SCFText, GAMESSSCFTypeToText((GAMESS_SCFType) i))) {
+			temp = (GAMESS_SCFType) i;
+			break;
+		}
+	}
+	if (temp != GAMESS_Invalid_SCFType) SCFType = temp;
+	return temp;
+}
+long ControlGroup::SetMPLevel(short NewMPLevel) {
+	if ((NewMPLevel!=0)&&(NewMPLevel!=2)) return -1;
+
+	MPLevelCIType = (MPLevelCIType & 0xFFF0) + NewMPLevel;
+	return (MPLevelCIType & 0x0F);
+}
+short ControlGroup::GetMPLevel(void) const {	//return the appropriate MP value based on SCF and Run types
+	short result=-1;
+	if ((SCFType == 0)||(SCFType == 1)) result = (MPLevelCIType & 0x0F);
+	if (((SCFType==2)||(SCFType==3)||(SCFType==5))&&(RunType!=2)&&(RunType!=3)&&(RunType!=4)&&
+		(RunType!=6)&&(RunType!=7)&&(RunType!=8)&&(RunType!=9)) result=(MPLevelCIType & 0x0F);
+	if (MPLevelCIType & 0xF0) result = -1;	//deactivate MP2 when CI is requested
+	if (GetCCType() != CC_None) result = -1;
+	return result;
+}
+CIRunType ControlGroup::SetCIType(CIRunType NewVal) {
+	MPLevelCIType = (MPLevelCIType&0x0F) + (NewVal<<4);
+	return (CIRunType)(MPLevelCIType & 0xF0);
+}
+CIRunType ControlGroup::GetCIType(void) const {
+	short result = ((MPLevelCIType & 0xF0)>>4);
+	if (GetSCFType() == 2) result = 0;
+	return (CIRunType) result;
+};
+TypeOfRun ControlGroup::SetRunType(const TypeOfRun & NewRunType) {
+	if ((NewRunType<=0)||(NewRunType>NumGAMESSRunTypes)) return InvalidRunType;
+	
+	RunType = NewRunType;
+	return RunType;
+}
+TypeOfRun ControlGroup::SetRunType(const char *RunText) {
+	TypeOfRun NewType = InvalidRunType;
+
+	for (int i=1; i<NumGAMESSRunTypes; i++) {
+		const char * test = GetGAMESSRunText((TypeOfRun)i);
+		if (-1<LocateKeyWord(RunText, test, strlen(test), 9)) {
+			NewType = (TypeOfRun)i;
+			break;
+		}
+	}
+
+	if (NewType<=0) return InvalidRunType;
+	
+	RunType = NewType;
+	return RunType;
+}
+const char * ControlGroup::GetGAMESSRunText(const TypeOfRun & r) {
+	switch (r) {
+		case Energy:
+			return "ENERGY";
+		case GradientRun:
+			return "GRADIENT";
+		case HessianRun:
+			return "HESSIAN";
+		case OptimizeRun:
+			return "OPTIMIZE";
+		case TrudgeRun:
+			return "TRUDGE";
+		case SadPointRun:
+			return "SADPOINT";
+		case IRCRun:
+			return "IRC";
+		case GradExtrRun:
+			return "GRADEXTR";
+		case DRCRun:
+			return "DRC";
+		case SurfaceRun:
+			return "SURFACE";
+		case PropRun:
+			return "PROP";
+		case MorokumaRun:
+			return "MOROKUMA";
+		case TransitnRun:
+			return "TRANSITN";
+		case SpinOrbitRun:
+			return "SPINORBT";
+		case FFieldRun:
+			return "FFIELD";
+		case TDHFRun:
+			return "TDHF";
+		case GLOBOPRun:
+			return "GLOBOP";
+		case VSCFRun:
+			return "VSCF";
+		case OptFMORun:
+			return "OPTFMO";
+		case RamanRun:
+			return "RAMAN";
+		case NMRRun:
+			return "NMR";
+		case MakeEFPRun:
+			return "MAKEFP";
+		default:
+			return "unknown";
+	}
+}
+const char * ControlGroup::GetGAMESSCCType(const CCRunType & r) {
+	switch (r) {
+		case CC_None:
+			return "NONE";
+		case CC_LCCD:
+			return "LCCD";
+		case CC_CCD:
+			return "CCD";
+		case CC_CCSD:
+			return "CCSD";
+		case CC_CCSDT:
+			return "CCSD(T)";
+		case CC_RCC:
+			return "R-CC";
+		case CC_CRCC:
+			return "CR-CC";
+		case CC_EOMCCSD:
+			return "EOM-CCSD";
+		case CC_CREOM:
+			return "CR-EOM";
+		default:
+			return "unknown";
+	}
+}
+CCRunType ControlGroup::SetCCType(CCRunType n) {
+	CCType = n;
+	return CCType;
+}
+CCRunType ControlGroup::SetCCType(const char * n) {
+	CCRunType NewType = CC_None;
+	
+	for (int i=1; i<NumCCTypes; i++) {
+		const char * test = GetGAMESSCCType((CCRunType)i);
+		if (-1<LocateKeyWord(n, test, strlen(test), 8)) {
+			NewType = (CCRunType)i;
+			break;
+		}
+	}
+	
+	if (NewType<=0) return CC_None;
+	
+	CCType = NewType;
+	return CCType;
+}
+CCRunType ControlGroup::GetCCType(void) const {
+	CCRunType result = CCType;
+	
+	if (GetSCFType() > 1) result = CC_None;
+	if (GetCIType() > 0) result = CC_None;
+	return result;
+}
+short ControlGroup::GetExeType(void) {
+	if ((ExeType==nil)||(0<=LocateKeyWord(ExeType, "RUN", 3,3))) return 0;	//Normal run
+	if (0<=LocateKeyWord(ExeType, "CHECK", 5,5)) return 1;
+	if (0<=LocateKeyWord(ExeType, "DEBUG", 5,5)) return 2;
+	return 3;
+}
+short ControlGroup::SetExeType(const char *ExeText) {
+	if (ExeText==nil) return 0;
+	long nchar = strlen(ExeText);
+	if (ExeType) {
+		delete [] ExeType;
+		ExeType = nil;
+	}
+	ExeType = new char(nchar+1);
+	strcpy(ExeType, ExeText);
+	return nchar;
+}
+short ControlGroup::SetExeType(short NewType) {
+	if ((NewType < 0)||(NewType > 2)) return -1;
+	if (ExeType) {
+		delete [] ExeType;
+		ExeType = nil;
+	}
+	if (NewType==1) {
+		ExeType = new char[6];
+		strcpy(ExeType, "CHECK");
+	} else if (NewType == 2) {
+		ExeType = new char[6];
+		strcpy(ExeType, "DEBUG");
+	}
+	return NewType;
+}
+CIRunType ControlGroup::SetCIType(const char * CIText) {
+	CIRunType newType = CI_None;
+	if (-1<FindKeyWord(CIText, "GUGA", 4)) newType = CI_GUGA;
+	else if (-1<FindKeyWord(CIText, "ALDET", 5)) newType = CI_ALDET;
+	else if (-1<FindKeyWord(CIText, "ORMAS", 5)) newType = CI_ORMAS;
+	else if (-1<FindKeyWord(CIText, "CIS", 3)) newType = CI_CIS;
+	else if (-1<FindKeyWord(CIText, "FSOCI", 5)) newType = CI_FSOCI;
+	else if (-1<FindKeyWord(CIText, "GENCI", 5)) newType = CI_GENCI;
+	return SetCIType(newType);
+}
+const char * ControlGroup::GetCIType(const CIRunType & citype) const {
+	switch (citype) {
+		default:
+			return "NONE";
+		case CI_GUGA:
+			return "GUGA";
+		case CI_ALDET:
+			return "ALDET";
+		case CI_ORMAS:
+			return "ORMAS";
+		case CI_CIS:
+			return "CIS";
+		case CI_FSOCI:
+			return "FSOCI";
+		case CI_GENCI:
+			return "GENCI";
+	}
+}
+CIRunType ControlGroup::GetCIType(char * outText) const {
+	CIRunType temp = GetCIType();
+	if (outText != NULL) {
+		strcpy(outText, GetCIType(temp));
+	}
+	return temp;
+}
+short ControlGroup::SetMaxIt(short NewVal) {
+	if (NewVal>=0) MaxIt = NewVal;
+	return MaxIt;
+}
+GAMESS_Localization ControlGroup::SetLocal(GAMESS_Localization NewVal) {
+	if ((NewVal>=GAMESS_No_Localization)&&(NewVal<NumGAMESSLocalizations)) Local = NewVal;
+	return Local;
+}
+GAMESS_Localization ControlGroup::SetLocal(const char * t) {
+	GAMESS_Localization temp = Invalid_Localization;
+	for (int i=0; i<NumGAMESSLocalizations; i++) {
+		if (!strcasecmp(t, GAMESSLocalizationToText((GAMESS_Localization) i))) {
+			temp = (GAMESS_Localization) i;
+			break;
+		}
+	}
+	if (temp != Invalid_Localization) Local = temp;
+	return temp;
+}
+const char * ControlGroup::GAMESSLocalizationToText(GAMESS_Localization t) {
+	switch (t) {
+		case GAMESS_No_Localization:
+			return "NONE";
+		case GAMESS_BOYS_Localization:
+			return "BOYS";
+		case GAMESS_RUEDNBRG_Localization:
+			return "RUEDNBRG";
+		case GAMESS_POP_Localization:
+			return "POP";
+	}
+	return "invalid";
+}
+const char * ControlGroup::GetFriendText(FriendType f) {
+	switch (f) {
+		case Friend_HONDO:
+			return "HONDO";
+		case Friend_MELDF:
+			return "MELDF";
+		case Friend_GAMESSUK:
+			return "GAMESSUK";
+		case Friend_GAUSSIAN:
+			return "GAUSSIAN";
+		case Friend_ALL:
+			return "ALL";
+	}
+	return "invalid";	//Getting to here indicates a bad value
+}
+FriendType ControlGroup::TextToFriend(const char * c) {
+	FriendType result = Friend_None;
+	for (int i=0; i<NumFriendTypes; i++) {
+		if (!strcasecmp(c, GetFriendText((FriendType) i))) {
+			result = (FriendType) i;
+			break;
+		}
+	}
+	return result;
+}
+FriendType ControlGroup::SetFriend(FriendType NewValue) {
+	if ((NewValue >= Friend_None)&&(NewValue < NumFriendTypes)) Friend = NewValue;
+	return (FriendType)Friend;
+}
+FriendType ControlGroup::SetFriend(const char * c) {
+	return SetFriend(TextToFriend(c));
+}
+short ControlGroup::SetCharge(short NewCharge) {
+	Charge = NewCharge;
+	return Charge;
+}
+short ControlGroup::SetMultiplicity(short NewMult) {
+	Multiplicity = NewMult;
+	return Multiplicity;
+}
+bool ControlGroup::SetMolPlot(bool State) {
+	if (Options & 1) Options -= 1;
+	if (State) Options += 1;
+	return ((Options & 1)?true:false);
+}
+bool ControlGroup::SetPlotOrb(bool State) {
+	if (Options & (1<<1)) Options -= (1<<1);
+	if (State) Options += (1<<1);
+	return ((Options & (1<<1))?true:false);
+}
+bool ControlGroup::SetAIMPAC(bool State) {
+	if (Options & (1<<2)) Options -= (1<<2);
+	if (State) Options += (1<<2);
+	return ((Options & (1<<2))?true:false);
+}
+bool ControlGroup::SetRPAC(bool State) {
+	if (Options & (1<<3)) Options -= (1<<3);
+	if (State) Options += (1<<3);
+	return ((Options & (1<<3))?true:false);
+}
+bool ControlGroup::SetIntType(bool State) {
+	if (Options & (1<<5)) Options -= (1<<5);
+	if (State) Options += (1<<5);
+	return ((Options & (1<<5))?true:false);
+}
+bool ControlGroup::SetNormF(bool State) {
+	if (Options & (1<<6)) Options -= (1<<6);
+	if (State) Options += (1<<6);
+	return ((Options & (1<<6))?true:false);
+}
+bool ControlGroup::UseDFT(bool State) {
+	if (Options & (1<<4)) Options -= (1<<4);
+	if (State) Options += (1<<4);
+	return (UseDFT());
+}
+bool ControlGroup::UseDFT(void) const {
+	bool result = false;
+	result = ((Options & (1<<4))?true:false);
+	if (GetSCFType() > 3) result = false;
+	if (GetMPLevel() > 0) result = false;
+	if (GetCIType() > 0) result = false;
+	if (GetCCType() != CC_None) result = false;
+	return result;
+}
+bool ControlGroup::SetNormP(bool State) {
+	if (Options & (1<<7)) Options -= (1<<7);
+	if (State) Options += (1<<7);
+	return GetNormP();
+}
+long ControlGroup::GetSize(BufferFile *Buffer) {
+	Boolean	cState = Buffer->GetOutput();
+	Buffer->SetOutput(false);
+	long size = WriteToBuffer(Buffer);
+	Buffer->SetOutput(cState);
+	return size;
+}
+long ControlGroup::WriteToBuffer(BufferFile *Buffer) {
+	long length = 28;
+
+	long Pos = Buffer->Write((Ptr) &length, sizeof(long));
+	Pos += Buffer->Write((Ptr) ExeType, sizeof (char *));
+	Pos += Buffer->Write((Ptr) &SCFType, sizeof(short));
+	Pos += Buffer->Write((Ptr) &MPLevelCIType, sizeof(short));
+	Pos += Buffer->Write((Ptr) &RunType, sizeof(short));
+	Pos += Buffer->Write((Ptr) &MaxIt, sizeof(short));
+	Pos += Buffer->Write((Ptr) &Charge, sizeof(short));
+	Pos += Buffer->Write((Ptr) &Multiplicity, sizeof(short));
+	Pos += Buffer->Write((Ptr) &Local, sizeof(short));
+	Pos += Buffer->Write((Ptr) &Friend, sizeof(short));
+	Pos += Buffer->Write((Ptr) &NPrint, sizeof(short));
+	Pos += Buffer->Write((Ptr) &ITol, sizeof(short));
+	Pos += Buffer->Write((Ptr) &ICut, sizeof(short));
+	Pos += Buffer->Write((Ptr) &Options, sizeof(char));
+	length = 0;
+	Pos += Buffer->Write((Ptr) &length, sizeof(char));	//padding byte for compatibility
+
+	if (ExeType) {
+		length = 1;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = 1 + strlen(ExeType);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += Buffer->Write((Ptr) ExeType, length);
+	}
+	if (CCType != CC_None) {
+		length = 2;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = sizeof(short);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += Buffer->Write((Ptr) &CCType, length);
+	}
+	length = 99;
+	Pos += Buffer->Write((Ptr) &length, sizeof(long));
+	return Pos;
+}
+long ControlGroup::ReadFromBuffer(BufferFile *Buffer, long length) {
+	long mylength, pos, code;
+
+	pos = Buffer->Read((Ptr) &mylength, sizeof(long));
+	if (mylength == 28) {
+		pos += Buffer->Read((Ptr) &ExeType, sizeof(char *));
+		pos += Buffer->Read((Ptr) &SCFType, sizeof(short));
+		pos += Buffer->Read((Ptr) &MPLevelCIType, sizeof(short));
+		pos += Buffer->Read((Ptr) &RunType, sizeof(short));
+		pos += Buffer->Read((Ptr) &MaxIt, sizeof(short));
+		pos += Buffer->Read((Ptr) &Charge, sizeof(short));
+		pos += Buffer->Read((Ptr) &Multiplicity, sizeof(short));
+		pos += Buffer->Read((Ptr) &Local, sizeof(short));
+		pos += Buffer->Read((Ptr) &Friend, sizeof(short));
+		pos += Buffer->Read((Ptr) &NPrint, sizeof(short));
+		pos += Buffer->Read((Ptr) &ITol, sizeof(short));
+		pos += Buffer->Read((Ptr) &ICut, sizeof(short));
+		pos += Buffer->Read((Ptr) &Options, sizeof(char));
+		pos += Buffer->Read((Ptr) &mylength, sizeof(char));//padding byte
+	} else {
+		return pos;
+	}
+	ExeType = NULL;
+	while (pos < length) {
+		//otherwise look for the exetype
+		pos += Buffer->Read((Ptr) &code, sizeof(long));
+		switch (code) {
+			case 1:
+				pos += Buffer->Read((Ptr) &mylength, sizeof(long));
+				ExeType = new char[mylength];
+				if (ExeType)
+					pos += Buffer->Read(ExeType, mylength);
+				else throw MemoryError();
+				break;
+			case 2:
+				pos += Buffer->Read((Ptr) &mylength, sizeof(long));
+				pos += Buffer->Read((Ptr) &CCType, sizeof(short));
+				break;
+		}
+	}
+	return pos;
+}
+void ControlGroup::ReadXML(XMLElement * parent) {
+	XMLElementList * children = parent->getChildren();
+	if (children) {
+		for (int i=0; i<children->length(); i++) {
+			XMLElement * child = children->item(i);
+			MMP_IOControlGroupNS item;
+			if (child && CML_convert(child->getName(), item)) {
+				bool tb;
+				switch (item) {
+					case MMP_IOCGSCFType:
+					{
+						const char * v = child->getValue();
+						if (v) SetSCFType(v);
+					}
+						break;
+					case MMP_IOCGRunType:
+					{
+						const char * v = child->getValue();
+						if (v) SetRunType(v);
+					}
+						break;
+					case MMP_IOCGExeType:
+					{
+						const char * v = child->getValue();
+						if (v) SetExeType(v);
+					}
+						break;
+					case MMP_IOCGMPLevel:
+					{
+						const char * v = child->getValue();
+						if (v) {
+							int mpl;
+							sscanf(v, "%d", &mpl);
+							SetMPLevel(mpl);
+						}
+					}
+						break;
+					case MMP_IOCGCIType:
+					{
+						const char * v = child->getValue();
+						if (v) SetCIType(v);
+					}
+						break;
+					case MMP_IOCGCCType:
+					{
+						const char * v = child->getValue();
+						if (v) SetCCType(v);
+					}
+						break;
+					case MMP_IOCGMaxIterations:
+					{
+						const char * v = child->getValue();
+						if (v) {
+							int mit;
+							sscanf(v, "%d", &mit);
+							SetMaxIt(mit);
+						}
+					}
+						break;
+					case MMP_IOCGCharge:
+					{
+						const char * v = child->getValue();
+						if (v) {
+							int chg;
+							sscanf(v, "%d", &chg);
+							SetCharge(chg);
+						}
+					}
+						break;
+					case MMP_IOCGMultiplicity:
+					{
+						const char * v = child->getValue();
+						if (v) {
+							int mul;
+							sscanf(v, "%d", &mul);
+							SetMultiplicity(mul);
+						}
+					}
+						break;
+					case MMP_IOCGLocalization:
+					{
+						const char * v = child->getValue();
+						if (v) SetLocal(v);
+					}
+						break;
+					case MMP_IOCGFriend:
+					{
+						const char * v = child->getValue();
+						if (v) SetFriend(v);
+					}
+						break;
+					case MMP_IOCGPrintOption:
+					{
+						const char * v = child->getValue();
+						if (v) {
+							int np;
+							sscanf(v, "%d", &np);
+							NPrint = np;
+						}
+					}
+						break;
+					case MMP_IOCGTolerance:
+					{
+						const char * v = child->getValue();
+						if (v) {
+							int it;
+							sscanf(v, "%d", &it);
+							ITol = it;
+						}
+					}
+						break;
+					case MMP_IOCGCutoff:
+					{
+						const char * v = child->getValue();
+						if (v) {
+							int it;
+							sscanf(v, "%d", &it);
+							ICut = it;
+						}
+					}
+						break;
+					case MMP_IOCGMolPlt:
+						if (child->getBoolValue(tb))
+							SetMolPlot(tb);
+						break;
+					case MMP_IOCGPlotOrb:
+						if (child->getBoolValue(tb))
+							SetPlotOrb(tb);
+						break;
+					case MMP_IOCGAIMPac:
+						if (child->getBoolValue(tb))
+							SetAIMPAC(tb);
+						break;
+					case MMP_IOCGRPac:
+						if (child->getBoolValue(tb))
+							SetRPAC(tb);
+						break;
+					case MMP_IOCGDFTActive:
+						if (child->getBoolValue(tb))
+							UseDFT(tb);
+						break;
+					case MMP_IOCGIntType:
+						if (child->getBoolValue(tb))
+							SetIntType(tb);
+						break;
+					case MMP_IOCGNormF:
+						if (child->getBoolValue(tb))
+							SetNormF(tb);
+						break;
+					case MMP_IOCGNormP:
+						if (child->getBoolValue(tb))
+							SetNormP(tb);
+						break;
+				}
+			}
+		}
+		delete children;
+	}
+}
+void ControlGroup::WriteXML(XMLElement * parent) const {
+	char line[kMaxLineLength];
+	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOControlGroupElement));
+	if (SCFType)
+		Ele->addChildElement(CML_convert(MMP_IOCGSCFType), GetSCFTypeText());
+	if (ExeType) Ele->addChildElement(CML_convert(MMP_IOCGExeType), ExeType);
+	Ele->addChildElement(CML_convert(MMP_IOCGCIType), GetCIType(GetCIType()));
+	Ele->addChildElement(CML_convert(MMP_IOCGRunType), GetGAMESSRunText(GetRunType()));
+	snprintf(line, kMaxLineLength, "%d", GetMPLevel());
+	Ele->addChildElement(CML_convert(MMP_IOCGMPLevel), line);
+	if (GetCCType() != CC_None)
+		Ele->addChildElement(CML_convert(MMP_IOCGCCType), GetGAMESSCCType(GetCCType()));
+	if (MaxIt) {
+		snprintf(line, kMaxLineLength, "%d", MaxIt);
+		Ele->addChildElement(CML_convert(MMP_IOCGMaxIterations), line);
+	}
+	if (Charge) {
+		snprintf(line, kMaxLineLength, "%d", Charge);
+		Ele->addChildElement(CML_convert(MMP_IOCGCharge), line);
+	}
+	if (Multiplicity) {
+		snprintf(line, kMaxLineLength, "%d", Multiplicity);
+		Ele->addChildElement(CML_convert(MMP_IOCGMultiplicity), line);
+	}
+	if (Local) {
+		Ele->addChildElement(CML_convert(MMP_IOCGLocalization), GetLocalText());
+	}
+	if (Friend) {	//punchs out input to other programs, disables exetype (forces check run)
+		Ele->addChildElement(CML_convert(MMP_IOCGFriend), GetFriendText());
+	}
+	if (NPrint) {
+		snprintf(line, kMaxLineLength, "%d", NPrint);
+		Ele->addChildElement(CML_convert(MMP_IOCGPrintOption), line);
+	}
+	if (ITol) {
+		snprintf(line, kMaxLineLength, "%d", ITol);
+		Ele->addChildElement(CML_convert(MMP_IOCGTolerance), line);
+	}
+	if (ICut) {
+		snprintf(line, kMaxLineLength, "%d", ICut);
+		Ele->addChildElement(CML_convert(MMP_IOCGCutoff), line);
+	}
+	if (GetMolPlot()) Ele->addChildElement(CML_convert(MMP_IOCGMolPlt), trueXML);
+	if (GetPlotOrb()) Ele->addChildElement(CML_convert(MMP_IOCGPlotOrb), trueXML);
+	if (GetAIMPAC()) Ele->addChildElement(CML_convert(MMP_IOCGAIMPac), trueXML);
+	if (GetRPAC()) Ele->addChildElement(CML_convert(MMP_IOCGRPac), trueXML);
+	if (UseDFT()) Ele->addChildElement(CML_convert(MMP_IOCGDFTActive), trueXML);
+	if (GetIntType()) Ele->addChildElement(CML_convert(MMP_IOCGIntType), trueXML);
+	if (GetNormF()) Ele->addChildElement(CML_convert(MMP_IOCGNormF), trueXML);
+	if (GetNormP()) Ele->addChildElement(CML_convert(MMP_IOCGNormP), trueXML);
+}
+void ControlGroup::WriteToFile(BufferFile *File, InputData *IData, long NumElectrons) {
+	char	Out[133], textVal[133];
+	Str255	Text;
+
+		//Punch the group label
+	File->WriteLine(" $CONTRL ", false);
+		//punch the SCF type and Run type
+	if (SCFType) {
+		sprintf(Out,"SCFTYP=%s ",GetSCFTypeText());
+		File->WriteLine(Out, false);
+	} else {	//Punch out the default RHF/ROHF wavefunction
+		if (NumElectrons & 1) sprintf(Out, "SCFTYP=ROHF ");
+		else sprintf(Out, "SCFTYP=RHF ");
+		File->WriteLine(Out, false);
+	}
+//	GetRunType(Text);	Text[Text[0]+1]=0;
+	sprintf(Out,"RUNTYP=%s ", GetGAMESSRunText(GetRunType()));
+	File->WriteLine(Out, false);
+	if ((ExeType)&&(!Friend)) {	//punch out ExeType if it is other than run
+		sprintf(Out, "EXETYP=%s ", ExeType);
+		File->WriteLine(Out, false);
+	}
+	if (GetMPLevel() > 0) {	//Write out MP level only if > zero
+		sprintf(Out,"MPLEVL=2 ");
+		File->WriteLine(Out, false);
+	}
+	if (GetCIType() || (GetSCFType() == 6)) {	//punch CIType if CI requested
+		GetCIType(textVal);
+		sprintf(Out, "CITYP=%s ", textVal);
+		File->WriteLine(Out, false);
+	}
+	if (GetCCType() != CC_None) {
+		sprintf(Out, "CCTYP=%s ", GetGAMESSCCType(CCType));
+		File->WriteLine(Out, false);
+	}
+	if (MaxIt) {	//Punch Maxit if non-default value
+		sprintf(Out, "MAXIT=%d ",MaxIt);
+		File->WriteLine(Out, false);
+	}
+	if (Charge) {
+		sprintf(Out, "ICHARG=%d ", Charge);
+		File->WriteLine(Out, false);
+	}
+	if (Multiplicity) {
+		sprintf(Out, "MULT=%d ", Multiplicity);
+		File->WriteLine(Out, false);
+	} else if (NumElectrons & 1) {	//for odd electron systems punch out a default doublet
+		sprintf(Out, "MULT=2 ");
+		File->WriteLine(Out, false);
+	}
+	if (Local) {
+		sprintf(Out, "LOCAL=%s ", GetLocalText());
+ 		File->WriteLine(Out, false);
+	}
+	if (IData->Basis) {
+		if (IData->Basis->GetECPPotential()) {
+			IData->Basis->GetECPPotential(Text);	Text[Text[0]+1]=0;
+			sprintf(Out, "ECP=%s ",&(Text[1]));
+	 		File->WriteLine(Out, false);
+		}
+	}
+	if (IData->Data) {
+		if (IData->Data->GetCoordType()) {
+			sprintf(Out, "COORD=%s ", IData->Data->GetCoordText());
+	 		File->WriteLine(Out, false);
+		}
+		if (IData->Data->GetUnits()) {
+			sprintf(Out, "UNITS=BOHR ");
+	 		File->WriteLine(Out, false);
+		}
+		if (IData->Data->GetNumZVar()) {
+			sprintf(Out, "NZVAR=%d ",IData->Data->GetNumZVar());
+	 		File->WriteLine(Out, false);
+		}
+		if (!IData->Data->GetUseSym()) {
+			sprintf(Out, "NOSYM=1 ");
+	 		File->WriteLine(Out, false);
+		}
+	}
+	if (Friend) {	//punchs out input to other programs, disables exetype (forces check run)
+		sprintf(Out, "FRIEND=%s ", GetFriendText());
+ 		File->WriteLine(Out, false);
+	}
+	if (GetMolPlot()) {
+		sprintf(Out, "MOLPLT=.TRUE. ", &(Text[1]));
+ 		File->WriteLine(Out, false);
+	}
+	if (GetPlotOrb()) {
+		sprintf(Out, "PLTORB=.TRUE. ", &(Text[1]));
+ 		File->WriteLine(Out, false);
+	}
+	if ((1!=GetExeType())&&(Friend==0)) {
+		if (GetAIMPAC()) {
+			sprintf(Out, "AIMPAC=.TRUE. ", &(Text[1]));
+	 		File->WriteLine(Out, false);
+		}
+		if (GetRPAC()) {
+			sprintf(Out, "RPAC=.TRUE. ", &(Text[1]));
+	 		File->WriteLine(Out, false);
+		}
+	}
+
+	File->WriteLine("$END", true);
+}
+void ControlGroup::RevertControlPane(ControlGroup *OldData) {
+	RunType = OldData->RunType;
+	SCFType = OldData->SCFType;
+	SetMPLevel(OldData->GetMPLevel());
+	UseDFT(OldData->UseDFT());
+	SetCIType(OldData->GetCIType());
+	SetCCType(OldData->GetCCType());
+	MaxIt = OldData->MaxIt;
+	if (ExeType) {
+		delete [] ExeType;
+		ExeType = nil;
+	}
+	SetExeType(OldData->ExeType);
+	Local = OldData->Local;
+	Charge = OldData->Charge;
+	Multiplicity = OldData->Multiplicity;
+}
+void ControlGroup::RevertProgPane(ControlGroup *OldData) {
+	SetMolPlot(OldData->GetMolPlot());
+	SetPlotOrb(OldData->GetPlotOrb());
+	SetAIMPAC(OldData->GetAIMPAC());
+	SetRPAC(OldData->GetRPAC());
+	SetFriend(OldData->GetFriend());
+}
+#pragma mark SystemGroup
+		//SystemGroup member functions
+long SystemGroup::SetTimeLimit(long NewTime) {
+	if (NewTime >= 0) TimeLimit = NewTime;
+	return TimeLimit;
+}
+const char * MemoryUnitToText(const MemoryUnit & mu) {
+	switch (mu) {
+		case wordsUnit:
+			return "words";
+		case bytesUnit:
+			return "bytes";
+		case megaWordsUnit:
+			return "Mwords";
+		case megaBytesUnit:
+			return "MB";
+		case gigaWordsUnit:
+			return "Gwords";
+		case gigaBytesUnit:
+			return "GB";
+	}
+	return "invalid";
+}
+bool TextToMemoryUnit(const char * t, MemoryUnit & mu) {
+	if (!t || !*t) return false;
+	for (int i = (int) wordsUnit; i != (int) NumberMemoryUnits; ++i) {
+		if (strcmp(t, MemoryUnitToText((MemoryUnit) i)) == 0) {
+			mu = (MemoryUnit) i;
+			return true;
+		}
+	}
+	return false;
+}
+const char * TimeUnitToText(const TimeUnit & tu) {
+	switch (tu) {
+		case secondUnit:
+			return "sec";
+		case minuteUnit:
+			return "min";
+		case hourUnit:
+			return "hr";
+		case dayUnit:
+			return "days";
+		case weekUnit:
+			return "weeks";
+		case yearUnit:
+			return "years";
+		case milleniaUnit:
+			return "millenia";
+	}
+	return "invalid";
+}
+bool TextToTimeUnit(const char * t, TimeUnit & tu) {
+	if (!t || !*t) return false;
+	for (int i = (int) secondUnit; i != (int) NumberTimeUnits; ++i) {
+		if (strcmp(t, TimeUnitToText((TimeUnit) i)) == 0) {
+			tu = (TimeUnit) i;
+			return true;
+		}
+	}
+	return false;
+}
+TimeUnit SystemGroup::SetTimeUnits(TimeUnit NewUnits) {
+	if ((NewUnits >= secondUnit)&&(NewUnits<NumberTimeUnits)) TimeUnits = NewUnits;
+	return TimeUnits;
+}
+float SystemGroup::GetConvertedTime(void) const {
+	float result, factor=1.0;
+
+	if (TimeLimit) result = TimeLimit;
+	else result = 525600.0;
+
+	switch (TimeUnits) {
+		case milleniaUnit:
+			factor = 1.0/1000.0;
+		case yearUnit:
+			factor *= 1/52.0;
+		case weekUnit:
+			factor *= 1/7.0;
+		case dayUnit:
+			factor *= 1/24.0;
+		case hourUnit:
+			factor *= 1/60.0;
+		case minuteUnit:
+		break;
+		case secondUnit:
+			factor = 60.0;
+		break;
+	}
+	result *= factor;
+	return result;
+}
+long SystemGroup::SetConvertedTime(float NewTime) {
+	long	result, factor = 1;
+
+	switch (TimeUnits) {
+		case milleniaUnit:
+			factor = 1000;
+		case yearUnit:
+			factor *= 52;
+		case weekUnit:
+			factor *= 7;
+		case dayUnit:
+			factor *= 24;
+		case hourUnit:
+			factor *= 60;
+		case minuteUnit:
+			result = (long)(NewTime * factor);
+		break;
+		case secondUnit:
+			result = (long)(NewTime/60.0);
+		break;
+	}
+	if (result >= 0) TimeLimit = result;
+	return TimeLimit;
+}
+double SystemGroup::SetMemory(double NewMemory) {
+	if (NewMemory > 0.0) Memory = NewMemory;
+	return Memory;
+}
+MemoryUnit SystemGroup::SetMemUnits(MemoryUnit NewUnits) {
+	if ((NewUnits>=wordsUnit)&&(NewUnits<NumberMemoryUnits)) MemUnits = NewUnits;
+	return MemUnits;
+}
+double SystemGroup::GetConvertedMem(void) const {
+	double result, factor=1.0;
+
+	if (Memory) result = Memory;
+	else result = 1000000;
+
+	switch (MemUnits) {
+		case bytesUnit:
+			factor = 8.0;
+		break;
+		case megaWordsUnit:
+			factor = 1.0/1000000.0;
+		break;
+		case megaBytesUnit:
+			factor = 8.0/(1024*1024);
+		break;
+	}
+	result *= factor;
+	return result;
+}
+double SystemGroup::SetConvertedMem(double NewMem) {
+	double	result, factor = 1;
+
+	switch (MemUnits) {
+		case megaBytesUnit:
+			factor *= 1024*1024;
+		case bytesUnit:
+			result = (long)(factor*NewMem/8.0);
+		break;
+		case megaWordsUnit:
+			factor *= 1000000;
+		case wordsUnit:
+			result = (long)(factor*NewMem);
+		break;
+	}
+	if (result >= 0) Memory = result;
+	return Memory;
+}
+char SystemGroup::SetDiag(char NewMethod) {
+	if ((NewMethod>=0)&&(NewMethod<4)) KDiag = NewMethod;
+	return KDiag;
+}
+bool SystemGroup::SetCoreFlag(bool State) {
+	if (Flags & 1) Flags --;
+	if (State) Flags ++;
+	return GetCoreFlag();
+}
+bool SystemGroup::SetBalanceType(bool Type) {
+	if (Flags & 2) Flags -= 2;
+	if (Type) Flags += 2;
+	return GetBalanceType();
+}
+bool SystemGroup::SetXDR(bool State) {
+	if (Flags & 4) Flags -= 4;
+	if (State) Flags += 4;
+	return GetXDR();
+}
+SystemGroup::SystemGroup(void) {
+	InitData();
+}
+SystemGroup::SystemGroup(SystemGroup *Copy) {
+	if (Copy) *this=*Copy;
+}
+void SystemGroup::InitData(void) {
+	TimeLimit = 0;
+	Memory = 0.0;
+	KDiag = 0;
+	TimeUnits = minuteUnit;
+	MemUnits = wordsUnit;
+	Flags = 0;
+}
+long SystemGroup::GetSize(BufferFile *Buffer) {
+	Boolean	cState = Buffer->GetOutput();
+	Buffer->SetOutput(false);
+	long size = WriteToBuffer(Buffer);
+	Buffer->SetOutput(cState);
+	return size;
+}
+long SystemGroup::WriteToBuffer(BufferFile *Buffer) {
+	long Pos, length = sizeof(SystemGroup);
+
+	Pos = Buffer->Write((Ptr) &length, sizeof(long));
+	Pos += Buffer->Write((Ptr) this, length);
+	return Pos;
+}
+void SystemGroup::WriteXML(XMLElement * parent) const {
+	char line[kMaxLineLength];
+	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOSystemGroupElement));
+	if (TimeLimit) {
+		snprintf(line, kMaxLineLength, "%f", GetConvertedTime());
+		XMLElement * t = Ele->addChildElement(CML_convert(MMP_IOSGTimeLimit), line);
+		t->addAttribute(CML_convert(MMP_IOSGTimeUnits), TimeUnitToText(TimeUnits));
+	}
+	if (Memory) {
+		snprintf(line, kMaxLineLength, "%lf", GetConvertedMem());
+		XMLElement * t = Ele->addChildElement(CML_convert(MMP_IOSGMemory), line);
+		t->addAttribute(CML_convert(MMP_IOSGMemoryUnits), MemoryUnitToText(MemUnits));
+	}
+	if (KDiag) {
+		snprintf(line, kMaxLineLength, "%d", KDiag);
+		Ele->addChildElement(CML_convert(MMP_IOSGKDiag), line);
+	}
+	if (GetCoreFlag()) Ele->addChildElement(CML_convert(MMP_IOSGCoreFlag), trueXML);
+	if (GetBalanceType()) Ele->addChildElement(CML_convert(MMP_IOSGBalanceType), trueXML);
+	if (GetXDR()) Ele->addChildElement(CML_convert(MMP_IOSGXDR), trueXML);
+}
+void SystemGroup::ReadXML(XMLElement * parent) {
+	XMLElementList * children = parent->getChildren();
+	if (children) {
+		for (int i=0; i<children->length(); i++) {
+			XMLElement * child = children->item(i);
+			MMP_IOControlGroupNS item;
+			if (child && CML_convert(child->getName(), item)) {
+				bool tb;
+				switch (item) {
+					case MMP_IOSGTimeLimit:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							const char * u = child->getAttributeValue(CML_convert(MMP_IOSGTimeUnits));
+							if (u) {
+								TimeUnit t;
+								if (TextToTimeUnit(u, t)) SetTimeUnits(t);
+							}
+							SetConvertedTime(temp);
+						}
+					}
+						break;
+					case MMP_IOSGMemory:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							const char * u = child->getAttributeValue(CML_convert(MMP_IOSGMemoryUnits));
+							if (u) {
+								MemoryUnit t;
+								if (TextToMemoryUnit(u, t)) SetMemUnits(t);
+							}
+							SetConvertedMem(temp);
+						}
+					}
+						break;
+					case MMP_IOSGKDiag:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetDiag(temp);
+						}
+					}
+						break;
+					case MMP_IOSGCoreFlag:
+						if (child->getBoolValue(tb))
+							SetCoreFlag(tb);
+						break;
+					case MMP_IOSGBalanceType:
+						if (child->getBoolValue(tb))
+							SetBalanceType(tb);
+						break;
+					case MMP_IOSGXDR:
+						if (child->getBoolValue(tb))
+							SetXDR(tb);
+						break;
+				}
+			}
+		}
+	}
+}
+long SystemGroup::ReadFromBuffer(BufferFile *Buffer) {
+	long mylength, size;
+
+	size = Buffer->Read((Ptr) &mylength, sizeof(long));
+//	if (mylength != sizeof(SystemGroup)) return size;
+	if (mylength != 12) return size;
+//	size += Buffer->Read((Ptr) this, mylength);
+	size += Buffer->Read((Ptr) &TimeLimit, sizeof(long));
+	size += Buffer->Read((Ptr) &mylength, sizeof(long));
+	Memory = mylength;
+	size += Buffer->Read(&KDiag, sizeof(char));
+	char temp;
+	size += Buffer->Read(&temp, sizeof(char));
+	SetTimeUnits((TimeUnit) temp);
+	size += Buffer->Read(&temp, sizeof(char));
+	SetMemUnits((MemoryUnit) temp);
+	size += Buffer->Read(&Flags, sizeof(char));
+	return size;
+}
+void SystemGroup::WriteToFile(BufferFile *File) {
+	long	test;
+	char	Out[133];
+
+		//Punch the group label
+	File->WriteLine(" $SYSTEM ", false);
+		//Time limit
+	test = TimeLimit;
+	if (test==0) test = 600;
+	sprintf(Out,"TIMLIM=%ld ",test);
+	File->WriteLine(Out, false);
+		//Memory
+	if (Memory) {
+		sprintf(Out, "MEMORY=%ld ", Memory);
+		File->WriteLine(Out, false);
+	}	//diag method
+	if (KDiag) {
+		sprintf(Out, "KDIAG=%d ", KDiag);
+		File->WriteLine(Out, false);
+	}	//core flag
+	if (GetCoreFlag()) {
+		sprintf(Out, "COREFL=.TRUE. ");
+		File->WriteLine(Out, false);
+	}	//Balance type
+	if (GetBalanceType()) {
+		sprintf(Out, "BALTYP=NXTVAL ");
+		File->WriteLine(Out, false);
+	}	//XDR
+	if (GetXDR()) {
+		sprintf(Out, "XDR=.TRUE. ");
+		File->WriteLine(Out, false);
+	}
+	File->WriteLine("$END", true);
+}
+#pragma mark BasisGroup
+		//BasisGroup member functions
+BasisGroup::BasisGroup(void) {
+	InitData();
+}
+BasisGroup::BasisGroup(BasisGroup *Copy) {
+	if (Copy) {
+		*this = *Copy;
+	}
+}
+void BasisGroup::InitData(void) {
+	Split2[0]=Split2[1]=0.0;
+	Split3[0]=Split3[1]=Split3[2]=0.0;
+	Basis=NumGauss=NumHeavyFuncs=NumPFuncs=ECPPotential=0;
+	Polar = GAMESS_BS_No_Polarization;
+	Flags = 0;
+}
+short BasisGroup::SetBasis(const char *BasisText) {
+	short NewBasis = -1;
+	Str255	text;
+
+	for (int i=1; i<kMaxBasisSets; i++) {
+		GetIndString(text, kBasisSetStrings, i);
+		if (-1<LocateKeyWord(BasisText, (char *) &(text[1]), text[0], 9)) {
+			NewBasis = i;
+			break;
+		}
+	}
+	if (NewBasis<0) return -1;
+
+	Basis = NewBasis;
+	return Basis;
+}
+short BasisGroup::SetBasis(short NewBasis) {
+	if ((NewBasis<-1)||(NewBasis>16)) return -1;
+	
+	Basis = NewBasis;
+	return Basis;
+}
+short BasisGroup::GetBasis(Str255 BasisText) const {
+	short temp = Basis;
+	if (temp <= 0) temp = 1;
+	GetIndString(BasisText, kBasisSetStrings, temp);
+
+	return Basis;
+}
+short BasisGroup::GetBasis(void) const {
+	return Basis;
+}
+short BasisGroup::SetNumGauss(short NewNumGauss) {
+	if ((NewNumGauss<0)||(NewNumGauss>6)) return -1;
+	if ((Basis==4)&&(NewNumGauss!=3)&&(NewNumGauss!=6)) return -1;
+	if ((Basis==5)&&(NewNumGauss<4)) return -1;
+	if ((Basis==6)&&(NewNumGauss!=6)) return -1;
+
+	NumGauss = NewNumGauss;
+	return NumGauss;
+}
+short BasisGroup::GetNumGauss(void) const {
+	return NumGauss;
+}
+short BasisGroup::SetNumDFuncs(short NewNum) {
+	if (NewNum > 3) return -1;
+
+	NumHeavyFuncs = NewNum + (NumHeavyFuncs & 0xF0);
+	return (NumHeavyFuncs & 0x0F);
+}
+short BasisGroup::GetNumDFuncs(void) const {
+	return (NumHeavyFuncs & 0x0F);
+}
+short BasisGroup::SetNumFFuncs(short NewNum) {
+	if (NewNum > 3) return -1;
+
+	NumHeavyFuncs = (NewNum<<4) + (NumHeavyFuncs & 0x0F);
+	return ((NumHeavyFuncs & 0xF0)>>4);
+}
+short BasisGroup::GetNumFFuncs(void) const {
+	return ((NumHeavyFuncs & 0xF0)>>4);
+}
+short BasisGroup::SetNumPFuncs(short NewNum) {
+	if (NewNum > 3) return -1;
+
+	NumPFuncs = NewNum;
+	return NumPFuncs;
+}
+short BasisGroup::GetNumPFuncs(void) const {
+	return NumPFuncs;
+}
+short BasisGroup::SetDiffuseSP(bool state) {
+	if (state && (!(Flags & 1))) Flags += 1;
+	else if (!state && (Flags & 1)) Flags -= 1;
+
+	return state;
+}
+short BasisGroup::SetDiffuseS(bool state) {
+	if (state && (!(Flags & 2))) Flags += 2;
+	else if (!state && (Flags & 2)) Flags -= 2;
+
+	return state;
+}
+GAMESS_BS_Polarization BasisGroup::SetPolar(GAMESS_BS_Polarization NewPolar) {
+	if ((NewPolar>=GAMESS_BS_No_Polarization)||(NewPolar<NumGAMESSBSPolarItems)) {
+		Polar = NewPolar;
+	}
+	return Polar;
+}
+GAMESS_BS_Polarization BasisGroup::SetPolar(const char *PolarText) {
+	GAMESS_BS_Polarization NewPolar = GAMESS_BS_Invalid_Polar;
+
+	for (int i=GAMESS_BS_No_Polarization; i<NumGAMESSBSPolarItems; i++) {
+		if (!strcasecmp(PolarText, PolarToText((GAMESS_BS_Polarization)i))) {
+			NewPolar = (GAMESS_BS_Polarization) i;
+			break;
+		}
+	}
+	if (NewPolar>=0) Polar = NewPolar;
+	return NewPolar;
+}
+const char * BasisGroup::PolarToText(GAMESS_BS_Polarization p) {
+	switch (p) {
+		case GAMESS_BS_No_Polarization:
+			return "none";
+		case GAMESS_BS_Pople_Polar:
+			return "POPLE";
+		case GAMESS_BS_PopN311_Polar:
+			return "POPN311";
+		case GAMESS_BS_Dunning_Polar:
+			return "DUNNING";
+		case GAMESS_BS_Huzinaga_Polar:
+			return "HUZINAGA";
+		case GAMESS_BS_Hondo7_Polar:
+			return "HONDO7";
+	}
+	return "invalid";
+}
+short BasisGroup::GetECPPotential(void) const {
+	short value = ECPPotential;
+	if (value == 0) {
+		if (Basis == 12) value = 2;
+		if (Basis == 13) value = 3;
+	}
+	return value;
+}
+short BasisGroup::GetECPPotential(Str255 ECPText) const {
+	short value = ECPPotential;
+	if (value == 0) {
+		if (Basis == 12) value = 2;
+		if (Basis == 13) value = 3;
+	}
+	GetIndString(ECPText, kECPPotStrings, 1+value);
+
+	return ECPPotential;
+}
+short BasisGroup::SetECPPotential(short NewType) {
+	if ((NewType<0)||(NewType>3)) return -1;
+	ECPPotential = NewType;
+	return ECPPotential;
+}
+short BasisGroup::SetECPPotential(const char * ECPText) {
+	short NewPot = -1;
+	Str255	text;
+
+	for (int i=1; i<kMaxECPPotStrings; i++) {
+		GetIndString(text, kECPPotStrings, i);
+		if (-1<LocateKeyWord(ECPText, (char *) &(text[1]), text[0], 9)) {
+			NewPot = i;
+			break;
+		}
+	}
+
+	if (NewPot<0) return -1;
+	ECPPotential = NewPot-1;
+	return ECPPotential;
+}
+long BasisGroup::GetSize(BufferFile *Buffer) {
+	Boolean	cState = Buffer->GetOutput();
+	Buffer->SetOutput(false);
+	long size = WriteToBuffer(Buffer);
+	Buffer->SetOutput(cState);
+	return size;
+}
+long BasisGroup::WriteToBuffer(BufferFile *Buffer) {
+	long Pos, length = sizeof(BasisGroup);
+
+	Pos = Buffer->Write((Ptr) &length, sizeof(long));
+	Pos += Buffer->Write((Ptr) this, length);
+	return Pos;
+}
+long BasisGroup::ReadFromBuffer(BufferFile *Buffer) {
+	long mylength, size;
+
+	size = Buffer->Read((Ptr) &mylength, sizeof(long));
+	if (mylength != sizeof(BasisGroup)) return size;
+	size += Buffer->Read((Ptr) this, mylength);
+	return size;
+}
+void BasisGroup::WriteXML(XMLElement * parent) const {
+	char line[kMaxLineLength];
+	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOBasisGroupElement));
+	if (GetBasis() != 0) {
+		Str255	Text;
+		GetBasis(Text);	Text[Text[0]+1]=0;
+		Ele->addChildElement(CML_convert(MMP_IOBGBasisSet), (const char *) &(Text[1]));
+	}
+	if (NumGauss) {
+		snprintf(line, kMaxLineLength, "%d", NumGauss);
+		Ele->addChildElement(CML_convert(MMP_IOBGNumGauss), line);
+	}
+	if (GetNumDFuncs()) {
+		snprintf(line, kMaxLineLength, "%d", GetNumDFuncs());
+		Ele->addChildElement(CML_convert(MMP_IOBGNumDFuncs), line);
+	}
+	if (GetNumFFuncs()) {
+		snprintf(line, kMaxLineLength, "%d", GetNumFFuncs());
+		Ele->addChildElement(CML_convert(MMP_IOBGNumFFuncs), line);
+	}
+	if (GetNumPFuncs()) {
+		snprintf(line, kMaxLineLength, "%d", GetNumPFuncs());
+		Ele->addChildElement(CML_convert(MMP_IOBGNumPFuncs), line);
+	}
+	if (GetPolar() != 0) {
+		Ele->addChildElement(CML_convert(MMP_IOBGPolar), GetPolarText());
+	}
+	if (GetECPPotential() != 0) {
+		Str255	Text;
+		GetECPPotential(Text);	Text[Text[0]+1]=0;
+		Ele->addChildElement(CML_convert(MMP_IOBGECPPotential), (const char *) &(Text[1]));
+	}
+	if (GetDiffuseSP()) Ele->addChildElement(CML_convert(MMP_IOBGDiffuseSP), trueXML);
+	if (GetDiffuseS()) Ele->addChildElement(CML_convert(MMP_IOBGDiffuseS), trueXML);
+	if (CheckBasis()) Ele->addChildElement(CML_convert(MMP_IOBGDisableBS), trueXML);
+}
+void BasisGroup::ReadXML(XMLElement * parent) {
+	XMLElementList * children = parent->getChildren();
+	if (children) {
+		for (int i=0; i<children->length(); i++) {
+			XMLElement * child = children->item(i);
+			MMP_IOControlGroupNS item;
+			if (child && CML_convert(child->getName(), item)) {
+				bool tb;
+				switch (item) {
+					case MMP_IOBGBasisSet:
+					{
+						const char * v = child->getValue();
+						if (v) SetBasis(v);
+					}
+						break;
+					case MMP_IOBGNumGauss:
+					{
+						long temp;
+						if (child->getLongValue(temp)) SetNumGauss(temp);
+					}
+						break;
+					case MMP_IOBGNumDFuncs:
+					{
+						long temp;
+						if (child->getLongValue(temp)) SetNumDFuncs(temp);
+					}
+						break;
+					case MMP_IOBGNumFFuncs:
+					{
+						long temp;
+						if (child->getLongValue(temp)) SetNumFFuncs(temp);
+					}
+						break;
+					case MMP_IOBGNumPFuncs:
+					{
+						long temp;
+						if (child->getLongValue(temp)) SetNumPFuncs(temp);
+					}
+						break;
+					case MMP_IOBGPolar:
+					{
+						const char * v = child->getValue();
+						if (v) SetPolar(v);
+					}
+						break;
+					case MMP_IOBGECPPotential:
+					{
+						const char * v = child->getValue();
+						if (v) SetECPPotential(v);
+					}
+						break;
+					case MMP_IOBGDiffuseSP:
+						if (child->getBoolValue(tb))
+							SetDiffuseSP(tb);
+						break;
+					case MMP_IOBGDiffuseS:
+						if (child->getBoolValue(tb))
+							SetDiffuseS(tb);
+						break;
+					case MMP_IOBGDisableBS:
+						if (child->getBoolValue(tb))
+							CheckBasis(tb);
+						break;
+				}
+			}
+		}
+	}
+}
+long BasisGroup::WriteToFile(BufferFile *File, MoleculeData * lData) {
+	char	Out[133];
+	Str255	Text;
+		//if a general basis set is present don't punch the $Basis group
+	if (lData->GetBasisSet() && (GetBasis() == 0)) return 1;
+		//Punch the group label
+	File->WriteLine(" $BASIS ", false);
+		//Basis Set
+	GetBasis(Text);	Text[Text[0]+1]=0;
+	sprintf(Out,"GBASIS=%s ",&(Text[1]));
+	File->WriteLine(Out, false);
+		//Number of Gaussians
+	if (NumGauss) {
+		sprintf(Out, "NGAUSS=%d ", NumGauss);
+		File->WriteLine(Out, false);
+	}	//number of heavy atom polarization functions
+	if (GetNumDFuncs()) {
+		sprintf(Out, "NDFUNC=%d ", GetNumDFuncs());
+		File->WriteLine(Out, false);
+	}	//number of heavy atom f type polarization functions
+	if (GetNumFFuncs()) {
+		sprintf(Out, "NFFUNC=%d ", GetNumFFuncs());
+		File->WriteLine(Out, false);
+	}	//number of light atom polarization functions
+	if (NumPFuncs) {
+		sprintf(Out, "NPFUNC=%d ", NumPFuncs);
+		File->WriteLine(Out, false);
+	}	//type of Polarization functions
+	if ((Polar)&&((NumHeavyFuncs)||(NumPFuncs))) {
+		sprintf(Out, "POLAR=%s ", GetPolarText());
+		File->WriteLine(Out, false);
+	}
+	if (GetDiffuseSP()) {
+		sprintf(Out, "DIFFSP=.TRUE. ");
+		File->WriteLine(Out, false);
+	}
+	if (GetDiffuseS()) {
+		sprintf(Out, "DIFFS=.TRUE. ");
+		File->WriteLine(Out, false);
+	}
+	File->WriteLine("$END", true);
+	return 0;
+}
+#pragma mark DataGroup
+		// Data Group member functions
+DataGroup::DataGroup(void) {
+	InitData();
+}
+DataGroup::DataGroup(DataGroup *Copy) {
+	if (Copy) {
+		*this = *Copy;
+		Title = nil;
+		if (Copy->Title) {
+			Title = new char[1+strlen(Copy->Title)];
+			if (Title) strcpy(Title, Copy->Title);
+		}
+	}
+}
+DataGroup::~DataGroup(void) {
+	if (Title) delete [] Title;
+}
+void DataGroup::InitData(void) {
+	Title = 0;
+	Coord = NumZVar = 0;
+	PointGroup = 1;
+	PGroupOrder = Options = 0;
+	SetUseSym(true);
+}
+short DataGroup::SetPointGroup(short NewPGroup) {
+	if ((NewPGroup<0)||(NewPGroup>15)) return -1;
+
+	PointGroup = NewPGroup;
+	return PointGroup;
+}
+short DataGroup::SetPointGroup(char *GroupText) {
+	short NewPGroup=-1;
+	Str255	text;
+	
+	if (GroupText[0] == 'S') {
+		PGroupOrder = GroupText[2] - 48;
+		GroupText[2]='N';
+	} else {
+		int i=0;
+		while (GroupText[i]&&(GroupText[i]!=' ')) {
+			if (isdigit(GroupText[i])&&(GroupText[i]!='1')) {
+				PGroupOrder = GroupText[i] - 48;	//single digit coverted to decimal digit
+				GroupText[i]='N';
+			}
+			i++;
+		}
+	}
+
+	for (int i=1; i<kMaxPGroups; i++) {
+		GetIndString(text, kPGroupStrings, i);
+		if (-1<LocateKeyWord(GroupText, (char *) &(text[1]), text[0], 9)) {
+			NewPGroup = i;
+			break;
+		}
+	}
+
+	if (NewPGroup<0) return -1;
+
+	PointGroup = NewPGroup;
+	return PointGroup;
+}
+short DataGroup::GetPointGroup(Str255 GroupText, Boolean InLine) const {
+	int	value = PointGroup;
+	if (value == 0) value = 1;	//default to C1
+	GetIndString(GroupText, kPGroupStrings, PointGroup);
+	GroupText[1+GroupText[0]] = 0;
+	if (InLine && (PGroupOrder>0)) {
+		for (int i=1; i<=GroupText[0]; i++) {
+			if (GroupText[i]=='N') {
+				GroupText[i] = PGroupOrder + 48;	//single digit coverted to decimal digit
+			}
+		}
+	}
+
+	return PointGroup;
+}
+short DataGroup::SetPointGroupOrder(short NewOrder) {
+	if (NewOrder > 0) PGroupOrder = NewOrder;
+	return PGroupOrder;
+}
+short DataGroup::SetTitle(const char *NewTitle, long length) {
+	if (Title) delete Title;
+	Title = NULL;
+
+	if (length == -1) length = strlen(NewTitle);
+
+		long TitleStart=0, TitleEnd=length-1, i, j;
+		//Strip blanks of both ends of title
+	while ((NewTitle[TitleStart] <= ' ')&&(TitleStart<length)) TitleStart ++;
+	while ((NewTitle[TitleEnd] <= ' ')&&(TitleEnd>0)) TitleEnd --;
+	length = TitleEnd - TitleStart + 1;
+
+	if (length <= 0) return 0;
+	if (length > 132) return -1;	//Title card is limited to one line
+
+	Title = new char[length + 1];
+	if (Title == NULL) throw MemoryError();
+	j=0;
+	for (i=TitleStart; i<=TitleEnd; i++) {
+		if ((NewTitle[i] == '\n')||(NewTitle[i] == '\r')) {
+			Title[j] = 0;
+			break;
+		}
+		Title[j] = NewTitle[i];
+		j++;
+	}
+	Title[j]=0;
+	return j;
+}
+const char * DataGroup::GetTitle(void) const {
+	return Title;
+}
+CoordinateType DataGroup::GetCoordType(void) const {
+	return (CoordinateType) Coord;
+}
+const char * DataGroup::GetCoordTypeText(CoordinateType t) {
+	switch (t) {
+		case UniqueCoordType:
+			return "UNIQUE";
+		case HINTCoordType:
+			return "HINT";
+		case CartesianCoordType:
+			return "CART";
+		case ZMTCoordType:
+			return "ZMT";
+		case ZMTMPCCoordType:
+			return "ZMTMPC";
+	}
+	return "invalid";
+}
+CoordinateType DataGroup::SetCoordType(const char * CoordText) {
+	CoordinateType NewCoord = invalidCoordinateType;
+	for (int i=1; i<NumberCoordinateTypes; i++) {
+		if (strcmp(CoordText, GetCoordTypeText((CoordinateType) i))==0) {
+			NewCoord = (CoordinateType) i;
+			break;
+		}
+	}
+	if (NewCoord<=invalidCoordinateType) return invalidCoordinateType;
+	Coord = NewCoord;
+	return (CoordinateType) Coord;
+}
+CoordinateType DataGroup::SetCoordType(CoordinateType NewType) {
+	if ((NewType<UniqueCoordType)&&(NewType>NumberCoordinateTypes)) return invalidCoordinateType;
+	Coord = NewType;
+	return (CoordinateType) Coord;
+}
+bool DataGroup::SetUnits(bool NewType) {
+	if (Options & 1) Options -= 1;
+	if (NewType) Options += 1;
+	return GetUnits();
+}
+bool DataGroup::SetUseSym(bool State) {
+	if (Options & (1<<1)) Options -= (1<<1);
+	if (State) Options += (1<<1);
+	return GetUseSym();
+}
+short DataGroup::SetNumZVar(short NewNum) {
+	if (NewNum<0) return -1;	//bad number
+	NumZVar = NewNum;
+	return NumZVar;
+}
+long DataGroup::GetSize(BufferFile *Buffer) {
+	Boolean	cState = Buffer->GetOutput();
+	Buffer->SetOutput(false);
+	long size = WriteToBuffer(Buffer);
+	Buffer->SetOutput(cState);
+	return size;
+}
+long DataGroup::WriteToBuffer(BufferFile *Buffer) {
+	long Pos, length = sizeof(DataGroup);
+
+	Pos = Buffer->Write((Ptr) &length, sizeof(long));
+	Pos += Buffer->Write((Ptr) this, length);
+
+	if (Title) {
+		length = 1;
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		length = 1 + strlen(Title);
+		Pos += Buffer->Write((Ptr) &length, sizeof(long));
+		Pos += Buffer->Write((Ptr) Title, length);
+	}
+	return Pos;
+}
+void DataGroup::ReadFromBuffer(BufferFile *Buffer, long length) {
+	long mylength, pos, code;
+
+	pos = Buffer->Read((Ptr) &mylength, sizeof(long));
+	if (mylength != sizeof(DataGroup)) return;
+	pos += Buffer->Read((Ptr) this, mylength);
+	if (pos < length) {
+		pos += Buffer->Read((Ptr) &code,sizeof(long));
+		if (code == 1) {	//Title card
+			pos += Buffer->Read((Ptr) &mylength, sizeof(long));
+			Title = new char[mylength];
+			if (Title) {
+				pos += Buffer->Read(Title, mylength);
+			} else throw MemoryError();
+		}
+	}
+}
+void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs * Prefs, long BasisTest) {
+	char	Out[133];
+	Str255	Text, AtomLabel;
+
+	Frame * cFrame = MainData->GetCurrentFramePtr();
+	BasisSet * lBasis = MainData->GetBasisSet();
+	BasisTest = BasisTest && lBasis;	//Make sure there really is a basis set defined
+//	if (BasisTest) File->WriteLine(" $CONTRL NORMP=1 $END", true);
+		//Punch the group label
+	File->WriteLine(" $DATA ", true);
+		//title
+	if (Title == NULL) File->WriteLine("Title goes here", true);
+	else File->WriteLine(Title, true);
+		//Point Group
+	GetPointGroup(Text, false);	Text[Text[0]+1]=0;
+	if ((PointGroup>3)&&(PointGroup<11)) {
+		sprintf(Out, "%s %d", &(Text[1]), PGroupOrder);
+	} else sprintf(Out, "%s", &(Text[1]));
+	File->WriteLine(Out, true);
+	if ((PointGroup!=0)&&(PointGroup!=1)) File->WriteLine("", true);
+		//coordinates
+	if (Coord == 4) {
+		Internals * IntCoords = MainData->GetInternalCoordinates();
+		if (IntCoords) IntCoords->WriteCoordinatesToFile(File, MainData, Prefs);
+	} else {
+		for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
+			Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
+			AtomLabel[AtomLabel[0]+1] = 0;
+			sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
+				(char *) &(AtomLabel[1]), (float) (cFrame->Atoms[iatom].GetType()), 
+				cFrame->Atoms[iatom].Position.x, cFrame->Atoms[iatom].Position.y,
+				cFrame->Atoms[iatom].Position.z);
+			File->WriteLine(Out, true);
+			if (BasisTest) lBasis->WriteBasis(File, iatom);
+		}
+	}
+	
+	File->WriteLine(" $END", true);
+	if (NumZVar) {	//punch out the current connectivity in a $ZMAT group
+		Internals * IntCoords = MainData->GetInternalCoordinates();
+		if (IntCoords) IntCoords->WriteZMATToFile(File);
+	}
+}
+void DataGroup::WriteXML(XMLElement * parent) const {
+	char line[kMaxLineLength];
+	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IODataGroupElement));
+	if (Title) Ele->addChildElement(CML_convert(MMP_IODGTitle), Title);
+	if (PointGroup) {
+		snprintf(line, kMaxLineLength, "%d", PointGroup);
+		XMLElement * t = Ele->addChildElement(CML_convert(MMP_IODGPointGroup), line);
+		if (PGroupOrder) {
+			snprintf(line, kMaxLineLength, "%d", PGroupOrder);
+			t->addAttribute(CML_convert(MMP_IODGPointGroupOrder), line);
+		}
+	}
+	if (Coord) Ele->addChildElement(CML_convert(MMP_IODGCoordType), GetCoordTypeText((CoordinateType) Coord));
+	if (GetNumZVar()) {
+		snprintf(line, kMaxLineLength, "%d", GetNumZVar());
+		Ele->addChildElement(CML_convert(MMP_IODGNumZVars), line);
+	}
+	if (GetUnits()) Ele->addChildElement(CML_convert(MMP_IODGUnits), trueXML);
+	if (GetUseSym()) Ele->addChildElement(CML_convert(MMP_IODGNoSymFlag), trueXML);
+}
+void DataGroup::ReadXML(XMLElement * parent) {
+	XMLElementList * children = parent->getChildren();
+	if (children) {
+		for (int i=0; i<children->length(); i++) {
+			XMLElement * child = children->item(i);
+			MMP_IOControlGroupNS item;
+			if (child && CML_convert(child->getName(), item)) {
+				bool tb;
+				switch (item) {
+					case MMP_IODGTitle:
+					{
+						const char * v = child->getValue();
+						if (v) SetTitle(v);
+					}
+						break;
+					case MMP_IODGPointGroup:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetPointGroup(temp);
+							if (child->getAttributeValue(CML_convert(MMP_IODGPointGroupOrder), temp)) 
+								SetPointGroupOrder(temp);
+						}
+					}
+						break;
+					case MMP_IODGCoordType:
+					{
+						const char * v = child->getValue();
+						if (v) SetCoordType(v);
+					}
+						break;
+					case MMP_IODGNumZVars:
+					{
+						long temp;
+						if (child->getLongValue(temp)) SetNumZVar(temp);
+					}
+						break;
+					case MMP_IODGUnits:
+						if (child->getBoolValue(tb))
+							SetUnits(tb);
+						break;
+					case MMP_IODGNoSymFlag:
+						if (child->getBoolValue(tb))
+							SetUseSym(tb);
+						break;
+				}
+			}
+		}
+	}
+}
+#pragma mark GuessGroup
+	//Guess Group functions
+//This function is here to provide a default value before returning the string
+const char * GuessGroup::GetGuessText(void) const {
+	short value = GetGuess();
+	if (value == 0) value = 1;
+
+	return ConvertGuessType(value);
+}
+short GuessGroup::SetGuess(const char * GuessText) {
+	short NewGuess = -1;
+
+	for (int i=1; i<NumberGuessTypes; i++) {
+		const char * val = ConvertGuessType(i);
+		if (-1<LocateKeyWord(GuessText, val, strlen(val), 7)) {
+			NewGuess = i;
+			break;
+		}
+	}
+	if (NewGuess<0) return -1;
+	NewGuess = SetGuess(NewGuess);
+	return NewGuess;
+}
+const char * GuessGroup::ConvertGuessType(const int & type) {
+	switch (type) {
+		case HUCKELGuessType:
+			return "HUCKEL";
+		case HCOREGuessType:
+			return "HCORE";
+		case MOREADGuessType:
+			return "MOREAD";
+		case MOSAVEDGuessType:
+			return "MOSAVED";
+		case SkipGuessType:
+			return "SKIP";	//By hand later?
+		default:
+			return "invalid";
+	}
+	return NULL;
+}
+GuessGroup::GuessGroup(void) {
+	InitData();
+}
+GuessGroup::GuessGroup(GuessGroup *Copy) {	//copy constructor
+	if (Copy) {
+		*this = *Copy;
+		IOrder = JOrder = NULL;
+			//check and copy I & J order here
+	}
+}
+void GuessGroup::InitData(void) {
+	MOTolZ = MOTolEquil = 0.0;
+	IOrder = JOrder = NULL;
+	NumOrbs = 0;
+	VecSource = 0;
+	GuessType = 0;
+	Options = 0;
+}
+long GuessGroup::GetSize(BufferFile *Buffer) {
+	Boolean	cState = Buffer->GetOutput();
+	Buffer->SetOutput(false);
+	long size = WriteToBuffer(Buffer);
+	Buffer->SetOutput(cState);
+	return size;
+}
+long GuessGroup::WriteToBuffer(BufferFile *Buffer) {
+	long total, code, length = sizeof(GuessGroup);
+
+	code = 1;
+	total = Buffer->Write((Ptr) &code, sizeof(long));
+	length = 2*sizeof(float) + sizeof(long) + 2*sizeof(short) + sizeof(char);
+	total += Buffer->Write((Ptr) &length, sizeof(long));
+	total += Buffer->Write((Ptr) &MOTolZ, sizeof(float));
+	total += Buffer->Write((Ptr) &MOTolEquil, sizeof(float));
+	total += Buffer->Write((Ptr) &NumOrbs, sizeof(long));
+	total += Buffer->Write((Ptr) &VecSource, sizeof(short));
+	total += Buffer->Write((Ptr) &GuessType, sizeof(short));
+	total += Buffer->Write((Ptr) &Options, sizeof(char));
+
+		//copy iorder and jorder too
+
+	return total;
+}
+long GuessGroup::ReadFromBuffer(BufferFile *Buffer) {
+	long mylength, size;
+
+	size = Buffer->Read((Ptr) &mylength, sizeof(long));
+	if (mylength != 1) return size;
+	size += Buffer->Read((Ptr) &mylength, sizeof(long));
+	if (mylength != (2*sizeof(float) + sizeof(long) + 2*sizeof(short) + sizeof(char))) return size;
+	
+	size += Buffer->Read((Ptr) &MOTolZ, sizeof(float));
+	size += Buffer->Read((Ptr) &MOTolEquil, sizeof(float));
+	size += Buffer->Read((Ptr) &NumOrbs, sizeof(long));
+	size += Buffer->Read((Ptr) &VecSource, sizeof(short));
+	size += Buffer->Read((Ptr) &GuessType, sizeof(short));
+	size += Buffer->Read((Ptr) &Options, sizeof(char));
+	return size;
+}
+void GuessGroup::WriteToFile(BufferFile *File, InputData *IData, MoleculeData * MainData) {
+	long	test=false;
+	char	Out[133];
+
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+		//first determine wether or not the Guess group needs to be punched
+	if (GetGuess()) test = true;
+	if (GetPrintMO()) test = true;
+	if (GetMix()&&IData->Control->GetMultiplicity()&&
+		(IData->Control->GetSCFType()==2)) test = true;
+
+	if (!test) return;
+
+		//Punch the group label
+	File->WriteLine(" $GUESS ", false);
+		//Guess Type
+	if (GetGuess()) {
+		sprintf(Out,"GUESS=%s ", GetGuessText());
+		File->WriteLine(Out, false);
+	}
+		//NumOrbs
+	if (GetGuess()==3) {
+		long nOrbs = GetNumOrbs();
+		if (!nOrbs) {	//Make a guess if the guess comes from local orbs
+			short tempVec = GetVecSource();
+			const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
+			if (Orbs->size() > 0) {
+				if ((tempVec<=0)||(tempVec>Orbs->size() + 2)) tempVec = 2;
+				if (tempVec > 1) {
+					OrbitalRec * OrbSet = (*Orbs)[tempVec-2];
+					nOrbs = OrbSet->getNumOccupiedAlphaOrbitals();
+					if (nOrbs <= 0) nOrbs = OrbSet->getNumAlphaOrbitals();
+				}
+			}
+		}
+		sprintf(Out, "NORB=%d ", nOrbs);
+		File->WriteLine(Out, false);
+	}	//PrintMO
+	if (GetPrintMO()) {
+		sprintf(Out, "PRTMO=.TRUE. ");
+		File->WriteLine(Out, false);
+	}	//Mix
+	if (GetMix()&&((IData->Control->GetMultiplicity()==1)||
+			(IData->Control->GetMultiplicity()==0))&&(IData->Control->GetSCFType()==2)) {
+		sprintf(Out, "MIX=.TRUE. ");
+		File->WriteLine(Out, false);
+	}
+	File->WriteLine("$END", true);
+}
+void GuessGroup::WriteVecGroup(BufferFile *File, MoleculeData * lData) {
+		//prepare to punch out $Vec information if Guess=MORead
+	if (GetGuess() == 3) {
+		Frame * lFrame = lData->GetCurrentFramePtr();
+		BasisSet * lBasis = lData->GetBasisSet();
+		long NumBasisFuncs = lBasis->GetNumBasisFuncs(false);
+		short tempVec = GetVecSource();
+		const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
+		if ((tempVec != 1)&&(Orbs->size() > 0)) {
+			if ((tempVec<=0)||(tempVec>Orbs->size() + 2)) tempVec = 2;
+			if (tempVec > 1) {
+				OrbitalRec * OrbSet = (*Orbs)[tempVec-2];
+				long nOrbs = GetNumOrbs();
+				if (nOrbs <= 0) {	//Setup the default value for the orbital count
+					nOrbs = OrbSet->getNumOccupiedAlphaOrbitals();
+					if (nOrbs <= 0) nOrbs = OrbSet->getNumAlphaOrbitals();
+				}
+				OrbSet->WriteVecGroup(File, NumBasisFuncs, nOrbs);
+			}
+		} else {
+			File->WriteLine("You must provide a $VEC group here!", true);
+		}
+	}
+}
+void GuessGroup::WriteXML(XMLElement * parent) const {
+	char line[kMaxLineLength];
+	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOGuessGroupElement));
+	if (GuessType) Ele->addChildElement(CML_convert(MMP_IOGGGuessType), ConvertGuessType(GuessType));
+	if (NumOrbs) {
+		snprintf(line, kMaxLineLength, "%d", NumOrbs);
+		Ele->addChildElement(CML_convert(MMP_IOGGNumOrbs), line);
+	}
+	if (VecSource) {
+		snprintf(line, kMaxLineLength, "%d", VecSource);
+		Ele->addChildElement(CML_convert(MMP_IOGGVecSource), line);
+	}
+	if (GetPrintMO()) Ele->addChildElement(CML_convert(MMP_IOGGPrintMO), trueXML);
+	if (GetNOrder()) Ele->addChildElement(CML_convert(MMP_IOGGOrbReorder), trueXML);
+	if (GetMix()) Ele->addChildElement(CML_convert(MMP_IOGGOrbMix), trueXML);
+	if (MOTolZ) {
+		snprintf(line, kMaxLineLength, "%f", MOTolZ);
+		Ele->addChildElement(CML_convert(MMP_IOGGMOTolZ), line);
+	}
+	if (MOTolEquil) {
+		snprintf(line, kMaxLineLength, "%f", MOTolEquil);
+		Ele->addChildElement(CML_convert(MMP_IOGGMOTolEquil), line);
+	}
+}
+void GuessGroup::ReadXML(XMLElement * parent) {
+	XMLElementList * children = parent->getChildren();
+	if (children) {
+		for (int i=0; i<children->length(); i++) {
+			XMLElement * child = children->item(i);
+			MMP_IOControlGroupNS item;
+			if (child && CML_convert(child->getName(), item)) {
+				bool tb;
+				switch (item) {
+					case MMP_IOGGGuessType:
+					{
+						const char * v = child->getValue();
+						if (v) SetGuess(v);
+					}
+						break;
+					case MMP_IOGGNumOrbs:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetNumOrbs(temp);
+						}
+					}
+						break;
+					case MMP_IOGGVecSource:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							VecSource = temp;
+						}
+					}
+						break;
+					case MMP_IOGGPrintMO:
+						if (child->getBoolValue(tb))
+							SetPrintMO(tb);
+						break;
+					case MMP_IOGGOrbReorder:
+						if (child->getBoolValue(tb))
+							SetNOrder(tb);
+						break;
+					case MMP_IOGGOrbMix:
+						if (child->getBoolValue(tb))
+							SetMix(tb);
+						break;
+					case MMP_IOGGMOTolZ:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) MOTolZ = temp;
+					}
+						break;
+					case MMP_IOGGMOTolEquil:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) MOTolEquil = temp;
+					}
+						break;
+				}
+			}
+		}
+	}
+}
+#pragma mark SCFGroup
+SCFGroup::SCFGroup(void) {
+	InitData();
+}
+SCFGroup::SCFGroup(SCFGroup *Copy) {
+	if (Copy)
+		*this = *Copy;
+	else
+		SCFGroup();
+}
+void SCFGroup::InitData(void) {
+	SOGTolerance = EnErrThresh = DEMCutoff = DampCutoff = 0.0;
+	ConvCriteria = MaxDIISEq = MVOCharge = 0;
+	Punch = Options1 = ConverganceFlags = 0;
+	SetFockDiff(true);
+}
+bool SCFGroup::SetDirectSCF(bool State) {
+	if (Options1 & 1) Options1--;
+	if (State) Options1 ++;
+	return GetDirectSCF();
+}
+bool SCFGroup::SetFockDiff(bool State) {
+	if (Options1 & 2) Options1 -= 2;
+	if (State) Options1 += 2;
+	return GetFockDiff();
+}
+bool SCFGroup::SetUHFNO(bool State) {
+	if (Options1 & 4) Options1 -= 4;
+	if (State) Options1 += 4;
+	return GetUHFNO();
+}
+short SCFGroup::SetConvergance(short NewConv) {
+	if (NewConv > 0) ConvCriteria = NewConv;
+	return ConvCriteria;
+}
+long SCFGroup::GetSize(BufferFile *Buffer) {
+	Boolean	cState = Buffer->GetOutput();
+	Buffer->SetOutput(false);
+	long size = WriteToBuffer(Buffer);
+	Buffer->SetOutput(cState);
+	return size;
+}
+long SCFGroup::WriteToBuffer(BufferFile *Buffer) {
+	long	pos, length = sizeof(SCFGroup);
+
+	pos = Buffer->Write((Ptr) &length, sizeof(long));
+	pos += Buffer->Write((Ptr) this, length);
+	return pos;
+}
+long SCFGroup::ReadFromBuffer(BufferFile *Buffer) {
+	long mylength, size;
+
+	size = Buffer->Read((Ptr) &mylength, sizeof(long));
+	if (mylength != sizeof(SCFGroup)) return size;
+	size += Buffer->Read((Ptr) this, mylength);
+	return size;
+}
+void SCFGroup::WriteToFile(BufferFile *File, InputData *IData) {
+	long	test=false;
+	char	Out[133];
+
+		//first determine wether or not the SCF group needs to be punched
+	if (IData->Control->GetSCFType() > 4) return;	//not relavent to the selected SCF type
+	if (ConvCriteria > 0) test = true;
+	if (GetDirectSCF()) test = true;
+	
+	if (!test) return;
+
+		//Punch the group label
+	File->WriteLine(" $SCF ", false);
+		//Direct SCF
+	if (GetDirectSCF()) {
+		sprintf(Out,"DIRSCF=.TRUE. ");
+		File->WriteLine(Out, false);
+		if (!GetFockDiff()) {	//Fock Differencing requires direct SCF
+			sprintf(Out,"FDIFF=.FALSE. ");
+			File->WriteLine(Out, false);
+		}
+	}
+		//convergance
+	if (ConvCriteria > 0) {
+		sprintf(Out, "NCONV=%d ", ConvCriteria);
+		File->WriteLine(Out, false);
+	}	//UHF Natural Orbitals
+	if (GetUHFNO()) {
+		sprintf(Out, "UHFNOS=.TRUE. ");
+		File->WriteLine(Out, false);
+	}
+
+	File->WriteLine("$END", true);
+}
+void SCFGroup::WriteXML(XMLElement * parent) const {
+	char line[kMaxLineLength];
+	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOSCFGroupElement));
+	if (GetConvergance()) {
+		snprintf(line, kMaxLineLength, "%d", GetConvergance());
+		Ele->addChildElement(CML_convert(MMP_IOSGConvCriteria), line);
+	}
+	if (GetDirectSCF()) Ele->addChildElement(CML_convert(MMP_IOSGDirectSCF), trueXML);
+	if (GetFockDiff()) Ele->addChildElement(CML_convert(MMP_IOSGFockDiff), trueXML);
+	if (GetUHFNO()) Ele->addChildElement(CML_convert(MMP_IOSGUHFNauralOrbitals), trueXML);
+}
+void SCFGroup::ReadXML(XMLElement * parent) {
+	XMLElementList * children = parent->getChildren();
+	if (children) {
+		for (int i=0; i<children->length(); i++) {
+			XMLElement * child = children->item(i);
+			MMP_IOControlGroupNS item;
+			if (child && CML_convert(child->getName(), item)) {
+				bool tb;
+				switch (item) {
+					case MMP_IOSGConvCriteria:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetConvergance(temp);
+						}
+					}
+						break;
+					case MMP_IOSGDirectSCF:
+						if (child->getBoolValue(tb))
+							SetDirectSCF(tb);
+						break;
+					case MMP_IOSGFockDiff:
+						if (child->getBoolValue(tb))
+							SetFockDiff(tb);
+						break;
+					case MMP_IOSGUHFNauralOrbitals:
+						if (child->getBoolValue(tb))
+							SetUHFNO(tb);
+						break;
+				}
+			}
+		}
+	}
+}
+#pragma mark MP2Group
+MP2Group::MP2Group(void) {
+	InitData();
+}
+MP2Group::MP2Group(MP2Group *Copy) {
+	*this = *Copy;
+}
+void MP2Group::InitData(void) {
+	CutOff = 0.0;
+	NumCoreElectrons = Memory = 0;
+	Method = AOInts = LMOMP2 = 0;
+}
+float MP2Group::SetIntCutoff(float NewCutoff) {
+	if (NewCutoff > 0.0) CutOff = NewCutoff;
+	return CutOff;
+}
+long MP2Group::SetNumCoreElectrons(long NewNum) {
+	if (NewNum>=0) NumCoreElectrons = NewNum;
+	return NumCoreElectrons;
+}
+long MP2Group::SetMemory(long NewMem) {
+	if (NewMem >= 0) Memory = NewMem;
+	return Memory;
+}
+char MP2Group::SetMethod(char NewMethod) {
+	if ((NewMethod==2)||(NewMethod==3)) Method = NewMethod;
+	return Method;
+}
+const char * MP2Group::GetAOIntMethodText(void) const {
+	if (AOInts == 0) return NULL;
+	if (AOInts == 1) return "DUP";
+	return "DIST";
+}
+void MP2Group::SetAOIntMethod(const char * t) {
+	if (!t) return;
+	if (!strcmp(t, "DUP")) AOInts = 1;
+	else if (!strcmp(t, "DIST")) AOInts = 2;
+}
+char MP2Group::SetAOIntMethod(char NewMethod) {
+	if ((NewMethod == 1)||(NewMethod == 2)) AOInts = NewMethod;
+	return AOInts;
+}
+bool MP2Group::GetLMOMP2(void) const {
+	if (LMOMP2) return true;
+	return false;
+}
+bool MP2Group::SetLMOMP2(bool State) {
+	if (State) LMOMP2 = true;
+	else LMOMP2 = false;
+	return LMOMP2;
+}
+long MP2Group::GetSize(BufferFile *Buffer) {
+	Boolean	cState = Buffer->GetOutput();
+	Buffer->SetOutput(false);
+	long size = WriteToBuffer(Buffer);
+	Buffer->SetOutput(cState);
+	return size;
+}
+long MP2Group::WriteToBuffer(BufferFile *Buffer) {
+	long	pos, length=sizeof(MP2Group);
+
+	pos = Buffer->Write((Ptr) &length, sizeof(long));
+	pos += Buffer->Write((Ptr) this, length);
+	return pos;
+}
+long MP2Group::ReadFromBuffer(BufferFile *Buffer) {
+	long mylength, size;
+
+	size = Buffer->Read((Ptr) &mylength, sizeof(long));
+	if (mylength != sizeof(MP2Group)) return size;
+	size += Buffer->Read((Ptr) this, mylength);
+	return size;
+}
+void MP2Group::WriteToFile(BufferFile *File, InputData *IData) {
+	long	test=false;
+	char	Out[133];
+
+		//first determine wether or not the MP2 group needs to be punched
+	if (IData->Control->GetMPLevel() != 2) return;	//Don't punch if MP2 isn't active
+	if (NumCoreElectrons||Memory||Method||AOInts) test = true;
+	if (GetLMOMP2()) test = true;
+	if (CutOff > 0.0) test = true;
+	
+	if (!test) return;
+
+		//Punch the group label
+	File->WriteLine(" $MP2 ", false);
+		//core electrons
+	if (NumCoreElectrons >= 0) {
+		sprintf(Out,"NCORE=%ld ", NumCoreElectrons);
+		File->WriteLine(Out, false);
+	}
+		//LMOMP2
+	if (GetLMOMP2()) {
+		sprintf(Out, "LMOMP2=.TRUE. ");
+		File->WriteLine(Out, false);
+	}	//Memory
+	if (Memory) {
+		sprintf(Out, "NWORD=%ld ",Memory);
+		File->WriteLine(Out, false);
+	}	//CutOff
+	if (CutOff > 0.0) {
+		sprintf(Out, "CUTOFF=%e.2 ", CutOff);
+		File->WriteLine(Out, false);
+	}	//Method
+	if (Method) {
+		sprintf(Out, "METHOD=%d ", Method);
+		File->WriteLine(Out, false);
+	}	//AO storage
+	if (AOInts) {
+		sprintf(Out, "AOINTS=%s ", GetAOIntMethodText());
+		File->WriteLine(Out, false);
+	}
+
+	File->WriteLine("$END", true);
+}
+void MP2Group::WriteXML(XMLElement * parent) const {
+	char line[kMaxLineLength];
+	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOMP2GroupElement));
+	if (NumCoreElectrons) {
+		snprintf(line, kMaxLineLength, "%d", NumCoreElectrons);
+		Ele->addChildElement(CML_convert(MMP_IOMGNumCoreElectrons), line);
+	}
+	if (CutOff > 0.0) {
+		snprintf(line, kMaxLineLength, "%lf", CutOff);
+		Ele->addChildElement(CML_convert(MMP_IOMGCutOff), line);
+	}
+	if (Memory) {
+		snprintf(line, kMaxLineLength, "%d", Memory);
+		Ele->addChildElement(CML_convert(MMP_IOMGMemory), line);
+	}
+	if (Method) {
+		snprintf(line, kMaxLineLength, "%d", Method);
+		Ele->addChildElement(CML_convert(MMP_IOMGTransMethod), line);
+	}
+	if (AOInts) Ele->addChildElement(CML_convert(MMP_IOMGAOInts), GetAOIntMethodText());
+	if (GetLMOMP2()) Ele->addChildElement(CML_convert(MMP_IOMGLMOMP2), trueXML);
+}
+void MP2Group::ReadXML(XMLElement * parent) {
+	XMLElementList * children = parent->getChildren();
+	if (children) {
+		for (int i=0; i<children->length(); i++) {
+			XMLElement * child = children->item(i);
+			MMP_IOControlGroupNS item;
+			if (child && CML_convert(child->getName(), item)) {
+				switch (item) {
+					case MMP_IOMGNumCoreElectrons:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetNumCoreElectrons(temp);
+						}
+					}
+						break;
+					case MMP_IOMGCutOff:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							SetIntCutoff(temp);
+						}
+					}
+						break;
+					case MMP_IOMGMemory:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetMemory(temp);
+						}
+					}
+						break;
+					case MMP_IOMGTransMethod:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							Method = temp;
+						}
+					}
+						break;
+					case MMP_IOMGAOInts:
+					{
+						const char * v = child->getValue();
+						if (v) {
+							SetAOIntMethod(v);
+						}
+					}
+						break;
+					case MMP_IOMGLMOMP2:
+					{
+						bool tb;
+						if (child->getBoolValue(tb))
+							SetLMOMP2(tb);
+					}
+						break;
+				}
+			}
+		}
+	}
+}
+#pragma mark HessianGroup
+void HessianGroup::InitData(void) {
+	DisplacementSize = 0.01;
+	FrequencyScaleFactor = 1.0;
+	BitOptions = 17;	//bit 1 + bit 5
+}
+long HessianGroup::GetSize(BufferFile *Buffer) {
+	Boolean	cState = Buffer->GetOutput();
+	Buffer->SetOutput(false);
+	long size = WriteToBuffer(Buffer);
+	Buffer->SetOutput(cState);
+	return size;
+}
+long HessianGroup::ReadFromBuffer(BufferFile *Buffer) {
+	long mylength, size;
+
+	size = Buffer->Read((Ptr) &mylength, sizeof(long));
+	if (mylength != sizeof(HessianGroup)) return size;
+	size += Buffer->Read((Ptr) this, mylength);
+	return size;
+}
+long HessianGroup::WriteToBuffer(BufferFile *Buffer) {
+	long	pos, length=sizeof(HessianGroup);
+
+	pos = Buffer->Write((Ptr) &length, sizeof(long));
+	pos += Buffer->Write((Ptr) this, length);
+	return pos;
+}
+void HessianGroup::WriteToFile(BufferFile *File, InputData *IData) {
+	Boolean	method=false;
+	char	Out[133];
+
+		//first determine wether or not the hessian group needs to be punched
+		//punch for hessians and optimize/sadpoint runs using Hess=Calc
+	if (IData->Control->GetRunType() == 3) method = true;
+	else if ((IData->Control->GetRunType() == 4)||(IData->Control->GetRunType() == 6)) {
+		if (IData->StatPt) {
+			if (IData->StatPt->GetHessMethod() == 3) method = true;
+		}
+	}
+	if (!method) return;
+
+	method = GetAnalyticMethod();
+	if (method) {
+		if (!(((IData->Control->GetSCFType() == 1)||(IData->Control->GetSCFType() == 3)||
+			(IData->Control->GetSCFType() == 4)||(IData->Control->GetSCFType() == 0))&&
+			(IData->Basis->GetECPPotential() <=1)))
+				method = false;
+	}
+		//Punch the group label
+	File->WriteLine(" $FORCE ", false);
+		//Method
+	if (method) File->WriteLine("METHOD=ANALYTIC ", false);
+	else File->WriteLine("METHOD=NUMERIC ", false);
+	if (!method) {
+			//NVIB
+		if (GetDoubleDiff()) {
+			File->WriteLine("NVIB=2 ", false);
+		}	//Vib Size
+		if (DisplacementSize != 0.01) {
+			sprintf(Out, "VIBSIZ=%f ", DisplacementSize);
+			File->WriteLine(Out, false);
+		}
+	}	//Purify
+	if (GetPurify()) {
+		File->WriteLine("PURIFY=.TRUE. ", false);
+	}	//Print internal FC's
+	if (GetPrintFC()) {
+		File->WriteLine("PRTIFC=.TRUE. ", false);
+	}	//vib analysis
+	if (GetVibAnalysis()) {
+		File->WriteLine("VIBANL=.TRUE. ", false);
+		if (FrequencyScaleFactor != 1.0) {
+			sprintf(Out, "SCLFAC=%f ", FrequencyScaleFactor);
+			File->WriteLine(Out, false);
+		}
+	} else File->WriteLine("VIBANL=.FALSE. ", false);
+
+	File->WriteLine("$END", true);
+}
+void HessianGroup::WriteXML(XMLElement * parent) const {
+	char line[kMaxLineLength];
+	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOHessianGroupElement));
+	if (DisplacementSize > 0.0) {
+		snprintf(line, kMaxLineLength, "%f", DisplacementSize);
+		Ele->addChildElement(CML_convert(MMP_IOHGDisplacementSize), line);
+	}
+	if (FrequencyScaleFactor > 0.0) {
+		snprintf(line, kMaxLineLength, "%lf", FrequencyScaleFactor);
+		Ele->addChildElement(CML_convert(MMP_IOHGFrequencyScaleFactor), line);
+	}
+	if (GetAnalyticMethod()) Ele->addChildElement(CML_convert(MMP_IOHGMethod), "analytic");
+	else Ele->addChildElement(CML_convert(MMP_IOHGMethod), "numeric");
+	if (GetPurify()) Ele->addChildElement(CML_convert(MMP_IOHGPurify), trueXML);
+	if (GetPrintFC()) Ele->addChildElement(CML_convert(MMP_IOHGInternalFC), trueXML);
+	if (GetVibAnalysis()) Ele->addChildElement(CML_convert(MMP_IOHGVibAnalysis), trueXML);
+}
+void HessianGroup::ReadXML(XMLElement * parent) {
+	XMLElementList * children = parent->getChildren();
+	if (children) {
+		for (int i=0; i<children->length(); i++) {
+			XMLElement * child = children->item(i);
+			MMP_IOControlGroupNS item;
+			if (child && CML_convert(child->getName(), item)) {
+				bool tb;
+				switch (item) {
+					case MMP_IOHGDisplacementSize:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							SetDisplacementSize(temp);
+						}
+					}
+						break;
+					case MMP_IOHGFrequencyScaleFactor:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							SetFreqScale(temp);
+						}
+					}
+						break;
+					case MMP_IOHGMethod:
+					{
+						const char * v = child->getValue();
+						if (v) {
+							if (!strcasecmp(v, "analytic")) SetAnalyticMethod(true);
+							else if (!strcasecmp(v, "numeric")) SetAnalyticMethod(false);
+						}
+					}
+						break;
+					case MMP_IOHGPurify:
+						if (child->getBoolValue(tb))
+							SetPurify(tb);
+						break;
+					case MMP_IOHGInternalFC:
+						if (child->getBoolValue(tb))
+							SetPrintFC(tb);
+						break;
+					case MMP_IOHGVibAnalysis:
+						if (child->getBoolValue(tb))
+							SetVibAnalysis(tb);
+						break;
+				}
+			}
+		}
+	}
+}
+#pragma mark DFTGroup
+void DFTGroup::InitData(void) {
+	GridSwitch = 3.0e-4;
+	Threshold = 1.0e-4;
+	Functional = 0;
+	NumRadialGrids = 96;
+	NumThetaGrids = 12;
+	NumPhiGrids = 24;
+	NumRadialGridsInit = 24;
+	NumThetaGridsInit = 8;
+	NumPhiGridsInit = 16;
+	BitFlags = 0;
+	SetAuxFunctions(true);
+	SetMethodGrid(true);
+}
+long DFTGroup::GetSize(BufferFile *Buffer) {
+	Boolean	cState = Buffer->GetOutput();
+	Buffer->SetOutput(false);
+	long size = WriteToBuffer(Buffer);
+	Buffer->SetOutput(cState);
+	return size;
+}
+long DFTGroup::WriteToBuffer(BufferFile *Buffer) {
+	long	pos, length=2*sizeof(float)+7*sizeof(short)+sizeof(char);
+
+	pos = Buffer->Write((Ptr) &length, sizeof(long));
+	pos += Buffer->Write((Ptr) &GridSwitch, sizeof(float));
+	pos += Buffer->Write((Ptr) &Threshold, sizeof(float));
+	pos += Buffer->Write((Ptr) &Functional, sizeof(short));
+	pos += Buffer->Write((Ptr) &NumRadialGrids, sizeof(short));
+	pos += Buffer->Write((Ptr) &NumThetaGrids, sizeof(short));
+	pos += Buffer->Write((Ptr) &NumPhiGrids, sizeof(short));
+	pos += Buffer->Write((Ptr) &NumRadialGridsInit, sizeof(short));
+	pos += Buffer->Write((Ptr) &NumThetaGridsInit, sizeof(short));
+	pos += Buffer->Write((Ptr) &NumPhiGridsInit, sizeof(short));
+	pos += Buffer->Write((Ptr) &BitFlags, sizeof(char));
+	return pos;
+}
+long DFTGroup::ReadFromBuffer(BufferFile *Buffer) {
+	long mylength, size, length = 2*sizeof(float)+7*sizeof(short)+sizeof(char);
+
+	size = Buffer->Read((Ptr) &mylength, sizeof(long));
+	if (mylength != length) return size;
+	size += Buffer->Read((Ptr) this, mylength);
+	size += Buffer->Read((Ptr) &GridSwitch, sizeof(float));
+	size += Buffer->Read((Ptr) &Threshold, sizeof(float));
+	size += Buffer->Read((Ptr) &Functional, sizeof(short));
+	size += Buffer->Read((Ptr) &NumRadialGrids, sizeof(short));
+	size += Buffer->Read((Ptr) &NumThetaGrids, sizeof(short));
+	size += Buffer->Read((Ptr) &NumPhiGrids, sizeof(short));
+	size += Buffer->Read((Ptr) &NumRadialGridsInit, sizeof(short));
+	size += Buffer->Read((Ptr) &NumThetaGridsInit, sizeof(short));
+	size += Buffer->Read((Ptr) &NumPhiGridsInit, sizeof(short));
+	size += Buffer->Read((Ptr) &BitFlags, sizeof(char));
+	return size;
+}
+void DFTGroup::WriteToFile(BufferFile *File, InputData *IData) {
+	char	Out[kMaxLineLength];
+
+	short SCFType = IData->Control->GetSCFType();
+		//first determine wether or not the DFT group needs to be punched
+	if ((SCFType > 3)|| !IData->Control->UseDFT()) return;//only punch for HF runtypes (RHF, ROHF, UHF)
+
+		//Punch the group label
+	File->WriteLine(" $DFT ", false);
+		//Write out the funtional, and any other optional parameters
+		//Method
+	if (!MethodGrid()) {	//punch method if it needs to be grid-free
+		sprintf(Out, "METHOD=GRIDFREE ");
+		File->WriteLine(Out, false);
+	}
+		Str255 name;
+	GetFunctional(name);
+	name[name[0]+1] = '\0';
+	sprintf(Out, "DFTTYP=%s ", &(name[1]));
+	File->WriteLine(Out, false);
+
+	File->WriteLine("$END", true);
+}
+short DFTGroup::GetFunctional(unsigned char * FuncName) const {
+	short temp = Functional;
+	FuncName[0] = 0;
+	if (temp <= 0) temp = 1;
+	if (MethodGrid()) {
+		if (temp <= kDFTGridFunctionalMaxStrings)
+			GetIndString(FuncName, kDFTGridFunctionalStrings, temp);
+	} else {	//Grid-free functional list is fairly different
+		if (temp <= kDFTGridFreeFunctionalMaxStrings)
+			GetIndString(FuncName, kDFTGridFreeFunctionalStrings, temp);
+	}
+	return Functional;
+}
+short DFTGroup::SetFunctional(short newvalue) {
+		//Probably need some checks here??
+	Functional = newvalue;
+	return Functional;
+}
+void DFTGroup::WriteXML(XMLElement * parent) const {
+	char line[kMaxLineLength];
+	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IODFTGroupElement));
+	snprintf(line, kMaxLineLength, "%f", GridSwitch);
+	Ele->addChildElement(CML_convert(MMP_IODFTGGridSwitch), line);
+	snprintf(line, kMaxLineLength, "%f", Threshold);
+	Ele->addChildElement(CML_convert(MMP_IODFTThreshold), line);
+	snprintf(line, kMaxLineLength, "%d", Functional);
+	Ele->addChildElement(CML_convert(MMP_IODFTFunctional), line);
+	snprintf(line, kMaxLineLength, "%d", NumRadialGrids);
+	Ele->addChildElement(CML_convert(MMP_IODFTNumRadialGrids), line);
+	snprintf(line, kMaxLineLength, "%d", NumThetaGrids);
+	Ele->addChildElement(CML_convert(MMP_IODFTNumThetaGrids), line);
+	snprintf(line, kMaxLineLength, "%d", NumPhiGrids);
+	Ele->addChildElement(CML_convert(MMP_IODFTNumPhiGrids), line);
+	snprintf(line, kMaxLineLength, "%d", NumRadialGridsInit);
+	Ele->addChildElement(CML_convert(MMP_IODFTNumRadialGridsInit), line);
+	snprintf(line, kMaxLineLength, "%d", NumThetaGridsInit);
+	Ele->addChildElement(CML_convert(MMP_IODFTNumThetaGridsInit), line);
+	snprintf(line, kMaxLineLength, "%d", NumPhiGridsInit);
+	Ele->addChildElement(CML_convert(MMP_IODFTNumPhiGridsInit), line);
+	if (MethodGrid()) Ele->addChildElement(CML_convert(MMP_IODFTGridMethod), trueXML);
+	if (GetAuxFunctions()) Ele->addChildElement(CML_convert(MMP_IODFTGetAuxFunctions), trueXML);
+	if (GetThree()) Ele->addChildElement(CML_convert(MMP_IODFTThree), trueXML);
+}
+void DFTGroup::ReadXML(XMLElement * parent) {
+	XMLElementList * children = parent->getChildren();
+	if (children) {
+		for (int i=0; i<children->length(); i++) {
+			XMLElement * child = children->item(i);
+			MMP_IOControlGroupNS item;
+			if (child && CML_convert(child->getName(), item)) {
+				bool tb;
+				switch (item) {
+					case MMP_IODFTGGridSwitch:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							GridSwitch = temp;
+						}
+					}
+						break;
+					case MMP_IODFTThreshold:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							Threshold = temp;
+						}
+					}
+						break;
+					case MMP_IODFTFunctional:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							Functional = temp;
+						}
+					}
+						break;
+					case MMP_IODFTNumRadialGrids:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							NumRadialGrids = temp;
+						}
+					}
+						break;
+					case MMP_IODFTNumThetaGrids:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							NumThetaGrids = temp;
+						}
+					}
+						break;
+					case MMP_IODFTNumPhiGrids:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							NumPhiGrids = temp;
+						}
+					}
+						break;
+					case MMP_IODFTNumRadialGridsInit:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							NumRadialGridsInit = temp;
+						}
+					}
+						break;
+					case MMP_IODFTNumThetaGridsInit:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							NumThetaGridsInit = temp;
+						}
+					}
+						break;
+					case MMP_IODFTNumPhiGridsInit:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							NumPhiGridsInit = temp;
+						}
+					}
+						break;
+					case MMP_IODFTGridMethod:
+						if (child->getBoolValue(tb))
+							SetMethodGrid(tb);
+						break;
+					case MMP_IODFTGetAuxFunctions:
+						if (child->getBoolValue(tb))
+							SetAuxFunctions(tb);
+						break;
+					case MMP_IODFTThree:
+						if (child->getBoolValue(tb))
+							SetThree(tb);
+						break;
+				}
+			}
+		}
+	}
+}
+#pragma mark StatPtGroup
+void StatPtGroup::InitData(void) {
+	OptConvergance = 0.0001;
+	InitTrustRadius = 0.0;
+	MaxTrustRadius = 0.0;
+	MinTrustRadius = 0.05;
+	StatJumpSize = 0.01;
+	ModeFollow = 1;
+	BitOptions = 0;
+	method = 3;
+	MaxSteps = 20;
+	nRecalcHess = 0;
+	SetRadiusUpdate(true);
+}
+long StatPtGroup::GetSize(BufferFile *Buffer) {
+	Boolean	cState = Buffer->GetOutput();
+	Buffer->SetOutput(false);
+	long size = WriteToBuffer(Buffer);
+	Buffer->SetOutput(cState);
+	return size;
+}
+long StatPtGroup::WriteToBuffer(BufferFile *Buffer) {
+	long	pos, length=sizeof(StatPtGroup);
+
+	pos = Buffer->Write((Ptr) &length, sizeof(long));
+	pos += Buffer->Write((Ptr) this, length);
+	return pos;
+}
+long StatPtGroup::ReadFromBuffer(BufferFile *Buffer) {
+	long mylength, size;
+
+	size = Buffer->Read((Ptr) &mylength, sizeof(long));
+	if (mylength != sizeof(StatPtGroup)) return size;
+	size += Buffer->Read((Ptr) this, mylength);
+	return size;
+}
+void StatPtGroup::WriteToFile(BufferFile *File, InputData *IData) {
+	char	Out[133];
+
+	short runType = IData->Control->GetRunType();
+		//first determine wether or not the statpt group needs to be punched
+	if ((runType != 4)&&(runType != 6)) return;	//only punch for optimize and sadpoint runs
+
+		//Punch the group label
+	File->WriteLine(" $STATPT ", false);
+		//write out the convergance criteria and number of steps by default, just
+		//to remind the user of their values. Everything else is optional.
+	sprintf(Out, "OPTTOL=%g ", GetOptConvergance());
+	File->WriteLine(Out, false);
+	sprintf(Out, "NSTEP=%d ", GetMaxSteps());
+	File->WriteLine(Out, false);
+		//Method
+	if (GetMethod() != 3) {
+		File->WriteLine("Method=", false);
+		switch (GetMethod()) {
+			case 1:
+				File->WriteLine("NR ", false);
+			break;
+			case 2:
+				File->WriteLine("RFO ", false);
+			break;
+			case 3:
+				File->WriteLine("QA ", false);
+			break;
+			case 4:
+				File->WriteLine("SCHLEGEL ", false);
+			break;
+			case 5:
+				File->WriteLine("CONOPT ", false);
+			break;
+		}
+	}	//DXMAX if non-default and method is not NR
+	if ((GetInitRadius() != 0.0)&&(GetMethod() !=1)) {
+		sprintf(Out, "DXMAX=%g ", GetInitRadius());
+		File->WriteLine(Out, false);
+	}
+	if ((GetMethod()==2)||(GetMethod()==3)) {
+		if (!GetRadiusUpdate()) File->WriteLine("TRUPD=.FALSE. ", false);
+		if (GetMaxRadius() != 0.0) {
+			sprintf(Out, "TRMAX=%g ", GetMaxRadius());
+			File->WriteLine(Out, false);
+		}
+		if (fabs(GetMinRadius() - 0.05)>1e-5) {
+			sprintf(Out, "TRMIN=%g ", GetMinRadius());
+			File->WriteLine(Out, false);
+		}
+	}
+	if ((runType == 6)&&(GetModeFollow() != 1)) {
+		sprintf(Out, "IFOLOW=%d ", GetModeFollow());
+		File->WriteLine(Out, false);
+	}
+	if (GetStatPoint()) {
+		File->WriteLine("STPT=.TRUE. ", false);
+		if (fabs(GetStatJump() - 0.01)>1e-5) {
+			sprintf(Out, "STSTEP=%g ", GetStatJump());
+			File->WriteLine(Out, false);
+		}
+	}
+	if (GetHessMethod()) {
+		File->WriteLine("HESS=", false);
+		switch (GetHessMethod()) {
+			case 1:
+				File->WriteLine("GUESS ", false);
+			break;
+			case 2:
+				File->WriteLine("READ ", false);
+			break;
+			case 3:
+				File->WriteLine("CALC ", false);
+			break;
+		}
+	}
+	if (GetHessRecalcInterval()) {
+		sprintf(Out, "IHREP=%d ", GetHessRecalcInterval());
+		File->WriteLine(Out, false);
+	}
+	if (AlwaysPrintOrbs()) {
+		File->WriteLine("NPRT=1 ", false);
+	}
+
+	File->WriteLine("$END", true);
+}
+void StatPtGroup::WriteXML(XMLElement * parent) const {
+	char line[kMaxLineLength];
+	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOStatPtGroupElement));
+	snprintf(line, kMaxLineLength, "%f", OptConvergance);
+	Ele->addChildElement(CML_convert(MMP_IOSPGOptConvergance), line);
+	snprintf(line, kMaxLineLength, "%f", InitTrustRadius);
+	Ele->addChildElement(CML_convert(MMP_IOSPGInitTrustRadius), line);
+	snprintf(line, kMaxLineLength, "%f", MaxTrustRadius);
+	Ele->addChildElement(CML_convert(MMP_IOSPGMaxTrustRadius), line);
+	snprintf(line, kMaxLineLength, "%f", MinTrustRadius);
+	Ele->addChildElement(CML_convert(MMP_IOSPGMinTrustRadius), line);
+	snprintf(line, kMaxLineLength, "%f", StatJumpSize);
+	Ele->addChildElement(CML_convert(MMP_IOSPGStatJumpSize), line);
+	snprintf(line, kMaxLineLength, "%ld", ModeFollow);
+	Ele->addChildElement(CML_convert(MMP_IOSPGModeFollow), line);
+	if (GetRadiusUpdate()) Ele->addChildElement(CML_convert(MMP_IOSPGRadiusUpdate), trueXML);
+	if (GetStatPoint()) Ele->addChildElement(CML_convert(MMP_IOSPGStatPoint), trueXML);
+	snprintf(line, kMaxLineLength, "%d", GetHessMethod());
+	Ele->addChildElement(CML_convert(MMP_IOSPGHessMethod), line);
+	snprintf(line, kMaxLineLength, "%d", method);
+	Ele->addChildElement(CML_convert(MMP_IOSPGMethod), line);
+	snprintf(line, kMaxLineLength, "%d", MaxSteps);
+	Ele->addChildElement(CML_convert(MMP_IOSPGMaxSteps), line);
+	snprintf(line, kMaxLineLength, "%d", nRecalcHess);
+	Ele->addChildElement(CML_convert(MMP_IOSPGnRecalcHess), line);
+	if (GetStatPoint()) Ele->addChildElement(CML_convert(MMP_IOSPGAlwaysPrintOrbs), trueXML);
+}
+void StatPtGroup::ReadXML(XMLElement * parent) {
+	XMLElementList * children = parent->getChildren();
+	if (children) {
+		for (int i=0; i<children->length(); i++) {
+			XMLElement * child = children->item(i);
+			MMP_IOControlGroupNS item;
+			if (child && CML_convert(child->getName(), item)) {
+				bool tb;
+				switch (item) {
+					case MMP_IOSPGOptConvergance:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							SetOptConvergance(temp);
+						}
+					}
+						break;
+					case MMP_IOSPGInitTrustRadius:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							SetInitRadius(temp);
+						}
+					}
+						break;
+					case MMP_IOSPGMaxTrustRadius:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							SetMaxRadius(temp);
+						}
+					}
+						break;
+					case MMP_IOSPGMinTrustRadius:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							SetMinRadius(temp);
+						}
+					}
+						break;
+					case MMP_IOSPGStatJumpSize:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							SetStatJump(temp);
+						}
+					}
+						break;
+					case MMP_IOSPGModeFollow:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetModeFollow(temp);
+						}
+					}
+						break;
+					case MMP_IOSPGRadiusUpdate:
+						if (child->getBoolValue(tb))
+							SetRadiusUpdate(tb);
+						break;
+					case MMP_IOSPGStatPoint:
+						if (child->getBoolValue(tb))
+							SetStatPoint(tb);
+						break;
+					case MMP_IOSPGHessMethod:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetHessMethod(temp);
+						}
+					}
+						break;
+					case MMP_IOSPGMethod:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetMethod(temp);
+						}
+					}
+						break;
+					case MMP_IOSPGMaxSteps:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetMaxSteps(temp);
+						}
+					}
+						break;
+					case MMP_IOSPGnRecalcHess:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetHessRecalcInterval(temp);
+						}
+					}
+						break;
+					case MMP_IOSPGAlwaysPrintOrbs:
+						if (child->getBoolValue(tb))
+							SetAlwaysPrintOrbs(tb);
+						break;
+				}
+			}
+		}
+	}
+}
+
+long MoleculeData::GetNumElectrons(void) const {
+	long result=cFrame->GetNumElectrons();
+	if (InputOptions && InputOptions->Control) result -= InputOptions->Control->GetCharge();
+	return result;
+}
+short MoleculeData::GetMultiplicity(void) const {
+	short result=1;
+	if (InputOptions && InputOptions->Control) result = InputOptions->Control->GetMultiplicity();
+	return result;
+}
+InputData * MoleculeData::GetInputData(void) {
+	if (!InputOptions) InputOptions = new InputData;
+	if (!InputOptions) throw MemoryError();
+	return InputOptions;
+}
+InputData * MoleculeData::SetInputData(InputData * NewData) {
+	if (InputOptions) delete InputOptions;
+	InputOptions = new InputData(NewData);
+	return InputOptions;
+}
+void MoleculeData::WriteInputFile(WinPrefs * Prefs) {
+	if (InputOptions) {
+		InputOptions->WriteInputFile(this, Prefs);
+	}
+}
+void MOPacInternals::WriteZMATToFile(BufferFile * File) {
+	char	Out[133];
+
+	File->WriteLine(" $ZMAT IZMAT(1)=", false);
+	for (long i=3; i<Count; i+=3) {
+		if (i>9) File->WriteLine(", ", false);
+		sprintf(Out, "1,%d,%d, ", (i+3)/3, ConnectionAtoms[i]+1);
+		File->WriteLine(Out, false);
+		if (i>3) {
+			sprintf(Out, "2,%d,%d,%d, ", (i+3)/3, ConnectionAtoms[i]+1, ConnectionAtoms[i+1]+1);
+			File->WriteLine(Out, false);
+			if (i>6) {
+				sprintf(Out, "3,%d,%d,%d,%d", (i+3)/3, ConnectionAtoms[i]+1,
+					ConnectionAtoms[i+1]+1, ConnectionAtoms[i+2]+1);
+				File->WriteLine(Out, false);
+			}
+		}
+	}
+	File->WriteLine(" $END", true);
+}
+void MOPacInternals::WriteCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) {
+	UpdateAtoms(MainData);	//First make sure the connectivity and values are up to date
+	CartesiansToInternals(MainData);
+		char	Out[133];
+		Str255	AtomLabel;
+		Frame *	cFrame = MainData->GetCurrentFramePtr();
+
+	for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
+		Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
+		AtomLabel[AtomLabel[0]+1] = 0;
+		if (iatom==0) sprintf(Out, "%s", (char *) &(AtomLabel[1]));
+		else if (iatom == 1)
+			sprintf(Out, "%s  %d %10.5f", (char *) &(AtomLabel[1]),
+				ConnectionAtoms[3*iatom]+1, Values[3*iatom]);
+		else if (iatom == 2)
+			sprintf(Out, "%s   %d %10.5f  %d %8.4f",
+				(char *) &(AtomLabel[1]), ConnectionAtoms[3*iatom]+1, Values[3*iatom], 
+				ConnectionAtoms[3*iatom+1]+1, Values[3*iatom+1]);
+		else
+			sprintf(Out, "%s   %d %10.5f  %d %8.4f  %d %8.4f",
+				(char *) &(AtomLabel[1]), ConnectionAtoms[3*iatom]+1, Values[3*iatom], 
+				ConnectionAtoms[3*iatom+1]+1, Values[3*iatom+1],
+				ConnectionAtoms[3*iatom+2]+1, Values[3*iatom+2]);
+		File->WriteLine(Out, true);
+	}
+}
+void OrbitalRec::WriteVecGroup(BufferFile * File, const long & NumBasisFuncs, const long & OrbCount) const {
+//First check for and write out the vec label
+	if (Label) {	//The label should include any necessary linefeeds
+		File->WriteLine(Label, true);
+	}
+//Punch the Group title
+	File->WriteLine(" $VEC", true);
+//write out the vectors using the GAMESS format (I2,I3,5E15.8)
+		long iline, nVec, nn, nOrbs, pOrb;
+	if ((OrbCount > 0) && (OrbCount <= NumAlphaOrbs)) nOrbs = OrbCount;
+	else nOrbs = NumAlphaOrbs;
+		char	Line[kMaxLineLength];
+		float * Vector=Vectors;
+	for (int ipass=0; ipass<2; ipass++) {
+		if (!Vector) {
+			File->WriteLine("Error in Vectors request!", true);
+			return;
+		}
+		nn = 0;	pOrb = 0;
+		for (long i=0; i<nOrbs; i++) {
+			iline = 1;	nVec = 0;
+			pOrb++;
+			if (pOrb>=100) pOrb -= 100;
+			sprintf(Line, "%2d%3d", pOrb, iline);
+			File->WriteLine(Line, false);
+			for (long ivec=0; ivec<NumBasisFuncs; ivec++) {
+				sprintf(Line, "%15.8E", Vector[nn]);
+				nn++;
+				File->WriteLine(Line, false);
+				nVec++;
+				if ((nVec>=5)&&(ivec+1<NumBasisFuncs)) {//wrap line and start the next line
+					File->WriteLine("", true);
+					iline ++;
+					sprintf(Line, "%2d%3d", pOrb, iline);
+					File->WriteLine(Line, false);
+					nVec = 0;
+				}
+			}
+			File->WriteLine("", true);
+		}
+		if (BaseWavefunction == UHF) {	//Repeat for beta set of orbitals for UHF wavefunctions
+			Vector = VectorsB;
+			if ((OrbCount > 0) && (OrbCount <= NumBetaOrbs)) nOrbs = OrbCount;
+			else nOrbs = NumBetaOrbs;
+		} else ipass++;
+	}
+//finish off the group
+	File->WriteLine(" $END", true);
+}
