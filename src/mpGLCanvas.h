@@ -17,6 +17,7 @@
 #define MPGLCANVAS_H 1
 
 #include "wx/wx.h"
+#include "wx/glcanvas.h"
 
 #include "MoleculeData.h"
 
