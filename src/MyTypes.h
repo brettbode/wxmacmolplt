@@ -348,8 +348,8 @@ class Surface {
 };
 
 void ApplyRotation(Matrix4D RotMat, long Axis, float AngleDegrees);
-void CalculateCenterOfMass(Atom * AtomList, long NumAtoms, float * AtomMasses, CPoint3D * Center);
-void MinimizeDifferences(Atom * FixedAtoms, mpAtom * targetAtoms, long NumAtoms,
+void CalculateCenterOfMass(mpAtom * AtomList, long NumAtoms, float * AtomMasses, CPoint3D * Center);
+void MinimizeDifferences(mpAtom * FixedAtoms, mpAtom * targetAtoms, long NumAtoms,
 		WinPrefs * Prefs, long NumOptAtoms);
 float CalculateSquaresValue(long NumOptAtoms, mpAtom CoordSetA[], CPoint3D CoordSet[]);
 
