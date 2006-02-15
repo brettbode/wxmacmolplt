@@ -14,7 +14,7 @@
 
 //Global exceptions types
 
-typedef bool Boolean;
+typedef long OSErr;
 
 class MemoryError {
 	private:
@@ -26,7 +26,7 @@ class MemoryError {
 class DataError {
 	public:
 		long ErrNum;
-		Boolean ErrorSet(void) {return ((ErrNum>0)?1:0);}
+		bool ErrorSet(void) {return ((ErrNum>0)?true:false);}
 		void SetError(long num) {ErrNum = num;}
 		DataError(void) {ErrNum = -1;};
 		DataError(long num) {ErrNum = num;};
