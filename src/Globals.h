@@ -19,8 +19,6 @@
 #ifndef _GlobalDefs_
 #define _GlobalDefs_
 
-typedef bool Boolean;
-
 #define MacintoshBuild		//define to build for Mac PPC or 68K
 #if __GNUC__
 	//unix/os X build
