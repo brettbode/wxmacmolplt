@@ -19,6 +19,7 @@
 #ifndef _GlobalDefs_
 #define _GlobalDefs_
 
+/*
 #define MacintoshBuild		//define to build for Mac PPC or 68K
 #if __GNUC__
 	//unix/os X build
@@ -37,6 +38,7 @@
 #else
 #define PM_OLDAPI
 #endif
+*/
 
 #if TARGET_API_MAC_CARBON
 #define CarbonBuild		//define to build PPC carbon app

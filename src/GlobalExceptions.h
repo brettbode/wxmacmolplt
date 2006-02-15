@@ -14,6 +14,8 @@
 
 //Global exceptions types
 
+typedef bool Boolean;
+
 class MemoryError {
 	private:
 		char *	ErrorMessage;
