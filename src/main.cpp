@@ -33,7 +33,9 @@ bool MpApp::OnInit() {
 
     // TODO:  Pass proper arguments to main frame object
     m_Frame = new MpMainFrame(wxT("wxMacMolPlt"));
-    SetExitOnFrameDelete(false);
+    // TODO:  Let app continue on frame delete
+    // SetExitOnFrameDelete(false);
+    SetExitOnFrameDelete(true);
 
     return true;
 }
