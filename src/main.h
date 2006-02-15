@@ -17,6 +17,7 @@
 #define MAIN_H 1
 
 #include "wx/wx.h"
+#include "wx/snglinst.h"
 
 #include "mpMainFrame.h"
 
