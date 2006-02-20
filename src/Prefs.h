@@ -13,6 +13,14 @@
 	All prefs accessors should now return true boolean values, BMB 11/2001
 */
 
+struct RGBColor {
+    unsigned short red;
+    unsigned short green;
+    unsigned short blue;
+};
+typedef struct RGBColor RGBColor;
+//typedef RGBColor * RGBColorPtr;
+
 #ifndef __Prefs__
 #define __Prefs__
 class SurfaceOptions {
