@@ -21,6 +21,10 @@ struct RGBColor {
 typedef struct RGBColor RGBColor;
 //typedef RGBColor * RGBColorPtr;
 
+// TODO: Make this function do something, or replace it entirely.  It comes
+// from the Mac code and isn't very useful here.
+void RGBForeColor(const RGBColor * color){}
+
 #ifndef __Prefs__
 #define __Prefs__
 class SurfaceOptions {
