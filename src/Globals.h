@@ -186,6 +186,11 @@ typedef struct RGBColor RGBColor;
 
 #endif	//End of Rhapsody definitions!
 
+#define max(x, y)		(((x)>(y)) ? (x) : (y))
+#define MAX(x, y)		(((x)>(y)) ? (x) : (y))
+#define min(x, y)		(((x)>(y)) ? (y) : (x))
+#define MIN(x, y)		(((x)>(y)) ? (y) : (x))
+
 //#define ChipmanCode	1	//Define to include the Chipman solvent surface code
 
 //Useful constants
