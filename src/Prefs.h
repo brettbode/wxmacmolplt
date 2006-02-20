@@ -21,7 +21,7 @@ struct RGBColor {
 typedef struct RGBColor RGBColor;
 //typedef RGBColor * RGBColorPtr;
 
-typedef char Str255 [256]
+typedef char Str255 [256];
 
 // TODO: Make this function do something, or replace it entirely.  It comes
 // from the Mac code and isn't very useful here.
