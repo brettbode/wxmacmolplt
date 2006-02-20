@@ -21,6 +21,9 @@
 #include "Prefs.h"
 #include <string.h>
 
+// Mac stuff
+const int eofErr = -39;
+
 extern WinPrefs *	gPreferences;
 
 long FindKeyWord(const char *buffer, char keyword[], long numbyte) {
