@@ -41,9 +41,27 @@ void MpGLCanvas::setMolData(MoleculeData *newMolData) {
     molData = newMolData;
 }
 
-wxImage *getImage(const int width, const int height) {
-    // TODO:  Make this function do what it is supposed to.
-    return NULL;
+wxImage getImage(const int width, const int height) {
+    // TODO:  respect width/height
+    // TODO:  avoid grabbing the menu
+    GLint view[4];
+    GLint cwidth,cheight;
+    unsigned char *pixels;
+
+    glGetIntegerv(GL_VIEWPORT, view);
+    cwidth = view[2];
+    cheight = view[3];
+
+    // malloc is required by wxImage,
+    // which takes responsibility for the memory
+    pixels = (unsigned char *) malloc(3 * cwidth * cheight);
+    bzero(pixels,3*cwidth*cheight);
+    glPixelStorei( GL_PACK_ALIGNMENT, 1 );
+    glReadBuffer( GL_BACK );
+    glReadPixels( 0, 0, cwidth, cheight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+    // create a wxImage from the data, and mirror it vertically
+    return wxImage(cwidth,cheight,pixels).Mirror(false);
 }
 
 void MpGLCanvas::eventSize(wxSizeEvent &event) {

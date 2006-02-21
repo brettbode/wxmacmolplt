@@ -69,11 +69,24 @@ class MpGLCanvas : public wxGLCanvas {
         /**
          * Creates an image of the canvas for purposes such as printing or
          * saving to a file.
+         *
+         * At present, the width and height parameters are ignored, and the
+         * returned image is the resolution of the canvas.  It can be used as
+         * follows:
+         *
+         * void MyFrame::OnSS(wxCommandEvent& WXUNUSED(event))
+         * {
+         *   wxImage img = GetCanvas()->getImage();
+         *   wxInitAllImageHandlers();
+         *   img.SaveFile("ss.png");
+         * }
+         * 
          * @param width The desired width of the image in pixels.
          * @param height The desired height of the image in pixels.
-         * @return A pointer to the image as a wxImage, or NULL on failure.
+         * @return A wxImage, the validity of which can be tested with
+         * wxImage::Ok().
          */
-        wxImage *getImage(const int width, const int height);
+        wxImage getImage(const int width, const int height);
         
         // Event Handlers
 
