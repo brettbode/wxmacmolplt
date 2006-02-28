@@ -174,7 +174,7 @@ BufferFile::BufferFile(Ptr Data, long DataSize)
 #ifdef UseMacIO
 	FileRefNum = 0;
 #else
-	FilePtr = nil;
+	FilePtr = NULL;
 #endif
 	IOType = -1;	//No file associated with this buffer
 					//and the buffer should not be freed when this object is destroyed
@@ -619,7 +619,11 @@ void BufferFile::SetBlockLength(long length) {
 	if (BlockCount >= BlockArrayAllocation) {
 		long * temp = new long[BlockArrayAllocation+10];
 		if (!temp) throw MemoryError();
+#ifdef UseHandles
 		BlockMoveData((Ptr) BlockLengths, (Ptr) temp, BlockArrayAllocation*sizeof(long));
+#else
+		memcpy((Ptr) temp, (Ptr) BlockLengths, BlockArrayAllocation*sizeof(long));
+#endif
 		delete [] BlockLengths;
 		BlockLengths = temp;
 		BlockArrayAllocation += 10;
