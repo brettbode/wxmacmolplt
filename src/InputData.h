@@ -85,6 +85,8 @@
 #define kDFTGridFuncPopup		2
 #define kDFTGridFreeFuncPopup	4
 
+typedef char Str255 [256];
+
 enum TypeOfRun {
 	InvalidRunType=0,
 	Energy=1,

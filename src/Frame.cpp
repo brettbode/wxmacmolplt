@@ -1278,8 +1278,22 @@ void Frame::ReadMP2Vectors(BufferFile * Buffer, BufferFile * DatBuffer, long Num
 	long * readflag) {
 
 	if (*readflag == 1) {	//If first pass query the user about reading vectors
-        // TODO:  Replace this with some kind of wxWidgets foo
-		*readflag = YesOrNoDialog(131, 2);
+        // TODO:  SAY SOMETHING INTELLIGENT
+        // 1 = Yes
+        // 0 = No
+		//*readflag = YesOrNoDialog(131, 2);
+        int result = 0;
+        wxMessageDialog *mdg = new wxMessageDialog(NULL,
+                                                   wxT(""),
+                                                   wxT(""),
+                                                   wxYES_NO | wxICON_QUESTION);
+        result = mdg->ShowModal();
+        if(result == wxID_YES) {
+            *readflag = 1;
+        }
+        else {
+            *readflag = 0;
+        }
 	}
 	if (!*readflag) return;
 	
