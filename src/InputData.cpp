@@ -3015,11 +3015,11 @@ short DFTGroup::GetFunctional(unsigned char * FuncName) const {
 	if (MethodGrid()) {
 		if (temp <= kDFTGridFunctionalMaxStrings)
 			// TODO: whatever
-            // GetIndString(FuncName, kDFTGridFunctionalStrings, temp);
+            ;// GetIndString(FuncName, kDFTGridFunctionalStrings, temp);
 	} else {	//Grid-free functional list is fairly different
 		if (temp <= kDFTGridFreeFunctionalMaxStrings)
 			// TODO: whatever
-            // GetIndString(FuncName, kDFTGridFreeFunctionalStrings, temp);
+            ;// GetIndString(FuncName, kDFTGridFreeFunctionalStrings, temp);
 	}
 	return Functional;
 }
