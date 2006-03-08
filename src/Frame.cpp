@@ -207,7 +207,9 @@ bool Frame::IncreaseAtomAllocation(long NumAdditional) {
  mpAtom * temp = new mpAtom[AtomAllocation+NumAdditional];
 	if (temp) {
 		if (Atoms != NULL) {
-			BlockMoveData(Atoms, temp, NumAtoms*sizeof(mpAtom));
+            // BlockMoveData is Mac only.
+			//BlockMoveData(Atoms, temp, NumAtoms*sizeof(mpAtom));
+            memcpy(temp, Atoms, NumAtoms*sizeof(mpAtom));
 			delete [] Atoms;
 		}
 		Atoms = temp;
@@ -354,7 +356,9 @@ bool Frame::IncreaseBondAllocation(long NumAdditional) {
 	Bond * temp = new Bond[BondAllocation+NumAdditional];
 	if (temp) {
 		if (Bonds != NULL) {
-			BlockMoveData(Bonds, temp, NumBonds*sizeof(Bond));
+            // BlockMoveData is Mac only.
+			//BlockMoveData(Bonds, temp, NumBonds*sizeof(Bond));
+            memcpy(temp, Bonds, NumBonds*sizeof(Bond));
 			delete [] Bonds;
 		}
 		Bonds = temp;
@@ -556,7 +560,9 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 		Bond * temp = new Bond[NumBonds+5];
 		maxbonds = NumBonds+5;
 		if (temp) {
-			BlockMoveData(Bonds, temp, NumBonds*sizeof(Bond));
+            // BlockMoveData is Mac only.
+			//BlockMoveData(Bonds, temp, NumBonds*sizeof(Bond));
+            memcpy(temp, Bonds, NumBonds*sizeof(Bond));
 			delete [] Bonds;
 			Bonds = temp;
 			BondAllocation = maxbonds;
