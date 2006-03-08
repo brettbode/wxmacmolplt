@@ -24,6 +24,7 @@
 #include "Prefs.h"
 #include "Gradient.h"
 #include "AtomTypeList.h"
+#include "wx/wx.h"
 #include <string.h>
 #include <new>
 #include <ctype.h>
@@ -545,8 +546,9 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 							if (newBond) {
 								if (! AddBond(iatm, jatm, lOrder)) {
 										Str255	Errmsg;
-									GetIndString(Errmsg, kerrstrings, 17);
-									MessageAlert(Errmsg);
+                                    // TODO:  Make not Mac-only
+									//GetIndString(Errmsg, kerrstrings, 17);
+									//MessageAlert(Errmsg);
 									delete [] Bonds;
 									Bonds = OldBonds;
 									NumBonds = NumOldBonds;
