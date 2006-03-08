@@ -14,7 +14,7 @@
 #include "BFiles.h"
 #include "myFiles.h"
 //#include "MyWindowClasses.h"
-#include "MolDisplay.h"
+//#include "MolDisplay.h"
 #include "Progress.h"
 #include "Prefs.h"
 #include "Gradient.h"

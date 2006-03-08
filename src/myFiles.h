@@ -15,10 +15,10 @@
 #define kOpenDLOG			2001		//Custom open dialog
 
 void OpenFile(void);
-void OpenTEXTFile(FSSpec *myFile, long flip, float offset, long nSkip);
-void OpenMolPFile(FSSpec *myFile);
+//void OpenTEXTFile(FSSpec *myFile, long flip, float offset, long nSkip);
+//void OpenMolPFile(FSSpec *myFile);
 BufferFile * OpenDatFile(void);
-Boolean GetTextFileName(FSSpec *outFile);
+//Boolean GetTextFileName(FSSpec *outFile);
 long LocateKeyWord(const char *Buffer, const char * KeyWord, long length, long bytecount);
 long ParseGLogLine(BufferFile * Buffer, Frame * lFrame, long numExpected, long Type, float *maxsize);
 long ParseCartLine(char *Line, long *atomtype, CPoint3D *coord, CPoint3D *offset, long Mode);

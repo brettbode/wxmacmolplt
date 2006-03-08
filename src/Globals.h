@@ -186,6 +186,7 @@ typedef struct RGBColor RGBColor;
 
 #endif	//End of Rhapsody definitions!
 
+// These are here because the ifdefs are broken right now.
 #define max(x, y)		(((x)>(y)) ? (x) : (y))
 #define MAX(x, y)		(((x)>(y)) ? (x) : (y))
 #define min(x, y)		(((x)>(y)) ? (y) : (x))
