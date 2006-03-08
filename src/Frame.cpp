@@ -75,7 +75,7 @@ void Frame::Read(BufferFile * Buffer, long length) {
 	Buffer->Read((Ptr) &NumAtoms, sizeof(long));
 	Buffer->Read((Ptr) &NumBonds, sizeof(long));
 	if (NumAtoms>0) {
-		Atoms = new Atom[NumAtoms];
+		Atoms = new mpAtom[NumAtoms];
 		if (!Atoms) throw MemoryError();
 		AtomAllocation = NumAtoms;
 	}
@@ -99,7 +99,7 @@ void Frame::Read41(BufferFile * Buffer, long length) {
 	Buffer->BufferSkip(28);
 
 	if (NumAtoms>0) {
-		Atoms = new Atom[NumAtoms];
+		Atoms = new mpAtom[NumAtoms];
 		if (!Atoms) throw MemoryError();
 		AtomAllocation = NumAtoms;
 	}
@@ -190,7 +190,7 @@ void Frame::SetNextFrame(Frame * next) { NextFrame = next; }
 void Frame::SetPreviousFrame(Frame * previous) { PreviousFrame = previous; }
 Frame * Frame::GetNextFrame(void) { return NextFrame; }
 Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
-Atom * Frame::AddAtom(long AtomType, CPoint3D AtomPosition) {
+mpAtom * Frame::AddAtom(long AtomType, CPoint3D AtomPosition) {
 	 mpAtom * result = NULL;
 	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(10);
 	if (NumAtoms<AtomAllocation) {
@@ -204,10 +204,10 @@ Atom * Frame::AddAtom(long AtomType, CPoint3D AtomPosition) {
 }
 bool Frame::IncreaseAtomAllocation(long NumAdditional) {
 	if (AtomAllocation+NumAdditional < NumAtoms) return false;
- mpAtom * temp = new Atom[AtomAllocation+NumAdditional];
+ mpAtom * temp = new mpAtom[AtomAllocation+NumAdditional];
 	if (temp) {
 		if (Atoms != NULL) {
-			BlockMoveData(Atoms, temp, NumAtoms*sizeof(Atom));
+			BlockMoveData(Atoms, temp, NumAtoms*sizeof(mpAtom));
 			delete [] Atoms;
 		}
 		Atoms = temp;
@@ -365,7 +365,7 @@ bool Frame::IncreaseBondAllocation(long NumAdditional) {
 void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any higher atoms
 	if ((AtomNum>=0)&&(AtomNum<NumAtoms)) {
 		if ((AtomNum<(NumAtoms-1))&&(NumAtoms>1))
-			BlockMoveData(&(Atoms[AtomNum+1]), &(Atoms[AtomNum]), (NumAtoms-AtomNum)*sizeof(Atom));
+			BlockMoveData(&(Atoms[AtomNum+1]), &(Atoms[AtomNum]), (NumAtoms-AtomNum)*sizeof(mpAtom));
 		NumAtoms--;
 			//remove this atom from the bond list
 		for (long ii=0; ii<NumBonds; ii++) {
