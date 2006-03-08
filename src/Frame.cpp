@@ -369,7 +369,9 @@ bool Frame::IncreaseBondAllocation(long NumAdditional) {
 void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any higher atoms
 	if ((AtomNum>=0)&&(AtomNum<NumAtoms)) {
 		if ((AtomNum<(NumAtoms-1))&&(NumAtoms>1))
-			BlockMoveData(&(Atoms[AtomNum+1]), &(Atoms[AtomNum]), (NumAtoms-AtomNum)*sizeof(mpAtom));
+            // BlockMoveData is Mac only
+			//BlockMoveData(&(Atoms[AtomNum+1]), &(Atoms[AtomNum]), (NumAtoms-AtomNum)*sizeof(mpAtom));
+            memcpy(&(Atoms[AtomNum]), &(Atoms[AtomNum+1]), (NumAtoms-AtomNum)*sizeof(mpAtom));
 		NumAtoms--;
 			//remove this atom from the bond list
 		for (long ii=0; ii<NumBonds; ii++) {
@@ -412,7 +414,8 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 	long OldBondAllocation = BondAllocation;
 	Bonds = new Bond[maxbonds];
 	if (Bonds == NULL) {
-		MessageAlertByID(kerrstrings, 17);
+        // TODO:  Replace this with something that works on non-Mac platforms
+		//MessageAlertByID(kerrstrings, 17);
 		Bonds = OldBonds;
 		return;
 	}
@@ -471,8 +474,10 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 						continue;	//bonds are not allowed between SIMOMM and ab intio atoms
 					if (! AddBond(iatm, jatm, lOrder)) {
 							Str255	Errmsg;
-						GetIndString(Errmsg, kerrstrings, 17);
-						MessageAlert(Errmsg);
+                        // TODO:  Replace this with something that works on
+                        //        non-Mac platforms
+						//GetIndString(Errmsg, kerrstrings, 17);
+						//MessageAlert(Errmsg);
 						delete [] Bonds;
 						Bonds = OldBonds;
 						NumBonds = NumOldBonds;
@@ -1271,6 +1276,7 @@ void Frame::ReadMP2Vectors(BufferFile * Buffer, BufferFile * DatBuffer, long Num
 	long * readflag) {
 
 	if (*readflag == 1) {	//If first pass query the user about reading vectors
+        // TODO:  Replace this with some kind of wxWidgets foo
 		*readflag = YesOrNoDialog(131, 2);
 	}
 	if (!*readflag) return;
@@ -1573,7 +1579,8 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 	}	//trap errors here and delete the VibRec
 	catch (std::bad_alloc) {//Memory error, cleanup and return.
 		if (Vibs) { delete Vibs; Vibs = NULL; }
-		MessageAlertByID(kerrstrings, 41);
+        // TODO:  Replace this with non-Mac code
+		//MessageAlertByID(kerrstrings, 41);
 	}
 	catch (UserCancel) {//We need to rethrow this one since the whole operation should be aborted
 		if (Vibs) { delete Vibs; Vibs = NULL; }
@@ -1581,7 +1588,8 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 	}
 	catch (...) {//File and data errors. Either way delete the vectors and return.
 		if (Vibs) { delete Vibs; Vibs = NULL; }
-		MessageAlertByID(kerrstrings, 42);
+        // TODO:  Replace this with non-Mac code
+		//MessageAlertByID(kerrstrings, 42);
 	}
 }
 
