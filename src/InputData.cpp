@@ -1549,7 +1549,8 @@ short BasisGroup::SetBasis(const char *BasisText) {
 	Str255	text;
 
 	for (int i=1; i<kMaxBasisSets; i++) {
-		GetIndString(text, kBasisSetStrings, i);
+		// TODO: whatever
+        // GetIndString(text, kBasisSetStrings, i);
 		if (-1<LocateKeyWord(BasisText, (char *) &(text[1]), text[0], 9)) {
 			NewBasis = i;
 			break;
@@ -1569,7 +1570,8 @@ short BasisGroup::SetBasis(short NewBasis) {
 short BasisGroup::GetBasis(Str255 BasisText) const {
 	short temp = Basis;
 	if (temp <= 0) temp = 1;
-	GetIndString(BasisText, kBasisSetStrings, temp);
+	// TODO: whatever
+    // GetIndString(BasisText, kBasisSetStrings, temp);
 
 	return Basis;
 }
@@ -1676,7 +1678,8 @@ short BasisGroup::GetECPPotential(Str255 ECPText) const {
 		if (Basis == 12) value = 2;
 		if (Basis == 13) value = 3;
 	}
-	GetIndString(ECPText, kECPPotStrings, 1+value);
+	// TODO: whatever
+    // GetIndString(ECPText, kECPPotStrings, 1+value);
 
 	return ECPPotential;
 }
@@ -1690,7 +1693,8 @@ short BasisGroup::SetECPPotential(const char * ECPText) {
 	Str255	text;
 
 	for (int i=1; i<kMaxECPPotStrings; i++) {
-		GetIndString(text, kECPPotStrings, i);
+		// TODO: whatever
+        // GetIndString(text, kECPPotStrings, i);
 		if (-1<LocateKeyWord(ECPText, (char *) &(text[1]), text[0], 9)) {
 			NewPot = i;
 			break;
@@ -1920,7 +1924,8 @@ short DataGroup::SetPointGroup(char *GroupText) {
 	}
 
 	for (int i=1; i<kMaxPGroups; i++) {
-		GetIndString(text, kPGroupStrings, i);
+		// TODO: whatever
+        // GetIndString(text, kPGroupStrings, i);
 		if (-1<LocateKeyWord(GroupText, (char *) &(text[1]), text[0], 9)) {
 			NewPGroup = i;
 			break;
@@ -1935,7 +1940,8 @@ short DataGroup::SetPointGroup(char *GroupText) {
 short DataGroup::GetPointGroup(Str255 GroupText, Boolean InLine) const {
 	int	value = PointGroup;
 	if (value == 0) value = 1;	//default to C1
-	GetIndString(GroupText, kPGroupStrings, PointGroup);
+	// TODO: whatever
+    // GetIndString(GroupText, kPGroupStrings, PointGroup);
 	GroupText[1+GroupText[0]] = 0;
 	if (InLine && (PGroupOrder>0)) {
 		for (int i=1; i<=GroupText[0]; i++) {
@@ -3008,10 +3014,12 @@ short DFTGroup::GetFunctional(unsigned char * FuncName) const {
 	if (temp <= 0) temp = 1;
 	if (MethodGrid()) {
 		if (temp <= kDFTGridFunctionalMaxStrings)
-			GetIndString(FuncName, kDFTGridFunctionalStrings, temp);
+			// TODO: whatever
+            // GetIndString(FuncName, kDFTGridFunctionalStrings, temp);
 	} else {	//Grid-free functional list is fairly different
 		if (temp <= kDFTGridFreeFunctionalMaxStrings)
-			GetIndString(FuncName, kDFTGridFreeFunctionalStrings, temp);
+			// TODO: whatever
+            // GetIndString(FuncName, kDFTGridFreeFunctionalStrings, temp);
 	}
 	return Functional;
 }
