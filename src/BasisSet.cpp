@@ -36,9 +36,10 @@ BasisSet::~BasisSet(void) {
 	if (NuclearCharge) delete [] NuclearCharge;
 }
 
+#ifndef __wxBuild__
 //		IO related routines
 long BasisSet::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
+	bool	cState = Buffer->GetOutput();
 	Buffer->SetOutput(false);
 	long length = WriteToBuffer(Buffer);
 	Buffer->SetOutput(cState);
@@ -132,7 +133,8 @@ void BasisSet::ReadCodes(BufferFile * Buffer, long nShells, long nFuncs, long Nu
 		}
 	}
 }
-long BasisSet::GetNumBasisFuncs(Boolean UseSphericalHarmonics) const {
+#endif
+long BasisSet::GetNumBasisFuncs(bool UseSphericalHarmonics) const {
 	long result;
 	if (!UseSphericalHarmonics)
 		result = NumFuncs;
@@ -158,7 +160,7 @@ void BasisSet::GetShellIndexArray(long * IndexArray) const {
 		}
 	}
 }
-void BasisSet::Normalize(Boolean /*InputNormed*/, Boolean /*NormOutput*/) {
+void BasisSet::Normalize(bool /*InputNormed*/, bool /*NormOutput*/) {
 //Set up the normalization constants: (2/pi)^3/4 * 2^n/n!!
 	float SNorm = sqrt(sqrt(pow(2.0/kPi, 3)));
 	float PNorm = SNorm*2;
@@ -285,7 +287,7 @@ BasisShell::~BasisShell(void) {
 	if (NormCoef) delete [] NormCoef;
 	if (InputCoef) delete [] InputCoef;
 }
-long BasisShell::GetNumFuncs(Boolean UseSphericalHarmonics) const {
+long BasisShell::GetNumFuncs(bool UseSphericalHarmonics) const {
 		//returns the # of functions for the shell based on the shell type
 	long ret;
 	long type = ShellType;
@@ -325,7 +327,7 @@ long BasisShell::GetNumFuncs(Boolean UseSphericalHarmonics) const {
 	return ret;
 }
 //Return the start of the function in the angular momenta list (MINI)
-long BasisShell::GetAngularStart(Boolean UseSphericalHarmonics) const {
+long BasisShell::GetAngularStart(bool UseSphericalHarmonics) const {
 	long ret;
 	long type = ShellType;
 	if (UseSphericalHarmonics) type += 10;
@@ -361,8 +363,9 @@ long BasisShell::GetAngularStart(Boolean UseSphericalHarmonics) const {
 	}
 	return ret;
 }
+#ifndef __wxBuild__
 long BasisShell::GetSize(BufferFile *Buffer) const {
-	Boolean	cState = Buffer->GetOutput();
+	bool	cState = Buffer->GetOutput();
 	Buffer->SetOutput(false);
 	long length = WriteToBuffer(Buffer);
 	Buffer->SetOutput(cState);
@@ -399,7 +402,8 @@ long BasisShell::WriteToBuffer(BufferFile *Buffer) const {
 
 	return total;
 }
-void BasisShell::GetLabel(char * label, short FuncNum, Boolean UseSphericalHarmonics) const {
+#endif
+void BasisShell::GetLabel(char * label, short FuncNum, bool UseSphericalHarmonics) const {
 	long type = ShellType;
 	if (UseSphericalHarmonics) type += 10;
 	switch (type) {
@@ -687,6 +691,7 @@ void BasisShell::GetLabel(char * label, short FuncNum, Boolean UseSphericalHarmo
 		break;
 	}
 }
+#ifndef __wxBuild__
 void BasisShell::Read(BufferFile *Buffer, long totalsize) {
 	long	code, length, total;
 
@@ -734,6 +739,7 @@ void BasisShell::Read(BufferFile *Buffer, long totalsize) {
 		}
 	}
 }
+#endif
 //Read in a general basis set from a GAMESS log file
 BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms) {
 	long NumShells=0, NextAtom=0, ShellStart=0,
@@ -745,7 +751,7 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms) {
 	long StartPos = Buffer->GetFilePos();
 		//go to the end of the basis and get the total # of shells to dimension mem
 		//output was changed in June, 2000
-	Boolean ShellsFound = Buffer->LocateKeyWord("TOTAL NUMBER OF BASIS SET SHELLS", 33);
+	bool ShellsFound = Buffer->LocateKeyWord("TOTAL NUMBER OF BASIS SET SHELLS", 33);
 	if (!ShellsFound) ShellsFound = Buffer->LocateKeyWord("TOTAL NUMBER OF SHELLS", 22);
 	if (ShellsFound) {
 		BasisEndPos = Buffer->GetFilePos();
@@ -811,7 +817,7 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms) {
 		NormCoef = Basis->Shells[ishell].NormCoef = new float[CoefsperPrim*NumPrims*sizeof(float)];
 		InputCoef = Basis->Shells[ishell].InputCoef = new float[CoefsperPrim*NumPrims*sizeof(float)];
 		if ((Exponent==NULL)||(NormCoef==NULL)) throw MemoryError();
-		Boolean OldStyle = false;
+		bool OldStyle = false;
 		if (FindKeyWord(LineText, "(", 1) != -1) OldStyle=true;
 		for (long iprim=0; iprim<NumPrims; iprim++) {
 			if (ShellType>=0) {
@@ -882,7 +888,7 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms) {
 		nTotFuncs += Basis->Shells[ishell].GetNumFuncs(false);
 		Basis->NumShells++;
 		if (iscanerr<3) {//Found next atom label so tidy up the current atom
-			Buffer->SkipnLines(2);	//Skip mpAtom label and blank line
+			Buffer->SkipnLines(2);	//Skip Atom label and blank line
 			long nGotShells = ishell-ShellStart+1;
 			long nMappedAtoms = (fShell-fShellStart-nGotShells)/nGotShells + 1;
 			Basis->NumFuncs += nMappedAtoms*nTotFuncs;

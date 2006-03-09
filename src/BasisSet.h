@@ -42,10 +42,10 @@ class BasisShell {
 		long WriteToBuffer(BufferFile *Buffer) const;
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
-		long GetNumFuncs(Boolean UseSphericalHarmonics) const;
-		long GetAngularStart(Boolean UseSphericalHarmonics) const;
+		long GetNumFuncs(bool UseSphericalHarmonics) const;
+		long GetAngularStart(bool UseSphericalHarmonics) const;
 		void Read(BufferFile *Buffer, long length);
-		void GetLabel(char * Label, short FuncNum, Boolean UseSphericalHarmonics) const;
+		void GetLabel(char * Label, short FuncNum, bool UseSphericalHarmonics) const;
 		inline long GetNumPrimitives(void) const {return NumPrims;};
 		inline long GetShellType(void) const {return ((ShellType>=0) ? ShellType : -ShellType);};
 };
@@ -73,10 +73,10 @@ class BasisSet {
 		void ReadCodes(BufferFile *Buffer, long NumShells, long NumFuncs, long NumAtoms,
 			long length);
 		void WriteBasis(BufferFile * File, long AtomNum) const;
-		long GetNumBasisFuncs(Boolean UseSphericalHarmonics) const;
+		long GetNumBasisFuncs(bool UseSphericalHarmonics) const;
 		inline long * GetNuclearChargeArray(void) const {return NuclearCharge;};
 		void GetShellIndexArray(long * IndexArray) const;
-		void Normalize(Boolean InputNormed, Boolean NormOutput);
+		void Normalize(bool InputNormed, bool NormOutput);
 		static BasisSet * ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms);
 };
 
