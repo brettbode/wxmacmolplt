@@ -85,8 +85,6 @@
 #define kDFTGridFuncPopup		2
 #define kDFTGridFreeFuncPopup	4
 
-typedef char Str255 [256];
-
 enum TypeOfRun {
 	InvalidRunType=0,
 	Energy=1,
@@ -347,7 +345,27 @@ class SystemGroup {
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
 };
-
+enum GAMESS_BasisSet {
+	GAMESS_BS_None=0,
+	GAMESS_BS_MINI,
+	GAMESS_BS_MIDI,
+	GAMESS_BS_STO,
+	GAMESS_BS_N21,
+	GAMESS_BS_N31,
+	GAMESS_BS_N311,
+	GAMESS_BS_DZV,
+	GAMESS_BS_DH,
+	GAMESS_BS_BC,
+	GAMESS_BS_TZV,
+	GAMESS_BS_MC,
+	GAMESS_BS_SBK,
+	GAMESS_BS_HW,
+	GAMESS_BS_MNDO,
+	GAMESS_BS_AM1,
+	GAMESS_BS_PM3,
+	
+	NumGAMESSBasisSetsItem
+};
 enum GAMESS_BS_Polarization {
 	GAMESS_BS_Invalid_Polar=-1,
 	GAMESS_BS_No_Polarization=0,
@@ -358,6 +376,15 @@ enum GAMESS_BS_Polarization {
 	GAMESS_BS_Hondo7_Polar,
 	
 	NumGAMESSBSPolarItems
+};
+enum GAMESS_BS_ECPotential {
+	GAMESS_BS_Invalid_ECP=-1,
+	GAMESS_BS_ECP_None=0,
+	GAMESS_BS_ECP_Read,
+	GAMESS_BS_ECP_SBK,
+	GAMESS_BS_ECP_HW,
+	
+	NumGAMESSBSECPItems
 };
 class BasisGroup {
 	private:
@@ -376,8 +403,9 @@ class BasisGroup {
 	public:		//Member functions
 		short SetBasis(const char *text);
 		short SetBasis(short NewBasis);
-		short GetBasis(Str255 BasisText) const;
+		const char * GetBasisText(void) const;
 		short GetBasis(void) const;
+		static const char * GAMESSBasisSetToText(GAMESS_BasisSet bs);
 		short SetNumGauss(short NewNumGauss);
 		short GetNumGauss(void) const;
 		short SetNumDFuncs(short NewNum);
@@ -395,9 +423,10 @@ class BasisGroup {
 		static const char * PolarToText(GAMESS_BS_Polarization p);
 		inline const char * GetPolarText(void) const {return PolarToText(Polar);};
 		inline GAMESS_BS_Polarization GetPolar(void) const {return Polar;};
+		static const char * GAMESSECPToText(GAMESS_BS_ECPotential p);
 		short GetECPPotential(void) const;
-		short GetECPPotential(Str255 ECPText) const;
-		short SetECPPotential(const char * ECPText);
+		const char * GetECPPotentialText(void) const;
+		GAMESS_BS_ECPotential SetECPPotential(const char * ECPText);
 		short SetECPPotential(short NewType);
 		inline bool CheckBasis(void) const {return ((Flags & 4)?true:false);};
 		inline void CheckBasis(bool state) {Flags = (Flags& 0xFB) + (state?4:0);};
@@ -436,7 +465,7 @@ class DataGroup {
 	public:		//data access functions
 		short SetPointGroup(short NewPGroup);
 		short SetPointGroup(char *GroupText);
-		short GetPointGroup(Str255 GroupText, Boolean InLine) const;
+		short GetPointGroup(Str255 GroupText, bool InLine) const;
 		inline short GetPointGroup(void) const {return PointGroup;};
 		short SetPointGroupOrder(short NewOrder);
 		inline short GetPointGroupOrder(void) const {return PGroupOrder;};

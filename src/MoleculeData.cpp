@@ -59,10 +59,10 @@ bool MoleculeData::SetupFrameMemory(long NumAtoms, long NumBonds) {
 	if (NumBonds < cFrame->BondAllocation) NumBonds = cFrame->BondAllocation;
 	if ((NumAtoms == cFrame->AtomAllocation)&&
 		(NumBonds == cFrame->BondAllocation)) return true;//no need to resize
- mpAtom * tempAtoms=NULL;
+	mpAtom * tempAtoms=NULL;
 	Bond * tempBonds=NULL;
 	try {
-		tempAtoms = new Atom[NumAtoms];
+		tempAtoms = new mpAtom[NumAtoms];
 		tempBonds = new Bond[NumBonds];
 	}
 	catch (std::bad_alloc) {
@@ -75,8 +75,8 @@ bool MoleculeData::SetupFrameMemory(long NumAtoms, long NumBonds) {
 //		if (tempBonds) delete [] tempBonds;
 //		return false;
 //	}
-	BlockMoveData(cFrame->Atoms, tempAtoms, cFrame->NumAtoms*sizeof(Atom));
-	BlockMoveData(cFrame->Bonds, tempBonds, cFrame->NumBonds*sizeof(Bond));
+	memcpy(tempAtoms, cFrame->Atoms, cFrame->NumAtoms*sizeof(mpAtom));
+	memcpy(tempBonds, cFrame->Bonds, cFrame->NumBonds*sizeof(Bond));
 	if (cFrame->Atoms) delete [] cFrame->Atoms;	//delete old arrays, if any
 	if (cFrame->Bonds) delete [] cFrame->Bonds;
 	cFrame->Atoms = tempAtoms;
@@ -236,7 +236,7 @@ void MoleculeData::CenterModelWindow(void) {
 	TotalRotation[3][2] = -NewCenter.z;
 }	/*CenterModelWindow*/
 void MoleculeData::ResetRotation(void) {
-	if (cFrame->NumAtoms > MaxAtoms) {
+	if ((cFrame->NumAtoms > MaxAtoms)||(RotCoords==NULL)||(zBuffer==NULL)) {
 		if (RotCoords != NULL) {
 			delete [] RotCoords;
 			RotCoords = NULL;
@@ -292,9 +292,9 @@ void MoleculeData::StickCoordinates(void) {
 }
 void MoleculeData::NewAtom(void) {
 	if (cFrame->NumAtoms>=cFrame->AtomAllocation) {
-	 mpAtom * temp = new Atom[cFrame->NumAtoms+10];
+		mpAtom * temp = new mpAtom[cFrame->NumAtoms+10];
 		if (temp) {
-			BlockMoveData(cFrame->Atoms, temp, cFrame->NumAtoms*sizeof(Atom));
+			memcpy(temp, cFrame->Atoms, cFrame->NumAtoms*sizeof(mpAtom));
 			if (cFrame->Atoms) delete [] cFrame->Atoms;
 			cFrame->Atoms = temp;
 			cFrame->AtomAllocation += 10;
@@ -339,7 +339,7 @@ void MoleculeData::InvertMode(void) {
 		Freq[iatm] *= -1.0;
 	}
 }	/*InvertMode*/
-void MoleculeData::UnitConversion(Boolean AtoB) {
+void MoleculeData::UnitConversion(bool AtoB) {
 	float		factor;
 //Choose the correct factor
 	if (AtoB) factor = kBohr2AngConversion;
@@ -407,7 +407,7 @@ void MoleculeData::FlipRotation(short theItem) {
 	TotalRotation[3][2] = FinalTrans.z;
 }	/*FlipRotation*/
 // Sets the plane of the screen to that defined by the three points provided
-Boolean MoleculeData::SetScreenPlane(CPoint3D *Points) {
+bool MoleculeData::SetScreenPlane(CPoint3D *Points) {
 	CPoint3D	Vector1, Vector2, Vector3;
 
 	Vector1.x = Points[1].x - Points[0].x;
@@ -503,7 +503,7 @@ void MoleculeData::LinearLeastSquaresFit(Progress * lProgress) {
 		FitMatrix[3][0] = lFrame->Atoms[0].Position.x;
 		FitMatrix[3][1] = lFrame->Atoms[0].Position.y;
 		FitMatrix[3][2] = lFrame->Atoms[0].Position.z;
-		Boolean	Done;
+		bool	Done;
 		for (long ipass=0; ipass<4; ipass++) {
 			if (ipass<3) {
 				RotAngle = 10.0;	TransAmount=0.1;
@@ -517,7 +517,7 @@ void MoleculeData::LinearLeastSquaresFit(Progress * lProgress) {
 			Done = false;
 			while (!Done) {
 				Done = true;
-				Boolean RotDone = false;
+				bool RotDone = false;
 				for (long jpass=0; jpass<2; jpass++) {
 					while (!RotDone) {
 						RotDone = true;
@@ -551,7 +551,7 @@ void MoleculeData::LinearLeastSquaresFit(Progress * lProgress) {
 					RotAngle *= 0.1;
 				}
 				if (ipass > 2) {	//Only rotate for the first two passes
-					Boolean TransDone = false;
+					bool TransDone = false;
 					while (!TransDone) {
 						TransDone = true;
 						for (long ii=0; ii<3; ii++) {
@@ -596,25 +596,32 @@ CleanUpAndExit:		//Clean up the RotCoords Array...
 	cFrame = SavedFrame;
 	::CopyMatrix(SavedRotation, TotalRotation);
 	ResetRotation();
+#ifndef __wxBuild__
 #ifdef CarbonBuild
 	Cursor	arrow;	
 	SetCursor(GetQDGlobalsArrow(&arrow));
 #else
 	SetCursor(&qd.arrow);	//reset the cursor to the standard arrow
 #endif
+#endif
 	return;	//Correct return
 FrameIncorrect:		//Incorrect frame list for this routine: throw up an error and exit
+#ifdef __wxBuild__
+	;
+#warning Need some sort of alert here
+#else
 	Str255	errmsg;
 	GetIndString(errmsg, kerrstrings, 33);
 	MessageAlert(errmsg);
+#endif
 }	/*LinearLeastSquaresFit*/
-Boolean MoleculeData::OrbSurfacePossible(void) {
-	Boolean result = false;
+bool MoleculeData::OrbSurfacePossible(void) {
+	bool result = false;
 	if (Basis) result = true;
 	return result;
 }
-Boolean MoleculeData::TotalDensityPossible(void) {
-	Boolean result = false;
+bool MoleculeData::TotalDensityPossible(void) {
+	bool result = false;
 	if (Basis) {
 		if (cFrame->Orbs.size() > 0) {//Currently TE density is based on eigenvectors only
 			std::vector<OrbitalRec *>::const_iterator OrbSet = cFrame->Orbs.begin();
@@ -672,8 +679,10 @@ void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
 	Frame * lFrame = cFrame;
 	Frame * lEndFrame = lFrame->NextFrame;
 	long NumAtoms = lFrame->NumAtoms;
-	long memNeeded = (NumPts+1)*(sizeof(Frame)+NumAtoms*sizeof(Atom))+5000;
+	long memNeeded = (NumPts+1)*(sizeof(Frame)+NumAtoms*sizeof(mpAtom))+5000;
+#ifndef __wxBuild__
 	if (MaxBlock() < memNeeded) return;	//roughly determine if sufficient memory is available
+#endif
 	
 	CPoint3D * offset = new CPoint3D[NumAtoms];
 	if (!offset) throw MemoryError();
@@ -810,7 +819,7 @@ void MoleculeData::SetCurrentFrame(long FrameNum) {
 		CurrentFrame++;
 	}
 }
-Boolean MoleculeData::SurfaceExportPossible(void) {
+bool MoleculeData::SurfaceExportPossible(void) {
 	return cFrame->SurfaceExportPossible();
 }
 bool MoleculeData::ModeVisible(void) const {
@@ -823,7 +832,10 @@ void MoleculeData::DeleteAtom(long AtomNum) {
 	cFrame->DeleteAtom(AtomNum);
 	ResetRotation();
 }
-Boolean MoleculeData::ValidAtom(long AtomNum) {
+bool MoleculeData::ValidAtom(long AtomNum) {
 	return ((AtomNum>=0)&&(AtomNum<cFrame->NumAtoms));
 }
 AtomTypeList * MoleculeData::GetAtomTypes(void) {return cFrame->GetAtomTypes();}
+long MoleculeData::GetNumBasisFunctions(void) const {
+	return ((Basis!=NULL)?Basis->NumFuncs : 0);
+}

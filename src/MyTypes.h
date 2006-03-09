@@ -53,7 +53,9 @@ enum TypeOfPointGroup {
 	CInfv, DInfh,
 	I, Ih,
 	T, Th, Td,
-	O, Oh
+	O, Oh,
+	
+	NumberPointGroups
 };
 
 class mpAtom {
@@ -65,16 +67,16 @@ class mpAtom {
 			//Type bit 9 - indicates EFP, first 4 bytes of label give fragment number
 			//Type bit 10 - pdb style biomolecule, label gives res, res #, atom type (alpha, beta...)
 			//Type bit 11 - SIMOMM MM atom
-		inline Boolean GetInvisibility(void) const {return (Highlite & 1);};	//Bit 1 sets invisibility
-		Boolean SetInvisibility(Boolean State) {if (Highlite&1) Highlite-=1; if (State) Highlite+=1;return (Highlite&1);};
-		inline Boolean GetSelectState(void) const {return (Highlite&2);};	//Bit 2 sets selected
-		Boolean SetSelectState(Boolean State) {if (Highlite&2) Highlite-=2; if (State) Highlite+=2; return (Highlite&2);};
+		inline bool GetInvisibility(void) const {return (Highlite & 1);};	//Bit 1 sets invisibility
+		bool SetInvisibility(bool State) {if (Highlite&1) Highlite-=1; if (State) Highlite+=1;return GetInvisibility();};
+		inline bool GetSelectState(void) const {return ((Highlite&2)!=0);};	//Bit 2 sets selected
+		bool SetSelectState(bool State) {if (Highlite&2) Highlite-=2; if (State) Highlite+=2; return GetSelectState();};
 		inline long GetType(void) const {return (Type & 0xFF);};
-		inline Boolean IsEffectiveFragment(void) const {return ((Type & (1<<8)) != 0);};
-		inline void IsEffectiveFragment(Boolean state) {Type = (Type & 0xFEFF) + (state ? (1<<8) : 0);};
-		inline Boolean HasBiolabel(void) const {return ((Type & (1<<9)) != 0);};
-		inline void IsSIMOMMAtom(Boolean state) {Type = (Type & 0xFBFF) + (state ? (1<<10) : 0);};
-		inline Boolean IsSIMOMMAtom(void) {return ((Type & (1<<10)) != 0);};
+		inline bool IsEffectiveFragment(void) const {return ((Type & (1<<8)) != 0);};
+		inline void IsEffectiveFragment(bool state) {Type = (Type & 0xFEFF) + (state ? (1<<8) : 0);};
+		inline bool HasBiolabel(void) const {return ((Type & (1<<9)) != 0);};
+		inline void IsSIMOMMAtom(bool state) {Type = (Type & 0xFBFF) + (state ? (1<<10) : 0);};
+		inline bool IsSIMOMMAtom(void) {return ((Type & (1<<10)) != 0);};
 		inline void SetFragmentNumber(long fragNum) {IsEffectiveFragment(true); *((long *) &Label[12]) = fragNum;};
 		inline long GetFragmentNumber(void) const {return *((long *) &Label[12]);};
 		inline long GetNuclearCharge(void) const {return (GetType());};	//NOT correct for ECP's!!!!!
@@ -95,8 +97,8 @@ class Bond {
 		BondOrder	Order;
 		char		Highlite;
 
-		Boolean GetSelectState(void) const {return (Highlite & 1);};
-		void SetSelectState(Boolean state) {if (Highlite & 1) Highlite--; if (state) Highlite++;}
+		bool GetSelectState(void) const {return (Highlite & 1);};
+		void SetSelectState(bool state) {if (Highlite & 1) Highlite--; if (state) Highlite++;}
 };
 enum EnergyUnit {
 	kDefault,
@@ -162,7 +164,7 @@ class AODensity {
 		AODensity(void);
 		~AODensity(void);
 		void SetupMemory(long NumBasisFunctions);
-		inline Boolean CheckDimension(long NumBasisFunctions) {return (NumBasisFunctions == Dimension);};
+		inline bool CheckDimension(long NumBasisFunctions) {return (NumBasisFunctions == Dimension);};
 		inline float * GetDensityArray(void) {return DensityArray;};
 		inline long * GetDensityIndex(void) {return IndexArray;};
 		inline short * GetDensityCheck(void) {return DensityCheckArray;};

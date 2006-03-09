@@ -190,6 +190,14 @@ typedef struct RGBColor RGBColor;
 
 #ifdef __wxBuild__
 typedef char * Ptr;
+struct RGBColor {
+	unsigned short 					red;						/*magnitude of red component*/
+	unsigned short 					green;						/*magnitude of green component*/
+	unsigned short 					blue;						/*magnitude of blue component*/
+};
+struct Point { short h; short v; };
+typedef unsigned char Boolean;
+typedef unsigned char Str255 [256];
 #endif
 
 // These are here because the ifdefs are broken right now.

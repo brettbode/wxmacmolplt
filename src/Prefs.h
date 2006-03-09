@@ -13,16 +13,6 @@
     All prefs accessors should now return true boolean values, BMB 11/2001
 */
 
-struct RGBColor {
-    unsigned short red;
-    unsigned short green;
-    unsigned short blue;
-};
-typedef struct RGBColor RGBColor;
-//typedef RGBColor * RGBColorPtr;
-
-typedef char Str255 [256];
-
 // TODO: Make this function do something, or replace it entirely.  It comes
 // from the Mac code and isn't very useful here.
 void RGBForeColor(const RGBColor * color){}
@@ -225,8 +215,8 @@ class WinPrefs {
         inline Boolean Default3DOn(void) const {return ((BitOptions & (1<<10))?true:false); };
         inline void Default3DOn(Boolean newVal) {BitOptions = (BitOptions & 0xFFFFFBFF) + (newVal?(1<<10):0);};
             //Note the meaning of the Native EOL bit is reversed
-        inline Boolean NativeEOLChar(void) const {return ((BitOptions & (1<<11))?false:true); };
-        inline void NativeEOLChar(Boolean newVal) {BitOptions = (BitOptions & 0xFFFFF7FF) + (newVal?0:(1<<11));};
+        inline bool NativeEOLChar(void) const {return ((BitOptions & (1<<11))?false:true); };
+        inline void NativeEOLChar(bool newVal) {BitOptions = (BitOptions & 0xFFFFF7FF) + (newVal?0:(1<<11));};
             //Set to indicate a custom thumbnail should be created when saving
         inline bool CreateCustomIcon(void) const {return ((BitOptions & (1<<12))?false:true); };
         inline void CreateCustomIcon(bool newVal) {BitOptions = (BitOptions & 0xFFFFEFFF) + (newVal?0:(1<<12));};

@@ -17,6 +17,7 @@
 #endif
 
 typedef class AtomTypeList AtomTypeList;
+typedef class WindowData WindowData;
 
 class MoleculeData {
 		friend class MolDisplayWin;
@@ -50,17 +51,22 @@ class MoleculeData {
 	public:
 		MoleculeData();
 		~MoleculeData(void);
-		long UnPackOldData(BufferFile *Buffer);
 		long ReadInitialFragmentCoords(BufferFile * Buffer);
 		void ReadFragmentCoordinates(BufferFile * Buffer, long NumFragmentAtoms);
+#ifndef __wxBuild__
 		void ConvertMainWinData1(BufferFile *Buffer, long size);
 		void ConvertMainWinData14(BufferFile * Buffer, long length);
-		void ReadRunInfoRec(BufferFile *Buffer, long length);
-		void ReadRunTitle(BufferFile *Buffer, long length);
+		long UnPackOldData(BufferFile *Buffer);
+		long UnPackData(BufferFile * Buffer);
 		void ReadMORec10(BufferFile * Buffer, long length);
 		long ReadMORec48(BufferFile *Buffer, const long & NumBasisFuncs, const long & ByteCount);
+#endif
+		void ReadRunInfoRec(BufferFile *Buffer, long length);
+		void ReadRunTitle(BufferFile *Buffer, long length);
 		void ReadBasisOptions(BufferFile * Buffer);
 		void ReadControlOptions(BufferFile * Buffer);
+		long WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData, bool allFrames, bool AllData);
+		long OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData, bool readPrefs);
 		inline float GetMoleculeSize(void) {return WindowSize;};
 		inline void SetMoleculeSize(float newVal) {if (newVal > 0.0) WindowSize = newVal;};
 		void GetModelCenter(CPoint3D * center);
@@ -69,26 +75,25 @@ class MoleculeData {
 		void SetModelRotation(float Psi, float Phi, float Theta);
 		void AdvanceFrame(void);
 		void SetCurrentFrame(long FrameNum);
-		long PackData(short Amount, BufferFile * Buffer);
-		long UnPackData(BufferFile * Buffer);
 	//	inline Boolean GetFrameMode(void) {return (DrawMode & (1<<3));};
 		AtomTypeList * GetAtomTypes(void);
-		Boolean SurfaceExportPossible(void);
+		bool SurfaceExportPossible(void);
 		inline long GetCurrentFrame(void) {return CurrentFrame;};
 		inline Frame* GetCurrentFramePtr(void) {return cFrame;};
 		inline Frame * GetFirstFrame(void) {return Frames;};
 		void ParseGAMESSBasisSet(BufferFile * Buffer);
 		long ParseECPotentials(BufferFile * Buffer);
-		inline BasisSet * GetBasisSet(void) {return Basis;};
+		inline BasisSet * GetBasisSet(void) const {return Basis;};
+		long GetNumBasisFunctions(void) const;
 		inline long GetNumFrames(void) {return NumFrames;};
-		Boolean OrbSurfacePossible(void);
-		Boolean TotalDensityPossible(void);
+		bool OrbSurfacePossible(void);
+		bool TotalDensityPossible(void);
 		void ResetRotation(void);
 		void CenterModelWindow(void);
 		void InvertMode(void);
-		void UnitConversion(Boolean AngToBohr);
+		void UnitConversion(bool AngToBohr);
 		void FlipRotation(short theItem);
-		Boolean SetScreenPlane(CPoint3D *Points);
+		bool SetScreenPlane(CPoint3D *Points);
 		void LinearLeastSquaresFit(Progress * lProgress);
 		void CreateLLM(long NumPts, WinPrefs * Prefs);
 		void CreateInternalLLM(long NumPts, WinPrefs * Prefs);
@@ -120,7 +125,7 @@ class MoleculeData {
 		void StickCoordinates(void);
 		inline Internals * GetInternalCoordinates(void) {return IntCoords;};
 		void DeleteAtom(long AtomNum);
-		Boolean ValidAtom(long AtomNum);
+		bool ValidAtom(long AtomNum);
 		void GetRotationMatrix(Matrix4D copy);
 };
 

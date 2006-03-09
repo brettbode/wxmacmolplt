@@ -286,7 +286,7 @@ void MOPacInternals::InternalsToCartesians(MoleculeData * MainData, WinPrefs * P
 	double DegToRad = acos(-1.0)/180.0;
 
 	if (lFrame->NumAtoms>1) {
-	 mpAtom * tempAtoms = new Atom[lFrame->NumAtoms];
+	 mpAtom * tempAtoms = new mpAtom[lFrame->NumAtoms];
 		if (tempAtoms) {
 				long i;
 			for (i=0; i<lFrame->NumAtoms; i++) tempAtoms[i].Type = lFrame->Atoms[i].Type;
@@ -392,19 +392,19 @@ void MOPacInternals::AddAtom(MoleculeData * MainData) {
 	if (3*lFrame->NumAtoms > Allocation) {
 		long * templ = new long[3*lFrame->NumAtoms+12];
 		if (templ) {
-			BlockMoveData(ConnectionAtoms, templ, Count*sizeof(long));
+			memcpy(templ, ConnectionAtoms, Count*sizeof(long));
 			delete [] ConnectionAtoms;
 			ConnectionAtoms = templ;
 		} else throw MemoryError();
 		float * tempVal = new float[3*lFrame->NumAtoms+12];
 		if (tempVal) {
-			BlockMoveData(Values, tempVal, Count*sizeof(float));
+			memcpy(tempVal, Values, Count*sizeof(float));
 			delete [] Values;
 			Values = tempVal;
 		} else throw MemoryError();
 		char * tempType = new char [3*lFrame->NumAtoms+12];
 		if (tempType) {
-			BlockMoveData(Type, tempType, Count*sizeof(char));
+			memcpy(tempType, Type, Count*sizeof(char));
 			delete [] Type;
 			Type = tempType;
 		} else throw MemoryError();

@@ -10,12 +10,8 @@
 	Brett Bode - February 1996
 	Changed InputeFileData uses to BufferFile calls 8-97
 */
-#define		kBasisSetStrings	303
-#define		kMaxBasisSets		16
 #define		kPGroupStrings		305
 #define		kMaxPGroups			15
-#define		kECPPotStrings		309
-#define		kMaxECPPotStrings	4
 #define		kDFTGridFunctionalStrings		311
 #define		kDFTGridFunctionalMaxStrings	21
 #define		kDFTGridFreeFunctionalStrings		312
@@ -279,59 +275,59 @@ void InputData::ReadFromBuffer(BufferFile *Buffer, long length) {
 		long blockStart = Buffer->GetFilePos();
 		switch (code) {
 			case 1:	//control group
-				if (Control==nil) Control = new ControlGroup;
+				if (Control==NULL) Control = new ControlGroup;
 				if (Control) Control->ReadFromBuffer(Buffer, objectLength);
 				else throw MemoryError();
 			break;
 			case 2: //system
-				if (System == nil) System = new SystemGroup;
+				if (System == NULL) System = new SystemGroup;
 				if (System) {
 					code = System->ReadFromBuffer(Buffer);
 //					if (code != objectLength) throw DataError();
 				} else throw MemoryError();
 			break;
 			case 3:
-				if (Basis == nil) Basis = new BasisGroup;
+				if (Basis == NULL) Basis = new BasisGroup;
 				if (Basis) {
 					code = Basis->ReadFromBuffer(Buffer);
 //					if (code != objectLength) throw DataError();
 				} else throw MemoryError();
 			break;
 			case 4:
-				if (Data == nil) Data = new DataGroup;
+				if (Data == NULL) Data = new DataGroup;
 				if (Data) Data->ReadFromBuffer(Buffer, objectLength);
 				else throw MemoryError();
 			break;
 			case 5:
-				if (Guess == nil) Guess = new GuessGroup;
+				if (Guess == NULL) Guess = new GuessGroup;
 				if (Guess) {
 					code = Guess->ReadFromBuffer(Buffer);
 	//				if (code != objectLength) throw DataError();
 				} else throw MemoryError();
 			break;
 			case 6:
-				if (SCF == nil) SCF = new SCFGroup;
+				if (SCF == NULL) SCF = new SCFGroup;
 				if (SCF) {
 					code = SCF->ReadFromBuffer(Buffer);
 //					if (code != objectLength) throw DataError();
 				} else throw MemoryError();
 			break;
 			case 7:
-				if (MP2 == nil) MP2 = new MP2Group;
+				if (MP2 == NULL) MP2 = new MP2Group;
 				if (MP2) {
 					code = MP2->ReadFromBuffer(Buffer);
 //					if (code != objectLength) throw DataError();
 				} else throw MemoryError();
 			break;
 			case 8:
-				if (Hessian == nil) Hessian = new HessianGroup;
+				if (Hessian == NULL) Hessian = new HessianGroup;
 				if (Hessian) {
 					code = Hessian->ReadFromBuffer(Buffer);
 //					if (code != objectLength) throw DataError();
 				} else throw MemoryError();
 			break;
 			case 9:
-				if (StatPt == nil) StatPt = new StatPtGroup;
+				if (StatPt == NULL) StatPt = new StatPtGroup;
 				if (StatPt) {
 					code = StatPt->ReadFromBuffer(Buffer);
 //					if (code != objectLength) throw DataError();
@@ -355,16 +351,16 @@ void InputData::ReadFromBuffer(BufferFile *Buffer, long length) {
 #pragma segment Control
 	//ControlGroup functions
 ControlGroup::ControlGroup(void) {
-	ExeType = nil;
+	ExeType = NULL;
 	Options=0;
 	InitControlPaneData();
 	InitProgPaneData();
 	NPrint=ITol=ICut=0;
 }
 ControlGroup::ControlGroup(ControlGroup *Copy) {
-	if (Copy == nil) return;
+	if (Copy == NULL) return;
 	*this = *Copy;
-	ExeType = nil;
+	ExeType = NULL;
 	if (Copy->ExeType) {
 		ExeType = new char[1+strlen(Copy->ExeType)];
 		if (ExeType) strcpy(ExeType, Copy->ExeType);
@@ -376,7 +372,7 @@ ControlGroup::~ControlGroup(void) {
 void ControlGroup::InitControlPaneData(void) {
 	if (ExeType) {
 		delete [] ExeType;
-		ExeType = nil;
+		ExeType = NULL;
 	}
 	SCFType=GAMESSDefaultSCFType;
 	MPLevelCIType=MaxIt=Charge=Multiplicity=0;
@@ -572,17 +568,17 @@ CCRunType ControlGroup::GetCCType(void) const {
 	return result;
 }
 short ControlGroup::GetExeType(void) {
-	if ((ExeType==nil)||(0<=LocateKeyWord(ExeType, "RUN", 3,3))) return 0;	//Normal run
+	if ((ExeType==NULL)||(0<=LocateKeyWord(ExeType, "RUN", 3,3))) return 0;	//Normal run
 	if (0<=LocateKeyWord(ExeType, "CHECK", 5,5)) return 1;
 	if (0<=LocateKeyWord(ExeType, "DEBUG", 5,5)) return 2;
 	return 3;
 }
 short ControlGroup::SetExeType(const char *ExeText) {
-	if (ExeText==nil) return 0;
+	if (ExeText==NULL) return 0;
 	long nchar = strlen(ExeText);
 	if (ExeType) {
 		delete [] ExeType;
-		ExeType = nil;
+		ExeType = NULL;
 	}
 	ExeType = new char(nchar+1);
 	strcpy(ExeType, ExeText);
@@ -592,7 +588,7 @@ short ControlGroup::SetExeType(short NewType) {
 	if ((NewType < 0)||(NewType > 2)) return -1;
 	if (ExeType) {
 		delete [] ExeType;
-		ExeType = nil;
+		ExeType = NULL;
 	}
 	if (NewType==1) {
 		ExeType = new char[6];
@@ -1112,8 +1108,7 @@ void ControlGroup::WriteToFile(BufferFile *File, InputData *IData, long NumElect
 	}
 	if (IData->Basis) {
 		if (IData->Basis->GetECPPotential()) {
-			IData->Basis->GetECPPotential(Text);	Text[Text[0]+1]=0;
-			sprintf(Out, "ECP=%s ",&(Text[1]));
+			sprintf(Out, "ECP=%s ",IData->Basis->GetECPPotentialText());
 	 		File->WriteLine(Out, false);
 		}
 	}
@@ -1170,7 +1165,7 @@ void ControlGroup::RevertControlPane(ControlGroup *OldData) {
 	MaxIt = OldData->MaxIt;
 	if (ExeType) {
 		delete [] ExeType;
-		ExeType = nil;
+		ExeType = NULL;
 	}
 	SetExeType(OldData->ExeType);
 	Local = OldData->Local;
@@ -1380,7 +1375,7 @@ void SystemGroup::InitData(void) {
 	Flags = 0;
 }
 long SystemGroup::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
+	bool cState = Buffer->GetOutput();
 	Buffer->SetOutput(false);
 	long size = WriteToBuffer(Buffer);
 	Buffer->SetOutput(cState);
@@ -1544,14 +1539,48 @@ void BasisGroup::InitData(void) {
 	Polar = GAMESS_BS_No_Polarization;
 	Flags = 0;
 }
+const char * BasisGroup::GAMESSBasisSetToText(GAMESS_BasisSet bs) {
+	switch (bs) {
+		case GAMESS_BS_MINI:
+			return "MINI";
+		case GAMESS_BS_MIDI:
+			return "MIDI";
+		case GAMESS_BS_STO:
+			return "STO";
+		case GAMESS_BS_N21:
+			return "N21";
+		case GAMESS_BS_N31:
+			return "N31";
+		case GAMESS_BS_N311:
+			return "N311";
+		case GAMESS_BS_DZV:
+			return "DZV";
+		case GAMESS_BS_DH:
+			return "DH";
+		case GAMESS_BS_BC:
+			return "BC";
+		case GAMESS_BS_TZV:
+			return "TZV";
+		case GAMESS_BS_MC:
+			return "MC";
+		case GAMESS_BS_SBK:
+			return "SBK";
+		case GAMESS_BS_HW:
+			return "HW";
+		case GAMESS_BS_MNDO:
+			return "MNDO";
+		case GAMESS_BS_AM1:
+			return "AM1";
+		case GAMESS_BS_PM3:
+			return "PM3";
+	}
+	return "invalid";
+}
 short BasisGroup::SetBasis(const char *BasisText) {
 	short NewBasis = -1;
-	Str255	text;
 
-	for (int i=1; i<kMaxBasisSets; i++) {
-		// TODO: whatever
-        // GetIndString(text, kBasisSetStrings, i);
-		if (-1<LocateKeyWord(BasisText, (char *) &(text[1]), text[0], 9)) {
+	for (int i=GAMESS_BS_None; i<NumGAMESSBasisSetsItem; i++) {
+		if (!strcasecmp(BasisText, GAMESSBasisSetToText((GAMESS_BasisSet)i))) {
 			NewBasis = i;
 			break;
 		}
@@ -1567,13 +1596,11 @@ short BasisGroup::SetBasis(short NewBasis) {
 	Basis = NewBasis;
 	return Basis;
 }
-short BasisGroup::GetBasis(Str255 BasisText) const {
+const char * BasisGroup::GetBasisText(void) const {
 	short temp = Basis;
 	if (temp <= 0) temp = 1;
-	// TODO: whatever
-    // GetIndString(BasisText, kBasisSetStrings, temp);
 
-	return Basis;
+	return GAMESSBasisSetToText((GAMESS_BasisSet) temp);
 }
 short BasisGroup::GetBasis(void) const {
 	return Basis;
@@ -1664,6 +1691,31 @@ const char * BasisGroup::PolarToText(GAMESS_BS_Polarization p) {
 	}
 	return "invalid";
 }
+const char * BasisGroup::GAMESSECPToText(GAMESS_BS_ECPotential p) {
+	switch (p) {
+		case GAMESS_BS_ECP_None:
+			return "NONE";
+		case GAMESS_BS_ECP_Read:
+			return "READ";
+		case GAMESS_BS_ECP_SBK:
+			return "SBK";
+		case GAMESS_BS_ECP_HW:
+			return "HW";
+	}
+	return "invalid";
+}
+GAMESS_BS_ECPotential BasisGroup::SetECPPotential(const char *ECPText) {
+	GAMESS_BS_ECPotential NewPot = GAMESS_BS_Invalid_ECP;
+	
+	for (int i=GAMESS_BS_ECP_None; i<NumGAMESSBSECPItems; i++) {
+		if (!strcasecmp(ECPText, GAMESSECPToText((GAMESS_BS_ECPotential)i))) {
+			NewPot = (GAMESS_BS_ECPotential) i;
+			break;
+		}
+	}
+	if (NewPot>=0) ECPPotential = NewPot;
+	return NewPot;
+}
 short BasisGroup::GetECPPotential(void) const {
 	short value = ECPPotential;
 	if (value == 0) {
@@ -1672,37 +1724,17 @@ short BasisGroup::GetECPPotential(void) const {
 	}
 	return value;
 }
-short BasisGroup::GetECPPotential(Str255 ECPText) const {
+const char * BasisGroup::GetECPPotentialText(void) const {
 	short value = ECPPotential;
 	if (value == 0) {
 		if (Basis == 12) value = 2;
 		if (Basis == 13) value = 3;
 	}
-	// TODO: whatever
-    // GetIndString(ECPText, kECPPotStrings, 1+value);
-
-	return ECPPotential;
+	return GAMESSECPToText((GAMESS_BS_ECPotential) value);
 }
 short BasisGroup::SetECPPotential(short NewType) {
 	if ((NewType<0)||(NewType>3)) return -1;
 	ECPPotential = NewType;
-	return ECPPotential;
-}
-short BasisGroup::SetECPPotential(const char * ECPText) {
-	short NewPot = -1;
-	Str255	text;
-
-	for (int i=1; i<kMaxECPPotStrings; i++) {
-		// TODO: whatever
-        // GetIndString(text, kECPPotStrings, i);
-		if (-1<LocateKeyWord(ECPText, (char *) &(text[1]), text[0], 9)) {
-			NewPot = i;
-			break;
-		}
-	}
-
-	if (NewPot<0) return -1;
-	ECPPotential = NewPot-1;
 	return ECPPotential;
 }
 long BasisGroup::GetSize(BufferFile *Buffer) {
@@ -1731,9 +1763,7 @@ void BasisGroup::WriteXML(XMLElement * parent) const {
 	char line[kMaxLineLength];
 	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOBasisGroupElement));
 	if (GetBasis() != 0) {
-		Str255	Text;
-		GetBasis(Text);	Text[Text[0]+1]=0;
-		Ele->addChildElement(CML_convert(MMP_IOBGBasisSet), (const char *) &(Text[1]));
+		Ele->addChildElement(CML_convert(MMP_IOBGBasisSet), GetBasisText());
 	}
 	if (NumGauss) {
 		snprintf(line, kMaxLineLength, "%d", NumGauss);
@@ -1755,9 +1785,7 @@ void BasisGroup::WriteXML(XMLElement * parent) const {
 		Ele->addChildElement(CML_convert(MMP_IOBGPolar), GetPolarText());
 	}
 	if (GetECPPotential() != 0) {
-		Str255	Text;
-		GetECPPotential(Text);	Text[Text[0]+1]=0;
-		Ele->addChildElement(CML_convert(MMP_IOBGECPPotential), (const char *) &(Text[1]));
+		Ele->addChildElement(CML_convert(MMP_IOBGECPPotential), GetECPPotentialText());
 	}
 	if (GetDiffuseSP()) Ele->addChildElement(CML_convert(MMP_IOBGDiffuseSP), trueXML);
 	if (GetDiffuseS()) Ele->addChildElement(CML_convert(MMP_IOBGDiffuseS), trueXML);
@@ -1833,14 +1861,12 @@ void BasisGroup::ReadXML(XMLElement * parent) {
 }
 long BasisGroup::WriteToFile(BufferFile *File, MoleculeData * lData) {
 	char	Out[133];
-	Str255	Text;
 		//if a general basis set is present don't punch the $Basis group
 	if (lData->GetBasisSet() && (GetBasis() == 0)) return 1;
 		//Punch the group label
 	File->WriteLine(" $BASIS ", false);
 		//Basis Set
-	GetBasis(Text);	Text[Text[0]+1]=0;
-	sprintf(Out,"GBASIS=%s ",&(Text[1]));
+	sprintf(Out,"GBASIS=%s ", GetBasisText());
 	File->WriteLine(Out, false);
 		//Number of Gaussians
 	if (NumGauss) {
@@ -1882,7 +1908,7 @@ DataGroup::DataGroup(void) {
 DataGroup::DataGroup(DataGroup *Copy) {
 	if (Copy) {
 		*this = *Copy;
-		Title = nil;
+		Title = NULL;
 		if (Copy->Title) {
 			Title = new char[1+strlen(Copy->Title)];
 			if (Title) strcpy(Title, Copy->Title);
@@ -1924,8 +1950,11 @@ short DataGroup::SetPointGroup(char *GroupText) {
 	}
 
 	for (int i=1; i<kMaxPGroups; i++) {
-		// TODO: whatever
-        // GetIndString(text, kPGroupStrings, i);
+#ifdef __wxBuild__
+#warning Need IndString replacement
+#else
+		GetIndString(text, kPGroupStrings, i);
+#endif
 		if (-1<LocateKeyWord(GroupText, (char *) &(text[1]), text[0], 9)) {
 			NewPGroup = i;
 			break;
@@ -1937,11 +1966,14 @@ short DataGroup::SetPointGroup(char *GroupText) {
 	PointGroup = NewPGroup;
 	return PointGroup;
 }
-short DataGroup::GetPointGroup(Str255 GroupText, Boolean InLine) const {
+short DataGroup::GetPointGroup(Str255 GroupText, bool InLine) const {
 	int	value = PointGroup;
 	if (value == 0) value = 1;	//default to C1
-	// TODO: whatever
-    // GetIndString(GroupText, kPGroupStrings, PointGroup);
+#ifdef __wxBuild__
+#warning Need GetIndString replacement
+#else
+	GetIndString(GroupText, kPGroupStrings, PointGroup);
+#endif
 	GroupText[1+GroupText[0]] = 0;
 	if (InLine && (PGroupOrder>0)) {
 		for (int i=1; i<=GroupText[0]; i++) {
@@ -3014,12 +3046,20 @@ short DFTGroup::GetFunctional(unsigned char * FuncName) const {
 	if (temp <= 0) temp = 1;
 	if (MethodGrid()) {
 		if (temp <= kDFTGridFunctionalMaxStrings)
-			// TODO: whatever
-            ;// GetIndString(FuncName, kDFTGridFunctionalStrings, temp);
+#ifdef __wxBuild__
+			;
+#warning Need GetIndString replacement
+#else
+			GetIndString(FuncName, kDFTGridFunctionalStrings, temp);
+#endif
 	} else {	//Grid-free functional list is fairly different
 		if (temp <= kDFTGridFreeFunctionalMaxStrings)
-			// TODO: whatever
-            ;// GetIndString(FuncName, kDFTGridFreeFunctionalStrings, temp);
+#ifdef __wxBuild__
+			;
+#warning Need GetIndString replacement
+#else
+			GetIndString(FuncName, kDFTGridFreeFunctionalStrings, temp);
+#endif
 	}
 	return Functional;
 }
