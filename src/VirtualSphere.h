@@ -23,13 +23,13 @@
 #ifndef	__VIRTUALSPHERE__
 #define __VIRTUALSPHERE__
 
-pascal void VirtualSphere (Point	p,	
+void VirtualSphere (Point	p,	
 						   Point	q,
 						   Point	cueCenter,
 						   long		cueRadius,
 						   Matrix4D rotationMatrix);
 
-pascal void VirtualSphereQD3D 	(Point	p,	
+void VirtualSphereQD3D 	(Point	p,	
 						  		 Point	q,
 						  		 Point	cueCenter,
 						  		 long	cueRadius,

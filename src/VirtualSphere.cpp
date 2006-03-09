@@ -12,8 +12,11 @@
 
    Part of Virtual Sphere Sample Code Release v1.1
   еееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееее*/
+#include "Globals.h"
 #include "Geometries.h"	//Needed for a couple of structure and type definition
+#ifndef __wxBuild__
 #include <Quickdraw.h>
+#endif
 #include "VirtualSphere.h"
 #include "Math3D.h"
 
@@ -23,7 +26,7 @@ static void PointOnUnitSphere (Point	p,
 							   long		cueRadius,
 							   CPoint3D	*v);
 void Rotate3DPt(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoord);
-pascal void SetRotation4DMatrix (Matrix4D ModelRotation, Matrix4D rotationMatrix, const CPoint3D *op, const CPoint3D *oq);
+void SetRotation4DMatrix (Matrix4D ModelRotation, Matrix4D rotationMatrix, const CPoint3D *op, const CPoint3D *oq);
 
 /*=================================================================================================
  VirtualSphere
@@ -31,7 +34,7 @@ pascal void SetRotation4DMatrix (Matrix4D ModelRotation, Matrix4D rotationMatrix
  Determine the axis and angle of rotation from the last 2 locations of the mouse
  relative to the Virtual Sphere cue circle.  
 -------------------------------------------------------------------------------------------------*/
-pascal void VirtualSphere (Point	p,	
+void VirtualSphere (Point	p,	
 						   Point	q,
 						   Point	cueCenter,
 						   long		cueRadius,
@@ -48,7 +51,7 @@ pascal void VirtualSphere (Point	p,
 	 * op to oq. */
 	SetRotationMatrix (rotationMatrix, &op, &oq);
 }
-pascal void VirtualSphereQD3D 	(Point	p,	
+void VirtualSphereQD3D 	(Point	p,	
 						  		 Point	q,
 						  		 Point	cueCenter,
 						  		 long	cueRadius,
@@ -67,7 +70,7 @@ pascal void VirtualSphereQD3D 	(Point	p,
 	SetRotation4DMatrix (ModelRotation, rotationMatrix, &op, &oq);
 }
 
-pascal void SetRotation4DMatrix (Matrix4D ModelRotation, Matrix4D rotationMatrix, const CPoint3D *op, const CPoint3D *oq)
+void SetRotation4DMatrix (Matrix4D ModelRotation, Matrix4D rotationMatrix, const CPoint3D *op, const CPoint3D *oq)
 {
 	float		s, c, t;
 	CPoint3D	a, b;

@@ -21,7 +21,7 @@ class Progress {
 	public:
 		Progress(void);
 		~Progress(void);
-		Boolean UpdateProgress(float PercentDone);
+		bool UpdateProgress(float PercentDone);
 		void ChangeText(char * newText);
 		void SetBaseValue(long NewVal);
 		void SetScaleFactor(float NewVal);

@@ -22,7 +22,7 @@ Progress::Progress(void) {
 Progress::~Progress(void) {
 }
 
-Boolean Progress::UpdateProgress(float PercentDone) {
+bool Progress::UpdateProgress(float PercentDone) {
     return true;
 }
 
