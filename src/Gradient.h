@@ -25,13 +25,15 @@ class GradientData {
 		~GradientData(void);
 		float GetRMS(void) {return RMS;};
 		float GetMaximum(void) {return Maximum;};
-		Boolean ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms, long SearchLength,
-			Boolean Style);
+		bool ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms, long SearchLength,
+			bool Style);
+#ifndef __wxBuild__
 		long GetSize(BufferFile * Buffer);
 		long Write(BufferFile * Buffer);
+		static GradientData * Read(BufferFile * Buffer);
+#endif
 		void WriteXML(XMLElement * parent);
 		void ReadXML(XMLElement * gradXML);
-		static GradientData * Read(BufferFile * Buffer);
 };
 
 #endif

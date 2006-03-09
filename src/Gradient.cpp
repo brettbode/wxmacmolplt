@@ -25,6 +25,7 @@ GradientData::GradientData(void) {
 GradientData::~GradientData(void) {
 	if (CartesianGradient) delete [] CartesianGradient;
 }
+#ifndef __wxBuild__
 long GradientData::GetSize(BufferFile * Buffer) {
 	Boolean	cState = Buffer->GetOutput();
 	Buffer->SetOutput(false);
@@ -73,10 +74,11 @@ long GradientData::Write(BufferFile * Buffer) {
 	}
 	return total;
 }
+#endif
 //Buffer should be positioned at the nserch line
-Boolean GradientData::ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms,
-		long SearchLength, Boolean Style) {
-	Boolean result = false;
+bool GradientData::ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms,
+		long SearchLength, bool Style) {
+	bool result = false;
 	char	Line[kMaxLineLength], token[kMaxLineLength];
 	float	nucCharge;
 	long	scanerr, iline, test;
