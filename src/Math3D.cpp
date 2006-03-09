@@ -69,7 +69,7 @@ void Rotate3DOffset(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoor
 }
 void SortzBuffer(CPoint3D coord[], long zBuffer[], long natoms)	{
 	int			itemp, iatm;
-	Boolean		done=false;
+	bool		done=false;
 
 	do {
 		done = true;
