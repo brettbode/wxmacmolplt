@@ -15,12 +15,12 @@ class AtomTypeList {
 	private:
 		long 	Types[kMaxAtomTypes];
 		long	NumSortedTypes;
-		Boolean	Sorted;
+		bool	Sorted;
 	public:
 		AtomTypeList(void);
 		void AddAtomType(long newType);
 		long GetMaxAtomType(void) const;
-		Boolean IsAtomInList(long atomType) const;
+		bool IsAtomInList(long atomType) const;
 		void Sort(void);
-		Boolean TransitionMetalInList(void) const;
+		bool TransitionMetalInList(void) const;
 };

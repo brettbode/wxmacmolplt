@@ -36,8 +36,8 @@ void AtomTypeList::Sort(void) {
 long AtomTypeList::GetMaxAtomType(void) const {
 	return (Types[NumSortedTypes-1]);
 }
-Boolean AtomTypeList::TransitionMetalInList(void) const {
-	Boolean result = false;
+bool AtomTypeList::TransitionMetalInList(void) const {
+	bool result = false;
 	
 	for (long i=0; i<NumSortedTypes; i++) {
 		if (Types[i]>=21 && Types[i]<=30) result = true;
@@ -46,8 +46,8 @@ Boolean AtomTypeList::TransitionMetalInList(void) const {
 	}
 	return result;
 }
-Boolean AtomTypeList::IsAtomInList(long atomType) const {
-	Boolean result = false;
+bool AtomTypeList::IsAtomInList(long atomType) const {
+	bool result = false;
 	
 	for (long i=0; i<NumSortedTypes; i++) {
 		if (Types[i] == atomType) result = true;
