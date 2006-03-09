@@ -19,6 +19,8 @@
 #ifndef _GlobalDefs_
 #define _GlobalDefs_
 
+//This needs to get put into the build system...
+#define __wxBuild__
 /*
 #define MacintoshBuild		//define to build for Mac PPC or 68K
 #if __GNUC__
@@ -185,6 +187,10 @@ struct RGBColor {
 typedef struct RGBColor RGBColor;
 
 #endif	//End of Rhapsody definitions!
+
+#ifdef __wxBuild__
+typedef char * Ptr;
+#endif
 
 // These are here because the ifdefs are broken right now.
 #define max(x, y)		(((x)>(y)) ? (x) : (y))

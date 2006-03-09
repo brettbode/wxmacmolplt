@@ -14,7 +14,12 @@
 
 //Global exceptions types
 
+//The following are for non-Mac systems
+#ifdef __wxBuild__
 typedef long OSErr;
+const int noErr = 0;
+const int eofErr = -39;
+#endif
 
 class MemoryError {
 	private:
@@ -36,8 +41,7 @@ class FileError {
 	public:
 		OSErr	Error;
 		FileError(void) {
-            // TODO:  Make this more than a no-op
-			//Error = noErr;
+			Error = noErr;
 		};
 		FileError(OSErr	err) {
 			Error = err;

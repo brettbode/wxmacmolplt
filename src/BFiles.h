@@ -15,9 +15,6 @@
 #define __BFILE__
 #include <stdio.h>
 
-typedef bool Boolean;
-typedef char* Ptr;
-
 #define	kBufferSize		65536		//default file buffer size
 #define kMaxLineLength	180			//arbitrary Max line length (should handle 132 col lines)
  
@@ -38,7 +35,7 @@ long FindKeyWord(const char *buffer, char keyword[], long numbyte);
 long ReadStringKeyword(const char * Line, char * Keyword, char * Value);
 long ReadLongKeyword(const char * Line, char * Keyword, long * Value);
 long ReadFloatKeyword(const char * Line, char * Keyword, float * Value);
-long ReadBooleanKeyword(const char * Line, char * Keyword, Boolean * Value);
+long ReadBooleanKeyword(const char * Line, char * Keyword, bool * Value);
 long LocateForValue(const char * Line, char * KeyWord);
 
 class BufferFile {
@@ -66,15 +63,15 @@ class BufferFile {
  		short		ColsPerLine;
  		short		IOType;
  		char		EOLchar;
- 		Boolean		DoIt;
+ 		bool		DoIt;
 			//Internal routine which takes care of the actual reading/writing to disk
  		void AdvanceBuffer(void);
  	public:
  			//Build a read buffer on the specified (already open!) file
 #ifdef UseMacIO
- 		BufferFile(short TargetFileRef, Boolean Write);
+ 		BufferFile(short TargetFileRef, bool Write);
 #else
- 		BufferFile(FILE * TargetFileRef, Boolean Write);
+ 		BufferFile(FILE * TargetFileRef, bool Write);
 #endif
 #ifdef UseHandles
  		BufferFile(Handle	TargetHandle, long HandleSize);
@@ -92,20 +89,20 @@ class BufferFile {
 		long PutText(const char * Text);
 		void BackupnLines(long nBack);
 		void SkipnLines(long nSkip);
-		inline Boolean LocateKeyWord(char Keyword[], long NumByte) {return LocateKeyWord(Keyword, NumByte, -1);};
+		inline bool LocateKeyWord(char Keyword[], long NumByte) {return LocateKeyWord(Keyword, NumByte, -1);};
 			//Search the file for the specified keyword until found, EOF, or the limit is reached
 			//Returns true or false, the file position upon exit will be the start of the keyword,
 			//or the starting position if the keyword is not found.
-		Boolean LocateKeyWord(char Keyword[], long NumByte, long Limit);
+		bool LocateKeyWord(char Keyword[], long NumByte, long Limit);
 		long FindBlankLine(void);
 		long GetNumLines(long size);
  		long BufferSkip(long NumBytes);
  		inline void SetColsPerLine(short newVal) {ColsPerLine = newVal;};
  		inline float GetPercentRead(void) {return (float) GetFilePos()/GetFileLength();};
  		long Write(const char * Source, long NumBytes);
-		long WriteLine(Ptr text, Boolean newline);
- 		Boolean SetOutput(Boolean State);
- 		Boolean GetOutput(void);
+		long WriteLine(Ptr text, bool newline);
+ 		bool SetOutput(bool State);
+ 		bool GetOutput(void);
  		void AbnormalCleanup(void);
  		void CloseFile(void);
  		void SetBlockLength(long length);

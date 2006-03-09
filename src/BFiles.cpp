@@ -21,9 +21,6 @@
 #include "Prefs.h"
 #include <string.h>
 
-// Mac stuff
-const int eofErr = -39;
-
 extern WinPrefs *	gPreferences;
 
 long FindKeyWord(const char *buffer, char keyword[], long numbyte) {
@@ -63,7 +60,7 @@ long ReadFloatKeyword(const char * Line, char * Keyword, float * Value) {
 	}
 	return (Pos == 1);
 }
-long ReadBooleanKeyword(const char * Line, char * Keyword, Boolean * Value) {
+long ReadBooleanKeyword(const char * Line, char * Keyword, bool * Value) {
 	long Pos = LocateForValue(Line, Keyword);
 	if (Pos > -1) {
 			char token[kMaxLineLength];
@@ -98,9 +95,9 @@ long LocateForValue(const char * Line, char * KeyWord) {
 }
 
 #ifdef UseMacIO
-BufferFile::BufferFile(short TargetFileRef, Boolean Write)
+BufferFile::BufferFile(short TargetFileRef, bool Write)
 #else
-BufferFile::BufferFile(FILE * TargetFileRef, Boolean Write)
+BufferFile::BufferFile(FILE * TargetFileRef, bool Write)
 #endif
 {
 //Initialize the class data
@@ -114,13 +111,13 @@ BufferFile::BufferFile(FILE * TargetFileRef, Boolean Write)
 	ColsPerLine = 80;
 	DoIt = true;
 	if (gPreferences->NativeEOLChar()) {
-#ifdef CarbonBuild
+#if defined(CarbonBuild) | defined(__wxBuild__)
 		EOLchar = '\n';
 #else
 		EOLchar = '\r';
 #endif
 	} else {
-#ifdef CarbonBuild
+#if defined(CarbonBuild) | defined(__wxBuild__)
 		EOLchar = '\r';
 #else
 		EOLchar = '\n';
@@ -180,13 +177,13 @@ BufferFile::BufferFile(Ptr Data, long DataSize)
 					//and the buffer should not be freed when this object is destroyed
 	DoIt = true;
 	if (gPreferences->NativeEOLChar()) {
-#ifdef CarbonBuild
+#if defined(CarbonBuild) | defined(__wxBuild__)
 		EOLchar = '\n';
 #else
 		EOLchar = '\r';
 #endif
 	} else {
-#ifdef CarbonBuild
+#if defined(CarbonBuild) | defined(__wxBuild__)
 		EOLchar = '\r';
 #else
 		EOLchar = '\n';
@@ -459,7 +456,7 @@ void BufferFile::SkipnLines(long nSkip) {
 long BufferFile::FindBlankLine(void) {
 	long Start = BufferStart + BufferPos, LineStart;
 	long BlankLinePos=-1;
-	Boolean	done=false;
+	bool	done=false;
 	
 	while (!done) {
 		done = true;
@@ -488,10 +485,10 @@ long BufferFile::FindBlankLine(void) {
 //Search the file for the specified keyword until found, EOF, or the limit is reached
 //Returns true or false, the file position upon exit will be the start of the keyword,
 //or the starting position if the keyword is not found.
-Boolean BufferFile::LocateKeyWord(char Keyword[], long NumByte, long Limit) {
+bool BufferFile::LocateKeyWord(char Keyword[], long NumByte, long Limit) {
 	long OldPosition = GetFilePos();
 	char	LineText[kMaxLineLength + 1];
-	Boolean	KeyWordFound=false;
+	bool	KeyWordFound=false;
 	
 	if (Limit < 0) Limit = ByteCount;
 	if (Limit > ByteCount) Limit = ByteCount;
@@ -565,7 +562,7 @@ long BufferFile::Write(const char * Source, long NumBytes) {
 	}
 	return NumBytes;
 }
-long BufferFile::WriteLine(Ptr text, Boolean NewLine) {
+long BufferFile::WriteLine(Ptr text, bool NewLine) {
 	long nchar = strlen(text);
 	if (DoIt) {
 		if ((nchar+BufferPos)>(BufferSize-10)) {//Make sure there is room in the buffer
@@ -604,11 +601,11 @@ long BufferFile::WriteLine(Ptr text, Boolean NewLine) {
 	}
 	return nchar;
 }
-Boolean BufferFile::SetOutput(Boolean State) {
+bool BufferFile::SetOutput(bool State) {
 	DoIt = State;
 	return DoIt;
 }
-Boolean BufferFile::GetOutput(void) { return DoIt; }
+bool BufferFile::GetOutput(void) { return DoIt; }
 //Setup a new restricted length read block. Length is
 //assumed to be the length from the current position to the
 //end of the block.
