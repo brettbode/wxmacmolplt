@@ -165,10 +165,10 @@ inline PixMapHandle GetPortPixMap(CGrafPtr thePort) {return thePort->portPixMap;
 	} **PatListHandle;
 
 //Special global routines
-pascal void MessageAlert (Str255 message);
-Boolean ConfirmationDialog(short ResID, short itemNum);
+void MessageAlert (Str255 message);
+bool ConfirmationDialog(short ResID, short itemNum);
 void MessageAlertAndQuit (Str255 message);
-Boolean YesOrNoDialog(short ResID, short itemNum);
+bool YesOrNoDialog(short ResID, short itemNum);
 void MessageAlertByID(const short ResID, const short itemNum);
 void ShowAboutMeDialog(void);
 Boolean FrontApp(void);
@@ -207,6 +207,8 @@ typedef unsigned char Str255 [256];
 #define MIN(x, y)		(((x)>(y)) ? (y) : (x))
 
 //#define ChipmanCode	1	//Define to include the Chipman solvent surface code
+
+void MessageAlert (const char * message);
 
 //Useful constants
 #define	kBohr2AngConversion	0.52917724924	/*Bohrs to Angstroms*/
