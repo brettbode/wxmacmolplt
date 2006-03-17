@@ -11,6 +11,7 @@
  ***************************************/
 
 #include "mpGLCanvas.h"
+#include <wx/image.h>
 
 MpGLCanvas::MpGLCanvas(wxWindow       *parent,
                        wxWindowID      id,
@@ -41,7 +42,7 @@ void MpGLCanvas::setMolData(MoleculeData *newMolData) {
     molData = newMolData;
 }
 
-wxImage getImage(const int width, const int height) {
+wxImage MpGLCanvas::getImage(const int width, const int height) {
     // TODO:  respect width/height
     // TODO:  avoid grabbing the menu
     GLint view[4];

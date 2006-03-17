@@ -13,10 +13,6 @@
     All prefs accessors should now return true boolean values, BMB 11/2001
 */
 
-// TODO: Make this function do something, or replace it entirely.  It comes
-// from the Mac code and isn't very useful here.
-void RGBForeColor(const RGBColor * color){}
-
 #ifndef __Prefs__
 #define __Prefs__
 class SurfaceOptions {
@@ -41,10 +37,14 @@ class SurfaceOptions {
         float SetMaxContour(float NewMax);
         void GetPosColor(RGBColor *Color) const {*Color = PosColor;};
         void SetPosColor(RGBColor *Color) {PosColor = *Color;};
+#ifndef __wxBuild__
         void SetPosColor(void) const {RGBForeColor(&PosColor);};
+#endif
         void GetNegColor(RGBColor *Color) const {*Color = NegColor;};
         void SetNegColor(RGBColor *Color) {NegColor = *Color;};
+#ifndef __wxBuild__
         void SetNegColor(void) const {RGBForeColor(&NegColor);};
+#endif
         Boolean GetShowZeroContour(void) const {return (Options & 1);};
         Boolean SetShowZeroContour(Boolean State);
         Boolean GetRotate2DMap(void) const {return ((Options & (1<<1))?true:false);};
@@ -74,10 +74,12 @@ class EnergyOptions {
         void SetNumDigits(short newValue) {nDigits = newValue;};
         long GetEPlotPointSize(void) const {return EPlotBallSize;};
         long SetEPlotPointSize(long NewSize) {return EPlotBallSize = NewSize;};
+#ifndef __wxBuild__
         void SetTEColor(void) {RGBForeColor(&TEColor);};
         void SetMPColor(void) {RGBForeColor(&MPColor);};
         void SetKEColor(void) {RGBForeColor(&KEColor);};
         void SetPEColor(void) {RGBForeColor(&PEColor);};
+#endif
         const RGBColor * GetTEColorPtr(void) const {return &TEColor;};
         const RGBColor * GetMPColorPtr(void) const {return &MPColor;};
         const RGBColor * GetKEColorPtr(void) const {return &KEColor;};
@@ -259,7 +261,9 @@ class WinPrefs {
         inline short SetLabelFontID(short NewID) {return LabelFontID=NewID;};
         inline short GetLabelSize(void) const {return LabelSize;};
         inline short SetLabelSize(short NewValue) {return LabelSize=NewValue;};
+#ifndef __wxBuild__
         inline void SetAtomColor(long AtomNum) {RGBForeColor(&(AtomColors[AtomNum]));};
+#endif
         void SetAtomPattern(long AtomNum);
         inline RGBColor * GetAtomColorLoc(long AtomNum) {return &(AtomColors[AtomNum]);};
         inline short * GetAtomPatternLoc(long AtomNum) {return &(AtomPatterns[AtomNum]);};
@@ -268,9 +272,13 @@ class WinPrefs {
         inline RGBColor * GetVectorColorLoc(void) {return &VectorColor;};
         inline RGBColor * GetBackgroundColorLoc(void) {return &BackColor;};
         inline short * GetVectorPatternLoc(void) {return &VectorPattern;};
+#ifndef __wxBuild__
         inline void SetBondColor(long BondOrder) {RGBForeColor(&(BondColors[BondOrder]));};
+#endif
         void SetBondPattern(long BondOrder);
+#ifndef __wxBuild__
         inline void SetVectorColor(void) const {RGBForeColor(&VectorColor);};
+#endif
         void SetVectorPattern(void);
         inline float GetVectorScale(void) const {return VectorScale;};
         inline float SetVectorScale(float NewValue) {return VectorScale = NewValue;};
