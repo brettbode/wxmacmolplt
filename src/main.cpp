@@ -11,11 +11,25 @@
 ***************************************/
 
 #include "main.h"
+#include "Prefs.h"
+
+//The global preferences settings
+    WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
+
 
 bool MpApp::OnInit() {
     // TODO:  Handle command line arguments.  See wxApp documentation
     // TODO:  Start logging stuff.
     // TODO:  Figure out what to do about Mac.  wxGetOsVersion may be useful
+
+	gPreferences = new WinPrefs;
+	gPrefDefaults = new WinPrefs;
+
+	// Now read in the users preferences file from the system:preferences folder if present
+	gPrefDefaults->ReadDefaultPrefs();
+	*gPreferences = *gPrefDefaults;
+		//attempt to read new xml pref file
+	gPreferences->ReadUserPrefs();
 
     const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
 
@@ -51,6 +65,10 @@ void MpApp::createMainFrame(const wxString &file) {
 void MpApp::destroyMainFrame(MpMainFrame *frame) {
     // TODO:  Close frame and remove it from storage
     // frame->Destroy();
+}
+
+void MessageAlert(const char * message) {
+#warning Implement a simple alert
 }
 
 // Tell wxWidgets to start the program:

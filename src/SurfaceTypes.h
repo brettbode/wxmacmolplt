@@ -361,7 +361,9 @@ class General2DSurface : public Surf2DBase {
 		General2DSurface(WinPrefs * Prefs);
 		General2DSurface(BufferFile * Buffer, long length);
 		General2DSurface(XMLElement * x);
+#ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
+#endif
 		virtual char * GetLabel(void) const;
 		virtual SurfaceType GetSurfaceType(void) const {return kGeneral2DSurface;};
 			//pick and read a file containing the 2D grid
@@ -379,7 +381,9 @@ class General3DSurface : public Surf3DBase {
 		virtual SurfaceType GetSurfaceType(void) const {return kGeneral3DSurface;};
 			//pick and read a file containing the 3D grid
 		void ReadGrid(const bool Square, const bool UseValue, const double & MultValue);
+#ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
+#endif
 #ifdef QuickDraw3D
 		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
 #endif
@@ -407,7 +411,9 @@ class TEDensity3DSurface : public Surf3DBase {
 		void UpdateData(TEDensity3DSurface * target);
 		inline void SetMaxSurfaceValue(float NewVal) {MaxMEPValue = NewVal;};
 		inline float GetMaxSurfaceValue(void) const {return MaxMEPValue;};
+#ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
+#endif
 		virtual void Update(MoleculeData * MainData);
 #ifdef QuickDraw3D
 		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
@@ -433,7 +439,9 @@ class TEDensity2DSurface : public Surf2DBase {
 		TEDensity2DSurface(BufferFile * Buffer, long length);
 		TEDensity2DSurface(TEDensity2DSurface * target);
 		TEDensity2DSurface(XMLElement * x);
+#ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
+#endif
 		virtual char * GetLabel(void) const;
 		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity2D;};
 		virtual long Write(BufferFile * Buffer);
@@ -448,7 +456,9 @@ class TEDensity1DSurface : public Surf1DBase {
 		TEDensity1DSurface(WinPrefs * Prefs);
 		TEDensity1DSurface(BufferFile * Buffer, long length);
 		TEDensity1DSurface(TEDensity1DSurface * target);
+#ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
+#endif
 		virtual char * GetLabel(void) const;
 		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity1D;};
 		virtual long Write(BufferFile * Buffer);
@@ -467,7 +477,9 @@ class MEP2DSurface : public Surf2DBase {
 		MEP2DSurface(XMLElement * x);
 		inline long getTargetOrbitalSet(void) const { return OrbSet;};
 		inline void setTargetOrbitalSet(const long & target) {OrbSet = target;};
+#ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
+#endif
 		virtual char * GetLabel(void) const;
 		virtual SurfaceType GetSurfaceType(void) const {return kMEP2D;};
 		virtual long Write(BufferFile * Buffer);
@@ -483,7 +495,9 @@ class MEP3DSurface : public Surf3DBase {
 		MEP3DSurface(WinPrefs * Prefs);
 		MEP3DSurface(BufferFile * Buffer, long length);
 		MEP3DSurface(XMLElement * x);
+#ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
+#endif
 		virtual char * GetLabel(void) const;
 		virtual SurfaceType GetSurfaceType(void) const {return kMEP3D;};
 		void UpdateData(MEP3DSurface * target);
@@ -511,7 +525,9 @@ class Orb3DSurface : public Surf3DBase, public OrbSurfBase {
 		Orb3DSurface(XMLElement * s);
 		virtual char * GetLabel(void) const;
 		virtual SurfaceType GetSurfaceType(void) const {return kOrb3DType;};
+#ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
+#endif
 		virtual void Update(MoleculeData * MainData);
 #ifdef QuickDraw3D
 		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
@@ -532,7 +548,9 @@ class Orb2DSurface : public Surf2DBase, public OrbSurfBase {
 		Orb2DSurface(BufferFile * Buffer, long length);
 		Orb2DSurface(Orb2DSurface * Original);
 		Orb2DSurface(XMLElement * x);
+#ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
+#endif
 		virtual char * GetLabel(void) const;
 		virtual SurfaceType GetSurfaceType(void) const {return kOrb2DType;};
 		virtual long Write(BufferFile * Buffer);

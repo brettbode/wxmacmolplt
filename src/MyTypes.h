@@ -316,7 +316,9 @@ class Surface {
 		void SetLabel(const char * NewLabel);
 		inline bool DefaultLabel(void) {return (Label == NULL);};
 		virtual bool Needs2DPlane(void) const;
+#ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window)=0;
+#endif
 		virtual void Update(MoleculeData * MainData);
 		virtual SurfaceType GetSurfaceType(void) const = 0;
 		virtual bool isTransparent(void) const {return false;};

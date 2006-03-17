@@ -45,12 +45,12 @@ class SurfaceOptions {
 #ifndef __wxBuild__
         void SetNegColor(void) const {RGBForeColor(&NegColor);};
 #endif
-        Boolean GetShowZeroContour(void) const {return (Options & 1);};
-        Boolean SetShowZeroContour(Boolean State);
-        Boolean GetRotate2DMap(void) const {return ((Options & (1<<1))?true:false);};
-        Boolean SetRotate2DMap(Boolean State);
-        Boolean Get2DHashMarks(void) const {return ((Options & (1<<2))?true:false);};
-        Boolean Set2DHashMarks(Boolean State);
+        bool GetShowZeroContour(void) const {return (Options & 1);};
+        bool SetShowZeroContour(bool State);
+        bool GetRotate2DMap(void) const {return ((Options & (1<<1))?true:false);};
+        bool SetRotate2DMap(bool State);
+        bool Get2DHashMarks(void) const {return ((Options & (1<<2))?true:false);};
+        bool Set2DHashMarks(bool State);
 };
 class EnergyOptions {
     public:
