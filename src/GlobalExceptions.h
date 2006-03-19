@@ -15,7 +15,7 @@
 //Global exceptions types
 
 //The following are for non-Mac systems
-#ifdef __wxBuild__
+#if defined(__wxBuild__) && !defined(__WXMAC__)
 typedef long OSErr;
 const int noErr = 0;
 const int eofErr = -39;

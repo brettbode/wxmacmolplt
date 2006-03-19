@@ -189,13 +189,18 @@ typedef struct RGBColor RGBColor;
 #endif	//End of Rhapsody definitions!
 
 #ifdef __wxBuild__
-typedef char * Ptr;
+//When building on a Mac the following types will get picked up from system headers
+#ifdef __WXMAC__
+#include <wx/glcanvas.h>
+#else
 struct RGBColor {
 	unsigned short 					red;						/*magnitude of red component*/
 	unsigned short 					green;						/*magnitude of green component*/
 	unsigned short 					blue;						/*magnitude of blue component*/
 };
 struct Point { short h; short v; };
+#endif
+typedef char * Ptr;
 typedef unsigned char Boolean;
 typedef unsigned char Str255 [256];
 #endif

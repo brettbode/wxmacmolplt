@@ -10,6 +10,7 @@
  * Last Modified: 11-14-2005  Steven Schulteis
 ***************************************/
 
+#include "Globals.h"
 #include "main.h"
 #include "Prefs.h"
 
@@ -42,6 +43,7 @@ bool MpApp::OnInit() {
         // TODO:  Handle this appropriately
         return false;
     }
+	MessageAlert("App init running");
 
     // TODO:  Pass proper arguments to main frame object
     m_Frame = new MpMainFrame(wxT("wxMacMolPlt"));
@@ -68,7 +70,9 @@ void MpApp::destroyMainFrame(MpMainFrame *frame) {
 }
 
 void MessageAlert(const char * message) {
-#warning Implement a simple alert
+//wxLogMessage throws up a simple dialog alert and gives the user the option
+//of viewing and saving the current complete log.
+	wxLogMessage(message);
 }
 
 // Tell wxWidgets to start the program:
