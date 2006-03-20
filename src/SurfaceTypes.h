@@ -424,7 +424,7 @@ class TEDensity3DSurface : public Surf3DBase {
 		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * progress);
-		float CalculateGrid(long xStart, long xEnd, Atom * Atoms, BasisSet * Basis,
+		float CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisSet * Basis,
 			float * Vectors, float * VectorsB, float * OccupancyA, float * OccupancyB, float * AOVector,
 			long NumOccupiedAlphaOrbs, long NumOccupiedBetaOrbs, long NumAtoms, Progress * progress, long * PercentDone, bool MPTask);
 		void CalculateSurfaceValues(MoleculeData * MainData, Progress * progress);
@@ -538,7 +538,7 @@ class Orb3DSurface : public Surf3DBase, public OrbSurfBase {
 		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * lProgress);
-		float CalculateGrid(long xStart, long xEnd, Atom * Atoms, BasisSet * Basis,
+		float CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisSet * Basis,
 			float * MOVector, long NumAtoms, Progress * lProgress, long * PercentDone, bool MPTask);
 		void UpdateData(Orb3DSurface * Original);
 };

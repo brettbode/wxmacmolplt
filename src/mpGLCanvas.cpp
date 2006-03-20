@@ -10,6 +10,7 @@
  * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
+#include "Globals.h"
 #include "mpGLCanvas.h"
 #include <wx/image.h>
 

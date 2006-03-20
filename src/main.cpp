@@ -72,7 +72,7 @@ void MpApp::destroyMainFrame(MpMainFrame *frame) {
 void MessageAlert(const char * message) {
 //wxLogMessage throws up a simple dialog alert and gives the user the option
 //of viewing and saving the current complete log.
-	wxLogMessage(message);
+//	wxLogMessage(wxT(message));
 }
 
 // Tell wxWidgets to start the program:

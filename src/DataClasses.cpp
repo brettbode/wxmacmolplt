@@ -74,7 +74,7 @@ void ApplyRotation(Matrix4D RotMat, long Axis, float AngleDegrees) {
 	RotMat[3][1] = InitialTrans.y;
 	RotMat[3][2] = InitialTrans.z;
 }	/*Apply Rotation*/
-void CalculateCenterOfMass(Atom * AtomList, long NumAtoms, float * AtomMasses, CPoint3D * Center) {
+void CalculateCenterOfMass(mpAtom * AtomList, long NumAtoms, float * AtomMasses, CPoint3D * Center) {
 	float TotalMass=0.0;
 	Center->x = Center->y = Center->z = 0.0;
 	for (long i=0; i<NumAtoms; i++) {
@@ -89,7 +89,7 @@ void CalculateCenterOfMass(Atom * AtomList, long NumAtoms, float * AtomMasses, C
 	Center->y /= TotalMass;
 	Center->z /= TotalMass;
 }
-void MinimizeDifferences(Atom * FixedAtoms, Atom * targetAtoms, long NumAtoms,
+void MinimizeDifferences(mpAtom * FixedAtoms, mpAtom * targetAtoms, long NumAtoms,
 		WinPrefs * Prefs, long NumOptAtoms) {
 	Matrix4D	FitMatrix, TempRotMat;
 	float		SquaresValue, NewSquareValue, RotAngle;
@@ -2328,7 +2328,7 @@ void Frame::ReadSurfaceList(BufferFile * Buffer, long length) {
 }
 //Calculate the sum of the squares of the change in position of each atom between
 //CoordSetA and CoordSetB
-float CalculateSquaresValue(long NumOptAtoms, Atom CoordSetA[], CPoint3D CoordSet[]) {
+float CalculateSquaresValue(long NumOptAtoms, mpAtom CoordSetA[], CPoint3D CoordSet[]) {
 	float result=0.0, x, y, z;
 	for (long iatom=0; iatom<NumOptAtoms; iatom++) {
 		x = (CoordSetA[iatom].Position.x - CoordSet[iatom].x);

@@ -81,7 +81,6 @@ class mpAtom {
 		inline long GetFragmentNumber(void) const {return *((long *) &Label[12]);};
 		inline long GetNuclearCharge(void) const {return (GetType());};	//NOT correct for ECP's!!!!!
 };
-typedef mpAtom Atom;
 
 enum BondOrder {
 	kHydrogenBond,

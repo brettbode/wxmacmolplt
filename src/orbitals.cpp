@@ -33,9 +33,9 @@
 extern Boolean		gMPAware;
 extern long			gNumProcessors;
 
-float CalculateMOAmplitude(float XValue, float YValue, float ZValue, Atom *Atoms,
+float CalculateMOAmplitude(float XValue, float YValue, float ZValue, mpAtom *Atoms,
 		BasisSet *Basis, float *MOVector, long NumAtoms, bool UseSphericalHarmonics);
-void CalculateAOAmplitudeVector(float XValue, float YValue, float ZValue, Atom *Atoms,
+void CalculateAOAmplitudeVector(float XValue, float YValue, float ZValue, mpAtom *Atoms,
 		BasisSet *Basis, float *AOVector, long NumAtoms);
 
 const char * ConvertTypeOfWavefunction(const TypeOfWavefunction & t) {
@@ -1225,7 +1225,7 @@ long MORec::Read(BufferFile *Buffer, long NumBasisFuncs, long ByteCount) {
 }
 */
 //Computes the MO Amplitude at the specified x,y,z
-float CalculateMOAmplitude(float XValue, float YValue, float ZValue, Atom *Atoms,
+float CalculateMOAmplitude(float XValue, float YValue, float ZValue, mpAtom *Atoms,
 		BasisSet *Basis, float *MOVector, long NumAtoms, bool UseSphericalHarmonics) {
 	long ivec = 0, NumPrims;
 	float	x, y, z, x2, y2, z2, r=0, r2, VectorSum, expcr2, Amplitude=0.0;
@@ -1349,7 +1349,7 @@ float CalculateMOAmplitude(float XValue, float YValue, float ZValue, Atom *Atoms
 	return Amplitude;
 }
 //Computes the AO Amplitude vector at the specified x,y,z
-void CalculateAOAmplitudeVector(float XValue, float YValue, float ZValue, Atom *Atoms,
+void CalculateAOAmplitudeVector(float XValue, float YValue, float ZValue, mpAtom *Atoms,
 		BasisSet *Basis, float *AOVector, long NumAtoms) {
 	long ivec = 0, NumPrims;
 	float	x, y, z, x2, y2, z2, r2, expcr2;
@@ -1788,7 +1788,7 @@ typedef struct Orb3DGridData {
 	Orb3DSurface *	Surf;
 	long	xStart;
 	long	xEnd;
-	Atom *	Atoms;
+	mpAtom *	Atoms;
 	BasisSet *	Basis;
 	float	*	MOVector;
 	long		NumAtoms;
@@ -2002,7 +2002,7 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	YGridInc *= kBohr2AngConversion;
 	ZGridInc *= kBohr2AngConversion;
 }
-float Orb3DSurface::CalculateGrid(long xStart, long xEnd, Atom * Atoms, BasisSet * Basis,
+float Orb3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisSet * Basis,
 		float * MOVector, long NumAtoms, Progress * lProgress, long * PercentDone, bool MPTask) {
 	float lGridMax = -1.0e20;
 	float lGridMin = 1.0e20;
@@ -2054,7 +2054,7 @@ typedef struct TE3DGridData {
 	TEDensity3DSurface *	Surf;
 	long	xStart;
 	long	xEnd;
-	Atom *	Atoms;
+	mpAtom *	Atoms;
 	BasisSet *	Basis;
 	float	*	Vectors;
 	float	*	VectorsB;
@@ -2076,7 +2076,7 @@ static OSErr CalcTEGrid(TE3DGridData * Data) {
 	return noErr;
 }
 #endif
-float TEDensity3DSurface::CalculateGrid(long xStart, long xEnd, Atom * Atoms, BasisSet * Basis,
+float TEDensity3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisSet * Basis,
 			float * Vectors, float * VectorsB, float * OccupancyA, float * OccupancyB, float * AOVector,
 			long NumOccupiedAlphaOrbs, long NumOccupiedBetaOrbs, long NumAtoms, Progress * lProgress, long * PercentDone, bool MPTask) {
 	float lGridMax = -1.0e20;

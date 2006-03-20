@@ -10,6 +10,7 @@
  * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
+#include "Globals.h"
 #include "mpMainFrame.h"
 
 BEGIN_EVENT_TABLE(MpMainFrame, wxFrame)
