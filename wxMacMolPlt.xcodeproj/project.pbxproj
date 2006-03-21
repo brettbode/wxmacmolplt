@@ -1,0 +1,507 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1652DA5C09D0B12600B7783F /* AtomTypeList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2709D0B12600B7783F /* AtomTypeList.cpp */; };
+		1652DA5D09D0B12600B7783F /* BasisSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2909D0B12600B7783F /* BasisSet.cpp */; };
+		1652DA5E09D0B12600B7783F /* BFiles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2B09D0B12600B7783F /* BFiles.cpp */; };
+		1652DA5F09D0B12600B7783F /* CML.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2E09D0B12600B7783F /* CML.cpp */; };
+		1652DA6009D0B12600B7783F /* DataClasses.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3009D0B12600B7783F /* DataClasses.cpp */; };
+		1652DA6109D0B12600B7783F /* Files.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3109D0B12600B7783F /* Files.cpp */; };
+		1652DA6209D0B12600B7783F /* Frame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3209D0B12600B7783F /* Frame.cpp */; };
+		1652DA6309D0B12600B7783F /* GaussHermite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3409D0B12600B7783F /* GaussHermite.cpp */; };
+		1652DA6409D0B12600B7783F /* Gradient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3909D0B12600B7783F /* Gradient.cpp */; };
+		1652DA6509D0B12600B7783F /* InputData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3B09D0B12600B7783F /* InputData.cpp */; };
+		1652DA6609D0B12600B7783F /* Internals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3D09D0B12600B7783F /* Internals.cpp */; };
+		1652DA6709D0B12600B7783F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3F09D0B12600B7783F /* main.cpp */; };
+		1652DA6809D0B12600B7783F /* Math3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4109D0B12600B7783F /* Math3D.cpp */; };
+		1652DA6909D0B12600B7783F /* MEP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4309D0B12600B7783F /* MEP.cpp */; };
+		1652DA6A09D0B12600B7783F /* MMPPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4409D0B12600B7783F /* MMPPrefs.cpp */; };
+		1652DA6B09D0B12600B7783F /* MoleculeData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4609D0B12600B7783F /* MoleculeData.cpp */; };
+		1652DA6C09D0B12600B7783F /* mpGLCanvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */; };
+		1652DA6D09D0B12600B7783F /* mpMainFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4A09D0B12600B7783F /* mpMainFrame.cpp */; };
+		1652DA6E09D0B12600B7783F /* orbitals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4E09D0B12600B7783F /* orbitals.cpp */; };
+		1652DA6F09D0B12600B7783F /* Progress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5009D0B12600B7783F /* Progress.cpp */; };
+		1652DA7009D0B12600B7783F /* RysPolynomial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5209D0B12600B7783F /* RysPolynomial.cpp */; };
+		1652DA7109D0B12600B7783F /* SurfaceBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5409D0B12600B7783F /* SurfaceBase.cpp */; };
+		1652DA7209D0B12600B7783F /* SurfWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5609D0B12600B7783F /* SurfWin.cpp */; };
+		1652DA7309D0B12600B7783F /* VirtualSphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5709D0B12600B7783F /* VirtualSphere.cpp */; };
+		1652DA7409D0B12600B7783F /* wxFiles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5909D0B12600B7783F /* wxFiles.cpp */; };
+		1652DA7509D0B12600B7783F /* XML.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5A09D0B12600B7783F /* XML.cpp */; };
+		1652DACD09D0B43700B7783F /* bindoc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC809D0B43700B7783F /* bindoc.icns */; };
+		1652DACE09D0B43700B7783F /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC909D0B43700B7783F /* Info.plist */; };
+		1652DACF09D0B43700B7783F /* MacMolPlt.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACA09D0B43700B7783F /* MacMolPlt.icns */; };
+		1652DAD009D0B43700B7783F /* prefs.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACB09D0B43700B7783F /* prefs.icns */; };
+		1652DAD109D0B43700B7783F /* text-doc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACC09D0B43700B7783F /* text-doc.icns */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXBuildStyle section */
+		1652DAB609D0B32900B7783F /* Development */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Development;
+		};
+		1652DAB709D0B32900B7783F /* Deployment */ = {
+			isa = PBXBuildStyle;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Deployment;
+		};
+/* End PBXBuildStyle section */
+
+/* Begin PBXFileReference section */
+		1652DA0B09D0AE8F00B7783F /* wxMacMolPlt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wxMacMolPlt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1652DA0E09D0AE8F00B7783F /* wxMacMolPlt-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "wxMacMolPlt-Info.plist"; sourceTree = "<group>"; };
+		1652DA2709D0B12600B7783F /* AtomTypeList.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = AtomTypeList.cpp; path = src/AtomTypeList.cpp; sourceTree = "<group>"; };
+		1652DA2809D0B12600B7783F /* AtomTypeList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtomTypeList.h; path = src/AtomTypeList.h; sourceTree = "<group>"; };
+		1652DA2909D0B12600B7783F /* BasisSet.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = BasisSet.cpp; path = src/BasisSet.cpp; sourceTree = "<group>"; };
+		1652DA2A09D0B12600B7783F /* BasisSet.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BasisSet.h; path = src/BasisSet.h; sourceTree = "<group>"; };
+		1652DA2B09D0B12600B7783F /* BFiles.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = BFiles.cpp; path = src/BFiles.cpp; sourceTree = "<group>"; };
+		1652DA2C09D0B12600B7783F /* BFiles.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = BFiles.h; path = src/BFiles.h; sourceTree = "<group>"; };
+		1652DA2D09D0B12600B7783F /* cell_table.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = cell_table.h; path = src/cell_table.h; sourceTree = "<group>"; };
+		1652DA2E09D0B12600B7783F /* CML.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CML.cpp; path = src/CML.cpp; sourceTree = "<group>"; };
+		1652DA2F09D0B12600B7783F /* CML.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CML.h; path = src/CML.h; sourceTree = "<group>"; };
+		1652DA3009D0B12600B7783F /* DataClasses.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = DataClasses.cpp; path = src/DataClasses.cpp; sourceTree = "<group>"; };
+		1652DA3109D0B12600B7783F /* Files.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Files.cpp; path = src/Files.cpp; sourceTree = "<group>"; };
+		1652DA3209D0B12600B7783F /* Frame.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Frame.cpp; path = src/Frame.cpp; sourceTree = "<group>"; };
+		1652DA3309D0B12600B7783F /* Frame.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Frame.h; path = src/Frame.h; sourceTree = "<group>"; };
+		1652DA3409D0B12600B7783F /* GaussHermite.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = GaussHermite.cpp; path = src/GaussHermite.cpp; sourceTree = "<group>"; };
+		1652DA3509D0B12600B7783F /* GaussHermite.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = GaussHermite.h; path = src/GaussHermite.h; sourceTree = "<group>"; };
+		1652DA3609D0B12600B7783F /* Geometries.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Geometries.h; path = src/Geometries.h; sourceTree = "<group>"; };
+		1652DA3709D0B12600B7783F /* GlobalExceptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = GlobalExceptions.h; path = src/GlobalExceptions.h; sourceTree = "<group>"; };
+		1652DA3809D0B12600B7783F /* Globals.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Globals.h; path = src/Globals.h; sourceTree = "<group>"; };
+		1652DA3909D0B12600B7783F /* Gradient.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Gradient.cpp; path = src/Gradient.cpp; sourceTree = "<group>"; };
+		1652DA3A09D0B12600B7783F /* Gradient.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Gradient.h; path = src/Gradient.h; sourceTree = "<group>"; };
+		1652DA3B09D0B12600B7783F /* InputData.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = InputData.cpp; path = src/InputData.cpp; sourceTree = "<group>"; };
+		1652DA3C09D0B12600B7783F /* InputData.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = InputData.h; path = src/InputData.h; sourceTree = "<group>"; };
+		1652DA3D09D0B12600B7783F /* Internals.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Internals.cpp; path = src/Internals.cpp; sourceTree = "<group>"; };
+		1652DA3E09D0B12600B7783F /* Internals.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Internals.h; path = src/Internals.h; sourceTree = "<group>"; };
+		1652DA3F09D0B12600B7783F /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = "<group>"; };
+		1652DA4009D0B12600B7783F /* main.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = main.h; path = src/main.h; sourceTree = "<group>"; };
+		1652DA4109D0B12600B7783F /* Math3D.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Math3D.cpp; path = src/Math3D.cpp; sourceTree = "<group>"; };
+		1652DA4209D0B12600B7783F /* Math3D.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Math3D.h; path = src/Math3D.h; sourceTree = "<group>"; };
+		1652DA4309D0B12600B7783F /* MEP.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MEP.cpp; path = src/MEP.cpp; sourceTree = "<group>"; };
+		1652DA4409D0B12600B7783F /* MMPPrefs.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MMPPrefs.cpp; path = src/MMPPrefs.cpp; sourceTree = "<group>"; };
+		1652DA4509D0B12600B7783F /* MMPPrefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MMPPrefs.h; path = src/MMPPrefs.h; sourceTree = "<group>"; };
+		1652DA4609D0B12600B7783F /* MoleculeData.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MoleculeData.cpp; path = src/MoleculeData.cpp; sourceTree = "<group>"; };
+		1652DA4709D0B12600B7783F /* MoleculeData.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MoleculeData.h; path = src/MoleculeData.h; sourceTree = "<group>"; };
+		1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = mpGLCanvas.cpp; path = src/mpGLCanvas.cpp; sourceTree = "<group>"; };
+		1652DA4909D0B12600B7783F /* mpGLCanvas.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mpGLCanvas.h; path = src/mpGLCanvas.h; sourceTree = "<group>"; };
+		1652DA4A09D0B12600B7783F /* mpMainFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = mpMainFrame.cpp; path = src/mpMainFrame.cpp; sourceTree = "<group>"; };
+		1652DA4B09D0B12600B7783F /* mpMainFrame.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mpMainFrame.h; path = src/mpMainFrame.h; sourceTree = "<group>"; };
+		1652DA4C09D0B12600B7783F /* myFiles.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = myFiles.h; path = src/myFiles.h; sourceTree = "<group>"; };
+		1652DA4D09D0B12600B7783F /* MyTypes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MyTypes.h; path = src/MyTypes.h; sourceTree = "<group>"; };
+		1652DA4E09D0B12600B7783F /* orbitals.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = orbitals.cpp; path = src/orbitals.cpp; sourceTree = "<group>"; };
+		1652DA4F09D0B12600B7783F /* Prefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Prefs.h; path = src/Prefs.h; sourceTree = "<group>"; };
+		1652DA5009D0B12600B7783F /* Progress.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Progress.cpp; path = src/Progress.cpp; sourceTree = "<group>"; };
+		1652DA5109D0B12600B7783F /* Progress.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Progress.h; path = src/Progress.h; sourceTree = "<group>"; };
+		1652DA5209D0B12600B7783F /* RysPolynomial.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = RysPolynomial.cpp; path = src/RysPolynomial.cpp; sourceTree = "<group>"; };
+		1652DA5309D0B12600B7783F /* RysPolynomial.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = RysPolynomial.h; path = src/RysPolynomial.h; sourceTree = "<group>"; };
+		1652DA5409D0B12600B7783F /* SurfaceBase.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = SurfaceBase.cpp; path = src/SurfaceBase.cpp; sourceTree = "<group>"; };
+		1652DA5509D0B12600B7783F /* SurfaceTypes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = SurfaceTypes.h; path = src/SurfaceTypes.h; sourceTree = "<group>"; };
+		1652DA5609D0B12600B7783F /* SurfWin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = SurfWin.cpp; path = src/SurfWin.cpp; sourceTree = "<group>"; };
+		1652DA5709D0B12600B7783F /* VirtualSphere.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = VirtualSphere.cpp; path = src/VirtualSphere.cpp; sourceTree = "<group>"; };
+		1652DA5809D0B12600B7783F /* VirtualSphere.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = VirtualSphere.h; path = src/VirtualSphere.h; sourceTree = "<group>"; };
+		1652DA5909D0B12600B7783F /* wxFiles.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = wxFiles.cpp; path = src/wxFiles.cpp; sourceTree = "<group>"; };
+		1652DA5A09D0B12600B7783F /* XML.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XML.cpp; path = src/XML.cpp; sourceTree = "<group>"; };
+		1652DA5B09D0B12600B7783F /* XML.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = XML.hpp; path = src/XML.hpp; sourceTree = "<group>"; };
+		1652DAC809D0B43700B7783F /* bindoc.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = bindoc.icns; path = resources/bindoc.icns; sourceTree = "<group>"; };
+		1652DAC909D0B43700B7783F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = Info.plist; path = resources/Info.plist; sourceTree = "<group>"; };
+		1652DACA09D0B43700B7783F /* MacMolPlt.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = MacMolPlt.icns; path = resources/MacMolPlt.icns; sourceTree = "<group>"; };
+		1652DACB09D0B43700B7783F /* prefs.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = prefs.icns; path = resources/prefs.icns; sourceTree = "<group>"; };
+		1652DACC09D0B43700B7783F /* text-doc.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "text-doc.icns"; path = "resources/text-doc.icns"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1652DA0909D0AE8F00B7783F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1652D9FD09D0AE7200B7783F = {
+			isa = PBXGroup;
+			children = (
+				1652DA2609D0B0E700B7783F /* source */,
+				1652DAC709D0B41400B7783F /* Resources */,
+				1652DA0C09D0AE8F00B7783F /* Products */,
+				1652DA0E09D0AE8F00B7783F /* wxMacMolPlt-Info.plist */,
+			);
+			sourceTree = "<group>";
+		};
+		1652DA0C09D0AE8F00B7783F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1652DA0B09D0AE8F00B7783F /* wxMacMolPlt.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1652DA2609D0B0E700B7783F /* source */ = {
+			isa = PBXGroup;
+			children = (
+				1652DA2709D0B12600B7783F /* AtomTypeList.cpp */,
+				1652DA2809D0B12600B7783F /* AtomTypeList.h */,
+				1652DA2909D0B12600B7783F /* BasisSet.cpp */,
+				1652DA2A09D0B12600B7783F /* BasisSet.h */,
+				1652DA2B09D0B12600B7783F /* BFiles.cpp */,
+				1652DA2C09D0B12600B7783F /* BFiles.h */,
+				1652DA2D09D0B12600B7783F /* cell_table.h */,
+				1652DA2E09D0B12600B7783F /* CML.cpp */,
+				1652DA2F09D0B12600B7783F /* CML.h */,
+				1652DA3009D0B12600B7783F /* DataClasses.cpp */,
+				1652DA3109D0B12600B7783F /* Files.cpp */,
+				1652DA3209D0B12600B7783F /* Frame.cpp */,
+				1652DA3309D0B12600B7783F /* Frame.h */,
+				1652DA3409D0B12600B7783F /* GaussHermite.cpp */,
+				1652DA3509D0B12600B7783F /* GaussHermite.h */,
+				1652DA3609D0B12600B7783F /* Geometries.h */,
+				1652DA3709D0B12600B7783F /* GlobalExceptions.h */,
+				1652DA3809D0B12600B7783F /* Globals.h */,
+				1652DA3909D0B12600B7783F /* Gradient.cpp */,
+				1652DA3A09D0B12600B7783F /* Gradient.h */,
+				1652DA3B09D0B12600B7783F /* InputData.cpp */,
+				1652DA3C09D0B12600B7783F /* InputData.h */,
+				1652DA3D09D0B12600B7783F /* Internals.cpp */,
+				1652DA3E09D0B12600B7783F /* Internals.h */,
+				1652DA3F09D0B12600B7783F /* main.cpp */,
+				1652DA4009D0B12600B7783F /* main.h */,
+				1652DA4109D0B12600B7783F /* Math3D.cpp */,
+				1652DA4209D0B12600B7783F /* Math3D.h */,
+				1652DA4309D0B12600B7783F /* MEP.cpp */,
+				1652DA4409D0B12600B7783F /* MMPPrefs.cpp */,
+				1652DA4509D0B12600B7783F /* MMPPrefs.h */,
+				1652DA4609D0B12600B7783F /* MoleculeData.cpp */,
+				1652DA4709D0B12600B7783F /* MoleculeData.h */,
+				1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */,
+				1652DA4909D0B12600B7783F /* mpGLCanvas.h */,
+				1652DA4A09D0B12600B7783F /* mpMainFrame.cpp */,
+				1652DA4B09D0B12600B7783F /* mpMainFrame.h */,
+				1652DA4C09D0B12600B7783F /* myFiles.h */,
+				1652DA4D09D0B12600B7783F /* MyTypes.h */,
+				1652DA4E09D0B12600B7783F /* orbitals.cpp */,
+				1652DA4F09D0B12600B7783F /* Prefs.h */,
+				1652DA5009D0B12600B7783F /* Progress.cpp */,
+				1652DA5109D0B12600B7783F /* Progress.h */,
+				1652DA5209D0B12600B7783F /* RysPolynomial.cpp */,
+				1652DA5309D0B12600B7783F /* RysPolynomial.h */,
+				1652DA5409D0B12600B7783F /* SurfaceBase.cpp */,
+				1652DA5509D0B12600B7783F /* SurfaceTypes.h */,
+				1652DA5609D0B12600B7783F /* SurfWin.cpp */,
+				1652DA5709D0B12600B7783F /* VirtualSphere.cpp */,
+				1652DA5809D0B12600B7783F /* VirtualSphere.h */,
+				1652DA5909D0B12600B7783F /* wxFiles.cpp */,
+				1652DA5A09D0B12600B7783F /* XML.cpp */,
+				1652DA5B09D0B12600B7783F /* XML.hpp */,
+			);
+			name = source;
+			sourceTree = "<group>";
+		};
+		1652DAC709D0B41400B7783F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				1652DAC809D0B43700B7783F /* bindoc.icns */,
+				1652DAC909D0B43700B7783F /* Info.plist */,
+				1652DACA09D0B43700B7783F /* MacMolPlt.icns */,
+				1652DACB09D0B43700B7783F /* prefs.icns */,
+				1652DACC09D0B43700B7783F /* text-doc.icns */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1652DA0A09D0AE8F00B7783F /* wxMacMolPlt */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1652DA0F09D0AE8F00B7783F /* Build configuration list for PBXNativeTarget "wxMacMolPlt" */;
+			buildPhases = (
+				1652DA0709D0AE8F00B7783F /* Resources */,
+				1652DA0809D0AE8F00B7783F /* Sources */,
+				1652DA0909D0AE8F00B7783F /* Frameworks */,
+			);
+			buildRules = (
+			);
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INFOPLIST_FILE = "wxMacMolPlt-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_LDFLAGS = (
+					"-framework",
+					Carbon,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = wxMacMolPlt;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = YES;
+			};
+			dependencies = (
+			);
+			name = wxMacMolPlt;
+			productName = wxMacMolPlt;
+			productReference = 1652DA0B09D0AE8F00B7783F /* wxMacMolPlt.app */;
+			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>${EXECUTABLE_NAME}</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.yourcompany.wxMacMolPlt</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+</dict>
+</plist>
+";
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1652D9FF09D0AE7200B7783F /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1652DA0009D0AE7200B7783F /* Build configuration list for PBXProject "wxMacMolPlt" */;
+			buildSettings = {
+			};
+			buildStyles = (
+				1652DAB609D0B32900B7783F /* Development */,
+				1652DAB709D0B32900B7783F /* Deployment */,
+			);
+			hasScannedForEncodings = 0;
+			mainGroup = 1652D9FD09D0AE7200B7783F;
+			productRefGroup = 1652DA0C09D0AE8F00B7783F /* Products */;
+			projectDirPath = "";
+			targets = (
+				1652DA0A09D0AE8F00B7783F /* wxMacMolPlt */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1652DA0709D0AE8F00B7783F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1652DACD09D0B43700B7783F /* bindoc.icns in Resources */,
+				1652DACE09D0B43700B7783F /* Info.plist in Resources */,
+				1652DACF09D0B43700B7783F /* MacMolPlt.icns in Resources */,
+				1652DAD009D0B43700B7783F /* prefs.icns in Resources */,
+				1652DAD109D0B43700B7783F /* text-doc.icns in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1652DA0809D0AE8F00B7783F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1652DA5C09D0B12600B7783F /* AtomTypeList.cpp in Sources */,
+				1652DA5D09D0B12600B7783F /* BasisSet.cpp in Sources */,
+				1652DA5E09D0B12600B7783F /* BFiles.cpp in Sources */,
+				1652DA5F09D0B12600B7783F /* CML.cpp in Sources */,
+				1652DA6009D0B12600B7783F /* DataClasses.cpp in Sources */,
+				1652DA6109D0B12600B7783F /* Files.cpp in Sources */,
+				1652DA6209D0B12600B7783F /* Frame.cpp in Sources */,
+				1652DA6309D0B12600B7783F /* GaussHermite.cpp in Sources */,
+				1652DA6409D0B12600B7783F /* Gradient.cpp in Sources */,
+				1652DA6509D0B12600B7783F /* InputData.cpp in Sources */,
+				1652DA6609D0B12600B7783F /* Internals.cpp in Sources */,
+				1652DA6709D0B12600B7783F /* main.cpp in Sources */,
+				1652DA6809D0B12600B7783F /* Math3D.cpp in Sources */,
+				1652DA6909D0B12600B7783F /* MEP.cpp in Sources */,
+				1652DA6A09D0B12600B7783F /* MMPPrefs.cpp in Sources */,
+				1652DA6B09D0B12600B7783F /* MoleculeData.cpp in Sources */,
+				1652DA6C09D0B12600B7783F /* mpGLCanvas.cpp in Sources */,
+				1652DA6D09D0B12600B7783F /* mpMainFrame.cpp in Sources */,
+				1652DA6E09D0B12600B7783F /* orbitals.cpp in Sources */,
+				1652DA6F09D0B12600B7783F /* Progress.cpp in Sources */,
+				1652DA7009D0B12600B7783F /* RysPolynomial.cpp in Sources */,
+				1652DA7109D0B12600B7783F /* SurfaceBase.cpp in Sources */,
+				1652DA7209D0B12600B7783F /* SurfWin.cpp in Sources */,
+				1652DA7309D0B12600B7783F /* VirtualSphere.cpp in Sources */,
+				1652DA7409D0B12600B7783F /* wxFiles.cpp in Sources */,
+				1652DA7509D0B12600B7783F /* XML.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1652DA0109D0AE7200B7783F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		1652DA0209D0AE7200B7783F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+		1652DA1009D0AE8F00B7783F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INFOPLIST_FILE = resources/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
+					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/include",
+					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/contrib/include",
+					"-D__WXMAC__",
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-DNO_GCC_PRAGMA",
+				);
+				OTHER_LDFLAGS = (
+					"-L/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib",
+					"-framework",
+					QuickTime,
+					"-framework",
+					IOKit,
+					"-framework",
+					Carbon,
+					"-framework",
+					Cocoa,
+					"-framework",
+					System,
+					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_base_carbon-2.6.a",
+					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_core-2.6.a",
+					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_gl-2.6.a",
+					"-lwxexpat-2.6",
+					"-lwxtiff-2.6",
+					"-lwxjpeg-2.6",
+					"-lwxpng-2.6",
+					"-lz",
+					"-lpthread",
+					"-liconv",
+					"-framework",
+					WebKit,
+					"-framework",
+					OpenGL,
+					"-framework",
+					AGL,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = wxMacMolPlt;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Debug;
+		};
+		1652DA1109D0AE8F00B7783F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				INFOPLIST_FILE = resources/Info.plist;
+				INSTALL_PATH = "$(HOME)/Applications";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
+					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/include",
+					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/contrib/include",
+					"-D__WXMAC__",
+					"-D_FILE_OFFSET_BITS=64",
+					"-D_LARGE_FILES",
+					"-DNO_GCC_PRAGMA",
+				);
+				OTHER_LDFLAGS = (
+					"-L/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib",
+					"-framework",
+					QuickTime,
+					"-framework",
+					IOKit,
+					"-framework",
+					Carbon,
+					"-framework",
+					Cocoa,
+					"-framework",
+					System,
+					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_base_carbon-2.6.a",
+					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_core-2.6.a",
+					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_gl-2.6.a",
+					"-lwxexpat-2.6",
+					"-lwxtiff-2.6",
+					"-lwxjpeg-2.6",
+					"-lwxpng-2.6",
+					"-lz",
+					"-lpthread",
+					"-liconv",
+					"-framework",
+					WebKit,
+					"-framework",
+					OpenGL,
+					"-framework",
+					AGL,
+				);
+				PREBINDING = NO;
+				PRODUCT_NAME = wxMacMolPlt;
+				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1652DA0009D0AE7200B7783F /* Build configuration list for PBXProject "wxMacMolPlt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1652DA0109D0AE7200B7783F /* Debug */,
+				1652DA0209D0AE7200B7783F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1652DA0F09D0AE8F00B7783F /* Build configuration list for PBXNativeTarget "wxMacMolPlt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1652DA1009D0AE8F00B7783F /* Debug */,
+				1652DA1109D0AE8F00B7783F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1652D9FF09D0AE7200B7783F /* Project object */;
+}
