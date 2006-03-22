@@ -31,6 +31,8 @@ class MpApp : public wxApp {
         // TODO:  Maybe use STL Vectors or something...
         MpMainFrame *m_Frame;
 
+        DECLARE_EVENT_TABLE()
+			
     public:
         /**
          * Overloads OnInit defined in the wxApp class.  This is where program
@@ -65,6 +67,9 @@ class MpApp : public wxApp {
          * @param frame A pointer to the frame to be destroyed.
          */
         void destroyMainFrame(MpMainFrame *frame);
+
+
+        void menuFileQuit(wxCommandEvent &event);
 };
 
 #endif /* #ifndef MAIN_H */

@@ -47,9 +47,13 @@ bool MpApp::OnInit() {
 
     // TODO:  Pass proper arguments to main frame object
     m_Frame = new MpMainFrame(wxT("wxMacMolPlt"));
-    // TODO:  Let app continue on frame delete
-    // SetExitOnFrameDelete(false);
+    // I think the following is appropriate.
+	// On Macs the app continues to run without any windows open, but Linux and Windows exit
+#ifdef __WXMAC__
+	SetExitOnFrameDelete(false);
+#else
     SetExitOnFrameDelete(true);
+#endif
 
     return true;
 }
@@ -69,6 +73,14 @@ void MpApp::destroyMainFrame(MpMainFrame *frame) {
     // frame->Destroy();
 }
 
+void MpApp::menuFileQuit(wxCommandEvent &event) {
+	//Need to loop over open files, prompting to save if needed
+	//then exit
+	
+	//This looks like it has the desired effect, but not sure if it is the "correct" way to exit
+	ExitMainLoop();
+}
+
 void MessageAlert(const char * message) {
 //wxLogMessage throws up a simple dialog alert and gives the user the option
 //of viewing and saving the current complete log.
@@ -76,6 +88,14 @@ void MessageAlert(const char * message) {
 	wxString str(message, wxConvUTF8);
 	wxLogMessage(str);
 }
+
+BEGIN_EVENT_TABLE(MpApp, wxApp)
+//EVT_MENU (wxID_NEW,          MpMainFrame::menuFileNew)
+//EVT_MENU (wxID_OPEN,         MpMainFrame::menuFileOpen)
+EVT_MENU (wxID_EXIT,         MpApp::menuFileQuit)
+
+//EVT_MENU (wxID_ABOUT,    MpMainFrame::menuHelpAbout)
+END_EVENT_TABLE()
 
 // Tell wxWidgets to start the program:
 IMPLEMENT_APP(MpApp)

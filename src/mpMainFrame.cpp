@@ -14,15 +14,15 @@
 #include "mpMainFrame.h"
 
 BEGIN_EVENT_TABLE(MpMainFrame, wxFrame)
-    EVT_MENU (wxID_NEW,          MpMainFrame::menuFileNew)
-    EVT_MENU (wxID_OPEN,         MpMainFrame::menuFileOpen)
+ //   EVT_MENU (wxID_NEW,          MpMainFrame::menuFileNew)
+ //   EVT_MENU (wxID_OPEN,         MpMainFrame::menuFileOpen)
     EVT_MENU (wxID_SAVE,         MpMainFrame::menuFileSave)
     EVT_MENU (wxID_SAVEAS,       MpMainFrame::menuFileSave_as)
     EVT_MENU (wxID_CLOSE,        MpMainFrame::menuFileClose)
     EVT_MENU (wxID_PRINT_SETUP,  MpMainFrame::menuFilePage_setup)
     EVT_MENU (wxID_PREVIEW,      MpMainFrame::menuFilePrint_preview)
     EVT_MENU (wxID_PRINT,        MpMainFrame::menuFilePrint)
-    EVT_MENU (wxID_EXIT,         MpMainFrame::menuFileQuit)
+//    EVT_MENU (wxID_EXIT,         MpMainFrame::menuFileQuit)
 
     EVT_MENU (wxID_UNDO,         MpMainFrame::menuEditUndo)
     EVT_MENU (wxID_CUT,          MpMainFrame::menuEditCut)
@@ -31,7 +31,7 @@ BEGIN_EVENT_TABLE(MpMainFrame, wxFrame)
     EVT_MENU (wxID_CLEAR,        MpMainFrame::menuEditClear)
     EVT_MENU (wxID_SELECTALL,    MpMainFrame::menuEditSelect_all)
 
-    EVT_MENU (wxID_ABOUT,    MpMainFrame::menuHelpAbout)
+ //   EVT_MENU (wxID_ABOUT,    MpMainFrame::menuHelpAbout)
 END_EVENT_TABLE()
 
 MpMainFrame::MpMainFrame(const wxString &title,
