@@ -4,7 +4,7 @@
  */
 
 /***************************************
- * mpMainFrame.h
+ * MolDisplayWin.h
  *
  * Defines a class that overloads the wxFrame class.  This class is used for
  * the document window(s).
@@ -13,20 +13,21 @@
  * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
-#ifndef MP_MAIN_FRAME_H
-#define MP_MAIN_FRAME_H 1
+#ifndef MolDisplayWin_H
+#define MolDisplayWin_H 1
 
 #include "wx/wx.h"
 
 #include "mpGLCanvas.h"
 #include "MoleculeData.h"
+#include "Prefs.h"
 
 /**
  * Subclasses wxFrame to define the main application window.  This is a
  * document window.  There can be multiple instances of the window in the
  * application, and each main window owns its dialogs.
  */
-class MpMainFrame : public wxFrame {
+class MolDisplayWin : public wxFrame {
     private:
         wxMenuBar *menuBar;
         wxMenu    *menuFile;
@@ -38,7 +39,8 @@ class MpMainFrame : public wxFrame {
         wxMenu    *menuWindow;
         wxMenu    *menuHelp;
 
-        MoleculeData *molData;
+        MoleculeData *	MainData;
+		WinPrefs 	*	Prefs;
         MpGLCanvas   *glCanvas;
 
         void createMenuBar(void);
@@ -53,7 +55,7 @@ class MpMainFrame : public wxFrame {
          * @param style The style of the new window.  See wxFrame class docs.
          * @param name The name of the new window.
          */
-        MpMainFrame(const wxString &title,
+        MolDisplayWin(const wxString &title,
                     const wxPoint  &position = wxDefaultPosition,
                     const wxSize   &size     = wxDefaultSize,
                     long            style    = wxDEFAULT_FRAME_STYLE,
@@ -63,7 +65,7 @@ class MpMainFrame : public wxFrame {
          * Destructor, mostly for cleaning up data that we've allocated
          * independently of wxWidgets.
          */
-        ~MpMainFrame();
+        virtual ~MolDisplayWin();
 
         // Below are the event handler functions for the menu.  The initial
         // list was taken from the original MacMolPlt menus.
@@ -136,9 +138,7 @@ class MpMainFrame : public wxFrame {
         //void menuWindowSurfaces(wxCommandEvent &event);
         //void menuWindowPreferences(wxCommandEvent &event);
         */
-
-        void menuHelpAbout(wxCommandEvent &event);
 };
 
-#endif /* #ifndef MP_MAIN_FRAME_H */
+#endif /* #ifndef MolDisplayWin_H */
 

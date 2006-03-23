@@ -43,16 +43,21 @@ bool MpApp::OnInit() {
         // TODO:  Handle this appropriately
         return false;
     }
-	MessageAlert("App init running");
+//	MessageAlert("App init running");
 
     // TODO:  Pass proper arguments to main frame object
-    m_Frame = new MpMainFrame(wxT("wxMacMolPlt"));
+//	MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
+//	MolWinList.push_back(temp);
+//    m_Frame = new MolDisplayWin(wxT("wxMacMolPlt"));
     // I think the following is appropriate.
 	// On Macs the app continues to run without any windows open, but Linux and Windows exit
 #ifdef __WXMAC__
+	wxPoint p(-100,-100);
+	wxSize s(10,10);
+	menuHolder = new macMenuWinPlaceholder(wxT("offscreen"), p, s);
 	SetExitOnFrameDelete(false);
 #else
-    SetExitOnFrameDelete(true);
+	SetExitOnFrameDelete(true);
 #endif
 
     return true;
@@ -68,9 +73,23 @@ void MpApp::createMainFrame(const wxString &file) {
     // TODO:  Create and store new MpMainFrame
 }
 
-void MpApp::destroyMainFrame(MpMainFrame *frame) {
+void MpApp::destroyMainFrame(MolDisplayWin *frame) {
     // TODO:  Close frame and remove it from storage
     // frame->Destroy();
+//	std::list<MolDisplayWin *>::const_iterator win = MolWinList.begin();
+//	while (win != MolWinList.end()) {
+//		if (frame == *win) {
+//			
+//		}
+//		win++;
+//	}
+	MolWinList.remove(frame);
+#ifdef __WXMAC__
+	if (MolWinList.size() <= 0) {
+		menuHolder->Show(true);
+		menuHolder->Show(false);
+	}
+#endif
 }
 
 void MpApp::menuFileQuit(wxCommandEvent &event) {
@@ -79,6 +98,22 @@ void MpApp::menuFileQuit(wxCommandEvent &event) {
 	
 	//This looks like it has the desired effect, but not sure if it is the "correct" way to exit
 	ExitMainLoop();
+}
+
+void MpApp::menuHelpAbout(wxCommandEvent &event) {
+	//Display a simple modal about box
+}
+
+void MpApp::menuFileNew(wxCommandEvent &event) {
+	MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
+	MolWinList.push_back(temp);
+}
+
+void MpApp::menuFileOpen(wxCommandEvent &event) {
+	//First need to use an open file dialog
+	//If the user chooses a file, create a window and have it process it.
+//	MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
+//	MolWinList.push_back(temp);
 }
 
 void MessageAlert(const char * message) {
@@ -90,13 +125,77 @@ void MessageAlert(const char * message) {
 }
 
 BEGIN_EVENT_TABLE(MpApp, wxApp)
-//EVT_MENU (wxID_NEW,          MpMainFrame::menuFileNew)
-//EVT_MENU (wxID_OPEN,         MpMainFrame::menuFileOpen)
+EVT_MENU (wxID_NEW,          MpApp::menuFileNew)
+EVT_MENU (wxID_OPEN,         MpApp::menuFileOpen)
 EVT_MENU (wxID_EXIT,         MpApp::menuFileQuit)
 
-//EVT_MENU (wxID_ABOUT,    MpMainFrame::menuHelpAbout)
+EVT_MENU (wxID_ABOUT,    MpApp::menuHelpAbout)
 END_EVENT_TABLE()
 
 // Tell wxWidgets to start the program:
 IMPLEMENT_APP(MpApp)
+
+#ifdef __WXMAC__
+macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,
+                         const wxPoint  &position,
+                         const wxSize   &size,
+                         long            style,
+                         const wxString &name)
+            :wxFrame((wxWindow *)NULL, wxID_ANY, title,
+                     position, size, style, name) {
+
+    createMenuBar();
+    SetMenuBar(menuBar);
+
+    Show(true);	//You seem to have to show it to get the menu bar to load
+	Show(false);//then hide it to get it out of the window lists
+}
+
+macMenuWinPlaceholder::~macMenuWinPlaceholder() {
+}
+
+void macMenuWinPlaceholder::createMenuBar(void) {
+    menuBar = new wxMenuBar;
+
+    menuFile = new wxMenu;
+    menuEdit = new wxMenu;
+    menuHelp = new wxMenu;
+
+    // TODO:  Create IDs for custom menu items
+    menuFile->Append(wxID_NEW, wxT("&New\tCtrl+N"));
+    menuFile->Append(wxID_OPEN, wxT("&Open ...\tCtrl+O"));
+  //  menuFile->Append(wxID_SAVE, wxT("&Save\tCtrl+S"));
+  //  menuFile->Append(wxID_SAVEAS, wxT("Save &as ...\tCtrl+Shift+S"));
+  //  menuFile->Append(wxID_CLOSE, wxT("&Close\tCtrl+W"));
+  //  menuFile->AppendSeparator();
+    //menuFile->Append(, wxT("Append New Frame"));
+    //menuFile->Append(, wxT("Add Frames from File ..."));
+    //menuFile->Append(, wxT("Delete Frame"));
+    //menuFile->AppendSeparator();
+    //menuFile->Append(, wxT("Import"));
+    //menuFile->Append(, wxT("Export"));
+    menuFile->AppendSeparator();
+    menuFile->Append(wxID_PRINT_SETUP, wxT("Page Set&up ..."));
+ //   menuFile->Append(wxID_PREVIEW, wxT("Print Pre&view\tCtrl+Shift+P"));
+ //   menuFile->Append(wxID_PRINT, wxT("&Print ...\tCtrl+P"));
+    // TODO:  Make Mac display Quit menu item in the correct place
+    menuFile->AppendSeparator();
+    menuFile->Append(wxID_EXIT, wxT("&Quit\tCtrl+Q"));
+    
+    menuEdit->Append(wxID_UNDO, wxT("&Undo\tCtrl+Z"));
+    menuEdit->AppendSeparator();
+    menuEdit->Append(wxID_CUT, wxT("Cu&t\tCtrl+X"));
+    menuEdit->Append(wxID_COPY, wxT("&Copy\tCtrl+C"));
+    menuEdit->Append(wxID_PASTE, wxT("&Paste\tCtrl+V"));
+    menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
+    menuEdit->AppendSeparator();
+    menuEdit->Append(wxID_SELECTALL, wxT("&Select all\tCtrl+A"));
+
+    menuHelp->Append(wxID_ABOUT, wxT("&About ..."));
+
+    menuBar->Append(menuFile, wxT("&File"));
+    menuBar->Append(menuEdit, wxT("&Edit"));
+    menuBar->Append(menuHelp, wxT("&Help"));
+}
+#endif
 

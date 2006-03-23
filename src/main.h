@@ -19,7 +19,45 @@
 #include "wx/wx.h"
 #include "wx/snglinst.h"
 
-#include "mpMainFrame.h"
+#include "MolDisplayWin.h"
+#include <list>
+
+#ifdef __WXMAC__
+/**
+ * Subclasses wxFrame to define a simple frame solely to manage a menubar
+ * when there is apparently no windows open. Only applicable to the Mac.
+ */
+class macMenuWinPlaceholder : public wxFrame {
+    private:
+        wxMenuBar *menuBar;
+        wxMenu    *menuFile;
+        wxMenu    *menuEdit;
+        wxMenu    *menuHelp;
+
+        void createMenuBar(void);
+
+    public:
+        /* Constructor that provides some useful default values.
+         * @param title The text that will be displayed in the new window's title bar.
+         * @param position The initial position of the new window.
+         * @param size The initial size of the new window.
+         * @param style The style of the new window.  See wxFrame class docs.
+         * @param name The name of the new window.
+         */
+        macMenuWinPlaceholder(const wxString &title,
+                    const wxPoint  &position,
+                    const wxSize   &size,
+                    long            style    = wxSYSTEM_MENU | wxFRAME_NO_TASKBAR,
+                    const wxString &name     = wxT("offscreen"));
+
+        /**
+         * Destructor, mostly for cleaning up data that we've allocated
+         * independently of wxWidgets.
+         */
+        ~macMenuWinPlaceholder();
+};
+
+#endif
 
 /**
  * Subclasses wxApp to define an application's data and operations.
@@ -28,8 +66,10 @@ class MpApp : public wxApp {
     private:
         wxSingleInstanceChecker *m_InstanceChecker;
 
-        // TODO:  Maybe use STL Vectors or something...
-        MpMainFrame *m_Frame;
+		std::list<MolDisplayWin *> MolWinList;
+#ifdef __WXMAC__
+		macMenuWinPlaceholder	* menuHolder;
+#endif
 
         DECLARE_EVENT_TABLE()
 			
@@ -66,11 +106,15 @@ class MpApp : public wxApp {
          *
          * @param frame A pointer to the frame to be destroyed.
          */
-        void destroyMainFrame(MpMainFrame *frame);
+        void destroyMainFrame(MolDisplayWin *frame);
 
 
         void menuFileQuit(wxCommandEvent &event);
+		void menuHelpAbout(wxCommandEvent &event);
+        void menuFileNew(wxCommandEvent &event);
+        void menuFileOpen(wxCommandEvent &event);
 };
 
+DECLARE_APP(MpApp)
 #endif /* #ifndef MAIN_H */
 

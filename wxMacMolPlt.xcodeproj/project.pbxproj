@@ -24,7 +24,6 @@
 		1652DA6A09D0B12600B7783F /* MMPPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4409D0B12600B7783F /* MMPPrefs.cpp */; };
 		1652DA6B09D0B12600B7783F /* MoleculeData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4609D0B12600B7783F /* MoleculeData.cpp */; };
 		1652DA6C09D0B12600B7783F /* mpGLCanvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */; };
-		1652DA6D09D0B12600B7783F /* mpMainFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4A09D0B12600B7783F /* mpMainFrame.cpp */; };
 		1652DA6E09D0B12600B7783F /* orbitals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4E09D0B12600B7783F /* orbitals.cpp */; };
 		1652DA6F09D0B12600B7783F /* Progress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5009D0B12600B7783F /* Progress.cpp */; };
 		1652DA7009D0B12600B7783F /* RysPolynomial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5209D0B12600B7783F /* RysPolynomial.cpp */; };
@@ -38,6 +37,7 @@
 		1652DACF09D0B43700B7783F /* MacMolPlt.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACA09D0B43700B7783F /* MacMolPlt.icns */; };
 		1652DAD009D0B43700B7783F /* prefs.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACB09D0B43700B7783F /* prefs.icns */; };
 		1652DAD109D0B43700B7783F /* text-doc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACC09D0B43700B7783F /* text-doc.icns */; };
+		168626DB09D33C6C00A77D97 /* MolDisplayWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildStyle section */
@@ -95,8 +95,6 @@
 		1652DA4709D0B12600B7783F /* MoleculeData.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MoleculeData.h; path = src/MoleculeData.h; sourceTree = "<group>"; };
 		1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = mpGLCanvas.cpp; path = src/mpGLCanvas.cpp; sourceTree = "<group>"; };
 		1652DA4909D0B12600B7783F /* mpGLCanvas.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mpGLCanvas.h; path = src/mpGLCanvas.h; sourceTree = "<group>"; };
-		1652DA4A09D0B12600B7783F /* mpMainFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = mpMainFrame.cpp; path = src/mpMainFrame.cpp; sourceTree = "<group>"; };
-		1652DA4B09D0B12600B7783F /* mpMainFrame.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mpMainFrame.h; path = src/mpMainFrame.h; sourceTree = "<group>"; };
 		1652DA4C09D0B12600B7783F /* myFiles.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = myFiles.h; path = src/myFiles.h; sourceTree = "<group>"; };
 		1652DA4D09D0B12600B7783F /* MyTypes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MyTypes.h; path = src/MyTypes.h; sourceTree = "<group>"; };
 		1652DA4E09D0B12600B7783F /* orbitals.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = orbitals.cpp; path = src/orbitals.cpp; sourceTree = "<group>"; };
@@ -118,6 +116,8 @@
 		1652DACA09D0B43700B7783F /* MacMolPlt.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = MacMolPlt.icns; path = resources/MacMolPlt.icns; sourceTree = "<group>"; };
 		1652DACB09D0B43700B7783F /* prefs.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = prefs.icns; path = resources/prefs.icns; sourceTree = "<group>"; };
 		1652DACC09D0B43700B7783F /* text-doc.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "text-doc.icns"; path = "resources/text-doc.icns"; sourceTree = "<group>"; };
+		168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MolDisplayWin.cpp; path = src/MolDisplayWin.cpp; sourceTree = "<group>"; };
+		168626DA09D33C6C00A77D97 /* MolDisplayWin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MolDisplayWin.h; path = src/MolDisplayWin.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,12 +183,12 @@
 				1652DA4309D0B12600B7783F /* MEP.cpp */,
 				1652DA4409D0B12600B7783F /* MMPPrefs.cpp */,
 				1652DA4509D0B12600B7783F /* MMPPrefs.h */,
+				168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */,
+				168626DA09D33C6C00A77D97 /* MolDisplayWin.h */,
 				1652DA4609D0B12600B7783F /* MoleculeData.cpp */,
 				1652DA4709D0B12600B7783F /* MoleculeData.h */,
 				1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */,
 				1652DA4909D0B12600B7783F /* mpGLCanvas.h */,
-				1652DA4A09D0B12600B7783F /* mpMainFrame.cpp */,
-				1652DA4B09D0B12600B7783F /* mpMainFrame.h */,
 				1652DA4C09D0B12600B7783F /* myFiles.h */,
 				1652DA4D09D0B12600B7783F /* MyTypes.h */,
 				1652DA4E09D0B12600B7783F /* orbitals.cpp */,
@@ -337,7 +337,6 @@
 				1652DA6A09D0B12600B7783F /* MMPPrefs.cpp in Sources */,
 				1652DA6B09D0B12600B7783F /* MoleculeData.cpp in Sources */,
 				1652DA6C09D0B12600B7783F /* mpGLCanvas.cpp in Sources */,
-				1652DA6D09D0B12600B7783F /* mpMainFrame.cpp in Sources */,
 				1652DA6E09D0B12600B7783F /* orbitals.cpp in Sources */,
 				1652DA6F09D0B12600B7783F /* Progress.cpp in Sources */,
 				1652DA7009D0B12600B7783F /* RysPolynomial.cpp in Sources */,
@@ -346,6 +345,7 @@
 				1652DA7309D0B12600B7783F /* VirtualSphere.cpp in Sources */,
 				1652DA7409D0B12600B7783F /* wxFiles.cpp in Sources */,
 				1652DA7509D0B12600B7783F /* XML.cpp in Sources */,
+				168626DB09D33C6C00A77D97 /* MolDisplayWin.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

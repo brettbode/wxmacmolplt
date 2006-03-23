@@ -4,37 +4,37 @@
  */
 
 /***************************************
- * mpMainFrame.cpp
+ * MolDisplayWin.cpp
  *
  * Created:       11-02-2005  Steven Schulteis
  * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
 #include "Globals.h"
-#include "mpMainFrame.h"
+#include "MolDisplayWin.h"
+#include "Prefs.h"
+#include "main.h"
 
-BEGIN_EVENT_TABLE(MpMainFrame, wxFrame)
- //   EVT_MENU (wxID_NEW,          MpMainFrame::menuFileNew)
- //   EVT_MENU (wxID_OPEN,         MpMainFrame::menuFileOpen)
-    EVT_MENU (wxID_SAVE,         MpMainFrame::menuFileSave)
-    EVT_MENU (wxID_SAVEAS,       MpMainFrame::menuFileSave_as)
-    EVT_MENU (wxID_CLOSE,        MpMainFrame::menuFileClose)
-    EVT_MENU (wxID_PRINT_SETUP,  MpMainFrame::menuFilePage_setup)
-    EVT_MENU (wxID_PREVIEW,      MpMainFrame::menuFilePrint_preview)
-    EVT_MENU (wxID_PRINT,        MpMainFrame::menuFilePrint)
-//    EVT_MENU (wxID_EXIT,         MpMainFrame::menuFileQuit)
+extern WinPrefs * gPreferences;
 
-    EVT_MENU (wxID_UNDO,         MpMainFrame::menuEditUndo)
-    EVT_MENU (wxID_CUT,          MpMainFrame::menuEditCut)
-    EVT_MENU (wxID_COPY,         MpMainFrame::menuEditCopy)
-    EVT_MENU (wxID_PASTE,        MpMainFrame::menuEditPaste)
-    EVT_MENU (wxID_CLEAR,        MpMainFrame::menuEditClear)
-    EVT_MENU (wxID_SELECTALL,    MpMainFrame::menuEditSelect_all)
+BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
+    EVT_MENU (wxID_SAVE,         MolDisplayWin::menuFileSave)
+    EVT_MENU (wxID_SAVEAS,       MolDisplayWin::menuFileSave_as)
+    EVT_MENU (wxID_CLOSE,        MolDisplayWin::menuFileClose)
+    EVT_MENU (wxID_PRINT_SETUP,  MolDisplayWin::menuFilePage_setup)
+    EVT_MENU (wxID_PREVIEW,      MolDisplayWin::menuFilePrint_preview)
+    EVT_MENU (wxID_PRINT,        MolDisplayWin::menuFilePrint)
 
- //   EVT_MENU (wxID_ABOUT,    MpMainFrame::menuHelpAbout)
+    EVT_MENU (wxID_UNDO,         MolDisplayWin::menuEditUndo)
+    EVT_MENU (wxID_CUT,          MolDisplayWin::menuEditCut)
+    EVT_MENU (wxID_COPY,         MolDisplayWin::menuEditCopy)
+    EVT_MENU (wxID_PASTE,        MolDisplayWin::menuEditPaste)
+    EVT_MENU (wxID_CLEAR,        MolDisplayWin::menuEditClear)
+    EVT_MENU (wxID_SELECTALL,    MolDisplayWin::menuEditSelect_all)
+
 END_EVENT_TABLE()
 
-MpMainFrame::MpMainFrame(const wxString &title,
+MolDisplayWin::MolDisplayWin(const wxString &title,
                          const wxPoint  &position,
                          const wxSize   &size,
                          long            style,
@@ -46,22 +46,28 @@ MpMainFrame::MpMainFrame(const wxString &title,
     SetMenuBar(menuBar);
 
     // TODO:  Make room for other controls (Frame picker, etc.)
-    molData = NULL;
+    MainData = new MoleculeData;
+	Prefs = new WinPrefs;
+	*Prefs = *gPreferences;
     glCanvas = new MpGLCanvas(this);
 
     Show(true);
 }
 
-MpMainFrame::~MpMainFrame() {
+MolDisplayWin::~MolDisplayWin() {
     // TODO:  Destroy any dialogs that are still in existence.
 
-    if(molData != NULL) {
+	MessageAlert("MolDisplayWin destructor running");
+    if(MainData != NULL) {
         glCanvas->setMolData(NULL);
-        delete molData;
+        delete MainData;
     }
+	if (Prefs != NULL) {
+		delete Prefs;
+	}
 }
 
-void MpMainFrame::createMenuBar(void) {
+void MolDisplayWin::createMenuBar(void) {
     menuBar = new wxMenuBar;
 
     menuFile = new wxMenu;
@@ -109,7 +115,7 @@ void MpMainFrame::createMenuBar(void) {
 
     // TODO:  Make Mac handle help menu properly
     // TODO:  Make Mac display About menu item in the correct place
-    menuHelp->Append(wxID_ABOUT, wxT("&About ...\tShift+F1"));
+    menuHelp->Append(wxID_ABOUT, wxT("&About ..."));
 
     menuBar->Append(menuFile, wxT("&File"));
     menuBar->Append(menuEdit, wxT("&Edit"));
@@ -122,57 +128,58 @@ void MpMainFrame::createMenuBar(void) {
 /* Event handler functions */
 
 /* File menu */
-void MpMainFrame::menuFileNew(wxCommandEvent &event) {
+void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
+	//Its possible we could handle this here if the current data is empty?
 }
 
-void MpMainFrame::menuFileOpen(wxCommandEvent &event) {
+void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
 }
 
-void MpMainFrame::menuFileSave(wxCommandEvent &event) {
+void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 }
 
-void MpMainFrame::menuFileSave_as(wxCommandEvent &event) {
-}
-
-void MpMainFrame::menuFileClose(wxCommandEvent &event) {
+void MolDisplayWin::menuFileClose(wxCommandEvent &event) {
+	//First we should check to see if a save is needed which could abort the close
+	
+	//Once we decide to close the window it may be system dependant whether we leave an empty window up
+	Destroy();
+	MpApp & app = wxGetApp();
+	app.destroyMainFrame(this);
     // This should leave the current window open, but close the file
     // associated with it, leaving an "empty" window.
 }
 
-void MpMainFrame::menuFilePage_setup(wxCommandEvent &event) {
+void MolDisplayWin::menuFilePage_setup(wxCommandEvent &event) {
 }
 
-void MpMainFrame::menuFilePrint_preview(wxCommandEvent &event) {
+void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
 }
 
-void MpMainFrame::menuFilePrint(wxCommandEvent &event) {
+void MolDisplayWin::menuFilePrint(wxCommandEvent &event) {
 }
 
-void MpMainFrame::menuFileQuit(wxCommandEvent &event) {
+void MolDisplayWin::menuFileQuit(wxCommandEvent &event) {
     // This should close the entire window.
 }
 
 /* Edit menu */
 
-void MpMainFrame::menuEditUndo(wxCommandEvent &event) {
+void MolDisplayWin::menuEditUndo(wxCommandEvent &event) {
 }
 
-void MpMainFrame::menuEditCut(wxCommandEvent &event) {
+void MolDisplayWin::menuEditCut(wxCommandEvent &event) {
 }
 
-void MpMainFrame::menuEditCopy(wxCommandEvent &event) {
+void MolDisplayWin::menuEditCopy(wxCommandEvent &event) {
 }
 
-void MpMainFrame::menuEditPaste(wxCommandEvent &event) {
+void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 }
 
-void MpMainFrame::menuEditClear(wxCommandEvent &event) {
+void MolDisplayWin::menuEditClear(wxCommandEvent &event) {
 }
 
-void MpMainFrame::menuEditSelect_all(wxCommandEvent &event) {
+void MolDisplayWin::menuEditSelect_all(wxCommandEvent &event) {
 }
 
-/* Help menu */
-void MpMainFrame::menuHelpAbout(wxCommandEvent &event) {
-}
 
