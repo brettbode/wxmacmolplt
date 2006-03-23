@@ -1,0 +1,33 @@
+Until we get a wiki up and running place notes on the wx port here for
+future reference.
+
+Useful reference material:
+  wxWidgets book - I have a paper copy on order, the pdf id in
+     ~brett/wxWidgets-Docs/
+  wxWidgets html docs (also in the above directory. If you download a
+     source tarball you can create a link in there to the docs in my afs.
+
+Open Questions:
+   How to handle multiple docs.
+     There is an MDI class that doesn't appear too bad on Mac and Windows,
+     the description doesn't sound too useful on Linux though. Sounds like
+     it uses a tabbed window where as I want to view multiple subwindows
+     at once.
+   How to handle Mac app - book says you must create an offscreen frame 
+     such that its frame is used when there are no open windows.
+   I think the Quit, New, Open, and About menu items can be handled by the
+     application class.
+
+Short term to do items:
+   Settle on MolDisplayWin class and define.
+   Implement New, Open, Close menu items.
+   Merge in the OpenGLgraphics source.
+   activate at some of the text file formats in Files.cpp
+
+Potentially useful tools:
+   DialogBlocks - GUI wxWidgets dialog editor ($65)
+   wxDesigner - also a GUI dialog editor
+   poEdit - message catalog creator for internationalization
+   wxMathPlot - add on library available from http://wxmathplot.sourceforge.net.
+     This might be very useful for the energy and frequency windows.
+
