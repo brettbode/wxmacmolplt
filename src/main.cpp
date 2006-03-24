@@ -76,13 +76,6 @@ void MpApp::createMainFrame(const wxString &file) {
 void MpApp::destroyMainFrame(MolDisplayWin *frame) {
     // TODO:  Close frame and remove it from storage
     // frame->Destroy();
-//	std::list<MolDisplayWin *>::const_iterator win = MolWinList.begin();
-//	while (win != MolWinList.end()) {
-//		if (frame == *win) {
-//			
-//		}
-//		win++;
-//	}
 	MolWinList.remove(frame);
 #ifdef __WXMAC__
 	if (MolWinList.size() <= 0) {
@@ -95,13 +88,25 @@ void MpApp::destroyMainFrame(MolDisplayWin *frame) {
 void MpApp::menuFileQuit(wxCommandEvent &event) {
 	//Need to loop over open files, prompting to save if needed
 	//then exit
+	std::list<MolDisplayWin *>::iterator win = MolWinList.begin();
+	while (win != MolWinList.end()) {
+			//Need to be careful since the close will remove the window from the list
+			//so increment the iterator before closing.
+		MolDisplayWin * temp = (*win);
+		win++;
+		if (!(temp->Close(false))) {
+			// User aborted the close
+			return;
+		}
+	}
 	
 	//This looks like it has the desired effect, but not sure if it is the "correct" way to exit
 	ExitMainLoop();
 }
 
-void MpApp::menuHelpAbout(wxCommandEvent &event) {
+void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {
 	//Display a simple modal about box
+	wxMessageBox(wxT("Welcome to MacMolPlt"), wxT(""));
 }
 
 void MpApp::menuFileNew(wxCommandEvent &event) {

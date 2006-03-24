@@ -18,19 +18,19 @@
 extern WinPrefs * gPreferences;
 
 BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
-    EVT_MENU (wxID_SAVE,         MolDisplayWin::menuFileSave)
-    EVT_MENU (wxID_SAVEAS,       MolDisplayWin::menuFileSave_as)
-    EVT_MENU (wxID_CLOSE,        MolDisplayWin::menuFileClose)
-    EVT_MENU (wxID_PRINT_SETUP,  MolDisplayWin::menuFilePage_setup)
-    EVT_MENU (wxID_PREVIEW,      MolDisplayWin::menuFilePrint_preview)
-    EVT_MENU (wxID_PRINT,        MolDisplayWin::menuFilePrint)
+    EVT_MENU (wxID_SAVE,			MolDisplayWin::menuFileSave)
+    EVT_MENU (wxID_SAVEAS,			MolDisplayWin::menuFileSave_as)
+    EVT_CLOSE(						MolDisplayWin::menuFileClose)
+    EVT_MENU (wxID_PRINT_SETUP,		MolDisplayWin::menuFilePage_setup)
+    EVT_MENU (wxID_PREVIEW,			MolDisplayWin::menuFilePrint_preview)
+    EVT_MENU (wxID_PRINT,			MolDisplayWin::menuFilePrint)
 
-    EVT_MENU (wxID_UNDO,         MolDisplayWin::menuEditUndo)
-    EVT_MENU (wxID_CUT,          MolDisplayWin::menuEditCut)
-    EVT_MENU (wxID_COPY,         MolDisplayWin::menuEditCopy)
-    EVT_MENU (wxID_PASTE,        MolDisplayWin::menuEditPaste)
-    EVT_MENU (wxID_CLEAR,        MolDisplayWin::menuEditClear)
-    EVT_MENU (wxID_SELECTALL,    MolDisplayWin::menuEditSelect_all)
+    EVT_MENU (wxID_UNDO,			MolDisplayWin::menuEditUndo)
+    EVT_MENU (wxID_CUT,				MolDisplayWin::menuEditCut)
+    EVT_MENU (wxID_COPY,			MolDisplayWin::menuEditCopy)
+    EVT_MENU (wxID_PASTE,			MolDisplayWin::menuEditPaste)
+    EVT_MENU (wxID_CLEAR,			MolDisplayWin::menuEditClear)
+    EVT_MENU (wxID_SELECTALL,		MolDisplayWin::menuEditSelect_all)
 
 END_EVENT_TABLE()
 
@@ -49,6 +49,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     MainData = new MoleculeData;
 	Prefs = new WinPrefs;
 	*Prefs = *gPreferences;
+	Dirty = false;
+	
     glCanvas = new MpGLCanvas(this);
 
     Show(true);
@@ -57,7 +59,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 MolDisplayWin::~MolDisplayWin() {
     // TODO:  Destroy any dialogs that are still in existence.
 
-	MessageAlert("MolDisplayWin destructor running");
     if(MainData != NULL) {
         glCanvas->setMolData(NULL);
         delete MainData;
@@ -138,15 +139,33 @@ void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
 void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 }
 
-void MolDisplayWin::menuFileClose(wxCommandEvent &event) {
+void MolDisplayWin::menuFileClose(wxCloseEvent &event) {
+	bool canVeto = event.CanVeto();
 	//First we should check to see if a save is needed which could abort the close
-	
-	//Once we decide to close the window it may be system dependant whether we leave an empty window up
-	Destroy();
+	if (Dirty && Prefs->GetPrompt4Save()) {
+		//prompt the user to see if they want the file saved
+		//Note the message should be slightly different if we can't abort the close
+	}
 	MpApp & app = wxGetApp();
+	//Once we decide to close the window it may be system dependant whether we 
+	//leave an empty window up. On the Mac the window is always destroyed.
+#ifndef __WXMAC__
+	if ((app.WindowCount() <= 1) && canVeto) {	
+		//This is the last window! Clear it out, but leave it open
+		delete MainData;
+		MainData = new MoleculeData;
+		delete Prefs;
+		Prefs = new winPrefs;
+		*Prefs = *gPfreferences;
+		Dirty = false;
+		SetTitle(wxT("Untitled"));
+		SetName(wxT("Untitled"));
+		event.Veto(true);
+		return;
+	}
+#endif
+	Destroy();
 	app.destroyMainFrame(this);
-    // This should leave the current window open, but close the file
-    // associated with it, leaving an "empty" window.
 }
 
 void MolDisplayWin::menuFilePage_setup(wxCommandEvent &event) {
@@ -156,10 +175,6 @@ void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuFilePrint(wxCommandEvent &event) {
-}
-
-void MolDisplayWin::menuFileQuit(wxCommandEvent &event) {
-    // This should close the entire window.
 }
 
 /* Edit menu */

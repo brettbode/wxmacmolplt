@@ -1278,22 +1278,18 @@ void Frame::ReadMP2Vectors(BufferFile * Buffer, BufferFile * DatBuffer, long Num
 	long * readflag) {
 
 	if (*readflag == 1) {	//If first pass query the user about reading vectors
-        // TODO:  SAY SOMETHING INTELLIGENT
         // 1 = Yes
         // 0 = No
-		//*readflag = YesOrNoDialog(131, 2);
-        int result = 0;
-        wxMessageDialog *mdg = new wxMessageDialog(NULL,
-                                                   wxT(""),
-                                                   wxT(""),
-                                                   wxYES_NO | wxICON_QUESTION);
-        result = mdg->ShowModal();
-        if(result == wxID_YES) {
+#ifdef __wxBuild__
+        int result = wxMessageBox(wxT("Do you wish to read the MP2 natural orbitals from the .dat file\?"),
+								  wxT(""), wxYES_NO | wxICON_QUESTION);
+        if(result == wxID_YES)
             *readflag = 1;
-        }
-        else {
+        else
             *readflag = 0;
-        }
+#else
+		*readflag = YesOrNoDialog(131, 2);
+#endif
 	}
 	if (!*readflag) return;
 	

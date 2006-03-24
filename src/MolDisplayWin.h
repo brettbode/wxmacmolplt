@@ -41,6 +41,7 @@ class MolDisplayWin : public wxFrame {
 
         MoleculeData *	MainData;
 		WinPrefs 	*	Prefs;
+		bool			Dirty;	//Flag to indicate a save is needed
         MpGLCanvas   *glCanvas;
 
         void createMenuBar(void);
@@ -74,7 +75,7 @@ class MolDisplayWin : public wxFrame {
         void menuFileOpen(wxCommandEvent &event);
         void menuFileSave(wxCommandEvent &event);
         void menuFileSave_as(wxCommandEvent &event);
-        void menuFileClose(wxCommandEvent &event);
+        void menuFileClose(wxCloseEvent &event);
         //void menuFileAppend_new_frame(wxCommandEvent &event);
         //void menuFileAdd_frames_from_file(wxCommandEvent &event);
         //void menuFileDelete_frame(wxCommandEvent &event);
@@ -83,7 +84,6 @@ class MolDisplayWin : public wxFrame {
         void menuFilePage_setup(wxCommandEvent &event);
         void menuFilePrint_preview(wxCommandEvent &event);
         void menuFilePrint(wxCommandEvent &event);
-        void menuFileQuit(wxCommandEvent &event);
         
         void menuEditUndo(wxCommandEvent &event);
         void menuEditCut(wxCommandEvent &event);

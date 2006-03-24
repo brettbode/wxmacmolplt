@@ -107,6 +107,11 @@ class MpApp : public wxApp {
          * @param frame A pointer to the frame to be destroyed.
          */
         void destroyMainFrame(MolDisplayWin *frame);
+		
+		/**
+		 * Returns the open window count
+		 */
+		int WindowCount(void) const {return MolWinList.size();};
 
 
         void menuFileQuit(wxCommandEvent &event);
