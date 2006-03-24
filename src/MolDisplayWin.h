@@ -75,7 +75,8 @@ class MolDisplayWin : public wxFrame {
         void menuFileOpen(wxCommandEvent &event);
         void menuFileSave(wxCommandEvent &event);
         void menuFileSave_as(wxCommandEvent &event);
-        void menuFileClose(wxCloseEvent &event);
+        void menuFileClose(wxCommandEvent &event);
+        void FileClose(wxCloseEvent &event);
         //void menuFileAppend_new_frame(wxCommandEvent &event);
         //void menuFileAdd_frames_from_file(wxCommandEvent &event);
         //void menuFileDelete_frame(wxCommandEvent &event);
@@ -90,6 +91,7 @@ class MolDisplayWin : public wxFrame {
         void menuEditCopy(wxCommandEvent &event);
         //void menuEditCopy_coordinates(wxCommandEvent &event);
         void menuEditPaste(wxCommandEvent &event);
+		void PasteText(void);
         void menuEditClear(wxCommandEvent &event);
         void menuEditSelect_all(wxCommandEvent &event);
         //void menuEditDefault_preferences(wxCommandEvent &event);
@@ -138,6 +140,23 @@ class MolDisplayWin : public wxFrame {
         //void menuWindowSurfaces(wxCommandEvent &event);
         //void menuWindowPreferences(wxCommandEvent &event);
         */
+		
+		//File handling routines
+		long OpenFile(wxString fileName);
+		long OpenXYZFile(BufferFile * Buffer);
+		long OpenPDBFile(BufferFile * Buffer);
+		long OpenMDLMolFile(BufferFile * Buffer);
+		long OpenGAMESSInput(BufferFile * Buffer);
+		long OpenMolPltFile(BufferFile *Buffer);
+			//Call to dump the message and close the window
+		void AbortOpen(const char * msg);
+		
+		//General Utility routine
+		void BondsChanged(void);
+		void FrameChanged(void);
+		void UpdateModelDisplay(void);
+		void ResetView(void);
+		void ResetModel(bool Center);
 };
 
 #endif /* #ifndef MolDisplayWin_H */

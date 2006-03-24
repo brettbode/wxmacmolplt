@@ -116,9 +116,17 @@ void MpApp::menuFileNew(wxCommandEvent &event) {
 
 void MpApp::menuFileOpen(wxCommandEvent &event) {
 	//First need to use an open file dialog
+	wxString filename = wxFileSelector(wxT("Choose a file to open"));
 	//If the user chooses a file, create a window and have it process it.
-//	MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
-//	MolWinList.push_back(temp);
+	if (filename.length() > 0) {
+		if (myfile != NULL) {
+			MolDisplayWin * temp = new MolDisplayWin(filename);
+			MolWinList.push_back(temp);
+			BufferFile * buffer = new BufferFile(myfile, false);
+			long r = temp->OpenFile(buffer);
+			if (r>0) temp->Show(true);
+		}
+	}
 }
 
 void MessageAlert(const char * message) {
