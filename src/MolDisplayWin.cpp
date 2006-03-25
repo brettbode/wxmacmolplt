@@ -11,6 +11,7 @@
  ***************************************/
 
 #include "Globals.h"
+#include "GlobalExceptions.h"
 #include "MolDisplayWin.h"
 #include "Prefs.h"
 #include "main.h"
@@ -54,6 +55,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	Prefs = new WinPrefs;
 	*Prefs = *gPreferences;
 	Dirty = false;
+	OpenGLData = NULL;
+	InitGLData();
 	
     glCanvas = new MpGLCanvas(this);
 
@@ -347,8 +350,9 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 		AbortOpen(wxT("Unable to open the requested file."));
 		return 0;
 	}
-//	try {
-		BufferFile * Buffer = new BufferFile(myfile, false);
+	BufferFile * Buffer = NULL;
+	try {
+		Buffer = new BufferFile(myfile, false);
 //		Window->SetSkipPoints(nSkip);
 		
 		// Attempt to identify the file type by looking for key words
@@ -385,19 +389,19 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 	//			if (test == 0) Window->AbortOpen(0);
 	//		}
 				break;
-//			default:	//Should only get here for unknown file types.
-//				Window->AbortOpen(34);
+			default:	//Should only get here for unknown file types.
+				AbortOpen("Unable to determine the file type.");
 		}
-//	}
-//	catch (std::bad_alloc) {//Out of memory error
-//		Window->AbortOpen(3);
-//	}
-//	catch (MemoryError) {
-//		Window->AbortOpen(3);
-//	}
-//	catch (UserCancel) {
-//		Window->AbortOpen(6);
-//	}
+	}
+	catch (std::bad_alloc) {//Out of memory error
+		AbortOpen("Not enough memory to open the file. Aborted!");
+	}
+	catch (MemoryError) {
+		AbortOpen("Not enough memory to open the file. Aborted!");
+	}
+	catch (UserCancel) {
+		AbortOpen("File open canceled by user");
+	}
 //	catch (DataError Error) {//Error parsing the file data
 //		if (!Error.ErrorSet())  Window->AbortOpen(21);
 //		else {
@@ -406,8 +410,8 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 //		}
 //	}
 	//Some kind of File system related error
-//	catch (FileError Error) { Error.WriteError(); Window->AbortOpen(-1);}
-///	catch (...) { Window->AbortOpen(40);}
+	catch (FileError Error) { Error.WriteError(); AbortOpen(NULL);}
+	catch (...) { AbortOpen("Unknown error reading the selected file. File open aborted.");}
 	if (Buffer) delete Buffer;		//Done reading so free up the buffer
 	if (test) {//Note test is left 0 if any exception occurs(which causes Window to be deleted)
 //		if (gPreferences->ChangeFileType()) {

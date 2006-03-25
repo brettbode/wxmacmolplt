@@ -200,6 +200,7 @@ struct RGBColor {
 };
 struct Point { short h; short v; };
 #endif
+#define UseOpenGL
 typedef char * Ptr;
 typedef unsigned char Boolean;
 typedef unsigned char Str255 [256];

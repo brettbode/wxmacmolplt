@@ -22,6 +22,7 @@
 #include "MoleculeData.h"
 #include "Prefs.h"
 
+typedef class OpenGLRec OpenGLRec;
 /**
  * Subclasses wxFrame to define the main application window.  This is a
  * document window.  There can be multiple instances of the window in the
@@ -41,7 +42,8 @@ class MolDisplayWin : public wxFrame {
 
         MoleculeData *	MainData;
 		WinPrefs 	*	Prefs;
-		bool			Dirty;	//Flag to indicate a save is needed
+		bool			Dirty;			//Flag to indicate a save is needed
+		OpenGLRec *		OpenGLData;		// Extra OpenGL data
         MpGLCanvas   *glCanvas;
 
         void createMenuBar(void);
@@ -157,6 +159,14 @@ class MolDisplayWin : public wxFrame {
 		void UpdateModelDisplay(void);
 		void ResetView(void);
 		void ResetModel(bool Center);
+		
+		//OpenGL drawing routines
+		void InitGLData(void);
+		void DrawGL(void);
+		void SortTransparentTriangles(void);
+		void DrawTransparentTriangles(void);
+		void DrawMoleculeCoreGL(void);
+		void AddAxisGL(void);
 };
 
 #endif /* #ifndef MolDisplayWin_H */

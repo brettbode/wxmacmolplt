@@ -31,6 +31,7 @@ struct GLWorldData {
  */
 class MpGLCanvas : public wxGLCanvas {
     private:
+		MolDisplayWin * MolWin;
         MoleculeData *molData;
         GLWorldData   worldData;
 
@@ -49,7 +50,7 @@ class MpGLCanvas : public wxGLCanvas {
          * @param style The style of the new widget.  See wxWindow class docs.
          * @param name The name of the new widget.
          */
-        MpGLCanvas(wxWindow       *parent,
+        MpGLCanvas(MolDisplayWin  *parent,
                    wxWindowID      id       = wxID_ANY,
                    const wxPoint  &position = wxDefaultPosition,
                    const wxSize   &size     = wxDefaultSize,

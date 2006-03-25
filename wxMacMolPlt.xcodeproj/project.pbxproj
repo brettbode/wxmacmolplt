@@ -38,6 +38,7 @@
 		1652DAD009D0B43700B7783F /* prefs.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACB09D0B43700B7783F /* prefs.icns */; };
 		1652DAD109D0B43700B7783F /* text-doc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACC09D0B43700B7783F /* text-doc.icns */; };
 		168626DB09D33C6C00A77D97 /* MolDisplayWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */; };
+		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildStyle section */
@@ -59,7 +60,6 @@
 
 /* Begin PBXFileReference section */
 		1652DA0B09D0AE8F00B7783F /* wxMacMolPlt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wxMacMolPlt.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		1652DA0E09D0AE8F00B7783F /* wxMacMolPlt-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "wxMacMolPlt-Info.plist"; sourceTree = "<group>"; };
 		1652DA2709D0B12600B7783F /* AtomTypeList.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = AtomTypeList.cpp; path = src/AtomTypeList.cpp; sourceTree = "<group>"; };
 		1652DA2809D0B12600B7783F /* AtomTypeList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtomTypeList.h; path = src/AtomTypeList.h; sourceTree = "<group>"; };
 		1652DA2909D0B12600B7783F /* BasisSet.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = BasisSet.cpp; path = src/BasisSet.cpp; sourceTree = "<group>"; };
@@ -118,6 +118,7 @@
 		1652DACC09D0B43700B7783F /* text-doc.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "text-doc.icns"; path = "resources/text-doc.icns"; sourceTree = "<group>"; };
 		168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MolDisplayWin.cpp; path = src/MolDisplayWin.cpp; sourceTree = "<group>"; };
 		168626DA09D33C6C00A77D97 /* MolDisplayWin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MolDisplayWin.h; path = src/MolDisplayWin.h; sourceTree = "<group>"; };
+		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,7 +138,6 @@
 				1652DA2609D0B0E700B7783F /* source */,
 				1652DAC709D0B41400B7783F /* Resources */,
 				1652DA0C09D0AE8F00B7783F /* Products */,
-				1652DA0E09D0AE8F00B7783F /* wxMacMolPlt-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -188,6 +188,7 @@
 				1652DA4609D0B12600B7783F /* MoleculeData.cpp */,
 				1652DA4709D0B12600B7783F /* MoleculeData.h */,
 				1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */,
+				8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */,
 				1652DA4909D0B12600B7783F /* mpGLCanvas.h */,
 				1652DA4C09D0B12600B7783F /* myFiles.h */,
 				1652DA4D09D0B12600B7783F /* MyTypes.h */,
@@ -346,6 +347,7 @@
 				1652DA7409D0B12600B7783F /* wxFiles.cpp in Sources */,
 				1652DA7509D0B12600B7783F /* XML.cpp in Sources */,
 				168626DB09D33C6C00A77D97 /* MolDisplayWin.cpp in Sources */,
+				8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -380,16 +382,16 @@
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
-					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/include",
-					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/contrib/include",
+					"-I/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
+					"-I/Users/brett/software/wxWidgets-2.6.2/include",
+					"-I/Users/brett/software/wxWidgets-2.6.2/contrib/include",
 					"-D__WXMAC__",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
 					"-DNO_GCC_PRAGMA",
 				);
 				OTHER_LDFLAGS = (
-					"-L/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib",
+					"-L/Users/brett/software/wxWidgets-2.6.2/osx-build/lib",
 					"-framework",
 					QuickTime,
 					"-framework",
@@ -400,9 +402,9 @@
 					Cocoa,
 					"-framework",
 					System,
-					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_base_carbon-2.6.a",
-					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_core-2.6.a",
-					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_gl-2.6.a",
+					"/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/libwx_base_carbon-2.6.a",
+					"/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/libwx_mac_core-2.6.a",
+					"/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/libwx_mac_gl-2.6.a",
 					"-lwxexpat-2.6",
 					"-lwxtiff-2.6",
 					"-lwxjpeg-2.6",
@@ -431,21 +433,22 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
-					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/include",
-					"-I/Users/brettbode/Documents/wxWidgets-2.6.2/contrib/include",
+					"-I/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
+					"-I/Users/brett/software/wxWidgets-2.6.2/include",
+					"-I/Users/brett/software/wxWidgets-2.6.2/contrib/include",
 					"-D__WXMAC__",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
 					"-DNO_GCC_PRAGMA",
 				);
 				OTHER_LDFLAGS = (
-					"-L/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib",
+					"-L/Users/brett/software/wxWidgets-2.6.2/osx-build/lib",
 					"-framework",
 					QuickTime,
 					"-framework",
@@ -456,9 +459,9 @@
 					Cocoa,
 					"-framework",
 					System,
-					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_base_carbon-2.6.a",
-					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_core-2.6.a",
-					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_gl-2.6.a",
+					"/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/libwx_base_carbon-2.6.a",
+					"/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/libwx_mac_core-2.6.a",
+					"/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/libwx_mac_gl-2.6.a",
 					"-lwxexpat-2.6",
 					"-lwxtiff-2.6",
 					"-lwxjpeg-2.6",
