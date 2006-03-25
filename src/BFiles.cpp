@@ -394,9 +394,11 @@ long BufferFile::GetLine(char * Line)
 		if (BufferPos>=BufferSize) AdvanceBuffer();
 	}
 #ifdef UseHandles
-	if (((*Buffer)[BufferPos] == 13)||((*Buffer)[BufferPos] == 10)) BufferPos++;
+	if (((BufferPos+BufferStart+1)<ByteCount)&&
+		(((*Buffer)[BufferPos] == 13)||((*Buffer)[BufferPos] == 10))) BufferPos++;
 #else
-	if ((Buffer[BufferPos] == 13)||(Buffer[BufferPos] == 10)) BufferPos++;
+	if (((BufferPos+BufferStart)<ByteCount)&&
+		((Buffer[BufferPos] == 13)||(Buffer[BufferPos] == 10))) BufferPos++;
 #endif
 	Line[LineChars] = 0;	//Make it a proper NULL terminated string
 	return LineChars;	//Return the number of characters read (not including the NULL)
@@ -493,7 +495,7 @@ bool BufferFile::LocateKeyWord(char Keyword[], long NumByte, long Limit) {
 	if (Limit < 0) Limit = ByteCount;
 	if (Limit > ByteCount) Limit = ByteCount;
 	while (!KeyWordFound) {
-		if ((BufferStart+BufferPos) >= Limit) {	//We've hit the end of the file without
+		if ((BufferStart+BufferPos+1) >= Limit) {	//We've hit the end of the file without
 			SetFilePos(OldPosition);				//finding the keyword
 			break;
 		}

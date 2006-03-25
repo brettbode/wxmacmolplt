@@ -352,7 +352,7 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 //		Window->SetSkipPoints(nSkip);
 		
 		// Attempt to identify the file type by looking for key words
-		TextFileType type = Buffer->GetFileType(fileName.c_str());
+		TextFileType type = Buffer->GetFileType((char *) fileName.mb_str(wxConvUTF8));
 	//	Window->BeginOperation();
 		switch (type) {
 			case kMolType:

@@ -515,7 +515,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				MainData->InputOptions->Control->SetLocal(token);
 			if (ReadLongKeyword(Line, "MULT", &nAtoms))
 				MainData->InputOptions->Control->SetMultiplicity(nAtoms);
-			if (ReadLongKeyword(Line, "MaxIt", &nAtoms))
+			if (ReadLongKeyword(Line, "MAXIT", &nAtoms))
 				MainData->InputOptions->Control->SetMaxIt(nAtoms);
 			if (ReadStringKeyword(Line, "ECP", token))
 				MainData->InputOptions->Basis->SetECPPotential(token);
