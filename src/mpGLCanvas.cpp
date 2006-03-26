@@ -26,6 +26,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 		//There is an additional parameter to wxGLCanvas that is an int
 		//array of GL options we might need. Might need to use WX_GL_RGBA and WX_GL_DOUBLEBUFFER?
     molData = NULL;
+	Prefs = NULL;
 	MolWin = parent;
 
 	//Hmm is this the right spot to initialize our GL settings?
@@ -74,6 +75,9 @@ void MpGLCanvas::render(void) {
 void MpGLCanvas::setMolData(MoleculeData *newMolData) {
     molData = newMolData;
 }
+void MpGLCanvas::setPrefs(WinPrefs *newPrefs) {
+    Prefs = newPrefs;
+}
 
 wxImage MpGLCanvas::getImage(const int width, const int height) {
     // TODO:  respect width/height
@@ -97,6 +101,57 @@ wxImage MpGLCanvas::getImage(const int width, const int height) {
     // create a wxImage from the data, and mirror it vertically
     return wxImage(cwidth,cheight,pixels).Mirror(false);
 }
+//0.0577 corresponds to fov=60 with zNear=0.1
+#define myGLperspective	0.050	//0.050 seems to match my 2D mode
+
+void MpGLCanvas::UpdateGLView(void) {
+    int width, height;
+    if(GetContext()) {
+        SetCurrent();
+		GetClientSize(&width, &height);
+        glViewport(0, 0, (GLint)width, (GLint)height);
+		GLdouble aspect = ((float)width)/height;
+		//	GLdouble ysize = 60.0;
+		//	if (aspect > 1.0) ysize /= aspect;
+		glMatrixMode (GL_PROJECTION);	//Setup the model space to screen space mapping
+		glLoadIdentity ();
+		//		gluPerspective(ysize, aspect, 0.1, 100.0);
+		GLdouble top, right;
+		if (aspect > 1.0) {
+			right = myGLperspective;
+			top = right/aspect;
+		} else {
+			top = myGLperspective;
+			right = top * aspect;
+		}
+		glFrustum(-right, right, -top, top, 0.1, 100.0);
+		glMatrixMode (GL_MODELVIEW);	//Prepare for model space by submitting the rotation/translation
+		glLoadIdentity ();
+		
+		RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
+		float red, green, blue;
+		red = (float) BackgroundColor->red/65536;
+		green = (float) BackgroundColor->green/65536;
+		blue = (float) BackgroundColor->blue/65536;	//Set the color to the Vector color
+		glClearColor(red, green, blue, 1.0f);		// Setup the background "clear" color
+		
+		float fillBrightness = Prefs->GetQD3DFillBrightness();
+		float PointBrightness = Prefs->GetQD3DPointBrightness();
+		GLfloat position[4] = {6.0,6.0,12.0,0.0};
+		GLfloat diffuse[4]  = {fillBrightness,fillBrightness,fillBrightness,0.0};
+		GLfloat specular[4] = {PointBrightness,PointBrightness,PointBrightness,0.0};
+		glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuse);
+		glLightfv(GL_LIGHT0,GL_SPECULAR,specular);
+		glLightfv(GL_LIGHT0,GL_POSITION,position);
+		GLfloat ambient[] = {0.0,0.0,0.0,0.0};
+		glLightfv(GL_LIGHT1,GL_AMBIENT,ambient);
+		glLightfv(GL_LIGHT1,GL_DIFFUSE,diffuse);
+		glLightfv(GL_LIGHT1,GL_SPECULAR,specular);
+		position[0] = -6.0;
+		glLightfv(GL_LIGHT1,GL_POSITION,position);
+		glEnable(GL_LIGHT1);
+    }
+}
 
 void MpGLCanvas::eventSize(wxSizeEvent &event) {
     int width, height;
@@ -105,10 +160,7 @@ void MpGLCanvas::eventSize(wxSizeEvent &event) {
 
     GetClientSize(&width, &height);
 
-    if(GetContext()) {
-        SetCurrent();
-        glViewport(0, 0, (GLint)width, (GLint)height);
-    }
+	UpdateGLView();
 }
 
 void MpGLCanvas::eventPaint(wxPaintEvent &event) {

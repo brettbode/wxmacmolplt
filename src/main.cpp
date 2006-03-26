@@ -80,7 +80,7 @@ void MpApp::destroyMainFrame(MolDisplayWin *frame) {
 #ifdef __WXMAC__
 	if (MolWinList.size() <= 0) {
 		menuHolder->Show(true);
-		menuHolder->Show(false);
+//		menuHolder->Show(false);
 	}
 #endif
 }
@@ -158,7 +158,7 @@ macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,
     SetMenuBar(menuBar);
 
     Show(true);	//You seem to have to show it to get the menu bar to load
-	Show(false);//then hide it to get it out of the window lists
+//	Show(false);//then hide it to get it out of the window lists
 }
 
 macMenuWinPlaceholder::~macMenuWinPlaceholder() {

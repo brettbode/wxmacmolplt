@@ -32,6 +32,7 @@ struct GLWorldData {
 class MpGLCanvas : public wxGLCanvas {
     private:
 		MolDisplayWin * MolWin;
+		WinPrefs * Prefs;
         MoleculeData *molData;
         GLWorldData   worldData;
 
@@ -68,6 +69,22 @@ class MpGLCanvas : public wxGLCanvas {
         void setMolData(MoleculeData *newMolData);
         
         /**
+		 * Sets the internal pointer to the window's preferences.  If the
+         * data structure needs to be deleted externally, this function should
+         * first be called with the parameter value set to NULL.  This will
+         * prevent the MpGLCanvas object from trying to reference a deleted
+         * data structure.
+         * @param newPrefs A pointer to the window preferences that the canvas should use.
+         */
+        void setPrefs(WinPrefs *newPrefs);
+
+        /**
+		 * Updates GL parameters for changes in the window shap or
+		 * for changes in the lighting and background color.
+         */
+        void UpdateGLView(void);
+		
+		/**
          * Creates an image of the canvas for purposes such as printing or
          * saving to a file.
          *
@@ -91,12 +108,12 @@ class MpGLCanvas : public wxGLCanvas {
         
         // Event Handlers
 
-        /**
-         * Handles resize events received by the widget.
+       /**
+			* Handles resize events received by the widget.
          * @param event The event to handle.
          */
         void eventSize(wxSizeEvent &event);
-
+		
         /**
          * Handles paint events received by the widget.  This is where OpenGL
          * code is run from.

@@ -39,6 +39,7 @@
 		1652DAD109D0B43700B7783F /* text-doc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACC09D0B43700B7783F /* text-doc.icns */; };
 		168626DB09D33C6C00A77D97 /* MolDisplayWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */; };
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
+		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildStyle section */
@@ -119,6 +120,7 @@
 		168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MolDisplayWin.cpp; path = src/MolDisplayWin.cpp; sourceTree = "<group>"; };
 		168626DA09D33C6C00A77D97 /* MolDisplayWin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MolDisplayWin.h; path = src/MolDisplayWin.h; sourceTree = "<group>"; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
+		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -213,6 +215,7 @@
 		1652DAC709D0B41400B7783F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */,
 				1652DAC809D0B43700B7783F /* bindoc.icns */,
 				1652DAC909D0B43700B7783F /* Info.plist */,
 				1652DACA09D0B43700B7783F /* MacMolPlt.icns */,
@@ -311,6 +314,7 @@
 				1652DACF09D0B43700B7783F /* MacMolPlt.icns in Resources */,
 				1652DAD009D0B43700B7783F /* prefs.icns in Resources */,
 				1652DAD109D0B43700B7783F /* text-doc.icns in Resources */,
+				8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

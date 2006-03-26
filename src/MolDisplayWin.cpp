@@ -59,7 +59,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	InitGLData();
 	
     glCanvas = new MpGLCanvas(this);
-
+	glCanvas->setPrefs(Prefs);
+	
     Show(true);
 }
 
@@ -430,7 +431,8 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 //		Window->FinishOperation();	//Close the progress dialog, if opened
 //		if (!Window->IsSavedFile() && gPreferences->Default3DOn()) Window->Activate3D();
 		//Tell the window its data has changed so that it will be redrawn correctly
-//		if (!Window->IsSavedFile()) Window->ResetModel(true);
+//		if (!Window->IsSavedFile()) 
+		ResetModel(true);
 	}
 	return test;
 }

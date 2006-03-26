@@ -298,6 +298,7 @@ void MolDisplayWin::UpdateGLView(void)
 		glEnable(GL_LIGHT1);
 	}
 }
+#endif
 void MolDisplayWin::UpdateGLModel(void) {	//model has changed so force update
 	if (OpenGLData != NULL) {
 		OpenGLData->triangleCount = 0;
@@ -324,6 +325,7 @@ void MolDisplayWin::UpdateGLModel(void) {	//model has changed so force update
 	}
 }
 
+#ifndef __wxBuild__
 //When using openGL we must update the draw context when a window is moved
 void MolDisplayWin::WindowMoved(void)
 {

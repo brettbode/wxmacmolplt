@@ -167,6 +167,7 @@ class MolDisplayWin : public wxFrame {
 		void DrawTransparentTriangles(void);
 		void DrawMoleculeCoreGL(void);
 		void AddAxisGL(void);
+		void UpdateGLModel(void);
 };
 
 #endif /* #ifndef MolDisplayWin_H */

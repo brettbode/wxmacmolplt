@@ -22,6 +22,9 @@
 extern short		gAppResRef;
 #include "StdPrefsLib.h"
 #endif
+#ifdef __wxBuild__
+#include <wx/stdpaths.h>
+#endif
 
 extern WinPrefs *	gPreferences;
 extern WinPrefs *	gPrefDefaults;
@@ -200,7 +203,47 @@ bool SurfaceOptions::Set2DHashMarks(bool State) {
 void WinPrefs::ReadDefaultPrefs(void) {
 	//Read the application default preferences
 #if defined(__wxBuild__)
-#warning Need to add code for the wx version to open the default prefs file
+	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
+	wxString pathname = gStdPaths.GetDataDir();
+#ifdef __WXMAC__
+	//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
+	//but xcode is putting them in Resources.
+	pathname.Remove(pathname.Length() - 13);
+	pathname += "Resources";
+#endif
+	pathname += "/MacMolPlt.Prefs.xml";
+	
+	FILE * preffile = fopen(pathname, "r");
+	if (preffile) {
+		fseek(preffile, 0, SEEK_END);
+		long ByteCount = ftell(preffile);
+		fseek(preffile, 0, SEEK_SET);
+		
+		char * buffer = new char[ByteCount + 1];
+		
+		long test = fread(buffer, 1, ByteCount, preffile);
+		buffer[ByteCount] = '\0';
+		if (test != ByteCount) MessageAlert("Error reading the default prefs file. This is bad!");
+		fclose(preffile);
+
+		XMLSetup();
+		
+		XMLDocument * xDoc = NULL;
+		try{
+			xDoc = new XMLDocument(buffer, ByteCount, true);
+			if (xDoc->parse()) {
+				XMLElement * root = xDoc->getDocumentRoot();
+				ReadMMPPrefs(root);
+			}
+			delete xDoc;
+		}
+		catch (...) {
+			if (xDoc != NULL) delete xDoc;
+			MessageAlert("XML Exception while parsing the default prefs file. This is bad!");
+		}
+		
+		XMLShutdown();
+	}
 #elif defined(CarbonBuild)
 	CFBundleRef myBundle = CFBundleGetMainBundle();
 	CFURLRef tempURL = CFBundleCopyResourceURL (myBundle, CFSTR("MacMolPlt.Prefs.xml"),
@@ -284,7 +327,48 @@ bool WinPrefs::ReadUserPrefs(void) {
 	bool result=false;
 
 #ifdef __wxBuild__
-#warning Add code to read the user prefs!
+	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
+	wxString pathname = gStdPaths.GetUserConfigDir();
+#ifdef __UNIX__
+	//The standarad unix path is the user's home dir. Thus the file should be "hidden".
+	pathname += "/.MacMolPlt.Prefs.xml";
+#else
+	pathname += "/MacMolPlt.Prefs.xml";
+#endif	
+	FILE * preffile = fopen(pathname, "r");
+	if (preffile) {
+		fseek(preffile, 0, SEEK_END);
+		long ByteCount = ftell(preffile);
+		fseek(preffile, 0, SEEK_SET);
+		
+		char * buffer = new char[ByteCount + 1];
+		
+		long test = fread(buffer, 1, ByteCount, preffile);
+		buffer[ByteCount] = '\0';
+		if (test != ByteCount) {
+			MessageAlert("Error reading the user prefs file.");
+			return false;
+		}
+		fclose(preffile);
+		
+		XMLSetup();
+		
+		XMLDocument * xDoc = NULL;
+		try{
+			xDoc = new XMLDocument(buffer, ByteCount, true);
+			if (xDoc->parse()) {
+				XMLElement * root = xDoc->getDocumentRoot();
+				ReadMMPPrefs(root);
+			}
+			delete xDoc;
+		}
+		catch (...) {
+			if (xDoc != NULL) delete xDoc;
+			MessageAlert("XML Exception while parsing the default prefs file. They may be corrupt!");
+		}
+		
+		XMLShutdown();
+	}
 #else
 	OSErr		myErr;
 	short		prefVRefNum, FileRefNum;

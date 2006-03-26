@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<MacMolPltPreferences>
+<MoleculeDisplayPreferences AnimationDelay="20" Atom3DQuality="13" BondWidth="0.068" AtomScale="0.005" DepthCue="0.15" VectorScale="0.5" FillBrightness3D="0.4" PointBrightness3D="0.8" LineWidth3D="0.004" LabelFontId="Chicago" LabelSize="10" AnimationSpeed="7" StereoOffset="3" RotateMode="true" AnimateMode="false" ShowAngles="true" StereoActive="false" ColorBondHalves="true" WireframeMode="false" OutlineBonds="false" UseCylinders="false" Use3DByDefault="false">
+<BackgroundColor red="1" green="1" blue="1"></BackgroundColor>
+<VectorColor red="1" green="0" blue="0" pattern="0"></VectorColor>
+<BondColor BondOrder="1" red="0.260868" green="0.260868" blue="0.260868" pattern="0"></BondColor>
+<BondColor BondOrder="2" red="0" green="0" blue="0" pattern="0"></BondColor>
+<BondColor BondOrder="3" red="0.0065156" green="0.0517891" blue="0.573175" pattern="0"></BondColor>
+<BondColor BondOrder="4" red="0.00840772" green="0.455375" blue="0.0945907" pattern="0"></BondColor>
+</MoleculeDisplayPreferences>
+<FileOptions SetFileCreator="true" CreateCustomIcon="true" PromptToSaveChanges="true" UseNativeEOLChars="true" SetBondOrder="false" CreateHydrogenBonds="false" ReadEverynDRCPoints="0" AutoCreateBonds="true" AutoBondTolerance="0.011" MaxBondLength="0" PreventHHBonds="true"></FileOptions>
+<AtomPreferences>
+<Atom Number="1" Size="37" Mass="1.0039" Label="H">
+<Color red="1" green="1" blue="1" pattern="0"></Color>
+</Atom>
+<Atom Number="2" Size="31" Mass="2.0005" Label="He">
+<Color red="1" green="1" blue="1" pattern="5"></Color>
+</Atom>
+<Atom Number="3" Size="152" Mass="2.6346" Label="Li">
+<Color red="0.657893" green="0.657893" blue="0.657893" pattern="0"></Color>
+</Atom>
+<Atom Number="4" Size="112" Mass="3.00203" Label="Be">
+<Color red="0.549325" green="0.549325" blue="0.549325" pattern="0"></Color>
+</Atom>
+<Atom Number="5" Size="85" Mass="3.288" Label="B">
+<Color red="0" green="0.322362" blue="0.322362" pattern="0"></Color>
+</Atom>
+<Atom Number="6" Size="77" Mass="3.46569" Label="C">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="0"></Color>
+</Atom>
+<Atom Number="7" Size="70" Mass="3.7426" Label="N">
+<Color red="0" green="0" blue="1" pattern="8"></Color>
+</Atom>
+<Atom Number="8" Size="73" Mass="3.9999" Label="O">
+<Color red="1" green="0" blue="0" pattern="37"></Color>
+</Atom>
+<Atom Number="9" Size="72" Mass="4.3587" Label="F">
+<Color red="0" green="1" blue="0.370642" pattern="0"></Color>
+</Atom>
+<Atom Number="10" Size="71" Mass="4.4922" Label="Ne">
+<Color red="1" green="0" blue="0.370642" pattern="0"></Color>
+</Atom>
+<Atom Number="11" Size="186" Mass="4.7948" Label="Na">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="2"></Color>
+</Atom>
+<Atom Number="12" Size="160" Mass="4.93" Label="Mg">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="3"></Color>
+</Atom>
+<Atom Number="13" Size="143" Mass="5.19438" Label="Al">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="4"></Color>
+</Atom>
+<Atom Number="14" Size="118" Mass="5.29958" Label="Si">
+<Color red="0" green="0.259403" blue="0.762951" pattern="6"></Color>
+</Atom>
+<Atom Number="15" Size="110" Mass="5.5654" Label="P">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="7"></Color>
+</Atom>
+<Atom Number="16" Size="103" Mass="5.6627" Label="S">
+<Color red="1" green="1" blue="0" pattern="8"></Color>
+</Atom>
+<Atom Number="17" Size="99" Mass="5.9542" Label="Cl">
+<Color red="0" green="0.697368" blue="0" pattern="9"></Color>
+</Atom>
+<Atom Number="18" Size="98" Mass="6.3204" Label="Ar">
+<Color red="0.762951" green="0" blue="0" pattern="10"></Color>
+</Atom>
+<Atom Number="19" Size="227" Mass="6.2529" Label="K">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="11"></Color>
+</Atom>
+<Atom Number="20" Size="197" Mass="6.3307" Label="Ca">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="12"></Color>
+</Atom>
+<Atom Number="21" Size="163" Mass="6.7049" Label="Sc">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="13"></Color>
+</Atom>
+<Atom Number="22" Size="147" Mass="6.9195" Label="Ti">
+<Color red="0.635935" green="1" blue="0" pattern="14"></Color>
+</Atom>
+<Atom Number="23" Size="134" Mass="7.1373" Label="V">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="15"></Color>
+</Atom>
+<Atom Number="24" Size="130" Mass="7.2108" Label="Cr">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="16"></Color>
+</Atom>
+<Atom Number="25" Size="130" Mass="7.4115" Label="Mn">
+<Color red="1" green="1" blue="1" pattern="17"></Color>
+</Atom>
+<Atom Number="26" Size="127" Mass="7.4731" Label="Fe">
+<Color red="0.549996" green="0" blue="0" pattern="18"></Color>
+</Atom>
+<Atom Number="27" Size="125" Mass="7.6768" Label="Co">
+<Color red="0.500008" green="0.500008" blue="0.500008" pattern="19"></Color>
+</Atom>
+<Atom Number="28" Size="124" Mass="7.6609" Label="Ni">
+<Color red="0.500008" green="0.500008" blue="0.500008" pattern="20"></Color>
+</Atom>
+<Atom Number="29" Size="128" Mass="7.9716" Label="Cu">
+<Color red="1" green="0.4" blue="0" pattern="21"></Color>
+</Atom>
+<Atom Number="30" Size="138" Mass="8.0864" Label="Zn">
+<Color red="0.457771" green="0.457771" blue="0.457771" pattern="22"></Color>
+</Atom>
+<Atom Number="31" Size="135" Mass="8.35" Label="Ga">
+<Color red="0.269718" green="0.269718" blue="0" pattern="23"></Color>
+</Atom>
+<Atom Number="32" Size="122" Mass="8.5212" Label="Ge">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="24"></Color>
+</Atom>
+<Atom Number="33" Size="120" Mass="8.6557" Label="As">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="25"></Color>
+</Atom>
+<Atom Number="34" Size="119" Mass="8.8859" Label="Se">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="26"></Color>
+</Atom>
+<Atom Number="35" Size="114" Mass="8.9389" Label="Br">
+<Color red="0" green="0" blue="0.15259" pattern="27"></Color>
+</Atom>
+<Atom Number="36" Size="112" Mass="9.1542" Label="Kr">
+<Color red="0.269718" green="0" blue="0" pattern="28"></Color>
+</Atom>
+<Atom Number="37" Size="248" Mass="9.2449" Label="Rb">
+<Color red="0" green="0" blue="0" pattern="29"></Color>
+</Atom>
+<Atom Number="38" Size="215" Mass="9.3606" Label="Sr">
+<Color red="0" green="0" blue="0" pattern="30"></Color>
+</Atom>
+<Atom Number="39" Size="181" Mass="9.429" Label="Y">
+<Color red="0" green="0" blue="0" pattern="31"></Color>
+</Atom>
+<Atom Number="40" Size="160" Mass="9.5511" Label="Zr">
+<Color red="0" green="0" blue="0" pattern="32"></Color>
+</Atom>
+<Atom Number="41" Size="148" Mass="9.6388" Label="Nb">
+<Color red="0" green="0" blue="0" pattern="33"></Color>
+</Atom>
+<Atom Number="42" Size="139" Mass="9.7949" Label="Mo">
+<Color red="0" green="0" blue="0" pattern="34"></Color>
+</Atom>
+<Atom Number="43" Size="136" Mass="9.8995" Label="Tc">
+<Color red="0" green="0" blue="0" pattern="35"></Color>
+</Atom>
+<Atom Number="44" Size="134" Mass="10.0533" Label="Ru">
+<Color red="0" green="0" blue="0" pattern="36"></Color>
+</Atom>
+<Atom Number="45" Size="135" Mass="10.1442" Label="Rh">
+<Color red="0" green="0" blue="0" pattern="37"></Color>
+</Atom>
+<Atom Number="46" Size="138" Mass="10.316" Label="Pd">
+<Color red="0.269718" green="0.269718" blue="0.269718" pattern="38"></Color>
+</Atom>
+<Atom Number="47" Size="141" Mass="10.3859" Label="Ag">
+<Color red="0.457771" green="0.457771" blue="0.457771" pattern="39"></Color>
+</Atom>
+<Atom Number="48" Size="150" Mass="10.6024" Label="Cd">
+<Color red="0" green="0" blue="0" pattern="10"></Color>
+</Atom>
+<Atom Number="49" Size="167" Mass="10.7154" Label="In">
+<Color red="0" green="0" blue="0" pattern="11"></Color>
+</Atom>
+<Atom Number="50" Size="140" Mass="10.8954" Label="Sn">
+<Color red="0" green="0" blue="0" pattern="12"></Color>
+</Atom>
+<Atom Number="51" Size="140" Mass="11.034" Label="Sb">
+<Color red="0" green="0" blue="0" pattern="13"></Color>
+</Atom>
+<Atom Number="52" Size="142" Mass="11.296" Label="Te">
+<Color red="0" green="0" blue="0" pattern="14"></Color>
+</Atom>
+<Atom Number="53" Size="133" Mass="11.2652" Label="I">
+<Color red="0" green="0" blue="0" pattern="15"></Color>
+</Atom>
+<Atom Number="54" Size="131" Mass="11.4582" Label="Xe">
+<Color red="0" green="0" blue="0" pattern="16"></Color>
+</Atom>
+<Atom Number="55" Size="265" Mass="11.5285" Label="Cs">
+<Color red="0" green="0" blue="0" pattern="17"></Color>
+</Atom>
+<Atom Number="56" Size="222" Mass="11.7187" Label="Ba">
+<Color red="0" green="0" blue="0" pattern="18"></Color>
+</Atom>
+<Atom Number="57" Size="182" Mass="11.7858" Label="La">
+<Color red="0" green="0" blue="0" pattern="19"></Color>
+</Atom>
+<Atom Number="58" Size="182" Mass="11.837" Label="Ce">
+<Color red="0" green="0" blue="0" pattern="20"></Color>
+</Atom>
+<Atom Number="59" Size="182" Mass="11.8705" Label="Pr">
+<Color red="0" green="0" blue="0" pattern="21"></Color>
+</Atom>
+<Atom Number="60" Size="181" Mass="12.01" Label="Nd">
+<Color red="0" green="0" blue="0" pattern="22"></Color>
+</Atom>
+<Atom Number="61" Size="181" Mass="12.0416" Label="Pm">
+<Color red="0" green="0" blue="0" pattern="23"></Color>
+</Atom>
+<Atom Number="62" Size="181" Mass="12.2621" Label="Sm">
+<Color red="0" green="0" blue="0" pattern="24"></Color>
+</Atom>
+<Atom Number="63" Size="180" Mass="12.3274" Label="Eu">
+<Color red="0" green="0" blue="0" pattern="25"></Color>
+</Atom>
+<Atom Number="64" Size="180" Mass="12.5399" Label="Gd">
+<Color red="0" green="0" blue="0" pattern="26"></Color>
+</Atom>
+<Atom Number="65" Size="180" Mass="12.6066" Label="Tb">
+<Color red="0" green="0" blue="0" pattern="27"></Color>
+</Atom>
+<Atom Number="66" Size="179" Mass="12.7475" Label="Dy">
+<Color red="0" green="0" blue="0" pattern="28"></Color>
+</Atom>
+<Atom Number="67" Size="178" Mass="12.8425" Label="Ho">
+<Color red="0" green="0" blue="0" pattern="29"></Color>
+</Atom>
+<Atom Number="68" Size="177" Mass="12.9329" Label="Er">
+<Color red="0" green="0" blue="0" pattern="30"></Color>
+</Atom>
+<Atom Number="69" Size="176" Mass="12.9975" Label="Tm">
+<Color red="0" green="0" blue="0" pattern="31"></Color>
+</Atom>
+<Atom Number="70" Size="175" Mass="13.1544" Label="Yb">
+<Color red="0" green="0" blue="0" pattern="32"></Color>
+</Atom>
+<Atom Number="71" Size="174" Mass="13.2275" Label="Lu">
+<Color red="0" green="0" blue="0" pattern="33"></Color>
+</Atom>
+<Atom Number="72" Size="160" Mass="13.3604" Label="Hf">
+<Color red="0" green="0" blue="0" pattern="34"></Color>
+</Atom>
+<Atom Number="73" Size="148" Mass="13.4499" Label="Ta">
+<Color red="0" green="0" blue="0" pattern="35"></Color>
+</Atom>
+<Atom Number="74" Size="139" Mass="13.561" Label="W">
+<Color red="0" green="0" blue="0" pattern="36"></Color>
+</Atom>
+<Atom Number="75" Size="137" Mass="13.6455" Label="Re">
+<Color red="0" green="0" blue="0" pattern="37"></Color>
+</Atom>
+<Atom Number="76" Size="136" Mass="13.7913" Label="Os">
+<Color red="0" green="0" blue="0" pattern="38"></Color>
+</Atom>
+<Atom Number="77" Size="136" Mass="13.8636" Label="Ir">
+<Color red="0" green="0" blue="0" pattern="39"></Color>
+</Atom>
+<Atom Number="78" Size="139" Mass="13.9678" Label="Pt">
+<Color red="0" green="0" blue="0" pattern="2"></Color>
+</Atom>
+<Atom Number="79" Size="142" Mass="14.0357" Label="Au">
+<Color red="0" green="0" blue="0" pattern="3"></Color>
+</Atom>
+<Atom Number="80" Size="151" Mass="14.1633" Label="Hg">
+<Color red="0" green="0" blue="0" pattern="4"></Color>
+</Atom>
+<Atom Number="81" Size="170" Mass="14.2969" Label="Tl">
+<Color red="0" green="0" blue="0" pattern="5"></Color>
+</Atom>
+<Atom Number="82" Size="146" Mass="14.3944" Label="Pb">
+<Color red="0" green="0" blue="0" pattern="6"></Color>
+</Atom>
+<Atom Number="83" Size="150" Mass="14.4568" Label="Bi">
+<Color red="0" green="0" blue="0" pattern="7"></Color>
+</Atom>
+<Atom Number="84" Size="168" Mass="14.4914" Label="Po">
+<Color red="0" green="0" blue="0" pattern="8"></Color>
+</Atom>
+<Atom Number="85" Size="140" Mass="14.4914" Label="At">
+<Color red="0" green="0" blue="0" pattern="9"></Color>
+</Atom>
+<Atom Number="86" Size="141" Mass="14.8997" Label="Rn">
+<Color red="0" green="0" blue="0" pattern="10"></Color>
+</Atom>
+<Atom Number="87" Size="280" Mass="14.9332" Label="Fr">
+<Color red="0" green="0" blue="0" pattern="11"></Color>
+</Atom>
+<Atom Number="88" Size="230" Mass="15.0341" Label="Ra">
+<Color red="0" green="0" blue="0" pattern="12"></Color>
+</Atom>
+<Atom Number="89" Size="183" Mass="15.0674" Label="Ac">
+<Color red="0" green="0" blue="0" pattern="13"></Color>
+</Atom>
+<Atom Number="90" Size="182" Mass="15.2328" Label="Th">
+<Color red="0" green="0" blue="0" pattern="14"></Color>
+</Atom>
+<Atom Number="91" Size="182" Mass="15.1999" Label="Pa">
+<Color red="0" green="0" blue="0" pattern="15"></Color>
+</Atom>
+<Atom Number="92" Size="182" Mass="15.4282" Label="U">
+<Color red="0" green="0" blue="0" pattern="16"></Color>
+</Atom>
+<Atom Number="93" Size="182" Mass="15.3964" Label="Np">
+<Color red="0" green="0" blue="0" pattern="17"></Color>
+</Atom>
+<Atom Number="94" Size="182" Mass="15.6205" Label="Pu">
+<Color red="0" green="0" blue="0" pattern="18"></Color>
+</Atom>
+<Atom Number="95" Size="182" Mass="15.5885" Label="Am">
+<Color red="0" green="0" blue="0" pattern="19"></Color>
+</Atom>
+<Atom Number="96" Size="182" Mass="15.7162" Label="Cm">
+<Color red="0" green="0" blue="0" pattern="20"></Color>
+</Atom>
+<Atom Number="97" Size="181" Mass="15.7162" Label="Bk">
+<Color red="0" green="0" blue="0" pattern="21"></Color>
+</Atom>
+<Atom Number="98" Size="181" Mass="15.843" Label="Cf">
+<Color red="0" green="0" blue="0" pattern="22"></Color>
+</Atom>
+<Atom Number="99" Size="180" Mass="15.8745" Label="Es">
+<Color red="0" green="0" blue="0" pattern="23"></Color>
+</Atom>
+<Atom Number="100" Size="180" Mass="16.0312" Label="Fm">
+<Color red="0" green="0" blue="0" pattern="24"></Color>
+</Atom>
+<Atom Number="101" Size="179" Mass="16.0624" Label="Md">
+<Color red="0" green="0" blue="0" pattern="25"></Color>
+</Atom>
+<Atom Number="102" Size="178" Mass="16.0935" Label="No">
+<Color red="0" green="0" blue="0" pattern="26"></Color>
+</Atom>
+<Atom Number="103" Size="177" Mass="16.1245" Label="Lr">
+<Color red="0" green="0" blue="0" pattern="27"></Color>
+</Atom>
+<Atom Number="104" Size="166" Mass="16.1245" Label="Rf">
+<Color red="0" green="0" blue="0" pattern="28"></Color>
+</Atom>
+<Atom Number="105" Size="155" Mass="16.1864" Label="Db">
+<Color red="0" green="0" blue="0" pattern="29"></Color>
+</Atom>
+<Atom Number="106" Size="145" Mass="16.2173" Label="Sg">
+<Color red="0" green="0" blue="0" pattern="30"></Color>
+</Atom>
+<Atom Number="107" Size="143" Mass="16.1864" Label="Bh">
+<Color red="0" green="0" blue="0" pattern="31"></Color>
+</Atom>
+<Atom Number="108" Size="140" Mass="16.2788" Label="Hs">
+<Color red="0" green="0" blue="0" pattern="32"></Color>
+</Atom>
+<Atom Number="109" Size="140" Mass="16.3095" Label="Mt">
+<Color red="0" green="0" blue="0" pattern="33"></Color>
+</Atom>
+<Atom Number="110" Size="140" Mass="0" Label="un">
+<Color red="0" green="0" blue="0" pattern="34"></Color>
+</Atom>
+<Atom Number="111" Size="140" Mass="0" Label="un">
+<Color red="0" green="0" blue="0" pattern="35"></Color>
+</Atom>
+<Atom Number="112" Size="145" Mass="0" Label="un">
+<Color red="0" green="0" blue="0" pattern="36"></Color>
+</Atom>
+<Atom Number="113" Size="150" Mass="0" Label="un">
+<Color red="0" green="0" blue="0" pattern="37"></Color>
+</Atom>
+<Atom Number="114" Size="147" Mass="0" Label="un">
+<Color red="0" green="0" blue="0" pattern="38"></Color>
+</Atom>
+<Atom Number="115" Size="30" Mass="0" Label="G">
+<Color red="0" green="0" blue="0" pattern="39"></Color>
+</Atom>
+<Atom Number="116" Size="25" Mass="0" Label="*C">
+<Color red="0" green="0" blue="0" pattern="36"></Color>
+</Atom>
+<Atom Number="117" Size="25" Mass="0">
+<Color red="0" green="0" blue="0" pattern="3"></Color>
+</Atom>
+<Atom Number="118" Size="25" Mass="0">
+<Color red="0" green="0" blue="0" pattern="4"></Color>
+</Atom>
+<Atom Number="119" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="5"></Color>
+</Atom>
+<Atom Number="120" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="0"></Color>
+</Atom>
+<Atom Number="121" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="0"></Color>
+</Atom>
+<Atom Number="122" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="0"></Color>
+</Atom>
+<Atom Number="123" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="0"></Color>
+</Atom>
+<Atom Number="124" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="0"></Color>
+</Atom>
+<Atom Number="125" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="0"></Color>
+</Atom>
+<Atom Number="126" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="0"></Color>
+</Atom>
+<Atom Number="127" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="0"></Color>
+</Atom>
+<Atom Number="128" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="0"></Color>
+</Atom>
+<Atom Number="129" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="0"></Color>
+</Atom>
+<Atom Number="130" Size="0" Mass="0">
+<Color red="0" green="0" blue="0" pattern="0"></Color>
+</Atom>
+</AtomPreferences>
+<EnergyWindowPreferences y1Zero="0" y2Zero="0" YAdjustmentFactor="1" IndicatorSize="8" NumberDigits="4" PlotTotalEnergy="true" PlotMPEnergy="false" PlotKineticEnergy="false" PlotPotentialEnergy="false" UseKCal="false" PlotRMSGradient="false" PlotMaximumGradient="false" PlotBondLength="false" PlotBondAngle="false" PlotDihedralAngle="false" Atom1="0" Atom2="0" Atom3="0" Atom4="0">
+<TEColor red="0" green="0" blue="0.915541"></TEColor>
+<MPColor red="0" green="0.610361" blue="0"></MPColor>
+<KEColor red="0.686656" green="0" blue="0.793469"></KEColor>
+<PEColor red="0.915541" green="0.915541" blue="0"></PEColor>
+</EnergyWindowPreferences>
+<SurfaceWindowOptions NumberContours="25" NumberGridPoints="30" GridSize="1" MaximumContourValue="1" ShowZeroContour="true" Rotate2DMap="true" Show2DHashMarks="false">
+<PositiveContourColor red="1" green="0" blue="0"></PositiveContourColor>
+<NegativeContourColor red="0" green="0" blue="1"></NegativeContourColor>
+</SurfaceWindowOptions>
+</MacMolPltPreferences>
