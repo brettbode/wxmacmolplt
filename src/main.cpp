@@ -57,6 +57,8 @@ bool MpApp::OnInit() {
 	menuHolder = new macMenuWinPlaceholder(wxT("offscreen"), p, s);
 	SetExitOnFrameDelete(false);
 #else
+	MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
+	MolWinList.push_back(temp);
 	SetExitOnFrameDelete(true);
 #endif
 
