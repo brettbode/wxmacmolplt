@@ -180,7 +180,7 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
 	//Once we decide to close the window it may be system dependant whether we 
 	//leave an empty window up. On the Mac the window is always destroyed.
 #ifndef __WXMAC__
-	if ((app.WindowCount() <= 1) && canVeto) {	
+/*	if ((app.WindowCount() <= 1) && canVeto) {	
 		//This is the last window! Clear it out, but leave it open
 		delete MainData;
 		MainData = new MoleculeData;
@@ -192,7 +192,7 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
 		SetName(wxT("Untitled"));
 		event.Veto(true);
 		return;
-	}
+	}*/
 #endif
 	Destroy();
 	app.destroyMainFrame(this);
