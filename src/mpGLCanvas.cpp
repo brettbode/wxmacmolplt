@@ -28,38 +28,42 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
     molData = NULL;
 	Prefs = NULL;
 	MolWin = parent;
+	initialized = false;
 
 	//Hmm is this the right spot to initialize our GL settings?
-	initGL();
+//	initGL();
 }
 
 void MpGLCanvas::initGL(void) {
-    // Initialize the OpenGL context here.
-	glEnable(GL_DEPTH_TEST);
-	
-	//	glShadeModel(GL_FLAT);
-	glShadeModel(GL_SMOOTH);
-	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-	glPolygonOffset (1.0, 1.0);
-	
-	GLfloat mat_specular[] = {0.8, 0.8, 0.8, 1.0};
-	GLfloat mat_shininess[] = {80.0};
-	GLfloat mat_diffuse[] = {0.2,0.2,0.2,0.8};
-	GLfloat mat_ambient[] = {0.1,0.1,0.1,0.8};
-	glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-	glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
-	glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
-	glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
-				//setup the static lighting properties
-	GLfloat ambient[4]  = {0.2,0.2,0.2,1.0};
-	GLfloat model_ambient[4]  = {0.1,0.1,0.1,0.1};
-	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
-	glLightfv(GL_LIGHT0,GL_AMBIENT,ambient);
-	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_TRUE);
-	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,GL_TRUE);
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
-	glEnable(GL_LIGHT0);
+    if(GetContext()) {
+		// Initialize the OpenGL context here.
+		glEnable(GL_DEPTH_TEST);
+		
+		//	glShadeModel(GL_FLAT);
+		glShadeModel(GL_SMOOTH);
+		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+		glPolygonOffset (1.0, 1.0);
+		
+		GLfloat mat_specular[] = {0.8, 0.8, 0.8, 1.0};
+		GLfloat mat_shininess[] = {80.0};
+		GLfloat mat_diffuse[] = {0.2,0.2,0.2,0.8};
+		GLfloat mat_ambient[] = {0.1,0.1,0.1,0.8};
+		glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+		glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+		glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+		glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+					//setup the static lighting properties
+		GLfloat ambient[4]  = {0.2,0.2,0.2,1.0};
+		GLfloat model_ambient[4]  = {0.1,0.1,0.1,0.1};
+		glEnable(GL_COLOR_MATERIAL);
+		glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
+		glLightfv(GL_LIGHT0,GL_AMBIENT,ambient);
+		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_TRUE);
+		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,GL_TRUE);
+		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
+		glEnable(GL_LIGHT0);
+		initialized = true;
+	}
 }
 
 void MpGLCanvas::render(void) {
@@ -171,6 +175,10 @@ void MpGLCanvas::eventPaint(wxPaintEvent &event) {
     }
 
     SetCurrent();
+	if (!initialized) {
+		initGL();
+		UpdateGLView();
+	}
 		//Only do the drawing if there is not an operation in progress
 		//otherwise the underlying data may not be complete.
 	if (!MolWin->OperInProgress()) MolWin->DrawGL();

@@ -36,6 +36,7 @@ class MpGLCanvas : public wxGLCanvas {
 		WinPrefs * Prefs;
         MoleculeData *molData;
         GLWorldData   worldData;
+		bool		initialized;
 
         void initGL(void);
         void render(void);
