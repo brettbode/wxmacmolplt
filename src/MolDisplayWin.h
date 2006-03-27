@@ -51,6 +51,8 @@ class MolDisplayWin : public wxFrame {
         MpGLCanvas *	glCanvas;
 
         void createMenuBar(void);
+		long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
+							  long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
 
         DECLARE_EVENT_TABLE()
 
@@ -149,11 +151,16 @@ class MolDisplayWin : public wxFrame {
 		
 		//File handling routines
 		long OpenFile(wxString fileName);
+		long OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, float offset);
+		long OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, float offset);
+		long OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append,
+						   long flip, float offset);
 		long OpenXYZFile(BufferFile * Buffer);
 		long OpenPDBFile(BufferFile * Buffer);
 		long OpenMDLMolFile(BufferFile * Buffer);
 		long OpenGAMESSInput(BufferFile * Buffer);
 		long OpenMolPltFile(BufferFile *Buffer);
+		long ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos);
 			//Call to dump the message and close the window
 		void AbortOpen(const char * msg);
 		

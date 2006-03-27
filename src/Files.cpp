@@ -1042,7 +1042,6 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 
 	return 1;
 } /* OpenMolPlt */
-#ifndef __wxBuild__
 long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
 	long 	ElectronsRemoved = 0, ProtonsRemoved=0, LinePos, atom;
 	char	LineText[kMaxLineLength];
@@ -1091,7 +1090,7 @@ long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
 	}
 	delete [] zcore;
 	if (ProtonsRemoved != ElectronsRemoved) {
-		MessageAlert("\pParse Error while reading ECP Potential Data. Use with caution!");
+		MessageAlert("Parse Error while reading ECP Potential Data. Use with caution!");
 	}
 	return ElectronsRemoved;
 }
@@ -1128,14 +1127,14 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 				&(position.y), &(position.z));
 		if (scannum != 5) throw DataError(13);
 		long atomtype = SetAtomType(Label);
-		Atom * newAtom = lFrame->AddAtom(atomtype, position);
+		mpAtom * newAtom = lFrame->AddAtom(atomtype, position);
 		if (newAtom) newAtom->IsSIMOMMAtom(true);
 	}
 		//Now add the full ab initio atoms
 	if (Buffer->LocateKeyWord("COORDINATES (BOHR)", 16, EnergyPos)) {	//first normal (ab initio) atoms
 		ProgressInd->ChangeText("Reading Coordinates");
 		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
-			{ AbortOpen(6); return 0;}
+			{ AbortOpen("File open canceled by user"); return 0;}
 
 		Buffer->SkipnLines(2);
 		StartPos = Buffer->GetFilePos();
@@ -1284,11 +1283,10 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			return (ParseSIMMOMLogFile(Buffer, EnergyPos));
 		}
 	//locate the input set of coordinates (present in every file)
-		SpinCursor(0);
 		if (Buffer->LocateKeyWord("COORDINATES (BOHR)", 16, EnergyPos)) {	//first normal (ab initio) atoms
 			ProgressInd->ChangeText("Reading Coordinates");
 			if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
-				{ AbortOpen(6); return 0;}
+				{ AbortOpen("File open canceled by user"); return 0;}
 
 			Buffer->SkipnLines(2);
 			StartPos = Buffer->GetFilePos();
@@ -1313,7 +1311,6 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		if (Prefs->GetAutoBond())
 			lFrame->SetBonds(Prefs, false);
 
-		SpinCursor(0);
 	//Read in the atomic basis set (if present) and keep it in case we find MO vectors later
 	//if it is not located and read in correctly MO vectors will also be skipped
 		if (Buffer->LocateKeyWord("ATOMIC BASIS SET", 16, EnergyPos)) {
@@ -1326,15 +1323,15 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			catch (MemoryError) {
 				if (MainData->Basis) delete MainData->Basis;
 				MainData->Basis = NULL;
-				MessageAlert("\pInsufficient Memory to read the Basis Set.");
+				MessageAlert("Insufficient Memory to read the Basis Set.");
 			}
 			catch (std::bad_alloc) {
 				if (MainData->Basis) delete MainData->Basis;
 				MainData->Basis = NULL;
-				MessageAlert("\pInsufficient Memory to read the Basis Set.");
+				MessageAlert("Insufficient Memory to read the Basis Set.");
 			}
 			catch (DataError) {
-				MessageAlert("\pAn error occured while reading the basis set, basis set skipped.");
+				MessageAlert("An error occured while reading the basis set, basis set skipped.");
 				if (MainData->Basis) delete MainData->Basis;
 				MainData->Basis = NULL;
 			}
@@ -1502,7 +1499,6 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 					Buffer->SetFilePos(StartPos);
 				}
 			}
-			SpinCursor(0);
 				//Attempt to read in orbitals for first geometry
 			SavedPos = Buffer->GetFilePos();
 			NextFinalPos = -1;
@@ -1579,7 +1575,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 								Buffer->SkipnLines(1);
 								ProgressInd->ChangeText("Reading eigenvectors");
 								if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
-									{ AbortOpen(6); return 0;}
+									{ AbortOpen("File open canceled by user"); return 0;}
 								OrbitalRec * OrbSet = lFrame->ParseGAMESSEigenVectors(Buffer, MainData->GetNumBasisFunctions(),
 									MainData->GetNumBasisFunctions(), NumBetaUHFOrbs, NumOccAlpha, NumOccBeta,
 									(TypeOfWavefunction)(MainData->InputOptions->Control->GetSCFType()), ProgressInd);
@@ -1622,13 +1618,13 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 					}
 				}
 				catch (std::bad_alloc) {
-					MessageAlert("\pInsufficient memory to read in eigenvectors.");
+					MessageAlert("Insufficient memory to read in eigenvectors.");
 				}
 				catch (MemoryError) {
-					MessageAlert("\pInsufficient memory to read in eigenvectors.");
+					MessageAlert("Insufficient memory to read in eigenvectors.");
 				}
 				catch (DataError) {
-					MessageAlert("\pError reading eigenvectors, orbitals skipped.");
+					MessageAlert("Error reading eigenvectors, orbitals skipped.");
 				}
 			}
 				//look for gradient data
@@ -1657,7 +1653,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			return this->OpenGAMESSIRCLog(Buffer, flip, offset, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
 		}
 	}
-	long memlength = sizeof(Frame) + lFrame->NumAtoms*sizeof(Atom) +
+	long memlength = sizeof(Frame) + lFrame->NumAtoms*sizeof(mpAtom) +
 					lFrame->NumBonds*sizeof(Bond) + 5000;
 	KeyWordFound = true;
 	double	FrameEnergy, MP2FrameEnergy;
@@ -1665,10 +1661,12 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 			{ throw UserCancel();}
 //Test for available memory
+#ifndef __wxBuild__
 		if (MaxBlock() < memlength) {
 			MessageAlertByID(kerrstrings, 29);
 			break;
 		}
+#endif
 		KeyWordFound = false;
 			//Advance to the start of the next geometry step BEGINNING GEOMETRY SEARCH POINT
 			//If there isn't one then we are done with the geometries
@@ -1916,13 +1914,13 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 					}
 				}
 				catch (std::bad_alloc) {
-					MessageAlert("\pInsufficient memory to read in eigenvectors.");
+					MessageAlert("Insufficient memory to read in eigenvectors.");
 				}
 				catch (MemoryError) {
-					MessageAlert("\pInsufficient memory to read in eigenvectors.");
+					MessageAlert("Insufficient memory to read in eigenvectors.");
 				}
 				catch (DataError) {
-					MessageAlert("\pError reading eigenvectors, orbitals skipped.");
+					MessageAlert("Error reading eigenvectors, orbitals skipped.");
 				}
 			}
 		}
@@ -1975,13 +1973,13 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			}
 		}
 		catch (std::bad_alloc) {
-			MessageAlert("\pInsufficient memory to read in the localized orbitals.");
+			MessageAlert("Insufficient memory to read in the localized orbitals.");
 		}
 		catch (MemoryError) {
-			MessageAlert("\pInsufficient memory to read in the localized orbitals.");
+			MessageAlert("Insufficient memory to read in the localized orbitals.");
 		}
 		catch (DataError) {
-			MessageAlert("\pError reading localized orbitals, local orbs. skipped.");
+			MessageAlert("Error reading localized orbitals, local orbs. skipped.");
 		}
 	}
 	if (DatBuffer) DatBuffer->CloseFile();
@@ -1999,7 +1997,6 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	}
 	return 1;
 }	/*OpenGAMESSlog*/
-#endif
 bool ReadGVBOccupancy(BufferFile * Buffer, long NumPairOrbs, long MaxOrbs, float * Occupancy) {
 		char Line[kMaxLineLength];
 		long	junk, Orb1, Orb2;
@@ -2016,7 +2013,6 @@ bool ReadGVBOccupancy(BufferFile * Buffer, long NumPairOrbs, long MaxOrbs, float
 	}
 	return true;
 }
-#ifndef __wxBuild__
 //routine to parse initial fragment coordinates which are in a real ugly
 //format with all of the multipole expantion points
 long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
@@ -2070,7 +2066,7 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 						Pos.x *= kBohr2AngConversion;
 						Pos.y *= kBohr2AngConversion;
 						Pos.z *= kBohr2AngConversion;
-						Atom * newAtom = lFrame->AddAtom(AtomType, Pos);
+						mpAtom * newAtom = lFrame->AddAtom(AtomType, Pos);
 						if (newAtom) newAtom->SetFragmentNumber(FragmentNumber);
 						MaxSize = MAX(MaxSize, fabs(Pos.x));
 						MaxSize = MAX(MaxSize, fabs(Pos.y));
@@ -2103,7 +2099,7 @@ void MoleculeData::ReadFragmentCoordinates(BufferFile * Buffer, long NumFragment
 			}
 			long AtomType = SetAtomType((unsigned char *) &(Label[0]));
 			if (AtomType > 0) {
-				Atom * newAtom = lFrame->AddAtom(AtomType, Pos);
+				mpAtom * newAtom = lFrame->AddAtom(AtomType, Pos);
 				if (newAtom) newAtom->SetFragmentNumber(FragmentNumber);
 				MaxSize = MAX(MaxSize, fabs(Pos.x));
 				MaxSize = MAX(MaxSize, fabs(Pos.y));
@@ -2267,7 +2263,11 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 	Frame * lFrame = MainData->cFrame;
 
 	if (!Append) {
+#ifdef __wxBuild__
+#warning Need to set file type
+#else
 		FileSave = 17; //IRC bit 5 plus bit 1 for saving
+#endif
 		if (!Buffer->LocateKeyWord("IRC INFORMATION PACKET", 22)) return 0;
 		if (!Buffer->LocateKeyWord("POINT=", 6)) return 0;
 		Buffer->GetLine(LineText);
@@ -2297,15 +2297,16 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 	}
 	NumAtoms = lFrame->NumAtoms;
 	KeyWordFound = Buffer->LocateKeyWord("POINT=", 6);
-	long memlength = sizeof(Frame)+NumAtoms*sizeof(Atom)+lFrame->NumBonds*sizeof(Bond)+5000;
+	long memlength = sizeof(Frame)+NumAtoms*sizeof(mpAtom)+lFrame->NumBonds*sizeof(Bond)+5000;
 	while (KeyWordFound) {
 		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 			{ throw UserCancel();}
+#ifndef __wxBuild__
 		if (MaxBlock() < memlength) {
 			MessageAlertByID(kerrstrings, 29);
 			break;
 		}
-
+#endif
 		Buffer->GetLine(LineText);
 		LinePos = 6;
 		sscanf(&(LineText[LinePos]), "%ld", &point);
@@ -2359,14 +2360,16 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 		KeyWordFound = Buffer->LocateKeyWord(NextPointKeyword, 20);
 		if (KeyWordFound) LINEAR=true;
 	}
-	long memlength = sizeof(Frame)+NumAtoms*sizeof(Atom)+lFrame->NumBonds*sizeof(Bond)+5000;
+	long memlength = sizeof(Frame)+NumAtoms*sizeof(mpAtom)+lFrame->NumBonds*sizeof(Bond)+5000;
 	while (KeyWordFound) {
 		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 			{ throw UserCancel();}
+#ifndef __wxBuild__
 		if (MaxBlock() < memlength) {
 			MessageAlertByID(kerrstrings, 29);
 			break;
 		}
+#endif
 		if (LINEAR) Buffer->BackupnLines(1);
 		Buffer->SkipnLines(1);
 		if (Buffer->LocateKeyWord("POINT", 5)) {
@@ -2451,15 +2454,15 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 				catch (std::bad_alloc) {
 	//				if (lFrame->Orbs) delete lFrame->Orbs;
 	//				lFrame->Orbs = NULL;
-					MessageAlert("\pInsufficient memory to read in eigenvectors.");
+					MessageAlert("Insufficient memory to read in eigenvectors.");
 				}
 				catch (MemoryError) {
 	//				if (lFrame->Orbs) delete lFrame->Orbs;
 	//				lFrame->Orbs = NULL;
-					MessageAlert("\pInsufficient memory to read in eigenvectors.");
+					MessageAlert("Insufficient memory to read in eigenvectors.");
 				}
 				catch (DataError) {
-					MessageAlert("\pError reading eigenvectors, orbitals skipped.");
+					MessageAlert("Error reading eigenvectors, orbitals skipped.");
 	//				if (lFrame->Orbs) delete lFrame->Orbs;
 	//				lFrame->Orbs = NULL;
 				}
@@ -2485,7 +2488,11 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 	ProgressInd->ChangeText("Reading GAMESS DRC fileÉ");
 	Frame * lFrame = MainData->cFrame;
 	if (!Append) {
+#ifdef __wxBuild__
+#warning Need to setup file type
+#else
 		FileSave = 33; //DRC bit 6 plus bit 1 for saving
+#endif
 		MainData->DrawMode += 8;
 	}
 	long FilePos = Buffer->GetFilePos();
@@ -2538,11 +2545,10 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 			lFrame->SetBonds(Prefs, false);
 
 		KeyWordFound = Buffer->LocateKeyWord(Etext, Elength);
-		SpinCursor(0);
 	}
 
 	NumAtoms = lFrame->NumAtoms;
-	long memlength = sizeof(Frame)+NumAtoms*sizeof(Atom)+lFrame->NumBonds*sizeof(Bond)+5000;
+	long memlength = sizeof(Frame)+NumAtoms*sizeof(mpAtom)+lFrame->NumBonds*sizeof(Bond)+5000;
 	long DRCnSkip = Prefs->GetDRCSkip();
 	while (KeyWordFound) {
 		Buffer->SkipnLines(1);
@@ -2550,11 +2556,12 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 			nskip = 0;
 			if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 				{ throw UserCancel();}
+#ifndef __wxBuild__
 			if (MaxBlock() < memlength) {
 				MessageAlertByID(kerrstrings, 29);
 				break;
 			}
-
+#endif
 			Buffer->GetLine(LineText);
 			sscanf(LineText, "%f", &tempfloat);
 			tempfloat *= flip;
@@ -2595,6 +2602,7 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 	MainData->CurrentFrame = 1;
 	return 1;
 }	/*OpenGAMESSDRC*/
+#ifndef __wxBuild__
 void MolDisplayWin::CloseFile(void) {
 	if (fileRefNum) {
 		FSClose(fileRefNum);

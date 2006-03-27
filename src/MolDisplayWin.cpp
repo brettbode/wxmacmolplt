@@ -373,6 +373,9 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 	BufferFile * Buffer = NULL;
 	try {
 		Buffer = new BufferFile(myfile, false);
+		//this is temporary, they are supposed to come from the open file dialog
+		long flip = 0;
+		float offset = 0.0;
 //		Window->SetSkipPoints(nSkip);
 		
 		// Attempt to identify the file type by looking for key words
@@ -383,13 +386,13 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 				test = OpenMolPltFile(Buffer);
 				break;
 			case kGAMESSlogType:
-	//			test = OpenGAMESSlog(Buffer, false, flip, offset);
+				test = OpenGAMESSlog(Buffer, false, flip, offset);
 				break;
 			case kGAMESSIRCType:
-	//			test = OpenGAMESSIRC(Buffer, false,flip,offset);
+				test = OpenGAMESSIRC(Buffer, false,flip,offset);
 				break;
 			case kGAMESSDRCType:
-	//			test = OpenGAMESSDRC(Buffer, false, false,flip,offset);
+				test = OpenGAMESSDRC(Buffer, false, false,flip,offset);
 				break;
 			case kGAMESSInputType:
 				test = OpenGAMESSInput(Buffer);
