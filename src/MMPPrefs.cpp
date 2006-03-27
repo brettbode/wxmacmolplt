@@ -211,9 +211,9 @@ void WinPrefs::ReadDefaultPrefs(void) {
 	pathname.Remove(pathname.Length() - 13);
 	pathname += "Resources";
 #endif
-	pathname += "/MacMolPlt.Prefs.xml";
+	pathname += wxT("/MacMolPlt.Prefs.xml");
 	
-	FILE * preffile = fopen(pathname, "r");
+	FILE * preffile = fopen(pathname.mb_str(wxConvUTF8), "r");
 	if (preffile) {
 		fseek(preffile, 0, SEEK_END);
 		long ByteCount = ftell(preffile);
@@ -331,11 +331,11 @@ bool WinPrefs::ReadUserPrefs(void) {
 	wxString pathname = gStdPaths.GetUserConfigDir();
 #ifdef __UNIX__
 	//The standarad unix path is the user's home dir. Thus the file should be "hidden".
-	pathname += "/.MacMolPlt.Prefs.xml";
+	pathname += wxT("/.MacMolPlt.Prefs.xml");
 #else
-	pathname += "/MacMolPlt.Prefs.xml";
+	pathname += wxT("/MacMolPlt.Prefs.xml");
 #endif	
-	FILE * preffile = fopen(pathname, "r");
+	FILE * preffile = fopen(pathname.mb_str(wxConvUTF8), "r");
 	if (preffile) {
 		fseek(preffile, 0, SEEK_END);
 		long ByteCount = ftell(preffile);

@@ -133,7 +133,7 @@ class Frame {
 			long NumOccBeta, Progress * lProgress, bool OrientedSet);
 		void ReadMP2Vectors(BufferFile * Buffer, BufferFile * DatBuffer, long NumFuncs,
 			Progress * lProgress, long * readflag);
-		float CalculateMEP(float XValue, float YValue, float ZValue, BasisSet *Basis,
+		float CalculateMEP(float x, float y, float z, BasisSet * Basis,
 			AODensity * TotalAODensity, GaussHermiteData * GHData, float * ElectronicMEP, float * NuclearMEP);
 		AODensity * GetAODensity(BasisSet * basis, const long & targetOrbSet);
 		void ReadGradient(BufferFile * Buffer, long SearchLength);

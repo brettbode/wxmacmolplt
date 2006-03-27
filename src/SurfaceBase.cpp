@@ -1672,3 +1672,4 @@ void SortContourPoints(long *Points, unsigned char index, long *VertexList, long
 						Normals[11] = Normals[6];
 
 */
+

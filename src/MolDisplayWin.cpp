@@ -185,8 +185,8 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
 		delete MainData;
 		MainData = new MoleculeData;
 		delete Prefs;
-		Prefs = new winPrefs;
-		*Prefs = *gPfreferences;
+		Prefs = new WinPrefs;
+		*Prefs = *gPreferences;
 		Dirty = false;
 		SetTitle(wxT("Untitled"));
 		SetName(wxT("Untitled"));
@@ -365,9 +365,9 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 	//This is modeled on OpenTextFile in the Mac version
 	long				test=0;
 	
-	FILE * myfile = fopen(fileName, "r");
+	FILE * myfile = fopen(fileName.mb_str(wxConvUTF8), "r");
 	if (myfile == NULL) {
-		AbortOpen(wxT("Unable to open the requested file."));
+		AbortOpen("Unable to open the requested file.");
 		return 0;
 	}
 	BufferFile * Buffer = NULL;
@@ -379,7 +379,7 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 //		Window->SetSkipPoints(nSkip);
 		
 		// Attempt to identify the file type by looking for key words
-		TextFileType type = Buffer->GetFileType((char *) fileName.mb_str(wxConvUTF8));
+		TextFileType type = Buffer->GetFileType((const char *) fileName.mb_str(wxConvUTF8));
 		BeginOperation();
 		switch (type) {
 			case kMolType:

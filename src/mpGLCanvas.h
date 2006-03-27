@@ -25,6 +25,7 @@
 struct GLWorldData {
 };
 
+typedef class MolDisplayWin MolDisplayWin;
 /**
  * Defines a widget for displaying an OpenGL canvas.  At this time it is a
  * child of the wxGLCanvas widget class.
