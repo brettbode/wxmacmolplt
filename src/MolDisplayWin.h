@@ -21,6 +21,7 @@
 #include "mpGLCanvas.h"
 #include "MoleculeData.h"
 #include "Prefs.h"
+#include "Progress.h"
 
 typedef class OpenGLRec OpenGLRec;
 /**
@@ -43,8 +44,11 @@ class MolDisplayWin : public wxFrame {
         MoleculeData *	MainData;
 		WinPrefs 	*	Prefs;
 		bool			Dirty;			//Flag to indicate a save is needed
+		bool			OperationInProgress;
+		
+		Progress *		ProgressInd;	// Progress indicator window for long operations
 		OpenGLRec *		OpenGLData;		// Extra OpenGL data
-        MpGLCanvas   *glCanvas;
+        MpGLCanvas *	glCanvas;
 
         void createMenuBar(void);
 
@@ -159,6 +163,9 @@ class MolDisplayWin : public wxFrame {
 		void UpdateModelDisplay(void);
 		void ResetView(void);
 		void ResetModel(bool Center);
+		void BeginOperation(void);
+		void FinishOperation(void);
+		bool OperInProgress(void) const {return OperationInProgress;};
 		
 		//OpenGL drawing routines
 		void InitGLData(void);

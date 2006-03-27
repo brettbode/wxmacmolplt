@@ -488,12 +488,9 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	long	nAtoms, EndOfGroup, StartPos, EndPos;
 	bool	BasisFound=false, BoolTest;
 
-#ifndef __wxBuild__
 	ProgressInd->ChangeText("Reading GAMESS input fileÉ");
-#endif
 
 	MainData->InputOptions = new InputData;
-//	if (!MainData->InputOptions) throw MemoryError();
 
 	EndOfGroup = false;
 	if (Buffer->FindGroup("CONTRL")) {
@@ -610,6 +607,8 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					CPoint3D	pos;
 					float		AtomType;
 				Buffer->GetLine(Line);
+				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+				{ throw UserCancel();}
 				sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
 				lFrame->AddAtom((long) AtomType, pos);
 				StartPos = Buffer->FindBlankLine();
@@ -632,9 +631,7 @@ long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
 // parts of this are a bit gross since the MDL format is fixed format without
 // whitespace in between the fields.
 
-#ifndef __wxBuild__
 	ProgressInd->ChangeText("Reading MDL MolFileÉ");
-#endif
 	Frame * lFrame = MainData->cFrame;
 
 	Buffer->GetLine(Line);	//The first Line is a comment/compound name line
@@ -702,9 +699,7 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 	long	nAtoms;
 	short	scanerr;
 
-#ifndef __wxBuild__
 	ProgressInd->ChangeText("Reading PDB fileÉ");
-#endif
 	Frame * lFrame = MainData->cFrame;
 		//First scan the file to determine the atoms
 	nAtoms = 0;
@@ -757,9 +752,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 	long	nAtoms,i;
 	short	scanerr;
 
-#ifndef __wxBuild__
 	ProgressInd->ChangeText("Reading XYZ fileÉ");
-#endif
 	Frame * lFrame = MainData->cFrame;
 		//1st line contains the number of atoms
 	Buffer->GetLine(Line);
@@ -825,10 +818,8 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 					lFrame = MainData->AddFrame(nAtoms,0);
 					if (!lFrame) throw MemoryError();
 					Buffer->GetLine(Line);
-#ifndef __wxBuild__
 					if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 						{ throw UserCancel();}
-#endif
 				} else {
 					nSkip++;
 					Buffer->SkipnLines(nAtoms+1);
@@ -849,9 +840,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 	float				BondLength=0.0;
 	char				LineText[kMaxLineLength+1], KeyWord[kMaxLineLength+1], token[5];
 
-#ifndef __wxBuild__
 	ProgressInd->ChangeText("Reading MolPlt format fileÉ");
-#endif
 	Frame * lFrame = MainData->cFrame;
 /*Now interpert the file data */
 		// Grab the first line (containing all keywords)
@@ -894,7 +883,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 	}
 
 	if (fileAtoms <= 0) {			/* There don't appear to be any atoms to read in ???*/
-		this->AbortOpen("NATOMS keyword missing. Are you sure this is a Molplt file\? Open file aborted.");
+		AbortOpen("NATOMS keyword missing. Are you sure this is a Molplt file\? Open file aborted.");
 		return 0;
 	}
 		//Allocate frame memory
@@ -914,6 +903,8 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 			long AtomType;
 			CPoint3D Pos, Vector;
 
+		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+		{ throw UserCancel();}
 		Buffer->GetLine(LineText);
 		test = ParseCartLine(LineText, &AtomType, &Pos, &Vector, Mode);
 		
@@ -1004,11 +995,9 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 			Buffer->SetFilePos(CurrentPos);
 
 			for (; ii < (3*(lFrame->NumAtoms)); ii++) {
-#ifndef __wxBuild__
 				/* Allow a small amount of background processing and allow user cancels */
 				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 					{ throw UserCancel();}
-#endif
 				Buffer->GetLine(LineText);
 				for (j=0; LineText[j] && (LineText[j] != '='); j++) ;
 				if (LineText[j] != '=') break;	/* no more frequencies so quit */

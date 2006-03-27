@@ -607,8 +607,7 @@ CleanUpAndExit:		//Clean up the RotCoords Array...
 	return;	//Correct return
 FrameIncorrect:		//Incorrect frame list for this routine: throw up an error and exit
 #ifdef __wxBuild__
-	;
-#warning Need some sort of alert here
+	MessageAlert("Sorry each frame must have the same number and order of atoms in order to fit an animation path.");
 #else
 	Str255	errmsg;
 	GetIndString(errmsg, kerrstrings, 33);

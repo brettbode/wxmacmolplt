@@ -171,14 +171,12 @@ void MpGLCanvas::eventPaint(wxPaintEvent &event) {
     }
 
     SetCurrent();
-	MolWin->DrawGL();
-//    if(molData != NULL) {
-//        render();
-//    }
-//    else {
-        // TODO:  Blank the context
-//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear out the buffer
-//    }
+		//Only do the drawing if there is not an operation in progress
+		//otherwise the underlying data may not be complete.
+	if (!MolWin->OperInProgress()) MolWin->DrawGL();
+	else
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear out the buffer
+
     SwapBuffers();
 }
 

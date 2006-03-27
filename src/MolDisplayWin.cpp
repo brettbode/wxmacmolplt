@@ -55,6 +55,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	Prefs = new WinPrefs;
 	*Prefs = *gPreferences;
 	Dirty = false;
+	OperationInProgress = false;
+	ProgressInd = NULL;
 	OpenGLData = NULL;
 	InitGLData();
 	
@@ -67,6 +69,11 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 MolDisplayWin::~MolDisplayWin() {
     // TODO:  Destroy any dialogs that are still in existence.
 
+	if (ProgressInd != NULL) {
+		delete ProgressInd;
+		ProgressInd = NULL;
+	}
+	
     if(MainData != NULL) {
         glCanvas->setMolData(NULL);
         delete MainData;
@@ -335,6 +342,18 @@ void MolDisplayWin::ResetModel(bool Center) {
 //	::SetControlValue(FrameScroll, MainData->CurrentFrame);
 //	draw();
 }
+void MolDisplayWin::BeginOperation(void) {
+	ProgressInd = new Progress;
+	if (!ProgressInd) throw MemoryError();
+	OperationInProgress = true;
+}
+void MolDisplayWin::FinishOperation(void) {
+	if (ProgressInd) {
+		delete ProgressInd;
+		ProgressInd = NULL;
+	}
+	OperationInProgress = false;
+}
 void MolDisplayWin::AbortOpen(const char * msg) {
 	
 	if (this) Close(true);
@@ -358,7 +377,7 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 		
 		// Attempt to identify the file type by looking for key words
 		TextFileType type = Buffer->GetFileType((char *) fileName.mb_str(wxConvUTF8));
-	//	Window->BeginOperation();
+		BeginOperation();
 		switch (type) {
 			case kMolType:
 				test = OpenMolPltFile(Buffer);
@@ -428,7 +447,7 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 		fclose(myfile);
 //		Window->CloseFile();	//Hmmm should this happen for CML files?
 //		if (!Window->IsSavedFile()) Window->SetFileType(5);
-//		Window->FinishOperation();	//Close the progress dialog, if opened
+		FinishOperation();	//Close the progress dialog, if opened
 //		if (!Window->IsSavedFile() && gPreferences->Default3DOn()) Window->Activate3D();
 		//Tell the window its data has changed so that it will be redrawn correctly
 //		if (!Window->IsSavedFile()) 
