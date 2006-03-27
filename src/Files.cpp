@@ -1277,7 +1277,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			}
 		}
 		Buffer->SetFilePos(0);
-		if (Buffer->LocateKeyWord("QMMM procedure is ON", 20, EnergyPos)) {
+		if (Buffer->LocateKeyWord("QMMM PROCEDURE IS ON", 20, EnergyPos)) {
 			//If this is a simmom type run then switch to that routine since the format is
 			//significantly different
 			return (ParseSIMMOMLogFile(Buffer, EnergyPos));
