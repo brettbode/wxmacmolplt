@@ -243,16 +243,16 @@ void BufferFile::SetFilePos(long NewPos) {
 // GetFileType will attempt to determine the type of text file we are dealing
 // with (ex: GAMESS log, GAMESS IRC ...) return Unknown when matching fails
 // the arguement is really a pascal string
-TextFileType BufferFile::GetFileType(char * fileName) {
+TextFileType BufferFile::GetFileType(const char * fileName) {
 	long EntryPos = GetFilePos(), FileSize=ByteCount;
 	TextFileType	Type=kUnknown;
 
 	ByteCount = BufferSize;
 		//Check file extention first
 	if (fileName != NULL) {
-		if (fileName[0] > 4) {
-			char * temp = &(fileName[fileName[0]-4]);
-			temp[5] = 0;
+		int len = strlen(fileName);
+		if (len > 4) {
+			const char * temp = &(fileName[len-4]);
 			if (-1<FindKeyWord(temp, ".XYZ", 4)) Type = kXYZType;
 			else if (-1<FindKeyWord(temp, ".PDB", 4)) Type = kPDBType;
 			else if (-1<FindKeyWord(temp, ".INP", 4)) Type = kGAMESSInputType;

@@ -82,7 +82,7 @@ class BufferFile {
 		long GetFilePos(void);
 		void SetFilePos(long NewPos);
 		inline long GetFileLength(void) {return ((ByteCount>GetFilePos())?ByteCount:GetFilePos());};
-		TextFileType GetFileType(char * fileName);
+		TextFileType GetFileType(const char * fileName);
 		long FindGroup(char * GroupName);
  		long Read(Ptr Target, long NumBytes);
  		long GetLine(char * Line);
