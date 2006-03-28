@@ -407,10 +407,10 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 				test = OpenMDLMolFile(Buffer);
 				break;
 			case CMLFile:
-	//		{
-	//			test = OpenCMLFile(Buffer);
-	//			if (test == 0) Window->AbortOpen(0);
-	//		}
+			{
+				test = OpenCMLFile(Buffer);
+				if (test == 0) AbortOpen(NULL);
+			}
 				break;
 			default:	//Should only get here for unknown file types.
 				AbortOpen("Unable to determine the file type.");
@@ -456,6 +456,30 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 //		if (!Window->IsSavedFile()) 
 		ResetModel(true);
 	}
+	return test;
+}
+long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWindows) {
+	if (ProgressInd) ProgressInd->ChangeText("Reading CML fileÉ");
+	long test = 0;
+	if (readWindows)
+		test = MainData->OpenCMLFile(Buffer, Prefs, NULL, readPrefs);
+//		test = MainData->OpenCMLFile(Buffer, Prefs, &winData, readPrefs);
+	else
+		test = MainData->OpenCMLFile(Buffer, Prefs, NULL, readPrefs);
+/*	if (test == 0) AbortOpen(0);
+	else {
+		SetFileType(2);
+		Rect tGRect;
+		winData.GetMolWinRect(tGRect);
+		SetWindowRect(&tGRect);
+		CalculateWindowParameters();
+		if (winData.is3DModeActive()) {
+			winData.is3DModeActive(false);
+			Activate3D();
+		}
+		ResetModel(false);
+	}
+			*/
 	return test;
 }
 

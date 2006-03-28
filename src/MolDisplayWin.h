@@ -151,6 +151,7 @@ class MolDisplayWin : public wxFrame {
 		
 		//File handling routines
 		long OpenFile(wxString fileName);
+		long OpenCMLFile(BufferFile * Buffer, bool readPrefs=true, bool readWindows=true);
 		long OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, float offset);
 		long OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, float offset);
 		long OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append,
