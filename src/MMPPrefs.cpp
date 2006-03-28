@@ -163,6 +163,7 @@ float WinPrefs::SetAtomMass(long AtomNum, float NewMass) {
 WinPrefs::WinPrefs(void) {
 	RendererName = NULL;
 	BitOptions = 0;
+	BackColor.red = BackColor.green = BackColor.blue = 65532;
 }
 WinPrefs::~WinPrefs(void) {
 	if (RendererName) delete [] RendererName;
@@ -500,19 +501,19 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					switch (elName) {
 						case MMPMolDisplay_BackColor:
 							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
-								BackColor.red = (short)(floatVal*65535.0);
+								BackColor.red = (unsigned short)(floatVal*65535.0);
 							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), floatVal))
-								BackColor.green = (short)(floatVal*65535.0);
+								BackColor.green = (unsigned short)(floatVal*65535.0);
 							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), floatVal))
-								BackColor.blue = (short)(floatVal*65535.0);
+								BackColor.blue = (unsigned short)(floatVal*65535.0);
 							break;
 						case MMPMolDisplay_VectorColor:
 							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
-								VectorColor.red = (short)(floatVal*65535.0);
+								VectorColor.red = (unsigned short)(floatVal*65535.0);
 							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), floatVal))
-								VectorColor.green = (short)(floatVal*65535.0);
+								VectorColor.green = (unsigned short)(floatVal*65535.0);
 							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), floatVal))
-								VectorColor.blue = (short)(floatVal*65535.0);
+								VectorColor.blue = (unsigned short)(floatVal*65535.0);
 							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_Pattern), longVal))
 								VectorPattern = longVal;
 							break;
@@ -521,11 +522,11 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 								int bondOrder = longVal - 1;
 								if ((bondOrder>=0)&&(bondOrder<kMaxBondTypes)) {
 									if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
-										BondColors[bondOrder].red = (short)(floatVal*65535.0);
+										BondColors[bondOrder].red = (unsigned short)(floatVal*65535.0);
 									if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), floatVal))
-										BondColors[bondOrder].green = (short)(floatVal*65535.0);
+										BondColors[bondOrder].green = (unsigned short)(floatVal*65535.0);
 									if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), floatVal))
-										BondColors[bondOrder].blue = (short)(floatVal*65535.0);
+										BondColors[bondOrder].blue = (unsigned short)(floatVal*65535.0);
 									if (molchild->getAttributeValue(MMPPref_convert(MMPPref_Pattern), longVal))
 										BondPatterns[bondOrder] = longVal;
 								}
@@ -586,11 +587,11 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 							if (colorList->length() > 0) {
 								XMLElement * clr = colorList->item(0);
 								if (clr->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
-									AtomColors[atmNumber].red = (short)(floatVal*65535.0);
+									AtomColors[atmNumber].red = (unsigned short)(floatVal*65535.0);
 								if (clr->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), floatVal))
-									AtomColors[atmNumber].green = (short)(floatVal*65535.0);
+									AtomColors[atmNumber].green = (unsigned short)(floatVal*65535.0);
 								if (clr->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), floatVal))
-									AtomColors[atmNumber].blue = (short)(floatVal*65535.0);
+									AtomColors[atmNumber].blue = (unsigned short)(floatVal*65535.0);
 								if (clr->getAttributeValue(MMPPref_convert(MMPPref_Pattern), longVal))
 									AtomPatterns[atmNumber] = longVal;
 							}
@@ -638,11 +639,11 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 							break;
 					}
 					if (echild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
-						clr->red = (short)(floatVal*65535.0);
+						clr->red = (unsigned short)(floatVal*65535.0);
 					if (echild->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), floatVal))
-						clr->green = (short)(floatVal*65535.0);
+						clr->green = (unsigned short)(floatVal*65535.0);
 					if (echild->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), floatVal))
-						clr->blue = (short)(floatVal*65535.0);
+						clr->blue = (unsigned short)(floatVal*65535.0);
 				}
 				delete eChildren;
 				if (child->getAttributeValue(MMPPref_convert(MMPEnergyOpt_PlotTE), boolVal))
@@ -701,11 +702,11 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					MMPPref_convert(molchild->getName(), elName);
 					RGBColor temp;
 					if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
-						temp.red = (short)(floatVal*65535.0);
+						temp.red = (unsigned short)(floatVal*65535.0);
 					if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), floatVal))
-						temp.green = (short)(floatVal*65535.0);
+						temp.green = (unsigned short)(floatVal*65535.0);
 					if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), floatVal))
-						temp.blue = (short)(floatVal*65535.0);
+						temp.blue = (unsigned short)(floatVal*65535.0);
 					switch (elName) {
 						case MMPSurfWin_PosColor:
 							SurfaceOpts.SetPosColor(&temp);
