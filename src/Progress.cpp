@@ -36,9 +36,11 @@ bool Progress::UpdateProgress(float Percent) {
 	long ctime = timer.Time();
 		//This check is probably not really needed, but it keeps us from calling
 		//the update function (which call Yield) too frequently.
-	if (progDlg && (ctime > NextTime)) {
-		result = progDlg->Update(PercentDone, tempLabel);
-		NextTime = ctime + SleepTime;
+	if (progDlg) {
+		if (ctime > NextTime) {
+			result = progDlg->Update(PercentDone, tempLabel);
+			NextTime = ctime + SleepTime;
+		}
 	} else if (RunTime<ctime) {
 		progDlg = new wxProgressDialog(wxT("progress"), tempLabel, 100, NULL, 
 									   wxPD_APP_MODAL | wxPD_CAN_ABORT);
