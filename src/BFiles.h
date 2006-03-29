@@ -31,12 +31,12 @@ typedef enum TextFileType {
 	CMLFile
 } TextFileType;
 
-long FindKeyWord(const char *buffer, char keyword[], long numbyte);
-long ReadStringKeyword(const char * Line, char * Keyword, char * Value);
-long ReadLongKeyword(const char * Line, char * Keyword, long * Value);
-long ReadFloatKeyword(const char * Line, char * Keyword, float * Value);
-long ReadBooleanKeyword(const char * Line, char * Keyword, bool * Value);
-long LocateForValue(const char * Line, char * KeyWord);
+long FindKeyWord(const char *buffer, const char keyword[], long numbyte);
+long ReadStringKeyword(const char * Line, const char * Keyword, char * Value);
+long ReadLongKeyword(const char * Line, const char * Keyword, long * Value);
+long ReadFloatKeyword(const char * Line, const char * Keyword, float * Value);
+long ReadBooleanKeyword(const char * Line, const char * Keyword, bool * Value);
+long LocateForValue(const char * Line, const char * KeyWord);
 
 class BufferFile {
 	private:
@@ -93,7 +93,7 @@ class BufferFile {
 			//Search the file for the specified keyword until found, EOF, or the limit is reached
 			//Returns true or false, the file position upon exit will be the start of the keyword,
 			//or the starting position if the keyword is not found.
-		bool LocateKeyWord(char Keyword[], long NumByte, long Limit);
+		bool LocateKeyWord(const char Keyword[], long NumByte, long Limit);
 		long FindBlankLine(void);
 		long GetNumLines(long size);
  		long BufferSkip(long NumBytes);

@@ -23,44 +23,52 @@
 
 extern WinPrefs *	gPreferences;
 
-long FindKeyWord(const char *buffer, char keyword[], long numbyte) {
+long FindKeyWord(const char *buffer, const char keyin[], long numbyte) {
 	long	check;
 	
+	char * keyword = new char[numbyte+1];
+	strncpy(keyword, keyin, numbyte);
+	keyword[numbyte] = '\0';
 	for (check=0; check<numbyte; check++) 				/* Make sure the keyword is uppercase */
 		if ((keyword[check]>96) && (keyword[check]<123)) keyword[check] -= 32;
 	long	pos=0;
+	long result = -1;
 	while (buffer[pos]) {
 		check = 0;
 		while (((buffer[pos+check] == keyword[check])||(buffer[pos+check]-32 == keyword[check]))&&
 			(check < numbyte)) check++;
-		if (check == numbyte) return pos;
+		if (check == numbyte) {
+			result = pos;
+			break;
+		}
 		pos++;
 	}
-	return -1;
+	delete [] keyword;
+	return result;
 } /* FindKeyword */
 
-long ReadStringKeyword(const char * Line, char * Keyword, char * Value) {
+long ReadStringKeyword(const char * Line, const char * Keyword, char * Value) {
 	long Pos = LocateForValue(Line, Keyword);
 	if (Pos > -1) {
 		Pos = sscanf(&(Line[Pos]), "%s", Value);
 	}
 	return (Pos == 1);
 }
-long ReadLongKeyword(const char * Line, char * Keyword, long * Value) {
+long ReadLongKeyword(const char * Line, const char * Keyword, long * Value) {
 	long Pos = LocateForValue(Line, Keyword);
 	if (Pos > -1) {
 		Pos = sscanf(&(Line[Pos]), "%ld", Value);
 	}
 	return (Pos == 1);
 }
-long ReadFloatKeyword(const char * Line, char * Keyword, float * Value) {
+long ReadFloatKeyword(const char * Line, const char * Keyword, float * Value) {
 	long Pos = LocateForValue(Line, Keyword);
 	if (Pos > -1) {
 		Pos = sscanf(&(Line[Pos]), "%f", Value);
 	}
 	return (Pos == 1);
 }
-long ReadBooleanKeyword(const char * Line, char * Keyword, bool * Value) {
+long ReadBooleanKeyword(const char * Line, const char * Keyword, bool * Value) {
 	long Pos = LocateForValue(Line, Keyword);
 	if (Pos > -1) {
 			char token[kMaxLineLength];
@@ -74,7 +82,7 @@ long ReadBooleanKeyword(const char * Line, char * Keyword, bool * Value) {
 }
 //This routine should find a keyword on the provided line (if it is there) and
 //return the position just after the '=' sign. 
-long LocateForValue(const char * Line, char * KeyWord) {
+long LocateForValue(const char * Line, const char * KeyWord) {
 	long Pos, Length;
 	Length = strlen(KeyWord);
 	Pos = FindKeyWord(Line, KeyWord, Length);
@@ -487,7 +495,7 @@ long BufferFile::FindBlankLine(void) {
 //Search the file for the specified keyword until found, EOF, or the limit is reached
 //Returns true or false, the file position upon exit will be the start of the keyword,
 //or the starting position if the keyword is not found.
-bool BufferFile::LocateKeyWord(char Keyword[], long NumByte, long Limit) {
+bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, long Limit) {
 	long OldPosition = GetFilePos();
 	char	LineText[kMaxLineLength + 1];
 	bool	KeyWordFound=false;
