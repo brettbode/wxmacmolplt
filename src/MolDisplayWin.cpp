@@ -153,8 +153,8 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->AppendSeparator();
     menuEdit->Append(wxID_PREFERENCES, wxT("Pr&eferences ..."));
 
-    menuView->Append(MMP_SHOWMODE, wxT("&Show Normal Mode"));
-    menuView->Append(MMP_SHOWAXIS, wxT("&Show Axis"));
+    menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode"));
+    menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show &Axis"));
     menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl+-"));
     menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl+="));
     menuView->Append(MMP_CENTER, wxT("&Center View"));
