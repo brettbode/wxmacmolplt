@@ -170,24 +170,25 @@ void MpGLCanvas::eventSize(wxSizeEvent &event) {
 void MpGLCanvas::eventPaint(wxPaintEvent &event) {
     wxPaintDC paintDC(this);
 
+	draw();
+}
+void MpGLCanvas::draw(void) {
     if(!GetContext()) {
         return;
     }
-
     SetCurrent();
 	if (!initialized) {
 		initGL();
 		UpdateGLView();
 	}
-		//Only do the drawing if there is not an operation in progress
-		//otherwise the underlying data may not be complete.
+	//Only do the drawing if there is not an operation in progress
+	//otherwise the underlying data may not be complete.
 	if (!MolWin->OperInProgress()) MolWin->DrawGL();
 	else
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear out the buffer
-
+	
     SwapBuffers();
 }
-
 void MpGLCanvas::eventErase(wxEraseEvent &event) {
     // Don't mess with this.  It's supposed to be empty.
     // This avoids flashing on Windows.

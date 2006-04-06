@@ -13,10 +13,23 @@
 #include "Globals.h"
 #include "main.h"
 #include "Prefs.h"
+#include <wx/cmdline.h>
+#include <wx/filename.h>
 
 //The global preferences settings
     WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
 
+static const wxCmdLineEntryDesc g_cmdLineDesc[] = 
+{ 
+{ wxCMD_LINE_SWITCH, wxT("h"), wxT("help"),    wxT("displays help on "
+												   "the command line parameters") }, 
+{ wxCMD_LINE_SWITCH, wxT("v"), wxT("version"), wxT("print version") }, 
+//{ wxCMD_LINE_OPTION, wxT("d"), wxT("debug"), wxT("specify a debug 
+//												 level") }, 
+{ wxCMD_LINE_PARAM,  NULL, NULL, wxT("input file"), 
+	wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL }, 
+{ wxCMD_LINE_NONE } 
+};
 
 bool MpApp::OnInit() {
     // TODO:  Handle command line arguments.  See wxApp documentation
@@ -44,7 +57,57 @@ bool MpApp::OnInit() {
         return false;
     }
 //	MessageAlert("App init running");
-
+// Parse command line 
+	wxString cmdFilename; 
+	wxCmdLineParser cmdParser(g_cmdLineDesc, argc, argv); 
+	int res; 
+	{ 
+		wxLogNull log; 
+		// Pass false to suppress auto Usage() message 
+		res = cmdParser.Parse(false); 
+	} 
+	// Check if the user asked for command-line help 
+	if (res == -1 || res > 0 || cmdParser.Found(wxT("h"))) 
+	{ 
+		cmdParser.Usage(); 
+		return false; 
+	} 
+	// Check if the user asked for the version 
+	if (cmdParser.Found(wxT("v"))) 
+	{ 
+#ifndef __WXMSW__ 
+		wxLog::SetActiveTarget(new wxLogStderr); 
+#endif 
+		wxString msg; 
+		wxString date(wxString::FromAscii(__DATE__)); 
+		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006 " 
+					   "Version %.2f, %s"), 7.0, (const wxChar*) date);
+		wxLogMessage(msg); 
+		return false; 
+	} 
+	// Check for debug level 
+//	long debugLevel = 0; 
+//	if (cmdParser.Found(wxT(ÒdÓ), & debugLevel)) 
+//	{        
+//	} 
+	// Check for a project filename 
+	if (cmdParser.GetParamCount() > 0) { 
+		cmdFilename = cmdParser.GetParam(0); 
+		// Under Windows when invoking via a document 
+		// in Explorer, we are passed the short form. 
+		// So normalize and make the long form. 
+		wxFileName fName(cmdFilename); 
+		fName.Normalize(wxPATH_NORM_LONG|wxPATH_NORM_DOTS| 
+						wxPATH_NORM_TILDE|wxPATH_NORM_ABSOLUTE); 
+		cmdFilename = fName.GetFullPath(); 
+		if (cmdFilename.length() > 0) {
+			MolDisplayWin * temp = new MolDisplayWin(cmdFilename);
+			MolWinList.push_back(temp);
+			long r = temp->OpenFile(cmdFilename);
+			if (r>0) temp->Show(true);
+		}
+	} 
+	
     // TODO:  Pass proper arguments to main frame object
 //	MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
 //	MolWinList.push_back(temp);
@@ -57,8 +120,10 @@ bool MpApp::OnInit() {
 	menuHolder = new macMenuWinPlaceholder(wxT("offscreen"), p, s);
 	SetExitOnFrameDelete(false);
 #else
-	MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
-	MolWinList.push_back(temp);
+	if (MolWinList.lenth()<=0){
+		MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
+		MolWinList.push_back(temp);
+	}
 	SetExitOnFrameDelete(true);
 #endif
 
@@ -110,7 +175,10 @@ void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {
 	//Display a simple modal about box
 	wxMessageBox(wxT("Welcome to MacMolPlt"), wxT(""));
 }
-
+void MpApp::menuPreferences(wxCommandEvent & WXUNUSED(event)) {
+	//Default application preferences
+#warning Open default preferences dialog here once implemented
+}
 void MpApp::menuFileNew(wxCommandEvent &event) {
 	MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
 	MolWinList.push_back(temp);
@@ -127,6 +195,16 @@ void MpApp::menuFileOpen(wxCommandEvent &event) {
 		if (r>0) temp->Show(true);
 	}
 }
+#ifdef __WXMAC__
+void MpApp::MacOpenFile(const wxString & filename) {
+	if (filename.length() > 0) {
+		MolDisplayWin * temp = new MolDisplayWin(filename);
+		MolWinList.push_back(temp);
+		long r = temp->OpenFile(filename);
+		if (r>0) temp->Show(true);
+	}
+}
+#endif
 
 void MessageAlert(const char * message) {
 //wxLogMessage throws up a simple dialog alert and gives the user the option

@@ -21,8 +21,26 @@
 
 extern WinPrefs * gPreferences;
 
+//I think these are only needed in this file.
+//They are custom ids used to tie the event table to the menus
+enum MMP_EventID {
+	MMP_SHRINK10=wxID_HIGHEST+1,
+	MMP_ENLARGE10,
+	MMP_SHOWMODE,
+	MMP_SHOWAXIS,
+	MMP_CENTER,
+	MMP_CONVERTTOBOHR,
+	MMP_CONVERTTOANGSTROMS,
+	MMP_INVERTNORMALMODE,
+	
+	Number_MMP_Ids
+};
+
 BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
-    EVT_MENU (wxID_SAVE,			MolDisplayWin::menuFileSave)
+#ifndef __WXMAC__
+	EVT_MENU (wxID_OPEN,			MolDisplayWin::menuFileOpen)
+#endif
+	EVT_MENU (wxID_SAVE,			MolDisplayWin::menuFileSave)
     EVT_MENU (wxID_SAVEAS,			MolDisplayWin::menuFileSave_as)
 	EVT_MENU (wxID_CLOSE,			MolDisplayWin::menuFileClose)
 	EVT_CLOSE(						MolDisplayWin::FileClose)
@@ -37,6 +55,15 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (wxID_CLEAR,			MolDisplayWin::menuEditClear)
     EVT_MENU (wxID_SELECTALL,		MolDisplayWin::menuEditSelect_all)
 
+	EVT_MENU (MMP_SHOWMODE,			MolDisplayWin::menuViewShowNormalMode)
+	EVT_MENU (MMP_SHOWAXIS,			MolDisplayWin::menuViewShowAxis)
+	EVT_MENU (MMP_SHRINK10,			MolDisplayWin::menuViewShrink_10)
+	EVT_MENU (MMP_ENLARGE10,		MolDisplayWin::menuViewEnlarge_10)
+	EVT_MENU (MMP_CENTER,			MolDisplayWin::menuViewCenter)
+
+	EVT_MENU (MMP_CONVERTTOBOHR,	MolDisplayWin::menuMoleculeConvertToBohr)
+	EVT_MENU (MMP_CONVERTTOANGSTROMS,	MolDisplayWin::menuMoleculeConvertToAngstroms)
+	EVT_MENU (MMP_INVERTNORMALMODE,	MolDisplayWin::menuMoleculeInvertNormalMode)
 END_EVENT_TABLE()
 
 MolDisplayWin::MolDisplayWin(const wxString &title,
@@ -123,11 +150,19 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
     menuEdit->AppendSeparator();
     menuEdit->Append(wxID_SELECTALL, wxT("&Select all\tCtrl+A"));
-    // TODO:  Potentially make Mac display Preferences menu item elsewhere
-    //menuEdit->AppendSeparator();
-    //menuEdit->Append(, wxT("Default Pr&eferences ..."));
+    menuEdit->AppendSeparator();
+    menuEdit->Append(wxID_PREFERENCES, wxT("Pr&eferences ..."));
 
-    // TODO:  Create menu items for remaining menus
+    menuView->Append(MMP_SHOWMODE, wxT("&Show Normal Mode"));
+    menuView->Append(MMP_SHOWAXIS, wxT("&Show Axis"));
+    menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl+-"));
+    menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl+="));
+    menuView->Append(MMP_CENTER, wxT("&Center View"));
+
+	menuMolecule->Append(MMP_CONVERTTOBOHR, wxT("Convert to &Bohr"));
+    menuMolecule->Append(MMP_CONVERTTOANGSTROMS, wxT("Convert to &Angstroms"));
+    menuMolecule->Append(MMP_INVERTNORMALMODE, wxT("&Invert Normal Mode"));
+// TODO:  Create menu items for remaining menus
 
     // TODO:  Make Mac handle help menu properly
     // TODO:  Make Mac display About menu item in the correct place
@@ -146,6 +181,23 @@ void MolDisplayWin::createMenuBar(void) {
 /* File menu */
 void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
 	//Its possible we could handle this here if the current data is empty?
+	//On the Mac Open always opens a new window
+#ifndef __WXMAC__
+	if (!dirty && (MainData->NumFrames == 1) && (MainData->MaxAtoms == 0)) {
+		//First need to use an open file dialog
+		wxString filename = wxFileSelector(wxT("Choose a file to open"));
+		//If the user chooses a file, create a window and have it process it.
+		if (filename.length() > 0) {
+	//		MolDisplayWin * temp = new MolDisplayWin(filename);
+	//		MolWinList.push_back(temp);
+			//Ok we have a problem. Abort open can't close the last window!
+			long r = OpenFile(filename);
+	//		if (r>0) temp->Show(true);
+		}
+	} else
+#endif
+		//otherwise just skip the event to pass it up the chain to the app handler
+		event.Skip();
 }
 
 void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
@@ -291,6 +343,46 @@ void MolDisplayWin::menuEditClear(wxCommandEvent &event) {
 
 void MolDisplayWin::menuEditSelect_all(wxCommandEvent &event) {
 }
+void MolDisplayWin::menuViewShowNormalMode(wxCommandEvent &event) {
+	MainData->SetDrawMode(1-MainData->GetDrawMode());
+	ResetModel(false);
+	Dirty = true;
+}
+void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
+	MainData->CenterModelWindow();
+	ResetModel(false);
+	Dirty = true;
+}
+void MolDisplayWin::menuViewShowAxis(wxCommandEvent &event) {
+	MainData->SetShowAxis(1-MainData->ShowAxis());
+	UpdateModelDisplay();
+	Dirty = true;
+}
+void MolDisplayWin::menuViewShrink_10(wxCommandEvent &event) {
+	MainData->WindowSize *= 1.1;
+	ResetView();
+	Dirty = true;
+}
+void MolDisplayWin::menuViewEnlarge_10(wxCommandEvent &event) {
+	MainData->WindowSize *= 0.9;
+	ResetView();
+	Dirty = true;
+}
+void MolDisplayWin::menuMoleculeConvertToBohr(wxCommandEvent &event) {
+	MainData->UnitConversion(0);
+	ResetAllWindows();
+	Dirty = true;
+}
+void MolDisplayWin::menuMoleculeConvertToAngstroms(wxCommandEvent &event) {
+	MainData->UnitConversion(1);
+	ResetAllWindows();
+	Dirty = true;
+}
+void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
+	MainData->InvertMode();
+	ResetModel(false);
+	Dirty = true;
+}
 
 void MolDisplayWin::BondsChanged(void) {
 #warning Need to pass event to bonds list here
@@ -311,8 +403,8 @@ void MolDisplayWin::FrameChanged(void) {
 void MolDisplayWin::UpdateModelDisplay(void) {
 #warning Activate the lines below when the functions are added
 	//	DrawFrame();
-	//	UpdateGLModel();
-	//	draw();
+	UpdateGLModel();
+	glCanvas->draw();
 }
 void MolDisplayWin::ResetView(void) {
 	//Check for and update any surfaces depending on the screen plane
@@ -321,8 +413,8 @@ void MolDisplayWin::ResetView(void) {
 		lSurface->RotateEvent(MainData);
 		lSurface = lSurface->GetNextSurface();
 	}
-//	UpdateGLView();
-//	draw();
+	glCanvas->UpdateGLView();
+	glCanvas->draw();
 }
 void MolDisplayWin::ResetModel(bool Center) {
 	if (Center) {
@@ -336,11 +428,19 @@ void MolDisplayWin::ResetModel(bool Center) {
 		lSurface->RotateEvent(MainData);
 		lSurface = lSurface->GetNextSurface();
 	}
-//	UpdateGLModel();
+	UpdateGLModel();
 	// Reset the frame scroll bar
 //	::SetControlMaximum(FrameScroll, MainData->NumFrames);
 //	::SetControlValue(FrameScroll, MainData->CurrentFrame);
-//	draw();
+	glCanvas->draw();
+}
+void MolDisplayWin::ResetAllWindows(void) {
+	glCanvas->UpdateGLView();
+	ResetModel(false);
+	//update the frame info.
+	
+	//force updates for all the child windows
+	
 }
 void MolDisplayWin::BeginOperation(void) {
 	ProgressInd = new Progress;
@@ -355,8 +455,24 @@ void MolDisplayWin::FinishOperation(void) {
 	OperationInProgress = false;
 }
 void MolDisplayWin::AbortOpen(const char * msg) {
-	
-	if (this) Close(true);
+	//On non-Mac systems we don't close the last window, instead
+	//reinitialize the window data and leave open
+#ifndef __WXMAC__
+	if (app.WindowCount() <= 1) {	
+		//This is the last window! Clear it out, but leave it open
+		delete MainData;
+		MainData = new MoleculeData;
+		delete Prefs;
+		Prefs = new WinPrefs;
+		*Prefs = *gPreferences;
+		Dirty = false;
+		SetTitle(wxT("Untitled"));
+		SetName(wxT("Untitled"));
+	} else
+#endif
+	{
+		if (this) Close(true);
+	}
 	
 	if (msg != NULL) MessageAlert(msg);
 } /* AbortOpen */

@@ -31,15 +31,15 @@ typedef class OpenGLRec OpenGLRec;
  */
 class MolDisplayWin : public wxFrame {
     private:
-        wxMenuBar *menuBar;
-        wxMenu    *menuFile;
-        wxMenu    *menuEdit;
-        wxMenu    *menuView;
-          wxMenu    *menuViewDisplay_frequency;
-          wxMenu    *menuViewRotate;
-        wxMenu    *menuMolecule;
-        wxMenu    *menuWindow;
-        wxMenu    *menuHelp;
+		wxMenuBar *menuBar;
+		wxMenu    *menuFile;
+		wxMenu    *menuEdit;
+		wxMenu    *menuView;
+		wxMenu    *menuViewDisplay_frequency;
+		wxMenu    *menuViewRotate;
+		wxMenu    *menuMolecule;
+		wxMenu    *menuWindow;
+		wxMenu    *menuHelp;
 
         MoleculeData *	MainData;
 		WinPrefs 	*	Prefs;
@@ -79,7 +79,7 @@ class MolDisplayWin : public wxFrame {
         // Below are the event handler functions for the menu.  The initial
         // list was taken from the original MacMolPlt menus.
 
-        void menuFileNew(wxCommandEvent &event);
+   //     void menuFileNew(wxCommandEvent &event);
         void menuFileOpen(wxCommandEvent &event);
         void menuFileSave(wxCommandEvent &event);
         void menuFileSave_as(wxCommandEvent &event);
@@ -102,9 +102,8 @@ class MolDisplayWin : public wxFrame {
 		void PasteText(void);
         void menuEditClear(wxCommandEvent &event);
         void menuEditSelect_all(wxCommandEvent &event);
-        //void menuEditDefault_preferences(wxCommandEvent &event);
 
-        //void menuViewShow_normal_mode(wxCommandEvent &event);
+        void menuViewShowNormalMode(wxCommandEvent &event);
           // void menuViewDisplay_frequencyDOSTUFF(wxCommandEvent &event);
         //void menuViewOffset_along_mode(wxCommandEvent &event);
         //void menuViewAnimate_mode(wxCommandEvent &event);
@@ -113,9 +112,10 @@ class MolDisplayWin : public wxFrame {
         //void menuVeiwShow_hydrogen_labels(wxCommandEvent &event);
         //void menuViewShow_atom_labels(wxCommandEvent &event);
         //void menuViewShow_atom_numbers(wxCommandEvent &event);
-        //void menuViewShow_axis(wxCommandEvent &event);
-        //void menuViewShrink_10(wxCommandEvent &event);
-        //void menuViewEnlarge_10(wxCommandEvent &event);
+		void menuViewShowAxis(wxCommandEvent &event);
+		void menuViewShrink_10(wxCommandEvent &event);
+		void menuViewEnlarge_10(wxCommandEvent &event);
+		void menuViewCenter(wxCommandEvent &event);
         //void menuViewCenter_molecule(wxCommandEvent &event);
           //void menuViewRotateTo_x_axis(wxCommandEvent &event);
           //void menuViewRotateTo_y_axis(wxCommandEvent &event);
@@ -132,9 +132,9 @@ class MolDisplayWin : public wxFrame {
         //void menuMoleculeSet_frame_energy(wxCommandEvent &event);
         //void menuMoleculeCreate_llm_path(wxCommandEvent &event);
         //void menuMoleculeMinimize_frame_movements(wxCommandEvent &event);
-        //void menuMoleculeConvert_to_bohrs(wxCommandEvent &event);
-        //void menuMoleculeConvert_to_angstroms(wxCommandEvent &event);
-        //void menuMoleculeInvert_normal_mode(wxCommandEvent &event);
+        void menuMoleculeConvertToBohr(wxCommandEvent &event);
+        void menuMoleculeConvertToAngstroms(wxCommandEvent &event);
+        void menuMoleculeInvertNormalMode(wxCommandEvent &event);
         
         //void menuWindow_Zmat_calculator(wxCommandEvent &event);
         /* On Mac, these will be part of dynamically created sub-menus for each
@@ -171,6 +171,7 @@ class MolDisplayWin : public wxFrame {
 		void UpdateModelDisplay(void);
 		void ResetView(void);
 		void ResetModel(bool Center);
+		void ResetAllWindows(void);
 		void BeginOperation(void);
 		void FinishOperation(void);
 		bool OperInProgress(void) const {return OperationInProgress;};

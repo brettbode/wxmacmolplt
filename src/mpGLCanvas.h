@@ -81,10 +81,11 @@ class MpGLCanvas : public wxGLCanvas {
         void setPrefs(WinPrefs *newPrefs);
 
         /**
-		 * Updates GL parameters for changes in the window shap or
+		 * Updates GL parameters for changes in the window shape or
 		 * for changes in the lighting and background color.
          */
         void UpdateGLView(void);
+		void draw(void);
 		
 		/**
          * Creates an image of the canvas for purposes such as printing or

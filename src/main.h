@@ -118,6 +118,15 @@ class MpApp : public wxApp {
 		void menuHelpAbout(wxCommandEvent &event);
         void menuFileNew(wxCommandEvent &event);
         void menuFileOpen(wxCommandEvent &event);
+		void menuPreferences(wxCommandEvent &event);
+#ifdef __WXMAC__
+		/**
+		 * Event sent on Macs when double click a document
+		 *
+		 * @param the filename to open
+		 */
+		void MacOpenFile(const wxString & fileName);
+#endif
 };
 
 DECLARE_APP(MpApp)
