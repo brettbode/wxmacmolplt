@@ -183,7 +183,7 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
 	//Its possible we could handle this here if the current data is empty?
 	//On the Mac Open always opens a new window
 #ifndef __WXMAC__
-	if (!dirty && (MainData->NumFrames == 1) && (MainData->MaxAtoms == 0)) {
+	if (!Dirty && (MainData->NumFrames == 1) && (MainData->MaxAtoms == 0)) {
 		//First need to use an open file dialog
 		wxString filename = wxFileSelector(wxT("Choose a file to open"));
 		//If the user chooses a file, create a window and have it process it.
@@ -458,6 +458,7 @@ void MolDisplayWin::AbortOpen(const char * msg) {
 	//On non-Mac systems we don't close the last window, instead
 	//reinitialize the window data and leave open
 #ifndef __WXMAC__
+	MpApp & app = wxGetApp();
 	if (app.WindowCount() <= 1) {	
 		//This is the last window! Clear it out, but leave it open
 		delete MainData;
