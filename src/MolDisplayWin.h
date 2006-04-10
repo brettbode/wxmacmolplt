@@ -116,17 +116,15 @@ class MolDisplayWin : public wxFrame {
 		void menuViewShrink_10(wxCommandEvent &event);
 		void menuViewEnlarge_10(wxCommandEvent &event);
 		void menuViewCenter(wxCommandEvent &event);
-        //void menuViewCenter_molecule(wxCommandEvent &event);
-          //void menuViewRotateTo_x_axis(wxCommandEvent &event);
-          //void menuViewRotateTo_y_axis(wxCommandEvent &event);
-          //void menuViewRotateTo_z_axis(wxCommandEvent &event);
-          //void menuViewRotate180_horizontal(wxCommandEvent &event);
-          //void menuViewRotate180_vertical(wxCommandEvent &event);
-          //void menuViewRotatePrinciple_orientation(wxCommandEvent &event);
-          //void menuViewRotateOther(wxCommandEvent &event);
+		void menuViewRotateTo_X_axis(wxCommandEvent &event);
+		void menuViewRotateTo_Y_axis(wxCommandEvent &event);
+		void menuViewRotateTo_Z_axis(wxCommandEvent &event);
+		void menuViewRotate180_horizontal(wxCommandEvent &event);
+		void menuViewRotate180_vertical(wxCommandEvent &event);
+		void menuViewRotatePrinciple_orientation(wxCommandEvent &event);
+		void menuViewRotateOther(wxCommandEvent &event);
         //void menuViewSet_window_parameters(wxCommandEvent &event);
         //void menuViewStereo(wxCommandEvent &event);
-        //void menuViewUse_opengl(wxCommandEvent &event);
         
         //void menuMoleculeSet_bond_length(wxCommandEvent &event);
         //void menuMoleculeSet_frame_energy(wxCommandEvent &event);

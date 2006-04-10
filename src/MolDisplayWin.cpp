@@ -18,6 +18,7 @@
 #include "Frame.h"
 #include "Math3D.h"
 #include "myFiles.h"
+//#include "ScreenPlaneDlg.h"
 
 extern WinPrefs * gPreferences;
 
@@ -29,6 +30,14 @@ enum MMP_EventID {
 	MMP_SHOWMODE,
 	MMP_SHOWAXIS,
 	MMP_CENTER,
+	MMP_ROTATESUBMENU,
+	MMP_ROTATETOXAXIS,
+	MMP_ROTATETOYAXIS,
+	MMP_ROTATETOZAXIS,
+	MMP_ROTATE180HOR,
+	MMP_ROTATE180VER,
+	MMP_ROTATEPRINC,
+	MMP_ROTATEOTHER,
 	MMP_CONVERTTOBOHR,
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
@@ -60,6 +69,13 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_SHRINK10,			MolDisplayWin::menuViewShrink_10)
 	EVT_MENU (MMP_ENLARGE10,		MolDisplayWin::menuViewEnlarge_10)
 	EVT_MENU (MMP_CENTER,			MolDisplayWin::menuViewCenter)
+	EVT_MENU (MMP_ROTATETOXAXIS,	MolDisplayWin::menuViewRotateTo_X_axis)
+	EVT_MENU (MMP_ROTATETOYAXIS,	MolDisplayWin::menuViewRotateTo_Y_axis)
+	EVT_MENU (MMP_ROTATETOZAXIS,	MolDisplayWin::menuViewRotateTo_Z_axis)
+	EVT_MENU (MMP_ROTATE180HOR,		MolDisplayWin::menuViewRotate180_horizontal)
+	EVT_MENU (MMP_ROTATE180VER,		MolDisplayWin::menuViewRotate180_vertical)
+	EVT_MENU (MMP_ROTATEPRINC,		MolDisplayWin::menuViewRotatePrinciple_orientation)
+	EVT_MENU (MMP_ROTATEOTHER,		MolDisplayWin::menuViewRotateOther)
 
 	EVT_MENU (MMP_CONVERTTOBOHR,	MolDisplayWin::menuMoleculeConvertToBohr)
 	EVT_MENU (MMP_CONVERTTOANGSTROMS,	MolDisplayWin::menuMoleculeConvertToAngstroms)
@@ -158,6 +174,17 @@ void MolDisplayWin::createMenuBar(void) {
     menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl+-"));
     menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl+="));
     menuView->Append(MMP_CENTER, wxT("&Center View"));
+	
+	menuViewRotate = new wxMenu;
+    menuView->Append(MMP_ROTATESUBMENU, wxT("&Rotate ..."), menuViewRotate);
+
+	menuViewRotate->Append(MMP_ROTATETOXAXIS, wxT("to &X-axis"));
+	menuViewRotate->Append(MMP_ROTATETOYAXIS, wxT("to &Y-axis"));
+	menuViewRotate->Append(MMP_ROTATETOZAXIS, wxT("to &Z-axis"));
+	menuViewRotate->Append(MMP_ROTATE180HOR, wxT("180¡ &Horizontal"));
+	menuViewRotate->Append(MMP_ROTATE180VER, wxT("180¡ &Vertical"));
+	menuViewRotate->Append(MMP_ROTATEPRINC, wxT("to &Principle Orientation"));
+	menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
 
 	menuMolecule->Append(MMP_CONVERTTOBOHR, wxT("Convert to &Bohr"));
     menuMolecule->Append(MMP_CONVERTTOANGSTROMS, wxT("Convert to &Angstroms"));
@@ -367,6 +394,50 @@ void MolDisplayWin::menuViewEnlarge_10(wxCommandEvent &event) {
 	MainData->WindowSize *= 0.9;
 	ResetView();
 	Dirty = true;
+}
+void MolDisplayWin::menuViewRotateTo_X_axis(wxCommandEvent &event) {
+	MainData->TotalRotation[0][2] = MainData->TotalRotation[1][1] = 1.0;
+	MainData->TotalRotation[2][0] = -1.0;
+	MainData->TotalRotation[0][0] = MainData->TotalRotation[2][2] =
+		MainData->TotalRotation[1][0] = MainData->TotalRotation[0][1] =
+		MainData->TotalRotation[1][2] = MainData->TotalRotation[2][1] = 0.0;
+	MainData->ResetRotation();
+	ResetView();
+	Dirty = true;
+}
+void MolDisplayWin::menuViewRotateTo_Y_axis(wxCommandEvent &event) {
+	MainData->TotalRotation[0][0] = MainData->TotalRotation[1][2] = 1.0;
+	MainData->TotalRotation[2][1] = -1.0;
+	MainData->TotalRotation[1][1] = MainData->TotalRotation[2][2] =
+		MainData->TotalRotation[0][1] = MainData->TotalRotation[0][2] =
+		MainData->TotalRotation[1][0] = MainData->TotalRotation[2][0] = 0.0;
+	MainData->ResetRotation();
+	ResetView();
+	Dirty = true;
+}
+void MolDisplayWin::menuViewRotateTo_Z_axis(wxCommandEvent &event) {
+	InitRotationMatrix(MainData->TotalRotation);
+	MainData->ResetRotation();
+	ResetView();
+	Dirty = true;
+}
+void MolDisplayWin::menuViewRotate180_horizontal(wxCommandEvent &event) {
+	MainData->FlipRotation(0);
+	MainData->ResetRotation();
+	ResetView();
+	Dirty = true;
+}
+void MolDisplayWin::menuViewRotate180_vertical(wxCommandEvent &event) {
+	MainData->FlipRotation(1);
+	MainData->ResetRotation();
+	ResetView();
+	Dirty = true;
+}
+void MolDisplayWin::menuViewRotatePrinciple_orientation(wxCommandEvent &event) {
+	MessageAlert("Sure would be nice if this was implemented...");
+}
+void MolDisplayWin::menuViewRotateOther(wxCommandEvent &event) {
+//	new ScreenPlaneDlg(this);
 }
 void MolDisplayWin::menuMoleculeConvertToBohr(wxCommandEvent &event) {
 	MainData->UnitConversion(0);
