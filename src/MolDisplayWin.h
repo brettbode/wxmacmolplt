@@ -182,6 +182,7 @@ class MolDisplayWin : public wxFrame {
 		void DrawMoleculeCoreGL(void);
 		void AddAxisGL(void);
 		void UpdateGLModel(void);
+		void Rotate(wxMouseEvent& event);
 };
 
 #endif /* #ifndef MolDisplayWin_H */

@@ -181,8 +181,8 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewRotate->Append(MMP_ROTATETOXAXIS, wxT("to &X-axis"));
 	menuViewRotate->Append(MMP_ROTATETOYAXIS, wxT("to &Y-axis"));
 	menuViewRotate->Append(MMP_ROTATETOZAXIS, wxT("to &Z-axis"));
-	menuViewRotate->Append(MMP_ROTATE180HOR, wxT("180¡ &Horizontal"));
-	menuViewRotate->Append(MMP_ROTATE180VER, wxT("180¡ &Vertical"));
+	menuViewRotate->Append(MMP_ROTATE180HOR, wxT("180 degrees &Horizontal"));
+	menuViewRotate->Append(MMP_ROTATE180VER, wxT("180 degrees &Vertical"));
 	menuViewRotate->Append(MMP_ROTATEPRINC, wxT("to &Principle Orientation"));
 	menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
 
@@ -671,3 +671,169 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
 	return test;
 }
 
+void MolDisplayWin::Rotate(wxMouseEvent& event) {
+#ifdef BROKEN
+	short		dx, dy, pixelDepth=0;
+	int		iatm;
+	Matrix4D	rotationMatrix, tempcopyMatrix;
+	Surface * lSurface;
+	bool	UpdateSurface=false;
+	/* For now, the sphere and text stuff has been cut to simplify the
+	 * function.  When it's working, they will be added back in.
+	 */
+	lSurface = MainData->cFrame->SurfaceList;
+	while (lSurface) {
+		UpdateSurface = UpdateSurface || lSurface->NeedsUpdateDuringRotation();
+		lSurface = lSurface->GetNextSurface();
+	}
+
+	/* dx,dy are now measured from the origin (click point) to the current
+	 * location
+	 */
+	dx = event.GetX();
+	dy = event.GetY();
+	if (event.ControlDown()) {	//Control key: translate instead of rotate
+#if 0
+		CPoint3D offset;
+		if (event.ShiftDown()) {	/*The shift key is down so move into/out of the screen*/
+			offset.z = dy/(hsize/MainData->WindowSize);
+			MainData->TotalRotation[3][2] += offset.z;
+		} else {
+			offset.x = dx/(hsize/MainData->WindowSize);
+			offset.y = dy/(hsize/MainData->WindowSize);
+			MainData->TotalRotation[3][0] += offset.x;
+			MainData->TotalRotation[3][1] -= offset.y;
+		}
+		if (!winData.is3DModeActive()) {
+			/* Now rotate the coordinates by multiplying by the matrix */
+			for (iatm=0; iatm<(MainData->cFrame->NumAtoms); iatm++) 
+				Rotate3DPt(MainData->TotalRotation, MainData->cFrame->Atoms[iatm].Position,
+						&(MainData->RotCoords[iatm]));	
+
+			SortzBuffer(MainData->RotCoords, MainData->zBuffer, MainData->cFrame->NumAtoms);
+		}
+#endif
+	} else {
+		if (event.ShiftDown()) {	/*The shift key is down so zoom instead of rotating*/
+			//if (dy == 0) continue;
+			if (dy > 99) dy = 99;
+			MainData->WindowSize *= 1.0 + 0.01*dy;
+		} else {
+			CPoint3D	InitialTrans, FinalTrans;
+			//First back rotate the translation to get the inital translation
+			InitialTrans.x = ((MainData->TotalRotation[3][0])*MainData->TotalRotation[0][0] +
+					( MainData->TotalRotation[3][1])*MainData->TotalRotation[0][1] +
+					( MainData->TotalRotation[3][2])*MainData->TotalRotation[0][2]);
+			InitialTrans.y = ((MainData->TotalRotation[3][0])*MainData->TotalRotation[1][0] +
+					( MainData->TotalRotation[3][1])*MainData->TotalRotation[1][1] +
+					( MainData->TotalRotation[3][2])*MainData->TotalRotation[1][2]);
+			InitialTrans.z = ((MainData->TotalRotation[3][0])*MainData->TotalRotation[2][0] +
+					( MainData->TotalRotation[3][1])*MainData->TotalRotation[2][1] +
+					( MainData->TotalRotation[3][2])*MainData->TotalRotation[2][2]);
+			//Now zero out the translation part of the matrix
+			MainData->TotalRotation[3][0] = MainData->TotalRotation[3][1] =
+				MainData->TotalRotation[3][2] = 0.0;
+			/* Concatenate the new rotation with the current rotation */
+			MultiplyMatrix (rotationMatrix, MainData->TotalRotation, tempcopyMatrix);
+			CopyMatrix (tempcopyMatrix, MainData->TotalRotation);
+			//Now rotate the translation to the new orientation
+			Rotate3DPt(MainData->TotalRotation, InitialTrans, &FinalTrans);
+			MainData->TotalRotation[3][0] = FinalTrans.x;
+			MainData->TotalRotation[3][1] = FinalTrans.y;
+			MainData->TotalRotation[3][2] = FinalTrans.z;
+
+#if 0
+			if (!winData.is3DModeActive()) {
+				/* Now rotate the coordinates by multiplying by the matrix */
+				for (iatm=0; iatm<(MainData->cFrame->NumAtoms); iatm++) 
+					Rotate3DPt(MainData->TotalRotation, MainData->cFrame->Atoms[iatm].Position,
+							&(MainData->RotCoords[iatm]));	
+
+				SortzBuffer(MainData->RotCoords, MainData->zBuffer, MainData->cFrame->NumAtoms);
+			}
+#endif
+		}
+	}	//Update any surfaces which depend on the screen plane
+	if (UpdateSurface) {
+		lSurface = MainData->cFrame->SurfaceList;
+		while (lSurface) {
+			lSurface->RotateEvent(MainData);
+			lSurface = lSurface->GetNextSurface();
+		}
+	}
+	/* Update the window */
+#ifdef UseOpenGL
+		if (winData.is3DModeActive()) {
+			if (UpdateSurface) UpdateGLModel();
+			RotateMoleculeGL(ShowAngles);
+		} else
+#endif
+		{
+			float scale = ((float) MAX(hsize, vsize))/(MainData->WindowSize);
+			BeginDrawingOffscreen(&myGWorld, thisWindow);
+			ClipRect(&TotalRect);
+			EraseRect(&TotalRect);
+			int npasses=1;
+			Matrix4D	SavedRotation;
+			if (Stereo) npasses=2;
+			long hcenter = hoffset;
+			for (int ipass=0; ipass<npasses; ipass++) {
+				ClipRect(&DisplayRect);
+				if (MainData->DrawMode & (1<<5)) {	//Planar drawing mode
+					//Scan the SurfaceList, drawing any that can be drawn
+					lSurface = MainData->cFrame->SurfaceList;
+					while (lSurface) {
+						lSurface->Draw2D(MainData, hcenter, sphereCenter.v, scale);
+						lSurface = lSurface->GetNextSurface();
+					}
+					DrawMoleculePlane(scale, hcenter, sphereCenter.v);
+				} else {	//otherwise use the normal psuedo-3D drawing code
+					DrawMolecule(scale, hcenter, sphereCenter.v);
+				}
+				if (Stereo) {
+					if (ipass == 0) {
+						CopyMatrix(MainData->TotalRotation, SavedRotation);
+						ApplyRotation(MainData->TotalRotation, 1, Prefs->GetStereoOffset());
+						MainData->ResetRotation();
+						Rect portRect;
+#ifdef CarbonBuild
+						GetWindowPortBounds(thisWindow, &portRect);
+#else
+						portRect = thisWindow->portRect;
+#endif
+						DisplayRect.left = DisplayRect.right + 1;
+						DisplayRect.right = portRect.right;
+						hcenter += width;
+					} else {
+						CopyMatrix(SavedRotation, MainData->TotalRotation);
+						MainData->ResetRotation();
+						DisplayRect.right = DisplayRect.left - 1;
+						DisplayRect.left = TotalRect.left;
+					}
+				}
+			}
+			ClipRect(&TotalRect);
+			FrameOval(&sphereRect);
+			EndDrawingOffscreen(myGWorld, thisWindow);
+		}
+#if 0
+	if (ShowAngles) {
+		float psi, phi, theta;
+		MatrixToEulerAngles(MainData->TotalRotation, &psi, &phi, &theta);
+		sprintf((char *)AngleString, "_%.2f, %.2f, %.2f, Scale:%.2f",
+				psi, phi, theta, MainData->WindowSize);
+		AngleString[0] = strlen((char *)AngleString) - 1;
+		TextFont(systemFont);
+		MoveTo(2,12);
+		DrawString(AngleString);
+	}
+#endif
+
+	//"clean up" the rotation matrix make the rotation part orthogonal and magnitude 1
+	OrthogonalizeRotationMatrix (MainData->TotalRotation);
+	DisplayRect = TotalRect;
+	/* Draw once again to get rid of the rotation sphere */
+	draw();
+	SetCursorToArrow();
+#endif
+}
