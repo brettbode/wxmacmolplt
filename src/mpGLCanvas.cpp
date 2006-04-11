@@ -195,7 +195,8 @@ void MpGLCanvas::eventErase(wxEraseEvent &event) {
 }
 
 void MpGLCanvas::eventMouse(wxMouseEvent &event) {
-    // Do stuff for rotation, menus, etc. here
+    // Pass mouse event to MolDisplayWin::Rotate for processing
+    MolWin->Rotate(event);
 }
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
