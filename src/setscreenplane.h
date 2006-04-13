@@ -23,6 +23,7 @@
  */
 
 ////@begin includes
+#include <wx/textctrl.h>
 ////@end includes
 
 /*!
@@ -84,7 +85,7 @@ public:
     SetScreenPlane( MolDisplayWin* parent, wxWindowID id = SYMBOL_SETSCREENPLANE_IDNAME, const wxString& caption = SYMBOL_SETSCREENPLANE_TITLE, const wxPoint& pos = SYMBOL_SETSCREENPLANE_POSITION, const wxSize& size = SYMBOL_SETSCREENPLANE_SIZE, long style = SYMBOL_SETSCREENPLANE_STYLE );
 
     /// Creation
-    bool Create( wxWindow* parent, wxWindowID id = SYMBOL_SETSCREENPLANE_IDNAME, const wxString& caption = SYMBOL_SETSCREENPLANE_TITLE, const wxPoint& pos = SYMBOL_SETSCREENPLANE_POSITION, const wxSize& size = SYMBOL_SETSCREENPLANE_SIZE, long style = SYMBOL_SETSCREENPLANE_STYLE );
+    bool Create( MolDisplayWin* parent, wxWindowID id = SYMBOL_SETSCREENPLANE_IDNAME, const wxString& caption = SYMBOL_SETSCREENPLANE_TITLE, const wxPoint& pos = SYMBOL_SETSCREENPLANE_POSITION, const wxSize& size = SYMBOL_SETSCREENPLANE_SIZE, long style = SYMBOL_SETSCREENPLANE_STYLE );
 
     /// Creates the controls and sizers
     void CreateControls();
@@ -170,18 +171,18 @@ public:
     static bool ShowToolTips();
 
 ////@begin SetScreenPlane member variables
-	wxTextCtl	* Atom1Ctl;
-	wxTextCtl	* Atom2Ctl;
-	wxTextCtl	* Atom3Ctl;
-	wxTextCtl	* Pt1XCtl;
-	wxTextCtl	* Pt1YCtl;
-	wxTextCtl	* Pt1ZCtl;
-	wxTextCtl	* Pt2XCtl;
-	wxTextCtl	* Pt2YCtl;
-	wxTextCtl	* Pt2ZCtl;
-	wxTextCtl	* Pt3XCtl;
-	wxTextCtl	* Pt3YCtl;
-	wxTextCtl	* Pt3ZCtl;
+	wxTextCtrl	* Atom1Ctl;
+	wxTextCtrl	* Atom2Ctl;
+	wxTextCtrl	* Atom3Ctl;
+	wxTextCtrl	* Pt1XCtl;
+	wxTextCtrl	* Pt1YCtl;
+	wxTextCtrl	* Pt1ZCtl;
+	wxTextCtrl	* Pt2XCtl;
+	wxTextCtrl	* Pt2YCtl;
+	wxTextCtrl	* Pt2ZCtl;
+	wxTextCtrl	* Pt3XCtl;
+	wxTextCtrl	* Pt3YCtl;
+	wxTextCtrl	* Pt3ZCtl;
     int atom1;
     int atom2;
     int atom3;

@@ -27,6 +27,11 @@
 #endif
 
 ////@begin includes
+#include "Globals.h"
+#include "MyTypes.h"
+#include "Math3D.h"
+#include "MolDisplayWin.h"
+#include "Frame.h"
 ////@end includes
 
 #include "setscreenplane.h"
@@ -93,7 +98,7 @@ SetScreenPlane::SetScreenPlane( )
 {
 }
 
-SetScreenPlane::SetScreenPlane( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
+SetScreenPlane::SetScreenPlane( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
     Create(parent, id, caption, pos, size, style);
 }
@@ -120,7 +125,7 @@ bool SetScreenPlane::Create( MolDisplayWin* p, wxWindowID id, const wxString& ca
     GetSizer()->SetSizeHints(this);
     Centre();
 ////@end SetScreenPlane creation
-	MainData = parent->GetData();
+	MoleculeData * MainData = parent->GetData();
 	CPoint3D inPoint, outPoint;
 	Matrix4D lRot, lInverse;
 	MainData->GetRotationMatrix(lRot);
@@ -160,55 +165,55 @@ void SetScreenPlane::CreateControls()
     wxStaticText* itemStaticText5 = new wxStaticText( itemDialog1, wxID_STATIC, _("Atom 1"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText5, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* Atom1Ctl = new wxTextCtrl( itemDialog1, ID_ATOM1, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
+    Atom1Ctl = new wxTextCtrl( itemDialog1, ID_ATOM1, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
     itemFlexGridSizer4->Add(Atom1Ctl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText7 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 1"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText7, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* Pt1XCtl = new wxTextCtrl( itemDialog1, ID_PT1X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    Pt1XCtl = new wxTextCtrl( itemDialog1, ID_PT1X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(Pt1XCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* Pt1YCtl = new wxTextCtrl( itemDialog1, ID_PT1Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    Pt1YCtl = new wxTextCtrl( itemDialog1, ID_PT1Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(Pt1YCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* Pt1ZCtl = new wxTextCtrl( itemDialog1, ID_PT1Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    Pt1ZCtl = new wxTextCtrl( itemDialog1, ID_PT1Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(Pt1ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText11 = new wxStaticText( itemDialog1, wxID_STATIC, _("Atom 2"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText11, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* Atom2Ctl = new wxTextCtrl( itemDialog1, ID_ATOM2, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
+    Atom2Ctl = new wxTextCtrl( itemDialog1, ID_ATOM2, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
     itemFlexGridSizer4->Add(Atom2Ctl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 2"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText13, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* Pt2XCtl = new wxTextCtrl( itemDialog1, ID_PT2X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    Pt2XCtl = new wxTextCtrl( itemDialog1, ID_PT2X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(Pt2XCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* Pt2YCtl = new wxTextCtrl( itemDialog1, ID_PT2Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    Pt2YCtl = new wxTextCtrl( itemDialog1, ID_PT2Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(Pt2YCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* Pt2ZCtl = new wxTextCtrl( itemDialog1, ID_PT2Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    Pt2ZCtl = new wxTextCtrl( itemDialog1, ID_PT2Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(Pt2ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText17 = new wxStaticText( itemDialog1, wxID_STATIC, _("Atom 3"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText17, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* Atom3Ctl = new wxTextCtrl( itemDialog1, ID_ATOM3, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
+    Atom3Ctl = new wxTextCtrl( itemDialog1, ID_ATOM3, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
     itemFlexGridSizer4->Add(Atom3Ctl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText19 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 3"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText19, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* Pt3XCtl = new wxTextCtrl( itemDialog1, ID_PT3X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    Pt3XCtl = new wxTextCtrl( itemDialog1, ID_PT3X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(Pt3XCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* Pt3YCtl = new wxTextCtrl( itemDialog1, ID_PT3Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    Pt3YCtl = new wxTextCtrl( itemDialog1, ID_PT3Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(Pt3YCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* Pt3ZCtl = new wxTextCtrl( itemDialog1, ID_PT3Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    Pt3ZCtl = new wxTextCtrl( itemDialog1, ID_PT3Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(Pt3ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText23 = new wxStaticText( itemDialog1, wxID_STATIC, _("or choose a symbolic plane"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -275,9 +280,28 @@ wxIcon SetScreenPlane::GetIconResource( const wxString& name )
 
 void SetScreenPlane::setPlaneValues(void) {
 	wxString field;
+	if (atom1 < 0) Atom1Ctl->Clear();
+	if (atom2 < 0) Atom2Ctl->Clear();
+	if (atom3 < 0) Atom3Ctl->Clear();
 	
 	field.Printf("%f", PlanePts[0].x);
 	Pt1XCtl->SetValue(field);
+	field.Printf("%f", PlanePts[0].y);
+	Pt1YCtl->SetValue(field);
+	field.Printf("%f", PlanePts[0].z);
+	Pt1ZCtl->SetValue(field);
+	field.Printf("%f", PlanePts[1].x);
+	Pt2XCtl->SetValue(field);
+	field.Printf("%f", PlanePts[1].y);
+	Pt2YCtl->SetValue(field);
+	field.Printf("%f", PlanePts[1].z);
+	Pt2ZCtl->SetValue(field);
+	field.Printf("%f", PlanePts[2].x);
+	Pt3XCtl->SetValue(field);
+	field.Printf("%f", PlanePts[2].y);
+	Pt3YCtl->SetValue(field);
+	field.Printf("%f", PlanePts[2].z);
+	Pt3ZCtl->SetValue(field);
 }
 /*!
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
@@ -298,10 +322,10 @@ void SetScreenPlane::OnCancelClick( wxCommandEvent& event )
 
 void SetScreenPlane::OnOkClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK in SetScreenPlane.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK in SetScreenPlane. 
+	MoleculeData * MainData = parent->GetData();
+	if (MainData->SetScreenPlane(PlanePts))
+		parent->ResetModel(false);
+	Destroy();
 }
 
 
@@ -311,10 +335,25 @@ void SetScreenPlane::OnOkClick( wxCommandEvent& event )
 
 void SetScreenPlane::OnAtom1Updated( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM1 in SetScreenPlane.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM1 in SetScreenPlane. 
+	if ((Atom1Ctl->GetLineLength(0)>0)&&Atom1Ctl->IsModified()) {
+		wxString text = Atom1Ctl->GetValue();
+		unsigned long temp;
+		if (text.ToULong(&temp)) {
+			MoleculeData * MainData = parent->GetData();
+			Frame * lFrame = MainData->GetCurrentFramePtr();
+			if (temp < lFrame->GetNumAtoms()) {
+				CPoint3D tp;
+				if (lFrame->GetAtomPosition(temp, tp)) {
+					atom1 = temp;
+					PlanePts[0] = tp;
+				}
+			}
+		}
+		if (atom1 >= 0)
+			setPlaneValues();
+		else
+			Atom1Ctl->Clear();
+	}
 }
 
 /*!
@@ -455,6 +494,14 @@ void SetScreenPlane::OnPt3zUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnXyClick( wxCommandEvent& event )
 {
+	atom1 = atom2 = atom3 = -1;
+	for (int i=0; i<3; i++)
+		PlanePts[i].x = PlanePts[i].y = PlanePts[i].z = 0.0;
+	
+	PlanePts[1].x = 1.0;
+	PlanePts[2].y = 1.0;
+	
+	setPlaneValues();
 }
 
 /*!
@@ -463,10 +510,14 @@ void SetScreenPlane::OnXyClick( wxCommandEvent& event )
 
 void SetScreenPlane::OnYxClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_YX in SetScreenPlane.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_YX in SetScreenPlane. 
+	atom1 = atom2 = atom3 = -1;
+	for (int i=0; i<3; i++)
+		PlanePts[i].x = PlanePts[i].y = PlanePts[i].z = 0.0;
+	
+	PlanePts[1].y = 1.0;
+	PlanePts[2].x = 1.0;
+	
+	setPlaneValues();
 }
 
 /*!
@@ -475,10 +526,14 @@ void SetScreenPlane::OnYxClick( wxCommandEvent& event )
 
 void SetScreenPlane::OnXzClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_XZ in SetScreenPlane.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_XZ in SetScreenPlane. 
+	atom1 = atom2 = atom3 = -1;
+	for (int i=0; i<3; i++)
+		PlanePts[i].x = PlanePts[i].y = PlanePts[i].z = 0.0;
+	
+	PlanePts[1].x = 1.0;
+	PlanePts[2].z = 1.0;
+	
+	setPlaneValues();
 }
 
 

@@ -169,6 +169,7 @@ class MolDisplayWin : public wxFrame {
 		void BondsChanged(void);
 		void FrameChanged(void);
 		void UpdateModelDisplay(void);
+		MoleculeData * GetData(void) const {return MainData;};
 		void ResetView(void);
 		void ResetModel(bool Center);
 		void ResetAllWindows(void);

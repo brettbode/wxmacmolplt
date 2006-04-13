@@ -87,7 +87,8 @@ class Frame {
 		long GetNumSurfaces(void);
 		void ChangeBond(long TheBond, short WhichPart, long TheAtom);
 		long GetBondAtom(long WhichBond, short ThePart);
-		short GetAtomType(long theAtom);
+		short GetAtomType(long theAtom) const;
+		bool GetAtomPosition(long theAtom, CPoint3D & p) const;
 	 mpAtom * AddAtom(long AtomType, CPoint3D AtomPosition);
 		bool IncreaseAtomAllocation(long NumAdditional);
 			//BondExists returns the id of the bond, -1 otherwise
@@ -103,8 +104,8 @@ class Frame {
 		bool SurfaceExportPossible(void);
 		void ExportSurface(BufferFile * Buffer);
 		AtomTypeList * GetAtomTypes(void);
-		inline long GetNumBonds(void) {return NumBonds;};
-		inline long GetNumAtoms(void) {return NumAtoms;};
+		inline long GetNumBonds(void) const {return NumBonds;};
+		inline long GetNumAtoms(void) const {return NumAtoms;};
 		inline Bond * GetBondLoc(long ibond) {return &(Bonds[ibond]);};
 		float GetBondLength(long ibond);
 		long GetNumMMAtoms(void);
@@ -121,7 +122,7 @@ class Frame {
 		inline void SetAtomSelectState(long AtomNum, bool state)
 			{if (AtomNum<NumAtoms) Atoms[AtomNum].SetSelectState(state);};
 		inline BondOrder GetBondOrder(long BondNum) {return Bonds[BondNum].Order;};
-		long GetNumElectrons(void);
+		long GetNumElectrons(void) const;
 		inline void SetBondOrder(long BondNum, BondOrder NewOrder) {Bonds[BondNum].Order = NewOrder;};
 		void ParseGAMESSGuessVectors(BufferFile * Buffer, long NumFuncs, TypeOfWavefunction t, Progress * lProgress);
 		void ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs, Progress * lProgress);
