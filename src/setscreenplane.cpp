@@ -102,24 +102,38 @@ SetScreenPlane::SetScreenPlane( wxWindow* parent, wxWindowID id, const wxString&
  * SetScreenPlane creator
  */
 
-bool SetScreenPlane::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
+bool SetScreenPlane::Create( MolDisplayWin* p, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin SetScreenPlane member initialisation
     atom1 = -1;
     atom2 = -1;
     atom3 = -1;
-    parent = NULL;
+    parent = p;
 ////@end SetScreenPlane member initialisation
 
 ////@begin SetScreenPlane creation
     SetExtraStyle(GetExtraStyle()|wxWS_EX_BLOCK_EVENTS);
-    wxDialog::Create( parent, id, caption, pos, size, style );
+    wxDialog::Create( p, id, caption, pos, size, style );
 
     CreateControls();
     GetSizer()->Fit(this);
     GetSizer()->SetSizeHints(this);
     Centre();
 ////@end SetScreenPlane creation
+	MainData = parent->GetData();
+	CPoint3D inPoint, outPoint;
+	Matrix4D lRot, lInverse;
+	MainData->GetRotationMatrix(lRot);
+	InverseMatrix(lRot, lInverse);
+	inPoint.x = inPoint.y = inPoint.z = 0.0;
+	BackRotate3DPt(lInverse, inPoint, &(PlanePts[0]));
+	inPoint.x = 1.0;
+	BackRotate3DPt(lInverse, inPoint, &(PlanePts[1]));
+	inPoint.x = 0.0;
+	inPoint.y = 1.0;
+	BackRotate3DPt(lInverse, inPoint, &(PlanePts[2]));
+	setPlaneValues();
+	
     return true;
 }
 
@@ -146,56 +160,56 @@ void SetScreenPlane::CreateControls()
     wxStaticText* itemStaticText5 = new wxStaticText( itemDialog1, wxID_STATIC, _("Atom 1"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText5, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl6 = new wxTextCtrl( itemDialog1, ID_ATOM1, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl6, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Atom1Ctl = new wxTextCtrl( itemDialog1, ID_ATOM1, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
+    itemFlexGridSizer4->Add(Atom1Ctl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText7 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 1"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText7, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl8 = new wxTextCtrl( itemDialog1, ID_PT1X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl8, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Pt1XCtl = new wxTextCtrl( itemDialog1, ID_PT1X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer4->Add(Pt1XCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* itemTextCtrl9 = new wxTextCtrl( itemDialog1, ID_PT1Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl9, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Pt1YCtl = new wxTextCtrl( itemDialog1, ID_PT1Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer4->Add(Pt1YCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* itemTextCtrl10 = new wxTextCtrl( itemDialog1, ID_PT1Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl10, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Pt1ZCtl = new wxTextCtrl( itemDialog1, ID_PT1Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer4->Add(Pt1ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText11 = new wxStaticText( itemDialog1, wxID_STATIC, _("Atom 2"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText11, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl12 = new wxTextCtrl( itemDialog1, ID_ATOM2, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl12, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Atom2Ctl = new wxTextCtrl( itemDialog1, ID_ATOM2, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
+    itemFlexGridSizer4->Add(Atom2Ctl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 2"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText13, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl14 = new wxTextCtrl( itemDialog1, ID_PT2X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl14, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Pt2XCtl = new wxTextCtrl( itemDialog1, ID_PT2X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer4->Add(Pt2XCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* itemTextCtrl15 = new wxTextCtrl( itemDialog1, ID_PT2Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl15, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Pt2YCtl = new wxTextCtrl( itemDialog1, ID_PT2Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer4->Add(Pt2YCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* itemTextCtrl16 = new wxTextCtrl( itemDialog1, ID_PT2Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl16, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Pt2ZCtl = new wxTextCtrl( itemDialog1, ID_PT2Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer4->Add(Pt2ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText17 = new wxStaticText( itemDialog1, wxID_STATIC, _("Atom 3"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText17, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl18 = new wxTextCtrl( itemDialog1, ID_ATOM3, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl18, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Atom3Ctl = new wxTextCtrl( itemDialog1, ID_ATOM3, _T(""), wxDefaultPosition, wxSize(50, -1), 0 );
+    itemFlexGridSizer4->Add(Atom3Ctl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText19 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 3"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer4->Add(itemStaticText19, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl20 = new wxTextCtrl( itemDialog1, ID_PT3X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl20, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Pt3XCtl = new wxTextCtrl( itemDialog1, ID_PT3X, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer4->Add(Pt3XCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* itemTextCtrl21 = new wxTextCtrl( itemDialog1, ID_PT3Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl21, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Pt3YCtl = new wxTextCtrl( itemDialog1, ID_PT3Y, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer4->Add(Pt3YCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* itemTextCtrl22 = new wxTextCtrl( itemDialog1, ID_PT3Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer4->Add(itemTextCtrl22, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* Pt3ZCtl = new wxTextCtrl( itemDialog1, ID_PT3Z, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer4->Add(Pt3ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText23 = new wxStaticText( itemDialog1, wxID_STATIC, _("or choose a symbolic plane"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer2->Add(itemStaticText23, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
@@ -257,6 +271,13 @@ wxIcon SetScreenPlane::GetIconResource( const wxString& name )
     wxUnusedVar(name);
     return wxNullIcon;
 ////@end SetScreenPlane icon retrieval
+}
+
+void SetScreenPlane::setPlaneValues(void) {
+	wxString field;
+	
+	field.Printf("%f", PlanePts[0].x);
+	Pt1XCtl->SetValue(field);
 }
 /*!
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
@@ -434,10 +455,6 @@ void SetScreenPlane::OnPt3zUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnXyClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_XY in SetScreenPlane.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_XY in SetScreenPlane. 
 }
 
 /*!

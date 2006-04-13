@@ -76,10 +76,12 @@ class MolDisplayWin : public wxFrame {
          */
         virtual ~MolDisplayWin();
 
+		//Call to update the menu bar itesm for the current data
+		void AdjustMenus(void);
+		void ClearMenus(void);
         // Below are the event handler functions for the menu.  The initial
         // list was taken from the original MacMolPlt menus.
 
-   //     void menuFileNew(wxCommandEvent &event);
         void menuFileOpen(wxCommandEvent &event);
         void menuFileSave(wxCommandEvent &event);
         void menuFileSave_as(wxCommandEvent &event);

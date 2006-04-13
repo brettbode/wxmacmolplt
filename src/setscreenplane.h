@@ -30,6 +30,7 @@
  */
 
 ////@begin forward declarations
+typedef class MolDisplayWin;
 ////@end forward declarations
 
 /*!
@@ -80,7 +81,7 @@ class SetScreenPlane: public wxDialog
 public:
     /// Constructors
     SetScreenPlane( );
-    SetScreenPlane( wxWindow* parent, wxWindowID id = SYMBOL_SETSCREENPLANE_IDNAME, const wxString& caption = SYMBOL_SETSCREENPLANE_TITLE, const wxPoint& pos = SYMBOL_SETSCREENPLANE_POSITION, const wxSize& size = SYMBOL_SETSCREENPLANE_SIZE, long style = SYMBOL_SETSCREENPLANE_STYLE );
+    SetScreenPlane( MolDisplayWin* parent, wxWindowID id = SYMBOL_SETSCREENPLANE_IDNAME, const wxString& caption = SYMBOL_SETSCREENPLANE_TITLE, const wxPoint& pos = SYMBOL_SETSCREENPLANE_POSITION, const wxSize& size = SYMBOL_SETSCREENPLANE_SIZE, long style = SYMBOL_SETSCREENPLANE_STYLE );
 
     /// Creation
     bool Create( wxWindow* parent, wxWindowID id = SYMBOL_SETSCREENPLANE_IDNAME, const wxString& caption = SYMBOL_SETSCREENPLANE_TITLE, const wxPoint& pos = SYMBOL_SETSCREENPLANE_POSITION, const wxSize& size = SYMBOL_SETSCREENPLANE_SIZE, long style = SYMBOL_SETSCREENPLANE_STYLE );
@@ -163,15 +164,29 @@ public:
     /// Retrieves icon resources
     wxIcon GetIconResource( const wxString& name );
 ////@end SetScreenPlane member function declarations
+	void setPlaneValues(void);
 
     /// Should we show tooltips?
     static bool ShowToolTips();
 
 ////@begin SetScreenPlane member variables
+	wxTextCtl	* Atom1Ctl;
+	wxTextCtl	* Atom2Ctl;
+	wxTextCtl	* Atom3Ctl;
+	wxTextCtl	* Pt1XCtl;
+	wxTextCtl	* Pt1YCtl;
+	wxTextCtl	* Pt1ZCtl;
+	wxTextCtl	* Pt2XCtl;
+	wxTextCtl	* Pt2YCtl;
+	wxTextCtl	* Pt2ZCtl;
+	wxTextCtl	* Pt3XCtl;
+	wxTextCtl	* Pt3YCtl;
+	wxTextCtl	* Pt3ZCtl;
     int atom1;
     int atom2;
     int atom3;
     MolDisplayWin * parent;
+	CPoint3D	PlanePts[3];
 ////@end SetScreenPlane member variables
 };
 

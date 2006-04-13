@@ -40,6 +40,7 @@
 		168626DB09D33C6C00A77D97 /* MolDisplayWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */; };
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
+		8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildStyle section */
@@ -121,6 +122,8 @@
 		168626DA09D33C6C00A77D97 /* MolDisplayWin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MolDisplayWin.h; path = src/MolDisplayWin.h; sourceTree = "<group>"; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
 		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
+		8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setscreenplane.cpp; path = src/setscreenplane.cpp; sourceTree = "<group>"; };
+		8BED377A09EDCC0E0003DF64 /* setscreenplane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setscreenplane.h; path = src/setscreenplane.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -198,6 +201,8 @@
 				1652DA4F09D0B12600B7783F /* Prefs.h */,
 				1652DA5009D0B12600B7783F /* Progress.cpp */,
 				1652DA5109D0B12600B7783F /* Progress.h */,
+				8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */,
+				8BED377A09EDCC0E0003DF64 /* setscreenplane.h */,
 				1652DA5209D0B12600B7783F /* RysPolynomial.cpp */,
 				1652DA5309D0B12600B7783F /* RysPolynomial.h */,
 				1652DA5409D0B12600B7783F /* SurfaceBase.cpp */,
@@ -352,6 +357,7 @@
 				1652DA7509D0B12600B7783F /* XML.cpp in Sources */,
 				168626DB09D33C6C00A77D97 /* MolDisplayWin.cpp in Sources */,
 				8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */,
+				8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,6 +391,7 @@
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-I/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
 					"-I/Users/brett/software/wxWidgets-2.6.2/include",
@@ -442,6 +449,7 @@
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-I/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
 					"-I/Users/brett/software/wxWidgets-2.6.2/include",

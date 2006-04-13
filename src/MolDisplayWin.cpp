@@ -18,7 +18,7 @@
 #include "Frame.h"
 #include "Math3D.h"
 #include "myFiles.h"
-//#include "ScreenPlaneDlg.h"
+#include "setscreenplane.h"
 
 extern WinPrefs * gPreferences;
 
@@ -201,6 +201,23 @@ void MolDisplayWin::createMenuBar(void) {
     menuBar->Append(menuMolecule, wxT("&Molecule"));
     menuBar->Append(menuWindow, wxT("&Window"));
     menuBar->Append(menuHelp, wxT("&Help"));
+}
+
+void MolDisplayWin::ClearMenus(void) {
+	menuFile->Enable(wxID_SAVE, false);
+	
+	menuEdit->Enable(wxID_UNDO, false);
+	menuView->Enable(MMP_SHOWMODE, false);
+	menuMolecule->Enable(MMP_INVERTNORMALMODE, false);
+}
+void MolDisplayWin::AdjustMenus(void) {
+	ClearMenus();
+	menuFile->Enable(wxID_SAVE, Dirty);
+	
+	if (MainData->cFrame->Vibs) {
+		menuView->Enable(MMP_SHOWMODE, true);
+		menuMolecule->Enable(MMP_INVERTNORMALMODE, true);
+	}
 }
 
 /* Event handler functions */
@@ -437,7 +454,8 @@ void MolDisplayWin::menuViewRotatePrinciple_orientation(wxCommandEvent &event) {
 	MessageAlert("Sure would be nice if this was implemented...");
 }
 void MolDisplayWin::menuViewRotateOther(wxCommandEvent &event) {
-//	new ScreenPlaneDlg(this);
+	SetScreenPlane * temp = new SetScreenPlane(this);
+	temp->Show();
 }
 void MolDisplayWin::menuMoleculeConvertToBohr(wxCommandEvent &event) {
 	MainData->UnitConversion(0);
@@ -504,6 +522,7 @@ void MolDisplayWin::ResetModel(bool Center) {
 //	::SetControlMaximum(FrameScroll, MainData->NumFrames);
 //	::SetControlValue(FrameScroll, MainData->CurrentFrame);
 	glCanvas->draw();
+	AdjustMenus();
 }
 void MolDisplayWin::ResetAllWindows(void) {
 	glCanvas->UpdateGLView();
