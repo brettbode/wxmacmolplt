@@ -21,17 +21,15 @@
 /*!
  * Includes
  */
-
-////@begin includes
 #include <wx/textctrl.h>
+////@begin includes
 ////@end includes
 
 /*!
  * Forward declarations
  */
-
-////@begin forward declarations
 typedef class MolDisplayWin;
+////@begin forward declarations
 ////@end forward declarations
 
 /*!
@@ -40,7 +38,7 @@ typedef class MolDisplayWin;
 
 ////@begin control identifiers
 #define ID_DIALOG 10000
-#define SYMBOL_SETSCREENPLANE_STYLE wxCAPTION|wxSYSTEM_MENU|wxSTAY_ON_TOP|wxCLOSE_BOX|wxDIALOG_MODAL|wxNO_BORDER
+#define SYMBOL_SETSCREENPLANE_STYLE wxCAPTION|wxSYSTEM_MENU|wxSTAY_ON_TOP|wxCLOSE_BOX|wxDIALOG_MODAL
 #define SYMBOL_SETSCREENPLANE_TITLE _("Set Screen Plane")
 #define SYMBOL_SETSCREENPLANE_IDNAME ID_DIALOG
 #define SYMBOL_SETSCREENPLANE_SIZE wxSize(400, 300)
@@ -182,12 +180,12 @@ public:
 	wxTextCtrl	* Pt3XCtl;
 	wxTextCtrl	* Pt3YCtl;
 	wxTextCtrl	* Pt3ZCtl;
+    CPoint3D PlanePts[3];
 ////@begin SetScreenPlane member variables
     int atom1;
     int atom2;
     int atom3;
     MolDisplayWin * parent;
-	CPoint3D	PlanePts[3];
 ////@end SetScreenPlane member variables
 };
 
