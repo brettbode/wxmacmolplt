@@ -336,6 +336,7 @@ void SetScreenPlane::OnOkClick( wxCommandEvent& event )
 void SetScreenPlane::OnAtom1Updated( wxCommandEvent& event )
 {
 	if ((Atom1Ctl->GetLineLength(0)>0)&&Atom1Ctl->IsModified()) {
+		bool validAtom = false;
 		wxString text = Atom1Ctl->GetValue();
 		unsigned long temp;
 		if (text.ToULong(&temp)) {
@@ -344,15 +345,22 @@ void SetScreenPlane::OnAtom1Updated( wxCommandEvent& event )
 			if (temp < lFrame->GetNumAtoms()) {
 				CPoint3D tp;
 				if (lFrame->GetAtomPosition(temp, tp)) {
+					validAtom = true;
 					atom1 = temp;
 					PlanePts[0] = tp;
 				}
 			}
 		}
-		if (atom1 >= 0)
+		if (validAtom)
 			setPlaneValues();
-		else
-			Atom1Ctl->Clear();
+		else {
+			if (atom1 >= 0) {
+				wxString atm;
+				atm.Printf("%d", atom1);
+				Atom1Ctl->SetValue(atm);
+			} else
+				Atom1Ctl->Clear();
+		}
 	}
 }
 
@@ -398,10 +406,33 @@ void SetScreenPlane::OnPt1zUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnAtom2Updated( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM2 in SetScreenPlane.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM2 in SetScreenPlane. 
+	if ((Atom2Ctl->GetLineLength(0)>0)&&Atom2Ctl->IsModified()) {
+		bool validAtom = false;
+		wxString text = Atom2Ctl->GetValue();
+		unsigned long temp;
+		if (text.ToULong(&temp)) {
+			MoleculeData * MainData = parent->GetData();
+			Frame * lFrame = MainData->GetCurrentFramePtr();
+			if (temp < lFrame->GetNumAtoms()) {
+				CPoint3D tp;
+				if (lFrame->GetAtomPosition(temp, tp)) {
+					validAtom = true;
+					atom2 = temp;
+					PlanePts[1] = tp;
+				}
+			}
+		}
+		if (validAtom)
+			setPlaneValues();
+		else {
+			if (atom2 >= 0) {
+				wxString atm;
+				atm.Printf("%d", atom2);
+				Atom2Ctl->SetValue(atm);
+			} else
+				Atom2Ctl->Clear();
+		}
+	}
 }
 
 /*!
@@ -446,10 +477,33 @@ void SetScreenPlane::OnPt2zUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnAtom3Updated( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM3 in SetScreenPlane.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM3 in SetScreenPlane. 
+	if ((Atom3Ctl->GetLineLength(0)>0)&&Atom3Ctl->IsModified()) {
+		bool validAtom = false;
+		wxString text = Atom3Ctl->GetValue();
+		unsigned long temp;
+		if (text.ToULong(&temp)) {
+			MoleculeData * MainData = parent->GetData();
+			Frame * lFrame = MainData->GetCurrentFramePtr();
+			if (temp < lFrame->GetNumAtoms()) {
+				CPoint3D tp;
+				if (lFrame->GetAtomPosition(temp, tp)) {
+					validAtom = true;
+					atom3 = temp;
+					PlanePts[2] = tp;
+				}
+			}
+		}
+		if (validAtom)
+			setPlaneValues();
+		else {
+			if (atom3 >= 0) {
+				wxString atm;
+				atm.Printf("%d", atom3);
+				Atom3Ctl->SetValue(atm);
+			} else
+				Atom3Ctl->Clear();
+		}
+	}
 }
 
 /*!

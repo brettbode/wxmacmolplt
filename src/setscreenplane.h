@@ -170,7 +170,6 @@ public:
     /// Should we show tooltips?
     static bool ShowToolTips();
 
-////@begin SetScreenPlane member variables
 	wxTextCtrl	* Atom1Ctl;
 	wxTextCtrl	* Atom2Ctl;
 	wxTextCtrl	* Atom3Ctl;
@@ -183,6 +182,7 @@ public:
 	wxTextCtrl	* Pt3XCtl;
 	wxTextCtrl	* Pt3YCtl;
 	wxTextCtrl	* Pt3ZCtl;
+////@begin SetScreenPlane member variables
     int atom1;
     int atom2;
     int atom3;
