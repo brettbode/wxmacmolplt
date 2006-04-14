@@ -19,6 +19,7 @@
 #include "Math3D.h"
 #include "myFiles.h"
 #include "setscreenplane.h"
+#include "BondsDlg.h"
 
 extern WinPrefs * gPreferences;
 
@@ -41,6 +42,7 @@ enum MMP_EventID {
 	MMP_CONVERTTOBOHR,
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
+	MMP_BONDSWINDOW,
 	
 	Number_MMP_Ids
 };
@@ -80,6 +82,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_CONVERTTOBOHR,	MolDisplayWin::menuMoleculeConvertToBohr)
 	EVT_MENU (MMP_CONVERTTOANGSTROMS,	MolDisplayWin::menuMoleculeConvertToAngstroms)
 	EVT_MENU (MMP_INVERTNORMALMODE,	MolDisplayWin::menuMoleculeInvertNormalMode)
+
+	EVT_MENU (MMP_BONDSWINDOW,	MolDisplayWin::menuWindowBonds)
 END_EVENT_TABLE()
 
 MolDisplayWin::MolDisplayWin(const wxString &title,
@@ -101,6 +105,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	OperationInProgress = false;
 	ProgressInd = NULL;
 	OpenGLData = NULL;
+	bondsWindow = NULL;
 	InitGLData();
 	
     glCanvas = new MpGLCanvas(this);
@@ -191,6 +196,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuMolecule->Append(MMP_INVERTNORMALMODE, wxT("&Invert Normal Mode"));
 // TODO:  Create menu items for remaining menus
 
+    menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"));
     // TODO:  Make Mac handle help menu properly
     // TODO:  Make Mac display About menu item in the correct place
     menuHelp->Append(wxID_ABOUT, wxT("&About ..."));
@@ -199,7 +205,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuBar->Append(menuEdit, wxT("&Edit"));
     menuBar->Append(menuView, wxT("&View"));
     menuBar->Append(menuMolecule, wxT("&Molecule"));
-    menuBar->Append(menuWindow, wxT("&Window"));
+    menuBar->Append(menuWindow, wxT("&Subwindow"));
     menuBar->Append(menuHelp, wxT("&Help"));
 }
 
@@ -471,6 +477,13 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 	MainData->InvertMode();
 	ResetModel(false);
 	Dirty = true;
+}
+void MolDisplayWin::menuWindowBonds(wxCommandEvent &event) {
+	if (bondsWindow) { //need to bring it to the front...
+	} else {
+		bondsWindow = new BondsDlg(this);
+		bondsWindow->Show();
+	}
 }
 
 void MolDisplayWin::BondsChanged(void) {

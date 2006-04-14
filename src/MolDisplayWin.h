@@ -24,6 +24,7 @@
 #include "Progress.h"
 
 typedef class OpenGLRec OpenGLRec;
+typedef class BondsDlg BondsDlg;
 /**
  * Subclasses wxFrame to define the main application window.  This is a
  * document window.  There can be multiple instances of the window in the
@@ -49,6 +50,8 @@ class MolDisplayWin : public wxFrame {
 		Progress *		ProgressInd;	// Progress indicator window for long operations
 		OpenGLRec *		OpenGLData;		// Extra OpenGL data
         MpGLCanvas *	glCanvas;
+		
+		BondsDlg *		bondsWindow;
 
         void createMenuBar(void);
 		long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
@@ -138,16 +141,16 @@ class MolDisplayWin : public wxFrame {
         
         //void menuWindow_Zmat_calculator(wxCommandEvent &event);
         /* On Mac, these will be part of dynamically created sub-menus for each
-         * main window
+         * main window*/
         //void menuWindowMain_display(wxCommandEvent &event);
-        //void menuWindowBonds(wxCommandEvent &event);
+        void menuWindowBonds(wxCommandEvent &event);
         //void menuWindowCoordinates(wxCommandEvent &event);
         //void menuWindowEnergy_plot(wxCommandEvent &event);
         //void menuWindowFrequencies(wxCommandEvent &event);
         //void menuWindowInput_builder(wxCommandEvent &event);
         //void menuWindowSurfaces(wxCommandEvent &event);
         //void menuWindowPreferences(wxCommandEvent &event);
-        */
+        
 		
 		//File handling routines
 		long OpenFile(wxString fileName);
