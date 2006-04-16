@@ -84,6 +84,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_INVERTNORMALMODE,	MolDisplayWin::menuMoleculeInvertNormalMode)
 
 	EVT_MENU (MMP_BONDSWINDOW,	MolDisplayWin::menuWindowBonds)
+
+	EVT_CHAR (MolDisplayWin::KeyHandler)
 END_EVENT_TABLE()
 
 MolDisplayWin::MolDisplayWin(const wxString &title,
@@ -477,6 +479,9 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 	MainData->InvertMode();
 	ResetModel(false);
 	Dirty = true;
+}
+void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
+	event.Skip();
 }
 void MolDisplayWin::menuWindowBonds(wxCommandEvent &event) {
 	if (bondsWindow) { //need to bring it to the front...

@@ -28,6 +28,7 @@
 ////@end includes
 #include "Globals.h"
 #include "MolDisplayWin.h"
+#include "Frame.h"
 
 #include "bondsdlg.h"
 
@@ -145,7 +146,7 @@ void BondsDlg::CreateControls()
     wxBoxSizer* itemBoxSizer8 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer2->Add(itemBoxSizer8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    bondList = new wxListCtrl( itemDialog1, ID_LISTCTRL, wxDefaultPosition, wxSize(200, -1), wxLC_REPORT|wxLC_EDIT_LABELS|wxSUNKEN_BORDER );
+    bondList = new wxListCtrl( itemDialog1, ID_LISTCTRL, wxDefaultPosition, wxSize(500, -1), wxLC_REPORT|wxLC_EDIT_LABELS|wxSUNKEN_BORDER );
     itemBoxSizer8->Add(bondList, 5, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 ////@end BondsDlg content construction
@@ -153,19 +154,53 @@ void BondsDlg::CreateControls()
 	wxListItem itemCol;
 	itemCol.SetText(_T("Atom 1"));
 	bondList->InsertColumn(0, itemCol);
+	bondList->SetColumnWidth(0, 90);
 	
 	itemCol.SetText(_T("Atom 2"));
 	bondList->InsertColumn(1, itemCol);
+	bondList->SetColumnWidth(1, 90);
 
 	itemCol.SetText(_T("Length"));
 	bondList->InsertColumn(2, itemCol);
+	bondList->SetColumnWidth(2, 150);
 
 	itemCol.SetText(_T("Type"));
 	bondList->InsertColumn(3, itemCol);
+	bondList->SetColumnWidth(3, 120);
+	
+	ResetList();
 }
 
 void BondsDlg::ResetList(void) {
 	//loop through the bonds and add each with SetItem(row, col, string)
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long nbonds = lFrame->GetNumBonds();
+	wxString buf;
+	for (long i=0; i<nbonds; i++) {
+		Bond * b = lFrame->GetBondLoc(i);
+		buf.Printf("%d", b->Atom1);
+		bondList->InsertItem(i, buf);
+		buf.Printf("%d", b->Atom2);
+		bondList->SetItem(i, 1, buf);
+		buf.Printf("%f", lFrame->GetBondLength(i));
+		bondList->SetItem(i, 2, buf);
+		switch (lFrame->GetBondOrder(i)) {
+			case kHydrogenBond:
+				buf.Printf("%s", _T("Hydrogen"));
+				break;
+			case kSingleBond:
+				buf.Printf("%s", _T("Single"));
+				break;
+			case kDoubleBond:
+				buf.Printf("%s", _T("Double"));
+				break;
+			case kTripleBond:
+				buf.Printf("%s", _T("Triple"));
+				break;
+		}
+		bondList->SetItem(i, 3, buf);
+	}
 }
 
 /*!
