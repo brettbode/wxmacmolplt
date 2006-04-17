@@ -21,7 +21,7 @@
  */
 
 ////@begin includes
-#include "wx/listctrl.h"
+#include "wx/grid.h"
 ////@end includes
 
 /*!
@@ -29,7 +29,7 @@
  */
 
 ////@begin forward declarations
-class wxListCtrl;
+class wxGrid;
 ////@end forward declarations
 class MolDisplayWin;
 
@@ -45,7 +45,7 @@ class MolDisplayWin;
 #define SYMBOL_BONDSDLG_SIZE wxSize(400, 300)
 #define SYMBOL_BONDSDLG_POSITION wxDefaultPosition
 #define ID_CHOICE 10022
-#define ID_LISTCTRL 10020
+#define ID_BONDGRID 10020
 ////@end control identifiers
 
 /*!
@@ -87,20 +87,14 @@ public:
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CHOICE
     void OnChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_LIST_ITEM_SELECTED event handler for ID_LISTCTRL
-    void OnListctrlSelected( wxListEvent& event );
+    /// wxEVT_GRID_SELECT_CELL event handler for ID_BONDGRID
+    void OnSelectCell( wxGridEvent& event );
 
-    /// wxEVT_COMMAND_LIST_ITEM_DESELECTED event handler for ID_LISTCTRL
-    void OnListctrlDeselected( wxListEvent& event );
+    /// wxEVT_GRID_EDITOR_HIDDEN event handler for ID_BONDGRID
+    void OnEditorHidden( wxGridEvent& event );
 
-    /// wxEVT_COMMAND_LIST_BEGIN_LABEL_EDIT event handler for ID_LISTCTRL
-    void OnListctrlBeginLabelEdit( wxListEvent& event );
-
-    /// wxEVT_COMMAND_LIST_END_LABEL_EDIT event handler for ID_LISTCTRL
-    void OnListctrlEndLabelEdit( wxListEvent& event );
-
-    /// wxEVT_COMMAND_LIST_DELETE_ITEM event handler for ID_LISTCTRL
-    void OnListctrlDeleteItem( wxListEvent& event );
+    /// wxEVT_GRID_RANGE_SELECT event handler for ID_BONDGRID
+    void OnRangeSelect( wxGridRangeSelectEvent& event );
 
 ////@end BondsDlg event handler declarations
 
@@ -126,7 +120,7 @@ public:
     wxButton* AddBtn;
     wxButton* DeleteBtn;
     wxChoice* BondOrderCtl;
-    wxListCtrl* bondList;
+    wxGrid* bondGrid;
     MolDisplayWin * Parent;
 ////@end BondsDlg member variables
 };

@@ -54,11 +54,9 @@ BEGIN_EVENT_TABLE( BondsDlg, wxDialog )
 
     EVT_CHOICE( ID_CHOICE, BondsDlg::OnChoiceSelected )
 
-    EVT_LIST_ITEM_SELECTED( ID_LISTCTRL, BondsDlg::OnListctrlSelected )
-    EVT_LIST_ITEM_DESELECTED( ID_LISTCTRL, BondsDlg::OnListctrlDeselected )
-    EVT_LIST_BEGIN_LABEL_EDIT( ID_LISTCTRL, BondsDlg::OnListctrlBeginLabelEdit )
-    EVT_LIST_END_LABEL_EDIT( ID_LISTCTRL, BondsDlg::OnListctrlEndLabelEdit )
-    EVT_LIST_DELETE_ITEM( ID_LISTCTRL, BondsDlg::OnListctrlDeleteItem )
+    EVT_GRID_SELECT_CELL( BondsDlg::OnSelectCell )
+    EVT_GRID_EDITOR_HIDDEN( BondsDlg::OnEditorHidden )
+    EVT_GRID_RANGE_SELECT( BondsDlg::OnRangeSelect )
 
 ////@end BondsDlg event table entries
 
@@ -87,7 +85,7 @@ bool BondsDlg::Create( MolDisplayWin* parent, wxWindowID id, const wxString& cap
     AddBtn = NULL;
     DeleteBtn = NULL;
     BondOrderCtl = NULL;
-    bondList = NULL;
+    bondGrid = NULL;
 ////@end BondsDlg member initialisation
     Parent = parent;
 
@@ -126,9 +124,11 @@ void BondsDlg::CreateControls()
     DeleteBtn = new wxButton( itemDialog1, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         DeleteBtn->SetToolTip(_("deletes the selected bond(s)"));
+    DeleteBtn->Enable(false);
     itemBoxSizer3->Add(DeleteBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText6 = new wxStaticText( itemDialog1, wxID_STATIC, _("Bond Type:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+    itemStaticText6->Enable(false);
     itemBoxSizer3->Add(itemStaticText6, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
     wxString BondOrderCtlStrings[] = {
@@ -141,50 +141,51 @@ void BondsDlg::CreateControls()
     BondOrderCtl->SetStringSelection(_("Single Bond"));
     if (ShowToolTips())
         BondOrderCtl->SetToolTip(_("Bond Order"));
+    BondOrderCtl->Enable(false);
     itemBoxSizer3->Add(BondOrderCtl, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxBoxSizer* itemBoxSizer8 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    itemBoxSizer2->Add(itemBoxSizer8, 5, wxGROW, 5);
 
-    bondList = new wxListCtrl( itemDialog1, ID_LISTCTRL, wxDefaultPosition, wxSize(500, -1), wxLC_REPORT|wxLC_EDIT_LABELS|wxSUNKEN_BORDER );
-    itemBoxSizer8->Add(bondList, 5, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    bondGrid = new wxGrid( itemDialog1, ID_BONDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxVSCROLL );
+    bondGrid->SetDefaultColSize(100);
+    bondGrid->SetDefaultRowSize(25);
+    bondGrid->SetColLabelSize(25);
+    bondGrid->SetRowLabelSize(0);
+    bondGrid->CreateGrid(5, 4, wxGrid::wxGridSelectRows);
+    itemBoxSizer8->Add(bondGrid, 5, wxGROW|wxALL, 0);
 
 ////@end BondsDlg content construction
-	//add the column headings here?
-	wxListItem itemCol;
-	itemCol.SetText(_T("Atom 1"));
-	bondList->InsertColumn(0, itemCol);
-	bondList->SetColumnWidth(0, 90);
-	
-	itemCol.SetText(_T("Atom 2"));
-	bondList->InsertColumn(1, itemCol);
-	bondList->SetColumnWidth(1, 90);
-
-	itemCol.SetText(_T("Length"));
-	bondList->InsertColumn(2, itemCol);
-	bondList->SetColumnWidth(2, 150);
-
-	itemCol.SetText(_T("Type"));
-	bondList->InsertColumn(3, itemCol);
-	bondList->SetColumnWidth(3, 120);
-	
+	 //Setup the columns to store integers and floats
+	bondGrid->SetColFormatNumber(0);
+	bondGrid->SetColFormatNumber(1);
+	bondGrid->SetColFormatFloat(2, -1, 6);
+	bondGrid->SetColLabelValue(0, _T("Atom 1"));
+	bondGrid->SetColLabelValue(1, _T("Atom 2"));
+	bondGrid->SetColLabelValue(2, _T("Length"));
+	bondGrid->SetColLabelValue(3, _T("Type"));
 	ResetList();
 }
 
 void BondsDlg::ResetList(void) {
+		//Clear off the old rows
+	bondGrid->DeleteRows(0, bondGrid->GetNumberRows(), true);
 	//loop through the bonds and add each with SetItem(row, col, string)
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long nbonds = lFrame->GetNumBonds();
+	//Add back the new ones
+	bondGrid->InsertRows(0, nbonds, true);
 	wxString buf;
 	for (long i=0; i<nbonds; i++) {
 		Bond * b = lFrame->GetBondLoc(i);
 		buf.Printf("%d", b->Atom1);
-		bondList->InsertItem(i, buf);
+		bondGrid->SetCellValue(i, 0, buf);
 		buf.Printf("%d", b->Atom2);
-		bondList->SetItem(i, 1, buf);
+		bondGrid->SetCellValue(i, 1, buf);
 		buf.Printf("%f", lFrame->GetBondLength(i));
-		bondList->SetItem(i, 2, buf);
+		bondGrid->SetCellValue(i, 2, buf);
+		bondGrid->SetReadOnly(i, 2, true);
 		switch (lFrame->GetBondOrder(i)) {
 			case kHydrogenBond:
 				buf.Printf("%s", _T("Hydrogen"));
@@ -199,7 +200,9 @@ void BondsDlg::ResetList(void) {
 				buf.Printf("%s", _T("Triple"));
 				break;
 		}
-		bondList->SetItem(i, 3, buf);
+		bondGrid->SetCellValue(i, 3, buf);
+		bondGrid->SetReadOnly(i, 3, true);
+		bondGrid->SetCellAlignment(wxALIGN_CENTRE, i, 3);
 	}
 }
 
@@ -274,63 +277,40 @@ void BondsDlg::OnChoiceSelected( wxCommandEvent& event )
 }
 
 /*!
- * wxEVT_COMMAND_LIST_ITEM_SELECTED event handler for ID_LISTCTRL
+ * wxEVT_GRID_SELECT_CELL event handler for ID_BONDGRID
  */
 
-void BondsDlg::OnListctrlSelected( wxListEvent& event )
+void BondsDlg::OnSelectCell( wxGridEvent& event )
 {
-////@begin wxEVT_COMMAND_LIST_ITEM_SELECTED event handler for ID_LISTCTRL in BondsDlg.
+////@begin wxEVT_GRID_SELECT_CELL event handler for ID_BONDGRID in BondsDlg.
     // Before editing this code, remove the block markers.
     event.Skip();
-////@end wxEVT_COMMAND_LIST_ITEM_SELECTED event handler for ID_LISTCTRL in BondsDlg. 
+////@end wxEVT_GRID_SELECT_CELL event handler for ID_BONDGRID in BondsDlg. 
 }
 
 /*!
- * wxEVT_COMMAND_LIST_ITEM_DESELECTED event handler for ID_LISTCTRL
+ * wxEVT_GRID_EDITOR_HIDDEN event handler for ID_BONDGRID
  */
 
-void BondsDlg::OnListctrlDeselected( wxListEvent& event )
+void BondsDlg::OnEditorHidden( wxGridEvent& event )
 {
-////@begin wxEVT_COMMAND_LIST_ITEM_DESELECTED event handler for ID_LISTCTRL in BondsDlg.
+////@begin wxEVT_GRID_EDITOR_HIDDEN event handler for ID_BONDGRID in BondsDlg.
     // Before editing this code, remove the block markers.
     event.Skip();
-////@end wxEVT_COMMAND_LIST_ITEM_DESELECTED event handler for ID_LISTCTRL in BondsDlg. 
+////@end wxEVT_GRID_EDITOR_HIDDEN event handler for ID_BONDGRID in BondsDlg. 
 }
 
-/*!
- * wxEVT_COMMAND_LIST_BEGIN_LABEL_EDIT event handler for ID_LISTCTRL
- */
-
-void BondsDlg::OnListctrlBeginLabelEdit( wxListEvent& event )
-{
-////@begin wxEVT_COMMAND_LIST_BEGIN_LABEL_EDIT event handler for ID_LISTCTRL in BondsDlg.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_LIST_BEGIN_LABEL_EDIT event handler for ID_LISTCTRL in BondsDlg. 
-}
 
 /*!
- * wxEVT_COMMAND_LIST_END_LABEL_EDIT event handler for ID_LISTCTRL
+ * wxEVT_GRID_RANGE_SELECT event handler for ID_BONDGRID
  */
 
-void BondsDlg::OnListctrlEndLabelEdit( wxListEvent& event )
+void BondsDlg::OnRangeSelect( wxGridRangeSelectEvent& event )
 {
-////@begin wxEVT_COMMAND_LIST_END_LABEL_EDIT event handler for ID_LISTCTRL in BondsDlg.
+////@begin wxEVT_GRID_RANGE_SELECT event handler for ID_BONDGRID in BondsDlg.
     // Before editing this code, remove the block markers.
     event.Skip();
-////@end wxEVT_COMMAND_LIST_END_LABEL_EDIT event handler for ID_LISTCTRL in BondsDlg. 
-}
-
-/*!
- * wxEVT_COMMAND_LIST_DELETE_ITEM event handler for ID_LISTCTRL
- */
-
-void BondsDlg::OnListctrlDeleteItem( wxListEvent& event )
-{
-////@begin wxEVT_COMMAND_LIST_DELETE_ITEM event handler for ID_LISTCTRL in BondsDlg.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_LIST_DELETE_ITEM event handler for ID_LISTCTRL in BondsDlg. 
+////@end wxEVT_GRID_RANGE_SELECT event handler for ID_BONDGRID in BondsDlg. 
 }
 
 
