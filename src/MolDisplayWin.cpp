@@ -19,7 +19,7 @@
 #include "Math3D.h"
 #include "myFiles.h"
 #include "setscreenplane.h"
-#include "BondsDlg.h"
+#include "bondsdlg.h"
 
 extern WinPrefs * gPreferences;
 

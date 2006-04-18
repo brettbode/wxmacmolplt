@@ -36,7 +36,7 @@ else
     AC_MSG_ERROR([wxWidgets is required. Try --with-wx-config.])
 fi
 WX_CXXFLAGS="`$WXCONFIG --cxxflags`"
-WX_LIBS="`$WXCONFIG --libs base,core,gl`"
+WX_LIBS="`$WXCONFIG --libs base,core,gl,adv`"
 AC_SUBST([WX_CXXFLAGS])
 AC_SUBST([WX_LIBS])
 
