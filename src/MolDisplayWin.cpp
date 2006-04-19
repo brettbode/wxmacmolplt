@@ -20,6 +20,7 @@
 #include "myFiles.h"
 #include "setscreenplane.h"
 #include "bondsdlg.h"
+#include "VirtualSphere.h"
 
 extern WinPrefs * gPreferences;
 
@@ -508,7 +509,6 @@ void MolDisplayWin::FrameChanged(void) {
 	UpdateModelDisplay();
 }
 void MolDisplayWin::UpdateModelDisplay(void) {
-#warning Activate the lines below when the functions are added
 	//	DrawFrame();
 	UpdateGLModel();
 	glCanvas->draw();
@@ -708,60 +708,58 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
 	return test;
 }
 
-void MolDisplayWin::Rotate(wxMouseEvent &event, wxRect DisplayRect) {
-	static wxPoint		p, q, sphereCenter;
-	static bool		Stereo;
-	static short		dx, dy, pixelDepth=0;
-	static long		sphereRadius; 
-	static int		iatm;
-	static bool		ShowAngles=Prefs->GetShowAngles();
-	static Matrix4D		rotationMatrix, tempcopyMatrix;
-	static wxRect		sphereRect;
-	static wxString		AngleString;
-	static long		hsize, vsize, width, hoffset;
-	static Surface *	lSurface;
-	static bool		UpdateSurface;
-	//CGrafPtr	lSavedPort;
-	//GDHandle	lSavedGDH;
+void MolDisplayWin::Rotate(wxMouseEvent &event) {
+	static wxPoint		p;
+	wxPoint				q, sphereCenter;
+	int					dx, dy;
+	Matrix4D			rotationMatrix, tempcopyMatrix;
+	wxRect				sphereRect;
+//	static wxString		AngleString;
+	long				hsize, vsize, width, hoffset, sphereRadius;
+	Surface *			lSurface;
+	bool				UpdateSurface = false;
 
-	if(event.LeftDown()) {
-		// initial drag setup
+	int wheel = event.GetWheelRotation();
+	if (wheel != 0) { //zoom
+		MainData->WindowSize *= 1.0 + 0.01*wheel;
+	}
+	
+	lSurface = MainData->cFrame->SurfaceList;
+	while (lSurface) {
+		UpdateSurface = UpdateSurface || lSurface->NeedsUpdateDuringRotation();
+		lSurface = lSurface->GetNextSurface();
+	}
+	bool Stereo = Prefs->UseStereo();
+	wxRect DisplayRect = glCanvas->GetRect();
+	hsize = DisplayRect.GetWidth();
+	vsize = DisplayRect.GetHeight();
+	if(Stereo) hsize/=2;
+	/* Figure out where to place the Virtual Sphere cue.*/
+	width = hsize;
+	sphereCenter.x = hsize/2; 
+	sphereCenter.y = vsize/2;
+	if (sphereCenter.x >= sphereCenter.y)
+		sphereRadius   = (long)((float) (sphereCenter.x)*0.9);
+	else
+		sphereRadius   = (long)((float) (sphereCenter.y)*0.9);
+	hoffset = sphereCenter.x;
+	if (Stereo && ! DisplayRect.Inside(p)) sphereCenter.x += hsize;
+	hsize = MAX(hsize, vsize);
+	sphereRect.SetHeight(sphereRadius);
+	sphereRect.SetWidth(sphereRadius);
+	sphereRect.SetX(sphereCenter.x - sphereRadius);
+	sphereRect.SetY(sphereCenter.y - sphereRadius);
+	
+	if(event.ButtonDown()) {
+		// initial drag setup, just save the initial cursor position
 		p = event.GetPosition();
-
-		UpdateSurface=false;
-		lSurface = MainData->cFrame->SurfaceList;
-		while (lSurface) {
-			UpdateSurface = UpdateSurface || lSurface->NeedsUpdateDuringRotation();
-			lSurface = lSurface->GetNextSurface();
-		}
-
-		//SetCursor (*GetCursor(crossCursor));
-		/* Figure out where to place the Virtual Sphere cue.*/
-		Stereo = Prefs->UseStereo();
-		hsize = DisplayRect.GetWidth();
-		vsize = DisplayRect.GetHeight();
-		if(Stereo) hsize/=2;
-		width = hsize;
-		sphereCenter.x = hsize/2; 
-		sphereCenter.y = vsize/2;
-		if (sphereCenter.x >= sphereCenter.y)
-			sphereRadius   = (long)((float) (sphereCenter.x)*0.9);
-		else
-			sphereRadius   = (long)((float) (sphereCenter.y)*0.9);
-		hoffset = sphereCenter.x;
-		if (Stereo && ! DisplayRect.Inside(p)) sphereCenter.x += hsize;
-		hsize = MAX(hsize, vsize);
-		sphereRect.SetHeight(sphereRadius);
-		sphereRect.SetWidth(sphereRadius);
-		sphereRect.SetX(sphereCenter.x - sphereRadius);
-		sphereRect.SetY(sphereCenter.y - sphereRadius);
 	} else if(event.Dragging()) {								
 		// main drag
 		q = event.GetPosition();
 		dx = q.x - p.x;
 		dy = q.y - p.y;
 		if (dx != 0 || dy != 0) {
-			if (event.CmdDown()) {	//Command key: translate instead of rotate
+			if (event.CmdDown() || event.RightIsDown()) {	//Command key: translate instead of rotate
 				CPoint3D offset;
 				if (event.ShiftDown()) {	/*The shift key is down so move into/out of the screen*/
 					offset.z = dy/(hsize/MainData->WindowSize);
@@ -773,21 +771,20 @@ void MolDisplayWin::Rotate(wxMouseEvent &event, wxRect DisplayRect) {
 					MainData->TotalRotation[3][1] -= offset.y;
 				}
 			} else {
-				if (event.ShiftDown()) {	/*The shift key is down so zoom instead of rotating*/
+				if (event.ShiftDown()||event.MiddleIsDown()) {	/*The shift key is down so zoom instead of rotating*/
 					if (dy == 0) return;
 					if (dy > 99) dy = 99;
 					MainData->WindowSize *= 1.0 + 0.01*dy;
-#ifdef QuickDraw3D
-					// this next q3d part would be broken
-					// if included
-					//If QD3D is active then zooming means changing the camera position
-					Rect temp = DisplayRect;	//expects the full displayrect
-					DisplayRect = TotalRect;
-					ChangeCameraAspectRatio();
-					DisplayRect = temp;	//return it to whatever was being used previously
-#endif
 				} else {
-					//VirtualSphereQD3D (p, q, sphereCenter, sphereRadius, rotationMatrix, MainData->TotalRotation);
+					Point pr, cur, sp;
+					pr.h = p.x;
+					pr.v = p.y;
+					cur.h = q.x;
+					cur.v = q.y;
+					sp.h = sphereCenter.x;
+					sp.v = sphereCenter.y;
+					VirtualSphereQD3D (pr, cur, sp, sphereRadius, rotationMatrix, MainData->TotalRotation);
+			//		VirtualSphereQD3D (p, q, sphereCenter, sphereRadius, rotationMatrix, MainData->TotalRotation);
 
 					CPoint3D	InitialTrans, FinalTrans;
 //First back rotate the translation to get the inital translation
@@ -811,6 +808,9 @@ void MolDisplayWin::Rotate(wxMouseEvent &event, wxRect DisplayRect) {
 					MainData->TotalRotation[3][0] = FinalTrans.x;
 					MainData->TotalRotation[3][1] = FinalTrans.y;
 					MainData->TotalRotation[3][2] = FinalTrans.z;
+
+					//"clean up" the rotation matrix make the rotation part orthogonal and magnitude 1
+					OrthogonalizeRotationMatrix (MainData->TotalRotation);
 				}
 			}	//Update any surfaces which depend on the screen plane
 			if (UpdateSurface) {
@@ -819,17 +819,10 @@ void MolDisplayWin::Rotate(wxMouseEvent &event, wxRect DisplayRect) {
 					lSurface->RotateEvent(MainData);
 					lSurface = lSurface->GetNextSurface();
 				}
-#ifdef QuickDraw3D
-				Q3DUpdateModel();
-#endif
 			}
 			/* Update the window */
-#ifdef QuickDraw3D
-			DrawMoleculeQ3D();
-#endif
 #ifdef UseOpenGL
 			if (UpdateSurface) UpdateGLModel();
-			RotateMoleculeGL(ShowAngles);
 #endif
 
 			/*if (ShowAngles) {
@@ -845,12 +838,16 @@ void MolDisplayWin::Rotate(wxMouseEvent &event, wxRect DisplayRect) {
 
 			p = q;		/* Remember previous mouse point for next iteration. */
 		}
-	} else if(event.LeftUp()) {
+	}
+	if (event.LeftIsDown()) {
+			//This will draw with the angles and circle displayed
+		RotateMoleculeGL(Prefs->GetShowAngles());
+		glCanvas->SwapBuffers();
+	} else {
 		// drag finished
 		//"clean up" the rotation matrix make the rotation part orthogonal and magnitude 1
 		OrthogonalizeRotationMatrix (MainData->TotalRotation);
 		/* Draw once again to get rid of the rotation sphere */
-		//draw();
-		//SetCursorToArrow();
+		glCanvas->draw();
 	}
 }

@@ -627,10 +627,13 @@ void MolDisplayWin::DrawMoleculeGL(void)
 
 	aglSwapBuffers(OpenGLData->aglContext);	// finally swap buffers to display our work
 }
+#endif
 void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 {
+#ifndef __wxBuild__
 	aglSetCurrentContext (OpenGLData->aglContext);
-
+#endif
+	
 	if (OpenGLData->transpTriList) { //update the transparent surface sorting
 		SortTransparentTriangles();
 	}
@@ -645,14 +648,20 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 		glGetIntegerv (GL_MATRIX_MODE, &matrixMode);
 		glMatrixMode (GL_PROJECTION);
 		glPushMatrix();
-			glLoadIdentity ();
-			glMatrixMode (GL_MODELVIEW);
-			glPushMatrix();
-				glLoadIdentity ();
-				long hsize = DisplayRect.right - DisplayRect.left;
-				long vsize = DisplayRect.bottom - DisplayRect.top;
-				glScalef (2.0 / hsize, -2.0 /  vsize, 1.0);
-				glTranslatef (-hsize / 2.0, -vsize / 2.0, 0.0);
+		glLoadIdentity ();
+		glMatrixMode (GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity ();
+#ifdef __wxBuild__
+		wxRect DisplayRect = glCanvas->GetRect();
+		long hsize = DisplayRect.GetWidth();
+		long vsize = DisplayRect.GetHeight();
+#else
+		long hsize = DisplayRect.right - DisplayRect.left;
+		long vsize = DisplayRect.bottom - DisplayRect.top;
+#endif
+		glScalef (2.0 / hsize, -2.0 /  vsize, 1.0);
+		glTranslatef (-hsize / 2.0, -vsize / 2.0, 0.0);
 
 		RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
 		long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
@@ -662,6 +671,7 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 					glColor3f (0.0, 0.0, 0.0);
 				else
 					glColor3f (1.0, 1.0, 1.0);
+#ifndef __wxBuild__
 				if (ShowAngles) {
 					glRasterPos3d (10, 12, 0); 
 						char AngleString[50];
@@ -673,7 +683,8 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 			//		glRasterPos3d (10, (DisplayRect.bottom - DisplayRect.top) - 3, 0); 
 			//		DrawCStringGL ((char*) glGetString (GL_RENDER), OpenGLData->fontList);
 				}
-					//Draw the trackball outline
+#endif
+				//Draw the trackball outline
 				{
 					Point			sphereCenter;
 					long			sphereRadius; 
@@ -702,9 +713,10 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 		glMatrixMode (matrixMode);
 	}
 	
+#ifndef __wxBuild__
 	aglSwapBuffers(OpenGLData->aglContext);	// finally swap buffers to display our work
-}
 #endif
+}
 void MolDisplayWin::DrawGL(void)
 {
 	GLenum error = glGetError();	//clear the error code
