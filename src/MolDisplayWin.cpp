@@ -721,7 +721,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 
 	int wheel = event.GetWheelRotation();
 	if (wheel != 0) { //zoom
-		MainData->WindowSize *= 1.0 + 0.01*wheel;
+		MainData->WindowSize *= 1.0 + 0.01*wheel/event.GetWheelDelta();
 	}
 	
 	lSurface = MainData->cFrame->SurfaceList;
@@ -824,17 +824,6 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 #ifdef UseOpenGL
 			if (UpdateSurface) UpdateGLModel();
 #endif
-
-			/*if (ShowAngles) {
-				float psi, phi, theta;
-				MatrixToEulerAngles(MainData->TotalRotation, &psi, &phi, &theta);
-				AngleString.Printf(_T("_%.2f, %.2f, %.2f, Scale:%.2f"),
-						psi, phi, theta, MainData->WindowSize);
-				AngleString.SetChar(0,AngleString.Len()-1);
-				TextFont(systemFont);
-				MoveTo(2,12);
-				DrawString(AngleString.c_str());
-			}*/
 
 			p = q;		/* Remember previous mouse point for next iteration. */
 		}
