@@ -42,7 +42,7 @@ class MolDisplayWin;
 #define SYMBOL_BONDSDLG_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_BONDSDLG_TITLE _("BondsDlg")
 #define SYMBOL_BONDSDLG_IDNAME ID_BONDSDIALOG
-#define SYMBOL_BONDSDLG_SIZE wxSize(400, 300)
+#define SYMBOL_BONDSDLG_SIZE wxDefaultSize
 #define SYMBOL_BONDSDLG_POSITION wxDefaultPosition
 #define ID_CHOICE 10022
 #define ID_BONDGRID 10020
@@ -78,6 +78,9 @@ public:
 
 ////@begin BondsDlg event handler declarations
 
+    /// wxEVT_CLOSE_WINDOW event handler for ID_BONDSDIALOG
+    void OnCloseWindow( wxCloseEvent& event );
+
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
     void OnAddClick( wxCommandEvent& event );
 
@@ -87,11 +90,11 @@ public:
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CHOICE
     void OnChoiceSelected( wxCommandEvent& event );
 
+    /// wxEVT_GRID_CELL_CHANGE event handler for ID_BONDGRID
+    void OnCellChange( wxGridEvent& event );
+
     /// wxEVT_GRID_SELECT_CELL event handler for ID_BONDGRID
     void OnSelectCell( wxGridEvent& event );
-
-    /// wxEVT_GRID_EDITOR_HIDDEN event handler for ID_BONDGRID
-    void OnEditorHidden( wxGridEvent& event );
 
     /// wxEVT_GRID_RANGE_SELECT event handler for ID_BONDGRID
     void OnRangeSelect( wxGridRangeSelectEvent& event );
@@ -115,10 +118,14 @@ public:
 	
 	// Clear off and rebuild the list of bonds
 	void ResetList(void);
+	
+	// Update the state of the selection dependant controls
+	void UpdateControls(void);
 
 ////@begin BondsDlg member variables
     wxButton* AddBtn;
     wxButton* DeleteBtn;
+    wxStaticText* bondText;
     wxChoice* BondOrderCtl;
     wxGrid* bondGrid;
     MolDisplayWin * Parent;

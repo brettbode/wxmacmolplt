@@ -48,14 +48,16 @@ IMPLEMENT_DYNAMIC_CLASS( BondsDlg, wxDialog )
 BEGIN_EVENT_TABLE( BondsDlg, wxDialog )
 
 ////@begin BondsDlg event table entries
+    EVT_CLOSE( BondsDlg::OnCloseWindow )
+
     EVT_BUTTON( wxID_ADD, BondsDlg::OnAddClick )
 
     EVT_BUTTON( wxID_DELETE, BondsDlg::OnDeleteClick )
 
     EVT_CHOICE( ID_CHOICE, BondsDlg::OnChoiceSelected )
 
+    EVT_GRID_CELL_CHANGE( BondsDlg::OnCellChange )
     EVT_GRID_SELECT_CELL( BondsDlg::OnSelectCell )
-    EVT_GRID_EDITOR_HIDDEN( BondsDlg::OnEditorHidden )
     EVT_GRID_RANGE_SELECT( BondsDlg::OnRangeSelect )
 
 ////@end BondsDlg event table entries
@@ -84,6 +86,7 @@ bool BondsDlg::Create( MolDisplayWin* parent, wxWindowID id, const wxString& cap
 ////@begin BondsDlg member initialisation
     AddBtn = NULL;
     DeleteBtn = NULL;
+    bondText = NULL;
     BondOrderCtl = NULL;
     bondGrid = NULL;
 ////@end BondsDlg member initialisation
@@ -127,9 +130,9 @@ void BondsDlg::CreateControls()
     DeleteBtn->Enable(false);
     itemBoxSizer3->Add(DeleteBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticText* itemStaticText6 = new wxStaticText( itemDialog1, wxID_STATIC, _("Bond Type:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-    itemStaticText6->Enable(false);
-    itemBoxSizer3->Add(itemStaticText6, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    bondText = new wxStaticText( itemDialog1, wxID_STATIC, _("Bond Type:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+    bondText->Enable(false);
+    itemBoxSizer3->Add(bondText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
     wxString BondOrderCtlStrings[] = {
         _("Hydrogen Bond"),
@@ -153,7 +156,7 @@ void BondsDlg::CreateControls()
     bondGrid->SetColLabelSize(25);
     bondGrid->SetRowLabelSize(0);
     bondGrid->CreateGrid(5, 4, wxGrid::wxGridSelectRows);
-    itemBoxSizer8->Add(bondGrid, 5, wxGROW|wxALL, 0);
+    itemBoxSizer8->Add(bondGrid, 1, wxGROW|wxALL, 0);
 
 ////@end BondsDlg content construction
 	 //Setup the columns to store integers and floats
@@ -174,36 +177,69 @@ void BondsDlg::ResetList(void) {
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long nbonds = lFrame->GetNumBonds();
-	//Add back the new ones
-	bondGrid->InsertRows(0, nbonds, true);
-	wxString buf;
+	if (nbonds > 0) {
+		bool temp = lFrame->GetBondSelectState(0);
+		//Add back the new ones
+		bondGrid->InsertRows(0, nbonds, true);
+		bondGrid->HideCellEditControl();
+		bondGrid->ClearSelection();
+		lFrame->SetBondSelectState(0, temp);
+		
+		wxString buf;
+		for (long i=0; i<nbonds; i++) {
+			Bond * b = lFrame->GetBondLoc(i);
+			buf.Printf("%d", b->Atom1);
+			bondGrid->SetCellValue(i, 0, buf);
+			buf.Printf("%d", b->Atom2);
+			bondGrid->SetCellValue(i, 1, buf);
+			buf.Printf("%f", lFrame->GetBondLength(i));
+			bondGrid->SetCellValue(i, 2, buf);
+			bondGrid->SetReadOnly(i, 2, true);
+			switch (lFrame->GetBondOrder(i)) {
+				case kHydrogenBond:
+					buf.Printf("%s", _T("Hydrogen"));
+					break;
+				case kSingleBond:
+					buf.Printf("%s", _T("Single"));
+					break;
+				case kDoubleBond:
+					buf.Printf("%s", _T("Double"));
+					break;
+				case kTripleBond:
+					buf.Printf("%s", _T("Triple"));
+					break;
+			}
+			bondGrid->SetCellValue(i, 3, buf);
+			bondGrid->SetReadOnly(i, 3, true);
+			bondGrid->SetCellAlignment(wxALIGN_CENTRE, i, 3);
+			if (b->GetSelectState()) bondGrid->SelectRow(i, true);
+		}
+	}
+	UpdateControls();
+}
+
+void BondsDlg::UpdateControls(void) {
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long nbonds = lFrame->GetNumBonds();
+	bool selectionActive = false;
+	BondOrder selectedOrder=kUnknownBond;
 	for (long i=0; i<nbonds; i++) {
 		Bond * b = lFrame->GetBondLoc(i);
-		buf.Printf("%d", b->Atom1);
-		bondGrid->SetCellValue(i, 0, buf);
-		buf.Printf("%d", b->Atom2);
-		bondGrid->SetCellValue(i, 1, buf);
-		buf.Printf("%f", lFrame->GetBondLength(i));
-		bondGrid->SetCellValue(i, 2, buf);
-		bondGrid->SetReadOnly(i, 2, true);
-		switch (lFrame->GetBondOrder(i)) {
-			case kHydrogenBond:
-				buf.Printf("%s", _T("Hydrogen"));
-				break;
-			case kSingleBond:
-				buf.Printf("%s", _T("Single"));
-				break;
-			case kDoubleBond:
-				buf.Printf("%s", _T("Double"));
-				break;
-			case kTripleBond:
-				buf.Printf("%s", _T("Triple"));
-				break;
+		if (b->GetSelectState()) {
+			if (!selectionActive) {
+				selectionActive = true;
+				selectedOrder = lFrame->GetBondOrder(i);
+			} else {
+				if (selectedOrder != lFrame->GetBondOrder(i))
+					selectedOrder = kMixedBonds;
+			}
 		}
-		bondGrid->SetCellValue(i, 3, buf);
-		bondGrid->SetReadOnly(i, 3, true);
-		bondGrid->SetCellAlignment(wxALIGN_CENTRE, i, 3);
 	}
+	DeleteBtn->Enable(selectionActive);
+	if (selectedOrder < kMixedBonds) BondOrderCtl->SetSelection(selectedOrder);
+	BondOrderCtl->Enable(selectionActive);
+	bondText->Enable(selectionActive);
 }
 
 /*!
@@ -246,10 +282,43 @@ wxIcon BondsDlg::GetIconResource( const wxString& name )
 
 void BondsDlg::OnAddClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD in BondsDlg.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD in BondsDlg. 
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long nbonds = lFrame->GetNumBonds();
+	if (lFrame->AddBond(0,1)) {
+		wxString buf;
+		bondGrid->AppendRows(1);
+		buf.Printf("%d", 0);
+		bondGrid->SetCellValue(nbonds, 0, buf);
+		buf.Printf("%d", 1);
+		bondGrid->SetCellValue(nbonds, 1, buf);
+		buf.Printf("%f", lFrame->GetBondLength(nbonds));
+		bondGrid->SetCellValue(nbonds, 2, buf);
+		bondGrid->SetReadOnly(nbonds, 2, true);
+		switch (lFrame->GetBondOrder(nbonds)) {
+			case kHydrogenBond:
+				buf.Printf("%s", _T("Hydrogen"));
+				break;
+			case kSingleBond:
+				buf.Printf("%s", _T("Single"));
+				break;
+			case kDoubleBond:
+				buf.Printf("%s", _T("Double"));
+				break;
+			case kTripleBond:
+				buf.Printf("%s", _T("Triple"));
+				break;
+		}
+		bondGrid->SetCellValue(nbonds, 3, buf);
+		bondGrid->SetReadOnly(nbonds, 3, true);
+		bondGrid->SetCellAlignment(wxALIGN_CENTRE, nbonds, 3);
+		lFrame->SetBondSelectState(nbonds, true);
+		bondGrid->SelectRow(nbonds, true);
+		bondGrid->SetGridCursor(nbonds, 0);
+		bondGrid->ShowCellEditControl();
+	}
+	UpdateControls();
+	Parent->ResetModel(false);
 }
 
 /*!
@@ -258,10 +327,19 @@ void BondsDlg::OnAddClick( wxCommandEvent& event )
 
 void BondsDlg::OnDeleteClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE in BondsDlg.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE in BondsDlg. 
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long nbonds = lFrame->GetNumBonds();
+	for (int i=(nbonds-1); i>=0; i--) {
+		Bond * b = lFrame->GetBondLoc(i);
+		if (b->GetSelectState()) {
+			lFrame->DeleteBond(i);
+			bondGrid->DeleteRows(i, 1, true);
+		}
+	}
+	bondGrid->ClearSelection();
+	UpdateControls();
+	Parent->ResetModel(false);
 }
 
 /*!
@@ -270,10 +348,35 @@ void BondsDlg::OnDeleteClick( wxCommandEvent& event )
 
 void BondsDlg::OnChoiceSelected( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CHOICE in BondsDlg.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CHOICE in BondsDlg. 
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long nbonds = lFrame->GetNumBonds();
+	int choice = BondOrderCtl->GetSelection();
+	for (int i=0; i<nbonds; i++) {
+		if (lFrame->GetBondSelectState(i)) {
+			wxString order;
+			switch (choice) {
+				case kHydrogenBond:
+					lFrame->SetBondOrder(i, kHydrogenBond);
+					order.Printf("%s", _T("Hydrogen"));
+					break;
+				case kSingleBond:
+					lFrame->SetBondOrder(i, kSingleBond);
+					order.Printf("%s", _T("Single"));
+					break;
+				case kDoubleBond:
+					lFrame->SetBondOrder(i, kDoubleBond);
+					order.Printf("%s", _T("Double"));
+					break;
+				case kTripleBond:
+					lFrame->SetBondOrder(i, kTripleBond);
+					order.Printf("%s", _T("Triple"));
+					break;
+			}
+			bondGrid->SetCellValue(i, 3, order);
+		}
+	}
+	Parent->ResetModel(false);
 }
 
 /*!
@@ -282,23 +385,24 @@ void BondsDlg::OnChoiceSelected( wxCommandEvent& event )
 
 void BondsDlg::OnSelectCell( wxGridEvent& event )
 {
-////@begin wxEVT_GRID_SELECT_CELL event handler for ID_BONDGRID in BondsDlg.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_GRID_SELECT_CELL event handler for ID_BONDGRID in BondsDlg. 
+	int row = event.GetRow();
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long nbonds = lFrame->GetNumBonds();
+	//we seem to only get selection events and not also deselection events
+	//so first clear off the list of selected cells
+	for (int i=0; i<nbonds; i++) {
+		Bond * b = lFrame->GetBondLoc(i);
+		b->SetSelectState(false);
+	}
+	if ((row>=0)&&(row<nbonds)) {
+		Bond * b = lFrame->GetBondLoc(row);
+		b->SetSelectState(event.Selecting());
+	}
+	UpdateControls();
+	event.Skip();
 }
 
-/*!
- * wxEVT_GRID_EDITOR_HIDDEN event handler for ID_BONDGRID
- */
-
-void BondsDlg::OnEditorHidden( wxGridEvent& event )
-{
-////@begin wxEVT_GRID_EDITOR_HIDDEN event handler for ID_BONDGRID in BondsDlg.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_GRID_EDITOR_HIDDEN event handler for ID_BONDGRID in BondsDlg. 
-}
 
 
 /*!
@@ -307,10 +411,55 @@ void BondsDlg::OnEditorHidden( wxGridEvent& event )
 
 void BondsDlg::OnRangeSelect( wxGridRangeSelectEvent& event )
 {
-////@begin wxEVT_GRID_RANGE_SELECT event handler for ID_BONDGRID in BondsDlg.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_GRID_RANGE_SELECT event handler for ID_BONDGRID in BondsDlg. 
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long nbonds = lFrame->GetNumBonds();
+	//we seem to only get selection events and not also deselection events
+	//so first clear off the list of selected cells
+	for (int i=0; i<nbonds; i++) lFrame->SetBondSelectState(i, false);
+	if(event.Selecting()) {
+		for (int i=event.GetTopRow(); i<=event.GetBottomRow(); i++) {
+			lFrame->SetBondSelectState(i, true);
+		}
+	}
+	
+	UpdateControls();
+	event.Skip();
 }
 
+
+/*!
+ * wxEVT_CLOSE_WINDOW event handler for ID_BONDSDIALOG
+ */
+
+void BondsDlg::OnCloseWindow( wxCloseEvent& event )
+{
+	Parent->CloseBondsWindow();
+}
+
+
+/*!
+ * wxEVT_GRID_CELL_CHANGE event handler for ID_BONDGRID
+ */
+
+void BondsDlg::OnCellChange( wxGridEvent& event )
+{
+	int row = event.GetRow();
+	int col = event.GetCol();
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long nbonds = lFrame->GetNumBonds();
+	wxString val = bondGrid->GetCellValue(row, col);
+	long newval;
+	if (val.ToLong(&newval)) {
+		if ((newval>-0)&&(newval<lFrame->GetNumAtoms())&&
+			(newval!=lFrame->GetBondAtom(row, 2-col))) {
+			lFrame->ChangeBond(row, col+1, newval);
+		}
+	}
+	val.Printf("%d", lFrame->GetBondAtom(row, col+1));
+	bondGrid->SetCellValue(row, col, val);
+	Parent->ResetModel(false);
+	event.Skip();
+}
 

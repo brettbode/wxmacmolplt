@@ -151,6 +151,7 @@ class MolDisplayWin : public wxFrame {
         //void menuWindowSurfaces(wxCommandEvent &event);
         //void menuWindowPreferences(wxCommandEvent &event);
 		void KeyHandler(wxKeyEvent &event);
+		void CloseBondsWindow(void);
 		
 		//File handling routines
 		long OpenFile(wxString fileName);

@@ -491,10 +491,15 @@ void MolDisplayWin::menuWindowBonds(wxCommandEvent &event) {
 		bondsWindow->Show();
 	}
 }
+void MolDisplayWin::CloseBondsWindow(void) {
+	if (bondsWindow) {
+		bondsWindow->Destroy();
+		bondsWindow = NULL;
+	}
+}
 
 void MolDisplayWin::BondsChanged(void) {
-#warning Need to pass event to bonds list here
-//	if (BondsDlog) BondsDlog->ResetList();
+	if (bondsWindow) bondsWindow->ResetList();
 	FrameChanged();
 };
 
