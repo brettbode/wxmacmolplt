@@ -208,5 +208,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
     EVT_PAINT            (MpGLCanvas::eventPaint)
     EVT_ERASE_BACKGROUND (MpGLCanvas::eventErase)
 	EVT_MOUSE_EVENTS     (MpGLCanvas::eventMouse)
+
+	EVT_CHAR (MolDisplayWin::KeyHandler)
 END_EVENT_TABLE()
 
