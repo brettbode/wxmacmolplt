@@ -1,10 +1,9 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        bondsdlg.cpp
-// Purpose:     
+// Purpose:     Provide a dialog to allow the user to inspect and change the bond list
 // Author:      Brett Bode
 // Modified by: 
 // Created:     Thu 13 Apr 16:02:45 2006
-// RCS-ID:      
 // Copyright:   (c) 2006 Iowa State University
 // Licence:     
 /////////////////////////////////////////////////////////////////////////////
@@ -59,6 +58,7 @@ BEGIN_EVENT_TABLE( BondsDlg, wxDialog )
     EVT_GRID_CELL_CHANGE( BondsDlg::OnCellChange )
     EVT_GRID_SELECT_CELL( BondsDlg::OnSelectCell )
     EVT_GRID_RANGE_SELECT( BondsDlg::OnRangeSelect )
+    EVT_SIZE( BondsDlg::OnSize )
 
 ////@end BondsDlg event table entries
 
@@ -167,6 +167,8 @@ void BondsDlg::CreateControls()
 	bondGrid->SetColLabelValue(1, _T("Atom 2"));
 	bondGrid->SetColLabelValue(2, _T("Length"));
 	bondGrid->SetColLabelValue(3, _T("Type"));
+	wxSize s(50, 150);
+	bondGrid->SetMinSize(s);
 	ResetList();
 }
 
@@ -315,6 +317,7 @@ void BondsDlg::OnAddClick( wxCommandEvent& event )
 		lFrame->SetBondSelectState(nbonds, true);
 		bondGrid->SelectRow(nbonds, true);
 		bondGrid->SetGridCursor(nbonds, 0);
+		bondGrid->MakeCellVisible(nbonds, 0);
 		bondGrid->ShowCellEditControl();
 	}
 	UpdateControls();
@@ -452,14 +455,34 @@ void BondsDlg::OnCellChange( wxGridEvent& event )
 	wxString val = bondGrid->GetCellValue(row, col);
 	long newval;
 	if (val.ToLong(&newval)) {
-		if ((newval>-0)&&(newval<lFrame->GetNumAtoms())&&
+		if ((newval>=0)&&(newval<lFrame->GetNumAtoms())&&
 			(newval!=lFrame->GetBondAtom(row, 2-col))) {
 			lFrame->ChangeBond(row, col+1, newval);
 		}
 	}
 	val.Printf("%d", lFrame->GetBondAtom(row, col+1));
 	bondGrid->SetCellValue(row, col, val);
+	val.Printf("%f", lFrame->GetBondLength(row));
+	bondGrid->SetCellValue(row, 2, val);
+	for (int i=0; i<nbonds; i++) lFrame->SetBondSelectState(i, false);
 	Parent->ResetModel(false);
 	event.Skip();
 }
+
+/*!
+ * wxEVT_SIZE event handler for ID_BONDGRID
+ */
+
+void BondsDlg::OnSize( wxSizeEvent& event )
+{
+	wxSize s = event.GetSize();
+	int width = (s.GetWidth()/4) - 4;
+	if (width < 40) width = 40;
+	bondGrid->SetColSize(0, width);
+	bondGrid->SetColSize(1, width);
+	bondGrid->SetColSize(2, width);
+	bondGrid->SetColSize(3, width);
+    event.Skip();
+}
+
 

@@ -99,6 +99,9 @@ public:
     /// wxEVT_GRID_RANGE_SELECT event handler for ID_BONDGRID
     void OnRangeSelect( wxGridRangeSelectEvent& event );
 
+    /// wxEVT_SIZE event handler for ID_BONDGRID
+    void OnSize( wxSizeEvent& event );
+
 ////@end BondsDlg event handler declarations
 
 ////@begin BondsDlg member function declarations

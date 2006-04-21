@@ -2423,6 +2423,7 @@
                 <string name="event-handler-0">"wxEVT_GRID_CELL_CHANGE|OnCellChange"</string>
                 <string name="event-handler-1">"wxEVT_GRID_SELECT_CELL|OnSelectCell"</string>
                 <string name="event-handler-2">"wxEVT_GRID_RANGE_SELECT|OnRangeSelect"</string>
+                <string name="event-handler-3">"wxEVT_SIZE|OnSize"</string>
                 <string name="proxy-Id name">"ID_BONDGRID"</string>
                 <long name="proxy-Id value">10020</long>
                 <string name="proxy-Class">"wxGrid"</string>
