@@ -20,6 +20,7 @@
 #include "myFiles.h"
 #include "setscreenplane.h"
 #include "bondsdlg.h"
+#include "coordinateswindow.h"
 #include "VirtualSphere.h"
 
 extern WinPrefs * gPreferences;
@@ -46,6 +47,7 @@ enum MMP_EventID {
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
 	MMP_BONDSWINDOW,
+	MMP_COORDSWINDOW,
 	
 	Number_MMP_Ids
 };
@@ -89,6 +91,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_INVERTNORMALMODE,	MolDisplayWin::menuMoleculeInvertNormalMode)
 
 	EVT_MENU (MMP_BONDSWINDOW,	MolDisplayWin::menuWindowBonds)
+	EVT_MENU (MMP_COORDSWINDOW,	MolDisplayWin::menuWindowCoordinates)
 
 	EVT_CHAR (MolDisplayWin::KeyHandler)
 END_EVENT_TABLE()
@@ -113,6 +116,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	ProgressInd = NULL;
 	OpenGLData = NULL;
 	bondsWindow = NULL;
+	coordsWindow = NULL;
 	InitGLData();
 	
     glCanvas = new MpGLCanvas(this);
@@ -206,6 +210,7 @@ void MolDisplayWin::createMenuBar(void) {
 // TODO:  Create menu items for remaining menus
 
     menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"));
+    menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"));
     // TODO:  Make Mac handle help menu properly
     // TODO:  Make Mac display About menu item in the correct place
     menuHelp->Append(wxID_ABOUT, wxT("&About ..."));
@@ -588,6 +593,7 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 }
 void MolDisplayWin::menuWindowBonds(wxCommandEvent &event) {
 	if (bondsWindow) { //need to bring it to the front...
+		bondsWindow->Raise();
 	} else {
 		bondsWindow = new BondsDlg(this);
 		bondsWindow->Show();
@@ -597,6 +603,20 @@ void MolDisplayWin::CloseBondsWindow(void) {
 	if (bondsWindow) {
 		bondsWindow->Destroy();
 		bondsWindow = NULL;
+	}
+}
+void MolDisplayWin::menuWindowCoordinates(wxCommandEvent &event) {
+	if (coordsWindow) { //need to bring it to the front...
+		coordsWindow->Raise();
+	} else {
+		coordsWindow = new CoordinatesWindow(this);
+		coordsWindow->Show();
+	}
+}
+void MolDisplayWin::CloseCoordsWindow(void) {
+	if (coordsWindow) {
+		coordsWindow->Destroy();
+		coordsWindow = NULL;
 	}
 }
 

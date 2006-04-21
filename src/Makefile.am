@@ -1,7 +1,7 @@
 bin_PROGRAMS = wxMacMolPlt
 wxMacMolPlt_SOURCES = main.cpp MolDisplayWin.cpp  mpGLCanvas.cpp \
     AtomTypeList.cpp BasisSet.cpp BFiles.cpp CML.cpp DataClasses.cpp \
-    bondsdlg.cpp Files.cpp Frame.cpp GaussHermite.cpp \
+    bondsdlg.cpp coordinateswindow.cpp Files.cpp Frame.cpp GaussHermite.cpp \
     Gradient.cpp InputData.cpp Internals.cpp Math3D.cpp MEP.cpp \
     MMPPrefs.cpp OpenGLGraphics.cpp \
     MoleculeData.cpp orbitals.cpp Progress.cpp RysPolynomial.cpp \

@@ -25,6 +25,7 @@
 
 typedef class OpenGLRec OpenGLRec;
 typedef class BondsDlg BondsDlg;
+typedef class CoordinatesWindow CoordinatesWindow;
 /**
  * Subclasses wxFrame to define the main application window.  This is a
  * document window.  There can be multiple instances of the window in the
@@ -52,6 +53,7 @@ class MolDisplayWin : public wxFrame {
         MpGLCanvas *	glCanvas;
 		
 		BondsDlg *		bondsWindow;
+		CoordinatesWindow * coordsWindow;
 
         void createMenuBar(void);
 		long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
@@ -146,7 +148,7 @@ class MolDisplayWin : public wxFrame {
          * main window*/
         //void menuWindowMain_display(wxCommandEvent &event);
         void menuWindowBonds(wxCommandEvent &event);
-        //void menuWindowCoordinates(wxCommandEvent &event);
+        void menuWindowCoordinates(wxCommandEvent &event);
         //void menuWindowEnergy_plot(wxCommandEvent &event);
         //void menuWindowFrequencies(wxCommandEvent &event);
         //void menuWindowInput_builder(wxCommandEvent &event);
@@ -154,6 +156,7 @@ class MolDisplayWin : public wxFrame {
         //void menuWindowPreferences(wxCommandEvent &event);
 		void KeyHandler(wxKeyEvent &event);
 		void CloseBondsWindow(void);
+		void CloseCoordsWindow(void);
 		
 		//File handling routines
 		long OpenFile(wxString fileName);
@@ -177,6 +180,7 @@ class MolDisplayWin : public wxFrame {
 		void ChangeFrames(long NewFrame);
 		void UpdateModelDisplay(void);
 		MoleculeData * GetData(void) const {return MainData;};
+		WinPrefs * GetPrefs(void) const {return Prefs;};
 		void ResetView(void);
 		void ResetModel(bool Center);
 		void ResetAllWindows(void);
