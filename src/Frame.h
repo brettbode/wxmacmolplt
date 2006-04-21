@@ -49,7 +49,7 @@ class Frame {
 		double		MP2Energy;
 		float		time;
 		long		IRCPt;
-	 mpAtom *		Atoms;
+		mpAtom *	Atoms;
 		Bond *		Bonds;
 		long		NumAtoms;
 		long		AtomAllocation;

@@ -203,12 +203,17 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
     MolWin->Rotate(event);
 }
 
+void MpGLCanvas::KeyHandler(wxKeyEvent & event) {
+	//char events are passed up the parent chain so se need to explicitely pass them
+	MolWin->KeyHandler(event);
+}
+
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
     EVT_SIZE             (MpGLCanvas::eventSize)
     EVT_PAINT            (MpGLCanvas::eventPaint)
     EVT_ERASE_BACKGROUND (MpGLCanvas::eventErase)
 	EVT_MOUSE_EVENTS     (MpGLCanvas::eventMouse)
 
-	EVT_CHAR (MolDisplayWin::KeyHandler)
+	EVT_CHAR (MpGLCanvas::KeyHandler)
 END_EVENT_TABLE()
 

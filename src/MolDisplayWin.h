@@ -109,6 +109,8 @@ class MolDisplayWin : public wxFrame {
         void menuEditSelect_all(wxCommandEvent &event);
 
         void menuViewShowNormalMode(wxCommandEvent &event);
+		void menuViewPrevNormalMode(wxCommandEvent &event);
+		void menuViewNextNormalMode(wxCommandEvent &event);
           // void menuViewDisplay_frequencyDOSTUFF(wxCommandEvent &event);
         //void menuViewOffset_along_mode(wxCommandEvent &event);
         //void menuViewAnimate_mode(wxCommandEvent &event);
@@ -172,6 +174,7 @@ class MolDisplayWin : public wxFrame {
 		//General Utility routine
 		void BondsChanged(void);
 		void FrameChanged(void);
+		void ChangeFrames(long NewFrame);
 		void UpdateModelDisplay(void);
 		MoleculeData * GetData(void) const {return MainData;};
 		void ResetView(void);

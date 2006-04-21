@@ -138,6 +138,12 @@ class MpGLCanvas : public wxGLCanvas {
          * \param event The event to handle.
          */
         void eventMouse(wxMouseEvent &event);
+		
+        /**
+		 * Handles Char events received by the widget. 
+         * \param event The event to handle.
+         */
+		void KeyHandler(wxKeyEvent & event);
 };
 
 #endif

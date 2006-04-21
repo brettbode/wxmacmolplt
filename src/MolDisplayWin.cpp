@@ -30,6 +30,8 @@ enum MMP_EventID {
 	MMP_SHRINK10=wxID_HIGHEST+1,
 	MMP_ENLARGE10,
 	MMP_SHOWMODE,
+	MMP_PREVMODE,
+	MMP_NEXTMODE,
 	MMP_SHOWAXIS,
 	MMP_CENTER,
 	MMP_ROTATESUBMENU,
@@ -68,6 +70,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (wxID_SELECTALL,		MolDisplayWin::menuEditSelect_all)
 
 	EVT_MENU (MMP_SHOWMODE,			MolDisplayWin::menuViewShowNormalMode)
+	EVT_MENU (MMP_PREVMODE,			MolDisplayWin::menuViewPrevNormalMode)
+	EVT_MENU (MMP_NEXTMODE,			MolDisplayWin::menuViewNextNormalMode)
 	EVT_MENU (MMP_SHOWAXIS,			MolDisplayWin::menuViewShowAxis)
 	EVT_MENU (MMP_SHRINK10,			MolDisplayWin::menuViewShrink_10)
 	EVT_MENU (MMP_ENLARGE10,		MolDisplayWin::menuViewEnlarge_10)
@@ -177,7 +181,9 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->AppendSeparator();
     menuEdit->Append(wxID_PREFERENCES, wxT("Pr&eferences ..."));
 
-    menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode"));
+    menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"));
+    menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
+    menuView->Append(MMP_NEXTMODE, wxT("Next Normal &Mode\tCtrl+]"));
     menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show &Axis"));
     menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl+-"));
     menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl+="));
@@ -217,6 +223,8 @@ void MolDisplayWin::ClearMenus(void) {
 	
 	menuEdit->Enable(wxID_UNDO, false);
 	menuView->Enable(MMP_SHOWMODE, false);
+	menuView->Enable(MMP_PREVMODE, false);
+	menuView->Enable(MMP_NEXTMODE, false);
 	menuMolecule->Enable(MMP_INVERTNORMALMODE, false);
 }
 void MolDisplayWin::AdjustMenus(void) {
@@ -225,6 +233,10 @@ void MolDisplayWin::AdjustMenus(void) {
 	
 	if (MainData->cFrame->Vibs) {
 		menuView->Enable(MMP_SHOWMODE, true);
+		menuView->Check(MMP_SHOWMODE, MainData->GetDrawMode());
+		if (MainData->cFrame->Vibs->CurrentMode>0) menuView->Enable(MMP_PREVMODE, true);
+		if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1))
+			menuView->Enable(MMP_NEXTMODE, true);
 		menuMolecule->Enable(MMP_INVERTNORMALMODE, true);
 	}
 }
@@ -401,6 +413,33 @@ void MolDisplayWin::menuViewShowNormalMode(wxCommandEvent &event) {
 	ResetModel(false);
 	Dirty = true;
 }
+void MolDisplayWin::menuViewPrevNormalMode(wxCommandEvent &event) {
+	if (MainData->cFrame->Vibs) {
+		if (MainData->cFrame->Vibs->CurrentMode>0) {
+			MainData->cFrame->Vibs->CurrentMode--;
+			//activate normal mode display if not active
+			if (!MainData->GetDrawMode()) {
+				MainData->SetDrawMode(true);
+				menuView->Check(MMP_SHOWMODE, true);
+			}
+			ResetModel(false);
+			Dirty = true;
+		}
+	}
+}
+void MolDisplayWin::menuViewNextNormalMode(wxCommandEvent &event) {
+	if (MainData->cFrame->Vibs) {
+		if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1)) {
+			MainData->cFrame->Vibs->CurrentMode++;
+			if (!MainData->GetDrawMode()) {
+				MainData->SetDrawMode(true);
+				menuView->Check(MMP_SHOWMODE, true);
+			}
+			ResetModel(false);
+			Dirty = true;
+		}
+	}
+}
 void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
 	MainData->CenterModelWindow();
 	ResetModel(false);
@@ -482,6 +521,69 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 	Dirty = true;
 }
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
+	int key = event.GetKeyCode();
+	if (!event.HasModifiers()) {
+		switch (key) {
+			case '[':
+				if (MainData->cFrame->Vibs) {
+					if (MainData->cFrame->Vibs->CurrentMode>0) {
+						MainData->cFrame->Vibs->CurrentMode--;
+						//activate normal mode display if not active
+						if (!MainData->GetDrawMode()) {
+							MainData->SetDrawMode(true);
+							menuView->Check(MMP_SHOWMODE, true);
+						}
+						ResetModel(false);
+						Dirty = true;
+					}
+				}
+				break;
+			case ']':
+				if (MainData->cFrame->Vibs) {
+					if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1)) {
+						MainData->cFrame->Vibs->CurrentMode++;
+						if (!MainData->GetDrawMode()) {
+							MainData->SetDrawMode(true);
+							menuView->Check(MMP_SHOWMODE, true);
+						}
+						ResetModel(false);
+						Dirty = true;
+					}
+				}
+				break;
+			case WXK_LEFT:
+				if (MainData->CurrentFrame>1) {
+					ChangeFrames(MainData->CurrentFrame - 1);
+				}
+				break;
+			case WXK_RIGHT:
+				if (MainData->CurrentFrame<MainData->NumFrames) {
+					ChangeFrames(MainData->CurrentFrame + 1);
+				}
+				break;
+			case WXK_HOME:
+				if (MainData->CurrentFrame>1) {
+					ChangeFrames(1);
+				}
+				break;
+			case WXK_END:
+				if (MainData->CurrentFrame<MainData->NumFrames) {
+					ChangeFrames(MainData->NumFrames);
+				}
+				break;
+		}
+	} else if (event.AltDown()) {
+		switch (key) {
+			case 140:	//option - a
+				MainData->cFrame->toggleAbInitioVisibility();
+				ResetModel(false);
+				break;
+			case 167:	//option - s
+				MainData->cFrame->toggleMMAtomVisibility();
+				ResetModel(false);
+				break;
+		}
+	}
 	event.Skip();
 }
 void MolDisplayWin::menuWindowBonds(wxCommandEvent &event) {
@@ -512,6 +614,27 @@ void MolDisplayWin::FrameChanged(void) {
 		temp = temp->GetNextSurface();
 	}
 	UpdateModelDisplay();
+}
+void MolDisplayWin::ChangeFrames(long NewFrame) {
+	if ((NewFrame>0)&&(NewFrame<=MainData->NumFrames)) {
+		if (NewFrame < MainData->CurrentFrame) {
+			MainData->cFrame = MainData->Frames;
+			MainData->CurrentFrame = 1;
+		}
+		while (MainData->CurrentFrame < NewFrame) {
+			MainData->cFrame = MainData->cFrame->NextFrame;
+			MainData->CurrentFrame++;
+		}
+		MainData->ResetRotation();
+		FrameChanged();
+
+#warning Update windows here when they are added
+	//	if (Coords) Coords->FrameChanged();
+		if (bondsWindow) bondsWindow->ResetList();
+	//	if (EPlotWin) EPlotWin->FrameChanged();
+	//	if (FreqPlotWin) FreqPlotWin->Reset(1);
+	//	if (SurfaceDlog) SurfaceDlog->Reset();
+	}
 }
 void MolDisplayWin::UpdateModelDisplay(void) {
 	//	DrawFrame();
