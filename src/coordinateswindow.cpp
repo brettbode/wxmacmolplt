@@ -29,6 +29,7 @@
 #include "Globals.h"
 #include "MolDisplayWin.h"
 #include "Frame.h"
+#include "Internals.h"
 
 #include "coordinateswindow.h"
 
@@ -204,7 +205,8 @@ void CoordinatesWindow::FrameChanged(void) {
 		lFrame->SetAtomSelectState(0, temp);
 		wxString buf;
 		for (long i=0; i<natoms; i++) {
-		//	buf.Printf("%s", );
+			Prefs->GetAtomLabel(lFrame->GetAtomType(i)-1, buf);
+			coordGrid->SetCellValue(i, 0, buf);
 			if (CoordType == 0) {
 				CPoint3D pos;
 				lFrame->GetAtomPosition(i, pos);
@@ -215,6 +217,24 @@ void CoordinatesWindow::FrameChanged(void) {
 				buf.Printf("%f", pos.z);
 				coordGrid->SetCellValue(i, 3, buf);
 			} else {
+				Internals * internals = MainData->GetInternalCoordinates();
+				MOPacInternals * mInts = NULL;
+				if (internals)
+					mInts = internals->GetMOPacStyle();
+				if (mInts) {
+					buf.Printf("%d", mInts->GetConnection(i,0)+1);
+					coordGrid->SetCellValue(i, 1, buf);
+					buf.Printf("%f", mInts->GetValue(i,0));
+					coordGrid->SetCellValue(i, 2, buf);
+					buf.Printf("%d", mInts->GetConnection(i,1)+1);
+					coordGrid->SetCellValue(i, 3, buf);
+					buf.Printf("%.2f", mInts->GetValue(i,1));
+					coordGrid->SetCellValue(i, 4, buf);
+					buf.Printf("%d", mInts->GetConnection(i,2)+1);
+					coordGrid->SetCellValue(i, 5, buf);
+					buf.Printf("%.2f", mInts->GetValue(i,2));
+					coordGrid->SetCellValue(i, 6, buf);
+				}
 			}
 		}
 	}

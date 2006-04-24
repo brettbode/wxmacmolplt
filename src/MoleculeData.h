@@ -123,7 +123,7 @@ class MoleculeData {
 		InputData * SetInputData(InputData * NewData);
 		void NewAtom(void);
 		void StickCoordinates(void);
-		inline Internals * GetInternalCoordinates(void) {return IntCoords;};
+		inline Internals * GetInternalCoordinates(void) const {return IntCoords;};
 		void DeleteAtom(long AtomNum);
 		bool ValidAtom(long AtomNum);
 		void GetRotationMatrix(Matrix4D copy);

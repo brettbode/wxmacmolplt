@@ -133,6 +133,16 @@ void WinPrefs::CopyQD3DPrefs(WinPrefs * Orig) {
 	UseQD3DHardware(Orig->UseQD3DHardware());
 	BackColor = Orig->BackColor;
 }
+#ifdef __wxBuild__
+void WinPrefs::GetAtomLabel(long AtomNum, wxString & text) const {
+	int		TextLength=0;
+	while (AtomLabels[AtomNum][TextLength]) {
+		text << AtomLabels[AtomNum][TextLength];
+		TextLength++;
+		if (TextLength >= 3) break;
+	}
+}
+#endif
 void WinPrefs::GetAtomLabel(long AtomNum, Str255 text) {
 	int		TextLength=0;
 	while (AtomLabels[AtomNum][TextLength]) {

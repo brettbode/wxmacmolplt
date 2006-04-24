@@ -284,6 +284,9 @@ class WinPrefs {
         inline float SetVectorScale(float NewValue) {return VectorScale = NewValue;};
         inline unsigned char * GetAtomLabelLoc(void) {return &(AtomLabels[0][0]);};
         void GetAtomLabel(long AtomNum, Str255 text);
+#ifdef __wxBuild__
+		void GetAtomLabel(long AtomNum, wxString & text) const;
+#endif
         void SetAtomLabel(long AtomNum, Str255 text);
         inline long * GetAtomSizeLoc(void) {return AtomSizes;};
         inline long GetAtomSize(long AtomNum) const {return AtomSizes[AtomNum];};
