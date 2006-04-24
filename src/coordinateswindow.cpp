@@ -49,6 +49,8 @@ IMPLEMENT_DYNAMIC_CLASS( CoordinatesWindow, wxDialog )
 BEGIN_EVENT_TABLE( CoordinatesWindow, wxDialog )
 
 ////@begin CoordinatesWindow event table entries
+    EVT_CLOSE( CoordinatesWindow::OnCloseWindow )
+
     EVT_BUTTON( wxID_ADD, CoordinatesWindow::OnAddClick )
 
     EVT_BUTTON( wxID_DELETE, CoordinatesWindow::OnDeleteClick )
@@ -344,7 +346,33 @@ void CoordinatesWindow::OnCoordchoice1Selected( wxCommandEvent& event )
 	int temp = coordTypeChoice->GetSelection();
 	if (temp != CoordType) {
 		CoordType = temp;
+		if (CoordType == 1) {
+			MoleculeData * MainData = Parent->GetData();
+			Internals * internals = MainData->GetInternalCoordinates();
+			if (!internals) {
+				MainData->InitializeInternals();
+				internals = MainData->GetInternalCoordinates();
+				if (!internals) {
+					CoordType = 0;
+	//				UpdateControls();
+					return;
+				}
+			}
+			MOPacInternals * mInts = internals->GetMOPacStyle();
+			if (!mInts) {
+				internals->CreateMOPacInternals(3*MainData->GetMaximumAtomCount());
+				mInts = internals->GetMOPacStyle();
+				if (mInts) {
+					CoordType = 0;
+	//				UpdateControls();
+					return;
+				}
+				mInts->GuessInit(MainData);
+			} else 
+				mInts->CartesiansToInternals(MainData);
+		}
 		SetupGridColumns();
+		FrameChanged();
 	}
 }
 
@@ -393,6 +421,16 @@ void CoordinatesWindow::OnSize( wxSizeEvent& event )
 	wxSize s = event.GetSize();
 	SizeCols(s);
     event.Skip();
+}
+
+
+/*!
+ * wxEVT_CLOSE_WINDOW event handler for ID_DIALOG
+ */
+
+void CoordinatesWindow::OnCloseWindow( wxCloseEvent& event )
+{
+	Parent->CloseCoordsWindow();
 }
 
 

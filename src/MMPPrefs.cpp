@@ -136,11 +136,14 @@ void WinPrefs::CopyQD3DPrefs(WinPrefs * Orig) {
 #ifdef __wxBuild__
 void WinPrefs::GetAtomLabel(long AtomNum, wxString & text) const {
 	int		TextLength=0;
+	text.Empty();
 	while (AtomLabels[AtomNum][TextLength]) {
-		text << AtomLabels[AtomNum][TextLength];
+		char temp = AtomLabels[AtomNum][TextLength];
+		text << temp;
 		TextLength++;
 		if (TextLength >= 3) break;
 	}
+	text << '\0';
 }
 #endif
 void WinPrefs::GetAtomLabel(long AtomNum, Str255 text) {

@@ -79,6 +79,9 @@ public:
 
 ////@begin CoordinatesWindow event handler declarations
 
+    /// wxEVT_CLOSE_WINDOW event handler for ID_DIALOG
+    void OnCloseWindow( wxCloseEvent& event );
+
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
     void OnAddClick( wxCommandEvent& event );
 

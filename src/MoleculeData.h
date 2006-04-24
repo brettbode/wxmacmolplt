@@ -118,11 +118,13 @@ class MoleculeData {
 		long GetNumBonds(void) const;
 		long GetNumElectrons(void) const;
 		short GetMultiplicity(void) const;
+		inline long GetMaximumAtomCount(void) const {return MaxAtoms;};
 		void WriteInputFile(WinPrefs * Prefs);
 		InputData * GetInputData(void);
 		InputData * SetInputData(InputData * NewData);
 		void NewAtom(void);
 		void StickCoordinates(void);
+		void InitializeInternals(void);
 		inline Internals * GetInternalCoordinates(void) const {return IntCoords;};
 		void DeleteAtom(long AtomNum);
 		bool ValidAtom(long AtomNum);

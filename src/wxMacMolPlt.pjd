@@ -2498,6 +2498,7 @@
           <string name="variable-0">"Parent|MolDisplayWin *|Parent|"</string>
           <string name="variable-1">"CoordType|int|CoordType|0"</string>
           <string name="variable-2">"Prefs|WinPrefs *|Prefs|"</string>
+          <string name="event-handler-0">"wxEVT_CLOSE_WINDOW|OnCloseWindow"</string>
           <string name="proxy-Id name">"ID_DIALOG"</string>
           <long name="proxy-Id value">10021</long>
           <string name="proxy-Class">"CoordinatesWindow"</string>

@@ -256,6 +256,9 @@ void MoleculeData::ResetRotation(void) {
 		//Now sort the Z Buffer
 	SortzBuffer(RotCoords, zBuffer, cFrame->NumAtoms);
 }
+void MoleculeData::InitializeInternals(void) {
+	if (!IntCoords) IntCoords = new Internals;
+}
 // Stick the coordinates by moving the rotated coordinates to the file coordinates
 // being careful to invalidate any orbital info
 void MoleculeData::StickCoordinates(void) {
