@@ -72,6 +72,7 @@ class mpAtom {
 		inline bool GetSelectState(void) const {return ((Highlite&2)!=0);};	//Bit 2 sets selected
 		bool SetSelectState(bool State) {if (Highlite&2) Highlite-=2; if (State) Highlite+=2; return GetSelectState();};
 		inline long GetType(void) const {return (Type & 0xFF);};
+		inline bool SetType(short atmType) {if ((atmType>0)&&(atmType<107)) {Type = atmType; return true;} return false;};
 		inline bool IsEffectiveFragment(void) const {return ((Type & (1<<8)) != 0);};
 		inline void IsEffectiveFragment(bool state) {Type = (Type & 0xFEFF) + (state ? (1<<8) : 0);};
 		inline bool HasBiolabel(void) const {return ((Type & (1<<9)) != 0);};

@@ -620,10 +620,16 @@ void MolDisplayWin::CloseCoordsWindow(void) {
 	}
 }
 
+void MolDisplayWin::AtomsChanged(void) {
+	if (bondsWindow) bondsWindow->ResetList();
+#warning Update surface window here
+//	if (SurfaceDlog) SurfaceDlog->Reset();
+	FrameChanged();
+}
 void MolDisplayWin::BondsChanged(void) {
 	if (bondsWindow) bondsWindow->ResetList();
 	FrameChanged();
-};
+}
 
 //scan the new frame changing any mode bits for consistancy
 void MolDisplayWin::FrameChanged(void) {

@@ -1128,7 +1128,7 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::vector<char *> & idList) 
 					idpos += nchar;
 				}
 				if ((n1!=1)||(n2!=1)||(n3!=1)||(n4!=1)) break;
-				atomType = SetAtomType((const unsigned char *)etstr);
+				atomType = ::SetAtomType((const unsigned char *)etstr);
 				if (atomType > 0) {
 					sscanf(xcstr, "%f", &(atomPos.x));
 					sscanf(ycstr, "%f", &(atomPos.y));
@@ -1165,7 +1165,7 @@ bool Frame::ParseAtomXML(XMLElement * atomXML, std::vector<char *> & idList) {
 
 	const char * et = atomXML->getAttributeValue(CML_convert(elementTypeAttr));
 	if (et != NULL) {	//I think the presence of "elementType" as an attribute should signal CML2
-		atomType = SetAtomType((const unsigned char *)et);
+		atomType = ::SetAtomType((const unsigned char *)et);
 		if (atomType > 0) {//good element name
 			const char * xcoord = atomXML->getAttributeValue(CML_convert(X3Attr));
 			const char * ycoord = atomXML->getAttributeValue(CML_convert(Y3Attr));
@@ -1192,7 +1192,7 @@ bool Frame::ParseAtomXML(XMLElement * atomXML, std::vector<char *> & idList) {
 					if (! strcmp(typ, "elementType")) {
 						et = strElem->getValue();
 						if (et != NULL) {
-							atomType = SetAtomType((const unsigned char *)et);
+							atomType = ::SetAtomType((const unsigned char *)et);
 							if (atomType > 0) {
 								const char * xcoord=NULL, * ycoord=NULL, *zcoord=NULL;
 								XMLElementList * flList = atomXML->getElementsByName("float");

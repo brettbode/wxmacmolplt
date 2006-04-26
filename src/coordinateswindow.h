@@ -135,6 +135,7 @@ public:
 	void SetupGridColumns(void);
 	void FrameChanged(void);
 	void SizeCols(wxSize & s);
+	void UpdateControls(void);
 
 ////@begin CoordinatesWindow member variables
     wxButton* deleteButton;

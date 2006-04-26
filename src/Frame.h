@@ -88,6 +88,7 @@ class Frame {
 		void ChangeBond(long TheBond, short WhichPart, long TheAtom);
 		long GetBondAtom(long WhichBond, short ThePart);
 		short GetAtomType(long theAtom) const;
+		bool SetAtomType(long theAtom, short atmType);
 		bool GetAtomPosition(long theAtom, CPoint3D & p) const;
 		mpAtom * AddAtom(long AtomType, CPoint3D AtomPosition);
 		bool IncreaseAtomAllocation(long NumAdditional);

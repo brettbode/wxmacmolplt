@@ -174,7 +174,8 @@ class MolDisplayWin : public wxFrame {
 			//Call to dump the message and close the window
 		void AbortOpen(const char * msg);
 		
-		//General Utility routine
+		//General Utility routines
+		void AtomsChanged(void);
 		void BondsChanged(void);
 		void FrameChanged(void);
 		void ChangeFrames(long NewFrame);

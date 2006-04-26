@@ -392,9 +392,16 @@ void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any highe
 		while (SurfaceList) DeleteSurface(0);
 	}
 }
+bool Frame::SetAtomType(long theAtom, short atmType) {
+	bool result = false;
+	if ((theAtom>=0)&&(theAtom<NumAtoms)) {
+		result = Atoms[theAtom].SetType(atmType);
+	}
+	return result;
+}
 short Frame::GetAtomType(long iatom) const {
 	short	result=0;
-	if (Atoms&&(iatom>=0)&&(iatom<NumAtoms)) result = Atoms[iatom].Type;
+	if (Atoms&&(iatom>=0)&&(iatom<NumAtoms)) result = Atoms[iatom].GetType();
 	return result;
 }
 bool Frame::GetAtomPosition(long iatom, CPoint3D & p) const {

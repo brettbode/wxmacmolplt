@@ -30,6 +30,7 @@
 #include "MolDisplayWin.h"
 #include "Frame.h"
 #include "Internals.h"
+#include "myFiles.h"
 
 #include "coordinateswindow.h"
 
@@ -157,9 +158,9 @@ void CoordinatesWindow::CreateControls()
     itemBoxSizer2->Add(coordGrid, 1, wxGROW|wxALL, 0);
 
 ////@end CoordinatesWindow content construction
-	coordTypeChoice->SetSelection(CoordType);
 	SetupGridColumns();
 	FrameChanged();
+	UpdateControls();
 }
 
 /*!
@@ -171,6 +172,19 @@ bool CoordinatesWindow::ShowToolTips()
     return true;
 }
 
+void CoordinatesWindow::UpdateControls(void) {
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	bool selectionActive = false;
+	for (long i=0; i<natoms; i++) {
+		if (lFrame->GetAtomSelectState(i)) {
+			selectionActive = true;
+		}
+	}
+	deleteButton->Enable(selectionActive);
+	coordTypeChoice->SetSelection(CoordType);
+}
 void CoordinatesWindow::SetupGridColumns(void) {
 	coordGrid->DeleteCols(0, coordGrid->GetNumberCols(), true);
 	if (CoordType == 0) {
@@ -209,6 +223,7 @@ void CoordinatesWindow::FrameChanged(void) {
 		for (long i=0; i<natoms; i++) {
 			Prefs->GetAtomLabel(lFrame->GetAtomType(i)-1, buf);
 			coordGrid->SetCellValue(i, 0, buf);
+			if (lFrame->GetAtomSelectState(i)) coordGrid->SelectRow(i, true);
 			if (CoordType == 0) {
 				CPoint3D pos;
 				lFrame->GetAtomPosition(i, pos);
@@ -224,18 +239,33 @@ void CoordinatesWindow::FrameChanged(void) {
 				if (internals)
 					mInts = internals->GetMOPacStyle();
 				if (mInts) {
-					buf.Printf("%d", mInts->GetConnection(i,0)+1);
-					coordGrid->SetCellValue(i, 1, buf);
-					buf.Printf("%f", mInts->GetValue(i,0));
-					coordGrid->SetCellValue(i, 2, buf);
-					buf.Printf("%d", mInts->GetConnection(i,1)+1);
-					coordGrid->SetCellValue(i, 3, buf);
-					buf.Printf("%.2f", mInts->GetValue(i,1));
-					coordGrid->SetCellValue(i, 4, buf);
-					buf.Printf("%d", mInts->GetConnection(i,2)+1);
-					coordGrid->SetCellValue(i, 5, buf);
-					buf.Printf("%.2f", mInts->GetValue(i,2));
-					coordGrid->SetCellValue(i, 6, buf);
+					if (i>0) {
+						buf.Printf("%d", mInts->GetConnection(i,0)+1);
+						coordGrid->SetCellValue(i, 1, buf);
+						buf.Printf("%f", mInts->GetValue(i,0));
+						coordGrid->SetCellValue(i, 2, buf);
+						if (i>1) {
+							buf.Printf("%d", mInts->GetConnection(i,1)+1);
+							coordGrid->SetCellValue(i, 3, buf);
+							buf.Printf("%.2f", mInts->GetValue(i,1));
+							coordGrid->SetCellValue(i, 4, buf);
+							if (i>2) {
+								buf.Printf("%d", mInts->GetConnection(i,2)+1);
+								coordGrid->SetCellValue(i, 5, buf);
+								buf.Printf("%.2f", mInts->GetValue(i,2));
+								coordGrid->SetCellValue(i, 6, buf);
+							} else {
+								for (int j=5; j<7; j++)
+									coordGrid->SetReadOnly(i, j, true);
+							}
+						} else {
+							for (int j=3; j<7; j++)
+								coordGrid->SetReadOnly(i, j, true);
+						}
+					} else {
+						for (int j=1; j<7; j++)
+							coordGrid->SetReadOnly(i, j, true);
+					}
 				}
 			}
 		}
@@ -295,10 +325,22 @@ wxIcon CoordinatesWindow::GetIconResource( const wxString& name )
 
 void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD in CoordinatesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD in CoordinatesWindow. 
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	MainData->NewAtom();
+	if (CoordType == 1) {
+		Internals * internals = MainData->GetInternalCoordinates();
+		if (internals) {
+			MOPacInternals * mInts = internals->GetMOPacStyle();
+			if (mInts)
+				mInts->AddAtom(MainData);
+		}
+	}
+	Parent->FrameChanged();
+	coordGrid->SelectRow(natoms, true);
+	coordGrid->SetGridCursor(natoms, 0);
+	coordGrid->MakeCellVisible(natoms, 0);
 }
 
 /*!
@@ -307,10 +349,18 @@ void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE in CoordinatesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE in CoordinatesWindow. 
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	for (int i=(natoms-1); i>=0; i--) {
+		if (lFrame->GetAtomSelectState(i)) {
+			lFrame->DeleteAtom(i);
+			coordGrid->DeleteRows(i, 1, true);
+		}
+	}
+	coordGrid->ClearSelection();
+	UpdateControls();
+	Parent->ResetModel(false);
 }
 
 /*!
@@ -319,10 +369,10 @@ void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnBondbuttonClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BONDBUTTON in CoordinatesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BONDBUTTON in CoordinatesWindow. 
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	lFrame->SetBonds(Prefs, true);
+	Parent->BondsChanged();
 }
 
 /*!
@@ -331,10 +381,11 @@ void CoordinatesWindow::OnBondbuttonClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnStickbuttonClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_STICKBUTTON in CoordinatesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_STICKBUTTON in CoordinatesWindow. 
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	MainData->StickCoordinates();
+	Parent->AtomsChanged();
+	FrameChanged();
 }
 
 /*!
@@ -354,7 +405,7 @@ void CoordinatesWindow::OnCoordchoice1Selected( wxCommandEvent& event )
 				internals = MainData->GetInternalCoordinates();
 				if (!internals) {
 					CoordType = 0;
-	//				UpdateControls();
+					UpdateControls();
 					return;
 				}
 			}
@@ -362,9 +413,9 @@ void CoordinatesWindow::OnCoordchoice1Selected( wxCommandEvent& event )
 			if (!mInts) {
 				internals->CreateMOPacInternals(3*MainData->GetMaximumAtomCount());
 				mInts = internals->GetMOPacStyle();
-				if (mInts) {
+				if (!mInts) {
 					CoordType = 0;
-	//				UpdateControls();
+					UpdateControls();
 					return;
 				}
 				mInts->GuessInit(MainData);
@@ -382,10 +433,33 @@ void CoordinatesWindow::OnCoordchoice1Selected( wxCommandEvent& event )
 
 void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 {
-////@begin wxEVT_GRID_CELL_CHANGE event handler for ID_GRID in CoordinatesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_GRID_CELL_CHANGE event handler for ID_GRID in CoordinatesWindow. 
+	int row = event.GetRow();
+	int col = event.GetCol();
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	wxString val = coordGrid->GetCellValue(row, col);
+	bool Changed = false;
+	if (col == 0) {	//Atomic label
+		long atomnum;
+		if (val.ToLong(&atomnum)) {	//number instead of symbol
+			if ((atomnum < 1)||(atomnum>107)) atomnum = -1;//Not a correct Atomic #
+		} else {
+			atomnum = ::SetAtomType((const unsigned char *)val.ToAscii());//Change the symbol to Atomic #
+			if ((atomnum < 1)||(atomnum>107)) atomnum = -1;//Not a correct Atomic label
+		}
+		if ((atomnum > -1)&&(atomnum!=lFrame->GetAtomType(row))) {//A atom type was found so change the type
+			lFrame->SetAtomType(row, atomnum);
+			Changed = true;
+		}
+		Prefs->GetAtomLabel(lFrame->GetAtomType(row)-1, val);
+		coordGrid->SetCellValue(row, 0, val);
+	} else {
+	}
+
+	if (Changed)
+		Parent->ResetModel(false);
+	event.Skip();
 }
 
 /*!
@@ -394,10 +468,20 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 
 void CoordinatesWindow::OnSelectCell( wxGridEvent& event )
 {
-////@begin wxEVT_GRID_SELECT_CELL event handler for ID_GRID in CoordinatesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_GRID_SELECT_CELL event handler for ID_GRID in CoordinatesWindow. 
+	int row = event.GetRow();
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	//we seem to only get selection events and not also deselection events
+	//so first clear off the list of selected cells
+	for (int i=0; i<natoms; i++) {
+		lFrame->SetAtomSelectState(i, false);
+	}
+	if ((row>=0)&&(row<natoms)) {
+		lFrame->SetAtomSelectState(row, event.Selecting());
+	}
+	UpdateControls();
+	event.Skip();
 }
 
 /*!
@@ -406,10 +490,20 @@ void CoordinatesWindow::OnSelectCell( wxGridEvent& event )
 
 void CoordinatesWindow::OnRangeSelect( wxGridRangeSelectEvent& event )
 {
-////@begin wxEVT_GRID_RANGE_SELECT event handler for ID_GRID in CoordinatesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_GRID_RANGE_SELECT event handler for ID_GRID in CoordinatesWindow. 
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	//we seem to only get selection events and not also deselection events
+	//so first clear off the list of selected cells
+	for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
+	if(event.Selecting()) {
+		for (int i=event.GetTopRow(); i<=event.GetBottomRow(); i++) {
+			lFrame->SetAtomSelectState(i, true);
+		}
+	}
+	
+	UpdateControls();
+	event.Skip();
 }
 
 /*!
@@ -432,5 +526,3 @@ void CoordinatesWindow::OnCloseWindow( wxCloseEvent& event )
 {
 	Parent->CloseCoordsWindow();
 }
-
-
