@@ -135,6 +135,7 @@ class GraphOptions {
 };
 
 typedef class XMLElement XMLElement;
+typedef class wxString wxString;
 class WinPrefs {
     private:
         RGBColor        AtomColors[kMaxAtomTypes], BondColors[kMaxBondTypes], VectorColor, BackColor;
