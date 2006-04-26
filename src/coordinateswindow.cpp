@@ -158,9 +158,15 @@ void CoordinatesWindow::CreateControls()
     itemBoxSizer2->Add(coordGrid, 1, wxGROW|wxALL, 0);
 
 ////@end CoordinatesWindow content construction
+	coordGrid->SetDefaultCellAlignment(wxALIGN_RIGHT, wxALIGN_CENTRE);
 	SetupGridColumns();
 	FrameChanged();
 	UpdateControls();
+    GetSizer()->Fit(this);
+    GetSizer()->SetSizeHints(this);
+    Centre();
+	wxSize s(50, 150);
+	coordGrid->SetMinSize(s);
 }
 
 /*!
@@ -186,6 +192,11 @@ void CoordinatesWindow::UpdateControls(void) {
 	coordTypeChoice->SetSelection(CoordType);
 }
 void CoordinatesWindow::SetupGridColumns(void) {
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	bool temp = false;
+	if (natoms>0) temp = lFrame->GetAtomSelectState(0);
 	coordGrid->DeleteCols(0, coordGrid->GetNumberCols(), true);
 	if (CoordType == 0) {
 		coordGrid->InsertCols(0, 4, true);
@@ -205,6 +216,10 @@ void CoordinatesWindow::SetupGridColumns(void) {
 	}
 	wxSize s = GetSize();
 	SizeCols(s);
+	if (natoms>0) {
+		coordGrid->ClearSelection();
+		lFrame->SetAtomSelectState(0, temp);
+	}
 }
 
 void CoordinatesWindow::FrameChanged(void) {
@@ -275,7 +290,7 @@ void CoordinatesWindow::FrameChanged(void) {
 void CoordinatesWindow::SizeCols(wxSize & s) {
 	int width = s.GetWidth() - 66;	//subtract off the row labels and scroll
 	if (CoordType == 0) {
-		int a = (int) (width/5.0);
+		int a = (int) (width/6.0);
 		int b = (int) ((width-a)/3.0);
 		coordGrid->SetColSize(0, a);
 		coordGrid->SetColSize(1, b);
@@ -328,6 +343,7 @@ void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
+	for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
 	MainData->NewAtom();
 	if (CoordType == 1) {
 		Internals * internals = MainData->GetInternalCoordinates();
@@ -337,7 +353,9 @@ void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 				mInts->AddAtom(MainData);
 		}
 	}
+	lFrame->SetAtomSelectState(natoms, true);
 	Parent->FrameChanged();
+	FrameChanged();
 	coordGrid->SelectRow(natoms, true);
 	coordGrid->SetGridCursor(natoms, 0);
 	coordGrid->MakeCellVisible(natoms, 0);
@@ -455,6 +473,134 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 		Prefs->GetAtomLabel(lFrame->GetAtomType(row)-1, val);
 		coordGrid->SetCellValue(row, 0, val);
 	} else {
+		if (CoordType == 0) {	//X, Y, Z cartesians
+			double fval;
+			if (val.ToDouble(&fval)) {
+				CPoint3D pos;
+				lFrame->GetAtomPosition(row, pos);
+				if ((col == 1)&&(fval != pos.x)) {
+					pos.x = fval;
+					Changed = true;
+				} else if ((col==2)&&(fval != pos.y)) {
+					pos.y = fval;
+					Changed = true;
+				} else if ((col == 3)&&(fval != pos.z)) {
+					pos.z = fval;
+					Changed = true;
+				}
+				if (Changed) lFrame->SetAtomPosition(row, pos);
+			} else {	//invalid text, just veto the change
+				event.Veto();
+				return;
+			}
+		} else { //z-matrix
+			long newid;
+			double fval;
+			bool goodVal;
+			MoleculeData * MainData = Parent->GetData();
+			Internals * internals = MainData->GetInternalCoordinates();
+			MOPacInternals * mInts = internals->GetMOPacStyle();
+			if (col & 1) { //odd numbered columns contain the integer connection ids
+				goodVal = val.ToLong(&newid);
+				newid --;
+					//test the value to see if it is in range
+				if (goodVal && ((newid < 0)||(newid>row))) goodVal = false;
+			} else {	//even numbered columns contain floats for the length and angles
+				goodVal = val.ToDouble(&fval);
+			}
+			if (goodVal) {
+				switch (col) {
+					case 1:
+						if (newid != mInts->GetConnection(row, 0)) {
+							//We need to make sure that the 3 reference atom ids are unique
+							//If we are already using the requested id, swap them
+							if (newid == mInts->GetConnection(row, 1))
+								mInts->SetConnection(row, 1, mInts->GetConnection(row, 0));
+							else if (newid == mInts->GetConnection(row, 2))
+								mInts->SetConnection(row, 2, mInts->GetConnection(row, 0));
+							mInts->SetConnection(row, 0, newid);
+							Changed = true;
+						}
+						break;
+					case 2:
+						if (fval != mInts->GetValue(row, 0)) {
+							mInts->SetValue(row, 0, fval);
+							Changed = true;
+						}
+						break;
+					case 3:
+						if (newid != mInts->GetConnection(row, 1)) {
+							//We need to make sure that the 3 reference atom ids are unique
+							//If we are already using the requested id, swap them
+							if (newid == mInts->GetConnection(row, 0))
+								mInts->SetConnection(row, 0, mInts->GetConnection(row, 1));
+							else if (newid == mInts->GetConnection(row, 2))
+								mInts->SetConnection(row, 2, mInts->GetConnection(row, 1));
+							mInts->SetConnection(row, 1, newid);
+							Changed = true;
+						}
+						break;
+					case 4:
+						if (fval != mInts->GetValue(row, 1)) {
+							mInts->SetValue(row, 1, fval);
+							Changed = true;
+						}
+						break;
+					case 5:
+						if (newid != mInts->GetConnection(row, 2)) {
+							//We need to make sure that the 3 reference atom ids are unique
+							//If we are already using the requested id, swap them
+							if (newid == mInts->GetConnection(row, 0))
+								mInts->SetConnection(row, 0, mInts->GetConnection(row, 2));
+							else if (newid == mInts->GetConnection(row, 1))
+								mInts->SetConnection(row, 1, mInts->GetConnection(row, 2));
+							mInts->SetConnection(row, 2, newid);
+							Changed = true;
+						}
+						break;
+					case 6:
+						if (fval != mInts->GetValue(row, 2)) {
+							mInts->SetValue(row, 2, fval);
+							Changed = true;
+						}
+						break;
+				}
+			}
+			if (!goodVal) {
+				event.Veto();
+				return;
+			}
+			if (Changed) {
+				if (col & 1) { //if a connection id was changed we need to regenerate the internals
+					mInts->CartesiansToInternals(MainData);
+						//Need to update the length and angles for this row
+					if (row>0) {
+						val.Printf("%d", mInts->GetConnection(row,0)+1);
+						coordGrid->SetCellValue(row, 1, val);
+						val.Printf("%f", mInts->GetValue(row,0));
+						coordGrid->SetCellValue(row, 2, val);
+						if (row>1) {
+							val.Printf("%d", mInts->GetConnection(row,1)+1);
+							coordGrid->SetCellValue(row, 3, val);
+							val.Printf("%.2f", mInts->GetValue(row,1));
+							coordGrid->SetCellValue(row, 4, val);
+							if (row>2) {
+								val.Printf("%d", mInts->GetConnection(row,2)+1);
+								coordGrid->SetCellValue(row, 5, val);
+								val.Printf("%.2f", mInts->GetValue(row,2));
+								coordGrid->SetCellValue(row, 6, val);
+							}
+						}
+					}
+					
+					// everything is now up to date, but we don't need to update the molecule display
+					Changed = false;
+				} else {	//a change of a bond length or angle actually moves the atoms
+					mInts->InternalsToCartesians(MainData, Prefs, row);
+					MainData->ResetRotation();
+				}
+			}
+		}
 	}
 
 	if (Changed)

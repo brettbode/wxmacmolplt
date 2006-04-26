@@ -412,6 +412,15 @@ bool Frame::GetAtomPosition(long iatom, CPoint3D & p) const {
 	}
 	return result;
 }
+bool Frame::SetAtomPosition(long theAtom, const CPoint3D & pos) {
+	bool result = false;
+	
+	if ((theAtom>=0)&&(theAtom<NumAtoms)) {
+		Atoms[theAtom].Position = pos;
+		result = true;
+	}
+	return result;
+}
 long Frame::GetNumElectrons(void) const {
 	long	result=0;
 	for (long i=0; i<NumAtoms; i++) result += Atoms[i].Type;
