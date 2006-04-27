@@ -362,43 +362,51 @@ void MolDisplayWin::menuEditCopy(wxCommandEvent &event) {
 void MolDisplayWin::menuEditCopyCoordinates(wxCommandEvent &event) {
 	CopyCoordinates(0);
 }
+#include <sstream>
 void MolDisplayWin::CopyCoordinates(short ctype) const {
 	//Now copy the coords
-	long		TextLength=0;
 	Frame *		lFrame = MainData->cFrame;
+	wxString textBuffer;
 	
-	//Make a guess for the Handle size based on the # of atoms and the line format
-	long datalength = lFrame->NumAtoms*70*sizeof(char);
-	char * lText = new char[datalength];
-	//Create a bufferFile object to protect the text buffer from overrun
-	BufferFile *Buffer = new BufferFile(lText, datalength);
 	try {
-		wxString textBuffer;
 		if (ctype == 0) {
 			char	LineText[100];
 			wxString	Label;
+			std::ostringstream	sbuf;
 			for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
 				Prefs->GetAtomLabel(lFrame->Atoms[iatm].GetType()-1, Label);
-				sprintf(LineText, "   %5.1f  %13.8f  %13.8f  %13.8f\r",
-						(float) (lFrame->Atoms[iatm].GetType()), 
-						lFrame->Atoms[iatm].Position.x, lFrame->Atoms[iatm].Position.y,
-						lFrame->Atoms[iatm].Position.z);
-				textBuffer << Label << LineText;
+				sbuf << Label;
+				textBuffer += Label;
+				Label.Printf("   %5.1f  %13.8f  %13.8f  %13.8f\r",
+								 (float) (lFrame->Atoms[iatm].GetType()), 
+								 lFrame->Atoms[iatm].Position.x, lFrame->Atoms[iatm].Position.y,
+								 lFrame->Atoms[iatm].Position.z);
+				sbuf << Label;
 			}
+			textBuffer.Printf("%s", sbuf.str().c_str());
 		} else if (ctype == 1) {
+			//Make a guess for the Handle size based on the # of atoms and the line format
+			long datalength = lFrame->NumAtoms*70*sizeof(char);
+			char * lText = new char[datalength];
+			//Create a bufferFile object to protect the text buffer from overrun
+			BufferFile *Buffer = new BufferFile(lText, datalength);
+
 			Internals * IntCoords = MainData->GetInternalCoordinates();
 			if (IntCoords) IntCoords->WriteCoordinatesToFile(Buffer, MainData, Prefs);
-			TextLength = Buffer->GetFilePos();
+
+			textBuffer.Printf("%s", lText);
+			delete Buffer;
+			delete [] lText;
 		}
 	}
-	catch (FileError) {	//The buffer length was probably exceeded, since this shouldn't happen
-//		DisposeHandle(lText);		//here, just abort the copy
-//		lText = NULL;
+	catch (...) {	//The buffer length was probably exceeded, since this shouldn't happen
+		return;
 	}
-	delete Buffer;
-//	gScrap.ClearScrap();
 	//Put the text onto the clipboard
-//	gScrap.PutText(lText, TextLength);
+	if (wxTheClipboard->Open()) {
+		wxTheClipboard->SetData(new wxTextDataObject(textBuffer));
+		wxTheClipboard->Close();
+	}
 }
 
 void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
@@ -415,8 +423,9 @@ void MolDisplayWin::PasteText(void) {
 			wxTextDataObject data;
 			wxTheClipboard->GetData(data);
 			wxString text = data.GetText();
-	//		BufferFile * TextBuffer = new BufferFile(text.ToAscii(), text.Length());
-			BufferFile * TextBuffer = NULL;
+			char * tbuf = new char[text.Length()+1];
+			strncpy(tbuf, text.ToAscii(), text.Length()+1);
+			BufferFile * TextBuffer = new BufferFile(tbuf, text.Length());
 			return;
 			if (MainData->NumFrames == 1) {	//If this is the only frame, make sure it is init'ed
 				InitRotationMatrix(MainData->TotalRotation);
@@ -425,6 +434,7 @@ void MolDisplayWin::PasteText(void) {
 			// There may be up to NumLines atoms so dimension memory accordingly
 			if (!MainData->SetupFrameMemory(NumLines, 0)) {
 				delete TextBuffer;
+				delete [] tbuf;
 				wxTheClipboard->Close();
 				return;
 			}
@@ -455,6 +465,7 @@ void MolDisplayWin::PasteText(void) {
 			}
 			//Done with the text handle so unlock it
 			delete TextBuffer;
+			delete [] tbuf;
 			
 			if (iline == 0) {	/*No atoms were found so clear the memory I just allocated*/
 		//		MainData->ResetFrameMemory();
