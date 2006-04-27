@@ -49,6 +49,7 @@ enum MMP_EventID {
 	MMP_CONVERTTOBOHR,
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
+	MMP_NEWFRAME,
 	MMP_COPYCOORDS,
 	MMP_BONDSWINDOW,
 	MMP_COORDSWINDOW,
@@ -57,6 +58,7 @@ enum MMP_EventID {
 };
 
 BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
+	EVT_MENU (MMP_NEWFRAME,			MolDisplayWin::menuFileAppendNewFrame)
 #ifndef __WXMAC__
 	EVT_MENU (wxID_OPEN,			MolDisplayWin::menuFileOpen)
 #endif
@@ -159,12 +161,12 @@ void MolDisplayWin::createMenuBar(void) {
 
     // TODO:  Create IDs for custom menu items
     menuFile->Append(wxID_NEW, wxT("&New\tCtrl+N"));
+    menuFile->Append(MMP_NEWFRAME, wxT("Append New Frame"));
     menuFile->Append(wxID_OPEN, wxT("&Open ...\tCtrl+O"));
     menuFile->Append(wxID_SAVE, wxT("&Save\tCtrl+S"));
     menuFile->Append(wxID_SAVEAS, wxT("Save &as ...\tCtrl+Shift+S"));
     menuFile->Append(wxID_CLOSE, wxT("&Close\tCtrl+W"));
     menuFile->AppendSeparator();
-    //menuFile->Append(, wxT("Append New Frame"));
     //menuFile->Append(, wxT("Add Frames from File ..."));
     //menuFile->Append(, wxT("Delete Frame"));
     //menuFile->AppendSeparator();
@@ -229,6 +231,7 @@ void MolDisplayWin::createMenuBar(void) {
 }
 
 void MolDisplayWin::ClearMenus(void) {
+	menuFile->Enable(MMP_NEWFRAME, false);
 	menuFile->Enable(wxID_SAVE, false);
 	
 	menuEdit->Enable(wxID_UNDO, false);
@@ -252,6 +255,7 @@ void MolDisplayWin::AdjustMenus(void) {
 			wxTheClipboard->Close();
 		}
 	} else {
+		menuFile->Enable(MMP_NEWFRAME, true);
 		menuEdit->Enable(wxID_COPY, true);
 		menuEdit->Enable(MMP_COPYCOORDS, true);
 	}
@@ -268,6 +272,10 @@ void MolDisplayWin::AdjustMenus(void) {
 /* Event handler functions */
 
 /* File menu */
+void MolDisplayWin::menuFileAppendNewFrame(wxCommandEvent &event) {
+	MainData->AddFrame(10,0);
+	ResetAllWindows();
+}
 void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
 	//Its possible we could handle this here if the current data is empty?
 	//On the Mac Open always opens a new window
@@ -426,7 +434,6 @@ void MolDisplayWin::PasteText(void) {
 			char * tbuf = new char[text.Length()+1];
 			strncpy(tbuf, text.ToAscii(), text.Length()+1);
 			BufferFile * TextBuffer = new BufferFile(tbuf, text.Length());
-			return;
 			if (MainData->NumFrames == 1) {	//If this is the only frame, make sure it is init'ed
 				InitRotationMatrix(MainData->TotalRotation);
 			}
@@ -735,7 +742,7 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
 		FrameChanged();
 
 #warning Update windows here when they are added
-	//	if (Coords) Coords->FrameChanged();
+		if (coordsWindow) coordsWindow->FrameChanged();
 		if (bondsWindow) bondsWindow->ResetList();
 	//	if (EPlotWin) EPlotWin->FrameChanged();
 	//	if (FreqPlotWin) FreqPlotWin->Reset(1);
@@ -782,6 +789,8 @@ void MolDisplayWin::ResetAllWindows(void) {
 	//update the frame info.
 	
 	//force updates for all the child windows
+	if (coordsWindow) coordsWindow->FrameChanged();
+	if (bondsWindow) bondsWindow->ResetList();
 	
 }
 void MolDisplayWin::BeginOperation(void) {
