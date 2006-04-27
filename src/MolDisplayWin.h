@@ -104,7 +104,8 @@ class MolDisplayWin : public wxFrame {
         void menuEditUndo(wxCommandEvent &event);
         void menuEditCut(wxCommandEvent &event);
         void menuEditCopy(wxCommandEvent &event);
-        //void menuEditCopy_coordinates(wxCommandEvent &event);
+        void menuEditCopyCoordinates(wxCommandEvent &event);
+		void CopyCoordinates(short coordtype) const;
         void menuEditPaste(wxCommandEvent &event);
 		void PasteText(void);
         void menuEditClear(wxCommandEvent &event);

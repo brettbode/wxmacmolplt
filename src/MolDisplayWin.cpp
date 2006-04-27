@@ -22,6 +22,9 @@
 #include "bondsdlg.h"
 #include "coordinateswindow.h"
 #include "VirtualSphere.h"
+#include "Internals.h"
+#include <wx/clipbrd.h>
+#include <wx/dataobj.h>
 
 extern WinPrefs * gPreferences;
 
@@ -46,6 +49,7 @@ enum MMP_EventID {
 	MMP_CONVERTTOBOHR,
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
+	MMP_COPYCOORDS,
 	MMP_BONDSWINDOW,
 	MMP_COORDSWINDOW,
 	
@@ -67,6 +71,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (wxID_UNDO,			MolDisplayWin::menuEditUndo)
     EVT_MENU (wxID_CUT,				MolDisplayWin::menuEditCut)
     EVT_MENU (wxID_COPY,			MolDisplayWin::menuEditCopy)
+	EVT_MENU (MMP_COPYCOORDS,		MolDisplayWin::menuEditCopyCoordinates)
     EVT_MENU (wxID_PASTE,			MolDisplayWin::menuEditPaste)
     EVT_MENU (wxID_CLEAR,			MolDisplayWin::menuEditClear)
     EVT_MENU (wxID_SELECTALL,		MolDisplayWin::menuEditSelect_all)
@@ -177,7 +182,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->AppendSeparator();
     menuEdit->Append(wxID_CUT, wxT("Cu&t\tCtrl+X"));
     menuEdit->Append(wxID_COPY, wxT("&Copy\tCtrl+C"));
-    //menuEdit->Append(,wxT("Copy Coordinates"));
+    menuEdit->Append(MMP_COPYCOORDS, wxT("Copy Coordinates"));
     menuEdit->Append(wxID_PASTE, wxT("&Paste\tCtrl+V"));
     menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
     menuEdit->AppendSeparator();
@@ -227,6 +232,10 @@ void MolDisplayWin::ClearMenus(void) {
 	menuFile->Enable(wxID_SAVE, false);
 	
 	menuEdit->Enable(wxID_UNDO, false);
+	menuEdit->Enable(wxID_CUT, false);
+	menuEdit->Enable(wxID_COPY, false);
+	menuEdit->Enable(MMP_COPYCOORDS, false);
+	menuEdit->Enable(wxID_PASTE, false);
 	menuView->Enable(MMP_SHOWMODE, false);
 	menuView->Enable(MMP_PREVMODE, false);
 	menuView->Enable(MMP_NEXTMODE, false);
@@ -235,7 +244,17 @@ void MolDisplayWin::ClearMenus(void) {
 void MolDisplayWin::AdjustMenus(void) {
 	ClearMenus();
 	menuFile->Enable(wxID_SAVE, Dirty);
-	
+	if (MainData->cFrame->NumAtoms == 0) {
+		if (wxTheClipboard->Open()) {
+			if (wxTheClipboard->IsSupported(wxDF_TEXT)) {
+				menuEdit->Enable(wxID_PASTE, true);
+			}
+			wxTheClipboard->Close();
+		}
+	} else {
+		menuEdit->Enable(wxID_COPY, true);
+		menuEdit->Enable(MMP_COPYCOORDS, true);
+	}
 	if (MainData->cFrame->Vibs) {
 		menuView->Enable(MMP_SHOWMODE, true);
 		menuView->Check(MMP_SHOWMODE, MainData->GetDrawMode());
@@ -340,72 +359,122 @@ void MolDisplayWin::menuEditCut(wxCommandEvent &event) {
 void MolDisplayWin::menuEditCopy(wxCommandEvent &event) {
 }
 
+void MolDisplayWin::menuEditCopyCoordinates(wxCommandEvent &event) {
+	CopyCoordinates(0);
+}
+void MolDisplayWin::CopyCoordinates(short ctype) const {
+	//Now copy the coords
+	long		TextLength=0;
+	Frame *		lFrame = MainData->cFrame;
+	
+	//Make a guess for the Handle size based on the # of atoms and the line format
+	long datalength = lFrame->NumAtoms*70*sizeof(char);
+	char * lText = new char[datalength];
+	//Create a bufferFile object to protect the text buffer from overrun
+	BufferFile *Buffer = new BufferFile(lText, datalength);
+	try {
+		wxString textBuffer;
+		if (ctype == 0) {
+			char	LineText[100];
+			wxString	Label;
+			for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
+				Prefs->GetAtomLabel(lFrame->Atoms[iatm].GetType()-1, Label);
+				sprintf(LineText, "   %5.1f  %13.8f  %13.8f  %13.8f\r",
+						(float) (lFrame->Atoms[iatm].GetType()), 
+						lFrame->Atoms[iatm].Position.x, lFrame->Atoms[iatm].Position.y,
+						lFrame->Atoms[iatm].Position.z);
+				textBuffer << Label << LineText;
+			}
+		} else if (ctype == 1) {
+			Internals * IntCoords = MainData->GetInternalCoordinates();
+			if (IntCoords) IntCoords->WriteCoordinatesToFile(Buffer, MainData, Prefs);
+			TextLength = Buffer->GetFilePos();
+		}
+	}
+	catch (FileError) {	//The buffer length was probably exceeded, since this shouldn't happen
+//		DisposeHandle(lText);		//here, just abort the copy
+//		lText = NULL;
+	}
+	delete Buffer;
+//	gScrap.ClearScrap();
+	//Put the text onto the clipboard
+//	gScrap.PutText(lText, TextLength);
+}
+
 void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
+	PasteText();
 }
 void MolDisplayWin::PasteText(void) {
 	//relax this restriction later (while in build mode)
 	if (MainData->cFrame->NumAtoms != 0) return;	//Do not allow pasting if there are already atoms in this frame
-//	if (gScrap.GetText()) {
-		long		iline, test, Type;
-		CPoint3D	Position, offset;
-		
-//		BufferFile * TextBuffer = new BufferFile(gScrap.GetText(), GetHandleSize(gScrap.GetText()));
-//		if (!TextBuffer) return;
-		
-		if (MainData->NumFrames == 1) {	//If this is the only frame, make sure it is init'ed
-			InitRotationMatrix(MainData->TotalRotation);
-		}
-		long NumLines =0;
-	//	long NumLines = TextBuffer->GetNumLines(-1);
-		// There may be up to NumLines atoms so dimension memory accordingly
-		if (!MainData->SetupFrameMemory(NumLines, 0)) {
-//			delete TextBuffer;
-			return;
-		}
-		
-		/*Now interpert each of the lines*/
-		for (iline=0; iline < NumLines; iline++) {
-			char LineText[kMaxLineLength];
+	if (wxTheClipboard->Open()) {
+		if (wxTheClipboard->IsSupported(wxDF_TEXT)) {
+			long		iline, test, Type;
+			CPoint3D	Position, offset;
 			
-//			TextBuffer->GetLine(LineText);
-			//Parse the current line: All values will be set in place if the
-			//parse is successful (test will return (-) if not). Normal modes
-			//shouldn't be pasted so pass in 0 for Mode.
-			test = ParseCartLine(LineText, &Type,&Position, &offset, 0);
-			if (test > 0) {	/*something was wrong with this line so skip it*/
-				
-				//A special atom was entered, store its offset.
-				if (Type > 115) {
-					if (Type > 255)
-						if (((Type - 255) < 1)||((Type - 255) > NumLines)) break;
-					if (!MainData->cFrame->AddSpecialAtom(offset, iline)) break;
-				}
-				
-				MainData->cFrame->AddAtom(Type, Position);
-				MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.x));
-				MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.y));
-				MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.z));
-			}
-		}
-		//Done with the text handle so unlock it
-//		delete TextBuffer;
-		
-		if (iline == 0) {	/*No atoms were found so clear the memory I just allocated*/
-//			MainData->ResetFrameMemory();
+			wxTextDataObject data;
+			wxTheClipboard->GetData(data);
+			wxString text = data.GetText();
+	//		BufferFile * TextBuffer = new BufferFile(text.ToAscii(), text.Length());
+			BufferFile * TextBuffer = NULL;
 			return;
+			if (MainData->NumFrames == 1) {	//If this is the only frame, make sure it is init'ed
+				InitRotationMatrix(MainData->TotalRotation);
+			}
+			long NumLines = TextBuffer->GetNumLines(-1);
+			// There may be up to NumLines atoms so dimension memory accordingly
+			if (!MainData->SetupFrameMemory(NumLines, 0)) {
+				delete TextBuffer;
+				wxTheClipboard->Close();
+				return;
+			}
+			
+			/*Now interpert each of the lines*/
+			for (iline=0; iline < NumLines; iline++) {
+				char LineText[kMaxLineLength];
+				
+				TextBuffer->GetLine(LineText);
+				//Parse the current line: All values will be set in place if the
+				//parse is successful (test will return (-) if not). Normal modes
+				//shouldn't be pasted so pass in 0 for Mode.
+				test = ParseCartLine(LineText, &Type,&Position, &offset, 0);
+				if (test > 0) {	/*something was wrong with this line so skip it*/
+					
+					//A special atom was entered, store its offset.
+					if (Type > 115) {
+						if (Type > 255)
+							if (((Type - 255) < 1)||((Type - 255) > NumLines)) break;
+						if (!MainData->cFrame->AddSpecialAtom(offset, iline)) break;
+					}
+					
+					MainData->cFrame->AddAtom(Type, Position);
+					MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.x));
+					MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.y));
+					MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.z));
+				}
+			}
+			//Done with the text handle so unlock it
+			delete TextBuffer;
+			
+			if (iline == 0) {	/*No atoms were found so clear the memory I just allocated*/
+		//		MainData->ResetFrameMemory();
+				wxTheClipboard->Close();
+				return;
+			}
+
+	//If there were special atoms found turn on drawing by default
+			if (MainData->cFrame->SpecialAtoms)	MainData->SetSpecialAtomDrawMode(true);
+
+			if (Prefs->GetAutoBond())
+			MainData->cFrame->SetBonds(Prefs, false);
+			//Now reset the display to take into account the new atoms
+			MainData->CenterModelWindow();
+			MainData->WindowSize = 2.0*MainData->MaxSize;
+			MainData->ResetRotation();
+			FrameChanged();
 		}
-
-//If there were special atoms found turn on drawing by default
-		if (MainData->cFrame->SpecialAtoms)	MainData->SetSpecialAtomDrawMode(true);
-
-		if (Prefs->GetAutoBond())
-		MainData->cFrame->SetBonds(Prefs, false);
-		//Now reset the display to take into account the new atoms
-		MainData->CenterModelWindow();
-		MainData->WindowSize = 2.0*MainData->MaxSize;
-		MainData->ResetRotation();
-		FrameChanged();
-//	}
+		wxTheClipboard->Close();
+	}
 }
 
 void MolDisplayWin::menuEditClear(wxCommandEvent &event) {
