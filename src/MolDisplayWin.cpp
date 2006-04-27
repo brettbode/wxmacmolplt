@@ -130,6 +130,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	glCanvas->setPrefs(Prefs);
 	
     Show(true);
+	AdjustMenus();
 }
 
 MolDisplayWin::~MolDisplayWin() {
@@ -239,6 +240,8 @@ void MolDisplayWin::ClearMenus(void) {
 	menuEdit->Enable(wxID_COPY, false);
 	menuEdit->Enable(MMP_COPYCOORDS, false);
 	menuEdit->Enable(wxID_PASTE, false);
+	menuEdit->Enable(wxID_CLEAR, false);
+	menuEdit->Enable(wxID_SELECTALL, false);
 	menuView->Enable(MMP_SHOWMODE, false);
 	menuView->Enable(MMP_PREVMODE, false);
 	menuView->Enable(MMP_NEXTMODE, false);
