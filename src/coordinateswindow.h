@@ -21,6 +21,7 @@
  */
 
 ////@begin includes
+#include "wx/frame.h"
 #include "wx/grid.h"
 ////@end includes
 
@@ -37,16 +38,17 @@ class wxGrid;
  */
 
 ////@begin control identifiers
-#define ID_DIALOG 10021
+#define ID_COORDINATESDIALOG 10021
 #define SYMBOL_COORDINATESWINDOW_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_COORDINATESWINDOW_TITLE _("Coordinates Window")
-#define SYMBOL_COORDINATESWINDOW_IDNAME ID_DIALOG
+#define SYMBOL_COORDINATESWINDOW_IDNAME ID_COORDINATESDIALOG
 #define SYMBOL_COORDINATESWINDOW_SIZE wxSize(400, 300)
 #define SYMBOL_COORDINATESWINDOW_POSITION wxDefaultPosition
 #define ID_BONDBUTTON 10023
 #define ID_STICKBUTTON 10024
 #define ID_COORDCHOICE1 10025
 #define ID_COORDGRID 10026
+#define MMP_COPYCOORDSITEM 10027
 ////@end control identifiers
 
 /*!
@@ -61,7 +63,7 @@ class wxGrid;
  * CoordinatesWindow class declaration
  */
 
-class CoordinatesWindow: public wxDialog
+class CoordinatesWindow: public wxFrame
 {    
     DECLARE_DYNAMIC_CLASS( CoordinatesWindow )
     DECLARE_EVENT_TABLE()
@@ -79,7 +81,7 @@ public:
 
 ////@begin CoordinatesWindow event handler declarations
 
-    /// wxEVT_CLOSE_WINDOW event handler for ID_DIALOG
+    /// wxEVT_CLOSE_WINDOW event handler for ID_COORDINATESDIALOG
     void OnCloseWindow( wxCloseEvent& event );
 
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
@@ -109,6 +111,18 @@ public:
     /// wxEVT_SIZE event handler for ID_COORDGRID
     void OnSize( wxSizeEvent& event );
 
+    /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE
+    void OnCloseClick( wxCommandEvent& event );
+
+    /// wxEVT_UPDATE_UI event handler for wxID_COPY
+    void OnCopyUpdate( wxUpdateUIEvent& event );
+
+    /// wxEVT_COMMAND_MENU_SELECTED event handler for MMP_COPYCOORDSITEM
+    void OnMmpCopycoordsitemClick( wxCommandEvent& event );
+
+    /// wxEVT_UPDATE_UI event handler for wxID_PASTE
+    void OnPasteUpdate( wxUpdateUIEvent& event );
+
 ////@end CoordinatesWindow event handler declarations
 
 ////@begin CoordinatesWindow member function declarations
@@ -136,7 +150,8 @@ public:
 	void FrameChanged(void);
 	void SizeCols(wxSize & s);
 	void UpdateControls(void);
-
+	bool ProcessEvent(wxEvent& event);
+	
 ////@begin CoordinatesWindow member variables
     wxButton* deleteButton;
     wxButton* BondButton;

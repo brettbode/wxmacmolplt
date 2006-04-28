@@ -41,13 +41,38 @@
  * CoordinatesWindow type definition
  */
 
-IMPLEMENT_DYNAMIC_CLASS( CoordinatesWindow, wxDialog )
+IMPLEMENT_DYNAMIC_CLASS( CoordinatesWindow, wxFrame )
 
 /*!
  * CoordinatesWindow event table definition
  */
+enum MMP_EventID {
+	MMP_SHRINK10=wxID_HIGHEST+1,
+	MMP_ENLARGE10,
+	MMP_SHOWMODE,
+	MMP_PREVMODE,
+	MMP_NEXTMODE,
+	MMP_SHOWAXIS,
+	MMP_CENTER,
+	MMP_ROTATESUBMENU,
+	MMP_ROTATETOXAXIS,
+	MMP_ROTATETOYAXIS,
+	MMP_ROTATETOZAXIS,
+	MMP_ROTATE180HOR,
+	MMP_ROTATE180VER,
+	MMP_ROTATEPRINC,
+	MMP_ROTATEOTHER,
+	MMP_CONVERTTOBOHR,
+	MMP_CONVERTTOANGSTROMS,
+	MMP_INVERTNORMALMODE,
+	MMP_COPYCOORDS,
+	MMP_BONDSWINDOW,
+	MMP_COORDSWINDOW,
+	
+	Number_MMP_Ids
+};
 
-BEGIN_EVENT_TABLE( CoordinatesWindow, wxDialog )
+BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 
 ////@begin CoordinatesWindow event table entries
     EVT_CLOSE( CoordinatesWindow::OnCloseWindow )
@@ -66,6 +91,14 @@ BEGIN_EVENT_TABLE( CoordinatesWindow, wxDialog )
     EVT_GRID_SELECT_CELL( CoordinatesWindow::OnSelectCell )
     EVT_GRID_RANGE_SELECT( CoordinatesWindow::OnRangeSelect )
     EVT_SIZE( CoordinatesWindow::OnSize )
+
+    EVT_MENU( wxID_CLOSE, CoordinatesWindow::OnCloseClick )
+
+    EVT_UPDATE_UI( wxID_COPY, CoordinatesWindow::OnCopyUpdate )
+
+    EVT_MENU( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemClick )
+
+    EVT_UPDATE_UI( wxID_PASTE, CoordinatesWindow::OnPasteUpdate )
 
 ////@end CoordinatesWindow event table entries
 
@@ -101,8 +134,8 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
 	Prefs = Parent->GetPrefs();
 
 ////@begin CoordinatesWindow creation
-    SetExtraStyle(GetExtraStyle()|wxWS_EX_BLOCK_EVENTS);
-    wxDialog::Create( parent, id, caption, pos, size, style );
+    SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
+    wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
     GetSizer()->Fit(this);
@@ -119,37 +152,63 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
 void CoordinatesWindow::CreateControls()
 {    
 ////@begin CoordinatesWindow content construction
-    CoordinatesWindow* itemDialog1 = this;
+    CoordinatesWindow* itemFrame1 = this;
+
+    wxMenuBar* menuBar = new wxMenuBar;
+    wxMenu* itemMenu12 = new wxMenu;
+    itemMenu12->Append(wxID_NEW, _("&New\tCtrl+N"), _T(""), wxITEM_NORMAL);
+    itemMenu12->Append(wxID_OPEN, _("&Open ...\tCtrl+O"), _T(""), wxITEM_NORMAL);
+    itemMenu12->Append(wxID_CLOSE, _("&Close\tCtrl+W"), _T(""), wxITEM_NORMAL);
+    menuBar->Append(itemMenu12, _("File"));
+    wxMenu* itemMenu16 = new wxMenu;
+    itemMenu16->Append(wxID_UNDO, _("&Undo\tCtrl+Z"), _T(""), wxITEM_NORMAL);
+    itemMenu16->Enable(wxID_UNDO, false);
+    itemMenu16->AppendSeparator();
+    itemMenu16->Append(wxID_CUT, _("Cu&t\tCtrl+X"), _T(""), wxITEM_NORMAL);
+    itemMenu16->Enable(wxID_CUT, false);
+    itemMenu16->Append(wxID_COPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
+    itemMenu16->Enable(wxID_COPY, false);
+    itemMenu16->Append(MMP_COPYCOORDSITEM, _("Copy Coordinates"), _T(""), wxITEM_NORMAL);
+    itemMenu16->Enable(MMP_COPYCOORDSITEM, false);
+    itemMenu16->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
+    itemMenu16->Enable(wxID_PASTE, false);
+    itemMenu16->Append(wxID_CLEAR, _("&Delete\tDel"), _T(""), wxITEM_NORMAL);
+    itemMenu16->Enable(wxID_CLEAR, false);
+    itemMenu16->AppendSeparator();
+    itemMenu16->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
+    itemMenu16->Enable(wxID_SELECTALL, false);
+    menuBar->Append(itemMenu16, _("Edit"));
+    itemFrame1->SetMenuBar(menuBar);
 
     wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
-    itemDialog1->SetSizer(itemBoxSizer2);
+    itemFrame1->SetSizer(itemBoxSizer2);
 
     wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxButton* itemButton4 = new wxButton( itemDialog1, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxButton* itemButton4 = new wxButton( itemFrame1, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer3->Add(itemButton4, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    deleteButton = new wxButton( itemDialog1, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+    deleteButton = new wxButton( itemFrame1, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer3->Add(deleteButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    BondButton = new wxButton( itemDialog1, ID_BONDBUTTON, _("Bond"), wxDefaultPosition, wxDefaultSize, 0 );
+    BondButton = new wxButton( itemFrame1, ID_BONDBUTTON, _("Bond"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer3->Add(BondButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxButton* itemButton7 = new wxButton( itemDialog1, ID_STICKBUTTON, _("Stick"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxButton* itemButton7 = new wxButton( itemFrame1, ID_STICKBUTTON, _("Stick"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer3->Add(itemButton7, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticText* itemStaticText8 = new wxStaticText( itemDialog1, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText* itemStaticText8 = new wxStaticText( itemFrame1, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer3->Add(itemStaticText8, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
     wxString coordTypeChoiceStrings[] = {
         _("Cartesian"),
         _("Z-Matrix")
     };
-    coordTypeChoice = new wxChoice( itemDialog1, ID_COORDCHOICE1, wxDefaultPosition, wxDefaultSize, 2, coordTypeChoiceStrings, 0 );
+    coordTypeChoice = new wxChoice( itemFrame1, ID_COORDCHOICE1, wxDefaultPosition, wxDefaultSize, 2, coordTypeChoiceStrings, 0 );
     itemBoxSizer3->Add(coordTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    coordGrid = new wxGrid( itemDialog1, ID_COORDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL );
+    coordGrid = new wxGrid( itemFrame1, ID_COORDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL );
     coordGrid->SetDefaultColSize(50);
     coordGrid->SetDefaultRowSize(25);
     coordGrid->SetColLabelSize(25);
@@ -672,3 +731,78 @@ void CoordinatesWindow::OnCloseWindow( wxCloseEvent& event )
 {
 	Parent->CloseCoordsWindow();
 }
+/*!
+ * wxEVT_UPDATE_UI event handler for wxID_COPY
+ */
+
+void CoordinatesWindow::OnCopyUpdate( wxUpdateUIEvent& event )
+{
+////@begin wxEVT_UPDATE_UI event handler for wxID_COPY in CoordinatesWindow.
+    // Before editing this code, remove the block markers.
+    event.Skip();
+////@end wxEVT_UPDATE_UI event handler for wxID_COPY in CoordinatesWindow. 
+}
+
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE
+ */
+
+void CoordinatesWindow::OnCloseClick( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE in CoordinatesWindow.
+    // Before editing this code, remove the block markers.
+    event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE in CoordinatesWindow. 
+}
+
+
+/*!
+ * wxEVT_UPDATE_UI event handler for wxID_PASTE
+ */
+
+void CoordinatesWindow::OnPasteUpdate( wxUpdateUIEvent& event )
+{
+////@begin wxEVT_UPDATE_UI event handler for wxID_PASTE in CoordinatesWindow.
+    // Before editing this code, remove the block markers.
+    event.Skip();
+////@end wxEVT_UPDATE_UI event handler for wxID_PASTE in CoordinatesWindow. 
+}
+
+bool CoordinatesWindow::ProcessEvent(wxEvent& event) 
+{
+	static wxEvent* s_lastEvent = NULL; 
+	// Check for infinite recursion 
+	if (& event == s_lastEvent) 
+		return false; 
+	if (event.IsCommandEvent() && 
+		!event.IsKindOf(CLASSINFO(wxChildFocusEvent)) && 
+		!event.IsKindOf(CLASSINFO(wxContextMenuEvent))) 
+	{ 
+		s_lastEvent = & event; 
+		wxControl *focusWin = wxDynamicCast(FindFocus(), wxControl);        
+		bool success = false; 
+		if (focusWin) 
+			success = focusWin->GetEventHandler() 
+				->ProcessEvent(event); 
+		if (!success) 
+			success = wxFrame::ProcessEvent(event); 
+		s_lastEvent = NULL; 
+		return success; 
+	} 
+	else 
+	{ 
+		return wxFrame::ProcessEvent(event); 
+	} 
+} 
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for MMP_COPYCOORDSITEM
+ */
+
+void CoordinatesWindow::OnMmpCopycoordsitemClick( wxCommandEvent& event )
+{
+	Parent->CopyCoordinates(CoordType);
+}
+
+

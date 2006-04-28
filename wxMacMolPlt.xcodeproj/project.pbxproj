@@ -38,6 +38,7 @@
 		1652DAD009D0B43700B7783F /* prefs.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACB09D0B43700B7783F /* prefs.icns */; };
 		1652DAD109D0B43700B7783F /* text-doc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACC09D0B43700B7783F /* text-doc.icns */; };
 		168626DB09D33C6C00A77D97 /* MolDisplayWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */; };
+		16B345EF09F9505C005FD3B2 /* coordinateswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */; };
 		16FB433009F026A300E84C6B /* bondsdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16FB432E09F026A300E84C6B /* bondsdlg.cpp */; };
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
@@ -121,6 +122,8 @@
 		1652DACC09D0B43700B7783F /* text-doc.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "text-doc.icns"; path = "resources/text-doc.icns"; sourceTree = "<group>"; };
 		168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MolDisplayWin.cpp; path = src/MolDisplayWin.cpp; sourceTree = "<group>"; };
 		168626DA09D33C6C00A77D97 /* MolDisplayWin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MolDisplayWin.h; path = src/MolDisplayWin.h; sourceTree = "<group>"; };
+		16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = coordinateswindow.cpp; path = src/coordinateswindow.cpp; sourceTree = "<group>"; };
+		16B345EE09F9505C005FD3B2 /* coordinateswindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = coordinateswindow.h; path = src/coordinateswindow.h; sourceTree = "<group>"; };
 		16FB432E09F026A300E84C6B /* bondsdlg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = bondsdlg.cpp; path = src/bondsdlg.cpp; sourceTree = "<group>"; };
 		16FB432F09F026A300E84C6B /* bondsdlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bondsdlg.h; path = src/bondsdlg.h; sourceTree = "<group>"; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
@@ -171,6 +174,8 @@
 				1652DA2D09D0B12600B7783F /* cell_table.h */,
 				1652DA2E09D0B12600B7783F /* CML.cpp */,
 				1652DA2F09D0B12600B7783F /* CML.h */,
+				16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */,
+				16B345EE09F9505C005FD3B2 /* coordinateswindow.h */,
 				1652DA3009D0B12600B7783F /* DataClasses.cpp */,
 				1652DA3109D0B12600B7783F /* Files.cpp */,
 				1652DA3209D0B12600B7783F /* Frame.cpp */,
@@ -364,6 +369,7 @@
 				8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */,
 				8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */,
 				16FB433009F026A300E84C6B /* bondsdlg.cpp in Sources */,
+				16B345EF09F9505C005FD3B2 /* coordinateswindow.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,6 +427,7 @@
 					System,
 					"/Users/brettbode/documents/wxWidgets-2.6.2/osx-build/lib/libwx_base_carbon-2.6.a",
 					"/Users/brettbode/documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_core-2.6.a",
+					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_adv-2.6.a",
 					"/Users/brettbode/documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_gl-2.6.a",
 					"-lwxexpat-2.6",
 					"-lwxtiff-2.6",
