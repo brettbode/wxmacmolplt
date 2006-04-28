@@ -50,6 +50,7 @@ enum MMP_EventID {
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
 	MMP_NEWFRAME,
+	MMP_DELETEFRAME,
 	MMP_COPYCOORDS,
 	MMP_BONDSWINDOW,
 	MMP_COORDSWINDOW,
@@ -66,6 +67,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (wxID_SAVEAS,			MolDisplayWin::menuFileSave_as)
 	EVT_MENU (wxID_CLOSE,			MolDisplayWin::menuFileClose)
 	EVT_CLOSE(						MolDisplayWin::FileClose)
+	EVT_MENU (MMP_DELETEFRAME,		MolDisplayWin::menuFileDeleteFrame)
     EVT_MENU (wxID_PRINT_SETUP,		MolDisplayWin::menuFilePage_setup)
     EVT_MENU (wxID_PREVIEW,			MolDisplayWin::menuFilePrint_preview)
     EVT_MENU (wxID_PRINT,			MolDisplayWin::menuFilePrint)
@@ -169,7 +171,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuFile->Append(wxID_CLOSE, wxT("&Close\tCtrl+W"));
     menuFile->AppendSeparator();
     //menuFile->Append(, wxT("Add Frames from File ..."));
-    //menuFile->Append(, wxT("Delete Frame"));
+	menuFile->Append(MMP_DELETEFRAME, wxT("Delete Frame"));
     //menuFile->AppendSeparator();
     //menuFile->Append(, wxT("Import"));
     //menuFile->Append(, wxT("Export"));
@@ -234,6 +236,7 @@ void MolDisplayWin::createMenuBar(void) {
 void MolDisplayWin::ClearMenus(void) {
 	menuFile->Enable(MMP_NEWFRAME, false);
 	menuFile->Enable(wxID_SAVE, false);
+	menuFile->Enable(MMP_DELETEFRAME, false);
 	
 	menuEdit->Enable(wxID_UNDO, false);
 	menuEdit->Enable(wxID_CUT, false);
@@ -262,6 +265,9 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuEdit->Enable(wxID_COPY, true);
 		menuEdit->Enable(MMP_COPYCOORDS, true);
 	}
+	if (MainData->NumFrames > 1 ) {
+		menuFile->Enable(MMP_DELETEFRAME, true);
+	}
 	if (MainData->cFrame->Vibs) {
 		menuView->Enable(MMP_SHOWMODE, true);
 		menuView->Check(MMP_SHOWMODE, MainData->GetDrawMode());
@@ -279,6 +285,11 @@ void MolDisplayWin::menuFileAppendNewFrame(wxCommandEvent &event) {
 	MainData->AddFrame(10,0);
 	ResetAllWindows();
 }
+void MolDisplayWin::menuFileDeleteFrame(wxCommandEvent &event) {
+	MainData->DeleteFrame();
+	ResetAllWindows();
+}
+
 void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
 	//Its possible we could handle this here if the current data is empty?
 	//On the Mac Open always opens a new window
