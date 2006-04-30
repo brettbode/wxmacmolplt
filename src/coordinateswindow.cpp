@@ -737,10 +737,7 @@ void CoordinatesWindow::OnCloseWindow( wxCloseEvent& event )
 
 void CoordinatesWindow::OnCopyUpdate( wxUpdateUIEvent& event )
 {
-////@begin wxEVT_UPDATE_UI event handler for wxID_COPY in CoordinatesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_UPDATE_UI event handler for wxID_COPY in CoordinatesWindow. 
+	event.Enable(false);
 }
 
 
@@ -750,10 +747,7 @@ void CoordinatesWindow::OnCopyUpdate( wxUpdateUIEvent& event )
 
 void CoordinatesWindow::OnCloseClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE in CoordinatesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE in CoordinatesWindow. 
+	Parent->CloseCoordsWindow();
 }
 
 
@@ -763,10 +757,7 @@ void CoordinatesWindow::OnCloseClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnPasteUpdate( wxUpdateUIEvent& event )
 {
-////@begin wxEVT_UPDATE_UI event handler for wxID_PASTE in CoordinatesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_UPDATE_UI event handler for wxID_PASTE in CoordinatesWindow. 
+	event.Enable(false);
 }
 
 bool CoordinatesWindow::ProcessEvent(wxEvent& event) 
