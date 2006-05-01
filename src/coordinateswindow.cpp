@@ -229,6 +229,8 @@ void CoordinatesWindow::CreateControls()
         _("Z-Matrix")
     };
     coordTypeChoice = new wxChoice( itemFrame1, ID_COORDCHOICE1, wxDefaultPosition, wxDefaultSize, 2, coordTypeChoiceStrings, 0 );
+    if (ShowToolTips())
+        coordTypeChoice->SetToolTip(_("Changes the displayed coordinate type."));
     itemBoxSizer3->Add(coordTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     coordGrid = new wxGrid( itemFrame1, ID_COORDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL );

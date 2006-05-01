@@ -15,6 +15,7 @@
 #include <wx/image.h>
 #include "MolDisplayWin.h"
 
+#include <iostream>
 MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
                        wxWindowID      id,
                        const wxPoint  &position,
@@ -29,7 +30,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 	Prefs = NULL;
 	MolWin = parent;
 	initialized = false;
-
+		
 	//Hmm is this the right spot to initialize our GL settings?
 //	initGL();
 }

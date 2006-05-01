@@ -51,7 +51,10 @@ class MolDisplayWin : public wxFrame {
 		Progress *		ProgressInd;	// Progress indicator window for long operations
 		OpenGLRec *		OpenGLData;		// Extra OpenGL data
         MpGLCanvas *	glCanvas;
-		
+		wxPanel *		displayPanel;
+		wxStatusBar *	statusBar;
+		wxScrollBar *	frameScrollBar;
+
 		BondsDlg *		bondsWindow;
 		CoordinatesWindow * coordsWindow;
 
@@ -200,6 +203,9 @@ class MolDisplayWin : public wxFrame {
 		void UpdateGLModel(void);
 		void Rotate(wxMouseEvent&);
 		void RotateMoleculeGL(bool);
+
+		void eventSize(wxSizeEvent &event);
+		void SizeChanged(void);
 };
 
 #endif /* #ifndef MolDisplayWin_H */

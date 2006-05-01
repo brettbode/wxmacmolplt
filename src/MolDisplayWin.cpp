@@ -54,6 +54,8 @@ enum MMP_EventID {
 	MMP_COPYCOORDS,
 	MMP_BONDSWINDOW,
 	MMP_COORDSWINDOW,
+	MMP_STATUSBAR,
+	MMP_FRAMESCROLLBAR,
 	
 	Number_MMP_Ids
 };
@@ -102,6 +104,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_BONDSWINDOW,	MolDisplayWin::menuWindowBonds)
 	EVT_MENU (MMP_COORDSWINDOW,	MolDisplayWin::menuWindowCoordinates)
 
+	EVT_SIZE( MolDisplayWin::eventSize )
 	EVT_CHAR (MolDisplayWin::KeyHandler)
 END_EVENT_TABLE()
 
@@ -128,9 +131,33 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	coordsWindow = NULL;
 	InitGLData();
 	
-    glCanvas = new MpGLCanvas(this);
+//    wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
+ //   SetSizer(itemBoxSizer2);
+//    wxPanel* displayPanel = new wxPanel( this, 11001, wxDefaultPosition, wxSize(200,200), wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+//	wxWindow * frame = new wxWindow(this, 11001, wxPoint(5,5), wxSize(200,200), wxSUNKEN_BORDER);
+    int width, height;
+    GetClientSize(&width, &height);
+	frameScrollBar = new wxScrollBar( this, MMP_FRAMESCROLLBAR, wxPoint(width-120, height-20), wxSize(100,-1), wxSB_HORIZONTAL );
+	int swidth, sheight;
+    frameScrollBar->GetClientSize(&swidth, &sheight);
+
+	glCanvas = new MpGLCanvas(this, 11002, wxPoint(0,0), wxSize(height-sheight,width));
 	glCanvas->setPrefs(Prefs);
+//    itemBoxSizer2->Add(glCanvas, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
+//	wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
+//    itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+//	statusBar = new wxStatusBar( this, MMP_STATUSBAR, wxST_SIZEGRIP|wxNO_BORDER );
+  //  statusBar->SetFieldsCount(2);
+	//wxString foo("test");
+//	statusBar->SetStatusText(foo);
+ //   itemBoxSizer3->Add(statusBar, 0, wxALIGN_BOTTOM|wxRIGHT|wxTOP|wxBOTTOM, 5);
+
+//	frameScrollBar = new wxScrollBar( this, MMP_FRAMESCROLLBAR, wxPoint(width-120, height-20), wxSize(100,-1), wxSB_HORIZONTAL );
+//	frameScrollBar->SetScrollbar(0, 1, 10, 1);
+//	itemBoxSizer3->Add(frameScrollBar, 0, wxALIGN_BOTTOM|wxALL, 5);
+	SizeChanged();
     Show(true);
 	AdjustMenus();
 }
@@ -151,7 +178,19 @@ MolDisplayWin::~MolDisplayWin() {
 		delete Prefs;
 	}
 }
+void MolDisplayWin::eventSize(wxSizeEvent &event) {
+	SizeChanged();
+}
+void MolDisplayWin::SizeChanged(void) {
+	//resize/reposition the controls and the display canvas
+    int width, height;
+    GetClientSize(&width, &height);
 
+	int swidth, sheight;
+    frameScrollBar->GetClientSize(&swidth, &sheight);
+	frameScrollBar->Move(width-116, height-sheight);
+	glCanvas->SetSize(wxSize(width, (height-sheight)));
+}
 void MolDisplayWin::createMenuBar(void) {
     menuBar = new wxMenuBar;
 
