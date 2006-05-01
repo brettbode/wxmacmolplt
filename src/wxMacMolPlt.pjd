@@ -6,7 +6,7 @@
     <string name="title">""</string>
     <string name="author">""</string>
     <string name="description">""</string>
-    <long name="doc_count">74</long>
+    <long name="doc_count">76</long>
     <string name="xrc_filename">""</string>
     <bool name="convert_images_to_xpm">0</bool>
     <bool name="inline_images">0</bool>
@@ -2619,7 +2619,7 @@
                 <string name="proxy-Label">"Add"</string>
                 <bool name="proxy-Default">0</bool>
                 <string name="proxy-Help text">""</string>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"Add a new atom to the list of coordinates."</string>
                 <string name="proxy-Background colour">""</string>
                 <string name="proxy-Foreground colour">""</string>
                 <string name="proxy-Font">""</string>
@@ -2671,7 +2671,7 @@
                 <string name="proxy-Label">"&amp;Delete"</string>
                 <bool name="proxy-Default">0</bool>
                 <string name="proxy-Help text">""</string>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"Delete the selected atoms."</string>
                 <string name="proxy-Background colour">""</string>
                 <string name="proxy-Foreground colour">""</string>
                 <string name="proxy-Font">""</string>
@@ -2723,7 +2723,7 @@
                 <string name="proxy-Label">"Bond"</string>
                 <bool name="proxy-Default">0</bool>
                 <string name="proxy-Help text">""</string>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"Apply the default bonding criteria."</string>
                 <string name="proxy-Background colour">""</string>
                 <string name="proxy-Foreground colour">""</string>
                 <string name="proxy-Font">""</string>
@@ -2775,7 +2775,7 @@
                 <string name="proxy-Label">"Stick"</string>
                 <bool name="proxy-Default">0</bool>
                 <string name="proxy-Help text">""</string>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"Use the current screen rotation as the reference frame."</string>
                 <string name="proxy-Background colour">""</string>
                 <string name="proxy-Foreground colour">""</string>
                 <string name="proxy-Font">""</string>
@@ -2884,7 +2884,7 @@
                 <string name="proxy-Strings">"Cartesian|Z-Matrix"</string>
                 <string name="proxy-Initial value">""</string>
                 <string name="proxy-Help text">""</string>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"Changes the displayed coordinate type."</string>
                 <string name="proxy-Background colour">""</string>
                 <string name="proxy-Foreground colour">""</string>
                 <string name="proxy-Font">""</string>
@@ -2996,7 +2996,6 @@
             <string name="proxy-type">"wbMenuBarProxy"</string>
             <string name="proxy-Id name">"ID_MENUBAR"</string>
             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
-            <long name="proxy-Id value">10030</long>
             <document>
               <string name="title">"File"</string>
               <string name="type">"dialog-control-document"</string>
@@ -3101,6 +3100,7 @@
                 <long name="locked">0</long>
                 <string name="created">"28/4/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_UPDATE_UI|OnUndoUpdate"</string>
                 <string name="proxy-Id name">"wxID_UNDO"</string>
                 <long name="proxy-Id value">5007</long>
                 <string name="proxy-Label">"&amp;Undo\tCtrl+Z"</string>
@@ -3135,6 +3135,7 @@
                 <long name="locked">0</long>
                 <string name="created">"28/4/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_UPDATE_UI|OnCutUpdate"</string>
                 <string name="proxy-Id name">"wxID_CUT"</string>
                 <long name="proxy-Id value">5030</long>
                 <string name="proxy-Label">"Cu&amp;t\tCtrl+X"</string>
@@ -3185,7 +3186,7 @@
                 <string name="proxy-Kind">"Normal"</string>
                 <bool name="proxy-Checked">0</bool>
                 <bool name="proxy-Enabled">0</bool>
-                <string name="proxy-Help text">""</string>
+                <string name="proxy-Help text">"Copy the full set of coordinates with the current coordinate type."</string>
                 <string name="proxy-Bitmap">""</string>
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
               </document>
@@ -3222,6 +3223,7 @@
                 <long name="locked">0</long>
                 <string name="created">"28/4/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_UPDATE_UI|OnClearUpdate"</string>
                 <string name="proxy-Id name">"wxID_CLEAR"</string>
                 <long name="proxy-Id value">5033</long>
                 <string name="proxy-Label">"&amp;Delete\tDel"</string>
@@ -3256,6 +3258,8 @@
                 <long name="locked">0</long>
                 <string name="created">"28/4/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnSelectallClick"</string>
+                <string name="event-handler-1">"wxEVT_UPDATE_UI|OnSelectallUpdate"</string>
                 <string name="proxy-Id name">"wxID_SELECTALL"</string>
                 <long name="proxy-Id value">5036</long>
                 <string name="proxy-Label">"&amp;Select all\tCtrl+A"</string>
@@ -3263,6 +3267,44 @@
                 <bool name="proxy-Checked">0</bool>
                 <bool name="proxy-Enabled">0</bool>
                 <string name="proxy-Help text">""</string>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              </document>
+            </document>
+            <document>
+              <string name="title">"Coordinates"</string>
+              <string name="type">"dialog-control-document"</string>
+              <string name="filename">""</string>
+              <string name="icon-name">"menu"</string>
+              <long name="is-transient">0</long>
+              <long name="owns-file">1</long>
+              <long name="title-mode">0</long>
+              <long name="locked">0</long>
+              <string name="created">"1/5/2006"</string>
+              <string name="proxy-type">"wbMenuProxy"</string>
+              <string name="proxy-Label">"Coordinates"</string>
+              <bool name="proxy-Enabled">1</bool>
+              <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              <document>
+                <string name="title">"Use Coordinates for Reference: ID_STICKMENU"</string>
+                <string name="type">"dialog-control-document"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="owns-file">1</long>
+                <long name="title-mode">0</long>
+                <long name="locked">0</long>
+                <string name="created">"1/5/2006"</string>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnStickmenuClick"</string>
+                <string name="event-handler-1">"wxEVT_UPDATE_UI|OnStickmenuUpdate"</string>
+                <string name="proxy-Id name">"ID_STICKMENU"</string>
+                <long name="proxy-Id value">10028</long>
+                <string name="proxy-Label">"Use Coordinates for Reference"</string>
+                <string name="proxy-Kind">"Normal"</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">"Makes the current rotated coordinates the reference coordinates."</string>
                 <string name="proxy-Bitmap">""</string>
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
               </document>

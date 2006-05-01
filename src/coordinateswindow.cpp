@@ -94,11 +94,23 @@ BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 
     EVT_MENU( wxID_CLOSE, CoordinatesWindow::OnCloseClick )
 
+    EVT_UPDATE_UI( wxID_UNDO, CoordinatesWindow::OnUndoUpdate )
+
+    EVT_UPDATE_UI( wxID_CUT, CoordinatesWindow::OnCutUpdate )
+
     EVT_UPDATE_UI( wxID_COPY, CoordinatesWindow::OnCopyUpdate )
 
     EVT_MENU( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemClick )
 
     EVT_UPDATE_UI( wxID_PASTE, CoordinatesWindow::OnPasteUpdate )
+
+    EVT_UPDATE_UI( wxID_CLEAR, CoordinatesWindow::OnClearUpdate )
+
+    EVT_MENU( wxID_SELECTALL, CoordinatesWindow::OnSelectallClick )
+    EVT_UPDATE_UI( wxID_SELECTALL, CoordinatesWindow::OnSelectallUpdate )
+
+    EVT_MENU( ID_STICKMENU, CoordinatesWindow::OnStickmenuClick )
+    EVT_UPDATE_UI( ID_STICKMENU, CoordinatesWindow::OnStickmenuUpdate )
 
 ////@end CoordinatesWindow event table entries
 
@@ -168,7 +180,7 @@ void CoordinatesWindow::CreateControls()
     itemMenu16->Enable(wxID_CUT, false);
     itemMenu16->Append(wxID_COPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
     itemMenu16->Enable(wxID_COPY, false);
-    itemMenu16->Append(MMP_COPYCOORDSITEM, _("Copy Coordinates"), _T(""), wxITEM_NORMAL);
+    itemMenu16->Append(MMP_COPYCOORDSITEM, _("Copy Coordinates"), _("Copy the full set of coordinates with the current coordinate type."), wxITEM_NORMAL);
     itemMenu16->Enable(MMP_COPYCOORDSITEM, false);
     itemMenu16->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
     itemMenu16->Enable(wxID_PASTE, false);
@@ -178,6 +190,9 @@ void CoordinatesWindow::CreateControls()
     itemMenu16->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
     itemMenu16->Enable(wxID_SELECTALL, false);
     menuBar->Append(itemMenu16, _("Edit"));
+    wxMenu* itemMenu26 = new wxMenu;
+    itemMenu26->Append(ID_STICKMENU, _("Use Coordinates for Reference"), _("Makes the current rotated coordinates the reference coordinates."), wxITEM_NORMAL);
+    menuBar->Append(itemMenu26, _("Coordinates"));
     itemFrame1->SetMenuBar(menuBar);
 
     wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
@@ -187,15 +202,23 @@ void CoordinatesWindow::CreateControls()
     itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     wxButton* itemButton4 = new wxButton( itemFrame1, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+    if (ShowToolTips())
+        itemButton4->SetToolTip(_("Add a new atom to the list of coordinates."));
     itemBoxSizer3->Add(itemButton4, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     deleteButton = new wxButton( itemFrame1, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+    if (ShowToolTips())
+        deleteButton->SetToolTip(_("Delete the selected atoms."));
     itemBoxSizer3->Add(deleteButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     BondButton = new wxButton( itemFrame1, ID_BONDBUTTON, _("Bond"), wxDefaultPosition, wxDefaultSize, 0 );
+    if (ShowToolTips())
+        BondButton->SetToolTip(_("Apply the default bonding criteria."));
     itemBoxSizer3->Add(BondButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxButton* itemButton7 = new wxButton( itemFrame1, ID_STICKBUTTON, _("Stick"), wxDefaultPosition, wxDefaultSize, 0 );
+    if (ShowToolTips())
+        itemButton7->SetToolTip(_("Use the current screen rotation as the reference frame."));
     itemBoxSizer3->Add(itemButton7, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText8 = new wxStaticText( itemFrame1, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -776,10 +799,10 @@ bool CoordinatesWindow::ProcessEvent(wxEvent& event)
 		if (focusWin) 
 			success = focusWin->GetEventHandler() 
 				->ProcessEvent(event); 
-		if (!success) 
-			success = wxFrame::ProcessEvent(event); 
-		s_lastEvent = NULL; 
-		return success; 
+		if (!success)
+			success = wxFrame::ProcessEvent(event);
+		s_lastEvent = NULL;
+		return success;
 	} 
 	else 
 	{ 
@@ -797,3 +820,82 @@ void CoordinatesWindow::OnMmpCopycoordsitemClick( wxCommandEvent& event )
 }
 
 
+/*!
+ * wxEVT_UPDATE_UI event handler for wxID_UNDO
+ */
+
+void CoordinatesWindow::OnUndoUpdate( wxUpdateUIEvent& event )
+{
+	event.Enable(false);
+}
+
+/*!
+ * wxEVT_UPDATE_UI event handler for wxID_CUT
+ */
+
+void CoordinatesWindow::OnCutUpdate( wxUpdateUIEvent& event )
+{
+	event.Enable(false);
+}
+
+/*!
+ * wxEVT_UPDATE_UI event handler for wxID_CLEAR
+ */
+
+void CoordinatesWindow::OnClearUpdate( wxUpdateUIEvent& event )
+{
+	event.Enable(coordGrid->IsSelection());
+}
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for wxID_SELECTALL
+ */
+
+void CoordinatesWindow::OnSelectallClick( wxCommandEvent& event )
+{
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	//we seem to only get selection events and not also deselection events
+	//so first clear off the list of selected cells
+	for (int i=0; i<natoms; i++) {
+		lFrame->SetAtomSelectState(i, true);
+		coordGrid->SelectRow(i, true);
+	}
+	
+	UpdateControls();
+}
+
+/*!
+ * wxEVT_UPDATE_UI event handler for wxID_SELECTALL
+ */
+
+void CoordinatesWindow::OnSelectallUpdate( wxUpdateUIEvent& event )
+{
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	event.Enable((natoms>0));
+}
+
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_STICKMENU
+ */
+
+void CoordinatesWindow::OnStickmenuClick( wxCommandEvent& event )
+{
+	OnStickbuttonClick(event);
+}
+
+/*!
+ * wxEVT_UPDATE_UI event handler for ID_STICKMENU
+ */
+
+void CoordinatesWindow::OnStickmenuUpdate( wxUpdateUIEvent& event )
+{
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	event.Enable((natoms>0));
+}

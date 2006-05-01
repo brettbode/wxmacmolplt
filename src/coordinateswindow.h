@@ -49,6 +49,7 @@ class wxGrid;
 #define ID_COORDCHOICE1 10025
 #define ID_COORDGRID 10026
 #define MMP_COPYCOORDSITEM 10027
+#define ID_STICKMENU 10028
 ////@end control identifiers
 
 /*!
@@ -114,6 +115,12 @@ public:
     /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE
     void OnCloseClick( wxCommandEvent& event );
 
+    /// wxEVT_UPDATE_UI event handler for wxID_UNDO
+    void OnUndoUpdate( wxUpdateUIEvent& event );
+
+    /// wxEVT_UPDATE_UI event handler for wxID_CUT
+    void OnCutUpdate( wxUpdateUIEvent& event );
+
     /// wxEVT_UPDATE_UI event handler for wxID_COPY
     void OnCopyUpdate( wxUpdateUIEvent& event );
 
@@ -122,6 +129,21 @@ public:
 
     /// wxEVT_UPDATE_UI event handler for wxID_PASTE
     void OnPasteUpdate( wxUpdateUIEvent& event );
+
+    /// wxEVT_UPDATE_UI event handler for wxID_CLEAR
+    void OnClearUpdate( wxUpdateUIEvent& event );
+
+    /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_SELECTALL
+    void OnSelectallClick( wxCommandEvent& event );
+
+    /// wxEVT_UPDATE_UI event handler for wxID_SELECTALL
+    void OnSelectallUpdate( wxUpdateUIEvent& event );
+
+    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_STICKMENU
+    void OnStickmenuClick( wxCommandEvent& event );
+
+    /// wxEVT_UPDATE_UI event handler for ID_STICKMENU
+    void OnStickmenuUpdate( wxUpdateUIEvent& event );
 
 ////@end CoordinatesWindow event handler declarations
 
