@@ -1,0 +1,113 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        llmdialog.h
+// Purpose:     
+// Author:      Brett Bode
+// Modified by: 
+// Created:     Tue  2 May 13:24:40 2006
+// RCS-ID:      
+// Copyright:   (c) 2006 Iowa State University
+// Licence:     
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef _LLMDIALOG_H_
+#define _LLMDIALOG_H_
+
+#if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
+#pragma interface "llmdialog.h"
+#endif
+
+/*!
+ * Includes
+ */
+
+////@begin includes
+////@end includes
+
+/*!
+ * Forward declarations
+ */
+
+////@begin forward declarations
+////@end forward declarations
+
+/*!
+ * Control identifiers
+ */
+
+////@begin control identifiers
+#define ID_DIALOG 10029
+#define SYMBOL_LLMDIALOG_STYLE wxSYSTEM_MENU|wxSTAY_ON_TOP|wxDIALOG_MODAL
+#define SYMBOL_LLMDIALOG_TITLE _("LLMDialog")
+#define SYMBOL_LLMDIALOG_IDNAME ID_DIALOG
+#define SYMBOL_LLMDIALOG_SIZE wxSize(400, 300)
+#define SYMBOL_LLMDIALOG_POSITION wxDefaultPosition
+#define ID_TEXTCTRL 10030
+#define ID_INTERNALSCHECKBOX 10031
+////@end control identifiers
+
+/*!
+ * Compatibility
+ */
+
+#ifndef wxCLOSE_BOX
+#define wxCLOSE_BOX 0x1000
+#endif
+
+/*!
+ * LLMDialog class declaration
+ */
+
+class LLMDialog: public wxDialog
+{    
+    DECLARE_DYNAMIC_CLASS( LLMDialog )
+    DECLARE_EVENT_TABLE()
+
+public:
+    /// Constructors
+    LLMDialog( );
+    LLMDialog( MolDisplayWin* parent, wxWindowID id = SYMBOL_LLMDIALOG_IDNAME, const wxString& caption = SYMBOL_LLMDIALOG_TITLE, const wxPoint& pos = SYMBOL_LLMDIALOG_POSITION, const wxSize& size = SYMBOL_LLMDIALOG_SIZE, long style = SYMBOL_LLMDIALOG_STYLE );
+
+    /// Creation
+    bool Create( MolDisplayWin* parent, wxWindowID id = SYMBOL_LLMDIALOG_IDNAME, const wxString& caption = SYMBOL_LLMDIALOG_TITLE, const wxPoint& pos = SYMBOL_LLMDIALOG_POSITION, const wxSize& size = SYMBOL_LLMDIALOG_SIZE, long style = SYMBOL_LLMDIALOG_STYLE );
+
+    /// Creates the controls and sizers
+    void CreateControls();
+
+////@begin LLMDialog event handler declarations
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TEXTCTRL
+    void OnTextctrlUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_INTERNALSCHECKBOX
+    void OnInternalscheckboxClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
+    void OnCancelClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
+    void OnOkClick( wxCommandEvent& event );
+
+////@end LLMDialog event handler declarations
+
+////@begin LLMDialog member function declarations
+
+    MolDisplayWin * GetParent() const { return Parent ; }
+    void SetParent(MolDisplayWin * value) { Parent = value ; }
+
+    /// Retrieves bitmap resources
+    wxBitmap GetBitmapResource( const wxString& name );
+
+    /// Retrieves icon resources
+    wxIcon GetIconResource( const wxString& name );
+////@end LLMDialog member function declarations
+
+    /// Should we show tooltips?
+    static bool ShowToolTips();
+
+////@begin LLMDialog member variables
+    MolDisplayWin * Parent;
+////@end LLMDialog member variables
+};
+
+#endif
+    // _LLMDIALOG_H_

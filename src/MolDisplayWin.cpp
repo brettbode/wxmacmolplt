@@ -23,6 +23,7 @@
 #include "coordinateswindow.h"
 #include "VirtualSphere.h"
 #include "Internals.h"
+#include "llmdialog.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
 
@@ -46,6 +47,8 @@ enum MMP_EventID {
 	MMP_ROTATE180VER,
 	MMP_ROTATEPRINC,
 	MMP_ROTATEOTHER,
+	MMP_CREATELLMPATH,
+	MMP_MINFRAMEMOVEMENTS,
 	MMP_CONVERTTOBOHR,
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
@@ -97,6 +100,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_ROTATEPRINC,		MolDisplayWin::menuViewRotatePrinciple_orientation)
 	EVT_MENU (MMP_ROTATEOTHER,		MolDisplayWin::menuViewRotateOther)
 
+	EVT_MENU (MMP_CREATELLMPATH,	MolDisplayWin::menuMoleculeCreateLLMPath)
+	EVT_MENU (MMP_MINFRAMEMOVEMENTS,	MolDisplayWin::menuMoleculeMinimizeFrameMovements)
 	EVT_MENU (MMP_CONVERTTOBOHR,	MolDisplayWin::menuMoleculeConvertToBohr)
 	EVT_MENU (MMP_CONVERTTOANGSTROMS,	MolDisplayWin::menuMoleculeConvertToAngstroms)
 	EVT_MENU (MMP_INVERTNORMALMODE,	MolDisplayWin::menuMoleculeInvertNormalMode)
@@ -243,6 +248,8 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewRotate->Append(MMP_ROTATEPRINC, wxT("to &Principle Orientation"));
 	menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
 
+	menuMolecule->Append(MMP_CREATELLMPATH, wxT("Create &LLM Path..."));
+	menuMolecule->Append(MMP_MINFRAMEMOVEMENTS, wxT("&Minimize Frame Movements"));
 	menuMolecule->Append(MMP_CONVERTTOBOHR, wxT("Convert to &Bohr"));
     menuMolecule->Append(MMP_CONVERTTOANGSTROMS, wxT("Convert to &Angstroms"));
     menuMolecule->Append(MMP_INVERTNORMALMODE, wxT("&Invert Normal Mode"));
@@ -277,6 +284,8 @@ void MolDisplayWin::ClearMenus(void) {
 	menuView->Enable(MMP_SHOWMODE, false);
 	menuView->Enable(MMP_PREVMODE, false);
 	menuView->Enable(MMP_NEXTMODE, false);
+	menuMolecule->Enable(MMP_CREATELLMPATH, false);
+	menuMolecule->Enable(MMP_MINFRAMEMOVEMENTS, false);
 	menuMolecule->Enable(MMP_INVERTNORMALMODE, false);
 }
 void MolDisplayWin::AdjustMenus(void) {
@@ -296,6 +305,18 @@ void MolDisplayWin::AdjustMenus(void) {
 	}
 	if (MainData->NumFrames > 1 ) {
 		menuFile->Enable(MMP_DELETEFRAME, true);
+		if (MainData->CurrentFrame < MainData->NumFrames) {
+			Frame * lFrame = MainData->GetCurrentFramePtr();
+			Frame * lnFrame = lFrame->GetNextFrame();
+			if (lFrame->NumAtoms == lnFrame->NumAtoms) {
+				for (long i=0; i<lFrame->NumAtoms; i++) {
+					bool good = true;
+					if (lFrame->Atoms[i].Type != lnFrame->Atoms[i].Type) good = false;
+					if (good) menuMolecule->Enable(MMP_CREATELLMPATH, true);
+				}
+			}
+		}
+		menuMolecule->Enable(MMP_MINFRAMEMOVEMENTS, true);
 	}
 	if (MainData->cFrame->Vibs) {
 		menuView->Enable(MMP_SHOWMODE, true);
@@ -640,9 +661,20 @@ void MolDisplayWin::menuViewRotateOther(wxCommandEvent &event) {
 	SetScreenPlane * temp = new SetScreenPlane(this);
 	temp->Show();
 }
-void MolDisplayWin::menuMoleculeConvertToBohr(wxCommandEvent &event) {
+void MolDisplayWin::menuMoleculeCreateLLMPath(wxCommandEvent &event) {
+	//The create LLM dialog does the work
+	LLMDialog * llm = new LLMDialog(this);
+	llm->Show();
+}
+void MolDisplayWin::menuMoleculeMinimizeFrameMovements(wxCommandEvent &event) {
 	MainData->UnitConversion(0);
 	ResetAllWindows();
+	Dirty = true;
+}
+void MolDisplayWin::menuMoleculeConvertToBohr(wxCommandEvent &event) {
+	BeginOperation();
+	MainData->LinearLeastSquaresFit(ProgressInd);
+	FinishOperation();
 	Dirty = true;
 }
 void MolDisplayWin::menuMoleculeConvertToAngstroms(wxCommandEvent &event) {

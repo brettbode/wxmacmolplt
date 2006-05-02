@@ -140,8 +140,8 @@ class MolDisplayWin : public wxFrame {
         
         //void menuMoleculeSet_bond_length(wxCommandEvent &event);
         //void menuMoleculeSet_frame_energy(wxCommandEvent &event);
-        //void menuMoleculeCreate_llm_path(wxCommandEvent &event);
-        //void menuMoleculeMinimize_frame_movements(wxCommandEvent &event);
+        void menuMoleculeCreateLLMPath(wxCommandEvent &event);
+        void menuMoleculeMinimizeFrameMovements(wxCommandEvent &event);
         void menuMoleculeConvertToBohr(wxCommandEvent &event);
         void menuMoleculeConvertToAngstroms(wxCommandEvent &event);
         void menuMoleculeInvertNormalMode(wxCommandEvent &event);
