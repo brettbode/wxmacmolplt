@@ -3180,6 +3180,7 @@
                 <string name="created">"28/4/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
                 <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMmpCopycoordsitemClick"</string>
+                <string name="event-handler-1">"wxEVT_UPDATE_UI|OnMmpCopycoordsitemUpdate"</string>
                 <string name="proxy-Id name">"MMP_COPYCOORDSITEM"</string>
                 <long name="proxy-Id value">10027</long>
                 <string name="proxy-Label">"Copy Coordinates"</string>

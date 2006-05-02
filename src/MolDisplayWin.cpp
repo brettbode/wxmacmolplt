@@ -106,6 +106,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 
 	EVT_SIZE( MolDisplayWin::eventSize )
 	EVT_CHAR (MolDisplayWin::KeyHandler)
+	EVT_COMMAND_SCROLL(MMP_FRAMESCROLLBAR, MolDisplayWin::OnScrollBarChange )
 END_EVENT_TABLE()
 
 MolDisplayWin::MolDisplayWin(const wxString &title,
@@ -119,7 +120,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     createMenuBar();
     SetMenuBar(menuBar);
 
-    // TODO:  Make room for other controls (Frame picker, etc.)
     MainData = new MoleculeData;
 	Prefs = new WinPrefs;
 	*Prefs = *gPreferences;
@@ -142,7 +142,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	
 	textBar = new wxStaticText(this, 11003, wxString("foo"), wxDefaultPosition, wxDefaultSize,
 						   wxALIGN_LEFT | wxST_NO_AUTORESIZE);
-//	textBar->SetLabel(wxString("some text"));
 
 	SizeChanged();
     Show(true);
@@ -150,7 +149,9 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 }
 
 MolDisplayWin::~MolDisplayWin() {
-    // TODO:  Destroy any dialogs that are still in existence.
+	//As long as all related windows indicate this window as their
+	//parent when they are created, they will be automatically destroyed
+	//when this window is destroyed.
 
 	if (ProgressInd != NULL) {
 		delete ProgressInd;
@@ -175,7 +176,7 @@ void MolDisplayWin::SizeChanged(void) {
 
 	int swidth, sheight;
     frameScrollBar->GetClientSize(&swidth, &sheight);
-	frameScrollBar->Move(width-116, height-sheight);
+	frameScrollBar->Move(width-114, height-sheight);
 	glCanvas->SetSize(wxSize(width, (height-sheight)));
 	
 	textBar->SetSize(0, height-sheight, width-114, sheight, wxSIZE_USE_EXISTING);
@@ -654,6 +655,15 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 	ResetModel(false);
 	Dirty = true;
 }
+void MolDisplayWin::OnScrollBarChange( wxScrollEvent& event ) {
+		//this function receives all events from the scroll bar and
+		//and thus provides live dragging.
+	int newpos = event.GetPosition() + 1;
+	if (newpos != MainData->CurrentFrame) {
+		ChangeFrames(newpos);
+	}
+}
+
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 	int key = event.GetKeyCode();
 	if (!event.HasModifiers()) {
@@ -769,6 +779,7 @@ void MolDisplayWin::FrameChanged(void) {
 		temp = temp->GetNextSurface();
 	}
 	UpdateModelDisplay();
+	AdjustMenus();
 }
 void MolDisplayWin::ChangeFrames(long NewFrame) {
 	if ((NewFrame>0)&&(NewFrame<=MainData->NumFrames)) {
@@ -789,7 +800,7 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
 	//	if (EPlotWin) EPlotWin->FrameChanged();
 	//	if (FreqPlotWin) FreqPlotWin->Reset(1);
 	//	if (SurfaceDlog) SurfaceDlog->Reset();
-		frameScrollBar->SetThumbPosition(MainData->CurrentFrame);
+		frameScrollBar->SetThumbPosition(MainData->CurrentFrame-1);
 	}
 }
 void MolDisplayWin::UpdateFrameText(void) {
@@ -895,7 +906,7 @@ void MolDisplayWin::ResetModel(bool Center) {
 	}
 	UpdateGLModel();
 	// Reset the frame scroll bar
-	frameScrollBar->SetScrollbar(MainData->CurrentFrame, 1, MainData->NumFrames, 1);
+	frameScrollBar->SetScrollbar(MainData->CurrentFrame-1, 1, MainData->NumFrames, 1);
 	UpdateFrameText();
 	glCanvas->draw();
 	AdjustMenus();

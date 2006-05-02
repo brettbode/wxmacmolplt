@@ -206,6 +206,8 @@ class MolDisplayWin : public wxFrame {
 
 		void eventSize(wxSizeEvent &event);
 		void SizeChanged(void);
+			//Function to receive all changes to the scroll bar
+		void OnScrollBarChange(wxScrollEvent& event);
 };
 
 #endif /* #ifndef MolDisplayWin_H */

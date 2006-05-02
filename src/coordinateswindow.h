@@ -127,6 +127,9 @@ public:
     /// wxEVT_COMMAND_MENU_SELECTED event handler for MMP_COPYCOORDSITEM
     void OnMmpCopycoordsitemClick( wxCommandEvent& event );
 
+    /// wxEVT_UPDATE_UI event handler for MMP_COPYCOORDSITEM
+    void OnMmpCopycoordsitemUpdate( wxUpdateUIEvent& event );
+
     /// wxEVT_UPDATE_UI event handler for wxID_PASTE
     void OnPasteUpdate( wxUpdateUIEvent& event );
 

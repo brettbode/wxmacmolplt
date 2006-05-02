@@ -101,6 +101,7 @@ BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
     EVT_UPDATE_UI( wxID_COPY, CoordinatesWindow::OnCopyUpdate )
 
     EVT_MENU( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemClick )
+    EVT_UPDATE_UI( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemUpdate )
 
     EVT_UPDATE_UI( wxID_PASTE, CoordinatesWindow::OnPasteUpdate )
 
@@ -901,3 +902,16 @@ void CoordinatesWindow::OnStickmenuUpdate( wxUpdateUIEvent& event )
 	long natoms = lFrame->GetNumAtoms();
 	event.Enable((natoms>0));
 }
+/*!
+ * wxEVT_UPDATE_UI event handler for MMP_COPYCOORDSITEM
+ */
+
+void CoordinatesWindow::OnMmpCopycoordsitemUpdate( wxUpdateUIEvent& event )
+{
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	event.Enable((natoms>0));
+}
+
+
