@@ -51,8 +51,7 @@ class MolDisplayWin : public wxFrame {
 		Progress *		ProgressInd;	// Progress indicator window for long operations
 		OpenGLRec *		OpenGLData;		// Extra OpenGL data
         MpGLCanvas *	glCanvas;
-		wxPanel *		displayPanel;
-		wxStatusBar *	statusBar;
+		wxStaticText *	textBar;
 		wxScrollBar *	frameScrollBar;
 
 		BondsDlg *		bondsWindow;
@@ -189,6 +188,7 @@ class MolDisplayWin : public wxFrame {
 		void ResetView(void);
 		void ResetModel(bool Center);
 		void ResetAllWindows(void);
+		void UpdateFrameText(void);
 		void BeginOperation(void);
 		void FinishOperation(void);
 		bool OperInProgress(void) const {return OperationInProgress;};

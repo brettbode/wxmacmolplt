@@ -131,10 +131,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	coordsWindow = NULL;
 	InitGLData();
 	
-//    wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
- //   SetSizer(itemBoxSizer2);
-//    wxPanel* displayPanel = new wxPanel( this, 11001, wxDefaultPosition, wxSize(200,200), wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-//	wxWindow * frame = new wxWindow(this, 11001, wxPoint(5,5), wxSize(200,200), wxSUNKEN_BORDER);
     int width, height;
     GetClientSize(&width, &height);
 	frameScrollBar = new wxScrollBar( this, MMP_FRAMESCROLLBAR, wxPoint(width-120, height-20), wxSize(100,-1), wxSB_HORIZONTAL );
@@ -143,20 +139,11 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
 	glCanvas = new MpGLCanvas(this, 11002, wxPoint(0,0), wxSize(height-sheight,width));
 	glCanvas->setPrefs(Prefs);
-//    itemBoxSizer2->Add(glCanvas, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
-//	wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
-//    itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	textBar = new wxStaticText(this, 11003, wxString("foo"), wxDefaultPosition, wxDefaultSize,
+						   wxALIGN_LEFT | wxST_NO_AUTORESIZE);
+//	textBar->SetLabel(wxString("some text"));
 
-//	statusBar = new wxStatusBar( this, MMP_STATUSBAR, wxST_SIZEGRIP|wxNO_BORDER );
-  //  statusBar->SetFieldsCount(2);
-	//wxString foo("test");
-//	statusBar->SetStatusText(foo);
- //   itemBoxSizer3->Add(statusBar, 0, wxALIGN_BOTTOM|wxRIGHT|wxTOP|wxBOTTOM, 5);
-
-//	frameScrollBar = new wxScrollBar( this, MMP_FRAMESCROLLBAR, wxPoint(width-120, height-20), wxSize(100,-1), wxSB_HORIZONTAL );
-//	frameScrollBar->SetScrollbar(0, 1, 10, 1);
-//	itemBoxSizer3->Add(frameScrollBar, 0, wxALIGN_BOTTOM|wxALL, 5);
 	SizeChanged();
     Show(true);
 	AdjustMenus();
@@ -190,6 +177,8 @@ void MolDisplayWin::SizeChanged(void) {
     frameScrollBar->GetClientSize(&swidth, &sheight);
 	frameScrollBar->Move(width-116, height-sheight);
 	glCanvas->SetSize(wxSize(width, (height-sheight)));
+	
+	textBar->SetSize(0, height-sheight, width-114, sheight, wxSIZE_USE_EXISTING);
 }
 void MolDisplayWin::createMenuBar(void) {
     menuBar = new wxMenuBar;
@@ -800,10 +789,85 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
 	//	if (EPlotWin) EPlotWin->FrameChanged();
 	//	if (FreqPlotWin) FreqPlotWin->Reset(1);
 	//	if (SurfaceDlog) SurfaceDlog->Reset();
+		frameScrollBar->SetThumbPosition(MainData->CurrentFrame);
 	}
 }
+void MolDisplayWin::UpdateFrameText(void) {
+	// Add a little information
+	wxString output;
+	Boolean	WriteEnergy=true;
+	//if (MainData->cFrame->Vibs) {
+	//	if (MainData->GetDrawMode()) {
+	//		DrawText("Freq=", 0, 5);
+	//		WriteEnergy = false;
+	//		long FreqPos=0;
+	//		for (long ii=1; ii<=(MainData->cFrame->Vibs->CurrentMode); ii++)
+	//			FreqPos += (int) MainData->cFrame->Vibs->Frequencies[FreqPos] + 1;
+	//		DrawString((unsigned char *) &(MainData->cFrame->Vibs->Frequencies[FreqPos]));
+	//	}
+	//}
+	if (WriteEnergy) {
+		double	Energy = 0.0;
+		EnergyOptions * lEOpts = Prefs->GetEnergyOptions();
+		GraphOptions * lPOpts = Prefs->GetGraphOptions();
+		float	UnitFactor = 1.0;
+		char	eText[kMaxLineLength] = "";
+		long	length=0;
+		if (lEOpts->GetDisplayUnits() == kKCalPerMole) UnitFactor = kHartreeTokCalPMol;
+		if (lEOpts->PlotMPEnergy())
+			Energy = (MainData->cFrame->MP2Energy-lEOpts->GetY1Zero())*UnitFactor;
+		else if (lEOpts->PlotEnergy())
+			Energy = (MainData->cFrame->Energy-lEOpts->GetY1Zero())*UnitFactor;
+		else if (lEOpts->PlotKEnergy())
+			Energy = (MainData->cFrame->KE-lEOpts->GetY2Zero())*UnitFactor;
+		else if (lEOpts->PlotPEnergy())
+			Energy = (MainData->cFrame->Energy - MainData->cFrame->KE-lEOpts->GetY1Zero())*UnitFactor;
+		if (Energy != 0.0) {
+			output.Printf("E=%.*f", lEOpts->GetNumDigits(), Energy);
+		}
+		if (lPOpts->PlotRMSGradient()) {
+			wxString temp;
+			temp.Printf(" RMS=%.*f", lEOpts->GetNumDigits(),
+					MainData->cFrame->GetRMSGradient()-lEOpts->GetY2Zero());
+			output += temp;
+		} else if (lPOpts->PlotMaxGradient()) {
+			wxString temp;
+			temp.Printf(" Max Grad=%.*f", lEOpts->GetNumDigits(),
+					MainData->cFrame->GetMaxGradient()-lEOpts->GetY2Zero());
+			output += temp;
+		} else if (lPOpts->PlotBondLength()) {
+			long a1, a2;
+			float bLength;
+			a1 = lPOpts->Get1stAtom();
+			a2 = lPOpts->Get2ndAtom();
+			if (MainData->cFrame->GetBondLength(a1, a2, &bLength)) {
+				wxString temp;
+				temp.Printf(" Bond %ld-%ld=%.*f", a1+1, a2+1,
+						lEOpts->GetNumDigits(), bLength-lEOpts->GetY2Zero());
+				output += temp;
+			}
+		} else if (lPOpts->PlotBondAngle()) {
+			long a1, a2, a3;
+			float bAngle;
+			a1 = lPOpts->Get1stAtom();
+			a2 = lPOpts->Get2ndAtom();
+			a3 = lPOpts->Get3rdAtom();
+			if (MainData->cFrame->GetBondAngle(a1, a2, a3, &bAngle)) {
+				wxString temp;
+				temp.Printf(" Angle %ld-%ld-%ld=%.*f", a1+1, a2+1, a3+1,
+						lEOpts->GetNumDigits(), bAngle-lEOpts->GetY2Zero());
+				output += temp;
+			}
+		}
+	}
+	wxString ft;
+	ft.Printf(" Frame %d of %d", MainData->GetCurrentFrame(), MainData->GetNumFrames());
+	output += ft;
+	
+	textBar->SetLabel(output);
+}
 void MolDisplayWin::UpdateModelDisplay(void) {
-	//	DrawFrame();
+	UpdateFrameText();
 	UpdateGLModel();
 	glCanvas->draw();
 }
@@ -831,8 +895,8 @@ void MolDisplayWin::ResetModel(bool Center) {
 	}
 	UpdateGLModel();
 	// Reset the frame scroll bar
-//	::SetControlMaximum(FrameScroll, MainData->NumFrames);
-//	::SetControlValue(FrameScroll, MainData->CurrentFrame);
+	frameScrollBar->SetScrollbar(MainData->CurrentFrame, 1, MainData->NumFrames, 1);
+	UpdateFrameText();
 	glCanvas->draw();
 	AdjustMenus();
 }
