@@ -138,7 +138,7 @@ class MolDisplayWin : public wxFrame {
         //void menuViewSet_window_parameters(wxCommandEvent &event);
         //void menuViewStereo(wxCommandEvent &event);
         
-        //void menuMoleculeSet_bond_length(wxCommandEvent &event);
+        void menuMoleculeSetBondLength(wxCommandEvent &event);
         //void menuMoleculeSet_frame_energy(wxCommandEvent &event);
         void menuMoleculeCreateLLMPath(wxCommandEvent &event);
         void menuMoleculeMinimizeFrameMovements(wxCommandEvent &event);

@@ -44,6 +44,7 @@
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
 		8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
+		8BEDFA000A09390700BF6F85 /* setbondlength.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildStyle section */
@@ -133,6 +134,8 @@
 		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
 		8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setscreenplane.cpp; path = src/setscreenplane.cpp; sourceTree = "<group>"; };
 		8BED377A09EDCC0E0003DF64 /* setscreenplane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setscreenplane.h; path = src/setscreenplane.h; sourceTree = "<group>"; };
+		8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setbondlength.cpp; path = src/setbondlength.cpp; sourceTree = "<group>"; };
+		8BEDF9FF0A09390700BF6F85 /* setbondlength.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setbondlength.h; path = src/setbondlength.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -216,6 +219,8 @@
 				1652DA4F09D0B12600B7783F /* Prefs.h */,
 				1652DA5009D0B12600B7783F /* Progress.cpp */,
 				1652DA5109D0B12600B7783F /* Progress.h */,
+				8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */,
+				8BEDF9FF0A09390700BF6F85 /* setbondlength.h */,
 				8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */,
 				8BED377A09EDCC0E0003DF64 /* setscreenplane.h */,
 				1652DA5209D0B12600B7783F /* RysPolynomial.cpp */,
@@ -376,6 +381,7 @@
 				16FB433009F026A300E84C6B /* bondsdlg.cpp in Sources */,
 				16B345EF09F9505C005FD3B2 /* coordinateswindow.cpp in Sources */,
 				1626378C0A07E46E0089452E /* llmdialog.cpp in Sources */,
+				8BEDFA000A09390700BF6F85 /* setbondlength.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -470,16 +476,16 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
-					"-I/Users/brett/software/wxWidgets-2.6.2/include",
-					"-I/Users/brett/software/wxWidgets-2.6.2/contrib/include",
+					"-I/Users/brett/software/wxWidgets-2.6.3/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
+					"-I/Users/brett/software/wxWidgets-2.6.3/include",
+					"-I/Users/brett/software/wxWidgets-2.6.3/contrib/include",
 					"-D__WXMAC__",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
 					"-DNO_GCC_PRAGMA",
 				);
 				OTHER_LDFLAGS = (
-					"-L/Users/brett/software/wxWidgets-2.6.2/osx-build/lib",
+					"-L/Users/brett/software/wxWidgets-2.6.3/osx-build/lib",
 					"-framework",
 					QuickTime,
 					"-framework",
@@ -490,9 +496,10 @@
 					Cocoa,
 					"-framework",
 					System,
-					"/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/libwx_base_carbon-2.6.a",
-					"/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/libwx_mac_core-2.6.a",
-					"/Users/brett/software/wxWidgets-2.6.2/osx-build/lib/libwx_mac_gl-2.6.a",
+					"-lwx_base_carbon-2.6",
+					"-lwx_mac_core-2.6",
+					"-lwx_mac_adv-2.6",
+					"-lwx_mac_gl-2.6",
 					"-lwxexpat-2.6",
 					"-lwxtiff-2.6",
 					"-lwxjpeg-2.6",
