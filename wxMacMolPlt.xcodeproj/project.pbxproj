@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1626378C0A07E46E0089452E /* llmdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1626378A0A07E46E0089452E /* llmdialog.cpp */; };
 		1652DA5C09D0B12600B7783F /* AtomTypeList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2709D0B12600B7783F /* AtomTypeList.cpp */; };
 		1652DA5D09D0B12600B7783F /* BasisSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2909D0B12600B7783F /* BasisSet.cpp */; };
 		1652DA5E09D0B12600B7783F /* BFiles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2B09D0B12600B7783F /* BFiles.cpp */; };
@@ -63,6 +64,8 @@
 /* End PBXBuildStyle section */
 
 /* Begin PBXFileReference section */
+		1626378A0A07E46E0089452E /* llmdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = llmdialog.cpp; path = src/llmdialog.cpp; sourceTree = "<group>"; };
+		1626378B0A07E46E0089452E /* llmdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = llmdialog.h; path = src/llmdialog.h; sourceTree = "<group>"; };
 		1652DA0B09D0AE8F00B7783F /* wxMacMolPlt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wxMacMolPlt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1652DA2709D0B12600B7783F /* AtomTypeList.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = AtomTypeList.cpp; path = src/AtomTypeList.cpp; sourceTree = "<group>"; };
 		1652DA2809D0B12600B7783F /* AtomTypeList.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = AtomTypeList.h; path = src/AtomTypeList.h; sourceTree = "<group>"; };
@@ -191,6 +194,8 @@
 				1652DA3C09D0B12600B7783F /* InputData.h */,
 				1652DA3D09D0B12600B7783F /* Internals.cpp */,
 				1652DA3E09D0B12600B7783F /* Internals.h */,
+				1626378A0A07E46E0089452E /* llmdialog.cpp */,
+				1626378B0A07E46E0089452E /* llmdialog.h */,
 				1652DA3F09D0B12600B7783F /* main.cpp */,
 				1652DA4009D0B12600B7783F /* main.h */,
 				1652DA4109D0B12600B7783F /* Math3D.cpp */,
@@ -370,6 +375,7 @@
 				8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */,
 				16FB433009F026A300E84C6B /* bondsdlg.cpp in Sources */,
 				16B345EF09F9505C005FD3B2 /* coordinateswindow.cpp in Sources */,
+				1626378C0A07E46E0089452E /* llmdialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
