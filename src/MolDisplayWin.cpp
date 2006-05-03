@@ -288,6 +288,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuView->Enable(MMP_SHOWMODE, false);
 	menuView->Enable(MMP_PREVMODE, false);
 	menuView->Enable(MMP_NEXTMODE, false);
+	menuMolecule->Enable(MMP_SETBONDLENGTH, false);
 	menuMolecule->Enable(MMP_CREATELLMPATH, false);
 	menuMolecule->Enable(MMP_MINFRAMEMOVEMENTS, false);
 	menuMolecule->Enable(MMP_INVERTNORMALMODE, false);
@@ -302,6 +303,7 @@ void MolDisplayWin::AdjustMenus(void) {
 			}
 			wxTheClipboard->Close();
 		}
+		menuMolecule->Enable(MMP_SETBONDLENGTH, true);
 	} else {
 		menuFile->Enable(MMP_NEWFRAME, true);
 		menuEdit->Enable(wxID_COPY, true);
