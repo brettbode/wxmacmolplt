@@ -36,7 +36,7 @@
 
 ////@begin control identifiers
 #define ID_DIALOG 10029
-#define SYMBOL_LLMDIALOG_STYLE wxSYSTEM_MENU|wxSTAY_ON_TOP|wxDIALOG_MODAL
+#define SYMBOL_LLMDIALOG_STYLE wxDEFAULT_DIALOG_STYLE|wxSYSTEM_MENU|wxSTAY_ON_TOP|wxCLOSE_BOX|wxDIALOG_MODAL
 #define SYMBOL_LLMDIALOG_TITLE _("LLMDialog")
 #define SYMBOL_LLMDIALOG_IDNAME ID_DIALOG
 #define SYMBOL_LLMDIALOG_SIZE wxSize(400, 300)
@@ -78,12 +78,6 @@ public:
     /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TEXTCTRL
     void OnTextctrlUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_INTERNALSCHECKBOX
-    void OnInternalscheckboxClick( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
-    void OnCancelClick( wxCommandEvent& event );
-
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
     void OnOkClick( wxCommandEvent& event );
 
@@ -105,6 +99,8 @@ public:
     static bool ShowToolTips();
 
 ////@begin LLMDialog member variables
+    wxTextCtrl* numPointsEdit;
+    wxCheckBox* internalCheck;
     MolDisplayWin * Parent;
 ////@end LLMDialog member variables
 };

@@ -664,17 +664,18 @@ void MolDisplayWin::menuViewRotateOther(wxCommandEvent &event) {
 void MolDisplayWin::menuMoleculeCreateLLMPath(wxCommandEvent &event) {
 	//The create LLM dialog does the work
 	LLMDialog * llm = new LLMDialog(this);
-	llm->Show();
-}
-void MolDisplayWin::menuMoleculeMinimizeFrameMovements(wxCommandEvent &event) {
-	MainData->UnitConversion(0);
-	ResetAllWindows();
+	llm->ShowModal();
 	Dirty = true;
 }
-void MolDisplayWin::menuMoleculeConvertToBohr(wxCommandEvent &event) {
+void MolDisplayWin::menuMoleculeMinimizeFrameMovements(wxCommandEvent &event) {
 	BeginOperation();
 	MainData->LinearLeastSquaresFit(ProgressInd);
 	FinishOperation();
+	Dirty = true;
+}
+void MolDisplayWin::menuMoleculeConvertToBohr(wxCommandEvent &event) {
+	MainData->UnitConversion(0);
+	ResetAllWindows();
 	Dirty = true;
 }
 void MolDisplayWin::menuMoleculeConvertToAngstroms(wxCommandEvent &event) {

@@ -51,10 +51,6 @@ BEGIN_EVENT_TABLE( LLMDialog, wxDialog )
 ////@begin LLMDialog event table entries
     EVT_TEXT( ID_TEXTCTRL, LLMDialog::OnTextctrlUpdated )
 
-    EVT_CHECKBOX( ID_INTERNALSCHECKBOX, LLMDialog::OnInternalscheckboxClick )
-
-    EVT_BUTTON( wxID_CANCEL, LLMDialog::OnCancelClick )
-
     EVT_BUTTON( wxID_OK, LLMDialog::OnOkClick )
 
 ////@end LLMDialog event table entries
@@ -81,6 +77,8 @@ LLMDialog::LLMDialog( MolDisplayWin* parent, wxWindowID id, const wxString& capt
 bool LLMDialog::Create( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin LLMDialog member initialisation
+    numPointsEdit = NULL;
+    internalCheck = NULL;
 ////@end LLMDialog member initialisation
 	Parent = parent;
 
@@ -114,16 +112,16 @@ void LLMDialog::CreateControls()
     wxStaticText* itemStaticText4 = new wxStaticText( itemDialog1, wxID_STATIC, _("Click the Create button to insert the\nnumber of frames given below along\nthe LLM path connecting the current\ngeometry with the next geometry."), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer2->Add(itemStaticText4, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl5 = new wxTextCtrl( itemDialog1, ID_TEXTCTRL, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    numPointsEdit = new wxTextCtrl( itemDialog1, ID_TEXTCTRL, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
-        itemTextCtrl5->SetToolTip(_("Enter an integer for the number of intermediate geometries to create"));
-    itemBoxSizer2->Add(itemTextCtrl5, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+        numPointsEdit->SetToolTip(_("Enter an integer for the number of intermediate geometries to create"));
+    itemBoxSizer2->Add(numPointsEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxCheckBox* itemCheckBox6 = new wxCheckBox( itemDialog1, ID_INTERNALSCHECKBOX, _("Compute using internal coordinates"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox6->SetValue(false);
+    internalCheck = new wxCheckBox( itemDialog1, ID_INTERNALSCHECKBOX, _("Compute using internal coordinates"), wxDefaultPosition, wxDefaultSize, 0 );
+    internalCheck->SetValue(false);
     if (ShowToolTips())
-        itemCheckBox6->SetToolTip(_("Check to create the LLM path using the currently defined set of internal coordinates"));
-    itemBoxSizer2->Add(itemCheckBox6, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+        internalCheck->SetToolTip(_("Check to create the LLM path using the currently defined set of internal coordinates"));
+    itemBoxSizer2->Add(internalCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     wxBoxSizer* itemBoxSizer7 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer2->Add(itemBoxSizer7, 0, wxALIGN_RIGHT|wxALL, 5);
@@ -137,7 +135,7 @@ void LLMDialog::CreateControls()
 
 ////@end LLMDialog content construction
 	MoleculeData * MainData = Parent->GetData();
-	itemCheckBox6->Enable(MainData->GetInternalCoordinates()!=NULL);
+	internalCheck->Enable(MainData->GetInternalCoordinates()!=NULL);
 }
 
 /*!
@@ -180,35 +178,16 @@ wxIcon LLMDialog::GetIconResource( const wxString& name )
 
 void LLMDialog::OnTextctrlUpdated( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TEXTCTRL in LLMDialog.
-    // Before editing this code, remove the block markers.
+	wxString textVal = numPointsEdit->GetValue();
+	long numPoints = 0;
+	if (! textVal.ToLong(&numPoints)) {
+		textVal.Printf("%ld", numPoints);
+		numPointsEdit->SetValue(textVal);
+	}
     event.Skip();
-////@end wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TEXTCTRL in LLMDialog. 
 }
 
-/*!
- * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_INTERNALSCHECKBOX
- */
 
-void LLMDialog::OnInternalscheckboxClick( wxCommandEvent& event )
-{
-////@begin wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_INTERNALSCHECKBOX in LLMDialog.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_INTERNALSCHECKBOX in LLMDialog. 
-}
-
-/*!
- * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
- */
-
-void LLMDialog::OnCancelClick( wxCommandEvent& event )
-{
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL in LLMDialog.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL in LLMDialog. 
-}
 
 /*!
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
@@ -216,10 +195,20 @@ void LLMDialog::OnCancelClick( wxCommandEvent& event )
 
 void LLMDialog::OnOkClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK in LLMDialog.
-    // Before editing this code, remove the block markers.
+	wxString textVal = numPointsEdit->GetValue();
+	long numPoints=0;
+	if (textVal.ToLong(&numPoints)) {
+		if (numPoints > 0) {
+			MoleculeData * MainData = Parent->GetData();
+			WinPrefs * Prefs = 	Prefs = Parent->GetPrefs();
+			if (internalCheck->IsChecked())
+				MainData->CreateInternalLLM(numPoints, Prefs);
+			else
+				MainData->CreateLLM(numPoints, Prefs);
+			Parent->ResetAllWindows();
+		}
+	}
     event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK in LLMDialog. 
 }
 
 
