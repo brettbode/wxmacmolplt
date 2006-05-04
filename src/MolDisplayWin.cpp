@@ -25,8 +25,10 @@
 #include "Internals.h"
 #include "llmdialog.h"
 #include "setbondlength.h"
+#include "appendframesoptions.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
+#include <wx/image.h>
 
 extern WinPrefs * gPreferences;
 
@@ -55,6 +57,7 @@ enum MMP_EventID {
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
 	MMP_NEWFRAME,
+	MMP_ADDFRAMES,
 	MMP_DELETEFRAME,
 	MMP_COPYCOORDS,
 	MMP_BONDSWINDOW,
@@ -70,6 +73,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 #ifndef __WXMAC__
 	EVT_MENU (wxID_OPEN,			MolDisplayWin::menuFileOpen)
 #endif
+	EVT_MENU (MMP_ADDFRAMES,		MolDisplayWin::menuFileAddFramesFromFile)
 	EVT_MENU (wxID_SAVE,			MolDisplayWin::menuFileSave)
     EVT_MENU (wxID_SAVEAS,			MolDisplayWin::menuFileSave_as)
 	EVT_MENU (wxID_CLOSE,			MolDisplayWin::menuFileClose)
@@ -84,6 +88,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (wxID_COPY,			MolDisplayWin::menuEditCopy)
 	EVT_MENU (MMP_COPYCOORDS,		MolDisplayWin::menuEditCopyCoordinates)
     EVT_MENU (wxID_PASTE,			MolDisplayWin::menuEditPaste)
+	EVT_UPDATE_UI( wxID_PASTE,		MolDisplayWin::OnPasteUpdate )
     EVT_MENU (wxID_CLEAR,			MolDisplayWin::menuEditClear)
     EVT_MENU (wxID_SELECTALL,		MolDisplayWin::menuEditSelect_all)
 
@@ -203,6 +208,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuFile->Append(wxID_NEW, wxT("&New\tCtrl+N"));
     menuFile->Append(MMP_NEWFRAME, wxT("Append New Frame"));
     menuFile->Append(wxID_OPEN, wxT("&Open ...\tCtrl+O"));
+    menuFile->Append(MMP_ADDFRAMES, wxT("Add Frames from File..."));
     menuFile->Append(wxID_SAVE, wxT("&Save\tCtrl+S"));
     menuFile->Append(wxID_SAVEAS, wxT("Save &as ...\tCtrl+Shift+S"));
     menuFile->Append(wxID_CLOSE, wxT("&Close\tCtrl+W"));
@@ -282,7 +288,6 @@ void MolDisplayWin::ClearMenus(void) {
 	menuEdit->Enable(wxID_CUT, false);
 	menuEdit->Enable(wxID_COPY, false);
 	menuEdit->Enable(MMP_COPYCOORDS, false);
-	menuEdit->Enable(wxID_PASTE, false);
 	menuEdit->Enable(wxID_CLEAR, false);
 	menuEdit->Enable(wxID_SELECTALL, false);
 	menuView->Enable(MMP_SHOWMODE, false);
@@ -297,17 +302,11 @@ void MolDisplayWin::AdjustMenus(void) {
 	ClearMenus();
 	menuFile->Enable(wxID_SAVE, Dirty);
 	if (MainData->cFrame->NumAtoms == 0) {
-		if (wxTheClipboard->Open()) {
-			if (wxTheClipboard->IsSupported(wxDF_TEXT)) {
-				menuEdit->Enable(wxID_PASTE, true);
-			}
-			wxTheClipboard->Close();
-		}
-		menuMolecule->Enable(MMP_SETBONDLENGTH, true);
 	} else {
 		menuFile->Enable(MMP_NEWFRAME, true);
 		menuEdit->Enable(wxID_COPY, true);
 		menuEdit->Enable(MMP_COPYCOORDS, true);
+		menuMolecule->Enable(MMP_SETBONDLENGTH, true);
 	}
 	if (MainData->NumFrames > 1 ) {
 		menuFile->Enable(MMP_DELETEFRAME, true);
@@ -331,6 +330,22 @@ void MolDisplayWin::AdjustMenus(void) {
 		if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1))
 			menuView->Enable(MMP_NEXTMODE, true);
 		menuMolecule->Enable(MMP_INVERTNORMALMODE, true);
+	}
+}
+/*!
+* wxEVT_UPDATE_UI event handler for wxID_PASTE
+ */
+
+void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event )
+{
+	event.Enable(false);
+	if (MainData->cFrame->NumAtoms == 0) {
+		if (wxTheClipboard->Open()) {
+			if (wxTheClipboard->IsSupported(wxDF_TEXT)) {
+				event.Enable(true);
+			}
+			wxTheClipboard->Close();
+		}
 	}
 }
 
@@ -365,6 +380,27 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
 #endif
 		//otherwise just skip the event to pass it up the chain to the app handler
 		event.Skip();
+}
+void MolDisplayWin::menuFileAddFramesFromFile(wxCommandEvent &event) {
+	//First prompt for the file. I don't know if there is anyway to add the
+	//extra options to the open file dialog.
+	wxFileDialog * fdlg = new wxFileDialog(this, 
+		wxT("Choose a file containing points to be appended to the currently open file."),
+						wxString(""), wxString(""), wxString("*"), wxOPEN|wxOVERWRITE_PROMPT);
+	fdlg->ShowModal();
+	wxString filename = fdlg->GetPath();
+	
+	//If the user chooses a file, create a window and have it process it.
+	if (filename.length() > 0) {
+		AppendFramesOptions * optDlg = new AppendFramesOptions(this);
+		optDlg->SetSkip(Prefs->GetDRCSkip());
+		optDlg->SetupItems();
+		if (optDlg->ShowModal() == wxID_OK) {
+			Prefs->SetDRCSkip(optDlg->GetSkip());
+			OpenFile(filename, optDlg->GetOffset(), optDlg->GetFlip(), true);
+		}
+		optDlg->Destroy();
+	}
 }
 
 void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
@@ -435,6 +471,11 @@ void MolDisplayWin::menuEditCut(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuEditCopy(wxCommandEvent &event) {
+	//Put the image onto the clipboard
+	if (wxTheClipboard->Open()) {
+		wxTheClipboard->SetData(new wxBitmapDataObject(glCanvas->getImage(0,0)));
+		wxTheClipboard->Close();
+	}
 }
 
 void MolDisplayWin::menuEditCopyCoordinates(wxCommandEvent &event) {
@@ -671,12 +712,14 @@ void MolDisplayWin::menuMoleculeSetBondLength(wxCommandEvent &event) {
 	//The set bond length dialog does the work
 	SetBondLength * dlg = new SetBondLength(this);
 	dlg->ShowModal();
+	dlg->Destroy();
 	Dirty = true;
 }
 void MolDisplayWin::menuMoleculeCreateLLMPath(wxCommandEvent &event) {
 	//The create LLM dialog does the work
 	LLMDialog * llm = new LLMDialog(this);
 	llm->ShowModal();
+	llm->Destroy();
 	Dirty = true;
 }
 void MolDisplayWin::menuMoleculeMinimizeFrameMovements(wxCommandEvent &event) {
@@ -1002,69 +1045,84 @@ void MolDisplayWin::AbortOpen(const char * msg) {
 	if (msg != NULL) MessageAlert(msg);
 } /* AbortOpen */
 
-long MolDisplayWin::OpenFile(wxString fileName) {
+long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool append) {
 	//This is modeled on OpenTextFile in the Mac version
 	long				test=0;
 	
 	FILE * myfile = fopen(fileName.mb_str(wxConvUTF8), "r");
 	if (myfile == NULL) {
-		AbortOpen("Unable to open the requested file.");
+		if (append)
+			AbortOpen("Unable to open the requested file.");
+		else
+			MessageAlert("Unable to open the requested file.");
 		return 0;
 	}
 	BufferFile * Buffer = NULL;
 	try {
 		Buffer = new BufferFile(myfile, false);
 		//this is temporary, they are supposed to come from the open file dialog
-		long flip = 0;
-		float offset = 0.0;
-//		Window->SetSkipPoints(nSkip);
+		long flipval = 1;
+		if (flip) flipval = -1;
 		
 		// Attempt to identify the file type by looking for key words
 		TextFileType type = Buffer->GetFileType((const char *) fileName.mb_str(wxConvUTF8));
 		BeginOperation();
 		switch (type) {
 			case kMolType:
-				test = OpenMolPltFile(Buffer);
+				if (!append)
+					test = OpenMolPltFile(Buffer);
 				break;
 			case kGAMESSlogType:
-				test = OpenGAMESSlog(Buffer, false, flip, offset);
+				test = OpenGAMESSlog(Buffer, append, flipval, offset);
 				break;
 			case kGAMESSIRCType:
-				test = OpenGAMESSIRC(Buffer, false,flip,offset);
+				test = OpenGAMESSIRC(Buffer, append,flipval,offset);
 				break;
 			case kGAMESSDRCType:
-				test = OpenGAMESSDRC(Buffer, false, false,flip,offset);
+				test = OpenGAMESSDRC(Buffer, false, append,flipval,offset);
 				break;
 			case kGAMESSInputType:
-				test = OpenGAMESSInput(Buffer);
+				if (!append)
+					test = OpenGAMESSInput(Buffer);
 				break;
 			case kXYZType:
-				test = OpenXYZFile(Buffer);
+				if (!append)
+					test = OpenXYZFile(Buffer);
 				break;
 			case kPDBType:
-				test = OpenPDBFile(Buffer);
+				if (!append)
+					test = OpenPDBFile(Buffer);
 				break;
 			case kMDLMolFile:
-				test = OpenMDLMolFile(Buffer);
+				if (!append)
+					test = OpenMDLMolFile(Buffer);
 				break;
 			case CMLFile:
 			{
-				test = OpenCMLFile(Buffer);
-				if (test == 0) AbortOpen(NULL);
+				if (!append) {
+					test = OpenCMLFile(Buffer);
+					if (test == 0) AbortOpen(NULL);
+				}
 			}
 				break;
 			default:	//Should only get here for unknown file types.
-				AbortOpen("Unable to determine the file type.");
+				if (!append)
+					AbortOpen("Unable to determine the file type.");
+				else
+					MessageAlert("Unable to determine the file type.");
 		}
 	}
 	catch (std::bad_alloc) {//Out of memory error
-		AbortOpen("Not enough memory to open the file. Aborted!");
+		if (!append)
+			AbortOpen("Not enough memory to open the file. Aborted!");
 	}
 	catch (MemoryError) {
-		AbortOpen("Not enough memory to open the file. Aborted!");
+		if (!append)
+			AbortOpen("Not enough memory to open the file. Aborted!");
 	}
 	catch (UserCancel) {
-		AbortOpen("File open canceled by user");
+		if (!append)
+			AbortOpen("File open canceled by user");
 	}
 //	catch (DataError Error) {//Error parsing the file data
 //		if (!Error.ErrorSet())  Window->AbortOpen(21);
@@ -1074,8 +1132,12 @@ long MolDisplayWin::OpenFile(wxString fileName) {
 //		}
 //	}
 	//Some kind of File system related error
-	catch (FileError Error) { Error.WriteError(); AbortOpen(NULL);}
-	catch (...) { AbortOpen("Unknown error reading the selected file. File open aborted.");}
+	catch (FileError Error) { Error.WriteError();
+		if (!append) AbortOpen(NULL);}
+	catch (...) { 
+		if (!append)
+			AbortOpen("Unknown error reading the selected file. File open aborted.");
+	}
 	if (Buffer) delete Buffer;		//Done reading so free up the buffer
 	if (test) {//Note test is left 0 if any exception occurs(which causes Window to be deleted)
 //		if (gPreferences->ChangeFileType()) {

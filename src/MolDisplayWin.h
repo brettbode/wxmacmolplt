@@ -95,7 +95,7 @@ class MolDisplayWin : public wxFrame {
         void menuFileClose(wxCommandEvent &event);
         void FileClose(wxCloseEvent &event);
         void menuFileAppendNewFrame(wxCommandEvent &event);
-        //void menuFileAdd_frames_from_file(wxCommandEvent &event);
+        void menuFileAddFramesFromFile(wxCommandEvent &event);
 		void menuFileDeleteFrame(wxCommandEvent &event);
         //void menuFileImport(wxCommandEvent &event);
         //void menuFileExport(wxCommandEvent &event);
@@ -109,6 +109,8 @@ class MolDisplayWin : public wxFrame {
         void menuEditCopyCoordinates(wxCommandEvent &event);
 		void CopyCoordinates(short coordtype) const;
         void menuEditPaste(wxCommandEvent &event);
+		/// wxEVT_UPDATE_UI event handler for wxID_PASTE
+		void OnPasteUpdate( wxUpdateUIEvent& event );
 		void PasteText(void);
         void menuEditClear(wxCommandEvent &event);
         void menuEditSelect_all(wxCommandEvent &event);
@@ -162,7 +164,7 @@ class MolDisplayWin : public wxFrame {
 		void CloseCoordsWindow(void);
 		
 		//File handling routines
-		long OpenFile(wxString fileName);
+		long OpenFile(wxString fileName, float offset=0.0, bool flip=false, bool append=false);
 		long OpenCMLFile(BufferFile * Buffer, bool readPrefs=true, bool readWindows=true);
 		long OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, float offset);
 		long OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, float offset);
