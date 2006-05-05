@@ -1,13 +1,11 @@
 /*
- * (c) 2005 Iowa State University
+ * (c) 2005-2006 Iowa State University
  *     see the LICENSE file in the top level directory
  */
 
 /***************************************
  * MolDisplayWin.cpp
  *
- * Created:       11-02-2005  Steven Schulteis
- * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
 #include "Globals.h"
@@ -29,6 +27,7 @@
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
 #include <wx/image.h>
+#include <wx/printdlg.h>
 
 extern WinPrefs * gPreferences;
 
@@ -142,6 +141,10 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	OpenGLData = NULL;
 	bondsWindow = NULL;
 	coordsWindow = NULL;
+	
+	pageSetupData = NULL;
+	printData = NULL;
+
 	InitGLData();
 	
     int width, height;
@@ -165,7 +168,9 @@ MolDisplayWin::~MolDisplayWin() {
 	//As long as all related windows indicate this window as their
 	//parent when they are created, they will be automatically destroyed
 	//when this window is destroyed.
-
+	if (printData) delete printData;
+	if (pageSetupData) delete pageSetupData;
+	
 	if (ProgressInd != NULL) {
 		delete ProgressInd;
 		ProgressInd = NULL;
@@ -213,16 +218,14 @@ void MolDisplayWin::createMenuBar(void) {
     menuFile->Append(wxID_SAVEAS, wxT("Save &as ...\tCtrl+Shift+S"));
     menuFile->Append(wxID_CLOSE, wxT("&Close\tCtrl+W"));
     menuFile->AppendSeparator();
-    //menuFile->Append(, wxT("Add Frames from File ..."));
 	menuFile->Append(MMP_DELETEFRAME, wxT("Delete Frame"));
-    //menuFile->AppendSeparator();
+    menuFile->AppendSeparator();
     //menuFile->Append(, wxT("Import"));
     //menuFile->Append(, wxT("Export"));
     //menuFile->AppendSeparator();
     menuFile->Append(wxID_PRINT_SETUP, wxT("Page Set&up ..."));
     menuFile->Append(wxID_PREVIEW, wxT("Print Pre&view\tCtrl+Shift+P"));
     menuFile->Append(wxID_PRINT, wxT("&Print ...\tCtrl+P"));
-    // TODO:  Make Mac display Quit menu item in the correct place
     menuFile->AppendSeparator();
     menuFile->Append(wxID_EXIT, wxT("&Quit\tCtrl+Q"));
     
@@ -267,8 +270,6 @@ void MolDisplayWin::createMenuBar(void) {
 
     menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"));
     menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"));
-    // TODO:  Make Mac handle help menu properly
-    // TODO:  Make Mac display About menu item in the correct place
     menuHelp->Append(wxID_ABOUT, wxT("&About ..."));
 
     menuBar->Append(menuFile, wxT("&File"));
@@ -454,14 +455,69 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
 }
 
 void MolDisplayWin::menuFilePage_setup(wxCommandEvent &event) {
+	if (!printData) printData = new wxPrintData;
+	if (!pageSetupData) pageSetupData = new wxPageSetupData;
+	(*pageSetupData) = *printData;
+	
+	wxPageSetupDialog pageSetupDialog(this, pageSetupData);
+	pageSetupDialog.ShowModal();
+	
+	(*printData) = pageSetupDialog.GetPageSetupData().GetPrintData();
+	(*pageSetupData) = pageSetupDialog.GetPageSetupData();
 }
 
 void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuFilePrint(wxCommandEvent &event) {
+	if (! printData || ! pageSetupData) menuFilePage_setup(event);
+	
+	wxPrintDialogData printDialogData(*printData);
+	wxPrinter printer(&printDialogData);
+	wxString title(_T("MacMolPlt printout"));
+	MolPrintOut printout(this, title);
+	if (!printer.Print(this, &printout, true)) {
+		if (wxPrinter::GetLastError() == wxPRINTER_ERROR) {
+			MessageAlert("The printing attempt failed...");
+		}
+		//otherwise the user canceled printing...
+	} else {
+		//save off the print data from a successful job
+		(*printData) = printer.GetPrintDialogData().GetPrintData();
+	}
 }
-
+MolPrintOut::MolPrintOut(MolDisplayWin * parent, wxString & title) :
+	wxPrintout(title) {
+	Parent = parent;
+}
+void MolPrintOut::GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int *selPageTo) {
+	*minPage = 1;
+	*maxPage = 1;
+	*selPageFrom = 1;
+	*selPageTo = 1;
+}
+bool MolPrintOut::HasPage(int pageNum) {
+	return (pageNum == 1);
+}
+bool MolPrintOut::OnBeginDocument(int startPage, int endPage) {
+	if (!wxPrintout::OnBeginDocument(startPage, endPage))
+		return false;
+	return true;
+}
+#include <iostream>
+bool MolPrintOut::OnPrintPage(int page) {
+	if (page != 1) return false;
+	wxDC * dc = GetDC();
+	if (dc) {
+		int h, w;
+		GetPPIPrinter(&w, &h);
+		std::cout << "ppi w = "<<w<<" and h= " << h<< std::endl;
+		GetPPIScreen(&w, &h);
+		std::cout << "screen ppi w = "<<w<<" and h= " << h<< std::endl;
+		return true;
+	}
+	return false;
+}
 /* Edit menu */
 
 void MolDisplayWin::menuEditUndo(wxCommandEvent &event) {

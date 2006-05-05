@@ -17,6 +17,7 @@
 #define MolDisplayWin_H 1
 
 #include "wx/wx.h"
+#include <wx/print.h>
 
 #include "mpGLCanvas.h"
 #include "MoleculeData.h"
@@ -56,6 +57,9 @@ class MolDisplayWin : public wxFrame {
 
 		BondsDlg *		bondsWindow;
 		CoordinatesWindow * coordsWindow;
+		
+		wxPageSetupDialogData * pageSetupData;
+		wxPrintData * printData;
 
         void createMenuBar(void);
 		long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
@@ -210,6 +214,17 @@ class MolDisplayWin : public wxFrame {
 		void SizeChanged(void);
 			//Function to receive all changes to the scroll bar
 		void OnScrollBarChange(wxScrollEvent& event);
+};
+
+class MolPrintOut : public wxPrintout {
+public:
+	MolPrintOut(MolDisplayWin * parent, wxString & title);
+	bool OnPrintPage(int page);
+	bool HasPage(int page);
+	bool OnBeginDocument(int startPage, int endPage);
+	void GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int *selPageTo);
+private:
+		MolDisplayWin * Parent;	
 };
 
 #endif /* #ifndef MolDisplayWin_H */
