@@ -16,6 +16,11 @@
 #include "MolDisplayWin.h"
 
 #include <iostream>
+
+#warning This setting might need some verification to ensure it's safe/functional
+int defAttribs[] = {WX_GL_DEPTH_SIZE, 16,
+                    0};
+
 MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
                        wxWindowID      id,
                        const wxPoint  &position,
@@ -23,7 +28,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
                        long            style,
                        const wxString &name)
            :wxGLCanvas((wxWindow *)parent, id, position, size,
-                       style|wxFULL_REPAINT_ON_RESIZE, name) {
+                       style|wxFULL_REPAINT_ON_RESIZE, name, defAttribs) {
 		//There is an additional parameter to wxGLCanvas that is an int
 		//array of GL options we might need. Might need to use WX_GL_RGBA and WX_GL_DOUBLEBUFFER?
     molData = NULL;
