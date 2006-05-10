@@ -159,8 +159,6 @@ void MpApp::createMainFrame(const wxString &filename) {
 }
 
 void MpApp::destroyMainFrame(MolDisplayWin *frame) {
-    // TODO:  Close frame and remove it from storage
-    // frame->Destroy();
 	MolWinList.remove(frame);
 #ifdef __WXMAC__
 	if (MolWinList.size() <= 0) {
@@ -207,6 +205,7 @@ void MpApp::menuFileOpen(wxCommandEvent &event) {
 	//If the user chooses a file, create a window and have it process it.
 	if (filename.length() > 0) {
         createMainFrame(filename);
+        // TODO:  Remove the commented code below once Brett is OK with it.
         /*
 		MolDisplayWin * temp = new MolDisplayWin(filename);
 		MolWinList.push_back(temp);
@@ -219,6 +218,7 @@ void MpApp::menuFileOpen(wxCommandEvent &event) {
 void MpApp::MacOpenFile(const wxString & filename) {
 	if (filename.length() > 0) {
         createMainFrame(filename);
+        // TODO:  Remove the commented code below once Brett is OK with it.
         /*
 		MolDisplayWin * temp = new MolDisplayWin(filename);
 		MolWinList.push_back(temp);
