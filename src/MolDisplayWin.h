@@ -8,9 +8,6 @@
  *
  * Defines a class that overloads the wxFrame class.  This class is used for
  * the document window(s).
- *
- * Created:       11-02-2005  Steven Schulteis
- * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
 #ifndef MolDisplayWin_H

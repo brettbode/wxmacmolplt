@@ -8,9 +8,6 @@
  *
  * Defines a wxWidgets component that displays a 3-dimensional representation
  * of a molecule.
- *
- * Created:       01-09-2006  Steven Schulteis
- * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
 #ifndef MPGLCANVAS_H

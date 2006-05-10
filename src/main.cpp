@@ -5,9 +5,6 @@
 
 /***************************************
  * main.cpp
- *
- * Created:       10-31-2005  Steven Schulteis
- * Last Modified: 11-14-2005  Steven Schulteis
 ***************************************/
 
 #include "Globals.h"

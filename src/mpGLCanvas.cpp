@@ -5,9 +5,6 @@
 
 /***************************************
  * mpGLCanvas.cpp
- *
- * Created:       01-09-2006  Steven Schulteis
- * Last Modified: 05-09-2006  Steven Schulteis
  ***************************************/
 
 #include "Globals.h"

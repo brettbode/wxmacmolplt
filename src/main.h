@@ -8,9 +8,6 @@
  *
  * Defines a class that overloads the wxApp class.  This class is responsible
  * for handling the beginning and end of the program's life.
- *
- * Created:       11-02-2005  Steven Schulteis
- * Last Modified: 11-14-2005  Steven Schulteis
 ***************************************/
 
 #ifndef MAIN_H
