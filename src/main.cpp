@@ -32,10 +32,6 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] =
 };
 
 bool MpApp::OnInit() {
-    // TODO:  Handle command line arguments.  See wxApp documentation
-    // TODO:  Start logging stuff.
-    // TODO:  Figure out what to do about Mac.  wxGetOsVersion may be useful
-
 	gPreferences = new WinPrefs;
 	gPrefDefaults = new WinPrefs;
 
@@ -49,15 +45,25 @@ bool MpApp::OnInit() {
 
     m_InstanceChecker = new wxSingleInstanceChecker();
 
-    if(m_InstanceChecker->Create(appName) == false) {
-        // TODO:  Do something intelligent here
+    if(m_InstanceChecker->Create(appName) == true) {
+        if(m_InstanceChecker->IsAnotherRunning()) {
+            // TODO:  Open a new window in the existing instance instead
+            wxMessageDialog *msg = new wxMessageDialog(NULL, wxT("wxMacMolPlt is already running.  Please close it before attempting to start it again."), wxT("Error"), wxOK | wxSTAY_ON_TOP | wxICON_EXCLAMATION);
+            msg->ShowModal();
+            delete msg;
+            return false;
+        }
     }
-    if(m_InstanceChecker->IsAnotherRunning()) {
-        // TODO:  Handle this appropriately
-        return false;
+    else {
+        wxMessageDialog *msg = new wxMessageDialog(NULL, wxT("wxMacMolPlt was unable to check for other running instances.  Click OK to continue anyway, or click Cancel to exit."), wxT("Warning"), wxOK | wxCANCEL | wxSTAY_ON_TOP | wxICON_EXCLAMATION);
+        int result = msg->ShowModal();
+        delete msg;
+        if(result == wxID_CANCEL) {
+            return false;
+        }
     }
-//	MessageAlert("App init running");
-// Parse command line 
+    
+    // Parse command line 
 	wxString cmdFilename; 
 	wxCmdLineParser cmdParser(g_cmdLineDesc, argc, argv); 
 	int res; 
@@ -136,8 +142,20 @@ int MpApp::OnExit() {
     return 0;
 }
 
-void MpApp::createMainFrame(const wxString &file) {
-    // TODO:  Create and store new MpMainFrame
+void MpApp::createMainFrame(const wxString &filename) {
+    MolDisplayWin *temp = NULL;
+
+    if(filename.IsEmpty()) {
+	    temp = new MolDisplayWin(wxT("Untitled"));
+	    MolWinList.push_back(temp);
+    }
+    else {
+        // TODO:  Error checking
+		temp = new MolDisplayWin(filename);
+		MolWinList.push_back(temp);
+		long r = temp->OpenFile(filename);
+		if (r>0) temp->Show(true);
+    }
 }
 
 void MpApp::destroyMainFrame(MolDisplayWin *frame) {
@@ -180,8 +198,7 @@ void MpApp::menuPreferences(wxCommandEvent & WXUNUSED(event)) {
 #warning Open default preferences dialog here once implemented
 }
 void MpApp::menuFileNew(wxCommandEvent &event) {
-	MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
-	MolWinList.push_back(temp);
+    createMainFrame();
 }
 
 void MpApp::menuFileOpen(wxCommandEvent &event) {
@@ -189,19 +206,25 @@ void MpApp::menuFileOpen(wxCommandEvent &event) {
 	wxString filename = wxFileSelector(wxT("Choose a file to open"));
 	//If the user chooses a file, create a window and have it process it.
 	if (filename.length() > 0) {
+        createMainFrame(filename);
+        /*
 		MolDisplayWin * temp = new MolDisplayWin(filename);
 		MolWinList.push_back(temp);
 		long r = temp->OpenFile(filename);
 		if (r>0) temp->Show(true);
+        */
 	}
 }
 #ifdef __WXMAC__
 void MpApp::MacOpenFile(const wxString & filename) {
 	if (filename.length() > 0) {
+        createMainFrame(filename);
+        /*
 		MolDisplayWin * temp = new MolDisplayWin(filename);
 		MolWinList.push_back(temp);
 		long r = temp->OpenFile(filename);
 		if (r>0) temp->Show(true);
+        */
 	}
 }
 #endif
