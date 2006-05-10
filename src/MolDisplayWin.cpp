@@ -510,11 +510,23 @@ bool MolPrintOut::OnPrintPage(int page) {
 		int h, w;
 		GetPPIPrinter(&w, &h);
 		std::cout << "ppi w = "<<w<<" and h= " << h<< std::endl;
-		GetPPIScreen(&w, &h);
-		std::cout << "screen ppi w = "<<w<<" and h= " << h<< std::endl;
+		int sh, sw;
+		GetPPIScreen(&sw, &sh);
+		std::cout << "screen ppi w = "<<sw<<" and h= " << sh<< std::endl;
+		float scale = (float)w/ (float)sw;
+		std::cout << "scale factor = "<<scale<< std::endl;
+		Parent->PrintGL(dc, scale);
 		return true;
 	}
 	return false;
+}
+void MolDisplayWin::PrintGL(wxDC * dc, const float & scaleFactor) {
+	BeginOperation();
+	ProgressInd->ChangeText("Generating Hi-res image");
+	Prefs->CylindersForLines(true);
+	glCanvas->GenerateHiResImage(dc, scaleFactor, ProgressInd, true, false);
+	Prefs->CylindersForLines(false);
+	FinishOperation();
 }
 /* Edit menu */
 

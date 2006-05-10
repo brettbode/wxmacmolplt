@@ -206,6 +206,7 @@ class MolDisplayWin : public wxFrame {
 		void UpdateGLModel(void);
 		void Rotate(wxMouseEvent&);
 		void RotateMoleculeGL(bool);
+		void PrintGL(wxDC * dc, const float & scaleFactor);
 
 		void eventSize(wxSizeEvent &event);
 		void SizeChanged(void);

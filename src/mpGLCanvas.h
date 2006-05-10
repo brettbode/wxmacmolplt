@@ -100,6 +100,16 @@ class MpGLCanvas : public wxGLCanvas {
          */
         wxImage getImage(const int width, const int height);
         
+			/* 
+			* @param dc The device context to send the output to.
+			* @param scaleFactor The ratio to scale the image up from the screen size.
+			* @param progress  A progress dialog to use in case this takes a while.
+			* @param center  Center the output in the device context.
+			* @param frame  Add a black frame around the image.
+			*/
+        void GenerateHiResImage(wxDC * dc, const float & scaleFactor, Progress * progress,
+								bool Center, bool frame);
+
         // Event Handlers
 
         /**
