@@ -1,13 +1,11 @@
 /*
- * (c) 2005 Iowa State University
+ * (c) 2005-2006 Iowa State University
  *     see the LICENSE file in the top level directory
  */
 
 /***************************************
  * mpGLCanvas.cpp
  *
- * Created:       01-09-2006  Steven Schulteis
- * Last Modified: 01-19-2006  Steven Schulteis
  ***************************************/
 
 #include "Globals.h"
@@ -18,7 +16,7 @@
 #include <iostream>
 
 #warning This setting might need some verification to ensure it's safe/functional
-int defAttribs[] = {WX_GL_DEPTH_SIZE, 16,
+int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16,
                     0};
 
 MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
