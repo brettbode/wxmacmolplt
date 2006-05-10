@@ -6,6 +6,8 @@
 /***************************************
  * mpGLCanvas.cpp
  *
+ * Created:       01-09-2006  Steven Schulteis
+ * Last Modified: 05-09-2006  Steven Schulteis
  ***************************************/
 
 #include "Globals.h"
@@ -15,7 +17,6 @@
 
 #include <iostream>
 
-#warning This setting might need some verification to ensure it's safe/functional
 int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16,
                     0};
 
