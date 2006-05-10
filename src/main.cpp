@@ -271,7 +271,6 @@ void macMenuWinPlaceholder::createMenuBar(void) {
     menuEdit = new wxMenu;
     menuHelp = new wxMenu;
 
-    // TODO:  Create IDs for custom menu items
     menuFile->Append(wxID_NEW, wxT("&New\tCtrl+N"));
     menuFile->Append(wxID_OPEN, wxT("&Open ...\tCtrl+O"));
   //  menuFile->Append(wxID_SAVE, wxT("&Save\tCtrl+S"));

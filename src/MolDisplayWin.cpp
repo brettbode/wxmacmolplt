@@ -420,8 +420,8 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
 		//Note the message should be slightly different if we can't abort the close
 		int style = wxYES_NO | wxICON_QUESTION;
 		if (canVeto) style = style | wxCANCEL;
-		int r = wxMessageBox(wxT("The file filename here has unsaved changes."),
-							 wxT("Do you wish to save the current data and customizations before closing?"),
+		int r = wxMessageBox(wxT("Do you wish to save the current data and customizations before closing?"),
+                             wxT("The file **filename here** has unsaved changes."),
 							 style, this);
 		if (r == wxCANCEL) {
 			event.Veto(true);

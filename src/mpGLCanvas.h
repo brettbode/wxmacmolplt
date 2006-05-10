@@ -18,10 +18,6 @@
 
 #include "MoleculeData.h"
 
-// TODO:  Make a useful data structure out of GLWorldData.
-struct GLWorldData {
-};
-
 typedef class MolDisplayWin MolDisplayWin;
 /**
  * Defines a widget for displaying an OpenGL canvas.  At this time it is a
@@ -32,11 +28,9 @@ class MpGLCanvas : public wxGLCanvas {
 		MolDisplayWin * MolWin;
 		WinPrefs * Prefs;
         MoleculeData *molData;
-        GLWorldData   worldData;
 		bool		initialized;
 
         void initGL(void);
-        void render(void);
 
         DECLARE_EVENT_TABLE()
 
@@ -108,7 +102,7 @@ class MpGLCanvas : public wxGLCanvas {
         
         // Event Handlers
 
-       /**
+        /**
 			* Handles resize events received by the widget.
          * @param event The event to handle.
          */

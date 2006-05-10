@@ -68,16 +68,6 @@ void MpGLCanvas::initGL(void) {
 	}
 }
 
-void MpGLCanvas::render(void) {
-    // TODO:  Test for previous initialization of the GL context
-    if( 1/* init */ ) {
-        initGL();
-        // TODO: Clear init flag
-    }
-
-    // Do your OpenGL stuff for rendering the scene here.
-}
-
 void MpGLCanvas::setMolData(MoleculeData *newMolData) {
     molData = newMolData;
 }
