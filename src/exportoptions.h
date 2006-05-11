@@ -81,6 +81,21 @@ public:
 
 ////@begin ExportOptions event handler declarations
 
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_FILE_TYPE_CHOICE
+    void OnFileTypeChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_RADIOBUTTON_SELECTED event handler for ID_SCREEN_RES_RADIOBUTTON
+    void OnScreenResRadiobuttonSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_RADIOBUTTON_SELECTED event handler for ID_CUSTOM_RES_RADIOBUTTON
+    void OnCustomResRadiobuttonSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
+    void OnOkClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
+    void OnCancelClick( wxCommandEvent& event );
+
 ////@end ExportOptions event handler declarations
 
 ////@begin ExportOptions member function declarations

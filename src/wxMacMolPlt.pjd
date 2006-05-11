@@ -5385,6 +5385,7 @@ points read in:"</string>
                 <long name="locked">0</long>
                 <string name="created">"11/5/2006"</string>
                 <string name="proxy-type">"wbChoiceProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnFileTypeChoiceSelected"</string>
                 <string name="proxy-Id name">"ID_FILE_TYPE_CHOICE"</string>
                 <long name="proxy-Id value">10045</long>
                 <string name="proxy-Class">"wxChoice"</string>
@@ -5500,6 +5501,7 @@ points read in:"</string>
                 <long name="locked">0</long>
                 <string name="created">"11/5/2006"</string>
                 <string name="proxy-type">"wbRadioButtonProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_RADIOBUTTON_SELECTED|OnScreenResRadiobuttonSelected"</string>
                 <string name="proxy-Id name">"ID_SCREEN_RES_RADIOBUTTON"</string>
                 <long name="proxy-Id value">10046</long>
                 <string name="proxy-Class">"wxRadioButton"</string>
@@ -5596,6 +5598,7 @@ points read in:"</string>
                 <long name="locked">0</long>
                 <string name="created">"11/5/2006"</string>
                 <string name="proxy-type">"wbRadioButtonProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_RADIOBUTTON_SELECTED|OnCustomResRadiobuttonSelected"</string>
                 <string name="proxy-Id name">"ID_CUSTOM_RES_RADIOBUTTON"</string>
                 <long name="proxy-Id value">10048</long>
                 <string name="proxy-Class">"wxRadioButton"</string>
@@ -6120,6 +6123,7 @@ points read in:"</string>
                 <long name="locked">1</long>
                 <string name="created">"11/5/2006"</string>
                 <string name="proxy-type">"wbButtonProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_BUTTON_CLICKED|OnOkClick"</string>
                 <string name="proxy-Id name">"wxID_OK"</string>
                 <long name="proxy-Id value">5100</long>
                 <string name="proxy-Class">"wxButton"</string>
@@ -6171,6 +6175,7 @@ points read in:"</string>
                 <long name="locked">1</long>
                 <string name="created">"11/5/2006"</string>
                 <string name="proxy-type">"wbButtonProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_BUTTON_CLICKED|OnCancelClick"</string>
                 <string name="proxy-Id name">"wxID_CANCEL"</string>
                 <long name="proxy-Id value">5101</long>
                 <string name="proxy-Class">"wxButton"</string>
