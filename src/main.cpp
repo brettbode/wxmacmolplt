@@ -110,6 +110,9 @@ bool MpApp::OnInit() {
 			if (r>0) temp->Show(true);
 		}
 	} 
+
+    // Initialize image handlers so we can save the PNG format and such.
+    wxInitAllImageHandlers();
 	
     // TODO:  Pass proper arguments to main frame object
 //	MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
