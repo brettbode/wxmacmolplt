@@ -109,6 +109,8 @@ class MpGLCanvas : public wxGLCanvas {
 			*/
         void GenerateHiResImage(wxDC * dc, const float & scaleFactor, Progress * progress,
 								bool Center, bool frame);
+        void GenerateHiResImageForExport(wxDC * dc, const float & scaleFactor, Progress * progress,
+								bool Center, bool frame);
 
         // Event Handlers
 

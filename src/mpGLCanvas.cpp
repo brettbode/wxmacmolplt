@@ -107,6 +107,116 @@ wxImage MpGLCanvas::getImage(const int width, const int height) {
 //0.0577 corresponds to fov=60 with zNear=0.1
 #define myGLperspective	0.050	//0.050 seems to match my 2D mode
 
+
+void MpGLCanvas::GenerateHiResImageForExport(wxDC * dc, const float & ScaleFactor, Progress * progress,
+									bool Center, bool frame) {
+	
+    if(!GetContext()) {
+        return;
+    }
+    SetCurrent();
+
+    GLint view[4];
+    GLint width,height;
+	
+    glGetIntegerv(GL_VIEWPORT, view);
+    width = view[2];
+    height = view[3];
+	int ScaledWidth = (int) (width * ScaleFactor);
+	int ScaledHeight = (int) (height * ScaleFactor);
+	int NumXPasses = ScaledWidth / width;
+	if ((NumXPasses * width) < ScaledWidth) NumXPasses++;
+	int NumYPasses = ScaledHeight / height;
+	if ((NumYPasses * height) < ScaledHeight) NumYPasses++;
+	int ViewportScaledX = NumXPasses * width;
+	int ViewportScaledY = NumYPasses * height;
+
+	long hOffset=0, vOffset=0;
+	if (Center) {	//Compute the offset to move the rect to center on the page
+		int PageCenterH, PageCenterV;
+		dc->GetSize(&PageCenterH, &PageCenterV);
+		PageCenterH /= 2;
+		PageCenterV /= 2;
+		long DCenterH = ScaledWidth/2;
+		long DCenterV = ScaledHeight/2;
+		vOffset = PageCenterV - DCenterV;
+		hOffset = PageCenterH - DCenterH;
+	}
+	
+	unsigned char *pixels = (unsigned char *) malloc(3 * width * height * sizeof(GLbyte));
+	glReadBuffer(GL_BACK);
+	
+	GLdouble hGLsize, vGLsize, GLLeft, GLTop;
+	double aspect = ((double)width)/((double)height);
+	if (aspect > 1.0) {
+		hGLsize = 2.0*(myGLperspective) / ScaleFactor;	//This corresponds to fov=60 with zNear=0.1
+		vGLsize = hGLsize/aspect;
+		GLLeft = -myGLperspective;
+		GLTop = -GLLeft/aspect;
+	} else {
+		vGLsize = 2.0*(myGLperspective) / ScaleFactor;
+		hGLsize = vGLsize * aspect;
+		GLTop = myGLperspective;
+		GLLeft = -GLTop *aspect;
+	}
+	
+	MolWin->UpdateGLModel();
+	
+	for (int jpass=0; jpass<NumYPasses; jpass++) {
+		int passheight = height;
+		if ((jpass+1) == NumYPasses) passheight = height - (ViewportScaledY - ScaledHeight);
+		for (int ipass=0; ipass<NumXPasses; ipass++) {
+			int passwidth = width;
+			if ((ipass+1) == NumXPasses) passwidth = width - (ViewportScaledX - ScaledWidth);
+			
+			//Setup the projection matrix to view the correct piece of the view for this pass
+			glMatrixMode (GL_PROJECTION);	//Setup the model space to screen space mapping
+			glLoadIdentity ();
+			GLdouble top, bottom, left, right;
+			left = GLLeft + ipass*hGLsize;
+			right = left + hGLsize;
+			top = GLTop - jpass*vGLsize;
+			bottom = top - vGLsize;
+			glFrustum(left, right, bottom, top, 0.1, 100.0);
+			
+			MolWin->DrawGL();
+			
+			glFinish();
+			bzero(pixels,3*width*height*sizeof(GLbyte));
+			glPixelStorei( GL_PACK_ALIGNMENT, 1 );
+			glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+			wxCoord x = ipass*width + hOffset;
+			wxCoord y = jpass*height + vOffset;
+			//I am not sure this is the best way to do this, but it
+			//converts the pixels to a wxImage, flips it vertically to get
+			//it into the right orientation, then converts it to a bitmap
+			//to draw into the device context. We retain ownership of the pixels
+			//and thus have to delete them below.
+			dc->DrawBitmap(wxBitmap(wxImage(width,height,pixels, true).Mirror(false)),
+						   x, y, false);
+			
+		}
+	}
+	delete [] pixels;
+	
+/*	if (FramePrintOut) {
+		RGBColor	BlackColor={0,0,0};
+		PenSize((short)ScaleFactor, (short)ScaleFactor);
+		RGBForeColor(&BlackColor);
+		Rect TotalRect;
+		TotalRect.left = hOffset;
+		TotalRect.right = TotalRect.left + ScaledWidth;
+		TotalRect.top = vOffset;
+		TotalRect.bottom = TotalRect.top + ScaledHeight;
+		FrameRect(&TotalRect);
+
+		dc->DrawRectangle(x, y, width, height);
+	}*/
+	MolWin->UpdateGLModel();
+	UpdateGLView();
+}
+
 void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor, Progress * progress,
 									bool Center, bool frame) {
 	

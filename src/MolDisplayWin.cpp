@@ -23,6 +23,7 @@
 #include "llmdialog.h"
 #include "setbondlength.h"
 #include "appendframesoptions.h"
+#include "exportoptionsdialog.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
 #include <wx/image.h>
@@ -371,9 +372,15 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
     //        checkbox, etc.
     // Alternative:  Make export a submenu and give each file type an item in
     //               the menu
-    if(fd->ShowModal() == wxID_OK) {
-        wxImage exportImage = glCanvas->getImage(100,100);
-        exportImage.SaveFile(fd->GetFilename());
+
+    ExportOptionsDialog *exportOptionsDlg = new ExportOptionsDialog(this);
+    if(exportOptionsDlg->ShowModal() == wxID_OK) {
+        if(fd->ShowModal() == wxID_OK) {
+            wxImage exportImage = glCanvas->getImage(100,100);
+            //wxBitmap *bmp = new wxBitmap(exportOptionsDlg->getWidth(),
+            //                             exportOptionsDlg->getHeight());
+            exportImage.SaveFile(fd->GetFilename());
+        }
     }
 
     delete fd;

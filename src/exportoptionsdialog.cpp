@@ -200,6 +200,8 @@ void ExportOptionsDialog::CreateControls()
 
 void ExportOptionsDialog::OnFileTypeChoiceSelected( wxCommandEvent& event )
 {
+    // TODO:  Change the controls available in the options static frame.
+
 ////@begin wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_FILE_TYPE_CHOICE in ExportOptionsDialog.
     // Before editing this code, remove the block markers.
     event.Skip();
