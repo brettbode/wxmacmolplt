@@ -31,36 +31,36 @@ typedef class CoordinatesWindow CoordinatesWindow;
  */
 class MolDisplayWin : public wxFrame {
     private:
-		wxMenuBar *menuBar;
-		wxMenu    *menuFile;
-		wxMenu    *menuEdit;
-		wxMenu    *menuView;
-		wxMenu    *menuViewDisplay_frequency;
-		wxMenu    *menuViewRotate;
-		wxMenu    *menuMolecule;
-		wxMenu    *menuWindow;
-		wxMenu    *menuHelp;
+        wxMenuBar *menuBar;
+        wxMenu    *menuFile;
+        wxMenu    *menuEdit;
+        wxMenu    *menuView;
+        wxMenu    *menuViewDisplay_frequency;
+        wxMenu    *menuViewRotate;
+        wxMenu    *menuMolecule;
+        wxMenu    *menuWindow;
+        wxMenu    *menuHelp;
 
-        MoleculeData *	MainData;
-		WinPrefs 	*	Prefs;
-		bool			Dirty;			//Flag to indicate a save is needed
-		bool			OperationInProgress;
-		
-		Progress *		ProgressInd;	// Progress indicator window for long operations
-		OpenGLRec *		OpenGLData;		// Extra OpenGL data
-        MpGLCanvas *	glCanvas;
-		wxStaticText *	textBar;
-		wxScrollBar *	frameScrollBar;
+        MoleculeData *MainData;
+        WinPrefs     *Prefs;
+        bool          Dirty;          //Flag to indicate a save is needed
+        bool          OperationInProgress;
+        
+        Progress     *ProgressInd;    // Progress indicator window for long operations
+        OpenGLRec    *OpenGLData;     // Extra OpenGL data
+        MpGLCanvas   *glCanvas;
+        wxStaticText *textBar;
+        wxScrollBar  *frameScrollBar;
 
-		BondsDlg *		bondsWindow;
-		CoordinatesWindow * coordsWindow;
-		
-		wxPageSetupDialogData * pageSetupData;
-		wxPrintData * printData;
+        BondsDlg          *bondsWindow;
+        CoordinatesWindow *coordsWindow;
+        
+        wxPageSetupDialogData *pageSetupData;
+        wxPrintData           *printData;
 
         void createMenuBar(void);
-		long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
-							  long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
+        long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
+                              long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
 
         DECLARE_EVENT_TABLE()
 
@@ -84,9 +84,9 @@ class MolDisplayWin : public wxFrame {
          */
         virtual ~MolDisplayWin();
 
-		//Call to update the menu bar itesm for the current data
-		void AdjustMenus(void);
-		void ClearMenus(void);
+        //Call to update the menu bar itesm for the current data
+        void AdjustMenus(void);
+        void ClearMenus(void);
         // Below are the event handler functions for the menu.  The initial
         // list was taken from the original MacMolPlt menus.
 
@@ -97,7 +97,7 @@ class MolDisplayWin : public wxFrame {
         void FileClose(wxCloseEvent &event);
         void menuFileAppendNewFrame(wxCommandEvent &event);
         void menuFileAddFramesFromFile(wxCommandEvent &event);
-		void menuFileDeleteFrame(wxCommandEvent &event);
+        void menuFileDeleteFrame(wxCommandEvent &event);
         //void menuFileImport(wxCommandEvent &event);
         //void menuFileExport(wxCommandEvent &event);
         void menuFilePage_setup(wxCommandEvent &event);
@@ -108,17 +108,17 @@ class MolDisplayWin : public wxFrame {
         void menuEditCut(wxCommandEvent &event);
         void menuEditCopy(wxCommandEvent &event);
         void menuEditCopyCoordinates(wxCommandEvent &event);
-		void CopyCoordinates(short coordtype) const;
+        void CopyCoordinates(short coordtype) const;
         void menuEditPaste(wxCommandEvent &event);
-		/// wxEVT_UPDATE_UI event handler for wxID_PASTE
-		void OnPasteUpdate( wxUpdateUIEvent& event );
-		void PasteText(void);
+        /// wxEVT_UPDATE_UI event handler for wxID_PASTE
+        void OnPasteUpdate( wxUpdateUIEvent& event );
+        void PasteText(void);
         void menuEditClear(wxCommandEvent &event);
         void menuEditSelect_all(wxCommandEvent &event);
 
         void menuViewShowNormalMode(wxCommandEvent &event);
-		void menuViewPrevNormalMode(wxCommandEvent &event);
-		void menuViewNextNormalMode(wxCommandEvent &event);
+        void menuViewPrevNormalMode(wxCommandEvent &event);
+        void menuViewNextNormalMode(wxCommandEvent &event);
           // void menuViewDisplay_frequencyDOSTUFF(wxCommandEvent &event);
         //void menuViewOffset_along_mode(wxCommandEvent &event);
         //void menuViewAnimate_mode(wxCommandEvent &event);
@@ -127,17 +127,17 @@ class MolDisplayWin : public wxFrame {
         //void menuVeiwShow_hydrogen_labels(wxCommandEvent &event);
         //void menuViewShow_atom_labels(wxCommandEvent &event);
         //void menuViewShow_atom_numbers(wxCommandEvent &event);
-		void menuViewShowAxis(wxCommandEvent &event);
-		void menuViewShrink_10(wxCommandEvent &event);
-		void menuViewEnlarge_10(wxCommandEvent &event);
-		void menuViewCenter(wxCommandEvent &event);
-		void menuViewRotateTo_X_axis(wxCommandEvent &event);
-		void menuViewRotateTo_Y_axis(wxCommandEvent &event);
-		void menuViewRotateTo_Z_axis(wxCommandEvent &event);
-		void menuViewRotate180_horizontal(wxCommandEvent &event);
-		void menuViewRotate180_vertical(wxCommandEvent &event);
-		void menuViewRotatePrinciple_orientation(wxCommandEvent &event);
-		void menuViewRotateOther(wxCommandEvent &event);
+        void menuViewShowAxis(wxCommandEvent &event);
+        void menuViewShrink_10(wxCommandEvent &event);
+        void menuViewEnlarge_10(wxCommandEvent &event);
+        void menuViewCenter(wxCommandEvent &event);
+        void menuViewRotateTo_X_axis(wxCommandEvent &event);
+        void menuViewRotateTo_Y_axis(wxCommandEvent &event);
+        void menuViewRotateTo_Z_axis(wxCommandEvent &event);
+        void menuViewRotate180_horizontal(wxCommandEvent &event);
+        void menuViewRotate180_vertical(wxCommandEvent &event);
+        void menuViewRotatePrinciple_orientation(wxCommandEvent &event);
+        void menuViewRotateOther(wxCommandEvent &event);
         //void menuViewSet_window_parameters(wxCommandEvent &event);
         //void menuViewStereo(wxCommandEvent &event);
         
@@ -160,69 +160,69 @@ class MolDisplayWin : public wxFrame {
         //void menuWindowInput_builder(wxCommandEvent &event);
         //void menuWindowSurfaces(wxCommandEvent &event);
         //void menuWindowPreferences(wxCommandEvent &event);
-		void KeyHandler(wxKeyEvent &event);
-		void CloseBondsWindow(void);
-		void CloseCoordsWindow(void);
-		
-		//File handling routines
-		long OpenFile(wxString fileName, float offset=0.0, bool flip=false, bool append=false);
-		long OpenCMLFile(BufferFile * Buffer, bool readPrefs=true, bool readWindows=true);
-		long OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, float offset);
-		long OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, float offset);
-		long OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append,
-						   long flip, float offset);
-		long OpenXYZFile(BufferFile * Buffer);
-		long OpenPDBFile(BufferFile * Buffer);
-		long OpenMDLMolFile(BufferFile * Buffer);
-		long OpenGAMESSInput(BufferFile * Buffer);
-		long OpenMolPltFile(BufferFile *Buffer);
-		long ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos);
-			//Call to dump the message and close the window
-		void AbortOpen(const char * msg);
-		
-		//General Utility routines
-		void AtomsChanged(void);
-		void BondsChanged(void);
-		void FrameChanged(void);
-		void ChangeFrames(long NewFrame);
-		void UpdateModelDisplay(void);
-		MoleculeData * GetData(void) const {return MainData;};
-		WinPrefs * GetPrefs(void) const {return Prefs;};
-		void ResetView(void);
-		void ResetModel(bool Center);
-		void ResetAllWindows(void);
-		void UpdateFrameText(void);
-		void BeginOperation(void);
-		void FinishOperation(void);
-		bool OperInProgress(void) const {return OperationInProgress;};
-		
-		//OpenGL drawing routines
-		void InitGLData(void);
-		void DrawGL(void);
-		void SortTransparentTriangles(void);
-		void DrawTransparentTriangles(void);
-		void DrawMoleculeCoreGL(void);
-		void AddAxisGL(void);
-		void UpdateGLModel(void);
-		void Rotate(wxMouseEvent&);
-		void RotateMoleculeGL(bool);
-		void PrintGL(wxDC * dc, const float & scaleFactor);
+        void KeyHandler(wxKeyEvent &event);
+        void CloseBondsWindow(void);
+        void CloseCoordsWindow(void);
+        
+        //File handling routines
+        long OpenFile(wxString fileName, float offset=0.0, bool flip=false, bool append=false);
+        long OpenCMLFile(BufferFile * Buffer, bool readPrefs=true, bool readWindows=true);
+        long OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, float offset);
+        long OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, float offset);
+        long OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append,
+                           long flip, float offset);
+        long OpenXYZFile(BufferFile * Buffer);
+        long OpenPDBFile(BufferFile * Buffer);
+        long OpenMDLMolFile(BufferFile * Buffer);
+        long OpenGAMESSInput(BufferFile * Buffer);
+        long OpenMolPltFile(BufferFile *Buffer);
+        long ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos);
+            //Call to dump the message and close the window
+        void AbortOpen(const char * msg);
+        
+        //General Utility routines
+        void AtomsChanged(void);
+        void BondsChanged(void);
+        void FrameChanged(void);
+        void ChangeFrames(long NewFrame);
+        void UpdateModelDisplay(void);
+        MoleculeData * GetData(void) const {return MainData;};
+        WinPrefs * GetPrefs(void) const {return Prefs;};
+        void ResetView(void);
+        void ResetModel(bool Center);
+        void ResetAllWindows(void);
+        void UpdateFrameText(void);
+        void BeginOperation(void);
+        void FinishOperation(void);
+        bool OperInProgress(void) const {return OperationInProgress;};
+        
+        //OpenGL drawing routines
+        void InitGLData(void);
+        void DrawGL(void);
+        void SortTransparentTriangles(void);
+        void DrawTransparentTriangles(void);
+        void DrawMoleculeCoreGL(void);
+        void AddAxisGL(void);
+        void UpdateGLModel(void);
+        void Rotate(wxMouseEvent&);
+        void RotateMoleculeGL(bool);
+        void PrintGL(wxDC * dc, const float & scaleFactor);
 
-		void eventSize(wxSizeEvent &event);
-		void SizeChanged(void);
-			//Function to receive all changes to the scroll bar
-		void OnScrollBarChange(wxScrollEvent& event);
+        void eventSize(wxSizeEvent &event);
+        void SizeChanged(void);
+            //Function to receive all changes to the scroll bar
+        void OnScrollBarChange(wxScrollEvent& event);
 };
 
 class MolPrintOut : public wxPrintout {
 public:
-	MolPrintOut(MolDisplayWin * parent, wxString & title);
-	bool OnPrintPage(int page);
-	bool HasPage(int page);
-	bool OnBeginDocument(int startPage, int endPage);
-	void GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int *selPageTo);
+    MolPrintOut(MolDisplayWin * parent, wxString & title);
+    bool OnPrintPage(int page);
+    bool HasPage(int page);
+    bool OnBeginDocument(int startPage, int endPage);
+    void GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int *selPageTo);
 private:
-		MolDisplayWin * Parent;	
+        MolDisplayWin * Parent; 
 };
 
 #endif /* #ifndef MolDisplayWin_H */

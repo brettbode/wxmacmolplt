@@ -453,22 +453,34 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
 }
 
 void MolDisplayWin::menuFilePage_setup(wxCommandEvent &event) {
-	if (!printData) printData = new wxPrintData;
-	if (!pageSetupData) pageSetupData = new wxPageSetupData;
-	(*pageSetupData) = *printData;
+    wxPrintData     *tempPrintData     = new wxPrintData;
+    wxPageSetupData *tempPageSetupData = new wxPageSetupData;
+
+	(*tempPageSetupData) = *tempPrintData;
 	
-	wxPageSetupDialog pageSetupDialog(this, pageSetupData);
-	pageSetupDialog.ShowModal();
-	
-	(*printData) = pageSetupDialog.GetPageSetupData().GetPrintData();
-	(*pageSetupData) = pageSetupDialog.GetPageSetupData();
+	wxPageSetupDialog pageSetupDialog(this, tempPageSetupData);
+
+	if(pageSetupDialog.ShowModal() == wxID_OK) {
+	    (*tempPageSetupData) = pageSetupDialog.GetPageSetupData();
+        if(pageSetupData != NULL) delete pageSetupData;
+        pageSetupData = tempPageSetupData;
+
+	    (*tempPrintData) = pageSetupData->GetPrintData();
+        if(printData != NULL) delete printData;
+        printData = tempPrintData;
+    }
+    else {
+        delete tempPageSetupData;
+        delete tempPrintData;
+    }
 }
 
 void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuFilePrint(wxCommandEvent &event) {
-	if (! printData || ! pageSetupData) menuFilePage_setup(event);
+	if (printData == NULL || pageSetupData == NULL) menuFilePage_setup(event);
+	if (printData == NULL || pageSetupData == NULL) return;
 	
 	wxPrintDialogData printDialogData(*printData);
 	wxPrinter printer(&printDialogData);
