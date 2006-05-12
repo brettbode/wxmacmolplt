@@ -218,7 +218,7 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor, Progre
 }
 
 void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
-    wxPen dcPen(wxT("BLACK"));
+    //wxPen dcPen(wxT("BLACK"));
 
     wxCoord dcWidth  = 0;
     wxCoord dcHeight = 0;
