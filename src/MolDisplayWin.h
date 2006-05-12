@@ -65,7 +65,8 @@ class MolDisplayWin : public wxFrame {
         DECLARE_EVENT_TABLE()
 
     public:
-        /* Constructor that provides some useful default values.
+        /**
+         * Constructor that provides some useful default values.
          * @param title The text that will be displayed in the new window's title bar.
          * @param position The initial position of the new window.
          * @param size The initial size of the new window.
@@ -83,6 +84,13 @@ class MolDisplayWin : public wxFrame {
          * independently of wxWidgets.
          */
         virtual ~MolDisplayWin();
+
+        /**
+         * Gets the dimensions of the glCanvas.
+         * @param width A pointer to an integer that will be set to the width
+         * @param height A pointer to an integer that will be set to the height
+         */
+        void getCanvasSize(long *width, long *height);
 
         //Call to update the menu bar itesm for the current data
         void AdjustMenus(void);

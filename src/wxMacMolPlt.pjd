@@ -4663,6 +4663,14 @@ considered a bond:"</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Stretch factor">0</long>
+            <long name="proxy-Border">5</long>
+            <bool name="proxy-wxLEFT">1</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
+            <bool name="proxy-wxTOP">1</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -5225,6 +5233,9 @@ points read in:"</string>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
           <long name="use-xrc">0</long>
+          <string name="variable-0">"width|int|Width|"</string>
+          <string name="variable-1">"height|int|Height|"</string>
+          <string name="variable-2">"filetype|wxString|Filetype|"</string>
           <string name="proxy-Id name">"ID_EXPORTOPTIONSDIALOG"</string>
           <long name="proxy-Id value">10044</long>
           <string name="proxy-Class">"ExportOptionsDialog"</string>
@@ -5389,7 +5400,7 @@ points read in:"</string>
                 <string name="proxy-Id name">"ID_FILE_TYPE_CHOICE"</string>
                 <long name="proxy-Id value">10045</long>
                 <string name="proxy-Class">"wxChoice"</string>
-                <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Member variable name">"fileTypeChoice"</string>
                 <string name="proxy-Strings">"Windows Bitmap (*.bmp)|Portable Network Graphics (*.png)|JPEG (*.jpeg)"</string>
                 <string name="proxy-Initial value">""</string>
                 <string name="proxy-Help text">""</string>
@@ -5506,7 +5517,7 @@ points read in:"</string>
                 <long name="proxy-Id value">10046</long>
                 <string name="proxy-Class">"wxRadioButton"</string>
                 <string name="proxy-Member variable name">""</string>
-                <string name="proxy-Label">"Screen Resolution"</string>
+                <string name="proxy-Label">"Standard Resolution"</string>
                 <bool name="proxy-Initial value">1</bool>
                 <string name="proxy-Help text">""</string>
                 <string name="proxy-Tooltip text">""</string>
@@ -5551,11 +5562,12 @@ points read in:"</string>
                 <long name="locked">0</long>
                 <string name="created">"11/5/2006"</string>
                 <string name="proxy-type">"wbChoiceProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnResChoiceSelected"</string>
                 <string name="proxy-Id name">"ID_RES_CHOICE"</string>
                 <long name="proxy-Id value">10047</long>
                 <string name="proxy-Class">"wxChoice"</string>
-                <string name="proxy-Member variable name">""</string>
-                <string name="proxy-Strings">"72dpi (Screen)|300dpi"</string>
+                <string name="proxy-Member variable name">"resChoice"</string>
+                <string name="proxy-Strings">"72dpi (Screen)|300dpi (Print)"</string>
                 <string name="proxy-Initial value">""</string>
                 <string name="proxy-Help text">""</string>
                 <string name="proxy-Tooltip text">""</string>
@@ -5701,7 +5713,7 @@ points read in:"</string>
                     <string name="proxy-Id name">"wxID_STATIC"</string>
                     <long name="proxy-Id value">5105</long>
                     <string name="proxy-Class">"wxStaticText"</string>
-                    <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Member variable name">"txt0"</string>
                     <string name="proxy-Label">"Width:"</string>
                     <long name="proxy-Wrapping width">-1</long>
                     <string name="proxy-Help text">""</string>
@@ -5755,10 +5767,11 @@ points read in:"</string>
                     <long name="locked">0</long>
                     <string name="created">"11/5/2006"</string>
                     <string name="proxy-type">"wbTextCtrlProxy"</string>
+                    <string name="event-handler-0">"wxEVT_COMMAND_TEXT_UPDATED|OnResWidthTextUpdated"</string>
                     <string name="proxy-Id name">"ID_RES_WIDTH_TEXT"</string>
                     <long name="proxy-Id value">10049</long>
                     <string name="proxy-Class">"wxTextCtrl"</string>
-                    <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Member variable name">"resWidthText"</string>
                     <string name="proxy-Initial value">""</string>
                     <long name="proxy-Max length">0</long>
                     <string name="proxy-Help text">""</string>
@@ -5770,7 +5783,7 @@ points read in:"</string>
                     <bool name="proxy-Enabled">0</bool>
                     <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                     <string name="proxy-Data variable">""</string>
-                    <string name="proxy-Data validator">""</string>
+                    <string name="proxy-Data validator">"widthValidator"</string>
                     <bool name="proxy-wxTE_MULTILINE">0</bool>
                     <bool name="proxy-wxTE_PROCESS_ENTER">0</bool>
                     <bool name="proxy-wxTE_PROCESS_TAB">0</bool>
@@ -5826,7 +5839,7 @@ points read in:"</string>
                     <string name="proxy-Id name">"wxID_STATIC"</string>
                     <long name="proxy-Id value">5105</long>
                     <string name="proxy-Class">"wxStaticText"</string>
-                    <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Member variable name">"txt1"</string>
                     <string name="proxy-Label">"pixels"</string>
                     <long name="proxy-Wrapping width">-1</long>
                     <string name="proxy-Help text">""</string>
@@ -5909,7 +5922,7 @@ points read in:"</string>
                     <string name="proxy-Id name">"wxID_STATIC"</string>
                     <long name="proxy-Id value">5105</long>
                     <string name="proxy-Class">"wxStaticText"</string>
-                    <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Member variable name">"txt2"</string>
                     <string name="proxy-Label">"Height:"</string>
                     <long name="proxy-Wrapping width">-1</long>
                     <string name="proxy-Help text">""</string>
@@ -5963,10 +5976,11 @@ points read in:"</string>
                     <long name="locked">0</long>
                     <string name="created">"11/5/2006"</string>
                     <string name="proxy-type">"wbTextCtrlProxy"</string>
+                    <string name="event-handler-0">"wxEVT_COMMAND_TEXT_UPDATED|OnResHeightTextUpdated"</string>
                     <string name="proxy-Id name">"ID_RES_HEIGHT_TEXT"</string>
                     <long name="proxy-Id value">10050</long>
                     <string name="proxy-Class">"wxTextCtrl"</string>
-                    <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Member variable name">"resHeightText"</string>
                     <string name="proxy-Initial value">""</string>
                     <long name="proxy-Max length">0</long>
                     <string name="proxy-Help text">""</string>
@@ -5978,7 +5992,7 @@ points read in:"</string>
                     <bool name="proxy-Enabled">0</bool>
                     <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                     <string name="proxy-Data variable">""</string>
-                    <string name="proxy-Data validator">""</string>
+                    <string name="proxy-Data validator">"heightValidator"</string>
                     <bool name="proxy-wxTE_MULTILINE">0</bool>
                     <bool name="proxy-wxTE_PROCESS_ENTER">0</bool>
                     <bool name="proxy-wxTE_PROCESS_TAB">0</bool>
@@ -6034,7 +6048,7 @@ points read in:"</string>
                     <string name="proxy-Id name">"wxID_STATIC"</string>
                     <long name="proxy-Id value">5105</long>
                     <string name="proxy-Class">"wxStaticText"</string>
-                    <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Member variable name">"txt3"</string>
                     <string name="proxy-Label">"pixels"</string>
                     <long name="proxy-Wrapping width">-1</long>
                     <string name="proxy-Help text">""</string>
@@ -6127,7 +6141,7 @@ points read in:"</string>
                 <string name="proxy-Id name">"wxID_OK"</string>
                 <long name="proxy-Id value">5100</long>
                 <string name="proxy-Class">"wxButton"</string>
-                <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Member variable name">"okButton"</string>
                 <string name="proxy-Label">"&amp;OK"</string>
                 <bool name="proxy-Default">0</bool>
                 <string name="proxy-Help text">""</string>
@@ -6175,7 +6189,6 @@ points read in:"</string>
                 <long name="locked">1</long>
                 <string name="created">"11/5/2006"</string>
                 <string name="proxy-type">"wbButtonProxy"</string>
-                <string name="event-handler-0">"wxEVT_COMMAND_BUTTON_CLICKED|OnCancelClick"</string>
                 <string name="proxy-Id name">"wxID_CANCEL"</string>
                 <long name="proxy-Id value">5101</long>
                 <string name="proxy-Class">"wxButton"</string>

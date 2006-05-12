@@ -80,36 +80,62 @@ public:
     void CreateControls();
 
 ////@begin ExportOptionsDialog event handler declarations
+
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_FILE_TYPE_CHOICE
     void OnFileTypeChoiceSelected( wxCommandEvent& event );
 
     /// wxEVT_COMMAND_RADIOBUTTON_SELECTED event handler for ID_SCREEN_RES_RADIOBUTTON
     void OnScreenResRadiobuttonSelected( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_RES_CHOICE
+    void OnResChoiceSelected( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_RADIOBUTTON_SELECTED event handler for ID_CUSTOM_RES_RADIOBUTTON
     void OnCustomResRadiobuttonSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_RES_WIDTH_TEXT
+    void OnResWidthTextUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_RES_HEIGHT_TEXT
+    void OnResHeightTextUpdated( wxCommandEvent& event );
 
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
     void OnOkClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
-    void OnCancelClick( wxCommandEvent& event );
-
 ////@end ExportOptionsDialog event handler declarations
 
-////@begin ExportOptionsDialog member function declarations
+
+    int getWidth() const { return width ; }
+    int getHeight() const { return height ; }
+    wxString getFiletype() const { return filetype ; }
+
     /// Retrieves bitmap resources
     wxBitmap GetBitmapResource( const wxString& name );
 
     /// Retrieves icon resources
     wxIcon GetIconResource( const wxString& name );
-////@end ExportOptionsDialog member function declarations
+
 
     /// Should we show tooltips?
     static bool ShowToolTips();
 
-////@begin ExportOptionsDialog member variables
-////@end ExportOptionsDialog member variables
+private:
+    long width;
+    long height;
+    double H2Wratio;
+    wxString filetype;
+
+    wxChoice        *fileTypeChoice;
+    wxChoice        *resChoice;
+    wxStaticText    *txt0;
+    wxStaticText    *txt1;
+    wxStaticText    *txt2;
+    wxStaticText    *txt3;
+    wxTextCtrl      *resWidthText;
+    wxTextCtrl      *resHeightText;
+    wxTextValidator  widthValidator;
+    wxTextValidator  heightValidator;
+    wxButton        *okButton;
 };
 
 #endif

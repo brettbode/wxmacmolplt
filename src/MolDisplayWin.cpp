@@ -186,9 +186,18 @@ MolDisplayWin::~MolDisplayWin() {
         delete Prefs;
     }
 }
+
+void MolDisplayWin::getCanvasSize(long *width, long *height) {
+    int w, h;
+    glCanvas->GetClientSize(&w, &h);
+    *width = w;
+    *height = h;
+}
+
 void MolDisplayWin::eventSize(wxSizeEvent &event) {
     SizeChanged();
 }
+
 void MolDisplayWin::SizeChanged(void) {
     //resize/reposition the controls and the display canvas
     int width, height;
@@ -201,6 +210,7 @@ void MolDisplayWin::SizeChanged(void) {
     
     textBar->SetSize(0, height-sheight, width-114, sheight, wxSIZE_USE_EXISTING);
 }
+
 void MolDisplayWin::createMenuBar(void) {
     menuBar = new wxMenuBar;
 

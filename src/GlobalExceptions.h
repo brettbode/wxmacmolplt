@@ -14,6 +14,9 @@
 
 //Global exceptions types
 
+#ifndef __GLOBAL_EXCEPTIONS_H__
+#define __GLOBAL_EXCEPTIONS_H__
+
 //The following are for non-Mac systems
 #if defined(__wxBuild__) && !defined(__WXMAC__)
 typedef long OSErr;
@@ -52,3 +55,6 @@ class UserCancel {
 	public:
 		UserCancel(void) {};
 };
+
+#endif
+

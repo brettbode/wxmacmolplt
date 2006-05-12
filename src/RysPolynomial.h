@@ -12,6 +12,9 @@
 
 */
 
+#ifndef _RYS_POLYNOMIAL_H_
+#define _RYS_POLYNOMIAL_H_
+
 #ifdef __cplusplus
 extern "C" {
 #endif	/* __cplusplus */
@@ -34,3 +37,6 @@ void RysSmt(double * c, double * s, long n);
 #ifdef __cplusplus
 }
 #endif  /*  __cplusplus  */
+
+#endif /* #ifndef _RYS_POLYNOMIAL_H_ */
+

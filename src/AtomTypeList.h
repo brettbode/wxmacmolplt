@@ -11,6 +11,9 @@
 	BMB 11/1998
 */
 
+#ifndef ATOM_TYPE_LIST_H
+#define ATOM_TYPE_LIST_H
+
 class AtomTypeList {
 	private:
 		long 	Types[kMaxAtomTypes];
@@ -24,3 +27,6 @@ class AtomTypeList {
 		void Sort(void);
 		bool TransitionMetalInList(void) const;
 };
+
+#endif
+

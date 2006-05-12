@@ -8,6 +8,9 @@
  *  Created by Brett Bode June 2005
  */
 
+#ifndef _MMP_PREFS_H_
+#define _MMP_PREFS_H_
+
 enum MMPPref_Element {
 	invalid_MMPPref_Element=0,
 	MMPPref_Wrapper,
@@ -170,3 +173,6 @@ bool MMPPref_convert(const char * s, MMPMolDisplayElments & t);
 bool MMPPref_convert(const char * s, MMPSurfaceWinElements & t);
 bool MMPPref_convert(const char * s, MMPEnergyOptions & b);
 bool MMPPref_convert(const char * s, MMPref_WinRect & b);
+
+#endif
+

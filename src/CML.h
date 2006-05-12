@@ -8,6 +8,9 @@
  *  Created by Brett Bode January 2005
  */
 
+#ifndef _CML_H_
+#define _CML_H_
+
 enum CML_Element {
 	invalid_CML_Element=0,
 	CMLElement,
@@ -465,3 +468,6 @@ bool CML_convert(const char * s, MMP_IOHessGroupNS & b);
 bool CML_convert(const char * s, MMP_IODFTGroupNS & b);
 bool CML_convert(const char * s, MMP_IOStatPtGroupNS & b);
 bool CML_convert(const char * s, MMP_BasisSetNS & b);
+
+#endif
+
