@@ -12,6 +12,7 @@
 #include "Prefs.h"
 #include <wx/cmdline.h>
 #include <wx/filename.h>
+#include <wx/image.h>
 
 //The global preferences settings
     WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;

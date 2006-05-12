@@ -519,6 +519,24 @@ void MolDisplayWin::menuFilePage_setup(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
+    if (printData == NULL || pageSetupData == NULL) menuFilePage_setup(event);
+    if (printData == NULL || pageSetupData == NULL) return;
+
+    wxPrintDialogData printDialogData(*printData);
+    wxString title(_T("MacMolPlt printout"));
+	wxPrintPreview * preview = new wxPrintPreview(new MolPrintOut(this, title),
+												new MolPrintOut(this, title),
+												&printDialogData);
+	if (!preview->Ok()) {//failure to create the print preview
+		delete preview;
+		//could throw up an error dialog
+		return;
+	}
+	wxPreviewFrame * frame = new wxPreviewFrame(preview, this, _T("wxMacMolPlt print preview"),
+												wxPoint(100,100), wxSize(600,650));
+	frame->Centre(wxBOTH);
+	frame->Initialize();
+	frame->Show();
 }
 
 void MolDisplayWin::menuFilePrint(wxCommandEvent &event) {
@@ -563,6 +581,8 @@ bool MolPrintOut::OnPrintPage(int page) {
     wxDC * dc = GetDC();
     if (dc) {
         int h, w;
+        wxSize dcp = dc->GetPPI();
+        std::cout << "dc ppi w = "<<dcp.GetWidth()<<" and h= " << dcp.GetHeight()<< std::endl;
         GetPPIPrinter(&w, &h);
         std::cout << "ppi w = "<<w<<" and h= " << h<< std::endl;
         int sh, sw;
@@ -576,12 +596,12 @@ bool MolPrintOut::OnPrintPage(int page) {
     return false;
 }
 void MolDisplayWin::PrintGL(wxDC * dc, const float & scaleFactor) {
-    BeginOperation();
-    ProgressInd->ChangeText("Generating Hi-res image");
-    Prefs->CylindersForLines(true);
-    glCanvas->GenerateHiResImage(dc, scaleFactor, ProgressInd, true, false);
-    Prefs->CylindersForLines(false);
-    FinishOperation();
+	BeginOperation();
+	ProgressInd->ChangeText("Generating Hi-res image");
+	Prefs->CylindersForLines(true);
+	glCanvas->GenerateHiResImage(dc, scaleFactor, ProgressInd, false, true);
+	Prefs->CylindersForLines(false);
+	FinishOperation();
 }
 /* Edit menu */
 

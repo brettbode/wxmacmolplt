@@ -107,7 +107,6 @@ wxImage MpGLCanvas::getImage(const int width, const int height) {
 //0.0577 corresponds to fov=60 with zNear=0.1
 #define myGLperspective 0.050   //0.050 seems to match my 2D mode
 
-
 void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor, Progress * progress,
                                     bool Center, bool frame) {
     
@@ -200,19 +199,12 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor, Progre
     }
     delete [] pixels;
     
-/*  if (FramePrintOut) {
-        RGBColor    BlackColor={0,0,0};
-        PenSize((short)ScaleFactor, (short)ScaleFactor);
-        RGBForeColor(&BlackColor);
-        Rect TotalRect;
-        TotalRect.left = hOffset;
-        TotalRect.right = TotalRect.left + ScaledWidth;
-        TotalRect.top = vOffset;
-        TotalRect.bottom = TotalRect.top + ScaledHeight;
-        FrameRect(&TotalRect);
-
-        dc->DrawRectangle(x, y, width, height);
-    }*/
+	if (frame) {
+		wxPen lpen = dc->GetPen();
+		lpen.SetWidth((int)ScaleFactor);
+		dc->SetPen(lpen);
+		dc->DrawRectangle(hOffset, vOffset, ScaledWidth, ScaledHeight);
+	}
     MolWin->UpdateGLModel();
     UpdateGLView();
 }
