@@ -25,10 +25,10 @@ typedef class MolDisplayWin MolDisplayWin;
  */
 class MpGLCanvas : public wxGLCanvas {
     private:
-		MolDisplayWin * MolWin;
-		WinPrefs * Prefs;
+        MolDisplayWin * MolWin;
+        WinPrefs * Prefs;
         MoleculeData *molData;
-		bool		initialized;
+        bool        initialized;
 
         void initGL(void);
 
@@ -62,7 +62,7 @@ class MpGLCanvas : public wxGLCanvas {
         void setMolData(MoleculeData *newMolData);
         
         /**
-		 * Sets the internal pointer to the window's preferences.  If the
+         * Sets the internal pointer to the window's preferences.  If the
          * data structure needs to be deleted externally, this function should
          * first be called with the parameter value set to NULL.  This will
          * prevent the MpGLCanvas object from trying to reference a deleted
@@ -72,13 +72,13 @@ class MpGLCanvas : public wxGLCanvas {
         void setPrefs(WinPrefs *newPrefs);
 
         /**
-		 * Updates GL parameters for changes in the window shape or
-		 * for changes in the lighting and background color.
+         * Updates GL parameters for changes in the window shape or
+         * for changes in the lighting and background color.
          */
         void UpdateGLView(void);
-		void draw(void);
-		
-		/**
+        void draw(void);
+        
+        /**
          * Creates an image of the canvas for purposes such as printing or
          * saving to a file.
          *
@@ -100,26 +100,35 @@ class MpGLCanvas : public wxGLCanvas {
          */
         wxImage getImage(const int width, const int height);
         
-			/* 
-			* @param dc The device context to send the output to.
-			* @param scaleFactor The ratio to scale the image up from the screen size.
-			* @param progress  A progress dialog to use in case this takes a while.
-			* @param center  Center the output in the device context.
-			* @param frame  Add a black frame around the image.
-			*/
+        /**
+         * @param dc The device context to send the output to.
+         * @param scaleFactor The ratio to scale the image up from the screen size.
+         * @param progress  A progress dialog to use in case this takes a while.
+         * @param center  Center the output in the device context.
+         * @param frame  Add a black frame around the image.
+         */
         void GenerateHiResImage(wxDC * dc, const float & scaleFactor, Progress * progress,
-								bool Center, bool frame);
-        void GenerateHiResImageForExport(wxDC * dc, const float & scaleFactor, Progress * progress,
-								bool Center, bool frame);
+                                bool Center, bool frame);
+
+        /**
+         * Draws the viewport into the given device context at the resolution
+         * of the device context.  If the device context height to width ratio
+         * is different than that of the viewport, the image will be clipped in
+         * the same way that it would be if the viewport were resized to the
+         * dimensions of the device context.
+         *
+         * @param dc An initialized device context to draw the viewport into.
+         */
+        void GenerateHiResImageForExport(wxDC *dc);
 
         // Event Handlers
 
         /**
-			* Handles resize events received by the widget.
+            * Handles resize events received by the widget.
          * @param event The event to handle.
          */
         void eventSize(wxSizeEvent &event);
-		
+        
         /**
          * Handles paint events received by the widget.  This is where OpenGL
          * code is run from.
@@ -141,12 +150,12 @@ class MpGLCanvas : public wxGLCanvas {
          * \param event The event to handle.
          */
         void eventMouse(wxMouseEvent &event);
-		
+        
         /**
-		 * Handles Char events received by the widget. 
+         * Handles Char events received by the widget. 
          * \param event The event to handle.
          */
-		void KeyHandler(wxKeyEvent & event);
+        void KeyHandler(wxKeyEvent & event);
 };
 
 #endif
