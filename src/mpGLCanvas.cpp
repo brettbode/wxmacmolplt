@@ -239,6 +239,9 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
     int passX = 0;
     int passY = 0;
 
+    long hOffset = 0;
+    long vOffset = 0;
+
     GLbyte *pixels;
 
 

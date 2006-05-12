@@ -365,24 +365,31 @@ void MolDisplayWin::menuFileDeleteFrame(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
+    ExportOptionsDialog *exportOptionsDlg = new ExportOptionsDialog(this);
     wxFileDialog *fd = new wxFileDialog(this, wxT("Export"), wxT(""), wxT(""),
                                         wxT("*"), wxSAVE | wxOVERWRITE_PROMPT);
 
-    // TODO:  Show an additional dialog to select file type, energy plot
-    //        checkbox, etc.
-    // Alternative:  Make export a submenu and give each file type an item in
-    //               the menu
+    wxMemoryDC memDC;
+    wxImage    exportImage;
+    wxBitmap  *bmp;
 
-    ExportOptionsDialog *exportOptionsDlg = new ExportOptionsDialog(this);
     if(exportOptionsDlg->ShowModal() == wxID_OK) {
         if(fd->ShowModal() == wxID_OK) {
-            wxImage exportImage = glCanvas->getImage(100,100);
-            //wxBitmap *bmp = new wxBitmap(exportOptionsDlg->getWidth(),
-            //                             exportOptionsDlg->getHeight());
+            // TODO:
+            //bmp = new wxBitmap(exportOptionsDlg->getWidth(),
+            //                   exportOptionsDlg->getHeight());
+            // Instead of:
+            bmp = new wxBitmap(1000, 1000);
+
+            memDC.SelectObject(*bmp);
+            glCanvas->GenerateHiResImageForExport(&memDC);
+            exportImage = bmp->ConvertToImage();
             exportImage.SaveFile(fd->GetFilename());
+            memDC.SelectObject(wxNullBitmap); // bmp has now been destroyed.
         }
     }
 
+    delete exportOptionsDlg;
     delete fd;
 }
 
