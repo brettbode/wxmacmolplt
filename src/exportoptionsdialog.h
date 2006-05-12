@@ -23,6 +23,7 @@
  */
 
 ////@begin includes
+#include "wx/spinctrl.h"
 ////@end includes
 
 /*!
@@ -30,6 +31,7 @@
  */
 
 ////@begin forward declarations
+class wxSpinCtrl;
 ////@end forward declarations
 
 /*!
@@ -47,8 +49,8 @@
 #define ID_SCREEN_RES_RADIOBUTTON 10046
 #define ID_RES_CHOICE 10047
 #define ID_CUSTOM_RES_RADIOBUTTON 10048
-#define ID_RES_WIDTH_TEXT 10049
-#define ID_RES_HEIGHT_TEXT 10050
+#define ID_RESWIDTHSPIN 10051
+#define ID_RESHEIGHTSPIN 10049
 ////@end control identifiers
 
 /*!
@@ -93,11 +95,11 @@ public:
     /// wxEVT_COMMAND_RADIOBUTTON_SELECTED event handler for ID_CUSTOM_RES_RADIOBUTTON
     void OnCustomResRadiobuttonSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_RES_WIDTH_TEXT
-    void OnResWidthTextUpdated( wxCommandEvent& event );
+    /// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_RESWIDTHSPIN
+    void OnReswidthspinUpdated( wxSpinEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_RES_HEIGHT_TEXT
-    void OnResHeightTextUpdated( wxCommandEvent& event );
+    /// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_RESHEIGHTSPIN
+    void OnResheightspinUpdated( wxSpinEvent& event );
 
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
     void OnOkClick( wxCommandEvent& event );
@@ -122,6 +124,8 @@ public:
 private:
     long width;
     long height;
+    long screenWidth;
+    long screenHeight;
     double H2Wratio;
     wxString filetype;
 
@@ -131,8 +135,8 @@ private:
     wxStaticText    *txt1;
     wxStaticText    *txt2;
     wxStaticText    *txt3;
-    wxTextCtrl      *resWidthText;
-    wxTextCtrl      *resHeightText;
+    wxSpinCtrl      *resWidthSpin;
+    wxSpinCtrl      *resHeightSpin;
     wxTextValidator  widthValidator;
     wxTextValidator  heightValidator;
     wxButton        *okButton;
