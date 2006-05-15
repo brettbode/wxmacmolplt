@@ -46,9 +46,7 @@ class wxSpinCtrl;
 #define SYMBOL_EXPORTOPTIONSDIALOG_SIZE wxSize(400, 300)
 #define SYMBOL_EXPORTOPTIONSDIALOG_POSITION wxDefaultPosition
 #define ID_FILE_TYPE_CHOICE 10045
-#define ID_SCREEN_RES_RADIOBUTTON 10046
 #define ID_RES_CHOICE 10047
-#define ID_CUSTOM_RES_RADIOBUTTON 10048
 #define ID_RESWIDTHSPIN 10051
 #define ID_RESHEIGHTSPIN 10049
 ////@end control identifiers
@@ -86,14 +84,8 @@ public:
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_FILE_TYPE_CHOICE
     void OnFileTypeChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_RADIOBUTTON_SELECTED event handler for ID_SCREEN_RES_RADIOBUTTON
-    void OnScreenResRadiobuttonSelected( wxCommandEvent& event );
-
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_RES_CHOICE
     void OnResChoiceSelected( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_RADIOBUTTON_SELECTED event handler for ID_CUSTOM_RES_RADIOBUTTON
-    void OnCustomResRadiobuttonSelected( wxCommandEvent& event );
 
     /// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_RESWIDTHSPIN
     void OnReswidthspinUpdated( wxSpinEvent& event );
@@ -106,10 +98,16 @@ public:
 
 ////@end ExportOptionsDialog event handler declarations
 
-
-    int getWidth() const { return width ; }
-    int getHeight() const { return height ; }
-    wxString getFiletype() const { return filetype ; }
+    int getWidth() const { return width; }
+    int getHeight() const { return height; }
+    wxString getWildcard() const {wxString wildcardStrings[] = {wxT("Windows Bitmap (*.bmp)|*.bmp")
+                                                               wxT("Portable Network Graphics (*.png)|*.png")
+                                                               wxT("JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg")};
+                                  return wildcardStrings[filetype]; }
+    wxString getExtension() const {wxString extensionStrings[] = {wxT("bmp"),
+                                                                  wxT("png"),
+                                                                  wxT("jpeg")};
+                                   return extensionStrings[filetype]; }
 
     /// Retrieves bitmap resources
     wxBitmap GetBitmapResource( const wxString& name );
@@ -127,7 +125,7 @@ private:
     long screenWidth;
     long screenHeight;
     double H2Wratio;
-    wxString filetype;
+    int filetype;
 
     wxChoice        *fileTypeChoice;
     wxChoice        *resChoice;
@@ -137,9 +135,6 @@ private:
     wxStaticText    *txt3;
     wxSpinCtrl      *resWidthSpin;
     wxSpinCtrl      *resHeightSpin;
-    wxTextValidator  widthValidator;
-    wxTextValidator  heightValidator;
-    wxButton        *okButton;
 };
 
 #endif

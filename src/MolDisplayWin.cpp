@@ -376,31 +376,29 @@ void MolDisplayWin::menuFileDeleteFrame(wxCommandEvent &event) {
 
 void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
     ExportOptionsDialog *exportOptionsDlg = new ExportOptionsDialog(this);
-    wxFileDialog *fd = new wxFileDialog(this, wxT("Export"), wxT(""), wxT(""),
-                                        wxT("*"), wxSAVE | wxOVERWRITE_PROMPT);
-
+    wxString   filepath;
     wxMemoryDC memDC;
     wxImage    exportImage;
     wxBitmap  *bmp;
 
     if(exportOptionsDlg->ShowModal() == wxID_OK) {
-        if(fd->ShowModal() == wxID_OK) {
-            // TODO:
-            //bmp = new wxBitmap(exportOptionsDlg->getWidth(),
-            //                   exportOptionsDlg->getHeight());
-            // Instead of:
-            bmp = new wxBitmap(1000, 1000);
-
+        filepath = wxFileSelector(wxT("Export"), wxT(""), wxT(""),
+                                  /*exportOptionsDlg->getExtension(),*/
+                                  wxT(""),
+                                  exportOptionsDlg->getWildcard(),
+                                  wxSAVE | wxOVERWRITE_PROMPT, this);
+        if(!filepath.empty()) {
+            bmp = new wxBitmap(exportOptionsDlg->getWidth(),
+                               exportOptionsDlg->getHeight());
             memDC.SelectObject(*bmp);
             glCanvas->GenerateHiResImageForExport(&memDC);
             exportImage = bmp->ConvertToImage();
-            exportImage.SaveFile(fd->GetFilename());
+            exportImage.SaveFile(filepath);
             memDC.SelectObject(wxNullBitmap); // bmp has now been destroyed.
         }
     }
 
     delete exportOptionsDlg;
-    delete fd;
 }
 
 void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
@@ -411,7 +409,7 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
         //First need to use an open file dialog
         wxString filename = wxFileSelector(wxT("Choose a file to open"));
         //If the user chooses a file, create a window and have it process it.
-        if (filename.length() > 0) {
+        if (!filename.empty()) {
     //      MolDisplayWin * temp = new MolDisplayWin(filename);
     //      MolWinList.push_back(temp);
             //Ok we have a problem. Abort open can't close the last window!
