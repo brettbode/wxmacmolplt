@@ -157,6 +157,7 @@ class WinPrefs {
         unsigned char   AtomLabels[kMaxAtomTypes][3];
         char *          RendererName;
         Boolean         RotateMode, AnimateMode, AutoBondFlag, HHBondFlag, SetCreator;
+		bool			FitToPage, CenterOnPage, FrameOnPage;
         EnergyOptions   EnergyPlotOptions;
         GraphOptions    PlotOptions;
         SurfaceOptions  SurfaceOpts;
@@ -220,7 +221,13 @@ class WinPrefs {
         inline void DetermineBondOrder(Boolean newVal) {BitOptions = (BitOptions & 0xFFFFFDFF) + (newVal?(1<<9):0);};
         inline Boolean Default3DOn(void) const {return ((BitOptions & (1<<10))?true:false); };
         inline void Default3DOn(Boolean newVal) {BitOptions = (BitOptions & 0xFFFFFBFF) + (newVal?(1<<10):0);};
-            //Note the meaning of the Native EOL bit is reversed
+		inline bool GetCenterOnPage(void) const {return CenterOnPage;};
+		inline void SetCenterOnPage(bool v) {CenterOnPage = v;};
+		inline bool GetFitToPage(void) const {return FitToPage;};
+		inline void SetFitToPage(bool v) {FitToPage = v;};
+		inline bool GetFramePage(void) const {return FrameOnPage;};
+		inline void SetFramePage(bool v) {FrameOnPage = v;};
+		//Note the meaning of the Native EOL bit is reversed
         inline bool NativeEOLChar(void) const {return ((BitOptions & (1<<11))?false:true); };
         inline void NativeEOLChar(bool newVal) {BitOptions = (BitOptions & 0xFFFFF7FF) + (newVal?0:(1<<11));};
             //Set to indicate a custom thumbnail should be created when saving

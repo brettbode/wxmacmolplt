@@ -158,10 +158,11 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     glCanvas = new MpGLCanvas(this, 11002, wxPoint(0,0), wxSize(height-sheight,width));
     glCanvas->setPrefs(Prefs);
     
-    textBar = new wxStaticText(this, 11003, wxString("foo"), wxDefaultPosition, wxDefaultSize,
+    textBar = new wxStaticText(this, 11003, wxString(""), wxDefaultPosition, wxDefaultSize,
                            wxALIGN_LEFT | wxST_NO_AUTORESIZE);
 
     SizeChanged();
+    frameScrollBar->SetScrollbar(1, 1, 1, 1);
     Show(true);
     AdjustMenus();
 }
@@ -668,33 +669,41 @@ bool MolPrintOut::OnBeginDocument(int startPage, int endPage) {
         return false;
     return true;
 }
-#include <iostream>
 bool MolPrintOut::OnPrintPage(int page) {
     if (page != 1) return false;
     wxDC * dc = GetDC();
     if (dc) {
         int h, w;
         wxSize dcp = dc->GetPPI();
-        std::cout << "dc ppi w = "<<dcp.GetWidth()<<" and h= " << dcp.GetHeight()<< std::endl;
         GetPPIPrinter(&w, &h);
-        std::cout << "ppi w = "<<w<<" and h= " << h<< std::endl;
         int sh, sw;
         GetPPIScreen(&sw, &sh);
-        std::cout << "screen ppi w = "<<sw<<" and h= " << sh<< std::endl;
         float scale = (float)w/ (float)sw;
-        std::cout << "scale factor = "<<scale<< std::endl;
-		dc->SetUserScale(1.0, 1.0);
-		dc->SetDeviceOrigin(0, 0);
         Parent->PrintGL(dc, scale);
         return true;
     }
     return false;
 }
-void MolDisplayWin::PrintGL(wxDC * dc, const float & scaleFactor) {
+void MolDisplayWin::PrintGL(wxDC * dc, const float & sFactor) {
+	float scaleFactor = sFactor;
 	BeginOperation();
 	ProgressInd->ChangeText("Generating Hi-res image");
 	Prefs->CylindersForLines(true);
-	glCanvas->GenerateHiResImage(dc, scaleFactor, ProgressInd, false, true);
+	if (Prefs->GetFitToPage()) {
+		int screenWidth, screenHeight;
+		glCanvas->GetSize(&screenWidth, &screenHeight);
+		float wRatio = ((float) screenWidth)/((float) screenHeight);
+		int pageWidth, pageHeight;
+        dc->GetSize(&pageWidth, &pageHeight);
+		float pRatio = ((float) pageWidth)/((float) pageHeight);
+		if (wRatio >= pRatio) {	//base scaleup on page width
+			scaleFactor = ((float) pageWidth)/((float) screenWidth);
+		} else {	//base scaleup on page height
+			scaleFactor = ((float) pageHeight)/((float) screenHeight);
+		}
+	}
+	glCanvas->GenerateHiResImage(dc, scaleFactor, ProgressInd, Prefs->GetCenterOnPage(),
+								 Prefs->GetFramePage());
 	Prefs->CylindersForLines(false);
 	FinishOperation();
 }

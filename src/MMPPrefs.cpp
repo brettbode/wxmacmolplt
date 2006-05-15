@@ -177,6 +177,8 @@ WinPrefs::WinPrefs(void) {
 	RendererName = NULL;
 	BitOptions = 0;
 	BackColor.red = BackColor.green = BackColor.blue = 65532;
+	FitToPage = FrameOnPage = false;
+	CenterOnPage = true;
 }
 WinPrefs::~WinPrefs(void) {
 	if (RendererName) delete [] RendererName;
