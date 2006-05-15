@@ -486,6 +486,7 @@ void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
             Dirty = false;
             delete buffer;
         }
+        fclose(currFile);
     }
     else {
         menuFileSave_as(event);
@@ -539,6 +540,7 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
             Dirty = false;
             delete buffer;
         }
+        fclose(currFile);
     }
 }
 
