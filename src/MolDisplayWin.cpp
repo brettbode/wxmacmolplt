@@ -588,6 +588,8 @@ bool MolPrintOut::OnPrintPage(int page) {
         std::cout << "screen ppi w = "<<sw<<" and h= " << sh<< std::endl;
         float scale = (float)w/ (float)sw;
         std::cout << "scale factor = "<<scale<< std::endl;
+		dc->SetUserScale(1.0, 1.0);
+		dc->SetDeviceOrigin(0, 0);
         Parent->PrintGL(dc, scale);
         return true;
     }

@@ -202,6 +202,7 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor, Progre
 	if (frame) {
 		wxPen lpen = dc->GetPen();
 		lpen.SetWidth((int)ScaleFactor);
+		dc->SetBrush(*wxTRANSPARENT_BRUSH);
 		dc->SetPen(lpen);
 		dc->DrawRectangle(hOffset, vOffset, ScaledWidth, ScaledHeight);
 	}
