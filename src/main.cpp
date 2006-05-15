@@ -204,7 +204,7 @@ void MpApp::menuFileOpen(wxCommandEvent &event) {
 	//First need to use an open file dialog
 	wxString filename = wxFileSelector(wxT("Choose a file to open"));
 	//If the user chooses a file, create a window and have it process it.
-	if (filename.length() > 0) {
+	if (!filename.empty()) {
         createMainFrame(filename);
         // TODO:  Remove the commented code below once Brett is OK with it.
         /*

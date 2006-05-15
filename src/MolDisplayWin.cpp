@@ -387,7 +387,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
                                   wxT(""),
                                   exportOptionsDlg->getWildcard(),
                                   wxSAVE | wxOVERWRITE_PROMPT, this);
-        if(!filepath.empty()) {
+        if(!filepath.IsEmpty()) {
             bmp = new wxBitmap(exportOptionsDlg->getWidth(),
                                exportOptionsDlg->getHeight());
             memDC.SelectObject(*bmp);
@@ -409,7 +409,7 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
         //First need to use an open file dialog
         wxString filename = wxFileSelector(wxT("Choose a file to open"));
         //If the user chooses a file, create a window and have it process it.
-        if (!filename.empty()) {
+        if (!filename.IsEmpty()) {
     //      MolDisplayWin * temp = new MolDisplayWin(filename);
     //      MolWinList.push_back(temp);
             //Ok we have a problem. Abort open can't close the last window!
@@ -444,9 +444,102 @@ void MolDisplayWin::menuFileAddFramesFromFile(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
+    if(!currFilePath.IsEmpty()) {
+        FILE *currFile = NULL;
+        BufferFile *buffer = NULL;
+
+        if((currFile = fopen(currFilePath.mb_str(wxConvUTF8), "w")) == NULL) {
+            MessageAlert("Unable to access the file.");
+            return;
+        }
+        try {
+            buffer = new BufferFile(currFile, true);
+        }
+        //catch (std::bad_alloc) {//Out of memory error
+            //if (!append)
+                //AbortOpen("Not enough memory to open the file. Aborted!");
+        //}
+        catch (MemoryError) {
+            MessageAlert("Not enough memory to open the file for writing.");
+        }
+        //catch (UserCancel) {
+            //if (!append)
+                //AbortOpen("File open canceled by user");
+        //}
+    //  catch (DataError Error) {//Error parsing the file data
+    //      if (!Error.ErrorSet())  Window->AbortOpen(21);
+    //      else {
+    //          Error.WriteError();
+    //          delete Window; Window = NULL;
+    //      }
+    //  }
+        //Some kind of File system related error
+        //catch (FileError Error) { Error.WriteError();
+            //if (!append) AbortOpen(NULL);}
+        //catch (...) { 
+            //if (!append)
+                //AbortOpen("Unknown error reading the selected file. File open aborted.");
+        //}
+
+        if(buffer) {
+            MainData->WriteCMLFile(buffer, Prefs, NULL, true, true);
+            Dirty = false;
+            delete buffer;
+        }
+    }
+    else {
+        menuFileSave_as(event);
+    }
 }
 
 void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
+    FILE *currFile = NULL;
+    BufferFile *buffer = NULL;
+    wxString filePath;
+
+    filePath = wxFileSelector(wxT("Save As"), wxT(""), wxT(""), wxT(""),
+                              wxT("CML Files (*.cml)"),
+                              wxSAVE | wxOVERWRITE_PROMPT, this);
+
+    if(!filePath.IsEmpty()) {
+        if((currFile = fopen(filePath.mb_str(wxConvUTF8), "w")) == NULL) {
+            MessageAlert("Unable to access the file.");
+            return;
+        }
+        try {
+            buffer = new BufferFile(currFile, true);
+        }
+        //catch (std::bad_alloc) {//Out of memory error
+            //if (!append)
+                //AbortOpen("Not enough memory to open the file. Aborted!");
+        //}
+        catch (MemoryError) {
+            MessageAlert("Not enough memory to open the file for writing.");
+        }
+        //catch (UserCancel) {
+            //if (!append)
+                //AbortOpen("File open canceled by user");
+        //}
+    //  catch (DataError Error) {//Error parsing the file data
+    //      if (!Error.ErrorSet())  Window->AbortOpen(21);
+    //      else {
+    //          Error.WriteError();
+    //          delete Window; Window = NULL;
+    //      }
+    //  }
+        //Some kind of File system related error
+        //catch (FileError Error) { Error.WriteError();
+        //if (!append) AbortOpen(NULL);}
+        //catch (...) { 
+            //if (!append)
+                //AbortOpen("Unknown error reading the selected file. File open aborted.");
+        //}
+        if(buffer) {
+            MainData->WriteCMLFile(buffer, Prefs, NULL, true, true);
+            Dirty = false;
+            delete buffer;
+        }
+    }
 }
 
 void MolDisplayWin::menuFileClose(wxCommandEvent &event) {
@@ -527,7 +620,7 @@ void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
 												&printDialogData);
 	if (!preview->Ok()) {//failure to create the print preview
 		delete preview;
-		//could throw up an error dialog
+		// TODO:  throw up an error dialog
 		return;
 	}
 	wxPreviewFrame * frame = new wxPreviewFrame(preview, this, _T("wxMacMolPlt print preview"),
@@ -1189,6 +1282,7 @@ void MolDisplayWin::AbortOpen(const char * msg) {
 long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool append) {
     //This is modeled on OpenTextFile in the Mac version
     long                test=0;
+    TextFileType type;
     
     FILE * myfile = fopen(fileName.mb_str(wxConvUTF8), "r");
     if (myfile == NULL) {
@@ -1206,7 +1300,7 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
         if (flip) flipval = -1;
         
         // Attempt to identify the file type by looking for key words
-        TextFileType type = Buffer->GetFileType((const char *) fileName.mb_str(wxConvUTF8));
+        type = Buffer->GetFileType((const char *) fileName.mb_str(wxConvUTF8));
         BeginOperation();
         switch (type) {
             case kMolType:
@@ -1299,6 +1393,14 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
         //Tell the window its data has changed so that it will be redrawn correctly
 //      if (!Window->IsSavedFile()) 
         ResetModel(true);
+
+        // Set the path for saving changes
+        if(type == CMLFile) {
+            currFilePath = fileName;
+        }
+        else {
+            currFilePath = wxT("");
+        }
     }
     return test;
 }
