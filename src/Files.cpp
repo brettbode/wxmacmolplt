@@ -3231,8 +3231,10 @@ long LocateKeyWord(const char *Buffer, const char * KeyWord, long length, long b
 {	long	test=0, pos=-1;
 
 	while (!test) {
-		for (pos++; ((Buffer[pos] != KeyWord[0])||(Buffer[pos+1] != KeyWord[1]))&&(pos<bytecount); pos++) ;
+		for (pos++; ((Buffer[pos] != KeyWord[0])||(Buffer[pos+1] != KeyWord[1]))&&(pos<bytecount)&&
+			 (Buffer[pos]!='\0'); pos++) ;
 		if (pos>=bytecount) return -1;
+		if (Buffer[pos]=='\0') return -1;
 		test = 2;
 		while ((Buffer[pos+test] == KeyWord[test])&&(test<length)) test++;
 		test = (long) test==length;
