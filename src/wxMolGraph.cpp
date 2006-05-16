@@ -10,6 +10,9 @@ wxMolGraph::wxMolGraph(wxWindow* parent, wxWindowID id) : wxControl(parent, id) 
 }
 
 int wxMolGraph::addXSet(vector<double> data, bool selectable) {
+    int index = data.size();
+
+    //data.push_back();
 }
 
 int wxMolGraph::addYSet(vector<pair<int,double>> data,
