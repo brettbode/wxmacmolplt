@@ -24,6 +24,7 @@
 #include "setbondlength.h"
 #include "appendframesoptions.h"
 #include "exportoptionsdialog.h"
+#include "printoptions.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
 #include <wx/image.h>
@@ -64,6 +65,7 @@ enum MMP_EventID {
     MMP_STATUSBAR,
     MMP_FRAMESCROLLBAR,
     MMP_EXPORT,
+	MMP_PRINTOPTIONS,
     
     Number_MMP_Ids
 };
@@ -81,6 +83,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_DELETEFRAME,      MolDisplayWin::menuFileDeleteFrame)
     EVT_MENU (MMP_EXPORT,           MolDisplayWin::menuFileExport)
     EVT_MENU (wxID_PRINT_SETUP,     MolDisplayWin::menuFilePage_setup)
+	EVT_MENU (MMP_PRINTOPTIONS,     MolDisplayWin::menuFilePrintOptions)
     EVT_MENU (wxID_PREVIEW,         MolDisplayWin::menuFilePrint_preview)
     EVT_MENU (wxID_PRINT,           MolDisplayWin::menuFilePrint)
 
@@ -236,6 +239,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuFile->Append(MMP_EXPORT, wxT("Export"));
     menuFile->AppendSeparator();
     menuFile->Append(wxID_PRINT_SETUP, wxT("Page Set&up ..."));
+    menuFile->Append(MMP_PRINTOPTIONS, wxT("Print Options ..."));
     menuFile->Append(wxID_PREVIEW, wxT("Print Pre&view\tCtrl+Shift+P"));
     menuFile->Append(wxID_PRINT, wxT("&Print ...\tCtrl+P"));
     menuFile->AppendSeparator();
@@ -557,14 +561,22 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
         //Note the message should be slightly different if we can't abort the close
         int style = wxYES_NO | wxICON_QUESTION;
         if (canVeto) style = style | wxCANCEL;
+		wxString fileText = wxT("The file ");
+		fileText += GetTitle();
+		fileText += wxT(" has unsaved changes.");
         int r = wxMessageBox(wxT("Do you wish to save the current data and customizations before closing?"),
-                             wxT("The file **filename here** has unsaved changes."),
-                             style, this);
+                             fileText, style, this);
         if (r == wxCANCEL) {
             event.Veto(true);
             return;
         } else if (r == wxYES) {
             //process the save
+			wxCommandEvent temp;
+			menuFileSave(temp);
+			if (Dirty) {//Dirty should be false if the save was successful
+				event.Veto(true);
+				return;
+			}
         }
     }
     MpApp & app = wxGetApp();
@@ -610,6 +622,14 @@ void MolDisplayWin::menuFilePage_setup(wxCommandEvent &event) {
         delete tempPageSetupData;
         delete tempPrintData;
     }
+}
+
+void MolDisplayWin::menuFilePrintOptions(wxCommandEvent &event) {
+	//throw up a mini dialog to handle some app specific printing options
+	PrintOptions * po = new PrintOptions(this);
+	po->ShowModal();
+    po->Destroy();
+    Dirty = true;
 }
 
 void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
