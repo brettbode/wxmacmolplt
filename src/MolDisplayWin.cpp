@@ -1436,13 +1436,18 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
     return test;
 }
 long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWindows) {
-    if (ProgressInd) ProgressInd->ChangeText("Reading CML fileÉ");
+	bool localprogress=false;
+	if (!ProgressInd) {
+		localprogress = true;
+		BeginOperation();
+	}
+    ProgressInd->ChangeText("Reading CML fileÉ");
     long test = 0;
     if (readWindows)
-        test = MainData->OpenCMLFile(Buffer, Prefs, NULL, readPrefs);
+        test = MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, readPrefs);
 //      test = MainData->OpenCMLFile(Buffer, Prefs, &winData, readPrefs);
     else
-        test = MainData->OpenCMLFile(Buffer, Prefs, NULL, readPrefs);
+        test = MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, readPrefs);
 /*  if (test == 0) AbortOpen(0);
     else {
         SetFileType(2);
@@ -1457,6 +1462,7 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
         ResetModel(false);
     }
             */
+	if (localprogress) FinishOperation();
     return test;
 }
 

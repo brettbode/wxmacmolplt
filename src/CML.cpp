@@ -682,7 +682,7 @@ void GradientData::WriteXML(XMLElement * parent) {
 
 /* Parse a CML1 or CML2 file */
 long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData,
-							   bool readPrefs) {
+							   Progress * ProgressInd, bool readPrefs) {
 	short errors = 0;
 	long result = 0;
 	long targetFrameNum = 1;
@@ -713,6 +713,11 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 							XMLElement * child = children->item(i);
 							CML_Element elName;
 							CML_convert(child->getName(), elName);
+					//		ProgressInd->ChangeText("Reading Basis information");
+							if (!ProgressInd->UpdateProgress((100*i)/children->length())) { 
+								delete xDoc;
+								throw UserCancel();
+							}
 							switch (elName) {
 								case MoleculeElement:
 									if (!firstFrame) {	//Add new frame
@@ -881,6 +886,9 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 		}
 		delete xDoc;
 	}
+    catch (UserCancel) {
+		errors++;
+    }
 	catch (...) {
 		if (xDoc != NULL) delete xDoc;
 		MessageAlert("XML Exception");

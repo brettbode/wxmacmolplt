@@ -277,21 +277,6 @@ void macMenuWinPlaceholder::createMenuBar(void) {
 
     menuFile->Append(wxID_NEW, wxT("&New\tCtrl+N"));
     menuFile->Append(wxID_OPEN, wxT("&Open ...\tCtrl+O"));
-  //  menuFile->Append(wxID_SAVE, wxT("&Save\tCtrl+S"));
-  //  menuFile->Append(wxID_SAVEAS, wxT("Save &as ...\tCtrl+Shift+S"));
-  //  menuFile->Append(wxID_CLOSE, wxT("&Close\tCtrl+W"));
-  //  menuFile->AppendSeparator();
-    //menuFile->Append(, wxT("Append New Frame"));
-    //menuFile->Append(, wxT("Add Frames from File ..."));
-    //menuFile->Append(, wxT("Delete Frame"));
-    //menuFile->AppendSeparator();
-    //menuFile->Append(, wxT("Import"));
-    //menuFile->Append(, wxT("Export"));
-    menuFile->AppendSeparator();
-    menuFile->Append(wxID_PRINT_SETUP, wxT("Page Set&up ..."));
- //   menuFile->Append(wxID_PREVIEW, wxT("Print Pre&view\tCtrl+Shift+P"));
- //   menuFile->Append(wxID_PRINT, wxT("&Print ...\tCtrl+P"));
-    // TODO:  Make Mac display Quit menu item in the correct place
     menuFile->AppendSeparator();
     menuFile->Append(wxID_EXIT, wxT("&Quit\tCtrl+Q"));
     

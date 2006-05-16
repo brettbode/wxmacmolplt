@@ -66,7 +66,7 @@ class MoleculeData {
 		void ReadBasisOptions(BufferFile * Buffer);
 		void ReadControlOptions(BufferFile * Buffer);
 		long WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData, bool allFrames, bool AllData);
-		long OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData, bool readPrefs);
+		long OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData, Progress * p, bool readPrefs);
 		inline float GetMoleculeSize(void) {return WindowSize;};
 		inline void SetMoleculeSize(float newVal) {if (newVal > 0.0) WindowSize = newVal;};
 		void GetModelCenter(CPoint3D * center);
