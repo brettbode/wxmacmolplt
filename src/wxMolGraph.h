@@ -1,5 +1,7 @@
 #include <wx.h>
 
+#ifndef _WX_MOL_GRAPH_H_
+#define _WX_MOL_GRAPH_H_
 
 #define MG_AXIS_X  0
 #define MG_AXIS_Y1 1
@@ -18,15 +20,33 @@
  * A custom widget designed for graphing various types of data associated
  * with molecules in wxMacMolPlt.
  */
-class wxMolGraph {
+class wxMolGraph : public wxControl {
   private:
+ /* x-sets x-set       x-val  y-sets y-set       x-index y-val */
+    vector<vector<pair<double,vector<vector<pair<int,    double>>>>>> data;
+
     /* TODO */
+
+    DECLARE_DYNAMIC_CLASS(wxMolGraph) /* NOTE:  Everything after this will be
+                                       * public!
+                                       */
 
   public:
     /**
-     * Default constructor to initialize a blank wxMolGraph.
+     * Default constructor.  This is here to keep wxWidgets RTTI happy.  You
+     * shouldn't actually use it.  This may change in the future.
      */
-    wxMolGraph();
+    wxMolGraph() {}
+
+    
+    /**
+     * Constructor for general use.
+     *
+     * @param parent The parent window of the new wxMolGraph.
+     * @param id The window ID of the new wxMolGraph.
+     */
+    wxMolGraph(wxWindow* parent, wxWindowID id);
+    /* TODO:  Write better doxygen comments for this function. */
 
 
     /**
@@ -190,9 +210,16 @@ class wxMolGraph {
     void setOffsetY(int axis, double offset);
 
 
+    void onPaint(wxPaintEvent &event);
+
+
     /* EVENTS:
      *  AXIS_CLICKED (event contains axis id)
      *  GRAPH_CLICKED (call getSelection and update other controls if needed)
      */
+
+    DECLARE_EVENT_TABLE();
 };
+
+#endif /* _WX_MOL_GRAPH_H_ */
 
