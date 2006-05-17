@@ -3,13 +3,14 @@
 IMPLEMENT_DYNAMIC_CLASS(wxMolGraph, wxControl)
 
 BEGIN_EVENT_TABLE(wxMolGraph, wxControl)
-    EVT_SIZE        (wxMolGraph::onSize)
-    EVT_PAINT       (wxMolGraph::onPaint)
+    EVT_SIZE         (wxMolGraph::onSize)
+    EVT_PAINT        (wxMolGraph::onPaint)
 
-    EVT_LEFT_DOWN   (wxMolGraph::onLeftClick)
-    EVT_LEFT_UP     (wxMolGraph::onLeftClick)
-    EVT_LEFT_DCLICK (wxMolGraph::onLeftDblClick)
-    EVT_MOTION      (wxMolGraph::onMotion)
+    EVT_LEFT_DOWN    (wxMolGraph::onLeftClick)
+    EVT_LEFT_UP      (wxMolGraph::onLeftClick)
+    EVT_LEFT_DCLICK  (wxMolGraph::onLeftDblClick)
+    EVT_MOTION       (wxMolGraph::onMotion)
+    EVT_LEAVE_WINDOW (wxMolGraph::onLeaveWindow)
 END_EVENT_TABLE()
 
 const wxEventType wxEVT_AXIS_DCLICK = wxNewEventType();
@@ -17,7 +18,12 @@ const wxEventType wxEVT_GRAPH_CLICK = wxNewEventType();
 
 const int BORDER = 2;
 
-wxMolGraph::wxMolGraph(wxWindow* parent, wxWindowID id) : wxControl(parent, id) {
+wxMolGraph::wxMolGraph(wxWindow       *parent,
+                       wxWindowID      id,
+                       const wxPoint  &pos,
+                       const wxSize   &size,
+                       long            style) :
+            wxControl(parent, id, pos, size, style) {
     /* TEMPORARY: */
     xAxisText = wxT("X-Axis");
     y1AxisText = wxT("Y1-Axis");
@@ -114,12 +120,8 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
     dc.SetBackground(*wxWHITE_BRUSH);
     dc.SetFont(*wxSWISS_FONT);
-    dc.SetTextBackground(*wxWHITE);
-    dc.SetTextBackground(*wxWHITE);
-    dc.SetBackgroundMode(wxSOLID);
 
     dc.Clear();
-    dc.DrawRectangle(x, y, canvasWidth, canvasHeight);
 
     dc.GetTextExtent(xAxisText, &xAxisTextWidth, &xAxisTextHeight);
     x = (canvasWidth / 2) - (xAxisTextWidth / 2);
@@ -176,5 +178,8 @@ void wxMolGraph::onLeftDblClick(wxMouseEvent &event) {
 }
 
 void wxMolGraph::onMotion(wxMouseEvent &event) {
+}
+
+void wxMolGraph::onLeaveWindow(wxMouseEvent &event) {
 }
 

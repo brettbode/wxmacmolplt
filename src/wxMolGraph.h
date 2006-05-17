@@ -50,7 +50,7 @@ class wxMolGraph : public wxControl {
   public:
     /**
      * Default constructor.  This is here to keep wxWidgets RTTI happy.  You
-     * shouldn't actually use it.  This may change in the future.
+     * shouldn't actually use it.
      */
     wxMolGraph() {}
 
@@ -61,8 +61,12 @@ class wxMolGraph : public wxControl {
      * @param parent The parent window of the new wxMolGraph.
      * @param id The window ID of the new wxMolGraph.
      */
-    wxMolGraph(wxWindow* parent, wxWindowID id);
-    /* TODO:  Write better doxygen comments for this function. */
+    wxMolGraph(wxWindow       *parent,
+               wxWindowID      id,
+               const wxPoint  &pos   = wxDefaultPosition,
+               const wxSize   &size  = wxDefaultSize,
+               long            style = wxSUNKEN_BORDER);
+    /* TODO:  Write complete doxygen comments for this function. */
 
 
     /**
@@ -256,6 +260,7 @@ class wxMolGraph : public wxControl {
     void onLeftClick(wxMouseEvent &event);
     void onLeftDblClick(wxMouseEvent &event);
     void onMotion(wxMouseEvent &event);
+    void onLeaveWindow(wxMouseEvent &event);
 
 
     DECLARE_EVENT_TABLE();
