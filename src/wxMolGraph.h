@@ -34,6 +34,13 @@ class wxMolGraph : public wxControl {
     /*               x-set  x-val    sel?   y-sets y-set       xi  y-val */
     vector<pair<pair<vector<double>, bool>, vector<vector<pair<int,double> > > > > data;
 
+    wxString xAxisText;
+    wxString y1AxisText;
+    wxString y2AxisText;
+
+    int numY1Graphs;
+    int numY2Graphs;
+
     /* TODO */
 
     DECLARE_DYNAMIC_CLASS(wxMolGraph) /* NOTE:  Everything after this will be
@@ -233,18 +240,23 @@ class wxMolGraph : public wxControl {
     void reset();
 
 
+    /**
+     * Overloaded wxControl member function that handles sizing of the control.
+     *
+     * @return The size the control wants to be.
+     */
+    wxSize DoGetBestSize() const;
+
+
     /* EVENT HANDLERS */
 
+    void onSize(wxSizeEvent &event);
     void onPaint(wxPaintEvent &event);
 
     void onLeftClick(wxMouseEvent &event);
     void onLeftDblClick(wxMouseEvent &event);
+    void onMotion(wxMouseEvent &event);
 
-
-    /* CUSTOM EVENTS:
-     *  EVT_AXIS_DCLICK (wxCommandEvent -- event.GetInt() returns axis id)
-     *  EVT_GRAPH_CLICK (call getSelection and update other controls if needed)
-     */
 
     DECLARE_EVENT_TABLE();
 };
