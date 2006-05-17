@@ -1,4 +1,8 @@
-#include <wx.h>
+#include "wx/wx.h"
+#include <vector>
+#include <utility>
+
+using namespace std;
 
 #ifndef _WX_MOL_GRAPH_H_
 #define _WX_MOL_GRAPH_H_
@@ -15,6 +19,11 @@
 
 #define MG_STYLE_POINT_LINE 0x03
 
+extern const wxEventType wxEVT_AXIS_DCLICK;
+extern const wxEventType wxEVT_GRAPH_CLICK;
+
+#define EVT_AXIS_DCLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_AXIS_DCLICK, id, -1, (wxObjectEventFunction)(wxEventFunction)(wxNotifyEventFunction)&fn, (wxObject *) NULL )
+#define EVT_GRAPH_CLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_GRAPH_CLICK, id, -1, (wxObjectEventFunction)(wxEventFunction)(wxNotifyEventFunction)&fn, (wxObject *) NULL )
 
 /**
  * A custom widget designed for graphing various types of data associated
@@ -22,8 +31,8 @@
  */
 class wxMolGraph : public wxControl {
   private:
- /* x-sets x-set       x-val  y-sets y-set       x-index y-val */
-    vector<vector<pair<double,vector<vector<pair<int,    double>>>>>> data;
+    /*               x-set  x-val    sel?   y-sets y-set       xi  y-val */
+    vector<pair<pair<vector<double>, bool>, vector<vector<pair<int,double> > > > > data;
 
     /* TODO */
 
@@ -47,6 +56,12 @@ class wxMolGraph : public wxControl {
      */
     wxMolGraph(wxWindow* parent, wxWindowID id);
     /* TODO:  Write better doxygen comments for this function. */
+
+
+    /**
+     * Destructor.  TODO:  Write something interesting for doxygen.
+     */
+    ~wxMolGraph() {}
 
 
     /**
@@ -102,7 +117,7 @@ class wxMolGraph : public wxControl {
      *         y-set associated with a given x-set having and index of zero.
      *         On failure this function returns a value less than zero.
      */
-    int addYSet(vector<pair<int,double>> data,
+    int addYSet(vector<pair<int,double> > data,
                 int xSet,
                 int axis,
                 int style,
@@ -210,12 +225,25 @@ class wxMolGraph : public wxControl {
     void setOffsetY(int axis, double offset);
 
 
+    /**
+     * Resets the wxMolGraph to its initial state.  Axis information, such as
+     * min/max and offset, is reset, all sets are removed, and
+     * the indices of newly added sets will restart at zero.
+     */
+    void reset();
+
+
+    /* EVENT HANDLERS */
+
     void onPaint(wxPaintEvent &event);
 
+    void onLeftClick(wxMouseEvent &event);
+    void onLeftDblClick(wxMouseEvent &event);
 
-    /* EVENTS:
-     *  AXIS_CLICKED (event contains axis id)
-     *  GRAPH_CLICKED (call getSelection and update other controls if needed)
+
+    /* CUSTOM EVENTS:
+     *  EVT_AXIS_DCLICK (wxCommandEvent -- event.GetInt() returns axis id)
+     *  EVT_GRAPH_CLICK (call getSelection and update other controls if needed)
      */
 
     DECLARE_EVENT_TABLE();
