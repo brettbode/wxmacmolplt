@@ -178,67 +178,37 @@ VibRec::VibRec(void) {
 	init();
 }
 VibRec::~VibRec(void) {
-	if (Frequencies) delete [] Frequencies;
-	if (NormMode) delete [] NormMode;
-	if (Intensities) delete [] Intensities;
-	if (ReducedMass) delete [] ReducedMass;
-	if (RamanIntensity) delete [] RamanIntensity;
-	if (Depolarization) delete [] Depolarization;
 }
 void VibRec::init(void) {
-	NormMode = NULL;
-	Frequencies = NULL;
-	Intensities = NULL;
-	ReducedMass = NULL;
-	RamanIntensity = NULL;
-	Depolarization = NULL;
 	NumModes = 0;
 	CurrentMode = 0;
-	FreqLength = 0;
 }
 void VibRec::Setup(const long & NumVibs, const long & NumAtoms) {
 	if (NumVibs>0) {
-		NormMode = new CPoint3D[NumAtoms*NumVibs];
-		Intensities = new float[NumVibs];
-		Frequencies = new char[NumVibs*20];
-		FreqLength = NumVibs*20;
-		if (!NormMode || !Frequencies || !Intensities)
-			throw MemoryError();
+		NormMode.reserve(NumAtoms*NumVibs);
+		Intensities.reserve(NumVibs);
+		Frequencies.reserve(NumVibs);
 		if (NumVibs == 1)	//Read in the single mode string
-			strcpy(Frequencies, "\11single mode");
+			Frequencies.push_back(std::string("single mode"));
 	//		GetIndString((unsigned char *)Frequencies, kIStringID, 1);
 		//init the intensities all to 1
-		for (long i=0; i<NumVibs; i++) Intensities[i]=1.0;
+		for (long i=0; i<NumVibs; i++) Intensities.push_back(1.0);
+		CPoint3D temp;
+		temp.x = temp.y = temp.z = 0.0;
 		for (long i=0; i<(NumAtoms*NumVibs); i++) {
-			NormMode[i].x = 0.0;
-			NormMode[i].y = 0.0;
-			NormMode[i].z = 0.0;
+			NormMode.push_back(temp);
 		}
 		NumModes = NumVibs;
 	}
 }
-bool VibRec::Resize(long NumAtoms, long Length) {	//reduce the allocation to the current # of modes
+bool VibRec::Resize(long NumAtoms) {	//reduce the allocation to the current # of modes
+	NormMode.resize(NumModes*NumAtoms);
 	CPoint3D * temp = new CPoint3D[NumModes*NumAtoms];
-	if (temp) {
-		memcpy(temp, NormMode, NumModes*NumAtoms*sizeof(CPoint3D));
-		delete [] NormMode;
-		NormMode = temp;
-		char * tempfreq = new char[Length];
-		if (tempfreq) {
-			memcpy(tempfreq, Frequencies, Length*sizeof(char));
-			delete [] Frequencies;
-			Frequencies = tempfreq;
-			FreqLength = Length;
-		}
-		float * tempi = new float[NumModes];
-		if (tempi) {
-			memcpy(tempi, Intensities, NumModes*sizeof(float));
-			delete [] Intensities;
-			Intensities = tempi;
-		}
-	} else return false;
+	Frequencies.resize(NumModes);
+	Intensities.resize(NumModes);
 	return true;
 }
+#ifndef __wxBuild__
 long VibRec::GetSize(BufferFile * Buffer, long NumAtoms) {
 	Boolean	cState = Buffer->GetOutput();
 	Buffer->SetOutput(false);
@@ -391,27 +361,23 @@ void VibRec::ReadCode47(BufferFile * Buffer, long NumAtoms, long length) {
 	if (NumModes <= 0)
 		NumModes = tModes;
 }
+#endif
 float VibRec::GetIntensity(long Mode) const {
 	float result = 1.0;	//default to 1.0
-	if (Intensities) result = Intensities[Mode];
+	if ((Mode>=0)&&(Mode<Intensities.size())) result = Intensities[Mode];
 	return result;
 }
 float VibRec::GetRamanIntensity(long Mode) const {
 	float result = 0.0;
-	if (RamanIntensity) result = RamanIntensity[Mode];
+	if ((Mode>=0)&&(Mode<RamanIntensity.size())) result = RamanIntensity[Mode];
 	return result;
 }
 float VibRec::GetFrequency(long Mode) const {
 	float result = 0.0;
-	if (Frequencies && (Mode >= 0) && (Mode < NumModes)) {
-		long FreqPos = 0;
-		for (long i=0; i<Mode; i++)
-			FreqPos += 1 + Frequencies[FreqPos];
-		char token[kMaxLineLength];
-		strncpy(token, (char *) &(Frequencies[FreqPos+1]), Frequencies[FreqPos]);
-		token[Frequencies[FreqPos]] = 0;
-		sscanf(token, "%f", &result);
-		if (token[Frequencies[FreqPos]-1] == 'i' || token[Frequencies[FreqPos]-1] == 'I')
+	if ((Mode >= 0) && (Mode < Frequencies.size())) {
+		sscanf(Frequencies[Mode].c_str(), "%f", &result);
+		if (((Frequencies[Mode])[Frequencies[Mode].length()-1] == 'i') ||
+			((Frequencies[Mode])[Frequencies[Mode].length()-1] == 'I'))
 			result *= -1.0;
 	}
 	return result;

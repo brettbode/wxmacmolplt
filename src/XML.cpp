@@ -811,6 +811,24 @@ long XMLElement::getFloatArray(const long & count, float * array) const {
 	}
 	return readsofar;
 }
+long XMLElement::getFloatArray(const long & count, std::vector<float> & array) const {
+	long readsofar=0;
+	if (value!=NULL) {
+		long pos=0;
+		int nchar;
+		float temp;
+		for (; readsofar<count; readsofar++) {
+			int itemCount = sscanf(&(value[pos]), "%f%n",
+								   &temp, &nchar);
+			pos += nchar;
+			if (itemCount != 1) {	//Just break and return what we have read in so far
+				break;
+			}
+			array.push_back(temp);
+		}
+	}
+	return readsofar;
+}
 long XMLElement::getLongArray(const long & count, long * array) const {
 	long readsofar=0;
 	if ((array != NULL)&&(value!=NULL)) {

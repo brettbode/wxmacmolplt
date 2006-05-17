@@ -122,7 +122,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_COORDSWINDOW, MolDisplayWin::menuWindowCoordinates)
 
     EVT_SIZE( MolDisplayWin::eventSize )
-    EVT_CHAR (MolDisplayWin::KeyHandler)
+    EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
     EVT_COMMAND_SCROLL(MMP_FRAMESCROLLBAR, MolDisplayWin::OnScrollBarChange )
 END_EVENT_TABLE()
 
@@ -1160,16 +1160,13 @@ void MolDisplayWin::UpdateFrameText(void) {
     // Add a little information
     wxString output;
     Boolean WriteEnergy=true;
-    //if (MainData->cFrame->Vibs) {
-    //  if (MainData->GetDrawMode()) {
-    //      DrawText("Freq=", 0, 5);
-    //      WriteEnergy = false;
-    //      long FreqPos=0;
-    //      for (long ii=1; ii<=(MainData->cFrame->Vibs->CurrentMode); ii++)
-    //          FreqPos += (int) MainData->cFrame->Vibs->Frequencies[FreqPos] + 1;
-    //      DrawString((unsigned char *) &(MainData->cFrame->Vibs->Frequencies[FreqPos]));
-    //  }
-    //}
+    if (MainData->cFrame->Vibs) {
+      if (MainData->GetDrawMode()) {
+		  wxString temp;
+		  output.Printf("Freq=%s", MainData->cFrame->Vibs->Frequencies[MainData->cFrame->Vibs->CurrentMode].c_str());
+          WriteEnergy = false;
+      }
+    }
     if (WriteEnergy) {
         double  Energy = 0.0;
         EnergyOptions * lEOpts = Prefs->GetEnergyOptions();

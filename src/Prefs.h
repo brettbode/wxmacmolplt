@@ -16,8 +16,6 @@
 #ifndef __Prefs__
 #define __Prefs__
 
-#warning it might be necessary to include Globals.h here
-
 class SurfaceOptions {
     private:
         long            NumContours;        // Max. # of contours (+ or -) in 2D map

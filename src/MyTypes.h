@@ -24,6 +24,8 @@ Added OpenGL version of Draw3D to Surface 6/2001 BMB
 #include <Quesa.h>
 #endif
 #endif
+#include <vector>
+#include <string>
 /* General Use Types independant of my data structures */
 #define kMaxAtomTypes		130
 #define kMaxBondTypes		4
@@ -131,27 +133,28 @@ class VibRec {
 	private:
 		void init(void);
 	public:
-		char *			Frequencies;		// packed array of Pascal strings
-		CPoint3D *		NormMode;			// Array of normal modes
-		float *			Intensities;		// Infrared intensity of each mode
-		float *			ReducedMass;		// Reduced Mass for each mode
-		float *			RamanIntensity;		// Raman spectrum
-		float *			Depolarization;		// depolarization
-		long			NumModes;			// number of modes here
-		long			CurrentMode;		// Currently Drawn mode
-		long			FreqLength;			// size of the Frequency array
+		std::vector<std::string>	Frequencies;	// array of strings
+		std::vector<CPoint3D>		NormMode;		// Array of normal modes
+		std::vector<float>			Intensities;	// Infrared intensity of each mode
+		std::vector<float>			ReducedMass;	// Reduced Mass for each mode
+		std::vector<float>			RamanIntensity;	// Raman spectrum
+		std::vector<float>			Depolarization;	// depolarization
+		long						NumModes;		// number of modes here
+		long						CurrentMode;	// Currently Drawn mode
 
 		VibRec(const long & NumVibs, const long & NumAtoms);
 		VibRec(void);
 		~VibRec(void);
 		void Setup(const long & NumVibs, const long & NumAtoms);
-		bool Resize(long NumAtoms, long FreqLength);
+		bool Resize(long NumAtoms);
+#ifndef __wxBuild__
 		static VibRec * ReadOldVibRec45(BufferFile * Buffer);
 		void ReadCode46(BufferFile * Buffer, long length);
 		void ReadCode47(BufferFile * Buffer, long NumAtoms, long length);
 		static VibRec * Read(BufferFile * Buffer, long NumAtoms);
 		long GetSize(BufferFile *Buffer, long NumAtoms);
 		long Write(BufferFile *Buffer, long NumAtoms);
+#endif
 		void WriteXML(XMLElement * parent, long NumAtoms) const;
 		void ReadXML(XMLElement * parent, const long & NumAtoms);
 		inline long GetNumModes(void) const {return NumModes;};

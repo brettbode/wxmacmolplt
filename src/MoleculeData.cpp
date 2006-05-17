@@ -276,7 +276,8 @@ void MoleculeData::StickCoordinates(void) {
 	}
 		// rotate any frequencies
 	if (cFrame->Vibs) {
-		CPoint3D *	Modes = cFrame->Vibs->NormMode, NMode;
+		std::vector<CPoint3D> & Modes = cFrame->Vibs->NormMode;
+		CPoint3D NMode;
 		for (long imode=0; imode < cFrame->Vibs->NumModes; imode++) {
 			long cmode = imode*cFrame->NumAtoms;
 			for (long iatom=0; iatom<cFrame->NumAtoms; iatom++) {

@@ -152,7 +152,7 @@ BufferFile::BufferFile(FILE * TargetFileRef, bool Write)
 #endif
 		if (ByteCount <= 0) throw DataError(24);
 //Allocate the Buffer
-		BufferSize = min(kBufferSize, ByteCount);
+		BufferSize = MIN(kBufferSize, ByteCount);
 		BlockLengths[0] = ByteCount;
 	}
 	if (BufferSize <= 0) throw MemoryError("Invalid buffer size!");
@@ -335,7 +335,7 @@ void BufferFile::AdvanceBuffer(void) {
 	if (!FilePtr) throw FileError(0);
 #endif
 	if (IOType == 1) {	//Write mode
-		long BytesToWrite = min(BufferSize, BufferPos);
+		long BytesToWrite = MIN(BufferSize, BufferPos);
 		if (BytesToWrite > 0) {
 #ifdef UseMacIO
 			SetFPos(FileRefNum, fsFromStart, BufferStart);
@@ -350,7 +350,7 @@ void BufferFile::AdvanceBuffer(void) {
 			BufferPos = 0;
 		}
 	} else {	//Read mode
-		long BytesToRead = min(BufferSize, (ByteCount-(BufferStart+BufferPos)));
+		long BytesToRead = MIN(BufferSize, (ByteCount-(BufferStart+BufferPos)));
 		if (BytesToRead >= 0) {
 #ifdef UseMacIO
 			SetFPos(FileRefNum, fsFromStart, (BufferStart+BufferPos));
@@ -372,7 +372,7 @@ long BufferFile::Read(Ptr Target, long NumBytes) {
 	if ((NumBytes+BufferStart+BufferPos)>BlockLengths[0]) throw DataError();
 	while (BytesRead<NumBytes) {
 		if (BufferPos>=BufferSize) AdvanceBuffer();
-		BlockSize = min((NumBytes-BytesRead), (BufferSize-BufferPos));
+		BlockSize = MIN((NumBytes-BytesRead), (BufferSize-BufferPos));
 #ifdef UseHandles
 		BlockMoveData(&((*Buffer)[BufferPos]), &(Target[BytesRead]), BlockSize);
 #else
@@ -428,7 +428,7 @@ long BufferFile::PutText(const char * Text)	//This requires a NULL terminated st
 void BufferFile::BackupnLines(long nBack) {
 	for (long nBacked=0; nBacked<=nBack; nBacked++) {
 		if ((BufferStart+BufferPos)<=0) break;	//Beginning of file reached
-		if (BufferPos == 0) { BufferStart = max(0, (BufferStart-BufferSize)); AdvanceBuffer();}
+		if (BufferPos == 0) { BufferStart = MAX(0, (BufferStart-BufferSize)); AdvanceBuffer();}
 #ifdef UseHandles
 		while (((*Buffer)[BufferPos] != 13)&&((*Buffer)[BufferPos] != 10)) {
 #else
@@ -437,7 +437,7 @@ void BufferFile::BackupnLines(long nBack) {
 			BufferPos --;
 			if ((BufferStart+BufferPos)==0) break;	//Beginning of file reached
 			if (BufferPos == 0) {	//Back up one buffer block
-				BufferStart = max(0, (BufferStart-BufferSize));
+				BufferStart = MAX(0, (BufferStart-BufferSize));
 				AdvanceBuffer();
 				BufferPos = BufferSize;	//Set pos to end of buffer
 			}
@@ -560,7 +560,7 @@ long BufferFile::Write(const char * Source, long NumBytes) {
 
 		while (BytesWritten<NumBytes) {
 			if (BufferPos>=BufferSize) AdvanceBuffer();
-			BlockSize = min((NumBytes-BytesWritten), (BufferSize-BufferPos));
+			BlockSize = MIN((NumBytes-BytesWritten), (BufferSize-BufferPos));
 #ifdef UseHandles
 			BlockMoveData(&(Source[BytesWritten]), &((*Buffer)[BufferPos]), BlockSize);
 #else

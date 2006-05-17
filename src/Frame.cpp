@@ -439,8 +439,7 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 	long OldBondAllocation = BondAllocation;
 	Bonds = new Bond[maxbonds];
 	if (Bonds == NULL) {
-        // TODO:  Replace this with something that works on non-Mac platforms
-		//MessageAlertByID(kerrstrings, 17);
+		MessageAlert("Insufficient Memory for Set Bond\nLength operation. Old Bonds left untouched.");
 		Bonds = OldBonds;
 		return;
 	}
@@ -499,10 +498,7 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 						continue;	//bonds are not allowed between SIMOMM and ab intio atoms
 					if (! AddBond(iatm, jatm, lOrder)) {
 							Str255	Errmsg;
-                        // TODO:  Replace this with something that works on
-                        //        non-Mac platforms
-						//GetIndString(Errmsg, kerrstrings, 17);
-						//MessageAlert(Errmsg);
+						MessageAlert("Insufficient Memory for Set Bond\nLength operation. Old Bonds left untouched.");
 						delete [] Bonds;
 						Bonds = OldBonds;
 						NumBonds = NumOldBonds;
@@ -570,9 +566,7 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 							if (newBond) {
 								if (! AddBond(iatm, jatm, lOrder)) {
 										Str255	Errmsg;
-                                    // TODO:  Make not Mac-only
-									//GetIndString(Errmsg, kerrstrings, 17);
-									//MessageAlert(Errmsg);
+									MessageAlert("Insufficient Memory for Set Bond\nLength operation. Old Bonds left untouched.");
 									delete [] Bonds;
 									Bonds = OldBonds;
 									NumBonds = NumOldBonds;
@@ -591,8 +585,6 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 		Bond * temp = new Bond[NumBonds+5];
 		maxbonds = NumBonds+5;
 		if (temp) {
-            // BlockMoveData is Mac only.
-			//BlockMoveData(Bonds, temp, NumBonds*sizeof(Bond));
             memcpy(temp, Bonds, NumBonds*sizeof(Bond));
 			delete [] Bonds;
 			Bonds = temp;
@@ -1437,13 +1429,13 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 	//		if (!lVibs) {
 	//			break;
 	//		}
-			long	imode=0, FreqPos=0, ifreq, LastPass=0, test, cmode;
+			long	imode=0, ifreq, LastPass=0, test, cmode;
 			int		nchar;
 			char	LineText[kMaxLineLength], token[kMaxLineLength];
 			while (imode<NumModes) {
 				if (!Buffer->LocateKeyWord("FREQUENCY:", 10)) break;
-		//		long NumVibs = min(9, NumModes-imode);
-				long NumVibs = ((9) > (NumModes-imode)) ? (NumModes-imode) : (9);
+				long NumVibs = MIN(9, NumModes-imode);
+		//		long NumVibs = ((9) > (NumModes-imode)) ? (NumModes-imode) : (9);
 				Buffer->GetLine(LineText);
 				long LinePos = 11;
 				long LineLength = strlen(LineText);
@@ -1458,9 +1450,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 								test++;
 								token[test]=0;
 							}
-							lVibs->Frequencies[FreqPos] = test; FreqPos++;
-							strcpy((char *) &(lVibs->Frequencies[FreqPos]), token);
-							FreqPos += test;
+							lVibs->Frequencies.push_back(std::string(token));
 							LinePos+=2;
 						} else NumVibs = icol;
 					} else NumVibs = icol;
@@ -1469,26 +1459,24 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 				if (Buffer->LocateKeyWord("REDUCED MASS:", 13, Buffer->GetFilePos()+132)) {
 					Buffer->GetLine(LineText);
 					LinePos = 14;
-					if ((imode == NumVibs)&&(lVibs->ReducedMass == NULL)) {
-						lVibs->ReducedMass = new float[NumModes];
+					if ((imode == NumVibs)&&(lVibs->ReducedMass.empty())) {
+						lVibs->ReducedMass.reserve(NumModes);
 					}
-					if (lVibs->ReducedMass != NULL) {
-						LineLength = strlen(LineText);
-						long	tVib = NumVibs;
-						float	rmass;
-						for (long icol=0; icol<tVib; icol++) {
-							if (LinePos<LineLength) {
-								test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
-								LinePos += nchar;
-								if (test) {
-									if (token[0] != '*') {
-										test = sscanf(token, "%f", &rmass);
-										if (test)
-											lVibs->ReducedMass[icol+LastPass] = rmass;
-									} else lVibs->ReducedMass[icol+LastPass] = 10000.0;
-								} else tVib = icol;
+					LineLength = strlen(LineText);
+					long	tVib = NumVibs;
+					float	rmass;
+					for (long icol=0; icol<tVib; icol++) {
+						if (LinePos<LineLength) {
+							test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
+							LinePos += nchar;
+							if (test) {
+								if (token[0] != '*') {
+									test = sscanf(token, "%f", &rmass);
+									if (test)
+										lVibs->ReducedMass.push_back(rmass);
+								} else lVibs->ReducedMass.push_back(10000.0);
 							} else tVib = icol;
-						}
+						} else tVib = icol;
 					}
 				}
 				if (Buffer->LocateKeyWord("INTENSITY:", 10, Buffer->GetFilePos()+132)) {
@@ -1514,51 +1502,47 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 				if (Buffer->LocateKeyWord("RAMAN INTENSITY:", 16, Buffer->GetFilePos()+132)) {
 					Buffer->GetLine(LineText);
 					LinePos = 17;
-					if ((imode == NumVibs)&&(lVibs->RamanIntensity == NULL)) {
-						lVibs->RamanIntensity = new float[NumModes];
+					if ((imode == NumVibs)&&(lVibs->RamanIntensity.empty())) {
+						lVibs->RamanIntensity.reserve(NumModes);
 					}
-					if (lVibs->RamanIntensity != NULL) {
-						LineLength = strlen(LineText);
-						long	tVib = NumVibs;
-						float	raman;
-						for (long icol=0; icol<tVib; icol++) {
-							if (LinePos<LineLength) {
-								test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
-								LinePos += nchar;
-								if (test) {
-									if (token[0] != '*') {
-										test = sscanf(token, "%f", &raman);
-										if (test)
-											lVibs->RamanIntensity[icol+LastPass] = raman;
-									} else lVibs->RamanIntensity[icol+LastPass] = 10000.0;
-								} else tVib = icol;
+					LineLength = strlen(LineText);
+					long	tVib = NumVibs;
+					float	raman;
+					for (long icol=0; icol<tVib; icol++) {
+						if (LinePos<LineLength) {
+							test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
+							LinePos += nchar;
+							if (test) {
+								if (token[0] != '*') {
+									test = sscanf(token, "%f", &raman);
+									if (test)
+										lVibs->RamanIntensity.push_back(raman);
+								} else lVibs->RamanIntensity.push_back(10000.0);
 							} else tVib = icol;
-						}
+						} else tVib = icol;
 					}
 				}
 				if (Buffer->LocateKeyWord("DEPOLARIZATION:", 15, Buffer->GetFilePos()+132)) {
 					Buffer->GetLine(LineText);
 					LinePos = 16;
-					if ((imode == NumVibs)&&(lVibs->Depolarization == NULL)) {
-						lVibs->Depolarization = new float[NumModes];
+					if ((imode == NumVibs)&&(lVibs->Depolarization.empty())) {
+						lVibs->Depolarization.reserve(NumModes);
 					}
-					if (lVibs->Depolarization != NULL) {
-						LineLength = strlen(LineText);
-						long	tVib = NumVibs;
-						float	depol;
-						for (long icol=0; icol<tVib; icol++) {
-							if (LinePos<LineLength) {
-								test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
-								LinePos += nchar;
-								if (test) {
-									if (token[0] != '*') {
-										test = sscanf(token, "%f", &depol);
-										if (test)
-											lVibs->Depolarization[icol+LastPass] = depol;
-									} else lVibs->Depolarization[icol+LastPass] = 10000.0;
-								} else tVib = icol;
+					LineLength = strlen(LineText);
+					long	tVib = NumVibs;
+					float	depol;
+					for (long icol=0; icol<tVib; icol++) {
+						if (LinePos<LineLength) {
+							test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
+							LinePos += nchar;
+							if (test) {
+								if (token[0] != '*') {
+									test = sscanf(token, "%f", &depol);
+									if (test)
+										lVibs->Depolarization.push_back(depol);
+								} else lVibs->Depolarization.push_back(10000.0);
 							} else tVib = icol;
-						}
+						} else tVib = icol;
 					}
 				}
 				test = Buffer->FindBlankLine();
@@ -1615,8 +1599,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 	}	//trap errors here and delete the VibRec
 	catch (std::bad_alloc) {//Memory error, cleanup and return.
 		if (Vibs) { delete Vibs; Vibs = NULL; }
-        // TODO:  Replace this with non-Mac code
-		//MessageAlertByID(kerrstrings, 41);
+		MessageAlert("Insufficient memory to read normal modes. Normal Modes will be skipped!");
 	}
 	catch (UserCancel) {//We need to rethrow this one since the whole operation should be aborted
 		if (Vibs) { delete Vibs; Vibs = NULL; }
@@ -1624,8 +1607,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 	}
 	catch (...) {//File and data errors. Either way delete the vectors and return.
 		if (Vibs) { delete Vibs; Vibs = NULL; }
-        // TODO:  Replace this with non-Mac code
-		//MessageAlertByID(kerrstrings, 42);
+		MessageAlert("Error parsing normal modes. Normal modes will be skipped.");
 	}
 }
 

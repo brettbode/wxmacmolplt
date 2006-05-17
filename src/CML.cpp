@@ -518,14 +518,9 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 	Ele->addAttribute(CML_convert(titleAttr), CML_convert(MMP_CurrentMode));
 	//Build a space separated string of the vibrational frequencies
 	std::ostringstream fbuf;
-	for (int i=0; i<FreqLength; i++) {
-		int fl = Frequencies[i];
+	for (int i=0; i<Frequencies.size(); i++) {
 		if (i>0) fbuf << "|";
-		i++;
-		for (int j=0; j<fl; j++) {
-			fbuf << Frequencies[i];
-			i++;
-		}
+		fbuf << Frequencies[i];
 	}
 	XMLElement * freqXML = vibElem->addChildElement(CML_convert(ArrayElement),
 												 fbuf.str().c_str());
@@ -550,7 +545,7 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 	snprintf(line, kMaxLineLength, "%d", (NumModes*NumAtoms));
 	modes->addAttribute(CML_convert(rowsAttr), line);
 	
-	if (Intensities) {
+	if (!Intensities.empty()) {
 		std::ostringstream freqbuf;
 		char line[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
@@ -564,7 +559,7 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 		snprintf(line, kMaxLineLength, "%d", NumModes);
 		modes->addAttribute(CML_convert(sizeAttr), line);
 	}
-	if (ReducedMass) {
+	if (!ReducedMass.empty()) {
 		std::ostringstream freqbuf;
 		char line[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
@@ -578,7 +573,7 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 		snprintf(line, kMaxLineLength, "%d", NumModes);
 		modes->addAttribute(CML_convert(sizeAttr), line);
 	}
-	if (RamanIntensity) {
+	if (!RamanIntensity.empty()) {
 		std::ostringstream freqbuf;
 		char line[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
@@ -592,7 +587,7 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 		snprintf(line, kMaxLineLength, "%d", NumModes);
 		modes->addAttribute(CML_convert(sizeAttr), line);
 	}
-	if (Depolarization) {
+	if (!Depolarization.empty()) {
 		std::ostringstream freqbuf;
 		char line[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
@@ -1726,20 +1721,22 @@ void VibRec::ReadXML(XMLElement * vibs, const long & NumAtoms) {
 											if (cols == 3) {	//should always be exactly 3 cols
 												if (child->getAttributeValue(CML_convert(rowsAttr), rows)) {
 													if (rows > 0) {
-														NormMode = new CPoint3D[rows];
-														NumModes = rows/NumAtoms;
-														int pos = 0, nchar;
-														const char * value = child->getValue();
-														for (int j=0; j<rows; j++) {
-															int count = sscanf(&(value[pos]), "%f %f %f%n",
-																			   &(NormMode[j].x),
-																			   &(NormMode[j].y),
-																			   &(NormMode[j].z), &nchar);
-															pos += nchar;
-															if (count != 3) {
-																delete [] NormMode;
-																NormMode = NULL;
-																break;
+														if (NumModes == (rows/NumAtoms)) {
+															NormMode.reserve(rows);
+															int pos = 0, nchar;
+															const char * value = child->getValue();
+															CPoint3D temp;
+															for (int j=0; j<rows; j++) {
+																int count = sscanf(&(value[pos]), "%f %f %f%n",
+																				   &(temp.x),
+																				   &(temp.y),
+																				   &(temp.z), &nchar);
+																NormMode.push_back(temp);
+																pos += nchar;
+																if (count != 3) {
+																	NormMode.resize(0);
+																	break;
+																}
 															}
 														}
 													}
@@ -1756,18 +1753,22 @@ void VibRec::ReadXML(XMLElement * vibs, const long & NumAtoms) {
 											const char * v = child->getValue();
 											if (v) {
 												long len = strlen(v);
-												if (!Frequencies) {
-													Frequencies = new char[len+2];
-													int vsize=0, vstart=0;
+												if (Frequencies.empty()) {
+													Frequencies.reserve(NumModes);
+													int mode=0;
+													std::ostringstream buf;
 													for (int j=0; j<len; j++) {
 														if (v[j] != '|') {
-															Frequencies[j+1] = v[j];
-															vsize++;
+															buf << v[j];
 														} else {
-															Frequencies[vstart] = vsize;
-															vsize =0;
-															vstart = j+1;
+															Frequencies.push_back(buf.str());
+															mode ++;
+															buf.str("");
 														}
+													}
+													if (!buf.str().empty()) {
+														Frequencies.push_back(buf.str());
+														mode ++;
 													}
 												}
 											}
@@ -1779,12 +1780,11 @@ void VibRec::ReadXML(XMLElement * vibs, const long & NumAtoms) {
 											if (child->getAttributeValue(CML_convert(sizeAttr), temp)) {
 												//failing the next test indicates a corrupt record.
 												if (temp !=NumModes) continue;
-												if (!Intensities) {
-													Intensities = new float[NumModes];
+												if (Intensities.empty()) {
+													Intensities.reserve(NumModes);
 													temp = child->getFloatArray(NumModes, Intensities);
 													if (temp != NumModes) {
-														delete [] Intensities;
-														Intensities = NULL;
+														Intensities.resize(0);
 													}
 												}
 											}
@@ -1796,12 +1796,11 @@ void VibRec::ReadXML(XMLElement * vibs, const long & NumAtoms) {
 											if (child->getAttributeValue(CML_convert(sizeAttr), temp)) {
 												//failing the next test indicates a corrupt record.
 												if (temp !=NumModes) continue;
-												if (!ReducedMass) {
-													ReducedMass = new float[NumModes];
+												if (ReducedMass.empty()) {
+													ReducedMass.reserve(NumModes);
 													temp = child->getFloatArray(NumModes, ReducedMass);
 													if (temp != NumModes) {
-														delete [] ReducedMass;
-														ReducedMass = NULL;
+														ReducedMass.resize(0);
 													}
 												}
 											}
@@ -1813,12 +1812,11 @@ void VibRec::ReadXML(XMLElement * vibs, const long & NumAtoms) {
 											if (child->getAttributeValue(CML_convert(sizeAttr), temp)) {
 												//failing the next test indicates a corrupt record.
 												if (temp !=NumModes) continue;
-												if (!RamanIntensity) {
-													RamanIntensity = new float[NumModes];
+												if (RamanIntensity.empty()) {
+													RamanIntensity.reserve(NumModes);
 													temp = child->getFloatArray(NumModes, RamanIntensity);
 													if (temp != NumModes) {
-														delete [] RamanIntensity;
-														RamanIntensity = NULL;
+														RamanIntensity.resize(0);
 													}
 												}
 											}
@@ -1830,12 +1828,11 @@ void VibRec::ReadXML(XMLElement * vibs, const long & NumAtoms) {
 											if (child->getAttributeValue(CML_convert(sizeAttr), temp)) {
 													//failing the next test indicates a corrupt record.
 												if (temp !=NumModes) continue;
-												if (!Depolarization) {
-													Depolarization = new float[NumModes];
+												if (Depolarization.empty()) {
+													Depolarization.reserve(NumModes);
 													temp = child->getFloatArray(NumModes, Depolarization);
 													if (temp != NumModes) {
-														delete [] Depolarization;
-														Depolarization = NULL;
+														Depolarization.resize(0);
 													}
 												}
 											}

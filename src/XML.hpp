@@ -155,6 +155,7 @@ class XMLElement {
 		bool getDoubleValue(double & x) const;
 		bool getLongValue(long & i) const;
 		long getFloatArray(const long & count, float * array) const;
+		long getFloatArray(const long & count, std::vector<float> & array) const;
 		long getLongArray(const long & count, long * array) const;
 		const char * getAttributeValue(const char * name) const;
 		bool getAttributeValue(const char * name, long & newvalue) const;

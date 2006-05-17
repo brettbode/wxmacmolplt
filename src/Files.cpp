@@ -1031,7 +1031,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 		}
 		lVibs->NumModes = ii;
 		if (lVibs->NumModes < 3*lFrame->NumAtoms)	/* Downsize the frequency storage to the size actually used */
-			lVibs->Resize(lFrame->NumAtoms, nkinds);
+			lVibs->Resize(lFrame->NumAtoms);
 	}
 	if (lFrame->Vibs) {
 		lFrame->Vibs->CurrentMode = Mode - 1;
