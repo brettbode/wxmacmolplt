@@ -38,8 +38,20 @@ class wxMolGraph : public wxControl {
     wxString y1AxisText;
     wxString y2AxisText;
 
+    double xMax;
+    double xMin;
+    double y1Max;
+    double y1Min;
+    double y2Max;
+    double y2Min;
+
     int numY1Graphs;
     int numY2Graphs;
+
+    wxRegion xAxisRegion;
+    wxRegion y1AxisRegion;
+    wxRegion y2AxisRegion;
+    wxRegion graphRegion;
 
     /* TODO */
 
@@ -60,13 +72,16 @@ class wxMolGraph : public wxControl {
      *
      * @param parent The parent window of the new wxMolGraph.
      * @param id The window ID of the new wxMolGraph.
+     * @param pos The initial position of the new wxMolGraph.
+     * @param size The initial size of the new wxMolGraph.
+     * @param style The initial style of the new wxMolGraph.
      */
     wxMolGraph(wxWindow       *parent,
                wxWindowID      id,
                const wxPoint  &pos   = wxDefaultPosition,
                const wxSize   &size  = wxDefaultSize,
                long            style = wxSUNKEN_BORDER);
-    /* TODO:  Write complete doxygen comments for this function. */
+    /* TODO:  Write more useful doxygen comments for this function. */
 
 
     /**
