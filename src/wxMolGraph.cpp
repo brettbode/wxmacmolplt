@@ -97,8 +97,97 @@ void wxMolGraph::reset() {
 wxSize wxMolGraph::DoGetBestSize() const {
     wxASSERT_MSG( m_widget, wxT("wxMolGraph::DoGetBestSize called before creation") );
 
-    wxCoord w = 400;
-    wxCoord h = 400;
+    wxClientDC dc(const_cast<wxMolGraph*> (this));
+    wxString  xMaxText;
+    wxString  xMinText;
+    wxString  y1MaxText;
+    wxString  y1MinText;
+    wxString  y2MaxText;
+    wxString  y2MinText;
+    wxCoord w = 0;
+    wxCoord h = 0;
+    wxSize x(0, 0);
+    wxSize xAxisTextSize(0, 0);
+    wxSize xMaxTextSize(0, 0);
+    wxSize xMinTextSize(0, 0);
+    wxSize y1(0, 0);
+    wxSize y1AxisTextSize(0, 0);
+    wxSize y1MaxTextSize(0, 0);
+    wxSize y1MinTextSize(0, 0);
+    wxSize y2(0, 0);
+    wxSize y2AxisTextSize(0, 0);
+    wxSize y2MaxTextSize(0, 0);
+    wxSize y2MinTextSize(0, 0);
+
+
+    dc.SetPen(*wxBLACK_PEN);
+    dc.SetBrush(*wxTRANSPARENT_BRUSH);
+    dc.SetBackground(*wxWHITE_BRUSH);
+    dc.SetFont(*wxSWISS_FONT);
+
+    xMaxText = wxString::Format("%0.4f", xMax);
+    xMinText = wxString::Format("%0.4f", xMin);
+    dc.GetTextExtent(xAxisText, &w, &h);
+    xAxisTextSize.Set(w, h);
+    dc.GetTextExtent(xMaxText, &w, &h);
+    xMaxTextSize.Set(w, h);
+    dc.GetTextExtent(xMinText, &w, &h);
+    xMinTextSize.Set(w, h);
+
+    y1MaxText = wxString::Format("%0.4f", y1Max);
+    y1MinText = wxString::Format("%0.4f", y1Min);
+    dc.GetTextExtent(y1AxisText, &w, &h);
+    y1AxisTextSize.Set(w, h);
+    dc.GetTextExtent(y1MaxText, &w, &h);
+    y1MaxTextSize.Set(w, h);
+    dc.GetTextExtent(y1MinText, &w, &h);
+    y1MinTextSize.Set(w, h);
+
+    y2MaxText = wxString::Format("%0.4f", y2Max);
+    y2MinText = wxString::Format("%0.4f", y2Min);
+    dc.GetTextExtent(y2AxisText, &w, &h);
+    y2AxisTextSize.Set(w, h);
+    dc.GetTextExtent(y2MaxText, &w, &h);
+    y2MaxTextSize.Set(w, h);
+    dc.GetTextExtent(y2MinText, &w, &h);
+    y2MinTextSize.Set(w, h);
+
+
+    x.SetWidth(xMinTextSize.GetHeight() +
+               xAxisTextSize.GetWidth() +
+               xMaxTextSize.GetHeight());
+    x.SetHeight(wxMax(xMinTextSize.GetWidth(), xMaxTextSize.GetWidth()) +
+                xAxisTextSize.GetHeight());
+
+    if(numY1Graphs > 0 || numY2Graphs == 0) {
+        y1.SetWidth(wxMax(y1MinTextSize.GetWidth(), y1MaxTextSize.GetWidth()) +
+                    y1AxisTextSize.GetHeight());
+        y1.SetHeight(y1MinTextSize.GetHeight() +
+                     y1AxisTextSize.GetWidth() +
+                     y1MaxTextSize.GetHeight());
+    }
+    else {
+        y1.Set(0, 0);
+    }
+
+    if(numY2Graphs > 0) {
+        y2.SetWidth(wxMax(y2MinTextSize.GetWidth(), y2MaxTextSize.GetWidth()) +
+                    y2AxisTextSize.GetHeight());
+        y2.SetHeight(y2MinTextSize.GetHeight() +
+                     y2AxisTextSize.GetWidth() +
+                     y2MaxTextSize.GetHeight());
+    }
+    else {
+        y2.Set(0, 0);
+    }
+
+    w = (2 * BORDER) +
+        y1.GetWidth() +
+        wxMax(x.GetWidth(), 300) +
+        y2.GetWidth();
+    h = (2 * BORDER) +
+        wxMax(wxMax(y1.GetHeight(), y2.GetHeight()), 200) +
+        x.GetHeight();
 
     return wxSize( w, h );
 }
@@ -115,13 +204,17 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     wxString  y1MinText;
     wxString  y2MaxText;
     wxString  y2MinText;
-    wxCoord   x  = 0;
-    wxCoord   x2 = 0;
-    wxCoord   x3 = 0;
-    wxCoord   x4 = 0;
-    wxCoord   y  = 0;
-    wxCoord   y2 = 0;
-    wxCoord   y3 = 0;
+    wxCoord   x          = 0;
+    wxCoord   x2         = 0;
+    wxCoord   x3         = 0;
+    wxCoord   x4         = 0;
+    wxCoord   y          = 0;
+    wxCoord   y2         = 0;
+    wxCoord   y3         = 0;
+    wxCoord   lineX      = 0;
+    wxCoord   lineY      = 0;
+    wxCoord   scaleMin   = 0;
+    wxCoord   scaleMax   = 0;
     wxSize    canvasSize(0, 0);
     wxSize    xAxisTextSize(0, 0);
     wxSize    xMaxTextSize(0, 0);
@@ -132,6 +225,11 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     wxSize    y2AxisTextSize(0, 0);
     wxSize    y2MaxTextSize(0, 0);
     wxSize    y2MinTextSize(0, 0);
+    double    conversion = 0;
+    double    spacing    = 0;
+    double    firstTick  = 0;
+    int       numTicks   = 0;
+    int       i          = 0;
 
     GetClientSize(&x, &y);
     canvasSize.Set(x, y);
@@ -173,20 +271,32 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
 
     
     // Calculate axis and graph regions.
-    x2 = y1AxisTextSize.GetHeight() + BORDER +
-         wxMax(y1MaxTextSize.GetWidth(), y1MinTextSize.GetWidth());
-    x3 = canvasSize.GetWidth() -
-         (y2AxisTextSize.GetHeight() + BORDER +
-          wxMax(y2MaxTextSize.GetWidth(), y2MinTextSize.GetWidth()));
-    x4 = canvasSize.GetWidth() - BORDER;
     y2 = canvasSize.GetHeight() -
          (xAxisTextSize.GetHeight() + BORDER +
           wxMax(xMaxTextSize.GetWidth(), xMinTextSize.GetWidth()));
     y3 = canvasSize.GetHeight() - BORDER;
+    if(numY1Graphs > 0 || numY2Graphs == 0) {
+        x2 = y1AxisTextSize.GetHeight() + BORDER +
+             wxMax(y1MaxTextSize.GetWidth(), y1MinTextSize.GetWidth());
+        y1AxisRegion = wxRegion(BORDER, BORDER, x2, y2);
+    }
+    else {
+        x2 = BORDER;
+        y1AxisRegion.Clear();
+    }
+    x4 = canvasSize.GetWidth() - BORDER;
+    if(numY2Graphs > 0) {
+        x3 = canvasSize.GetWidth() -
+             (y2AxisTextSize.GetHeight() + BORDER +
+              wxMax(y2MaxTextSize.GetWidth(), y2MinTextSize.GetWidth()));
+        y2AxisRegion = wxRegion(x3, BORDER, (x4 - x3), y2);
+    }
+    else {
+        x3 = x4;
+        y2AxisRegion.Clear();
+    }
 
     xAxisRegion = wxRegion(x2, y2, (x3 - x2), (y3 - y2));
-    y1AxisRegion = wxRegion(BORDER, BORDER, x2, y2);
-    y2AxisRegion = wxRegion(x3, BORDER, (x4 - x3), y2);
     graphRegion = wxRegion(x2, BORDER, (x3 - x2), y2);
 
 
@@ -200,6 +310,26 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     x = x3 - xMaxTextSize.GetHeight();
     y = y2 + xMaxTextSize.GetWidth();
     dc.DrawRotatedText(xMaxText, x, y, 90.0);
+    x = x2 + 3;
+    y = y2 - (dc.GetCharHeight() / 2);
+    lineX = x3 - 2;
+    dc.DrawLine(x, y, lineX, y);
+    // Tick marks:
+    scaleMin = x2 + (dc.GetCharHeight() / 2);
+    scaleMax = x3 - (dc.GetCharHeight() / 2);
+    numTicks = (scaleMax - scaleMin) / 60;
+    spacing = (xMax - xMin) / (double)numTicks;
+    // TODO:  Round spacing
+    conversion = (double)(scaleMax - scaleMin) / (xMax - xMin);
+    y = y2 - 3;
+    lineY = y2 - (dc.GetCharHeight() / 2);
+    // TODO:  Find first tick
+    firstTick = xMin;
+    for(i = 0; i * spacing + firstTick < xMax; i++) {
+        x = (int)(((double)i * spacing + firstTick) * conversion) + scaleMin;
+        dc.DrawLine(x, y, x, lineY);
+    }
+
 
     // Y1 Axis
     if(numY1Graphs > 0 || numY2Graphs == 0) {
@@ -212,6 +342,27 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
         x = x2 - y1MinTextSize.GetWidth();
         y = y2 - y1MinTextSize.GetHeight();
         dc.DrawText(y1MinText, x, y);
+        x = x2 + (dc.GetCharHeight() / 2);
+        y = y2 - 3;
+        lineY = BORDER + (dc.GetCharHeight() / 2);
+        dc.DrawLine(x, y, x, lineY);
+        lineX = x2 + 3;
+        dc.DrawLine(lineX, lineY, x + 1, lineY);
+        // Tick marks:
+        scaleMin = y2 - (dc.GetCharHeight() / 2);
+        scaleMax = BORDER + (dc.GetCharHeight() / 2);
+        numTicks = (scaleMin - scaleMax) / 60;
+        spacing = (y1Max - y1Min) / (double)numTicks;
+        // TODO:  Round spacing
+        conversion = (double)(scaleMin - scaleMax) / (y1Max - y1Min);
+        x = x2 + 3;
+        lineX = x2 + (dc.GetCharHeight() / 2);
+        // TODO:  Find first tick
+        firstTick = y1Min;
+        for(i = 0; i * spacing + firstTick < y1Max; i++) {
+            y = scaleMin - (int)(((double)i * spacing + firstTick) * conversion);
+            dc.DrawLine(x, y, lineX, y);
+        }
     }
 
     // Y2 Axis
@@ -225,6 +376,27 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
         x = x3;
         y = y2 - y2MinTextSize.GetHeight();
         dc.DrawText(y2MinText, x, y);
+        x = x3 - (dc.GetCharHeight() / 2);
+        y = y2 - 3;
+        lineY = BORDER + (dc.GetCharHeight() / 2);
+        dc.DrawLine(x, y, x, lineY);
+        lineX = x3 - 2;
+        dc.DrawLine(x, lineY, lineX, lineY);
+        // Tick marks:
+        scaleMin = y2 - (dc.GetCharHeight() / 2);
+        scaleMax = BORDER + (dc.GetCharHeight() / 2);
+        numTicks = (scaleMin - scaleMax) / 60;
+        spacing = (y2Max - y2Min) / (double)numTicks;
+        // TODO:  Round spacing
+        conversion = (double)(scaleMin - scaleMax) / (y2Max - y2Min);
+        x = x3 - (dc.GetCharHeight() / 2);
+        lineX = x3 - 2;
+        // TODO:  Find first tick
+        firstTick = y2Min;
+        for(i = 0; i * spacing + firstTick < y2Max; i++) {
+            y = scaleMin - (int)(((double)i * spacing + firstTick) * conversion);
+            dc.DrawLine(x, y, lineX, y);
+        }
     }
 }
 
@@ -234,7 +406,6 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
     if(event.LeftDown()) {
         if(graphRegion.Contains(event.GetPosition()) == wxInRegion) {
             // Store coords
-            cout << "Graph Clicked" << endl;
         }
         event.Skip();
     }
@@ -252,18 +423,15 @@ void wxMolGraph::onLeftDblClick(wxMouseEvent &event) {
 
     if(xAxisRegion.Contains(event.GetPosition()) == wxInRegion) {
         event_axis.SetInt(MG_AXIS_X);
-        cout << "X-Axis Double-Clicked" << endl;
         wxPostEvent(this, event_axis);
     }
     else if(y1AxisRegion.Contains(event.GetPosition()) == wxInRegion) {
         event_axis.SetInt(MG_AXIS_Y1);
         wxPostEvent(this, event_axis);
-        cout << "Y1-Axis Double-Clicked" << endl;
     }
     else if(y2AxisRegion.Contains(event.GetPosition()) == wxInRegion) {
         event_axis.SetInt(MG_AXIS_Y2);
         wxPostEvent(this, event_axis);
-        cout << "Y2-Axis Double-Clicked" << endl;
     }
 }
 
