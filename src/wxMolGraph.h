@@ -31,8 +31,8 @@ extern const wxEventType wxEVT_GRAPH_CLICK;
  */
 class wxMolGraph : public wxControl {
   private:
-    /*               x-set  x-val    sel?   y-sets y-set       xi  y-val */
-    vector<pair<pair<vector<double>, bool>, vector<vector<pair<int,double> > > > > data;
+    /*               x-set  x-val  x-curr  y-sets y-set       xi  y-val */
+    vector<pair<pair<vector<double>, int>, vector<vector<pair<int,double> > > > > data;
 
     wxString xAxisText;
     wxString y1AxisText;
@@ -52,6 +52,8 @@ class wxMolGraph : public wxControl {
     wxRegion y1AxisRegion;
     wxRegion y2AxisRegion;
     wxRegion graphRegion;
+
+    int precision;
 
     /* TODO */
 

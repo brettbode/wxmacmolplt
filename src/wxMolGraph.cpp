@@ -30,12 +30,13 @@ wxMolGraph::wxMolGraph(wxWindow       *parent,
     y2AxisText = wxT("Y2-Axis");
     xMax = 352.0;
     xMin = 0.0;
-    y1Max = 1.0;
-    y1Min = 0.0;
+    y1Max = 10.0;
+    y1Min = 1.0;
     y2Max = 25.37163;
     y2Min = -1.21398;
     numY1Graphs = 1;
     numY2Graphs = 1;
+    precision = 4;
 }
 
 int wxMolGraph::addXSet(vector<double> data, bool selectable) {
@@ -125,8 +126,8 @@ wxSize wxMolGraph::DoGetBestSize() const {
     dc.SetBackground(*wxWHITE_BRUSH);
     dc.SetFont(*wxSWISS_FONT);
 
-    xMaxText = wxString::Format("%0.4f", xMax);
-    xMinText = wxString::Format("%0.4f", xMin);
+    xMaxText = wxString::Format("%0.*f", precision, xMax);
+    xMinText = wxString::Format("%0.*f", precision, xMin);
     dc.GetTextExtent(xAxisText, &w, &h);
     xAxisTextSize.Set(w, h);
     dc.GetTextExtent(xMaxText, &w, &h);
@@ -134,8 +135,8 @@ wxSize wxMolGraph::DoGetBestSize() const {
     dc.GetTextExtent(xMinText, &w, &h);
     xMinTextSize.Set(w, h);
 
-    y1MaxText = wxString::Format("%0.4f", y1Max);
-    y1MinText = wxString::Format("%0.4f", y1Min);
+    y1MaxText = wxString::Format("%0.*f", precision, y1Max);
+    y1MinText = wxString::Format("%0.*f", precision, y1Min);
     dc.GetTextExtent(y1AxisText, &w, &h);
     y1AxisTextSize.Set(w, h);
     dc.GetTextExtent(y1MaxText, &w, &h);
@@ -143,8 +144,8 @@ wxSize wxMolGraph::DoGetBestSize() const {
     dc.GetTextExtent(y1MinText, &w, &h);
     y1MinTextSize.Set(w, h);
 
-    y2MaxText = wxString::Format("%0.4f", y2Max);
-    y2MinText = wxString::Format("%0.4f", y2Min);
+    y2MaxText = wxString::Format("%0.*f", precision, y2Max);
+    y2MinText = wxString::Format("%0.*f", precision, y2Min);
     dc.GetTextExtent(y2AxisText, &w, &h);
     y2AxisTextSize.Set(w, h);
     dc.GetTextExtent(y2MaxText, &w, &h);
@@ -242,8 +243,8 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     dc.Clear();
 
 
-    xMaxText = wxString::Format("%0.4f", xMax);
-    xMinText = wxString::Format("%0.4f", xMin);
+    xMaxText = wxString::Format("%0.*f", precision, xMax);
+    xMinText = wxString::Format("%0.*f", precision, xMin);
     dc.GetTextExtent(xAxisText, &x, &y);
     xAxisTextSize.Set(x, y);
     dc.GetTextExtent(xMaxText, &x, &y);
@@ -251,8 +252,8 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     dc.GetTextExtent(xMinText, &x, &y);
     xMinTextSize.Set(x, y);
 
-    y1MaxText = wxString::Format("%0.4f", y1Max);
-    y1MinText = wxString::Format("%0.4f", y1Min);
+    y1MaxText = wxString::Format("%0.*f", precision, y1Max);
+    y1MinText = wxString::Format("%0.*f", precision, y1Min);
     dc.GetTextExtent(y1AxisText, &x, &y);
     y1AxisTextSize.Set(x, y);
     dc.GetTextExtent(y1MaxText, &x, &y);
@@ -260,8 +261,8 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     dc.GetTextExtent(y1MinText, &x, &y);
     y1MinTextSize.Set(x, y);
 
-    y2MaxText = wxString::Format("%0.4f", y2Max);
-    y2MinText = wxString::Format("%0.4f", y2Min);
+    y2MaxText = wxString::Format("%0.*f", precision, y2Max);
+    y2MinText = wxString::Format("%0.*f", precision, y2Min);
     dc.GetTextExtent(y2AxisText, &x, &y);
     y2AxisTextSize.Set(x, y);
     dc.GetTextExtent(y2MaxText, &x, &y);
@@ -326,7 +327,7 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     // TODO:  Find first tick
     firstTick = xMin;
     for(i = 0; i * spacing + firstTick < xMax; i++) {
-        x = (int)(((double)i * spacing + firstTick) * conversion) + scaleMin;
+        x = scaleMin + (int)(((double)i * spacing + firstTick - xMin) * conversion);
         dc.DrawLine(x, y, x, lineY);
     }
 
@@ -360,7 +361,7 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
         // TODO:  Find first tick
         firstTick = y1Min;
         for(i = 0; i * spacing + firstTick < y1Max; i++) {
-            y = scaleMin - (int)(((double)i * spacing + firstTick) * conversion);
+            y = scaleMin - (int)(((double)i * spacing + firstTick - y1Min) * conversion);
             dc.DrawLine(x, y, lineX, y);
         }
     }
@@ -394,7 +395,7 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
         // TODO:  Find first tick
         firstTick = y2Min;
         for(i = 0; i * spacing + firstTick < y2Max; i++) {
-            y = scaleMin - (int)(((double)i * spacing + firstTick) * conversion);
+            y = scaleMin - (int)(((double)i * spacing + firstTick - y2Min) * conversion);
             dc.DrawLine(x, y, lineX, y);
         }
     }
