@@ -134,9 +134,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
             :wxFrame((wxWindow *)NULL, wxID_ANY, title,
                      position, size, style, name) {
 
-    createMenuBar();
-    SetMenuBar(menuBar);
-
     MainData = new MoleculeData;
     Prefs = new WinPrefs;
     *Prefs = *gPreferences;
@@ -166,6 +163,9 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
     SizeChanged();
     frameScrollBar->SetScrollbar(1, 1, 1, 1);
+    createMenuBar();
+    SetMenuBar(menuBar);
+
     Show(true);
     AdjustMenus();
 }
@@ -1114,7 +1114,9 @@ void MolDisplayWin::CloseCoordsWindow(void) {
 
 void MolDisplayWin::AtomsChanged(void) {
     if (bondsWindow) bondsWindow->ResetList();
+#ifndef WIN32
 #warning Update surface window here
+#endif
 //  if (SurfaceDlog) SurfaceDlog->Reset();
     FrameChanged();
 }
@@ -1147,7 +1149,9 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
         MainData->ResetRotation();
         FrameChanged();
 
+#ifndef WIN32
 #warning Update windows here when they are added
+#endif
         if (coordsWindow) coordsWindow->FrameChanged();
         if (bondsWindow) bondsWindow->ResetList();
     //  if (EPlotWin) EPlotWin->FrameChanged();

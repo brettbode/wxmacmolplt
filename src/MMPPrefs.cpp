@@ -468,7 +468,9 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					SetQD3DLineWidth(floatVal);
 				val = child->getAttributeValue(MMPPref_convert(MMPMolDisplay_LabelFontID));
 #ifdef __wxBuild__
+#ifndef WIN32
 #warning Need to handle the font pref
+#endif
 #else
 				LabelFontID = systemFont;
 				if (val) {
@@ -740,7 +742,9 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 }
 void WinPrefs::WriteUserPrefs(void) const {
 #ifdef __wxBuild__
+#ifndef WIN32
 #warning Add code to write the user prefs!
+#endif
 #else
 	// There seem to be a couple of ways to go with this. There is the old style FindFolder/
 	// FSpec based routines where you directly interact with a file in the "preferences" directory
@@ -828,7 +832,9 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	outbuf << QD3DLineWidth;
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_3DLineWidth), outbuf.str().c_str());
 #ifdef __wxBuild__
+#ifndef WIN32
 #warning Need to handle the font pref
+#endif
 #else
 	Str255 FontName;
 #ifdef CarbonBuild

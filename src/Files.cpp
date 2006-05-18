@@ -58,7 +58,9 @@ bool ReadGVBOccupancy(BufferFile * Buffer, long NumPairOrbs, long MaxOrbs, float
 
 void FileError::WriteError(void) {
 #ifdef __wxBuild__
+#ifndef WIN32
 #warning Need warning string replacement
+#endif
 #else
 	Str255	errmsg;
 
@@ -74,7 +76,9 @@ void FileError::WriteError(void) {
 }
 void DataError::WriteError(void) {
 #ifdef __wxBuild__
+#ifndef WIN32
 #warning Need warning string replacement
+#endif
 #else
 	SetCursorToArrow();
 	if (ErrNum>0) {
@@ -2264,7 +2268,9 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 
 	if (!Append) {
 #ifdef __wxBuild__
+#ifndef WIN32
 #warning Need to set file type
+#endif
 #else
 		FileSave = 17; //IRC bit 5 plus bit 1 for saving
 #endif
@@ -2489,7 +2495,9 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 	Frame * lFrame = MainData->cFrame;
 	if (!Append) {
 #ifdef __wxBuild__
+#ifndef WIN32
 #warning Need to setup file type
+#endif
 #else
 		FileSave = 33; //DRC bit 6 plus bit 1 for saving
 #endif

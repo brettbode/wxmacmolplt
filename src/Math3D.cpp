@@ -413,7 +413,7 @@ void SymmetricJacobiDiagonalization(double * SymMatrix, double * EigenVectors,
 void JacobiDiagonalization(double * Matrix, double * EigenVectors, long Dimension,
 	long /*NumVectors*/, long Start, long End) {
 
-	const double root2=sqrt(2);
+	const double root2=sqrt((double)2.0);
 	long ieaa=0, ieab=0, i;
 	double tt=0.0;
 	double * big = new double[Dimension];

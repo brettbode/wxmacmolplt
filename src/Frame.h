@@ -21,6 +21,10 @@ typedef class GradientData GradientData;
 typedef class AtomTypeList AtomTypeList;
 typedef class XMLElement XMLElement;
 
+#ifdef WIN32
+#undef AddAtom
+#endif
+
 #include <vector>
 
 typedef class Frame Frame;

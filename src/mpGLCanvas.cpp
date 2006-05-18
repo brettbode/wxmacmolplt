@@ -93,7 +93,8 @@ wxImage MpGLCanvas::getImage(const int width, const int height) {
     // malloc is required by wxImage,
     // which takes responsibility for the memory
     pixels = (unsigned char *) malloc(3 * cwidth * cheight * sizeof(GLbyte));
-    bzero(pixels,3*cwidth*cheight*sizeof(GLbyte));
+//    bzero(pixels,3*cwidth*cheight*sizeof(GLbyte));
+	memset(pixels, 0, 3*cwidth*cheight*sizeof(GLbyte));
     glPixelStorei( GL_PACK_ALIGNMENT, 1 );
     //draw into the back buffer
     MolWin->DrawGL();
@@ -181,7 +182,8 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor, Progre
             MolWin->DrawGL();
             
             glFinish();
-            bzero(pixels,3*width*height*sizeof(GLbyte));
+    //        bzero(pixels,3*width*height*sizeof(GLbyte));
+			memset(pixels, 0, 3*width*height*sizeof(GLbyte));
             glPixelStorei( GL_PACK_ALIGNMENT, 1 );
             glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
@@ -306,7 +308,8 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
             MolWin->DrawGL();
             
             glFinish();
-            bzero(pixels,canvasWidth * canvasHeight * 3 * sizeof(GLbyte));
+     //       bzero(pixels,canvasWidth * canvasHeight * 3 * sizeof(GLbyte));
+            memset(pixels,0, canvasWidth * canvasHeight * 3 * sizeof(GLbyte));
             glPixelStorei( GL_PACK_ALIGNMENT, 1 );
             glReadPixels(0, 0, canvasWidth, canvasHeight, GL_RGB,
                          GL_UNSIGNED_BYTE, pixels);

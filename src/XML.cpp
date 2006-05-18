@@ -17,6 +17,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <cctype>
 //#include "libbamboo.h"
 #ifdef UseXERCESC
@@ -26,6 +27,10 @@
 #else
 #include <xercesc/parsers/DOMParser.hpp>
 #endif
+#endif
+
+#ifdef WIN32
+#define strcasecmp strcmp
 #endif
 
 using std::cerr;
@@ -720,7 +725,7 @@ bool XMLElement::getAttributeValue(const char * target, float & result) const {
 		if (strlen(val)>0) {
 			float temp;
 			char * end;
-			temp = strtof(val, &end);
+			temp = strtod(val, &end);
 			if (end[0] == '\0') { 
 				result = temp;
 				success = true;

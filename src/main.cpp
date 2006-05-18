@@ -194,7 +194,9 @@ void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {
 }
 void MpApp::menuPreferences(wxCommandEvent & WXUNUSED(event)) {
 	//Default application preferences
+#ifndef WIN32
 #warning Open default preferences dialog here once implemented
+#endif
 }
 void MpApp::menuFileNew(wxCommandEvent &event) {
     createMainFrame();

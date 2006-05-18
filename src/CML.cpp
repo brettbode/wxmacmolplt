@@ -24,6 +24,7 @@
 #include <sstream>
 #include <string.h>
 #include <iomanip>
+#include <stdio.h>
 
 #include "XML.hpp"
 #include "CML.h"
@@ -35,6 +36,9 @@
 #include "Internals.h"
 #include "InputData.h"
 #include "Math3D.h"
+#ifdef WIN32
+#undef AddAtom
+#endif
 
 //notes on extending CML
 //anything can go inside the CML tag.

@@ -1951,7 +1951,9 @@ short DataGroup::SetPointGroup(char *GroupText) {
 
 	for (int i=1; i<kMaxPGroups; i++) {
 #ifdef __wxBuild__
+#ifndef WIN32
 #warning Need IndString replacement
+#endif
 #else
 		GetIndString(text, kPGroupStrings, i);
 #endif
@@ -1970,7 +1972,9 @@ short DataGroup::GetPointGroup(Str255 GroupText, bool InLine) const {
 	int	value = PointGroup;
 	if (value == 0) value = 1;	//default to C1
 #ifdef __wxBuild__
+#ifndef WIN32
 #warning Need GetIndString replacement
+#endif
 #else
 	GetIndString(GroupText, kPGroupStrings, PointGroup);
 #endif
@@ -3048,7 +3052,9 @@ short DFTGroup::GetFunctional(unsigned char * FuncName) const {
 		if (temp <= kDFTGridFunctionalMaxStrings)
 #ifdef __wxBuild__
 			;
+#ifndef WIN32
 #warning Need GetIndString replacement
+#endif
 #else
 			GetIndString(FuncName, kDFTGridFunctionalStrings, temp);
 #endif
@@ -3056,7 +3062,9 @@ short DFTGroup::GetFunctional(unsigned char * FuncName) const {
 		if (temp <= kDFTGridFreeFunctionalMaxStrings)
 #ifdef __wxBuild__
 			;
+#ifndef WIN32
 #warning Need GetIndString replacement
+#endif
 #else
 			GetIndString(FuncName, kDFTGridFreeFunctionalStrings, temp);
 #endif

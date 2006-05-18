@@ -744,7 +744,7 @@ void CoordinatesWindow::OnRangeSelect( wxGridRangeSelectEvent& event )
 void CoordinatesWindow::OnSize( wxSizeEvent& event )
 {
 	wxSize s = event.GetSize();
-	SizeCols(s);
+	if (coordGrid) SizeCols(s);
     event.Skip();
 }
 

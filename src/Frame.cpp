@@ -29,6 +29,10 @@
 #include <new>
 #include <ctype.h>
 
+#ifdef WIN32
+#undef AddAtom
+#endif
+
 Frame::Frame(void) {
 	Energy = 0.0;
 	KE = 0.0;

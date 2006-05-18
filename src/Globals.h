@@ -200,6 +200,12 @@ struct RGBColor {
 };
 struct Point { short h; short v; };
 #endif
+
+#ifdef WIN32
+#define snprintf _snprintf
+#define strcasecmp strcmp
+#endif
+
 #define UseOpenGL
 typedef char * Ptr;
 typedef unsigned char Boolean;
