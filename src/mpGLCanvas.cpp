@@ -337,7 +337,7 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 
 void MpGLCanvas::UpdateGLView(void) {
     int width, height;
-    if((molData!=NULL)&&GetContext()) {
+    if(GetContext()) {
         SetCurrent();
         GetClientSize(&width, &height);
         glViewport(0, 0, (GLint)width, (GLint)height);
