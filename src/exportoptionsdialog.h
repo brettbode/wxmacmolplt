@@ -100,8 +100,8 @@ public:
 
     int getWidth() const { return width; }
     int getHeight() const { return height; }
-    wxString getWildcard() const {wxString wildcardStrings[] = {wxT("Windows Bitmap (*.bmp)|*.bmp")
-                                                               wxT("Portable Network Graphics (*.png)|*.png")
+    wxString getWildcard() const {wxString wildcardStrings[] = {wxT("Windows Bitmap (*.bmp)|*.bmp"),
+                                                               wxT("Portable Network Graphics (*.png)|*.png"),
                                                                wxT("JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg")};
                                   return wildcardStrings[filetype]; }
     wxString getExtension() const {wxString extensionStrings[] = {wxT("bmp"),
