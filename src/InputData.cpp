@@ -1054,7 +1054,6 @@ void ControlGroup::WriteXML(XMLElement * parent) const {
 }
 void ControlGroup::WriteToFile(BufferFile *File, InputData *IData, long NumElectrons) {
 	char	Out[133], textVal[133];
-	Str255	Text;
 
 		//Punch the group label
 	File->WriteLine(" $CONTRL ", false);
@@ -1067,7 +1066,6 @@ void ControlGroup::WriteToFile(BufferFile *File, InputData *IData, long NumElect
 		else sprintf(Out, "SCFTYP=RHF ");
 		File->WriteLine(Out, false);
 	}
-//	GetRunType(Text);	Text[Text[0]+1]=0;
 	sprintf(Out,"RUNTYP=%s ", GetGAMESSRunText(GetRunType()));
 	File->WriteLine(Out, false);
 	if ((ExeType)&&(!Friend)) {	//punch out ExeType if it is other than run
@@ -1135,20 +1133,20 @@ void ControlGroup::WriteToFile(BufferFile *File, InputData *IData, long NumElect
  		File->WriteLine(Out, false);
 	}
 	if (GetMolPlot()) {
-		sprintf(Out, "MOLPLT=.TRUE. ", &(Text[1]));
+		sprintf(Out, "MOLPLT=.TRUE. ");
  		File->WriteLine(Out, false);
 	}
 	if (GetPlotOrb()) {
-		sprintf(Out, "PLTORB=.TRUE. ", &(Text[1]));
+		sprintf(Out, "PLTORB=.TRUE. ");
  		File->WriteLine(Out, false);
 	}
 	if ((1!=GetExeType())&&(Friend==0)) {
 		if (GetAIMPAC()) {
-			sprintf(Out, "AIMPAC=.TRUE. ", &(Text[1]));
+			sprintf(Out, "AIMPAC=.TRUE. ");
 	 		File->WriteLine(Out, false);
 		}
 		if (GetRPAC()) {
-			sprintf(Out, "RPAC=.TRUE. ", &(Text[1]));
+			sprintf(Out, "RPAC=.TRUE. ");
 	 		File->WriteLine(Out, false);
 		}
 	}
@@ -1925,15 +1923,49 @@ void DataGroup::InitData(void) {
 	PGroupOrder = Options = 0;
 	SetUseSym(true);
 }
-short DataGroup::SetPointGroup(short NewPGroup) {
-	if ((NewPGroup<0)||(NewPGroup>15)) return -1;
+short DataGroup::SetPointGroup(GAMESSPointGroup NewPGroup) {
+	if ((NewPGroup<invalidPGroup)||(NewPGroup>NumberGAMESSPointGroups)) return -1;
 
 	PointGroup = NewPGroup;
 	return PointGroup;
 }
+const char * DataGroup::GetGAMESSPointGroupText(GAMESSPointGroup p) {
+	switch (p) {
+		case GAMESS_C1:
+			return "C1";
+		case GAMESS_CS:
+			return "CS";
+		case GAMESS_CI:
+			return "CI";
+		case GAMESS_CNH:
+			return "CNH";
+		case GAMESS_CNV:
+			return "CNV";
+		case GAMESS_CN:
+			return "CN";
+		case GAMESS_S2N:
+			return "S2N";
+		case GAMESS_DND:
+			return "DND";
+		case GAMESS_DNH:
+			return "DNH";
+		case GAMESS_DN:
+			return "DN";
+		case GAMESS_TD:
+			return "TD";
+		case GAMESS_TH:
+			return "TH";
+		case GAMESS_T:
+			return "T";
+		case GAMESS_OH:
+			return "OH";
+		case GAMESS_O:
+			return "O";
+	}
+	return "invalid";
+}
 short DataGroup::SetPointGroup(char *GroupText) {
-	short NewPGroup=-1;
-	Str255	text;
+	GAMESSPointGroup NewPGroup=invalidPGroup;
 	
 	if (GroupText[0] == 'S') {
 		PGroupOrder = GroupText[2] - 48;
@@ -1949,44 +1981,17 @@ short DataGroup::SetPointGroup(char *GroupText) {
 		}
 	}
 
-	for (int i=1; i<kMaxPGroups; i++) {
-#ifdef __wxBuild__
-#ifndef WIN32
-#warning Need IndString replacement
-#endif
-#else
-		GetIndString(text, kPGroupStrings, i);
-#endif
-		if (-1<LocateKeyWord(GroupText, (char *) &(text[1]), text[0], 9)) {
-			NewPGroup = i;
+	for (int i=1; i<NumberGAMESSPointGroups; i++) {
+		if (strcmp(GroupText, GetGAMESSPointGroupText((GAMESSPointGroup) i))==0) {
+			NewPGroup = (GAMESSPointGroup) i;
 			break;
 		}
 	}
+	if (NewPGroup<=invalidPGroup) return invalidPGroup;
 
 	if (NewPGroup<0) return -1;
 
 	PointGroup = NewPGroup;
-	return PointGroup;
-}
-short DataGroup::GetPointGroup(Str255 GroupText, bool InLine) const {
-	int	value = PointGroup;
-	if (value == 0) value = 1;	//default to C1
-#ifdef __wxBuild__
-#ifndef WIN32
-#warning Need GetIndString replacement
-#endif
-#else
-	GetIndString(GroupText, kPGroupStrings, PointGroup);
-#endif
-	GroupText[1+GroupText[0]] = 0;
-	if (InLine && (PGroupOrder>0)) {
-		for (int i=1; i<=GroupText[0]; i++) {
-			if (GroupText[i]=='N') {
-				GroupText[i] = PGroupOrder + 48;	//single digit coverted to decimal digit
-			}
-		}
-	}
-
 	return PointGroup;
 }
 short DataGroup::SetPointGroupOrder(short NewOrder) {
@@ -2116,7 +2121,6 @@ void DataGroup::ReadFromBuffer(BufferFile *Buffer, long length) {
 }
 void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs * Prefs, long BasisTest) {
 	char	Out[133];
-	Str255	Text, AtomLabel;
 
 	Frame * cFrame = MainData->GetCurrentFramePtr();
 	BasisSet * lBasis = MainData->GetBasisSet();
@@ -2128,10 +2132,9 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 	if (Title == NULL) File->WriteLine("Title goes here", true);
 	else File->WriteLine(Title, true);
 		//Point Group
-	GetPointGroup(Text, false);	Text[Text[0]+1]=0;
-	if ((PointGroup>3)&&(PointGroup<11)) {
-		sprintf(Out, "%s %d", &(Text[1]), PGroupOrder);
-	} else sprintf(Out, "%s", &(Text[1]));
+	if ((PointGroup>GAMESS_CI)&&(PointGroup<GAMESS_TD)) {
+		sprintf(Out, "%s %d", GetPointGroupText(), PGroupOrder);
+	} else sprintf(Out, "%s", GetPointGroupText());
 	File->WriteLine(Out, true);
 	if ((PointGroup!=0)&&(PointGroup!=1)) File->WriteLine("", true);
 		//coordinates
@@ -2140,6 +2143,7 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 		if (IntCoords) IntCoords->WriteCoordinatesToFile(File, MainData, Prefs);
 	} else {
 		for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
+			Str255 AtomLabel;
 			Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
 			AtomLabel[AtomLabel[0]+1] = 0;
 			sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
@@ -2196,7 +2200,7 @@ void DataGroup::ReadXML(XMLElement * parent) {
 					{
 						long temp;
 						if (child->getLongValue(temp)) {
-							SetPointGroup(temp);
+							SetPointGroup((GAMESSPointGroup)temp);
 							if (child->getAttributeValue(CML_convert(MMP_IODGPointGroupOrder), temp)) 
 								SetPointGroupOrder(temp);
 						}
@@ -3036,40 +3040,115 @@ void DFTGroup::WriteToFile(BufferFile *File, InputData *IData) {
 		sprintf(Out, "METHOD=GRIDFREE ");
 		File->WriteLine(Out, false);
 	}
-		Str255 name;
-	GetFunctional(name);
-	name[name[0]+1] = '\0';
-	sprintf(Out, "DFTTYP=%s ", &(name[1]));
+	sprintf(Out, "DFTTYP=%s ", GetFunctionalText());
 	File->WriteLine(Out, false);
 
 	File->WriteLine("$END", true);
 }
-short DFTGroup::GetFunctional(unsigned char * FuncName) const {
+const char * DFTGroup::GetDFTGridFuncText(DFTFunctionalsGrid type) {
+	switch (type) {
+		case DFT_Grid_Slater:
+			return "SLATER";
+		case DFT_Grid_Becke:
+			return "BECKE";
+		case DFT_Grid_VWN:
+			return "VWN";
+		case DFT_Grid_LYP:
+			return "LYP";
+		case DFT_Grid_SVWN:
+			return "SVWN";
+		case DFT_Grid_BVWN:
+			return "BVWN";
+		case DFT_Grid_BLYP:
+			return "BLYP";
+		case DFT_Grid_B3LYP:
+			return "B3LYP";
+		case DFT_Grid_GILL:
+			return "GILL";
+		case DFT_Grid_PBE:
+			return "PBE";
+		case DFT_Grid_OP:
+			return "OP";
+		case DFT_Grid_SLYP:
+			return "SLYP";
+		case DFT_Grid_SOP:
+			return "SOP";
+		case DFT_Grid_BOP:
+			return "BOP";
+		case DFT_Grid_GVWN:
+			return "GVWN";
+		case DFT_Grid_GLYP:
+			return "GLYP";
+		case DFT_Grid_GOP:
+			return "GOP";
+		case DFT_Grid_PBEVWN:
+			return "PBEVWN";
+		case DFT_Grid_PBELYP:
+			return "PBELYP";
+		case DFT_Grid_PBEOP:
+			return "PBEOP";
+		case DFT_Grid_BHHLYP:
+			return "BHHLYP";
+	}
+	return "invalid";
+}
+const char * DFTGroup::GetDFTGridFreeFuncText(DFTFunctionalsGridFree type) {
+	switch (type) {
+		case DFT_GridFree_Slater:
+			return "SLATER";
+		case DFT_GridFree_Becke:
+			return "BECKE";
+		case DFT_GridFree_VWN:
+			return "VWN";
+		case DFT_GridFree_LYP:
+			return "LYP";
+		case DFT_GridFree_SVWN:
+			return "SVWN";
+		case DFT_GridFree_BVWN:
+			return "BVWN";
+		case DFT_GridFree_BLYP:
+			return "BLYP";
+		case DFT_GridFree_B3LYP:
+			return "B3LYP";
+		case DFT_GridFree_XALPHA:
+			return "XALPHA";
+		case DFT_GridFree_Depristo:
+			return "DEPRISTO";
+		case DFT_GridFree_CAMA:
+			return "CAMA";
+		case DFT_GridFree_HALF:
+			return "HALF";
+		case DFT_GridFree_PWLOC:
+			return "PWLOC";
+		case DFT_GridFree_BPWLOC:
+			return "BPWLOC";
+		case DFT_GridFree_CAMB:
+			return "CAMB";
+		case DFT_GridFree_XVWN:
+			return "XVWN";
+		case DFT_GridFree_XPWLOC:
+			return "XPWLOC";
+		case DFT_GridFree_SPWLOC:
+			return "SPWLOC";
+		case DFT_GridFree_WIGNER:
+			return "WIGNER";
+		case DFT_GridFree_WS:
+			return "WS";
+		case DFT_GridFree_WIGEXP:
+			return "WIGEXP";
+	}
+	return "invalid";
+}
+
+const char * DFTGroup::GetFunctionalText(void) const {
 	short temp = Functional;
-	FuncName[0] = 0;
 	if (temp <= 0) temp = 1;
 	if (MethodGrid()) {
-		if (temp <= kDFTGridFunctionalMaxStrings)
-#ifdef __wxBuild__
-			;
-#ifndef WIN32
-#warning Need GetIndString replacement
-#endif
-#else
-			GetIndString(FuncName, kDFTGridFunctionalStrings, temp);
-#endif
+		return GetDFTGridFuncText((DFTFunctionalsGrid) temp);
 	} else {	//Grid-free functional list is fairly different
-		if (temp <= kDFTGridFreeFunctionalMaxStrings)
-#ifdef __wxBuild__
-			;
-#ifndef WIN32
-#warning Need GetIndString replacement
-#endif
-#else
-			GetIndString(FuncName, kDFTGridFreeFunctionalStrings, temp);
-#endif
+		return GetDFTGridFreeFuncText((DFTFunctionalsGridFree) temp);
 	}
-	return Functional;
+	return NULL;
 }
 short DFTGroup::SetFunctional(short newvalue) {
 		//Probably need some checks here??

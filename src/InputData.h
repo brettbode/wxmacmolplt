@@ -452,6 +452,26 @@ enum CoordinateType {
 	
 	NumberCoordinateTypes
 };
+enum GAMESSPointGroup {
+	invalidPGroup=0,
+	GAMESS_C1,
+	GAMESS_CS,
+	GAMESS_CI,
+	GAMESS_CNH,
+	GAMESS_CNV,
+	GAMESS_CN,
+	GAMESS_S2N,
+	GAMESS_DND,
+	GAMESS_DNH,
+	GAMESS_DN,
+	GAMESS_TD,
+	GAMESS_TH,
+	GAMESS_T,
+	GAMESS_OH,
+	GAMESS_O,
+	
+	NumberGAMESSPointGroups
+};
 class DataGroup {
 	private:
 		char		*Title;
@@ -463,10 +483,11 @@ class DataGroup {
 			//bit 1 units
 			//bit 2 NoSym
 	public:		//data access functions
-		short SetPointGroup(short NewPGroup);
+		short SetPointGroup(GAMESSPointGroup NewPGroup);
 		short SetPointGroup(char *GroupText);
-		short GetPointGroup(Str255 GroupText, bool InLine) const;
-		inline short GetPointGroup(void) const {return PointGroup;};
+		static const char * GetGAMESSPointGroupText(GAMESSPointGroup p);
+		const char * GetPointGroupText(void) const {return GetGAMESSPointGroupText((GAMESSPointGroup) PointGroup);};
+		inline GAMESSPointGroup GetPointGroup(void) const {return (GAMESSPointGroup)PointGroup;};
 		short SetPointGroupOrder(short NewOrder);
 		inline short GetPointGroupOrder(void) const {return PGroupOrder;};
 		short SetTitle(const char *NewTitle, long length=-1);
@@ -659,6 +680,58 @@ class HessianGroup {
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
 };
+enum DFTFunctionalsGrid {
+	invalidDFTGrid=0,
+	DFT_Grid_Slater,
+	DFT_Grid_Becke,
+	DFT_Grid_VWN,
+	DFT_Grid_LYP,
+	DFT_Grid_SVWN,
+	DFT_Grid_BVWN,
+	DFT_Grid_BLYP,
+	DFT_Grid_B3LYP,
+	DFT_Grid_GILL,
+	DFT_Grid_PBE,
+	DFT_Grid_OP,
+	DFT_Grid_SLYP,
+	DFT_Grid_SOP,
+	DFT_Grid_BOP,
+	DFT_Grid_GVWN,
+	DFT_Grid_GLYP,
+	DFT_Grid_GOP,
+	DFT_Grid_PBEVWN,
+	DFT_Grid_PBELYP,
+	DFT_Grid_PBEOP,
+	DFT_Grid_BHHLYP,
+	
+	NumberGRIDDFTFuncs
+};
+enum DFTFunctionalsGridFree {
+	invalidDFTGridFreeType=0,
+	DFT_GridFree_Slater,
+	DFT_GridFree_Becke,
+	DFT_GridFree_VWN,
+	DFT_GridFree_LYP,
+	DFT_GridFree_SVWN,
+	DFT_GridFree_BVWN,
+	DFT_GridFree_BLYP,
+	DFT_GridFree_B3LYP,
+	DFT_GridFree_XALPHA,
+	DFT_GridFree_Depristo,
+	DFT_GridFree_CAMA,
+	DFT_GridFree_HALF,
+	DFT_GridFree_PWLOC,
+	DFT_GridFree_BPWLOC,
+	DFT_GridFree_CAMB,
+	DFT_GridFree_XVWN,
+	DFT_GridFree_XPWLOC,
+	DFT_GridFree_SPWLOC,
+	DFT_GridFree_WIGNER,
+	DFT_GridFree_WS,
+	DFT_GridFree_WIGEXP,
+	
+	NumberDFTGridFreeFuncs
+};
 class DFTGroup {
 	private:
 		float	GridSwitch;
@@ -683,8 +756,10 @@ class DFTGroup {
 		bool GetThree(void) const {return ((BitFlags & 4) != 0);};
 		void SetThree(bool state) {BitFlags = (BitFlags & 0xB) + (state ? 4 : 0);};
 		inline short GetFunctional(void) const {return Functional;};
-		short GetFunctional(unsigned char * name) const;
+		const char * GetFunctionalText(void) const;
 		short SetFunctional(short newvalue);
+		static const char * GetDFTGridFuncText(DFTFunctionalsGrid d);
+		static const char * GetDFTGridFreeFuncText(DFTFunctionalsGridFree d);
 
 		long GetSize(BufferFile *Buffer);
 		long WriteToBuffer(BufferFile *Buffer);
