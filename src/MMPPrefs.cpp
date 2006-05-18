@@ -143,7 +143,6 @@ void WinPrefs::GetAtomLabel(long AtomNum, wxString & text) const {
 		TextLength++;
 		if (TextLength >= 3) break;
 	}
-	text << '\0';
 }
 #endif
 void WinPrefs::GetAtomLabel(long AtomNum, Str255 text) {
