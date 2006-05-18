@@ -41,17 +41,19 @@ class MolDisplayWin : public wxFrame {
         wxMenu    *menuWindow;
         wxMenu    *menuHelp;
 
-        wxString      currFilePath;
-        MoleculeData *MainData;
-        WinPrefs     *Prefs;
-        bool          Dirty;          //Flag to indicate a save is needed
-        bool          OperationInProgress;
+        wxString		currFilePath;
+        MoleculeData	*MainData;
+        WinPrefs		*Prefs;
+        bool			Dirty;          //Flag to indicate a save is needed
+		bool			OperationInProgress;
+		bool			timerRunning;
         
-        Progress     *ProgressInd;    // Progress indicator window for long operations
-        OpenGLRec    *OpenGLData;     // Extra OpenGL data
-        MpGLCanvas   *glCanvas;
-        wxStaticText *textBar;
-        wxScrollBar  *frameScrollBar;
+        Progress		*ProgressInd;    // Progress indicator window for long operations
+        OpenGLRec		*OpenGLData;     // Extra OpenGL data
+        MpGLCanvas		*glCanvas;
+        wxStaticText	*textBar;
+        wxScrollBar		*frameScrollBar;
+		wxTimer			m_timer;
 
         BondsDlg          *bondsWindow;
         CoordinatesWindow *coordsWindow;
@@ -131,8 +133,8 @@ class MolDisplayWin : public wxFrame {
         void menuViewNextNormalMode(wxCommandEvent &event);
           // void menuViewDisplay_frequencyDOSTUFF(wxCommandEvent &event);
         //void menuViewOffset_along_mode(wxCommandEvent &event);
-        //void menuViewAnimate_mode(wxCommandEvent &event);
-        //void menuViewAnimate_frames(wxCommandEvent &event);
+        void menuViewAnimateMode(wxCommandEvent &event);
+        void menuViewAnimateFrames(wxCommandEvent &event);
         //void menuViewShow_special_atoms(wxCommandEvent &event);
         //void menuVeiwShow_hydrogen_labels(wxCommandEvent &event);
         //void menuViewShow_atom_labels(wxCommandEvent &event);
@@ -220,6 +222,7 @@ class MolDisplayWin : public wxFrame {
 
         void eventSize(wxSizeEvent &event);
         void SizeChanged(void);
+		void OnFrameAnimationTimer(wxTimerEvent & event);
             //Function to receive all changes to the scroll bar
         void OnScrollBarChange(wxScrollEvent& event);
 };

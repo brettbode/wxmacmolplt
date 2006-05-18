@@ -66,6 +66,8 @@ enum MMP_EventID {
     MMP_FRAMESCROLLBAR,
     MMP_EXPORT,
 	MMP_PRINTOPTIONS,
+	MMP_ANIMATEFRAMES,
+	MMP_ANIMATEFRAMESTIMER,
     
     Number_MMP_Ids
 };
@@ -100,6 +102,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
     EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
     EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
+	EVT_MENU (MMP_ANIMATEFRAMES,	MolDisplayWin::menuViewAnimateFrames)
     EVT_MENU (MMP_SHRINK10,         MolDisplayWin::menuViewShrink_10)
     EVT_MENU (MMP_ENLARGE10,        MolDisplayWin::menuViewEnlarge_10)
     EVT_MENU (MMP_CENTER,           MolDisplayWin::menuViewCenter)
@@ -121,6 +124,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_BONDSWINDOW,  MolDisplayWin::menuWindowBonds)
     EVT_MENU (MMP_COORDSWINDOW, MolDisplayWin::menuWindowCoordinates)
 
+	EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
     EVT_SIZE( MolDisplayWin::eventSize )
     EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
     EVT_COMMAND_SCROLL(MMP_FRAMESCROLLBAR, MolDisplayWin::OnScrollBarChange )
@@ -215,6 +219,13 @@ void MolDisplayWin::SizeChanged(void) {
     textBar->SetSize(0, height-sheight, width-114, sheight, wxSIZE_USE_EXISTING);
 }
 
+void MolDisplayWin::OnFrameAnimationTimer(wxTimerEvent & event) {
+	if (MainData->CurrentFrame>=MainData->NumFrames)
+		ChangeFrames(1);
+	else
+		ChangeFrames(MainData->CurrentFrame+1);
+}
+
 void MolDisplayWin::createMenuBar(void) {
     menuBar = new wxMenuBar;
 
@@ -261,6 +272,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
     menuView->Append(MMP_NEXTMODE, wxT("Next Normal &Mode\tCtrl+]"));
     menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show &Axis"));
+    menuView->AppendCheckItem(MMP_ANIMATEFRAMES, wxT("Animate &Frames\tCtrl+F"));
     menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl+-"));
     menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl+="));
     menuView->Append(MMP_CENTER, wxT("&Center View"));
@@ -917,6 +929,21 @@ void MolDisplayWin::menuViewShowAxis(wxCommandEvent &event) {
     MainData->SetShowAxis(1-MainData->ShowAxis());
     UpdateModelDisplay();
     Dirty = true;
+}
+void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &event) {
+	long AnimateTime = Prefs->GetAnimateTime();
+	if (m_timer.IsRunning()) {
+		m_timer.Stop();
+		timerRunning = false;
+	} else {
+		if (MainData->CurrentFrame>=MainData->NumFrames)
+			ChangeFrames(1);
+		else
+			ChangeFrames(MainData->CurrentFrame+1);
+		m_timer.SetOwner(this, MMP_ANIMATEFRAMESTIMER);
+		m_timer.Start(10*AnimateTime);
+		timerRunning = true;
+	}
 }
 void MolDisplayWin::menuViewShrink_10(wxCommandEvent &event) {
     MainData->WindowSize *= 1.1;
