@@ -180,6 +180,7 @@ MolDisplayWin::~MolDisplayWin() {
     //when this window is destroyed.
     if (printData) delete printData;
     if (pageSetupData) delete pageSetupData;
+    glCanvas->setPrefs(NULL);
     
     if (ProgressInd != NULL) {
         delete ProgressInd;
@@ -187,7 +188,6 @@ MolDisplayWin::~MolDisplayWin() {
     }
     
     if(MainData != NULL) {
-        glCanvas->setMolData(NULL);
         delete MainData;
     }
     if (Prefs != NULL) {

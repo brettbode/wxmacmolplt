@@ -27,7 +27,6 @@ class MpGLCanvas : public wxGLCanvas {
     private:
         MolDisplayWin * MolWin;
         WinPrefs * Prefs;
-        MoleculeData *molData;
         bool        initialized;
 
         void initGL(void);
@@ -51,16 +50,6 @@ class MpGLCanvas : public wxGLCanvas {
                    long            style    = wxSUNKEN_BORDER,
                    const wxString &name     = wxT("DemoGLCanvas"));
 
-        /**
-         * Sets the internal pointer to the molecule data structure.  If the
-         * data structure needs to be deleted externally, this function should
-         * first be called with the parameter value set to NULL.  This will
-         * prevent the MpGLCanvas object from trying to reference a deleted
-         * data structure.
-         * @param newMolData A pointer to the molecule data that the canvas should use.
-         */
-        void setMolData(MoleculeData *newMolData);
-        
         /**
          * Sets the internal pointer to the window's preferences.  If the
          * data structure needs to be deleted externally, this function should
