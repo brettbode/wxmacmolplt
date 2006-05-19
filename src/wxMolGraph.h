@@ -7,10 +7,15 @@ using namespace std;
 #ifndef _WX_MOL_GRAPH_H_
 #define _WX_MOL_GRAPH_H_
 
+extern const wxEventType wxEVT_AXIS_DCLICK;
+extern const wxEventType wxEVT_GRAPH_CLICK;
+
+#define EVT_AXIS_DCLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_AXIS_DCLICK, id, -1, (wxObjectEventFunction)(wxEventFunction)(wxNotifyEventFunction)&fn, (wxObject *) NULL )
+#define EVT_GRAPH_CLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_GRAPH_CLICK, id, -1, (wxObjectEventFunction)(wxEventFunction)(wxNotifyEventFunction)&fn, (wxObject *) NULL )
+
 #define MG_AXIS_X  0
 #define MG_AXIS_Y1 1
 #define MG_AXIS_Y2 2
-
 
 #define MG_STYLE_NONE  0x00
 #define MG_STYLE_POINT 0x01
@@ -19,11 +24,19 @@ using namespace std;
 
 #define MG_STYLE_POINT_LINE 0x03
 
-extern const wxEventType wxEVT_AXIS_DCLICK;
-extern const wxEventType wxEVT_GRAPH_CLICK;
+typedef pair< vector< double >, int > XSet;
+typedef vector< pair< int, double > > YSet;
+typedef vector< pair< XSet, vector< YSet > > > DataSet;
+typedef struct _YSettings YSettings;
 
-#define EVT_AXIS_DCLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_AXIS_DCLICK, id, -1, (wxObjectEventFunction)(wxEventFunction)(wxNotifyEventFunction)&fn, (wxObject *) NULL )
-#define EVT_GRAPH_CLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_GRAPH_CLICK, id, -1, (wxObjectEventFunction)(wxEventFunction)(wxNotifyEventFunction)&fn, (wxObject *) NULL )
+struct _YSettings {
+    bool     exists;
+    int      axis;
+    int      style;
+    wxColour color;
+    int      shape;
+    int      size;
+};
 
 /**
  * A custom widget designed for graphing various types of data associated
@@ -31,8 +44,8 @@ extern const wxEventType wxEVT_GRAPH_CLICK;
  */
 class wxMolGraph : public wxControl {
   private:
-    /*               x-set  x-val  x-curr  y-sets y-set       xi  y-val */
-    vector<pair<pair<vector<double>, int>, vector<vector<pair<int,double> > > > > data;
+    DataSet data;
+    vector< vector< YSettings > > dataSettings;
 
     wxString xAxisText;
     wxString y1AxisText;
@@ -94,12 +107,14 @@ class wxMolGraph : public wxControl {
 
     /**
      * Adds a new set of x-values to the wxMolGraph.  If necessary, the scale
-     * of the x-axis will be adjusted to contain the new values, but nothing
-     * will be drawn for the new set until a y-set is associated with it.
+     * of the x-axis will be adjusted to contain the new values, but no data
+     * points will be drawn for the new x-set until a y-set is associated with
+     * it.
      *
      * @param data A vector of the x-values in the set.  The elements  of the
      *             vector are expected to be in increasing order, and no two
-     *             elements may have the same value.
+     *             elements may have the same value.  If these requirements are
+     *             not met, the behavior of the widget is undefined.
      * @param selectable Sets the selectable flag for the set.  If it is true,
      *                   points may be selected with a mouse (or arrow keys?).
      * @return On success this function returns the index of the x-set within
@@ -117,14 +132,14 @@ class wxMolGraph : public wxControl {
      * @param data A vector of pairs, one for each y-value.  The first element
      *             of each pair is the index of the x-value (within the
      *             associated x-set) with which the y-value is associated.
-     *             The indices must occur in increasing order, and no two
-     *             y-values in a set may be associated with the same x-index;
-     *             however, there need not be a y-value associated with every
-     *             possible index in the x-set.  If an x-index is outside the
-     *             range of the x-set, the y-value associated with that
-     *             x-index, and all y-values occuring after it in the vector,
-     *             wils be ignored.  The second element of each pair is the
-     *             y-value itself.
+     *             The indices are expected to occur in increasing order, and
+     *             no two y-values in a set may be associated with the same
+     *             x-index; however, there need not be a y-value associated
+     *             with every possible index in the x-set.  If an x-index is
+     *             outside the range of the x-set, the y-value associated with
+     *             that x-index, and all y-values occuring after it in the
+     *             vector, wils be ignored.  The second element of each pair is
+     *             the y-value itself.
      * @param xSet The index of the x-set with which to associate the new y-set.
      * @param axis Specifies which axis to graph the y-set on.  Must be one of
      *             MG_AXIS_Y1 or MG_AXIS_Y2.
@@ -145,7 +160,7 @@ class wxMolGraph : public wxControl {
      *         y-set associated with a given x-set having and index of zero.
      *         On failure this function returns a value less than zero.
      */
-    int addYSet(vector<pair<int,double> > data,
+    int addYSet(YSet data,
                 int xSet,
                 int axis,
                 int style,
@@ -189,7 +204,8 @@ class wxMolGraph : public wxControl {
      * is set to false, this function has no effect.
      *
      * @param xSet The x-set for which to set the selected index.
-     * @param index The new selected index.
+     * @param index The new selected index.  If the index is not in the x-set,
+     *              the selection will remain unchanged.
      */
     void setSelection(int xSet, int index);
 
