@@ -710,7 +710,8 @@ bool MolPrintOut::OnPrintPage(int page) {
         GetPPIPrinter(&w, &h);
         int sh, sw;
         GetPPIScreen(&sw, &sh);
-        float scale = (float)w/ (float)sw;
+   //     float scale = (float)w/ (float)sw;
+        float scale = (float)dcp.GetWidth()/ (float)sw;
         Parent->PrintGL(dc, scale);
         return true;
     }

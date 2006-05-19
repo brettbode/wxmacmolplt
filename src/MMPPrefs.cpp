@@ -237,15 +237,16 @@ void WinPrefs::ReadDefaultPrefs(void) {
 		char * buffer = new char[ByteCount + 1];
 		
 		long test = fread(buffer, 1, ByteCount, preffile);
-		buffer[ByteCount] = '\0';
-		if (test != ByteCount) MessageAlert("Error reading the default prefs file. This is bad!");
+		buffer[test] = '\0';
+	//This test doesn't work on Windoze
+	//	if (test != ByteCount) MessageAlert("Error reading the default prefs file. This is bad!");
 		fclose(preffile);
 
 		XMLSetup();
 		
 		XMLDocument * xDoc = NULL;
 		try{
-			xDoc = new XMLDocument(buffer, ByteCount, true);
+			xDoc = new XMLDocument(buffer, test, true);
 			if (xDoc->parse()) {
 				XMLElement * root = xDoc->getDocumentRoot();
 				ReadMMPPrefs(root);
@@ -359,18 +360,18 @@ bool WinPrefs::ReadUserPrefs(void) {
 		char * buffer = new char[ByteCount + 1];
 		
 		long test = fread(buffer, 1, ByteCount, preffile);
-		buffer[ByteCount] = '\0';
-		if (test != ByteCount) {
-			MessageAlert("Error reading the user prefs file.");
-			return false;
-		}
+		buffer[test] = '\0';
+//		if (test != ByteCount) {
+//			MessageAlert("Error reading the user prefs file.");
+//			return false;
+//		}
 		fclose(preffile);
 		
 		XMLSetup();
 		
 		XMLDocument * xDoc = NULL;
 		try{
-			xDoc = new XMLDocument(buffer, ByteCount, true);
+			xDoc = new XMLDocument(buffer, test, true);
 			if (xDoc->parse()) {
 				XMLElement * root = xDoc->getDocumentRoot();
 				ReadMMPPrefs(root);
