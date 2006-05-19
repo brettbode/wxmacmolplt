@@ -431,6 +431,9 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
     //      MolWinList.push_back(temp);
             //Ok we have a problem. Abort open can't close the last window!
             long r = OpenFile(filename);
+			if (r>0) {
+				SetTitle(filename);
+			}
     //      if (r>0) temp->Show(true);
         }
     } else
@@ -1457,8 +1460,7 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
         // Set the path for saving changes
         if(type == CMLFile) {
             currFilePath = fileName;
-        }
-        else {
+        } else {
             currFilePath = wxT("");
         }
     }
