@@ -13,9 +13,9 @@ extern const wxEventType wxEVT_GRAPH_CLICK;
 #define EVT_AXIS_DCLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_AXIS_DCLICK, id, -1, (wxObjectEventFunction)(wxEventFunction)(wxNotifyEventFunction)&fn, (wxObject *) NULL )
 #define EVT_GRAPH_CLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_GRAPH_CLICK, id, -1, (wxObjectEventFunction)(wxEventFunction)(wxNotifyEventFunction)&fn, (wxObject *) NULL )
 
-#define MG_AXIS_X  0
-#define MG_AXIS_Y1 1
-#define MG_AXIS_Y2 2
+#define MG_AXIS_X  0x00
+#define MG_AXIS_Y1 0x01
+#define MG_AXIS_Y2 0x02
 
 #define MG_STYLE_NONE  0x00
 #define MG_STYLE_POINT 0x01
@@ -23,6 +23,8 @@ extern const wxEventType wxEVT_GRAPH_CLICK;
 #define MG_STYLE_BAR   0x04
 
 #define MG_STYLE_POINT_LINE 0x03
+
+#define MG_SHAPE_CIRCLE 0x01
 
 typedef pair< vector< double >, int > XSet;
 typedef vector< pair< int, double > > YSet;
@@ -67,6 +69,18 @@ class wxMolGraph : public wxControl {
     wxRegion graphRegion;
 
     int precision;
+
+    wxCoord clickedX;
+    wxCoord clickedY;
+
+    double xConversion;
+    double y1Conversion;
+    double y2Conversion;
+
+    wxCoord xScaleMin;
+    wxCoord xScaleMax;
+    wxCoord yScaleMin;
+    wxCoord yScaleMax;
 
     /* TODO */
 

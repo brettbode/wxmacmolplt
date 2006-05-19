@@ -55,7 +55,7 @@ wxMolGraph::wxMolGraph(wxWindow       *parent,
     ys.push_back(make_pair(2, 9.5));
     ys.push_back(make_pair(3, 7.0));
     ys.push_back(make_pair(4, 19.0));
-    addYSet(ys, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, *wxBLACK);
+    addYSet(ys, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, *wxCYAN);
 }
 
 int wxMolGraph::addXSet(vector<double> xData, bool selectable) {
@@ -103,6 +103,8 @@ int wxMolGraph::addYSet(YSet yData,
     newYSettings.axis = axis;
     newYSettings.style = style;
     newYSettings.color = color;
+    newYSettings.shape = MG_SHAPE_CIRCLE;
+    newYSettings.size  = 4;
 
     try {
         data[xSet].second.push_back(yData);
@@ -240,6 +242,17 @@ void wxMolGraph::reset() {
     y1AxisRegion.Clear();
     y2AxisRegion.Clear();
     graphRegion.Clear();
+    clickedX = 0;
+    clickedY = 0;
+    xConversion  = 0.0;
+    y1Conversion = 0.0;
+    y2Conversion = 0.0;
+    xScaleMin = 0;
+    xScaleMax = 0;
+    yScaleMin = 0;
+    yScaleMax = 0;
+    Refresh();
+    Update();
 }
 
 wxSize wxMolGraph::DoGetBestSize() const {
@@ -361,10 +374,6 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     wxCoord   y3         = 0;
     wxCoord   lineX      = 0;
     wxCoord   lineY      = 0;
-    wxCoord   xScaleMin   = 0;
-    wxCoord   xScaleMax   = 0;
-    wxCoord   yScaleMin   = 0;
-    wxCoord   yScaleMax   = 0;
     wxSize    canvasSize(0, 0);
     wxSize    xAxisTextSize(0, 0);
     wxSize    xMaxTextSize(0, 0);
@@ -375,9 +384,6 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     wxSize    y2AxisTextSize(0, 0);
     wxSize    y2MaxTextSize(0, 0);
     wxSize    y2MinTextSize(0, 0);
-    double    xConversion = 0.0;
-    double    y1Conversion = 0.0;
-    double    y2Conversion = 0.0;
     double    spacing    = 0.0;
     double    firstTick  = 0.0;
     double    xCoord     = 0.0;
@@ -577,29 +583,63 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
                             y = yScaleMin - (int)((yCoord - y2Min) * y2Conversion);
                             break;
                     }
-                    // TEMPORARY:
-                    dc.DrawCircle(x, y, 3);
+                    dc.SetBrush(wxBrush(dataSettings[i][j].color));
+                    dc.SetPen(wxPen(*wxBLACK, 2));
+                    switch(dataSettings[i][j].shape) {
+                        case MG_SHAPE_CIRCLE:
+                            dc.DrawCircle(x, y, dataSettings[i][j].size);
+                            break;
+                    }
                 }
             }
         }
     }
     catch(const out_of_range &e) {
     }
+
+    dc.SetBrush(wxNullBrush);
+    dc.SetPen(wxNullPen);
 }
 
 void wxMolGraph::onLeftClick(wxMouseEvent &event) {
     wxCommandEvent event_graph(wxEVT_GRAPH_CLICK);
+    double x = 0.0;
+    int i = 0;
+    int j = 0;
 
     if(event.LeftDown()) {
-        if(graphRegion.Contains(event.GetPosition()) == wxInRegion) {
-            cout << "Graph Clicked!" << endl;
-            // Store coords
-        }
+        event.GetPosition(&clickedX, &clickedY);
         event.Skip();
     }
     else if(event.LeftUp()) {
         if(graphRegion.Contains(event.GetPosition()) == wxInRegion &&
-           0 /* Still hovering over same x-val */) {
+           graphRegion.Contains(clickedX, clickedY) == wxInRegion) {
+            clickedX = 0;
+            clickedY = 0;
+            x = (event.GetX() - xScaleMin) / xConversion + xMin;
+            for(i = 0; i < data.size(); i++) {
+                if(x <= data[i].first.first[0]) {
+                    data[i].first.second = 0;
+                }
+                else if(x >= *(data[i].first.first.end() - 1)) {
+                    data[i].first.second = data[i].first.first.size() - 1;
+                }
+                else {
+                    for(j = 0; j < data[i].first.first.size() - 1; j++) {
+                        if(x > data[i].first.first[j] &&
+                           x < data[i].first.first[j + 1]) {
+                            if(x - data[i].first.first[j] <
+                               data[i].first.first[j + 1] - x) {
+                                data[i].first.second = j;
+                            }
+                            else {
+                                data[i].first.second = j + 1;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
             wxPostEvent(this, event_graph);
         }
     }
