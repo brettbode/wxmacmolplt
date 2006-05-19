@@ -82,6 +82,9 @@ class wxMolGraph : public wxControl {
     wxCoord yScaleMin;
     wxCoord yScaleMax;
 
+    double y1Offset;
+    double y2Offset;
+
     /* TODO */
 
     DECLARE_DYNAMIC_CLASS(wxMolGraph) /* NOTE:  Everything after this will be
@@ -150,10 +153,9 @@ class wxMolGraph : public wxControl {
      *             no two y-values in a set may be associated with the same
      *             x-index; however, there need not be a y-value associated
      *             with every possible index in the x-set.  If an x-index is
-     *             outside the range of the x-set, the y-value associated with
-     *             that x-index, and all y-values occuring after it in the
-     *             vector, wils be ignored.  The second element of each pair is
-     *             the y-value itself.
+     *             outside the range of the x-set, the widget's behavior is
+     *             undefined.  The second element of each pair is the y-value
+     *             itself.
      * @param xSet The index of the x-set with which to associate the new y-set.
      * @param axis Specifies which axis to graph the y-set on.  Must be one of
      *             MG_AXIS_Y1 or MG_AXIS_Y2.
@@ -284,9 +286,9 @@ class wxMolGraph : public wxControl {
 
 
     /**
-     * Resets the wxMolGraph to its initial state.  Axis information, such as
-     * min/max and offset, is reset, all sets are removed, and
-     * the indices of newly added sets will restart at zero.
+     * Restores the wxMolGraph to its initial state.  Axis information, such as
+     * min/max and offset, is reset, all sets are removed, and the indices of
+     * newly added sets will restart at zero.
      */
     void reset();
 

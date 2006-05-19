@@ -39,8 +39,6 @@ wxMolGraph::wxMolGraph(wxWindow       *parent,
     y1Min = 1.0;
     y2Max = 25.37163;
     y2Min = -1.21398;
-    numY1Graphs = 1;
-    numY2Graphs = 1;
     precision = 4;
     vector<double> v(5);
     v[0] = 20.5;
@@ -55,7 +53,9 @@ wxMolGraph::wxMolGraph(wxWindow       *parent,
     ys.push_back(make_pair(2, 9.5));
     ys.push_back(make_pair(3, 7.0));
     ys.push_back(make_pair(4, 19.0));
-    addYSet(ys, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, *wxCYAN);
+    y1Offset = 1.0;
+    y2Offset = -1.21398;
+    addYSet(ys, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE | MG_STYLE_BAR, *wxCYAN);
 }
 
 int wxMolGraph::addXSet(vector<double> xData, bool selectable) {
@@ -221,6 +221,16 @@ void wxMolGraph::setAxisLabel(int axis, wxString &label) {
 }
 
 void wxMolGraph::setOffsetY(int axis, double offset) {
+    switch(axis) {
+        case MG_AXIS_Y1:
+            y1Offset = offset;
+            break;
+        case MG_AXIS_Y2:
+            y2Offset = offset;
+            break;
+    }
+
+    Refresh();
 }
 
 void wxMolGraph::reset() {
@@ -251,6 +261,8 @@ void wxMolGraph::reset() {
     xScaleMax = 0;
     yScaleMin = 0;
     yScaleMax = 0;
+    y1Offset = 0.0;
+    y2Offset = 0.0;
     Refresh();
     Update();
 }
@@ -295,8 +307,8 @@ wxSize wxMolGraph::DoGetBestSize() const {
     dc.GetTextExtent(xMinText, &w, &h);
     xMinTextSize.Set(w, h);
 
-    y1MaxText = wxString::Format("%0.*f", precision, y1Max);
-    y1MinText = wxString::Format("%0.*f", precision, y1Min);
+    y1MaxText = wxString::Format("%0.*f", precision, y1Max - y1Offset);
+    y1MinText = wxString::Format("%0.*f", precision, y1Min - y1Offset);
     dc.GetTextExtent(y1AxisText, &w, &h);
     y1AxisTextSize.Set(w, h);
     dc.GetTextExtent(y1MaxText, &w, &h);
@@ -304,8 +316,8 @@ wxSize wxMolGraph::DoGetBestSize() const {
     dc.GetTextExtent(y1MinText, &w, &h);
     y1MinTextSize.Set(w, h);
 
-    y2MaxText = wxString::Format("%0.*f", precision, y2Max);
-    y2MinText = wxString::Format("%0.*f", precision, y2Min);
+    y2MaxText = wxString::Format("%0.*f", precision, y2Max - y2Offset);
+    y2MinText = wxString::Format("%0.*f", precision, y2Min - y2Offset);
     dc.GetTextExtent(y2AxisText, &w, &h);
     y2AxisTextSize.Set(w, h);
     dc.GetTextExtent(y2MaxText, &w, &h);
@@ -414,8 +426,8 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     dc.GetTextExtent(xMinText, &x, &y);
     xMinTextSize.Set(x, y);
 
-    y1MaxText = wxString::Format("%0.*f", precision, y1Max);
-    y1MinText = wxString::Format("%0.*f", precision, y1Min);
+    y1MaxText = wxString::Format("%0.*f", precision, y1Max - y1Offset);
+    y1MinText = wxString::Format("%0.*f", precision, y1Min - y1Offset);
     dc.GetTextExtent(y1AxisText, &x, &y);
     y1AxisTextSize.Set(x, y);
     dc.GetTextExtent(y1MaxText, &x, &y);
@@ -423,8 +435,8 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     dc.GetTextExtent(y1MinText, &x, &y);
     y1MinTextSize.Set(x, y);
 
-    y2MaxText = wxString::Format("%0.*f", precision, y2Max);
-    y2MinText = wxString::Format("%0.*f", precision, y2Min);
+    y2MaxText = wxString::Format("%0.*f", precision, y2Max - y2Offset);
+    y2MinText = wxString::Format("%0.*f", precision, y2Min - y2Offset);
     dc.GetTextExtent(y2AxisText, &x, &y);
     y2AxisTextSize.Set(x, y);
     dc.GetTextExtent(y2MaxText, &x, &y);
@@ -573,7 +585,6 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
                 for(k = 0; k < data[i].second[j].size(); k++) {
                     xCoord = data[i].first.first.at(data[i].second[j][k].first);
                     yCoord = data[i].second[j][k].second;
-                    // I don't know if this part works
                     x = xScaleMin + (int)((xCoord - xMin) * xConversion);
                     switch(dataSettings[i][j].axis) {
                         case MG_AXIS_Y1:
@@ -583,12 +594,46 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
                             y = yScaleMin - (int)((yCoord - y2Min) * y2Conversion);
                             break;
                     }
+
                     dc.SetBrush(wxBrush(dataSettings[i][j].color));
-                    dc.SetPen(wxPen(*wxBLACK, 2));
-                    switch(dataSettings[i][j].shape) {
-                        case MG_SHAPE_CIRCLE:
-                            dc.DrawCircle(x, y, dataSettings[i][j].size);
-                            break;
+                    dc.SetPen(wxPen(*wxBLACK));
+                    if(dataSettings[i][j].style & MG_STYLE_LINE) {
+                        if(k + 1 < data[i].second[j].size()) {
+                            xCoord = data[i].first.first.at(data[i].second[j][k+1].first);
+                            yCoord = data[i].second[j][k+1].second;
+                            lineX = xScaleMin + (int)((xCoord - xMin) * xConversion);
+                            switch(dataSettings[i][j].axis) {
+                                case MG_AXIS_Y1:
+                                    lineY = yScaleMin - (int)((yCoord - y1Min) * y1Conversion);
+                                    break;
+                                case MG_AXIS_Y2:
+                                    lineY = yScaleMin - (int)((yCoord - y2Min) * y2Conversion);
+                                    break;
+                            }
+                            dc.DrawLine(x, y, lineX, lineY);
+                        }
+                    }
+                    if(dataSettings[i][j].style & MG_STYLE_BAR) {
+                        if(data[i].first.second == data[i].second[j][k].first) {
+                            dc.SetPen(wxPen(*wxRED));
+                        }
+                        else {
+                            dc.SetPen(wxPen(*wxBLACK));
+                        }
+                        dc.DrawLine(x, y, x, yScaleMin);
+                    }
+                    if(dataSettings[i][j].style & MG_STYLE_POINT) {
+                        if(data[i].first.second == data[i].second[j][k].first) {
+                            dc.SetBrush(wxBrush(*wxRED));
+                        }
+                        else {
+                            dc.SetBrush(wxBrush(dataSettings[i][j].color));
+                        }
+                        switch(dataSettings[i][j].shape) {
+                            case MG_SHAPE_CIRCLE:
+                                dc.DrawCircle(x, y, dataSettings[i][j].size);
+                                break;
+                        }
                     }
                 }
             }
@@ -640,6 +685,7 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
                     }
                 }
             }
+            Refresh();
             wxPostEvent(this, event_graph);
         }
     }
