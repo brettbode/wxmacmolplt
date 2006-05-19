@@ -1,4 +1,7 @@
 #include "wxMolGraph.h"
+#include <stdexcept>
+
+using namespace std;
 
 IMPLEMENT_DYNAMIC_CLASS(wxMolGraph, wxControl)
 
@@ -48,10 +51,10 @@ wxMolGraph::wxMolGraph(wxWindow       *parent,
     addXSet(v, true);
     YSet ys;
     ys.push_back(make_pair(0, 1.5));
-    ys.push_back(make_pair(1, 2.5));
-    ys.push_back(make_pair(2, 5.5));
-    ys.push_back(make_pair(3, 7.5));
-    ys.push_back(make_pair(4, 9.0));
+    ys.push_back(make_pair(1, 5.5));
+    ys.push_back(make_pair(2, 9.5));
+    ys.push_back(make_pair(3, 7.0));
+    ys.push_back(make_pair(4, 19.0));
     addYSet(ys, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, *wxBLACK);
 }
 
@@ -69,14 +72,14 @@ int wxMolGraph::addXSet(vector<double> xData, bool selectable) {
     try {
         data.push_back(make_pair(newXSet, emptyYSetGroup));
     }
-    catch(bad_alloc) {
+    catch(const bad_alloc &e) {
         return -1;
     }
 
     try {
         dataSettings.push_back(emptyYSettingsGroup);
     }
-    catch(bad_alloc) {
+    catch(const bad_alloc &e) {
         data.pop_back();
         return -1;
     }
@@ -104,13 +107,13 @@ int wxMolGraph::addYSet(YSet yData,
     try {
         data[xSet].second.push_back(yData);
     }
-    catch(bad_alloc) {
+    catch(const bad_alloc &e) {
         return -1;
     }
     try {
         dataSettings[xSet].push_back(newYSettings);
     }
-    catch(bad_alloc) {
+    catch(const bad_alloc &e) {
         data[xSet].second.pop_back();
         return -1;
     }
@@ -382,6 +385,7 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     int       numTicks   = 0;
     int       i          = 0;
     int       j          = 0;
+    int       k          = 0;
     DataSet::iterator pos;
 
     GetClientSize(&x, &y);
@@ -450,7 +454,10 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     }
 
     xAxisRegion = wxRegion(x2, y2, (x3 - x2), (y3 - y2));
-    graphRegion = wxRegion(x2, BORDER, (x3 - x2), y2);
+    graphRegion = wxRegion(x2 + dc.GetCharHeight() / 2,
+                  BORDER,
+                  x3 - x2 - dc.GetCharHeight() + 1,
+                  y2 - dc.GetCharHeight() / 2);
 
 
     // X Axis
@@ -553,28 +560,31 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     }
 
     // Data
-    //try {
+    dc.SetClippingRegion(graphRegion);
+    try {
         for(i = 0; i < data.size(); i++) {
-            for(j = 0; j < data[i].second[0].size(); j++) {
-                xCoord = data[i].first.first.at(data[i].second[0][j].first);
-                yCoord = data[i].second[0][j].second;
-                // I don't know if this part works
-                x = xScaleMin + (int)((xCoord - xMin) * xConversion);
-                switch(dataSettings[i][0].axis) {
-                    case MG_AXIS_Y1:
-                        y = yScaleMin - (int)((yCoord - y1Min) * y1Conversion);
-                        break;
-                    case MG_AXIS_Y2:
-                        y = yScaleMin - (int)((yCoord - y2Min) * y2Conversion);
-                        break;
+            for(j = 0; j < data[i].second.size(); j++) {
+                for(k = 0; k < data[i].second[j].size(); k++) {
+                    xCoord = data[i].first.first.at(data[i].second[j][k].first);
+                    yCoord = data[i].second[j][k].second;
+                    // I don't know if this part works
+                    x = xScaleMin + (int)((xCoord - xMin) * xConversion);
+                    switch(dataSettings[i][j].axis) {
+                        case MG_AXIS_Y1:
+                            y = yScaleMin - (int)((yCoord - y1Min) * y1Conversion);
+                            break;
+                        case MG_AXIS_Y2:
+                            y = yScaleMin - (int)((yCoord - y2Min) * y2Conversion);
+                            break;
+                    }
+                    // TEMPORARY:
+                    dc.DrawCircle(x, y, 3);
                 }
-                // TEMPORARY:
-                dc.DrawCircle(x, y, 3);
             }
         }
-    //}
-    //catch(out_of_range) {
-    //}
+    }
+    catch(const out_of_range &e) {
+    }
 }
 
 void wxMolGraph::onLeftClick(wxMouseEvent &event) {
@@ -582,6 +592,7 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
 
     if(event.LeftDown()) {
         if(graphRegion.Contains(event.GetPosition()) == wxInRegion) {
+            cout << "Graph Clicked!" << endl;
             // Store coords
         }
         event.Skip();
