@@ -225,6 +225,10 @@ class MolDisplayWin : public wxFrame {
 		void OnFrameAnimationTimer(wxTimerEvent & event);
             //Function to receive all changes to the scroll bar
         void OnScrollBarChange(wxScrollEvent& event);
+			//Function to be called when window loses focus to stop animations
+		void OnMenuOpen(wxMenuEvent & event);
+		void OnKillFocus(wxFocusEvent & event);
+		void StopAnimations(void);
 };
 
 class MolPrintOut : public wxPrintout {

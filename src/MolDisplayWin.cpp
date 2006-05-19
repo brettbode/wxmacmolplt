@@ -68,6 +68,8 @@ enum MMP_EventID {
 	MMP_PRINTOPTIONS,
 	MMP_ANIMATEFRAMES,
 	MMP_ANIMATEFRAMESTIMER,
+	MMP_ANIMATEMODE,
+	MMP_ANIMATEMODETIMER,
     
     Number_MMP_Ids
 };
@@ -99,6 +101,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
 
     EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
+	EVT_MENU (MMP_ANIMATEMODE,		MolDisplayWin::menuViewAnimateMode)
     EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
     EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
     EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
@@ -128,6 +131,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_SIZE( MolDisplayWin::eventSize )
     EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
     EVT_COMMAND_SCROLL(MMP_FRAMESCROLLBAR, MolDisplayWin::OnScrollBarChange )
+	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen )
+	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 END_EVENT_TABLE()
 
 MolDisplayWin::MolDisplayWin(const wxString &title,
@@ -219,6 +224,21 @@ void MolDisplayWin::SizeChanged(void) {
     textBar->SetSize(0, height-sheight, width-114, sheight, wxSIZE_USE_EXISTING);
 }
 
+void MolDisplayWin::OnMenuOpen(wxMenuEvent & event) {
+	StopAnimations();
+	event.Skip();
+}
+void MolDisplayWin::OnKillFocus(wxFocusEvent & event) {
+	StopAnimations();
+	event.Skip();
+}
+void MolDisplayWin::StopAnimations(void) {
+	if (m_timer.IsRunning()) {
+		m_timer.Stop();
+		timerRunning = false;
+	}
+}
+
 void MolDisplayWin::OnFrameAnimationTimer(wxTimerEvent & event) {
 	if (MainData->CurrentFrame>=MainData->NumFrames)
 		ChangeFrames(1);
@@ -269,10 +289,11 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->Append(wxID_PREFERENCES, wxT("Pr&eferences ..."));
 
     menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"));
+    menuView->Append(MMP_ANIMATEMODE, wxT("Animate Mode\tCtrl+M"));
     menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
-    menuView->Append(MMP_NEXTMODE, wxT("Next Normal &Mode\tCtrl+]"));
+    menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
     menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show &Axis"));
-    menuView->AppendCheckItem(MMP_ANIMATEFRAMES, wxT("Animate &Frames\tCtrl+F"));
+    menuView->Append(MMP_ANIMATEFRAMES, wxT("Animate &Frames\tCtrl+F"));
     menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl+-"));
     menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl+="));
     menuView->Append(MMP_CENTER, wxT("&Center View"));
@@ -321,8 +342,10 @@ void MolDisplayWin::ClearMenus(void) {
     menuEdit->Enable(wxID_CLEAR, false);
     menuEdit->Enable(wxID_SELECTALL, false);
     menuView->Enable(MMP_SHOWMODE, false);
+    menuView->Enable(MMP_ANIMATEMODE, false);
     menuView->Enable(MMP_PREVMODE, false);
     menuView->Enable(MMP_NEXTMODE, false);
+    menuView->Enable(MMP_ANIMATEFRAMES, false);
     menuMolecule->Enable(MMP_SETBONDLENGTH, false);
     menuMolecule->Enable(MMP_CREATELLMPATH, false);
     menuMolecule->Enable(MMP_MINFRAMEMOVEMENTS, false);
@@ -341,6 +364,7 @@ void MolDisplayWin::AdjustMenus(void) {
     }
     if (MainData->NumFrames > 1 ) {
         menuFile->Enable(MMP_DELETEFRAME, true);
+		menuView->Enable(MMP_ANIMATEFRAMES, true);
         if (MainData->CurrentFrame < MainData->NumFrames) {
             Frame * lFrame = MainData->GetCurrentFramePtr();
             Frame * lnFrame = lFrame->GetNextFrame();
@@ -356,6 +380,7 @@ void MolDisplayWin::AdjustMenus(void) {
     }
     if (MainData->cFrame->Vibs) {
         menuView->Enable(MMP_SHOWMODE, true);
+		menuView->Enable(MMP_ANIMATEMODE, true);
         menuView->Check(MMP_SHOWMODE, MainData->GetDrawMode());
         if (MainData->cFrame->Vibs->CurrentMode>0) menuView->Enable(MMP_PREVMODE, true);
         if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1))
@@ -929,6 +954,8 @@ void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
     ResetModel(false);
     Dirty = true;
 }
+void MolDisplayWin::menuViewAnimateMode(wxCommandEvent &event) {
+}
 void MolDisplayWin::menuViewShowAxis(wxCommandEvent &event) {
     MainData->SetShowAxis(1-MainData->ShowAxis());
     UpdateModelDisplay();
@@ -1040,7 +1067,8 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
     Dirty = true;
 }
 void MolDisplayWin::OnScrollBarChange( wxScrollEvent& event ) {
-        //this function receives all events from the scroll bar and
+	StopAnimations();
+		//this function receives all events from the scroll bar and
         //and thus provides live dragging.
     int newpos = event.GetPosition() + 1;
     if (newpos != MainData->CurrentFrame) {
@@ -1049,6 +1077,7 @@ void MolDisplayWin::OnScrollBarChange( wxScrollEvent& event ) {
 }
 
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
+	StopAnimations();
     int key = event.GetKeyCode();
     if (!event.HasModifiers()) {
         switch (key) {
