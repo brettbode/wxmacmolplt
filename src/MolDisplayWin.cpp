@@ -417,30 +417,45 @@ void MolDisplayWin::menuFileDeleteFrame(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
-    ExportOptionsDialog *exportOptionsDlg = new ExportOptionsDialog(this);
+    wxFileDialog        *fileDlg = NULL;
+    ExportOptionsDialog *exportOptionsDlg = NULL;
     wxString   filepath;
     wxMemoryDC memDC;
     wxImage    exportImage;
     wxBitmap  *bmp;
+    wxString   wildcards(wxT("Windows Bitmap (*.bmp)|*.bmp|Portable Network Graphics (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg"));
+    int        index = 0;
 
-    if(exportOptionsDlg->ShowModal() == wxID_OK) {
-        filepath = wxFileSelector(wxT("Export"), wxT(""), wxT(""),
-                                  /*exportOptionsDlg->getExtension(),*/
-                                  wxT(""),
-                                  exportOptionsDlg->getWildcard(),
-                                  wxSAVE | wxOVERWRITE_PROMPT, this);
-        if(!filepath.IsEmpty()) {
-            bmp = new wxBitmap(exportOptionsDlg->getWidth(),
-                               exportOptionsDlg->getHeight());
-            memDC.SelectObject(*bmp);
-            glCanvas->GenerateHiResImageForExport(&memDC);
-            exportImage = bmp->ConvertToImage();
-            exportImage.SaveFile(filepath);
-            memDC.SelectObject(wxNullBitmap); // bmp has now been destroyed.
+    fileDlg = new wxFileDialog(this,
+                               wxT("Export"),
+                               wxT(""),
+                               wxT(""),
+                               wildcards,
+                               wxSAVE | wxOVERWRITE_PROMPT);
+
+    if(fileDlg->ShowModal() == wxID_OK) {
+        filepath = fileDlg->GetPath();
+        index    = fileDlg->GetFilterIndex();
+        exportOptionsDlg = new ExportOptionsDialog(this);
+        if(exportOptionsDlg->ShowModal() == wxID_OK) {
+            switch(index) {
+                case 0:
+                case 1:
+                case 2:
+                    bmp = new wxBitmap(exportOptionsDlg->getWidth(),
+                                       exportOptionsDlg->getHeight());
+                    memDC.SelectObject(*bmp);
+                    glCanvas->GenerateHiResImageForExport(&memDC);
+                    exportImage = bmp->ConvertToImage();
+                    exportImage.SaveFile(filepath);
+                    memDC.SelectObject(wxNullBitmap); // bmp has now been
+                                                      // destroyed.
+            }
         }
     }
 
     delete exportOptionsDlg;
+    delete fileDlg;
 }
 
 void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {

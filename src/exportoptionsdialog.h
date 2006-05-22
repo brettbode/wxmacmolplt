@@ -45,7 +45,7 @@ class wxSpinCtrl;
 #define SYMBOL_EXPORTOPTIONSDIALOG_IDNAME ID_EXPORTOPTIONSDIALOG
 #define SYMBOL_EXPORTOPTIONSDIALOG_SIZE wxSize(400, 300)
 #define SYMBOL_EXPORTOPTIONSDIALOG_POSITION wxDefaultPosition
-#define ID_FILE_TYPE_CHOICE 10045
+#define ID_RES_PANEL 10045
 #define ID_RES_CHOICE 10047
 #define ID_RESWIDTHSPIN 10051
 #define ID_RESHEIGHTSPIN 10049
@@ -81,9 +81,6 @@ public:
 
 ////@begin ExportOptionsDialog event handler declarations
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_FILE_TYPE_CHOICE
-    void OnFileTypeChoiceSelected( wxCommandEvent& event );
-
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_RES_CHOICE
     void OnResChoiceSelected( wxCommandEvent& event );
 
@@ -100,21 +97,12 @@ public:
 
     int getWidth() const { return width; }
     int getHeight() const { return height; }
-    wxString getWildcard() const {wxString wildcardStrings[] = {wxT("Windows Bitmap (*.bmp)|*.bmp"),
-                                                               wxT("Portable Network Graphics (*.png)|*.png"),
-                                                               wxT("JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg")};
-                                  return wildcardStrings[filetype]; }
-    wxString getExtension() const {wxString extensionStrings[] = {wxT("bmp"),
-                                                                  wxT("png"),
-                                                                  wxT("jpeg")};
-                                   return extensionStrings[filetype]; }
 
     /// Retrieves bitmap resources
     wxBitmap GetBitmapResource( const wxString& name );
 
     /// Retrieves icon resources
     wxIcon GetIconResource( const wxString& name );
-
 
     /// Should we show tooltips?
     static bool ShowToolTips();
@@ -135,6 +123,7 @@ private:
     wxStaticText    *txt3;
     wxSpinCtrl      *resWidthSpin;
     wxSpinCtrl      *resHeightSpin;
+    wxPanel         *panelRes;
 };
 
 #endif

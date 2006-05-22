@@ -49,8 +49,6 @@ IMPLEMENT_DYNAMIC_CLASS( ExportOptionsDialog, wxDialog )
 BEGIN_EVENT_TABLE( ExportOptionsDialog, wxDialog )
 
 ////@begin ExportOptionsDialog event table entries
-    EVT_CHOICE( ID_FILE_TYPE_CHOICE, ExportOptionsDialog::OnFileTypeChoiceSelected )
-
     EVT_CHOICE( ID_RES_CHOICE, ExportOptionsDialog::OnResChoiceSelected )
 
     EVT_SPINCTRL( ID_RESWIDTHSPIN, ExportOptionsDialog::OnReswidthspinUpdated )
@@ -83,7 +81,7 @@ ExportOptionsDialog::ExportOptionsDialog( wxWindow* parent, wxWindowID id, const
 bool ExportOptionsDialog::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin ExportOptionsDialog member initialisation
-    fileTypeChoice = NULL;
+    panelRes = NULL;
     resChoice = NULL;
     txt0 = NULL;
     resWidthSpin = NULL;
@@ -128,82 +126,57 @@ void ExportOptionsDialog::CreateControls()
     wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
     itemDialog1->SetSizer(itemBoxSizer2);
 
-    wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL, 5);
+    panelRes = new wxPanel( itemDialog1, ID_RES_PANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER );
+    itemBoxSizer2->Add(panelRes, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxStaticText* itemStaticText4 = new wxStaticText( itemDialog1, wxID_STATIC, _("File Type:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer3->Add(itemStaticText4, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
-
-    wxString fileTypeChoiceStrings[] = {
-        _("Windows Bitmap (*.bmp)"),
-        _("Portable Network Graphics (*.png)"),
-        _("JPEG (*.jpeg;*.jpg)")
-    };
-    fileTypeChoice = new wxChoice( itemDialog1, ID_FILE_TYPE_CHOICE, wxDefaultPosition, wxDefaultSize, 3, fileTypeChoiceStrings, 0 );
-    itemBoxSizer3->Add(fileTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxTOP|wxBOTTOM, 5);
-
-    wxStaticBox* itemStaticBoxSizer6Static = new wxStaticBox(itemDialog1, wxID_ANY, _("Options"));
-    wxStaticBoxSizer* itemStaticBoxSizer6 = new wxStaticBoxSizer(itemStaticBoxSizer6Static, wxVERTICAL);
-    itemBoxSizer2->Add(itemStaticBoxSizer6, 0, wxGROW|wxALL, 5);
+    wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
+    panelRes->SetSizer(itemBoxSizer4);
 
     wxString resChoiceStrings[] = {
         _("72dpi (Screen)"),
         _("300dpi (Print)"),
         _("Custom")
     };
-    resChoice = new wxChoice( itemDialog1, ID_RES_CHOICE, wxDefaultPosition, wxDefaultSize, 3, resChoiceStrings, 0 );
+    resChoice = new wxChoice( panelRes, ID_RES_CHOICE, wxDefaultPosition, wxDefaultSize, 3, resChoiceStrings, 0 );
     resChoice->SetStringSelection(_("72dpi (Screen)"));
-    itemStaticBoxSizer6->Add(resChoice, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    itemBoxSizer4->Add(resChoice, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer8 = new wxBoxSizer(wxVERTICAL);
-    itemStaticBoxSizer6->Add(itemBoxSizer8, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 5);
+    wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer4->Add(itemBoxSizer6, 0, wxALIGN_RIGHT, 5);
 
-    wxBoxSizer* itemBoxSizer9 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer8->Add(itemBoxSizer9, 0, wxALIGN_RIGHT, 5);
+    txt0 = new wxStaticText( panelRes, wxID_STATIC, _("Width:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer6->Add(txt0, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    txt0 = new wxStaticText( itemDialog1, wxID_STATIC, _("Width:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer9->Add(txt0, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    resWidthSpin = new wxSpinCtrl( panelRes, ID_RESWIDTHSPIN, _T("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 999999999, 300 );
+    itemBoxSizer6->Add(resWidthSpin, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
 
-    resWidthSpin = new wxSpinCtrl( itemDialog1, ID_RESWIDTHSPIN, _T("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 999999999, 300 );
-    itemBoxSizer9->Add(resWidthSpin, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
+    txt1 = new wxStaticText( panelRes, wxID_STATIC, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer6->Add(txt1, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    txt1 = new wxStaticText( itemDialog1, wxID_STATIC, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer9->Add(txt1, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxBoxSizer* itemBoxSizer10 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer4->Add(itemBoxSizer10, 0, wxALIGN_RIGHT, 5);
 
-    wxBoxSizer* itemBoxSizer13 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer8->Add(itemBoxSizer13, 0, wxALIGN_RIGHT, 5);
+    txt2 = new wxStaticText( panelRes, wxID_STATIC, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer10->Add(txt2, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    txt2 = new wxStaticText( itemDialog1, wxID_STATIC, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer13->Add(txt2, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    resHeightSpin = new wxSpinCtrl( panelRes, ID_RESHEIGHTSPIN, _T("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 999999999, 300 );
+    itemBoxSizer10->Add(resHeightSpin, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
 
-    resHeightSpin = new wxSpinCtrl( itemDialog1, ID_RESHEIGHTSPIN, _T("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 999999999, 300 );
-    itemBoxSizer13->Add(resHeightSpin, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
+    txt3 = new wxStaticText( panelRes, wxID_STATIC, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer10->Add(txt3, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    txt3 = new wxStaticText( itemDialog1, wxID_STATIC, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer13->Add(txt3, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxStdDialogButtonSizer* itemStdDialogButtonSizer14 = new wxStdDialogButtonSizer;
 
-    wxStdDialogButtonSizer* itemStdDialogButtonSizer17 = new wxStdDialogButtonSizer;
+    itemBoxSizer2->Add(itemStdDialogButtonSizer14, 0, wxALIGN_RIGHT|wxRIGHT|wxTOP|wxBOTTOM, 5);
+    wxButton* itemButton15 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStdDialogButtonSizer14->AddButton(itemButton15);
 
-    itemBoxSizer2->Add(itemStdDialogButtonSizer17, 0, wxALIGN_RIGHT|wxRIGHT|wxTOP|wxBOTTOM, 5);
-    wxButton* itemButton18 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStdDialogButtonSizer17->AddButton(itemButton18);
+    wxButton* itemButton16 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStdDialogButtonSizer14->AddButton(itemButton16);
 
-    wxButton* itemButton19 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStdDialogButtonSizer17->AddButton(itemButton19);
-
-    itemStdDialogButtonSizer17->Realize();
+    itemStdDialogButtonSizer14->Realize();
 
 ////@end ExportOptionsDialog content construction
-}
-
-/*!
- * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_FILE_TYPE_CHOICE
- */
-
-void ExportOptionsDialog::OnFileTypeChoiceSelected( wxCommandEvent& event )
-{
-    // TODO:  Change the controls available in the options static frame.
-    filetype = fileTypeChoice->GetSelection();
 }
 
 /*!
