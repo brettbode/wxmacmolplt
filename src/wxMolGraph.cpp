@@ -29,7 +29,7 @@ wxMolGraph::wxMolGraph(wxWindow       *parent,
             wxControl(parent, id, pos, size, style) {
     reset();
 
-    /* TEMPORARY: */
+    /* TEMPORARY FOR TESTING:
     xAxisText  = wxT("X-Axis");
     y1AxisText = wxT("Y1-Axis");
     y2AxisText = wxT("Y2-Axis");
@@ -55,7 +55,15 @@ wxMolGraph::wxMolGraph(wxWindow       *parent,
     ys.push_back(make_pair(4, 19.0));
     y1Offset = 1.0;
     y2Offset = -1.21398;
-    addYSet(ys, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE | MG_STYLE_BAR, *wxCYAN);
+    addYSet(ys,
+            0,
+            MG_AXIS_Y1,
+            MG_STYLE_POINT_LINE | MG_STYLE_BAR,
+            *wxCYAN,
+            MG_SHAPE_DIAMOND,
+            16);
+    autoScaleY(MG_AXIS_Y1);
+    */
 }
 
 int wxMolGraph::addXSet(vector<double> xData, bool selectable) {
@@ -84,7 +92,7 @@ int wxMolGraph::addXSet(vector<double> xData, bool selectable) {
         return -1;
     }
 
-    // TODO:  Adjust X-Axis Scale
+    autoScaleX();
     
     Refresh();
 
@@ -95,7 +103,9 @@ int wxMolGraph::addYSet(YSet yData,
                         int xSet,
                         int axis,
                         int style,
-                        wxColour color) {
+                        wxColour color,
+                        int shape,
+                        int size) {
     int index = data[xSet].second.size();
     YSettings newYSettings;
 
@@ -103,8 +113,8 @@ int wxMolGraph::addYSet(YSet yData,
     newYSettings.axis = axis;
     newYSettings.style = style;
     newYSettings.color = color;
-    newYSettings.shape = MG_SHAPE_CIRCLE;
-    newYSettings.size  = 4;
+    newYSettings.shape = shape;
+    newYSettings.size  = size;
 
     try {
         data[xSet].second.push_back(yData);
@@ -160,6 +170,8 @@ void wxMolGraph::delXSet(int xSet) {
     data[xSet].first.second = -1;
     data[xSet].second.clear();
     dataSettings[xSet].clear();
+
+    autoScaleX();
 }
 
 void wxMolGraph::delYSet(int xSet, int ySet) {
@@ -204,6 +216,86 @@ void wxMolGraph::setYAxisMax(int axis, double val) {
 }
 
 void wxMolGraph::autoScaleY(int axis) {
+    double min = 0.0;
+    double max = 0.0;
+    double pad = 0.0;
+    int i = 0;
+    int j = 0;
+    int k = 0;
+    bool set = false;
+
+    for(i = 0; i < data.size(); i++) {
+        for(j = 0; j < data[i].second.size(); j++) {
+            if(dataSettings[i][j].axis == axis) {
+                for(k = 0; k < data[i].second[j].size(); k++) {
+                    if(data[i].second[j][k].second < min || !set) {
+                        min = data[i].second[j][k].second;
+                    }
+                    if(data[i].second[j][k].second > max || !set) {
+                        max = data[i].second[j][k].second;
+                    }
+                    if(!set) {
+                        set = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if(set) {
+        pad = (max - min) / 10.0;
+        max += pad;
+        min -= pad;
+        if(!(max - min)) {
+            max += 1.0;
+            min -= 1.0;
+        }
+        switch(axis) {
+            case MG_AXIS_Y1:
+                y1Max = max;
+                y1Min = min;
+                break;
+            case MG_AXIS_Y2:
+                y2Max = max;
+                y2Min = min;
+                break;
+        }
+    }
+}
+
+void wxMolGraph::autoScaleX(void) {
+    double min = 0.0;
+    double max = 0.0;
+    double pad = 0.0;
+    int i = 0;
+    int j = 0;
+    bool set = false;
+
+    for(i = 0; i < data.size(); i++) {
+        for(j = 0; j < data[i].first.first.size(); j++) {
+            if(data[i].first.first[j] < min || !set) {
+                min = data[i].first.first[j];
+            }
+            if(data[i].first.first[j] > max || !set) {
+                max = data[i].first.first[j];
+            }
+            if(!set) {
+                set = true;
+            }
+        }
+    }
+
+    if(set) {
+        pad = (max - min) / 10.0;
+        max += pad;
+        min -= pad;
+        if(!(max - min)) {
+            max += 1.0;
+            min += 1.0;
+        }
+        xMax = max;
+        xMin = min;
+    }
 }
 
 void wxMolGraph::setAxisLabel(int axis, wxString &label) {
@@ -405,6 +497,7 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     int       j          = 0;
     int       k          = 0;
     DataSet::iterator pos;
+    wxPoint polyPoints[4];
 
     GetClientSize(&x, &y);
     canvasSize.Set(x, y);
@@ -542,6 +635,12 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
             dc.DrawLine(x, y, lineX, y);
         }
     }
+    else {
+        x = x2 + (dc.GetCharHeight() / 2);
+        y = y2 - 3;
+        lineY = y2 - (dc.GetCharHeight() / 2);
+        dc.DrawLine(x, y, x, lineY);
+    }
 
     // Y2 Axis
     if(numY2Graphs > 0) {
@@ -575,6 +674,12 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
             y = yScaleMin - (int)(((double)i * spacing + firstTick - y2Min) * y2Conversion);
             dc.DrawLine(x, y, lineX, y);
         }
+    }
+    else {
+        x = x3 - (dc.GetCharHeight() / 2);
+        y = y2 - 3;
+        lineY = y2 - (dc.GetCharHeight() / 2);
+        dc.DrawLine(x, y, x, lineY);
     }
 
     // Data
@@ -631,7 +736,29 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
                         }
                         switch(dataSettings[i][j].shape) {
                             case MG_SHAPE_CIRCLE:
-                                dc.DrawCircle(x, y, dataSettings[i][j].size);
+                                dc.DrawCircle(x, y, dataSettings[i][j].size / 2);
+                                break;
+                            case MG_SHAPE_DIAMOND:
+                                polyPoints[0].x = 0;
+                                polyPoints[0].y = dataSettings[i][j].size / 2 + 2;
+                                polyPoints[1].x = dataSettings[i][j].size / 2 + 2;
+                                polyPoints[1].y = 0;
+                                polyPoints[2].x = 0;
+                                polyPoints[2].y = -(dataSettings[i][j].size / 2 + 2);
+                                polyPoints[3].x = -(dataSettings[i][j].size / 2 + 2);
+                                polyPoints[3].y = 0;
+                                dc.DrawPolygon(4, polyPoints, x, y);
+                                break;
+                            case MG_SHAPE_SQUARE:
+                                polyPoints[0].x = dataSettings[i][j].size / 2;
+                                polyPoints[0].y = dataSettings[i][j].size / 2;
+                                polyPoints[1].x = dataSettings[i][j].size / 2;
+                                polyPoints[1].y = -dataSettings[i][j].size / 2;
+                                polyPoints[2].x = -(dataSettings[i][j].size / 2);
+                                polyPoints[2].y = -(dataSettings[i][j].size / 2);
+                                polyPoints[3].x = -(dataSettings[i][j].size / 2);
+                                polyPoints[3].y = (dataSettings[i][j].size / 2);
+                                dc.DrawPolygon(4, polyPoints, x, y);
                                 break;
                         }
                     }

@@ -24,7 +24,9 @@ extern const wxEventType wxEVT_GRAPH_CLICK;
 
 #define MG_STYLE_POINT_LINE 0x03
 
-#define MG_SHAPE_CIRCLE 0x01
+#define MG_SHAPE_CIRCLE  0x01
+#define MG_SHAPE_DIAMOND 0x02
+#define MG_SHAPE_SQUARE  0x03
 
 typedef pair< vector< double >, int > XSet;
 typedef vector< pair< int, double > > YSet;
@@ -170,6 +172,16 @@ class wxMolGraph : public wxControl {
      *                                   point and the x-axis.
      *                  MG_STYLE_POINT_LINE - The same as
      *                                   (MG_STYLE_POINT | MG_STYLE_LINE)
+     *
+     * @param color If the style includes MG_STYLE_POINT, the point will be
+     *              filled with this color.
+     * @param shape If the style includes MG_STYLE_POINT, the point will be
+     *              drawn with this shape.  Valid shape flags are:
+     *                  MG_SHAPE_CIRCLE
+     *                  MG_SHAPE_DIAMOND
+     *                  MG_SHAPE_SQUARE
+     * @param size  If the style includes MG_STYLE_POINT, the point will be
+     *              drawn with approximately this diameter in pixels.
      * @return On success this function returns the index of the y-set within
      *         the associated x-set.  This will be one greater than the index
      *         of the last y-set associated with the same x-set, with the first
@@ -180,13 +192,16 @@ class wxMolGraph : public wxControl {
                 int xSet,
                 int axis,
                 int style,
-                wxColour color);
+                wxColour color,
+                int shape = MG_SHAPE_CIRCLE,
+                int size  = 8);
 
 
     /**
      * Removes an x-set, and all y-sets associated with it, from the
-     * wxMolGraph.  This causes the wxMolGraph to be redrawn.  Note that this
-     * has no effect on the index assigned to the next x-set added.
+     * wxMolGraph.  This causes the x-axis to be auto-scaled and the wxMolGraph
+     * to be redrawn.  Note that this has no effect on the index assigned to
+     * the next x-set added.
      *
      * @param xSet The index of the x-set to remove.
      */
@@ -263,6 +278,9 @@ class wxMolGraph : public wxControl {
     void autoScaleY(int axis);
 
 
+    void autoScaleX(void);
+
+
     /**
      * Sets the label for the given axis.
      *
@@ -296,7 +314,7 @@ class wxMolGraph : public wxControl {
     /**
      * Overloaded wxControl member function that handles sizing of the control.
      *
-     * @return The size the control wants to be.
+     * @return The minimum size the control can be.
      */
     wxSize DoGetBestSize() const;
 
