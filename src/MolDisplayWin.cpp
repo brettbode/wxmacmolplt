@@ -142,6 +142,9 @@ public:
 	std::vector<CPoint3D>	SavedCoordinates;
 	std::vector<CPoint3D>	ModeOffset;
 	float					offsetFactor;
+	int						iPoint;
+	int						inc;
+	int						NumPoints;
 	wxTimer					m_timer;
 	bool					SavedDrawMode;
 };
@@ -253,6 +256,16 @@ void MolDisplayWin::StopAnimations(void) {
 		m_timer.Stop();
 		timerRunning = false;
 	}
+	if (ModeAnimationData) { //if data already exists toggle off the animation
+		ModeAnimationData->m_timer.Stop();
+		MainData->SetDrawMode(ModeAnimationData->SavedDrawMode);
+		for (int iatm=0; iatm<(MainData->cFrame->NumAtoms); iatm++) {
+			MainData->cFrame->Atoms[iatm].Position = ModeAnimationData->SavedCoordinates[iatm];	
+		}
+		delete ModeAnimationData;
+		ModeAnimationData = NULL;
+	}
+	ResetModel(false);
 }
 
 void MolDisplayWin::OnFrameAnimationTimer(wxTimerEvent & event) {
@@ -987,6 +1000,20 @@ void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
 }
 void MolDisplayWin::OnModeAnimation(wxTimerEvent & event) {
 	if (ModeAnimationData) {
+		if ((ModeAnimationData->iPoint==ModeAnimationData->NumPoints)||
+			(ModeAnimationData->iPoint==-ModeAnimationData->NumPoints)) {
+			ModeAnimationData->inc *= -1;
+			ModeAnimationData->offsetFactor *= -1.0;
+		}
+		ModeAnimationData->iPoint += ModeAnimationData->inc;
+		Frame * lFrame = MainData->cFrame;
+		mpAtom * lAtoms = lFrame->Atoms;
+		for (int iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
+			lAtoms[iatm].Position.x += ModeAnimationData->offsetFactor*(ModeAnimationData->ModeOffset[iatm].x);
+			lAtoms[iatm].Position.y += ModeAnimationData->offsetFactor*(ModeAnimationData->ModeOffset[iatm].y);
+			lAtoms[iatm].Position.z += ModeAnimationData->offsetFactor*(ModeAnimationData->ModeOffset[iatm].z);
+		}
+		ResetModel(false);
 	}
 }
 void MolDisplayWin::menuViewAnimateMode(wxCommandEvent &event) {
@@ -998,11 +1025,14 @@ void MolDisplayWin::menuViewAnimateMode(wxCommandEvent &event) {
 		}
 		delete ModeAnimationData;
 		ModeAnimationData = NULL;
+		ResetModel(false);
 	} else {
 		if (!MainData->cFrame->Vibs) return;
 		Frame * lFrame = MainData->cFrame;
 		ModeAnimationData = new ModeAnimation();
 		ModeAnimationData->SavedDrawMode = false;
+		ModeAnimationData->iPoint = 1;
+		ModeAnimationData->inc = 1;
 		ModeAnimationData->SavedCoordinates.reserve(lFrame->NumAtoms);
 		ModeAnimationData->ModeOffset.reserve(lFrame->NumAtoms);
 		
@@ -1011,9 +1041,10 @@ void MolDisplayWin::menuViewAnimateMode(wxCommandEvent &event) {
 			if (!Prefs->GetAnimateMode()) MainData->SetDrawMode(false);
 		}
 		long cmode = (lFrame->NumAtoms)*(lFrame->Vibs->CurrentMode);
+		//The offset factor may need some work yet...
+		ModeAnimationData->NumPoints = Prefs->GetAnimationSpeed();
 		ModeAnimationData->offsetFactor = 1.0/(4.5*Prefs->GetAnimationSpeed());
 		float	VectorScale = Prefs->GetVectorScale();
-		long AnimationSpeed = Prefs->GetAnimationSpeed();
 		mpAtom * lAtoms = lFrame->Atoms;
 		CPoint3D temp;
 		for (int iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
@@ -1022,6 +1053,7 @@ void MolDisplayWin::menuViewAnimateMode(wxCommandEvent &event) {
 			temp *= VectorScale;
 			ModeAnimationData->ModeOffset.push_back(temp);
 		}
+		ModeAnimationData->m_timer.SetOwner(this, MMP_ANIMATEMODETIMER);
 		ModeAnimationData->m_timer.Start(30);//Go for about 30 frames per second
 	}
 }
