@@ -10,6 +10,7 @@
 #include "Globals.h"
 #include "main.h"
 #include "Prefs.h"
+#include "aboutwxmacmolplt.h"
 #include <wx/cmdline.h>
 #include <wx/filename.h>
 #include <wx/image.h>
@@ -190,7 +191,9 @@ void MpApp::menuFileQuit(wxCommandEvent &event) {
 
 void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {
 	//Display a simple modal about box
-	wxMessageBox(wxT("Welcome to MacMolPlt"), wxT(""));
+	AboutwxMacMolPlt * po = new AboutwxMacMolPlt(NULL);
+	po->ShowModal();
+    po->Destroy();
 }
 void MpApp::menuPreferences(wxCommandEvent & WXUNUSED(event)) {
 	//Default application preferences

@@ -42,6 +42,9 @@
 		16B345EF09F9505C005FD3B2 /* coordinateswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */; };
 		16FB433009F026A300E84C6B /* bondsdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16FB432E09F026A300E84C6B /* bondsdlg.cpp */; };
 		8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
+		8B6075B10A1A34B1008CC9FD /* printoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */; };
+		8B6AF30B0A13EAC8004D2E5F /* exportoptionsdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */; };
+		8B7145C90A23983200435951 /* aboutwxmacmolplt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */; };
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
 		8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
@@ -133,6 +136,12 @@
 		16FB432F09F026A300E84C6B /* bondsdlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bondsdlg.h; path = src/bondsdlg.h; sourceTree = "<group>"; };
 		8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = appendframesoptions.cpp; path = src/appendframesoptions.cpp; sourceTree = "<group>"; };
 		8B4BB4410A0A7C9D00FE9CC6 /* appendframesoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = appendframesoptions.h; path = src/appendframesoptions.h; sourceTree = "<group>"; };
+		8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = printoptions.cpp; path = src/printoptions.cpp; sourceTree = "<group>"; };
+		8B6075B00A1A34B1008CC9FD /* printoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = printoptions.h; path = src/printoptions.h; sourceTree = "<group>"; };
+		8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = exportoptionsdialog.cpp; path = src/exportoptionsdialog.cpp; sourceTree = "<group>"; };
+		8B6AF30A0A13EAC8004D2E5F /* exportoptionsdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = exportoptionsdialog.h; path = src/exportoptionsdialog.h; sourceTree = "<group>"; };
+		8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = aboutwxmacmolplt.cpp; path = src/aboutwxmacmolplt.cpp; sourceTree = "<group>"; };
+		8B7145C80A23983200435951 /* aboutwxmacmolplt.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = aboutwxmacmolplt.h; path = src/aboutwxmacmolplt.h; sourceTree = "<group>"; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
 		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
 		8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setscreenplane.cpp; path = src/setscreenplane.cpp; sourceTree = "<group>"; };
@@ -172,6 +181,8 @@
 		1652DA2609D0B0E700B7783F /* source */ = {
 			isa = PBXGroup;
 			children = (
+				8B7145C80A23983200435951 /* aboutwxmacmolplt.h */,
+				8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */,
 				8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */,
 				8B4BB4410A0A7C9D00FE9CC6 /* appendframesoptions.h */,
 				1652DA2709D0B12600B7783F /* AtomTypeList.cpp */,
@@ -188,6 +199,8 @@
 				16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */,
 				16B345EE09F9505C005FD3B2 /* coordinateswindow.h */,
 				1652DA3009D0B12600B7783F /* DataClasses.cpp */,
+				8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */,
+				8B6AF30A0A13EAC8004D2E5F /* exportoptionsdialog.h */,
 				1652DA3109D0B12600B7783F /* Files.cpp */,
 				1652DA3209D0B12600B7783F /* Frame.cpp */,
 				1652DA3309D0B12600B7783F /* Frame.h */,
@@ -222,6 +235,8 @@
 				1652DA4D09D0B12600B7783F /* MyTypes.h */,
 				1652DA4E09D0B12600B7783F /* orbitals.cpp */,
 				1652DA4F09D0B12600B7783F /* Prefs.h */,
+				8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */,
+				8B6075B00A1A34B1008CC9FD /* printoptions.h */,
 				1652DA5009D0B12600B7783F /* Progress.cpp */,
 				1652DA5109D0B12600B7783F /* Progress.h */,
 				8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */,
@@ -388,6 +403,9 @@
 				1626378C0A07E46E0089452E /* llmdialog.cpp in Sources */,
 				8BEDFA000A09390700BF6F85 /* setbondlength.cpp in Sources */,
 				8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */,
+				8B6AF30B0A13EAC8004D2E5F /* exportoptionsdialog.cpp in Sources */,
+				8B6075B10A1A34B1008CC9FD /* printoptions.cpp in Sources */,
+				8B7145C90A23983200435951 /* aboutwxmacmolplt.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,16 +441,16 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I/Users/brettbode/documents/wxWidgets-2.6.2/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
-					"-I/Users/brettbode/documents/wxWidgets-2.6.2/include",
-					"-I/Users/brettbode/documentswxWidgets-2.6.2/contrib/include",
+					"-I/Users/brett/software/wxWidgets-2.6.3/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
+					"-I/Users/brett/software/wxWidgets-2.6.3/include",
+					"-I/Users/brett/software/wxWidgets-2.6.3/contrib/include",
 					"-D__WXMAC__",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
 					"-DNO_GCC_PRAGMA",
 				);
 				OTHER_LDFLAGS = (
-					"-L/Users/brettbode/documents/wxWidgets-2.6.2/osx-build/lib",
+					"-L/Users/brett/software/wxWidgets-2.6.3/osx-build/lib",
 					"-framework",
 					QuickTime,
 					"-framework",
@@ -443,10 +461,10 @@
 					Cocoa,
 					"-framework",
 					System,
-					"/Users/brettbode/documents/wxWidgets-2.6.2/osx-build/lib/libwx_base_carbon-2.6.a",
-					"/Users/brettbode/documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_core-2.6.a",
-					"/Users/brettbode/Documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_adv-2.6.a",
-					"/Users/brettbode/documents/wxWidgets-2.6.2/osx-build/lib/libwx_mac_gl-2.6.a",
+					"-lwx_base_carbon-2.6",
+					"-lwx_mac_core-2.6",
+					"-lwx_mac_adv-2.6",
+					"-lwx_mac_gl-2.6",
 					"-lwxexpat-2.6",
 					"-lwxtiff-2.6",
 					"-lwxjpeg-2.6",

@@ -1,6 +1,6 @@
 bin_PROGRAMS = wxMacMolPlt
 wxMacMolPlt_SOURCES = main.cpp MolDisplayWin.cpp  mpGLCanvas.cpp \
-	appendframesoptions.cpp \
+	aboutwxmacmolplt.cpp appendframesoptions.cpp \
     AtomTypeList.cpp BasisSet.cpp BFiles.cpp CML.cpp DataClasses.cpp \
     bondsdlg.cpp coordinateswindow.cpp Files.cpp Frame.cpp GaussHermite.cpp \
     Gradient.cpp InputData.cpp Internals.cpp llmdialog.cpp  Math3D.cpp MEP.cpp \
