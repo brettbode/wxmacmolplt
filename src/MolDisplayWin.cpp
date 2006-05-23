@@ -454,6 +454,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
     wxBitmap  *bmp;
     wxString   wildcards(wxT("Windows Bitmap (*.bmp)|*.bmp|Portable Network Graphics (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg"));
     int        index = 0;
+    int        type  = 0;
 
     fileDlg = new wxFileDialog(this,
                                wxT("Export"),
@@ -469,14 +470,34 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
         if(exportOptionsDlg->ShowModal() == wxID_OK) {
             switch(index) {
                 case 0:
+                    if(!type) {
+                        type = wxBITMAP_TYPE_BMP;
+                        if(!filepath.Lower().Matches(wxT("*.bmp"))) {
+                            filepath.Append(wxT(".bmp"));
+                        }
+                    }
                 case 1:
+                    if(!type) {
+                        type = wxBITMAP_TYPE_PNG;
+                        if(!filepath.Lower().Matches(wxT("*.png"))) {
+                            filepath.Append(wxT(".png"));
+                        }
+                    }
                 case 2:
+                    if(!type) {
+                        type = wxBITMAP_TYPE_JPEG;
+                        if(!filepath.Lower().Matches(wxT("*.jpg")) &&
+                           !filepath.Lower().Matches(wxT("*.jpeg"))) {
+
+                            filepath.Append(wxT(".jpg"));
+                        }
+                    }
                     bmp = new wxBitmap(exportOptionsDlg->getWidth(),
                                        exportOptionsDlg->getHeight());
                     memDC.SelectObject(*bmp);
                     glCanvas->GenerateHiResImageForExport(&memDC);
                     exportImage = bmp->ConvertToImage();
-                    exportImage.SaveFile(filepath);
+                    exportImage.SaveFile(filepath, type);
                     memDC.SelectObject(wxNullBitmap); // bmp has now been
                                                       // destroyed.
             }
