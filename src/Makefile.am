@@ -8,7 +8,7 @@ wxMacMolPlt_SOURCES = main.cpp MolDisplayWin.cpp  mpGLCanvas.cpp \
     MoleculeData.cpp orbitals.cpp Progress.cpp RysPolynomial.cpp \
     setbondlength.cpp setscreenplane.cpp SurfaceBase.cpp SurfWin.cpp \
     VirtualSphere.cpp wxFiles.cpp XML.cpp exportoptionsdialog.cpp \
-	wxMolGraph.cpp
+	wxMolGraph.cpp energyplotdialog.cpp
 AM_CXXFLAGS = $(WX_CXXFLAGS)
 wxMacMolPlt_LDADD = $(WX_LIBS)
 wxMacMolPlt_LDFLAGS = $(WX_CXXFLAGS)
