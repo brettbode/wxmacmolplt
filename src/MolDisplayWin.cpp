@@ -128,12 +128,23 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_COORDSWINDOW, MolDisplayWin::menuWindowCoordinates)
 
 	EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
+	EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
     EVT_SIZE( MolDisplayWin::eventSize )
     EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
     EVT_COMMAND_SCROLL(MMP_FRAMESCROLLBAR, MolDisplayWin::OnScrollBarChange )
 	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen )
 	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 END_EVENT_TABLE()
+
+	//Local use class to hold data during the animation of normal modes
+class ModeAnimation {
+public:
+	std::vector<CPoint3D>	SavedCoordinates;
+	std::vector<CPoint3D>	ModeOffset;
+	float					offsetFactor;
+	wxTimer					m_timer;
+	bool					SavedDrawMode;
+};
 
 MolDisplayWin::MolDisplayWin(const wxString &title,
                          const wxPoint  &position,
@@ -150,6 +161,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     OperationInProgress = false;
     ProgressInd = NULL;
     OpenGLData = NULL;
+	ModeAnimationData = NULL;
     bondsWindow = NULL;
     coordsWindow = NULL;
     
@@ -186,6 +198,10 @@ MolDisplayWin::~MolDisplayWin() {
     if (printData) delete printData;
     if (pageSetupData) delete pageSetupData;
     glCanvas->setPrefs(NULL);
+	if (ModeAnimationData) {
+		delete ModeAnimationData;
+		ModeAnimationData = NULL;
+	}
     
     if (ProgressInd != NULL) {
         delete ProgressInd;
@@ -969,7 +985,45 @@ void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
     ResetModel(false);
     Dirty = true;
 }
+void MolDisplayWin::OnModeAnimation(wxTimerEvent & event) {
+	if (ModeAnimationData) {
+	}
+}
 void MolDisplayWin::menuViewAnimateMode(wxCommandEvent &event) {
+	if (ModeAnimationData) { //if data already exists toggle off the animation
+		ModeAnimationData->m_timer.Stop();
+		MainData->SetDrawMode(ModeAnimationData->SavedDrawMode);
+		for (int iatm=0; iatm<(MainData->cFrame->NumAtoms); iatm++) {
+			MainData->cFrame->Atoms[iatm].Position = ModeAnimationData->SavedCoordinates[iatm];	
+		}
+		delete ModeAnimationData;
+		ModeAnimationData = NULL;
+	} else {
+		if (!MainData->cFrame->Vibs) return;
+		Frame * lFrame = MainData->cFrame;
+		ModeAnimationData = new ModeAnimation();
+		ModeAnimationData->SavedDrawMode = false;
+		ModeAnimationData->SavedCoordinates.reserve(lFrame->NumAtoms);
+		ModeAnimationData->ModeOffset.reserve(lFrame->NumAtoms);
+		
+		if (MainData->GetDrawMode()) {
+			ModeAnimationData->SavedDrawMode = true;
+			if (!Prefs->GetAnimateMode()) MainData->SetDrawMode(false);
+		}
+		long cmode = (lFrame->NumAtoms)*(lFrame->Vibs->CurrentMode);
+		ModeAnimationData->offsetFactor = 1.0/(4.5*Prefs->GetAnimationSpeed());
+		float	VectorScale = Prefs->GetVectorScale();
+		long AnimationSpeed = Prefs->GetAnimationSpeed();
+		mpAtom * lAtoms = lFrame->Atoms;
+		CPoint3D temp;
+		for (int iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
+			ModeAnimationData->SavedCoordinates.push_back(lAtoms[iatm].Position);
+			temp = lFrame->Vibs->NormMode[iatm+cmode];
+			temp *= VectorScale;
+			ModeAnimationData->ModeOffset.push_back(temp);
+		}
+		ModeAnimationData->m_timer.Start(30);//Go for about 30 frames per second
+	}
 }
 void MolDisplayWin::menuViewShowAxis(wxCommandEvent &event) {
     MainData->SetShowAxis(1-MainData->ShowAxis());

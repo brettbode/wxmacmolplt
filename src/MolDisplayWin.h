@@ -24,6 +24,7 @@
 typedef class OpenGLRec OpenGLRec;
 typedef class BondsDlg BondsDlg;
 typedef class CoordinatesWindow CoordinatesWindow;
+typedef class ModeAnimation ModeAnimation;
 /**
  * Subclasses wxFrame to define the main application window.  This is a
  * document window.  There can be multiple instances of the window in the
@@ -53,6 +54,7 @@ class MolDisplayWin : public wxFrame {
         MpGLCanvas		*glCanvas;
         wxStaticText	*textBar;
         wxScrollBar		*frameScrollBar;
+		ModeAnimation	*ModeAnimationData;
 		wxTimer			m_timer;
 
         BondsDlg          *bondsWindow;
@@ -225,6 +227,8 @@ class MolDisplayWin : public wxFrame {
 		void OnFrameAnimationTimer(wxTimerEvent & event);
             //Function to receive all changes to the scroll bar
         void OnScrollBarChange(wxScrollEvent& event);
+			//Called during normal mode animations
+		void OnModeAnimation(wxTimerEvent & event);
 			//Function to be called when window loses focus to stop animations
 		void OnMenuOpen(wxMenuEvent & event);
 		void OnKillFocus(wxFocusEvent & event);

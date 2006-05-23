@@ -190,7 +190,6 @@ void VibRec::Setup(const long & NumVibs, const long & NumAtoms) {
 		Frequencies.reserve(NumVibs);
 		if (NumVibs == 1)	//Read in the single mode string
 			Frequencies.push_back(std::string("single mode"));
-	//		GetIndString((unsigned char *)Frequencies, kIStringID, 1);
 		//init the intensities all to 1
 		for (long i=0; i<NumVibs; i++) Intensities.push_back(1.0);
 		CPoint3D temp;
