@@ -26,7 +26,7 @@
 
 ////@begin includes
 ////@end includes
-#include "globals.h"
+#include "Globals.h"
 #include "aboutwxmacmolplt.h"
 
 ////@begin XPM images
