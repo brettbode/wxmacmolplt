@@ -24,6 +24,7 @@
 typedef class OpenGLRec OpenGLRec;
 typedef class BondsDlg BondsDlg;
 typedef class CoordinatesWindow CoordinatesWindow;
+typedef class EnergyPlotDialog EnergyPlotDialog;
 typedef class ModeAnimation ModeAnimation;
 /**
  * Subclasses wxFrame to define the main application window.  This is a
@@ -59,6 +60,7 @@ class MolDisplayWin : public wxFrame {
 
         BondsDlg          *bondsWindow;
         CoordinatesWindow *coordsWindow;
+        EnergyPlotDialog  *energyPlotWindow;
         
         wxPageSetupDialogData *pageSetupData;
         wxPrintData           *printData;
@@ -169,7 +171,7 @@ class MolDisplayWin : public wxFrame {
         //void menuWindowMain_display(wxCommandEvent &event);
         void menuWindowBonds(wxCommandEvent &event);
         void menuWindowCoordinates(wxCommandEvent &event);
-        //void menuWindowEnergy_plot(wxCommandEvent &event);
+        void menuWindowEnergy_plot(wxCommandEvent &event);
         //void menuWindowFrequencies(wxCommandEvent &event);
         //void menuWindowInput_builder(wxCommandEvent &event);
         //void menuWindowSurfaces(wxCommandEvent &event);
@@ -177,6 +179,7 @@ class MolDisplayWin : public wxFrame {
         void KeyHandler(wxKeyEvent &event);
         void CloseBondsWindow(void);
         void CloseCoordsWindow(void);
+        void CloseEnergy_plotWindow(void);
         
         //File handling routines
         long OpenFile(wxString fileName, float offset=0.0, bool flip=false, bool append=false);

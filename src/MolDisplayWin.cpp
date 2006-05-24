@@ -18,6 +18,7 @@
 #include "setscreenplane.h"
 #include "bondsdlg.h"
 #include "coordinateswindow.h"
+#include "energyplotdialog.h"
 #include "VirtualSphere.h"
 #include "Internals.h"
 #include "llmdialog.h"
@@ -62,6 +63,7 @@ enum MMP_EventID {
     MMP_COPYCOORDS,
     MMP_BONDSWINDOW,
     MMP_COORDSWINDOW,
+    MMP_ENERGYPLOTWINDOW,
     MMP_STATUSBAR,
     MMP_FRAMESCROLLBAR,
     MMP_EXPORT,
@@ -124,8 +126,9 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_CONVERTTOANGSTROMS, MolDisplayWin::menuMoleculeConvertToAngstroms)
     EVT_MENU (MMP_INVERTNORMALMODE,   MolDisplayWin::menuMoleculeInvertNormalMode)
 
-    EVT_MENU (MMP_BONDSWINDOW,  MolDisplayWin::menuWindowBonds)
-    EVT_MENU (MMP_COORDSWINDOW, MolDisplayWin::menuWindowCoordinates)
+    EVT_MENU (MMP_BONDSWINDOW,      MolDisplayWin::menuWindowBonds)
+    EVT_MENU (MMP_COORDSWINDOW,     MolDisplayWin::menuWindowCoordinates)
+    EVT_MENU (MMP_ENERGYPLOTWINDOW, MolDisplayWin::menuWindowEnergy_plot)
 
 	EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
 	EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
@@ -167,6 +170,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	ModeAnimationData = NULL;
     bondsWindow = NULL;
     coordsWindow = NULL;
+    energyPlotWindow = NULL;
     
     pageSetupData = NULL;
     printData = NULL;
@@ -348,6 +352,7 @@ void MolDisplayWin::createMenuBar(void) {
 
     menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"));
     menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"));
+    menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"));
     menuHelp->Append(wxID_ABOUT, wxT("&About ..."));
 
     menuBar->Append(menuFile, wxT("&File"));
@@ -1293,6 +1298,21 @@ void MolDisplayWin::CloseCoordsWindow(void) {
         coordsWindow = NULL;
     }
 }
+void MolDisplayWin::menuWindowEnergy_plot(wxCommandEvent &event) {
+    if(energyPlotWindow) { // need to bring it to the front...
+        energyPlotWindow->Raise();
+    }
+    else {
+        energyPlotWindow = new EnergyPlotDialog(this);
+        energyPlotWindow->Show();
+    }
+}
+void MolDisplayWin::CloseEnergy_plotWindow(void) {
+    if(energyPlotWindow) {
+        energyPlotWindow->Destroy();
+        energyPlotWindow = NULL;
+    }
+}
 
 void MolDisplayWin::AtomsChanged(void) {
     if (bondsWindow) bondsWindow->ResetList();
@@ -1336,7 +1356,7 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
 #endif
         if (coordsWindow) coordsWindow->FrameChanged();
         if (bondsWindow) bondsWindow->ResetList();
-    //  if (EPlotWin) EPlotWin->FrameChanged();
+    //  if (energyPlotWindow) energyPlotWindow->FrameChanged();
     //  if (FreqPlotWin) FreqPlotWin->Reset(1);
     //  if (SurfaceDlog) SurfaceDlog->Reset();
         frameScrollBar->SetThumbPosition(MainData->CurrentFrame-1);
@@ -1455,6 +1475,7 @@ void MolDisplayWin::ResetAllWindows(void) {
     //force updates for all the child windows
     if (coordsWindow) coordsWindow->FrameChanged();
     if (bondsWindow) bondsWindow->ResetList();
+    // TODO:  update energyPlotWindow
     
 }
 void MolDisplayWin::BeginOperation(void) {

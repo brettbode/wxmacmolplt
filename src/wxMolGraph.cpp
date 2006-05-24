@@ -601,12 +601,11 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
         dc.DrawLine(x, y, x, lineY);
     }
 
-
     // Y1 Axis
     if(numY1Graphs > 0 || numY2Graphs == 0) {
         x = BORDER;
         y = BORDER + ((y2 - BORDER) / 2) + (y1AxisTextSize.GetWidth() / 2);
-        dc.DrawRotatedText(y1AxisText, x, y, 90.0);
+        if(!y1AxisText.IsEmpty()) dc.DrawRotatedText(y1AxisText, x, y, 90.0);
         x = x2 - y1MaxTextSize.GetWidth();
         y = BORDER;
         dc.DrawText(y1MaxText, x, y);
@@ -646,7 +645,7 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     if(numY2Graphs > 0) {
         x = x4 - y2AxisTextSize.GetHeight();
         y = BORDER + ((y2 - BORDER) / 2) + (y2AxisTextSize.GetWidth() / 2);
-        dc.DrawRotatedText(y2AxisText, x, y, 90.0);
+        if(!y2AxisText.IsEmpty()) dc.DrawRotatedText(y2AxisText, x, y, 90.0);
         x = x3;
         y = BORDER;
         dc.DrawText(y2MaxText, x, y);

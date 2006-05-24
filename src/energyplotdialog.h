@@ -75,9 +75,11 @@ public:
     void CreateControls();
 
 ////@begin EnergyPlotDialog event handler declarations
+
 ////@end EnergyPlotDialog event handler declarations
 
 ////@begin EnergyPlotDialog member function declarations
+
     /// Retrieves bitmap resources
     wxBitmap GetBitmapResource( const wxString& name );
 

@@ -30,7 +30,6 @@
 #include "energyplotdialog.h"
 
 ////@begin XPM images
-
 ////@end XPM images
 
 /*!
