@@ -217,27 +217,13 @@ void MpApp::menuFileOpen(wxCommandEvent &event) {
 	wxString filename = wxFileSelector(wxT("Choose a file to open"));
 	//If the user chooses a file, create a window and have it process it.
 	if (!filename.empty()) {
-        createMainFrame(filename);
-        // TODO:  Remove the commented code below once Brett is OK with it.
-        /*
-		MolDisplayWin * temp = new MolDisplayWin(filename);
-		MolWinList.push_back(temp);
-		long r = temp->OpenFile(filename);
-		if (r>0) temp->Show(true);
-        */
+		createMainFrame(filename);
 	}
 }
 #ifdef __WXMAC__
 void MpApp::MacOpenFile(const wxString & filename) {
 	if (filename.length() > 0) {
         createMainFrame(filename);
-        // TODO:  Remove the commented code below once Brett is OK with it.
-        /*
-		MolDisplayWin * temp = new MolDisplayWin(filename);
-		MolWinList.push_back(temp);
-		long r = temp->OpenFile(filename);
-		if (r>0) temp->Show(true);
-        */
 	}
 }
 #endif

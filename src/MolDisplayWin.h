@@ -113,7 +113,7 @@ class MolDisplayWin : public wxFrame {
         void menuFileAppendNewFrame(wxCommandEvent &event);
         void menuFileAddFramesFromFile(wxCommandEvent &event);
         void menuFileDeleteFrame(wxCommandEvent &event);
-        //void menuFileImport(wxCommandEvent &event);
+        void menuFileImport(wxCommandEvent &event);
         void menuFileExport(wxCommandEvent &event);
         void menuFilePage_setup(wxCommandEvent &event);
         void menuFilePrintOptions(wxCommandEvent &event);

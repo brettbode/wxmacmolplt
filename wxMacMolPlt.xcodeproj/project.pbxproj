@@ -44,29 +44,14 @@
 		8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
 		8B6075B10A1A34B1008CC9FD /* printoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */; };
 		8B6AF30B0A13EAC8004D2E5F /* exportoptionsdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */; };
+		8B6C7BFB0A24E9C100B7358F /* energyplotdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */; };
+		8B6C7BFF0A24E9E800B7358F /* wxMolGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */; };
 		8B7145C90A23983200435951 /* aboutwxmacmolplt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */; };
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
 		8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
 		8BEDFA000A09390700BF6F85 /* setbondlength.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXBuildStyle section */
-		1652DAB609D0B32900B7783F /* Development */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-			};
-			name = Development;
-		};
-		1652DAB709D0B32900B7783F /* Deployment */ = {
-			isa = PBXBuildStyle;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-			};
-			name = Deployment;
-		};
-/* End PBXBuildStyle section */
 
 /* Begin PBXFileReference section */
 		1626378A0A07E46E0089452E /* llmdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = llmdialog.cpp; path = src/llmdialog.cpp; sourceTree = "<group>"; };
@@ -140,6 +125,10 @@
 		8B6075B00A1A34B1008CC9FD /* printoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = printoptions.h; path = src/printoptions.h; sourceTree = "<group>"; };
 		8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = exportoptionsdialog.cpp; path = src/exportoptionsdialog.cpp; sourceTree = "<group>"; };
 		8B6AF30A0A13EAC8004D2E5F /* exportoptionsdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = exportoptionsdialog.h; path = src/exportoptionsdialog.h; sourceTree = "<group>"; };
+		8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = energyplotdialog.cpp; path = src/energyplotdialog.cpp; sourceTree = "<group>"; };
+		8B6C7BFA0A24E9C100B7358F /* energyplotdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = energyplotdialog.h; path = src/energyplotdialog.h; sourceTree = "<group>"; };
+		8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = wxMolGraph.cpp; path = src/wxMolGraph.cpp; sourceTree = "<group>"; };
+		8B6C7BFE0A24E9E800B7358F /* wxMolGraph.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = wxMolGraph.h; path = src/wxMolGraph.h; sourceTree = "<group>"; };
 		8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = aboutwxmacmolplt.cpp; path = src/aboutwxmacmolplt.cpp; sourceTree = "<group>"; };
 		8B7145C80A23983200435951 /* aboutwxmacmolplt.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = aboutwxmacmolplt.h; path = src/aboutwxmacmolplt.h; sourceTree = "<group>"; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
@@ -199,6 +188,8 @@
 				16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */,
 				16B345EE09F9505C005FD3B2 /* coordinateswindow.h */,
 				1652DA3009D0B12600B7783F /* DataClasses.cpp */,
+				8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */,
+				8B6C7BFA0A24E9C100B7358F /* energyplotdialog.h */,
 				8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */,
 				8B6AF30A0A13EAC8004D2E5F /* exportoptionsdialog.h */,
 				1652DA3109D0B12600B7783F /* Files.cpp */,
@@ -229,6 +220,8 @@
 				1652DA4609D0B12600B7783F /* MoleculeData.cpp */,
 				1652DA4709D0B12600B7783F /* MoleculeData.h */,
 				1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */,
+				8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */,
+				8B6C7BFE0A24E9E800B7358F /* wxMolGraph.h */,
 				8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */,
 				1652DA4909D0B12600B7783F /* mpGLCanvas.h */,
 				1652DA4C09D0B12600B7783F /* myFiles.h */,
@@ -283,48 +276,11 @@
 			);
 			buildRules = (
 			);
-			buildSettings = {
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				INFOPLIST_FILE = "wxMacMolPlt-Info.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				OTHER_LDFLAGS = (
-					"-framework",
-					Carbon,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = wxMacMolPlt;
-				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
-			};
 			dependencies = (
 			);
 			name = wxMacMolPlt;
 			productName = wxMacMolPlt;
 			productReference = 1652DA0B09D0AE8F00B7783F /* wxMacMolPlt.app */;
-			productSettingsXML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
-<plist version=\"1.0\">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleExecutable</key>
-	<string>${EXECUTABLE_NAME}</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.yourcompany.wxMacMolPlt</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>1.0</string>
-</dict>
-</plist>
-";
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -333,12 +289,6 @@
 		1652D9FF09D0AE7200B7783F /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 1652DA0009D0AE7200B7783F /* Build configuration list for PBXProject "wxMacMolPlt" */;
-			buildSettings = {
-			};
-			buildStyles = (
-				1652DAB609D0B32900B7783F /* Development */,
-				1652DAB709D0B32900B7783F /* Deployment */,
-			);
 			hasScannedForEncodings = 0;
 			mainGroup = 1652D9FD09D0AE7200B7783F;
 			productRefGroup = 1652DA0C09D0AE8F00B7783F /* Products */;
@@ -406,6 +356,8 @@
 				8B6AF30B0A13EAC8004D2E5F /* exportoptionsdialog.cpp in Sources */,
 				8B6075B10A1A34B1008CC9FD /* printoptions.cpp in Sources */,
 				8B7145C90A23983200435951 /* aboutwxmacmolplt.cpp in Sources */,
+				8B6C7BFB0A24E9C100B7358F /* energyplotdialog.cpp in Sources */,
+				8B6C7BFF0A24E9E800B7358F /* wxMolGraph.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

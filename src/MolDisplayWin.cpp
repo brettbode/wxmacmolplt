@@ -60,6 +60,7 @@ enum MMP_EventID {
     MMP_NEWFRAME,
     MMP_ADDFRAMES,
     MMP_DELETEFRAME,
+	MMP_IMPORTMENU,
     MMP_COPYCOORDS,
     MMP_BONDSWINDOW,
     MMP_COORDSWINDOW,
@@ -87,6 +88,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (wxID_CLOSE,           MolDisplayWin::menuFileClose)
     EVT_CLOSE(                      MolDisplayWin::FileClose)
     EVT_MENU (MMP_DELETEFRAME,      MolDisplayWin::menuFileDeleteFrame)
+	EVT_MENU (MMP_IMPORTMENU,		MolDisplayWin::menuFileImport)
     EVT_MENU (MMP_EXPORT,           MolDisplayWin::menuFileExport)
     EVT_MENU (wxID_PRINT_SETUP,     MolDisplayWin::menuFilePage_setup)
 	EVT_MENU (MMP_PRINTOPTIONS,     MolDisplayWin::menuFilePrintOptions)
@@ -299,8 +301,8 @@ void MolDisplayWin::createMenuBar(void) {
     menuFile->AppendSeparator();
     menuFile->Append(MMP_DELETEFRAME, wxT("Delete Frame"));
     menuFile->AppendSeparator();
-    //menuFile->Append(, wxT("Import"));
-    menuFile->Append(MMP_EXPORT, wxT("Export"));
+    menuFile->Append(MMP_IMPORTMENU, wxT("Import..."));
+    menuFile->Append(MMP_EXPORT, wxT("Export..."));
     menuFile->AppendSeparator();
     menuFile->Append(wxID_PRINT_SETUP, wxT("Page Set&up ..."));
     menuFile->Append(MMP_PRINTOPTIONS, wxT("Print Options ..."));
@@ -450,6 +452,14 @@ void MolDisplayWin::menuFileDeleteFrame(wxCommandEvent &event) {
     ResetAllWindows();
 }
 
+void MolDisplayWin::menuFileImport(wxCommandEvent &event) {
+	//First need to use an open file dialog
+	wxString filename = wxFileSelector(wxT("Choose a GAMESS .DAT file to import a $VEC group"));
+	//If the user chooses a file, create a window and have it process it.
+	if (!filename.empty()) {
+ //       createMainFrame(filename);
+ 	}
+}
 void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
     wxFileDialog        *fileDlg = NULL;
     ExportOptionsDialog *exportOptionsDlg = NULL;
