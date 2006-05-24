@@ -14,6 +14,7 @@
 #include <wx/cmdline.h>
 #include <wx/filename.h>
 #include <wx/image.h>
+#include <wx/splash.h>
 
 //The global preferences settings
     WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
@@ -30,20 +31,12 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] =
 { wxCMD_LINE_NONE } 
 };
 
+#include "sp.xpm"
 bool MpApp::OnInit() {
-	gPreferences = new WinPrefs;
-	gPrefDefaults = new WinPrefs;
-
-	// Now read in the users preferences file from the system:preferences folder if present
-	gPrefDefaults->ReadDefaultPrefs();
-	*gPreferences = *gPrefDefaults;
-		//attempt to read new xml pref file
-	gPreferences->ReadUserPrefs();
-
     const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
-
+	
     m_InstanceChecker = new wxSingleInstanceChecker();
-
+	
     if(m_InstanceChecker->Create(appName) == true) {
         if(m_InstanceChecker->IsAnotherRunning()) {
             // TODO:  Open a new window in the existing instance instead
@@ -61,6 +54,20 @@ bool MpApp::OnInit() {
             return false;
         }
     }
+		//Throw up a simple splash screen
+	wxBitmap sp_bitmap(sp_xpm);
+	wxSplashScreen * splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 2000,
+												 NULL, -1, wxDefaultPosition, wxDefaultSize,
+												 wxSIMPLE_BORDER|wxSTAY_ON_TOP);
+
+	gPreferences = new WinPrefs;
+	gPrefDefaults = new WinPrefs;
+
+	// Now read in the users preferences file from the system:preferences folder if present
+	gPrefDefaults->ReadDefaultPrefs();
+	*gPreferences = *gPrefDefaults;
+		//attempt to read new xml pref file
+	gPreferences->ReadUserPrefs();
     
     // Parse command line 
 	wxString cmdFilename; 
