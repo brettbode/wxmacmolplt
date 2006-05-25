@@ -28,42 +28,6 @@ wxMolGraph::wxMolGraph(wxWindow       *parent,
                        long            style) :
             wxControl(parent, id, pos, size, style) {
     reset();
-
-    /* TEMPORARY FOR TESTING:
-    xAxisText  = wxT("X-Axis");
-    y1AxisText = wxT("Y1-Axis");
-    y2AxisText = wxT("Y2-Axis");
-    xMax  = 352.0;
-    xMin  = 0.0;
-    y1Max = 10.0;
-    y1Min = 1.0;
-    y2Max = 25.37163;
-    y2Min = -1.21398;
-    precision = 4;
-    vector<double> v(5);
-    v[0] = 20.5;
-    v[1] = 93.7;
-    v[2] = 144.0;
-    v[3] = 250.0;
-    v[4] = 300.0;
-    addXSet(v, true);
-    YSet ys;
-    ys.push_back(make_pair(0, 1.5));
-    ys.push_back(make_pair(1, 5.5));
-    ys.push_back(make_pair(2, 9.5));
-    ys.push_back(make_pair(3, 7.0));
-    ys.push_back(make_pair(4, 19.0));
-    y1Offset = 1.0;
-    y2Offset = -1.21398;
-    addYSet(ys,
-            0,
-            MG_AXIS_Y1,
-            MG_STYLE_POINT_LINE | MG_STYLE_BAR,
-            *wxCYAN,
-            MG_SHAPE_DIAMOND,
-            16);
-    autoScaleY(MG_AXIS_Y1);
-    */
 }
 
 int wxMolGraph::addXSet(vector<double> xData, bool selectable) {
@@ -191,6 +155,8 @@ void wxMolGraph::setSelection(int xSet, int index) {
     if(index < data[xSet].first.first.size()) {
         data[xSet].first.second = index;
     }
+
+    Refresh();
 }
 
 void wxMolGraph::setYAxisMin(int axis, double val) {
@@ -291,7 +257,7 @@ void wxMolGraph::autoScaleX(void) {
         min -= pad;
         if(!(max - min)) {
             max += 1.0;
-            min += 1.0;
+            min -= 1.0;
         }
         xMax = max;
         xMin = min;

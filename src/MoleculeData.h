@@ -22,7 +22,7 @@ typedef class WindowData WindowData;
 class MoleculeData {
 		friend class MolDisplayWin;
 		friend class CoordWin;
-		friend class EnergyPlotWin;
+		friend class EnergyPlotDialog;
 		friend class Surf2DBase;
 		friend class Surf3DBase;
 	private:

@@ -1366,7 +1366,7 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
 #endif
         if (coordsWindow) coordsWindow->FrameChanged();
         if (bondsWindow) bondsWindow->ResetList();
-    //  if (energyPlotWindow) energyPlotWindow->FrameChanged();
+        if (energyPlotWindow) energyPlotWindow->FrameChanged();
     //  if (FreqPlotWin) FreqPlotWin->Reset(1);
     //  if (SurfaceDlog) SurfaceDlog->Reset();
         frameScrollBar->SetThumbPosition(MainData->CurrentFrame-1);

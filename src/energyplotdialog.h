@@ -87,6 +87,8 @@ public:
     wxIcon GetIconResource( const wxString& name );
 ////@end EnergyPlotDialog member function declarations
 
+    void FrameChanged(void);
+
     /// Should we show tooltips?
     static bool ShowToolTips();
 

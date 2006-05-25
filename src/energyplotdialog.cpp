@@ -29,6 +29,10 @@
 
 #include "energyplotdialog.h"
 
+#include "Globals.h"
+#include "MolDisplayWin.h"
+#include "Frame.h"
+
 ////@begin XPM images
 ////@end XPM images
 
@@ -68,6 +72,12 @@ EnergyPlotDialog::EnergyPlotDialog( wxWindow* parent, wxWindowID id, const wxStr
 
 bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
+    MoleculeData *mData = ((MolDisplayWin *)parent)->GetData();
+    vector< double > xSetData;
+    vector< pair< int, double > > energyData;
+    Frame *currFrame = NULL;
+    int i = 0;
+    
 ////@begin EnergyPlotDialog member initialisation
     epGraph = NULL;
 ////@end EnergyPlotDialog member initialisation
@@ -81,6 +91,15 @@ bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& 
     GetSizer()->SetSizeHints(this);
     Centre();
 ////@end EnergyPlotDialog creation
+
+    // Add data to epGraph
+    for(currFrame = mData->Frames, i = 0; currFrame != NULL; currFrame = currFrame->NextFrame, i++) {
+        xSetData.push_back((double)(currFrame->time));
+        energyData.push_back(make_pair(i, currFrame->Energy));
+    }
+    epGraph->addXSet(xSetData, true);
+    epGraph->addYSet(energyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, *wxCYAN);
+    epGraph->autoScaleY(MG_AXIS_Y1);
     return true;
 }
 
@@ -135,4 +154,10 @@ wxIcon EnergyPlotDialog::GetIconResource( const wxString& name )
     wxUnusedVar(name);
     return wxNullIcon;
 ////@end EnergyPlotDialog icon retrieval
+}
+
+void EnergyPlotDialog::FrameChanged(void) {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+
+    epGraph->setSelection(0, (int)(parent->GetData()->GetCurrentFrame()) - 1);
 }
