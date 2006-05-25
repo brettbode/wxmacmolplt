@@ -47,10 +47,11 @@ IMPLEMENT_DYNAMIC_CLASS( EnergyPlotDialog, wxDialog )
  */
 
 BEGIN_EVENT_TABLE( EnergyPlotDialog, wxDialog )
-
 ////@begin EnergyPlotDialog event table entries
-////@end EnergyPlotDialog event table entries
+    EVT_AXIS_DCLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphAxisDClick)
+    EVT_GRAPH_CLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphGraphClick)
 
+////@end EnergyPlotDialog event table entries
 END_EVENT_TABLE()
 
 /*!
@@ -161,3 +162,29 @@ void EnergyPlotDialog::FrameChanged(void) {
 
     epGraph->setSelection(0, (int)(parent->GetData()->GetCurrentFrame()) - 1);
 }
+
+/*!
+ * EVT_GRAPH_CLICK event handler for ID_EPGRAPH
+ */
+
+void EnergyPlotDialog::OnEpgraphGraphClick( wxCommandEvent& event )
+{
+////@begin EVT_GRAPH_CLICK event handler for ID_EPGRAPH in EnergyPlotDialog.
+////@end EVT_GRAPH_CLICK event handler for ID_EPGRAPH in EnergyPlotDialog. 
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    
+    parent->ChangeFrames(epGraph->getSelection(0) + 1);
+    cout << "Attempted to change to frame #" << epGraph->getSelection(0) + 1 << endl;
+}
+
+/*!
+ * wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH
+ */
+
+void EnergyPlotDialog::OnEpgraphAxisDClick( wxCommandEvent& event )
+{
+////@begin wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH in EnergyPlotDialog.
+////@end wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH in EnergyPlotDialog. 
+}
+
+

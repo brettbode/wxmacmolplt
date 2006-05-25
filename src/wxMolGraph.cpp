@@ -16,8 +16,8 @@ BEGIN_EVENT_TABLE(wxMolGraph, wxControl)
     EVT_LEAVE_WINDOW (wxMolGraph::onLeaveWindow)
 END_EVENT_TABLE()
 
-const wxEventType wxEVT_AXIS_DCLICK = wxNewEventType();
-const wxEventType wxEVT_GRAPH_CLICK = wxNewEventType();
+const int wxEVT_AXIS_DCLICK = wxNewEventType();
+const int wxEVT_GRAPH_CLICK = wxNewEventType();
 
 const int BORDER = 2;
 
@@ -785,7 +785,8 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
 }
 
 void wxMolGraph::onLeftDblClick(wxMouseEvent &event) {
-    wxCommandEvent event_axis(wxEVT_AXIS_DCLICK);
+    wxCommandEvent event_axis(wxEVT_AXIS_DCLICK, GetId());
+    event_axis.SetEventObject(this);
 
     if(xAxisRegion.Contains(event.GetPosition()) == wxInRegion) {
         event_axis.SetInt(MG_AXIS_X);

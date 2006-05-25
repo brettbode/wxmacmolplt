@@ -7,11 +7,11 @@ using namespace std;
 #ifndef _WX_MOL_GRAPH_H_
 #define _WX_MOL_GRAPH_H_
 
-extern const wxEventType wxEVT_AXIS_DCLICK;
-extern const wxEventType wxEVT_GRAPH_CLICK;
+extern const int wxEVT_AXIS_DCLICK;
+extern const int wxEVT_GRAPH_CLICK;
 
-#define EVT_AXIS_DCLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_AXIS_DCLICK, id, -1, (wxObjectEventFunction)(wxEventFunction)(wxNotifyEventFunction)&fn, (wxObject *) NULL )
-#define EVT_GRAPH_CLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_GRAPH_CLICK, id, -1, (wxObjectEventFunction)(wxEventFunction)(wxNotifyEventFunction)&fn, (wxObject *) NULL )
+#define EVT_AXIS_DCLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_AXIS_DCLICK, id, -1, (wxObjectEventFunction) (wxEventFunction) wxStaticCastEvent( wxCommandEventFunction, &fn ), (wxObject *) NULL ),
+#define EVT_GRAPH_CLICK(id, fn) DECLARE_EVENT_TABLE_ENTRY( wxEVT_GRAPH_CLICK, id, -1, (wxObjectEventFunction) (wxEventFunction) wxStaticCastEvent( wxCommandEventFunction, &fn ), (wxObject *) NULL ),
 
 #define MG_AXIS_X  0x00
 #define MG_AXIS_Y1 0x01

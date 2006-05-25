@@ -76,6 +76,12 @@ public:
 
 ////@begin EnergyPlotDialog event handler declarations
 
+    /// wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH
+    void OnEpgraphAxisDClick( wxCommandEvent& event );
+
+    /// wxEVT_GRAPH_CLICK event handler for ID_EPGRAPH
+    void OnEpgraphGraphClick( wxCommandEvent& event );
+
 ////@end EnergyPlotDialog event handler declarations
 
 ////@begin EnergyPlotDialog member function declarations
