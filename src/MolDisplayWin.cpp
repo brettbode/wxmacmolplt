@@ -13,6 +13,8 @@
 #include "Prefs.h"
 #include "main.h"
 #include "Frame.h"
+#include "BasisSet.h"
+#include "InputData.h"
 #include "Math3D.h"
 #include "myFiles.h"
 #include "setscreenplane.h"
@@ -455,9 +457,82 @@ void MolDisplayWin::menuFileDeleteFrame(wxCommandEvent &event) {
 void MolDisplayWin::menuFileImport(wxCommandEvent &event) {
 	//First need to use an open file dialog
 	wxString filename = wxFileSelector(wxT("Choose a GAMESS .DAT file to import a $VEC group"));
-	//If the user chooses a file, create a window and have it process it.
+	//We are looking for $ VEC groups. Scan to see how many are there. If more than 1 the user will
+	//have to choose.
 	if (!filename.empty()) {
- //       createMainFrame(filename);
+		FILE * myfile = fopen(filename.mb_str(wxConvUTF8), "r");
+		if (myfile == NULL) {
+			MessageAlert("Unable to open the selected file!");
+		} else {
+			BufferFile * Buffer = NULL;
+			try {
+				Buffer = new BufferFile(myfile, false);
+				int vecCount=0;
+				while (Buffer->LocateKeyWord("$VEC", 4)) {
+					vecCount++;
+					Buffer->SkipnLines(1);
+				}
+				Buffer->SetFilePos(0);
+				if (vecCount <= 0) {
+					MessageAlert("No $VEC group found in the selected file.");
+				} else if (vecCount == 1) {
+					if (Buffer->LocateKeyWord("$VEC", 4)) {
+						//Buffer should now have the correct position
+						BasisSet * lBasis = MainData->GetBasisSet();
+						Frame * lFrame = MainData->GetCurrentFramePtr();
+						InputData * lInputData = MainData->GetInputData();
+						if (lBasis) {
+							long NumFuncs = lBasis->GetNumBasisFuncs(false);
+							long SCFType = lInputData->Control->GetSCFType();
+							long NumBetaOrbs = 0;
+							if (SCFType == UHF) NumBetaOrbs = NumFuncs;
+							else SCFType = 0;
+							OrbitalRec * OrbSet = NULL;
+							try {
+								OrbSet = new OrbitalRec(NumFuncs, NumBetaOrbs, NumFuncs);
+								if (OrbSet) {
+									OrbSet->ReadVecGroup(Buffer, NumFuncs, (TypeOfWavefunction) SCFType);
+								}
+							}
+							catch (DataError) {
+								MessageAlert("Invalid data encountered while reading $Vec group. Import aborted!");
+								if (OrbSet) {
+									delete OrbSet;
+									OrbSet = NULL;
+								}
+							}
+							catch (MemoryError) {
+								MessageAlert("Insufficient memory to import $Vec. Aborted!");
+								if (OrbSet) {
+									delete OrbSet;
+									OrbSet = NULL;
+								}
+							}
+							catch (std::bad_alloc) {
+								MessageAlert("Insufficient memory to import $Vec. Aborted!");
+								if (OrbSet) {
+									delete OrbSet;
+									OrbSet = NULL;
+								}
+							}
+							catch (FileError) {
+								MessageAlert("Unexpected end of file encountered.");
+								if (OrbSet) {
+									delete OrbSet;
+									OrbSet = NULL;
+								}
+							}
+							if (OrbSet != NULL) lFrame->Orbs.push_back(OrbSet);
+						}
+					}
+				} else { //The user must choose the desired one
+				}
+			}
+			catch (...) {
+				MessageAlert("An error occurred importing the $VEC group.");
+			}
+			if (Buffer) delete Buffer;      //Done reading so free up the buffer
+		}
  	}
 }
 void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
