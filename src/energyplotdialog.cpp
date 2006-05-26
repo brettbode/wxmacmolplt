@@ -49,6 +49,8 @@ IMPLEMENT_DYNAMIC_CLASS( EnergyPlotDialog, wxDialog )
 
 BEGIN_EVENT_TABLE( EnergyPlotDialog, wxDialog )
 ////@begin EnergyPlotDialog event table entries
+    EVT_CLOSE( EnergyPlotDialog::OnCloseWindow )
+
     EVT_AXIS_DCLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphAxisDClick)
     EVT_GRAPH_CLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphGraphClick)
 
@@ -102,6 +104,7 @@ bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& 
     epGraph->addXSet(xSetData, true);
     epGraph->addYSet(energyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, *wxCYAN);
     epGraph->autoScaleY(MG_AXIS_Y1);
+    epGraph->setSelection(0, mData->CurrentFrame - 1);
     return true;
 }
 
@@ -185,6 +188,17 @@ void EnergyPlotDialog::OnEpgraphAxisDClick( wxCommandEvent& event )
 {
 ////@begin wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH in EnergyPlotDialog.
 ////@end wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH in EnergyPlotDialog. 
+}
+
+
+/*!
+ * wxEVT_CLOSE_WINDOW event handler for ID_ENERGYPLOTDIALOG
+ */
+
+void EnergyPlotDialog::OnCloseWindow( wxCloseEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    parent->CloseEnergy_plotWindow();
 }
 
 

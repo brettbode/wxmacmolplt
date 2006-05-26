@@ -76,6 +76,9 @@ public:
 
 ////@begin EnergyPlotDialog event handler declarations
 
+    /// wxEVT_CLOSE_WINDOW event handler for ID_ENERGYPLOTDIALOG
+    void OnCloseWindow( wxCloseEvent& event );
+
     /// wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH
     void OnEpgraphAxisDClick( wxCommandEvent& event );
 
