@@ -76,9 +76,14 @@ EnergyPlotDialog::EnergyPlotDialog( wxWindow* parent, wxWindowID id, const wxStr
 
 bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
-    MoleculeData *mData = ((MolDisplayWin *)parent)->GetData();
+    MoleculeData  *mData = ((MolDisplayWin *)parent)->GetData();
+    EnergyOptions *eOpts = ((MolDisplayWin *)parent)->GetPrefs()->GetEnergyOptions();
+    
     vector< double > xSetData;
-    vector< pair< int, double > > energyData;
+    vector< pair< int, double > > totalEnergyData;
+    vector< pair< int, double > > potentialEnergyData;
+    vector< pair< int, double > > mp2EnergyData;
+    vector< pair< int, double > > kineticEnergyData;
     Frame *currFrame = NULL;
     int i = 0;
     
@@ -99,10 +104,29 @@ bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& 
     // Add data to epGraph
     for(currFrame = mData->Frames, i = 0; currFrame != NULL; currFrame = currFrame->NextFrame, i++) {
         xSetData.push_back((double)(currFrame->time));
-        energyData.push_back(make_pair(i, currFrame->Energy));
+        totalEnergyData.push_back(make_pair(i, currFrame->Energy));
+        potentialEnergyData.push_back(make_pair(i, currFrame->Energy - currFrame->KE));
+        mp2EnergyData.push_back(make_pair(i, currFrame->MP2Energy));
+        kineticEnergyData.push_back(make_pair(i, currFrame->KE));
     }
     epGraph->addXSet(xSetData, true);
-    epGraph->addYSet(energyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, *wxCYAN);
+    
+    if(eOpts->PlotEnergy()) {
+        epGraph->addYSet(totalEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetTEColor())));
+    }
+    if(eOpts->PlotPEnergy()) {
+        epGraph->addYSet(potentialEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetPEColor())));
+    }
+    if(eOpts->PlotMPEnergy()) {
+        epGraph->addYSet(mp2EnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetMPColor())));
+    }
+    if(eOpts->PlotKEnergy()) {
+        epGraph->addYSet(kineticEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())));
+    }
+    
+    epGraph->setOffsetY(MG_AXIS_Y1, eOpts->GetY1Zero());
+    epGraph->setOffsetY(MG_AXIS_Y2, eOpts->GetY2Zero());
+    epGraph->setPrecision(eOpts->GetNumDigits());
     epGraph->autoScaleY(MG_AXIS_Y1);
     epGraph->setSelection(0, mData->CurrentFrame - 1);
     return true;

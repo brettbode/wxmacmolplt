@@ -73,12 +73,13 @@ int wxMolGraph::addYSet(YSet yData,
     int index = data[xSet].second.size();
     YSettings newYSettings;
 
-    newYSettings.exists = true;
-    newYSettings.axis = axis;
-    newYSettings.style = style;
-    newYSettings.color = color;
-    newYSettings.shape = shape;
-    newYSettings.size  = size;
+    newYSettings.visible = true;
+    newYSettings.exists  = true;
+    newYSettings.axis    = axis;
+    newYSettings.style   = style;
+    newYSettings.color   = color;
+    newYSettings.shape   = shape;
+    newYSettings.size    = size;
 
     try {
         data[xSet].second.push_back(yData);
@@ -323,6 +324,10 @@ void wxMolGraph::reset() {
     y2Offset = 0.0;
     Refresh();
     Update();
+}
+
+void wxMolGraph::setPrecision(int p) {
+    precision = p;
 }
 
 wxSize wxMolGraph::DoGetBestSize() const {

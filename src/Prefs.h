@@ -16,6 +16,11 @@
 #ifndef __Prefs__
 #define __Prefs__
 
+#include "wx/wx.h"
+
+wxColour RGB2WX(RGBColor &c);
+RGBColor WX2RGB(wxColour &c);
+
 class SurfaceOptions {
     private:
         long            NumContours;        // Max. # of contours (+ or -) in 2D map

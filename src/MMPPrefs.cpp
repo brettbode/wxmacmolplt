@@ -29,6 +29,26 @@ extern short		gAppResRef;
 extern WinPrefs *	gPreferences;
 extern WinPrefs *	gPrefDefaults;
 
+wxColour RGB2WX(RGBColor &c) {
+    wxColor newC;
+    unsigned char r = (unsigned char)(c.red   >> 8);
+    unsigned char g = (unsigned char)(c.green >> 8);
+    unsigned char b = (unsigned char)(c.blue  >> 8);
+
+    newC.Set(r, g, b);
+
+    return newC;
+}
+
+RGBColor WX2RGB(wxColour &c) {
+    RGBColor newC;
+    newC.red   = c.Red()   << 8;
+    newC.green = c.Green() << 8;
+    newC.blue  = c.Blue()  << 8;
+
+    return newC;
+}
+
 //copy in the factory default values from the gPrefDefaults
 void WinPrefs::ReadAtomDefaults(void) {
 	CopyAtomPrefs(gPrefDefaults);

@@ -34,6 +34,7 @@ typedef vector< pair< XSet, vector< YSet > > > DataSet;
 typedef struct _YSettings YSettings;
 
 struct _YSettings {
+    bool     visible;
     bool     exists;
     int      axis;
     int      style;
@@ -309,6 +310,15 @@ class wxMolGraph : public wxControl {
      * newly added sets will restart at zero.
      */
     void reset();
+
+
+    /**
+     * Sets the number of places after the decimal point that should be
+     * displayed.  The default value is 4.
+     *
+     * @param p The new precision value.
+     */
+    void setPrecision(int p);
 
 
     /**
