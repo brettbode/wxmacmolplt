@@ -167,5 +167,37 @@ void ChooseVECgroup::OnOkUpdate( wxUpdateUIEvent& event )
 }
 
 void ChooseVECgroup::SetBuffer(BufferFile * buffer) {
+/*	while (Buffer->LocateKeyWord("$VEC", 4)) {
+		char Label[3*kMaxLineLength];
+		//Read $vec label lines
+		long VecPos = Buffer->GetFilePos() - 2;
+		long LabelLength;
+		LabelLength = 0;
+		if (VecPos > 0) {
+			Buffer->BackupnLines(3);
+			long back3Pos = Buffer->GetFilePos();
+			//scan the up to 3 lines
+			while (VecPos - Buffer->GetFilePos() > 0) {
+				Buffer->GetLine(Label);	//actually looking for $end from a previous group
+				if (-1 < FindKeyWord(Label, "$END", 4))
+					back3Pos = Buffer->GetFilePos();
+			}
+			LabelLength = VecPos - back3Pos + 1;
+			if (LabelLength > 2) {
+				Buffer->SetFilePos(back3Pos);
+				Buffer->Read((Ptr) Label, LabelLength-1);	//note: buffer position should be back at $vec
+				Label[LabelLength-1] = 0;	//make it a proper C string
+			}
+		}
+		if (LabelLength <= 2) {strcpy(Label, "No label"); LabelLength = 9;}
+		LAddRow(1, theCell.v, VecList);
+		LSetCell((Ptr) Label, (LabelLength+1)*sizeof(char), theCell, VecList);
+		if (VecPos < 0) VecPos = 0;
+		Buffer->SetFilePos(VecPos);
+		Buffer->SkipnLines(2);
+	}*/
+}
+int ChooseVECgroup::GetTarget(void) {
+	return 0;
 }
 
