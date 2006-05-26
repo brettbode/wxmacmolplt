@@ -7270,7 +7270,7 @@ Modeling, 1998, 16, 133-138."</string>
               <string name="proxy-Data variable">""</string>
               <string name="proxy-Data validator">""</string>
               <bool name="proxy-wxLC_LIST ">0</bool>
-              <bool name="proxy-wxLC_REPORT">0</bool>
+              <bool name="proxy-wxLC_REPORT">1</bool>
               <bool name="proxy-wxLC_ICON">0</bool>
               <bool name="proxy-wxLC_SMALL_ICON">0</bool>
               <bool name="proxy-wxLC_VIRTUAL">0</bool>
@@ -7279,11 +7279,11 @@ Modeling, 1998, 16, 133-138."</string>
               <bool name="proxy-wxLC_AUTOARRANGE">0</bool>
               <bool name="proxy-wxLC_USER_TEXT">0</bool>
               <bool name="proxy-wxLC_EDIT_LABELS">0</bool>
-              <bool name="proxy-wxLC_NO_HEADER">0</bool>
+              <bool name="proxy-wxLC_NO_HEADER">1</bool>
               <bool name="proxy-wxLC_SINGLE_SEL">1</bool>
               <bool name="proxy-wxLC_SORT_ASCENDING">0</bool>
               <bool name="proxy-wxLC_SORT_DESCENDING">0</bool>
-              <bool name="proxy-wxLC_HRULES">0</bool>
+              <bool name="proxy-wxLC_HRULES">1</bool>
               <bool name="proxy-wxLC_VRULES">0</bool>
               <bool name="proxy-wxNO_BORDER">0</bool>
               <bool name="proxy-wxSIMPLE_BORDER">0</bool>

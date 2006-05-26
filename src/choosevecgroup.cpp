@@ -104,7 +104,7 @@ void ChooseVECgroup::CreateControls()
     itemStaticText3->Wrap(400);
     itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    list = new wxListCtrl( itemDialog1, ID_LISTCTRL, wxDefaultPosition, wxSize(400, 300), wxLC_SINGLE_SEL );
+    list = new wxListCtrl( itemDialog1, ID_LISTCTRL, wxDefaultPosition, wxSize(400, 300), wxLC_REPORT|wxLC_NO_HEADER|wxLC_SINGLE_SEL|wxLC_HRULES );
     if (ShowToolTips())
         list->SetToolTip(_("Click on the $VEC group to import"));
     itemBoxSizer2->Add(list, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -165,9 +165,10 @@ void ChooseVECgroup::OnOkUpdate( wxUpdateUIEvent& event )
 	if (list->GetSelectedItemCount() > 0) event.Enable(true);
     event.Skip();
 }
-
-void ChooseVECgroup::SetBuffer(BufferFile * buffer) {
-/*	while (Buffer->LocateKeyWord("$VEC", 4)) {
+#include <iostream>
+void ChooseVECgroup::SetBuffer(BufferFile * Buffer) {
+	int vecCount=0;
+	while (Buffer->LocateKeyWord("$VEC", 4)) {
 		char Label[3*kMaxLineLength];
 		//Read $vec label lines
 		long VecPos = Buffer->GetFilePos() - 2;
@@ -190,12 +191,13 @@ void ChooseVECgroup::SetBuffer(BufferFile * buffer) {
 			}
 		}
 		if (LabelLength <= 2) {strcpy(Label, "No label"); LabelLength = 9;}
-		LAddRow(1, theCell.v, VecList);
-		LSetCell((Ptr) Label, (LabelLength+1)*sizeof(char), theCell, VecList);
+		list->InsertItem(vecCount, wxString(Label, wxConvUTF8));
+		vecCount++;
+		std::cout << "label is: " << Label << std::endl;
 		if (VecPos < 0) VecPos = 0;
 		Buffer->SetFilePos(VecPos);
 		Buffer->SkipnLines(2);
-	}*/
+	}
 }
 int ChooseVECgroup::GetTarget(void) {
 	return 0;
