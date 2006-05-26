@@ -27,11 +27,12 @@
 ////@begin includes
 ////@end includes
 
-#include "energyplotdialog.h"
-
 #include "Globals.h"
 #include "MolDisplayWin.h"
 #include "Frame.h"
+
+#include "energyplotdialog.h"
+#include <iostream>
 
 ////@begin XPM images
 ////@end XPM images

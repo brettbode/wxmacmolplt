@@ -49,6 +49,7 @@
 		8B7145C90A23983200435951 /* aboutwxmacmolplt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */; };
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
+		8BE7C29D0A273D9700DACA25 /* choosevecgroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */; };
 		8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
 		8BEDFA000A09390700BF6F85 /* setbondlength.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */; };
 /* End PBXBuildFile section */
@@ -133,6 +134,8 @@
 		8B7145C80A23983200435951 /* aboutwxmacmolplt.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = aboutwxmacmolplt.h; path = src/aboutwxmacmolplt.h; sourceTree = "<group>"; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
 		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
+		8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = choosevecgroup.cpp; path = src/choosevecgroup.cpp; sourceTree = "<group>"; };
+		8BE7C29C0A273D9700DACA25 /* choosevecgroup.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = choosevecgroup.h; path = src/choosevecgroup.h; sourceTree = "<group>"; };
 		8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setscreenplane.cpp; path = src/setscreenplane.cpp; sourceTree = "<group>"; };
 		8BED377A09EDCC0E0003DF64 /* setscreenplane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setscreenplane.h; path = src/setscreenplane.h; sourceTree = "<group>"; };
 		8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setbondlength.cpp; path = src/setbondlength.cpp; sourceTree = "<group>"; };
@@ -183,6 +186,8 @@
 				16FB432E09F026A300E84C6B /* bondsdlg.cpp */,
 				16FB432F09F026A300E84C6B /* bondsdlg.h */,
 				1652DA2D09D0B12600B7783F /* cell_table.h */,
+				8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */,
+				8BE7C29C0A273D9700DACA25 /* choosevecgroup.h */,
 				1652DA2E09D0B12600B7783F /* CML.cpp */,
 				1652DA2F09D0B12600B7783F /* CML.h */,
 				16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */,
@@ -358,6 +363,7 @@
 				8B7145C90A23983200435951 /* aboutwxmacmolplt.cpp in Sources */,
 				8B6C7BFB0A24E9C100B7358F /* energyplotdialog.cpp in Sources */,
 				8B6C7BFF0A24E9E800B7358F /* wxMolGraph.cpp in Sources */,
+				8BE7C29D0A273D9700DACA25 /* choosevecgroup.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -27,6 +27,7 @@
 #include "setbondlength.h"
 #include "appendframesoptions.h"
 #include "exportoptionsdialog.h"
+#include "choosevecgroup.h"
 #include "printoptions.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
@@ -453,7 +454,6 @@ void MolDisplayWin::menuFileDeleteFrame(wxCommandEvent &event) {
     MainData->DeleteFrame();
     ResetAllWindows();
 }
-
 void MolDisplayWin::menuFileImport(wxCommandEvent &event) {
 	//First need to use an open file dialog
 	wxString filename = wxFileSelector(wxT("Choose a GAMESS .DAT file to import a $VEC group"));
@@ -526,6 +526,12 @@ void MolDisplayWin::menuFileImport(wxCommandEvent &event) {
 						}
 					}
 				} else { //The user must choose the desired one
+					ChooseVECgroup * chooser = new ChooseVECgroup(this);
+					chooser->SetBuffer(Buffer);
+					int rcode = chooser->ShowModal();
+					if (rcode == wxID_OK) {
+					}
+					chooser->Destroy();
 				}
 			}
 			catch (...) {
