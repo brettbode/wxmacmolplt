@@ -305,6 +305,18 @@ class wxMolGraph : public wxControl {
 
 
     /**
+     * Sets the visibility of the given y-set.  Y-sets that are not visible do
+     * not affect axis autoscaling.  All sets are visible by default.
+     *
+     * @param xSet The x-set which the y-set belongs to.
+     * @param ySet The y-set.
+     * @param visible If true, the y-set will be visible.  If false, the y-set
+     *                will not be drawn.
+     */
+    void setVisible(int xSet, int ySet, bool visible);
+
+
+    /**
      * Restores the wxMolGraph to its initial state.  Axis information, such as
      * min/max and offset, is reset, all sets are removed, and the indices of
      * newly added sets will restart at zero.

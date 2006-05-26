@@ -193,7 +193,7 @@ void wxMolGraph::autoScaleY(int axis) {
 
     for(i = 0; i < data.size(); i++) {
         for(j = 0; j < data[i].second.size(); j++) {
-            if(dataSettings[i][j].axis == axis) {
+            if(dataSettings[i][j].axis == axis && dataSettings[i][j].visible) {
                 for(k = 0; k < data[i].second[j].size(); k++) {
                     if(data[i].second[j][k].second < min || !set) {
                         min = data[i].second[j][k].second;
@@ -290,6 +290,10 @@ void wxMolGraph::setOffsetY(int axis, double offset) {
     }
 
     Refresh();
+}
+
+void wxMolGraph::setVisible(int xSet, int ySet, bool visible) {
+    dataSettings[xSet][ySet].visible = visible;
 }
 
 void wxMolGraph::reset() {
@@ -657,79 +661,81 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
     try {
         for(i = 0; i < data.size(); i++) {
             for(j = 0; j < data[i].second.size(); j++) {
-                for(k = 0; k < data[i].second[j].size(); k++) {
-                    xCoord = data[i].first.first.at(data[i].second[j][k].first);
-                    yCoord = data[i].second[j][k].second;
-                    x = xScaleMin + (int)((xCoord - xMin) * xConversion);
-                    switch(dataSettings[i][j].axis) {
-                        case MG_AXIS_Y1:
-                            y = yScaleMin - (int)((yCoord - y1Min) * y1Conversion);
-                            break;
-                        case MG_AXIS_Y2:
-                            y = yScaleMin - (int)((yCoord - y2Min) * y2Conversion);
-                            break;
-                    }
-
-                    dc.SetBrush(wxBrush(dataSettings[i][j].color));
-                    dc.SetPen(wxPen(*wxBLACK));
-                    if(dataSettings[i][j].style & MG_STYLE_LINE) {
-                        if(k + 1 < data[i].second[j].size()) {
-                            xCoord = data[i].first.first.at(data[i].second[j][k+1].first);
-                            yCoord = data[i].second[j][k+1].second;
-                            lineX = xScaleMin + (int)((xCoord - xMin) * xConversion);
-                            switch(dataSettings[i][j].axis) {
-                                case MG_AXIS_Y1:
-                                    lineY = yScaleMin - (int)((yCoord - y1Min) * y1Conversion);
+                if(dataSettings[i][j].visible) {
+                    for(k = 0; k < data[i].second[j].size(); k++) {
+                        xCoord = data[i].first.first.at(data[i].second[j][k].first);
+                        yCoord = data[i].second[j][k].second;
+                        x = xScaleMin + (int)((xCoord - xMin) * xConversion);
+                        switch(dataSettings[i][j].axis) {
+                            case MG_AXIS_Y1:
+                                y = yScaleMin - (int)((yCoord - y1Min) * y1Conversion);
+                                break;
+                            case MG_AXIS_Y2:
+                                y = yScaleMin - (int)((yCoord - y2Min) * y2Conversion);
+                                break;
+                        }
+    
+                        dc.SetBrush(wxBrush(dataSettings[i][j].color));
+                        dc.SetPen(wxPen(*wxBLACK));
+                        if(dataSettings[i][j].style & MG_STYLE_LINE) {
+                            if(k + 1 < data[i].second[j].size()) {
+                                xCoord = data[i].first.first.at(data[i].second[j][k+1].first);
+                                yCoord = data[i].second[j][k+1].second;
+                                lineX = xScaleMin + (int)((xCoord - xMin) * xConversion);
+                                switch(dataSettings[i][j].axis) {
+                                    case MG_AXIS_Y1:
+                                        lineY = yScaleMin - (int)((yCoord - y1Min) * y1Conversion);
+                                        break;
+                                    case MG_AXIS_Y2:
+                                        lineY = yScaleMin - (int)((yCoord - y2Min) * y2Conversion);
+                                        break;
+                                }
+                                dc.DrawLine(x, y, lineX, lineY);
+                            }
+                        }
+                        if(dataSettings[i][j].style & MG_STYLE_BAR) {
+                            if(data[i].first.second == data[i].second[j][k].first) {
+                                dc.SetPen(wxPen(*wxRED));
+                            }
+                            else {
+                                dc.SetPen(wxPen(*wxBLACK));
+                            }
+                            dc.DrawLine(x, y, x, yScaleMin);
+                        }
+                        if(dataSettings[i][j].style & MG_STYLE_POINT) {
+                            if(data[i].first.second == data[i].second[j][k].first) {
+                                dc.SetBrush(wxBrush(*wxRED));
+                            }
+                            else {
+                                dc.SetBrush(wxBrush(dataSettings[i][j].color));
+                            }
+                            switch(dataSettings[i][j].shape) {
+                                case MG_SHAPE_CIRCLE:
+                                    dc.DrawCircle(x, y, dataSettings[i][j].size / 2);
                                     break;
-                                case MG_AXIS_Y2:
-                                    lineY = yScaleMin - (int)((yCoord - y2Min) * y2Conversion);
+                                case MG_SHAPE_DIAMOND:
+                                    polyPoints[0].x = 0;
+                                    polyPoints[0].y = dataSettings[i][j].size / 2 + 2;
+                                    polyPoints[1].x = dataSettings[i][j].size / 2 + 2;
+                                    polyPoints[1].y = 0;
+                                    polyPoints[2].x = 0;
+                                    polyPoints[2].y = -(dataSettings[i][j].size / 2 + 2);
+                                    polyPoints[3].x = -(dataSettings[i][j].size / 2 + 2);
+                                    polyPoints[3].y = 0;
+                                    dc.DrawPolygon(4, polyPoints, x, y);
+                                    break;
+                                case MG_SHAPE_SQUARE:
+                                    polyPoints[0].x = dataSettings[i][j].size / 2;
+                                    polyPoints[0].y = dataSettings[i][j].size / 2;
+                                    polyPoints[1].x = dataSettings[i][j].size / 2;
+                                    polyPoints[1].y = -dataSettings[i][j].size / 2;
+                                    polyPoints[2].x = -(dataSettings[i][j].size / 2);
+                                    polyPoints[2].y = -(dataSettings[i][j].size / 2);
+                                    polyPoints[3].x = -(dataSettings[i][j].size / 2);
+                                    polyPoints[3].y = (dataSettings[i][j].size / 2);
+                                    dc.DrawPolygon(4, polyPoints, x, y);
                                     break;
                             }
-                            dc.DrawLine(x, y, lineX, lineY);
-                        }
-                    }
-                    if(dataSettings[i][j].style & MG_STYLE_BAR) {
-                        if(data[i].first.second == data[i].second[j][k].first) {
-                            dc.SetPen(wxPen(*wxRED));
-                        }
-                        else {
-                            dc.SetPen(wxPen(*wxBLACK));
-                        }
-                        dc.DrawLine(x, y, x, yScaleMin);
-                    }
-                    if(dataSettings[i][j].style & MG_STYLE_POINT) {
-                        if(data[i].first.second == data[i].second[j][k].first) {
-                            dc.SetBrush(wxBrush(*wxRED));
-                        }
-                        else {
-                            dc.SetBrush(wxBrush(dataSettings[i][j].color));
-                        }
-                        switch(dataSettings[i][j].shape) {
-                            case MG_SHAPE_CIRCLE:
-                                dc.DrawCircle(x, y, dataSettings[i][j].size / 2);
-                                break;
-                            case MG_SHAPE_DIAMOND:
-                                polyPoints[0].x = 0;
-                                polyPoints[0].y = dataSettings[i][j].size / 2 + 2;
-                                polyPoints[1].x = dataSettings[i][j].size / 2 + 2;
-                                polyPoints[1].y = 0;
-                                polyPoints[2].x = 0;
-                                polyPoints[2].y = -(dataSettings[i][j].size / 2 + 2);
-                                polyPoints[3].x = -(dataSettings[i][j].size / 2 + 2);
-                                polyPoints[3].y = 0;
-                                dc.DrawPolygon(4, polyPoints, x, y);
-                                break;
-                            case MG_SHAPE_SQUARE:
-                                polyPoints[0].x = dataSettings[i][j].size / 2;
-                                polyPoints[0].y = dataSettings[i][j].size / 2;
-                                polyPoints[1].x = dataSettings[i][j].size / 2;
-                                polyPoints[1].y = -dataSettings[i][j].size / 2;
-                                polyPoints[2].x = -(dataSettings[i][j].size / 2);
-                                polyPoints[2].y = -(dataSettings[i][j].size / 2);
-                                polyPoints[3].x = -(dataSettings[i][j].size / 2);
-                                polyPoints[3].y = (dataSettings[i][j].size / 2);
-                                dc.DrawPolygon(4, polyPoints, x, y);
-                                break;
                         }
                     }
                 }
