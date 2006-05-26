@@ -175,7 +175,6 @@ void EnergyPlotDialog::OnEpgraphGraphClick( wxCommandEvent& event )
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     
     parent->ChangeFrames(epGraph->getSelection(0) + 1);
-    cout << "Attempted to change to frame #" << epGraph->getSelection(0) + 1 << endl;
 }
 
 /*!

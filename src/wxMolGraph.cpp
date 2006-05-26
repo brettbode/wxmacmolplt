@@ -739,7 +739,7 @@ void wxMolGraph::onPaint(wxPaintEvent &event) {
 }
 
 void wxMolGraph::onLeftClick(wxMouseEvent &event) {
-    wxCommandEvent event_graph(wxEVT_GRAPH_CLICK);
+    wxCommandEvent event_graph(wxEVT_GRAPH_CLICK, GetId());
     double x = 0.0;
     int i = 0;
     int j = 0;
