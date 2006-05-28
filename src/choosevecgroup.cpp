@@ -47,6 +47,8 @@ IMPLEMENT_DYNAMIC_CLASS( ChooseVECgroup, wxDialog )
 BEGIN_EVENT_TABLE( ChooseVECgroup, wxDialog )
 
 ////@begin ChooseVECgroup event table entries
+    EVT_GRID_EDITOR_SHOWN( ChooseVECgroup::OnEditorShown )
+
     EVT_UPDATE_UI( wxID_OK, ChooseVECgroup::OnOkUpdate )
 
 ////@end ChooseVECgroup event table entries
@@ -104,9 +106,14 @@ void ChooseVECgroup::CreateControls()
     itemStaticText3->Wrap(400);
     itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    list = new wxListCtrl( itemDialog1, ID_LISTCTRL, wxDefaultPosition, wxSize(400, 300), wxLC_REPORT|wxLC_NO_HEADER|wxLC_SINGLE_SEL|wxLC_HRULES );
+    list = new wxGrid( itemDialog1, ID_GRID, wxDefaultPosition, wxSize(516, 300), wxSUNKEN_BORDER|wxVSCROLL );
     if (ShowToolTips())
-        list->SetToolTip(_("Click on the $VEC group to import"));
+        list->SetToolTip(_("Choose the $VEC group to import"));
+    list->SetDefaultColSize(500);
+    list->SetDefaultRowSize(60);
+    list->SetColLabelSize(0);
+    list->SetRowLabelSize(0);
+    list->CreateGrid(1, 1, wxGrid::wxGridSelectRows);
     itemBoxSizer2->Add(list, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxHORIZONTAL);
@@ -162,12 +169,12 @@ wxIcon ChooseVECgroup::GetIconResource( const wxString& name )
 
 void ChooseVECgroup::OnOkUpdate( wxUpdateUIEvent& event )
 {
-	if (list->GetSelectedItemCount() > 0) event.Enable(true);
+	if (list->IsSelection()) event.Enable(true);
     event.Skip();
 }
-#include <iostream>
 void ChooseVECgroup::SetBuffer(BufferFile * Buffer) {
 	int vecCount=0;
+	list->DeleteRows(0, list->GetNumberRows(), true);
 	while (Buffer->LocateKeyWord("$VEC", 4)) {
 		char Label[3*kMaxLineLength];
 		//Read $vec label lines
@@ -191,15 +198,28 @@ void ChooseVECgroup::SetBuffer(BufferFile * Buffer) {
 			}
 		}
 		if (LabelLength <= 2) {strcpy(Label, "No label"); LabelLength = 9;}
-		list->InsertItem(vecCount, wxString(Label, wxConvUTF8));
+		list->InsertRows(vecCount, 1, true);
+		list->SetCellValue(vecCount, 0, wxString(Label, wxConvUTF8));
 		vecCount++;
-		std::cout << "label is: " << Label << std::endl;
 		if (VecPos < 0) VecPos = 0;
 		Buffer->SetFilePos(VecPos);
 		Buffer->SkipnLines(2);
 	}
+	list->SelectRow(0, true);
 }
 int ChooseVECgroup::GetTarget(void) {
-	return 0;
+	return list->GetGridCursorRow();
 }
+
+
+
+/*!
+ * wxEVT_GRID_EDITOR_SHOWN event handler for ID_GRID
+ */
+
+void ChooseVECgroup::OnEditorShown( wxGridEvent& event )
+{
+    event.Veto();
+}
+
 

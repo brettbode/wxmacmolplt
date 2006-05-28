@@ -475,63 +475,75 @@ void MolDisplayWin::menuFileImport(wxCommandEvent &event) {
 				Buffer->SetFilePos(0);
 				if (vecCount <= 0) {
 					MessageAlert("No $VEC group found in the selected file.");
-				} else if (vecCount == 1) {
-					if (Buffer->LocateKeyWord("$VEC", 4)) {
-						//Buffer should now have the correct position
-						BasisSet * lBasis = MainData->GetBasisSet();
-						Frame * lFrame = MainData->GetCurrentFramePtr();
-						InputData * lInputData = MainData->GetInputData();
-						if (lBasis) {
-							long NumFuncs = lBasis->GetNumBasisFuncs(false);
-							long SCFType = lInputData->Control->GetSCFType();
-							long NumBetaOrbs = 0;
-							if (SCFType == UHF) NumBetaOrbs = NumFuncs;
-							else SCFType = 0;
-							OrbitalRec * OrbSet = NULL;
-							try {
-								OrbSet = new OrbitalRec(NumFuncs, NumBetaOrbs, NumFuncs);
-								if (OrbSet) {
-									OrbSet->ReadVecGroup(Buffer, NumFuncs, (TypeOfWavefunction) SCFType);
+				} else {
+					int targetVec = -1;
+					if (vecCount == 1) {
+						targetVec = 0;
+					} else { //The user must choose the desired one
+						ChooseVECgroup * chooser = new ChooseVECgroup(this);
+						chooser->SetBuffer(Buffer);
+						int rcode = chooser->ShowModal();
+						if (rcode == wxID_OK) {
+							targetVec = chooser->GetTarget() + 1;
+						}
+						chooser->Destroy();
+					}
+					if (targetVec >= 1) {
+						Buffer->SetFilePos(0);
+						for (int i=0; i<targetVec; i++) {
+							if (i>0) Buffer->SkipnLines(1);
+							Buffer->LocateKeyWord("$VEC", 4);
+						}
+						if (Buffer->LocateKeyWord("$VEC", 4)) {
+							//Buffer should now have the correct position
+							BasisSet * lBasis = MainData->GetBasisSet();
+							Frame * lFrame = MainData->GetCurrentFramePtr();
+							InputData * lInputData = MainData->GetInputData();
+							if (lBasis) {
+								long NumFuncs = lBasis->GetNumBasisFuncs(false);
+								long SCFType = lInputData->Control->GetSCFType();
+								long NumBetaOrbs = 0;
+								if (SCFType == UHF) NumBetaOrbs = NumFuncs;
+								else SCFType = 0;
+								OrbitalRec * OrbSet = NULL;
+								try {
+									OrbSet = new OrbitalRec(NumFuncs, NumBetaOrbs, NumFuncs);
+									if (OrbSet) {
+										OrbSet->ReadVecGroup(Buffer, NumFuncs, (TypeOfWavefunction) SCFType);
+									}
 								}
-							}
-							catch (DataError) {
-								MessageAlert("Invalid data encountered while reading $Vec group. Import aborted!");
-								if (OrbSet) {
-									delete OrbSet;
-									OrbSet = NULL;
+								catch (DataError) {
+									MessageAlert("Invalid data encountered while reading $Vec group. Import aborted!");
+									if (OrbSet) {
+										delete OrbSet;
+										OrbSet = NULL;
+									}
 								}
-							}
-							catch (MemoryError) {
-								MessageAlert("Insufficient memory to import $Vec. Aborted!");
-								if (OrbSet) {
-									delete OrbSet;
-									OrbSet = NULL;
+								catch (MemoryError) {
+									MessageAlert("Insufficient memory to import $Vec. Aborted!");
+									if (OrbSet) {
+										delete OrbSet;
+										OrbSet = NULL;
+									}
 								}
-							}
-							catch (std::bad_alloc) {
-								MessageAlert("Insufficient memory to import $Vec. Aborted!");
-								if (OrbSet) {
-									delete OrbSet;
-									OrbSet = NULL;
+								catch (std::bad_alloc) {
+									MessageAlert("Insufficient memory to import $Vec. Aborted!");
+									if (OrbSet) {
+										delete OrbSet;
+										OrbSet = NULL;
+									}
 								}
-							}
-							catch (FileError) {
-								MessageAlert("Unexpected end of file encountered.");
-								if (OrbSet) {
-									delete OrbSet;
-									OrbSet = NULL;
+								catch (FileError) {
+									MessageAlert("Unexpected end of file encountered.");
+									if (OrbSet) {
+										delete OrbSet;
+										OrbSet = NULL;
+									}
 								}
+								if (OrbSet != NULL) lFrame->Orbs.push_back(OrbSet);
 							}
-							if (OrbSet != NULL) lFrame->Orbs.push_back(OrbSet);
 						}
 					}
-				} else { //The user must choose the desired one
-					ChooseVECgroup * chooser = new ChooseVECgroup(this);
-					chooser->SetBuffer(Buffer);
-					int rcode = chooser->ShowModal();
-					if (rcode == wxID_OK) {
-					}
-					chooser->Destroy();
 				}
 			}
 			catch (...) {

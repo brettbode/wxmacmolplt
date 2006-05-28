@@ -21,7 +21,7 @@
  */
 
 ////@begin includes
-#include "wx/listctrl.h"
+#include "wx/grid.h"
 ////@end includes
 
 /*!
@@ -29,7 +29,7 @@
  */
 
 ////@begin forward declarations
-class wxListCtrl;
+class wxGrid;
 ////@end forward declarations
 
 /*!
@@ -43,7 +43,7 @@ class wxListCtrl;
 #define SYMBOL_CHOOSEVECGROUP_IDNAME ID_DIALOG
 #define SYMBOL_CHOOSEVECGROUP_SIZE wxSize(400, 300)
 #define SYMBOL_CHOOSEVECGROUP_POSITION wxDefaultPosition
-#define ID_LISTCTRL 10056
+#define ID_GRID 10056
 ////@end control identifiers
 
 /*!
@@ -76,6 +76,9 @@ public:
 
 ////@begin ChooseVECgroup event handler declarations
 
+    /// wxEVT_GRID_EDITOR_SHOWN event handler for ID_GRID
+    void OnEditorShown( wxGridEvent& event );
+
     /// wxEVT_UPDATE_UI event handler for wxID_OK
     void OnOkUpdate( wxUpdateUIEvent& event );
 
@@ -96,7 +99,7 @@ public:
 	int GetTarget(void);
 
 ////@begin ChooseVECgroup member variables
-    wxListCtrl* list;
+    wxGrid* list;
 ////@end ChooseVECgroup member variables
 };
 
