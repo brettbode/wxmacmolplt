@@ -28,6 +28,7 @@
 #include "appendframesoptions.h"
 #include "exportoptionsdialog.h"
 #include "choosevecgroup.h"
+#include "coordinateoffset.h"
 #include "printoptions.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
@@ -76,6 +77,7 @@ enum MMP_EventID {
 	MMP_ANIMATEFRAMESTIMER,
 	MMP_ANIMATEMODE,
 	MMP_ANIMATEMODETIMER,
+	MMP_OFFSETMODE,
     
     Number_MMP_Ids
 };
@@ -109,6 +111,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 
     EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
 	EVT_MENU (MMP_ANIMATEMODE,		MolDisplayWin::menuViewAnimateMode)
+	EVT_MENU (MMP_OFFSETMODE,		MolDisplayWin::menuViewOffsetAlongMode)
     EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
     EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
     EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
@@ -328,6 +331,7 @@ void MolDisplayWin::createMenuBar(void) {
 
     menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"));
     menuView->Append(MMP_ANIMATEMODE, wxT("Animate Mode\tCtrl+M"));
+    menuView->Append(MMP_OFFSETMODE, wxT("Offset along mode..."));
     menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
     menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
     menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show &Axis"));
@@ -350,6 +354,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."));
     menuMolecule->Append(MMP_CREATELLMPATH, wxT("Create &LLM Path..."));
     menuMolecule->Append(MMP_MINFRAMEMOVEMENTS, wxT("&Minimize Frame Movements"));
+    menuMolecule->AppendSeparator();
     menuMolecule->Append(MMP_CONVERTTOBOHR, wxT("Convert to &Bohr"));
     menuMolecule->Append(MMP_CONVERTTOANGSTROMS, wxT("Convert to &Angstroms"));
     menuMolecule->Append(MMP_INVERTNORMALMODE, wxT("&Invert Normal Mode"));
@@ -384,6 +389,7 @@ void MolDisplayWin::ClearMenus(void) {
     menuView->Enable(MMP_ANIMATEMODE, false);
     menuView->Enable(MMP_PREVMODE, false);
     menuView->Enable(MMP_NEXTMODE, false);
+    menuView->Enable(MMP_OFFSETMODE, false);
     menuView->Enable(MMP_ANIMATEFRAMES, false);
     menuMolecule->Enable(MMP_SETBONDLENGTH, false);
     menuMolecule->Enable(MMP_CREATELLMPATH, false);
@@ -424,6 +430,7 @@ void MolDisplayWin::AdjustMenus(void) {
         if (MainData->cFrame->Vibs->CurrentMode>0) menuView->Enable(MMP_PREVMODE, true);
         if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1))
             menuView->Enable(MMP_NEXTMODE, true);
+		menuView->Enable(MMP_OFFSETMODE, true);
         menuMolecule->Enable(MMP_INVERTNORMALMODE, true);
     }
 }
@@ -1121,6 +1128,11 @@ void MolDisplayWin::menuViewNextNormalMode(wxCommandEvent &event) {
             Dirty = true;
         }
     }
+}
+void MolDisplayWin::menuViewOffsetAlongMode(wxCommandEvent &event) {
+	CoordinateOffset * co = new CoordinateOffset(this);
+	co->ShowModal();
+	co->Destroy();
 }
 void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
     MainData->CenterModelWindow();

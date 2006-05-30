@@ -158,6 +158,8 @@ class VibRec {
 		void WriteXML(XMLElement * parent, long NumAtoms) const;
 		void ReadXML(XMLElement * parent, const long & NumAtoms);
 		inline long GetNumModes(void) const {return NumModes;};
+		inline long GetCurrentMode(void) const {return CurrentMode;};
+		void GetModeOffset(const long & loc, CPoint3D & offset) const {offset = NormMode[loc];};
 		float GetIntensity(long Mode) const;
 		float GetFrequency(long Mode) const;
 		float GetRamanIntensity(long Mode) const;

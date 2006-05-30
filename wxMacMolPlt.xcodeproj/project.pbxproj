@@ -49,6 +49,7 @@
 		8B7145C90A23983200435951 /* aboutwxmacmolplt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */; };
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
+		8BDC5DDD0A29F25F0060517F /* coordinateoffset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */; };
 		8BE7C29D0A273D9700DACA25 /* choosevecgroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */; };
 		8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
 		8BEDFA000A09390700BF6F85 /* setbondlength.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */; };
@@ -134,6 +135,8 @@
 		8B7145C80A23983200435951 /* aboutwxmacmolplt.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = aboutwxmacmolplt.h; path = src/aboutwxmacmolplt.h; sourceTree = "<group>"; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
 		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
+		8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = coordinateoffset.cpp; path = src/coordinateoffset.cpp; sourceTree = "<group>"; };
+		8BDC5DDC0A29F25F0060517F /* coordinateoffset.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = coordinateoffset.h; path = src/coordinateoffset.h; sourceTree = "<group>"; };
 		8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = choosevecgroup.cpp; path = src/choosevecgroup.cpp; sourceTree = "<group>"; };
 		8BE7C29C0A273D9700DACA25 /* choosevecgroup.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = choosevecgroup.h; path = src/choosevecgroup.h; sourceTree = "<group>"; };
 		8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setscreenplane.cpp; path = src/setscreenplane.cpp; sourceTree = "<group>"; };
@@ -190,6 +193,8 @@
 				8BE7C29C0A273D9700DACA25 /* choosevecgroup.h */,
 				1652DA2E09D0B12600B7783F /* CML.cpp */,
 				1652DA2F09D0B12600B7783F /* CML.h */,
+				8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */,
+				8BDC5DDC0A29F25F0060517F /* coordinateoffset.h */,
 				16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */,
 				16B345EE09F9505C005FD3B2 /* coordinateswindow.h */,
 				1652DA3009D0B12600B7783F /* DataClasses.cpp */,
@@ -364,6 +369,7 @@
 				8B6C7BFB0A24E9C100B7358F /* energyplotdialog.cpp in Sources */,
 				8B6C7BFF0A24E9E800B7358F /* wxMolGraph.cpp in Sources */,
 				8BE7C29D0A273D9700DACA25 /* choosevecgroup.cpp in Sources */,
+				8BDC5DDD0A29F25F0060517F /* coordinateoffset.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -391,7 +397,7 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = G5;
+				GCC_MODEL_TUNING = "";
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";

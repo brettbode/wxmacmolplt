@@ -136,7 +136,7 @@ class MolDisplayWin : public wxFrame {
         void menuViewPrevNormalMode(wxCommandEvent &event);
         void menuViewNextNormalMode(wxCommandEvent &event);
           // void menuViewDisplay_frequencyDOSTUFF(wxCommandEvent &event);
-        //void menuViewOffset_along_mode(wxCommandEvent &event);
+        void menuViewOffsetAlongMode(wxCommandEvent &event);
         void menuViewAnimateMode(wxCommandEvent &event);
         void menuViewAnimateFrames(wxCommandEvent &event);
         //void menuViewShow_special_atoms(wxCommandEvent &event);
