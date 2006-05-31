@@ -37,6 +37,7 @@ class Frame {
 		friend class CoordWin;
 		friend class MoleculeData;
 		friend class EnergyPlotDialog;
+		friend class FrequenciesDialog;
 		friend class ZCalcWin;
 		friend class Surf2DBase;
 		friend class Surf3DBase;

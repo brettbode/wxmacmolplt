@@ -23,6 +23,7 @@ class MoleculeData {
 		friend class MolDisplayWin;
 		friend class CoordWin;
 		friend class EnergyPlotDialog;
+		friend class FrequenciesDialog;
 		friend class Surf2DBase;
 		friend class Surf3DBase;
 	private:

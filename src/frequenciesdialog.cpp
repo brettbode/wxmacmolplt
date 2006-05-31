@@ -30,6 +30,8 @@
 #include "Globals.h"
 #include "MolDisplayWin.h"
 #include "Frame.h"
+#include <wx/clipbrd.h>
+
 #include "frequenciesdialog.h"
 
 ////@begin XPM images
@@ -110,7 +112,7 @@ void FrequenciesDialog::CreateControls()
     itemFrame1->SetSizer(itemBoxSizer5);
 
     fGraph = new wxMolGraph( itemFrame1, ID_CUSTOM, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-    itemBoxSizer5->Add(fGraph, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    itemBoxSizer5->Add(fGraph, 1, wxGROW|wxALL, 5);
 
 ////@end FrequenciesDialog content construction
 }
@@ -154,9 +156,37 @@ wxIcon FrequenciesDialog::GetIconResource( const wxString& name )
  */
 
 void FrequenciesDialog::FrameChanged(void) {
+    RegenData();
+    Refresh();
 }
 
 void FrequenciesDialog::RegenData(void) {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    
+    MoleculeData  *mData = parent->GetData();
+    VibRec *Vibs = parent->GetData()->cFrame->Vibs;
+    
+    vector< double > xSetData;
+    vector< pair< int, double > > freqData;
+    float temp;
+    int i = 0;
+    
+
+    fGraph->reset();
+    
+    if(Vibs == NULL) return;
+    
+    for(i = 0; i < Vibs->GetNumModes(); i++) {
+        xSetData.push_back((double)(Vibs->GetFrequency(i)));
+        freqData.push_back(make_pair(i, Vibs->GetIntensity(i)));
+    }
+    fGraph->addXSet(xSetData, true);
+    
+    fGraph->addYSet(freqData, 0, MG_AXIS_Y1, MG_STYLE_BAR, *wxBLACK);
+
+    //fGraph->setPrecision(eOpts->GetNumDigits());
+    fGraph->autoScaleY(MG_AXIS_Y1);
+    fGraph->setSelection(0, mData->CurrentFrame - 1);
 }
 
 void FrequenciesDialog::OnCloseWindow( wxCloseEvent& event )
@@ -171,8 +201,19 @@ void FrequenciesDialog::OnCloseWindow( wxCloseEvent& event )
 
 void FrequenciesDialog::OnCopyClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_MENU_SELECTED event handler for wxID_COPY in FrequenciesDialog.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_MENU_SELECTED event handler for wxID_COPY in FrequenciesDialog. 
+    int width = 0;
+    int height = 0;
+    fGraph->GetClientSize(&width, &height);
+    wxBitmap tempBmp(width, height);
+    wxMemoryDC tempDC;
+
+    tempDC.SelectObject(tempBmp);
+    fGraph->draw(tempDC);
+
+    if (wxTheClipboard->Open()) {
+        wxTheClipboard->SetData(new wxBitmapDataObject(tempBmp));
+        wxTheClipboard->Close();
+    }
+    
+    tempDC.SelectObject(wxNullBitmap);
 }
