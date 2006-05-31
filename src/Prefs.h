@@ -281,6 +281,9 @@ class WinPrefs {
 #ifndef __wxBuild__
         inline void SetAtomColor(long AtomNum) {RGBForeColor(&(AtomColors[AtomNum]));};
 #endif
+	inline void SetAtomColor(long AtomNum, RGBColor* color) {AtomColors[AtomNum] = *color; };
+	//Added by Song Li
+
         void SetAtomPattern(long AtomNum);
         inline RGBColor * GetAtomColorLoc(long AtomNum) {return &(AtomColors[AtomNum]);};
         inline short * GetAtomPatternLoc(long AtomNum) {return &(AtomPatterns[AtomNum]);};
@@ -292,6 +295,9 @@ class WinPrefs {
 #ifndef __wxBuild__
         inline void SetBondColor(long BondOrder) {RGBForeColor(&(BondColors[BondOrder]));};
 #endif
+	inline void SetBondColor(long BondOrder, RGBColor* color) {BondColors[BondOrder] = *color;};
+	inline void SetVectorColor(RGBColor* color) {VectorColor = *color; }; // --Song
+
         void SetBondPattern(long BondOrder);
 #ifndef __wxBuild__
         inline void SetVectorColor(void) const {RGBForeColor(&VectorColor);};
