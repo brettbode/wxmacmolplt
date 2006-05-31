@@ -111,16 +111,14 @@ void EnergyPlotDialog::CreateControls()
     wxMenuBar* menuBar = new wxMenuBar;
     wxMenu* itemMenu3 = new wxMenu;
     itemMenu3->Append(wxID_COPY, _("&Copy"), _T(""), wxITEM_NORMAL);
-    menuBar->Append(itemMenu3, _("Edit"));
-    wxMenu* itemMenu5 = new wxMenu;
-    menuBar->Append(itemMenu5, _("Preferences"));
+    menuBar->Append(itemMenu3, _("&Edit"));
     itemFrame1->SetMenuBar(menuBar);
 
-    wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxVERTICAL);
-    itemFrame1->SetSizer(itemBoxSizer6);
+    wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxVERTICAL);
+    itemFrame1->SetSizer(itemBoxSizer5);
 
     epGraph = new wxMolGraph( itemFrame1, ID_EPGRAPH, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-    itemBoxSizer6->Add(epGraph, 1, wxGROW|wxALL, 5);
+    itemBoxSizer5->Add(epGraph, 1, wxGROW|wxALL, 5);
 
 ////@end EnergyPlotDialog content construction
 }
@@ -300,5 +298,3 @@ void EnergyPlotDialog::OnCopyClick( wxCommandEvent& event )
     
     tempDC.SelectObject(wxNullBitmap);
 }
-
-

@@ -38,10 +38,10 @@ class wxMolGraph;
  */
 
 ////@begin control identifiers
-#define ID_FRAME 10065
+#define ID_EPLOTDIALOG 10065
 #define SYMBOL_ENERGYPLOTDIALOG_STYLE wxDEFAULT_FRAME_STYLE|wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_ENERGYPLOTDIALOG_TITLE _("Energy Plot")
-#define SYMBOL_ENERGYPLOTDIALOG_IDNAME ID_FRAME
+#define SYMBOL_ENERGYPLOTDIALOG_IDNAME ID_EPLOTDIALOG
 #define SYMBOL_ENERGYPLOTDIALOG_SIZE wxSize(400, 300)
 #define SYMBOL_ENERGYPLOTDIALOG_POSITION wxDefaultPosition
 #define ID_EPGRAPH 10000
@@ -77,7 +77,7 @@ public:
 
 ////@begin EnergyPlotDialog event handler declarations
 
-    /// wxEVT_CLOSE_WINDOW event handler for ID_FRAME
+    /// wxEVT_CLOSE_WINDOW event handler for ID_EPLOTDIALOG
     void OnCloseWindow( wxCloseEvent& event );
 
     /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_COPY
@@ -112,3 +112,4 @@ public:
 };
 
 #endif
+    // _ENERGYPLOTDIALOG_H_

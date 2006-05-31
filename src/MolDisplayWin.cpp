@@ -27,6 +27,7 @@
 #include "setbondlength.h"
 #include "appendframesoptions.h"
 #include "exportoptionsdialog.h"
+#include "frequenciesdialog.h"
 #include "choosevecgroup.h"
 #include "coordinateoffset.h"
 #include "frameenergy.h"
@@ -72,21 +73,22 @@ enum MMP_EventID {
     MMP_NEWFRAME,
     MMP_ADDFRAMES,
     MMP_DELETEFRAME,
-	MMP_IMPORTMENU,
+    MMP_IMPORTMENU,
     MMP_COPYCOORDS,
     MMP_BONDSWINDOW,
     MMP_COORDSWINDOW,
     MMP_ENERGYPLOTWINDOW,
+    MMP_FREQUENCIESWINDOW,
     MMP_STATUSBAR,
     MMP_FRAMESCROLLBAR,
     MMP_EXPORT,
-	MMP_PRINTOPTIONS,
-	MMP_ANIMATEFRAMES,
-	MMP_ANIMATEFRAMESTIMER,
-	MMP_ANIMATEMODE,
-	MMP_ANIMATEMODETIMER,
-	MMP_OFFSETMODE,
-	MMP_ENERGYEDIT,
+    MMP_PRINTOPTIONS,
+    MMP_ANIMATEFRAMES,
+    MMP_ANIMATEFRAMESTIMER,
+    MMP_ANIMATEMODE,
+    MMP_ANIMATEMODETIMER,
+    MMP_OFFSETMODE,
+    MMP_ENERGYEDIT,
     
     Number_MMP_Ids
 };
@@ -103,10 +105,10 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (wxID_CLOSE,           MolDisplayWin::menuFileClose)
     EVT_CLOSE(                      MolDisplayWin::FileClose)
     EVT_MENU (MMP_DELETEFRAME,      MolDisplayWin::menuFileDeleteFrame)
-	EVT_MENU (MMP_IMPORTMENU,		MolDisplayWin::menuFileImport)
+    EVT_MENU (MMP_IMPORTMENU,       MolDisplayWin::menuFileImport)
     EVT_MENU (MMP_EXPORT,           MolDisplayWin::menuFileExport)
     EVT_MENU (wxID_PRINT_SETUP,     MolDisplayWin::menuFilePage_setup)
-	EVT_MENU (MMP_PRINTOPTIONS,     MolDisplayWin::menuFilePrintOptions)
+    EVT_MENU (MMP_PRINTOPTIONS,     MolDisplayWin::menuFilePrintOptions)
     EVT_MENU (wxID_PREVIEW,         MolDisplayWin::menuFilePrint_preview)
     EVT_MENU (wxID_PRINT,           MolDisplayWin::menuFilePrint)
 
@@ -118,16 +120,16 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
     EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
     EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
-  EVT_MENU (ID_GLOBAL_PREFERENCES,		MolDisplayWin::menuPreferences)
-  EVT_MENU (ID_LOCAL_PREFERENCES,		MolDisplayWin::menuPreferences)
+  EVT_MENU (ID_GLOBAL_PREFERENCES,  MolDisplayWin::menuPreferences)
+  EVT_MENU (ID_LOCAL_PREFERENCES,   MolDisplayWin::menuPreferences)
   //added by Song Li
     EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
-	EVT_MENU (MMP_ANIMATEMODE,		MolDisplayWin::menuViewAnimateMode)
-	EVT_MENU (MMP_OFFSETMODE,		MolDisplayWin::menuViewOffsetAlongMode)
+    EVT_MENU (MMP_ANIMATEMODE,      MolDisplayWin::menuViewAnimateMode)
+    EVT_MENU (MMP_OFFSETMODE,       MolDisplayWin::menuViewOffsetAlongMode)
     EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
     EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
     EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
-	EVT_MENU (MMP_ANIMATEFRAMES,	MolDisplayWin::menuViewAnimateFrames)
+    EVT_MENU (MMP_ANIMATEFRAMES,    MolDisplayWin::menuViewAnimateFrames)
     EVT_MENU (MMP_SHRINK10,         MolDisplayWin::menuViewShrink_10)
     EVT_MENU (MMP_ENLARGE10,        MolDisplayWin::menuViewEnlarge_10)
     EVT_MENU (MMP_CENTER,           MolDisplayWin::menuViewCenter)
@@ -139,38 +141,39 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_ROTATEPRINC,      MolDisplayWin::menuViewRotatePrinciple_orientation)
     EVT_MENU (MMP_ROTATEOTHER,      MolDisplayWin::menuViewRotateOther)
 
-    EVT_MENU (MMP_SETBONDLENGTH,	MolDisplayWin::menuMoleculeSetBondLength)
-	EVT_MENU (MMP_ENERGYEDIT,		MolDisplayWin::menuMoleculeSetFrameEnergy)
+    EVT_MENU (MMP_SETBONDLENGTH,      MolDisplayWin::menuMoleculeSetBondLength)
+    EVT_MENU (MMP_ENERGYEDIT,         MolDisplayWin::menuMoleculeSetFrameEnergy)
     EVT_MENU (MMP_CREATELLMPATH,      MolDisplayWin::menuMoleculeCreateLLMPath)
     EVT_MENU (MMP_MINFRAMEMOVEMENTS,  MolDisplayWin::menuMoleculeMinimizeFrameMovements)
     EVT_MENU (MMP_CONVERTTOBOHR,      MolDisplayWin::menuMoleculeConvertToBohr)
     EVT_MENU (MMP_CONVERTTOANGSTROMS, MolDisplayWin::menuMoleculeConvertToAngstroms)
     EVT_MENU (MMP_INVERTNORMALMODE,   MolDisplayWin::menuMoleculeInvertNormalMode)
 
-    EVT_MENU (MMP_BONDSWINDOW,      MolDisplayWin::menuWindowBonds)
-    EVT_MENU (MMP_COORDSWINDOW,     MolDisplayWin::menuWindowCoordinates)
-    EVT_MENU (MMP_ENERGYPLOTWINDOW, MolDisplayWin::menuWindowEnergy_plot)
+    EVT_MENU (MMP_BONDSWINDOW,       MolDisplayWin::menuWindowBonds)
+    EVT_MENU (MMP_COORDSWINDOW,      MolDisplayWin::menuWindowCoordinates)
+    EVT_MENU (MMP_ENERGYPLOTWINDOW,  MolDisplayWin::menuWindowEnergy_plot)
+    EVT_MENU (MMP_FREQUENCIESWINDOW, MolDisplayWin::menuWindowFrequencies)
 
-	EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
-	EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
+    EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
+    EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
     EVT_SIZE( MolDisplayWin::eventSize )
     EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
     EVT_COMMAND_SCROLL(MMP_FRAMESCROLLBAR, MolDisplayWin::OnScrollBarChange )
-	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen )
-	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
+    EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen )
+    EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 END_EVENT_TABLE()
 
-	//Local use class to hold data during the animation of normal modes
+    //Local use class to hold data during the animation of normal modes
 class ModeAnimation {
 public:
-	std::vector<CPoint3D>	SavedCoordinates;
-	std::vector<CPoint3D>	ModeOffset;
-	float					offsetFactor;
-	int						iPoint;
-	int						inc;
-	int						NumPoints;
-	wxTimer					m_timer;
-	bool					SavedDrawMode;
+    std::vector<CPoint3D>   SavedCoordinates;
+    std::vector<CPoint3D>   ModeOffset;
+    float                   offsetFactor;
+    int                     iPoint;
+    int                     inc;
+    int                     NumPoints;
+    wxTimer                 m_timer;
+    bool                    SavedDrawMode;
 };
 
 MolDisplayWin::MolDisplayWin(const wxString &title,
@@ -188,10 +191,11 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     OperationInProgress = false;
     ProgressInd = NULL;
     OpenGLData = NULL;
-	ModeAnimationData = NULL;
+    ModeAnimationData = NULL;
     bondsWindow = NULL;
     coordsWindow = NULL;
     energyPlotWindow = NULL;
+    frequenciesWindow = NULL;
     
     pageSetupData = NULL;
     printData = NULL;
@@ -226,10 +230,10 @@ MolDisplayWin::~MolDisplayWin() {
     if (printData) delete printData;
     if (pageSetupData) delete pageSetupData;
     glCanvas->setPrefs(NULL);
-	if (ModeAnimationData) {
-		delete ModeAnimationData;
-		ModeAnimationData = NULL;
-	}
+    if (ModeAnimationData) {
+        delete ModeAnimationData;
+        ModeAnimationData = NULL;
+    }
     
     if (ProgressInd != NULL) {
         delete ProgressInd;
@@ -269,35 +273,35 @@ void MolDisplayWin::SizeChanged(void) {
 }
 
 void MolDisplayWin::OnMenuOpen(wxMenuEvent & event) {
-	StopAnimations();
-	event.Skip();
+    StopAnimations();
+    event.Skip();
 }
 void MolDisplayWin::OnKillFocus(wxFocusEvent & event) {
-	StopAnimations();
-	event.Skip();
+    StopAnimations();
+    event.Skip();
 }
 void MolDisplayWin::StopAnimations(void) {
-	if (m_timer.IsRunning()) {
-		m_timer.Stop();
-		timerRunning = false;
-	}
-	if (ModeAnimationData) { //if data already exists toggle off the animation
-		ModeAnimationData->m_timer.Stop();
-		MainData->SetDrawMode(ModeAnimationData->SavedDrawMode);
-		for (int iatm=0; iatm<(MainData->cFrame->NumAtoms); iatm++) {
-			MainData->cFrame->Atoms[iatm].Position = ModeAnimationData->SavedCoordinates[iatm];	
-		}
-		delete ModeAnimationData;
-		ModeAnimationData = NULL;
-	}
-	ResetModel(false);
+    if (m_timer.IsRunning()) {
+        m_timer.Stop();
+        timerRunning = false;
+    }
+    if (ModeAnimationData) { //if data already exists toggle off the animation
+        ModeAnimationData->m_timer.Stop();
+        MainData->SetDrawMode(ModeAnimationData->SavedDrawMode);
+        for (int iatm=0; iatm<(MainData->cFrame->NumAtoms); iatm++) {
+            MainData->cFrame->Atoms[iatm].Position = ModeAnimationData->SavedCoordinates[iatm]; 
+        }
+        delete ModeAnimationData;
+        ModeAnimationData = NULL;
+    }
+    ResetModel(false);
 }
 
 void MolDisplayWin::OnFrameAnimationTimer(wxTimerEvent & event) {
-	if (MainData->CurrentFrame>=MainData->NumFrames)
-		ChangeFrames(1);
-	else
-		ChangeFrames(MainData->CurrentFrame+1);
+    if (MainData->CurrentFrame>=MainData->NumFrames)
+        ChangeFrames(1);
+    else
+        ChangeFrames(MainData->CurrentFrame+1);
 }
 
 void MolDisplayWin::createMenuBar(void) {
@@ -377,6 +381,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"));
     menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"));
     menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"));
+    menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"));
     menuWindow->Append(ID_LOCAL_PREFERENCES, wxT("Pr&eferences ..."));
     menuHelp->Append(wxID_ABOUT, wxT("&About ..."));
 
@@ -420,13 +425,13 @@ void MolDisplayWin::AdjustMenus(void) {
         menuFile->Enable(MMP_NEWFRAME, true);
         menuEdit->Enable(wxID_COPY, true);
         menuEdit->Enable(MMP_COPYCOORDS, true);
-		menuMolecule->Enable(MMP_ENERGYEDIT, true);
+        menuMolecule->Enable(MMP_ENERGYEDIT, true);
         menuMolecule->Enable(MMP_SETBONDLENGTH, true);
         menuFile->Enable(MMP_EXPORT, true);
     }
     if (MainData->NumFrames > 1 ) {
         menuFile->Enable(MMP_DELETEFRAME, true);
-		menuView->Enable(MMP_ANIMATEFRAMES, true);
+        menuView->Enable(MMP_ANIMATEFRAMES, true);
         if (MainData->CurrentFrame < MainData->NumFrames) {
             Frame * lFrame = MainData->GetCurrentFramePtr();
             Frame * lnFrame = lFrame->GetNextFrame();
@@ -442,12 +447,12 @@ void MolDisplayWin::AdjustMenus(void) {
     }
     if (MainData->cFrame->Vibs) {
         menuView->Enable(MMP_SHOWMODE, true);
-		menuView->Enable(MMP_ANIMATEMODE, true);
+        menuView->Enable(MMP_ANIMATEMODE, true);
         menuView->Check(MMP_SHOWMODE, MainData->GetDrawMode());
         if (MainData->cFrame->Vibs->CurrentMode>0) menuView->Enable(MMP_PREVMODE, true);
         if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1))
             menuView->Enable(MMP_NEXTMODE, true);
-		menuView->Enable(MMP_OFFSETMODE, true);
+        menuView->Enable(MMP_OFFSETMODE, true);
         menuMolecule->Enable(MMP_INVERTNORMALMODE, true);
     }
 }
@@ -479,103 +484,103 @@ void MolDisplayWin::menuFileDeleteFrame(wxCommandEvent &event) {
     ResetAllWindows();
 }
 void MolDisplayWin::menuFileImport(wxCommandEvent &event) {
-	//First need to use an open file dialog
-	wxString filename = wxFileSelector(wxT("Choose a GAMESS .DAT file to import a $VEC group"));
-	//We are looking for $ VEC groups. Scan to see how many are there. If more than 1 the user will
-	//have to choose.
-	if (!filename.empty()) {
-		FILE * myfile = fopen(filename.mb_str(wxConvUTF8), "r");
-		if (myfile == NULL) {
-			MessageAlert("Unable to open the selected file!");
-		} else {
-			BufferFile * Buffer = NULL;
-			try {
-				Buffer = new BufferFile(myfile, false);
-				int vecCount=0;
-				while (Buffer->LocateKeyWord("$VEC", 4)) {
-					vecCount++;
-					Buffer->SkipnLines(1);
-				}
-				Buffer->SetFilePos(0);
-				if (vecCount <= 0) {
-					MessageAlert("No $VEC group found in the selected file.");
-				} else {
-					int targetVec = -1;
-					if (vecCount == 1) {
-						targetVec = 0;
-					} else { //The user must choose the desired one
-						ChooseVECgroup * chooser = new ChooseVECgroup(this);
-						chooser->SetBuffer(Buffer);
-						int rcode = chooser->ShowModal();
-						if (rcode == wxID_OK) {
-							targetVec = chooser->GetTarget() + 1;
-						}
-						chooser->Destroy();
-					}
-					if (targetVec >= 1) {
-						Buffer->SetFilePos(0);
-						for (int i=0; i<targetVec; i++) {
-							if (i>0) Buffer->SkipnLines(1);
-							Buffer->LocateKeyWord("$VEC", 4);
-						}
-						if (Buffer->LocateKeyWord("$VEC", 4)) {
-							//Buffer should now have the correct position
-							BasisSet * lBasis = MainData->GetBasisSet();
-							Frame * lFrame = MainData->GetCurrentFramePtr();
-							InputData * lInputData = MainData->GetInputData();
-							if (lBasis) {
-								long NumFuncs = lBasis->GetNumBasisFuncs(false);
-								long SCFType = lInputData->Control->GetSCFType();
-								long NumBetaOrbs = 0;
-								if (SCFType == UHF) NumBetaOrbs = NumFuncs;
-								else SCFType = 0;
-								OrbitalRec * OrbSet = NULL;
-								try {
-									OrbSet = new OrbitalRec(NumFuncs, NumBetaOrbs, NumFuncs);
-									if (OrbSet) {
-										OrbSet->ReadVecGroup(Buffer, NumFuncs, (TypeOfWavefunction) SCFType);
-									}
-								}
-								catch (DataError) {
-									MessageAlert("Invalid data encountered while reading $Vec group. Import aborted!");
-									if (OrbSet) {
-										delete OrbSet;
-										OrbSet = NULL;
-									}
-								}
-								catch (MemoryError) {
-									MessageAlert("Insufficient memory to import $Vec. Aborted!");
-									if (OrbSet) {
-										delete OrbSet;
-										OrbSet = NULL;
-									}
-								}
-								catch (std::bad_alloc) {
-									MessageAlert("Insufficient memory to import $Vec. Aborted!");
-									if (OrbSet) {
-										delete OrbSet;
-										OrbSet = NULL;
-									}
-								}
-								catch (FileError) {
-									MessageAlert("Unexpected end of file encountered.");
-									if (OrbSet) {
-										delete OrbSet;
-										OrbSet = NULL;
-									}
-								}
-								if (OrbSet != NULL) lFrame->Orbs.push_back(OrbSet);
-							}
-						}
-					}
-				}
-			}
-			catch (...) {
-				MessageAlert("An error occurred importing the $VEC group.");
-			}
-			if (Buffer) delete Buffer;      //Done reading so free up the buffer
-		}
- 	}
+    //First need to use an open file dialog
+    wxString filename = wxFileSelector(wxT("Choose a GAMESS .DAT file to import a $VEC group"));
+    //We are looking for $ VEC groups. Scan to see how many are there. If more than 1 the user will
+    //have to choose.
+    if (!filename.empty()) {
+        FILE * myfile = fopen(filename.mb_str(wxConvUTF8), "r");
+        if (myfile == NULL) {
+            MessageAlert("Unable to open the selected file!");
+        } else {
+            BufferFile * Buffer = NULL;
+            try {
+                Buffer = new BufferFile(myfile, false);
+                int vecCount=0;
+                while (Buffer->LocateKeyWord("$VEC", 4)) {
+                    vecCount++;
+                    Buffer->SkipnLines(1);
+                }
+                Buffer->SetFilePos(0);
+                if (vecCount <= 0) {
+                    MessageAlert("No $VEC group found in the selected file.");
+                } else {
+                    int targetVec = -1;
+                    if (vecCount == 1) {
+                        targetVec = 0;
+                    } else { //The user must choose the desired one
+                        ChooseVECgroup * chooser = new ChooseVECgroup(this);
+                        chooser->SetBuffer(Buffer);
+                        int rcode = chooser->ShowModal();
+                        if (rcode == wxID_OK) {
+                            targetVec = chooser->GetTarget() + 1;
+                        }
+                        chooser->Destroy();
+                    }
+                    if (targetVec >= 1) {
+                        Buffer->SetFilePos(0);
+                        for (int i=0; i<targetVec; i++) {
+                            if (i>0) Buffer->SkipnLines(1);
+                            Buffer->LocateKeyWord("$VEC", 4);
+                        }
+                        if (Buffer->LocateKeyWord("$VEC", 4)) {
+                            //Buffer should now have the correct position
+                            BasisSet * lBasis = MainData->GetBasisSet();
+                            Frame * lFrame = MainData->GetCurrentFramePtr();
+                            InputData * lInputData = MainData->GetInputData();
+                            if (lBasis) {
+                                long NumFuncs = lBasis->GetNumBasisFuncs(false);
+                                long SCFType = lInputData->Control->GetSCFType();
+                                long NumBetaOrbs = 0;
+                                if (SCFType == UHF) NumBetaOrbs = NumFuncs;
+                                else SCFType = 0;
+                                OrbitalRec * OrbSet = NULL;
+                                try {
+                                    OrbSet = new OrbitalRec(NumFuncs, NumBetaOrbs, NumFuncs);
+                                    if (OrbSet) {
+                                        OrbSet->ReadVecGroup(Buffer, NumFuncs, (TypeOfWavefunction) SCFType);
+                                    }
+                                }
+                                catch (DataError) {
+                                    MessageAlert("Invalid data encountered while reading $Vec group. Import aborted!");
+                                    if (OrbSet) {
+                                        delete OrbSet;
+                                        OrbSet = NULL;
+                                    }
+                                }
+                                catch (MemoryError) {
+                                    MessageAlert("Insufficient memory to import $Vec. Aborted!");
+                                    if (OrbSet) {
+                                        delete OrbSet;
+                                        OrbSet = NULL;
+                                    }
+                                }
+                                catch (std::bad_alloc) {
+                                    MessageAlert("Insufficient memory to import $Vec. Aborted!");
+                                    if (OrbSet) {
+                                        delete OrbSet;
+                                        OrbSet = NULL;
+                                    }
+                                }
+                                catch (FileError) {
+                                    MessageAlert("Unexpected end of file encountered.");
+                                    if (OrbSet) {
+                                        delete OrbSet;
+                                        OrbSet = NULL;
+                                    }
+                                }
+                                if (OrbSet != NULL) lFrame->Orbs.push_back(OrbSet);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (...) {
+                MessageAlert("An error occurred importing the $VEC group.");
+            }
+            if (Buffer) delete Buffer;      //Done reading so free up the buffer
+        }
+    }
 }
 void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
     wxFileDialog        *fileDlg = NULL;
@@ -653,9 +658,9 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
     //      MolWinList.push_back(temp);
             //Ok we have a problem. Abort open can't close the last window!
             long r = OpenFile(filename);
-			if (r>0) {
-				SetTitle(filename);
-			}
+            if (r>0) {
+                SetTitle(filename);
+            }
     //      if (r>0) temp->Show(true);
         }
     } else
@@ -798,9 +803,9 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
         //Note the message should be slightly different if we can't abort the close
         int style = wxYES_NO | wxICON_QUESTION;
         if (canVeto) style = style | wxCANCEL;
-		wxString fileText = wxT("The file ");
-		fileText += GetTitle();
-		fileText += wxT(" has unsaved changes.");
+        wxString fileText = wxT("The file ");
+        fileText += GetTitle();
+        fileText += wxT(" has unsaved changes.");
         int r = wxMessageBox(wxT("Do you wish to save the current data and customizations before closing?"),
                              fileText, style, this);
         if (r == wxCANCEL) {
@@ -808,12 +813,12 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
             return;
         } else if (r == wxYES) {
             //process the save
-			wxCommandEvent temp;
-			menuFileSave(temp);
-			if (Dirty) {//Dirty should be false if the save was successful
-				event.Veto(true);
-				return;
-			}
+            wxCommandEvent temp;
+            menuFileSave(temp);
+            if (Dirty) {//Dirty should be false if the save was successful
+                event.Veto(true);
+                return;
+            }
         }
     }
     MpApp & app = wxGetApp();
@@ -862,9 +867,9 @@ void MolDisplayWin::menuFilePage_setup(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuFilePrintOptions(wxCommandEvent &event) {
-	//throw up a mini dialog to handle some app specific printing options
-	PrintOptions * po = new PrintOptions(this);
-	po->ShowModal();
+    //throw up a mini dialog to handle some app specific printing options
+    PrintOptions * po = new PrintOptions(this);
+    po->ShowModal();
     po->Destroy();
     Dirty = true;
 }
@@ -875,19 +880,19 @@ void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
 
     wxPrintDialogData printDialogData(*printData);
     wxString title(_T("MacMolPlt printout"));
-	wxPrintPreview * preview = new wxPrintPreview(new MolPrintOut(this, title),
-												new MolPrintOut(this, title),
-												&printDialogData);
-	if (!preview->Ok()) {//failure to create the print preview
-		delete preview;
-		// TODO:  throw up an error dialog
-		return;
-	}
-	wxPreviewFrame * frame = new wxPreviewFrame(preview, this, _T("wxMacMolPlt print preview"),
-												wxPoint(100,100), wxSize(600,650));
-	frame->Centre(wxBOTH);
-	frame->Initialize();
-	frame->Show();
+    wxPrintPreview * preview = new wxPrintPreview(new MolPrintOut(this, title),
+                                                new MolPrintOut(this, title),
+                                                &printDialogData);
+    if (!preview->Ok()) {//failure to create the print preview
+        delete preview;
+        // TODO:  throw up an error dialog
+        return;
+    }
+    wxPreviewFrame * frame = new wxPreviewFrame(preview, this, _T("wxMacMolPlt print preview"),
+                                                wxPoint(100,100), wxSize(600,650));
+    frame->Centre(wxBOTH);
+    frame->Initialize();
+    frame->Show();
 }
 
 void MolDisplayWin::menuFilePrint(wxCommandEvent &event) {
@@ -943,27 +948,27 @@ bool MolPrintOut::OnPrintPage(int page) {
     return false;
 }
 void MolDisplayWin::PrintGL(wxDC * dc, const float & sFactor) {
-	float scaleFactor = sFactor;
-	BeginOperation();
-	ProgressInd->ChangeText("Generating Hi-res image");
-	Prefs->CylindersForLines(true);
-	if (Prefs->GetFitToPage()) {
-		int screenWidth, screenHeight;
-		glCanvas->GetSize(&screenWidth, &screenHeight);
-		float wRatio = ((float) screenWidth)/((float) screenHeight);
-		int pageWidth, pageHeight;
+    float scaleFactor = sFactor;
+    BeginOperation();
+    ProgressInd->ChangeText("Generating Hi-res image");
+    Prefs->CylindersForLines(true);
+    if (Prefs->GetFitToPage()) {
+        int screenWidth, screenHeight;
+        glCanvas->GetSize(&screenWidth, &screenHeight);
+        float wRatio = ((float) screenWidth)/((float) screenHeight);
+        int pageWidth, pageHeight;
         dc->GetSize(&pageWidth, &pageHeight);
-		float pRatio = ((float) pageWidth)/((float) pageHeight);
-		if (wRatio >= pRatio) {	//base scaleup on page width
-			scaleFactor = ((float) pageWidth)/((float) screenWidth);
-		} else {	//base scaleup on page height
-			scaleFactor = ((float) pageHeight)/((float) screenHeight);
-		}
-	}
-	glCanvas->GenerateHiResImage(dc, scaleFactor, ProgressInd, Prefs->GetCenterOnPage(),
-								 Prefs->GetFramePage());
-	Prefs->CylindersForLines(false);
-	FinishOperation();
+        float pRatio = ((float) pageWidth)/((float) pageHeight);
+        if (wRatio >= pRatio) { //base scaleup on page width
+            scaleFactor = ((float) pageWidth)/((float) screenWidth);
+        } else {    //base scaleup on page height
+            scaleFactor = ((float) pageHeight)/((float) screenHeight);
+        }
+    }
+    glCanvas->GenerateHiResImage(dc, scaleFactor, ProgressInd, Prefs->GetCenterOnPage(),
+                                 Prefs->GetFramePage());
+    Prefs->CylindersForLines(false);
+    FinishOperation();
 }
 /* Edit menu */
 
@@ -1147,9 +1152,9 @@ void MolDisplayWin::menuViewNextNormalMode(wxCommandEvent &event) {
     }
 }
 void MolDisplayWin::menuViewOffsetAlongMode(wxCommandEvent &event) {
-	CoordinateOffset * co = new CoordinateOffset(this);
-	co->ShowModal();
-	co->Destroy();
+    CoordinateOffset * co = new CoordinateOffset(this);
+    co->ShowModal();
+    co->Destroy();
 }
 void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
     MainData->CenterModelWindow();
@@ -1157,63 +1162,63 @@ void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
     Dirty = true;
 }
 void MolDisplayWin::OnModeAnimation(wxTimerEvent & event) {
-	if (ModeAnimationData) {
-		if ((ModeAnimationData->iPoint==ModeAnimationData->NumPoints)||
-			(ModeAnimationData->iPoint==-ModeAnimationData->NumPoints)) {
-			ModeAnimationData->inc *= -1;
-			ModeAnimationData->offsetFactor *= -1.0;
-		}
-		ModeAnimationData->iPoint += ModeAnimationData->inc;
-		Frame * lFrame = MainData->cFrame;
-		mpAtom * lAtoms = lFrame->Atoms;
-		for (int iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
-			lAtoms[iatm].Position.x += ModeAnimationData->offsetFactor*(ModeAnimationData->ModeOffset[iatm].x);
-			lAtoms[iatm].Position.y += ModeAnimationData->offsetFactor*(ModeAnimationData->ModeOffset[iatm].y);
-			lAtoms[iatm].Position.z += ModeAnimationData->offsetFactor*(ModeAnimationData->ModeOffset[iatm].z);
-		}
-		ResetModel(false);
-	}
+    if (ModeAnimationData) {
+        if ((ModeAnimationData->iPoint==ModeAnimationData->NumPoints)||
+            (ModeAnimationData->iPoint==-ModeAnimationData->NumPoints)) {
+            ModeAnimationData->inc *= -1;
+            ModeAnimationData->offsetFactor *= -1.0;
+        }
+        ModeAnimationData->iPoint += ModeAnimationData->inc;
+        Frame * lFrame = MainData->cFrame;
+        mpAtom * lAtoms = lFrame->Atoms;
+        for (int iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
+            lAtoms[iatm].Position.x += ModeAnimationData->offsetFactor*(ModeAnimationData->ModeOffset[iatm].x);
+            lAtoms[iatm].Position.y += ModeAnimationData->offsetFactor*(ModeAnimationData->ModeOffset[iatm].y);
+            lAtoms[iatm].Position.z += ModeAnimationData->offsetFactor*(ModeAnimationData->ModeOffset[iatm].z);
+        }
+        ResetModel(false);
+    }
 }
 void MolDisplayWin::menuViewAnimateMode(wxCommandEvent &event) {
-	if (ModeAnimationData) { //if data already exists toggle off the animation
-		ModeAnimationData->m_timer.Stop();
-		MainData->SetDrawMode(ModeAnimationData->SavedDrawMode);
-		for (int iatm=0; iatm<(MainData->cFrame->NumAtoms); iatm++) {
-			MainData->cFrame->Atoms[iatm].Position = ModeAnimationData->SavedCoordinates[iatm];	
-		}
-		delete ModeAnimationData;
-		ModeAnimationData = NULL;
-		ResetModel(false);
-	} else {
-		if (!MainData->cFrame->Vibs) return;
-		Frame * lFrame = MainData->cFrame;
-		ModeAnimationData = new ModeAnimation();
-		ModeAnimationData->SavedDrawMode = false;
-		ModeAnimationData->iPoint = 1;
-		ModeAnimationData->inc = 1;
-		ModeAnimationData->SavedCoordinates.reserve(lFrame->NumAtoms);
-		ModeAnimationData->ModeOffset.reserve(lFrame->NumAtoms);
-		
-		if (MainData->GetDrawMode()) {
-			ModeAnimationData->SavedDrawMode = true;
-			if (!Prefs->GetAnimateMode()) MainData->SetDrawMode(false);
-		}
-		long cmode = (lFrame->NumAtoms)*(lFrame->Vibs->CurrentMode);
-		//The offset factor may need some work yet...
-		ModeAnimationData->NumPoints = Prefs->GetAnimationSpeed();
-		ModeAnimationData->offsetFactor = 1.0/(4.5*Prefs->GetAnimationSpeed());
-		float	VectorScale = Prefs->GetVectorScale();
-		mpAtom * lAtoms = lFrame->Atoms;
-		CPoint3D temp;
-		for (int iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
-			ModeAnimationData->SavedCoordinates.push_back(lAtoms[iatm].Position);
-			temp = lFrame->Vibs->NormMode[iatm+cmode];
-			temp *= VectorScale;
-			ModeAnimationData->ModeOffset.push_back(temp);
-		}
-		ModeAnimationData->m_timer.SetOwner(this, MMP_ANIMATEMODETIMER);
-		ModeAnimationData->m_timer.Start(30);//Go for about 30 frames per second
-	}
+    if (ModeAnimationData) { //if data already exists toggle off the animation
+        ModeAnimationData->m_timer.Stop();
+        MainData->SetDrawMode(ModeAnimationData->SavedDrawMode);
+        for (int iatm=0; iatm<(MainData->cFrame->NumAtoms); iatm++) {
+            MainData->cFrame->Atoms[iatm].Position = ModeAnimationData->SavedCoordinates[iatm]; 
+        }
+        delete ModeAnimationData;
+        ModeAnimationData = NULL;
+        ResetModel(false);
+    } else {
+        if (!MainData->cFrame->Vibs) return;
+        Frame * lFrame = MainData->cFrame;
+        ModeAnimationData = new ModeAnimation();
+        ModeAnimationData->SavedDrawMode = false;
+        ModeAnimationData->iPoint = 1;
+        ModeAnimationData->inc = 1;
+        ModeAnimationData->SavedCoordinates.reserve(lFrame->NumAtoms);
+        ModeAnimationData->ModeOffset.reserve(lFrame->NumAtoms);
+        
+        if (MainData->GetDrawMode()) {
+            ModeAnimationData->SavedDrawMode = true;
+            if (!Prefs->GetAnimateMode()) MainData->SetDrawMode(false);
+        }
+        long cmode = (lFrame->NumAtoms)*(lFrame->Vibs->CurrentMode);
+        //The offset factor may need some work yet...
+        ModeAnimationData->NumPoints = Prefs->GetAnimationSpeed();
+        ModeAnimationData->offsetFactor = 1.0/(4.5*Prefs->GetAnimationSpeed());
+        float   VectorScale = Prefs->GetVectorScale();
+        mpAtom * lAtoms = lFrame->Atoms;
+        CPoint3D temp;
+        for (int iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
+            ModeAnimationData->SavedCoordinates.push_back(lAtoms[iatm].Position);
+            temp = lFrame->Vibs->NormMode[iatm+cmode];
+            temp *= VectorScale;
+            ModeAnimationData->ModeOffset.push_back(temp);
+        }
+        ModeAnimationData->m_timer.SetOwner(this, MMP_ANIMATEMODETIMER);
+        ModeAnimationData->m_timer.Start(30);//Go for about 30 frames per second
+    }
 }
 void MolDisplayWin::menuViewShowAxis(wxCommandEvent &event) {
     MainData->SetShowAxis(1-MainData->ShowAxis());
@@ -1221,19 +1226,19 @@ void MolDisplayWin::menuViewShowAxis(wxCommandEvent &event) {
     Dirty = true;
 }
 void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &event) {
-	long AnimateTime = Prefs->GetAnimateTime();
-	if (m_timer.IsRunning()) {
-		m_timer.Stop();
-		timerRunning = false;
-	} else {
-		if (MainData->CurrentFrame>=MainData->NumFrames)
-			ChangeFrames(1);
-		else
-			ChangeFrames(MainData->CurrentFrame+1);
-		m_timer.SetOwner(this, MMP_ANIMATEFRAMESTIMER);
-		m_timer.Start(10*AnimateTime);
-		timerRunning = true;
-	}
+    long AnimateTime = Prefs->GetAnimateTime();
+    if (m_timer.IsRunning()) {
+        m_timer.Stop();
+        timerRunning = false;
+    } else {
+        if (MainData->CurrentFrame>=MainData->NumFrames)
+            ChangeFrames(1);
+        else
+            ChangeFrames(MainData->CurrentFrame+1);
+        m_timer.SetOwner(this, MMP_ANIMATEFRAMESTIMER);
+        m_timer.Start(10*AnimateTime);
+        timerRunning = true;
+    }
 }
 void MolDisplayWin::menuViewShrink_10(wxCommandEvent &event) {
     MainData->WindowSize *= 1.1;
@@ -1304,17 +1309,17 @@ void MolDisplayWin::menuPreferences(wxCommandEvent &event)
         bool isGlobal;
         int id = event.GetId();
 
-	if ( id == ID_GLOBAL_PREFERENCES )
-	  isGlobal = true;
-	else if ( id == ID_LOCAL_PREFERENCES )
-	  isGlobal = false;
-	else
-	  cout<<"This shouldn't happen!"<<endl;
+    if ( id == ID_GLOBAL_PREFERENCES )
+      isGlobal = true;
+    else if ( id == ID_LOCAL_PREFERENCES )
+      isGlobal = false;
+    else
+      cout<<"This shouldn't happen!"<<endl;
 
-	setPreference * pre_dlg = new setPreference(this, isGlobal);
-	pre_dlg->ShowModal();
-	pre_dlg->Destroy();
-	Dirty = true;
+    setPreference * pre_dlg = new setPreference(this, isGlobal);
+    pre_dlg->ShowModal();
+    pre_dlg->Destroy();
+    Dirty = true;
 }
 
 void MolDisplayWin::menuMoleculeSetFrameEnergy(wxCommandEvent &event) {
@@ -1360,8 +1365,8 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
     Dirty = true;
 }
 void MolDisplayWin::OnScrollBarChange( wxScrollEvent& event ) {
-	StopAnimations();
-		//this function receives all events from the scroll bar and
+    StopAnimations();
+        //this function receives all events from the scroll bar and
         //and thus provides live dragging.
     int newpos = event.GetPosition() + 1;
     if (newpos != MainData->CurrentFrame) {
@@ -1370,7 +1375,7 @@ void MolDisplayWin::OnScrollBarChange( wxScrollEvent& event ) {
 }
 
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
-	StopAnimations();
+    StopAnimations();
     int key = event.GetKeyCode();
     if (!event.HasModifiers()) {
         switch (key) {
@@ -1479,6 +1484,21 @@ void MolDisplayWin::CloseEnergy_plotWindow(void) {
         energyPlotWindow = NULL;
     }
 }
+void MolDisplayWin::menuWindowFrequencies(wxCommandEvent &event) {
+    if(frequenciesWindow) { // need to bring it to the front...
+        frequenciesWindow->Raise();
+    }
+    else {
+        frequenciesWindow = new FrequenciesDialog(this);
+        frequenciesWindow->Show();
+    }
+}
+void MolDisplayWin::CloseFrequenciesWindow(void) {
+    if(frequenciesWindow) {
+        frequenciesWindow->Destroy();
+        frequenciesWindow = NULL;
+    }
+}
 
 void MolDisplayWin::AtomsChanged(void) {
     if (bondsWindow) bondsWindow->ResetList();
@@ -1523,7 +1543,7 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
         if (coordsWindow) coordsWindow->FrameChanged();
         if (bondsWindow) bondsWindow->ResetList();
         if (energyPlotWindow) energyPlotWindow->FrameChanged();
-    //  if (FreqPlotWin) FreqPlotWin->Reset(1);
+        if (frequenciesWindow) frequenciesWindow->FrameChanged();
     //  if (SurfaceDlog) SurfaceDlog->Reset();
         frameScrollBar->SetThumbPosition(MainData->CurrentFrame-1);
     }
@@ -1534,8 +1554,8 @@ void MolDisplayWin::UpdateFrameText(void) {
     Boolean WriteEnergy=true;
     if (MainData->cFrame->Vibs) {
       if (MainData->GetDrawMode()) {
-		  wxString temp;
-		  output.Printf("Freq=%s", MainData->cFrame->Vibs->Frequencies[MainData->cFrame->Vibs->CurrentMode].c_str());
+          wxString temp;
+          output.Printf("Freq=%s", MainData->cFrame->Vibs->Frequencies[MainData->cFrame->Vibs->CurrentMode].c_str());
           WriteEnergy = false;
       }
     }
@@ -1642,6 +1662,7 @@ void MolDisplayWin::ResetAllWindows(void) {
     if (coordsWindow) coordsWindow->FrameChanged();
     if (bondsWindow) bondsWindow->ResetList();
     // TODO:  update energyPlotWindow
+    // TODO:  update frequenciesWindow
     
 }
 void MolDisplayWin::BeginOperation(void) {
@@ -1805,11 +1826,11 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
     return test;
 }
 long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWindows) {
-	bool localprogress=false;
-	if (!ProgressInd) {
-		localprogress = true;
-		BeginOperation();
-	}
+    bool localprogress=false;
+    if (!ProgressInd) {
+        localprogress = true;
+        BeginOperation();
+    }
     ProgressInd->ChangeText("Reading CML file…");
     long test = 0;
     if (readWindows)
@@ -1831,7 +1852,7 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
         ResetModel(false);
     }
             */
-	if (localprogress) FinishOperation();
+    if (localprogress) FinishOperation();
     return test;
 }
 
