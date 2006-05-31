@@ -29,6 +29,8 @@ extern short		gAppResRef;
 extern WinPrefs *	gPreferences;
 extern WinPrefs *	gPrefDefaults;
 
+//using namespace std;
+
 wxColour RGB2WX(RGBColor &c) {
     wxColor newC;
     unsigned char r = (unsigned char)(c.red   >> 8);
@@ -158,13 +160,28 @@ void WinPrefs::GetAtomLabel(long AtomNum, wxString & text) const {
 	int		TextLength=0;
 	text.Empty();
 	while (AtomLabels[AtomNum][TextLength]) {
-		char temp = AtomLabels[AtomNum][TextLength];
+	  char temp = AtomLabels[AtomNum][TextLength];
 		text << temp;
 		TextLength++;
 		if (TextLength >= 3) break;
 	}
 }
+
+void WinPrefs::SetAtomLabel(long AtomNum, wxString text) 
+{
+  int TextLength = text.Length();
+  int pos=0;
+
+  if (TextLength > 3) TextLength = 3;		//truncate labels longer than 3 char
+
+  for (; pos < TextLength; pos++) 
+    {	//I know, I know. This copies in reverse order, but its only 3 bytes
+      AtomLabels[AtomNum][pos] = text.GetChar(pos);
+    }
+  if (pos < 3) AtomLabels[AtomNum][pos] = '\0';
+}
 #endif
+
 void WinPrefs::GetAtomLabel(long AtomNum, Str255 text) {
 	int		TextLength=0;
 	while (AtomLabels[AtomNum][TextLength]) {

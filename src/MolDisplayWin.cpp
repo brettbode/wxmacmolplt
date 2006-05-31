@@ -38,8 +38,15 @@
 
 extern WinPrefs * gPreferences;
 
+using namespace std;
+
 //I think these are only needed in this file.
 //They are custom ids used to tie the event table to the menus
+
+#define ID_GLOBAL_PREFERENCES 500
+#define ID_LOCAL_PREFERENCES 501
+//temporarily put ID definitions here   -Song Li
+
 enum MMP_EventID {
     MMP_SHRINK10=wxID_HIGHEST+1,
     MMP_ENLARGE10,
@@ -84,6 +91,7 @@ enum MMP_EventID {
     Number_MMP_Ids
 };
 
+
 BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_NEWFRAME,         MolDisplayWin::menuFileAppendNewFrame)
 #ifndef __WXMAC__
@@ -110,7 +118,9 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
     EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
     EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
-
+  EVT_MENU (ID_GLOBAL_PREFERENCES,		MolDisplayWin::menuPreferences)
+  EVT_MENU (ID_LOCAL_PREFERENCES,		MolDisplayWin::menuPreferences)
+  //added by Song Li
     EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
 	EVT_MENU (MMP_ANIMATEMODE,		MolDisplayWin::menuViewAnimateMode)
 	EVT_MENU (MMP_OFFSETMODE,		MolDisplayWin::menuViewOffsetAlongMode)
@@ -330,7 +340,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->AppendSeparator();
     menuEdit->Append(wxID_SELECTALL, wxT("&Select all\tCtrl+A"));
     menuEdit->AppendSeparator();
-    menuEdit->Append(wxID_PREFERENCES, wxT("Pr&eferences ..."));
+    menuEdit->Append(ID_GLOBAL_PREFERENCES, wxT("Global Pr&eferences ..."));
 
     menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"));
     menuView->Append(MMP_ANIMATEMODE, wxT("Animate Mode\tCtrl+M"));
@@ -367,6 +377,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"));
     menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"));
     menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"));
+    menuWindow->Append(ID_LOCAL_PREFERENCES, wxT("Pr&eferences ..."));
     menuHelp->Append(wxID_ABOUT, wxT("&About ..."));
 
     menuBar->Append(menuFile, wxT("&File"));
@@ -1279,6 +1290,7 @@ void MolDisplayWin::menuViewRotateOther(wxCommandEvent &event) {
     SetScreenPlane * temp = new SetScreenPlane(this);
     temp->Show();
 }
+
 void MolDisplayWin::menuMoleculeSetBondLength(wxCommandEvent &event) {
     //The set bond length dialog does the work
     SetBondLength * dlg = new SetBondLength(this);
@@ -1286,6 +1298,25 @@ void MolDisplayWin::menuMoleculeSetBondLength(wxCommandEvent &event) {
     dlg->Destroy();
     Dirty = true;
 }
+
+void MolDisplayWin::menuPreferences(wxCommandEvent &event) 
+{
+        bool isGlobal;
+        int id = event.GetId();
+
+	if ( id == ID_GLOBAL_PREFERENCES )
+	  isGlobal = true;
+	else if ( id == ID_LOCAL_PREFERENCES )
+	  isGlobal = false;
+	else
+	  cout<<"This shouldn't happen!"<<endl;
+
+	setPreference * pre_dlg = new setPreference(this, isGlobal);
+	pre_dlg->ShowModal();
+	pre_dlg->Destroy();
+	Dirty = true;
+}
+
 void MolDisplayWin::menuMoleculeSetFrameEnergy(wxCommandEvent &event) {
     FrameEnergy * dlg = new FrameEnergy(this);
     dlg->ShowModal();
@@ -1299,6 +1330,7 @@ void MolDisplayWin::menuMoleculeSetFrameEnergy(wxCommandEvent &event) {
     }
     Dirty = true;
 }
+
 void MolDisplayWin::menuMoleculeCreateLLMPath(wxCommandEvent &event) {
     //The create LLM dialog does the work
     LLMDialog * llm = new LLMDialog(this);

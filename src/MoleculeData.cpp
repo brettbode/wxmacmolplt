@@ -154,6 +154,7 @@ Frame * MoleculeData::LocateNewFrame(float XPosition)
 	NumFrames ++;
 	return lNewFrame;
 } /*LocateNewFrame*/
+
 Frame * MoleculeData::AddFrame(long NumAtoms, long NumBonds) {
 	Frame * temp = new Frame;
 	if (!temp) throw MemoryError();
@@ -170,6 +171,7 @@ Frame * MoleculeData::AddFrame(long NumAtoms, long NumBonds) {
 	CurrentFrame++;
 	return temp;
 }
+
 void MoleculeData::DeleteFrame(void) {
 	if (!cFrame->NextFrame && !cFrame->PreviousFrame) return;
 	Frame * temp = cFrame;

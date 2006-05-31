@@ -21,6 +21,9 @@
 #include "Prefs.h"
 #include "Progress.h"
 
+#include "setPreference.h"
+//added by Song Li
+
 typedef class OpenGLRec OpenGLRec;
 typedef class BondsDlg BondsDlg;
 typedef class CoordinatesWindow CoordinatesWindow;
@@ -157,6 +160,9 @@ class MolDisplayWin : public wxFrame {
         //void menuViewSet_window_parameters(wxCommandEvent &event);
         //void menuViewStereo(wxCommandEvent &event);
         
+		void menuPreferences(wxCommandEvent &event);
+		//added by Song Li
+
         void menuMoleculeSetBondLength(wxCommandEvent &event);
         void menuMoleculeSetFrameEnergy(wxCommandEvent &event);
         void menuMoleculeCreateLLMPath(wxCommandEvent &event);

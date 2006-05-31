@@ -144,7 +144,7 @@ inline PixMapHandle GetPortPixMap(CGrafPtr thePort) {return thePort->portPixMap;
 #define MIN(x, y)		(((x)>(y)) ? (y) : (x))
 #define fsign(x)		(((x)<0.0) ? -1.0 : 1.0)
 
-#define kMaxOpenDocuments	20			//Max possible open documents
+//#define kMaxOpenDocuments	20			//Max possible open documents
 #define kMinDocDim			150			//Min size (height and width) of the main display
 #define kBarHeight			15			//Scroll bar height (or width)
 #define	rDitherPatterns		0			//Dither patterns rsrc #
@@ -222,6 +222,9 @@ typedef unsigned char Str255 [256];
 //#define ChipmanCode	1	//Define to include the Chipman solvent surface code
 
 void MessageAlert (const char * message);
+
+#define kMaxOpenDocuments	20			//Max possible open documents
+//make kMaxOpenDocuments a global definition
 
 //Useful constants
 #define	kBohr2AngConversion	0.52917724924	/*Bohrs to Angstroms*/

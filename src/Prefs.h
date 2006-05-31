@@ -58,6 +58,7 @@ class SurfaceOptions {
         bool Get2DHashMarks(void) const {return ((Options & (1<<2))?true:false);};
         bool Set2DHashMarks(bool State);
 };
+
 class EnergyOptions {
     public:
         Boolean PlotEnergy(void) const {return (PlotFlag & 1);};
@@ -110,6 +111,7 @@ class EnergyOptions {
         char        PlotFlag;       //indicates what to plot (1=TE,2=MP,3=KE,4=PE,5=kcal/mol,
                                     //6=other-use graph options)
 };
+
 class GraphOptions {
     public:
         GraphOptions(void) {Options=0; atom1 = atom2 = atom3 = atom4 = 0;};
@@ -142,6 +144,7 @@ class GraphOptions {
 
 typedef class XMLElement XMLElement;
 typedef class wxString wxString;
+
 class WinPrefs {
     private:
         RGBColor        AtomColors[kMaxAtomTypes], BondColors[kMaxBondTypes], VectorColor, BackColor;
@@ -300,6 +303,7 @@ class WinPrefs {
         void GetAtomLabel(long AtomNum, Str255 text);
 #ifdef __wxBuild__
 		void GetAtomLabel(long AtomNum, wxString & text) const;
+		void SetAtomLabel(long AtomNum, wxString text);
 #endif
         void SetAtomLabel(long AtomNum, Str255 text);
         inline long * GetAtomSizeLoc(void) {return AtomSizes;};
