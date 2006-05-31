@@ -89,6 +89,14 @@ class Frame {
 		void DeleteSurfaceWithID(long SurfaceID);
 		void AppendSurface(Surface * NewSurface);
 		long GetNumSurfaces(void);
+		inline double GetEnergy(void) const {return Energy;};
+		inline double GetKineticEnergy(void) const {return KE;};
+		inline double GetMP2Energy(void) const {return MP2Energy;};
+		inline float GetTime(void) const {return time;};
+		inline void SetEnergy(const double & val) {Energy = val;};
+		inline void SetKineticEnergy(const double & val) {KE = val;};
+		inline void SetMP2Energy(const double & val) {MP2Energy = val;};
+		inline void SetTime(const float & val) {time = val;};
 		void ChangeBond(long TheBond, short WhichPart, long TheAtom);
 		long GetBondAtom(long WhichBond, short ThePart);
 		short GetAtomType(long theAtom) const;

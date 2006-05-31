@@ -29,6 +29,7 @@
 #include "exportoptionsdialog.h"
 #include "choosevecgroup.h"
 #include "coordinateoffset.h"
+#include "frameenergy.h"
 #include "printoptions.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
@@ -78,6 +79,7 @@ enum MMP_EventID {
 	MMP_ANIMATEMODE,
 	MMP_ANIMATEMODETIMER,
 	MMP_OFFSETMODE,
+	MMP_ENERGYEDIT,
     
     Number_MMP_Ids
 };
@@ -127,7 +129,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_ROTATEPRINC,      MolDisplayWin::menuViewRotatePrinciple_orientation)
     EVT_MENU (MMP_ROTATEOTHER,      MolDisplayWin::menuViewRotateOther)
 
-    EVT_MENU (MMP_SETBONDLENGTH,      MolDisplayWin::menuMoleculeSetBondLength)
+    EVT_MENU (MMP_SETBONDLENGTH,	MolDisplayWin::menuMoleculeSetBondLength)
+	EVT_MENU (MMP_ENERGYEDIT,		MolDisplayWin::menuMoleculeSetFrameEnergy)
     EVT_MENU (MMP_CREATELLMPATH,      MolDisplayWin::menuMoleculeCreateLLMPath)
     EVT_MENU (MMP_MINFRAMEMOVEMENTS,  MolDisplayWin::menuMoleculeMinimizeFrameMovements)
     EVT_MENU (MMP_CONVERTTOBOHR,      MolDisplayWin::menuMoleculeConvertToBohr)
@@ -352,6 +355,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
 
     menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."));
+    menuMolecule->Append(MMP_ENERGYEDIT, wxT("Set &Frame Energy..."));
     menuMolecule->Append(MMP_CREATELLMPATH, wxT("Create &LLM Path..."));
     menuMolecule->Append(MMP_MINFRAMEMOVEMENTS, wxT("&Minimize Frame Movements"));
     menuMolecule->AppendSeparator();
@@ -392,6 +396,7 @@ void MolDisplayWin::ClearMenus(void) {
     menuView->Enable(MMP_OFFSETMODE, false);
     menuView->Enable(MMP_ANIMATEFRAMES, false);
     menuMolecule->Enable(MMP_SETBONDLENGTH, false);
+    menuMolecule->Enable(MMP_ENERGYEDIT, false);
     menuMolecule->Enable(MMP_CREATELLMPATH, false);
     menuMolecule->Enable(MMP_MINFRAMEMOVEMENTS, false);
     menuMolecule->Enable(MMP_INVERTNORMALMODE, false);
@@ -404,6 +409,7 @@ void MolDisplayWin::AdjustMenus(void) {
         menuFile->Enable(MMP_NEWFRAME, true);
         menuEdit->Enable(wxID_COPY, true);
         menuEdit->Enable(MMP_COPYCOORDS, true);
+		menuMolecule->Enable(MMP_ENERGYEDIT, true);
         menuMolecule->Enable(MMP_SETBONDLENGTH, true);
         menuFile->Enable(MMP_EXPORT, true);
     }
@@ -1280,6 +1286,16 @@ void MolDisplayWin::menuMoleculeSetBondLength(wxCommandEvent &event) {
     dlg->Destroy();
     Dirty = true;
 }
+void MolDisplayWin::menuMoleculeSetFrameEnergy(wxCommandEvent &event) {
+    FrameEnergy * dlg = new FrameEnergy(this);
+    dlg->ShowModal();
+    dlg->Destroy();
+    UpdateFrameText();
+#ifndef WIN32
+#warning Need to reset the energy plot here if open as the energy data may have changed
+#endif
+    Dirty = true;
+}
 void MolDisplayWin::menuMoleculeCreateLLMPath(wxCommandEvent &event) {
     //The create LLM dialog does the work
     LLMDialog * llm = new LLMDialog(this);
@@ -1499,7 +1515,7 @@ void MolDisplayWin::UpdateFrameText(void) {
         if (lEOpts->PlotMPEnergy())
             Energy = (MainData->cFrame->MP2Energy-lEOpts->GetY1Zero())*UnitFactor;
         else if (lEOpts->PlotEnergy())
-            Energy = (MainData->cFrame->Energy-lEOpts->GetY1Zero())*UnitFactor;
+            Energy = (MainData->cFrame->GetEnergy()-lEOpts->GetY1Zero())*UnitFactor;
         else if (lEOpts->PlotKEnergy())
             Energy = (MainData->cFrame->KE-lEOpts->GetY2Zero())*UnitFactor;
         else if (lEOpts->PlotPEnergy())
