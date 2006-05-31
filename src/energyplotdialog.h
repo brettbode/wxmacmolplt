@@ -21,6 +21,7 @@
  */
 
 ////@begin includes
+#include "wx/frame.h"
 #include "wxMolGraph.h"
 ////@end includes
 
@@ -37,13 +38,13 @@ class wxMolGraph;
  */
 
 ////@begin control identifiers
-#define ID_ENERGYPLOTDIALOG 10053
-#define SYMBOL_ENERGYPLOTDIALOG_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
+#define ID_FRAME 10065
+#define SYMBOL_ENERGYPLOTDIALOG_STYLE wxDEFAULT_FRAME_STYLE|wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_ENERGYPLOTDIALOG_TITLE _("Energy Plot")
-#define SYMBOL_ENERGYPLOTDIALOG_IDNAME ID_ENERGYPLOTDIALOG
-#define SYMBOL_ENERGYPLOTDIALOG_SIZE wxDefaultSize
+#define SYMBOL_ENERGYPLOTDIALOG_IDNAME ID_FRAME
+#define SYMBOL_ENERGYPLOTDIALOG_SIZE wxSize(400, 300)
 #define SYMBOL_ENERGYPLOTDIALOG_POSITION wxDefaultPosition
-#define ID_EPGRAPH 10054
+#define ID_EPGRAPH 10000
 ////@end control identifiers
 
 /*!
@@ -58,7 +59,7 @@ class wxMolGraph;
  * EnergyPlotDialog class declaration
  */
 
-class EnergyPlotDialog: public wxDialog
+class EnergyPlotDialog: public wxFrame
 {    
     DECLARE_DYNAMIC_CLASS( EnergyPlotDialog )
     DECLARE_EVENT_TABLE()
@@ -76,8 +77,11 @@ public:
 
 ////@begin EnergyPlotDialog event handler declarations
 
-    /// wxEVT_CLOSE_WINDOW event handler for ID_ENERGYPLOTDIALOG
+    /// wxEVT_CLOSE_WINDOW event handler for ID_FRAME
     void OnCloseWindow( wxCloseEvent& event );
+
+    /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_COPY
+    void OnCopyClick( wxCommandEvent& event );
 
     /// wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH
     void OnEpgraphAxisDClick( wxCommandEvent& event );
@@ -108,4 +112,3 @@ public:
 };
 
 #endif
-    // _ENERGYPLOTDIALOG_H_

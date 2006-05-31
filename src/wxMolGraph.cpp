@@ -438,6 +438,10 @@ void wxMolGraph::onSize(wxSizeEvent &event) {
 
 void wxMolGraph::onPaint(wxPaintEvent &event) {
     wxPaintDC dc(this);
+    draw(dc);
+}
+
+void wxMolGraph::draw(wxDC &dc) {
     wxString  xMaxText;
     wxString  xMinText;
     wxString  y1MaxText;

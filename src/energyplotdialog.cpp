@@ -31,6 +31,7 @@
 #include "MolDisplayWin.h"
 #include "Frame.h"
 #include "Gradient.h"
+#include <wx/clipbrd.h>
 
 #include "energyplotdialog.h"
 #include <iostream>
@@ -42,15 +43,17 @@
  * EnergyPlotDialog type definition
  */
 
-IMPLEMENT_DYNAMIC_CLASS( EnergyPlotDialog, wxDialog )
+IMPLEMENT_DYNAMIC_CLASS( EnergyPlotDialog, wxFrame )
 
 /*!
  * EnergyPlotDialog event table definition
  */
 
-BEGIN_EVENT_TABLE( EnergyPlotDialog, wxDialog )
+BEGIN_EVENT_TABLE( EnergyPlotDialog, wxFrame )
 ////@begin EnergyPlotDialog event table entries
     EVT_CLOSE( EnergyPlotDialog::OnCloseWindow )
+
+    EVT_MENU( wxID_COPY, EnergyPlotDialog::OnCopyClick )
 
     EVT_AXIS_DCLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphAxisDClick)
     EVT_GRAPH_CLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphGraphClick)
@@ -82,8 +85,7 @@ bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& 
 ////@end EnergyPlotDialog member initialisation
 
 ////@begin EnergyPlotDialog creation
-    SetExtraStyle(GetExtraStyle()|wxWS_EX_BLOCK_EVENTS);
-    wxDialog::Create( parent, id, caption, pos, size, style );
+    wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
     GetSizer()->Fit(this);
@@ -104,13 +106,21 @@ bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& 
 void EnergyPlotDialog::CreateControls()
 {    
 ////@begin EnergyPlotDialog content construction
-    EnergyPlotDialog* itemDialog1 = this;
+    EnergyPlotDialog* itemFrame1 = this;
 
-    wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
-    itemDialog1->SetSizer(itemBoxSizer2);
+    wxMenuBar* menuBar = new wxMenuBar;
+    wxMenu* itemMenu3 = new wxMenu;
+    itemMenu3->Append(wxID_COPY, _("&Copy"), _T(""), wxITEM_NORMAL);
+    menuBar->Append(itemMenu3, _("Edit"));
+    wxMenu* itemMenu5 = new wxMenu;
+    menuBar->Append(itemMenu5, _("Preferences"));
+    itemFrame1->SetMenuBar(menuBar);
 
-    epGraph = new wxMolGraph( itemDialog1, ID_EPGRAPH, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-    itemBoxSizer2->Add(epGraph, 1, wxGROW|wxALL, 5);
+    wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxVERTICAL);
+    itemFrame1->SetSizer(itemBoxSizer6);
+
+    epGraph = new wxMolGraph( itemFrame1, ID_EPGRAPH, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
+    itemBoxSizer6->Add(epGraph, 1, wxGROW|wxALL, 5);
 
 ////@end EnergyPlotDialog content construction
 }
@@ -241,8 +251,6 @@ void EnergyPlotDialog::RegenData(void) {
 
 void EnergyPlotDialog::OnEpgraphGraphClick( wxCommandEvent& event )
 {
-////@begin EVT_GRAPH_CLICK event handler for ID_EPGRAPH in EnergyPlotDialog.
-////@end EVT_GRAPH_CLICK event handler for ID_EPGRAPH in EnergyPlotDialog. 
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     
     parent->ChangeFrames(epGraph->getSelection(0) + 1);
@@ -267,6 +275,30 @@ void EnergyPlotDialog::OnCloseWindow( wxCloseEvent& event )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->CloseEnergy_plotWindow();
+}
+
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU
+ */
+
+void EnergyPlotDialog::OnCopyClick( wxCommandEvent& event )
+{
+    int width = 0;
+    int height = 0;
+    epGraph->GetClientSize(&width, &height);
+    wxBitmap tempBmp(width, height);
+    wxMemoryDC tempDC;
+
+    tempDC.SelectObject(tempBmp);
+    epGraph->draw(tempDC);
+
+    if (wxTheClipboard->Open()) {
+        wxTheClipboard->SetData(new wxBitmapDataObject(tempBmp));
+        wxTheClipboard->Close();
+    }
+    
+    tempDC.SelectObject(wxNullBitmap);
 }
 
 

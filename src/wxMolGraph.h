@@ -341,6 +341,9 @@ class wxMolGraph : public wxControl {
     wxSize DoGetBestSize() const;
 
 
+    void draw(wxDC &dc);
+
+
     /* EVENT HANDLERS */
 
     void onSize(wxSizeEvent &event);
