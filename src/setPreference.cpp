@@ -71,15 +71,6 @@ setPreference::~setPreference( )
         m_imageList = (wxImageList *) NULL;
     }
 
-  /*delete atomPanel;
-  delete bondPanel;
-  delete displayPanel;
-  delete energyPanel;
-  delete filePanel;
-  delete scalPanel;
-  delete stereoPanel;
-  delete surfPanel;
-  delete qd3dPanel;*/
 }
 
 setPreference::setPreference( MolDisplayWin* parent, bool isGlobal, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
@@ -87,6 +78,7 @@ setPreference::setPreference( MolDisplayWin* parent, bool isGlobal, wxWindowID i
   mIsGlobal = isGlobal;
 
   mPrefs = new WinPrefs;
+
   if (isGlobal)
     *mPrefs = *gPreferences;
   else

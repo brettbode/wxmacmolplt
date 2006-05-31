@@ -51,6 +51,10 @@ class SurfaceOptions {
 #ifndef __wxBuild__
         void SetNegColor(void) const {RGBForeColor(&NegColor);};
 #endif
+	void SetPosColor(RGBColor color) {PosColor = color;};
+	void SetNegColor(RGBColor color) {NegColor = color;};
+	//Song Li
+
         bool GetShowZeroContour(void) const {return (Options & 1);};
         bool SetShowZeroContour(bool State);
         bool GetRotate2DMap(void) const {return ((Options & (1<<1))?true:false);};
@@ -87,6 +91,12 @@ class EnergyOptions {
         void SetKEColor(void) {RGBForeColor(&KEColor);};
         void SetPEColor(void) {RGBForeColor(&PEColor);};
 #endif
+	void SetTEColor(RGBColor color) {TEColor = color;};
+        void SetMPColor(RGBColor color) {MPColor = color;};
+        void SetKEColor(RGBColor color) {KEColor = color;};
+        void SetPEColor(RGBColor color) {PEColor = color;};
+	//Song Li
+
         const RGBColor * GetTEColorPtr(void) const {return &TEColor;};
         const RGBColor * GetMPColorPtr(void) const {return &MPColor;};
         const RGBColor * GetKEColorPtr(void) const {return &KEColor;};
@@ -281,7 +291,7 @@ class WinPrefs {
 #ifndef __wxBuild__
         inline void SetAtomColor(long AtomNum) {RGBForeColor(&(AtomColors[AtomNum]));};
 #endif
-	inline void SetAtomColor(long AtomNum, RGBColor* color) {AtomColors[AtomNum] = *color; };
+	inline void SetAtomColor(long AtomNum, RGBColor color) {AtomColors[AtomNum] = color; };
 	//Added by Song Li
 
         void SetAtomPattern(long AtomNum);
@@ -291,12 +301,13 @@ class WinPrefs {
         inline short * GetBondPatternLoc(long BondOrder) {return &(BondPatterns[BondOrder]);};
         inline RGBColor * GetVectorColorLoc(void) {return &VectorColor;};
         inline RGBColor * GetBackgroundColorLoc(void) {return &BackColor;};
+	inline void SetBackgroundColorLoc(RGBColor color) {BackColor = color;};
         inline short * GetVectorPatternLoc(void) {return &VectorPattern;};
 #ifndef __wxBuild__
         inline void SetBondColor(long BondOrder) {RGBForeColor(&(BondColors[BondOrder]));};
 #endif
-	inline void SetBondColor(long BondOrder, RGBColor* color) {BondColors[BondOrder] = *color;};
-	inline void SetVectorColor(RGBColor* color) {VectorColor = *color; }; // --Song
+	inline void SetBondColor(long BondOrder, RGBColor color) {BondColors[BondOrder] = color;};
+	inline void SetVectorColor(RGBColor color) {VectorColor = color; }; // --Song
 
         void SetBondPattern(long BondOrder);
 #ifndef __wxBuild__

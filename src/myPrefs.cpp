@@ -646,7 +646,7 @@ void AtomPrefsPane::saveToTempPrefs()
       mTargetPrefs->SetAtomSize(i, size);
       (mEleMasses[i]->GetValue()).ToDouble(&mass);
       mTargetPrefs->SetAtomMass(i, mass);
-      mTargetPrefs->SetAtomColor(i, &(WX2RGB(mColorArea[i]->getColor())));
+      mTargetPrefs->SetAtomColor(i, WX2RGB(mColorArea[i]->getColor()));
     }
 }
 
@@ -735,8 +735,8 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targe
 
 void BondPrefsPane::saveToTempPrefs()
 {
-  mTargetPrefs->SetBondColor(mChoiceId, &(WX2RGB(mColorArea->getColor())));
-  mTargetPrefs->SetVectorColor(&(WX2RGB(mNormColorArea->getColor())));
+  mTargetPrefs->SetBondColor(mChoiceId, WX2RGB(mColorArea->getColor()));
+  mTargetPrefs->SetVectorColor(WX2RGB(mNormColorArea->getColor()));
 }
 
 void BondPrefsPane::OnSliderUpdate( wxCommandEvent &WXUNUSED(event) )
@@ -758,7 +758,7 @@ void BondPrefsPane::OnChoice( wxCommandEvent &event )
 {
   //int localId = -1;
 
-  mTargetPrefs->SetBondColor(mChoiceId, &(WX2RGB(mColorArea->getColor()))); //save the old setting first
+  mTargetPrefs->SetBondColor(mChoiceId, WX2RGB(mColorArea->getColor())); //save the old setting first
 
   wxString localStr = event.GetString();
 
@@ -785,7 +785,7 @@ DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *
   mUpperSizer = new wxBoxSizer(wxHORIZONTAL);
   mLowerSizer = new wxBoxSizer(wxVERTICAL);
 
-  wxString choices[] = {_T("Ball & Stick"), _T("WireFrame (Bonds only)")};
+  wxString choices[] = {_T("Ball and Stick"), _T("WireFrame (Bonds only)")};
   
   mRdoBox = new wxRadioBox( this, ID_DISPLAY_MODE_RADIOBOX, _T("Display Mode"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 1, wxRA_SPECIFY_COLS );
   mChkColor = new wxCheckBox(this, ID_COLOR_BONDS_BY_ATOM_COLOR, _T("Color bonds by atom color"), wxDefaultPosition);
@@ -825,7 +825,7 @@ void DisplayPrefsPane::OnRadio( wxCommandEvent &event )
 {
   wxString tmpStr = event.GetString();
 
-  if (tmpStr.Cmp(_T("Ball & Stick")) == 0)
+  if (tmpStr.Cmp(_T("Ball and Stick")) == 0)
     {
       mTargetPrefs->DrawBallnStick(true);
       mTargetPrefs->DrawWireFrame(false);
@@ -1070,6 +1070,11 @@ void EnergyPrefsPane::saveToTempPrefs()
   (mNumDigitsArea->GetValue()).ToLong(&localLong);
   lEOpts->SetNumDigits(localLong);
 
+  lEOpts->SetTEColor(WX2RGB(mEColor->getColor()));
+  lEOpts->SetMPColor(WX2RGB(mMPColor->getColor()));
+  lEOpts->SetKEColor(WX2RGB(mOtherColor->getColor()));
+  lEOpts->SetPEColor(WX2RGB(mPEColor->getColor()));
+
   if (!PrefsAreGlobal())
     {
       (mY1pt->GetValue()).ToDouble(&localDouble);
@@ -1247,7 +1252,7 @@ if (PrefsAreGlobal())
     mMiddleSizer->Add(mChkBox[8], 0, wxALIGN_LEFT | wxALL, 3);
 
   mSldTol = new wxSlider( this, ID_AUTO_BOND_TOLERANCE_SLIDER, 
-			  (int)(targetPrefs->GetAutoBondScale()*10000), 
+			  (int)(targetPrefs->GetAutoBondScale()*10000+0.5), 
 			  50, 150, wxDefaultPosition, 
 			  wxSize(155,wxDefaultCoord), 
 			  wxSL_AUTOTICKS | wxSL_LABELS);
@@ -1318,7 +1323,7 @@ void FilePrefsPane::OnCheckBox( wxCommandEvent &event)
 
 void FilePrefsPane::OnSliderUpdate( wxCommandEvent &WXUNUSED(event) )
 {
-  mTargetPrefs->SetAutoBondScale((float)(mSldTol->GetValue()/10000));
+  mTargetPrefs->SetAutoBondScale((float)(mSldTol->GetValue())/10000);
 }
 
 
@@ -1337,13 +1342,13 @@ void ScalingPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * ta
   mTargetPrefs = targetPrefs;
 
   mSld[0] = new wxSlider( this, ID_ATOM_SIZE_SLIDER, 
-			  (int)(targetPrefs->GetAtomScale()*10000), 
+			  (int)(targetPrefs->GetAtomScale()*10000+0.5), 
 			  0, 250, wxDefaultPosition, 
 			  wxSize(155,wxDefaultCoord), 
 			  wxSL_AUTOTICKS | wxSL_LABELS);
 
   mSld[1] = new wxSlider( this, ID_DEPTH_CUEING_SLIDER, 
-			  (int)(targetPrefs->GetZScale()*100), 
+			  (int)(targetPrefs->GetZScale()*100+0.5), 
 			  0, 70, wxDefaultPosition, 
 			  wxSize(155,wxDefaultCoord), 
 			  wxSL_AUTOTICKS | wxSL_LABELS);
@@ -1380,9 +1385,9 @@ void ScalingPrefsPane::OnSliderUpdate( wxCommandEvent &event )
   int id = event.GetId();
 
   if (id == ID_ATOM_SIZE_SLIDER)
-    mTargetPrefs->SetAtomScale((float)(mSld[0]->GetValue()/10000));
+    mTargetPrefs->SetAtomScale((float)(mSld[0]->GetValue())/10000);
   if (id == ID_DEPTH_CUEING_SLIDER)
-    mTargetPrefs->SetZScale((float)(mSld[1]->GetValue()/100));
+    mTargetPrefs->SetZScale((float)(mSld[1]->GetValue())/100);
   if (id == ID_ANIM_QUALITY_SLIDER)
     mTargetPrefs->SetAnimationSpeed(mSld[2]->GetValue()+1);
   if (id == ID_FRAME_DELAY_SLIDER)
@@ -1496,7 +1501,7 @@ void SurfacePrefsPane::SetupPaneItems( MolDisplayWin* targetWindow, WinPrefs * t
   mRightUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Grid Size:")), 0, wxALIGN_CENTER | wxALL, 3);
 
   mSldGridSize = new wxSlider( this, ID_3D_GRID_SIZE_SLIDER, 
-			    (int)(100*(lSOpts->GetGridSize())), 0, 300,
+			    (int)(100*(lSOpts->GetGridSize())+0.5), 0, 300,
                              wxDefaultPosition, wxSize(155,wxDefaultCoord),
                              wxSL_AUTOTICKS | wxSL_LABELS);
   mRightUpperSizer->Add(mSldGridSize, 0, wxALIGN_CENTER | wxALL, 3);
@@ -1541,6 +1546,9 @@ void SurfacePrefsPane::saveToTempPrefs()
   lSOpts->SetNumContours(lv);
   (mMaxContourValue->GetValue()).ToDouble(&dv);
   lSOpts->SetMaxContour(dv);
+
+  lSOpts->SetPosColor(WX2RGB(mSurfColor[0]->getColor()));
+  lSOpts->SetNegColor(WX2RGB(mSurfColor[1]->getColor()));
 }
 
 void SurfacePrefsPane::OnSliderUpdate( wxCommandEvent& event)
@@ -1584,28 +1592,28 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targe
 
   mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Bond Size:")), 0, wxALIGN_CENTER | wxALL, 3);
   mSld[0] = new wxSlider( this, ID_BOND_SIZE_SLIDER, 
-			    (int)(targetPrefs->GetQD3DBondWidth()*500), 1, 100,
+			    (int)(targetPrefs->GetQD3DBondWidth()*500+0.5), 1, 100,
                              wxDefaultPosition, wxSize(155,wxDefaultCoord),
                              wxSL_AUTOTICKS | wxSL_LABELS);
   mUpperSizer->Add(mSld[0], 0, wxALIGN_LEFT | wxALL, 3);
 
   mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Display Quality:")), 0, wxALIGN_CENTER | wxALL, 3);
   mSld[1] = new wxSlider( this, ID_DISPLAY_QUALITY_SLIDER, 
-			    (int)(targetPrefs->GetQD3DAtomQuality()), 2, 40,
+			    (int)(targetPrefs->GetQD3DAtomQuality()+0.5), 2, 40,
                              wxDefaultPosition, wxSize(155,wxDefaultCoord),
                              wxSL_AUTOTICKS | wxSL_LABELS);
   mUpperSizer->Add(mSld[1], 0, wxALIGN_LEFT | wxALL, 3);
 
   mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Fill Light Brightness:")), 0, wxALIGN_CENTER | wxALL, 3);
   mSld[2] = new wxSlider( this, ID_FILL_LIGHT_BRIGHTNESS_SLIDER, 
-		       (int)(targetPrefs->GetQD3DFillBrightness()*100), 0, 100,
+		       (int)(targetPrefs->GetQD3DFillBrightness()*100+0.5), 0, 100,
                              wxDefaultPosition, wxSize(155,wxDefaultCoord),
                              wxSL_AUTOTICKS | wxSL_LABELS);
   mUpperSizer->Add(mSld[2], 0, wxALIGN_LEFT | wxALL, 3);
 
   mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Point Light Brightness:")), 0, wxALIGN_CENTER | wxALL, 3);
   mSld[3] = new wxSlider( this, ID_POINT_LIGHT_BRIGHTNESS_SLIDER, 
-		      (int)(targetPrefs->GetQD3DPointBrightness()*100), 0, 100,
+		      (int)(targetPrefs->GetQD3DPointBrightness()*100+0.5), 0, 100,
                              wxDefaultPosition, wxSize(155,wxDefaultCoord),
                              wxSL_AUTOTICKS | wxSL_LABELS);
   mUpperSizer->Add(mSld[3], 0, wxALIGN_LEFT | wxALL, 3);
@@ -1613,7 +1621,7 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targe
   mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("High-Resolution Line Width:")), 0, wxALIGN_CENTER | wxALL, 3);
   targetPrefs->CylindersForLines(true);
   mSld[4] = new wxSlider( this, ID_LINE_WIDTH_SLIDER, 
-		      (int)(targetPrefs->GetQD3DLineWidth()*10000), 0, 200,
+		      (int)(targetPrefs->GetQD3DLineWidth()*10000+0.5), 0, 200,
                              wxDefaultPosition, wxSize(155,wxDefaultCoord),
                              wxSL_AUTOTICKS | wxSL_LABELS);
   targetPrefs->CylindersForLines(false);
@@ -1639,7 +1647,7 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targe
 
 void QD3DPrefsPane::saveToTempPrefs()
 {
-
+  mTargetPrefs->SetBackgroundColorLoc(WX2RGB(mBackgrdColor->getColor()));
 }
 
 void QD3DPrefsPane::OnCheckBox( wxCommandEvent& WXUNUSED(event))
@@ -1652,13 +1660,13 @@ void QD3DPrefsPane::OnSliderUpdate( wxCommandEvent &event )
   int id = event.GetId();
 
   if (id == ID_BOND_SIZE_SLIDER)
-    mTargetPrefs->SetQD3DBondWidth((float)(mSld[0]->GetValue()/500));
+    mTargetPrefs->SetQD3DBondWidth((float)(mSld[0]->GetValue())/500);
   if (id == ID_DISPLAY_QUALITY_SLIDER)
     mTargetPrefs->SetQD3DAtomQuality(mSld[1]->GetValue());
   if (id == ID_FILL_LIGHT_BRIGHTNESS_SLIDER)
-    mTargetPrefs->SetQD3DFillBrightness((float)(mSld[2]->GetValue()/100));
+    mTargetPrefs->SetQD3DFillBrightness((float)(mSld[2]->GetValue())/100);
   if (id == ID_POINT_LIGHT_BRIGHTNESS_SLIDER)
-    mTargetPrefs->SetQD3DPointBrightness((float)(mSld[3]->GetValue()/100));
+    mTargetPrefs->SetQD3DPointBrightness((float)(mSld[3]->GetValue())/100);
   if (id == ID_LINE_WIDTH_SLIDER)
-    mTargetPrefs->SetQD3DLineWidth((float)(mSld[4]->GetValue()/10000));
+    mTargetPrefs->SetQD3DLineWidth((float)(mSld[4]->GetValue())/10000);
 }
