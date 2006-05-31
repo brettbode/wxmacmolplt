@@ -1294,6 +1294,9 @@ void MolDisplayWin::menuMoleculeSetFrameEnergy(wxCommandEvent &event) {
 #ifndef WIN32
 #warning Need to reset the energy plot here if open as the energy data may have changed
 #endif
+    if(energyPlotWindow != NULL) {
+        energyPlotWindow->RegenData();
+    }
     Dirty = true;
 }
 void MolDisplayWin::menuMoleculeCreateLLMPath(wxCommandEvent &event) {

@@ -97,6 +97,7 @@ public:
 ////@end EnergyPlotDialog member function declarations
 
     void FrameChanged(void);
+    void RegenData(void);
 
     /// Should we show tooltips?
     static bool ShowToolTips();
