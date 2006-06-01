@@ -759,15 +759,16 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
     double x = 0.0;
     int i = 0;
     int j = 0;
-    cout << "Clickety" << endl;
 
     if(event.LeftDown()) {
         event.GetPosition(&clickedX, &clickedY);
         event.Skip();
     }
     else if(event.LeftUp()) {
+        cout << "Left Up" << endl;
         if(graphRegion.Contains(event.GetPosition()) == wxInRegion &&
            graphRegion.Contains(clickedX, clickedY) == wxInRegion) {
+            cout << "Contained in graph" << endl;
             clickedX = 0;
             clickedY = 0;
             x = (event.GetX() - xScaleMin) / xConversion + xMin;
@@ -794,9 +795,9 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
                     }
                 }
             }
+            cout << "New selection!" << endl;
             Refresh();
             wxPostEvent(this, event_graph);
-            cout << "Custom event sent" << endl;
         }
     }
 
