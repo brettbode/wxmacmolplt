@@ -625,8 +625,7 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targe
 
   mSldScale = new wxSlider( this, ID_NORMAL_MODE_SCALING_SLIDER, 
 			    (int)(targetPrefs->GetVectorScale()*10 - 1), 0, 25,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
+                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
 
   mUpperSizer->Add(mChkAnim, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
   mUpperSizer->Add(mChkRotation, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
@@ -1195,8 +1194,7 @@ if (PrefsAreGlobal())
   mSldTol = new wxSlider( this, ID_AUTO_BOND_TOLERANCE_SLIDER, 
 			  (int)(targetPrefs->GetAutoBondScale()*10000+0.5), 
 			  50, 150, wxDefaultPosition, 
-			  wxSize(155,wxDefaultCoord), 
-			  wxSL_AUTOTICKS | wxSL_LABELS);
+			  wxSize(155,wxDefaultCoord));
 
   mLowerSizer->Add(new wxStaticText(this, wxID_ANY, _T("Auto-Bond Tolerance:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
   mLowerSizer->Add(mSldTol, 0, wxALIGN_LEFT | wxALL, 3);
@@ -1285,26 +1283,22 @@ void ScalingPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * ta
   mSld[0] = new wxSlider( this, ID_ATOM_SIZE_SLIDER, 
 			  (int)(targetPrefs->GetAtomScale()*10000+0.5), 
 			  0, 250, wxDefaultPosition, 
-			  wxSize(155,wxDefaultCoord), 
-			  wxSL_AUTOTICKS | wxSL_LABELS);
+			  wxSize(155,wxDefaultCoord));
 
   mSld[1] = new wxSlider( this, ID_DEPTH_CUEING_SLIDER, 
 			  (int)(targetPrefs->GetZScale()*100+0.5), 
 			  0, 70, wxDefaultPosition, 
-			  wxSize(155,wxDefaultCoord), 
-			  wxSL_AUTOTICKS | wxSL_LABELS);
+			  wxSize(155,wxDefaultCoord));
 
   mSld[2] = new wxSlider( this, ID_ANIM_QUALITY_SLIDER, 
 			  (int)(targetPrefs->GetAnimationSpeed()-1), 
 			  0, 15, wxDefaultPosition, 
-			  wxSize(155,wxDefaultCoord), 
-			  wxSL_AUTOTICKS | wxSL_LABELS);
+			  wxSize(155,wxDefaultCoord));
 
   mSld[3] = new wxSlider( this, ID_FRAME_DELAY_SLIDER, 
 			  (int)(targetPrefs->GetAnimateTime()), 
 			  0, 120, wxDefaultPosition, 
-			  wxSize(155,wxDefaultCoord), 
-			  wxSL_AUTOTICKS | wxSL_LABELS);
+			  wxSize(155,wxDefaultCoord));
 
   mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Atom Size:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
   mMainSizer->Add(mSld[0], 0, wxALIGN_LEFT | wxALL, 3);
@@ -1534,41 +1528,36 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targe
   mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Bond Size:")), 0, wxALIGN_CENTER | wxALL, 3);
   mSld[0] = new wxSlider( this, ID_BOND_SIZE_SLIDER, 
 			    (int)(targetPrefs->GetQD3DBondWidth()*500+0.5), 1, 100,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
-  mUpperSizer->Add(mSld[0], 0, wxALIGN_LEFT | wxALL, 3);
+                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
+  mUpperSizer->Add(mSld[0], 0, wxALIGN_CENTER | wxALL, 3);
 
   mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Display Quality:")), 0, wxALIGN_CENTER | wxALL, 3);
   mSld[1] = new wxSlider( this, ID_DISPLAY_QUALITY_SLIDER, 
 			    (int)(targetPrefs->GetQD3DAtomQuality()+0.5), 2, 40,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
-  mUpperSizer->Add(mSld[1], 0, wxALIGN_LEFT | wxALL, 3);
+                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
+  mUpperSizer->Add(mSld[1], 0, wxALIGN_CENTER | wxALL, 3);
 
   mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Fill Light Brightness:")), 0, wxALIGN_CENTER | wxALL, 3);
   mSld[2] = new wxSlider( this, ID_FILL_LIGHT_BRIGHTNESS_SLIDER, 
 		       (int)(targetPrefs->GetQD3DFillBrightness()*100+0.5), 0, 100,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
-  mUpperSizer->Add(mSld[2], 0, wxALIGN_LEFT | wxALL, 3);
+                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
+  mUpperSizer->Add(mSld[2], 0, wxALIGN_CENTER | wxALL, 3);
 
   mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Point Light Brightness:")), 0, wxALIGN_CENTER | wxALL, 3);
   mSld[3] = new wxSlider( this, ID_POINT_LIGHT_BRIGHTNESS_SLIDER, 
 		      (int)(targetPrefs->GetQD3DPointBrightness()*100+0.5), 0, 100,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
-  mUpperSizer->Add(mSld[3], 0, wxALIGN_LEFT | wxALL, 3);
+                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
+  mUpperSizer->Add(mSld[3], 0, wxALIGN_CENTER | wxALL, 3);
 
   mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("High-Resolution Line Width:")), 0, wxALIGN_CENTER | wxALL, 3);
   targetPrefs->CylindersForLines(true);
   mSld[4] = new wxSlider( this, ID_LINE_WIDTH_SLIDER, 
 		      (int)(targetPrefs->GetQD3DLineWidth()*10000+0.5), 0, 200,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
+                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
   targetPrefs->CylindersForLines(false);
-  mUpperSizer->Add(mSld[4], 0, wxALIGN_LEFT | wxALL, 3);
+  mUpperSizer->Add(mSld[4], 0, wxALIGN_CENTER | wxALL, 3);
 
-  mMainSizer->Add(mUpperSizer);
+  mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER | wxALL, 3 );
 
   if (PrefsAreGlobal())
     {

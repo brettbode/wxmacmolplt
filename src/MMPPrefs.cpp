@@ -15,6 +15,7 @@
 
 #include <sstream>
 #include <string.h>
+#include <fstream>
 
 #include "MMPPrefs.h"
 
@@ -29,7 +30,7 @@ extern short		gAppResRef;
 extern WinPrefs *	gPreferences;
 extern WinPrefs *	gPrefDefaults;
 
-//using namespace std;
+using namespace std;
 
 wxColour RGB2WX(RGBColor &c) {
     wxColor newC;
@@ -62,6 +63,7 @@ void WinPrefs::CopyAtomPrefs(WinPrefs * Orig) {
 	memcpy((Ptr) AtomSizes, Orig->AtomSizes, kMaxAtomTypes*sizeof(int));
 	memcpy((Ptr) AtomMasses, Orig->AtomMasses, kMaxAtomTypes*sizeof(float));
 }
+
 void WinPrefs::ReadBondDefaults(void) {
 	for (int i=0; i<kMaxBondTypes; i++) {
 		BondColors[i] = gPrefDefaults->BondColors[i];
@@ -73,6 +75,7 @@ void WinPrefs::ReadBondDefaults(void) {
 	VectorScale = gPrefDefaults->VectorScale;
 	AnimateMode = gPrefDefaults->AnimateMode;
 }
+
 void WinPrefs::CopyBondPrefs(WinPrefs * Orig) {
 	memcpy(BondColors, Orig->GetBondColorLoc(0), 4*sizeof(RGBColor));
 	memcpy(BondPatterns, Orig->GetBondPatternLoc(0), 4*sizeof(short));
@@ -82,40 +85,50 @@ void WinPrefs::CopyBondPrefs(WinPrefs * Orig) {
 	VectorScale = Orig->GetVectorScale();
 	AnimateMode = Orig->GetAnimateMode();
 }
+
 void WinPrefs::CopyDisplayPrefs(WinPrefs * Orig) {
 	DrawWireFrame(Orig->DrawWireFrame());
 	ColorBondHalves(Orig->ColorBondHalves());
 	OutLineBonds(Orig->OutLineBonds());
 }
+
 void WinPrefs::ReadDisplayDefaults(void) {
 	CopyDisplayPrefs(gPrefDefaults);
 }
+
 void WinPrefs::ReadEnergyDefaults(void) {
 	CopyEnergyPrefs(gPrefDefaults);
 }
+
 void WinPrefs::CopyEnergyPrefs(WinPrefs * Orig) {
 	EnergyOptions * temp = Orig->GetEnergyOptions();
 	EnergyPlotOptions = *temp;
 	GraphOptions * tempPOpts = Orig->GetGraphOptions();
 	PlotOptions = *tempPOpts;
 }
+
 void WinPrefs::ReadSurfaceDefaults(void) {
 	CopySurfacePrefs(gPrefDefaults);
 }
+
 void WinPrefs::CopySurfacePrefs(WinPrefs * Orig) {
 	SurfaceOptions * temp = Orig->GetSurfaceOptions();
 	SurfaceOpts = *temp;
 }
+
 void WinPrefs::ReadFontDefaults(void) {
 	CopyFontPrefs(gPrefDefaults);
 }
+
 void WinPrefs::CopyFontPrefs(WinPrefs * Orig) {
 	LabelFontID = Orig->GetLabelFontID();
 	LabelSize = Orig->GetLabelSize();
 }
+
 void WinPrefs::ReadFileDefaults(void) {
 	CopyFilePrefs(gPrefDefaults);
 }
+
 void WinPrefs::CopyFilePrefs(WinPrefs * Orig) {
 	AutoBondScale = Orig->GetAutoBondScale();
 	AutoBondFlag = Orig->GetAutoBond();
@@ -127,22 +140,27 @@ void WinPrefs::CopyFilePrefs(WinPrefs * Orig) {
 	SetShowAngles(Orig->GetShowAngles());
 	ChangeFileType(Orig->ChangeFileType());
 }
+
 void WinPrefs::ReadStereoDefaults(void) {
 	StereoOffset = gPrefDefaults->GetStereoOffset();
 	UseStereo(gPrefDefaults->UseStereo());
 }
+
 void WinPrefs::ReadScalingDefaults(void) {
 	CopyScalingPrefs(gPrefDefaults);
 }
+
 void WinPrefs::CopyScalingPrefs(WinPrefs * Orig) {
 	AnimationSpeed = Orig->GetAnimationSpeed();
 	AtomScale = Orig->GetAtomScale();
 	ZScale = Orig->GetZScale();
 	AnimateTime = Orig->GetAnimateTime();
 }
+
 void WinPrefs::ReadQD3DDefaults(void) {
 	CopyQD3DPrefs(gPrefDefaults);
 }
+
 void WinPrefs::CopyQD3DPrefs(WinPrefs * Orig) {
 	BondWidth = Orig->GetQD3DBondWidth();
 	QD3DAtomQuality = Orig->GetQD3DAtomQuality();
@@ -155,6 +173,7 @@ void WinPrefs::CopyQD3DPrefs(WinPrefs * Orig) {
 	UseQD3DHardware(Orig->UseQD3DHardware());
 	BackColor = Orig->BackColor;
 }
+
 #ifdef __wxBuild__
 void WinPrefs::GetAtomLabel(long AtomNum, wxString & text) const {
 	int		TextLength=0;
@@ -199,16 +218,19 @@ void WinPrefs::SetAtomLabel(long AtomNum, Str255 text) {
 	}
 	if (pos < 3) AtomLabels[AtomNum][pos] = '\0';
 }
+
 long WinPrefs::SetAtomSize(long AtomNum, long NewSize) {
 	if ((NewSize >= 0) && (NewSize < 1000))	//Don't allow huge or negative atom sizes
 		AtomSizes[AtomNum] = NewSize;
 	return AtomSizes[AtomNum];
 }
+
 float WinPrefs::SetAtomMass(long AtomNum, float NewMass) {
 	if ((NewMass > 0.0) && (NewMass < 1.0e5))
 		AtomMasses[AtomNum] = sqrt(NewMass);	//Masses are stored as sqrt's
 	return (AtomMasses[AtomNum]*AtomMasses[AtomNum]);
 }
+
 WinPrefs::WinPrefs(void) {
 	RendererName = NULL;
 	BitOptions = 0;
@@ -216,6 +238,7 @@ WinPrefs::WinPrefs(void) {
 	FitToPage = FrameOnPage = false;
 	CenterOnPage = true;
 }
+
 WinPrefs::~WinPrefs(void) {
 	if (RendererName) delete [] RendererName;
 }
@@ -224,28 +247,34 @@ long SurfaceOptions::SetNumContours(long NewNum) {
 	if ((NewNum > 0)&&(NewNum < 1000)) NumContours = NewNum;
 	return NumContours;
 }
+
 long SurfaceOptions::SetNumGridPoints(long NewNum) {
 	if ((NewNum>10)&&(NewNum<300)) NumGridPoints = NewNum;
 	return NumGridPoints;
 }
+
 float SurfaceOptions::SetGridSize(float NewSize) {
 	if ((NewSize>0.0)&&(NewSize<10.0)) GridSize = NewSize;
 	return GridSize;
 }
+
 float SurfaceOptions::SetMaxContour(float NewMax) {
 	if (NewMax>0.0) MaxContourValue = NewMax;
 	return MaxContourValue;
 }
+
 bool SurfaceOptions::SetShowZeroContour(bool State) {
 	if (Options & 1) Options--;
 	if (State) Options++;
 	return (Options & 1);
 }
+
 bool SurfaceOptions::SetRotate2DMap(bool State) {
 	if (Options & (1<<1)) Options-= (1<<1);
 	if (State) Options+= (1<<1);
 	return ((Options & (1<<1))?true:false);
 }
+
 bool SurfaceOptions::Set2DHashMarks(bool State) {
 	if (Options & (1<<2)) Options-= (1<<2);
 	if (State) Options+= (1<<2);
@@ -777,11 +806,33 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 	}
 	return 1;
 }
+
 void WinPrefs::WriteUserPrefs(void) const {
 #ifdef __wxBuild__
-#ifndef WIN32
-#warning Add code to write the user prefs!
+  wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
+  wxString pathname = gStdPaths.GetUserConfigDir();
+#ifdef __UNIX__
+  //The standarad unix path is the user's home dir. Thus the file should be "hidden".
+  pathname += wxT("/.MacMolPlt.Prefs.xml");
+#else
+  pathname += wxT("/MacMolPlt.Prefs.xml");
 #endif
+
+  XMLSetup();
+  XMLDocument * xDoc = new XMLDocument(MMPPref_convert(MMPPref_Wrapper), true, "MacMolPlt");
+  XMLElement * xmlRoot = xDoc->getDocumentRoot();
+	
+  WriteMMPPrefs(xmlRoot);
+  std::ostringstream Preftext;
+  Preftext << *xDoc;	
+  delete xDoc;
+  XMLShutdown();
+
+  std::ofstream outFile;
+  outFile.open(pathname.mb_str(wxConvUTF8));
+  outFile<<Preftext.str();
+  outFile.close();
+
 #else
 	// There seem to be a couple of ways to go with this. There is the old style FindFolder/
 	// FSpec based routines where you directly interact with a file in the "preferences" directory
@@ -1151,7 +1202,7 @@ const char * MMPPref_convert(MMPPref_Element t)
             return "AtomPreferences";
         case MMPPref_AtomElement:
             return "Atom";
-		case MMPPref_CoordWinPrefs:
+        case MMPPref_CoordWinPrefs:
             return "CoordinateWindowPreferences";
         case MMPPref_BondsWinPrefs:
             return "BondWindowPreferences";

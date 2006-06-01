@@ -63,7 +63,8 @@ setPreference::setPreference( )
 
 setPreference::~setPreference( )
 {
-  delete mPrefs;
+  if (mIsGlobal)
+    delete mPrefs;
 
   /*if (m_imageList)
     {
@@ -190,8 +191,16 @@ void setPreference::OnOK( wxCommandEvent& event )
     case 8: qd3dPanel->saveToTempPrefs(); break;
     }
 
-  *gPreferences = *mPrefs;
-  gPreferences->WriteUserPrefs();
+  if (mIsGlobal)
+    {
+      *gPreferences = *mPrefs;
+      gPreferences->WriteUserPrefs();
+    }
+  else
+    {
+      //mParent->SetWindowPreferences(mPrefs);
+      mParent->ResetAllWindows();
+    }
 
   Close();
 }
@@ -200,7 +209,7 @@ void setPreference::RecreateBooks()
 { 
   wxChoicebook *oldBook = m_choiceBook;
 
-  m_choiceBook = new wxChoicebook(m_panel, ID_NOTEBOOK, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT);
+  m_choiceBook = new wxChoicebook(m_panel, ID_NOTEBOOK, wxDefaultPosition, wxSize(10,10), wxCHB_DEFAULT);
 
   //m_choiceBook->SetImageList(m_imageList);
 
