@@ -1,4 +1,5 @@
 #include "wxMolGraph.h"
+#include <iostream>
 #include <stdexcept>
 
 using namespace std;
@@ -758,6 +759,7 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
     double x = 0.0;
     int i = 0;
     int j = 0;
+    cout << "Clickety" << endl;
 
     if(event.LeftDown()) {
         event.GetPosition(&clickedX, &clickedY);
@@ -794,6 +796,7 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
             }
             Refresh();
             wxPostEvent(this, event_graph);
+            cout << "Custom event sent" << endl;
         }
     }
 
