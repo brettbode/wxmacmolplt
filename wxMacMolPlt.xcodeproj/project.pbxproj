@@ -42,6 +42,9 @@
 		16B345EF09F9505C005FD3B2 /* coordinateswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */; };
 		16FB433009F026A300E84C6B /* bondsdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16FB432E09F026A300E84C6B /* bondsdlg.cpp */; };
 		8B1DA3F10A2BE373009DFD94 /* frameenergy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA3EF0A2BE373009DFD94 /* frameenergy.cpp */; };
+		8B1DA4750A2E189B009DFD94 /* setPreference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4730A2E189B009DFD94 /* setPreference.cpp */; };
+		8B1DA4830A2E6A18009DFD94 /* frequenciesdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA47F0A2E6A17009DFD94 /* frequenciesdialog.cpp */; };
+		8B1DA4840A2E6A18009DFD94 /* myPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */; };
 		8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
 		8B6075B10A1A34B1008CC9FD /* printoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */; };
 		8B6AF30B0A13EAC8004D2E5F /* exportoptionsdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */; };
@@ -124,6 +127,12 @@
 		16FB432F09F026A300E84C6B /* bondsdlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = bondsdlg.h; path = src/bondsdlg.h; sourceTree = "<group>"; };
 		8B1DA3EF0A2BE373009DFD94 /* frameenergy.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = frameenergy.cpp; path = src/frameenergy.cpp; sourceTree = "<group>"; };
 		8B1DA3F00A2BE373009DFD94 /* frameenergy.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = frameenergy.h; path = src/frameenergy.h; sourceTree = "<group>"; };
+		8B1DA4730A2E189B009DFD94 /* setPreference.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setPreference.cpp; path = src/setPreference.cpp; sourceTree = "<group>"; };
+		8B1DA4740A2E189B009DFD94 /* setPreference.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setPreference.h; path = src/setPreference.h; sourceTree = "<group>"; };
+		8B1DA47F0A2E6A17009DFD94 /* frequenciesdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = frequenciesdialog.cpp; path = src/frequenciesdialog.cpp; sourceTree = "<group>"; };
+		8B1DA4800A2E6A17009DFD94 /* frequenciesdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = frequenciesdialog.h; path = src/frequenciesdialog.h; sourceTree = "<group>"; };
+		8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = myPrefs.cpp; path = src/myPrefs.cpp; sourceTree = "<group>"; };
+		8B1DA4820A2E6A17009DFD94 /* PrefsPanes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsPanes.h; path = src/PrefsPanes.h; sourceTree = "<group>"; };
 		8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = appendframesoptions.cpp; path = src/appendframesoptions.cpp; sourceTree = "<group>"; };
 		8B4BB4410A0A7C9D00FE9CC6 /* appendframesoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = appendframesoptions.h; path = src/appendframesoptions.h; sourceTree = "<group>"; };
 		8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = printoptions.cpp; path = src/printoptions.cpp; sourceTree = "<group>"; };
@@ -210,6 +219,8 @@
 				1652DA3309D0B12600B7783F /* Frame.h */,
 				8B1DA3EF0A2BE373009DFD94 /* frameenergy.cpp */,
 				8B1DA3F00A2BE373009DFD94 /* frameenergy.h */,
+				8B1DA47F0A2E6A17009DFD94 /* frequenciesdialog.cpp */,
+				8B1DA4800A2E6A17009DFD94 /* frequenciesdialog.h */,
 				1652DA3409D0B12600B7783F /* GaussHermite.cpp */,
 				1652DA3509D0B12600B7783F /* GaussHermite.h */,
 				1652DA3609D0B12600B7783F /* Geometries.h */,
@@ -243,6 +254,10 @@
 				1652DA4D09D0B12600B7783F /* MyTypes.h */,
 				1652DA4E09D0B12600B7783F /* orbitals.cpp */,
 				1652DA4F09D0B12600B7783F /* Prefs.h */,
+				8B1DA4730A2E189B009DFD94 /* setPreference.cpp */,
+				8B1DA4740A2E189B009DFD94 /* setPreference.h */,
+				8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */,
+				8B1DA4820A2E6A17009DFD94 /* PrefsPanes.h */,
 				8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */,
 				8B6075B00A1A34B1008CC9FD /* printoptions.h */,
 				1652DA5009D0B12600B7783F /* Progress.cpp */,
@@ -376,6 +391,9 @@
 				8BE7C29D0A273D9700DACA25 /* choosevecgroup.cpp in Sources */,
 				8BDC5DDD0A29F25F0060517F /* coordinateoffset.cpp in Sources */,
 				8B1DA3F10A2BE373009DFD94 /* frameenergy.cpp in Sources */,
+				8B1DA4750A2E189B009DFD94 /* setPreference.cpp in Sources */,
+				8B1DA4830A2E6A18009DFD94 /* frequenciesdialog.cpp in Sources */,
+				8B1DA4840A2E6A18009DFD94 /* myPrefs.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
