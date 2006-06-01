@@ -18,8 +18,9 @@
 ////@begin includes
 #include "wx/sizer.h"
 #include "wx/gbsizer.h"
-#include "wx/listbook.h"
-#include "wx/notebook.h"
+//#include "wx/listbook.h"
+//#include "wx/notebook.h"
+#include "wx/choicebk.h"
 #include "wx/imaglist.h"
 #include "wx/artprov.h"
 ////@end includes
@@ -49,7 +50,7 @@ class QD3DPrefsPane;
 #define SYMBOL_SETPREFERENCE_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_SETPREFERENCE_TITLE _("Preferences...")
 #define SYMBOL_SETPREFERENCE_IDNAME ID_MY_PRE_DIALOG
-#define SYMBOL_SETPREFERENCE_SIZE wxSize(400, 300)
+#define SYMBOL_SETPREFERENCE_SIZE wxSize(40, 30)
 #define SYMBOL_SETPREFERENCE_POSITION wxDefaultPosition
 #define MARGIN 4
 
@@ -91,7 +92,7 @@ public:
     void OnSetFont(wxCommandEvent& event);
 
     /// noteBook event
-    void OnNotebook(wxNotebookEvent& event);
+    void OnChoicebook(wxChoicebookEvent& event);
 
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
     void OnOK( wxCommandEvent& event );
@@ -106,14 +107,14 @@ public:
     void RecreateBooks();
     wxBookCtrlBase *GetCurrentBook();
     void CreateInitialPages(wxBookCtrlBase *parent);
-    int GetIconIndex(wxBookCtrlBase* bookCtrl);
+    //int GetIconIndex(wxBookCtrlBase* bookCtrl);
 ////@end SetPreference member function declarations
 
  private:
 
     wxPanel *m_panel;
-    wxListbook   *m_listBook;
-    wxNotebook* m_noteBook;
+    wxChoicebook   *m_choiceBook;
+    //wxNotebook* m_noteBook;
     wxBoxSizer *m_sizer;
     wxImageList *m_imageList;
     wxBoxSizer *m_bottomSizer;

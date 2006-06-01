@@ -262,48 +262,6 @@ void WinPrefs::ReadUserPrefs_old(void) {
   */ //Song Li
 }
 
-/*void WinPrefs::WriteUserPrefs(void) {
-	short	fileRefNum;
-	OSErr	myErr;
-
-	if (!PreferencesFileExists ((OSType) 'BMBm', (OSType) 'Pref')) {//No file exists so first create one
-		FSSpec	PrefSpec;
-		short		prefVRefNum;
-		long		prefDirNum;
-
-			//First look for and delete any 'old' style prefs file
-		myErr = FindFolder(kOnSystemDisk, kPreferencesFolderType, kDontCreateFolder, &prefVRefNum, &prefDirNum);
-		myErr = FSMakeFSSpec(prefVRefNum, prefDirNum, "\pMacMolPlt Prefs", &PrefSpec);
-		if (myErr==noErr) FSpDelete(&PrefSpec);
-		NewPreferencesFile ((OSType) 'BMBm', (OSType) 'Pref', "\pMacMolPlt Prefs",NULL);
-	}
-	myErr = OpenPreferencesFile ((OSType) 'BMBm', (OSType) 'Pref', &fileRefNum);
-	if (myErr != noErr) return;//Probably should alert the user here
-//prefs files is open: first check the version and set/update if necessary
-	NumVersion		myNumVersion;
-	Str255			shortVersionStr, longVersionStr;
-	short			countryCode;
-	myErr = GetFileVersion (fileRefNum, 1, &myNumVersion, &countryCode, shortVersionStr, longVersionStr);
-	if ((myErr != noErr)||(myNumVersion.majorRev != gMacMolPltVersion.majorRev)||(myNumVersion.minorAndBugRev!=gMacMolPltVersion.minorAndBugRev)) {
-		//Note minor and bug rev share a byte so they must checked simultaneously
-		if (myNumVersion.majorRev < 4) {	//Delete old pre-4.0 resources
-			DeletePreference (fileRefNum, (ResType) 'AtmC', 1);	//old single-bond color and pattern
-			DeletePreference (fileRefNum, (ResType) 'AtmP', 1);
-		}
-		myNumVersion = gMacMolPltVersion;
-		sprintf((char *) &(shortVersionStr[1]), "%d.%d.%d", myNumVersion.majorRev, ((myNumVersion.minorAndBugRev & 0xF0)>>4), (myNumVersion.minorAndBugRev & 0x0F));
-		shortVersionStr[0] = strlen((char *) &(shortVersionStr[1]));
-		sprintf((char *) &(longVersionStr[1]), "%d.%d.%d Preferences for MacMolPlt", myNumVersion.majorRev, ((myNumVersion.minorAndBugRev & 0xF0)>>4), (myNumVersion.minorAndBugRev & 0x0F));
-		longVersionStr[0] = strlen((char *) &(longVersionStr[1]));
-		SetFileVersion (fileRefNum, 1, &myNumVersion, 0, shortVersionStr, longVersionStr);
-	}
-//Now save the actual preferences as resources
-	WriteAllPrefs(fileRefNum);
-//Done writing preferences so close the file
-	ClosePreferencesFile (fileRefNum);
-}
-*/
-
 void WinPrefs::WriteAllPrefs(short fileRefNum) {
   /*
 	short ResID;
@@ -462,23 +420,6 @@ void WinPrefs::SetAtomPattern(long AtomNum) {
 	PenPat((ConstPatternParam) &((**gDitherPatterns).patList[(AtomPatterns[AtomNum])]));
   */ //Song Li
 }
-
-/*
-void WinPrefs::SetBondPattern(long BondOrder) {
-	PenPat((ConstPatternParam) &((**gDitherPatterns).patList[(BondPatterns[BondOrder])]));
-}
-void WinPrefs::SetVectorPattern(void) {
-	PenPat((ConstPatternParam) &((**gDitherPatterns).patList[VectorPattern]));
-}
-void WinPrefs::SetRendererName(char * NewName) {
-	if (RendererName) delete [] RendererName;
-	RendererName = NULL;
-	if (NewName) {
-		RendererName = new char[strlen(NewName)+1];
-		if (RendererName) strcpy(RendererName, NewName);
-	}
-}
-*/ //Song Li
 
 //Read the preference specified by the resource type and ID into the
 //ptr passed in. Note the memory for preference MUST be allocated by the
@@ -653,7 +594,7 @@ void AtomPrefsPane::saveToTempPrefs()
 BondPrefsPane::BondPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean Global)
 	: PrefsPane(targetWindow, parent, kBondPrefsPane, Global) 
 {
-	Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER|wxScrolledWindowStyle );
+	Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
 
 	mMainSizer = new wxBoxSizer(wxVERTICAL);
 	mUpperSizer = new wxBoxSizer(wxVERTICAL);
@@ -779,7 +720,7 @@ void BondPrefsPane::OnChoice( wxCommandEvent &event )
 DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean Global)
 	: PrefsPane(targetWindow, parent, kDisplayPrefsPane, Global) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER|wxScrolledWindowStyle );
+  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER);
 
   mMainSizer = new wxBoxSizer(wxVERTICAL);
   mUpperSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -849,7 +790,7 @@ void DisplayPrefsPane::OnCheckBox( wxCommandEvent &event)
 EnergyPrefsPane::EnergyPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, parent, kEPrefsPane, GlobalPrefs) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER|wxScrolledWindowStyle );
+  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
 
   mMainSizer = new wxBoxSizer(wxVERTICAL);
   mUpperSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -1181,7 +1122,7 @@ void EnergyPrefsPane::OnRadio( wxCommandEvent& event )
 FilePrefsPane::FilePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, parent, kFilePrefsPane, GlobalPrefs) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER|wxScrolledWindowStyle );
+  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
 
   mMainSizer = new wxBoxSizer(wxVERTICAL);
   mUpperSizer = new wxBoxSizer(wxVERTICAL);
@@ -1330,7 +1271,7 @@ void FilePrefsPane::OnSliderUpdate( wxCommandEvent &WXUNUSED(event) )
 ScalingPrefsPane::ScalingPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, parent, kScalingPrefsPane, GlobalPrefs) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER|wxScrolledWindowStyle );
+  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
 
   mMainSizer = new wxFlexGridSizer(2,4);
 
@@ -1397,7 +1338,7 @@ void ScalingPrefsPane::OnSliderUpdate( wxCommandEvent &event )
 StereoPrefsPane::StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, parent, kStereoPrefsPane, GlobalPrefs) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER|wxScrolledWindowStyle );
+  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
 
   mMainSizer = new wxBoxSizer(wxVERTICAL);
   mMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -1443,7 +1384,7 @@ void StereoPrefsPane::OnCheckBox( wxCommandEvent& WXUNUSED(event))
 SurfacePrefsPane::SurfacePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, parent, kSurfacePrefsPane, GlobalPrefs) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER|wxScrolledWindowStyle );
+  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
 
   mMainSizer = new wxBoxSizer(wxHORIZONTAL);
   mLeftSizer = new wxBoxSizer(wxVERTICAL);
@@ -1577,7 +1518,7 @@ void SurfacePrefsPane::OnCheckBox( wxCommandEvent& event)
 QD3DPrefsPane::QD3DPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, parent, kQD3DPrefsPane, GlobalPrefs) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER|wxScrolledWindowStyle );
+  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
 
   mMainSizer = new wxBoxSizer(wxVERTICAL);
   mUpperSizer = new wxGridSizer(2,5);

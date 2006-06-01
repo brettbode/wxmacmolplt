@@ -43,8 +43,8 @@ IMPLEMENT_DYNAMIC_CLASS( setPreference, wxDialog )
 
 BEGIN_EVENT_TABLE( setPreference, wxDialog )
 
-  EVT_NOTEBOOK_PAGE_CHANGED(ID_NOTEBOOK, setPreference::OnNotebook)
-  EVT_NOTEBOOK_PAGE_CHANGING(ID_NOTEBOOK, setPreference::OnNotebook)
+  EVT_CHOICEBOOK_PAGE_CHANGED(ID_NOTEBOOK, setPreference::OnChoicebook)
+  EVT_CHOICEBOOK_PAGE_CHANGING(ID_NOTEBOOK, setPreference::OnChoicebook)
   //related to wxNoteBook
 
   EVT_BUTTON( myID_SETFONT, setPreference::OnSetFont )
@@ -65,11 +65,12 @@ setPreference::~setPreference( )
 {
   delete mPrefs;
 
-  if (m_imageList)
+  /*if (m_imageList)
     {
         delete m_imageList;
         m_imageList = (wxImageList *) NULL;
     }
+  */
 
 }
 
@@ -98,10 +99,10 @@ bool setPreference::Create( MolDisplayWin* parent, wxWindowID id, const wxString
     wxDialog::Create( parent, id, caption, pos, size, style );
 
     m_sizer = new wxBoxSizer(wxVERTICAL);
-    m_noteBook   = (wxNotebook *)   NULL;
+    m_choiceBook   = (wxChoicebook *)   NULL;
     m_panel      = (wxPanel *)      NULL;
 
-    wxSize imageSize(32, 32);
+    /*wxSize imageSize(32, 32);
 
     m_imageList
         = new wxImageList( imageSize.GetWidth(), imageSize.GetHeight() );
@@ -125,6 +126,7 @@ bool setPreference::Create( MolDisplayWin* parent, wxWindowID id, const wxString
         (
             wxArtProvider::GetIcon(wxART_ERROR, wxART_OTHER, imageSize)
         );
+    */
 
     m_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
         wxTAB_TRAVERSAL | wxCLIP_CHILDREN | wxNO_BORDER | wxNO_FULL_REPAINT_ON_RESIZE);
@@ -152,6 +154,7 @@ bool setPreference::Create( MolDisplayWin* parent, wxWindowID id, const wxString
     return true;
 }
 
+/*
 int setPreference::GetIconIndex(wxBookCtrlBase* bookCtrl)
 {
     if (bookCtrl && bookCtrl->GetImageList())
@@ -166,6 +169,7 @@ int setPreference::GetIconIndex(wxBookCtrlBase* bookCtrl)
 
     return -1;
 }
+*/
 
 /*!
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
@@ -194,11 +198,11 @@ void setPreference::OnOK( wxCommandEvent& event )
 
 void setPreference::RecreateBooks()
 { 
-  wxNotebook *oldBook = m_noteBook;
+  wxChoicebook *oldBook = m_choiceBook;
 
-  m_noteBook = new wxNotebook(m_panel, ID_NOTEBOOK, wxDefaultPosition, SYMBOL_SETPREFERENCE_SIZE, wxNB_DEFAULT);
+  m_choiceBook = new wxChoicebook(m_panel, ID_NOTEBOOK, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT);
 
-  m_noteBook->SetImageList(m_imageList);
+  //m_choiceBook->SetImageList(m_imageList);
 
   if (oldBook)
     {
@@ -208,8 +212,8 @@ void setPreference::RecreateBooks()
       for (int n = 0; n < count; n++)
 	{
 	  wxString str = oldBook->GetPageText(n);
-	  wxWindow *page = new wxPanel(m_noteBook);
-	  m_noteBook->AddPage(page, str, false, GetIconIndex(m_noteBook) );
+	  wxWindow *page = new wxPanel(m_choiceBook);
+	  m_choiceBook->AddPage(page, str, false );
         }
 
       m_sizer->Detach(oldBook);
@@ -217,22 +221,22 @@ void setPreference::RecreateBooks()
 
       if (sel != wxNOT_FOUND)
 	{
-	  m_noteBook->SetSelection(sel);
+	  m_choiceBook->SetSelection(sel);
 	}                                                                           }
   else
     {
-      CreateInitialPages(m_noteBook);
+      CreateInitialPages(m_choiceBook);
     }
 
-  m_sizer->Insert(0, m_noteBook, 5, wxEXPAND | wxALL, MARGIN);                    
-  m_sizer->Show(m_noteBook);
+  m_sizer->Insert(0, m_choiceBook, 5, wxEXPAND | wxALL, MARGIN);                    
+  m_sizer->Show(m_choiceBook);
   m_sizer->Layout();
 }
     
 
 wxBookCtrlBase *setPreference::GetCurrentBook()
 {
-  return m_noteBook;
+  return m_choiceBook;
 }
 
 void setPreference::CreateInitialPages(wxBookCtrlBase *parent)
@@ -240,39 +244,39 @@ void setPreference::CreateInitialPages(wxBookCtrlBase *parent)
     // Create and add some panels to the notebook
     atomPanel = new AtomPrefsPane(mParent, parent, mIsGlobal);
     atomPanel->SetupPaneItems(mParent, mPrefs);
-    parent->AddPage( atomPanel, wxT("Elements"), false, GetIconIndex(parent) );
+    parent->AddPage( atomPanel, wxT("Elements"), false );
 
     bondPanel = new BondPrefsPane(mParent, parent, mIsGlobal);
     bondPanel->SetupPaneItems(mParent, mPrefs);
-    parent->AddPage( bondPanel, wxT("Bonds/Vectors"), false, GetIconIndex(parent) );
+    parent->AddPage( bondPanel, wxT("Bonds/Vectors"), false );
 
     displayPanel = new DisplayPrefsPane(mParent, parent, mIsGlobal);
     displayPanel->SetupPaneItems(mParent, mPrefs);
-    parent->AddPage( displayPanel, wxT("Display Options"), false, GetIconIndex(parent) );
+    parent->AddPage( displayPanel, wxT("Display Options"), false );
 
     energyPanel = new EnergyPrefsPane(mParent, parent, mIsGlobal);
     energyPanel->SetupPaneItems(mParent, mPrefs);
-    parent->AddPage( energyPanel, wxT("Energy Options"), false, GetIconIndex(parent) );
+    parent->AddPage( energyPanel, wxT("Energy Options"), false );
 
     filePanel = new FilePrefsPane(mParent, parent, mIsGlobal);
     filePanel->SetupPaneItems(mParent, mPrefs);
-    parent->AddPage( filePanel, wxT("File"), false, GetIconIndex(parent) );
+    parent->AddPage( filePanel, wxT("File"), false );
 
     scalPanel = new ScalingPrefsPane(mParent, parent, mIsGlobal);
     scalPanel->SetupPaneItems(mParent, mPrefs);
-    parent->AddPage( scalPanel, wxT("Scaling/Speed"), false, GetIconIndex(parent) );
+    parent->AddPage( scalPanel, wxT("Scaling/Speed"), false );
 
     stereoPanel = new StereoPrefsPane(mParent, parent, mIsGlobal);
     stereoPanel->SetupPaneItems(mParent, mPrefs);
-    parent->AddPage( stereoPanel, wxT("Stereo Options"), false, GetIconIndex(parent) );
+    parent->AddPage( stereoPanel, wxT("Stereo Options"), false );
 
     surfPanel = new SurfacePrefsPane(mParent, parent, mIsGlobal);
     surfPanel->SetupPaneItems(mParent, mPrefs);
-    parent->AddPage( surfPanel, wxT("Surface Options"), false, GetIconIndex(parent) );
+    parent->AddPage( surfPanel, wxT("Surface Options"), false );
 
     qd3dPanel = new QD3DPrefsPane(mParent, parent, mIsGlobal);
     qd3dPanel->SetupPaneItems(mParent, mPrefs);
-    parent->AddPage( qd3dPanel, wxT("3D Options"), false, GetIconIndex(parent) );
+    parent->AddPage( qd3dPanel, wxT("3D Options"), false );
 
     parent->SetSelection(0);
     currPanel = 0;
@@ -309,7 +313,7 @@ void setPreference::OnSetFont(wxCommandEvent& WXUNUSED(event))
     }
 }
 
-void setPreference::OnNotebook(wxNotebookEvent& event)
+void setPreference::OnChoicebook(wxChoicebookEvent& event)
 {
   int idx = event.GetOldSelection();
   
