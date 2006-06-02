@@ -1,5 +1,4 @@
 #include "wxMolGraph.h"
-#include <iostream>
 #include <stdexcept>
 
 using namespace std;
@@ -765,11 +764,9 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
         event.Skip();
     }
     else if(event.LeftUp()) {
-        cout << "Left Up" << endl;
         wxPoint p((int)clickedX, (int)clickedY);
         if(graphRegion.Contains(event.GetPosition()) == wxInRegion &&
            graphRegion.Contains(p) == wxInRegion) {
-            cout << "Contained in graph" << endl;
             clickedX = 0;
             clickedY = 0;
             x = (event.GetX() - xScaleMin) / xConversion + xMin;
@@ -796,7 +793,6 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
                     }
                 }
             }
-            cout << "New selection!" << endl;
             Refresh();
             wxPostEvent(this, event_graph);
         }

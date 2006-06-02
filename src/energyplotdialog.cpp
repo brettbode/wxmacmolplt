@@ -186,7 +186,8 @@ void EnergyPlotDialog::RegenData(void) {
     //long atom2 = 0;
     //long atom3 = 0;
     int i = 0;
-    
+    int size = (int)(eOpts->GetEPlotPointSize());
+
 
     epGraph->reset();
     
@@ -203,12 +204,12 @@ void EnergyPlotDialog::RegenData(void) {
     }
     epGraph->addXSet(xSetData, true);
     
-    epGraph->addYSet(totalEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetTEColor())));
-    epGraph->addYSet(potentialEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetPEColor())));
-    epGraph->addYSet(mp2EnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetMPColor())));
-    epGraph->addYSet(kineticEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())));
-    //epGraph->addYSet(rmsGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(/* TODO */)));
-    //epGraph->addYSet(maxGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(/* TODO */)));
+    epGraph->addYSet(totalEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetTEColor())), MG_SHAPE_CIRCLE, size);
+    epGraph->addYSet(potentialEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetPEColor())), MG_SHAPE_CIRCLE, size);
+    epGraph->addYSet(mp2EnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetMPColor())), MG_SHAPE_CIRCLE, size);
+    epGraph->addYSet(kineticEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
+    //epGraph->addYSet(rmsGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(/* TODO */)), MG_SHAPE_CIRCLE, size);
+    //epGraph->addYSet(maxGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(/* TODO */)), MG_SHAPE_CIRCLE, size);
     if(!eOpts->PlotEnergy()) {
         epGraph->setVisible(0, 0, false);
     }
