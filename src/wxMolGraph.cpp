@@ -230,6 +230,14 @@ void wxMolGraph::autoScaleY(int axis) {
     }
 }
 
+void wxMolGraph::setXAxisMin(double val) {
+    xMin = val;
+}
+
+void wxMolGraph::setXAxisMax(double val) {
+    xMax = val;
+}
+
 void wxMolGraph::autoScaleX(void) {
     double min = 0.0;
     double max = 0.0;

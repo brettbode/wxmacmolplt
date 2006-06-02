@@ -278,7 +278,8 @@ class wxMolGraph : public wxControl {
      */
     void autoScaleY(int axis);
 
-
+    void setXAxisMin(double val);
+    void setXAxisMax(double val);
     void autoScaleX(void);
 
 
