@@ -84,6 +84,8 @@ bool Orbital3D::Create( wxWindow* parent, wxWindowID id, const wxPoint& pos, con
     allFrameCheck = NULL;
     orbSetChoice = NULL;
     rPhaseCheck = NULL;
+    gridSizeSlider = NULL;
+    updateButton = NULL;
 ////@end Orbital3D member initialisation
 
 ////@begin Orbital3D creation
@@ -139,6 +141,82 @@ void Orbital3D::CreateControls()
     rPhaseCheck = new wxCheckBox( itemPanel1, ID_CHECKBOX5, _("Reverse Phase"), wxDefaultPosition, wxDefaultSize, 0 );
     rPhaseCheck->SetValue(false);
     itemBoxSizer8->Add(rPhaseCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer12 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer2->Add(itemBoxSizer12, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    wxStaticText* itemStaticText13 = new wxStaticText( itemPanel1, wxID_STATIC, _("Grid Size:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer12->Add(itemStaticText13, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    gridSizeSlider = new wxSlider( itemPanel1, ID_GRIDSIZESLIDER1, 0, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+    itemBoxSizer12->Add(gridSizeSlider, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer15 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer2->Add(itemBoxSizer15, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    wxStaticText* itemStaticText16 = new wxStaticText( itemPanel1, wxID_STATIC, _("Number of\nGrid Points:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer15->Add(itemStaticText16, 0, wxALIGN_TOP|wxALL|wxADJUST_MINSIZE, 5);
+
+    wxSlider* itemSlider17 = new wxSlider( itemPanel1, ID_SLIDER1, 0, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+    itemBoxSizer15->Add(itemSlider17, 0, wxALIGN_TOP|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer18 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer15->Add(itemBoxSizer18, 0, wxALIGN_TOP|wxALL, 5);
+
+    wxStaticText* itemStaticText19 = new wxStaticText( itemPanel1, wxID_STATIC, _("Contour Value:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer18->Add(itemStaticText19, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    wxTextCtrl* itemTextCtrl20 = new wxTextCtrl( itemPanel1, ID_TEXTCTRL6, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer18->Add(itemTextCtrl20, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer15->Add(itemBoxSizer21, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    wxSlider* itemSlider22 = new wxSlider( itemPanel1, ID_SLIDER2, 0, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+    itemBoxSizer21->Add(itemSlider22, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer23 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer21->Add(itemBoxSizer23, 0, wxGROW|wxALL, 5);
+
+    wxStaticText* itemStaticText24 = new wxStaticText( itemPanel1, wxID_STATIC, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer23->Add(itemStaticText24, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    wxStaticText* itemStaticText25 = new wxStaticText( itemPanel1, wxID_STATIC, _("0.0"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer23->Add(itemStaticText25, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    wxBoxSizer* itemBoxSizer26 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer2->Add(itemBoxSizer26, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer27 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer26->Add(itemBoxSizer27, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    wxStaticText* itemStaticText28 = new wxStaticText( itemPanel1, wxID_STATIC, _("Select Orbital:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer27->Add(itemStaticText28, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    wxString* itemChoice29Strings = NULL;
+    wxChoice* itemChoice29 = new wxChoice( itemPanel1, ID_CHOICE2, wxDefaultPosition, wxDefaultSize, 0, itemChoice29Strings, 0 );
+    itemBoxSizer27->Add(itemChoice29, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    wxString* itemListBox30Strings = NULL;
+    wxListBox* itemListBox30 = new wxListBox( itemPanel1, ID_LISTBOX, wxDefaultPosition, wxDefaultSize, 0, itemListBox30Strings, wxLB_SINGLE );
+    itemBoxSizer27->Add(itemListBox30, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer31 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer26->Add(itemBoxSizer31, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    wxStaticText* itemStaticText32 = new wxStaticText( itemPanel1, wxID_STATIC, _("Orbital Vector:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer31->Add(itemStaticText32, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    wxString* itemListBox33Strings = NULL;
+    wxListBox* itemListBox33 = new wxListBox( itemPanel1, ID_LISTBOX1, wxDefaultPosition, wxDefaultSize, 0, itemListBox33Strings, wxLB_SINGLE );
+    itemBoxSizer31->Add(itemListBox33, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer34 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer26->Add(itemBoxSizer34, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    updateButton = new wxButton( itemPanel1, ID_UPDATEBUTTON, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
+    updateButton->SetDefault();
+    itemBoxSizer34->Add(updateButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 ////@end Orbital3D content construction
 }

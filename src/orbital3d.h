@@ -46,6 +46,14 @@
 #define ID_CHECKBOX4 10073
 #define ID_CHOICE1 10074
 #define ID_CHECKBOX5 10075
+#define ID_GRIDSIZESLIDER1 10076
+#define ID_SLIDER1 10077
+#define ID_TEXTCTRL6 10079
+#define ID_SLIDER2 10078
+#define ID_CHOICE2 10080
+#define ID_LISTBOX 10081
+#define ID_LISTBOX1 10082
+#define ID_UPDATEBUTTON 10083
 ////@end control identifiers
 
 /*!
@@ -113,6 +121,8 @@ public:
     wxCheckBox* allFrameCheck;
     wxChoice* orbSetChoice;
     wxCheckBox* rPhaseCheck;
+    wxSlider* gridSizeSlider;
+    wxButton* updateButton;
 ////@end Orbital3D member variables
 };
 

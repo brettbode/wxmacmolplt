@@ -23,6 +23,7 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
+#include <wx/listctrl.h>
 #include <wx/listbook.h>
 
 ////@begin includes
@@ -112,7 +113,7 @@ void SurfacesWindow::CreateControls()
 
     listBook = new wxListbook( itemFrame1, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxLB_BOTTOM|wxSUNKEN_BORDER );
 
-    itemBoxSizer5->Add(listBook, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    itemBoxSizer5->Add(listBook, 4, wxGROW|wxALL, 2);
 
     wxBoxSizer* itemBoxSizer7 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer5->Add(itemBoxSizer7, 0, wxALIGN_RIGHT|wxALL, 5);
@@ -120,16 +121,20 @@ void SurfacesWindow::CreateControls()
     wxButton* itemButton8 = new wxButton( itemFrame1, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         itemButton8->SetToolTip(_("Delete the selected surface"));
-    itemBoxSizer7->Add(itemButton8, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer7->Add(itemButton8, 0, wxALIGN_BOTTOM|wxALL, 5);
 
     wxButton* itemButton9 = new wxButton( itemFrame1, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         itemButton9->SetToolTip(_("Add a new surface"));
-    itemBoxSizer7->Add(itemButton9, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer7->Add(itemButton9, 0, wxALIGN_BOTTOM|wxALL, 5);
 
 ////@end SurfacesWindow content construction
+	wxListView * t = listBook->GetListView();
+	t->SetWindowStyle(wxLC_LIST);
 	Orbital3D * temp = new Orbital3D(this);
 	listBook->AddPage(temp, wxT("test orb"), false);
+	temp = new Orbital3D(this);
+	listBook->AddPage(temp, wxT("test pane 2"), false);
 }
 
 /*!
