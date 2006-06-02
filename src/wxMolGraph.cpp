@@ -766,8 +766,9 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
     }
     else if(event.LeftUp()) {
         cout << "Left Up" << endl;
+        wxPoint p((int)clickedX, (int)clickedY);
         if(graphRegion.Contains(event.GetPosition()) == wxInRegion &&
-           graphRegion.Contains(clickedX, clickedY) == wxInRegion) {
+           graphRegion.Contains(p) == wxInRegion) {
             cout << "Contained in graph" << endl;
             clickedX = 0;
             clickedY = 0;
