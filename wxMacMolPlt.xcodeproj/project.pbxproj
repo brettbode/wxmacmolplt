@@ -46,6 +46,8 @@
 		8B1DA4830A2E6A18009DFD94 /* frequenciesdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA47F0A2E6A17009DFD94 /* frequenciesdialog.cpp */; };
 		8B1DA4840A2E6A18009DFD94 /* myPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */; };
 		8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
+		8B4FB3D30A3093470014F6B5 /* orbital3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3CF0A3093470014F6B5 /* orbital3d.cpp */; };
+		8B4FB3D40A3093470014F6B5 /* surfaceswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */; };
 		8B6075B10A1A34B1008CC9FD /* printoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */; };
 		8B6AF30B0A13EAC8004D2E5F /* exportoptionsdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */; };
 		8B6C7BFB0A24E9C100B7358F /* energyplotdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */; };
@@ -135,6 +137,10 @@
 		8B1DA4820A2E6A17009DFD94 /* PrefsPanes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsPanes.h; path = src/PrefsPanes.h; sourceTree = "<group>"; };
 		8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = appendframesoptions.cpp; path = src/appendframesoptions.cpp; sourceTree = "<group>"; };
 		8B4BB4410A0A7C9D00FE9CC6 /* appendframesoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = appendframesoptions.h; path = src/appendframesoptions.h; sourceTree = "<group>"; };
+		8B4FB3CF0A3093470014F6B5 /* orbital3d.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = orbital3d.cpp; path = src/orbital3d.cpp; sourceTree = "<group>"; };
+		8B4FB3D00A3093470014F6B5 /* orbital3d.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = orbital3d.h; path = src/orbital3d.h; sourceTree = "<group>"; };
+		8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceswindow.cpp; path = src/surfaceswindow.cpp; sourceTree = "<group>"; };
+		8B4FB3D20A3093470014F6B5 /* surfaceswindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceswindow.h; path = src/surfaceswindow.h; sourceTree = "<group>"; };
 		8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = printoptions.cpp; path = src/printoptions.cpp; sourceTree = "<group>"; };
 		8B6075B00A1A34B1008CC9FD /* printoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = printoptions.h; path = src/printoptions.h; sourceTree = "<group>"; };
 		8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = exportoptionsdialog.cpp; path = src/exportoptionsdialog.cpp; sourceTree = "<group>"; };
@@ -247,6 +253,10 @@
 				1652DA4709D0B12600B7783F /* MoleculeData.h */,
 				1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */,
 				8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */,
+				8B4FB3CF0A3093470014F6B5 /* orbital3d.cpp */,
+				8B4FB3D00A3093470014F6B5 /* orbital3d.h */,
+				8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */,
+				8B4FB3D20A3093470014F6B5 /* surfaceswindow.h */,
 				8B6C7BFE0A24E9E800B7358F /* wxMolGraph.h */,
 				8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */,
 				1652DA4909D0B12600B7783F /* mpGLCanvas.h */,
@@ -394,6 +404,8 @@
 				8B1DA4750A2E189B009DFD94 /* setPreference.cpp in Sources */,
 				8B1DA4830A2E6A18009DFD94 /* frequenciesdialog.cpp in Sources */,
 				8B1DA4840A2E6A18009DFD94 /* myPrefs.cpp in Sources */,
+				8B4FB3D30A3093470014F6B5 /* orbital3d.cpp in Sources */,
+				8B4FB3D40A3093470014F6B5 /* surfaceswindow.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

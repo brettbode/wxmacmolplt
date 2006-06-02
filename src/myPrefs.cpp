@@ -734,6 +734,7 @@ DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *
   SetSizer(mMainSizer);
 }
 
+#include <iostream>
 void DisplayPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targetPrefs) 
 {
   mTargetPrefs = targetPrefs;

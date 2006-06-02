@@ -28,6 +28,7 @@
 #include "appendframesoptions.h"
 #include "exportoptionsdialog.h"
 #include "frequenciesdialog.h"
+#include "surfaceswindow.h"
 #include "choosevecgroup.h"
 #include "coordinateoffset.h"
 #include "frameenergy.h"
@@ -44,7 +45,6 @@ using namespace std;
 //I think these are only needed in this file.
 //They are custom ids used to tie the event table to the menus
 
-#define ID_GLOBAL_PREFERENCES 500
 #define ID_LOCAL_PREFERENCES 501
 //temporarily put ID definitions here   -Song Li
 
@@ -79,6 +79,7 @@ enum MMP_EventID {
     MMP_COORDSWINDOW,
     MMP_ENERGYPLOTWINDOW,
     MMP_FREQUENCIESWINDOW,
+	MMP_SURFACESWINDOW,
     MMP_STATUSBAR,
     MMP_FRAMESCROLLBAR,
     MMP_EXPORT,
@@ -120,9 +121,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
     EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
     EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
-  EVT_MENU (ID_GLOBAL_PREFERENCES,  MolDisplayWin::menuPreferences)
-  EVT_MENU (ID_LOCAL_PREFERENCES,   MolDisplayWin::menuPreferences)
-  //added by Song Li
+	EVT_MENU (wxID_PREFERENCES,  MolDisplayWin::menuPreferences)
+	EVT_MENU (ID_LOCAL_PREFERENCES,   MolDisplayWin::menuPreferences)
     EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
     EVT_MENU (MMP_ANIMATEMODE,      MolDisplayWin::menuViewAnimateMode)
     EVT_MENU (MMP_OFFSETMODE,       MolDisplayWin::menuViewOffsetAlongMode)
@@ -153,6 +153,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_COORDSWINDOW,      MolDisplayWin::menuWindowCoordinates)
     EVT_MENU (MMP_ENERGYPLOTWINDOW,  MolDisplayWin::menuWindowEnergy_plot)
     EVT_MENU (MMP_FREQUENCIESWINDOW, MolDisplayWin::menuWindowFrequencies)
+	EVT_MENU (MMP_SURFACESWINDOW,	MolDisplayWin::menuWindowSurfaces)
 
     EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
     EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
@@ -196,6 +197,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     coordsWindow = NULL;
     energyPlotWindow = NULL;
     frequenciesWindow = NULL;
+	surfacesWindow = NULL;
     
     pageSetupData = NULL;
     printData = NULL;
@@ -344,7 +346,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->AppendSeparator();
     menuEdit->Append(wxID_SELECTALL, wxT("&Select all\tCtrl+A"));
     menuEdit->AppendSeparator();
-    menuEdit->Append(ID_GLOBAL_PREFERENCES, wxT("Global Pr&eferences ..."));
+    menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
 
     menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"));
     menuView->Append(MMP_ANIMATEMODE, wxT("Animate Mode\tCtrl+M"));
@@ -382,6 +384,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"));
     menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"));
     menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"));
+    menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"));
     menuWindow->Append(ID_LOCAL_PREFERENCES, wxT("Pr&eferences ..."));
     menuHelp->Append(wxID_ABOUT, wxT("&About ..."));
 
@@ -1309,12 +1312,12 @@ void MolDisplayWin::menuPreferences(wxCommandEvent &event)
         bool isGlobal;
         int id = event.GetId();
 
-    if ( id == ID_GLOBAL_PREFERENCES )
-      isGlobal = true;
+    if ( id == wxID_PREFERENCES )
+		isGlobal = true;
     else if ( id == ID_LOCAL_PREFERENCES )
-      isGlobal = false;
+		isGlobal = false;
     else
-      cout<<"This shouldn't happen!"<<endl;
+		MessageAlert("This shouldn't happen!");
 
     setPreference * pre_dlg = new setPreference(this, isGlobal);
     pre_dlg->ShowModal();
@@ -1497,6 +1500,21 @@ void MolDisplayWin::CloseFrequenciesWindow(void) {
     if(frequenciesWindow) {
         frequenciesWindow->Destroy();
         frequenciesWindow = NULL;
+    }
+}
+void MolDisplayWin::menuWindowSurfaces(wxCommandEvent &event) {
+    if(surfacesWindow) { // need to bring it to the front...
+        surfacesWindow->Raise();
+    }
+    else {
+        surfacesWindow = new SurfacesWindow(this);
+        surfacesWindow->Show();
+    }
+}
+void MolDisplayWin::CloseSurfacesWindow(void) {
+    if(surfacesWindow) {
+        surfacesWindow->Destroy();
+        surfacesWindow = NULL;
     }
 }
 
