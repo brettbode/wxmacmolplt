@@ -44,6 +44,8 @@ class wxMolGraph;
 #define SYMBOL_FREQUENCIESDIALOG_IDNAME ID_FREQDIALOG
 #define SYMBOL_FREQUENCIESDIALOG_SIZE wxSize(400, 300)
 #define SYMBOL_FREQUENCIESDIALOG_POSITION wxDefaultPosition
+#define ID_PREVMODE 10084
+#define ID_NEXTMODE 10085
 #define ID_CUSTOM 10066
 ////@end control identifiers
 
@@ -81,6 +83,12 @@ public:
 
     /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_COPY
     void OnCopyClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_PREVMODE
+    void OnPrevmodeClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_NEXTMODE
+    void OnNextmodeClick( wxCommandEvent& event );
 
     /// wxEVT_GRAPH_CLICK event handler for ID_CUSTOM
     void OnCustomGraphClick( wxCommandEvent& event );

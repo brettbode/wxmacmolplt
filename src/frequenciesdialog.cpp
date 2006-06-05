@@ -53,6 +53,10 @@ BEGIN_EVENT_TABLE( FrequenciesDialog, wxFrame )
 
     EVT_MENU( wxID_COPY, FrequenciesDialog::OnCopyClick )
 
+    EVT_MENU( ID_PREVMODE, FrequenciesDialog::OnPrevmodeClick )
+
+    EVT_MENU( ID_NEXTMODE, FrequenciesDialog::OnNextmodeClick )
+
     EVT_GRAPH_CLICK(ID_CUSTOM, FrequenciesDialog::OnCustomGraphClick)
 
 ////@end FrequenciesDialog event table entries
@@ -108,13 +112,17 @@ void FrequenciesDialog::CreateControls()
     wxMenu* itemMenu3 = new wxMenu;
     itemMenu3->Append(wxID_COPY, _("&Copy"), _T(""), wxITEM_NORMAL);
     menuBar->Append(itemMenu3, _("&Edit"));
+    wxMenu* itemMenu5 = new wxMenu;
+    itemMenu5->Append(ID_PREVMODE, _("&Previous Normal Mode\tCtrl+["), _T(""), wxITEM_NORMAL);
+    itemMenu5->Append(ID_NEXTMODE, _("Ne&xt Normal Mode\tCtrl+]"), _T(""), wxITEM_NORMAL);
+    menuBar->Append(itemMenu5, _("&View"));
     itemFrame1->SetMenuBar(menuBar);
 
-    wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxVERTICAL);
-    itemFrame1->SetSizer(itemBoxSizer5);
+    wxBoxSizer* itemBoxSizer8 = new wxBoxSizer(wxVERTICAL);
+    itemFrame1->SetSizer(itemBoxSizer8);
 
     fGraph = new wxMolGraph( itemFrame1, ID_CUSTOM, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-    itemBoxSizer5->Add(fGraph, 1, wxGROW|wxALL, 5);
+    itemBoxSizer8->Add(fGraph, 1, wxGROW|wxALL, 5);
 
 ////@end FrequenciesDialog content construction
 }
@@ -234,6 +242,33 @@ void FrequenciesDialog::OnCustomGraphClick( wxCommandEvent& event )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->ChangeModes(fGraph->getSelection(0));
+}
+
+
+
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_PREVMODE
+ */
+
+void FrequenciesDialog::OnPrevmodeClick( wxCommandEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    if(parent->GetData()->cFrame->Vibs->CurrentMode > 0) {
+        parent->ChangeModes(parent->GetData()->cFrame->Vibs->CurrentMode - 1);
+    }
+}
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_NEXTMODE
+ */
+
+void FrequenciesDialog::OnNextmodeClick( wxCommandEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    if(parent->GetData()->cFrame->Vibs->CurrentMode < parent->GetData()->cFrame->Vibs->NumModes - 1) {
+        parent->ChangeModes(parent->GetData()->cFrame->Vibs->CurrentMode + 1);
+    }
 }
 
 
