@@ -202,6 +202,7 @@ void FrequenciesDialog::RegenData(void) {
 
     //fGraph->setPrecision(eOpts->GetNumDigits());
     fGraph->autoScaleY(MG_AXIS_Y1);
+    fGraph->setYAxisMin(MG_AXIS_Y1, 0.0);
     fGraph->setXAxisMin(0.0);
     fGraph->setSelection(0, mData->CurrentFrame - 1);
 }

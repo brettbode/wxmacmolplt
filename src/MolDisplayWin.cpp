@@ -1554,6 +1554,7 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
     }
 }
 void MolDisplayWin::ModeChanged(void) {
+    StopAnimations();
     if(frequenciesWindow != NULL) {
         frequenciesWindow->ModeChanged();
     }
