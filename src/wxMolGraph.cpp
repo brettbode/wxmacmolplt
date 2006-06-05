@@ -768,7 +768,6 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
     int j = 0;
 
     if(event.LeftDown()) {
-		cout << "Left down" << endl;
         event.GetPosition(&clickedX, &clickedY);
         event.Skip();
     }

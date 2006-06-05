@@ -53,6 +53,8 @@ BEGIN_EVENT_TABLE( FrequenciesDialog, wxFrame )
 
     EVT_MENU( wxID_COPY, FrequenciesDialog::OnCopyClick )
 
+    EVT_GRAPH_CLICK(ID_CUSTOM, FrequenciesDialog::OnCustomGraphClick)
+
 ////@end FrequenciesDialog event table entries
 END_EVENT_TABLE()
 
@@ -160,6 +162,12 @@ void FrequenciesDialog::FrameChanged(void) {
     Refresh();
 }
 
+void FrequenciesDialog::ModeChanged(void) {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    fGraph->setSelection(0, parent->GetData()->cFrame->Vibs->GetCurrentMode());
+    Refresh();
+}
+
 void FrequenciesDialog::RegenData(void) {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     
@@ -218,3 +226,14 @@ void FrequenciesDialog::OnCopyClick( wxCommandEvent& event )
     
     tempDC.SelectObject(wxNullBitmap);
 }
+/*!
+ * wxEVT_GRAPH_CLICK event handler for ID_CUSTOM
+ */
+
+void FrequenciesDialog::OnCustomGraphClick( wxCommandEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    parent->ChangeModes(fGraph->getSelection(0));
+}
+
+

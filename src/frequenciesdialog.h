@@ -82,6 +82,9 @@ public:
     /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_COPY
     void OnCopyClick( wxCommandEvent& event );
 
+    /// wxEVT_GRAPH_CLICK event handler for ID_CUSTOM
+    void OnCustomGraphClick( wxCommandEvent& event );
+
 ////@end FrequenciesDialog event handler declarations
 
 ////@begin FrequenciesDialog member function declarations
@@ -94,6 +97,7 @@ public:
 ////@end FrequenciesDialog member function declarations
 
     void FrameChanged(void);
+    void ModeChanged(void);
     void RegenData(void);
 
     /// Should we show tooltips?

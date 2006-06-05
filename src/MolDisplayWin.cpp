@@ -1130,27 +1130,14 @@ void MolDisplayWin::menuViewShowNormalMode(wxCommandEvent &event) {
 void MolDisplayWin::menuViewPrevNormalMode(wxCommandEvent &event) {
     if (MainData->cFrame->Vibs) {
         if (MainData->cFrame->Vibs->CurrentMode>0) {
-            MainData->cFrame->Vibs->CurrentMode--;
-            //activate normal mode display if not active
-            if (!MainData->GetDrawMode()) {
-                MainData->SetDrawMode(true);
-                menuView->Check(MMP_SHOWMODE, true);
-            }
-            ResetModel(false);
-            Dirty = true;
+            ChangeModes(MainData->cFrame->Vibs->CurrentMode - 1);
         }
     }
 }
 void MolDisplayWin::menuViewNextNormalMode(wxCommandEvent &event) {
     if (MainData->cFrame->Vibs) {
         if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1)) {
-            MainData->cFrame->Vibs->CurrentMode++;
-            if (!MainData->GetDrawMode()) {
-                MainData->SetDrawMode(true);
-                menuView->Check(MMP_SHOWMODE, true);
-            }
-            ResetModel(false);
-            Dirty = true;
+            ChangeModes(MainData->cFrame->Vibs->CurrentMode + 1);
         }
     }
 }
@@ -1564,6 +1551,23 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
         if (frequenciesWindow) frequenciesWindow->FrameChanged();
     //  if (SurfaceDlog) SurfaceDlog->Reset();
         frameScrollBar->SetThumbPosition(MainData->CurrentFrame-1);
+    }
+}
+void MolDisplayWin::ModeChanged(void) {
+    if(frequenciesWindow != NULL) {
+        frequenciesWindow->ModeChanged();
+    }
+    if(!MainData->GetDrawMode()) {
+        MainData->SetDrawMode(true);
+        menuView->Check(MMP_SHOWMODE, true);
+    }
+    ResetModel(false);
+    Dirty = true;
+}
+void MolDisplayWin::ChangeModes(long NewMode) {
+    if(NewMode >= 0 && NewMode < MainData->cFrame->Vibs->GetNumModes()) {
+        MainData->cFrame->Vibs->CurrentMode = NewMode;
+        ModeChanged();
     }
 }
 void MolDisplayWin::UpdateFrameText(void) {

@@ -214,6 +214,8 @@ class MolDisplayWin : public wxFrame {
         void BondsChanged(void);
         void FrameChanged(void);
         void ChangeFrames(long NewFrame);
+        void ModeChanged(void);
+        void ChangeModes(long NewMode);
         void UpdateModelDisplay(void);
         MoleculeData * GetData(void) const {return MainData;};
         WinPrefs * GetPrefs(void) const {return Prefs;};
