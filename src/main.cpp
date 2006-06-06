@@ -18,6 +18,8 @@
 
 //The global preferences settings
     WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
+    MolDisplayWin *	gWindow[kMaxOpenDocuments];  // Song Li
+    long  gNumDocuments;
 
 static const wxCmdLineEntryDesc g_cmdLineDesc[] = 
 { 
@@ -68,7 +70,12 @@ bool MpApp::OnInit() {
 	*gPreferences = *gPrefDefaults;
 		//attempt to read new xml pref file
 	gPreferences->ReadUserPrefs();
-    
+
+	//track all opened windows
+	gNumDocuments = 0;
+	for ( int i = 0; i < kMaxOpenDocuments; i++)
+	  gWindow[i] = NULL;
+
     // Parse command line 
 	wxString cmdFilename; 
 	wxCmdLineParser cmdParser(g_cmdLineDesc, argc, argv); 

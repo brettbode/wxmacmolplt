@@ -52,6 +52,19 @@ RGBColor WX2RGB(wxColour &c) {
     return newC;
 }
 
+void WinPrefs::resetAllDefaults()
+{
+  ReadAtomDefaults();
+  ReadBondDefaults();
+  ReadDisplayDefaults();
+  ReadEnergyDefaults();
+  ReadSurfaceDefaults();
+  ReadFileDefaults();
+  ReadStereoDefaults();
+  ReadScalingDefaults();
+  ReadQD3DDefaults();
+}
+
 //copy in the factory default values from the gPrefDefaults
 void WinPrefs::ReadAtomDefaults(void) {
 	CopyAtomPrefs(gPrefDefaults);

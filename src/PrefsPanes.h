@@ -29,13 +29,13 @@ class PrefsPane
 {
 	public:
 			//Constructor should add the needed pane items and do one time inits
-  PrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, short PaneID, Boolean GlobalPrefs) { isGlobalPrefs = GlobalPrefs; }
+  PrefsPane(MolDisplayWin* targetWindow, WinPrefs* targetPrefs, short PaneID, Boolean GlobalPrefs);
+
+  ~PrefsPane(); 
 
 			//setupitems should do all inits that might/can be done more than once
 			//like setting control values
-		virtual void SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targetPrefs)=0;
-
-		virtual void UpdatePane(MolDisplayWin*, WinPrefs *) {};
+		virtual void SetupPaneItems(MolDisplayWin* targetWindow)=0;
 
 		virtual void saveToTempPrefs()=0;
 
@@ -68,9 +68,9 @@ class colorArea : public wxPanel
 class AtomPrefsPane : public PrefsPane, public wxScrolledWindow 
 {
 	public:
-		AtomPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs);
+		AtomPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		~AtomPrefsPane();
-		virtual void SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targetPrefs);
+		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
 	private:
@@ -94,9 +94,9 @@ class BondPrefsPane : public PrefsPane, public wxPanel
 {
 	public:
 
-                BondPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs);
+                BondPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
                 ~BondPrefsPane();
-		virtual void SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targetPrefs);
+		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
 		void OnChoice( wxCommandEvent &event );
@@ -127,8 +127,8 @@ class BondPrefsPane : public PrefsPane, public wxPanel
 class DisplayPrefsPane : public PrefsPane, public wxPanel
 {
 	public:
-		DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs);
-		virtual void SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targetPrefs);
+		DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
+		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
 		void OnRadio( wxCommandEvent &event );
@@ -150,9 +150,9 @@ class DisplayPrefsPane : public PrefsPane, public wxPanel
 class EnergyPrefsPane : public PrefsPane, public wxPanel
 {
 	public:
-		EnergyPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs);
+		EnergyPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		~EnergyPrefsPane();
-		virtual void SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targetPrefs);
+		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
 		void OnSliderUpdate( wxCommandEvent &WXUNUSED(event) );
@@ -196,8 +196,8 @@ class EnergyPrefsPane : public PrefsPane, public wxPanel
 class FilePrefsPane : public PrefsPane, public wxPanel
 {
 	public:
-		FilePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs);
-		virtual void SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targetPrefs);
+		FilePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
+		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
 		void OnCheckBox( wxCommandEvent& WXUNUSED(event));
@@ -223,8 +223,8 @@ class FilePrefsPane : public PrefsPane, public wxPanel
 class ScalingPrefsPane : public PrefsPane, public wxPanel
 {
 	public:
-		ScalingPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs);
-		virtual void SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targetPrefs);
+		ScalingPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
+		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
 		void OnSliderUpdate( wxCommandEvent &event );
@@ -241,8 +241,8 @@ class ScalingPrefsPane : public PrefsPane, public wxPanel
 class StereoPrefsPane : public PrefsPane, public wxPanel
 {
 	public:
-		StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs);
-		virtual void SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targetPrefs);
+		StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
+		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
 		void OnCheckBox( wxCommandEvent& WXUNUSED(event));
@@ -263,9 +263,9 @@ class StereoPrefsPane : public PrefsPane, public wxPanel
 class SurfacePrefsPane : public PrefsPane,  public wxPanel
 {
 	public:
-		SurfacePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent,  Boolean GlobalPrefs);
+		SurfacePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		~SurfacePrefsPane();
-		virtual void SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targetPrefs);
+		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
 		void OnCheckBox( wxCommandEvent& event);
@@ -296,8 +296,8 @@ class SurfacePrefsPane : public PrefsPane,  public wxPanel
 class QD3DPrefsPane : public PrefsPane, public wxPanel
 {
 	public:
-		QD3DPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, Boolean GlobalPrefs);
-		virtual void SetupPaneItems(MolDisplayWin* targetWindow, WinPrefs * targetPrefs);
+		QD3DPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
+		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
 		void OnCheckBox( wxCommandEvent& WXUNUSED(event));

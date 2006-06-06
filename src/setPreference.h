@@ -21,8 +21,8 @@
 //#include "wx/listbook.h"
 //#include "wx/notebook.h"
 #include "wx/choicebk.h"
-#include "wx/imaglist.h"
-#include "wx/artprov.h"
+//#include "wx/imaglist.h"
+//#include "wx/artprov.h"
 ////@end includes
 
 /*!
@@ -50,22 +50,17 @@ class QD3DPrefsPane;
 #define SYMBOL_SETPREFERENCE_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_SETPREFERENCE_TITLE _("Preferences...")
 #define SYMBOL_SETPREFERENCE_IDNAME ID_MY_PRE_DIALOG
-#define SYMBOL_SETPREFERENCE_SIZE wxSize(40, 30)
+#define SYMBOL_SETPREFERENCE_SIZE wxSize(400, 300)
 #define SYMBOL_SETPREFERENCE_POSITION wxDefaultPosition
 #define MARGIN 4
 
-#define ID_LISTBOOK 20000
 #define ID_NOTEBOOK 20001
 #define myID_SETFONT 30000
+#define ID_FACTORY_DEFAULT 30001
+#define ID_USER_DEFAULT 30002
+#define ID_REVERT 30003
+#define ID_APPLY 30004
 ////@end control identifiers
-
-/*!
- * Compatibility
- */
-
-#ifndef wxCLOSE_BOX
-#define wxCLOSE_BOX 0x1000
-#endif
 
 /*!
  * SetPreference class declaration
@@ -73,7 +68,7 @@ class QD3DPrefsPane;
 
 class setPreference : public wxDialog
 {    
-    DECLARE_DYNAMIC_CLASS( setPreference )
+  DECLARE_DYNAMIC_CLASS( setPreference )
 
 public:
     /// Constructors
@@ -82,12 +77,9 @@ public:
     // Destructor
     ~setPreference();
 
-    bool Create( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style );
+    bool create( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style );
 
 ////@begin setPreference event handler declarations
-
-    //void OnAddPage(wxCommandEvent& event);
-    //we don't need adding pages for the moment
 
     void OnSetFont(wxCommandEvent& event);
 
@@ -96,7 +88,10 @@ public:
 
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
     void OnOK( wxCommandEvent& event );
-
+    void facDefaults( wxCommandEvent& WXUNUSED(event) );
+    void userDefaults( wxCommandEvent& WXUNUSED(event) );
+    void OnApply( wxCommandEvent& event );
+    void OnRevert( wxCommandEvent& event );
 ////@end setPreference event handler declarations
 
 ////@begin setPreference member function declarations
@@ -107,6 +102,9 @@ public:
     void RecreateBooks();
     wxBookCtrlBase *GetCurrentBook();
     void CreateInitialPages(wxBookCtrlBase *parent);
+    void saveCurrPrefs(int panelID);
+    void copyCurrPrefs(int panelID, WinPrefs* newPrefs);
+    void updatePanels(int panelID);
     //int GetIconIndex(wxBookCtrlBase* bookCtrl);
 ////@end SetPreference member function declarations
 
@@ -118,9 +116,17 @@ public:
     wxBoxSizer *m_sizer;
     wxImageList *m_imageList;
     wxBoxSizer *m_bottomSizer;
+    wxBoxSizer *m_midSizer;
+    wxBoxSizer *m_midLeftSizer;
+    wxBoxSizer *m_midRightSizer;
+
     wxButton* m_buttOK;
+    wxButton* m_buttApply;
     wxButton* m_buttCancel;
     wxButton* m_buttFont;
+    wxButton* m_buttFacDef;
+    wxButton* m_buttUserDef;
+    wxButton* m_buttRevert;
 
     AtomPrefsPane *atomPanel;
     BondPrefsPane *bondPanel;

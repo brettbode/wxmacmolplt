@@ -187,6 +187,7 @@ class WinPrefs {
         void ReadDefaultPrefs(void);
         void ReadUserPrefs_old(void);
         bool ReadUserPrefs(void);
+	void resetAllDefaults(void);
         void ReadAtomDefaults(void);
         void ReadBondDefaults(void);
         void ReadDisplayDefaults(void);
@@ -235,7 +236,7 @@ class WinPrefs {
         inline void AllowHydrogenBonds(Boolean newVal) {BitOptions = (BitOptions & 0xFFFFFEFF) + (newVal?256:0);};
         inline Boolean DetermineBondOrder(void) const {return ((BitOptions & (1<<9))?true:false); };
         inline void DetermineBondOrder(Boolean newVal) {BitOptions = (BitOptions & 0xFFFFFDFF) + (newVal?(1<<9):0);};
-        inline Boolean Default3DOn(void) const {return ((BitOptions & (1<<10))?true:false); };
+        inline Boolean Default3DOn(void) const { return ((BitOptions & (1<<10))?true:false); };
         inline void Default3DOn(Boolean newVal) {BitOptions = (BitOptions & 0xFFFFFBFF) + (newVal?(1<<10):0);};
 		inline bool GetCenterOnPage(void) const {return CenterOnPage;};
 		inline void SetCenterOnPage(bool v) {CenterOnPage = v;};
@@ -334,6 +335,7 @@ class WinPrefs {
         inline Boolean SetRotateMode(Boolean state) {return RotateMode = state;};
         inline Boolean GetAnimateMode(void) const {return AnimateMode;};
         inline Boolean SetAnimateMode(Boolean state) {return AnimateMode=state;};
+	inline long GetBitOpt() { return  BitOptions; } //for debugging
 };
 
 // New preferences classes below here..

@@ -39,6 +39,8 @@
 #include <wx/printdlg.h>
 
 extern WinPrefs * gPreferences;
+extern long  gNumDocuments;
+extern MolDisplayWin *	gWindow[kMaxOpenDocuments];
 
 using namespace std;
 
@@ -197,10 +199,18 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     coordsWindow = NULL;
     energyPlotWindow = NULL;
     frequenciesWindow = NULL;
-	surfacesWindow = NULL;
+    surfacesWindow = NULL;
     
     pageSetupData = NULL;
     printData = NULL;
+
+    int i;
+    for (i = 0; (gWindow[i]!=NULL)&&(i<kMaxOpenDocuments); i++) ;
+    if (i>=kMaxOpenDocuments) return;
+    gWindow[i] = this;
+    gNumDocuments++;
+    mGlobalID = i;
+/* Increment the open document count */
 
     InitGLData();
     
@@ -248,6 +258,9 @@ MolDisplayWin::~MolDisplayWin() {
     if (Prefs != NULL) {
         delete Prefs;
     }
+
+    gWindow[mGlobalID] = NULL;
+    gNumDocuments--;
 }
 
 void MolDisplayWin::getCanvasSize(long *width, long *height) {
@@ -2010,4 +2023,11 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
         /* Draw once again to get rid of the rotation sphere */
         glCanvas->draw();
     }
+}
+
+void MolDisplayWin::ChangePrefs(WinPrefs * newPrefs) 
+{
+	SetWindowPreferences(newPrefs);
+	ResetAllWindows();
+	//if (PrefsDlog) PrefsDlog->PrefsChanged();
 }

@@ -76,6 +76,8 @@ class MolDisplayWin : public wxFrame {
         long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
                               long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
 
+	int mGlobalID;
+
         DECLARE_EVENT_TABLE()
 
     public:
@@ -219,6 +221,8 @@ class MolDisplayWin : public wxFrame {
         void UpdateModelDisplay(void);
         MoleculeData * GetData(void) const {return MainData;};
         WinPrefs * GetPrefs(void) const {return Prefs;};
+	void SetWindowPreferences(WinPrefs * NewPrefs) {if (Prefs) *Prefs=*NewPrefs; }
+	void ChangePrefs(WinPrefs * newPrefs);
         void ResetView(void);
         void ResetModel(bool Center);
         void ResetAllWindows(void);
