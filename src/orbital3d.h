@@ -41,9 +41,6 @@
 #define SYMBOL_ORBITAL3D_IDNAME ID_MYDIALOG4
 #define SYMBOL_ORBITAL3D_SIZE wxSize(400, 300)
 #define SYMBOL_ORBITAL3D_POSITION wxDefaultPosition
-#define ID_TEXTCTRL5 10071
-#define ID_CHECKBOX3 10072
-#define ID_CHECKBOX4 10073
 #define ID_CHOICE1 10074
 #define ID_CHECKBOX5 10075
 #define ID_GRIDSIZESLIDER1 10076
@@ -86,15 +83,6 @@ public:
 
 ////@begin Orbital3D event handler declarations
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TEXTCTRL5
-    void OnTextctrl5Updated( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX3
-    void OnCheckbox3Click( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX4
-    void OnCheckbox4Click( wxCommandEvent& event );
-
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CHOICE1
     void OnChoice1Selected( wxCommandEvent& event );
 
@@ -116,9 +104,6 @@ public:
     static bool ShowToolTips();
 
 ////@begin Orbital3D member variables
-    wxTextCtrl* titleEdit;
-    wxCheckBox* visCheck;
-    wxCheckBox* allFrameCheck;
     wxChoice* orbSetChoice;
     wxCheckBox* rPhaseCheck;
     wxSlider* gridSizeSlider;
