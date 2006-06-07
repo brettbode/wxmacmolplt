@@ -53,7 +53,7 @@ BEGIN_EVENT_TABLE( SurfacesWindow, wxFrame )
 ////@begin SurfacesWindow event table entries
     EVT_BUTTON( wxID_DELETE, SurfacesWindow::OnDeleteClick )
 
-    EVT_BUTTON( wxID_ADD, SurfacesWindow::OnAddClick )
+    EVT_CHOICE( ID_ADDSURFCHOICE, SurfacesWindow::OnAddsurfchoiceSelected )
 
 ////@end SurfacesWindow event table entries
 
@@ -79,7 +79,11 @@ SurfacesWindow::SurfacesWindow( MolDisplayWin* parent, wxWindowID id, const wxSt
 bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin SurfacesWindow member initialisation
+    surfTitleEdit = NULL;
+    visibleCheck = NULL;
+    allFrameCheck = NULL;
     listBook = NULL;
+    surfAddChoice = NULL;
 ////@end SurfacesWindow member initialisation
 	Parent = parent;
 
@@ -111,22 +115,47 @@ void SurfacesWindow::CreateControls()
     wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxVERTICAL);
     itemFrame1->SetSizer(itemBoxSizer5);
 
+    wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer5->Add(itemBoxSizer6, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    surfTitleEdit = new wxTextCtrl( itemFrame1, ID_SURFTITLE, _T(""), wxDefaultPosition, wxSize(250, -1), 0 );
+    itemBoxSizer6->Add(surfTitleEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    visibleCheck = new wxCheckBox( itemFrame1, ID_VISIBLECHECK, _("Visible"), wxDefaultPosition, wxDefaultSize, 0 );
+    visibleCheck->SetValue(false);
+    itemBoxSizer6->Add(visibleCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    allFrameCheck = new wxCheckBox( itemFrame1, ID_ALLFRAMECHECK, _("All Frames"), wxDefaultPosition, wxDefaultSize, 0 );
+    allFrameCheck->SetValue(false);
+    itemBoxSizer6->Add(allFrameCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
     listBook = new wxListbook( itemFrame1, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxLB_BOTTOM|wxSUNKEN_BORDER );
 
     itemBoxSizer5->Add(listBook, 4, wxGROW|wxALL, 2);
 
-    wxBoxSizer* itemBoxSizer7 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer5->Add(itemBoxSizer7, 0, wxALIGN_RIGHT|wxALL, 5);
+    wxBoxSizer* itemBoxSizer11 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer5->Add(itemBoxSizer11, 0, wxALIGN_RIGHT|wxALL, 5);
 
-    wxButton* itemButton8 = new wxButton( itemFrame1, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxButton* itemButton12 = new wxButton( itemFrame1, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
-        itemButton8->SetToolTip(_("Delete the selected surface"));
-    itemBoxSizer7->Add(itemButton8, 0, wxALIGN_BOTTOM|wxALL, 5);
+        itemButton12->SetToolTip(_("Delete the selected surface"));
+    itemBoxSizer11->Add(itemButton12, 0, wxALIGN_BOTTOM|wxALL, 5);
 
-    wxButton* itemButton9 = new wxButton( itemFrame1, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
-    if (ShowToolTips())
-        itemButton9->SetToolTip(_("Add a new surface"));
-    itemBoxSizer7->Add(itemButton9, 0, wxALIGN_BOTTOM|wxALL, 5);
+    wxStaticText* itemStaticText13 = new wxStaticText( itemFrame1, wxID_STATIC, _("Add a surface of type:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer11->Add(itemStaticText13, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    wxString surfAddChoiceStrings[] = {
+        _("2D Orbital"),
+        _("3D Orbital"),
+        _("2D Total Electron Density"),
+        _("3D Total Electron Density"),
+        _("2D Molecular Electrostatic Potential"),
+        _("3D Molecular Electrostatic Potential"),
+        _("General 2D from File"),
+        _("General 3D from File")
+    };
+    surfAddChoice = new wxChoice( itemFrame1, ID_ADDSURFCHOICE, wxDefaultPosition, wxDefaultSize, 8, surfAddChoiceStrings, 0 );
+    itemBoxSizer11->Add(surfAddChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 ////@end SurfacesWindow content construction
 	wxListView * t = listBook->GetListView();
@@ -184,15 +213,15 @@ void SurfacesWindow::OnDeleteClick( wxCommandEvent& event )
 }
 
 /*!
- * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ADDSURFCHOICE
  */
 
-void SurfacesWindow::OnAddClick( wxCommandEvent& event )
+void SurfacesWindow::OnAddsurfchoiceSelected( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD in SurfacesWindow.
+////@begin wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ADDSURFCHOICE in SurfacesWindow.
     // Before editing this code, remove the block markers.
     event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD in SurfacesWindow. 
+////@end wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ADDSURFCHOICE in SurfacesWindow. 
 }
 
 

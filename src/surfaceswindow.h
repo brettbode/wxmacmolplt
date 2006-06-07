@@ -44,7 +44,11 @@ class wxListbook;
 #define SYMBOL_SURFACESWINDOW_IDNAME ID_FRAME
 #define SYMBOL_SURFACESWINDOW_SIZE wxSize(500, 400)
 #define SYMBOL_SURFACESWINDOW_POSITION wxDefaultPosition
+#define ID_SURFTITLE 10086
+#define ID_VISIBLECHECK 10087
+#define ID_ALLFRAMECHECK 10088
 #define ID_SURFLISTBOOK 10069
+#define ID_ADDSURFCHOICE 10089
 ////@end control identifiers
 
 /*!
@@ -79,8 +83,8 @@ public:
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE
     void OnDeleteClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
-    void OnAddClick( wxCommandEvent& event );
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ADDSURFCHOICE
+    void OnAddsurfchoiceSelected( wxCommandEvent& event );
 
 ////@end SurfacesWindow event handler declarations
 
@@ -100,7 +104,11 @@ public:
     static bool ShowToolTips();
 
 ////@begin SurfacesWindow member variables
+    wxTextCtrl* surfTitleEdit;
+    wxCheckBox* visibleCheck;
+    wxCheckBox* allFrameCheck;
     wxListbook* listBook;
+    wxChoice* surfAddChoice;
     MolDisplayWin * Parent;
 ////@end SurfacesWindow member variables
 };
