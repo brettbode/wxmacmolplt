@@ -160,9 +160,9 @@ void SurfacesWindow::CreateControls()
 ////@end SurfacesWindow content construction
 	wxListView * t = listBook->GetListView();
 	t->SetWindowStyle(wxLC_LIST);
-	Orbital3D * temp = new Orbital3D(this);
+	Orbital3D * temp = new Orbital3D(listBook);
 	listBook->AddPage(temp, wxT("test orb"), false);
-	temp = new Orbital3D(this);
+	temp = new Orbital3D(listBook);
 	listBook->AddPage(temp, wxT("test pane 2"), false);
 }
 
