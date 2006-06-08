@@ -219,7 +219,7 @@ void setPreference::OnOK( wxCommandEvent& event )
     }
   else
     {
-      //mParent->SetWindowPreferences(mPrefs);
+      mParent->SetWindowPreferences(mPrefs);
       mParent->ResetAllWindows();
     }
 

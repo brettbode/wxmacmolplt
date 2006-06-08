@@ -1320,8 +1320,8 @@ void MolDisplayWin::menuPreferences(wxCommandEvent &event)
 		MessageAlert("This shouldn't happen!");
 
     setPreference * pre_dlg = new setPreference(this, isGlobal);
-    pre_dlg->ShowModal();
-    pre_dlg->Destroy();
+    pre_dlg->Show();
+    //pre_dlg->Destroy();
     Dirty = true;
 }
 
