@@ -166,6 +166,10 @@ void SurfacesWindow::CreateControls()
 	listBook->AddPage(temp, wxT("test pane 2"), false);
 }
 
+void SurfacesWindow::Reset(void) {
+	//rebuild the list of surfaces
+}
+
 /*!
  * Should we show tooltips?
  */

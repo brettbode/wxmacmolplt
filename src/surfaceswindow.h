@@ -102,6 +102,8 @@ public:
 
     /// Should we show tooltips?
     static bool ShowToolTips();
+	
+	void Reset(void);	//Call to rebuild the dialog
 
 ////@begin SurfacesWindow member variables
     wxTextCtrl* surfTitleEdit;
@@ -111,6 +113,33 @@ public:
     wxChoice* surfAddChoice;
     MolDisplayWin * Parent;
 ////@end SurfacesWindow member variables
+};
+
+class SurfacePane : public wxPanel {
+public:
+	SurfacePane(wxWindow * parent, MolDisplayWin * owner, Surface * target);
+protected:
+	wxBoxSizer *	mMainSizer;
+};
+
+class TEDPane : public SurfacePane {
+public:
+	TEDPane(wxWindow * parent, MolDisplayWin * owner, Surface * target);
+protected:
+	wxBoxSizer *	mOrbSetSizer;
+	wxChoice *		orbSetChoice;
+};
+
+class TEDensity2DPane : public TEDPane {
+public:
+	TEDensity2DPane(wxWindow * parent, MolDisplayWin * owner, TEDensity2DSurface * target);
+private:
+};
+
+class TEDensity3DPane : public TEDPane {
+public:
+	TEDensity3DPane(wxWindow * parent, MolDisplayWin * owner, TEDensity3DSurface * target);
+private:
 };
 
 #endif

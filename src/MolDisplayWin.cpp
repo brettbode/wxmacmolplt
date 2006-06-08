@@ -1330,9 +1330,6 @@ void MolDisplayWin::menuMoleculeSetFrameEnergy(wxCommandEvent &event) {
     dlg->ShowModal();
     dlg->Destroy();
     UpdateFrameText();
-#ifndef WIN32
-#warning Need to reset the energy plot here if open as the energy data may have changed
-#endif
     if(energyPlotWindow != NULL) {
         energyPlotWindow->RegenData();
     }
@@ -1520,10 +1517,7 @@ void MolDisplayWin::CloseSurfacesWindow(void) {
 
 void MolDisplayWin::AtomsChanged(void) {
     if (bondsWindow) bondsWindow->ResetList();
-#ifndef WIN32
-#warning Update surface window here
-#endif
-//  if (SurfaceDlog) SurfaceDlog->Reset();
+	if (surfacesWindow) surfacesWindow->Reset();
     FrameChanged();
 }
 void MolDisplayWin::BondsChanged(void) {
@@ -1555,14 +1549,11 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
         MainData->ResetRotation();
         FrameChanged();
 
-#ifndef WIN32
-#warning Update windows here when they are added
-#endif
         if (coordsWindow) coordsWindow->FrameChanged();
         if (bondsWindow) bondsWindow->ResetList();
         if (energyPlotWindow) energyPlotWindow->FrameChanged();
         if (frequenciesWindow) frequenciesWindow->FrameChanged();
-    //  if (SurfaceDlog) SurfaceDlog->Reset();
+		if (surfacesWindow) surfacesWindow->Reset();
         frameScrollBar->SetThumbPosition(MainData->CurrentFrame-1);
     }
 }
