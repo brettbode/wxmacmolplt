@@ -104,6 +104,7 @@ public:
     static bool ShowToolTips();
 	
 	void Reset(void);	//Call to rebuild the dialog
+	void BuildAddChoice(void);
 
 ////@begin SurfacesWindow member variables
     wxTextCtrl* surfTitleEdit;

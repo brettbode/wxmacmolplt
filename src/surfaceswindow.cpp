@@ -168,6 +168,18 @@ void SurfacesWindow::CreateControls()
 
 void SurfacesWindow::Reset(void) {
 	//rebuild the list of surfaces
+	int oldpage = listBook->GetSelection();
+	listBook->DeleteAllPages();
+	
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+}
+
+void SurfacesWindow::BuildAddChoice(void) {
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	
+	surfAddChoice->Clear();
 }
 
 /*!
@@ -210,10 +222,12 @@ wxIcon SurfacesWindow::GetIconResource( const wxString& name )
 
 void SurfacesWindow::OnDeleteClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE in SurfacesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE in SurfacesWindow. 
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+
+	int targetSurf = listBook->GetSelection();
+	lFrame->DeleteSurface(targetSurf);
+	listBook->DeletePage(targetSurf);
 }
 
 /*!
