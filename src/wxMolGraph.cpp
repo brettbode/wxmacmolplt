@@ -97,9 +97,11 @@ int wxMolGraph::addYSet(YSet yData,
 
     if(axis == MG_AXIS_Y1) {
         numY1Graphs++;
+        numY1Visible++;
     }
     else if(axis == MG_AXIS_Y2) {
         numY2Graphs++;
+        numY2Visible++;
     }
     else {
         data[xSet].second.pop_back();
@@ -123,9 +125,11 @@ void wxMolGraph::delXSet(int xSet) {
             switch(pos->axis) {
                 case MG_AXIS_Y1:
                     numY1Graphs--;
+                    if(pos->visible) numY1Visible--;
                     break;
                 case MG_AXIS_Y2:
                     numY2Graphs--;
+                    if(pos->visible) numY2Visible--;
                     break;
             }
         }
@@ -301,7 +305,19 @@ void wxMolGraph::setOffsetY(int axis, double offset) {
 }
 
 void wxMolGraph::setVisible(int xSet, int ySet, bool visible) {
-    dataSettings[xSet][ySet].visible = visible;
+    if(dataSettings[xSet][ySet].visible != visible) {
+        switch(dataSettings[xSet][ySet].axis) {
+            case MG_AXIS_Y1:
+                if(visible) numY1Visible++;
+                else numY1Visible--;
+                break;
+            case MG_AXIS_Y2:
+                if(visible) numY2Visible++;
+                else numY2Visible--;
+                break;
+        }
+        dataSettings[xSet][ySet].visible = visible;
+    }
 }
 
 void wxMolGraph::reset() {
@@ -317,7 +333,9 @@ void wxMolGraph::reset() {
     y2Max = 1.0;
     y2Min = 0.0;
     numY1Graphs = 0;
+    numY1Visible = 0;
     numY2Graphs = 0;
+    numY2Visible = 0;
     precision = 4;
     xAxisRegion.Clear();
     y1AxisRegion.Clear();
@@ -407,7 +425,7 @@ wxSize wxMolGraph::DoGetBestSize() const {
     x.SetHeight(wxMax(xMinTextSize.GetWidth(), xMaxTextSize.GetWidth()) +
                 xAxisTextSize.GetHeight());
 
-    if(numY1Graphs > 0 || numY2Graphs == 0) {
+    if(numY1Visible > 0 || numY2Visible == 0) {
         y1.SetWidth(wxMax(y1MinTextSize.GetWidth(), y1MaxTextSize.GetWidth()) +
                     y1AxisTextSize.GetHeight());
         y1.SetHeight(y1MinTextSize.GetHeight() +
@@ -418,7 +436,7 @@ wxSize wxMolGraph::DoGetBestSize() const {
         y1.Set(0, 0);
     }
 
-    if(numY2Graphs > 0) {
+    if(numY2Visible > 0) {
         y2.SetWidth(wxMax(y2MinTextSize.GetWidth(), y2MaxTextSize.GetWidth()) +
                     y2AxisTextSize.GetHeight());
         y2.SetHeight(y2MinTextSize.GetHeight() +
@@ -436,7 +454,7 @@ wxSize wxMolGraph::DoGetBestSize() const {
     h = (2 * BORDER) +
         wxMax(wxMax(y1.GetHeight(), y2.GetHeight()), 200) +
         x.GetHeight();
-
+    
     return wxSize( w, h );
 }
 
@@ -530,7 +548,7 @@ void wxMolGraph::draw(wxDC &dc) {
          (xAxisTextSize.GetHeight() + BORDER +
           wxMax(xMaxTextSize.GetWidth(), xMinTextSize.GetWidth()));
     y3 = canvasSize.GetHeight() - BORDER;
-    if(numY1Graphs > 0 || numY2Graphs == 0) {
+    if(numY1Visible > 0 || numY2Visible == 0) {
         x2 = y1AxisTextSize.GetHeight() + BORDER +
              wxMax(y1MaxTextSize.GetWidth(), y1MinTextSize.GetWidth());
         y1AxisRegion = wxRegion(BORDER, BORDER, x2, y2);
@@ -540,7 +558,7 @@ void wxMolGraph::draw(wxDC &dc) {
         y1AxisRegion.Clear();
     }
     x4 = canvasSize.GetWidth() - BORDER;
-    if(numY2Graphs > 0) {
+    if(numY2Visible > 0) {
         x3 = canvasSize.GetWidth() -
              (y2AxisTextSize.GetHeight() + BORDER +
               wxMax(y2MaxTextSize.GetWidth(), y2MinTextSize.GetWidth()));
@@ -589,7 +607,7 @@ void wxMolGraph::draw(wxDC &dc) {
     }
 
     // Y1 Axis
-    if(numY1Graphs > 0 || numY2Graphs == 0) {
+    if(numY1Visible > 0 || numY2Visible == 0) {
         x = BORDER;
         y = BORDER + ((y2 - BORDER) / 2) + (y1AxisTextSize.GetWidth() / 2);
         if(!y1AxisText.IsEmpty()) dc.DrawRotatedText(y1AxisText, x, y, 90.0);
@@ -629,7 +647,7 @@ void wxMolGraph::draw(wxDC &dc) {
     }
 
     // Y2 Axis
-    if(numY2Graphs > 0) {
+    if(numY2Visible > 0) {
         x = x4 - y2AxisTextSize.GetHeight();
         y = BORDER + ((y2 - BORDER) / 2) + (y2AxisTextSize.GetWidth() / 2);
         if(!y2AxisText.IsEmpty()) dc.DrawRotatedText(y2AxisText, x, y, 90.0);

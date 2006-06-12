@@ -65,6 +65,8 @@ class wxMolGraph : public wxControl {
 
     int numY1Graphs;
     int numY2Graphs;
+    int numY1Visible;
+    int numY2Visible;
 
     wxRegion xAxisRegion;
     wxRegion y1AxisRegion;
@@ -87,8 +89,6 @@ class wxMolGraph : public wxControl {
 
     double y1Offset;
     double y2Offset;
-
-    /* TODO */
 
     DECLARE_DYNAMIC_CLASS(wxMolGraph) /* NOTE:  Everything after this will be
                                        * public!

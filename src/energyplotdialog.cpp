@@ -176,8 +176,8 @@ void EnergyPlotDialog::RegenData(void) {
     vector< pair< int, double > > potentialEnergyData;
     vector< pair< int, double > > mp2EnergyData;
     vector< pair< int, double > > kineticEnergyData;
-    //vector< pair< int, double > > rmsGradData;
-    //vector< pair< int, double > > maxGradData;
+    vector< pair< int, double > > rmsGradData;
+    vector< pair< int, double > > maxGradData;
     //vector< pair< int, double > > bondLenData;
     //vector< pair< int, double > > bondAngleData;
     Frame *currFrame = NULL;
@@ -197,8 +197,8 @@ void EnergyPlotDialog::RegenData(void) {
         potentialEnergyData.push_back(make_pair(i, currFrame->Energy - currFrame->KE));
         mp2EnergyData.push_back(make_pair(i, currFrame->MP2Energy));
         kineticEnergyData.push_back(make_pair(i, currFrame->KE));
-        //rmsGradData.push_back(make_pair(i, (double)(currFrame->Gradient->GetRMS())));
-        //maxGradData.push_back(make_pair(i, (double)(currFrame->Gradient->GetMaximum())));
+        if(currFrame->Gradient != NULL) rmsGradData.push_back(make_pair(i, (double)(currFrame->Gradient->GetRMS())));
+        if(currFrame->Gradient != NULL) maxGradData.push_back(make_pair(i, (double)(currFrame->Gradient->GetMaximum())));
         //bondLenData.push_back(make_pair(i, ));
         //bondAngleData.push_back(make_pair(i, ));
     }
@@ -208,8 +208,8 @@ void EnergyPlotDialog::RegenData(void) {
     epGraph->addYSet(potentialEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetPEColor())), MG_SHAPE_CIRCLE, size);
     epGraph->addYSet(mp2EnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetMPColor())), MG_SHAPE_CIRCLE, size);
     epGraph->addYSet(kineticEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
-    //epGraph->addYSet(rmsGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(/* TODO */)), MG_SHAPE_CIRCLE, size);
-    //epGraph->addYSet(maxGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(/* TODO */)), MG_SHAPE_CIRCLE, size);
+    epGraph->addYSet(rmsGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
+    epGraph->addYSet(maxGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
     if(!eOpts->PlotEnergy()) {
         epGraph->setVisible(0, 0, false);
     }
@@ -222,13 +222,13 @@ void EnergyPlotDialog::RegenData(void) {
     if(!eOpts->PlotKEnergy()) {
         epGraph->setVisible(0, 3, false);
     }
-    /*
     if(!gOpts->PlotRMSGradient()) {
         epGraph->setVisible(0, 4, false);
     }
     if(!gOpts->PlotMaxGradient()) {
         epGraph->setVisible(0, 5, false);
     }
+    /*
     if(!gOpts->PlotBondLength()) {
         epGraph->setVisible(0, 6, false);
     }
