@@ -30,6 +30,7 @@ typedef class CoordinatesWindow CoordinatesWindow;
 typedef class EnergyPlotDialog EnergyPlotDialog;
 typedef class FrequenciesDialog FrequenciesDialog;
 typedef class SurfacesWindow SurfacesWindow;
+typedef class InputBuilderWindow InputBuilderWindow;
 typedef class ModeAnimation ModeAnimation;
 /**
  * Subclasses wxFrame to define the main application window.  This is a
@@ -68,6 +69,7 @@ class MolDisplayWin : public wxFrame {
         EnergyPlotDialog	*energyPlotWindow;
 		FrequenciesDialog	*frequenciesWindow;
 		SurfacesWindow		*surfacesWindow;
+        InputBuilderWindow  *inputBuilderWindow;
         
         wxPageSetupDialogData *pageSetupData;
         wxPrintData           *printData;
@@ -185,7 +187,7 @@ class MolDisplayWin : public wxFrame {
         void menuWindowCoordinates(wxCommandEvent &event);
         void menuWindowEnergy_plot(wxCommandEvent &event);
         void menuWindowFrequencies(wxCommandEvent &event);
-        //void menuWindowInput_builder(wxCommandEvent &event);
+        void menuWindowInput_builder(wxCommandEvent &event);
         void menuWindowSurfaces(wxCommandEvent &event);
         //void menuWindowPreferences(wxCommandEvent &event);
         void KeyHandler(wxKeyEvent &event);
@@ -194,6 +196,7 @@ class MolDisplayWin : public wxFrame {
         void CloseEnergy_plotWindow(void);
         void CloseFrequenciesWindow(void);
         void CloseSurfacesWindow(void);
+        void CloseInputBuilderWindow(void);
         
         //File handling routines
         long OpenFile(wxString fileName, float offset=0.0, bool flip=false, bool append=false);

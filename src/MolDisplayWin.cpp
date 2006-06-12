@@ -28,6 +28,7 @@
 #include "appendframesoptions.h"
 #include "exportoptionsdialog.h"
 #include "frequenciesdialog.h"
+#include "inputbuilder.h"
 #include "surfaceswindow.h"
 #include "choosevecgroup.h"
 #include "coordinateoffset.h"
@@ -40,7 +41,7 @@
 
 extern WinPrefs * gPreferences;
 extern long  gNumDocuments;
-extern MolDisplayWin *	gWindow[kMaxOpenDocuments];
+extern MolDisplayWin *  gWindow[kMaxOpenDocuments];
 
 using namespace std;
 
@@ -81,7 +82,8 @@ enum MMP_EventID {
     MMP_COORDSWINDOW,
     MMP_ENERGYPLOTWINDOW,
     MMP_FREQUENCIESWINDOW,
-	MMP_SURFACESWINDOW,
+    MMP_INPUTBUILDERWINDOW,
+    MMP_SURFACESWINDOW,
     MMP_STATUSBAR,
     MMP_FRAMESCROLLBAR,
     MMP_EXPORT,
@@ -123,8 +125,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
     EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
     EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
-	EVT_MENU (wxID_PREFERENCES,  MolDisplayWin::menuPreferences)
-	EVT_MENU (ID_LOCAL_PREFERENCES,   MolDisplayWin::menuPreferences)
+    EVT_MENU (wxID_PREFERENCES,  MolDisplayWin::menuPreferences)
+    EVT_MENU (ID_LOCAL_PREFERENCES,   MolDisplayWin::menuPreferences)
     EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
     EVT_MENU (MMP_ANIMATEMODE,      MolDisplayWin::menuViewAnimateMode)
     EVT_MENU (MMP_OFFSETMODE,       MolDisplayWin::menuViewOffsetAlongMode)
@@ -151,11 +153,12 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_CONVERTTOANGSTROMS, MolDisplayWin::menuMoleculeConvertToAngstroms)
     EVT_MENU (MMP_INVERTNORMALMODE,   MolDisplayWin::menuMoleculeInvertNormalMode)
 
-    EVT_MENU (MMP_BONDSWINDOW,       MolDisplayWin::menuWindowBonds)
-    EVT_MENU (MMP_COORDSWINDOW,      MolDisplayWin::menuWindowCoordinates)
-    EVT_MENU (MMP_ENERGYPLOTWINDOW,  MolDisplayWin::menuWindowEnergy_plot)
-    EVT_MENU (MMP_FREQUENCIESWINDOW, MolDisplayWin::menuWindowFrequencies)
-	EVT_MENU (MMP_SURFACESWINDOW,	MolDisplayWin::menuWindowSurfaces)
+    EVT_MENU (MMP_BONDSWINDOW,        MolDisplayWin::menuWindowBonds)
+    EVT_MENU (MMP_COORDSWINDOW,       MolDisplayWin::menuWindowCoordinates)
+    EVT_MENU (MMP_ENERGYPLOTWINDOW,   MolDisplayWin::menuWindowEnergy_plot)
+    EVT_MENU (MMP_FREQUENCIESWINDOW,  MolDisplayWin::menuWindowFrequencies)
+    EVT_MENU (MMP_INPUTBUILDERWINDOW, MolDisplayWin::menuWindowInput_builder)
+    EVT_MENU (MMP_SURFACESWINDOW,     MolDisplayWin::menuWindowSurfaces)
 
     EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
     EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
@@ -200,6 +203,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     energyPlotWindow = NULL;
     frequenciesWindow = NULL;
     surfacesWindow = NULL;
+    inputBuilderWindow = NULL;
     
     pageSetupData = NULL;
     printData = NULL;
@@ -397,9 +401,10 @@ void MolDisplayWin::createMenuBar(void) {
     menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"));
     menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"));
     menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"));
+    menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"));
     menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"));
-    menuWindow->Append(ID_LOCAL_PREFERENCES, wxT("Pr&eferences ..."));
-    menuHelp->Append(wxID_ABOUT, wxT("&About ..."));
+    menuWindow->Append(ID_LOCAL_PREFERENCES, wxT("Pr&eferences"));
+    menuHelp->Append(wxID_ABOUT, wxT("&About"));
 
     menuBar->Append(menuFile, wxT("&File"));
     menuBar->Append(menuEdit, wxT("&Edit"));
@@ -1313,11 +1318,11 @@ void MolDisplayWin::menuPreferences(wxCommandEvent &event)
         int id = event.GetId();
 
     if ( id == wxID_PREFERENCES )
-		isGlobal = true;
+        isGlobal = true;
     else if ( id == ID_LOCAL_PREFERENCES )
-		isGlobal = false;
+        isGlobal = false;
     else
-		MessageAlert("This shouldn't happen!");
+        MessageAlert("This shouldn't happen!");
 
     setPreference * pre_dlg = new setPreference(this, isGlobal);
     pre_dlg->Show();
@@ -1499,6 +1504,21 @@ void MolDisplayWin::CloseFrequenciesWindow(void) {
         frequenciesWindow = NULL;
     }
 }
+void MolDisplayWin::menuWindowInput_builder(wxCommandEvent &event) {
+    if(inputBuilderWindow) {
+        inputBuilderWindow->Raise();
+    }
+    else {
+        inputBuilderWindow = new InputBuilderWindow(this);
+        inputBuilderWindow->Show();
+    }
+}
+void MolDisplayWin::CloseInputBuilderWindow(void) {
+    if(inputBuilderWindow) {
+        inputBuilderWindow->Destroy();
+        inputBuilderWindow = NULL;
+    }
+}
 void MolDisplayWin::menuWindowSurfaces(wxCommandEvent &event) {
     if(surfacesWindow) { // need to bring it to the front...
         surfacesWindow->Raise();
@@ -1517,7 +1537,7 @@ void MolDisplayWin::CloseSurfacesWindow(void) {
 
 void MolDisplayWin::AtomsChanged(void) {
     if (bondsWindow) bondsWindow->ResetList();
-	if (surfacesWindow) surfacesWindow->Reset();
+    if (surfacesWindow) surfacesWindow->Reset();
     FrameChanged();
 }
 void MolDisplayWin::BondsChanged(void) {
@@ -1553,7 +1573,7 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
         if (bondsWindow) bondsWindow->ResetList();
         if (energyPlotWindow) energyPlotWindow->FrameChanged();
         if (frequenciesWindow) frequenciesWindow->FrameChanged();
-		if (surfacesWindow) surfacesWindow->Reset();
+        if (surfacesWindow) surfacesWindow->Reset();
         frameScrollBar->SetThumbPosition(MainData->CurrentFrame-1);
     }
 }
@@ -2018,7 +2038,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 
 void MolDisplayWin::ChangePrefs(WinPrefs * newPrefs) 
 {
-	SetWindowPreferences(newPrefs);
-	ResetAllWindows();
-	//if (PrefsDlog) PrefsDlog->PrefsChanged();
+    SetWindowPreferences(newPrefs);
+    ResetAllWindows();
+    //if (PrefsDlog) PrefsDlog->PrefsChanged();
 }

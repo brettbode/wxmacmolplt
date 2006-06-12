@@ -23,41 +23,47 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
+#include <wx/listctrl.h>
+#include <wx/listbook.h>
 
 ////@begin includes
 ////@end includes
 
+#include "Globals.h"
+#include "MolDisplayWin.h"
 #include "inputbuilder.h"
 
 ////@begin XPM images
 ////@end XPM images
 
 /*!
- * InputBuilder type definition
+ * InputBuilderWindow type definition
  */
 
-IMPLEMENT_CLASS( InputBuilder, wxFrame )
+IMPLEMENT_CLASS( InputBuilderWindow, wxFrame )
 
 /*!
- * InputBuilder event table definition
+ * InputBuilderWindow event table definition
  */
 
-BEGIN_EVENT_TABLE( InputBuilder, wxFrame )
+BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 
-////@begin InputBuilder event table entries
-////@end InputBuilder event table entries
+////@begin InputBuilderWindow event table entries
+    EVT_CLOSE( InputBuilderWindow::OnCloseWindow )
+
+////@end InputBuilderWindow event table entries
 
 END_EVENT_TABLE()
 
 /*!
- * InputBuilder constructors
+ * InputBuilderWindow constructors
  */
 
-InputBuilder::InputBuilder( )
+InputBuilderWindow::InputBuilderWindow( )
 {
 }
 
-InputBuilder::InputBuilder( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
+InputBuilderWindow::InputBuilderWindow( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
     Create( parent, id, caption, pos, size, style );
 }
@@ -66,20 +72,20 @@ InputBuilder::InputBuilder( wxWindow* parent, wxWindowID id, const wxString& cap
  * InputBuilder creator
  */
 
-bool InputBuilder::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
+bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
-////@begin InputBuilder member initialisation
+////@begin InputBuilderWindow member initialisation
     listBook = NULL;
-////@end InputBuilder member initialisation
+////@end InputBuilderWindow member initialisation
 
-////@begin InputBuilder creation
+////@begin InputBuilderWindow creation
     wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
     GetSizer()->Fit(this);
     GetSizer()->SetSizeHints(this);
     Centre();
-////@end InputBuilder creation
+////@end InputBuilderWindow creation
     return true;
 }
 
@@ -87,17 +93,17 @@ bool InputBuilder::Create( wxWindow* parent, wxWindowID id, const wxString& capt
  * Control creation for InputBuilder
  */
 
-void InputBuilder::CreateControls()
+void InputBuilderWindow::CreateControls()
 {    
-////@begin InputBuilder content construction
-    InputBuilder* itemFrame1 = this;
+////@begin InputBuilderWindow content construction
+    InputBuilderWindow* itemFrame1 = this;
 
     wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
     itemFrame1->SetSizer(itemBoxSizer2);
 
-    listBook = new wxListbook( itemFrame1, ID_NOTEBOOK, wxDefaultPosition, wxDefaultSize, wxNB_BOTTOM|wxSUNKEN_BORDER );
+    listBook = new wxListbook( itemFrame1, ID_IBNOTEBOOK, wxDefaultPosition, wxDefaultSize, wxNB_BOTTOM|wxSUNKEN_BORDER );
 
-    wxPanel* itemPanel4 = new wxPanel( listBook, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxPanel* itemPanel4 = new wxPanel( listBook, ID_IBBASISPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxVERTICAL);
     itemPanel4->SetSizer(itemBoxSizer5);
 
@@ -161,7 +167,7 @@ void InputBuilder::CreateControls()
 
     listBook->AddPage(itemPanel4, _("Basis"));
 
-    wxPanel* itemPanel24 = new wxPanel( listBook, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxPanel* itemPanel24 = new wxPanel( listBook, ID_IBCONTROLPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* itemBoxSizer25 = new wxBoxSizer(wxVERTICAL);
     itemPanel24->SetSizer(itemBoxSizer25);
 
@@ -259,7 +265,7 @@ void InputBuilder::CreateControls()
 
     listBook->AddPage(itemPanel24, _("Control"));
 
-    wxPanel* itemPanel56 = new wxPanel( listBook, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxPanel* itemPanel56 = new wxPanel( listBook, ID_IBDATAPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* itemBoxSizer57 = new wxBoxSizer(wxVERTICAL);
     itemPanel56->SetSizer(itemBoxSizer57);
 
@@ -318,7 +324,7 @@ void InputBuilder::CreateControls()
 
     listBook->AddPage(itemPanel56, _("Data"));
 
-    wxPanel* itemPanel75 = new wxPanel( listBook, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxPanel* itemPanel75 = new wxPanel( listBook, ID_IBSYSTEMPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* itemBoxSizer76 = new wxBoxSizer(wxVERTICAL);
     itemPanel75->SetSizer(itemBoxSizer76);
 
@@ -370,7 +376,7 @@ void InputBuilder::CreateControls()
 
     listBook->AddPage(itemPanel75, _("System"));
 
-    wxPanel* itemPanel90 = new wxPanel( listBook, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxPanel* itemPanel90 = new wxPanel( listBook, ID_IBMOGUESSPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* itemBoxSizer91 = new wxBoxSizer(wxVERTICAL);
     itemPanel90->SetSizer(itemBoxSizer91);
 
@@ -393,7 +399,7 @@ void InputBuilder::CreateControls()
 
     listBook->AddPage(itemPanel90, _("MO Guess"));
 
-    wxPanel* itemPanel97 = new wxPanel( listBook, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxPanel* itemPanel97 = new wxPanel( listBook, ID_IBMISCPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* itemBoxSizer98 = new wxBoxSizer(wxVERTICAL);
     itemPanel97->SetSizer(itemBoxSizer98);
 
@@ -429,7 +435,7 @@ void InputBuilder::CreateControls()
 
     listBook->AddPage(itemPanel97, _("Misc. Prefs"));
 
-    wxPanel* itemPanel105 = new wxPanel( listBook, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxPanel* itemPanel105 = new wxPanel( listBook, ID_IBSCBOPTSPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* itemBoxSizer106 = new wxBoxSizer(wxVERTICAL);
     itemPanel105->SetSizer(itemBoxSizer106);
 
@@ -477,14 +483,14 @@ void InputBuilder::CreateControls()
 
     itemStdDialogButtonSizer116->Realize();
 
-////@end InputBuilder content construction
+////@end InputBuilderWindow content construction
 }
 
 /*!
  * Should we show tooltips?
  */
 
-bool InputBuilder::ShowToolTips()
+bool InputBuilderWindow::ShowToolTips()
 {
     return true;
 }
@@ -493,24 +499,35 @@ bool InputBuilder::ShowToolTips()
  * Get bitmap resources
  */
 
-wxBitmap InputBuilder::GetBitmapResource( const wxString& name )
+wxBitmap InputBuilderWindow::GetBitmapResource( const wxString& name )
 {
     // Bitmap retrieval
-////@begin InputBuilder bitmap retrieval
+////@begin InputBuilderWindow bitmap retrieval
     wxUnusedVar(name);
     return wxNullBitmap;
-////@end InputBuilder bitmap retrieval
+////@end InputBuilderWindow bitmap retrieval
 }
 
 /*!
  * Get icon resources
  */
 
-wxIcon InputBuilder::GetIconResource( const wxString& name )
+wxIcon InputBuilderWindow::GetIconResource( const wxString& name )
 {
     // Icon retrieval
-////@begin InputBuilder icon retrieval
+////@begin InputBuilderWindow icon retrieval
     wxUnusedVar(name);
     return wxNullIcon;
-////@end InputBuilder icon retrieval
+////@end InputBuilderWindow icon retrieval
 }
+/*!
+ * wxEVT_CLOSE_WINDOW event handler for ID_INPUTBUILDERWINDOW
+ */
+
+void InputBuilderWindow::OnCloseWindow( wxCloseEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    parent->CloseInputBuilderWindow();
+}
+
+
