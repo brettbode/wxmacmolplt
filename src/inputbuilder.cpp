@@ -101,7 +101,7 @@ void InputBuilderWindow::CreateControls()
     wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
     itemFrame1->SetSizer(itemBoxSizer2);
 
-    listBook = new wxListbook( itemFrame1, ID_IBNOTEBOOK, wxDefaultPosition, wxDefaultSize, wxNB_BOTTOM|wxSUNKEN_BORDER );
+    listBook = new wxListbook( itemFrame1, ID_IBNOTEBOOK, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxLB_BOTTOM );
 
     wxPanel* itemPanel4 = new wxPanel( listBook, ID_IBBASISPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxVERTICAL);
@@ -461,7 +461,7 @@ void InputBuilderWindow::CreateControls()
 
     listBook->AddPage(itemPanel105, _("SCF Options"));
 
-    itemBoxSizer2->Add(listBook, 1, wxGROW|wxALL, 5);
+    itemBoxSizer2->Add(listBook, 1, wxGROW|wxALL, 2);
 
     wxBoxSizer* itemBoxSizer113 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer2->Add(itemBoxSizer113, 0, wxGROW, 5);
@@ -484,6 +484,9 @@ void InputBuilderWindow::CreateControls()
     itemStdDialogButtonSizer116->Realize();
 
 ////@end InputBuilderWindow content construction
+    wxListView * t = listBook->GetListView();
+	//t->SetWindowStyle(wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_NO_HEADER);
+    t->SetWindowStyle(wxLC_LIST);
 }
 
 /*!

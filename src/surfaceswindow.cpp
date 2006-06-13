@@ -91,6 +91,8 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
     wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
+    GetSizer()->Fit(this);
+    GetSizer()->SetSizeHints(this);
     Centre();
 ////@end SurfacesWindow creation
     return true;
@@ -129,7 +131,7 @@ void SurfacesWindow::CreateControls()
     allFrameCheck->SetValue(false);
     itemBoxSizer6->Add(allFrameCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    listBook = new wxListbook( itemFrame1, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxLB_BOTTOM|wxSUNKEN_BORDER );
+    listBook = new wxListbook( itemFrame1, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxLB_BOTTOM );
 
     itemBoxSizer5->Add(listBook, 4, wxGROW|wxALL, 2);
 
