@@ -161,7 +161,7 @@ void SurfacesWindow::CreateControls()
 
 ////@end SurfacesWindow content construction
 	wxListView * t = listBook->GetListView();
-	t->SetWindowStyle(wxLC_LIST);
+	t->SetWindowStyle(wxLC_LIST|wxLC_SINGLE_SEL);
 	Orbital3D * temp = new Orbital3D(listBook);
 	listBook->AddPage(temp, wxT("test orb"), false);
 	temp = new Orbital3D(listBook);

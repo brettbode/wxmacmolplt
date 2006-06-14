@@ -39,7 +39,7 @@ class wxListbook;
 
 ////@begin control identifiers
 #define ID_INPUTBUILDERWINDOW 10071
-#define SYMBOL_INPUTBUILDERWINDOW_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX|wxCLIP_CHILDREN |wxTAB_TRAVERSAL
+#define SYMBOL_INPUTBUILDERWINDOW_STYLE wxCAPTION|wxSYSTEM_MENU|wxCLOSE_BOX|wxCLIP_CHILDREN |wxTAB_TRAVERSAL
 #define SYMBOL_INPUTBUILDERWINDOW_TITLE _("Input Builder")
 #define SYMBOL_INPUTBUILDERWINDOW_IDNAME ID_INPUTBUILDERWINDOW
 #define SYMBOL_INPUTBUILDERWINDOW_SIZE wxDefaultSize
@@ -87,6 +87,14 @@ class wxListbook;
 #define ID_CHOICE22 10132
 #define ID_CHECKBOX11 10133
 #define ID_CHECKBOX12 10134
+#define ID_IBHESSOPTSPANEL 10144
+#define ID_RADIOBOX2 10145
+#define ID_TEXTCTRL15 10151
+#define ID_CHECKBOX20 10146
+#define ID_CHECKBOX21 10147
+#define ID_CHECKBOX22 10148
+#define ID_CHECKBOX23 10149
+#define ID_TEXTCTRL14 10150
 #define ID_IBMISCPANEL 10096
 #define ID_CHECKBOX13 10136
 #define ID_CHECKBOX14 10137
@@ -98,6 +106,18 @@ class wxListbook;
 #define ID_CHECKBOX18 10141
 #define ID_CHECKBOX19 10142
 #define ID_TEXTCTRL13 10143
+#define ID_IBSTATPOINTPANEL 10152
+#define ID_TEXTCTRL16 10153
+#define ID_TEXTCTRL17 10154
+#define ID_CHOICE23 10155
+#define ID_TEXTCTRL18 10159
+#define ID_TEXTCTRL19 10160
+#define ID_TEXTCTRL20 10161
+#define ID_CHECKBOX25 10157
+#define ID_CHECKBOX26 10158
+#define ID_RADIOBOX3 10162
+#define ID_TEXTCTRL21 10163
+#define ID_CHECKBOX24 10156
 #define ID_BUTTON 10073
 #define ID_BUTTON1 10090
 ////@end control identifiers
@@ -150,6 +170,11 @@ public:
 
 ////@begin InputBuilderWindow member variables
     wxListbook* listBook;
+    wxWindow * tabMOGuess;
+    wxWindow * tabHessOpts;
+    wxWindow * tabMiscPrefs;
+    wxWindow * tabSCFOpts;
+    wxWindow * tabStatPoint;
 ////@end InputBuilderWindow member variables
 };
 
