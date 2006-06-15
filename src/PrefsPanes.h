@@ -65,7 +65,7 @@ class colorArea : public wxPanel
   DECLARE_EVENT_TABLE()
 };
 
-class AtomPrefsPane : public PrefsPane, public wxScrolledWindow 
+class AtomPrefsPane : public wxScrolledWindow, public PrefsPane
 {
 	public:
 		AtomPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
@@ -90,7 +90,7 @@ class AtomPrefsPane : public PrefsPane, public wxScrolledWindow
 };
 
 
-class BondPrefsPane : public PrefsPane, public wxPanel
+class BondPrefsPane : public wxPanel, public PrefsPane
 {
 	public:
 
@@ -100,9 +100,9 @@ class BondPrefsPane : public PrefsPane, public wxPanel
 		virtual void saveToTempPrefs();
 
 		void OnChoice( wxCommandEvent &event );
-		void OnSliderUpdate( wxCommandEvent &WXUNUSED(event) );
-		void OnToggleAnim(wxCommandEvent& WXUNUSED(event));
-		void OnToggleRotation(wxCommandEvent& WXUNUSED(event));
+		void OnSliderUpdate( wxCommandEvent &event);
+		void OnToggleAnim(wxCommandEvent& event);
+		void OnToggleRotation(wxCommandEvent& event);
 
 	private:
 		wxBoxSizer* mMainSizer;
@@ -124,7 +124,7 @@ class BondPrefsPane : public PrefsPane, public wxPanel
 };
 
 
-class DisplayPrefsPane : public PrefsPane, public wxPanel
+class DisplayPrefsPane : public wxPanel, public PrefsPane
 {
 	public:
 		DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
@@ -147,7 +147,7 @@ class DisplayPrefsPane : public PrefsPane, public wxPanel
 };
 
 
-class EnergyPrefsPane : public PrefsPane, public wxPanel
+class EnergyPrefsPane : public wxPanel, public PrefsPane
 {
 	public:
 		EnergyPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
@@ -193,7 +193,7 @@ class EnergyPrefsPane : public PrefsPane, public wxPanel
 };
 
 
-class FilePrefsPane : public PrefsPane, public wxPanel
+class FilePrefsPane : public wxPanel, public PrefsPane
 {
 	public:
 		FilePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
@@ -220,7 +220,7 @@ class FilePrefsPane : public PrefsPane, public wxPanel
 };
 
 
-class ScalingPrefsPane : public PrefsPane, public wxPanel
+class ScalingPrefsPane : public wxPanel, public PrefsPane
 {
 	public:
 		ScalingPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
@@ -238,7 +238,7 @@ class ScalingPrefsPane : public PrefsPane, public wxPanel
 };
 
 
-class StereoPrefsPane : public PrefsPane, public wxPanel
+class StereoPrefsPane : public wxPanel, public PrefsPane
 {
 	public:
 		StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
@@ -260,7 +260,7 @@ class StereoPrefsPane : public PrefsPane, public wxPanel
 };
 
 
-class SurfacePrefsPane : public PrefsPane,  public wxPanel
+class SurfacePrefsPane : public wxPanel, public PrefsPane
 {
 	public:
 		SurfacePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
@@ -293,7 +293,7 @@ class SurfacePrefsPane : public PrefsPane,  public wxPanel
 };
 
 
-class QD3DPrefsPane : public PrefsPane, public wxPanel
+class QD3DPrefsPane : public wxPanel, public PrefsPane
 {
 	public:
 		QD3DPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);

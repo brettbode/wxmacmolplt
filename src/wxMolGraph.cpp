@@ -361,7 +361,7 @@ void wxMolGraph::setPrecision(int p) {
 }
 
 wxSize wxMolGraph::DoGetBestSize() const {
-    wxASSERT_MSG( m_widget, wxT("wxMolGraph::DoGetBestSize called before creation") );
+ //   wxASSERT_MSG( m_widget, wxT("wxMolGraph::DoGetBestSize called before creation") );
 
     wxClientDC dc(const_cast<wxMolGraph*> (this));
     wxString  xMaxText;

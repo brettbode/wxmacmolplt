@@ -78,6 +78,7 @@
 #include "PrefsPanes.h"
 #include <stdio.h>
 #include <string.h>
+#include <wx/colordlg.h>
 
 using namespace std;
 
