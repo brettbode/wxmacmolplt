@@ -23,6 +23,7 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
+
 #include <wx/listctrl.h>
 #include <wx/listbook.h>
 
@@ -33,10 +34,18 @@
 #include "Frame.h"
 
 #include "surfaceswindow.h"
-#include "orbital3d.h"
+#include "surfaceDlg.h"
 
-////@begin XPM images
-////@end XPM images
+#define ID_2D_ORBITAL_PANE 1
+#define ID_3D_ORBITAL_PANE 2
+#define ID_2D_TE_DENSITY_PANE 3
+#define ID_3D_TE_DENSITY_PANE 4
+#define ID_2D_ME_POTENTIAL_PANE 5
+#define ID_3D_ME_POTENTIAL_PANE 6
+#define ID_2D_FILE_PANE 7
+#define ID_3D_FILE_PANE 8
+
+using namespace std;
 
 /*!
  * SurfacesWindow type definition
@@ -51,13 +60,13 @@ IMPLEMENT_CLASS( SurfacesWindow, wxFrame )
 BEGIN_EVENT_TABLE( SurfacesWindow, wxFrame )
 
 ////@begin SurfacesWindow event table entries
-    EVT_BUTTON( wxID_DELETE, SurfacesWindow::OnDeleteClick )
-
-    EVT_CHOICE( ID_ADDSURFCHOICE, SurfacesWindow::OnAddsurfchoiceSelected )
-
+  EVT_BUTTON( wxID_DELETE, SurfacesWindow::OnDeleteClick )
+  EVT_BUTTON( wxID_ADD, SurfacesWindow::OnAddClick )
+  EVT_CLOSE( SurfacesWindow::OnClose )
 ////@end SurfacesWindow event table entries
 
 END_EVENT_TABLE()
+
 
 /*!
  * SurfacesWindow constructors
@@ -67,9 +76,15 @@ SurfacesWindow::SurfacesWindow( )
 {
 }
 
+SurfacesWindow::~SurfacesWindow()
+{
+  Parent->CloseSurfacesWindow();
+}
+
 SurfacesWindow::SurfacesWindow( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
-    Create( parent, id, caption, pos, size, style );
+  mData = parent->GetData();
+  Create( parent, id, caption, pos, size, style );
 }
 
 /*!
@@ -78,17 +93,17 @@ SurfacesWindow::SurfacesWindow( MolDisplayWin* parent, wxWindowID id, const wxSt
 
 bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
-////@begin SurfacesWindow member initialisation
     surfTitleEdit = NULL;
     visibleCheck = NULL;
     allFrameCheck = NULL;
     listBook = NULL;
-    surfAddChoice = NULL;
-////@end SurfacesWindow member initialisation
-	Parent = parent;
+
+    Parent = parent;
 
 ////@begin SurfacesWindow creation
     wxFrame::Create( parent, id, caption, pos, size, style );
+
+    selectSurfaceType();
 
     CreateControls();
     GetSizer()->Fit(this);
@@ -105,67 +120,139 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
 void SurfacesWindow::CreateControls()
 {    
 ////@begin SurfacesWindow content construction
-    SurfacesWindow* itemFrame1 = this;
+  //SurfacesWindow* itemFrame1 = this;
 
+    /*
     wxMenuBar* menuBar = new wxMenuBar;
     wxMenu* itemMenu3 = new wxMenu;
     menuBar->Append(itemMenu3, _("File"));
     wxMenu* itemMenu4 = new wxMenu;
     menuBar->Append(itemMenu4, _("Edit"));
     itemFrame1->SetMenuBar(menuBar);
+    */
 
-    wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxVERTICAL);
-    itemFrame1->SetSizer(itemBoxSizer5);
+    mainSizer = new wxBoxSizer(wxVERTICAL);
+    upperSizer = new wxBoxSizer(wxHORIZONTAL);
 
-    wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer5->Add(itemBoxSizer6, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    surfTitleEdit = new wxTextCtrl( this, ID_SURFTITLE, _T(""), wxDefaultPosition, wxSize(250, -1), 0 );
+    upperSizer->Add(surfTitleEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    surfTitleEdit = new wxTextCtrl( itemFrame1, ID_SURFTITLE, _T(""), wxDefaultPosition, wxSize(250, -1), 0 );
-    itemBoxSizer6->Add(surfTitleEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
-    visibleCheck = new wxCheckBox( itemFrame1, ID_VISIBLECHECK, _("Visible"), wxDefaultPosition, wxDefaultSize, 0 );
+    visibleCheck = new wxCheckBox( this, ID_VISIBLECHECK, _("Visible"), wxDefaultPosition, wxDefaultSize, 0 );
     visibleCheck->SetValue(false);
-    itemBoxSizer6->Add(visibleCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    upperSizer->Add(visibleCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    allFrameCheck = new wxCheckBox( itemFrame1, ID_ALLFRAMECHECK, _("All Frames"), wxDefaultPosition, wxDefaultSize, 0 );
+    allFrameCheck = new wxCheckBox( this, ID_ALLFRAMECHECK, _("All Frames"), wxDefaultPosition, wxDefaultSize, 0 );
     allFrameCheck->SetValue(false);
-    itemBoxSizer6->Add(allFrameCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    upperSizer->Add(allFrameCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    listBook = new wxListbook( itemFrame1, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxLB_BOTTOM );
+    listBook = new wxListbook( this, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxLB_BOTTOM|wxSUNKEN_BORDER );
 
-    itemBoxSizer5->Add(listBook, 4, wxGROW|wxALL, 2);
+    middleSizer = new wxBoxSizer(wxHORIZONTAL);
+    middleSizer->Add(listBook, 4, wxGROW|wxALL, 2);
 
-    wxBoxSizer* itemBoxSizer11 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer5->Add(itemBoxSizer11, 0, wxALIGN_RIGHT|wxALL, 5);
+    addButton = new wxButton( this, wxID_ADD, _("&Add"), wxDefaultPosition, wxDefaultSize, 0 );
+    delButton = new wxButton( this, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 
-    wxButton* itemButton12 = new wxButton( itemFrame1, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
-        itemButton12->SetToolTip(_("Delete the selected surface"));
-    itemBoxSizer11->Add(itemButton12, 0, wxALIGN_BOTTOM|wxALL, 5);
+      {
+        addButton->SetToolTip(_("Add a surface"));
+	delButton->SetToolTip(_("Delete the  selected surface"));
+      }
 
-    wxStaticText* itemStaticText13 = new wxStaticText( itemFrame1, wxID_STATIC, _("Add a surface of type:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer11->Add(itemStaticText13, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    bottomSizer = new wxBoxSizer(wxHORIZONTAL);
+    bottomSizer->Add(addButton, 0, wxALIGN_BOTTOM|wxALL, 5);
+    bottomSizer->Add(delButton, 0, wxALIGN_BOTTOM|wxALL, 5);
 
-    wxString surfAddChoiceStrings[] = {
-        _("2D Orbital"),
-        _("3D Orbital"),
-        _("2D Total Electron Density"),
-        _("3D Total Electron Density"),
-        _("2D Molecular Electrostatic Potential"),
-        _("3D Molecular Electrostatic Potential"),
-        _("General 2D from File"),
-        _("General 3D from File")
-    };
-    surfAddChoice = new wxChoice( itemFrame1, ID_ADDSURFCHOICE, wxDefaultPosition, wxDefaultSize, 8, surfAddChoiceStrings, 0 );
-    itemBoxSizer11->Add(surfAddChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mainSizer->Add(upperSizer, 0, wxALIGN_LEFT|wxALL, 5);
+    mainSizer->Add(middleSizer, 0, wxALIGN_LEFT|wxALL, 5);
+    mainSizer->Add(bottomSizer, 0, wxALIGN_LEFT|wxALL, 5);
 
-////@end SurfacesWindow content construction
-	wxListView * t = listBook->GetListView();
-	t->SetWindowStyle(wxLC_LIST|wxLC_SINGLE_SEL);
-	Orbital3D * temp = new Orbital3D(listBook);
-	listBook->AddPage(temp, wxT("test orb"), false);
-	temp = new Orbital3D(listBook);
-	listBook->AddPage(temp, wxT("test pane 2"), false);
+    SetSizer(mainSizer);
+
+    wxListView * t = listBook->GetListView();
+    t->SetWindowStyle(wxLC_LIST);
+    Orbital3DSurf * temp = new Orbital3DSurf(listBook);
+    listBook->AddPage(temp, mCurrSurfStr, false);
+    //listBook->AddPage(temp, wxT("test pane 2"), false);
+}
+
+void SurfacesWindow::OnAddClick( wxCommandEvent& event )
+{
+  Orbital3DSurf * temp = new Orbital3DSurf(listBook);
+
+  if ( selectSurfaceType() != -1)
+    listBook->AddPage(temp, mCurrSurfStr, false);
+}
+
+/*!
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE
+ */
+
+void SurfacesWindow::OnDeleteClick( wxCommandEvent& event )
+{
+  Frame * lFrame = mData->GetCurrentFramePtr();
+
+  int targetSurf = listBook->GetSelection();
+  lFrame->DeleteSurface(targetSurf);
+  listBook->DeletePage(targetSurf);
+}
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ADDSURFCHOICE
+ */
+
+int SurfacesWindow::selectSurfaceType()
+{
+  vector<wxString> allOptions;
+  int numOptions = 2;
+
+  if (mData->OrbSurfacePossible())
+    {
+      allOptions.push_back(_T("2D Orbital"));
+      allOptions.push_back(_T("3D Orbital"));
+      numOptions += 2;
+    }
+
+  if (mData->TotalDensityPossible())
+    {
+      allOptions.push_back(_T("2D Total Electron Density"));
+      allOptions.push_back(_T("3D Total Electron Density"));
+      allOptions.push_back(_T("2D Molecular Electrostatic Potential"));
+      allOptions.push_back(_T("3D Molecular Electrostatic Potential"));
+      numOptions += 4;
+    }
+
+  allOptions.push_back(_T("General 2D from File"));
+  allOptions.push_back(_T("General 3D from File"));
+
+  wxSingleChoiceDialog dialog(this, _T("Choose the type of surface to create:"),
+			      _T("Surface Type"),
+			      numOptions, &allOptions.front());
+
+  dialog.SetSelection(0);
+
+  if (dialog.ShowModal() == wxID_OK)
+    mCurrSurfStr= dialog.GetStringSelection();
+
+  if (mCurrSurfStr.Cmp("2D Orbital") == 0)
+    return ID_2D_ORBITAL_PANE;
+  if (mCurrSurfStr.Cmp("3D Orbital") == 0)
+    return ID_3D_ORBITAL_PANE;
+  if (mCurrSurfStr.Cmp("2D Total Electron Density") == 0)
+    return ID_2D_TE_DENSITY_PANE;
+  if (mCurrSurfStr.Cmp("3D Total Electron Density") == 0)
+    return ID_3D_TE_DENSITY_PANE;
+  if (mCurrSurfStr.Cmp("2D Molecular Electrostatic Potential") == 0)
+    return ID_2D_ME_POTENTIAL_PANE;
+  if (mCurrSurfStr.Cmp("3D Molecular Electrostatic Potential") == 0)
+    return ID_3D_ME_POTENTIAL_PANE;
+  if (mCurrSurfStr.Cmp("General 2D from File") == 0)
+    return ID_2D_FILE_PANE;
+  if (mCurrSurfStr.Cmp("General 3D from File") == 0)
+    return ID_3D_FILE_PANE;
+
+  return -1;
+
 }
 
 void SurfacesWindow::Reset(void) {
@@ -177,11 +264,9 @@ void SurfacesWindow::Reset(void) {
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 }
 
-void SurfacesWindow::BuildAddChoice(void) {
-	MoleculeData * MainData = Parent->GetData();
-	Frame * lFrame = MainData->GetCurrentFramePtr();
-	
-	surfAddChoice->Clear();
+void SurfacesWindow::OnClose( wxCloseEvent& event )
+{
+  Destroy();
 }
 
 /*!
@@ -218,30 +303,6 @@ wxIcon SurfacesWindow::GetIconResource( const wxString& name )
     return wxNullIcon;
 ////@end SurfacesWindow icon retrieval
 }
-/*!
- * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE
- */
 
-void SurfacesWindow::OnDeleteClick( wxCommandEvent& event )
-{
-	MoleculeData * MainData = Parent->GetData();
-	Frame * lFrame = MainData->GetCurrentFramePtr();
-
-	int targetSurf = listBook->GetSelection();
-	lFrame->DeleteSurface(targetSurf);
-	listBook->DeletePage(targetSurf);
-}
-
-/*!
- * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ADDSURFCHOICE
- */
-
-void SurfacesWindow::OnAddsurfchoiceSelected( wxCommandEvent& event )
-{
-////@begin wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ADDSURFCHOICE in SurfacesWindow.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ADDSURFCHOICE in SurfacesWindow. 
-}
 
 

@@ -23,6 +23,8 @@
 #include "MolDisplayWin.h"
 ////@end includes
 
+class colorArea;
+
 #define NUM_ATOM_LABELS 5
 
 class PrefsPane
@@ -46,23 +48,6 @@ class PrefsPane
 
         protected:
 		WinPrefs* mTargetPrefs;
-};
-
-class colorArea : public wxPanel
-{
- public:
-  colorArea(wxWindow* parent, int i);
-  ~colorArea();
-  int getId() { return mID; }
-  void draw(RGBColor*);
-  wxColour& getColor();
-  void OnMouse(wxMouseEvent &event);
-
- private:
-  int mID;
-  wxColour mCurrentColor;
-
-  DECLARE_EVENT_TABLE()
 };
 
 class AtomPrefsPane : public wxScrolledWindow, public PrefsPane

@@ -22,7 +22,7 @@
 
 ////@begin includes
 #include "wx/frame.h"
-#include "wx/notebook.h"
+//#include "wx/notebook.h"
 ////@end includes
 
 /*!
@@ -42,7 +42,7 @@ class wxListbook;
 #define SYMBOL_SURFACESWINDOW_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_SURFACESWINDOW_TITLE _("Surfaces")
 #define SYMBOL_SURFACESWINDOW_IDNAME ID_FRAME
-#define SYMBOL_SURFACESWINDOW_SIZE wxDefaultSize
+#define SYMBOL_SURFACESWINDOW_SIZE wxSize(560,550)
 #define SYMBOL_SURFACESWINDOW_POSITION wxDefaultPosition
 #define ID_SURFTITLE 10086
 #define ID_VISIBLECHECK 10087
@@ -58,6 +58,7 @@ class wxListbook;
 #ifndef wxCLOSE_BOX
 #define wxCLOSE_BOX 0x1000
 #endif
+  
 
 /*!
  * SurfacesWindow class declaration
@@ -71,6 +72,7 @@ class SurfacesWindow: public wxFrame
 public:
     /// Constructors
     SurfacesWindow( );
+    ~SurfacesWindow( );
     SurfacesWindow( MolDisplayWin* parent, wxWindowID id = SYMBOL_SURFACESWINDOW_IDNAME, const wxString& caption = SYMBOL_SURFACESWINDOW_TITLE, const wxPoint& pos = SYMBOL_SURFACESWINDOW_POSITION, const wxSize& size = SYMBOL_SURFACESWINDOW_SIZE, long style = SYMBOL_SURFACESWINDOW_STYLE );
 
     bool Create( MolDisplayWin* parent, wxWindowID id = SYMBOL_SURFACESWINDOW_IDNAME, const wxString& caption = SYMBOL_SURFACESWINDOW_TITLE, const wxPoint& pos = SYMBOL_SURFACESWINDOW_POSITION, const wxSize& size = SYMBOL_SURFACESWINDOW_SIZE, long style = SYMBOL_SURFACESWINDOW_STYLE );
@@ -79,13 +81,9 @@ public:
     void CreateControls();
 
 ////@begin SurfacesWindow event handler declarations
-
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE
     void OnDeleteClick( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ADDSURFCHOICE
-    void OnAddsurfchoiceSelected( wxCommandEvent& event );
-
+    void OnAddClick( wxCommandEvent& event );
+    void OnClose( wxCloseEvent& event );
 ////@end SurfacesWindow event handler declarations
 
 ////@begin SurfacesWindow member function declarations
@@ -103,17 +101,28 @@ public:
     /// Should we show tooltips?
     static bool ShowToolTips();
 	
-	void Reset(void);	//Call to rebuild the dialog
-	void BuildAddChoice(void);
+    void Reset(void);	//Call to rebuild the dialog
 
-////@begin SurfacesWindow member variables
+ private:
+
+    int selectSurfaceType();
+
+
+    wxBoxSizer* mainSizer;
+    wxBoxSizer* upperSizer;
+    wxBoxSizer* middleSizer;
+    wxBoxSizer* bottomSizer;
     wxTextCtrl* surfTitleEdit;
     wxCheckBox* visibleCheck;
     wxCheckBox* allFrameCheck;
     wxListbook* listBook;
-    wxChoice* surfAddChoice;
+    wxButton* addButton;
+    wxButton* delButton;
     MolDisplayWin * Parent;
-////@end SurfacesWindow member variables
+
+    wxString mCurrSurfStr;
+
+    MoleculeData* mData;
 };
 
 class SurfacePane : public wxPanel {
@@ -134,12 +143,6 @@ protected:
 class TEDensity2DPane : public TEDPane {
 public:
 	TEDensity2DPane(wxWindow * parent, MolDisplayWin * owner, TEDensity2DSurface * target);
-private:
-};
-
-class TEDensity3DPane : public TEDPane {
-public:
-	TEDensity3DPane(wxWindow * parent, MolDisplayWin * owner, TEDensity3DSurface * target);
 private:
 };
 

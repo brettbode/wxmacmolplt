@@ -17,7 +17,6 @@
 
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
-#include "wx/colordlg.h"
 #endif
 
 //put ID definitions here later
@@ -76,6 +75,7 @@
 #include "MyTypes.h"
 #include "Prefs.h"
 #include "PrefsPanes.h"
+#include "colorArea.h"
 #include <stdio.h>
 #include <string.h>
 #include <wx/colordlg.h>
@@ -83,10 +83,6 @@
 using namespace std;
 
 extern short		gAppResRef;
-
-BEGIN_EVENT_TABLE(colorArea, wxPanel)
-    EVT_MOUSE_EVENTS(colorArea::OnMouse)
-END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(BondPrefsPane, wxPanel)
   EVT_CHOICE (ID_BOND_MODE_CHOICE, BondPrefsPane::OnChoice)
@@ -349,47 +345,6 @@ PrefsPane::PrefsPane(MolDisplayWin* targetWindow, WinPrefs* targetPrefs, short P
 PrefsPane::~PrefsPane() 
 { 
   //delete mTargetPrefs; 
-}
-
-colorArea::colorArea(wxWindow* parent, int i)
-{
-  Create(parent, -1, wxDefaultPosition, wxSize(50, 20));
-  mID = i;
-  //mDC = new wxPaintDC(parent);
-}
-
-colorArea::~colorArea()
-{
-  //delete mDC;
-}
-
-void colorArea::draw(RGBColor* color)
-{
-  SetBackgroundColour(wxColour(color->red/256, color->green/256, color->blue/256));
-  mCurrentColor = wxColour(color->red/256, color->green/256, color->blue/256);
-}
-
-wxColour& colorArea::getColor()
-{
-  return mCurrentColor;
-}
-
-void colorArea::OnMouse(wxMouseEvent &event)
-{
-  wxColourData clrData;
-  clrData.SetColour(GetBackgroundColour());
-
-  if (event.LeftDClick())
-    {
-      wxColourDialog dialog(this, &clrData);
-      dialog.SetTitle(_T("Choose Color"));
-
-      if (dialog.ShowModal() == wxID_OK)
-	{
-	  mCurrentColor = dialog.GetColourData().GetColour();
-	  SetBackgroundColour(mCurrentColor);
-	}
-    }
 }
 
 AtomPrefsPane::AtomPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean Global) 

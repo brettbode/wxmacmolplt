@@ -1521,7 +1521,7 @@ void MolDisplayWin::CloseInputBuilderWindow(void) {
 }
 void MolDisplayWin::menuWindowSurfaces(wxCommandEvent &event) {
     if(surfacesWindow) { // need to bring it to the front...
-        surfacesWindow->Raise();
+      surfacesWindow->Raise();
     }
     else {
         surfacesWindow = new SurfacesWindow(this);
