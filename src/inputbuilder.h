@@ -23,6 +23,7 @@
 ////@begin includes
 #include "wx/frame.h"
 #include "wx/notebook.h"
+#include "wx/spinctrl.h"
 ////@end includes
 
 /*!
@@ -75,9 +76,9 @@ class wxListbook;
 #define ID_CHOICE18 10121
 #define ID_CHECKBOX8 10122
 #define ID_IBSYSTEMPANEL 10094
-#define ID_TEXTCTRL11 10124
+#define ID_SPINCTRL 10164
 #define ID_CHOICE19 10125
-#define ID_TEXTCTRL12 10126
+#define ID_SPINCTRL1 10124
 #define ID_CHOICE20 10127
 #define ID_CHOICE21 10128
 #define ID_CHECKBOX9 10129
@@ -105,7 +106,7 @@ class wxListbook;
 #define ID_CHECKBOX17 10140
 #define ID_CHECKBOX18 10141
 #define ID_CHECKBOX19 10142
-#define ID_TEXTCTRL13 10143
+#define ID_SPINCTRL2 10126
 #define ID_IBSTATPOINTPANEL 10152
 #define ID_TEXTCTRL16 10153
 #define ID_TEXTCTRL17 10154
