@@ -107,7 +107,6 @@ public:
 
     int selectSurfaceType();
 
-
     wxBoxSizer* mainSizer;
     wxBoxSizer* upperSizer;
     wxBoxSizer* middleSizer;

@@ -37,6 +37,8 @@ void colorArea::draw(RGBColor* color)
 {
   SetBackgroundColour(wxColour(color->red/256, color->green/256, color->blue/256));
   mCurrentColor = wxColour(color->red/256, color->green/256, color->blue/256);
+
+  Update();
 }
 
 wxColour& colorArea::getColor()
