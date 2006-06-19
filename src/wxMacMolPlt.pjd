@@ -9119,14 +9119,6 @@ along the chosen normal mode."</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -11289,7 +11281,7 @@ Grid Points:"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
                       <string name="proxy-Id name">"ID_CHOICE3"</string>
                       <long name="proxy-Id value">10098</long>
-                      <string name="proxy-Class">"wxChoice"</string>
+                      <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
                       <string name="proxy-Strings">""</string>
                       <string name="proxy-Initial value">""</string>
@@ -11419,7 +11411,7 @@ Grid Points:"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
                       <string name="proxy-Id name">"ID_CHOICE4"</string>
                       <long name="proxy-Id value">10099</long>
-                      <string name="proxy-Class">"wxChoice"</string>
+                      <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
                       <string name="proxy-Strings">""</string>
                       <string name="proxy-Initial value">""</string>
@@ -11554,7 +11546,7 @@ Grid Points:"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
                       <string name="proxy-Id name">"ID_CHOICE5"</string>
                       <long name="proxy-Id value">10100</long>
-                      <string name="proxy-Class">"wxChoice"</string>
+                      <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
                       <string name="proxy-Strings">"0|1|2|3"</string>
                       <string name="proxy-Initial value">"0"</string>
@@ -11658,7 +11650,7 @@ Grid Points:"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
                       <string name="proxy-Id name">"ID_CHOICE6"</string>
                       <long name="proxy-Id value">10101</long>
-                      <string name="proxy-Class">"wxChoice"</string>
+                      <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
                       <string name="proxy-Strings">"0|1|2|3"</string>
                       <string name="proxy-Initial value">"0"</string>
@@ -11762,7 +11754,7 @@ Grid Points:"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
                       <string name="proxy-Id name">"ID_CHOICE7"</string>
                       <long name="proxy-Id value">10102</long>
-                      <string name="proxy-Class">"wxChoice"</string>
+                      <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
                       <string name="proxy-Strings">"0|1|2|3"</string>
                       <string name="proxy-Initial value">"0"</string>
@@ -11892,7 +11884,7 @@ Grid Points:"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
                       <string name="proxy-Id name">"ID_CHOICE8"</string>
                       <long name="proxy-Id value">10103</long>
-                      <string name="proxy-Class">"wxChoice"</string>
+                      <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
                       <string name="proxy-Strings">""</string>
                       <string name="proxy-Initial value">""</string>
@@ -12249,7 +12241,7 @@ Grid Points:"</string>
                         <string name="proxy-type">"wbChoiceProxy"</string>
                         <string name="proxy-Id name">"ID_CHOICE9"</string>
                         <long name="proxy-Id value">10106</long>
-                        <string name="proxy-Class">"wxChoice"</string>
+                        <string name="proxy-Class">"wxUglyChoice"</string>
                         <string name="proxy-Member variable name">""</string>
                         <string name="proxy-Strings">"Energy|Gradient|Hessian|Optimization|Trudge|Saddle Point|IRC|Gradient Extremal|DRC|Energy Surface|Properties|Morokuma|Radiative Transition mom.|Spin Orbit|Finite Electric Field|TDHF|Global Optimization|VSCF|FMO Optimization|Raman Intensities|NMR|Make EFP"</string>
                         <string name="proxy-Initial value">"Energy"</string>
@@ -12353,7 +12345,7 @@ Grid Points:"</string>
                         <string name="proxy-type">"wbChoiceProxy"</string>
                         <string name="proxy-Id name">"ID_CHOICE10"</string>
                         <long name="proxy-Id value">10107</long>
-                        <string name="proxy-Class">"wxChoice"</string>
+                        <string name="proxy-Class">"wxUglyChoice"</string>
                         <string name="proxy-Member variable name">""</string>
                         <string name="proxy-Strings">"RHF|UHF|ROHF|GVB|MCSCF|None (CI)"</string>
                         <string name="proxy-Initial value">"RHF"</string>
@@ -12457,7 +12449,7 @@ Grid Points:"</string>
                         <string name="proxy-type">"wbChoiceProxy"</string>
                         <string name="proxy-Id name">"ID_CHOICE11"</string>
                         <long name="proxy-Id value">10108</long>
-                        <string name="proxy-Class">"wxChoice"</string>
+                        <string name="proxy-Class">"wxUglyChoice"</string>
                         <string name="proxy-Member variable name">""</string>
                         <string name="proxy-Strings">"None|Foster-Boys|Edmiston-Ruedenberg|Pipek-Mezey"</string>
                         <string name="proxy-Initial value">"None"</string>
@@ -12991,7 +12983,7 @@ Grid Points:"</string>
                             <string name="proxy-type">"wbChoiceProxy"</string>
                             <string name="proxy-Id name">"ID_CHOICE12"</string>
                             <long name="proxy-Id value">10111</long>
-                            <string name="proxy-Class">"wxChoice"</string>
+                            <string name="proxy-Class">"wxUglyChoice"</string>
                             <string name="proxy-Member variable name">""</string>
                             <string name="proxy-Strings">"Normal Run|Check|Debug|Other..."</string>
                             <string name="proxy-Initial value">"Normal Run"</string>
@@ -13388,7 +13380,7 @@ Grid Points:"</string>
                           <string name="proxy-type">"wbChoiceProxy"</string>
                           <string name="proxy-Id name">"ID_CHOICE13"</string>
                           <long name="proxy-Id value">10115</long>
-                          <string name="proxy-Class">"wxChoice"</string>
+                          <string name="proxy-Class">"wxUglyChoice"</string>
                           <string name="proxy-Member variable name">""</string>
                           <string name="proxy-Strings">"None|GUGA|Ames Lab. Determinant|Occupation Restricted Multiple Active Space|CI Singles|Full Second Order CI|General CI"</string>
                           <string name="proxy-Initial value">"None"</string>
@@ -13492,7 +13484,7 @@ Grid Points:"</string>
                           <string name="proxy-type">"wbChoiceProxy"</string>
                           <string name="proxy-Id name">"ID_CHOICE14"</string>
                           <long name="proxy-Id value">10116</long>
-                          <string name="proxy-Class">"wxChoice"</string>
+                          <string name="proxy-Class">"wxUglyChoice"</string>
                           <string name="proxy-Member variable name">""</string>
                           <string name="proxy-Strings">"None|LCCD: linearized CC|CCD: CC with doubles|CCSD: CC with singles and doubles|CCSD(T)|R-CC|CR-CC|EOM-CCSD|CR-EOM"</string>
                           <string name="proxy-Initial value">"None"</string>
@@ -13842,7 +13834,7 @@ Grid Points:"</string>
                           <string name="proxy-type">"wbChoiceProxy"</string>
                           <string name="proxy-Id name">"ID_CHOICE15"</string>
                           <long name="proxy-Id value">10118</long>
-                          <string name="proxy-Class">"wxChoice"</string>
+                          <string name="proxy-Class">"wxUglyChoice"</string>
                           <string name="proxy-Member variable name">""</string>
                           <string name="proxy-Strings">"Unique cartesian Coords.|Hilderbrant internals|Cartesian coordinates|Z-Matrix|MOPAC Z-Matrix"</string>
                           <string name="proxy-Initial value">"Unique cartesian Coords."</string>
@@ -13946,7 +13938,7 @@ Grid Points:"</string>
                           <string name="proxy-type">"wbChoiceProxy"</string>
                           <string name="proxy-Id name">"ID_CHOICE16"</string>
                           <long name="proxy-Id value">10119</long>
-                          <string name="proxy-Class">"wxChoice"</string>
+                          <string name="proxy-Class">"wxUglyChoice"</string>
                           <string name="proxy-Member variable name">""</string>
                           <string name="proxy-Strings">"Angstroms|Bohr"</string>
                           <string name="proxy-Initial value">"Angstroms"</string>
@@ -14266,7 +14258,7 @@ Grid Points:"</string>
                           <string name="proxy-type">"wbChoiceProxy"</string>
                           <string name="proxy-Id name">"ID_CHOICE17"</string>
                           <long name="proxy-Id value">10120</long>
-                          <string name="proxy-Class">"wxChoice"</string>
+                          <string name="proxy-Class">"wxUglyChoice"</string>
                           <string name="proxy-Member variable name">""</string>
                           <string name="proxy-Strings">""</string>
                           <string name="proxy-Initial value">""</string>
@@ -14370,7 +14362,7 @@ Grid Points:"</string>
                           <string name="proxy-type">"wbChoiceProxy"</string>
                           <string name="proxy-Id name">"ID_CHOICE18"</string>
                           <long name="proxy-Id value">10121</long>
-                          <string name="proxy-Class">"wxChoice"</string>
+                          <string name="proxy-Class">"wxUglyChoice"</string>
                           <string name="proxy-Member variable name">""</string>
                           <string name="proxy-Strings">""</string>
                           <string name="proxy-Initial value">""</string>
@@ -14701,7 +14693,7 @@ Grid Points:"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
                       <string name="proxy-Id name">"ID_CHOICE19"</string>
                       <long name="proxy-Id value">10125</long>
-                      <string name="proxy-Class">"wxChoice"</string>
+                      <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
                       <string name="proxy-Strings">"Seconds|Minutes|Hours|Days|Weeks|Years|Millenia"</string>
                       <string name="proxy-Initial value">"Minutes"</string>
@@ -14861,7 +14853,7 @@ Grid Points:"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
                       <string name="proxy-Id name">"ID_CHOICE20"</string>
                       <long name="proxy-Id value">10127</long>
-                      <string name="proxy-Class">"wxChoice"</string>
+                      <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
                       <string name="proxy-Strings">"Words|Bytes|MegaWords|MegaBytes"</string>
                       <string name="proxy-Initial value">"Words"</string>
@@ -14991,7 +14983,7 @@ Grid Points:"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
                       <string name="proxy-Id name">"ID_CHOICE21"</string>
                       <long name="proxy-Id value">10128</long>
-                      <string name="proxy-Class">"wxChoice"</string>
+                      <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
                       <string name="proxy-Strings">"default|EVVRSP|GIVEIS|JACOBI"</string>
                       <string name="proxy-Initial value">"default"</string>
@@ -15360,7 +15352,7 @@ Grid Points:"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
                       <string name="proxy-Id name">"ID_CHOICE22"</string>
                       <long name="proxy-Id value">10132</long>
-                      <string name="proxy-Class">"wxChoice"</string>
+                      <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
                       <string name="proxy-Strings">"Huckel|HCore|MO Read ($VEC)|MO Saved (DICTNRY)|Skip"</string>
                       <string name="proxy-Initial value">"Huckel"</string>
@@ -17383,7 +17375,7 @@ Grid Points:"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
                       <string name="proxy-Id name">"ID_CHOICE23"</string>
                       <long name="proxy-Id value">10155</long>
-                      <string name="proxy-Class">"wxChoice"</string>
+                      <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
                       <string name="proxy-Strings">""</string>
                       <string name="proxy-Initial value">""</string>

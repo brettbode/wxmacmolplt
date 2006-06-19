@@ -1,4 +1,5 @@
 #include "wxUglyChoice.h"
+#include "arrow.xpm"
 
 IMPLEMENT_DYNAMIC_CLASS(wxUglyChoice,wxPanel)
 
@@ -9,8 +10,15 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
                            wxWindowID id,
                            const wxPoint &pos,
                            const wxSize &size,
-                           const wxString &name) :
-                  wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL, name) {
+                           int n,
+                           const wxString choices[],
+                           long style) :
+                  wxPanel(parent,
+                          id,
+                          pos,
+                          size,
+                          wxTAB_TRAVERSAL,
+                          wxT("ugly_choice")) {
 
     /* Initialize control elements */
 
@@ -21,11 +29,11 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
                            wxDefaultSize,
                            wxTE_READONLY);
 
-    wxBitmap btnBitmap(wxT("arrow.xpm"), wxBITMAP_TYPE_XPM);
+    wxBitmap btnBitmap(arrow_xpm);
     m_btn = new wxBitmapButton(this, wxID_ANY, btnBitmap);
-    btnID = m_btn->GetId();
     wxSize tSize = m_txt->GetSize();
     m_btn->SetSize(tSize.GetHeight(), tSize.GetHeight());
+    btnID = m_btn->GetId();
     Connect(btnID,
             wxEVT_COMMAND_BUTTON_CLICKED,
             wxCommandEventHandler(wxUglyChoice::onButtonClick));
@@ -41,6 +49,14 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
     sizer->Add(m_txt, 1, wxEXPAND);
     sizer->Add(m_btn);
     SetSizer(sizer);
+
+    /* Add initial items to control */
+    
+    if(choices != NULL) {
+        for(int i = 0; i < n; ++i) {
+            Append(choices[i]);
+        }
+    }
 }
 
 wxUglyChoice::~wxUglyChoice() {
@@ -118,12 +134,26 @@ bool wxUglyChoice::GetEnabled(int n) const {
     return m_menu->IsEnabled(item[n]);
 }
 
-void wxUglyChoice::SetSelection(int n) {
+bool wxUglyChoice::SetSelection(int n) {
     selection = n;
     m_txt->SetValue(m_menu->GetLabel(item[selection]));
 #if 0 //wxHAS_RADIO_MENU_ITEMS
     m_menu->Check(item[selection], true);
 #endif
+
+    return true;
+}
+
+bool wxUglyChoice::SetStringSelection(const wxString &string) {
+    int id = 0;
+    if((id = m_menu->FindItem(string)) == wxNOT_FOUND) {
+        return false;
+    }
+    for(int i = 0; i < item.size(); ++i) {
+        if(item[i] == id) {
+            return SetSelection(i);
+        }
+    }
 }
 
 int wxUglyChoice::GetSelection() const {

@@ -36,7 +36,9 @@ class wxUglyChoice : public wxPanel {
                  wxWindowID id = -1,
                  const wxPoint &pos = wxDefaultPosition,
                  const wxSize &size = wxDefaultSize,
-                 const wxString &name = wxT("ugly_choice"));
+                 int n = 0,
+                 const wxString choices[] = NULL,
+                 long style = 0);
 
     /**
      * Destructor.  TODO
@@ -103,7 +105,12 @@ class wxUglyChoice : public wxPanel {
      *
      * @param n The index of the item to select.
      */
-    void SetSelection(int n);
+    bool SetSelection(int n);
+
+    /**
+     * Included to keep DialogBlocks happy.
+     */
+    bool SetStringSelection(const wxString &string);
 
     /**
      * @return The index of the currently selected item.

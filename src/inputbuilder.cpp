@@ -118,7 +118,7 @@ void InputBuilderWindow::CreateControls()
     itemBoxSizer6->Add(itemStaticText7, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString* itemChoice8Strings = NULL;
-    wxChoice* itemChoice8 = new wxChoice( itemPanel4, ID_CHOICE3, wxDefaultPosition, wxDefaultSize, 0, itemChoice8Strings, 0 );
+    wxUglyChoice* itemChoice8 = new wxUglyChoice( itemPanel4, ID_CHOICE3, wxDefaultPosition, wxDefaultSize, 0, itemChoice8Strings, 0 );
     itemBoxSizer6->Add(itemChoice8, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     itemBoxSizer6->Add(5, 5, 0, wxGROW|wxALL, 5);
@@ -128,7 +128,7 @@ void InputBuilderWindow::CreateControls()
     itemBoxSizer6->Add(itemStaticText10, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
     wxString* itemChoice11Strings = NULL;
-    wxChoice* itemChoice11 = new wxChoice( itemPanel4, ID_CHOICE4, wxDefaultPosition, wxDefaultSize, 0, itemChoice11Strings, 0 );
+    wxUglyChoice* itemChoice11 = new wxUglyChoice( itemPanel4, ID_CHOICE4, wxDefaultPosition, wxDefaultSize, 0, itemChoice11Strings, 0 );
     itemChoice11->Enable(false);
     itemBoxSizer6->Add(itemChoice11, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -143,7 +143,7 @@ void InputBuilderWindow::CreateControls()
         _("2"),
         _("3")
     };
-    wxChoice* itemChoice14 = new wxChoice( itemPanel4, ID_CHOICE5, wxDefaultPosition, wxDefaultSize, 4, itemChoice14Strings, 0 );
+    wxUglyChoice* itemChoice14 = new wxUglyChoice( itemPanel4, ID_CHOICE5, wxDefaultPosition, wxDefaultSize, 4, itemChoice14Strings, 0 );
     itemChoice14->SetStringSelection(_("0"));
     itemFlexGridSizer12->Add(itemChoice14, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
@@ -156,7 +156,7 @@ void InputBuilderWindow::CreateControls()
         _("2"),
         _("3")
     };
-    wxChoice* itemChoice16 = new wxChoice( itemPanel4, ID_CHOICE6, wxDefaultPosition, wxDefaultSize, 4, itemChoice16Strings, 0 );
+    wxUglyChoice* itemChoice16 = new wxUglyChoice( itemPanel4, ID_CHOICE6, wxDefaultPosition, wxDefaultSize, 4, itemChoice16Strings, 0 );
     itemChoice16->SetStringSelection(_("0"));
     itemFlexGridSizer12->Add(itemChoice16, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
@@ -169,7 +169,7 @@ void InputBuilderWindow::CreateControls()
         _("2"),
         _("3")
     };
-    wxChoice* itemChoice18 = new wxChoice( itemPanel4, ID_CHOICE7, wxDefaultPosition, wxDefaultSize, 4, itemChoice18Strings, 0 );
+    wxUglyChoice* itemChoice18 = new wxUglyChoice( itemPanel4, ID_CHOICE7, wxDefaultPosition, wxDefaultSize, 4, itemChoice18Strings, 0 );
     itemChoice18->SetStringSelection(_("0"));
     itemFlexGridSizer12->Add(itemChoice18, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -180,7 +180,7 @@ void InputBuilderWindow::CreateControls()
     itemBoxSizer19->Add(itemStaticText20, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString* itemChoice21Strings = NULL;
-    wxChoice* itemChoice21 = new wxChoice( itemPanel4, ID_CHOICE8, wxDefaultPosition, wxDefaultSize, 0, itemChoice21Strings, 0 );
+    wxUglyChoice* itemChoice21 = new wxUglyChoice( itemPanel4, ID_CHOICE8, wxDefaultPosition, wxDefaultSize, 0, itemChoice21Strings, 0 );
     itemChoice21->Enable(false);
     itemBoxSizer19->Add(itemChoice21, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -230,7 +230,7 @@ void InputBuilderWindow::CreateControls()
         _("NMR"),
         _("Make EFP")
     };
-    wxChoice* itemChoice29 = new wxChoice( itemPanel24, ID_CHOICE9, wxDefaultPosition, wxDefaultSize, 22, itemChoice29Strings, 0 );
+    wxUglyChoice* itemChoice29 = new wxUglyChoice( itemPanel24, ID_CHOICE9, wxDefaultPosition, wxDefaultSize, 22, itemChoice29Strings, 0 );
     itemChoice29->SetStringSelection(_("Energy"));
     itemFlexGridSizer27->Add(itemChoice29, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
@@ -245,7 +245,7 @@ void InputBuilderWindow::CreateControls()
         _("MCSCF"),
         _("None (CI)")
     };
-    wxChoice* itemChoice31 = new wxChoice( itemPanel24, ID_CHOICE10, wxDefaultPosition, wxDefaultSize, 6, itemChoice31Strings, 0 );
+    wxUglyChoice* itemChoice31 = new wxUglyChoice( itemPanel24, ID_CHOICE10, wxDefaultPosition, wxDefaultSize, 6, itemChoice31Strings, 0 );
     itemChoice31->SetStringSelection(_("RHF"));
     itemFlexGridSizer27->Add(itemChoice31, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
@@ -258,7 +258,7 @@ void InputBuilderWindow::CreateControls()
         _("Edmiston-Ruedenberg"),
         _("Pipek-Mezey")
     };
-    wxChoice* itemChoice33 = new wxChoice( itemPanel24, ID_CHOICE11, wxDefaultPosition, wxDefaultSize, 4, itemChoice33Strings, 0 );
+    wxUglyChoice* itemChoice33 = new wxUglyChoice( itemPanel24, ID_CHOICE11, wxDefaultPosition, wxDefaultSize, 4, itemChoice33Strings, 0 );
     itemChoice33->SetStringSelection(_("None"));
     itemFlexGridSizer27->Add(itemChoice33, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -297,7 +297,7 @@ void InputBuilderWindow::CreateControls()
         _("Debug"),
         _("Other...")
     };
-    wxChoice* itemChoice45 = new wxChoice( itemPanel24, ID_CHOICE12, wxDefaultPosition, wxDefaultSize, 4, itemChoice45Strings, 0 );
+    wxUglyChoice* itemChoice45 = new wxUglyChoice( itemPanel24, ID_CHOICE12, wxDefaultPosition, wxDefaultSize, 4, itemChoice45Strings, 0 );
     itemChoice45->SetStringSelection(_("Normal Run"));
     itemFlexGridSizer43->Add(itemChoice45, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
@@ -332,7 +332,7 @@ void InputBuilderWindow::CreateControls()
         _("Full Second Order CI"),
         _("General CI")
     };
-    wxChoice* itemChoice53 = new wxChoice( itemPanel24, ID_CHOICE13, wxDefaultPosition, wxDefaultSize, 7, itemChoice53Strings, 0 );
+    wxUglyChoice* itemChoice53 = new wxUglyChoice( itemPanel24, ID_CHOICE13, wxDefaultPosition, wxDefaultSize, 7, itemChoice53Strings, 0 );
     itemChoice53->SetStringSelection(_("None"));
     itemFlexGridSizer51->Add(itemChoice53, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
@@ -350,7 +350,7 @@ void InputBuilderWindow::CreateControls()
         _("EOM-CCSD"),
         _("CR-EOM")
     };
-    wxChoice* itemChoice55 = new wxChoice( itemPanel24, ID_CHOICE14, wxDefaultPosition, wxDefaultSize, 9, itemChoice55Strings, 0 );
+    wxUglyChoice* itemChoice55 = new wxUglyChoice( itemPanel24, ID_CHOICE14, wxDefaultPosition, wxDefaultSize, 9, itemChoice55Strings, 0 );
     itemChoice55->SetStringSelection(_("None"));
     itemFlexGridSizer51->Add(itemChoice55, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -380,7 +380,7 @@ void InputBuilderWindow::CreateControls()
         _("Z-Matrix"),
         _("MOPAC Z-Matrix")
     };
-    wxChoice* itemChoice63 = new wxChoice( itemPanel56, ID_CHOICE15, wxDefaultPosition, wxDefaultSize, 5, itemChoice63Strings, 0 );
+    wxUglyChoice* itemChoice63 = new wxUglyChoice( itemPanel56, ID_CHOICE15, wxDefaultPosition, wxDefaultSize, 5, itemChoice63Strings, 0 );
     itemChoice63->SetStringSelection(_("Unique cartesian Coords."));
     itemFlexGridSizer61->Add(itemChoice63, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
@@ -391,7 +391,7 @@ void InputBuilderWindow::CreateControls()
         _("Angstroms"),
         _("Bohr")
     };
-    wxChoice* itemChoice65 = new wxChoice( itemPanel56, ID_CHOICE16, wxDefaultPosition, wxDefaultSize, 2, itemChoice65Strings, 0 );
+    wxUglyChoice* itemChoice65 = new wxUglyChoice( itemPanel56, ID_CHOICE16, wxDefaultPosition, wxDefaultSize, 2, itemChoice65Strings, 0 );
     itemChoice65->SetStringSelection(_("Angstroms"));
     itemFlexGridSizer61->Add(itemChoice65, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -412,7 +412,7 @@ void InputBuilderWindow::CreateControls()
     itemFlexGridSizer70->Add(itemStaticText71, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
     wxString* itemChoice72Strings = NULL;
-    wxChoice* itemChoice72 = new wxChoice( itemPanel56, ID_CHOICE17, wxDefaultPosition, wxDefaultSize, 0, itemChoice72Strings, 0 );
+    wxUglyChoice* itemChoice72 = new wxUglyChoice( itemPanel56, ID_CHOICE17, wxDefaultPosition, wxDefaultSize, 0, itemChoice72Strings, 0 );
     itemFlexGridSizer70->Add(itemChoice72, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
     wxStaticText* itemStaticText73 = new wxStaticText( itemPanel56, wxID_STATIC, _("Order of Principle Axis:"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -420,7 +420,7 @@ void InputBuilderWindow::CreateControls()
     itemFlexGridSizer70->Add(itemStaticText73, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString* itemChoice74Strings = NULL;
-    wxChoice* itemChoice74 = new wxChoice( itemPanel56, ID_CHOICE18, wxDefaultPosition, wxDefaultSize, 0, itemChoice74Strings, 0 );
+    wxUglyChoice* itemChoice74 = new wxUglyChoice( itemPanel56, ID_CHOICE18, wxDefaultPosition, wxDefaultSize, 0, itemChoice74Strings, 0 );
     itemChoice74->Enable(false);
     itemFlexGridSizer70->Add(itemChoice74, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -451,7 +451,7 @@ void InputBuilderWindow::CreateControls()
         _("Years"),
         _("Millenia")
     };
-    wxChoice* itemChoice81 = new wxChoice( itemPanel76, ID_CHOICE19, wxDefaultPosition, wxDefaultSize, 7, itemChoice81Strings, 0 );
+    wxUglyChoice* itemChoice81 = new wxUglyChoice( itemPanel76, ID_CHOICE19, wxDefaultPosition, wxDefaultSize, 7, itemChoice81Strings, 0 );
     itemChoice81->SetStringSelection(_("Minutes"));
     itemFlexGridSizer78->Add(itemChoice81, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
@@ -467,7 +467,7 @@ void InputBuilderWindow::CreateControls()
         _("MegaWords"),
         _("MegaBytes")
     };
-    wxChoice* itemChoice84 = new wxChoice( itemPanel76, ID_CHOICE20, wxDefaultPosition, wxDefaultSize, 4, itemChoice84Strings, 0 );
+    wxUglyChoice* itemChoice84 = new wxUglyChoice( itemPanel76, ID_CHOICE20, wxDefaultPosition, wxDefaultSize, 4, itemChoice84Strings, 0 );
     itemChoice84->SetStringSelection(_("Words"));
     itemFlexGridSizer78->Add(itemChoice84, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -482,7 +482,7 @@ void InputBuilderWindow::CreateControls()
         _("GIVEIS"),
         _("JACOBI")
     };
-    wxChoice* itemChoice87 = new wxChoice( itemPanel76, ID_CHOICE21, wxDefaultPosition, wxDefaultSize, 4, itemChoice87Strings, 0 );
+    wxUglyChoice* itemChoice87 = new wxUglyChoice( itemPanel76, ID_CHOICE21, wxDefaultPosition, wxDefaultSize, 4, itemChoice87Strings, 0 );
     itemChoice87->SetStringSelection(_("default"));
     itemBoxSizer85->Add(itemChoice87, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -519,7 +519,7 @@ void InputBuilderWindow::CreateControls()
         _("MO Saved (DICTNRY)"),
         _("Skip")
     };
-    wxChoice* itemChoice95 = new wxChoice( itemPanel91, ID_CHOICE22, wxDefaultPosition, wxDefaultSize, 5, itemChoice95Strings, 0 );
+    wxUglyChoice* itemChoice95 = new wxUglyChoice( itemPanel91, ID_CHOICE22, wxDefaultPosition, wxDefaultSize, 5, itemChoice95Strings, 0 );
     itemChoice95->SetStringSelection(_("Huckel"));
     itemBoxSizer93->Add(itemChoice95, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -669,7 +669,7 @@ void InputBuilderWindow::CreateControls()
     itemBoxSizer135->Add(itemStaticText136, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString* itemChoice137Strings = NULL;
-    wxChoice* itemChoice137 = new wxChoice( itemPanel128, ID_CHOICE23, wxDefaultPosition, wxDefaultSize, 0, itemChoice137Strings, 0 );
+    wxUglyChoice* itemChoice137 = new wxUglyChoice( itemPanel128, ID_CHOICE23, wxDefaultPosition, wxDefaultSize, 0, itemChoice137Strings, 0 );
     itemBoxSizer135->Add(itemChoice137, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxBoxSizer* itemBoxSizer138 = new wxBoxSizer(wxHORIZONTAL);

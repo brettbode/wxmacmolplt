@@ -26,6 +26,8 @@
 #include "wx/spinctrl.h"
 ////@end includes
 
+#include "wxUglyChoice.h"
+
 /*!
  * Forward declarations
  */
