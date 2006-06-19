@@ -117,8 +117,35 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText7 = new wxStaticText( itemPanel4, wxID_STATIC, _("Basis Set:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
     itemBoxSizer6->Add(itemStaticText7, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxString* itemChoice8Strings = NULL;
-    wxUglyChoice* itemChoice8 = new wxUglyChoice( itemPanel4, ID_CHOICE3, wxDefaultPosition, wxDefaultSize, 0, itemChoice8Strings, 0 );
+    wxString itemChoice8Strings[] = {
+        _("MINI"),
+        _("MIDI"),
+        _("STO-2G"),
+        _("STO-3G"),
+        _("STO-4G"),
+        _("STO-5G"),
+        _("STO-6G"),
+        _("3-21G"),
+        _("6-21G"),
+        _("4-31G"),
+        _("5-31G"),
+        _("6-31G"),
+        _("6-311G"),
+        _("Double Zeta Valance"),
+        _("Dunning/Hay DZ"),
+        _("Binning/Curtiss DZ"),
+        _("Triple Zeta Valence"),
+        _("McLean/Chandler"),
+        _T(""),
+        _("SBKJC Valance"),
+        _("Hay/Wadt Valance"),
+        _T(""),
+        _("MNDO"),
+        _("AM1"),
+        _("PM3")
+    };
+    wxUglyChoice* itemChoice8 = new wxUglyChoice( itemPanel4, ID_CHOICE3, wxDefaultPosition, wxDefaultSize, 25, itemChoice8Strings, 0 );
+    itemChoice8->SetStringSelection(_("MINI"));
     itemBoxSizer6->Add(itemChoice8, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     itemBoxSizer6->Add(5, 5, 0, wxGROW|wxALL, 5);
@@ -127,8 +154,14 @@ void InputBuilderWindow::CreateControls()
     itemStaticText10->Enable(false);
     itemBoxSizer6->Add(itemStaticText10, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-    wxString* itemChoice11Strings = NULL;
-    wxUglyChoice* itemChoice11 = new wxUglyChoice( itemPanel4, ID_CHOICE4, wxDefaultPosition, wxDefaultSize, 0, itemChoice11Strings, 0 );
+    wxString itemChoice11Strings[] = {
+        _("None"),
+        _("Read"),
+        _("SBKJC"),
+        _("Hay-Wadt")
+    };
+    wxUglyChoice* itemChoice11 = new wxUglyChoice( itemPanel4, ID_CHOICE4, wxDefaultPosition, wxDefaultSize, 4, itemChoice11Strings, 0 );
+    itemChoice11->SetStringSelection(_("None"));
     itemChoice11->Enable(false);
     itemBoxSizer6->Add(itemChoice11, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 

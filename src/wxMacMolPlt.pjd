@@ -11283,8 +11283,8 @@ Grid Points:"</string>
                       <long name="proxy-Id value">10098</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
-                      <string name="proxy-Strings">""</string>
-                      <string name="proxy-Initial value">""</string>
+                      <string name="proxy-Strings">"MINI|MIDI|STO-2G|STO-3G|STO-4G|STO-5G|STO-6G|3-21G|6-21G|4-31G|5-31G|6-31G|6-311G|Double Zeta Valance|Dunning/Hay DZ|Binning/Curtiss DZ|Triple Zeta Valence|McLean/Chandler||SBKJC Valance|Hay/Wadt Valance||MNDO|AM1|PM3"</string>
+                      <string name="proxy-Initial value">"MINI"</string>
                       <string name="proxy-Help text">""</string>
                       <string name="proxy-Tooltip text">""</string>
                       <string name="proxy-Background colour">""</string>
@@ -11413,8 +11413,8 @@ Grid Points:"</string>
                       <long name="proxy-Id value">10099</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">""</string>
-                      <string name="proxy-Strings">""</string>
-                      <string name="proxy-Initial value">""</string>
+                      <string name="proxy-Strings">"None|Read|SBKJC|Hay-Wadt"</string>
+                      <string name="proxy-Initial value">"None"</string>
                       <string name="proxy-Help text">""</string>
                       <string name="proxy-Tooltip text">""</string>
                       <string name="proxy-Background colour">""</string>
