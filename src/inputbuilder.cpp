@@ -51,6 +51,22 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 ////@begin InputBuilderWindow event table entries
     EVT_CLOSE( InputBuilderWindow::OnCloseWindow )
 
+    EVT_CHOICE( ID_BASIS_CHOICE, InputBuilderWindow::OnBasisChoiceSelected )
+
+    EVT_CHOICE( ID_ECPT_CHOICE, InputBuilderWindow::OnEcptChoiceSelected )
+
+    EVT_CHOICE( ID_NUMD_CHOICE, InputBuilderWindow::OnNumdChoiceSelected )
+
+    EVT_CHOICE( ID_NUMF_CHOICE, InputBuilderWindow::OnNumfChoiceSelected )
+
+    EVT_CHOICE( ID_NUMP_CHOICE, InputBuilderWindow::OnNumpChoiceSelected )
+
+    EVT_CHOICE( ID_POLAR_CHOICE, InputBuilderWindow::OnPolarChoiceSelected )
+
+    EVT_CHECKBOX( ID_DIFFL_CHECKBOX, InputBuilderWindow::OnDifflCheckboxClick )
+
+    EVT_CHECKBOX( ID_DIFFS_CHECKBOX, InputBuilderWindow::OnDiffsCheckboxClick )
+
 ////@end InputBuilderWindow event table entries
 
 END_EVENT_TABLE()
@@ -81,6 +97,14 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     tabSCFOpts = NULL;
     tabStatPoint = NULL;
     listBook = NULL;
+    basisChoice = NULL;
+    ecpTypeChoice = NULL;
+    numDChoice = NULL;
+    numFChoice = NULL;
+    numPChoice = NULL;
+    polarChoice = NULL;
+    diffuseLCheck = NULL;
+    diffuseSCheck = NULL;
 ////@end InputBuilderWindow member initialisation
 
 ////@begin InputBuilderWindow creation
@@ -117,7 +141,7 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText7 = new wxStaticText( itemPanel4, wxID_STATIC, _("Basis Set:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
     itemBoxSizer6->Add(itemStaticText7, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxString itemChoice8Strings[] = {
+    wxString basisChoiceStrings[] = {
         _("MINI"),
         _("MIDI"),
         _("STO-2G"),
@@ -144,9 +168,9 @@ void InputBuilderWindow::CreateControls()
         _("AM1"),
         _("PM3")
     };
-    wxUglyChoice* itemChoice8 = new wxUglyChoice( itemPanel4, ID_CHOICE3, wxDefaultPosition, wxDefaultSize, 25, itemChoice8Strings, 0 );
-    itemChoice8->SetStringSelection(_("MINI"));
-    itemBoxSizer6->Add(itemChoice8, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    basisChoice = new wxUglyChoice( itemPanel4, ID_BASIS_CHOICE, wxDefaultPosition, wxDefaultSize, 25, basisChoiceStrings, 0 );
+    basisChoice->SetStringSelection(_("MINI"));
+    itemBoxSizer6->Add(basisChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     itemBoxSizer6->Add(5, 5, 0, wxGROW|wxALL, 5);
 
@@ -154,57 +178,57 @@ void InputBuilderWindow::CreateControls()
     itemStaticText10->Enable(false);
     itemBoxSizer6->Add(itemStaticText10, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-    wxString itemChoice11Strings[] = {
+    wxString ecpTypeChoiceStrings[] = {
         _("None"),
         _("Read"),
         _("SBKJC"),
         _("Hay-Wadt")
     };
-    wxUglyChoice* itemChoice11 = new wxUglyChoice( itemPanel4, ID_CHOICE4, wxDefaultPosition, wxDefaultSize, 4, itemChoice11Strings, 0 );
-    itemChoice11->SetStringSelection(_("None"));
-    itemChoice11->Enable(false);
-    itemBoxSizer6->Add(itemChoice11, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    ecpTypeChoice = new wxUglyChoice( itemPanel4, ID_ECPT_CHOICE, wxDefaultPosition, wxDefaultSize, 4, ecpTypeChoiceStrings, 0 );
+    ecpTypeChoice->SetStringSelection(_("None"));
+    ecpTypeChoice->Enable(false);
+    itemBoxSizer6->Add(ecpTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxFlexGridSizer* itemFlexGridSizer12 = new wxFlexGridSizer(0, 2, 0, 0);
     itemBoxSizer5->Add(itemFlexGridSizer12, 0, wxGROW, 5);
     wxStaticText* itemStaticText13 = new wxStaticText( itemPanel4, wxID_STATIC, _("# D heavy atom polarization functions:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer12->Add(itemStaticText13, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxString itemChoice14Strings[] = {
+    wxString numDChoiceStrings[] = {
         _("0"),
         _("1"),
         _("2"),
         _("3")
     };
-    wxUglyChoice* itemChoice14 = new wxUglyChoice( itemPanel4, ID_CHOICE5, wxDefaultPosition, wxDefaultSize, 4, itemChoice14Strings, 0 );
-    itemChoice14->SetStringSelection(_("0"));
-    itemFlexGridSizer12->Add(itemChoice14, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    numDChoice = new wxUglyChoice( itemPanel4, ID_NUMD_CHOICE, wxDefaultPosition, wxDefaultSize, 4, numDChoiceStrings, 0 );
+    numDChoice->SetStringSelection(_("0"));
+    itemFlexGridSizer12->Add(numDChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
     wxStaticText* itemStaticText15 = new wxStaticText( itemPanel4, wxID_STATIC, _("# F heavy atom polarization functions:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer12->Add(itemStaticText15, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxString itemChoice16Strings[] = {
+    wxString numFChoiceStrings[] = {
         _("0"),
         _("1"),
         _("2"),
         _("3")
     };
-    wxUglyChoice* itemChoice16 = new wxUglyChoice( itemPanel4, ID_CHOICE6, wxDefaultPosition, wxDefaultSize, 4, itemChoice16Strings, 0 );
-    itemChoice16->SetStringSelection(_("0"));
-    itemFlexGridSizer12->Add(itemChoice16, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    numFChoice = new wxUglyChoice( itemPanel4, ID_NUMF_CHOICE, wxDefaultPosition, wxDefaultSize, 4, numFChoiceStrings, 0 );
+    numFChoice->SetStringSelection(_("0"));
+    itemFlexGridSizer12->Add(numFChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
     wxStaticText* itemStaticText17 = new wxStaticText( itemPanel4, wxID_STATIC, _("# light atom polarization functions:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer12->Add(itemStaticText17, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxString itemChoice18Strings[] = {
+    wxString numPChoiceStrings[] = {
         _("0"),
         _("1"),
         _("2"),
         _("3")
     };
-    wxUglyChoice* itemChoice18 = new wxUglyChoice( itemPanel4, ID_CHOICE7, wxDefaultPosition, wxDefaultSize, 4, itemChoice18Strings, 0 );
-    itemChoice18->SetStringSelection(_("0"));
-    itemFlexGridSizer12->Add(itemChoice18, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    numPChoice = new wxUglyChoice( itemPanel4, ID_NUMP_CHOICE, wxDefaultPosition, wxDefaultSize, 4, numPChoiceStrings, 0 );
+    numPChoice->SetStringSelection(_("0"));
+    itemFlexGridSizer12->Add(numPChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer5->Add(itemBoxSizer19, 0, wxGROW, 5);
@@ -212,18 +236,18 @@ void InputBuilderWindow::CreateControls()
     itemStaticText20->Enable(false);
     itemBoxSizer19->Add(itemStaticText20, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxString* itemChoice21Strings = NULL;
-    wxUglyChoice* itemChoice21 = new wxUglyChoice( itemPanel4, ID_CHOICE8, wxDefaultPosition, wxDefaultSize, 0, itemChoice21Strings, 0 );
-    itemChoice21->Enable(false);
-    itemBoxSizer19->Add(itemChoice21, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxString* polarChoiceStrings = NULL;
+    polarChoice = new wxUglyChoice( itemPanel4, ID_POLAR_CHOICE, wxDefaultPosition, wxDefaultSize, 0, polarChoiceStrings, 0 );
+    polarChoice->Enable(false);
+    itemBoxSizer19->Add(polarChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxCheckBox* itemCheckBox22 = new wxCheckBox( itemPanel4, ID_CHECKBOX3, _("Diffuse L-shell on heavy atoms"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox22->SetValue(false);
-    itemBoxSizer5->Add(itemCheckBox22, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
+    diffuseLCheck = new wxCheckBox( itemPanel4, ID_DIFFL_CHECKBOX, _("Diffuse L-shell on heavy atoms"), wxDefaultPosition, wxDefaultSize, 0 );
+    diffuseLCheck->SetValue(false);
+    itemBoxSizer5->Add(diffuseLCheck, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxCheckBox* itemCheckBox23 = new wxCheckBox( itemPanel4, ID_CHECKBOX4, _("Diffuse s-shell on hydrogens"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox23->SetValue(false);
-    itemBoxSizer5->Add(itemCheckBox23, 0, wxGROW|wxALL, 5);
+    diffuseSCheck = new wxCheckBox( itemPanel4, ID_DIFFS_CHECKBOX, _("Diffuse s-shell on hydrogens"), wxDefaultPosition, wxDefaultSize, 0 );
+    diffuseSCheck->SetValue(false);
+    itemBoxSizer5->Add(diffuseSCheck, 0, wxGROW|wxALL, 5);
 
     listBook->AddPage(itemPanel4, _("Basis"));
 
@@ -865,6 +889,121 @@ void InputBuilderWindow::OnCloseWindow( wxCloseEvent& event )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->CloseInputBuilderWindow();
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_BASIS_CHOICE
+ */
+
+void InputBuilderWindow::OnBasisChoiceSelected( wxCommandEvent& event )
+{
+    short BasisValue = 0;
+    short NumGauss   = 0;
+    int   itemValue  = basisChoice->GetSelection();
+    
+    if(itemValue < 2) {
+        BasisValue = itemValue + 1;
+    }
+    else if(itemValue < 7) {
+        BasisValue = 3;
+        NumGauss = itemValue;
+    }
+    else if(itemValue < 9) {
+        BasisValue = 4;
+        NumGauss = ((itemValue==7) ? 3 : 6);
+    }
+    else if(itemValue < 12) {
+        BasisValue = 5;
+        NumGauss = itemValue - 5;
+    }
+    else if(itemValue < 19) {
+        BasisValue = itemValue - 6;
+        if(itemValue == 12) NumGauss = 6;
+    }
+    else if(itemValue < 21) {
+        BasisValue = itemValue - 7;
+    }
+    else {
+        BasisValue = itemValue - 8;
+    }
+    
+    TmpInputRec->Basis->SetBasis(BasisValue);
+    TmpInputRec->Basis->SetNumGauss(NumGauss);
+    //SetupItems();
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ECPT_CHOICE
+ */
+
+void InputBuilderWindow::OnEcptChoiceSelected( wxCommandEvent& event )
+{
+    TmpInputRec->Basis->SetECPPotential(ecpTypeChoice->GetSelection());
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POLAR_CHOICE
+ */
+
+void InputBuilderWindow::OnPolarChoiceSelected( wxCommandEvent& event )
+{
+    TmpInputRec->Basis->SetPolar((GAMESS_BS_Polarization)(polarChoice->GetSelection() + 1));
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIFFL_CHECKBOX
+ */
+
+void InputBuilderWindow::OnDifflCheckboxClick( wxCommandEvent& event )
+{
+    TmpInputRec->Basis->SetDiffuseSP(event.IsChecked());
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIFFS_CHECKBOX
+ */
+
+void InputBuilderWindow::OnDiffsCheckboxClick( wxCommandEvent& event )
+{
+    TmpInputRec->Basis->SetDiffuseS(event.IsChecked());
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMD_CHOICE
+ */
+
+void InputBuilderWindow::OnNumdChoiceSelected( wxCommandEvent& event )
+{
+    TmpInputRec->Basis->SetNumDFuncs(numDChoice->GetSelection() + 1);
+    //SetupItems();
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMF_CHOICE
+ */
+
+void InputBuilderWindow::OnNumfChoiceSelected( wxCommandEvent& event )
+{
+    TmpInputRec->Basis->SetNumFFuncs(numFChoice->GetSelection() + 1);
+    //SetupItems();
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMP_CHOICE
+ */
+
+void InputBuilderWindow::OnNumpChoiceSelected( wxCommandEvent& event )
+{
+    TmpInputRec->Basis->SetNumPFuncs(numPChoice->GetSelection() + 1);
+    //SetupItems();
 }
 
 

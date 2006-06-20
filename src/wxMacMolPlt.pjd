@@ -9119,6 +9119,14 @@ along the chosen normal mode."</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Stretch factor">0</long>
+            <long name="proxy-Border">5</long>
+            <bool name="proxy-wxLEFT">1</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
+            <bool name="proxy-wxTOP">1</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -11269,7 +11277,7 @@ Grid Points:"</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE3"</string>
+                      <string name="title">"wxChoice: ID_BASIS_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -11279,10 +11287,11 @@ Grid Points:"</string>
                       <long name="locked">0</long>
                       <string name="created">"12/6/2006"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
-                      <string name="proxy-Id name">"ID_CHOICE3"</string>
+                      <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnBasisChoiceSelected"</string>
+                      <string name="proxy-Id name">"ID_BASIS_CHOICE"</string>
                       <long name="proxy-Id value">10098</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"basisChoice"</string>
                       <string name="proxy-Strings">"MINI|MIDI|STO-2G|STO-3G|STO-4G|STO-5G|STO-6G|3-21G|6-21G|4-31G|5-31G|6-31G|6-311G|Double Zeta Valance|Dunning/Hay DZ|Binning/Curtiss DZ|Triple Zeta Valence|McLean/Chandler||SBKJC Valance|Hay/Wadt Valance||MNDO|AM1|PM3"</string>
                       <string name="proxy-Initial value">"MINI"</string>
                       <string name="proxy-Help text">""</string>
@@ -11399,7 +11408,7 @@ Grid Points:"</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE4"</string>
+                      <string name="title">"wxChoice: ID_ECPT_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -11409,10 +11418,11 @@ Grid Points:"</string>
                       <long name="locked">0</long>
                       <string name="created">"12/6/2006"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
-                      <string name="proxy-Id name">"ID_CHOICE4"</string>
+                      <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnEcptChoiceSelected"</string>
+                      <string name="proxy-Id name">"ID_ECPT_CHOICE"</string>
                       <long name="proxy-Id value">10099</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"ecpTypeChoice"</string>
                       <string name="proxy-Strings">"None|Read|SBKJC|Hay-Wadt"</string>
                       <string name="proxy-Initial value">"None"</string>
                       <string name="proxy-Help text">""</string>
@@ -11534,7 +11544,7 @@ Grid Points:"</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE5"</string>
+                      <string name="title">"wxChoice: ID_NUMD_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -11544,10 +11554,11 @@ Grid Points:"</string>
                       <long name="locked">0</long>
                       <string name="created">"12/6/2006"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
-                      <string name="proxy-Id name">"ID_CHOICE5"</string>
+                      <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnNumdChoiceSelected"</string>
+                      <string name="proxy-Id name">"ID_NUMD_CHOICE"</string>
                       <long name="proxy-Id value">10100</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"numDChoice"</string>
                       <string name="proxy-Strings">"0|1|2|3"</string>
                       <string name="proxy-Initial value">"0"</string>
                       <string name="proxy-Help text">""</string>
@@ -11638,7 +11649,7 @@ Grid Points:"</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE6"</string>
+                      <string name="title">"wxChoice: ID_NUMF_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -11648,10 +11659,11 @@ Grid Points:"</string>
                       <long name="locked">0</long>
                       <string name="created">"12/6/2006"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
-                      <string name="proxy-Id name">"ID_CHOICE6"</string>
+                      <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnNumfChoiceSelected"</string>
+                      <string name="proxy-Id name">"ID_NUMF_CHOICE"</string>
                       <long name="proxy-Id value">10101</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"numFChoice"</string>
                       <string name="proxy-Strings">"0|1|2|3"</string>
                       <string name="proxy-Initial value">"0"</string>
                       <string name="proxy-Help text">""</string>
@@ -11742,7 +11754,7 @@ Grid Points:"</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE7"</string>
+                      <string name="title">"wxChoice: ID_NUMP_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -11752,10 +11764,11 @@ Grid Points:"</string>
                       <long name="locked">0</long>
                       <string name="created">"12/6/2006"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
-                      <string name="proxy-Id name">"ID_CHOICE7"</string>
+                      <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnNumpChoiceSelected"</string>
+                      <string name="proxy-Id name">"ID_NUMP_CHOICE"</string>
                       <long name="proxy-Id value">10102</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"numPChoice"</string>
                       <string name="proxy-Strings">"0|1|2|3"</string>
                       <string name="proxy-Initial value">"0"</string>
                       <string name="proxy-Help text">""</string>
@@ -11872,7 +11885,7 @@ Grid Points:"</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE8"</string>
+                      <string name="title">"wxChoice: ID_POLAR_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -11882,10 +11895,11 @@ Grid Points:"</string>
                       <long name="locked">0</long>
                       <string name="created">"12/6/2006"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
-                      <string name="proxy-Id name">"ID_CHOICE8"</string>
+                      <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnPolarChoiceSelected"</string>
+                      <string name="proxy-Id name">"ID_POLAR_CHOICE"</string>
                       <long name="proxy-Id value">10103</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"polarChoice"</string>
                       <string name="proxy-Strings">""</string>
                       <string name="proxy-Initial value">""</string>
                       <string name="proxy-Help text">""</string>
@@ -11920,7 +11934,7 @@ Grid Points:"</string>
                     </document>
                   </document>
                   <document>
-                    <string name="title">"wxCheckBox: ID_CHECKBOX3"</string>
+                    <string name="title">"wxCheckBox: ID_DIFFL_CHECKBOX"</string>
                     <string name="type">"dialog-control-document"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"checkbox"</string>
@@ -11930,10 +11944,11 @@ Grid Points:"</string>
                     <long name="locked">0</long>
                     <string name="created">"12/6/2006"</string>
                     <string name="proxy-type">"wbCheckBoxProxy"</string>
-                    <string name="proxy-Id name">"ID_CHECKBOX3"</string>
+                    <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnDifflCheckboxClick"</string>
+                    <string name="proxy-Id name">"ID_DIFFL_CHECKBOX"</string>
                     <long name="proxy-Id value">10104</long>
                     <string name="proxy-Class">"wxCheckBox"</string>
-                    <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Member variable name">"diffuseLCheck"</string>
                     <string name="proxy-Label">"Diffuse L-shell on heavy atoms"</string>
                     <bool name="proxy-Initial value">0</bool>
                     <string name="proxy-Help text">""</string>
@@ -11971,7 +11986,7 @@ Grid Points:"</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                   </document>
                   <document>
-                    <string name="title">"wxCheckBox: ID_CHECKBOX4"</string>
+                    <string name="title">"wxCheckBox: ID_DIFFS_CHECKBOX"</string>
                     <string name="type">"dialog-control-document"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"checkbox"</string>
@@ -11981,10 +11996,11 @@ Grid Points:"</string>
                     <long name="locked">0</long>
                     <string name="created">"12/6/2006"</string>
                     <string name="proxy-type">"wbCheckBoxProxy"</string>
-                    <string name="proxy-Id name">"ID_CHECKBOX4"</string>
+                    <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnDiffsCheckboxClick"</string>
+                    <string name="proxy-Id name">"ID_DIFFS_CHECKBOX"</string>
                     <long name="proxy-Id value">10105</long>
                     <string name="proxy-Class">"wxCheckBox"</string>
-                    <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Member variable name">"diffuseSCheck"</string>
                     <string name="proxy-Label">"Diffuse s-shell on hydrogens"</string>
                     <bool name="proxy-Initial value">0</bool>
                     <string name="proxy-Help text">""</string>

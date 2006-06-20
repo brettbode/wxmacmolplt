@@ -65,16 +65,21 @@ wxUglyChoice::~wxUglyChoice() {
 int wxUglyChoice::Append(const wxString &item) {
     wxMenuItem *mi = NULL;
 
+    if(!item.IsEmpty()) {
 #if 0 //wxHAS_RADIO_MENU_ITEMS
-    mi = m_menu->AppendRadioItem(wxID_ANY, item);
+        mi = m_menu->AppendRadioItem(wxID_ANY, item);
 #else
-    mi = m_menu->Append(wxID_ANY, item);
+        mi = m_menu->Append(wxID_ANY, item);
 #endif
-    this->item.push_back(mi->GetId());
+        this->item.push_back(mi->GetId());
 
-    Connect(mi->GetId(),
-            wxEVT_COMMAND_MENU_SELECTED,
-            wxCommandEventHandler(wxUglyChoice::onMenuSelect));
+        Connect(mi->GetId(),
+                wxEVT_COMMAND_MENU_SELECTED,
+                wxCommandEventHandler(wxUglyChoice::onMenuSelect));
+    }
+    else {
+        m_menu->AppendSeparator();
+    }
             
     // TODO:  Return valid value
     return 0;
@@ -83,16 +88,21 @@ int wxUglyChoice::Append(const wxString &item) {
 int wxUglyChoice::Insert(const wxString &item, int pos) {
     wxMenuItem *mi = NULL;
 
+    if(!item.IsEmpty()) {
 #if 0 //wxHAS_RADIO_MENU_ITEMS
-    mi = m_menu->InsertRadioItem(pos, wxID_ANY, item);
+        mi = m_menu->InsertRadioItem(pos, wxID_ANY, item);
 #else
-    mi = m_menu->Insert(pos, wxID_ANY, item);
+        mi = m_menu->Insert(pos, wxID_ANY, item);
 #endif
-    this->item.insert(this->item.begin() + pos, mi->GetId());
+        this->item.insert(this->item.begin() + pos, mi->GetId());
 
-    Connect(mi->GetId(),
-            wxEVT_COMMAND_MENU_SELECTED,
-            wxCommandEventHandler(wxUglyChoice::onMenuSelect));
+        Connect(mi->GetId(),
+                wxEVT_COMMAND_MENU_SELECTED,
+                wxCommandEventHandler(wxUglyChoice::onMenuSelect));
+    }
+    else {
+        m_menu->InsertSeparator(pos);
+    }
             
     // TODO:  Return valid value
     return 0;

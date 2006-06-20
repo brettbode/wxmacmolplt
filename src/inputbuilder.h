@@ -27,6 +27,7 @@
 ////@end includes
 
 #include "wxUglyChoice.h"
+#include "InputData.h"
 
 /*!
  * Forward declarations
@@ -34,6 +35,7 @@
 
 ////@begin forward declarations
 class wxListbook;
+class wxUglyChoice;
 ////@end forward declarations
 
 /*!
@@ -49,14 +51,14 @@ class wxListbook;
 #define SYMBOL_INPUTBUILDERWINDOW_POSITION wxDefaultPosition
 #define ID_IBNOTEBOOK 10072
 #define ID_IBBASISPANEL 10091
-#define ID_CHOICE3 10098
-#define ID_CHOICE4 10099
-#define ID_CHOICE5 10100
-#define ID_CHOICE6 10101
-#define ID_CHOICE7 10102
-#define ID_CHOICE8 10103
-#define ID_CHECKBOX3 10104
-#define ID_CHECKBOX4 10105
+#define ID_BASIS_CHOICE 10098
+#define ID_ECPT_CHOICE 10099
+#define ID_NUMD_CHOICE 10100
+#define ID_NUMF_CHOICE 10101
+#define ID_NUMP_CHOICE 10102
+#define ID_POLAR_CHOICE 10103
+#define ID_DIFFL_CHECKBOX 10104
+#define ID_DIFFS_CHECKBOX 10105
 #define ID_IBCONTROLPANEL 10092
 #define ID_CHOICE9 10106
 #define ID_CHOICE10 10107
@@ -157,6 +159,30 @@ public:
     /// wxEVT_CLOSE_WINDOW event handler for ID_INPUTBUILDERWINDOW
     void OnCloseWindow( wxCloseEvent& event );
 
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_BASIS_CHOICE
+    void OnBasisChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ECPT_CHOICE
+    void OnEcptChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMD_CHOICE
+    void OnNumdChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMF_CHOICE
+    void OnNumfChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMP_CHOICE
+    void OnNumpChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POLAR_CHOICE
+    void OnPolarChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIFFL_CHECKBOX
+    void OnDifflCheckboxClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIFFS_CHECKBOX
+    void OnDiffsCheckboxClick( wxCommandEvent& event );
+
 ////@end InputBuilderWindow event handler declarations
 
 ////@begin InputBuilderWindow member function declarations
@@ -173,12 +199,22 @@ public:
 
 ////@begin InputBuilderWindow member variables
     wxListbook* listBook;
+    wxUglyChoice* basisChoice;
+    wxUglyChoice* ecpTypeChoice;
+    wxUglyChoice* numDChoice;
+    wxUglyChoice* numFChoice;
+    wxUglyChoice* numPChoice;
+    wxUglyChoice* polarChoice;
+    wxCheckBox* diffuseLCheck;
+    wxCheckBox* diffuseSCheck;
     wxWindow * tabMOGuess;
     wxWindow * tabHessOpts;
     wxWindow * tabMiscPrefs;
     wxWindow * tabSCFOpts;
     wxWindow * tabStatPoint;
 ////@end InputBuilderWindow member variables
+
+    InputData * TmpInputRec;
 };
 
 #endif
