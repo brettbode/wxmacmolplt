@@ -115,6 +115,9 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     GetSizer()->SetSizeHints(this);
     Centre();
 ////@end InputBuilderWindow creation
+
+    TmpInputRec = new InputData(((MolDisplayWin *)parent)->GetData()->GetInputData());
+
     return true;
 }
 
