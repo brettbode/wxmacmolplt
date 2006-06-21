@@ -60,25 +60,25 @@ class wxUglyChoice;
 #define ID_DIFFL_CHECKBOX 10104
 #define ID_DIFFS_CHECKBOX 10105
 #define ID_IBCONTROLPANEL 10092
-#define ID_CHOICE9 10106
-#define ID_CHOICE10 10107
-#define ID_CHOICE11 10108
-#define ID_TEXTCTRL5 10109
-#define ID_TEXTCTRL7 10110
-#define ID_CHOICE12 10111
-#define ID_TEXTCTRL8 10112
-#define ID_CHECKBOX6 10113
-#define ID_CHECKBOX7 10114
-#define ID_CHOICE13 10115
-#define ID_CHOICE14 10116
+#define ID_RUN_CHOICE 10106
+#define ID_SCF_CHOICE 10107
+#define ID_LOCAL_CHOICE 10108
+#define ID_MCHARGE_TEXTCTRL 10109
+#define ID_MULT_TEXTCTRL 10110
+#define ID_EXE_CHOICE 10111
+#define ID_MAXIT_TEXTCTRL 10112
+#define ID_MP2_CHECKBOX 10113
+#define ID_DFT_CHECKBOX 10114
+#define ID_CI_CHOICE 10115
+#define ID_CC_CHOICE 10116
 #define ID_IBDATAPANEL 10093
-#define ID_TEXTCTRL9 10117
-#define ID_CHOICE15 10118
-#define ID_CHOICE16 10119
+#define ID_TITLE_TEXTCTRL 10117
+#define ID_COORD_CHOICE 10118
+#define ID_UNIT_CHOICE 10119
 #define ID_TEXTCTRL10 10123
-#define ID_CHOICE17 10120
-#define ID_CHOICE18 10121
-#define ID_CHECKBOX8 10122
+#define ID_POINTGROUP_CHOICE 10120
+#define ID_ORDER_CHOICE 10121
+#define ID_SYMMETRY_CHECKBOX 10122
 #define ID_IBSYSTEMPANEL 10094
 #define ID_SPINCTRL 10164
 #define ID_CHOICE19 10125
@@ -183,6 +183,30 @@ public:
     /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIFFS_CHECKBOX
     void OnDiffsCheckboxClick( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_RUN_CHOICE
+    void OnRunChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_SCF_CHOICE
+    void OnScfChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_LOCAL_CHOICE
+    void OnLocalChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_EXE_CHOICE
+    void OnExeChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_MP2_CHECKBOX
+    void OnMp2CheckboxClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DFT_CHECKBOX
+    void OnDftCheckboxClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CI_CHOICE
+    void OnCiChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CC_CHOICE
+    void OnCcChoiceSelected( wxCommandEvent& event );
+
 ////@end InputBuilderWindow event handler declarations
 
 ////@begin InputBuilderWindow member function declarations
@@ -207,6 +231,14 @@ public:
     wxUglyChoice* polarChoice;
     wxCheckBox* diffuseLCheck;
     wxCheckBox* diffuseSCheck;
+    wxUglyChoice* runChoice;
+    wxUglyChoice* scfChoice;
+    wxUglyChoice* localChoice;
+    wxUglyChoice* exeChoice;
+    wxCheckBox* mp2Check;
+    wxCheckBox* dftChoice;
+    wxUglyChoice* ciChoice;
+    wxUglyChoice* ccChoice;
     wxWindow * tabMOGuess;
     wxWindow * tabHessOpts;
     wxWindow * tabMiscPrefs;
