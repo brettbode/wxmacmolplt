@@ -171,7 +171,9 @@ void MpApp::createMainFrame(const wxString &filename) {
 		long r = temp->OpenFile(filename);
 		if (r>0) temp->Show(true);
     }
+#ifdef __WXMAC__
 	menuHolder->Show(false);
+#endif
 }
 
 void MpApp::ApplyPrefsToAll(WinPrefs * prefs) {
