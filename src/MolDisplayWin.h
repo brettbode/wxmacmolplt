@@ -70,6 +70,7 @@ class MolDisplayWin : public wxFrame {
 		FrequenciesDialog	*frequenciesWindow;
 		SurfacesWindow		*surfacesWindow;
         InputBuilderWindow  *inputBuilderWindow;
+		setPreference		*prefsDlg;
         
         wxPageSetupDialogData *pageSetupData;
         wxPrintData           *printData;
@@ -77,8 +78,6 @@ class MolDisplayWin : public wxFrame {
         void createMenuBar(void);
         long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
                               long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
-
-	int mGlobalID;
 
         DECLARE_EVENT_TABLE()
 
@@ -169,7 +168,7 @@ class MolDisplayWin : public wxFrame {
         //void menuViewStereo(wxCommandEvent &event);
         
 		void menuPreferences(wxCommandEvent &event);
-		//added by Song Li
+        void ClosePrefsWindow(void);
 
         void menuMoleculeSetBondLength(wxCommandEvent &event);
         void menuMoleculeSetFrameEnergy(wxCommandEvent &event);
@@ -224,8 +223,8 @@ class MolDisplayWin : public wxFrame {
         void UpdateModelDisplay(void);
         MoleculeData * GetData(void) const {return MainData;};
         WinPrefs * GetPrefs(void) const {return Prefs;};
-	void SetWindowPreferences(WinPrefs * NewPrefs) {if (Prefs) *Prefs=*NewPrefs; }
-	void ChangePrefs(WinPrefs * newPrefs);
+		void SetWindowPreferences(WinPrefs * NewPrefs) {if (Prefs) *Prefs=*NewPrefs; }
+		void ChangePrefs(WinPrefs * newPrefs);
         void ResetView(void);
         void ResetModel(bool Center);
         void ResetAllWindows(void);

@@ -56,6 +56,7 @@ class macMenuWinPlaceholder : public wxFrame {
 
 #endif
 
+typedef class setPreference;
 /**
  * Subclasses wxApp to define an application's data and operations.
  */
@@ -64,6 +65,7 @@ class MpApp : public wxApp {
         wxSingleInstanceChecker *m_InstanceChecker;
 
 		std::list<MolDisplayWin *> MolWinList;
+		setPreference *	gPrefDlg;
 #ifdef __WXMAC__
 		macMenuWinPlaceholder	* menuHolder;
 #endif
@@ -116,6 +118,8 @@ class MpApp : public wxApp {
         void menuFileNew(wxCommandEvent &event);
         void menuFileOpen(wxCommandEvent &event);
 		void menuPreferences(wxCommandEvent &event);
+		void ApplyPrefsToAll(WinPrefs * prefs);
+		void CloseGlobalPrefs(void);
 #ifdef __WXMAC__
 		/**
 		 * Event sent on Macs when double click a document

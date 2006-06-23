@@ -10,6 +10,7 @@
 #include "Globals.h"
 #include "main.h"
 #include "Prefs.h"
+#include "setPreference.h"
 #include "aboutwxmacmolplt.h"
 #include <wx/cmdline.h>
 #include <wx/filename.h>
@@ -18,8 +19,6 @@
 
 //The global preferences settings
     WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
-    MolDisplayWin *	gWindow[kMaxOpenDocuments];  // Song Li
-    long  gNumDocuments;
 
 static const wxCmdLineEntryDesc g_cmdLineDesc[] = 
 { 
@@ -36,6 +35,7 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] =
 #include "sp.xpm"
 bool MpApp::OnInit() {
     const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
+	gPrefDlg = NULL;
 	
     m_InstanceChecker = new wxSingleInstanceChecker();
 	
@@ -70,11 +70,6 @@ bool MpApp::OnInit() {
 	*gPreferences = *gPrefDefaults;
 		//attempt to read new xml pref file
 	gPreferences->ReadUserPrefs();
-
-	//track all opened windows
-	gNumDocuments = 0;
-	for ( int i = 0; i < kMaxOpenDocuments; i++)
-	  gWindow[i] = NULL;
 
     // Parse command line 
 	wxString cmdFilename; 
@@ -140,6 +135,11 @@ bool MpApp::OnInit() {
 	wxPoint p(-100,-100);
 	wxSize s(10,10);
 	menuHolder = new macMenuWinPlaceholder(wxT("offscreen"), p, s);
+	menuHolder->Show(false);
+	if (MolWinList.size()<=0){
+		MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
+		MolWinList.push_back(temp);
+	} else menuHolder->Show(true);
 	SetExitOnFrameDelete(false);
 #else
 	if (MolWinList.size()<=0){
@@ -164,14 +164,28 @@ void MpApp::createMainFrame(const wxString &filename) {
     if(filename.IsEmpty()) {
 	    temp = new MolDisplayWin(wxT("Untitled"));
 	    MolWinList.push_back(temp);
-    }
-    else {
+    } else {
         // TODO:  Error checking
 		temp = new MolDisplayWin(filename);
 		MolWinList.push_back(temp);
 		long r = temp->OpenFile(filename);
 		if (r>0) temp->Show(true);
     }
+	menuHolder->Show(false);
+}
+
+void MpApp::ApplyPrefsToAll(WinPrefs * prefs) {
+	std::list<MolDisplayWin *>::iterator win = MolWinList.begin();
+	while (win != MolWinList.end()) {
+		MolDisplayWin * temp = (*win);
+		(*win)->ChangePrefs(prefs);
+		win++;
+	}
+}
+
+void MpApp::CloseGlobalPrefs(void) {
+	gPrefDlg->Destroy();
+	gPrefDlg = NULL;
 }
 
 void MpApp::destroyMainFrame(MolDisplayWin *frame) {
@@ -211,9 +225,12 @@ void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {
 }
 void MpApp::menuPreferences(wxCommandEvent & WXUNUSED(event)) {
 	//Default application preferences
-#ifndef WIN32
-#warning Open default preferences dialog here once implemented
-#endif
+    if (gPrefDlg) { //need to bring it to the front...
+        gPrefDlg->Raise();
+    } else {
+        gPrefDlg = new setPreference(NULL, true);
+        gPrefDlg->Show();
+    }
 }
 void MpApp::menuFileNew(wxCommandEvent &event) {
     createMainFrame();
@@ -247,6 +264,7 @@ BEGIN_EVENT_TABLE(MpApp, wxApp)
 EVT_MENU (wxID_NEW,          MpApp::menuFileNew)
 EVT_MENU (wxID_OPEN,         MpApp::menuFileOpen)
 EVT_MENU (wxID_EXIT,         MpApp::menuFileQuit)
+EVT_MENU (wxID_PREFERENCES,  MpApp::menuPreferences)
 
 EVT_MENU (wxID_ABOUT,    MpApp::menuHelpAbout)
 END_EVENT_TABLE()
@@ -266,7 +284,7 @@ macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,
     createMenuBar();
     SetMenuBar(menuBar);
 
-    Show(true);	//You seem to have to show it to get the menu bar to load
+//    Show(true);	//You seem to have to show it to get the menu bar to load
 //	Show(false);//then hide it to get it out of the window lists
 }
 
@@ -293,6 +311,8 @@ void macMenuWinPlaceholder::createMenuBar(void) {
     menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
     menuEdit->AppendSeparator();
     menuEdit->Append(wxID_SELECTALL, wxT("&Select all\tCtrl+A"));
+    menuEdit->AppendSeparator();
+    menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
 
     menuHelp->Append(wxID_ABOUT, wxT("&About ..."));
 

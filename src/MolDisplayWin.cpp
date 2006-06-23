@@ -40,8 +40,6 @@
 #include <wx/printdlg.h>
 
 extern WinPrefs * gPreferences;
-extern long  gNumDocuments;
-extern MolDisplayWin *  gWindow[kMaxOpenDocuments];
 
 using namespace std;
 
@@ -125,7 +123,6 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
     EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
     EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
-    EVT_MENU (wxID_PREFERENCES,  MolDisplayWin::menuPreferences)
     EVT_MENU (ID_LOCAL_PREFERENCES,   MolDisplayWin::menuPreferences)
     EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
     EVT_MENU (MMP_ANIMATEMODE,      MolDisplayWin::menuViewAnimateMode)
@@ -204,17 +201,10 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     frequenciesWindow = NULL;
     surfacesWindow = NULL;
     inputBuilderWindow = NULL;
+	prefsDlg = NULL;
     
     pageSetupData = NULL;
     printData = NULL;
-
-    int i;
-    for (i = 0; (gWindow[i]!=NULL)&&(i<kMaxOpenDocuments); i++) ;
-    if (i>=kMaxOpenDocuments) return;
-    gWindow[i] = this;
-    gNumDocuments++;
-    mGlobalID = i;
-/* Increment the open document count */
 
     InitGLData();
     
@@ -262,9 +252,6 @@ MolDisplayWin::~MolDisplayWin() {
     if (Prefs != NULL) {
         delete Prefs;
     }
-
-    gWindow[mGlobalID] = NULL;
-    gNumDocuments--;
 }
 
 void MolDisplayWin::getCanvasSize(long *width, long *height) {
@@ -1325,10 +1312,18 @@ void MolDisplayWin::menuPreferences(wxCommandEvent &event)
     else
         MessageAlert("This shouldn't happen!");
 
-    setPreference * pre_dlg = new setPreference(this, isGlobal);
-    pre_dlg->Show();
-    //pre_dlg->Destroy();
-    Dirty = true;
+	if (prefsDlg) {
+		prefsDlg->Raise();
+	} else {
+		prefsDlg = new setPreference(this, isGlobal);
+		prefsDlg->Show();
+	}
+}
+void MolDisplayWin::ClosePrefsWindow(void) {
+    if (prefsDlg) {
+        prefsDlg->Destroy();
+        prefsDlg = NULL;
+    }
 }
 
 void MolDisplayWin::menuMoleculeSetFrameEnergy(wxCommandEvent &event) {

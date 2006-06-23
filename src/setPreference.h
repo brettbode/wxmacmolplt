@@ -79,6 +79,9 @@ public:
 
     bool create( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style );
 
+    /// wxEVT_CLOSE_WINDOW event handler for ID_COORDINATESDIALOG
+    void OnCloseWindow( wxCloseEvent& event );
+    void OnCancel( wxCommandEvent& event );
 ////@begin setPreference event handler declarations
 
     void OnSetFont(wxCommandEvent& event);

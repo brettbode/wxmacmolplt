@@ -24,6 +24,7 @@
 #include "Globals.h"
 #include "PrefsPanes.h"
 #include "MolDisplayWin.h"
+#include "main.h"
 
 #include "setPreference.h"
 
@@ -40,6 +41,7 @@ IMPLEMENT_DYNAMIC_CLASS( setPreference, wxDialog )
  */
 
 BEGIN_EVENT_TABLE( setPreference, wxDialog )
+	EVT_CLOSE( setPreference::OnCloseWindow )
 
   EVT_CHOICEBOOK_PAGE_CHANGED(ID_NOTEBOOK, setPreference::OnChoicebook)
   EVT_CHOICEBOOK_PAGE_CHANGING(ID_NOTEBOOK, setPreference::OnChoicebook)
@@ -47,6 +49,7 @@ BEGIN_EVENT_TABLE( setPreference, wxDialog )
 
   EVT_BUTTON( myID_SETFONT, setPreference::OnSetFont )
   EVT_BUTTON( wxID_OK, setPreference::OnOK )
+	EVT_BUTTON( wxID_CANCEL, setPreference::OnCancel )
   EVT_BUTTON( ID_FACTORY_DEFAULT, setPreference::facDefaults )
   EVT_BUTTON( ID_APPLY, setPreference::OnApply )
   EVT_BUTTON( ID_REVERT, setPreference::OnRevert )
@@ -63,10 +66,8 @@ setPreference::setPreference( )
 
 }
 
-
 setPreference::~setPreference( )
 {
-  //if (mIsGlobal)
     delete mPrefs;
 
   /*if (m_imageList)
@@ -205,25 +206,43 @@ int setPreference::GetIconIndex(wxBookCtrlBase* bookCtrl)
 */
 
 /*!
+* wxEVT_CLOSE_WINDOW event handler for ID_DIALOG
+ */
+
+void setPreference::OnCloseWindow( wxCloseEvent& event )
+{
+	if (mIsGlobal) {
+		MpApp & app = wxGetApp();
+		app.CloseGlobalPrefs();
+	} else {
+		mParent->ClosePrefsWindow();
+	}
+}
+/*!
+* wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
+ */
+
+void setPreference::OnCancel( wxCommandEvent& event )
+{
+	Close();
+}
+/*!
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
  */
 
 void setPreference::OnOK( wxCommandEvent& event )
 {
-  saveCurrPrefs(currPanel);
+	saveCurrPrefs(currPanel);
 
-  if (mIsGlobal)
-    {
-      *gPreferences = *mPrefs;
-      gPreferences->WriteUserPrefs();
-    }
-  else
-    {
-      mParent->SetWindowPreferences(mPrefs);
-      mParent->ResetAllWindows();
-    }
+	if (mIsGlobal) {
+		*gPreferences = *mPrefs;
+		gPreferences->WriteUserPrefs();
+	} else {
+		mParent->SetWindowPreferences(mPrefs);
+		mParent->ResetAllWindows();
+	}
 
-  Close();
+	Close();
 }
 
 void setPreference::facDefaults( wxCommandEvent& WXUNUSED(event) )
@@ -251,20 +270,16 @@ void setPreference::userDefaults( wxCommandEvent& WXUNUSED(event) )
   updatePanels(currPanel);
 }
 
-void setPreference::OnApply( wxCommandEvent& WXUNUSED(event) )
-{
-  saveCurrPrefs(currPanel);
+void setPreference::OnApply( wxCommandEvent& WXUNUSED(event) ) {
+	saveCurrPrefs(currPanel);
 
-  if (!mIsGlobal)
-    {
-      mParent->SetWindowPreferences(mPrefs);
-      mParent->ResetAllWindows();
-    }
-  else
-    {
-      for (int i=0; i<kMaxOpenDocuments; i++)
-	if (gWindow[i]) gWindow[i]->ChangePrefs(mPrefs);
-    }
+	if (!mIsGlobal) {
+		mParent->SetWindowPreferences(mPrefs);
+		mParent->ResetAllWindows();
+	} else {
+		MpApp & app = wxGetApp();
+		app.ApplyPrefsToAll(mPrefs);
+	}
 
 }
 
