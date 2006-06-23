@@ -122,6 +122,7 @@ public:
     wxString mCurrSurfStr;
 
     MoleculeData* mData;
+    WinPrefs* mPrefs;
 };
 
 class SurfacePane : public wxPanel {

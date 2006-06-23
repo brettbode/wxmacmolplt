@@ -33,6 +33,7 @@
 #include "MolDisplayWin.h"
 #include "Frame.h"
 
+#include "SurfaceTypes.h"
 #include "surfaceswindow.h"
 #include "surfaceDlg.h"
 
@@ -99,11 +100,9 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
     listBook = NULL;
 
     Parent = parent;
-
+    mPrefs = parent->GetPrefs();
 ////@begin SurfacesWindow creation
     wxFrame::Create( parent, id, caption, pos, size, style );
-
-    selectSurfaceType();
 
     CreateControls();
     GetSizer()->Fit(this);
@@ -138,11 +137,9 @@ void SurfacesWindow::CreateControls()
     upperSizer->Add(surfTitleEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     visibleCheck = new wxCheckBox( this, ID_VISIBLECHECK, _("Visible"), wxDefaultPosition, wxDefaultSize, 0 );
-    visibleCheck->SetValue(false);
     upperSizer->Add(visibleCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     allFrameCheck = new wxCheckBox( this, ID_ALLFRAMECHECK, _("All Frames"), wxDefaultPosition, wxDefaultSize, 0 );
-    allFrameCheck->SetValue(false);
     upperSizer->Add(allFrameCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     listBook = new wxListbook( this, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxLB_BOTTOM|wxSUNKEN_BORDER );
@@ -169,19 +166,51 @@ void SurfacesWindow::CreateControls()
 
     SetSizer(mainSizer);
 
+    int type = selectSurfaceType();
     wxListView * t = listBook->GetListView();
     t->SetWindowStyle(wxLC_LIST);
-    Orbital3DSurf * temp = new Orbital3DSurf(listBook);
-    listBook->AddPage(temp, mCurrSurfStr, false);
-    //listBook->AddPage(temp, wxT("test pane 2"), false);
+
+    BaseSurfacePane* tempPane = NULL;
+    Surface* newSurface = NULL;
+
+    switch (type)
+    {
+    case ID_3D_ORBITAL_PANE:
+      newSurface = new Orb3DSurface(mPrefs);
+      tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(newSurface), mData, mPrefs );
+      break;
+    }
+
+    if ( tempPane && newSurface)
+      {
+	visibleCheck->SetValue(newSurface->GetVisibility());
+	allFrameCheck->SetValue((newSurface->GetSurfaceID() != 0));
+      }
+    else
+      {
+	visibleCheck->Disable();
+	allFrameCheck->Disable();
+      }
+
+    if ( type != -1)
+      listBook->AddPage(tempPane, mCurrSurfStr, false);
 }
 
 void SurfacesWindow::OnAddClick( wxCommandEvent& event )
 {
-  Orbital3DSurf * temp = new Orbital3DSurf(listBook);
+  int surfTypeId = selectSurfaceType();
+  BaseSurfacePane* tempPane;
 
-  if ( selectSurfaceType() != -1)
-    listBook->AddPage(temp, mCurrSurfStr, false);
+  switch (surfTypeId)
+    {
+    case ID_3D_ORBITAL_PANE:
+      Orb3DSurface* newSurface = new Orb3DSurface(mPrefs);
+      tempPane = new Orbital3DSurfPane(listBook,newSurface, mData, mPrefs );
+      break;
+    }
+
+  if ( surfTypeId != -1)
+    listBook->AddPage(tempPane, mCurrSurfStr, false);
 }
 
 /*!

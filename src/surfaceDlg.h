@@ -24,6 +24,9 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
+
+#include <vector>
+
 ////@end includes
 
 /*!
@@ -32,6 +35,13 @@
 
 ////@begin forward declarations
 class colorArea;
+class MoleculeData;
+class WinPrefs;
+
+class Surface;
+class Surf3DBase;
+class Orb3DSurface;
+class OrbSurfBase;
 ////@end forward declarations
 
 /*!
@@ -62,6 +72,7 @@ class colorArea;
 #define ID_ORB_FORMAT_CHOICE 10087
 #define ID_ORB_COLOR_POSITIVE 10088
 #define ID_ORB_COLOR_NEGATIVE 10089
+#define ID_SPH_HARMONICS_CHECKBOX 10090
 
 ////@end control identifiers
 
@@ -84,7 +95,7 @@ class BaseSurfacePane : public wxPanel
  public:
 
   BaseSurfacePane() {}
-  BaseSurfacePane( wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+  BaseSurfacePane( wxWindow* parent, Surface* target, MoleculeData* data, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
   ~BaseSurfacePane();
 
   bool Create( wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
@@ -95,6 +106,8 @@ class BaseSurfacePane : public wxPanel
   wxBoxSizer* middleSizer;
   wxBoxSizer* bottomSizer;
   wxBoxSizer* leftMiddleSizer;
+  wxBoxSizer* upperLeftMiddleSizer;
+  wxBoxSizer* lowerLeftMiddleSizer;
   wxFlexGridSizer* rightMiddleSizer;
   wxBoxSizer* leftBottomSizer;
   wxBoxSizer* rightBottomSizer;
@@ -106,11 +119,41 @@ class BaseSurfacePane : public wxPanel
   wxButton* mSetParamBut;
   wxButton* mExportBut;
   wxButton* mUpdateBut;
+  wxCheckBox* mSphHarmonicsChk;
+
+  //MoleculeData* mData;
 
  private:
   void CreateControls();
- 
+
+  Surface* mTarget;
+
   //DECLARE_EVENT_TABLE()
+};
+
+class OrbSurfacePane
+{
+ public:
+  OrbSurfacePane() {}
+  OrbSurfacePane( OrbSurfBase* target, MoleculeData* data, WinPrefs* prefs );
+  ~OrbSurfacePane();
+
+ protected:
+  void makeMOList(std::vector<wxString>& choice);
+  void makeAOList(wxString& choice);
+  int getOrbSetForOrbPane(std::vector<wxString>& choice);
+
+  long TargetSet;
+  long OrbOptions; //from mac version
+  long OrbColumnEnergyOrOccupation;
+  long SphericalHarmonics;
+  long PlotOrb;
+  MoleculeData* mData;
+
+ private:
+  OrbSurfBase* mTarget;
+  WinPrefs* mPrefs;
+
 };
 
 /*!
@@ -131,11 +174,11 @@ class Surface2DPane : public BaseSurfacePane
 
 class Surface3DPane : public BaseSurfacePane
 {
-  DECLARE_CLASS(Surface3DPane);
+  DECLARE_CLASS(Surface3DPane)
 
  public:
   Surface3DPane() {}
-  Surface3DPane( wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+  Surface3DPane( wxWindow* parent, Surf3DBase* target, MoleculeData* data, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
   ~Surface3DPane();
 
  protected:
@@ -149,21 +192,28 @@ class Surface3DPane : public BaseSurfacePane
   wxCheckBox* mSmoothChkBox;
   wxButton* mFreeMemBut;
 
+  void On3DRadioBox (wxCommandEvent& event );
+  void OnSmoothCheck (wxCommandEvent& event );
+
  private:
   void CreateControls();
+
+  Surf3DBase* mTarget;
+  bool UseNormals;
+  bool UseSolidSurface;
 
   //DECLARE_EVENT_TABLE()
 }; 
 
-class Orbital3DSurf : public Surface3DPane
+class Orbital3DSurfPane : public Surface3DPane, public OrbSurfacePane
 {    
-  DECLARE_CLASS( Orbital3DSurf )
+  DECLARE_CLASS( Orbital3DSurfPane )
 
 public:
     /// Constructors
-    Orbital3DSurf() { }
-    Orbital3DSurf( wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
-    ~Orbital3DSurf();
+    Orbital3DSurfPane() { }
+    Orbital3DSurfPane( wxWindow* parent, Orb3DSurface* target, MoleculeData* data, WinPrefs* prefs, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    ~Orbital3DSurfPane();
 
     /// Creates the controls and sizers
     void CreateControls();
@@ -191,6 +241,11 @@ public:
     static bool ShowToolTips();
 
  private:
+    void OnOrbFormatChoice( wxCommandEvent &event );
+    void OnAtomList( wxCommandEvent &event );
+    void OnOrbSetChoice( wxCommandEvent &event );
+    void OnSphHarmonicChk(wxCommandEvent &event );
+
     wxBoxSizer* mSubLeftBot1Sizer;
     wxBoxSizer* mSubLeftBot2Sizer;
     wxBoxSizer* mSubRightBot1Sizer;
@@ -207,7 +262,9 @@ public:
     wxTextCtrl* mOrbCoef;
     wxChoice* mOrbFormatChoice;
 
-    //DECLARE_EVENT_TABLE()
+    Orb3DSurface* mTarget;
+
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

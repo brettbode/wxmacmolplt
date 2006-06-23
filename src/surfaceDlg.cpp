@@ -22,6 +22,11 @@
 
 #include "surfaceDlg.h"
 #include "colorArea.h"
+#include "SurfaceTypes.h"
+#include "MoleculeData.h"
+#include "Frame.h"
+#include "BasisSet.h"
+#include "Prefs.h"
 
 ////@begin XPM images
 ////@end XPM images
@@ -40,15 +45,28 @@ using namespace std;
 
 IMPLEMENT_CLASS( BaseSurfacePane, wxPanel )
 IMPLEMENT_CLASS( Surface3DPane, wxPanel )
-IMPLEMENT_CLASS( Orbital3DSurf, wxPanel )
+IMPLEMENT_CLASS( Orbital3DSurfPane, wxPanel )
+
+
+BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
+  EVT_CHOICE  (ID_ORB_FORMAT_CHOICE,  Orbital3DSurfPane::OnOrbFormatChoice)
+  EVT_CHOICE  (ID_ORB_CHOICE, Orbital3DSurfPane::OnOrbSetChoice)
+  EVT_LISTBOX (ID_ATOM_LIST, Orbital3DSurfPane::OnAtomList)
+  EVT_CHECKBOX (ID_SPH_HARMONICS_CHECKBOX, Orbital3DSurfPane::OnSphHarmonicChk)
+  EVT_RADIOBOX (ID_3D_RADIOBOX, Surface3DPane::On3DRadioBox)
+  EVT_CHECKBOX (ID_SMOOTH_CHECKBOX, Surface3DPane::OnSmoothCheck)
+END_EVENT_TABLE()
 
 /*!
  * Base class of any Panel
  */
 
-BaseSurfacePane::BaseSurfacePane( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style )
+BaseSurfacePane::BaseSurfacePane( wxWindow* parent, Surface* target, MoleculeData* data, wxWindowID id, const wxPoint& pos, const wxSize& size, long style )
 {
-    Create(parent, id, pos, size, style);
+  mTarget = target;
+  //mData = data;
+
+  Create(parent, id, pos, size, style);
 }
 
 BaseSurfacePane::~BaseSurfacePane()
@@ -79,7 +97,9 @@ void BaseSurfacePane::CreateControls()
   upperSizer = new wxBoxSizer(wxHORIZONTAL);
   middleSizer = new wxBoxSizer(wxHORIZONTAL);
   bottomSizer = new wxBoxSizer(wxHORIZONTAL);
-  leftMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
+  leftMiddleSizer = new wxBoxSizer(wxVERTICAL);
+  upperLeftMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
+  lowerLeftMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
   rightMiddleSizer = new wxFlexGridSizer(2,2,0,0);
   leftBottomSizer = new wxBoxSizer(wxHORIZONTAL);
   rightBottomSizer = new wxBoxSizer(wxVERTICAL);
@@ -94,13 +114,11 @@ void BaseSurfacePane::CreateControls()
                             wxDefaultPosition,
                             wxDefaultSize);
 
-  wxString choices[] = {_T("for test")};
-  mOrbSetChoice = new wxChoice( this, ID_ORB_CHOICE, wxPoint(10,10), wxSize(120,wxDefaultCoord), 1, choices );
-
-  mNumGridPntSld = new wxSlider( this, ID_GRID_POINT_SLIDER, 0, 0, 200,
+  mNumGridPntSld = new wxSlider( this, ID_GRID_POINT_SLIDER, 
+				 0, 10, 150,
 				 wxDefaultPosition, wxSize(155,wxDefaultCoord),
                              wxSL_AUTOTICKS | wxSL_LABELS);
-  //range is set temporarily for testing
+  //set the initial value in the child object
 
   mSetParamBut = new wxButton( this, ID_SET_PARAM_BUT, wxT("Set Parameters"), wxPoint(450, 160) );
   mExportBut = new wxButton( this, ID_SURFACE_EXPORT_BUT, wxT("Export"), wxPoint(450, 160) );
@@ -109,13 +127,404 @@ void BaseSurfacePane::CreateControls()
   SetSizer(mainSizer);
 }
 
+OrbSurfacePane::OrbSurfacePane( OrbSurfBase* target, MoleculeData* data, WinPrefs* prefs )
+{
+  mTarget = target;
+  mData = data;
+  mPrefs = prefs;
+
+  TargetSet = mTarget->GetTargetSet();
+  OrbOptions = mTarget->GetOptions();
+  OrbColumnEnergyOrOccupation = mTarget->GetOrbOccDisplay();
+  PlotOrb = target->GetTargetOrb();
+  SphericalHarmonics = target->UseSphericalHarmonics();
+
+  if ((TargetSet<0)||(!(OrbOptions&1))) 
+    {	//default to something sensible
+      Frame * lFrame = mData->GetCurrentFramePtr();
+      const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
+
+      if (Orbs->size() > 0) 
+	{
+	  TargetSet = 0;	//just default to the first set...
+	} 
+      else
+	OrbOptions = 1;	//No MO's so default to AO's
+    }
+
+}
+
+OrbSurfacePane::~OrbSurfacePane()
+{
+
+}
+
+int OrbSurfacePane::getOrbSetForOrbPane(vector<wxString>& choice)
+{
+  Frame * lFrame = mData->GetCurrentFramePtr();
+  const vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
+
+  short item, numitems;
+
+  choice.push_back(_T("Atomic Orbitals"));
+  item = 1; numitems = 1;
+
+  if (Orbs->size() > 0) 
+    {
+      std::vector<OrbitalRec *>::const_iterator OrbSet = Orbs->begin();
+      long	OrbSetCount = 0;
+      while (OrbSet != Orbs->end()) 
+	{
+	  if (TargetSet == OrbSetCount) item = numitems + 1;
+
+	  if (((*OrbSet)->getOrbitalWavefunctionType() == UHF)&&
+	      (!((*OrbSet)->getOrbitalType() == NaturalOrbital))) 
+	    {
+	      if ((*OrbSet)->getOrbitalType() == LocalizedOrbital) 
+		{
+		  choice.push_back(_T("Alpha Spin Localized Orbitals"));
+		  choice.push_back(_T("Beta Spin Localized Orbitals"));
+		} 
+	      else if ((*OrbSet)->getOrbitalType() == LocalizedOrbital) 
+		{
+		  choice.push_back(_T("Alpha Spin Oriented Localized Orbitals"));
+		  choice.push_back(_T("Beta Spin Oriented Localized Orbitals"));
+		} 
+	      else if ((*OrbSet)->getOrbitalType() == GuessOrbital) 
+		{
+		  choice.push_back(_T("Alpha Spin Initial Guess Orbitals"));
+		  choice.push_back(_T("Beta Spin Initial Guess Orbitals"));
+		} 
+	      else 
+		{
+		  choice.push_back(_T("Alpha Spin Orbitals"));
+		  choice.push_back(_T("Beta Spin Orbitals"));
+		}
+	      numitems++;	//increment count for two sets, other increment is done below
+				
+	      if ((TargetSet == OrbSetCount)&&(OrbOptions & 16)) 
+		item = numitems+1;	//target beta set
+	    } 
+	  else 
+	    {
+	      switch ((*OrbSet)->getOrbitalType()) 
+		{
+		case OptimizedOrbital:
+		  if ((*OrbSet)->getOrbitalWavefunctionType() == MCSCF)
+		    choice.push_back(_T("MCSCF Optimized Orbitals"));
+		  else
+		    choice.push_back(_T("Molecular EigenVectors"));
+		  break;
+
+		case NaturalOrbital:
+		  switch ((*OrbSet)->getOrbitalWavefunctionType()) 
+		    {
+		    case UHF:
+		      choice.push_back(_T("UHF Natural Orbitals"));
+		      break;
+		    case GVB:
+		      choice.push_back(_T("GVB GI Orbitals"));
+		      break;
+		    case MCSCF:
+		      choice.push_back(_T("MCSCF Natural Orbitals"));
+		      break;
+		    case CI:
+		      choice.push_back(_T("CI Natural Orbitals"));
+		      break;
+		    case RHFMP2:
+		      choice.push_back(_T("RMP2 Natural Orbitals"));
+		      break;
+		    default:
+		      choice.push_back(_T("Natural Orbitals"));
+		    }
+		  break;
+
+		case LocalizedOrbital:
+		  choice.push_back(_T("Localized Orbitals"));
+		  break;
+		case OrientedLocalizedOrbital:
+		  choice.push_back(_T("Oriented Localized Orbitals"));
+		  break;
+		case GuessOrbital:
+		  choice.push_back(_T("Initial Guess Orbitals"));
+		  break;
+		default:
+		  choice.push_back(_T("Molecular Orbitals"));
+		}
+	    }
+	  numitems++;
+	  OrbSetCount++;
+	  OrbSet++;
+	}
+	}
+
+  return item;
+}
+
+void OrbSurfacePane::makeMOList(vector<wxString>& choice)
+{
+  Frame * lFrame = mData->GetCurrentFramePtr();
+  const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
+
+  wxString tmpStr;
+
+  if (lFrame && (Orbs->size() > 0)) 
+    {
+      OrbitalRec * lMOs = NULL;
+
+      if ((TargetSet < Orbs->size())&&(TargetSet >= 0)) 
+	lMOs = (*Orbs)[TargetSet];
+
+      if (lMOs) 
+	{
+	  Boolean Alpha = !(OrbOptions & 16);
+	  long	NumMOs;
+	  char * SymLabel;
+	  float * Energy;
+	  float * OccNum;
+
+	  if (Alpha) 
+	    {
+	      NumMOs=lMOs->NumAlphaOrbs;
+	      SymLabel = lMOs->SymType;
+	      Energy = lMOs->Energy;
+	      OccNum = lMOs->OrbOccupation;
+	    } 
+	  else 
+	    {
+	      NumMOs=lMOs->NumBetaOrbs;
+	      SymLabel = lMOs->SymTypeB;
+	      Energy = lMOs->EnergyB;
+	      OccNum = lMOs->OrbOccupationB;
+	    }
+
+	  char* oneSymLabel;
+
+	  for (int theCell = 0; theCell < NumMOs; theCell++) 
+	    {
+	      tmpStr.Printf("%d  ", theCell+1); 
+	      char text[30];
+	      int nchar;
+
+	      if (SymLabel) 
+	      {	//Add the symetry of the orb, if known
+		
+		oneSymLabel = &(SymLabel[theCell*5]);	
+		//offset to the label for this orb
+
+		for (int ichar=0; ichar<4; ichar++) 
+		  {
+		    if ((oneSymLabel[ichar])=='\0') break;
+
+		    if ((oneSymLabel[ichar]>='0')&&(oneSymLabel[ichar]<='9')) 
+		      {
+			tmpStr.Append(oneSymLabel[ichar]);
+		      } 
+		    else if ((oneSymLabel[ichar]=='U')||(oneSymLabel[ichar]=='u')) 
+		      {
+			tmpStr.Append('u');
+		      } 
+		    else if ((oneSymLabel[ichar]=='G')||(oneSymLabel[ichar]=='g')) 
+		      {
+			tmpStr.Append('g');
+		      } 
+		    else
+		      tmpStr.Append(oneSymLabel[ichar]);
+		  }
+		//TextSize(12);	//reset the point size
+	      }
+
+	      tmpStr.Append('\t');
+
+	      nchar=0;
+	      if (OrbColumnEnergyOrOccupation) 
+		{	//orb occupation selected
+		
+		  if (OccNum) 
+		    sprintf(text, "%.3f%n", OccNum[theCell], &nchar);
+		  else 
+		    {	
+		    //attempt to set the occupation based on the wavefunction type
+		    if (lMOs->getOrbitalWavefunctionType() == RHF) 
+		      {
+			if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
+			  strcpy(text, "2  ");
+			else 
+			  strcpy(text, "0  ");
+			nchar = 3;
+		      } 
+		    else if (lMOs->getOrbitalWavefunctionType() == ROHF) 
+		      {
+			strcpy(text, "0  ");
+			if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
+			  strcpy(text, "2  ");
+			else if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
+			  strcpy(text, "1  ");
+			nchar = 3;
+		      } 
+		    else if (lMOs->getOrbitalWavefunctionType() == UHF) 
+		      {
+			strcpy(text, "0  ");
+			if (Alpha) 
+			  {
+			    if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
+			      strcpy(text,"1  ");
+			  }
+			else if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
+			  strcpy(text, "1  ");
+			nchar = 3;
+		      } 
+		    else 
+		      {	//MCSCF or CI occupations can't be guessed
+			strcpy(text, "??  ");
+			nchar = 4;
+		      }
+		  }
+		} 
+	      else if (Energy) 
+		{	//punch out the orb energy
+		  sprintf(text, "%.3f%n", Energy[theCell], &nchar);
+		}
+
+	      if (nchar>0) 
+		{
+		  tmpStr.Append(text);
+		  choice.push_back(tmpStr);
+		}
+	    }
+	}
+    }
+}
+
+void OrbSurfacePane::makeAOList(wxString& choice)
+{
+  BasisSet * BasisPtr = mData->GetBasisSet();
+
+  if (BasisPtr) 
+    {
+      long NumBasisFuncs = BasisPtr->GetNumBasisFuncs(SphericalHarmonics);
+
+      for (int theCell = 0; theCell < NumBasisFuncs; theCell++) 
+	{
+	  long ifunc = 0, iatom=0;
+	  Frame * lFrame = mData->GetCurrentFramePtr();
+
+	  while (ifunc<=theCell) 
+	    {
+	      long minshell = BasisPtr->BasisMap[2*iatom];
+	      long maxshell = BasisPtr->BasisMap[2*iatom+1];
+
+	      for (long ishell=minshell;ishell<=maxshell;ishell++) 
+		{
+		  long jfunc = ifunc+(BasisPtr->Shells[ishell]).GetNumFuncs(SphericalHarmonics);
+		  if (theCell<jfunc) 
+		    {	//Found the right shell, now pick out the right function
+		      char label[63];
+		      wxString tmpStr;
+		      int nchar;
+		      //punch out the atom # and symbol if this is the 1st function for this atom
+
+		      if ((ishell==minshell)&&(theCell==ifunc))
+			{
+			  sprintf(label, "%ld  ", iatom+1);
+			  choice.Append(label);
+
+			  if (mPrefs) 
+			    {
+			      long AtomType = lFrame->GetAtomType(iatom)-1;
+			      mPrefs->GetAtomLabel(AtomType, tmpStr);
+			      choice.Append(tmpStr);
+			    }
+			}
+		      choice.Append('\t');
+
+		      jfunc = theCell-ifunc;
+		      BasisPtr->Shells[ishell].GetLabel(label, jfunc, SphericalHarmonics);
+		      nchar = strlen(label);
+		      
+		      if (nchar>0)
+			{	//Make sure there really is something there
+			  choice.Append(' ');
+			  choice.Append(' ');
+			  choice.Append(label);
+
+			  for (long ichar=1; ichar<=nchar; ichar++)
+			    {
+			      char isExponent = ((label[ichar]>='0')&&
+						 (label[ichar]<='9')&&
+						 (label[ichar-1]>='r')&&
+						 (label[ichar-1]<='z'));
+			      if (isExponent)
+				{
+				      //adjust vertical position
+				}
+				
+				  //DrawText(label, ichar, 1);
+			    }
+			}
+		      choice.Append('\t');
+
+		      ifunc = theCell+1;
+		      ishell=maxshell;
+		    }
+		  else
+		    ifunc = jfunc;
+		}
+	      iatom++;
+	    }
+	  
+	  if (PlotOrb>=0) 
+	    {	//Is an MO selected?
+	      if (!(OrbOptions&1)) 
+		{	//If not displaying AO's
+		  const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
+		  if (Orbs->size() > 0) 
+		    {
+		      OrbitalRec *MOs = NULL;
+		      if ((TargetSet < Orbs->size())&&(TargetSet >= 0)) 
+			MOs = (*Orbs)[TargetSet];
+
+		      if (MOs) 
+			{
+			  float * aVector=NULL;
+
+			  if (OrbOptions & 16) 
+			    {
+			      if (PlotOrb<MOs->NumBetaOrbs)
+				aVector = &(MOs->VectorsB[NumBasisFuncs*PlotOrb]);
+			    } 
+			  else 
+			    {
+			      if (PlotOrb<MOs->NumAlphaOrbs)
+				aVector = &(MOs->Vectors[NumBasisFuncs*PlotOrb]);
+			    }
+
+			  if (aVector) 
+			    {
+			      char label[63];
+
+			      sprintf(label, "%.3f", aVector[theCell]);//prepare the coef for printing
+			      choice.Append(label);
+			    }
+			}
+		    }
+		}
+	    }
+	  choice.Append('\n');
+	}
+    }
+}
+
 /*
  * 3D surface dialog class
  */
 
-Surface3DPane::Surface3DPane( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : BaseSurfacePane(parent, id, pos, size, style)
+Surface3DPane::Surface3DPane( wxWindow* parent, Surf3DBase* target, MoleculeData* data, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : BaseSurfacePane(parent, target, data, id, pos, size, style)
 {
-    CreateControls();
+  mTarget = target;
+  CreateControls();
+  UseSolidSurface = mTarget->SolidSurface();
+  UseNormals = mTarget->UseSurfaceNormals();
 }
 
 Surface3DPane::~Surface3DPane()
@@ -125,6 +534,8 @@ Surface3DPane::~Surface3DPane()
 
 void Surface3DPane::CreateControls()
 {
+  float GridMax = mTarget->GetGridMax();
+
   label2 = new wxStaticText( this, wxID_ANY,
                             _T("Grid Size:"),
                             wxDefaultPosition,
@@ -134,39 +545,71 @@ void Surface3DPane::CreateControls()
                             wxDefaultPosition,
                             wxDefaultSize);
 
-  mGridSizeSld = new wxSlider( this, ID_GRID_SIZE_SLIDER, 0, 0, 200,
+  mGridSizeSld = new wxSlider( this, ID_GRID_SIZE_SLIDER, 
+			       (short) (100*mTarget->GetGridSize()), 0, 300,
                              wxDefaultPosition, wxSize(155,wxDefaultCoord),
                              wxSL_AUTOTICKS | wxSL_LABELS);
-  mContourValSld = new wxSlider( this, ID_CONTOUR_VALUE_SLIDER, 0, 0, 200,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
-  //range is set temporarily for testing;
+  mContourValSld = new wxSlider( this, ID_CONTOUR_VALUE_SLIDER, 
+				 (short)(100*(mTarget->GetContourValue()/((fabs(GridMax)>=0.001)?GridMax:0.25))), 
+				 0, 100, wxDefaultPosition, 
+				 wxSize(155,wxDefaultCoord),
+				 wxSL_AUTOTICKS | wxSL_LABELS);
 
   label4 = new wxStaticText( this, wxID_ANY,
                             _T("Transparency Color:"),
                             wxDefaultPosition,
                             wxDefaultSize);
+
+  RGBColor transpColor;
+  mTarget->GetTranspColor(&transpColor);
+
   mTransColor = new colorArea(this, ID_TRANSPARENCY_COLOR);
+  mTransColor->draw(&transpColor);
 
   wxString choices[] = {_T("Solid"), _T("Wire Frame")};
   m3DRdoBox = new wxRadioBox( this, ID_3D_RADIOBOX, _T(""), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 1, wxRA_SPECIFY_ROWS );
-
+  m3DRdoBox->SetSelection(1-UseSolidSurface);
+  
   mSmoothChkBox = new wxCheckBox( this, ID_SMOOTH_CHECKBOX, _T("Smooth"), wxPoint(340,130), wxDefaultSize );
+  mSmoothChkBox->SetValue(UseNormals);
+
+  if (UseSolidSurface)
+    mSmoothChkBox->Enable();
+  else
+    mSmoothChkBox->Disable();
 
   mFreeMemBut = new wxButton( this, ID_FREE_MEM_BUT, wxT("Free Mem"), wxPoint(450, 160) );
 
+}
+
+void Surface3DPane::On3DRadioBox (wxCommandEvent& event )
+{
+  int isSolid = m3DRdoBox->GetSelection();
+
+  if (!isSolid)
+    mSmoothChkBox->Enable();
+  else
+    mSmoothChkBox->Disable();
+
+}
+
+void Surface3DPane::OnSmoothCheck (wxCommandEvent& event )
+{
+  UseNormals = mSmoothChkBox->GetValue();
+  mTarget->UseSurfaceNormals(UseNormals);
 }
 
 /*!
  * Orbital3D constructors
  */
 
-Orbital3DSurf::Orbital3DSurf( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : Surface3DPane(parent, id, pos, size, style)
+Orbital3DSurfPane::Orbital3DSurfPane( wxWindow* parent, Orb3DSurface* target, MoleculeData* data, WinPrefs* prefs, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : Surface3DPane(parent, target, data, id, pos, size, style), OrbSurfacePane(target, data, prefs)
 {
-    CreateControls();
+  mTarget = target;
+  CreateControls();
 }
 
-Orbital3DSurf::~Orbital3DSurf()
+Orbital3DSurfPane::~Orbital3DSurfPane()
 {
   delete mOrbColor1;
   delete mOrbColor2;
@@ -176,16 +619,42 @@ Orbital3DSurf::~Orbital3DSurf()
  * Control creation for Orbital3D
  */
 
-void Orbital3DSurf::CreateControls()
+void Orbital3DSurfPane::CreateControls()
 {    
+  float GridMax = mTarget->GetGridMax();
+
     upperSizer->Add(label0, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+
+    vector<wxString> choices;
+    int itemSelect = getOrbSetForOrbPane(choices) - 1;
+
+    mOrbSetChoice = new wxChoice( this, ID_ORB_CHOICE, wxPoint(10,10), wxSize(200,wxDefaultCoord), choices.size(), &choices.front() );
+    mOrbSetChoice->SetSelection(itemSelect);
     upperSizer->Add(mOrbSetChoice, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+
     upperSizer->Add(10,10);
     mRevPhaseChk = new wxCheckBox(this, ID_REVERSE_PHASE_CHECKBOX, _T("Reverse Phase"), wxDefaultPosition);
+    mRevPhaseChk->SetValue(mTarget->GetPhaseChange());
+
     upperSizer->Add(mRevPhaseChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
-    leftMiddleSizer->Add(label1, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-    leftMiddleSizer->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+    mSphHarmonicsChk = new wxCheckBox( this, ID_SPH_HARMONICS_CHECKBOX, _T("Spherical Harmonics"), wxDefaultPosition, wxDefaultSize );
+    mSphHarmonicsChk->SetValue(SphericalHarmonics);
+    upperLeftMiddleSizer->Add(mSphHarmonicsChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+
+    if (OrbOptions & 1 && PlotOrb >= 0)
+      upperLeftMiddleSizer->Show(mSphHarmonicsChk, true);
+    else
+    upperLeftMiddleSizer->Show(mSphHarmonicsChk, false);
+
+    upperLeftMiddleSizer->Layout();
+
+    lowerLeftMiddleSizer->Add(label1, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+    lowerLeftMiddleSizer->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+    mNumGridPntSld->SetValue(mTarget->GetNumGridPoints());
+
+    leftMiddleSizer->Add(upperLeftMiddleSizer, 0, wxALL, 3);
+    leftMiddleSizer->Add(lowerLeftMiddleSizer, 0, wxALL, 3);
 
     rightMiddleSizer->Add(label2, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
     rightMiddleSizer->Add(mGridSizeSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -204,19 +673,25 @@ void Orbital3DSurf::CreateControls()
     mOrbFormatChoice = new wxChoice( this, ID_ORB_FORMAT_CHOICE, wxDefaultPosition, wxSize(120,wxDefaultCoord), 2, choices1 );
     mSubLeftBot1Sizer->Add(mOrbFormatChoice, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
-    wxString choices2[] = {_T("test")};
+    vector<wxString> choices2;
+    makeMOList(choices2);
+
+    wxString choices3;
+    makeAOList(choices3);
+
     mAtomList = new wxListBox( this, ID_ATOM_LIST,
-                               wxDefaultPosition, wxSize(120,180),
-                               1, choices2, wxLB_MULTIPLE |wxLB_ALWAYS_SB );
+                               wxDefaultPosition, wxSize(130,180),
+                               choices2.size(), &choices2.front(), 
+			       wxLB_SINGLE |wxLB_ALWAYS_SB );
 
     mSubLeftBot1Sizer->Add(mAtomList, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
     mSubLeftBot2Sizer->Add(new wxStaticText(this, wxID_ANY,
-                            _T("Orbital vector: \n Atom Orbital Coef"),
+                            _T("Orbital vector: \nAtom Orbital Coef"),
                             wxDefaultPosition,
-                            wxDefaultSize), 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+                            wxDefaultSize), 0, wxALIGN_CENTER_VERTICAL | wxALL, 1);
 
-    mOrbCoef = new wxTextCtrl( this, wxID_ANY, _T("Atom Orbital Coef."), wxPoint(20,160), wxSize(120,180) );
+    mOrbCoef = new wxTextCtrl( this, wxID_ANY, choices3, wxPoint(20,160), wxSize(120,200), wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL);
     mSubLeftBot2Sizer->Add(mOrbCoef, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
     leftBottomSizer->Add(mSubLeftBot1Sizer, 0, wxALL, 5);
@@ -228,23 +703,20 @@ void Orbital3DSurf::CreateControls()
                             wxDefaultPosition,
                             wxDefaultSize), 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
-    /*!!! temporarily give a color for testing  */
 
-    RGBColor tmpColor;
-    tmpColor.red = 0.0;
-    tmpColor.green = 0.0;
-    tmpColor.blue = 0.0;
+    RGBColor posColor, negColor;
+    mTarget->GetPosColor(&posColor);
+    mTarget->GetNegColor(&negColor);
 
     mOrbColor1 = new colorArea(this, ID_ORB_COLOR_POSITIVE);
-    mOrbColor1->draw(&tmpColor);
+    mOrbColor1->draw(&posColor);
     mOrbColor2 = new colorArea(this, ID_ORB_COLOR_NEGATIVE);
-    mOrbColor2->draw(&tmpColor);
+    mOrbColor2->draw(&negColor);
     mSubRightBot1Sizer->Add(mOrbColor1, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
     mSubRightBot1Sizer->Add(mOrbColor2, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
     mSubRightBot2Sizer = new wxBoxSizer(wxHORIZONTAL);
     mSubRightBot2Sizer->Add(label4, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-    mTransColor->draw(&tmpColor);
     mSubRightBot2Sizer->Add(mTransColor, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
     mSubRightBot3Sizer = new wxBoxSizer(wxHORIZONTAL);
@@ -274,11 +746,112 @@ void Orbital3DSurf::CreateControls()
     mainSizer->Add(bottomSizer);
 }
 
-/*!
- * Should we show tooltips?
- */
+void Orbital3DSurfPane::OnOrbFormatChoice( wxCommandEvent &event )
+{
+  int itemtype = mOrbFormatChoice->GetSelection();
 
-bool Orbital3DSurf::ShowToolTips()
+  if (OrbColumnEnergyOrOccupation) OrbColumnEnergyOrOccupation = false;
+  if (itemtype) OrbColumnEnergyOrOccupation = true;
+
+  vector<wxString> newChoice;
+  makeMOList(newChoice);
+
+  mAtomList->Set(newChoice.size(), &newChoice.front());
+
+}
+
+void Orbital3DSurfPane::OnOrbSetChoice( wxCommandEvent &event )
+{
+  int item = mOrbSetChoice->GetSelection()+1;
+  int itemtype=0;
+
+  if (item <= 1) 
+    {
+      if (!(OrbOptions&1)) 
+	{
+	  OrbOptions = 1; itemtype=1;
+	}
+    } 
+  else 
+    {
+      short numitems=1;
+      OrbOptions = 0;	//turn off AOs and alpha/beta flags
+      Frame * lFrame = mData->GetCurrentFramePtr();
+
+      const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
+
+      if (Orbs->size() > 0) 
+	{
+	  vector<OrbitalRec *>::const_iterator OrbSet = Orbs->begin();
+	  long	OrbSetCount = 0;
+
+	  while (OrbSet != Orbs->end()) 
+	    {
+	      numitems++;
+	      if (numitems == item) 
+		{
+		  TargetSet = OrbSetCount;
+		  itemtype = 1;
+		  break;
+		}
+
+	      if (((*OrbSet)->getOrbitalWavefunctionType() == UHF)&&
+		  (!((*OrbSet)->getOrbitalType() == NaturalOrbital))) 
+		{
+		  numitems++;	//Extra increment for the beta set
+		  if (numitems == item) 
+		    {
+		      TargetSet = OrbSetCount;
+		      OrbOptions = 16;	//beta set selected
+		      itemtype = 1;
+		      break;
+		    }
+		}
+	      OrbSetCount++;
+	      OrbSet++;
+	    }
+	}
+    }		
+			
+  if (itemtype) 
+    {	//TargetSet has been choosen
+      PlotOrb = -1;
+
+      //BasisSet * lBasis = MainData->GetBasisSet();
+      //LAddRow(lBasis->GetNumBasisFuncs(SphericalHarmonics), 0, AOList);
+
+      if (!(OrbOptions&1)) 
+	{	//add some MO rows!
+	  //don't know what's this adding rows for  -Song
+
+	  upperLeftMiddleSizer->Show(mSphHarmonicsChk, false);	  
+	  SphericalHarmonics = false;
+	} 
+      else 
+	{	//Must be looking for AOs
+	  upperLeftMiddleSizer->Show(mSphHarmonicsChk, true);
+	  mSphHarmonicsChk->SetValue(SphericalHarmonics);
+	}
+
+      upperLeftMiddleSizer->Layout();
+    }
+}
+
+void Orbital3DSurfPane::OnAtomList( wxCommandEvent &event )
+{
+  PlotOrb = event.GetSelection();
+  
+  wxString choice;
+  makeAOList(choice);
+  mOrbCoef->SetValue(choice);
+}
+
+void Orbital3DSurfPane::OnSphHarmonicChk(wxCommandEvent &event )
+{
+  SphericalHarmonics = mSphHarmonicsChk->GetValue();
+}
+
+bool Orbital3DSurfPane::ShowToolTips()
 {
     return true;
 }
@@ -287,7 +860,7 @@ bool Orbital3DSurf::ShowToolTips()
  * Get bitmap resources
  */
 
-wxBitmap Orbital3DSurf::GetBitmapResource( const wxString& name )
+wxBitmap Orbital3DSurfPane::GetBitmapResource( const wxString& name )
 {
     // Bitmap retrieval
 ////@begin Orbital3D bitmap retrieval
@@ -300,7 +873,7 @@ wxBitmap Orbital3DSurf::GetBitmapResource( const wxString& name )
  * Get icon resources
  */
 
-wxIcon Orbital3DSurf::GetIconResource( const wxString& name )
+wxIcon Orbital3DSurfPane::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 ////@begin Orbital3D icon retrieval
@@ -309,30 +882,4 @@ wxIcon Orbital3DSurf::GetIconResource( const wxString& name )
 ////@end Orbital3D icon retrieval
 }
 
-/*!
- * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CHOICE1
- */
-
-/*
-void Orbital3DSurf::OnChoice1Selected( wxCommandEvent& event )
-{
-////@begin wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CHOICE1 in Orbital3D.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CHOICE1 in Orbital3D. 
-}
-*/
-
-/*!
- * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX5
- */
-/*
-void Orbital3DSurf::OnCheckbox5Click( wxCommandEvent& event )
-{
-////@begin wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX5 in Orbital3D.
-    // Before editing this code, remove the block markers.
-    event.Skip();
-////@end wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX5 in Orbital3D. 
-}
-*/
 
