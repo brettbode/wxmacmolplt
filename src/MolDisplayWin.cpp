@@ -1234,7 +1234,8 @@ void MolDisplayWin::menuViewShowAxis(wxCommandEvent &event) {
     Dirty = true;
 }
 void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &event) {
-    long AnimateTime = Prefs->GetAnimateTime();
+    long AnimateTime = 10*Prefs->GetAnimateTime();
+	if (AnimateTime < 1) AnimateTime = 1;
     if (m_timer.IsRunning()) {
         m_timer.Stop();
         timerRunning = false;
@@ -1244,7 +1245,7 @@ void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &event) {
         else
             ChangeFrames(MainData->CurrentFrame+1);
         m_timer.SetOwner(this, MMP_ANIMATEFRAMESTIMER);
-        m_timer.Start(10*AnimateTime);
+        m_timer.Start(AnimateTime);
         timerRunning = true;
     }
 }
