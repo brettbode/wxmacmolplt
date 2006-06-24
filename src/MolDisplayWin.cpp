@@ -662,8 +662,6 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
         wxString filename = wxFileSelector(wxT("Choose a file to open"));
         //If the user chooses a file, create a window and have it process it.
         if (!filename.IsEmpty()) {
-    //      MolDisplayWin * temp = new MolDisplayWin(filename);
-    //      MolWinList.push_back(temp);
             //Ok we have a problem. Abort open can't close the last window!
             long r = OpenFile(filename);
             if (r>0) {
@@ -1840,15 +1838,24 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
     }
     if (Buffer) delete Buffer;      //Done reading so free up the buffer
     if (test) {//Note test is left 0 if any exception occurs(which causes Window to be deleted)
-//      if (gPreferences->ChangeFileType()) {
-//          // Looks like this is a good file so set the creator type for the neat icon
-//          FInfo   myFInfo;
-//          HGetFInfo(myFile->vRefNum, myFile->parID, myFile->name, &myFInfo);
-//          if (myFInfo.fdCreator != (OSType) 'BMBm') {
-//              myFInfo.fdCreator = (OSType) 'BMBm';
-//              HSetFInfo(myFile->vRefNum, myFile->parID, myFile->name, &myFInfo);
-//          }
-//      }
+#ifdef __WXMAC__
+      if (gPreferences->ChangeFileType()) {
+		  // Looks like this is a good file so set the creator type for the neat icon
+		  FSRef mFSRef;
+		  OSStatus s = FSPathMakeRef((const UInt8 *)(fileName.ToAscii()), &mFSRef, false);
+		  if (s == noErr) {
+			  FSCatalogInfoBitmap fields = kFSCatInfoFinderInfo;
+			  FSCatalogInfo info;
+			  
+			  FSGetCatalogInfo(&mFSRef, fields, &info, NULL, NULL, NULL);
+			  FileInfo * mfinfo = (FileInfo *) (&(info.finderInfo));
+			  if (mfinfo->fileCreator != (OSType) 'BMBm') {
+				  mfinfo->fileCreator = (OSType) 'BMBm';
+				  FSSetCatalogInfo(&mFSRef, fields, &info);
+			  }
+		  }
+	  }
+#endif
         //Text files are not used after opening so close it immediately
         fclose(myfile);
 //      Window->CloseFile();    //Hmmm should this happen for CML files?
