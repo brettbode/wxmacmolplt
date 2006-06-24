@@ -146,194 +146,6 @@ BEGIN_EVENT_TABLE(QD3DPrefsPane, wxPanel)
   EVT_CHECKBOX (ID_ACTIVATE_3D_MODE, QD3DPrefsPane::OnCheckBox)
 END_EVENT_TABLE()
 
-void WinPrefs::WriteAllPrefs(short fileRefNum) {
-  /*
-	short ResID;
-		//First the colors: bond, vector, and all atom defaults
-	ResID=4;
-	WritePreference (fileRefNum, (ResType) 'AtmC', &ResID, (Ptr) BondColors, 4*sizeof(RGBColor));
-	ResID=2;
-	WritePreference (fileRefNum, (ResType) 'AtmC', &ResID, (Ptr) &VectorColor, sizeof(RGBColor));
-	ResID=130;
-	WritePreference (fileRefNum, (ResType) 'AtmC', &ResID, (Ptr) AtomColors, 130*sizeof(RGBColor));
-		//Now the patterns: bonds, vector, and all atom defaults
-	ResID=4;
-	WritePreference (fileRefNum, (ResType) 'AtmP', &ResID, (Ptr) BondPatterns, 4*sizeof(short));
-	ResID=2;
-	WritePreference (fileRefNum, (ResType) 'AtmP', &ResID, (Ptr) &VectorPattern, sizeof(short));
-	ResID=130;
-	WritePreference (fileRefNum, (ResType) 'AtmP', &ResID, (Ptr) AtomPatterns, 130*sizeof(short));
-		//atomlabels
-	ResID=130;
-	WritePreference (fileRefNum, (ResType) 'AtmL', &ResID, (Ptr) AtomLabels, 130*3*sizeof(char));
-		//Atom radii
-	ResID=130;
-	WritePreference (fileRefNum, (ResType) 'AtmS', &ResID, (Ptr) AtomSizes, 130*sizeof(int));
-		//Atom masses (stores as the square root of the actual mass)
-	ResID=115;
-	WritePreference (fileRefNum, (ResType) 'AtmM', &ResID, (Ptr) AtomMasses, 115*sizeof(float));
-	ResID=128;
-	WritePreference (fileRefNum, (ResType) 'EnPr', &ResID, (Ptr) &EnergyPlotOptions, sizeof(EnergyOptions));
-	ResID=128;
-	WritePreference (fileRefNum, (ResType) 'GrPr', &ResID, (Ptr) &PlotOptions, sizeof(GraphOptions));
-		//Font preferences
-	Str255	FontName;
-#ifdef CarbonBuild
-	FMGetFontFamilyName(LabelFontID, FontName);
-#else
-	GetFontName(LabelFontID, FontName);	// Store the font name -- not the ID
-#endif
-	ResID=1;
-	WritePreference (fileRefNum, (ResType) 'AtmF', &ResID, (Ptr) &FontName, (FontName[0]+1)*sizeof(char));
-	ResID=2;
-	WritePreference (fileRefNum, (ResType) 'AtmF', &ResID, (Ptr) &LabelSize, sizeof(short));
-		//Display related preferences (Note: different types mixed in)
-	ResID=1;
-	WritePreference (fileRefNum, (ResType) 'DisP', &ResID, (Ptr) &AnimationSpeed, sizeof(short));
-	ResID=2;
-	WritePreference (fileRefNum, (ResType) 'DisP', &ResID, (Ptr) &VectorScale, sizeof(float));
-	ResID=3;
-	WritePreference (fileRefNum, (ResType) 'DisP', &ResID, (Ptr) &AtomScale, sizeof(float));
-	ResID=4;
-	WritePreference (fileRefNum, (ResType) 'DisP', &ResID, (Ptr) &ZScale, sizeof(float));
-	ResID=5;
-	WritePreference (fileRefNum, (ResType) 'DisP', &ResID, (Ptr) &RotateMode, sizeof(Boolean));
-	ResID=6;
-	WritePreference (fileRefNum, (ResType) 'DisP', &ResID, (Ptr) &AnimateMode, sizeof(Boolean));
-	ResID=7;
-	WritePreference (fileRefNum, (ResType) 'DisP', &ResID, (Ptr) &AnimateTime, sizeof(long));
-	ResID=9;
-	WritePreference (fileRefNum, (ResType) 'DisP', &ResID, (Ptr) &BitOptions, sizeof(long));
-	ResID=10;
-	WritePreference (fileRefNum, (ResType) 'DisP', &ResID, (Ptr) &StereoOffset, sizeof(short));
-		//Misc file open and new frame preferences
-	ResID=1;
-	WritePreference (fileRefNum, (ResType) 'FilP', &ResID, (Ptr) &AutoBondScale, sizeof(float));
-	ResID=2;
-	WritePreference (fileRefNum, (ResType) 'FilP', &ResID, (Ptr) &AutoBondFlag, sizeof(Boolean));
-	ResID=3;
-	WritePreference (fileRefNum, (ResType) 'FilP', &ResID, (Ptr) &HHBondFlag, sizeof(Boolean));
-	ResID=4;
-	WritePreference (fileRefNum, (ResType) 'FilP', &ResID, (Ptr) &DRCnFileSkip, sizeof(long));
-	ResID=5;
-	WritePreference (fileRefNum, (ResType) 'FilP', &ResID, (Ptr) &SetCreator, sizeof(Boolean));
-	ResID=1;
-	WritePreference (fileRefNum, (ResType) 'Surf', &ResID, (Ptr) &SurfaceOpts, sizeof(SurfaceOptions));
-		//QD3D related preferences
-	ResID=1;
-	WritePreference (fileRefNum, (ResType) 'QD3P', &ResID, (Ptr) &BondWidth, sizeof(float));
-	ResID=2;
-	WritePreference (fileRefNum, (ResType) 'QD3P', &ResID, (Ptr) &QD3DAtomQuality, sizeof(long));
-	ResID=3;
-	WritePreference (fileRefNum, (ResType) 'QD3P', &ResID, (Ptr) &QD3DFillBrightness, sizeof(float));
-	ResID=4;
-	WritePreference (fileRefNum, (ResType) 'QD3P', &ResID, (Ptr) &QD3DPointBrightness, sizeof(float));
-	ResID=5;
-	WritePreference (fileRefNum, (ResType) 'QD3P', &ResID, (Ptr) &QD3DLineWidth, sizeof(float));
-	ResID=6;
-	WritePreference (fileRefNum, (ResType) 'AtmC', &ResID, (Ptr) &BackColor, sizeof(RGBColor));
-*/
-}
-
-// Read the file preferences out of the already open resource fork of the data file
-void WinPrefs::ReadFilePrefs(short fileRef) {
-  /*
-		//Read in the default atom colors
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmC', 4, (Ptr) BondColors, 4*sizeof(RGBColor));
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmC', 2, (Ptr) &VectorColor, sizeof(RGBColor));
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmC', 130, (Ptr) AtomColors, 130*sizeof(RGBColor));
-		//Read in the default atom patterns
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmP', 4, (Ptr) BondPatterns, 4*sizeof(short));
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmP', 2, (Ptr) &VectorPattern, sizeof(short));
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmP', 130, (Ptr) AtomPatterns, 130*sizeof(short));
-		//Atom Labels
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmL', 130, (Ptr) AtomLabels, 3*130*sizeof(char));
-		//Atom radii
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmS', 130, (Ptr) AtomSizes, 130*sizeof(int));
-		//Atom masses
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmM', 115, (Ptr) AtomMasses, 115*sizeof(float));
-		// Energy Plot options
-	myReadPreference(fileRef, fileRef, (ResType) 'EnPr', 128, (Ptr) &EnergyPlotOptions, sizeof(EnergyOptions));
-	myReadPreference(fileRef, fileRef, (ResType) 'GrPr', 128, (Ptr) &PlotOptions, sizeof(GraphOptions));
-	if (EnergyPlotOptions.GetYAdjustment() == 0)
-		EnergyPlotOptions.SetYAdjustment(1.0);
-		//Font Preferences
-	Str255 FontName, TestFontName;
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmF', 1, (Ptr) FontName, -255);
-	if (FontName[0] <= 0) {
-		LabelFontID = systemFont;
-	} else {
-#ifdef CarbonBuild
-		LabelFontID = FMGetFontFamilyFromName(FontName);
-		FMGetFontFamilyName(LabelFontID, TestFontName);
-#else
-		GetFNum(FontName, &LabelFontID);
-		GetFontName(LabelFontID, TestFontName);
-#endif
-		if (!(EqualString(FontName, TestFontName, false, false)))
-			LabelFontID = systemFont;
-	}
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmF', 2, (Ptr) &LabelSize, sizeof(short));
-		//Display related preferences (Note: different types mixed in)
-	myReadPreference(fileRef, fileRef, (ResType) 'DisP', 1, (Ptr) &AnimationSpeed, sizeof(short));
-	myReadPreference(fileRef, fileRef, (ResType) 'DisP', 2, (Ptr) &VectorScale, sizeof(float));
-	myReadPreference(fileRef, fileRef, (ResType) 'DisP', 3, (Ptr) &AtomScale, sizeof(float));
-	myReadPreference(fileRef, fileRef, (ResType) 'DisP', 4, (Ptr) &ZScale, sizeof(float));
-	myReadPreference(fileRef, fileRef, (ResType) 'DisP', 5, (Ptr) &RotateMode, sizeof(Boolean));
-	myReadPreference(fileRef, fileRef, (ResType) 'DisP', 6, (Ptr) &AnimateMode, sizeof(Boolean));
-	myReadPreference(fileRef, fileRef, (ResType) 'DisP', 7, (Ptr) &AnimateTime, sizeof(long));
-	myReadPreference(fileRef, fileRef, (ResType) 'DisP', 9, (Ptr) &BitOptions, sizeof(long));
-		//Misc file open and new frame preferences
-	myReadPreference(fileRef, fileRef, (ResType) 'FilP', 1, (Ptr) &AutoBondScale, sizeof(float));
-	myReadPreference(fileRef, fileRef, (ResType) 'FilP', 2, (Ptr) &AutoBondFlag, sizeof(Boolean));
-	myReadPreference(fileRef, fileRef, (ResType) 'FilP', 3, (Ptr) &HHBondFlag, sizeof(Boolean));
-	myReadPreference(fileRef, fileRef, (ResType) 'FilP', 4, (Ptr) &DRCnFileSkip, sizeof(long));
-	myReadPreference(fileRef, fileRef, (ResType) 'FilP', 5, (Ptr) &SetCreator, sizeof(Boolean));
-		//QuickDraw 3D related preferences
-	myReadPreference(fileRef, fileRef, (ResType) 'QD3P', 1, (Ptr) &BondWidth, sizeof(float));
-	myReadPreference(fileRef, fileRef, (ResType) 'QD3P', 2, (Ptr) &QD3DAtomQuality, sizeof(long));
-	myReadPreference(fileRef, fileRef, (ResType) 'QD3P', 3, (Ptr) &QD3DFillBrightness, sizeof(float));
-	myReadPreference(fileRef, fileRef, (ResType) 'QD3P', 4, (Ptr) &QD3DPointBrightness, sizeof(float));
-	myReadPreference(fileRef, fileRef, (ResType) 'QD3P', 5, (Ptr) &QD3DLineWidth, sizeof(float));
-	myReadPreference(fileRef, fileRef, (ResType) 'AtmC', 6, (Ptr) &BackColor, sizeof(RGBColor));
-}
-void WinPrefs::WriteFilePrefs(short fileRef) {
-	WriteAllPrefs(fileRef);
-}
-void WinPrefs::SetAtomPattern(long AtomNum) {
-	PenPat((ConstPatternParam) &((**gDitherPatterns).patList[(AtomPatterns[AtomNum])]));
-  */ //Song Li
-}
-
-//Read the preference specified by the resource type and ID into the
-//ptr passed in. Note the memory for preference MUST be allocated by the
-//caller
-/*OSErr myReadPreference(short fRefNum, short AppRefNum, ResType resourceType,
-	short resourceID, Ptr preference, long size) {
-
-	Handle lpreference=NULL;
-	OSErr result;
-		//First attempt to read the preference from the user pref file
-	result = ReadPreference (fRefNum, resourceType, &resourceID, &lpreference);
-		//If the preference could not be read in from the pref file get it
-		//from the app defaults in the app resource fork if the user passed in a different id
-	if ((result!=noErr)&&(fRefNum!=AppRefNum)) {
-		if (lpreference) DisposeHandle(lpreference);
-		result = ReadPreference (AppRefNum, resourceType, &resourceID, &lpreference);
-	}
-	if ((result==noErr)&&(size>=0)) {
-		BlockMoveData(*lpreference, preference, size);
-	} else if ((size < 0)&&(lpreference != NULL)) {	//Copy over whatever is there...
-		long size2 = -size;
-		size = GetHandleSize(lpreference);
-		if ((size<=size2)&&(size>0)) {
-			BlockMoveData(*lpreference, preference, size);
-		} else result = -1;
-	}
-	if (lpreference) DisposeHandle(lpreference);
-	return result;
-	}*/
-
 PrefsPane::PrefsPane(MolDisplayWin* targetWindow, WinPrefs* targetPrefs, short PaneID, Boolean GlobalPrefs) 
 { 
   isGlobalPrefs = GlobalPrefs;
@@ -997,11 +809,13 @@ void FilePrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mChkBox[4] = new wxCheckBox(this, ID_SHOW_ANGLES_WHILE_ROTATING, _T("Show angles while rotating"));
   mChkBox[4]->SetValue(mTargetPrefs->GetShowAngles());
 
+#ifdef __WXMAC__
 if (PrefsAreGlobal())
     {
       mChkBox[5] = new wxCheckBox(this, ID_USE_MAC_EOL_CHAR, _T("Use Mac EOL chars"));
       mChkBox[5]->SetValue(mTargetPrefs->NativeEOLChar());
     }
+#endif
 
   mChkBox[6] = new wxCheckBox(this, ID_PROMPT_SAVE_FILE, _T("Prompt to save file"));
   mChkBox[6]->SetValue(mTargetPrefs->GetPrompt4Save());
@@ -1010,11 +824,13 @@ if (PrefsAreGlobal())
   mChkBox[7] = new wxCheckBox(this, ID_CREATE_CUSTOM_FILE_ICON, _T("create custom file icon"));
   mChkBox[7]->SetValue(mTargetPrefs->CreateCustomIcon());
 
+#ifdef __WXMAC__
   if (PrefsAreGlobal())
     {
       mChkBox[8] = new wxCheckBox(this, ID_CHANGE_FILE_CREATOR, _T("Change file creator type to wxMacMolPlt"));
       mChkBox[8]->SetValue(mTargetPrefs->ChangeFileType());
     }
+#endif
 
   mUpperSizer->Add(mChkBox[0], 0, wxALIGN_LEFT | wxALL, 3);
 
@@ -1027,14 +843,18 @@ if (PrefsAreGlobal())
 
   mMiddleSizer->Add(mChkBox[4], 0, wxALIGN_LEFT | wxALL, 3);
 
+#ifdef __WXMAC__
   if (PrefsAreGlobal())
     mMiddleSizer->Add(mChkBox[5], 0, wxALIGN_LEFT | wxALL, 3);
+#endif
 
   mMiddleSizer->Add(mChkBox[6], 0, wxALIGN_LEFT | wxALL, 3);
   mMiddleSizer->Add(mChkBox[7], 0, wxALIGN_LEFT | wxALL, 3);
 
+#ifdef __WXMAC__
   if (PrefsAreGlobal())
     mMiddleSizer->Add(mChkBox[8], 0, wxALIGN_LEFT | wxALL, 3);
+#endif
 
   mSldTol = new wxSlider( this, ID_AUTO_BOND_TOLERANCE_SLIDER, 
 			  (int)(mTargetPrefs->GetAutoBondScale()*10000+0.5), 
@@ -1094,15 +914,18 @@ void FilePrefsPane::OnCheckBox( wxCommandEvent &event)
     mTargetPrefs->AllowHydrogenBonds(mChkBox[3]->GetValue());
   else if (event.GetId() == ID_SHOW_ANGLES_WHILE_ROTATING)
     mTargetPrefs->SetShowAngles(mChkBox[4]->GetValue());
+#ifdef __WXMAC__
   else if (event.GetId() == ID_USE_MAC_EOL_CHAR && PrefsAreGlobal())
     mTargetPrefs->NativeEOLChar(mChkBox[5]->GetValue());
+#endif
   else if (event.GetId() == ID_PROMPT_SAVE_FILE)
     mTargetPrefs->SetPrompt4Save(mChkBox[6]->GetValue());
   else if (event.GetId() == ID_CREATE_CUSTOM_FILE_ICON)
     mTargetPrefs->CreateCustomIcon(mChkBox[7]->GetValue());
+#ifdef __WXMAC__
   else if (event.GetId() == ID_CHANGE_FILE_CREATOR)
     mTargetPrefs->ChangeFileType(mChkBox[8]->GetValue());
-
+#endif
 }
 
 void FilePrefsPane::OnSliderUpdate( wxCommandEvent &WXUNUSED(event) )
