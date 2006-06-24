@@ -32,7 +32,6 @@ using namespace std;
 
 extern WinPrefs *	gPreferences;
 extern WinPrefs *	gPrefDefaults;
-extern MolDisplayWin *	gWindow[kMaxOpenDocuments];
 
 IMPLEMENT_DYNAMIC_CLASS( setPreference, wxDialog )
 
