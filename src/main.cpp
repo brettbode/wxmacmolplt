@@ -1,5 +1,5 @@
 /*
- * (c) 2005 Iowa State University
+ * (c) 2005-2006 Iowa State University
  *     see the LICENSE file in the top level directory
  */
 
@@ -36,7 +36,8 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] =
 bool MpApp::OnInit() {
     const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
 	gPrefDlg = NULL;
-	
+
+#ifndef __WXMAC__
     m_InstanceChecker = new wxSingleInstanceChecker();
 	
     if(m_InstanceChecker->Create(appName) == true) {
@@ -56,6 +57,7 @@ bool MpApp::OnInit() {
             return false;
         }
     }
+#endif
 		//Throw up a simple splash screen
 	wxBitmap sp_bitmap(sp_xpm);
 	wxSplashScreen * splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 2000,
@@ -125,16 +127,12 @@ bool MpApp::OnInit() {
     // Initialize image handlers so we can save the PNG format and such.
     wxInitAllImageHandlers();
 	
-    // TODO:  Pass proper arguments to main frame object
-//	MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
-//	MolWinList.push_back(temp);
-//    m_Frame = new MolDisplayWin(wxT("wxMacMolPlt"));
     // I think the following is appropriate.
 	// On Macs the app continues to run without any windows open, but Linux and Windows exit
 #ifdef __WXMAC__
 	wxPoint p(-100,-100);
 	wxSize s(10,10);
-	menuHolder = new macMenuWinPlaceholder(wxT("offscreen"), p, s);
+	menuHolder = new macMenuWinPlaceholder(wxT(""), p, s);
 	menuHolder->Show(false);
 	if (MolWinList.size()<=0){
 		MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
@@ -165,7 +163,6 @@ void MpApp::createMainFrame(const wxString &filename) {
 	    temp = new MolDisplayWin(wxT("Untitled"));
 	    MolWinList.push_back(temp);
     } else {
-        // TODO:  Error checking
 		temp = new MolDisplayWin(filename);
 		MolWinList.push_back(temp);
 		long r = temp->OpenFile(filename);
@@ -195,7 +192,6 @@ void MpApp::destroyMainFrame(MolDisplayWin *frame) {
 #ifdef __WXMAC__
 	if (MolWinList.size() <= 0) {
 		menuHolder->Show(true);
-//		menuHolder->Show(false);
 	}
 #endif
 }
@@ -285,9 +281,6 @@ macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,
 
     createMenuBar();
     SetMenuBar(menuBar);
-
-//    Show(true);	//You seem to have to show it to get the menu bar to load
-//	Show(false);//then hide it to get it out of the window lists
 }
 
 macMenuWinPlaceholder::~macMenuWinPlaceholder() {
