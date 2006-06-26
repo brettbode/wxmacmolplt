@@ -181,7 +181,10 @@ class Surface3DPane : public BaseSurfacePane
   Surface3DPane( wxWindow* parent, Surf3DBase* target, MoleculeData* data, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
   ~Surface3DPane();
 
- protected:
+  void On3DRadioBox (wxCommandEvent& event );
+  void OnSmoothCheck (wxCommandEvent& event );
+  
+protected:
   wxStaticText* label2;
   wxStaticText* label3;
   wxStaticText* label4;
@@ -191,9 +194,6 @@ class Surface3DPane : public BaseSurfacePane
   wxRadioBox* m3DRdoBox;
   wxCheckBox* mSmoothChkBox;
   wxButton* mFreeMemBut;
-
-  void On3DRadioBox (wxCommandEvent& event );
-  void OnSmoothCheck (wxCommandEvent& event );
 
  private:
   void CreateControls();

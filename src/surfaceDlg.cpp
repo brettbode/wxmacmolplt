@@ -20,9 +20,9 @@
 #pragma hdrstop
 #endif
 
+#include "SurfaceTypes.h"
 #include "surfaceDlg.h"
 #include "colorArea.h"
-#include "SurfaceTypes.h"
 #include "MoleculeData.h"
 #include "Frame.h"
 #include "BasisSet.h"
