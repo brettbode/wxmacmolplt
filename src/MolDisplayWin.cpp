@@ -739,7 +739,10 @@ void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
             Dirty = false;
             delete buffer;
         }
-        fclose(currFile);
+#ifdef __WXMAC__
+		if (Prefs->CreateCustomIcon()) CreateCustomFileIcon(currFilePath);
+#endif
+		fclose(currFile);
     }
     else {
         menuFileSave_as(event);
@@ -793,9 +796,155 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
             Dirty = false;
             delete buffer;
         }
+#ifdef __WXMAC__
+		if (Prefs->CreateCustomIcon()) CreateCustomFileIcon(filePath);
+#endif
         fclose(currFile);
     }
 }
+
+#ifdef __WXMAC__
+OSErr	SendFinderAppleEvent( AliasHandle aliasH, AEEventID appleEventID );
+OSErr	SaveCustomIcon( wxString & filename, IconFamilyHandle icnsH );
+//	This routine will set the custom icon in the file with
+//  an image based on the current molecule display.
+//	It does this by creating a PicHandle, then creating an icon from the Picture,
+//	and finally saving the custom icon to disk.
+bool MolDisplayWin::CreateCustomFileIcon( const wxString & filePath ) {
+	bool result = false;
+	
+	//	create a pict of the current molecule display
+	wxImage mImage = glCanvas->getImage(0,0);
+	//How do we get a PicHandle from a wxImage?
+/*	PicHandle pictH	= CreatePICT( 72, false );	
+	if ( pictH != NULL ) {
+		//	IconFamilyResource.resourceType + IconFamilyResource.resourceSize
+		IconFamilyHandle icnsH	= (IconFamilyHandle) NewHandle( 8 );		
+		if ( icnsH == NULL ) return( memFullErr );
+		(**icnsH).resourceType			= kIconFamilyType;
+		(**icnsH).resourceSize			= 8;
+		
+		//	Create the icon from the Picture
+		OSErr err	= SetIconFamilyData( icnsH, 'PICT', (Handle)pictH );
+		if (err == noErr) {
+			//	Save the custom icon to disk
+			SaveCustomIcon( filePath, icnsH );
+		}
+		if ( icnsH != NULL ) DisposeHandle( (Handle) icnsH );
+		KillPicture( pictH );
+	}*/
+	return result;
+}
+/*OSErr	FSpGetCatInfo( FSSpec *spec, CInfoPBRec *cpb )
+{
+	cpb->hFileInfo.ioFDirIndex	= 0;
+	cpb->hFileInfo.ioNamePtr	= spec->name;
+	cpb->hFileInfo.ioVRefNum	= spec->vRefNum;
+	cpb->hFileInfo.ioDirID		= spec->parID;
+	
+	return( PBGetCatInfoSync( cpb ) );
+}
+//	Saves the custom icon to disk - Mostly copied from Apple sample code
+//	A file with a custom icon must contain a resource ( 'icns', -16455 ) and have its kHasCustomIcon bit set.
+//	A folder with a custom icon must contain a file named "\pIcon\r" within it with a resource ( 'icns', -16455 ) and have the folders kHasCustomIcon bit set.
+OSErr	SaveCustomIcon( wxString & filename, IconFamilyHandle icnsH )
+{
+	short				refNum;
+	OSErr				err;
+	Handle				h;
+	CInfoPBRec			cpb;
+	AliasHandle			aliasH;
+	
+	err = FSpGetCatInfo( targetSpec, &cpb );
+	if (err != noErr) return err;
+	
+	if ( cpb.hFileInfo.ioFlAttrib & kioFlAttribDirMask )									//	If the target is a directory
+	{
+		FSSpec  fsSpec;
+		err = FSMakeFSSpec( cpb.dirInfo.ioVRefNum, cpb.dirInfo.ioDrDirID, "\pIcon\r", &fsSpec );//	Create an FSSpec to the "\pIcon\r" file
+			HCreateResFile( fsSpec.vRefNum, fsSpec.parID, "\pIcon\r" );							//	Create the resource forked file "\pIcon\r"
+			refNum = FSpOpenResFile( &fsSpec, fsRdWrPerm );										//	Open it with write permissions
+	}
+	else
+	{
+		HCreateResFile( targetSpec->vRefNum, targetSpec->parID, targetSpec->name );			//	Create the resource forked file "\pIcon\r"
+		refNum = FSpOpenResFile( targetSpec, fsCurPerm );									//	Open it with write permissions
+	}
+	
+	if ( refNum == -1 )	return err;
+	
+	UseResFile( refNum );
+	h	= Get1Resource( 'icns', kCustomIconResource );
+	if ( h != NULL )																		//	If it already has a custom icon
+	{
+		RemoveResource( h );																//	Remove the existing custom icon
+		DisposeHandle( h );
+	}
+	AddResource( (Handle) icnsH, 'icns', kCustomIconResource, nil );						//	Create a new resource ( 'icns', -16455 )
+																							//	err	= ResError(); if ( err != noErr ) DebugStr("\p AddResource Failed" );
+	WriteResource( (Handle) icnsH );														//	Save the 'icns' resource
+																							//	err	= ResError(); if ( err != noErr ) DebugStr("\p WriteResource Failed" );
+	DetachResource( (Handle) icnsH );
+	//	err	= ResError(); if ( err != noErr ) DebugStr("\p DetachResource Failed" );
+	
+	CloseResFile( refNum );																	//	Close the resource fork
+	
+	cpb.hFileInfo.ioFlFndrInfo.fdFlags	|=	kHasCustomIcon;									//	Set the kHasCustomIcon flag
+	cpb.hFileInfo.ioDirID   = cpb.dirInfo.ioDrParID;
+	err	= PBSetCatInfoSync( &cpb );															//	Set the Custom Icon bit on disk
+	
+	err	= NewAliasMinimal( targetSpec, &aliasH );											//	Create an alias to our target
+	if (err == noErr) {
+		err	= SendFinderAppleEvent( aliasH, kAESync );											//	Send the Finder a kAESync AppleEvent to force it to update the icon immediately
+		DisposeHandle( (Handle) aliasH );
+	}
+	return( err );
+}*/
+//	Utility routine to send the Finder an event within its kAEFinderSuite.  We use it to send a kAESync AppleEvent which forces the Finder
+//	to immediately display the new icon.
+OSErr	SendFinderAppleEvent( AliasHandle aliasH, AEEventID appleEventID )
+{
+	ProcessInfoRec			processInfo;
+	OSErr					err;
+	AppleEvent				appleEvent		= { typeNull, NULL };
+	AEDesc					aeDesc			= { typeNull, NULL };
+	ProcessSerialNumber		psn				= { kNoProcess, kNoProcess };
+	AppleEvent				aeReply			= { typeNull, NULL };
+	
+	BlockZero( (Ptr)&processInfo, sizeof(processInfo) );
+	processInfo.processInfoLength	= sizeof( processInfo );
+	
+	for ( err = GetNextProcess( &psn ) ; err == noErr ; err = GetNextProcess( &psn ) )
+	{
+		err	= GetProcessInformation( &psn, &processInfo );
+		if ( (processInfo.processSignature == 'MACS') && (processInfo.processType == 'FNDR') )			//	Find the Finders PSN by searching all running processes
+			break;
+	}
+	if (err != noErr) return err;
+	
+	err	= AECreateDesc( typeProcessSerialNumber, &psn, sizeof( psn ), &aeDesc );
+	if (err == noErr) {
+		err	= AECreateAppleEvent( kAEFinderSuite, appleEventID, &aeDesc, kAutoGenerateReturnID, kAnyTransactionID, &appleEvent );	//	Create AppleEvent (kAEFinderSuite, appleEventID)
+		(void) AEDisposeDesc( &aeDesc );
+		if (err == noErr) {
+			err	= AECreateDesc( typeAlias, *aliasH, GetHandleSize( (Handle)aliasH ), &aeDesc );
+			if (err == noErr) {
+				err	= AEPutParamDesc( &appleEvent, keyDirectObject, &aeDesc );
+				(void) AEDisposeDesc( &aeDesc );
+				
+				if (err == noErr) {
+					err = AESend( &appleEvent, &aeReply, kAENoReply, kAENormalPriority, kNoTimeOut, NULL, NULL );		//	Send the AppleEvent to the Finder
+					(void) AEDisposeDesc( &aeReply );
+					
+					if (err == noErr)
+						(void) AEDisposeDesc( &appleEvent );
+				}
+			}
+		}
+	}
+	return( err );
+}
+#endif
 
 void MolDisplayWin::menuFileClose(wxCommandEvent &event) {
     Close();

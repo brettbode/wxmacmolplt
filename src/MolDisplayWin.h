@@ -118,7 +118,8 @@ class MolDisplayWin : public wxFrame {
         void menuFileOpen(wxCommandEvent &event);
         void menuFileSave(wxCommandEvent &event);
         void menuFileSave_as(wxCommandEvent &event);
-        void menuFileClose(wxCommandEvent &event);
+		bool CreateCustomFileIcon(const wxString & filePath);
+		void menuFileClose(wxCommandEvent &event);
         void FileClose(wxCloseEvent &event);
         void menuFileAppendNewFrame(wxCommandEvent &event);
         void menuFileAddFramesFromFile(wxCommandEvent &event);
