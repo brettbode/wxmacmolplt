@@ -38,6 +38,7 @@
 #include <wx/dataobj.h>
 #include <wx/image.h>
 #include <wx/printdlg.h>
+#include <wx/mstream.h>
 
 extern WinPrefs * gPreferences;
 
@@ -805,18 +806,24 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 
 #ifdef __WXMAC__
 OSErr	SendFinderAppleEvent( AliasHandle aliasH, AEEventID appleEventID );
-OSErr	SaveCustomIcon( wxString & filename, IconFamilyHandle icnsH );
+OSErr	SaveCustomIcon( const wxString & filename, IconFamilyHandle icnsH );
+#include <wx/mac/carbon/private.h>
 //	This routine will set the custom icon in the file with
 //  an image based on the current molecule display.
 //	It does this by creating a PicHandle, then creating an icon from the Picture,
 //	and finally saving the custom icon to disk.
+//  I am utilizing a private interface to internal data for the wxBitmap class so
+//  be warned that this could break in the future!
 bool MolDisplayWin::CreateCustomFileIcon( const wxString & filePath ) {
 	bool result = false;
 	
 	//	create a pict of the current molecule display
 	wxImage mImage = glCanvas->getImage(0,0);
-	//How do we get a PicHandle from a wxImage?
-/*	PicHandle pictH	= CreatePICT( 72, false );	
+	wxBitmap * mBitmap = new wxBitmap(mImage);
+	//The following utilizes a Mac specific internal pair of calls
+	//to get a PicHandle from a wxBitmap.
+	wxBitmapRefData * mBitmapData = mBitmap->GetBitmapData();
+	PicHandle pictH = mBitmapData->GetPictHandle();
 	if ( pictH != NULL ) {
 		//	IconFamilyResource.resourceType + IconFamilyResource.resourceSize
 		IconFamilyHandle icnsH	= (IconFamilyHandle) NewHandle( 8 );		
@@ -831,50 +838,33 @@ bool MolDisplayWin::CreateCustomFileIcon( const wxString & filePath ) {
 			SaveCustomIcon( filePath, icnsH );
 		}
 		if ( icnsH != NULL ) DisposeHandle( (Handle) icnsH );
-		KillPicture( pictH );
-	}*/
+	}
 	return result;
-}
-/*OSErr	FSpGetCatInfo( FSSpec *spec, CInfoPBRec *cpb )
-{
-	cpb->hFileInfo.ioFDirIndex	= 0;
-	cpb->hFileInfo.ioNamePtr	= spec->name;
-	cpb->hFileInfo.ioVRefNum	= spec->vRefNum;
-	cpb->hFileInfo.ioDirID		= spec->parID;
-	
-	return( PBGetCatInfoSync( cpb ) );
 }
 //	Saves the custom icon to disk - Mostly copied from Apple sample code
 //	A file with a custom icon must contain a resource ( 'icns', -16455 ) and have its kHasCustomIcon bit set.
 //	A folder with a custom icon must contain a file named "\pIcon\r" within it with a resource ( 'icns', -16455 ) and have the folders kHasCustomIcon bit set.
-OSErr	SaveCustomIcon( wxString & filename, IconFamilyHandle icnsH )
+OSErr	SaveCustomIcon( const wxString & filename, IconFamilyHandle icnsH )
 {
-	short				refNum;
-	OSErr				err;
-	Handle				h;
-	CInfoPBRec			cpb;
-	AliasHandle			aliasH;
+	OSErr				err=fnfErr;
 	
-	err = FSpGetCatInfo( targetSpec, &cpb );
+	FSRef mFSRef;
+	FSSpec targetSpec;
+	OSStatus s = FSPathMakeRef((const UInt8 *)(filename.ToAscii()), &mFSRef, false);
+	FSCatalogInfoBitmap fields = kFSCatInfoFinderInfo;
+	FSCatalogInfo info;
+	if (s == noErr) {
+	  err = FSGetCatalogInfo(&mFSRef, fields, &info, NULL, &targetSpec, NULL);
+	}
 	if (err != noErr) return err;
-	
-	if ( cpb.hFileInfo.ioFlAttrib & kioFlAttribDirMask )									//	If the target is a directory
-	{
-		FSSpec  fsSpec;
-		err = FSMakeFSSpec( cpb.dirInfo.ioVRefNum, cpb.dirInfo.ioDrDirID, "\pIcon\r", &fsSpec );//	Create an FSSpec to the "\pIcon\r" file
-			HCreateResFile( fsSpec.vRefNum, fsSpec.parID, "\pIcon\r" );							//	Create the resource forked file "\pIcon\r"
-			refNum = FSpOpenResFile( &fsSpec, fsRdWrPerm );										//	Open it with write permissions
-	}
-	else
-	{
-		HCreateResFile( targetSpec->vRefNum, targetSpec->parID, targetSpec->name );			//	Create the resource forked file "\pIcon\r"
-		refNum = FSpOpenResFile( targetSpec, fsCurPerm );									//	Open it with write permissions
-	}
+
+	HCreateResFile( targetSpec.vRefNum, targetSpec.parID, targetSpec.name );			//	Create the resource forked file "\pIcon\r"
+	short refNum = FSpOpenResFile( &targetSpec, fsCurPerm );									//	Open it with write permissions
 	
 	if ( refNum == -1 )	return err;
 	
 	UseResFile( refNum );
-	h	= Get1Resource( 'icns', kCustomIconResource );
+	Handle h	= Get1Resource( 'icns', kCustomIconResource );
 	if ( h != NULL )																		//	If it already has a custom icon
 	{
 		RemoveResource( h );																//	Remove the existing custom icon
@@ -888,18 +878,21 @@ OSErr	SaveCustomIcon( wxString & filename, IconFamilyHandle icnsH )
 	//	err	= ResError(); if ( err != noErr ) DebugStr("\p DetachResource Failed" );
 	
 	CloseResFile( refNum );																	//	Close the resource fork
+		//now modify the finder bit to indicate the file has a custom icon
+	FileInfo * mfinfo = (FileInfo *) (&(info.finderInfo));
+	if (!(mfinfo->finderFlags & kHasCustomIcon)) {
+		mfinfo->finderFlags = mfinfo->finderFlags | kHasCustomIcon;
+		FSSetCatalogInfo(&mFSRef, fields, &info);
+	}
 	
-	cpb.hFileInfo.ioFlFndrInfo.fdFlags	|=	kHasCustomIcon;									//	Set the kHasCustomIcon flag
-	cpb.hFileInfo.ioDirID   = cpb.dirInfo.ioDrParID;
-	err	= PBSetCatInfoSync( &cpb );															//	Set the Custom Icon bit on disk
-	
-	err	= NewAliasMinimal( targetSpec, &aliasH );											//	Create an alias to our target
+	AliasHandle			aliasH;
+	err	= NewAliasMinimal( &targetSpec, &aliasH );											//	Create an alias to our target
 	if (err == noErr) {
 		err	= SendFinderAppleEvent( aliasH, kAESync );											//	Send the Finder a kAESync AppleEvent to force it to update the icon immediately
 		DisposeHandle( (Handle) aliasH );
 	}
 	return( err );
-}*/
+}
 //	Utility routine to send the Finder an event within its kAEFinderSuite.  We use it to send a kAESync AppleEvent which forces the Finder
 //	to immediately display the new icon.
 OSErr	SendFinderAppleEvent( AliasHandle aliasH, AEEventID appleEventID )
