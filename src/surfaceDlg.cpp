@@ -20,6 +20,7 @@
 #pragma hdrstop
 #endif
 
+#include "Globals.h"
 #include "SurfaceTypes.h"
 #include "surfaceDlg.h"
 #include "colorArea.h"
