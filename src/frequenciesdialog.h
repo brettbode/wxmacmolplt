@@ -22,8 +22,8 @@
 
 ////@begin includes
 #include "wx/frame.h"
-#include "wxMolGraph.h"
 ////@end includes
+#include "wxMolGraph.h"
 
 /*!
  * Forward declarations
@@ -46,6 +46,7 @@ class wxMolGraph;
 #define SYMBOL_FREQUENCIESDIALOG_POSITION wxDefaultPosition
 #define ID_PREVMODE 10084
 #define ID_NEXTMODE 10085
+#define ID_FREQLISTBOX 10143
 #define ID_CUSTOM 10066
 ////@end control identifiers
 
@@ -90,10 +91,12 @@ public:
     /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_NEXTMODE
     void OnNextmodeClick( wxCommandEvent& event );
 
-    /// wxEVT_GRAPH_CLICK event handler for ID_CUSTOM
-    void OnCustomGraphClick( wxCommandEvent& event );
+    /// wxEVT_COMMAND_LISTBOX_SELECTED event handler for ID_FREQLISTBOX
+    void OnFreqlistboxSelected( wxCommandEvent& event );
 
 ////@end FrequenciesDialog event handler declarations
+	/// wxEVT_GRAPH_CLICK event handler for ID_CUSTOM
+	void OnCustomGraphClick( wxCommandEvent& event );
 
 ////@begin FrequenciesDialog member function declarations
 
@@ -112,6 +115,7 @@ public:
     static bool ShowToolTips();
 
 ////@begin FrequenciesDialog member variables
+    wxListBox* mFreqListBox;
     wxMolGraph* fGraph;
 ////@end FrequenciesDialog member variables
 };

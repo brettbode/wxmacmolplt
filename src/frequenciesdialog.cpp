@@ -57,7 +57,7 @@ BEGIN_EVENT_TABLE( FrequenciesDialog, wxFrame )
 
     EVT_MENU( ID_NEXTMODE, FrequenciesDialog::OnNextmodeClick )
 
-    EVT_GRAPH_CLICK(ID_CUSTOM, FrequenciesDialog::OnCustomGraphClick)
+    EVT_LISTBOX( ID_FREQLISTBOX, FrequenciesDialog::OnFreqlistboxSelected )
 
 ////@end FrequenciesDialog event table entries
 END_EVENT_TABLE()
@@ -82,6 +82,7 @@ FrequenciesDialog::FrequenciesDialog( wxWindow* parent, wxWindowID id, const wxS
 bool FrequenciesDialog::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin FrequenciesDialog member initialisation
+    mFreqListBox = NULL;
     fGraph = NULL;
 ////@end FrequenciesDialog member initialisation
 
@@ -121,8 +122,15 @@ void FrequenciesDialog::CreateControls()
     wxBoxSizer* itemBoxSizer8 = new wxBoxSizer(wxVERTICAL);
     itemFrame1->SetSizer(itemBoxSizer8);
 
+    wxBoxSizer* itemBoxSizer9 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer8->Add(itemBoxSizer9, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    wxString* mFreqListBoxStrings = NULL;
+    mFreqListBox = new wxListBox( itemFrame1, ID_FREQLISTBOX, wxDefaultPosition, wxDefaultSize, 0, mFreqListBoxStrings, wxLB_SINGLE );
+    itemBoxSizer9->Add(mFreqListBox, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
     fGraph = new wxMolGraph( itemFrame1, ID_CUSTOM, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-    itemBoxSizer8->Add(fGraph, 1, wxGROW|wxALL, 5);
+    itemBoxSizer9->Add(fGraph, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 ////@end FrequenciesDialog content construction
 }
@@ -270,6 +278,19 @@ void FrequenciesDialog::OnNextmodeClick( wxCommandEvent& event )
     if(parent->GetData()->cFrame->Vibs->CurrentMode < parent->GetData()->cFrame->Vibs->NumModes - 1) {
         parent->ChangeModes(parent->GetData()->cFrame->Vibs->CurrentMode + 1);
     }
+}
+
+
+/*!
+ * wxEVT_COMMAND_LISTBOX_SELECTED event handler for ID_FREQLISTBOX
+ */
+
+void FrequenciesDialog::OnFreqlistboxSelected( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_LISTBOX_SELECTED event handler for ID_FREQLISTBOX in FrequenciesDialog.
+    // Before editing this code, remove the block markers.
+    event.Skip();
+////@end wxEVT_COMMAND_LISTBOX_SELECTED event handler for ID_FREQLISTBOX in FrequenciesDialog. 
 }
 
 
