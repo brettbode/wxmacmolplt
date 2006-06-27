@@ -197,6 +197,7 @@ class MolDisplayWin : public wxFrame {
         void CloseFrequenciesWindow(void);
         void CloseSurfacesWindow(void);
         void CloseInputBuilderWindow(void);
+		void MolDisplayWin::OnActivate(wxActivateEvent & event);
         
         //File handling routines
         long OpenFile(wxString fileName, float offset=0.0, bool flip=false, bool append=false);

@@ -149,6 +149,8 @@ public:
     void OnStickmenuUpdate( wxUpdateUIEvent& event );
 
 ////@end CoordinatesWindow event handler declarations
+	
+	void OnActivate(wxActivateEvent & event);
 
 ////@begin CoordinatesWindow member function declarations
 

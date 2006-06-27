@@ -115,6 +115,7 @@ BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 
 ////@end CoordinatesWindow event table entries
 
+	EVT_ACTIVATE(CoordinatesWindow::OnActivate)
 END_EVENT_TABLE()
 
 /*!
@@ -914,4 +915,9 @@ void CoordinatesWindow::OnMmpCopycoordsitemUpdate( wxUpdateUIEvent& event )
 	event.Enable((natoms>0));
 }
 
-
+void CoordinatesWindow::OnActivate(wxActivateEvent & event) {
+	if (event.GetActive()) {
+		Parent->StopAnimations();
+	}
+	event.Skip();
+}

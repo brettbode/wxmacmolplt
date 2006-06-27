@@ -165,6 +165,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_COMMAND_SCROLL(MMP_FRAMESCROLLBAR, MolDisplayWin::OnScrollBarChange )
     EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen )
     EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
+	EVT_ACTIVATE(MolDisplayWin::OnActivate)
 END_EVENT_TABLE()
 
     //Local use class to hold data during the animation of normal modes
@@ -287,6 +288,13 @@ void MolDisplayWin::OnKillFocus(wxFocusEvent & event) {
     StopAnimations();
     event.Skip();
 }
+void MolDisplayWin::OnActivate(wxActivateEvent & event) {
+	if (! event.GetActive()) {
+		StopAnimations();
+	}
+	event.Skip();
+}
+
 void MolDisplayWin::StopAnimations(void) {
     if (m_timer.IsRunning()) {
         m_timer.Stop();
