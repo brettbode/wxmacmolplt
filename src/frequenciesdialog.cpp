@@ -50,6 +50,7 @@ IMPLEMENT_CLASS( FrequenciesDialog, wxFrame )
 BEGIN_EVENT_TABLE( FrequenciesDialog, wxFrame )
 ////@begin FrequenciesDialog event table entries
     EVT_CLOSE( FrequenciesDialog::OnCloseWindow )
+    EVT_SIZE( FrequenciesDialog::OnSize )
 
     EVT_MENU( wxID_COPY, FrequenciesDialog::OnCopyClick )
 
@@ -60,6 +61,7 @@ BEGIN_EVENT_TABLE( FrequenciesDialog, wxFrame )
     EVT_LISTBOX( ID_FREQLISTBOX, FrequenciesDialog::OnFreqlistboxSelected )
 
 ////@end FrequenciesDialog event table entries
+	EVT_GRAPH_CLICK(ID_CUSTOM, FrequenciesDialog::OnCustomGraphClick)
 END_EVENT_TABLE()
 
 /*!
@@ -123,14 +125,16 @@ void FrequenciesDialog::CreateControls()
     itemFrame1->SetSizer(itemBoxSizer8);
 
     wxBoxSizer* itemBoxSizer9 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer8->Add(itemBoxSizer9, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    itemBoxSizer8->Add(itemBoxSizer9, 0, wxGROW|wxALL, 5);
 
     wxString* mFreqListBoxStrings = NULL;
     mFreqListBox = new wxListBox( itemFrame1, ID_FREQLISTBOX, wxDefaultPosition, wxDefaultSize, 0, mFreqListBoxStrings, wxLB_SINGLE );
-    itemBoxSizer9->Add(mFreqListBox, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    if (ShowToolTips())
+        mFreqListBox->SetToolTip(_("Click the frequency to display the desired mode."));
+    itemBoxSizer9->Add(mFreqListBox, 0, wxGROW|wxALL, 5);
 
     fGraph = new wxMolGraph( itemFrame1, ID_CUSTOM, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-    itemBoxSizer9->Add(fGraph, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer9->Add(fGraph, 1, wxGROW|wxALL, 5);
 
 ////@end FrequenciesDialog content construction
 }
@@ -181,6 +185,7 @@ void FrequenciesDialog::FrameChanged(void) {
 void FrequenciesDialog::ModeChanged(void) {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     fGraph->setSelection(0, parent->GetData()->cFrame->Vibs->GetCurrentMode());
+	mFreqListBox->SetSelection(parent->GetData()->cFrame->Vibs->GetCurrentMode());
     Refresh();
 }
 
@@ -190,19 +195,23 @@ void FrequenciesDialog::RegenData(void) {
     MoleculeData  *mData = parent->GetData();
     VibRec *Vibs = parent->GetData()->cFrame->Vibs;
     
-    vector< double > xSetData;
-    vector< pair< int, double > > freqData;
+	std::vector< double > xSetData;
+	std::vector< pair< int, double > > freqData;
     float temp;
     int i = 0;
     
-
+	mFreqListBox->Clear();
     fGraph->reset();
     
     if(Vibs == NULL) return;
+	wxString freq;
     
     for(i = 0; i < Vibs->GetNumModes(); i++) {
         xSetData.push_back((double)(Vibs->GetFrequency(i)));
         freqData.push_back(make_pair(i, Vibs->GetIntensity(i)));
+		
+		freq.Printf("%f", Vibs->GetFrequency(i));
+		mFreqListBox->InsertItems(1, &freq, i);
     }
     fGraph->addXSet(xSetData, true);
     
@@ -212,7 +221,8 @@ void FrequenciesDialog::RegenData(void) {
     fGraph->autoScaleY(MG_AXIS_Y1);
     fGraph->setYAxisMin(MG_AXIS_Y1, 0.0);
     fGraph->setXAxisMin(0.0);
-    fGraph->setSelection(0, mData->CurrentFrame - 1);
+    fGraph->setSelection(0, Vibs->GetCurrentMode());
+	mFreqListBox->SetSelection(Vibs->GetCurrentMode());
 }
 
 void FrequenciesDialog::OnCloseWindow( wxCloseEvent& event )
@@ -287,10 +297,36 @@ void FrequenciesDialog::OnNextmodeClick( wxCommandEvent& event )
 
 void FrequenciesDialog::OnFreqlistboxSelected( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_LISTBOX_SELECTED event handler for ID_FREQLISTBOX in FrequenciesDialog.
-    // Before editing this code, remove the block markers.
+	int newSelection = mFreqListBox->GetSelection();
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    
+    MoleculeData  *mData = parent->GetData();
+    VibRec *Vibs = parent->GetData()->cFrame->Vibs;
+    
+    if(Vibs != NULL) {
+		if (newSelection != Vibs->GetCurrentMode()) {
+			parent->ChangeModes(newSelection);
+		}
+	}
     event.Skip();
-////@end wxEVT_COMMAND_LISTBOX_SELECTED event handler for ID_FREQLISTBOX in FrequenciesDialog. 
+}
+
+
+/*!
+ * wxEVT_SIZE event handler for ID_FREQDIALOG
+ */
+#include <iostream>
+void FrequenciesDialog::OnSize( wxSizeEvent& event )
+{
+    //resize/reposition the controls and the display canvas
+    int width, height;
+    GetClientSize(&width, &height);
+	
+	int cw, ch;
+	mFreqListBox->GetClientSize(&cw, &ch);
+	mFreqListBox->SetSize(wxSize(cw, height));
+	std::cout << "heights are " << ch << " " << height << std::endl;
+    event.Skip();
 }
 
 
