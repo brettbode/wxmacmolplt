@@ -155,7 +155,7 @@ class GraphOptions {
 class FrequencyWindowOptions {
 private:
     //Only thing I can think of is store the size and position for the window
-    Rect    FreqWindowRect;
+//    Rect    FreqWindowRect;
 	float	YScaleFactor;
 	bool	ShowRaman;
 	bool	ShowIR;
