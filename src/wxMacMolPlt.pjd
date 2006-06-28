@@ -12101,8 +12101,8 @@ Grid Points:"</string>
                       <long name="proxy-Id value">10103</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
                       <string name="proxy-Member variable name">"polarChoice"</string>
-                      <string name="proxy-Strings">""</string>
-                      <string name="proxy-Initial value">""</string>
+                      <string name="proxy-Strings">"Pople|Pople N311|Dunning|Huzinaga|Hondo7"</string>
+                      <string name="proxy-Initial value">"Huzinaga"</string>
                       <string name="proxy-Help text">""</string>
                       <string name="proxy-Tooltip text">""</string>
                       <string name="proxy-Background colour">""</string>

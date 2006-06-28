@@ -148,7 +148,9 @@ public:
     /// Constructors
     InputBuilderWindow( );
     InputBuilderWindow( wxWindow* parent, wxWindowID id = SYMBOL_INPUTBUILDERWINDOW_IDNAME, const wxString& caption = SYMBOL_INPUTBUILDERWINDOW_TITLE, const wxPoint& pos = SYMBOL_INPUTBUILDERWINDOW_POSITION, const wxSize& size = SYMBOL_INPUTBUILDERWINDOW_SIZE, long style = SYMBOL_INPUTBUILDERWINDOW_STYLE );
-
+    
+    ~InputBuilderWindow();
+    
     bool Create( wxWindow* parent, wxWindowID id = SYMBOL_INPUTBUILDERWINDOW_IDNAME, const wxString& caption = SYMBOL_INPUTBUILDERWINDOW_TITLE, const wxPoint& pos = SYMBOL_INPUTBUILDERWINDOW_POSITION, const wxSize& size = SYMBOL_INPUTBUILDERWINDOW_SIZE, long style = SYMBOL_INPUTBUILDERWINDOW_STYLE );
 
     /// Creates the controls and sizers

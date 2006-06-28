@@ -100,6 +100,17 @@ InputBuilderWindow::InputBuilderWindow( wxWindow* parent, wxWindowID id, const w
     Create( parent, id, caption, pos, size, style );
 }
 
+InputBuilderWindow::~InputBuilderWindow() {
+    //temp
+    delete tabMOGuess;
+    delete tabHessOpts;
+    delete tabMiscPrefs;
+    delete tabSCFOpts;
+    delete tabStatPoint;
+    
+    delete TmpInputRec;
+}
+
 /*!
  * InputBuilder creator
  */
@@ -265,8 +276,15 @@ void InputBuilderWindow::CreateControls()
     itemStaticText20->Enable(false);
     itemBoxSizer19->Add(itemStaticText20, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxString* polarChoiceStrings = NULL;
-    polarChoice = new wxUglyChoice( itemPanel4, ID_POLAR_CHOICE, wxDefaultPosition, wxDefaultSize, 0, polarChoiceStrings, 0 );
+    wxString polarChoiceStrings[] = {
+        _("Pople"),
+        _("Pople N311"),
+        _("Dunning"),
+        _("Huzinaga"),
+        _("Hondo7")
+    };
+    polarChoice = new wxUglyChoice( itemPanel4, ID_POLAR_CHOICE, wxDefaultPosition, wxDefaultSize, 5, polarChoiceStrings, 0 );
+    polarChoice->SetStringSelection(_("Huzinaga"));
     polarChoice->Enable(false);
     itemBoxSizer19->Add(polarChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -1004,7 +1022,14 @@ void InputBuilderWindow::SetupItems() {
     else {
         exeChoice->Enable(true);
     }
-    
+
+    // Enable/Disable ecpTypeChoice
+    if(!(TmpInputRec->Basis->GetBasis() == 12 || TmpInputRec->Basis->GetBasis() == 13)) {
+        ecpTypeChoice->Enable(false);
+    }
+    else {
+        ecpTypeChoice->Enable(true);
+    }
 }
 
 
