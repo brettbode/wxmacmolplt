@@ -42,7 +42,7 @@ class wxMolGraph;
 #define SYMBOL_FREQUENCIESDIALOG_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_FREQUENCIESDIALOG_TITLE _("Frequencies")
 #define SYMBOL_FREQUENCIESDIALOG_IDNAME ID_FREQDIALOG
-#define SYMBOL_FREQUENCIESDIALOG_SIZE wxSize(400, 300)
+#define SYMBOL_FREQUENCIESDIALOG_SIZE wxDefaultSize
 #define SYMBOL_FREQUENCIESDIALOG_POSITION wxDefaultPosition
 #define ID_PREVMODE 10084
 #define ID_NEXTMODE 10085
@@ -81,9 +81,6 @@ public:
 
     /// wxEVT_CLOSE_WINDOW event handler for ID_FREQDIALOG
     void OnCloseWindow( wxCloseEvent& event );
-
-    /// wxEVT_SIZE event handler for ID_FREQDIALOG
-    void OnSize( wxSizeEvent& event );
 
     /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_COPY
     void OnCopyClick( wxCommandEvent& event );

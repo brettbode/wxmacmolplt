@@ -50,7 +50,6 @@ IMPLEMENT_CLASS( FrequenciesDialog, wxFrame )
 BEGIN_EVENT_TABLE( FrequenciesDialog, wxFrame )
 ////@begin FrequenciesDialog event table entries
     EVT_CLOSE( FrequenciesDialog::OnCloseWindow )
-    EVT_SIZE( FrequenciesDialog::OnSize )
 
     EVT_MENU( wxID_COPY, FrequenciesDialog::OnCopyClick )
 
@@ -125,7 +124,7 @@ void FrequenciesDialog::CreateControls()
     itemFrame1->SetSizer(itemBoxSizer8);
 
     wxBoxSizer* itemBoxSizer9 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer8->Add(itemBoxSizer9, 0, wxGROW|wxALL, 5);
+    itemBoxSizer8->Add(itemBoxSizer9, 1, wxGROW|wxALL, 5);
 
     wxString* mFreqListBoxStrings = NULL;
     mFreqListBox = new wxListBox( itemFrame1, ID_FREQLISTBOX, wxDefaultPosition, wxDefaultSize, 0, mFreqListBoxStrings, wxLB_SINGLE );
@@ -310,23 +309,4 @@ void FrequenciesDialog::OnFreqlistboxSelected( wxCommandEvent& event )
 	}
     event.Skip();
 }
-
-
-/*!
- * wxEVT_SIZE event handler for ID_FREQDIALOG
- */
-#include <iostream>
-void FrequenciesDialog::OnSize( wxSizeEvent& event )
-{
-    //resize/reposition the controls and the display canvas
-    int width, height;
-    GetClientSize(&width, &height);
-	
-	int cw, ch;
-	mFreqListBox->GetClientSize(&cw, &ch);
-	mFreqListBox->SetSize(wxSize(cw, height));
-	std::cout << "heights are " << ch << " " << height << std::endl;
-    event.Skip();
-}
-
 
