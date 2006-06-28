@@ -183,6 +183,7 @@ void wxUglyChoice::onButtonClick(wxCommandEvent &event) {
 }
 
 void wxUglyChoice::onMenuSelect(wxCommandEvent &event) {
+    wxCommandEvent evt(wxEVT_COMMAND_CHOICE_SELECTED, GetId());
     unsigned int i = 0;
 
     for(i = 0; i < item.size(); i++) {
@@ -190,5 +191,8 @@ void wxUglyChoice::onMenuSelect(wxCommandEvent &event) {
     }
 
     SetSelection(i);
+    evt.SetInt(selection);
+    evt.SetString(GetStringSelection());
+    wxPostEvent(this, evt);
 }
 

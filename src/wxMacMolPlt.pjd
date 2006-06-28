@@ -7091,6 +7091,14 @@ Modeling, 1998, 16, 133-138."</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Stretch factor">0</long>
+            <long name="proxy-Border">5</long>
+            <bool name="proxy-wxLEFT">1</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
+            <bool name="proxy-wxTOP">1</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -7462,6 +7470,14 @@ Modeling, 1998, 16, 133-138."</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Stretch factor">0</long>
+            <long name="proxy-Border">5</long>
+            <bool name="proxy-wxLEFT">1</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
+            <bool name="proxy-wxTOP">1</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -11229,14 +11245,6 @@ Grid Points:"</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -11316,6 +11324,8 @@ Grid Points:"</string>
                 <string name="proxy-Id name">"ID_IBBASISPANEL"</string>
                 <long name="proxy-Id value">10091</long>
                 <string name="proxy-Class">"wxPanel"</string>
+                <string name="proxy-Tab label">"Basis"</string>
+                <string name="proxy-Tab icon">""</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
                 <bool name="proxy-External implementation">0</bool>
@@ -11360,8 +11370,6 @@ Grid Points:"</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <string name="proxy-Tab label">"Basis"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -12246,6 +12254,8 @@ Grid Points:"</string>
                 <string name="proxy-Id name">"ID_IBCONTROLPANEL"</string>
                 <long name="proxy-Id value">10092</long>
                 <string name="proxy-Class">"wxPanel"</string>
+                <string name="proxy-Tab label">"Control"</string>
+                <string name="proxy-Tab icon">""</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
                 <bool name="proxy-External implementation">0</bool>
@@ -12290,8 +12300,6 @@ Grid Points:"</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <string name="proxy-Tab label">"Control"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -13458,7 +13466,7 @@ Grid Points:"</string>
                         <string name="proxy-Id name">"ID_DFT_CHECKBOX"</string>
                         <long name="proxy-Id value">10114</long>
                         <string name="proxy-Class">"wxCheckBox"</string>
-                        <string name="proxy-Member variable name">"dftChoice"</string>
+                        <string name="proxy-Member variable name">"dftCheck"</string>
                         <string name="proxy-Label">"Use DFT"</string>
                         <bool name="proxy-Initial value">0</bool>
                         <string name="proxy-Help text">""</string>
@@ -13754,6 +13762,8 @@ Grid Points:"</string>
                 <string name="proxy-Id name">"ID_IBDATAPANEL"</string>
                 <long name="proxy-Id value">10093</long>
                 <string name="proxy-Class">"wxPanel"</string>
+                <string name="proxy-Tab label">"Data"</string>
+                <string name="proxy-Tab icon">""</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
                 <bool name="proxy-External implementation">0</bool>
@@ -13798,8 +13808,6 @@ Grid Points:"</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <string name="proxy-Tab label">"Data"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -14683,6 +14691,8 @@ Grid Points:"</string>
                 <string name="proxy-Id name">"ID_IBSYSTEMPANEL"</string>
                 <long name="proxy-Id value">10094</long>
                 <string name="proxy-Class">"wxPanel"</string>
+                <string name="proxy-Tab label">"System"</string>
+                <string name="proxy-Tab icon">""</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
                 <bool name="proxy-External implementation">0</bool>
@@ -14727,8 +14737,6 @@ Grid Points:"</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <string name="proxy-Tab label">"System"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -15403,6 +15411,8 @@ Grid Points:"</string>
                 <string name="proxy-Id name">"ID_IBMOGUESSPANEL"</string>
                 <long name="proxy-Id value">10095</long>
                 <string name="proxy-Class">"wxPanel"</string>
+                <string name="proxy-Tab label">"MO Guess"</string>
+                <string name="proxy-Tab icon">""</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
                 <bool name="proxy-External implementation">0</bool>
@@ -15447,8 +15457,6 @@ Grid Points:"</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <string name="proxy-Tab label">"MO Guess"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -15722,6 +15730,8 @@ Grid Points:"</string>
                 <string name="proxy-Id name">"ID_IBHESSOPTSPANEL"</string>
                 <long name="proxy-Id value">10144</long>
                 <string name="proxy-Class">"wxPanel"</string>
+                <string name="proxy-Tab label">"Hess. Options"</string>
+                <string name="proxy-Tab icon">""</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
                 <bool name="proxy-External implementation">0</bool>
@@ -15766,8 +15776,6 @@ Grid Points:"</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <string name="proxy-Tab label">"Hess. Options"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -16391,6 +16399,8 @@ Grid Points:"</string>
                 <string name="proxy-Id name">"ID_IBMISCPANEL"</string>
                 <long name="proxy-Id value">10096</long>
                 <string name="proxy-Class">"wxPanel"</string>
+                <string name="proxy-Tab label">"Misc. Prefs"</string>
+                <string name="proxy-Tab icon">""</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
                 <bool name="proxy-External implementation">0</bool>
@@ -16435,8 +16445,6 @@ Grid Points:"</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <string name="proxy-Tab label">"Misc. Prefs"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -16611,7 +16619,7 @@ Grid Points:"</string>
                       <string name="proxy-Id name">"ID_CHECKBOX15"</string>
                       <long name="proxy-Id value">10138</long>
                       <string name="proxy-Class">"wxCheckBox"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"aimpacCheck"</string>
                       <string name="proxy-Label">"Atoms In Molecules (AIMPAC)"</string>
                       <bool name="proxy-Initial value">0</bool>
                       <string name="proxy-Help text">""</string>
@@ -16662,7 +16670,7 @@ Grid Points:"</string>
                       <string name="proxy-Id name">"ID_CHECKBOX16"</string>
                       <long name="proxy-Id value">10139</long>
                       <string name="proxy-Class">"wxCheckBox"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"rpacCheck"</string>
                       <string name="proxy-Label">"RPAC"</string>
                       <bool name="proxy-Initial value">0</bool>
                       <string name="proxy-Help text">""</string>
@@ -16766,6 +16774,8 @@ Grid Points:"</string>
                 <string name="proxy-Id name">"ID_IBSCBOPTSPANEL"</string>
                 <long name="proxy-Id value">10097</long>
                 <string name="proxy-Class">"wxPanel"</string>
+                <string name="proxy-Tab label">"SCF Options"</string>
+                <string name="proxy-Tab icon">""</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
                 <bool name="proxy-External implementation">0</bool>
@@ -16810,8 +16820,6 @@ Grid Points:"</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <string name="proxy-Tab label">"SCF Options"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -17145,6 +17153,8 @@ Grid Points:"</string>
                 <string name="proxy-Id name">"ID_IBSTATPOINTPANEL"</string>
                 <long name="proxy-Id value">10152</long>
                 <string name="proxy-Class">"wxPanel"</string>
+                <string name="proxy-Tab label">"Stat. Point"</string>
+                <string name="proxy-Tab icon">""</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
                 <bool name="proxy-External implementation">0</bool>
@@ -17189,8 +17199,6 @@ Grid Points:"</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <string name="proxy-Tab label">"Stat. Point"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
