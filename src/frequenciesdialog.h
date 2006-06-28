@@ -46,6 +46,10 @@ class wxMolGraph;
 #define SYMBOL_FREQUENCIESDIALOG_POSITION wxDefaultPosition
 #define ID_PREVMODE 10084
 #define ID_NEXTMODE 10085
+#define ID_MENUIRINTEN 10165
+#define ID_MENURAMANINTEN 10166
+#define ID_MENUZOOMIN 10167
+#define ID_MENUZOOMOUT 10168
 #define ID_FREQLISTBOX 10143
 #define ID_CUSTOM 10066
 ////@end control identifiers
@@ -90,6 +94,18 @@ public:
 
     /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_NEXTMODE
     void OnNextmodeClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUIRINTEN
+    void OnMenuirintenClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENURAMANINTEN
+    void OnMenuramanintenClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUZOOMIN
+    void OnMenuzoominClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUZOOMOUT
+    void OnMenuzoomoutClick( wxCommandEvent& event );
 
     /// wxEVT_COMMAND_LISTBOX_SELECTED event handler for ID_FREQLISTBOX
     void OnFreqlistboxSelected( wxCommandEvent& event );

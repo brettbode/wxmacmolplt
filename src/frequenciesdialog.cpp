@@ -57,6 +57,14 @@ BEGIN_EVENT_TABLE( FrequenciesDialog, wxFrame )
 
     EVT_MENU( ID_NEXTMODE, FrequenciesDialog::OnNextmodeClick )
 
+    EVT_MENU( ID_MENUIRINTEN, FrequenciesDialog::OnMenuirintenClick )
+
+    EVT_MENU( ID_MENURAMANINTEN, FrequenciesDialog::OnMenuramanintenClick )
+
+    EVT_MENU( ID_MENUZOOMIN, FrequenciesDialog::OnMenuzoominClick )
+
+    EVT_MENU( ID_MENUZOOMOUT, FrequenciesDialog::OnMenuzoomoutClick )
+
     EVT_LISTBOX( ID_FREQLISTBOX, FrequenciesDialog::OnFreqlistboxSelected )
 
 ////@end FrequenciesDialog event table entries
@@ -117,25 +125,35 @@ void FrequenciesDialog::CreateControls()
     wxMenu* itemMenu5 = new wxMenu;
     itemMenu5->Append(ID_PREVMODE, _("&Previous Normal Mode\tCtrl+["), _T(""), wxITEM_NORMAL);
     itemMenu5->Append(ID_NEXTMODE, _("Ne&xt Normal Mode\tCtrl+]"), _T(""), wxITEM_NORMAL);
+    itemMenu5->AppendSeparator();
+    itemMenu5->Append(ID_MENUIRINTEN, _("Show &IR Intensity"), _T(""), wxITEM_RADIO);
+    itemMenu5->Append(ID_MENURAMANINTEN, _("Show &Raman Intensity"), _T(""), wxITEM_RADIO);
+    itemMenu5->AppendSeparator();
+    itemMenu5->Append(ID_MENUZOOMIN, _("Zoom In\tCtrl++"), _T(""), wxITEM_NORMAL);
+    itemMenu5->Append(ID_MENUZOOMOUT, _("Zoom Out\tCtrl+-"), _T(""), wxITEM_NORMAL);
     menuBar->Append(itemMenu5, _("&View"));
     itemFrame1->SetMenuBar(menuBar);
 
-    wxBoxSizer* itemBoxSizer8 = new wxBoxSizer(wxVERTICAL);
-    itemFrame1->SetSizer(itemBoxSizer8);
+    wxBoxSizer* itemBoxSizer14 = new wxBoxSizer(wxVERTICAL);
+    itemFrame1->SetSizer(itemBoxSizer14);
 
-    wxBoxSizer* itemBoxSizer9 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer8->Add(itemBoxSizer9, 1, wxGROW|wxALL, 5);
+    wxBoxSizer* itemBoxSizer15 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer14->Add(itemBoxSizer15, 1, wxGROW|wxALL, 5);
 
     wxString* mFreqListBoxStrings = NULL;
     mFreqListBox = new wxListBox( itemFrame1, ID_FREQLISTBOX, wxDefaultPosition, wxDefaultSize, 0, mFreqListBoxStrings, wxLB_SINGLE );
     if (ShowToolTips())
         mFreqListBox->SetToolTip(_("Click the frequency to display the desired mode."));
-    itemBoxSizer9->Add(mFreqListBox, 0, wxGROW|wxALL, 5);
+    itemBoxSizer15->Add(mFreqListBox, 0, wxGROW|wxALL, 5);
 
     fGraph = new wxMolGraph( itemFrame1, ID_CUSTOM, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-    itemBoxSizer9->Add(fGraph, 1, wxGROW|wxALL, 5);
+    itemBoxSizer15->Add(fGraph, 1, wxGROW|wxALL, 5);
 
 ////@end FrequenciesDialog content construction
+    itemMenu3->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
+    wxMenu * menuHelp = new wxMenu;
+    menuHelp->Append(wxID_ABOUT, wxT("&About"));
+    menuBar->Append(menuHelp, wxT("&Help"));
 }
 
 /*!
@@ -190,6 +208,10 @@ void FrequenciesDialog::ModeChanged(void) {
 
 void FrequenciesDialog::RegenData(void) {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	WinPrefs * Prefs = parent->GetPrefs();
+	FrequencyWindowOptions * fprefs = Prefs->GetFrequencyWindowOptions();
+	
+	bool UseRaman = fprefs->ShowRamanIntensity();
     
     MoleculeData  *mData = parent->GetData();
     VibRec *Vibs = parent->GetData()->cFrame->Vibs;
@@ -207,7 +229,10 @@ void FrequenciesDialog::RegenData(void) {
     
     for(i = 0; i < Vibs->GetNumModes(); i++) {
         xSetData.push_back((double)(Vibs->GetFrequency(i)));
-        freqData.push_back(make_pair(i, Vibs->GetIntensity(i)));
+		if (UseRaman)
+			freqData.push_back(make_pair(i, Vibs->GetRamanIntensity(i)));
+		else
+			freqData.push_back(make_pair(i, Vibs->GetIntensity(i)));
 		
 		freq.Printf("%f", Vibs->GetFrequency(i));
 		mFreqListBox->InsertItems(1, &freq, i);
@@ -219,7 +244,13 @@ void FrequenciesDialog::RegenData(void) {
     //fGraph->setPrecision(eOpts->GetNumDigits());
     fGraph->autoScaleY(MG_AXIS_Y1);
     fGraph->setYAxisMin(MG_AXIS_Y1, 0.0);
+	fGraph->setYAxisMax(MG_AXIS_Y1, fGraph->getYAxisMax(MG_AXIS_Y1)*fprefs->GetYScaleFactor());
     fGraph->setXAxisMin(0.0);
+	if (UseRaman) 
+		fGraph->setAxisLabel(MG_AXIS_Y1, _("Raman Intensity"));
+	else
+		fGraph->setAxisLabel(MG_AXIS_Y1, _("IR Intensity"));
+	fGraph->setAxisLabel(MG_AXIS_X, _("Frequency"));
     fGraph->setSelection(0, Vibs->GetCurrentMode());
 	mFreqListBox->SetSelection(Vibs->GetCurrentMode());
 }
@@ -309,4 +340,70 @@ void FrequenciesDialog::OnFreqlistboxSelected( wxCommandEvent& event )
 	}
     event.Skip();
 }
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUIRINTEN
+ */
+
+void FrequenciesDialog::OnMenuirintenClick( wxCommandEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	WinPrefs * Prefs = parent->GetPrefs();
+	FrequencyWindowOptions * fprefs = Prefs->GetFrequencyWindowOptions();
+	
+	fprefs->ShowRamanIntensity(false);
+	fprefs->ShowIRIntensity(true);
+
+	RegenData();	//regenerate the graph with the new intensity
+}
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENURAMANINTEN
+ */
+
+void FrequenciesDialog::OnMenuramanintenClick( wxCommandEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	WinPrefs * Prefs = parent->GetPrefs();
+	FrequencyWindowOptions * fprefs = Prefs->GetFrequencyWindowOptions();
+	
+	fprefs->ShowRamanIntensity(true);
+	fprefs->ShowIRIntensity(false);
+	
+	RegenData();	//regenerate the graph with the new intensity
+}
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUITEM1
+ */
+void FrequenciesDialog::OnMenuzoominClick( wxCommandEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	WinPrefs * Prefs = parent->GetPrefs();
+	FrequencyWindowOptions * fprefs = Prefs->GetFrequencyWindowOptions();
+	
+	fprefs->SetYScaleFactor(0.9*fprefs->GetYScaleFactor());
+
+	fGraph->setYAxisMax(MG_AXIS_Y1, fGraph->getYAxisMax(MG_AXIS_Y1)*0.9);
+
+	Refresh();
+}
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUITEM2
+ */
+
+void FrequenciesDialog::OnMenuzoomoutClick( wxCommandEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	WinPrefs * Prefs = parent->GetPrefs();
+	FrequencyWindowOptions * fprefs = Prefs->GetFrequencyWindowOptions();
+	
+	fprefs->SetYScaleFactor(1.1*fprefs->GetYScaleFactor());
+	
+	fGraph->setYAxisMax(MG_AXIS_Y1, fGraph->getYAxisMax(MG_AXIS_Y1)*1.1);
+	
+	Refresh();
+}
+
 

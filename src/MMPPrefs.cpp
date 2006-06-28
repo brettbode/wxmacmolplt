@@ -52,6 +52,12 @@ RGBColor WX2RGB(wxColour &c) {
     return newC;
 }
 
+FrequencyWindowOptions::FrequencyWindowOptions(void) {
+	YScaleFactor = 1.0;
+	ShowRaman = false;
+	ShowIR = true;
+}
+
 void WinPrefs::resetAllDefaults()
 {
   ReadAtomDefaults();
