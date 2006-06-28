@@ -296,7 +296,7 @@ class wxMolGraph : public wxControl {
      *             MG_AXIS_X, MG_AXIS_Y1, or MG_AXIS_Y2.
      * @param label The new label for the axis.
      */
-    void setAxisLabel(int axis, wxString &label);
+    void setAxisLabel(int axis, const wxString &label);
 
 
     /**

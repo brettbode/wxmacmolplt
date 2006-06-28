@@ -311,7 +311,7 @@ void wxMolGraph::autoScaleX(void) {
     }
 }
 
-void wxMolGraph::setAxisLabel(int axis, wxString &label) {
+void wxMolGraph::setAxisLabel(int axis, const wxString &label) {
     switch(axis) {
         case MG_AXIS_X:
             xAxisText = label;
