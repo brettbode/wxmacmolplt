@@ -202,7 +202,7 @@ void CoordinateOffset::OnTextctrl1Updated( wxCommandEvent& event )
 	wxString textVal = editField->GetValue();
 	double val = 0.0;
 	if (textVal.ToDouble(&val)) {
-		slider->SetValue(val);
+		slider->SetValue((int)val);
 		ApplyOffset(val);
 	}
     event.Skip();
