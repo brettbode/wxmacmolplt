@@ -268,6 +268,10 @@ class wxMolGraph : public wxControl {
     void setYAxisMax(int axis, double val);
 
 
+    double getYAxisMin(int axis);
+    double getYAxisMax(int axis);
+
+
     /**
      * Adjusts the upper and lower bounds of the given y-axis and adjusts the
      * scale to show all data graphed on the axis.  After adjusting, the
@@ -280,6 +284,8 @@ class wxMolGraph : public wxControl {
 
     void setXAxisMin(double val);
     void setXAxisMax(double val);
+    double getXAxisMin();
+    double getXAxisMax();
     void autoScaleX(void);
 
 

@@ -186,6 +186,32 @@ void wxMolGraph::setYAxisMax(int axis, double val) {
     }
 }
 
+double wxMolGraph::getYAxisMin(int axis) {
+    switch(axis) {
+        case MG_AXIS_Y1:
+            return y1Min;
+            break;
+        case MG_AXIS_Y2:
+            return y2Min;
+            break;
+    }
+
+    return 0.0;
+}
+
+double wxMolGraph::getYAxisMax(int axis) {
+    switch(axis) {
+        case MG_AXIS_Y1:
+            return y1Max;
+            break;
+        case MG_AXIS_Y2:
+            return y2Max;
+            break;
+    }
+
+    return 0.0;
+}
+
 void wxMolGraph::autoScaleY(int axis) {
     double min = 0.0;
     double max = 0.0;
@@ -240,6 +266,14 @@ void wxMolGraph::setXAxisMin(double val) {
 
 void wxMolGraph::setXAxisMax(double val) {
     xMax = val;
+}
+
+double wxMolGraph::getXAxisMin() {
+    return xMin;
+}
+
+double wxMolGraph::getXAxisMax() {
+    return xMax;
 }
 
 void wxMolGraph::autoScaleX(void) {

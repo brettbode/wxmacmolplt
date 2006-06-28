@@ -24,6 +24,7 @@
 #include "wx/frame.h"
 #include "wx/notebook.h"
 #include "wx/spinctrl.h"
+#include "wx/valtext.h"
 ////@end includes
 
 #include "wxUglyChoice.h"
@@ -63,8 +64,8 @@ class wxUglyChoice;
 #define ID_RUN_CHOICE 10106
 #define ID_SCF_CHOICE 10107
 #define ID_LOCAL_CHOICE 10108
-#define ID_MCHARGE_TEXTCTRL 10109
-#define ID_MULT_TEXTCTRL 10110
+#define ID_CHARGE_SPINCTRL 10164
+#define ID_MULT_SPINCTRL 10110
 #define ID_EXE_CHOICE 10111
 #define ID_MAXIT_TEXTCTRL 10112
 #define ID_MP2_CHECKBOX 10113
@@ -88,6 +89,9 @@ class wxUglyChoice;
 #define ID_CHECKBOX9 10129
 #define ID_RADIOBOX 10130
 #define ID_CHECKBOX10 10131
+#define ID_IBDFTPANEL 10109
+#define ID_CHOICE3 10143
+#define ID_CHOICE4 10165
 #define ID_IBMOGUESSPANEL 10095
 #define ID_CHOICE22 10132
 #define ID_CHECKBOX11 10133
@@ -106,7 +110,14 @@ class wxUglyChoice;
 #define ID_CHECKBOX15 10138
 #define ID_CHECKBOX16 10139
 #define ID_RADIOBOX1 10135
-#define ID_IBSCBOPTSPANEL 10097
+#define ID_IBMP2PANEL 10166
+#define ID_SPINCTRL3 10167
+#define ID_TEXTCTRL5 10168
+#define ID_TEXTCTRL7 10169
+#define ID_CHECKBOX3 10170
+#define ID_RADIOBOX4 10171
+#define ID_RADIOBOX5 10172
+#define ID_IBSCFOPTSPANEL 10097
 #define ID_CHECKBOX17 10140
 #define ID_CHECKBOX18 10141
 #define ID_CHECKBOX19 10142
@@ -220,6 +231,8 @@ public:
 
     /// Should we show tooltips?
     static bool ShowToolTips();
+    
+    void SetupItems();
 
 ////@begin InputBuilderWindow member variables
     wxListbook* listBook;
@@ -236,7 +249,7 @@ public:
     wxUglyChoice* localChoice;
     wxUglyChoice* exeChoice;
     wxCheckBox* mp2Check;
-    wxCheckBox* dftChoice;
+    wxCheckBox* dftCheck;
     wxUglyChoice* ciChoice;
     wxUglyChoice* ccChoice;
     wxWindow * tabMOGuess;
