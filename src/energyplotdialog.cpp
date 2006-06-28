@@ -110,7 +110,7 @@ void EnergyPlotDialog::CreateControls()
 
     wxMenuBar* menuBar = new wxMenuBar;
     wxMenu* itemMenu3 = new wxMenu;
-    itemMenu3->Append(wxID_COPY, _("&Copy"), _T(""), wxITEM_NORMAL);
+    itemMenu3->Append(wxID_COPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
     menuBar->Append(itemMenu3, _("&Edit"));
     itemFrame1->SetMenuBar(menuBar);
 
@@ -121,6 +121,10 @@ void EnergyPlotDialog::CreateControls()
     itemBoxSizer5->Add(epGraph, 1, wxGROW|wxALL, 5);
 
 ////@end EnergyPlotDialog content construction
+    itemMenu3->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
+    wxMenu * menuHelp = new wxMenu;
+    menuHelp->Append(wxID_ABOUT, wxT("&About"));
+    menuBar->Append(menuHelp, wxT("&Help"));
 }
 
 /*!

@@ -7055,7 +7055,7 @@ Modeling, 1998, 16, 133-138."</string>
               <bool name="proxy-Enabled">1</bool>
               <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
               <document>
-                <string name="title">"&amp;Copy: wxID_COPY"</string>
+                <string name="title">"&amp;Copy\tCtrl+C: wxID_COPY"</string>
                 <string name="type">"dialog-control-document"</string>
                 <string name="filename">""</string>
                 <string name="icon-name">"menuitem"</string>
@@ -7068,7 +7068,7 @@ Modeling, 1998, 16, 133-138."</string>
                 <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnCopyClick"</string>
                 <string name="proxy-Id name">"wxID_COPY"</string>
                 <long name="proxy-Id value">5031</long>
-                <string name="proxy-Label">"&amp;Copy"</string>
+                <string name="proxy-Label">"&amp;Copy\tCtrl+C"</string>
                 <string name="proxy-Kind">"Normal"</string>
                 <bool name="proxy-Checked">0</bool>
                 <bool name="proxy-Enabled">1</bool>
@@ -7091,14 +7091,6 @@ Modeling, 1998, 16, 133-138."</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -7261,7 +7253,7 @@ Modeling, 1998, 16, 133-138."</string>
               <bool name="proxy-Enabled">1</bool>
               <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
               <document>
-                <string name="title">"&amp;Copy: wxID_COPY"</string>
+                <string name="title">"&amp;Copy\tCtrl+C: ID_FREQCOPY"</string>
                 <string name="type">"dialog-control-document"</string>
                 <string name="filename">""</string>
                 <string name="icon-name">"menuitem"</string>
@@ -7271,10 +7263,10 @@ Modeling, 1998, 16, 133-138."</string>
                 <long name="locked">0</long>
                 <string name="created">"5/6/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
-                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnCopyClick"</string>
-                <string name="proxy-Id name">"wxID_COPY"</string>
-                <long name="proxy-Id value">5031</long>
-                <string name="proxy-Label">"&amp;Copy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnFreqcopyClick"</string>
+                <string name="proxy-Id name">"ID_FREQCOPY"</string>
+                <long name="proxy-Id value">10170</long>
+                <string name="proxy-Label">"&amp;Copy\tCtrl+C"</string>
                 <string name="proxy-Kind">"Normal"</string>
                 <bool name="proxy-Checked">0</bool>
                 <bool name="proxy-Enabled">1</bool>

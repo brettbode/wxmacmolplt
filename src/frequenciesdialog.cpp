@@ -51,7 +51,7 @@ BEGIN_EVENT_TABLE( FrequenciesDialog, wxFrame )
 ////@begin FrequenciesDialog event table entries
     EVT_CLOSE( FrequenciesDialog::OnCloseWindow )
 
-    EVT_MENU( wxID_COPY, FrequenciesDialog::OnCopyClick )
+    EVT_MENU( ID_FREQCOPY, FrequenciesDialog::OnFreqcopyClick )
 
     EVT_MENU( ID_PREVMODE, FrequenciesDialog::OnPrevmodeClick )
 
@@ -120,7 +120,7 @@ void FrequenciesDialog::CreateControls()
 
     wxMenuBar* menuBar = new wxMenuBar;
     wxMenu* itemMenu3 = new wxMenu;
-    itemMenu3->Append(wxID_COPY, _("&Copy"), _T(""), wxITEM_NORMAL);
+    itemMenu3->Append(ID_FREQCOPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
     menuBar->Append(itemMenu3, _("&Edit"));
     wxMenu* itemMenu5 = new wxMenu;
     itemMenu5->Append(ID_PREVMODE, _("&Previous Normal Mode\tCtrl+["), _T(""), wxITEM_NORMAL);
@@ -265,7 +265,7 @@ void FrequenciesDialog::OnCloseWindow( wxCloseEvent& event )
  * wxEVT_COMMAND_MENU_SELECTED event handler for wxID_COPY
  */
 
-void FrequenciesDialog::OnCopyClick( wxCommandEvent& event )
+void FrequenciesDialog::OnFreqcopyClick( wxCommandEvent& event )
 {
     int width = 0;
     int height = 0;
@@ -405,5 +405,3 @@ void FrequenciesDialog::OnMenuzoomoutClick( wxCommandEvent& event )
 	
 	Refresh();
 }
-
-
