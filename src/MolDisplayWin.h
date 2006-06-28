@@ -165,7 +165,7 @@ class MolDisplayWin : public wxFrame {
         void menuViewRotate180_vertical(wxCommandEvent &event);
         void menuViewRotatePrinciple_orientation(wxCommandEvent &event);
         void menuViewRotateOther(wxCommandEvent &event);
-        //void menuViewSet_window_parameters(wxCommandEvent &event);
+		void menuViewSetWindowParameters(wxCommandEvent &event);
         //void menuViewStereo(wxCommandEvent &event);
         
 		void menuPreferences(wxCommandEvent &event);

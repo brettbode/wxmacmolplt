@@ -34,6 +34,7 @@
 #include "coordinateoffset.h"
 #include "frameenergy.h"
 #include "printoptions.h"
+#include "windowparameters.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
 #include <wx/image.h>
@@ -93,6 +94,7 @@ enum MMP_EventID {
     MMP_ANIMATEMODETIMER,
     MMP_OFFSETMODE,
     MMP_ENERGYEDIT,
+	MMP_WINDOWPARAMETERS,
     
     Number_MMP_Ids
 };
@@ -142,6 +144,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_ROTATE180VER,     MolDisplayWin::menuViewRotate180_vertical)
     EVT_MENU (MMP_ROTATEPRINC,      MolDisplayWin::menuViewRotatePrinciple_orientation)
     EVT_MENU (MMP_ROTATEOTHER,      MolDisplayWin::menuViewRotateOther)
+	EVT_MENU (MMP_WINDOWPARAMETERS,	MolDisplayWin::menuViewSetWindowParameters)
 
     EVT_MENU (MMP_SETBONDLENGTH,      MolDisplayWin::menuMoleculeSetBondLength)
     EVT_MENU (MMP_ENERGYEDIT,         MolDisplayWin::menuMoleculeSetFrameEnergy)
@@ -362,8 +365,8 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
 
     menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"));
-    menuView->Append(MMP_ANIMATEMODE, wxT("Animate Mode\tCtrl+M"));
-    menuView->Append(MMP_OFFSETMODE, wxT("Offset along mode..."));
+    menuView->Append(MMP_ANIMATEMODE, wxT("&Animate Mode\tCtrl+M"));
+    menuView->Append(MMP_OFFSETMODE, wxT("&Offset along mode..."));
     menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
     menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
     menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show &Axis"));
@@ -374,6 +377,7 @@ void MolDisplayWin::createMenuBar(void) {
     
     menuViewRotate = new wxMenu;
     menuView->Append(MMP_ROTATESUBMENU, wxT("&Rotate ..."), menuViewRotate);
+    menuView->Append(MMP_WINDOWPARAMETERS, wxT("Set &Window Parameters..."));
 
     menuViewRotate->Append(MMP_ROTATETOXAXIS, wxT("to &X-axis"));
     menuViewRotate->Append(MMP_ROTATETOYAXIS, wxT("to &Y-axis"));
@@ -1393,6 +1397,11 @@ void MolDisplayWin::menuViewEnlarge_10(wxCommandEvent &event) {
     MainData->WindowSize *= 0.9;
     ResetView();
     Dirty = true;
+}
+void MolDisplayWin::menuViewSetWindowParameters(wxCommandEvent &event) {
+	windowparameters * temp = new windowparameters(this);
+	if (temp->ShowModal() != wxID_CANCEL) Dirty = true;
+	temp->Destroy();
 }
 void MolDisplayWin::menuViewRotateTo_X_axis(wxCommandEvent &event) {
     MainData->TotalRotation[0][2] = MainData->TotalRotation[1][1] = 1.0;
