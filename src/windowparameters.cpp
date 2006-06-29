@@ -310,26 +310,110 @@ bool windowparameters::Apply(void) {
 	int width, height;
 	parent->GetClientSize(&width, &height);
 	double tw, th;
-	if (!screenX.ToDouble(&tw)) {
-		tw = width;
+	if (!mXWinSize->GetValue().ToDouble(&tw)) {
+		tw = width/UnitConversion;
 		result = false;
 	}
 	if (tw <= 0) {
-		tw = width;
+		tw = width/UnitConversion;
 		result = false;
 	}
-	if (!screenY.ToDouble(&th)) {
-		th = height;
+	if (!mYWinSize->GetValue().ToDouble(&th)) {
+		th = height/UnitConversion;
 		result = false;
 	}
 	if (th <= 0) {
-		th = height;
+		th = height/UnitConversion;
 		result = false;
 	}
+	double wScale;
+	if (!mWindowScale->GetValue().ToDouble(&wScale)) {
+		result = false;
+		wScale = MainData->GetMoleculeSize();
+	}
+	if (wScale <= 0.0) {
+		result = false;
+		wScale = MainData->GetMoleculeSize();
+	}
+	double tc;
+	CPoint3D center;
+	MainData->GetModelCenter(&center);
+	if (!mXWinCenter->GetValue().ToDouble(&tc)) {
+		result = false;
+		tc = center.x;
+	}
+	center.x = tc;
+	if (!mYWinCenter->GetValue().ToDouble(&tc)) {
+		result = false;
+		tc = center.y;
+	}
+	center.y = tc;
+	if (!mZWinCenter->GetValue().ToDouble(&tc)) {
+		result = false;
+		tc = center.z;
+	}
+	center.z = tc;
 	
-	if (result) {
+	double tpsi, tphi, ttheta;
+	float psi1, phi1, theta1;
+	MainData->GetModelRotation(&psi1, &phi1, &theta1);
+	if (!mPsiEdit->GetValue().ToDouble(&tpsi)) {
+		result = false;
+		tpsi = psi1;
+	}
+	if (!mPhiEdit->GetValue().ToDouble(&tphi)) {
+		result = false;
+		tphi = phi1;
+	}
+	if (!mThetaEdit->GetValue().ToDouble(&ttheta)) {
+		result = false;
+		ttheta = theta1;
+	}
+	
+	if (result) {	//everything looks good, apply it to the window and redraw
 		tw *= UnitConversion;
 		th *= UnitConversion;
+		if ((tw!=width)||(th!=height)) {
+			width = tw;
+			height = th;
+			parent->SetClientSize(width, height);
+		}
+		MainData->SetMoleculeSize(wScale);
+		MainData->SetModelCenter(&center);
+		MainData->SetModelRotation(tpsi,tphi,ttheta);
+
+		parent->ResetModel(false);
+	} else { //punch out the values we have and return false
+		wxString temp, temp2;
+
+		if (mUnitRadios->GetSelection() == 0) {
+			int w = tw;
+			int h = th;
+			temp.Printf("%d", w);
+			temp2.Printf("%d", h);
+		} else {
+			temp.Printf("%f", tw);
+			temp2.Printf("%f", th);
+		}
+		mXWinSize->SetValue(temp);
+		mYWinSize->SetValue(temp2);
+		
+		temp.Printf("%f", wScale);
+		mWindowScale->SetValue(temp);
+		
+		temp.Printf("%f", center.x);
+		mXWinCenter->SetValue(temp);
+		temp.Printf("%f", center.y);
+		mYWinCenter->SetValue(temp);
+		temp.Printf("%f", center.z);
+		mZWinCenter->SetValue(temp);
+		
+		temp.Printf("%.2f", tpsi);
+		mPsiEdit->SetValue(temp);
+		temp.Printf("%.2f", tphi);
+		mPhiEdit->SetValue(temp);
+		temp.Printf("%.2f", ttheta);
+		mThetaEdit->SetValue(temp);
 	}
 	
 	return result;
@@ -341,10 +425,7 @@ bool windowparameters::Apply(void) {
 
 void windowparameters::OnApplyClick( wxCommandEvent& event )
 {
-	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
-	int width, height;
-	wxString	t;
-	parent->GetClientSize(&width, &height);
+	Apply();
 }
 
 /*!
@@ -353,10 +434,9 @@ void windowparameters::OnApplyClick( wxCommandEvent& event )
 
 void windowparameters::OnOkClick( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK in windowparameters.
-    // Before editing this code, remove the block markers.
+	if (!Apply()) {
+//		event.veto();
+		return;
+	}
     event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK in windowparameters. 
 }
-
-
