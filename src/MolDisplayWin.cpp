@@ -184,6 +184,19 @@ public:
     bool                    SavedDrawMode;
 };
 
+//Class to hold CML data on the clipboard
+class WXDLLEXPORT wxCMLDataObject : public wxDataObjectSimple {
+public:
+	wxCMLDataObject(char * cmlText=NULL) : wxDataObjectSimple(_("CML")) {CML = cmlText;};
+	virtual ~wxCMLDataObject(void) {if (CML) delete [] CML; CML=NULL;};
+	char * GetCML(void) const {return CML;};
+	virtual size_t GetDataSize(void) const {return (CML?strlen(CML):0);};
+	
+private:
+	char * CML;
+    DECLARE_NO_COPY_CLASS(wxCMLDataObject)
+};
+
 MolDisplayWin::MolDisplayWin(const wxString &title,
                          const wxPoint  &position,
                          const wxSize   &size,
@@ -485,7 +498,8 @@ void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event ) {
     event.Enable(false);
     if (MainData->cFrame->NumAtoms == 0) {
         if (wxTheClipboard->Open()) {
-            if (wxTheClipboard->IsSupported(wxDF_TEXT)) {
+            if (wxTheClipboard->IsSupported(wxDF_TEXT) ||
+				wxTheClipboard->IsSupported(_("CML"))) {
                 event.Enable(true);
             }
             wxTheClipboard->Close();
@@ -1141,7 +1155,34 @@ void MolDisplayWin::menuEditCut(wxCommandEvent &event) {
 void MolDisplayWin::menuEditCopy(wxCommandEvent &event) {
     //Put the image onto the clipboard
     if (wxTheClipboard->Open()) {
-        wxTheClipboard->SetData(new wxBitmapDataObject(glCanvas->getImage(0,0)));
+		wxDataObjectComposite * comp = new wxDataObjectComposite();
+		comp->Add(new wxBitmapDataObject(glCanvas->getImage(0,0)), true);
+		
+		//Next add a CML version for internal pasting
+		BufferFile *Buffer=NULL;
+		char *	CML=NULL;
+		try {	//First get the size needed for the buffer
+			Buffer = new BufferFile(CML, 0);
+			Buffer->SetOutput(false);	//no actual writing, just keep track of the total size
+			long datalength = MainData->WriteCMLFile(Buffer, Prefs, NULL, false, true);
+			delete Buffer;
+			CML = new char[datalength+1];
+			CML[datalength]='\0';
+			Buffer = new BufferFile(CML, datalength);
+			MainData->WriteCMLFile(Buffer, Prefs, NULL, false, true);
+			
+			comp->Add(new wxCMLDataObject(CML), false);
+		}
+		catch (MemoryError) {
+			if (Buffer) delete Buffer;
+			if (CML) delete [] CML;
+		}
+		catch (FileError) {		//This shouldn't happen
+			if (Buffer) delete Buffer;
+			if (CML) delete [] CML;
+		}
+//        wxTheClipboard->SetData(new wxBitmapDataObject(glCanvas->getImage(0,0)));
+        wxTheClipboard->SetData(comp);
         wxTheClipboard->Close();
     }
 }
@@ -1197,7 +1238,78 @@ void MolDisplayWin::CopyCoordinates(short ctype) const {
 }
 
 void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
-    PasteText();
+    if (wxTheClipboard->Open()) {
+        if (wxTheClipboard->IsSupported(_("CML"))) {
+			wxCMLDataObject cmlObject;
+			if (wxTheClipboard->GetData(cmlObject)) {
+				char * CML = cmlObject.GetCML();
+				if (CML) {
+					BeginOperation();
+					try {
+						if (MainData->NumFrames > 1) {
+							MoleculeData *	tdatap = new MoleculeData();
+							if (!tdatap) return;
+							BufferFile *Buffer = new BufferFile(CML, strlen(CML));
+							if (tdatap->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, false)) {
+								tdatap->cFrame->PreviousFrame = MainData->cFrame->PreviousFrame;
+								tdatap->cFrame->NextFrame = MainData->cFrame->NextFrame;
+								if (MainData->cFrame->PreviousFrame)
+									MainData->cFrame->PreviousFrame->NextFrame = tdatap->cFrame;
+								if (MainData->cFrame->NextFrame)
+									MainData->cFrame->NextFrame->PreviousFrame = tdatap->cFrame;
+								MainData->cFrame->PreviousFrame = MainData->cFrame->NextFrame = NULL;
+								if (MainData->cFrame == MainData->Frames) MainData->Frames = tdatap->cFrame;
+								delete MainData->cFrame;
+								MainData->cFrame = tdatap->cFrame;
+								if (tdatap->MaxAtoms > MainData->MaxAtoms) {
+									MainData->MaxAtoms = tdatap->MaxAtoms;
+									if (MainData->RotCoords) delete [] MainData->RotCoords;
+									if (MainData->zBuffer) delete [] MainData->zBuffer;
+									MainData->RotCoords = tdatap->RotCoords;
+									MainData->zBuffer = tdatap->zBuffer;
+									tdatap->RotCoords = NULL;
+									tdatap->zBuffer = NULL;
+								}
+								if (tdatap->Basis && !MainData->Basis) {
+									MainData->Basis = tdatap->Basis;
+									tdatap->Basis = NULL;
+								}
+								tdatap->cFrame = tdatap->Frames = NULL; //this frame is now in use in MainData
+							}
+							if (Buffer) delete Buffer;
+							delete tdatap;
+						} else {
+							BufferFile *Buffer = new BufferFile(CML, strlen(CML));
+					//		WindowData tempData;
+							if (MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, true)) {
+							//if (MainData->OpenCMLFile(Buffer, Prefs, &tempData, true)) {
+				//				FileSave = 1;
+							}
+							if (Buffer) delete Buffer;
+						}
+					}
+					catch (MemoryError) {
+						MessageAlert("Insufficient memory to complete the paste!");
+						Close();
+						return;
+					}
+					catch (DataError) {
+						MessageAlert("Invalid data encountered!");
+						Close();
+						return;
+					}
+					FinishOperation();
+					MainData->ResetRotation();
+					FrameChanged();
+				}
+			}
+			wxTheClipboard->Close();
+		} else if (wxTheClipboard->IsSupported(wxDF_TEXT)) {
+			wxTheClipboard->Close();
+			PasteText();
+		} else
+			wxTheClipboard->Close();
+	}
 }
 void MolDisplayWin::PasteText(void) {
     //relax this restriction later (while in build mode)
