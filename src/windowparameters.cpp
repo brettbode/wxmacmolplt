@@ -292,12 +292,59 @@ void windowparameters::OnUnitsradioboxSelected( wxCommandEvent& event )
 	mYWinSize->SetValue(t);
 }
 
+bool windowparameters::Apply(void) {
+	bool result = true;
+	
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	MoleculeData * 	MainData = parent->GetData();
+	
+	double UnitConversion = 1.0;
+	switch (mUnitRadios->GetSelection()) {
+		case 1:
+			UnitConversion = 72.0;
+			break;
+		case 2:
+			UnitConversion = 72.0*0.3937;
+			break;
+	}
+	int width, height;
+	parent->GetClientSize(&width, &height);
+	double tw, th;
+	if (!screenX.ToDouble(&tw)) {
+		tw = width;
+		result = false;
+	}
+	if (tw <= 0) {
+		tw = width;
+		result = false;
+	}
+	if (!screenY.ToDouble(&th)) {
+		th = height;
+		result = false;
+	}
+	if (th <= 0) {
+		th = height;
+		result = false;
+	}
+	
+	if (result) {
+		tw *= UnitConversion;
+		th *= UnitConversion;
+	}
+	
+	return result;
+}
+
 /*!
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_APPLY
  */
 
 void windowparameters::OnApplyClick( wxCommandEvent& event )
 {
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	int width, height;
+	wxString	t;
+	parent->GetClientSize(&width, &height);
 }
 
 /*!

@@ -130,6 +130,8 @@ public:
     /// Retrieves icon resources
     wxIcon GetIconResource( const wxString& name );
 ////@end windowparameters member function declarations
+	
+	bool Apply(void);
 
     /// Should we show tooltips?
     static bool ShowToolTips();
