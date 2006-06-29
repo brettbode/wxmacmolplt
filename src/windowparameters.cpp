@@ -374,8 +374,8 @@ bool windowparameters::Apply(void) {
 		tw *= UnitConversion;
 		th *= UnitConversion;
 		if ((tw!=width)||(th!=height)) {
-			width = tw;
-			height = th;
+			width = (int) tw;
+			height = (int) th;
 			parent->SetClientSize(width, height);
 		}
 		MainData->SetMoleculeSize(wScale);
@@ -387,8 +387,8 @@ bool windowparameters::Apply(void) {
 		wxString temp, temp2;
 
 		if (mUnitRadios->GetSelection() == 0) {
-			int w = tw;
-			int h = th;
+			int w = (int) tw;
+			int h = (int) th;
 			temp.Printf("%d", w);
 			temp2.Printf("%d", h);
 		} else {
