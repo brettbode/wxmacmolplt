@@ -11179,6 +11179,12 @@ Grid Points:"</string>
           <string name="variable-2">"tabMiscPrefs|wxWindow *||NULL"</string>
           <string name="variable-3">"tabSCFOpts|wxWindow *||NULL"</string>
           <string name="variable-4">"tabStatPoint|wxWindow *||NULL"</string>
+          <string name="variable-5">"tabBasis|wxWindow *||"</string>
+          <string name="variable-6">"tabControl|wxWindow *||"</string>
+          <string name="variable-7">"tabData|wxWindow *||"</string>
+          <string name="variable-8">"tabSystem|wxWindow *||"</string>
+          <string name="variable-9">"tabDFT|wxWindow *||"</string>
+          <string name="variable-10">"tabMP2Opts|wxWindow *||"</string>
           <string name="event-handler-0">"wxEVT_CLOSE_WINDOW|OnCloseWindow"</string>
           <string name="proxy-Id name">"ID_INPUTBUILDERWINDOW"</string>
           <long name="proxy-Id value">10071</long>
@@ -18235,7 +18241,7 @@ Grid Points:"</string>
                       <long name="proxy-Id value">10162</long>
                       <string name="proxy-Class">"wxRadioBox"</string>
                       <string name="proxy-Member variable name">""</string>
-                      <string name="proxy-Label">"Radiobox"</string>
+                      <string name="proxy-Label">"Initial Hessian"</string>
                       <long name="proxy-Major dimension count">1</long>
                       <string name="proxy-Help text">""</string>
                       <string name="proxy-Tooltip text">""</string>
@@ -18859,6 +18865,14 @@ Grid Points:"</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Stretch factor">0</long>
+            <long name="proxy-Border">5</long>
+            <bool name="proxy-wxLEFT">1</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
+            <bool name="proxy-wxTOP">1</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>

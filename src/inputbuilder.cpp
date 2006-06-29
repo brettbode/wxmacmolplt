@@ -102,11 +102,11 @@ InputBuilderWindow::InputBuilderWindow( wxWindow* parent, wxWindowID id, const w
 
 InputBuilderWindow::~InputBuilderWindow() {
     //temp
-    delete tabMOGuess;
-    delete tabHessOpts;
-    delete tabMiscPrefs;
-    delete tabSCFOpts;
-    delete tabStatPoint;
+    tabMOGuess->Destroy();
+    tabHessOpts->Destroy();
+    tabMiscPrefs->Destroy();
+    tabSCFOpts->Destroy();
+    tabStatPoint->Destroy();
     
     delete TmpInputRec;
 }
@@ -815,7 +815,7 @@ void InputBuilderWindow::CreateControls()
         _("Read (from $HESS)"),
         _("Calculate")
     };
-    wxRadioBox* itemRadioBox150 = new wxRadioBox( itemPanel128, ID_RADIOBOX3, _("Radiobox"), wxDefaultPosition, wxDefaultSize, 3, itemRadioBox150Strings, 1, wxRA_SPECIFY_COLS );
+    wxRadioBox* itemRadioBox150 = new wxRadioBox( itemPanel128, ID_RADIOBOX3, _("Initial Hessian"), wxDefaultPosition, wxDefaultSize, 3, itemRadioBox150Strings, 1, wxRA_SPECIFY_COLS );
     itemBoxSizer149->Add(itemRadioBox150, 0, wxGROW|wxALL, 5);
 
     wxStaticText* itemStaticText151 = new wxStaticText( itemPanel128, wxID_STATIC, _("Recalc. Hess every"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -856,67 +856,63 @@ void InputBuilderWindow::CreateControls()
     itemStdDialogButtonSizer158->Realize();
 
 ////@end InputBuilderWindow content construction
+    tabStatPoint = listBook->GetPage(10);
+    listBook->RemovePage(10);
+    
+    tabSCFOpts = listBook->GetPage(9);
+    listBook->RemovePage(9);
+    
+    tabMP2Opts = listBook->GetPage(8);
+    listBook->RemovePage(8);
+    
+    tabMiscPrefs = listBook->GetPage(7);
+    listBook->RemovePage(7);
+    
+    tabHessOpts  = listBook->GetPage(6);
+    listBook->RemovePage(6);
+    
+    tabMOGuess = listBook->GetPage(5);
+    listBook->RemovePage(5);
+        
+    tabDFT = listBook->GetPage(4);
+    listBook->RemovePage(4);
+    
+    tabSystem = listBook->GetPage(3);
+    listBook->RemovePage(3);
+    
+    tabData = listBook->GetPage(2);
+    listBook->RemovePage(2);
+    
+    tabControl = listBook->GetPage(1);
+    listBook->RemovePage(1);
+    
+    tabBasis = listBook->GetPage(0);
+    listBook->RemovePage(0);
+    
     wxListView * t = listBook->GetListView();
 	//t->SetWindowStyle(wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_NO_HEADER);
 	t->SetWindowStyle(wxLC_LIST|wxLC_SINGLE_SEL);
     
-    /* Make sure all tabs get displayed properly */
-    wxWindow *tempPane = NULL;
-    
-    tempPane = listBook->GetPage(0);
-    listBook->RemovePage(0);
-    listBook->InsertPage(0, tempPane, _("Basis"));
-    
-    tempPane = listBook->GetPage(1);
-    listBook->RemovePage(1);
-    listBook->InsertPage(1, tempPane, _("Control"));
-    
-    tempPane = listBook->GetPage(2);
-    listBook->RemovePage(2);
-    listBook->InsertPage(2, tempPane, _("Data"));
-    
-    tempPane = listBook->GetPage(3);
-    listBook->RemovePage(3);
-    listBook->InsertPage(3, tempPane, _("System"));
-    
-    tempPane = listBook->GetPage(4);
-    listBook->RemovePage(4);
-    listBook->InsertPage(4, tempPane, _("DFT"));
-    
-    tabMOGuess   = listBook->GetPage(5);
-    listBook->RemovePage(5);
-    listBook->InsertPage(5, tabMOGuess, _("MO Guess"));
-        
-    tabHessOpts  = listBook->GetPage(6);
-    listBook->RemovePage(6);
-    listBook->InsertPage(6, tabHessOpts, _("Hess. Options"));
-    
-    tabMiscPrefs = listBook->GetPage(7);
-    listBook->RemovePage(7);
-    listBook->InsertPage(7, tabMiscPrefs, _("Misc. Prefs"));
-    
-    tempPane = listBook->GetPage(8);
-    listBook->RemovePage(8);
-    listBook->InsertPage(8, tempPane, _("MP2 Options"));
-    
-    tabSCFOpts   = listBook->GetPage(9);
-    listBook->RemovePage(9);
-    listBook->InsertPage(9, tabSCFOpts, _("SCF Options"));
-    
-    tabStatPoint = listBook->GetPage(10);
-    listBook->RemovePage(10);
-    listBook->InsertPage(10, tabStatPoint, _("Stat. Point"));
-    
-    tempPane = NULL;
+    listBook->AddPage(tabBasis, _("Basis"));
+    listBook->AddPage(tabControl, _("Control"));
+    listBook->AddPage(tabData, _("Data"));
+    listBook->AddPage(tabSystem, _("System"));
+    listBook->AddPage(tabDFT, _("DFT"));
+    listBook->AddPage(tabMOGuess, _("MO Guess"));
+    listBook->AddPage(tabHessOpts, _("Hess. Options"));
+    listBook->AddPage(tabMiscPrefs, _("Misc. Prefs"));
+    listBook->AddPage(tabMP2Opts, _("MP2 Options"));
+    listBook->AddPage(tabSCFOpts, _("SCF Options"));
+    listBook->AddPage(tabStatPoint, _("Stat. Point"));
     
     listBook->SetSelection(1);
     
-    listBook->RemovePage(10);
-    listBook->RemovePage(9);
+    //listBook->RemovePage(10);
+    //listBook->RemovePage(9);
     //listBook->RemovePage(8);
-    listBook->RemovePage(7);
-    listBook->RemovePage(6);
-    listBook->RemovePage(5);
+    //listBook->RemovePage(7);
+    //listBook->RemovePage(6);
+    //listBook->RemovePage(5);
     //listBook->RemovePage(4);
 }
 

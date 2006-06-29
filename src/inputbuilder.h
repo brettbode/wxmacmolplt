@@ -250,6 +250,12 @@ public:
     wxWindow * tabMiscPrefs;
     wxWindow * tabSCFOpts;
     wxWindow * tabStatPoint;
+    wxWindow * tabBasis;
+    wxWindow * tabControl;
+    wxWindow * tabData;
+    wxWindow * tabSystem;
+    wxWindow * tabDFT;
+    wxWindow * tabMP2Opts;
 ////@end InputBuilderWindow member variables
 
     InputData * TmpInputRec;
