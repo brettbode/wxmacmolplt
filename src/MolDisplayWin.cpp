@@ -35,6 +35,7 @@
 #include "frameenergy.h"
 #include "printoptions.h"
 #include "windowparameters.h"
+#include "zmatrixcalculator.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
 #include <wx/image.h>
@@ -95,6 +96,7 @@ enum MMP_EventID {
     MMP_OFFSETMODE,
     MMP_ENERGYEDIT,
 	MMP_WINDOWPARAMETERS,
+	MMP_ZMATRIXCALC,
     
     Number_MMP_Ids
 };
@@ -126,7 +128,6 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
     EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
     EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
-    EVT_MENU (ID_LOCAL_PREFERENCES,   MolDisplayWin::menuPreferences)
     EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
     EVT_MENU (MMP_ANIMATEMODE,      MolDisplayWin::menuViewAnimateMode)
     EVT_MENU (MMP_OFFSETMODE,       MolDisplayWin::menuViewOffsetAlongMode)
@@ -154,12 +155,14 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_CONVERTTOANGSTROMS, MolDisplayWin::menuMoleculeConvertToAngstroms)
     EVT_MENU (MMP_INVERTNORMALMODE,   MolDisplayWin::menuMoleculeInvertNormalMode)
 
-    EVT_MENU (MMP_BONDSWINDOW,        MolDisplayWin::menuWindowBonds)
-    EVT_MENU (MMP_COORDSWINDOW,       MolDisplayWin::menuWindowCoordinates)
-    EVT_MENU (MMP_ENERGYPLOTWINDOW,   MolDisplayWin::menuWindowEnergy_plot)
-    EVT_MENU (MMP_FREQUENCIESWINDOW,  MolDisplayWin::menuWindowFrequencies)
-    EVT_MENU (MMP_INPUTBUILDERWINDOW, MolDisplayWin::menuWindowInput_builder)
-    EVT_MENU (MMP_SURFACESWINDOW,     MolDisplayWin::menuWindowSurfaces)
+	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
+	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)
+	EVT_MENU (MMP_ENERGYPLOTWINDOW,		MolDisplayWin::menuWindowEnergy_plot)
+	EVT_MENU (MMP_FREQUENCIESWINDOW,	MolDisplayWin::menuWindowFrequencies)
+	EVT_MENU (MMP_INPUTBUILDERWINDOW,	MolDisplayWin::menuWindowInput_builder)
+	EVT_MENU (MMP_SURFACESWINDOW,		MolDisplayWin::menuWindowSurfaces)
+	EVT_MENU (ID_LOCAL_PREFERENCES,		MolDisplayWin::menuPreferences)
+	EVT_MENU (MMP_ZMATRIXCALC,			MolDisplayWin::menuWindowZMatrixCalc)
 
     EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
     EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
@@ -233,6 +236,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     surfacesWindow = NULL;
     inputBuilderWindow = NULL;
 	prefsDlg = NULL;
+	zMatCalcDlg = NULL;
     
     pageSetupData = NULL;
     printData = NULL;
@@ -429,6 +433,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"));
     menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"));
     menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"));
+    menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"));
     menuWindow->Append(ID_LOCAL_PREFERENCES, wxT("Pr&eferences"));
     menuHelp->Append(wxID_ABOUT, wxT("&About"));
 
@@ -1812,6 +1817,20 @@ void MolDisplayWin::CloseSurfacesWindow(void) {
         surfacesWindow = NULL;
     }
 }
+void MolDisplayWin::menuWindowZMatrixCalc(wxCommandEvent &event) {
+    if(zMatCalcDlg) { // need to bring it to the front...
+		zMatCalcDlg->Raise();
+    } else {
+        zMatCalcDlg = new ZMatrixCalculator(this);
+        zMatCalcDlg->Show();
+    }
+}
+void MolDisplayWin::CloseZMatrixCalc(void) {
+    if(zMatCalcDlg) {
+        zMatCalcDlg->Destroy();
+        zMatCalcDlg = NULL;
+    }
+}
 
 void MolDisplayWin::AtomsChanged(void) {
     if (bondsWindow) bondsWindow->ResetList();
@@ -1852,6 +1871,7 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
         if (energyPlotWindow) energyPlotWindow->FrameChanged();
         if (frequenciesWindow) frequenciesWindow->FrameChanged();
         if (surfacesWindow) surfacesWindow->Reset();
+		if (zMatCalcDlg) zMatCalcDlg->UpdateValues();
         frameScrollBar->SetThumbPosition(MainData->CurrentFrame-1);
     }
 }
@@ -1981,13 +2001,13 @@ void MolDisplayWin::ResetModel(bool Center) {
 void MolDisplayWin::ResetAllWindows(void) {
     glCanvas->UpdateGLView();
     ResetModel(false);
-    //update the frame info.
     
     //force updates for all the child windows
     if (coordsWindow) coordsWindow->FrameChanged();
     if (bondsWindow) bondsWindow->ResetList();
-    // TODO:  update energyPlotWindow
-    // TODO:  update frequenciesWindow
+	if (energyPlotWindow) energyPlotWindow->RegenData();
+	if (frequenciesWindow) frequenciesWindow->FrameChanged();
+	if (zMatCalcDlg) zMatCalcDlg->UpdateValues();
     
 }
 void MolDisplayWin::BeginOperation(void) {

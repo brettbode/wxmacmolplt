@@ -32,6 +32,7 @@ typedef class FrequenciesDialog FrequenciesDialog;
 typedef class SurfacesWindow SurfacesWindow;
 typedef class InputBuilderWindow InputBuilderWindow;
 typedef class ModeAnimation ModeAnimation;
+typedef class ZMatrixCalculator ZMatrixCalculator;
 /**
  * Subclasses wxFrame to define the main application window.  This is a
  * document window.  There can be multiple instances of the window in the
@@ -71,6 +72,7 @@ class MolDisplayWin : public wxFrame {
 		SurfacesWindow		*surfacesWindow;
         InputBuilderWindow  *inputBuilderWindow;
 		setPreference		*prefsDlg;
+		ZMatrixCalculator	*zMatCalcDlg;
         
         wxPageSetupDialogData *pageSetupData;
         wxPrintData           *printData;
@@ -179,9 +181,7 @@ class MolDisplayWin : public wxFrame {
         void menuMoleculeConvertToAngstroms(wxCommandEvent &event);
         void menuMoleculeInvertNormalMode(wxCommandEvent &event);
         
-        //void menuWindow_Zmat_calculator(wxCommandEvent &event);
-        /* On Mac, these will be part of dynamically created sub-menus for each
-         * main window*/
+		//Commands to open (or raise) the various data subviews.
         //void menuWindowMain_display(wxCommandEvent &event);
         void menuWindowBonds(wxCommandEvent &event);
         void menuWindowCoordinates(wxCommandEvent &event);
@@ -189,7 +189,7 @@ class MolDisplayWin : public wxFrame {
         void menuWindowFrequencies(wxCommandEvent &event);
         void menuWindowInput_builder(wxCommandEvent &event);
         void menuWindowSurfaces(wxCommandEvent &event);
-        //void menuWindowPreferences(wxCommandEvent &event);
+        void menuWindowZMatrixCalc(wxCommandEvent &event);
         void KeyHandler(wxKeyEvent &event);
         void CloseBondsWindow(void);
         void CloseCoordsWindow(void);
@@ -197,6 +197,7 @@ class MolDisplayWin : public wxFrame {
         void CloseFrequenciesWindow(void);
         void CloseSurfacesWindow(void);
         void CloseInputBuilderWindow(void);
+        void CloseZMatrixCalc(void);
 		void MolDisplayWin::OnActivate(wxActivateEvent & event);
         
         //File handling routines
