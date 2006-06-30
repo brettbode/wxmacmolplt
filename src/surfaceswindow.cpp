@@ -183,6 +183,9 @@ void SurfacesWindow::CreateControls()
 
     if ( tempPane && newSurface)
       {
+	Frame * lFrame = mData->GetCurrentFramePtr();
+	lFrame->AppendSurface(newSurface);
+
 	tempPane->SetVisibility(true);
 	visibleCheck->SetValue(true);
 	allFrameCheck->SetValue((newSurface->GetSurfaceID() != 0));
@@ -200,14 +203,30 @@ void SurfacesWindow::CreateControls()
 void SurfacesWindow::OnAddClick( wxCommandEvent& event )
 {
   int surfTypeId = selectSurfaceType();
-  BaseSurfacePane* tempPane;
+  BaseSurfacePane* tempPane = NULL;
+  Surface* newSurface = NULL;
 
   switch (surfTypeId)
     {
     case ID_3D_ORBITAL_PANE:
-      Orb3DSurface* newSurface = new Orb3DSurface(mPrefs);
-      tempPane = new Orbital3DSurfPane(listBook,newSurface, mData, mPrefs );
+      newSurface = new Orb3DSurface(mPrefs);
+      tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(newSurface), mData, mPrefs );
       break;
+    }
+
+  if ( tempPane && newSurface)
+    {
+      Frame * lFrame = mData->GetCurrentFramePtr();
+      lFrame->AppendSurface(newSurface);
+
+      tempPane->SetVisibility(true);
+      visibleCheck->SetValue(true);
+      allFrameCheck->SetValue((newSurface->GetSurfaceID() != 0));
+    }
+  else
+    {
+      visibleCheck->Disable();
+      allFrameCheck->Disable();
     }
 
   if ( surfTypeId != -1)
