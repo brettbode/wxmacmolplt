@@ -27,6 +27,7 @@ class colorArea : public wxPanel
 {
  public:
   colorArea(wxWindow* parent, int i);
+  colorArea(wxWindow* parent, int i, RGBColor* color);
   ~colorArea();
   int getId() { return mID; }
   void draw(RGBColor*);
@@ -36,6 +37,9 @@ class colorArea : public wxPanel
  private:
   int mID;
   wxColour mCurrentColor;
+  RGBColor* mColorPtr;
+
+  wxWindow* mParent;
 
   DECLARE_EVENT_TABLE()
 };

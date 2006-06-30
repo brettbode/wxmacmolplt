@@ -56,6 +56,13 @@ class OrbSurfBase;
 #define SYMBOL_ORBITAL3D_SIZE wxSize(400, 300)
 #define SYMBOL_ORBITAL3D_POSITION wxDefaultPosition
 
+#define SYMBOL_PARAM_SIZE wxSize(400, 300)
+#define SYMBOL_PARAM_POSITION wxDefaultPosition
+#define ID_2D_PARAM_DIALOG 10071
+#define ID_3D_PARAM_DIALOG 10072
+#define SYMBOL_2D_PARAM_TITLE _("2D Manual Parameter Adjustment")
+#define SYMBOL_3D_PARAM_TITLE _("3D Manual Parameter Adjustment")
+
 #define ID_ORB_CHOICE 10074
 #define ID_GRID_POINT_SLIDER 10075
 #define ID_SET_PARAM_BUT 10076
@@ -73,7 +80,9 @@ class OrbSurfBase;
 #define ID_ORB_COLOR_POSITIVE 10088
 #define ID_ORB_COLOR_NEGATIVE 10089
 #define ID_SPH_HARMONICS_CHECKBOX 10090
-
+#define ID_3D_ORB_TEXTCTRL 10091
+#define ID_COPY_ALL 10092
+#define ID_PASTE_ALL 10093
 ////@end control identifiers
 
 /*!
@@ -99,8 +108,20 @@ class BaseSurfacePane : public wxPanel
   ~BaseSurfacePane();
 
   bool Create( wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
- 
+
+  virtual void TargetToPane() = 0;
+  virtual void refreshControls() = 0;
+
+  void SetVisibility(bool state);
+  virtual bool UpdateNeeded(void);
+  void SetUpdateTest(bool test);
+  void setUpdateButton();
+
  protected:
+  void OnGridPointSld( wxCommandEvent &event );
+  void OnSetParam( wxCommandEvent &event );
+  void OnExport( wxCommandEvent &event );
+
   wxBoxSizer* mainSizer;
   wxBoxSizer* upperSizer;
   wxBoxSizer* middleSizer;
@@ -121,7 +142,11 @@ class BaseSurfacePane : public wxPanel
   wxButton* mUpdateBut;
   wxCheckBox* mSphHarmonicsChk;
 
-  //MoleculeData* mData;
+  bool Visible;
+  bool AllFrames;
+  bool UpdateTest;
+  long NumGridPoints;
+  bool SwitchFixGrid;
 
  private:
   void CreateControls();
@@ -139,6 +164,8 @@ class OrbSurfacePane
   ~OrbSurfacePane();
 
  protected:
+  bool UpdateEvent(); 
+
   void makeMOList(std::vector<wxString>& choice);
   void makeAOList(wxString& choice);
   int getOrbSetForOrbPane(std::vector<wxString>& choice);
@@ -148,6 +175,8 @@ class OrbSurfacePane
   long OrbColumnEnergyOrOccupation;
   long SphericalHarmonics;
   long PlotOrb;
+  bool PhaseChange;
+
   MoleculeData* mData;
 
  private:
@@ -181,10 +210,14 @@ class Surface3DPane : public BaseSurfacePane
   Surface3DPane( wxWindow* parent, Surf3DBase* target, MoleculeData* data, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
   ~Surface3DPane();
 
+protected:
   void On3DRadioBox (wxCommandEvent& event );
   void OnSmoothCheck (wxCommandEvent& event );
-  
-protected:
+  void OnTextEnter(wxCommandEvent& event );
+  void OnFreeMem(wxCommandEvent& event );
+
+  void setContourValueSld();
+
   wxStaticText* label2;
   wxStaticText* label3;
   wxStaticText* label4;
@@ -194,13 +227,18 @@ protected:
   wxRadioBox* m3DRdoBox;
   wxCheckBox* mSmoothChkBox;
   wxButton* mFreeMemBut;
+  wxTextCtrl* m3DOrbMaxText;
+
+  float GridSize;
+  RGBColor TranspColor;
+  bool UseNormals;
+  bool UseSolidSurface;
+  float ContourValue;
 
  private:
   void CreateControls();
 
   Surf3DBase* mTarget;
-  bool UseNormals;
-  bool UseSolidSurface;
 
   //DECLARE_EVENT_TABLE()
 }; 
@@ -214,6 +252,9 @@ public:
     Orbital3DSurfPane() { }
     Orbital3DSurfPane( wxWindow* parent, Orb3DSurface* target, MoleculeData* data, WinPrefs* prefs, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
     ~Orbital3DSurfPane();
+
+    virtual void TargetToPane();
+    virtual void refreshControls();
 
     /// Creates the controls and sizers
     void CreateControls();
@@ -241,13 +282,20 @@ public:
     static bool ShowToolTips();
 
  private:
+    virtual bool UpdateNeeded(void);
+
     void OnOrbFormatChoice( wxCommandEvent &event );
     void OnAtomList( wxCommandEvent &event );
     void OnOrbSetChoice( wxCommandEvent &event );
     void OnSphHarmonicChk(wxCommandEvent &event );
+    void OnReversePhase(wxCommandEvent &event );
+    void OnContourValueSld(wxCommandEvent &event );
+    void OnGridSizeSld(wxCommandEvent &event );
+    void OnUpdate(wxCommandEvent &event );
 
     wxBoxSizer* mSubLeftBot1Sizer;
     wxBoxSizer* mSubLeftBot2Sizer;
+    wxBoxSizer* mSubRightBot0Sizer;
     wxBoxSizer* mSubRightBot1Sizer;
     wxBoxSizer* mSubRightBot2Sizer;
     wxBoxSizer* mSubRightBot3Sizer;
@@ -261,10 +309,62 @@ public:
     wxListBox* mAtomList;
     wxTextCtrl* mOrbCoef;
     wxChoice* mOrbFormatChoice;
+    wxStaticText* mContourMaxTick;
 
     Orb3DSurface* mTarget;
 
+    RGBColor PosColor;
+    RGBColor NegColor;
+
     DECLARE_EVENT_TABLE()
+};
+
+/*
+class Surface2DParamDlg : public wxFrame 
+{
+ public:
+  Surface2DParamDlg(BaseSurfacePane * parent, Surf2DBase * targetSurface);
+  ~Surface2DParamDlg(void);
+
+ private:
+  BaseSurfacePane * mParent;
+  Surf2DBase * mTargetSurf;
+};
+*/
+
+class Surface3DParamDlg : public wxFrame 
+{
+  DECLARE_CLASS(Surface3DParamDlg);
+
+ public:
+  Surface3DParamDlg(BaseSurfacePane * parent, Surface * targetSurface, wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE );
+
+
+  ~Surface3DParamDlg(void){}
+
+  bool Create(wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE );
+  
+ private:
+  void createControls();
+
+  void OnClose(wxCommandEvent &event );
+  void OnCancel(wxCommandEvent &event );
+  void OnCopyAll(wxCommandEvent &event );
+  void OnPasteAll(wxCommandEvent &event );
+
+  wxBoxSizer* mainSizer;
+  wxBoxSizer *firstTierSizer, *secondTierSizer, *thirdTierSizer;
+  wxBoxSizer* fourthTierSizer;
+
+  wxTextCtrl *numGridPoint1, *numGridPoint2, *numGridPoint3;
+  wxTextCtrl *originText1, *originText2, *originText3;
+  wxTextCtrl *gridIncText1, *gridIncText2, *gridIncText3;
+  wxButton *okButton, *cancelButton, *copyAllButton, *pasteAllButton;
+
+  BaseSurfacePane * mParent;
+  Surf3DBase *	mTargetSurf;
+
+  DECLARE_EVENT_TABLE()
 };
 
 #endif

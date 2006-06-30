@@ -11,21 +11,34 @@
 #include "wx/colordlg.h"
 
 #include "colorArea.h"
+#include "surfaceDlg.h"
 
 #ifdef __BORLANDC__
 #pragma hdrstop
 #endif
 
+wxColour RGB2WX(RGBColor &c);
+RGBColor WX2RGB(wxColour &c);
+
 BEGIN_EVENT_TABLE(colorArea, wxPanel)
     EVT_MOUSE_EVENTS(colorArea::OnMouse)
 END_EVENT_TABLE()
 
-
 colorArea::colorArea(wxWindow* parent, int i)
 {
   Create(parent, -1, wxDefaultPosition, wxSize(50, 20));
+
   mID = i;
-  //mDC = new wxPaintDC(parent);
+  mParent = parent;
+}
+
+colorArea::colorArea(wxWindow* parent, int i, RGBColor* color)
+{
+  Create(parent, -1, wxDefaultPosition, wxSize(50, 20));
+
+  mID = i;
+  mColorPtr = color;
+  mParent = parent;
 }
 
 colorArea::~colorArea()
@@ -60,6 +73,17 @@ void colorArea::OnMouse(wxMouseEvent &event)
 	{
 	  mCurrentColor = dialog.GetColourData().GetColour();
 	  SetBackgroundColour(mCurrentColor);
+
+	  RGBColor tmpRGBColor = WX2RGB(mCurrentColor);
+	  mColorPtr->red = tmpRGBColor.red;
+	  mColorPtr->green = tmpRGBColor.green;
+	  mColorPtr->blue = tmpRGBColor.blue;
+
+	  Update();
+
+	  if (mID == ID_ORB_COLOR_POSITIVE || mID == ID_ORB_COLOR_NEGATIVE
+	      || mID == ID_TRANSPARENCY_COLOR)
+	    (dynamic_cast<BaseSurfacePane*>(mParent))->setUpdateButton();
 	}
     }
 }

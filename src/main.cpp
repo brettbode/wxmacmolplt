@@ -16,6 +16,7 @@
 #include <wx/filename.h>
 #include <wx/image.h>
 #include <wx/splash.h>
+#include <wx/config.h>
 
 //The global preferences settings
     WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
@@ -152,6 +153,9 @@ bool MpApp::OnInit() {
 
 int MpApp::OnExit() {
     delete m_InstanceChecker;
+
+    delete wxConfigBase::Set((wxConfigBase *) NULL);
+    //delete config object if there is one created before  -Song Li
 
     return 0;
 }

@@ -183,7 +183,8 @@ void SurfacesWindow::CreateControls()
 
     if ( tempPane && newSurface)
       {
-	visibleCheck->SetValue(newSurface->GetVisibility());
+	tempPane->SetVisibility(true);
+	visibleCheck->SetValue(true);
 	allFrameCheck->SetValue((newSurface->GetSurfaceID() != 0));
       }
     else
