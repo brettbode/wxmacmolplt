@@ -185,12 +185,25 @@ public:
 };
 
 //Class to hold CML data on the clipboard
+//This is really intended for internal use for copying data from one file to another.
 class WXDLLEXPORT wxCMLDataObject : public wxDataObjectSimple {
 public:
-	wxCMLDataObject(char * cmlText=NULL) : wxDataObjectSimple(_("CML")) {CML = cmlText;};
+	wxCMLDataObject(char * cmlText=NULL) : wxDataObjectSimple(_("CML")) {
+		CML = cmlText;};
 	virtual ~wxCMLDataObject(void) {if (CML) delete [] CML; CML=NULL;};
 	char * GetCML(void) const {return CML;};
 	virtual size_t GetDataSize(void) const {return (CML?strlen(CML):0);};
+	virtual bool GetDataHere(void * buf) const {if (CML) {strcpy((char *)buf, CML); return true;} return false;};
+	virtual bool SetData(size_t len, const void * buf) {
+		if (CML) {delete [] CML; CML = NULL;}
+		if (len>0) {
+			CML = new char[len+1];
+			CML[len] = '\0';
+			if (buf) strncpy(CML, (const char *)buf, len);
+			return true;
+		}
+		return false;
+	};
 	
 private:
 	char * CML;
