@@ -177,7 +177,7 @@ void SurfacesWindow::CreateControls()
     {
     case ID_3D_ORBITAL_PANE:
       newSurface = new Orb3DSurface(mPrefs);
-      tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(newSurface), mData, mPrefs );
+      tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(newSurface), this);
       break;
     }
 
@@ -210,7 +210,7 @@ void SurfacesWindow::OnAddClick( wxCommandEvent& event )
     {
     case ID_3D_ORBITAL_PANE:
       newSurface = new Orb3DSurface(mPrefs);
-      tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(newSurface), mData, mPrefs );
+      tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(newSurface), this );
       break;
     }
 
@@ -244,6 +244,7 @@ void SurfacesWindow::OnDeleteClick( wxCommandEvent& event )
   int targetSurf = listBook->GetSelection();
   lFrame->DeleteSurface(targetSurf);
   listBook->DeletePage(targetSurf);
+  Parent->UpdateModelDisplay();
 }
 
 /*!
@@ -353,5 +354,16 @@ wxIcon SurfacesWindow::GetIconResource( const wxString& name )
 ////@end SurfacesWindow icon retrieval
 }
 
-
+void SurfacesWindow::SurfaceUpdated(void) {
+	//Do we need to generate a frame changed event here???
+	BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
+	if (tempPane) {
+		Surface * tempSurf = tempPane->GetTargetSurface();
+		wxString temp;
+		temp.Printf("%s", tempSurf->GetLabel());
+		surfTitleEdit->SetValue(temp);
+		listBook->SetPageText(listBook->GetSelection(), temp);
+	} 
+	Parent->UpdateModelDisplay();
+}
 

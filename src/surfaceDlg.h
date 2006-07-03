@@ -42,6 +42,7 @@ class Surface;
 class Surf3DBase;
 class Orb3DSurface;
 class OrbSurfBase;
+class SurfacesWindow;
 ////@end forward declarations
 
 /*!
@@ -104,7 +105,7 @@ class BaseSurfacePane : public wxPanel
  public:
 
   BaseSurfacePane() {}
-  BaseSurfacePane( wxWindow* parent, Surface* target, MoleculeData* data, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+  BaseSurfacePane( wxWindow* parent, Surface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
   ~BaseSurfacePane();
 
   bool Create( wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
@@ -116,6 +117,7 @@ class BaseSurfacePane : public wxPanel
   virtual bool UpdateNeeded(void);
   void SetUpdateTest(bool test);
   void setUpdateButton();
+  Surface * GetTargetSurface(void) const {return mTarget;};
 
   void OnGridPointSld( wxCommandEvent &event );
   void OnSetParam( wxCommandEvent &event );
@@ -148,6 +150,8 @@ protected:
   long NumGridPoints;
   bool SwitchFixGrid;
 
+  SurfacesWindow * owner;
+
  private:
   void CreateControls();
 
@@ -160,7 +164,7 @@ class OrbSurfacePane
 {
  public:
   OrbSurfacePane() {}
-  OrbSurfacePane( OrbSurfBase* target, MoleculeData* data, WinPrefs* prefs );
+  OrbSurfacePane( OrbSurfBase* target, SurfacesWindow* owner);
   ~OrbSurfacePane();
 
  protected:
@@ -177,12 +181,9 @@ class OrbSurfacePane
   long PlotOrb;
   bool PhaseChange;
 
-  MoleculeData* mData;
-
  private:
   OrbSurfBase* mTarget;
-  WinPrefs* mPrefs;
-
+  SurfacesWindow * myowner;
 };
 
 /*!
@@ -207,7 +208,7 @@ class Surface3DPane : public BaseSurfacePane
 
 public:
   Surface3DPane() {}
-  Surface3DPane( wxWindow* parent, Surf3DBase* target, MoleculeData* data, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+  Surface3DPane( wxWindow* parent, Surf3DBase* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
   ~Surface3DPane();
 
   void On3DRadioBox (wxCommandEvent& event );
@@ -250,7 +251,7 @@ class Orbital3DSurfPane : public Surface3DPane, public OrbSurfacePane
 public:
     /// Constructors
     Orbital3DSurfPane() { }
-    Orbital3DSurfPane( wxWindow* parent, Orb3DSurface* target, MoleculeData* data, WinPrefs* prefs, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    Orbital3DSurfPane( wxWindow* parent, Orb3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
     ~Orbital3DSurfPane();
 
     virtual void TargetToPane();

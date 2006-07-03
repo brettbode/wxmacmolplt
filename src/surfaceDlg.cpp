@@ -29,6 +29,8 @@
 #include "BasisSet.h"
 #include "Prefs.h"
 #include "Progress.h"
+#include "MolDisplayWin.h"
+#include "surfaceswindow.h"
 
 #include <wx/config.h>
 
@@ -81,16 +83,17 @@ END_EVENT_TABLE()
  * Base class of any Panel
  */
 
-BaseSurfacePane::BaseSurfacePane( wxWindow* parent, Surface* target, MoleculeData* data, wxWindowID id, const wxPoint& pos, const wxSize& size, long style )
+BaseSurfacePane::BaseSurfacePane( wxWindow* parent, Surface* target, SurfacesWindow* p, wxWindowID id, const wxPoint& pos, const wxSize& size, long style )
 {
-  mTarget = target;
+	mTarget = target;
+	owner = p;
   //mData = data;
 
-  Visible = target->GetVisibility();
-  AllFrames = (mTarget->GetSurfaceID() != 0);
-  UpdateTest = false;
+	Visible = target->GetVisibility();
+	AllFrames = (mTarget->GetSurfaceID() != 0);
+	UpdateTest = false;
 
-  Create(parent, id, pos, size, style);
+	Create(parent, id, pos, size, style);
 }
 
 BaseSurfacePane::~BaseSurfacePane()
@@ -208,11 +211,10 @@ void BaseSurfacePane::setUpdateButton()
 
 bool BaseSurfacePane::UpdateNeeded(void) {return false;}	//By default update is unavailable
 
-OrbSurfacePane::OrbSurfacePane( OrbSurfBase* target, MoleculeData* data, WinPrefs* prefs )
+OrbSurfacePane::OrbSurfacePane( OrbSurfBase* target, SurfacesWindow* o)
 {
   mTarget = target;
-  mData = data;
-  mPrefs = prefs;
+	myowner = o;
 
   TargetSet = mTarget->GetTargetSet();
   OrbOptions = mTarget->GetOptions();
@@ -223,6 +225,7 @@ OrbSurfacePane::OrbSurfacePane( OrbSurfBase* target, MoleculeData* data, WinPref
 
   if ((TargetSet<0)||(!(OrbOptions&1))) 
     {	//default to something sensible
+	  MoleculeData * mData = myowner->GetMoleculeData();
       Frame * lFrame = mData->GetCurrentFramePtr();
       const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
 
@@ -277,8 +280,9 @@ bool OrbSurfacePane::UpdateEvent()
 
 int OrbSurfacePane::getOrbSetForOrbPane(vector<wxString>& choice)
 {
-  Frame * lFrame = mData->GetCurrentFramePtr();
-  const vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
+	MoleculeData * mData = myowner->GetMoleculeData();
+	Frame * lFrame = mData->GetCurrentFramePtr();
+	const vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
 
   short item, numitems;
 
@@ -379,8 +383,9 @@ int OrbSurfacePane::getOrbSetForOrbPane(vector<wxString>& choice)
 
 void OrbSurfacePane::makeMOList(vector<wxString>& choice)
 {
-  Frame * lFrame = mData->GetCurrentFramePtr();
-  const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
+	MoleculeData * mData = myowner->GetMoleculeData();
+	Frame * lFrame = mData->GetCurrentFramePtr();
+	const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
 
   wxString tmpStr;
 
@@ -514,7 +519,8 @@ void OrbSurfacePane::makeMOList(vector<wxString>& choice)
 
 void OrbSurfacePane::makeAOList(wxString& choice)
 {
-  BasisSet * BasisPtr = mData->GetBasisSet();
+	MoleculeData * mData = myowner->GetMoleculeData();
+	BasisSet * BasisPtr = mData->GetBasisSet();
 
   if (BasisPtr) 
     {
@@ -545,6 +551,7 @@ void OrbSurfacePane::makeAOList(wxString& choice)
 			  sprintf(label, "%ld  ", iatom+1);
 			  choice.Append(label);
 
+			  WinPrefs * mPrefs = myowner->GetPrefs();
 			  if (mPrefs) 
 			    {
 			      long AtomType = lFrame->GetAtomType(iatom)-1;
@@ -635,7 +642,9 @@ void OrbSurfacePane::makeAOList(wxString& choice)
  * 3D surface dialog class
  */
 
-Surface3DPane::Surface3DPane( wxWindow* parent, Surf3DBase* target, MoleculeData* data, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : BaseSurfacePane(parent, target, data, id, pos, size, style)
+Surface3DPane::Surface3DPane( wxWindow* parent, Surf3DBase* target, SurfacesWindow* Owner, wxWindowID id,
+							  const wxPoint& pos, const wxSize& size, long style ) 
+	: BaseSurfacePane(parent, target, Owner, id, pos, size, style)
 {
   mTarget = target;
   CreateControls();
@@ -756,7 +765,9 @@ void Surface3DPane::OnFreeMem(wxCommandEvent& event )
  * Orbital3D constructors
  */
 
-Orbital3DSurfPane::Orbital3DSurfPane( wxWindow* parent, Orb3DSurface* target, MoleculeData* data, WinPrefs* prefs, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) : Surface3DPane(parent, target, data, id, pos, size, style), OrbSurfacePane(target, data, prefs)
+Orbital3DSurfPane::Orbital3DSurfPane( wxWindow* parent, Orb3DSurface* target, SurfacesWindow* o, wxWindowID id,
+									  const wxPoint& pos, const wxSize& size, long style ) 
+			: Surface3DPane(parent, target, o, id, pos, size, style), OrbSurfacePane(target, o)
 {
   mTarget = target;
 
@@ -1027,6 +1038,7 @@ void Orbital3DSurfPane::OnOrbSetChoice( wxCommandEvent &event )
     {
       short numitems=1;
       OrbOptions = 0;	//turn off AOs and alpha/beta flags
+	  MoleculeData * mData = owner->GetMoleculeData();
       Frame * lFrame = mData->GetCurrentFramePtr();
 
       const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
@@ -1190,6 +1202,8 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event )
   mTarget->UseSurfaceNormals(UseNormals);
 
   OrbSurfacePane::UpdateEvent();
+  
+  MoleculeData * mData = owner->GetMoleculeData();
 
   //update this surface's data on all frames if necessary
   if (AllFrames != (mTarget->GetSurfaceID() != 0)) 
@@ -1319,6 +1333,7 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event )
 
   mUpdateBut->Disable();
 
+  owner->SurfaceUpdated();
 }
 
 

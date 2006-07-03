@@ -48,6 +48,7 @@ class wxListbook;
 #define ID_VISIBLECHECK 10087
 #define ID_ALLFRAMECHECK 10088
 #define ID_SURFLISTBOOK 10069
+#define ID_PANEL 10071
 #define ID_ADDSURFCHOICE 10089
 ////@end control identifiers
 
@@ -102,6 +103,12 @@ public:
     static bool ShowToolTips();
 	
     void Reset(void);	//Call to rebuild the dialog
+	
+	MoleculeData * GetMoleculeData(void) const {return Parent->GetData();};
+	WinPrefs * GetPrefs(void) const {return Parent->GetPrefs();};
+		//Call when the active surface has change to cause the
+		//surface title to update and the main display to redraw.
+	void SurfaceUpdated(void);
 
  private:
 
