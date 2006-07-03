@@ -1223,8 +1223,8 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event )
     }
 
   Progress * lProgress = new Progress();
-  if (!lProgress) 
-    cout<<"Cannot allocate the pregress bar!"<<endl;
+//  if (!lProgress) 
+  //  cout<<"Cannot allocate the pregress bar!"<<endl;
 
   if (AllFrames) 
     {	//compute the contour for each frame, no grid is kept

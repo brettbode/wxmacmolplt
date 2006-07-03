@@ -117,11 +117,11 @@ class BaseSurfacePane : public wxPanel
   void SetUpdateTest(bool test);
   void setUpdateButton();
 
- protected:
   void OnGridPointSld( wxCommandEvent &event );
   void OnSetParam( wxCommandEvent &event );
   void OnExport( wxCommandEvent &event );
 
+protected:
   wxBoxSizer* mainSizer;
   wxBoxSizer* upperSizer;
   wxBoxSizer* middleSizer;
@@ -205,12 +205,11 @@ class Surface3DPane : public BaseSurfacePane
 {
   DECLARE_CLASS(Surface3DPane)
 
- public:
+public:
   Surface3DPane() {}
   Surface3DPane( wxWindow* parent, Surf3DBase* target, MoleculeData* data, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
   ~Surface3DPane();
 
-protected:
   void On3DRadioBox (wxCommandEvent& event );
   void OnSmoothCheck (wxCommandEvent& event );
   void OnTextEnter(wxCommandEvent& event );
@@ -218,6 +217,7 @@ protected:
 
   void setContourValueSld();
 
+protected:
   wxStaticText* label2;
   wxStaticText* label3;
   wxStaticText* label4;
