@@ -80,6 +80,7 @@ public:
     bool Create( MolDisplayWin* parent, wxWindowID id = SYMBOL_SURFACESWINDOW_IDNAME, const wxString& caption = SYMBOL_SURFACESWINDOW_TITLE, const wxPoint& pos = SYMBOL_SURFACESWINDOW_POSITION, const wxSize& size = SYMBOL_SURFACESWINDOW_SIZE, long style = SYMBOL_SURFACESWINDOW_STYLE );
 
     /// Creates the controls and sizers
+    void addNewPane(int type);
     void CreateControls();
 
 ////@begin SurfacesWindow event handler declarations

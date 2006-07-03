@@ -39,7 +39,9 @@ class MoleculeData;
 class WinPrefs;
 
 class Surface;
+class Surf2DBase;
 class Surf3DBase;
+class Orb2DSurface;
 class Orb3DSurface;
 class OrbSurfBase;
 class SurfacesWindow;
@@ -56,6 +58,12 @@ class SurfacesWindow;
 #define SYMBOL_ORBITAL3D_IDNAME ID_MYDIALOG4
 #define SYMBOL_ORBITAL3D_SIZE wxSize(400, 300)
 #define SYMBOL_ORBITAL3D_POSITION wxDefaultPosition
+
+#define SYMBOL_ORBITAL2D_STYLE wxSUNKEN_BORDER
+#define SYMBOL_ORBITAL2D_TITLE _("3D Orbital")
+#define SYMBOL_ORBITAL2D_IDNAME ID_MYDIALOG4
+#define SYMBOL_ORBITAL2D_SIZE wxSize(400, 300)
+#define SYMBOL_ORBITAL2D_POSITION wxDefaultPosition
 
 #define SYMBOL_PARAM_SIZE wxSize(400, 300)
 #define SYMBOL_PARAM_POSITION wxDefaultPosition
@@ -78,12 +86,18 @@ class SurfacesWindow;
 #define ID_TRANSPARENCY_COLOR 10085
 #define ID_REVERSE_PHASE_CHECKBOX 10086
 #define ID_ORB_FORMAT_CHOICE 10087
-#define ID_ORB_COLOR_POSITIVE 10088
-#define ID_ORB_COLOR_NEGATIVE 10089
-#define ID_SPH_HARMONICS_CHECKBOX 10090
-#define ID_3D_ORB_TEXTCTRL 10091
-#define ID_COPY_ALL 10092
-#define ID_PASTE_ALL 10093
+#define ID_2D_COLOR_POSITIVE 10088
+#define ID_2D_COLOR_NEGATIVE 10089
+#define ID_3D_COLOR_POSITIVE 10090
+#define ID_3D_COLOR_NEGATIVE 10091
+#define ID_SPH_HARMONICS_CHECKBOX 10092
+#define ID_3D_ORB_TEXTCTRL 10093
+#define ID_COPY_ALL 10094
+#define ID_PASTE_ALL 10095
+#define ID_SHOW_ZERO_CHECKBOX 10096
+#define ID_DASH_CHECKBOX 10097
+#define ID_SET_PLANE_BUT 10098
+#define ID_USE_PLANE_CHECKBOX 10099
 ////@end control identifiers
 
 /*!
@@ -142,7 +156,6 @@ protected:
   wxButton* mSetParamBut;
   wxButton* mExportBut;
   wxButton* mUpdateBut;
-  wxCheckBox* mSphHarmonicsChk;
 
   bool Visible;
   bool AllFrames;
@@ -189,18 +202,38 @@ class OrbSurfacePane
 /*!
  * 2D class declaration
  */
-/*
+
 class Surface2DPane : public BaseSurfacePane
 {
+  DECLARE_CLASS(Surface2DPane)
 
  public:
   Surface2DPane() {}
+  Surface2DPane( wxWindow* parent, Surf2DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style );
   ~Surface2DPane();
 
+ protected:
+
+  wxStaticText* mNumContourLabel;
+  wxStaticText* mContourValLabel;
+  wxTextCtrl* mNumContourText;
+  wxTextCtrl* mContourValText;
+  wxCheckBox* mShowZeroCheck;
+  wxCheckBox* mDashCheck;
+  wxButton* mSetPlaneBut;
+  colorArea* mOrbColor1;
+  colorArea* mOrbColor2;
+  RGBColor PosColor;
+  RGBColor NegColor;
+
  private:
+  void CreateControls();
+
+  Surf2DBase* mTarget;
+
   //DECLARE_EVENT_TABLE()
 };
-*/
+
 
 class Surface3DPane : public BaseSurfacePane
 {
@@ -208,7 +241,8 @@ class Surface3DPane : public BaseSurfacePane
 
 public:
   Surface3DPane() {}
-  Surface3DPane( wxWindow* parent, Surf3DBase* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+
+  Surface3DPane( wxWindow* parent, Surf3DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style );
   ~Surface3DPane();
 
   void On3DRadioBox (wxCommandEvent& event );
@@ -224,6 +258,8 @@ protected:
   wxStaticText* label4;
   wxSlider* mGridSizeSld;
   wxSlider* mContourValSld;
+  colorArea* mOrbColor1;
+  colorArea* mOrbColor2;
   colorArea* mTransColor;
   wxRadioBox* m3DRdoBox;
   wxCheckBox* mSmoothChkBox;
@@ -231,6 +267,8 @@ protected:
   wxTextCtrl* m3DOrbMaxText;
 
   float GridSize;
+  RGBColor PosColor;
+  RGBColor NegColor;
   RGBColor TranspColor;
   bool UseNormals;
   bool UseSolidSurface;
@@ -243,6 +281,44 @@ protected:
 
   //DECLARE_EVENT_TABLE()
 }; 
+
+class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
+{    
+  DECLARE_CLASS( Orbital2DSurfPane )
+
+ public:
+    /// Constructors
+    Orbital2DSurfPane() { }
+    Orbital2DSurfPane( wxWindow* parent, Orb2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL2D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL2D_POSITION, const wxSize& size = SYMBOL_ORBITAL2D_SIZE, long style = SYMBOL_ORBITAL2D_STYLE );
+    ~Orbital2DSurfPane();
+
+    virtual void TargetToPane();
+    virtual void refreshControls();
+
+ private:
+    void CreateControls();
+
+    wxBoxSizer* mSubLeftBot1Sizer;
+    wxBoxSizer* mSubLeftBot2Sizer;
+    wxBoxSizer* mSubRightBot1Sizer;
+    wxBoxSizer* mSubRightBot2Sizer;
+    wxGridSizer* mSubRightBot3Sizer;
+
+    wxListBox* mAtomList;
+    wxTextCtrl* mOrbCoef;
+    wxChoice* mOrbFormatChoice;
+    wxCheckBox* mSphHarmonicsChk;
+    wxCheckBox* mUsePlaneChk;
+    wxCheckBox* mRevPhaseChk;
+
+    long NumContours;
+    float MaxContourValue;
+    bool ShowZeroContour;
+    bool UseScreenPlane;
+    bool DashLines;
+
+    Orb2DSurface* mTarget;
+};
 
 class Orbital3DSurfPane : public Surface3DPane, public OrbSurfacePane
 {    
@@ -259,16 +335,6 @@ public:
 
     /// Creates the controls and sizers
     void CreateControls();
-
-////@begin Orbital3D event handler declarations
-
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CHOICE1
-    //void OnChoice1Selected( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX5
-    //void OnCheckbox5Click( wxCommandEvent& event );
-
-////@end Orbital3D event handler declarations
 
 ////@begin Orbital3D member function declarations
 
@@ -303,19 +369,14 @@ public:
     wxBoxSizer* mSubRightBot4Sizer;
     wxGridSizer* mSubRightBot5Sizer;
 
-    wxCheckBox* mRevPhaseChk;
-    wxChoice* mSltOrbChoice;
-    colorArea* mOrbColor1;
-    colorArea* mOrbColor2;
     wxListBox* mAtomList;
     wxTextCtrl* mOrbCoef;
     wxChoice* mOrbFormatChoice;
+    wxCheckBox* mSphHarmonicsChk;
+    wxCheckBox* mRevPhaseChk;  
     wxStaticText* mContourMaxTick;
 
     Orb3DSurface* mTarget;
-
-    RGBColor PosColor;
-    RGBColor NegColor;
 
     DECLARE_EVENT_TABLE()
 };

@@ -81,7 +81,8 @@ void colorArea::OnMouse(wxMouseEvent &event)
 
 	  Update();
 
-	  if (mID == ID_ORB_COLOR_POSITIVE || mID == ID_ORB_COLOR_NEGATIVE
+	  if (mID == ID_2D_COLOR_POSITIVE || mID == ID_2D_COLOR_NEGATIVE
+	      || mID == ID_3D_COLOR_POSITIVE || mID == ID_3D_COLOR_NEGATIVE
 	      || mID == ID_TRANSPARENCY_COLOR)
 	    (dynamic_cast<BaseSurfacePane*>(mParent))->setUpdateButton();
 	}

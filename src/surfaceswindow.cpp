@@ -65,7 +65,7 @@ BEGIN_EVENT_TABLE( SurfacesWindow, wxFrame )
   EVT_BUTTON( wxID_ADD, SurfacesWindow::OnAddClick )
   EVT_CLOSE( SurfacesWindow::OnClose )
 ////@end SurfacesWindow event table entries
-	EVT_LISTBOOK_PAGE_CHANGED(ID_SURFLISTBOOK, SurfacesWindow::OnPageChanged )
+  EVT_LISTBOOK_PAGE_CHANGED(ID_SURFLISTBOOK, SurfacesWindow::OnPageChanged )
 
 END_EVENT_TABLE()
 
@@ -171,11 +171,22 @@ void SurfacesWindow::CreateControls()
     wxListView * t = listBook->GetListView();
     t->SetWindowStyle(wxLC_LIST);
 
-    BaseSurfacePane* tempPane = NULL;
-    Surface* newSurface = NULL;
+    addNewPane(type);
 
-    switch (type)
+}
+
+void SurfacesWindow::addNewPane(int type)
+{
+  BaseSurfacePane* tempPane = NULL;
+  Surface* newSurface = NULL;
+
+  switch (type)
     {
+    case ID_2D_ORBITAL_PANE:
+      newSurface = new Orb2DSurface(mPrefs);
+      tempPane = new Orbital2DSurfPane(listBook, dynamic_cast<Orb2DSurface*>(newSurface), this);
+      break;
+
     case ID_3D_ORBITAL_PANE:
       newSurface = new Orb3DSurface(mPrefs);
       tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(newSurface), this);
@@ -204,36 +215,7 @@ void SurfacesWindow::CreateControls()
 void SurfacesWindow::OnAddClick( wxCommandEvent& event )
 {
   int surfTypeId = selectSurfaceType();
-  BaseSurfacePane* tempPane = NULL;
-  Surface* newSurface = NULL;
-
-  switch (surfTypeId)
-    {
-    case ID_3D_ORBITAL_PANE:
-      newSurface = new Orb3DSurface(mPrefs);
-      tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(newSurface), this );
-      break;
-    }
-
-  if ( tempPane && newSurface)
-    {
-      Frame * lFrame = mData->GetCurrentFramePtr();
-      lFrame->AppendSurface(newSurface);
-
-      tempPane->SetVisibility(true);
-      visibleCheck->Enable();
-      allFrameCheck->Enable();
-      visibleCheck->SetValue(true);
-      allFrameCheck->SetValue((newSurface->GetSurfaceID() != 0));
-    }
-  else
-    {
-      visibleCheck->Disable();
-      allFrameCheck->Disable();
-    }
-
-  if ( surfTypeId != -1)
-    listBook->AddPage(tempPane, mCurrSurfStr, false);
+  addNewPane(surfTypeId);
 }
 
 /*!
