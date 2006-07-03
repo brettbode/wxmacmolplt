@@ -32,6 +32,7 @@
 ////@begin forward declarations
 class wxListbook;
 ////@end forward declarations
+class wxListbookEvent;
 
 /*!
  * Control identifiers
@@ -109,6 +110,9 @@ public:
 		//Call when the active surface has change to cause the
 		//surface title to update and the main display to redraw.
 	void SurfaceUpdated(void);
+	
+		//Called when the list book page gets changed 
+	void OnPageChanged(wxListbookEvent & event);
 
  private:
 

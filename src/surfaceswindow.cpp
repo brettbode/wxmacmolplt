@@ -65,6 +65,7 @@ BEGIN_EVENT_TABLE( SurfacesWindow, wxFrame )
   EVT_BUTTON( wxID_ADD, SurfacesWindow::OnAddClick )
   EVT_CLOSE( SurfacesWindow::OnClose )
 ////@end SurfacesWindow event table entries
+	EVT_LISTBOOK_PAGE_CHANGED(ID_SURFLISTBOOK, SurfacesWindow::OnPageChanged )
 
 END_EVENT_TABLE()
 
@@ -220,6 +221,8 @@ void SurfacesWindow::OnAddClick( wxCommandEvent& event )
       lFrame->AppendSurface(newSurface);
 
       tempPane->SetVisibility(true);
+      visibleCheck->Enable();
+      allFrameCheck->Enable();
       visibleCheck->SetValue(true);
       allFrameCheck->SetValue((newSurface->GetSurfaceID() != 0));
     }
@@ -245,6 +248,10 @@ void SurfacesWindow::OnDeleteClick( wxCommandEvent& event )
   lFrame->DeleteSurface(targetSurf);
   listBook->DeletePage(targetSurf);
   Parent->UpdateModelDisplay();
+  if (listBook->GetPageCount()<= 0) {
+      visibleCheck->Disable();
+      allFrameCheck->Disable();
+  }
 }
 
 /*!
@@ -363,7 +370,18 @@ void SurfacesWindow::SurfaceUpdated(void) {
 		temp.Printf("%s", tempSurf->GetLabel());
 		surfTitleEdit->SetValue(temp);
 		listBook->SetPageText(listBook->GetSelection(), temp);
+		//The previous line does not immediately update the list text???
 	} 
 	Parent->UpdateModelDisplay();
+}
+
+void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
+	wxString temp(_("No surface chosen."));
+	BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
+	if (tempPane) {
+		Surface * tempSurf = tempPane->GetTargetSurface();
+		temp.Printf("%s", tempSurf->GetLabel());
+	}
+	surfTitleEdit->SetValue(temp);
 }
 
