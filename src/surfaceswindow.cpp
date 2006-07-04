@@ -167,10 +167,10 @@ void SurfacesWindow::CreateControls()
 
     SetSizer(mainSizer);
 
-    int type = selectSurfaceType();
     wxListView * t = listBook->GetListView();
     t->SetWindowStyle(wxLC_LIST);
 
+    int type = selectSurfaceType();
     addNewPane(type);
 
 }
@@ -191,6 +191,11 @@ void SurfacesWindow::addNewPane(int type)
       newSurface = new Orb3DSurface(mPrefs);
       tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(newSurface), this);
       break;
+
+	case ID_3D_FILE_PANE:
+		newSurface = new General3DSurface(mPrefs);
+		tempPane = new General3DSurfPane(listBook, dynamic_cast<General3DSurface*>(newSurface), this);
+		break;
     }
 
     if ( tempPane && newSurface)

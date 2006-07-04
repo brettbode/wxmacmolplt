@@ -43,6 +43,7 @@ class Surf2DBase;
 class Surf3DBase;
 class Orb2DSurface;
 class Orb3DSurface;
+class General3DSurface;
 class OrbSurfBase;
 class SurfacesWindow;
 ////@end forward declarations
@@ -378,6 +379,56 @@ public:
 
     Orb3DSurface* mTarget;
 
+    DECLARE_EVENT_TABLE()
+};
+
+class General3DSurfPane : public Surface3DPane
+{    
+	DECLARE_CLASS( General3DSurfPane )
+	
+public:
+    /// Constructors
+    General3DSurfPane() { }
+    General3DSurfPane( wxWindow* parent, General3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    ~General3DSurfPane();
+	
+    virtual void TargetToPane();
+    virtual void refreshControls();
+	
+    /// Creates the controls and sizers
+    void CreateControls();
+	
+	////@begin Orbital3D member function declarations
+	
+    /// Retrieves bitmap resources
+    wxBitmap GetBitmapResource( const wxString& name );
+	
+    /// Retrieves icon resources
+    wxIcon GetIconResource( const wxString& name );
+	////@end Orbital3D member function declarations
+	
+    /// Should we show tooltips?
+    static bool ShowToolTips();
+	
+private:
+	virtual bool UpdateNeeded(void);
+	
+//    void OnReversePhase(wxCommandEvent &event );
+  //  void OnContourValueSld(wxCommandEvent &event );
+  //  void OnGridSizeSld(wxCommandEvent &event );
+  //  void OnUpdate(wxCommandEvent &event );
+	
+/*    wxBoxSizer* mSubLeftBot1Sizer;
+    wxBoxSizer* mSubLeftBot2Sizer;
+    wxBoxSizer* mSubRightBot0Sizer;
+    wxBoxSizer* mSubRightBot1Sizer;
+    wxBoxSizer* mSubRightBot2Sizer;
+    wxBoxSizer* mSubRightBot3Sizer;
+    wxBoxSizer* mSubRightBot4Sizer;
+    wxGridSizer* mSubRightBot5Sizer;
+*/
+    General3DSurface* mTarget;
+	
     DECLARE_EVENT_TABLE()
 };
 

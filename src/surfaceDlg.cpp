@@ -1581,6 +1581,160 @@ Surface3DParamDlg::Surface3DParamDlg(BaseSurfacePane * parent, Surface * targetS
   Create(id, caption, pos, size, style);
  
 }
+/*!
+* General3DSurfPane class
+ */
+
+General3DSurfPane::General3DSurfPane( wxWindow* parent, General3DSurface* target, 
+									  SurfacesWindow* o, wxWindowID id,
+									  const wxPoint& pos, const wxSize& size, 
+									  long style ) 
+			: Surface3DPane(parent, target, o, id, pos, size, style)
+{
+	mTarget = target;
+	
+	TargetToPane();
+	CreateControls();
+}
+
+General3DSurfPane::~Orbital3DSurfPane()
+{
+	
+}
+
+void General3DSurfPane::TargetToPane(void) 
+{
+//	NumGridPoints = mTarget->GetNumGridPoints();
+	mTarget->GetPosColor(&PosColor);
+	mTarget->GetNegColor(&NegColor);
+	mTarget->GetTranspColor(&TranspColor);
+//	GridSize = mTarget->GetGridSize();
+	ContourValue = mTarget->GetContourValue();
+	UseSolidSurface = mTarget->SolidSurface();
+	UseNormals = mTarget->UseSurfaceNormals();
+	UpdateTest = false;
+//	SwitchFixGrid = false;
+}
+
+void General3DSurfPane::refreshControls()
+{
+	float GridMax = mTarget->GetGridMax();
+	
+//	mNumGridPntSld->SetValue(NumGridPoints);
+//	mGridSizeSld->SetValue((short)(100*GridSize));
+	mContourValSld->SetValue((short)(100*(ContourValue/((fabs(GridMax)>=0.001)?GridMax:0.25))));
+	m3DRdoBox->SetSelection(1-UseSolidSurface);
+	mSmoothChkBox->SetValue(UseNormals);
+	
+	if (UseSolidSurface)
+		mSmoothChkBox->Enable();
+	else
+		mSmoothChkBox->Disable();
+	
+	mOrbColor1->draw(&PosColor);
+	mOrbColor2->draw(&NegColor);
+	mTransColor->draw(&TranspColor);
+}
+
+/*!
+* Control creation General3D
+ */
+
+void General3DSurfPane::CreateControls()
+{    
+	float GridMax = mTarget->GetGridMax();
+	
+	upperSizer->Add(label0, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+
+	upperLeftMiddleSizer->Layout();
+	
+	lowerLeftMiddleSizer->Add(label1, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	
+	leftMiddleSizer->Add(upperLeftMiddleSizer, 0, wxALL, 3);
+	leftMiddleSizer->Add(lowerLeftMiddleSizer, 0, wxALL, 3);
+	
+	rightMiddleSizer->Add(label3, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
+	rightMiddleSizer->Add(mContourValSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
+
+	wxString tmpStr;
+	tmpStr.Printf("%.4f", ContourValue);
+	m3DOrbMaxText->SetValue(tmpStr);
+	middleSizer->Add(leftMiddleSizer, 0, wxALL, 10);
+	middleSizer->Add(rightMiddleSizer, 0, wxALL, 10);
+	bottomSizer->Add(leftBottomSizer, 0, wxALL, 3);
+	bottomSizer->Add(rightBottomSizer, 0, wxALL, 3);
+	mainSizer->Add(upperSizer);
+	mainSizer->Add(middleSizer);
+	mainSizer->Add(bottomSizer);
+}
+
+bool General3DSurfPane::UpdateNeeded(void) 
+{
+	bool result = false;
+	
+//	if (PlotOrb >= 0) 
+    {	//Don't update unless a valid orbital is chosen
+		if (Visible != mTarget->GetVisibility()) result = true;
+		if (AllFrames != (mTarget->GetSurfaceID() != 0)) result = true;
+		if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
+		if (ContourValue != mTarget->GetContourValue()) result = true;
+		if (GridSize != mTarget->GetGridSize()) result = true;
+		if (UseSolidSurface != mTarget->SolidSurface()) result = true;
+		if (UseNormals != mTarget->UseSurfaceNormals()) result = true;
+//		if (PhaseChange != mTarget->GetPhaseChange()) result = true;
+		
+		if (!result) 
+		{
+			RGBColor	testColor;
+			mTarget->GetPosColor(&testColor);
+			if ((PosColor.red != testColor.red)||(PosColor.green!=testColor.green)
+				||(PosColor.blue!=testColor.blue)) 
+				result=true;
+			
+			mTarget->GetNegColor(&testColor);
+			if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)
+				||(NegColor.blue!=testColor.blue)) 
+				result=true;
+			
+			mTarget->GetTranspColor(&testColor);
+			if ((TranspColor.red != testColor.red)
+				||(TranspColor.green!=testColor.green)
+				||(TranspColor.blue!=testColor.blue)) 
+				result=true;
+		}
+    }
+	return result;
+}
+bool General3DSurfPane::ShowToolTips()
+{
+    return true;
+}
+
+/*!
+* Get bitmap resources
+ */
+
+wxBitmap General3DSurfPane::GetBitmapResource( const wxString& name )
+{
+    // Bitmap retrieval
+	////@begin Orbital3D bitmap retrieval
+    wxUnusedVar(name);
+    return wxNullBitmap;
+	////@end Orbital3D bitmap retrieval
+}
+
+/*!
+* Get icon resources
+ */
+
+wxIcon General3DSurfPane::GetIconResource( const wxString& name )
+{
+    // Icon retrieval
+	////@begin Orbital3D icon retrieval
+    wxUnusedVar(name);
+    return wxNullIcon;
+	////@end Orbital3D icon retrieval
+}
 
 bool Surface3DParamDlg::Create(wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style)
 {
