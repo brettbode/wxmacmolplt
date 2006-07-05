@@ -7,10 +7,10 @@
 #endif
 
 // For compilers that support precompilation, includes "wx/wx.h".
+#include "Globals.h"
 #include "wx/wxprec.h"
 #include "wx/colordlg.h"
 
-#include "Globals.h"
 #include "colorArea.h"
 #include "surfaceDlg.h"
 
