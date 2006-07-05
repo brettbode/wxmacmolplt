@@ -10,8 +10,9 @@ wxMacMolPlt_SOURCES = main.cpp MolDisplayWin.cpp  mpGLCanvas.cpp \
     setbondlength.cpp setscreenplane.cpp SurfaceBase.cpp SurfWin.cpp \
     VirtualSphere.cpp wxFiles.cpp XML.cpp exportoptionsdialog.cpp \
 	wxMolGraph.cpp energyplotdialog.cpp setPreference.cpp myPrefs.cpp \
-	frequenciesdialog.cpp surfaceswindow.cpp surfaceDlg.cpp colorArea.cpp inputbuilder.cpp \
-	wxUglyChoice.cpp windowparameters.cpp zmatrixcalculator.cpp
+	frequenciesdialog.cpp surfaceswindow.cpp surfaceDlg.cpp colorArea.cpp \
+	inputbuilder.cpp wxUglyChoice.cpp windowparameters.cpp \
+	zmatrixcalculator.cpp
 
 AM_CXXFLAGS = $(WX_CXXFLAGS)
 wxMacMolPlt_LDADD = $(WX_LIBS)

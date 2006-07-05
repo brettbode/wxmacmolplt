@@ -1105,7 +1105,7 @@ void InputBuilderWindow::SetupItems() {
     }
     
     // Enable/Disable exeChoice
-    if(!TmpInputRec->Control->GetFriend()) {
+    if(TmpInputRec->Control->GetFriend()) {
         exeChoice->Enable(false);
     }
     else {
