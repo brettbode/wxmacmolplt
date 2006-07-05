@@ -48,6 +48,19 @@ IMPLEMENT_CLASS( General3DSurfPane, wxPanel )
 
 IMPLEMENT_CLASS( Surface3DParamDlg, wxFrame )
 
+BEGIN_EVENT_TABLE( Orbital2DSurfPane, wxPanel )
+  EVT_CHOICE  (ID_ORB_FORMAT_CHOICE,  Orbital2DSurfPane::OnOrbFormatChoice)
+  EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
+  EVT_CHOICE  (ID_ORB_CHOICE, Orbital2DSurfPane::OnOrbSetChoice)
+  EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
+  EVT_LISTBOX (ID_ATOM_LIST, Orbital2DSurfPane::OnAtomList)
+  EVT_CHECKBOX (ID_USE_PLANE_CHECKBOX, Orbital2DSurfPane::OnUsePlaneChk)
+  EVT_CHECKBOX (ID_SHOW_ZERO_CHECKBOX, Surface2DPane::OnShowZeroChk)
+  EVT_CHECKBOX (ID_DASH_CHECKBOX, Surface2DPane::OnDashChk)
+  EVT_CHECKBOX (ID_REVERSE_PHASE_CHECKBOX, Orbital2DSurfPane::OnReversePhase)
+  EVT_BUTTON (ID_SURFACE_UPDATE_BUT, Orbital2DSurfPane::OnUpdate)
+END_EVENT_TABLE()
+
 BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
   EVT_CHOICE  (ID_ORB_FORMAT_CHOICE,  Orbital3DSurfPane::OnOrbFormatChoice)
   EVT_CHOICE  (ID_ORB_CHOICE, Orbital3DSurfPane::OnOrbSetChoice)
@@ -205,7 +218,9 @@ void BaseSurfacePane::setUpdateButton()
     mUpdateBut->Disable();
 }
 
-bool BaseSurfacePane::UpdateNeeded(void) {return false;}	//By default update is unavailable
+//bool BaseSurfacePane::UpdateNeeded(void) {return false;}	//By default update is unavailable
+// maybe UpdateNeeded can be pure virtual
+
 
 OrbSurfacePane::OrbSurfacePane( OrbSurfBase* target, SurfacesWindow* o)
 {
@@ -599,6 +614,68 @@ void OrbSurfacePane::makeAOList(wxString& choice)
     }
 }
 
+void OrbSurfacePane::setFlagOnOrbFormatChange(int itemtype)
+{
+  if (OrbColumnEnergyOrOccupation) OrbColumnEnergyOrOccupation = false;
+  if (itemtype) OrbColumnEnergyOrOccupation = true;
+}
+
+int OrbSurfacePane::orbSetChangeEvt(int item, SurfacesWindow * owner)
+{
+  int itemtype=0;
+
+  if (item <= 1) 
+    {
+      if (!(OrbOptions&1)) 
+	{
+	  OrbOptions = 1; itemtype=1;
+	}
+    } 
+  else 
+    {
+      short numitems=1;
+      OrbOptions = 0;	//turn off AOs and alpha/beta flags
+      MoleculeData * mData = owner->GetMoleculeData();
+      Frame * lFrame = mData->GetCurrentFramePtr();
+
+      const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
+
+      if (Orbs->size() > 0) 
+	{
+	  vector<OrbitalRec *>::const_iterator OrbSet = Orbs->begin();
+	  long	OrbSetCount = 0;
+
+	  while (OrbSet != Orbs->end()) 
+	    {
+	      numitems++;
+	      if (numitems == item) 
+		{
+		  TargetSet = OrbSetCount;
+		  itemtype = 1;
+		  break;
+		}
+
+	      if (((*OrbSet)->getOrbitalWavefunctionType() == UHF)&&
+		  (!((*OrbSet)->getOrbitalType() == NaturalOrbital))) 
+		{
+		  numitems++;	//Extra increment for the beta set
+		  if (numitems == item) 
+		    {
+		      TargetSet = OrbSetCount;
+		      OrbOptions = 16;	//beta set selected
+		      itemtype = 1;
+		      break;
+		    }
+		}
+	      OrbSetCount++;
+	      OrbSet++;
+	    }
+	}
+    }		
+			
+  return itemtype;
+}
+
 /*
  * General 2D surface dialog class
  */
@@ -625,16 +702,17 @@ void Surface2DPane::CreateControls()
                             _T("Max # of contours:"),
                             wxDefaultPosition,
                             wxDefaultSize);
-
   mContourValLabel = new wxStaticText( this, wxID_ANY,
                             _T("Max contour value:"),
                             wxDefaultPosition,
                             wxDefaultSize);
 
   mNumContourText = new wxTextCtrl( this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
+
   mContourValText = new wxTextCtrl( this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
 
   mShowZeroCheck = new wxCheckBox( this, ID_SHOW_ZERO_CHECKBOX, _T("Show zero contour"), wxPoint(340,130), wxDefaultSize );
+
   mDashCheck = new wxCheckBox( this, ID_DASH_CHECKBOX, _T("Dash - contour"), wxPoint(340,130), wxDefaultSize );
 
   mSetPlaneBut = new wxButton( this, ID_SET_PLANE_BUT, wxT("Set Plane"));
@@ -652,6 +730,20 @@ void Surface2DPane::OnPosColorChange(wxCommandEvent & event) {
 void Surface2DPane::OnNegColorChange(wxCommandEvent & event) {
 	mOrbColor2->getColor(&NegColor);
 	setUpdateButton();
+}
+
+
+
+void Surface2DPane::OnDashChk(wxCommandEvent& event )
+{
+  DashLines = mDashCheck->GetValue();
+  setUpdateButton();
+}
+
+void Surface2DPane::OnShowZeroChk( wxCommandEvent &event )
+{
+  ShowZeroContour = mShowZeroCheck->GetValue();
+  setUpdateButton();
 }
 
 /*
@@ -866,9 +958,18 @@ void Orbital2DSurfPane::CreateControls()
   leftMiddleSizer->Add(upperLeftMiddleSizer, 0, wxALL, 3);
   leftMiddleSizer->Add(lowerLeftMiddleSizer, 0, wxALL, 3);
 
+  wxString tmpStr;
+
   rightMiddleSizer->Add(mNumContourLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
+
+  tmpStr.Printf("%ld", NumContours);
+  mNumContourText->SetValue(tmpStr);
   rightMiddleSizer->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
+
   rightMiddleSizer->Add(mContourValLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
+
+  tmpStr.Printf("%.2f", MaxContourValue);
+  mContourValText->SetValue(tmpStr);
   rightMiddleSizer->Add(mContourValText, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
 
   mSubLeftBot1Sizer = new wxBoxSizer(wxVERTICAL);
@@ -894,7 +995,12 @@ void Orbital2DSurfPane::CreateControls()
 
   mSubRightBot1Sizer = new wxBoxSizer(wxVERTICAL);
   mUsePlaneChk = new wxCheckBox(this, ID_USE_PLANE_CHECKBOX, _T("Use plane of screen"), wxDefaultPosition);
+  mUsePlaneChk->SetValue(UseScreenPlane);
   mRevPhaseChk = new wxCheckBox(this, ID_REVERSE_PHASE_CHECKBOX, _T("Reverse Phase"), wxDefaultPosition);
+  mRevPhaseChk->SetValue(PhaseChange);
+  mDashCheck->SetValue(DashLines);
+  mShowZeroCheck->SetValue(ShowZeroContour);
+
   mSubRightBot1Sizer->Add(mUsePlaneChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   mSubRightBot1Sizer->Add(mShowZeroCheck, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   mSubRightBot1Sizer->Add(mDashCheck, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -941,9 +1047,209 @@ void Orbital2DSurfPane::TargetToPane(void)
   UpdateTest = false;
 }
 
+bool Orbital2DSurfPane::UpdateNeeded(void) 
+{
+  bool result = false;
+
+  if (PlotOrb >= 0) 
+    {	//Don't update unless a valid orbital is chosen
+      if (PlotOrb != mTarget->GetTargetOrb()) result=true;
+      if (Visible != mTarget->GetVisibility()) result = true;
+      if (AllFrames != (mTarget->GetSurfaceID() != 0)) result = true;
+      if (TargetSet != mTarget->GetTargetSet()) result = true;
+      if (OrbOptions != mTarget->GetOptions()) result = true;
+      if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
+      if (NumContours != mTarget->GetNumContours()) result = true;
+      if (MaxContourValue != mTarget->GetMaxValue()) result = true;
+      if (ShowZeroContour != mTarget->GetShowZeroContour()) result = true;
+      if (UseScreenPlane != mTarget->GetRotate2DMap()) result = true;
+      if (DashLines != mTarget->GetDashLine()) result = true;
+      if (PhaseChange != mTarget->GetPhaseChange()) result = true;
+      if (SphericalHarmonics != mTarget->UseSphericalHarmonics()) result = true;
+
+      if (!result) 
+	{
+	  RGBColor	testColor;
+	  mTarget->GetPosColor(&testColor);
+	  if ((PosColor.red != testColor.red)||(PosColor.green!=testColor.green)
+	      ||(PosColor.blue!=testColor.blue)) result=true;
+	  mTarget->GetNegColor(&testColor);
+	  if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)||
+	      (NegColor.blue!=testColor.blue)) result=true;
+	}
+    }
+  return result;
+}
+
+void Orbital2DSurfPane::OnUpdate(wxCommandEvent &event ) 
+{
+  bool updateGrid = UpdateTest;
+  MoleculeData * data = owner->GetMoleculeData();
+
+  if (NumGridPoints != mTarget->GetNumGridPoints()) 
+    {
+      updateGrid = true;
+      mTarget->SetNumGridPoints(NumGridPoints);
+    }
+
+  mTarget->SetVisibility(Visible);
+  mTarget->SetNumContours(NumContours);
+  mTarget->SetMaxValue(MaxContourValue);
+  mTarget->SetPosColor(&PosColor);
+  mTarget->SetNegColor(&NegColor);
+  mTarget->SetShowZeroContour(ShowZeroContour);
+  if (UseScreenPlane && !mTarget->GetRotate2DMap()) updateGrid = true;
+  mTarget->SetRotate2DMap(UseScreenPlane);
+  mTarget->SetDashLine(DashLines);
+  if (PhaseChange != mTarget->GetPhaseChange()) {
+    updateGrid = true;
+    mTarget->SetPhaseChange(PhaseChange);
+  }
+  if (OrbSurfacePane::UpdateEvent()) updateGrid = true;
+  if (AllFrames != (mTarget->GetSurfaceID() != 0)) 
+    {	//update all frames
+      long	SurfaceID;
+      Frame *	lFrame = data->GetFirstFrame();
+      if (AllFrames) 
+	{	//adding the surface to all frames
+	  SurfaceID = mTarget->SetSurfaceID();
+	  while (lFrame) 
+	    {
+	      if (lFrame != data->GetCurrentFramePtr()) 
+		{
+		  Orb2DSurface * NewSurface = new Orb2DSurface(mTarget);
+		  lFrame->AppendSurface(NewSurface);
+		}
+	      lFrame = lFrame->GetNextFrame();
+	    }
+	} 
+      else 
+	{			//deleting the surface from other frames
+	  SurfaceID = mTarget->GetSurfaceID();
+	  mTarget->SetSurfaceID(0);	//Unmark this frames surface so it doesn't get deleted
+	  while (lFrame) 
+	    {
+	      lFrame->DeleteSurfaceWithID(SurfaceID);
+	      lFrame = lFrame->GetNextFrame();
+	    }
+	}
+    } 
+  else if (AllFrames) 
+    {
+      long SurfaceID = mTarget->GetSurfaceID();
+      Frame * lFrame = data->GetFirstFrame();
+      while (lFrame) 
+	{
+	  if (lFrame != data->GetCurrentFramePtr()) 
+	    {
+	      Surface * temp = lFrame->GetSurfaceWithID(SurfaceID);
+	      Orb2DSurface * lSurf = NULL;
+	      if (temp)
+		if (temp->GetSurfaceType() == kOrb2DType)
+		  lSurf = (Orb2DSurface *) temp;
+	      if (lSurf) {
+		lSurf->UpdateData(mTarget);
+		if (updateGrid) mTarget->FreeGrid();
+	      }
+	    }
+	  lFrame = lFrame->GetNextFrame();
+	}
+    }
+  if (updateGrid) mTarget->FreeGrid();
+  UpdateTest = false;
+  mExportBut->Enable();
+
+  mUpdateBut->Disable();
+
+  owner->SurfaceUpdated();
+}
+
 void Orbital2DSurfPane::refreshControls()
 {
 
+}
+
+void Orbital2DSurfPane::OnOrbSetChoice( wxCommandEvent &event )
+{
+  int item = mOrbSetChoice->GetSelection()+1;
+  int itemtype = orbSetChangeEvt(item, owner);
+
+  if (itemtype) 
+    {	//TargetSet has been choosen
+      PlotOrb = -1;
+
+      //BasisSet * lBasis = MainData->GetBasisSet();
+      //LAddRow(lBasis->GetNumBasisFuncs(SphericalHarmonics), 0, AOList);
+
+      if (!(OrbOptions&1)) 
+	{	//add some MO rows!
+	  //don't know what's this adding rows for  -Song
+
+	  upperLeftMiddleSizer->Show(mSphHarmonicsChk, false);	  
+	  SphericalHarmonics = false;
+	} 
+      else 
+	{	//Must be looking for AOs
+	  upperLeftMiddleSizer->Show(mSphHarmonicsChk, true);
+	  mSphHarmonicsChk->SetValue(SphericalHarmonics);
+	}
+
+      upperLeftMiddleSizer->Layout();
+    }
+
+  if (item <= 1)
+    {
+      mAtomList->Clear();
+      PlotOrb = -1;
+
+      wxString choice;
+      makeAOList(choice);
+      mOrbCoef->SetValue(choice);
+    }
+  else
+    {
+      vector<wxString> newChoice;
+      makeMOList(newChoice);
+
+      mAtomList->Set(newChoice.size(), &newChoice.front());
+    }
+
+}
+
+void Orbital2DSurfPane::OnAtomList( wxCommandEvent &event )
+{
+  PlotOrb = event.GetSelection();
+  
+  wxString choice;
+  makeAOList(choice);
+  mOrbCoef->SetValue(choice);
+
+  setUpdateButton();  
+}
+
+void Orbital2DSurfPane::OnOrbFormatChoice( wxCommandEvent &event )
+{
+  int itemtype = mOrbFormatChoice->GetSelection();
+  setFlagOnOrbFormatChange(itemtype);
+
+  vector<wxString> newChoice;
+  makeMOList(newChoice);
+
+  mAtomList->Set(newChoice.size(), &newChoice.front());
+
+}
+
+void Orbital2DSurfPane::OnUsePlaneChk( wxCommandEvent &event )
+{
+  UseScreenPlane = mUsePlaneChk->GetValue();
+  setUpdateButton();
+}
+
+void Orbital2DSurfPane::OnReversePhase(wxCommandEvent &event )
+{
+  PhaseChange = mRevPhaseChk->GetValue();
+
+  setUpdateButton();
 }
 
 /*!
@@ -1196,9 +1502,7 @@ bool Orbital3DSurfPane::UpdateNeeded(void)
 void Orbital3DSurfPane::OnOrbFormatChoice( wxCommandEvent &event )
 {
   int itemtype = mOrbFormatChoice->GetSelection();
-
-  if (OrbColumnEnergyOrOccupation) OrbColumnEnergyOrOccupation = false;
-  if (itemtype) OrbColumnEnergyOrOccupation = true;
+  setFlagOnOrbFormatChange(itemtype);
 
   vector<wxString> newChoice;
   makeMOList(newChoice);
@@ -1210,57 +1514,8 @@ void Orbital3DSurfPane::OnOrbFormatChoice( wxCommandEvent &event )
 void Orbital3DSurfPane::OnOrbSetChoice( wxCommandEvent &event )
 {
   int item = mOrbSetChoice->GetSelection()+1;
-  int itemtype=0;
+  int itemtype = orbSetChangeEvt(item, owner);
 
-  if (item <= 1) 
-    {
-      if (!(OrbOptions&1)) 
-	{
-	  OrbOptions = 1; itemtype=1;
-	}
-    } 
-  else 
-    {
-      short numitems=1;
-      OrbOptions = 0;	//turn off AOs and alpha/beta flags
-      MoleculeData * mData = owner->GetMoleculeData();
-      Frame * lFrame = mData->GetCurrentFramePtr();
-
-      const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
-
-      if (Orbs->size() > 0) 
-	{
-	  vector<OrbitalRec *>::const_iterator OrbSet = Orbs->begin();
-	  long	OrbSetCount = 0;
-
-	  while (OrbSet != Orbs->end()) 
-	    {
-	      numitems++;
-	      if (numitems == item) 
-		{
-		  TargetSet = OrbSetCount;
-		  itemtype = 1;
-		  break;
-		}
-
-	      if (((*OrbSet)->getOrbitalWavefunctionType() == UHF)&&
-		  (!((*OrbSet)->getOrbitalType() == NaturalOrbital))) 
-		{
-		  numitems++;	//Extra increment for the beta set
-		  if (numitems == item) 
-		    {
-		      TargetSet = OrbSetCount;
-		      OrbOptions = 16;	//beta set selected
-		      itemtype = 1;
-		      break;
-		    }
-		}
-	      OrbSetCount++;
-	      OrbSet++;
-	    }
-	}
-    }		
-			
   if (itemtype) 
     {	//TargetSet has been choosen
       PlotOrb = -1;

@@ -127,9 +127,9 @@ class BaseSurfacePane : public wxPanel
 
   virtual void TargetToPane() = 0;
   virtual void refreshControls() = 0;
+  virtual bool UpdateNeeded(void) = 0;
 
   void SetVisibility(bool state);
-  virtual bool UpdateNeeded(void);
   void SetUpdateTest(bool test);
   void setUpdateButton();
   Surface * GetTargetSurface(void) const {return mTarget;};
@@ -184,9 +184,12 @@ class OrbSurfacePane
  protected:
   bool UpdateEvent(); 
 
+  //put code that is common for orbital panels
   void makeMOList(std::vector<wxString>& choice);
   void makeAOList(wxString& choice);
   int getOrbSetForOrbPane(std::vector<wxString>& choice);
+  int orbSetChangeEvt(int item, SurfacesWindow * owner);
+  void setFlagOnOrbFormatChange(int itemtype);
 
   long TargetSet;
   long OrbOptions; //from mac version
@@ -217,6 +220,8 @@ class Surface2DPane : public BaseSurfacePane
 	void OnNegColorChange(wxCommandEvent & event);
 
  protected:
+  void OnShowZeroChk( wxCommandEvent &event );
+  void OnDashChk(wxCommandEvent& event );
 
   wxStaticText* mNumContourLabel;
   wxStaticText* mContourValLabel;
@@ -229,6 +234,11 @@ class Surface2DPane : public BaseSurfacePane
   colorArea* mOrbColor2;
   RGBColor PosColor;
   RGBColor NegColor;
+
+  long NumContours;
+  float MaxContourValue;
+  bool ShowZeroContour;
+  bool DashLines;
 
  private:
   void CreateControls();
@@ -302,8 +312,16 @@ class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
     virtual void TargetToPane();
     virtual void refreshControls();
 
+    void OnOrbSetChoice( wxCommandEvent &event );
+    void OnAtomList( wxCommandEvent &event );
+    void OnOrbFormatChoice( wxCommandEvent &event );
+    void OnUsePlaneChk( wxCommandEvent &event );
+    void OnReversePhase(wxCommandEvent &event );
+
  private:
+    virtual bool UpdateNeeded(void);
     void CreateControls();
+    void OnUpdate(wxCommandEvent &event );
 
     wxBoxSizer* mSubLeftBot1Sizer;
     wxBoxSizer* mSubLeftBot2Sizer;
@@ -318,13 +336,11 @@ class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
     wxCheckBox* mUsePlaneChk;
     wxCheckBox* mRevPhaseChk;
 
-    long NumContours;
-    float MaxContourValue;
-    bool ShowZeroContour;
     bool UseScreenPlane;
-    bool DashLines;
 
     Orb2DSurface* mTarget;
+
+    DECLARE_EVENT_TABLE()
 };
 
 class Orbital3DSurfPane : public Surface3DPane, public OrbSurfacePane

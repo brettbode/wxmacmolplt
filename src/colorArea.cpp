@@ -52,6 +52,7 @@ const wxColour& colorArea::getColor() const
 {
   return mCurrentColor;
 }
+
 void colorArea::getColor(RGBColor * color) const {
 	RGBColor tmpRGBColor = WX2RGB(mCurrentColor);
 	color->red = tmpRGBColor.red;

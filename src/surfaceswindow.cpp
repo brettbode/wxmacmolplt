@@ -120,16 +120,6 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
 void SurfacesWindow::CreateControls()
 {    
 ////@begin SurfacesWindow content construction
-  //SurfacesWindow* itemFrame1 = this;
-
-    /*
-    wxMenuBar* menuBar = new wxMenuBar;
-    wxMenu* itemMenu3 = new wxMenu;
-    menuBar->Append(itemMenu3, _("File"));
-    wxMenu* itemMenu4 = new wxMenu;
-    menuBar->Append(itemMenu4, _("Edit"));
-    itemFrame1->SetMenuBar(menuBar);
-    */
 
     mainSizer = new wxBoxSizer(wxVERTICAL);
     upperSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -192,10 +182,10 @@ void SurfacesWindow::addNewPane(int type)
       tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(newSurface), this);
       break;
 
-	case ID_3D_FILE_PANE:
-		newSurface = new General3DSurface(mPrefs);
-		tempPane = new General3DSurfPane(listBook, dynamic_cast<General3DSurface*>(newSurface), this);
-		break;
+    case ID_3D_FILE_PANE:
+      newSurface = new General3DSurface(mPrefs);
+      tempPane = new General3DSurfPane(listBook, dynamic_cast<General3DSurface*>(newSurface), this);
+      break;
     }
 
     if ( tempPane && newSurface)
@@ -214,7 +204,7 @@ void SurfacesWindow::addNewPane(int type)
       }
 
     if ( type != -1)
-      listBook->AddPage(tempPane, mCurrSurfStr, false);
+      listBook->AddPage(tempPane, mCurrSurfStr, true);
 }
 
 void SurfacesWindow::OnAddClick( wxCommandEvent& event )
@@ -366,8 +356,9 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 	wxString temp(_("No surface chosen."));
 	BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
 	if (tempPane) {
-		Surface * tempSurf = tempPane->GetTargetSurface();
-		temp.Printf("%s", tempSurf->GetLabel());
+	  GetSizer()->Fit(this);
+	  Surface * tempSurf = tempPane->GetTargetSurface();
+	  temp.Printf("%s", tempSurf->GetLabel());
 	}
 	surfTitleEdit->SetValue(temp);
 }
