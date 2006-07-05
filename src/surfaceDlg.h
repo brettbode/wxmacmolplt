@@ -213,6 +213,9 @@ class Surface2DPane : public BaseSurfacePane
   Surface2DPane( wxWindow* parent, Surf2DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style );
   ~Surface2DPane();
 
+	void OnPosColorChange(wxCommandEvent & event);
+	void OnNegColorChange(wxCommandEvent & event);
+
  protected:
 
   wxStaticText* mNumContourLabel;
@@ -250,6 +253,9 @@ public:
   void OnSmoothCheck (wxCommandEvent& event );
   void OnTextEnter(wxCommandEvent& event );
   void OnFreeMem(wxCommandEvent& event );
+	void OnPosColorChange(wxCommandEvent & event);
+	void OnNegColorChange(wxCommandEvent & event);
+	void OnTranspColorChange(wxCommandEvent & event);
 
   void setContourValueSld();
 

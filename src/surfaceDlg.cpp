@@ -37,16 +37,6 @@
 ////@begin XPM images
 ////@end XPM images
 
-/*!
- * Orbital3D event table definition
- */
-
-/*BEGIN_EVENT_TABLE( Orbital3DSurf, wxPanel )
-    EVT_CHOICE( ID_CHOICE1, Orbital3DSurf::OnChoice1Selected )
-    EVT_CHECKBOX( ID_CHECKBOX5, Orbital3DSurf::OnCheckbox5Click )
-END_EVENT_TABLE()
-*/
-
 using namespace std;
 
 IMPLEMENT_CLASS( BaseSurfacePane, wxPanel )
@@ -74,6 +64,9 @@ BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
   EVT_BUTTON (ID_SET_PARAM_BUT, BaseSurfacePane::OnSetParam)
   EVT_BUTTON (ID_FREE_MEM_BUT, Surface3DPane::OnFreeMem)
   EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
+	EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( Surface3DParamDlg, wxFrame )
@@ -391,134 +384,98 @@ void OrbSurfacePane::makeMOList(vector<wxString>& choice)
 	Frame * lFrame = mData->GetCurrentFramePtr();
 	const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
 
-  wxString tmpStr;
+	wxString tmpStr;
 
-  if (lFrame && (Orbs->size() > 0)) 
-    {
-      OrbitalRec * lMOs = NULL;
+	if (lFrame && (Orbs->size() > 0)) {
+		OrbitalRec * lMOs = NULL;
 
-      if ((TargetSet < Orbs->size())&&(TargetSet >= 0)) 
-	lMOs = (*Orbs)[TargetSet];
+		if ((TargetSet < Orbs->size())&&(TargetSet >= 0)) 
+			lMOs = (*Orbs)[TargetSet];
 
-      if (lMOs) 
-	{
-	  Boolean Alpha = !(OrbOptions & 16);
-	  long	NumMOs;
-	  char * SymLabel;
-	  float * Energy;
-	  float * OccNum;
+		if (lMOs) {
+			bool Alpha = !(OrbOptions & 16);
+			long	NumMOs;
+			char * SymLabel;
+			float * Energy;
+			float * OccNum;
 
-	  if (Alpha) 
-	    {
-	      NumMOs=lMOs->NumAlphaOrbs;
-	      SymLabel = lMOs->SymType;
-	      Energy = lMOs->Energy;
-	      OccNum = lMOs->OrbOccupation;
-	    } 
-	  else 
-	    {
-	      NumMOs=lMOs->NumBetaOrbs;
-	      SymLabel = lMOs->SymTypeB;
-	      Energy = lMOs->EnergyB;
-	      OccNum = lMOs->OrbOccupationB;
-	    }
+			if (Alpha) {
+				NumMOs=lMOs->NumAlphaOrbs;
+				SymLabel = lMOs->SymType;
+				Energy = lMOs->Energy;
+				OccNum = lMOs->OrbOccupation;
+			} else {
+				NumMOs=lMOs->NumBetaOrbs;
+				SymLabel = lMOs->SymTypeB;
+				Energy = lMOs->EnergyB;
+				OccNum = lMOs->OrbOccupationB;
+			}
 
-	  char* oneSymLabel;
+			char* oneSymLabel;
 
-	  for (int theCell = 0; theCell < NumMOs; theCell++) 
-	    {
-	      tmpStr.Printf("%d  ", theCell+1); 
-	      char text[30];
-	      int nchar;
+			for (int theCell = 0; theCell < NumMOs; theCell++) {
+				tmpStr.Printf("%d  ", theCell+1); 
 
-	      if (SymLabel) 
-	      {	//Add the symetry of the orb, if known
+				if (SymLabel) {	//Add the symetry of the orb, if known
 		
-		oneSymLabel = &(SymLabel[theCell*5]);	
-		//offset to the label for this orb
+					oneSymLabel = &(SymLabel[theCell*5]);	
+					//offset to the label for this orb
 
-		for (int ichar=0; ichar<4; ichar++) 
-		  {
-		    if ((oneSymLabel[ichar])=='\0') break;
+					for (int ichar=0; ichar<4; ichar++) {
+						if ((oneSymLabel[ichar])=='\0') break;
 
-		    if ((oneSymLabel[ichar]>='0')&&(oneSymLabel[ichar]<='9')) 
-		      {
-			tmpStr.Append(oneSymLabel[ichar]);
-		      } 
-		    else if ((oneSymLabel[ichar]=='U')||(oneSymLabel[ichar]=='u')) 
-		      {
-			tmpStr.Append('u');
-		      } 
-		    else if ((oneSymLabel[ichar]=='G')||(oneSymLabel[ichar]=='g')) 
-		      {
-			tmpStr.Append('g');
-		      } 
-		    else
-		      tmpStr.Append(oneSymLabel[ichar]);
-		  }
-		//TextSize(12);	//reset the point size
-	      }
+						if ((oneSymLabel[ichar]>='0')&&(oneSymLabel[ichar]<='9')) {
+							tmpStr.Append(oneSymLabel[ichar]);
+						} else if ((oneSymLabel[ichar]=='U')||(oneSymLabel[ichar]=='u')) {
+							tmpStr.Append('u');
+						} else if ((oneSymLabel[ichar]=='G')||(oneSymLabel[ichar]=='g')) {
+							tmpStr.Append('g');
+						} else
+							tmpStr.Append(oneSymLabel[ichar]);
+					}
+				//TextSize(12);	//reset the point size
+				}
 
-	      tmpStr.Append('\t');
+				tmpStr.Append('\t');
 
-	      nchar=0;
-	      if (OrbColumnEnergyOrOccupation) 
-		{	//orb occupation selected
+				wxString temp;
+				if (OrbColumnEnergyOrOccupation) {	//orb occupation selected
 		
-		  if (OccNum) 
-		    sprintf(text, "%.3f%n", OccNum[theCell], &nchar);
-		  else 
-		    {	
-		    //attempt to set the occupation based on the wavefunction type
-		    if (lMOs->getOrbitalWavefunctionType() == RHF) 
-		      {
-			if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
-			  strcpy(text, "2  ");
-			else 
-			  strcpy(text, "0  ");
-			nchar = 3;
-		      } 
-		    else if (lMOs->getOrbitalWavefunctionType() == ROHF) 
-		      {
-			strcpy(text, "0  ");
-			if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
-			  strcpy(text, "2  ");
-			else if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
-			  strcpy(text, "1  ");
-			nchar = 3;
-		      } 
-		    else if (lMOs->getOrbitalWavefunctionType() == UHF) 
-		      {
-			strcpy(text, "0  ");
-			if (Alpha) 
-			  {
-			    if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
-			      strcpy(text,"1  ");
-			  }
-			else if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
-			  strcpy(text, "1  ");
-			nchar = 3;
-		      } 
-		    else 
-		      {	//MCSCF or CI occupations can't be guessed
-			strcpy(text, "??  ");
-			nchar = 4;
-		      }
-		  }
-		} 
-	      else if (Energy) 
-		{	//punch out the orb energy
-		  sprintf(text, "%.3f%n", Energy[theCell], &nchar);
-		}
+					if (OccNum)
+						temp.Printf("%.3f", OccNum[theCell]);
+					else {	
+						//attempt to set the occupation based on the wavefunction type
+						if (lMOs->getOrbitalWavefunctionType() == RHF) {
+							if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
+								temp.Printf("2  ");
+							else 
+								temp.Printf("0  ");
+						} else if (lMOs->getOrbitalWavefunctionType() == ROHF) {
+							temp.Printf("0  ");
+							if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
+								temp.Printf("2  ");
+							else if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
+								temp.Printf("1  ");
+						} else if (lMOs->getOrbitalWavefunctionType() == UHF) {
+							temp.Printf("0  ");
+							if (Alpha) {
+								if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
+									temp.Printf("1  ");
+							} else if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
+								temp.Printf("1  ");
+						} else {	//MCSCF or CI occupations can't be guessed
+							temp.Printf("?? ");
+						}
+					}
+				} else if (Energy) {	//punch out the orb energy
+					temp.Printf("%.3f", Energy[theCell]);
+				}
 
-	      if (nchar>0) 
-		{
-		  tmpStr.Append(text);
-		  choice.push_back(tmpStr);
+				tmpStr.Append(temp);
+				choice.push_back(tmpStr);
+			}
 		}
-	    }
 	}
-    }
 }
 
 void OrbSurfacePane::makeAOList(wxString& choice)
@@ -686,9 +643,15 @@ void Surface2DPane::CreateControls()
   mTarget->GetNegColor(&NegColor);
 
   mOrbColor1 = new colorArea(this, ID_2D_COLOR_POSITIVE, &PosColor);
-//  mOrbColor1->draw(&PosColor);
   mOrbColor2 = new colorArea(this, ID_2D_COLOR_NEGATIVE, &NegColor);
-//  mOrbColor2->draw(&NegColor);
+}
+void Surface2DPane::OnPosColorChange(wxCommandEvent & event) {
+	mOrbColor1->getColor(&PosColor);
+	setUpdateButton();
+}
+void Surface2DPane::OnNegColorChange(wxCommandEvent & event) {
+	mOrbColor2->getColor(&NegColor);
+	setUpdateButton();
 }
 
 /*
@@ -807,7 +770,7 @@ void Surface3DPane::OnTextEnter(wxCommandEvent& event )
 
       if (newVal < 0.0) newVal *= -1.0;
       if (newVal > mTarget->GetGridMax()) 
-	newVal = mTarget->GetGridMax();
+		  newVal = mTarget->GetGridMax();
       
       ContourValue = newVal;
       tmpStr.Printf("%.4f", newVal);
@@ -821,6 +784,19 @@ void Surface3DPane::OnFreeMem(wxCommandEvent& event )
 {
   mTarget->FreeGrid();
   mFreeMemBut->Disable();
+}
+
+void Surface3DPane::OnPosColorChange(wxCommandEvent & event) {
+	mOrbColor1->getColor(&PosColor);
+	setUpdateButton();
+}
+void Surface3DPane::OnNegColorChange(wxCommandEvent & event) {
+	mOrbColor2->getColor(&NegColor);
+	setUpdateButton();
+}
+void Surface3DPane::OnTranspColorChange(wxCommandEvent & event) {
+	mTransColor->getColor(&TranspColor);
+	setUpdateButton();
 }
 
 /*!
@@ -1064,7 +1040,7 @@ void Orbital3DSurfPane::CreateControls()
   makeAOList(choices3);
 
   mAtomList = new wxListBox( this, ID_ATOM_LIST,
-                             wxDefaultPosition, wxSize(130,180),
+                             wxDefaultPosition, wxSize(140,180),
                              choices2.size(), &choices2.front(), 
 			     wxLB_SINGLE |wxLB_ALWAYS_SB );
 

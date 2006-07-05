@@ -232,7 +232,6 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
       mMainSizer->Add(mEleMasses[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
       mColorArea[i] = new colorArea(this, i, mTargetPrefs->GetAtomColorLoc(i));
- //     mColorArea[i]->draw(mTargetPrefs->GetAtomColorLoc(i));
       mMainSizer->Add(mColorArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
     }
 
@@ -251,7 +250,6 @@ void AtomPrefsPane::saveToTempPrefs()
       mTargetPrefs->SetAtomSize(i, size);
       (mEleMasses[i]->GetValue()).ToDouble(&mass);
       mTargetPrefs->SetAtomMass(i, mass);
-//      mTargetPrefs->SetAtomColor(i, WX2RGB(mColorArea[i]->getColor()));
 	  mColorArea[i]->getColor(mTargetPrefs->GetAtomColorLoc(i));
     }
 }
@@ -312,15 +310,11 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mInnerSizer->Add(mBondChoice, 0, wxALIGN_RIGHT | wxALL, 3);
 
   mColorArea = new colorArea(this, 1, mTargetPrefs->GetBondColorLoc(1));
-//  mColorArea->draw(mTargetPrefs->GetBondColorLoc(1));
   mPatternArea = new colorArea(this, 2, mTargetPrefs->GetBondColorLoc(1));
-//  mPatternArea->draw(mTargetPrefs->GetBondColorLoc(1));
   //!!! don't know where to get patterns, use color 
 
   mNormColorArea = new colorArea(this, 3, mTargetPrefs->GetVectorColorLoc());
-//  mNormColorArea->draw(mTargetPrefs->GetVectorColorLoc());
   mNormPatternArea = new colorArea(this, 4, mTargetPrefs->GetVectorColorLoc());
-//  mNormPatternArea->draw(mTargetPrefs->GetVectorColorLoc());
 
   mInnerSizer->Add(mColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
   mInnerSizer->Add(mPatternArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
@@ -508,13 +502,9 @@ void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mUpperSizer->Add(mNumDigitsArea, 0, wxALIGN_CENTER | wxALL, 3);
 
   mEColor = new colorArea(this, 0, lEOpts->GetTEColor());
-//  mEColor->draw(lEOpts->GetTEColor());
   mMPColor = new colorArea(this, 1, lEOpts->GetMPColor());
-//  mMPColor->draw(lEOpts->GetMPColor());
   mPEColor = new colorArea(this, 2, lEOpts->GetPEColor());
-//  mPEColor->draw(lEOpts->GetPEColor());
   mOtherColor = new colorArea(this, 3, lEOpts->GetKEColor());
-//  mOtherColor->draw(lEOpts->GetKEColor());
 
   mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("E Color")), 0, wxALIGN_RIGHT | wxALL, 3);
   mLowerSizer->Add(mEColor, 0, wxALIGN_LEFT | wxALL, 3);
@@ -670,13 +660,9 @@ void EnergyPrefsPane::saveToTempPrefs()
   (mNumDigitsArea->GetValue()).ToLong(&localLong);
   lEOpts->SetNumDigits(localLong);
 
-//  lEOpts->SetTEColor(WX2RGB(mEColor->getColor()));
   mEColor->getColor(lEOpts->GetTEColor());
-//  lEOpts->SetMPColor(WX2RGB(mMPColor->getColor()));
   mMPColor->getColor(lEOpts->GetMPColor());
-//  lEOpts->SetKEColor(WX2RGB(mOtherColor->getColor()));
   mOtherColor->getColor(lEOpts->GetKEColor());
-//  lEOpts->SetPEColor(WX2RGB(mPEColor->getColor()));
   mPEColor->getColor(lEOpts->GetPEColor());
 
   if (!PrefsAreGlobal())
@@ -1238,7 +1224,6 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
 	
   mLowerSizer->Add(new wxStaticText(this, wxID_ANY, _T("Background color:")), 0, wxALIGN_CENTER | wxALL, 3);
   mBackgrdColor = new colorArea(this, 0, mTargetPrefs->GetBackgroundColorLoc());
-//  mBackgrdColor->draw(mTargetPrefs->GetBackgroundColorLoc());
   mLowerSizer->Add(mBackgrdColor, 0, wxALIGN_CENTER | wxALL, 3);
 
   mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER | wxALL, 3);
@@ -1247,7 +1232,6 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
 
 void QD3DPrefsPane::saveToTempPrefs()
 {
-//  mTargetPrefs->SetBackgroundColorLoc(WX2RGB(mBackgrdColor->getColor()));
 	mBackgrdColor->getColor(mTargetPrefs->GetBackgroundColorLoc());
 }
 
