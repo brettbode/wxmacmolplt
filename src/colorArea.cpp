@@ -22,14 +22,12 @@ BEGIN_EVENT_TABLE(colorArea, wxPanel)
     EVT_MOUSE_EVENTS(colorArea::OnMouse)
 END_EVENT_TABLE()
 
-colorArea::colorArea(wxWindow* parent, int i, const RGBColor* color)
+colorArea::colorArea(wxWindow* parent, int id, const RGBColor* color)
 {
-  Create(parent, -1, wxDefaultPosition, wxSize(50, 20));
+  Create(parent, id, wxDefaultPosition, wxSize(50, 20), wxSUNKEN_BORDER);
 
-  mID = i;
   mCurrentColor = RGB2WX(*color);
   SetBackgroundColour(mCurrentColor);
-//  Refresh();
 }
 
 colorArea::~colorArea()
@@ -37,7 +35,6 @@ colorArea::~colorArea()
   //delete mDC;
 }
 
-//void colorArea::draw(RGBColor* color)
 void colorArea::draw(void)
 {
   SetBackgroundColour(mCurrentColor);
@@ -47,6 +44,7 @@ void colorArea::draw(void)
 
 void colorArea::setColor(const RGBColor * color) {
 	mCurrentColor = RGB2WX(*color);
+	SetBackgroundColour(mCurrentColor);
 	Refresh();
 }
 
@@ -74,7 +72,6 @@ void colorArea::OnMouse(wxMouseEvent &event)
 			mCurrentColor = dialog.GetColourData().GetColour();
 			SetBackgroundColour(mCurrentColor);
 
-	//		Update();
 			Refresh();
 
 			wxCommandEvent evt(wxEVT_COMMAND_ENTER, GetId());
