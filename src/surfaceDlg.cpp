@@ -54,6 +54,7 @@ IMPLEMENT_CLASS( Surface2DPane, wxPanel )
 IMPLEMENT_CLASS( Surface3DPane, wxPanel )
 IMPLEMENT_CLASS( Orbital2DSurfPane, wxPanel )
 IMPLEMENT_CLASS( Orbital3DSurfPane, wxPanel )
+IMPLEMENT_CLASS( General3DSurfPane, wxPanel )
 
 IMPLEMENT_CLASS( Surface3DParamDlg, wxFrame )
 
@@ -1597,7 +1598,7 @@ General3DSurfPane::General3DSurfPane( wxWindow* parent, General3DSurface* target
 	CreateControls();
 }
 
-General3DSurfPane::~Orbital3DSurfPane()
+General3DSurfPane::~General3DSurfPane()
 {
 	
 }

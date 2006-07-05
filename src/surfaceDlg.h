@@ -379,7 +379,7 @@ public:
 
     Orb3DSurface* mTarget;
 
-    DECLARE_EVENT_TABLE()
+   DECLARE_EVENT_TABLE()
 };
 
 class General3DSurfPane : public Surface3DPane
@@ -429,7 +429,7 @@ private:
 */
     General3DSurface* mTarget;
 	
-    DECLARE_EVENT_TABLE()
+//    DECLARE_EVENT_TABLE()
 };
 
 /*
