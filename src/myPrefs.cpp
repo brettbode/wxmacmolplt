@@ -231,8 +231,8 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
       mEleMasses[i] = new wxTextCtrl( this, wxID_ANY, tmp, wxDefaultPosition, wxSize(50, 20));
       mMainSizer->Add(mEleMasses[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-      mColorArea[i] = new colorArea(this, i);
-      mColorArea[i]->draw(mTargetPrefs->GetAtomColorLoc(i));
+      mColorArea[i] = new colorArea(this, i, mTargetPrefs->GetAtomColorLoc(i));
+ //     mColorArea[i]->draw(mTargetPrefs->GetAtomColorLoc(i));
       mMainSizer->Add(mColorArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
     }
 
@@ -251,7 +251,8 @@ void AtomPrefsPane::saveToTempPrefs()
       mTargetPrefs->SetAtomSize(i, size);
       (mEleMasses[i]->GetValue()).ToDouble(&mass);
       mTargetPrefs->SetAtomMass(i, mass);
-      mTargetPrefs->SetAtomColor(i, WX2RGB(mColorArea[i]->getColor()));
+//      mTargetPrefs->SetAtomColor(i, WX2RGB(mColorArea[i]->getColor()));
+	  mColorArea[i]->getColor(mTargetPrefs->GetAtomColorLoc(i));
     }
 }
 
@@ -310,16 +311,16 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("Pattern")), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
   mInnerSizer->Add(mBondChoice, 0, wxALIGN_RIGHT | wxALL, 3);
 
-  mColorArea = new colorArea(this, 1);
-  mColorArea->draw(mTargetPrefs->GetBondColorLoc(1));
-  mPatternArea = new colorArea(this, 2);
-  mPatternArea->draw(mTargetPrefs->GetBondColorLoc(1));
+  mColorArea = new colorArea(this, 1, mTargetPrefs->GetBondColorLoc(1));
+//  mColorArea->draw(mTargetPrefs->GetBondColorLoc(1));
+  mPatternArea = new colorArea(this, 2, mTargetPrefs->GetBondColorLoc(1));
+//  mPatternArea->draw(mTargetPrefs->GetBondColorLoc(1));
   //!!! don't know where to get patterns, use color 
 
-  mNormColorArea = new colorArea(this, 3);
-  mNormColorArea->draw(mTargetPrefs->GetVectorColorLoc());
-  mNormPatternArea = new colorArea(this, 4);
-  mNormPatternArea->draw(mTargetPrefs->GetVectorColorLoc());
+  mNormColorArea = new colorArea(this, 3, mTargetPrefs->GetVectorColorLoc());
+//  mNormColorArea->draw(mTargetPrefs->GetVectorColorLoc());
+  mNormPatternArea = new colorArea(this, 4, mTargetPrefs->GetVectorColorLoc());
+//  mNormPatternArea->draw(mTargetPrefs->GetVectorColorLoc());
 
   mInnerSizer->Add(mColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
   mInnerSizer->Add(mPatternArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
@@ -337,8 +338,8 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
 
 void BondPrefsPane::saveToTempPrefs()
 {
-  mTargetPrefs->SetBondColor(mChoiceId, WX2RGB(mColorArea->getColor()));
-  mTargetPrefs->SetVectorColor(WX2RGB(mNormColorArea->getColor()));
+	mColorArea->getColor(mTargetPrefs->GetBondColorLoc(mChoiceId));
+	mNormColorArea->getColor(mTargetPrefs->GetVectorColorLoc());
 }
 
 void BondPrefsPane::OnSliderUpdate( wxCommandEvent &WXUNUSED(event) )
@@ -360,21 +361,21 @@ void BondPrefsPane::OnChoice( wxCommandEvent &event )
 {
   //int localId = -1;
 
-  mTargetPrefs->SetBondColor(mChoiceId, WX2RGB(mColorArea->getColor())); //save the old setting first
+	mColorArea->getColor(mTargetPrefs->GetBondColorLoc(mChoiceId));
 
-  wxString localStr = event.GetString();
+	wxString localStr = event.GetString();
 
-  if ( localStr.Cmp(_T("Hydrogen Bonds")) == 0)
-    mChoiceId = 0;
-  else if ( localStr.Cmp(_T("Single Bonds")) == 0)
-    mChoiceId = 1;
-  else if ( localStr.Cmp(_T("Double Bonds")) == 0)
-    mChoiceId = 2;
-  else if ( localStr.Cmp(_T("Triple Bonds")) == 0)
-    mChoiceId = 3;
+	if ( localStr.Cmp(_T("Hydrogen Bonds")) == 0)
+		mChoiceId = 0;
+	else if ( localStr.Cmp(_T("Single Bonds")) == 0)
+		mChoiceId = 1;
+	else if ( localStr.Cmp(_T("Double Bonds")) == 0)
+		mChoiceId = 2;
+	else if ( localStr.Cmp(_T("Triple Bonds")) == 0)
+		mChoiceId = 3;
 
-  mColorArea->draw(mTargetPrefs->GetBondColorLoc(mChoiceId));
-  mPatternArea->draw(mTargetPrefs->GetBondColorLoc(mChoiceId));
+	mColorArea->setColor(mTargetPrefs->GetBondColorLoc(mChoiceId));
+	mPatternArea->setColor(mTargetPrefs->GetBondColorLoc(mChoiceId));
 }
 
 
@@ -506,14 +507,14 @@ void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString("# digits")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
   mUpperSizer->Add(mNumDigitsArea, 0, wxALIGN_CENTER | wxALL, 3);
 
-  mEColor = new colorArea(this, 0);
-  mEColor->draw(lEOpts->GetTEColor());
-  mMPColor = new colorArea(this, 1);
-  mMPColor->draw(lEOpts->GetMPColor());
-  mPEColor = new colorArea(this, 2);
-  mPEColor->draw(lEOpts->GetPEColor());
-  mOtherColor = new colorArea(this, 3);
-  mOtherColor->draw(lEOpts->GetKEColor());
+  mEColor = new colorArea(this, 0, lEOpts->GetTEColor());
+//  mEColor->draw(lEOpts->GetTEColor());
+  mMPColor = new colorArea(this, 1, lEOpts->GetMPColor());
+//  mMPColor->draw(lEOpts->GetMPColor());
+  mPEColor = new colorArea(this, 2, lEOpts->GetPEColor());
+//  mPEColor->draw(lEOpts->GetPEColor());
+  mOtherColor = new colorArea(this, 3, lEOpts->GetKEColor());
+//  mOtherColor->draw(lEOpts->GetKEColor());
 
   mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("E Color")), 0, wxALIGN_RIGHT | wxALL, 3);
   mLowerSizer->Add(mEColor, 0, wxALIGN_LEFT | wxALL, 3);
@@ -669,10 +670,14 @@ void EnergyPrefsPane::saveToTempPrefs()
   (mNumDigitsArea->GetValue()).ToLong(&localLong);
   lEOpts->SetNumDigits(localLong);
 
-  lEOpts->SetTEColor(WX2RGB(mEColor->getColor()));
-  lEOpts->SetMPColor(WX2RGB(mMPColor->getColor()));
-  lEOpts->SetKEColor(WX2RGB(mOtherColor->getColor()));
-  lEOpts->SetPEColor(WX2RGB(mPEColor->getColor()));
+//  lEOpts->SetTEColor(WX2RGB(mEColor->getColor()));
+  mEColor->getColor(lEOpts->GetTEColor());
+//  lEOpts->SetMPColor(WX2RGB(mMPColor->getColor()));
+  mMPColor->getColor(lEOpts->GetMPColor());
+//  lEOpts->SetKEColor(WX2RGB(mOtherColor->getColor()));
+  mOtherColor->getColor(lEOpts->GetKEColor());
+//  lEOpts->SetPEColor(WX2RGB(mPEColor->getColor()));
+  mPEColor->getColor(lEOpts->GetPEColor());
 
   if (!PrefsAreGlobal())
     {
@@ -1071,12 +1076,12 @@ void SurfacePrefsPane::SetupPaneItems( MolDisplayWin* targetWindow)
 
   RGBColor* tmpColor = new RGBColor();
 
-  mSurfColor[0] = new colorArea(this, 0);
   lSOpts->GetPosColor(tmpColor);
-  mSurfColor[0]->draw(tmpColor);
-  mSurfColor[1] = new colorArea(this, 1);
+  mSurfColor[0] = new colorArea(this, 0, tmpColor);
+//  mSurfColor[0]->draw(tmpColor);
   lSOpts->GetNegColor(tmpColor);
-  mSurfColor[1]->draw(tmpColor);
+  mSurfColor[1] = new colorArea(this, 1, tmpColor);
+//  mSurfColor[1]->draw(tmpColor);
 
   mLeftMidSizer->Add(mSurfColor[0], 0, wxALIGN_TOP | wxALL, 1);
   mLeftMidSizer->Add(mSurfColor[1], 0, wxALIGN_TOP | wxALL, 1);
@@ -1134,18 +1139,21 @@ void SurfacePrefsPane::SetupPaneItems( MolDisplayWin* targetWindow)
 
 void SurfacePrefsPane::saveToTempPrefs()
 {
-  SurfaceOptions * lSOpts = mTargetPrefs->GetSurfaceOptions();
+	SurfaceOptions * lSOpts = mTargetPrefs->GetSurfaceOptions();
 
-  long lv;
-  double dv;
+	long lv;
+	double dv;
 
-  (mNumContour->GetValue()).ToLong(&lv);
-  lSOpts->SetNumContours(lv);
-  (mMaxContourValue->GetValue()).ToDouble(&dv);
-  lSOpts->SetMaxContour(dv);
+	(mNumContour->GetValue()).ToLong(&lv);
+	lSOpts->SetNumContours(lv);
+	(mMaxContourValue->GetValue()).ToDouble(&dv);
+	lSOpts->SetMaxContour(dv);
 
-  lSOpts->SetPosColor(WX2RGB(mSurfColor[0]->getColor()));
-  lSOpts->SetNegColor(WX2RGB(mSurfColor[1]->getColor()));
+	RGBColor tmpColor;
+	mSurfColor[0]->getColor(&tmpColor);
+	lSOpts->SetPosColor(tmpColor);
+	mSurfColor[1]->getColor(&tmpColor);
+	lSOpts->SetNegColor(tmpColor);
 }
 
 void SurfacePrefsPane::OnSliderUpdate( wxCommandEvent& event)
@@ -1229,8 +1237,8 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   */ //There is no 2-D mode for now
 	
   mLowerSizer->Add(new wxStaticText(this, wxID_ANY, _T("Background color:")), 0, wxALIGN_CENTER | wxALL, 3);
-  mBackgrdColor = new colorArea(this, 0);
-  mBackgrdColor->draw(mTargetPrefs->GetBackgroundColorLoc());
+  mBackgrdColor = new colorArea(this, 0, mTargetPrefs->GetBackgroundColorLoc());
+//  mBackgrdColor->draw(mTargetPrefs->GetBackgroundColorLoc());
   mLowerSizer->Add(mBackgrdColor, 0, wxALIGN_CENTER | wxALL, 3);
 
   mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER | wxALL, 3);
@@ -1239,7 +1247,8 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
 
 void QD3DPrefsPane::saveToTempPrefs()
 {
-  mTargetPrefs->SetBackgroundColorLoc(WX2RGB(mBackgrdColor->getColor()));
+//  mTargetPrefs->SetBackgroundColorLoc(WX2RGB(mBackgrdColor->getColor()));
+	mBackgrdColor->getColor(mTargetPrefs->GetBackgroundColorLoc());
 }
 
 void QD3DPrefsPane::OnCheckBox( wxCommandEvent& WXUNUSED(event))

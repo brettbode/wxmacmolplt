@@ -19,8 +19,6 @@
 #ifdef __wxBuild__
 #include "wx/wx.h"
 
-wxColour RGB2WX(RGBColor &c);
-RGBColor WX2RGB(wxColour &c);
 #endif
 
 class SurfaceOptions {

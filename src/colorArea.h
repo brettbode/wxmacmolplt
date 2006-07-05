@@ -20,26 +20,30 @@
 ////@begin includes
 #include "wx/wx.h"
 
-#include "Globals.h"
 ////@end includes
+wxColour RGB2WX(const RGBColor &c);
+RGBColor WX2RGB(const wxColour &c);
 
 class colorArea : public wxPanel
 {
  public:
-  colorArea(wxWindow* parent, int i);
-  colorArea(wxWindow* parent, int i, RGBColor* color);
+//  colorArea(wxWindow* parent, int i);
+  colorArea(wxWindow* parent, int i, const RGBColor* color);
   ~colorArea();
   int getId() { return mID; }
-  void draw(RGBColor*);
-  wxColour& getColor();
+//  void draw(RGBColor*);
+  void draw(void);
+  const wxColour& getColor(void) const;
+  void getColor(RGBColor * color) const;
+  void setColor(const RGBColor * color);
+	// function that handles the actual color change
+	// A wxEVT_COMMAND_ENTER event is generated if the color is changed.
   void OnMouse(wxMouseEvent &event);
 
  private:
   int mID;
   wxColour mCurrentColor;
-  RGBColor* mColorPtr;
-
-  wxWindow* mParent;
+//  RGBColor mColorPtr;
 
   DECLARE_EVENT_TABLE()
 };

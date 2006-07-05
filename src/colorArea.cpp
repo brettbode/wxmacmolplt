@@ -10,6 +10,7 @@
 #include "wx/wxprec.h"
 #include "wx/colordlg.h"
 
+#include "Globals.h"
 #include "colorArea.h"
 #include "surfaceDlg.h"
 
@@ -17,28 +18,18 @@
 #pragma hdrstop
 #endif
 
-wxColour RGB2WX(RGBColor &c);
-RGBColor WX2RGB(wxColour &c);
-
 BEGIN_EVENT_TABLE(colorArea, wxPanel)
     EVT_MOUSE_EVENTS(colorArea::OnMouse)
 END_EVENT_TABLE()
 
-colorArea::colorArea(wxWindow* parent, int i)
+colorArea::colorArea(wxWindow* parent, int i, const RGBColor* color)
 {
   Create(parent, -1, wxDefaultPosition, wxSize(50, 20));
 
   mID = i;
-  mParent = parent;
-}
-
-colorArea::colorArea(wxWindow* parent, int i, RGBColor* color)
-{
-  Create(parent, -1, wxDefaultPosition, wxSize(50, 20));
-
-  mID = i;
-  mColorPtr = color;
-  mParent = parent;
+  mCurrentColor = RGB2WX(*color);
+  SetBackgroundColour(mCurrentColor);
+//  Refresh();
 }
 
 colorArea::~colorArea()
@@ -46,45 +37,48 @@ colorArea::~colorArea()
   //delete mDC;
 }
 
-void colorArea::draw(RGBColor* color)
+//void colorArea::draw(RGBColor* color)
+void colorArea::draw(void)
 {
-  SetBackgroundColour(wxColour(color->red/256, color->green/256, color->blue/256));
-  mCurrentColor = wxColour(color->red/256, color->green/256, color->blue/256);
+  SetBackgroundColour(mCurrentColor);
 
   Update();
 }
 
-wxColour& colorArea::getColor()
+void colorArea::setColor(const RGBColor * color) {
+	mCurrentColor = RGB2WX(*color);
+	Refresh();
+}
+
+const wxColour& colorArea::getColor() const
 {
   return mCurrentColor;
+}
+void colorArea::getColor(RGBColor * color) const {
+	RGBColor tmpRGBColor = WX2RGB(mCurrentColor);
+	color->red = tmpRGBColor.red;
+	color->green = tmpRGBColor.green;
+	color->blue = tmpRGBColor.blue;
 }
 
 void colorArea::OnMouse(wxMouseEvent &event)
 {
-  wxColourData clrData;
-  clrData.SetColour(GetBackgroundColour());
+	wxColourData clrData;
+	clrData.SetColour(GetBackgroundColour());
 
-  if (event.LeftDClick())
-    {
-      wxColourDialog dialog(this, &clrData);
-      dialog.SetTitle(_T("Choose Color"));
+	if (event.LeftDClick()) {
+		wxColourDialog dialog(this, &clrData);
+		dialog.SetTitle(_T("Choose Color"));
 
-      if (dialog.ShowModal() == wxID_OK)
-	{
-	  mCurrentColor = dialog.GetColourData().GetColour();
-	  SetBackgroundColour(mCurrentColor);
+		if (dialog.ShowModal() == wxID_OK) {
+			mCurrentColor = dialog.GetColourData().GetColour();
+			SetBackgroundColour(mCurrentColor);
 
-	  RGBColor tmpRGBColor = WX2RGB(mCurrentColor);
-	  mColorPtr->red = tmpRGBColor.red;
-	  mColorPtr->green = tmpRGBColor.green;
-	  mColorPtr->blue = tmpRGBColor.blue;
+	//		Update();
+			Refresh();
 
-	  Update();
-
-	  if (mID == ID_2D_COLOR_POSITIVE || mID == ID_2D_COLOR_NEGATIVE
-	      || mID == ID_3D_COLOR_POSITIVE || mID == ID_3D_COLOR_NEGATIVE
-	      || mID == ID_TRANSPARENCY_COLOR)
-	    (dynamic_cast<BaseSurfacePane*>(mParent))->setUpdateButton();
+			wxCommandEvent evt(wxEVT_COMMAND_ENTER, GetId());
+			wxPostEvent(this, evt);
+		}
 	}
-    }
 }

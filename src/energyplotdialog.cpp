@@ -32,6 +32,7 @@
 #include "Frame.h"
 #include "Gradient.h"
 #include <wx/clipbrd.h>
+#include "colorArea.h"
 
 #include "energyplotdialog.h"
 #include <iostream>

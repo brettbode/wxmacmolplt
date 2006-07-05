@@ -32,7 +32,7 @@ extern WinPrefs *	gPrefDefaults;
 
 using namespace std;
 
-wxColour RGB2WX(RGBColor &c) {
+wxColour RGB2WX(const RGBColor &c) {
     wxColor newC;
     unsigned char r = (unsigned char)(c.red   >> 8);
     unsigned char g = (unsigned char)(c.green >> 8);
@@ -43,7 +43,7 @@ wxColour RGB2WX(RGBColor &c) {
     return newC;
 }
 
-RGBColor WX2RGB(wxColour &c) {
+RGBColor WX2RGB(const wxColour &c) {
     RGBColor newC;
     newC.red   = c.Red()   << 8;
     newC.green = c.Green() << 8;

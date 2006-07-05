@@ -686,9 +686,9 @@ void Surface2DPane::CreateControls()
   mTarget->GetNegColor(&NegColor);
 
   mOrbColor1 = new colorArea(this, ID_2D_COLOR_POSITIVE, &PosColor);
-  mOrbColor1->draw(&PosColor);
+//  mOrbColor1->draw(&PosColor);
   mOrbColor2 = new colorArea(this, ID_2D_COLOR_NEGATIVE, &NegColor);
-  mOrbColor2->draw(&NegColor);
+//  mOrbColor2->draw(&NegColor);
 }
 
 /*
@@ -748,11 +748,11 @@ void Surface3DPane::CreateControls()
   mTarget->GetNegColor(&NegColor);
 
   mOrbColor1 = new colorArea(this, ID_3D_COLOR_POSITIVE, &PosColor);
-  mOrbColor1->draw(&PosColor);
+//  mOrbColor1->draw(&PosColor);
   mOrbColor2 = new colorArea(this, ID_3D_COLOR_NEGATIVE, &NegColor);
-  mOrbColor2->draw(&NegColor);
+//  mOrbColor2->draw(&NegColor);
   mTransColor = new colorArea(this, ID_TRANSPARENCY_COLOR, &TranspColor);
-  mTransColor->draw(&TranspColor);
+//  mTransColor->draw(&TranspColor);
 
   wxString choices[] = {_T("Solid"), _T("Wire Frame")};
   m3DRdoBox = new wxRadioBox( this, ID_3D_RADIOBOX, _T(""), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 1, wxRA_SPECIFY_ROWS );
@@ -1020,9 +1020,12 @@ void Orbital3DSurfPane::refreshControls()
   else
     mSmoothChkBox->Disable();
 
-  mOrbColor1->draw(&PosColor);
-  mOrbColor2->draw(&NegColor);
-  mTransColor->draw(&TranspColor);
+  mOrbColor1->setColor(&PosColor);
+  mOrbColor2->setColor(&NegColor);
+  mTransColor->setColor(&TranspColor);
+//  mOrbColor1->draw(&PosColor);
+  //mOrbColor2->draw(&NegColor);
+ // mTransColor->draw(&TranspColor);
 }
 
 /*!
@@ -1632,9 +1635,9 @@ void General3DSurfPane::refreshControls()
 	else
 		mSmoothChkBox->Disable();
 	
-	mOrbColor1->draw(&PosColor);
-	mOrbColor2->draw(&NegColor);
-	mTransColor->draw(&TranspColor);
+//	mOrbColor1->draw(&PosColor);
+//	mOrbColor2->draw(&NegColor);
+//	mTransColor->draw(&TranspColor);
 }
 
 /*!
