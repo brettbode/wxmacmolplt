@@ -140,19 +140,7 @@ class BaseSurfacePane : public wxPanel
 
 protected:
   wxBoxSizer* mainSizer;
-  wxBoxSizer* upperSizer;
-  wxBoxSizer* middleSizer;
-  wxBoxSizer* bottomSizer;
-  wxBoxSizer* leftMiddleSizer;
-  wxBoxSizer* upperLeftMiddleSizer;
-  wxBoxSizer* lowerLeftMiddleSizer;
-  wxFlexGridSizer* rightMiddleSizer;
-  wxBoxSizer* leftBottomSizer;
-  wxBoxSizer* rightBottomSizer;
 
-  wxStaticText* label0;
-  wxStaticText* label1;
-  wxChoice* mOrbSetChoice;
   wxSlider* mNumGridPntSld;
   wxButton* mSetParamBut;
   wxButton* mExportBut;
@@ -198,9 +186,12 @@ class OrbSurfacePane
   long PlotOrb;
   bool PhaseChange;
 
- private:
+  wxChoice* mOrbSetChoice;
+
+private:
   OrbSurfBase* mTarget;
   SurfacesWindow * myowner;
+
 };
 
 /*!
@@ -241,7 +232,6 @@ class Surface2DPane : public BaseSurfacePane
   bool DashLines;
 
  private:
-  void CreateControls();
 
   Surf2DBase* mTarget;
 
@@ -270,9 +260,6 @@ public:
   void setContourValueSld();
 
 protected:
-  wxStaticText* label2;
-  wxStaticText* label3;
-  wxStaticText* label4;
   wxSlider* mGridSizeSld;
   wxSlider* mContourValSld;
   colorArea* mOrbColor1;
@@ -292,7 +279,6 @@ protected:
   float ContourValue;
 
  private:
-  void CreateControls();
 
   Surf3DBase* mTarget;
 
@@ -322,6 +308,16 @@ class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
     virtual bool UpdateNeeded(void);
     void CreateControls();
     void OnUpdate(wxCommandEvent &event );
+
+	wxBoxSizer* upperSizer;
+	wxBoxSizer* middleSizer;
+	wxBoxSizer* bottomSizer;
+	wxBoxSizer* leftMiddleSizer;
+	wxBoxSizer* upperLeftMiddleSizer;
+	wxBoxSizer* lowerLeftMiddleSizer;
+	wxFlexGridSizer* rightMiddleSizer;
+	wxBoxSizer* leftBottomSizer;
+	wxBoxSizer* rightBottomSizer;
 
     wxBoxSizer* mSubLeftBot1Sizer;
     wxBoxSizer* mSubLeftBot2Sizer;
@@ -382,6 +378,16 @@ public:
     void OnContourValueSld(wxCommandEvent &event );
     void OnGridSizeSld(wxCommandEvent &event );
     void OnUpdate(wxCommandEvent &event );
+
+	wxBoxSizer* upperSizer;
+	wxBoxSizer* middleSizer;
+	wxBoxSizer* bottomSizer;
+	wxBoxSizer* leftMiddleSizer;
+	wxBoxSizer* upperLeftMiddleSizer;
+	wxBoxSizer* lowerLeftMiddleSizer;
+	wxFlexGridSizer* rightMiddleSizer;
+	wxBoxSizer* leftBottomSizer;
+	wxBoxSizer* rightBottomSizer;
 
     wxBoxSizer* mSubLeftBot1Sizer;
     wxBoxSizer* mSubLeftBot2Sizer;
@@ -451,7 +457,7 @@ private:
 */
     General3DSurface* mTarget;
 	
-//    DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 /*

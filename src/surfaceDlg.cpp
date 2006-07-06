@@ -84,6 +84,15 @@ BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
 	EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
 END_EVENT_TABLE()
 
+BEGIN_EVENT_TABLE( General3DSurfPane, wxPanel )
+	EVT_RADIOBOX (ID_3D_RADIOBOX, Surface3DPane::On3DRadioBox)
+	EVT_CHECKBOX (ID_SMOOTH_CHECKBOX, Surface3DPane::OnSmoothCheck)
+	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
+	EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
+END_EVENT_TABLE()
+
 BEGIN_EVENT_TABLE( Surface3DParamDlg, wxFrame )
   EVT_BUTTON (wxID_OK, Surface3DParamDlg::OnClose)
   EVT_BUTTON (wxID_CANCEL, Surface3DParamDlg::OnCancel)
@@ -132,35 +141,6 @@ bool BaseSurfacePane::Create( wxWindow* parent, wxWindowID id, const wxPoint& po
 void BaseSurfacePane::CreateControls()
 {
   mainSizer = new wxBoxSizer(wxVERTICAL);
-  upperSizer = new wxBoxSizer(wxHORIZONTAL);
-  middleSizer = new wxBoxSizer(wxHORIZONTAL);
-  bottomSizer = new wxBoxSizer(wxHORIZONTAL);
-  leftMiddleSizer = new wxBoxSizer(wxVERTICAL);
-  upperLeftMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
-  lowerLeftMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
-  rightMiddleSizer = new wxFlexGridSizer(2,2,0,0);
-  leftBottomSizer = new wxBoxSizer(wxHORIZONTAL);
-  rightBottomSizer = new wxBoxSizer(wxVERTICAL);
-
-  label0 = new wxStaticText( this, wxID_ANY,
-                            _T("Select Orbital Set:"),
-                            wxDefaultPosition,
-                            wxDefaultSize);
-
-  label1 = new wxStaticText( this, wxID_ANY,
-                            _T("Number of\n Grid Points:"),
-                            wxDefaultPosition,
-                            wxDefaultSize);
-
-  mNumGridPntSld = new wxSlider( this, ID_GRID_POINT_SLIDER, 
-				 0, 10, 150,
-				 wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
-  //set the initial value in the child object
-
-  mSetParamBut = new wxButton( this, ID_SET_PARAM_BUT, wxT("Set Parameters"), wxPoint(450, 160) );
-  mExportBut = new wxButton( this, ID_SURFACE_EXPORT_BUT, wxT("Export"), wxPoint(450, 160) );
-  mUpdateBut = new wxButton( this, ID_SURFACE_UPDATE_BUT, wxT("Update"), wxPoint(450, 160) );
 
   SetSizer(mainSizer);
 }
@@ -689,7 +669,6 @@ Surface2DPane::Surface2DPane( wxWindow* parent, Surf2DBase* target,
   : BaseSurfacePane(parent, target, Owner, id, pos, size, style)
 {
   mTarget = target;
-  CreateControls();
 }
 
 Surface2DPane::~Surface2DPane()
@@ -698,33 +677,6 @@ Surface2DPane::~Surface2DPane()
   delete mOrbColor2;
 }
 
-void Surface2DPane::CreateControls()
-{
-  mNumContourLabel = new wxStaticText( this, wxID_ANY,
-                            _T("Max # of contours:"),
-                            wxDefaultPosition,
-                            wxDefaultSize);
-  mContourValLabel = new wxStaticText( this, wxID_ANY,
-                            _T("Max contour value:"),
-                            wxDefaultPosition,
-                            wxDefaultSize);
-
-  mNumContourText = new wxTextCtrl( this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
-
-  mContourValText = new wxTextCtrl( this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
-
-  mShowZeroCheck = new wxCheckBox( this, ID_SHOW_ZERO_CHECKBOX, _T("Show zero contour"), wxPoint(340,130), wxDefaultSize );
-
-  mDashCheck = new wxCheckBox( this, ID_DASH_CHECKBOX, _T("Dash - contour"), wxPoint(340,130), wxDefaultSize );
-
-  mSetPlaneBut = new wxButton( this, ID_SET_PLANE_BUT, wxT("Set Plane"));
-
-  mTarget->GetPosColor(&PosColor);
-  mTarget->GetNegColor(&NegColor);
-
-  mOrbColor1 = new colorArea(this, ID_2D_COLOR_POSITIVE, &PosColor);
-  mOrbColor2 = new colorArea(this, ID_2D_COLOR_NEGATIVE, &NegColor);
-}
 void Surface2DPane::OnPosColorChange(wxCommandEvent & event) {
 	mOrbColor1->getColor(&PosColor);
 	setUpdateButton();
@@ -759,7 +711,6 @@ Surface3DPane::Surface3DPane( wxWindow* parent, Surf3DBase* target,
   : BaseSurfacePane(parent, target, Owner, id, pos, size, style)
 {
   mTarget = target;
-  CreateControls();
   UseSolidSurface = mTarget->SolidSurface();
   UseNormals = mTarget->UseSurfaceNormals();
 }
@@ -769,62 +720,6 @@ Surface3DPane::~Surface3DPane()
   delete mOrbColor1;
   delete mOrbColor2;
   delete mTransColor;
-}
-
-void Surface3DPane::CreateControls()
-{
-  float GridMax = mTarget->GetGridMax();
-
-  label2 = new wxStaticText( this, wxID_ANY,
-                            _T("Grid Size:"),
-                            wxDefaultPosition,
-                            wxDefaultSize);
-  label3 = new wxStaticText( this, wxID_ANY,
-                            _T("Contour Value:"),
-                            wxDefaultPosition,
-                            wxDefaultSize);
-
-  mGridSizeSld = new wxSlider( this, ID_GRID_SIZE_SLIDER, 
-			       (short) (100*mTarget->GetGridSize()), 0, 300,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
-  mContourValSld = new wxSlider( this, ID_CONTOUR_VALUE_SLIDER, 
-				 (short)(100*(mTarget->GetContourValue()/((fabs(GridMax)>=0.001)?GridMax:0.25))), 
-				 0, 100, wxDefaultPosition, 
-				 wxSize(155,wxDefaultCoord));
-
-  m3DOrbMaxText = new wxTextCtrl( this, ID_3D_ORB_TEXTCTRL, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-
-  label4 = new wxStaticText( this, wxID_ANY,
-                            _T("Transparency Color:"),
-                            wxDefaultPosition,
-                            wxDefaultSize);
-
-  mTarget->GetTranspColor(&TranspColor);
-  mTarget->GetPosColor(&PosColor);
-  mTarget->GetNegColor(&NegColor);
-
-  mOrbColor1 = new colorArea(this, ID_3D_COLOR_POSITIVE, &PosColor);
-//  mOrbColor1->draw(&PosColor);
-  mOrbColor2 = new colorArea(this, ID_3D_COLOR_NEGATIVE, &NegColor);
-//  mOrbColor2->draw(&NegColor);
-  mTransColor = new colorArea(this, ID_TRANSPARENCY_COLOR, &TranspColor);
-//  mTransColor->draw(&TranspColor);
-
-  wxString choices[] = {_T("Solid"), _T("Wire Frame")};
-  m3DRdoBox = new wxRadioBox( this, ID_3D_RADIOBOX, _T(""), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 1, wxRA_SPECIFY_ROWS );
-  m3DRdoBox->SetSelection(1-UseSolidSurface);
-  
-  mSmoothChkBox = new wxCheckBox( this, ID_SMOOTH_CHECKBOX, _T("Smooth"), wxPoint(340,130), wxDefaultSize );
-  mSmoothChkBox->SetValue(UseNormals);
-
-  if (UseSolidSurface)
-    mSmoothChkBox->Enable();
-  else
-    mSmoothChkBox->Disable();
-
-  mFreeMemBut = new wxButton( this, ID_FREE_MEM_BUT, wxT("Free Mem"), wxPoint(450, 160) );
-
 }
 
 void Surface3DPane::setContourValueSld()
@@ -916,8 +811,63 @@ Orbital2DSurfPane::~Orbital2DSurfPane()
 
 void Orbital2DSurfPane::CreateControls()
 {
-  upperSizer->Add(label0, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	//Stuff from the base class creation
+	upperSizer = new wxBoxSizer(wxHORIZONTAL);
+	middleSizer = new wxBoxSizer(wxHORIZONTAL);
+	bottomSizer = new wxBoxSizer(wxHORIZONTAL);
+	leftMiddleSizer = new wxBoxSizer(wxVERTICAL);
+	upperLeftMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
+	lowerLeftMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
+	rightMiddleSizer = new wxFlexGridSizer(2,2,0,0);
+	leftBottomSizer = new wxBoxSizer(wxHORIZONTAL);
+	rightBottomSizer = new wxBoxSizer(wxVERTICAL);
+	
+	wxStaticText * label0 = new wxStaticText( this, wxID_ANY,
+							   _T("Select Orbital Set:"),
+							   wxDefaultPosition,
+							   wxDefaultSize);
+	
+	wxStaticText * label1 = new wxStaticText( this, wxID_ANY,
+							   _T("Number of\n Grid Points:"),
+							   wxDefaultPosition,
+							   wxDefaultSize);
+	
+	mNumGridPntSld = new wxSlider( this, ID_GRID_POINT_SLIDER, 
+								   0, 10, 150,
+								   wxDefaultPosition, wxSize(155,wxDefaultCoord),
+								   wxSL_AUTOTICKS | wxSL_LABELS);
+	//set the initial value in the child object
+	
+	mSetParamBut = new wxButton( this, ID_SET_PARAM_BUT, wxT("Set Parameters"), wxPoint(450, 160) );
+	mExportBut = new wxButton( this, ID_SURFACE_EXPORT_BUT, wxT("Export"), wxPoint(450, 160) );
+	mUpdateBut = new wxButton( this, ID_SURFACE_UPDATE_BUT, wxT("Update"), wxPoint(450, 160) );
+	upperSizer->Add(label0, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
+	mNumContourLabel = new wxStaticText( this, wxID_ANY,
+										 _T("Max # of contours:"),
+										 wxDefaultPosition,
+										 wxDefaultSize);
+	mContourValLabel = new wxStaticText( this, wxID_ANY,
+										 _T("Max contour value:"),
+										 wxDefaultPosition,
+										 wxDefaultSize);
+	
+	mNumContourText = new wxTextCtrl( this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
+	
+	mContourValText = new wxTextCtrl( this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
+	
+	mShowZeroCheck = new wxCheckBox( this, ID_SHOW_ZERO_CHECKBOX, _T("Show zero contour"), wxPoint(340,130), wxDefaultSize );
+	
+	mDashCheck = new wxCheckBox( this, ID_DASH_CHECKBOX, _T("Dash - contour"), wxPoint(340,130), wxDefaultSize );
+	
+	mSetPlaneBut = new wxButton( this, ID_SET_PLANE_BUT, wxT("Set Plane"));
+	
+	mTarget->GetPosColor(&PosColor);
+	mTarget->GetNegColor(&NegColor);
+	
+	mOrbColor1 = new colorArea(this, ID_2D_COLOR_POSITIVE, &PosColor);
+	mOrbColor2 = new colorArea(this, ID_2D_COLOR_NEGATIVE, &NegColor);
+	
   vector<wxString> choices;
   int itemSelect = getOrbSetForOrbPane(choices) - 1;
 
@@ -1317,9 +1267,90 @@ void Orbital3DSurfPane::refreshControls()
  */
 
 void Orbital3DSurfPane::CreateControls()
-{    
-  float GridMax = mTarget->GetGridMax();
+{
+	//stuff from the base class creator
+	upperSizer = new wxBoxSizer(wxHORIZONTAL);
+	middleSizer = new wxBoxSizer(wxHORIZONTAL);
+	bottomSizer = new wxBoxSizer(wxHORIZONTAL);
+	leftMiddleSizer = new wxBoxSizer(wxVERTICAL);
+	upperLeftMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
+	lowerLeftMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
+	rightMiddleSizer = new wxFlexGridSizer(2,2,0,0);
+	leftBottomSizer = new wxBoxSizer(wxHORIZONTAL);
+	rightBottomSizer = new wxBoxSizer(wxVERTICAL);
+	
+	wxStaticText * label0 = new wxStaticText( this, wxID_ANY,
+							   _T("Select Orbital Set:"),
+							   wxDefaultPosition,
+							   wxDefaultSize);
+	
+	wxStaticText * label1 = new wxStaticText( this, wxID_ANY,
+							   _T("Number of\n Grid Points:"),
+							   wxDefaultPosition,
+							   wxDefaultSize);
+	
+	mNumGridPntSld = new wxSlider( this, ID_GRID_POINT_SLIDER, 
+								   0, 10, 150,
+								   wxDefaultPosition, wxSize(155,wxDefaultCoord),
+								   wxSL_AUTOTICKS | wxSL_LABELS);
+	//set the initial value in the child object
+	
+	mSetParamBut = new wxButton( this, ID_SET_PARAM_BUT, wxT("Set Parameters"), wxPoint(450, 160) );
+	mExportBut = new wxButton( this, ID_SURFACE_EXPORT_BUT, wxT("Export"), wxPoint(450, 160) );
+	mUpdateBut = new wxButton( this, ID_SURFACE_UPDATE_BUT, wxT("Update"), wxPoint(450, 160) );
 
+	float GridMax = mTarget->GetGridMax();
+	
+	wxStaticText * label2 = new wxStaticText( this, wxID_ANY,
+							   _T("Grid Size:"),
+							   wxDefaultPosition,
+							   wxDefaultSize);
+	wxStaticText * label3 = new wxStaticText( this, wxID_ANY,
+							   _T("Contour Value:"),
+							   wxDefaultPosition,
+							   wxDefaultSize);
+	
+	mGridSizeSld = new wxSlider( this, ID_GRID_SIZE_SLIDER, 
+								 (short) (100*mTarget->GetGridSize()), 0, 300,
+								 wxDefaultPosition, wxSize(155,wxDefaultCoord),
+								 wxSL_AUTOTICKS | wxSL_LABELS);
+	mContourValSld = new wxSlider( this, ID_CONTOUR_VALUE_SLIDER, 
+								   (short)(100*(mTarget->GetContourValue()/((fabs(GridMax)>=0.001)?GridMax:0.25))), 
+								   0, 100, wxDefaultPosition, 
+								   wxSize(155,wxDefaultCoord));
+	
+	m3DOrbMaxText = new wxTextCtrl( this, ID_3D_ORB_TEXTCTRL, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+	
+	wxStaticText * label4 = new wxStaticText( this, wxID_ANY,
+							   _T("Transparency Color:"),
+							   wxDefaultPosition,
+							   wxDefaultSize);
+	
+	mTarget->GetTranspColor(&TranspColor);
+	mTarget->GetPosColor(&PosColor);
+	mTarget->GetNegColor(&NegColor);
+	
+	mOrbColor1 = new colorArea(this, ID_3D_COLOR_POSITIVE, &PosColor);
+	//  mOrbColor1->draw(&PosColor);
+	mOrbColor2 = new colorArea(this, ID_3D_COLOR_NEGATIVE, &NegColor);
+	//  mOrbColor2->draw(&NegColor);
+	mTransColor = new colorArea(this, ID_TRANSPARENCY_COLOR, &TranspColor);
+	//  mTransColor->draw(&TranspColor);
+	
+	wxString radiochoices[] = {_T("Solid"), _T("Wire Frame")};
+	m3DRdoBox = new wxRadioBox( this, ID_3D_RADIOBOX, _T(""), wxDefaultPosition, wxDefaultSize, WXSIZEOF(radiochoices), radiochoices, 1, wxRA_SPECIFY_ROWS );
+	m3DRdoBox->SetSelection(1-UseSolidSurface);
+	
+	mSmoothChkBox = new wxCheckBox( this, ID_SMOOTH_CHECKBOX, _T("Smooth"), wxPoint(340,130), wxDefaultSize );
+	mSmoothChkBox->SetValue(UseNormals);
+	
+	if (UseSolidSurface)
+		mSmoothChkBox->Enable();
+	else
+		mSmoothChkBox->Disable();
+	
+	mFreeMemBut = new wxButton( this, ID_FREE_MEM_BUT, wxT("Free Mem"), wxPoint(450, 160) );
+	
   upperSizer->Add(label0, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
   vector<wxString> choices;
@@ -1879,30 +1910,6 @@ void General3DSurfPane::refreshControls()
 
 void General3DSurfPane::CreateControls()
 {    
-	float GridMax = mTarget->GetGridMax();
-	
-	upperSizer->Add(label0, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-
-	upperLeftMiddleSizer->Layout();
-	
-	lowerLeftMiddleSizer->Add(label1, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-	
-	leftMiddleSizer->Add(upperLeftMiddleSizer, 0, wxALL, 3);
-	leftMiddleSizer->Add(lowerLeftMiddleSizer, 0, wxALL, 3);
-	
-	rightMiddleSizer->Add(label3, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
-	rightMiddleSizer->Add(mContourValSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
-
-	wxString tmpStr;
-	tmpStr.Printf("%.4f", ContourValue);
-	m3DOrbMaxText->SetValue(tmpStr);
-	middleSizer->Add(leftMiddleSizer, 0, wxALL, 10);
-	middleSizer->Add(rightMiddleSizer, 0, wxALL, 10);
-	bottomSizer->Add(leftBottomSizer, 0, wxALL, 3);
-	bottomSizer->Add(rightBottomSizer, 0, wxALL, 3);
-	mainSizer->Add(upperSizer);
-	mainSizer->Add(middleSizer);
-	mainSizer->Add(bottomSizer);
 }
 
 bool General3DSurfPane::UpdateNeeded(void) 
