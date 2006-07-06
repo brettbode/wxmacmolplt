@@ -99,6 +99,8 @@ class SurfacesWindow;
 #define ID_DASH_CHECKBOX 10097
 #define ID_SET_PLANE_BUT 10098
 #define ID_USE_PLANE_CHECKBOX 10099
+#define ID_NUM_CONTOUR_TEXT 10100
+#define ID_MAX_CONTOUR_VALUE_TEXT 10101
 ////@end control identifiers
 
 /*!
@@ -207,10 +209,12 @@ class Surface2DPane : public BaseSurfacePane
   Surface2DPane( wxWindow* parent, Surf2DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style );
   ~Surface2DPane();
 
-	void OnPosColorChange(wxCommandEvent & event);
-	void OnNegColorChange(wxCommandEvent & event);
-	void OnShowZeroChk( wxCommandEvent &event );
-	void OnDashChk(wxCommandEvent& event );
+  void OnPosColorChange(wxCommandEvent & event);
+  void OnNegColorChange(wxCommandEvent & event);
+  void OnShowZeroChk( wxCommandEvent &event );
+  void OnDashChk(wxCommandEvent& event );
+  void OnTextEnter( wxCommandEvent &event );
+  void OnIdle( wxIdleEvent& WXUNUSED(event) );
 
  protected:
 
@@ -253,9 +257,9 @@ public:
   void OnSmoothCheck (wxCommandEvent& event );
   void OnTextEnter(wxCommandEvent& event );
   void OnFreeMem(wxCommandEvent& event );
-	void OnPosColorChange(wxCommandEvent & event);
-	void OnNegColorChange(wxCommandEvent & event);
-	void OnTranspColorChange(wxCommandEvent & event);
+  void OnPosColorChange(wxCommandEvent & event);
+  void OnNegColorChange(wxCommandEvent & event);
+  void OnTranspColorChange(wxCommandEvent & event);
 
   void setContourValueSld();
 
