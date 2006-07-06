@@ -218,10 +218,10 @@ class Surface2DPane : public BaseSurfacePane
 
 	void OnPosColorChange(wxCommandEvent & event);
 	void OnNegColorChange(wxCommandEvent & event);
+	void OnShowZeroChk( wxCommandEvent &event );
+	void OnDashChk(wxCommandEvent& event );
 
  protected:
-  void OnShowZeroChk( wxCommandEvent &event );
-  void OnDashChk(wxCommandEvent& event );
 
   wxStaticText* mNumContourLabel;
   wxStaticText* mContourValLabel;
