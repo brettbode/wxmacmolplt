@@ -92,15 +92,21 @@ class SurfacesWindow;
 #define ID_3D_COLOR_POSITIVE 10090
 #define ID_3D_COLOR_NEGATIVE 10091
 #define ID_SPH_HARMONICS_CHECKBOX 10092
-#define ID_3D_ORB_TEXTCTRL 10093
+#define ID_CONTOUR_VALUE_EDIT 10093
 #define ID_COPY_ALL 10094
 #define ID_PASTE_ALL 10095
 #define ID_SHOW_ZERO_CHECKBOX 10096
 #define ID_DASH_CHECKBOX 10097
 #define ID_SET_PLANE_BUT 10098
 #define ID_USE_PLANE_CHECKBOX 10099
-#define ID_NUM_CONTOUR_TEXT 10100
-#define ID_MAX_CONTOUR_VALUE_TEXT 10101
+#define ID_GENFILEBUTTON 10100
+#define ID_GENMULTCHECK 10101
+#define ID_GENMULTEDIT 10102
+#define ID_GENSQUARECHECK 10103
+#define ID_GENCONPOSNEGCHECK 10104
+#define ID_GENSURFGRIDMINTEXT 10105
+#define ID_GRID_MAX_TEXT 10106
+#define ID_NUM_CONTOUR_TEXT 10107
 ////@end control identifiers
 
 /*!
@@ -255,7 +261,7 @@ public:
 
   void On3DRadioBox (wxCommandEvent& event );
   void OnSmoothCheck (wxCommandEvent& event );
-  void OnTextEnter(wxCommandEvent& event );
+  void OnContourValueEnter(wxCommandEvent& event );
   void OnFreeMem(wxCommandEvent& event );
   void OnPosColorChange(wxCommandEvent & event);
   void OnNegColorChange(wxCommandEvent & event);
@@ -266,13 +272,15 @@ public:
 protected:
   wxSlider* mGridSizeSld;
   wxSlider* mContourValSld;
+  wxTextCtrl* mContourValueEdit;
+  wxStaticText* mGridMinText;
+  wxStaticText* mGridMaxText;
   colorArea* mOrbColor1;
   colorArea* mOrbColor2;
   colorArea* mTransColor;
   wxRadioBox* m3DRdoBox;
   wxCheckBox* mSmoothChkBox;
   wxButton* mFreeMemBut;
-  wxTextCtrl* m3DOrbMaxText;
 
   float GridSize;
   RGBColor PosColor;
@@ -407,7 +415,6 @@ public:
     wxChoice* mOrbFormatChoice;
     wxCheckBox* mSphHarmonicsChk;
     wxCheckBox* mRevPhaseChk;  
-    wxStaticText* mContourMaxTick;
 
     Orb3DSurface* mTarget;
 
@@ -429,15 +436,12 @@ public:
 	
     /// Creates the controls and sizers
     void CreateControls();
-	
-	////@begin Orbital3D member function declarations
-	
+
     /// Retrieves bitmap resources
     wxBitmap GetBitmapResource( const wxString& name );
 	
     /// Retrieves icon resources
     wxIcon GetIconResource( const wxString& name );
-	////@end Orbital3D member function declarations
 	
     /// Should we show tooltips?
     static bool ShowToolTips();
@@ -445,21 +449,26 @@ public:
 private:
 	virtual bool UpdateNeeded(void);
 	
-//    void OnReversePhase(wxCommandEvent &event );
-  //  void OnContourValueSld(wxCommandEvent &event );
-  //  void OnGridSizeSld(wxCommandEvent &event );
-  //  void OnUpdate(wxCommandEvent &event );
+	void OnMultCheck(wxCommandEvent &event);
+	void OnSquareCheck(wxCommandEvent &event);
+	void OnContourPosNegCheck(wxCommandEvent &event);
+	void OnFileButton(wxCommandEvent &event);
+	void OnUpdate(wxCommandEvent &event );
+    void OnContourValueSld(wxCommandEvent &event );
+	void OnContourValueEnter(wxCommandEvent& event );
+	void OnMultValueEnter(wxCommandEvent& event );
 	
-/*    wxBoxSizer* mSubLeftBot1Sizer;
-    wxBoxSizer* mSubLeftBot2Sizer;
-    wxBoxSizer* mSubRightBot0Sizer;
-    wxBoxSizer* mSubRightBot1Sizer;
-    wxBoxSizer* mSubRightBot2Sizer;
-    wxBoxSizer* mSubRightBot3Sizer;
-    wxBoxSizer* mSubRightBot4Sizer;
-    wxGridSizer* mSubRightBot5Sizer;
-*/
-    General3DSurface* mTarget;
+    wxCheckBox* mMultCheck;
+    wxTextCtrl* mGenMultValue;
+    wxCheckBox* mSquareCheck;
+    wxCheckBox* mGenContourPosNegCheck;
+	wxString MultValueString;
+
+    General3DSurface*	mTarget;
+	bool				ContourPosNeg;
+	bool				useMultValue;
+	bool				squareValues;
+	float				MultValue;
 	
     DECLARE_EVENT_TABLE()
 };

@@ -632,6 +632,7 @@ void MolDisplayWin::menuFileImport(wxCommandEvent &event) {
                 MessageAlert("An error occurred importing the $VEC group.");
             }
             if (Buffer) delete Buffer;      //Done reading so free up the buffer
+			fclose(myfile);
         }
     }
 }

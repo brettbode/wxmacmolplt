@@ -2989,13 +2989,26 @@ void MolDisplayWin::WriteMDLMolFile(BufferFile * Buffer) {
 		//Final line needs to be end line to terminate properties block
 	Buffer->PutText("M  END\r");
 }
+#endif
 void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const double & MultValue) {
+#ifdef __wxBuild__
+    wxString filename = wxFileSelector(wxT("Choose a file containing the surface data."));
+    //We are looking for $ VEC groups. Scan to see how many are there. If more than 1 the user will
+    //have to choose.
+	FILE * myfile = NULL;
+    if (!filename.empty()) {
+        myfile = fopen(filename.mb_str(wxConvUTF8), "r");
+        if (myfile == NULL) {
+            MessageAlert("Unable to open the selected file!");
+			return;
+        }
+	} else
+		return;
+#else
 	//First prompt the user for the file
 	FSSpec				inFile;
 	short				fileRefNum=0;
 	OSErr				myerr;
-
-	bool FirstFile = (Grid == NULL);
 
 	if (!GetTextFileName(&inFile)) return;
 
@@ -3003,6 +3016,9 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 	myerr = FSpOpenDF(&inFile, fsRdPerm, &fileRefNum);
 	if (myerr != noErr) fileRefNum = 0;
 	if (!fileRefNum) return;	//no file found/chosen
+#endif
+	bool FirstFile = (Grid == NULL);
+	
 //Ok got a file, create a buffer for it and then attempt to read it in
 	if (FirstFile) {
 		if (Label) {delete [] Label; Label = NULL;}
@@ -3016,7 +3032,11 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 	CPoint3D	tempPt;
 	try {
 			char Line[kMaxLineLength];
+#ifdef __wxBuild__
+		Buffer = new BufferFile(myfile, false);
+#else
 		Buffer = new BufferFile(fileRefNum, false);
+#endif
 		Buffer->GetLine(Line);
 		if (FirstFile) SetLabel(Line);
 		Buffer->GetLine(Line);
@@ -3109,22 +3129,42 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 		FreeGrid();
 	}
 	if (Buffer) delete Buffer;
+#ifdef __wxBuild__
+	fclose(myfile);
+#else
 	FSClose(fileRefNum);
+#endif
 }
 void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const double & MultValue) {
 	//First prompt the user for the file
+#ifdef __wxBuild__
+    wxString filename = wxFileSelector(wxT("Choose a file containing the surface data."));
+    //We are looking for $ VEC groups. Scan to see how many are there. If more than 1 the user will
+    //have to choose.
+	FILE * myfile = NULL;
+    if (!filename.empty()) {
+        myfile = fopen(filename.mb_str(wxConvUTF8), "r");
+        if (myfile == NULL) {
+            MessageAlert("Unable to open the selected file!");
+			return;
+        }
+	} else
+		return;
+#else
 	FSSpec				inFile;
 	short				fileRefNum=0;
 	OSErr				myerr;
 
-	bool FirstFile = (Grid == NULL);
-
 	if (!GetTextFileName(&inFile)) return;
-
-// Attempt to open the data fork of the selected file
+	
+	// Attempt to open the data fork of the selected file
 	myerr = FSpOpenDF(&inFile, fsRdPerm, &fileRefNum);
 	if (myerr != noErr) fileRefNum = 0;
 	if (!fileRefNum) return;	//no file found/chosen
+#endif	
+
+	bool FirstFile = (Grid == NULL);
+
 //Ok got a file, create a buffer for it and then attempt to read it in
 	if (FirstFile) {	//shouldn't have old data if the first file...
 		if (Label) {delete [] Label; Label = NULL;}
@@ -3139,7 +3179,11 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 	short	scanerr;
 	try {
 			char Line[kMaxLineLength];
+#ifdef __wxBuild__
+		Buffer = new BufferFile(myfile, false);
+#else
 		Buffer = new BufferFile(fileRefNum, false);
+#endif
 		Buffer->GetLine(Line);
 		if (FirstFile) SetLabel(Line);	//grab the label only if this is the first data file
 
@@ -3232,9 +3276,12 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 		if (Grid) FreeGrid();
 	}
 	if (Buffer) delete Buffer;
+#ifdef __wxBuild__
+	fclose(myfile);
+#else
 	FSClose(fileRefNum);
-}
 #endif
+}
 long LocateKeyWord(const char *Buffer, const char * KeyWord, long length, long bytecount)
 {	long	test=0, pos=-1;
 
