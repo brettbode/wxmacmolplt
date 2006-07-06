@@ -54,6 +54,7 @@ BEGIN_EVENT_TABLE( Orbital2DSurfPane, wxPanel )
   EVT_CHOICE  (ID_ORB_CHOICE, Orbital2DSurfPane::OnOrbSetChoice)
   EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
   EVT_LISTBOX (ID_ATOM_LIST, Orbital2DSurfPane::OnAtomList)
+  EVT_LISTBOX (ID_ORB_COEF, Orbital2DSurfPane::OnCoefList)
   EVT_CHECKBOX (ID_USE_PLANE_CHECKBOX, Orbital2DSurfPane::OnUsePlaneChk)
   EVT_CHECKBOX (ID_SHOW_ZERO_CHECKBOX, Surface2DPane::OnShowZeroChk)
   EVT_CHECKBOX (ID_DASH_CHECKBOX, Surface2DPane::OnDashChk)
@@ -70,6 +71,7 @@ BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
   EVT_CHOICE  (ID_ORB_FORMAT_CHOICE,  Orbital3DSurfPane::OnOrbFormatChoice)
   EVT_CHOICE  (ID_ORB_CHOICE, Orbital3DSurfPane::OnOrbSetChoice)
   EVT_LISTBOX (ID_ATOM_LIST, Orbital3DSurfPane::OnAtomList)
+  EVT_LISTBOX (ID_ORB_COEF, Orbital3DSurfPane::OnCoefList)
   EVT_CHECKBOX (ID_SPH_HARMONICS_CHECKBOX, Orbital3DSurfPane::OnSphHarmonicChk)
   EVT_RADIOBOX (ID_3D_RADIOBOX, Surface3DPane::On3DRadioBox)
   EVT_CHECKBOX (ID_SMOOTH_CHECKBOX, Surface3DPane::OnSmoothCheck)
@@ -242,6 +244,8 @@ OrbSurfacePane::OrbSurfacePane( OrbSurfBase* target, SurfacesWindow* o)
       else
 	OrbOptions = 1;	//No MO's so default to AO's
     }
+
+  coefIsEnabled = false;
 
 }
 
@@ -487,10 +491,12 @@ void OrbSurfacePane::makeMOList(vector<wxString>& choice)
 	}
 }
 
-void OrbSurfacePane::makeAOList(wxString& choice)
+void OrbSurfacePane::makeAOList(vector<wxString>& choice)
 {
-	MoleculeData * mData = myowner->GetMoleculeData();
-	BasisSet * BasisPtr = mData->GetBasisSet();
+  wxString aChoice;
+
+  MoleculeData * mData = myowner->GetMoleculeData();
+  BasisSet * BasisPtr = mData->GetBasisSet();
 
   if (BasisPtr) 
     {
@@ -498,6 +504,7 @@ void OrbSurfacePane::makeAOList(wxString& choice)
 
       for (int theCell = 0; theCell < NumBasisFuncs; theCell++) 
 	{
+	  aChoice.Clear();
 	  long ifunc = 0, iatom=0;
 	  Frame * lFrame = mData->GetCurrentFramePtr();
 
@@ -513,23 +520,27 @@ void OrbSurfacePane::makeAOList(wxString& choice)
 		    {	//Found the right shell, now pick out the right function
 		      char label[63];
 		      wxString tmpStr;
-		      int nchar;
+		      int nchar = 0;
 		      //punch out the atom # and symbol if this is the 1st function for this atom
 
 		      if ((ishell==minshell)&&(theCell==ifunc))
 			{
 			  sprintf(label, "%ld  ", iatom+1);
-			  choice.Append(label);
+			  aChoice.Append(label);
 
 			  WinPrefs * mPrefs = myowner->GetPrefs();
 			  if (mPrefs) 
 			    {
 			      long AtomType = lFrame->GetAtomType(iatom)-1;
 			      mPrefs->GetAtomLabel(AtomType, tmpStr);
-			      choice.Append(tmpStr);
+			      aChoice.Append(tmpStr);
 			    }
 			}
-		      choice.Append('\t');
+		      
+		      nchar = aChoice.Length();
+
+		      for ( int i = 0; i < 9 - nchar; i++)
+			aChoice.Append(' ');
 
 		      jfunc = theCell-ifunc;
 		      BasisPtr->Shells[ishell].GetLabel(label, jfunc, SphericalHarmonics);
@@ -537,9 +548,9 @@ void OrbSurfacePane::makeAOList(wxString& choice)
 		      
 		      if (nchar>0)
 			{	//Make sure there really is something there
-			  choice.Append(' ');
-			  choice.Append(' ');
-			  choice.Append(label);
+			  aChoice.Append(' ');
+			  aChoice.Append(' ');
+			  aChoice.Append(label);
 
 			  for (long ichar=1; ichar<=nchar; ichar++)
 			    {
@@ -555,7 +566,9 @@ void OrbSurfacePane::makeAOList(wxString& choice)
 				  //DrawText(label, ichar, 1);
 			    }
 			}
-		      choice.Append('\t');
+
+		      for ( int i = 0; i < 6-nchar; i++)
+			aChoice.Append(' ');
 
 		      ifunc = theCell+1;
 		      ishell=maxshell;
@@ -597,13 +610,13 @@ void OrbSurfacePane::makeAOList(wxString& choice)
 			      char label[63];
 
 			      sprintf(label, "%.3f", aVector[theCell]);//prepare the coef for printing
-			      choice.Append(label);
+			      aChoice.Append(label);
 			    }
 			}
 		    }
 		}
 	    }
-	  choice.Append('\n');
+	  choice.push_back(aChoice);
 	}
     }
 }
@@ -925,7 +938,7 @@ void Orbital2DSurfPane::CreateControls()
   vector<wxString> choices2;
   makeMOList(choices2);
 
-  wxString choices3;
+  vector<wxString> choices3;
   makeAOList(choices3);
 
   mAtomList = new wxListBox( this, ID_ATOM_LIST,
@@ -933,7 +946,7 @@ void Orbital2DSurfPane::CreateControls()
                              choices2.size(), &choices2.front(), 
 			     wxLB_SINGLE |wxLB_ALWAYS_SB );
 
-  mOrbCoef = new wxTextCtrl( this, wxID_ANY, choices3, wxPoint(20,160), wxSize(120,200), wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL);
+  mOrbCoef = new wxListBox( this, ID_ORB_COEF, wxPoint(20,160), wxSize(150,200), choices3.size(), &choices3.front(), wxLB_SINGLE |wxLB_ALWAYS_SB);
 
   mSphHarmonicsChk->SetValue(SphericalHarmonics);
   upperLeftMiddleSizer->Add(mSphHarmonicsChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -1195,13 +1208,16 @@ void Orbital2DSurfPane::OnOrbSetChoice( wxCommandEvent &event )
     {
       mAtomList->Clear();
       PlotOrb = -1;
+      coefIsEnabled = true;
 
-      wxString choice;
+      vector<wxString> choice;
       makeAOList(choice);
-      mOrbCoef->SetValue(choice);
+      mOrbCoef->Set(choice.size(), &choice.front());
     }
   else
     {
+      coefIsEnabled = false;
+
       vector<wxString> newChoice;
       makeMOList(newChoice);
 
@@ -1210,13 +1226,25 @@ void Orbital2DSurfPane::OnOrbSetChoice( wxCommandEvent &event )
 
 }
 
+void Orbital2DSurfPane::OnCoefList( wxCommandEvent &event )
+{
+  if (coefIsEnabled)
+    {
+      if (OrbOptions&1)
+	PlotOrb = mOrbCoef->GetSelection();
+
+      setUpdateButton();
+    }
+
+}
+
 void Orbital2DSurfPane::OnAtomList( wxCommandEvent &event )
 {
   PlotOrb = event.GetSelection();
   
-  wxString choice;
+  vector<wxString> choice;
   makeAOList(choice);
-  mOrbCoef->SetValue(choice);
+  mOrbCoef->Set(choice.size(), &choice.front());
 
   setUpdateButton();  
 }
@@ -1417,7 +1445,7 @@ void Orbital3DSurfPane::CreateControls()
   vector<wxString> choices2;
   makeMOList(choices2);
 
-  wxString choices3;
+  vector<wxString> choices3;
   makeAOList(choices3);
 
   mAtomList = new wxListBox( this, ID_ATOM_LIST,
@@ -1425,7 +1453,7 @@ void Orbital3DSurfPane::CreateControls()
                              choices2.size(), &choices2.front(), 
 			     wxLB_SINGLE |wxLB_ALWAYS_SB );
 
-  mOrbCoef = new wxTextCtrl( this, wxID_ANY, choices3, wxPoint(20,160), wxSize(120,200), wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL);
+  mOrbCoef = new wxListBox( this, ID_ORB_COEF, wxPoint(20,160), wxSize(150,200), choices3.size(), &choices3.front(), wxLB_SINGLE |wxLB_ALWAYS_SB );
 
   mSphHarmonicsChk->SetValue(SphericalHarmonics);
   upperLeftMiddleSizer->Add(mSphHarmonicsChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -1617,13 +1645,16 @@ void Orbital3DSurfPane::OnOrbSetChoice( wxCommandEvent &event )
     {
       mAtomList->Clear();
       PlotOrb = -1;
+      coefIsEnabled = true;
 
-      wxString choice;
+      vector<wxString> choice;
       makeAOList(choice);
-      mOrbCoef->SetValue(choice);
+      mOrbCoef->Set(choice.size(), &choice.front());
     }
   else
     {
+      coefIsEnabled = false;
+
       vector<wxString> newChoice;
       makeMOList(newChoice);
 
@@ -1632,13 +1663,25 @@ void Orbital3DSurfPane::OnOrbSetChoice( wxCommandEvent &event )
 
 }
 
+void Orbital3DSurfPane::OnCoefList( wxCommandEvent &event )
+{
+  if (coefIsEnabled)
+    {
+      if (OrbOptions&1)
+	PlotOrb = mOrbCoef->GetSelection();
+
+      setUpdateButton();
+    }
+
+}
+
 void Orbital3DSurfPane::OnAtomList( wxCommandEvent &event )
 {
   PlotOrb = event.GetSelection();
   
-  wxString choice;
+  vector<wxString> choice;
   makeAOList(choice);
-  mOrbCoef->SetValue(choice);
+  mOrbCoef->Set(choice.size(), &choice.front());
 
   setUpdateButton();  
 }

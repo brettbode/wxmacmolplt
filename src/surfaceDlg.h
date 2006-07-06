@@ -99,6 +99,9 @@ class SurfacesWindow;
 #define ID_DASH_CHECKBOX 10097
 #define ID_SET_PLANE_BUT 10098
 #define ID_USE_PLANE_CHECKBOX 10099
+#define ID_NUM_CONTOUR_TEXT 10100
+#define ID_MAX_CONTOUR_VALUE_TEXT 10101
+#define ID_ORB_COEF 10102
 #define ID_GENFILEBUTTON 10100
 #define ID_GENMULTCHECK 10101
 #define ID_GENMULTEDIT 10102
@@ -107,6 +110,10 @@ class SurfacesWindow;
 #define ID_GENSURFGRIDMINTEXT 10105
 #define ID_GRID_MAX_TEXT 10106
 #define ID_NUM_CONTOUR_TEXT 10107
+#define ID_NUM_CONTOUR_TEXT 10108
+#define ID_MAX_CONTOUR_VALUE_TEXT 10109
+#define ID_ORB_COEF 10110
+
 ////@end control identifiers
 
 /*!
@@ -182,7 +189,7 @@ class OrbSurfacePane
 
   //put code that is common for orbital panels
   void makeMOList(std::vector<wxString>& choice);
-  void makeAOList(wxString& choice);
+  void makeAOList(std::vector<wxString>& choice);
   int getOrbSetForOrbPane(std::vector<wxString>& choice);
   int orbSetChangeEvt(int item, SurfacesWindow * owner);
   void setFlagOnOrbFormatChange(int itemtype);
@@ -193,6 +200,7 @@ class OrbSurfacePane
   long SphericalHarmonics;
   long PlotOrb;
   bool PhaseChange;
+  bool coefIsEnabled;
 
   wxChoice* mOrbSetChoice;
 
@@ -315,21 +323,22 @@ class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
     void OnOrbFormatChoice( wxCommandEvent &event );
     void OnUsePlaneChk( wxCommandEvent &event );
     void OnReversePhase(wxCommandEvent &event );
+    void OnCoefList( wxCommandEvent &event );
 
  private:
     virtual bool UpdateNeeded(void);
     void CreateControls();
     void OnUpdate(wxCommandEvent &event );
 
-	wxBoxSizer* upperSizer;
-	wxBoxSizer* middleSizer;
-	wxBoxSizer* bottomSizer;
-	wxBoxSizer* leftMiddleSizer;
-	wxBoxSizer* upperLeftMiddleSizer;
-	wxBoxSizer* lowerLeftMiddleSizer;
-	wxFlexGridSizer* rightMiddleSizer;
-	wxBoxSizer* leftBottomSizer;
-	wxBoxSizer* rightBottomSizer;
+    wxBoxSizer* upperSizer;
+    wxBoxSizer* middleSizer;
+    wxBoxSizer* bottomSizer;
+    wxBoxSizer* leftMiddleSizer;
+    wxBoxSizer* upperLeftMiddleSizer;
+    wxBoxSizer* lowerLeftMiddleSizer;
+    wxFlexGridSizer* rightMiddleSizer;
+    wxBoxSizer* leftBottomSizer;
+    wxBoxSizer* rightBottomSizer;
 
     wxBoxSizer* mSubLeftBot1Sizer;
     wxBoxSizer* mSubLeftBot2Sizer;
@@ -338,7 +347,7 @@ class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
     wxGridSizer* mSubRightBot3Sizer;
 
     wxListBox* mAtomList;
-    wxTextCtrl* mOrbCoef;
+    wxListBox* mOrbCoef;
     wxChoice* mOrbFormatChoice;
     wxCheckBox* mSphHarmonicsChk;
     wxCheckBox* mUsePlaneChk;
@@ -390,16 +399,17 @@ public:
     void OnContourValueSld(wxCommandEvent &event );
     void OnGridSizeSld(wxCommandEvent &event );
     void OnUpdate(wxCommandEvent &event );
+    void OnCoefList( wxCommandEvent &event );
 
-	wxBoxSizer* upperSizer;
-	wxBoxSizer* middleSizer;
-	wxBoxSizer* bottomSizer;
-	wxBoxSizer* leftMiddleSizer;
-	wxBoxSizer* upperLeftMiddleSizer;
-	wxBoxSizer* lowerLeftMiddleSizer;
-	wxFlexGridSizer* rightMiddleSizer;
-	wxBoxSizer* leftBottomSizer;
-	wxBoxSizer* rightBottomSizer;
+    wxBoxSizer* upperSizer;
+    wxBoxSizer* middleSizer;
+    wxBoxSizer* bottomSizer;
+    wxBoxSizer* leftMiddleSizer;
+    wxBoxSizer* upperLeftMiddleSizer;
+    wxBoxSizer* lowerLeftMiddleSizer;
+    wxFlexGridSizer* rightMiddleSizer;
+    wxBoxSizer* leftBottomSizer;
+    wxBoxSizer* rightBottomSizer;
 
     wxBoxSizer* mSubLeftBot1Sizer;
     wxBoxSizer* mSubLeftBot2Sizer;
@@ -411,7 +421,7 @@ public:
     wxGridSizer* mSubRightBot5Sizer;
 
     wxListBox* mAtomList;
-    wxTextCtrl* mOrbCoef;
+    wxListBox* mOrbCoef;
     wxChoice* mOrbFormatChoice;
     wxCheckBox* mSphHarmonicsChk;
     wxCheckBox* mRevPhaseChk;  
