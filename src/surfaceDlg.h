@@ -44,6 +44,7 @@ class Surf3DBase;
 class Orb2DSurface;
 class Orb3DSurface;
 class General3DSurface;
+class General2DSurface;
 class OrbSurfBase;
 class SurfacesWindow;
 ////@end forward declarations
@@ -109,10 +110,6 @@ class SurfacesWindow;
 #define ID_GENCONPOSNEGCHECK 10104
 #define ID_GENSURFGRIDMINTEXT 10105
 #define ID_GRID_MAX_TEXT 10106
-#define ID_NUM_CONTOUR_TEXT 10107
-#define ID_NUM_CONTOUR_TEXT 10108
-#define ID_MAX_CONTOUR_VALUE_TEXT 10109
-#define ID_ORB_COEF 10110
 
 ////@end control identifiers
 
@@ -476,6 +473,56 @@ private:
 
     General3DSurface*	mTarget;
 	bool				ContourPosNeg;
+	bool				useMultValue;
+	bool				squareValues;
+	float				MultValue;
+	
+    DECLARE_EVENT_TABLE()
+};
+
+class General2DSurfPane : public Surface2DPane
+{    
+	DECLARE_CLASS( General3DSurfPane )
+	
+public:
+    /// Constructors
+    General2DSurfPane() { }
+    General2DSurfPane( wxWindow* parent, General2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    ~General2DSurfPane();
+	
+    virtual void TargetToPane();
+    virtual void refreshControls();
+	
+    /// Creates the controls and sizers
+    void CreateControls();
+	
+    /// Retrieves bitmap resources
+    wxBitmap GetBitmapResource( const wxString& name );
+	
+    /// Retrieves icon resources
+    wxIcon GetIconResource( const wxString& name );
+	
+    /// Should we show tooltips?
+    static bool ShowToolTips() {return true;};
+	
+private:
+	virtual bool UpdateNeeded(void);
+	
+	void OnMultCheck(wxCommandEvent &event);
+	void OnSquareCheck(wxCommandEvent &event);
+	void OnFileButton(wxCommandEvent &event);
+	void OnUpdate(wxCommandEvent &event );
+	void OnContourValueEnter(wxCommandEvent& event );
+	void OnMultValueEnter(wxCommandEvent& event );
+	
+    wxCheckBox* mMultCheck;
+    wxTextCtrl* mGenMultValue;
+    wxCheckBox* mSquareCheck;
+	wxString MultValueString;
+	wxString mMaxContourCountString;
+	wxString mMaxContourValueString;
+	
+    General2DSurface*	mTarget;
 	bool				useMultValue;
 	bool				squareValues;
 	float				MultValue;

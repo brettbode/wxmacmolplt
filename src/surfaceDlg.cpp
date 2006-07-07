@@ -45,6 +45,7 @@ IMPLEMENT_CLASS( Surface3DPane, wxPanel )
 IMPLEMENT_CLASS( Orbital2DSurfPane, wxPanel )
 IMPLEMENT_CLASS( Orbital3DSurfPane, wxPanel )
 IMPLEMENT_CLASS( General3DSurfPane, wxPanel )
+IMPLEMENT_CLASS( General2DSurfPane, wxPanel )
 
 IMPLEMENT_CLASS( Surface3DParamDlg, wxFrame )
 
@@ -105,6 +106,19 @@ BEGIN_EVENT_TABLE( General3DSurfPane, wxPanel )
 	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
 	EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, General3DSurfPane::OnUpdate)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE( General2DSurfPane, wxPanel )
+	EVT_BUTTON (ID_GENFILEBUTTON, General2DSurfPane::OnFileButton)
+	EVT_CHECKBOX (ID_GENMULTCHECK, General2DSurfPane::OnMultCheck)
+	EVT_CHECKBOX (ID_GENSQUARECHECK, General2DSurfPane::OnSquareCheck)
+	EVT_TEXT_ENTER (ID_CONTOUR_VALUE_EDIT, General2DSurfPane::OnContourValueEnter)
+	EVT_TEXT_ENTER (ID_GENMULTEDIT, General2DSurfPane::OnMultValueEnter)
+//	EVT_BUTTON (ID_FREE_MEM_BUT, Surface2DPane::OnFreeMem)
+	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface2DPane::OnNegColorChange)
+	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, General2DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( Surface3DParamDlg, wxFrame )
@@ -2301,6 +2315,267 @@ wxBitmap General3DSurfPane::GetBitmapResource( const wxString& name )
  */
 
 wxIcon General3DSurfPane::GetIconResource( const wxString& name )
+{
+    // Icon retrieval
+	////@begin Orbital3D icon retrieval
+    wxUnusedVar(name);
+    return wxNullIcon;
+	////@end Orbital3D icon retrieval
+}
+/*!
+* General2DSurfPane class
+ */
+
+General2DSurfPane::General2DSurfPane( wxWindow* parent, General2DSurface* target, 
+									  SurfacesWindow* o, wxWindowID id,
+									  const wxPoint& pos, const wxSize& size, 
+									  long style ) 
+: Surface2DPane(parent, target, o, id, pos, size, style)
+{
+	mTarget = target;
+	MultValue = -1.0;
+	useMultValue = false;
+	squareValues = false;
+	
+	TargetToPane();
+	CreateControls();
+	refreshControls();
+}
+
+General2DSurfPane::~General2DSurfPane()
+{
+	
+}
+
+void General2DSurfPane::CreateControls() {
+	General2DSurfPane * Gen2DPanel = this;	//this is here just to match the code below from DialogBlocks
+
+	wxBoxSizer* itemBoxSizer41 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer41, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText42 = new wxStaticText( Gen2DPanel, wxID_STATIC, _("Choose 2D grid file:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer41->Add(itemStaticText42, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    wxButton* itemButton43 = new wxButton( Gen2DPanel, ID_GENFILEBUTTON, _("Choose File..."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer41->Add(itemButton43, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer44 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer44, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    mMultCheck = new wxCheckBox( Gen2DPanel, ID_GENMULTCHECK, _("Multiply by:"), wxDefaultPosition, wxDefaultSize, 0 );
+    mMultCheck->SetValue(false);
+    if (ShowToolTips())
+        mMultCheck->SetToolTip(_("check to multiply the grid values by the value to the left as they are read in from file."));
+    itemBoxSizer44->Add(mMultCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    mGenMultValue = new wxTextCtrl( Gen2DPanel, ID_GENMULTEDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    if (ShowToolTips())
+        mGenMultValue->SetToolTip(_("Enter a value to multiply the grid by as it is read in from file."));
+    itemBoxSizer44->Add(mGenMultValue, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    mSquareCheck = new wxCheckBox( Gen2DPanel, ID_GENSQUARECHECK, _("Square Grid values as read in"), wxDefaultPosition, wxDefaultSize, 0 );
+    mSquareCheck->SetValue(false);
+    mainSizer->Add(mSquareCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer48 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer48, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText49 = new wxStaticText( Gen2DPanel, wxID_STATIC, _("Max # of contours:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer48->Add(itemStaticText49, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mNumContourText = new wxTextCtrl( Gen2DPanel, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer48->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer51 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer51, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText52 = new wxStaticText( Gen2DPanel, wxID_STATIC, _("Max contour value:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer51->Add(itemStaticText52, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mContourValText = new wxTextCtrl( Gen2DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer51->Add(mContourValText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer54 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer54, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+    wxBoxSizer* itemBoxSizer55 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer54->Add(itemBoxSizer55, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
+    wxStaticText* itemStaticText56 = new wxStaticText( Gen2DPanel, wxID_STATIC, _("Positive Color:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer55->Add(itemStaticText56, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mOrbColor1 = new colorArea( Gen2DPanel, ID_2D_COLOR_POSITIVE, &PosColor );
+    itemBoxSizer55->Add(mOrbColor1, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer58 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer54->Add(itemBoxSizer58, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
+    wxStaticText* itemStaticText59 = new wxStaticText( Gen2DPanel, wxID_STATIC, _("Negative Color:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer58->Add(itemStaticText59, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mOrbColor2 = new colorArea( Gen2DPanel, ID_2D_COLOR_NEGATIVE, &NegColor );
+    itemBoxSizer58->Add(mOrbColor2, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mShowZeroCheck = new wxCheckBox( Gen2DPanel, ID_SHOW_ZERO_CHECKBOX, _("Show zero value contour"), wxDefaultPosition, wxDefaultSize, 0 );
+    mShowZeroCheck->SetValue(false);
+    if (ShowToolTips())
+        mShowZeroCheck->SetToolTip(_("Check to produce a gray contour where the plane changes sign."));
+    mainSizer->Add(mShowZeroCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mDashCheck = new wxCheckBox( Gen2DPanel, ID_DASH_CHECKBOX, _("Dash negative contours"), wxDefaultPosition, wxDefaultSize, 0 );
+    mDashCheck->SetValue(false);
+    if (ShowToolTips())
+        mDashCheck->SetToolTip(_("Produces dashed negative contour lines for easier viewing in B & W."));
+    mainSizer->Add(mDashCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer63 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer63, 0, wxALIGN_RIGHT|wxALL, 5);
+//    mFreeMemBut = new wxButton( Gen2DPanel, ID_FREE_MEM_BUT, _("Free Mem"), wxDefaultPosition, wxDefaultSize, 0 );
+//    if (ShowToolTips())
+//        mFreeMemBut->SetToolTip(_("Click to free the memory used by the 3D grid."));
+//    itemBoxSizer63->Add(mFreeMemBut, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    mExportBut = new wxButton( Gen2DPanel, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
+    if (ShowToolTips())
+        mExportBut->SetToolTip(_("Click to export the selected surface to a text file."));
+    itemBoxSizer63->Add(mExportBut, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    mUpdateBut = new wxButton( Gen2DPanel, ID_SURFACE_UPDATE_BUT, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
+    mUpdateBut->SetDefault();
+    if (ShowToolTips())
+        mUpdateBut->SetToolTip(_("Click to apply your changes to the molecule display."));
+    itemBoxSizer63->Add(mUpdateBut, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+	mGenMultValue->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & MultValueString) );
+	mNumContourText->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & mMaxContourCountString) );
+	mContourValText->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & mMaxContourValueString) );
+}
+void General2DSurfPane::TargetToPane(void) 
+{
+	mTarget->GetPosColor(&PosColor);
+	mTarget->GetNegColor(&NegColor);
+	MaxContourValue = mTarget->GetMaxValue();
+	NumContours = mTarget->GetNumContours();
+	DashLines = mTarget->GetDashLine();
+	ShowZeroContour = mTarget->GetShowZeroContour();
+	UpdateTest = false;
+}
+bool General2DSurfPane::UpdateNeeded(void) 
+{
+	bool result = UpdateTest;
+	
+	if (mTarget->GridAvailable()) {	//Don't update unless a valid 2D grid has been read in from file
+		if (Visible != mTarget->GetVisibility()) result = true;
+		if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
+		if (NumContours != mTarget->GetNumContours()) result = true;
+		if (MaxContourValue != mTarget->GetMaxValue()) result = true;
+		if (ShowZeroContour != mTarget->GetShowZeroContour()) result = true;
+		if (DashLines != mTarget->GetDashLine()) result = true;
+		if (!result) {
+			RGBColor	testColor;
+			mTarget->GetPosColor(&testColor);
+			if ((PosColor.red != testColor.red)||(PosColor.green!=testColor.green)||
+				(PosColor.blue!=testColor.blue)) result=true;
+			mTarget->GetNegColor(&testColor);
+			if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)||
+				(NegColor.blue!=testColor.blue)) result=true;
+		}
+	}
+	return result;
+}
+void General2DSurfPane::OnUpdate(wxCommandEvent &event) {
+	mTarget->SetVisibility(Visible);
+	mTarget->SetNumContours(NumContours);
+	mTarget->SetMaxValue(MaxContourValue);
+	mTarget->SetPosColor(&PosColor);
+	mTarget->SetNegColor(&NegColor);
+	mTarget->SetShowZeroContour(ShowZeroContour);
+	mTarget->SetDashLine(DashLines);
+	
+	UpdateTest = false;
+	setUpdateButton();
+	owner->SurfaceUpdated();
+}
+
+void General2DSurfPane::refreshControls()
+{
+	wxString tmpStr;
+	tmpStr.Printf("%.2f", MaxContourValue);
+	mContourValText->SetValue(tmpStr);
+	tmpStr.Printf("%ld", NumContours);
+	mNumContourText->SetValue(tmpStr);
+	
+	tmpStr.Printf("%.4f", MultValue);
+	mGenMultValue->SetValue(tmpStr);
+	mMultCheck->SetValue(useMultValue);
+	mSquareCheck->SetValue(squareValues);
+
+	mOrbColor1->setColor(&PosColor);
+	mOrbColor2->setColor(&NegColor);
+	
+	mShowZeroCheck->SetValue(ShowZeroContour);
+	mDashCheck->SetValue(DashLines);
+}
+
+void General2DSurfPane::OnFileButton(wxCommandEvent& event ) {
+	mTarget->ReadGrid(squareValues, useMultValue, MultValue);
+	UpdateTest = true;
+	refreshControls();
+	setUpdateButton();
+}
+
+void General2DSurfPane::OnMultCheck( wxCommandEvent &event )
+{
+	useMultValue = mMultCheck->GetValue();
+	setUpdateButton();
+}
+void General2DSurfPane::OnSquareCheck( wxCommandEvent &event )
+{
+	squareValues = mSquareCheck->GetValue();
+	setUpdateButton();
+}
+void General2DSurfPane::OnMultValueEnter(wxCommandEvent& event )
+{
+	double newVal=0.0;
+	wxString temp = mGenMultValue->GetValue();
+	
+	if (temp.ToDouble(&newVal)) {
+		MultValue = newVal;
+	}
+	temp.Printf("%.4f", MultValue);
+	mGenMultValue->SetValue(temp);
+	setUpdateButton();
+}
+void General2DSurfPane::OnContourValueEnter(wxCommandEvent& event )
+{
+	double newVal=0.0;
+	
+	wxString tmpStr = mContourValText->GetValue();
+	if (!tmpStr.ToDouble(&newVal)) {
+		tmpStr.Printf("%.4f", MaxContourValue);
+		mContourValText->SetValue(tmpStr);
+		return;
+	}
+	
+	if (newVal > 0.0) MaxContourValue = newVal;
+	
+	tmpStr.Printf("%.4f", newVal);
+	mContourValText->SetValue(tmpStr);
+		
+	setUpdateButton();
+}
+
+/*!
+* Get bitmap resources
+ */
+
+wxBitmap General2DSurfPane::GetBitmapResource( const wxString& name )
+{
+    // Bitmap retrieval
+	////@begin Orbital3D bitmap retrieval
+    wxUnusedVar(name);
+    return wxNullBitmap;
+	////@end Orbital3D bitmap retrieval
+}
+
+/*!
+* Get icon resources
+ */
+
+wxIcon General2DSurfPane::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 	////@begin Orbital3D icon retrieval
