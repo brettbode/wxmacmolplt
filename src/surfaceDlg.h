@@ -226,6 +226,8 @@ class Surface2DPane : public BaseSurfacePane
   void OnDashChk(wxCommandEvent& event );
   void OnTextEnter( wxCommandEvent &event );
   void OnIdle( wxIdleEvent& WXUNUSED(event) );
+  void OnSetPlane( wxCommandEvent &event );
+  void OnSetParam( wxCommandEvent &event );
 
  protected:
 
@@ -271,6 +273,8 @@ public:
   void OnPosColorChange(wxCommandEvent & event);
   void OnNegColorChange(wxCommandEvent & event);
   void OnTranspColorChange(wxCommandEvent & event);
+  void OnIdle( wxIdleEvent& WXUNUSED(event) );
+  void OnSetParam( wxCommandEvent &event );
 
   void setContourValueSld();
 
@@ -296,6 +300,7 @@ protected:
   float ContourValue;
 
  private:
+  void changeContourValue();
 
   Surf3DBase* mTarget;
 
@@ -373,6 +378,16 @@ public:
     /// Creates the controls and sizers
     void CreateControls();
 
+    void OnOrbFormatChoice( wxCommandEvent &event );
+    void OnAtomList( wxCommandEvent &event );
+    void OnOrbSetChoice( wxCommandEvent &event );
+    void OnSphHarmonicChk(wxCommandEvent &event );
+    void OnReversePhase(wxCommandEvent &event );
+    void OnContourValueSld(wxCommandEvent &event );
+    void OnGridSizeSld(wxCommandEvent &event );
+    void OnUpdate(wxCommandEvent &event );
+    void OnCoefList( wxCommandEvent &event );
+
 ////@begin Orbital3D member function declarations
 
     /// Retrieves bitmap resources
@@ -387,16 +402,6 @@ public:
 
  private:
     virtual bool UpdateNeeded(void);
-
-    void OnOrbFormatChoice( wxCommandEvent &event );
-    void OnAtomList( wxCommandEvent &event );
-    void OnOrbSetChoice( wxCommandEvent &event );
-    void OnSphHarmonicChk(wxCommandEvent &event );
-    void OnReversePhase(wxCommandEvent &event );
-    void OnContourValueSld(wxCommandEvent &event );
-    void OnGridSizeSld(wxCommandEvent &event );
-    void OnUpdate(wxCommandEvent &event );
-    void OnCoefList( wxCommandEvent &event );
 
     wxBoxSizer* upperSizer;
     wxBoxSizer* middleSizer;
@@ -530,26 +535,49 @@ private:
     DECLARE_EVENT_TABLE()
 };
 
-/*
+
 class Surface2DParamDlg : public wxFrame 
 {
+  DECLARE_CLASS(Surface2DParamDlg);
+
  public:
-  Surface2DParamDlg(BaseSurfacePane * parent, Surf2DBase * targetSurface);
-  ~Surface2DParamDlg(void);
+  Surface2DParamDlg(BaseSurfacePane * parent, Surf2DBase * targetSurface, wxWindowID id = ID_2D_PARAM_DIALOG, const wxString& caption = SYMBOL_2D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE );
+
+  ~Surface2DParamDlg(void) {}
+
+  bool Create(wxWindowID id = ID_2D_PARAM_DIALOG, const wxString& caption = SYMBOL_2D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE );
 
  private:
+  void createControls();
+
+  void OnClose(wxCommandEvent &event );
+  void OnCancel(wxCommandEvent &event );
+  void OnCopyAll(wxCommandEvent &event );
+  void OnPasteAll(wxCommandEvent &event );
+
+  wxBoxSizer* mainSizer;
+  wxBoxSizer *firstTierSizer, *secondTierSizer, *thirdTierSizer;
+  wxBoxSizer *fourthTierSizer, *fifthTierSizer;
+
+  wxTextCtrl *numGridPoint;
+  wxTextCtrl *originText1, *originText2, *originText3;
+  wxTextCtrl *vectorAxis1x, *vectorAxis1y, *vectorAxis1z;
+  wxTextCtrl *vectorAxis2x, *vectorAxis2y, *vectorAxis2z;
+  wxButton *okButton, *cancelButton, *copyAllButton, *pasteAllButton;
+
   BaseSurfacePane * mParent;
   Surf2DBase * mTargetSurf;
+
+  DECLARE_EVENT_TABLE()
 };
-*/
+
 
 class Surface3DParamDlg : public wxFrame 
 {
   DECLARE_CLASS(Surface3DParamDlg);
 
  public:
-  Surface3DParamDlg(BaseSurfacePane * parent, Surface * targetSurface, wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE );
-
+  Surface3DParamDlg(BaseSurfacePane * parent, Surf3DBase * targetSurface, wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE );
 
   ~Surface3DParamDlg(void){}
 

@@ -3026,6 +3026,7 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 	}
 
 	BufferFile * Buffer = NULL;
+
 	bool	success = false;
 	long	LineLength, LinePos;
 	short	scanerr;
@@ -3173,6 +3174,7 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 	}
 
 	BufferFile * Buffer = NULL;
+
 	bool	success = false;
 	long	LineLength, LinePos, tempL;
 	CPoint3D	tempPt;

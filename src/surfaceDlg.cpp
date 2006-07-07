@@ -31,6 +31,7 @@
 #include "Progress.h"
 #include "MolDisplayWin.h"
 #include "surfaceswindow.h"
+#include "setscreenplane.h"
 
 #include <wx/config.h>
 
@@ -47,6 +48,7 @@ IMPLEMENT_CLASS( Orbital3DSurfPane, wxPanel )
 IMPLEMENT_CLASS( General3DSurfPane, wxPanel )
 IMPLEMENT_CLASS( General2DSurfPane, wxPanel )
 
+IMPLEMENT_CLASS( Surface2DParamDlg, wxFrame )
 IMPLEMENT_CLASS( Surface3DParamDlg, wxFrame )
 
 BEGIN_EVENT_TABLE( Orbital2DSurfPane, wxPanel )
@@ -61,6 +63,8 @@ BEGIN_EVENT_TABLE( Orbital2DSurfPane, wxPanel )
   EVT_CHECKBOX (ID_DASH_CHECKBOX, Surface2DPane::OnDashChk)
   EVT_CHECKBOX (ID_REVERSE_PHASE_CHECKBOX, Orbital2DSurfPane::OnReversePhase)
   EVT_BUTTON (ID_SURFACE_UPDATE_BUT, Orbital2DSurfPane::OnUpdate)
+  EVT_BUTTON (ID_SET_PARAM_BUT, Surface2DPane::OnSetParam)
+  EVT_BUTTON (ID_SET_PLANE_BUT, Surface2DPane::OnSetPlane)
   EVT_COMMAND_ENTER(ID_2D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
   EVT_COMMAND_ENTER(ID_2D_COLOR_NEGATIVE, Surface2DPane::OnNegColorChange)
   EVT_TEXT_ENTER (ID_NUM_CONTOUR_TEXT, Surface2DPane::OnTextEnter)
@@ -82,12 +86,13 @@ BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
   EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
   EVT_BUTTON (ID_SURFACE_UPDATE_BUT, Orbital3DSurfPane::OnUpdate)
   EVT_TEXT_ENTER (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
-  EVT_BUTTON (ID_SET_PARAM_BUT, BaseSurfacePane::OnSetParam)
+  EVT_BUTTON (ID_SET_PARAM_BUT, Surface3DPane::OnSetParam)
   EVT_BUTTON (ID_FREE_MEM_BUT, Surface3DPane::OnFreeMem)
   EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
   EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
   EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
   EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
+  EVT_IDLE(Surface3DPane::OnIdle)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( General3DSurfPane, wxPanel )
@@ -119,6 +124,13 @@ BEGIN_EVENT_TABLE( General2DSurfPane, wxPanel )
 	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface2DPane::OnNegColorChange)
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, General2DSurfPane::OnUpdate)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE( Surface2DParamDlg, wxFrame )
+  EVT_BUTTON (wxID_OK, Surface2DParamDlg::OnClose)
+  EVT_BUTTON (wxID_CANCEL, Surface2DParamDlg::OnCancel)
+  EVT_BUTTON (ID_COPY_ALL, Surface2DParamDlg::OnCopyAll)
+  EVT_BUTTON (ID_PASTE_ALL, Surface2DParamDlg::OnPasteAll)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( Surface3DParamDlg, wxFrame )
@@ -179,12 +191,6 @@ void BaseSurfacePane::OnGridPointSld( wxCommandEvent &event )
   SwitchFixGrid = true;
 
   setUpdateButton();
-}
-
-void BaseSurfacePane::OnSetParam( wxCommandEvent &event )
-{
-  Surface3DParamDlg* paramDlg = new Surface3DParamDlg(this, mTarget);
-  paramDlg->Show();
 }
 
 void BaseSurfacePane::OnExport( wxCommandEvent &event )
@@ -751,10 +757,10 @@ void Surface2DPane::OnIdle( wxIdleEvent& WXUNUSED(event) )
 	{
 	  NumContours = atol((mNumContourText->GetValue()).c_str());
 	  MaxContourValue = atof((mContourValText->GetValue()).c_str());
+	  setUpdateButton();
 	}
     }
 
-  setUpdateButton();
 }
 
 void Surface2DPane::OnDashChk(wxCommandEvent& event )
@@ -767,6 +773,18 @@ void Surface2DPane::OnShowZeroChk( wxCommandEvent &event )
 {
   ShowZeroContour = mShowZeroCheck->GetValue();
   setUpdateButton();
+}
+
+void Surface2DPane::OnSetPlane( wxCommandEvent &event )
+{
+  SetScreenPlane * temp = new SetScreenPlane(owner->GetParent());
+  temp->Show();
+}
+
+void Surface2DPane::OnSetParam( wxCommandEvent &event )
+{
+  Surface2DParamDlg* paramDlg = new Surface2DParamDlg(this, mTarget);
+  paramDlg->Show();
 }
 
 /*
@@ -817,7 +835,7 @@ void Surface3DPane::OnSmoothCheck (wxCommandEvent& event )
   setUpdateButton();
 }
 
-void Surface3DPane::OnContourValueEnter(wxCommandEvent& event )
+void Surface3DPane::changeContourValue()
 {
   float newVal;
 
@@ -838,6 +856,31 @@ void Surface3DPane::OnContourValueEnter(wxCommandEvent& event )
     }
 }
 
+void Surface3DPane::OnContourValueEnter(wxCommandEvent& event )
+{
+  changeContourValue();
+}
+
+void Surface3DPane::OnIdle( wxIdleEvent& WXUNUSED(event) )
+{
+  static wxWindow *s_windowFocus = (wxWindow *)NULL;
+  wxWindow *focus = wxWindow::FindFocus();
+
+  if ( focus && (focus != s_windowFocus) )
+    {
+      s_windowFocus = focus;
+      wxString className = s_windowFocus->GetClassInfo()->GetClassName();
+
+      if (className.Cmp(_T("wxTextCtrl")) == 0 
+	  || className.Cmp(_T("Orbital3DSurfPane")) == 0 )
+	{
+	  changeContourValue();
+	  setUpdateButton();
+	}
+    }
+
+}
+
 void Surface3DPane::OnFreeMem(wxCommandEvent& event )
 {
   mTarget->FreeGrid();
@@ -855,6 +898,12 @@ void Surface3DPane::OnNegColorChange(wxCommandEvent & event) {
 void Surface3DPane::OnTranspColorChange(wxCommandEvent & event) {
 	mTransColor->getColor(&TranspColor);
 	setUpdateButton();
+}
+
+void Surface3DPane::OnSetParam( wxCommandEvent &event )
+{
+  Surface3DParamDlg* paramDlg = new Surface3DParamDlg(this, mTarget);
+  paramDlg->Show();
 }
 
 /*!
@@ -1072,6 +1121,9 @@ bool Orbital2DSurfPane::UpdateNeeded(void)
 {
   bool result = false;
 
+  NumContours = atol((mNumContourText->GetValue()).c_str());
+  MaxContourValue = atof((mContourValText->GetValue()).c_str());
+
   if (PlotOrb >= 0) 
     {	//Don't update unless a valid orbital is chosen
       if (PlotOrb != mTarget->GetTargetOrb()) result=true;
@@ -1187,7 +1239,24 @@ void Orbital2DSurfPane::OnUpdate(wxCommandEvent &event )
 
 void Orbital2DSurfPane::refreshControls()
 {
+  wxString tmpStr;
 
+  mNumGridPntSld->SetValue(NumGridPoints);
+  mSphHarmonicsChk->SetValue(SphericalHarmonics); 
+
+  tmpStr.Printf("%ld", NumContours);
+  mNumContourText->SetValue(tmpStr);
+
+  tmpStr.Printf("%.2f", MaxContourValue);
+  mContourValText->SetValue(tmpStr);
+
+  mUsePlaneChk->SetValue(UseScreenPlane);
+  mRevPhaseChk->SetValue(PhaseChange);
+  mDashCheck->SetValue(DashLines);
+  mShowZeroCheck->SetValue(ShowZeroContour);
+
+  mOrbColor1->setColor(&PosColor);
+  mOrbColor2->setColor(&NegColor);
 }
 
 void Orbital2DSurfPane::OnOrbSetChoice( wxCommandEvent &event )
@@ -1565,6 +1634,7 @@ void Orbital3DSurfPane::CreateControls()
   rightBottomSizer->Add(mSubRightBot5Sizer);
 
   middleSizer->Add(leftMiddleSizer, 0, wxALL, 10);
+  middleSizer->Add(45,10);
   middleSizer->Add(rightMiddleSizer, 0, wxALL, 10);
   bottomSizer->Add(leftBottomSizer, 0, wxALL, 3);
   bottomSizer->Add(rightBottomSizer, 0, wxALL, 3);
@@ -1576,6 +1646,8 @@ void Orbital3DSurfPane::CreateControls()
 bool Orbital3DSurfPane::UpdateNeeded(void) 
 {
   bool result = false;
+
+  ContourValue = atof(mContourValueEdit->GetValue());
 
   if (PlotOrb >= 0) 
     {	//Don't update unless a valid orbital is chosen
@@ -1907,7 +1979,6 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event )
   owner->SurfaceUpdated();
 }
 
-
 bool Orbital3DSurfPane::ShowToolTips()
 {
     return true;
@@ -1939,14 +2010,6 @@ wxIcon Orbital3DSurfPane::GetIconResource( const wxString& name )
 ////@end Orbital3D icon retrieval
 }
 
-Surface3DParamDlg::Surface3DParamDlg(BaseSurfacePane * parent, Surface * targetSurface, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style)
-{
-  mParent = parent;
-  mTargetSurf = dynamic_cast<Surf3DBase*>(targetSurface);
-
-  Create(id, caption, pos, size, style);
- 
-}
 /*!
 * General3DSurfPane class
  */
@@ -2582,6 +2645,250 @@ wxIcon General2DSurfPane::GetIconResource( const wxString& name )
     wxUnusedVar(name);
     return wxNullIcon;
 	////@end Orbital3D icon retrieval
+}
+
+Surface2DParamDlg::Surface2DParamDlg(BaseSurfacePane * parent, Surf2DBase * targetSurface, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style)
+{
+  mParent = parent;
+  mTargetSurf = targetSurface;
+
+  Create(id, caption, pos, size, style);
+
+}
+
+bool Surface2DParamDlg::Create(wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style)
+{
+  wxFrame::Create( mParent, id, caption, pos, size, style );
+
+  createControls();
+
+  GetSizer()->Fit(this);
+  GetSizer()->SetSizeHints(this);
+  Centre();
+
+  return true;
+}
+
+void Surface2DParamDlg::createControls()
+{
+  wxString tmpStr;
+  CPoint3D tempPt;
+  mTargetSurf->GetOrigin(&tempPt);
+
+  mainSizer = new wxBoxSizer(wxVERTICAL);
+
+  firstTierSizer = new wxBoxSizer(wxHORIZONTAL);
+  secondTierSizer = new wxBoxSizer(wxHORIZONTAL);
+  thirdTierSizer = new wxBoxSizer(wxHORIZONTAL);
+  fourthTierSizer = new wxBoxSizer(wxHORIZONTAL);
+  fifthTierSizer = new wxBoxSizer(wxHORIZONTAL);
+
+  firstTierSizer->Add(new wxStaticText(this, wxID_ANY,
+				       _T("Number of grid points:"),
+				       wxDefaultPosition, wxDefaultSize), 
+		 0, wxALIGN_LEFT | wxALL, 3);
+
+  numGridPoint = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
+  tmpStr.Printf("%ld", mTargetSurf->GetNumGridPoints());
+  numGridPoint->SetValue(tmpStr);
+  firstTierSizer->Add(numGridPoint, 0, wxALL, 5);
+
+  mainSizer->Add(firstTierSizer);
+
+  mTargetSurf->GetOrigin(&tempPt);
+
+  mainSizer->Add(new wxStaticText(this, wxID_ANY,
+				  _T("Origin (x, y, z):"),
+				  wxDefaultPosition, wxDefaultSize), 
+		 0, wxALIGN_LEFT | wxALL, 3);
+
+  originText1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+  tmpStr.Printf("%f", tempPt.x);
+  originText1->SetValue(tmpStr);
+
+  originText2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+  tmpStr.Printf("%f", tempPt.y);
+  originText2->SetValue(tmpStr);
+
+  originText3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+  tmpStr.Printf("%f", tempPt.z);
+  originText3->SetValue(tmpStr);
+
+  secondTierSizer->Add(originText1, 0, wxALL, 5);
+  secondTierSizer->Add(originText2, 0, wxALL, 5);
+  secondTierSizer->Add(originText3, 0, wxALL, 5);
+
+  mainSizer->Add(secondTierSizer);
+
+  mTargetSurf->GetXIncrement(&tempPt);
+
+  mainSizer->Add(new wxStaticText(this, wxID_ANY,
+				  _T("Vector defining axis 1:"),
+				  wxDefaultPosition, wxDefaultSize), 
+		 0, wxALIGN_LEFT | wxALL, 3);
+
+  vectorAxis1x = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+  tmpStr.Printf("%f", tempPt.x);
+  vectorAxis1x->SetValue(tmpStr);
+
+  vectorAxis1y = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+  tmpStr.Printf("%f", tempPt.y);
+  vectorAxis1y->SetValue(tmpStr);
+
+  vectorAxis1z = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+  tmpStr.Printf("%f", tempPt.z);
+  vectorAxis1z->SetValue(tmpStr);
+
+  thirdTierSizer->Add(vectorAxis1x, 0, wxALL, 5);
+  thirdTierSizer->Add(vectorAxis1y, 0, wxALL, 5);
+  thirdTierSizer->Add(vectorAxis1z, 0, wxALL, 5);
+
+  mTargetSurf->GetYIncrement(&tempPt);
+
+  mainSizer->Add(thirdTierSizer);
+
+  mainSizer->Add(new wxStaticText(this, wxID_ANY,
+				  _T("Vector defining axis 2:"),
+				  wxDefaultPosition, wxDefaultSize), 
+		 0, wxALIGN_LEFT | wxALL, 3);
+
+  vectorAxis2x = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+  tmpStr.Printf("%f", tempPt.x);
+  vectorAxis2x->SetValue(tmpStr);
+
+  vectorAxis2y = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+  tmpStr.Printf("%f", tempPt.y);
+  vectorAxis2y->SetValue(tmpStr);
+
+  vectorAxis2z = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+  tmpStr.Printf("%f", tempPt.z);
+  vectorAxis2z->SetValue(tmpStr);
+
+  fourthTierSizer->Add(vectorAxis2x, 0, wxALL, 5);
+  fourthTierSizer->Add(vectorAxis2y, 0, wxALL, 5);
+  fourthTierSizer->Add(vectorAxis2z, 0, wxALL, 5);
+
+  mainSizer->Add(fourthTierSizer);
+
+  okButton = new wxButton( this, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize);
+  cancelButton = new wxButton( this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize);
+  copyAllButton = new wxButton( this, ID_COPY_ALL, _("&Copy All"), wxDefaultPosition, wxDefaultSize);
+  pasteAllButton = new wxButton( this, ID_PASTE_ALL, _("&Paste All"), wxDefaultPosition, wxDefaultSize);
+
+  fifthTierSizer->Add(copyAllButton , 0, wxALL, 5);
+  fifthTierSizer->Add(pasteAllButton , 0, wxALL, 5);
+  fifthTierSizer->Add(cancelButton , 0, wxALL, 5);
+  fifthTierSizer->Add(okButton , 0, wxALL, 5);
+
+  mainSizer->Add(fifthTierSizer);
+
+  SetSizer(mainSizer);
+}
+
+void Surface2DParamDlg::OnClose(wxCommandEvent &event )
+{
+  wxString tmpStr;
+  long tempLong;
+  CPoint3D tempPt;
+  float	tempFlt;
+
+  tmpStr = numGridPoint->GetValue();
+  tempLong = atol(tmpStr.c_str());
+  mTargetSurf->SetNumGridPoints(tempLong);
+
+  tmpStr = originText1->GetValue();
+  tempPt.x = atof(tmpStr.c_str());
+  tmpStr = originText2->GetValue();
+  tempPt.y = atof(tmpStr.c_str());
+  tmpStr = originText3->GetValue();
+  tempPt.z = atof(tmpStr.c_str());
+
+  mTargetSurf->SetOrigin(&tempPt);
+
+  tmpStr = vectorAxis1x->GetValue();
+  tempPt.x = atof(tmpStr);
+  tmpStr = vectorAxis1y->GetValue();
+  tempPt.y = atof(tmpStr);			     
+  tmpStr = vectorAxis1z->GetValue();
+  tempPt.z = atof(tmpStr);
+
+  mTargetSurf->SetXIncrement(&tempPt);
+
+  tmpStr = vectorAxis2x->GetValue();
+  tempPt.x = atof(tmpStr);
+  tmpStr = vectorAxis2y->GetValue();
+  tempPt.y = atof(tmpStr);			     
+  tmpStr = vectorAxis2z->GetValue();
+  tempPt.z = atof(tmpStr);
+
+  mTargetSurf->SetYIncrement(&tempPt);
+
+  mTargetSurf->SetRotate2DMap(false);
+
+  mParent->TargetToPane();
+  mParent->refreshControls();
+  mParent->SetUpdateTest(true);
+
+  Destroy();
+}
+
+void Surface2DParamDlg::OnCancel(wxCommandEvent &event )
+{
+  Destroy();
+}
+
+/*!!! Use wxWidgets' config class to implement copyAll and pasteAll
+  instead of operating on a file directly
+*/
+
+void Surface2DParamDlg::OnCopyAll(wxCommandEvent &event )
+{
+  wxConfigBase *pConfig = wxConfigBase::Get();
+
+  pConfig->Write(_T("/Parameters/Surface2D/NumGridPoints"), numGridPoint->GetValue());
+
+  pConfig->Write(_T("/Parameters/Surface2D/OriginX"), originText1->GetValue());
+  pConfig->Write(_T("/Parameters/Surface2D/OriginY"), originText2->GetValue());
+  pConfig->Write(_T("/Parameters/Surface2D/OriginZ"), originText3->GetValue());
+
+  pConfig->Write(_T("/Parameters/Surface2D/vectorAxis1x"), vectorAxis1x->GetValue());
+  pConfig->Write(_T("/Parameters/Surface2D/vectorAxis1y"), vectorAxis1y->GetValue());
+  pConfig->Write(_T("/Parameters/Surface2D/vectorAxis1z"), vectorAxis1z->GetValue());
+
+  pConfig->Write(_T("/Parameters/Surface2D/vectorAxis2x"), vectorAxis2x->GetValue());
+  pConfig->Write(_T("/Parameters/Surface2D/vectorAxis2y"), vectorAxis2y->GetValue());
+  pConfig->Write(_T("/Parameters/Surface2D/vectorAxis2z"), vectorAxis2z->GetValue());
+
+}
+
+void Surface2DParamDlg::OnPasteAll(wxCommandEvent &event )
+{
+  wxConfigBase *pConfig = wxConfigBase::Get();
+
+  pConfig->SetPath(_T("/Parameters/Surface2D"));
+
+  numGridPoint->SetValue(pConfig->Read(_T("NumGridPoints")));
+
+  originText1->SetValue(pConfig->Read(_T("OriginX")));
+  originText2->SetValue(pConfig->Read(_T("OriginY")));
+  originText3->SetValue(pConfig->Read(_T("OriginZ")));
+
+  vectorAxis1x->SetValue(pConfig->Read(_T("vectorAxis1x")));
+  vectorAxis1y->SetValue(pConfig->Read(_T("vectorAxis1y")));
+  vectorAxis1z->SetValue(pConfig->Read(_T("vectorAxis1z")));
+
+  vectorAxis2x->SetValue(pConfig->Read(_T("vectorAxis2x")));
+  vectorAxis2y->SetValue(pConfig->Read(_T("vectorAxis2y")));
+  vectorAxis2z->SetValue(pConfig->Read(_T("vectorAxis2z")));
+}
+
+Surface3DParamDlg::Surface3DParamDlg(BaseSurfacePane * parent, Surf3DBase * targetSurface, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style)
+{
+  mParent = parent;
+  mTargetSurf = targetSurface;
+
+  Create(id, caption, pos, size, style);
+ 
 }
 
 bool Surface3DParamDlg::Create(wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style)
