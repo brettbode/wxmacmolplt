@@ -3026,7 +3026,7 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 	}
 
 	BufferFile * Buffer = NULL;
-	bool	Success = false;
+	bool	success = false;
 	long	LineLength, LinePos;
 	short	scanerr;
 	CPoint3D	tempPt;
@@ -3117,14 +3117,14 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 		HUnlock(Grid);
 #endif
 
-		Success = true;
+		success = true;
 	}
 	catch (DataError Error) { Error.WriteError();}
 	catch (FileError Error) { Error.WriteError();}
 	catch (...) {
-		Success = false;
+		success = false;
 	}
-	if (!Success && FirstFile) {	//invalid data or out of memory, etc
+	if (!success && FirstFile) {	//invalid data or out of memory, etc
 		if (Label) {delete [] Label; Label = NULL;}
 		FreeGrid();
 	}
@@ -3173,7 +3173,7 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 	}
 
 	BufferFile * Buffer = NULL;
-	bool	Success = false;
+	bool	success = false;
 	long	LineLength, LinePos, tempL;
 	CPoint3D	tempPt;
 	short	scanerr;
@@ -3264,14 +3264,14 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 		HUnlock(Grid);
 #endif
 
-		Success = true;
+		success = true;
 	}
 	catch (DataError Error) { Error.WriteError();}
 	catch (FileError Error) { Error.WriteError();}
 	catch (...) {
-		Success = false;
+		success = false;
 	}
-	if (!Success && FirstFile) {	//invalid data or out of memory, etc
+	if (!success && FirstFile) {	//invalid data or out of memory, etc
 		if (Label) {delete [] Label; Label = NULL;}
 		if (Grid) FreeGrid();
 	}
