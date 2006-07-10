@@ -44,12 +44,13 @@ class wxGrid;
 #define SYMBOL_COORDINATESWINDOW_IDNAME ID_COORDINATESDIALOG
 #define SYMBOL_COORDINATESWINDOW_SIZE wxSize(400, 300)
 #define SYMBOL_COORDINATESWINDOW_POSITION wxDefaultPosition
+#define MMP_COPYCOORDSITEM 10027
+#define ID_STICKMENU 10028
+#define ID_PANEL3 10222
 #define ID_BONDBUTTON 10023
 #define ID_STICKBUTTON 10024
 #define ID_COORDCHOICE1 10025
 #define ID_COORDGRID 10026
-#define MMP_COPYCOORDSITEM 10027
-#define ID_STICKMENU 10028
 ////@end control identifiers
 
 /*!
@@ -84,33 +85,6 @@ public:
 
     /// wxEVT_CLOSE_WINDOW event handler for ID_COORDINATESDIALOG
     void OnCloseWindow( wxCloseEvent& event );
-
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
-    void OnAddClick( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE
-    void OnDeleteClick( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BONDBUTTON
-    void OnBondbuttonClick( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_STICKBUTTON
-    void OnStickbuttonClick( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_COORDCHOICE1
-    void OnCoordchoice1Selected( wxCommandEvent& event );
-
-    /// wxEVT_GRID_CELL_CHANGE event handler for ID_COORDGRID
-    void OnCellChange( wxGridEvent& event );
-
-    /// wxEVT_GRID_SELECT_CELL event handler for ID_COORDGRID
-    void OnSelectCell( wxGridEvent& event );
-
-    /// wxEVT_GRID_RANGE_SELECT event handler for ID_COORDGRID
-    void OnRangeSelect( wxGridRangeSelectEvent& event );
-
-    /// wxEVT_SIZE event handler for ID_COORDGRID
-    void OnSize( wxSizeEvent& event );
 
     /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE
     void OnCloseClick( wxCommandEvent& event );
@@ -147,6 +121,33 @@ public:
 
     /// wxEVT_UPDATE_UI event handler for ID_STICKMENU
     void OnStickmenuUpdate( wxUpdateUIEvent& event );
+
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
+    void OnAddClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE
+    void OnDeleteClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BONDBUTTON
+    void OnBondbuttonClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_STICKBUTTON
+    void OnStickbuttonClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_COORDCHOICE1
+    void OnCoordchoice1Selected( wxCommandEvent& event );
+
+    /// wxEVT_GRID_CELL_CHANGE event handler for ID_COORDGRID
+    void OnCellChange( wxGridEvent& event );
+
+    /// wxEVT_GRID_SELECT_CELL event handler for ID_COORDGRID
+    void OnSelectCell( wxGridEvent& event );
+
+    /// wxEVT_GRID_RANGE_SELECT event handler for ID_COORDGRID
+    void OnRangeSelect( wxGridRangeSelectEvent& event );
+
+    /// wxEVT_SIZE event handler for ID_COORDGRID
+    void OnSize( wxSizeEvent& event );
 
 ////@end CoordinatesWindow event handler declarations
 	

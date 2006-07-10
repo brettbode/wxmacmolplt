@@ -77,21 +77,6 @@ BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 ////@begin CoordinatesWindow event table entries
     EVT_CLOSE( CoordinatesWindow::OnCloseWindow )
 
-    EVT_BUTTON( wxID_ADD, CoordinatesWindow::OnAddClick )
-
-    EVT_BUTTON( wxID_DELETE, CoordinatesWindow::OnDeleteClick )
-
-    EVT_BUTTON( ID_BONDBUTTON, CoordinatesWindow::OnBondbuttonClick )
-
-    EVT_BUTTON( ID_STICKBUTTON, CoordinatesWindow::OnStickbuttonClick )
-
-    EVT_CHOICE( ID_COORDCHOICE1, CoordinatesWindow::OnCoordchoice1Selected )
-
-    EVT_GRID_CELL_CHANGE( CoordinatesWindow::OnCellChange )
-    EVT_GRID_SELECT_CELL( CoordinatesWindow::OnSelectCell )
-    EVT_GRID_RANGE_SELECT( CoordinatesWindow::OnRangeSelect )
-    EVT_SIZE( CoordinatesWindow::OnSize )
-
     EVT_MENU( wxID_CLOSE, CoordinatesWindow::OnCloseClick )
 
     EVT_UPDATE_UI( wxID_UNDO, CoordinatesWindow::OnUndoUpdate )
@@ -112,6 +97,21 @@ BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 
     EVT_MENU( ID_STICKMENU, CoordinatesWindow::OnStickmenuClick )
     EVT_UPDATE_UI( ID_STICKMENU, CoordinatesWindow::OnStickmenuUpdate )
+
+    EVT_BUTTON( wxID_ADD, CoordinatesWindow::OnAddClick )
+
+    EVT_BUTTON( wxID_DELETE, CoordinatesWindow::OnDeleteClick )
+
+    EVT_BUTTON( ID_BONDBUTTON, CoordinatesWindow::OnBondbuttonClick )
+
+    EVT_BUTTON( ID_STICKBUTTON, CoordinatesWindow::OnStickbuttonClick )
+
+    EVT_CHOICE( ID_COORDCHOICE1, CoordinatesWindow::OnCoordchoice1Selected )
+
+    EVT_GRID_CELL_CHANGE( CoordinatesWindow::OnCellChange )
+    EVT_GRID_SELECT_CELL( CoordinatesWindow::OnSelectCell )
+    EVT_GRID_RANGE_SELECT( CoordinatesWindow::OnRangeSelect )
+    EVT_SIZE( CoordinatesWindow::OnSize )
 
 ////@end CoordinatesWindow event table entries
 
@@ -152,8 +152,6 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
     wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
-    GetSizer()->Fit(this);
-    GetSizer()->SetSizeHints(this);
     Centre();
 ////@end CoordinatesWindow creation
     return true;
@@ -169,90 +167,92 @@ void CoordinatesWindow::CreateControls()
     CoordinatesWindow* itemFrame1 = this;
 
     wxMenuBar* menuBar = new wxMenuBar;
-    wxMenu* itemMenu12 = new wxMenu;
-    itemMenu12->Append(wxID_NEW, _("&New\tCtrl+N"), _T(""), wxITEM_NORMAL);
-    itemMenu12->Append(wxID_OPEN, _("&Open ...\tCtrl+O"), _T(""), wxITEM_NORMAL);
-    itemMenu12->Append(wxID_CLOSE, _("&Close\tCtrl+W"), _T(""), wxITEM_NORMAL);
-    menuBar->Append(itemMenu12, _("File"));
-    wxMenu* itemMenu16 = new wxMenu;
-    itemMenu16->Append(wxID_UNDO, _("&Undo\tCtrl+Z"), _T(""), wxITEM_NORMAL);
-    itemMenu16->Enable(wxID_UNDO, false);
-    itemMenu16->AppendSeparator();
-    itemMenu16->Append(wxID_CUT, _("Cu&t\tCtrl+X"), _T(""), wxITEM_NORMAL);
-    itemMenu16->Enable(wxID_CUT, false);
-    itemMenu16->Append(wxID_COPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
-    itemMenu16->Enable(wxID_COPY, false);
-    itemMenu16->Append(MMP_COPYCOORDSITEM, _("Copy Coordinates"), _("Copy the full set of coordinates with the current coordinate type."), wxITEM_NORMAL);
-    itemMenu16->Enable(MMP_COPYCOORDSITEM, false);
-    itemMenu16->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
-    itemMenu16->Enable(wxID_PASTE, false);
-    itemMenu16->Append(wxID_CLEAR, _("&Delete\tDel"), _T(""), wxITEM_NORMAL);
-    itemMenu16->Enable(wxID_CLEAR, false);
-    itemMenu16->AppendSeparator();
-    itemMenu16->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
-    itemMenu16->Enable(wxID_SELECTALL, false);
-    menuBar->Append(itemMenu16, _("Edit"));
-    wxMenu* itemMenu26 = new wxMenu;
-    itemMenu26->Append(ID_STICKMENU, _("Use Coordinates for Reference"), _("Makes the current rotated coordinates the reference coordinates."), wxITEM_NORMAL);
-    menuBar->Append(itemMenu26, _("Coordinates"));
+    wxMenu* itemMenu3 = new wxMenu;
+    itemMenu3->Append(wxID_NEW, _("&New\tCtrl+N"), _T(""), wxITEM_NORMAL);
+    itemMenu3->Append(wxID_OPEN, _("&Open ...\tCtrl+O"), _T(""), wxITEM_NORMAL);
+    itemMenu3->Append(wxID_CLOSE, _("&Close\tCtrl+W"), _T(""), wxITEM_NORMAL);
+    menuBar->Append(itemMenu3, _("File"));
+    wxMenu* itemMenu7 = new wxMenu;
+    itemMenu7->Append(wxID_UNDO, _("&Undo\tCtrl+Z"), _T(""), wxITEM_NORMAL);
+    itemMenu7->Enable(wxID_UNDO, false);
+    itemMenu7->AppendSeparator();
+    itemMenu7->Append(wxID_CUT, _("Cu&t\tCtrl+X"), _T(""), wxITEM_NORMAL);
+    itemMenu7->Enable(wxID_CUT, false);
+    itemMenu7->Append(wxID_COPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
+    itemMenu7->Enable(wxID_COPY, false);
+    itemMenu7->Append(MMP_COPYCOORDSITEM, _("Copy Coordinates"), _("Copy the full set of coordinates with the current coordinate type."), wxITEM_NORMAL);
+    itemMenu7->Enable(MMP_COPYCOORDSITEM, false);
+    itemMenu7->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
+    itemMenu7->Enable(wxID_PASTE, false);
+    itemMenu7->Append(wxID_CLEAR, _("&Delete\tDel"), _T(""), wxITEM_NORMAL);
+    itemMenu7->Enable(wxID_CLEAR, false);
+    itemMenu7->AppendSeparator();
+    itemMenu7->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
+    itemMenu7->Enable(wxID_SELECTALL, false);
+    menuBar->Append(itemMenu7, _("Edit"));
+    wxMenu* itemMenu17 = new wxMenu;
+    itemMenu17->Append(ID_STICKMENU, _("Use Coordinates for Reference"), _("Makes the current rotated coordinates the reference coordinates."), wxITEM_NORMAL);
+    menuBar->Append(itemMenu17, _("Coordinates"));
     itemFrame1->SetMenuBar(menuBar);
 
-    wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
-    itemFrame1->SetSizer(itemBoxSizer2);
+    wxPanel* itemPanel19 = new wxPanel( itemFrame1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
 
-    wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxBoxSizer* itemBoxSizer20 = new wxBoxSizer(wxVERTICAL);
+    itemPanel19->SetSizer(itemBoxSizer20);
 
-    wxButton* itemButton4 = new wxButton( itemFrame1, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer20->Add(itemBoxSizer21, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    wxButton* itemButton22 = new wxButton( itemPanel19, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
-        itemButton4->SetToolTip(_("Add a new atom to the list of coordinates."));
-    itemBoxSizer3->Add(itemButton4, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+        itemButton22->SetToolTip(_("Add a new atom to the list of coordinates."));
+    itemBoxSizer21->Add(itemButton22, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    deleteButton = new wxButton( itemFrame1, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+    deleteButton = new wxButton( itemPanel19, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         deleteButton->SetToolTip(_("Delete the selected atoms."));
-    itemBoxSizer3->Add(deleteButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer21->Add(deleteButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    BondButton = new wxButton( itemFrame1, ID_BONDBUTTON, _("Bond"), wxDefaultPosition, wxDefaultSize, 0 );
+    BondButton = new wxButton( itemPanel19, ID_BONDBUTTON, _("Bond"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         BondButton->SetToolTip(_("Apply the default bonding criteria."));
-    itemBoxSizer3->Add(BondButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer21->Add(BondButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxButton* itemButton7 = new wxButton( itemFrame1, ID_STICKBUTTON, _("Stick"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxButton* itemButton25 = new wxButton( itemPanel19, ID_STICKBUTTON, _("Stick"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
-        itemButton7->SetToolTip(_("Use the current screen rotation as the reference frame."));
-    itemBoxSizer3->Add(itemButton7, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+        itemButton25->SetToolTip(_("Use the current screen rotation as the reference frame."));
+    itemBoxSizer21->Add(itemButton25, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticText* itemStaticText8 = new wxStaticText( itemFrame1, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer3->Add(itemStaticText8, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText26 = new wxStaticText( itemPanel19, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer21->Add(itemStaticText26, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
     wxString coordTypeChoiceStrings[] = {
         _("Cartesian"),
         _("Z-Matrix")
     };
-    coordTypeChoice = new wxChoice( itemFrame1, ID_COORDCHOICE1, wxDefaultPosition, wxDefaultSize, 2, coordTypeChoiceStrings, 0 );
+    coordTypeChoice = new wxChoice( itemPanel19, ID_COORDCHOICE1, wxDefaultPosition, wxDefaultSize, 2, coordTypeChoiceStrings, 0 );
     if (ShowToolTips())
         coordTypeChoice->SetToolTip(_("Changes the displayed coordinate type."));
-    itemBoxSizer3->Add(coordTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer21->Add(coordTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    coordGrid = new wxGrid( itemFrame1, ID_COORDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL );
+    coordGrid = new wxGrid( itemPanel19, ID_COORDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL );
     coordGrid->SetDefaultColSize(50);
     coordGrid->SetDefaultRowSize(25);
     coordGrid->SetColLabelSize(25);
     coordGrid->SetRowLabelSize(50);
     coordGrid->CreateGrid(5, 5, wxGrid::wxGridSelectRows);
-    itemBoxSizer2->Add(coordGrid, 1, wxGROW|wxALL, 0);
+    itemBoxSizer20->Add(coordGrid, 1, wxGROW|wxALL, 0);
 
 ////@end CoordinatesWindow content construction
 	coordGrid->SetDefaultCellAlignment(wxALIGN_RIGHT, wxALIGN_CENTRE);
 	SetupGridColumns();
 	FrameChanged();
 	UpdateControls();
-    GetSizer()->Fit(this);
-    GetSizer()->SetSizeHints(this);
     Centre();
 	wxSize s(50, 150);
 	coordGrid->SetMinSize(s);
+	itemPanel19->Fit();
+	Fit();
 }
 
 /*!
