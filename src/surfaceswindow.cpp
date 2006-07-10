@@ -220,6 +220,7 @@ void SurfacesWindow::addNewPane(int type)
 
     if ( type != -1)
       listBook->AddPage(tempPane, mCurrSurfStr, true);
+
 }
 
 void SurfacesWindow::OnAddClick( wxCommandEvent& event )
