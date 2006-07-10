@@ -66,7 +66,7 @@ BEGIN_EVENT_TABLE( SurfacesWindow, wxFrame )
   EVT_CLOSE( SurfacesWindow::OnClose )
 ////@end SurfacesWindow event table entries
   EVT_LISTBOOK_PAGE_CHANGED(ID_SURFLISTBOOK, SurfacesWindow::OnPageChanged )
-
+  EVT_TEXT_ENTER (ID_SURFTITLE, SurfacesWindow::OnTitleChanged )
 END_EVENT_TABLE()
 
 
@@ -124,7 +124,7 @@ void SurfacesWindow::CreateControls()
     mainSizer = new wxBoxSizer(wxVERTICAL);
     upperSizer = new wxBoxSizer(wxHORIZONTAL);
 
-    surfTitleEdit = new wxTextCtrl( this, ID_SURFTITLE, _T(""), wxDefaultPosition, wxSize(250, -1), 0 );
+    surfTitleEdit = new wxTextCtrl( this, ID_SURFTITLE, _T(""), wxDefaultPosition, wxSize(250, -1), wxTE_PROCESS_ENTER);
     upperSizer->Add(surfTitleEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     visibleCheck = new wxCheckBox( this, ID_VISIBLECHECK, _("Visible"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -158,7 +158,7 @@ void SurfacesWindow::CreateControls()
     SetSizer(mainSizer);
 
     wxListView * t = listBook->GetListView();
-    t->SetWindowStyle(wxLC_LIST);
+    t->SetWindowStyle(wxLC_LIST | wxLC_ALIGN_LEFT);
 
     int type = selectSurfaceType();
     addNewPane(type);
@@ -378,3 +378,20 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 	surfTitleEdit->SetValue(temp);
 }
 
+void SurfacesWindow::OnTitleChanged(wxCommandEvent& event )
+{
+  //wxListView * t = listBook->GetListView();
+  int id = listBook->GetSelection();
+  int maxItem = listBook->GetPageCount();
+  wxString newLabel = surfTitleEdit->GetValue();
+
+  BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
+  if (tempPane) 
+    {
+      Surface * tempSurf = tempPane->GetTargetSurface();
+      tempSurf->SetLabel(newLabel.c_str());
+    }
+
+  listBook->RemovePage(id);
+  listBook->InsertPage(id, tempPane, newLabel, true);
+}

@@ -64,13 +64,20 @@ class SurfacesWindow;
 #define SYMBOL_ORBITAL3D_POSITION wxDefaultPosition
 
 #define SYMBOL_ORBITAL2D_STYLE wxSUNKEN_BORDER
-#define SYMBOL_ORBITAL2D_TITLE _("3D Orbital")
+#define SYMBOL_ORBITAL2D_TITLE _("2D Orbital")
 #define SYMBOL_ORBITAL2D_IDNAME ID_MYDIALOG4
 #define SYMBOL_ORBITAL2D_SIZE wxSize(400, 300)
 #define SYMBOL_ORBITAL2D_POSITION wxDefaultPosition
 
+#define SYMBOL_TED2D_STYLE wxSUNKEN_BORDER
+#define SYMBOL_TED2D_TITLE _("2D Total Electron Density")
+#define SYMBOL_TED2D_IDNAME ID_MYDIALOG4
+#define SYMBOL_TED2D_SIZE wxSize(400, 300)
+#define SYMBOL_TED2D_POSITION wxDefaultPosition
+
 #define SYMBOL_PARAM_SIZE wxSize(400, 300)
 #define SYMBOL_PARAM_POSITION wxDefaultPosition
+
 #define ID_2D_PARAM_DIALOG 10071
 #define ID_3D_PARAM_DIALOG 10072
 #define SYMBOL_2D_PARAM_TITLE _("2D Manual Parameter Adjustment")
@@ -447,6 +454,27 @@ public:
 
    DECLARE_EVENT_TABLE()
 };
+
+/*class TEDensity2DSurfPane : public Surface2DPane
+{    
+  DECLARE_CLASS( TEDensity2DSurfPane )
+
+ public:
+  TEDensity2DSurfPane() { }
+  TEDensity2DSurfPane( wxWindow* parent, TEDensity2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_TED2D_IDNAME, const wxPoint& pos = SYMBOL_TED2D_POSITION, const wxSize& size = SYMBOL_TED2D_SIZE, long style = SYMBOL_TED2D_STYLE );
+  ~TEDensity2DSurfPane();
+
+  virtual void TargetToPane();
+  virtual void refreshControls();
+
+  void CreateControls();
+
+ private:
+  long	TargetOrbSet;
+
+  TEDensity2DSurface* mTarget;
+
+};*/
 
 class General3DSurfPane : public Surface3DPane
 {    

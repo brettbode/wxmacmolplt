@@ -46,6 +46,7 @@ IMPLEMENT_CLASS( Surface2DPane, wxPanel )
 IMPLEMENT_CLASS( Surface3DPane, wxPanel )
 IMPLEMENT_CLASS( Orbital2DSurfPane, wxPanel )
 IMPLEMENT_CLASS( Orbital3DSurfPane, wxPanel )
+  //IMPLEMENT_CLASS( TEDensity2DSurfPane, wxPanel )
 IMPLEMENT_CLASS( General3DSurfPane, wxPanel )
 IMPLEMENT_CLASS( General2DSurfPane, wxPanel )
 IMPLEMENT_CLASS( TEDensity2DSurfPane, wxPanel )
@@ -2097,6 +2098,50 @@ wxIcon Orbital3DSurfPane::GetIconResource( const wxString& name )
     return wxNullIcon;
 ////@end Orbital3D icon retrieval
 }
+
+/*2D TEDensity Panel*/ 
+/*
+TEDensity2DSurfPane::TEDensity2DSurfPane( wxWindow* parent, 
+					  TEDensity2DSurface* target, 
+					  SurfacesWindow* o, wxWindowID id,
+					  const wxPoint& pos, const wxSize& size, 
+					  long style ) 
+  : Surface2DPane(parent, target, o, id, pos, size, style)
+{
+  mTarget = target;
+
+  TargetToPane();
+  CreateControls();
+}
+
+TEDensity2DSurfPane::~TEDensity2DSurfPane()
+{
+
+}
+
+void TEDensity2DSurfPane::TargetToPane()
+{
+  TargetOrbSet = mTarget->getTargetOrbSet();
+  NumGridPoints = mTarget->GetNumGridPoints();
+  NumContours = mTarget->GetNumContours();
+  MaxContourValue = mTarget->GetMaxValue();
+  mTarget->GetPosColor(&Color);
+  UseScreenPlane = mTarget->GetRotate2DMap();
+  Visible = mTarget->GetVisibility();
+  AllFrames = (mTarget->GetSurfaceID() != 0);
+  UpdateTest = false;
+}
+
+void TEDensity2DSurfPane::CreateControls()
+{
+
+}
+
+void TEDensity2DSurfPane::refreshControls()
+{
+
+}
+*/
 
 /*!
 * General3DSurfPane class

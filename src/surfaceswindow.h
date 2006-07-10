@@ -114,6 +114,7 @@ public:
 	
 		//Called when the list book page gets changed 
 	void OnPageChanged(wxListbookEvent & event);
+	void OnTitleChanged(wxCommandEvent& event );
 
  private:
 
