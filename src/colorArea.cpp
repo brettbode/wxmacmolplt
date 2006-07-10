@@ -12,7 +12,6 @@
 #include "wx/colordlg.h"
 
 #include "colorArea.h"
-#include "surfaceDlg.h"
 
 #ifdef __BORLANDC__
 #pragma hdrstop
