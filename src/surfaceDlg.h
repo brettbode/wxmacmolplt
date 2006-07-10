@@ -45,6 +45,7 @@ class Orb2DSurface;
 class Orb3DSurface;
 class General3DSurface;
 class General2DSurface;
+class TEDensity2DSurface;
 class OrbSurfBase;
 class SurfacesWindow;
 ////@end forward declarations
@@ -132,7 +133,7 @@ class BaseSurfacePane : public wxPanel
  public:
 
   BaseSurfacePane() {}
-  BaseSurfacePane( wxWindow* parent, Surface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+  BaseSurfacePane( wxWindow* parent, Surface * target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
   ~BaseSurfacePane();
 
   bool Create( wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
@@ -149,6 +150,8 @@ class BaseSurfacePane : public wxPanel
   void OnGridPointSld( wxCommandEvent &event );
   void OnSetParam( wxCommandEvent &event );
   void OnExport( wxCommandEvent &event );
+  void BuildOrbSetPopup(void);
+  void OnOrbSetChoice( wxCommandEvent &event );
 
 protected:
   wxBoxSizer* mainSizer;
@@ -163,6 +166,8 @@ protected:
   bool UpdateTest;
   long NumGridPoints;
   bool SwitchFixGrid;
+  long TargetOrbSet;
+  wxChoice* mOrbSetChoice;
 
   SurfacesWindow * owner;
 
@@ -199,8 +204,6 @@ class OrbSurfacePane
   bool PhaseChange;
   bool coefIsEnabled;
 
-  wxChoice* mOrbSetChoice;
-
 private:
   OrbSurfBase* mTarget;
   SurfacesWindow * myowner;
@@ -224,6 +227,7 @@ class Surface2DPane : public BaseSurfacePane
   void OnNegColorChange(wxCommandEvent & event);
   void OnShowZeroChk( wxCommandEvent &event );
   void OnDashChk(wxCommandEvent& event );
+  void OnUsePlaneChk( wxCommandEvent &event );
   void OnContourValueText( wxCommandEvent &event );
   void SetContourValueText(void);
   void OnNumContoursText( wxCommandEvent &event );
@@ -240,6 +244,7 @@ class Surface2DPane : public BaseSurfacePane
   wxTextCtrl* mContourValText;
   wxCheckBox* mShowZeroCheck;
   wxCheckBox* mDashCheck;
+  wxCheckBox* mUsePlaneChk;
   wxButton* mSetPlaneBut;
   colorArea* mOrbColor1;
   colorArea* mOrbColor2;
@@ -250,6 +255,9 @@ class Surface2DPane : public BaseSurfacePane
   float MaxContourValue;
   bool ShowZeroContour;
   bool DashLines;
+  bool UseScreenPlane;
+  wxString mMaxContourCountString;
+  wxString mMaxContourValueString;
 
  private:
 
@@ -326,7 +334,6 @@ class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
     void OnOrbSetChoice( wxCommandEvent &event );
     void OnAtomList( wxCommandEvent &event );
     void OnOrbFormatChoice( wxCommandEvent &event );
-    void OnUsePlaneChk( wxCommandEvent &event );
     void OnReversePhase(wxCommandEvent &event );
     void OnCoefList( wxCommandEvent &event );
 
@@ -355,10 +362,7 @@ class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
     wxListBox* mOrbCoef;
     wxChoice* mOrbFormatChoice;
     wxCheckBox* mSphHarmonicsChk;
-    wxCheckBox* mUsePlaneChk;
     wxCheckBox* mRevPhaseChk;
-
-    bool UseScreenPlane;
 
     Orb2DSurface* mTarget;
 
@@ -527,8 +531,6 @@ private:
     wxTextCtrl* mGenMultValue;
     wxCheckBox* mSquareCheck;
 	wxString MultValueString;
-	wxString mMaxContourCountString;
-	wxString mMaxContourValueString;
 	
     General2DSurface*	mTarget;
 	bool				useMultValue;
@@ -538,6 +540,40 @@ private:
     DECLARE_EVENT_TABLE()
 };
 
+class TEDensity2DSurfPane : public Surface2DPane
+{    
+	DECLARE_CLASS( TEDensity2DSurfPane )
+	
+public:
+    /// Constructors
+    TEDensity2DSurfPane() { }
+    TEDensity2DSurfPane( wxWindow* parent, TEDensity2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    ~TEDensity2DSurfPane();
+	
+    virtual void TargetToPane();
+    virtual void refreshControls();
+	
+    /// Creates the controls and sizers
+    void CreateControls();
+	
+    /// Retrieves bitmap resources
+    wxBitmap GetBitmapResource( const wxString& name );
+	
+    /// Retrieves icon resources
+    wxIcon GetIconResource( const wxString& name );
+	
+    /// Should we show tooltips?
+    static bool ShowToolTips() {return true;};
+	
+private:
+	virtual bool UpdateNeeded(void);
+
+	void OnUpdate(wxCommandEvent &event );
+
+    TEDensity2DSurface*	mTarget;
+	
+    DECLARE_EVENT_TABLE()
+};
 
 class Surface2DParamDlg : public wxFrame 
 {
