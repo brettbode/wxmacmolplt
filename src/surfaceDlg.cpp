@@ -49,6 +49,7 @@ IMPLEMENT_CLASS( Orbital3DSurfPane, wxPanel )
 IMPLEMENT_CLASS( General3DSurfPane, wxPanel )
 IMPLEMENT_CLASS( General2DSurfPane, wxPanel )
 IMPLEMENT_CLASS( TEDensity2DSurfPane, wxPanel )
+IMPLEMENT_CLASS( TEDensity3DSurfPane, wxPanel )
 
 IMPLEMENT_CLASS( Surface2DParamDlg, wxFrame )
 IMPLEMENT_CLASS( Surface3DParamDlg, wxFrame )
@@ -140,6 +141,26 @@ BEGIN_EVENT_TABLE( TEDensity2DSurfPane, wxPanel )
 	EVT_BUTTON (ID_SET_PARAM_BUT, Surface2DPane::OnSetParam)
 	EVT_BUTTON (ID_SET_PLANE_BUT, Surface2DPane::OnSetPlane)
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, TEDensity2DSurfPane::OnUpdate)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE( TEDensity3DSurfPane, wxPanel )
+	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
+	EVT_CHOICE  (ID_ORB_CHOICE, BaseSurfacePane::OnOrbSetChoice)
+	EVT_SLIDER (ID_CONTOUR_VALUE_SLIDER, Surface3DPane::OnContourValueSld)
+	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
+	EVT_SLIDER (ID_GRID_SIZE_SLIDER, Surface3DPane::OnGridSizeSld)
+	EVT_CHECKBOX (ID_TED3D_COLOR_SURF_CHECK, TEDensity3DSurfPane::OnUseMEPCheck)
+	EVT_CHECKBOX (ID_USERGB_COLOR_CHECK, TEDensity3DSurfPane::OnRGBColorCheck)
+	EVT_TEXT (ID_TED3D_MAX_MAP_EDIT, TEDensity3DSurfPane::OnMaxMEPValueText)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
+	EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
+	EVT_RADIOBOX (ID_3D_RADIOBOX, Surface3DPane::On3DRadioBox)
+	EVT_CHECKBOX (ID_SMOOTH_CHECKBOX, Surface3DPane::OnSmoothCheck)
+	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
+	EVT_BUTTON (ID_SET_PARAM_BUT, Surface3DPane::OnSetParam)
+	EVT_BUTTON (ID_FREE_MEM_BUT, Surface3DPane::OnFreeMem)
+	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, TEDensity3DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( Surface2DParamDlg, wxFrame )
@@ -884,30 +905,52 @@ void Surface3DPane::OnSmoothCheck (wxCommandEvent& event )
   setUpdateButton();
 }
 
-void Surface3DPane::changeContourValue()
-{
-  float newVal;
+void Surface3DPane::changeContourValue() {
+	double newVal;
 
-  if (mTarget->GetGridMax() > 0.000001 )
-    {
-      wxString tmpStr = mContourValueEdit->GetValue();
-      newVal = atof(tmpStr.c_str());
+	if (mTarget->GetGridMax() > 0.000001 ){
+		wxString tmpStr = mContourValueEdit->GetValue();
+		if (tmpStr.ToDouble(&newVal)) {
+			if (newVal < 0.0) newVal *= -1.0;
+			if (newVal > mTarget->GetGridMax()) 
+				newVal = mTarget->GetGridMax();
 
-      if (newVal < 0.0) newVal *= -1.0;
-      if (newVal > mTarget->GetGridMax()) 
-		  newVal = mTarget->GetGridMax();
-      
-      ContourValue = newVal;
-      tmpStr.Printf("%.4f", newVal);
-
-      setContourValueSld();
-      mContourValueEdit->SetValue(tmpStr);
-    }
+			ContourValue = newVal;
+			setContourValueSld();
+			setUpdateButton();
+		}
+	}
 }
 
 void Surface3DPane::OnContourValueEnter(wxCommandEvent& event )
 {
   changeContourValue();
+}
+void Surface3DPane::SetContourValueText(void)
+{
+	wxString tmpStr;
+	tmpStr.Printf("%.4f", ContourValue);
+	mContourValueEdit->SetValue(tmpStr);
+}
+void Surface3DPane::SetContourMaxValueText(void)
+{
+	wxString tmpStr;
+	tmpStr.Printf("%.4f", mTarget->GetGridMax());
+	mGridMaxText->SetLabel(tmpStr);
+}
+void Surface3DPane::OnContourValueSld(wxCommandEvent &event )
+{
+	float GridMax = mTarget->GetGridMax();
+	ContourValue = 0.01 * mContourValSld->GetValue() * ((fabs(GridMax)>=0.001)?GridMax:0.25);
+	
+	SetContourValueText();
+	
+	setUpdateButton();
+}
+void Surface3DPane::OnGridSizeSld(wxCommandEvent &event )
+{
+	GridSize = 0.01 * mGridSizeSld->GetValue();
+	setUpdateButton();
 }
 
 void Surface3DPane::OnIdle( wxIdleEvent& WXUNUSED(event) )
@@ -2678,7 +2721,7 @@ wxIcon General2DSurfPane::GetIconResource( const wxString& name )
 }
 
 /*!
-* General2DSurfPane class
+* TEDensity2DSurfPane class
  */
 
 TEDensity2DSurfPane::TEDensity2DSurfPane( wxWindow* parent, TEDensity2DSurface* target, 
@@ -2967,6 +3010,459 @@ wxBitmap TEDensity2DSurfPane::GetBitmapResource( const wxString& name )
  */
 
 wxIcon TEDensity2DSurfPane::GetIconResource( const wxString& name )
+{
+    // Icon retrieval
+	////@begin Orbital3D icon retrieval
+    wxUnusedVar(name);
+    return wxNullIcon;
+	////@end Orbital3D icon retrieval
+}
+
+/*!
+* TEDensity3DSurfPane class
+ */
+
+TEDensity3DSurfPane::TEDensity3DSurfPane( wxWindow* parent, TEDensity3DSurface* target, 
+										  SurfacesWindow* o, wxWindowID id,
+										  const wxPoint& pos, const wxSize& size, 
+										  long style ) 
+: Surface3DPane(parent, target, o, id, pos, size, style)
+{
+	mTarget = target;
+	
+	TargetToPane();
+	CreateControls();
+	BuildOrbSetPopup();
+	refreshControls();
+}
+
+TEDensity3DSurfPane::~TEDensity3DSurfPane()
+{
+	
+}
+void TEDensity3DSurfPane::TargetToPane(void) 
+{
+	mTarget->GetPosColor(&PosColor);
+	mTarget->GetNegColor(&NegColor);
+	mTarget->GetTranspColor(&TranspColor);
+	ContourValue = mTarget->GetContourValue();
+	UseSolidSurface = mTarget->SolidSurface();
+	UseNormals = mTarget->UseSurfaceNormals();
+	NumGridPoints = mTarget->GetNumGridPoints();
+	TargetOrbSet = mTarget->getTargetOrbSet();
+	GridSize = mTarget->GetGridSize();
+	Visible = mTarget->GetVisibility();
+	AllFrames = (mTarget->GetSurfaceID() != 0);
+	UseMEP = mTarget->ColorByValue();
+	UseNormals = mTarget->UseSurfaceNormals();
+	UseRGBSurfaceColor = mTarget->UseRGBColoration();
+	MaxMEPValue = mTarget->GetMaxSurfaceValue();
+	UpdateTest = false;
+}
+void TEDensity3DSurfPane::refreshControls()
+{
+	mOrbSetChoice->SetSelection(TargetOrbSet);
+	SetContourValueText();
+	setContourValueSld();
+	SetContourMaxValueText();
+	
+	mOrbColor1->setColor(&PosColor);
+	mOrbColor2->setColor(&NegColor);
+	mTransColor->setColor(&TranspColor);
+
+	mColorSurfCheck->SetValue(UseMEP);
+	mUseRGBColorCheck->SetValue(UseRGBSurfaceColor);
+	if (UseMEP) {
+		mUseRGBColorCheck->Enable();
+		mMaxMapEdit->Enable();
+	} else {
+		mUseRGBColorCheck->Disable();
+		mMaxMapEdit->Disable();
+	}
+	SetMaxMEPValueText();
+	mNumGridPntSld->SetValue(NumGridPoints);
+	mGridSizeSld->SetValue((short)(100*GridSize));
+
+	m3DRdoBox->SetSelection(1-UseSolidSurface);
+	mSmoothChkBox->SetValue(UseNormals);
+	
+	if (UseSolidSurface)
+		mSmoothChkBox->Enable();
+	else
+		mSmoothChkBox->Disable();
+}
+void TEDensity3DSurfPane::OnUseMEPCheck( wxCommandEvent &event )
+{
+	UseMEP = mColorSurfCheck->GetValue();
+	refreshControls();
+	setUpdateButton();
+}
+void TEDensity3DSurfPane::OnRGBColorCheck( wxCommandEvent &event )
+{
+	UseRGBSurfaceColor = mUseRGBColorCheck->GetValue();
+//	refreshControls();
+	setUpdateButton();
+}
+void TEDensity3DSurfPane::OnMaxMEPValueText(wxCommandEvent& event )
+{
+	double newVal=0.0;
+	wxString temp = mMaxMapEdit->GetValue();
+	
+	if (temp.ToDouble(&newVal)) {
+		MaxMEPValue = newVal;
+	}
+	setUpdateButton();
+}
+void TEDensity3DSurfPane::SetMaxMEPValueText(void) {
+	wxString temp;
+	temp.Printf("%.4f", MaxMEPValue);
+	mMaxMapEdit->SetValue(temp);
+}
+bool TEDensity3DSurfPane::UpdateNeeded(void) 
+{
+	bool result = UpdateTest;
+	
+	if (Visible != mTarget->GetVisibility()) result = true;
+	if (AllFrames != (mTarget->GetSurfaceID() != 0)) result = true;
+	if (TargetOrbSet != mTarget->getTargetOrbSet()) result = true;
+	if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
+	if (ContourValue != mTarget->GetContourValue()) result = true;
+	if (GridSize != mTarget->GetGridSize()) result = true;
+	if (UseSolidSurface != mTarget->SolidSurface()) result = true;
+	if (UseMEP != mTarget->ColorByValue()) result = true;
+	if (UseNormals != mTarget->UseSurfaceNormals()) result = true;
+	if (UseRGBSurfaceColor != mTarget->UseRGBColoration()) result = true;
+	if (MaxMEPValue != mTarget->GetMaxSurfaceValue()) result = true;
+	if (!result) {
+		RGBColor	testColor;
+		mTarget->GetPosColor(&testColor);
+		if ((PosColor.red != testColor.red)||(PosColor.green!=testColor.green)||
+			(PosColor.blue!=testColor.blue)) result=true;
+		mTarget->GetNegColor(&testColor);
+		if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)||
+			(NegColor.blue!=testColor.blue)) result=true;
+		mTarget->GetTranspColor(&testColor);
+		if ((TranspColor.red != testColor.red)||(TranspColor.green!=testColor.green)||
+			(TranspColor.blue!=testColor.blue)) result=true;
+	}
+	return result;
+}
+void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
+	SetMaxMEPValueText();
+	SetContourValueText();
+	
+	//only update the grid if needed
+	bool updateGrid=UpdateTest, updateContour=false, updateMEP=false;
+	if (TargetOrbSet != mTarget->getTargetOrbSet()) {
+		updateGrid = true;
+		mTarget->SetFixGrid(false);
+	}
+	if (NumGridPoints != mTarget->GetNumGridPoints()) {
+		updateGrid = true;
+		mTarget->SetFixGrid(false);
+	}
+	if (ContourValue != mTarget->GetContourValue()) updateContour = true;
+	if (GridSize != mTarget->GetGridSize()) {
+		updateGrid = true;
+		mTarget->SetFixGrid(false);
+	}
+	if (Visible && !mTarget->ContourAvail()) updateContour = true;
+	if (UseMEP && !mTarget->ColorByValue()) updateMEP = true;
+	if (updateMEP && !mTarget->ContourAvail()) updateContour = true;
+	//test to see if grid/contour must be updated anyway...
+	if (updateContour && ! mTarget->GridAvailable()) updateGrid = true;
+	if (updateGrid) updateContour = true;
+	if (updateContour && UseMEP) updateMEP = true;
+	mTarget->SetVisibility(Visible);
+	mTarget->SolidSurface(UseSolidSurface);
+	mTarget->setTargetOrbSet(TargetOrbSet);
+	mTarget->SetNumGridPoints(NumGridPoints);
+	mTarget->SetContourValue(ContourValue);
+	mTarget->SetMaxSurfaceValue(MaxMEPValue);
+	mTarget->SetGridSize(GridSize);
+	mTarget->SetPosColor(&PosColor);
+	mTarget->SetNegColor(&NegColor);
+	mTarget->SetTranspColor(&TranspColor);
+	mTarget->SetColorByValue(UseMEP);
+	mTarget->UseSurfaceNormals(UseNormals);
+	mTarget->UseRGBColoration(UseRGBSurfaceColor);
+	MoleculeData * data = owner->GetMoleculeData();
+	WinPrefs * Prefs = owner->GetPrefs();
+	//update this surface's data on all frames if necessary
+	if (AllFrames != (mTarget->GetSurfaceID() != 0)) {	//update all frames
+		long	SurfaceID;
+		Frame *	lFrame = data->GetFirstFrame();
+		updateGrid = updateContour = true;
+		if (AllFrames) {	//adding the surface to all frames
+			SurfaceID = mTarget->SetSurfaceID();
+			while (lFrame) {
+				if (lFrame != data->GetCurrentFramePtr()) {
+					TEDensity3DSurface * NewSurface = new TEDensity3DSurface(Prefs);
+					if (NewSurface) {
+						NewSurface->SetSurfaceID(SurfaceID);
+						lFrame->AppendSurface(NewSurface);
+					}
+				}
+				lFrame = lFrame->GetNextFrame();
+			}
+		} else {			//deleting the surface from other frames
+			SurfaceID = mTarget->GetSurfaceID();
+			mTarget->SetSurfaceID(0);	//Unmark this frames surface so it doesn't get deleted
+			while (lFrame) {
+				lFrame->DeleteSurfaceWithID(SurfaceID);
+				lFrame = lFrame->GetNextFrame();
+			}
+		}
+	}
+	Progress * lProgress = new Progress();
+//	if (!lProgress) throw MemoryError();
+	if (AllFrames) {	//compute the contour for each frame, no grid is kept
+		long SurfaceID = mTarget->GetSurfaceID();
+		long CurrentFrame = data->GetCurrentFrame();
+		long NumFrames = data->GetNumFrames();
+		for (int i=0; i<NumFrames; i++) {
+			TEDensity3DSurface * lSurf;
+			lSurf = NULL;
+			data->SetCurrentFrame(i+1);
+			Frame * lFrame = data->GetCurrentFramePtr();
+			if (CurrentFrame != data->GetCurrentFrame()) {
+				Surface * temp = lFrame->GetSurfaceWithID(SurfaceID);
+				//Confirm that the surface is the correct type
+				if (temp)
+					if (temp->GetSurfaceType() == kTotalDensity3D)
+						lSurf = (TEDensity3DSurface *) temp;
+				if (lSurf) lSurf->UpdateData(mTarget);
+			} else lSurf = mTarget;
+			if (lSurf) {
+				if (!UseMEP) mTarget->FreeList();
+				if (Visible) {
+					float MEPScale = 1.0;
+					if (updateMEP) MEPScale = 0.5;
+					lProgress->ChangeText("Calculating 3D GridÉ");
+					lProgress->SetBaseValue((long)(100*i*MEPScale/NumFrames));
+					lProgress->SetScaleFactor((float) 0.9*MEPScale/NumFrames);
+					if (updateGrid) lSurf->CalculateMOGrid(data, lProgress);
+					lProgress->ChangeText("Contouring gridÉ");
+					lProgress->SetBaseValue((long)(100*i/NumFrames + 90.0*MEPScale/NumFrames));
+					lProgress->SetScaleFactor((float) 0.1*MEPScale/NumFrames);
+					if (updateContour) lSurf->Contour3DGrid(lProgress);
+					if (updateMEP) {
+						lProgress->ChangeText("Calculating MEP valuesÉ");
+						lProgress->SetBaseValue(100*i/NumFrames + 50/NumFrames);
+						lProgress->SetScaleFactor(0.5/NumFrames);
+						mTarget->CalculateSurfaceValues(data, lProgress);
+					}
+					lSurf->FreeGrid();
+				} else {
+					if (updateContour) lSurf->FreeContour();
+					if (updateMEP) lSurf->FreeList();
+				}
+			}
+		}
+		data->SetCurrentFrame(CurrentFrame);
+	} else {	//simply update this surface
+		if (!UseMEP) mTarget->FreeList();
+		if (Visible) {
+			float MEPScale = 1.0;
+			if (updateMEP) MEPScale = 0.5;
+			if (updateGrid) {
+				lProgress->ChangeText("Calculating 3D GridÉ");
+				lProgress->SetScaleFactor(0.9*MEPScale);
+				mTarget->CalculateMOGrid(data, lProgress);
+			}
+			if (updateContour) {
+				lProgress->ChangeText("Contouring gridÉ");
+				lProgress->SetBaseValue((long)(90*MEPScale));
+				lProgress->SetScaleFactor(0.1*MEPScale);
+				mTarget->Contour3DGrid(lProgress);
+			}
+			if (updateMEP) {
+				lProgress->ChangeText("Calculating MEP valuesÉ");
+				lProgress->SetBaseValue(50);
+				lProgress->SetScaleFactor(0.5);
+				mTarget->CalculateSurfaceValues(data, lProgress);
+			}
+		} else {
+			//always free the grid for invisable surfaces since they can be big
+			mTarget->FreeGrid();
+			//free the contour so that it will be updated when it is made visible
+			if (updateContour) mTarget->FreeContour();
+			if (updateMEP) mTarget->FreeList();
+		}
+	}
+	if (lProgress) delete lProgress;
+/*	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DFreeMem, target->GridAvailable());
+	//Setup the contour value and grid max text items
+	short	itemtype;
+	Handle	itemhandle;
+	Rect	itemrect;
+	GetDialogItem(SurfaceDlg, kSurfBaseItems+kTE3DValue, &itemtype, &itemhandle, &itemrect);
+	float ContourValue = target->GetContourValue(), GridMax = target->GetGridMax();
+	Str255	itemText;
+	sprintf((char *) &(itemText[1]), "%.4f", ContourValue);
+	itemText[0] = strlen((char *) &(itemText[1]));
+	SetDialogItemText(itemhandle, itemText);
+	GetDialogItem(SurfaceDlg, kSurfBaseItems+kTE3DMaxValue, &itemtype, &itemhandle, &itemrect);
+	sprintf((char *) &(itemText[1]), "%.4f", GridMax);
+	itemText[0] = strlen((char *) &(itemText[1]));
+	SetDialogItemText(itemhandle, itemText);
+	UpdateTest = false;
+	SetupContourSlider();
+	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DExportButton, target->ExportPossible());
+	*/
+	setContourValueSld();
+	SetContourMaxValueText();
+	UpdateTest = false;
+	setUpdateButton();
+	owner->SurfaceUpdated();
+}
+void TEDensity3DSurfPane::CreateControls() {
+	TEDensity3DSurfPane * TED3DPanel = this;	//this is here just to match the code below from DialogBlocks
+
+	wxBoxSizer* itemBoxSizer93 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer93, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText94 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Select Orbital Set:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer93->Add(itemStaticText94, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    wxString* mOrbSetChoiceStrings = NULL;
+    mOrbSetChoice = new wxChoice( TED3DPanel, ID_ORB_CHOICE, wxDefaultPosition, wxDefaultSize, 0, mOrbSetChoiceStrings, 0 );
+    if (ShowToolTips())
+        mOrbSetChoice->SetToolTip(_("Choose the set of vectors to use for producing the TED surface."));
+    itemBoxSizer93->Add(mOrbSetChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer96 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer96, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
+    wxStaticText* itemStaticText97 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Number of grid points:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer96->Add(itemStaticText97, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mNumGridPntSld = new wxSlider( TED3DPanel, ID_GRID_POINT_SLIDER, 0, 10, 150, wxDefaultPosition, wxDefaultSize, wxSL_LABELS );
+    itemBoxSizer96->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer99 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer99, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
+    wxStaticText* itemStaticText100 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Grid Size:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer99->Add(itemStaticText100, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mGridSizeSld = new wxSlider( TED3DPanel, ID_GRID_SIZE_SLIDER, 0, 0, 300, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+    itemBoxSizer99->Add(mGridSizeSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer102 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer102, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
+    wxBoxSizer* itemBoxSizer103 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer102->Add(itemBoxSizer103, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxStaticText* itemStaticText104 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Contour Value:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer103->Add(itemStaticText104, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mContourValueEdit = new wxTextCtrl( TED3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer103->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer106 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer102->Add(itemBoxSizer106, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3);
+    mContourValSld = new wxSlider( TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+    itemBoxSizer106->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+	
+    wxBoxSizer* itemBoxSizer108 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer106->Add(itemBoxSizer108, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5);
+    mGridMinText = new wxStaticText( TED3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
+    itemBoxSizer108->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mGridMaxText = new wxStaticText( TED3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+    itemBoxSizer108->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    wxBoxSizer* itemBoxSizer111 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer111, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+    wxBoxSizer* itemBoxSizer112 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer111->Add(itemBoxSizer112, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mColorSurfCheck = new wxCheckBox( TED3DPanel, ID_TED3D_COLOR_SURF_CHECK, _("Colorize using the surface MEP value"), wxDefaultPosition, wxDefaultSize, 0 );
+    mColorSurfCheck->SetValue(false);
+    itemBoxSizer112->Add(mColorSurfCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mUseRGBColorCheck = new wxCheckBox( TED3DPanel, ID_USERGB_COLOR_CHECK, _("Use RGB surface coloration"), wxDefaultPosition, wxDefaultSize, 0 );
+    mUseRGBColorCheck->SetValue(false);
+    itemBoxSizer112->Add(mUseRGBColorCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer115 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer111->Add(itemBoxSizer115, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxStaticText* itemStaticText116 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Max. value to map"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer115->Add(itemStaticText116, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mMaxMapEdit = new wxTextCtrl( TED3DPanel, ID_TED3D_MAX_MAP_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer115->Add(mMaxMapEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer118 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer118, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+    wxBoxSizer* itemBoxSizer119 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer118->Add(itemBoxSizer119, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxBoxSizer* itemBoxSizer120 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer119->Add(itemBoxSizer120, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+    wxStaticText* itemStaticText121 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Surface Color:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer120->Add(itemStaticText121, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mOrbColor1 = new colorArea( TED3DPanel, ID_3D_COLOR_POSITIVE, &PosColor );
+    itemBoxSizer120->Add(mOrbColor1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    mOrbColor2 = new colorArea( TED3DPanel, ID_3D_COLOR_NEGATIVE, &NegColor);
+    itemBoxSizer120->Add(mOrbColor2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer124 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer119->Add(itemBoxSizer124, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+    wxStaticText* itemStaticText125 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Transparency color:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer124->Add(itemStaticText125, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mTransColor = new colorArea( TED3DPanel, ID_TRANSPARENCY_COLOR, &TranspColor );
+    itemBoxSizer124->Add(mTransColor, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer127 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer119->Add(itemBoxSizer127, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+    wxString m3DRdoBoxStrings[] = {
+        _("&Solid"),
+        _("&WireFrame")
+    };
+    m3DRdoBox = new wxRadioBox( TED3DPanel, ID_3D_RADIOBOX, _("Surface Display"), wxDefaultPosition, wxDefaultSize, 2, m3DRdoBoxStrings, 1, wxRA_SPECIFY_ROWS );
+    m3DRdoBox->SetSelection(0);
+    itemBoxSizer127->Add(m3DRdoBox, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    mSmoothChkBox = new wxCheckBox( TED3DPanel, ID_SMOOTH_CHECKBOX, _("Smooth"), wxDefaultPosition, wxDefaultSize, 0 );
+    mSmoothChkBox->SetValue(false);
+    if (ShowToolTips())
+        mSmoothChkBox->SetToolTip(_("Check to use surface normals to smooth out the surface of the contour."));
+    itemBoxSizer127->Add(mSmoothChkBox, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer130 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer118->Add(itemBoxSizer130, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mSetParamBut = new wxButton( TED3DPanel, ID_SET_PARAM_BUT, _("Parameters..."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer130->Add(mSetParamBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mFreeMemBut = new wxButton( TED3DPanel, ID_FREE_MEM_BUT, _("Free Mem"), wxDefaultPosition, wxDefaultSize, 0 );
+    if (ShowToolTips())
+        mFreeMemBut->SetToolTip(_("Click to free the memory used by the 3D grid."));
+    itemBoxSizer130->Add(mFreeMemBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mExportBut = new wxButton( TED3DPanel, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer130->Add(mExportBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mUpdateBut = new wxButton( TED3DPanel, ID_SURFACE_UPDATE_BUT, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
+    mUpdateBut->SetDefault();
+    itemBoxSizer130->Add(mUpdateBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+}
+/*!
+* Get bitmap resources
+ */
+
+wxBitmap TEDensity3DSurfPane::GetBitmapResource( const wxString& name )
+{
+    // Bitmap retrieval
+	////@begin Orbital3D bitmap retrieval
+    wxUnusedVar(name);
+    return wxNullBitmap;
+	////@end Orbital3D bitmap retrieval
+}
+
+/*!
+* Get icon resources
+ */
+
+wxIcon TEDensity3DSurfPane::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 	////@begin Orbital3D icon retrieval

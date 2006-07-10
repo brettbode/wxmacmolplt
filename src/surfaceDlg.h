@@ -46,6 +46,7 @@ class Orb3DSurface;
 class General3DSurface;
 class General2DSurface;
 class TEDensity2DSurface;
+class TEDensity3DSurface;
 class OrbSurfBase;
 class SurfacesWindow;
 ////@end forward declarations
@@ -111,6 +112,9 @@ class SurfacesWindow;
 #define ID_GENCONPOSNEGCHECK 10107
 #define ID_GENSURFGRIDMINTEXT 10108
 #define ID_GRID_MAX_TEXT 10109
+#define ID_TED3D_COLOR_SURF_CHECK 10110
+#define ID_USERGB_COLOR_CHECK 10111
+#define ID_TED3D_MAX_MAP_EDIT 10112
 
 ////@end control identifiers
 
@@ -286,8 +290,12 @@ public:
   void OnTranspColorChange(wxCommandEvent & event);
   void OnIdle( wxIdleEvent& WXUNUSED(event) );
   void OnSetParam( wxCommandEvent &event );
+  void OnGridSizeSld(wxCommandEvent &event );
 
   void setContourValueSld();
+  void SetContourValueText(void);
+  void OnContourValueSld(wxCommandEvent &event );
+  void SetContourMaxValueText(void);
 
 protected:
   wxSlider* mGridSizeSld;
@@ -571,6 +579,53 @@ private:
 	void OnUpdate(wxCommandEvent &event );
 
     TEDensity2DSurface*	mTarget;
+	
+    DECLARE_EVENT_TABLE()
+};
+class TEDensity3DSurfPane : public Surface3DPane
+{    
+	DECLARE_CLASS( TEDensity3DSurfPane )
+	
+public:
+    /// Constructors
+    TEDensity3DSurfPane() { }
+    TEDensity3DSurfPane( wxWindow* parent, TEDensity3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    ~TEDensity3DSurfPane();
+	
+    virtual void TargetToPane();
+    virtual void refreshControls();
+	void OnUseMEPCheck(wxCommandEvent &event );
+	void OnRGBColorCheck(wxCommandEvent &event );
+	void OnMaxMEPValueText(wxCommandEvent &event );
+	
+    /// Creates the controls and sizers
+    void CreateControls();
+	
+    /// Retrieves bitmap resources
+    wxBitmap GetBitmapResource( const wxString& name );
+	
+    /// Retrieves icon resources
+    wxIcon GetIconResource( const wxString& name );
+	
+    /// Should we show tooltips?
+    static bool ShowToolTips() {return true;};
+	
+private:
+		virtual bool UpdateNeeded(void);
+	
+	void OnUpdate(wxCommandEvent &event );
+	void SetMaxMEPValueText(void);
+	
+	wxCheckBox*	mColorSurfCheck;
+	wxCheckBox*	mUseRGBColorCheck;
+	wxTextCtrl*	mMaxMapEdit;
+	wxString mMaxMapValidator;
+	
+	bool	UseMEP;
+	bool	UseRGBSurfaceColor;
+	float	MaxMEPValue;
+	
+    TEDensity3DSurface*	mTarget;
 	
     DECLARE_EVENT_TABLE()
 };
