@@ -39,6 +39,7 @@
 ////@end XPM images
 
 using namespace std;
+#include <iostream>
 
 IMPLEMENT_CLASS( BaseSurfacePane, wxPanel )
 IMPLEMENT_CLASS( Surface2DPane, wxPanel )
@@ -67,9 +68,9 @@ BEGIN_EVENT_TABLE( Orbital2DSurfPane, wxPanel )
   EVT_BUTTON (ID_SET_PLANE_BUT, Surface2DPane::OnSetPlane)
   EVT_COMMAND_ENTER(ID_2D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
   EVT_COMMAND_ENTER(ID_2D_COLOR_NEGATIVE, Surface2DPane::OnNegColorChange)
-  EVT_TEXT_ENTER (ID_NUM_CONTOUR_TEXT, Surface2DPane::OnTextEnter)
-  EVT_TEXT_ENTER (ID_CONTOUR_VALUE_EDIT, Surface2DPane::OnTextEnter)
-  EVT_IDLE(Surface2DPane::OnIdle)
+	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface2DPane::OnContourValueText)
+	EVT_TEXT (ID_NUM_CONTOUR_TEXT, Surface2DPane::OnNumContoursText)
+//  EVT_IDLE(Surface2DPane::OnIdle)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
@@ -117,12 +118,14 @@ BEGIN_EVENT_TABLE( General2DSurfPane, wxPanel )
 	EVT_BUTTON (ID_GENFILEBUTTON, General2DSurfPane::OnFileButton)
 	EVT_CHECKBOX (ID_GENMULTCHECK, General2DSurfPane::OnMultCheck)
 	EVT_CHECKBOX (ID_GENSQUARECHECK, General2DSurfPane::OnSquareCheck)
-	EVT_TEXT_ENTER (ID_CONTOUR_VALUE_EDIT, General2DSurfPane::OnContourValueEnter)
-	EVT_TEXT_ENTER (ID_GENMULTEDIT, General2DSurfPane::OnMultValueEnter)
-//	EVT_BUTTON (ID_FREE_MEM_BUT, Surface2DPane::OnFreeMem)
+	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface2DPane::OnContourValueText)
+	EVT_TEXT (ID_NUM_CONTOUR_TEXT, Surface2DPane::OnNumContoursText)
+	EVT_TEXT (ID_GENMULTEDIT, General2DSurfPane::OnMultValueEnter)
 	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
-	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
-	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface2DPane::OnNegColorChange)
+	EVT_COMMAND_ENTER(ID_2D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
+	EVT_COMMAND_ENTER(ID_2D_COLOR_NEGATIVE, Surface2DPane::OnNegColorChange)
+	EVT_CHECKBOX (ID_SHOW_ZERO_CHECKBOX, Surface2DPane::OnShowZeroChk)
+	EVT_CHECKBOX (ID_DASH_CHECKBOX, Surface2DPane::OnDashChk)
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, General2DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
@@ -731,14 +734,6 @@ void Surface2DPane::OnNegColorChange(wxCommandEvent & event) {
 	setUpdateButton();
 }
 
-void Surface2DPane::OnTextEnter( wxCommandEvent &event )
-{
-  NumContours = atol((mNumContourText->GetValue()).c_str());
-  MaxContourValue = atof((mContourValText->GetValue()).c_str());
-
-  setUpdateButton();
-}
-
 /* if the focus in the panel is changed between main panel and 
    two wxTextCtrls, read the content of two wxTextCtrls. */
 
@@ -785,6 +780,39 @@ void Surface2DPane::OnSetParam( wxCommandEvent &event )
 {
   Surface2DParamDlg* paramDlg = new Surface2DParamDlg(this, mTarget);
   paramDlg->Show();
+}
+void Surface2DPane::OnContourValueText(wxCommandEvent& event )
+{	//Contour Value edit text has changed, convert the text
+	double newVal=0.0;
+	
+	wxString tmpStr = mContourValText->GetValue();
+	if (tmpStr.ToDouble(&newVal)) {
+		if (newVal > 0.0) MaxContourValue = newVal;
+	}
+	setUpdateButton();
+}
+void Surface2DPane::SetContourValueText(void)
+{
+	wxString tmpStr;
+	tmpStr.Printf("%.4f", MaxContourValue);
+	mContourValText->SetValue(tmpStr);
+}
+void Surface2DPane::OnNumContoursText(wxCommandEvent& event )
+{	//Num contours edit text has changed, convert the text
+	long newVal=-1;
+	
+	wxString tmpStr = mNumContourText->GetValue();
+	if (tmpStr.ToLong(&newVal)) {
+		if (newVal > 0) NumContours = newVal;
+	}
+	
+	setUpdateButton();
+}
+void Surface2DPane::SetNumContoursText(void)
+{
+	wxString tmpStr;
+	tmpStr.Printf("%ld", NumContours);
+	mNumContourText->SetValue(tmpStr);
 }
 
 /*
@@ -970,9 +998,9 @@ void Orbital2DSurfPane::CreateControls()
 					     wxDefaultPosition,
 					     wxDefaultSize);
 	
-	mNumContourText = new wxTextCtrl( this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
+	mNumContourText = new wxTextCtrl( this, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize);
 	
-	mContourValText = new wxTextCtrl( this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
+	mContourValText = new wxTextCtrl( this, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize);
 	
 	mShowZeroCheck = new wxCheckBox( this, ID_SHOW_ZERO_CHECKBOX, _T("Show zero contour"), wxPoint(340,130), wxDefaultSize );
 	
@@ -997,7 +1025,8 @@ void Orbital2DSurfPane::CreateControls()
 
   wxString choices1[] = {_T("Energy"), _T("Occupation #")};
   mOrbFormatChoice = new wxChoice( this, ID_ORB_FORMAT_CHOICE, wxDefaultPosition, wxSize(120,wxDefaultCoord), 2, choices1 );
-
+  mOrbFormatChoice->SetSelection(0);
+  
   vector<wxString> choices2;
   makeMOList(choices2);
 
@@ -1089,7 +1118,8 @@ void Orbital2DSurfPane::CreateControls()
   mSubRightBot3Sizer->Add(mSetPlaneBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   mSubRightBot3Sizer->Add(mExportBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   mSubRightBot3Sizer->Add(mUpdateBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-
+  mUpdateBut->SetDefault();
+  
   rightBottomSizer->Add(mSubRightBot1Sizer);
   rightBottomSizer->Add(mSubRightBot2Sizer);
   rightBottomSizer->Add(mSubRightBot3Sizer);
@@ -1121,8 +1151,8 @@ bool Orbital2DSurfPane::UpdateNeeded(void)
 {
   bool result = false;
 
-  NumContours = atol((mNumContourText->GetValue()).c_str());
-  MaxContourValue = atof((mContourValText->GetValue()).c_str());
+//  NumContours = atol((mNumContourText->GetValue()).c_str());
+//  MaxContourValue = atof((mContourValText->GetValue()).c_str());
 
   if (PlotOrb >= 0) 
     {	//Don't update unless a valid orbital is chosen
@@ -1156,7 +1186,10 @@ bool Orbital2DSurfPane::UpdateNeeded(void)
 
 void Orbital2DSurfPane::OnUpdate(wxCommandEvent &event ) 
 {
-  bool updateGrid = UpdateTest;
+	SetNumContoursText();
+	SetContourValueText();
+
+	bool updateGrid = UpdateTest;
   MoleculeData * data = owner->GetMoleculeData();
 
   if (NumGridPoints != mTarget->GetNumGridPoints()) 
@@ -2486,12 +2519,7 @@ void General2DSurfPane::CreateControls() {
 	
     wxBoxSizer* itemBoxSizer63 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer63, 0, wxALIGN_RIGHT|wxALL, 5);
-//    mFreeMemBut = new wxButton( Gen2DPanel, ID_FREE_MEM_BUT, _("Free Mem"), wxDefaultPosition, wxDefaultSize, 0 );
-//    if (ShowToolTips())
-//        mFreeMemBut->SetToolTip(_("Click to free the memory used by the 3D grid."));
-//    itemBoxSizer63->Add(mFreeMemBut, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-	
-    mExportBut = new wxButton( Gen2DPanel, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
+	mExportBut = new wxButton( Gen2DPanel, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         mExportBut->SetToolTip(_("Click to export the selected surface to a text file."));
     itemBoxSizer63->Add(mExportBut, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2540,6 +2568,9 @@ bool General2DSurfPane::UpdateNeeded(void)
 	return result;
 }
 void General2DSurfPane::OnUpdate(wxCommandEvent &event) {
+	SetNumContoursText();
+	SetContourValueText();
+
 	mTarget->SetVisibility(Visible);
 	mTarget->SetNumContours(NumContours);
 	mTarget->SetMaxValue(MaxContourValue);
@@ -2561,8 +2592,7 @@ void General2DSurfPane::refreshControls()
 	tmpStr.Printf("%ld", NumContours);
 	mNumContourText->SetValue(tmpStr);
 	
-	tmpStr.Printf("%.4f", MultValue);
-	mGenMultValue->SetValue(tmpStr);
+	SetMultValue();
 	mMultCheck->SetValue(useMultValue);
 	mSquareCheck->SetValue(squareValues);
 
@@ -2572,8 +2602,16 @@ void General2DSurfPane::refreshControls()
 	mShowZeroCheck->SetValue(ShowZeroContour);
 	mDashCheck->SetValue(DashLines);
 }
+void General2DSurfPane::SetMultValue(void) {
+	wxString temp;
+	temp.Printf("%.4f", MultValue);
+	mGenMultValue->SetValue(temp);
+}
 
 void General2DSurfPane::OnFileButton(wxCommandEvent& event ) {
+	//Push out the current validated MultValue before we use it
+	SetMultValue();
+
 	mTarget->ReadGrid(squareValues, useMultValue, MultValue);
 	UpdateTest = true;
 	refreshControls();
@@ -2598,26 +2636,6 @@ void General2DSurfPane::OnMultValueEnter(wxCommandEvent& event )
 	if (temp.ToDouble(&newVal)) {
 		MultValue = newVal;
 	}
-	temp.Printf("%.4f", MultValue);
-	mGenMultValue->SetValue(temp);
-	setUpdateButton();
-}
-void General2DSurfPane::OnContourValueEnter(wxCommandEvent& event )
-{
-	double newVal=0.0;
-	
-	wxString tmpStr = mContourValText->GetValue();
-	if (!tmpStr.ToDouble(&newVal)) {
-		tmpStr.Printf("%.4f", MaxContourValue);
-		mContourValText->SetValue(tmpStr);
-		return;
-	}
-	
-	if (newVal > 0.0) MaxContourValue = newVal;
-	
-	tmpStr.Printf("%.4f", newVal);
-	mContourValText->SetValue(tmpStr);
-		
 	setUpdateButton();
 }
 

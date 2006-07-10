@@ -103,13 +103,13 @@ class SurfacesWindow;
 #define ID_NUM_CONTOUR_TEXT 10100
 #define ID_MAX_CONTOUR_VALUE_TEXT 10101
 #define ID_ORB_COEF 10102
-#define ID_GENFILEBUTTON 10100
-#define ID_GENMULTCHECK 10101
-#define ID_GENMULTEDIT 10102
-#define ID_GENSQUARECHECK 10103
-#define ID_GENCONPOSNEGCHECK 10104
-#define ID_GENSURFGRIDMINTEXT 10105
-#define ID_GRID_MAX_TEXT 10106
+#define ID_GENFILEBUTTON 10103
+#define ID_GENMULTCHECK 10104
+#define ID_GENMULTEDIT 10105
+#define ID_GENSQUARECHECK 10106
+#define ID_GENCONPOSNEGCHECK 10107
+#define ID_GENSURFGRIDMINTEXT 10108
+#define ID_GRID_MAX_TEXT 10109
 
 ////@end control identifiers
 
@@ -224,7 +224,10 @@ class Surface2DPane : public BaseSurfacePane
   void OnNegColorChange(wxCommandEvent & event);
   void OnShowZeroChk( wxCommandEvent &event );
   void OnDashChk(wxCommandEvent& event );
-  void OnTextEnter( wxCommandEvent &event );
+  void OnContourValueText( wxCommandEvent &event );
+  void SetContourValueText(void);
+  void OnNumContoursText( wxCommandEvent &event );
+  void SetNumContoursText(void);
   void OnIdle( wxIdleEvent& WXUNUSED(event) );
   void OnSetPlane( wxCommandEvent &event );
   void OnSetParam( wxCommandEvent &event );
@@ -517,8 +520,8 @@ private:
 	void OnSquareCheck(wxCommandEvent &event);
 	void OnFileButton(wxCommandEvent &event);
 	void OnUpdate(wxCommandEvent &event );
-	void OnContourValueEnter(wxCommandEvent& event );
 	void OnMultValueEnter(wxCommandEvent& event );
+	void SetMultValue(void);
 	
     wxCheckBox* mMultCheck;
     wxTextCtrl* mGenMultValue;

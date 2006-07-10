@@ -182,6 +182,11 @@ void SurfacesWindow::addNewPane(int type)
       tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(newSurface), this);
       break;
 
+    case ID_2D_FILE_PANE:
+		newSurface = new General2DSurface(mPrefs);
+		tempPane = new General2DSurfPane(listBook, dynamic_cast<General2DSurface*>(newSurface), this);
+		break;
+
     case ID_3D_FILE_PANE:
       newSurface = new General3DSurface(mPrefs);
       tempPane = new General3DSurfPane(listBook, dynamic_cast<General3DSurface*>(newSurface), this);
