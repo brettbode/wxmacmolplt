@@ -177,20 +177,20 @@ public:
     /// Should we show tooltips?
     static bool ShowToolTips();
 
-	wxTextCtrl	* Atom1Ctl;
-	wxTextCtrl	* Atom2Ctl;
-	wxTextCtrl	* Atom3Ctl;
-	wxTextCtrl	* Pt1XCtl;
-	wxTextCtrl	* Pt1YCtl;
-	wxTextCtrl	* Pt1ZCtl;
-	wxTextCtrl	* Pt2XCtl;
-	wxTextCtrl	* Pt2YCtl;
-	wxTextCtrl	* Pt2ZCtl;
-	wxTextCtrl	* Pt3XCtl;
-	wxTextCtrl	* Pt3YCtl;
-	wxTextCtrl	* Pt3ZCtl;
     CPoint3D PlanePts[3];
 ////@begin SetScreenPlane member variables
+    wxTextCtrl* Atom1Ctl;
+    wxTextCtrl* Pt1XCtl;
+    wxTextCtrl* Pt1YCtl;
+    wxTextCtrl* Pt1ZCtl;
+    wxTextCtrl* Atom2Ctl;
+    wxTextCtrl* Pt2XCtl;
+    wxTextCtrl* Pt2YCtl;
+    wxTextCtrl* Pt2ZCtl;
+    wxTextCtrl* Atom3Ctl;
+    wxTextCtrl* Pt3XCtl;
+    wxTextCtrl* Pt3YCtl;
+    wxTextCtrl* Pt3ZCtl;
     int atom1;
     int atom2;
     int atom3;
