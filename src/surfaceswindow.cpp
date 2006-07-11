@@ -119,7 +119,6 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
 
 void SurfacesWindow::CreateControls()
 {    
-////@begin SurfacesWindow content construction
 
     MainPanel = new wxPanel( this, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
 
@@ -158,11 +157,17 @@ void SurfacesWindow::CreateControls()
     mainSizer->Add(middleSizer, 0, wxALIGN_LEFT|wxALL, 5);
     mainSizer->Add(bottomSizer, 0, wxALIGN_LEFT|wxALL, 5);
 
-    wxListView * t = listBook->GetListView();
-    t->SetWindowStyle(wxLC_LIST | wxLC_ALIGN_LEFT);
+//    wxListView * t = listBook->GetListView();
+  //  t->SetWindowStyle(wxLC_LIST | wxLC_ALIGN_LEFT);
 
-    int type = selectSurfaceType();
-    addNewPane(type);
+	Frame * lFrame = mData->GetCurrentFramePtr();
+	long NumSurfaces = lFrame->GetNumSurfaces();
+	if (NumSurfaces == 0) {
+		int type = selectSurfaceType();
+		addNewPane(type);
+	} else {
+		Reset();
+	}
 
 }
 
@@ -325,8 +330,48 @@ void SurfacesWindow::Reset(void) {
 	int oldpage = listBook->GetSelection();
 	listBook->DeleteAllPages();
 	
+	BaseSurfacePane* tempPane = NULL;
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long NumSurfaces = lFrame->GetNumSurfaces();
+	if (NumSurfaces > 0 ) {
+		for (int i=0; i<NumSurfaces; i++) {
+			Surface * lSurf = lFrame->GetSurface(i);
+			if (lSurf) {
+				switch (lSurf->GetSurfaceType()) {
+					case kOrb3DType:
+						tempPane = new Orbital3DSurfPane(listBook, dynamic_cast<Orb3DSurface*>(lSurf), this);
+						break;
+					case kOrb2DType:
+						tempPane = new Orbital2DSurfPane(listBook, dynamic_cast<Orb2DSurface*>(lSurf), this);
+						break;
+					case kTotalDensity3D:
+						tempPane = new TEDensity3DSurfPane(listBook, dynamic_cast<TEDensity3DSurface*>(lSurf), this);
+						break;
+					case kTotalDensity2D:
+						tempPane = new TEDensity2DSurfPane(listBook, dynamic_cast<TEDensity2DSurface*>(lSurf), this);
+						break;
+					case kMEP2D:
+						tempPane = new MEP2DSurfPane(listBook, dynamic_cast<MEP2DSurface*>(lSurf), this);
+						break;
+					case kMEP3D:
+						tempPane = new MEP3DSurfPane(listBook, dynamic_cast<MEP3DSurface*>(lSurf), this);
+						break;
+					case kGeneral2DSurface:
+						tempPane = new General2DSurfPane(listBook, dynamic_cast<General2DSurface*>(lSurf), this);
+						break;
+					case kGeneral3DSurface:
+						tempPane = new General3DSurfPane(listBook, dynamic_cast<General3DSurface*>(lSurf), this);
+						break;
+				}
+				wxString temp;
+				temp.Printf("%s", lSurf->GetLabel());
+				listBook->AddPage(tempPane, temp, true);
+			}
+		}
+	} else {
+		//setup a message about the lack of any surfaces
+	}
 }
 
 void SurfacesWindow::OnClose( wxCloseEvent& event )
@@ -393,6 +438,8 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 		Fit();
 	  Surface * tempSurf = tempPane->GetTargetSurface();
 	  temp.Printf("%s", tempSurf->GetLabel());
+	  visibleCheck->SetValue(tempPane->GetVisibility());
+	  allFrameCheck->SetValue(tempPane->GetAllFrames());
 	}
 	surfTitleEdit->SetValue(temp);
 }

@@ -156,6 +156,8 @@ class BaseSurfacePane : public wxPanel
   virtual bool UpdateNeeded(void) = 0;
 
   void SetVisibility(bool state);
+  bool GetVisibility(void) const {return Visible;};
+  bool GetAllFrames(void) const {return AllFrames;};
   void SetUpdateTest(bool test);
   void setUpdateButton();
   Surface * GetTargetSurface(void) const {return mTarget;};
