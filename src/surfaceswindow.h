@@ -115,7 +115,8 @@ public:
 		//Called when the list book page gets changed 
 	void OnPageChanged(wxListbookEvent & event);
 	void OnTitleChanged(wxCommandEvent& event );
-
+	void OnVisibleCheck( wxCommandEvent& event );
+	void OnAllFrameCheck(wxCommandEvent& event );
  private:
 
     int selectSurfaceType();

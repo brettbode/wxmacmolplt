@@ -288,6 +288,13 @@ void BaseSurfacePane::SetVisibility(bool state)
   setUpdateButton();
 }
 
+void BaseSurfacePane::setAllFrames(bool state) 
+{
+  AllFrames = state;
+
+  setUpdateButton();
+}
+
 void BaseSurfacePane::SetUpdateTest(bool test) 
 {
   UpdateTest = test;

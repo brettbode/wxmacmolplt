@@ -67,6 +67,8 @@ BEGIN_EVENT_TABLE( SurfacesWindow, wxFrame )
 ////@end SurfacesWindow event table entries
   EVT_LISTBOOK_PAGE_CHANGED(ID_SURFLISTBOOK, SurfacesWindow::OnPageChanged )
   EVT_TEXT_ENTER (ID_SURFTITLE, SurfacesWindow::OnTitleChanged )
+  EVT_CHECKBOX (ID_VISIBLECHECK, SurfacesWindow::OnVisibleCheck)
+  EVT_CHECKBOX (ID_ALLFRAMECHECK, SurfacesWindow::OnAllFrameCheck)
 END_EVENT_TABLE()
 
 
@@ -106,10 +108,14 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
     wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
+
+    //GetSizer()->Fit(this);
+    //GetSizer()->SetSizeHints(this);
     Centre();
 ////@end SurfacesWindow creation
-	MainPanel->Fit();
-	Fit();
+    MainPanel->Fit();
+    Fit();
+
     return true;
 }
 
@@ -135,7 +141,7 @@ void SurfacesWindow::CreateControls()
     allFrameCheck = new wxCheckBox( MainPanel, ID_ALLFRAMECHECK, _("All Frames"), wxDefaultPosition, wxDefaultSize, 0 );
     upperSizer->Add(allFrameCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    listBook = new wxListbook( MainPanel, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxLB_BOTTOM|wxSUNKEN_BORDER );
+    listBook = new wxListbook( MainPanel, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxLB_BOTTOM | wxSUNKEN_BORDER );
 
     middleSizer = new wxBoxSizer(wxHORIZONTAL);
     middleSizer->Add(listBook, 4, wxGROW|wxALL, 2);
@@ -239,6 +245,18 @@ void SurfacesWindow::addNewPane(int type)
 
 }
 
+void SurfacesWindow::OnVisibleCheck( wxCommandEvent& event )
+{
+  BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
+  tempPane->SetVisibility(event.GetSelection());
+}
+
+void SurfacesWindow::OnAllFrameCheck( wxCommandEvent& event )
+{
+  BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
+  tempPane->setAllFrames(event.GetSelection());
+}
+
 void SurfacesWindow::OnAddClick( wxCommandEvent& event )
 {
   int surfTypeId = selectSurfaceType();
@@ -301,6 +319,7 @@ int SurfacesWindow::selectSurfaceType()
 
   dialog.SetSelection(0);
 
+  mCurrSurfStr.Clear();
   if (dialog.ShowModal() == wxID_OK)
     mCurrSurfStr= dialog.GetStringSelection();
 
@@ -432,10 +451,11 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 	wxString temp(_("No surface chosen."));
 	BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
 	if (tempPane) {
-	  //listBook->Fit();
+	  //GetSizer()->Fit(this);
 	  tempPane->GetSizer()->Fit(tempPane);
-		MainPanel->Fit();
-		Fit();
+	  MainPanel->Fit();
+	  Fit();
+
 	  Surface * tempSurf = tempPane->GetTargetSurface();
 	  temp.Printf("%s", tempSurf->GetLabel());
 	  visibleCheck->SetValue(tempPane->GetVisibility());
