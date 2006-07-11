@@ -693,6 +693,40 @@ private:
 	
     DECLARE_EVENT_TABLE()
 };
+class MEP3DSurfPane : public Surface3DPane
+{    
+	DECLARE_CLASS( MEP3DSurfPane )
+	
+public:
+    /// Constructors
+    MEP3DSurfPane() { }
+    MEP3DSurfPane( wxWindow* parent, MEP3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    ~MEP3DSurfPane();
+	
+    virtual void TargetToPane();
+    virtual void refreshControls();
+	
+    /// Creates the controls and sizers
+    void CreateControls();
+	
+    /// Retrieves bitmap resources
+    wxBitmap GetBitmapResource( const wxString& name );
+	
+    /// Retrieves icon resources
+    wxIcon GetIconResource( const wxString& name );
+	
+    /// Should we show tooltips?
+    static bool ShowToolTips() {return true;};
+	
+private:
+		virtual bool UpdateNeeded(void);
+	
+	void OnUpdate(wxCommandEvent &event );
+
+    MEP3DSurface*	mTarget;
+	
+    DECLARE_EVENT_TABLE()
+};
 
 class Surface2DParamDlg : public wxFrame 
 {

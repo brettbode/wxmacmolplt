@@ -52,6 +52,7 @@ IMPLEMENT_CLASS( General2DSurfPane, wxPanel )
 IMPLEMENT_CLASS( TEDensity2DSurfPane, wxPanel )
 IMPLEMENT_CLASS( TEDensity3DSurfPane, wxPanel )
 IMPLEMENT_CLASS( MEP2DSurfPane, wxPanel )
+IMPLEMENT_CLASS( MEP3DSurfPane, wxPanel )
 
 IMPLEMENT_CLASS( Surface2DParamDlg, wxFrame )
 IMPLEMENT_CLASS( Surface3DParamDlg, wxFrame )
@@ -179,6 +180,23 @@ BEGIN_EVENT_TABLE( MEP2DSurfPane, wxPanel )
 	EVT_BUTTON (ID_SET_PARAM_BUT, Surface2DPane::OnSetParam)
 	EVT_BUTTON (ID_SET_PLANE_BUT, Surface2DPane::OnSetPlane)
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, MEP2DSurfPane::OnUpdate)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE( MEP3DSurfPane, wxPanel )
+	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
+	EVT_CHOICE  (ID_ORB_CHOICE, BaseSurfacePane::OnOrbSetChoice)
+	EVT_SLIDER (ID_CONTOUR_VALUE_SLIDER, Surface3DPane::OnContourValueSld)
+	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
+	EVT_SLIDER (ID_GRID_SIZE_SLIDER, Surface3DPane::OnGridSizeSld)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
+	EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
+	EVT_RADIOBOX (ID_3D_RADIOBOX, Surface3DPane::On3DRadioBox)
+	EVT_CHECKBOX (ID_SMOOTH_CHECKBOX, Surface3DPane::OnSmoothCheck)
+	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
+	EVT_BUTTON (ID_SET_PARAM_BUT, Surface3DPane::OnSetParam)
+	EVT_BUTTON (ID_FREE_MEM_BUT, Surface3DPane::OnFreeMem)
+	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, MEP3DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( Surface2DParamDlg, wxFrame )
@@ -3116,7 +3134,6 @@ void TEDensity3DSurfPane::TargetToPane(void)
 	Visible = mTarget->GetVisibility();
 	AllFrames = (mTarget->GetSurfaceID() != 0);
 	UseMEP = mTarget->ColorByValue();
-	UseNormals = mTarget->UseSurfaceNormals();
 	UseRGBSurfaceColor = mTarget->UseRGBColoration();
 	MaxMEPValue = mTarget->GetMaxSurfaceValue();
 	UpdateTest = false;
@@ -3789,6 +3806,336 @@ wxIcon MEP2DSurfPane::GetIconResource( const wxString& name )
     wxUnusedVar(name);
     return wxNullIcon;
 	////@end icon retrieval
+}
+
+/*!
+* MEP3DSurfPane class
+ */
+
+MEP3DSurfPane::MEP3DSurfPane( wxWindow* parent, MEP3DSurface* target, 
+										  SurfacesWindow* o, wxWindowID id,
+										  const wxPoint& pos, const wxSize& size, 
+										  long style ) 
+: Surface3DPane(parent, target, o, id, pos, size, style)
+{
+	mTarget = target;
+	
+	TargetToPane();
+	CreateControls();
+	BuildOrbSetPopup();
+	refreshControls();
+}
+
+MEP3DSurfPane::~MEP3DSurfPane()
+{
+	
+}
+void MEP3DSurfPane::TargetToPane(void) 
+{
+	mTarget->GetPosColor(&PosColor);
+	mTarget->GetNegColor(&NegColor);
+	mTarget->GetTranspColor(&TranspColor);
+	ContourValue = mTarget->GetContourValue();
+	UseSolidSurface = mTarget->SolidSurface();
+	UseNormals = mTarget->UseSurfaceNormals();
+	NumGridPoints = mTarget->GetNumGridPoints();
+	TargetOrbSet = mTarget->getTargetOrbitalSet();
+	GridSize = mTarget->GetGridSize();
+	Visible = mTarget->GetVisibility();
+	AllFrames = (mTarget->GetSurfaceID() != 0);
+	UpdateTest = false;
+}
+void MEP3DSurfPane::refreshControls()
+{
+	mOrbSetChoice->SetSelection(TargetOrbSet);
+	SetContourValueText();
+	setContourValueSld();
+	SetContourMaxValueText();
+	
+	mOrbColor1->setColor(&PosColor);
+	mOrbColor2->setColor(&NegColor);
+	mTransColor->setColor(&TranspColor);
+	
+	mNumGridPntSld->SetValue(NumGridPoints);
+	mGridSizeSld->SetValue((short)(100*GridSize));
+	
+	m3DRdoBox->SetSelection(1-UseSolidSurface);
+	mSmoothChkBox->SetValue(UseNormals);
+	
+	if (UseSolidSurface)
+		mSmoothChkBox->Enable();
+	else
+		mSmoothChkBox->Disable();
+}
+bool MEP3DSurfPane::UpdateNeeded(void) 
+{
+	bool result = UpdateTest;
+	
+	if (Visible != mTarget->GetVisibility()) result = true;
+	if (AllFrames != (mTarget->GetSurfaceID() != 0)) result = true;
+	if (TargetOrbSet != mTarget->getTargetOrbitalSet()) result = true;
+	if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
+	if (ContourValue != mTarget->GetContourValue()) result = true;
+	if (GridSize != mTarget->GetGridSize()) result = true;
+	if (UseSolidSurface != mTarget->SolidSurface()) result = true;
+	if (UseNormals != mTarget->UseSurfaceNormals()) result = true;
+	if (!result) {
+		RGBColor	testColor;
+		mTarget->GetPosColor(&testColor);
+		if ((PosColor.red != testColor.red)||(PosColor.green!=testColor.green)||
+			(PosColor.blue!=testColor.blue)) result=true;
+		mTarget->GetNegColor(&testColor);
+		if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)||
+			(NegColor.blue!=testColor.blue)) result=true;
+		mTarget->GetTranspColor(&testColor);
+		if ((TranspColor.red != testColor.red)||(TranspColor.green!=testColor.green)||
+			(TranspColor.blue!=testColor.blue)) result=true;
+	}
+	return result;
+}
+void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
+	SetContourValueText();
+	
+	//only update the grid if needed
+	bool updateGrid=UpdateTest, updateContour=false;
+	if (TargetOrbSet != mTarget->getTargetOrbitalSet()) {
+		updateGrid = true;
+		mTarget->SetFixGrid(false);
+	}
+	if (NumGridPoints != mTarget->GetNumGridPoints()) {
+		updateGrid = true;
+		mTarget->SetFixGrid(false);
+	}
+	if (ContourValue != mTarget->GetContourValue()) updateContour = true;
+	if (GridSize != mTarget->GetGridSize()) {
+		updateGrid = true;
+		mTarget->SetFixGrid(false);
+	}
+	if (Visible && !mTarget->ContourAvail()) updateContour = true;
+	//test to see if grid/contour must be updated anyway...
+	if (updateContour && ! mTarget->GridAvailable()) updateGrid = true;
+	if (updateGrid) updateContour = true;
+	mTarget->SetVisibility(Visible);
+	mTarget->SolidSurface(UseSolidSurface);
+	mTarget->setTargetOrbitalSet(TargetOrbSet);
+	mTarget->SetNumGridPoints(NumGridPoints);
+	mTarget->SetContourValue(ContourValue);
+	mTarget->SetGridSize(GridSize);
+	mTarget->SetPosColor(&PosColor);
+	mTarget->SetNegColor(&NegColor);
+	mTarget->SetTranspColor(&TranspColor);
+	mTarget->UseSurfaceNormals(UseNormals);
+	MoleculeData * data = owner->GetMoleculeData();
+	WinPrefs * Prefs = owner->GetPrefs();
+	//update this surface's data on all frames if necessary
+	if (AllFrames != (mTarget->GetSurfaceID() != 0)) {	//update all frames
+		long	SurfaceID;
+		Frame *	lFrame = data->GetFirstFrame();
+		updateGrid = updateContour = true;
+		if (AllFrames) {	//adding the surface to all frames
+			SurfaceID = mTarget->SetSurfaceID();
+			while (lFrame) {
+				if (lFrame != data->GetCurrentFramePtr()) {
+					MEP3DSurface * NewSurface = new MEP3DSurface(Prefs);
+					if (NewSurface) {
+						NewSurface->SetSurfaceID(SurfaceID);
+						lFrame->AppendSurface(NewSurface);
+					}
+				}
+				lFrame = lFrame->GetNextFrame();
+			}
+		} else {			//deleting the surface from other frames
+			SurfaceID = mTarget->GetSurfaceID();
+			mTarget->SetSurfaceID(0);	//Unmark this frames surface so it doesn't get deleted
+			while (lFrame) {
+				lFrame->DeleteSurfaceWithID(SurfaceID);
+				lFrame = lFrame->GetNextFrame();
+			}
+		}
+	}
+	Progress * lProgress = new Progress();
+	if (AllFrames) {	//compute the contour for each frame, no grid is kept
+		long SurfaceID = mTarget->GetSurfaceID();
+		long CurrentFrame = data->GetCurrentFrame();
+		long NumFrames = data->GetNumFrames();
+		for (int i=0; i<NumFrames; i++) {
+			MEP3DSurface * lSurf;
+			lSurf = NULL;
+			data->SetCurrentFrame(i+1);
+			Frame * lFrame = data->GetCurrentFramePtr();
+			if (CurrentFrame != data->GetCurrentFrame()) {
+				Surface * temp = lFrame->GetSurfaceWithID(SurfaceID);
+				//Confirm that the surface is the correct type
+				if (temp)
+					if (temp->GetSurfaceType() == kTotalDensity3D)
+						lSurf = (MEP3DSurface *) temp;
+				if (lSurf) lSurf->UpdateData(mTarget);
+			} else lSurf = mTarget;
+			if (lSurf) {
+				if (Visible) {
+					lProgress->ChangeText("Calculating 3D GridÉ");
+					lProgress->SetBaseValue(100*i/NumFrames);
+					lProgress->SetScaleFactor((float) 0.9/NumFrames);
+					if (updateGrid) lSurf->CalculateMEPGrid(data, lProgress);
+					lProgress->ChangeText("Contouring gridÉ");
+					lProgress->SetBaseValue((long)(100*i/NumFrames + 90.0/NumFrames));
+					lProgress->SetScaleFactor((float) 0.1/NumFrames);
+					if (updateContour) lSurf->Contour3DGrid(lProgress);
+					lSurf->FreeGrid();
+				} else {
+					if (updateContour) lSurf->FreeContour();
+				}
+			}
+		}
+		data->SetCurrentFrame(CurrentFrame);
+	} else {	//simply update this surface
+		if (Visible) {
+			lProgress->ChangeText("Calculating 3D GridÉ");
+			lProgress->SetScaleFactor(0.95);
+			if (updateGrid) mTarget->CalculateMEPGrid(data, lProgress);
+			lProgress->ChangeText("Contouring gridÉ");
+			lProgress->SetBaseValue(95);
+			lProgress->SetScaleFactor(0.05);
+			if (updateContour) mTarget->Contour3DGrid(lProgress);
+		} else {
+			mTarget->FreeGrid();
+			if (updateContour) mTarget->FreeContour();
+		}
+	}
+	if (lProgress) delete lProgress;
+	/*	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DFreeMem, target->GridAvailable());
+	//Setup the contour value and grid max text items
+	short	itemtype;
+	Handle	itemhandle;
+	Rect	itemrect;
+	GetDialogItem(SurfaceDlg, kSurfBaseItems+kTE3DValue, &itemtype, &itemhandle, &itemrect);
+	float ContourValue = target->GetContourValue(), GridMax = target->GetGridMax();
+	Str255	itemText;
+	sprintf((char *) &(itemText[1]), "%.4f", ContourValue);
+	itemText[0] = strlen((char *) &(itemText[1]));
+	SetDialogItemText(itemhandle, itemText);
+	GetDialogItem(SurfaceDlg, kSurfBaseItems+kTE3DMaxValue, &itemtype, &itemhandle, &itemrect);
+	sprintf((char *) &(itemText[1]), "%.4f", GridMax);
+	itemText[0] = strlen((char *) &(itemText[1]));
+	SetDialogItemText(itemhandle, itemText);
+	UpdateTest = false;
+	SetupContourSlider();
+	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DExportButton, target->ExportPossible());
+	*/
+	setContourValueSld();
+	SetContourMaxValueText();
+	UpdateTest = false;
+	setUpdateButton();
+	owner->SurfaceUpdated();
+}
+void MEP3DSurfPane::CreateControls() {
+	MEP3DSurfPane * MEP3DPanel = this;	//this is here just to match the code below from DialogBlocks
+	
+	wxBoxSizer* itemBoxSizer168 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer168, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText169 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Select Orbital Set:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer168->Add(itemStaticText169, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    wxString* mOrbSetChoiceStrings = NULL;
+    mOrbSetChoice = new wxChoice( MEP3DPanel, ID_ORB_CHOICE, wxDefaultPosition, wxDefaultSize, 0, mOrbSetChoiceStrings, 0 );
+    if (ShowToolTips())
+        mOrbSetChoice->SetToolTip(_("Choose the set of vectors to use for producing the MEP surface."));
+    itemBoxSizer168->Add(mOrbSetChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer171 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer171, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
+    wxStaticText* itemStaticText172 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Number of grid points:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer171->Add(itemStaticText172, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mNumGridPntSld = new wxSlider( MEP3DPanel, ID_GRID_POINT_SLIDER, 0, 10, 150, wxDefaultPosition, wxDefaultSize, wxSL_LABELS );
+    itemBoxSizer171->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer174 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer174, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
+    wxStaticText* itemStaticText175 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Grid Size:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer174->Add(itemStaticText175, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mGridSizeSld = new wxSlider( MEP3DPanel, ID_GRID_SIZE_SLIDER, 0, 0, 300, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+    itemBoxSizer174->Add(mGridSizeSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer177 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer177, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
+    wxBoxSizer* itemBoxSizer178 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer177->Add(itemBoxSizer178, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3);
+    wxStaticText* itemStaticText179 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Contour Value:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer178->Add(itemStaticText179, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mContourValueEdit = new wxTextCtrl( MEP3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer178->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer181 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer177->Add(itemBoxSizer181, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3);
+    mContourValSld = new wxSlider( MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+    itemBoxSizer181->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+	
+    wxBoxSizer* itemBoxSizer183 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer181->Add(itemBoxSizer183, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5);
+    mGridMinText = new wxStaticText( MEP3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
+    itemBoxSizer183->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mGridMaxText = new wxStaticText( MEP3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+    itemBoxSizer183->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    wxBoxSizer* itemBoxSizer186 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer186, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+    wxBoxSizer* itemBoxSizer187 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer186->Add(itemBoxSizer187, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxBoxSizer* itemBoxSizer188 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer187->Add(itemBoxSizer188, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+    wxStaticText* itemStaticText189 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Surface Color:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer188->Add(itemStaticText189, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mOrbColor1 = new colorArea( MEP3DPanel, ID_3D_COLOR_POSITIVE, &PosColor );
+    itemBoxSizer188->Add(mOrbColor1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    mOrbColor2 = new colorArea( MEP3DPanel, ID_3D_COLOR_NEGATIVE, &NegColor );
+    itemBoxSizer188->Add(mOrbColor2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer192 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer187->Add(itemBoxSizer192, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+    wxStaticText* itemStaticText193 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Transparency color:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer192->Add(itemStaticText193, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mTransColor = new colorArea( MEP3DPanel, ID_TRANSPARENCY_COLOR, &TranspColor );
+    itemBoxSizer192->Add(mTransColor, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer195 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer187->Add(itemBoxSizer195, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+    wxString m3DRdoBoxStrings[] = {
+        _("&Solid"),
+        _("&WireFrame")
+    };
+    m3DRdoBox = new wxRadioBox( MEP3DPanel, ID_3D_RADIOBOX, _("Surface Display"), wxDefaultPosition, wxDefaultSize, 2, m3DRdoBoxStrings, 1, wxRA_SPECIFY_ROWS );
+    m3DRdoBox->SetSelection(0);
+    itemBoxSizer195->Add(m3DRdoBox, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    mSmoothChkBox = new wxCheckBox( MEP3DPanel, ID_SMOOTH_CHECKBOX, _("Smooth"), wxDefaultPosition, wxDefaultSize, 0 );
+    mSmoothChkBox->SetValue(false);
+    if (ShowToolTips())
+        mSmoothChkBox->SetToolTip(_("Check to use surface normals to smooth out the surface of the contour."));
+    itemBoxSizer195->Add(mSmoothChkBox, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer198 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer186->Add(itemBoxSizer198, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mSetParamBut = new wxButton( MEP3DPanel, ID_SET_PARAM_BUT, _("Parameters..."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer198->Add(mSetParamBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mFreeMemBut = new wxButton( MEP3DPanel, ID_FREE_MEM_BUT, _("Free Mem"), wxDefaultPosition, wxDefaultSize, 0 );
+    if (ShowToolTips())
+        mFreeMemBut->SetToolTip(_("Click to free the memory used by the 3D grid."));
+    itemBoxSizer198->Add(mFreeMemBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mExportBut = new wxButton( MEP3DPanel, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer198->Add(mExportBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mUpdateBut = new wxButton( MEP3DPanel, ID_SURFACE_UPDATE_BUT, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
+    mUpdateBut->SetDefault();
+    itemBoxSizer198->Add(mUpdateBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 }
 
 Surface2DParamDlg::Surface2DParamDlg(BaseSurfacePane * parent, Surf2DBase * targetSurface, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style)
