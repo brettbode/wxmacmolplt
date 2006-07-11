@@ -120,6 +120,7 @@ public:
 
     int selectSurfaceType();
 
+	wxPanel * MainPanel;
     wxBoxSizer* mainSizer;
     wxBoxSizer* upperSizer;
     wxBoxSizer* middleSizer;

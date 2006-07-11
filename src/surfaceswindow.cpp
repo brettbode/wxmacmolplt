@@ -106,10 +106,10 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
     wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
-    GetSizer()->Fit(this);
-    GetSizer()->SetSizeHints(this);
     Centre();
 ////@end SurfacesWindow creation
+	MainPanel->Fit();
+	Fit();
     return true;
 }
 
@@ -121,25 +121,28 @@ void SurfacesWindow::CreateControls()
 {    
 ////@begin SurfacesWindow content construction
 
+    MainPanel = new wxPanel( this, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+
     mainSizer = new wxBoxSizer(wxVERTICAL);
+    MainPanel->SetSizer(mainSizer);
     upperSizer = new wxBoxSizer(wxHORIZONTAL);
 
-    surfTitleEdit = new wxTextCtrl( this, ID_SURFTITLE, _T(""), wxDefaultPosition, wxSize(250, -1), wxTE_PROCESS_ENTER);
+    surfTitleEdit = new wxTextCtrl( MainPanel, ID_SURFTITLE, _T(""), wxDefaultPosition, wxSize(250, -1), wxTE_PROCESS_ENTER);
     upperSizer->Add(surfTitleEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    visibleCheck = new wxCheckBox( this, ID_VISIBLECHECK, _("Visible"), wxDefaultPosition, wxDefaultSize, 0 );
+    visibleCheck = new wxCheckBox( MainPanel, ID_VISIBLECHECK, _("Visible"), wxDefaultPosition, wxDefaultSize, 0 );
     upperSizer->Add(visibleCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    allFrameCheck = new wxCheckBox( this, ID_ALLFRAMECHECK, _("All Frames"), wxDefaultPosition, wxDefaultSize, 0 );
+    allFrameCheck = new wxCheckBox( MainPanel, ID_ALLFRAMECHECK, _("All Frames"), wxDefaultPosition, wxDefaultSize, 0 );
     upperSizer->Add(allFrameCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    listBook = new wxListbook( this, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxLB_BOTTOM|wxSUNKEN_BORDER );
+    listBook = new wxListbook( MainPanel, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxLB_BOTTOM|wxSUNKEN_BORDER );
 
     middleSizer = new wxBoxSizer(wxHORIZONTAL);
     middleSizer->Add(listBook, 4, wxGROW|wxALL, 2);
 
-    addButton = new wxButton( this, wxID_ADD, _("&Add"), wxDefaultPosition, wxDefaultSize, 0 );
-    delButton = new wxButton( this, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+    addButton = new wxButton( MainPanel, wxID_ADD, _("&Add"), wxDefaultPosition, wxDefaultSize, 0 );
+    delButton = new wxButton( MainPanel, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 
     if (ShowToolTips())
       {
@@ -154,8 +157,6 @@ void SurfacesWindow::CreateControls()
     mainSizer->Add(upperSizer, 0, wxALIGN_LEFT|wxALL, 5);
     mainSizer->Add(middleSizer, 0, wxALIGN_LEFT|wxALL, 5);
     mainSizer->Add(bottomSizer, 0, wxALIGN_LEFT|wxALL, 5);
-
-    SetSizer(mainSizer);
 
     wxListView * t = listBook->GetListView();
     t->SetWindowStyle(wxLC_LIST | wxLC_ALIGN_LEFT);
@@ -237,6 +238,10 @@ void SurfacesWindow::OnAddClick( wxCommandEvent& event )
 {
   int surfTypeId = selectSurfaceType();
   addNewPane(surfTypeId);
+  if (listBook->GetPageCount()> 0) {
+      visibleCheck->Enable();
+      allFrameCheck->Enable();
+  }
 }
 
 /*!
@@ -384,7 +389,8 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 	if (tempPane) {
 	  //listBook->Fit();
 	  tempPane->GetSizer()->Fit(tempPane);
-	  GetSizer()->Fit(this);
+		MainPanel->Fit();
+		Fit();
 	  Surface * tempSurf = tempPane->GetTargetSurface();
 	  temp.Printf("%s", tempSurf->GetLabel());
 	}
