@@ -377,6 +377,8 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 	wxString temp(_("No surface chosen."));
 	BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
 	if (tempPane) {
+	  //listBook->Fit();
+	  tempPane->GetSizer()->Fit(tempPane);
 	  GetSizer()->Fit(this);
 	  Surface * tempSurf = tempPane->GetTargetSurface();
 	  temp.Printf("%s", tempSurf->GetLabel());
@@ -388,7 +390,6 @@ void SurfacesWindow::OnTitleChanged(wxCommandEvent& event )
 {
   //wxListView * t = listBook->GetListView();
   int id = listBook->GetSelection();
-  int maxItem = listBook->GetPageCount();
   wxString newLabel = surfTitleEdit->GetValue();
 
   BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
