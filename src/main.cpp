@@ -93,7 +93,7 @@ bool MpApp::OnInit() {
 	if (cmdParser.Found(wxT("v"))) 
 	{ 
 #ifndef __WXMSW__ 
-		wxLog::SetActiveTarget(new wxLogStderr); 
+		wxLog::SetActiveTarget(new wxLogStderr);
 #endif 
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 

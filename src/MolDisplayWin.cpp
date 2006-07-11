@@ -42,6 +42,10 @@
 #include <wx/printdlg.h>
 #include <wx/mstream.h>
 
+#ifdef __WXMSW__
+#include <stdio.h>
+#endif
+
 extern WinPrefs * gPreferences;
 
 using namespace std;
@@ -213,6 +217,7 @@ private:
     DECLARE_NO_COPY_CLASS(wxCMLDataObject)
 };
 
+
 MolDisplayWin::MolDisplayWin(const wxString &title,
                          const wxPoint  &position,
                          const wxSize   &size,
@@ -240,6 +245,13 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     
     pageSetupData = NULL;
     printData = NULL;
+
+#ifdef __WXMSW__
+	//Visual studio is a total pile.
+	//The %n format specifier is disabled by default and
+	//putting this in the app init function didn't work.
+	_set_printf_count_output(1);
+#endif
 
     InitGLData();
     
@@ -329,9 +341,11 @@ void MolDisplayWin::OnActivate(wxActivateEvent & event) {
 }
 
 void MolDisplayWin::StopAnimations(void) {
+	bool resetNeeded = false;
     if (m_timer.IsRunning()) {
         m_timer.Stop();
         timerRunning = false;
+		resetNeeded = true;
     }
     if (ModeAnimationData) { //if data already exists toggle off the animation
         ModeAnimationData->m_timer.Stop();
@@ -341,8 +355,9 @@ void MolDisplayWin::StopAnimations(void) {
         }
         delete ModeAnimationData;
         ModeAnimationData = NULL;
+		resetNeeded = true;
     }
-    ResetModel(false);
+    if (resetNeeded) ResetModel(false);
 }
 
 void MolDisplayWin::OnFrameAnimationTimer(wxTimerEvent & event) {
@@ -1032,6 +1047,7 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
         return;
     }*/
 #endif
+	Freeze();
     Destroy();
     app.destroyMainFrame(this);
 }

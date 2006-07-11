@@ -393,7 +393,7 @@ void MpGLCanvas::eventPaint(wxPaintEvent &event) {
     draw();
 }
 void MpGLCanvas::draw(void) {
-    if(!GetContext()) {
+    if(!GetContext()||!MolWin->IsShown()||(Prefs==NULL)) {
         return;
     }
     SetCurrent();
