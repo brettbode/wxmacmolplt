@@ -164,6 +164,22 @@ BEGIN_EVENT_TABLE( TEDensity3DSurfPane, wxPanel )
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, TEDensity3DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
+BEGIN_EVENT_TABLE( MEP2DSurfPane, wxPanel )
+	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
+	EVT_CHOICE  (ID_ORB_CHOICE, BaseSurfacePane::OnOrbSetChoice)
+	EVT_CHECKBOX (ID_USE_PLANE_CHECKBOX, Surface2DPane::OnUsePlaneChk)
+	EVT_CHECKBOX (ID_SHOW_ZERO_CHECKBOX, Surface2DPane::OnShowZeroChk)
+	EVT_CHECKBOX (ID_DASH_CHECKBOX, Surface2DPane::OnDashChk)
+	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface2DPane::OnContourValueText)
+	EVT_TEXT (ID_NUM_CONTOUR_TEXT, Surface2DPane::OnNumContoursText)
+	EVT_COMMAND_ENTER(ID_2D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
+	EVT_COMMAND_ENTER(ID_2D_COLOR_NEGATIVE, Surface2DPane::OnNegColorChange)
+	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
+	EVT_BUTTON (ID_SET_PARAM_BUT, Surface2DPane::OnSetParam)
+	EVT_BUTTON (ID_SET_PLANE_BUT, Surface2DPane::OnSetPlane)
+	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, MEP2DSurfPane::OnUpdate)
+END_EVENT_TABLE()
+
 BEGIN_EVENT_TABLE( Surface2DParamDlg, wxFrame )
   EVT_BUTTON (wxID_OK, Surface2DParamDlg::OnClose)
   EVT_BUTTON (wxID_CANCEL, Surface2DParamDlg::OnCancel)
@@ -3514,6 +3530,264 @@ wxIcon TEDensity3DSurfPane::GetIconResource( const wxString& name )
     wxUnusedVar(name);
     return wxNullIcon;
 	////@end Orbital3D icon retrieval
+}
+/*!
+* TEDensity2DSurfPane class
+ */
+
+MEP2DSurfPane::MEP2DSurfPane( wxWindow* parent, MEP2DSurface* target, 
+										  SurfacesWindow* o, wxWindowID id,
+										  const wxPoint& pos, const wxSize& size, 
+										  long style ) 
+: Surface2DPane(parent, target, o, id, pos, size, style)
+{
+	mTarget = target;
+	
+	TargetToPane();
+	CreateControls();
+	BuildOrbSetPopup();
+	refreshControls();
+}
+
+MEP2DSurfPane::~MEP2DSurfPane()
+{
+	
+}
+void MEP2DSurfPane::CreateControls() {
+	MEP2DSurfPane * MEP2DPanel = this;	//this is here just to match the code below from DialogBlocks
+
+	wxBoxSizer* itemBoxSizer137 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer137, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText138 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Select Orbital Set:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer137->Add(itemStaticText138, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    wxString* mOrbSetChoiceStrings = NULL;
+    mOrbSetChoice = new wxChoice( MEP2DPanel, ID_ORB_CHOICE, wxDefaultPosition, wxDefaultSize, 0, mOrbSetChoiceStrings, 0 );
+    if (ShowToolTips())
+        mOrbSetChoice->SetToolTip(_("Choose the set of vectors to use for producing the MEP surface."));
+    itemBoxSizer137->Add(mOrbSetChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer140 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer140, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText141 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Number of grid points:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer140->Add(itemStaticText141, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mNumGridPntSld = new wxSlider( MEP2DPanel, ID_GRID_POINT_SLIDER, 0, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_LABELS );
+    itemBoxSizer140->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer143 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer143, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText144 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Max. # of contours:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer143->Add(itemStaticText144, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mNumContourText = new wxTextCtrl( MEP2DPanel, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer143->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer146 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer146, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText147 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Max. contour value:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer146->Add(itemStaticText147, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mContourValText = new wxTextCtrl( MEP2DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer146->Add(mContourValText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	
+    mUsePlaneChk = new wxCheckBox( MEP2DPanel, ID_USE_PLANE_CHECKBOX, _("Use plane of screen"), wxDefaultPosition, wxDefaultSize, 0 );
+    mUsePlaneChk->SetValue(false);
+    mainSizer->Add(mUsePlaneChk, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mShowZeroCheck = new wxCheckBox( MEP2DPanel, ID_SHOW_ZERO_CHECKBOX, _("Show zero value contour"), wxDefaultPosition, wxDefaultSize, 0 );
+    mShowZeroCheck->SetValue(false);
+    if (ShowToolTips())
+        mShowZeroCheck->SetToolTip(_("Check to produce a gray contour where the plane changes sign."));
+    mainSizer->Add(mShowZeroCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mDashCheck = new wxCheckBox( MEP2DPanel, ID_DASH_CHECKBOX, _("Dash negative contours"), wxDefaultPosition, wxDefaultSize, 0 );
+    mDashCheck->SetValue(false);
+    if (ShowToolTips())
+        mDashCheck->SetToolTip(_("Produces dashed negative contour lines for easier viewing in B & W."));
+    mainSizer->Add(mDashCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer152 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer152, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+    wxBoxSizer* itemBoxSizer153 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer152->Add(itemBoxSizer153, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
+    wxStaticText* itemStaticText154 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Positive Color:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer153->Add(itemStaticText154, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mOrbColor1 = new colorArea( MEP2DPanel, ID_2D_COLOR_POSITIVE, &PosColor );
+    itemBoxSizer153->Add(mOrbColor1, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer156 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer152->Add(itemBoxSizer156, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
+    wxStaticText* itemStaticText157 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Negative Color:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer156->Add(itemStaticText157, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	
+    mOrbColor2 = new colorArea( MEP2DPanel, ID_2D_COLOR_NEGATIVE, &NegColor);
+    itemBoxSizer156->Add(mOrbColor2, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer159 = new wxBoxSizer(wxHORIZONTAL);
+    mainSizer->Add(itemBoxSizer159, 0, wxALIGN_RIGHT|wxALL, 5);
+    wxBoxSizer* itemBoxSizer160 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer159->Add(itemBoxSizer160, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mSetParamBut = new wxButton( MEP2DPanel, ID_SET_PARAM_BUT, _("Parameters..."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer160->Add(mSetParamBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mSetPlaneBut = new wxButton( MEP2DPanel, ID_SET_PLANE_BUT, _("Set Plane..."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer160->Add(mSetPlaneBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    wxBoxSizer* itemBoxSizer163 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer159->Add(itemBoxSizer163, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mExportBut = new wxButton( MEP2DPanel, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer163->Add(mExportBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	
+    mUpdateBut = new wxButton( MEP2DPanel, ID_SURFACE_UPDATE_BUT, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
+    mUpdateBut->SetDefault();
+    itemBoxSizer163->Add(mUpdateBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+}
+void MEP2DSurfPane::TargetToPane(void) 
+{
+	TargetOrbSet = mTarget->getTargetOrbitalSet();
+	NumGridPoints = mTarget->GetNumGridPoints();
+	mTarget->GetPosColor(&PosColor);
+	mTarget->GetNegColor(&NegColor);
+	MaxContourValue = mTarget->GetMaxValue();
+	NumContours = mTarget->GetNumContours();
+	UseScreenPlane = mTarget->GetRotate2DMap();
+	DashLines = mTarget->GetDashLine();
+	ShowZeroContour = mTarget->GetShowZeroContour();
+	Visible = mTarget->GetVisibility();
+	AllFrames = (mTarget->GetSurfaceID() != 0);
+	UpdateTest = false;
+}
+bool MEP2DSurfPane::UpdateNeeded(void) 
+{
+	bool result = UpdateTest;
+	
+	if (Visible != mTarget->GetVisibility()) result = true;
+	if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
+	if (NumContours != mTarget->GetNumContours()) result = true;
+	if (MaxContourValue != mTarget->GetMaxValue()) result = true;
+	if (UseScreenPlane != mTarget->GetRotate2DMap()) result = true;
+	if (ShowZeroContour != mTarget->GetShowZeroContour()) result = true;
+	if (DashLines != mTarget->GetDashLine()) result = true;
+	if (TargetOrbSet != mTarget->getTargetOrbitalSet()) result = true;
+	if (!result) {
+		RGBColor	testColor;
+		mTarget->GetPosColor(&testColor);
+		if ((PosColor.red != testColor.red)||(PosColor.green!=testColor.green)||
+			(PosColor.blue!=testColor.blue)) result=true;
+		mTarget->GetNegColor(&testColor);
+		if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)||
+			(NegColor.blue!=testColor.blue)) result=true;
+	}
+	return result;
+}
+void MEP2DSurfPane::OnUpdate(wxCommandEvent &event) {
+	SetNumContoursText();
+	SetContourValueText();
+	
+	bool	updateGrid = UpdateTest;
+	if (TargetOrbSet != mTarget->getTargetOrbitalSet()) {
+		mTarget->setTargetOrbitalSet(TargetOrbSet);
+		updateGrid = true;
+	}
+	if (NumGridPoints != mTarget->GetNumGridPoints()) {
+		mTarget->SetNumGridPoints(NumGridPoints);
+		updateGrid = true;
+	}
+	mTarget->SetVisibility(Visible);
+	mTarget->SetNumContours(NumContours);
+	mTarget->SetMaxValue(MaxContourValue);
+	mTarget->SetPosColor(&PosColor);
+	mTarget->SetNegColor(&NegColor);
+	mTarget->SetShowZeroContour(ShowZeroContour);
+	mTarget->SetDashLine(DashLines);
+	if (UseScreenPlane && !mTarget->GetRotate2DMap()) updateGrid = true;
+	mTarget->SetRotate2DMap(UseScreenPlane);
+	
+	MoleculeData * mData = owner->GetMoleculeData();
+	if (AllFrames != (mTarget->GetSurfaceID() != 0)) {	//update all frames
+		long	SurfaceID;
+		Frame *	lFrame = mData->GetFirstFrame();
+		if (AllFrames) {	//adding the surface to all frames
+			SurfaceID = mTarget->SetSurfaceID();
+			while (lFrame) {
+				if (lFrame != mData->GetCurrentFramePtr()) {
+					MEP2DSurface * NewSurface = new MEP2DSurface(mTarget);
+					lFrame->AppendSurface(NewSurface);
+				}
+				lFrame = lFrame->GetNextFrame();
+			}
+		} else {			//deleting the surface from other frames
+			SurfaceID = mTarget->GetSurfaceID();
+			mTarget->SetSurfaceID(0);	//Unmark this frames surface so it doesn't get deleted
+			while (lFrame) {
+				lFrame->DeleteSurfaceWithID(SurfaceID);
+				lFrame = lFrame->GetNextFrame();
+			}
+		}
+	} else if (AllFrames) {
+		long SurfaceID = mTarget->GetSurfaceID();
+		Frame * lFrame = mData->GetFirstFrame();
+		while (lFrame) {
+			if (lFrame != mData->GetCurrentFramePtr()) {
+				Surface * temp = lFrame->GetSurfaceWithID(SurfaceID);
+				MEP2DSurface * lSurf = NULL;
+				if (temp)
+					if (temp->GetSurfaceType() == kOrb2DType)
+						lSurf = (MEP2DSurface *) temp;
+				if (lSurf) {
+					lSurf->UpdateData(mTarget);
+					if (updateGrid) lSurf->FreeGrid();
+				}
+			}
+			lFrame = lFrame->GetNextFrame();
+		}
+	}
+	if (updateGrid) mTarget->FreeGrid();
+	UpdateTest = false;
+	setUpdateButton();
+	owner->SurfaceUpdated();
+}
+void MEP2DSurfPane::refreshControls()
+{
+	mOrbSetChoice->SetSelection(TargetOrbSet);
+	SetNumContoursText();
+	SetContourValueText();
+	
+	mOrbColor1->setColor(&PosColor);
+	mOrbColor2->setColor(&NegColor);
+	
+	mNumGridPntSld->SetValue(NumGridPoints);
+	
+	mUsePlaneChk->SetValue(UseScreenPlane);
+	mShowZeroCheck->SetValue(ShowZeroContour);
+	mDashCheck->SetValue(DashLines);
+}
+/*!
+* Get bitmap resources
+ */
+
+wxBitmap MEP2DSurfPane::GetBitmapResource( const wxString& name )
+{
+    // Bitmap retrieval
+	////@begin bitmap retrieval
+    wxUnusedVar(name);
+    return wxNullBitmap;
+	////@end bitmap retrieval
+}
+
+/*!
+* Get icon resources
+ */
+
+wxIcon MEP2DSurfPane::GetIconResource( const wxString& name )
+{
+    // Icon retrieval
+	////@begin icon retrieval
+    wxUnusedVar(name);
+    return wxNullIcon;
+	////@end icon retrieval
 }
 
 Surface2DParamDlg::Surface2DParamDlg(BaseSurfacePane * parent, Surf2DBase * targetSurface, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style)

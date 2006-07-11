@@ -47,6 +47,8 @@ class General3DSurface;
 class General2DSurface;
 class TEDensity2DSurface;
 class TEDensity3DSurface;
+class MEP2DSurface;
+class MEP3DSurface;
 class OrbSurfBase;
 class SurfacesWindow;
 ////@end forward declarations
@@ -654,6 +656,40 @@ private:
 	float	MaxMEPValue;
 	
     TEDensity3DSurface*	mTarget;
+	
+    DECLARE_EVENT_TABLE()
+};
+class MEP2DSurfPane : public Surface2DPane
+{    
+	DECLARE_CLASS( MEP2DSurfPane )
+	
+public:
+    /// Constructors
+    MEP2DSurfPane() { }
+    MEP2DSurfPane( wxWindow* parent, MEP2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    ~MEP2DSurfPane();
+	
+    virtual void TargetToPane();
+    virtual void refreshControls();
+	
+    /// Creates the controls and sizers
+    void CreateControls();
+	
+    /// Retrieves bitmap resources
+    wxBitmap GetBitmapResource( const wxString& name );
+	
+    /// Retrieves icon resources
+    wxIcon GetIconResource( const wxString& name );
+	
+    /// Should we show tooltips?
+    static bool ShowToolTips() {return true;};
+	
+private:
+		virtual bool UpdateNeeded(void);
+	
+	void OnUpdate(wxCommandEvent &event );
+	
+    MEP2DSurface*	mTarget;
 	
     DECLARE_EVENT_TABLE()
 };

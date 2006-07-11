@@ -192,6 +192,11 @@ void SurfacesWindow::addNewPane(int type)
 		tempPane = new TEDensity3DSurfPane(listBook, dynamic_cast<TEDensity3DSurface*>(newSurface), this);
 		break;
 		
+	case ID_2D_ME_POTENTIAL_PANE:
+		newSurface = new MEP2DSurface(mPrefs);
+		tempPane = new MEP2DSurfPane(listBook, dynamic_cast<MEP2DSurface*>(newSurface), this);
+		break;
+		
 	case ID_2D_FILE_PANE:
 		newSurface = new General2DSurface(mPrefs);
 		tempPane = new General2DSurfPane(listBook, dynamic_cast<General2DSurface*>(newSurface), this);
