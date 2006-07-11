@@ -51,6 +51,7 @@ IMPLEMENT_CLASS( General3DSurfPane, wxPanel )
 IMPLEMENT_CLASS( General2DSurfPane, wxPanel )
 IMPLEMENT_CLASS( TEDensity2DSurfPane, wxPanel )
 IMPLEMENT_CLASS( TEDensity3DSurfPane, wxPanel )
+IMPLEMENT_CLASS( MEP2DSurfPane, wxPanel )
 
 IMPLEMENT_CLASS( Surface2DParamDlg, wxFrame )
 IMPLEMENT_CLASS( Surface3DParamDlg, wxFrame )
