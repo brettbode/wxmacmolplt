@@ -83,6 +83,12 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 
     EVT_CHOICE( ID_CC_CHOICE, InputBuilderWindow::OnCcChoiceSelected )
 
+    EVT_BUTTON( ID_DEFAULTSBUTTON, InputBuilderWindow::OnDefaultsbuttonClick )
+
+    EVT_BUTTON( ID_REVERTBUTTON, InputBuilderWindow::OnRevertbuttonClick )
+
+    EVT_BUTTON( ID_WRITEFILEBUTTON, InputBuilderWindow::OnWritefilebuttonClick )
+
     EVT_BUTTON( wxID_CANCEL, InputBuilderWindow::OnCancelClick )
 
     EVT_BUTTON( wxID_OK, InputBuilderWindow::OnOkClick )
@@ -106,11 +112,11 @@ InputBuilderWindow::InputBuilderWindow( wxWindow* parent, wxWindowID id, const w
 
 InputBuilderWindow::~InputBuilderWindow() {
     //temp
-    tabMOGuess->Destroy();
-    tabHessOpts->Destroy();
-    tabMiscPrefs->Destroy();
-    tabSCFOpts->Destroy();
-    tabStatPoint->Destroy();
+    //tabMOGuess->Destroy();
+    //tabHessOpts->Destroy();
+    //tabMiscPrefs->Destroy();
+    //tabSCFOpts->Destroy();
+    //tabStatPoint->Destroy();
     
     delete TmpInputRec;
 }
@@ -122,11 +128,6 @@ InputBuilderWindow::~InputBuilderWindow() {
 bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin InputBuilderWindow member initialisation
-    tabMOGuess = NULL;
-    tabHessOpts = NULL;
-    tabMiscPrefs = NULL;
-    tabSCFOpts = NULL;
-    tabStatPoint = NULL;
     listBook = NULL;
     basisChoice = NULL;
     ecpTypeChoice = NULL;
@@ -156,6 +157,9 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     symmetryCheck = NULL;
     aimpacCheck = NULL;
     rpacCheck = NULL;
+    defaultsBtn = NULL;
+    revertBtn = NULL;
+    writeBtn = NULL;
 ////@end InputBuilderWindow member initialisation
 
 ////@begin InputBuilderWindow creation
@@ -948,87 +952,67 @@ void InputBuilderWindow::CreateControls()
 
     listBook->AddPage(itemPanel147, _("Stat. Point"));
 
+    wxPanel* itemPanel174 = new wxPanel( listBook, ID_SUMMARYPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+
+    listBook->AddPage(itemPanel174, _("Summary"));
+
     itemBoxSizer2->Add(listBook, 1, wxGROW|wxALL, 2);
 
-    wxBoxSizer* itemBoxSizer174 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer174, 0, wxGROW, 5);
+    wxBoxSizer* itemBoxSizer175 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer2->Add(itemBoxSizer175, 0, wxGROW, 5);
 
-    wxButton* itemButton175 = new wxButton( itemFrame1, ID_BUTTON, _("Write File"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer174->Add(itemButton175, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
+    defaultsBtn = new wxButton( itemFrame1, ID_DEFAULTSBUTTON, _("Use Defaults"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer175->Add(defaultsBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxButton* itemButton176 = new wxButton( itemFrame1, ID_BUTTON1, _("Summary"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer174->Add(itemButton176, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    revertBtn = new wxButton( itemFrame1, ID_REVERTBUTTON, _("Revert"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer175->Add(revertBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStdDialogButtonSizer* itemStdDialogButtonSizer177 = new wxStdDialogButtonSizer;
+    writeBtn = new wxButton( itemFrame1, ID_WRITEFILEBUTTON, _("Write File"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer175->Add(writeBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-    itemBoxSizer174->Add(itemStdDialogButtonSizer177, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-    wxButton* itemButton178 = new wxButton( itemFrame1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStdDialogButtonSizer177->AddButton(itemButton178);
+    wxStdDialogButtonSizer* itemStdDialogButtonSizer179 = new wxStdDialogButtonSizer;
 
-    wxButton* itemButton179 = new wxButton( itemFrame1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStdDialogButtonSizer177->AddButton(itemButton179);
+    itemBoxSizer175->Add(itemStdDialogButtonSizer179, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxButton* itemButton180 = new wxButton( itemFrame1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStdDialogButtonSizer179->AddButton(itemButton180);
 
-    itemStdDialogButtonSizer177->Realize();
+    wxButton* itemButton181 = new wxButton( itemFrame1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStdDialogButtonSizer179->AddButton(itemButton181);
+
+    itemStdDialogButtonSizer179->Realize();
 
 ////@end InputBuilderWindow content construction
-    tabStatPoint = listBook->GetPage(10);
-    listBook->RemovePage(10);
+
+    tabText[0] = wxT("Basis");
+    tabText[1] = wxT("Control");
+    tabText[2] = wxT("Data");
+    tabText[3] = wxT("System");
+    tabText[4] = wxT("DFT");
+    tabText[5] = wxT("MO Guess");
+    tabText[6] = wxT("Hess. Options");
+    tabText[7] = wxT("Misc. Prefs");
+    tabText[8] = wxT("MP2 Options");
+    tabText[9] = wxT("SCF Options");
+    tabText[10] = wxT("Stat. Point");
+    tabText[11] = wxT("Summary");
+
+    for(int i = NUM_PANES - 1; i >= 0; i--) {
+        tab[i] = listBook->GetPage(i);
+        listBook->RemovePage(i);
+        visibleTab[i] = false;
+    }
     
-    tabSCFOpts = listBook->GetPage(9);
-    listBook->RemovePage(9);
-    
-    tabMP2Opts = listBook->GetPage(8);
-    listBook->RemovePage(8);
-    
-    tabMiscPrefs = listBook->GetPage(7);
-    listBook->RemovePage(7);
-    
-    tabHessOpts  = listBook->GetPage(6);
-    listBook->RemovePage(6);
-    
-    tabMOGuess = listBook->GetPage(5);
-    listBook->RemovePage(5);
-        
-    tabDFT = listBook->GetPage(4);
-    listBook->RemovePage(4);
-    
-    tabSystem = listBook->GetPage(3);
-    listBook->RemovePage(3);
-    
-    tabData = listBook->GetPage(2);
-    listBook->RemovePage(2);
-    
-    tabControl = listBook->GetPage(1);
-    listBook->RemovePage(1);
-    
-    tabBasis = listBook->GetPage(0);
-    listBook->RemovePage(0);
-    
-    wxListView * t = listBook->GetListView();
+    //wxListView * t = listBook->GetListView();
 	//t->SetWindowStyle(wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_NO_HEADER);
-	t->SetWindowStyle(wxLC_LIST|wxLC_SINGLE_SEL);
-    
-    listBook->AddPage(tabBasis, _("Basis"));
-    listBook->AddPage(tabControl, _("Control"));
-    listBook->AddPage(tabData, _("Data"));
-    listBook->AddPage(tabSystem, _("System"));
-    listBook->AddPage(tabDFT, _("DFT"));
-    listBook->AddPage(tabMOGuess, _("MO Guess"));
-    listBook->AddPage(tabHessOpts, _("Hess. Options"));
-    listBook->AddPage(tabMiscPrefs, _("Misc. Prefs"));
-    listBook->AddPage(tabMP2Opts, _("MP2 Options"));
-    listBook->AddPage(tabSCFOpts, _("SCF Options"));
-    listBook->AddPage(tabStatPoint, _("Stat. Point"));
-    
+	//t->SetWindowStyle(wxLC_LIST|wxLC_SINGLE_SEL);
+
+    setPaneVisible(BASIS_PANE,   true);
+    setPaneVisible(CONTROL_PANE, true);
+    setPaneVisible(DATA_PANE,    true);
+    setPaneVisible(SYSTEM_PANE,  true);
+    setPaneVisible(SUMMARY_PANE, true);
+
     listBook->SetSelection(1);
-    
-    //listBook->RemovePage(10);
-    //listBook->RemovePage(9);
-    //listBook->RemovePage(8);
-    //listBook->RemovePage(7);
-    //listBook->RemovePage(6);
-    //listBook->RemovePage(5);
-    //listBook->RemovePage(4);
 }
 
 /*!
@@ -1369,4 +1353,75 @@ void InputBuilderWindow::OnOkClick( wxCommandEvent& event )
     parent->CloseInputBuilderWindow();
 }
 
+
+/*!
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
+ */
+
+void InputBuilderWindow::OnDefaultsbuttonClick( wxCommandEvent& event )
+{
+    int currPage = listBook->GetSelection();
+    wxString pageTxt = listBook->GetPageText(currPage);
+    
+    SetupItems();
+}
+
+
+/*!
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_REVERTBUTTON
+ */
+
+void InputBuilderWindow::OnRevertbuttonClick( wxCommandEvent& event )
+{
+    int currPage = listBook->GetSelection();
+    wxString pageTxt = listBook->GetPageText(currPage);
+    
+    SetupItems();
+}
+
+
+/*!
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_WRITEFILEBUTTON
+ */
+
+void InputBuilderWindow::OnWritefilebuttonClick( wxCommandEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    parent->GetData()->SetInputData(TmpInputRec);
+    parent->GetData()->WriteInputFile(parent->GetPrefs());
+}
+
+
+void InputBuilderWindow::setPaneVisible(int pane, bool visible) {
+    int currPos = pane;
+    int i = 0;
+    
+    if(visibleTab[pane] == visible) return;
+    
+    for(i = 0; i < pane; i++) {
+        if(!visibleTab[i]) {
+            currPos--;
+        }
+    }
+    
+    if(visible) {
+        visibleTab[pane] = listBook->InsertPage(currPos, tab[pane], tabText[pane]);
+    }
+    else {
+        visibleTab[pane] = !(listBook->RemovePage(currPos));
+    }
+}
+
+int InputBuilderWindow::getCurrentPane() {
+    int currPane = listBook->GetSelection();
+    int i = 0;
+    
+    for(i = 0; i <= currPane; i++) {
+        if(!visibleTab[i]) {
+            currPane++;
+        }
+    }
+    
+    return currPane;
+}
 

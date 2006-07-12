@@ -133,9 +133,29 @@ class wxUglyChoice;
 #define ID_RADIOBOX3 10162
 #define ID_TEXTCTRL21 10163
 #define ID_CHECKBOX24 10156
-#define ID_BUTTON 10073
-#define ID_BUTTON1 10090
+#define ID_SUMMARYPANEL 10229
+#define ID_DEFAULTSBUTTON 10228
+#define ID_REVERTBUTTON 10090
+#define ID_WRITEFILEBUTTON 10073
 ////@end control identifiers
+
+
+enum {
+    BASIS_PANE,
+    CONTROL_PANE,
+    DATA_PANE,
+    SYSTEM_PANE,
+    DFT_PANE,
+    MOGUESS_PANE,
+    HESSOPTS_PANE,
+    MISCPREFS_PANE,
+    MP2OPTS_PANE,
+    SCFOPTS_PANE,
+    STATPOINT_PANE,
+    SUMMARY_PANE,
+    NUM_PANES
+};
+
 
 /*!
  * Compatibility
@@ -219,6 +239,15 @@ public:
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CC_CHOICE
     void OnCcChoiceSelected( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
+    void OnDefaultsbuttonClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_REVERTBUTTON
+    void OnRevertbuttonClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_WRITEFILEBUTTON
+    void OnWritefilebuttonClick( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
     void OnCancelClick( wxCommandEvent& event );
 
@@ -271,20 +300,19 @@ public:
     wxCheckBox* symmetryCheck;
     wxCheckBox* aimpacCheck;
     wxCheckBox* rpacCheck;
-    wxWindow * tabMOGuess;
-    wxWindow * tabHessOpts;
-    wxWindow * tabMiscPrefs;
-    wxWindow * tabSCFOpts;
-    wxWindow * tabStatPoint;
-    wxWindow * tabBasis;
-    wxWindow * tabControl;
-    wxWindow * tabData;
-    wxWindow * tabSystem;
-    wxWindow * tabDFT;
-    wxWindow * tabMP2Opts;
+    wxButton* defaultsBtn;
+    wxButton* revertBtn;
+    wxButton* writeBtn;
 ////@end InputBuilderWindow member variables
 
     InputData * TmpInputRec;
+    
+    wxWindow *tab[NUM_PANES];
+    wxString  tabText[NUM_PANES];
+    bool visibleTab[NUM_PANES];
+    
+    void setPaneVisible(int pane, bool visible);
+    int getCurrentPane();
 };
 
 #endif
