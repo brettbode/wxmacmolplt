@@ -580,7 +580,7 @@ short ControlGroup::SetExeType(const char *ExeText) {
 		delete [] ExeType;
 		ExeType = NULL;
 	}
-	ExeType = new char(nchar+1);
+	ExeType = new char[nchar+1];
 	strcpy(ExeType, ExeText);
 	return nchar;
 }
