@@ -269,6 +269,18 @@ public:
     static bool ShowToolTips();
     
     void SetupItems();
+    void SetupBasisItems();
+    void SetupControlItems();
+    void SetupDataItems();
+    void SetupSystemItems();
+    void SetupDFTItems();
+    void SetupMOGuessItems();
+    void SetupHessOptsItems();
+    void SetupMiscPrefsItems();
+    void SetupMP2OptsItems();
+    void SetupSCFOptsItems();
+    void SetupStatPointItems();
+    void SetupSummaryItems();
 
 ////@begin InputBuilderWindow member variables
     wxListbook* listBook;

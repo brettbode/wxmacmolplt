@@ -1061,13 +1061,45 @@ void InputBuilderWindow::OnCloseWindow( wxCloseEvent& event )
 
 
 void InputBuilderWindow::SetupItems() {
+    SetupBasisItems();
+    SetupControlItems();
+    SetupDataItems();
+    SetupSystemItems();
+    SetupDFTItems();
+    SetupMOGuessItems();
+    SetupHessOptsItems();
+    SetupMiscPrefsItems();
+    SetupMP2OptsItems();
+    SetupSCFOptsItems();
+    SetupStatPointItems();
+    SetupSummaryItems();
+}
+
+void InputBuilderWindow::SetupBasisItems() {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     
+    // Enable/Disable ecpTypeChoice
+    if(!(TmpInputRec->Basis->GetBasis() == 12 || TmpInputRec->Basis->GetBasis() == 13)) {
+        ecpTypeChoice->Enable(false);
+    }
+    else {
+        ecpTypeChoice->Enable(true);
+    }
+}
+
+void InputBuilderWindow::SetupControlItems() {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+        
     short mp2 = TmpInputRec->Control->GetMPLevel();
     bool dft = TmpInputRec->Control->UseDFT();
     short ci = TmpInputRec->Control->GetCIType();
     CCRunType cc = TmpInputRec->Control->GetCCType();
     long scft = TmpInputRec->Control->GetSCFType();
+    
+    int itemValue = 0;
+    
+    itemValue = TmpInputRec->Control->GetRunType();
+    runChoice->SetSelection(itemValue);
     
     if(scft == 0) {
         if(parent->GetData()->GetNumElectrons() & 1) {
@@ -1077,6 +1109,7 @@ void InputBuilderWindow::SetupItems() {
             scft = 1;
         }
     }
+    scfChoice->SetSelection(scft);
 
     // Enable/Disable mp2Check
     if(ci || cc || dft || (mp2 < 0)) {
@@ -1117,14 +1150,46 @@ void InputBuilderWindow::SetupItems() {
     else {
         exeChoice->Enable(true);
     }
+}
 
-    // Enable/Disable ecpTypeChoice
-    if(!(TmpInputRec->Basis->GetBasis() == 12 || TmpInputRec->Basis->GetBasis() == 13)) {
-        ecpTypeChoice->Enable(false);
-    }
-    else {
-        ecpTypeChoice->Enable(true);
-    }
+void InputBuilderWindow::SetupDataItems() {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+}
+
+void InputBuilderWindow::SetupSystemItems() {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+}
+
+void InputBuilderWindow::SetupDFTItems() {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+}
+
+void InputBuilderWindow::SetupMOGuessItems() {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+}
+
+void InputBuilderWindow::SetupHessOptsItems() {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+}
+
+void InputBuilderWindow::SetupMiscPrefsItems() {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+}
+
+void InputBuilderWindow::SetupMP2OptsItems() {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+}
+
+void InputBuilderWindow::SetupSCFOptsItems() {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+}
+
+void InputBuilderWindow::SetupStatPointItems() {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+}
+
+void InputBuilderWindow::SetupSummaryItems() {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 }
 
 
