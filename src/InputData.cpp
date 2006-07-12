@@ -3554,9 +3554,9 @@ InputData * MoleculeData::SetInputData(InputData * NewData) {
 	InputOptions = new InputData(NewData);
 	return InputOptions;
 }
-void MoleculeData::WriteInputFile(WinPrefs * Prefs) {
+void MoleculeData::WriteInputFile(MolDisplayWin * owner) {
 	if (InputOptions) {
-		InputOptions->WriteInputFile(this, Prefs);
+		InputOptions->WriteInputFile(this, owner);
 	}
 }
 void MOPacInternals::WriteZMATToFile(BufferFile * File) {

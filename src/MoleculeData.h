@@ -120,7 +120,7 @@ class MoleculeData {
 		long GetNumElectrons(void) const;
 		short GetMultiplicity(void) const;
 		inline long GetMaximumAtomCount(void) const {return MaxAtoms;};
-		void WriteInputFile(WinPrefs * Prefs);
+		void WriteInputFile(MolDisplayWin * owner);
 		InputData * GetInputData(void);
 		InputData * SetInputData(InputData * NewData);
 		void NewAtom(void);

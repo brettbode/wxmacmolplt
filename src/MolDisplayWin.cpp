@@ -830,6 +830,8 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
         }
         try {
             buffer = new BufferFile(currFile, true);
+            MainData->WriteCMLFile(buffer, Prefs, NULL, true, true);
+            Dirty = false;
         }
         //catch (std::bad_alloc) {//Out of memory error
             //if (!append)
@@ -857,8 +859,6 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
                 //AbortOpen("Unknown error reading the selected file. File open aborted.");
         //}
         if(buffer) {
-            MainData->WriteCMLFile(buffer, Prefs, NULL, true, true);
-            Dirty = false;
             delete buffer;
         }
 #ifdef __WXMAC__

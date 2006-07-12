@@ -819,6 +819,7 @@ class StatPtGroup {
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
 };
+class MolDisplayWin;
 
 class InputData {
 	public:
@@ -838,7 +839,7 @@ class InputData {
 		~InputData(void);
 		long GetSize(BufferFile *Buffer);	//returns total size of the Input group and all subgroups
 		long WriteToBuffer(BufferFile *Buffer);	//Pack Input data into the provided buffer
-		long WriteInputFile(MoleculeData * lData, WinPrefs * Prefs);	//Write out an input file for another program (GAMESS etc)
+		long WriteInputFile(MoleculeData * lData, MolDisplayWin * owner);	//Write out an input file for another program (GAMESS etc)
 		void ReadFromBuffer(BufferFile *Buffer, long length);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);

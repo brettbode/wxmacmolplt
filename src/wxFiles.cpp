@@ -12,6 +12,7 @@
 #include "GlobalExceptions.h"
 #include "Progress.h"
 #include "MoleculeData.h"
+#include "MolDisplayWin.h"
 #include "BFiles.h"
 #include "myFiles.h"
 #include "InputData.h"
@@ -20,8 +21,44 @@
 extern WinPrefs *	gPreferences;
 
 	//Prompt for a filename and then write out a valid input file for GAMESS
-long InputData::WriteInputFile(MoleculeData * lData, WinPrefs * Prefs) {
+long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
 
+    FILE *currFile = NULL;
+    BufferFile *buffer = NULL;
+	
+    wxString filePath = wxFileSelector(wxT("Save As"), wxT(""), wxT(""), wxT(""),
+                              wxT("GAMESS input files (.inp)"),
+                              wxSAVE | wxOVERWRITE_PROMPT, owner);
+	
+    if(!filePath.IsEmpty()) {
+        if((currFile = fopen(filePath.mb_str(wxConvUTF8), "w")) == NULL) {
+            MessageAlert("Unable to access the file.");
+            return 0;
+        }
+        try {
+            buffer = new BufferFile(currFile, true);
+			long BasisTest=0;
+			buffer->WriteLine("!   File created by MacMolPlt 6", true);
+			if (Control) Control->WriteToFile(buffer, this, lData->GetNumElectrons());
+			if (DFT) DFT->WriteToFile(buffer, this);
+			if (System) System->WriteToFile(buffer);
+			if (Basis) BasisTest = Basis->WriteToFile(buffer, lData);
+			if (Guess) Guess->WriteToFile(buffer, this, lData);
+			if (SCF) SCF->WriteToFile(buffer, this);
+			if (MP2) MP2->WriteToFile(buffer, this);
+			if (StatPt) StatPt->WriteToFile(buffer, this);
+			if (Hessian) Hessian->WriteToFile(buffer, this);
+			if (Data) Data->WriteToFile(buffer, lData, owner->GetPrefs(), BasisTest);
+			if (Guess) Guess->WriteVecGroup(buffer, lData);
+        }
+        catch (MemoryError) {
+            MessageAlert("Not enough memory to open the file for writing.");
+        }
+		if(buffer) {
+			delete buffer;
+		}
+		fclose(currFile);
+    }
 	return 1;
 }
 

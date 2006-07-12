@@ -1388,7 +1388,7 @@ void InputBuilderWindow::OnWritefilebuttonClick( wxCommandEvent& event )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->GetData()->SetInputData(TmpInputRec);
-    parent->GetData()->WriteInputFile(parent->GetPrefs());
+    parent->GetData()->WriteInputFile(parent);
 }
 
 
