@@ -175,6 +175,8 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
 
     TmpInputRec = new InputData(((MolDisplayWin *)parent)->GetData()->GetInputData());
 
+    SetupItems();
+    
     return true;
 }
 
@@ -1109,7 +1111,7 @@ void InputBuilderWindow::SetupControlItems() {
             scft = 1;
         }
     }
-    scfChoice->SetSelection(scft);
+    scfChoice->SetSelection(scft - 1);
 
     // Enable/Disable mp2Check
     if(ci || cc || dft || (mp2 < 0)) {
@@ -1218,15 +1220,12 @@ void InputBuilderWindow::OnBasisChoiceSelected( wxCommandEvent& event )
         BasisValue = 5;
         NumGauss = itemValue - 5;
     }
-    else if(itemValue < 19) {
+    else if(itemValue < 18) {
         BasisValue = itemValue - 6;
         if(itemValue == 12) NumGauss = 6;
     }
-    else if(itemValue < 21) {
-        BasisValue = itemValue - 7;
-    }
     else {
-        BasisValue = itemValue - 8;
+        BasisValue = itemValue - 6;
     }
     
     TmpInputRec->Basis->SetBasis(BasisValue);
@@ -1323,7 +1322,7 @@ void InputBuilderWindow::OnRunChoiceSelected( wxCommandEvent& event )
 
 void InputBuilderWindow::OnScfChoiceSelected( wxCommandEvent& event )
 {
-    TmpInputRec->Control->SetSCFType((GAMESS_SCFType)(scfChoice->GetSelection()));
+    TmpInputRec->Control->SetSCFType((GAMESS_SCFType)(scfChoice->GetSelection() + 1));
     SetupItems();
 }
 
@@ -1463,8 +1462,6 @@ void InputBuilderWindow::OnDefaultsbuttonClick( wxCommandEvent& event )
             // NO-OP
             break;
     }
-    
-    SetupItems();
 }
 
 
