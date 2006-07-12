@@ -44,7 +44,7 @@ class wxUglyChoice;
 
 ////@begin control identifiers
 #define ID_INPUTBUILDERWINDOW 10071
-#define SYMBOL_INPUTBUILDERWINDOW_STYLE wxCAPTION|wxSYSTEM_MENU|wxCLOSE_BOX|wxCLIP_CHILDREN |wxTAB_TRAVERSAL
+#define SYMBOL_INPUTBUILDERWINDOW_STYLE wxCAPTION|wxSYSTEM_MENU|wxCLOSE_BOX|wxTAB_TRAVERSAL
 #define SYMBOL_INPUTBUILDERWINDOW_TITLE _("Input Builder")
 #define SYMBOL_INPUTBUILDERWINDOW_IDNAME ID_INPUTBUILDERWINDOW
 #define SYMBOL_INPUTBUILDERWINDOW_SIZE wxDefaultSize
@@ -219,6 +219,12 @@ public:
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CC_CHOICE
     void OnCcChoiceSelected( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
+    void OnCancelClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
+    void OnOkClick( wxCommandEvent& event );
+
 ////@end InputBuilderWindow event handler declarations
 
 ////@begin InputBuilderWindow member function declarations
@@ -248,11 +254,21 @@ public:
     wxUglyChoice* runChoice;
     wxUglyChoice* scfChoice;
     wxUglyChoice* localChoice;
+    wxTextCtrl* mchargeText;
+    wxTextCtrl* multText;
     wxUglyChoice* exeChoice;
+    wxTextCtrl* scfIterText;
     wxCheckBox* mp2Check;
     wxCheckBox* dftCheck;
     wxUglyChoice* ciChoice;
     wxUglyChoice* ccChoice;
+    wxTextCtrl* titleText;
+    wxUglyChoice* coordTypeChoice;
+    wxUglyChoice* unitChoice;
+    wxTextCtrl* zmatrixVarsText;
+    wxUglyChoice* pointGroupChoice;
+    wxUglyChoice* paxisOrderChoice;
+    wxCheckBox* symmetryCheck;
     wxCheckBox* aimpacCheck;
     wxCheckBox* rpacCheck;
     wxWindow * tabMOGuess;

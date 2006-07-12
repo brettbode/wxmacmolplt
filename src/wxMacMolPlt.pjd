@@ -7437,6 +7437,14 @@ Modeling, 1998, 16, 133-138."</string>
               <string name="proxy-type">"wbBoxSizerProxy"</string>
               <string name="proxy-Orientation">"Vertical"</string>
               <string name="proxy-Member variable name">""</string>
+              <string name="proxy-AlignH">"Centre"</string>
+              <string name="proxy-AlignV">"Centre"</string>
+              <long name="proxy-Stretch factor">0</long>
+              <long name="proxy-Border">5</long>
+              <bool name="proxy-wxLEFT">1</bool>
+              <bool name="proxy-wxRIGHT">1</bool>
+              <bool name="proxy-wxTOP">1</bool>
+              <bool name="proxy-wxBOTTOM">1</bool>
               <bool name="proxy-wxSHAPED">0</bool>
               <bool name="proxy-wxADJUST_MINSIZE">0</bool>
               <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -7878,6 +7886,14 @@ Modeling, 1998, 16, 133-138."</string>
               <string name="proxy-type">"wbBoxSizerProxy"</string>
               <string name="proxy-Orientation">"Vertical"</string>
               <string name="proxy-Member variable name">""</string>
+              <string name="proxy-AlignH">"Centre"</string>
+              <string name="proxy-AlignV">"Centre"</string>
+              <long name="proxy-Stretch factor">0</long>
+              <long name="proxy-Border">5</long>
+              <bool name="proxy-wxLEFT">1</bool>
+              <bool name="proxy-wxRIGHT">1</bool>
+              <bool name="proxy-wxTOP">1</bool>
+              <bool name="proxy-wxBOTTOM">1</bool>
               <bool name="proxy-wxSHAPED">0</bool>
               <bool name="proxy-wxADJUST_MINSIZE">0</bool>
               <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -10332,7 +10348,6 @@ along the chosen normal mode."</string>
           <long name="proxy-Width">-1</long>
           <long name="proxy-Height">-1</long>
           <string name="proxy-Event sources">""</string>
-          <bool name="proxy-wxCLIP_CHILDREN ">1</bool>
           <document>
             <string name="title">"wxBoxSizer V"</string>
             <string name="type">"dialog-control-document"</string>
@@ -10346,20 +10361,12 @@ along the chosen normal mode."</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
             <document>
-              <string name="title">"wxNotebook: ID_IBNOTEBOOK"</string>
+              <string name="title">"wxListbook: ID_IBNOTEBOOK"</string>
               <string name="type">"dialog-control-document"</string>
               <string name="filename">""</string>
               <string name="icon-name">"notebook"</string>
@@ -10438,6 +10445,8 @@ along the chosen normal mode."</string>
                 <string name="proxy-Class">"wxPanel"</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Tab label">"Basis"</string>
+                <string name="proxy-Tab icon">""</string>
                 <bool name="proxy-External implementation">0</bool>
                 <bool name="proxy-Separate files">0</bool>
                 <string name="proxy-Implementation filename">""</string>
@@ -10486,8 +10495,6 @@ along the chosen normal mode."</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
                 <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
-                <string name="proxy-Tab label">"Basis"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -10598,7 +10605,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_BASIS_CHOICE"</string>
+                      <string name="title">"wxUglyChoice: ID_BASIS_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -10733,7 +10740,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_ECPT_CHOICE"</string>
+                      <string name="title">"wxUglyChoice: ID_ECPT_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -10873,7 +10880,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_NUMD_CHOICE"</string>
+                      <string name="title">"wxUglyChoice: ID_NUMD_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -10982,7 +10989,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_NUMF_CHOICE"</string>
+                      <string name="title">"wxUglyChoice: ID_NUMF_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -11091,7 +11098,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_NUMP_CHOICE"</string>
+                      <string name="title">"wxUglyChoice: ID_NUMP_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -11226,7 +11233,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_POLAR_CHOICE"</string>
+                      <string name="title">"wxUglyChoice: ID_POLAR_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -11402,6 +11409,8 @@ along the chosen normal mode."</string>
                 <string name="proxy-Class">"wxPanel"</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Tab label">"Control"</string>
+                <string name="proxy-Tab icon">""</string>
                 <bool name="proxy-External implementation">0</bool>
                 <bool name="proxy-Separate files">0</bool>
                 <string name="proxy-Implementation filename">""</string>
@@ -11449,9 +11458,6 @@ along the chosen normal mode."</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
-                <string name="proxy-Tab label">"Control"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -11600,7 +11606,7 @@ along the chosen normal mode."</string>
                         <string name="proxy-Custom ctor arguments">""</string>
                       </document>
                       <document>
-                        <string name="title">"wxChoice: ID_RUN_CHOICE"</string>
+                        <string name="title">"wxUglyChoice: ID_RUN_CHOICE"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
                         <string name="icon-name">"choice"</string>
@@ -11709,7 +11715,7 @@ along the chosen normal mode."</string>
                         <string name="proxy-Custom ctor arguments">""</string>
                       </document>
                       <document>
-                        <string name="title">"wxChoice: ID_SCF_CHOICE"</string>
+                        <string name="title">"wxUglyChoice: ID_SCF_CHOICE"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
                         <string name="icon-name">"choice"</string>
@@ -11818,7 +11824,7 @@ along the chosen normal mode."</string>
                         <string name="proxy-Custom ctor arguments">""</string>
                       </document>
                       <document>
-                        <string name="title">"wxChoice: ID_LOCAL_CHOICE"</string>
+                        <string name="title">"wxUglyChoice: ID_LOCAL_CHOICE"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
                         <string name="icon-name">"choice"</string>
@@ -12055,7 +12061,7 @@ along the chosen normal mode."</string>
                             <string name="proxy-Id name">"ID_MCHARGE_TEXTCTRL"</string>
                             <long name="proxy-Id value">10109</long>
                             <string name="proxy-Class">"wxTextCtrl"</string>
-                            <string name="proxy-Member variable name">""</string>
+                            <string name="proxy-Member variable name">"mchargeText"</string>
                             <string name="proxy-Initial value">"0"</string>
                             <long name="proxy-Max length">0</long>
                             <string name="proxy-Help text">""</string>
@@ -12184,7 +12190,7 @@ along the chosen normal mode."</string>
                             <string name="proxy-Id name">"ID_MULT_TEXTCTRL"</string>
                             <long name="proxy-Id value">10110</long>
                             <string name="proxy-Class">"wxTextCtrl"</string>
-                            <string name="proxy-Member variable name">""</string>
+                            <string name="proxy-Member variable name">"multText"</string>
                             <string name="proxy-Initial value">"1"</string>
                             <long name="proxy-Max length">0</long>
                             <string name="proxy-Help text">""</string>
@@ -12365,7 +12371,7 @@ along the chosen normal mode."</string>
                             <string name="proxy-Custom ctor arguments">""</string>
                           </document>
                           <document>
-                            <string name="title">"wxChoice: ID_EXE_CHOICE"</string>
+                            <string name="title">"wxUglyChoice: ID_EXE_CHOICE"</string>
                             <string name="type">"dialog-control-document"</string>
                             <string name="filename">""</string>
                             <string name="icon-name">"choice"</string>
@@ -12487,7 +12493,7 @@ along the chosen normal mode."</string>
                             <string name="proxy-Id name">"ID_MAXIT_TEXTCTRL"</string>
                             <long name="proxy-Id value">10112</long>
                             <string name="proxy-Class">"wxTextCtrl"</string>
-                            <string name="proxy-Member variable name">""</string>
+                            <string name="proxy-Member variable name">"scfIterText"</string>
                             <string name="proxy-Initial value">"30"</string>
                             <long name="proxy-Max length">0</long>
                             <string name="proxy-Help text">""</string>
@@ -12777,7 +12783,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom ctor arguments">""</string>
                         </document>
                         <document>
-                          <string name="title">"wxChoice: ID_CI_CHOICE"</string>
+                          <string name="title">"wxUglyChoice: ID_CI_CHOICE"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"choice"</string>
@@ -12886,7 +12892,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom ctor arguments">""</string>
                         </document>
                         <document>
-                          <string name="title">"wxChoice: ID_CC_CHOICE"</string>
+                          <string name="title">"wxUglyChoice: ID_CC_CHOICE"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"choice"</string>
@@ -12956,6 +12962,8 @@ along the chosen normal mode."</string>
                 <string name="proxy-Class">"wxPanel"</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Tab label">"Data"</string>
+                <string name="proxy-Tab icon">""</string>
                 <bool name="proxy-External implementation">0</bool>
                 <bool name="proxy-Separate files">0</bool>
                 <string name="proxy-Implementation filename">""</string>
@@ -13003,9 +13011,6 @@ along the chosen normal mode."</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
-                <string name="proxy-Tab label">"Data"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -13070,7 +13075,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Id name">"ID_TITLE_TEXTCTRL"</string>
                       <long name="proxy-Id value">10117</long>
                       <string name="proxy-Class">"wxTextCtrl"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"titleText"</string>
                       <string name="proxy-Initial value">"Title"</string>
                       <long name="proxy-Max length">0</long>
                       <string name="proxy-Help text">""</string>
@@ -13249,7 +13254,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom ctor arguments">""</string>
                         </document>
                         <document>
-                          <string name="title">"wxChoice: ID_COORD_CHOICE"</string>
+                          <string name="title">"wxUglyChoice: ID_COORD_CHOICE"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"choice"</string>
@@ -13262,7 +13267,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Id name">"ID_COORD_CHOICE"</string>
                           <long name="proxy-Id value">10118</long>
                           <string name="proxy-Class">"wxUglyChoice"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"coordTypeChoice"</string>
                           <string name="proxy-Strings">"Unique cartesian Coords.|Hilderbrant internals|Cartesian coordinates|Z-Matrix|MOPAC Z-Matrix"</string>
                           <string name="proxy-Initial value">"Unique cartesian Coords."</string>
                           <string name="proxy-Help text">""</string>
@@ -13357,7 +13362,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom ctor arguments">""</string>
                         </document>
                         <document>
-                          <string name="title">"wxChoice: ID_UNIT_CHOICE"</string>
+                          <string name="title">"wxUglyChoice: ID_UNIT_CHOICE"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"choice"</string>
@@ -13370,7 +13375,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Id name">"ID_UNIT_CHOICE"</string>
                           <long name="proxy-Id value">10119</long>
                           <string name="proxy-Class">"wxUglyChoice"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"unitChoice"</string>
                           <string name="proxy-Strings">"Angstroms|Bohr"</string>
                           <string name="proxy-Initial value">"Angstroms"</string>
                           <string name="proxy-Help text">""</string>
@@ -13504,7 +13509,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Id name">"ID_TEXTCTRL10"</string>
                           <long name="proxy-Id value">10123</long>
                           <string name="proxy-Class">"wxTextCtrl"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"zmatrixVarsText"</string>
                           <string name="proxy-Initial value">"0"</string>
                           <long name="proxy-Max length">0</long>
                           <string name="proxy-Help text">""</string>
@@ -13685,7 +13690,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom ctor arguments">""</string>
                         </document>
                         <document>
-                          <string name="title">"wxChoice: ID_POINTGROUP_CHOICE"</string>
+                          <string name="title">"wxUglyChoice: ID_POINTGROUP_CHOICE"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"choice"</string>
@@ -13698,7 +13703,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Id name">"ID_POINTGROUP_CHOICE"</string>
                           <long name="proxy-Id value">10120</long>
                           <string name="proxy-Class">"wxUglyChoice"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"pointGroupChoice"</string>
                           <string name="proxy-Strings">""</string>
                           <string name="proxy-Initial value">""</string>
                           <string name="proxy-Help text">""</string>
@@ -13793,7 +13798,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom ctor arguments">""</string>
                         </document>
                         <document>
-                          <string name="title">"wxChoice: ID_ORDER_CHOICE"</string>
+                          <string name="title">"wxUglyChoice: ID_ORDER_CHOICE"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"choice"</string>
@@ -13806,7 +13811,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Id name">"ID_ORDER_CHOICE"</string>
                           <long name="proxy-Id value">10121</long>
                           <string name="proxy-Class">"wxUglyChoice"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"paxisOrderChoice"</string>
                           <string name="proxy-Strings">""</string>
                           <string name="proxy-Initial value">""</string>
                           <string name="proxy-Help text">""</string>
@@ -13856,7 +13861,7 @@ along the chosen normal mode."</string>
                         <string name="proxy-Id name">"ID_SYMMETRY_CHECKBOX"</string>
                         <long name="proxy-Id value">10122</long>
                         <string name="proxy-Class">"wxCheckBox"</string>
-                        <string name="proxy-Member variable name">""</string>
+                        <string name="proxy-Member variable name">"symmetryCheck"</string>
                         <string name="proxy-Label">"Use Symmetry During Calculation"</string>
                         <bool name="proxy-Initial value">1</bool>
                         <string name="proxy-Help text">""</string>
@@ -13915,6 +13920,8 @@ along the chosen normal mode."</string>
                 <string name="proxy-Class">"wxPanel"</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Tab label">"System"</string>
+                <string name="proxy-Tab icon">""</string>
                 <bool name="proxy-External implementation">0</bool>
                 <bool name="proxy-Separate files">0</bool>
                 <string name="proxy-Implementation filename">""</string>
@@ -13962,9 +13969,6 @@ along the chosen normal mode."</string>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
-                <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
-                <string name="proxy-Tab label">"System"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -14138,7 +14142,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE19"</string>
+                      <string name="title">"wxUglyChoice: ID_CHOICE19"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -14304,7 +14308,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE20"</string>
+                      <string name="title">"wxUglyChoice: ID_CHOICE20"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -14438,7 +14442,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE21"</string>
+                      <string name="title">"wxUglyChoice: ID_CHOICE21"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -14664,6 +14668,8 @@ along the chosen normal mode."</string>
                 <string name="proxy-Class">"wxPanel"</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Tab label">"DFT"</string>
+                <string name="proxy-Tab icon">""</string>
                 <bool name="proxy-External implementation">0</bool>
                 <bool name="proxy-Separate files">0</bool>
                 <string name="proxy-Implementation filename">""</string>
@@ -14712,8 +14718,6 @@ along the chosen normal mode."</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
                 <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
-                <string name="proxy-Tab label">"DFT"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -14829,7 +14833,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE3"</string>
+                      <string name="title">"wxUglyChoice: ID_CHOICE3"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -14937,7 +14941,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE4"</string>
+                      <string name="title">"wxUglyChoice: ID_CHOICE4"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -15004,6 +15008,8 @@ along the chosen normal mode."</string>
                 <string name="proxy-Class">"wxPanel"</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Tab label">"MO Guess"</string>
+                <string name="proxy-Tab icon">""</string>
                 <bool name="proxy-External implementation">0</bool>
                 <bool name="proxy-Separate files">0</bool>
                 <string name="proxy-Implementation filename">""</string>
@@ -15052,8 +15058,6 @@ along the chosen normal mode."</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
                 <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
-                <string name="proxy-Tab label">"MO Guess"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -15164,7 +15168,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE22"</string>
+                      <string name="title">"wxUglyChoice: ID_CHOICE22"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -15337,6 +15341,8 @@ along the chosen normal mode."</string>
                 <string name="proxy-Class">"wxPanel"</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Tab label">"Hess. Options"</string>
+                <string name="proxy-Tab icon">""</string>
                 <bool name="proxy-External implementation">0</bool>
                 <bool name="proxy-Separate files">0</bool>
                 <string name="proxy-Implementation filename">""</string>
@@ -15385,8 +15391,6 @@ along the chosen normal mode."</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
                 <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
-                <string name="proxy-Tab label">"Hess. Options"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -16031,6 +16035,8 @@ along the chosen normal mode."</string>
                 <string name="proxy-Class">"wxPanel"</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Tab label">"Misc. Prefs"</string>
+                <string name="proxy-Tab icon">""</string>
                 <bool name="proxy-External implementation">0</bool>
                 <bool name="proxy-Separate files">0</bool>
                 <string name="proxy-Implementation filename">""</string>
@@ -16079,8 +16085,6 @@ along the chosen normal mode."</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
                 <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
-                <string name="proxy-Tab label">"Misc. Prefs"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -16423,6 +16427,8 @@ along the chosen normal mode."</string>
                 <string name="proxy-Class">"wxPanel"</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Tab label">"MP2 Options"</string>
+                <string name="proxy-Tab icon">""</string>
                 <bool name="proxy-External implementation">0</bool>
                 <bool name="proxy-Separate files">0</bool>
                 <string name="proxy-Implementation filename">""</string>
@@ -16471,8 +16477,6 @@ along the chosen normal mode."</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
                 <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
-                <string name="proxy-Tab label">"MP2 Options"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -17093,6 +17097,8 @@ along the chosen normal mode."</string>
                 <string name="proxy-Class">"wxPanel"</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Tab label">"SCF Options"</string>
+                <string name="proxy-Tab icon">""</string>
                 <bool name="proxy-External implementation">0</bool>
                 <bool name="proxy-Separate files">0</bool>
                 <string name="proxy-Implementation filename">""</string>
@@ -17141,8 +17147,6 @@ along the chosen normal mode."</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
                 <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
-                <string name="proxy-Tab label">"SCF Options"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -17488,6 +17492,8 @@ along the chosen normal mode."</string>
                 <string name="proxy-Class">"wxPanel"</string>
                 <string name="proxy-Base class">"wxPanel"</string>
                 <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Tab label">"Stat. Point"</string>
+                <string name="proxy-Tab icon">""</string>
                 <bool name="proxy-External implementation">0</bool>
                 <bool name="proxy-Separate files">0</bool>
                 <string name="proxy-Implementation filename">""</string>
@@ -17536,8 +17542,6 @@ along the chosen normal mode."</string>
                 <string name="proxy-Custom ctor arguments">""</string>
                 <string name="proxy-Event sources">""</string>
                 <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
-                <string name="proxy-Tab label">"Stat. Point"</string>
-                <string name="proxy-Tab icon">""</string>
                 <document>
                   <string name="title">"wxBoxSizer V"</string>
                   <string name="type">"dialog-control-document"</string>
@@ -17937,7 +17941,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxChoice: ID_CHOICE23"</string>
+                      <string name="title">"wxUglyChoice: ID_CHOICE23"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -19059,6 +19063,7 @@ along the chosen normal mode."</string>
                   <long name="locked">1</long>
                   <string name="created">"12/6/2006"</string>
                   <string name="proxy-type">"wbButtonProxy"</string>
+                  <string name="event-handler-0">"wxEVT_COMMAND_BUTTON_CLICKED|OnCancelClick"</string>
                   <string name="proxy-Id name">"wxID_CANCEL"</string>
                   <long name="proxy-Id value">5101</long>
                   <string name="proxy-Class">"wxButton"</string>
@@ -19112,6 +19117,7 @@ along the chosen normal mode."</string>
                   <long name="locked">1</long>
                   <string name="created">"12/6/2006"</string>
                   <string name="proxy-type">"wbButtonProxy"</string>
+                  <string name="event-handler-0">"wxEVT_COMMAND_BUTTON_CLICKED|OnOkClick"</string>
                   <string name="proxy-Id name">"wxID_OK"</string>
                   <long name="proxy-Id value">5100</long>
                   <string name="proxy-Class">"wxButton"</string>
@@ -22022,8 +22028,6 @@ along the chosen normal mode."</string>
                   <string name="proxy-Class">"wxPanel"</string>
                   <string name="proxy-Base class">"wxPanel"</string>
                   <string name="proxy-Member variable name">"Gen3DPanel"</string>
-                  <string name="proxy-Tab label">"Gen3D"</string>
-                  <string name="proxy-Tab icon">""</string>
                   <bool name="proxy-External implementation">0</bool>
                   <bool name="proxy-Separate files">0</bool>
                   <string name="proxy-Implementation filename">""</string>
@@ -22071,6 +22075,8 @@ along the chosen normal mode."</string>
                   <string name="proxy-Custom arguments">""</string>
                   <string name="proxy-Custom ctor arguments">""</string>
                   <string name="proxy-Event sources">""</string>
+                  <string name="proxy-Tab label">"Gen3D"</string>
+                  <string name="proxy-Tab icon">""</string>
                   <document>
                     <string name="title">"wxBoxSizer V"</string>
                     <string name="type">"dialog-control-document"</string>
@@ -23701,8 +23707,6 @@ along the chosen normal mode."</string>
                   <string name="proxy-Class">"wxPanel"</string>
                   <string name="proxy-Base class">"wxPanel"</string>
                   <string name="proxy-Member variable name">"Gen2DPanel"</string>
-                  <string name="proxy-Tab label">"Gen2D"</string>
-                  <string name="proxy-Tab icon">""</string>
                   <bool name="proxy-External implementation">0</bool>
                   <bool name="proxy-Separate files">0</bool>
                   <string name="proxy-Implementation filename">""</string>
@@ -23750,6 +23754,8 @@ along the chosen normal mode."</string>
                   <string name="proxy-Custom arguments">""</string>
                   <string name="proxy-Custom ctor arguments">""</string>
                   <string name="proxy-Event sources">""</string>
+                  <string name="proxy-Tab label">"Gen2D"</string>
+                  <string name="proxy-Tab icon">""</string>
                   <document>
                     <string name="title">"wxBoxSizer V"</string>
                     <string name="type">"dialog-control-document"</string>
@@ -24997,8 +25003,6 @@ along the chosen normal mode."</string>
                   <string name="proxy-Class">"wxPanel"</string>
                   <string name="proxy-Base class">"wxPanel"</string>
                   <string name="proxy-Member variable name">"TED2DPANEL"</string>
-                  <string name="proxy-Tab label">"2D TED"</string>
-                  <string name="proxy-Tab icon">""</string>
                   <bool name="proxy-External implementation">0</bool>
                   <bool name="proxy-Separate files">0</bool>
                   <string name="proxy-Implementation filename">""</string>
@@ -25046,6 +25050,8 @@ along the chosen normal mode."</string>
                   <string name="proxy-Custom arguments">""</string>
                   <string name="proxy-Custom ctor arguments">""</string>
                   <string name="proxy-Event sources">""</string>
+                  <string name="proxy-Tab label">"2D TED"</string>
+                  <string name="proxy-Tab icon">""</string>
                   <document>
                     <string name="title">"wxBoxSizer V"</string>
                     <string name="type">"dialog-control-document"</string>
@@ -26171,8 +26177,6 @@ along the chosen normal mode."</string>
                   <string name="proxy-Class">"wxPanel"</string>
                   <string name="proxy-Base class">"wxPanel"</string>
                   <string name="proxy-Member variable name">"TED3DPanel"</string>
-                  <string name="proxy-Tab label">"TED3D"</string>
-                  <string name="proxy-Tab icon">""</string>
                   <bool name="proxy-External implementation">0</bool>
                   <bool name="proxy-Separate files">0</bool>
                   <string name="proxy-Implementation filename">""</string>
@@ -26220,6 +26224,8 @@ along the chosen normal mode."</string>
                   <string name="proxy-Custom arguments">""</string>
                   <string name="proxy-Custom ctor arguments">""</string>
                   <string name="proxy-Event sources">""</string>
+                  <string name="proxy-Tab label">"TED3D"</string>
+                  <string name="proxy-Tab icon">""</string>
                   <document>
                     <string name="title">"wxBoxSizer V"</string>
                     <string name="type">"dialog-control-document"</string>
@@ -28198,8 +28204,6 @@ along the chosen normal mode."</string>
                   <string name="proxy-Class">"wxPanel"</string>
                   <string name="proxy-Base class">"wxPanel"</string>
                   <string name="proxy-Member variable name">"MEP2DPanel"</string>
-                  <string name="proxy-Tab label">"MEP 2D"</string>
-                  <string name="proxy-Tab icon">""</string>
                   <bool name="proxy-External implementation">0</bool>
                   <bool name="proxy-Separate files">0</bool>
                   <string name="proxy-Implementation filename">""</string>
@@ -28247,6 +28251,8 @@ along the chosen normal mode."</string>
                   <string name="proxy-Custom arguments">""</string>
                   <string name="proxy-Custom ctor arguments">""</string>
                   <string name="proxy-Event sources">""</string>
+                  <string name="proxy-Tab label">"MEP 2D"</string>
+                  <string name="proxy-Tab icon">""</string>
                   <document>
                     <string name="title">"wxBoxSizer V"</string>
                     <string name="type">"dialog-control-document"</string>
@@ -29649,8 +29655,6 @@ along the chosen normal mode."</string>
                   <string name="proxy-Class">"wxPanel"</string>
                   <string name="proxy-Base class">"wxPanel"</string>
                   <string name="proxy-Member variable name">"MEP3DPanel"</string>
-                  <string name="proxy-Tab label">"MEP3D"</string>
-                  <string name="proxy-Tab icon">""</string>
                   <bool name="proxy-External implementation">0</bool>
                   <bool name="proxy-Separate files">0</bool>
                   <string name="proxy-Implementation filename">""</string>
@@ -29698,6 +29702,8 @@ along the chosen normal mode."</string>
                   <string name="proxy-Custom arguments">""</string>
                   <string name="proxy-Custom ctor arguments">""</string>
                   <string name="proxy-Event sources">""</string>
+                  <string name="proxy-Tab label">"MEP3D"</string>
+                  <string name="proxy-Tab icon">""</string>
                   <document>
                     <string name="title">"wxBoxSizer V"</string>
                     <string name="type">"dialog-control-document"</string>

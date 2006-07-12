@@ -83,6 +83,10 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 
     EVT_CHOICE( ID_CC_CHOICE, InputBuilderWindow::OnCcChoiceSelected )
 
+    EVT_BUTTON( wxID_CANCEL, InputBuilderWindow::OnCancelClick )
+
+    EVT_BUTTON( wxID_OK, InputBuilderWindow::OnOkClick )
+
 ////@end InputBuilderWindow event table entries
 
 END_EVENT_TABLE()
@@ -135,11 +139,21 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     runChoice = NULL;
     scfChoice = NULL;
     localChoice = NULL;
+    mchargeText = NULL;
+    multText = NULL;
     exeChoice = NULL;
+    scfIterText = NULL;
     mp2Check = NULL;
     dftCheck = NULL;
     ciChoice = NULL;
     ccChoice = NULL;
+    titleText = NULL;
+    coordTypeChoice = NULL;
+    unitChoice = NULL;
+    zmatrixVarsText = NULL;
+    pointGroupChoice = NULL;
+    paxisOrderChoice = NULL;
+    symmetryCheck = NULL;
     aimpacCheck = NULL;
     rpacCheck = NULL;
 ////@end InputBuilderWindow member initialisation
@@ -148,8 +162,10 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
-    GetSizer()->Fit(this);
-    GetSizer()->SetSizeHints(this);
+    if (GetSizer())
+    {
+        GetSizer()->SetSizeHints(this);
+    }
     Centre();
 ////@end InputBuilderWindow creation
 
@@ -378,14 +394,14 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText38 = new wxStaticText( itemPanel24, wxID_STATIC, _("Molecule Charge:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer37->Add(itemStaticText38, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl39 = new wxTextCtrl( itemPanel24, ID_MCHARGE_TEXTCTRL, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer37->Add(itemTextCtrl39, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    mchargeText = new wxTextCtrl( itemPanel24, ID_MCHARGE_TEXTCTRL, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer37->Add(mchargeText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
     wxStaticText* itemStaticText40 = new wxStaticText( itemPanel24, wxID_STATIC, _("Multiplicity:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer37->Add(itemStaticText40, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl41 = new wxTextCtrl( itemPanel24, ID_MULT_TEXTCTRL, _("1"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer37->Add(itemTextCtrl41, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    multText = new wxTextCtrl( itemPanel24, ID_MULT_TEXTCTRL, _("1"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer37->Add(multText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticBox* itemStaticBoxSizer42Static = new wxStaticBox(itemPanel24, wxID_ANY, _T(""));
     wxStaticBoxSizer* itemStaticBoxSizer42 = new wxStaticBoxSizer(itemStaticBoxSizer42Static, wxVERTICAL);
@@ -408,8 +424,8 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText46 = new wxStaticText( itemPanel24, wxID_STATIC, _("Max # SCF Iterations:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer43->Add(itemStaticText46, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl47 = new wxTextCtrl( itemPanel24, ID_MAXIT_TEXTCTRL, _("30"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer43->Add(itemTextCtrl47, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    scfIterText = new wxTextCtrl( itemPanel24, ID_MAXIT_TEXTCTRL, _("30"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer43->Add(scfIterText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticBox* itemStaticBoxSizer48Static = new wxStaticBox(itemPanel24, wxID_ANY, _T(""));
     wxStaticBoxSizer* itemStaticBoxSizer48 = new wxStaticBoxSizer(itemStaticBoxSizer48Static, wxVERTICAL);
@@ -466,8 +482,8 @@ void InputBuilderWindow::CreateControls()
 
     wxBoxSizer* itemBoxSizer58 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer57->Add(itemBoxSizer58, 0, wxALIGN_LEFT, 5);
-    wxTextCtrl* itemTextCtrl59 = new wxTextCtrl( itemPanel56, ID_TITLE_TEXTCTRL, _("Title"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer58->Add(itemTextCtrl59, 0, wxGROW|wxALL, 5);
+    titleText = new wxTextCtrl( itemPanel56, ID_TITLE_TEXTCTRL, _("Title"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer58->Add(titleText, 0, wxGROW|wxALL, 5);
 
     wxStaticBox* itemStaticBoxSizer60Static = new wxStaticBox(itemPanel56, wxID_ANY, _T(""));
     wxStaticBoxSizer* itemStaticBoxSizer60 = new wxStaticBoxSizer(itemStaticBoxSizer60Static, wxVERTICAL);
@@ -477,35 +493,35 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText62 = new wxStaticText( itemPanel56, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer61->Add(itemStaticText62, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxString itemChoice63Strings[] = {
+    wxString coordTypeChoiceStrings[] = {
         _("Unique cartesian Coords."),
         _("Hilderbrant internals"),
         _("Cartesian coordinates"),
         _("Z-Matrix"),
         _("MOPAC Z-Matrix")
     };
-    wxUglyChoice* itemChoice63 = new wxUglyChoice( itemPanel56, ID_COORD_CHOICE, wxDefaultPosition, wxDefaultSize, 5, itemChoice63Strings, 0 );
-    itemChoice63->SetStringSelection(_("Unique cartesian Coords."));
-    itemFlexGridSizer61->Add(itemChoice63, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    coordTypeChoice = new wxUglyChoice( itemPanel56, ID_COORD_CHOICE, wxDefaultPosition, wxDefaultSize, 5, coordTypeChoiceStrings, 0 );
+    coordTypeChoice->SetStringSelection(_("Unique cartesian Coords."));
+    itemFlexGridSizer61->Add(coordTypeChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
     wxStaticText* itemStaticText64 = new wxStaticText( itemPanel56, wxID_STATIC, _("Units:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer61->Add(itemStaticText64, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxString itemChoice65Strings[] = {
+    wxString unitChoiceStrings[] = {
         _("Angstroms"),
         _("Bohr")
     };
-    wxUglyChoice* itemChoice65 = new wxUglyChoice( itemPanel56, ID_UNIT_CHOICE, wxDefaultPosition, wxDefaultSize, 2, itemChoice65Strings, 0 );
-    itemChoice65->SetStringSelection(_("Angstroms"));
-    itemFlexGridSizer61->Add(itemChoice65, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    unitChoice = new wxUglyChoice( itemPanel56, ID_UNIT_CHOICE, wxDefaultPosition, wxDefaultSize, 2, unitChoiceStrings, 0 );
+    unitChoice->SetStringSelection(_("Angstroms"));
+    itemFlexGridSizer61->Add(unitChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxBoxSizer* itemBoxSizer66 = new wxBoxSizer(wxHORIZONTAL);
     itemStaticBoxSizer60->Add(itemBoxSizer66, 0, wxGROW, 5);
     wxStaticText* itemStaticText67 = new wxStaticText( itemPanel56, wxID_STATIC, _("# of Z-Matrix Variables:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer66->Add(itemStaticText67, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl68 = new wxTextCtrl( itemPanel56, ID_TEXTCTRL10, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer66->Add(itemTextCtrl68, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    zmatrixVarsText = new wxTextCtrl( itemPanel56, ID_TEXTCTRL10, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer66->Add(zmatrixVarsText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticBox* itemStaticBoxSizer69Static = new wxStaticBox(itemPanel56, wxID_ANY, _T(""));
     wxStaticBoxSizer* itemStaticBoxSizer69 = new wxStaticBoxSizer(itemStaticBoxSizer69Static, wxVERTICAL);
@@ -515,22 +531,22 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText71 = new wxStaticText( itemPanel56, wxID_STATIC, _("Point Group:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer70->Add(itemStaticText71, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxString* itemChoice72Strings = NULL;
-    wxUglyChoice* itemChoice72 = new wxUglyChoice( itemPanel56, ID_POINTGROUP_CHOICE, wxDefaultPosition, wxDefaultSize, 0, itemChoice72Strings, 0 );
-    itemFlexGridSizer70->Add(itemChoice72, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    wxString* pointGroupChoiceStrings = NULL;
+    pointGroupChoice = new wxUglyChoice( itemPanel56, ID_POINTGROUP_CHOICE, wxDefaultPosition, wxDefaultSize, 0, pointGroupChoiceStrings, 0 );
+    itemFlexGridSizer70->Add(pointGroupChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
     wxStaticText* itemStaticText73 = new wxStaticText( itemPanel56, wxID_STATIC, _("Order of Principle Axis:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemStaticText73->Enable(false);
     itemFlexGridSizer70->Add(itemStaticText73, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxString* itemChoice74Strings = NULL;
-    wxUglyChoice* itemChoice74 = new wxUglyChoice( itemPanel56, ID_ORDER_CHOICE, wxDefaultPosition, wxDefaultSize, 0, itemChoice74Strings, 0 );
-    itemChoice74->Enable(false);
-    itemFlexGridSizer70->Add(itemChoice74, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxString* paxisOrderChoiceStrings = NULL;
+    paxisOrderChoice = new wxUglyChoice( itemPanel56, ID_ORDER_CHOICE, wxDefaultPosition, wxDefaultSize, 0, paxisOrderChoiceStrings, 0 );
+    paxisOrderChoice->Enable(false);
+    itemFlexGridSizer70->Add(paxisOrderChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxCheckBox* itemCheckBox75 = new wxCheckBox( itemPanel56, ID_SYMMETRY_CHECKBOX, _("Use Symmetry During Calculation"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox75->SetValue(true);
-    itemStaticBoxSizer69->Add(itemCheckBox75, 0, wxALIGN_LEFT|wxALL, 5);
+    symmetryCheck = new wxCheckBox( itemPanel56, ID_SYMMETRY_CHECKBOX, _("Use Symmetry During Calculation"), wxDefaultPosition, wxDefaultSize, 0 );
+    symmetryCheck->SetValue(true);
+    itemStaticBoxSizer69->Add(symmetryCheck, 0, wxALIGN_LEFT|wxALL, 5);
 
     listBook->AddPage(itemPanel56, _("Data"));
 
@@ -599,6 +615,7 @@ void InputBuilderWindow::CreateControls()
         _("Next Value")
     };
     wxRadioBox* itemRadioBox89 = new wxRadioBox( itemPanel76, ID_RADIOBOX, _("Parallel Load Balance Type"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox89Strings, 1, wxRA_SPECIFY_COLS );
+    itemRadioBox89->SetSelection(0);
     itemBoxSizer77->Add(itemRadioBox89, 0, wxALIGN_LEFT|wxALL, 5);
 
     wxCheckBox* itemCheckBox90 = new wxCheckBox( itemPanel76, ID_CHECKBOX10, _("Use External Data Representation for messages"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -698,6 +715,7 @@ void InputBuilderWindow::CreateControls()
         _("Numeric")
     };
     wxRadioBox* itemRadioBox108 = new wxRadioBox( itemPanel105, ID_RADIOBOX2, _("Method"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox108Strings, 1, wxRA_SPECIFY_COLS );
+    itemRadioBox108->SetSelection(0);
     itemBoxSizer107->Add(itemRadioBox108, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxBoxSizer* itemBoxSizer109 = new wxBoxSizer(wxHORIZONTAL);
@@ -766,6 +784,7 @@ void InputBuilderWindow::CreateControls()
         _("All")
     };
     wxRadioBox* itemRadioBox126 = new wxRadioBox( itemPanel119, ID_RADIOBOX1, _("Forces Check Run Type"), wxDefaultPosition, wxDefaultSize, 6, itemRadioBox126Strings, 1, wxRA_SPECIFY_COLS );
+    itemRadioBox126->SetSelection(0);
     itemBoxSizer120->Add(itemRadioBox126, 0, wxALIGN_LEFT|wxALL, 5);
 
     listBook->AddPage(itemPanel119, _("Misc. Prefs"));
@@ -803,6 +822,7 @@ void InputBuilderWindow::CreateControls()
         _("Two phase bin sort")
     };
     wxRadioBox* itemRadioBox137 = new wxRadioBox( itemPanel127, ID_RADIOBOX4, _("Transformation method"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox137Strings, 1, wxRA_SPECIFY_COLS );
+    itemRadioBox137->SetSelection(0);
     itemBoxSizer128->Add(itemRadioBox137, 0, wxALIGN_LEFT|wxALL, 5);
 
     wxString itemRadioBox138Strings[] = {
@@ -810,6 +830,7 @@ void InputBuilderWindow::CreateControls()
         _("Distributed across all nodes")
     };
     wxRadioBox* itemRadioBox138 = new wxRadioBox( itemPanel127, ID_RADIOBOX5, _("AO integral storage"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox138Strings, 1, wxRA_SPECIFY_COLS );
+    itemRadioBox138->SetSelection(0);
     itemBoxSizer128->Add(itemRadioBox138, 0, wxALIGN_LEFT|wxALL, 5);
 
     listBook->AddPage(itemPanel127, _("MP2 Options"));
@@ -909,6 +930,7 @@ void InputBuilderWindow::CreateControls()
         _("Calculate")
     };
     wxRadioBox* itemRadioBox169 = new wxRadioBox( itemPanel147, ID_RADIOBOX3, _("Initial Hessian"), wxDefaultPosition, wxDefaultSize, 3, itemRadioBox169Strings, 1, wxRA_SPECIFY_COLS );
+    itemRadioBox169->SetSelection(0);
     itemBoxSizer168->Add(itemRadioBox169, 0, wxGROW|wxALL, 5);
 
     wxStaticText* itemStaticText170 = new wxStaticText( itemPanel147, wxID_STATIC, _("Recalc. Hess every"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -1322,6 +1344,29 @@ void InputBuilderWindow::OnCcChoiceSelected( wxCommandEvent& event )
 void InputBuilderWindow::OnExeChoiceSelected( wxCommandEvent& event )
 {
     TmpInputRec->Control->SetExeType(exeChoice->GetSelection());
+}
+
+
+/*!
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
+ */
+
+void InputBuilderWindow::OnCancelClick( wxCommandEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    parent->CloseInputBuilderWindow();
+}
+
+
+/*!
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
+ */
+
+void InputBuilderWindow::OnOkClick( wxCommandEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    parent->GetData()->SetInputData(TmpInputRec);
+    parent->CloseInputBuilderWindow();
 }
 
 
