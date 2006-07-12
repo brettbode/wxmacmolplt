@@ -47,7 +47,7 @@ class MpGLCanvas : public wxGLCanvas {
                    wxWindowID      id       = wxID_ANY,
                    const wxPoint  &position = wxDefaultPosition,
                    const wxSize   &size     = wxDefaultSize,
-                   long            style    = wxSUNKEN_BORDER,
+                   long            style    = wxNO_BORDER,
                    const wxString &name     = wxT("DemoGLCanvas"));
 
         /**
