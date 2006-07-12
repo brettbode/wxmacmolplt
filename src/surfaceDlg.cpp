@@ -1093,6 +1093,12 @@ void Orbital2DSurfPane::CreateControls()
 	
 	mSetParamBut = new wxButton( this, ID_SET_PARAM_BUT, wxT("Set Parameters"), wxPoint(450, 160) );
 	mExportBut = new wxButton( this, ID_SURFACE_EXPORT_BUT, wxT("Export"), wxPoint(450, 160) );
+
+	if (mTarget->ExportPossible())
+	  mExportBut->Enable();
+	else
+	  mExportBut->Disable();
+
 	mUpdateBut = new wxButton( this, ID_SURFACE_UPDATE_BUT, wxT("Update"), wxPoint(450, 160) );
 	upperSizer->Add(label0, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
@@ -1581,6 +1587,12 @@ void Orbital3DSurfPane::CreateControls()
 	
 	mSetParamBut = new wxButton( this, ID_SET_PARAM_BUT, wxT("Set Parameters"), wxPoint(450, 160) );
 	mExportBut = new wxButton( this, ID_SURFACE_EXPORT_BUT, wxT("Export"), wxPoint(450, 160) );
+
+	if (mTarget->ExportPossible())
+	  mExportBut->Enable();
+	else
+	  mExportBut->Disable();
+
 	mUpdateBut = new wxButton( this, ID_SURFACE_UPDATE_BUT, wxT("Update"), wxPoint(450, 160) );
 
 	float GridMax = mTarget->GetGridMax();
@@ -1634,7 +1646,12 @@ void Orbital3DSurfPane::CreateControls()
 		mSmoothChkBox->Disable();
 	
 	mFreeMemBut = new wxButton( this, ID_FREE_MEM_BUT, wxT("Free Mem"), wxPoint(450, 160) );
-	
+
+	if (mTarget->GridAvailable())
+	  mFreeMemBut->Enable();
+	else
+	  mFreeMemBut->Disable();
+
   upperSizer->Add(label0, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
   vector<wxString> choices;
@@ -2372,6 +2389,12 @@ void General3DSurfPane::CreateControls()
     wxBoxSizer* itemBoxSizer35 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer35, 0, wxALIGN_RIGHT|wxALL, 5);
     mFreeMemBut = new wxButton( Gen3DPanel, ID_FREE_MEM_BUT, _("Free Mem"), wxDefaultPosition, wxDefaultSize, 0 );
+
+    if (mTarget->GridAvailable())
+      mFreeMemBut->Enable();
+    else
+      mFreeMemBut->Disable();
+
     if (ShowToolTips())
         mFreeMemBut->SetToolTip(_("Click to free the memory used by the 3D grid."));
     itemBoxSizer35->Add(mFreeMemBut, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2382,6 +2405,12 @@ void General3DSurfPane::CreateControls()
     itemBoxSizer35->Add(mExportBut, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mUpdateBut = new wxButton( Gen3DPanel, ID_SURFACE_UPDATE_BUT, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
+
+    if (mTarget->ExportPossible())
+      mExportBut->Enable();
+    else
+      mExportBut->Disable();
+
     mUpdateBut->SetDefault();
     if (ShowToolTips())
         mUpdateBut->SetToolTip(_("Click to apply your changes to the molecule display."));
@@ -2662,7 +2691,13 @@ void General2DSurfPane::CreateControls() {
 	
     wxBoxSizer* itemBoxSizer63 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer63, 0, wxALIGN_RIGHT|wxALL, 5);
-	mExportBut = new wxButton( Gen2DPanel, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
+    mExportBut = new wxButton( Gen2DPanel, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
+
+    if (mTarget->ExportPossible())
+      mExportBut->Enable();
+    else
+      mExportBut->Disable();
+
     if (ShowToolTips())
         mExportBut->SetToolTip(_("Click to export the selected surface to a text file."));
     itemBoxSizer63->Add(mExportBut, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2967,6 +3002,12 @@ void TEDensity2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer88 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer84->Add(itemBoxSizer88, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
     mExportBut = new wxButton( TED2DPANEL, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
+
+    if (mTarget->ExportPossible())
+      mExportBut->Enable();
+    else
+      mExportBut->Disable();
+
     itemBoxSizer88->Add(mExportBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mUpdateBut = new wxButton( TED2DPANEL, ID_SURFACE_UPDATE_BUT, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -3065,6 +3106,7 @@ void TEDensity2DSurfPane::OnUpdate(wxCommandEvent &event) {
 	if (updateGrid) mTarget->FreeGrid();
 	UpdateTest = false;
 	setUpdateButton();
+	mExportBut->Enable();
 	owner->SurfaceUpdated();
 }
 
@@ -3378,6 +3420,12 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 		}
 	}
 	if (lProgress) delete lProgress;
+
+	if (mTarget->GridAvailable())
+	  mFreeMemBut->Enable();
+	else
+	  mFreeMemBut->Disable();
+
 /*	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DFreeMem, target->GridAvailable());
 	//Setup the contour value and grid max text items
 	short	itemtype;
@@ -3401,6 +3449,12 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	SetContourMaxValueText();
 	UpdateTest = false;
 	setUpdateButton();
+
+	if (mTarget->ExportPossible())
+	  mExportBut->Enable();
+	else
+	  mExportBut->Disable();
+
 	owner->SurfaceUpdated();
 }
 void TEDensity3DSurfPane::CreateControls() {
@@ -3521,11 +3575,23 @@ void TEDensity3DSurfPane::CreateControls() {
     itemBoxSizer130->Add(mSetParamBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mFreeMemBut = new wxButton( TED3DPanel, ID_FREE_MEM_BUT, _("Free Mem"), wxDefaultPosition, wxDefaultSize, 0 );
+
+    if (mTarget->GridAvailable())
+      mFreeMemBut->Enable();
+    else
+      mFreeMemBut->Disable();
+
     if (ShowToolTips())
         mFreeMemBut->SetToolTip(_("Click to free the memory used by the 3D grid."));
     itemBoxSizer130->Add(mFreeMemBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mExportBut = new wxButton( TED3DPanel, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
+
+    if (mTarget->ExportPossible())
+      mExportBut->Enable();
+    else
+      mExportBut->Disable();
+
     itemBoxSizer130->Add(mExportBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mUpdateBut = new wxButton( TED3DPanel, ID_SURFACE_UPDATE_BUT, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -3664,6 +3730,12 @@ void MEP2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer163 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer159->Add(itemBoxSizer163, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
     mExportBut = new wxButton( MEP2DPanel, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
+
+    if (mTarget->ExportPossible())
+      mExportBut->Enable();
+    else
+      mExportBut->Disable();
+
     itemBoxSizer163->Add(mExportBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mUpdateBut = new wxButton( MEP2DPanel, ID_SURFACE_UPDATE_BUT, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -3773,6 +3845,7 @@ void MEP2DSurfPane::OnUpdate(wxCommandEvent &event) {
 	if (updateGrid) mTarget->FreeGrid();
 	UpdateTest = false;
 	setUpdateButton();
+	mExportBut->Enable();
 	owner->SurfaceUpdated();
 }
 void MEP2DSurfPane::refreshControls()
@@ -4011,6 +4084,12 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 		}
 	}
 	if (lProgress) delete lProgress;
+
+	if (mTarget->GridAvailable())
+	  mFreeMemBut->Enable();
+	else
+	  mFreeMemBut->Disable();
+
 	/*	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DFreeMem, target->GridAvailable());
 	//Setup the contour value and grid max text items
 	short	itemtype;
@@ -4034,8 +4113,15 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	SetContourMaxValueText();
 	UpdateTest = false;
 	setUpdateButton();
+
+	if (mTarget->ExportPossible())
+	  mExportBut->Enable();
+	else
+	  mExportBut->Disable();
+
 	owner->SurfaceUpdated();
 }
+
 void MEP3DSurfPane::CreateControls() {
 	MEP3DSurfPane * MEP3DPanel = this;	//this is here just to match the code below from DialogBlocks
 	
@@ -4134,11 +4220,23 @@ void MEP3DSurfPane::CreateControls() {
     itemBoxSizer198->Add(mSetParamBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mFreeMemBut = new wxButton( MEP3DPanel, ID_FREE_MEM_BUT, _("Free Mem"), wxDefaultPosition, wxDefaultSize, 0 );
+
+    if (mTarget->GridAvailable())
+      mFreeMemBut->Enable();
+    else
+      mFreeMemBut->Disable();
+
     if (ShowToolTips())
         mFreeMemBut->SetToolTip(_("Click to free the memory used by the 3D grid."));
     itemBoxSizer198->Add(mFreeMemBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mExportBut = new wxButton( MEP3DPanel, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0 );
+
+    if (mTarget->ExportPossible())
+      mExportBut->Enable();
+    else
+      mExportBut->Disable();
+
     itemBoxSizer198->Add(mExportBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mUpdateBut = new wxButton( MEP3DPanel, ID_SURFACE_UPDATE_BUT, _("Update"), wxDefaultPosition, wxDefaultSize, 0 );
