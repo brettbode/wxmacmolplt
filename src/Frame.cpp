@@ -1303,7 +1303,7 @@ void Frame::ReadMP2Vectors(BufferFile * Buffer, BufferFile * DatBuffer, long Num
 #ifdef __wxBuild__
         int result = wxMessageBox(wxT("Do you wish to read the MP2 natural orbitals from the .dat file\?"),
 								  wxT(""), wxYES_NO | wxICON_QUESTION);
-        if(result == wxID_YES)
+        if(result == wxYES)
             *readflag = 1;
         else
             *readflag = 0;
