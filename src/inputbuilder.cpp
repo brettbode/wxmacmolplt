@@ -1360,8 +1360,44 @@ void InputBuilderWindow::OnOkClick( wxCommandEvent& event )
 
 void InputBuilderWindow::OnDefaultsbuttonClick( wxCommandEvent& event )
 {
-    int currPage = listBook->GetSelection();
-    wxString pageTxt = listBook->GetPageText(currPage);
+    switch(getCurrentPane()) {
+        case BASIS_PANE:
+            TmpInputRec->Basis->InitData();
+            break;
+        case CONTROL_PANE:
+            TmpInputRec->Control->InitControlPaneData();
+            break;
+        case DATA_PANE:
+            TmpInputRec->Data->InitData();
+            break;
+        case SYSTEM_PANE:
+            TmpInputRec->System->InitData();
+            break;
+        case DFT_PANE:
+            TmpInputRec->DFT->InitData();
+            break;
+        case MOGUESS_PANE:
+            TmpInputRec->Guess->InitData();
+            break;
+        case HESSOPTS_PANE:
+            TmpInputRec->Hessian->InitData();
+            break;
+        case MISCPREFS_PANE:
+            TmpInputRec->Control->InitProgPaneData();
+            break;
+        case MP2OPTS_PANE:
+            TmpInputRec->MP2->InitData();
+            break;
+        case SCFOPTS_PANE:
+            TmpInputRec->SCF->InitData();
+            break;
+        case STATPOINT_PANE:
+            TmpInputRec->StatPt->InitData();
+            break;
+        default:
+            // NO-OP
+            break;
+    }
     
     SetupItems();
 }
@@ -1373,8 +1409,78 @@ void InputBuilderWindow::OnDefaultsbuttonClick( wxCommandEvent& event )
 
 void InputBuilderWindow::OnRevertbuttonClick( wxCommandEvent& event )
 {
-    int currPage = listBook->GetSelection();
-    wxString pageTxt = listBook->GetPageText(currPage);
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    InputData *OldData = ((MolDisplayWin *)parent)->GetData()->GetInputData();
+    
+    switch(getCurrentPane()) {
+        case BASIS_PANE:
+            *(TmpInputRec->Basis) = *(OldData->Basis);
+            break;
+        case CONTROL_PANE:
+            TmpInputRec->Control->RevertControlPane(OldData->Control);
+            break;
+        case DATA_PANE:
+            if(TmpInputRec->Data) delete TmpInputRec->Data;
+            TmpInputRec->Data = new DataGroup(OldData->Data);
+            break;
+        case SYSTEM_PANE:
+            *(TmpInputRec->System) = *(OldData->System);
+            break;
+        case DFT_PANE:
+            if(OldData->DFT) {
+                *(TmpInputRec->DFT) = *(OldData->DFT);
+            }
+            else {
+                TmpInputRec->DFT->InitData();
+            }
+            break;
+        case MOGUESS_PANE:
+            if(OldData->Guess) {
+                *(TmpInputRec->Guess) = *(OldData->Guess);
+            }
+            else {
+                TmpInputRec->Guess->InitData();
+            }
+            break;
+        case HESSOPTS_PANE:
+            if(OldData->Hessian) {
+                *(TmpInputRec->Hessian) = *(OldData->Hessian);
+            }
+            else {
+                TmpInputRec->Hessian->InitData();
+            }
+            break;
+        case MISCPREFS_PANE:
+            TmpInputRec->Control->RevertProgPane(OldData->Control);
+            break;
+        case MP2OPTS_PANE:
+            if(OldData->MP2) {
+                *(TmpInputRec->MP2) = *(OldData->MP2);
+            }
+            else {
+                TmpInputRec->MP2->InitData();
+            }
+            break;
+        case SCFOPTS_PANE:
+            if(OldData->SCF) {
+                *(TmpInputRec->SCF) = *(OldData->SCF);
+            }
+            else {
+                TmpInputRec->SCF->InitData();
+            }
+            break;
+        case STATPOINT_PANE:
+            if(OldData->StatPt) {
+                *(TmpInputRec->StatPt) = *(OldData->StatPt);
+            }
+            else {
+                TmpInputRec->StatPt->InitData();
+            }
+            break;
+        default:
+            // NO-OP
+            break;
+    }
     
     SetupItems();
 }
