@@ -64,17 +64,18 @@ class SurfaceOptions {
 
 class EnergyOptions {
 	public:
+	EnergyOptions(void) {nDigits=4; eUnits=kDefault; PlotFlag=0;};
 		bool PlotEnergy(void) const {return (PlotFlag & 1);};
 		bool PlotMPEnergy(void) const {return ((PlotFlag & 2)?true:false);};
 		bool PlotKEnergy(void) const {return ((PlotFlag & 4)?true:false);};
 		bool PlotPEnergy(void) const {return ((PlotFlag & 8)?true:false);};
 		bool PlotOther(void) const {return ((PlotFlag & 32)?true:false);};
-		EnergyUnit GetDisplayUnits(void) const {return (EnergyUnit)((PlotFlag & 16) >> 4);};
+		EnergyUnit GetDisplayUnits(void) const {return eUnits;};
 		void SetPlotEnergy(bool State) {if (PlotFlag & 1) PlotFlag--; if (State) PlotFlag++;};
 		void SetPlotMPEnergy(bool State) {if (PlotFlag & 2) PlotFlag-=2; if (State) PlotFlag+=2;};
 		void SetPlotKEnergy(bool State) {if (PlotFlag & 4) PlotFlag-=4; if (State) PlotFlag+=4;};
 		void SetPlotPEnergy(bool State) {if (PlotFlag & 8) PlotFlag-=8; if (State) PlotFlag+=8;};
-		void SetDisplayUnits(EnergyUnit NewUnits) {PlotFlag = ((PlotFlag & 0xEF)+(NewUnits << 4));};
+		void SetDisplayUnits(EnergyUnit NewUnits) {eUnits = NewUnits;};
 		void SetPlotOther(bool State) {PlotFlag = (PlotFlag & 0xDF) + (State?32:0);};
 		float GetY1Zero(void) const {return y1Zero;};
 		float GetY2Zero(void) const {return y2Zero;};
@@ -116,6 +117,7 @@ class EnergyOptions {
 		RGBColor	KEColor;
 		RGBColor	PEColor;
 		short		nDigits;
+		EnergyUnit	eUnits;
 		char		PlotFlag;	//indicates what to plot (1=TE,2=MP,3=KE,4=PE,5=kcal/mol,
 								//6=other-use graph options)
 };

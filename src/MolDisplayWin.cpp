@@ -245,6 +245,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     
     pageSetupData = NULL;
     printData = NULL;
+	infoPanel = NULL;
 
 #ifdef __WXMSW__
 	//Visual studio is a total pile.
@@ -257,15 +258,17 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     
     int width, height;
     GetClientSize(&width, &height);
-    frameScrollBar = new wxScrollBar( this, MMP_FRAMESCROLLBAR, wxPoint(width-120, height-20), wxSize(100,-1), wxSB_HORIZONTAL );
+    infoPanel = new wxPanel( this, 11004, wxPoint(0, height-20), wxSize(width, 20), wxNO_BORDER );
+    frameScrollBar = new wxScrollBar( infoPanel, MMP_FRAMESCROLLBAR, wxPoint(width-120, 0), wxSize(100,-1), wxSB_HORIZONTAL );
+
     int swidth, sheight;
     frameScrollBar->GetClientSize(&swidth, &sheight);
 
     glCanvas = new MpGLCanvas(this, 11002, wxPoint(0,0), wxSize(height-sheight,width));
     glCanvas->setPrefs(Prefs);
     
-    textBar = new wxStaticText(this, 11003, wxString(""), wxDefaultPosition, wxDefaultSize,
-                           wxALIGN_LEFT | wxST_NO_AUTORESIZE);
+    textBar = new wxStaticText(infoPanel, 11003, wxString(""), wxDefaultPosition, wxDefaultSize,
+							   wxALIGN_LEFT | wxST_NO_AUTORESIZE);
 
     SizeChanged();
     frameScrollBar->SetScrollbar(1, 1, 1, 1);
@@ -319,10 +322,11 @@ void MolDisplayWin::SizeChanged(void) {
 
     int swidth, sheight;
     frameScrollBar->GetClientSize(&swidth, &sheight);
-    frameScrollBar->Move(width-114, height-sheight);
+	infoPanel->SetSize(0, height-sheight, width, sheight, wxSIZE_USE_EXISTING);
+    frameScrollBar->Move(width-114, 0);
     glCanvas->SetSize(wxSize(width, (height-sheight)));
     
-    textBar->SetSize(0, height-sheight, width-114, sheight, wxSIZE_USE_EXISTING);
+	textBar->SetSize(0, 0, width-114, sheight, wxSIZE_USE_EXISTING);
 }
 
 void MolDisplayWin::OnMenuOpen(wxMenuEvent & event) {

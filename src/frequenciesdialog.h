@@ -51,6 +51,7 @@ class wxMolGraph;
 #define ID_MENURAMANINTEN 10166
 #define ID_MENUZOOMIN 10167
 #define ID_MENUZOOMOUT 10168
+#define ID_PANEL4 10226
 #define ID_FREQLISTBOX 10143
 #define ID_CUSTOM 10066
 ////@end control identifiers

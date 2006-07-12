@@ -51,6 +51,7 @@ class MolDisplayWin : public wxFrame {
         wxMenu    *menuHelp;
 
         wxString		currFilePath;
+		wxPanel *		infoPanel;
         MoleculeData	*MainData;
         WinPrefs		*Prefs;
         bool			Dirty;          //Flag to indicate a save is needed

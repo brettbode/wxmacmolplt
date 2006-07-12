@@ -1655,6 +1655,7 @@ void Orbital3DSurfPane::CreateControls()
 
   wxString choices1[] = {_T("Energy"), _T("Occupation #")};
   mOrbFormatChoice = new wxChoice( this, ID_ORB_FORMAT_CHOICE, wxDefaultPosition, wxSize(120,wxDefaultCoord), 2, choices1 );
+  mOrbFormatChoice->SetSelection(0);
 
   vector<wxString> choices2;
   makeMOList(choices2);

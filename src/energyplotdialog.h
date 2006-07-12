@@ -44,6 +44,7 @@ class wxMolGraph;
 #define SYMBOL_ENERGYPLOTDIALOG_IDNAME ID_EPLOTDIALOG
 #define SYMBOL_ENERGYPLOTDIALOG_SIZE wxDefaultSize
 #define SYMBOL_ENERGYPLOTDIALOG_POSITION wxDefaultPosition
+#define ID_PANEL5 10227
 #define ID_EPGRAPH 10000
 ////@end control identifiers
 
@@ -84,7 +85,7 @@ public:
     void OnCopyClick( wxCommandEvent& event );
 
     /// wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH
-    void OnEpgraphAxisDClick( wxCommandEvent& event );
+	void OnEpgraphAxisDClick( wxCommandEvent& event );
 
     /// wxEVT_GRAPH_CLICK event handler for ID_EPGRAPH
     void OnEpgraphGraphClick( wxCommandEvent& event );

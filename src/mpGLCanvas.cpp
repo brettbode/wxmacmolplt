@@ -24,7 +24,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
                        long            style,
                        const wxString &name)
            :wxGLCanvas((wxWindow *)parent, id, position, size,
-                       style|wxFULL_REPAINT_ON_RESIZE, name, defAttribs) {
+                       style|wxFULL_REPAINT_ON_RESIZE|wxNO_BORDER, name, defAttribs) {
         //There is an additional parameter to wxGLCanvas that is an int
         //array of GL options we might need. Might need to use WX_GL_RGBA and WX_GL_DOUBLEBUFFER?
     Prefs = NULL;

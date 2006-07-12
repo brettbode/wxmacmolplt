@@ -133,7 +133,7 @@ void SurfacesWindow::CreateControls()
     upperSizer = new wxBoxSizer(wxHORIZONTAL);
 
     surfTitleEdit = new wxTextCtrl( MainPanel, ID_SURFTITLE, _T(""), wxDefaultPosition, wxSize(250, -1), wxTE_PROCESS_ENTER);
-    upperSizer->Add(surfTitleEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    upperSizer->Add(surfTitleEdit, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     visibleCheck = new wxCheckBox( MainPanel, ID_VISIBLECHECK, _("Visible"), wxDefaultPosition, wxDefaultSize, 0 );
     upperSizer->Add(visibleCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -257,14 +257,15 @@ void SurfacesWindow::OnAllFrameCheck( wxCommandEvent& event )
   tempPane->setAllFrames(event.GetSelection());
 }
 
-void SurfacesWindow::OnAddClick( wxCommandEvent& event )
-{
-  int surfTypeId = selectSurfaceType();
-  addNewPane(surfTypeId);
-  if (listBook->GetPageCount()> 0) {
-      visibleCheck->Enable();
-      allFrameCheck->Enable();
-  }
+void SurfacesWindow::OnAddClick( wxCommandEvent& event ) {
+	int surfTypeId = selectSurfaceType();
+	if (surfTypeId > 0) {
+		addNewPane(surfTypeId);
+		if (listBook->GetPageCount()> 0) {
+			visibleCheck->Enable();
+			allFrameCheck->Enable();
+		}
+	}
 }
 
 /*!
@@ -452,7 +453,7 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 	BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
 	if (tempPane) {
 	  //GetSizer()->Fit(this);
-	  tempPane->GetSizer()->Fit(tempPane);
+//	  tempPane->GetSizer()->Fit(tempPane);
 	  MainPanel->Fit();
 	  Fit();
 
