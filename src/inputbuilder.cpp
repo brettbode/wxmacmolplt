@@ -1350,7 +1350,7 @@ void InputBuilderWindow::OnScfChoiceSelected( wxCommandEvent& event )
 
 void InputBuilderWindow::OnLocalChoiceSelected( wxCommandEvent& event )
 {
-    TmpInputRec->Control->SetLocal((GAMESS_Localization)(localChoice->GetSelection()));
+    TmpInputRec->Control->SetLocal((GAMESS_Localization)(localChoice->GetSelection() + 1));
     SetupItems();
 }
 /*!
