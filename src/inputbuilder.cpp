@@ -1101,7 +1101,8 @@ void InputBuilderWindow::SetupControlItems() {
     int itemValue = 0;
     
     itemValue = TmpInputRec->Control->GetRunType();
-    runChoice->SetSelection(itemValue);
+    if(itemValue == 0) itemValue = 1;
+    runChoice->SetSelection(itemValue - 1);
     
     if(scft == 0) {
         if(parent->GetData()->GetNumElectrons() & 1) {
@@ -1115,43 +1116,59 @@ void InputBuilderWindow::SetupControlItems() {
 
     // Enable/Disable mp2Check
     if(ci || cc || dft || (mp2 < 0)) {
+        mp2Check->SetValue(false);
         mp2Check->Enable(false);
     }
     else {
         mp2Check->Enable(true);
+        if(mp2 < 0) mp2 = 0;
+        if(mp2 == 2) mp2 = 1;
+        mp2Check->SetValue(mp2);
     }
     
     // Enable/Disable dftCheck
     if(ci || cc || (mp2 > 0) || (scft > 3)) {
+        dftCheck->SetValue(false);
         dftCheck->Enable(false);
     }
     else {
         dftCheck->Enable(true);
+        dftCheck->SetValue(dft);
     }
     
     // Enable/Disable ciChoice
     if((mp2 > 0) || dft || cc || scft == 2) {
+        ciChoice->SetSelection(0);
         ciChoice->Enable(false);
     }
     else {
         ciChoice->Enable(true);
+        ciChoice->SetSelection(ci);
     }
     
     // Enable/Disable ccChoice
     if((mp2 > 0) || dft || ci || scft > 1) {
+        ccChoice->SetSelection(0);
         ccChoice->Enable(false);
     }
     else {
         ccChoice->Enable(true);
+        ccChoice->SetSelection(cc);
     }
     
+    // TODO:  scfIterText
+    
     // Enable/Disable exeChoice
+    exeChoice->SetSelection(TmpInputRec->Control->GetExeType());
     if(TmpInputRec->Control->GetFriend()) {
         exeChoice->Enable(false);
     }
     else {
         exeChoice->Enable(true);
     }
+    
+    // TODO:  mchargeText
+    // TODO:  multText
 }
 
 void InputBuilderWindow::SetupDataItems() {
@@ -1311,7 +1328,7 @@ void InputBuilderWindow::OnNumpChoiceSelected( wxCommandEvent& event )
 
 void InputBuilderWindow::OnRunChoiceSelected( wxCommandEvent& event )
 {
-    TmpInputRec->Control->SetRunType((TypeOfRun)(runChoice->GetSelection()));
+    TmpInputRec->Control->SetRunType((TypeOfRun)(runChoice->GetSelection() + 1));
     SetupItems();
 }
 
