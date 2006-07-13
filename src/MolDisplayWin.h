@@ -214,7 +214,12 @@ class MolDisplayWin : public wxFrame {
         long OpenGAMESSInput(BufferFile * Buffer);
         long OpenMolPltFile(BufferFile *Buffer);
         long ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos);
-            //Call to dump the message and close the window
+		void ExportGAMESS(BufferFile * Buffer, bool AllFrames);
+		void WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames);
+		void WriteFrequencies(BufferFile * Buffer);
+		void WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllModes, bool AnimateMode);
+		void WriteMDLMolFile(BufferFile * Buffer);
+         //Call to dump the message and close the window
         void AbortOpen(const char * msg);
         
         //General Utility routines

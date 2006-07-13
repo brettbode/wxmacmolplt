@@ -2662,6 +2662,7 @@ void MolDisplayWin::WritePICT(BufferFile * Buffer) {
 		KillPicture(tempPict);
 	}
 }
+#endif
 void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
 	Frame * lFrame = MainData->Frames;
 	long NumFrames = MainData->NumFrames;
@@ -2670,27 +2671,28 @@ void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
 		NumFrames = 1;
 	}
 		long		iatom;
-		Str255		PointGroup, AtomLabel;
-		char		text[kMaxLineLength];
-		bool		C1Sym=false;
+		Str255		AtomLabel;
+		char		text[kMaxLineLength], PointGroup[80];
+		bool		C1Sym=true;
+		GAMESSPointGroup	sym = GAMESS_C1;
 		
 	if (MainData->InputOptions) {
-		iatom = MainData->InputOptions->Data->GetPointGroup(PointGroup, false);
-		C1Sym = (iatom == C1);
-		if ((iatom>3)&&(iatom<11)) {
-			sprintf((char *) &(PointGroup[PointGroup[0]+1]), " %d",
-				MainData->InputOptions->Data->GetPointGroupOrder());
-		}
-	} else {
-		strcpy((char *) &(PointGroup[1]), "C1");
-		C1Sym = true;
+		sym = MainData->InputOptions->Data->GetPointGroup();
+		C1Sym = (sym == GAMESS_C1);
 	}
 	for (long i=0; i<NumFrames; i++) {
 		sprintf(text, " $DATA\rComments go here: Frame # %ld\r%s\r", 
 			i, &(PointGroup[1]));
 		Buffer->PutText(text);
-		if (!C1Sym) {	//Add a blank line unless the Point Group is C1
-			sprintf(text, "\r");
+		if (C1Sym) {
+			Buffer->PutText("C1\r");
+		} else {	//Add a blank line unless the Point Group is C1
+			if ((sym>=GAMESS_CNH)&&(sym<=GAMESS_DN)) {
+				sprintf(text, "%s %d\r\r", MainData->InputOptions->Data->GetPointGroupText(), 
+						MainData->InputOptions->Data->GetPointGroupOrder());
+			} else {
+				sprintf(text, "%s\r\r", MainData->InputOptions->Data->GetPointGroupText());
+			}
 			Buffer->PutText(text);
 		}
 		for (iatom=0; iatom<lFrame->NumAtoms; iatom++) {
@@ -2803,20 +2805,15 @@ void MolDisplayWin::WriteFrequencies(BufferFile * Buffer) {
 	lFrame = MainData->cFrame;
 
 	if (!lFrame->Vibs) return;
-//		Atom * lAtoms = lFrame->Atoms;
-		char * lFreq = lFrame->Vibs->Frequencies, Line[kMaxLineLength];
-		long	fPos = 0;
-		float *	lInten=NULL;
-	if (lFrame->Vibs->Intensities) lInten = lFrame->Vibs->Intensities;
+
+	bool haveInten = (lFrame->Vibs->Intensities.size() > 0);
+
 	Buffer->PutText("Frequency\tIntensity\r");
 	for (long i=0; i<lFrame->Vibs->GetNumModes(); i++) {
-		strncpy(Line, &(lFreq[fPos+1]), lFreq[fPos]);
-		Line[lFreq[fPos]] = 0;
-		fPos += 1 + lFreq[fPos];
-		sprintf(text, "%s", Line);
+		sprintf(text, "%s", lFrame->Vibs->Frequencies[i].c_str());
 		Buffer->PutText(text);
-		if (lInten) {
-			sprintf(text, "\t%f", lInten[i]);
+		if (haveInten) {
+			sprintf(text, "\t%f", lFrame->Vibs->GetIntensity(i));
 			Buffer->PutText(text);
 		}
 		Buffer->PutText("\r");
@@ -2836,20 +2833,13 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 
 	if (AnimateMode) {	//One geometry with all normal modes
 		if (!lFrame->Vibs) return;
-		Atom * lAtoms = lFrame->Atoms;
-		char * lFreq = lFrame->Vibs->Frequencies, FreqLabel[kMaxLineLength];
-		long	fPos = 0, i, iatm;
-		for (i=0; i<lFrame->Vibs->CurrentMode; i++) {
-			fPos += 1 + lFreq[fPos];
-		}	//Store the frequency label for later use
-		strncpy(FreqLabel, &(lFreq[fPos+1]), lFreq[fPos]);
-		FreqLabel[lFreq[fPos]] = 0;
+		mpAtom * lAtoms = lFrame->Atoms;
+		long	i, iatm;
 		long cmode = (lFrame->NumAtoms)*(lFrame->Vibs->CurrentMode);
 		CPoint3D * ModeOffset = new CPoint3D[lFrame->NumAtoms];
 		CPoint3D * tempAtoms = new CPoint3D[lFrame->NumAtoms];
 		if (!ModeOffset || !tempAtoms) return;
 		float	VectorScale = Prefs->GetVectorScale();
-//		long AnimationSpeed = Prefs->GetAnimationSpeed();
 		float offsetFactor = 1.0/40.0;
 		for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
 			tempAtoms[iatm] = lAtoms[iatm].Position;
@@ -2867,7 +2857,8 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 			}	//Now punch out the XYZ frame
 			sprintf(text, "%ld\r", lFrame->NumAtoms);
 			Buffer->PutText(text);
-			sprintf(text, "Frequency %s Frame %ld\r", FreqLabel, i+1);
+			sprintf(text, "Frequency %s Frame %ld\r", 
+					lFrame->Vibs->Frequencies[lFrame->Vibs->CurrentMode].c_str(), i+1);
 			Buffer->PutText(text);
 			for (long j=0; j<lFrame->NumAtoms; j++) {
 					Str255	Label;
@@ -2887,16 +2878,13 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 		delete [] ModeOffset;
 	} else if (AllModes) {
 		if (!lFrame->Vibs) return;
-			Atom * lAtoms = lFrame->Atoms;
-			char * lFreq = lFrame->Vibs->Frequencies, Line[kMaxLineLength];
-			long	fPos = 0;
+			mpAtom * lAtoms = lFrame->Atoms;
+			char Line[kMaxLineLength];
 		for (long i=0; i<lFrame->Vibs->GetNumModes(); i++) {
 			sprintf(text, "%ld\r", lFrame->NumAtoms);
 			Buffer->PutText(text);
-			strncpy(Line, &(lFreq[fPos+1]), lFreq[fPos]);
-			Line[lFreq[fPos]] = 0;
-			fPos += 1 + lFreq[fPos];
-			sprintf(text, "Frequency %s\r", Line);
+			sprintf(text, "Frequency %s\r", 
+					lFrame->Vibs->Frequencies[i].c_str());
 			Buffer->PutText(text);
 			for (long j=0; j<lFrame->NumAtoms; j++) {
 					Str255	Label;
@@ -2915,7 +2903,7 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 		}
 	} else {	
 		for (long i=0; i<NumFrames; i++) {
-				Atom * lAtoms = lFrame->Atoms;
+				mpAtom * lAtoms = lFrame->Atoms;
 			sprintf(text, "%ld\r", lFrame->NumAtoms);
 			Buffer->PutText(text);
 			sprintf(text, "Frame %ld\r", i+1);
@@ -2965,7 +2953,7 @@ void MolDisplayWin::WriteMDLMolFile(BufferFile * Buffer) {
 	sprintf(Line, "%3ld%3ld  0  0  0  0  0  0  0  0  0 v2000\r",
 		lFrame->GetNumAtoms(), lFrame->GetNumBonds());
 	Buffer->PutText(Line);
-		Atom * lAtoms = lFrame->Atoms;
+		mpAtom * lAtoms = lFrame->Atoms;
 		long i;
 	for (i=0; i<lFrame->GetNumAtoms(); i++) {
 			Str255	Label;
@@ -2989,7 +2977,6 @@ void MolDisplayWin::WriteMDLMolFile(BufferFile * Buffer) {
 		//Final line needs to be end line to terminate properties block
 	Buffer->PutText("M  END\r");
 }
-#endif
 void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const double & MultValue) {
 #ifdef __wxBuild__
     wxString filename = wxFileSelector(wxT("Choose a file containing the surface data."));

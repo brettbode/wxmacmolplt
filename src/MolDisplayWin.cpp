@@ -710,6 +710,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
                     exportImage.SaveFile(filepath, type);
                     memDC.SelectObject(wxNullBitmap); // bmp has now been
                                                       // destroyed.
+					break;
             }
         }
     }
