@@ -232,7 +232,8 @@ void SurfacesWindow::addNewPane(int type)
 
 	tempPane->SetVisibility(true);
 	visibleCheck->SetValue(true);
-	allFrameCheck->SetValue((newSurface->GetSurfaceID() != 0));
+
+	allFrameCheck->SetValue((newSurface->GetSurfaceID() != 0));	 
       }
     else
       {
@@ -263,7 +264,7 @@ void SurfacesWindow::OnAddClick( wxCommandEvent& event ) {
 		addNewPane(surfTypeId);
 		if (listBook->GetPageCount()> 0) {
 			visibleCheck->Enable();
-			allFrameCheck->Enable();
+			//allFrameCheck->Enable();
 		}
 	}
 }
@@ -460,7 +461,15 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 	  Surface * tempSurf = tempPane->GetTargetSurface();
 	  temp.Printf("%s", tempSurf->GetLabel());
 	  visibleCheck->SetValue(tempPane->GetVisibility());
-	  allFrameCheck->SetValue(tempPane->GetAllFrames());
+
+	  int surfType = tempSurf->GetSurfaceType();
+	  if ( surfType == kGeneral2DSurface || surfType == kGeneral3DSurface)
+	    allFrameCheck->Disable();
+	  else
+	    {
+	      allFrameCheck->Enable();
+	      allFrameCheck->SetValue(tempPane->GetAllFrames());
+	    }
 	}
 	surfTitleEdit->SetValue(temp);
 }
