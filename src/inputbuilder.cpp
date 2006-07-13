@@ -83,6 +83,16 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 
     EVT_CHOICE( ID_CC_CHOICE, InputBuilderWindow::OnCcChoiceSelected )
 
+    EVT_CHOICE( ID_COORD_CHOICE, InputBuilderWindow::OnCoordChoiceSelected )
+
+    EVT_CHOICE( ID_UNIT_CHOICE, InputBuilderWindow::OnUnitChoiceSelected )
+
+    EVT_CHOICE( ID_POINTGROUP_CHOICE, InputBuilderWindow::OnPointgroupChoiceSelected )
+
+    EVT_CHOICE( ID_ORDER_CHOICE, InputBuilderWindow::OnOrderChoiceSelected )
+
+    EVT_CHECKBOX( ID_SYMMETRY_CHECKBOX, InputBuilderWindow::OnSymmetryCheckboxClick )
+
     EVT_BUTTON( ID_DEFAULTSBUTTON, InputBuilderWindow::OnDefaultsbuttonClick )
 
     EVT_BUTTON( ID_REVERTBUTTON, InputBuilderWindow::OnRevertbuttonClick )
@@ -130,10 +140,12 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
 ////@begin InputBuilderWindow member initialisation
     listBook = NULL;
     basisChoice = NULL;
+    ecpTypeLabel = NULL;
     ecpTypeChoice = NULL;
     numDChoice = NULL;
     numFChoice = NULL;
     numPChoice = NULL;
+    polarLabel = NULL;
     polarChoice = NULL;
     diffuseLCheck = NULL;
     diffuseSCheck = NULL;
@@ -146,7 +158,9 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     scfIterText = NULL;
     mp2Check = NULL;
     dftCheck = NULL;
+    ciLabel = NULL;
     ciChoice = NULL;
+    ccLabel = NULL;
     ccChoice = NULL;
     titleText = NULL;
     coordTypeChoice = NULL;
@@ -155,6 +169,14 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     pointGroupChoice = NULL;
     paxisOrderChoice = NULL;
     symmetryCheck = NULL;
+    timeLimitSpin = NULL;
+    timeLimitUnitChoice = NULL;
+    memorySpin = NULL;
+    memoryUnitChoice = NULL;
+    diagChoice = NULL;
+    coreCheck = NULL;
+    plBalanceRadio = NULL;
+    externDataRepCheck = NULL;
     aimpacCheck = NULL;
     rpacCheck = NULL;
     defaultsBtn = NULL;
@@ -236,9 +258,9 @@ void InputBuilderWindow::CreateControls()
 
     itemBoxSizer6->Add(5, 5, 0, wxGROW|wxALL, 5);
 
-    wxStaticText* itemStaticText10 = new wxStaticText( itemPanel4, wxID_STATIC, _("ECP Type:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-    itemStaticText10->Enable(false);
-    itemBoxSizer6->Add(itemStaticText10, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
+    ecpTypeLabel = new wxStaticText( itemPanel4, wxID_STATIC, _("ECP Type:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+    ecpTypeLabel->Enable(false);
+    itemBoxSizer6->Add(ecpTypeLabel, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
     wxString ecpTypeChoiceStrings[] = {
         _("None"),
@@ -294,9 +316,9 @@ void InputBuilderWindow::CreateControls()
 
     wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer5->Add(itemBoxSizer19, 0, wxGROW, 5);
-    wxStaticText* itemStaticText20 = new wxStaticText( itemPanel4, wxID_STATIC, _("Polar:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStaticText20->Enable(false);
-    itemBoxSizer19->Add(itemStaticText20, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    polarLabel = new wxStaticText( itemPanel4, wxID_STATIC, _("Polar:"), wxDefaultPosition, wxDefaultSize, 0 );
+    polarLabel->Enable(false);
+    itemBoxSizer19->Add(polarLabel, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString polarChoiceStrings[] = {
         _("Pople"),
@@ -446,8 +468,8 @@ void InputBuilderWindow::CreateControls()
 
     wxFlexGridSizer* itemFlexGridSizer51 = new wxFlexGridSizer(0, 2, 0, 0);
     itemStaticBoxSizer48->Add(itemFlexGridSizer51, 0, wxGROW, 5);
-    wxStaticText* itemStaticText52 = new wxStaticText( itemPanel24, wxID_STATIC, _("CI:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer51->Add(itemStaticText52, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    ciLabel = new wxStaticText( itemPanel24, wxID_STATIC, _("CI:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer51->Add(ciLabel, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
     wxString ciChoiceStrings[] = {
         _("None"),
@@ -462,8 +484,8 @@ void InputBuilderWindow::CreateControls()
     ciChoice->SetStringSelection(_("None"));
     itemFlexGridSizer51->Add(ciChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText54 = new wxStaticText( itemPanel24, wxID_STATIC, _("CC:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer51->Add(itemStaticText54, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    ccLabel = new wxStaticText( itemPanel24, wxID_STATIC, _("CC:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer51->Add(ccLabel, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString ccChoiceStrings[] = {
         _("None"),
@@ -565,10 +587,10 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText79 = new wxStaticText( itemPanel76, wxID_STATIC, _("Time Limit:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer78->Add(itemStaticText79, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxSpinCtrl* itemSpinCtrl80 = new wxSpinCtrl( itemPanel76, ID_SPINCTRL, _T("525600"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 525600 );
-    itemFlexGridSizer78->Add(itemSpinCtrl80, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    timeLimitSpin = new wxSpinCtrl( itemPanel76, ID_TIMELIMIT_SPINCTRL, _T("525600"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 525600 );
+    itemFlexGridSizer78->Add(timeLimitSpin, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxString itemChoice81Strings[] = {
+    wxString timeLimitUnitChoiceStrings[] = {
         _("Seconds"),
         _("Minutes"),
         _("Hours"),
@@ -577,56 +599,56 @@ void InputBuilderWindow::CreateControls()
         _("Years"),
         _("Millenia")
     };
-    wxUglyChoice* itemChoice81 = new wxUglyChoice( itemPanel76, ID_CHOICE19, wxDefaultPosition, wxDefaultSize, 7, itemChoice81Strings, 0 );
-    itemChoice81->SetStringSelection(_("Minutes"));
-    itemFlexGridSizer78->Add(itemChoice81, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    timeLimitUnitChoice = new wxUglyChoice( itemPanel76, ID_TIMELIMITUNITS_CHOICE, wxDefaultPosition, wxDefaultSize, 7, timeLimitUnitChoiceStrings, 0 );
+    timeLimitUnitChoice->SetStringSelection(_("Minutes"));
+    itemFlexGridSizer78->Add(timeLimitUnitChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
     wxStaticText* itemStaticText82 = new wxStaticText( itemPanel76, wxID_STATIC, _("Memory:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer78->Add(itemStaticText82, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxSpinCtrl* itemSpinCtrl83 = new wxSpinCtrl( itemPanel76, ID_SPINCTRL1, _T("1000000"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 1000000 );
-    itemFlexGridSizer78->Add(itemSpinCtrl83, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    memorySpin = new wxSpinCtrl( itemPanel76, ID_MEMORY_SPINCTRL, _T("1000000"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 1000000 );
+    itemFlexGridSizer78->Add(memorySpin, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxString itemChoice84Strings[] = {
+    wxString memoryUnitChoiceStrings[] = {
         _("Words"),
         _("Bytes"),
         _("MegaWords"),
         _("MegaBytes")
     };
-    wxUglyChoice* itemChoice84 = new wxUglyChoice( itemPanel76, ID_CHOICE20, wxDefaultPosition, wxDefaultSize, 4, itemChoice84Strings, 0 );
-    itemChoice84->SetStringSelection(_("Words"));
-    itemFlexGridSizer78->Add(itemChoice84, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    memoryUnitChoice = new wxUglyChoice( itemPanel76, ID_MEMORYUNITS_CHOICE, wxDefaultPosition, wxDefaultSize, 4, memoryUnitChoiceStrings, 0 );
+    memoryUnitChoice->SetStringSelection(_("Words"));
+    itemFlexGridSizer78->Add(memoryUnitChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxBoxSizer* itemBoxSizer85 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer77->Add(itemBoxSizer85, 0, wxGROW, 5);
     wxStaticText* itemStaticText86 = new wxStaticText( itemPanel76, wxID_STATIC, _("Diagonalization Method:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer85->Add(itemStaticText86, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxString itemChoice87Strings[] = {
+    wxString diagChoiceStrings[] = {
         _("default"),
         _("EVVRSP"),
         _("GIVEIS"),
         _("JACOBI")
     };
-    wxUglyChoice* itemChoice87 = new wxUglyChoice( itemPanel76, ID_CHOICE21, wxDefaultPosition, wxDefaultSize, 4, itemChoice87Strings, 0 );
-    itemChoice87->SetStringSelection(_("default"));
-    itemBoxSizer85->Add(itemChoice87, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    diagChoice = new wxUglyChoice( itemPanel76, ID_DIAGONALIZATION_CHOICE, wxDefaultPosition, wxDefaultSize, 4, diagChoiceStrings, 0 );
+    diagChoice->SetStringSelection(_("default"));
+    itemBoxSizer85->Add(diagChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxCheckBox* itemCheckBox88 = new wxCheckBox( itemPanel76, ID_CHECKBOX9, _("Produce \"core\" file upon abort"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox88->SetValue(false);
-    itemBoxSizer77->Add(itemCheckBox88, 0, wxALIGN_LEFT|wxALL, 5);
+    coreCheck = new wxCheckBox( itemPanel76, ID_CORE_CHECKBOX, _("Produce \"core\" file upon abort"), wxDefaultPosition, wxDefaultSize, 0 );
+    coreCheck->SetValue(false);
+    itemBoxSizer77->Add(coreCheck, 0, wxALIGN_LEFT|wxALL, 5);
 
-    wxString itemRadioBox89Strings[] = {
+    wxString plBalanceRadioStrings[] = {
         _("Loop"),
         _("Next Value")
     };
-    wxRadioBox* itemRadioBox89 = new wxRadioBox( itemPanel76, ID_RADIOBOX, _("Parallel Load Balance Type"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox89Strings, 1, wxRA_SPECIFY_COLS );
-    itemRadioBox89->SetSelection(0);
-    itemBoxSizer77->Add(itemRadioBox89, 0, wxALIGN_LEFT|wxALL, 5);
+    plBalanceRadio = new wxRadioBox( itemPanel76, ID_PLBALANCE_RADIOBOX, _("Parallel Load Balance Type"), wxDefaultPosition, wxDefaultSize, 2, plBalanceRadioStrings, 1, wxRA_SPECIFY_COLS );
+    plBalanceRadio->SetSelection(0);
+    itemBoxSizer77->Add(plBalanceRadio, 0, wxALIGN_LEFT|wxALL, 5);
 
-    wxCheckBox* itemCheckBox90 = new wxCheckBox( itemPanel76, ID_CHECKBOX10, _("Use External Data Representation for messages"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox90->SetValue(false);
-    itemBoxSizer77->Add(itemCheckBox90, 0, wxALIGN_LEFT|wxALL, 5);
+    externDataRepCheck = new wxCheckBox( itemPanel76, ID_EXTERNDATAREP_CHECKBOX, _("Use External Data Representation for messages"), wxDefaultPosition, wxDefaultSize, 0 );
+    externDataRepCheck->SetValue(false);
+    itemBoxSizer77->Add(externDataRepCheck, 0, wxALIGN_LEFT|wxALL, 5);
 
     listBook->AddPage(itemPanel76, _("System"));
 
@@ -1079,14 +1101,76 @@ void InputBuilderWindow::SetupItems() {
 
 void InputBuilderWindow::SetupBasisItems() {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    short BasisValue = TmpInputRec->Basis->GetBasis();
+    short NumGauss = TmpInputRec->Basis->GetNumGauss();
+    int itemValue = 0;
+    int testValue = 0;
     
-    // Enable/Disable ecpTypeChoice
-    if(!(TmpInputRec->Basis->GetBasis() == 12 || TmpInputRec->Basis->GetBasis() == 13)) {
-        ecpTypeChoice->Enable(false);
+    // basisChoice
+    itemValue = BasisValue;
+    if(itemValue == 0) itemValue = 1;
+    else if(itemValue == 3) itemValue = NumGauss + 1;
+    else if(itemValue == 4) {
+        itemValue += 4;
+        if(NumGauss == 6) itemValue++;
+    }
+    else if(itemValue == 5) itemValue = NumGauss + 6;
+    else if(itemValue > 5) itemValue += 7;
+    basisChoice->SetSelection(itemValue - 1);
+    // TODO:  CheckBasisMenu();
+    
+    // ecpTypeChoice
+    if(BasisValue == 12 || BasisValue == 13) {
+        ecpTypeChoice->Enable(true);
+        ecpTypeLabel->Enable(true);
+        itemValue = TmpInputRec->Basis->GetECPPotential();
+        if(itemValue == 0) {
+            if(BasisValue == 12) itemValue = 2;
+            else itemValue = 3;
+        }
+        ecpTypeChoice->SetSelection(itemValue);
     }
     else {
-        ecpTypeChoice->Enable(true);
+        ecpTypeChoice->Enable(false);
+        ecpTypeLabel->Enable(false);
     }
+    
+    // polarChoice
+    testValue = TmpInputRec->Basis->GetNumPFuncs() +
+                TmpInputRec->Basis->GetNumDFuncs() +
+                TmpInputRec->Basis->GetNumFFuncs();
+    if(testValue) {
+        polarChoice->Enable(true);
+        polarLabel->Enable(true);
+        itemValue = TmpInputRec->Basis->GetPolar();
+        if(itemValue == 0) {
+            if(BasisValue == 6 || BasisValue == 11) itemValue = 2;
+            else if(BasisValue == 7 || BasisValue == 8) itemValue = 3;
+            else if(BasisValue < 3) itemValue = 4;
+            else if(BasisValue == 10) itemValue = 5;
+            else itemValue = 1;
+        }
+        polarChoice->SetSelection(itemValue - 1);
+    }
+    else {
+        polarChoice->Enable(false);
+        polarLabel->Enable(false);
+    }
+    
+    // diffuseLCheck
+    diffuseLCheck->SetValue(TmpInputRec->Basis->GetDiffuseSP());
+    
+    // diffuseSCheck
+    diffuseSCheck->SetValue(TmpInputRec->Basis->GetDiffuseS());
+    
+    // numDChoice
+    numDChoice->SetSelection(TmpInputRec->Basis->GetNumDFuncs());
+    
+    // numFChoice
+    numFChoice->SetSelection(TmpInputRec->Basis->GetNumFFuncs());
+    
+    // numPChoice
+    numPChoice->SetSelection(TmpInputRec->Basis->GetNumPFuncs());
 }
 
 void InputBuilderWindow::SetupControlItems() {
@@ -1114,7 +1198,7 @@ void InputBuilderWindow::SetupControlItems() {
     }
     scfChoice->SetSelection(scft - 1);
 
-    // Enable/Disable mp2Check
+    // mp2Check
     if(ci || cc || dft || (mp2 < 0)) {
         mp2Check->SetValue(false);
         mp2Check->Enable(false);
@@ -1126,7 +1210,7 @@ void InputBuilderWindow::SetupControlItems() {
         mp2Check->SetValue(mp2);
     }
     
-    // Enable/Disable dftCheck
+    // dftCheck
     if(ci || cc || (mp2 > 0) || (scft > 3)) {
         dftCheck->SetValue(false);
         dftCheck->Enable(false);
@@ -1136,29 +1220,33 @@ void InputBuilderWindow::SetupControlItems() {
         dftCheck->SetValue(dft);
     }
     
-    // Enable/Disable ciChoice
+    // ciChoice
     if((mp2 > 0) || dft || cc || scft == 2) {
         ciChoice->SetSelection(0);
         ciChoice->Enable(false);
+        ciLabel->Enable(false);
     }
     else {
         ciChoice->Enable(true);
+        ciLabel->Enable(true);
         ciChoice->SetSelection(ci);
     }
     
-    // Enable/Disable ccChoice
+    // ccChoice
     if((mp2 > 0) || dft || ci || scft > 1) {
         ccChoice->SetSelection(0);
         ccChoice->Enable(false);
+        ccLabel->Enable(false);
     }
     else {
         ccChoice->Enable(true);
+        ccLabel->Enable(true);
         ccChoice->SetSelection(cc);
     }
     
     // TODO:  scfIterText
     
-    // Enable/Disable exeChoice
+    // exeChoice
     exeChoice->SetSelection(TmpInputRec->Control->GetExeType());
     if(TmpInputRec->Control->GetFriend()) {
         exeChoice->Enable(false);
@@ -1173,6 +1261,21 @@ void InputBuilderWindow::SetupControlItems() {
 
 void InputBuilderWindow::SetupDataItems() {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    int itemValue;
+    
+    // coordTypeChoice
+    itemValue = TmpInputRec->Data->GetCoordType();
+    if(itemValue == 0) itemValue = 1;
+    coordTypeChoice->SetSelection(itemValue - 1);
+    
+    // unitChoice
+    unitChoice->SetSelection(TmpInputRec->Data->GetUnits());
+    
+    // TODO:  pointGroupChoice
+    // TODO:  paxisOrderChoice
+    
+    // symmetryCheck
+    symmetryCheck->SetValue(TmpInputRec->Data->GetUseSym());
 }
 
 void InputBuilderWindow::SetupSystemItems() {
@@ -1267,7 +1370,7 @@ void InputBuilderWindow::OnEcptChoiceSelected( wxCommandEvent& event )
 
 void InputBuilderWindow::OnPolarChoiceSelected( wxCommandEvent& event )
 {
-    TmpInputRec->Basis->SetPolar((GAMESS_BS_Polarization)(polarChoice->GetSelection()));
+    TmpInputRec->Basis->SetPolar((GAMESS_BS_Polarization)(polarChoice->GetSelection() + 1));
 }
 
 
@@ -1609,4 +1712,61 @@ int InputBuilderWindow::getCurrentPane() {
     
     return currPane;
 }
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_COORD_CHOICE
+ */
+
+void InputBuilderWindow::OnCoordChoiceSelected( wxCommandEvent& event )
+{
+    TmpInputRec->Data->SetCoordType((CoordinateType)(coordTypeChoice->GetSelection() + 1));
+    SetupItems();
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_UNIT_CHOICE
+ */
+
+void InputBuilderWindow::OnUnitChoiceSelected( wxCommandEvent& event )
+{
+    TmpInputRec->Data->SetUnits(unitChoice->GetSelection());
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POINTGROUP_CHOICE
+ */
+
+void InputBuilderWindow::OnPointgroupChoiceSelected( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POINTGROUP_CHOICE in InputBuilderWindow.
+    // Before editing this code, remove the block markers.
+    event.Skip();
+////@end wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POINTGROUP_CHOICE in InputBuilderWindow. 
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ORDER_CHOICE
+ */
+
+void InputBuilderWindow::OnOrderChoiceSelected( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ORDER_CHOICE in InputBuilderWindow.
+    // Before editing this code, remove the block markers.
+    event.Skip();
+////@end wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ORDER_CHOICE in InputBuilderWindow. 
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_SYMMETRY_CHECKBOX
+ */
+
+void InputBuilderWindow::OnSymmetryCheckboxClick( wxCommandEvent& event )
+{
+    TmpInputRec->Data->SetUseSym(event.IsChecked());
+}
+
 

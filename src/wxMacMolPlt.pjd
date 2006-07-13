@@ -10681,7 +10681,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Id name">"wxID_STATIC"</string>
                       <long name="proxy-Id value">5105</long>
                       <string name="proxy-Class">"wxStaticText"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"ecpTypeLabel"</string>
                       <string name="proxy-Label">"ECP Type:"</string>
                       <long name="proxy-Wrapping width">-1</long>
                       <string name="proxy-Help text">""</string>
@@ -11174,7 +11174,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Id name">"wxID_STATIC"</string>
                       <long name="proxy-Id value">5105</long>
                       <string name="proxy-Class">"wxStaticText"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"polarLabel"</string>
                       <string name="proxy-Label">"Polar:"</string>
                       <long name="proxy-Wrapping width">-1</long>
                       <string name="proxy-Help text">""</string>
@@ -12724,7 +12724,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Id name">"wxID_STATIC"</string>
                           <long name="proxy-Id value">5105</long>
                           <string name="proxy-Class">"wxStaticText"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"ciLabel"</string>
                           <string name="proxy-Label">"CI:"</string>
                           <long name="proxy-Wrapping width">-1</long>
                           <string name="proxy-Help text">""</string>
@@ -12833,7 +12833,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Id name">"wxID_STATIC"</string>
                           <long name="proxy-Id value">5105</long>
                           <string name="proxy-Class">"wxStaticText"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"ccLabel"</string>
                           <string name="proxy-Label">"CC:"</string>
                           <long name="proxy-Wrapping width">-1</long>
                           <string name="proxy-Help text">""</string>
@@ -13251,6 +13251,7 @@ along the chosen normal mode."</string>
                           <long name="locked">0</long>
                           <string name="created">"29/6/2006"</string>
                           <string name="proxy-type">"wbChoiceProxy"</string>
+                          <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnCoordChoiceSelected"</string>
                           <string name="proxy-Id name">"ID_COORD_CHOICE"</string>
                           <long name="proxy-Id value">10118</long>
                           <string name="proxy-Class">"wxUglyChoice"</string>
@@ -13359,6 +13360,7 @@ along the chosen normal mode."</string>
                           <long name="locked">0</long>
                           <string name="created">"29/6/2006"</string>
                           <string name="proxy-type">"wbChoiceProxy"</string>
+                          <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnUnitChoiceSelected"</string>
                           <string name="proxy-Id name">"ID_UNIT_CHOICE"</string>
                           <long name="proxy-Id value">10119</long>
                           <string name="proxy-Class">"wxUglyChoice"</string>
@@ -13687,6 +13689,7 @@ along the chosen normal mode."</string>
                           <long name="locked">0</long>
                           <string name="created">"29/6/2006"</string>
                           <string name="proxy-type">"wbChoiceProxy"</string>
+                          <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnPointgroupChoiceSelected"</string>
                           <string name="proxy-Id name">"ID_POINTGROUP_CHOICE"</string>
                           <long name="proxy-Id value">10120</long>
                           <string name="proxy-Class">"wxUglyChoice"</string>
@@ -13795,6 +13798,7 @@ along the chosen normal mode."</string>
                           <long name="locked">0</long>
                           <string name="created">"29/6/2006"</string>
                           <string name="proxy-type">"wbChoiceProxy"</string>
+                          <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnOrderChoiceSelected"</string>
                           <string name="proxy-Id name">"ID_ORDER_CHOICE"</string>
                           <long name="proxy-Id value">10121</long>
                           <string name="proxy-Class">"wxUglyChoice"</string>
@@ -13845,6 +13849,7 @@ along the chosen normal mode."</string>
                         <long name="locked">0</long>
                         <string name="created">"29/6/2006"</string>
                         <string name="proxy-type">"wbCheckBoxProxy"</string>
+                        <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnSymmetryCheckboxClick"</string>
                         <string name="proxy-Id name">"ID_SYMMETRY_CHECKBOX"</string>
                         <long name="proxy-Id value">10122</long>
                         <string name="proxy-Class">"wxCheckBox"</string>
@@ -14071,7 +14076,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxSpinCtrl: ID_SPINCTRL"</string>
+                      <string name="title">"wxSpinCtrl: ID_TIMELIMIT_SPINCTRL"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"spinctrl"</string>
@@ -14081,10 +14086,10 @@ along the chosen normal mode."</string>
                       <long name="locked">0</long>
                       <string name="created">"29/6/2006"</string>
                       <string name="proxy-type">"wbSpinCtrlProxy"</string>
-                      <string name="proxy-Id name">"ID_SPINCTRL"</string>
+                      <string name="proxy-Id name">"ID_TIMELIMIT_SPINCTRL"</string>
                       <long name="proxy-Id value">10164</long>
                       <string name="proxy-Class">"wxSpinCtrl"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"timeLimitSpin"</string>
                       <long name="proxy-Minimum value">1</long>
                       <long name="proxy-Maximum value">2147483647</long>
                       <long name="proxy-Initial value">525600</long>
@@ -14129,7 +14134,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxUglyChoice: ID_CHOICE19"</string>
+                      <string name="title">"wxUglyChoice: ID_TIMELIMITUNITS_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -14139,10 +14144,10 @@ along the chosen normal mode."</string>
                       <long name="locked">0</long>
                       <string name="created">"29/6/2006"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
-                      <string name="proxy-Id name">"ID_CHOICE19"</string>
+                      <string name="proxy-Id name">"ID_TIMELIMITUNITS_CHOICE"</string>
                       <long name="proxy-Id value">10125</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"timeLimitUnitChoice"</string>
                       <string name="proxy-Strings">"Seconds|Minutes|Hours|Days|Weeks|Years|Millenia"</string>
                       <string name="proxy-Initial value">"Minutes"</string>
                       <string name="proxy-Help text">""</string>
@@ -14237,7 +14242,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxSpinCtrl: ID_SPINCTRL1"</string>
+                      <string name="title">"wxSpinCtrl: ID_MEMORY_SPINCTRL"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"spinctrl"</string>
@@ -14247,10 +14252,10 @@ along the chosen normal mode."</string>
                       <long name="locked">0</long>
                       <string name="created">"29/6/2006"</string>
                       <string name="proxy-type">"wbSpinCtrlProxy"</string>
-                      <string name="proxy-Id name">"ID_SPINCTRL1"</string>
+                      <string name="proxy-Id name">"ID_MEMORY_SPINCTRL"</string>
                       <long name="proxy-Id value">10124</long>
                       <string name="proxy-Class">"wxSpinCtrl"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"memorySpin"</string>
                       <long name="proxy-Minimum value">1</long>
                       <long name="proxy-Maximum value">2147483647</long>
                       <long name="proxy-Initial value">1000000</long>
@@ -14295,7 +14300,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxUglyChoice: ID_CHOICE20"</string>
+                      <string name="title">"wxUglyChoice: ID_MEMORYUNITS_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -14305,10 +14310,10 @@ along the chosen normal mode."</string>
                       <long name="locked">0</long>
                       <string name="created">"29/6/2006"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
-                      <string name="proxy-Id name">"ID_CHOICE20"</string>
+                      <string name="proxy-Id name">"ID_MEMORYUNITS_CHOICE"</string>
                       <long name="proxy-Id value">10127</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"memoryUnitChoice"</string>
                       <string name="proxy-Strings">"Words|Bytes|MegaWords|MegaBytes"</string>
                       <string name="proxy-Initial value">"Words"</string>
                       <string name="proxy-Help text">""</string>
@@ -14429,7 +14434,7 @@ along the chosen normal mode."</string>
                       <string name="proxy-Custom ctor arguments">""</string>
                     </document>
                     <document>
-                      <string name="title">"wxUglyChoice: ID_CHOICE21"</string>
+                      <string name="title">"wxUglyChoice: ID_DIAGONALIZATION_CHOICE"</string>
                       <string name="type">"dialog-control-document"</string>
                       <string name="filename">""</string>
                       <string name="icon-name">"choice"</string>
@@ -14439,10 +14444,10 @@ along the chosen normal mode."</string>
                       <long name="locked">0</long>
                       <string name="created">"29/6/2006"</string>
                       <string name="proxy-type">"wbChoiceProxy"</string>
-                      <string name="proxy-Id name">"ID_CHOICE21"</string>
+                      <string name="proxy-Id name">"ID_DIAGONALIZATION_CHOICE"</string>
                       <long name="proxy-Id value">10128</long>
                       <string name="proxy-Class">"wxUglyChoice"</string>
-                      <string name="proxy-Member variable name">""</string>
+                      <string name="proxy-Member variable name">"diagChoice"</string>
                       <string name="proxy-Strings">"default|EVVRSP|GIVEIS|JACOBI"</string>
                       <string name="proxy-Initial value">"default"</string>
                       <string name="proxy-Help text">""</string>
@@ -14479,7 +14484,7 @@ along the chosen normal mode."</string>
                     </document>
                   </document>
                   <document>
-                    <string name="title">"wxCheckBox: ID_CHECKBOX9"</string>
+                    <string name="title">"wxCheckBox: ID_CORE_CHECKBOX"</string>
                     <string name="type">"dialog-control-document"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"checkbox"</string>
@@ -14489,10 +14494,10 @@ along the chosen normal mode."</string>
                     <long name="locked">0</long>
                     <string name="created">"29/6/2006"</string>
                     <string name="proxy-type">"wbCheckBoxProxy"</string>
-                    <string name="proxy-Id name">"ID_CHECKBOX9"</string>
+                    <string name="proxy-Id name">"ID_CORE_CHECKBOX"</string>
                     <long name="proxy-Id value">10129</long>
                     <string name="proxy-Class">"wxCheckBox"</string>
-                    <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Member variable name">"coreCheck"</string>
                     <string name="proxy-Label">"Produce &quot;core&quot; file upon abort"</string>
                     <bool name="proxy-Initial value">0</bool>
                     <string name="proxy-Help text">""</string>
@@ -14532,7 +14537,7 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                   </document>
                   <document>
-                    <string name="title">"wxRadioBox: ID_RADIOBOX"</string>
+                    <string name="title">"wxRadioBox: ID_PLBALANCE_RADIOBOX"</string>
                     <string name="type">"dialog-control-document"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"radiobox"</string>
@@ -14542,10 +14547,10 @@ along the chosen normal mode."</string>
                     <long name="locked">0</long>
                     <string name="created">"29/6/2006"</string>
                     <string name="proxy-type">"wbRadioBoxProxy"</string>
-                    <string name="proxy-Id name">"ID_RADIOBOX"</string>
+                    <string name="proxy-Id name">"ID_PLBALANCE_RADIOBOX"</string>
                     <long name="proxy-Id value">10130</long>
                     <string name="proxy-Class">"wxRadioBox"</string>
-                    <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Member variable name">"plBalanceRadio"</string>
                     <string name="proxy-Label">"Parallel Load Balance Type"</string>
                     <long name="proxy-Major dimension count">1</long>
                     <string name="proxy-Items">"Loop|Next Value"</string>
@@ -14585,7 +14590,7 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                   </document>
                   <document>
-                    <string name="title">"wxCheckBox: ID_CHECKBOX10"</string>
+                    <string name="title">"wxCheckBox: ID_EXTERNDATAREP_CHECKBOX"</string>
                     <string name="type">"dialog-control-document"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"checkbox"</string>
@@ -14595,10 +14600,10 @@ along the chosen normal mode."</string>
                     <long name="locked">0</long>
                     <string name="created">"29/6/2006"</string>
                     <string name="proxy-type">"wbCheckBoxProxy"</string>
-                    <string name="proxy-Id name">"ID_CHECKBOX10"</string>
+                    <string name="proxy-Id name">"ID_EXTERNDATAREP_CHECKBOX"</string>
                     <long name="proxy-Id value">10131</long>
                     <string name="proxy-Class">"wxCheckBox"</string>
-                    <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Member variable name">"externDataRepCheck"</string>
                     <string name="proxy-Label">"Use External Data Representation for messages"</string>
                     <bool name="proxy-Initial value">0</bool>
                     <string name="proxy-Help text">""</string>

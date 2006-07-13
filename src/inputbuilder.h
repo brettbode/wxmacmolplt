@@ -36,6 +36,7 @@
 ////@begin forward declarations
 class wxListbook;
 class wxUglyChoice;
+class wxSpinCtrl;
 ////@end forward declarations
 
 /*!
@@ -80,14 +81,14 @@ class wxUglyChoice;
 #define ID_ORDER_CHOICE 10121
 #define ID_SYMMETRY_CHECKBOX 10122
 #define ID_IBSYSTEMPANEL 10094
-#define ID_SPINCTRL 10164
-#define ID_CHOICE19 10125
-#define ID_SPINCTRL1 10124
-#define ID_CHOICE20 10127
-#define ID_CHOICE21 10128
-#define ID_CHECKBOX9 10129
-#define ID_RADIOBOX 10130
-#define ID_CHECKBOX10 10131
+#define ID_TIMELIMIT_SPINCTRL 10164
+#define ID_TIMELIMITUNITS_CHOICE 10125
+#define ID_MEMORY_SPINCTRL 10124
+#define ID_MEMORYUNITS_CHOICE 10127
+#define ID_DIAGONALIZATION_CHOICE 10128
+#define ID_CORE_CHECKBOX 10129
+#define ID_PLBALANCE_RADIOBOX 10130
+#define ID_EXTERNDATAREP_CHECKBOX 10131
 #define ID_IBDFTPANEL 10181
 #define ID_CHOICE3 10183
 #define ID_CHOICE4 10184
@@ -239,6 +240,21 @@ public:
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CC_CHOICE
     void OnCcChoiceSelected( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_COORD_CHOICE
+    void OnCoordChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_UNIT_CHOICE
+    void OnUnitChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POINTGROUP_CHOICE
+    void OnPointgroupChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ORDER_CHOICE
+    void OnOrderChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_SYMMETRY_CHECKBOX
+    void OnSymmetryCheckboxClick( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
     void OnDefaultsbuttonClick( wxCommandEvent& event );
 
@@ -285,10 +301,12 @@ public:
 ////@begin InputBuilderWindow member variables
     wxListbook* listBook;
     wxUglyChoice* basisChoice;
+    wxStaticText* ecpTypeLabel;
     wxUglyChoice* ecpTypeChoice;
     wxUglyChoice* numDChoice;
     wxUglyChoice* numFChoice;
     wxUglyChoice* numPChoice;
+    wxStaticText* polarLabel;
     wxUglyChoice* polarChoice;
     wxCheckBox* diffuseLCheck;
     wxCheckBox* diffuseSCheck;
@@ -301,7 +319,9 @@ public:
     wxTextCtrl* scfIterText;
     wxCheckBox* mp2Check;
     wxCheckBox* dftCheck;
+    wxStaticText* ciLabel;
     wxUglyChoice* ciChoice;
+    wxStaticText* ccLabel;
     wxUglyChoice* ccChoice;
     wxTextCtrl* titleText;
     wxUglyChoice* coordTypeChoice;
@@ -310,6 +330,14 @@ public:
     wxUglyChoice* pointGroupChoice;
     wxUglyChoice* paxisOrderChoice;
     wxCheckBox* symmetryCheck;
+    wxSpinCtrl* timeLimitSpin;
+    wxUglyChoice* timeLimitUnitChoice;
+    wxSpinCtrl* memorySpin;
+    wxUglyChoice* memoryUnitChoice;
+    wxUglyChoice* diagChoice;
+    wxCheckBox* coreCheck;
+    wxRadioBox* plBalanceRadio;
+    wxCheckBox* externDataRepCheck;
     wxCheckBox* aimpacCheck;
     wxCheckBox* rpacCheck;
     wxButton* defaultsBtn;
