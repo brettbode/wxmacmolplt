@@ -50,6 +50,7 @@ class wxSpinCtrl;
 #define SYMBOL_INPUTBUILDERWINDOW_IDNAME ID_INPUTBUILDERWINDOW
 #define SYMBOL_INPUTBUILDERWINDOW_SIZE wxDefaultSize
 #define SYMBOL_INPUTBUILDERWINDOW_POSITION wxDefaultPosition
+#define ID_PANEL6 10230
 #define ID_IBNOTEBOOK 10072
 #define ID_IBBASISPANEL 10091
 #define ID_BASIS_CHOICE 10098
@@ -90,14 +91,14 @@ class wxSpinCtrl;
 #define ID_PLBALANCE_RADIOBOX 10130
 #define ID_EXTERNDATAREP_CHECKBOX 10131
 #define ID_IBDFTPANEL 10181
-#define ID_CHOICE3 10183
-#define ID_CHOICE4 10184
+#define ID_DFTMETHOD_CHOICE 10183
+#define ID_FUNCTIONAL_CHOICE 10184
 #define ID_IBMOGUESSPANEL 10095
-#define ID_CHOICE22 10132
-#define ID_CHECKBOX11 10133
-#define ID_CHECKBOX12 10134
+#define ID_INITGUESS_CHOICE 10132
+#define ID_PRINTINITGUESS_CHECKBOX 10133
+#define ID_ROTORBITALS_CHECKBOX 10134
 #define ID_IBHESSOPTSPANEL 10144
-#define ID_RADIOBOX2 10145
+#define ID_RADIOBOX 10145
 #define ID_TEXTCTRL15 10151
 #define ID_CHECKBOX20 10146
 #define ID_CHECKBOX21 10147
@@ -338,6 +339,11 @@ public:
     wxCheckBox* coreCheck;
     wxRadioBox* plBalanceRadio;
     wxCheckBox* externDataRepCheck;
+    wxUglyChoice* dftMethodChoice;
+    wxUglyChoice* dftFuncChoice;
+    wxUglyChoice* initGuessChoice;
+    wxCheckBox* printInitGuessCheck;
+    wxCheckBox* rotOrbitalsCheck;
     wxCheckBox* aimpacCheck;
     wxCheckBox* rpacCheck;
     wxButton* defaultsBtn;
