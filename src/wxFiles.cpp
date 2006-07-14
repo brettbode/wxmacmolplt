@@ -32,7 +32,7 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
 	
     if(!filePath.IsEmpty()) {
         if((currFile = fopen(filePath.mb_str(wxConvUTF8), "w")) == NULL) {
-            MessageAlert("Unable to access the file.");
+            MessageAlert("Unable to open the file for output.");
             return 0;
         }
         try {

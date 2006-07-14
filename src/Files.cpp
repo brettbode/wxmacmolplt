@@ -2681,8 +2681,7 @@ void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
 		C1Sym = (sym == GAMESS_C1);
 	}
 	for (long i=0; i<NumFrames; i++) {
-		sprintf(text, " $DATA\rComments go here: Frame # %ld\r%s\r", 
-			i, &(PointGroup[1]));
+		sprintf(text, " $DATA\rComments go here: Frame # %ld\r", i);
 		Buffer->PutText(text);
 		if (C1Sym) {
 			Buffer->PutText("C1\r");

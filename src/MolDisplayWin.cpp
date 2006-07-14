@@ -662,7 +662,13 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
     wxMemoryDC memDC;
     wxImage    exportImage;
     wxBitmap  *bmp;
-    wxString   wildcards(wxT("Windows Bitmap (*.bmp)|*.bmp|Portable Network Graphics (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg"));
+    wxString   wildcards(wxT("Windows Bitmap (*.bmp)|*.bmp|Portable Network Graphics (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg"
+							 "|GAMESS $DATA group (*.inp)|*.inp"
+							 "|MDL MolFile"
+							 "|XMOL (*.xyz)|*.xyz"
+							 "|Tab delimited Energies (*.txt)|*.txt"));
+	if (MainData->cFrame->Vibs) {
+	}
     int        index = 0;
     int        type  = 0;
 
@@ -676,47 +682,109 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
     if(fileDlg->ShowModal() == wxID_OK) {
         filepath = fileDlg->GetPath();
         index    = fileDlg->GetFilterIndex();
-        exportOptionsDlg = new ExportOptionsDialog(this);
-        if(exportOptionsDlg->ShowModal() == wxID_OK) {
-            switch(index) {
-                case 0:
-                    if(!type) {
-                        type = wxBITMAP_TYPE_BMP;
-                        if(!filepath.Lower().Matches(wxT("*.bmp"))) {
-                            filepath.Append(wxT(".bmp"));
-                        }
-                    }
-                case 1:
-                    if(!type) {
-                        type = wxBITMAP_TYPE_PNG;
-                        if(!filepath.Lower().Matches(wxT("*.png"))) {
-                            filepath.Append(wxT(".png"));
-                        }
-                    }
-                case 2:
-                    if(!type) {
-                        type = wxBITMAP_TYPE_JPEG;
-                        if(!filepath.Lower().Matches(wxT("*.jpg")) &&
-                           !filepath.Lower().Matches(wxT("*.jpeg"))) {
+		if (index <= 2) {
+			exportOptionsDlg = new ExportOptionsDialog(this);
+			if(exportOptionsDlg->ShowModal() == wxID_OK) {
+				switch(index) {
+					case 0:
+						if(!type) {
+							type = wxBITMAP_TYPE_BMP;
+							if(!filepath.Lower().Matches(wxT("*.bmp"))) {
+								filepath.Append(wxT(".bmp"));
+							}
+						}
+					case 1:
+						if(!type) {
+							type = wxBITMAP_TYPE_PNG;
+							if(!filepath.Lower().Matches(wxT("*.png"))) {
+								filepath.Append(wxT(".png"));
+							}
+						}
+					case 2:
+						if(!type) {
+							type = wxBITMAP_TYPE_JPEG;
+							if(!filepath.Lower().Matches(wxT("*.jpg")) &&
+							   !filepath.Lower().Matches(wxT("*.jpeg"))) {
 
-                            filepath.Append(wxT(".jpg"));
-                        }
-                    }
-                    bmp = new wxBitmap(exportOptionsDlg->getWidth(),
-                                       exportOptionsDlg->getHeight());
-                    memDC.SelectObject(*bmp);
-                    glCanvas->GenerateHiResImageForExport(&memDC);
-                    exportImage = bmp->ConvertToImage();
-                    exportImage.SaveFile(filepath, type);
-                    memDC.SelectObject(wxNullBitmap); // bmp has now been
-                                                      // destroyed.
-					break;
-            }
-        }
+								filepath.Append(wxT(".jpg"));
+							}
+						}
+						bmp = new wxBitmap(exportOptionsDlg->getWidth(),
+										   exportOptionsDlg->getHeight());
+						memDC.SelectObject(*bmp);
+						glCanvas->GenerateHiResImageForExport(&memDC);
+						exportImage = bmp->ConvertToImage();
+						exportImage.SaveFile(filepath, type);
+						memDC.SelectObject(wxNullBitmap); // bmp has now been
+														  // destroyed.
+						break;
+				}
+			}
+			exportOptionsDlg->Destroy();
+		} else {
+			FILE *currFile = NULL;
+
+			if((currFile = fopen(filepath.mb_str(wxConvUTF8), "w")) != NULL) {
+				BufferFile *buffer = NULL;
+				try {
+					buffer = new BufferFile(currFile, true);
+
+					bool AllFrames = false;
+					switch (index) {
+						case 3:
+							if (MainData->GetNumFrames()>1) {
+								AllFrames = (wxMessageBox(wxT("Should all geometries (frames) be included\?"),
+														  wxT(""), wxYES_NO | wxICON_QUESTION) == wxYES);
+							}
+							ExportGAMESS(buffer, AllFrames);
+							break;
+						case 4:
+							WriteMDLMolFile(buffer);
+							break;
+						case 5:
+						{
+							if (MainData->GetNumFrames()>1) {
+								AllFrames = (wxMessageBox(wxT("Should all geometries (frames) be included\?"),
+														  wxT(""), wxYES_NO | wxICON_QUESTION) == wxYES);
+							}
+							bool AllModes = false;
+							bool AnimateMode = false;
+							if (!AllFrames && MainData->cFrame->Vibs) {
+								if (MainData->cFrame->Vibs->GetNumModes() > 1) {
+									AllModes = (wxMessageBox(wxT("Should all normal modes be included\?"),
+															  wxT(""), wxYES_NO | wxICON_QUESTION) == wxYES);
+								}
+								if (!AllModes && (MainData->cFrame->Vibs->GetNumModes() > 0)) {
+									AnimateMode = (wxMessageBox(wxT("Would you like to include data to animate the current normal mode\?"),
+															 wxT(""), wxYES_NO | wxICON_QUESTION) == wxYES);
+								}
+							}
+							WriteXYZFile(buffer, AllFrames, AllModes, AnimateMode);
+						}
+							break;
+						case 6:
+							if (MainData->GetNumFrames()>1) {
+								AllFrames = (wxMessageBox(wxT("Should all geometries (frames) be included\?"),
+														  wxT(""), wxYES_NO | wxICON_QUESTION) == wxYES);
+							}
+							WriteTabbedEnergies(buffer, AllFrames);
+							break;
+					}
+				}
+				catch (MemoryError) {
+					MessageAlert("Not enough memory to open the file for writing.");
+				}
+				if(buffer) {
+					delete buffer;
+				}
+				fclose(currFile);
+			} else {
+				MessageAlert("Unable to open the file for output.");
+			}
+		}
     }
 
-    delete exportOptionsDlg;
-    delete fileDlg;
+    fileDlg->Destroy();
 }
 
 void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
