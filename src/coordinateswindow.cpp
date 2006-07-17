@@ -152,6 +152,10 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
     wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
+    if (GetSizer())
+    {
+        GetSizer()->SetSizeHints(this);
+    }
     Centre();
 ////@end CoordinatesWindow creation
     return true;
@@ -195,53 +199,57 @@ void CoordinatesWindow::CreateControls()
     menuBar->Append(itemMenu17, _("Coordinates"));
     itemFrame1->SetMenuBar(menuBar);
 
-    wxPanel* itemPanel19 = new wxPanel( itemFrame1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxVERTICAL);
+    itemFrame1->SetSizer(itemBoxSizer19);
 
-    wxBoxSizer* itemBoxSizer20 = new wxBoxSizer(wxVERTICAL);
-    itemPanel19->SetSizer(itemBoxSizer20);
+    wxPanel* itemPanel20 = new wxPanel( itemFrame1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+    itemBoxSizer19->Add(itemPanel20, 1, wxGROW, 0);
 
-    wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer20->Add(itemBoxSizer21, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxVERTICAL);
+    itemPanel20->SetSizer(itemBoxSizer21);
 
-    wxButton* itemButton22 = new wxButton( itemPanel19, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxBoxSizer* itemBoxSizer22 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer21->Add(itemBoxSizer22, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+    wxButton* itemButton23 = new wxButton( itemPanel20, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
-        itemButton22->SetToolTip(_("Add a new atom to the list of coordinates."));
-    itemBoxSizer21->Add(itemButton22, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+        itemButton23->SetToolTip(_("Add a new atom to the list of coordinates."));
+    itemBoxSizer22->Add(itemButton23, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    deleteButton = new wxButton( itemPanel19, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+    deleteButton = new wxButton( itemPanel20, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         deleteButton->SetToolTip(_("Delete the selected atoms."));
-    itemBoxSizer21->Add(deleteButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer22->Add(deleteButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    BondButton = new wxButton( itemPanel19, ID_BONDBUTTON, _("Bond"), wxDefaultPosition, wxDefaultSize, 0 );
+    BondButton = new wxButton( itemPanel20, ID_BONDBUTTON, _("Bond"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         BondButton->SetToolTip(_("Apply the default bonding criteria."));
-    itemBoxSizer21->Add(BondButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer22->Add(BondButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxButton* itemButton25 = new wxButton( itemPanel19, ID_STICKBUTTON, _("Stick"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxButton* itemButton26 = new wxButton( itemPanel20, ID_STICKBUTTON, _("Stick"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
-        itemButton25->SetToolTip(_("Use the current screen rotation as the reference frame."));
-    itemBoxSizer21->Add(itemButton25, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+        itemButton26->SetToolTip(_("Use the current screen rotation as the reference frame."));
+    itemBoxSizer22->Add(itemButton26, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticText* itemStaticText26 = new wxStaticText( itemPanel19, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer21->Add(itemStaticText26, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText27 = new wxStaticText( itemPanel20, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer22->Add(itemStaticText27, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
     wxString coordTypeChoiceStrings[] = {
         _("Cartesian"),
         _("Z-Matrix")
     };
-    coordTypeChoice = new wxChoice( itemPanel19, ID_COORDCHOICE1, wxDefaultPosition, wxDefaultSize, 2, coordTypeChoiceStrings, 0 );
+    coordTypeChoice = new wxChoice( itemPanel20, ID_COORDCHOICE1, wxDefaultPosition, wxDefaultSize, 2, coordTypeChoiceStrings, 0 );
     if (ShowToolTips())
         coordTypeChoice->SetToolTip(_("Changes the displayed coordinate type."));
-    itemBoxSizer21->Add(coordTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer22->Add(coordTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    coordGrid = new wxGrid( itemPanel19, ID_COORDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL );
+    coordGrid = new wxGrid( itemPanel20, ID_COORDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL );
     coordGrid->SetDefaultColSize(50);
     coordGrid->SetDefaultRowSize(25);
     coordGrid->SetColLabelSize(25);
     coordGrid->SetRowLabelSize(50);
     coordGrid->CreateGrid(5, 5, wxGrid::wxGridSelectRows);
-    itemBoxSizer20->Add(coordGrid, 1, wxGROW|wxALL, 0);
+    itemBoxSizer21->Add(coordGrid, 1, wxGROW|wxALL, 0);
 
 ////@end CoordinatesWindow content construction
 	coordGrid->SetDefaultCellAlignment(wxALIGN_RIGHT, wxALIGN_CENTRE);
@@ -251,7 +259,6 @@ void CoordinatesWindow::CreateControls()
     Centre();
 	wxSize s(50, 150);
 	coordGrid->SetMinSize(s);
-	itemPanel19->Fit();
 	Fit();
 }
 

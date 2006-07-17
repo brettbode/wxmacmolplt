@@ -56,8 +56,8 @@ BEGIN_EVENT_TABLE( EnergyPlotDialog, wxFrame )
 
     EVT_MENU( wxID_COPY, EnergyPlotDialog::OnCopyClick )
 
-	EVT_AXIS_DCLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphAxisDClick)
-	EVT_GRAPH_CLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphGraphClick)
+    EVT_AXIS_DCLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphAxisDClick)
+    EVT_GRAPH_CLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphGraphClick)
 
 ////@end EnergyPlotDialog event table entries
 END_EVENT_TABLE()
@@ -89,6 +89,10 @@ bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& 
     wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
+    if (GetSizer())
+    {
+        GetSizer()->SetSizeHints(this);
+    }
     Centre();
 ////@end EnergyPlotDialog creation
 
@@ -113,13 +117,17 @@ void EnergyPlotDialog::CreateControls()
     menuBar->Append(itemMenu3, _("&Edit"));
     itemFrame1->SetMenuBar(menuBar);
 
-    wxPanel* itemPanel5 = new wxPanel( itemFrame1, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxVERTICAL);
+    itemFrame1->SetSizer(itemBoxSizer5);
 
-    wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxVERTICAL);
-    itemPanel5->SetSizer(itemBoxSizer6);
+    wxPanel* itemPanel6 = new wxPanel( itemFrame1, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+    itemBoxSizer5->Add(itemPanel6, 1, wxGROW, 0);
 
-    epGraph = new wxMolGraph( itemPanel5, ID_EPGRAPH, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-    itemBoxSizer6->Add(epGraph, 1, wxGROW|wxALL, 5);
+    wxBoxSizer* itemBoxSizer7 = new wxBoxSizer(wxVERTICAL);
+    itemPanel6->SetSizer(itemBoxSizer7);
+
+    epGraph = new wxMolGraph( itemPanel6, ID_EPGRAPH, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
+    itemBoxSizer7->Add(epGraph, 1, wxGROW|wxALL, 5);
 
 ////@end EnergyPlotDialog content construction
     itemMenu3->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));

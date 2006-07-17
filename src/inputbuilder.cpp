@@ -193,6 +193,10 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
+    if (GetSizer())
+    {
+        GetSizer()->SetSizeHints(this);
+    }
     Centre();
 ////@end InputBuilderWindow creation
 
@@ -212,21 +216,25 @@ void InputBuilderWindow::CreateControls()
 ////@begin InputBuilderWindow content construction
     InputBuilderWindow* itemFrame1 = this;
 
-    wxPanel* itemPanel2 = new wxPanel( itemFrame1, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
+    itemFrame1->SetSizer(itemBoxSizer2);
 
-    wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxVERTICAL);
-    itemPanel2->SetSizer(itemBoxSizer3);
+    wxPanel* itemPanel3 = new wxPanel( itemFrame1, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+    itemBoxSizer2->Add(itemPanel3, 1, wxGROW, 0);
 
-    listBook = new wxListbook( itemPanel2, ID_IBNOTEBOOK, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxLB_LEFT );
+    wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
+    itemPanel3->SetSizer(itemBoxSizer4);
 
-    wxPanel* itemPanel5 = new wxPanel( listBook, ID_IBBASISPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxVERTICAL);
-    itemPanel5->SetSizer(itemBoxSizer6);
+    listBook = new wxListbook( itemPanel3, ID_IBNOTEBOOK, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxLB_LEFT );
 
-    wxBoxSizer* itemBoxSizer7 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer6->Add(itemBoxSizer7, 0, wxGROW, 5);
-    wxStaticText* itemStaticText8 = new wxStaticText( itemPanel5, wxID_STATIC, _("Basis Set:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-    itemBoxSizer7->Add(itemStaticText8, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxPanel* itemPanel6 = new wxPanel( listBook, ID_IBBASISPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer7 = new wxBoxSizer(wxVERTICAL);
+    itemPanel6->SetSizer(itemBoxSizer7);
+
+    wxBoxSizer* itemBoxSizer8 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer7->Add(itemBoxSizer8, 0, wxGROW, 5);
+    wxStaticText* itemStaticText9 = new wxStaticText( itemPanel6, wxID_STATIC, _("Basis Set:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+    itemBoxSizer8->Add(itemStaticText9, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString basisChoiceStrings[] = {
         _("MINI"),
@@ -255,15 +263,15 @@ void InputBuilderWindow::CreateControls()
         _("AM1"),
         _("PM3")
     };
-    basisChoice = new wxUglyChoice( itemPanel5, ID_BASIS_CHOICE, wxDefaultPosition, wxDefaultSize, 25, basisChoiceStrings, 0 );
+    basisChoice = new wxUglyChoice( itemPanel6, ID_BASIS_CHOICE, wxDefaultPosition, wxDefaultSize, 25, basisChoiceStrings, 0 );
     basisChoice->SetStringSelection(_("MINI"));
-    itemBoxSizer7->Add(basisChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer8->Add(basisChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    itemBoxSizer7->Add(5, 5, 0, wxGROW|wxALL, 5);
+    itemBoxSizer8->Add(5, 5, 0, wxGROW|wxALL, 5);
 
-    ecpTypeLabel = new wxStaticText( itemPanel5, wxID_STATIC, _("ECP Type:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+    ecpTypeLabel = new wxStaticText( itemPanel6, wxID_STATIC, _("ECP Type:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
     ecpTypeLabel->Enable(false);
-    itemBoxSizer7->Add(ecpTypeLabel, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
+    itemBoxSizer8->Add(ecpTypeLabel, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
     wxString ecpTypeChoiceStrings[] = {
         _("None"),
@@ -271,15 +279,15 @@ void InputBuilderWindow::CreateControls()
         _("SBKJC"),
         _("Hay-Wadt")
     };
-    ecpTypeChoice = new wxUglyChoice( itemPanel5, ID_ECPT_CHOICE, wxDefaultPosition, wxDefaultSize, 4, ecpTypeChoiceStrings, 0 );
+    ecpTypeChoice = new wxUglyChoice( itemPanel6, ID_ECPT_CHOICE, wxDefaultPosition, wxDefaultSize, 4, ecpTypeChoiceStrings, 0 );
     ecpTypeChoice->SetStringSelection(_("None"));
     ecpTypeChoice->Enable(false);
-    itemBoxSizer7->Add(ecpTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer8->Add(ecpTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxFlexGridSizer* itemFlexGridSizer13 = new wxFlexGridSizer(0, 2, 0, 0);
-    itemBoxSizer6->Add(itemFlexGridSizer13, 0, wxGROW, 5);
-    wxStaticText* itemStaticText14 = new wxStaticText( itemPanel5, wxID_STATIC, _("# D heavy atom polarization functions:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer13->Add(itemStaticText14, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxFlexGridSizer* itemFlexGridSizer14 = new wxFlexGridSizer(0, 2, 0, 0);
+    itemBoxSizer7->Add(itemFlexGridSizer14, 0, wxGROW, 5);
+    wxStaticText* itemStaticText15 = new wxStaticText( itemPanel6, wxID_STATIC, _("# D heavy atom polarization functions:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer14->Add(itemStaticText15, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
     wxString numDChoiceStrings[] = {
         _("0"),
@@ -287,12 +295,12 @@ void InputBuilderWindow::CreateControls()
         _("2"),
         _("3")
     };
-    numDChoice = new wxUglyChoice( itemPanel5, ID_NUMD_CHOICE, wxDefaultPosition, wxDefaultSize, 4, numDChoiceStrings, 0 );
+    numDChoice = new wxUglyChoice( itemPanel6, ID_NUMD_CHOICE, wxDefaultPosition, wxDefaultSize, 4, numDChoiceStrings, 0 );
     numDChoice->SetStringSelection(_("0"));
-    itemFlexGridSizer13->Add(numDChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemFlexGridSizer14->Add(numDChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText16 = new wxStaticText( itemPanel5, wxID_STATIC, _("# F heavy atom polarization functions:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer13->Add(itemStaticText16, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText17 = new wxStaticText( itemPanel6, wxID_STATIC, _("# F heavy atom polarization functions:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer14->Add(itemStaticText17, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
     wxString numFChoiceStrings[] = {
         _("0"),
@@ -300,12 +308,12 @@ void InputBuilderWindow::CreateControls()
         _("2"),
         _("3")
     };
-    numFChoice = new wxUglyChoice( itemPanel5, ID_NUMF_CHOICE, wxDefaultPosition, wxDefaultSize, 4, numFChoiceStrings, 0 );
+    numFChoice = new wxUglyChoice( itemPanel6, ID_NUMF_CHOICE, wxDefaultPosition, wxDefaultSize, 4, numFChoiceStrings, 0 );
     numFChoice->SetStringSelection(_("0"));
-    itemFlexGridSizer13->Add(numFChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemFlexGridSizer14->Add(numFChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText18 = new wxStaticText( itemPanel5, wxID_STATIC, _("# light atom polarization functions:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer13->Add(itemStaticText18, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText19 = new wxStaticText( itemPanel6, wxID_STATIC, _("# light atom polarization functions:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer14->Add(itemStaticText19, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString numPChoiceStrings[] = {
         _("0"),
@@ -313,15 +321,15 @@ void InputBuilderWindow::CreateControls()
         _("2"),
         _("3")
     };
-    numPChoice = new wxUglyChoice( itemPanel5, ID_NUMP_CHOICE, wxDefaultPosition, wxDefaultSize, 4, numPChoiceStrings, 0 );
+    numPChoice = new wxUglyChoice( itemPanel6, ID_NUMP_CHOICE, wxDefaultPosition, wxDefaultSize, 4, numPChoiceStrings, 0 );
     numPChoice->SetStringSelection(_("0"));
-    itemFlexGridSizer13->Add(numPChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemFlexGridSizer14->Add(numPChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer20 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer6->Add(itemBoxSizer20, 0, wxGROW, 5);
-    polarLabel = new wxStaticText( itemPanel5, wxID_STATIC, _("Polar:"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer7->Add(itemBoxSizer21, 0, wxGROW, 5);
+    polarLabel = new wxStaticText( itemPanel6, wxID_STATIC, _("Polar:"), wxDefaultPosition, wxDefaultSize, 0 );
     polarLabel->Enable(false);
-    itemBoxSizer20->Add(polarLabel, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    itemBoxSizer21->Add(polarLabel, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString polarChoiceStrings[] = {
         _("Pople"),
@@ -330,32 +338,32 @@ void InputBuilderWindow::CreateControls()
         _("Huzinaga"),
         _("Hondo7")
     };
-    polarChoice = new wxUglyChoice( itemPanel5, ID_POLAR_CHOICE, wxDefaultPosition, wxDefaultSize, 5, polarChoiceStrings, 0 );
+    polarChoice = new wxUglyChoice( itemPanel6, ID_POLAR_CHOICE, wxDefaultPosition, wxDefaultSize, 5, polarChoiceStrings, 0 );
     polarChoice->SetStringSelection(_("Huzinaga"));
     polarChoice->Enable(false);
-    itemBoxSizer20->Add(polarChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer21->Add(polarChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    diffuseLCheck = new wxCheckBox( itemPanel5, ID_DIFFL_CHECKBOX, _("Diffuse L-shell on heavy atoms"), wxDefaultPosition, wxDefaultSize, 0 );
+    diffuseLCheck = new wxCheckBox( itemPanel6, ID_DIFFL_CHECKBOX, _("Diffuse L-shell on heavy atoms"), wxDefaultPosition, wxDefaultSize, 0 );
     diffuseLCheck->SetValue(false);
-    itemBoxSizer6->Add(diffuseLCheck, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemBoxSizer7->Add(diffuseLCheck, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    diffuseSCheck = new wxCheckBox( itemPanel5, ID_DIFFS_CHECKBOX, _("Diffuse s-shell on hydrogens"), wxDefaultPosition, wxDefaultSize, 0 );
+    diffuseSCheck = new wxCheckBox( itemPanel6, ID_DIFFS_CHECKBOX, _("Diffuse s-shell on hydrogens"), wxDefaultPosition, wxDefaultSize, 0 );
     diffuseSCheck->SetValue(false);
-    itemBoxSizer6->Add(diffuseSCheck, 0, wxGROW|wxALL, 5);
+    itemBoxSizer7->Add(diffuseSCheck, 0, wxGROW|wxALL, 5);
 
-    listBook->AddPage(itemPanel5, _("Basis"));
+    listBook->AddPage(itemPanel6, _("Basis"));
 
-    wxPanel* itemPanel25 = new wxPanel( listBook, ID_IBCONTROLPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer26 = new wxBoxSizer(wxVERTICAL);
-    itemPanel25->SetSizer(itemBoxSizer26);
+    wxPanel* itemPanel26 = new wxPanel( listBook, ID_IBCONTROLPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer27 = new wxBoxSizer(wxVERTICAL);
+    itemPanel26->SetSizer(itemBoxSizer27);
 
-    wxStaticBox* itemStaticBoxSizer27Static = new wxStaticBox(itemPanel25, wxID_ANY, _T(""));
-    wxStaticBoxSizer* itemStaticBoxSizer27 = new wxStaticBoxSizer(itemStaticBoxSizer27Static, wxVERTICAL);
-    itemBoxSizer26->Add(itemStaticBoxSizer27, 0, wxALIGN_LEFT|wxALL, 5);
-    wxFlexGridSizer* itemFlexGridSizer28 = new wxFlexGridSizer(0, 2, 0, 0);
-    itemStaticBoxSizer27->Add(itemFlexGridSizer28, 0, wxGROW, 5);
-    wxStaticText* itemStaticText29 = new wxStaticText( itemPanel25, wxID_STATIC, _("Run Type:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer28->Add(itemStaticText29, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxStaticBox* itemStaticBoxSizer28Static = new wxStaticBox(itemPanel26, wxID_ANY, _T(""));
+    wxStaticBoxSizer* itemStaticBoxSizer28 = new wxStaticBoxSizer(itemStaticBoxSizer28Static, wxVERTICAL);
+    itemBoxSizer27->Add(itemStaticBoxSizer28, 0, wxALIGN_LEFT|wxALL, 5);
+    wxFlexGridSizer* itemFlexGridSizer29 = new wxFlexGridSizer(0, 2, 0, 0);
+    itemStaticBoxSizer28->Add(itemFlexGridSizer29, 0, wxGROW, 5);
+    wxStaticText* itemStaticText30 = new wxStaticText( itemPanel26, wxID_STATIC, _("Run Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer29->Add(itemStaticText30, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
     wxString runChoiceStrings[] = {
         _("Energy"),
@@ -381,12 +389,12 @@ void InputBuilderWindow::CreateControls()
         _("NMR"),
         _("Make EFP")
     };
-    runChoice = new wxUglyChoice( itemPanel25, ID_RUN_CHOICE, wxDefaultPosition, wxDefaultSize, 22, runChoiceStrings, 0 );
+    runChoice = new wxUglyChoice( itemPanel26, ID_RUN_CHOICE, wxDefaultPosition, wxDefaultSize, 22, runChoiceStrings, 0 );
     runChoice->SetStringSelection(_("Energy"));
-    itemFlexGridSizer28->Add(runChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemFlexGridSizer29->Add(runChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText31 = new wxStaticText( itemPanel25, wxID_STATIC, _("SCF Type:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer28->Add(itemStaticText31, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText32 = new wxStaticText( itemPanel26, wxID_STATIC, _("SCF Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer29->Add(itemStaticText32, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
     wxString scfChoiceStrings[] = {
         _("RHF"),
@@ -396,12 +404,12 @@ void InputBuilderWindow::CreateControls()
         _("MCSCF"),
         _("None (CI)")
     };
-    scfChoice = new wxUglyChoice( itemPanel25, ID_SCF_CHOICE, wxDefaultPosition, wxDefaultSize, 6, scfChoiceStrings, 0 );
+    scfChoice = new wxUglyChoice( itemPanel26, ID_SCF_CHOICE, wxDefaultPosition, wxDefaultSize, 6, scfChoiceStrings, 0 );
     scfChoice->SetStringSelection(_("RHF"));
-    itemFlexGridSizer28->Add(scfChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemFlexGridSizer29->Add(scfChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText33 = new wxStaticText( itemPanel25, wxID_STATIC, _("Localization Method:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer28->Add(itemStaticText33, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText34 = new wxStaticText( itemPanel26, wxID_STATIC, _("Localization Method:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer29->Add(itemStaticText34, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString localChoiceStrings[] = {
         _("None"),
@@ -409,38 +417,38 @@ void InputBuilderWindow::CreateControls()
         _("Edmiston-Ruedenberg"),
         _("Pipek-Mezey")
     };
-    localChoice = new wxUglyChoice( itemPanel25, ID_LOCAL_CHOICE, wxDefaultPosition, wxDefaultSize, 4, localChoiceStrings, 0 );
+    localChoice = new wxUglyChoice( itemPanel26, ID_LOCAL_CHOICE, wxDefaultPosition, wxDefaultSize, 4, localChoiceStrings, 0 );
     localChoice->SetStringSelection(_("None"));
-    itemFlexGridSizer28->Add(localChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemFlexGridSizer29->Add(localChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer35 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer26->Add(itemBoxSizer35, 0, wxGROW, 5);
-    wxBoxSizer* itemBoxSizer36 = new wxBoxSizer(wxVERTICAL);
-    itemBoxSizer35->Add(itemBoxSizer36, 0, wxGROW, 5);
-    wxStaticBox* itemStaticBoxSizer37Static = new wxStaticBox(itemPanel25, wxID_ANY, _T(""));
-    wxStaticBoxSizer* itemStaticBoxSizer37 = new wxStaticBoxSizer(itemStaticBoxSizer37Static, wxVERTICAL);
-    itemBoxSizer36->Add(itemStaticBoxSizer37, 0, wxGROW|wxALL, 5);
-    wxFlexGridSizer* itemFlexGridSizer38 = new wxFlexGridSizer(0, 2, 0, 0);
-    itemStaticBoxSizer37->Add(itemFlexGridSizer38, 0, wxGROW, 5);
-    wxStaticText* itemStaticText39 = new wxStaticText( itemPanel25, wxID_STATIC, _("Molecule Charge:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer38->Add(itemStaticText39, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxBoxSizer* itemBoxSizer36 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer27->Add(itemBoxSizer36, 0, wxGROW, 5);
+    wxBoxSizer* itemBoxSizer37 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer36->Add(itemBoxSizer37, 0, wxGROW, 5);
+    wxStaticBox* itemStaticBoxSizer38Static = new wxStaticBox(itemPanel26, wxID_ANY, _T(""));
+    wxStaticBoxSizer* itemStaticBoxSizer38 = new wxStaticBoxSizer(itemStaticBoxSizer38Static, wxVERTICAL);
+    itemBoxSizer37->Add(itemStaticBoxSizer38, 0, wxGROW|wxALL, 5);
+    wxFlexGridSizer* itemFlexGridSizer39 = new wxFlexGridSizer(0, 2, 0, 0);
+    itemStaticBoxSizer38->Add(itemFlexGridSizer39, 0, wxGROW, 5);
+    wxStaticText* itemStaticText40 = new wxStaticText( itemPanel26, wxID_STATIC, _("Molecule Charge:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer39->Add(itemStaticText40, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    mchargeText = new wxTextCtrl( itemPanel25, ID_MCHARGE_TEXTCTRL, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer38->Add(mchargeText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    mchargeText = new wxTextCtrl( itemPanel26, ID_MCHARGE_TEXTCTRL, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer39->Add(mchargeText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText41 = new wxStaticText( itemPanel25, wxID_STATIC, _("Multiplicity:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer38->Add(itemStaticText41, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText42 = new wxStaticText( itemPanel26, wxID_STATIC, _("Multiplicity:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer39->Add(itemStaticText42, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    multText = new wxTextCtrl( itemPanel25, ID_MULT_TEXTCTRL, _("1"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer38->Add(multText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    multText = new wxTextCtrl( itemPanel26, ID_MULT_TEXTCTRL, _("1"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer39->Add(multText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticBox* itemStaticBoxSizer43Static = new wxStaticBox(itemPanel25, wxID_ANY, _T(""));
-    wxStaticBoxSizer* itemStaticBoxSizer43 = new wxStaticBoxSizer(itemStaticBoxSizer43Static, wxVERTICAL);
-    itemBoxSizer36->Add(itemStaticBoxSizer43, 0, wxGROW|wxALL, 5);
-    wxFlexGridSizer* itemFlexGridSizer44 = new wxFlexGridSizer(0, 2, 0, 0);
-    itemStaticBoxSizer43->Add(itemFlexGridSizer44, 0, wxGROW, 5);
-    wxStaticText* itemStaticText45 = new wxStaticText( itemPanel25, wxID_STATIC, _("Exe. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer44->Add(itemStaticText45, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxStaticBox* itemStaticBoxSizer44Static = new wxStaticBox(itemPanel26, wxID_ANY, _T(""));
+    wxStaticBoxSizer* itemStaticBoxSizer44 = new wxStaticBoxSizer(itemStaticBoxSizer44Static, wxVERTICAL);
+    itemBoxSizer37->Add(itemStaticBoxSizer44, 0, wxGROW|wxALL, 5);
+    wxFlexGridSizer* itemFlexGridSizer45 = new wxFlexGridSizer(0, 2, 0, 0);
+    itemStaticBoxSizer44->Add(itemFlexGridSizer45, 0, wxGROW, 5);
+    wxStaticText* itemStaticText46 = new wxStaticText( itemPanel26, wxID_STATIC, _("Exe. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer45->Add(itemStaticText46, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
     wxString exeChoiceStrings[] = {
         _("Normal Run"),
@@ -448,31 +456,31 @@ void InputBuilderWindow::CreateControls()
         _("Debug"),
         _("Other...")
     };
-    exeChoice = new wxUglyChoice( itemPanel25, ID_EXE_CHOICE, wxDefaultPosition, wxDefaultSize, 4, exeChoiceStrings, 0 );
+    exeChoice = new wxUglyChoice( itemPanel26, ID_EXE_CHOICE, wxDefaultPosition, wxDefaultSize, 4, exeChoiceStrings, 0 );
     exeChoice->SetStringSelection(_("Normal Run"));
-    itemFlexGridSizer44->Add(exeChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemFlexGridSizer45->Add(exeChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText47 = new wxStaticText( itemPanel25, wxID_STATIC, _("Max # SCF Iterations:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer44->Add(itemStaticText47, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText48 = new wxStaticText( itemPanel26, wxID_STATIC, _("Max # SCF Iterations:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer45->Add(itemStaticText48, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    scfIterText = new wxTextCtrl( itemPanel25, ID_MAXIT_TEXTCTRL, _("30"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer44->Add(scfIterText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    scfIterText = new wxTextCtrl( itemPanel26, ID_MAXIT_TEXTCTRL, _("30"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer45->Add(scfIterText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticBox* itemStaticBoxSizer49Static = new wxStaticBox(itemPanel25, wxID_ANY, _T(""));
-    wxStaticBoxSizer* itemStaticBoxSizer49 = new wxStaticBoxSizer(itemStaticBoxSizer49Static, wxVERTICAL);
-    itemBoxSizer35->Add(itemStaticBoxSizer49, 0, wxALIGN_TOP|wxALL, 5);
-    mp2Check = new wxCheckBox( itemPanel25, ID_MP2_CHECKBOX, _("Use MP2"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticBox* itemStaticBoxSizer50Static = new wxStaticBox(itemPanel26, wxID_ANY, _T(""));
+    wxStaticBoxSizer* itemStaticBoxSizer50 = new wxStaticBoxSizer(itemStaticBoxSizer50Static, wxVERTICAL);
+    itemBoxSizer36->Add(itemStaticBoxSizer50, 0, wxALIGN_TOP|wxALL, 5);
+    mp2Check = new wxCheckBox( itemPanel26, ID_MP2_CHECKBOX, _("Use MP2"), wxDefaultPosition, wxDefaultSize, 0 );
     mp2Check->SetValue(false);
-    itemStaticBoxSizer49->Add(mp2Check, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemStaticBoxSizer50->Add(mp2Check, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    dftCheck = new wxCheckBox( itemPanel25, ID_DFT_CHECKBOX, _("Use DFT"), wxDefaultPosition, wxDefaultSize, 0 );
+    dftCheck = new wxCheckBox( itemPanel26, ID_DFT_CHECKBOX, _("Use DFT"), wxDefaultPosition, wxDefaultSize, 0 );
     dftCheck->SetValue(false);
-    itemStaticBoxSizer49->Add(dftCheck, 0, wxGROW|wxALL, 5);
+    itemStaticBoxSizer50->Add(dftCheck, 0, wxGROW|wxALL, 5);
 
-    wxFlexGridSizer* itemFlexGridSizer52 = new wxFlexGridSizer(0, 2, 0, 0);
-    itemStaticBoxSizer49->Add(itemFlexGridSizer52, 0, wxGROW, 5);
-    ciLabel = new wxStaticText( itemPanel25, wxID_STATIC, _("CI:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer52->Add(ciLabel, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxFlexGridSizer* itemFlexGridSizer53 = new wxFlexGridSizer(0, 2, 0, 0);
+    itemStaticBoxSizer50->Add(itemFlexGridSizer53, 0, wxGROW, 5);
+    ciLabel = new wxStaticText( itemPanel26, wxID_STATIC, _("CI:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer53->Add(ciLabel, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
     wxString ciChoiceStrings[] = {
         _("None"),
@@ -483,12 +491,12 @@ void InputBuilderWindow::CreateControls()
         _("Full Second Order CI"),
         _("General CI")
     };
-    ciChoice = new wxUglyChoice( itemPanel25, ID_CI_CHOICE, wxDefaultPosition, wxDefaultSize, 7, ciChoiceStrings, 0 );
+    ciChoice = new wxUglyChoice( itemPanel26, ID_CI_CHOICE, wxDefaultPosition, wxDefaultSize, 7, ciChoiceStrings, 0 );
     ciChoice->SetStringSelection(_("None"));
-    itemFlexGridSizer52->Add(ciChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemFlexGridSizer53->Add(ciChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    ccLabel = new wxStaticText( itemPanel25, wxID_STATIC, _("CC:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer52->Add(ccLabel, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    ccLabel = new wxStaticText( itemPanel26, wxID_STATIC, _("CC:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer53->Add(ccLabel, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString ccChoiceStrings[] = {
         _("None"),
@@ -501,28 +509,28 @@ void InputBuilderWindow::CreateControls()
         _("EOM-CCSD"),
         _("CR-EOM")
     };
-    ccChoice = new wxUglyChoice( itemPanel25, ID_CC_CHOICE, wxDefaultPosition, wxDefaultSize, 9, ccChoiceStrings, 0 );
+    ccChoice = new wxUglyChoice( itemPanel26, ID_CC_CHOICE, wxDefaultPosition, wxDefaultSize, 9, ccChoiceStrings, 0 );
     ccChoice->SetStringSelection(_("None"));
-    itemFlexGridSizer52->Add(ccChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemFlexGridSizer53->Add(ccChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    listBook->AddPage(itemPanel25, _("Control"));
+    listBook->AddPage(itemPanel26, _("Control"));
 
-    wxPanel* itemPanel57 = new wxPanel( listBook, ID_IBDATAPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer58 = new wxBoxSizer(wxVERTICAL);
-    itemPanel57->SetSizer(itemBoxSizer58);
-
+    wxPanel* itemPanel58 = new wxPanel( listBook, ID_IBDATAPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* itemBoxSizer59 = new wxBoxSizer(wxVERTICAL);
-    itemBoxSizer58->Add(itemBoxSizer59, 0, wxALIGN_LEFT, 5);
-    titleText = new wxTextCtrl( itemPanel57, ID_TITLE_TEXTCTRL, _("Title"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer59->Add(titleText, 0, wxGROW|wxALL, 5);
+    itemPanel58->SetSizer(itemBoxSizer59);
 
-    wxStaticBox* itemStaticBoxSizer61Static = new wxStaticBox(itemPanel57, wxID_ANY, _T(""));
-    wxStaticBoxSizer* itemStaticBoxSizer61 = new wxStaticBoxSizer(itemStaticBoxSizer61Static, wxVERTICAL);
-    itemBoxSizer59->Add(itemStaticBoxSizer61, 0, wxALIGN_LEFT|wxALL, 5);
-    wxFlexGridSizer* itemFlexGridSizer62 = new wxFlexGridSizer(0, 2, 0, 0);
-    itemStaticBoxSizer61->Add(itemFlexGridSizer62, 0, wxGROW, 5);
-    wxStaticText* itemStaticText63 = new wxStaticText( itemPanel57, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer62->Add(itemStaticText63, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxBoxSizer* itemBoxSizer60 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer59->Add(itemBoxSizer60, 0, wxALIGN_LEFT, 5);
+    titleText = new wxTextCtrl( itemPanel58, ID_TITLE_TEXTCTRL, _("Title"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer60->Add(titleText, 0, wxGROW|wxALL, 5);
+
+    wxStaticBox* itemStaticBoxSizer62Static = new wxStaticBox(itemPanel58, wxID_ANY, _T(""));
+    wxStaticBoxSizer* itemStaticBoxSizer62 = new wxStaticBoxSizer(itemStaticBoxSizer62Static, wxVERTICAL);
+    itemBoxSizer60->Add(itemStaticBoxSizer62, 0, wxALIGN_LEFT|wxALL, 5);
+    wxFlexGridSizer* itemFlexGridSizer63 = new wxFlexGridSizer(0, 2, 0, 0);
+    itemStaticBoxSizer62->Add(itemFlexGridSizer63, 0, wxGROW, 5);
+    wxStaticText* itemStaticText64 = new wxStaticText( itemPanel58, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer63->Add(itemStaticText64, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
     wxString coordTypeChoiceStrings[] = {
         _("Unique cartesian Coords."),
@@ -531,67 +539,67 @@ void InputBuilderWindow::CreateControls()
         _("Z-Matrix"),
         _("MOPAC Z-Matrix")
     };
-    coordTypeChoice = new wxUglyChoice( itemPanel57, ID_COORD_CHOICE, wxDefaultPosition, wxDefaultSize, 5, coordTypeChoiceStrings, 0 );
+    coordTypeChoice = new wxUglyChoice( itemPanel58, ID_COORD_CHOICE, wxDefaultPosition, wxDefaultSize, 5, coordTypeChoiceStrings, 0 );
     coordTypeChoice->SetStringSelection(_("Unique cartesian Coords."));
-    itemFlexGridSizer62->Add(coordTypeChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemFlexGridSizer63->Add(coordTypeChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText65 = new wxStaticText( itemPanel57, wxID_STATIC, _("Units:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer62->Add(itemStaticText65, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText66 = new wxStaticText( itemPanel58, wxID_STATIC, _("Units:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer63->Add(itemStaticText66, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString unitChoiceStrings[] = {
         _("Angstroms"),
         _("Bohr")
     };
-    unitChoice = new wxUglyChoice( itemPanel57, ID_UNIT_CHOICE, wxDefaultPosition, wxDefaultSize, 2, unitChoiceStrings, 0 );
+    unitChoice = new wxUglyChoice( itemPanel58, ID_UNIT_CHOICE, wxDefaultPosition, wxDefaultSize, 2, unitChoiceStrings, 0 );
     unitChoice->SetStringSelection(_("Angstroms"));
-    itemFlexGridSizer62->Add(unitChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemFlexGridSizer63->Add(unitChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer67 = new wxBoxSizer(wxHORIZONTAL);
-    itemStaticBoxSizer61->Add(itemBoxSizer67, 0, wxGROW, 5);
-    wxStaticText* itemStaticText68 = new wxStaticText( itemPanel57, wxID_STATIC, _("# of Z-Matrix Variables:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer67->Add(itemStaticText68, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxBoxSizer* itemBoxSizer68 = new wxBoxSizer(wxHORIZONTAL);
+    itemStaticBoxSizer62->Add(itemBoxSizer68, 0, wxGROW, 5);
+    wxStaticText* itemStaticText69 = new wxStaticText( itemPanel58, wxID_STATIC, _("# of Z-Matrix Variables:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer68->Add(itemStaticText69, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    zmatrixVarsText = new wxTextCtrl( itemPanel57, ID_TEXTCTRL10, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer67->Add(zmatrixVarsText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    zmatrixVarsText = new wxTextCtrl( itemPanel58, ID_TEXTCTRL10, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer68->Add(zmatrixVarsText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticBox* itemStaticBoxSizer70Static = new wxStaticBox(itemPanel57, wxID_ANY, _T(""));
-    wxStaticBoxSizer* itemStaticBoxSizer70 = new wxStaticBoxSizer(itemStaticBoxSizer70Static, wxVERTICAL);
-    itemBoxSizer59->Add(itemStaticBoxSizer70, 0, wxALIGN_LEFT|wxALL, 5);
-    wxFlexGridSizer* itemFlexGridSizer71 = new wxFlexGridSizer(0, 2, 0, 0);
-    itemStaticBoxSizer70->Add(itemFlexGridSizer71, 0, wxGROW, 5);
-    wxStaticText* itemStaticText72 = new wxStaticText( itemPanel57, wxID_STATIC, _("Point Group:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer71->Add(itemStaticText72, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxStaticBox* itemStaticBoxSizer71Static = new wxStaticBox(itemPanel58, wxID_ANY, _T(""));
+    wxStaticBoxSizer* itemStaticBoxSizer71 = new wxStaticBoxSizer(itemStaticBoxSizer71Static, wxVERTICAL);
+    itemBoxSizer60->Add(itemStaticBoxSizer71, 0, wxALIGN_LEFT|wxALL, 5);
+    wxFlexGridSizer* itemFlexGridSizer72 = new wxFlexGridSizer(0, 2, 0, 0);
+    itemStaticBoxSizer71->Add(itemFlexGridSizer72, 0, wxGROW, 5);
+    wxStaticText* itemStaticText73 = new wxStaticText( itemPanel58, wxID_STATIC, _("Point Group:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer72->Add(itemStaticText73, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
     wxString* pointGroupChoiceStrings = NULL;
-    pointGroupChoice = new wxUglyChoice( itemPanel57, ID_POINTGROUP_CHOICE, wxDefaultPosition, wxDefaultSize, 0, pointGroupChoiceStrings, 0 );
-    itemFlexGridSizer71->Add(pointGroupChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    pointGroupChoice = new wxUglyChoice( itemPanel58, ID_POINTGROUP_CHOICE, wxDefaultPosition, wxDefaultSize, 0, pointGroupChoiceStrings, 0 );
+    itemFlexGridSizer72->Add(pointGroupChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText74 = new wxStaticText( itemPanel57, wxID_STATIC, _("Order of Principle Axis:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStaticText74->Enable(false);
-    itemFlexGridSizer71->Add(itemStaticText74, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText75 = new wxStaticText( itemPanel58, wxID_STATIC, _("Order of Principle Axis:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStaticText75->Enable(false);
+    itemFlexGridSizer72->Add(itemStaticText75, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString* paxisOrderChoiceStrings = NULL;
-    paxisOrderChoice = new wxUglyChoice( itemPanel57, ID_ORDER_CHOICE, wxDefaultPosition, wxDefaultSize, 0, paxisOrderChoiceStrings, 0 );
+    paxisOrderChoice = new wxUglyChoice( itemPanel58, ID_ORDER_CHOICE, wxDefaultPosition, wxDefaultSize, 0, paxisOrderChoiceStrings, 0 );
     paxisOrderChoice->Enable(false);
-    itemFlexGridSizer71->Add(paxisOrderChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemFlexGridSizer72->Add(paxisOrderChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    symmetryCheck = new wxCheckBox( itemPanel57, ID_SYMMETRY_CHECKBOX, _("Use Symmetry During Calculation"), wxDefaultPosition, wxDefaultSize, 0 );
+    symmetryCheck = new wxCheckBox( itemPanel58, ID_SYMMETRY_CHECKBOX, _("Use Symmetry During Calculation"), wxDefaultPosition, wxDefaultSize, 0 );
     symmetryCheck->SetValue(true);
-    itemStaticBoxSizer70->Add(symmetryCheck, 0, wxALIGN_LEFT|wxALL, 5);
+    itemStaticBoxSizer71->Add(symmetryCheck, 0, wxALIGN_LEFT|wxALL, 5);
 
-    listBook->AddPage(itemPanel57, _("Data"));
+    listBook->AddPage(itemPanel58, _("Data"));
 
-    wxPanel* itemPanel77 = new wxPanel( listBook, ID_IBSYSTEMPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer78 = new wxBoxSizer(wxVERTICAL);
-    itemPanel77->SetSizer(itemBoxSizer78);
+    wxPanel* itemPanel78 = new wxPanel( listBook, ID_IBSYSTEMPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer79 = new wxBoxSizer(wxVERTICAL);
+    itemPanel78->SetSizer(itemBoxSizer79);
 
-    wxFlexGridSizer* itemFlexGridSizer79 = new wxFlexGridSizer(0, 3, 0, 0);
-    itemBoxSizer78->Add(itemFlexGridSizer79, 0, wxGROW, 5);
-    wxStaticText* itemStaticText80 = new wxStaticText( itemPanel77, wxID_STATIC, _("Time Limit:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer79->Add(itemStaticText80, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxFlexGridSizer* itemFlexGridSizer80 = new wxFlexGridSizer(0, 3, 0, 0);
+    itemBoxSizer79->Add(itemFlexGridSizer80, 0, wxGROW, 5);
+    wxStaticText* itemStaticText81 = new wxStaticText( itemPanel78, wxID_STATIC, _("Time Limit:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer80->Add(itemStaticText81, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    timeLimitSpin = new wxSpinCtrl( itemPanel77, ID_TIMELIMIT_SPINCTRL, _T("525600"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 525600 );
-    itemFlexGridSizer79->Add(timeLimitSpin, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    timeLimitSpin = new wxSpinCtrl( itemPanel78, ID_TIMELIMIT_SPINCTRL, _T("525600"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 525600 );
+    itemFlexGridSizer80->Add(timeLimitSpin, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxString timeLimitUnitChoiceStrings[] = {
         _("Seconds"),
@@ -602,15 +610,15 @@ void InputBuilderWindow::CreateControls()
         _("Years"),
         _("Millenia")
     };
-    timeLimitUnitChoice = new wxUglyChoice( itemPanel77, ID_TIMELIMITUNITS_CHOICE, wxDefaultPosition, wxDefaultSize, 7, timeLimitUnitChoiceStrings, 0 );
+    timeLimitUnitChoice = new wxUglyChoice( itemPanel78, ID_TIMELIMITUNITS_CHOICE, wxDefaultPosition, wxDefaultSize, 7, timeLimitUnitChoiceStrings, 0 );
     timeLimitUnitChoice->SetStringSelection(_("Minutes"));
-    itemFlexGridSizer79->Add(timeLimitUnitChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemFlexGridSizer80->Add(timeLimitUnitChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText83 = new wxStaticText( itemPanel77, wxID_STATIC, _("Memory:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer79->Add(itemStaticText83, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText84 = new wxStaticText( itemPanel78, wxID_STATIC, _("Memory:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer80->Add(itemStaticText84, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    memorySpin = new wxSpinCtrl( itemPanel77, ID_MEMORY_SPINCTRL, _T("1000000"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 1000000 );
-    itemFlexGridSizer79->Add(memorySpin, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    memorySpin = new wxSpinCtrl( itemPanel78, ID_MEMORY_SPINCTRL, _T("1000000"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 1000000 );
+    itemFlexGridSizer80->Add(memorySpin, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxString memoryUnitChoiceStrings[] = {
         _("Words"),
@@ -618,14 +626,14 @@ void InputBuilderWindow::CreateControls()
         _("MegaWords"),
         _("MegaBytes")
     };
-    memoryUnitChoice = new wxUglyChoice( itemPanel77, ID_MEMORYUNITS_CHOICE, wxDefaultPosition, wxDefaultSize, 4, memoryUnitChoiceStrings, 0 );
+    memoryUnitChoice = new wxUglyChoice( itemPanel78, ID_MEMORYUNITS_CHOICE, wxDefaultPosition, wxDefaultSize, 4, memoryUnitChoiceStrings, 0 );
     memoryUnitChoice->SetStringSelection(_("Words"));
-    itemFlexGridSizer79->Add(memoryUnitChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemFlexGridSizer80->Add(memoryUnitChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer86 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer78->Add(itemBoxSizer86, 0, wxGROW, 5);
-    wxStaticText* itemStaticText87 = new wxStaticText( itemPanel77, wxID_STATIC, _("Diagonalization Method:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer86->Add(itemStaticText87, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxBoxSizer* itemBoxSizer87 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer79->Add(itemBoxSizer87, 0, wxGROW, 5);
+    wxStaticText* itemStaticText88 = new wxStaticText( itemPanel78, wxID_STATIC, _("Diagonalization Method:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer87->Add(itemStaticText88, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString diagChoiceStrings[] = {
         _("default"),
@@ -633,47 +641,47 @@ void InputBuilderWindow::CreateControls()
         _("GIVEIS"),
         _("JACOBI")
     };
-    diagChoice = new wxUglyChoice( itemPanel77, ID_DIAGONALIZATION_CHOICE, wxDefaultPosition, wxDefaultSize, 4, diagChoiceStrings, 0 );
+    diagChoice = new wxUglyChoice( itemPanel78, ID_DIAGONALIZATION_CHOICE, wxDefaultPosition, wxDefaultSize, 4, diagChoiceStrings, 0 );
     diagChoice->SetStringSelection(_("default"));
-    itemBoxSizer86->Add(diagChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer87->Add(diagChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    coreCheck = new wxCheckBox( itemPanel77, ID_CORE_CHECKBOX, _("Produce \"core\" file upon abort"), wxDefaultPosition, wxDefaultSize, 0 );
+    coreCheck = new wxCheckBox( itemPanel78, ID_CORE_CHECKBOX, _("Produce \"core\" file upon abort"), wxDefaultPosition, wxDefaultSize, 0 );
     coreCheck->SetValue(false);
-    itemBoxSizer78->Add(coreCheck, 0, wxALIGN_LEFT|wxALL, 5);
+    itemBoxSizer79->Add(coreCheck, 0, wxALIGN_LEFT|wxALL, 5);
 
     wxString plBalanceRadioStrings[] = {
         _("Loop"),
         _("Next Value")
     };
-    plBalanceRadio = new wxRadioBox( itemPanel77, ID_PLBALANCE_RADIOBOX, _("Parallel Load Balance Type"), wxDefaultPosition, wxDefaultSize, 2, plBalanceRadioStrings, 1, wxRA_SPECIFY_COLS );
+    plBalanceRadio = new wxRadioBox( itemPanel78, ID_PLBALANCE_RADIOBOX, _("Parallel Load Balance Type"), wxDefaultPosition, wxDefaultSize, 2, plBalanceRadioStrings, 1, wxRA_SPECIFY_COLS );
     plBalanceRadio->SetSelection(0);
-    itemBoxSizer78->Add(plBalanceRadio, 0, wxALIGN_LEFT|wxALL, 5);
+    itemBoxSizer79->Add(plBalanceRadio, 0, wxALIGN_LEFT|wxALL, 5);
 
-    externDataRepCheck = new wxCheckBox( itemPanel77, ID_EXTERNDATAREP_CHECKBOX, _("Use External Data Representation for messages"), wxDefaultPosition, wxDefaultSize, 0 );
+    externDataRepCheck = new wxCheckBox( itemPanel78, ID_EXTERNDATAREP_CHECKBOX, _("Use External Data Representation for messages"), wxDefaultPosition, wxDefaultSize, 0 );
     externDataRepCheck->SetValue(false);
-    itemBoxSizer78->Add(externDataRepCheck, 0, wxALIGN_LEFT|wxALL, 5);
+    itemBoxSizer79->Add(externDataRepCheck, 0, wxALIGN_LEFT|wxALL, 5);
 
-    listBook->AddPage(itemPanel77, _("System"));
+    listBook->AddPage(itemPanel78, _("System"));
 
-    wxPanel* itemPanel92 = new wxPanel( listBook, ID_IBDFTPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer93 = new wxBoxSizer(wxVERTICAL);
-    itemPanel92->SetSizer(itemBoxSizer93);
+    wxPanel* itemPanel93 = new wxPanel( listBook, ID_IBDFTPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer94 = new wxBoxSizer(wxVERTICAL);
+    itemPanel93->SetSizer(itemBoxSizer94);
 
-    wxFlexGridSizer* itemFlexGridSizer94 = new wxFlexGridSizer(0, 2, 0, 0);
-    itemBoxSizer93->Add(itemFlexGridSizer94, 0, wxALIGN_LEFT, 5);
-    wxStaticText* itemStaticText95 = new wxStaticText( itemPanel92, wxID_STATIC, _("Method:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer94->Add(itemStaticText95, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxFlexGridSizer* itemFlexGridSizer95 = new wxFlexGridSizer(0, 2, 0, 0);
+    itemBoxSizer94->Add(itemFlexGridSizer95, 0, wxALIGN_LEFT, 5);
+    wxStaticText* itemStaticText96 = new wxStaticText( itemPanel93, wxID_STATIC, _("Method:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer95->Add(itemStaticText96, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
     wxString dftMethodChoiceStrings[] = {
         _("Grid"),
         _("Grid-Free")
     };
-    dftMethodChoice = new wxUglyChoice( itemPanel92, ID_DFTMETHOD_CHOICE, wxDefaultPosition, wxDefaultSize, 2, dftMethodChoiceStrings, 0 );
+    dftMethodChoice = new wxUglyChoice( itemPanel93, ID_DFTMETHOD_CHOICE, wxDefaultPosition, wxDefaultSize, 2, dftMethodChoiceStrings, 0 );
     dftMethodChoice->SetStringSelection(_("Grid"));
-    itemFlexGridSizer94->Add(dftMethodChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemFlexGridSizer95->Add(dftMethodChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText97 = new wxStaticText( itemPanel92, wxID_STATIC, _("DFT Functional:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer94->Add(itemStaticText97, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText98 = new wxStaticText( itemPanel93, wxID_STATIC, _("DFT Functional:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer95->Add(itemStaticText98, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString dftFuncChoiceStrings[] = {
         _("Slater exchange"),
@@ -698,20 +706,20 @@ void InputBuilderWindow::CreateControls()
         _("PBEOP: PBE exchange + OP correlation"),
         _("BHHLYP: HF and BECKE exchange + LYP correlation")
     };
-    dftFuncChoice = new wxUglyChoice( itemPanel92, ID_FUNCTIONAL_CHOICE, wxDefaultPosition, wxDefaultSize, 21, dftFuncChoiceStrings, 0 );
+    dftFuncChoice = new wxUglyChoice( itemPanel93, ID_FUNCTIONAL_CHOICE, wxDefaultPosition, wxDefaultSize, 21, dftFuncChoiceStrings, 0 );
     dftFuncChoice->SetStringSelection(_("Slater exchange"));
-    itemFlexGridSizer94->Add(dftFuncChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemFlexGridSizer95->Add(dftFuncChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    listBook->AddPage(itemPanel92, _("DFT"));
+    listBook->AddPage(itemPanel93, _("DFT"));
 
-    wxPanel* itemPanel99 = new wxPanel( listBook, ID_IBMOGUESSPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer100 = new wxBoxSizer(wxVERTICAL);
-    itemPanel99->SetSizer(itemBoxSizer100);
+    wxPanel* itemPanel100 = new wxPanel( listBook, ID_IBMOGUESSPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer101 = new wxBoxSizer(wxVERTICAL);
+    itemPanel100->SetSizer(itemBoxSizer101);
 
-    wxBoxSizer* itemBoxSizer101 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer100->Add(itemBoxSizer101, 0, wxALIGN_LEFT, 5);
-    wxStaticText* itemStaticText102 = new wxStaticText( itemPanel99, wxID_STATIC, _("Initial Guess:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer101->Add(itemStaticText102, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxBoxSizer* itemBoxSizer102 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer101->Add(itemBoxSizer102, 0, wxALIGN_LEFT, 5);
+    wxStaticText* itemStaticText103 = new wxStaticText( itemPanel100, wxID_STATIC, _("Initial Guess:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer102->Add(itemStaticText103, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString initGuessChoiceStrings[] = {
         _("Huckel"),
@@ -720,93 +728,93 @@ void InputBuilderWindow::CreateControls()
         _("MO Saved (DICTNRY)"),
         _("Skip")
     };
-    initGuessChoice = new wxUglyChoice( itemPanel99, ID_INITGUESS_CHOICE, wxDefaultPosition, wxDefaultSize, 5, initGuessChoiceStrings, 0 );
+    initGuessChoice = new wxUglyChoice( itemPanel100, ID_INITGUESS_CHOICE, wxDefaultPosition, wxDefaultSize, 5, initGuessChoiceStrings, 0 );
     initGuessChoice->SetStringSelection(_("Huckel"));
-    itemBoxSizer101->Add(initGuessChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer102->Add(initGuessChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    printInitGuessCheck = new wxCheckBox( itemPanel99, ID_PRINTINITGUESS_CHECKBOX, _("Print the initial guess"), wxDefaultPosition, wxDefaultSize, 0 );
+    printInitGuessCheck = new wxCheckBox( itemPanel100, ID_PRINTINITGUESS_CHECKBOX, _("Print the initial guess"), wxDefaultPosition, wxDefaultSize, 0 );
     printInitGuessCheck->SetValue(false);
-    itemBoxSizer100->Add(printInitGuessCheck, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemBoxSizer101->Add(printInitGuessCheck, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    rotOrbitalsCheck = new wxCheckBox( itemPanel99, ID_ROTORBITALS_CHECKBOX, _("Rotate alpha and beta orbitals"), wxDefaultPosition, wxDefaultSize, 0 );
+    rotOrbitalsCheck = new wxCheckBox( itemPanel100, ID_ROTORBITALS_CHECKBOX, _("Rotate alpha and beta orbitals"), wxDefaultPosition, wxDefaultSize, 0 );
     rotOrbitalsCheck->SetValue(false);
     rotOrbitalsCheck->Enable(false);
-    itemBoxSizer100->Add(rotOrbitalsCheck, 0, wxALIGN_LEFT|wxALL, 5);
+    itemBoxSizer101->Add(rotOrbitalsCheck, 0, wxALIGN_LEFT|wxALL, 5);
 
-    listBook->AddPage(itemPanel99, _("MO Guess"));
+    listBook->AddPage(itemPanel100, _("MO Guess"));
 
-    wxPanel* itemPanel106 = new wxPanel( listBook, ID_IBHESSOPTSPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer107 = new wxBoxSizer(wxVERTICAL);
-    itemPanel106->SetSizer(itemBoxSizer107);
+    wxPanel* itemPanel107 = new wxPanel( listBook, ID_IBHESSOPTSPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer108 = new wxBoxSizer(wxVERTICAL);
+    itemPanel107->SetSizer(itemBoxSizer108);
 
-    wxBoxSizer* itemBoxSizer108 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer107->Add(itemBoxSizer108, 0, wxALIGN_LEFT, 5);
-    wxString itemRadioBox109Strings[] = {
+    wxBoxSizer* itemBoxSizer109 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer108->Add(itemBoxSizer109, 0, wxALIGN_LEFT, 5);
+    wxString itemRadioBox110Strings[] = {
         _("Analytic"),
         _("Numeric")
     };
-    wxRadioBox* itemRadioBox109 = new wxRadioBox( itemPanel106, ID_RADIOBOX, _("Method"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox109Strings, 1, wxRA_SPECIFY_COLS );
-    itemRadioBox109->SetSelection(0);
-    itemBoxSizer108->Add(itemRadioBox109, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxRadioBox* itemRadioBox110 = new wxRadioBox( itemPanel107, ID_RADIOBOX, _("Method"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox110Strings, 1, wxRA_SPECIFY_COLS );
+    itemRadioBox110->SetSelection(0);
+    itemBoxSizer109->Add(itemRadioBox110, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer110 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer108->Add(itemBoxSizer110, 0, wxALIGN_TOP|wxALL, 5);
-    wxStaticText* itemStaticText111 = new wxStaticText( itemPanel106, wxID_STATIC, _("Displacement size (bohrs):"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer110->Add(itemStaticText111, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxBoxSizer* itemBoxSizer111 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer109->Add(itemBoxSizer111, 0, wxALIGN_TOP|wxALL, 5);
+    wxStaticText* itemStaticText112 = new wxStaticText( itemPanel107, wxID_STATIC, _("Displacement size (bohrs):"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer111->Add(itemStaticText112, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl112 = new wxTextCtrl( itemPanel106, ID_TEXTCTRL15, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer110->Add(itemTextCtrl112, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* itemTextCtrl113 = new wxTextCtrl( itemPanel107, ID_TEXTCTRL15, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer111->Add(itemTextCtrl113, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxCheckBox* itemCheckBox113 = new wxCheckBox( itemPanel106, ID_CHECKBOX20, _("Double differenced hessian"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox113->SetValue(false);
-    itemBoxSizer107->Add(itemCheckBox113, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
-
-    wxCheckBox* itemCheckBox114 = new wxCheckBox( itemPanel106, ID_CHECKBOX21, _("Purify hessian"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxCheckBox* itemCheckBox114 = new wxCheckBox( itemPanel107, ID_CHECKBOX20, _("Double differenced hessian"), wxDefaultPosition, wxDefaultSize, 0 );
     itemCheckBox114->SetValue(false);
-    itemBoxSizer107->Add(itemCheckBox114, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemBoxSizer108->Add(itemCheckBox114, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxCheckBox* itemCheckBox115 = new wxCheckBox( itemPanel106, ID_CHECKBOX22, _("Print internal force constants"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxCheckBox* itemCheckBox115 = new wxCheckBox( itemPanel107, ID_CHECKBOX21, _("Purify hessian"), wxDefaultPosition, wxDefaultSize, 0 );
     itemCheckBox115->SetValue(false);
-    itemBoxSizer107->Add(itemCheckBox115, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemBoxSizer108->Add(itemCheckBox115, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxCheckBox* itemCheckBox116 = new wxCheckBox( itemPanel106, ID_CHECKBOX23, _("Vibrational Analysis"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxCheckBox* itemCheckBox116 = new wxCheckBox( itemPanel107, ID_CHECKBOX22, _("Print internal force constants"), wxDefaultPosition, wxDefaultSize, 0 );
     itemCheckBox116->SetValue(false);
-    itemBoxSizer107->Add(itemCheckBox116, 0, wxGROW|wxALL, 5);
+    itemBoxSizer108->Add(itemCheckBox116, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxBoxSizer* itemBoxSizer117 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer107->Add(itemBoxSizer117, 0, wxGROW, 5);
-    wxStaticText* itemStaticText118 = new wxStaticText( itemPanel106, wxID_STATIC, _("Frequency scale factor:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer117->Add(itemStaticText118, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxCheckBox* itemCheckBox117 = new wxCheckBox( itemPanel107, ID_CHECKBOX23, _("Vibrational Analysis"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemCheckBox117->SetValue(false);
+    itemBoxSizer108->Add(itemCheckBox117, 0, wxGROW|wxALL, 5);
 
-    wxTextCtrl* itemTextCtrl119 = new wxTextCtrl( itemPanel106, ID_TEXTCTRL14, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer117->Add(itemTextCtrl119, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxBoxSizer* itemBoxSizer118 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer108->Add(itemBoxSizer118, 0, wxGROW, 5);
+    wxStaticText* itemStaticText119 = new wxStaticText( itemPanel107, wxID_STATIC, _("Frequency scale factor:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer118->Add(itemStaticText119, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    listBook->AddPage(itemPanel106, _("Hess. Options"));
+    wxTextCtrl* itemTextCtrl120 = new wxTextCtrl( itemPanel107, ID_TEXTCTRL14, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer118->Add(itemTextCtrl120, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxPanel* itemPanel120 = new wxPanel( listBook, ID_IBMISCPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer121 = new wxBoxSizer(wxVERTICAL);
-    itemPanel120->SetSizer(itemBoxSizer121);
+    listBook->AddPage(itemPanel107, _("Hess. Options"));
 
-    wxStaticBox* itemStaticBoxSizer122Static = new wxStaticBox(itemPanel120, wxID_ANY, _T(""));
-    wxStaticBoxSizer* itemStaticBoxSizer122 = new wxStaticBoxSizer(itemStaticBoxSizer122Static, wxVERTICAL);
-    itemBoxSizer121->Add(itemStaticBoxSizer122, 0, wxALIGN_LEFT|wxALL, 5);
-    wxCheckBox* itemCheckBox123 = new wxCheckBox( itemPanel120, ID_CHECKBOX13, _("MolPlt"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox123->SetValue(false);
-    itemStaticBoxSizer122->Add(itemCheckBox123, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
+    wxPanel* itemPanel121 = new wxPanel( listBook, ID_IBMISCPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer122 = new wxBoxSizer(wxVERTICAL);
+    itemPanel121->SetSizer(itemBoxSizer122);
 
-    wxCheckBox* itemCheckBox124 = new wxCheckBox( itemPanel120, ID_CHECKBOX14, _("PltOrb"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticBox* itemStaticBoxSizer123Static = new wxStaticBox(itemPanel121, wxID_ANY, _T(""));
+    wxStaticBoxSizer* itemStaticBoxSizer123 = new wxStaticBoxSizer(itemStaticBoxSizer123Static, wxVERTICAL);
+    itemBoxSizer122->Add(itemStaticBoxSizer123, 0, wxALIGN_LEFT|wxALL, 5);
+    wxCheckBox* itemCheckBox124 = new wxCheckBox( itemPanel121, ID_CHECKBOX13, _("MolPlt"), wxDefaultPosition, wxDefaultSize, 0 );
     itemCheckBox124->SetValue(false);
-    itemStaticBoxSizer122->Add(itemCheckBox124, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemStaticBoxSizer123->Add(itemCheckBox124, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    aimpacCheck = new wxCheckBox( itemPanel120, ID_CHECKBOX15, _("Atoms In Molecules (AIMPAC)"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxCheckBox* itemCheckBox125 = new wxCheckBox( itemPanel121, ID_CHECKBOX14, _("PltOrb"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemCheckBox125->SetValue(false);
+    itemStaticBoxSizer123->Add(itemCheckBox125, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
+
+    aimpacCheck = new wxCheckBox( itemPanel121, ID_CHECKBOX15, _("Atoms In Molecules (AIMPAC)"), wxDefaultPosition, wxDefaultSize, 0 );
     aimpacCheck->SetValue(false);
-    itemStaticBoxSizer122->Add(aimpacCheck, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemStaticBoxSizer123->Add(aimpacCheck, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    rpacCheck = new wxCheckBox( itemPanel120, ID_CHECKBOX16, _("RPAC"), wxDefaultPosition, wxDefaultSize, 0 );
+    rpacCheck = new wxCheckBox( itemPanel121, ID_CHECKBOX16, _("RPAC"), wxDefaultPosition, wxDefaultSize, 0 );
     rpacCheck->SetValue(false);
-    itemStaticBoxSizer122->Add(rpacCheck, 0, wxALIGN_LEFT|wxALL, 5);
+    itemStaticBoxSizer123->Add(rpacCheck, 0, wxALIGN_LEFT|wxALL, 5);
 
-    wxString itemRadioBox127Strings[] = {
+    wxString itemRadioBox128Strings[] = {
         _("None"),
         _("Hondo 8.2"),
         _("MELDF"),
@@ -814,199 +822,199 @@ void InputBuilderWindow::CreateControls()
         _("Gaussian 9x"),
         _("All")
     };
-    wxRadioBox* itemRadioBox127 = new wxRadioBox( itemPanel120, ID_RADIOBOX1, _("Forces Check Run Type"), wxDefaultPosition, wxDefaultSize, 6, itemRadioBox127Strings, 1, wxRA_SPECIFY_COLS );
-    itemRadioBox127->SetSelection(0);
-    itemBoxSizer121->Add(itemRadioBox127, 0, wxALIGN_LEFT|wxALL, 5);
+    wxRadioBox* itemRadioBox128 = new wxRadioBox( itemPanel121, ID_RADIOBOX1, _("Forces Check Run Type"), wxDefaultPosition, wxDefaultSize, 6, itemRadioBox128Strings, 1, wxRA_SPECIFY_COLS );
+    itemRadioBox128->SetSelection(0);
+    itemBoxSizer122->Add(itemRadioBox128, 0, wxALIGN_LEFT|wxALL, 5);
 
-    listBook->AddPage(itemPanel120, _("Misc. Prefs"));
+    listBook->AddPage(itemPanel121, _("Misc. Prefs"));
 
-    wxPanel* itemPanel128 = new wxPanel( listBook, ID_IBMP2PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer129 = new wxBoxSizer(wxVERTICAL);
-    itemPanel128->SetSizer(itemBoxSizer129);
+    wxPanel* itemPanel129 = new wxPanel( listBook, ID_IBMP2PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer130 = new wxBoxSizer(wxVERTICAL);
+    itemPanel129->SetSizer(itemBoxSizer130);
 
-    wxFlexGridSizer* itemFlexGridSizer130 = new wxFlexGridSizer(0, 2, 0, 0);
-    itemBoxSizer129->Add(itemFlexGridSizer130, 0, wxGROW, 5);
-    wxStaticText* itemStaticText131 = new wxStaticText( itemPanel128, wxID_STATIC, _("# of core electrons:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer130->Add(itemStaticText131, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxFlexGridSizer* itemFlexGridSizer131 = new wxFlexGridSizer(0, 2, 0, 0);
+    itemBoxSizer130->Add(itemFlexGridSizer131, 0, wxGROW, 5);
+    wxStaticText* itemStaticText132 = new wxStaticText( itemPanel129, wxID_STATIC, _("# of core electrons:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer131->Add(itemStaticText132, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl132 = new wxTextCtrl( itemPanel128, ID_TEXTCTRL5, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer130->Add(itemTextCtrl132, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    wxTextCtrl* itemTextCtrl133 = new wxTextCtrl( itemPanel129, ID_TEXTCTRL5, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer131->Add(itemTextCtrl133, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText133 = new wxStaticText( itemPanel128, wxID_STATIC, _("Memory (in words):"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer130->Add(itemStaticText133, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText134 = new wxStaticText( itemPanel129, wxID_STATIC, _("Memory (in words):"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer131->Add(itemStaticText134, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl134 = new wxTextCtrl( itemPanel128, ID_TEXTCTRL7, _("All"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer130->Add(itemTextCtrl134, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    wxTextCtrl* itemTextCtrl135 = new wxTextCtrl( itemPanel129, ID_TEXTCTRL7, _("All"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer131->Add(itemTextCtrl135, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxStaticText* itemStaticText135 = new wxStaticText( itemPanel128, wxID_STATIC, _("Integral retention cutoff:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer130->Add(itemStaticText135, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxStaticText* itemStaticText136 = new wxStaticText( itemPanel129, wxID_STATIC, _("Integral retention cutoff:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer131->Add(itemStaticText136, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl136 = new wxTextCtrl( itemPanel128, ID_TEXTCTRL8, _("1e-09"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer130->Add(itemTextCtrl136, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxTextCtrl* itemTextCtrl137 = new wxTextCtrl( itemPanel129, ID_TEXTCTRL8, _("1e-09"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer131->Add(itemTextCtrl137, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxCheckBox* itemCheckBox137 = new wxCheckBox( itemPanel128, ID_CHECKBOX3, _("Use Localized Orbitals"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox137->SetValue(false);
-    itemBoxSizer129->Add(itemCheckBox137, 0, wxGROW|wxALL, 5);
+    wxCheckBox* itemCheckBox138 = new wxCheckBox( itemPanel129, ID_CHECKBOX3, _("Use Localized Orbitals"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemCheckBox138->SetValue(false);
+    itemBoxSizer130->Add(itemCheckBox138, 0, wxGROW|wxALL, 5);
 
-    wxString itemRadioBox138Strings[] = {
+    wxString itemRadioBox139Strings[] = {
         _("Segmented transformation"),
         _("Two phase bin sort")
     };
-    wxRadioBox* itemRadioBox138 = new wxRadioBox( itemPanel128, ID_RADIOBOX4, _("Transformation method"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox138Strings, 1, wxRA_SPECIFY_COLS );
-    itemRadioBox138->SetSelection(0);
-    itemBoxSizer129->Add(itemRadioBox138, 0, wxALIGN_LEFT|wxALL, 5);
+    wxRadioBox* itemRadioBox139 = new wxRadioBox( itemPanel129, ID_RADIOBOX4, _("Transformation method"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox139Strings, 1, wxRA_SPECIFY_COLS );
+    itemRadioBox139->SetSelection(0);
+    itemBoxSizer130->Add(itemRadioBox139, 0, wxALIGN_LEFT|wxALL, 5);
 
-    wxString itemRadioBox139Strings[] = {
+    wxString itemRadioBox140Strings[] = {
         _("Duplicated on each node"),
         _("Distributed across all nodes")
     };
-    wxRadioBox* itemRadioBox139 = new wxRadioBox( itemPanel128, ID_RADIOBOX5, _("AO integral storage"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox139Strings, 1, wxRA_SPECIFY_COLS );
-    itemRadioBox139->SetSelection(0);
-    itemBoxSizer129->Add(itemRadioBox139, 0, wxALIGN_LEFT|wxALL, 5);
+    wxRadioBox* itemRadioBox140 = new wxRadioBox( itemPanel129, ID_RADIOBOX5, _("AO integral storage"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox140Strings, 1, wxRA_SPECIFY_COLS );
+    itemRadioBox140->SetSelection(0);
+    itemBoxSizer130->Add(itemRadioBox140, 0, wxALIGN_LEFT|wxALL, 5);
 
-    listBook->AddPage(itemPanel128, _("MP2 Options"));
+    listBook->AddPage(itemPanel129, _("MP2 Options"));
 
-    wxPanel* itemPanel140 = new wxPanel( listBook, ID_IBSCBOPTSPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer141 = new wxBoxSizer(wxVERTICAL);
-    itemPanel140->SetSizer(itemBoxSizer141);
+    wxPanel* itemPanel141 = new wxPanel( listBook, ID_IBSCBOPTSPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer142 = new wxBoxSizer(wxVERTICAL);
+    itemPanel141->SetSizer(itemBoxSizer142);
 
-    wxCheckBox* itemCheckBox142 = new wxCheckBox( itemPanel140, ID_CHECKBOX17, _("Direct SCF"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox142->SetValue(false);
-    itemBoxSizer141->Add(itemCheckBox142, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
+    wxCheckBox* itemCheckBox143 = new wxCheckBox( itemPanel141, ID_CHECKBOX17, _("Direct SCF"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemCheckBox143->SetValue(false);
+    itemBoxSizer142->Add(itemCheckBox143, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxCheckBox* itemCheckBox143 = new wxCheckBox( itemPanel140, ID_CHECKBOX18, _("Compute only change in Fock Matrix"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox143->SetValue(true);
-    itemCheckBox143->Enable(false);
-    itemBoxSizer141->Add(itemCheckBox143, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
-
-    wxCheckBox* itemCheckBox144 = new wxCheckBox( itemPanel140, ID_CHECKBOX19, _("Generate UHF Natural Orbitals"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox144->SetValue(false);
+    wxCheckBox* itemCheckBox144 = new wxCheckBox( itemPanel141, ID_CHECKBOX18, _("Compute only change in Fock Matrix"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemCheckBox144->SetValue(true);
     itemCheckBox144->Enable(false);
-    itemBoxSizer141->Add(itemCheckBox144, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
+    itemBoxSizer142->Add(itemCheckBox144, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxBoxSizer* itemBoxSizer145 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer141->Add(itemBoxSizer145, 0, wxALIGN_LEFT, 5);
-    wxStaticText* itemStaticText146 = new wxStaticText( itemPanel140, wxID_STATIC, _("SCF convergence criteria:  10^"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer145->Add(itemStaticText146, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxCheckBox* itemCheckBox145 = new wxCheckBox( itemPanel141, ID_CHECKBOX19, _("Generate UHF Natural Orbitals"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemCheckBox145->SetValue(false);
+    itemCheckBox145->Enable(false);
+    itemBoxSizer142->Add(itemCheckBox145, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxSpinCtrl* itemSpinCtrl147 = new wxSpinCtrl( itemPanel140, ID_SPINCTRL2, _T("5"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 5 );
-    itemBoxSizer145->Add(itemSpinCtrl147, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxBoxSizer* itemBoxSizer146 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer142->Add(itemBoxSizer146, 0, wxALIGN_LEFT, 5);
+    wxStaticText* itemStaticText147 = new wxStaticText( itemPanel141, wxID_STATIC, _("SCF convergence criteria:  10^"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer146->Add(itemStaticText147, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    listBook->AddPage(itemPanel140, _("SCF Options"));
+    wxSpinCtrl* itemSpinCtrl148 = new wxSpinCtrl( itemPanel141, ID_SPINCTRL2, _T("5"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 5 );
+    itemBoxSizer146->Add(itemSpinCtrl148, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxPanel* itemPanel148 = new wxPanel( listBook, ID_IBSTATPOINTPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-    wxBoxSizer* itemBoxSizer149 = new wxBoxSizer(wxVERTICAL);
-    itemPanel148->SetSizer(itemBoxSizer149);
+    listBook->AddPage(itemPanel141, _("SCF Options"));
 
-    wxFlexGridSizer* itemFlexGridSizer150 = new wxFlexGridSizer(0, 2, 0, 0);
-    itemBoxSizer149->Add(itemFlexGridSizer150, 0, wxGROW, 5);
-    wxStaticText* itemStaticText151 = new wxStaticText( itemPanel148, wxID_STATIC, _("Max. number of steps:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer150->Add(itemStaticText151, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxPanel* itemPanel149 = new wxPanel( listBook, ID_IBSTATPOINTPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer150 = new wxBoxSizer(wxVERTICAL);
+    itemPanel149->SetSizer(itemBoxSizer150);
 
-    wxTextCtrl* itemTextCtrl152 = new wxTextCtrl( itemPanel148, ID_TEXTCTRL16, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer150->Add(itemTextCtrl152, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    wxFlexGridSizer* itemFlexGridSizer151 = new wxFlexGridSizer(0, 2, 0, 0);
+    itemBoxSizer150->Add(itemFlexGridSizer151, 0, wxGROW, 5);
+    wxStaticText* itemStaticText152 = new wxStaticText( itemPanel149, wxID_STATIC, _("Max. number of steps:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer151->Add(itemStaticText152, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxStaticText* itemStaticText153 = new wxStaticText( itemPanel148, wxID_STATIC, _("Gradient convergance criteria:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer150->Add(itemStaticText153, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxTextCtrl* itemTextCtrl153 = new wxTextCtrl( itemPanel149, ID_TEXTCTRL16, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer151->Add(itemTextCtrl153, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxTextCtrl* itemTextCtrl154 = new wxTextCtrl( itemPanel148, ID_TEXTCTRL17, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer150->Add(itemTextCtrl154, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxStaticText* itemStaticText154 = new wxStaticText( itemPanel149, wxID_STATIC, _("Gradient convergance criteria:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer151->Add(itemStaticText154, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxBoxSizer* itemBoxSizer155 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer149->Add(itemBoxSizer155, 0, wxGROW, 5);
-    wxStaticText* itemStaticText156 = new wxStaticText( itemPanel148, wxID_STATIC, _("Optimization method:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer155->Add(itemStaticText156, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxTextCtrl* itemTextCtrl155 = new wxTextCtrl( itemPanel149, ID_TEXTCTRL17, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer151->Add(itemTextCtrl155, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxString* itemChoice157Strings = NULL;
-    wxUglyChoice* itemChoice157 = new wxUglyChoice( itemPanel148, ID_CHOICE23, wxDefaultPosition, wxDefaultSize, 0, itemChoice157Strings, 0 );
-    itemBoxSizer155->Add(itemChoice157, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxBoxSizer* itemBoxSizer156 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer150->Add(itemBoxSizer156, 0, wxGROW, 5);
+    wxStaticText* itemStaticText157 = new wxStaticText( itemPanel149, wxID_STATIC, _("Optimization method:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer156->Add(itemStaticText157, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxBoxSizer* itemBoxSizer158 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer149->Add(itemBoxSizer158, 0, wxGROW|wxALL, 5);
-    wxFlexGridSizer* itemFlexGridSizer159 = new wxFlexGridSizer(0, 2, 0, 0);
-    itemBoxSizer158->Add(itemFlexGridSizer159, 0, wxGROW, 5);
-    wxStaticText* itemStaticText160 = new wxStaticText( itemPanel148, wxID_STATIC, _("Initial step size:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer159->Add(itemStaticText160, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxString* itemChoice158Strings = NULL;
+    wxUglyChoice* itemChoice158 = new wxUglyChoice( itemPanel149, ID_CHOICE23, wxDefaultPosition, wxDefaultSize, 0, itemChoice158Strings, 0 );
+    itemBoxSizer156->Add(itemChoice158, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxTextCtrl* itemTextCtrl161 = new wxTextCtrl( itemPanel148, ID_TEXTCTRL18, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer159->Add(itemTextCtrl161, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    wxBoxSizer* itemBoxSizer159 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer150->Add(itemBoxSizer159, 0, wxGROW|wxALL, 5);
+    wxFlexGridSizer* itemFlexGridSizer160 = new wxFlexGridSizer(0, 2, 0, 0);
+    itemBoxSizer159->Add(itemFlexGridSizer160, 0, wxGROW, 5);
+    wxStaticText* itemStaticText161 = new wxStaticText( itemPanel149, wxID_STATIC, _("Initial step size:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer160->Add(itemStaticText161, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxStaticText* itemStaticText162 = new wxStaticText( itemPanel148, wxID_STATIC, _("Min. step size:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer159->Add(itemStaticText162, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+    wxTextCtrl* itemTextCtrl162 = new wxTextCtrl( itemPanel149, ID_TEXTCTRL18, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer160->Add(itemTextCtrl162, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxTextCtrl* itemTextCtrl163 = new wxTextCtrl( itemPanel148, ID_TEXTCTRL19, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer159->Add(itemTextCtrl163, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
+    wxStaticText* itemStaticText163 = new wxStaticText( itemPanel149, wxID_STATIC, _("Min. step size:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer160->Add(itemStaticText163, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxStaticText* itemStaticText164 = new wxStaticText( itemPanel148, wxID_STATIC, _("Max. step size:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer159->Add(itemStaticText164, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+    wxTextCtrl* itemTextCtrl164 = new wxTextCtrl( itemPanel149, ID_TEXTCTRL19, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer160->Add(itemTextCtrl164, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxTextCtrl* itemTextCtrl165 = new wxTextCtrl( itemPanel148, ID_TEXTCTRL20, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemFlexGridSizer159->Add(itemTextCtrl165, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxStaticText* itemStaticText165 = new wxStaticText( itemPanel149, wxID_STATIC, _("Max. step size:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer160->Add(itemStaticText165, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxBoxSizer* itemBoxSizer166 = new wxBoxSizer(wxVERTICAL);
-    itemBoxSizer158->Add(itemBoxSizer166, 0, wxGROW, 5);
-    wxCheckBox* itemCheckBox167 = new wxCheckBox( itemPanel148, ID_CHECKBOX25, _("Update Step Size"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox167->SetValue(false);
-    itemBoxSizer166->Add(itemCheckBox167, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
+    wxTextCtrl* itemTextCtrl166 = new wxTextCtrl( itemPanel149, ID_TEXTCTRL20, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer160->Add(itemTextCtrl166, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxCheckBox* itemCheckBox168 = new wxCheckBox( itemPanel148, ID_CHECKBOX26, _("Stationary Pt."), wxDefaultPosition, wxDefaultSize, 0 );
+    wxBoxSizer* itemBoxSizer167 = new wxBoxSizer(wxVERTICAL);
+    itemBoxSizer159->Add(itemBoxSizer167, 0, wxGROW, 5);
+    wxCheckBox* itemCheckBox168 = new wxCheckBox( itemPanel149, ID_CHECKBOX25, _("Update Step Size"), wxDefaultPosition, wxDefaultSize, 0 );
     itemCheckBox168->SetValue(false);
-    itemBoxSizer166->Add(itemCheckBox168, 0, wxGROW|wxALL, 5);
+    itemBoxSizer167->Add(itemCheckBox168, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxBoxSizer* itemBoxSizer169 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer149->Add(itemBoxSizer169, 0, wxGROW, 5);
-    wxString itemRadioBox170Strings[] = {
+    wxCheckBox* itemCheckBox169 = new wxCheckBox( itemPanel149, ID_CHECKBOX26, _("Stationary Pt."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemCheckBox169->SetValue(false);
+    itemBoxSizer167->Add(itemCheckBox169, 0, wxGROW|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer170 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer150->Add(itemBoxSizer170, 0, wxGROW, 5);
+    wxString itemRadioBox171Strings[] = {
         _("Guess (+ definite)"),
         _("Read (from $HESS)"),
         _("Calculate")
     };
-    wxRadioBox* itemRadioBox170 = new wxRadioBox( itemPanel148, ID_RADIOBOX3, _("Initial Hessian"), wxDefaultPosition, wxDefaultSize, 3, itemRadioBox170Strings, 1, wxRA_SPECIFY_COLS );
-    itemRadioBox170->SetSelection(0);
-    itemBoxSizer169->Add(itemRadioBox170, 0, wxGROW|wxALL, 5);
+    wxRadioBox* itemRadioBox171 = new wxRadioBox( itemPanel149, ID_RADIOBOX3, _("Initial Hessian"), wxDefaultPosition, wxDefaultSize, 3, itemRadioBox171Strings, 1, wxRA_SPECIFY_COLS );
+    itemRadioBox171->SetSelection(0);
+    itemBoxSizer170->Add(itemRadioBox171, 0, wxGROW|wxALL, 5);
 
-    wxStaticText* itemStaticText171 = new wxStaticText( itemPanel148, wxID_STATIC, _("Recalc. Hess every"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer169->Add(itemStaticText171, 0, wxALIGN_TOP|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 10);
+    wxStaticText* itemStaticText172 = new wxStaticText( itemPanel149, wxID_STATIC, _("Recalc. Hess every"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer170->Add(itemStaticText172, 0, wxALIGN_TOP|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 10);
 
-    wxTextCtrl* itemTextCtrl172 = new wxTextCtrl( itemPanel148, ID_TEXTCTRL21, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer169->Add(itemTextCtrl172, 0, wxALIGN_TOP|wxALL, 5);
+    wxTextCtrl* itemTextCtrl173 = new wxTextCtrl( itemPanel149, ID_TEXTCTRL21, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer170->Add(itemTextCtrl173, 0, wxALIGN_TOP|wxALL, 5);
 
-    wxStaticText* itemStaticText173 = new wxStaticText( itemPanel148, wxID_STATIC, _("steps."), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer169->Add(itemStaticText173, 0, wxALIGN_TOP|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 10);
+    wxStaticText* itemStaticText174 = new wxStaticText( itemPanel149, wxID_STATIC, _("steps."), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer170->Add(itemStaticText174, 0, wxALIGN_TOP|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 10);
 
-    wxCheckBox* itemCheckBox174 = new wxCheckBox( itemPanel148, ID_CHECKBOX24, _("Print Orbs at each iteration"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox174->SetValue(false);
-    itemBoxSizer149->Add(itemCheckBox174, 0, wxGROW|wxALL, 5);
+    wxCheckBox* itemCheckBox175 = new wxCheckBox( itemPanel149, ID_CHECKBOX24, _("Print Orbs at each iteration"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemCheckBox175->SetValue(false);
+    itemBoxSizer150->Add(itemCheckBox175, 0, wxGROW|wxALL, 5);
 
-    listBook->AddPage(itemPanel148, _("Stat. Point"));
+    listBook->AddPage(itemPanel149, _("Stat. Point"));
 
-    wxPanel* itemPanel175 = new wxPanel( listBook, ID_SUMMARYPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxPanel* itemPanel176 = new wxPanel( listBook, ID_SUMMARYPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
 
-    listBook->AddPage(itemPanel175, _("Summary"));
+    listBook->AddPage(itemPanel176, _("Summary"));
 
-    itemBoxSizer3->Add(listBook, 1, wxGROW|wxALL, 2);
+    itemBoxSizer4->Add(listBook, 1, wxGROW|wxALL, 2);
 
-    wxBoxSizer* itemBoxSizer176 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer3->Add(itemBoxSizer176, 0, wxGROW, 5);
+    wxBoxSizer* itemBoxSizer177 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer4->Add(itemBoxSizer177, 0, wxGROW, 5);
 
-    defaultsBtn = new wxButton( itemPanel2, ID_DEFAULTSBUTTON, _("Use Defaults"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer176->Add(defaultsBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    defaultsBtn = new wxButton( itemPanel3, ID_DEFAULTSBUTTON, _("Use Defaults"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer177->Add(defaultsBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    revertBtn = new wxButton( itemPanel2, ID_REVERTBUTTON, _("Revert"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer176->Add(revertBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    revertBtn = new wxButton( itemPanel3, ID_REVERTBUTTON, _("Revert"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer177->Add(revertBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    writeBtn = new wxButton( itemPanel2, ID_WRITEFILEBUTTON, _("Write File"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer176->Add(writeBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
+    writeBtn = new wxButton( itemPanel3, ID_WRITEFILEBUTTON, _("Write File"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer177->Add(writeBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-    wxStdDialogButtonSizer* itemStdDialogButtonSizer180 = new wxStdDialogButtonSizer;
+    wxStdDialogButtonSizer* itemStdDialogButtonSizer181 = new wxStdDialogButtonSizer;
 
-    itemBoxSizer176->Add(itemStdDialogButtonSizer180, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-    wxButton* itemButton181 = new wxButton( itemPanel2, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStdDialogButtonSizer180->AddButton(itemButton181);
+    itemBoxSizer177->Add(itemStdDialogButtonSizer181, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxButton* itemButton182 = new wxButton( itemPanel3, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStdDialogButtonSizer181->AddButton(itemButton182);
 
-    wxButton* itemButton182 = new wxButton( itemPanel2, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStdDialogButtonSizer180->AddButton(itemButton182);
+    wxButton* itemButton183 = new wxButton( itemPanel3, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStdDialogButtonSizer181->AddButton(itemButton183);
 
-    itemStdDialogButtonSizer180->Realize();
+    itemStdDialogButtonSizer181->Realize();
 
 ////@end InputBuilderWindow content construction
 

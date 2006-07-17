@@ -67,6 +67,8 @@ BEGIN_EVENT_TABLE( FrequenciesDialog, wxFrame )
 
     EVT_LISTBOX( ID_FREQLISTBOX, FrequenciesDialog::OnFreqlistboxSelected )
 
+    EVT_GRAPH_CLICK(ID_CUSTOM, FrequenciesDialog::OnCustomGraphClick)
+
 ////@end FrequenciesDialog event table entries
 	EVT_GRAPH_CLICK(ID_CUSTOM, FrequenciesDialog::OnCustomGraphClick)
 END_EVENT_TABLE()
@@ -99,6 +101,10 @@ bool FrequenciesDialog::Create( wxWindow* parent, wxWindowID id, const wxString&
     wxFrame::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
+    if (GetSizer())
+    {
+        GetSizer()->SetSizeHints(this);
+    }
     Centre();
 ////@end FrequenciesDialog creation
 
@@ -132,22 +138,26 @@ void FrequenciesDialog::CreateControls()
     menuBar->Append(itemMenu5, _("&View"));
     itemFrame1->SetMenuBar(menuBar);
 
-    wxPanel* itemPanel14 = new wxPanel( itemFrame1, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer14 = new wxBoxSizer(wxVERTICAL);
+    itemFrame1->SetSizer(itemBoxSizer14);
 
-    wxBoxSizer* itemBoxSizer15 = new wxBoxSizer(wxVERTICAL);
-    itemPanel14->SetSizer(itemBoxSizer15);
+    wxPanel* itemPanel15 = new wxPanel( itemFrame1, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+    itemBoxSizer14->Add(itemPanel15, 1, wxGROW, 0);
 
-    wxBoxSizer* itemBoxSizer16 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer15->Add(itemBoxSizer16, 1, wxGROW|wxALL, 5);
+    wxBoxSizer* itemBoxSizer16 = new wxBoxSizer(wxVERTICAL);
+    itemPanel15->SetSizer(itemBoxSizer16);
+
+    wxBoxSizer* itemBoxSizer17 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer16->Add(itemBoxSizer17, 1, wxGROW|wxALL, 5);
 
     wxString* mFreqListBoxStrings = NULL;
-    mFreqListBox = new wxListBox( itemPanel14, ID_FREQLISTBOX, wxDefaultPosition, wxDefaultSize, 0, mFreqListBoxStrings, wxLB_SINGLE );
+    mFreqListBox = new wxListBox( itemPanel15, ID_FREQLISTBOX, wxDefaultPosition, wxDefaultSize, 0, mFreqListBoxStrings, wxLB_SINGLE );
     if (ShowToolTips())
         mFreqListBox->SetToolTip(_("Click the frequency to display the desired mode."));
-    itemBoxSizer16->Add(mFreqListBox, 0, wxGROW|wxALL, 5);
+    itemBoxSizer17->Add(mFreqListBox, 0, wxGROW|wxALL, 5);
 
-    fGraph = new wxMolGraph( itemPanel14, ID_CUSTOM, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-    itemBoxSizer16->Add(fGraph, 1, wxGROW|wxALL, 5);
+    fGraph = new wxMolGraph( itemPanel15, ID_CUSTOM, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
+    itemBoxSizer17->Add(fGraph, 1, wxGROW|wxALL, 5);
 
 ////@end FrequenciesDialog content construction
     itemMenu3->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));

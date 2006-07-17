@@ -22,6 +22,7 @@
 
 ////@begin includes
 #include "wx/frame.h"
+#include "wxMolGraph.h"
 ////@end includes
 #include "wxMolGraph.h"
 
@@ -112,9 +113,11 @@ public:
     /// wxEVT_COMMAND_LISTBOX_SELECTED event handler for ID_FREQLISTBOX
     void OnFreqlistboxSelected( wxCommandEvent& event );
 
+    /// wxEVT_GRAPH_CLICK event handler for ID_CUSTOM
+    void OnCustomGraphClick( wxCommandEvent& event );
+
 ////@end FrequenciesDialog event handler declarations
-	/// wxEVT_GRAPH_CLICK event handler for ID_CUSTOM
-	void OnCustomGraphClick( wxCommandEvent& event );
+
 
 ////@begin FrequenciesDialog member function declarations
 
