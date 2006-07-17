@@ -157,7 +157,7 @@ int MpApp::OnExit() {
     delete wxConfigBase::Set((wxConfigBase *) NULL);
     //delete config object if there is one created before  -Song Li
 
-    return 0;
+	return wxApp::OnExit();
 }
 
 void MpApp::createMainFrame(const wxString &filename) {
@@ -216,7 +216,7 @@ void MpApp::menuFileQuit(wxCommandEvent &event) {
 	}
 	
 	//This looks like it has the desired effect, but not sure if it is the "correct" way to exit
-	ExitMainLoop();
+//	ExitMainLoop();
 }
 
 void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {

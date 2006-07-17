@@ -1120,9 +1120,8 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
         return;
     }*/
 #endif
-	Freeze();
-    Destroy();
     app.destroyMainFrame(this);
+    Destroy();
 }
 
 void MolDisplayWin::menuFilePage_setup(wxCommandEvent &event) {
