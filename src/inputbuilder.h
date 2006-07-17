@@ -136,6 +136,12 @@ class wxSpinCtrl;
 #define ID_TEXTCTRL21 10163
 #define ID_CHECKBOX24 10156
 #define ID_SUMMARYPANEL 10229
+#define ID_SUMMARY_TITLE 10231
+#define ID_SUMMARY_BASISSET 10232
+#define ID_SUMMARY_SCFTYPE 10233
+#define ID_SUMMARY_RUNTYPE 10234
+#define ID_SUMMARY_PG 10235
+#define ID_SUMMARY_ELEC 10236
 #define ID_DEFAULTSBUTTON 10228
 #define ID_REVERTBUTTON 10090
 #define ID_WRITEFILEBUTTON 10073
@@ -346,6 +352,12 @@ public:
     wxCheckBox* rotOrbitalsCheck;
     wxCheckBox* aimpacCheck;
     wxCheckBox* rpacCheck;
+    wxTextCtrl* mTitleText;
+    wxTextCtrl* mBasisSetText;
+    wxTextCtrl* mSCFTypeText;
+    wxTextCtrl* mRunTypeText;
+    wxTextCtrl* mPointGroupText;
+    wxTextCtrl* mElectronCorr;
     wxButton* defaultsBtn;
     wxButton* revertBtn;
     wxButton* writeBtn;

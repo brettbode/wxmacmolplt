@@ -184,6 +184,12 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     rotOrbitalsCheck = NULL;
     aimpacCheck = NULL;
     rpacCheck = NULL;
+    mTitleText = NULL;
+    mBasisSetText = NULL;
+    mSCFTypeText = NULL;
+    mRunTypeText = NULL;
+    mPointGroupText = NULL;
+    mElectronCorr = NULL;
     defaultsBtn = NULL;
     revertBtn = NULL;
     writeBtn = NULL;
@@ -988,33 +994,89 @@ void InputBuilderWindow::CreateControls()
     listBook->AddPage(itemPanel149, _("Stat. Point"));
 
     wxPanel* itemPanel176 = new wxPanel( listBook, ID_SUMMARYPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+    wxBoxSizer* itemBoxSizer177 = new wxBoxSizer(wxVERTICAL);
+    itemPanel176->SetSizer(itemBoxSizer177);
+
+    wxBoxSizer* itemBoxSizer178 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer177->Add(itemBoxSizer178, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText179 = new wxStaticText( itemPanel176, wxID_STATIC, _("Title:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer178->Add(itemStaticText179, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    mTitleText = new wxTextCtrl( itemPanel176, ID_SUMMARY_TITLE, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    mTitleText->Enable(false);
+    itemBoxSizer178->Add(mTitleText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer181 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer177->Add(itemBoxSizer181, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText182 = new wxStaticText( itemPanel176, wxID_STATIC, _("Basis Set:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer181->Add(itemStaticText182, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    mBasisSetText = new wxTextCtrl( itemPanel176, ID_SUMMARY_BASISSET, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    mBasisSetText->Enable(false);
+    itemBoxSizer181->Add(mBasisSetText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer184 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer177->Add(itemBoxSizer184, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText185 = new wxStaticText( itemPanel176, wxID_STATIC, _("SCF Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer184->Add(itemStaticText185, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    mSCFTypeText = new wxTextCtrl( itemPanel176, ID_SUMMARY_SCFTYPE, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    mSCFTypeText->Enable(false);
+    itemBoxSizer184->Add(mSCFTypeText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer187 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer177->Add(itemBoxSizer187, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText188 = new wxStaticText( itemPanel176, wxID_STATIC, _("Run Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer187->Add(itemStaticText188, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    mRunTypeText = new wxTextCtrl( itemPanel176, ID_SUMMARY_RUNTYPE, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    mRunTypeText->Enable(false);
+    itemBoxSizer187->Add(mRunTypeText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer190 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer177->Add(itemBoxSizer190, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText191 = new wxStaticText( itemPanel176, wxID_STATIC, _("Molecular Point Group:"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer190->Add(itemStaticText191, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    mPointGroupText = new wxTextCtrl( itemPanel176, ID_SUMMARY_PG, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    mPointGroupText->Enable(false);
+    itemBoxSizer190->Add(mPointGroupText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+    wxBoxSizer* itemBoxSizer193 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer177->Add(itemBoxSizer193, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    wxStaticText* itemStaticText194 = new wxStaticText( itemPanel176, wxID_STATIC, _("Electron Correlation"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemBoxSizer193->Add(itemStaticText194, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+
+    mElectronCorr = new wxTextCtrl( itemPanel176, ID_SUMMARY_ELEC, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    mElectronCorr->Enable(false);
+    itemBoxSizer193->Add(mElectronCorr, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     listBook->AddPage(itemPanel176, _("Summary"));
 
     itemBoxSizer4->Add(listBook, 1, wxGROW|wxALL, 2);
 
-    wxBoxSizer* itemBoxSizer177 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer4->Add(itemBoxSizer177, 0, wxGROW, 5);
+    wxBoxSizer* itemBoxSizer196 = new wxBoxSizer(wxHORIZONTAL);
+    itemBoxSizer4->Add(itemBoxSizer196, 0, wxGROW, 5);
 
     defaultsBtn = new wxButton( itemPanel3, ID_DEFAULTSBUTTON, _("Use Defaults"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer177->Add(defaultsBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer196->Add(defaultsBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     revertBtn = new wxButton( itemPanel3, ID_REVERTBUTTON, _("Revert"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer177->Add(revertBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer196->Add(revertBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     writeBtn = new wxButton( itemPanel3, ID_WRITEFILEBUTTON, _("Write File"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer177->Add(writeBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
+    itemBoxSizer196->Add(writeBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
-    wxStdDialogButtonSizer* itemStdDialogButtonSizer181 = new wxStdDialogButtonSizer;
+    wxStdDialogButtonSizer* itemStdDialogButtonSizer200 = new wxStdDialogButtonSizer;
 
-    itemBoxSizer177->Add(itemStdDialogButtonSizer181, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-    wxButton* itemButton182 = new wxButton( itemPanel3, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStdDialogButtonSizer181->AddButton(itemButton182);
+    itemBoxSizer196->Add(itemStdDialogButtonSizer200, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    wxButton* itemButton201 = new wxButton( itemPanel3, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStdDialogButtonSizer200->AddButton(itemButton201);
 
-    wxButton* itemButton183 = new wxButton( itemPanel3, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStdDialogButtonSizer181->AddButton(itemButton183);
+    wxButton* itemButton202 = new wxButton( itemPanel3, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemStdDialogButtonSizer200->AddButton(itemButton202);
 
-    itemStdDialogButtonSizer181->Realize();
+    itemStdDialogButtonSizer200->Realize();
 
 ////@end InputBuilderWindow content construction
 
