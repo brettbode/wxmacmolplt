@@ -664,10 +664,14 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
     wxBitmap  *bmp;
     wxString   wildcards(wxT("Windows Bitmap (*.bmp)|*.bmp|Portable Network Graphics (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg"
 							 "|GAMESS $DATA group (*.inp)|*.inp"
-							 "|MDL MolFile"
+							 "|MDL MolFile|*.mol"
 							 "|XMOL (*.xyz)|*.xyz"
+							 "|Pure Chemical Markup Language (*.cml)|*.cml"
 							 "|Tab delimited Energies (*.txt)|*.txt"));
 	if (MainData->cFrame->Vibs) {
+		if (MainData->cFrame->Vibs->GetNumModes() > 0) {
+			wildcards.append(wxT("|Frequencies|*.txt"));
+		}
 	}
     int        index = 0;
     int        type  = 0;
@@ -767,7 +771,17 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 								AllFrames = (wxMessageBox(wxT("Should all geometries (frames) be included\?"),
 														  wxT(""), wxYES_NO | wxICON_QUESTION) == wxYES);
 							}
+							MainData->WriteCMLFile(buffer, Prefs, NULL, AllFrames, false);
+							break;
+						case 7:
+							if (MainData->GetNumFrames()>1) {
+								AllFrames = (wxMessageBox(wxT("Should all geometries (frames) be included\?"),
+														  wxT(""), wxYES_NO | wxICON_QUESTION) == wxYES);
+							}
 							WriteTabbedEnergies(buffer, AllFrames);
+							break;
+						case 8:
+							WriteFrequencies(buffer);
 							break;
 					}
 				}
