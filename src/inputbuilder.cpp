@@ -31,6 +31,7 @@
 
 #include "Globals.h"
 #include "MolDisplayWin.h"
+#include "AtomTypeList.h"
 #include "inputbuilder.h"
 
 ////@begin XPM images
@@ -1192,7 +1193,7 @@ void InputBuilderWindow::SetupBasisItems() {
     else if(itemValue == 5) itemValue = NumGauss + 6;
     else if(itemValue > 5) itemValue += 7;
     basisChoice->SetSelection(itemValue - 1);
-    // TODO:  CheckBasisMenu();
+    CheckBasisMenu();
     
     // ecpTypeChoice
     if(BasisValue == 12 || BasisValue == 13) {
@@ -1867,6 +1868,86 @@ int InputBuilderWindow::getPaneAtPosition(int pos) {
     
     return currPane;
 }
-    
+
+#define kIBBasisMenuItem   2
+#define kNumBasisMenuItems 23
 void InputBuilderWindow::CheckBasisMenu(void) {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    AtomTypeList * list = parent->GetData()->GetAtomTypes();
+    int i = 0;
+    bool states[kNumBasisMenuItems];
+    
+    if(list) {
+        for(i = 0; i < kNumBasisMenuItems; i++) states[i] = true;
+        list->Sort();
+        long MaxType = list->GetMaxAtomType();
+        if(MaxType > 86) {
+            for(i = 0; i < kNumBasisMenuItems; i++) states[i] = false;
+        }
+        else if(MaxType > 54) {
+            for(i = 0; i < kNumBasisMenuItems; i++) states[i] = false;
+            states[0] = true;
+            states[18] = true;
+        }
+        else if(MaxType > 18) {
+            states[8] = false;
+            states[12] = false;
+            states[14] = false;
+            states[17] = false;
+            states[20] = false;
+            states[21] = false;
+            states[22] = false;
+            if(list->TransitionMetalInList()) {
+                states[9] = false;
+                states[10] = false;
+                states[11] = false;
+                states[13] = false;
+                states[15] = false;
+                states[19] = false;
+            }
+            if(list->IsAtomInList(19) || list->IsAtomInList(20)) {
+                states[9] = false;
+                states[10] = false;
+                states[11] = false;
+                states[13] = false;
+                states[15] = false;
+            }
+            if(MaxType > 30) states[16] = false;
+        }
+        else if(MaxType > 10) {
+            states[10] = false;
+            states[12] = false;
+            states[15] = false;
+            if(list->IsAtomInList(11) ||
+               list->IsAtomInList(12) ||
+               list->IsAtomInList(13) ||
+               list->IsAtomInList(14) ||
+               list->IsAtomInList(18)) states[9] = false;
+            if(list->IsAtomInList(11) ||
+               list->IsAtomInList(12) ||
+               list->IsAtomInList(18)) {
+                states[13] = false;
+                states[14] = false;
+            }
+        }
+        else {
+            states[15] = false;
+            if(list->IsAtomInList(3) ||
+               list->IsAtomInList(4) ||
+               list->IsAtomInList(5) ||
+               list->IsAtomInList(10)) states[10] = false;
+        }
+        
+        if(list->IsAtomInList(2)) {
+            states[13] = false;
+            states[14] = false;
+            states[16] = false;
+        }
+        
+        delete list;
+        
+        for(i = 0; i < kNumBasisMenuItems; i++) {
+            basisChoice->SetEnabled(i, states[i]);
+        }
+    }
 }
