@@ -23170,14 +23170,6 @@ along the chosen normal mode."</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -23345,6 +23337,8 @@ along the chosen normal mode."</string>
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">"Gen3DPanel"</string>
+                    <string name="proxy-Tab label">"Gen3D"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -23392,8 +23386,6 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"Gen3D"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -25024,6 +25016,8 @@ along the chosen normal mode."</string>
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">"Gen2DPanel"</string>
+                    <string name="proxy-Tab label">"Gen2D"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -25071,8 +25065,6 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"Gen2D"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -26320,6 +26312,8 @@ along the chosen normal mode."</string>
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">"TED2DPANEL"</string>
+                    <string name="proxy-Tab label">"2D TED"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -26367,8 +26361,6 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"2D TED"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -27494,6 +27486,8 @@ along the chosen normal mode."</string>
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">"TED3DPanel"</string>
+                    <string name="proxy-Tab label">"TED3D"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -27541,8 +27535,6 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"TED3D"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -29521,6 +29513,8 @@ along the chosen normal mode."</string>
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">"MEP2DPanel"</string>
+                    <string name="proxy-Tab label">"MEP 2D"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -29568,8 +29562,6 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"MEP 2D"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -30972,6 +30964,8 @@ along the chosen normal mode."</string>
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">"MEP3DPanel"</string>
+                    <string name="proxy-Tab label">"MEP3D"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -31019,8 +31013,6 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"MEP3D"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>

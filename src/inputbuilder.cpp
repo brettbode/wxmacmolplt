@@ -1257,6 +1257,7 @@ void InputBuilderWindow::SetupControlItems() {
     short ci = TmpInputRec->Control->GetCIType();
     CCRunType cc = TmpInputRec->Control->GetCCType();
     long scft = TmpInputRec->Control->GetSCFType();
+    long NumElectrons = parent->GetData()->GetNumElectrons();
     
     int itemValue = 0;
     
@@ -1265,7 +1266,7 @@ void InputBuilderWindow::SetupControlItems() {
     runChoice->SetSelection(itemValue - 1);
     
     if(scft == 0) {
-        if(parent->GetData()->GetNumElectrons() & 1) {
+        if(NumElectrons & 1) {
             scft = 3;
         }
         else {
@@ -1320,7 +1321,10 @@ void InputBuilderWindow::SetupControlItems() {
         ccChoice->SetSelection(cc);
     }
     
-    // TODO:  scfIterText
+    // scfIterText
+    itemValue = TmpInputRec->Control->GetMaxIt();
+    if(itemValue <= 0) itemValue = 30;
+    scfIterText->SetValue(wxString::Format("%d", itemValue));
     
     // exeChoice
     exeChoice->SetSelection(TmpInputRec->Control->GetExeType());
@@ -1331,8 +1335,16 @@ void InputBuilderWindow::SetupControlItems() {
         exeChoice->Enable(true);
     }
     
-    // TODO:  mchargeText
-    // TODO:  multText
+    // mchargeText
+    mchargeText->SetValue(wxString::Format("%hd", TmpInputRec->Control->GetCharge()));
+    
+    // multText
+    itemValue = TmpInputRec->Control->GetMultiplicity();
+    if(itemValue <= 0) {
+        if(NumElectrons & 1) itemValue == 2;
+        else itemValue = 1;
+    }
+    multText->SetValue(wxString::Format("%d", itemValue));
 }
 
 void InputBuilderWindow::SetupDataItems() {
