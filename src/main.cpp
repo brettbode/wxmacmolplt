@@ -216,7 +216,9 @@ void MpApp::menuFileQuit(wxCommandEvent &event) {
 	}
 	
 	//This looks like it has the desired effect, but not sure if it is the "correct" way to exit
-//	ExitMainLoop();
+#ifdef __WXMAC__
+	ExitMainLoop();
+#endif
 }
 
 void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {
