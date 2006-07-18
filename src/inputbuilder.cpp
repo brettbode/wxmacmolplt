@@ -1390,6 +1390,51 @@ void InputBuilderWindow::SetupStatPointItems() {
 
 void InputBuilderWindow::SetupSummaryItems() {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	
+	if (TmpInputRec->Data->GetTitle()) {
+		mTitleText->SetValue(wxString(TmpInputRec->Data->GetTitle(), wxConvUTF8));
+	} else mTitleText->Clear();
+	if (TmpInputRec->Basis->GetBasis()) {
+		wxString temp(TmpInputRec->Basis->GetBasisText(), wxConvUTF8);
+		if ((TmpInputRec->Basis->GetBasis()>3)&&(TmpInputRec->Basis->GetBasis()<6)) {
+			temp.Printf("%d-%s", TmpInputRec->Basis->GetNumGauss(), TmpInputRec->Basis->GetBasisText());
+		} else if (TmpInputRec->Basis->GetBasis()==3) {
+			temp.Printf("%s-%dG", TmpInputRec->Basis->GetBasisText(), TmpInputRec->Basis->GetNumGauss());
+		}
+		mBasisSetText->SetValue(temp);
+	} else mBasisSetText->Clear();
+	
+	mRunTypeText->SetValue(ControlGroup::GetGAMESSRunText(TmpInputRec->Control->GetRunType()));
+
+	if (TmpInputRec->Control->GetSCFType()) {
+		mSCFTypeText->SetValue(wxString(TmpInputRec->Control->GetSCFTypeText(), wxConvUTF8));
+	} else mSCFTypeText->Clear();
+	{
+		wxString pg;
+		const char * pgt = TmpInputRec->Data->GetPointGroupText();
+		if (TmpInputRec->Data->GetPointGroupOrder() > 0) {
+			int i=0;
+			while (pgt[i]) {
+				if (pgt[i] == 'N') {
+					wxString temp;
+					temp.Printf("%d", TmpInputRec->Data->GetPointGroupOrder());
+					pg.append(temp);
+				} else {
+					pg.append((char)pgt[i]);
+				}
+				i++;
+			}
+		} else pg = wxString(pgt, wxConvUTF8);
+		mPointGroupText->SetValue(pg);
+	}
+	wxString eclevel;
+	if (TmpInputRec->Control->GetMPLevel())
+		eclevel.Printf("MP2");
+	else if (TmpInputRec->Control->GetCCType())
+		eclevel.Printf(TmpInputRec->Control->GetGAMESSCCType(TmpInputRec->Control->GetCCType()));
+	else if (TmpInputRec->Control->GetCIType())
+		eclevel.Printf(TmpInputRec->Control->GetCIType(TmpInputRec->Control->GetCIType()));
+	mElectronCorr->SetValue(eclevel);
 }
 
 
@@ -1847,7 +1892,7 @@ void InputBuilderWindow::OnSymmetryCheckboxClick( wxCommandEvent& event )
 
 void InputBuilderWindow::OnIblistbookPageChanged( wxListbookEvent& event )
 {
-	switch (event.GetSelection()) {	//This doesn't currently work as the pane id is not what is returned
+	switch (getPaneAtPosition(event.GetSelection())) {
 		case SUMMARY_PANE:
 			SetupSummaryItems();
 			break;
