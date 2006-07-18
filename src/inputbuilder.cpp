@@ -51,6 +51,8 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 ////@begin InputBuilderWindow event table entries
     EVT_CLOSE( InputBuilderWindow::OnCloseWindow )
 
+    EVT_LISTBOOK_PAGE_CHANGED( ID_IBNOTEBOOK, InputBuilderWindow::OnIblistbookPageChanged )
+
     EVT_CHOICE( ID_BASIS_CHOICE, InputBuilderWindow::OnBasisChoiceSelected )
 
     EVT_CHOICE( ID_ECPT_CHOICE, InputBuilderWindow::OnEcptChoiceSelected )
@@ -231,7 +233,7 @@ void InputBuilderWindow::CreateControls()
     wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
     itemPanel3->SetSizer(itemBoxSizer4);
 
-    listBook = new wxListbook( itemPanel3, ID_IBNOTEBOOK, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxLB_LEFT );
+    listBook = new wxListbook( itemPanel3, ID_IBNOTEBOOK, wxDefaultPosition, wxDefaultSize, wxLB_LEFT|wxLB_DEFAULT|wxSUNKEN_BORDER );
 
     wxPanel* itemPanel6 = new wxPanel( listBook, ID_IBBASISPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* itemBoxSizer7 = new wxBoxSizer(wxVERTICAL);
@@ -1842,6 +1844,21 @@ void InputBuilderWindow::OnOrderChoiceSelected( wxCommandEvent& event )
 void InputBuilderWindow::OnSymmetryCheckboxClick( wxCommandEvent& event )
 {
     TmpInputRec->Data->SetUseSym(event.IsChecked());
+}
+
+
+/*!
+ * wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED event handler for ID_IBNOTEBOOK
+ */
+
+void InputBuilderWindow::OnIblistbookPageChanged( wxListbookEvent& event )
+{
+	switch (event.GetSelection()) {	//This doesn't currently work as the pane id is not what is returned
+		case SUMMARY_PANE:
+			SetupSummaryItems();
+			break;
+	}
+    event.Skip();
 }
 
 

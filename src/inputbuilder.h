@@ -22,7 +22,7 @@
 
 ////@begin includes
 #include "wx/frame.h"
-#include "wx/notebook.h"
+#include "wx/listbook.h"
 #include "wx/spinctrl.h"
 ////@end includes
 
@@ -198,6 +198,9 @@ public:
 
     /// wxEVT_CLOSE_WINDOW event handler for ID_INPUTBUILDERWINDOW
     void OnCloseWindow( wxCloseEvent& event );
+
+    /// wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED event handler for ID_IBNOTEBOOK
+    void OnIblistbookPageChanged( wxListbookEvent& event );
 
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_BASIS_CHOICE
     void OnBasisChoiceSelected( wxCommandEvent& event );
