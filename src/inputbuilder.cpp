@@ -1659,6 +1659,8 @@ void InputBuilderWindow::OnDefaultsbuttonClick( wxCommandEvent& event )
             // NO-OP
             break;
     }
+    
+    SetupItems();
 }
 
 
@@ -1778,16 +1780,7 @@ void InputBuilderWindow::setPaneVisible(int pane, bool visible) {
 }
 
 int InputBuilderWindow::getCurrentPane() {
-    int currPane = listBook->GetSelection();
-    int i = 0;
-    
-    for(i = 0; i <= currPane; i++) {
-        if(!visibleTab[i]) {
-            currPane++;
-        }
-    }
-    
-    return currPane;
+    getPaneAtPosition(listBook->GetSelection());
 }
 
 /*!
@@ -1862,3 +1855,18 @@ void InputBuilderWindow::OnIblistbookPageChanged( wxListbookEvent& event )
 }
 
 
+int InputBuilderWindow::getPaneAtPosition(int pos) {
+    int currPane = pos;
+    int i = 0;
+    
+    for(i = 0; i <= currPane; i++) {
+        if(!visibleTab[i]) {
+            currPane++;
+        }
+    }
+    
+    return currPane;
+}
+    
+void InputBuilderWindow::CheckBasisMenu(void) {
+}

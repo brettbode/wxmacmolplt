@@ -374,6 +374,9 @@ public:
     
     void setPaneVisible(int pane, bool visible);
     int getCurrentPane();
+    int getPaneAtPosition(int pos);
+    
+    void CheckBasisMenu(void);
 };
 
 #endif
