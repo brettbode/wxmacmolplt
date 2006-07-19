@@ -77,7 +77,7 @@ class wxSpinCtrl;
 #define ID_TITLE_TEXTCTRL 10117
 #define ID_COORD_CHOICE 10118
 #define ID_UNIT_CHOICE 10119
-#define ID_TEXTCTRL10 10123
+#define ID_ZMAT_VARS_TEXT 10123
 #define ID_POINTGROUP_CHOICE 10120
 #define ID_ORDER_CHOICE 10121
 #define ID_SYMMETRY_CHECKBOX 10122
@@ -250,11 +250,17 @@ public:
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CC_CHOICE
     void OnCcChoiceSelected( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TITLE_TEXTCTRL
+    void OnTitleTextctrlUpdated( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_COORD_CHOICE
     void OnCoordChoiceSelected( wxCommandEvent& event );
 
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_UNIT_CHOICE
     void OnUnitChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ZMAT_VARS_TEXT
+    void OnZmatVarsTextUpdated( wxCommandEvent& event );
 
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POINTGROUP_CHOICE
     void OnPointgroupChoiceSelected( wxCommandEvent& event );

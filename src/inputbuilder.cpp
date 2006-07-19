@@ -86,9 +86,13 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 
     EVT_CHOICE( ID_CC_CHOICE, InputBuilderWindow::OnCcChoiceSelected )
 
+    EVT_TEXT( ID_TITLE_TEXTCTRL, InputBuilderWindow::OnTitleTextctrlUpdated )
+
     EVT_CHOICE( ID_COORD_CHOICE, InputBuilderWindow::OnCoordChoiceSelected )
 
     EVT_CHOICE( ID_UNIT_CHOICE, InputBuilderWindow::OnUnitChoiceSelected )
+
+    EVT_TEXT( ID_ZMAT_VARS_TEXT, InputBuilderWindow::OnZmatVarsTextUpdated )
 
     EVT_CHOICE( ID_POINTGROUP_CHOICE, InputBuilderWindow::OnPointgroupChoiceSelected )
 
@@ -568,7 +572,9 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText69 = new wxStaticText( itemPanel58, wxID_STATIC, _("# of Z-Matrix Variables:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer68->Add(itemStaticText69, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    zmatrixVarsText = new wxTextCtrl( itemPanel58, ID_TEXTCTRL10, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    zmatrixVarsText = new wxTextCtrl( itemPanel58, ID_ZMAT_VARS_TEXT, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    if (ShowToolTips())
+        zmatrixVarsText->SetToolTip(_("If set and a set of internal coordinates are defined a $ZMAT group will be punched out."));
     itemBoxSizer68->Add(zmatrixVarsText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticBox* itemStaticBoxSizer71Static = new wxStaticBox(itemPanel58, wxID_ANY, _T(""));
@@ -1372,6 +1378,12 @@ void InputBuilderWindow::SetupControlItems() {
 void InputBuilderWindow::SetupDataItems() {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     int itemValue;
+	
+	//Title
+	if (TmpInputRec->Data->GetTitle())
+		titleText->SetValue(wxString(TmpInputRec->Data->GetTitle(), wxConvUTF8));
+	else
+		titleText->SetValue(wxString(_T("Title")));
     
     // coordTypeChoice
     itemValue = TmpInputRec->Data->GetCoordType();
@@ -1380,6 +1392,11 @@ void InputBuilderWindow::SetupDataItems() {
     
     // unitChoice
     unitChoice->SetSelection(TmpInputRec->Data->GetUnits());
+	
+	//# Z-Matrix vars
+	wxString zvars;
+	zvars.Printf("%d", TmpInputRec->Data->GetNumZVar());
+	zmatrixVarsText->SetValue(zvars);
     
 		//Point Group
 	itemValue = TmpInputRec->Data->GetPointGroup();
@@ -2067,3 +2084,30 @@ void InputBuilderWindow::CheckBasisMenu(void) {
         }
     }
 }
+/*!
+ * wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ZMAT_VARS_TEXT
+ */
+
+void InputBuilderWindow::OnZmatVarsTextUpdated( wxCommandEvent& event )
+{
+	wxString temp = zmatrixVarsText->GetValue();
+	long t;
+	if (temp.ToLong(&t)) {
+		TmpInputRec->Data->SetNumZVar(t);
+	}
+    event.Skip();
+}
+
+
+/*!
+ * wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TITLE_TEXTCTRL
+ */
+
+void InputBuilderWindow::OnTitleTextctrlUpdated( wxCommandEvent& event )
+{
+	wxString temp = titleText->GetValue();
+	TmpInputRec->Data->SetTitle(temp.c_str());
+    event.Skip();
+}
+
+
