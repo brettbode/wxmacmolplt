@@ -145,6 +145,7 @@ bool wxUglyChoice::GetEnabled(int n) const {
 }
 
 bool wxUglyChoice::SetSelection(int n) {
+	if ((n<0)||(n>item.size())) return false;
     selection = n;
     m_txt->SetValue(m_menu->GetLabel(item[selection]));
 #if 0 //wxHAS_RADIO_MENU_ITEMS
