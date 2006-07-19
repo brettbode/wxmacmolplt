@@ -94,6 +94,8 @@ class wxUglyChoice;
 #define ID_FUNCTIONAL_CHOICE 10184
 #define ID_IBMOGUESSPANEL 10095
 #define ID_INITGUESS_CHOICE 10132
+#define ID_MOGUESS_VECSOURCE_CHOICE 10124
+#define ID_MOGUESS_VECORBCOUNT_TEXT 10238
 #define ID_PRINTINITGUESS_CHECKBOX 10133
 #define ID_ROTORBITALS_CHECKBOX 10134
 #define ID_IBHESSOPTSPANEL 10144
@@ -294,6 +296,21 @@ public:
     /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_EXTERNDATAREP_CHECKBOX
     void OnExterndatarepCheckboxClick( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_INITGUESS_CHOICE
+    void OnInitguessChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_MOGUESS_VECSOURCE_CHOICE
+    void OnMoguessVecsourceChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MOGUESS_VECORBCOUNT_TEXT
+    void OnMoguessVecorbcountTextUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PRINTINITGUESS_CHECKBOX
+    void OnPrintinitguessCheckboxClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_ROTORBITALS_CHECKBOX
+    void OnRotorbitalsCheckboxClick( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
     void OnDefaultsbuttonClick( wxCommandEvent& event );
 
@@ -382,6 +399,8 @@ public:
     wxUglyChoice* dftMethodChoice;
     wxUglyChoice* dftFuncChoice;
     wxUglyChoice* initGuessChoice;
+    wxUglyChoice* mMOSourceChoice;
+    wxTextCtrl* mVecOrbCountText;
     wxCheckBox* printInitGuessCheck;
     wxCheckBox* rotOrbitalsCheck;
     wxCheckBox* aimpacCheck;
