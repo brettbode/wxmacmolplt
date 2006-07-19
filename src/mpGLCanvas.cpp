@@ -13,6 +13,10 @@
 #include "MolDisplayWin.h"
 #include "glf.h"
 
+#ifdef __wxBuild__
+#include <wx/stdpaths.h>
+#endif
+
 #include <iostream>
 
 extern int glf_initialized;
@@ -82,8 +86,15 @@ void MpGLCanvas::initGL(void) {
 	  {
 	    glfInit();
 
-	    if (glfLoadFont("../resources/fonts/arial1.glf") < 0)
-	      std::cout<<"Warning: font file not found!"<<std::endl;
+	    wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
+	    wxString pathname = gStdPaths.GetDataDir();
+
+	    pathname += "/arial1.glf";
+	    if (glfLoadFont((char*)pathname.c_str()) < 0)
+	      {
+		std::cout<<"Warning: font file not found!"<<std::endl;
+		glfClose();
+	      }
 	    else
 	      glf_initialized = 1;
 	  }
