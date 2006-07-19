@@ -1005,7 +1005,7 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText179 = new wxStaticText( itemPanel176, wxID_STATIC, _("Title:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer178->Add(itemStaticText179, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    mTitleText = new wxTextCtrl( itemPanel176, ID_SUMMARY_TITLE, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    mTitleText = new wxTextCtrl( itemPanel176, ID_SUMMARY_TITLE, _T(""), wxDefaultPosition, wxSize(400, -1), 0 );
     mTitleText->Enable(false);
     itemBoxSizer178->Add(mTitleText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -1014,7 +1014,7 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText182 = new wxStaticText( itemPanel176, wxID_STATIC, _("Basis Set:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer181->Add(itemStaticText182, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    mBasisSetText = new wxTextCtrl( itemPanel176, ID_SUMMARY_BASISSET, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    mBasisSetText = new wxTextCtrl( itemPanel176, ID_SUMMARY_BASISSET, _T(""), wxDefaultPosition, wxSize(400, -1), 0 );
     mBasisSetText->Enable(false);
     itemBoxSizer181->Add(mBasisSetText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -1050,7 +1050,7 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText194 = new wxStaticText( itemPanel176, wxID_STATIC, _("Electron Correlation"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer193->Add(itemStaticText194, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    mElectronCorr = new wxTextCtrl( itemPanel176, ID_SUMMARY_ELEC, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    mElectronCorr = new wxTextCtrl( itemPanel176, ID_SUMMARY_ELEC, _T(""), wxDefaultPosition, wxSize(200, -1), 0 );
     mElectronCorr->Enable(false);
     itemBoxSizer193->Add(mElectronCorr, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -1413,6 +1413,26 @@ void InputBuilderWindow::SetupSummaryItems() {
 		} else if (TmpInputRec->Basis->GetBasis()==3) {
 			temp.Printf("%s-%dG", TmpInputRec->Basis->GetBasisText(), TmpInputRec->Basis->GetNumGauss());
 		}
+		if (TmpInputRec->Basis->GetNumDFuncs()) {
+			wxString t;
+			t.Printf(", # D funcs = %d", TmpInputRec->Basis->GetNumDFuncs());
+			temp.Append(t);
+		}
+		if (TmpInputRec->Basis->GetNumPFuncs()) {
+			wxString t;
+			t.Printf(", # P funcs = %d", TmpInputRec->Basis->GetNumPFuncs());
+			temp.Append(t);
+		}
+		if (TmpInputRec->Basis->GetNumFFuncs()) {
+			wxString t;
+			t.Printf(", # F funcs = %d", TmpInputRec->Basis->GetNumFFuncs());
+			temp.Append(t);
+		}
+		if (TmpInputRec->Basis->GetPolar() > GAMESS_BS_No_Polarization) {
+			wxString t;
+			t.Printf(", Polar = %s", TmpInputRec->Basis->GetPolarText());
+			temp.Append(t);
+		}
 		mBasisSetText->SetValue(temp);
 	} else mBasisSetText->Clear();
 	
@@ -1440,7 +1460,7 @@ void InputBuilderWindow::SetupSummaryItems() {
 		mPointGroupText->SetValue(pg);
 	}
 	wxString eclevel;
-	if (TmpInputRec->Control->GetMPLevel())
+	if (TmpInputRec->Control->GetMPLevel() == 2)
 		eclevel.Printf("MP2");
 	else if (TmpInputRec->Control->GetCCType())
 		eclevel.Printf(TmpInputRec->Control->GetGAMESSCCType(TmpInputRec->Control->GetCCType()));
