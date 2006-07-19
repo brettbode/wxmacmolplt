@@ -579,16 +579,38 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText73 = new wxStaticText( itemPanel58, wxID_STATIC, _("Point Group:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer72->Add(itemStaticText73, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    wxString* pointGroupChoiceStrings = NULL;
-    pointGroupChoice = new wxUglyChoice( itemPanel58, ID_POINTGROUP_CHOICE, wxDefaultPosition, wxDefaultSize, 0, pointGroupChoiceStrings, 0 );
+    wxString pointGroupChoiceStrings[] = {
+        _("C1"),
+        _("CS"),
+        _("CI"),
+        _("CnH"),
+        _("CnV"),
+        _("Cn"),
+        _("S2n"),
+        _("DnD"),
+        _("DnH"),
+        _("Dn"),
+        _("TD"),
+        _("TH"),
+        _("T"),
+        _("OH"),
+        _("O")
+    };
+    pointGroupChoice = new wxUglyChoice( itemPanel58, ID_POINTGROUP_CHOICE, wxDefaultPosition, wxDefaultSize, 15, pointGroupChoiceStrings, 0 );
     itemFlexGridSizer72->Add(pointGroupChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
     wxStaticText* itemStaticText75 = new wxStaticText( itemPanel58, wxID_STATIC, _("Order of Principle Axis:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemStaticText75->Enable(false);
     itemFlexGridSizer72->Add(itemStaticText75, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxString* paxisOrderChoiceStrings = NULL;
-    paxisOrderChoice = new wxUglyChoice( itemPanel58, ID_ORDER_CHOICE, wxDefaultPosition, wxDefaultSize, 0, paxisOrderChoiceStrings, 0 );
+    wxString paxisOrderChoiceStrings[] = {
+        _("2"),
+        _("3"),
+        _("4")
+    };
+    paxisOrderChoice = new wxUglyChoice( itemPanel58, ID_ORDER_CHOICE, wxDefaultPosition, wxDefaultSize, 3, paxisOrderChoiceStrings, 0 );
+    if (ShowToolTips())
+        paxisOrderChoice->SetToolTip(_("Replaces the 'n' above."));
     paxisOrderChoice->Enable(false);
     itemFlexGridSizer72->Add(paxisOrderChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -1359,11 +1381,31 @@ void InputBuilderWindow::SetupDataItems() {
     // unitChoice
     unitChoice->SetSelection(TmpInputRec->Data->GetUnits());
     
-    // TODO:  pointGroupChoice
-    // TODO:  paxisOrderChoice
+		//Point Group
+	itemValue = TmpInputRec->Data->GetPointGroup();
+	if (itemValue == 0) itemValue = 1;
+	pointGroupChoice->SetSelection(itemValue-1);
+
+		//Point group order
+	SetupPointGroupOrder();
     
     // symmetryCheck
     symmetryCheck->SetValue(TmpInputRec->Data->GetUseSym());
+}
+
+void InputBuilderWindow::SetupPointGroupOrder(void) {
+	//Point group order - only applicable to certain point groups
+	int itemValue = TmpInputRec->Data->GetPointGroup();
+	if (itemValue == 0) itemValue = 1;
+	if ((itemValue>3)&&(itemValue<11)) {
+		paxisOrderChoice->Enable(true);
+		itemValue = TmpInputRec->Data->GetPointGroupOrder()-1;
+		if (itemValue <= 0) {
+			itemValue = 1;
+			TmpInputRec->Data->SetPointGroupOrder(2);
+		}
+		paxisOrderChoice->SetSelection(itemValue-1);
+	} else paxisOrderChoice->Enable(false);
 }
 
 void InputBuilderWindow::SetupSystemItems() {
@@ -1888,10 +1930,9 @@ void InputBuilderWindow::OnUnitChoiceSelected( wxCommandEvent& event )
 
 void InputBuilderWindow::OnPointgroupChoiceSelected( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POINTGROUP_CHOICE in InputBuilderWindow.
-    // Before editing this code, remove the block markers.
+	TmpInputRec->Data->SetPointGroup((GAMESSPointGroup)(pointGroupChoice->GetSelection()+1));
+	SetupPointGroupOrder();
     event.Skip();
-////@end wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POINTGROUP_CHOICE in InputBuilderWindow. 
 }
 
 
@@ -1901,10 +1942,8 @@ void InputBuilderWindow::OnPointgroupChoiceSelected( wxCommandEvent& event )
 
 void InputBuilderWindow::OnOrderChoiceSelected( wxCommandEvent& event )
 {
-////@begin wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ORDER_CHOICE in InputBuilderWindow.
-    // Before editing this code, remove the block markers.
+	TmpInputRec->Data->SetPointGroupOrder(paxisOrderChoice->GetSelection()+2);
     event.Skip();
-////@end wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ORDER_CHOICE in InputBuilderWindow. 
 }
 
 

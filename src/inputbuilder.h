@@ -307,6 +307,8 @@ public:
     void SetupSCFOptsItems();
     void SetupStatPointItems();
     void SetupSummaryItems();
+	
+	void SetupPointGroupOrder(void);
 
 ////@begin InputBuilderWindow member variables
     wxListbook* listBook;

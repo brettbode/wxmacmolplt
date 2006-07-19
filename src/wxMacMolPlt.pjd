@@ -13920,7 +13920,7 @@ along the chosen normal mode."</string>
                               <long name="proxy-Id value">10120</long>
                               <string name="proxy-Class">"wxUglyChoice"</string>
                               <string name="proxy-Member variable name">"pointGroupChoice"</string>
-                              <string name="proxy-Strings">""</string>
+                              <string name="proxy-Strings">"C1|CS|CI|CnH|CnV|Cn|S2n|DnD|DnH|Dn|TD|TH|T|OH|O"</string>
                               <string name="proxy-Initial value">""</string>
                               <string name="proxy-Help text">""</string>
                               <string name="proxy-Tooltip text">""</string>
@@ -14029,10 +14029,10 @@ along the chosen normal mode."</string>
                               <long name="proxy-Id value">10121</long>
                               <string name="proxy-Class">"wxUglyChoice"</string>
                               <string name="proxy-Member variable name">"paxisOrderChoice"</string>
-                              <string name="proxy-Strings">""</string>
+                              <string name="proxy-Strings">"2|3|4"</string>
                               <string name="proxy-Initial value">""</string>
                               <string name="proxy-Help text">""</string>
-                              <string name="proxy-Tooltip text">""</string>
+                              <string name="proxy-Tooltip text">"Replaces the 'n' above."</string>
                               <string name="proxy-Background colour">""</string>
                               <string name="proxy-Foreground colour">""</string>
                               <string name="proxy-Font">""</string>
