@@ -36,7 +36,6 @@
 ////@begin forward declarations
 class wxListbook;
 class wxUglyChoice;
-class wxSpinCtrl;
 ////@end forward declarations
 
 /*!
@@ -82,9 +81,9 @@ class wxSpinCtrl;
 #define ID_ORDER_CHOICE 10121
 #define ID_SYMMETRY_CHECKBOX 10122
 #define ID_IBSYSTEMPANEL 10094
-#define ID_TIMELIMIT_SPINCTRL 10164
+#define ID_TIMELIMIT_TEXT 10237
 #define ID_TIMELIMITUNITS_CHOICE 10125
-#define ID_MEMORY_SPINCTRL 10124
+#define ID_MEMORY_TEXT 10164
 #define ID_MEMORYUNITS_CHOICE 10127
 #define ID_DIAGONALIZATION_CHOICE 10128
 #define ID_CORE_CHECKBOX 10129
@@ -271,6 +270,30 @@ public:
     /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_SYMMETRY_CHECKBOX
     void OnSymmetryCheckboxClick( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TIMELIMIT_TEXT
+    void OnTimelimitTextUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_TIMELIMITUNITS_CHOICE
+    void OnTimelimitunitsChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MEMORY_TEXT
+    void OnMemoryTextUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_MEMORYUNITS_CHOICE
+    void OnMemoryunitsChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_DIAGONALIZATION_CHOICE
+    void OnDiagonalizationChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CORE_CHECKBOX
+    void OnCoreCheckboxClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_PLBALANCE_RADIOBOX
+    void OnPlbalanceRadioboxSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_EXTERNDATAREP_CHECKBOX
+    void OnExterndatarepCheckboxClick( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
     void OnDefaultsbuttonClick( wxCommandEvent& event );
 
@@ -348,9 +371,9 @@ public:
     wxUglyChoice* pointGroupChoice;
     wxUglyChoice* paxisOrderChoice;
     wxCheckBox* symmetryCheck;
-    wxSpinCtrl* timeLimitSpin;
+    wxTextCtrl* timeLimitText;
     wxUglyChoice* timeLimitUnitChoice;
-    wxSpinCtrl* memorySpin;
+    wxTextCtrl* memoryText;
     wxUglyChoice* memoryUnitChoice;
     wxUglyChoice* diagChoice;
     wxCheckBox* coreCheck;

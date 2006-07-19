@@ -100,6 +100,22 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 
     EVT_CHECKBOX( ID_SYMMETRY_CHECKBOX, InputBuilderWindow::OnSymmetryCheckboxClick )
 
+    EVT_TEXT( ID_TIMELIMIT_TEXT, InputBuilderWindow::OnTimelimitTextUpdated )
+
+    EVT_CHOICE( ID_TIMELIMITUNITS_CHOICE, InputBuilderWindow::OnTimelimitunitsChoiceSelected )
+
+    EVT_TEXT( ID_MEMORY_TEXT, InputBuilderWindow::OnMemoryTextUpdated )
+
+    EVT_CHOICE( ID_MEMORYUNITS_CHOICE, InputBuilderWindow::OnMemoryunitsChoiceSelected )
+
+    EVT_CHOICE( ID_DIAGONALIZATION_CHOICE, InputBuilderWindow::OnDiagonalizationChoiceSelected )
+
+    EVT_CHECKBOX( ID_CORE_CHECKBOX, InputBuilderWindow::OnCoreCheckboxClick )
+
+    EVT_RADIOBOX( ID_PLBALANCE_RADIOBOX, InputBuilderWindow::OnPlbalanceRadioboxSelected )
+
+    EVT_CHECKBOX( ID_EXTERNDATAREP_CHECKBOX, InputBuilderWindow::OnExterndatarepCheckboxClick )
+
     EVT_BUTTON( ID_DEFAULTSBUTTON, InputBuilderWindow::OnDefaultsbuttonClick )
 
     EVT_BUTTON( ID_REVERTBUTTON, InputBuilderWindow::OnRevertbuttonClick )
@@ -176,9 +192,9 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     pointGroupChoice = NULL;
     paxisOrderChoice = NULL;
     symmetryCheck = NULL;
-    timeLimitSpin = NULL;
+    timeLimitText = NULL;
     timeLimitUnitChoice = NULL;
-    memorySpin = NULL;
+    memoryText = NULL;
     memoryUnitChoice = NULL;
     diagChoice = NULL;
     coreCheck = NULL;
@@ -635,8 +651,8 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText81 = new wxStaticText( itemPanel78, wxID_STATIC, _("Time Limit:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer80->Add(itemStaticText81, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    timeLimitSpin = new wxSpinCtrl( itemPanel78, ID_TIMELIMIT_SPINCTRL, _T("525600"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 525600 );
-    itemFlexGridSizer80->Add(timeLimitSpin, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    timeLimitText = new wxTextCtrl( itemPanel78, ID_TIMELIMIT_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer80->Add(timeLimitText, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxString timeLimitUnitChoiceStrings[] = {
         _("Seconds"),
@@ -654,8 +670,8 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText84 = new wxStaticText( itemPanel78, wxID_STATIC, _("Memory:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer80->Add(itemStaticText84, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    memorySpin = new wxSpinCtrl( itemPanel78, ID_MEMORY_SPINCTRL, _T("1000000"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 1000000 );
-    itemFlexGridSizer80->Add(memorySpin, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    memoryText = new wxTextCtrl( itemPanel78, ID_MEMORY_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    itemFlexGridSizer80->Add(memoryText, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxString memoryUnitChoiceStrings[] = {
         _("Words"),
@@ -1428,7 +1444,25 @@ void InputBuilderWindow::SetupPointGroupOrder(void) {
 void InputBuilderWindow::SetupSystemItems() {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     
-    
+    wxString time;
+	time.Printf("%.2f", TmpInputRec->System->GetConvertedTime());
+	timeLimitText->SetValue(time);
+	
+	timeLimitUnitChoice->SetSelection(TmpInputRec->System->GetTimeUnits()-1);
+	
+	wxString mem;
+	mem.Printf("%.2f", TmpInputRec->System->GetConvertedMem());
+	memoryText->SetValue(mem);
+	
+	memoryUnitChoice->SetSelection(TmpInputRec->System->GetMemUnits()-1);
+	
+	diagChoice->SetSelection(TmpInputRec->System->GetDiag());
+	
+	coreCheck->SetValue(TmpInputRec->System->GetCoreFlag());
+	
+	plBalanceRadio->SetSelection(TmpInputRec->System->GetBalanceType());
+	
+	externDataRepCheck->SetValue(TmpInputRec->System->GetXDR());
 }
 
 void InputBuilderWindow::SetupDFTItems() {
@@ -2107,6 +2141,108 @@ void InputBuilderWindow::OnTitleTextctrlUpdated( wxCommandEvent& event )
 {
 	wxString temp = titleText->GetValue();
 	TmpInputRec->Data->SetTitle(temp.c_str());
+    event.Skip();
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CORE_CHECKBOX
+ */
+
+void InputBuilderWindow::OnCoreCheckboxClick( wxCommandEvent& event )
+{
+	TmpInputRec->System->SetCoreFlag(coreCheck->GetValue());
+    event.Skip();
+}
+
+
+/*!
+ * wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TIMELIMIT_TEXT
+ */
+
+void InputBuilderWindow::OnTimelimitTextUpdated( wxCommandEvent& event )
+{
+	wxString temp = timeLimitText->GetValue();
+	double t;
+	if (temp.ToDouble(&t)) {
+		TmpInputRec->System->SetConvertedTime(t);
+	}
+
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_TIMELIMITUNITS_CHOICE
+ */
+
+void InputBuilderWindow::OnTimelimitunitsChoiceSelected( wxCommandEvent& event )
+{
+	TmpInputRec->System->SetTimeUnits((TimeUnit) (timeLimitUnitChoice->GetSelection()+1));
+    wxString time;
+	time.Printf("%.2f", TmpInputRec->System->GetConvertedTime());
+	timeLimitText->SetValue(time);
+
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MEMORY_TEXT
+ */
+
+void InputBuilderWindow::OnMemoryTextUpdated( wxCommandEvent& event )
+{
+	wxString temp = memoryText->GetValue();
+	double t;
+	if (temp.ToDouble(&t)) {
+		TmpInputRec->System->SetConvertedMem(t);
+	}
+
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_MEMORYUNITS_CHOICE
+ */
+
+void InputBuilderWindow::OnMemoryunitsChoiceSelected( wxCommandEvent& event )
+{
+	TmpInputRec->System->SetMemUnits((MemoryUnit) (memoryUnitChoice->GetSelection()+1));
+	wxString mem;
+	mem.Printf("%.2f", TmpInputRec->System->GetConvertedMem());
+	memoryText->SetValue(mem);
+
+    event.Skip();
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_DIAGONALIZATION_CHOICE
+ */
+
+void InputBuilderWindow::OnDiagonalizationChoiceSelected( wxCommandEvent& event )
+{
+	TmpInputRec->System->SetDiag(diagChoice->GetSelection());
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_PLBALANCE_RADIOBOX
+ */
+
+void InputBuilderWindow::OnPlbalanceRadioboxSelected( wxCommandEvent& event )
+{
+	TmpInputRec->System->SetBalanceType(plBalanceRadio->GetSelection());
+    event.Skip();
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_EXTERNDATAREP_CHECKBOX
+ */
+
+void InputBuilderWindow::OnExterndatarepCheckboxClick( wxCommandEvent& event )
+{
+	TmpInputRec->System->SetXDR(externDataRepCheck->GetValue());
     event.Skip();
 }
 
