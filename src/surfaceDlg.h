@@ -590,7 +590,7 @@ class TEDensity2DSurfPane : public Surface2DPane
 public:
     /// Constructors
     TEDensity2DSurfPane() { }
-    TEDensity2DSurfPane( wxWindow* parent, TEDensity2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    TEDensity2DSurfPane( wxWindow* parent, TEDensity2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_TED2D_IDNAME, const wxPoint& pos = SYMBOL_TED2D_POSITION, const wxSize& size = SYMBOL_TED2D_SIZE, long style = SYMBOL_TED2D_STYLE );
     ~TEDensity2DSurfPane();
 	
     virtual void TargetToPane();

@@ -21,6 +21,8 @@
 //The global preferences settings
     WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
 
+int glf_initialized = 0;
+
 static const wxCmdLineEntryDesc g_cmdLineDesc[] = 
 { 
 { wxCMD_LINE_SWITCH, wxT("h"), wxT("help"),    wxT("displays help on "
@@ -157,7 +159,7 @@ int MpApp::OnExit() {
     delete wxConfigBase::Set((wxConfigBase *) NULL);
     //delete config object if there is one created before  -Song Li
 
-	return wxApp::OnExit();
+    return 0;
 }
 
 void MpApp::createMainFrame(const wxString &filename) {
@@ -216,9 +218,7 @@ void MpApp::menuFileQuit(wxCommandEvent &event) {
 	}
 	
 	//This looks like it has the desired effect, but not sure if it is the "correct" way to exit
-#ifdef __WXMAC__
 	ExitMainLoop();
-#endif
 }
 
 void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {

@@ -144,7 +144,7 @@ void SurfacesWindow::CreateControls()
     listBook = new wxListbook( MainPanel, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxLB_BOTTOM | wxSUNKEN_BORDER );
 
     middleSizer = new wxBoxSizer(wxHORIZONTAL);
-    middleSizer->Add(listBook, 1, wxGROW|wxALL, 2);
+    middleSizer->Add(listBook, 1, wxEXPAND|wxALL, 2);
 
     addButton = new wxButton( MainPanel, wxID_ADD, _("&Add"), wxDefaultPosition, wxDefaultSize, 0 );
     delButton = new wxButton( MainPanel, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -454,7 +454,6 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 	BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
 	if (tempPane) {
 	  //GetSizer()->Fit(this);
-//	  tempPane->GetSizer()->Fit(tempPane);
 	  MainPanel->Fit();
 	  Fit();
 

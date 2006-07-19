@@ -58,6 +58,8 @@ class MpGLCanvas : public wxGLCanvas {
          * data structure.
          * @param newPrefs A pointer to the window preferences that the canvas should use.
          */
+	~MpGLCanvas();
+
         void setPrefs(WinPrefs *newPrefs);
 
         /**

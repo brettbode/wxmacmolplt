@@ -15,6 +15,8 @@ AC_ARG_WITH(wx-config,
     fi
 ])
 
+dnl C-compiler checks
+AC_PROG_CC
 
 AC_PROG_CXX
 dnl AX_CHECK_GL

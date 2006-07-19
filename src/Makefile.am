@@ -12,7 +12,7 @@ wxMacMolPlt_SOURCES = main.cpp MolDisplayWin.cpp  mpGLCanvas.cpp \
 	wxMolGraph.cpp energyplotdialog.cpp setPreference.cpp myPrefs.cpp \
 	frequenciesdialog.cpp surfaceswindow.cpp surfaceDlg.cpp colorArea.cpp \
 	inputbuilder.cpp wxUglyChoice.cpp windowparameters.cpp \
-	zmatrixcalculator.cpp
+	zmatrixcalculator.cpp glf.c
 
 AM_CXXFLAGS = $(WX_CXXFLAGS)
 wxMacMolPlt_LDADD = $(WX_LIBS)

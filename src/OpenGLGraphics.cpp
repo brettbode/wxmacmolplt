@@ -17,22 +17,26 @@
 #ifndef __wxBuild__
 #include "MyWindowClasses.h"
 #endif
+
 #include "MoleculeData.h"
 #include "Frame.h"
 #include "SurfaceTypes.h"
 #include "Math3D.h"
+
 #ifndef __wxBuild__
 #include "MolDisplay.h"
 #include "Offscreen.h"
 #else
 #include "MolDisplayWin.h"
 #include "mpGLCanvas.h"
+#include "glf.h"
 #ifdef __WXMAC__
 #include <AGL/glu.h>
 #else
 #include "GL/glu.h"
 #endif
 #endif
+
 #include "Prefs.h"
 #include "Progress.h"
 
@@ -667,10 +671,33 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 		long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
 
 	//choose black or white based on the background color
-				if (backMagnitude > 70000)  //"light" background choose black
-					glColor3f (0.0, 0.0, 0.0);
-				else
-					glColor3f (1.0, 1.0, 1.0);
+		if (backMagnitude > 70000)  //"light" background choose black
+		  glColor3f (0.0, 0.0, 0.0);
+		else
+		  glColor3f (1.0, 1.0, 1.0);
+
+		if (ShowAngles) {
+		  char AngleString[50];
+		  float psi, phi, theta;
+		  MatrixToEulerAngles(MainData->TotalRotation, &psi, &phi, &theta);
+		  sprintf((char *)AngleString, "%.2f, %.2f, %.2f, Scale:%.2f",
+			  psi, phi, theta, MainData->WindowSize);
+
+		  int canvasWidth, canvasHeight;
+		  glCanvas->GetSize(&canvasWidth, &canvasHeight);
+		  float sclX = 20/(float)canvasWidth;
+		  float sclY = 20/(float)canvasHeight;
+
+		  glPushMatrix();
+		  glLoadIdentity();
+		  glTranslatef(-0.85, 0.95, 0);
+		  glScalef(sclX, sclY, 1);
+		  glfDrawSolidString(AngleString);
+		  glPopMatrix();
+
+		  glFlush();
+		  //glCanvas->SwapBuffers();
+		}
 #ifndef __wxBuild__
 				if (ShowAngles) {
 					glRasterPos3d (10, 12, 0); 

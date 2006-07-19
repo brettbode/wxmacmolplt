@@ -11,8 +11,11 @@
 #include "mpGLCanvas.h"
 #include <wx/image.h>
 #include "MolDisplayWin.h"
+#include "glf.h"
 
 #include <iostream>
+
+extern int glf_initialized;
 
 int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16,
                     0};
@@ -33,6 +36,15 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
         
     //Hmm is this the right spot to initialize our GL settings?
 //  initGL();
+}
+
+MpGLCanvas::~MpGLCanvas()
+{
+  if (glf_initialized)
+    {
+      glfClose();
+      glf_initialized = 0;
+    }
 }
 
 void MpGLCanvas::initGL(void) {
@@ -64,6 +76,14 @@ void MpGLCanvas::initGL(void) {
         glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
         glEnable(GL_LIGHT0);
         initialized = true;
+
+	/*!!! GL font initialization  */
+	if (!glf_initialized)
+	  {
+	    glfInit();
+	    glfLoadFont("../resources/fonts/arial1.glf");
+	    glf_initialized = 1;
+	  }
     }
 }
 

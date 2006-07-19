@@ -239,6 +239,7 @@ bool BaseSurfacePane::Create( wxWindow* parent, wxWindowID id, const wxPoint& po
   wxPanel::Create( parent, id, pos, size, style );
 
   CreateControls();
+
   GetSizer()->Fit(this);
   GetSizer()->SetSizeHints(this);
   Centre();
