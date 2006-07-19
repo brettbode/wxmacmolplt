@@ -81,8 +81,11 @@ void MpGLCanvas::initGL(void) {
 	if (!glf_initialized)
 	  {
 	    glfInit();
-	    glfLoadFont("../resources/fonts/arial1.glf");
-	    glf_initialized = 1;
+
+	    if (glfLoadFont("../resources/fonts/arial1.glf") < 0)
+	      std::cout<<"Warning: font file not found!"<<std::endl;
+	    else
+	      glf_initialized = 1;
 	  }
     }
 }
