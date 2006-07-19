@@ -45,8 +45,13 @@
 		8B1DA4750A2E189B009DFD94 /* setPreference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4730A2E189B009DFD94 /* setPreference.cpp */; };
 		8B1DA4830A2E6A18009DFD94 /* frequenciesdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA47F0A2E6A17009DFD94 /* frequenciesdialog.cpp */; };
 		8B1DA4840A2E6A18009DFD94 /* myPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */; };
+		8B279CFF0A4B6F0D00994DD5 /* colorArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF50A4B6F0D00994DD5 /* colorArea.cpp */; };
+		8B279D000A4B6F0D00994DD5 /* inputbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF70A4B6F0D00994DD5 /* inputbuilder.cpp */; };
+		8B279D010A4B6F0D00994DD5 /* surfaceDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */; };
+		8B279D020A4B6F0D00994DD5 /* surfaces.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CFB0A4B6F0D00994DD5 /* surfaces.cpp */; };
+		8B279D030A4B6F0D00994DD5 /* wxUglyChoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CFD0A4B6F0D00994DD5 /* wxUglyChoice.cpp */; };
+		8B3B899D0A6EAD7E0041EA88 /* glf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B899C0A6EAD7E0041EA88 /* glf.cpp */; };
 		8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
-		8B4FB3D30A3093470014F6B5 /* orbital3d.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3CF0A3093470014F6B5 /* orbital3d.cpp */; };
 		8B4FB3D40A3093470014F6B5 /* surfaceswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */; };
 		8B6075B10A1A34B1008CC9FD /* printoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */; };
 		8B6AF30B0A13EAC8004D2E5F /* exportoptionsdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */; };
@@ -59,6 +64,8 @@
 		8BE7C29D0A273D9700DACA25 /* choosevecgroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */; };
 		8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
 		8BEDFA000A09390700BF6F85 /* setbondlength.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */; };
+		8BF17D780A5328210059B71F /* windowparameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17D760A5328210059B71F /* windowparameters.cpp */; };
+		8BF17DA40A55D0910059B71F /* zmatrixcalculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -135,10 +142,20 @@
 		8B1DA4800A2E6A17009DFD94 /* frequenciesdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = frequenciesdialog.h; path = src/frequenciesdialog.h; sourceTree = "<group>"; };
 		8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = myPrefs.cpp; path = src/myPrefs.cpp; sourceTree = "<group>"; };
 		8B1DA4820A2E6A17009DFD94 /* PrefsPanes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsPanes.h; path = src/PrefsPanes.h; sourceTree = "<group>"; };
+		8B279CF50A4B6F0D00994DD5 /* colorArea.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = colorArea.cpp; path = src/colorArea.cpp; sourceTree = "<group>"; };
+		8B279CF60A4B6F0D00994DD5 /* colorArea.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = colorArea.h; path = src/colorArea.h; sourceTree = "<group>"; };
+		8B279CF70A4B6F0D00994DD5 /* inputbuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = inputbuilder.cpp; path = src/inputbuilder.cpp; sourceTree = "<group>"; };
+		8B279CF80A4B6F0D00994DD5 /* inputbuilder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = inputbuilder.h; path = src/inputbuilder.h; sourceTree = "<group>"; };
+		8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceDlg.cpp; path = src/surfaceDlg.cpp; sourceTree = "<group>"; };
+		8B279CFA0A4B6F0D00994DD5 /* surfaceDlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceDlg.h; path = src/surfaceDlg.h; sourceTree = "<group>"; };
+		8B279CFB0A4B6F0D00994DD5 /* surfaces.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaces.cpp; path = src/surfaces.cpp; sourceTree = "<group>"; };
+		8B279CFC0A4B6F0D00994DD5 /* surfaces.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaces.h; path = src/surfaces.h; sourceTree = "<group>"; };
+		8B279CFD0A4B6F0D00994DD5 /* wxUglyChoice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = wxUglyChoice.cpp; path = src/wxUglyChoice.cpp; sourceTree = "<group>"; };
+		8B279CFE0A4B6F0D00994DD5 /* wxUglyChoice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = wxUglyChoice.h; path = src/wxUglyChoice.h; sourceTree = "<group>"; };
+		8B3B89720A6EAB540041EA88 /* glf.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = glf.h; path = src/glf.h; sourceTree = "<group>"; };
+		8B3B899C0A6EAD7E0041EA88 /* glf.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = glf.cpp; path = src/glf.cpp; sourceTree = "<group>"; };
 		8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = appendframesoptions.cpp; path = src/appendframesoptions.cpp; sourceTree = "<group>"; };
 		8B4BB4410A0A7C9D00FE9CC6 /* appendframesoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = appendframesoptions.h; path = src/appendframesoptions.h; sourceTree = "<group>"; };
-		8B4FB3CF0A3093470014F6B5 /* orbital3d.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = orbital3d.cpp; path = src/orbital3d.cpp; sourceTree = "<group>"; };
-		8B4FB3D00A3093470014F6B5 /* orbital3d.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = orbital3d.h; path = src/orbital3d.h; sourceTree = "<group>"; };
 		8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceswindow.cpp; path = src/surfaceswindow.cpp; sourceTree = "<group>"; };
 		8B4FB3D20A3093470014F6B5 /* surfaceswindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceswindow.h; path = src/surfaceswindow.h; sourceTree = "<group>"; };
 		8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = printoptions.cpp; path = src/printoptions.cpp; sourceTree = "<group>"; };
@@ -161,6 +178,10 @@
 		8BED377A09EDCC0E0003DF64 /* setscreenplane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setscreenplane.h; path = src/setscreenplane.h; sourceTree = "<group>"; };
 		8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setbondlength.cpp; path = src/setbondlength.cpp; sourceTree = "<group>"; };
 		8BEDF9FF0A09390700BF6F85 /* setbondlength.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setbondlength.h; path = src/setbondlength.h; sourceTree = "<group>"; };
+		8BF17D760A5328210059B71F /* windowparameters.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = windowparameters.cpp; path = src/windowparameters.cpp; sourceTree = "<group>"; };
+		8BF17D770A5328210059B71F /* windowparameters.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = windowparameters.h; path = src/windowparameters.h; sourceTree = "<group>"; };
+		8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = zmatrixcalculator.cpp; path = src/zmatrixcalculator.cpp; sourceTree = "<group>"; };
+		8BF17DA30A55D0910059B71F /* zmatrixcalculator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zmatrixcalculator.h; path = src/zmatrixcalculator.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +232,8 @@
 				8BE7C29C0A273D9700DACA25 /* choosevecgroup.h */,
 				1652DA2E09D0B12600B7783F /* CML.cpp */,
 				1652DA2F09D0B12600B7783F /* CML.h */,
+				8B279CF50A4B6F0D00994DD5 /* colorArea.cpp */,
+				8B279CF60A4B6F0D00994DD5 /* colorArea.h */,
 				8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */,
 				8BDC5DDC0A29F25F0060517F /* coordinateoffset.h */,
 				16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */,
@@ -230,10 +253,14 @@
 				1652DA3409D0B12600B7783F /* GaussHermite.cpp */,
 				1652DA3509D0B12600B7783F /* GaussHermite.h */,
 				1652DA3609D0B12600B7783F /* Geometries.h */,
+				8B3B89720A6EAB540041EA88 /* glf.h */,
+				8B3B899C0A6EAD7E0041EA88 /* glf.cpp */,
 				1652DA3709D0B12600B7783F /* GlobalExceptions.h */,
 				1652DA3809D0B12600B7783F /* Globals.h */,
 				1652DA3909D0B12600B7783F /* Gradient.cpp */,
 				1652DA3A09D0B12600B7783F /* Gradient.h */,
+				8B279CF70A4B6F0D00994DD5 /* inputbuilder.cpp */,
+				8B279CF80A4B6F0D00994DD5 /* inputbuilder.h */,
 				1652DA3B09D0B12600B7783F /* InputData.cpp */,
 				1652DA3C09D0B12600B7783F /* InputData.h */,
 				1652DA3D09D0B12600B7783F /* Internals.cpp */,
@@ -252,14 +279,16 @@
 				1652DA4609D0B12600B7783F /* MoleculeData.cpp */,
 				1652DA4709D0B12600B7783F /* MoleculeData.h */,
 				1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */,
+				1652DA4909D0B12600B7783F /* mpGLCanvas.h */,
 				8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */,
-				8B4FB3CF0A3093470014F6B5 /* orbital3d.cpp */,
-				8B4FB3D00A3093470014F6B5 /* orbital3d.h */,
-				8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */,
-				8B4FB3D20A3093470014F6B5 /* surfaceswindow.h */,
 				8B6C7BFE0A24E9E800B7358F /* wxMolGraph.h */,
 				8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */,
-				1652DA4909D0B12600B7783F /* mpGLCanvas.h */,
+				8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */,
+				8B279CFA0A4B6F0D00994DD5 /* surfaceDlg.h */,
+				8B279CFB0A4B6F0D00994DD5 /* surfaces.cpp */,
+				8B279CFC0A4B6F0D00994DD5 /* surfaces.h */,
+				8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */,
+				8B4FB3D20A3093470014F6B5 /* surfaceswindow.h */,
 				1652DA4C09D0B12600B7783F /* myFiles.h */,
 				1652DA4D09D0B12600B7783F /* MyTypes.h */,
 				1652DA4E09D0B12600B7783F /* orbitals.cpp */,
@@ -272,20 +301,26 @@
 				8B6075B00A1A34B1008CC9FD /* printoptions.h */,
 				1652DA5009D0B12600B7783F /* Progress.cpp */,
 				1652DA5109D0B12600B7783F /* Progress.h */,
+				1652DA5209D0B12600B7783F /* RysPolynomial.cpp */,
+				1652DA5309D0B12600B7783F /* RysPolynomial.h */,
 				8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */,
 				8BEDF9FF0A09390700BF6F85 /* setbondlength.h */,
 				8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */,
 				8BED377A09EDCC0E0003DF64 /* setscreenplane.h */,
-				1652DA5209D0B12600B7783F /* RysPolynomial.cpp */,
-				1652DA5309D0B12600B7783F /* RysPolynomial.h */,
 				1652DA5409D0B12600B7783F /* SurfaceBase.cpp */,
 				1652DA5509D0B12600B7783F /* SurfaceTypes.h */,
 				1652DA5609D0B12600B7783F /* SurfWin.cpp */,
 				1652DA5709D0B12600B7783F /* VirtualSphere.cpp */,
 				1652DA5809D0B12600B7783F /* VirtualSphere.h */,
+				8BF17D760A5328210059B71F /* windowparameters.cpp */,
+				8BF17D770A5328210059B71F /* windowparameters.h */,
 				1652DA5909D0B12600B7783F /* wxFiles.cpp */,
+				8B279CFD0A4B6F0D00994DD5 /* wxUglyChoice.cpp */,
+				8B279CFE0A4B6F0D00994DD5 /* wxUglyChoice.h */,
 				1652DA5A09D0B12600B7783F /* XML.cpp */,
 				1652DA5B09D0B12600B7783F /* XML.hpp */,
+				8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */,
+				8BF17DA30A55D0910059B71F /* zmatrixcalculator.h */,
 			);
 			name = source;
 			sourceTree = "<group>";
@@ -404,8 +439,15 @@
 				8B1DA4750A2E189B009DFD94 /* setPreference.cpp in Sources */,
 				8B1DA4830A2E6A18009DFD94 /* frequenciesdialog.cpp in Sources */,
 				8B1DA4840A2E6A18009DFD94 /* myPrefs.cpp in Sources */,
-				8B4FB3D30A3093470014F6B5 /* orbital3d.cpp in Sources */,
 				8B4FB3D40A3093470014F6B5 /* surfaceswindow.cpp in Sources */,
+				8B279CFF0A4B6F0D00994DD5 /* colorArea.cpp in Sources */,
+				8B279D000A4B6F0D00994DD5 /* inputbuilder.cpp in Sources */,
+				8B279D010A4B6F0D00994DD5 /* surfaceDlg.cpp in Sources */,
+				8B279D020A4B6F0D00994DD5 /* surfaces.cpp in Sources */,
+				8B279D030A4B6F0D00994DD5 /* wxUglyChoice.cpp in Sources */,
+				8BF17D780A5328210059B71F /* windowparameters.cpp in Sources */,
+				8BF17DA40A55D0910059B71F /* zmatrixcalculator.cpp in Sources */,
+				8B3B899D0A6EAD7E0041EA88 /* glf.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
