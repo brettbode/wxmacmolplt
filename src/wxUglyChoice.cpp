@@ -136,6 +136,11 @@ int wxUglyChoice::GetCount() const {
     return item.size();
 }
 
+void wxUglyChoice::SetToolTip(const wxString& tip) {
+    m_txt->SetToolTip(tip);
+    m_btn->SetToolTip(tip);
+}
+
 void wxUglyChoice::SetEnabled(int n, bool enabled) {
     m_menu->Enable(item[n], enabled);
 }

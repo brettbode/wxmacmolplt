@@ -85,6 +85,13 @@ class wxUglyChoice : public wxPanel {
      * @return The number of items in the list.
      */
     int GetCount() const;
+
+    /**
+     * Sets the tooltip for the control.
+     *
+     * @param tip The text of the tool tip.
+     */
+    void SetToolTip(const wxString& tip);
     
     /**
      * Enables or disables an item.
