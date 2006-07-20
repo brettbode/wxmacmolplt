@@ -77,7 +77,13 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 
     EVT_CHOICE( ID_LOCAL_CHOICE, InputBuilderWindow::OnLocalChoiceSelected )
 
+    EVT_TEXT( ID_MCHARGE_TEXTCTRL, InputBuilderWindow::OnMchargeTextctrlUpdated )
+
+    EVT_TEXT( ID_MULT_TEXTCTRL, InputBuilderWindow::OnMultTextctrlUpdated )
+
     EVT_CHOICE( ID_EXE_CHOICE, InputBuilderWindow::OnExeChoiceSelected )
+
+    EVT_TEXT( ID_MAXIT_TEXTCTRL, InputBuilderWindow::OnMaxitTextctrlUpdated )
 
     EVT_CHECKBOX( ID_MP2_CHECKBOX, InputBuilderWindow::OnMp2CheckboxClick )
 
@@ -1452,6 +1458,9 @@ void InputBuilderWindow::SetupControlItems() {
         else itemValue = 1;
     }
     multText->SetValue(wxString::Format("%d", itemValue));
+    
+    // localChoice
+    localChoice->SetSelection(TmpInputRec->Control->GetLocal() - 1);
 }
 
 void InputBuilderWindow::SetupDataItems() {
@@ -1507,24 +1516,32 @@ void InputBuilderWindow::SetupPointGroupOrder(void) {
 void InputBuilderWindow::SetupSystemItems() {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     
+    // timeLimitText
     wxString time;
 	time.Printf("%.2f", TmpInputRec->System->GetConvertedTime());
 	timeLimitText->SetValue(time);
 	
-	timeLimitUnitChoice->SetSelection(TmpInputRec->System->GetTimeUnits()-1);
+    // timeLimitUnitChoice
+	timeLimitUnitChoice->SetSelection(TmpInputRec->System->GetTimeUnits() - 1);
 	
+    // memoryText
 	wxString mem;
 	mem.Printf("%.2f", TmpInputRec->System->GetConvertedMem());
 	memoryText->SetValue(mem);
 	
-	memoryUnitChoice->SetSelection(TmpInputRec->System->GetMemUnits()-1);
+    // memoryUnitChoice
+	memoryUnitChoice->SetSelection(TmpInputRec->System->GetMemUnits() - 1);
 	
+    // diagChoice
 	diagChoice->SetSelection(TmpInputRec->System->GetDiag());
 	
+    // coreCheck
 	coreCheck->SetValue(TmpInputRec->System->GetCoreFlag());
 	
+    // plBalanceRadio
 	plBalanceRadio->SetSelection(TmpInputRec->System->GetBalanceType());
 	
+    // externDataRepCheck
 	externDataRepCheck->SetValue(TmpInputRec->System->GetXDR());
 }
 
@@ -2602,3 +2619,49 @@ void InputBuilderWindow::OnScfConvSpinUpdated( wxSpinEvent& event )
 }
 
 
+/*!
+ * wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MCHARGE_TEXTCTRL
+ */
+
+void InputBuilderWindow::OnMchargeTextctrlUpdated( wxCommandEvent& event )
+{
+    wxString tmpStr = mchargeText->GetValue();
+    long val = 0;
+    if(tmpStr.ToLong(&val)) {
+        TmpInputRec->Control->SetCharge((short)val);
+    }
+    
+    event.Skip();
+}
+
+
+/*!
+ * wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MULT_TEXTCTRL
+ */
+
+void InputBuilderWindow::OnMultTextctrlUpdated( wxCommandEvent& event )
+{
+    wxString tmpStr = multText->GetValue();
+    long val = 0;
+    if(tmpStr.ToLong(&val)) {
+        TmpInputRec->Control->SetMultiplicity((short)val);
+    }
+    
+    event.Skip();
+}
+
+
+/*!
+ * wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MAXIT_TEXTCTRL
+ */
+
+void InputBuilderWindow::OnMaxitTextctrlUpdated( wxCommandEvent& event )
+{
+    wxString tmpStr = scfIterText->GetValue();
+    long val = 0;
+    if(tmpStr.ToLong(&val)) {
+        TmpInputRec->Control->SetMaxIt((short)val);
+    }
+    
+    event.Skip();
+}

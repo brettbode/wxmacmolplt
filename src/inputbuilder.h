@@ -237,8 +237,17 @@ public:
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_LOCAL_CHOICE
     void OnLocalChoiceSelected( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MCHARGE_TEXTCTRL
+    void OnMchargeTextctrlUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MULT_TEXTCTRL
+    void OnMultTextctrlUpdated( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_EXE_CHOICE
     void OnExeChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MAXIT_TEXTCTRL
+    void OnMaxitTextctrlUpdated( wxCommandEvent& event );
 
     /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_MP2_CHECKBOX
     void OnMp2CheckboxClick( wxCommandEvent& event );

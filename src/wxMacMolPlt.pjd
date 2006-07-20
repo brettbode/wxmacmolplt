@@ -12269,6 +12269,7 @@ along the chosen normal mode."</string>
                                 <long name="locked">0</long>
                                 <string name="created">"17/7/2006"</string>
                                 <string name="proxy-type">"wbTextCtrlProxy"</string>
+                                <string name="event-handler-0">"wxEVT_COMMAND_TEXT_UPDATED|OnMchargeTextctrlUpdated"</string>
                                 <string name="proxy-Id name">"ID_MCHARGE_TEXTCTRL"</string>
                                 <long name="proxy-Id value">10109</long>
                                 <string name="proxy-Class">"wxTextCtrl"</string>
@@ -12398,6 +12399,7 @@ along the chosen normal mode."</string>
                                 <long name="locked">0</long>
                                 <string name="created">"17/7/2006"</string>
                                 <string name="proxy-type">"wbTextCtrlProxy"</string>
+                                <string name="event-handler-0">"wxEVT_COMMAND_TEXT_UPDATED|OnMultTextctrlUpdated"</string>
                                 <string name="proxy-Id name">"ID_MULT_TEXTCTRL"</string>
                                 <long name="proxy-Id value">10110</long>
                                 <string name="proxy-Class">"wxTextCtrl"</string>
@@ -12701,6 +12703,7 @@ along the chosen normal mode."</string>
                                 <long name="locked">0</long>
                                 <string name="created">"17/7/2006"</string>
                                 <string name="proxy-type">"wbTextCtrlProxy"</string>
+                                <string name="event-handler-0">"wxEVT_COMMAND_TEXT_UPDATED|OnMaxitTextctrlUpdated"</string>
                                 <string name="proxy-Id name">"ID_MAXIT_TEXTCTRL"</string>
                                 <long name="proxy-Id value">10112</long>
                                 <string name="proxy-Class">"wxTextCtrl"</string>
