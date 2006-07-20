@@ -126,17 +126,19 @@ class wxSpinCtrl;
 #define ID_UHF_NO_CHECK 10142
 #define ID_SCF_CONV_SPIN 10126
 #define ID_IBSTATPOINTPANEL 10152
-#define ID_TEXTCTRL16 10153
-#define ID_TEXTCTRL17 10154
-#define ID_CHOICE23 10155
-#define ID_TEXTCTRL18 10159
-#define ID_TEXTCTRL19 10160
-#define ID_TEXTCTRL20 10161
-#define ID_CHECKBOX25 10157
-#define ID_CHECKBOX26 10158
-#define ID_RADIOBOX3 10162
-#define ID_TEXTCTRL21 10163
-#define ID_CHECKBOX24 10156
+#define ID_MAXSTEPCOUNT_EDIT 10153
+#define ID_GRADCONVCRITERIA_EDIT 10154
+#define ID_OPTMETHOD_CHOICE 10155
+#define ID_INITSTEPSIZE_EDIT 10159
+#define ID_MINSTEPSIZE_EDIT 10160
+#define ID_MAXSTEPSIZE_CHECK 10161
+#define ID_UPDATESTEPSIZE_CHECK 10157
+#define ID_STATPT_CHECK 10158
+#define ID_STATPT_JUMP_EDIT 10239
+#define ID_INIT_HESS_RADIO 10162
+#define ID_HESS_RECALC_EDIT 10163
+#define ID_STATPT_MODE_EDIT 10240
+#define ID_PRINTORBS_CHECK 10156
 #define ID_SUMMARYPANEL 10229
 #define ID_SUMMARY_TITLE 10231
 #define ID_SUMMARY_BASISSET 10232
@@ -348,6 +350,45 @@ public:
     /// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_SCF_CONV_SPIN
     void OnScfConvSpinUpdated( wxSpinEvent& event );
 
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MAXSTEPCOUNT_EDIT
+    void OnMaxstepcountEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_GRADCONVCRITERIA_EDIT
+    void OnGradconvcriteriaEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_OPTMETHOD_CHOICE
+    void OnOptmethodChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_INITSTEPSIZE_EDIT
+    void OnInitstepsizeEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MINSTEPSIZE_EDIT
+    void OnMinstepsizeEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MAXSTEPSIZE_CHECK
+    void OnMaxstepsizeEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_UPDATESTEPSIZE_CHECK
+    void OnUpdatestepsizeCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_STATPT_CHECK
+    void OnStatptCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_STATPT_JUMP_EDIT
+    void OnStatptJumpEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_INIT_HESS_RADIO
+    void OnInitHessRadioSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_HESS_RECALC_EDIT
+    void OnHessRecalcEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_STATPT_MODE_EDIT
+    void OnStatptModeEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PRINTORBS_CHECK
+    void OnPrintorbsCheckClick( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
     void OnDefaultsbuttonClick( wxCommandEvent& event );
 
@@ -449,6 +490,19 @@ public:
     wxCheckBox* mFDiffCheck;
     wxCheckBox* mUHFNOCheck;
     wxSpinCtrl* mSCFConvSpin;
+    wxTextCtrl* mMaxStepCountEdit;
+    wxTextCtrl* mGradConvEdit;
+    wxUglyChoice* mOptMethodChoice;
+    wxTextCtrl* mInitStepSizeEdit;
+    wxTextCtrl* mMinStepSizeEdit;
+    wxTextCtrl* mMaxStepSizeEdit;
+    wxCheckBox* mUpdateStepSizeCheck;
+    wxCheckBox* mIsStatPtCheck;
+    wxTextCtrl* mStatPtJumpSizeEdit;
+    wxRadioBox* mInitHessRadio;
+    wxTextCtrl* mHessRecalcEdit;
+    wxTextCtrl* mStatPtModeEdit;
+    wxCheckBox* mPrintOrbsCheck;
     wxTextCtrl* mTitleText;
     wxTextCtrl* mBasisSetText;
     wxTextCtrl* mSCFTypeText;
