@@ -2891,7 +2891,7 @@ void HessianGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	File->WriteLine(" $FORCE ", false);
 		//Method
 	if (method) File->WriteLine("METHOD=ANALYTIC ", false);
-	else File->WriteLine("METHOD=NUMERIC ", false);
+	else File->WriteLine("METHOD=SEMINUM ", false);
 	if (!method) {
 			//NVIB
 		if (GetDoubleDiff()) {

@@ -16065,7 +16065,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         <bool name="proxy-wxFIXED_MINSIZE">0</bool>
                         <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                         <document>
-                          <string name="title">"wxRadioBox: ID_RADIOBOX"</string>
+                          <string name="title">"wxRadioBox: ID_HESSMETHOD_RADIO"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"radiobox"</string>
@@ -16075,16 +16075,17 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                           <long name="locked">0</long>
                           <string name="created">"17/7/2006"</string>
                           <string name="proxy-type">"wbRadioBoxProxy"</string>
-                          <string name="proxy-Id name">"ID_RADIOBOX"</string>
+                          <string name="event-handler-0">"wxEVT_COMMAND_RADIOBOX_SELECTED|OnHessmethodRadioSelected"</string>
+                          <string name="proxy-Id name">"ID_HESSMETHOD_RADIO"</string>
                           <long name="proxy-Id value">10145</long>
                           <string name="proxy-Class">"wxRadioBox"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"mHessMethodRadio"</string>
                           <string name="proxy-Label">"Method"</string>
                           <long name="proxy-Major dimension count">1</long>
                           <string name="proxy-Items">"Analytic|Numeric"</string>
                           <long name="proxy-Initial value">0</long>
                           <string name="proxy-Help text">""</string>
-                          <string name="proxy-Tooltip text">""</string>
+                          <string name="proxy-Tooltip text">"$FORCE:METHOD - Choose Numerical to compute the 2nd derivative of the energy numerically by repeated energy and gradient evaluations. Generally you should use numeric hessians only when analytic versions are not available or are to expensive."</string>
                           <string name="proxy-Background colour">""</string>
                           <string name="proxy-Foreground colour">""</string>
                           <string name="proxy-Font">""</string>
@@ -16202,7 +16203,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Custom ctor arguments">""</string>
                           </document>
                           <document>
-                            <string name="title">"wxTextCtrl: ID_TEXTCTRL15"</string>
+                            <string name="title">"wxTextCtrl: ID_FORCEDISPLACE_EDIT"</string>
                             <string name="type">"dialog-control-document"</string>
                             <string name="filename">""</string>
                             <string name="icon-name">"textctrl"</string>
@@ -16212,14 +16213,15 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <long name="locked">0</long>
                             <string name="created">"17/7/2006"</string>
                             <string name="proxy-type">"wbTextCtrlProxy"</string>
-                            <string name="proxy-Id name">"ID_TEXTCTRL15"</string>
+                            <string name="event-handler-0">"wxEVT_COMMAND_TEXT_UPDATED|OnForcedisplaceEditUpdated"</string>
+                            <string name="proxy-Id name">"ID_FORCEDISPLACE_EDIT"</string>
                             <long name="proxy-Id value">10151</long>
                             <string name="proxy-Class">"wxTextCtrl"</string>
-                            <string name="proxy-Member variable name">""</string>
+                            <string name="proxy-Member variable name">"mHESSDisplaceEdit"</string>
                             <string name="proxy-Initial value">""</string>
                             <long name="proxy-Max length">0</long>
                             <string name="proxy-Help text">""</string>
-                            <string name="proxy-Tooltip text">""</string>
+                            <string name="proxy-Tooltip text">"$FORCE:VIBSIZ Enter a value (in Bohrs) for the size of the displacement for numerical hessians. (default is 0.01)"</string>
                             <string name="proxy-Background colour">""</string>
                             <string name="proxy-Foreground colour">""</string>
                             <string name="proxy-Font">""</string>
@@ -16274,7 +16276,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         </document>
                       </document>
                       <document>
-                        <string name="title">"wxCheckBox: ID_CHECKBOX20"</string>
+                        <string name="title">"wxCheckBox: ID_HESSDOUBLEDIFFCHECK"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
                         <string name="icon-name">"checkbox"</string>
@@ -16284,14 +16286,15 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         <long name="locked">0</long>
                         <string name="created">"17/7/2006"</string>
                         <string name="proxy-type">"wbCheckBoxProxy"</string>
-                        <string name="proxy-Id name">"ID_CHECKBOX20"</string>
+                        <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnHessdoublediffcheckClick"</string>
+                        <string name="proxy-Id name">"ID_HESSDOUBLEDIFFCHECK"</string>
                         <long name="proxy-Id value">10146</long>
                         <string name="proxy-Class">"wxCheckBox"</string>
-                        <string name="proxy-Member variable name">""</string>
+                        <string name="proxy-Member variable name">"mHessDblDiffCheck"</string>
                         <string name="proxy-Label">"Double differenced hessian"</string>
                         <bool name="proxy-Initial value">0</bool>
                         <string name="proxy-Help text">""</string>
-                        <string name="proxy-Tooltip text">""</string>
+                        <string name="proxy-Tooltip text">"$FORCE:NVIB - Click to double difference the numeric hessian. This will nearly double the number of energy and gradients needed, but will give better accuracy. Recomended for transition state searchs."</string>
                         <string name="proxy-Data variable">""</string>
                         <string name="proxy-Data validator">""</string>
                         <string name="proxy-Background colour">""</string>
@@ -16327,7 +16330,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         <string name="proxy-Custom ctor arguments">""</string>
                       </document>
                       <document>
-                        <string name="title">"wxCheckBox: ID_CHECKBOX21"</string>
+                        <string name="title">"wxCheckBox: ID_HESSPURIFYCHECK"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
                         <string name="icon-name">"checkbox"</string>
@@ -16337,14 +16340,15 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         <long name="locked">0</long>
                         <string name="created">"17/7/2006"</string>
                         <string name="proxy-type">"wbCheckBoxProxy"</string>
-                        <string name="proxy-Id name">"ID_CHECKBOX21"</string>
+                        <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnHesspurifycheckClick"</string>
+                        <string name="proxy-Id name">"ID_HESSPURIFYCHECK"</string>
                         <long name="proxy-Id value">10147</long>
                         <string name="proxy-Class">"wxCheckBox"</string>
-                        <string name="proxy-Member variable name">""</string>
+                        <string name="proxy-Member variable name">"mHessPurifyCheck"</string>
                         <string name="proxy-Label">"Purify hessian"</string>
                         <bool name="proxy-Initial value">0</bool>
                         <string name="proxy-Help text">""</string>
-                        <string name="proxy-Tooltip text">""</string>
+                        <string name="proxy-Tooltip text">"$FORCE:PURIFY - Click to transform the hessian to internal coordinates and then back to remove any rotations or translations."</string>
                         <string name="proxy-Data variable">""</string>
                         <string name="proxy-Data validator">""</string>
                         <string name="proxy-Background colour">""</string>
@@ -16380,7 +16384,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         <string name="proxy-Custom ctor arguments">""</string>
                       </document>
                       <document>
-                        <string name="title">"wxCheckBox: ID_CHECKBOX22"</string>
+                        <string name="title">"wxCheckBox: ID_HESSPRTINTFC_CHECK"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
                         <string name="icon-name">"checkbox"</string>
@@ -16390,14 +16394,15 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         <long name="locked">0</long>
                         <string name="created">"17/7/2006"</string>
                         <string name="proxy-type">"wbCheckBoxProxy"</string>
-                        <string name="proxy-Id name">"ID_CHECKBOX22"</string>
+                        <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnHessprtintfcCheckClick"</string>
+                        <string name="proxy-Id name">"ID_HESSPRTINTFC_CHECK"</string>
                         <long name="proxy-Id value">10148</long>
                         <string name="proxy-Class">"wxCheckBox"</string>
-                        <string name="proxy-Member variable name">""</string>
+                        <string name="proxy-Member variable name">"mHessPrintIntFCCheck"</string>
                         <string name="proxy-Label">"Print internal force constants"</string>
                         <bool name="proxy-Initial value">0</bool>
                         <string name="proxy-Help text">""</string>
-                        <string name="proxy-Tooltip text">""</string>
+                        <string name="proxy-Tooltip text">"$FORCE:PRTIFC - Click to print out the internal coordinate force constants."</string>
                         <string name="proxy-Data variable">""</string>
                         <string name="proxy-Data validator">""</string>
                         <string name="proxy-Background colour">""</string>
@@ -16433,7 +16438,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         <string name="proxy-Custom ctor arguments">""</string>
                       </document>
                       <document>
-                        <string name="title">"wxCheckBox: ID_CHECKBOX23"</string>
+                        <string name="title">"wxCheckBox: ID_HESSVIBANL_CHECK"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
                         <string name="icon-name">"checkbox"</string>
@@ -16443,14 +16448,15 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         <long name="locked">0</long>
                         <string name="created">"17/7/2006"</string>
                         <string name="proxy-type">"wbCheckBoxProxy"</string>
-                        <string name="proxy-Id name">"ID_CHECKBOX23"</string>
+                        <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnHessvibanlCheckClick"</string>
+                        <string name="proxy-Id name">"ID_HESSVIBANL_CHECK"</string>
                         <long name="proxy-Id value">10149</long>
                         <string name="proxy-Class">"wxCheckBox"</string>
-                        <string name="proxy-Member variable name">""</string>
+                        <string name="proxy-Member variable name">"mHessVibAnlCheck"</string>
                         <string name="proxy-Label">"Vibrational Analysis"</string>
                         <bool name="proxy-Initial value">0</bool>
                         <string name="proxy-Help text">""</string>
-                        <string name="proxy-Tooltip text">""</string>
+                        <string name="proxy-Tooltip text">"$FORCE:VIBANL - Click to perform vibrational analysis. This is very inexpensive once the force constant matrix is known."</string>
                         <string name="proxy-Data variable">""</string>
                         <string name="proxy-Data validator">""</string>
                         <string name="proxy-Background colour">""</string>
@@ -16570,7 +16576,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                           <string name="proxy-Custom ctor arguments">""</string>
                         </document>
                         <document>
-                          <string name="title">"wxTextCtrl: ID_TEXTCTRL14"</string>
+                          <string name="title">"wxTextCtrl: ID_HESSFREQSCALE_EDIT"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"textctrl"</string>
@@ -16580,14 +16586,15 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                           <long name="locked">0</long>
                           <string name="created">"17/7/2006"</string>
                           <string name="proxy-type">"wbTextCtrlProxy"</string>
-                          <string name="proxy-Id name">"ID_TEXTCTRL14"</string>
+                          <string name="event-handler-0">"wxEVT_COMMAND_TEXT_UPDATED|OnHessfreqscaleEditUpdated"</string>
+                          <string name="proxy-Id name">"ID_HESSFREQSCALE_EDIT"</string>
                           <long name="proxy-Id value">10150</long>
                           <string name="proxy-Class">"wxTextCtrl"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"mHessFreqScaleEdit"</string>
                           <string name="proxy-Initial value">""</string>
                           <long name="proxy-Max length">0</long>
                           <string name="proxy-Help text">""</string>
-                          <string name="proxy-Tooltip text">""</string>
+                          <string name="proxy-Tooltip text">"$FORCE:SCLFAC Enter a floating point value representing the frequency scaling factor to use for the thermochemical analysis. (unscaled frequencies are always printed)."</string>
                           <string name="proxy-Background colour">""</string>
                           <string name="proxy-Foreground colour">""</string>
                           <string name="proxy-Font">""</string>

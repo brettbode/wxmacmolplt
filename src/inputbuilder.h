@@ -102,13 +102,13 @@ class wxSpinCtrl;
 #define ID_PRINTINITGUESS_CHECKBOX 10133
 #define ID_ROTORBITALS_CHECKBOX 10134
 #define ID_IBHESSOPTSPANEL 10144
-#define ID_RADIOBOX 10145
-#define ID_TEXTCTRL15 10151
-#define ID_CHECKBOX20 10146
-#define ID_CHECKBOX21 10147
-#define ID_CHECKBOX22 10148
-#define ID_CHECKBOX23 10149
-#define ID_TEXTCTRL14 10150
+#define ID_HESSMETHOD_RADIO 10145
+#define ID_FORCEDISPLACE_EDIT 10151
+#define ID_HESSDOUBLEDIFFCHECK 10146
+#define ID_HESSPURIFYCHECK 10147
+#define ID_HESSPRTINTFC_CHECK 10148
+#define ID_HESSVIBANL_CHECK 10149
+#define ID_HESSFREQSCALE_EDIT 10150
 #define ID_IBMISCPANEL 10096
 #define ID_MOLPLT_CHECK 10136
 #define ID_PLTORB_CHECK 10137
@@ -335,6 +335,27 @@ public:
     /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_ROTORBITALS_CHECKBOX
     void OnRotorbitalsCheckboxClick( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_HESSMETHOD_RADIO
+    void OnHessmethodRadioSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_FORCEDISPLACE_EDIT
+    void OnForcedisplaceEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSDOUBLEDIFFCHECK
+    void OnHessdoublediffcheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSPURIFYCHECK
+    void OnHesspurifycheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSPRTINTFC_CHECK
+    void OnHessprtintfcCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSVIBANL_CHECK
+    void OnHessvibanlCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_HESSFREQSCALE_EDIT
+    void OnHessfreqscaleEditUpdated( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_MOLPLT_CHECK
     void OnMolpltCheckClick( wxCommandEvent& event );
 
@@ -516,6 +537,13 @@ public:
     wxTextCtrl* mVecOrbCountText;
     wxCheckBox* printInitGuessCheck;
     wxCheckBox* rotOrbitalsCheck;
+    wxRadioBox* mHessMethodRadio;
+    wxTextCtrl* mHESSDisplaceEdit;
+    wxCheckBox* mHessDblDiffCheck;
+    wxCheckBox* mHessPurifyCheck;
+    wxCheckBox* mHessPrintIntFCCheck;
+    wxCheckBox* mHessVibAnlCheck;
+    wxTextCtrl* mHessFreqScaleEdit;
     wxCheckBox* mMolPltCheck;
     wxCheckBox* mPltOrbCheck;
     wxCheckBox* aimpacCheck;

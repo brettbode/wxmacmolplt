@@ -139,6 +139,20 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 
     EVT_CHECKBOX( ID_ROTORBITALS_CHECKBOX, InputBuilderWindow::OnRotorbitalsCheckboxClick )
 
+    EVT_RADIOBOX( ID_HESSMETHOD_RADIO, InputBuilderWindow::OnHessmethodRadioSelected )
+
+    EVT_TEXT( ID_FORCEDISPLACE_EDIT, InputBuilderWindow::OnForcedisplaceEditUpdated )
+
+    EVT_CHECKBOX( ID_HESSDOUBLEDIFFCHECK, InputBuilderWindow::OnHessdoublediffcheckClick )
+
+    EVT_CHECKBOX( ID_HESSPURIFYCHECK, InputBuilderWindow::OnHesspurifycheckClick )
+
+    EVT_CHECKBOX( ID_HESSPRTINTFC_CHECK, InputBuilderWindow::OnHessprtintfcCheckClick )
+
+    EVT_CHECKBOX( ID_HESSVIBANL_CHECK, InputBuilderWindow::OnHessvibanlCheckClick )
+
+    EVT_TEXT( ID_HESSFREQSCALE_EDIT, InputBuilderWindow::OnHessfreqscaleEditUpdated )
+
     EVT_CHECKBOX( ID_MOLPLT_CHECK, InputBuilderWindow::OnMolpltCheckClick )
 
     EVT_CHECKBOX( ID_PLTORB_CHECK, InputBuilderWindow::OnPltorbCheckClick )
@@ -290,6 +304,13 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     mVecOrbCountText = NULL;
     printInitGuessCheck = NULL;
     rotOrbitalsCheck = NULL;
+    mHessMethodRadio = NULL;
+    mHESSDisplaceEdit = NULL;
+    mHessDblDiffCheck = NULL;
+    mHessPurifyCheck = NULL;
+    mHessPrintIntFCCheck = NULL;
+    mHessVibAnlCheck = NULL;
+    mHessFreqScaleEdit = NULL;
     mMolPltCheck = NULL;
     mPltOrbCheck = NULL;
     aimpacCheck = NULL;
@@ -990,45 +1011,59 @@ void InputBuilderWindow::CreateControls()
 
     wxBoxSizer* itemBoxSizer117 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer116->Add(itemBoxSizer117, 0, wxALIGN_LEFT, 5);
-    wxString itemRadioBox118Strings[] = {
+    wxString mHessMethodRadioStrings[] = {
         _("Analytic"),
         _("Numeric")
     };
-    wxRadioBox* itemRadioBox118 = new wxRadioBox( itemPanel115, ID_RADIOBOX, _("Method"), wxDefaultPosition, wxDefaultSize, 2, itemRadioBox118Strings, 1, wxRA_SPECIFY_COLS );
-    itemRadioBox118->SetSelection(0);
-    itemBoxSizer117->Add(itemRadioBox118, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mHessMethodRadio = new wxRadioBox( itemPanel115, ID_HESSMETHOD_RADIO, _("Method"), wxDefaultPosition, wxDefaultSize, 2, mHessMethodRadioStrings, 1, wxRA_SPECIFY_COLS );
+    mHessMethodRadio->SetSelection(0);
+    if (ShowToolTips())
+        mHessMethodRadio->SetToolTip(_("$FORCE:METHOD - Choose Numerical to compute the 2nd derivative of the energy numerically by repeated energy and gradient evaluations. Generally you should use numeric hessians only when analytic versions are not available or are to expensive."));
+    itemBoxSizer117->Add(mHessMethodRadio, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxBoxSizer* itemBoxSizer119 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer117->Add(itemBoxSizer119, 0, wxALIGN_TOP|wxALL, 5);
     wxStaticText* itemStaticText120 = new wxStaticText( itemPanel115, wxID_STATIC, _("Displacement size (bohrs):"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer119->Add(itemStaticText120, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl121 = new wxTextCtrl( itemPanel115, ID_TEXTCTRL15, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer119->Add(itemTextCtrl121, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mHESSDisplaceEdit = new wxTextCtrl( itemPanel115, ID_FORCEDISPLACE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    if (ShowToolTips())
+        mHESSDisplaceEdit->SetToolTip(_("$FORCE:VIBSIZ Enter a value (in Bohrs) for the size of the displacement for numerical hessians. (default is 0.01)"));
+    itemBoxSizer119->Add(mHESSDisplaceEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxCheckBox* itemCheckBox122 = new wxCheckBox( itemPanel115, ID_CHECKBOX20, _("Double differenced hessian"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox122->SetValue(false);
-    itemBoxSizer116->Add(itemCheckBox122, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
+    mHessDblDiffCheck = new wxCheckBox( itemPanel115, ID_HESSDOUBLEDIFFCHECK, _("Double differenced hessian"), wxDefaultPosition, wxDefaultSize, 0 );
+    mHessDblDiffCheck->SetValue(false);
+    if (ShowToolTips())
+        mHessDblDiffCheck->SetToolTip(_("$FORCE:NVIB - Click to double difference the numeric hessian. This will nearly double the number of energy and gradients needed, but will give better accuracy. Recomended for transition state searchs."));
+    itemBoxSizer116->Add(mHessDblDiffCheck, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxCheckBox* itemCheckBox123 = new wxCheckBox( itemPanel115, ID_CHECKBOX21, _("Purify hessian"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox123->SetValue(false);
-    itemBoxSizer116->Add(itemCheckBox123, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
+    mHessPurifyCheck = new wxCheckBox( itemPanel115, ID_HESSPURIFYCHECK, _("Purify hessian"), wxDefaultPosition, wxDefaultSize, 0 );
+    mHessPurifyCheck->SetValue(false);
+    if (ShowToolTips())
+        mHessPurifyCheck->SetToolTip(_("$FORCE:PURIFY - Click to transform the hessian to internal coordinates and then back to remove any rotations or translations."));
+    itemBoxSizer116->Add(mHessPurifyCheck, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxCheckBox* itemCheckBox124 = new wxCheckBox( itemPanel115, ID_CHECKBOX22, _("Print internal force constants"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox124->SetValue(false);
-    itemBoxSizer116->Add(itemCheckBox124, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
+    mHessPrintIntFCCheck = new wxCheckBox( itemPanel115, ID_HESSPRTINTFC_CHECK, _("Print internal force constants"), wxDefaultPosition, wxDefaultSize, 0 );
+    mHessPrintIntFCCheck->SetValue(false);
+    if (ShowToolTips())
+        mHessPrintIntFCCheck->SetToolTip(_("$FORCE:PRTIFC - Click to print out the internal coordinate force constants."));
+    itemBoxSizer116->Add(mHessPrintIntFCCheck, 0, wxGROW|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxCheckBox* itemCheckBox125 = new wxCheckBox( itemPanel115, ID_CHECKBOX23, _("Vibrational Analysis"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox125->SetValue(false);
-    itemBoxSizer116->Add(itemCheckBox125, 0, wxGROW|wxALL, 5);
+    mHessVibAnlCheck = new wxCheckBox( itemPanel115, ID_HESSVIBANL_CHECK, _("Vibrational Analysis"), wxDefaultPosition, wxDefaultSize, 0 );
+    mHessVibAnlCheck->SetValue(false);
+    if (ShowToolTips())
+        mHessVibAnlCheck->SetToolTip(_("$FORCE:VIBANL - Click to perform vibrational analysis. This is very inexpensive once the force constant matrix is known."));
+    itemBoxSizer116->Add(mHessVibAnlCheck, 0, wxGROW|wxALL, 5);
 
     wxBoxSizer* itemBoxSizer126 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer116->Add(itemBoxSizer126, 0, wxGROW, 5);
     wxStaticText* itemStaticText127 = new wxStaticText( itemPanel115, wxID_STATIC, _("Frequency scale factor:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer126->Add(itemStaticText127, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxTextCtrl* itemTextCtrl128 = new wxTextCtrl( itemPanel115, ID_TEXTCTRL14, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer126->Add(itemTextCtrl128, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mHessFreqScaleEdit = new wxTextCtrl( itemPanel115, ID_HESSFREQSCALE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    if (ShowToolTips())
+        mHessFreqScaleEdit->SetToolTip(_("$FORCE:SCLFAC Enter a floating point value representing the frequency scaling factor to use for the thermochemical analysis. (unscaled frequencies are always printed)."));
+    itemBoxSizer126->Add(mHessFreqScaleEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     listBook->AddPage(itemPanel115, _("Hess. Options"));
 
@@ -1496,6 +1531,9 @@ void InputBuilderWindow::SetupItems() {
 
 	setPaneVisible(STATPOINT_PANE, ((TmpInputRec->Control->GetRunType() == 4)||(TmpInputRec->Control->GetRunType() == 6)));
 	setPaneVisible(MP2OPTS_PANE, (TmpInputRec->Control->GetMPLevel() == 2));
+	setPaneVisible(HESSOPTS_PANE, (TmpInputRec->Control->GetRunType() == 3)||(
+				((TmpInputRec->Control->GetRunType() == 3)||(TmpInputRec->Control->GetRunType() == 6))&&
+					(TmpInputRec->StatPt->GetHessMethod() == 3)));
 }
 
 void InputBuilderWindow::SetupBasisItems() {
@@ -1879,7 +1917,41 @@ void InputBuilderWindow::SetupMOGuessItems() {
 }
 
 void InputBuilderWindow::SetupHessOptsItems() {
-    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	if (!TmpInputRec->Hessian) TmpInputRec->Hessian = new HessianGroup;
+
+	bool AnalyticPoss = (((TmpInputRec->Control->GetSCFType() == 1)||(TmpInputRec->Control->GetSCFType() == 3)||
+							 (TmpInputRec->Control->GetSCFType() == 4)||(TmpInputRec->Control->GetSCFType() == 0))&&
+							(TmpInputRec->Control->GetMPLevel() == 0));
+	
+	bool AnalyticSelected = TmpInputRec->Hessian->GetAnalyticMethod() && AnalyticPoss;
+	mHessMethodRadio->Enable(AnalyticPoss);
+	if (AnalyticSelected) mHessMethodRadio->SetSelection(0);
+	else mHessMethodRadio->SetSelection(1);
+	//Double difference
+	mHessDblDiffCheck->Enable(!AnalyticSelected);
+	mHessDblDiffCheck->SetValue(TmpInputRec->Hessian->GetDoubleDiff());
+	//Purify
+	mHessPurifyCheck->Enable((TmpInputRec->Data->GetNumZVar() > 0));
+	mHessPurifyCheck->SetValue(TmpInputRec->Hessian->GetPurify());
+	//Print FC
+	mHessPrintIntFCCheck->Enable((TmpInputRec->Data->GetNumZVar() > 0));
+	mHessPrintIntFCCheck->SetValue(TmpInputRec->Hessian->GetPrintFC());
+	//vibartional analysis
+	mHessVibAnlCheck->SetValue(TmpInputRec->Hessian->GetVibAnalysis());
+	//frequency scale factor
+	mHessFreqScaleEdit->Enable(TmpInputRec->Hessian->GetVibAnalysis());
+	if (TmpInputRec->Hessian->GetVibAnalysis()) {
+		wxString temp;
+		temp.Printf(wxT("%f"), TmpInputRec->Hessian->GetFreqScale());
+		mHessFreqScaleEdit->SetValue(temp);
+	}
+	//displacement
+	mHESSDisplaceEdit->Enable(!AnalyticSelected);
+	if (!AnalyticSelected) {
+		wxString temp;
+		temp.Printf(wxT("%f"), TmpInputRec->Hessian->GetDisplacementSize());
+		mHESSDisplaceEdit->SetValue(temp);
+	}
 }
 
 void InputBuilderWindow::SetupMiscPrefsItems() {
@@ -2572,6 +2644,9 @@ void InputBuilderWindow::OnSymmetryCheckboxClick( wxCommandEvent& event )
 void InputBuilderWindow::OnIblistbookPageChanged( wxListbookEvent& event )
 {
 	switch (getPaneAtPosition(event.GetSelection())) {
+		case HESSOPTS_PANE:
+			SetupHessOptsItems();
+			break;
 		case SUMMARY_PANE:
 			SetupSummaryItems();
 			break;
@@ -3306,4 +3381,85 @@ void InputBuilderWindow::OnGridfreeFunctionalChoiceSelected( wxCommandEvent& eve
 {
     TmpInputRec->DFT->SetFunctional(dftGridFreeFuncChoice->GetSelection() + 1);
 }
+
+/*!
+ * wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_HESSMETHOD_RADIO
+ */
+
+void InputBuilderWindow::OnHessmethodRadioSelected( wxCommandEvent& event )
+{
+	TmpInputRec->Hessian->SetAnalyticMethod(!(mHessMethodRadio->GetSelection()));
+	SetupHessOptsItems();
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_TEXT_UPDATED event handler for ID_FORCEDISPLACE_EDIT
+ */
+
+void InputBuilderWindow::OnForcedisplaceEditUpdated( wxCommandEvent& event )
+{
+    wxString tmpStr = mHESSDisplaceEdit->GetValue();
+    double val;
+    if(tmpStr.ToDouble(&val)) {
+        TmpInputRec->Hessian->SetDisplacementSize(val);
+    }
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSDOUBLEDIFFCHECK
+ */
+
+void InputBuilderWindow::OnHessdoublediffcheckClick( wxCommandEvent& event )
+{
+	TmpInputRec->Hessian->SetDoubleDiff(mHessDblDiffCheck->GetValue());
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSPURIFYCHECK
+ */
+
+void InputBuilderWindow::OnHesspurifycheckClick( wxCommandEvent& event )
+{
+	TmpInputRec->Hessian->SetPurify(mHessPurifyCheck->GetValue());
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSPRTINTFC_CHECK
+ */
+
+void InputBuilderWindow::OnHessprtintfcCheckClick( wxCommandEvent& event )
+{
+	TmpInputRec->Hessian->SetPrintFC(mHessPrintIntFCCheck->GetValue());
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSVIBANL_CHECK
+ */
+
+void InputBuilderWindow::OnHessvibanlCheckClick( wxCommandEvent& event )
+{
+	TmpInputRec->Hessian->SetVibAnalysis(mHessVibAnlCheck->GetValue());
+	SetupHessOptsItems();
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_TEXT_UPDATED event handler for ID_HESSFREQSCALE_EDIT
+ */
+
+void InputBuilderWindow::OnHessfreqscaleEditUpdated( wxCommandEvent& event )
+{
+    wxString tmpStr = mHessFreqScaleEdit->GetValue();
+    double val;
+    if(tmpStr.ToDouble(&val)) {
+        TmpInputRec->Hessian->SetFreqScale(val);
+    }
+    event.Skip();
+}
+
 
