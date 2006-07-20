@@ -199,7 +199,7 @@ class MolDisplayWin : public wxFrame {
         void CloseSurfacesWindow(void);
         void CloseInputBuilderWindow(void);
         void CloseZMatrixCalc(void);
-		void MolDisplayWin::OnActivate(wxActivateEvent & event);
+		void OnActivate(wxActivateEvent & event);
         
         //File handling routines
         long OpenFile(wxString fileName, float offset=0.0, bool flip=false, bool append=false);

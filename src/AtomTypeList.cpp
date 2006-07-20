@@ -54,3 +54,4 @@ bool AtomTypeList::IsAtomInList(long atomType) const {
 	}
 	return result;
 }
+

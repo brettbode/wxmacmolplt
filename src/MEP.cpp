@@ -791,3 +791,4 @@ void OrbitalRec::GetAODensityMatrix(float * AODensityArray, long NumOccAlpha, lo
 		delete OccupancyA;
 	if (OccupancyB) delete OccupancyB;
 }
+

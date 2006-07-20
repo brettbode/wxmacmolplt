@@ -18,6 +18,7 @@
 
 typedef class AtomTypeList AtomTypeList;
 typedef class WindowData WindowData;
+typedef class MolDisplayWin MolDisplayWin;
 
 class MoleculeData {
 		friend class MolDisplayWin;
