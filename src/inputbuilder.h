@@ -92,7 +92,8 @@ class wxSpinCtrl;
 #define ID_EXTERNDATAREP_CHECKBOX 10131
 #define ID_IBDFTPANEL 10181
 #define ID_DFTMETHOD_CHOICE 10183
-#define ID_FUNCTIONAL_CHOICE 10184
+#define ID_GRID_FUNCTIONAL_CHOICE 10184
+#define ID_GRIDFREE_FUNCTIONAL_CHOICE 10184
 #define ID_IBMOGUESSPANEL 10095
 #define ID_INITGUESS_CHOICE 10132
 #define ID_MOGUESS_VECSOURCE_CHOICE 10124
@@ -308,6 +309,15 @@ public:
     /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_EXTERNDATAREP_CHECKBOX
     void OnExterndatarepCheckboxClick( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_DFTMETHOD_CHOICE
+    void OnDftmethodChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_GRID_FUNCTIONAL_CHOICE
+    void OnGridFunctionalChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_GRIDFREE_FUNCTIONAL_CHOICE
+    void OnGridfreeFunctionalChoiceSelected( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_INITGUESS_CHOICE
     void OnInitguessChoiceSelected( wxCommandEvent& event );
 
@@ -475,7 +485,8 @@ public:
     wxRadioBox* plBalanceRadio;
     wxCheckBox* externDataRepCheck;
     wxUglyChoice* dftMethodChoice;
-    wxUglyChoice* dftFuncChoice;
+    wxUglyChoice* dftGridFuncChoice;
+    wxUglyChoice* dftGridFreeFuncChoice;
     wxUglyChoice* initGuessChoice;
     wxUglyChoice* mMOSourceChoice;
     wxTextCtrl* mVecOrbCountText;
