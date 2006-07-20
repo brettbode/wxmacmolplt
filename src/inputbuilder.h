@@ -36,6 +36,7 @@
 ////@begin forward declarations
 class wxListbook;
 class wxUglyChoice;
+class wxBoxSizer;
 class wxSpinCtrl;
 ////@end forward declarations
 
@@ -485,6 +486,7 @@ public:
     wxRadioBox* plBalanceRadio;
     wxCheckBox* externDataRepCheck;
     wxUglyChoice* dftMethodChoice;
+    wxBoxSizer* funcSizer;
     wxUglyChoice* dftGridFuncChoice;
     wxUglyChoice* dftGridFreeFuncChoice;
     wxUglyChoice* initGuessChoice;

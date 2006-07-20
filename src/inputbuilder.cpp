@@ -268,6 +268,7 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     plBalanceRadio = NULL;
     externDataRepCheck = NULL;
     dftMethodChoice = NULL;
+    funcSizer = NULL;
     dftGridFuncChoice = NULL;
     dftGridFreeFuncChoice = NULL;
     initGuessChoice = NULL;
@@ -848,8 +849,8 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText98 = new wxStaticText( itemPanel93, wxID_STATIC, _("DFT Functional:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer95->Add(itemStaticText98, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxBoxSizer* itemBoxSizer99 = new wxBoxSizer(wxVERTICAL);
-    itemFlexGridSizer95->Add(itemBoxSizer99, 1, wxGROW|wxGROW, 5);
+    funcSizer = new wxBoxSizer(wxVERTICAL);
+    itemFlexGridSizer95->Add(funcSizer, 1, wxGROW|wxGROW, 5);
     wxString dftGridFuncChoiceStrings[] = {
         _("Slater exchange"),
         _("Becke 1988 exchange"),
@@ -875,7 +876,7 @@ void InputBuilderWindow::CreateControls()
     };
     dftGridFuncChoice = new wxUglyChoice( itemPanel93, ID_GRID_FUNCTIONAL_CHOICE, wxDefaultPosition, wxDefaultSize, 21, dftGridFuncChoiceStrings, 0 );
     dftGridFuncChoice->SetStringSelection(_("Slater exchange"));
-    itemBoxSizer99->Add(dftGridFuncChoice, 0, wxALIGN_LEFT|wxALL, 5);
+    funcSizer->Add(dftGridFuncChoice, 0, wxALIGN_LEFT|wxALL, 5);
 
     wxString dftGridFreeFuncChoiceStrings[] = {
         _("Slater exchange"),
@@ -902,7 +903,7 @@ void InputBuilderWindow::CreateControls()
     };
     dftGridFreeFuncChoice = new wxUglyChoice( itemPanel93, ID_GRIDFREE_FUNCTIONAL_CHOICE, wxDefaultPosition, wxDefaultSize, 21, dftGridFreeFuncChoiceStrings, 0 );
     dftGridFreeFuncChoice->SetStringSelection(_("Slater exchange"));
-    itemBoxSizer99->Add(dftGridFreeFuncChoice, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    funcSizer->Add(dftGridFreeFuncChoice, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     listBook->AddPage(itemPanel93, _("DFT"));
 
@@ -1732,11 +1733,13 @@ void InputBuilderWindow::SetupDFTItems() {
         dftGridFreeFuncChoice->Show(false);
         dftGridFuncChoice->Show(true);
         dftGridFuncChoice->SetSelection(TmpInputRec->DFT->GetFunctional() - 1);
+        funcSizer->Layout();
     }
     else {
         dftGridFuncChoice->Show(false);
         dftGridFreeFuncChoice->Show(true);
         dftGridFreeFuncChoice->SetSelection(TmpInputRec->DFT->GetFunctional() - 1);
+        funcSizer->Layout();
     }
 }
 

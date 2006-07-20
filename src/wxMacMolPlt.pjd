@@ -15205,7 +15205,7 @@ along the chosen normal mode."</string>
                           <string name="created">"20/7/2006"</string>
                           <string name="proxy-type">"wbBoxSizerProxy"</string>
                           <string name="proxy-Orientation">"Vertical"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"funcSizer"</string>
                           <string name="proxy-AlignH">"Expand"</string>
                           <string name="proxy-AlignV">"Expand"</string>
                           <long name="proxy-Stretch factor">1</long>
