@@ -92,10 +92,10 @@ void MpGLCanvas::initGL(void) {
 		//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
 		//but xcode is putting them in Resources.
 		pathname.Remove(pathname.Length() - 13);
-		pathname += "Resources";
+		pathname += wxT("Resources");
 #endif
 		
-	    pathname += "/arial1.glf";
+	    pathname += wxT("/arial1.glf");
 	    if (glfLoadFont((char*)pathname.c_str()) < 0)
 	      {
 		std::cout<<"Warning: font file not found!"<<std::endl;
