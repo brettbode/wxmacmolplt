@@ -107,11 +107,11 @@ class wxUglyChoice;
 #define ID_CHECKBOX23 10149
 #define ID_TEXTCTRL14 10150
 #define ID_IBMISCPANEL 10096
-#define ID_CHECKBOX13 10136
-#define ID_CHECKBOX14 10137
-#define ID_CHECKBOX15 10138
-#define ID_CHECKBOX16 10139
-#define ID_RADIOBOX1 10135
+#define ID_MOLPLT_CHECK 10136
+#define ID_PLTORB_CHECK 10137
+#define ID_AIMPAC_CHECK 10138
+#define ID_RPAC_CHECK 10139
+#define ID_MISC_PROG_RADIO 10135
 #define ID_IBMP2PANEL 10182
 #define ID_TEXTCTRL5 10185
 #define ID_TEXTCTRL7 10186
@@ -311,6 +311,21 @@ public:
     /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_ROTORBITALS_CHECKBOX
     void OnRotorbitalsCheckboxClick( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_MOLPLT_CHECK
+    void OnMolpltCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PLTORB_CHECK
+    void OnPltorbCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_AIMPAC_CHECK
+    void OnAimpacCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_RPAC_CHECK
+    void OnRpacCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_MISC_PROG_RADIO
+    void OnMiscProgRadioSelected( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
     void OnDefaultsbuttonClick( wxCommandEvent& event );
 
@@ -403,8 +418,11 @@ public:
     wxTextCtrl* mVecOrbCountText;
     wxCheckBox* printInitGuessCheck;
     wxCheckBox* rotOrbitalsCheck;
+    wxCheckBox* mMolPltCheck;
+    wxCheckBox* mPltOrbCheck;
     wxCheckBox* aimpacCheck;
     wxCheckBox* rpacCheck;
+    wxRadioBox* mMiscProgRadio;
     wxTextCtrl* mTitleText;
     wxTextCtrl* mBasisSetText;
     wxTextCtrl* mSCFTypeText;

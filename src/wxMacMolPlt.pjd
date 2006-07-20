@@ -6,7 +6,7 @@
     <string name="title">""</string>
     <string name="author">""</string>
     <string name="description">""</string>
-    <long name="doc_count">690</long>
+    <long name="doc_count">691</long>
     <string name="xrc_filename">""</string>
     <bool name="convert_images_to_xpm">0</bool>
     <bool name="inline_images">0</bool>
@@ -15449,7 +15449,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom styles">""</string>
                           <long name="proxy-X">-1</long>
                           <long name="proxy-Y">-1</long>
-                          <long name="proxy-Width">-1</long>
+                          <long name="proxy-Width">300</long>
                           <long name="proxy-Height">-1</long>
                           <string name="proxy-AlignH">"Centre"</string>
                           <string name="proxy-AlignV">"Centre"</string>
@@ -15584,7 +15584,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom styles">""</string>
                           <long name="proxy-X">-1</long>
                           <long name="proxy-Y">-1</long>
-                          <long name="proxy-Width">-1</long>
+                          <long name="proxy-Width">300</long>
                           <long name="proxy-Height">-1</long>
                           <string name="proxy-AlignH">"Centre"</string>
                           <string name="proxy-AlignV">"Centre"</string>
@@ -16651,6 +16651,65 @@ along the chosen normal mode."</string>
                       <bool name="proxy-wxFIXED_MINSIZE">0</bool>
                       <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                       <document>
+                        <string name="title">"wxStaticText: wxID_STATIC"</string>
+                        <string name="type">"dialog-control-document"</string>
+                        <string name="filename">""</string>
+                        <string name="icon-name">"statictext"</string>
+                        <long name="is-transient">0</long>
+                        <long name="owns-file">1</long>
+                        <long name="title-mode">0</long>
+                        <long name="locked">0</long>
+                        <string name="created">"19/7/2006"</string>
+                        <string name="proxy-type">"wbStaticTextProxy"</string>
+                        <string name="proxy-Id name">"wxID_STATIC"</string>
+                        <long name="proxy-Id value">5105</long>
+                        <string name="proxy-Class">"wxStaticText"</string>
+                        <string name="proxy-Member variable name">""</string>
+                        <string name="proxy-Label">"GAMESS interface to other codes."</string>
+                        <long name="proxy-Wrapping width">-1</long>
+                        <string name="proxy-Help text">""</string>
+                        <string name="proxy-Tooltip text">""</string>
+                        <string name="proxy-Background colour">""</string>
+                        <string name="proxy-Foreground colour">""</string>
+                        <string name="proxy-Font">""</string>
+                        <bool name="proxy-Hidden">0</bool>
+                        <bool name="proxy-Enabled">1</bool>
+                        <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                        <string name="proxy-Data variable">""</string>
+                        <string name="proxy-Data validator">""</string>
+                        <bool name="proxy-wxALIGN_LEFT">0</bool>
+                        <bool name="proxy-wxALIGN_RIGHT">0</bool>
+                        <bool name="proxy-wxALIGN_CENTRE">0</bool>
+                        <bool name="proxy-wxST_NO_AUTORESIZE">0</bool>
+                        <bool name="proxy-wxNO_BORDER">0</bool>
+                        <bool name="proxy-wxSIMPLE_BORDER">0</bool>
+                        <bool name="proxy-wxDOUBLE_BORDER">0</bool>
+                        <bool name="proxy-wxSUNKEN_BORDER">0</bool>
+                        <bool name="proxy-wxRAISED_BORDER">0</bool>
+                        <bool name="proxy-wxSTATIC_BORDER">0</bool>
+                        <bool name="proxy-wxWANTS_CHARS">0</bool>
+                        <bool name="proxy-wxNO_FULL_REPAINT_ON_RESIZE">0</bool>
+                        <bool name="proxy-wxFULL_REPAINT_ON_RESIZE">0</bool>
+                        <string name="proxy-Custom styles">""</string>
+                        <long name="proxy-X">-1</long>
+                        <long name="proxy-Y">-1</long>
+                        <long name="proxy-Width">-1</long>
+                        <long name="proxy-Height">-1</long>
+                        <string name="proxy-AlignH">"Left"</string>
+                        <string name="proxy-AlignV">"Centre"</string>
+                        <long name="proxy-Stretch factor">0</long>
+                        <long name="proxy-Border">5</long>
+                        <bool name="proxy-wxLEFT">1</bool>
+                        <bool name="proxy-wxRIGHT">1</bool>
+                        <bool name="proxy-wxTOP">1</bool>
+                        <bool name="proxy-wxBOTTOM">1</bool>
+                        <bool name="proxy-wxSHAPED">0</bool>
+                        <bool name="proxy-wxADJUST_MINSIZE">1</bool>
+                        <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+                        <string name="proxy-Custom arguments">""</string>
+                        <string name="proxy-Custom ctor arguments">""</string>
+                      </document>
+                      <document>
                         <string name="title">"wxStaticBoxSizer V"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
@@ -16659,7 +16718,7 @@ along the chosen normal mode."</string>
                         <long name="owns-file">1</long>
                         <long name="title-mode">0</long>
                         <long name="locked">0</long>
-                        <string name="created">"17/7/2006"</string>
+                        <string name="created">"19/7/2006"</string>
                         <string name="proxy-type">"wbStaticBoxSizerProxy"</string>
                         <string name="proxy-Id name">"wxID_ANY"</string>
                         <string name="proxy-Id value">"-1"</string>
@@ -16684,7 +16743,7 @@ along the chosen normal mode."</string>
                         <bool name="proxy-wxFIXED_MINSIZE">0</bool>
                         <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                         <document>
-                          <string name="title">"wxCheckBox: ID_CHECKBOX13"</string>
+                          <string name="title">"wxCheckBox: ID_MOLPLT_CHECK"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"checkbox"</string>
@@ -16692,12 +16751,13 @@ along the chosen normal mode."</string>
                           <long name="owns-file">1</long>
                           <long name="title-mode">0</long>
                           <long name="locked">0</long>
-                          <string name="created">"17/7/2006"</string>
+                          <string name="created">"19/7/2006"</string>
                           <string name="proxy-type">"wbCheckBoxProxy"</string>
-                          <string name="proxy-Id name">"ID_CHECKBOX13"</string>
+                          <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnMolpltCheckClick"</string>
+                          <string name="proxy-Id name">"ID_MOLPLT_CHECK"</string>
                           <long name="proxy-Id value">10136</long>
                           <string name="proxy-Class">"wxCheckBox"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"mMolPltCheck"</string>
                           <string name="proxy-Label">"MolPlt"</string>
                           <bool name="proxy-Initial value">0</bool>
                           <string name="proxy-Help text">""</string>
@@ -16737,7 +16797,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom ctor arguments">""</string>
                         </document>
                         <document>
-                          <string name="title">"wxCheckBox: ID_CHECKBOX14"</string>
+                          <string name="title">"wxCheckBox: ID_PLTORB_CHECK"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"checkbox"</string>
@@ -16745,12 +16805,13 @@ along the chosen normal mode."</string>
                           <long name="owns-file">1</long>
                           <long name="title-mode">0</long>
                           <long name="locked">0</long>
-                          <string name="created">"17/7/2006"</string>
+                          <string name="created">"19/7/2006"</string>
                           <string name="proxy-type">"wbCheckBoxProxy"</string>
-                          <string name="proxy-Id name">"ID_CHECKBOX14"</string>
+                          <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnPltorbCheckClick"</string>
+                          <string name="proxy-Id name">"ID_PLTORB_CHECK"</string>
                           <long name="proxy-Id value">10137</long>
                           <string name="proxy-Class">"wxCheckBox"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"mPltOrbCheck"</string>
                           <string name="proxy-Label">"PltOrb"</string>
                           <bool name="proxy-Initial value">0</bool>
                           <string name="proxy-Help text">""</string>
@@ -16790,7 +16851,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom ctor arguments">""</string>
                         </document>
                         <document>
-                          <string name="title">"wxCheckBox: ID_CHECKBOX15"</string>
+                          <string name="title">"wxCheckBox: ID_AIMPAC_CHECK"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"checkbox"</string>
@@ -16798,9 +16859,10 @@ along the chosen normal mode."</string>
                           <long name="owns-file">1</long>
                           <long name="title-mode">0</long>
                           <long name="locked">0</long>
-                          <string name="created">"17/7/2006"</string>
+                          <string name="created">"19/7/2006"</string>
                           <string name="proxy-type">"wbCheckBoxProxy"</string>
-                          <string name="proxy-Id name">"ID_CHECKBOX15"</string>
+                          <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnAimpacCheckClick"</string>
+                          <string name="proxy-Id name">"ID_AIMPAC_CHECK"</string>
                           <long name="proxy-Id value">10138</long>
                           <string name="proxy-Class">"wxCheckBox"</string>
                           <string name="proxy-Member variable name">"aimpacCheck"</string>
@@ -16843,7 +16905,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom ctor arguments">""</string>
                         </document>
                         <document>
-                          <string name="title">"wxCheckBox: ID_CHECKBOX16"</string>
+                          <string name="title">"wxCheckBox: ID_RPAC_CHECK"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"checkbox"</string>
@@ -16851,9 +16913,10 @@ along the chosen normal mode."</string>
                           <long name="owns-file">1</long>
                           <long name="title-mode">0</long>
                           <long name="locked">0</long>
-                          <string name="created">"17/7/2006"</string>
+                          <string name="created">"19/7/2006"</string>
                           <string name="proxy-type">"wbCheckBoxProxy"</string>
-                          <string name="proxy-Id name">"ID_CHECKBOX16"</string>
+                          <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnRpacCheckClick"</string>
+                          <string name="proxy-Id name">"ID_RPAC_CHECK"</string>
                           <long name="proxy-Id value">10139</long>
                           <string name="proxy-Class">"wxCheckBox"</string>
                           <string name="proxy-Member variable name">"rpacCheck"</string>
@@ -16897,7 +16960,7 @@ along the chosen normal mode."</string>
                         </document>
                       </document>
                       <document>
-                        <string name="title">"wxRadioBox: ID_RADIOBOX1"</string>
+                        <string name="title">"wxRadioBox: ID_MISC_PROG_RADIO"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
                         <string name="icon-name">"radiobox"</string>
@@ -16905,13 +16968,14 @@ along the chosen normal mode."</string>
                         <long name="owns-file">1</long>
                         <long name="title-mode">0</long>
                         <long name="locked">0</long>
-                        <string name="created">"17/7/2006"</string>
+                        <string name="created">"19/7/2006"</string>
                         <string name="proxy-type">"wbRadioBoxProxy"</string>
-                        <string name="proxy-Id name">"ID_RADIOBOX1"</string>
+                        <string name="event-handler-0">"wxEVT_COMMAND_RADIOBOX_SELECTED|OnMiscProgRadioSelected"</string>
+                        <string name="proxy-Id name">"ID_MISC_PROG_RADIO"</string>
                         <long name="proxy-Id value">10135</long>
                         <string name="proxy-Class">"wxRadioBox"</string>
-                        <string name="proxy-Member variable name">""</string>
-                        <string name="proxy-Label">"Forces Check Run Type"</string>
+                        <string name="proxy-Member variable name">"mMiscProgRadio"</string>
+                        <string name="proxy-Label">"These Force a Check Run Type"</string>
                         <long name="proxy-Major dimension count">1</long>
                         <string name="proxy-Items">"None|Hondo 8.2|MELDF|GAMESS (UK version)|Gaussian 9x|All"</string>
                         <long name="proxy-Initial value">0</long>
