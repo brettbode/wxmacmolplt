@@ -1909,19 +1909,19 @@ void InputBuilderWindow::SetupMP2OptsItems() {
 	
 	wxString temp;
 	//# core electrons
-	temp.Printf("%ld", TmpInputRec->MP2->GetNumCoreElectrons());
+	temp.Printf(wxT("%ld"), TmpInputRec->MP2->GetNumCoreElectrons());
 	mMP2CoreEleEdit->SetValue(temp);
 	//memory
 	long memVal = TmpInputRec->MP2->GetMemory();
 	if (memVal == 0)
-		temp.Printf("All");
+		temp.Printf(wxT("All"));
 	else
-		temp.Printf("%d", memVal);
+		temp.Printf(wxT("%d"), memVal);
 	mMP2MemEdit->SetValue(temp);
 	//integral cutoff
 	double	tempf = TmpInputRec->MP2->GetIntCutoff();
 	if (tempf == 0.0) tempf = 1.0e-9;
-	temp.Printf("%g", tempf);
+	temp.Printf(wxT("%g"), tempf);
 	mMP2IntCutoffEdit->SetValue(temp);
 	//LMOMP2
 	mLMOMP2Check->Enable((1>=TmpInputRec->Control->GetSCFType()));
