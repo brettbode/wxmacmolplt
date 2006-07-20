@@ -48,9 +48,9 @@
 		8B279CFF0A4B6F0D00994DD5 /* colorArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF50A4B6F0D00994DD5 /* colorArea.cpp */; };
 		8B279D000A4B6F0D00994DD5 /* inputbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF70A4B6F0D00994DD5 /* inputbuilder.cpp */; };
 		8B279D010A4B6F0D00994DD5 /* surfaceDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */; };
-		8B279D020A4B6F0D00994DD5 /* surfaces.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CFB0A4B6F0D00994DD5 /* surfaces.cpp */; };
 		8B279D030A4B6F0D00994DD5 /* wxUglyChoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CFD0A4B6F0D00994DD5 /* wxUglyChoice.cpp */; };
 		8B3B899D0A6EAD7E0041EA88 /* glf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B899C0A6EAD7E0041EA88 /* glf.cpp */; };
+		8B45D25E0A700DB60005269A /* arial1.glf in Resources */ = {isa = PBXBuildFile; fileRef = 8B45D25D0A700DB60005269A /* arial1.glf */; };
 		8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
 		8B4FB3D40A3093470014F6B5 /* surfaceswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */; };
 		8B6075B10A1A34B1008CC9FD /* printoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */; };
@@ -148,18 +148,19 @@
 		8B279CF80A4B6F0D00994DD5 /* inputbuilder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = inputbuilder.h; path = src/inputbuilder.h; sourceTree = "<group>"; };
 		8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceDlg.cpp; path = src/surfaceDlg.cpp; sourceTree = "<group>"; };
 		8B279CFA0A4B6F0D00994DD5 /* surfaceDlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceDlg.h; path = src/surfaceDlg.h; sourceTree = "<group>"; };
-		8B279CFB0A4B6F0D00994DD5 /* surfaces.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaces.cpp; path = src/surfaces.cpp; sourceTree = "<group>"; };
-		8B279CFC0A4B6F0D00994DD5 /* surfaces.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaces.h; path = src/surfaces.h; sourceTree = "<group>"; };
 		8B279CFD0A4B6F0D00994DD5 /* wxUglyChoice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = wxUglyChoice.cpp; path = src/wxUglyChoice.cpp; sourceTree = "<group>"; };
 		8B279CFE0A4B6F0D00994DD5 /* wxUglyChoice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = wxUglyChoice.h; path = src/wxUglyChoice.h; sourceTree = "<group>"; };
 		8B3B89720A6EAB540041EA88 /* glf.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = glf.h; path = src/glf.h; sourceTree = "<group>"; };
 		8B3B899C0A6EAD7E0041EA88 /* glf.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = glf.cpp; path = src/glf.cpp; sourceTree = "<group>"; };
+		8B45D25D0A700DB60005269A /* arial1.glf */ = {isa = PBXFileReference; lastKnownFileType = file; name = arial1.glf; path = resources/fonts/arial1.glf; sourceTree = "<group>"; };
 		8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = appendframesoptions.cpp; path = src/appendframesoptions.cpp; sourceTree = "<group>"; };
 		8B4BB4410A0A7C9D00FE9CC6 /* appendframesoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = appendframesoptions.h; path = src/appendframesoptions.h; sourceTree = "<group>"; };
 		8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceswindow.cpp; path = src/surfaceswindow.cpp; sourceTree = "<group>"; };
 		8B4FB3D20A3093470014F6B5 /* surfaceswindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceswindow.h; path = src/surfaceswindow.h; sourceTree = "<group>"; };
 		8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = printoptions.cpp; path = src/printoptions.cpp; sourceTree = "<group>"; };
 		8B6075B00A1A34B1008CC9FD /* printoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = printoptions.h; path = src/printoptions.h; sourceTree = "<group>"; };
+		8B641E370A472F8D0075F96C /* surfaceDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceDlg.cpp; path = src/surfaceDlg.cpp; sourceTree = "<group>"; };
+		8B641E380A472F8D0075F96C /* surfaceDlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceDlg.h; path = src/surfaceDlg.h; sourceTree = "<group>"; };
 		8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = exportoptionsdialog.cpp; path = src/exportoptionsdialog.cpp; sourceTree = "<group>"; };
 		8B6AF30A0A13EAC8004D2E5F /* exportoptionsdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = exportoptionsdialog.h; path = src/exportoptionsdialog.h; sourceTree = "<group>"; };
 		8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = energyplotdialog.cpp; path = src/energyplotdialog.cpp; sourceTree = "<group>"; };
@@ -170,6 +171,8 @@
 		8B7145C80A23983200435951 /* aboutwxmacmolplt.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = aboutwxmacmolplt.h; path = src/aboutwxmacmolplt.h; sourceTree = "<group>"; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
 		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
+		8BD5BA820A41E01800FF9CAE /* inputbuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = inputbuilder.cpp; path = src/inputbuilder.cpp; sourceTree = "<group>"; };
+		8BD5BA830A41E01800FF9CAE /* inputbuilder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = inputbuilder.h; path = src/inputbuilder.h; sourceTree = "<group>"; };
 		8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = coordinateoffset.cpp; path = src/coordinateoffset.cpp; sourceTree = "<group>"; };
 		8BDC5DDC0A29F25F0060517F /* coordinateoffset.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = coordinateoffset.h; path = src/coordinateoffset.h; sourceTree = "<group>"; };
 		8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = choosevecgroup.cpp; path = src/choosevecgroup.cpp; sourceTree = "<group>"; };
@@ -265,6 +268,8 @@
 				1652DA3C09D0B12600B7783F /* InputData.h */,
 				1652DA3D09D0B12600B7783F /* Internals.cpp */,
 				1652DA3E09D0B12600B7783F /* Internals.h */,
+				8BD5BA820A41E01800FF9CAE /* inputbuilder.cpp */,
+				8BD5BA830A41E01800FF9CAE /* inputbuilder.h */,
 				1626378A0A07E46E0089452E /* llmdialog.cpp */,
 				1626378B0A07E46E0089452E /* llmdialog.h */,
 				1652DA3F09D0B12600B7783F /* main.cpp */,
@@ -285,8 +290,6 @@
 				8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */,
 				8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */,
 				8B279CFA0A4B6F0D00994DD5 /* surfaceDlg.h */,
-				8B279CFB0A4B6F0D00994DD5 /* surfaces.cpp */,
-				8B279CFC0A4B6F0D00994DD5 /* surfaces.h */,
 				8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */,
 				8B4FB3D20A3093470014F6B5 /* surfaceswindow.h */,
 				1652DA4C09D0B12600B7783F /* myFiles.h */,
@@ -310,6 +313,8 @@
 				1652DA5409D0B12600B7783F /* SurfaceBase.cpp */,
 				1652DA5509D0B12600B7783F /* SurfaceTypes.h */,
 				1652DA5609D0B12600B7783F /* SurfWin.cpp */,
+				8B641E370A472F8D0075F96C /* surfaceDlg.cpp */,
+				8B641E380A472F8D0075F96C /* surfaceDlg.h */,
 				1652DA5709D0B12600B7783F /* VirtualSphere.cpp */,
 				1652DA5809D0B12600B7783F /* VirtualSphere.h */,
 				8BF17D760A5328210059B71F /* windowparameters.cpp */,
@@ -329,6 +334,7 @@
 			isa = PBXGroup;
 			children = (
 				8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */,
+				8B45D25D0A700DB60005269A /* arial1.glf */,
 				1652DAC809D0B43700B7783F /* bindoc.icns */,
 				1652DAC909D0B43700B7783F /* Info.plist */,
 				1652DACA09D0B43700B7783F /* MacMolPlt.icns */,
@@ -385,6 +391,7 @@
 				1652DAD009D0B43700B7783F /* prefs.icns in Resources */,
 				1652DAD109D0B43700B7783F /* text-doc.icns in Resources */,
 				8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */,
+				8B45D25E0A700DB60005269A /* arial1.glf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -443,7 +450,6 @@
 				8B279CFF0A4B6F0D00994DD5 /* colorArea.cpp in Sources */,
 				8B279D000A4B6F0D00994DD5 /* inputbuilder.cpp in Sources */,
 				8B279D010A4B6F0D00994DD5 /* surfaceDlg.cpp in Sources */,
-				8B279D020A4B6F0D00994DD5 /* surfaces.cpp in Sources */,
 				8B279D030A4B6F0D00994DD5 /* wxUglyChoice.cpp in Sources */,
 				8BF17D780A5328210059B71F /* windowparameters.cpp in Sources */,
 				8BF17DA40A55D0910059B71F /* zmatrixcalculator.cpp in Sources */,
