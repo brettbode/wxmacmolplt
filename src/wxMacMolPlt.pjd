@@ -17777,7 +17777,7 @@ along the chosen normal mode."</string>
                       <bool name="proxy-wxFIXED_MINSIZE">0</bool>
                       <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                       <document>
-                        <string name="title">"wxCheckBox: ID_CHECKBOX17"</string>
+                        <string name="title">"wxCheckBox: ID_DIRECTSCF_CHECK"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
                         <string name="icon-name">"checkbox"</string>
@@ -17787,10 +17787,11 @@ along the chosen normal mode."</string>
                         <long name="locked">0</long>
                         <string name="created">"17/7/2006"</string>
                         <string name="proxy-type">"wbCheckBoxProxy"</string>
-                        <string name="proxy-Id name">"ID_CHECKBOX17"</string>
+                        <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnDirectscfCheckClick"</string>
+                        <string name="proxy-Id name">"ID_DIRECTSCF_CHECK"</string>
                         <long name="proxy-Id value">10140</long>
                         <string name="proxy-Class">"wxCheckBox"</string>
-                        <string name="proxy-Member variable name">""</string>
+                        <string name="proxy-Member variable name">"mDirectSCFCheck"</string>
                         <string name="proxy-Label">"Direct SCF"</string>
                         <bool name="proxy-Initial value">0</bool>
                         <string name="proxy-Help text">""</string>
@@ -17830,7 +17831,7 @@ along the chosen normal mode."</string>
                         <string name="proxy-Custom ctor arguments">""</string>
                       </document>
                       <document>
-                        <string name="title">"wxCheckBox: ID_CHECKBOX18"</string>
+                        <string name="title">"wxCheckBox: ID_FDIFF_CHECK"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
                         <string name="icon-name">"checkbox"</string>
@@ -17840,12 +17841,13 @@ along the chosen normal mode."</string>
                         <long name="locked">0</long>
                         <string name="created">"17/7/2006"</string>
                         <string name="proxy-type">"wbCheckBoxProxy"</string>
-                        <string name="proxy-Id name">"ID_CHECKBOX18"</string>
+                        <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnFdiffCheckClick"</string>
+                        <string name="proxy-Id name">"ID_FDIFF_CHECK"</string>
                         <long name="proxy-Id value">10141</long>
                         <string name="proxy-Class">"wxCheckBox"</string>
-                        <string name="proxy-Member variable name">""</string>
+                        <string name="proxy-Member variable name">"mFDiffCheck"</string>
                         <string name="proxy-Label">"Compute only change in Fock Matrix"</string>
-                        <bool name="proxy-Initial value">1</bool>
+                        <bool name="proxy-Initial value">0</bool>
                         <string name="proxy-Help text">""</string>
                         <string name="proxy-Tooltip text">""</string>
                         <string name="proxy-Data variable">""</string>
@@ -17883,7 +17885,7 @@ along the chosen normal mode."</string>
                         <string name="proxy-Custom ctor arguments">""</string>
                       </document>
                       <document>
-                        <string name="title">"wxCheckBox: ID_CHECKBOX19"</string>
+                        <string name="title">"wxCheckBox: ID_UHF_NO_CHECK"</string>
                         <string name="type">"dialog-control-document"</string>
                         <string name="filename">""</string>
                         <string name="icon-name">"checkbox"</string>
@@ -17893,10 +17895,11 @@ along the chosen normal mode."</string>
                         <long name="locked">0</long>
                         <string name="created">"17/7/2006"</string>
                         <string name="proxy-type">"wbCheckBoxProxy"</string>
-                        <string name="proxy-Id name">"ID_CHECKBOX19"</string>
+                        <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnUhfNoCheckClick"</string>
+                        <string name="proxy-Id name">"ID_UHF_NO_CHECK"</string>
                         <long name="proxy-Id value">10142</long>
                         <string name="proxy-Class">"wxCheckBox"</string>
-                        <string name="proxy-Member variable name">""</string>
+                        <string name="proxy-Member variable name">"mUHFNOCheck"</string>
                         <string name="proxy-Label">"Generate UHF Natural Orbitals"</string>
                         <bool name="proxy-Initial value">0</bool>
                         <string name="proxy-Help text">""</string>
@@ -18020,7 +18023,7 @@ along the chosen normal mode."</string>
                           <string name="proxy-Custom ctor arguments">""</string>
                         </document>
                         <document>
-                          <string name="title">"wxSpinCtrl: ID_SPINCTRL2"</string>
+                          <string name="title">"wxSpinCtrl: ID_SCF_CONV_SPIN"</string>
                           <string name="type">"dialog-control-document"</string>
                           <string name="filename">""</string>
                           <string name="icon-name">"spinctrl"</string>
@@ -18030,10 +18033,11 @@ along the chosen normal mode."</string>
                           <long name="locked">0</long>
                           <string name="created">"17/7/2006"</string>
                           <string name="proxy-type">"wbSpinCtrlProxy"</string>
-                          <string name="proxy-Id name">"ID_SPINCTRL2"</string>
+                          <string name="event-handler-0">"wxEVT_COMMAND_SPINCTRL_UPDATED|OnScfConvSpinUpdated"</string>
+                          <string name="proxy-Id name">"ID_SCF_CONV_SPIN"</string>
                           <long name="proxy-Id value">10126</long>
                           <string name="proxy-Class">"wxSpinCtrl"</string>
-                          <string name="proxy-Member variable name">""</string>
+                          <string name="proxy-Member variable name">"mSCFConvSpin"</string>
                           <long name="proxy-Minimum value">1</long>
                           <long name="proxy-Maximum value">2147483647</long>
                           <long name="proxy-Initial value">5</long>

@@ -2501,6 +2501,9 @@ void SCFGroup::InitData(void) {
 	SOGTolerance = EnErrThresh = DEMCutoff = DampCutoff = 0.0;
 	ConvCriteria = MaxDIISEq = MVOCharge = 0;
 	Punch = Options1 = ConverganceFlags = 0;
+		//default Direct SCF to true. This is not the GAMESS default
+		//but is better in most cases.
+	SetDirectSCF(true);
 	SetFockDiff(true);
 }
 bool SCFGroup::SetDirectSCF(bool State) {

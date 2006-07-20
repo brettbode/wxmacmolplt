@@ -36,6 +36,7 @@
 ////@begin forward declarations
 class wxListbook;
 class wxUglyChoice;
+class wxSpinCtrl;
 ////@end forward declarations
 
 /*!
@@ -120,10 +121,10 @@ class wxUglyChoice;
 #define ID_RADIOBOX4 10189
 #define ID_RADIOBOX5 10190
 #define ID_IBSCBOPTSPANEL 10097
-#define ID_CHECKBOX17 10140
-#define ID_CHECKBOX18 10141
-#define ID_CHECKBOX19 10142
-#define ID_SPINCTRL2 10126
+#define ID_DIRECTSCF_CHECK 10140
+#define ID_FDIFF_CHECK 10141
+#define ID_UHF_NO_CHECK 10142
+#define ID_SCF_CONV_SPIN 10126
 #define ID_IBSTATPOINTPANEL 10152
 #define ID_TEXTCTRL16 10153
 #define ID_TEXTCTRL17 10154
@@ -326,6 +327,18 @@ public:
     /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_MISC_PROG_RADIO
     void OnMiscProgRadioSelected( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIRECTSCF_CHECK
+    void OnDirectscfCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_FDIFF_CHECK
+    void OnFdiffCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_UHF_NO_CHECK
+    void OnUhfNoCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_SCF_CONV_SPIN
+    void OnScfConvSpinUpdated( wxSpinEvent& event );
+
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
     void OnDefaultsbuttonClick( wxCommandEvent& event );
 
@@ -423,6 +436,10 @@ public:
     wxCheckBox* aimpacCheck;
     wxCheckBox* rpacCheck;
     wxRadioBox* mMiscProgRadio;
+    wxCheckBox* mDirectSCFCheck;
+    wxCheckBox* mFDiffCheck;
+    wxCheckBox* mUHFNOCheck;
+    wxSpinCtrl* mSCFConvSpin;
     wxTextCtrl* mTitleText;
     wxTextCtrl* mBasisSetText;
     wxTextCtrl* mSCFTypeText;

@@ -137,6 +137,14 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 
     EVT_RADIOBOX( ID_MISC_PROG_RADIO, InputBuilderWindow::OnMiscProgRadioSelected )
 
+    EVT_CHECKBOX( ID_DIRECTSCF_CHECK, InputBuilderWindow::OnDirectscfCheckClick )
+
+    EVT_CHECKBOX( ID_FDIFF_CHECK, InputBuilderWindow::OnFdiffCheckClick )
+
+    EVT_CHECKBOX( ID_UHF_NO_CHECK, InputBuilderWindow::OnUhfNoCheckClick )
+
+    EVT_SPINCTRL( ID_SCF_CONV_SPIN, InputBuilderWindow::OnScfConvSpinUpdated )
+
     EVT_BUTTON( ID_DEFAULTSBUTTON, InputBuilderWindow::OnDefaultsbuttonClick )
 
     EVT_BUTTON( ID_REVERTBUTTON, InputBuilderWindow::OnRevertbuttonClick )
@@ -233,6 +241,10 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     aimpacCheck = NULL;
     rpacCheck = NULL;
     mMiscProgRadio = NULL;
+    mDirectSCFCheck = NULL;
+    mFDiffCheck = NULL;
+    mUHFNOCheck = NULL;
+    mSCFConvSpin = NULL;
     mTitleText = NULL;
     mBasisSetText = NULL;
     mSCFTypeText = NULL;
@@ -244,6 +256,8 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     writeBtn = NULL;
 ////@end InputBuilderWindow member initialisation
 
+	TmpInputRec = new InputData(((MolDisplayWin *)parent)->GetData()->GetInputData());
+
 ////@begin InputBuilderWindow creation
     wxFrame::Create( parent, id, caption, pos, size, style );
 
@@ -254,8 +268,6 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
     }
     Centre();
 ////@end InputBuilderWindow creation
-
-    TmpInputRec = new InputData(((MolDisplayWin *)parent)->GetData()->GetInputData());
 
     SetupItems();
     
@@ -977,27 +989,27 @@ void InputBuilderWindow::CreateControls()
     wxBoxSizer* itemBoxSizer149 = new wxBoxSizer(wxVERTICAL);
     itemPanel148->SetSizer(itemBoxSizer149);
 
-    wxCheckBox* itemCheckBox150 = new wxCheckBox( itemPanel148, ID_CHECKBOX17, _("Direct SCF"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox150->SetValue(false);
-    itemBoxSizer149->Add(itemCheckBox150, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
+    mDirectSCFCheck = new wxCheckBox( itemPanel148, ID_DIRECTSCF_CHECK, _("Direct SCF"), wxDefaultPosition, wxDefaultSize, 0 );
+    mDirectSCFCheck->SetValue(false);
+    itemBoxSizer149->Add(mDirectSCFCheck, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxCheckBox* itemCheckBox151 = new wxCheckBox( itemPanel148, ID_CHECKBOX18, _("Compute only change in Fock Matrix"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox151->SetValue(true);
-    itemCheckBox151->Enable(false);
-    itemBoxSizer149->Add(itemCheckBox151, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
+    mFDiffCheck = new wxCheckBox( itemPanel148, ID_FDIFF_CHECK, _("Compute only change in Fock Matrix"), wxDefaultPosition, wxDefaultSize, 0 );
+    mFDiffCheck->SetValue(false);
+    mFDiffCheck->Enable(false);
+    itemBoxSizer149->Add(mFDiffCheck, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
 
-    wxCheckBox* itemCheckBox152 = new wxCheckBox( itemPanel148, ID_CHECKBOX19, _("Generate UHF Natural Orbitals"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemCheckBox152->SetValue(false);
-    itemCheckBox152->Enable(false);
-    itemBoxSizer149->Add(itemCheckBox152, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
+    mUHFNOCheck = new wxCheckBox( itemPanel148, ID_UHF_NO_CHECK, _("Generate UHF Natural Orbitals"), wxDefaultPosition, wxDefaultSize, 0 );
+    mUHFNOCheck->SetValue(false);
+    mUHFNOCheck->Enable(false);
+    itemBoxSizer149->Add(mUHFNOCheck, 0, wxALIGN_LEFT|wxLEFT|wxRIGHT|wxTOP, 5);
 
     wxBoxSizer* itemBoxSizer153 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer149->Add(itemBoxSizer153, 0, wxALIGN_LEFT, 5);
     wxStaticText* itemStaticText154 = new wxStaticText( itemPanel148, wxID_STATIC, _("SCF convergence criteria:  10^"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer153->Add(itemStaticText154, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxSpinCtrl* itemSpinCtrl155 = new wxSpinCtrl( itemPanel148, ID_SPINCTRL2, _T("5"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 5 );
-    itemBoxSizer153->Add(itemSpinCtrl155, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mSCFConvSpin = new wxSpinCtrl( itemPanel148, ID_SCF_CONV_SPIN, _T("5"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 2147483647, 5 );
+    itemBoxSizer153->Add(mSCFConvSpin, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     listBook->AddPage(itemPanel148, _("SCF Options"));
 
@@ -1201,6 +1213,7 @@ void InputBuilderWindow::CreateControls()
     setPaneVisible(DATA_PANE,    true);
 	setPaneVisible(MOGUESS_PANE, true);
     setPaneVisible(SYSTEM_PANE,  true);
+	if (TmpInputRec->Control->GetSCFType() <= 4) setPaneVisible(SCFOPTS_PANE, true);
     setPaneVisible(MISCPREFS_PANE, true);
     setPaneVisible(SUMMARY_PANE, true);
 
@@ -1644,7 +1657,26 @@ void InputBuilderWindow::SetupMP2OptsItems() {
 }
 
 void InputBuilderWindow::SetupSCFOptsItems() {
-    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	if (!TmpInputRec->SCF) TmpInputRec->SCF = new SCFGroup;
+	mDirectSCFCheck->SetValue(TmpInputRec->SCF->GetDirectSCF());
+	if ((TmpInputRec->SCF->GetDirectSCF() && (3>=TmpInputRec->Control->GetSCFType()))) {
+		mFDiffCheck->SetValue(TmpInputRec->SCF->GetFockDiff());
+		mFDiffCheck->Enable(true);
+	} else {
+		mFDiffCheck->SetValue(false);
+		mFDiffCheck->Enable(false);
+	}
+	if (TmpInputRec->Control->GetSCFType() == GAMESS_UHF) {
+		mUHFNOCheck->SetValue(TmpInputRec->SCF->GetUHFNO());
+		mUHFNOCheck->Enable(true);
+	} else {
+		mUHFNOCheck->SetValue(false);
+		mUHFNOCheck->Enable(false);
+	}
+
+	int conv = TmpInputRec->SCF->GetConvergance();
+	if (conv == 0) conv = 5;
+	mSCFConvSpin->SetValue(conv);
 }
 
 void InputBuilderWindow::SetupStatPointItems() {
@@ -1849,6 +1881,7 @@ void InputBuilderWindow::OnRunChoiceSelected( wxCommandEvent& event )
 void InputBuilderWindow::OnScfChoiceSelected( wxCommandEvent& event )
 {
     TmpInputRec->Control->SetSCFType((GAMESS_SCFType)(scfChoice->GetSelection() + 1));
+	setPaneVisible(SCFOPTS_PANE, (TmpInputRec->Control->GetSCFType() <= 4));
     SetupItems();
 }
 
@@ -2523,6 +2556,48 @@ void InputBuilderWindow::OnMiscProgRadioSelected( wxCommandEvent& event )
 		SetupMiscPrefsItems();
 		SetupControlItems();
 	}
+    event.Skip();
+}
+
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIRECTSCF_CHECK
+ */
+
+void InputBuilderWindow::OnDirectscfCheckClick( wxCommandEvent& event )
+{
+	TmpInputRec->SCF->SetDirectSCF(mDirectSCFCheck->GetValue());
+	SetupSCFOptsItems();
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_FDIFF_CHECK
+ */
+
+void InputBuilderWindow::OnFdiffCheckClick( wxCommandEvent& event )
+{
+	TmpInputRec->SCF->SetFockDiff(mFDiffCheck->GetValue());
+    event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_UHF_NO_CHECK
+ */
+
+void InputBuilderWindow::OnUhfNoCheckClick( wxCommandEvent& event )
+{
+	TmpInputRec->SCF->SetUHFNO(mUHFNOCheck->GetValue());
+ //   event.Skip();
+}
+
+/*!
+ * wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_SCF_CONV_SPIN
+ */
+
+void InputBuilderWindow::OnScfConvSpinUpdated( wxSpinEvent& event )
+{
+	TmpInputRec->SCF->SetConvergance(mSCFConvSpin->GetValue());
     event.Skip();
 }
 
