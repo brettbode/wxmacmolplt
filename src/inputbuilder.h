@@ -116,12 +116,13 @@ class wxSpinCtrl;
 #define ID_RPAC_CHECK 10139
 #define ID_MISC_PROG_RADIO 10135
 #define ID_IBMP2PANEL 10182
-#define ID_TEXTCTRL5 10185
-#define ID_TEXTCTRL7 10186
-#define ID_TEXTCTRL8 10187
-#define ID_CHECKBOX3 10188
-#define ID_RADIOBOX4 10189
-#define ID_RADIOBOX5 10190
+#define ID_MP2_CORE_EDIT 10185
+#define ID_MP2MEM_EDIT 10186
+#define ID_MP2INTCUTOFF_EDIT 10187
+#define ID_LMOMP2_CHECK 10188
+#define ID_MP2PROP_CHECK 10241
+#define ID_MP2TRANS_RADIO 10189
+#define ID_MP2AOSTORAGE_RADIO 10190
 #define ID_IBSCBOPTSPANEL 10097
 #define ID_DIRECTSCF_CHECK 10140
 #define ID_FDIFF_CHECK 10141
@@ -349,6 +350,27 @@ public:
     /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_MISC_PROG_RADIO
     void OnMiscProgRadioSelected( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MP2_CORE_EDIT
+    void OnMp2CoreEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MP2MEM_EDIT
+    void OnMp2memEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MP2INTCUTOFF_EDIT
+    void OnMp2intcutoffEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_LMOMP2_CHECK
+    void OnLmomp2CheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_MP2PROP_CHECK
+    void OnMp2propCheckClick( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_MP2TRANS_RADIO
+    void OnMp2transRadioSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_MP2AOSTORAGE_RADIO
+    void OnMp2aostorageRadioSelected( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIRECTSCF_CHECK
     void OnDirectscfCheckClick( wxCommandEvent& event );
 
@@ -499,6 +521,13 @@ public:
     wxCheckBox* aimpacCheck;
     wxCheckBox* rpacCheck;
     wxRadioBox* mMiscProgRadio;
+    wxTextCtrl* mMP2CoreEleEdit;
+    wxTextCtrl* mMP2MemEdit;
+    wxTextCtrl* mMP2IntCutoffEdit;
+    wxCheckBox* mLMOMP2Check;
+    wxCheckBox* mMP2PropCheck;
+    wxRadioBox* mMP2TransRadio;
+    wxRadioBox* mMP2AOStorageRadio;
     wxCheckBox* mDirectSCFCheck;
     wxCheckBox* mFDiffCheck;
     wxCheckBox* mUHFNOCheck;
