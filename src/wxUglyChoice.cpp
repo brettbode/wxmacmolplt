@@ -20,6 +20,8 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
                           wxTAB_TRAVERSAL,
                           wxT("ugly_choice")) {
 
+    this->SetSizeHints(size.GetWidth(), size.GetHeight());
+
     /* Initialize control elements */
 
     m_txt = new wxTextCtrl(this,
