@@ -365,6 +365,7 @@ enum MMP_IOMP2GroupNS {
 	MMP_IOMGTransMethod,
 	MMP_IOMGAOInts,
 	MMP_IOMGLMOMP2,
+	MMP_IOMP2MP2PRP,
 	
 	NumberMMPIOMP2GroupItems
 };

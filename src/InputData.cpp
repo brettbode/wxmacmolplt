@@ -2637,6 +2637,7 @@ void MP2Group::InitData(void) {
 	CutOff = 0.0;
 	NumCoreElectrons = Memory = 0;
 	Method = AOInts = LMOMP2 = 0;
+	MP2Prop = false;
 }
 float MP2Group::SetIntCutoff(float NewCutoff) {
 	if (NewCutoff > 0.0) CutOff = NewCutoff;
@@ -2718,6 +2719,11 @@ void MP2Group::WriteToFile(BufferFile *File, InputData *IData) {
 		sprintf(Out,"NCORE=%ld ", NumCoreElectrons);
 		File->WriteLine(Out, false);
 	}
+	//MP2Prop
+	if ((IData->Control->GetRunType() <= Energy) && GetMP2Prop()) {
+		sprintf(Out, "MP2PRP=.TRUE. ");
+		File->WriteLine(Out, false);
+	}
 		//LMOMP2
 	if (GetLMOMP2()) {
 		sprintf(Out, "LMOMP2=.TRUE. ");
@@ -2763,6 +2769,7 @@ void MP2Group::WriteXML(XMLElement * parent) const {
 	}
 	if (AOInts) Ele->addChildElement(CML_convert(MMP_IOMGAOInts), GetAOIntMethodText());
 	if (GetLMOMP2()) Ele->addChildElement(CML_convert(MMP_IOMGLMOMP2), trueXML);
+	if (GetMP2Prop()) Ele->addChildElement(CML_convert(MMP_IOMP2MP2PRP), trueXML);
 }
 void MP2Group::ReadXML(XMLElement * parent) {
 	XMLElementList * children = parent->getChildren();
@@ -2817,6 +2824,13 @@ void MP2Group::ReadXML(XMLElement * parent) {
 						bool tb;
 						if (child->getBoolValue(tb))
 							SetLMOMP2(tb);
+					}
+						break;
+					case MMP_IOMP2MP2PRP:
+					{
+						bool tb;
+						if (child->getBoolValue(tb))
+							SetMP2Prop(tb);
 					}
 						break;
 				}

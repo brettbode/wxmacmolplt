@@ -617,6 +617,7 @@ class MP2Group {
 		char		Method;
 		char		AOInts;
 		char		LMOMP2;
+		bool		MP2Prop;
 	public:
 		MP2Group(void);
 		MP2Group(MP2Group *Copy);
@@ -636,6 +637,8 @@ class MP2Group {
 		void SetAOIntMethod(const char * t);
 		bool GetLMOMP2(void) const;
 		bool SetLMOMP2(bool State);
+		bool GetMP2Prop(void) const {return MP2Prop;};
+		void SetMP2Prop(bool state) {MP2Prop = state;};
 
 		long GetSize(BufferFile *Buffer);
 		long WriteToBuffer(BufferFile *Buffer);
