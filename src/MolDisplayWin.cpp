@@ -267,7 +267,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     glCanvas = new MpGLCanvas(this, 11002, wxPoint(0,0), wxSize(height-sheight,width));
     glCanvas->setPrefs(Prefs);
     
-    textBar = new wxStaticText(infoPanel, 11003, wxString(""), wxDefaultPosition, wxDefaultSize,
+    textBar = new wxStaticText(infoPanel, 11003, wxString(wxT("")), wxDefaultPosition, wxDefaultSize,
 							   wxALIGN_LEFT | wxST_NO_AUTORESIZE);
 
     SizeChanged();
@@ -813,7 +813,7 @@ void MolDisplayWin::menuFileAddFramesFromFile(wxCommandEvent &event) {
     //extra options to the open file dialog.
     wxFileDialog * fdlg = new wxFileDialog(this, 
         wxT("Choose a file containing points to be appended to the currently open file."),
-                        wxString(""), wxString(""), wxString("*"), wxOPEN|wxOVERWRITE_PROMPT);
+                        wxString(wxT("")), wxString(wxT("")), wxString(wxT("*")), wxOPEN|wxOVERWRITE_PROMPT);
     fdlg->ShowModal();
     wxString filename = fdlg->GetPath();
     
@@ -1313,13 +1313,13 @@ void MolDisplayWin::CopyCoordinates(short ctype) const {
                 Prefs->GetAtomLabel(lFrame->Atoms[iatm].GetType()-1, Label);
                 sbuf << Label;
                 textBuffer += Label;
-                Label.Printf("   %5.1f  %13.8f  %13.8f  %13.8f\r",
+                Label.Printf(wxT("   %5.1f  %13.8f  %13.8f  %13.8f\r"),
                                  (float) (lFrame->Atoms[iatm].GetType()), 
                                  lFrame->Atoms[iatm].Position.x, lFrame->Atoms[iatm].Position.y,
                                  lFrame->Atoms[iatm].Position.z);
                 sbuf << Label;
             }
-            textBuffer.Printf("%s", sbuf.str().c_str());
+            textBuffer.Printf(wxT("%s"), sbuf.str().c_str());
         } else if (ctype == 1) {
             //Make a guess for the Handle size based on the # of atoms and the line format
             long datalength = lFrame->NumAtoms*70*sizeof(char);
@@ -1330,7 +1330,7 @@ void MolDisplayWin::CopyCoordinates(short ctype) const {
             Internals * IntCoords = MainData->GetInternalCoordinates();
             if (IntCoords) IntCoords->WriteCoordinatesToFile(Buffer, MainData, Prefs);
 
-            textBuffer.Printf("%s", lText);
+            textBuffer.Printf(wxT("%s"), lText);
             delete Buffer;
             delete [] lText;
         }
@@ -1990,7 +1990,7 @@ void MolDisplayWin::UpdateFrameText(void) {
     if (MainData->cFrame->Vibs) {
       if (MainData->GetDrawMode()) {
           wxString temp;
-          output.Printf("Freq=%s", MainData->cFrame->Vibs->Frequencies[MainData->cFrame->Vibs->CurrentMode].c_str());
+          output.Printf(wxT("Freq=%s"), MainData->cFrame->Vibs->Frequencies[MainData->cFrame->Vibs->CurrentMode].c_str());
           WriteEnergy = false;
       }
     }
@@ -2011,16 +2011,16 @@ void MolDisplayWin::UpdateFrameText(void) {
         else if (lEOpts->PlotPEnergy())
             Energy = (MainData->cFrame->Energy - MainData->cFrame->KE-lEOpts->GetY1Zero())*UnitFactor;
         if (Energy != 0.0) {
-            output.Printf("E=%.*f", lEOpts->GetNumDigits(), Energy);
+            output.Printf(wxT("E=%.*f"), lEOpts->GetNumDigits(), Energy);
         }
         if (lPOpts->PlotRMSGradient()) {
             wxString temp;
-            temp.Printf(" RMS=%.*f", lEOpts->GetNumDigits(),
+            temp.Printf(wxT(" RMS=%.*f"), lEOpts->GetNumDigits(),
                     MainData->cFrame->GetRMSGradient()-lEOpts->GetY2Zero());
             output += temp;
         } else if (lPOpts->PlotMaxGradient()) {
             wxString temp;
-            temp.Printf(" Max Grad=%.*f", lEOpts->GetNumDigits(),
+            temp.Printf(wxT(" Max Grad=%.*f"), lEOpts->GetNumDigits(),
                     MainData->cFrame->GetMaxGradient()-lEOpts->GetY2Zero());
             output += temp;
         } else if (lPOpts->PlotBondLength()) {
@@ -2030,7 +2030,7 @@ void MolDisplayWin::UpdateFrameText(void) {
             a2 = lPOpts->Get2ndAtom();
             if (MainData->cFrame->GetBondLength(a1, a2, &bLength)) {
                 wxString temp;
-                temp.Printf(" Bond %ld-%ld=%.*f", a1+1, a2+1,
+                temp.Printf(wxT(" Bond %ld-%ld=%.*f"), a1+1, a2+1,
                         lEOpts->GetNumDigits(), bLength-lEOpts->GetY2Zero());
                 output += temp;
             }
@@ -2042,14 +2042,14 @@ void MolDisplayWin::UpdateFrameText(void) {
             a3 = lPOpts->Get3rdAtom();
             if (MainData->cFrame->GetBondAngle(a1, a2, a3, &bAngle)) {
                 wxString temp;
-                temp.Printf(" Angle %ld-%ld-%ld=%.*f", a1+1, a2+1, a3+1,
+                temp.Printf(wxT(" Angle %ld-%ld-%ld=%.*f"), a1+1, a2+1, a3+1,
                         lEOpts->GetNumDigits(), bAngle-lEOpts->GetY2Zero());
                 output += temp;
             }
         }
     }
     wxString ft;
-    ft.Printf(" Frame %d of %d", MainData->GetCurrentFrame(), MainData->GetNumFrames());
+    ft.Printf(wxT(" Frame %d of %d"), MainData->GetCurrentFrame(), MainData->GetNumFrames());
     output += ft;
     
     textBar->SetLabel(output);

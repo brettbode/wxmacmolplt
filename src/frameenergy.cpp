@@ -143,13 +143,13 @@ void FrameEnergy::CreateControls()
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	wxString temp;
-	temp.Printf("%.8f",lFrame->GetEnergy());
+	temp.Printf(wxT("%.8f"),lFrame->GetEnergy());
 	TEedit->SetValue(temp);
-	temp.Printf("%.8f",lFrame->GetMP2Energy());
+	temp.Printf(wxT("%.8f"),lFrame->GetMP2Energy());
 	MP2edit->SetValue(temp);
-	temp.Printf("%.8f",lFrame->GetKineticEnergy());
+	temp.Printf(wxT("%.8f"),lFrame->GetKineticEnergy());
 	KEedit->SetValue(temp);
-	temp.Printf("%.8f",lFrame->GetTime());
+	temp.Printf(wxT("%.8f"),lFrame->GetTime());
 	TimeEdit->SetValue(temp);
 	
 	//convert the values when tabing and when OK is hit
@@ -202,7 +202,7 @@ void FrameEnergy::OnOkClick( wxCommandEvent& event )
 	if (temp.ToDouble(&dval)) {
 		lFrame->SetEnergy(dval);
 	} else {
-		temp.Printf("%.8f",dval);
+		temp.Printf(wxT("%.8f"),dval);
 		TEedit->SetValue(temp);
 		return;
 	}
@@ -211,7 +211,7 @@ void FrameEnergy::OnOkClick( wxCommandEvent& event )
 	if (mp2.ToDouble(&dval)) {
 		lFrame->SetMP2Energy(dval);
 	} else {
-		temp.Printf("%.8f",dval);
+		temp.Printf(wxT("%.8f"),dval);
 		MP2edit->SetValue(temp);
 		return;
 	}
@@ -220,7 +220,7 @@ void FrameEnergy::OnOkClick( wxCommandEvent& event )
 	if (ke.ToDouble(&dval)) {
 		lFrame->SetKineticEnergy(dval);
 	} else {
-		temp.Printf("%.8f",dval);
+		temp.Printf(wxT("%.8f"),dval);
 		KEedit->SetValue(temp);
 		return;
 	}
@@ -229,7 +229,7 @@ void FrameEnergy::OnOkClick( wxCommandEvent& event )
 	if (time.ToDouble(&dval)) {
 		lFrame->SetTime(dval);
 	} else {
-		temp.Printf("%.8f",lFrame->GetTime());
+		temp.Printf(wxT("%.8f"),lFrame->GetTime());
 		TimeEdit->SetValue(temp);
 		return;
 	}

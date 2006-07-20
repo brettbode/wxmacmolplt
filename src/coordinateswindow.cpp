@@ -335,11 +335,11 @@ void CoordinatesWindow::FrameChanged(void) {
 			if (CoordType == 0) {
 				CPoint3D pos;
 				lFrame->GetAtomPosition(i, pos);
-				buf.Printf("%f", pos.x);
+				buf.Printf(wxT("%f"), pos.x);
 				coordGrid->SetCellValue(i, 1, buf);
-				buf.Printf("%f", pos.y);
+				buf.Printf(wxT("%f"), pos.y);
 				coordGrid->SetCellValue(i, 2, buf);
-				buf.Printf("%f", pos.z);
+				buf.Printf(wxT("%f"), pos.z);
 				coordGrid->SetCellValue(i, 3, buf);
 			} else {
 				Internals * internals = MainData->GetInternalCoordinates();
@@ -348,19 +348,19 @@ void CoordinatesWindow::FrameChanged(void) {
 					mInts = internals->GetMOPacStyle();
 				if (mInts) {
 					if (i>0) {
-						buf.Printf("%d", mInts->GetConnection(i,0)+1);
+						buf.Printf(wxT("%d"), mInts->GetConnection(i,0)+1);
 						coordGrid->SetCellValue(i, 1, buf);
-						buf.Printf("%f", mInts->GetValue(i,0));
+						buf.Printf(wxT("%f"), mInts->GetValue(i,0));
 						coordGrid->SetCellValue(i, 2, buf);
 						if (i>1) {
-							buf.Printf("%d", mInts->GetConnection(i,1)+1);
+							buf.Printf(wxT("%d"), mInts->GetConnection(i,1)+1);
 							coordGrid->SetCellValue(i, 3, buf);
-							buf.Printf("%.2f", mInts->GetValue(i,1));
+							buf.Printf(wxT("%.2f"), mInts->GetValue(i,1));
 							coordGrid->SetCellValue(i, 4, buf);
 							if (i>2) {
-								buf.Printf("%d", mInts->GetConnection(i,2)+1);
+								buf.Printf(wxT("%d"), mInts->GetConnection(i,2)+1);
 								coordGrid->SetCellValue(i, 5, buf);
-								buf.Printf("%.2f", mInts->GetValue(i,2));
+								buf.Printf(wxT("%.2f"), mInts->GetValue(i,2));
 								coordGrid->SetCellValue(i, 6, buf);
 							} else {
 								for (int j=5; j<7; j++)
@@ -556,7 +556,8 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 		if (val.ToLong(&atomnum)) {	//number instead of symbol
 			if ((atomnum < 1)||(atomnum>107)) atomnum = -1;//Not a correct Atomic #
 		} else {
-			atomnum = ::SetAtomType((const unsigned char *)val.ToAscii());//Change the symbol to Atomic #
+            const char *tmpChar = val.ToAscii();
+			atomnum = ::SetAtomType((const unsigned char *)tmpChar);//Change the symbol to Atomic #
 			if ((atomnum < 1)||(atomnum>107)) atomnum = -1;//Not a correct Atomic label
 		}
 		if ((atomnum > -1)&&(atomnum!=lFrame->GetAtomType(row))) {//A atom type was found so change the type
@@ -668,19 +669,19 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 					mInts->CartesiansToInternals(MainData);
 						//Need to update the length and angles for this row
 					if (row>0) {
-						val.Printf("%d", mInts->GetConnection(row,0)+1);
+						val.Printf(wxT("%d"), mInts->GetConnection(row,0)+1);
 						coordGrid->SetCellValue(row, 1, val);
-						val.Printf("%f", mInts->GetValue(row,0));
+						val.Printf(wxT("%f"), mInts->GetValue(row,0));
 						coordGrid->SetCellValue(row, 2, val);
 						if (row>1) {
-							val.Printf("%d", mInts->GetConnection(row,1)+1);
+							val.Printf(wxT("%d"), mInts->GetConnection(row,1)+1);
 							coordGrid->SetCellValue(row, 3, val);
-							val.Printf("%.2f", mInts->GetValue(row,1));
+							val.Printf(wxT("%.2f"), mInts->GetValue(row,1));
 							coordGrid->SetCellValue(row, 4, val);
 							if (row>2) {
-								val.Printf("%d", mInts->GetConnection(row,2)+1);
+								val.Printf(wxT("%d"), mInts->GetConnection(row,2)+1);
 								coordGrid->SetCellValue(row, 5, val);
-								val.Printf("%.2f", mInts->GetValue(row,2));
+								val.Printf(wxT("%.2f"), mInts->GetValue(row,2));
 								coordGrid->SetCellValue(row, 6, val);
 							}
 						}

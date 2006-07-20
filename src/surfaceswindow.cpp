@@ -325,21 +325,21 @@ int SurfacesWindow::selectSurfaceType()
   if (dialog.ShowModal() == wxID_OK)
     mCurrSurfStr= dialog.GetStringSelection();
 
-  if (mCurrSurfStr.Cmp("2D Orbital") == 0)
+  if (mCurrSurfStr.Cmp(wxT("2D Orbital")) == 0)
     return ID_2D_ORBITAL_PANE;
-  if (mCurrSurfStr.Cmp("3D Orbital") == 0)
+  if (mCurrSurfStr.Cmp(wxT("3D Orbital")) == 0)
     return ID_3D_ORBITAL_PANE;
-  if (mCurrSurfStr.Cmp("2D Total Electron Density") == 0)
+  if (mCurrSurfStr.Cmp(wxT("2D Total Electron Density")) == 0)
     return ID_2D_TE_DENSITY_PANE;
-  if (mCurrSurfStr.Cmp("3D Total Electron Density") == 0)
+  if (mCurrSurfStr.Cmp(wxT("3D Total Electron Density")) == 0)
     return ID_3D_TE_DENSITY_PANE;
-  if (mCurrSurfStr.Cmp("2D Molecular Electrostatic Potential") == 0)
+  if (mCurrSurfStr.Cmp(wxT("2D Molecular Electrostatic Potential")) == 0)
     return ID_2D_ME_POTENTIAL_PANE;
-  if (mCurrSurfStr.Cmp("3D Molecular Electrostatic Potential") == 0)
+  if (mCurrSurfStr.Cmp(wxT("3D Molecular Electrostatic Potential")) == 0)
     return ID_3D_ME_POTENTIAL_PANE;
-  if (mCurrSurfStr.Cmp("General 2D from File") == 0)
+  if (mCurrSurfStr.Cmp(wxT("General 2D from File")) == 0)
     return ID_2D_FILE_PANE;
-  if (mCurrSurfStr.Cmp("General 3D from File") == 0)
+  if (mCurrSurfStr.Cmp(wxT("General 3D from File")) == 0)
     return ID_3D_FILE_PANE;
 
   return -1;
@@ -386,7 +386,7 @@ void SurfacesWindow::Reset(void) {
 						break;
 				}
 				wxString temp;
-				temp.Printf("%s", lSurf->GetLabel());
+				temp.Printf(wxT("%s"), lSurf->GetLabel());
 				listBook->AddPage(tempPane, temp, true);
 			}
 		}
@@ -441,7 +441,7 @@ void SurfacesWindow::SurfaceUpdated(void) {
 	if (tempPane) {
 		Surface * tempSurf = tempPane->GetTargetSurface();
 		wxString temp;
-		temp.Printf("%s", tempSurf->GetLabel());
+		temp.Printf(wxT("%s"), tempSurf->GetLabel());
 		surfTitleEdit->SetValue(temp);
 		listBook->SetPageText(listBook->GetSelection(), temp);
 		//The previous line does not immediately update the list text???
@@ -458,7 +458,7 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 	  Fit();
 
 	  Surface * tempSurf = tempPane->GetTargetSurface();
-	  temp.Printf("%s", tempSurf->GetLabel());
+	  temp.Printf(wxT("%s"), tempSurf->GetLabel());
 	  visibleCheck->SetValue(tempPane->GetVisibility());
 
 	  int surfType = tempSurf->GetSurfaceType();
@@ -483,7 +483,7 @@ void SurfacesWindow::OnTitleChanged(wxCommandEvent& event )
   if (tempPane) 
     {
       Surface * tempSurf = tempPane->GetTargetSurface();
-      tempSurf->SetLabel(newLabel.c_str());
+      tempSurf->SetLabel((const char *)(newLabel.c_str()));
     }
 
   listBook->RemovePage(id);

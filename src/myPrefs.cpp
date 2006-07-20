@@ -164,11 +164,11 @@ AtomPrefsPane::AtomPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent
 {
   Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER|wxScrolledWindowStyle );
 
-  mLabels[0] = wxString("Atom");
-  mLabels[1] = wxString("#");
-  mLabels[2] = wxString("size(pm)");
-  mLabels[3] = wxString("mass");
-  mLabels[4] = wxString("Color");
+  mLabels[0] = wxString(wxT("Atom"));
+  mLabels[1] = wxString(wxT("#"));
+  mLabels[2] = wxString(wxT("size(pm)"));
+  mLabels[3] = wxString(wxT("mass"));
+  mLabels[4] = wxString(wxT("Color"));
 
   mMainSizer = new wxFlexGridSizer(kMaxAtomTypes, NUM_ATOM_LABELS, 3, 10);
 
@@ -212,7 +212,7 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
       mEleNames[i] = new wxTextCtrl( this, wxID_ANY, tmp, wxDefaultPosition, wxSize(30, 20));
       mMainSizer->Add(mEleNames[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-      tmp.Printf("%d", i+1);
+      tmp.Printf(wxT("%d"), i+1);
       mMainSizer->Add(new wxStaticText(
                             this,
                             wxID_ANY,
@@ -223,11 +223,11 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
                            ),
                        0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-      tmp.Printf("%d",mTargetPrefs->GetAtomSize(i));
+      tmp.Printf(wxT("%d"),mTargetPrefs->GetAtomSize(i));
       mEleSizes[i] = new wxTextCtrl( this, wxID_ANY, tmp, wxDefaultPosition, wxSize(40, 20));
       mMainSizer->Add(mEleSizes[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-      tmp.Printf("%.2f",mTargetPrefs->GetAtomMass(i));
+      tmp.Printf(wxT("%.2f"),mTargetPrefs->GetAtomMass(i));
       mEleMasses[i] = new wxTextCtrl( this, wxID_ANY, tmp, wxDefaultPosition, wxSize(50, 20));
       mMainSizer->Add(mEleMasses[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
@@ -290,7 +290,7 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
 
   mUpperSizer->Add(mChkAnim, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
   mUpperSizer->Add(mChkRotation, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-  mSldSizer->Add(new wxStaticText(this, wxID_ANY, wxString("Normal Mode Scaling:")) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+  mSldSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Mode Scaling:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   mSldSizer->Add(mSldScale, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
   mUpperSizer->Add(mSldSizer);
 
@@ -304,9 +304,9 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mBondChoice->SetSelection(1);
   mChoiceId = 1;
 
-  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("")), 0, wxALIGN_RIGHT | wxALL, 3);
-  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("Color")), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("Pattern")), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT(""))), 0, wxALIGN_RIGHT | wxALL, 3);
+  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Color"))), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Pattern"))), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
   mInnerSizer->Add(mBondChoice, 0, wxALIGN_RIGHT | wxALL, 3);
 
   mColorArea = new colorArea(this, 1, mTargetPrefs->GetBondColorLoc(1));
@@ -319,7 +319,7 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mInnerSizer->Add(mColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
   mInnerSizer->Add(mPatternArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("Normal Modes:")), 0, wxALIGN_RIGHT | wxALL, 3);
+  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Modes:"))), 0, wxALIGN_RIGHT | wxALL, 3);
   mInnerSizer->Add(mNormColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
   mInnerSizer->Add(mNormPatternArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
@@ -492,13 +492,13 @@ void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
                              wxSL_AUTOTICKS | wxSL_LABELS);
 
   wxString tmp;
-  tmp.Printf("%d", lEOpts->GetNumDigits());
+  tmp.Printf(wxT("%d"), lEOpts->GetNumDigits());
   mNumDigitsArea = new wxTextCtrl( this, wxID_ANY, tmp, wxDefaultPosition, wxDefaultSize);
 
-  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString("E. Plot Ball Size:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("E. Plot Ball Size:"))), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
   mUpperSizer->Add(mSldBallSize, 0, wxALIGN_LEFT | wxALL, 3);
   mUpperSizer->Add(30, 30);
-  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString("# digits")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("# digits"))), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
   mUpperSizer->Add(mNumDigitsArea, 0, wxALIGN_CENTER | wxALL, 3);
 
   mEColor = new colorArea(this, 0, lEOpts->GetTEColor());
@@ -506,28 +506,28 @@ void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mPEColor = new colorArea(this, 2, lEOpts->GetPEColor());
   mOtherColor = new colorArea(this, 3, lEOpts->GetKEColor());
 
-  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("E Color")), 0, wxALIGN_RIGHT | wxALL, 3);
+  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("E Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
   mLowerSizer->Add(mEColor, 0, wxALIGN_LEFT | wxALL, 3);
-  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("MP Color")), 0, wxALIGN_RIGHT | wxALL, 3);
+  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("MP Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
   mLowerSizer->Add(mMPColor, 0, wxALIGN_LEFT | wxALL, 3);
 
   if (!PrefsAreGlobal())
     {
-      mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("Y1 zero pt ")), 0, wxALIGN_RIGHT | wxALL, 3);
-      tmp.Printf("%.4f",lEOpts->GetY1Zero());
+      mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Y1 zero pt "))), 0, wxALIGN_RIGHT | wxALL, 3);
+      tmp.Printf(wxT("%.4f"),lEOpts->GetY1Zero());
       mY1pt = new wxTextCtrl(this, wxID_ANY, tmp);
       mLowerSizer->Add(mY1pt, 0, wxALIGN_RIGHT | wxALL, 3);
     }
 
-  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("PE Color")), 0, wxALIGN_RIGHT | wxALL, 3);
+  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("PE Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
   mLowerSizer->Add(mPEColor, 0, wxALIGN_LEFT | wxALL, 3);
-  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("Other Color")), 0, wxALIGN_RIGHT | wxALL, 3);
+  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Other Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
   mLowerSizer->Add(mOtherColor, 0, wxALIGN_LEFT | wxALL, 3);
 
   if (!PrefsAreGlobal())
     {
-      mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString("Y2 zero pt ")), 0, wxALIGN_RIGHT | wxALL, 3);
-      tmp.Printf("%.4f",lEOpts->GetY2Zero());
+      mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Y2 zero pt "))), 0, wxALIGN_RIGHT | wxALL, 3);
+      tmp.Printf(wxT("%.4f"),lEOpts->GetY2Zero());
       mY2pt = new wxTextCtrl(this, wxID_ANY, tmp);
       mLowerSizer->Add(mY2pt, 0, wxALIGN_RIGHT | wxALL, 3);
     }
@@ -622,26 +622,26 @@ void EnergyPrefsPane::setHiddenCtrls()
   wxString tmp;
   if (!mAtomText[0])
     {
-      tmp.Printf("%d", lPOpts->Get1stAtom()+1);
+      tmp.Printf(wxT("%d"), lPOpts->Get1stAtom()+1);
       mAtomText[0] = new wxTextCtrl(this, wxID_ANY, tmp);
     }
   if (!mAtomText[1])
     {
-      tmp.Printf("%d", lPOpts->Get2ndAtom()+1);
+      tmp.Printf(wxT("%d"), lPOpts->Get2ndAtom()+1);
       mAtomText[1] = new wxTextCtrl(this, wxID_ANY, tmp);
     }
 
-  mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString("Atom 1:")), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
+  mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 1:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
   mRight1BottomSizer->Add(mAtomText[0], wxALIGN_CENTER | wxALL, 3);
-  mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString("Atom 2:")), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
+  mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 2:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
   mRight1BottomSizer->Add(mAtomText[1], wxALIGN_CENTER | wxALL, 3);
 
   if (!mAtomText[2])
     {
-      tmp.Printf("%d", lPOpts->Get3rdAtom()+1);
+      tmp.Printf(wxT("%d"), lPOpts->Get3rdAtom()+1);
       mAtomText[2] = new wxTextCtrl(this, wxID_ANY, tmp);
     }
-  mRight2BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString("Atom 3:")), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
+  mRight2BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 3:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
   mRight2BottomSizer->Add(mAtomText[2], wxALIGN_CENTER | wxALL, 3);
 	  
   mRightBottomSizer->Add(mRight1BottomSizer);
@@ -856,7 +856,7 @@ if (PrefsAreGlobal())
   mLowerSizer->Add(mSldTol, 0, wxALIGN_LEFT | wxALL, 3);
 
   wxString tmp;
-  tmp.Printf("%d", mTargetPrefs->GetDRCSkip());
+  tmp.Printf(wxT("%d"), mTargetPrefs->GetDRCSkip());
   mPointSkip = new wxTextCtrl(this, wxID_ANY, tmp);
 
   mBottomSizer->Add(new wxStaticText(this, wxID_ANY, _T("When reading a DRC file how many\n points should be skipped between\n points read in? (0 reads every point)")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
@@ -1007,7 +1007,7 @@ void StereoPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mMiddleSizer->Add(new wxStaticText(this, wxID_ANY, _T("Offset (degrees) ")), 0, wxALIGN_LEFT | wxALL, 10);
 
   wxString tmp;
-  tmp.Printf("%d", mTargetPrefs->GetStereoOffset());
+  tmp.Printf(wxT("%d"), mTargetPrefs->GetStereoOffset());
   mOffDegree = new wxTextCtrl( this, wxID_ANY, tmp);
 
   mMiddleSizer->Add(mOffDegree, 0, wxALIGN_LEFT | wxALL, 3);
@@ -1100,13 +1100,13 @@ void SurfacePrefsPane::SetupPaneItems( MolDisplayWin* targetWindow)
   mRightMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("# of Contours:")), 0, wxALIGN_CENTER | wxALL, 3);
   
   wxString tmp;
-  tmp.Printf("%d", lSOpts->GetNumContours());
+  tmp.Printf(wxT("%d"), lSOpts->GetNumContours());
   mNumContour = new wxTextCtrl(this, wxID_ANY, tmp);
   mRightMidSizer->Add(mNumContour, 0, wxALIGN_CENTER | wxALL, 3);
 
  mRightMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("Max contour value")), 0, wxALIGN_CENTER | wxALL, 3);
 
-  tmp.Printf("%.3f", lSOpts->GetMaxContour());
+  tmp.Printf(wxT("%.3f"), lSOpts->GetMaxContour());
   mMaxContourValue = new wxTextCtrl(this, wxID_ANY, tmp);
   mRightMidSizer->Add(mMaxContourValue, 0, wxALIGN_CENTER | wxALL, 3);			       
   mRightSizer->Add(mRightMidSizer);

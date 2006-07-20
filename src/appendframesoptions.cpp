@@ -186,9 +186,9 @@ wxIcon AppendFramesOptions::GetIconResource( const wxString& name )
 void AppendFramesOptions::SetupItems(void) {
     negativeCheck->SetValue(flip);
 	wxString buf;
-	buf.Printf("%lf", offset);
+	buf.Printf(wxT("%lf"), offset);
     offsetEdit->SetValue(buf);
-	buf.Printf("%ld", skip);
+	buf.Printf(wxT("%ld"), skip);
     skipEdit->SetValue(buf);
 }
 /*!
@@ -201,13 +201,13 @@ void AppendFramesOptions::OnOkClick( wxCommandEvent& event )
 	bool good = true;
 	wxString oval = offsetEdit->GetValue();
 	if (! oval.ToDouble(&offset)) {
-		oval.Printf("%lf", offset);
+		oval.Printf(wxT("%lf"), offset);
 		offsetEdit->SetValue(oval);
 		good = false;
 	}
 	wxString sval = skipEdit->GetValue();
 	if (! sval.ToLong(&skip)) {
-		sval.Printf("%ld", skip);
+		sval.Printf(wxT("%ld"), skip);
 		skipEdit->SetValue(sval);
 		good = false;
 	}

@@ -528,7 +528,7 @@ void OrbSurfacePane::makeMOList(vector<wxString>& choice)
 			char* oneSymLabel;
 
 			for (int theCell = 0; theCell < NumMOs; theCell++) {
-				tmpStr.Printf("%d  ", theCell+1); 
+				tmpStr.Printf(wxT("%d  "), theCell+1); 
 
 				if (SymLabel) {	//Add the symetry of the orb, if known
 		
@@ -558,33 +558,33 @@ void OrbSurfacePane::makeMOList(vector<wxString>& choice)
 				if (OrbColumnEnergyOrOccupation) {	//orb occupation selected
 		
 					if (OccNum)
-						temp.Printf("%.3f", OccNum[theCell]);
+						temp.Printf(wxT("%.3f"), OccNum[theCell]);
 					else {	
 						//attempt to set the occupation based on the wavefunction type
 						if (lMOs->getOrbitalWavefunctionType() == RHF) {
 							if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
-								temp.Printf("2  ");
+								temp.Printf(wxT("2  "));
 							else 
-								temp.Printf("0  ");
+								temp.Printf(wxT("0  "));
 						} else if (lMOs->getOrbitalWavefunctionType() == ROHF) {
-							temp.Printf("0  ");
+							temp.Printf(wxT("0  "));
 							if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
-								temp.Printf("2  ");
+								temp.Printf(wxT("2  "));
 							else if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
-								temp.Printf("1  ");
+								temp.Printf(wxT("1  "));
 						} else if (lMOs->getOrbitalWavefunctionType() == UHF) {
-							temp.Printf("0  ");
+							temp.Printf(wxT("0  "));
 							if (Alpha) {
 								if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
-									temp.Printf("1  ");
+									temp.Printf(wxT("1  "));
 							} else if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
-								temp.Printf("1  ");
+								temp.Printf(wxT("1  "));
 						} else {	//MCSCF or CI occupations can't be guessed
-							temp.Printf("?? ");
+							temp.Printf(wxT("?? "));
 						}
 					}
 				} else if (Energy) {	//punch out the orb energy
-					temp.Printf("%.3f", Energy[theCell]);
+					temp.Printf(wxT("%.3f"), Energy[theCell]);
 				}
 
 				tmpStr.Append(temp);
@@ -629,7 +629,7 @@ void OrbSurfacePane::makeAOList(vector<wxString>& choice)
 		      if ((ishell==minshell)&&(theCell==ifunc))
 			{
 			  sprintf(label, "%ld", iatom+1);
-			  aChoice.Append(label);
+			  aChoice.Append((wxChar*)label);
 
 			  nchar = aChoice.Length();
 
@@ -662,7 +662,7 @@ void OrbSurfacePane::makeAOList(vector<wxString>& choice)
 			{	//Make sure there really is something there
 			  //aChoice.Append(' ');
 			  //aChoice.Append(' ');
-			  aChoice.Append(label);
+			  aChoice.Append((wxChar*)label);
 
 			  for (long ichar=1; ichar<=nchar; ichar++)
 			    {
@@ -725,7 +725,7 @@ void OrbSurfacePane::makeAOList(vector<wxString>& choice)
 			      char label[63];
 
 			      sprintf(label, "%.3f", aVector[theCell]);//prepare the coef for printing
-			      aChoice.Append(label);
+			      aChoice.Append((wxChar*)label);
 			    }
 			}
 		    }
@@ -844,8 +844,8 @@ void Surface2DPane::OnIdle( wxIdleEvent& WXUNUSED(event) )
       if (className.Cmp(_T("wxTextCtrl")) == 0 
 	  || className.Cmp(_T("Orbital2DSurfPane")) == 0 )
 	{
-	  NumContours = atol((mNumContourText->GetValue()).c_str());
-	  MaxContourValue = atof((mContourValText->GetValue()).c_str());
+	  NumContours = atol((const char *)(mNumContourText->GetValue()).c_str());
+	  MaxContourValue = atof((const char *)(mContourValText->GetValue()).c_str());
 	  setUpdateButton();
 	}
     }
@@ -894,7 +894,7 @@ void Surface2DPane::OnContourValueText(wxCommandEvent& event )
 void Surface2DPane::SetContourValueText(void)
 {
 	wxString tmpStr;
-	tmpStr.Printf("%.4f", MaxContourValue);
+	tmpStr.Printf(wxT("%.4f"), MaxContourValue);
 	mContourValText->SetValue(tmpStr);
 }
 void Surface2DPane::OnNumContoursText(wxCommandEvent& event )
@@ -911,7 +911,7 @@ void Surface2DPane::OnNumContoursText(wxCommandEvent& event )
 void Surface2DPane::SetNumContoursText(void)
 {
 	wxString tmpStr;
-	tmpStr.Printf("%ld", NumContours);
+	tmpStr.Printf(wxT("%ld"), NumContours);
 	mNumContourText->SetValue(tmpStr);
 }
 
@@ -987,13 +987,13 @@ void Surface3DPane::OnContourValueEnter(wxCommandEvent& event )
 void Surface3DPane::SetContourValueText(void)
 {
 	wxString tmpStr;
-	tmpStr.Printf("%.4f", ContourValue);
+	tmpStr.Printf(wxT("%.4f"), ContourValue);
 	mContourValueEdit->SetValue(tmpStr);
 }
 void Surface3DPane::SetContourMaxValueText(void)
 {
 	wxString tmpStr;
-	tmpStr.Printf("%.4f", mTarget->GetGridMax());
+	tmpStr.Printf(wxT("%.4f"), mTarget->GetGridMax());
 	mGridMaxText->SetLabel(tmpStr);
 }
 void Surface3DPane::OnContourValueSld(wxCommandEvent &event )
@@ -1189,13 +1189,13 @@ void Orbital2DSurfPane::CreateControls()
 
   rightMiddleSizer->Add(mNumContourLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
 
-  tmpStr.Printf("%ld", NumContours);
+  tmpStr.Printf(wxT("%ld"), NumContours);
   mNumContourText->SetValue(tmpStr);
   rightMiddleSizer->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
 
   rightMiddleSizer->Add(mContourValLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
 
-  tmpStr.Printf("%.2f", MaxContourValue);
+  tmpStr.Printf(wxT("%.2f"), MaxContourValue);
   mContourValText->SetValue(tmpStr);
   rightMiddleSizer->Add(mContourValText, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
 
@@ -1749,7 +1749,7 @@ void Orbital3DSurfPane::CreateControls()
   mSubRightBot0Sizer->Add(mContourValueEdit);
 
   wxString tmpStr;
-  tmpStr.Printf("%.4f", ContourValue);
+  tmpStr.Printf(wxT("%.4f"), ContourValue);
   mContourValueEdit->SetValue(tmpStr);
 
   mSubRightBot0Sizer->Add(30,30);
@@ -1758,7 +1758,7 @@ void Orbital3DSurfPane::CreateControls()
   mSubRightBot0Sizer->Add(mGridMinText, 0, wxALIGN_TOP | wxALL, 3);
   mSubRightBot0Sizer->Add(100,30);
 
-  tmpStr.Printf("%.4f", GridMax);
+  tmpStr.Printf(wxT("%.4f"), GridMax);
   mGridMaxText = new wxStaticText(this, wxID_ANY, tmpStr, 
 				     wxDefaultPosition, wxDefaultSize);
   mSubRightBot0Sizer->Add(mGridMaxText, 
@@ -1811,7 +1811,7 @@ bool Orbital3DSurfPane::UpdateNeeded(void)
 {
   bool result = false;
 
-  ContourValue = atof(mContourValueEdit->GetValue());
+  ContourValue = atof((const char *)((mContourValueEdit->GetValue()).c_str()));
 
   if (PlotOrb >= 0) 
     {	//Don't update unless a valid orbital is chosen
@@ -1955,7 +1955,7 @@ void Orbital3DSurfPane::OnContourValueSld(wxCommandEvent &event )
   //mTarget->SetContourValue(ContourValue);
 
   wxString tmpStr;
-  tmpStr.Printf("%.4f", ContourValue);
+  tmpStr.Printf(wxT("%.4f"), ContourValue);
   mContourValueEdit->SetValue(tmpStr);
 
   setUpdateButton();
@@ -2124,7 +2124,7 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event )
   float GridMax = mTarget->GetGridMax();
 
   wxString tmpStr;
-  tmpStr.Printf("%.4f", GridMax);
+  tmpStr.Printf(wxT("%.4f"), GridMax);
   mGridMaxText->SetLabel(tmpStr);
 
   setContourValueSld();
@@ -2265,14 +2265,14 @@ void General3DSurfPane::refreshControls()
 	
 	mContourValSld->SetValue((short) (100*((ContourValue - GridMin)/Range)));
 	wxString tmpStr;
-	tmpStr.Printf("%.4f", ContourValue);
+	tmpStr.Printf(wxT("%.4f"), ContourValue);
 	mContourValueEdit->SetValue(tmpStr);
-	tmpStr.Printf("%.4f", GridMax);
+	tmpStr.Printf(wxT("%.4f"), GridMax);
 	mGridMaxText->SetLabel(tmpStr);
-	tmpStr.Printf("%.4f", GridMin);
+	tmpStr.Printf(wxT("%.4f"), GridMin);
 	mGridMinText->SetLabel(tmpStr);
 
-	tmpStr.Printf("%.4f", MultValue);
+	tmpStr.Printf(wxT("%.4f"), MultValue);
 	mGenMultValue->SetValue(tmpStr);
 	mMultCheck->SetValue(useMultValue);
 	mSquareCheck->SetValue(squareValues);
@@ -2488,7 +2488,7 @@ void General3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	
 	mContourValSld->SetValue((short) (100*((ContourValue-GridMin)/Range)));
 	wxString tmpStr;
-	tmpStr.Printf("%.4f", ContourValue);
+	tmpStr.Printf(wxT("%.4f"), ContourValue);
 	mContourValueEdit->SetValue(tmpStr);
 	
 	UpdateTest = false;
@@ -2518,7 +2518,7 @@ void General3DSurfPane::OnContourValueEnter(wxCommandEvent& event )
 	if (mTarget->GetGridMax() > 0.000001 ) {
 		wxString tmpStr = mContourValueEdit->GetValue();
 		if (!tmpStr.ToDouble(&newVal)) {
-			tmpStr.Printf("%.4f", ContourValue);
+			tmpStr.Printf(wxT("%.4f"), ContourValue);
 			mContourValueEdit->SetValue(tmpStr);
 			return;
 		}
@@ -2527,7 +2527,7 @@ void General3DSurfPane::OnContourValueEnter(wxCommandEvent& event )
 		if (fabs(newVal) > mTarget->GetGridMax()) newVal = mTarget->GetGridMax();
 		ContourValue = newVal;
 
-		tmpStr.Printf("%.4f", newVal);
+		tmpStr.Printf(wxT("%.4f"), newVal);
 		mContourValueEdit->SetValue(tmpStr);
 		
 		float GridMax = mTarget->GetGridMax();
@@ -2551,7 +2551,7 @@ void General3DSurfPane::OnContourValueSld(wxCommandEvent &event )
 	ContourValue = GridMin + (0.01 * mContourValSld->GetValue() * Range);
 	
 	wxString tmpStr;
-	tmpStr.Printf("%.4f", ContourValue);
+	tmpStr.Printf(wxT("%.4f"), ContourValue);
 	mContourValueEdit->SetValue(tmpStr);
 	
 	setUpdateButton();
@@ -2564,7 +2564,7 @@ void General3DSurfPane::OnMultValueEnter(wxCommandEvent& event )
 	if (temp.ToDouble(&newVal)) {
 		MultValue = newVal;
 	}
-	temp.Printf("%.4f", MultValue);
+	temp.Printf(wxT("%.4f"), MultValue);
 	mGenMultValue->SetValue(temp);
 	setUpdateButton();
 }
@@ -2780,9 +2780,9 @@ void General2DSurfPane::OnUpdate(wxCommandEvent &event) {
 void General2DSurfPane::refreshControls()
 {
 	wxString tmpStr;
-	tmpStr.Printf("%.2f", MaxContourValue);
+	tmpStr.Printf(wxT("%.2f"), MaxContourValue);
 	mContourValText->SetValue(tmpStr);
-	tmpStr.Printf("%ld", NumContours);
+	tmpStr.Printf(wxT("%ld"), NumContours);
 	mNumContourText->SetValue(tmpStr);
 	
 	SetMultValue();
@@ -2797,7 +2797,7 @@ void General2DSurfPane::refreshControls()
 }
 void General2DSurfPane::SetMultValue(void) {
 	wxString temp;
-	temp.Printf("%.4f", MultValue);
+	temp.Printf(wxT("%.4f"), MultValue);
 	mGenMultValue->SetValue(temp);
 }
 
@@ -3259,7 +3259,7 @@ void TEDensity3DSurfPane::OnMaxMEPValueText(wxCommandEvent& event )
 }
 void TEDensity3DSurfPane::SetMaxMEPValueText(void) {
 	wxString temp;
-	temp.Printf("%.4f", MaxMEPValue);
+	temp.Printf(wxT("%.4f"), MaxMEPValue);
 	mMaxMapEdit->SetValue(temp);
 }
 bool TEDensity3DSurfPane::UpdateNeeded(void) 
@@ -4301,7 +4301,7 @@ void Surface2DParamDlg::createControls()
 		 0, wxALIGN_LEFT | wxALL, 3);
 
   numGridPoint = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
-  tmpStr.Printf("%ld", mTargetSurf->GetNumGridPoints());
+  tmpStr.Printf(wxT("%ld"), mTargetSurf->GetNumGridPoints());
   numGridPoint->SetValue(tmpStr);
   firstTierSizer->Add(numGridPoint, 0, wxALL, 5);
 
@@ -4315,15 +4315,15 @@ void Surface2DParamDlg::createControls()
 		 0, wxALIGN_LEFT | wxALL, 3);
 
   originText1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.x);
+  tmpStr.Printf(wxT("%f"), tempPt.x);
   originText1->SetValue(tmpStr);
 
   originText2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.y);
+  tmpStr.Printf(wxT("%f"), tempPt.y);
   originText2->SetValue(tmpStr);
 
   originText3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.z);
+  tmpStr.Printf(wxT("%f"), tempPt.z);
   originText3->SetValue(tmpStr);
 
   secondTierSizer->Add(originText1, 0, wxALL, 5);
@@ -4340,15 +4340,15 @@ void Surface2DParamDlg::createControls()
 		 0, wxALIGN_LEFT | wxALL, 3);
 
   vectorAxis1x = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.x);
+  tmpStr.Printf(wxT("%f"), tempPt.x);
   vectorAxis1x->SetValue(tmpStr);
 
   vectorAxis1y = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.y);
+  tmpStr.Printf(wxT("%f"), tempPt.y);
   vectorAxis1y->SetValue(tmpStr);
 
   vectorAxis1z = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.z);
+  tmpStr.Printf(wxT("%f"), tempPt.z);
   vectorAxis1z->SetValue(tmpStr);
 
   thirdTierSizer->Add(vectorAxis1x, 0, wxALL, 5);
@@ -4365,15 +4365,15 @@ void Surface2DParamDlg::createControls()
 		 0, wxALIGN_LEFT | wxALL, 3);
 
   vectorAxis2x = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.x);
+  tmpStr.Printf(wxT("%f"), tempPt.x);
   vectorAxis2x->SetValue(tmpStr);
 
   vectorAxis2y = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.y);
+  tmpStr.Printf(wxT("%f"), tempPt.y);
   vectorAxis2y->SetValue(tmpStr);
 
   vectorAxis2z = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.z);
+  tmpStr.Printf(wxT("%f"), tempPt.z);
   vectorAxis2z->SetValue(tmpStr);
 
   fourthTierSizer->Add(vectorAxis2x, 0, wxALL, 5);
@@ -4405,33 +4405,33 @@ void Surface2DParamDlg::OnClose(wxCommandEvent &event )
   float	tempFlt;
 
   tmpStr = numGridPoint->GetValue();
-  tempLong = atol(tmpStr.c_str());
+  tempLong = atol((const char *)tmpStr.c_str());
   mTargetSurf->SetNumGridPoints(tempLong);
 
   tmpStr = originText1->GetValue();
-  tempPt.x = atof(tmpStr.c_str());
+  tempPt.x = atof((const char *)tmpStr.c_str());
   tmpStr = originText2->GetValue();
-  tempPt.y = atof(tmpStr.c_str());
+  tempPt.y = atof((const char *)tmpStr.c_str());
   tmpStr = originText3->GetValue();
-  tempPt.z = atof(tmpStr.c_str());
+  tempPt.z = atof((const char *)tmpStr.c_str());
 
   mTargetSurf->SetOrigin(&tempPt);
 
   tmpStr = vectorAxis1x->GetValue();
-  tempPt.x = atof(tmpStr);
+  tempPt.x = atof((const char *)tmpStr.c_str());
   tmpStr = vectorAxis1y->GetValue();
-  tempPt.y = atof(tmpStr);			     
+  tempPt.y = atof((const char *)tmpStr.c_str());			     
   tmpStr = vectorAxis1z->GetValue();
-  tempPt.z = atof(tmpStr);
+  tempPt.z = atof((const char *)tmpStr.c_str());
 
   mTargetSurf->SetXIncrement(&tempPt);
 
   tmpStr = vectorAxis2x->GetValue();
-  tempPt.x = atof(tmpStr);
+  tempPt.x = atof((const char *)tmpStr.c_str());
   tmpStr = vectorAxis2y->GetValue();
-  tempPt.y = atof(tmpStr);			     
+  tempPt.y = atof((const char *)tmpStr.c_str());			     
   tmpStr = vectorAxis2z->GetValue();
-  tempPt.z = atof(tmpStr);
+  tempPt.z = atof((const char *)tmpStr.c_str());
 
   mTargetSurf->SetYIncrement(&tempPt);
 
@@ -4531,15 +4531,15 @@ void Surface3DParamDlg::createControls()
 
   firstTierSizer = new wxBoxSizer(wxHORIZONTAL);
   numGridPoint1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
-  tmpStr.Printf("%ld", mTargetSurf->GetNumXGridPoints());
+  tmpStr.Printf(wxT("%ld"), mTargetSurf->GetNumXGridPoints());
   numGridPoint1->SetValue(tmpStr);
 
   numGridPoint2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
-  tmpStr.Printf("%ld", mTargetSurf->GetNumYGridPoints());
+  tmpStr.Printf(wxT("%ld"), mTargetSurf->GetNumYGridPoints());
   numGridPoint2->SetValue(tmpStr);
 
   numGridPoint3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
-  tmpStr.Printf("%ld", mTargetSurf->GetNumZGridPoints());
+  tmpStr.Printf(wxT("%ld"), mTargetSurf->GetNumZGridPoints());
   numGridPoint3->SetValue(tmpStr);
 
   firstTierSizer->Add(numGridPoint1, 0, wxALL, 5);
@@ -4558,15 +4558,15 @@ void Surface3DParamDlg::createControls()
   mTargetSurf->GetOrigin(&tempPt);
 
   originText1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.x);
+  tmpStr.Printf(wxT("%f"), tempPt.x);
   originText1->SetValue(tmpStr);
 
   originText2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.y);
+  tmpStr.Printf(wxT("%f"), tempPt.y);
   originText2->SetValue(tmpStr);
 
   originText3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", tempPt.z);
+  tmpStr.Printf(wxT("%f"), tempPt.z);
   originText3->SetValue(tmpStr);
 
   secondTierSizer->Add(originText1, 0, wxALL, 5);
@@ -4582,15 +4582,15 @@ void Surface3DParamDlg::createControls()
 
   thirdTierSizer = new wxBoxSizer(wxHORIZONTAL);
   gridIncText1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", mTargetSurf->GetXGridInc());
+  tmpStr.Printf(wxT("%f"), mTargetSurf->GetXGridInc());
   gridIncText1->SetValue(tmpStr);
 
   gridIncText2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", mTargetSurf->GetYGridInc());
+  tmpStr.Printf(wxT("%f"), mTargetSurf->GetYGridInc());
   gridIncText2->SetValue(tmpStr);
 
   gridIncText3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
-  tmpStr.Printf("%f", mTargetSurf->GetZGridInc());
+  tmpStr.Printf(wxT("%f"), mTargetSurf->GetZGridInc());
   gridIncText3->SetValue(tmpStr);
 
   thirdTierSizer->Add(gridIncText1, 0, wxALL, 5);
@@ -4623,36 +4623,36 @@ void Surface3DParamDlg::OnClose(wxCommandEvent &event )
   float	tempFlt;
 
   tmpStr = numGridPoint1->GetValue();
-  tempLong = atol(tmpStr.c_str());
+  tempLong = atol((const char *)tmpStr.c_str());
   mTargetSurf->SetNumXGridPoints(tempLong);
 
   tmpStr = numGridPoint2->GetValue();
-  tempLong = atol(tmpStr.c_str());		
+  tempLong = atol((const char *)tmpStr.c_str());		
   mTargetSurf->SetNumYGridPoints(tempLong);
 				
   tmpStr = numGridPoint3->GetValue();
-  tempLong = atol(tmpStr.c_str());
+  tempLong = atol((const char *)tmpStr.c_str());
   mTargetSurf->SetNumZGridPoints(tempLong);
 
   tmpStr = originText1->GetValue();
-  tempPt.x = atof(tmpStr.c_str());
+  tempPt.x = atof((const char *)tmpStr.c_str());
   tmpStr = originText2->GetValue();
-  tempPt.y = atof(tmpStr.c_str());
+  tempPt.y = atof((const char *)tmpStr.c_str());
   tmpStr = originText3->GetValue();
-  tempPt.z = atof(tmpStr.c_str());
+  tempPt.z = atof((const char *)tmpStr.c_str());
 
   mTargetSurf->SetOrigin(&tempPt);
 
   tmpStr = gridIncText1->GetValue();
-  tempFlt = atof(tmpStr);
+  tempFlt = atof((const char *)tmpStr.c_str());
   mTargetSurf->SetXGridInc(tempFlt);
 
   tmpStr = gridIncText2->GetValue();
-  tempFlt = atof(tmpStr);
+  tempFlt = atof((const char *)tmpStr.c_str());
   mTargetSurf->SetYGridInc(tempFlt);			
 			       
   tmpStr = gridIncText3->GetValue();
-  tempFlt = atof(tmpStr);
+  tempFlt = atof((const char *)tmpStr.c_str());
   mTargetSurf->SetZGridInc(tempFlt);
 	
   mTargetSurf->SetFixGrid(true);

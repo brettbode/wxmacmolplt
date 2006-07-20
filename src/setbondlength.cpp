@@ -188,7 +188,7 @@ void SetBondLength::CreateControls()
 	hydrogenCheck->SetValue(Prefs->AllowHydrogenBonds());
 	normalTolSlider->SetValue((int) (Prefs->GetAutoBondScale()*10000));
 	wxString buf;
-	buf.Printf("%.2f",Prefs->GetMaxBondLength());
+	buf.Printf(wxT("%.2f"),Prefs->GetMaxBondLength());
 	maxValueEdit->SetValue(buf);
 }
 
@@ -235,7 +235,7 @@ void SetBondLength::OnMaxlengtheditUpdated( wxCommandEvent& event )
 	wxString textVal = maxValueEdit->GetValue();
 	double val = 0.0;
 	if (! textVal.ToDouble(&val)) {
-		textVal.Printf("%.2f", val);
+		textVal.Printf(wxT("%.2f"), val);
 		maxValueEdit->SetValue(textVal);
 	}
     event.Skip();

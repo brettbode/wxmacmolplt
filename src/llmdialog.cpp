@@ -183,7 +183,7 @@ void LLMDialog::OnTextctrlUpdated( wxCommandEvent& event )
 	wxString textVal = numPointsEdit->GetValue();
 	long numPoints = 0;
 	if (! textVal.ToLong(&numPoints)) {
-		textVal.Printf("%ld", numPoints);
+		textVal.Printf(wxT("%ld"), numPoints);
 		numPointsEdit->SetValue(textVal);
 	}
     event.Skip();

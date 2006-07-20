@@ -309,23 +309,23 @@ void SetScreenPlane::setPlaneValues(void) {
 	if (atom2 < 0) Atom2Ctl->Clear();
 	if (atom3 < 0) Atom3Ctl->Clear();
 	
-	field.Printf("%f", PlanePts[0].x);
+	field.Printf(wxT("%f"), PlanePts[0].x);
 	Pt1XCtl->SetValue(field);
-	field.Printf("%f", PlanePts[0].y);
+	field.Printf(wxT("%f"), PlanePts[0].y);
 	Pt1YCtl->SetValue(field);
-	field.Printf("%f", PlanePts[0].z);
+	field.Printf(wxT("%f"), PlanePts[0].z);
 	Pt1ZCtl->SetValue(field);
-	field.Printf("%f", PlanePts[1].x);
+	field.Printf(wxT("%f"), PlanePts[1].x);
 	Pt2XCtl->SetValue(field);
-	field.Printf("%f", PlanePts[1].y);
+	field.Printf(wxT("%f"), PlanePts[1].y);
 	Pt2YCtl->SetValue(field);
-	field.Printf("%f", PlanePts[1].z);
+	field.Printf(wxT("%f"), PlanePts[1].z);
 	Pt2ZCtl->SetValue(field);
-	field.Printf("%f", PlanePts[2].x);
+	field.Printf(wxT("%f"), PlanePts[2].x);
 	Pt3XCtl->SetValue(field);
-	field.Printf("%f", PlanePts[2].y);
+	field.Printf(wxT("%f"), PlanePts[2].y);
 	Pt3YCtl->SetValue(field);
-	field.Printf("%f", PlanePts[2].z);
+	field.Printf(wxT("%f"), PlanePts[2].z);
 	Pt3ZCtl->SetValue(field);
 }
 
@@ -370,7 +370,7 @@ void SetScreenPlane::OnAtom1Updated( wxCommandEvent& event )
 		else {
 			if (atom1 >= 0) {
 				wxString atm;
-				atm.Printf("%d", atom1);
+				atm.Printf(wxT("%d"), atom1);
 				Atom1Ctl->SetValue(atm);
 			} else
 				Atom1Ctl->Clear();
@@ -474,7 +474,7 @@ void SetScreenPlane::OnAtom2Updated( wxCommandEvent& event )
 		else {
 			if (atom2 >= 0) {
 				wxString atm;
-				atm.Printf("%d", atom2);
+				atm.Printf(wxT("%d"), atom2);
 				Atom2Ctl->SetValue(atm);
 			} else
 				Atom2Ctl->Clear();
@@ -578,7 +578,7 @@ void SetScreenPlane::OnAtom3Updated( wxCommandEvent& event )
 		else {
 			if (atom3 >= 0) {
 				wxString atm;
-				atm.Printf("%d", atom3);
+				atm.Printf(wxT("%d"), atom3);
 				Atom3Ctl->SetValue(atm);
 			} else
 				Atom3Ctl->Clear();

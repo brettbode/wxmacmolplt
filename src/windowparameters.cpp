@@ -209,23 +209,23 @@ void windowparameters::CreateControls()
 	
 	int width, height;
 	parent->GetClientSize(&width, &height);
-	screenX.Printf("%d", width);
-	screenY.Printf("%d", height);
+	screenX.Printf(wxT("%d"), width);
+	screenY.Printf(wxT("%d"), height);
 	
 	float scale = MainData->GetMoleculeSize();
-	windowScale.Printf("%f", scale);
+	windowScale.Printf(wxT("%f"), scale);
 
 	CPoint3D center;
 	MainData->GetModelCenter(&center);
-	XCenter.Printf("%f", center.x);
-	YCenter.Printf("%f", center.y);
-	ZCenter.Printf("%f", center.z);
+	XCenter.Printf(wxT("%f"), center.x);
+	YCenter.Printf(wxT("%f"), center.y);
+	ZCenter.Printf(wxT("%f"), center.z);
 
 	float psi1, phi1, theta1;
 	MainData->GetModelRotation(&psi1, &phi1, &theta1);
-	psi.Printf("%.2f", psi1);
-	phi.Printf("%.2f", phi1);
-	theta.Printf("%.2f", theta1);
+	psi.Printf(wxT("%.2f"), psi1);
+	phi.Printf(wxT("%.2f"), phi1);
+	theta.Printf(wxT("%.2f"), theta1);
 }
 
 /*!
@@ -274,16 +274,16 @@ void windowparameters::OnUnitsradioboxSelected( wxCommandEvent& event )
 	parent->GetClientSize(&width, &height);
 	switch (mUnitRadios->GetSelection()) {
 		case 0:	//pixels
-			screenX.Printf("%d", width);
-			screenY.Printf("%d", height);
+			screenX.Printf(wxT("%d"), width);
+			screenY.Printf(wxT("%d"), height);
 			break;
 		case 1: //inches
-			screenX.Printf("%f", ((float)width/72.0));
-			screenY.Printf("%f", ((float)height/72.0));
+			screenX.Printf(wxT("%f"), ((float)width/72.0));
+			screenY.Printf(wxT("%f"), ((float)height/72.0));
 			break;
 		case 2:	//cm
-			screenX.Printf("%f", ((float)width/(72.0*0.3937)));
-			screenY.Printf("%f", ((float)height/(72.0*0.3937)));
+			screenX.Printf(wxT("%f"), ((float)width/(72.0*0.3937)));
+			screenY.Printf(wxT("%f"), ((float)height/(72.0*0.3937)));
 			break;
 	}
 	t = screenX;
@@ -389,30 +389,30 @@ bool windowparameters::Apply(void) {
 		if (mUnitRadios->GetSelection() == 0) {
 			int w = (int) tw;
 			int h = (int) th;
-			temp.Printf("%d", w);
-			temp2.Printf("%d", h);
+			temp.Printf(wxT("%d"), w);
+			temp2.Printf(wxT("%d"), h);
 		} else {
-			temp.Printf("%f", tw);
-			temp2.Printf("%f", th);
+			temp.Printf(wxT("%f"), tw);
+			temp2.Printf(wxT("%f"), th);
 		}
 		mXWinSize->SetValue(temp);
 		mYWinSize->SetValue(temp2);
 		
-		temp.Printf("%f", wScale);
+		temp.Printf(wxT("%f"), wScale);
 		mWindowScale->SetValue(temp);
 		
-		temp.Printf("%f", center.x);
+		temp.Printf(wxT("%f"), center.x);
 		mXWinCenter->SetValue(temp);
-		temp.Printf("%f", center.y);
+		temp.Printf(wxT("%f"), center.y);
 		mYWinCenter->SetValue(temp);
-		temp.Printf("%f", center.z);
+		temp.Printf(wxT("%f"), center.z);
 		mZWinCenter->SetValue(temp);
 		
-		temp.Printf("%.2f", tpsi);
+		temp.Printf(wxT("%.2f"), tpsi);
 		mPsiEdit->SetValue(temp);
-		temp.Printf("%.2f", tphi);
+		temp.Printf(wxT("%.2f"), tphi);
 		mPhiEdit->SetValue(temp);
-		temp.Printf("%.2f", ttheta);
+		temp.Printf(wxT("%.2f"), ttheta);
 		mThetaEdit->SetValue(temp);
 	}
 	

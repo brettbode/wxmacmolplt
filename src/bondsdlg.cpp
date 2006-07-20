@@ -190,25 +190,25 @@ void BondsDlg::ResetList(void) {
 		wxString buf;
 		for (long i=0; i<nbonds; i++) {
 			Bond * b = lFrame->GetBondLoc(i);
-			buf.Printf("%d", b->Atom1);
+			buf.Printf(wxT("%d"), b->Atom1);
 			bondGrid->SetCellValue(i, 0, buf);
-			buf.Printf("%d", b->Atom2);
+			buf.Printf(wxT("%d"), b->Atom2);
 			bondGrid->SetCellValue(i, 1, buf);
-			buf.Printf("%f", lFrame->GetBondLength(i));
+			buf.Printf(wxT("%f"), lFrame->GetBondLength(i));
 			bondGrid->SetCellValue(i, 2, buf);
 			bondGrid->SetReadOnly(i, 2, true);
 			switch (lFrame->GetBondOrder(i)) {
 				case kHydrogenBond:
-					buf.Printf("%s", _T("Hydrogen"));
+					buf.Printf(wxT("%s"), _T("Hydrogen"));
 					break;
 				case kSingleBond:
-					buf.Printf("%s", _T("Single"));
+					buf.Printf(wxT("%s"), _T("Single"));
 					break;
 				case kDoubleBond:
-					buf.Printf("%s", _T("Double"));
+					buf.Printf(wxT("%s"), _T("Double"));
 					break;
 				case kTripleBond:
-					buf.Printf("%s", _T("Triple"));
+					buf.Printf(wxT("%s"), _T("Triple"));
 					break;
 			}
 			bondGrid->SetCellValue(i, 3, buf);
@@ -290,25 +290,25 @@ void BondsDlg::OnAddClick( wxCommandEvent& event )
 	if (lFrame->AddBond(0,1)) {
 		wxString buf;
 		bondGrid->AppendRows(1);
-		buf.Printf("%d", 0);
+		buf.Printf(wxT("%d"), 0);
 		bondGrid->SetCellValue(nbonds, 0, buf);
-		buf.Printf("%d", 1);
+		buf.Printf(wxT("%d"), 1);
 		bondGrid->SetCellValue(nbonds, 1, buf);
-		buf.Printf("%f", lFrame->GetBondLength(nbonds));
+		buf.Printf(wxT("%f"), lFrame->GetBondLength(nbonds));
 		bondGrid->SetCellValue(nbonds, 2, buf);
 		bondGrid->SetReadOnly(nbonds, 2, true);
 		switch (lFrame->GetBondOrder(nbonds)) {
 			case kHydrogenBond:
-				buf.Printf("%s", _T("Hydrogen"));
+				buf.Printf(wxT("%s"), _T("Hydrogen"));
 				break;
 			case kSingleBond:
-				buf.Printf("%s", _T("Single"));
+				buf.Printf(wxT("%s"), _T("Single"));
 				break;
 			case kDoubleBond:
-				buf.Printf("%s", _T("Double"));
+				buf.Printf(wxT("%s"), _T("Double"));
 				break;
 			case kTripleBond:
-				buf.Printf("%s", _T("Triple"));
+				buf.Printf(wxT("%s"), _T("Triple"));
 				break;
 		}
 		bondGrid->SetCellValue(nbonds, 3, buf);
@@ -361,19 +361,19 @@ void BondsDlg::OnChoiceSelected( wxCommandEvent& event )
 			switch (choice) {
 				case kHydrogenBond:
 					lFrame->SetBondOrder(i, kHydrogenBond);
-					order.Printf("%s", _T("Hydrogen"));
+					order.Printf(wxT("%s"), _T("Hydrogen"));
 					break;
 				case kSingleBond:
 					lFrame->SetBondOrder(i, kSingleBond);
-					order.Printf("%s", _T("Single"));
+					order.Printf(wxT("%s"), _T("Single"));
 					break;
 				case kDoubleBond:
 					lFrame->SetBondOrder(i, kDoubleBond);
-					order.Printf("%s", _T("Double"));
+					order.Printf(wxT("%s"), _T("Double"));
 					break;
 				case kTripleBond:
 					lFrame->SetBondOrder(i, kTripleBond);
-					order.Printf("%s", _T("Triple"));
+					order.Printf(wxT("%s"), _T("Triple"));
 					break;
 			}
 			bondGrid->SetCellValue(i, 3, order);
@@ -460,9 +460,9 @@ void BondsDlg::OnCellChange( wxGridEvent& event )
 			lFrame->ChangeBond(row, col+1, newval);
 		}
 	}
-	val.Printf("%d", lFrame->GetBondAtom(row, col+1));
+	val.Printf(wxT("%d"), lFrame->GetBondAtom(row, col+1));
 	bondGrid->SetCellValue(row, col, val);
-	val.Printf("%f", lFrame->GetBondLength(row));
+	val.Printf(wxT("%f"), lFrame->GetBondLength(row));
 	bondGrid->SetCellValue(row, 2, val);
 	for (int i=0; i<nbonds; i++) lFrame->SetBondSelectState(i, false);
 	Parent->ResetModel(false);

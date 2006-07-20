@@ -244,7 +244,7 @@ void FrequenciesDialog::RegenData(void) {
 		else
 			freqData.push_back(make_pair(i, Vibs->GetIntensity(i)));
 		
-		freq.Printf("%f", Vibs->GetFrequency(i));
+		freq.Printf(wxT("%f"), Vibs->GetFrequency(i));
 		mFreqListBox->InsertItems(1, &freq, i);
     }
     fGraph->addXSet(xSetData, true);

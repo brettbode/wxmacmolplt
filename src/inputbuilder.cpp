@@ -1648,7 +1648,7 @@ void InputBuilderWindow::SetupControlItems() {
     // scfIterText
     itemValue = TmpInputRec->Control->GetMaxIt();
     if(itemValue <= 0) itemValue = 30;
-    scfIterText->SetValue(wxString::Format("%d", itemValue));
+    scfIterText->SetValue(wxString::Format(wxT("%d"), itemValue));
     
     // exeChoice
     exeChoice->SetSelection(TmpInputRec->Control->GetExeType());
@@ -1662,7 +1662,7 @@ void InputBuilderWindow::SetupControlItems() {
     }
     
     // mchargeText
-    mchargeText->SetValue(wxString::Format("%hd", TmpInputRec->Control->GetCharge()));
+    mchargeText->SetValue(wxString::Format(wxT("%hd"), TmpInputRec->Control->GetCharge()));
     
     // multText
     itemValue = TmpInputRec->Control->GetMultiplicity();
@@ -1670,7 +1670,7 @@ void InputBuilderWindow::SetupControlItems() {
         if(NumElectrons & 1) itemValue == 2;
         else itemValue = 1;
     }
-    multText->SetValue(wxString::Format("%d", itemValue));
+    multText->SetValue(wxString::Format(wxT("%d"), itemValue));
     
     // localChoice
     localChoice->SetSelection(TmpInputRec->Control->GetLocal() - 1);
@@ -1696,7 +1696,7 @@ void InputBuilderWindow::SetupDataItems() {
 	
 	//# Z-Matrix vars
 	wxString zvars;
-	zvars.Printf("%d", TmpInputRec->Data->GetNumZVar());
+	zvars.Printf(wxT("%d"), TmpInputRec->Data->GetNumZVar());
 	zmatrixVarsText->SetValue(zvars);
     
 		//Point Group
@@ -1731,7 +1731,7 @@ void InputBuilderWindow::SetupSystemItems() {
     
     // timeLimitText
     wxString time;
-	time.Printf("%.2f", TmpInputRec->System->GetConvertedTime());
+	time.Printf(wxT("%.2f"), TmpInputRec->System->GetConvertedTime());
 	timeLimitText->SetValue(time);
 	
     // timeLimitUnitChoice
@@ -1739,7 +1739,7 @@ void InputBuilderWindow::SetupSystemItems() {
 	
     // memoryText
 	wxString mem;
-	mem.Printf("%.2f", TmpInputRec->System->GetConvertedMem());
+	mem.Printf(wxT("%.2f"), TmpInputRec->System->GetConvertedMem());
 	memoryText->SetValue(mem);
 	
     // memoryUnitChoice
@@ -1863,7 +1863,7 @@ void InputBuilderWindow::SetupMOGuessItems() {
 			}
 		}
 		wxString noText;
-		noText.Printf("%d", numOrbs);
+		noText.Printf(wxT("%d"), numOrbs);
 		mVecOrbCountText->SetValue(noText);
 	} else {
 		mMOSourceChoice->Enable(false);
@@ -1975,11 +1975,11 @@ void InputBuilderWindow::SetupStatPointItems() {
 
 	wxString temp;
 	//max steps
-	temp.Printf("%d", TmpInputRec->StatPt->GetMaxSteps());
+	temp.Printf(wxT("%d"), TmpInputRec->StatPt->GetMaxSteps());
 	mMaxStepCountEdit->SetValue(temp);
 	
 	//conv. criteria
-	temp.Printf("%g", TmpInputRec->StatPt->GetOptConvergance());
+	temp.Printf(wxT("%g"), TmpInputRec->StatPt->GetOptConvergance());
 	mGradConvEdit->SetValue(temp);
 	
 	//method
@@ -1997,11 +1997,11 @@ void InputBuilderWindow::SetupStatPointItems() {
 			else if (RunType == 6) tempf = 0.2;
 			else tempf = 0.3;
 		}
-		temp.Printf("%g", tempf);
+		temp.Printf(wxT("%g"), tempf);
 		mInitStepSizeEdit->SetValue(temp);
 	}
 	//Min step size
-	temp.Printf("%g", TmpInputRec->StatPt->GetMinRadius());
+	temp.Printf(wxT("%g"), TmpInputRec->StatPt->GetMinRadius());
 	mMinStepSizeEdit->SetValue(temp);
 	//max step size
 	float tempf = TmpInputRec->StatPt->GetMaxRadius();
@@ -2009,11 +2009,11 @@ void InputBuilderWindow::SetupStatPointItems() {
 		if (RunType == 6) tempf = 0.3;
 		else tempf = 0.5;
 	}
-	temp.Printf("%g", tempf);
+	temp.Printf(wxT("%g"), tempf);
 	mMaxStepSizeEdit->SetValue(temp);
 	
 	//hess recalc interval
-	temp.Printf("%d", TmpInputRec->StatPt->GetHessRecalcInterval());
+	temp.Printf(wxT("%d"), TmpInputRec->StatPt->GetHessRecalcInterval());
 	mHessRecalcEdit->SetValue(temp);
 	
 	//Init Hess
@@ -2033,7 +2033,7 @@ void InputBuilderWindow::SetupStatPointItems() {
 	//statpt jump off size
 	if (TmpInputRec->StatPt->GetStatPoint()) {
 		mStatPtJumpSizeEdit->Enable(true);
-		temp.Printf("%g", TmpInputRec->StatPt->GetStatJump());
+		temp.Printf(wxT("%g"), TmpInputRec->StatPt->GetStatJump());
 		mStatPtJumpSizeEdit->SetValue(temp);
 	} else {
 		mStatPtJumpSizeEdit->Enable(false);
@@ -2041,7 +2041,7 @@ void InputBuilderWindow::SetupStatPointItems() {
 	//mode to follow
 	if (RunType == 6) {
 		mStatPtModeEdit->Enable(true);
-		temp.Printf("%ld", TmpInputRec->StatPt->GetModeFollow());
+		temp.Printf(wxT("%ld"), TmpInputRec->StatPt->GetModeFollow());
 		mStatPtModeEdit->SetValue(temp);
 	} else
 		mStatPtModeEdit->Enable(false);
@@ -2056,34 +2056,35 @@ void InputBuilderWindow::SetupSummaryItems() {
 	if (TmpInputRec->Basis->GetBasis()) {
 		wxString temp(TmpInputRec->Basis->GetBasisText(), wxConvUTF8);
 		if ((TmpInputRec->Basis->GetBasis()>3)&&(TmpInputRec->Basis->GetBasis()<6)) {
-			temp.Printf("%d-%s", TmpInputRec->Basis->GetNumGauss(), TmpInputRec->Basis->GetBasisText());
+			temp.Printf(wxT("%d-%s"), TmpInputRec->Basis->GetNumGauss(), TmpInputRec->Basis->GetBasisText());
 		} else if (TmpInputRec->Basis->GetBasis()==3) {
-			temp.Printf("%s-%dG", TmpInputRec->Basis->GetBasisText(), TmpInputRec->Basis->GetNumGauss());
+			temp.Printf(wxT("%s-%dG"), TmpInputRec->Basis->GetBasisText(), TmpInputRec->Basis->GetNumGauss());
 		}
 		if (TmpInputRec->Basis->GetNumDFuncs()) {
 			wxString t;
-			t.Printf(", # D funcs = %d", TmpInputRec->Basis->GetNumDFuncs());
+			t.Printf(wxT(", # D funcs = %d"), TmpInputRec->Basis->GetNumDFuncs());
 			temp.Append(t);
 		}
 		if (TmpInputRec->Basis->GetNumPFuncs()) {
 			wxString t;
-			t.Printf(", # P funcs = %d", TmpInputRec->Basis->GetNumPFuncs());
+			t.Printf(wxT(", # P funcs = %d"), TmpInputRec->Basis->GetNumPFuncs());
 			temp.Append(t);
 		}
 		if (TmpInputRec->Basis->GetNumFFuncs()) {
 			wxString t;
-			t.Printf(", # F funcs = %d", TmpInputRec->Basis->GetNumFFuncs());
+			t.Printf(wxT(", # F funcs = %d"), TmpInputRec->Basis->GetNumFFuncs());
 			temp.Append(t);
 		}
 		if (TmpInputRec->Basis->GetPolar() > GAMESS_BS_No_Polarization) {
 			wxString t;
-			t.Printf(", Polar = %s", TmpInputRec->Basis->GetPolarText());
+			t.Printf(wxT(", Polar = %s"), TmpInputRec->Basis->GetPolarText());
 			temp.Append(t);
 		}
 		mBasisSetText->SetValue(temp);
 	} else mBasisSetText->Clear();
 	
-	mRunTypeText->SetValue(ControlGroup::GetGAMESSRunText(TmpInputRec->Control->GetRunType()));
+    wxString temp(ControlGroup::GetGAMESSRunText(TmpInputRec->Control->GetRunType()), wxConvUTF8);
+	mRunTypeText->SetValue(temp);
 
 	if (TmpInputRec->Control->GetSCFType()) {
 		mSCFTypeText->SetValue(wxString(TmpInputRec->Control->GetSCFTypeText(), wxConvUTF8));
@@ -2096,10 +2097,10 @@ void InputBuilderWindow::SetupSummaryItems() {
 			while (pgt[i]) {
 				if (pgt[i] == 'N') {
 					wxString temp;
-					temp.Printf("%d", TmpInputRec->Data->GetPointGroupOrder());
-					pg.append(temp);
+					temp.Printf(wxT("%d"), TmpInputRec->Data->GetPointGroupOrder());
+					pg.Append(temp);
 				} else {
-					pg.append((char)pgt[i]);
+					pg.Append((char)(pgt[i]), 1);
 				}
 				i++;
 			}
@@ -2108,11 +2109,11 @@ void InputBuilderWindow::SetupSummaryItems() {
 	}
 	wxString eclevel;
 	if (TmpInputRec->Control->GetMPLevel() == 2)
-		eclevel.Printf("MP2");
+		eclevel.Printf(wxT("MP2"));
 	else if (TmpInputRec->Control->GetCCType())
-		eclevel.Printf(TmpInputRec->Control->GetGAMESSCCType(TmpInputRec->Control->GetCCType()));
+		eclevel.Printf((wxChar*)TmpInputRec->Control->GetGAMESSCCType(TmpInputRec->Control->GetCCType()));
 	else if (TmpInputRec->Control->GetCIType())
-		eclevel.Printf(TmpInputRec->Control->GetCIType(TmpInputRec->Control->GetCIType()));
+		eclevel.Printf((wxChar*)TmpInputRec->Control->GetCIType(TmpInputRec->Control->GetCIType()));
 	mElectronCorr->SetValue(eclevel);
 }
 
@@ -2696,7 +2697,7 @@ void InputBuilderWindow::OnZmatVarsTextUpdated( wxCommandEvent& event )
 void InputBuilderWindow::OnTitleTextctrlUpdated( wxCommandEvent& event )
 {
 	wxString temp = titleText->GetValue();
-	TmpInputRec->Data->SetTitle(temp.c_str());
+	TmpInputRec->Data->SetTitle((const char *)temp.c_str());
     event.Skip();
 }
 
@@ -2735,7 +2736,7 @@ void InputBuilderWindow::OnTimelimitunitsChoiceSelected( wxCommandEvent& event )
 {
 	TmpInputRec->System->SetTimeUnits((TimeUnit) (timeLimitUnitChoice->GetSelection()+1));
     wxString time;
-	time.Printf("%.2f", TmpInputRec->System->GetConvertedTime());
+	time.Printf(wxT("%.2f"), TmpInputRec->System->GetConvertedTime());
 	timeLimitText->SetValue(time);
 
     event.Skip();
@@ -2764,7 +2765,7 @@ void InputBuilderWindow::OnMemoryunitsChoiceSelected( wxCommandEvent& event )
 {
 	TmpInputRec->System->SetMemUnits((MemoryUnit) (memoryUnitChoice->GetSelection()+1));
 	wxString mem;
-	mem.Printf("%.2f", TmpInputRec->System->GetConvertedMem());
+	mem.Printf(wxT("%.2f"), TmpInputRec->System->GetConvertedMem());
 	memoryText->SetValue(mem);
 
     event.Skip();

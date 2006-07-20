@@ -217,7 +217,7 @@ void CoordinateOffset::OnSliderUpdated( wxCommandEvent& event )
 {
 	int sval = slider->GetValue();
 	wxString eval;
-	eval.Printf("%d", sval);
+	eval.Printf(wxT("%d"), sval);
 	editField->SetValue(eval);
 	ApplyOffset(sval);
     event.Skip();

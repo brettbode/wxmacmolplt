@@ -289,7 +289,7 @@ void ZMatrixCalculator::UpdateValues(void) {
 			offset1.z = pos2.z - pos1.z;
 			float BondLength = offset1.Magnitude();
 			wxString temp;
-			temp.Printf("%.5f", BondLength);
+			temp.Printf(wxT("%.5f"), BondLength);
 			mBondLength->SetValue(temp);
 
 			if (mAtom3Edit->GetValue().ToLong(&atm3)) {
@@ -313,7 +313,7 @@ void ZMatrixCalculator::UpdateValues(void) {
 					float BondAngle = acos(length3);
 					BondAngle *= kRadToDegree;
 					
-					temp.Printf("%.5f", BondAngle);
+					temp.Printf(wxT("%.5f"), BondAngle);
 					mBondAngle->SetValue(temp);
 					
 					if (mAtom4Edit->GetValue().ToLong(&atm4)) {
@@ -353,7 +353,7 @@ void ZMatrixCalculator::UpdateValues(void) {
 									if (Sense < 0.0) Dihedral = -Dihedral;
 									Dihedral *= 180.0/Pi;
 									
-									temp.Printf("%.5f", Dihedral);
+									temp.Printf(wxT("%.5f"), Dihedral);
 									mDihedralAngle->SetValue(temp);
 								}
 							}
