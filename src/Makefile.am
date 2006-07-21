@@ -60,10 +60,10 @@ wxMacMolPlt_SOURCES =                             \
 	wxFiles.cpp                                   \
 	wxMolGraph.cpp          wxMolGraph.h          \
 	wxUglyChoice.cpp        wxUglyChoice.h        \
-	XML.cpp                                       \
+	XML.cpp                 XML.hpp               \
 	zmatrixcalculator.cpp   zmatrixcalculator.h
 
 AM_CXXFLAGS = $(WX_CXXFLAGS)
 wxMacMolPlt_LDADD = $(WX_LIBS)
 wxMacMolPlt_LDFLAGS = $(WX_CXXFLAGS)
-EXTRA_DIST = wxMacMolPlt.pjd
+EXTRA_DIST = wxMacMolPlt.pjd sp.xpm arrow.xpm
