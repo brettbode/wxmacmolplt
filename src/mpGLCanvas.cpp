@@ -96,7 +96,7 @@ void MpGLCanvas::initGL(void) {
 #endif
 		
 	    pathname += wxT("/arial1.glf");
-	    if (glfLoadFont((char*)pathname.c_str()) < 0)
+	    if (glfLoadFont(pathname.mb_str(wxConvUTF8)) < 0)
 	      {
 		std::cout<<"Warning: font file not found!"<<std::endl;
 		glfClose();

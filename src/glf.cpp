@@ -198,7 +198,7 @@ static int LittleEndian()
 |	Return: GLF_OK - if all OK
 |	Return: GLF_ERROR - if any error 
 */
-static int ReadFont(char *font_name, struct glf_font *glff)
+static int ReadFont(const char *font_name, struct glf_font *glff)
 {
 
 	FILE *fontf;
@@ -302,7 +302,7 @@ static int ReadFont(char *font_name, struct glf_font *glff)
 | Return value: GLF_ERROR  - if error
 |               >=0 - returned font descriptor (load success)
 */
-int glfLoadFont(char *font_name)
+int glfLoadFont(const char *font_name)
 {
 	int i;
 	char flag; /* Temporary flag */

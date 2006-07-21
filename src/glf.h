@@ -60,7 +60,7 @@ void glfInit();
 void glfClose();
 
 /* Font loading/unloading functions */
-int	glfLoadFont(char *font_name);			/* Load Vector font to memory */
+int	glfLoadFont(const char *font_name);			/* Load Vector font to memory */
 int	glfLoadBMFFont(char *FName);			/* Load Bitmap font to memory */
 int	glfUnloadFont();						/* Unload font from memory */
 int glfUnloadBMFFont();						/* Unload current BMF font */
