@@ -11,6 +11,7 @@
 #if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
 #pragma implementation "setbondlength.h"
 #endif
+#include "Globals.h"
 
 // For compilers that support precompilation, includes "wx/wx.h".
 #include "wx/wxprec.h"
@@ -25,7 +26,6 @@
 
 ////@begin includes
 ////@end includes
-#include "Globals.h"
 #include "MolDisplayWin.h"
 #include "Frame.h"
 

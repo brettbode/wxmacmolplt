@@ -12,6 +12,7 @@
 #pragma implementation "bondsdlg.h"
 #endif
 
+#include "Globals.h"
 // For compilers that support precompilation, includes "wx/wx.h".
 #include "wx/wxprec.h"
 
@@ -25,7 +26,6 @@
 
 ////@begin includes
 ////@end includes
-#include "Globals.h"
 #include "MolDisplayWin.h"
 #include "Frame.h"
 

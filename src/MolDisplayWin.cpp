@@ -36,6 +36,7 @@
 #include "printoptions.h"
 #include "windowparameters.h"
 #include "zmatrixcalculator.h"
+#include "setPreference.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
 #include <wx/image.h>

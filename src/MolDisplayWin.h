@@ -21,9 +21,6 @@
 #include "Prefs.h"
 #include "Progress.h"
 
-#include "setPreference.h"
-//added by Song Li
-
 typedef class OpenGLRec OpenGLRec;
 typedef class BondsDlg BondsDlg;
 typedef class CoordinatesWindow CoordinatesWindow;
@@ -33,6 +30,7 @@ typedef class SurfacesWindow SurfacesWindow;
 typedef class InputBuilderWindow InputBuilderWindow;
 typedef class ModeAnimation ModeAnimation;
 typedef class ZMatrixCalculator ZMatrixCalculator;
+typedef class setPreference setPreference;
 /**
  * Subclasses wxFrame to define the main application window.  This is a
  * document window.  There can be multiple instances of the window in the

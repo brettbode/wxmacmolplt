@@ -12,6 +12,7 @@
 #if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
 #pragma implementation "windowparameters.h"
 #endif
+#include "Globals.h"
 
 // For compilers that support precompilation, includes "wx/wx.h".
 #include "wx/wxprec.h"
@@ -27,7 +28,6 @@
 ////@begin includes
 ////@end includes
 
-#include "Globals.h"
 #include "MolDisplayWin.h"
 #include "windowparameters.h"
 

@@ -7,6 +7,7 @@
 #if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
 #pragma implementation "PrefsPanes.h"
 #endif
+#include "Globals.h"
 
 // For compilers that support precompilation, includes "wx/wx.h".
 #include "wx/wxprec.h"
@@ -70,7 +71,6 @@
 #define ID_UNIT_RADIOBOX 5036
 #define ID_MISC_RADIOBOX 5037
 
-#include "Globals.h"
 #include "GlobalExceptions.h"
 #include "MyTypes.h"
 #include "Prefs.h"
