@@ -51,7 +51,6 @@ wxMacMolPlt_SOURCES =                             \
 	setscreenplane.cpp      setscreenplane.h      \
 	SurfaceBase.cpp                               \
 	surfaceDlg.cpp          surfaceDlg.h          \
-							surfacelayout.h       \
 	surfaceswindow.cpp      surfaceswindow.h      \
 							SurfaceTypes.h        \
 	SurfWin.cpp                                   \
