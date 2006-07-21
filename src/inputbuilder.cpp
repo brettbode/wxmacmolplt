@@ -1462,7 +1462,7 @@ void InputBuilderWindow::CreateControls()
     setPaneVisible(DATA_PANE,    true);
 	setPaneVisible(MOGUESS_PANE, true);
     setPaneVisible(SYSTEM_PANE,  true);
-    //if(TmpInputRec->Control->UseDFT()) setPaneVisible(DFT_PANE, true);
+    if(TmpInputRec->Control->UseDFT()) setPaneVisible(DFT_PANE, true);
 	if(TmpInputRec->Control->GetSCFType() <= 4) setPaneVisible(SCFOPTS_PANE, true);
     setPaneVisible(MISCPREFS_PANE, true);
     setPaneVisible(SUMMARY_PANE, true);
@@ -1657,6 +1657,7 @@ void InputBuilderWindow::SetupControlItems() {
         dftCheck->Enable(true);
         dftCheck->SetValue(dft);
         if(dft) setPaneVisible(DFT_PANE, true);
+        else setPaneVisible(DFT_PANE, false);
     }
     
     // ciChoice
