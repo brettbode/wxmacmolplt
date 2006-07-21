@@ -22,7 +22,7 @@ wxMacMolPlt_SOURCES =                             \
 	GaussHermite.cpp        GaussHermite.h        \
 							Geometries.h          \
 	glf.cpp                 glf.h                 \
-							GlobalExcepations.h   \
+							GlobalExceptions.h    \
 							Globals.h             \
     Gradient.cpp            Gradient.h            \
 	inputbuilder.cpp        inputbuilder.h        \
