@@ -31,10 +31,10 @@ void Orb3DSurface::Update(MoleculeData * MainData) {
 	if (Visible) {
 			Progress * lProgress = new Progress();
 		if (lProgress) {
-			lProgress->ChangeText("Calculating 3D GridÉ");
+			lProgress->ChangeText("Calculating 3D Grid...");
 			lProgress->SetScaleFactor(0.9);
 			CalculateMOGrid(MainData, lProgress);
-			lProgress->ChangeText("Contouring 3D GridÉ");
+			lProgress->ChangeText("Contouring 3D Grid...");
 			lProgress->SetBaseValue(90);
 			lProgress->SetScaleFactor(0.1);
 			Contour3DGrid(lProgress);
@@ -48,15 +48,15 @@ void TEDensity3DSurface::Update(MoleculeData * MainData) {
 		if (lProgress) {
 				float MEPScale = 1.0;
 			if (ColorByValue()) MEPScale = 0.5;
-			lProgress->ChangeText("Calculating 3D GridÉ");
+			lProgress->ChangeText("Calculating 3D Grid...");
 			lProgress->SetScaleFactor(0.9*MEPScale);
 			CalculateMOGrid(MainData, lProgress);
-			lProgress->ChangeText("Contouring 3D GridÉ");
+			lProgress->ChangeText("Contouring 3D Grid...");
 			lProgress->SetBaseValue((long)(90*MEPScale));
 			lProgress->SetScaleFactor(0.1*MEPScale);
 			Contour3DGrid(lProgress);
 			if (ColorByValue()) {
-				lProgress->ChangeText("Calculating MEP valuesÉ");
+				lProgress->ChangeText("Calculating MEP values...");
 				lProgress->SetBaseValue(50);
 				lProgress->SetScaleFactor(0.5);
 				CalculateSurfaceValues(MainData, lProgress);
@@ -75,7 +75,7 @@ void MEP2DSurface::Update(MoleculeData * MainData) {
 		GetGWorld (&lSavedPort, &lSavedGDH);
 #endif
 		if (lProgress) {
-			lProgress->ChangeText("Calculating 2D GridÉ");
+			lProgress->ChangeText("Calculating 2D Grid...");
 			CalculateMOGrid(MainData, lProgress);
 			delete lProgress;
 		}
@@ -88,10 +88,10 @@ void MEP3DSurface::Update(MoleculeData * MainData) {
 	if (Visible) {
 			Progress * lProgress = new Progress();
 		if (lProgress) {
-			lProgress->ChangeText("Calculating 3D GridÉ");
+			lProgress->ChangeText("Calculating 3D Grid...");
 			lProgress->SetScaleFactor(0.95);
 			CalculateMEPGrid(MainData, lProgress);
-			lProgress->ChangeText("Contouring 3D GridÉ");
+			lProgress->ChangeText("Contouring 3D Grid...");
 			lProgress->SetBaseValue(95);
 			lProgress->SetScaleFactor(0.05);
 			Contour3DGrid(lProgress);

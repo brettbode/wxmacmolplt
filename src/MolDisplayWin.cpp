@@ -2276,7 +2276,7 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
         localprogress = true;
         BeginOperation();
     }
-    ProgressInd->ChangeText("Reading CML fileÉ");
+    ProgressInd->ChangeText("Reading CML file...");
     long test = 0;
     if (readWindows)
         test = MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, readPrefs);

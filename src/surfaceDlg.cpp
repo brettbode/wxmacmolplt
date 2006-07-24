@@ -2077,11 +2077,11 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event )
 	    {
 	      if (Visible) 
 		{
-		  lProgress->ChangeText("Calculating 3D GridÉ");
+		  lProgress->ChangeText("Calculating 3D Grid...");
 		  lProgress->SetBaseValue(100*i/NumFrames);
 		  lProgress->SetScaleFactor((float) 0.9/NumFrames);
 		  if (updateGrid) mTarget->CalculateMOGrid(mData, lProgress);
-		  lProgress->ChangeText("Contouring gridÉ");
+		  lProgress->ChangeText("Contouring grid...");
 		  lProgress->SetBaseValue((long)(100*i/NumFrames + 90.0/NumFrames));
 		  lProgress->SetScaleFactor((float) 0.1/NumFrames);
 		  if (updateContour) mTarget->Contour3DGrid(lProgress);
@@ -2100,10 +2100,10 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event )
     {	//simply update this surface
       if (Visible) 
 	{
-	  lProgress->ChangeText("Calculating 3D GridÉ");
+	  lProgress->ChangeText("Calculating 3D Grid...");
 	  lProgress->SetScaleFactor(0.9);
 	  if (updateGrid) mTarget->CalculateMOGrid(mData, lProgress);
-	  lProgress->ChangeText("Contouring gridÉ");
+	  lProgress->ChangeText("Contouring grid...");
 	  lProgress->SetBaseValue(90);
 	  lProgress->SetScaleFactor(0.1);
 	  if (updateContour) mTarget->Contour3DGrid(lProgress);
@@ -2475,7 +2475,7 @@ void General3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	mTarget->UseSurfaceNormals(UseNormals);
 	if (updateContour && mTarget->GridAvailable()) {
 		Progress * lProgress = new Progress();
-		lProgress->ChangeText("Contouring gridÉ");
+		lProgress->ChangeText("Contouring grid...");
 		mTarget->Contour3DGrid(lProgress);
 		delete lProgress;
 	}
@@ -3382,16 +3382,16 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 				if (Visible) {
 					float MEPScale = 1.0;
 					if (updateMEP) MEPScale = 0.5;
-					lProgress->ChangeText("Calculating 3D GridÉ");
+					lProgress->ChangeText("Calculating 3D Grid...");
 					lProgress->SetBaseValue((long)(100*i*MEPScale/NumFrames));
 					lProgress->SetScaleFactor((float) 0.9*MEPScale/NumFrames);
 					if (updateGrid) lSurf->CalculateMOGrid(data, lProgress);
-					lProgress->ChangeText("Contouring gridÉ");
+					lProgress->ChangeText("Contouring grid...");
 					lProgress->SetBaseValue((long)(100*i/NumFrames + 90.0*MEPScale/NumFrames));
 					lProgress->SetScaleFactor((float) 0.1*MEPScale/NumFrames);
 					if (updateContour) lSurf->Contour3DGrid(lProgress);
 					if (updateMEP) {
-						lProgress->ChangeText("Calculating MEP valuesÉ");
+						lProgress->ChangeText("Calculating MEP values...");
 						lProgress->SetBaseValue(100*i/NumFrames + 50/NumFrames);
 						lProgress->SetScaleFactor(0.5/NumFrames);
 						mTarget->CalculateSurfaceValues(data, lProgress);
@@ -3410,18 +3410,18 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 			float MEPScale = 1.0;
 			if (updateMEP) MEPScale = 0.5;
 			if (updateGrid) {
-				lProgress->ChangeText("Calculating 3D GridÉ");
+				lProgress->ChangeText("Calculating 3D Grid...");
 				lProgress->SetScaleFactor(0.9*MEPScale);
 				mTarget->CalculateMOGrid(data, lProgress);
 			}
 			if (updateContour) {
-				lProgress->ChangeText("Contouring gridÉ");
+				lProgress->ChangeText("Contouring grid...");
 				lProgress->SetBaseValue((long)(90*MEPScale));
 				lProgress->SetScaleFactor(0.1*MEPScale);
 				mTarget->Contour3DGrid(lProgress);
 			}
 			if (updateMEP) {
-				lProgress->ChangeText("Calculating MEP valuesÉ");
+				lProgress->ChangeText("Calculating MEP values...");
 				lProgress->SetBaseValue(50);
 				lProgress->SetScaleFactor(0.5);
 				mTarget->CalculateSurfaceValues(data, lProgress);
@@ -4069,11 +4069,11 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 			} else lSurf = mTarget;
 			if (lSurf) {
 				if (Visible) {
-					lProgress->ChangeText("Calculating 3D GridÉ");
+					lProgress->ChangeText("Calculating 3D Grid...");
 					lProgress->SetBaseValue(100*i/NumFrames);
 					lProgress->SetScaleFactor((float) 0.9/NumFrames);
 					if (updateGrid) lSurf->CalculateMEPGrid(data, lProgress);
-					lProgress->ChangeText("Contouring gridÉ");
+					lProgress->ChangeText("Contouring grid...");
 					lProgress->SetBaseValue((long)(100*i/NumFrames + 90.0/NumFrames));
 					lProgress->SetScaleFactor((float) 0.1/NumFrames);
 					if (updateContour) lSurf->Contour3DGrid(lProgress);
@@ -4086,10 +4086,10 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 		data->SetCurrentFrame(CurrentFrame);
 	} else {	//simply update this surface
 		if (Visible) {
-			lProgress->ChangeText("Calculating 3D GridÉ");
+			lProgress->ChangeText("Calculating 3D Grid...");
 			lProgress->SetScaleFactor(0.95);
 			if (updateGrid) mTarget->CalculateMEPGrid(data, lProgress);
-			lProgress->ChangeText("Contouring gridÉ");
+			lProgress->ChangeText("Contouring grid...");
 			lProgress->SetBaseValue(95);
 			lProgress->SetScaleFactor(0.05);
 			if (updateContour) mTarget->Contour3DGrid(lProgress);

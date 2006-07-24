@@ -492,7 +492,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	long	nAtoms, EndOfGroup, StartPos, EndPos;
 	bool	BasisFound=false, BoolTest;
 
-	ProgressInd->ChangeText("Reading GAMESS input fileÉ");
+	ProgressInd->ChangeText("Reading GAMESS input file...");
 
 	MainData->InputOptions = new InputData;
 
@@ -635,7 +635,7 @@ long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
 // parts of this are a bit gross since the MDL format is fixed format without
 // whitespace in between the fields.
 
-	ProgressInd->ChangeText("Reading MDL MolFileÉ");
+	ProgressInd->ChangeText("Reading MDL MolFile...");
 	Frame * lFrame = MainData->cFrame;
 
 	Buffer->GetLine(Line);	//The first Line is a comment/compound name line
@@ -703,7 +703,7 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 	long	nAtoms;
 	short	scanerr;
 
-	ProgressInd->ChangeText("Reading PDB fileÉ");
+	ProgressInd->ChangeText("Reading PDB file...");
 	Frame * lFrame = MainData->cFrame;
 		//First scan the file to determine the atoms
 	nAtoms = 0;
@@ -756,7 +756,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 	long	nAtoms,i;
 	short	scanerr;
 
-	ProgressInd->ChangeText("Reading XYZ fileÉ");
+	ProgressInd->ChangeText("Reading XYZ file...");
 	Frame * lFrame = MainData->cFrame;
 		//1st line contains the number of atoms
 	Buffer->GetLine(Line);
@@ -844,7 +844,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 	float				BondLength=0.0;
 	char				LineText[kMaxLineLength+1], KeyWord[kMaxLineLength+1], token[5];
 
-	ProgressInd->ChangeText("Reading MolPlt format fileÉ");
+	ProgressInd->ChangeText("Reading MolPlt format file...");
 	Frame * lFrame = MainData->cFrame;
 /*Now interpert the file data */
 		// Grab the first line (containing all keywords)
@@ -1178,7 +1178,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	char			LineText[kMaxLineLength], token[kMaxLineLength];
 	BufferFile *	DatBuffer=NULL;
 
-	ProgressInd->ChangeText("Reading GAMESS log fileÉ");
+	ProgressInd->ChangeText("Reading GAMESS log file...");
 	Frame * lFrame = MainData->cFrame;
 
 	EnergyPos = -1;
@@ -2263,7 +2263,7 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 	bool			KeyWordFound;
 	char			LineText[kMaxLineLength+1];
 
-	ProgressInd->ChangeText("Reading GAMESS IRC fileÉ");
+	ProgressInd->ChangeText("Reading GAMESS IRC file...");
 	Frame * lFrame = MainData->cFrame;
 
 	if (!Append) {
@@ -2352,7 +2352,7 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 	float			Xpos;
 	bool			LINEAR=false;
 
-	ProgressInd->ChangeText("Reading GAMESS IRC log fileÉ");
+	ProgressInd->ChangeText("Reading GAMESS IRC log file...");
 	Frame * lFrame = MainData->cFrame;
 
 	long NumAtoms = lFrame->NumAtoms;
@@ -2491,7 +2491,7 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 	float			tempfloat;
 	double			PE;
 
-	ProgressInd->ChangeText("Reading GAMESS DRC fileÉ");
+	ProgressInd->ChangeText("Reading GAMESS DRC file...");
 	Frame * lFrame = MainData->cFrame;
 	if (!Append) {
 #ifdef __wxBuild__

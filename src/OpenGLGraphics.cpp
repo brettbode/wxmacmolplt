@@ -479,7 +479,7 @@ void MolDisplayWin::Print3DGL(const PMPrintSession mySession,
 	const PMPageFormat myFormat, long PrinterRes, bool Center, bool FramePrintOut)
 #endif
 {			//This routine is setup for Carbon only
-	ProgressInd->ChangeText("Rendering large imageÉ");
+	ProgressInd->ChangeText("Rendering large image...");
 		//Calculate a factor to convert the 72dpi QD3D drawing to the printer res
 	float ScaleFactor = (float)PrinterRes/72.0;
 		PMRect	PageRect;
