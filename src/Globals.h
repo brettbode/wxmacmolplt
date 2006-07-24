@@ -21,7 +21,7 @@
 
 //This needs to get put into the build system...
 #define __wxBuild__
-#define wxMacMolPlt_VERSION "6.0dev"
+#define wxMacMolPlt_VERSION "6.0"
 /*
 #define MacintoshBuild		//define to build for Mac PPC or 68K
 #if __GNUC__
