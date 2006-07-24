@@ -36,6 +36,7 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] =
 };
 
 #include "sp.xpm"
+wxSplashScreen * splash = NULL;
 bool MpApp::OnInit() {
     const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
 	gPrefDlg = NULL;
@@ -63,7 +64,7 @@ bool MpApp::OnInit() {
 #endif
 		//Throw up a simple splash screen
 	wxBitmap sp_bitmap(sp_xpm);
-	wxSplashScreen * splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 2000,
+	splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 2000,
 												 NULL, -1, wxDefaultPosition, wxDefaultSize,
 												 wxSIMPLE_BORDER|wxSTAY_ON_TOP);
 
@@ -110,7 +111,10 @@ bool MpApp::OnInit() {
 //	{        
 //	} 
 	// Check for a project filename 
-	if (cmdParser.GetParamCount() > 0) { 
+	if (cmdParser.GetParamCount() > 0) {
+		//explicitly destroy the splash screen to get it out of the way
+		splash->Destroy();
+		
 		cmdFilename = cmdParser.GetParam(0); 
 		// Under Windows when invoking via a document 
 		// in Explorer, we are passed the short form. 
@@ -250,6 +254,10 @@ void MpApp::menuFileOpen(wxCommandEvent &event) {
 }
 #ifdef __WXMAC__
 void MpApp::MacOpenFile(const wxString & filename) {
+		//first get rid of the splash screen if its still around
+	if (splash)
+		if (splash->IsShown()) splash->Destroy();
+
 	if (filename.length() > 0) {
         createMainFrame(filename);
 	}
