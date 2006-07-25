@@ -1,0 +1,76 @@
+<HTML>
+<HEAD>
+   <TITLE>LLM path analysis</TITLE>
+</HEAD>
+<BODY>
+
+<H2><CENTER>Linear Least Motion path analysis</CENTER></H2>
+
+<P>MacMolPlt has the ability to automate the generation of a Linear
+Least Motion (LLM) path connecting two know structures. This path can
+be constructed in either cartesian coordinates or in Z-matrix style
+internal coordinates. LLM paths can be useful for locating a
+transition state, or at the very least, putting an upper bound on the
+height of a transition state. One problem with an LLM path using
+cartesian coordinates is that bonds may be overly stretched or
+compressed causing large variations in the energy. To avoid this
+problem you can use internal coordinates for the LLM path. Creating
+an LLM path in MacMolPlt is quite easy.</P>
+
+<UL>
+   <LI>First you need a window with the two endpoints of the LLM in
+   adjacent Frames. One way to accomplish this is:
+   
+   <UL>
+      <LI>Create a new document.
+      
+      <LI>Paste in the coordinates of the starting point.
+      
+      <LI>Append a new empty frame using the Append New Frame menu
+      item
+      
+      <LI>Paste the coordinates of the endpoint into the empty frame.
+   
+   </UL>
+   
+   <LI>Next minimize the differences between frames by positioning
+   the Frames sequence to the first structure and choosing the
+   Minimize Frame Movements. This will zero out any translation or
+   rotations between the two structures.
+   
+   <LI>If you wish to use internal coordinates then you must specify
+   a valid set of internal coordinates in the Coordinates Window at
+   this time (Open the
+   <A HREF="MacMolPlt_Windows.html#Coords">Coordinates window</A>,
+   choose Internals and modify the default list as needed).
+   
+   <LI>Next choose the Create LLM Path... menu item.
+   
+   <UL>
+      <LI>Enter the number of LLM path points to create (the  total
+      number of points on the path is 2 plus the number you enter
+      here).
+      
+      <LI>If you wish to use internal coordinates check the box.
+      
+      <LI>Hit Create LLM.
+   </UL>
+</UL>
+
+<P>That's it. You will now find the requested number of structures in
+between the two structure you input. I recommend saving the LLM path
+at this point. You probably already have the energies for the two
+endpoints. However, you still need them for the points MacMolPlt
+created. To obtain these energies you will need to generate a series
+of input files to run single point energy calculations. You can
+generate these files by hand (by copying the coordinates of each
+frame out of MacMolPlt) or use MacMolPlt's
+<A HREF="MacMolPlt_Windows.html#IB">Input Builder window</A> to
+generate the input files for you (still one file at a time though).
+Once the calculations are done you can copy the desired energy
+information and use the Set Frame Energy... menu item to set the
+energy of each geometry. Once all points are input you can view the
+<A HREF="MacMolPlt_Windows.html#EPlot">energy graph</A> to see how
+the LLM path behaves.</P>
+</BODY>
+</HTML>

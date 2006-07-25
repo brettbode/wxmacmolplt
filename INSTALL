@@ -1,0 +1,24 @@
+Currently wxMacMolPlt includes build files and has been tested on Mac OS X,
+Linux and Windows. Since most people building from source will be running
+Linux this file focuses on the build instructions for Linux. To build from
+source on any OS you must have a C++ compiler such as g++ and an install
+of wxWidgets with OpenGL support enabled. wxWidgets 2.6 and later should work.
+Prebuilt packages should also work. We have tested against the version 2.6.3
+prebuilt package within Debain and foudn it to work.
+
+If your distribution does not offer a prebuilt wxWidgets package you will need
+to grab the latest source copy from www.wxwidgets.org and install it. You 
+should be able to do this using the following:
+   ./configure --with-opengl
+   make
+   make install
+
+To install MacMolPlt run:
+  ./configure
+  make
+  make install
+If you have installed wxWidgets in a non-standard location you can add
+--with-wx-config=/path/to/wx
+to the ./configure step. The make install step is important as it installs two
+required resource files in addition to the binary. Once installed you should
+be able to run MacMolPlt by typing "wxMacMolPlt".

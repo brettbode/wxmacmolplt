@@ -1,0 +1,852 @@
+<HTML>
+<HEAD>
+   <TITLE>Version History</TITLE>
+</HEAD>
+<BODY>
+
+<P>This page contains a brief history of MacMolPlt. In general I
+recomend that you always upgrade to the current version. I fix bugs
+in almost every release as well as adding new features. Thus if you
+find a bug or have a feature request please make sure you have the
+current release before reporting it.</P>
+
+<P>
+<HR WIDTH="80%">
+</P><BR>
+<P>Version 6.0:</P>
+<UL>
+	<LI>The GUI interface has been completely rewritten to use the cross
+platform wxWidgets toolkit. Thus this is the first release to run on Linux and
+Windows.
+	<LI>There are many minor additions including a reworked frequencies dialog,
+      ability to rotate during animations and more.
+	<LI>One signficant missing feature is the lack of a movie export option.
+</UL>
+<P>Version 5.6.2:</P>
+<UL>
+	<LI>Fixed odd Show/Hide menu text problem.</LI>
+	<LI>Fixed PowerPC portion of universal build such that this one will run on Mac OS X 10.2.8 and later.</LI>
+</UL>
+
+<P>Version 5.6:</P>
+
+<UL>
+   <LI>Added ability to read the initial guess orbitals if present</LI>
+   <LI>Added CI singles. Handles CITYP and CIS natural orbitals.</LI>
+   <LI>Converted to a CML based save file format. This will be the last version
+       that will read in the old binary file format. Binary file parsing is
+       only supported on PowerPC systems.</LI>
+   <LI>Possibly fixed a bug where orbitals would vanish upon rotation with OpenGL active.</LI>
+   <LI>Several bug fixes, including one involving semi-emperical log files.</LI>
+   <LI>Tweaked the lighting under OpenGl. You may need to lower the Fill light brightness if you have saved preferences.</LI>
+</UL>
+
+<P>Version 5.5:</P>
+
+<UL>
+   <LI>Fixed problems with the MDL mol file parser with files containing more than 100 atoms.</LI>
+   <LI>Updated to match latest GAMESS output for geometry searches.</LI>
+   <LI>New support for reading and exporting <a href="MacMolPlt_Files.html#CML">Chemical Markup Language (CML) files</a>.</LI>
+   <LI>New option to create custom file icons when saving to a binary file. You can turn this off in the File Preferences.</li>
+   <LI>Added DFT and coupled cluster options to the input builder.</LI>
+   <LI>Fix to read in latest fragment format in IRC log files.</LI>
+</UL>
+
+<P>Version 5.4.1:</P>
+
+<UL>
+   <LI>Updated list of GAMESS run types to add recent additions.</LI>
+   <LI>Harmonic freqencies are read from GAMESS VSCF log files.</LI>
+   <LI>2D surfaces now use the variable line width parameter when using OpenGL to give better visability when printing or producing hi-res images.</LI>
+   <LI>Fixed bug in exporting QuickTime Movies when OpenGL was active.</LI>
+   <LI>Fixed bug in the preferences window where patterns were not updated properly.</LI>
+</UL>
+
+<p>Version 5.4:</p>
+<ul>
+	<LI>Added option (now the default) to use the common RGB scheme when colorizing a TED surface with MEP values. The old two color intensity scheme is also still an option.</LI>
+	<LI>Fixed bug in QuickTime Movie export that would result in an empty movie.</LI>
+	<LI>CI natural orbitals are now read in when a CI follows an RHF/ROHF/etc caculcation. In that case both the SCF and CI orbitals are available.</LI>
+	<LI>Fixed bug detecting SCFTYP=NONE.</LI>
+	<LI>Substantial change to how orbitals are stored internally to handle a basically arbitrary number of orbital sets for any frame. Thus both RHF and MP2 vectors can now be viewed at once as well as the CI natural orbitals for each eigenstate computed.</LI>
+	<li>Carbon version reworked to build a mach-o executable and use newer printing APIs. The only noticable change should be that the Carbon version no longer runs on MacOS 9.</LI>
+	<li>Transparent surfaces now work correctly in OpenGL.</LI>
+	<li>OpenGL code tuneup to produce much nicer output.</LI>
+</ul>
+<P>Version 5.3.6:</P>
+
+<UL>
+   <LI>Fixed bug that could cause a crash reading old binary files.</LI>
+   <LI>Frame count is now always displayed.</LI>
+   <LI>Fixed bug in GAMESS log file append code.</LI>
+   <LI>SIMOMM log files now read hessians correctly.</LI>
+</UL>
+
+<P>Version 5.3.5:</P>
+
+<UL>
+   <LI>Fixed bug with $VEC import when there are more than 500 basis functions.</LI>
+   <LI>Added global preference to activate 3D mode by default (under 3D Options prefs. pane).</LI>
+   <LI>Frame number is printed out in Frame info area during frame animations.</LI>
+   <LI>Carbon version now uses unix style line feeds by default when writing a GAMESS input
+       file. There is a preference in the File prefs pane to change this behavior for all
+       versions. Unix line feeds should be used for input files to the MacOS X version of 
+       GAMESS.</LI>
+</UL>
+
+<P>Version 5.3.4:</P>
+
+<UL>
+   <LI>Fixed a bug parsing log files with only effective fragments and non-water fragements.</LI>
+   <LI>Modified general 2D and 3D surfaces to allow multiplication by an arbitrary value rather than just -1.</LI>
+   <LI>Fixed longstanding bug pasting in binary data from pictures.</LI>
+   <LI>Fixed bug in opening DAT files for MP2 orbitals.</LI>
+   <LI>Updated parser for a change in the format of CI natural orbital printout.</LI>
+</UL>
+
+
+<P>Version 5.3.3:</P>
+
+<UL>
+   <LI>Fixed a bug where the run title was not screened out of the search for keywords.</LI>
+   <LI>Changed parsing code for Control options in log files (needed for the latest GAMESS version).</LI>
+</UL>
+
+<P>Version 5.3.2:</P>
+
+<UL>
+   <LI>QuickTime export is now enabled in Carbon version.</LI>
+   <LI>Fixed memory managment bug in QuickTime export code.</LI>
+   <LI>Changed the creator type of exported QuickTime movies to the QuickTime Movie player.</LI>
+   <LI>Fixed mode animation bug in carbon version.</LI>
+</UL>
+
+<P>Version 5.3.1: (Carbon changes only)</P>
+
+<UL>
+   <LI>Fixed bug in clipboard code that prevented Paste from working properly.</LI>
+   <LI>All Open file dialogs should now have an All Files choice.</LI>
+   <LI>Corrected hi-resolution PICT export of OpenGL images.</LI>
+</UL>
+
+<P>Version 5.3:</P>
+
+<UL>
+   <LI>New Carbon version to run native on MacOS X (Many, many changes in code to facilitate this
+   new version).</LI>
+   <LI>Added ability to read UHF natural orbitals.</LI>
+   <LI>Added ability to read Oriented Localized Molecular Orbitals from GAMESS log files.</LI>
+   <LI>Updated DRC parsing code to read in DRC output from GAMESS versions post Nov. 2001.</LI>
+   <LI>Fixed bug with UHF occupation numbers (effected UHF based MEPs, and TED's).</LI>
+</UL>
+
+<P>Version 5.2.7:</P>
+
+<UL>
+   <LI>Fixed bug which could cause a crash when opening log files.
+</UL>
+
+<P>Version 5.2.6:</P>
+
+<UL>
+   <LI>Fixed problem normalizing basis functions from August 2000 and
+   later GAMESS files. WARNING version 5.2.4 and 5.2.5 did not
+   correctly normalize basis functions from the latest GAMESS
+   release.
+</UL>
+
+<P>Version 5.2.5:</P>
+
+<UL>
+   <LI>Fixed problem reading incomplete sets of UHF orbitals
+   
+   <LI>Fixed problem with MP code so that MacMolPlt will once again
+   use all available CPUs during long calculations.
+</UL>
+
+<P>Version 5.2.4:</P>
+
+<UL>
+   <LI>Updated file parser for the change in the GAMESS log file
+   basis set format in August 2000 and later versions of GAMESS.
+</UL>
+
+<P>Version 5.2.3:</P>
+
+<UL>
+   <LI>File parsing code was updated to correctly read in MCSCF
+   orbitals from July 200 and later versions of GAMESS
+   
+   <LI>Fixed bug which caused unnecessary grid updates for Orbitals
+   surfaces.
+   
+   <LI>Trapped out of memory errors better.
+</UL>
+
+<P>Version 5.2.2:</P>
+
+<UL>
+   <LI>Bug fixed: Color picker position is now correct for Gen2D and
+   Gen3D surfaces.
+   
+   <LI>Bug fixed: 3D surfaces will not activate QuickDraw 3D if it is
+   not available.
+   
+   <LI>Bug fixed: MacOS 9.0.4 introduced a problem with the MP
+   library so I have disabled it. This will prevent problems when
+   generating MEPMaps.
+   
+   <LI>Updated input parser for a change in the GAMESS log file
+   output introduced in June 2000.
+</UL>
+
+<P>Version 5.2.1:</P>
+
+<UL>
+   <LI>Fixed bug preventing QuickTime Movie exports from working with
+   a frame animation.
+</UL>
+
+<P>Version 5.2:</P>
+
+<UL>
+   <LI>Patched the Gaussian log file coordinate format to accept the
+   extra 'atomic type' field added by G98.
+   
+   <LI>Added ability to copy, export and print QD3D transparent
+   surfaces (<A HREF="MacMolPlt_Windows.html#ATI_Note
+               ">see note for restrictions</A>).
+   
+   <LI>Added option to view <A HREF="MacMolPlt_Surfaces.html">Atomic
+   Orbital Surfaces</A> as spherical harmonics rather than cartesian
+   gaussians.
+</UL>
+
+<P>Version 5.1.1:</P>
+
+<UL>
+   <LI>Fixed several bugs some cosemetic, some not.
+   
+   <LI>Added options to automatically determine the bond order for
+   bonds and guess at hydrogen bonds. Both option can be turned in
+   the Preferences:File preferences and in the Set Bonds dialogs.
+   
+   <LI>Added option to animate a normal mode in an
+   <A HREF="MacMolPlt_Files.html#XYZ">XYZ file export</A>.
+</UL>
+
+<P>Version 5.1:</P>
+
+<UL>
+   <LI>Fixed bug which caused normal modes to be improperly mass
+   weighted when read in from GAMESS log files.
+   
+   <LI>Added input/export support for the
+   <A HREF="MacMolPlt_Files.html#MDL">MDL MolFile</A> format. (basic
+   structures only)
+   
+   <LI>Basis set menu in the
+   <A HREF="MacMolPlt_Windows.html#IB">input builder</A> now
+   indicates which basis sets are available for the current molecule.
+   
+   <LI>New <A HREF="MacMolPlt_Windows.html#frequencies">Frequencies
+   window</A> which plots a line graph of the infrared intensity for
+   each frequency
+   
+   <LI>Added option to export frequencies (and the corresponding
+   intensities)
+</UL>
+
+<P>Version 5.0:</P>
+
+<UL>
+   <LI>New options in the energy plot include the ability to plot the
+   rms or maximum gradient, a bond length or bond angle along with
+   the usual energies.
+   
+   <LI>Added option to use internal coodinates when generating a LLM
+   path
+   
+   <LI>Log files with MP2 gradients now prompt to read the vectors
+   from the dat file such that MP2 total densities and MEP maps are
+   now available.
+   
+   <LI>GVB GI (geminal pair) orbitals are now read in from log files
+   
+   <LI>The state of QuickDraw 3D is now saved with binary files
+   
+   <LI>Updating a 3D surface will now automatically activate
+   QuickDraw 3D
+   
+   <LI>Many bug fixes and feature refinements including:
+   
+   <UL>
+      <LI>Fixed several bugs related to creating density differences.
+      One result is that all grid parameters are now reported in
+      Angstroms. Previous saved surfaces and exported grids will need
+      to be changed.
+      
+      <LI>The export code now reports more errors instead of just
+      ignoring them. In addition exporting hi-res QD3D PICTS requires
+      much less system memory.
+      
+      <LI>Open and Save dialogs are now compatible with the new MacOS
+      8.5 file navigation library
+      
+      <LI>Optimizations now default to the final geometry
+      
+      <LI>Navigation services code fixed to work with Mac OS 8.5
+   </UL>
+</UL>
+
+<P>Version 4.8:</P>
+
+<UL>
+   <LI>Updated parsing code for the new Ames Lab determinate CI (used
+   by default in FORS MCSCF).
+   
+   <LI>Modified 3D contouring code such that the minimum number of
+   vertices are stored. The result is lower memory requirements and
+   calculating surface MEP values is up to 6 times faster.
+   
+   <LI>Added option to smooth 3D surfaces. Its not perfect, but it is
+   an improvement.
+</UL>
+
+<P>Version 4.7.3:</P>
+
+<UL>
+   <LI>Systems with an odd number of electrons are now defaulted to
+   ROHF and Multiplicity=2.
+   
+   <LI>Fixed the parsing code for UHF orbitals.
+   
+   <LI>Fixed bug which could cause the negative portion of orbitals
+   to disappear when viewing 3D orbitals.
+</UL>
+
+<P>Version 4.7.2:</P>
+
+<UL>
+   <LI>Added option to include the energy plot in exported Quicktime
+   Movies of frame animations
+   
+   <LI>Energy plots created from log files containing MP2 energies
+   now default to displaying MP2 energies
+   
+   <LI>Fixed a couple of file parsing bugs
+</UL>
+
+<P>Version 4.7.1:</P>
+
+<UL>
+   <LI>Added an export button for General 2D and 3D surfaces
+   
+   <LI>Creator of exported surface files is now BBEdit since
+   MacMolPlt does not directly open them.
+   
+   <LI>Fixed bug in reading optimizations in the new GAMESS format
+   
+   <LI>Fixed bug saving/reading binary surfaces
+</UL>
+
+<P>Version 4.7:</P>
+
+<UL>
+   <LI>New Display preferences section including new options to:
+   
+   <UL>
+      <LI>Display model in wireframe mode
+      
+      <LI>Color bonds according to the atom color at each end
+      
+      <LI>Outline bonds in black (applies to standard 2D mode only)
+   </UL>
+   
+   <LI>New opyions in the print dialog to:
+   
+   <UL>
+      <LI>Print a black frame around display.
+      
+      <LI>Center the print out on the page.
+      
+      <LI>Scale the display to use the maximum amount of the page
+      (without changing the aspect ratio of the display).
+   </UL>
+   
+   <LI>Fixed bug in General surface (2D and 3D) code affecting
+   density differences.
+   
+   <LI>Fixed recently introduced bug which prevented MCSCF orbitals
+   from being parsed.
+</UL>
+
+<P>Version 4.6.3:</P>
+
+<UL>
+   <LI>Consolidated several routines related to Surfaces resulting in
+   a smaller executable and several bug fixes.
+   
+   <LI>The Export button is now properly enabled for 2D surfaces.
+   
+   <LI>2D surfaces now properly update when toggling the Use Screen
+   Plane feature.
+   
+   <LI>Z-Matrix calculator window list should now update properly
+   when windows are opened and closed.
+   
+   <LI>Fixed point group order and # F functions popups in the input
+   builder.
+   
+   <LI>Fixed problem with some filenames in the menus and added a #
+   to Untitled windows
+</UL>
+
+<P>Version 4.6.2:</P>
+
+<UL>
+   <LI>Added option to color map MEP values to
+   <A HREF="MacMolPlt_Surfaces.html#3DTED">3D total electron density
+   isosurfaces</A> (Pretty cool!)
+   
+   <LI>Fixed Serveral MEP related bugs
+</UL>
+
+<P>Version 4.6.1:</P>
+
+<UL>
+   <LI>Fixed a bug which could produce incorrect MEP values
+   
+   <LI>Fixed several interface bugs in the MEP surfaces
+   
+   <LI>Fix problem where 2D surfaces where being recalculated more
+   often than necessary
+</UL>
+
+<P>Version 4.6:</P>
+
+<UL>
+   <LI>New <A HREF="MacMolPlt_Surfaces.html">2D and 3D Molecular
+   Electrostatic Potentials</A> (MEPMaps) (Required a lot of new
+   code!)
+   
+   <LI>Updated <A HREF="MacMolPlt_Files.html#GAMESSLog">GAMESS log
+   file</A> parser for the new format in optimizations.
+   
+   <LI>Several smaller things which I can't seem to remember right
+   now...
+</UL>
+
+<P>Version 4.5:</P>
+
+<UL>
+   <LI>New Stereo drawing mode.
+   
+   <LI><A HREF="MacMolPlt_Surfaces.html#dendiff">New Density
+   difference capability</A>. (Read the documentation carefully on
+   this one!)
+   
+   <LI>Fixed up Manual Window font width problems.
+</UL>
+
+<P>Version 4.4:</P>
+
+<UL>
+   <LI>Enabled Select All for Coords and Bonds windows
+   
+   <LI><A HREF="MacMolPlt_Files.html#GAMESSLog">GAMESS log files</A>
+   containing effective fragments now are read in correctly (to view
+   frequencies involving fragments you will have to update your
+   GAMESS version to one out very soon)
+   
+   <LI>Simple <A HREF="MacMolPlt_Files.html#pdb">Protein Data Bank
+   (pdb) file</A> parser to read pdb files
+   
+   <LI>New Manual window parameter adjustment window allows you to
+   manually set window size, scaling, center, and rotation angles.
+   
+   <LI>The angle information which is optionally printed while
+   rotating now prints the Eulerian angles.
+   
+   <LI>Bugs Fixed:
+   
+   <UL>
+      <LI>fixed problem reading single frequencies in .mol files
+      
+      <LI>fixed problem with saving frequencies and internal
+      coordinate information
+      
+      <LI>fixed a bug with copy and pasting binary data
+      
+      <LI>fixed several bugs in the calculation and display of
+      internal coordinates in the Coords Window.
+   </UL>
+</UL>
+
+<P>Version 4.3:</P>
+
+<UL>
+   <LI>Added several new export file types including:
+   
+   <UL>
+      <LI><A HREF="MacMolPlt_Files.html#JPEG">JPEG image</A> (for use
+      on WWW pages etc)
+      
+      <LI><A HREF="MacMolPlt_Files.html#QuickTime">QuickTime
+      movies</A> of normal mode animations or frame animations (also
+      for WWW etc)
+      
+      <LI><A HREF="MacMolPlt_Files.html#PICT">hi-res PICT</A> for
+      ease of including hi-res QuickDraw 3D images into other apps.
+   </UL>
+</UL>
+
+<P>Version 4.2:</P>
+
+<UL>
+   <LI>Added ability to apply a surface across all frames of a file.
+   Thus you can create animations of orbitals and total electron
+   densities. To along with this ability the log file parsing code
+   now reads orbitals for all frames in a log file, if present.
+   
+   <LI>Added ability to import a $Vec group from a
+   <A HREF="MacMolPlt_Files.html#datfiles">GAMESS .DAT file</A>.
+   
+   <LI>Setting Guess=MOREAD now punchs out the current orbitals to a
+   $Vec group.
+   
+   <LI>Changing the reference orientation of a molecule (such using
+   the minimize frame movements, or by clicking the Stick Coordinates
+   button in the Coords Win) now updates any orbitals for the new
+   orientation (3D surfaces must be recalculated though).
+   
+   <LI>Added option to Hide hydrogen atom labels.
+</UL>
+
+<P>Version 4.1.2:</P>
+
+<UL>
+   <LI>Added optimization options (Stat. Point) to the input builder
+   
+   <LI>Added option to plot the
+   <A HREF="MacMolPlt_Surfaces.html#2DOrbitals">negative contours</A>
+   as dashed lines
+   
+   <LI>Corrected System version check to function properly with
+   System 8 and beyond.
+</UL>
+
+<P>Version 4.1.1:</P>
+
+<UL>
+   <LI>Added hessian options to the input builder
+   
+   <LI>Updated the input builder for the changes in CI run types and
+   MRMP runs
+   
+   <LI>Few minor bug fixes
+</UL>
+
+<P>Version 4.1:</P>
+
+<UL>
+   <LI>Added ability to
+   <A HREF="MacMolPlt_Files.html#SurfExport">export 2D and 3D</A>
+   surface grid data.
+   
+   <LI>Added <A HREF="MacMolPlt_Surfaces.html#2DGeneral">general
+   2D</A> and <A HREF="MacMolPlt_Surfaces.html#3DGeneral">3D</A>
+   surface types which read in data in the 2D and 3D export format.
+   
+   <LI>Added ability to read <A HREF="MacMolPlt_Files.html#XYZ">XMol
+   style XYZ</A> format files.
+   
+   <LI>Fixed a few bugs...
+</UL>
+
+<P>Version 4.0.2:</P>
+
+<UL>
+   <LI>Several bug fixes including:
+   
+   <UL>
+      <LI>A problem opening certain binary files from previous
+      version of MacMolPlt.
+      
+      <LI>Surfaces are now correctly saved to the binary file, any
+      surfaces saved previously should be considered corrupt and will
+      not be read in.
+   </UL>
+</UL>
+
+<P>Version 4.0.1:</P>
+
+<UL>
+   <LI>Several minor bugs fixs or feature tweaks
+</UL>
+
+<P>Version 4.0:</P>
+
+<UL>
+   <LI>Substantial redesign of the entire application.
+   
+   <LI>New - Each file has its own preferences
+   
+   <LI>New - Total electron density surfaces
+   
+   <LI>New - Ability to view multiple surfaces simutaneously
+   
+   <LI>New - Z-Matrix style internal coordinates
+</UL>
+
+<P>Version 3.2.2:</P>
+
+<UL>
+   <LI>Fixed crash which occurred when attempting to view AO's
+</UL>
+
+<P>Version 3.2.1:</P>
+
+<UL>
+   <LI>Fixed hang which occured when an improper text file was opened
+   (like a GAMESS input file)
+   
+   <LI>Fixed bug which prevented orbitals from being read in from a
+   numerical hessian log file
+   
+   <LI>Fixed bug in 68K slider (so no more special versions)
+</UL>
+
+<P>Version 3.2:</P>
+
+<UL>
+   <LI>New Normal mode offset dialog
+   
+   <LI>Added hammer button in coordinate window
+   
+   <LI>Significant internal changes to the log/irc code such that it
+   should be more robust and uses much less memory
+</UL>
+
+<P>Version 3.1.4:</P>
+
+<UL>
+   <LI>Added 3DMF file export.
+   
+   <LI>Improved coordinate pasting.
+   
+   <LI>Fixed Copy bug introduced in the last version preventing
+   pasting back in to a new window.
+</UL>
+
+<P>Version 3.1.3:</P>
+
+<UL>
+   <LI>Fixed a couple of bugs related to parsing MO's (one was with
+   the narrow terminal option)
+   
+   <LI>Reworked my print loop such that you should get the maximum
+   possible output quality on any printer whether QuickDraw 3D is
+   enabled or not.
+</UL>
+
+<P>Version 3.1.2:</P>
+
+<UL>
+   <LI>Changed orbital selection dialog and added orbital options
+   dialog with several new options for 2D contours.
+</UL>
+
+<P>Version 3.1.1:</P>
+
+<UL>
+   <LI>New Set Plane dialog to easily choose orbital plotting planes
+   
+   <LI>Fixed bug in the input generator when using MP2
+   
+   <LI>Fixed memory related bug in 2D MO code
+</UL>
+
+<P>Version 3.1:</P>
+
+<UL>
+   <LI>New 2D Orbital contour maps (on any Macintosh)
+   
+   <LI>Fixed End Of Line bug in punching input files
+   
+   <LI>Fixed memory leak in when viewing MO's
+</UL>
+
+<P>Version 3.0.1:</P>
+
+<UL>
+   <LI>Improved the MO parsing code; All wavefunction types except CI
+   should work.
+   
+   <LI>Fixed a bug which caused a crash when opening a binary file
+   with saved MO's
+   
+   <LI>Fixed a bug which caused IRC structure information to be
+   skipped in log files.
+   
+   <LI>IO with binary files now uses a file independent buffer size.
+</UL>
+
+<P>Version 3.0:</P>
+
+<UL>
+   <LI>New GAMESS input file generator
+   
+   <LI>New 3D MO display using QD3D
+   
+   <LI>Many bug fixes
+</UL>
+
+<P>Version 2.3.1:</P>
+
+<UL>
+   <LI>Added QuickDraw 3D preferences for bond width, atom quality,
+   and lighting
+   
+   <LI>Greatly reduced the memory used by QD3D for large molecules
+</UL>
+
+<P>Version 2.3:</P>
+
+<UL>
+   <LI>Fixed bug in Energy Plot window during animation
+   
+   <LI>Fixed a couple of small memory leaks
+   
+   <LI>Completely new integrated preferences dialog (with lots of
+   balloon help!)
+   
+   <LI>New preferences file format
+</UL>
+
+<P>Version 2.2.1:</P>
+
+<UL>
+   <LI>Fix a bug in normal mode animation (animation didn't work
+   properly in 2.2)
+   
+   <LI>Several small changes
+   
+   <LI>Compiled with CW 1.3 (PPC version will run better on 603 and
+   604 processors)
+</UL>
+
+<P>Version 2.2:</P>
+
+<UL>
+   <LI>Added ability to translate molecules in main display window
+   (hold down command key while rotating)
+   
+   <LI>Automatically center molecules when pasted or read in from a
+   text file
+   
+   <LI>Added option to minimize changes between frames. Thus
+   translations and rotations are removed, very useful for splicing
+   separate IRC's together or for looking a G92 optimizations
+   
+   <LI>QuickDraw 3D support (only on PowerMacintosh's with the QD3D
+   library installed)
+</UL>
+
+<P>Version 2.1.1:</P>
+
+<UL>
+   <LI>Fixed a couple of bugs related to reading Frequencies from log
+   files and mixed frequencies and irc frames
+</UL>
+
+<P>Version 2.1:</P>
+
+<UL>
+   <LI>Added the ability to build molecules by hand (in the
+   Coordinates window)
+   
+   <LI>Added a Z-matrix calculator
+   
+   <LI>Added an option to export to a text file with a GAMESS $DATA
+   format
+   
+   <LI>improved IRC input for "negative" IRC values
+   
+   <LI>Made related windows "stick" together when switching between
+   files (This should make it easier to give presentations)
+   
+   <LI>Added balloon help for menus and some dialogs
+   
+   <LI>Several bug fixes mainly related to opening large files
+   without sufficient memory
+</UL>
+
+<P>Version 2.0: (Many changes thus the change in the major version
+number)</P>
+
+<UL>
+   <LI>MacMolPlt can now read GAMESS log and IRC (meaning IRC and
+   DRC) files
+   
+   <LI>Link together multiple log and IRC files to create one movie
+   
+   <LI>Read frequencies directly from log files
+   
+   <LI>Change displayed frequency from the keyboard
+   
+   <LI>Optional information bar (frame #, energy, frequency)
+   
+   <LI>Create simple energy plots for any set of geometry points
+   
+   <LI>Changed to Metrowerks CodeWarrior (1.2.1) compilers (from
+   Apple's MPW compilers)
+</UL>
+
+<P>Version 1.2:</P>
+
+<UL>
+   <LI>Pasting coordinates now works for the following three formats:
+   
+   <UL>
+      <LI>GAMESS Label x y z
+      
+      <LI>GAMESS Label (atomic #) x y z
+      
+      <LI>G92 (atom #) (atomic #) x y z
+      
+      <LI>You may use coordinates in either Bohrs or Angstroms, but
+      once in the program you should convert the units to Angstroms
+      using the new options under the Molecule menu especially if you
+      wish to use the bonding features.
+   </UL>
+   
+   <LI>New option to prevent H-H bonds when using the auto-bond or
+   the radius bonding methods.
+   
+   <LI>New ability to add or delete one bond at a time.
+   
+   <LI>New special "atom" type for displaying Dipoles (see below for
+   more info)
+</UL>
+
+<P>Version 1.1:</P>
+
+<UL>
+   <LI>Several Bug fixes mainly involving reading MolPlt files.
+   
+   <LI>Added a save option for saving to a binary file for future
+   reuse.
+   
+   <LI>Smaller Application memory partition (see Memory Use below).
+   
+   <LI>Added Display of coordinates.
+   
+   <LI>Added ability to generate bonds (from a radius or "normal"
+   bond lengths).
+   
+   <LI>Added ability to paste cartesian coordinates to a new window
+   from GAMESS or Gaussian files.
+</UL>
+</BODY>
+</HTML>
