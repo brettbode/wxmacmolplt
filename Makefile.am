@@ -1,6 +1,6 @@
 SUBDIRS = src
 pkgdata_DATA = resources/MacMolPlt.Prefs.xml resources/fonts/arial1.glf \
-	MacMolPlt_Manual.html \
+	MacMolPlt_Manual.html Manual_pages/WalkThrough.html \
 	Manual_pages/2D_General_Dialog.gif Manual_pages/2D_MEP.gif \
 	Manual_pages/2D_MEP_Dialog.gif Manual_pages/2D_Orbital.gif \
 	Manual_pages/2D_Orbital_Dialog.gif Manual_pages/2D_TED.gif \
@@ -13,13 +13,14 @@ pkgdata_DATA = resources/MacMolPlt.Prefs.xml resources/fonts/arial1.glf \
 	Manual_pages/MEP_3D.jpg Manual_pages/MEP_3D_Dialog.gif \
 	Manual_pages/MacMolPlt_Files.html Manual_pages/MacMolPlt_Surfaces.html \
 	Manual_pages/MacMolPlt_Windows.html Manual_pages/Version_History.html \
-	Manual_pages/Water.gif Manual_pages/sample-mol.jpg
+	Manual_pages/Water.gif Manual_pages/sample-mol.jpg \
+	samples/water.log samples/sample.irc
 EXTRA_DIST = wxMacMolPlt.kdevelop         \
 	wxMacMolPlt.vcproj     wxMacMolPlt.rc \
 	wxMacMolPlt.xcodeproj/project.pbxproj \
 	resources/MacMolPlt.Prefs.xml         \
 	resources/fonts/arial1.glf			\
-	MacMolPlt_Manual.html \
+	MacMolPlt_Manual.html Manual_pages/WalkThrough.html \
 	Manual_pages/2D_General_Dialog.gif Manual_pages/2D_MEP.gif \
 	Manual_pages/2D_MEP_Dialog.gif Manual_pages/2D_Orbital.gif \
 	Manual_pages/2D_Orbital_Dialog.gif Manual_pages/2D_TED.gif \
@@ -32,4 +33,5 @@ EXTRA_DIST = wxMacMolPlt.kdevelop         \
 	Manual_pages/MEP_3D.jpg Manual_pages/MEP_3D_Dialog.gif \
 	Manual_pages/MacMolPlt_Files.html Manual_pages/MacMolPlt_Surfaces.html \
 	Manual_pages/MacMolPlt_Windows.html Manual_pages/Version_History.html \
-	Manual_pages/Water.gif Manual_pages/sample-mol.jpg
+	Manual_pages/Water.gif Manual_pages/sample-mol.jpg \
+	samples/water.log samples/sample.irc
