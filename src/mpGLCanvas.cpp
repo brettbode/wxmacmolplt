@@ -16,6 +16,9 @@
 #ifdef __wxBuild__
 #include <wx/stdpaths.h>
 #endif
+#ifdef __WXMAC__
+#include <AGL/glu.h>
+#endif
 
 #include <iostream>
 
