@@ -147,6 +147,8 @@ class MpGLCanvas : public wxGLCanvas {
          * \param event The event to handle.
          */
         void KeyHandler(wxKeyEvent & event);
+
+	void SelectObj(int x, int y);
 };
 
 #endif

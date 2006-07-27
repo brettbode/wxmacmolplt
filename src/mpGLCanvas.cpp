@@ -459,6 +459,13 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
         return;
     }
     SetCurrent();
+
+    //if ( event.GetButton() ==  wxMOUSE_BTN_LEFT )
+    //  {
+    //	wxPoint tmpPnt = event.GetPosition();
+    //std::cout<<"x:"<<tmpPnt.x<<" y:"<<tmpPnt.y<<std::endl;
+    //  }
+
     // Pass mouse event to MolDisplayWin::Rotate for processing
     MolWin->Rotate(event);
 }
@@ -467,6 +474,38 @@ void MpGLCanvas::KeyHandler(wxKeyEvent & event) {
     //char events are passed up the parent chain so se need to explicitely pass them
     MolWin->KeyHandler(event);
 }
+
+void MpGLCanvas::SelectObj(int x, int y)
+ {
+   GLuint buff[64] = {0};
+   GLint hits, view[4];
+   int id;
+ 
+   glSelectBuffer(64, buff);
+   glGetIntegerv(GL_VIEWPORT, view);
+ 	
+   glRenderMode(GL_SELECT);
+   glInitNames();
+   glPushName(0);
+ 
+ 	glMatrixMode(GL_PROJECTION);
+ 	glPushMatrix();
+ 		glLoadIdentity();
+ 
+ 		gluPickMatrix(x, y, 1.0, 1.0, view);
+ 		gluPerspective(60, 1.0, 0.0001, 1000.0);
+ 
+ 		glMatrixMode(GL_MODELVIEW);
+ 		
+ 		//gl_draw();
+ 
+ 		glMatrixMode(GL_PROJECTION);
+ 	glPopMatrix();
+ 
+ 	hits = glRenderMode(GL_RENDER);
+ 
+ 	glMatrixMode(GL_MODELVIEW);
+ }
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
     EVT_SIZE             (MpGLCanvas::eventSize)

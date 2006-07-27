@@ -64,6 +64,8 @@ enum MMP_EventID {
     MMP_PREVMODE,
     MMP_NEXTMODE,
     MMP_SHOWAXIS,
+    MMP_SHOWATOMLABELS,
+    MMP_SHOWATOMNUMBER,
     MMP_CENTER,
     MMP_ROTATESUBMENU,
     MMP_ROTATETOXAXIS,
@@ -139,6 +141,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
     EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
     EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
+    EVT_MENU (MMP_SHOWATOMLABELS,   MolDisplayWin::menuViewShowAtomLabel)
+    EVT_MENU (MMP_SHOWATOMNUMBER,   MolDisplayWin::menuViewShowAtomNumber)
     EVT_MENU (MMP_ANIMATEFRAMES,    MolDisplayWin::menuViewAnimateFrames)
     EVT_MENU (MMP_SHRINK10,         MolDisplayWin::menuViewShrink_10)
     EVT_MENU (MMP_ENLARGE10,        MolDisplayWin::menuViewEnlarge_10)
@@ -420,6 +424,8 @@ void MolDisplayWin::createMenuBar(void) {
     menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
     menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
     menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show &Axis"));
+    menuView->AppendCheckItem(MMP_SHOWATOMLABELS, wxT("Show Atom Labels"));
+    menuView->AppendCheckItem(MMP_SHOWATOMNUMBER, wxT("Show Atom Number"));
     menuView->Append(MMP_ANIMATEFRAMES, wxT("Animate &Frames\tCtrl+F"));
     menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl+-"));
     menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl+="));
@@ -1599,6 +1605,21 @@ void MolDisplayWin::menuViewShowAxis(wxCommandEvent &event) {
     UpdateModelDisplay();
     Dirty = true;
 }
+
+void MolDisplayWin::menuViewShowAtomLabel(wxCommandEvent &event)
+{
+  MainData->SetAtomLabelDrawMode(1-MainData->DrawAtomLabels());
+  UpdateModelDisplay();
+  Dirty = true;
+}
+
+void MolDisplayWin::menuViewShowAtomNumber(wxCommandEvent &event)
+{
+  MainData->SetAtomNumbersDrawMode(1-MainData->DrawAtomNumbers());
+  UpdateModelDisplay();
+  Dirty = true;
+}
+
 void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &event) {
     long AnimateTime = 10*Prefs->GetAnimateTime();
 	if (AnimateTime < 1) AnimateTime = 1;

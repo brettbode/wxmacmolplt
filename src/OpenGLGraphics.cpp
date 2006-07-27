@@ -753,6 +753,10 @@ void MolDisplayWin::DrawGL(void)
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
 	glTranslatef(0.0, 0.0, -(MainData->WindowSize));
+
+	if (MainData->DrawAtomLabels() || MainData->DrawAtomNumbers() )
+	  DrawLabel();
+
 	glMultMatrixf((const GLfloat *) &(MainData->TotalRotation));
 
 	glEnable(GL_LIGHTING);
@@ -855,6 +859,72 @@ void MolDisplayWin::DrawGL(void)
 	glDisable(GL_LIGHTING);
 }
 
+void MolDisplayWin::DrawLabel()
+{
+  Frame * lFrame=MainData->cFrame;
+  mpAtom * lAtoms = lFrame->Atoms;
+  long NumAtoms = lFrame->NumAtoms;
+  float AtomScale = Prefs->GetAtomScale();
+  GLdouble BondSize = Prefs->GetQD3DBondWidth();
+
+  wxString atomLabel;
+  long CurrentAtomType;
+  CPoint3D origPt, transPt;
+  long CurrentAtom;
+
+  if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) 
+    {
+      for (long iatom=0; iatom<NumAtoms; iatom++) 
+	{
+	  if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
+
+	  atomLabel.Clear();
+
+	  CurrentAtomType = lAtoms[iatom].GetType() - 1;
+
+	  //!!! retrieve atom label
+	  if ( MainData->DrawAtomLabels() )
+	    Prefs->GetAtomLabel(CurrentAtomType, atomLabel);
+
+	  if (MainData->DrawAtomNumbers() )
+	    {
+	      wxString tmpStr;
+
+	      CurrentAtom = MainData->zBuffer[iatom];
+	      tmpStr.Printf("%d", CurrentAtom+1);
+	      atomLabel.Append(tmpStr);
+	    }
+
+	  float radius;
+	  if (!Prefs->DrawWireFrame()) radius = AtomScale*Prefs->GetAtomSize(CurrentAtomType);
+	  else radius = BondSize;
+			
+	  if (radius<0.01) continue;	//skip really small spheres
+
+	  RGBColor * AtomColor = Prefs->GetAtomColorLoc(CurrentAtomType);
+	  float red, green, blue;
+	  red = AtomColor->red/65536.0;
+	  green = AtomColor->green/65536.0;
+	  blue = AtomColor->blue/65536.0;
+
+	  origPt.x = lAtoms[iatom].Position.x;
+	  origPt.y = lAtoms[iatom].Position.y;
+	  origPt.z = lAtoms[iatom].Position.z;
+
+	  Rotate3DPt(MainData->TotalRotation, origPt, &transPt );
+
+	  glPushMatrix();
+	  glTranslatef(0.0, 0.0, radius+0.01);
+	  glTranslatef(transPt.x, transPt.y, transPt.z);
+
+	  glColor3f(1-red, 1-green, 1-blue);
+	  glScalef(0.1+0.08*radius, 0.1+0.08*radius, 1);
+	  glfDrawSolidString((char*)atomLabel.c_str());
+	  glPopMatrix();
+	}
+    }
+}
+
 void MolDisplayWin::SortTransparentTriangles(void) {
 	for (int i=0; i<OpenGLData->triangleCount; i++) {
 		Rotate3DPt(MainData->TotalRotation, OpenGLData->transpTriList[OpenGLData->transpIndex[i]].v1,
@@ -930,6 +1000,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 	if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) {
 		for (long iatom=0; iatom<NumAtoms; iatom++) {
+
 			if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
 			long curAtomType = lAtoms[iatom].GetType() - 1;
 

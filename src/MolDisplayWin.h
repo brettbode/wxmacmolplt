@@ -156,6 +156,8 @@ class MolDisplayWin : public wxFrame {
         //void menuViewShow_atom_labels(wxCommandEvent &event);
         //void menuViewShow_atom_numbers(wxCommandEvent &event);
         void menuViewShowAxis(wxCommandEvent &event);
+	void menuViewShowAtomLabel(wxCommandEvent &event);
+	void menuViewShowAtomNumber(wxCommandEvent &event);
         void menuViewShrink_10(wxCommandEvent &event);
         void menuViewEnlarge_10(wxCommandEvent &event);
         void menuViewCenter(wxCommandEvent &event);
@@ -251,6 +253,7 @@ class MolDisplayWin : public wxFrame {
         void Rotate(wxMouseEvent&);
         void RotateMoleculeGL(bool);
         void PrintGL(wxDC * dc, const float & scaleFactor);
+	void DrawLabel(void); //added by Song Li
 
         void eventSize(wxSizeEvent &event);
         void SizeChanged(void);
