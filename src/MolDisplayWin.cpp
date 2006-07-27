@@ -562,7 +562,7 @@ void MolDisplayWin::menuFileImport(wxCommandEvent &event) {
     //We are looking for $ VEC groups. Scan to see how many are there. If more than 1 the user will
     //have to choose.
     if (!filename.empty()) {
-        FILE * myfile = fopen(filename.mb_str(wxConvUTF8), "r");
+        FILE * myfile = fopen(filename.mb_str(wxConvUTF8), "rb");
         if (myfile == NULL) {
             MessageAlert("Unable to open the selected file!");
         } else {
@@ -2148,7 +2148,7 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
     long                test=0;
     TextFileType type;
     
-    FILE * myfile = fopen(fileName.mb_str(wxConvUTF8), "r");
+    FILE * myfile = fopen(fileName.mb_str(wxConvUTF8), "rb");
     if (myfile == NULL) {
         if (append)
             AbortOpen("Unable to open the requested file.");

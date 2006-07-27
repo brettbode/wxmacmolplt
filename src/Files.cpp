@@ -2983,7 +2983,7 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
     //have to choose.
 	FILE * myfile = NULL;
     if (!filename.empty()) {
-        myfile = fopen(filename.mb_str(wxConvUTF8), "r");
+        myfile = fopen(filename.mb_str(wxConvUTF8), "rb");
         if (myfile == NULL) {
             MessageAlert("Unable to open the selected file!");
 			return;
@@ -3130,7 +3130,7 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
     //have to choose.
 	FILE * myfile = NULL;
     if (!filename.empty()) {
-        myfile = fopen(filename.mb_str(wxConvUTF8), "r");
+        myfile = fopen(filename.mb_str(wxConvUTF8), "rb");
         if (myfile == NULL) {
             MessageAlert("Unable to open the selected file!");
 			return;

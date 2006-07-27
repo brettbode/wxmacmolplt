@@ -68,7 +68,7 @@ BufferFile * OpenDatFile(void) {
 
     wxString filename = wxFileSelector(wxT("Choose a GAMESS .DAT file corresponding to this log file."));
     if (!filename.empty()) {
-        FILE * myfile = fopen(filename.mb_str(wxConvUTF8), "r");
+        FILE * myfile = fopen(filename.mb_str(wxConvUTF8), "rb");
         if (myfile == NULL) {
             MessageAlert("Unable to open the selected file!");
         } else {
