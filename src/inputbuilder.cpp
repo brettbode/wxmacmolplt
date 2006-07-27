@@ -1712,7 +1712,7 @@ void InputBuilderWindow::SetupControlItems() {
     multText->SetValue(wxString::Format(wxT("%d"), itemValue));
     
     // localChoice
-    localChoice->SetSelection(TmpInputRec->Control->GetLocal() - 1);
+    localChoice->SetSelection(TmpInputRec->Control->GetLocal());
 }
 
 void InputBuilderWindow::SetupDataItems() {
@@ -2330,7 +2330,7 @@ void InputBuilderWindow::OnScfChoiceSelected( wxCommandEvent& event )
 
 void InputBuilderWindow::OnLocalChoiceSelected( wxCommandEvent& event )
 {
-    TmpInputRec->Control->SetLocal((GAMESS_Localization)(localChoice->GetSelection() + 1));
+    TmpInputRec->Control->SetLocal((GAMESS_Localization)(localChoice->GetSelection()));
     SetupItems();
 }
 /*!
