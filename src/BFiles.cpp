@@ -405,6 +405,7 @@ long BufferFile::GetLine(char * Line)
 	if (((BufferPos+BufferStart+1)<ByteCount)&&
 		(((*Buffer)[BufferPos] == 13)||((*Buffer)[BufferPos] == 10))) BufferPos++;
 #else
+	if ((Buffer[BufferPos]==13)&&(Buffer[BufferPos+1]==10)) BufferPos++;
 	if (((BufferPos+BufferStart)<ByteCount)&&
 		((Buffer[BufferPos] == 13)||(Buffer[BufferPos] == 10))) BufferPos++;
 #endif
@@ -442,6 +443,7 @@ void BufferFile::BackupnLines(long nBack) {
 				BufferPos = BufferSize;	//Set pos to end of buffer
 			}
 		}
+		if ((Buffer[BufferPos]==10)&&(Buffer[BufferPos-1]==13)) BufferPos--;
 		BufferPos --;
 	}
 	if (BufferPos>0) BufferPos += 2;
@@ -460,6 +462,7 @@ void BufferFile::SkipnLines(long nSkip) {
 			if ((BufferStart+BufferPos)>=ByteCount) break;	//End of file reached, assume EOL
 			if (BufferPos>=BufferSize) AdvanceBuffer();
 		}
+		if ((Buffer[BufferPos]==13)&&(Buffer[BufferPos+1]==10)) BufferPos++;
 		BufferPos ++;	//Advance to the first character of the next line
 	}
 }
@@ -485,6 +488,7 @@ long BufferFile::FindBlankLine(void) {
 			if ((BufferStart+BufferPos)>=ByteCount) break;	//End of file reached, assume EOL
 			if (BufferPos>=BufferSize) AdvanceBuffer();
 		}
+		if ((Buffer[BufferPos]==13)&&(Buffer[BufferPos+1]==10)) BufferPos++;
 		if (done) BlankLinePos = LineStart;
 		BufferPos ++;
 	}
@@ -507,11 +511,12 @@ bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, long Limit) {
 			SetFilePos(OldPosition);				//finding the keyword
 			break;
 		}
+		long lineStartPos = GetFilePos();
 		GetLine(LineText);
 		long Start = FindKeyWord(LineText, Keyword, NumByte);
 		if (Start > -1) {	//Found it!
 			KeyWordFound = true;
-			OldPosition = BufferPos + BufferStart + Start - (strlen(LineText)+1);
+			OldPosition = lineStartPos + Start;
 			SetFilePos(OldPosition);
 		}
 	}
@@ -531,7 +536,9 @@ long BufferFile::GetNumLines(long size) {
 		if (((*Buffer)[BufferPos] == 13)||((*Buffer)[BufferPos]==10)) NumLines++;
 #else
 		if ((Buffer[BufferPos] == 13)||(Buffer[BufferPos]==10)) NumLines++;
+		if ((Buffer[BufferPos]==13)&&(Buffer[BufferPos+1]==10)) BufferPos++;
 #endif
+		
 		BufferPos++;
 	}
 	BufferPos--;
