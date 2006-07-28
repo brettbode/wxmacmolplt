@@ -428,9 +428,12 @@ long ControlGroup::SetMPLevel(short NewMPLevel) {
 }
 short ControlGroup::GetMPLevel(void) const {	//return the appropriate MP value based on SCF and Run types
 	short result=-1;
-	if ((SCFType == 0)||(SCFType == 1)) result = (MPLevelCIType & 0x0F);
-	if (((SCFType==2)||(SCFType==3)||(SCFType==5))&&(RunType!=2)&&(RunType!=3)&&(RunType!=4)&&
-		(RunType!=6)&&(RunType!=7)&&(RunType!=8)&&(RunType!=9)) result=(MPLevelCIType & 0x0F);
+		//MP2 energy and gradients are available for RHF, UHF and ROHF
+	if ((SCFType >= GAMESSDefaultSCFType)&&(SCFType <= GAMESS_ROHF)) result = (MPLevelCIType & 0x0F);
+		//MrMP2 energies are also available
+	else if ((SCFType==GAMESS_MCSCF)&&
+		(RunType!=GradientRun)&&(RunType!=HessianRun)&&(RunType!=OptimizeRun)&&
+		(RunType!=SadPointRun)&&(RunType!=IRCRun)&&(RunType!=GradExtrRun)&&(RunType!=DRCRun)) result=(MPLevelCIType & 0x0F);
 	if (MPLevelCIType & 0xF0) result = -1;	//deactivate MP2 when CI is requested
 	if (GetCCType() != CC_None) result = -1;
 	return result;
@@ -2635,7 +2638,8 @@ MP2Group::MP2Group(MP2Group *Copy) {
 }
 void MP2Group::InitData(void) {
 	CutOff = 0.0;
-	NumCoreElectrons = Memory = 0;
+	NumCoreElectrons = -1;
+	Memory = 0;
 	Method = AOInts = LMOMP2 = 0;
 	MP2Prop = false;
 }
@@ -2706,7 +2710,7 @@ void MP2Group::WriteToFile(BufferFile *File, InputData *IData) {
 
 		//first determine wether or not the MP2 group needs to be punched
 	if (IData->Control->GetMPLevel() != 2) return;	//Don't punch if MP2 isn't active
-	if (NumCoreElectrons||Memory||Method||AOInts) test = true;
+	if ((NumCoreElectrons>=0)||Memory||Method||AOInts) test = true;
 	if (GetLMOMP2()) test = true;
 	if (CutOff > 0.0) test = true;
 	
@@ -2716,8 +2720,12 @@ void MP2Group::WriteToFile(BufferFile *File, InputData *IData) {
 	File->WriteLine(" $MP2 ", false);
 		//core electrons
 	if (NumCoreElectrons >= 0) {
-		sprintf(Out,"NCORE=%ld ", NumCoreElectrons);
+		sprintf(Out,"NACORE=%ld ", NumCoreElectrons);
 		File->WriteLine(Out, false);
+		if (IData->Control->GetSCFType() == GAMESS_UHF) {
+			sprintf(Out,"NBCORE=%ld ", NumCoreElectrons);
+			File->WriteLine(Out, false);
+		}
 	}
 	//MP2Prop
 	if ((IData->Control->GetRunType() <= Energy) && GetMP2Prop()) {
@@ -2734,7 +2742,7 @@ void MP2Group::WriteToFile(BufferFile *File, InputData *IData) {
 		File->WriteLine(Out, false);
 	}	//CutOff
 	if (CutOff > 0.0) {
-		sprintf(Out, "CUTOFF=%e.2 ", CutOff);
+		sprintf(Out, "CUTOFF=%.2e ", CutOff);
 		File->WriteLine(Out, false);
 	}	//Method
 	if (Method) {

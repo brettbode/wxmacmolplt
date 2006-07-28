@@ -1982,8 +1982,10 @@ void InputBuilderWindow::SetupMP2OptsItems() {
 	
 	wxString temp;
 	//# core electrons
-	temp.Printf(wxT("%ld"), TmpInputRec->MP2->GetNumCoreElectrons());
-	mMP2CoreEleEdit->SetValue(temp);
+	if (TmpInputRec->MP2->GetNumCoreElectrons()>=0) {
+		temp.Printf(wxT("%ld"), TmpInputRec->MP2->GetNumCoreElectrons());
+		mMP2CoreEleEdit->SetValue(temp);
+	}
 	//memory
 	long memVal = TmpInputRec->MP2->GetMemory();
 	if (memVal == 0)
@@ -3134,6 +3136,11 @@ void InputBuilderWindow::OnInitstepsizeEditUpdated( wxCommandEvent& event )
 	wxString temp = mInitStepSizeEdit->GetValue();
 	double t;
 	if (temp.ToDouble(&t)) {
+		//test against the default
+		double def = 0.3;
+		if (TmpInputRec->StatPt->GetMethod() == 5) def = 0.1;
+		else if (TmpInputRec->Control->GetRunType() == 6) def = 0.2;
+		if (fabs(t-def) < 1.0e-10) t = 0.0;
 		TmpInputRec->StatPt->SetInitRadius(t);
 	}
     event.Skip();
@@ -3175,6 +3182,10 @@ void InputBuilderWindow::OnMaxstepsizeEditUpdated( wxCommandEvent& event )
 	wxString temp = mMaxStepSizeEdit->GetValue();
 	double t;
 	if (temp.ToDouble(&t)) {
+		//test against the default
+		double def=0.5;
+		if (TmpInputRec->Control->GetRunType() == 6) def = 0.3;
+		if (fabs(t-def) < 1.0e-10) t = 0.0;
 		TmpInputRec->StatPt->SetMaxRadius(t);
 	}
     event.Skip();
@@ -3278,7 +3289,8 @@ void InputBuilderWindow::OnMp2CoreEditUpdated( wxCommandEvent& event )
     wxString tmpStr = mMP2CoreEleEdit->GetValue();
     long val;
     if(tmpStr.ToLong(&val)) {
-        TmpInputRec->MP2->SetNumCoreElectrons(val);
+		if (val >= 0)
+			TmpInputRec->MP2->SetNumCoreElectrons(val);
     }
     event.Skip();
 }
@@ -3306,7 +3318,9 @@ void InputBuilderWindow::OnMp2intcutoffEditUpdated( wxCommandEvent& event )
     wxString tmpStr = mMP2IntCutoffEdit->GetValue();
     double val;
     if(tmpStr.ToDouble(&val)) {
-        TmpInputRec->MP2->SetIntCutoff(val);
+		//test against the default
+		if (fabs(val - 1.0e-9) < 1.0e-20) val = 0.0;
+		TmpInputRec->MP2->SetIntCutoff(val);
     }
     event.Skip();
 }
