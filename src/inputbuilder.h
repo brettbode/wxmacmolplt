@@ -87,6 +87,8 @@ class wxSpinCtrl;
 #define ID_TIMELIMITUNITS_CHOICE 10125
 #define ID_MEMORY_TEXT 10164
 #define ID_MEMORYUNITS_CHOICE 10127
+#define ID_MEMDDI_EDIT 10242
+#define ID_MEMDDICHOICE 10000
 #define ID_DIAGONALIZATION_CHOICE 10128
 #define ID_CORE_CHECKBOX 10129
 #define ID_PLBALANCE_RADIOBOX 10130
@@ -298,6 +300,12 @@ public:
 
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_MEMORYUNITS_CHOICE
     void OnMemoryunitsChoiceSelected( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MEMDDI_EDIT
+    void OnMemddiEditUpdated( wxCommandEvent& event );
+
+    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_MEMDDICHOICE
+    void OnMemddichoiceSelected( wxCommandEvent& event );
 
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_DIAGONALIZATION_CHOICE
     void OnDiagonalizationChoiceSelected( wxCommandEvent& event );
@@ -524,6 +532,8 @@ public:
     wxUglyChoice* timeLimitUnitChoice;
     wxTextCtrl* memoryText;
     wxUglyChoice* memoryUnitChoice;
+    wxTextCtrl* memddiText;
+    wxUglyChoice* memddiUnitChoice;
     wxUglyChoice* diagChoice;
     wxCheckBox* coreCheck;
     wxRadioBox* plBalanceRadio;
