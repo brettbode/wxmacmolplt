@@ -1502,7 +1502,7 @@ void SystemGroup::WriteToFile(BufferFile *File) {
 	File->WriteLine(Out, false);
 		//Memory
 	if (Memory) {
-		sprintf(Out, "MEMORY=%ld ", Memory);
+		sprintf(Out, "MEMORY=%ld ", (long)Memory);
 		File->WriteLine(Out, false);
 	}	//diag method
 	if (KDiag) {
