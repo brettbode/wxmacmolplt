@@ -890,8 +890,7 @@ void MolDisplayWin::DrawLabel()
 	    {
 	      wxString tmpStr;
 
-	      CurrentAtom = MainData->zBuffer[iatom];
-	      tmpStr.Printf("%d", CurrentAtom+1);
+	      tmpStr.Printf("%d", iatom+1);
 	      atomLabel.Append(tmpStr);
 	    }
 
