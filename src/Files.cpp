@@ -598,7 +598,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		if (-1 == FindKeyWord(token, "C1", 2)) Buffer->SkipnLines(1);
 		StartPos = Buffer->GetFilePos();
 		if (!Buffer->LocateKeyWord("$END", 4)) throw DataError();
-		EndPos = Buffer->GetFilePos();
+		EndPos = Buffer->GetFilePos() - 1;
 		if (MainData->InputOptions->Data->GetCoordType() <= 3) {
 			Buffer->SetFilePos(StartPos);
 			nAtoms = Buffer->GetNumLines(EndPos - StartPos) - 1;
