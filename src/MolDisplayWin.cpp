@@ -425,7 +425,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
     menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show &Axis"));
     menuView->AppendCheckItem(MMP_SHOWATOMLABELS, wxT("Show Atom Labels"));
-    menuView->AppendCheckItem(MMP_SHOWATOMNUMBER, wxT("Show Atom Number"));
+    menuView->AppendCheckItem(MMP_SHOWATOMNUMBER, wxT("Show Atom Numbers"));
     menuView->Append(MMP_ANIMATEFRAMES, wxT("Animate &Frames\tCtrl+F"));
     menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl+-"));
     menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl+="));
