@@ -305,14 +305,16 @@ class SystemGroup {
 	private:
 		long		TimeLimit; //This is always stored as minutes
 		double		Memory; //Always stored as words
+		double		MemDDI;	//stored as megawords
 		char		KDiag;
 		TimeUnit	TimeUnits;
-		MemoryUnit		MemUnits;
+		MemoryUnit	MemUnits;
+		MemoryUnit	MemDDIUnits;
 		char		Flags;		//One bit flags
 			//bit 1		CoreFlag;
-			//bit 2		BalanceType;
+			//bit 2		BalanceType; set to true for LOOP
 			//bit 3		XDR;
-			//bit 4		PTime; I don't think this is used
+			//bit 4		PARALL;
 	public:
 		inline long GetTimeLimit(void) const {return TimeLimit;};
 		long SetTimeLimit(long NewTime);
@@ -326,6 +328,12 @@ class SystemGroup {
 		MemoryUnit SetMemUnits(MemoryUnit NewUnits);
 		double GetConvertedMem(void) const;
 		double SetConvertedMem(double NewMem);
+		inline MemoryUnit GetMemDDIUnits(void) const {return MemDDIUnits;};
+		inline double GetMemDDI(void) const {return MemDDI;};
+		double SetMemDDI(double NewMemDDI);
+		double GetConvertedMemDDI(void) const;
+		double SetConvertedMemDDI(double NewMem);
+		MemoryUnit SetMemDDIUnits(MemoryUnit NewUnits);
 		inline char GetDiag(void) const {return KDiag;};
 		char SetDiag(char NewMethod);
 		bool GetCoreFlag(void) const {return ((Flags & 1)?true:false);};
@@ -334,6 +342,8 @@ class SystemGroup {
 		bool SetBalanceType(bool Type);
 		bool GetXDR(void) const {return ((Flags & 4)?true:false);};
 		bool SetXDR(bool State);
+		inline bool GetParallel(void) const {return ((Flags & 8)?true:false);};
+		bool SetParallel(bool State);
 				//other member functions
 		SystemGroup(void);
 		SystemGroup(SystemGroup *Copy);
@@ -344,6 +354,7 @@ class SystemGroup {
 		void WriteToFile(BufferFile *File);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
+		void ReadSystemOptions(BufferFile * Buffer);
 };
 enum GAMESS_BasisSet {
 	GAMESS_BS_None=0,

@@ -565,6 +565,10 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				MainData->InputOptions->System->SetTimeLimit(nAtoms);
 			if (ReadLongKeyword(Line, "MEMORY", &nAtoms))
 				MainData->InputOptions->System->SetMemory(nAtoms);
+			if (ReadLongKeyword(Line, "MEMDDI", &nAtoms))
+				MainData->InputOptions->System->SetMemDDI(nAtoms);
+			if (ReadBooleanKeyword(Line, "PARALL", &BoolTest))
+				MainData->InputOptions->System->SetParallel(BoolTest);
 			if (ReadLongKeyword(Line, "KDIAG", &nAtoms))
 				MainData->InputOptions->System->SetDiag(nAtoms);
 			if (ReadBooleanKeyword(Line, "COREFL", &BoolTest))
@@ -1386,6 +1390,11 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			if (!Buffer->LocateKeyWord("JOB OPTIONS", 11, EnergyPos)) throw DataError();
 		}
 		MainData->ReadControlOptions(Buffer);
+			//System group is immediately after the control group
+		if (Buffer->LocateKeyWord("SYSTEM OPTIONS", 14, EnergyPos)) {
+			MainData->InputOptions->System->ReadSystemOptions(Buffer);
+		}
+		
 			//Now that the $control options are read in normalize the basis set (normf and normp are needed)
 		if (MainData->Basis) MainData->Basis->Normalize(MainData->InputOptions->Control->GetNormP(),
 			MainData->InputOptions->Control->GetNormF());
@@ -2257,6 +2266,63 @@ void MoleculeData::ReadControlOptions(BufferFile * Buffer) {
 		Buffer->SetFilePos(StartPos);
 	}
 }
+void SystemGroup::ReadSystemOptions(BufferFile * Buffer) {
+	long	test;
+	char	LineText[kMaxLineLength], token[kMaxLineLength];
+	long StartPos = Buffer->GetFilePos();	//All keywords should be between these positions
+	long EndPos = Buffer->FindBlankLine();
+
+	if (Buffer->LocateKeyWord("MEMORY=", 7, EndPos)) {
+		Buffer->GetLine(LineText);
+		double temp=0.0;
+		sscanf(&(LineText[7]), "%lf", &temp);
+		SetMemory(temp);
+		Buffer->SetFilePos(StartPos);
+	}
+	if (Buffer->LocateKeyWord("MEMDDI=", 7, EndPos)) {
+		Buffer->GetLine(LineText);
+		double temp=0.0;
+		sscanf(&(LineText[7]), "%lf", &temp);
+		SetMemDDI(temp);
+		Buffer->SetFilePos(StartPos);
+	}
+	if (Buffer->LocateKeyWord("TIMLIM=", 7, EndPos)) {
+		Buffer->GetLine(LineText);
+		double temp=0.0;
+		sscanf(&(LineText[7]), "%lf%s", &temp, token);
+		if (FindKeyWord(token, "SECONDS", 7)>=0)
+			temp /= 60.0;	//For some odd reason TIMLIM is printed in seconds...
+		SetTimeLimit(temp);
+		Buffer->SetFilePos(StartPos);
+	}
+	if (Buffer->LocateKeyWord("PARALL=", 7, EndPos)) {
+		Buffer->GetLine(LineText);
+		sscanf(&(LineText[7]), "%s", token);
+		if (token[0]=='F') SetParallel(false);
+		else if (token[0]=='T') SetParallel(true);
+		Buffer->SetFilePos(StartPos);
+	}
+	if (Buffer->LocateKeyWord("BALTYP=", 7, EndPos)) {
+		Buffer->GetLine(LineText);
+		sscanf(&(LineText[7]), "%s", token);
+		if (FindKeyWord(token, "LOOP", 4)>=0)
+			SetBalanceType(true);
+		Buffer->SetFilePos(StartPos);
+	}
+	if (Buffer->LocateKeyWord("COREFL=", 7, EndPos)) {
+		Buffer->GetLine(LineText);
+		sscanf(&(LineText[7]), "%s", token);
+		if (token[0]=='F') SetCoreFlag(false);
+		else if (token[0]=='T') SetCoreFlag(true);
+		Buffer->SetFilePos(StartPos);
+	}
+	if (Buffer->LocateKeyWord("KDIAG=", 6, EndPos)) {
+		Buffer->GetLine(LineText);
+		int temp;
+		sscanf(&(LineText[6]), "%d", &temp);
+		SetDiag(temp);
+	}
+}	
 long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, float offset)
 {	long			LinePos, NumAtoms, point;
 	float			Xpos;

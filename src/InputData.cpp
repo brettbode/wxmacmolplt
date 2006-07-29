@@ -1342,6 +1342,52 @@ double SystemGroup::SetConvertedMem(double NewMem) {
 	if (result >= 0) Memory = result;
 	return Memory;
 }
+double SystemGroup::SetMemDDI(double NewMemory) {
+	if (NewMemory >= 0.0) MemDDI = NewMemory;
+	return Memory;
+}
+MemoryUnit SystemGroup::SetMemDDIUnits(MemoryUnit NewUnits) {
+	if ((NewUnits>=megaWordsUnit)&&(NewUnits<NumberMemoryUnits)) MemDDIUnits = NewUnits;
+	return MemDDIUnits;
+}
+double SystemGroup::GetConvertedMemDDI(void) const {
+	double result, factor=1.0;
+	
+	result = MemDDI;	//memDDI is stored in MW
+	
+	switch (MemDDIUnits) {
+		case megaBytesUnit:
+			factor = 8.0;
+			break;
+		case gigaWordsUnit:
+			factor = 1.0/1000.0;
+			break;
+		case gigaBytesUnit:
+			factor = 8.0/(1000.0);
+			break;
+	}
+	result *= factor;
+	return result;
+}
+double SystemGroup::SetConvertedMemDDI(double NewMem) {
+	double	result, factor = 1;
+	
+	switch (MemDDIUnits) {
+		case megaBytesUnit:
+			factor = 1.0/8.0;
+			break;
+		case gigaWordsUnit:
+			factor = 1000.0;
+			break;
+		case gigaBytesUnit:
+			factor = 1000.0/8.0;
+			break;
+	}
+	result = NewMem*factor;
+	if (result >= 0) MemDDI = result;
+	return MemDDI;
+}
+
 char SystemGroup::SetDiag(char NewMethod) {
 	if ((NewMethod>=0)&&(NewMethod<4)) KDiag = NewMethod;
 	return KDiag;
@@ -1361,6 +1407,11 @@ bool SystemGroup::SetXDR(bool State) {
 	if (State) Flags += 4;
 	return GetXDR();
 }
+bool SystemGroup::SetParallel(bool State) {
+	if (Flags & 8) Flags -= 8;
+	if (State) Flags += 8;
+	return GetParallel();
+}
 SystemGroup::SystemGroup(void) {
 	InitData();
 }
@@ -1370,9 +1421,11 @@ SystemGroup::SystemGroup(SystemGroup *Copy) {
 void SystemGroup::InitData(void) {
 	TimeLimit = 0;
 	Memory = 0.0;
+	MemDDI = 0.0;
 	KDiag = 0;
 	TimeUnits = minuteUnit;
 	MemUnits = wordsUnit;
+	MemDDIUnits = megaWordsUnit;
 	Flags = 0;
 }
 long SystemGroup::GetSize(BufferFile *Buffer) {
@@ -1402,10 +1455,16 @@ void SystemGroup::WriteXML(XMLElement * parent) const {
 		XMLElement * t = Ele->addChildElement(CML_convert(MMP_IOSGMemory), line);
 		t->addAttribute(CML_convert(MMP_IOSGMemoryUnits), MemoryUnitToText(MemUnits));
 	}
+	if (MemDDI) {
+		snprintf(line, kMaxLineLength, "%lf", GetConvertedMemDDI());
+		XMLElement * t = Ele->addChildElement(CML_convert(MMP_IOSGMemDDI), line);
+		t->addAttribute(CML_convert(MMP_IOSGMemoryUnits), MemoryUnitToText(MemDDIUnits));
+	}
 	if (KDiag) {
 		snprintf(line, kMaxLineLength, "%d", KDiag);
 		Ele->addChildElement(CML_convert(MMP_IOSGKDiag), line);
 	}
+	if (GetParallel()) Ele->addChildElement(CML_convert(MMP_IOSGParallel), trueXML);
 	if (GetCoreFlag()) Ele->addChildElement(CML_convert(MMP_IOSGCoreFlag), trueXML);
 	if (GetBalanceType()) Ele->addChildElement(CML_convert(MMP_IOSGBalanceType), trueXML);
 	if (GetXDR()) Ele->addChildElement(CML_convert(MMP_IOSGXDR), trueXML);
@@ -1465,6 +1524,23 @@ void SystemGroup::ReadXML(XMLElement * parent) {
 						if (child->getBoolValue(tb))
 							SetXDR(tb);
 						break;
+					case MMP_IOSGMemDDI:
+					{
+						double temp;
+						if (child->getDoubleValue(temp)) {
+							const char * u = child->getAttributeValue(CML_convert(MMP_IOSGMemoryUnits));
+							if (u) {
+								MemoryUnit t;
+								if (TextToMemoryUnit(u, t)) SetMemDDIUnits(t);
+							}
+							SetConvertedMemDDI(temp);
+						}
+					}
+						break;
+					case MMP_IOSGParallel:
+						if (child->getBoolValue(tb))
+							SetParallel(tb);
+						break;
 				}
 			}
 		}
@@ -1503,6 +1579,14 @@ void SystemGroup::WriteToFile(BufferFile *File) {
 		//Memory
 	if (Memory) {
 		sprintf(Out, "MEMORY=%ld ", (long)Memory);
+		File->WriteLine(Out, false);
+	}
+	if (MemDDI) {
+		sprintf(Out, "MEMDDI=%ld ", (long)MemDDI);
+		File->WriteLine(Out, false);
+	}	//PARALL
+	if (GetParallel()) {
+		sprintf(Out, "PARALL=.TRUE. ");
 		File->WriteLine(Out, false);
 	}	//diag method
 	if (KDiag) {

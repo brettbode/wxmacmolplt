@@ -93,6 +93,7 @@ class wxSpinCtrl;
 #define ID_CORE_CHECKBOX 10129
 #define ID_PLBALANCE_RADIOBOX 10130
 #define ID_EXTERNDATAREP_CHECKBOX 10131
+#define ID_PARALL_CHECK 10243
 #define ID_IBDFTPANEL 10181
 #define ID_DFTMETHOD_CHOICE 10183
 #define ID_GRID_FUNCTIONAL_CHOICE 10184
@@ -319,6 +320,9 @@ public:
     /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_EXTERNDATAREP_CHECKBOX
     void OnExterndatarepCheckboxClick( wxCommandEvent& event );
 
+    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PARALL_CHECK
+    void OnParallCheckClick( wxCommandEvent& event );
+
     /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_DFTMETHOD_CHOICE
     void OnDftmethodChoiceSelected( wxCommandEvent& event );
 
@@ -538,6 +542,7 @@ public:
     wxCheckBox* coreCheck;
     wxRadioBox* plBalanceRadio;
     wxCheckBox* externDataRepCheck;
+    wxCheckBox* mSGParallCheck;
     wxUglyChoice* dftMethodChoice;
     wxBoxSizer* funcSizer;
     wxUglyChoice* dftGridFuncChoice;

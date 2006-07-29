@@ -300,6 +300,8 @@ enum MMP_IOSystemGroupNS {
 	MMP_IOSGCoreFlag,
 	MMP_IOSGBalanceType,
 	MMP_IOSGXDR,
+	MMP_IOSGMemDDI,
+	MMP_IOSGParallel,
 	
 	NumberMMPIOSystemGroupItems
 };
