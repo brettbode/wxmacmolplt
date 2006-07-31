@@ -1794,9 +1794,21 @@ void Surf3DBase::CreateWireSurface(CPoint3D * Vertices, CPoint3D * Normals, long
 		RGBColor * NColor, float MaxSurfaceValue, MoleculeData * MainData)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glDisable(GL_LIGHTING);
+	glLineWidth(1);
 	CreateSolidSurface(Vertices, Normals, VertexList,
 		NumTriangles, SurfaceColor, SurfaceValue, NColor, MaxSurfaceValue, MainData, NULL);
+	glEnable(GL_LIGHTING);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	
+/*	glDisable(GL_LIGHTING);
+	glLineWidth(1);
+	//This code works only slightly better than the above code on the Intel Macs with ATI hardware.
+	//It seems to miss some lines?
+	CreateWireFrameSurfaceWithLines(Vertices, VertexList,
+					   NumTriangles, SurfaceColor, SurfaceValue, NColor, MaxSurfaceValue, MainData);	
+//	glEnable(GL_LIGHTING);
+	*/
 }
 
 void Surf3DBase::SetSurfaceColor(const float & surfaceValue, const RGBColor * pColor, const RGBColor * nColor,
@@ -1973,6 +1985,77 @@ long Surf3DBase::CreateSolidSurface(CPoint3D * Vertices, CPoint3D * Normals, lon
 	}
 	if (!transpTri)
 		glEnd();	//End of triangle creation
+	return result;
+}
+long Surf3DBase::CreateWireFrameSurfaceWithLines(CPoint3D * Vertices, long * vList,
+									long NumTriangles, RGBColor * SurfaceColor, float * SurfaceValue,
+									RGBColor * NColor, float MaxSurfaceValue, MoleculeData * )
+{
+	long				v1, v2, v3, result=0;
+	GLfloat				alpha=1.0, red, green, blue, xnorm, ynorm, znorm;
+	
+	red = (float) SurfaceColor->red/65536.0;
+	green = (float) SurfaceColor->green/65536.0;
+	blue = (float) SurfaceColor->blue/65536.0;
+	red = MIN(red, 1.0);
+	blue = MIN(blue, 1.0);
+	green = MIN(green, 1.0);
+	red = MAX(red, 0.0);
+	blue = MAX(blue, 0.0);
+	green = MAX(green, 0.0);
+	long * VertexList = vList;
+	
+	if (!SurfaceValue) {	//If we are not using surface coloring setup the color once for all the triangles
+		glColor4f(red, green, blue, alpha);
+	}
+	
+	glLineWidth(1);
+	glBegin(GL_LINES);
+	for (long itri=0; itri<NumTriangles; itri++) {
+		v1 = VertexList[3*itri];
+		v2 = VertexList[3*itri+1];
+		v3 = VertexList[3*itri+2];
+		
+		if (SurfaceValue) {
+			float temp = SurfaceValue[v1];
+			temp /= MaxSurfaceValue;
+			SetSurfaceColor(temp, SurfaceColor, NColor, red, green, blue);
+			glColor4f(red, green, blue, alpha);
+		}
+		
+		glVertex3d(Vertices[v1].x, Vertices[v1].y, Vertices[v1].z);
+
+		if (SurfaceValue) {
+			float temp = SurfaceValue[v2];
+			temp /= MaxSurfaceValue;
+			SetSurfaceColor(temp, SurfaceColor, NColor, red, green, blue);
+			glColor4f(red, green, blue, alpha);
+		}
+
+		glVertex3d(Vertices[v2].x, Vertices[v2].y, Vertices[v2].z);
+			//Once for 1-2, once for 2-3
+		glVertex3d(Vertices[v2].x, Vertices[v2].y, Vertices[v2].z);
+		
+		if (SurfaceValue) {
+			float temp = SurfaceValue[v3];
+			temp /= MaxSurfaceValue;
+			SetSurfaceColor(temp, SurfaceColor, NColor, red, green, blue);
+			glColor4f(red, green, blue, alpha);
+		}
+		glVertex3d(Vertices[v3].x, Vertices[v3].y, Vertices[v3].z);
+
+		glVertex3d(Vertices[v3].x, Vertices[v3].y, Vertices[v3].z);
+
+		if (SurfaceValue) {
+			float temp = SurfaceValue[v1];
+			temp /= MaxSurfaceValue;
+			SetSurfaceColor(temp, SurfaceColor, NColor, red, green, blue);
+			glColor4f(red, green, blue, alpha);
+		}
+		
+		glVertex3d(Vertices[v1].x, Vertices[v1].y, Vertices[v1].z);
+	}
+	glEnd();	//End of Line creation
 	return result;
 }
 

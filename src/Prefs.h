@@ -249,8 +249,8 @@ class WinPrefs {
 		inline void DrawWireFrame(Boolean State) {BitOptions = (BitOptions & 0xFFFFFFDF) + (State?32:0);};
 		inline Boolean OutLineBonds(void) const {return ((BitOptions & (1<<6))?true:false);};
 		inline void OutLineBonds(Boolean State) {BitOptions = (BitOptions & 0xFFFFFFBF) + (State?64:0);};
-		inline Boolean CylindersForLines(void) const {return ((BitOptions & (1<<7))?true:false); };
-		inline void CylindersForLines(Boolean newVal) {BitOptions = (BitOptions & 0xFFFFFF7F) + (newVal?128:0);};
+		inline bool CylindersForLines(void) const {return ((BitOptions & (1<<7))?true:false); };
+		inline void CylindersForLines(bool newVal) {BitOptions = (BitOptions & 0xFFFFFF7F) + (newVal?128:0);};
 		inline Boolean AllowHydrogenBonds(void) const {return ((BitOptions & (1<<8))?true:false); };
 		inline void AllowHydrogenBonds(Boolean newVal) {BitOptions = (BitOptions & 0xFFFFFEFF) + (newVal?256:0);};
 		inline Boolean DetermineBondOrder(void) const {return ((BitOptions & (1<<9))?true:false); };
