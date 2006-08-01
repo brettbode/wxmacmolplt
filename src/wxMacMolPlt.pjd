@@ -12708,7 +12708,7 @@ along the chosen normal mode."</string>
                                 <long name="proxy-Id value">10112</long>
                                 <string name="proxy-Class">"wxTextCtrl"</string>
                                 <string name="proxy-Member variable name">"scfIterText"</string>
-                                <string name="proxy-Initial value">"30"</string>
+                                <string name="proxy-Initial value">""</string>
                                 <long name="proxy-Max length">0</long>
                                 <string name="proxy-Help text">""</string>
                                 <string name="proxy-Tooltip text">"$CONTRL:MAXIT - Enter the maximum number of SCF iterations. If the wavefunction is not converged at this point the run will be aborted."</string>
