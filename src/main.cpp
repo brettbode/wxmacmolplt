@@ -37,6 +37,8 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] =
 
 #include "sp.xpm"
 wxSplashScreen * splash = NULL;
+wxTimer splashTimer;
+#define splashT_ID 12399
 bool MpApp::OnInit() {
     const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
 	gPrefDlg = NULL;
@@ -64,10 +66,15 @@ bool MpApp::OnInit() {
 #endif
 		//Throw up a simple splash screen
 	wxBitmap sp_bitmap(sp_xpm);
-	splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 2000,
-												 NULL, -1, wxDefaultPosition, wxDefaultSize,
-												 wxSIMPLE_BORDER|wxSTAY_ON_TOP);
-
+	splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_NO_TIMEOUT , 2000,
+								NULL, -1, wxDefaultPosition, wxDefaultSize,
+								wxSIMPLE_BORDER|wxSTAY_ON_TOP);
+	splashTimer.SetOwner(this, splashT_ID);
+	splashTimer.Start(2000, wxTIMER_ONE_SHOT);
+//	splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 2000,
+//								NULL, -1, wxDefaultPosition, wxDefaultSize,
+//								wxSIMPLE_BORDER|wxSTAY_ON_TOP);
+	
 	gPreferences = new WinPrefs;
 	gPrefDefaults = new WinPrefs;
 
@@ -113,7 +120,10 @@ bool MpApp::OnInit() {
 	// Check for a project filename 
 	if (cmdParser.GetParamCount() > 0) {
 		//explicitly destroy the splash screen to get it out of the way
-		splash->Destroy();
+		if (splash) {
+			splash->Destroy();
+			splash = NULL;
+		}
 		
 		cmdFilename = cmdParser.GetParam(0); 
 		// Under Windows when invoking via a document 
@@ -155,6 +165,12 @@ bool MpApp::OnInit() {
 #endif
 
     return true;
+}
+void MpApp::splashCleanup(wxTimerEvent & event) {
+	if (splash) {
+		splash->Destroy();
+		splash = NULL;
+	}
 }
 
 int MpApp::OnExit() {
@@ -255,9 +271,11 @@ void MpApp::menuFileOpen(wxCommandEvent &event) {
 #ifdef __WXMAC__
 void MpApp::MacOpenFile(const wxString & filename) {
 		//first get rid of the splash screen if its still around
-	if (splash)
-		if (splash->IsShown()) splash->Destroy();
-
+	if (splash) {
+		splash->Destroy();
+		splash = NULL;
+	}
+	
 	if (filename.length() > 0) {
         createMainFrame(filename);
 	}
@@ -279,6 +297,7 @@ EVT_MENU (wxID_EXIT,         MpApp::menuFileQuit)
 EVT_MENU (wxID_PREFERENCES,  MpApp::menuPreferences)
 
 EVT_MENU (wxID_ABOUT,    MpApp::menuHelpAbout)
+EVT_TIMER(splashT_ID,	MpApp::splashCleanup)
 END_EVENT_TABLE()
 
 // Tell wxWidgets to start the program:

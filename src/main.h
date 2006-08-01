@@ -120,6 +120,7 @@ class MpApp : public wxApp {
 		void menuPreferences(wxCommandEvent &event);
 		void ApplyPrefsToAll(WinPrefs * prefs);
 		void CloseGlobalPrefs(void);
+		void splashCleanup(wxTimerEvent & event);
 #ifdef __WXMAC__
 		/**
 		 * Event sent on Macs when double click a document
