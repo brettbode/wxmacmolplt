@@ -12274,7 +12274,7 @@ along the chosen normal mode."</string>
                                 <long name="proxy-Id value">10109</long>
                                 <string name="proxy-Class">"wxTextCtrl"</string>
                                 <string name="proxy-Member variable name">"mchargeText"</string>
-                                <string name="proxy-Initial value">"0"</string>
+                                <string name="proxy-Initial value">""</string>
                                 <long name="proxy-Max length">0</long>
                                 <string name="proxy-Help text">""</string>
                                 <string name="proxy-Tooltip text">"$CONTRL:ICHARG - Enter an integer value for the molecular charge."</string>
@@ -12404,7 +12404,7 @@ along the chosen normal mode."</string>
                                 <long name="proxy-Id value">10110</long>
                                 <string name="proxy-Class">"wxTextCtrl"</string>
                                 <string name="proxy-Member variable name">"multText"</string>
-                                <string name="proxy-Initial value">"1"</string>
+                                <string name="proxy-Initial value">""</string>
                                 <long name="proxy-Max length">0</long>
                                 <string name="proxy-Help text">""</string>
                                 <string name="proxy-Tooltip text">"$CONTRL:MULT - Enter an integer value for the spin state."</string>
@@ -13291,7 +13291,7 @@ along the chosen normal mode."</string>
                           <long name="proxy-Id value">10117</long>
                           <string name="proxy-Class">"wxTextCtrl"</string>
                           <string name="proxy-Member variable name">"titleText"</string>
-                          <string name="proxy-Initial value">"Title"</string>
+                          <string name="proxy-Initial value">""</string>
                           <long name="proxy-Max length">0</long>
                           <string name="proxy-Help text">""</string>
                           <string name="proxy-Tooltip text">"$DATA - You may enter a one line title which may help you identify this input deck in the future."</string>
@@ -13728,7 +13728,7 @@ along the chosen normal mode."</string>
                               <long name="proxy-Id value">10123</long>
                               <string name="proxy-Class">"wxTextCtrl"</string>
                               <string name="proxy-Member variable name">"zmatrixVarsText"</string>
-                              <string name="proxy-Initial value">"0"</string>
+                              <string name="proxy-Initial value">""</string>
                               <long name="proxy-Max length">0</long>
                               <string name="proxy-Help text">""</string>
                               <string name="proxy-Tooltip text">"$CONTRL:NZVAR - Enter an integer number representing the number of internal coordinates for your molecule. Normally this will be 3N-6 (3N-5 for linear molecules) where N is the number of atoms. A value of 0 selects cartesian coordinates. If set and a set of internal coordinates are defined a $ZMAT group will be punched out."</string>

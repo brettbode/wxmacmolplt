@@ -604,7 +604,7 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText40 = new wxStaticText( itemPanel26, wxID_STATIC, _("Molecule Charge:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer39->Add(itemStaticText40, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
 
-    mchargeText = new wxTextCtrl( itemPanel26, ID_MCHARGE_TEXTCTRL, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    mchargeText = new wxTextCtrl( itemPanel26, ID_MCHARGE_TEXTCTRL, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         mchargeText->SetToolTip(_("$CONTRL:ICHARG - Enter an integer value for the molecular charge."));
     itemFlexGridSizer39->Add(mchargeText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
@@ -612,7 +612,7 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText42 = new wxStaticText( itemPanel26, wxID_STATIC, _("Multiplicity:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemFlexGridSizer39->Add(itemStaticText42, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    multText = new wxTextCtrl( itemPanel26, ID_MULT_TEXTCTRL, _("1"), wxDefaultPosition, wxDefaultSize, 0 );
+    multText = new wxTextCtrl( itemPanel26, ID_MULT_TEXTCTRL, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         multText->SetToolTip(_("$CONTRL:MULT - Enter an integer value for the spin state."));
     itemFlexGridSizer39->Add(multText, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -702,7 +702,7 @@ void InputBuilderWindow::CreateControls()
 
     wxBoxSizer* itemBoxSizer60 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer59->Add(itemBoxSizer60, 0, wxALIGN_LEFT, 5);
-    titleText = new wxTextCtrl( itemPanel58, ID_TITLE_TEXTCTRL, _("Title"), wxDefaultPosition, wxDefaultSize, 0 );
+    titleText = new wxTextCtrl( itemPanel58, ID_TITLE_TEXTCTRL, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         titleText->SetToolTip(_("$DATA - You may enter a one line title which may help you identify this input deck in the future."));
     itemBoxSizer60->Add(titleText, 0, wxGROW|wxALL, 5);
@@ -742,7 +742,7 @@ void InputBuilderWindow::CreateControls()
     wxStaticText* itemStaticText69 = new wxStaticText( itemPanel58, wxID_STATIC, _("# of Z-Matrix Variables:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer68->Add(itemStaticText69, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    zmatrixVarsText = new wxTextCtrl( itemPanel58, ID_ZMAT_VARS_TEXT, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    zmatrixVarsText = new wxTextCtrl( itemPanel58, ID_ZMAT_VARS_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         zmatrixVarsText->SetToolTip(_("$CONTRL:NZVAR - Enter an integer number representing the number of internal coordinates for your molecule. Normally this will be 3N-6 (3N-5 for linear molecules) where N is the number of atoms. A value of 0 selects cartesian coordinates. If set and a set of internal coordinates are defined a $ZMAT group will be punched out."));
     itemBoxSizer68->Add(zmatrixVarsText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
