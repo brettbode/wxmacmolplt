@@ -890,7 +890,7 @@ void MolDisplayWin::DrawLabel()
 	    {
 	      wxString tmpStr;
 
-	      tmpStr.Printf("%d", iatom+1);
+	      tmpStr.Printf(wxT("%d"), iatom+1);
 	      atomLabel.Append(tmpStr);
 	    }
 
@@ -918,7 +918,7 @@ void MolDisplayWin::DrawLabel()
 
 	  glColor3f(1-red, 1-green, 1-blue);
 	  glScalef(0.1+0.08*radius, 0.1+0.08*radius, 1);
-	  glfDrawSolidString((char*)atomLabel.c_str());
+	  glfDrawSolidString((const char*)atomLabel.mb_str(wxConvUTF8));
 	  glPopMatrix();
 	}
     }

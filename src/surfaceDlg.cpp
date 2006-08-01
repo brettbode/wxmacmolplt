@@ -629,7 +629,7 @@ void OrbSurfacePane::makeAOList(vector<wxString>& choice)
 		      if ((ishell==minshell)&&(theCell==ifunc))
 			{
 			  sprintf(label, "%ld", iatom+1);
-			  aChoice.Append((wxChar*)label);
+				aChoice.Printf(wxT("%ld"), iatom+1);
 
 			  nchar = aChoice.Length();
 
@@ -662,7 +662,8 @@ void OrbSurfacePane::makeAOList(vector<wxString>& choice)
 			{	//Make sure there really is something there
 			  //aChoice.Append(' ');
 			  //aChoice.Append(' ');
-			  aChoice.Append((wxChar*)label);
+			  wxString ltemp(label, wxConvUTF8);
+			  aChoice.Append(ltemp);
 
 			  for (long ichar=1; ichar<=nchar; ichar++)
 			    {
@@ -722,10 +723,10 @@ void OrbSurfacePane::makeAOList(vector<wxString>& choice)
 
 			  if (aVector) 
 			    {
-			      char label[63];
+				  wxString label;
 
-			      sprintf(label, "%.3f", aVector[theCell]);//prepare the coef for printing
-			      aChoice.Append((wxChar*)label);
+			      label.Printf(wxT("%.3f"), aVector[theCell]);//prepare the coef for printing
+			      aChoice.Append(label);
 			    }
 			}
 		    }

@@ -385,8 +385,7 @@ void SurfacesWindow::Reset(void) {
 						tempPane = new General3DSurfPane(listBook, dynamic_cast<General3DSurface*>(lSurf), this);
 						break;
 				}
-				wxString temp;
-				temp.Printf(wxT("%s"), lSurf->GetLabel());
+				wxString temp(lSurf->GetLabel(), wxConvUTF8);
 				listBook->AddPage(tempPane, temp, true);
 			}
 		}
@@ -440,8 +439,7 @@ void SurfacesWindow::SurfaceUpdated(void) {
 	BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
 	if (tempPane) {
 		Surface * tempSurf = tempPane->GetTargetSurface();
-		wxString temp;
-		temp.Printf(wxT("%s"), tempSurf->GetLabel());
+		wxString temp(tempSurf->GetLabel(), wxConvUTF8);
 		surfTitleEdit->SetValue(temp);
 		listBook->SetPageText(listBook->GetSelection(), temp);
 		//The previous line does not immediately update the list text???
@@ -458,7 +456,8 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 	  Fit();
 
 	  Surface * tempSurf = tempPane->GetTargetSurface();
-	  temp.Printf(wxT("%s"), tempSurf->GetLabel());
+	  wxString t2(tempSurf->GetLabel(), wxConvUTF8);
+	  temp = t2;
 	  visibleCheck->SetValue(tempPane->GetVisibility());
 
 	  int surfType = tempSurf->GetSurfaceType();

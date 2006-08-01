@@ -2173,10 +2173,11 @@ void InputBuilderWindow::SetupSummaryItems() {
 	} else mTitleText->Clear();
 	if (TmpInputRec->Basis->GetBasis()) {
 		wxString temp(TmpInputRec->Basis->GetBasisText(), wxConvUTF8);
+		wxString t2(TmpInputRec->Basis->GetBasisText(), wxConvUTF8);
 		if ((TmpInputRec->Basis->GetBasis()>3)&&(TmpInputRec->Basis->GetBasis()<6)) {
-			temp.Printf(wxT("%d-%s"), TmpInputRec->Basis->GetNumGauss(), TmpInputRec->Basis->GetBasisText());
+			temp.Printf(wxT("%d-%s"), TmpInputRec->Basis->GetNumGauss(), t2.c_str());
 		} else if (TmpInputRec->Basis->GetBasis()==3) {
-			temp.Printf(wxT("%s-%dG"), TmpInputRec->Basis->GetBasisText(), TmpInputRec->Basis->GetNumGauss());
+			temp.Printf(wxT("%s-%dG"), t2.c_str(), TmpInputRec->Basis->GetNumGauss());
 		}
 		if (TmpInputRec->Basis->GetNumDFuncs()) {
 			wxString t;
@@ -2195,8 +2196,10 @@ void InputBuilderWindow::SetupSummaryItems() {
 		}
 		if (TmpInputRec->Basis->GetPolar() > GAMESS_BS_No_Polarization) {
 			wxString t;
-			t.Printf(wxT(", Polar = %s"), TmpInputRec->Basis->GetPolarText());
+			wxString t1(TmpInputRec->Basis->GetPolarText(), wxConvUTF8);
+			t.Printf(wxT(", Polar = "));
 			temp.Append(t);
+			temp.Append(t1);
 		}
 		mBasisSetText->SetValue(temp);
 	} else mBasisSetText->Clear();
@@ -2228,10 +2231,13 @@ void InputBuilderWindow::SetupSummaryItems() {
 	wxString eclevel;
 	if (TmpInputRec->Control->GetMPLevel() == 2)
 		eclevel.Printf(wxT("MP2"));
-	else if (TmpInputRec->Control->GetCCType())
-		eclevel.Printf((wxChar*)TmpInputRec->Control->GetGAMESSCCType(TmpInputRec->Control->GetCCType()));
-	else if (TmpInputRec->Control->GetCIType())
-		eclevel.Printf((wxChar*)TmpInputRec->Control->GetCIType(TmpInputRec->Control->GetCIType()));
+	else if (TmpInputRec->Control->GetCCType()) {
+		wxString t(TmpInputRec->Control->GetGAMESSCCType(TmpInputRec->Control->GetCCType()), wxConvUTF8);
+		eclevel = t;
+	} else if (TmpInputRec->Control->GetCIType()) {
+		wxString t(TmpInputRec->Control->GetCIType(TmpInputRec->Control->GetCIType()), wxConvUTF8);
+		eclevel = t;
+	}
 	mElectronCorr->SetValue(eclevel);
 }
 
@@ -2818,7 +2824,7 @@ void InputBuilderWindow::OnZmatVarsTextUpdated( wxCommandEvent& event )
 void InputBuilderWindow::OnTitleTextctrlUpdated( wxCommandEvent& event )
 {
 	wxString temp = titleText->GetValue();
-	TmpInputRec->Data->SetTitle((const char *)temp.c_str());
+	TmpInputRec->Data->SetTitle((const char *)temp.mb_str(wxConvUTF8));
     event.Skip();
 }
 

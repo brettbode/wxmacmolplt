@@ -197,12 +197,14 @@ void WinPrefs::CopyQD3DPrefs(WinPrefs * Orig) {
 void WinPrefs::GetAtomLabel(long AtomNum, wxString & text) const {
 	int		TextLength=0;
 	text.Empty();
+	std::string t1;
 	while (AtomLabels[AtomNum][TextLength]) {
-	  char temp = AtomLabels[AtomNum][TextLength];
-		text << temp;
+		char temp = AtomLabels[AtomNum][TextLength];
+		t1 += temp;
 		TextLength++;
 		if (TextLength >= 3) break;
 	}
+	text = wxString(t1.c_str(), wxConvUTF8);
 }
 
 void WinPrefs::SetAtomLabel(long AtomNum, wxString text) 
@@ -212,10 +214,11 @@ void WinPrefs::SetAtomLabel(long AtomNum, wxString text)
 
   if (TextLength > 3) TextLength = 3;		//truncate labels longer than 3 char
 
-  for (; pos < TextLength; pos++) 
-    {	//I know, I know. This copies in reverse order, but its only 3 bytes
-      AtomLabels[AtomNum][pos] = text.GetChar(pos);
-    }
+  const char * t = (const char *) text.mb_str();
+	for (; pos < TextLength; pos++) {
+		//AtomLabels[AtomNum][pos] = text.GetChar(pos);
+		AtomLabels[AtomNum][pos] = t[pos];
+	}
   if (pos < 3) AtomLabels[AtomNum][pos] = '\0';
 }
 #endif
