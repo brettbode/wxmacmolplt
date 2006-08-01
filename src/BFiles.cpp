@@ -405,9 +405,11 @@ long BufferFile::GetLine(char * Line)
 	if (((BufferPos+BufferStart+1)<ByteCount)&&
 		(((*Buffer)[BufferPos] == 13)||((*Buffer)[BufferPos] == 10))) BufferPos++;
 #else
-	if ((Buffer[BufferPos]==13)&&(Buffer[BufferPos+1]==10)) BufferPos++;
 	if (((BufferPos+BufferStart)<ByteCount)&&
-		((Buffer[BufferPos] == 13)||(Buffer[BufferPos] == 10))) BufferPos++;
+		((Buffer[BufferPos] == 13)||(Buffer[BufferPos] == 10))) {
+		if ((Buffer[BufferPos]==13)&&(Buffer[BufferPos+1]==10)) BufferPos++;
+		BufferPos++;
+	}
 #endif
 	Line[LineChars] = 0;	//Make it a proper NULL terminated string
 	return LineChars;	//Return the number of characters read (not including the NULL)
