@@ -18,6 +18,8 @@
 #endif
 #ifdef __WXMAC__
 #include <AGL/glu.h>
+#else
+#include <GL/glu.h>
 #endif
 
 #include <iostream>
@@ -97,8 +99,11 @@ void MpGLCanvas::initGL(void) {
 		pathname.Remove(pathname.Length() - 13);
 		pathname += wxT("Resources");
 #endif
-		
+#ifdef __WXMSW__
+	    pathname += wxT("\\arial1.glf");
+#else
 	    pathname += wxT("/arial1.glf");
+#endif
 	    if (glfLoadFont(pathname.mb_str(wxConvUTF8)) < 0)
 	      {
 		std::cout<<"Warning: font file not found!"<<std::endl;
