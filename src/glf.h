@@ -72,7 +72,7 @@ int	glfUnloadBMFFontD(int bmf_descriptor);	/* Unload BMF font by bmf_descriptor 
 void glfDrawWiredSymbol(char s);    /* Draw wired symbol    */
 void glfDrawWiredString(char *s);   /* Draw wired string    */
 void glfDrawSolidSymbol(char s);    /* Draw solid symbol    */
-void glfDrawSolidString(char *s);   /* Draw wired string    */
+void glfDrawSolidString(const char *s);   /* Draw wired string    */
 void glfDraw3DWiredSymbol(char s);  /* Draw 3D wired symbol */
 void glfDraw3DWiredString(char *s); /* Draw 3D wired string */
 void glfDraw3DSolidSymbol(char s);  /* Draw 3D solid symbol */

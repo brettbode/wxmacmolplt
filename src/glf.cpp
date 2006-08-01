@@ -414,7 +414,7 @@ void glfDrawWiredSymbolF(int font_descriptor, char s)
 	curfont = temp;
 }
 
-static void DrawString(char *s, void (*funct) (char s))
+static void DrawString(const char *s, void (*funct) (char s))
 {
 	int i;
 	float sda, sdb;
@@ -559,7 +559,7 @@ static void DrawString(char *s, void (*funct) (char s))
 	glPopMatrix();
 }
 
-void glfDrawWiredString(char *s)
+void glfDrawWiredString(const char *s)
 {
 	DrawString(s, &glfDrawWiredSymbol);
 }
@@ -625,7 +625,7 @@ void glfDrawSolidSymbolF(int font_descriptor, char s)
 	curfont = temp;
 }
 
-void glfDrawSolidString(char *s)
+void glfDrawSolidString(const char *s)
 {
 	DrawString(s, &glfDrawSolidSymbol);
 }
