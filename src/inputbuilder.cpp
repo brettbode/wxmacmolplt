@@ -2632,7 +2632,7 @@ void InputBuilderWindow::setPaneVisible(int pane, bool visible) {
 }
 
 int InputBuilderWindow::getCurrentPane() {
-    getPaneAtPosition(listBook->GetSelection());
+    return getPaneAtPosition(listBook->GetSelection());
 }
 
 /*!

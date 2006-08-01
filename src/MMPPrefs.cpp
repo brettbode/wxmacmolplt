@@ -216,7 +216,6 @@ void WinPrefs::SetAtomLabel(long AtomNum, wxString text)
 
   const char * t = (const char *) text.mb_str();
 	for (; pos < TextLength; pos++) {
-		//AtomLabels[AtomNum][pos] = text.GetChar(pos);
 		AtomLabels[AtomNum][pos] = t[pos];
 	}
   if (pos < 3) AtomLabels[AtomNum][pos] = '\0';
