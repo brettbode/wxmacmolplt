@@ -27,9 +27,6 @@ dnl     AC_MSG_ERROR([OpenGL is required.])
 dnl fi
 
 
-dnl I need a way to test for wxWidgets GL support, or else I need to ditch it
-dnl in favor of some kind of decent off-screen rendering.
-
 AC_MSG_CHECKING([wxWidgets version])
 if wxversion=`$WXCONFIG --version`; then
     AC_MSG_RESULT([$wxversion])
@@ -41,6 +38,37 @@ WX_CXXFLAGS="`$WXCONFIG --cxxflags`"
 WX_LIBS="`$WXCONFIG --libs base,core,gl,adv`"
 AC_SUBST([WX_CXXFLAGS])
 AC_SUBST([WX_LIBS])
+
+AC_MSG_CHECKING([for OpenGL support in wxWidgets])
+AC_LANG_SAVE()
+AC_LANG_CPLUSPLUS()
+TEMP_CXXFLAGS=$CXXFLAGS
+CXXFLAGS="$CXXFLAGS `$WXCONFIG --cxxflags`"
+TEMP_LIBS=$LIBS
+LIBS="$LIBS `$WXCONFIG --libs`"
+AC_TRY_RUN([
+            #include <cstdlib>
+            #include "wx/wx.h"
+            #include "wx/glcanvas.h"
+            using namespace std;
+            class MyApp: public wxApp { virtual bool OnInit(); };
+            bool MyApp::OnInit() {
+            #if wxUSE_GLCANVAS
+                exit(0);
+                return 0;
+            #else
+                exit(-1);
+                return -1;
+            #endif
+            }
+            IMPLEMENT_APP(MyApp)
+           ],
+           AC_MSG_RESULT([yes]),
+           AC_MSG_RESULT([not found])
+           AC_MSG_ERROR([wxMacMolPlt requires wxWidgets to be compiled with OpenGL support.]))
+CXXFLAGS=$TEMP_CXXFLAGS
+LIBS=$TEMP_LIBS
+AC_LANG_RESTORE()
 
 
 AC_SUBST(ac_aux_dir)
