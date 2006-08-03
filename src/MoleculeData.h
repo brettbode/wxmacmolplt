@@ -27,6 +27,7 @@ class MoleculeData {
 		friend class FrequenciesDialog;
 		friend class Surf2DBase;
 		friend class Surf3DBase;
+		friend class MpGLCanvas;
 	private:
 		CPoint3D	*RotCoords;				// The currently displayed, rotated coordinates
 		long		*zBuffer;				// the sorting order for RotCoords

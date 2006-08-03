@@ -60,7 +60,20 @@ extern Boolean	gOpenGLAvailable;
 	//0.0577 corresponds to fov=60 with zNear=0.1
 #define myGLperspective	0.050	//0.050 seems to match my 2D mode
 
+//#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
+
 void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd, const float & lineWidth);
+
+const GLubyte stippleMask[128] =
+
+  {0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00};
 
 class OpenGLRec {
 	public:
@@ -761,6 +774,7 @@ void MolDisplayWin::DrawGL(void)
 
 	glEnable(GL_LIGHTING);
 		//Draw the main molecular geometry
+
 	if (MainData->cFrame->NumAtoms > 0) {
 		if (OpenGLData->MainListActive) {
 			glCallList(OpenGLData->MainDisplayList);
@@ -1014,16 +1028,34 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			red = AtomColor->red/65536.0;
 			green = AtomColor->green/65536.0;
 			blue = AtomColor->blue/65536.0;
-			
+
+			if ( mHighliteState )
+			  {
+			    glEnable(GL_POLYGON_STIPPLE);
+			    glPolygonStipple(stippleMask);
+			  }
+			else
+			  glDisable(GL_POLYGON_STIPPLE);
+
+			if (lAtoms[iatom].GetSelectState())
+			  glDisable(GL_POLYGON_STIPPLE);
+
 			glPushMatrix();
 			glTranslatef(lAtoms[iatom].Position.x, lAtoms[iatom].Position.y,
 				lAtoms[iatom].Position.z);
 			
 			glColor3f(red, green, blue);
+
+			glLoadName(iatom);
+
 			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere
 			glPopMatrix();
 		}
 	}
+
+	glLoadName(-1);  //only balls are selectable for now
+	                 //so give a NULL name value to the rest geometries
+
 		//bonds as cylinders
 		//In wireframe mode with bonds colored by atom color we simply scink the atom radius to the bond
 		//size and get a nice rounded end cap. If bonds are not colored by atom color then the sphere is
@@ -1245,6 +1277,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		}
 	glEnd();*/
 
+	glDisable(GL_POLYGON_STIPPLE);  //make sure everything outside 
+	                                //this function has no stipple effect
 }
 
 void MolDisplayWin::AddAxisGL(void)

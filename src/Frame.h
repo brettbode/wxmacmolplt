@@ -48,6 +48,7 @@ class Frame {
 		friend class MOPacInternals;
 		friend class DataGroup;
 		friend class ImportVecDlg;
+		friend class MpGLCanvas;
 	private:
 		double		Energy;
 		double		KE;
@@ -68,6 +69,7 @@ class Frame {
 
 		Frame *		NextFrame;
 		Frame *		PreviousFrame;
+
 	public:
 		Frame(void);
 		~Frame(void);
@@ -164,6 +166,7 @@ class Frame {
 		bool ParseBondXML(XMLElement * bondXML, const std::vector<char *> & idList);
 		void ParseBondArrayXML(XMLElement * arrayXML, const std::vector<char *> & idList);
 		long WriteCMLFrame(XMLElement * parent, bool AllData);
+
 };
 
 #endif

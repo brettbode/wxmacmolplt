@@ -42,6 +42,8 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
     Prefs = NULL;
     MolWin = parent;
     initialized = false;
+
+    mMainData = parent->GetData();
         
     //Hmm is this the right spot to initialize our GL settings?
 //  initGL();
@@ -69,11 +71,13 @@ void MpGLCanvas::initGL(void) {
         GLfloat mat_specular[] = {0.8, 0.8, 0.8, 1.0};
         GLfloat mat_shininess[] = {80.0};
         GLfloat mat_diffuse[] = {0.2,0.2,0.2,0.8};
-        GLfloat mat_ambient[] = {0.1,0.1,0.1,0.8};
+	GLfloat mat_ambient[] = {0.1,0.1,0.1,0.8};
+
         glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
         glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
         glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
         glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+
                     //setup the static lighting properties
         GLfloat ambient[4]  = {0.2,0.2,0.2,1.0};
         GLfloat model_ambient[4]  = {0.1,0.1,0.1,0.1};
@@ -468,11 +472,11 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
     }
     SetCurrent();
 
-    //if ( event.GetButton() ==  wxMOUSE_BTN_LEFT )
-    //  {
-    //	wxPoint tmpPnt = event.GetPosition();
-    //std::cout<<"x:"<<tmpPnt.x<<" y:"<<tmpPnt.y<<std::endl;
-    //  }
+    if ( event.GetButton() ==  wxMOUSE_BTN_LEFT )
+      {
+    	wxPoint tmpPnt = event.GetPosition();
+	SelectObj(tmpPnt.x, tmpPnt.y);
+      }
 
     // Pass mouse event to MolDisplayWin::Rotate for processing
     MolWin->Rotate(event);
@@ -485,34 +489,89 @@ void MpGLCanvas::KeyHandler(wxKeyEvent & event) {
 
 void MpGLCanvas::SelectObj(int x, int y)
  {
-   GLuint buff[64] = {0};
+   GLuint buff[128];
    GLint hits, view[4];
    int id;
  
-   glSelectBuffer(64, buff);
+   glSelectBuffer(128, buff);
    glGetIntegerv(GL_VIEWPORT, view);
  	
    glRenderMode(GL_SELECT);
    glInitNames();
    glPushName(0);
+
+   glMatrixMode(GL_PROJECTION);
+
+   glPushMatrix();
+   glLoadIdentity();
+
+   gluPickMatrix(x, view[3]-y, 1.0, 1.0, view);
+   //gluPerspective(60, 1.0, 0.0001, 1000.0);
+
+   GLdouble top, right;
+   int width, height;
+
+   GetClientSize(&width, &height);
+
+   GLdouble aspect = ((float)width)/height;
+
+   if (aspect > 1.0) 
+     {
+       right = myGLperspective;
+       top = right/aspect;
+     } 
+   else 
+     {
+       top = myGLperspective;
+       right = top * aspect;
+     }
+
+   glFrustum(-right, right, -top, top, 0.1, 100.0);
+
+   glMatrixMode(GL_MODELVIEW);
+
+   MolWin->DrawGL();
+
+   glMatrixMode(GL_PROJECTION);
+   glPopMatrix();
  
- 	glMatrixMode(GL_PROJECTION);
- 	glPushMatrix();
- 		glLoadIdentity();
- 
- 		gluPickMatrix(x, y, 1.0, 1.0, view);
- 		gluPerspective(60, 1.0, 0.0001, 1000.0);
- 
- 		glMatrixMode(GL_MODELVIEW);
- 		
- 		//gl_draw();
- 
- 		glMatrixMode(GL_PROJECTION);
- 	glPopMatrix();
- 
- 	hits = glRenderMode(GL_RENDER);
- 
- 	glMatrixMode(GL_MODELVIEW);
+   hits = glRenderMode(GL_RENDER);
+   
+   int select_id = -1;
+   unsigned int min_depth = 0xFFFFFFFF;
+
+   for (int i = 0; i < hits; i++)
+     {
+       if (buff[i*4+3] < 0 || buff[i*4+3] > 256)
+	 continue;   //out of range
+
+       if (buff[i*4+1] < min_depth)
+	 {
+	   min_depth = buff[i*4+1];
+	   select_id = buff[i*4+3];
+	 }
+     }
+
+   Frame *  lFrame = mMainData->cFrame;
+   mpAtom * lAtoms = lFrame->Atoms;
+
+   if (hits > 0)
+     {
+       MolWin->SetHighliteMode(true);
+       lAtoms[select_id].SetSelectState(true);
+     }
+   else
+     {
+       for ( int i = 0; i < lFrame->NumAtoms; i++)
+	 lAtoms[i].SetSelectState(false);
+
+       MolWin->SetHighliteMode(false);
+     }
+
+   glMatrixMode(GL_MODELVIEW);
+
+   MolWin->UpdateGLModel();
+   //draw();
  }
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)

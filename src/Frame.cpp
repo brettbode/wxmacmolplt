@@ -52,6 +52,7 @@ Frame::Frame(void) {
 
 	NextFrame = NULL;
 	PreviousFrame = NULL;
+ 
 }
 long Frame::Write(BufferFile * Buffer) {
 	long length, total=0;

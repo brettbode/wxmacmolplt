@@ -80,6 +80,8 @@ class MolDisplayWin : public wxFrame {
         long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
                               long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
 
+	bool mHighliteState;
+
         DECLARE_EVENT_TABLE()
 
     public:
@@ -253,6 +255,7 @@ class MolDisplayWin : public wxFrame {
         void Rotate(wxMouseEvent&);
         void RotateMoleculeGL(bool);
         void PrintGL(wxDC * dc, const float & scaleFactor);
+	void SetHighliteMode(bool state) { mHighliteState = state; }
 	void DrawLabel(void); //added by Song Li
 
         void eventSize(wxSizeEvent &event);

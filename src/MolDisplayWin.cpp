@@ -252,6 +252,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     printData = NULL;
 	infoPanel = NULL;
 
+	mHighliteState = false;
+
 #ifdef __WXMSW__
 	//Visual studio is a total pile.
 	//The %n format specifier is disabled by default and

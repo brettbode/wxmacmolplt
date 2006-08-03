@@ -17,6 +17,7 @@
 #include "wx/glcanvas.h"
 
 #include "MoleculeData.h"
+#include "Frame.h"
 
 typedef class MolDisplayWin MolDisplayWin;
 /**
@@ -28,6 +29,8 @@ class MpGLCanvas : public wxGLCanvas {
         MolDisplayWin * MolWin;
         WinPrefs * Prefs;
         bool        initialized;
+
+	MoleculeData *mMainData;
 
         void initGL(void);
 
