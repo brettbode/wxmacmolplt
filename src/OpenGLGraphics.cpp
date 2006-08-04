@@ -1053,6 +1053,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		}
 	}
 
+	if ( mHighliteState )
+	  glEnable(GL_POLYGON_STIPPLE);
+
 	glLoadName(-1);  //only balls are selectable for now
 	                 //so give a NULL name value to the rest geometries
 
