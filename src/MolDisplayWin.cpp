@@ -386,7 +386,9 @@ void MolDisplayWin::createMenuBar(void) {
     menuView = new wxMenu;
     menuMolecule = new wxMenu;
     menuWindow = new wxMenu;
+#ifdef __WXMAC__
     menuHelp = new wxMenu;
+#endif
 
     menuFile->Append(wxID_NEW, wxT("&New\tCtrl+N"));
     menuFile->Append(MMP_NEWFRAME, wxT("Append New Frame"));
@@ -421,7 +423,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
 
     menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"));
-    menuView->Append(MMP_ANIMATEMODE, wxT("&Animate Mode\tCtrl+M"));
+    menuView->Append(MMP_ANIMATEMODE, wxT("&Animate Mode\tShift+Ctrl+M"));
     menuView->Append(MMP_OFFSETMODE, wxT("&Offset along mode..."));
     menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
     menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
@@ -463,13 +465,14 @@ void MolDisplayWin::createMenuBar(void) {
     menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"));
     menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"));
     menuWindow->Append(ID_LOCAL_PREFERENCES, wxT("Pr&eferences"));
-    menuHelp->Append(wxID_ABOUT, wxT("&About"));
 
     menuBar->Append(menuFile, wxT("&File"));
     menuBar->Append(menuEdit, wxT("&Edit"));
     menuBar->Append(menuView, wxT("&View"));
     menuBar->Append(menuMolecule, wxT("&Molecule"));
     menuBar->Append(menuWindow, wxT("&Subwindow"));
+
+    menuHelp->Append(wxID_ABOUT, wxT("&About MacMolPlt..."));
     menuBar->Append(menuHelp, wxT("&Help"));
 }
 
