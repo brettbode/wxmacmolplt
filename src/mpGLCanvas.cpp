@@ -542,7 +542,7 @@ void MpGLCanvas::SelectObj(int x, int y)
 
    for (int i = 0; i < hits; i++)
      {
-       if (buff[i*4+3] < 0 || buff[i*4+3] > 256)
+       if (buff[i*4+3] < 0 || buff[i*4+3] > 512)
 	 continue;   //out of range
 
        if (buff[i*4+1] < min_depth)
@@ -554,16 +554,33 @@ void MpGLCanvas::SelectObj(int x, int y)
 
    Frame *  lFrame = mMainData->cFrame;
    mpAtom * lAtoms = lFrame->Atoms;
+   Bond * lBonds = lFrame->Bonds;
 
    if (hits > 0)
      {
        MolWin->SetHighliteMode(true);
-       lAtoms[select_id].SetSelectState(true);
+
+       if (select_id < 255)
+	 lAtoms[select_id].SetSelectState(true);
+       else
+	 {
+	   lBonds[select_id-255].SetSelectState(true);
+
+	   long atom1 = lBonds[select_id-255].Atom1;
+	   long atom2 = lBonds[select_id-255].Atom2;
+
+	   lAtoms[atom1].SetSelectState(true);
+	   lAtoms[atom2].SetSelectState(true); //select atoms that 
+	                                       //this bond connect
+	 }
      }
    else
      {
        for ( int i = 0; i < lFrame->NumAtoms; i++)
 	 lAtoms[i].SetSelectState(false);
+
+       for ( int i = 0; i < lFrame->NumBonds; i++)
+	 lBonds[i].SetSelectState(false);
 
        MolWin->SetHighliteMode(false);
      }
