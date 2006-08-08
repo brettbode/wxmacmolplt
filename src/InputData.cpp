@@ -2972,13 +2972,10 @@ void HessianGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	}
 	if (!method) return;
 
-	method = GetAnalyticMethod();
-	if (method) {
-		if (!(((IData->Control->GetSCFType() == 1)||(IData->Control->GetSCFType() == 3)||
-			(IData->Control->GetSCFType() == 4)||(IData->Control->GetSCFType() == 0))&&
-			(IData->Basis->GetECPPotential() <=1)))
-				method = false;
-	}
+	bool AnalyticPoss = (((IData->Control->GetSCFType() == 1)||(IData->Control->GetSCFType() == 3)||
+						  (IData->Control->GetSCFType() == 4)||(IData->Control->GetSCFType() == 0))&&
+						 (IData->Control->GetMPLevel() == 0));
+	method = GetAnalyticMethod() && AnalyticPoss;
 		//Punch the group label
 	File->WriteLine(" $FORCE ", false);
 		//Method
