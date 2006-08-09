@@ -386,9 +386,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuView = new wxMenu;
     menuMolecule = new wxMenu;
     menuWindow = new wxMenu;
-#ifdef __WXMAC__
     menuHelp = new wxMenu;
-#endif
 
     menuFile->Append(wxID_NEW, wxT("&New\tCtrl+N"));
     menuFile->Append(MMP_NEWFRAME, wxT("Append New Frame"));
