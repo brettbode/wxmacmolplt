@@ -123,7 +123,7 @@ void wxUglyChoice::Clear() {
 
     for(i = item.begin(); i != item.end(); ++i) {
         m_menu->Destroy(*i);
-        Disconnect(item[*i],
+        Disconnect(*i,
                    wxEVT_COMMAND_MENU_SELECTED,
                    wxCommandEventHandler(wxUglyChoice::onMenuSelect));
     }
