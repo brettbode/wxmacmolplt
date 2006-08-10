@@ -215,6 +215,7 @@ class MolDisplayWin : public wxFrame {
         long OpenMDLMolFile(BufferFile * Buffer);
         long OpenGAMESSInput(BufferFile * Buffer);
         long OpenMolPltFile(BufferFile *Buffer);
+		long OpenMoldenFile(BufferFile * Buffer);
         long ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos);
 		void ExportGAMESS(BufferFile * Buffer, bool AllFrames);
 		void WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames);

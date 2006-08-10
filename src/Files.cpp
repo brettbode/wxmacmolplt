@@ -440,6 +440,9 @@ void OpenTEXTFile(FSSpec *myFile, long flip, float offset, long nSkip) {
 				if (test == 0) Window->AbortOpen(0);
 			}
 			break;
+			case MolDenFile:
+				test = Window->OpenMoldenFile(Buffer);
+				break;
 			default:	//Should only get here for unknown file types.
 				Window->AbortOpen(34);
 		}
@@ -1050,6 +1053,11 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 
 	return 1;
 } /* OpenMolPlt */
+long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
+	
+	return 1;
+}
+
 long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
 	long 	ElectronsRemoved = 0, ProtonsRemoved=0, LinePos, atom;
 	char	LineText[kMaxLineLength];
@@ -2747,29 +2755,29 @@ void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
 		C1Sym = (sym == GAMESS_C1);
 	}
 	for (long i=0; i<NumFrames; i++) {
-		sprintf(text, " $DATA\rComments go here: Frame # %ld\r", i);
+		sprintf(text, " $DATA\rComments go here: Frame # %ld\n", i);
 		Buffer->PutText(text);
 		if (C1Sym) {
-			Buffer->PutText("C1\r");
+			Buffer->PutText("C1\n");
 		} else {	//Add a blank line unless the Point Group is C1
 			if ((sym>=GAMESS_CNH)&&(sym<=GAMESS_DN)) {
-				sprintf(text, "%s %d\r\r", MainData->InputOptions->Data->GetPointGroupText(), 
+				sprintf(text, "%s %d\n\n", MainData->InputOptions->Data->GetPointGroupText(), 
 						MainData->InputOptions->Data->GetPointGroupOrder());
 			} else {
-				sprintf(text, "%s\r\r", MainData->InputOptions->Data->GetPointGroupText());
+				sprintf(text, "%s\n\n", MainData->InputOptions->Data->GetPointGroupText());
 			}
 			Buffer->PutText(text);
 		}
 		for (iatom=0; iatom<lFrame->NumAtoms; iatom++) {
 			Prefs->GetAtomLabel(lFrame->Atoms[iatom].GetType()-1, AtomLabel);
 			AtomLabel[AtomLabel[0]+1] = 0;
-			sprintf(text, "%s   %5.1f  %10.5f  %10.5f  %10.5f\r",
+			sprintf(text, "%s   %5.1f  %10.5f  %10.5f  %10.5f\n",
 				(char *) &(AtomLabel[1]), (float) (lFrame->Atoms[iatom].Type), 
 				lFrame->Atoms[iatom].Position.x, lFrame->Atoms[iatom].Position.y,
 				lFrame->Atoms[iatom].Position.z);
 			Buffer->PutText(text);
 		}
-		sprintf(text, " $END\r");
+		sprintf(text, " $END\n");
 		Buffer->PutText(text);
 
 		lFrame = lFrame->NextFrame;
@@ -2807,7 +2815,7 @@ void MolDisplayWin::WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames) {
 		sprintf(text, "\tAngle %ld-%ld-%ld", a1+1, a2+1, a3+1);
 		Buffer->PutText(text);
 	}
-	Buffer->PutText("\r");
+	Buffer->PutText("\n");
 
 	Frame * lFrame = MainData->Frames;
 	float	UnitFactor = 1.0;
@@ -2858,7 +2866,7 @@ void MolDisplayWin::WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames) {
 				Buffer->PutText(text);
 			} Buffer->PutText("\t");
 		}
-		Buffer->PutText("\r");
+		Buffer->PutText("\n");
 
 		lFrame = lFrame->NextFrame;
 		if (!lFrame) break;
@@ -2872,8 +2880,11 @@ void MolDisplayWin::WriteFrequencies(BufferFile * Buffer) {
 	if (!lFrame->Vibs) return;
 
 	bool haveInten = (lFrame->Vibs->Intensities.size() > 0);
+	bool haveRaman = (lFrame->Vibs->RamanIntensity.size() > 0);
 
-	Buffer->PutText("Frequency\tIntensity\r");
+	Buffer->PutText("Frequency\tIntensity");
+	if (haveRaman) Buffer->PutText("\tRaman Intensity");
+	Buffer->PutText("\n");
 	for (long i=0; i<lFrame->Vibs->GetNumModes(); i++) {
 		sprintf(text, "%s", lFrame->Vibs->Frequencies[i].c_str());
 		Buffer->PutText(text);
@@ -2881,7 +2892,11 @@ void MolDisplayWin::WriteFrequencies(BufferFile * Buffer) {
 			sprintf(text, "\t%f", lFrame->Vibs->GetIntensity(i));
 			Buffer->PutText(text);
 		}
-		Buffer->PutText("\r");
+		if (haveRaman) {
+			sprintf(text, "\t%f", lFrame->Vibs->GetRamanIntensity(i));
+			Buffer->PutText(text);
+		}
+		Buffer->PutText("\n");
 	}
 }
 void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllModes,

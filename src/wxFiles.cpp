@@ -31,7 +31,7 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
                               wxSAVE | wxOVERWRITE_PROMPT, owner);
 	
     if(!filePath.IsEmpty()) {
-        if((currFile = fopen(filePath.mb_str(wxConvUTF8), "w")) == NULL) {
+        if((currFile = fopen(filePath.mb_str(wxConvUTF8), "wb")) == NULL) {
             MessageAlert("Unable to open the file for output.");
             return 0;
         }

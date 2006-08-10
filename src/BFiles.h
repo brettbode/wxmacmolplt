@@ -28,7 +28,8 @@ typedef enum TextFileType {
 	kXYZType,
 	kPDBType,
 	kMDLMolFile,
-	CMLFile
+	CMLFile,
+	MolDenFile
 } TextFileType;
 
 long FindKeyWord(const char *buffer, const char keyword[], long numbyte);

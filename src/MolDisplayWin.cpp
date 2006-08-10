@@ -2228,6 +2228,9 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
                 }
             }
                 break;
+			case MolDenFile:
+				test = OpenMoldenFile(Buffer);
+				break;
             default:    //Should only get here for unknown file types.
                 if (!append)
                     AbortOpen("Unable to determine the file type.");
