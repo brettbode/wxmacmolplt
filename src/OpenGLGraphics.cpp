@@ -75,7 +75,6 @@ const GLubyte stippleMask[128] =
     0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
     0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00};
 */
-
   {0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55, 0xaa, 0xaa, 0xaa, 0xaa, 0x11, 0x11, 0x11, 0x11,
     0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55, 0xaa, 0xaa, 0xaa, 0xaa, 0x11, 0x11, 0x11, 0x11,
     0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55, 0xaa, 0xaa, 0xaa, 0xaa, 0x11, 0x11, 0x11, 0x11,
@@ -84,6 +83,16 @@ const GLubyte stippleMask[128] =
     0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55, 0xaa, 0xaa, 0xaa, 0xaa, 0x11, 0x11, 0x11, 0x11,
     0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55, 0xaa, 0xaa, 0xaa, 0xaa, 0x11, 0x11, 0x11, 0x11,
     0xaa, 0xaa, 0xaa, 0xaa, 0x55, 0x55, 0x55, 0x55, 0xaa, 0xaa, 0xaa, 0xaa, 0x11, 0x11, 0x11, 0x11};
+
+GLfloat d_specular[] = {0.1, 0.1, 0.1, 1.0};
+GLfloat d_shininess[] = {1.0};
+GLfloat d_diffuse[] = {0.02,0.02,0.02,0.8};
+GLfloat d_ambient[] = {0.1,0.1,0.1,0.8};
+
+GLfloat l_specular[] = {0.8, 0.8, 0.8, 1.0};
+GLfloat l_shininess[] = {80.0};
+GLfloat l_diffuse[] = {0.2,0.2,0.2,0.8};
+GLfloat l_ambient[] = {0.1,0.1,0.1,0.8};
 
 class OpenGLRec {
 	public:
@@ -1011,7 +1020,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 	gluQuadricOrientation(qobj, GLU_OUTSIDE);
 	gluQuadricNormals(qobj, GLU_SMOOTH); //GLU_FLAT GLU_NONE
 
-
 	Frame *	lFrame=MainData->cFrame;
 	mpAtom * lAtoms = lFrame->Atoms;
 	Bond * lBonds = lFrame->Bonds;
@@ -1039,26 +1047,47 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			green = AtomColor->green/65536.0;
 			blue = AtomColor->blue/65536.0;
 
-			if ( mHighliteState )
-			  {
-			    glEnable(GL_POLYGON_STIPPLE);
-			    glPolygonStipple(stippleMask);
-			  }
-			else
-			  glDisable(GL_POLYGON_STIPPLE);
-
-			if (lAtoms[iatom].GetSelectState())
-			  glDisable(GL_POLYGON_STIPPLE);
-
 			glPushMatrix();
-			glTranslatef(lAtoms[iatom].Position.x, lAtoms[iatom].Position.y,
-				lAtoms[iatom].Position.z);
+			glTranslatef(lAtoms[iatom].Position.x, 
+				     lAtoms[iatom].Position.y,
+				     lAtoms[iatom].Position.z);
 			
 			glColor3f(red, green, blue);
+			
+			if ( mHighliteState && !lAtoms[iatom].GetSelectState())
+			  {
+			    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
+			    glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
+			    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
+			    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+			  }
+			else
+			  {
+			    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+			    glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
+			    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
+			    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
+			  }
 
 			glLoadName(iatom);
 
 			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere
+
+			if ( mHighliteState && !lAtoms[iatom].GetSelectState())
+			  {
+			    glColor3f(0.0f,0.0f,0.0f);
+			    glEnable(GL_POLYGON_STIPPLE);
+			    glPolygonStipple(stippleMask);
+			    gluSphere(qobj, radius+0.01, (long)(1.5*Quality), (long)(Quality));
+			    glDisable(GL_POLYGON_STIPPLE);
+
+			    glColor4f(0.5,0.5,0.5,0.7f);
+			    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+			    glEnable(GL_BLEND);
+			    gluSphere(qobj, radius+0.02, (long)(1.5*Quality), (long)(Quality));
+			    glDisable(GL_BLEND);
+			  }
+
 			glPopMatrix();
 		}
 	}
@@ -1074,18 +1103,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		long atom2 = lBonds[ibond].Atom2;
 		if (lAtoms[atom1].GetInvisibility() || lAtoms[atom2].GetInvisibility()) continue;
 
-		if ( mHighliteState )
-		  {
-		    glEnable(GL_POLYGON_STIPPLE);
-		    glPolygonStipple(stippleMask);
-		  }
-		else
-		  glDisable(GL_POLYGON_STIPPLE);
-
-		if ( (lAtoms[atom1].GetSelectState() && 
-		      lAtoms[atom2].GetSelectState()) 
-		     || lBonds[ibond].GetSelectState())
-		  glDisable(GL_POLYGON_STIPPLE);
 		//if both atoms are selected, the bond is automatically selected
 		v1.x = lAtoms[atom1].Position.x;
 		v1.y = lAtoms[atom1].Position.y;
@@ -1109,6 +1126,21 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		rotMat[3][0] = v1.x;
 		rotMat[3][1] = v1.y;
 		rotMat[3][2] = v1.z;
+
+		if ( mHighliteState && !lBonds[ibond].GetSelectState())
+		  {
+		    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
+		    glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
+		    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
+		    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+		  }
+		else
+		  {
+		    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+		    glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
+		    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
+		    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
+		  }
 
 		glPushMatrix();
 		glMultMatrixf((const GLfloat *) &rotMat);
@@ -1179,6 +1211,30 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 				gluDisk(qobj, 0.0, BondSize, (long)(Quality), 2);
 			}
 		}
+
+
+		if ( mHighliteState && !lBonds[ibond].GetSelectState())
+		  {
+		    glPopMatrix();
+		    glPushMatrix();
+		    rotMat[3][0] = v1.x;
+		    rotMat[3][1] = v1.y;
+		    rotMat[3][2] = v1.z;
+		    glMultMatrixf((const GLfloat *) &rotMat);
+
+		    glColor3f(0.0f,0.0f,0.0f);
+		    glEnable(GL_POLYGON_STIPPLE);
+		    glPolygonStipple(stippleMask);
+		    gluCylinder(qobj, BondSize+0.01, BondSize+0.01, length, (long)(Quality), (long)(0.5*Quality));
+		    glDisable(GL_POLYGON_STIPPLE);
+
+		    glColor4f(0.5,0.5,0.5,0.7f);
+		    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+		    glEnable(GL_BLEND);
+		    gluCylinder(qobj, BondSize+0.02, BondSize+0.02, length, (long)(Quality), (long)(0.5*Quality));
+		    glDisable(GL_BLEND);
+		  }
+
 		glPopMatrix();
 	}
 

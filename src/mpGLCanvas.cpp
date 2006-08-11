@@ -561,7 +561,18 @@ void MpGLCanvas::SelectObj(int x, int y)
        MolWin->SetHighliteMode(true);
 
        if (select_id < 255)
-	 lAtoms[select_id].SetSelectState(true);
+	 {
+	   lAtoms[select_id].SetSelectState(true);
+
+	   for (int i = 0; i < lFrame->NumBonds; i++)
+	     {
+	       long atom1 = lBonds[i].Atom1;
+	       long atom2 = lBonds[i].Atom2;
+
+	       if (lAtoms[atom1].GetSelectState() && lAtoms[atom2].GetSelectState())
+		 lBonds[i].SetSelectState(true);
+	     }
+	 }
        else
 	 {
 	   lBonds[select_id-255].SetSelectState(true);
