@@ -32,7 +32,7 @@ class MpGLCanvas : public wxGLCanvas {
 
 	MoleculeData *mMainData;
 
-	GLuint texture[1];  //store texture ID, only need one for now
+	//GLuint texture[1];  //store texture ID, only need one for now
 
         void initGL(void);
 
