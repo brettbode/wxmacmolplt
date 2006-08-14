@@ -2232,10 +2232,20 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 				test = OpenMoldenFile(Buffer);
 				break;
             default:    //Should only get here for unknown file types.
-                if (!append)
-                    AbortOpen("Unable to determine the file type.");
-                else
-                    MessageAlert("Unable to determine the file type.");
+			{
+				Buffer->SetFilePos(0);
+				long test;
+				Buffer->Read((char *) &test, sizeof(long));
+				if ((test == 'BMBm')||(test == 'mBMB')) {
+					if (append) MessageAlert("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
+					else AbortOpen("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
+				} else {
+					if (!append)
+						AbortOpen("Unable to determine the file type.");
+					else
+						MessageAlert("Unable to determine the file type.");
+				}
+			}
         }
     }
     catch (std::bad_alloc) {//Out of memory error
