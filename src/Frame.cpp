@@ -1629,3 +1629,12 @@ void Frame::toggleAbInitioVisibility(void) {
 			Atoms[i].SetInvisibility(1-Atoms[i].GetInvisibility());
 	}
 }
+
+void Frame::resetAllSelectState()
+{
+  for ( int i = 0; i < NumAtoms; i++)
+    Atoms[i].SetSelectState(false);
+
+  for ( int i = 0; i < NumBonds; i++)
+    Bonds[i].SetSelectState(false);
+}

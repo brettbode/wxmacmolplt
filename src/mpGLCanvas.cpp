@@ -471,6 +471,9 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
     if(!GetContext()) {
         return;
     }
+
+    bool deSelectAll = true;
+
     SetCurrent();
 
     if (event.LeftDown())
@@ -479,13 +482,14 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
     if (event.Dragging())
       mSelectState++;
 
-    // allow a liitle bit dragging to be interpreted as selection
+    if (event.ControlDown())
+      deSelectAll = false;
+
+    // allow a little bit dragging to be interpreted as selection
     if ( event.LeftUp() && (mSelectState >= 0 && mSelectState < 3))
       {
     	wxPoint tmpPnt = event.GetPosition();
-	SelectObj(tmpPnt.x, tmpPnt.y);
-	//draw();
-
+	SelectObj(tmpPnt.x, tmpPnt.y, deSelectAll);
 	mSelectState = -1;
       }
 
@@ -499,7 +503,7 @@ void MpGLCanvas::KeyHandler(wxKeyEvent & event) {
     MolWin->KeyHandler(event);
 }
 
-void MpGLCanvas::SelectObj(int x, int y)
+void MpGLCanvas::SelectObj(int x, int y, bool mode)
  {
    GLuint buff[128];
    GLint hits, view[4];
@@ -570,6 +574,9 @@ void MpGLCanvas::SelectObj(int x, int y)
 
    if (hits > 0)
      {
+       if (mode)
+	 lFrame->resetAllSelectState();
+
        MolWin->SetHighliteMode(true);
 
        if (select_id < 255)
@@ -599,12 +606,7 @@ void MpGLCanvas::SelectObj(int x, int y)
      }
    else
      {
-       for ( int i = 0; i < lFrame->NumAtoms; i++)
-	 lAtoms[i].SetSelectState(false);
-
-       for ( int i = 0; i < lFrame->NumBonds; i++)
-	 lBonds[i].SetSelectState(false);
-
+       lFrame->resetAllSelectState();
        MolWin->SetHighliteMode(false);
      }
 

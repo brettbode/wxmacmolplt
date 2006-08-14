@@ -154,7 +154,7 @@ class MpGLCanvas : public wxGLCanvas {
          */
         void KeyHandler(wxKeyEvent & event);
 
-	void SelectObj(int x, int y);
+	void SelectObj(int x, int y, bool mode);
 };
 
 #endif

@@ -167,6 +167,8 @@ class Frame {
 		void ParseBondArrayXML(XMLElement * arrayXML, const std::vector<char *> & idList);
 		long WriteCMLFrame(XMLElement * parent, bool AllData);
 
+		void resetAllSelectState();
+
 };
 
 #endif
