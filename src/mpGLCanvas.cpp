@@ -44,7 +44,8 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
     initialized = false;
 
     mMainData = parent->GetData();
-        
+
+    mSelectState = -1;
     //Hmm is this the right spot to initialize our GL settings?
 //  initGL();
 }
@@ -472,14 +473,25 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
     }
     SetCurrent();
 
-    if ( event.GetButton() ==  wxMOUSE_BTN_LEFT )
+    if (event.LeftDown())
+      mSelectState = 0;
+
+    if (event.Dragging())
+      mSelectState++;
+
+    // allow a liitle bit dragging to be interpreted as selection
+    if ( event.LeftUp() && (mSelectState >= 0 && mSelectState < 3))
       {
     	wxPoint tmpPnt = event.GetPosition();
 	SelectObj(tmpPnt.x, tmpPnt.y);
+	//draw();
+
+	mSelectState = -1;
       }
 
     // Pass mouse event to MolDisplayWin::Rotate for processing
-    MolWin->Rotate(event);
+    //if (event.Dragging())
+      MolWin->Rotate(event);
 }
 
 void MpGLCanvas::KeyHandler(wxKeyEvent & event) {
@@ -599,7 +611,6 @@ void MpGLCanvas::SelectObj(int x, int y)
    glMatrixMode(GL_MODELVIEW);
 
    MolWin->UpdateGLModel();
-   //draw();
  }
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
