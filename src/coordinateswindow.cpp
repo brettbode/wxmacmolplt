@@ -132,6 +132,15 @@ CoordinatesWindow::CoordinatesWindow( MolDisplayWin* parent, wxWindowID id, cons
 }
 
 /*!
+ * CoordinatesWindow destructors
+ */
+
+CoordinatesWindow::~CoordinatesWindow( )
+{
+  Parent->SetHighliteMode(false);
+}
+
+/*!
  * CoordinatesWindow creator
  */
 
@@ -156,6 +165,9 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
     {
         GetSizer()->SetSizeHints(this);
     }
+
+    Parent->SetHighliteMode(true);
+
     Centre();
 ////@end CoordinatesWindow creation
     return true;
@@ -402,6 +414,20 @@ void CoordinatesWindow::SizeCols(wxSize & s) {
 	}
 		
 }
+
+void CoordinatesWindow::UpdateSelection()
+{
+  MoleculeData * MainData = Parent->GetData();
+  Frame * lFrame = MainData->GetCurrentFramePtr();
+  long natoms = lFrame->GetNumAtoms();
+
+  coordGrid->ClearSelection();
+
+  for (long i=0; i<natoms; i++) 
+    if (lFrame->GetAtomSelectState(i))
+      coordGrid->SelectRow(i, true);
+}
+
 /*!
  * Get bitmap resources
  */
@@ -708,7 +734,7 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 
 void CoordinatesWindow::OnSelectCell( wxGridEvent& event )
 {
-	int row = event.GetRow();
+  int row = event.GetRow();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
@@ -721,6 +747,10 @@ void CoordinatesWindow::OnSelectCell( wxGridEvent& event )
 		lFrame->SetAtomSelectState(row, event.Selecting());
 	}
 	UpdateControls();
+
+	Parent->UpdateGLModel();
+	Parent->ResetView();
+
 	event.Skip();
 }
 
@@ -735,14 +765,21 @@ void CoordinatesWindow::OnRangeSelect( wxGridRangeSelectEvent& event )
 	long natoms = lFrame->GetNumAtoms();
 	//we seem to only get selection events and not also deselection events
 	//so first clear off the list of selected cells
-	for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
+	//for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
 	if(event.Selecting()) {
-		for (int i=event.GetTopRow(); i<=event.GetBottomRow(); i++) {
-			lFrame->SetAtomSelectState(i, true);
-		}
-	}
+	  for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
+	  //move the deselection here to prevent "blind" deselection
+	  //triggered by ClearSelection()   -Song Li
+	  for (int i=event.GetTopRow(); i<=event.GetBottomRow(); i++) {
+	    lFrame->SetAtomSelectState(i, true);
+	  }
 	
-	UpdateControls();
+	  UpdateControls();
+
+	  Parent->UpdateGLModel();
+	  Parent->ResetView();
+	}
+
 	event.Skip();
 }
 

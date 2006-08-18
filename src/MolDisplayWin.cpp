@@ -2483,3 +2483,9 @@ void MolDisplayWin::ChangePrefs(WinPrefs * newPrefs)
     ResetAllWindows();
     //if (PrefsDlog) PrefsDlog->PrefsChanged();
 }
+
+void MolDisplayWin::SelectionChanged()
+{
+  if (coordsWindow)
+    coordsWindow->UpdateSelection();
+}

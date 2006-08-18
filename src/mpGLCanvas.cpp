@@ -495,7 +495,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
     // Pass mouse event to MolDisplayWin::Rotate for processing
     //if (event.Dragging())
-      MolWin->Rotate(event);
+    MolWin->Rotate(event);
 }
 
 void MpGLCanvas::KeyHandler(wxKeyEvent & event) {
@@ -613,6 +613,7 @@ void MpGLCanvas::SelectObj(int x, int y, bool mode)
    glMatrixMode(GL_MODELVIEW);
 
    MolWin->UpdateGLModel();
+   MolWin->SelectionChanged();
  }
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)

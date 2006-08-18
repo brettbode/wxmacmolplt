@@ -258,6 +258,7 @@ class MolDisplayWin : public wxFrame {
         void PrintGL(wxDC * dc, const float & scaleFactor);
 	void SetHighliteMode(bool state) { mHighliteState = state; }
 	void DrawLabel(void); //added by Song Li
+	void SelectionChanged();
 
         void eventSize(wxSizeEvent &event);
         void SizeChanged(void);

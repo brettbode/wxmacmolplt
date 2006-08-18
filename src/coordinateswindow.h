@@ -74,6 +74,7 @@ public:
     /// Constructors
     CoordinatesWindow( );
     CoordinatesWindow( MolDisplayWin* parent, wxWindowID id = SYMBOL_COORDINATESWINDOW_IDNAME, const wxString& caption = SYMBOL_COORDINATESWINDOW_TITLE, const wxPoint& pos = SYMBOL_COORDINATESWINDOW_POSITION, const wxSize& size = SYMBOL_COORDINATESWINDOW_SIZE, long style = SYMBOL_COORDINATESWINDOW_STYLE );
+    ~CoordinatesWindow( ); //destructor
 
     /// Creation
     bool Create( MolDisplayWin* parent, wxWindowID id = SYMBOL_COORDINATESWINDOW_IDNAME, const wxString& caption = SYMBOL_COORDINATESWINDOW_TITLE, const wxPoint& pos = SYMBOL_COORDINATESWINDOW_POSITION, const wxSize& size = SYMBOL_COORDINATESWINDOW_SIZE, long style = SYMBOL_COORDINATESWINDOW_STYLE );
@@ -179,6 +180,7 @@ public:
 	void SizeCols(wxSize & s);
 	void UpdateControls(void);
 	bool ProcessEvent(wxEvent& event);
+	void UpdateSelection();
 	
 ////@begin CoordinatesWindow member variables
     wxButton* deleteButton;
