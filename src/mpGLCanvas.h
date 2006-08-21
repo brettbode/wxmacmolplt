@@ -154,7 +154,13 @@ class MpGLCanvas : public wxGLCanvas {
          */
         void KeyHandler(wxKeyEvent & event);
 
-	void SelectObj(int x, int y, bool mode);
+        /**
+		 * Translates a mouse click into a selection of an atom or bond 
+         * \param x x coordinate of the click.
+         * \param y y coordinate of the click.
+         * \param mode if true clear off other selections.
+         */
+		void SelectObj(int x, int y, bool mode);
 };
 
 #endif
