@@ -152,6 +152,9 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
     BondButton = NULL;
     coordTypeChoice = NULL;
     coordGrid = NULL;
+
+    needClearAll = true;
+    
 ////@end CoordinatesWindow member initialisation
 	Parent = parent;
 	Prefs = Parent->GetPrefs();
@@ -415,13 +418,16 @@ void CoordinatesWindow::SizeCols(wxSize & s) {
 		
 }
 
-void CoordinatesWindow::UpdateSelection()
+void CoordinatesWindow::UpdateSelection(bool mode)
 {
   MoleculeData * MainData = Parent->GetData();
   Frame * lFrame = MainData->GetCurrentFramePtr();
   long natoms = lFrame->GetNumAtoms();
 
-  coordGrid->ClearSelection();
+  needClearAll = mode;
+
+  if (mode)
+    coordGrid->ClearSelection();
 
   for (long i=0; i<natoms; i++) 
     if (lFrame->GetAtomSelectState(i))
@@ -734,6 +740,8 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 
 void CoordinatesWindow::OnSelectCell( wxGridEvent& event )
 {
+  needClearAll = true;
+
   int row = event.GetRow();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
@@ -760,16 +768,19 @@ void CoordinatesWindow::OnSelectCell( wxGridEvent& event )
 
 void CoordinatesWindow::OnRangeSelect( wxGridRangeSelectEvent& event )
 {
+  if (!needClearAll)
+    return;
+
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
 	//we seem to only get selection events and not also deselection events
 	//so first clear off the list of selected cells
 	//for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
+
 	if(event.Selecting()) {
 	  for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
-	  //move the deselection here to prevent "blind" deselection
-	  //triggered by ClearSelection()   -Song Li
+
 	  for (int i=event.GetTopRow(); i<=event.GetBottomRow(); i++) {
 	    lFrame->SetAtomSelectState(i, true);
 	  }

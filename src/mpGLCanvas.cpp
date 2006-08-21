@@ -484,7 +484,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
  //   if (event.ControlDown())
 	if (event.CmdDown())
-		deSelectAll = false;
+	  deSelectAll = false;
 
     // allow a little bit dragging to be interpreted as selection
 	if ( event.LeftUp() && (mSelectState >= 0 && mSelectState < 3)) {
@@ -611,7 +611,7 @@ void MpGLCanvas::SelectObj(int x, int y, bool mode) {
 	glMatrixMode(GL_MODELVIEW);
 
 	MolWin->UpdateGLModel();
-	MolWin->SelectionChanged();
+	MolWin->SelectionChanged(mode);
 }
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)

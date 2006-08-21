@@ -180,7 +180,7 @@ public:
 	void SizeCols(wxSize & s);
 	void UpdateControls(void);
 	bool ProcessEvent(wxEvent& event);
-	void UpdateSelection();
+	void UpdateSelection(bool mode);
 	
 ////@begin CoordinatesWindow member variables
     wxButton* deleteButton;
@@ -190,6 +190,8 @@ public:
     MolDisplayWin * Parent;
     int CoordType;
     WinPrefs * Prefs;
+
+    bool needClearAll;
 ////@end CoordinatesWindow member variables
 };
 

@@ -942,6 +942,7 @@ void MolDisplayWin::DrawLabel()
 
 	  glColor3f(1-red, 1-green, 1-blue);
 	  glScalef(0.1+0.08*radius, 0.1+0.08*radius, 1);
+	  glLoadName(iatom);
 	  glfDrawSolidString((const char*)atomLabel.mb_str(wxConvUTF8));
 	  glPopMatrix();
 	}
