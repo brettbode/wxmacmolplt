@@ -49,6 +49,8 @@ IMPLEMENT_DYNAMIC_CLASS( ZMatrixCalculator, wxDialog )
 BEGIN_EVENT_TABLE( ZMatrixCalculator, wxDialog )
 
 ////@begin ZMatrixCalculator event table entries
+    EVT_CLOSE( ZMatrixCalculator::OnCloseWindow )
+
     EVT_TEXT( ID_ATOM1EDIT, ZMatrixCalculator::OnAtom1editUpdated )
 
     EVT_TEXT( ID_ATOM2EDIT, ZMatrixCalculator::OnAtom2editUpdated )
@@ -95,8 +97,10 @@ bool ZMatrixCalculator::Create( wxWindow* parent, wxWindowID id, const wxString&
     wxDialog::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
-    GetSizer()->Fit(this);
-    GetSizer()->SetSizeHints(this);
+    if (GetSizer())
+    {
+        GetSizer()->SetSizeHints(this);
+    }
     Centre();
 ////@end ZMatrixCalculator creation
     return true;
@@ -364,3 +368,14 @@ void ZMatrixCalculator::UpdateValues(void) {
 		}
 	}
 }
+/*!
+ * wxEVT_CLOSE_WINDOW event handler for ID_MYDIALOG6
+ */
+
+void ZMatrixCalculator::OnCloseWindow( wxCloseEvent& event )
+{
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	parent->CloseZMatrixCalc();
+}
+
+

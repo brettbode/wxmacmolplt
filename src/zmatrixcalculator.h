@@ -81,6 +81,9 @@ public:
 
 ////@begin ZMatrixCalculator event handler declarations
 
+    /// wxEVT_CLOSE_WINDOW event handler for ID_MYDIALOG6
+    void OnCloseWindow( wxCloseEvent& event );
+
     /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM1EDIT
     void OnAtom1editUpdated( wxCommandEvent& event );
 
