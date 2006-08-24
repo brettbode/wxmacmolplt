@@ -2488,4 +2488,6 @@ void MolDisplayWin::SelectionChanged(bool mode)
 {
   if (coordsWindow)
     coordsWindow->UpdateSelection(mode);
+  if (bondsWindow)
+    bondsWindow->UpdateSelection(mode);
 }

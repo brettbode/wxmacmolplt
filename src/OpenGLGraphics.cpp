@@ -1093,6 +1093,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			Matrix4D	rotMat;
 		long atom1 = lBonds[ibond].Atom1;
 		long atom2 = lBonds[ibond].Atom2;
+		BondOrder tmpOrder = lBonds[ibond].Order;
+
 		if (lAtoms[atom1].GetInvisibility() || lAtoms[atom2].GetInvisibility()) continue;
 
 		//if both atoms are selected, the bond is automatically selected
@@ -1134,47 +1136,61 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
 		  }
 
+		//!!! take hydrogen bond as single bond for now
+		GLdouble baseBondOffset = -0.05 * (MAX(tmpOrder,1) - 1);
+		GLdouble tmpBondSize = BondSize/MAX(tmpOrder,1);
+
 		glPushMatrix();
 		glMultMatrixf((const GLfloat *) &rotMat);
 		if (Prefs->ColorBondHalves()) {
-
 		  glLoadName(ibond+NumAtoms);   //bond names start after the last atom
-
 				//center the color change at the middle of the visible part of the bond
-			float radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
-			float radius2 = AtomScale*Prefs->GetAtomSize(lAtoms[atom2].GetType() - 1);
-			float percent1 = radius1/length;
-			float percent2 = radius2/length;
-			float centerPercent = 0.5 + 0.5*(percent1-percent2);
+		  float radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
+		  float radius2 = AtomScale*Prefs->GetAtomSize(lAtoms[atom2].GetType() - 1);
+		  float percent1 = radius1/length;
+		  float percent2 = radius2/length;
+		  float centerPercent = 0.5 + 0.5*(percent1-percent2);
 		
-				CPoint3D v3;		//first half bond from atom 1
-			v3.x = centerPercent*(v2.x - v1.x)+v1.x;
-			v3.y = centerPercent*(v2.y - v1.y)+v1.y;
-			v3.z = centerPercent*(v2.z - v1.z)+v1.z;
+		  CPoint3D v3;		//first half bond from atom 1
+		  v3.x = centerPercent*(v2.x - v1.x)+v1.x;
+		  v3.y = centerPercent*(v2.y - v1.y)+v1.y;
+		  v3.z = centerPercent*(v2.z - v1.z)+v1.z;
 
-			RGBColor * BondColor = Prefs->GetAtomColorLoc(lAtoms[atom1].GetType() - 1);
-				float red, green, blue;
-			red = BondColor->red/65536.0;
-			green = BondColor->green/65536.0;
-			blue = BondColor->blue/65536.0;
-			glColor3f(red, green, blue);
-			gluCylinder(qobj, BondSize, BondSize, length*centerPercent, (long)(Quality), (long)(0.5*Quality));
-	//		if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
+		  RGBColor * BondColor = Prefs->GetAtomColorLoc(lAtoms[atom1].GetType() - 1);
+		  float red, green, blue;
+		  red = BondColor->red/65536.0;
+		  green = BondColor->green/65536.0;
+		  blue = BondColor->blue/65536.0;
+		  glColor3f(red, green, blue);
+		  for ( int i = 0; i < MAX(tmpOrder,1); ++i)
+		    {
+		      glPushMatrix();
+		      glTranslatef(0.0, baseBondOffset+i*0.1, 0.0);
+		      gluCylinder(qobj, tmpBondSize, tmpBondSize, length*centerPercent, (long)(Quality), (long)(0.5*Quality));
+		      glPopMatrix();
+		    }
+	//	       if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
 	//			gluDisk(qobj, 0.0, BondSize, (long)(Quality), 2);
 	//		}
 
-			BondColor = Prefs->GetAtomColorLoc(lAtoms[atom2].GetType() - 1);
-			red = BondColor->red/65536.0;
-			green = BondColor->green/65536.0;
-			blue = BondColor->blue/65536.0;
-			glColor3f(red, green, blue);
-			glPopMatrix();
-			glPushMatrix();
-			rotMat[3][0] = v3.x;
-			rotMat[3][1] = v3.y;
-			rotMat[3][2] = v3.z;
-			glMultMatrixf((const GLfloat *) &rotMat);
-			gluCylinder(qobj, BondSize, BondSize, length*(1-centerPercent), (long)(Quality), (long)(0.5*Quality));
+		  BondColor = Prefs->GetAtomColorLoc(lAtoms[atom2].GetType() - 1);
+		  red = BondColor->red/65536.0;
+		  green = BondColor->green/65536.0;
+		  blue = BondColor->blue/65536.0;
+		  glColor3f(red, green, blue);
+		  glPopMatrix();
+		  glPushMatrix();
+		  rotMat[3][0] = v3.x;
+		  rotMat[3][1] = v3.y;
+		  rotMat[3][2] = v3.z;
+		  glMultMatrixf((const GLfloat *) &rotMat);
+		  for ( int i = 0; i < MAX(tmpOrder,1); ++i)
+		    {
+		      glPushMatrix();
+		      glTranslatef(0.0, baseBondOffset+i*0.1, 0.0);
+		      gluCylinder(qobj, tmpBondSize, tmpBondSize, length*(1-centerPercent), (long)(Quality), (long)(0.5*Quality));
+		      glPopMatrix();
+		    }
 	//		if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
 	//			glPopMatrix();
 	//			glPushMatrix();
@@ -1185,46 +1201,60 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 	//			gluDisk(qobj, 0.0, BondSize, (long)(Quality), 2);
 	//		}
 		} else {
-			RGBColor * BondColor = Prefs->GetBondColorLoc(lBonds[ibond].Order);
-				float red, green, blue;
-			red = BondColor->red/65536.0;
-			green = BondColor->green/65536.0;
-			blue = BondColor->blue/65536.0;
-			glColor3f(red, green, blue);
-			gluCylinder(qobj, BondSize, BondSize, length, (long)(Quality), (long)(0.5*Quality));
-			if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
-				gluDisk(qobj, 0.0, BondSize, (long)(Quality), 2);
-				glPopMatrix();
-				glPushMatrix();
-				rotMat[3][0] = v2.x;
-				rotMat[3][1] = v2.y;
-				rotMat[3][2] = v2.z;
-				glMultMatrixf((const GLfloat *) &rotMat);
-				gluDisk(qobj, 0.0, BondSize, (long)(Quality), 2);
-			}
-		}
+		  RGBColor * BondColor = Prefs->GetBondColorLoc(lBonds[ibond].Order);
+		  float red, green, blue;
+		  red = BondColor->red/65536.0;
+		  green = BondColor->green/65536.0;
+		  blue = BondColor->blue/65536.0;
+		  glColor3f(red, green, blue);
+		  for ( int i = 0; i < MAX(tmpOrder,1); ++i)
+		    {
+		      glPushMatrix();
+		      glTranslatef(0.0, baseBondOffset+i*0.1, 0.0);
+		      gluCylinder(qobj, tmpBondSize, tmpBondSize, length, (long)(Quality), (long)(0.5*Quality));
+		      glPopMatrix();
+		    }
 
+		  if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
+		    gluDisk(qobj, 0.0, tmpBondSize, (long)(Quality), 2);
+		    glPopMatrix();
+		    glPushMatrix();
+		    rotMat[3][0] = v2.x;
+		    rotMat[3][1] = v2.y;
+		    rotMat[3][2] = v2.z;
+		    glMultMatrixf((const GLfloat *) &rotMat);
+		    gluDisk(qobj, 0.0, tmpBondSize, (long)(Quality), 2);
+		  }
+		}
 
 		if ( mHighliteState && !lBonds[ibond].GetSelectState())
 		  {
 		    glPopMatrix();
 		    glPushMatrix();
+
 		    rotMat[3][0] = v1.x;
 		    rotMat[3][1] = v1.y;
 		    rotMat[3][2] = v1.z;
 		    glMultMatrixf((const GLfloat *) &rotMat);
 
-		    glColor3f(0.0f,0.0f,0.0f);
-		    glEnable(GL_POLYGON_STIPPLE);
-		    glPolygonStipple(stippleMask);
-		    gluCylinder(qobj, BondSize+0.01, BondSize+0.01, length, (long)(Quality), (long)(0.5*Quality));
-		    glDisable(GL_POLYGON_STIPPLE);
+		    for ( int i = 0; i < MAX(tmpOrder,1); ++i)
+		      {
+			glColor3f(0.0f,0.0f,0.0f);
+			glEnable(GL_POLYGON_STIPPLE);
+			glPolygonStipple(stippleMask);
 
-		    glColor4f(0.5,0.5,0.5,0.7f);
-		    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-		    glEnable(GL_BLEND);
-		    gluCylinder(qobj, BondSize+0.02, BondSize+0.02, length, (long)(Quality), (long)(0.5*Quality));
-		    glDisable(GL_BLEND);
+			glPushMatrix();
+			glTranslatef(0.0, baseBondOffset+i*0.1, 0.0);
+			gluCylinder(qobj, tmpBondSize+0.01, tmpBondSize+0.01, length, (long)(Quality), (long)(0.5*Quality));
+			glDisable(GL_POLYGON_STIPPLE);
+
+			glColor4f(0.5,0.5,0.5,0.7f);
+			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_BLEND);
+			gluCylinder(qobj, tmpBondSize+0.02, tmpBondSize+0.02, length, (long)(Quality), (long)(0.5*Quality));
+			glDisable(GL_BLEND);
+			glPopMatrix();
+		      }
 		  }
 
 		glPopMatrix();

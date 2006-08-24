@@ -125,6 +125,7 @@ public:
 	// Update the state of the selection dependant controls
 	void UpdateControls(void);
 
+	void UpdateSelection(bool mode);
 ////@begin BondsDlg member variables
     wxButton* AddBtn;
     wxButton* DeleteBtn;

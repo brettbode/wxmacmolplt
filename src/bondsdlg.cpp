@@ -355,6 +355,7 @@ void BondsDlg::OnChoiceSelected( wxCommandEvent& event )
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long nbonds = lFrame->GetNumBonds();
 	int choice = BondOrderCtl->GetSelection();
+
 	for (int i=0; i<nbonds; i++) {
 		if (lFrame->GetBondSelectState(i)) {
 			wxString order;
@@ -419,11 +420,12 @@ void BondsDlg::OnRangeSelect( wxGridRangeSelectEvent& event )
 	long nbonds = lFrame->GetNumBonds();
 	//we seem to only get selection events and not also deselection events
 	//so first clear off the list of selected cells
-	for (int i=0; i<nbonds; i++) lFrame->SetBondSelectState(i, false);
+	//for (int i=0; i<nbonds; i++) lFrame->SetBondSelectState(i, false);
 	if(event.Selecting()) {
-		for (int i=event.GetTopRow(); i<=event.GetBottomRow(); i++) {
-			lFrame->SetBondSelectState(i, true);
-		}
+	  for (int i=0; i<nbonds; i++) lFrame->SetBondSelectState(i, false);
+	  for (int i=event.GetTopRow(); i<=event.GetBottomRow(); i++) {
+	    lFrame->SetBondSelectState(i, true);
+	  }
 	}
 	
 	UpdateControls();
@@ -485,4 +487,16 @@ void BondsDlg::OnSize( wxSizeEvent& event )
     event.Skip();
 }
 
+void BondsDlg::UpdateSelection(bool mode)
+{
+  MoleculeData * MainData = Parent->GetData();
+  Frame * lFrame = MainData->GetCurrentFramePtr();
+  long nbonds = lFrame->GetNumBonds();
 
+  if (mode)
+    bondGrid->ClearSelection();
+
+  for (long i=0; i<nbonds; i++) 
+    if (lFrame->GetBondSelectState(i))
+      bondGrid->SelectRow(i, true);
+}
