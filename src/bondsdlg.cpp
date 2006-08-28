@@ -190,9 +190,9 @@ void BondsDlg::ResetList(void) {
 		wxString buf;
 		for (long i=0; i<nbonds; i++) {
 			Bond * b = lFrame->GetBondLoc(i);
-			buf.Printf(wxT("%d"), b->Atom1);
+			buf.Printf(wxT("%d"), (b->Atom1 + 1));
 			bondGrid->SetCellValue(i, 0, buf);
-			buf.Printf(wxT("%d"), b->Atom2);
+			buf.Printf(wxT("%d"), (b->Atom2 + 1));
 			bondGrid->SetCellValue(i, 1, buf);
 			buf.Printf(wxT("%f"), lFrame->GetBondLength(i));
 			bondGrid->SetCellValue(i, 2, buf);
@@ -290,9 +290,9 @@ void BondsDlg::OnAddClick( wxCommandEvent& event )
 	if (lFrame->AddBond(0,1)) {
 		wxString buf;
 		bondGrid->AppendRows(1);
-		buf.Printf(wxT("%d"), 0);
-		bondGrid->SetCellValue(nbonds, 0, buf);
 		buf.Printf(wxT("%d"), 1);
+		bondGrid->SetCellValue(nbonds, 0, buf);
+		buf.Printf(wxT("%d"), 2);
 		bondGrid->SetCellValue(nbonds, 1, buf);
 		buf.Printf(wxT("%f"), lFrame->GetBondLength(nbonds));
 		bondGrid->SetCellValue(nbonds, 2, buf);
@@ -457,12 +457,13 @@ void BondsDlg::OnCellChange( wxGridEvent& event )
 	wxString val = bondGrid->GetCellValue(row, col);
 	long newval;
 	if (val.ToLong(&newval)) {
+		newval --;
 		if ((newval>=0)&&(newval<lFrame->GetNumAtoms())&&
 			(newval!=lFrame->GetBondAtom(row, 2-col))) {
 			lFrame->ChangeBond(row, col+1, newval);
 		}
 	}
-	val.Printf(wxT("%d"), lFrame->GetBondAtom(row, col+1));
+	val.Printf(wxT("%d"), (lFrame->GetBondAtom(row, col+1) + 1));
 	bondGrid->SetCellValue(row, col, val);
 	val.Printf(wxT("%f"), lFrame->GetBondLength(row));
 	bondGrid->SetCellValue(row, 2, val);
