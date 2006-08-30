@@ -77,7 +77,7 @@ void FileError::WriteError(void) {
 void DataError::WriteError(void) {
 #ifdef __wxBuild__
 #ifndef WIN32
-#warning Need warning string replacement
+//#warning Need warning string replacement
 #endif
 #else
 	SetCursorToArrow();
@@ -1054,6 +1054,35 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 	return 1;
 } /* OpenMolPlt */
 long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
+	char	LineText[kMaxLineLength];
+	Frame * lFrame = MainData->cFrame;
+	// I think we need the atoms keyword first. Its cartesian coordinates are the ones for 
+	// any included orbitals
+	if (Buffer->LocateKeyWord("[ATOMS]", 7, -1)) {
+		float unitConv = 1.0;	//default to angstroms
+		Buffer->GetLine(LineText);
+		if (FindKeyWord(LineText, "AU", 2) > 0) unitConv = kAng2BohrConversion;
+		//ugh why does everybody have to create their own cartesian format...
+		Buffer->GetLine(LineText);
+		while ((LineText[0] != '[')&&(Buffer->GetFilePos()<Buffer->GetFileSize())) {
+			char	token[kMaxLineLength];
+			long atomNum, junk;
+			CPoint3D pos;
+			//name # atomic_# x y z
+			int count = sscanf(LineText, "%s %ld %ld %f %f %f", token, &junk, &atomNum,
+							   &(pos.x), &(pos.y), &(pos.z));
+			if ((count == 6)&&((atomNum>0)&&(atomNum<120))) {
+				lFrame->AddAtom(atomNum, pos);
+			} else {
+				throw DataError();
+			}
+			Buffer->GetLine(LineText);
+		}
+		if (Prefs->GetAutoBond())
+			lFrame->SetBonds(Prefs, false);
+		
+	} 
+	//not finding atoms isn't very useful for MacMolPlt...
 	
 	return 1;
 }
@@ -1124,7 +1153,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 
 	Buffer->SkipnLines(3);
 	long StartPos = Buffer->GetFilePos();
-	if (!(Buffer->LocateKeyWord("-----------", 11, EnergyPos))) throw DataError();
+	if (!(Buffer->LocateKeyWord("-----------", 11, -1))) throw DataError();
 	long test = Buffer->GetFilePos() - StartPos;
 	Buffer->SetFilePos(StartPos);
 	long numlines = Buffer->GetNumLines(test) - 1;
@@ -1147,7 +1176,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 		if (newAtom) newAtom->IsSIMOMMAtom(true);
 	}
 		//Now add the full ab initio atoms
-	if (Buffer->LocateKeyWord("COORDINATES (BOHR)", 16, EnergyPos)) {	//first normal (ab initio) atoms
+	if (Buffer->LocateKeyWord("COORDINATES (BOHR)", 16, -1)) {	//first normal (ab initio) atoms
 		ProgressInd->ChangeText("Reading Coordinates");
 		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 			{ AbortOpen("File open canceled by user"); return 0;}
