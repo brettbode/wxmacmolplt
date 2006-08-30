@@ -267,7 +267,7 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 			else if (-1<FindKeyWord(temp, ".CML", 4)) Type = CMLFile;
 		}
 	}
-	if ((GetFilePos() < kMaxLineLength) && LocateKeyWord("[MOLDEN FOMAT]", 14, kMaxLineLength))
+	if ((GetFilePos() < kMaxLineLength) && LocateKeyWord("[MOLDEN FORMAT]", 14, kMaxLineLength))
 		Type = MolDenFile;
 	while ((ByteCount <= FileSize)&&(Type == kUnknown)) {
 		if (LocateKeyWord("GAMESS VERSION", 14, -1))
