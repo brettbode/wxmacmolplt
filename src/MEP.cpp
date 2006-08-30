@@ -393,11 +393,11 @@ float Frame::CalculateMEP(float XValue, float YValue, float ZValue,
 	Root	RysRoots;
 	GaussHermiteIntegral	GHInt;
 	AngularIndeces AngIndex;
-	BasisShell * Shells = Basis->Shells;
+	std::vector<BasisShell> & Shells = Basis->Shells;
 	float * Density = TotalAODensity->GetDensityArray();
 	long * DensityIndex = TotalAODensity->GetDensityIndex();
 	short * DensityCheck = TotalAODensity->GetDensityCheck();
-	long * NuclearCharge = Basis->GetNuclearChargeArray();
+	std::vector<long> & NuclearCharge = Basis->NuclearCharge;
 
 	double Pi212= 1.1283791670955;
 
@@ -630,7 +630,7 @@ AODensity * OrbitalRec::GetAODensity(BasisSet * lBasis, long NumAtoms) {
 				NumOccupiedBetaOrbs, NumBasisFunctions);
 			lBasis->GetShellIndexArray(TotalAODensity->GetDensityIndex());
 
-			BasisShell * Shells = lBasis->Shells;
+			std::vector<BasisShell> & Shells = lBasis->Shells;
 			float * Density = TotalAODensity->GetDensityArray();
 			long * DensityIndex = TotalAODensity->GetDensityIndex();
 			short * DensityCheck = TotalAODensity->GetDensityCheck();

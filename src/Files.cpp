@@ -1078,9 +1078,21 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 			}
 			Buffer->GetLine(LineText);
 		}
+		Buffer->SetFilePos(0);
 		if (Prefs->GetAutoBond())
 			lFrame->SetBonds(Prefs, false);
-		
+		//Now look for a basis set
+		//MacMolPlt only supports GTOs so we don't even look for the STO keyword
+		if (Buffer->LocateKeyWord("[GTO]", 5, -1)) {
+				//We really don't know how many shells there will be so this is just
+				//a rough estimate.
+			BasisSet * lbasis = new BasisSet(lFrame->NumAtoms, 5*lFrame->NumAtoms);
+			if (lbasis->ReadMolDenBasisSet(Buffer, lFrame->NumAtoms)) {
+				if (MainData->Basis) delete MainData->Basis;
+				MainData->Basis = lbasis;
+			} else
+				delete lbasis;
+		}
 	} 
 	//not finding atoms isn't very useful for MacMolPlt...
 	

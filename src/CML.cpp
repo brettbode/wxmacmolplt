@@ -179,62 +179,58 @@ void BasisSet::WriteXML(XMLElement * parent) const {
 	t->addAttribute(CML_convert(MMP_BSMapLength), MapLength);
 	t->addAttribute(CML_convert(MMP_BSNumShells), NumShells);
 	t->addAttribute(CML_convert(MMP_BSNumFunctions), NumFuncs);
-	for (int i=0; i<NumShells; i++) {
+	for (int i=0; i<Shells.size(); i++) {
 		Shells[i].WriteXML(t);
 	}
-	if (BasisMap) {
+	if (BasisMap.size()) {
 		std::ostringstream buf;
-		for (int i=0; i<(2*MapLength); i++) buf << BasisMap[i] << " ";
+		for (int i=0; i<BasisMap.size(); i++) buf << BasisMap[i] << " ";
 		XMLElement * map = t->addChildElement(CML_convert(ArrayElement),
 														buf.str().c_str());
 		map->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
 		map->addAttribute(CML_convert(titleAttr), CML_convert(MMP_BSMap));
-		map->addAttribute(CML_convert(sizeAttr), 2*MapLength);
+		map->addAttribute(CML_convert(sizeAttr), BasisMap.size());
 	}
-	if (NuclearCharge) {
+	if (NuclearCharge.size()) {
 		std::ostringstream buf;
-		for (int i=0; i<MapLength; i++) buf << NuclearCharge[i] << " ";
+		for (int i=0; i<NuclearCharge.size(); i++) buf << NuclearCharge[i] << " ";
 		XMLElement * map = t->addChildElement(CML_convert(ArrayElement),
 											  buf.str().c_str());
 		map->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
 		map->addAttribute(CML_convert(titleAttr), CML_convert(MMP_BSNucCharge));
-		map->addAttribute(CML_convert(sizeAttr), MapLength);
+		map->addAttribute(CML_convert(sizeAttr), NuclearCharge.size());
 	}
 }
 void BasisShell::WriteXML(XMLElement * parent) const {
 	XMLElement * t = parent->addChildElement(CML_convert(MMP_BasisShell));
 	t->addAttribute(CML_convert(MMP_BSShellType), ShellType);
 	t->addAttribute(CML_convert(MMP_BSNumPrims), NumPrims);
-	if (Exponent) {
+	if (Exponent.size()) {
 		std::ostringstream buf;
-		for (int i=0; i<NumPrims; i++) buf << Exponent[i] << " ";
+		for (int i=0; i<Exponent.size(); i++) buf << Exponent[i] << " ";
 		XMLElement * map = t->addChildElement(CML_convert(ArrayElement),
 											  buf.str().c_str());
 		map->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
 		map->addAttribute(CML_convert(titleAttr), CML_convert(MMP_BSExponent));
-		map->addAttribute(CML_convert(sizeAttr), NumPrims);
+		map->addAttribute(CML_convert(sizeAttr), Exponent.size());
 	}
-	if (NormCoef) {
+	if (NormCoef.size()) {
 		std::ostringstream buf;
-		int length = NumPrims;
-		if (ShellType < 0) length *= 2;
-		for (int i=0; i<length; i++) buf << NormCoef[i] << " ";
+		for (int i=0; i<NormCoef.size(); i++) buf << NormCoef[i] << " ";
 		XMLElement * map = t->addChildElement(CML_convert(ArrayElement),
 											  buf.str().c_str());
 		map->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
 		map->addAttribute(CML_convert(titleAttr), CML_convert(MMP_BSNormCoef));
-		map->addAttribute(CML_convert(sizeAttr), length);
+		map->addAttribute(CML_convert(sizeAttr), NormCoef.size());
 	}
-	if (InputCoef) {
+	if (InputCoef.size()) {
 		std::ostringstream buf;
-		int length = NumPrims;
-		if (ShellType < 0) length *= 2;
-		for (int i=0; i<length; i++) buf << InputCoef[i] << " ";
+		for (int i=0; i<InputCoef.size(); i++) buf << InputCoef[i] << " ";
 		XMLElement * map = t->addChildElement(CML_convert(ArrayElement),
 											  buf.str().c_str());
 		map->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
 		map->addAttribute(CML_convert(titleAttr), CML_convert(MMP_BSInputCoef));
-		map->addAttribute(CML_convert(sizeAttr), length);
+		map->addAttribute(CML_convert(sizeAttr), InputCoef.size());
 	}
 }
 
@@ -1530,6 +1526,8 @@ BasisSet * BasisSet::ReadXML(XMLElement * parent) {
 						for (int i=0; i<children->length(); i++) {
 							XMLElement * child = children->item(i);
 							if (!strcmp(child->getName(), CML_convert(MMP_BasisShell))) {
+								BasisShell temp;
+								target->Shells.push_back(temp);
 								target->Shells[shellCount].ReadXML(child);
 								shellCount++;
 							} else if (!strcmp(child->getName(), CML_convert(ArrayElement))) {
@@ -1542,7 +1540,10 @@ BasisSet * BasisSet::ReadXML(XMLElement * parent) {
 											int nchar, pos=0;
 											const char * val = child->getValue();
 											for (int i=0; i<mlength; i++) {
-												if (sscanf(&(val[pos]), "%ld %ld%n", &(target->BasisMap[2*i]), &(target->BasisMap[2*i+1]), &nchar) != 2) throw DataError();
+												long is, ie;
+												if (sscanf(&(val[pos]), "%ld %ld%n", &is, &ie, &nchar) != 2) throw DataError();
+												target->BasisMap[2*i] = is;
+												target->BasisMap[2*i+1] = ie;
 												pos += nchar;
 											}
 										}
@@ -1552,7 +1553,9 @@ BasisSet * BasisSet::ReadXML(XMLElement * parent) {
 											int nchar, pos=0;
 											const char * val = child->getValue();
 											for (int i=0; i<mlength; i++) {
-												if (sscanf(&(val[pos]), "%ld%n", &(target->NuclearCharge[i]), &nchar) != 1) throw DataError();
+												long ic;
+												if (sscanf(&(val[pos]), "%ld%n", &ic, &nchar) != 1) throw DataError();
+												target->NuclearCharge[i] = ic;
 												pos += nchar;
 											}
 										}
@@ -1596,9 +1599,10 @@ void BasisShell::ReadXML(XMLElement * parent) {
 							switch (attr) {
 								case MMP_BSExponent:
 								{
-									Exponent = new float[NumPrims];
+									float temp;
 									for (int j=0; j<NumPrims; j++) {
-										if (sscanf(&(val[pos]), "%f%n", &(Exponent[j]), &nchar) != 1) throw DataError();
+										if (sscanf(&(val[pos]), "%f%n", &temp, &nchar) != 1) throw DataError();
+										Exponent.push_back(temp);
 										pos += nchar;
 									}
 								}
@@ -1607,9 +1611,10 @@ void BasisShell::ReadXML(XMLElement * parent) {
 								{
 									int length = NumPrims;
 									if (ShellType < 0) length *= 2;
-									NormCoef = new float[length];
+									float temp;
 									for (int j=0; j<length; j++) {
-										if (sscanf(&(val[pos]), "%f%n", &(NormCoef[j]), &nchar) != 1) throw DataError();
+										if (sscanf(&(val[pos]), "%f%n", &temp, &nchar) != 1) throw DataError();
+										NormCoef.push_back(temp);
 										pos += nchar;
 									}
 								}
@@ -1618,9 +1623,10 @@ void BasisShell::ReadXML(XMLElement * parent) {
 								{
 									int length = NumPrims;
 									if (ShellType < 0) length *= 2;
-									InputCoef = new float[length];
+									float temp;
 									for (int j=0; j<length; j++) {
-										if (sscanf(&(val[pos]), "%f%n", &(InputCoef[j]), &nchar) != 1) throw DataError();
+										if (sscanf(&(val[pos]), "%f%n", &temp, &nchar) != 1) throw DataError();
+										InputCoef.push_back(temp);
 										pos += nchar;
 									}
 								}

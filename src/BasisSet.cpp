@@ -21,119 +21,20 @@
 
 //		Constructor and destructor
 BasisSet::BasisSet(long nAtoms, long nShells) {
-	Shells = new BasisShell[nShells];
+	Shells.reserve(nShells);
 	NumShells = NumFuncs = 0;
 	MapLength = nAtoms;
-	if (Shells) BasisMap = new long[2*nAtoms];
-	if (BasisMap) NuclearCharge = new long[2*nAtoms];
-	if ((Shells==NULL)||(BasisMap==NULL)||(NuclearCharge==NULL)) throw MemoryError();	//Check on memory allocation
-	for (long i=0; i<nAtoms; i++) {BasisMap[2*i] = 0; BasisMap[2*i+1]=-1;}	//clear the basismap
-	NuclearCharge[0] = -1;
+	BasisMap.reserve(2*nAtoms);
+	NuclearCharge.reserve(nAtoms);
+	for (long i=0; i<nAtoms; i++) {
+		BasisMap.push_back(0);
+		BasisMap.push_back(-1);	//clear the basismap
+		NuclearCharge.push_back(-1);
+	}
 }
 BasisSet::~BasisSet(void) {
-	if (Shells) delete [] Shells;
-	if (BasisMap) delete [] BasisMap;
-	if (NuclearCharge) delete [] NuclearCharge;
 }
 
-#ifndef __wxBuild__
-//		IO related routines
-long BasisSet::GetSize(BufferFile *Buffer) {
-	bool	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long length = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return length;
-}
-long BasisSet::WriteToBuffer(BufferFile *Buffer) {
-	long length, code, total;
-	
-	code = 4;
-	total = Buffer->Write((Ptr) &code, sizeof(long));
-	length = 3*sizeof(long);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) &MapLength, sizeof(long));
-	total += Buffer->Write((Ptr) &NumShells, sizeof(long));
-	total += Buffer->Write((Ptr) &NumFuncs, sizeof(long));
-	code = 2;
-	for (int i=0; i<NumShells; i++) {
-		total += Buffer->Write((Ptr) &code, sizeof(long));
-		length = Shells[i].GetSize(Buffer);
-		total += Buffer->Write((Ptr) &length, sizeof(long));
-		total += Shells[i].WriteToBuffer(Buffer);
-	}
-	code = 3;
-	total += Buffer->Write((Ptr) &code, sizeof(long));
-	length = 2*MapLength*sizeof(long);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) BasisMap, length);
-	code = 5;
-	total += Buffer->Write((Ptr) &code, sizeof(long));
-	length = MapLength*sizeof(long);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) NuclearCharge, length);
-	
-	return total;
-}
-BasisSet * BasisSet::Read(BufferFile *Buffer, long NumAtoms, long FullLength) {
-	long code, length;
-	long nShells, nFuncs, nMap;
-	BasisSet * target=NULL;
-//	long StartPos = Buffer->GetFilePos();
-
-	Buffer->Read((Ptr) &code, sizeof(long));
-	Buffer->Read((Ptr) &length, sizeof(long));
-	if (code == 1) {
-		if (length != (2*sizeof(Ptr)+3*sizeof(long))) throw DataError();
-		Buffer->Read((Ptr) &code, sizeof(long));
-		Buffer->Read((Ptr) &code, sizeof(long));
-		Buffer->Read((Ptr) &nMap, sizeof(long));
-		if (NumAtoms>0) nMap = NumAtoms;
-		Buffer->Read((Ptr) &nShells, sizeof(long));
-		Buffer->Read((Ptr) &nFuncs, sizeof(long));
-		target = new BasisSet(nMap, nShells);
-		if (target == NULL) throw MemoryError();
-	} else if (code == 4) {
-		if (length != 3*sizeof(long)) throw DataError();
-		Buffer->Read((Ptr) &nMap, sizeof(long));
-		Buffer->Read((Ptr) &nShells, sizeof(long));
-		Buffer->Read((Ptr) &nFuncs, sizeof(long));
-		target = new BasisSet(nMap, nShells);
-		if (target == NULL) throw MemoryError();
-	} else throw DataError();
-	target->ReadCodes(Buffer, nShells, nFuncs, NumAtoms, (FullLength-Buffer->GetFilePos()));
-
-	return target;
-}
-void BasisSet::ReadCodes(BufferFile * Buffer, long nShells, long nFuncs, long NumAtoms,
-		long FullLength) {
-	long code, length;
-	long StartPos = Buffer->GetFilePos();
-
-	NumShells = nShells;
-	NumFuncs = nFuncs;
-	for (int i=0; i<NumShells; i++) {
-		Buffer->Read((Ptr) &code, sizeof(long));
-		if (code != 2) throw DataError();
-		Buffer->Read((Ptr) &length, sizeof(long));
-		Shells[i].Read(Buffer, length);
-	}
-	Buffer->Read((Ptr) &code, sizeof(long));
-	if (code != 3) throw DataError();
-	Buffer->Read((Ptr) &length, sizeof(long));
-	if (NumAtoms>0) MapLength = NumAtoms;
-	if (length != 2*MapLength*sizeof(long)) throw DataError();
-	Buffer->Read((Ptr) BasisMap, length);
-	if (FullLength > (Buffer->GetFilePos() - StartPos)) {
-		Buffer->Read((Ptr) &code, sizeof(long));
-		if (code == 5) {
-			Buffer->Read((Ptr) &length, sizeof(long));
-			if (length != MapLength*sizeof(long)) throw DataError();
-			Buffer->Read((Ptr) NuclearCharge, length);
-		}
-	}
-}
-#endif
 long BasisSet::GetNumBasisFuncs(bool UseSphericalHarmonics) const {
 	long result;
 	if (!UseSphericalHarmonics)
@@ -168,11 +69,11 @@ void BasisSet::Normalize(bool /*InputNormed*/, bool /*NormOutput*/) {
 	float FNorm = DNorm*2/sqrt(5.0);
 	float GNorm = FNorm*2/sqrt(7.0);
 	for (long ishell=0; ishell<NumShells; ishell++) {
-		float *NormCoef, *InputCoef, fExp;
+		float	fExp;
 		long	NumPrims;
 		short	ShellType = Shells[ishell].ShellType;
-		NormCoef = Shells[ishell].NormCoef;
-		InputCoef = Shells[ishell].InputCoef;
+		std::vector<float> & NormCoef = Shells[ishell].NormCoef;
+		std::vector<float> & InputCoef = Shells[ishell].InputCoef;
 		NumPrims = Shells[ishell].NumPrims;
 		for (long iprim=0; iprim<NumPrims; iprim++) {
 			fExp = Shells[ishell].Exponent[iprim];
@@ -279,13 +180,9 @@ void BasisSet::WriteBasis(BufferFile * File, long AtomNum) const {
 }
 
 BasisShell::BasisShell(void) {
-	Exponent = NormCoef = InputCoef = NULL;
 	NumPrims = 0;
 }
 BasisShell::~BasisShell(void) {
-	if (Exponent) delete [] Exponent;
-	if (NormCoef) delete [] NormCoef;
-	if (InputCoef) delete [] InputCoef;
 }
 long BasisShell::GetNumFuncs(bool UseSphericalHarmonics) const {
 		//returns the # of functions for the shell based on the shell type
@@ -363,46 +260,6 @@ long BasisShell::GetAngularStart(bool UseSphericalHarmonics) const {
 	}
 	return ret;
 }
-#ifndef __wxBuild__
-long BasisShell::GetSize(BufferFile *Buffer) const {
-	bool	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long length = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return length;
-}
-long BasisShell::WriteToBuffer(BufferFile *Buffer) const {
-	long	length, total, code;
-
-	code = 4;
-	total = Buffer->Write((Ptr) &code, sizeof(long));
-	length = 2*sizeof(short);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) &ShellType, sizeof(short));
-	total += Buffer->Write((Ptr) &NumPrims, sizeof(short));
-	code = 2;
-	total += Buffer->Write((Ptr) &code, sizeof(long));
-	length = NumPrims*sizeof(float);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) Exponent, length);
-	code = 3;
-	total += Buffer->Write((Ptr) &code, sizeof(long));
-	if (ShellType<0) length = 2*NumPrims*sizeof(float);	//L shell
-	else length = NumPrims*sizeof(float);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) NormCoef, length);
-	if (InputCoef != NULL) {
-		code = 5;
-		total += Buffer->Write((Ptr) &code, sizeof(long));
-		if (ShellType<0) length = 2*NumPrims*sizeof(float);	//L shell
-		else length = NumPrims*sizeof(float);
-		total += Buffer->Write((Ptr) &length, sizeof(long));
-		total += Buffer->Write((Ptr) InputCoef, length);
-	}
-
-	return total;
-}
-#endif
 void BasisShell::GetLabel(char * label, short FuncNum, bool UseSphericalHarmonics) const {
 	long type = ShellType;
 	if (UseSphericalHarmonics) type += 10;
@@ -691,55 +548,6 @@ void BasisShell::GetLabel(char * label, short FuncNum, bool UseSphericalHarmonic
 		break;
 	}
 }
-#ifndef __wxBuild__
-void BasisShell::Read(BufferFile *Buffer, long totalsize) {
-	long	code, length, total;
-
-	total = Buffer->Read((Ptr) &code, sizeof(long));
-	if ((code!=1)&&(code!=4)) throw DataError();
-	total += Buffer->Read((Ptr) &length, sizeof(long));
-	if (code == 1) {
-//		if (length!=sizeof(BasisShell)) throw DataError();	//incorrect size
-				//12 is old size of a BasisShell
-		if (length!=12) throw DataError();	//incorrect size
-		total += Buffer->BufferSkip(8);
-		total += Buffer->Read((Ptr) &ShellType, sizeof(short));
-		total += Buffer->Read((Ptr) &NumPrims, sizeof(short));
-	} else if (code == 4) {
-		if (length != 2*sizeof(short)) throw DataError();
-		total += Buffer->Read((Ptr) &ShellType, sizeof(short));
-		total += Buffer->Read((Ptr) &NumPrims, sizeof(short));
-	}
-	Exponent = NormCoef = NULL;
-	Exponent = new float[NumPrims];
-	if (ShellType>=0) NormCoef = new float[NumPrims];
-	else NormCoef = new float[2*NumPrims];
-	if ((Exponent==NULL)||(NormCoef==NULL)) throw MemoryError();
-		//next should come the code and length for the exponent array
-	total += Buffer->Read((Ptr) &code, sizeof(long));
-	if (code != 2) throw DataError();
-	total += Buffer->Read((Ptr) &length, sizeof(long));
-	if (length != NumPrims*sizeof(float)) throw DataError();
-	total += Buffer->Read((Ptr) Exponent, length);
-	total += Buffer->Read((Ptr) &code, sizeof(long));
-	if (code != 3) throw DataError();
-	total += Buffer->Read((Ptr) &length, sizeof(long));
-	if ((ShellType>=0)&&(length!=NumPrims*sizeof(float))) throw DataError();
-	else if ((ShellType<0)&&(length!=2*NumPrims*sizeof(float))) throw DataError();
-	total += Buffer->Read((Ptr) NormCoef, length);
-	if ((total + 2*sizeof(long))<totalsize) {
-		total += Buffer->Read((Ptr) &code, sizeof(long));
-		total += Buffer->Read((Ptr) &length, sizeof(long));
-		if (code == 5) {
-			if (ShellType>=0) InputCoef = new float[NumPrims];
-			else InputCoef = new float[2*NumPrims];
-			if ((ShellType>=0)&&(length!=NumPrims*sizeof(float))) throw DataError();
-			else if ((ShellType<0)&&(length!=2*NumPrims*sizeof(float))) throw DataError();
-			total += Buffer->Read((Ptr) InputCoef, length);
-		}
-	}
-}
-#endif
 //Read in a general basis set from a GAMESS log file
 BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms) {
 	long NumShells=0, NextAtom=0, ShellStart=0,
@@ -776,10 +584,11 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms) {
 	//The ishell loop could be a do-while structure, but this ensures
 	//that I don't go off the end of the shell array
 	for (long ishell=0; ishell<NumShells; ishell++) {
-		float *Exponent, *NormCoef, *InputCoef, fExp, fCoef1, fCoef2, fCoef3, scrap;
+		float	fExp, fCoef1, fCoef2, fCoef3, scrap;
 		char	ShellText[10];
 		long	fShell, scrapl, NumPrims, CoefsperPrim;
 		short	ShellType;
+		BasisShell	foo;
 
 		StartPos = Buffer->GetFilePos();
 		EndPos = Buffer->FindBlankLine();
@@ -811,14 +620,31 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms) {
 			default:
 				throw DataError();
 		}
+		Basis->Shells.push_back(foo);
 		Basis->Shells[ishell].NumPrims = NumPrims;
 		Basis->Shells[ishell].ShellType = ShellType;
-		Exponent = Basis->Shells[ishell].Exponent = new float[NumPrims*sizeof(float)];
-		NormCoef = Basis->Shells[ishell].NormCoef = new float[CoefsperPrim*NumPrims*sizeof(float)];
-		InputCoef = Basis->Shells[ishell].InputCoef = new float[CoefsperPrim*NumPrims*sizeof(float)];
-		if ((Exponent==NULL)||(NormCoef==NULL)) throw MemoryError();
+		std::vector<float> & Exponent = Basis->Shells[ishell].Exponent;
+		std::vector<float> & NormCoef = Basis->Shells[ishell].NormCoef;
+		std::vector<float> & InputCoef = Basis->Shells[ishell].InputCoef;
+		Exponent.reserve(NumPrims);
+		if (ShellType >= 0) {
+			NormCoef.reserve(NumPrims);
+			InputCoef.reserve(NumPrims);
+		} else {
+			NormCoef.reserve(2*NumPrims);
+			InputCoef.reserve(2*NumPrims);
+		}
 		bool OldStyle = false;
 		if (FindKeyWord(LineText, "(", 1) != -1) OldStyle=true;
+		for (long iprim=0; iprim<NumPrims; iprim++) {
+			InputCoef.push_back(0.0);
+			NormCoef.push_back(0.0);
+			if (ShellType<0) {
+				InputCoef.push_back(0.0);
+				NormCoef.push_back(0.0);
+			}
+			Exponent.push_back(0.0);
+		}
 		for (long iprim=0; iprim<NumPrims; iprim++) {
 			if (ShellType>=0) {
 				if (OldStyle) {
@@ -905,3 +731,96 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms) {
 	}
 	return Basis;
 }	/*ParseGAMESSBasisSet*/
+
+bool BasisSet::ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms) {
+	bool result = true;
+	char	LineText[kMaxLineLength];
+	long	shellCount = 0;
+	
+	Buffer->SkipnLines(1);
+	for (int i=0; i<NumAtoms; i++) {
+		long shellStart = shellCount;
+		long atomNum=-1;
+		Buffer->GetLine(LineText);
+		sscanf(LineText, "%ld", &atomNum);
+		if (atomNum != (i+1)) return false;	//incorrect order?
+		Buffer->GetLine(LineText);
+		while (strlen(LineText) > 1) {
+			char	token[kMaxLineLength];
+			int		numPrims;
+			if (sscanf(LineText, "%s %d", token, &numPrims) == 2) {
+				short	ShellType;
+				if (strlen(token) == 1) {
+					switch (toupper(token[0])) {
+						case 'S':
+							ShellType = 0;
+							break;
+						case 'P':
+							ShellType = 1;
+							break;
+						case 'D':
+							ShellType = 2;
+							break;
+						case 'F':
+							ShellType = 3;
+							break;
+						case 'G':
+							ShellType = 4;
+							break;
+						default:
+							return false; //invalid type
+					}
+				} else if (strlen(token) == 2) {
+					if ((toupper(token[0])=='S')&&(toupper(token[1])=='P'))
+						ShellType = -1;
+					else return false;
+				} else return false; //invalid shell type
+				if (numPrims <= 0) return false;
+				
+				BasisShell t;
+				Shells.push_back(t);
+				Shells[shellCount].NumPrims = numPrims;
+				Shells[shellCount].ShellType = ShellType;
+				std::vector<float> & Exponent = Shells[shellCount].Exponent;
+				std::vector<float> & NormCoef = Shells[shellCount].NormCoef;
+				std::vector<float> & InputCoef = Shells[shellCount].InputCoef;
+				Exponent.reserve(numPrims);
+				if (ShellType >= 0) {
+					NormCoef.reserve(numPrims);
+					InputCoef.reserve(numPrims);
+				} else {
+					NormCoef.reserve(2*numPrims);
+					InputCoef.reserve(2*numPrims);
+				}
+				for (long iprim=0; iprim<numPrims; iprim++) {
+					InputCoef.push_back(0.0);
+					NormCoef.push_back(0.0);
+					if (ShellType<0) {
+						InputCoef.push_back(0.0);
+						NormCoef.push_back(0.0);
+					}
+					Exponent.push_back(0.0);
+				}
+				for (long iprim=0; iprim<numPrims; iprim++) {
+					float	fexp, fcoef, fcoefp;
+					Buffer->GetLine(LineText);
+					if (ShellType >= 0) {
+						if (sscanf(LineText, "%f %f", &fexp, &fcoef) != 2) return false;
+					} else {
+						if (sscanf(LineText, "%f %f %f", &fexp, &fcoef, &fcoefp) == 3) {
+							InputCoef[iprim+numPrims] = fcoefp;
+						} else return false;
+					}
+					Exponent[iprim] = fexp;
+					InputCoef[iprim] = fcoef;
+				}
+				shellCount ++;
+				
+			} else return false;
+			Buffer->GetLine(LineText);
+		}
+		BasisMap[2*i] = shellStart;
+		BasisMap[2*i+1] = shellCount - 1;
+	}
+	return result;
+}

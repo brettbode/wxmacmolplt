@@ -593,7 +593,7 @@ void OrbitalRec::setLabel(const char * str) {
 	}
 }
 void OrbitalRec::RotateVectors(Matrix4D rotationMatrix, BasisSet * Basis, long NumAtoms) {
-	BasisShell	*Shells=Basis->Shells;
+	std::vector<BasisShell> & Shells=Basis->Shells;
 
 		//Set up normalization constants for d,f,g functions
 	float sqrt3 = sqrt(3.0);
@@ -1229,7 +1229,7 @@ float CalculateMOAmplitude(float XValue, float YValue, float ZValue, mpAtom *Ato
 		BasisSet *Basis, float *MOVector, long NumAtoms, bool UseSphericalHarmonics) {
 	long ivec = 0, NumPrims;
 	float	x, y, z, x2, y2, z2, r=0, r2, VectorSum, expcr2, Amplitude=0.0;
-	BasisShell	*Shells=Basis->Shells;
+	std::vector<BasisShell> & Shells=Basis->Shells;
 
 		//Set up normalization constants for d,f,g functions
 	float sqrt3 = sqrt(3.0);
@@ -1353,7 +1353,7 @@ void CalculateAOAmplitudeVector(float XValue, float YValue, float ZValue, mpAtom
 		BasisSet *Basis, float *AOVector, long NumAtoms) {
 	long ivec = 0, NumPrims;
 	float	x, y, z, x2, y2, z2, r2, expcr2;
-	BasisShell	*Shells=Basis->Shells;
+	std::vector<BasisShell> & Shells=Basis->Shells;
 
 		//Set up normalization constants for d,f,g functions
 	float sqrt3 = sqrt(3.0);
