@@ -1001,6 +1001,9 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 	}
 	return OrbSet;
 }
+void Frame::ReadMolDenOrbitals(BufferFile * Buffer, long NumFuncs) {
+	//We don't have a lot of information about the orbitals so assume the largest case
+}
 //Handle CI vectors
 void Frame::ParseGAMESSCIVectors(BufferFile * Buffer, long NumFuncs, Progress * lProgress) {
 	long	iorb, jorb, imaxorb=0, NumNOrbs=0, TestOrb,

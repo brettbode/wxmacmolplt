@@ -149,6 +149,7 @@ class Frame {
 			long NumBetaOrbs, const long & NumOccAlpha, const long & NumOccBeta, const TypeOfWavefunction & method, Progress * lProgress);
 		OrbitalRec * ParseGAMESSLMOs(BufferFile * Buffer, long NumFuncs, long NumAlphaOrbs,
 			long NumOccBeta, Progress * lProgress, bool OrientedSet);
+		void ReadMolDenOrbitals(BufferFile * Buffer, long NumFuncs);
 		void ReadMP2Vectors(BufferFile * Buffer, BufferFile * DatBuffer, long NumFuncs,
 			Progress * lProgress, long * readflag);
 		float CalculateMEP(float x, float y, float z, BasisSet * Basis,

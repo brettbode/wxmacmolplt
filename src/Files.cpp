@@ -1094,6 +1094,10 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 			} else
 				delete lbasis;
 		}
+		if (MainData->Basis) {	//look for orbitals if we have a basis set
+			if (Buffer->LocateKeyWord("[MO]", 4, -1)) {
+			}
+		}
 	} 
 	//not finding atoms isn't very useful for MacMolPlt...
 	
