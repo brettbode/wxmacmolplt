@@ -347,7 +347,7 @@ OrbSurfacePane::OrbSurfacePane( OrbSurfBase* target, SurfacesWindow* o)
     }
 
   coefIsEnabled = false;
-
+  if (OrbOptions&1) coefIsEnabled = true;
 }
 
 OrbSurfacePane::~OrbSurfacePane()
