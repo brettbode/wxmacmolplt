@@ -1090,6 +1090,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 			if (lbasis->ReadMolDenBasisSet(Buffer, lFrame->NumAtoms)) {
 				if (MainData->Basis) delete MainData->Basis;
 				MainData->Basis = lbasis;
+				lbasis->Normalize(false, false);
 			} else
 				delete lbasis;
 		}

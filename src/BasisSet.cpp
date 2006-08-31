@@ -745,7 +745,7 @@ bool BasisSet::ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms) {
 		sscanf(LineText, "%ld", &atomNum);
 		if (atomNum != (i+1)) return false;	//incorrect order?
 		Buffer->GetLine(LineText);
-		while (strlen(LineText) > 1) {
+		while (!IsBlank(LineText)) {
 			char	token[kMaxLineLength];
 			int		numPrims;
 			if (sscanf(LineText, "%s %d", token, &numPrims) == 2) {
@@ -814,8 +814,9 @@ bool BasisSet::ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms) {
 					Exponent[iprim] = fexp;
 					InputCoef[iprim] = fcoef;
 				}
+				NumFuncs += Shells[shellCount].GetNumFuncs(false);
+				NumShells ++;
 				shellCount ++;
-				
 			} else return false;
 			Buffer->GetLine(LineText);
 		}

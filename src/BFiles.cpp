@@ -470,6 +470,18 @@ void BufferFile::SkipnLines(long nSkip) {
 		BufferPos ++;	//Advance to the first character of the next line
 	}
 }
+bool IsBlank(const char * Line) {
+	bool result = true;
+	long length = strlen(Line);
+	for (long i=0; i<length; i++) {
+		if (Line[i]>32) {
+			result = false;
+			break;
+		}
+	}
+	
+	return result;
+}
 long BufferFile::FindBlankLine(void) {
 	long Start = BufferStart + BufferPos, LineStart;
 	long BlankLinePos=-1;

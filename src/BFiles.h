@@ -38,6 +38,7 @@ long ReadLongKeyword(const char * Line, const char * Keyword, long * Value);
 long ReadFloatKeyword(const char * Line, const char * Keyword, float * Value);
 long ReadBooleanKeyword(const char * Line, const char * Keyword, bool * Value);
 long LocateForValue(const char * Line, const char * KeyWord);
+bool IsBlank(const char * Line);
 
 class BufferFile {
 	private:
