@@ -16,6 +16,7 @@
 #include "BasisSet.h"
 #include <math.h>
 #include <string.h>
+#include <cctype>
 
 //	Basis set related routines
 
