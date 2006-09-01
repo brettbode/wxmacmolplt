@@ -1,6 +1,6 @@
 AC_INIT(src/main.cpp)
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE(wxMacMolPlt, 0.0.1)
+AM_INIT_AUTOMAKE(wxMacMolPlt, 6.2.0)
 dnl AC_CONFIG_HEADER
 dnl AC_REVISION
 
@@ -51,8 +51,7 @@ AC_TRY_RUN([
             #include "wx/wx.h"
             #include "wx/glcanvas.h"
             using namespace std;
-            class MyApp: public wxApp { virtual bool OnInit(); };
-            bool MyApp::OnInit() {
+            int main() {
             #if wxUSE_GLCANVAS
                 exit(0);
                 return 0;
@@ -61,7 +60,6 @@ AC_TRY_RUN([
                 return -1;
             #endif
             }
-            IMPLEMENT_APP(MyApp)
            ],
            AC_MSG_RESULT([yes]),
            AC_MSG_RESULT([not found])
