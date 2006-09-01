@@ -145,6 +145,7 @@ class MolDisplayWin : public wxFrame {
         void PasteText(void);
         void menuEditClear(wxCommandEvent &event);
         void menuEditSelect_all(wxCommandEvent &event);
+	void menuEditInteractive_mode(wxCommandEvent &event);
 
         void menuViewShowNormalMode(wxCommandEvent &event);
         void menuViewPrevNormalMode(wxCommandEvent &event);

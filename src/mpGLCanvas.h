@@ -32,8 +32,11 @@ class MpGLCanvas : public wxGLCanvas {
 
 	MoleculeData *mMainData;
 
-	//GLuint texture[1];  //store texture ID, only need one for now
 	int mSelectState;
+	int selected;
+	bool interactiveMode;
+	GLdouble atomDepth;
+	GLint winDiffX, winDiffY;
 
         void initGL(void);
 
@@ -160,7 +163,12 @@ class MpGLCanvas : public wxGLCanvas {
          * \param y y coordinate of the click.
          * \param mode if true clear off other selections.
          */
-		void SelectObj(int x, int y, bool mode);
+	
+	int testPicking(int x, int y);
+	void SelectObj(int select_id, bool mode);
+	void toggleInteractiveMode() { interactiveMode = 1 - interactiveMode; } 
+	void findReal3DCoord(int x, int y, GLdouble& realX, GLdouble& realY, GLdouble& realZ);
+	void findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, GLdouble& winY, GLdouble& winZ);
 };
 
 #endif

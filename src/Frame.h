@@ -169,7 +169,6 @@ class Frame {
 		long WriteCMLFrame(XMLElement * parent, bool AllData);
 
 		void resetAllSelectState();
-
 };
 
 #endif

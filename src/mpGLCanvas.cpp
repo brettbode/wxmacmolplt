@@ -46,6 +46,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
     mMainData = parent->GetData();
 
     mSelectState = -1;
+    interactiveMode = false;
     //Hmm is this the right spot to initialize our GL settings?
 //  initGL();
 }
@@ -475,12 +476,47 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	bool deSelectAll = true;
 
 	SetCurrent();
+	wxPoint tmpPnt = event.GetPosition();
+
+	Frame *  lFrame = mMainData->cFrame;
+	long NumAtoms = lFrame->NumAtoms;
+	mpAtom * lAtoms = lFrame->Atoms;
 
 	if (event.LeftDown())
-		mSelectState = 0;
+	  {
+	    mSelectState = 0;
+	    selected = testPicking(tmpPnt.x, tmpPnt.y);
+
+	    if ( selected >= 0 && selected < NumAtoms && interactiveMode)
+	      {
+		GLdouble tmpWinX, tmpWinY;
+
+		findWinCoord(lAtoms[selected].Position.x,
+			      lAtoms[selected].Position.y,
+			      lAtoms[selected].Position.z,
+			      tmpWinX, tmpWinY, atomDepth);
+
+		winDiffX = tmpPnt.x - (int)tmpWinX;
+		winDiffY = tmpPnt.y - (int)tmpWinY; //because the window y-axis
+		                                    //points downward
+	      }
+	  }
 
 	if (event.Dragging())
-		mSelectState++;
+	  {
+	    mSelectState++;
+	    if ( selected >= 0 && selected < NumAtoms && interactiveMode)
+	      {
+		GLdouble newX, newY, newZ;
+
+		findReal3DCoord(tmpPnt.x-winDiffX, tmpPnt.y-winDiffY, newX, newY, newZ);
+		lAtoms[selected].Position.x = newX;
+		lAtoms[selected].Position.y = newY;
+		lAtoms[selected].Position.z = newZ;
+
+		MolWin->UpdateGLModel();
+	      }
+	  }
 
  //   if (event.ControlDown())
 	if (event.CmdDown())
@@ -488,13 +524,15 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
     // allow a little bit dragging to be interpreted as selection
 	if ( event.LeftUp() && (mSelectState >= 0 && mSelectState < 3)) {
-		wxPoint tmpPnt = event.GetPosition();
-		SelectObj(tmpPnt.x, tmpPnt.y, deSelectAll);
-		mSelectState = -1;
+	  SelectObj(selected, deSelectAll);
+	  mSelectState = -1;
 	}
     // Pass mouse event to MolDisplayWin::Rotate for processing
-    //if (event.Dragging())
-	MolWin->Rotate(event);
+    if (interactiveMode)
+      draw();
+    else
+      MolWin->Rotate(event);
+
 }
 
 void MpGLCanvas::KeyHandler(wxKeyEvent & event) {
@@ -502,10 +540,43 @@ void MpGLCanvas::KeyHandler(wxKeyEvent & event) {
     MolWin->KeyHandler(event);
 }
 
-void MpGLCanvas::SelectObj(int x, int y, bool mode) {
-   GLuint buff[128];
-   GLint hits, view[4];
-   int id;
+void MpGLCanvas::findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, GLdouble& winY, GLdouble& winZ)
+{
+  GLdouble mvMatrix[16];
+  GLdouble projMatrix[16];
+  GLint viewport[4];
+
+  glGetIntegerv(GL_VIEWPORT, viewport);	
+  glGetDoublev (GL_MODELVIEW_MATRIX, mvMatrix);
+  glGetDoublev (GL_PROJECTION_MATRIX, projMatrix);
+
+  gluProject(x, y, z, mvMatrix, projMatrix, viewport, &winX, &winY, &winZ);
+
+  winY = viewport[3] - winY;  //"pretend" to have wx's coordinate system
+}
+
+void MpGLCanvas::findReal3DCoord(int x, int y, GLdouble& realX, GLdouble& realY, GLdouble& realZ)
+{
+  GLdouble mvMatrix[16];
+  GLdouble projMatrix[16];
+  GLint viewport[4];
+  GLfloat winX, winY;
+
+  glGetIntegerv(GL_VIEWPORT, viewport);	
+  glGetDoublev (GL_MODELVIEW_MATRIX, mvMatrix);
+  glGetDoublev (GL_PROJECTION_MATRIX, projMatrix);
+
+  winX = (float)x;
+  winY = (float)(viewport[3]-y);
+
+  gluUnProject (winX, winY, atomDepth, mvMatrix, projMatrix, viewport, &realX, &realY, &realZ);
+}
+
+int MpGLCanvas::testPicking(int x, int y)
+{
+  GLuint buff[128];
+  GLint hits, view[4];
+  int id;
  
    glSelectBuffer(128, buff);
    glGetIntegerv(GL_VIEWPORT, view);
@@ -529,89 +600,94 @@ void MpGLCanvas::SelectObj(int x, int y, bool mode) {
 
    GLdouble aspect = ((float)width)/height;
 
-	if (aspect > 1.0) {
-		right = myGLperspective;
-		top = right/aspect;
-	} else {
-		top = myGLperspective;
-		right = top * aspect;
-	}
+   if (aspect > 1.0) {
+     right = myGLperspective;
+     top = right/aspect;
+   } else {
+     top = myGLperspective;
+     right = top * aspect;
+   }
 
-	glFrustum(-right, right, -top, top, 0.1, 100.0);
+   glFrustum(-right, right, -top, top, 0.1, 100.0);
 
-	glMatrixMode(GL_MODELVIEW);
+   glMatrixMode(GL_MODELVIEW);
 
-	MolWin->DrawGL();
+   MolWin->DrawGL();
 
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
+   glMatrixMode(GL_PROJECTION);
+   glPopMatrix();
  
-	hits = glRenderMode(GL_RENDER);
+   hits = glRenderMode(GL_RENDER);
    
-	int select_id = -1;
-	unsigned int min_depth = 0xFFFFFFFF;
+   int select_id = -1;
+   unsigned int min_depth = 0xFFFFFFFF;
 
-	for (int i = 0; i < hits; i++) {
-		if (buff[i*4+3] < 0 || buff[i*4+3] > 512)
-			continue;   //out of range
+   for (int i = 0; i < hits; i++) {
+     if (buff[i*4+3] < 0 || buff[i*4+3] > 512)
+       continue;   //out of range
 
-		if (buff[i*4+1] < min_depth) {
-			min_depth = buff[i*4+1];
-			select_id = buff[i*4+3];
-		}
-	}
+     if (buff[i*4+1] < min_depth) {
+       min_depth = buff[i*4+1];
+       select_id = buff[i*4+3];
+     }
+   }
 
-	Frame *  lFrame = mMainData->cFrame;
-	long NumAtoms = lFrame->NumAtoms;
-	mpAtom * lAtoms = lFrame->Atoms;
-	Bond * lBonds = lFrame->Bonds;
+   return select_id;
+}
 
-	if (hits > 0) {
-		if (mode)
-			lFrame->resetAllSelectState();
+void MpGLCanvas::SelectObj(int select_id, bool mode) 
+{
+  Frame *  lFrame = mMainData->cFrame;
+  long NumAtoms = lFrame->NumAtoms;
+  mpAtom * lAtoms = lFrame->Atoms;
+  Bond * lBonds = lFrame->Bonds;
 
-		if (select_id < NumAtoms) {
-			bool newstate = true;
-			if (!mode && lAtoms[select_id].GetSelectState()) newstate = false;
-			lAtoms[select_id].SetSelectState(newstate);
+  if (mode)
+      lFrame->resetAllSelectState();
 
-			for (int i = 0; i < lFrame->NumBonds; i++) {
-				long atom1 = lBonds[i].Atom1;
-				long atom2 = lBonds[i].Atom2;
+  if (select_id >= 0) {
+    if (select_id < NumAtoms) {
+      bool newstate = true;
+      if (!mode && lAtoms[select_id].GetSelectState()) newstate = false;
+      lAtoms[select_id].SetSelectState(newstate);
 
-				if (lAtoms[atom1].GetSelectState() && lAtoms[atom2].GetSelectState())
-					lBonds[i].SetSelectState(newstate);
-			}
-		} else {
-			select_id -= NumAtoms;
-			bool newstate = true;
-			if (!mode && lBonds[select_id].GetSelectState()) newstate = false;
-			lBonds[select_id].SetSelectState(newstate);
+      for (int i = 0; i < lFrame->NumBonds; i++) {
+	long atom1 = lBonds[i].Atom1;
+	long atom2 = lBonds[i].Atom2;
 
-			long atom1 = lBonds[select_id].Atom1;
-			long atom2 = lBonds[select_id].Atom2;
+	if (lAtoms[atom1].GetSelectState() && lAtoms[atom2].GetSelectState())
+	  lBonds[i].SetSelectState(newstate);
+      }
+    } else {
+      select_id -= NumAtoms;
+      bool newstate = true;
+      if (!mode && lBonds[select_id].GetSelectState()) newstate = false;
+      lBonds[select_id].SetSelectState(newstate);
 
-			lAtoms[atom1].SetSelectState(newstate);
-			lAtoms[atom2].SetSelectState(newstate); //select atoms that 
-													//this bond connect
-		}
-		bool result = false;
-		for (long i=0; i<NumAtoms; i++) {
-			if (lAtoms[i].GetSelectState()) {
-				result = true;
-				break;
-			}
-		}
-		MolWin->SetHighliteMode(result);
-	} else {
-		lFrame->resetAllSelectState();
-		MolWin->SetHighliteMode(false);
-	}
+      long atom1 = lBonds[select_id].Atom1;
+      long atom2 = lBonds[select_id].Atom2;
 
-	glMatrixMode(GL_MODELVIEW);
+      lAtoms[atom1].SetSelectState(newstate);
+      lAtoms[atom2].SetSelectState(newstate); //select atoms that 							      //this bond connect
+    }
 
-	MolWin->UpdateGLModel();
-	MolWin->SelectionChanged(mode);
+    bool result = false;
+    for (long i=0; i<NumAtoms; i++) {
+      if (lAtoms[i].GetSelectState()) {
+	result = true;
+	break;
+      }
+    }
+    MolWin->SetHighliteMode(result);
+  } else {
+    lFrame->resetAllSelectState();
+    MolWin->SetHighliteMode(false);
+  }
+
+  glMatrixMode(GL_MODELVIEW);
+
+  MolWin->UpdateGLModel();
+  MolWin->SelectionChanged(mode);
 }
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)

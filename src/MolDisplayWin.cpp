@@ -104,6 +104,7 @@ enum MMP_EventID {
     MMP_ENERGYEDIT,
 	MMP_WINDOWPARAMETERS,
 	MMP_ZMATRIXCALC,
+    MMP_INTERACTIVE,
     
     Number_MMP_Ids
 };
@@ -135,6 +136,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
     EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
     EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
+    EVT_MENU (MMP_INTERACTIVE,      MolDisplayWin::menuEditInteractive_mode)
+
     EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
     EVT_MENU (MMP_ANIMATEMODE,      MolDisplayWin::menuViewAnimateMode)
     EVT_MENU (MMP_OFFSETMODE,       MolDisplayWin::menuViewOffsetAlongMode)
@@ -418,6 +421,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->AppendSeparator();
     menuEdit->Append(wxID_SELECTALL, wxT("&Select all\tCtrl+A"));
     menuEdit->AppendSeparator();
+    menuEdit->AppendCheckItem(MMP_INTERACTIVE, wxT("Interactive Mode"));
     menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
 
     menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"));
@@ -1515,6 +1519,13 @@ void MolDisplayWin::menuEditClear(wxCommandEvent &event) {
 
 void MolDisplayWin::menuEditSelect_all(wxCommandEvent &event) {
 }
+
+void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
+{
+  if (glCanvas)
+    glCanvas->toggleInteractiveMode();
+}
+
 void MolDisplayWin::menuViewShowNormalMode(wxCommandEvent &event) {
     MainData->SetDrawMode(1-MainData->GetDrawMode());
     ResetModel(false);
