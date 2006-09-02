@@ -17,6 +17,7 @@
 #include <wx/image.h>
 #include <wx/splash.h>
 #include <wx/config.h>
+#include <wx/stdpaths.h>
 
 //The global preferences settings
     WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
@@ -43,6 +44,14 @@ bool MpApp::OnInit() {
     const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
 	gPrefDlg = NULL;
 
+#ifdef __LINUX__
+	//It has become apparent that wx is not determining the install prefix
+	//correctly on linux. So set it here as a workaround
+        wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
+		// Ok I don't know how else to get the wxStandardPaths class?
+	wxStandardPaths * paths = (wxStandardPaths * ) &gStdPaths;
+	paths->SetInstallPrefix(wxString(INSTALL_PREFIX,wxConvUTF8));
+#endif
 #ifndef __WXMAC__
     m_InstanceChecker = new wxSingleInstanceChecker();
 	
