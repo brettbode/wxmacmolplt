@@ -111,7 +111,7 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_ShowAxis));
 			Ele->addAttribute(CML_convert(contentAttr), "true");
 		}
-		if (DrawAtomLabels()) {
+		if (Prefs->ShowAtomicSymbolLabels()) {
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_ShowAtomLabels));
 			Ele->addAttribute(CML_convert(contentAttr), "true");
@@ -121,7 +121,7 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_LabelHAtoms));
 			Ele->addAttribute(CML_convert(contentAttr), "true");
 		}
-		if (DrawAtomNumbers()) {
+		if (Prefs->ShowAtomNumberLabels()) {
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_ShowAtomNumbers));
 			Ele->addAttribute(CML_convert(contentAttr), "true");
@@ -807,7 +807,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 														{
 															bool val;
 															if (mdchild->getAttributeValue(CML_convert(contentAttr), val))
-																SetAtomLabelDrawMode(val);
+																Prefs->ShowAtomicSymbolLabels(val);
 														}
 															break;
 														case MMP_LabelHAtoms:
@@ -821,7 +821,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 														{
 															bool val;
 															if (mdchild->getAttributeValue(CML_convert(contentAttr), val))
-																SetAtomNumbersDrawMode(val);
+																Prefs->ShowAtomNumberLabels(val);
 														}
 															break;
 														case MMP_InternalCoordinates:

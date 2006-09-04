@@ -190,7 +190,7 @@ class WinPrefs {
 		unsigned char	AtomLabels[kMaxAtomTypes][3];
 		char *			RendererName;
 		Boolean			RotateMode, AnimateMode, AutoBondFlag, HHBondFlag, SetCreator;
-		bool			FitToPage, CenterOnPage, FrameOnPage;
+		bool			FitToPage, CenterOnPage, FrameOnPage, SymbolLabels, NumberLabels;
 		EnergyOptions	EnergyPlotOptions;
 		GraphOptions	PlotOptions;
 		SurfaceOptions	SurfaceOpts;
@@ -263,6 +263,10 @@ class WinPrefs {
 		inline void SetFitToPage(bool v) {FitToPage = v;};
 		inline bool GetFramePage(void) const {return FrameOnPage;};
 		inline void SetFramePage(bool v) {FrameOnPage = v;};
+		inline bool ShowAtomicSymbolLabels(void) const {return SymbolLabels;};
+		inline void ShowAtomicSymbolLabels(bool v) {SymbolLabels = v;};
+		inline bool ShowAtomNumberLabels(void) const {return NumberLabels;};
+		inline void ShowAtomNumberLabels(bool v) {NumberLabels = v;};
 		//Note the meaning of the Native EOL bit is reversed
 		inline bool NativeEOLChar(void) const {return ((BitOptions & (1<<11))?false:true); };
 		inline void NativeEOLChar(bool newVal) {BitOptions = (BitOptions & 0xFFFFF7FF) + (newVal?0:(1<<11));};

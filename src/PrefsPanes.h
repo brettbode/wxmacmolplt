@@ -117,16 +117,15 @@ class DisplayPrefsPane : public wxPanel, public PrefsPane
 		virtual void saveToTempPrefs();
 
 		void OnRadio( wxCommandEvent &event );
+		void OnLabelsRadio( wxCommandEvent &event );
 		void OnCheckBox( wxCommandEvent& WXUNUSED(event));
 
 	private:
 		wxBoxSizer* mMainSizer;
-		wxBoxSizer* mUpperSizer;
-		wxBoxSizer* mLowerSizer;
 
 		wxRadioBox* mRdoBox;
 		wxCheckBox* mChkColor;
-		wxCheckBox* mChkOutline;
+		wxRadioBox*	mAtomLabels;
 
 		DECLARE_EVENT_TABLE()
 };

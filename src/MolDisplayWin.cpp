@@ -64,8 +64,14 @@ enum MMP_EventID {
     MMP_PREVMODE,
     MMP_NEXTMODE,
     MMP_SHOWAXIS,
+	MMP_ATOMLABELSSUBMENU,
+	MMP_NO_ATOMLABEL,
     MMP_SHOWATOMLABELS,
     MMP_SHOWATOMNUMBER,
+	MMP_BOTHATOMLABELS,
+	MMP_DISPLAYMODESUBMENU,
+	MMP_WIREFRAMEMODE,
+	MMP_BALLANDSTICKMODE,
     MMP_CENTER,
     MMP_ROTATESUBMENU,
     MMP_ROTATETOXAXIS,
@@ -144,8 +150,12 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
     EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
     EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
+	EVT_MENU (MMP_NO_ATOMLABEL,		MolDisplayWin::menuViewHideAtomLabels)
     EVT_MENU (MMP_SHOWATOMLABELS,   MolDisplayWin::menuViewShowAtomLabel)
     EVT_MENU (MMP_SHOWATOMNUMBER,   MolDisplayWin::menuViewShowAtomNumber)
+	EVT_MENU (MMP_BOTHATOMLABELS,   MolDisplayWin::menuViewShowBothAtomLabels)
+	EVT_MENU (MMP_WIREFRAMEMODE,	MolDisplayWin::menuViewWireFrameStyle)
+	EVT_MENU (MMP_BALLANDSTICKMODE,	MolDisplayWin::menuViewBallAndStickStyle)
     EVT_MENU (MMP_ANIMATEFRAMES,    MolDisplayWin::menuViewAnimateFrames)
     EVT_MENU (MMP_SHRINK10,         MolDisplayWin::menuViewShrink_10)
     EVT_MENU (MMP_ENLARGE10,        MolDisplayWin::menuViewEnlarge_10)
@@ -430,8 +440,19 @@ void MolDisplayWin::createMenuBar(void) {
     menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
     menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
     menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show &Axis"));
-    menuView->AppendCheckItem(MMP_SHOWATOMLABELS, wxT("Show Atom Labels"));
-    menuView->AppendCheckItem(MMP_SHOWATOMNUMBER, wxT("Show Atom Numbers"));
+	
+	menuViewLabels = new wxMenu;
+    menuView->Append(MMP_ATOMLABELSSUBMENU, wxT("&Atom Labels"), menuViewLabels);
+    menuViewLabels->AppendRadioItem(MMP_NO_ATOMLABEL, wxT("None"));
+    menuViewLabels->AppendRadioItem(MMP_SHOWATOMLABELS, wxT("Atomic Symbol"));
+    menuViewLabels->AppendRadioItem(MMP_SHOWATOMNUMBER, wxT("Atom Number"));
+    menuViewLabels->AppendRadioItem(MMP_BOTHATOMLABELS, wxT("Symbols and Numbers"));
+	
+	menuViewStyle = new wxMenu;
+    menuView->Append(MMP_DISPLAYMODESUBMENU, wxT("&Display Style"), menuViewStyle);
+    menuViewStyle->AppendRadioItem(MMP_WIREFRAMEMODE, wxT("Wire Frame"));
+    menuViewStyle->AppendRadioItem(MMP_BALLANDSTICKMODE, wxT("Ball and Stick"));
+	
     menuView->Append(MMP_ANIMATEFRAMES, wxT("Animate &Frames\tCtrl+F"));
     menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl+-"));
     menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl+="));
@@ -505,6 +526,20 @@ void MolDisplayWin::ClearMenus(void) {
 void MolDisplayWin::AdjustMenus(void) {
     ClearMenus();
     menuFile->Enable(wxID_SAVE, Dirty);
+	if (Prefs->ShowAtomicSymbolLabels() && Prefs->ShowAtomNumberLabels())
+		menuViewLabels->Check(MMP_BOTHATOMLABELS, true);
+	else if (Prefs->ShowAtomicSymbolLabels())
+		menuViewLabels->Check(MMP_SHOWATOMLABELS, true);
+	else if (Prefs->ShowAtomNumberLabels())
+		menuViewLabels->Check(MMP_SHOWATOMNUMBER, true);
+	else
+		menuViewLabels->Check(MMP_NO_ATOMLABEL, true);
+
+	if (Prefs->DrawWireFrame())
+		menuViewStyle->Check(MMP_WIREFRAMEMODE, true);
+	else
+		menuViewStyle->Check(MMP_BALLANDSTICKMODE, true);
+	
     if (MainData->cFrame->NumAtoms == 0) {
     } else {
         menuFile->Enable(MMP_NEWFRAME, true);
@@ -1620,18 +1655,50 @@ void MolDisplayWin::menuViewShowAxis(wxCommandEvent &event) {
     Dirty = true;
 }
 
+void MolDisplayWin::menuViewHideAtomLabels(wxCommandEvent &event)
+{
+	Prefs->ShowAtomicSymbolLabels(false);
+	Prefs->ShowAtomNumberLabels(false);
+	UpdateModelDisplay();
+	Dirty = true;
+}
+
 void MolDisplayWin::menuViewShowAtomLabel(wxCommandEvent &event)
 {
-  MainData->SetAtomLabelDrawMode(1-MainData->DrawAtomLabels());
-  UpdateModelDisplay();
-  Dirty = true;
+	Prefs->ShowAtomicSymbolLabels(true);
+	Prefs->ShowAtomNumberLabels(false);
+	UpdateModelDisplay();
+	Dirty = true;
 }
 
 void MolDisplayWin::menuViewShowAtomNumber(wxCommandEvent &event)
 {
-  MainData->SetAtomNumbersDrawMode(1-MainData->DrawAtomNumbers());
-  UpdateModelDisplay();
-  Dirty = true;
+	Prefs->ShowAtomicSymbolLabels(false);
+	Prefs->ShowAtomNumberLabels(true);
+	UpdateModelDisplay();
+	Dirty = true;
+}
+void MolDisplayWin::menuViewShowBothAtomLabels(wxCommandEvent &event)
+{
+	Prefs->ShowAtomicSymbolLabels(true);
+	Prefs->ShowAtomNumberLabels(true);
+	UpdateModelDisplay();
+	Dirty = true;
+}
+
+void MolDisplayWin::menuViewWireFrameStyle(wxCommandEvent &event)
+{
+	Prefs->DrawBallnStick(false);
+	Prefs->DrawWireFrame(true);
+	UpdateModelDisplay();
+	Dirty = true;
+}
+void MolDisplayWin::menuViewBallAndStickStyle(wxCommandEvent &event)
+{
+	Prefs->DrawBallnStick(true);
+	Prefs->DrawWireFrame(false);
+	UpdateModelDisplay();
+	Dirty = true;
 }
 
 void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &event) {

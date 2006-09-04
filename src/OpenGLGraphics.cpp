@@ -777,7 +777,7 @@ void MolDisplayWin::DrawGL(void)
 	glLoadIdentity ();
 	glTranslatef(0.0, 0.0, -(MainData->WindowSize));
 
-	if (MainData->DrawAtomLabels() || MainData->DrawAtomNumbers() )
+	if (Prefs->ShowAtomicSymbolLabels() || Prefs->ShowAtomNumberLabels() )
 	  DrawLabel();
 
 	glMultMatrixf((const GLfloat *) &(MainData->TotalRotation));
@@ -907,10 +907,10 @@ void MolDisplayWin::DrawLabel()
 	  CurrentAtomType = lAtoms[iatom].GetType() - 1;
 
 	  //!!! retrieve atom label
-	  if ( MainData->DrawAtomLabels() )
+	  if ( Prefs->ShowAtomicSymbolLabels() )
 	    Prefs->GetAtomLabel(CurrentAtomType, atomLabel);
 
-	  if (MainData->DrawAtomNumbers() )
+	  if (Prefs->ShowAtomNumberLabels() )
 	    {
 	      wxString tmpStr;
 

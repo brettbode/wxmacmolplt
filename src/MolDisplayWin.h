@@ -42,7 +42,8 @@ class MolDisplayWin : public wxFrame {
         wxMenu    *menuFile;
         wxMenu    *menuEdit;
         wxMenu    *menuView;
-        wxMenu    *menuViewDisplay_frequency;
+        wxMenu    *menuViewLabels;
+        wxMenu    *menuViewStyle;
         wxMenu    *menuViewRotate;
         wxMenu    *menuMolecule;
         wxMenu    *menuWindow;
@@ -145,7 +146,7 @@ class MolDisplayWin : public wxFrame {
         void PasteText(void);
         void menuEditClear(wxCommandEvent &event);
         void menuEditSelect_all(wxCommandEvent &event);
-	void menuEditInteractive_mode(wxCommandEvent &event);
+		void menuEditInteractive_mode(wxCommandEvent &event);
 
         void menuViewShowNormalMode(wxCommandEvent &event);
         void menuViewPrevNormalMode(wxCommandEvent &event);
@@ -159,8 +160,12 @@ class MolDisplayWin : public wxFrame {
         //void menuViewShow_atom_labels(wxCommandEvent &event);
         //void menuViewShow_atom_numbers(wxCommandEvent &event);
         void menuViewShowAxis(wxCommandEvent &event);
-	void menuViewShowAtomLabel(wxCommandEvent &event);
-	void menuViewShowAtomNumber(wxCommandEvent &event);
+		void menuViewHideAtomLabels(wxCommandEvent &event);
+		void menuViewShowAtomLabel(wxCommandEvent &event);
+		void menuViewShowAtomNumber(wxCommandEvent &event);
+		void menuViewShowBothAtomLabels(wxCommandEvent &event);
+		void menuViewWireFrameStyle(wxCommandEvent &event);
+		void menuViewBallAndStickStyle(wxCommandEvent &event);
         void menuViewShrink_10(wxCommandEvent &event);
         void menuViewEnlarge_10(wxCommandEvent &event);
         void menuViewCenter(wxCommandEvent &event);

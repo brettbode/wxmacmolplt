@@ -104,12 +104,8 @@ class MoleculeData {
 		void DeleteFrame(void);
 		bool SetupFrameMemory(long NumAtoms, long NumBonds);
 		Frame * LocateNewFrame(float XPosition);
-		inline bool DrawAtomLabels(void) const {return (DrawLabels & 1);};
 		inline bool DrawHLabels(void) const {return ((DrawLabels & 4) == 0);};
 		inline void SetHLabelMode(bool State) {DrawLabels = (DrawLabels & 0xFB) + (State ? 0: 4);};
-		inline void SetAtomLabelDrawMode(bool State) {if (DrawLabels&1) DrawLabels--; if (State) DrawLabels++;};
-		inline bool DrawAtomNumbers(void) const {return ((DrawLabels & 2)!=0);};
-		inline void SetAtomNumbersDrawMode(bool State) {if (DrawLabels&2) DrawLabels-=2; if (State) DrawLabels+=2;};
 		bool ModeVisible(void) const;
 		void SetDescription(char * NewLabel);
 		inline bool SetSpecialAtomDrawMode(bool State) {if (DrawMode&2) DrawMode-=2; if (State) DrawMode+=2; return State;};

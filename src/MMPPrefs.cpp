@@ -257,6 +257,7 @@ WinPrefs::WinPrefs(void) {
 	BitOptions = 0;
 	BackColor.red = BackColor.green = BackColor.blue = 65532;
 	FitToPage = FrameOnPage = false;
+	SymbolLabels = NumberLabels = false;
 	CenterOnPage = true;
 }
 
@@ -599,6 +600,10 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					Default3DOn(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_Use3DHardwareAccel), boolVal))
 					UseQD3DHardware(boolVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowSymbolLabels), boolVal))
+					ShowAtomicSymbolLabels(boolVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowAtomNumbers), boolVal))
+					ShowAtomNumberLabels(boolVal);
 				XMLElementList * molChildren = child->getChildren();
 				for (int im=0; im<molChildren->length(); im++) {
 					XMLElement * molchild = molChildren->item(im);
@@ -979,6 +984,8 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_UseCylinders), (CylindersForLines()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_Use3DByDefault), (Default3DOn()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_Use3DHardwareAccel), (UseQD3DHardware()?trueXML:falseXML));
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowSymbolLabels), (ShowAtomicSymbolLabels()?trueXML:falseXML));
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowAtomNumbers), (ShowAtomNumberLabels()?trueXML:falseXML));
 	
 	XMLElement * color = molElement->addChildElement(MMPPref_convert(MMPMolDisplay_BackColor));
 	outbuf.str("");
@@ -1385,6 +1392,10 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "Use3DByDefault";
         case MMPMolDisplay_Use3DHardwareAccel:
             return "Use3DHardware";
+        case MMPMolDisplay_ShowSymbolLabels:
+            return "ShowAtomicSymbols";
+        case MMPMolDisplay_ShowAtomNumbers:
+            return "ShowAtomNumbers";
 		default:
             return "invalid";
     }

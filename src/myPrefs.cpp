@@ -38,7 +38,7 @@
 #define ID_BOND_MODE_CHOICE 5003
 #define ID_DISPLAY_MODE_RADIOBOX 5004
 #define ID_COLOR_BONDS_BY_ATOM_COLOR 5005
-#define ID_OUTLINE_BONDS 5006
+#define ID_ATOM_LABELS_RADIO 5006
 #define ID_PLOT_BALL_SIZE_SLIDER 5007
 #define ID_AUTO_BOND_PASTE_OPEN 5008
 #define ID_GUESS_BOND_ORDER 5009
@@ -94,7 +94,7 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE(DisplayPrefsPane, wxPanel)
   EVT_RADIOBOX (ID_DISPLAY_MODE_RADIOBOX, DisplayPrefsPane::OnRadio)
   EVT_CHECKBOX (ID_COLOR_BONDS_BY_ATOM_COLOR, DisplayPrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_OUTLINE_BONDS, DisplayPrefsPane::OnCheckBox)
+  EVT_RADIOBOX (ID_ATOM_LABELS_RADIO, DisplayPrefsPane::OnLabelsRadio)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(EnergyPrefsPane, wxPanel)
@@ -379,37 +379,43 @@ DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *
   Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER);
 
   mMainSizer = new wxBoxSizer(wxVERTICAL);
-  mUpperSizer = new wxBoxSizer(wxHORIZONTAL);
-  mLowerSizer = new wxBoxSizer(wxVERTICAL);
 
   wxString choices[] = {_T("Ball and Stick"), _T("WireFrame (Bonds only)")};
   
   mRdoBox = new wxRadioBox( this, ID_DISPLAY_MODE_RADIOBOX, _T("Display Mode"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 1, wxRA_SPECIFY_COLS );
   mChkColor = new wxCheckBox(this, ID_COLOR_BONDS_BY_ATOM_COLOR, _T("Color bonds by atom color"), wxDefaultPosition);
-  mChkOutline = new wxCheckBox(this, ID_OUTLINE_BONDS, _T("Outline Bonds"), wxDefaultPosition);
 
+  wxString atomLabels[] = {_T("None"), _T("Atomic Symbols"), _T("Atom Numbers"), _T("Both Symbols and Numbers")};
+  
+  mAtomLabels = new wxRadioBox( this, ID_ATOM_LABELS_RADIO, _T("Atom Labels"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(atomLabels), atomLabels, 1, wxRA_SPECIFY_COLS );
+  
   SetSizer(mMainSizer);
 }
 
 #include <iostream>
-void DisplayPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) 
-{
-  if ( mTargetPrefs->DrawBallnStick() && !mTargetPrefs->DrawWireFrame())
-    mRdoBox->SetSelection(0);
-  else if ( !mTargetPrefs->DrawBallnStick() && mTargetPrefs->DrawWireFrame())
-    mRdoBox->SetSelection(1);
-  else
-    cout<<"Something wrong! Check preference setting!"<<endl;
+void DisplayPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+	if ( mTargetPrefs->DrawBallnStick() && !mTargetPrefs->DrawWireFrame())
+		mRdoBox->SetSelection(0);
+	else if ( !mTargetPrefs->DrawBallnStick() && mTargetPrefs->DrawWireFrame())
+		mRdoBox->SetSelection(1);
+	else
+		cout<<"Something wrong! Check preference setting!"<<endl;
 
-  mUpperSizer->Add(mRdoBox, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	mMainSizer->Add(mRdoBox, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-  mChkColor->SetValue(mTargetPrefs->ColorBondHalves());
-  mChkOutline->SetValue(mTargetPrefs->OutLineBonds());
-  mLowerSizer->Add(mChkColor, 1, wxALIGN_LEFT | wxALL, 3);
-  mLowerSizer->Add(mChkOutline, 1, wxALIGN_LEFT | wxALL, 3);
+	mChkColor->SetValue(mTargetPrefs->ColorBondHalves());
 
-  mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER | wxALL, 3);
-  mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER | wxALL, 3);
+	if (mTargetPrefs->ShowAtomicSymbolLabels() && mTargetPrefs->ShowAtomNumberLabels())
+		mAtomLabels->SetSelection(3);
+	else if (mTargetPrefs->ShowAtomNumberLabels())
+		mAtomLabels->SetSelection(2);
+	else if (mTargetPrefs->ShowAtomicSymbolLabels())
+		mAtomLabels->SetSelection(1);
+	else
+		mAtomLabels->SetSelection(0);
+  
+	mMainSizer->Add(mChkColor, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	mMainSizer->Add(mAtomLabels, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 }
 
 void DisplayPrefsPane::saveToTempPrefs()
@@ -433,12 +439,31 @@ void DisplayPrefsPane::OnRadio( wxCommandEvent &event )
     }
 }
 
+void DisplayPrefsPane::OnLabelsRadio( wxCommandEvent &event ) {
+	switch (event.GetSelection()) {
+		case 0:
+			mTargetPrefs->ShowAtomicSymbolLabels(false);
+			mTargetPrefs->ShowAtomNumberLabels(false);
+			break;
+		case 1:
+			mTargetPrefs->ShowAtomicSymbolLabels(true);
+			mTargetPrefs->ShowAtomNumberLabels(false);
+			break;
+		case 2:
+			mTargetPrefs->ShowAtomicSymbolLabels(false);
+			mTargetPrefs->ShowAtomNumberLabels(true);
+			break;
+		case 3:
+			mTargetPrefs->ShowAtomicSymbolLabels(true);
+			mTargetPrefs->ShowAtomNumberLabels(true);
+			break;
+	}
+}
+
 void DisplayPrefsPane::OnCheckBox( wxCommandEvent &event)
 {
   if (event.GetId() == ID_COLOR_BONDS_BY_ATOM_COLOR)
     mTargetPrefs->ColorBondHalves(mChkColor->GetValue());
-  else if (event.GetId() == ID_OUTLINE_BONDS)
-    mTargetPrefs->OutLineBonds(mChkOutline->GetValue());
 }
 
 
