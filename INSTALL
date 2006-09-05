@@ -4,7 +4,10 @@ Linux this file focuses on the build instructions for Linux. To build from
 source on any OS you must have a C++ compiler such as g++ and an install
 of wxWidgets with OpenGL support enabled. wxWidgets 2.6 and later should work.
 Prebuilt packages should also work. We have tested against the version 2.6.3
-prebuilt package within Debain and foudn it to work.
+prebuilt package within Debian and found it to work. If you are building on
+Fedora Core 5 first install the wxGTK-2.6.3, wxGTK-gl-2.6.3 and
+wxGTK-devel-2.6.3 rpms. With those three rpms installed you should have no
+trouble building or running wxMacMolPlt.
 
 If your distribution does not offer a prebuilt wxWidgets package you will need
 to grab the latest source copy from www.wxwidgets.org and install it. You 
