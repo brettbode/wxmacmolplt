@@ -658,7 +658,7 @@ void MpGLCanvas::SelectObj(int select_id, bool mode)
 	if (lAtoms[atom1].GetSelectState() && lAtoms[atom2].GetSelectState())
 	  lBonds[i].SetSelectState(newstate);
       }
-    } else {
+    } else if (select_id < (NumAtoms + lFrame->NumBonds)) {
       select_id -= NumAtoms;
       bool newstate = true;
       if (!mode && lBonds[select_id].GetSelectState()) newstate = false;
