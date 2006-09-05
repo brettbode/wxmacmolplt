@@ -22,6 +22,9 @@
 //This needs to get put into the build system...
 #define __wxBuild__
 #define wxMacMolPlt_VERSION "6.2"
+
+//activate the following line to use the interactive editor
+//#define ENABLE_INTERACTIVE_MODE
 /*
 #define MacintoshBuild		//define to build for Mac PPC or 68K
 #if __GNUC__
