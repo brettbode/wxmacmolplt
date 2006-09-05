@@ -1003,6 +1003,94 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 }
 void Frame::ReadMolDenOrbitals(BufferFile * Buffer, long NumFuncs) {
 	//We don't have a lot of information about the orbitals so assume the largest case
+	
+	OrbitalRec * OrbSet = NULL;
+	try {
+		//There doesn't seem to be a good way to predetermine the number of orbitals so dimension a 
+		//worse case
+		OrbSet = new OrbitalRec(NumFuncs, NumFuncs, NumFuncs);
+		char	Line[kMaxLineLength+1];
+		bool	done=false;
+		long alphaCount=0, betaCount=0;
+		
+		while (!done && (Buffer->GetFilePos()<Buffer->GetFileSize())) {
+			float * vector = NULL, energy=0.0, occ=-1;
+			bool header=true, good=true, alphaSpin=true;
+			char symLabel[5]="";
+			while (header) {
+				Buffer->GetLine(Line);
+				if (FindKeyWord(Line,"[",1)>=0) {
+					good = false;
+					done = true;
+					break;
+				}
+				int p;
+				if ((p=FindKeyWord(Line, "ENE=", 4))>=0) {
+					sscanf(&(Line[p+4]),"%f", &energy);
+				} else if (FindKeyWord(Line, "SPIN=", 5)>=0) {
+					if (FindKeyWord(Line, "BETA", 4)>=0) alphaSpin = false;
+				} else if ((p=FindKeyWord(Line, "OCCUP=", 6))>=0) {
+					sscanf(&(Line[p+6]),"%f", &occ);
+				} else if ((p=FindKeyWord(Line, "SYM=", 4))>=0) {
+					sscanf(&(Line[p+4]),"%4s", symLabel);
+				} else {
+					int test;
+					float junk;
+					if (sscanf(Line, "%d %f", &test, &junk) == 2 ) {//start of the vector
+						Buffer->BackupnLines(1);
+						header = false;
+						break;
+					}
+				}
+			}
+			if (!good) break;
+			if (alphaSpin) {
+				vector = &(OrbSet->Vectors[alphaCount*NumFuncs]);
+				OrbSet->Energy[alphaCount] = energy;
+				if (occ > -1.0) {
+					if (!(OrbSet->OrbOccupation)) {
+						OrbSet->OrbOccupation = new float[NumFuncs];
+					}
+					OrbSet->OrbOccupation[alphaCount] = occ;
+				}
+				strncpy(&(OrbSet->SymType[alphaCount*5]), symLabel, 4);
+			} else {
+				vector = &(OrbSet->VectorsB[betaCount*NumFuncs]);
+				OrbSet->EnergyB[betaCount] = energy;
+				if (occ > -1.0) {
+					if (!(OrbSet->OrbOccupationB)) {
+						OrbSet->OrbOccupationB = new float[NumFuncs];
+					}
+					OrbSet->OrbOccupationB[betaCount] = occ;
+				}
+				strncpy(&(OrbSet->SymTypeB[betaCount*5]), symLabel, 4);
+			}
+			
+			for (int i=0; i<NumFuncs; i++) {	//loop over the vector itself
+				Buffer->GetLine(Line);
+				int iline;
+				float vec;
+				if (sscanf(Line, "%d %f", &iline, &vec) == 2) {
+					if (iline != (i+1)) throw DataError();
+					vector[i] = vec;
+				} else throw DataError();
+			}
+			if (alphaSpin) alphaCount++;
+			else betaCount++;
+		}
+		
+		OrbSet->NumAlphaOrbs = alphaCount;
+		if (OrbSet->OrbOccupation) OrbSet->NumOccupiedAlphaOrbs = alphaCount;
+		OrbSet->NumBetaOrbs = betaCount;
+		if (OrbSet->OrbOccupationB) OrbSet->NumOccupiedBetaOrbs = betaCount;
+	}
+	catch (...) {
+		if (OrbSet) {
+			delete OrbSet;
+			OrbSet=NULL;
+		}
+	}
+	if (OrbSet) Orbs.push_back(OrbSet);
 }
 //Handle CI vectors
 void Frame::ParseGAMESSCIVectors(BufferFile * Buffer, long NumFuncs, Progress * lProgress) {

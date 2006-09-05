@@ -1096,6 +1096,8 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 		}
 		if (MainData->Basis) {	//look for orbitals if we have a basis set
 			if (Buffer->LocateKeyWord("[MO]", 4, -1)) {
+				Buffer->SkipnLines(1);
+				lFrame->ReadMolDenOrbitals(Buffer, MainData->Basis->GetNumBasisFuncs(false));
 			}
 		}
 	} 
