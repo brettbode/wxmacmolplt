@@ -50,7 +50,10 @@ bool MpApp::OnInit() {
         wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
 		// Ok I don't know how else to get the wxStandardPaths class?
 	wxStandardPaths * paths = (wxStandardPaths * ) &gStdPaths;
-	paths->SetInstallPrefix(wxString(INSTALL_PREFIX,wxConvUTF8));
+	if (strcmp(INSTALL_PREFIX, "NONE"))
+		paths->SetInstallPrefix(wxString(INSTALL_PREFIX,wxConvUTF8));
+	else
+		paths->SetInstallPrefix(wxString("/usr/local/",wxConvUTF8));
 #endif
 #ifndef __WXMAC__
     m_InstanceChecker = new wxSingleInstanceChecker();
