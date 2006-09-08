@@ -495,10 +495,9 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			      lAtoms[selected].Position.y,
 			      lAtoms[selected].Position.z,
 			      tmpWinX, tmpWinY, atomDepth);
-
+ 
 		winDiffX = tmpPnt.x - (int)tmpWinX;
-		winDiffY = tmpPnt.y - (int)tmpWinY; //because the window y-axis
-		                                    //points downward
+		winDiffY = tmpPnt.y - (int)tmpWinY;
 	      }
 	  }
 
@@ -523,9 +522,36 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	  deSelectAll = false;
 
     // allow a little bit dragging to be interpreted as selection
-	if ( event.LeftUp() && (mSelectState >= 0 && mSelectState < 3)) {
-	  SelectObj(selected, deSelectAll);
-	  mSelectState = -1;
+	if ( event.LeftUp())
+	  {
+	    if (interactiveMode)
+	      {
+		if (selected < 0)
+		  {
+		    AtomTypeDialog* newAtomTypeDlg = new AtomTypeDialog(this);
+		    if (newAtomTypeDlg->ShowModal() == wxID_OK)
+		      {
+			GLdouble newX, newY, newZ;
+
+			findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
+			//estimate an atomDepth value, X and Y values are of no use 
+			CPoint3D newPnt;
+			findReal3DCoord(tmpPnt.x, tmpPnt.y, newX, newY, newZ);
+			newPnt.x = newX;
+			newPnt.y = newY;
+			newPnt.z = newZ;
+
+			lFrame->AddAtom(newAtomTypeDlg->getID(), newPnt);
+			MolWin->UpdateGLModel();
+		      }
+		    delete newAtomTypeDlg;
+		  }
+	      }
+	    else if (mSelectState >= 0 && mSelectState < 3)
+	      {
+		SelectObj(selected, deSelectAll);
+		mSelectState = -1;
+	      }
 	}
     // Pass mouse event to MolDisplayWin::Rotate for processing
     if (interactiveMode)
@@ -690,6 +716,55 @@ void MpGLCanvas::SelectObj(int select_id, bool mode)
   MolWin->SelectionChanged(mode);
 }
 
+MpGLCanvas::AtomTypeDialog::AtomTypeDialog(MpGLCanvas * parent, wxWindowID id, const wxString& caption) : typeID(1)
+{
+  Create(parent, id, caption);
+}
+
+void MpGLCanvas::AtomTypeDialog::Create(MpGLCanvas * parent, wxWindowID id, const wxString& caption)
+{
+  wxDialog::Create( parent, id, caption, wxDefaultPosition, wxSize(250, 125), wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX);
+
+  std::vector<wxString> atomTypes;
+
+  for ( int i = 0; i < kMaxAtomTypes; i++)
+    {
+      wxString tmp;
+
+      parent->Prefs->GetAtomLabel(i, tmp);
+
+      if (tmp.Length() > 0)
+	atomTypes.push_back(tmp);
+    }
+
+  mainSizer = new wxBoxSizer(wxVERTICAL);
+  upperSizer = new wxBoxSizer(wxVERTICAL);
+  lowerSizer = new wxBoxSizer(wxHORIZONTAL);
+
+  mTypeChoice = new wxChoice(this, ID_NEW_ATOM_TYPE_CHOICE, wxPoint(30,30), wxSize(200,wxDefaultCoord), atomTypes.size(), &atomTypes.front());
+  mTypeChoice->SetSelection(0);
+
+  mButtOK = new wxButton(this, wxID_OK, wxT("OK") );
+  mButtCancel = new wxButton(this, wxID_CANCEL, wxT("Cancel"));
+
+  upperSizer->Add(mTypeChoice, 0, wxALIGN_CENTRE | wxALL, 20);
+  upperSizer->Add(8,8);
+  lowerSizer->Add(10,10);
+  lowerSizer->Add(mButtOK, 0, wxALIGN_CENTRE | wxALL, 10);
+  lowerSizer->Add(mButtCancel, 0, wxALIGN_CENTRE | wxALL, 10);
+
+  mainSizer->Add(upperSizer);
+  mainSizer->Add(lowerSizer);
+
+  mainSizer->Layout();
+  Centre(wxBOTH);
+}
+
+void MpGLCanvas::AtomTypeDialog::OnChoice( wxCommandEvent &event )
+{
+  typeID = event.GetInt() + 1;
+}
+
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
     EVT_SIZE             (MpGLCanvas::eventSize)
     EVT_PAINT            (MpGLCanvas::eventPaint)
@@ -699,3 +774,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
     EVT_CHAR (MpGLCanvas::KeyHandler)
 END_EVENT_TABLE()
 
+
+BEGIN_EVENT_TABLE(MpGLCanvas::AtomTypeDialog, wxDialog)
+  EVT_CHOICE ( ID_NEW_ATOM_TYPE_CHOICE, AtomTypeDialog::OnChoice )
+END_EVENT_TABLE()

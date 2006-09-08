@@ -19,6 +19,10 @@
 #include "MoleculeData.h"
 #include "Frame.h"
 
+#define NEW_ATOM_TYPE_DIALOG 30001
+#define NEW_ATOM_TYPE_TITLE _("Select an Atom type")
+#define ID_NEW_ATOM_TYPE_CHOICE 30010
+
 typedef class MolDisplayWin MolDisplayWin;
 /**
  * Defines a widget for displaying an OpenGL canvas.  At this time it is a
@@ -26,6 +30,29 @@ typedef class MolDisplayWin MolDisplayWin;
  */
 class MpGLCanvas : public wxGLCanvas {
     private:
+
+  class AtomTypeDialog : public wxDialog
+    {
+    public:
+      AtomTypeDialog() {}
+      AtomTypeDialog( MpGLCanvas * parent, wxWindowID id = NEW_ATOM_TYPE_DIALOG, const wxString& caption = NEW_ATOM_TYPE_TITLE);
+      ~AtomTypeDialog() {}
+
+      void OnChoice( wxCommandEvent &event );
+      int getID() { return typeID; }
+
+    private:
+      void Create(MpGLCanvas * parent, wxWindowID id, const wxString& caption);
+
+      wxBoxSizer *mainSizer, *upperSizer, *lowerSizer;
+      wxButton *mButtOK, *mButtCancel;
+      wxChoice* mTypeChoice;
+
+      int typeID;
+
+      DECLARE_EVENT_TABLE()
+    };
+        
         MolDisplayWin * MolWin;
         WinPrefs * Prefs;
         bool        initialized;
@@ -169,6 +196,7 @@ class MpGLCanvas : public wxGLCanvas {
 	void toggleInteractiveMode() { interactiveMode = 1 - interactiveMode; } 
 	void findReal3DCoord(int x, int y, GLdouble& realX, GLdouble& realY, GLdouble& realZ);
 	void findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, GLdouble& winY, GLdouble& winZ);
+	
 };
 
 #endif

@@ -431,9 +431,9 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->AppendSeparator();
     menuEdit->Append(wxID_SELECTALL, wxT("&Select all\tCtrl+A"));
     menuEdit->AppendSeparator();
-#ifdef ENABLE_INTERACTIVE_MODE
+    //#ifdef ENABLE_INTERACTIVE_MODE
     menuEdit->AppendCheckItem(MMP_INTERACTIVE, wxT("Interactive Mode"));
-#endif
+    //#endif
     menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
 
     menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"));
