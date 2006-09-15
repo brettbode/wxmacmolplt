@@ -425,13 +425,24 @@ void CoordinatesWindow::UpdateSelection(bool mode)
   long natoms = lFrame->GetNumAtoms();
 
   needClearAll = mode;
+  std::vector<int> selected_ids;
+
+  for (long i=0; i<natoms; i++) 
+    if (lFrame->GetAtomSelectState(i))
+	  selected_ids.push_back(i);
+//remember the selected atom before clearing selections
+
+  FrameChanged();
 
   if (mode)
     coordGrid->ClearSelection();
 
-  for (long i=0; i<natoms; i++) 
-    if (lFrame->GetAtomSelectState(i))
-      coordGrid->SelectRow(i, true);
+  if (natoms > coordGrid->GetNumberRows())
+    coordGrid->MakeCellVisible(natoms-1, 0);
+
+  for ( int i = 0; i < selected_ids.size(); ++i)
+    coordGrid->SelectRow(selected_ids[i], true);
+
 }
 
 /*!
@@ -740,7 +751,9 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 
 void CoordinatesWindow::OnSelectCell( wxGridEvent& event )
 {
-  needClearAll = true;
+  //needClearAll = true;
+  if (!needClearAll)
+    return;
 
   int row = event.GetRow();
 	MoleculeData * MainData = Parent->GetData();

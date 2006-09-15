@@ -513,6 +513,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		lAtoms[selected].Position.y = newY;
 		lAtoms[selected].Position.z = newZ;
 
+		SelectObj(selected, deSelectAll);
+		MolWin->SelectionChanged(deSelectAll);
 		MolWin->UpdateGLModel();
 	      }
 	  }
@@ -529,7 +531,9 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		if (selected < 0)
 		  {
 		    AtomTypeDialog* newAtomTypeDlg = new AtomTypeDialog(this);
-		    if (newAtomTypeDlg->ShowModal() == wxID_OK)
+		    long tmpStatus = newAtomTypeDlg->ShowModal();
+
+		    if (tmpStatus == wxID_OK)
 		      {
 			GLdouble newX, newY, newZ;
 
@@ -542,16 +546,19 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			newPnt.z = newZ;
 
 			lFrame->AddAtom(newAtomTypeDlg->getID(), newPnt);
-			MolWin->UpdateGLModel();
 		      }
+
 		    delete newAtomTypeDlg;
 		  }
 	      }
 	    else if (mSelectState >= 0 && mSelectState < 3)
 	      {
-		SelectObj(selected, deSelectAll);
 		mSelectState = -1;
 	      }
+
+	    SelectObj(selected, deSelectAll);
+	    MolWin->SelectionChanged(deSelectAll);
+	    MolWin->UpdateGLModel();
 	}
     // Pass mouse event to MolDisplayWin::Rotate for processing
     if (interactiveMode)
@@ -712,8 +719,6 @@ void MpGLCanvas::SelectObj(int select_id, bool mode)
 
   glMatrixMode(GL_MODELVIEW);
 
-  MolWin->UpdateGLModel();
-  MolWin->SelectionChanged(mode);
 }
 
 MpGLCanvas::AtomTypeDialog::AtomTypeDialog(MpGLCanvas * parent, wxWindowID id, const wxString& caption) : typeID(1)
