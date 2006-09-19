@@ -19,6 +19,7 @@
 
 ////@begin includes
 #include "wx/wx.h"
+#include <wx/bookctrl.h>
 #include <wx/fontdlg.h>
 #include "MolDisplayWin.h"
 ////@end includes
