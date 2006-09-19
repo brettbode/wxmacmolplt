@@ -13,6 +13,7 @@
 #include "Globals.h"
 #include "GlobalExceptions.h"
 #include "BFiles.h"
+#include "MyTypes.h"
 #include "BasisSet.h"
 #include <math.h>
 #include <string.h>
@@ -550,7 +551,7 @@ void BasisShell::GetLabel(char * label, short FuncNum, bool UseSphericalHarmonic
 	}
 }
 //Read in a general basis set from a GAMESS log file
-BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms) {
+BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms, const mpAtom * Atoms) {
 	long NumShells=0, NextAtom=0, ShellStart=0,
 		fShellStart=0, BasisEndPos, nTotFuncs=0, LinePos, EndPos, iatom, items;
 	char	LineText[kMaxLineLength+1];
@@ -719,6 +720,8 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms) {
 			long nGotShells = ishell-ShellStart+1;
 			long nMappedAtoms = (fShell-fShellStart-nGotShells)/nGotShells + 1;
 			Basis->NumFuncs += nMappedAtoms*nTotFuncs;
+			//skip over any MM atoms since they aren't included in the basis
+			while (Atoms[NextAtom].IsSIMOMMAtom() && (NextAtom < NumAtoms)) NextAtom++;
 			nTotFuncs = 0;	//reset the function counter for the next atom
 			for (iatom=0; iatom<nMappedAtoms; iatom++) {
 				Basis->BasisMap[2*NextAtom] = ShellStart;

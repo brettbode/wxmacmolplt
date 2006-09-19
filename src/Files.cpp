@@ -1215,6 +1215,45 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 	}
 	if (Prefs->GetAutoBond())
 		lFrame->SetBonds(Prefs, false);
+	//attempt to read in the atomic basis set
+	if (Buffer->LocateKeyWord("ATOMIC BASIS SET", 16)) {
+		ProgressInd->ChangeText("Reading atomic basis set");
+		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+		{ throw UserCancel();}
+		try {
+			MainData->ParseGAMESSBasisSet(Buffer);
+			BasisSet * Basis = MainData->Basis;
+			if (Basis) {	//generate the nuclear charge array
+				if (Basis->NuclearCharge[0] == -1) {
+					if (MainData->cFrame->NumAtoms == Basis->MapLength) {
+						//for the purpose of the basis set, set the charge of mm atoms to 0
+						for (long iatom=0; iatom<MainData->cFrame->NumAtoms; iatom++) {
+							if (! MainData->cFrame->Atoms[iatom].IsSIMOMMAtom() )
+								Basis->NuclearCharge[iatom] = MainData->cFrame->Atoms[iatom].GetNuclearCharge();
+							else
+								Basis->NuclearCharge[iatom] = 0;
+						}
+					}
+				}
+			}
+		}
+		catch (MemoryError) {
+			if (MainData->Basis) delete MainData->Basis;
+			MainData->Basis = NULL;
+			MessageAlert("Insufficient Memory to read the Basis Set.");
+		}
+		catch (std::bad_alloc) {
+			if (MainData->Basis) delete MainData->Basis;
+			MainData->Basis = NULL;
+			MessageAlert("Insufficient Memory to read the Basis Set.");
+		}
+		catch (DataError) {
+			MessageAlert("An error occured while reading the basis set, basis set skipped.");
+			if (MainData->Basis) delete MainData->Basis;
+			MainData->Basis = NULL;
+		}
+	}
+
 	if (Buffer->LocateKeyWord("QM+MM Energy (Hartree):", 23)) {
 		Buffer->GetLine(LineText);
 			double FrameEnergy;

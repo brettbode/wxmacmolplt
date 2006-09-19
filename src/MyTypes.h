@@ -60,6 +60,21 @@ enum TypeOfPointGroup {
 	NumberPointGroups
 };
 
+enum TypeofEnergy {
+	PlainEnergy=0,	//general untyped energy
+	HFEnergy,		//RHF, ROHF, UHF
+	DFTEnergy,
+	PT2Energy,		//2nd order perturbation theory energy
+	PT4Energy,		//4th order perturbation theory energy
+	MCSCFEnergy,
+	MRMP2Energy,
+	CCSDEnergy,
+	CCSDPTPEnergy,	//CCSD(T)
+	CIEnergy,
+	
+	NumberEnergyTypes
+};
+
 class mpAtom {
 	public:
 		CPoint3D	Position;
@@ -79,7 +94,7 @@ class mpAtom {
 		inline void IsEffectiveFragment(bool state) {Type = (Type & 0xFEFF) + (state ? (1<<8) : 0);};
 		inline bool HasBiolabel(void) const {return ((Type & (1<<9)) != 0);};
 		inline void IsSIMOMMAtom(bool state) {Type = (Type & 0xFBFF) + (state ? (1<<10) : 0);};
-		inline bool IsSIMOMMAtom(void) {return ((Type & (1<<10)) != 0);};
+		inline bool IsSIMOMMAtom(void) const {return ((Type & (1<<10)) != 0);};
 		inline void SetFragmentNumber(long fragNum) {IsEffectiveFragment(true); *((long *) &Label[12]) = fragNum;};
 		inline long GetFragmentNumber(void) const {return *((long *) &Label[12]);};
 		inline long GetNuclearCharge(void) const {return (GetType());};	//NOT correct for ECP's!!!!!

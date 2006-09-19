@@ -644,7 +644,7 @@ bool MoleculeData::TotalDensityPossible(void) {
 //Read in a general basis set from a GAMESS log file
 void MoleculeData::ParseGAMESSBasisSet(BufferFile * Buffer) {
 
-	Basis = BasisSet::ParseGAMESSBasisSet(Buffer, cFrame->NumAtoms);
+	Basis = BasisSet::ParseGAMESSBasisSet(Buffer, cFrame->NumAtoms, cFrame->Atoms);
 	if (Basis) {	//Setup the default nuclear charge array. This will be changed if
 					//ECP's are used.
 			long iatom;

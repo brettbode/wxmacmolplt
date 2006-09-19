@@ -71,7 +71,7 @@ class BasisSet {
 		inline std::vector<long> GetNuclearChargeArray(void) const {return NuclearCharge;};
 		void GetShellIndexArray(long * IndexArray) const;
 		void Normalize(bool InputNormed, bool NormOutput);
-		static BasisSet * ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms);
+		static BasisSet * ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms, const mpAtom * Atoms);
 		bool ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms);
 };
 
