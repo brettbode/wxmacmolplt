@@ -347,6 +347,9 @@ void WinPrefs::ReadDefaultPrefs(void) {
 		}
 		
 		XMLShutdown();
+	} else {
+		std::cerr << "Unable to open default preferences file. MacMolPlt probably isn't installed properly!\n"
+		"Attempted to open file : " << pathname.mb_str(wxConvUTF8) << std::endl;
 	}
 #elif defined(CarbonBuild)
 	CFBundleRef myBundle = CFBundleGetMainBundle();
