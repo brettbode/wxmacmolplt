@@ -802,6 +802,8 @@ void Surf3DBase::SetupGridParameters(Frame * lFrame) {
 		XGridMin = YGridMin = ZGridMin = 1.0e10;
 		XGridMax = YGridMax = ZGridMax = -XGridMin;
 		for (int iatom=0; iatom<lFrame->NumAtoms; iatom++) {
+			if (lFrame->Atoms[iatom].IsSIMOMMAtom() || lFrame->Atoms[iatom].IsEffectiveFragment())
+				continue;	//Don't include MM type atoms in the surface volume since they lack basis functions
 			XGridMin = MIN(XGridMin, lFrame->Atoms[iatom].Position.x*kAng2BohrConversion);
 			XGridMax = MAX(XGridMax, lFrame->Atoms[iatom].Position.x*kAng2BohrConversion);
 			YGridMin = MIN(YGridMin, lFrame->Atoms[iatom].Position.y*kAng2BohrConversion);

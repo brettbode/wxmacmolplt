@@ -68,6 +68,7 @@ class MoleculeData {
 		void ReadRunTitle(BufferFile *Buffer, long length);
 		void ReadBasisOptions(BufferFile * Buffer);
 		void ReadControlOptions(BufferFile * Buffer);
+		long ParseTinkerCoordinates(BufferFile * Buffer);
 		long WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData, bool allFrames, bool AllData);
 		long OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData, Progress * p, bool readPrefs);
 		inline float GetMoleculeSize(void) {return WindowSize;};

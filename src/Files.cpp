@@ -1158,6 +1158,40 @@ long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
 	}
 	return ElectronsRemoved;
 }
+long MoleculeData::ParseTinkerCoordinates(BufferFile *Buffer) {
+	char		LineText[kMaxLineLength];
+	
+	Frame * lFrame = cFrame;
+	if (!Buffer->LocateKeyWord("Cartesian Coordinates of Atoms in Bulk Model", 44)) {
+		return 0;
+	}	
+	//Grab the tinker coordinate output
+	
+	Buffer->SkipnLines(3);
+	long StartPos = Buffer->GetFilePos();
+	if (!(Buffer->LocateKeyWord("-----------", 11, -1))) throw DataError();
+	long test = Buffer->GetFilePos() - StartPos;
+	Buffer->SetFilePos(StartPos);
+	long numlines = Buffer->GetNumLines(test) - 1;
+	if (numlines > 0) {
+		if (!SetupFrameMemory(numlines, 0)) throw std::bad_alloc();
+	} else {
+		throw DataError(12);
+	}
+	for (long i=0; i<numlines; i++) {
+		long linenum;
+		CPoint3D	position;
+		unsigned char	Label[kMaxLineLength];
+		
+		Buffer->GetLine(LineText);
+		int scannum = sscanf(LineText, "%ld %s %f %f %f", &linenum, Label, &(position.x),
+							 &(position.y), &(position.z));
+		if (scannum != 5) throw DataError(13);
+		long atomtype = SetAtomType(Label);
+		mpAtom * newAtom = lFrame->AddAtom(atomtype, position);
+		if (newAtom) newAtom->IsSIMOMMAtom(true);
+	}
+}
 long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 		char		LineText[kMaxLineLength];
 
@@ -1273,7 +1307,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 					NumCoreOrbs, NumOpenOrbs, NumGVBPairOrbs, EnergyPos,
 					ReadMP2Orbitals=1, NextFinalPos, SavedPos;
 	float			*Occupancy = NULL;
-	bool			KeyWordFound;
+	bool			KeyWordFound, SIMOMM=false;
 	char			LineText[kMaxLineLength], token[kMaxLineLength];
 	BufferFile *	DatBuffer=NULL;
 
@@ -1383,7 +1417,13 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		if (Buffer->LocateKeyWord("QMMM PROCEDURE IS ON", 20, EnergyPos)) {
 			//If this is a simmom type run then switch to that routine since the format is
 			//significantly different
-			return (ParseSIMMOMLogFile(Buffer, EnergyPos));
+//			return (ParseSIMMOMLogFile(Buffer, EnergyPos));
+			SIMOMM=true;
+			ProgressInd->ChangeText("Reading Tinker Coordinates");
+			if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+			{throw UserCancel();}
+			MainData->ParseTinkerCoordinates(Buffer);
+			//The ab initio atoms will be added below
 		}
 	//locate the input set of coordinates (present in every file)
 		if (Buffer->LocateKeyWord("COORDINATES (BOHR)", 16, EnergyPos)) {	//first normal (ab initio) atoms
@@ -1396,7 +1436,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			test = Buffer->FindBlankLine() - StartPos;
 			numlines = Buffer->GetNumLines(test);
 			if (numlines > 0) {
-				if (!MainData->SetupFrameMemory(numlines, 0)) throw MemoryError();
+				if (!MainData->SetupFrameMemory(numlines+lFrame->NumAtoms, 0)) throw MemoryError();
 			} else {
 				throw DataError(22);
 			}
@@ -1422,6 +1462,20 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				{ throw UserCancel();}
 			try {
 				MainData->ParseGAMESSBasisSet(Buffer);
+				BasisSet * Basis = MainData->Basis;
+				if (Basis && SIMOMM) {	//generate the nuclear charge array
+					if (Basis->NuclearCharge[0] == -1) {
+						if (MainData->cFrame->NumAtoms == Basis->MapLength) {
+							//for the purpose of the basis set, set the charge of mm atoms to 0
+							for (long iatom=0; iatom<MainData->cFrame->NumAtoms; iatom++) {
+								if (! MainData->cFrame->Atoms[iatom].IsSIMOMMAtom() )
+									Basis->NuclearCharge[iatom] = MainData->cFrame->Atoms[iatom].GetNuclearCharge();
+								else
+									Basis->NuclearCharge[iatom] = 0;
+							}
+						}
+					}
+				}
 			}
 			catch (MemoryError) {
 				if (MainData->Basis) delete MainData->Basis;
@@ -1735,6 +1789,32 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 					MessageAlert("Error reading eigenvectors, orbitals skipped.");
 				}
 			}
+			if (SIMOMM) {	//See if we have MM energies and new coords
+				//could also grab the MM energy here
+				if (Buffer->LocateKeyWord("QM+MM Energy (Hartree):", 23)) {
+					Buffer->GetLine(LineText);
+					double FrameEnergy;
+					sscanf(&(LineText[24]), "%lf", &FrameEnergy);
+					lFrame->Energy = FrameEnergy;
+				}
+				//now update the coordinates with the new MM list
+				Frame * preserve = MainData->cFrame;
+				lFrame = MainData->AddFrame(MainData->cFrame->NumAtoms,0);
+				MainData->ParseTinkerCoordinates(Buffer);
+				if (MainData->cFrame->NumAtoms > 0) {
+					//update the coordinates in the first frame
+					for (int iatom=0; iatom<MainData->cFrame->NumAtoms; iatom++) {
+						if (MainData->cFrame->Atoms[iatom].IsSIMOMMAtom()) {
+							preserve->Atoms[iatom].Position.x = MainData->cFrame->Atoms[iatom].Position.x;
+							preserve->Atoms[iatom].Position.y = MainData->cFrame->Atoms[iatom].Position.y;
+							preserve->Atoms[iatom].Position.z = MainData->cFrame->Atoms[iatom].Position.z;
+						}
+					}
+				}
+				// delete off the temporary frame
+				MainData->DeleteFrame();
+				lFrame = preserve;
+			}
 				//look for gradient data
 			lFrame->ReadGradient(Buffer, NextFinalPos);
 		} else if (NumFragmentAtoms > 0) {
@@ -1764,6 +1844,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	long memlength = sizeof(Frame) + lFrame->NumAtoms*sizeof(mpAtom) +
 					lFrame->NumBonds*sizeof(Bond) + 5000;
 	KeyWordFound = true;
+//	if (SIMOMM) KeyWordFound = false;	//only grab a single geometry for SIMOMM
 	double	FrameEnergy, MP2FrameEnergy;
 	while (KeyWordFound) {
 		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
@@ -1854,6 +1935,16 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				lpFrame = lFrame;
 				lFrame = MainData->AddFrame(lpFrame->NumAtoms,0);
 
+				if (SIMOMM) {	//copy over the MM atoms so that they will be in the same order
+					for (int iatom=0; iatom<lpFrame->NumAtoms; iatom++) {
+						if (lpFrame->Atoms[iatom].IsSIMOMMAtom()) {
+							lFrame->AddAtom(lpFrame->Atoms[iatom].Type, 
+											lpFrame->Atoms[iatom].Position);
+							lFrame->Atoms[iatom].IsSIMOMMAtom(true);
+						}
+					}
+				}
+				
 				try {
 					if (lpFrame->NumAtoms-NumFragmentAtoms > 0) {
 
@@ -1906,10 +1997,39 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			if (lFrame->GetNumAtoms()==0) {Buffer->SetFilePos(StartPos); break;}
 			lFrame->Energy = FrameEnergy;
 			lFrame->MP2Energy = MP2FrameEnergy;
-			if (Prefs->GetAutoBond())
-				lFrame->SetBonds(Prefs, false);
 			lFrame->IRCPt = lpFrame->IRCPt + flip;
 			lFrame->time = lpFrame->time + flip + offset;
+			
+			if (SIMOMM) {
+				Buffer->SetFilePos(EnergyPos);
+				//could also grab the MM energy here
+				if (Buffer->LocateKeyWord("QM+MM Energy (Hartree):", 23)) {
+					Buffer->GetLine(LineText);
+					double FrameEnergy;
+					sscanf(&(LineText[24]), "%lf", &FrameEnergy);
+					lFrame->Energy = FrameEnergy;
+				}
+				//now update the coordinates with the new MM list
+				Frame * preserve = MainData->cFrame;
+				lFrame = MainData->AddFrame(MainData->cFrame->NumAtoms,0);
+				MainData->ParseTinkerCoordinates(Buffer);
+				if (MainData->cFrame->NumAtoms > 0) {
+					//update the coordinates in the first frame
+					for (int iatom=0; iatom<MainData->cFrame->NumAtoms; iatom++) {
+						if (MainData->cFrame->Atoms[iatom].IsSIMOMMAtom()) {
+							preserve->Atoms[iatom].Position.x = MainData->cFrame->Atoms[iatom].Position.x;
+							preserve->Atoms[iatom].Position.y = MainData->cFrame->Atoms[iatom].Position.y;
+							preserve->Atoms[iatom].Position.z = MainData->cFrame->Atoms[iatom].Position.z;
+						}
+					}
+				}
+				// delete off the temporary frame
+				MainData->DeleteFrame();
+				lFrame = preserve;
+			}
+
+			if (Prefs->GetAutoBond())
+				lFrame->SetBonds(Prefs, false);
 //			NextFinalPos = -1;
 			Buffer->SetFilePos(EnergyPos);
 //			long SavedPos = Buffer->GetFilePos();
