@@ -109,8 +109,8 @@ class Surf2DBase : public Surface {
 		RGBColor	NegColor;
 		long		NumContours;
 		float		MaxContourValue;
-		long		SurfOptions;	//bit field: 1 for zero contour, 2 for Screen Plane, 4 for dashed contours,
-									//8 for contouring both +/- contours
+		long		SurfOptions;	//bit field: 1 for zero contour, 2 for Screen Plane, 3 for dashed contours,
+									//4 for contouring both +/- contours, 5 for show plane
 	public:
 		Surf2DBase(WinPrefs * Prefs);
 		Surf2DBase(void);
@@ -123,6 +123,8 @@ class Surf2DBase : public Surface {
 		inline void SetDashLine(bool NewVal) {SurfOptions = (SurfOptions & 0xFFFFFFFB) + (NewVal ? 4 : 0);};
 		inline bool ContourBothPosNeg(void) const {return ((SurfOptions & 8)!=0);};
 		inline void SetContourBothPosNeg(bool NewVal) {SurfOptions = (SurfOptions & 0xFFFFFFF7) + (NewVal ? 8 : 0);};
+		inline bool ShowPlottingPlane(void) const {return ((SurfOptions & 16)!=0);};
+		inline void ShowPlottingPlane(bool NewVal) {SurfOptions = (SurfOptions & 0xFFFFFFEF) + (NewVal ? 16 : 0);};
 		inline long GetSurfOptions(void) const {return SurfOptions;};
 		inline void GetPosColor(RGBColor *temp) const {*temp=PosColor;};
 		inline void SetPosColor(const RGBColor *newColor) {PosColor=*newColor;};

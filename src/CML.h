@@ -153,6 +153,7 @@ enum MMP_SurfaceNameSpace {
 	MMP_SurfScreenPlane,
 	MMP_SurfDashedContours,
 	MMP_SurfPosNegContours,
+	MMP_DisplayPlane,
 	MMP_SurfMaxMEPValue,
 	MMP_SurfGrid,
 	MMP_SurfNumXGridPoints,

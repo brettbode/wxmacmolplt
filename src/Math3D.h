@@ -37,6 +37,7 @@ void MultiplyMatrix (Matrix4D a, Matrix4D b, Matrix4D aTimesB);
 void Normalize3D (CPoint3D *v);
 void OrthogonalizeRotationMatrix(Matrix4D a);
 void SetRotationMatrix (Matrix4D rotationMatrix, const CPoint3D *op, const CPoint3D *oq);
+void SetPlaneRotation(Matrix4D rotationMatrix, const CPoint3D & op, const CPoint3D & oq);
 void BackRotate3DPt(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoord);
 void UnitCrossProduct3D (const CPoint3D *a, const CPoint3D *b, CPoint3D *aCrossB);
 

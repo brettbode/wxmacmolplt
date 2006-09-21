@@ -2360,6 +2360,8 @@ const char * CML_convert(MMP_SurfaceNameSpace t)
             return "UseDashedContours";
         case MMP_SurfPosNegContours:
             return "ShowPositiveNegativeContours";
+		case MMP_DisplayPlane:
+			return "DisplayPlane";
         case MMP_SurfMaxMEPValue:
             return "MaximumSurfaceValue";
         case MMP_SurfGrid:

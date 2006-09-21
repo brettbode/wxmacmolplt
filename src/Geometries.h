@@ -34,11 +34,25 @@ class CPoint3D {
 			z *= fval;
 			return *this;
 		}
-		CPoint3D operator*(float factor) {
+		CPoint3D operator*(float factor) const {
 			CPoint3D result;
 			result.x = x * factor;
 			result.y = y * factor;
 			result.z = z * factor;
+			return result;
+		}
+		CPoint3D operator-(const CPoint3D & pt) const {
+			CPoint3D result;
+			result.x = x - pt.x;
+			result.y = y - pt.y;
+			result.z = z - pt.z;
+			return result;
+		}
+		CPoint3D operator+(const CPoint3D & pt) const {
+			CPoint3D result;
+			result.x = x + pt.x;
+			result.y = y + pt.y;
+			result.z = z + pt.z;
 			return result;
 		}
 		inline float Magnitude(void) {return sqrt(x*x+y*y+z*z);};

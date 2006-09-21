@@ -63,6 +63,7 @@ extern Boolean	gOpenGLAvailable;
 //#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
 
 void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd, const float & lineWidth);
+void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2);
 
 const GLubyte stippleMask[128] =
 
@@ -1481,6 +1482,7 @@ long Surf2DBase::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangl
 			//Update the grid if needed, then contour and display
 		if (!Grid) Update(MainData);
 		if (Grid) Contour2DGrid3DGL(MainData, Prefs);
+		if (ShowPlottingPlane()) DrawTranslucentPlane(Origin, Origin+XInc*(NumGridPoints-1), Origin+YInc*(NumGridPoints-1));
 	}
 	return 0;
 }
@@ -2255,5 +2257,56 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
 	gluCylinder(qobj, lineWidth, lineWidth, length, 4, 1);
+	glPopMatrix();
+}
+
+//Draw a transluecent plane
+void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2) {
+	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
+	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
+	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
+	float save_emissive[4], save_diffuse[4], save_specular[4];
+	Matrix4D rotationMatrix;
+
+	glGetMaterialfv(GL_FRONT, GL_DIFFUSE, save_diffuse);
+	glGetMaterialfv(GL_FRONT, GL_EMISSION, save_emissive);
+	glGetMaterialfv(GL_FRONT, GL_SPECULAR, save_specular);
+
+	CPoint3D vec1 = p1 - origin;
+	CPoint3D vec2 = p2 - origin;
+	float s1Length = vec1.Magnitude();
+	float s2Length = vec2.Magnitude();
+	SetPlaneRotation(rotationMatrix, vec1, vec2);
+
+	glPushMatrix();
+	glTranslatef(origin.x, origin.y, origin.z);
+	glMultMatrixf((const GLfloat *) &rotationMatrix);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glEnable(GL_BLEND);
+	glDepthMask(GL_FALSE);
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, plane_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
+	glColor4f(0, .64, .85, 0.4);
+   
+	glRectf(0, 0, s1Length, s2Length);
+
+	glDisable(GL_BLEND);
+
+	glDisable(GL_LIGHTING);
+	glColor4f(0, .64, .85, 1);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glLineWidth(1);
+	glRectf(0, 0, s1Length, s2Length);
+	glEnable(GL_LIGHTING);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	glDepthMask(GL_TRUE);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, save_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, save_emissive);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, save_specular);
+	
 	glPopMatrix();
 }

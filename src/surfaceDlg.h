@@ -124,6 +124,7 @@ class SurfacesWindow;
 #define ID_TED3D_COLOR_SURF_CHECK 10110
 #define ID_USERGB_COLOR_CHECK 10111
 #define ID_TED3D_MAX_MAP_EDIT 10112
+#define ID_DISPLAY_PLANE_CHECKBOX 10244
 
 ////@end control identifiers
 
@@ -246,6 +247,7 @@ class Surface2DPane : public BaseSurfacePane
   void OnShowZeroChk( wxCommandEvent &event );
   void OnDashChk(wxCommandEvent& event );
   void OnUsePlaneChk( wxCommandEvent &event );
+  void OnDisplayPlaneChk( wxCommandEvent &event );
   void OnContourValueText( wxCommandEvent &event );
   void SetContourValueText(void);
   void OnNumContoursText( wxCommandEvent &event );
@@ -263,6 +265,7 @@ class Surface2DPane : public BaseSurfacePane
   wxCheckBox* mShowZeroCheck;
   wxCheckBox* mDashCheck;
   wxCheckBox* mUsePlaneChk;
+  wxCheckBox* mDisplayPlaneCheck;
   wxButton* mSetPlaneBut;
   colorArea* mOrbColor1;
   colorArea* mOrbColor2;
@@ -274,6 +277,7 @@ class Surface2DPane : public BaseSurfacePane
   bool ShowZeroContour;
   bool DashLines;
   bool UseScreenPlane;
+  bool DisplayPlane;
   wxString mMaxContourCountString;
   wxString mMaxContourValueString;
 

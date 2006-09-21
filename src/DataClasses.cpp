@@ -685,6 +685,7 @@ void Surf2DBase::Write2DXML(XMLElement * parent, bool writeGrid) const {
 	sElem->addChildElement(CML_convert(MMP_SurfScreenPlane), (GetRotate2DMap()?trueXML:falseXML));
 	sElem->addChildElement(CML_convert(MMP_SurfDashedContours), (GetDashLine()?trueXML:falseXML));
 	sElem->addChildElement(CML_convert(MMP_SurfPosNegContours), (ContourBothPosNeg()?trueXML:falseXML));
+	sElem->addChildElement(CML_convert(MMP_DisplayPlane), (ShowPlottingPlane()?trueXML:falseXML));
 	
 	if (writeGrid && Grid) {
 		std::ostringstream buf;
@@ -789,6 +790,10 @@ void Surf2DBase::Read2DXML(XMLElement * parent) {
 				case MMP_SurfContourPosNeg:
 					if (child->getBoolValue(tb))
 						SetContourBothPosNeg(tb);
+					break;
+				case MMP_DisplayPlane:
+					if (child->getBoolValue(tb))
+						ShowPlottingPlane(tb);
 					break;
 				case MMP_SurfGrid:
 					if (NumGridPoints > 0) {

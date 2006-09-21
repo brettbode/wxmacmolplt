@@ -216,6 +216,7 @@ void InverseMatrix(Matrix4D A, Matrix4D AInverse) {
 	AInverse[3][0] = -1.0*A[3][0];
 	AInverse[3][1] = -1.0*A[3][1];
 	AInverse[3][2] = -1.0*A[3][2];
+	AInverse[3][3] = A[3][3];
 }
 /*=================================================================================================
  MultiplyMatrix
@@ -327,6 +328,50 @@ void SetRotationMatrix (Matrix4D rotationMatrix, const CPoint3D *op, const CPoin
 	#undef ax2
 	#undef ay2
 	#undef az2
+}
+//Generate a rotation matrix to rotate the x-y plane to the plane defined by vectors op and oq
+void SetPlaneRotation(Matrix4D rotationMatrix, const CPoint3D & op, const CPoint3D & oq) {
+	CPoint3D	Vector1, Vector2, Vector3;
+	Matrix4D	A;
+	
+	Vector1 = op;
+	Vector2 = oq;
+	
+	float length = Vector1.Magnitude();
+	if (length <= 0.0) return;	//2 points with the same coordinates
+	Vector1.x /= length;
+	Vector1.y /= length;
+	Vector1.z /= length;
+	length = Vector2.Magnitude();
+	if (length <= 0.0) return;
+	Vector2.x /= length;
+	Vector2.y /= length;
+	Vector2.z /= length;
+	float V1DotV2 = DotProduct3D(&Vector2, &Vector1);
+	//Make sure the vectors are not parallel or anti-parallel
+	if (fabs(V1DotV2) >= 1.0) return;
+	Vector2.x -= V1DotV2*Vector1.x;
+	Vector2.y -= V1DotV2*Vector1.y;
+	Vector2.z -= V1DotV2*Vector1.z;
+	Normalize3D(&Vector2);
+	CrossProduct3D (&Vector1, &Vector2, &Vector3);
+	Normalize3D(&Vector3);
+	
+	A[0][0] = Vector1.x;
+	A[1][0] = Vector1.y;
+	A[2][0] = Vector1.z;
+	A[0][3] = 0.0;
+	A[0][1] = Vector2.x;
+	A[1][1] = Vector2.y;
+	A[2][1] = Vector2.z;
+	A[1][3] = 0.0;
+	A[0][2] = Vector3.x;
+	A[1][2] = Vector3.y;
+	A[2][2] = Vector3.z;
+	A[2][3] = A[3][0] = A[3][1] = A[3][2] = 0.0;
+	A[3][3] = 1.0;
+	
+	InverseMatrix(A, rotationMatrix);
 }
 void BackRotate3DPt(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoord)
 {

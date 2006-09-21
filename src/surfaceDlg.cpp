@@ -73,6 +73,7 @@ BEGIN_EVENT_TABLE( Orbital2DSurfPane, wxPanel )
   EVT_BUTTON (ID_SET_PLANE_BUT, Surface2DPane::OnSetPlane)
   EVT_COMMAND_ENTER(ID_2D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
   EVT_COMMAND_ENTER(ID_2D_COLOR_NEGATIVE, Surface2DPane::OnNegColorChange)
+	EVT_CHECKBOX (ID_DISPLAY_PLANE_CHECKBOX, Surface2DPane::OnDisplayPlaneChk)
 	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface2DPane::OnContourValueText)
 	EVT_TEXT (ID_NUM_CONTOUR_TEXT, Surface2DPane::OnNumContoursText)
 END_EVENT_TABLE()
@@ -130,6 +131,7 @@ BEGIN_EVENT_TABLE( General2DSurfPane, wxPanel )
 	EVT_COMMAND_ENTER(ID_2D_COLOR_NEGATIVE, Surface2DPane::OnNegColorChange)
 	EVT_CHECKBOX (ID_SHOW_ZERO_CHECKBOX, Surface2DPane::OnShowZeroChk)
 	EVT_CHECKBOX (ID_DASH_CHECKBOX, Surface2DPane::OnDashChk)
+	EVT_CHECKBOX (ID_DISPLAY_PLANE_CHECKBOX, Surface2DPane::OnDisplayPlaneChk)
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, General2DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
@@ -137,6 +139,7 @@ BEGIN_EVENT_TABLE( TEDensity2DSurfPane, wxPanel )
 	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
 	EVT_CHOICE  (ID_ORB_CHOICE, BaseSurfacePane::OnOrbSetChoice)
 	EVT_CHECKBOX (ID_USE_PLANE_CHECKBOX, Surface2DPane::OnUsePlaneChk)
+	EVT_CHECKBOX (ID_DISPLAY_PLANE_CHECKBOX, Surface2DPane::OnDisplayPlaneChk)
 	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface2DPane::OnContourValueText)
 	EVT_TEXT (ID_NUM_CONTOUR_TEXT, Surface2DPane::OnNumContoursText)
 	EVT_COMMAND_ENTER(ID_2D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
@@ -172,6 +175,7 @@ BEGIN_EVENT_TABLE( MEP2DSurfPane, wxPanel )
 	EVT_CHECKBOX (ID_USE_PLANE_CHECKBOX, Surface2DPane::OnUsePlaneChk)
 	EVT_CHECKBOX (ID_SHOW_ZERO_CHECKBOX, Surface2DPane::OnShowZeroChk)
 	EVT_CHECKBOX (ID_DASH_CHECKBOX, Surface2DPane::OnDashChk)
+	EVT_CHECKBOX (ID_DISPLAY_PLANE_CHECKBOX, Surface2DPane::OnDisplayPlaneChk)
 	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface2DPane::OnContourValueText)
 	EVT_TEXT (ID_NUM_CONTOUR_TEXT, Surface2DPane::OnNumContoursText)
 	EVT_COMMAND_ENTER(ID_2D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
@@ -864,6 +868,11 @@ void Surface2DPane::OnShowZeroChk( wxCommandEvent &event )
   ShowZeroContour = mShowZeroCheck->GetValue();
   setUpdateButton();
 }
+void Surface2DPane::OnDisplayPlaneChk( wxCommandEvent &event )
+{
+	DisplayPlane = mDisplayPlaneCheck->GetValue();
+	setUpdateButton();
+}
 
 void Surface2DPane::OnSetPlane( wxCommandEvent &event )
 {
@@ -1224,12 +1233,17 @@ void Orbital2DSurfPane::CreateControls()
   mSubRightBot1Sizer = new wxBoxSizer(wxVERTICAL);
   mUsePlaneChk = new wxCheckBox(this, ID_USE_PLANE_CHECKBOX, _T("Use plane of screen"), wxDefaultPosition);
   mUsePlaneChk->SetValue(UseScreenPlane);
+  mDisplayPlaneCheck = new wxCheckBox( this, ID_DISPLAY_PLANE_CHECKBOX, _("Display Plotting Plane"), wxDefaultPosition, wxDefaultSize, 0 );
+  mDisplayPlaneCheck->SetValue(DisplayPlane);
+  mDisplayPlaneCheck->SetToolTip(_("Display a translucent plane with border to indicate the plotting plane"));
+  
   mRevPhaseChk = new wxCheckBox(this, ID_REVERSE_PHASE_CHECKBOX, _T("Reverse Phase"), wxDefaultPosition);
   mRevPhaseChk->SetValue(PhaseChange);
   mDashCheck->SetValue(DashLines);
   mShowZeroCheck->SetValue(ShowZeroContour);
 
   mSubRightBot1Sizer->Add(mUsePlaneChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+  mSubRightBot1Sizer->Add(mDisplayPlaneCheck, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   mSubRightBot1Sizer->Add(mShowZeroCheck, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   mSubRightBot1Sizer->Add(mDashCheck, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   mSubRightBot1Sizer->Add(mRevPhaseChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -1273,6 +1287,7 @@ void Orbital2DSurfPane::TargetToPane(void)
   UseScreenPlane = mTarget->GetRotate2DMap();
   Visible = mTarget->GetVisibility();
   DashLines = mTarget->GetDashLine();
+  DisplayPlane = mTarget->ShowPlottingPlane();
   UpdateTest = false;
 }
 
@@ -1297,6 +1312,7 @@ bool Orbital2DSurfPane::UpdateNeeded(void)
       if (UseScreenPlane != mTarget->GetRotate2DMap()) result = true;
       if (DashLines != mTarget->GetDashLine()) result = true;
       if (PhaseChange != mTarget->GetPhaseChange()) result = true;
+      if (DisplayPlane != mTarget->ShowPlottingPlane()) result = true;
       if (SphericalHarmonics != mTarget->UseSphericalHarmonics()) result = true;
 
       if (!result) 
@@ -1333,6 +1349,7 @@ void Orbital2DSurfPane::OnUpdate(wxCommandEvent &event )
   mTarget->SetPosColor(&PosColor);
   mTarget->SetNegColor(&NegColor);
   mTarget->SetShowZeroContour(ShowZeroContour);
+  mTarget->ShowPlottingPlane(DisplayPlane);
   if (UseScreenPlane && !mTarget->GetRotate2DMap()) updateGrid = true;
   mTarget->SetRotate2DMap(UseScreenPlane);
   mTarget->SetDashLine(DashLines);
@@ -1413,6 +1430,7 @@ void Orbital2DSurfPane::refreshControls()
   mRevPhaseChk->SetValue(PhaseChange);
   mDashCheck->SetValue(DashLines);
   mShowZeroCheck->SetValue(ShowZeroContour);
+  mDisplayPlaneCheck->SetValue(DisplayPlane);
 
   mOrbColor1->setColor(&PosColor);
   mOrbColor2->setColor(&NegColor);
@@ -2698,7 +2716,13 @@ void General2DSurfPane::CreateControls() {
     if (ShowToolTips())
         mShowZeroCheck->SetToolTip(_("Check to produce a gray contour where the plane changes sign."));
     mainSizer->Add(mShowZeroCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
-	
+
+	mDisplayPlaneCheck = new wxCheckBox( Gen2DPanel, ID_DISPLAY_PLANE_CHECKBOX, _("Display Plotting Plane"), wxDefaultPosition, wxDefaultSize, 0 );
+    mDisplayPlaneCheck->SetValue(false);
+    if (ShowToolTips())
+        mDisplayPlaneCheck->SetToolTip(_("Display a translucent plane with border to indicate the plotting plane"));
+    mainSizer->Add(mDisplayPlaneCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
     mDashCheck = new wxCheckBox( Gen2DPanel, ID_DASH_CHECKBOX, _("Dash negative contours"), wxDefaultPosition, wxDefaultSize, 0 );
     mDashCheck->SetValue(false);
     if (ShowToolTips())
@@ -2736,6 +2760,7 @@ void General2DSurfPane::TargetToPane(void)
 	NumContours = mTarget->GetNumContours();
 	DashLines = mTarget->GetDashLine();
 	ShowZeroContour = mTarget->GetShowZeroContour();
+	DisplayPlane = mTarget->ShowPlottingPlane();
 	UpdateTest = false;
 }
 bool General2DSurfPane::UpdateNeeded(void) 
@@ -2749,6 +2774,7 @@ bool General2DSurfPane::UpdateNeeded(void)
 		if (MaxContourValue != mTarget->GetMaxValue()) result = true;
 		if (ShowZeroContour != mTarget->GetShowZeroContour()) result = true;
 		if (DashLines != mTarget->GetDashLine()) result = true;
+		if (DisplayPlane != mTarget->ShowPlottingPlane()) result = true;
 		if (!result) {
 			RGBColor	testColor;
 			mTarget->GetPosColor(&testColor);
@@ -2772,6 +2798,7 @@ void General2DSurfPane::OnUpdate(wxCommandEvent &event) {
 	mTarget->SetNegColor(&NegColor);
 	mTarget->SetShowZeroContour(ShowZeroContour);
 	mTarget->SetDashLine(DashLines);
+	mTarget->ShowPlottingPlane(DisplayPlane);
 	
 	UpdateTest = false;
 	setUpdateButton();
@@ -2795,6 +2822,7 @@ void General2DSurfPane::refreshControls()
 	
 	mShowZeroCheck->SetValue(ShowZeroContour);
 	mDashCheck->SetValue(DashLines);
+	mDisplayPlaneCheck->SetValue(DisplayPlane);
 }
 void General2DSurfPane::SetMultValue(void) {
 	wxString temp;
@@ -2996,7 +3024,13 @@ void TEDensity2DSurfPane::CreateControls() {
     mUsePlaneChk = new wxCheckBox( TED2DPANEL, ID_USE_PLANE_CHECKBOX, _("Use plane of screen"), wxDefaultPosition, wxDefaultSize, 0 );
     mUsePlaneChk->SetValue(false);
     mainSizer->Add(mUsePlaneChk, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
-	
+
+	mDisplayPlaneCheck = new wxCheckBox( TED2DPANEL, ID_DISPLAY_PLANE_CHECKBOX, _("Display Plotting Plane"), wxDefaultPosition, wxDefaultSize, 0 );
+    mDisplayPlaneCheck->SetValue(false);
+    if (ShowToolTips())
+        mDisplayPlaneCheck->SetToolTip(_("Display a translucent plane with border to indicate the plotting plane."));
+    mainSizer->Add(mDisplayPlaneCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
     wxBoxSizer* itemBoxSizer81 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer81, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText82 = new wxStaticText( TED2DPANEL, wxID_STATIC, _("Contour color:"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -3038,6 +3072,7 @@ void TEDensity2DSurfPane::TargetToPane(void)
 	MaxContourValue = mTarget->GetMaxValue();
 	NumContours = mTarget->GetNumContours();
 	UseScreenPlane = mTarget->GetRotate2DMap();
+	DisplayPlane = mTarget->ShowPlottingPlane();
 	Visible = mTarget->GetVisibility();
 	AllFrames = (mTarget->GetSurfaceID() != 0);
 	UpdateTest = false;
@@ -3051,6 +3086,7 @@ bool TEDensity2DSurfPane::UpdateNeeded(void)
 	if (NumContours != mTarget->GetNumContours()) result = true;
 	if (MaxContourValue != mTarget->GetMaxValue()) result = true;
 	if (UseScreenPlane != mTarget->GetRotate2DMap()) result = true;
+	if (DisplayPlane != mTarget->ShowPlottingPlane()) result = true;
 	if (TargetOrbSet != mTarget->getTargetOrbSet()) result = true;
 	if (!result) {
 		RGBColor	testColor;
@@ -3079,6 +3115,7 @@ void TEDensity2DSurfPane::OnUpdate(wxCommandEvent &event) {
 	mTarget->SetPosColor(&PosColor);
 	if (UseScreenPlane && !mTarget->GetRotate2DMap()) updateGrid = true;
 	mTarget->SetRotate2DMap(UseScreenPlane);
+	mTarget->ShowPlottingPlane(DisplayPlane);
 	
 	MoleculeData * mData = owner->GetMoleculeData();
 	if (AllFrames != (mTarget->GetSurfaceID() != 0)) {	//update all frames
@@ -3137,6 +3174,7 @@ void TEDensity2DSurfPane::refreshControls()
 	mNumGridPntSld->SetValue(NumGridPoints);
 	
 	mUsePlaneChk->SetValue(UseScreenPlane);
+	mDisplayPlaneCheck->SetValue(DisplayPlane);
 }
 /*!
 * Get bitmap resources
@@ -3702,6 +3740,12 @@ void MEP2DSurfPane::CreateControls() {
     mUsePlaneChk = new wxCheckBox( MEP2DPanel, ID_USE_PLANE_CHECKBOX, _("Use plane of screen"), wxDefaultPosition, wxDefaultSize, 0 );
     mUsePlaneChk->SetValue(false);
     mainSizer->Add(mUsePlaneChk, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+	mDisplayPlaneCheck = new wxCheckBox( MEP2DPanel, ID_DISPLAY_PLANE_CHECKBOX, _("Display Plotting Plane"), wxDefaultPosition, wxDefaultSize, 0 );
+    mDisplayPlaneCheck->SetValue(false);
+    if (ShowToolTips())
+        mDisplayPlaneCheck->SetToolTip(_("Display a translucent plane with border to indicate the plotting plane"));
+    mainSizer->Add(mDisplayPlaneCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mShowZeroCheck = new wxCheckBox( MEP2DPanel, ID_SHOW_ZERO_CHECKBOX, _("Show zero value contour"), wxDefaultPosition, wxDefaultSize, 0 );
     mShowZeroCheck->SetValue(false);
@@ -3769,6 +3813,7 @@ void MEP2DSurfPane::TargetToPane(void)
 	UseScreenPlane = mTarget->GetRotate2DMap();
 	DashLines = mTarget->GetDashLine();
 	ShowZeroContour = mTarget->GetShowZeroContour();
+	DisplayPlane = mTarget->ShowPlottingPlane();
 	Visible = mTarget->GetVisibility();
 	AllFrames = (mTarget->GetSurfaceID() != 0);
 	UpdateTest = false;
@@ -3783,6 +3828,7 @@ bool MEP2DSurfPane::UpdateNeeded(void)
 	if (MaxContourValue != mTarget->GetMaxValue()) result = true;
 	if (UseScreenPlane != mTarget->GetRotate2DMap()) result = true;
 	if (ShowZeroContour != mTarget->GetShowZeroContour()) result = true;
+	if (DisplayPlane != mTarget->ShowPlottingPlane()) result = true;
 	if (DashLines != mTarget->GetDashLine()) result = true;
 	if (TargetOrbSet != mTarget->getTargetOrbitalSet()) result = true;
 	if (!result) {
@@ -3816,6 +3862,7 @@ void MEP2DSurfPane::OnUpdate(wxCommandEvent &event) {
 	mTarget->SetNegColor(&NegColor);
 	mTarget->SetShowZeroContour(ShowZeroContour);
 	mTarget->SetDashLine(DashLines);
+	mTarget->ShowPlottingPlane(DisplayPlane);
 	if (UseScreenPlane && !mTarget->GetRotate2DMap()) updateGrid = true;
 	mTarget->SetRotate2DMap(UseScreenPlane);
 	
@@ -3878,6 +3925,7 @@ void MEP2DSurfPane::refreshControls()
 	mUsePlaneChk->SetValue(UseScreenPlane);
 	mShowZeroCheck->SetValue(ShowZeroContour);
 	mDashCheck->SetValue(DashLines);
+	mDisplayPlaneCheck->SetValue(DisplayPlane);
 }
 /*!
 * Get bitmap resources
