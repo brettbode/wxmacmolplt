@@ -630,7 +630,7 @@ void MolDisplayWin::menuFileImport(wxCommandEvent &event) {
                 } else {
                     int targetVec = -1;
                     if (vecCount == 1) {
-                        targetVec = 0;
+                        targetVec = 1;
                     } else { //The user must choose the desired one
                         ChooseVECgroup * chooser = new ChooseVECgroup(this);
                         chooser->SetBuffer(Buffer);
