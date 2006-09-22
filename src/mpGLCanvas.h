@@ -61,6 +61,7 @@ class MpGLCanvas : public wxGLCanvas {
 
 	int mSelectState;
 	int selected;
+	int oldSelect;
 	bool interactiveMode;
 	GLdouble atomDepth;
 	GLint winDiffX, winDiffY;

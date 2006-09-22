@@ -266,6 +266,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	infoPanel = NULL;
 
 	mHighliteState = false;
+	interactiveMode = false;
 
 #ifdef __WXMSW__
 	//Visual studio is a total pile.
@@ -1559,8 +1560,12 @@ void MolDisplayWin::menuEditSelect_all(wxCommandEvent &event) {
 
 void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 {
+  interactiveMode = 1 - interactiveMode;
+
   if (glCanvas)
     glCanvas->toggleInteractiveMode();
+
+  //DrawGL();
 }
 
 void MolDisplayWin::menuViewShowNormalMode(wxCommandEvent &event) {

@@ -760,7 +760,7 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 				}
 			glPopMatrix(); // GL_MODELVIEW
 			glMatrixMode (GL_PROJECTION);
-		glPopMatrix();
+			glPopMatrix();
 		glMatrixMode (matrixMode);
 	}
 	
@@ -780,6 +780,13 @@ void MolDisplayWin::DrawGL(void)
 
 	if (Prefs->ShowAtomicSymbolLabels() || Prefs->ShowAtomNumberLabels() )
 	  DrawLabel();
+
+	if (interactiveMode)
+	  {
+	    const char modeString[] = "editing";
+
+	    DrawStaticLabel(modeString, 0.75, 0.95);
+	  }
 
 	glMultMatrixf((const GLfloat *) &(MainData->TotalRotation));
 
@@ -882,6 +889,43 @@ void MolDisplayWin::DrawGL(void)
 		glDisable(GL_BLEND);
 	}
 	glDisable(GL_LIGHTING);
+}
+
+void MolDisplayWin::DrawStaticLabel(const char* label, GLfloat x, GLfloat y)
+{
+  int canvasWidth, canvasHeight;
+
+  glCanvas->GetSize(&canvasWidth, &canvasHeight);
+  float sclX = 20/(float)canvasWidth;
+  float sclY = 20/(float)canvasHeight;
+
+  RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
+  long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
+
+  if (backMagnitude > 70000)
+    glColor3f (0.0, 0.0, 0.0);
+  else
+    glColor3f (1.0, 1.0, 1.0);
+
+  GLint matrixMode;
+  glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity ();
+
+  glTranslatef(x, y, 0);
+  glScalef(sclX, sclY, 1);
+  glfDrawSolidString(label);
+
+  glFlush();
+
+  glPopMatrix(); // GL_MODELVIEW
+  glMatrixMode (GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode (matrixMode);
 }
 
 void MolDisplayWin::DrawLabel()

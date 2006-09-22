@@ -47,6 +47,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 
     mSelectState = -1;
     interactiveMode = false;
+    oldSelect = -1;
     //Hmm is this the right spot to initialize our GL settings?
 //  initGL();
 }
@@ -549,6 +550,20 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		      }
 
 		    delete newAtomTypeDlg;
+
+		    oldSelect = -1;
+		  }
+		else if (selected != oldSelect)
+		  {
+		    int tmpBondStatus = lFrame->BondExists(oldSelect,selected);
+ 
+		    if (tmpBondStatus == -1)
+		      lFrame->AddBond(oldSelect,selected);
+
+		    oldSelect = selected;
+
+		    if (tmpBondStatus == -1)
+		      selected = -1;
 		  }
 	      }
 	    else if (mSelectState >= 0 && mSelectState < 3)

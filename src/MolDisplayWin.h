@@ -82,6 +82,7 @@ class MolDisplayWin : public wxFrame {
                               long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
 
 	bool mHighliteState;
+	bool interactiveMode;
 
         DECLARE_EVENT_TABLE()
 
@@ -263,6 +264,7 @@ class MolDisplayWin : public wxFrame {
         void RotateMoleculeGL(bool);
         void PrintGL(wxDC * dc, const float & scaleFactor);
 	void SetHighliteMode(bool state) { mHighliteState = state; }
+	void DrawStaticLabel(const char* label, GLfloat x, GLfloat y);
 	void DrawLabel(void); //added by Song Li
 	void SelectionChanged(bool mode);
 
