@@ -2282,14 +2282,14 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 	glTranslatef(origin.x, origin.y, origin.z);
 	glMultMatrixf((const GLfloat *) &rotationMatrix);
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 	glDepthMask(GL_FALSE);
 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, plane_diffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
-	glColor4f(0, .64, .85, 0.4);
+	glColor4f(0, .64, .85, 0.3);
    
 	glRectf(0, 0, s1Length, s2Length);
 
