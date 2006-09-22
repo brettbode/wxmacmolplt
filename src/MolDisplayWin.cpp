@@ -64,6 +64,7 @@ enum MMP_EventID {
     MMP_PREVMODE,
     MMP_NEXTMODE,
     MMP_SHOWAXIS,
+	MMP_SHOWSYMMETRYOPERATOR,
 	MMP_ATOMLABELSSUBMENU,
 	MMP_NO_ATOMLABEL,
     MMP_SHOWATOMLABELS,
@@ -149,7 +150,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_OFFSETMODE,       MolDisplayWin::menuViewOffsetAlongMode)
     EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
     EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
-    EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
+	EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
+	EVT_MENU (MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::menuViewShowSymmetryOperators)
 	EVT_MENU (MMP_NO_ATOMLABEL,		MolDisplayWin::menuViewHideAtomLabels)
     EVT_MENU (MMP_SHOWATOMLABELS,   MolDisplayWin::menuViewShowAtomLabel)
     EVT_MENU (MMP_SHOWATOMNUMBER,   MolDisplayWin::menuViewShowAtomNumber)
@@ -442,14 +444,15 @@ void MolDisplayWin::createMenuBar(void) {
     menuView->Append(MMP_OFFSETMODE, wxT("&Offset along mode..."));
     menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
     menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
-    menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show &Axis"));
+    menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show Ax&is"));
+    menuView->AppendCheckItem(MMP_SHOWSYMMETRYOPERATOR, wxT("Show S&ymmetry Operators"));
 	
 	menuViewLabels = new wxMenu;
-    menuView->Append(MMP_ATOMLABELSSUBMENU, wxT("&Atom Labels"), menuViewLabels);
-    menuViewLabels->AppendRadioItem(MMP_NO_ATOMLABEL, wxT("None"));
-    menuViewLabels->AppendRadioItem(MMP_SHOWATOMLABELS, wxT("Atomic Symbol"));
-    menuViewLabels->AppendRadioItem(MMP_SHOWATOMNUMBER, wxT("Atom Number"));
-    menuViewLabels->AppendRadioItem(MMP_BOTHATOMLABELS, wxT("Symbols and Numbers"));
+    menuView->Append(MMP_ATOMLABELSSUBMENU, wxT("Atom &Labels"), menuViewLabels);
+    menuViewLabels->AppendRadioItem(MMP_NO_ATOMLABEL, wxT("&None"));
+    menuViewLabels->AppendRadioItem(MMP_SHOWATOMLABELS, wxT("Atomic &Symbol"));
+    menuViewLabels->AppendRadioItem(MMP_SHOWATOMNUMBER, wxT("Atom &Number"));
+    menuViewLabels->AppendRadioItem(MMP_BOTHATOMLABELS, wxT("S&ymbols and Numbers"));
 	
 	menuViewStyle = new wxMenu;
     menuView->Append(MMP_DISPLAYMODESUBMENU, wxT("&Display Style"), menuViewStyle);
@@ -520,6 +523,8 @@ void MolDisplayWin::ClearMenus(void) {
     menuView->Enable(MMP_NEXTMODE, false);
     menuView->Enable(MMP_OFFSETMODE, false);
     menuView->Enable(MMP_ANIMATEFRAMES, false);
+    menuView->Enable(MMP_SHOWSYMMETRYOPERATOR, false);
+	menuView->Check(MMP_SHOWSYMMETRYOPERATOR, false);
     menuMolecule->Enable(MMP_SETBONDLENGTH, false);
     menuMolecule->Enable(MMP_ENERGYEDIT, false);
     menuMolecule->Enable(MMP_CREATELLMPATH, false);
@@ -538,6 +543,15 @@ void MolDisplayWin::AdjustMenus(void) {
 	else
 		menuViewLabels->Check(MMP_NO_ATOMLABEL, true);
 
+	if (MainData->InputOptions) {
+		if (MainData->InputOptions->Data) {
+			if (MainData->InputOptions->Data->GetPointGroup() > GAMESS_C1) {
+				menuView->Enable(MMP_SHOWSYMMETRYOPERATOR, true);
+				menuView->Check(MMP_SHOWSYMMETRYOPERATOR, Prefs->ShowSymmetryOperators());
+			}
+		}
+	}
+				
 	if (Prefs->DrawWireFrame())
 		menuViewStyle->Check(MMP_WIREFRAMEMODE, true);
 	else
@@ -1658,6 +1672,11 @@ void MolDisplayWin::menuViewAnimateMode(wxCommandEvent &event) {
 }
 void MolDisplayWin::menuViewShowAxis(wxCommandEvent &event) {
     MainData->SetShowAxis(1-MainData->ShowAxis());
+    UpdateModelDisplay();
+    Dirty = true;
+}
+void MolDisplayWin::menuViewShowSymmetryOperators(wxCommandEvent &event) {
+    Prefs->ShowSymmetryOperators(1-Prefs->ShowSymmetryOperators());
     UpdateModelDisplay();
     Dirty = true;
 }

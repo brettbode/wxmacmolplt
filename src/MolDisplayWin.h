@@ -158,9 +158,8 @@ class MolDisplayWin : public wxFrame {
         void menuViewAnimateFrames(wxCommandEvent &event);
         //void menuViewShow_special_atoms(wxCommandEvent &event);
         //void menuVeiwShow_hydrogen_labels(wxCommandEvent &event);
-        //void menuViewShow_atom_labels(wxCommandEvent &event);
-        //void menuViewShow_atom_numbers(wxCommandEvent &event);
         void menuViewShowAxis(wxCommandEvent &event);
+		void menuViewShowSymmetryOperators(wxCommandEvent &event);
 		void menuViewHideAtomLabels(wxCommandEvent &event);
 		void menuViewShowAtomLabel(wxCommandEvent &event);
 		void menuViewShowAtomNumber(wxCommandEvent &event);
@@ -259,6 +258,7 @@ class MolDisplayWin : public wxFrame {
         void DrawTransparentTriangles(void);
         void DrawMoleculeCoreGL(void);
         void AddAxisGL(void);
+		void AddSymmetryOperators(void);
         void UpdateGLModel(void);
         void Rotate(wxMouseEvent&);
         void RotateMoleculeGL(bool);

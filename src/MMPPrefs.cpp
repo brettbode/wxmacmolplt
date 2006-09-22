@@ -259,6 +259,7 @@ WinPrefs::WinPrefs(void) {
 	FitToPage = FrameOnPage = false;
 	SymbolLabels = NumberLabels = false;
 	CenterOnPage = true;
+	ShowSymOps = false;
 }
 
 WinPrefs::~WinPrefs(void) {
@@ -607,6 +608,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					ShowAtomicSymbolLabels(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowAtomNumbers), boolVal))
 					ShowAtomNumberLabels(boolVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowSymmetryOps), boolVal))
+					ShowSymmetryOperators(boolVal);
 				XMLElementList * molChildren = child->getChildren();
 				for (int im=0; im<molChildren->length(); im++) {
 					XMLElement * molchild = molChildren->item(im);
@@ -989,6 +992,7 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_Use3DHardwareAccel), (UseQD3DHardware()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowSymbolLabels), (ShowAtomicSymbolLabels()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowAtomNumbers), (ShowAtomNumberLabels()?trueXML:falseXML));
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowSymmetryOps), (ShowSymmetryOperators()?trueXML:falseXML));
 	
 	XMLElement * color = molElement->addChildElement(MMPPref_convert(MMPMolDisplay_BackColor));
 	outbuf.str("");
@@ -1399,6 +1403,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "ShowAtomicSymbols";
         case MMPMolDisplay_ShowAtomNumbers:
             return "ShowAtomNumbers";
+        case MMPMolDisplay_ShowSymmetryOps:
+            return "ShowSymmetryOperators";
 		default:
             return "invalid";
     }

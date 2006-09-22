@@ -107,6 +107,7 @@ enum MMPMolDisplayElments {
 	MMPMolDisplay_Use3DHardwareAccel,
 	MMPMolDisplay_ShowSymbolLabels,
 	MMPMolDisplay_ShowAtomNumbers,
+	MMPMolDisplay_ShowSymmetryOps,
 	
 	NumberMMPMolDisplayElements
 };

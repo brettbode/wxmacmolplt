@@ -22,6 +22,7 @@
 #include "Frame.h"
 #include "SurfaceTypes.h"
 #include "Math3D.h"
+#include "InputData.h"
 
 #ifndef __wxBuild__
 #include "MolDisplay.h"
@@ -63,6 +64,8 @@ extern Boolean	gOpenGLAvailable;
 //#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
 
 void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd, const float & lineWidth);
+void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order);
+void DrawInversionPoint(void);
 void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2);
 
 const GLubyte stippleMask[128] =
@@ -855,6 +858,7 @@ void MolDisplayWin::DrawGL(void)
 //			MessageAlert(errmsg);
 //		}
 //	}
+	if (Prefs->ShowSymmetryOperators()) AddSymmetryOperators();
 	//Transparent surfaces have to be depth sorted and drawn last.
 	if (OpenGLData->haveTransparentSurfaces) {
 		glEnable(GL_BLEND);
@@ -1520,6 +1524,87 @@ void MolDisplayWin::AddAxisGL(void)
 	gluDeleteQuadric(qobj);	//finally delete the quadric object
 }
 
+void MolDisplayWin::AddSymmetryOperators(void) {
+	//Add planes, rotation axis's, etc as appropriate for the selected symmetry point group
+	//This routine attempts to match the GAMESS assumptions on symmetry
+	// z is the principle rotation axis (if any)
+	// x is a perpendicular two-fold axis (if any),
+	// xz is the sigma-v plane (if any), and
+	// xy is the sigma-h plane (if any).
+	
+	if (!MainData->InputOptions) return;
+	if (!MainData->InputOptions->Data) return;
+	CPoint3D origin={0,0,0}, p1={0,0,0}, p2={0,0,0};
+	switch (MainData->InputOptions->Data->GetPointGroup()) {
+		case GAMESS_CS: //single sigma-h plane - XY plane
+			origin.x = origin.y = - MainData->MaxSize;
+			p1.x = MainData->MaxSize;
+			p1.y = - p1.x;
+			p2.x = -MainData->MaxSize;
+			p2.y = -p2.x;
+			DrawTranslucentPlane(origin, p1, p2);
+			break;
+		case GAMESS_CI:
+			DrawInversionPoint();
+			break;
+		case GAMESS_CNH:
+		{
+			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			if (order == 2) DrawInversionPoint();
+			origin.x = origin.y = - MainData->MaxSize;
+			p1.x = MainData->MaxSize;
+			p1.y = - p1.x;
+			p2.x = -MainData->MaxSize;
+			p2.y = -p2.x;
+			DrawTranslucentPlane(origin, p1, p2);
+		}
+			break;
+		case GAMESS_CNV:	//CN axis plus N sigma-v planes
+		{
+			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			for (int i=0; i<order; i++) {
+				origin.x = - cos(kPi * i/order) * MainData->MaxSize;
+				origin.y = - sin(kPi * i/order) * MainData->MaxSize;
+				origin.z = - MainData->MaxSize;
+				p1.x = - origin.x;
+				p1.y = - origin.y;
+				p1.z = origin.z;
+				p2.x = origin.x;
+				p2.y = origin.y;
+				p2.z = - origin.z;
+				DrawTranslucentPlane(origin, p1, p2);
+			}
+			origin.x = origin.y = p1.x = p1.y = 0.0;
+		}
+		//	break;	//let this rool through to pick up the axis
+		case GAMESS_CN:
+		{
+			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			origin.z = -MainData->MaxSize;
+			p1.z = MainData->MaxSize;
+			DrawRotationAxis(origin, p1, order);
+		}
+			break;
+		case GAMESS_S2N:
+			break;
+		case GAMESS_DND:
+			break;
+		case GAMESS_DNH:
+			break;
+		case GAMESS_DN:
+			break;
+		case GAMESS_TD:
+			break;
+		case GAMESS_TH:
+			break;
+		case GAMESS_T:
+			break;
+		case GAMESS_OH:
+			break;
+		case GAMESS_O:
+			break;
+	}
+}
 long Surf2DBase::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle *)
 {
 	if (Visible) {
@@ -2303,6 +2388,37 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 	gluCylinder(qobj, lineWidth, lineWidth, length, 4, 1);
 	glPopMatrix();
 }
+void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order) {
+	GLUquadricObj * qobj = NULL;
+	qobj = gluNewQuadric();
+
+	CPoint3D	offset, NormalOffset, NormEnd, NormStart={0,0,1};
+	Matrix4D	rotMat;
+	
+	offset.x =  lineEnd.x - lineStart.x;
+	offset.y =  lineEnd.y - lineStart.y;
+	offset.z =  lineEnd.z - lineStart.z;
+	float length = offset.Magnitude();
+	if (length>0.00001) {
+		NormalOffset.x = offset.x/length;
+		NormalOffset.y = offset.y/length;
+		NormalOffset.z = offset.z/length;
+	} else
+		NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
+	NormEnd = lineEnd;
+	Normalize3D (&NormEnd);
+	SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
+	rotMat[3][0] = lineStart.x;
+	rotMat[3][1] = lineStart.y;
+	rotMat[3][2] = lineStart.z;
+	
+	glPushMatrix();
+	glMultMatrixf((const GLfloat *) &rotMat);
+	gluCylinder(qobj, 0.1, 0.1, length, 12, 1);
+	glPopMatrix();
+	
+	if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
+}
 
 //Draw a transluecent plane
 void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2) {
@@ -2353,4 +2469,29 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, save_specular);
 	
 	glPopMatrix();
+}
+void DrawInversionPoint(void) {
+	GLUquadricObj * qobj = NULL;
+	qobj = gluNewQuadric();
+	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
+	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
+	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
+	float save_emissive[4], save_diffuse[4], save_specular[4];
+	
+	glGetMaterialfv(GL_FRONT, GL_DIFFUSE, save_diffuse);
+	glGetMaterialfv(GL_FRONT, GL_EMISSION, save_emissive);
+	glGetMaterialfv(GL_FRONT, GL_SPECULAR, save_specular);
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, plane_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
+	glColor4f(.7, .7, .7, 1.0);
+
+	//Assume the inversion point is at the origin
+	gluSphere(qobj, 0.2, 30, 20);	//Create and draw the sphere
+	
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, save_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, save_emissive);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, save_specular);
+	if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
 }
