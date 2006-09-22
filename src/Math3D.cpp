@@ -213,6 +213,7 @@ void InverseMatrix(Matrix4D A, Matrix4D AInverse) {
 	AInverse[2][0] = (A[1][0]*A[2][1]-A[1][1]*A[2][0])/DetA;
 	AInverse[2][1] = (A[0][1]*A[2][0]-A[0][0]*A[2][1])/DetA;
 	AInverse[2][2] = (A[0][0]*A[1][1]-A[0][1]*A[1][0])/DetA;
+	AInverse[0][3] = AInverse[1][3] = AInverse[2][3] = 0.0;
 	AInverse[3][0] = -1.0*A[3][0];
 	AInverse[3][1] = -1.0*A[3][1];
 	AInverse[3][2] = -1.0*A[3][2];
