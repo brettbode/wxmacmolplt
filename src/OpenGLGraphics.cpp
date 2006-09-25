@@ -1551,13 +1551,17 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 		case GAMESS_CNH:
 		{
 			int order = MainData->InputOptions->Data->GetPointGroupOrder();
-			if (order == 2) DrawInversionPoint();
+			if ((order == 2)||(order == 4)||(order == 6)) DrawInversionPoint();
 			origin.x = origin.y = - MainData->MaxSize;
 			p1.x = MainData->MaxSize;
 			p1.y = - p1.x;
 			p2.x = -MainData->MaxSize;
 			p2.y = -p2.x;
 			DrawTranslucentPlane(origin, p1, p2);
+			origin.x = origin.y = p1.x = p1.y = 0.0;
+			origin.z = -MainData->MaxSize;
+			p1.z = MainData->MaxSize;
+			DrawRotationAxis(origin, p1, order);
 		}
 			break;
 		case GAMESS_CNV:	//CN axis plus N sigma-v planes
@@ -1591,16 +1595,49 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 		case GAMESS_DND:
 			break;
 		case GAMESS_DNH:
-			break;
+		{
+			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			if ((order == 2)||(order == 4)||(order == 6)) DrawInversionPoint();
+			origin.x = origin.y = - MainData->MaxSize;
+			p1.x = MainData->MaxSize;
+			p1.y = - p1.x;
+			p2.x = -MainData->MaxSize;
+			p2.y = -p2.x;
+			DrawTranslucentPlane(origin, p1, p2);
+		}
+//			break;
 		case GAMESS_DN:
+		{
+			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			origin.x = origin.y = p1.x = p1.y = 0.0;
+			origin.z = -MainData->MaxSize;
+			p1.z = MainData->MaxSize;
+			DrawRotationAxis(origin, p1, order);
+			//Set of order C2 axis perpendicular to primary axis
+			for (int i=0; i<order; i++) {
+				origin.x = - cos(kPi * i/order) * MainData->MaxSize;
+				origin.y = - sin(kPi * i/order) * MainData->MaxSize;
+				origin.z = 0.0;
+				p1.x = - origin.x;
+				p1.y = - origin.y;
+				p1.z = origin.z;
+				DrawRotationAxis(origin, p1, order);
+			}
+		}
 			break;
 		case GAMESS_TD:
 			break;
 		case GAMESS_TH:
+		{
+			DrawInversionPoint();
+		}
 			break;
 		case GAMESS_T:
 			break;
 		case GAMESS_OH:
+		{
+			DrawInversionPoint();
+		}
 			break;
 		case GAMESS_O:
 			break;
@@ -2475,22 +2512,25 @@ void DrawInversionPoint(void) {
 	GLUquadricObj * qobj = NULL;
 	qobj = gluNewQuadric();
 	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
-	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
-	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
-	float save_emissive[4], save_diffuse[4], save_specular[4];
+	float plane_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+	float plane_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	float save_emissive[4], save_diffuse[4], save_specular[4], shininess;
 	
+	glGetMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
 	glGetMaterialfv(GL_FRONT, GL_DIFFUSE, save_diffuse);
 	glGetMaterialfv(GL_FRONT, GL_EMISSION, save_emissive);
 	glGetMaterialfv(GL_FRONT, GL_SPECULAR, save_specular);
 
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 128.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, plane_diffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
+//	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
 	glColor4f(.7, .7, .7, 1.0);
 
 	//Assume the inversion point is at the origin
 	gluSphere(qobj, 0.2, 30, 20);	//Create and draw the sphere
 	
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, save_diffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, save_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, save_specular);
