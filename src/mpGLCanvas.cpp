@@ -625,7 +625,7 @@ int MpGLCanvas::testPicking(int x, int y)
   GLuint buff[128];
   GLint hits, view[4];
   int id;
- 
+
    glSelectBuffer(128, buff);
    glGetIntegerv(GL_VIEWPORT, view);
  	
