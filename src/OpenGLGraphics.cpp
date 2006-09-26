@@ -2427,8 +2427,60 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 	glPopMatrix();
 }
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order) {
+	//temp location to try a texture map...
+	int imageWidth =16;
+	GLubyte bw[16][16] ={	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,255,128,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,255,255,0,0,0,0,0,0},
+	{0,255,255,255,255,255,255,255,255,255,128,0,0,0,0,0},
+	{0,255,255,255,255,255,255,255,255,255,255,0,0,0,0},
+	{0,255,255,255,255,255,255,255,255,255,255,128,0,0,0},
+	{0,255,255,255,255,255,255,255,255,255,255,128,0,0,0},
+	{0,255,255,255,255,255,255,255,255,255,255,0,0,0,0},
+	{0,255,255,255,255,255,255,255,255,255,128,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,255,255,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,255,128,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
+	GLubyte testimage[16][16][4];
+	for (int i=0; i<imageWidth; i++) {
+		for (int j=0; j<imageWidth; j++) {
+			int c = ((((i&0x8)==0)^((j&0x8))==0))*255;
+//			testimage[i][j][0] = c;
+//			testimage[i][j][1] = c;
+//			testimage[i][j][2] = c;
+//			testimage[i][j][3] = 255;
+			testimage[i][j][0] = bw[i][j];
+			testimage[i][j][1] = bw[i][j];
+			testimage[i][j][2] = bw[i][j];
+			testimage[i][j][3] = bw[i][j];
+			if (bw[i][j] == 0) testimage[i][j][3]=128;
+		}
+	}
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	GLuint texname;
+	glGenTextures(1, &texname);
+	glBindTexture(GL_TEXTURE_2D, texname);
+	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageWidth, 0, GL_RGBA,
+				 GL_UNSIGNED_BYTE, testimage);
+	
+	glEnable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+//	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
+	
 	GLUquadricObj * qobj = NULL;
 	qobj = gluNewQuadric();
+
 
 	CPoint3D	offset, NormalOffset, NormEnd, NormStart={0,0,1};
 	Matrix4D	rotMat;
@@ -2452,10 +2504,20 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
-	gluCylinder(qobj, 0.1, 0.1, length, 12, 1);
+	gluQuadricTexture(qobj, GL_TRUE);
+	gluCylinder(qobj, 0.1, 0.1, 0.2, 12, 1);
+	glTranslatef(0, 0, 0.2);
+	gluQuadricTexture(qobj, GL_FALSE);
+	gluCylinder(qobj, 0.1, 0.1, length-0.4, 12, 1);
+	glTranslatef(0, 0, length-0.4);
+	gluQuadricTexture(qobj, GL_TRUE);
+	gluCylinder(qobj, 0.1, 0.1, 0.2, 12, 1);
 	glPopMatrix();
 	
 	if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
+	
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
 }
 
 //Draw a transluecent plane
