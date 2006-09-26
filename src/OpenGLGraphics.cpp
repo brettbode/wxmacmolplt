@@ -1593,6 +1593,37 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 		case GAMESS_S2N:
 			break;
 		case GAMESS_DND:
+		{
+			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			if ((order == 3)||(order == 5)) DrawInversionPoint();
+			origin.x = origin.y = p1.x = p1.y = 0.0;
+			origin.z = -MainData->MaxSize;
+			p1.z = MainData->MaxSize;
+			DrawRotationAxis(origin, p1, order);
+			//Set of order C2 axis perpendicular to primary axis
+			for (int i=0; i<order; i++) {
+				origin.x = - cos(kPi * i/order) * MainData->MaxSize;
+				origin.y = - sin(kPi * i/order) * MainData->MaxSize;
+				origin.z = 0.0;
+				p1.x = - origin.x;
+				p1.y = - origin.y;
+				p1.z = origin.z;
+				DrawRotationAxis(origin, p1, 2);
+			}
+				//There are order count of planes bisecting the 2 fold axis
+			for (int i=0; i<order; i++) {
+				origin.x = - sin(kPi * i/order) * MainData->MaxSize;
+				origin.y = - cos(kPi * i/order) * MainData->MaxSize;
+				origin.z = -MainData->MaxSize;
+				p1.x = - origin.x;
+				p1.y = - origin.y;
+				p1.z = origin.z;
+				p2.x = origin.x;
+				p2.y = origin.y;
+				p2.z = - origin.z;
+				DrawTranslucentPlane(origin, p1, p2);
+			}
+		}
 			break;
 		case GAMESS_DNH:
 		{
@@ -1621,7 +1652,7 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 				p1.x = - origin.x;
 				p1.y = - origin.y;
 				p1.z = origin.z;
-				DrawRotationAxis(origin, p1, order);
+				DrawRotationAxis(origin, p1, 2);
 			}
 		}
 			break;
@@ -2427,8 +2458,20 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 	glPopMatrix();
 }
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order) {
-	//temp location to try a texture map...
+	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
+	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
+	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
+	float save_emissive[4], save_diffuse[4], save_specular[4];
+	
+	glGetMaterialfv(GL_FRONT, GL_DIFFUSE, save_diffuse);
+	glGetMaterialfv(GL_FRONT, GL_EMISSION, save_emissive);
+	glGetMaterialfv(GL_FRONT, GL_SPECULAR, save_specular);
+
 	int imageWidth =16;
+	//Our width needs to be a power of two. So orders 1, 2 and 4 are no problem. Other orders such as 3
+	//must be padded out to the next higher power of two.
+	int repeat = order;
+	if (order == 3) repeat = 4;
 	GLubyte bw[16][16] ={	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0},
@@ -2445,19 +2488,34 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	{0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
-	GLubyte testimage[16][16][4];
+	GLubyte * testimage = new GLubyte[imageWidth*imageWidth*repeat*4];
+	int p = 0;
 	for (int i=0; i<imageWidth; i++) {
-		for (int j=0; j<imageWidth; j++) {
-			int c = ((((i&0x8)==0)^((j&0x8))==0))*255;
-//			testimage[i][j][0] = c;
-//			testimage[i][j][1] = c;
-//			testimage[i][j][2] = c;
-//			testimage[i][j][3] = 255;
-			testimage[i][j][0] = bw[i][j];
-			testimage[i][j][1] = bw[i][j];
-			testimage[i][j][2] = bw[i][j];
-			testimage[i][j][3] = bw[i][j];
-			if (bw[i][j] == 0) testimage[i][j][3]=128;
+		for (int o=0; o<order; o++) {
+			for (int j=0; j<imageWidth; j++) {
+				testimage[p] = bw[i][j];
+				testimage[p + 1] = bw[i][j];
+				testimage[p + 2] = bw[i][j];
+				testimage[p + 3] = bw[i][j];
+				if (bw[i][j] == 0) testimage[p + 3]=178;
+				p+=4;
+			}
+			if (order == 3) {
+				for (int t=0; t<5; t++) {
+					testimage[p] = 0;
+					testimage[p + 1] = 0;
+					testimage[p + 2] = 0;
+					testimage[p + 3] = 178;
+					p+=4;
+				}
+			}
+		}
+		if (order == 3) {
+			testimage[p] = 0;
+			testimage[p + 1] = 0;
+			testimage[p + 2] = 0;
+			testimage[p + 3] = 178;
+			p+=4;
 		}
 	}
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -2467,20 +2525,23 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, imageWidth, 0, GL_RGBA,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth*repeat, imageWidth, 0, GL_RGBA,
 				 GL_UNSIGNED_BYTE, testimage);
 	
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, plane_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
+	glColor4f(0, .64, .85, 0.7);
+
 	glEnable(GL_BLEND);
 	glEnable(GL_TEXTURE_2D);
-//	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
 	
 	GLUquadricObj * qobj = NULL;
 	qobj = gluNewQuadric();
-
 
 	CPoint3D	offset, NormalOffset, NormEnd, NormStart={0,0,1};
 	Matrix4D	rotMat;
@@ -2518,6 +2579,10 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
+	glDeleteTextures(1, &texname);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, save_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, save_emissive);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, save_specular);
 }
 
 //Draw a transluecent plane

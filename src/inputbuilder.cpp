@@ -2463,6 +2463,7 @@ void InputBuilderWindow::OnOkClick( wxCommandEvent& event )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->GetData()->SetInputData(TmpInputRec);
+	parent->ResetModel(false);
     parent->CloseInputBuilderWindow();
 }
 
