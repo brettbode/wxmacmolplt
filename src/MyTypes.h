@@ -358,7 +358,7 @@ class Surface {
 		long WriteSurface(BufferFile * Buffer);
 		long Read(BufferFile * Buffer, long length);
 		virtual void Export(BufferFile * Buffer) const;
-		void ExportToFile(void);
+	//	void ExportToFile(void);
 		virtual void RotateSurface(Matrix4D RotationMatrix);
 		virtual bool ExportPossible(void) const {return false;};
 		virtual bool NeedsUpdateDuringRotation(void) const {return false;};
