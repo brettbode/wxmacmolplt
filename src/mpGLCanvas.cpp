@@ -502,6 +502,11 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	      }
 	  }
 
+	if (event.RightDown() && interactiveMode)
+	  {
+	    selected = testPicking(tmpPnt.x, tmpPnt.y);
+	  }
+
 	if (event.Dragging())
 	  {
 	    mSelectState++;
@@ -527,54 +532,68 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
     // allow a little bit dragging to be interpreted as selection
 	if ( event.LeftUp())
 	  {
-	    if (interactiveMode)
-	      {
-		if (selected < 0)
-		  {
-		    AtomTypeDialog* newAtomTypeDlg = new AtomTypeDialog(this);
-		    long tmpStatus = newAtomTypeDlg->ShowModal();
-
-		    if (tmpStatus == wxID_OK)
-		      {
-			GLdouble newX, newY, newZ;
-
-			findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
-			//estimate an atomDepth value, X and Y values are of no use 
-			CPoint3D newPnt;
-			findReal3DCoord(tmpPnt.x, tmpPnt.y, newX, newY, newZ);
-			newPnt.x = newX;
-			newPnt.y = newY;
-			newPnt.z = newZ;
-
-			lFrame->AddAtom(newAtomTypeDlg->getID(), newPnt);
-		      }
-
-		    delete newAtomTypeDlg;
-
-		    oldSelect = -1;
-		  }
-		else if (selected != oldSelect)
-		  {
-		    int tmpBondStatus = lFrame->BondExists(oldSelect,selected);
- 
-		    if (tmpBondStatus == -1)
-		      lFrame->AddBond(oldSelect,selected);
-
-		    oldSelect = selected;
-
-		    if (tmpBondStatus == -1)
-		      selected = -1;
-		  }
-	      }
-	    else if (mSelectState >= 0 && mSelectState < 3)
+	    if (mSelectState >= 0 && mSelectState < 3)
 	      {
 		mSelectState = -1;
+ 
+		if (interactiveMode)
+		  {
+		    if (selected < 0)
+		      {
+			AtomTypeDialog* newAtomTypeDlg = new AtomTypeDialog(this);
+			long tmpStatus = newAtomTypeDlg->ShowModal();
+
+			if (tmpStatus == wxID_OK)
+			  {
+			    GLdouble newX, newY, newZ;
+
+			    findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
+			    //estimate an atomDepth value, X and Y values are of no use 
+			    CPoint3D newPnt;
+			    findReal3DCoord(tmpPnt.x, tmpPnt.y, newX, newY, newZ);
+			    newPnt.x = newX;
+			    newPnt.y = newY;
+			    newPnt.z = newZ;
+
+			    lFrame->AddAtom(newAtomTypeDlg->getID(), newPnt);
+			  }
+
+			delete newAtomTypeDlg;
+
+			oldSelect = -1;
+		      }
+		    else if (selected != oldSelect)
+		      {
+			int tmpBondStatus = lFrame->BondExists(oldSelect,selected);
+ 
+			if (tmpBondStatus == -1)
+			  lFrame->AddBond(oldSelect,selected);
+
+			oldSelect = selected;
+
+			if (tmpBondStatus == -1)
+			  selected = -1;
+		      }
+		  }
 	      }
 
 	    SelectObj(selected, deSelectAll);
 	    MolWin->SelectionChanged(deSelectAll);
 	    MolWin->UpdateGLModel();
 	}
+	
+	if (event.RightUp() && interactiveMode)
+	  {
+	    if (selected >= 0 && selected < NumAtoms)
+	      lFrame->DeleteAtom(selected);
+
+	    if (selected >= NumAtoms)
+	      lFrame->DeleteBond(selected - NumAtoms);	
+
+	    MolWin->SelectionChanged(deSelectAll);
+	    MolWin->UpdateGLModel();    
+	  }
+
     // Pass mouse event to MolDisplayWin::Rotate for processing
     if (interactiveMode)
       draw();
