@@ -606,9 +606,9 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		StartPos = Buffer->GetFilePos();
 		if (!Buffer->LocateKeyWord("$END", 4)) throw DataError();
 		EndPos = Buffer->GetFilePos() - 1;
-		if (MainData->InputOptions->Data->GetCoordType() <= 3) {
-			Buffer->SetFilePos(StartPos);
-			nAtoms = Buffer->GetNumLines(EndPos - StartPos) - 1;
+		Buffer->SetFilePos(StartPos);
+		nAtoms = Buffer->GetNumLines(EndPos - StartPos);
+		if (MainData->InputOptions->Data->GetCoordType() <= CartesianCoordType) {
 			if (nAtoms > 0) {
 				if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
 			} else {
@@ -620,6 +620,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				Buffer->GetLine(Line);
 				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 				{ throw UserCancel();}
+				pos.x = pos.y = pos.z = 0.0;
 				sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
 				lFrame->AddAtom((long) AtomType, pos);
 				StartPos = Buffer->FindBlankLine();
@@ -628,9 +629,16 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					Buffer->SkipnLines(1);
 				}
 			}
-			if (Prefs->GetAutoBond())	//setup bonds, if needed
-				lFrame->SetBonds(Prefs, false);
+		} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTMPCCoordType) {
+			if (nAtoms > 0) {
+				if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
+			} else {
+				throw DataError(14);
+			}
+			MainData->ParseMOPACZMatrix(Buffer, nAtoms, Prefs);
 		}
+		if (Prefs->GetAutoBond())	//setup bonds, if needed
+			lFrame->SetBonds(Prefs, false);
 	}
 	
 	return 1;

@@ -196,6 +196,14 @@ void MOPacInternals::GuessInit(MoleculeData * MainData) {
 	Count = 3*lFrame->NumAtoms;
 	CartesiansToInternals(MainData);
 }
+void MOPacInternals::AddInternalCoordinate(long whichAtom, long connectedAtom, short type, float value) {
+	if (3*whichAtom > Allocation) return;
+	if (connectedAtom > whichAtom) return; //forward references are not allowed
+	if ((type < 0)||(type>2)) return; //invalid type
+	if (3*whichAtom > Count) Count = 3*whichAtom;
+	ConnectionAtoms[3*whichAtom+type] = connectedAtom;
+	Values[3*whichAtom+type] = value;
+}
 //Take the given cartesians and connection list and recalculate
 //the values of each internal coordinate
 void MOPacInternals::CartesiansToInternals(MoleculeData * MainData) {

@@ -27,7 +27,7 @@ class MOPacInternals {
 		long		Allocation;
 		long		Count;
 	public:
-		MOPacInternals(long NumAtoms);
+		MOPacInternals(long count);
 		MOPacInternals(BufferFile * Buffer);
 		MOPacInternals(XMLElement * Parent);
 		~MOPacInternals(void);
@@ -44,6 +44,7 @@ class MOPacInternals {
 		void UpdateAtoms(MoleculeData * MainData);
 		inline long GetConnection(long i, short part) {return ConnectionAtoms[3*i+part];};
 		inline float GetValue(long i, short part) {return Values[3*i+part];};
+		void AddInternalCoordinate(long whichAtom, long connectedAtom, short type, float value);
 		inline void SetConnection(long i, short part, long j) {
 			if ((i>=0)&&(i<Count)&&(part>=0)&&(part<3)) ConnectionAtoms[3*i+part]=j;};
 		inline void SetValue(long i, short part, float val) {

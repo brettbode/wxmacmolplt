@@ -21,6 +21,7 @@
 #include "VirtualSphere.h"
 #include "Progress.h"
 #include "Prefs.h"
+#include "myFiles.h"
 #include <string.h>
 #include <new>
 
@@ -655,6 +656,64 @@ void MoleculeData::ParseGAMESSBasisSet(BufferFile * Buffer) {
 		}
 	}
 }	/*ParseGAMESSBasisSet*/
+void MoleculeData::ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, WinPrefs * Prefs) {
+	if (!IntCoords) {
+		IntCoords = new Internals;
+	}
+	MOPacInternals * mInts = IntCoords->GetMOPacStyle();
+	if (!mInts) {
+		IntCoords->CreateMOPacInternals(3*nAtoms);
+		mInts = IntCoords->GetMOPacStyle();
+	}
+	int iline=0;
+	long EndPos = Buffer->GetFileSize();
+	while ((Buffer->GetFilePos() < EndPos)&&(iline<nAtoms)) {
+		CPoint3D	pos = {0,0,0};	//This is just a placeholder
+		char		token[kMaxLineLength], Line[kMaxLineLength];
+		float		bondLength, bondAngle, bondDihedral;
+		long		AtomType;
+		int			j1, j2, j3, con1, con2, con3;
+		Buffer->GetLine(Line);
+		int readCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", token, &bondLength, &j1, &bondAngle, &j2,
+			   &bondDihedral, &j3, &con1, &con2, &con3);
+		if (readCount < 1) break;	//failed to parse anything??
+		AtomType = SetAtomType((unsigned char *) token);
+		cFrame->AddAtom(AtomType, pos);
+		if (iline > 0) {
+			if (readCount < 2) break;
+			if (iline == 1) {	//the second atom will specify only the bond length
+				con1 = 1;
+			} else {
+				if (iline == 2) {	//For the third atom the connectivity is optional
+					if ((readCount >= 5)&&(readCount <=7)) {
+						con1 = 2;
+						con2 = 1;	//The default allows the connections to be assumed
+						if (readCount >= 6) {
+							con1 = bondDihedral;
+							con2 = j3;
+						}
+					} else break;	//invalid line
+				}
+			}
+			if (bondLength < 0.0) break;
+			con1--;
+			con2--;
+			con3--;
+			if (con1 >= iline) break;
+			mInts->AddInternalCoordinate(iline, con1, 0, bondLength);
+			if (iline > 1) {
+				mInts->AddInternalCoordinate(iline, con2, 1, bondAngle);
+				if (iline > 2)
+					mInts->AddInternalCoordinate(iline, con3, 2, bondDihedral);
+			}
+		}
+		iline++;
+	}
+		//if we punted after the AddAtom call delete off the atom without internal coordinate information
+	if (iline > cFrame->NumAtoms) cFrame->DeleteAtom(iline-1);
+	//Now convert the set of internals into cartesians
+	mInts->InternalsToCartesians(this, Prefs, 0);
+}
 void MoleculeData::GetModelCenter(CPoint3D * center) {
 		CPoint3D	temp;
 	temp.x = -TotalRotation[3][0];
