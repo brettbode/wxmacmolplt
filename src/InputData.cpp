@@ -2225,9 +2225,12 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 	File->WriteLine(Out, true);
 	if ((PointGroup!=0)&&(PointGroup!=1)) File->WriteLine("", true);
 		//coordinates
-	if (Coord == 4) {
+	if (Coord == ZMTCoordType) {	//"normal" style z-matrix
 		Internals * IntCoords = MainData->GetInternalCoordinates();
 		if (IntCoords) IntCoords->WriteCoordinatesToFile(File, MainData, Prefs);
+	} else if (Coord == ZMTMPCCoordType) {
+		Internals * IntCoords = MainData->GetInternalCoordinates();
+		if (IntCoords) IntCoords->WriteMPCZMatCoordinatesToFile(File, MainData, Prefs);
 	} else {
 		for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
 			Str255 AtomLabel;
@@ -3708,6 +3711,33 @@ void MOPacInternals::WriteCoordinatesToFile(BufferFile * File, MoleculeData * Ma
 				(char *) &(AtomLabel[1]), ConnectionAtoms[3*iatom]+1, Values[3*iatom], 
 				ConnectionAtoms[3*iatom+1]+1, Values[3*iatom+1],
 				ConnectionAtoms[3*iatom+2]+1, Values[3*iatom+2]);
+		File->WriteLine(Out, true);
+	}
+}
+//This if very similar to the prevous function, but the format is a little different
+void MOPacInternals::WriteMPCZMatCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) {
+	UpdateAtoms(MainData);	//First make sure the connectivity and values are up to date
+	CartesiansToInternals(MainData);
+	char	Out[133];
+	Str255	AtomLabel;
+	Frame *	cFrame = MainData->GetCurrentFramePtr();
+	
+	for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
+		Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
+		AtomLabel[AtomLabel[0]+1] = 0;
+		if (iatom==0) sprintf(Out, "%s", (char *) &(AtomLabel[1]));
+		else if (iatom == 1)
+			sprintf(Out, "%s   %10.5f", (char *) &(AtomLabel[1]),
+					Values[3*iatom]);
+		else if (iatom == 2)
+			sprintf(Out, "%s   %10.5f 0 %8.4f 0 %d %d",
+					(char *) &(AtomLabel[1]), Values[3*iatom], 
+					Values[3*iatom+1], ConnectionAtoms[3*iatom]+1, ConnectionAtoms[3*iatom+1]+1);
+		else
+			sprintf(Out, "%s   %10.5f 0 %8.4f 0 %8.4f 0 %d %d %d",
+					(char *) &(AtomLabel[1]), Values[3*iatom], Values[3*iatom+1],
+					Values[3*iatom+2], ConnectionAtoms[3*iatom]+1,
+					ConnectionAtoms[3*iatom+1]+1, ConnectionAtoms[3*iatom+2]+1);
 		File->WriteLine(Out, true);
 	}
 }

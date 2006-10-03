@@ -33,6 +33,7 @@ class MOPacInternals {
 		~MOPacInternals(void);
 		void WriteZMATToFile(BufferFile * File);
 		void WriteCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs);
+		void WriteMPCZMatCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs);
 		long GetSize(BufferFile * Buffer);
 		long Write(BufferFile * Buffer);
 		void WriteXML(XMLElement * parent) const;
@@ -71,6 +72,8 @@ class Internals {
 		inline void WriteZMATToFile(BufferFile * File) {if (MOPacStyle) MOPacStyle->WriteZMATToFile(File);};
 		inline void WriteCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) 
 			{if (MOPacStyle) MOPacStyle->WriteCoordinatesToFile(File, MainData, Prefs);};
+		inline void WriteMPCZMatCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) 
+		{if (MOPacStyle) MOPacStyle->WriteMPCZMatCoordinatesToFile(File, MainData, Prefs);};
 };
 
 #endif
