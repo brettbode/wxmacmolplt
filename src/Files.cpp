@@ -629,6 +629,17 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					Buffer->SkipnLines(1);
 				}
 			}
+		} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTCoordType) {
+			long bPos = Buffer->FindBlankLine();
+			if ((bPos > 0)&&(bPos < EndPos)) {
+				nAtoms = Buffer->GetNumLines(bPos - StartPos);
+			}
+			if (nAtoms > 0) {
+				if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
+			} else {
+				throw DataError(14);
+			}
+			MainData->ParseZMatrix(Buffer, nAtoms, Prefs);
 		} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTMPCCoordType) {
 			if (nAtoms > 0) {
 				if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();

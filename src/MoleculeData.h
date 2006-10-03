@@ -57,6 +57,7 @@ class MoleculeData {
 		long ReadInitialFragmentCoords(BufferFile * Buffer);
 		void ReadFragmentCoordinates(BufferFile * Buffer, long NumFragmentAtoms);
 		void ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, WinPrefs * Prefs);
+		void ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPrefs * Prefs);
 #ifndef __wxBuild__
 		void ConvertMainWinData1(BufferFile *Buffer, long size);
 		void ConvertMainWinData14(BufferFile * Buffer, long length);

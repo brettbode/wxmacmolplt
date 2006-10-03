@@ -24,6 +24,7 @@
 #include "myFiles.h"
 #include <string.h>
 #include <new>
+#include <map>
 
 MoleculeData::MoleculeData(void) {
 	RotCoords = NULL;
@@ -656,6 +657,121 @@ void MoleculeData::ParseGAMESSBasisSet(BufferFile * Buffer) {
 		}
 	}
 }	/*ParseGAMESSBasisSet*/
+//Parse a gaussian style zmatrix as would be formated in GAMESS input
+void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPrefs * Prefs) {
+	if (!IntCoords) {
+		IntCoords = new Internals;
+	}
+	MOPacInternals * mInts = IntCoords->GetMOPacStyle();
+	if (!mInts) {
+		IntCoords->CreateMOPacInternals(3*nAtoms);
+		mInts = IntCoords->GetMOPacStyle();
+	}
+	int iline=0;
+	long StartPos = Buffer->GetFilePos();
+	Buffer->LocateKeyWord("$END", 4);
+	long EndPos = Buffer->GetFilePos();
+	Buffer->SetFilePos(StartPos);
+	//First jump past the atoms and build a map of any string=value pairs (if any)
+	std::map<std::string, double> valueMap;
+	long bPos = Buffer->FindBlankLine();
+	if ((bPos > 0)&&(bPos < EndPos)) {
+		while (Buffer->GetFilePos() < EndPos) {
+			char		token[kMaxLineLength], Line[kMaxLineLength];
+			double		value;
+			Buffer->GetLine(Line);
+			int readCount = sscanf(Line, "%s=%lf", token, &value);
+			if (readCount!=2) break;
+			std::pair<std::string, double> myVal(token, value);
+			std::pair<std::map<std::string, double>::iterator, bool> p = valueMap.insert(myVal);
+			if (! myVal.second) {	//We have hit a duplicate value
+				MessageAlert("Duplicate keys detected in the value list");
+			}
+		}
+	}
+	
+	while ((Buffer->GetFilePos() < EndPos)&&(iline<nAtoms)) {
+		CPoint3D	pos = {0,0,0};	//This is just a placeholder
+		char		token[kMaxLineLength], Line[kMaxLineLength], bondText[kMaxLineLength],
+					angleText[kMaxLineLength], dihedralText[kMaxLineLength];
+		float		bondLength, bondAngle, bondDihedral;
+		long		AtomType;
+		int			con1, con2, con3;
+		Buffer->GetLine(Line);
+		int readCount = sscanf(Line, "%s %d %f %d %f %d %f", token, &con1, bondText, &con2, &angleText, &con3,
+							   &dihedralText);
+		if (readCount < 1) break;	//failed to parse anything??
+		AtomType = SetAtomType((unsigned char *) token);
+		if (AtomType < 0) break;
+		cFrame->AddAtom(AtomType, pos);
+		if (iline > 0) {
+			if (readCount < 2) break;
+			if (sscanf(bondText, "%f", &bondLength) != 1) {
+				//attempt to lookup the value in the map
+				char * s = bondText;
+				double flip = 1.0;
+				if (bondText[0] = '-') {
+					s = &(bondText[1]);
+					flip = -1.0;
+				}
+				std::map<std::string, double>::iterator p = valueMap.find(s);
+				if (p != valueMap.end()) {
+					bondLength = flip * (*p).second;
+				} else break;	//missing key value
+			}
+			if (iline >= 2) {
+				if (readCount < 4) break;
+				if (sscanf(angleText, "%f", &bondAngle) != 1) {
+					//attempt to lookup the value in the map
+					char * s = angleText;
+					double flip = 1.0;
+					if (angleText[0] = '-') {
+						s = &(angleText[1]);
+						flip = -1.0;
+					}
+					std::map<std::string, double>::iterator p = valueMap.find(s);
+					if (p != valueMap.end()) {
+						bondAngle = flip * (*p).second;
+					} else break;	//missing key value
+				}
+				if (iline >= 3) {
+					if (readCount < 6) break;
+					if (sscanf(dihedralText, "%f", &bondDihedral) != 1) {
+						//attempt to lookup the value in the map
+						char * s = dihedralText;
+						double flip = 1.0;
+						if (dihedralText[0] = '-') {
+							s = &(dihedralText[1]);
+							flip = -1.0;
+						}
+						std::map<std::string, double>::iterator p = valueMap.find(s);
+						if (p != valueMap.end()) {
+							bondDihedral = flip * (*p).second;
+						} else break;	//missing key value
+					}
+				}
+			}
+			if (bondLength < 0.0) break;
+			con1--;
+			con2--;
+			con3--;
+			if (con1 >= iline) break;
+			mInts->AddInternalCoordinate(iline, con1, 0, bondLength);
+			if (iline > 1) {
+				if (con2 >= iline) break;
+				mInts->AddInternalCoordinate(iline, con2, 1, bondAngle);
+				if (iline > 2)
+					if (con3 >= iline) break;
+					mInts->AddInternalCoordinate(iline, con3, 2, bondDihedral);
+			}
+		}
+		iline++;
+	}
+	//if we punted after the AddAtom call delete off the atom without internal coordinate information
+	if (iline > cFrame->NumAtoms) cFrame->DeleteAtom(iline-1);
+	//Now convert the set of internals into cartesians
+	mInts->InternalsToCartesians(this, Prefs, 0);
+}
 void MoleculeData::ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, WinPrefs * Prefs) {
 	if (!IntCoords) {
 		IntCoords = new Internals;
@@ -689,7 +805,7 @@ void MoleculeData::ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, W
 						con1 = 2;
 						con2 = 1;	//The default allows the connections to be assumed
 						if (readCount >= 6) {
-							con1 = bondDihedral;
+							con1 = (int) bondDihedral;
 							con2 = j3;
 						}
 					} else break;	//invalid line
