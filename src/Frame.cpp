@@ -245,19 +245,27 @@ void Frame::ReadGradient(BufferFile * Buffer, long SearchLength) {
 
 	Buffer->SetFilePos(SavedPos);	//reset position so other code isn't broken
 }
-float Frame::GetRMSGradient(void) {
+float Frame::GetRMSGradient(void) const {
 	float result=-1.0;
 	if (Gradient) {
 		result = Gradient->GetRMS();
 	}
 	return result;
 }
-float Frame::GetMaxGradient(void) {
+float Frame::GetMaxGradient(void) const {
 	float result=-1.0;
 	if (Gradient) {
 		result = Gradient->GetMaximum();
 	}
 	return result;
+}
+void Frame::SetRMSGradient(float v) {
+	if (!Gradient) Gradient = new GradientData;
+	if (Gradient) Gradient->SetRMS(v);
+}
+void Frame::SetMaximumGradient(float v) {
+	if (!Gradient) Gradient = new GradientData;
+	if (Gradient) Gradient->SetMaximum(v);
 }
 bool Frame::AddSpecialAtom(CPoint3D Vector, long AtomNum) {
 	if (!SpecialAtoms) SpecialAtoms = new CPoint3D[AtomAllocation];

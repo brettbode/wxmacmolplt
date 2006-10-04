@@ -156,8 +156,10 @@ class Frame {
 			AODensity * TotalAODensity, GaussHermiteData * GHData, float * ElectronicMEP, float * NuclearMEP);
 		AODensity * GetAODensity(BasisSet * basis, const long & targetOrbSet);
 		void ReadGradient(BufferFile * Buffer, long SearchLength);
-		float GetRMSGradient(void);
-		float GetMaxGradient(void);
+		float GetRMSGradient(void) const;
+		float GetMaxGradient(void) const;
+		void SetRMSGradient(float val);
+		void SetMaximumGradient(float val);
 		inline VibRec * GetFrequencies(void) {return Vibs;};
 		void ParseNormalModes(BufferFile * Buffer, Progress *, WinPrefs *);
 		void DeleteOrbitals(void);

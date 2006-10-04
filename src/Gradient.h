@@ -23,8 +23,10 @@ class GradientData {
 	public:
 		GradientData(void);
 		~GradientData(void);
-		float GetRMS(void) {return RMS;};
-		float GetMaximum(void) {return Maximum;};
+		float GetRMS(void) const {return RMS;};
+		float GetMaximum(void) const {return Maximum;};
+		void SetRMS(float v) {RMS = v;};
+		void SetMaximum(float v) {Maximum = v;};
 		bool ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms, long SearchLength,
 			bool Style);
 #ifndef __wxBuild__

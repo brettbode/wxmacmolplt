@@ -1075,12 +1075,121 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 	char	LineText[kMaxLineLength];
 	Frame * lFrame = MainData->cFrame;
+	Buffer->SetFilePos(0);
+	if (Buffer->LocateKeyWord("[GEOMETRIES]", 12, -1)) {	//both formats use Angstroms
+		Buffer->GetLine(LineText);
+		if (FindKeyWord(LineText, "XYZ", 3) >= 0) { //cartesian coordinates
+												   // XYZ format looks like
+												   //   #_of_atoms
+												   //  title often containing "scf done: energy"
+												   //  one line for each atom in the form "symbol x y z"
+			while (Buffer->GetFilePos() < Buffer->GetFileSize()) {
+				Buffer->GetLine(LineText);
+				int atmCount=0;
+				if (sscanf(LineText, "%d", &atmCount) == 1) {
+					if (atmCount <= 0) break;
+					Buffer->GetLine(LineText);
+					if (lFrame->NumAtoms > 0) {
+						float t = lFrame->time;
+						lFrame = MainData->AddFrame(atmCount, 0);
+						lFrame->time = t+1;
+					}
+					int epos = FindKeyWord(LineText, "done:", 5);
+					if (epos > 0) {
+						sscanf(&(LineText[epos+5]), "%lf", &(lFrame->Energy));
+					}
+					for (int iatm=0; iatm<atmCount; iatm++) {
+						unsigned char token[kMaxLineLength];
+						CPoint3D	pos;
+						Buffer->GetLine(LineText);
+						int rdcount = sscanf(LineText, "%s %f %f %f", token, &(pos.x), &(pos.y), &(pos.z));
+						if (rdcount == 4) {
+							long atomnum = SetAtomType(token);
+							if (atomnum>0)
+								lFrame->AddAtom(atomnum, pos);
+						}
+					}
+					if (Prefs->GetAutoBond())
+						lFrame->SetBonds(Prefs, false);
+				} else break;
+			}
+		} else if (FindKeyWord(LineText, "ZMAT", 4) >= 0) {	//GAMESS-UK style z matrix
+			while (Buffer->GetFilePos() < Buffer->GetFileSize()) {
+				Buffer->GetLine(LineText);
+				if (FindKeyWord(LineText, "ZMAT", 4) >= 0) {
+					Buffer->BackupnLines(1);
+					if (lFrame->NumAtoms > 0) {
+						float t = lFrame->time;
+						lFrame = MainData->AddFrame(lFrame->NumAtoms, 0);
+						lFrame->time = t+1;
+					}
+					MainData->ParseGAMESSUKZMatrix(Buffer, Prefs);
+					if (lFrame->NumAtoms == 0) break;
+					if (Prefs->GetAutoBond())
+						lFrame->SetBonds(Prefs, false);
+				} else break;
+			}
+		}	//else there is some undocumented type...
+		Buffer->SetFilePos(0);
+		if (Buffer->LocateKeyWord("[GEOCONV]", 9, -1)) {
+			Buffer->SkipnLines(1);
+			bool good = true;
+			while (good) {
+				good = false;
+				Buffer->GetLine(LineText);
+				if (FindKeyWord(LineText, "energy", 6) == 0) {
+					good = true;
+					int iframe = 1;
+					MainData->SetCurrentFrame(iframe);
+					Buffer->GetLine(LineText);
+					while (sscanf(LineText, "%lf", &MainData->cFrame->Energy) == 1) {
+						iframe++;
+						if (iframe > MainData->GetNumFrames()) break;
+						MainData->SetCurrentFrame(iframe);
+						Buffer->GetLine(LineText);
+					}
+					if (iframe <= MainData->GetNumFrames()) Buffer->BackupnLines(1);
+				} else if (FindKeyWord(LineText, "max-force", 9) == 0) {
+					good = true;
+					int iframe = 1;
+					MainData->SetCurrentFrame(iframe);
+					Buffer->GetLine(LineText);
+					float val;
+					while (sscanf(LineText, "%lf", &val) == 1) {
+						MainData->cFrame->SetRMSGradient(val);
+						iframe++;
+						if (iframe > MainData->GetNumFrames()) break;
+						MainData->SetCurrentFrame(iframe);
+						Buffer->GetLine(LineText);
+					}
+					if (iframe <= MainData->GetNumFrames()) Buffer->BackupnLines(1);
+				} else if (FindKeyWord(LineText, "rms-force", 9) == 0) {
+					good = true;
+					int iframe = 1;
+					MainData->SetCurrentFrame(iframe);
+					Buffer->GetLine(LineText);
+					float val;
+					while (sscanf(LineText, "%lf", &val) == 1) {
+						MainData->cFrame->SetMaximumGradient(val);
+						iframe++;
+						if (iframe > MainData->GetNumFrames()) break;
+						MainData->SetCurrentFrame(iframe);
+						Buffer->GetLine(LineText);
+					}
+					if (iframe <= MainData->GetNumFrames()) Buffer->BackupnLines(1);
+				}
+			}
+			MainData->SetCurrentFrame(MainData->GetNumFrames());
+		}
+	}
+	Buffer->SetFilePos(0);
 	// I think we need the atoms keyword first. Its cartesian coordinates are the ones for 
 	// any included orbitals
 	if (Buffer->LocateKeyWord("[ATOMS]", 7, -1)) {
 		float unitConv = 1.0;	//default to angstroms
 		Buffer->GetLine(LineText);
 		if (FindKeyWord(LineText, "AU", 2) > 0) unitConv = kAng2BohrConversion;
+		if (lFrame->NumAtoms > 0) lFrame = MainData->AddFrame(lFrame->NumAtoms, 0);
 		//ugh why does everybody have to create their own cartesian format...
 		Buffer->GetLine(LineText);
 		while ((LineText[0] != '[')&&(Buffer->GetFilePos()<Buffer->GetFileSize())) {
@@ -1119,8 +1228,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 				lFrame->ReadMolDenOrbitals(Buffer, MainData->Basis->GetNumBasisFuncs(false));
 			}
 		}
-	} 
-	//not finding atoms isn't very useful for MacMolPlt...
+	}
 	
 	return 1;
 }

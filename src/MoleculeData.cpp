@@ -780,6 +780,165 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 	//Now convert the set of internals into cartesians
 	mInts->InternalsToCartesians(this, Prefs, 0);
 }
+void MoleculeData::ParseGAMESSUKZMatrix(BufferFile * Buffer, WinPrefs * Prefs) {
+	//In order to support concatinated sets of coords we will use a local set of internals if a preexisting
+	//set is present
+	//First determine the potential number of atoms
+	char	Line[kMaxLineLength];
+	Buffer->GetLine(Line);
+	if (FindKeyWord(Line, "ZMAT", 4) < 0) return;	//Not positioned at the start of the zmatrix block
+	float	unitConversion = kBohr2AngConversion;	//The default units are AU
+	if (FindKeyWord(Line, "ANGS", 4) > 0) unitConversion = 1.0;
+	long BlockStart = Buffer->GetFilePos();
+	if (! Buffer->LocateKeyWord("END", 3, -1)) return;	//end of block marker not found
+	long EndPos = Buffer->GetFilePos();
+	Buffer->SetFilePos(BlockStart);
+	long LastAtomPos = EndPos;
+	if (Buffer->LocateKeyWord("VARIABLES", 9, EndPos)) {
+		LastAtomPos = Buffer->GetFilePos();
+		Buffer->SetFilePos(BlockStart);
+	}
+	if (Buffer->LocateKeyWord("CONSTANTS", 9, EndPos)) {
+		if (Buffer->GetFilePos() < LastAtomPos)
+			LastAtomPos = Buffer->GetFilePos();
+		Buffer->SetFilePos(BlockStart);
+	}
+	long atmCount = Buffer->GetNumLines(LastAtomPos);
+	
+	bool internalsAreLocal=false;
+	if (!IntCoords) {
+		IntCoords = new Internals;
+	}
+	MOPacInternals * mInts = IntCoords->GetMOPacStyle();
+	if (!mInts) {
+		IntCoords->CreateMOPacInternals(3*atmCount);
+		mInts = IntCoords->GetMOPacStyle();
+	} else {
+		internalsAreLocal = true;
+		mInts = new MOPacInternals(3*atmCount);
+	}
+	//First jump past the atoms and build a map of any string=value pairs (if any)
+	std::map<std::string, double> valueMap;
+	if (Buffer->LocateKeyWord("VARIABLES", 9, EndPos)) {
+		Buffer->SkipnLines(1);
+		while (Buffer->GetFilePos() < EndPos) {
+			char		token[kMaxLineLength];
+			double		value;
+			Buffer->GetLine(Line);
+			int readCount = sscanf(Line, "%s %lf", token, &value);
+			if (readCount!=2) break;
+			std::pair<std::string, double> myVal(token, value);
+			std::pair<std::map<std::string, double>::iterator, bool> p = valueMap.insert(myVal);
+			if (! myVal.second) {	//We have hit a duplicate value
+				MessageAlert("Duplicate keys detected in the value list");
+			}
+		}
+		Buffer->SetFilePos(BlockStart);
+	}
+	if (Buffer->LocateKeyWord("CONSTANTS", 9, EndPos)) {
+		Buffer->SkipnLines(1);
+		while (Buffer->GetFilePos() < EndPos) {
+			char		token[kMaxLineLength];
+			double		value;
+			Buffer->GetLine(Line);
+			int readCount = sscanf(Line, "%s %lf", token, &value);
+			if (readCount!=2) break;
+			std::pair<std::string, double> myVal(token, value);
+			std::pair<std::map<std::string, double>::iterator, bool> p = valueMap.insert(myVal);
+			if (! myVal.second) {	//We have hit a duplicate value
+				MessageAlert("Duplicate keys detected in the value list");
+			}
+		}
+		Buffer->SetFilePos(BlockStart);
+	}
+	
+	int iline=0;
+	while ((Buffer->GetFilePos() < LastAtomPos)&&(iline<atmCount)) {
+		CPoint3D	pos = {0,0,0};	//This is just a placeholder
+		char		token[kMaxLineLength], bondText[kMaxLineLength],
+			angleText[kMaxLineLength], dihedralText[kMaxLineLength];
+		float		bondLength, bondAngle, bondDihedral;
+		long		AtomType;
+		int			con1, con2, con3;
+		Buffer->GetLine(Line);
+		int readCount = sscanf(Line, "%s %d %s %d %s %d %s", token, &con1, bondText, &con2, &angleText, &con3,
+							   &dihedralText);
+		if (readCount < 1) break;	//failed to parse anything??
+		AtomType = SetAtomType((unsigned char *) token);
+		if (AtomType < 0) break;
+		cFrame->AddAtom(AtomType, pos);
+		if (iline > 0) {
+			if (readCount < 2) break;
+			if (sscanf(bondText, "%f", &bondLength) != 1) {
+				//attempt to lookup the value in the map
+				char * s = bondText;
+				double flip = 1.0;
+				if (bondText[0] == '-') {
+					s = &(bondText[1]);
+					flip = -1.0;
+				}
+				std::map<std::string, double>::iterator p = valueMap.find(s);
+				if (p != valueMap.end()) {
+					bondLength = flip * (*p).second;
+				} else break;	//missing key value
+			}
+			if (iline >= 2) {
+				if (readCount < 4) break;
+				if (sscanf(angleText, "%f", &bondAngle) != 1) {
+					//attempt to lookup the value in the map
+					char * s = angleText;
+					double flip = 1.0;
+					if (angleText[0] == '-') {
+						s = &(angleText[1]);
+						flip = -1.0;
+					}
+					std::map<std::string, double>::iterator p = valueMap.find(s);
+					if (p != valueMap.end()) {
+						bondAngle = flip * (*p).second;
+					} else break;	//missing key value
+				}
+				if (iline >= 3) {
+					if (readCount < 6) break;
+					if (sscanf(dihedralText, "%f", &bondDihedral) != 1) {
+						//attempt to lookup the value in the map
+						char * s = dihedralText;
+						double flip = 1.0;
+						if (dihedralText[0] == '-') {
+							s = &(dihedralText[1]);
+							flip = -1.0;
+						}
+						std::map<std::string, double>::iterator p = valueMap.find(s);
+						if (p != valueMap.end()) {
+							bondDihedral = flip * (*p).second;
+						} else break;	//missing key value
+					}
+				}
+			}
+			if (bondLength < 0.0) break;
+			con1--;
+			con2--;
+			con3--;
+			if (con1 >= iline) break;
+			mInts->AddInternalCoordinate(iline, con1, 0, bondLength);
+			if (iline > 1) {
+				if (con2 >= iline) break;
+				mInts->AddInternalCoordinate(iline, con2, 1, bondAngle);
+				if (iline > 2) {
+					if (con3 >= iline) break;
+					mInts->AddInternalCoordinate(iline, con3, 2, bondDihedral);
+				}
+			}
+		}
+		iline++;
+	}
+	//if we punted after the AddAtom call delete off the atom without internal coordinate information
+	if (iline > cFrame->NumAtoms) cFrame->DeleteAtom(iline-1);
+	//Now convert the set of internals into cartesians
+	mInts->InternalsToCartesians(this, Prefs, 0);
+	if (internalsAreLocal) delete mInts;
+	Buffer->SetFilePos(EndPos);
+	Buffer->SkipnLines(1);
+}
 void MoleculeData::ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, WinPrefs * Prefs) {
 	if (!IntCoords) {
 		IntCoords = new Internals;
