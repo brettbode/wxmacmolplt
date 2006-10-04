@@ -676,11 +676,17 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 	std::map<std::string, double> valueMap;
 	long bPos = Buffer->FindBlankLine();
 	if ((bPos > 0)&&(bPos < EndPos)) {
+		Buffer->SetFilePos(bPos);
+		Buffer->SkipnLines(1);
 		while (Buffer->GetFilePos() < EndPos) {
 			char		token[kMaxLineLength], Line[kMaxLineLength];
 			double		value;
 			Buffer->GetLine(Line);
-			int readCount = sscanf(Line, "%s=%lf", token, &value);
+			char * last;
+			if (strtok_r(Line, "=", &last) == NULL) break;
+			if (last == NULL) break;
+			int readCount = sscanf(Line, "%s", token);
+			readCount += sscanf(last, "%lf", &value);
 			if (readCount!=2) break;
 			std::pair<std::string, double> myVal(token, value);
 			std::pair<std::map<std::string, double>::iterator, bool> p = valueMap.insert(myVal);
@@ -688,6 +694,7 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 				MessageAlert("Duplicate keys detected in the value list");
 			}
 		}
+		Buffer->SetFilePos(StartPos);
 	}
 	
 	while ((Buffer->GetFilePos() < EndPos)&&(iline<nAtoms)) {
@@ -698,7 +705,7 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 		long		AtomType;
 		int			con1, con2, con3;
 		Buffer->GetLine(Line);
-		int readCount = sscanf(Line, "%s %d %f %d %f %d %f", token, &con1, bondText, &con2, &angleText, &con3,
+		int readCount = sscanf(Line, "%s %d %s %d %s %d %s", token, &con1, bondText, &con2, &angleText, &con3,
 							   &dihedralText);
 		if (readCount < 1) break;	//failed to parse anything??
 		AtomType = SetAtomType((unsigned char *) token);
@@ -710,7 +717,7 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 				//attempt to lookup the value in the map
 				char * s = bondText;
 				double flip = 1.0;
-				if (bondText[0] = '-') {
+				if (bondText[0] == '-') {
 					s = &(bondText[1]);
 					flip = -1.0;
 				}
@@ -725,7 +732,7 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 					//attempt to lookup the value in the map
 					char * s = angleText;
 					double flip = 1.0;
-					if (angleText[0] = '-') {
+					if (angleText[0] == '-') {
 						s = &(angleText[1]);
 						flip = -1.0;
 					}
@@ -740,7 +747,7 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 						//attempt to lookup the value in the map
 						char * s = dihedralText;
 						double flip = 1.0;
-						if (dihedralText[0] = '-') {
+						if (dihedralText[0] == '-') {
 							s = &(dihedralText[1]);
 							flip = -1.0;
 						}
@@ -760,9 +767,10 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 			if (iline > 1) {
 				if (con2 >= iline) break;
 				mInts->AddInternalCoordinate(iline, con2, 1, bondAngle);
-				if (iline > 2)
+				if (iline > 2) {
 					if (con3 >= iline) break;
 					mInts->AddInternalCoordinate(iline, con3, 2, bondDihedral);
+				}
 			}
 		}
 		iline++;
