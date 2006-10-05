@@ -162,6 +162,7 @@ class Frame {
 		void SetMaximumGradient(float val);
 		inline VibRec * GetFrequencies(void) {return Vibs;};
 		void ParseNormalModes(BufferFile * Buffer, Progress *, WinPrefs *);
+		void ParseMolDenFrequencies(BufferFile * Buffer, WinPrefs *);
 		void DeleteOrbitals(void);
 		bool ReadCMLMolecule(XMLElement * molElement);
 		bool ParseAtomXML(XMLElement * atomXML, std::vector<char *> & idList);

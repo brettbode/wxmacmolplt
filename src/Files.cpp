@@ -1183,8 +1183,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 		}
 	}
 	Buffer->SetFilePos(0);
-	// I think we need the atoms keyword first. Its cartesian coordinates are the ones for 
-	// any included orbitals
+	// Now look for the ATOMS keyword to use as coordinates for any MOs 
 	if (Buffer->LocateKeyWord("[ATOMS]", 7, -1)) {
 		float unitConv = 1.0;	//default to angstroms
 		Buffer->GetLine(LineText);
@@ -1226,6 +1225,35 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 			if (Buffer->LocateKeyWord("[MO]", 4, -1)) {
 				Buffer->SkipnLines(1);
 				lFrame->ReadMolDenOrbitals(Buffer, MainData->Basis->GetNumBasisFuncs(false));
+			}
+		}
+	}
+	Buffer->SetFilePos(0);
+	if (Buffer->LocateKeyWord("[FR-COORD]", 10, -1)) {	//FR-COORD section is coordinates for frequencies
+														//The units are bohr throughout
+		if (lFrame->NumAtoms > 0) lFrame = MainData->AddFrame(lFrame->NumAtoms, 0);
+		Buffer->SkipnLines(1);
+		Buffer->GetLine(LineText);
+		while ((LineText[0] != '[')&&(Buffer->GetFilePos()<Buffer->GetFileSize())) {
+			unsigned char	token[kMaxLineLength];
+			long atomNum, junk;
+			CPoint3D pos;
+			//name x y z
+			int rdcount = sscanf(LineText, "%s %f %f %f", token, &(pos.x), &(pos.y), &(pos.z));
+			pos *= kBohr2AngConversion;
+			if (rdcount == 4) {
+				long atomnum = SetAtomType(token);
+				if (atomnum>0)
+					lFrame->AddAtom(atomnum, pos);
+			}
+			Buffer->GetLine(LineText);
+		}
+		Buffer->SetFilePos(0);
+		if (lFrame->NumAtoms > 0) {
+			if (Prefs->GetAutoBond())
+				lFrame->SetBonds(Prefs, false);
+			if (Buffer->LocateKeyWord("[FREQ]", 6, -1)) {
+				lFrame->ParseMolDenFrequencies(Buffer, Prefs);
 			}
 		}
 	}

@@ -1521,8 +1521,6 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 			long NumModes = 3*NumAtoms;
 			long NumActiveAtoms = NumAtoms;
 			if (NumSIMOMMAtoms > 0) {
-	//			NumModes = NumSIMOMMAtoms*3;
-	//			NumActiveAtoms = NumSIMOMMAtoms;
 				NumActiveAtoms = NumAtoms - NumSIMOMMAtoms;
 				NumModes = (NumActiveAtoms)*3;
 			}
@@ -1708,6 +1706,87 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 	catch (UserCancel) {//We need to rethrow this one since the whole operation should be aborted
 		if (Vibs) { delete Vibs; Vibs = NULL; }
 		throw;
+	}
+	catch (...) {//File and data errors. Either way delete the vectors and return.
+		if (Vibs) { delete Vibs; Vibs = NULL; }
+		MessageAlert("Error parsing normal modes. Normal modes will be skipped.");
+	}
+}
+void Frame::ParseMolDenFrequencies(BufferFile * Buffer, WinPrefs * Prefs) {
+	try {//catch errors locally
+		if (Buffer->LocateKeyWord("[FREQ]", 6)) {
+			Buffer->SkipnLines(1);
+			long NumModes = 3*NumAtoms;
+			VibRec * lVibs = Vibs = new VibRec(NumModes, NumAtoms);
+			
+			char	LineText[kMaxLineLength], token[kMaxLineLength];
+			for (int i=0; i<NumModes; i++) {
+				Buffer->GetLine(LineText);
+				if (LineText[0] == '[') {
+					NumModes = i;
+					break;
+				}
+				int c =	sscanf(LineText, "%s", token);
+				if (c == 1) {
+					lVibs->Frequencies.push_back(std::string(token));
+				} else {
+					NumModes = i;
+					break;
+				}
+				if (Buffer->GetFilePos() >= Buffer->GetFileSize()) {
+					NumModes = i;
+					break;
+				}
+			}
+			Buffer->SetFilePos(0);
+			if (Buffer->LocateKeyWord("[INT]", 5)) {
+				Buffer->SkipnLines(1);
+				char token2[kMaxLineLength];
+				for (int i=0; i<NumModes; i++) {
+					Buffer->GetLine(LineText);
+					if (LineText[0] == '[') break;
+					int c =	sscanf(LineText, "%s %s", token, token2);
+					float inten;
+					if (c >= 1) {
+						int check = sscanf(token, "%f", &inten);
+						if (check != 1) inten = 10000.0;
+						lVibs->Intensities[i] = inten;
+						if (c == 2) {
+							check = sscanf(token, "%f", &inten);
+							if (check != 1) inten = 10000.0;
+							lVibs->RamanIntensity.push_back(inten);
+						}
+					} else break;
+					if (Buffer->GetFilePos() >= Buffer->GetFileSize()) break;
+				}
+			}
+			Buffer->SetFilePos(0);
+			if (Buffer->LocateKeyWord("[FR-NORM-COORD]", 14)) {
+				Buffer->SkipnLines(1);
+				for (int i=0; i<NumModes; i++) {
+					Buffer->GetLine(LineText);
+					int check;
+					sscanf(LineText, "%s %d", token, &check);
+					if (check != (i+1)) {
+						NumModes = i;
+						break;
+					}
+					for (int j=0; j<NumAtoms; j++) {
+						Buffer->GetLine(LineText);
+						int imode = j + i*NumAtoms;
+						check = sscanf(LineText, "%f %f %f", &(lVibs->NormMode[imode].x), &(lVibs->NormMode[imode].y),
+									   &(lVibs->NormMode[imode].z));
+						float lmass = Prefs->GetSqrtAtomMass(Atoms[j].GetType()-1);
+						lVibs->NormMode[imode] *= lmass;
+					}
+				}
+			}
+			lVibs->NumModes = NumModes;
+		}
+	}	//trap errors here and delete the VibRec
+	catch (std::bad_alloc) {//Memory error, cleanup and return.
+		if (Vibs) { delete Vibs; Vibs = NULL; }
+		MessageAlert("Insufficient memory to read normal modes. Normal Modes will be skipped!");
 	}
 	catch (...) {//File and data errors. Either way delete the vectors and return.
 		if (Vibs) { delete Vibs; Vibs = NULL; }
