@@ -494,10 +494,18 @@ void BondsDlg::UpdateSelection(bool mode)
   Frame * lFrame = MainData->GetCurrentFramePtr();
   long nbonds = lFrame->GetNumBonds();
 
+  if (nbonds != bondGrid->GetNumberRows())
+    {
+      ResetList();
+      bondGrid->MakeCellVisible(nbonds-1, 0);
+    }
+
   if (mode)
     bondGrid->ClearSelection();
 
   for (long i=0; i<nbonds; i++) 
     if (lFrame->GetBondSelectState(i))
       bondGrid->SelectRow(i, true);
+
+  Layout();
 }

@@ -426,22 +426,30 @@ void CoordinatesWindow::UpdateSelection(bool mode)
 
   needClearAll = mode;
   std::vector<int> selected_ids;
+  int visibleRow = 0;
 
   for (long i=0; i<natoms; i++) 
     if (lFrame->GetAtomSelectState(i))
+      {
 	  selected_ids.push_back(i);
+	  visibleRow = i;
+      }
 //remember the selected atom before clearing selections
 
-  FrameChanged();
+  if (natoms != coordGrid->GetNumberRows())
+    {
+      FrameChanged();
+      visibleRow = natoms - 1;
+    }
 
   if (mode)
     coordGrid->ClearSelection();
 
-  if (natoms > coordGrid->GetNumberRows())
-    coordGrid->MakeCellVisible(natoms-1, 0);
-
   for ( int i = 0; i < selected_ids.size(); ++i)
     coordGrid->SelectRow(selected_ids[i], true);
+
+  Layout();
+  coordGrid->MakeCellVisible(visibleRow, 0);
 
 }
 
