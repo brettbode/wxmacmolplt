@@ -403,7 +403,7 @@ void MpGLCanvas::UpdateGLView(void) {
             top = myGLperspective;
             right = top * aspect;
         }
-        glFrustum(-right, right, -top, top, 0.1, 100.0);
+        glFrustum(-right, right, -top, top, 0.1, 1000.0);
         glMatrixMode (GL_MODELVIEW);    //Prepare for model space by submitting the rotation/translation
         glLoadIdentity ();
         
