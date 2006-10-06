@@ -2207,7 +2207,7 @@ void MolDisplayWin::ResetView(void) {
 void MolDisplayWin::ResetModel(bool Center) {
     if (Center) {
         MainData->CenterModelWindow();
-        MainData->WindowSize = 2.0*(MainData->MaxSize+1.0);
+        MainData->WindowSize = 1.25*(MainData->MaxSize+1.0);
     }
     MainData->ResetRotation();
     //Check for and update any surfaces depending on the screen plane

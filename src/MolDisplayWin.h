@@ -97,7 +97,7 @@ class MolDisplayWin : public wxFrame {
          */
         MolDisplayWin(const wxString &title,
                     const wxPoint  &position = wxDefaultPosition,
-                    const wxSize   &size     = wxDefaultSize,
+                    const wxSize   &size     = wxSize(400,420),
                     long            style    = wxDEFAULT_FRAME_STYLE,
                     const wxString &name     = wxT("MpMainFrame"));
 
