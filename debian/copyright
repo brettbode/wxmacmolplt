@@ -1,0 +1,28 @@
+This package was debianized by Brett Bode <brett@scl.ameslab.gov> on
+Tue, 10 Oct 2006 09:20:35 -0500.
+
+It was downloaded from http://www.scl.ameslab.gov/MacMolPlt/
+
+Upstream Author: Brett Bode <brett@scl.ameslab.gov>
+
+Copyright: (c) 2006, Iowa State University of Science and Technology
+   All rights reserved.
+
+License:
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+Please refer to `/usr/share/common-licenses/GPL' for the full text of the
+license.
+
+
+The Debian packaging is (C) 2006, Brett Bode <brett@scl.ameslab.gov> and
+is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
+
+
+# Please also look if there are files or directories which have a
+# different copyright/license attached and list them here.
+

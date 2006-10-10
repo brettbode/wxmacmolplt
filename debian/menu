@@ -1,0 +1,2 @@
+?package(macmolplt):needs="X11|text|vc|wm" section="Apps/science"\
+  title="MacMolPlt" command="/usr/bin/macmolplt"
