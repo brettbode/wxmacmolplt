@@ -25,6 +25,9 @@
 #include <string.h>
 #include <new>
 #include <map>
+#ifdef WIN32
+#undef AddAtom
+#endif
 
 MoleculeData::MoleculeData(void) {
 	RotCoords = NULL;
