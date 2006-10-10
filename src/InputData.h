@@ -17,7 +17,6 @@
 #ifndef __INPUTDATA__
 #define __INPUTDATA__
 
-#pragma options align=power
 #ifndef __BFILE__
 #include "BFiles.h"
 #endif
