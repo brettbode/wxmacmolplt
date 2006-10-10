@@ -682,8 +682,17 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 			char		token[kMaxLineLength], Line[kMaxLineLength];
 			double		value;
 			Buffer->GetLine(Line);
-			char * last;
-			if (strtok_r(Line, "=", &last) == NULL) break;
+			char * last=NULL;
+			int foo=0;	//Since VS lacks strtok_r we'll make do with this
+			while ((Line[foo] != '\0')&&(foo < kMaxLineLength)) {
+				if (Line[foo] == '=') {
+					Line[foo]='\0';
+					last = &(Line[foo+1]);
+					break;
+				}
+				foo++;
+			}
+		//	if (strtok_r(Line, "=", &last) == NULL) break;
 			if (last == NULL) break;
 			int readCount = sscanf(Line, "%s", token);
 			readCount += sscanf(last, "%lf", &value);
