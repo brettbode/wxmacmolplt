@@ -255,6 +255,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\glf.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\GlobalExceptions.h"
 				>
 			</File>
@@ -483,6 +487,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\glf.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Gradient.cpp"
 				>
 			</File>
@@ -521,6 +529,14 @@
 			<File
 				RelativePath=".\src\MolDisplayWin.cpp"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						RuntimeLibrary="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\src\MoleculeData.cpp"
