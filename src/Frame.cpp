@@ -70,6 +70,39 @@ long Frame::Write(BufferFile * Buffer) {
 	
 	return total;
 }
+
+Frame& Frame::operator= (const Frame& f)
+{
+  /*int lNumAtoms = this->NumAtoms;
+  int lNumBonds = this->NumBonds;
+
+  for ( int i = 0; i < lNumAtoms; i++)
+    DeleteAtom(i);
+
+  for ( int i = 0; i < lNumBonds; i++)
+    DeleteBond(i);
+
+    std::cout<<this->NumAtoms<<"  :  "<<this->NumBonds<<std::endl;*/
+
+  delete [] Atoms;
+  Atoms = NULL;
+  delete [] Bonds;
+  Bonds = NULL;
+
+  this->NumAtoms = 0;
+  this->NumBonds = 0;
+  this->AtomAllocation = 0;
+  this->BondAllocation = 0;
+
+  for ( int i = 0; i < f.NumAtoms; i++)
+    AddAtom(f.Atoms[i].Type, f.Atoms[i].Position);
+
+  for ( int i = 0; i < f.NumBonds; i++)
+    AddBond(f.Bonds[i].Atom1, f.Bonds[i].Atom2, f.Bonds[i].Order);
+
+  return *this;
+}
+
 void Frame::Read(BufferFile * Buffer, long length) {
 	if (length != (3*sizeof(double) + sizeof(float) +3*sizeof(long))) throw DataError();
 
@@ -197,14 +230,14 @@ void Frame::SetPreviousFrame(Frame * previous) { PreviousFrame = previous; }
 Frame * Frame::GetNextFrame(void) { return NextFrame; }
 Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
 mpAtom * Frame::AddAtom(long AtomType, CPoint3D AtomPosition) {
-	 mpAtom * result = NULL;
+        mpAtom * result = NULL;
 	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(10);
 	if (NumAtoms<AtomAllocation) {
-		Atoms[NumAtoms].Type = AtomType;
-		Atoms[NumAtoms].Position = AtomPosition;
-		Atoms[NumAtoms].Highlite = 0;
-		result = &Atoms[NumAtoms];
-		NumAtoms++;
+	  Atoms[NumAtoms].Type = AtomType;
+	  Atoms[NumAtoms].Position = AtomPosition;
+	  Atoms[NumAtoms].Highlite = 0;
+	  result = &Atoms[NumAtoms];
+	  NumAtoms++;
 	}
 	return result;
 }
@@ -215,8 +248,9 @@ bool Frame::IncreaseAtomAllocation(long NumAdditional) {
 		if (Atoms != NULL) {
             // BlockMoveData is Mac only.
 			//BlockMoveData(Atoms, temp, NumAtoms*sizeof(mpAtom));
+
             memcpy(temp, Atoms, NumAtoms*sizeof(mpAtom));
-			delete [] Atoms;
+	    delete [] Atoms;
 		}
 		Atoms = temp;
 		AtomAllocation += NumAdditional;

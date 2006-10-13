@@ -73,6 +73,10 @@ class Frame {
 	public:
 		Frame(void);
 		~Frame(void);
+
+		Frame& operator= (const Frame& f);
+		//assignment operator overload
+
 		void Read(BufferFile * Buffer, long length);
 		long Write(BufferFile * Buffer);
 		void Read41(BufferFile * Buffer, long length);

@@ -22,6 +22,8 @@
 #define NEW_ATOM_TYPE_DIALOG 30001
 #define NEW_ATOM_TYPE_TITLE _("Select an Atom type")
 #define ID_NEW_ATOM_TYPE_CHOICE 30010
+#define GL_Popup_Menu_Apply_All 30011
+
 
 typedef class MolDisplayWin MolDisplayWin;
 /**
@@ -67,6 +69,7 @@ class MpGLCanvas : public wxGLCanvas {
 	GLint winDiffX, winDiffY;
 
         void initGL(void);
+	void interactPopupMenu(int x, int y);
 
         DECLARE_EVENT_TABLE()
 
@@ -191,7 +194,9 @@ class MpGLCanvas : public wxGLCanvas {
          * \param y y coordinate of the click.
          * \param mode if true clear off other selections.
          */
-	
+	void On_Apply_All(wxCommandEvent& event);
+	//implementation of the correspondent popup-menu selection
+
 	int testPicking(int x, int y);
 	void SelectObj(int select_id, bool mode);
 	void toggleInteractiveMode() { interactiveMode = 1 - interactiveMode; } 

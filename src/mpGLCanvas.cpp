@@ -488,23 +488,27 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	    mSelectState = 0;
 	    selected = testPicking(tmpPnt.x, tmpPnt.y);
 
-	    if ( selected >= 0 && selected < NumAtoms && interactiveMode)
-	      {
-		GLdouble tmpWinX, tmpWinY;
+	    if ( interactiveMode)
+	      if ( selected >= 0 && selected < NumAtoms )
+		{
+		  GLdouble tmpWinX, tmpWinY;
 
-		findWinCoord(lAtoms[selected].Position.x,
-			      lAtoms[selected].Position.y,
-			      lAtoms[selected].Position.z,
-			      tmpWinX, tmpWinY, atomDepth);
+		  findWinCoord(lAtoms[selected].Position.x,
+			       lAtoms[selected].Position.y,
+			       lAtoms[selected].Position.z,
+			       tmpWinX, tmpWinY, atomDepth);
  
-		winDiffX = tmpPnt.x - (int)tmpWinX;
-		winDiffY = tmpPnt.y - (int)tmpWinY;
-	      }
+		  winDiffX = tmpPnt.x - (int)tmpWinX;
+		  winDiffY = tmpPnt.y - (int)tmpWinY;
+		}
 	  }
 
 	if (event.RightDown() && interactiveMode)
 	  {
 	    selected = testPicking(tmpPnt.x, tmpPnt.y);
+
+	    if (selected < 0)
+	      interactPopupMenu(tmpPnt.x, tmpPnt.y);
 	  }
 
 	if (event.Dragging())
@@ -755,6 +759,29 @@ void MpGLCanvas::SelectObj(int select_id, bool mode)
 
 }
 
+void MpGLCanvas::interactPopupMenu(int x, int y)
+{
+  wxMenu menu;
+
+  menu.Append(GL_Popup_Menu_Apply_All, _T("&Apply to All Frames"));
+  PopupMenu(&menu, x, y);
+}
+//make a popup menu editing the objets in the scene
+
+void MpGLCanvas::On_Apply_All(wxCommandEvent& event)
+{
+  Frame * lFrame = mMainData->cFrame;
+  Frame * cFrame = mMainData->Frames;
+
+  for ( int i = 0; i < mMainData->NumFrames; i++)
+    {
+      if (mMainData->CurrentFrame-1 != i)
+	*cFrame = *lFrame;
+
+      cFrame = cFrame->NextFrame;
+    }
+}
+
 MpGLCanvas::AtomTypeDialog::AtomTypeDialog(MpGLCanvas * parent, wxWindowID id, const wxString& caption) : typeID(1)
 {
   Create(parent, id, caption);
@@ -811,6 +838,8 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
     EVT_MOUSE_EVENTS     (MpGLCanvas::eventMouse)
 
     EVT_CHAR (MpGLCanvas::KeyHandler)
+
+  EVT_MENU (GL_Popup_Menu_Apply_All, MpGLCanvas::On_Apply_All)
 END_EVENT_TABLE()
 
 
