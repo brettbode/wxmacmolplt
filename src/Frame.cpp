@@ -71,19 +71,9 @@ long Frame::Write(BufferFile * Buffer) {
 	return total;
 }
 
+/*
 Frame& Frame::operator= (const Frame& f)
 {
-  /*int lNumAtoms = this->NumAtoms;
-  int lNumBonds = this->NumBonds;
-
-  for ( int i = 0; i < lNumAtoms; i++)
-    DeleteAtom(i);
-
-  for ( int i = 0; i < lNumBonds; i++)
-    DeleteBond(i);
-
-    std::cout<<this->NumAtoms<<"  :  "<<this->NumBonds<<std::endl;*/
-
   delete [] Atoms;
   Atoms = NULL;
   delete [] Bonds;
@@ -102,6 +92,8 @@ Frame& Frame::operator= (const Frame& f)
 
   return *this;
 }
+*/
+//not needed currently
 
 void Frame::Read(BufferFile * Buffer, long length) {
 	if (length != (3*sizeof(double) + sizeof(float) +3*sizeof(long))) throw DataError();

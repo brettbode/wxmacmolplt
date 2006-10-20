@@ -507,8 +507,13 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	  {
 	    selected = testPicking(tmpPnt.x, tmpPnt.y);
 
-	    if (selected < 0)
-	      interactPopupMenu(tmpPnt.x, tmpPnt.y);
+	    if (selected >= 0)
+	      {
+		interactPopupMenu(tmpPnt.x, tmpPnt.y);
+
+		 MolWin->SelectionChanged(deSelectAll);
+		 MolWin->UpdateGLModel();
+	      }
 	  }
 
 	if (event.Dragging())
@@ -586,18 +591,6 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	    MolWin->UpdateGLModel();
 	}
 	
-	if (event.RightUp() && interactiveMode)
-	  {
-	    if (selected >= 0 && selected < NumAtoms)
-	      lFrame->DeleteAtom(selected);
-
-	    if (selected >= NumAtoms)
-	      lFrame->DeleteBond(selected - NumAtoms);	
-
-	    MolWin->SelectionChanged(deSelectAll);
-	    MolWin->UpdateGLModel();    
-	  }
-
     // Pass mouse event to MolDisplayWin::Rotate for processing
     if (interactiveMode)
       draw();
@@ -764,21 +757,60 @@ void MpGLCanvas::interactPopupMenu(int x, int y)
   wxMenu menu;
 
   menu.Append(GL_Popup_Menu_Apply_All, _T("&Apply to All Frames"));
+  menu.Append(GL_Popup_Delete_Item_Current_Frame, _T("&Delete"));
+  menu.Append(GL_Popup_Delete_Item_All_Frames, _T("&Delete in All Frames"));
+
   PopupMenu(&menu, x, y);
 }
 //make a popup menu editing the objets in the scene
 
 void MpGLCanvas::On_Apply_All(wxCommandEvent& event)
 {
-  Frame * lFrame = mMainData->cFrame;
+  Frame *  lFrame = mMainData->cFrame;
+  long NumAtoms = lFrame->NumAtoms;
+
+  if (selected < 0 || selected >= NumAtoms)
+    return;
+
   Frame * cFrame = mMainData->Frames;
 
   for ( int i = 0; i < mMainData->NumFrames; i++)
     {
       if (mMainData->CurrentFrame-1 != i)
-	*cFrame = *lFrame;
+	cFrame->Atoms[selected] = lFrame->Atoms[selected];
 
       cFrame = cFrame->NextFrame;
+    }
+}
+
+void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event)
+{
+  Frame * lFrame = mMainData->cFrame;
+  long NumAtoms = lFrame->NumAtoms;
+
+  if (selected >= 0 && selected < NumAtoms)
+    lFrame->DeleteAtom(selected);
+
+  if (selected >= NumAtoms)
+    lFrame->DeleteBond(selected - NumAtoms);
+
+}
+
+void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event)
+{
+  Frame * lFrame = mMainData->Frames;
+
+  while (lFrame)
+    {
+      long NumAtoms = lFrame->NumAtoms;
+
+      if (selected >= 0 && selected < NumAtoms)
+	lFrame->DeleteAtom(selected);
+
+      if (selected >= NumAtoms)
+	lFrame->DeleteBond(selected - NumAtoms);
+
+      lFrame = lFrame->NextFrame;
     }
 }
 
@@ -840,6 +872,8 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
     EVT_CHAR (MpGLCanvas::KeyHandler)
 
   EVT_MENU (GL_Popup_Menu_Apply_All, MpGLCanvas::On_Apply_All)
+  EVT_MENU (GL_Popup_Delete_Item_Current_Frame, MpGLCanvas::On_Delete_Single_Frame)
+  EVT_MENU (GL_Popup_Delete_Item_All_Frames, MpGLCanvas::On_Delete_All_Frames)
 END_EVENT_TABLE()
 
 

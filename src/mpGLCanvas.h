@@ -23,7 +23,8 @@
 #define NEW_ATOM_TYPE_TITLE _("Select an Atom type")
 #define ID_NEW_ATOM_TYPE_CHOICE 30010
 #define GL_Popup_Menu_Apply_All 30011
-
+#define GL_Popup_Delete_Item_Current_Frame 30012
+#define GL_Popup_Delete_Item_All_Frames 30013
 
 typedef class MolDisplayWin MolDisplayWin;
 /**
@@ -195,6 +196,8 @@ class MpGLCanvas : public wxGLCanvas {
          * \param mode if true clear off other selections.
          */
 	void On_Apply_All(wxCommandEvent& event);
+	void On_Delete_Single_Frame(wxCommandEvent& event);
+	void On_Delete_All_Frames(wxCommandEvent& event);
 	//implementation of the correspondent popup-menu selection
 
 	int testPicking(int x, int y);

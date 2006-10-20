@@ -74,8 +74,8 @@ class Frame {
 		Frame(void);
 		~Frame(void);
 
-		Frame& operator= (const Frame& f);
-		//assignment operator overload
+		//Frame& operator= (const Frame& f);
+		//assignment operator overload -- not needed currently
 
 		void Read(BufferFile * Buffer, long length);
 		long Write(BufferFile * Buffer);
