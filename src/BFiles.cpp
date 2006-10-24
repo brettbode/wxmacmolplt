@@ -409,8 +409,11 @@ long BufferFile::GetLine(char * Line)
 #else
 	if (((BufferPos+BufferStart)<ByteCount)&&
 		((Buffer[BufferPos] == 13)||(Buffer[BufferPos] == 10))) {
-		if ((Buffer[BufferPos]==13)&&(Buffer[BufferPos+1]==10)) BufferPos++;
 		BufferPos++;
+		if (Buffer[BufferPos-1]==13) {
+			if (BufferPos >= BufferSize) AdvanceBuffer();
+			if (Buffer[BufferPos]==10) BufferPos++;
+		}
 	}
 #endif
 	Line[LineChars] = 0;	//Make it a proper NULL terminated string
