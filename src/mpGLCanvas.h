@@ -15,6 +15,9 @@
 
 #include "wx/wx.h"
 #include "wx/glcanvas.h"
+#include "wx/popupwin.h"
+#include "wx/generic/dragimgg.h"
+#define wxDragImage wxGenericDragImage
 
 #include "MoleculeData.h"
 #include "Frame.h"
@@ -61,6 +64,8 @@ class MpGLCanvas : public wxGLCanvas {
         bool        initialized;
 
 	MoleculeData *mMainData;
+	//coordPopup* lPopup;
+	wxDragImage*    mDragWin;
 
 	int mSelectState;
 	int selected;

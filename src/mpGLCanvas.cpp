@@ -48,6 +48,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
     mSelectState = -1;
     interactiveMode = false;
     oldSelect = -1;
+    mDragWin = NULL;
     //Hmm is this the right spot to initialize our GL settings?
 //  initGL();
 }
@@ -519,6 +520,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	if (event.Dragging())
 	  {
 	    mSelectState++;
+
 	    if ( selected >= 0 && selected < NumAtoms && interactiveMode)
 	      {
 		GLdouble newX, newY, newZ;
@@ -531,6 +533,24 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		SelectObj(selected, deSelectAll);
 		MolWin->SelectionChanged(deSelectAll);
 		MolWin->UpdateGLModel();
+
+		if (!mDragWin)
+		  {
+		    mDragWin = new wxDragImage(wxString(_T("abc")), wxCursor(wxCURSOR_HAND));
+
+		    if (!mDragWin->BeginDrag(wxPoint(0,30), this))
+		      {
+			delete mDragWin;
+			mDragWin = (wxDragImage*) NULL;
+		      }
+		    else
+		      {
+			mDragWin->Move(event.GetPosition());
+			mDragWin->Show();
+		      }
+		  }
+		else
+		  mDragWin->Move(event.GetPosition());
 	      }
 	  }
 
@@ -584,6 +604,13 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			  selected = -1;
 		      }
 		  }
+	      }
+
+	    if (mDragWin)
+	      {
+		mDragWin->EndDrag();
+		delete mDragWin;
+		mDragWin = NULL;
 	      }
 
 	    SelectObj(selected, deSelectAll);
