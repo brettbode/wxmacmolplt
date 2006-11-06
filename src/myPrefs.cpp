@@ -1085,13 +1085,13 @@ void SurfacePrefsPane::SetupPaneItems( MolDisplayWin* targetWindow)
   mLeftMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("+")), 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_BOTTOM | wxALL, 1);
   mLeftMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("-")), 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_BOTTOM | wxALL, 1);
 
-  RGBColor* tmpColor = new RGBColor();
+  RGBColor tmpColor;
 
-  lSOpts->GetPosColor(tmpColor);
-  mSurfColor[0] = new colorArea(this, 0, tmpColor);
+  lSOpts->GetPosColor(&tmpColor);
+  mSurfColor[0] = new colorArea(this, 0, &tmpColor);
 //  mSurfColor[0]->draw(tmpColor);
-  lSOpts->GetNegColor(tmpColor);
-  mSurfColor[1] = new colorArea(this, 1, tmpColor);
+  lSOpts->GetNegColor(&tmpColor);
+  mSurfColor[1] = new colorArea(this, 1, &tmpColor);
 //  mSurfColor[1]->draw(tmpColor);
 
   mLeftMidSizer->Add(mSurfColor[0], 0, wxALIGN_TOP | wxALL, 1);

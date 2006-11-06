@@ -534,23 +534,28 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		MolWin->SelectionChanged(deSelectAll);
 		MolWin->UpdateGLModel();
 
-		if (!mDragWin)
+		if (mDragWin)
 		  {
-		    mDragWin = new wxDragImage(wxString(_T("abc")), wxCursor(wxCURSOR_HAND));
+		    mDragWin->EndDrag();
+		    delete mDragWin;
+		    mDragWin = (wxDragImage*) NULL;
+		  }
 
-		    if (!mDragWin->BeginDrag(wxPoint(0,30), this))
-		      {
-			delete mDragWin;
-			mDragWin = (wxDragImage*) NULL;
-		      }
-		    else
-		      {
-			mDragWin->Move(event.GetPosition());
-			mDragWin->Show();
-		      }
+		wxString tmp3Dcoord;
+
+		tmp3Dcoord.Printf("%.2f,%.2f,%.2f", newX, newY, newZ);
+		mDragWin = new wxDragImage(tmp3Dcoord, wxCursor(wxCURSOR_HAND));
+
+		if (!mDragWin->BeginDrag(wxPoint(0,30), this))
+		  {
+		    delete mDragWin;
+		    mDragWin = (wxDragImage*) NULL;
 		  }
 		else
-		  mDragWin->Move(event.GetPosition());
+		  {
+		    mDragWin->Move(event.GetPosition());
+		    mDragWin->Show();
+		  }
 	      }
 	  }
 
