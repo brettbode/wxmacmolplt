@@ -728,7 +728,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				if (child->getAttributeValue(MMPPref_convert(MMPEnergyOpt_y1Zero), floatVal))
 					EnergyPlotOptions.SetY1Zero(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPEnergyOpt_y2Zero), floatVal))
-					EnergyPlotOptions.SetY1Zero(floatVal);
+				  //EnergyPlotOptions.SetY1Zero(floatVal);
+				  EnergyPlotOptions.SetY2Zero(floatVal); //modified by Song Li
 				if (child->getAttributeValue(MMPPref_convert(MMPEnergyOpt_yAdjustFactor), floatVal))
 					EnergyPlotOptions.SetYAdjustment(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPEnergyOpt_indicatorSize), longVal))

@@ -492,6 +492,8 @@ EnergyPrefsPane::EnergyPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *pa
   mAtomText[0] = NULL;
   mAtomText[1] = NULL;
   mAtomText[2] = NULL;
+  mY1pt = NULL;
+  mY2pt = NULL;
 
   SetSizer(mMainSizer);
 
@@ -503,6 +505,9 @@ EnergyPrefsPane::~EnergyPrefsPane()
   delete mMPColor;
   delete mPEColor;
   delete mOtherColor;
+
+  if (mY1pt) delete mY1pt;
+  if (mY2pt) delete mY2pt;
 }
 
 void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) 

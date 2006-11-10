@@ -803,13 +803,18 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event)
 
   if (selected < 0 || selected >= NumAtoms)
     return;
-
+  
   Frame * cFrame = mMainData->Frames;
 
   for ( int i = 0; i < mMainData->NumFrames; i++)
     {
       if (mMainData->CurrentFrame-1 != i)
-	cFrame->Atoms[selected] = lFrame->Atoms[selected];
+	{
+	  if (selected >= cFrame->NumAtoms)
+	    cFrame->AddAtom(lFrame->Atoms[selected].Type, lFrame->Atoms[selected].Position);
+	  else
+	    cFrame->Atoms[selected] = lFrame->Atoms[selected];
+	}
 
       cFrame = cFrame->NextFrame;
     }
@@ -887,6 +892,7 @@ void MpGLCanvas::AtomTypeDialog::Create(MpGLCanvas * parent, wxWindowID id, cons
   mainSizer->Add(lowerSizer);
 
   mainSizer->Layout();
+  SetSizer(mainSizer);
   Centre(wxBOTH);
 }
 

@@ -325,6 +325,9 @@ MolDisplayWin::~MolDisplayWin() {
     if (Prefs != NULL) {
         delete Prefs;
     }
+
+    if (OpenGLData)
+      delete OpenGLData;
 }
 
 void MolDisplayWin::getCanvasSize(long *width, long *height) {
