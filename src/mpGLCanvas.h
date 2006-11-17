@@ -75,7 +75,7 @@ class MpGLCanvas : public wxGLCanvas {
 	GLint winDiffX, winDiffY;
 
         void initGL(void);
-	void interactPopupMenu(int x, int y);
+	void interactPopupMenu(int x, int y, bool isAtom);
 
         DECLARE_EVENT_TABLE()
 

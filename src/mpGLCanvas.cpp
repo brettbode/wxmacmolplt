@@ -510,7 +510,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	    if (selected >= 0)
 	      {
-		interactPopupMenu(tmpPnt.x, tmpPnt.y);
+		interactPopupMenu(tmpPnt.x, tmpPnt.y, selected < NumAtoms);
 
 		 MolWin->SelectionChanged(deSelectAll);
 		 MolWin->UpdateGLModel();
@@ -784,11 +784,13 @@ void MpGLCanvas::SelectObj(int select_id, bool mode)
 
 }
 
-void MpGLCanvas::interactPopupMenu(int x, int y)
+void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom)
 {
   wxMenu menu;
 
-  menu.Append(GL_Popup_Menu_Apply_All, _T("&Apply to All Frames"));
+  if (isAtom)
+    menu.Append(GL_Popup_Menu_Apply_All, _T("&Apply to All Frames"));
+
   menu.Append(GL_Popup_Delete_Item_Current_Frame, _T("&Delete"));
   menu.Append(GL_Popup_Delete_Item_All_Frames, _T("&Delete in All Frames"));
 
