@@ -11,6 +11,7 @@
 #if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
 #pragma implementation "bondsdlg.h"
 #endif
+#include "Globals.h"
 
 #include "Globals.h"
 // For compilers that support precompilation, includes "wx/wx.h".
@@ -97,8 +98,10 @@ bool BondsDlg::Create( MolDisplayWin* parent, wxWindowID id, const wxString& cap
     wxDialog::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
-    GetSizer()->Fit(this);
-    GetSizer()->SetSizeHints(this);
+    if (GetSizer())
+    {
+        GetSizer()->SetSizeHints(this);
+    }
     Centre();
 ////@end BondsDlg creation
     return true;
