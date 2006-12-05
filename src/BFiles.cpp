@@ -331,19 +331,16 @@ long BufferFile::FindGroup(char * GroupName) {
 	return result;
 }
 void BufferFile::AdvanceBuffer(void) {
-#ifdef UseMacIO
-	if (!FileRefNum) throw FileError(0);
-#else
-	if (!FilePtr) throw FileError(0);
-#endif
 	if (IOType == 1) {	//Write mode
 		long BytesToWrite = MIN(BufferSize, BufferPos);
 		if (BytesToWrite > 0) {
 #ifdef UseMacIO
+			if (!FileRefNum) throw FileError(0);
 			SetFPos(FileRefNum, fsFromStart, BufferStart);
 			OSErr myerr = FSWrite(FileRefNum, &BytesToWrite, *Buffer);
 			if (myerr != noErr) throw FileError(myerr);
 #else
+			if (!FilePtr) throw FileError(0);
 			fseek(FilePtr, BufferStart, SEEK_SET);
 			long written = fwrite(Buffer, 1, BytesToWrite, FilePtr);
 			if (written != BytesToWrite) throw FileError();
@@ -353,12 +350,14 @@ void BufferFile::AdvanceBuffer(void) {
 		}
 	} else {	//Read mode
 		long BytesToRead = MIN(BufferSize, (ByteCount-(BufferStart+BufferPos)));
-		if (BytesToRead >= 0) {
+		if (BytesToRead > 0) {
 #ifdef UseMacIO
+			if (!FileRefNum) throw FileError(0);
 			SetFPos(FileRefNum, fsFromStart, (BufferStart+BufferPos));
 			OSErr myerr = FSRead(FileRefNum, &BytesToRead, *Buffer);
 			if (myerr != noErr) throw FileError(myerr);
 #else
+			if (!FilePtr) throw FileError(0);
 			fseek(FilePtr, (BufferStart+BufferPos), SEEK_SET);
 			long read = fread(Buffer, 1, BytesToRead, FilePtr);
 			if (read != BytesToRead) throw FileError();
@@ -407,7 +406,7 @@ long BufferFile::GetLine(char * Line)
 	if (((BufferPos+BufferStart+1)<ByteCount)&&
 		(((*Buffer)[BufferPos] == 13)||((*Buffer)[BufferPos] == 10))) BufferPos++;
 #else
-	if (((BufferPos+BufferStart)<ByteCount)&&
+	if (((BufferPos+BufferStart+1)<ByteCount)&&
 		((Buffer[BufferPos] == 13)||(Buffer[BufferPos] == 10))) {
 		BufferPos++;
 		if (Buffer[BufferPos-1]==13) {

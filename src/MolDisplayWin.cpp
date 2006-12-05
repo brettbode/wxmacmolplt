@@ -1507,47 +1507,54 @@ void MolDisplayWin::PasteText(void) {
             wxString text = data.GetText();
             char * tbuf = new char[text.Length()+1];
             strncpy(tbuf, text.ToAscii(), text.Length()+1);
-            BufferFile * TextBuffer = new BufferFile(tbuf, text.Length());
-            if (MainData->NumFrames == 1) { //If this is the only frame, make sure it is init'ed
-                InitRotationMatrix(MainData->TotalRotation);
-            }
-            long NumLines = TextBuffer->GetNumLines(-1);
-            // There may be up to NumLines atoms so dimension memory accordingly
-            if (!MainData->SetupFrameMemory(NumLines, 0)) {
-                delete TextBuffer;
-                delete [] tbuf;
-                wxTheClipboard->Close();
-                return;
-            }
-            
-            /*Now interpert each of the lines*/
-            for (iline=0; iline < NumLines; iline++) {
-                char LineText[kMaxLineLength];
-                
-                TextBuffer->GetLine(LineText);
-                //Parse the current line: All values will be set in place if the
-                //parse is successful (test will return (-) if not). Normal modes
-                //shouldn't be pasted so pass in 0 for Mode.
-                test = ParseCartLine(LineText, &Type,&Position, &offset, 0);
-                if (test > 0) { /*something was wrong with this line so skip it*/
-                    
-                    //A special atom was entered, store its offset.
-                    if (Type > 115) {
-                        if (Type > 255)
-                            if (((Type - 255) < 1)||((Type - 255) > NumLines)) break;
-                        if (!MainData->cFrame->AddSpecialAtom(offset, iline)) break;
-                    }
-                    
-                    MainData->cFrame->AddAtom(Type, Position);
-                    MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.x));
-                    MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.y));
-                    MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.z));
-                }
-            }
-            //Done with the text handle so unlock it
-            delete TextBuffer;
-            delete [] tbuf;
-            
+			BufferFile * TextBuffer=NULL;
+			try {
+				TextBuffer = new BufferFile(tbuf, text.Length());
+				if (MainData->NumFrames == 1) { //If this is the only frame, make sure it is init'ed
+					InitRotationMatrix(MainData->TotalRotation);
+				}
+				long NumLines = TextBuffer->GetNumLines(-1);
+				// There may be up to NumLines atoms so dimension memory accordingly
+				if (!MainData->SetupFrameMemory(NumLines, 0)) {
+					delete TextBuffer;
+					delete [] tbuf;
+					wxTheClipboard->Close();
+					return;
+				}
+				
+				/*Now interpert each of the lines*/
+				for (iline=0; iline < NumLines; iline++) {
+					char LineText[kMaxLineLength];
+					
+					TextBuffer->GetLine(LineText);
+					//Parse the current line: All values will be set in place if the
+					//parse is successful (test will return (-) if not). Normal modes
+					//shouldn't be pasted so pass in 0 for Mode.
+					test = ParseCartLine(LineText, &Type,&Position, &offset, 0);
+					if (test > 0) { /*something was wrong with this line so skip it*/
+						
+						//A special atom was entered, store its offset.
+						if (Type > 115) {
+							if (Type > 255)
+								if (((Type - 255) < 1)||((Type - 255) > NumLines)) break;
+							if (!MainData->cFrame->AddSpecialAtom(offset, iline)) break;
+						}
+						
+						MainData->cFrame->AddAtom(Type, Position);
+						MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.x));
+						MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.y));
+						MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.z));
+					}
+				}
+				//Done with the text handle so unlock it
+				delete TextBuffer;
+			}
+			catch (...) {
+				//Hmm there was a failure in the paste - what should we do to cleanup?
+				if (TextBuffer) delete TextBuffer;
+			}
+			delete [] tbuf;
+           
             if (iline == 0) {   /*No atoms were found so clear the memory I just allocated*/
         //      MainData->ResetFrameMemory();
                 wxTheClipboard->Close();

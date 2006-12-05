@@ -2001,6 +2001,12 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	KeyWordFound = true;
 //	if (SIMOMM) KeyWordFound = false;	//only grab a single geometry for SIMOMM
 	double	FrameEnergy, MP2FrameEnergy;
+	bool NewStyleGeometryKeyWord=true;
+	char GeoSearchToken[] = "BEGINNING GEOMETRY SEARCH POINT";
+	if (!(Buffer->LocateKeyWord(GeoSearchToken, 31))) {
+		NewStyleGeometryKeyWord = false;
+		strcpy(GeoSearchToken, "1NSERCH");
+	}
 	while (KeyWordFound) {
 		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 			{ throw UserCancel();}
@@ -2014,8 +2020,9 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		KeyWordFound = false;
 			//Advance to the start of the next geometry step BEGINNING GEOMETRY SEARCH POINT
 			//If there isn't one then we are done with the geometries
-		if (!(Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31) || 
-			  Buffer->LocateKeyWord("1NSERCH", 7))) break;
+		if (!(Buffer->LocateKeyWord(GeoSearchToken, strlen(GeoSearchToken)))) break;
+//		if (!(Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31) || 
+//			  Buffer->LocateKeyWord("1NSERCH", 7))) break;
 		StartPos = Buffer->GetFilePos();
 		if (Buffer->LocateKeyWord("FINAL", 5)) {	//Search for final and energy on the same line
 			Buffer->GetLine(LineText);				//since final also appears in LMO calcs.
@@ -2064,18 +2071,20 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 
 		if (KeyWordFound) {
 				//Let the user know we are still making progress
-	//		sprintf(LineText, "Reading Coordinates: frame %ld", MainData->NumFrames);
-	//		ProgressInd->ChangeText(LineText);
-	//		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
-	//			{ throw UserCancel();}
+			sprintf(LineText, "Reading Coordinates: frame %ld", MainData->NumFrames);
+			ProgressInd->ChangeText(LineText);
+			if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+				{ throw UserCancel();}
 			EnergyPos = Buffer->GetFilePos();
 
 			Buffer->SkipnLines(1);
 			NextFinalPos = -1;
 			if (lFrame->NumAtoms - NumFragmentAtoms > 0) {
-				if (Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31)) {
+		//		if (NewStyleGeometryKeyWord&&Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31)) {
+				if (Buffer->LocateKeyWord(GeoSearchToken, strlen(GeoSearchToken))) {
 					KeyWordFound = true;
 				} else {
+					NewStyleGeometryKeyWord = false;
 					KeyWordFound = Buffer->LocateKeyWord("FINAL", 5);
 				}
 				if (KeyWordFound) NextFinalPos = Buffer->GetFilePos();
@@ -2085,8 +2094,9 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		// at the top of am optimization step, but the older style is also still possible
 		//Look for ab initio atoms first
 			Buffer->SetFilePos(StartPos);	//reset pos to last frame to begin search
-			if (Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31) || 
-				 Buffer->LocateKeyWord("1NSERCH", 7)) {
+//			if (Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31) || 
+//				 Buffer->LocateKeyWord("1NSERCH", 7)) {
+			if (Buffer->LocateKeyWord(GeoSearchToken, strlen(GeoSearchToken))) {
 				lpFrame = lFrame;
 				lFrame = MainData->AddFrame(lpFrame->NumAtoms,0);
 
@@ -2129,8 +2139,9 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 					if (NumFragmentAtoms > 0) {
 						long tempPos = Buffer->GetFilePos();
 						Buffer->SetFilePos(StartPos);
-						if (Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31) || 
-							 Buffer->LocateKeyWord("1NSERCH", 7)) {
+						if (Buffer->LocateKeyWord(GeoSearchToken, strlen(GeoSearchToken))) {
+				//		if (Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31) || 
+				//			Buffer->LocateKeyWord("1NSERCH", 7)) {
 							if (Buffer->LocateKeyWord("COORDINATES OF FRAGMENT MULTIPOLE CENTERS", 41, NextFinalPos)) {
 								Buffer->SkipnLines(3);
 								MainData->ReadFragmentCoordinates(Buffer, NumFragmentAtoms);
