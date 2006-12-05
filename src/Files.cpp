@@ -778,7 +778,7 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 }
 
 long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
-	char Line[kMaxLineLength];
+	char	Line[kMaxLineLength];
 	long	nAtoms,i;
 	short	scanerr;
 
@@ -789,9 +789,13 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 	scanerr = sscanf(Line, "%ld", &nAtoms);
 	if ((scanerr!=1)||(nAtoms<=0)) throw DataError(15);
 		//allocate memory for the atoms
-	if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
-	Buffer->GetLine(Line);
-	MainData->SetDescription(Line);
+	if (lFrame->NumAtoms > 0) {	//If there are already atoms treat as an append
+		lFrame = MainData->AddFrame(nAtoms,0);
+	} else {
+		if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
+		Buffer->GetLine(Line);
+		MainData->SetDescription(Line);
+	}
 	long DRCnSkip = Prefs->GetDRCSkip(), nSkip=0;
 		bool Done=false;
 		bool RdPoint = true;
