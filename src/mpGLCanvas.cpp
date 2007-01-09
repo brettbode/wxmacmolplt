@@ -543,7 +543,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 		wxString tmp3Dcoord;
 
-		tmp3Dcoord.Printf("%.2f,%.2f,%.2f", newX, newY, newZ);
+		tmp3Dcoord.Printf(wxT("%.2f,%.2f,%.2f"), newX, newY, newZ);
 		mDragWin = new wxDragImage(tmp3Dcoord, wxCursor(wxCURSOR_HAND));
 
 		if (!mDragWin->BeginDrag(wxPoint(0,30), this))
