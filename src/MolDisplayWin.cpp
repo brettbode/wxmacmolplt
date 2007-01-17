@@ -326,8 +326,7 @@ MolDisplayWin::~MolDisplayWin() {
         delete Prefs;
     }
 
-    if (OpenGLData)
-      delete OpenGLData;
+	DeleteGLData();
 }
 
 void MolDisplayWin::getCanvasSize(long *width, long *height) {
@@ -1058,7 +1057,8 @@ OSErr	SaveCustomIcon( const wxString & filename, IconFamilyHandle icnsH )
 	
 	FSRef mFSRef;
 	FSSpec targetSpec;
-	OSStatus s = FSPathMakeRef((const UInt8 *)(filename.ToAscii()), &mFSRef, false);
+	const char * t = filename.mb_str(wxConvUTF8);
+	OSStatus s = FSPathMakeRef((const UInt8 *) t, &mFSRef, false);
 	FSCatalogInfoBitmap fields = kFSCatInfoFinderInfo;
 	FSCatalogInfo info;
 	if (s == noErr) {
@@ -1094,7 +1094,7 @@ OSErr	SaveCustomIcon( const wxString & filename, IconFamilyHandle icnsH )
 	}
 	
 	AliasHandle			aliasH;
-	err	= NewAliasMinimal( &targetSpec, &aliasH );											//	Create an alias to our target
+	err = FSNewAliasMinimal(&mFSRef, &aliasH);
 	if (err == noErr) {
 		err	= SendFinderAppleEvent( aliasH, kAESync );											//	Send the Finder a kAESync AppleEvent to force it to update the icon immediately
 		DisposeHandle( (Handle) aliasH );
@@ -2286,7 +2286,7 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
     long                test=0;
     TextFileType type;
     
-    FILE * myfile = fopen(fileName.mb_str(wxConvUTF8), "rb");
+	FILE * myfile = fopen(fileName.mb_str(wxConvUTF8), "rb");
     if (myfile == NULL) {
         if (append)
             AbortOpen("Unable to open the requested file.");
@@ -2394,7 +2394,9 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
       if (gPreferences->ChangeFileType()) {
 		  // Looks like this is a good file so set the creator type for the neat icon
 		  FSRef mFSRef;
-		  OSStatus s = FSPathMakeRef((const UInt8 *)(fileName.ToAscii()), &mFSRef, false);
+		  const char * t = fileName.mb_str(wxConvUTF8);
+		  OSStatus s = FSPathMakeRef((const UInt8 *) t, &mFSRef, false);
+//		  OSStatus s = FSPathMakeRef((const UInt8 *)(fileName.ToAscii()), &mFSRef, false);
 		  if (s == noErr) {
 			  FSCatalogInfoBitmap fields = kFSCatInfoFinderInfo;
 			  FSCatalogInfo info;
@@ -2493,7 +2495,11 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
     else
         sphereRadius   = (long)((float) (sphereCenter.y)*0.9);
     hoffset = sphereCenter.x;
+#if wxCHECK_VERSION(2, 8, 0)
+    if (Stereo && ! DisplayRect.Contains(p)) sphereCenter.x += hsize;
+#else
     if (Stereo && ! DisplayRect.Inside(p)) sphereCenter.x += hsize;
+#endif
     hsize = MAX(hsize, vsize);
     sphereRect.SetHeight(sphereRadius);
     sphereRect.SetWidth(sphereRadius);
