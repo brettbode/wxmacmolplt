@@ -799,69 +799,78 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 	long DRCnSkip = Prefs->GetDRCSkip(), nSkip=0;
 		bool Done=false;
 		bool RdPoint = true;
-	while (!Done) {
-		Done = true;
-		if (RdPoint) {
-			for (i=0; i<nAtoms; i++) {
-					long AtomType, test;
-					CPoint3D Pos, Vector;
+	try {
+		while (!Done) {
+			Done = true;
+			if (RdPoint) {
+				for (i=0; i<nAtoms; i++) {
+						long AtomType, test;
+						CPoint3D Pos, Vector;
 
-				Buffer->GetLine(Line);
-				test = ParseCartLine(Line, &AtomType, &Pos, &Vector, -1);
-				
-				if (test==-1) {	//invalid atom type
-					throw DataError(17);
-				} else if (test<0) {//other invalid data was encountered
-					throw DataError(18);
-				}
-				if (AtomType > 115) {
-					if (AtomType > 255) {
-						if (((AtomType - 255) < 1)||((AtomType - 255) > nAtoms)) throw DataError(19);
-					}
-					if (!lFrame->AddSpecialAtom(Vector, i)) {
-						throw MemoryError();
-					}
-				} else if (test == 7) {	//mass weight the normal mode
-					if (i==0) {
-						lFrame->Vibs = new VibRec(1, nAtoms);
-						if (!lFrame->Vibs) throw MemoryError();
-					}
-					if (lFrame->Vibs) {
-						lFrame->Vibs->NormMode[i].x = Vector.x*Prefs->GetSqrtAtomMass(AtomType-1);
-						lFrame->Vibs->NormMode[i].y = Vector.y*Prefs->GetSqrtAtomMass(AtomType-1);
-						lFrame->Vibs->NormMode[i].z = Vector.z*Prefs->GetSqrtAtomMass(AtomType-1);
-					}
-				}
-				lFrame->AddAtom(AtomType, Pos);
-				MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.x));
-				MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.y));
-				MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.z));
-			}
-			if (Prefs->GetAutoBond())	//setup bonds, if needed
-				lFrame->SetBonds(Prefs, false);
-		}
-		long cPos = Buffer->GetFilePos();
-		long fileLength = Buffer->GetFileLength();
-		if (cPos < fileLength) {	//If we haven't reached the end of the file
-			Buffer->GetLine(Line);	//check to see if another frame is available
-			scanerr = sscanf(Line, "%ld", &nAtoms);
-			if ((scanerr==1)&&(nAtoms>0)) {
-				if (nSkip >= DRCnSkip) {
-					nSkip = 0;
-					RdPoint = true;
-					lFrame = MainData->AddFrame(nAtoms,0);
-					if (!lFrame) throw MemoryError();
 					Buffer->GetLine(Line);
-					if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
-						{ throw UserCancel();}
-				} else {
-					nSkip++;
-					Buffer->SkipnLines(nAtoms+1);
-					RdPoint = false;
+					test = ParseCartLine(Line, &AtomType, &Pos, &Vector, -1);
+					
+					if (test==-1) {	//invalid atom type
+						throw DataError(17);
+					} else if (test<0) {//other invalid data was encountered
+						throw DataError(18);
+					}
+					if (AtomType > 115) {
+						if (AtomType > 255) {
+							if (((AtomType - 255) < 1)||((AtomType - 255) > nAtoms)) throw DataError(19);
+						}
+						if (!lFrame->AddSpecialAtom(Vector, i)) {
+							throw MemoryError();
+						}
+					} else if (test == 7) {	//mass weight the normal mode
+						if (i==0) {
+							lFrame->Vibs = new VibRec(1, nAtoms);
+							if (!lFrame->Vibs) throw MemoryError();
+						}
+						if (lFrame->Vibs) {
+							lFrame->Vibs->NormMode[i].x = Vector.x*Prefs->GetSqrtAtomMass(AtomType-1);
+							lFrame->Vibs->NormMode[i].y = Vector.y*Prefs->GetSqrtAtomMass(AtomType-1);
+							lFrame->Vibs->NormMode[i].z = Vector.z*Prefs->GetSqrtAtomMass(AtomType-1);
+						}
+					}
+					lFrame->AddAtom(AtomType, Pos);
+					MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.x));
+					MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.y));
+					MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.z));
 				}
-				Done = false;
+				if (Prefs->GetAutoBond())	//setup bonds, if needed
+					lFrame->SetBonds(Prefs, false);
+			}
+			long cPos = Buffer->GetFilePos();
+			long fileLength = Buffer->GetFileLength();
+			if (cPos < fileLength) {	//If we haven't reached the end of the file
+				Buffer->GetLine(Line);	//check to see if another frame is available
+				scanerr = sscanf(Line, "%ld", &nAtoms);
+				if ((scanerr==1)&&(nAtoms>0)) {
+					if (nSkip >= DRCnSkip) {
+						nSkip = 0;
+						RdPoint = true;
+						lFrame = MainData->AddFrame(nAtoms,0);
+						if (!lFrame) throw MemoryError();
+						Buffer->GetLine(Line);
+						if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+							{ throw UserCancel();}
+					} else {
+						nSkip++;
+						Buffer->SkipnLines(nAtoms+1);
+						RdPoint = false;
+					}
+					Done = false;
+				}
 			}
 		}
+	}
+	catch (DataError Error) {
+		//attempt to save part of file
+		if (MainData->GetNumFrames() > 1) {
+			MainData->DeleteFrame();
+		}
+		MessageAlert("Error while parsing file. Partial file may be valid.");
 	}
 	return 1;
 }
