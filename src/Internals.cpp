@@ -181,15 +181,30 @@ void MOPacInternals::GuessInit(MoleculeData * MainData) {
 				DihedralAtom = i;
 			}
 		}	//the three closest atoms are now known
+		/* Originally I simply used the closest 3 atoms as the connection atoms.
+			However, this apparently does not work so well for large molecules that 
+			fold back on themselves, especially those with hydrogen bonds.
+			So instead try using the connection list for the atom defining the bond.
+		*/
 		ConnectionAtoms[3*iatom] = BondedAtom;
 		Values[3*iatom] = BondLength;
 		Type[3*iatom] = 0;
 			//Bond angle - atom -> BondedAtom -> AngleAtom
-		ConnectionAtoms[3*iatom+1] = AngleAtom;
+		if (BondedAtom > 0)
+			ConnectionAtoms[3*iatom+1] = ConnectionAtoms[3*BondedAtom];
+		else
+			ConnectionAtoms[3*iatom+1] = AngleAtom;
 		Type[3*iatom+1] = 1;
 		if (iatom>2) {
 				//Dihedral Angle
-			ConnectionAtoms[3*iatom+2] = DihedralAtom;
+			if (BondedAtom > 2)
+				ConnectionAtoms[3*iatom+2] = ConnectionAtoms[3*BondedAtom+1];
+			else {
+				if (DihedralAtom != ConnectionAtoms[3*iatom+1])
+					ConnectionAtoms[3*iatom+2] = DihedralAtom;
+				else
+					ConnectionAtoms[3*iatom+2] = AngleAtom;
+			}
 			Type[3*iatom+2] = 2;
 		}
 	}
