@@ -114,7 +114,7 @@ void LLMDialog::CreateControls()
     wxStaticText* itemStaticText4 = new wxStaticText( itemDialog1, wxID_STATIC, _("Click the Create button to insert the\nnumber of frames given below along\nthe LLM path connecting the current\ngeometry with the next geometry."), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer2->Add(itemStaticText4, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    numPointsEdit = new wxTextCtrl( itemDialog1, ID_TEXTCTRL, _("0"), wxDefaultPosition, wxDefaultSize, 0 );
+    numPointsEdit = new wxTextCtrl( itemDialog1, ID_TEXTCTRL, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         numPointsEdit->SetToolTip(_("Enter an integer for the number of intermediate geometries to create"));
     itemBoxSizer2->Add(numPointsEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -138,6 +138,7 @@ void LLMDialog::CreateControls()
 ////@end LLMDialog content construction
 	MoleculeData * MainData = Parent->GetData();
 	internalCheck->Enable(MainData->GetInternalCoordinates()!=NULL);
+	numPointsEdit->SetValue(wxT("0"));
 }
 
 /*!
