@@ -15,6 +15,12 @@
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
+ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
+	confflags += --build $(DEB_HOST_GNU_TYPE)
+else
+	confflags += --build $(DEB_HOST_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+endif
+
 
 CFLAGS = -Wall -g
 
@@ -27,7 +33,7 @@ endif
 config.status: configure
 	dh_testdir
 	# Add here commands to configure the package.
-	./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs"
+	CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs" ./configure $(confflags) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
 
 
 build: build-stamp
@@ -46,8 +52,8 @@ clean:
 	dh_testroot
 	rm -f build-stamp 
 
-	# Add here commands to clean up after the build process.
-	-$(MAKE) distclean
+	-$(MAKE) clean
+
 ifneq "$(wildcard /usr/share/misc/config.sub)" ""
 	cp -f /usr/share/misc/config.sub config.sub
 endif
@@ -55,6 +61,10 @@ ifneq "$(wildcard /usr/share/misc/config.guess)" ""
 	cp -f /usr/share/misc/config.guess config.guess
 endif
 
+	# This block may need to change
+	touch configure.ac && \
+	touch aclocal.m4 && \
+	touch configure
 
 	dh_clean 
 
