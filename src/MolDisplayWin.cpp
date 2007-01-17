@@ -302,6 +302,13 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
     AdjustMenus();
 }
 
+void MolDisplayWin::DeleteGLData(void) {
+    if(OpenGLData) {
+        /* TODO:  Brett needs to verify that this is correct */
+        delete OpenGLData;
+    }
+}
+
 MolDisplayWin::~MolDisplayWin() {
     //As long as all related windows indicate this window as their
     //parent when they are created, they will be automatically destroyed
