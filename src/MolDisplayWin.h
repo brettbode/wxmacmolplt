@@ -253,6 +253,7 @@ class MolDisplayWin : public wxFrame {
         
         //OpenGL drawing routines
         void InitGLData(void);
+		void DeleteGLData(void);
         void DrawGL(void);
         void SortTransparentTriangles(void);
         void DrawTransparentTriangles(void);
@@ -262,6 +263,7 @@ class MolDisplayWin : public wxFrame {
         void UpdateGLModel(void);
         void Rotate(wxMouseEvent&);
         void RotateMoleculeGL(bool);
+		void DrawHydrogenBond(long bondNum);
         void PrintGL(wxDC * dc, const float & scaleFactor);
 	void SetHighliteMode(bool state) { mHighliteState = state; }
 	void DrawStaticLabel(const char* label, GLfloat x, GLfloat y);
