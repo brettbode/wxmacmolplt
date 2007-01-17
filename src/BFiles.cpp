@@ -406,7 +406,7 @@ long BufferFile::GetLine(char * Line)
 	if (((BufferPos+BufferStart+1)<ByteCount)&&
 		(((*Buffer)[BufferPos] == 13)||((*Buffer)[BufferPos] == 10))) BufferPos++;
 #else
-	if (((BufferPos+BufferStart+1)<ByteCount)&&
+	if (((BufferPos+BufferStart)<ByteCount)&&
 		((Buffer[BufferPos] == 13)||(Buffer[BufferPos] == 10))) {
 		BufferPos++;
 		if (Buffer[BufferPos-1]==13) {
