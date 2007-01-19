@@ -333,7 +333,8 @@ MolDisplayWin::~MolDisplayWin() {
         delete Prefs;
     }
 
-	DeleteGLData();
+    DeleteGLData();
+
 }
 
 void MolDisplayWin::getCanvasSize(long *width, long *height) {

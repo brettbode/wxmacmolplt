@@ -475,10 +475,12 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		return;
 	}
 
+	static wxPoint oldTmpPnt;
 	bool deSelectAll = true;
 
-	SetCurrent();
 	wxPoint tmpPnt = event.GetPosition();
+
+	SetCurrent();
 
 	Frame *  lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
@@ -521,42 +523,66 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	  {
 	    mSelectState++;
 
-	    if ( selected >= 0 && selected < NumAtoms && interactiveMode)
+	    if (interactiveMode)
 	      {
-		GLdouble newX, newY, newZ;
-
-		findReal3DCoord(tmpPnt.x-winDiffX, tmpPnt.y-winDiffY, newX, newY, newZ);
-		lAtoms[selected].Position.x = newX;
-		lAtoms[selected].Position.y = newY;
-		lAtoms[selected].Position.z = newZ;
-
-		SelectObj(selected, deSelectAll);
-		MolWin->SelectionChanged(deSelectAll);
-		MolWin->UpdateGLModel();
-
-		if (mDragWin)
+		if ( selected >= 0 && selected < NumAtoms)
 		  {
-		    mDragWin->EndDrag();
-		    delete mDragWin;
-		    mDragWin = (wxDragImage*) NULL;
-		  }
+		    GLdouble newX, newY, newZ;
 
-		wxString tmp3Dcoord;
+		    findReal3DCoord(tmpPnt.x-winDiffX, tmpPnt.y-winDiffY, newX, newY, newZ);
+		    lAtoms[selected].Position.x = newX;
+		    lAtoms[selected].Position.y = newY;
+		    lAtoms[selected].Position.z = newZ;
 
-		tmp3Dcoord.Printf(wxT("%.2f,%.2f,%.2f"), newX, newY, newZ);
+		    SelectObj(selected, deSelectAll);
+		    MolWin->SelectionChanged(deSelectAll);
 
-		mDragWin = new wxDragImage(tmp3Dcoord, wxCursor(wxCURSOR_HAND));
+		    if (mDragWin)
+		      {
+			mDragWin->EndDrag();
+			delete mDragWin;
+			mDragWin = (wxDragImage*) NULL;
+		      }
 
-		if (!mDragWin->BeginDrag(wxPoint(0,30), this))
-		  {
-		    delete mDragWin;
-		    mDragWin = (wxDragImage*) NULL;
+		    wxString tmp3Dcoord;
+
+		    tmp3Dcoord.Printf(wxT("%.2f,%.2f,%.2f"), newX, newY, newZ);
+
+		    mDragWin = new wxDragImage(tmp3Dcoord, wxCursor(wxCURSOR_HAND));
+
+		    if (!mDragWin->BeginDrag(wxPoint(0,30), this))
+		      {
+			delete mDragWin;
+			mDragWin = (wxDragImage*) NULL;
+		      }
+		    else
+		      {
+			mDragWin->Move(event.GetPosition());
+			mDragWin->Show();
+		      }
 		  }
 		else
-		  {
-		    mDragWin->Move(event.GetPosition());
-		    mDragWin->Show();
+		  { //if not explicitly point to an atom, move all
+		    //currently selected atoms
+
+		    int dy = tmpPnt.y - oldTmpPnt.y;
+		    int hsize = GetRect().GetWidth();
+
+		    if (event.CmdDown() || event.RightIsDown()) //translate
+		      {
+			//for ( int i = 0; i < NumAtoms; i++)
+			//if (lAtoms[i].GetSelectState())
+			    //lAtoms[i].Position.z += dy/(hsize/mMainData->WindowSize);
+		      }
+
+		    if (event.ShiftDown()) //move along z-axis
+		      {
+			for ( int i = 0; i < NumAtoms; i++)
+			  if (lAtoms[i].GetSelectState())
+			    lAtoms[i].Position.z += (float)dy/(float)(0.1*hsize/mMainData->WindowSize);
+		      }
 		  }
+		MolWin->UpdateGLModel();
 	      }
 	  }
 
@@ -601,15 +627,20 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		      {
 			int tmpBondStatus = lFrame->BondExists(oldSelect,selected);
  
-			if (tmpBondStatus == -1)
+			if (deSelectAll && tmpBondStatus == -1)
 			  lFrame->AddBond(oldSelect,selected);
 
 			oldSelect = selected;
 
-			if (tmpBondStatus == -1)
+			if (deSelectAll && tmpBondStatus == -1)
 			  selected = -1;
 		      }
 		  }
+
+		SelectObj(selected, deSelectAll);
+		MolWin->SelectionChanged(deSelectAll);
+		MolWin->UpdateGLModel();
+
 	      }
 
 	    if (mDragWin)
@@ -618,12 +649,10 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		delete mDragWin;
 		mDragWin = NULL;
 	      }
-
-	    SelectObj(selected, deSelectAll);
-	    MolWin->SelectionChanged(deSelectAll);
-	    MolWin->UpdateGLModel();
 	}
 	
+	oldTmpPnt = tmpPnt;
+
     // Pass mouse event to MolDisplayWin::Rotate for processing
     if (interactiveMode)
       draw();
