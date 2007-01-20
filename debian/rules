@@ -1,26 +1,19 @@
 #!/usr/bin/make -f
-# -*- makefile -*-
-# Sample debian/rules that uses debhelper.
-# This file was originally written by Joey Hess and Craig Small.
-# As a special exception, when this file is copied by dh-make into a
-# dh-make output file, you may use that output file without restriction.
-# This special exception was added by Craig Small in version 0.37 of dh-make.
+# Derived from sample debian/rules that uses debhelper, originally written by
+# Joey Hess and Craig Small.
 
-# Uncomment this to turn on verbose mode.
+export DH_ALWAYS_EXCLUDE=CVS:.cvsignore
 #export DH_VERBOSE=1
 
-
-# These are used for cross-compiling and for saving the configure script
-# from having to guess our platform (since we know it already)
 DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 
+CONFFLAGS =
 ifeq ($(DEB_BUILD_GNU_TYPE), $(DEB_HOST_GNU_TYPE))
-	confflags += --build $(DEB_HOST_GNU_TYPE)
+	CONFFLAGS += --build $(DEB_HOST_GNU_TYPE)
 else
-	confflags += --build $(DEB_HOST_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+	CONFFLAGS += --build $(DEB_HOST_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
 endif
-
 
 CFLAGS = -Wall -g
 
@@ -32,17 +25,14 @@ endif
 
 config.status: configure
 	dh_testdir
-	# Add here commands to configure the package.
-	CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs" ./configure $(confflags) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
-
+	CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs" ./configure $(CONFFLAGS) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
 
 build: build-stamp
-
-build-stamp:  config.status
+build-stamp: clean config.status
 	dh_testdir
 
-	# Add here commands to compile the package.
 	$(MAKE)
+
 	#docbook-to-man debian/wxmacmolplt.sgml > wxmacmolplt.1
 
 	touch $@
@@ -52,7 +42,7 @@ clean:
 	dh_testroot
 	rm -f build-stamp 
 
-	-$(MAKE) clean
+	-$(MAKE) distclean
 
 ifneq "$(wildcard /usr/share/misc/config.sub)" ""
 	cp -f /usr/share/misc/config.sub config.sub
@@ -74,15 +64,11 @@ install: build
 	dh_clean -k 
 	dh_installdirs
 
-	# Add here commands to install the package into debian/wxmacmolplt.
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/wxmacmolplt
 
 
-# Build architecture-independent files here.
 binary-indep: build install
-# We have nothing to do by default.
 
-# Build architecture-dependent files here.
 binary-arch: build install
 	dh_testdir
 	dh_testroot
