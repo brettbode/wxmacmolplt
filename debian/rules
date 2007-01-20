@@ -28,7 +28,7 @@ config.status: configure
 	CFLAGS="$(CFLAGS)" LDFLAGS="-Wl,-z,defs" ./configure $(CONFFLAGS) --prefix=/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info
 
 build: build-stamp
-build-stamp: clean config.status
+build-stamp: config.status
 	dh_testdir
 
 	$(MAKE)
