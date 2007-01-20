@@ -1,6 +1,7 @@
-AC_INIT(src/main.cpp)
+AC_INIT(wxmacmolplt, 6.2.0, brett@scl.ameslab.gov)
+AC_CONFIG_SRCDIR(src/main.cpp)
 AC_CONFIG_AUX_DIR(config)
-AM_INIT_AUTOMAKE(wxMacMolPlt, 6.2.0)
+AM_INIT_AUTOMAKE([1.9 foreign])
 dnl AC_CONFIG_HEADER
 dnl AC_REVISION
 AM_MAINTAINER_MODE
