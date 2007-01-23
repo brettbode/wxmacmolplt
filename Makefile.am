@@ -1,6 +1,6 @@
 SUBDIRS = src
-pkgdata_DATA = resources/MacMolPlt.Prefs.xml resources/fonts/arial1.glf \
-				LICENSE \
+nobase_dist_pkgdata_DATA = resources/MacMolPlt.Prefs.xml
+	resources/fonts/arial1.glf LICENSE \
 	MacMolPlt_Manual.html Manual_pages/WalkThrough.html \
 	Manual_pages/2D_General_Dialog.gif Manual_pages/2D_MEP.gif \
 	Manual_pages/2D_MEP_Dialog.gif Manual_pages/2D_Orbital.gif \
