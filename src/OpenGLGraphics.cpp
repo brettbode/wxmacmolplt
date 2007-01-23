@@ -925,7 +925,7 @@ void MolDisplayWin::DrawStaticLabel(const char* label, GLfloat x, GLfloat y)
   glPushMatrix();
   glLoadIdentity ();
 
-  glTranslatef(x, y, 0);
+  glTranslatef(x, y, 0.999999);
   glLoadName(0);
   glScalef(sclX, sclY, 1);
   glfDrawSolidString(label);
