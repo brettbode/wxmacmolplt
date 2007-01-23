@@ -139,6 +139,11 @@ OpenGLRec::~OpenGLRec(void) {
 void MolDisplayWin::InitGLData(void) {
 	OpenGLData = new OpenGLRec;
 }
+void MolDisplayWin::DeleteGLData(void) {
+    if (OpenGLData)
+		delete OpenGLData;
+	OpenGLData = NULL;
+}
 #endif
 
 #ifndef __wxBuild__
@@ -921,7 +926,7 @@ void MolDisplayWin::DrawStaticLabel(const char* label, GLfloat x, GLfloat y)
   glLoadIdentity ();
 
   glTranslatef(x, y, 0);
-  glLoadName(-1);
+  glLoadName(0);
   glScalef(sclX, sclY, 1);
   glfDrawSolidString(label);
 
@@ -992,7 +997,7 @@ void MolDisplayWin::DrawLabel()
 
 	  glColor3f(1-red, 1-green, 1-blue);
 	  glScalef(0.1+0.08*radius, 0.1+0.08*radius, 1);
-	  glLoadName(iatom);
+	  glLoadName(iatom+1);
 	  glfDrawSolidString((const char*)atomLabel.mb_str(wxConvUTF8));
 	  glPopMatrix();
 	}
@@ -1084,18 +1089,19 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			
 			if (radius<0.01) continue;	//skip really small spheres
 
-			RGBColor * AtomColor = Prefs->GetAtomColorLoc(curAtomType);
-				float red, green, blue;
-			red = AtomColor->red/65536.0;
-			green = AtomColor->green/65536.0;
-			blue = AtomColor->blue/65536.0;
+		//	RGBColor * AtomColor = Prefs->GetAtomColorLoc(curAtomType);
+		//		float red, green, blue;
+		//	red = AtomColor->red/65536.0;
+		//	green = AtomColor->green/65536.0;
+		//	blue = AtomColor->blue/65536.0;
 
 			glPushMatrix();
 			glTranslatef(lAtoms[iatom].Position.x, 
 				     lAtoms[iatom].Position.y,
 				     lAtoms[iatom].Position.z);
 			
-			glColor3f(red, green, blue);
+		//	glColor3f(red, green, blue);
+			Prefs->ChangeColorAtomColor(curAtomType+1);
 			
 			if ( mHighliteState && !lAtoms[iatom].GetSelectState())
 			  {
@@ -1112,7 +1118,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
 			  }
 
-			glLoadName(iatom);
+			glLoadName(iatom+1);
 
 			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere
 
@@ -1145,6 +1151,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		long atom1 = lBonds[ibond].Atom1;
 		long atom2 = lBonds[ibond].Atom2;
 		BondOrder tmpOrder = lBonds[ibond].Order;
+	//	if (tmpOrder == kHydrogenBond) {
+	//		DrawHydrogenBond(ibond);
+	//		continue;
+	//	}
 		if (!Prefs->ColorBondHalves()) tmpOrder = kSingleBond;	//only generate multiple pipes when colored by atom color
 		//!!! take hydrogen bond as single bond for now
 		GLdouble tmpBondSize = BondSize/MAX(tmpOrder,1);
@@ -1193,7 +1203,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			glPushMatrix();
 			glMultMatrixf((const GLfloat *) &rotMat);
 			if (Prefs->ColorBondHalves()) {
-			  glLoadName(ibond+NumAtoms);   //bond names start after the last atom
+			  glLoadName(ibond+NumAtoms+1);   //bond names start after the last atom
 					//center the color change at the middle of the visible part of the bond
 			  float radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
 			  float radius2 = AtomScale*Prefs->GetAtomSize(lAtoms[atom2].GetType() - 1);
@@ -1206,12 +1216,13 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			  v3.y = centerPercent*(v2.y - v1.y)+v1.y;
 			  v3.z = centerPercent*(v2.z - v1.z)+v1.z;
 
-			  RGBColor * BondColor = Prefs->GetAtomColorLoc(lAtoms[atom1].GetType() - 1);
-			  float red, green, blue;
-			  red = BondColor->red/65536.0;
-			  green = BondColor->green/65536.0;
-			  blue = BondColor->blue/65536.0;
-			  glColor3f(red, green, blue);
+			  Prefs->ChangeColorAtomColor(lAtoms[atom1].GetType());
+	//		  RGBColor * BondColor = Prefs->GetAtomColorLoc(lAtoms[atom1].GetType() - 1);
+	//		  float red, green, blue;
+	//		  red = BondColor->red/65536.0;
+	//		  green = BondColor->green/65536.0;
+	//		  blue = BondColor->blue/65536.0;
+	//		  glColor3f(red, green, blue);
 			  glPushMatrix();
 			  glTranslatef(0.0, baseBondOffset+ipipe*3.5*tmpBondSize, 0.0);
 			  gluCylinder(qobj, tmpBondSize, tmpBondSize, length*centerPercent, (long)(Quality), (long)(0.5*Quality));
@@ -1220,11 +1231,12 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			  }
 			  glPopMatrix();
 
-			  BondColor = Prefs->GetAtomColorLoc(lAtoms[atom2].GetType() - 1);
-			  red = BondColor->red/65536.0;
-			  green = BondColor->green/65536.0;
-			  blue = BondColor->blue/65536.0;
-			  glColor3f(red, green, blue);
+			  Prefs->ChangeColorAtomColor(lAtoms[atom2].GetType());
+	//		  BondColor = Prefs->GetAtomColorLoc(lAtoms[atom2].GetType() - 1);
+	//		  red = BondColor->red/65536.0;
+	//		  green = BondColor->green/65536.0;
+	//		  blue = BondColor->blue/65536.0;
+	//		  glColor3f(red, green, blue);
 			  glPopMatrix();
 			  glPushMatrix();
 			  rotMat[3][0] = v3.x;
@@ -1254,12 +1266,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		//			gluDisk(qobj, 0.0, BondSize, (long)(Quality), 2);
 		//		}
 			} else {
-			  RGBColor * BondColor = Prefs->GetBondColorLoc(lBonds[ibond].Order);
-			  float red, green, blue;
-			  red = BondColor->red/65536.0;
-			  green = BondColor->green/65536.0;
-			  blue = BondColor->blue/65536.0;
-			  glColor3f(red, green, blue);
+				Prefs->ChangeColorBondColor(lBonds[ibond].Order);
 			  for ( int i = 0; i < MAX(tmpOrder,1); ++i)
 				{
 				  glPushMatrix();
@@ -1342,7 +1349,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 	if ( mHighliteState )
 	  glEnable(GL_POLYGON_STIPPLE);
 
-	glLoadName(-1);  //only atoms and bonds are selectable
+	glLoadName(0);  //only atoms and bonds are selectable
 	                 //so give a NULL name value to the rest of the geometries
 
 	if (MainData->GetDrawMode() && lFrame->Vibs) {	//Add the current normal mode, if active
@@ -1350,12 +1357,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 		long cmode = (lFrame->NumAtoms)*(lFrame->Vibs->CurrentMode);
 
-		RGBColor * VectorColor = Prefs->GetVectorColorLoc();
-			float red, green, blue;
-		red = (float) VectorColor->red/65536;
-		green = (float) VectorColor->green/65536;
-		blue = (float) VectorColor->blue/65536;	//Set the color to the Vector color
-		glColor3f(red, green, blue);
+		Prefs->ChangeColorVectorColor();
 
 		CPoint3D NormStart={0,0,1};
 		for (long iatom=0; iatom<NumAtoms; iatom++) {
@@ -1465,6 +1467,48 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 	glDisable(GL_POLYGON_STIPPLE);  //make sure everything outside 
 	                                //this function has no stipple effect
+}
+void WinPrefs::ChangeColorBondColor(long order) const {
+	float red, green, blue;
+	red = BondColors[order].red/65536.0;
+	green = BondColors[order].green/65536.0;
+	blue = BondColors[order].blue/65536.0;
+	glColor3f(red, green, blue);
+}
+void WinPrefs::ChangeColorAtomColor(long atomtype) const {
+	float red, green, blue;
+	red = AtomColors[atomtype-1].red/65536.0;
+	green = AtomColors[atomtype-1].green/65536.0;
+	blue = AtomColors[atomtype-1].blue/65536.0;
+	glColor3f(red, green, blue);
+}
+void WinPrefs::ChangeColorVectorColor(void) const {
+	float red, green, blue;
+	red = VectorColor.red/65536.0;
+	green = VectorColor.green/65536.0;
+	blue = VectorColor.blue/65536.0;
+	glColor3f(red, green, blue);
+}
+
+void MolDisplayWin::DrawHydrogenBond(long bondNum) {
+	CPoint3D	v1, v2;
+
+	Prefs->ChangeColorBondColor(kHydrogenBond);
+	Frame *	lFrame=MainData->cFrame;
+	long atom1 = lFrame->Bonds[bondNum].Atom1;
+	long atom2 = lFrame->Bonds[bondNum].Atom2;
+	v1.x = lFrame->Atoms[atom1].Position.x;
+	v1.y = lFrame->Atoms[atom1].Position.y;
+	v1.z = lFrame->Atoms[atom1].Position.z;
+	v2.x = lFrame->Atoms[atom2].Position.x;
+	v2.y = lFrame->Atoms[atom2].Position.y;
+	v2.z = lFrame->Atoms[atom2].Position.z;
+	
+	glLineWidth(10.0);
+	glBegin(GL_LINES);
+	glVertex3d(v1.x, v1.y, v1.z);
+	glVertex3d(v2.x, v2.y, v2.z);
+	glEnd();
 }
 
 void MolDisplayWin::AddAxisGL(void)

@@ -330,6 +330,10 @@ class WinPrefs {
 		inline short * GetVectorPatternLoc(void) {return &VectorPattern;};
 #ifndef __wxBuild__
 		inline void SetBondColor(long BondOrder) {RGBForeColor(&(BondColors[BondOrder]));};
+#else
+		void ChangeColorBondColor(long BondOrder) const;
+		void ChangeColorVectorColor(void) const;
+		void ChangeColorAtomColor(long atomtype) const;
 #endif
 		inline void SetBondColor(long BondOrder, const RGBColor & color) {BondColors[BondOrder] = color;};
 		inline void SetVectorColor(const RGBColor & color) {VectorColor = color; };

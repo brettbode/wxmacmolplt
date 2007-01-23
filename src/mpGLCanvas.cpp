@@ -758,7 +758,7 @@ int MpGLCanvas::testPicking(int x, int y)
      }
    }
 
-   return select_id;
+   return (select_id-1);
 }
 
 void MpGLCanvas::SelectObj(int select_id, bool mode) 
