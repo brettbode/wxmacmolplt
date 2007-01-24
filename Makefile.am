@@ -1,4 +1,5 @@
 SUBDIRS = src
+dist_man_MANS = Manual_pages/wxmacmolplt.1 
 dist_pkgdata_DATA = resources/MacMolPlt.Prefs.xml \
 	resources/fonts/arial1.glf LICENSE \
 	MacMolPlt_Manual.html Manual_pages/WalkThrough.html \
