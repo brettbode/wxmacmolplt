@@ -1,5 +1,5 @@
-bin_PROGRAMS = wxMacMolPlt
-wxMacMolPlt_SOURCES =                             \
+bin_PROGRAMS = wxmacmolplt
+wxmacmolplt_SOURCES =                             \
 	aboutwxmacmolplt.cpp    aboutwxmacmolplt.h    \
 	appendframesoptions.cpp appendframesoptions.h \
 	AtomTypeList.cpp        AtomTypeList.h        \
@@ -63,6 +63,6 @@ wxMacMolPlt_SOURCES =                             \
 	zmatrixcalculator.cpp   zmatrixcalculator.h
 
 AM_CXXFLAGS = $(WX_CXXFLAGS)
-wxMacMolPlt_LDADD = $(WX_LIBS)
-wxMacMolPlt_LDFLAGS = $(WX_CXXFLAGS)
+wxmacmolplt_LDADD = $(WX_LIBS)
+wxmacmolplt_LDFLAGS = $(WX_CXXFLAGS)
 EXTRA_DIST = wxMacMolPlt.pjd sp.xpm arrow.xpm
