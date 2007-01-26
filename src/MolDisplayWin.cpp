@@ -2517,7 +2517,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
         dy = q.y - p.y;
         if (dx != 0 || dy != 0) {
             if (event.CmdDown() || event.RightIsDown()) {   //Command key: translate instead of rotate
-                CPoint3D offset;
+	      CPoint3D offset;
                 if (event.ShiftDown()) {    /*The shift key is down so move into/out of the screen*/
                     offset.z = dy/(hsize/MainData->WindowSize);
                     MainData->TotalRotation[3][2] += offset.z;

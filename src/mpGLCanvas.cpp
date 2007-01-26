@@ -471,7 +471,7 @@ void MpGLCanvas::eventErase(wxEraseEvent &event) {
 }
 
 void MpGLCanvas::eventMouse(wxMouseEvent &event) {
-	if(!GetContext()) {
+        if(!GetContext()) {
 		return;
 	}
 
@@ -529,7 +529,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		  {
 		    GLdouble newX, newY, newZ;
 
-		    findReal3DCoord(tmpPnt.x-winDiffX, tmpPnt.y-winDiffY, newX, newY, newZ);
+		    findReal3DCoord(tmpPnt.x-winDiffX, tmpPnt.y-winDiffY, atomDepth, newX, newY, newZ);
 		    lAtoms[selected].Position.x = newX;
 		    lAtoms[selected].Position.y = newY;
 		    lAtoms[selected].Position.z = newZ;
@@ -565,21 +565,40 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		  { //if not explicitly point to an atom, move all
 		    //currently selected atoms
 
+		    GLdouble tmpX, tmpY, tmpZ;
+		    GLdouble newX, newY, newZ;
+		    int dx = tmpPnt.x - oldTmpPnt.x;
 		    int dy = tmpPnt.y - oldTmpPnt.y;
 		    int hsize = GetRect().GetWidth();
 
 		    if (event.CmdDown() || event.RightIsDown()) //translate
 		      {
-			//for ( int i = 0; i < NumAtoms; i++)
-			//if (lAtoms[i].GetSelectState())
-			    //lAtoms[i].Position.z += dy/(hsize/mMainData->WindowSize);
+			for ( int i = 0; i < NumAtoms; i++)
+			  if (lAtoms[i].GetSelectState())
+			    {
+			      findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ);
+
+			      tmpX += (float)dx/(float)(0.05*hsize/mMainData->WindowSize);
+			      tmpY += (float)dy/(float)(0.05*hsize/mMainData->WindowSize);
+			      findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ);
+			      lAtoms[i].Position.x = newX;
+			      lAtoms[i].Position.y = newY;
+			      lAtoms[i].Position.z = newZ;
+			    }
 		      }
 
 		    if (event.ShiftDown()) //move along z-axis
 		      {
 			for ( int i = 0; i < NumAtoms; i++)
 			  if (lAtoms[i].GetSelectState())
-			    lAtoms[i].Position.z += (float)dy/(float)(0.1*hsize/mMainData->WindowSize);
+			    {
+			      findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ);
+			      tmpZ -= (float)dy/(float)(25*hsize/mMainData->WindowSize);
+			      findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ);
+			      lAtoms[i].Position.x = newX;
+			      lAtoms[i].Position.y = newY;
+			      lAtoms[i].Position.z = newZ;
+			    }
 		      }
 		  }
 		MolWin->UpdateGLModel();
@@ -611,7 +630,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			    findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
 			    //estimate an atomDepth value, X and Y values are of no use 
 			    CPoint3D newPnt;
-			    findReal3DCoord(tmpPnt.x, tmpPnt.y, newX, newY, newZ);
+			    findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y, atomDepth, newX, newY, newZ);
 			    newPnt.x = newX;
 			    newPnt.y = newY;
 			    newPnt.z = newZ;
@@ -681,21 +700,21 @@ void MpGLCanvas::findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, G
   winY = viewport[3] - winY;  //"pretend" to have wx's coordinate system
 }
 
-void MpGLCanvas::findReal3DCoord(int x, int y, GLdouble& realX, GLdouble& realY, GLdouble& realZ)
+void MpGLCanvas::findReal3DCoord(GLdouble x, GLdouble y, GLdouble z, GLdouble& realX, GLdouble& realY, GLdouble& realZ)
 {
   GLdouble mvMatrix[16];
   GLdouble projMatrix[16];
   GLint viewport[4];
-  GLfloat winX, winY;
+  GLdouble winX, winY;
 
   glGetIntegerv(GL_VIEWPORT, viewport);	
   glGetDoublev (GL_MODELVIEW_MATRIX, mvMatrix);
   glGetDoublev (GL_PROJECTION_MATRIX, projMatrix);
 
-  winX = (float)x;
-  winY = (float)(viewport[3]-y);
+  winX = x;
+  winY = (GLdouble)(viewport[3])-y;
 
-  gluUnProject (winX, winY, atomDepth, mvMatrix, projMatrix, viewport, &realX, &realY, &realZ);
+  gluUnProject (winX, winY, z, mvMatrix, projMatrix, viewport, &realX, &realY, &realZ);
 }
 
 int MpGLCanvas::testPicking(int x, int y)
