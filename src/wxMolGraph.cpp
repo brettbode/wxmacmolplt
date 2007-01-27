@@ -153,6 +153,7 @@ void wxMolGraph::delYSet(int xSet, int ySet) {
 }
 
 int wxMolGraph::getSelection(int xSet) {
+    if(data[xSet].first.second == -1) return 0;
     return data[xSet].first.second;
 }
 

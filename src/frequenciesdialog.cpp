@@ -300,7 +300,11 @@ void FrequenciesDialog::OnFreqcopyClick( wxCommandEvent& event )
 void FrequenciesDialog::OnCustomGraphClick( wxCommandEvent& event )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
-    parent->ChangeModes(fGraph->getSelection(0));
+    MoleculeData *MainData = parent->GetData();
+
+    if(MainData->cFrame->Vibs) {
+        parent->ChangeModes(fGraph->getSelection(0));
+    }
 }
 
 
