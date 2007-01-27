@@ -19,5 +19,7 @@ dist_pkgdata_DATA = resources/MacMolPlt.Prefs.xml \
 	samples/water.log samples/sample.irc
 EXTRA_DIST = wxMacMolPlt.kdevelop LICENSE  \
 	wxMacMolPlt.vcproj     wxMacMolPlt.rc \
-	wxMacMolPlt.xcodeproj/project.pbxproj
+	wxMacMolPlt.xcodeproj/project.pbxproj \
+	debian/changelog debian/compat debian/control debian/copyright \
+	debian/dirs debian/docs debian/menu debian/rules
 
