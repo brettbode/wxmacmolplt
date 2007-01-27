@@ -293,6 +293,7 @@ void FrequenciesDialog::OnFreqcopyClick( wxCommandEvent& event )
     
     tempDC.SelectObject(wxNullBitmap);
 }
+
 /*!
  * wxEVT_GRAPH_CLICK event handler for ID_CUSTOM
  */
@@ -306,9 +307,6 @@ void FrequenciesDialog::OnCustomGraphClick( wxCommandEvent& event )
         parent->ChangeModes(fGraph->getSelection(0));
     }
 }
-
-
-
 
 /*!
  * wxEVT_COMMAND_MENU_SELECTED event handler for ID_PREVMODE
