@@ -768,9 +768,6 @@ int MpGLCanvas::testPicking(int x, int y)
    unsigned int min_depth = 0xFFFFFFFF;
 
    for (int i = 0; i < hits; i++) {
-     if (buff[i*4+3] < 0 || buff[i*4+3] > 512)
-       continue;   //out of range
-
      if (buff[i*4+1] < min_depth) {
        min_depth = buff[i*4+1];
        select_id = buff[i*4+3];
