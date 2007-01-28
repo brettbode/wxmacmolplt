@@ -60,6 +60,7 @@ extern Boolean	gOpenGLAvailable;
 #endif
 	//0.0577 corresponds to fov=60 with zNear=0.1
 #define myGLperspective	0.050	//0.050 seems to match my 2D mode
+//#define myGLperspective	0.10	//0.050 seems to match my 2D mode
 
 //#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
 
@@ -1127,13 +1128,13 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			    glColor3f(0.0f,0.0f,0.0f);
 			    glEnable(GL_POLYGON_STIPPLE);
 			    glPolygonStipple(stippleMask);
-			    gluSphere(qobj, radius+0.01, (long)(1.5*Quality), (long)(Quality));
+			    gluSphere(qobj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
 			    glDisable(GL_POLYGON_STIPPLE);
 
 			    glColor4f(0.5,0.5,0.5,0.7f);
 			    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 			    glEnable(GL_BLEND);
-			    gluSphere(qobj, radius+0.02, (long)(1.5*Quality), (long)(Quality));
+			    gluSphere(qobj, radius*1.02, (long)(1.5*Quality), (long)(Quality));
 			    glDisable(GL_BLEND);
 			  }
 
@@ -1150,11 +1151,24 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			Matrix4D	rotMat;
 		long atom1 = lBonds[ibond].Atom1;
 		long atom2 = lBonds[ibond].Atom2;
+		glLoadName(ibond+NumAtoms+1);   //bond names start after the last atom
+		if ( mHighliteState && !lBonds[ibond].GetSelectState()) {
+			glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
+			glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
+			glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
+			glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+		} else {
+			glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+			glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
+			glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
+			glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
+		}
+		
 		BondOrder tmpOrder = lBonds[ibond].Order;
-	//	if (tmpOrder == kHydrogenBond) {
-	//		DrawHydrogenBond(ibond);
-	//		continue;
-	//	}
+		if (tmpOrder == kHydrogenBond) {
+			DrawHydrogenBond(ibond);
+			continue;
+		}
 		if (!Prefs->ColorBondHalves()) tmpOrder = kSingleBond;	//only generate multiple pipes when colored by atom color
 		//!!! take hydrogen bond as single bond for now
 		GLdouble tmpBondSize = BondSize/MAX(tmpOrder,1);
@@ -1188,22 +1202,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			rotMat[3][1] = v1.y;
 			rotMat[3][2] = v1.z;
 
-			if ( mHighliteState && !lBonds[ibond].GetSelectState()) {
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
-			} else {
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
-			}
-
 			glPushMatrix();
 			glMultMatrixf((const GLfloat *) &rotMat);
 			if (Prefs->ColorBondHalves()) {
-			  glLoadName(ibond+NumAtoms+1);   //bond names start after the last atom
 					//center the color change at the middle of the visible part of the bond
 			  float radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
 			  float radius2 = AtomScale*Prefs->GetAtomSize(lAtoms[atom2].GetType() - 1);
@@ -1301,9 +1302,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 				glPolygonStipple(stippleMask);
 
 				glTranslatef(0.0, baseBondOffset+ipipe*3.5*tmpBondSize, 0.0);
-				gluCylinder(qobj, tmpBondSize+0.01, tmpBondSize+0.01, length, (long)(Quality), (long)(0.5*Quality));
+				gluCylinder(qobj, tmpBondSize*1.01, tmpBondSize+0.01, length, (long)(Quality), (long)(0.5*Quality));
 				if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
-					gluSphere(qobj, tmpBondSize+0.01, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
+					gluSphere(qobj, tmpBondSize*1.01, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
 					glPopMatrix();
 					glPushMatrix();
 					rotMat[3][0] = v2.x;
@@ -1311,7 +1312,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 					rotMat[3][2] = v2.z;
 					glMultMatrixf((const GLfloat *) &rotMat);
 					glTranslatef(0.0, baseBondOffset+ipipe*3.5*tmpBondSize, 0.0);
-					gluSphere(qobj, tmpBondSize+0.01, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
+					gluSphere(qobj, tmpBondSize*1.01, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
 					glPopMatrix();
 					glPushMatrix();
 					rotMat[3][0] = v1.x;
@@ -1325,9 +1326,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 				glColor4f(0.5,0.5,0.5,0.7f);
 				glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 				glEnable(GL_BLEND);
-				gluCylinder(qobj, tmpBondSize+0.02, tmpBondSize+0.02, length, (long)(Quality), (long)(0.5*Quality));
+				gluCylinder(qobj, tmpBondSize*1.02, tmpBondSize+0.02, length, (long)(Quality), (long)(0.5*Quality));
 				if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
-					gluSphere(qobj, tmpBondSize+0.02, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
+					gluSphere(qobj, tmpBondSize*1.02, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
 					glPopMatrix();
 					glPushMatrix();
 					rotMat[3][0] = v2.x;
@@ -1335,7 +1336,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 					rotMat[3][2] = v2.z;
 					glMultMatrixf((const GLfloat *) &rotMat);
 					glTranslatef(0.0, baseBondOffset+ipipe*3.5*tmpBondSize, 0.0);
-					gluSphere(qobj, tmpBondSize+0.01, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
+					gluSphere(qobj, tmpBondSize*1.02, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
 					glPopMatrix();
 					glPushMatrix();
 					glMultMatrixf((const GLfloat *) &rotMat);
@@ -1491,9 +1492,11 @@ void WinPrefs::ChangeColorVectorColor(void) const {
 }
 
 void MolDisplayWin::DrawHydrogenBond(long bondNum) {
-	CPoint3D	v1, v2;
+	CPoint3D	v1, v2, offset;
 
 	Prefs->ChangeColorBondColor(kHydrogenBond);
+	GLdouble BondSize = Prefs->GetQD3DBondWidth() * 0.5;
+	float Quality = Prefs->GetQD3DAtomQuality();
 	Frame *	lFrame=MainData->cFrame;
 	long atom1 = lFrame->Bonds[bondNum].Atom1;
 	long atom2 = lFrame->Bonds[bondNum].Atom2;
@@ -1503,12 +1506,61 @@ void MolDisplayWin::DrawHydrogenBond(long bondNum) {
 	v2.x = lFrame->Atoms[atom2].Position.x;
 	v2.y = lFrame->Atoms[atom2].Position.y;
 	v2.z = lFrame->Atoms[atom2].Position.z;
+	offset.x = v2.x - v1.x;
+	offset.y = v2.y - v1.y;
+	offset.z = v2.z - v1.z;
 	
-	glLineWidth(10.0);
-	glBegin(GL_LINES);
-	glVertex3d(v1.x, v1.y, v1.z);
-	glVertex3d(v2.x, v2.y, v2.z);
-	glEnd();
+	//GL lines don't scale with distance so they aren't a good solution
+//	glLineWidth(10.0);
+//	glBegin(GL_LINES);
+//	glVertex3d(v1.x, v1.y, v1.z);
+//	glVertex3d(v2.x, v2.y, v2.z);
+//	glEnd();
+	//Plot as a series of spheres
+	CPoint3D	NormalOffset, NormEnd, NormStart={0,0,1};
+	Matrix4D	rotMat;
+	
+	float length = offset.Magnitude();
+	if (length>0.00001) {
+		NormalOffset.x = offset.x/length;
+		NormalOffset.y = offset.y/length;
+		NormalOffset.z = offset.z/length;
+	} else
+		NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
+	NormEnd = v2;
+	Normalize3D (&NormEnd);
+	SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
+	rotMat[3][0] = v1.x;
+	rotMat[3][1] = v1.y;
+	rotMat[3][2] = v1.z;
+	
+	glPushMatrix();
+	glMultMatrixf((const GLfloat *) &rotMat);
+	GLUquadricObj * qobj = NULL;
+	qobj = gluNewQuadric();
+	if (!qobj) throw std::bad_alloc();
+	float pos=0.75*BondSize;
+	glTranslatef(0.0, 0.0, pos);
+	while (pos < length) {
+		gluSphere(qobj, BondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
+		if ( mHighliteState && !lFrame->Bonds[bondNum].GetSelectState()) {
+			glColor3f(0.0f,0.0f,0.0f);
+			glEnable(GL_POLYGON_STIPPLE);
+			glPolygonStipple(stippleMask);
+			gluSphere(qobj, BondSize*1.01, (long)(Quality), (long)(0.5*Quality));
+			glDisable(GL_POLYGON_STIPPLE);
+			
+			glColor4f(0.5,0.5,0.5,0.7f);
+			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_BLEND);
+			gluSphere(qobj, BondSize*1.02, (long)(Quality), (long)(0.5*Quality));
+			glDisable(GL_BLEND);
+		}
+		glTranslatef(0.0, 0.0, 2.5*BondSize);
+		pos += 2.5*BondSize;
+	}
+	glPopMatrix();
+	if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
 }
 
 void MolDisplayWin::AddAxisGL(void)
