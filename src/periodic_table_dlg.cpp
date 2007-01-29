@@ -60,7 +60,7 @@ bool PeriodicTableDlg::Create(
    this->parent = parent;
 
    /* No element has been selected yet. */
-   prev_id = -1;
+   prev_id = -2;
 
    elements = (element_t *) malloc(sizeof(element_t) * nelements);
    if (elements == NULL) {
@@ -157,7 +157,7 @@ void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
 
 int PeriodicTableDlg::GetSelectedID(void) {
 
-   return prev_id + 1;
+   return prev_id;
 
 }
 

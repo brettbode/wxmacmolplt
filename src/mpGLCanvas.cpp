@@ -637,11 +637,6 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
              periodic_dlg->Show();
           }
 
-			/* AtomTypeDialog* newAtomTypeDlg = new AtomTypeDialog(this); */
-
-			/* long tmpStatus = newAtomTypeDlg->ShowModal(); */
-
-			/* if (tmpStatus == wxID_OK) */
 			if (periodic_dlg->GetSelectedID() != -1) 
 			  {
 			    GLdouble newX, newY, newZ;
@@ -649,16 +644,14 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			    findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
 			    //estimate an atomDepth value, X and Y values are of no use 
 			    CPoint3D newPnt;
-			    findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y, atomDepth, newX, newY, newZ);
+			    findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y,
+                             atomDepth, newX, newY, newZ);
 			    newPnt.x = newX;
 			    newPnt.y = newY;
 			    newPnt.z = newZ;
 
 			    lFrame->AddAtom(periodic_dlg->GetSelectedID(), newPnt);
-			    /* lFrame->AddAtom(newAtomTypeDlg->getID(), newPnt); */
 			  }
-
-			/* delete newAtomTypeDlg; */
 
 			oldSelect = -1;
 		      }
