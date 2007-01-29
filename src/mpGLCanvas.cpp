@@ -24,6 +24,8 @@
 
 #include <iostream>
 
+#include "periodic_table_dlg.h"
+
 extern int glf_initialized;
 
 int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16,
@@ -42,6 +44,8 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
     Prefs = NULL;
     MolWin = parent;
     initialized = false;
+
+    periodic_dlg = NULL;
 
     mMainData = parent->GetData();
 
@@ -620,10 +624,25 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		  {
 		    if (selected < 0)
 		      {
-			AtomTypeDialog* newAtomTypeDlg = new AtomTypeDialog(this);
-			long tmpStatus = newAtomTypeDlg->ShowModal();
 
-			if (tmpStatus == wxID_OK)
+          if (periodic_dlg) {
+             periodic_dlg->Raise();
+          } else {
+             wxRect window_rect = GetRect();
+             periodic_dlg = new PeriodicTableDlg(
+                              this, wxT("Periodic Table"),
+                              window_rect.x + window_rect.width,
+                              window_rect.y + 30);
+                              
+             periodic_dlg->Show();
+          }
+
+			/* AtomTypeDialog* newAtomTypeDlg = new AtomTypeDialog(this); */
+
+			/* long tmpStatus = newAtomTypeDlg->ShowModal(); */
+
+			/* if (tmpStatus == wxID_OK) */
+			if (periodic_dlg->GetSelectedID() != -1) 
 			  {
 			    GLdouble newX, newY, newZ;
 
@@ -635,10 +654,11 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			    newPnt.y = newY;
 			    newPnt.z = newZ;
 
-			    lFrame->AddAtom(newAtomTypeDlg->getID(), newPnt);
+			    lFrame->AddAtom(periodic_dlg->GetSelectedID(), newPnt);
+			    /* lFrame->AddAtom(newAtomTypeDlg->getID(), newPnt); */
 			  }
 
-			delete newAtomTypeDlg;
+			/* delete newAtomTypeDlg; */
 
 			oldSelect = -1;
 		      }
@@ -947,6 +967,34 @@ void MpGLCanvas::AtomTypeDialog::Create(MpGLCanvas * parent, wxWindowID id, cons
 void MpGLCanvas::AtomTypeDialog::OnChoice( wxCommandEvent &event )
 {
   typeID = event.GetInt() + 1;
+}
+
+void MpGLCanvas::toggleInteractiveMode(void) {
+
+   interactiveMode = 1 - interactiveMode;
+
+   if (interactiveMode) {
+      if (periodic_dlg) {
+         periodic_dlg->Raise();
+      } else {
+         wxRect window_rect = GetRect();
+         periodic_dlg = new PeriodicTableDlg(
+                          this, wxT("Periodic Table"),
+                          window_rect.x + window_rect.width,
+                          window_rect.y + 30);
+                          
+         periodic_dlg->Show();
+      }
+   } else {
+      ClosePeriodicDlg();
+   }
+} 
+
+void MpGLCanvas::ClosePeriodicDlg(void) {
+   if (periodic_dlg) {
+      periodic_dlg->Destroy();
+      periodic_dlg = NULL;
+   }
 }
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)

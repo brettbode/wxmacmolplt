@@ -21,6 +21,7 @@
 
 #include "MoleculeData.h"
 #include "Frame.h"
+#include "periodic_table_dlg.h"
 
 #define NEW_ATOM_TYPE_DIALOG 30001
 #define NEW_ATOM_TYPE_TITLE _("Select an Atom type")
@@ -29,6 +30,7 @@
 #define GL_Popup_Delete_Item_Current_Frame 30012
 #define GL_Popup_Delete_Item_All_Frames 30013
 
+class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
 /**
  * Defines a widget for displaying an OpenGL canvas.  At this time it is a
@@ -55,6 +57,7 @@ class MpGLCanvas : public wxGLCanvas {
       wxChoice* mTypeChoice;
 
       int typeID;
+      MpGLCanvas *parent;
 
       DECLARE_EVENT_TABLE()
     };
@@ -62,6 +65,7 @@ class MpGLCanvas : public wxGLCanvas {
         MolDisplayWin * MolWin;
         WinPrefs * Prefs;
         bool        initialized;
+        PeriodicTableDlg *periodic_dlg;
 
 	MoleculeData *mMainData;
 	//coordPopup* lPopup;
@@ -207,9 +211,13 @@ class MpGLCanvas : public wxGLCanvas {
 
 	int testPicking(int x, int y);
 	void SelectObj(int select_id, bool mode);
-	void toggleInteractiveMode() { interactiveMode = 1 - interactiveMode; } 
+	void toggleInteractiveMode();
 	void findReal3DCoord(GLdouble x, GLdouble y, GLdouble z, GLdouble& realX, GLdouble& realY, GLdouble& realZ);
 	void findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, GLdouble& winY, GLdouble& winZ);
+
+   void ClosePeriodicDlg(void);
+   /* MpGLCanvas *GetParent(void) { return parent; } */
+   WinPrefs *GetPrefs(void) { return Prefs; }
 	
 };
 
