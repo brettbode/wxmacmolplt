@@ -312,8 +312,8 @@ void WinPrefs::ReadDefaultPrefs(void) {
 #ifdef __WXMAC__
 	//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
 	//but xcode is putting them in Resources.
-	pathname.Remove(pathname.Length() - 17);
-	pathname += wxT("resources");
+	pathname.Remove(pathname.Length() - 13);
+	pathname += wxT("Resources");
 #endif
 	pathname += wxT("/MacMolPlt.Prefs.xml");
 	
