@@ -72,6 +72,7 @@ class PeriodicTableDlg: public wxDialog {
       int prev_id;
       MpGLCanvas *parent;
       void NumberToTableCoords(int atomic_number, int *row, int *col);
+      int platform_offset;
 
    DECLARE_DYNAMIC_CLASS(PeriodicTableDlg)
    DECLARE_EVENT_TABLE()

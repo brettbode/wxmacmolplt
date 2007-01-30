@@ -12,8 +12,6 @@
 
 #include "periodic_table_dlg.h"
 
-#define BUTTON_SIZE 40
-
 IMPLEMENT_DYNAMIC_CLASS(PeriodicTableDlg, wxDialog)
 
 BEGIN_EVENT_TABLE(PeriodicTableDlg, wxDialog)
@@ -48,8 +46,17 @@ bool PeriodicTableDlg::Create(
    int row;
    int col;
 
+#ifdef __WXMAC__
+   #define BUTTON_SIZE 28
+   platform_offset = 22;
+#else
+   #define BUTTON_SIZE 40
+   platform_offset = 0;
+#endif
+
    wxDialog::Create(parent, wxID_ANY, title, wxPoint(xpos, ypos),
-                    wxSize(BUTTON_SIZE * 18, BUTTON_SIZE * 10),
+                    wxSize(BUTTON_SIZE * 18,
+                           BUTTON_SIZE * 10 + platform_offset),
                     wxCLOSE_BOX | wxCAPTION);
 
    nelements = 112;
