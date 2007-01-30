@@ -70,6 +70,26 @@ CXXFLAGS=$TEMP_CXXFLAGS
 LIBS=$TEMP_LIBS
 AC_LANG_RESTORE()
 
+#Begin Mike Ekstrand's cleverness
+if test -z "${datarootdir}"; then
+    datarootdir="${datadir}"
+    AC_SUBST([datarootdir])
+fi
+
+if test -z "${docdir}"; then
+    # be compatible with old make's
+    docdir='${datarootdir}/doc/${PACKAGE}'
+    dvidir='${docdir}'
+    pdfdir='${docdir}'
+    psdir='${docdir}'
+    htmldir='${docdir}'
+    AC_SUBST([docdir])
+    AC_SUBST([dvidir])
+    AC_SUBST([pdfdir])
+    AC_SUBST([psdir])
+    AC_SUBST([htmldir])
+fi
+#End cleverness
 
 AC_SUBST(ac_aux_dir)
 AC_OUTPUT(Makefile src/Makefile)
