@@ -26,6 +26,8 @@
 #include <stdio.h>
 
 #include "Globals.h"
+#undef max
+#undef min
 #include "mpGLCanvas.h"
 #include "Prefs.h"
 
@@ -36,11 +38,6 @@ class MpGLCanvas;
 /* ------------------------------------------------------------------------- */
 
 typedef struct {
-   /* wxString *name; */
-   /* wxString *symbol; */
-   /* int row; */
-   /* int col; */
-   /* int atomic_number; */
    wxBitmapButton *button;
    wxBitmap *off_bmp;
    wxBitmap *on_bmp;
@@ -56,19 +53,17 @@ class PeriodicTableDlg: public wxDialog {
       PeriodicTableDlg();
       PeriodicTableDlg(MpGLCanvas *parent,
                        const wxChar *title = wxT("Periodic Table"),
-                       int xpos = 100, int ypos = 100, int width = 400,
-                       int height = 300);
+                       int xpos = 100, int ypos = 100);
       ~PeriodicTableDlg();
 
       bool Create(MpGLCanvas *parent,
                   const wxChar *title = wxT("Periodic Table"),
-                  int xpos = 100, int ypos = 100, int width = 400,
-                  int height = 300);
-      void PeriodicTableDlg::New(wxCommandEvent& WXUNUSED(event));
-      void PeriodicTableDlg::ElementSelected(wxCommandEvent& event);
-      void PeriodicTableDlg::MouseMoved(wxMouseEvent& event);
-      int PeriodicTableDlg::GetSelectedID(void);
-      void PeriodicTableDlg::OnClose(wxCloseEvent& event);
+                  int xpos = 100, int ypos = 100);
+      void New(wxCommandEvent& WXUNUSED(event));
+      void ElementSelected(wxCommandEvent& event);
+      void MouseMoved(wxMouseEvent& event);
+      int GetSelectedID(void);
+      void OnClose(wxCloseEvent& event);
 
    private:
       wxButton *button;
@@ -76,8 +71,7 @@ class PeriodicTableDlg: public wxDialog {
       int nelements;
       int prev_id;
       MpGLCanvas *parent;
-      void PeriodicTableDlg::NumberToTableCoords(int atomic_number, int *row,
-                                                 int *col);
+      void NumberToTableCoords(int atomic_number, int *row, int *col);
 
    DECLARE_DYNAMIC_CLASS(PeriodicTableDlg)
    DECLARE_EVENT_TABLE()

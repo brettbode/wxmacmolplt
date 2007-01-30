@@ -12,9 +12,7 @@
 
 #include "periodic_table_dlg.h"
 
-/* class WinPrefs; */
-
-#define BUTTON_SIZE 26
+#define BUTTON_SIZE 40
 
 IMPLEMENT_DYNAMIC_CLASS(PeriodicTableDlg, wxDialog)
 
@@ -33,16 +31,14 @@ PeriodicTableDlg::PeriodicTableDlg() {
 /* ------------------------------------------------------------------------- */
 
 PeriodicTableDlg::PeriodicTableDlg(
-      MpGLCanvas *parent, const wxChar *title, int xpos, int ypos,
-      int width, int height) {
-   Create(parent, title, xpos, ypos, width, height);
+      MpGLCanvas *parent, const wxChar *title, int xpos, int ypos) {
+   Create(parent, title, xpos, ypos);
 }
 
 /* ------------------------------------------------------------------------- */
 
 bool PeriodicTableDlg::Create(
-      MpGLCanvas *parent, const wxChar *title, int xpos, int ypos,
-      int width, int height) {
+      MpGLCanvas *parent, const wxChar *title, int xpos, int ypos) {
 
    wxFont *font;            // Font of atomic symbol
    wxMemoryDC *mem_dc;      // Offscreen renderer for button bitmaps
@@ -53,7 +49,8 @@ bool PeriodicTableDlg::Create(
    int col;
 
    wxDialog::Create(parent, wxID_ANY, title, wxPoint(xpos, ypos),
-                    wxSize(BUTTON_SIZE * 18, height), wxCLOSE_BOX);
+                    wxSize(BUTTON_SIZE * 18, BUTTON_SIZE * 10),
+                    wxCLOSE_BOX | wxCAPTION);
 
    nelements = 112;
 
