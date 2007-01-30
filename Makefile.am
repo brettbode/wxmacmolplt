@@ -1,6 +1,6 @@
 SUBDIRS = src
 dist_doc_DATA = LICENSE
-dist_man_MANS = Manual_pages/wxmacmolplt.1 
+dist_man_MANS = resources/wxmacmolplt.1 
 dist_pkgdata_DATA = resources/MacMolPlt.Prefs.xml \
 	resources/fonts/arial1.glf
 nobase_dist_pkgdata_DATA = MacMolPlt_Manual.html \
