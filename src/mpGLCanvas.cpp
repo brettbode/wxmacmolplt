@@ -626,7 +626,9 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		      {
 
           if (periodic_dlg) {
-             periodic_dlg->Raise();
+             if (periodic_dlg->GetSelectedID() == 0) {
+                periodic_dlg->Raise();
+             }
           } else {
              wxRect window_rect = GetRect();
              periodic_dlg = new PeriodicTableDlg(
@@ -637,7 +639,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
              periodic_dlg->Show();
           }
 
-			if (periodic_dlg->GetSelectedID() != -1) 
+			if (periodic_dlg->GetSelectedID() != 0) 
 			  {
 			    GLdouble newX, newY, newZ;
 

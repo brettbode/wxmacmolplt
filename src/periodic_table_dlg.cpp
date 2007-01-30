@@ -60,7 +60,7 @@ bool PeriodicTableDlg::Create(
    this->parent = parent;
 
    /* No element has been selected yet. */
-   prev_id = -2;
+   prev_id = -1;
 
    elements = (element_t *) malloc(sizeof(element_t) * nelements);
    if (elements == NULL) {
@@ -135,6 +135,11 @@ PeriodicTableDlg::~PeriodicTableDlg() {
 
 void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
 
+   /* This function is called when one of the element buttons is pushed.  
+    * The selected button's image is inverted since wxBitmapButton's do not
+    * hold state.  We internally track the button's state and invert and
+    * revert images accordingly. */
+
    int id;                /* The atomic number and index of element. */
 
    id = event.GetId();
@@ -157,7 +162,10 @@ void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
 
 int PeriodicTableDlg::GetSelectedID(void) {
 
-   return prev_id;
+   /* This function returns the atomic number of the currently selected atom,
+    * or 0 if no atom is selected. */
+
+   return prev_id + 1;
 
 }
 
@@ -171,6 +179,10 @@ void PeriodicTableDlg::OnClose(wxCloseEvent& event) {
 
 void PeriodicTableDlg::NumberToTableCoords(int atomic_number, int *row,
                                            int *col) {
+
+   /* This function calculates the row and column position within the periodic
+    * table of the element indicated by atomic_number.  This information
+    * could be pushed out to preferences file, but this works for now. */
 
    int i;
 
