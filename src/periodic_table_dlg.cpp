@@ -45,13 +45,16 @@ bool PeriodicTableDlg::Create(
    int i;
    int row;
    int col;
+   int font_size;
 
 #ifdef __WXMAC__
-   #define BUTTON_SIZE 28
+   #define BUTTON_SIZE 26
    platform_offset = 22;
+   font_size = 12;
 #else
    #define BUTTON_SIZE 30
    platform_offset = 0;
+   font_size = 10;
 #endif
 
    wxDialog::Create(parent, wxID_ANY, title, wxPoint(xpos, ypos),
@@ -77,8 +80,9 @@ bool PeriodicTableDlg::Create(
    /* All button images are generated dynamically.  So, we need a font and an
     * offscreen renderer. */
    mem_dc = new wxMemoryDC();
-   font = new wxFont(10, wxSWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL,
-                     false, wxT(""), wxFONTENCODING_SYSTEM);
+   font = new wxFont(font_size, wxSWISS, wxFONTSTYLE_NORMAL,
+                     wxFONTWEIGHT_NORMAL, false, wxT(""),
+                     wxFONTENCODING_SYSTEM);
    mem_dc->SetFont(*font);
 
    for (i = 0; i < nelements; i++) {
