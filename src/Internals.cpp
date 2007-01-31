@@ -400,7 +400,7 @@ void MOPacInternals::InternalsToCartesians(MoleculeData * MainData, WinPrefs * P
 				//note this only attempts to match the first four atoms, the others
 				//will be allowed to wander
 //			MinimizeDifferences(lFrame->Atoms, tempAtoms, lFrame->NumAtoms, Prefs,
-//				max(lFrame->NumAtoms, 4));
+//				MAX(lFrame->NumAtoms, 4));
 			if (ChangedAtom < 4)
 				MinimizeDifferences(lFrame->Atoms, tempAtoms, lFrame->NumAtoms, Prefs,
 					lFrame->NumAtoms);

@@ -763,7 +763,7 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 					delete OrbSet;
 					return;
 				}
-	//			imaxorb = min(10, NumNOrbs-iorb);	//Max of 10 orbitals per line
+	//			imaxorb = MIN(10, NumNOrbs-iorb);	//Max of 10 orbitals per line
 				imaxorb = ((10) > (NumNOrbs-iorb)) ? (NumNOrbs-iorb) : (10);	//Max of 10 orbitals per line
 				Buffer->GetLine(Line);
 				LinePos = 0;
@@ -832,7 +832,7 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 					delete OrbSet;
 					return;
 				}
-	//			imaxorb = min(10, NumOptOrbs-iorb);	//Max of 10 orbitals per line
+	//			imaxorb = MIN(10, NumOptOrbs-iorb);	//Max of 10 orbitals per line
 				imaxorb = ((10) > (NumOptOrbs-iorb)) ? (NumOptOrbs-iorb) : (10);	//Max of 10 orbitals per line
 				Buffer->GetLine(Line);
 				LinePos = 0;

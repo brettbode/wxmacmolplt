@@ -476,7 +476,7 @@ void JacobiDiagonalization(double * Matrix, double * EigenVectors, long Dimensio
 		jbig[i] = 0;
 		if ((i>0)&&(i>=Start)) {
 			long ii = (i*(i+1))/2;
-			long j = min(i, End);
+			long j = MIN(i, End);
 			for (long k=0; k<j; j++) {
 				if (fabs(big[i]) < fabs(Matrix[ii+k])) {
 					big[i] = Matrix[ii+k];
@@ -486,7 +486,7 @@ void JacobiDiagonalization(double * Matrix, double * EigenVectors, long Dimensio
 		}
 	}
 // 2x2 Jacobi iterations begin here
-	long MaxIt = max((Dimension*Dimension+Dimension)/2, 500);
+	long MaxIt = MAX((Dimension*Dimension+Dimension)/2, 500);
 	long Iter = 0;
 		double	SD;
 		long	jj, j, it;
@@ -497,12 +497,12 @@ void JacobiDiagonalization(double * Matrix, double * EigenVectors, long Dimensio
 		jj = -1;
 		for (j=0; j<Dimension; j++) {
 			jj += j + 1;
-			SD = min(eps, fabs(Matrix[jj]));
+			SD = MIN(eps, fabs(Matrix[jj]));
 		}
-		double test = max(eps, (1.0e-12)*max(SD, 3.0e-06));
+		double test = MAX(eps, (1.0e-12)*MAX(SD, 3.0e-06));
 			//Find the largest off-diagonal element
 		double T = 0.0;
-		long I1 = max(1, Start);
+		long I1 = MAX(1, Start);
 		long IB = I1;
 		for (i=I1; i<Dimension; i++) {
 			if (T<fabs(big[i])) {
@@ -590,7 +590,7 @@ void JacobiDiagonalization(double * Matrix, double * EigenVectors, long Dimensio
 				}
 				long kq = IEAR-ir-IA+1;
 				big[ir] = 0.0;
-				long ir1 = min(ir, End);
+				long ir1 = MIN(ir, End);
 				for (i=0; i<ir1; i++) {
 					long k = kq+i;
 					if (fabs(big[ir]) < fabs(Matrix[k])) {

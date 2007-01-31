@@ -141,9 +141,7 @@ inline PixMapHandle GetPortPixMap(CGrafPtr thePort) {return thePort->portPixMap;
 //#ifndef fabs
 //#define fabs(aaFloat)	(((aaFloat)>=0.0) ? (aaFloat) : -(aaFloat))
 //#endif
-#define max(x, y)		(((x)>(y)) ? (x) : (y))
 #define MAX(x, y)		(((x)>(y)) ? (x) : (y))
-#define min(x, y)		(((x)>(y)) ? (y) : (x))
 #define MIN(x, y)		(((x)>(y)) ? (y) : (x))
 #define fsign(x)		(((x)<0.0) ? -1.0 : 1.0)
 
@@ -217,9 +215,7 @@ typedef unsigned char Str255 [256];
 #endif
 
 // These are here because the ifdefs are broken right now.
-#define max(x, y)		(((x)>(y)) ? (x) : (y))
 #define MAX(x, y)		(((x)>(y)) ? (x) : (y))
-#define min(x, y)		(((x)>(y)) ? (y) : (x))
 #define MIN(x, y)		(((x)>(y)) ? (y) : (x))
 
 //#define ChipmanCode	1	//Define to include the Chipman solvent surface code
