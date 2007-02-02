@@ -26,8 +26,6 @@
 #include <stdio.h>
 
 #include "Globals.h"
-#undef max
-#undef min
 #include "mpGLCanvas.h"
 #include "Prefs.h"
 
