@@ -1259,8 +1259,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 				NormalOffset.x = offset.x/length;
 				NormalOffset.y = offset.y/length;
 				NormalOffset.z = offset.z/length;
-			} else
+			} else {
 				NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
+         }
 
 			SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
 			rotMat[3][0] = v1.x;
@@ -1337,30 +1338,29 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
          // We only need to draw one cylinder the whole length of a bond since
          // the user's not interested in coloring each half differently.
          else {
-				Prefs->ChangeColorBondColor(lBonds[ibond].Order);
-			  for ( int i = 0; i < MAX(tmpOrder,1); ++i)
-				{
-				  glPushMatrix();
-				  // glTranslatef(0.0, baseBondOffset+i*0.1, 0.0);
-				  gluCylinder(qobj, tmpBondSize, tmpBondSize, length, (long)(Quality), (long)(0.5*Quality));
-				  glPopMatrix();
-				}
+            Prefs->ChangeColorBondColor(lBonds[ibond].Order);
+            for (int i = 0; i < MAX(tmpOrder,1); ++i) {
+              glPushMatrix();
+              gluCylinder(qobj, tmpBondSize, tmpBondSize, length, 
+                          (long) Quality, (long) (0.5f * Quality));
+              glPopMatrix();
+            }
 
-			  if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
-				gluDisk(qobj, 0.0, tmpBondSize, (long)(Quality), 2);
-				glPopMatrix();
-				glPushMatrix();
-				rotMat[3][0] = v2.x;
-				rotMat[3][1] = v2.y;
-				rotMat[3][2] = v2.z;
-				glMultMatrixf((const GLfloat *) &rotMat);
-				gluDisk(qobj, 0.0, tmpBondSize, (long)(Quality), 2);
-			  }
-			}
+            if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
+              gluDisk(qobj, 0.0, tmpBondSize, (long) Quality, 2);
+              glPopMatrix();
+              glPushMatrix();
+              rotMat[3][0] = v2.x;
+              rotMat[3][1] = v2.y;
+              rotMat[3][2] = v2.z;
+              glMultMatrixf((const GLfloat *) &rotMat);
+              gluDisk(qobj, 0.0, tmpBondSize, (long) Quality, 2);
+            }
+         }
 
          // Now, if a bond is selected but not this one, we need to draw an
          // encapsulating cylinder to mask it out.
-			if ( mHighliteState && !lBonds[ibond].GetSelectState()) {
+			if (mHighliteState && !lBonds[ibond].GetSelectState()) {
 				glPopMatrix();
 				glPushMatrix();
 
@@ -1369,51 +1369,42 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 				rotMat[3][2] = v1.z;
 				glMultMatrixf((const GLfloat *) &rotMat);
 
-				glColor3f(0.0f,0.0f,0.0f);
+            // Display stippled cylinder and spheres slightly larger than bond
+            // cylinder and spheres.  Additionally, it appears that one end of
+            // the mask flares out.
+				glColor3f(0.0f, 0.0f, 0.0f);
 				glEnable(GL_POLYGON_STIPPLE);
 				glPolygonStipple(stippleMask);
-
-				// glTranslatef(0.0, baseBondOffset+ipipe*3.5*tmpBondSize, 0.0);
-				gluCylinder(qobj, tmpBondSize*1.01, tmpBondSize+0.01, length, (long)(Quality), (long)(0.5*Quality));
+				gluCylinder(qobj, tmpBondSize * 1.01f, tmpBondSize + 0.01f,
+                        length, (long) Quality, (long) (0.5f * Quality));
 				if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
-					gluSphere(qobj, tmpBondSize*1.01, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
-					glPopMatrix();
-					glPushMatrix();
-					rotMat[3][0] = v2.x;
-					rotMat[3][1] = v2.y;
-					rotMat[3][2] = v2.z;
-					glMultMatrixf((const GLfloat *) &rotMat);
-					// glTranslatef(0.0, baseBondOffset+ipipe*3.5*tmpBondSize, 0.0);
-					gluSphere(qobj, tmpBondSize*1.01, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
-					glPopMatrix();
-					glPushMatrix();
-					rotMat[3][0] = v1.x;
-					rotMat[3][1] = v1.y;
-					rotMat[3][2] = v1.z;
-					glMultMatrixf((const GLfloat *) &rotMat);
-					// glTranslatef(0.0, baseBondOffset+ipipe*3.5*tmpBondSize, 0.0);
+					gluSphere(qobj, tmpBondSize * 1.01f, (long) Quality,
+                         (long) (0.5f * Quality));
+               glPushMatrix();
+               glTranslatef(0.0f, 0.0f, length);
+					gluSphere(qobj, tmpBondSize + 0.01f, (long) Quality,
+                         (long) (0.5f * Quality));
+               glPopMatrix();
 				}
 				glDisable(GL_POLYGON_STIPPLE);
 
-				glColor4f(0.5,0.5,0.5,0.7f);
+            // Display semi-transparent and non-stippled cylinder and spheres
+            // slightly larger than the bond and stippled cylinder and spheres.
+            // Additionally, it appears that one end of the mask flares out.
+				glColor4f(0.5f, 0.5f, 0.5f, 0.7f);
 				glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 				glEnable(GL_BLEND);
-				gluCylinder(qobj, tmpBondSize*1.02, tmpBondSize+0.02, length, (long)(Quality), (long)(0.5*Quality));
+            gluCylinder(qobj, tmpBondSize * 1.02f, tmpBondSize + 0.02f,
+                        length, (long) Quality, (long) (0.5 * Quality));
 				if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
-					gluSphere(qobj, tmpBondSize*1.02, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
-					glPopMatrix();
-					glPushMatrix();
-					rotMat[3][0] = v2.x;
-					rotMat[3][1] = v2.y;
-					rotMat[3][2] = v2.z;
-					glMultMatrixf((const GLfloat *) &rotMat);
-					// glTranslatef(0.0, baseBondOffset+ipipe*3.5*tmpBondSize, 0.0);
-					gluSphere(qobj, tmpBondSize*1.02, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
-					glPopMatrix();
-					glPushMatrix();
-					glMultMatrixf((const GLfloat *) &rotMat);
+					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
+                         (long) (0.5 * Quality));
+               glTranslatef(0.0f, 0.0f, length);
+					gluSphere(qobj, tmpBondSize + 0.02f, (long) Quality,
+                         (long) (0.5 * Quality));
 				}
 				glDisable(GL_BLEND);
+
 			}
 			glPopMatrix();
 		}
