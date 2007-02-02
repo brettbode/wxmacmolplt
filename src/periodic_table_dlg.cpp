@@ -48,11 +48,13 @@ bool PeriodicTableDlg::Create(
    int font_size;
 
 #ifdef __WXMAC__
-   #define BUTTON_SIZE 26
+#define BUTTON_SIZE 34
+#define IMAGE_SIZE 32
    platform_offset = 22;
    font_size = 12;
 #else
-   #define BUTTON_SIZE 30
+#define BUTTON_SIZE 34
+#define IMAGE_SIZE 32
    platform_offset = 0;
    font_size = 10;
 #endif
@@ -95,6 +97,7 @@ bool PeriodicTableDlg::Create(
       elements[i].on_bmp = new wxBitmap(BUTTON_SIZE, BUTTON_SIZE);
       elements[i].off_bmp = new wxBitmap(BUTTON_SIZE, BUTTON_SIZE);
 
+      // Create unselected version with white background, black text.
       mem_dc->SelectObject(*(elements[i].off_bmp));
       mem_dc->GetTextExtent(symbol, &symbol_width, &symbol_height);
       mem_dc->SetBackground(*wxWHITE_BRUSH);
@@ -104,6 +107,7 @@ bool PeriodicTableDlg::Create(
                        (BUTTON_SIZE - symbol_width) / 2,
                        (BUTTON_SIZE - symbol_height) / 2);
 
+      // Create selected version with black background, white text.
       mem_dc->SelectObject(*(elements[i].on_bmp));
       mem_dc->SetBackground(*wxBLACK_BRUSH);
       mem_dc->Clear();
@@ -116,6 +120,13 @@ bool PeriodicTableDlg::Create(
          new wxBitmapButton(this, i, *(elements[i].off_bmp),
                             wxPoint(col * BUTTON_SIZE, row * BUTTON_SIZE),
                             wxSize(BUTTON_SIZE, BUTTON_SIZE));
+
+      // Display a quick note when user hovers over button.
+      wxString tool_tip;
+      tool_tip.Printf(wxT("Number: %d, Mass: %f"), i + 1,
+                      parent->GetPrefs()->GetAtomMass(i));
+      elements[i].button->SetToolTip(tool_tip);
+
    }
 
    delete font;
