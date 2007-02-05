@@ -21,7 +21,7 @@
 
 //This needs to get put into the build system...
 #define __wxBuild__
-#define wxMacMolPlt_VERSION "6.2"
+#define wxMacMolPlt_VERSION "6.3"
 
 //activate the following line to use the interactive editor
 //#define ENABLE_INTERACTIVE_MODE
@@ -53,7 +53,6 @@
 #endif
 #define PM_USE_SESSION_APIS 0	//Turn off printing session APIs for now.
 #endif
-//#define RhapsodyBuild		//define to build for Rhapsody (any platform)
 
 #ifdef MacintoshBuild
 
@@ -145,7 +144,6 @@ inline PixMapHandle GetPortPixMap(CGrafPtr thePort) {return thePort->portPixMap;
 #define MIN(x, y)		(((x)>(y)) ? (y) : (x))
 #define fsign(x)		(((x)<0.0) ? -1.0 : 1.0)
 
-//#define kMaxOpenDocuments	20			//Max possible open documents
 #define kMinDocDim			150			//Min size (height and width) of the main display
 #define kBarHeight			15			//Scroll bar height (or width)
 #define	rDitherPatterns		0			//Dither patterns rsrc #
@@ -176,19 +174,6 @@ void ShowAboutMeDialog(void);
 Boolean FrontApp(void);
 
 #endif	//End of Mac definitions!
-
-#ifdef RhapsodyBuild
-
-#define BlockMoveData(source, target, nBytes)	memcpy(target, source, nBytes)
-
-struct RGBColor {
-	unsigned short 					red;						/*magnitude of red component*/
-	unsigned short 					green;						/*magnitude of green component*/
-	unsigned short 					blue;						/*magnitude of blue component*/
-};
-typedef struct RGBColor RGBColor;
-
-#endif	//End of Rhapsody definitions!
 
 #ifdef __wxBuild__
 //When building on a Mac the following types will get picked up from system headers
@@ -221,9 +206,6 @@ typedef unsigned char Str255 [256];
 //#define ChipmanCode	1	//Define to include the Chipman solvent surface code
 
 void MessageAlert (const char * message);
-
-#define kMaxOpenDocuments	20			//Max possible open documents
-//make kMaxOpenDocuments a global definition
 
 //Useful constants
 #define	kBohr2AngConversion	0.52917724924	/*Bohrs to Angstroms*/

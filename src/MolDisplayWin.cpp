@@ -437,9 +437,9 @@ void MolDisplayWin::createMenuBar(void) {
     menuEdit->AppendSeparator();
     menuEdit->Append(wxID_SELECTALL, wxT("&Select all\tCtrl+A"));
     menuEdit->AppendSeparator();
-    //#ifdef ENABLE_INTERACTIVE_MODE
+#ifdef ENABLE_INTERACTIVE_MODE
     menuEdit->AppendCheckItem(MMP_INTERACTIVE, wxT("Interactive Mode"));
-    //#endif
+#endif
     menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
 
     menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"));
@@ -447,8 +447,11 @@ void MolDisplayWin::createMenuBar(void) {
     menuView->Append(MMP_OFFSETMODE, wxT("&Offset along mode..."));
     menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
     menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
+    menuView->AppendSeparator();
     menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show Ax&is"));
+#ifdef ENABLE_INTERACTIVE_MODE
     menuView->AppendCheckItem(MMP_SHOWSYMMETRYOPERATOR, wxT("Show S&ymmetry Operators"));
+#endif
 	
 	menuViewLabels = new wxMenu;
     menuView->Append(MMP_ATOMLABELSSUBMENU, wxT("Atom &Labels"), menuViewLabels);
