@@ -319,6 +319,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\periodic_table_dlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Prefs.h"
 				>
 			</File>
@@ -556,6 +560,10 @@
 			</File>
 			<File
 				RelativePath=".\src\orbitals.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\periodic_table_dlg.cpp"
 				>
 			</File>
 			<File
