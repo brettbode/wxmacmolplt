@@ -1088,6 +1088,14 @@ void ControlGroup::WriteToFile(BufferFile *File, InputData *IData, long NumElect
 		sprintf(Out, "CCTYP=%s ", GetGAMESSCCType(CCType));
 		File->WriteLine(Out, false);
 	}
+
+	if (IData->DFT) {
+		if (UseDFT()) {
+			sprintf(Out, "DFTTYP=%s ", IData->DFT->GetFunctionalText());
+			File->WriteLine(Out, false);
+		}
+	}
+	
 	if (MaxIt) {	//Punch Maxit if non-default value
 		sprintf(Out, "MAXIT=%d ",MaxIt);
 		File->WriteLine(Out, false);
@@ -3140,7 +3148,7 @@ void DFTGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	short SCFType = IData->Control->GetSCFType();
 		//first determine wether or not the DFT group needs to be punched
 	if ((SCFType > 3)|| !IData->Control->UseDFT()) return;//only punch for HF runtypes (RHF, ROHF, UHF)
-
+	if (MethodGrid()) return; //Only need this group for gridfree method currently
 		//Punch the group label
 	File->WriteLine(" $DFT ", false);
 		//Write out the funtional, and any other optional parameters
@@ -3149,8 +3157,6 @@ void DFTGroup::WriteToFile(BufferFile *File, InputData *IData) {
 		sprintf(Out, "METHOD=GRIDFREE ");
 		File->WriteLine(Out, false);
 	}
-	sprintf(Out, "DFTTYP=%s ", GetFunctionalText());
-	File->WriteLine(Out, false);
 
 	File->WriteLine("$END", true);
 }
