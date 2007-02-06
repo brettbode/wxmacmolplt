@@ -29,6 +29,10 @@
 #define GL_Popup_Menu_Apply_All 30011
 #define GL_Popup_Delete_Item_Current_Frame 30012
 #define GL_Popup_Delete_Item_All_Frames 30013
+#define GL_Popup_To_Single_Bond 30014
+#define GL_Popup_To_Double_Bond 30015
+#define GL_Popup_To_Triple_Bond 30016
+#define GL_Popup_To_Hydrogen_Bond 30017
 
 class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
@@ -207,6 +211,10 @@ class MpGLCanvas : public wxGLCanvas {
 	void On_Apply_All(wxCommandEvent& event);
 	void On_Delete_Single_Frame(wxCommandEvent& event);
 	void On_Delete_All_Frames(wxCommandEvent& event);
+	void ToSingleBond(wxCommandEvent& event);
+	void ToDoubleBond(wxCommandEvent& event);
+	void ToTripleBond(wxCommandEvent& event);
+	void ToHydrogenBond(wxCommandEvent& event);
 	//implementation of the correspondent popup-menu selection
 
 	int testPicking(int x, int y);

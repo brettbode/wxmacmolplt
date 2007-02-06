@@ -848,16 +848,81 @@ void MpGLCanvas::SelectObj(int select_id, bool mode)
 void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom)
 {
   wxMenu menu;
+  wxMenuItem *item;
+  wxMenu *submenu;
+  Frame *lFrame = mMainData->cFrame;
+  long NumAtoms = lFrame->NumAtoms;
 
-  if (isAtom)
-    menu.Append(GL_Popup_Menu_Apply_All, _T("&Apply to All Frames"));
+  // If a bond is clicked on, we show some bond specific items, like
+  // the length of the bond and the order.
+  if (!isAtom) {
+     submenu = new wxMenu();
+     wxString length_label;
+     length_label.Printf("Bond length: %f",
+                         lFrame->GetBondLength(selected - NumAtoms));
+     item = menu.Append(wxID_ANY, length_label);
+     item->Enable(false);
+     submenu->AppendRadioItem(GL_Popup_To_Single_Bond, wxT("Single"));
+     submenu->AppendRadioItem(GL_Popup_To_Double_Bond, wxT("Double"));
+     submenu->AppendRadioItem(GL_Popup_To_Triple_Bond, wxT("Triple"));
+     submenu->AppendRadioItem(GL_Popup_To_Hydrogen_Bond, wxT("Hydrogen"));
+     menu.Append(wxID_ANY, wxT("Bond Order"), submenu);
+     menu.AppendSeparator();
+  } else {
+     menu.Append(GL_Popup_Menu_Apply_All, _T("&Apply to All Frames"));
+  }
 
   menu.Append(GL_Popup_Delete_Item_Current_Frame, _T("&Delete"));
   menu.Append(GL_Popup_Delete_Item_All_Frames, _T("&Delete in All Frames"));
 
   PopupMenu(&menu, x, y);
+
 }
 //make a popup menu editing the objets in the scene
+
+void MpGLCanvas::ToSingleBond(wxCommandEvent& event) {
+
+   // This function converts the selected bond to single order.  It is 
+   // assumed that selected contains the index of the bond plus the number
+   // of atoms in the frame.
+
+   Frame *lFrame = mMainData->cFrame;
+
+   lFrame->Bonds[selected - lFrame->NumAtoms].Order = kSingleBond;
+}
+
+void MpGLCanvas::ToDoubleBond(wxCommandEvent& event) {
+
+   // This function converts the selected bond to double order.  It is 
+   // assumed that selected contains the index of the bond plus the number
+   // of atoms in the frame.
+
+   Frame *lFrame = mMainData->cFrame;
+
+   lFrame->Bonds[selected - lFrame->NumAtoms].Order = kDoubleBond;
+}
+
+void MpGLCanvas::ToTripleBond(wxCommandEvent& event) {
+
+   // This function converts the selected bond to triple order.  It is 
+   // assumed that selected contains the index of the bond plus the number
+   // of atoms in the frame.
+   
+   Frame *lFrame = mMainData->cFrame;
+
+   lFrame->Bonds[selected - lFrame->NumAtoms].Order = kTripleBond;
+}
+
+void MpGLCanvas::ToHydrogenBond(wxCommandEvent& event) {
+
+   // This function converts the selected bond to hydrogen order.  It is 
+   // assumed that selected contains the index of the bond plus the number
+   // of atoms in the frame.
+   
+   Frame *lFrame = mMainData->cFrame;
+
+   lFrame->Bonds[selected - lFrame->NumAtoms].Order = kHydrogenBond;
+}
 
 void MpGLCanvas::On_Apply_All(wxCommandEvent& event)
 {
@@ -993,16 +1058,20 @@ void MpGLCanvas::ClosePeriodicDlg(void) {
 }
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
-    EVT_SIZE             (MpGLCanvas::eventSize)
-    EVT_PAINT            (MpGLCanvas::eventPaint)
-    EVT_ERASE_BACKGROUND (MpGLCanvas::eventErase)
-    EVT_MOUSE_EVENTS     (MpGLCanvas::eventMouse)
+   EVT_SIZE             (MpGLCanvas::eventSize)
+   EVT_PAINT            (MpGLCanvas::eventPaint)
+   EVT_ERASE_BACKGROUND (MpGLCanvas::eventErase)
+   EVT_MOUSE_EVENTS     (MpGLCanvas::eventMouse)
 
-    EVT_CHAR (MpGLCanvas::KeyHandler)
+   EVT_CHAR(MpGLCanvas::KeyHandler)
 
-  EVT_MENU (GL_Popup_Menu_Apply_All, MpGLCanvas::On_Apply_All)
-  EVT_MENU (GL_Popup_Delete_Item_Current_Frame, MpGLCanvas::On_Delete_Single_Frame)
-  EVT_MENU (GL_Popup_Delete_Item_All_Frames, MpGLCanvas::On_Delete_All_Frames)
+   EVT_MENU(GL_Popup_Menu_Apply_All, MpGLCanvas::On_Apply_All)
+   EVT_MENU(GL_Popup_Delete_Item_Current_Frame, MpGLCanvas::On_Delete_Single_Frame)
+   EVT_MENU(GL_Popup_Delete_Item_All_Frames, MpGLCanvas::On_Delete_All_Frames)
+   EVT_MENU(GL_Popup_To_Single_Bond, MpGLCanvas::ToSingleBond)
+   EVT_MENU(GL_Popup_To_Double_Bond, MpGLCanvas::ToDoubleBond)
+   EVT_MENU(GL_Popup_To_Triple_Bond, MpGLCanvas::ToTripleBond)
+   EVT_MENU(GL_Popup_To_Hydrogen_Bond, MpGLCanvas::ToHydrogenBond)
 END_EVENT_TABLE()
 
 
