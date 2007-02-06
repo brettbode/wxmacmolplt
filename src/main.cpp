@@ -41,6 +41,7 @@ wxSplashScreen * splash = NULL;
 wxTimer splashTimer;
 #define splashT_ID 12399
 bool MpApp::OnInit() {
+	m_InstanceChecker = NULL;
     const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
 	gPrefDlg = NULL;
 
@@ -186,7 +187,10 @@ void MpApp::splashCleanup(wxTimerEvent & event) {
 }
 
 int MpApp::OnExit() {
-    delete m_InstanceChecker;
+	if (m_InstanceChecker) {
+		delete m_InstanceChecker;
+		m_InstanceChecker = NULL;
+	}
 
     delete wxConfigBase::Set((wxConfigBase *) NULL);
     //delete config object if there is one created before  -Song Li
