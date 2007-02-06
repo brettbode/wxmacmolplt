@@ -1,18 +1,18 @@
 %define prefix /usr
 %define bindir %{prefix}/bin
 %define sysconfdir %{prefix}/share
-%define docdir %{prefix}/share/wxMacMolPlt
+%define docdir %{prefix}/share/wxmacmolplt
 %define debug_package %{nil}
 %define __check_files %{nil}
-Name: wxMacMolPlt
-Version: 6.2.0
+Name: wxmacmolplt
+Version: 6.3.0
 Release: 1
 Summary: MacMolPlt molecular visualization package
 Group: undefined
 License: GPL
 Prefix: %{prefix}
-Source: wxMacMolPlt-%{version}.tar.gz  
-BuildRoot: %{_tmppath}/wxMacMolPlt-%{version}-root
+Source: wxmacmolplt-%{version}.tar.gz  
+BuildRoot: %{_tmppath}/wxmacmolplt-%{version}-root
 BuildRequires: wxGTK-devel >= 2.6.3
 Requires: wxGTK >= 2.6.3 wxGTK-gl >= 2.6.3
 
@@ -25,10 +25,11 @@ wxMacMolPlt is a molecular visualization tool for use with GAMESS
 
 %files
 %defattr(-, root, root)
-%{bindir}/wxMacMolPlt
-%{sysconfdir}/wxMacMolPlt/MacMolPlt.Prefs.xml
-%{sysconfdir}/wxMacMolPlt/arial1.glf
-%doc %{docdir}/LICENSE
+%{bindir}/wxmacmolplt
+%{sysconfdir}/wxmacmolplt/MacMolPlt.Prefs.xml
+%{sysconfdir}/wxmacmolplt/arial1.glf
+%doc %{sysconfdir}/doc/wxmacmolplt/LICENSE
+%doc %{sysconfdir}/man/man1/wxmacmolplt.1.gz
 %doc %{docdir}/MacMolPlt_Manual.html
 %doc %{docdir}/Manual_pages/*
 %doc %{docdir}/samples/*
@@ -40,5 +41,3 @@ make
 %install
 if [ -d $RPM_BUILD_ROOT ]; then rm -r $RPM_BUILD_ROOT; fi;
 make DESTDIR=$RPM_BUILD_ROOT prefix=%{prefix} install
-cp -r Manual_pages $RPM_BUILD_ROOT/%{docdir}/Manual_pages
-cp -r samples $RPM_BUILD_ROOT/%{docdir}/samples
