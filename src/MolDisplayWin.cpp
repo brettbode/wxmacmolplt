@@ -2132,14 +2132,15 @@ void MolDisplayWin::ChangeModes(long NewMode) {
         ModeChanged();
     }
 }
+#include <iostream>
 void MolDisplayWin::UpdateFrameText(void) {
     // Add a little information
     wxString output;
     Boolean WriteEnergy=true;
     if (MainData->cFrame->Vibs) {
       if (MainData->GetDrawMode()) {
-          wxString temp;
-          output.Printf(wxT("Freq=%s"), MainData->cFrame->Vibs->Frequencies[MainData->cFrame->Vibs->CurrentMode].c_str());
+		  wxString str(MainData->cFrame->Vibs->Frequencies[MainData->cFrame->Vibs->CurrentMode].c_str(), wxConvUTF8);
+          output.Printf(wxT("Freq=%s"), str.c_str());
           WriteEnergy = false;
       }
     }
@@ -2200,7 +2201,7 @@ void MolDisplayWin::UpdateFrameText(void) {
     wxString ft;
     ft.Printf(wxT(" Frame %d of %d"), MainData->GetCurrentFrame(), MainData->GetNumFrames());
     output += ft;
-    
+
     textBar->SetLabel(output);
 }
 void MolDisplayWin::UpdateModelDisplay(void) {
