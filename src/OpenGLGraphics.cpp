@@ -1235,7 +1235,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
       offset_vec.z = perp_obj[2] - lAtoms[atom1].Position.z;
       offset_vec *= 1 / offset_vec.Magnitude();
       
-      // For each bond between atoms...
+      // For each "sub-bond" between these two atoms...
 		for (int ipipe = 0; ipipe < MAX(tmpOrder,1); ++ipipe) {
 
 			v1.x = lAtoms[atom1].Position.x + offset_vec.x * baseBondOffset +
@@ -1370,19 +1370,18 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 				glMultMatrixf((const GLfloat *) &rotMat);
 
             // Display stippled cylinder and spheres slightly larger than bond
-            // cylinder and spheres.  Additionally, it appears that one end of
-            // the mask flares out.
+            // cylinder and spheres.
 				glColor3f(0.0f, 0.0f, 0.0f);
 				glEnable(GL_POLYGON_STIPPLE);
 				glPolygonStipple(stippleMask);
-				gluCylinder(qobj, tmpBondSize * 1.01f, tmpBondSize + 0.01f,
+				gluCylinder(qobj, tmpBondSize * 1.01f, tmpBondSize * 1.01f,
                         length, (long) Quality, (long) (0.5f * Quality));
 				if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
 					gluSphere(qobj, tmpBondSize * 1.01f, (long) Quality,
                          (long) (0.5f * Quality));
                glPushMatrix();
                glTranslatef(0.0f, 0.0f, length);
-					gluSphere(qobj, tmpBondSize + 0.01f, (long) Quality,
+					gluSphere(qobj, tmpBondSize * 1.01f, (long) Quality,
                          (long) (0.5f * Quality));
                glPopMatrix();
 				}
@@ -1390,17 +1389,16 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
             // Display semi-transparent and non-stippled cylinder and spheres
             // slightly larger than the bond and stippled cylinder and spheres.
-            // Additionally, it appears that one end of the mask flares out.
 				glColor4f(0.5f, 0.5f, 0.5f, 0.7f);
 				glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 				glEnable(GL_BLEND);
-            gluCylinder(qobj, tmpBondSize * 1.02f, tmpBondSize + 0.02f,
+            gluCylinder(qobj, tmpBondSize * 1.02f, tmpBondSize * 1.02f,
                         length, (long) Quality, (long) (0.5 * Quality));
 				if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
 					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
                          (long) (0.5 * Quality));
                glTranslatef(0.0f, 0.0f, length);
-					gluSphere(qobj, tmpBondSize + 0.02f, (long) Quality,
+					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
                          (long) (0.5 * Quality));
 				}
 				glDisable(GL_BLEND);
