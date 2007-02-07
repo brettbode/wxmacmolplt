@@ -14,7 +14,10 @@ Prefix: %{prefix}
 Source: wxmacmolplt-%{version}.tar.gz  
 BuildRoot: %{_tmppath}/wxmacmolplt-%{version}-root
 BuildRequires: wxGTK-devel >= 2.6.3
+#FC
 Requires: wxGTK >= 2.6.3 wxGTK-gl >= 2.6.3
+#Mandriva 2007.0 naming
+#Requires: libwxgtk2.6 >= 2.6.3
 
 %description
 wxMacMolPlt is a molecular visualization tool for use with GAMESS
@@ -29,7 +32,10 @@ wxMacMolPlt is a molecular visualization tool for use with GAMESS
 %{sysconfdir}/wxmacmolplt/MacMolPlt.Prefs.xml
 %{sysconfdir}/wxmacmolplt/arial1.glf
 %doc %{sysconfdir}/doc/wxmacmolplt/LICENSE
+#FC gz
 %doc %{sysconfdir}/man/man1/wxmacmolplt.1.gz
+#Mandriva uses bz2
+#%doc %{sysconfdir}/man/man1/wxmacmolplt.1.bz2
 %doc %{docdir}/MacMolPlt_Manual.html
 %doc %{docdir}/Manual_pages/*
 %doc %{docdir}/samples/*
