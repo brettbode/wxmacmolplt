@@ -2,17 +2,19 @@ Currently wxMacMolPlt includes build files and has been tested on Mac OS X,
 Linux and Windows. Since most people building from source will be running
 Linux this file focuses on the build instructions for Linux. To build from
 source on any OS you must have a C++ compiler such as g++ and an install
-of wxWidgets with OpenGL support enabled. wxWidgets 2.6 and later should work.
+of wxWidgets with OpenGL support enabled. wxWidgets 2.6 through 2.8.0 
+should work.
 Prebuilt packages should also work. We have tested against the version 2.6.3
 prebuilt package within Debian and found it to work. If you are building on
-Fedora Core 5 first install the wxGTK-2.6.3, wxGTK-gl-2.6.3 and
+Fedora Core 5 or 6 first install the wxGTK-2.6.3, wxGTK-gl-2.6.3 and
 wxGTK-devel-2.6.3 rpms. With those three rpms installed you should have no
 trouble building or running wxMacMolPlt.
 
 If your distribution does not offer a prebuilt wxWidgets package you will need
 to grab the latest source copy from www.wxwidgets.org and install it. You 
-should be able to do this using the following:
-   ./configure --with-opengl
+should be able to do this using the following (opengl is required, unicode is
+optional, but should be used if you use non ascii chars in your file system):
+   ./configure --with-opengl --enable-unicode
    make
    make install
 
@@ -25,3 +27,13 @@ If you have installed wxWidgets in a non-standard location you can add
 to the ./configure step. The make install step is important as it installs two
 required resource files in addition to the binary. Once installed you should
 be able to run MacMolPlt by typing "wxMacMolPlt".
+
+If you get an error during the MacMolPlt configure step saying that your wx
+build lacks OpenGL support the problem may be that you need the location of
+the wxWidgets shared libraries in your ld path. First as root try running:
+  ldconfig
+Then retry the configure step. If that still doesn't work check that the file
+/etc/ld.so.conf contains the path to the directory containing your wxWidgets
+libraries. Then rerun ldconfig. Alternatively you can build static wxWidgets
+libraries by adding "--disable-shared" to the wxWidgets configure step.
+
