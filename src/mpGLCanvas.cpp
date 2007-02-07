@@ -475,223 +475,244 @@ void MpGLCanvas::eventErase(wxEraseEvent &event) {
 }
 
 void MpGLCanvas::eventMouse(wxMouseEvent &event) {
-        if(!GetContext()) {
-		return;
-	}
+   if (!GetContext()) {
+      return;
+   }
 
-	static wxPoint oldTmpPnt;
-	bool deSelectAll = true;
+   static wxPoint oldTmpPnt;
+   bool deSelectAll = true;
 
-	wxPoint tmpPnt = event.GetPosition();
+   wxPoint tmpPnt = event.GetPosition();
 
-	SetCurrent();
+   SetCurrent();
 
-	Frame *  lFrame = mMainData->cFrame;
-	long NumAtoms = lFrame->NumAtoms;
-	mpAtom * lAtoms = lFrame->Atoms;
+   Frame *  lFrame = mMainData->cFrame;
+   long NumAtoms = lFrame->NumAtoms;
+   mpAtom * lAtoms = lFrame->Atoms;
 
-	if (event.LeftDown())
-	  {
-	    mSelectState = 0;
-	    selected = testPicking(tmpPnt.x, tmpPnt.y);
+   // First handle left mouse down.
+   if (event.LeftDown())
+     {
+       mSelectState = 0;
+       selected = testPicking(tmpPnt.x, tmpPnt.y);
 
-	    if ( interactiveMode)
-	      if ( selected >= 0 && selected < NumAtoms )
-		{
-		  GLdouble tmpWinX, tmpWinY;
+       if ( interactiveMode)
+         if ( selected >= 0 && selected < NumAtoms )
+           {
+             GLdouble tmpWinX, tmpWinY;
 
-		  findWinCoord(lAtoms[selected].Position.x,
-			       lAtoms[selected].Position.y,
-			       lAtoms[selected].Position.z,
-			       tmpWinX, tmpWinY, atomDepth);
- 
-		  winDiffX = tmpPnt.x - (int)tmpWinX;
-		  winDiffY = tmpPnt.y - (int)tmpWinY;
-		}
-	  }
+             findWinCoord(lAtoms[selected].Position.x,
+                     lAtoms[selected].Position.y,
+                     lAtoms[selected].Position.z,
+                     tmpWinX, tmpWinY, atomDepth);
+      
+             winDiffX = tmpPnt.x - (int)tmpWinX;
+             winDiffY = tmpPnt.y - (int)tmpWinY;
+           }
+     }
+   
+   // If not left, try right click in edit mode.
+   else if (event.RightDown() && interactiveMode)
+     {
+       selected = testPicking(tmpPnt.x, tmpPnt.y);
 
-	if (event.RightDown() && interactiveMode)
-	  {
-	    selected = testPicking(tmpPnt.x, tmpPnt.y);
+       if (selected >= 0)
+         {
+           interactPopupMenu(tmpPnt.x, tmpPnt.y, selected < NumAtoms);
 
-	    if (selected >= 0)
-	      {
-		interactPopupMenu(tmpPnt.x, tmpPnt.y, selected < NumAtoms);
+           MolWin->SelectionChanged(deSelectAll);
+           MolWin->UpdateGLModel();
+         }
+     }
 
-		 MolWin->SelectionChanged(deSelectAll);
-		 MolWin->UpdateGLModel();
-	      }
-	  }
+   // If we made it this far, button states haven't changed.  Are we dragging?
+   else if (event.Dragging())
+     {
+       mSelectState++;
 
-	if (event.Dragging())
-	  {
-	    mSelectState++;
+       // Are we dragging in edit mode?
+       if (interactiveMode)
+         {
 
-	    if (interactiveMode)
-	      {
-		if ( selected >= 0 && selected < NumAtoms)
-		  {
-		    GLdouble newX, newY, newZ;
+           // If an atom is clicked on...
+           if (selected >= 0 && selected < NumAtoms)
+             {
+               GLdouble newX, newY, newZ;
 
-		    findReal3DCoord(tmpPnt.x-winDiffX, tmpPnt.y-winDiffY, atomDepth, newX, newY, newZ);
-		    lAtoms[selected].Position.x = newX;
-		    lAtoms[selected].Position.y = newY;
-		    lAtoms[selected].Position.z = newZ;
+               findReal3DCoord(tmpPnt.x-winDiffX, tmpPnt.y-winDiffY, atomDepth, newX, newY, newZ);
+               lAtoms[selected].Position.x = newX;
+               lAtoms[selected].Position.y = newY;
+               lAtoms[selected].Position.z = newZ;
 
-		    SelectObj(selected, deSelectAll);
-		    MolWin->SelectionChanged(deSelectAll);
+               SelectObj(selected, deSelectAll);
+               MolWin->SelectionChanged(deSelectAll);
 
-		    if (mDragWin)
-		      {
-			mDragWin->EndDrag();
-			delete mDragWin;
-			mDragWin = (wxDragImage*) NULL;
-		      }
+               if (mDragWin)
+                 {
+                   mDragWin->EndDrag();
+                   delete mDragWin;
+                   mDragWin = (wxDragImage*) NULL;
+                 }
 
-		    wxString tmp3Dcoord;
+               wxString tmp3Dcoord;
 
-		    tmp3Dcoord.Printf(wxT("%.2f,%.2f,%.2f"), newX, newY, newZ);
+               tmp3Dcoord.Printf(wxT("%.2f,%.2f,%.2f"), newX, newY, newZ);
 
-		    mDragWin = new wxDragImage(tmp3Dcoord, wxCursor(wxCURSOR_HAND));
+               mDragWin = new wxDragImage(tmp3Dcoord, wxCursor(wxCURSOR_HAND));
 
-		    if (!mDragWin->BeginDrag(wxPoint(0,30), this))
-		      {
-			delete mDragWin;
-			mDragWin = (wxDragImage*) NULL;
-		      }
-		    else
-		      {
-			mDragWin->Move(event.GetPosition());
-			mDragWin->Show();
-		      }
-		  }
-		else
-		  { //if not explicitly point to an atom, move all
-		    //currently selected atoms
-
-		    GLdouble tmpX, tmpY, tmpZ;
-		    GLdouble newX, newY, newZ;
-		    int dx = tmpPnt.x - oldTmpPnt.x;
-		    int dy = tmpPnt.y - oldTmpPnt.y;
-		    int hsize = GetRect().GetWidth();
-
-		    if (event.CmdDown() || event.RightIsDown()) //translate
-		      {
-			for ( int i = 0; i < NumAtoms; i++)
-			  if (lAtoms[i].GetSelectState())
-			    {
-			      findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ);
-
-			      tmpX += (float)dx/(float)(0.05*hsize/mMainData->WindowSize);
-			      tmpY += (float)dy/(float)(0.05*hsize/mMainData->WindowSize);
-			      findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ);
-			      lAtoms[i].Position.x = newX;
-			      lAtoms[i].Position.y = newY;
-			      lAtoms[i].Position.z = newZ;
-			    }
-		      }
-
-		    if (event.ShiftDown()) //move along z-axis
-		      {
-			for ( int i = 0; i < NumAtoms; i++)
-			  if (lAtoms[i].GetSelectState())
-			    {
-			      findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ);
-			      tmpZ -= (float)dy/(float)(25*hsize/mMainData->WindowSize);
-			      findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ);
-			      lAtoms[i].Position.x = newX;
-			      lAtoms[i].Position.y = newY;
-			      lAtoms[i].Position.z = newZ;
-			    }
-		      }
-		  }
-		MolWin->UpdateGLModel();
-	      }
-	  }
-
- //   if (event.ControlDown())
-	if (event.CmdDown())
-	  deSelectAll = false;
-
-    // allow a little bit dragging to be interpreted as selection
-	if ( event.LeftUp())
-	  {
-	    if (mSelectState >= 0 && mSelectState < 3)
-	      {
-		mSelectState = -1;
- 
-		if (interactiveMode)
-		  {
-		    if (selected < 0)
-		      {
-
-          if (periodic_dlg) {
-             if (periodic_dlg->GetSelectedID() == 0) {
-                periodic_dlg->Raise();
+               if (!mDragWin->BeginDrag(wxPoint(0,30), this))
+                 {
+                   delete mDragWin;
+                   mDragWin = (wxDragImage*) NULL;
+                 }
+               else
+                 {
+                   mDragWin->Move(event.GetPosition());
+                   mDragWin->Show();
+                 }
              }
-          } else {
-             wxRect window_rect = GetRect();
-             periodic_dlg = new PeriodicTableDlg(
-                              this, wxT("Periodic Table"),
-                              window_rect.x + window_rect.width,
-                              window_rect.y + 30);
-                              
-             periodic_dlg->Show();
-          }
 
-			if (periodic_dlg->GetSelectedID() != 0) 
-			  {
-			    GLdouble newX, newY, newZ;
+           // If an atom is not clicked on, but some are selected, move those.
+           else
+             {
 
-			    findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
-			    //estimate an atomDepth value, X and Y values are of no use 
-			    CPoint3D newPnt;
-			    findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y,
-                             atomDepth, newX, newY, newZ);
-			    newPnt.x = newX;
-			    newPnt.y = newY;
-			    newPnt.z = newZ;
+               GLdouble tmpX, tmpY, tmpZ;
+               GLdouble newX, newY, newZ;
+               int dx = tmpPnt.x - oldTmpPnt.x;
+               int dy = tmpPnt.y - oldTmpPnt.y;
+               int hsize = GetRect().GetWidth();
 
-			    lFrame->AddAtom(periodic_dlg->GetSelectedID(), newPnt);
-			  }
+               // If command key or right mouse button is down, we simply
+               // translate the selected atoms.
+               if (event.CmdDown() || event.RightIsDown()) //translate
+                 {
+                   for ( int i = 0; i < NumAtoms; i++)
+                     if (lAtoms[i].GetSelectState())
+                       {
+                         findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ);
 
-			oldSelect = -1;
-		      }
-		    else if (selected != oldSelect)
-		      {
-			int tmpBondStatus = lFrame->BondExists(oldSelect,selected);
- 
-			if (deSelectAll && tmpBondStatus == -1)
-			  lFrame->AddBond(oldSelect,selected);
+                         tmpX += (float)dx/(float)(0.05*hsize/mMainData->WindowSize);
+                         tmpY += (float)dy/(float)(0.05*hsize/mMainData->WindowSize);
+                         findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ);
+                         lAtoms[i].Position.x = newX;
+                         lAtoms[i].Position.y = newY;
+                         lAtoms[i].Position.z = newZ;
+                       }
+                 }
 
-			oldSelect = selected;
+               // Otherwise, if shift is down, we modify selected atoms' depth.
+               else if (event.ShiftDown()) //move along z-axis
+                 {
+                   for ( int i = 0; i < NumAtoms; i++)
+                     if (lAtoms[i].GetSelectState())
+                       {
+                         findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ);
+                         tmpZ -= (float)dy/(float)(25*hsize/mMainData->WindowSize);
+                         findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ);
+                         lAtoms[i].Position.x = newX;
+                         lAtoms[i].Position.y = newY;
+                         lAtoms[i].Position.z = newZ;
+                       }
+                 }
+             }
 
-			if (deSelectAll && tmpBondStatus == -1)
-			  selected = -1;
-		      }
-		  }
+           MolWin->UpdateGLModel();
+         }
+     }
 
-		SelectObj(selected, deSelectAll);
-		MolWin->SelectionChanged(deSelectAll);
-		MolWin->UpdateGLModel();
+   else if (event.CmdDown())
+     deSelectAll = false;
 
-	      }
+   // If the left mouse button is released, the user is either done dragging,
+   // in which case we do nothing, or the user has selected an item.
+   else if (event.LeftUp())
+     {
 
-	    if (mDragWin)
-	      {
-		mDragWin->EndDrag();
-		delete mDragWin;
-		mDragWin = NULL;
-	      }
-	}
-	
-	oldTmpPnt = tmpPnt;
+       // Allow a little bit of dragging to be interpreted as selection.
+       if (mSelectState >= 0 && mSelectState < 3)
+         {
+           mSelectState = -1;
+    
+           // If editing, we  
+           if (interactiveMode)
+             {
 
-    // Pass mouse event to MolDisplayWin::Rotate for processing
-    if (interactiveMode)
-      draw();
-    else
-      MolWin->Rotate(event);
+               // If the user clicked on nothing, we try to add an atom given
+               // the selected element on the periodic table palette.
+               if (selected < 0)
+                 {
+                   if (periodic_dlg) {
+                      if (periodic_dlg->GetSelectedID() == 0) {
+                         periodic_dlg->Raise();
+                      }
+                   } else {
+                      wxRect window_rect = GetRect();
+                      periodic_dlg = new PeriodicTableDlg(
+                                       this, wxT("Periodic Table"),
+                                       window_rect.x + window_rect.width,
+                                       window_rect.y + 30);
+                                       
+                      periodic_dlg->Show();
+                   }
+     
+                   // If an element is selected, add an instance of it.
+                   if (periodic_dlg->GetSelectedID() != 0) 
+                     {
+                       GLdouble newX, newY, newZ;
+     
+                       findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
+                       //estimate an atomDepth value, X and Y values are of no use 
+                       CPoint3D newPnt;
+                       findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y,
+                                       atomDepth, newX, newY, newZ);
+                       newPnt.x = newX;
+                       newPnt.y = newY;
+                       newPnt.z = newZ;
+     
+                       lFrame->AddAtom(periodic_dlg->GetSelectedID(), newPnt);
+                     }
+     
+                   oldSelect = -1;
+                 }
+
+               // If two different items were selected in sequence, try to
+               // add a bond between them.  Seems like it'd be wise to see
+               // if selected indicates an atom (and not a bond) here...
+               else if (selected != oldSelect)
+                 {
+                   int tmpBondStatus = lFrame->BondExists(oldSelect,selected);
+       
+                    if (deSelectAll && tmpBondStatus == -1)
+                      lFrame->AddBond(oldSelect,selected);
+
+                    oldSelect = selected;
+
+                    if (deSelectAll && tmpBondStatus == -1)
+                      selected = -1;
+                 }
+             }
+
+           SelectObj(selected, deSelectAll);
+           MolWin->SelectionChanged(deSelectAll);
+           MolWin->UpdateGLModel();
+
+         }
+
+       if (mDragWin)
+         {
+           mDragWin->EndDrag();
+           delete mDragWin;
+           mDragWin = NULL;
+         }
+     }
+   
+   oldTmpPnt = tmpPnt;
+
+   // Pass mouse event to MolDisplayWin::Rotate for processing
+   if (interactiveMode)
+     draw();
+   else
+     MolWin->Rotate(event);
 
 }
 
@@ -852,20 +873,35 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom)
   wxMenu *submenu;
   Frame *lFrame = mMainData->cFrame;
   long NumAtoms = lFrame->NumAtoms;
+  int bond_order;
+  submenu = new wxMenu();
+  wxString length_label;
 
   // If a bond is clicked on, we show some bond specific items, like
   // the length of the bond and the order.
   if (!isAtom) {
-     submenu = new wxMenu();
-     wxString length_label;
-     length_label.Printf(wxT("Bond length: %f"),
+     length_label.Printf("Bond length: %f",
                          lFrame->GetBondLength(selected - NumAtoms));
      item = menu.Append(wxID_ANY, length_label);
      item->Enable(false);
-     submenu->AppendRadioItem(GL_Popup_To_Single_Bond, wxT("Single"));
-     submenu->AppendRadioItem(GL_Popup_To_Double_Bond, wxT("Double"));
-     submenu->AppendRadioItem(GL_Popup_To_Triple_Bond, wxT("Triple"));
-     submenu->AppendRadioItem(GL_Popup_To_Hydrogen_Bond, wxT("Hydrogen"));
+     bond_order = lFrame->Bonds[selected - NumAtoms].Order;
+     item = submenu->AppendRadioItem(GL_Popup_To_Single_Bond, wxT("Single"));
+     if (bond_order == kSingleBond) {
+        item->Check(true);
+     }
+     item = submenu->AppendRadioItem(GL_Popup_To_Double_Bond, wxT("Double"));
+     if (bond_order == kDoubleBond) {
+        item->Check(true);
+     }
+     item = submenu->AppendRadioItem(GL_Popup_To_Triple_Bond, wxT("Triple"));
+     if (bond_order == kTripleBond) {
+        item->Check(true);
+     }
+     item = submenu->AppendRadioItem(GL_Popup_To_Hydrogen_Bond,
+                                     wxT("Hydrogen"));
+     if (bond_order == kHydrogenBond) {
+        item->Check(true);
+     }
      menu.Append(wxID_ANY, wxT("Bond Order"), submenu);
      menu.AppendSeparator();
   } else {
