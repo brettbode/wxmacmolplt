@@ -525,6 +525,16 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
          }
      }
 
+   // How 'bout a right click?
+   else if (event.RightDown()) {
+      // See what was right-clicked on.  If it was a bond, then we show
+      // a contextual menu.
+      selected = testPicking(tmpPnt.x, tmpPnt.y);
+      if (selected >= NumAtoms) {
+         bondPopupMenu(tmpPnt.x, tmpPnt.y);
+      }
+   }
+
    // If we made it this far, button states haven't changed.  Are we dragging?
    else if (event.Dragging())
      {
@@ -915,6 +925,49 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom)
 
 }
 //make a popup menu editing the objets in the scene
+
+void MpGLCanvas::bondPopupMenu(int x, int y) {
+
+  // This function shows a popup menu that shows some information and
+  // operations for the clicked-on bond.  It's assumed that selected is
+  // a valid index in the bonds lists, plus NumAtoms.
+
+  wxMenu menu;
+  wxMenuItem *item;
+  wxMenu *submenu;
+  Frame *lFrame = mMainData->cFrame;
+  long NumAtoms = lFrame->NumAtoms;
+  int bond_order;
+  submenu = new wxMenu();
+  wxString length_label;
+
+  length_label.Printf("Bond length: %f",
+                      lFrame->GetBondLength(selected - NumAtoms));
+  item = menu.Append(wxID_ANY, length_label);
+  item->Enable(false);
+  bond_order = lFrame->Bonds[selected - NumAtoms].Order;
+  item = submenu->AppendRadioItem(GL_Popup_To_Single_Bond, wxT("Single"));
+  if (bond_order == kSingleBond) {
+     item->Check(true);
+  }
+  item = submenu->AppendRadioItem(GL_Popup_To_Double_Bond, wxT("Double"));
+  if (bond_order == kDoubleBond) {
+     item->Check(true);
+  }
+  item = submenu->AppendRadioItem(GL_Popup_To_Triple_Bond, wxT("Triple"));
+  if (bond_order == kTripleBond) {
+     item->Check(true);
+  }
+  item = submenu->AppendRadioItem(GL_Popup_To_Hydrogen_Bond,
+                                  wxT("Hydrogen"));
+  if (bond_order == kHydrogenBond) {
+     item->Check(true);
+  }
+  menu.Append(wxID_ANY, wxT("Bond Order"), submenu);
+
+  PopupMenu(&menu, x, y);
+
+}
 
 void MpGLCanvas::ToSingleBond(wxCommandEvent& event) {
 
