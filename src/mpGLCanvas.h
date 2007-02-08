@@ -84,6 +84,7 @@ class MpGLCanvas : public wxGLCanvas {
 
         void initGL(void);
 	void interactPopupMenu(int x, int y, bool isAtom);
+	void bondPopupMenu(int x, int y);
 
         DECLARE_EVENT_TABLE()
 
