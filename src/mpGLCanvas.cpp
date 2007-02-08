@@ -890,7 +890,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom)
   // If a bond is clicked on, we show some bond specific items, like
   // the length of the bond and the order.
   if (!isAtom) {
-     length_label.Printf("Bond length: %f",
+     length_label.Printf(wxT("Bond length): %f"),
                          lFrame->GetBondLength(selected - NumAtoms));
      item = menu.Append(wxID_ANY, length_label);
      item->Enable(false);
@@ -941,7 +941,7 @@ void MpGLCanvas::bondPopupMenu(int x, int y) {
   submenu = new wxMenu();
   wxString length_label;
 
-  length_label.Printf("Bond length: %f",
+  length_label.Printf(wxT("Bond length: %f"),
                       lFrame->GetBondLength(selected - NumAtoms));
   item = menu.Append(wxID_ANY, length_label);
   item->Enable(false);
