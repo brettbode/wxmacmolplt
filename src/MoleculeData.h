@@ -132,6 +132,7 @@ class MoleculeData {
 		void DeleteAtom(long AtomNum);
 		bool ValidAtom(long AtomNum);
 		void GetRotationMatrix(Matrix4D copy);
+
 };
 
 #endif

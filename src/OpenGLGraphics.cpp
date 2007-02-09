@@ -52,6 +52,8 @@
 #include "aglString.h"
 #endif
 
+#include "patterns.h"
+
 #include <new>
 #include <string.h>
 
@@ -1141,6 +1143,15 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			    glEnable(GL_BLEND);
 			    gluSphere(qobj, radius*1.02, (long)(1.5*Quality), (long)(Quality));
 			    glDisable(GL_BLEND);
+			  }
+
+			if (show2DPatternMode && lAtoms[iatom].GetType() > 6)
+			  {
+			    glColor3f(0.0f,0.0f,0.0f);
+			    glEnable(GL_POLYGON_STIPPLE);
+			    glPolygonStipple(atomMaskPatterns[lAtoms[iatom].GetType()%numPatterns]); //for test
+			    gluSphere(qobj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
+			    glDisable(GL_POLYGON_STIPPLE);
 			  }
 
 			glPopMatrix();

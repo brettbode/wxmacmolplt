@@ -176,12 +176,14 @@ class WinPrefs {
 	private:
 		RGBColor		AtomColors[kMaxAtomTypes], BondColors[kMaxBondTypes], VectorColor, BackColor;
 		long			AtomSizes[kMaxAtomTypes], AnimateTime, DRCnFileSkip,
-						QD3DAtomQuality, BitOptions;	//bit 1: prompt4save, bit 2: show angles, bit 3: use QD3D hardware
+						QD3DAtomQuality, BitOptions;
+		//bit 1: prompt4save, bit 2: show angles, bit 3: use QD3D hardware
 														//bit 4: Stereo, bit 5: color bond halves, bit6: Wireframe mode
 														//bit 7: Outline bonds, bit 8: Use cylinders for lines
 														//bit 9: Look for H bonds, bit 10: determine bond order
 														//bit 11: Default for 3D mode, bit 12: native EOL chars
 														//bit 13: Create custom file icon
+
 		float			AtomMasses[kMaxAtomTypes], AutoBondScale, BondWidth, AtomScale,
 						ZScale, VectorScale, QD3DFillBrightness, QD3DPointBrightness,
 						MaxBondLength, QD3DLineWidth;

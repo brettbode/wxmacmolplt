@@ -83,6 +83,7 @@ class MolDisplayWin : public wxFrame {
 
 	bool mHighliteState;
 	bool interactiveMode;
+	bool show2DPatternMode;
 
         DECLARE_EVENT_TABLE()
 
@@ -164,6 +165,7 @@ class MolDisplayWin : public wxFrame {
 		void menuViewShowAtomLabel(wxCommandEvent &event);
 		void menuViewShowAtomNumber(wxCommandEvent &event);
 		void menuViewShowBothAtomLabels(wxCommandEvent &event);
+		void menuViewShow2DPattern(wxCommandEvent &event);
 		void menuViewWireFrameStyle(wxCommandEvent &event);
 		void menuViewBallAndStickStyle(wxCommandEvent &event);
         void menuViewShrink_10(wxCommandEvent &event);

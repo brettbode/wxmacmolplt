@@ -69,6 +69,7 @@ enum MMP_EventID {
 	MMP_NO_ATOMLABEL,
     MMP_SHOWATOMLABELS,
     MMP_SHOWATOMNUMBER,
+    MMP_SHOWPATTERN,
 	MMP_BOTHATOMLABELS,
 	MMP_DISPLAYMODESUBMENU,
 	MMP_WIREFRAMEMODE,
@@ -156,6 +157,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
     EVT_MENU (MMP_SHOWATOMLABELS,   MolDisplayWin::menuViewShowAtomLabel)
     EVT_MENU (MMP_SHOWATOMNUMBER,   MolDisplayWin::menuViewShowAtomNumber)
 	EVT_MENU (MMP_BOTHATOMLABELS,   MolDisplayWin::menuViewShowBothAtomLabels)
+    EVT_MENU (MMP_SHOWPATTERN,   MolDisplayWin::menuViewShow2DPattern)
 	EVT_MENU (MMP_WIREFRAMEMODE,	MolDisplayWin::menuViewWireFrameStyle)
 	EVT_MENU (MMP_BALLANDSTICKMODE,	MolDisplayWin::menuViewBallAndStickStyle)
     EVT_MENU (MMP_ANIMATEFRAMES,    MolDisplayWin::menuViewAnimateFrames)
@@ -269,6 +271,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
 	mHighliteState = false;
 	interactiveMode = false;
+	show2DPatternMode = false;
 
 #ifdef __WXMSW__
 	//Visual studio is a total pile.
@@ -484,6 +487,8 @@ void MolDisplayWin::createMenuBar(void) {
     menuViewRotate->Append(MMP_ROTATE180VER, wxT("180 degrees &Vertical"));
     menuViewRotate->Append(MMP_ROTATEPRINC, wxT("to &Principle Orientation"));
     menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
+
+    menuView->AppendCheckItem(MMP_SHOWPATTERN, wxT("Show Patterns"));
 
     menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."));
     menuMolecule->Append(MMP_ENERGYEDIT, wxT("Set &Frame Energy..."));
@@ -1727,6 +1732,16 @@ void MolDisplayWin::menuViewShowBothAtomLabels(wxCommandEvent &event)
 	Prefs->ShowAtomNumberLabels(true);
 	UpdateModelDisplay();
 	Dirty = true;
+}
+
+void MolDisplayWin::menuViewShow2DPattern(wxCommandEvent &event)
+{
+  show2DPatternMode = 1 - show2DPatternMode;
+
+  if (show2DPatternMode)
+    SetHighliteMode(false);  //automatically disable highlighting atoms if showing 2D patterns
+  UpdateModelDisplay();
+  Dirty = true;
 }
 
 void MolDisplayWin::menuViewWireFrameStyle(wxCommandEvent &event)

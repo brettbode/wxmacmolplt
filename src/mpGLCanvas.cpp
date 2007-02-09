@@ -625,7 +625,41 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
                        }
                  }
              }
+	   /*          } else {
+             wxRect window_rect = GetRect();
+             periodic_dlg = new PeriodicTableDlg(
+                              this, wxT("Periodic Table"),
+                              window_rect.x + window_rect.width,
+                              window_rect.y + 30);
+                              
+             periodic_dlg->Show();
+          }
 
+			if (periodic_dlg->GetSelectedID() != 0) 
+			  {
+			    GLdouble newX, newY, newZ;
+
+			    findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
+			    //estimate an atomDepth value, X and Y values are of no use 
+			    CPoint3D newPnt;
+			    findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y,
+                             atomDepth, newX, newY, newZ);
+			    newPnt.x = newX;
+			    newPnt.y = newY;
+			    newPnt.z = newZ;
+			    
+			    lFrame->AddAtom(periodic_dlg->GetSelectedID(), newPnt);
+			  }
+
+			oldSelect = -1;
+		      }
+		    else if (selected != oldSelect)
+		      {
+			int tmpBondStatus = lFrame->BondExists(oldSelect,selected);
+ 
+			if (deSelectAll && tmpBondStatus == -1)
+			  lFrame->AddBond(oldSelect,selected);
+*/
            MolWin->UpdateGLModel();
          }
      }
