@@ -138,10 +138,11 @@ void CoordinateOffset::CreateControls()
         slider->SetToolTip(_("Adjust the slider to adjust the magnitude of the offset"));
     itemBoxSizer4->Add(slider, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    editField = new wxTextCtrl( itemDialog1, ID_TEXTCTRL1, _("0.0"), wxDefaultPosition, wxDefaultSize, 0 );
+    editField = new wxTextCtrl( itemDialog1, ID_TEXTCTRL1, "", wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         editField->SetToolTip(_("Type in a specific value for the offset percentage"));
     itemBoxSizer4->Add(editField, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	editField->SetValue(_("0.0"));
 
     wxStaticText* itemStaticText7 = new wxStaticText( itemDialog1, wxID_STATIC, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer4->Add(itemStaticText7, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
@@ -224,23 +225,25 @@ void CoordinateOffset::OnSliderUpdated( wxCommandEvent& event )
 }
 
 void CoordinateOffset::ApplyOffset(float offset) {
-	offset /= 100.0;
-	MoleculeData * MainData = Parent->GetData();
-	Frame *	lFrame = MainData->GetCurrentFramePtr();
-	VibRec * vibs = lFrame->GetFrequencies();
-	long cmode = lFrame->GetNumAtoms() * vibs->GetCurrentMode();
-	WinPrefs * Prefs = Parent->GetPrefs();
-	float VectorScale = Prefs->GetVectorScale();
+	if (origCoords.size() > 0) {
+		offset /= 100.0;
+		MoleculeData * MainData = Parent->GetData();
+		Frame *	lFrame = MainData->GetCurrentFramePtr();
+		VibRec * vibs = lFrame->GetFrequencies();
+		long cmode = lFrame->GetNumAtoms() * vibs->GetCurrentMode();
+		WinPrefs * Prefs = Parent->GetPrefs();
+		float VectorScale = Prefs->GetVectorScale();
 	
-	CPoint3D temp, temp2;
-	for (long iatom=0; iatom < lFrame->GetNumAtoms(); iatom++) {
-		vibs->GetModeOffset(iatom+cmode, temp2);
-		temp.x = origCoords[iatom].x + offset*VectorScale*temp2.x;
-		temp.y = origCoords[iatom].y + offset*VectorScale*temp2.y;
-		temp.z = origCoords[iatom].z + offset*VectorScale*temp2.z;
-		lFrame->SetAtomPosition(iatom, temp);
+		CPoint3D temp, temp2;
+		for (long iatom=0; iatom < lFrame->GetNumAtoms(); iatom++) {
+			vibs->GetModeOffset(iatom+cmode, temp2);
+			temp.x = origCoords[iatom].x + offset*VectorScale*temp2.x;
+			temp.y = origCoords[iatom].y + offset*VectorScale*temp2.y;
+			temp.z = origCoords[iatom].z + offset*VectorScale*temp2.z;
+			lFrame->SetAtomPosition(iatom, temp);
+		}
+		Parent->ResetModel(false);
 	}
-	Parent->ResetModel(false);
 }
 
 
