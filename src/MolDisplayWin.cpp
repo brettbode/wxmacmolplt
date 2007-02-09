@@ -294,7 +294,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 							   wxALIGN_LEFT | wxST_NO_AUTORESIZE);
 
     SizeChanged();
-    frameScrollBar->SetScrollbar(1, 1, 1, 1);
+	glCanvas->SetFocus();
+	frameScrollBar->SetScrollbar(1, 1, 1, 1);
     createMenuBar();
     SetMenuBar(menuBar);
 
@@ -321,9 +322,11 @@ MolDisplayWin::~MolDisplayWin() {
     
     if(MainData != NULL) {
         delete MainData;
+		MainData = NULL;
     }
     if (Prefs != NULL) {
         delete Prefs;
+		Prefs = NULL;
     }
 
     DeleteGLData();
@@ -466,8 +469,8 @@ void MolDisplayWin::createMenuBar(void) {
     menuViewStyle->AppendRadioItem(MMP_BALLANDSTICKMODE, wxT("Ball and Stick"));
 	
     menuView->Append(MMP_ANIMATEFRAMES, wxT("Animate &Frames\tCtrl+F"));
-    menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl+-"));
-    menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl+="));
+    menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl-down"));
+    menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl-up"));
     menuView->Append(MMP_CENTER, wxT("&Center View"));
     
     menuViewRotate = new wxMenu;
@@ -1199,9 +1202,9 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
         return;
     }*/
 #endif
-	Freeze();
-    Destroy();
     app.destroyMainFrame(this);
+	//Freeze();
+    Destroy();
 }
 
 void MolDisplayWin::menuFilePage_setup(wxCommandEvent &event) {
@@ -1899,6 +1902,7 @@ void MolDisplayWin::OnScrollBarChange( wxScrollEvent& event ) {
     if (newpos != MainData->CurrentFrame) {
         ChangeFrames(newpos);
     }
+	glCanvas->SetFocus();
 }
 
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
