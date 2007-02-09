@@ -27,7 +27,7 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
     BufferFile *buffer = NULL;
 	
     wxString filePath = wxFileSelector(wxT("Save As"), wxT(""), wxT(""), wxT(""),
-                              wxT("GAMESS input files (.inp)"),
+                              wxT("GAMESS input files (*.inp)|*.inp"),
                               wxSAVE | wxOVERWRITE_PROMPT, owner);
 	
     if(!filePath.IsEmpty()) {
