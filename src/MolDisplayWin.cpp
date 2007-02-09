@@ -1385,7 +1385,6 @@ void MolDisplayWin::menuEditCopy(wxCommandEvent &event) {
 void MolDisplayWin::menuEditCopyCoordinates(wxCommandEvent &event) {
     CopyCoordinates(0);
 }
-#include <sstream>
 void MolDisplayWin::CopyCoordinates(short ctype) const {
     //Now copy the coords
     Frame *     lFrame = MainData->cFrame;
@@ -1395,29 +1394,27 @@ void MolDisplayWin::CopyCoordinates(short ctype) const {
         if (ctype == 0) {
             char    LineText[100];
             wxString    Label;
-            std::ostringstream  sbuf;
             for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
                 Prefs->GetAtomLabel(lFrame->Atoms[iatm].GetType()-1, Label);
-                sbuf << Label;
-                textBuffer += Label;
+				textBuffer.Append(Label);
                 Label.Printf(wxT("   %5.1f  %13.8f  %13.8f  %13.8f\r"),
                                  (float) (lFrame->Atoms[iatm].GetType()), 
                                  lFrame->Atoms[iatm].Position.x, lFrame->Atoms[iatm].Position.y,
                                  lFrame->Atoms[iatm].Position.z);
-                sbuf << Label;
+				textBuffer.Append(Label);
             }
-            textBuffer.Printf(wxT("%s"), sbuf.str().c_str());
         } else if (ctype == 1) {
             //Make a guess for the Handle size based on the # of atoms and the line format
             long datalength = lFrame->NumAtoms*70*sizeof(char);
-            char * lText = new char[datalength];
+            char * lText = new char[datalength+1];
             //Create a bufferFile object to protect the text buffer from overrun
             BufferFile *Buffer = new BufferFile(lText, datalength);
 
             Internals * IntCoords = MainData->GetInternalCoordinates();
             if (IntCoords) IntCoords->WriteCoordinatesToFile(Buffer, MainData, Prefs);
 
-            textBuffer.Printf(wxT("%s"), lText);
+			lText[Buffer->GetFilePos()] = '\0';
+			textBuffer = wxString(lText, wxConvUTF8);
             delete Buffer;
             delete [] lText;
         }
