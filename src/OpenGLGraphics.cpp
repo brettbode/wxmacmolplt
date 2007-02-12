@@ -72,6 +72,7 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order);
 void DrawInversionPoint(void);
 void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2);
+void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width);
 
 const GLubyte stippleMask[128] =
 
@@ -1164,6 +1165,22 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
    glGetDoublev(GL_PROJECTION_MATRIX, proj);
    glGetIntegerv(GL_VIEWPORT, viewport);
+
+   GLuint tex_id;
+   unsigned char texture[8] = {255, 0, 0, 255, 255, 0, 0, 255};
+   glGenTextures(1, &tex_id);
+   glBindTexture(GL_TEXTURE_1D, tex_id);
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+   glTexImage1D(GL_TEXTURE_1D, 0, GL_ALPHA, 8, 0, GL_ALPHA,
+                GL_UNSIGNED_BYTE, texture);
+
+	for (long ilength = 0; ilength < lFrame->NumAnnoLengths; ilength++) {
+		glLoadName(ilength + NumAtoms + NumBonds + 1);
+      DashedQuadFromLine(lFrame->Atoms[lFrame->AnnoLengths[ilength].atom1].Position,
+                         lFrame->Atoms[lFrame->AnnoLengths[ilength].atom2].Position, BondSize * 0.25);
+   }
 
 		//bonds as cylinders
 		//In wireframe mode with bonds colored by atom color we simply scink the atom radius to the bond
@@ -2625,6 +2642,112 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 	gluCylinder(qobj, lineWidth, lineWidth, length, 4, 1);
 	glPopMatrix();
 }
+
+void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, 
+                        float width) {
+
+   float len;
+   // CPoint3D vec; 
+   GLdouble scr_coords1[3];  // Screen coordinates of pt1
+   GLdouble scr_coords2[3];  // Screen coordinates of pt2
+   CPoint3D scr_vec;         // Screen space vector between atoms
+   GLdouble perp_obj[3];     // Object coords on vector perp. to scr_vec
+   CPoint3D offset_vec;      // Direction to shift bond cylinders
+   GLdouble modelview[16];
+   GLdouble proj[16];
+   GLint viewport[4];
+
+   glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+   glGetDoublev(GL_PROJECTION_MATRIX, proj);
+   glGetIntegerv(GL_VIEWPORT, viewport);
+
+   // Find screen coordinates of one point.
+   gluProject(pt1.x, pt1.y, pt1.z, modelview, proj, viewport,
+              &(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2]));
+
+   // Find screen coordinates of other atom.
+   gluProject(pt2.x, pt2.y, pt2.z, modelview, proj, viewport,
+              &(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2]));
+
+   // Find vector perpendicular to vector between two screen points and
+   // normalize it so we can scalar multiply it later.  We flip and 
+   // negate the slope of the line between the two screen coordinates to
+   // get the slop of the perpendicular line.
+   scr_vec.x = scr_coords2[1] - scr_coords1[1];
+   scr_vec.y = scr_coords1[0] - scr_coords2[0];
+   scr_vec.z = 0;
+   scr_vec *= 1 / scr_vec.Magnitude();
+
+   // Now find a point on the perpendicular vector with pt1's depth
+   // and get its object coordinates.
+   gluUnProject(scr_coords1[0] + scr_vec.x * 10,
+                scr_coords1[1] + scr_vec.y * 10,
+                scr_coords1[2],
+                modelview, proj, viewport,
+                &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
+
+   // Finally, we see what direction all bond cylinders must be offset
+   // so that they will always stay in view.
+   offset_vec.x = perp_obj[0] - pt1.x;
+   offset_vec.y = perp_obj[1] - pt1.y;
+   offset_vec.z = perp_obj[2] - pt1.z;
+   offset_vec *= 1 / offset_vec.Magnitude();
+
+   // vec = pt2 - pt1; 
+
+   // len = vec.Magnitude(); 
+   len = (pt2 - pt1).Magnitude();
+   printf("len: %f\n", len);
+
+   CPoint3D new_pt1a;
+   CPoint3D new_pt1b;
+   CPoint3D new_pt2a;
+   CPoint3D new_pt2b;
+
+   new_pt1a.x = pt1.x + offset_vec.x * width;
+   new_pt1a.y = pt1.y + offset_vec.y * width;
+   new_pt1a.z = pt1.z + offset_vec.z * width;
+   new_pt1b.x = pt1.x - offset_vec.x * width;
+   new_pt1b.y = pt1.y - offset_vec.y * width;
+   new_pt1b.z = pt1.z - offset_vec.z * width;
+   new_pt2a.x = pt2.x + offset_vec.x * width;
+   new_pt2a.y = pt2.y + offset_vec.y * width;
+   new_pt2a.z = pt2.z + offset_vec.z * width;
+   new_pt2b.x = pt2.x - offset_vec.x * width;
+   new_pt2b.y = pt2.y - offset_vec.y * width;
+   new_pt2b.z = pt2.z - offset_vec.z * width;
+
+   glDisable(GL_LIGHTING);
+   glEnable(GL_ALPHA_TEST);
+   glAlphaFunc(GL_GREATER, 0.5f);
+   glEnable(GL_TEXTURE_1D);
+   glColor3f(0.0f, 0.0f, 0.0f);
+   glBegin(GL_QUADS);
+      glTexCoord1f(0.0f);
+      glVertex3f(new_pt1a.x, new_pt1a.y, new_pt1a.z);
+      glVertex3f(new_pt1b.x, new_pt1b.y, new_pt1b.z);
+      glTexCoord1f(len / 0.1f);
+      glVertex3f(new_pt2b.x, new_pt2b.y, new_pt2b.z);
+      glVertex3f(new_pt2a.x, new_pt2a.y, new_pt2a.z);
+   glEnd();
+   glDisable(GL_TEXTURE_1D);
+   glDisable(GL_ALPHA_TEST);
+   glEnable(GL_LIGHTING);
+
+   char len_label[40];
+
+   glPushMatrix();
+   sprintf(len_label, "%.4f", len);
+   glTranslatef((pt1.x + pt2.x) / 2.0f - offset_vec.x * 3 * width, 
+                (pt1.y + pt2.y) / 2.0f - offset_vec.y * 3 * width, 
+                (pt1.z + pt2.z) / 2.0f - offset_vec.z * 3 * width);
+   glScalef(0.1f, 0.1, 0.1f);
+   glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+   glfDrawSolidString(len_label);
+   glPopMatrix();
+
+}
+
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order) {
 	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
 	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };

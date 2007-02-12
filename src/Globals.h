@@ -24,7 +24,7 @@
 #define wxMacMolPlt_VERSION "6.3"
 
 //activate the following line to use the interactive editor
-//#define ENABLE_INTERACTIVE_MODE
+#define ENABLE_INTERACTIVE_MODE
 /*
 #define MacintoshBuild		//define to build for Mac PPC or 68K
 #if __GNUC__

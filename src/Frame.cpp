@@ -50,10 +50,19 @@ Frame::Frame(void) {
 	SurfaceList = NULL;
 	Gradient = NULL;
 
+   AnnoLengths = NULL;
+   AnnoAngles = NULL;
+   AnnoDihedrals = NULL;
+   NumAnnoLengths = 0;
+   NumAnnoAngles = 0;
+   NumAnnoDihedrals = 0;
+	AnnoLengthAllocation = 0;
+
 	NextFrame = NULL;
 	PreviousFrame = NULL;
  
 }
+
 long Frame::Write(BufferFile * Buffer) {
 	long length, total=0;
 
@@ -221,6 +230,60 @@ void Frame::SetNextFrame(Frame * next) { NextFrame = next; }
 void Frame::SetPreviousFrame(Frame * previous) { PreviousFrame = previous; }
 Frame * Frame::GetNextFrame(void) { return NextFrame; }
 Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
+
+AnnotateLength *Frame::AddAnnotateLength(long atom1, long atom2) {
+
+   AnnotateLength *result = NULL;
+
+	if (NumAnnoLengths >= AnnoLengthAllocation) {
+      IncreaseAnnoLengthAllocation(10);
+   }
+
+	if (NumAnnoLengths < AnnoLengthAllocation) {
+	   AnnoLengths[NumAnnoLengths].atom1 = atom1;
+	   AnnoLengths[NumAnnoLengths].atom2 = atom2;
+	   result = &AnnoLengths[NumAnnoLengths];
+	   NumAnnoLengths++;
+	}
+
+	return result;
+
+}
+
+bool Frame::IncreaseAnnoLengthAllocation(long NumAdditional) {
+
+	if (AnnoLengthAllocation + NumAdditional < NumAnnoLengths) {
+      return false;
+   }
+
+   AnnotateLength *tmp =
+      new AnnotateLength[AnnoLengthAllocation + NumAdditional];
+
+	if (tmp) {
+		if (AnnoLengths != NULL) {
+         memcpy(tmp, AnnoLengths, NumAnnoLengths * sizeof(AnnotateLength));
+	      delete [] AnnoLengths;
+		}
+		AnnoLengths = tmp;
+		AnnoLengthAllocation += NumAdditional;
+	} else {
+      return false;
+   }
+
+	return true;
+}
+
+void Frame::DeleteAnnoLength(long AnnoLengthNum) {
+
+	if (AnnoLengthNum < NumAnnoLengths) {
+		NumAnnoLengths--;
+		for (long i = AnnoLengthNum; i < NumAnnoLengths; i++) {
+			AnnoLengths[i] = AnnoLengths[i + 1];
+		}
+	}
+
+}
+
 mpAtom * Frame::AddAtom(long AtomType, CPoint3D AtomPosition) {
         mpAtom * result = NULL;
 	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(10);

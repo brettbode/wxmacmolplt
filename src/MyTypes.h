@@ -75,6 +75,27 @@ enum TypeofEnergy {
 	NumberEnergyTypes
 };
 
+class AnnotateLength {
+   public:
+      int atom1;
+      int atom2;
+};
+
+class AnnotateAngle {
+   public:
+      int atom1;
+      int atom2;
+      int atom3;
+};
+
+class AnnotateDihedrals {
+   public:
+      int atom1;
+      int atom2;
+      int atom3;
+      int atom4;
+};
+
 class mpAtom {
 	public:
 		CPoint3D	Position;

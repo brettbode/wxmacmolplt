@@ -33,6 +33,10 @@
 #define GL_Popup_To_Double_Bond 30015
 #define GL_Popup_To_Triple_Bond 30016
 #define GL_Popup_To_Hydrogen_Bond 30017
+#define GL_Popup_Measure_Length 30018
+#define GL_Popup_Measure_Angle 30019
+#define GL_Popup_Measure_Dihedral 30020
+#define GL_Popup_Delete_AnnoLength 30021
 
 class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
@@ -41,7 +45,7 @@ typedef class MolDisplayWin MolDisplayWin;
  * child of the wxGLCanvas widget class.
  */
 class MpGLCanvas : public wxGLCanvas {
-    private:
+   private:
 
   class AtomTypeDialog : public wxDialog
     {
@@ -66,27 +70,31 @@ class MpGLCanvas : public wxGLCanvas {
       DECLARE_EVENT_TABLE()
     };
         
-        MolDisplayWin * MolWin;
-        WinPrefs * Prefs;
-        bool        initialized;
-        PeriodicTableDlg *periodic_dlg;
+   MolDisplayWin * MolWin;
+   WinPrefs * Prefs;
+   bool        initialized;
+   PeriodicTableDlg *periodic_dlg;
 
-	MoleculeData *mMainData;
-	//coordPopup* lPopup;
-	wxDragImage*    mDragWin;
+   MoleculeData *mMainData;
+   //coordPopup* lPopup;
+   wxDragImage *mDragWin;
+   
+   int mSelectState;
+   int selected;
+   int oldSelect;
+   bool interactiveMode;
+   GLdouble atomDepth;
+   GLint winDiffX, winDiffY;
 
-	int mSelectState;
-	int selected;
-	int oldSelect;
-	bool interactiveMode;
-	GLdouble atomDepth;
-	GLint winDiffX, winDiffY;
+   void initGL(void);
+   void interactPopupMenu(int x, int y, bool isAtom);
+   void bondPopupMenu(int x, int y);
+   void annoLengthPopupMenu(int x, int y);
+   void measurePopupMenu(int x, int y);
+   int select_stack[4];
+   int select_stack_top;
 
-        void initGL(void);
-	void interactPopupMenu(int x, int y, bool isAtom);
-	void bondPopupMenu(int x, int y);
-
-        DECLARE_EVENT_TABLE()
+   DECLARE_EVENT_TABLE()
 
     public:
         /**
@@ -113,7 +121,7 @@ class MpGLCanvas : public wxGLCanvas {
          * data structure.
          * @param newPrefs A pointer to the window preferences that the canvas should use.
          */
-	~MpGLCanvas();
+        ~MpGLCanvas();
 
         void setPrefs(WinPrefs *newPrefs);
 
@@ -204,30 +212,32 @@ class MpGLCanvas : public wxGLCanvas {
         void KeyHandler(wxKeyEvent & event);
 
         /**
-		 * Translates a mouse click into a selection of an atom or bond 
+         * Translates a mouse click into a selection of an atom or bond 
          * \param x x coordinate of the click.
          * \param y y coordinate of the click.
          * \param mode if true clear off other selections.
          */
-	void On_Apply_All(wxCommandEvent& event);
-	void On_Delete_Single_Frame(wxCommandEvent& event);
-	void On_Delete_All_Frames(wxCommandEvent& event);
-	void ToSingleBond(wxCommandEvent& event);
-	void ToDoubleBond(wxCommandEvent& event);
-	void ToTripleBond(wxCommandEvent& event);
-	void ToHydrogenBond(wxCommandEvent& event);
-	//implementation of the correspondent popup-menu selection
-
-	int testPicking(int x, int y);
-	void SelectObj(int select_id, bool mode);
-	void toggleInteractiveMode();
-	void findReal3DCoord(GLdouble x, GLdouble y, GLdouble z, GLdouble& realX, GLdouble& realY, GLdouble& realZ);
-	void findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, GLdouble& winY, GLdouble& winZ);
-
-   void ClosePeriodicDlg(void);
-   /* MpGLCanvas *GetParent(void) { return parent; } */
-   WinPrefs *GetPrefs(void) { return Prefs; }
-	
+         void On_Apply_All(wxCommandEvent& event);
+         void On_Delete_Single_Frame(wxCommandEvent& event);
+         void On_Delete_All_Frames(wxCommandEvent& event);
+         void ToSingleBond(wxCommandEvent& event);
+         void ToDoubleBond(wxCommandEvent& event);
+         void ToTripleBond(wxCommandEvent& event);
+         void ToHydrogenBond(wxCommandEvent& event);
+         void AddLengthAnnotation(wxCommandEvent& event);
+         void DeleteLengthAnnotation(wxCommandEvent& event);
+         //implementation of the correspondent popup-menu selection
+         
+         int testPicking(int x, int y);
+         void SelectObj(int select_id, bool mode);
+         void toggleInteractiveMode();
+         void findReal3DCoord(GLdouble x, GLdouble y, GLdouble z, GLdouble& realX, GLdouble& realY, GLdouble& realZ);
+         void findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, GLdouble& winY, GLdouble& winZ);
+         
+         void ClosePeriodicDlg(void);
+         /* MpGLCanvas *GetParent(void) { return parent; } */
+         WinPrefs *GetPrefs(void) { return Prefs; }
+         
 };
 
 #endif
