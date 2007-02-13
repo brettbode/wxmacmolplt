@@ -2556,6 +2556,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
                     if (dy == 0) return;
                     if (dy > 99) dy = 99;
                     MainData->WindowSize *= 1.0 + 0.01*dy;
+					glCanvas->UpdateGLView();
                 } else {
                     Point pr, cur, sp;
                     pr.h = p.x;

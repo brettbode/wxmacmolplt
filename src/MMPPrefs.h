@@ -86,7 +86,7 @@ enum MMPMolDisplayElments {
 	MMPMolDisplay_3DAtomQuality,
 	MMPMolDisplay_BondWidth,
 	MMPMolDisplay_AtomScale,
-	MMPMolDisplay_ZScale,
+	MMPMolDisplay_GLFOV,
 	MMPMolDisplay_VectorScale,
 	MMPMolDisplay_3DFillBrightness,
 	MMPMolDisplay_3DPointBrightness,

@@ -185,7 +185,7 @@ class WinPrefs {
 														//bit 13: Create custom file icon
 
 		float			AtomMasses[kMaxAtomTypes], AutoBondScale, BondWidth, AtomScale,
-						ZScale, VectorScale, QD3DFillBrightness, QD3DPointBrightness,
+						GLFOV, VectorScale, QD3DFillBrightness, QD3DPointBrightness,
 						MaxBondLength, QD3DLineWidth;
 		short			AtomPatterns[kMaxAtomTypes], LabelFontID, LabelSize, VectorPattern,
 						BondPatterns[kMaxBondTypes], AnimationSpeed, StereoOffset;
@@ -298,8 +298,9 @@ class WinPrefs {
 		inline float SetQD3DPointBrightness(float NewValue) {return QD3DPointBrightness = NewValue;};
 		inline float GetAtomScale(void) const {return AtomScale;};
 		inline float SetAtomScale(float NewValue) {return AtomScale=NewValue;};
-		inline float GetZScale(void) const {return ZScale;};
-		inline float SetZScale(float NewValue) {return ZScale=NewValue;};
+			//Note the GL FOV is really stored as FOV/2
+		inline float GetGLFOV(void) const {return GLFOV;};
+		inline float SetGLFOV(float NewValue) {return GLFOV=((NewValue>0)&&(NewValue<90)?NewValue:30);};
 		inline long GetAnimateTime(void) const {return AnimateTime;};
 		inline long SetAnimateTime(long NewValue) {return AnimateTime=NewValue;};
 		inline short GetAnimationSpeed(void) const {return AnimationSpeed;};

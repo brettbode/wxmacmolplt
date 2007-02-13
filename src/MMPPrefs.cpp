@@ -172,7 +172,6 @@ void WinPrefs::ReadScalingDefaults(void) {
 void WinPrefs::CopyScalingPrefs(WinPrefs * Orig) {
 	AnimationSpeed = Orig->GetAnimationSpeed();
 	AtomScale = Orig->GetAtomScale();
-	ZScale = Orig->GetZScale();
 	AnimateTime = Orig->GetAnimateTime();
 }
 
@@ -190,6 +189,7 @@ void WinPrefs::CopyQD3DPrefs(WinPrefs * Orig) {
 	QD3DLineWidth = Orig->GetQD3DLineWidth();
 	Orig->CylindersForLines(CylindersForLines());
 	UseQD3DHardware(Orig->UseQD3DHardware());
+	GLFOV = Orig->GetGLFOV();
 	BackColor = Orig->BackColor;
 }
 
@@ -255,6 +255,7 @@ float WinPrefs::SetAtomMass(long AtomNum, float NewMass) {
 WinPrefs::WinPrefs(void) {
 	RendererName = NULL;
 	BitOptions = 0;
+	GLFOV = 30.0;
 	BackColor.red = BackColor.green = BackColor.blue = 65532;
 	FitToPage = FrameOnPage = false;
 	SymbolLabels = NumberLabels = false;
@@ -550,8 +551,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					SetQD3DBondWidth(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AtomScale), floatVal))
 					SetAtomScale(floatVal);
-				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ZScale), floatVal))
-					SetZScale(floatVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_GLFOV), floatVal))
+					SetGLFOV(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_VectorScale), floatVal))
 					SetVectorScale(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DFillBrightness), floatVal))
@@ -942,8 +943,8 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	outbuf << GetAtomScale();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_AtomScale), outbuf.str().c_str());
 	outbuf.str("");
-	outbuf << GetZScale();
-	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ZScale), outbuf.str().c_str());
+	outbuf << GetGLFOV();
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_GLFOV), outbuf.str().c_str());
 	outbuf.str("");
 	outbuf << GetVectorScale();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_VectorScale), outbuf.str().c_str());
@@ -1362,8 +1363,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "BondWidth";
         case MMPMolDisplay_AtomScale:
             return "AtomScale";
-        case MMPMolDisplay_ZScale:
-            return "DepthCue";
+        case MMPMolDisplay_GLFOV:
+            return "FieldOfView";
         case MMPMolDisplay_VectorScale:
             return "VectorScale";
         case MMPMolDisplay_3DFillBrightness:

@@ -24,7 +24,7 @@
 #define kAtomPrefsPane		1
 #define kBondPrefsPane		2
 #define kDisplayPrefsPane	3
-#define kEPrefsPane		4
+#define kEPrefsPane			4
 #define kFontPrefsPane		5
 #define kFilePrefsPane		6
 #define kScalingPrefsPane	7
@@ -70,6 +70,7 @@
 #define ID_POTENTIAL_ENERGY 5035
 #define ID_UNIT_RADIOBOX 5036
 #define ID_MISC_RADIOBOX 5037
+#define ID_DISPLAY_DEPTH_SLIDER	5038
 
 #include "GlobalExceptions.h"
 #include "MyTypes.h"
@@ -376,20 +377,23 @@ void BondPrefsPane::OnChoice( wxCommandEvent &event )
 DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean Global)
 	: PrefsPane(targetWindow, targetPrefs, kDisplayPrefsPane, Global) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER);
+	Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER);
 
-  mMainSizer = new wxBoxSizer(wxVERTICAL);
+	mMainSizer = new wxBoxSizer(wxVERTICAL);
 
-  wxString choices[] = {_T("Ball and Stick"), _T("WireFrame (Bonds only)")};
-  
-  mRdoBox = new wxRadioBox( this, ID_DISPLAY_MODE_RADIOBOX, _T("Display Mode"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 1, wxRA_SPECIFY_COLS );
-  mChkColor = new wxCheckBox(this, ID_COLOR_BONDS_BY_ATOM_COLOR, _T("Color bonds by atom color"), wxDefaultPosition);
+	wxString choices[] = {_T("Ball and Stick"), _T("WireFrame (Bonds only)")};
 
-  wxString atomLabels[] = {_T("None"), _T("Atomic Symbols"), _T("Atom Numbers"), _T("Both Symbols and Numbers")};
-  
-  mAtomLabels = new wxRadioBox( this, ID_ATOM_LABELS_RADIO, _T("Atom Labels"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(atomLabels), atomLabels, 1, wxRA_SPECIFY_COLS );
-  
-  SetSizer(mMainSizer);
+	mRdoBox = new wxRadioBox( this, ID_DISPLAY_MODE_RADIOBOX, _T("Display Mode"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 0, wxRA_SPECIFY_ROWS );
+	mChkColor = new wxCheckBox(this, ID_COLOR_BONDS_BY_ATOM_COLOR, _T("Color bonds by atom color"), wxDefaultPosition, wxDefaultSize, 0);
+
+	wxString atomLabels[] = {_T("None"), _T("Atomic Symbols"), _T("Atom Numbers"), _T("Both Symbols and Numbers")};
+
+	mAtomLabels = new wxRadioBox( this, ID_ATOM_LABELS_RADIO, _T("Atom Labels"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(atomLabels), atomLabels, 0, wxRA_SPECIFY_ROWS );
+
+	mMainSizer->Add(mRdoBox, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	mMainSizer->Add(mChkColor, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
+	mMainSizer->Add(mAtomLabels, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	SetSizer(mMainSizer);
 }
 
 #include <iostream>
@@ -401,7 +405,6 @@ void DisplayPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 	else
 		cout<<"Something wrong! Check preference setting!"<<endl;
 
-	mMainSizer->Add(mRdoBox, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
 	mChkColor->SetValue(mTargetPrefs->ColorBondHalves());
 
@@ -413,9 +416,6 @@ void DisplayPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 		mAtomLabels->SetSelection(1);
 	else
 		mAtomLabels->SetSelection(0);
-  
-	mMainSizer->Add(mChkColor, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-	mMainSizer->Add(mAtomLabels, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 }
 
 void DisplayPrefsPane::saveToTempPrefs()
@@ -892,11 +892,11 @@ if (PrefsAreGlobal())
   mBottomSizer->Add(new wxStaticText(this, wxID_ANY, _T("When reading a DRC file how many\n points should be skipped between\n points read in? (0 reads every point)")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
   mBottomSizer->Add(mPointSkip, 0, wxALIGN_CENTER | wxALL, 3);
 
-  mMainSizer->Add(mUpperSizer);
-  mMainSizer->Add(mSecondSizer);
-  mMainSizer->Add(mMiddleSizer);
-  mMainSizer->Add(mLowerSizer);
-  mMainSizer->Add(mBottomSizer);
+  mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+  mMainSizer->Add(mSecondSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+  mMainSizer->Add(mMiddleSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+  mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+  mMainSizer->Add(mBottomSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
 
 }
 
@@ -958,11 +958,13 @@ void FilePrefsPane::OnSliderUpdate( wxCommandEvent &WXUNUSED(event) )
 ScalingPrefsPane::ScalingPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, targetPrefs, kScalingPrefsPane, GlobalPrefs) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
+	Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
 
-  mMainSizer = new wxFlexGridSizer(2,4);
+	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
+	mMainSizer = new wxFlexGridSizer(2,3);
+    itemBoxSizer4->Add(mMainSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-  SetSizer(mMainSizer);
+	SetSizer(itemBoxSizer4);
 }
 
 void ScalingPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) 
@@ -972,29 +974,22 @@ void ScalingPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
 			  0, 250, wxDefaultPosition, 
 			  wxSize(155,wxDefaultCoord));
 
-  mSld[1] = new wxSlider( this, ID_DEPTH_CUEING_SLIDER, 
-			  (int)(mTargetPrefs->GetZScale()*100+0.5), 
-			  0, 70, wxDefaultPosition, 
-			  wxSize(155,wxDefaultCoord));
-
-  mSld[2] = new wxSlider( this, ID_ANIM_QUALITY_SLIDER, 
+  mSld[1] = new wxSlider( this, ID_ANIM_QUALITY_SLIDER, 
 			  (int)(mTargetPrefs->GetAnimationSpeed()-1), 
 			  0, 15, wxDefaultPosition, 
 			  wxSize(155,wxDefaultCoord));
 
-  mSld[3] = new wxSlider( this, ID_FRAME_DELAY_SLIDER, 
+  mSld[2] = new wxSlider( this, ID_FRAME_DELAY_SLIDER, 
 			  (int)(mTargetPrefs->GetAnimateTime()), 
 			  0, 120, wxDefaultPosition, 
 			  wxSize(155,wxDefaultCoord));
 
   mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Atom Size:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
   mMainSizer->Add(mSld[0], 0, wxALIGN_LEFT | wxALL, 3);
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Depth Cueing:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-  mMainSizer->Add(mSld[1], 0, wxALIGN_LEFT | wxALL, 3);
   mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Mode Animation Quality:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-  mMainSizer->Add(mSld[2], 0, wxALIGN_LEFT | wxALL, 3);
+  mMainSizer->Add(mSld[1], 0, wxALIGN_LEFT | wxALL, 3);
   mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Frame Delay:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-  mMainSizer->Add(mSld[3], 0, wxALIGN_LEFT | wxALL, 3);
+  mMainSizer->Add(mSld[2], 0, wxALIGN_LEFT | wxALL, 3);
 }
 
 void ScalingPrefsPane::saveToTempPrefs()
@@ -1008,12 +1003,10 @@ void ScalingPrefsPane::OnSliderUpdate( wxCommandEvent &event )
 
   if (id == ID_ATOM_SIZE_SLIDER)
     mTargetPrefs->SetAtomScale((float)(mSld[0]->GetValue())/10000);
-  if (id == ID_DEPTH_CUEING_SLIDER)
-    mTargetPrefs->SetZScale((float)(mSld[1]->GetValue())/100);
   if (id == ID_ANIM_QUALITY_SLIDER)
-    mTargetPrefs->SetAnimationSpeed(mSld[2]->GetValue()+1);
+    mTargetPrefs->SetAnimationSpeed(mSld[1]->GetValue()+1);
   if (id == ID_FRAME_DELAY_SLIDER)
-    mTargetPrefs->SetAnimateTime(mSld[3]->GetValue());
+    mTargetPrefs->SetAnimateTime(mSld[2]->GetValue());
 }
 
 StereoPrefsPane::StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
@@ -1201,7 +1194,7 @@ QD3DPrefsPane::QD3DPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent
   Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
 
   mMainSizer = new wxBoxSizer(wxVERTICAL);
-  mUpperSizer = new wxGridSizer(2,5);
+  mUpperSizer = new wxGridSizer(2,6);
   mLowerSizer = new wxBoxSizer(wxHORIZONTAL);
 
   SetSizer(mMainSizer);
@@ -1241,6 +1234,14 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mTargetPrefs->CylindersForLines(false);
   mUpperSizer->Add(mSld[4], 0, wxALIGN_CENTER | wxALL, 3);
 
+  mSld[5] = new wxSlider( this, ID_DEPTH_CUEING_SLIDER, 
+						  (int)(mTargetPrefs->GetGLFOV()), 
+						  0, 45, wxDefaultPosition, 
+						  wxSize(155,wxDefaultCoord));
+  
+  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("3D Perspective:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+  mUpperSizer->Add(mSld[5], 0, wxALIGN_CENTER | wxALL, 3);
+  
   mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER | wxALL, 3 );
 
   /*
@@ -1284,4 +1285,6 @@ void QD3DPrefsPane::OnSliderUpdate( wxCommandEvent &event )
     mTargetPrefs->SetQD3DPointBrightness((float)(mSld[3]->GetValue())/100);
   if (id == ID_LINE_WIDTH_SLIDER)
     mTargetPrefs->SetQD3DLineWidth((float)(mSld[4]->GetValue())/10000);
+  if (id == ID_DEPTH_CUEING_SLIDER)
+	  mTargetPrefs->SetGLFOV((float)(mSld[5]->GetValue()));
 }

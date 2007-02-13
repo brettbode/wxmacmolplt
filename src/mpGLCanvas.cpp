@@ -162,7 +162,7 @@ wxImage MpGLCanvas::getImage(const int width, const int height) {
     return wxImage(cwidth,cheight,pixels).Mirror(false);
 }
 //0.0577 corresponds to fov=60 with zNear=0.1
-#define myGLperspective 0.050   //0.050 seems to match my 2D mode
+//#define myGLperspective 0.050   //0.050 seems to match my 2D mode
 
 void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor, Progress * progress,
                                     bool Center, bool frame) {
@@ -202,6 +202,8 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor, Progre
     unsigned char *pixels = (unsigned char *) malloc(3 * width * height * sizeof(GLbyte));
     glReadBuffer(GL_BACK);
     
+	GLdouble zNear = 0.1;
+	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV()*(kPi)/180.0);
     GLdouble hGLsize, vGLsize, GLLeft, GLTop;
     double aspect = ((double)width)/((double)height);
     if (aspect > 1.0) {
@@ -233,7 +235,7 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor, Progre
             right = left + hGLsize;
             top = GLTop - jpass*vGLsize;
             bottom = top - vGLsize;
-            glFrustum(left, right, bottom, top, 0.1, 100.0);
+            glFrustum(left, right, bottom, top, zNear, 1000.0);
             
             MolWin->DrawGL();
             
@@ -319,6 +321,8 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 
     glReadBuffer(GL_BACK);
 
+	GLdouble zNear = 0.1;
+	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV());
     GLdouble hGLsize, vGLsize, GLLeft, GLTop;
     double aspect = ((double)canvasWidth)/((double)canvasHeight);
     if (aspect > 1.0) {
@@ -358,7 +362,7 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
             right = left + hGLsize;
             top = GLTop - passY * vGLsize;
             bottom = top - vGLsize;
-            glFrustum(left, right, bottom, top, 0.1, 100.0);
+            glFrustum(left, right, bottom, top, zNear, 1000.0);
             
             MolWin->DrawGL();
             
@@ -388,7 +392,6 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
     MolWin->UpdateGLModel();
     UpdateGLView();
 }
-
 void MpGLCanvas::UpdateGLView(void) {
     int width, height;
     if(GetContext()&&(Prefs!=NULL)&&MolWin->IsShown()) {
@@ -400,6 +403,11 @@ void MpGLCanvas::UpdateGLView(void) {
         //  if (aspect > 1.0) ysize /= aspect;
         glMatrixMode (GL_PROJECTION);   //Setup the model space to screen space mapping
         glLoadIdentity ();
+		GLdouble zNear = 0.1;
+		GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV()*(kPi)/180.0);
+		//At the moment the prefs limit the GLFOV to > 0 so the glOrtho code will not
+		//get run. Before it can be activated need to figure out what to do with it in the 
+		//hi-res image export routines.
         //      gluPerspective(ysize, aspect, 0.1, 100.0);
         GLdouble top, right;
         if (aspect > 1.0) {
@@ -409,7 +417,18 @@ void MpGLCanvas::UpdateGLView(void) {
             top = myGLperspective;
             right = top * aspect;
         }
-        glFrustum(-right, right, -top, top, 0.1, 1000.0);
+		if (myGLperspective > 0.001)
+			glFrustum(-right, right, -top, top, zNear, 1000.0);
+		else {
+			if (aspect > 1.0) {
+				right = mMainData->WindowSize;
+				top = right/aspect;
+			} else {
+				top = mMainData->WindowSize;
+				right = top * aspect;
+			}
+			glOrtho(-right, right, -top, top, zNear, 1000.0);
+		}
         glMatrixMode (GL_MODELVIEW);    //Prepare for model space by submitting the rotation/translation
         glLoadIdentity ();
         
@@ -836,6 +855,8 @@ int MpGLCanvas::testPicking(int x, int y)
 
    GLdouble aspect = ((float)width)/height;
 
+   GLdouble zNear = 0.1;
+   GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV()*(kPi)/180.0);
    if (aspect > 1.0) {
      right = myGLperspective;
      top = right/aspect;
@@ -844,7 +865,18 @@ int MpGLCanvas::testPicking(int x, int y)
      right = top * aspect;
    }
 
-   glFrustum(-right, right, -top, top, 0.1, 100.0);
+	if (myGLperspective > 0.001)
+	   glFrustum(-right, right, -top, top, zNear, 1000.0);
+	else {
+		if (aspect > 1.0) {
+			right = mMainData->WindowSize;
+			top = right/aspect;
+		} else {
+			top = mMainData->WindowSize;
+			right = top * aspect;
+		}
+		glOrtho(-right, right, -top, top, zNear, 1000.0);
+	}
 
    glMatrixMode(GL_MODELVIEW);
 

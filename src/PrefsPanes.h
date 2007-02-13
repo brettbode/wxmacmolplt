@@ -120,6 +120,7 @@ class DisplayPrefsPane : public wxPanel, public PrefsPane
 		void OnRadio( wxCommandEvent &event );
 		void OnLabelsRadio( wxCommandEvent &event );
 		void OnCheckBox( wxCommandEvent& WXUNUSED(event));
+		void OnDepthSlider(wxCommandEvent &event);
 
 	private:
 		wxBoxSizer* mMainSizer;
@@ -127,6 +128,7 @@ class DisplayPrefsPane : public wxPanel, public PrefsPane
 		wxRadioBox* mRdoBox;
 		wxCheckBox* mChkColor;
 		wxRadioBox*	mAtomLabels;
+		wxSlider*	mDepthSlider;
 
 		DECLARE_EVENT_TABLE()
 };
@@ -217,7 +219,7 @@ class ScalingPrefsPane : public wxPanel, public PrefsPane
 	private:
 		wxFlexGridSizer* mMainSizer;
 
-		wxSlider* mSld[4];
+		wxSlider* mSld[3];
 
 		DECLARE_EVENT_TABLE()
 };
@@ -295,7 +297,7 @@ class QD3DPrefsPane : public wxPanel, public PrefsPane
 
 		wxCheckBox* mChk3D;
 		colorArea* mBackgrdColor;
-		wxSlider* mSld[5];
+		wxSlider* mSld[6];
 
 		DECLARE_EVENT_TABLE()
 };

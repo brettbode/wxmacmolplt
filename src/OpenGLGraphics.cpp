@@ -63,7 +63,7 @@
 extern Boolean	gOpenGLAvailable;
 #endif
 	//0.0577 corresponds to fov=60 with zNear=0.1
-#define myGLperspective	0.050	//0.050 seems to match my 2D mode
+//#define myGLperspective	0.050	//0.050 seems to match my 2D mode
 //#define myGLperspective	0.10	//0.050 seems to match my 2D mode
 
 //#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
@@ -304,6 +304,8 @@ void MolDisplayWin::UpdateGLView(void)
 		glMatrixMode (GL_PROJECTION);	//Setup the model space to screen space mapping
 		glLoadIdentity ();
 //		gluPerspective(ysize, aspect, 0.1, 100.0);
+		GLdouble zNear = 0.1;
+		GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV());
 		GLdouble top, right;
 		if (aspect > 1.0) {
 			right = myGLperspective;
@@ -312,7 +314,7 @@ void MolDisplayWin::UpdateGLView(void)
 			top = myGLperspective;
 			right = top * aspect;
 		}
-		glFrustum(-right, right, -top, top, 0.1, 100.0);
+		glFrustum(-right, right, -top, top, zNear, 100.0);
 		glMatrixMode (GL_MODELVIEW);	//Prepare for model space by submitting the rotation/translation
 		glLoadIdentity ();
 
@@ -400,6 +402,8 @@ void MolDisplayWin::Create3DGLPICT(WindowPtr PrintWindow)
 		
 	glReadBuffer(GL_BACK);
 	PixMapHandle myPixMap = NewPixMap();
+	GLdouble zNear = 0.1;
+	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV());
 	GLdouble hGLsize, vGLsize, GLLeft, GLTop;
 	double aspect = ((double)width)/((double)height);
 	if (aspect > 1.0) {
@@ -437,7 +441,7 @@ void MolDisplayWin::Create3DGLPICT(WindowPtr PrintWindow)
 				right = left + hGLsize;
 				top = GLTop - jpass*vGLsize;
 				bottom = top - vGLsize;
-				glFrustum(left, right, bottom, top, 0.1, 100.0);
+				glFrustum(left, right, bottom, top, zNear, 100.0);
 
 				DrawGL();
 
@@ -560,6 +564,8 @@ void MolDisplayWin::Print3DGL(const PMPrintSession mySession,
 	aglSetCurrentContext (OpenGLData->aglContext);
 	glReadBuffer(GL_BACK);
 
+	GLdouble zNear = 0.1;
+	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV());
 	GLdouble hGLsize, vGLsize, GLLeft, GLTop;
 	double aspect = ((double)width)/((double)height);
 	if (aspect > 1.0) {
@@ -592,7 +598,7 @@ void MolDisplayWin::Print3DGL(const PMPrintSession mySession,
 			right = left + hGLsize;
 			top = GLTop - jpass*vGLsize;
 			bottom = top - vGLsize;
-			glFrustum(left, right, bottom, top, 0.1, 100.0);
+			glFrustum(left, right, bottom, top, zNear, 100.0);
 
 			DrawGL();
 
