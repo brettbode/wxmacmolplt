@@ -455,7 +455,7 @@ void MolDisplayWin::createMenuBar(void) {
     menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
     menuView->AppendSeparator();
     menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show Ax&is"));
-#ifdef ENABLE_INTERACTIVE_MODE
+#ifdef ENABLE_SHOWSYMMETRY_MODE
     menuView->AppendCheckItem(MMP_SHOWSYMMETRYOPERATOR, wxT("Show S&ymmetry Operators"));
 #endif
 	
@@ -537,8 +537,10 @@ void MolDisplayWin::ClearMenus(void) {
     menuView->Enable(MMP_NEXTMODE, false);
     menuView->Enable(MMP_OFFSETMODE, false);
     menuView->Enable(MMP_ANIMATEFRAMES, false);
+#ifdef ENABLE_SHOWSYMMETRY_MODE
     menuView->Enable(MMP_SHOWSYMMETRYOPERATOR, false);
 	menuView->Check(MMP_SHOWSYMMETRYOPERATOR, false);
+#endif
     menuMolecule->Enable(MMP_SETBONDLENGTH, false);
     menuMolecule->Enable(MMP_ENERGYEDIT, false);
     menuMolecule->Enable(MMP_CREATELLMPATH, false);
@@ -557,6 +559,7 @@ void MolDisplayWin::AdjustMenus(void) {
 	else
 		menuViewLabels->Check(MMP_NO_ATOMLABEL, true);
 
+#ifdef ENABLE_SHOWSYMMETRY_MODE
 	if (MainData->InputOptions) {
 		if (MainData->InputOptions->Data) {
 			if (MainData->InputOptions->Data->GetPointGroup() > GAMESS_C1) {
@@ -565,7 +568,8 @@ void MolDisplayWin::AdjustMenus(void) {
 			}
 		}
 	}
-				
+#endif
+
 	if (Prefs->DrawWireFrame())
 		menuViewStyle->Check(MMP_WIREFRAMEMODE, true);
 	else
