@@ -125,6 +125,7 @@ class SurfacesWindow;
 #define ID_USERGB_COLOR_CHECK 10111
 #define ID_TED3D_MAX_MAP_EDIT 10112
 #define ID_DISPLAY_PLANE_CHECKBOX 10244
+#define ID_INVERT_RGB_CHECK 10245
 
 ////@end control identifiers
 
@@ -635,6 +636,7 @@ public:
     virtual void refreshControls();
 	void OnUseMEPCheck(wxCommandEvent &event );
 	void OnRGBColorCheck(wxCommandEvent &event );
+	void OnInvertRGBCheck(wxCommandEvent &event );
 	void OnMaxMEPValueText(wxCommandEvent &event );
 	
     /// Creates the controls and sizers
@@ -657,11 +659,13 @@ private:
 	
 	wxCheckBox*	mColorSurfCheck;
 	wxCheckBox*	mUseRGBColorCheck;
+	wxCheckBox*	mInvertRGBCheck;
 	wxTextCtrl*	mMaxMapEdit;
 	wxString mMaxMapValidator;
 	
 	bool	UseMEP;
 	bool	UseRGBSurfaceColor;
+	bool	InvertRGBSurfaceColor;
 	float	MaxMEPValue;
 	
     TEDensity3DSurface*	mTarget;

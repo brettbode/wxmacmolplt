@@ -881,6 +881,8 @@ void Surf3DBase::Write3DXML(XMLElement * parent, bool writeGrid) const {
 	sElem->addChildElement(CML_convert(MMP_SurfColorizeSurface), (ColorByValue()?trueXML:falseXML));
 	sElem->addChildElement(CML_convert(MMP_SurfUseSurfaceNormals), (UseSurfaceNormals()?trueXML:falseXML));
 	sElem->addChildElement(CML_convert(MMP_SurfUseRGBColor), (UseRGBColoration()?trueXML:falseXML));
+	if (InvertRGBColoration()) sElem->addChildElement(CML_convert(MMP_SurfInvertRGBColor), 
+													  (InvertRGBColoration()?trueXML:falseXML));
 	sElem->addChildElement(CML_convert(MMP_SurfFixedGrid), (GetFixGrid()?trueXML:falseXML));
 	sElem->addChildElement(CML_convert(MMP_SurfContourPosNeg), (ContourBothPosNeg()?trueXML:falseXML));
 
@@ -1060,6 +1062,10 @@ void Surf3DBase::Read3DXML(XMLElement * parent) {
 				case MMP_SurfUseRGBColor:
 					if (child->getBoolValue(tb))
 						UseRGBColoration(tb);
+					break;
+				case MMP_SurfInvertRGBColor:
+					if (child->getBoolValue(tb))
+						InvertRGBColoration(tb);
 					break;
 				case MMP_SurfFixedGrid:
 					if (child->getBoolValue(tb))

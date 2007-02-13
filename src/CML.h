@@ -165,6 +165,7 @@ enum MMP_SurfaceNameSpace {
 	MMP_SurfColorizeSurface,
 	MMP_SurfUseSurfaceNormals,
 	MMP_SurfUseRGBColor,
+	MMP_SurfInvertRGBColor,
 	MMP_SurfFixedGrid,
 	MMP_SurfContourPosNeg,
 	MMP_SurfNumVertices,

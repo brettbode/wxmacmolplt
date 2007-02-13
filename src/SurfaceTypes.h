@@ -223,6 +223,7 @@ class Surf3DBase : public Surface {
 									//16 to use preset values for grid
 									//32 to compute and use surface normals
 									//64 method to colorize surface (set to use +/- colors)
+									//128 invert color mapping
 		RGBColor	PosColor;
 		RGBColor	NegColor;
 		RGBColor	TranspColor;		//Transparency color
@@ -252,6 +253,8 @@ class Surf3DBase : public Surface {
 		inline bool UseSurfaceNormals(void) const {return ((Mode & 32)!=0);};
 		inline void UseRGBColoration(bool state) {Mode = (Mode & 0xFFFFFFBF) + (state?0:64);};
 		inline bool UseRGBColoration(void) const {return ((Mode & 64)==0);};
+		inline void InvertRGBColoration(bool state) {Mode = (Mode & 0xFFFFFF7F) + (state?128:0);};
+		inline bool InvertRGBColoration(void) const {return ((Mode & 128)!=0);};
 		inline void GetPosColor(RGBColor *temp) const {*temp=PosColor;};
 		inline void SetPosColor(RGBColor *newColor) {PosColor=*newColor;};
 		inline void GetNegColor(RGBColor *temp) const {*temp=NegColor;};

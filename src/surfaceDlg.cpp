@@ -157,6 +157,7 @@ BEGIN_EVENT_TABLE( TEDensity3DSurfPane, wxPanel )
 	EVT_SLIDER (ID_GRID_SIZE_SLIDER, Surface3DPane::OnGridSizeSld)
 	EVT_CHECKBOX (ID_TED3D_COLOR_SURF_CHECK, TEDensity3DSurfPane::OnUseMEPCheck)
 	EVT_CHECKBOX (ID_USERGB_COLOR_CHECK, TEDensity3DSurfPane::OnRGBColorCheck)
+	EVT_CHECKBOX (ID_INVERT_RGB_CHECK, TEDensity3DSurfPane::OnInvertRGBCheck)
 	EVT_TEXT (ID_TED3D_MAX_MAP_EDIT, TEDensity3DSurfPane::OnMaxMEPValueText)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
@@ -3253,6 +3254,7 @@ void TEDensity3DSurfPane::TargetToPane(void)
 	AllFrames = (mTarget->GetSurfaceID() != 0);
 	UseMEP = mTarget->ColorByValue();
 	UseRGBSurfaceColor = mTarget->UseRGBColoration();
+	InvertRGBSurfaceColor = mTarget->InvertRGBColoration();
 	MaxMEPValue = mTarget->GetMaxSurfaceValue();
 	UpdateTest = false;
 }
@@ -3271,9 +3273,12 @@ void TEDensity3DSurfPane::refreshControls()
 	mUseRGBColorCheck->SetValue(UseRGBSurfaceColor);
 	if (UseMEP) {
 		mUseRGBColorCheck->Enable();
+		if (UseRGBSurfaceColor) mInvertRGBCheck->Enable();
+		else mInvertRGBCheck->Disable();
 		mMaxMapEdit->Enable();
 	} else {
 		mUseRGBColorCheck->Disable();
+		mInvertRGBCheck->Disable();
 		mMaxMapEdit->Disable();
 	}
 	SetMaxMEPValueText();
@@ -3297,7 +3302,13 @@ void TEDensity3DSurfPane::OnUseMEPCheck( wxCommandEvent &event )
 void TEDensity3DSurfPane::OnRGBColorCheck( wxCommandEvent &event )
 {
 	UseRGBSurfaceColor = mUseRGBColorCheck->GetValue();
-//	refreshControls();
+	refreshControls();
+	setUpdateButton();
+}
+void TEDensity3DSurfPane::OnInvertRGBCheck( wxCommandEvent &event )
+{
+	InvertRGBSurfaceColor = mInvertRGBCheck->GetValue();
+	//	refreshControls();
 	setUpdateButton();
 }
 void TEDensity3DSurfPane::OnMaxMEPValueText(wxCommandEvent& event )
@@ -3329,6 +3340,7 @@ bool TEDensity3DSurfPane::UpdateNeeded(void)
 	if (UseMEP != mTarget->ColorByValue()) result = true;
 	if (UseNormals != mTarget->UseSurfaceNormals()) result = true;
 	if (UseRGBSurfaceColor != mTarget->UseRGBColoration()) result = true;
+	if (InvertRGBSurfaceColor != mTarget->InvertRGBColoration()) result = true;
 	if (MaxMEPValue != mTarget->GetMaxSurfaceValue()) result = true;
 	if (!result) {
 		RGBColor	testColor;
@@ -3383,6 +3395,7 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	mTarget->SetColorByValue(UseMEP);
 	mTarget->UseSurfaceNormals(UseNormals);
 	mTarget->UseRGBColoration(UseRGBSurfaceColor);
+	mTarget->InvertRGBColoration(InvertRGBSurfaceColor);
 	MoleculeData * data = owner->GetMoleculeData();
 	WinPrefs * Prefs = owner->GetPrefs();
 	//update this surface's data on all frames if necessary
@@ -3587,9 +3600,17 @@ void TEDensity3DSurfPane::CreateControls() {
     itemBoxSizer112->Add(mColorSurfCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mUseRGBColorCheck = new wxCheckBox( TED3DPanel, ID_USERGB_COLOR_CHECK, _("Use RGB surface coloration"), wxDefaultPosition, wxDefaultSize, 0 );
-    mUseRGBColorCheck->SetValue(false);
+	if (ShowToolTips())
+        mUseRGBColorCheck->SetToolTip(_("Uses blue for attractive, green for neutral, and red of repulsive to a + charge"));
+	mUseRGBColorCheck->SetValue(false);
     itemBoxSizer112->Add(mUseRGBColorCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
-	
+
+	mInvertRGBCheck = new wxCheckBox( TED3DPanel, ID_INVERT_RGB_CHECK, _("Invert color map"), wxDefaultPosition, wxDefaultSize, 0 );
+	mInvertRGBCheck->SetValue(false);
+	if (ShowToolTips())
+	   mInvertRGBCheck->SetToolTip(_("Flips the RGB mapping so that red is attractive, blue replusive to a + charge"));
+	itemBoxSizer112->Add(mInvertRGBCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	   
     wxBoxSizer* itemBoxSizer115 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer111->Add(itemBoxSizer115, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
     wxStaticText* itemStaticText116 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Max. value to map"), wxDefaultPosition, wxDefaultSize, 0 );

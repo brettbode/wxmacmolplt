@@ -2370,6 +2370,7 @@ void Surf3DBase::SetSurfaceColor(const float & surfaceValue, const RGBColor * pC
 								float & red, float & green, float & blue) const {
 	float	localVal = surfaceValue;
 	if (UseRGBColoration()) {
+		if (InvertRGBColoration()) localVal *= -1.0;
 		if (localVal < 0.0) {
 			if (localVal < -1.0) localVal = -1.0;
 			red = 0.0;

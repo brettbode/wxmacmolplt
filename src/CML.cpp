@@ -2384,6 +2384,8 @@ const char * CML_convert(MMP_SurfaceNameSpace t)
             return "UseNormals";
         case MMP_SurfUseRGBColor:
             return "UseRGBColorization";
+        case MMP_SurfInvertRGBColor:
+            return "InvertRGBColorization";
         case MMP_SurfFixedGrid:
             return "FixedGrid";
         case MMP_SurfContourPosNeg:
