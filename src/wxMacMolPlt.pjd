@@ -6702,7 +6702,6 @@ points read in:"</string>
           <long name="proxy-Width">400</long>
           <long name="proxy-Height">300</long>
           <string name="proxy-Event sources">""</string>
-          <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
           <document>
             <string name="title">"wxBoxSizer V"</string>
             <string name="type">"dialog-control-document"</string>
@@ -6715,14 +6714,6 @@ points read in:"</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -6890,8 +6881,7 @@ that you use my program!"</string>
                 <string name="proxy-Class">"wxStaticText"</string>
                 <string name="proxy-Member variable name">""</string>
                 <string name="proxy-Label">"Available via the WWW URL:
-http://www.scl.ameslab.gov/
-~brett/MacMolPlt/"</string>
+http://www.scl.ameslab.gov/MacMolPlt/"</string>
                 <long name="proxy-Wrapping width">-1</long>
                 <string name="proxy-Help text">""</string>
                 <string name="proxy-Tooltip text">""</string>
@@ -7023,6 +7013,32 @@ brett@scl.ameslab.gov"</string>
                 <bool name="proxy-wxFIXED_MINSIZE">0</bool>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
+              </document>
+              <document>
+                <string name="title">"Spacer"</string>
+                <string name="type">"dialog-control-document"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"spacer"</string>
+                <long name="is-transient">0</long>
+                <long name="owns-file">1</long>
+                <long name="title-mode">0</long>
+                <long name="locked">0</long>
+                <string name="created">"13/2/2007"</string>
+                <string name="proxy-type">"wbSpacerProxy"</string>
+                <long name="proxy-Width">15</long>
+                <long name="proxy-Height">5</long>
+                <string name="proxy-AlignH">"Centre"</string>
+                <string name="proxy-AlignV">"Centre"</string>
+                <long name="proxy-Stretch factor">0</long>
+                <long name="proxy-Border">5</long>
+                <bool name="proxy-wxLEFT">1</bool>
+                <bool name="proxy-wxRIGHT">1</bool>
+                <bool name="proxy-wxTOP">1</bool>
+                <bool name="proxy-wxBOTTOM">1</bool>
+                <bool name="proxy-wxSHAPED">0</bool>
+                <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+                <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
               </document>
               <document>
                 <string name="title">"wxStaticText: wxID_STATIC"</string>

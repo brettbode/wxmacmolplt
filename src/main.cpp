@@ -84,9 +84,6 @@ bool MpApp::OnInit() {
 								wxSIMPLE_BORDER|wxSTAY_ON_TOP);
 	splashTimer.SetOwner(this, splashT_ID);
 	splashTimer.Start(2000, wxTIMER_ONE_SHOT);
-//	splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 2000,
-//								NULL, -1, wxDefaultPosition, wxDefaultSize,
-//								wxSIMPLE_BORDER|wxSTAY_ON_TOP);
 	
 	gPreferences = new WinPrefs;
 	gPrefDefaults = new WinPrefs;
