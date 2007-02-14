@@ -255,9 +255,9 @@ void setPreference::facDefaults( wxCommandEvent& WXUNUSED(event) )
     case 3: mPrefs->ReadEnergyDefaults(); break;
     case 4: mPrefs->ReadFileDefaults(); break;
     case 5: mPrefs->ReadScalingDefaults(); break;
-    case 6: mPrefs->ReadStereoDefaults(); break;
-    case 7: mPrefs->ReadSurfaceDefaults(); break;
-    case 8: mPrefs->ReadQD3DDefaults(); break;
+//    case 6: mPrefs->ReadStereoDefaults(); break;
+    case 6: mPrefs->ReadSurfaceDefaults(); break;
+    case 7: mPrefs->ReadQD3DDefaults(); break;
     }
 
   updatePanels(currPanel);
@@ -305,9 +305,9 @@ void setPreference::saveCurrPrefs(int panelID)
     case 3: energyPanel->saveToTempPrefs(); break;
     case 4: filePanel->saveToTempPrefs(); break;
     case 5: scalPanel->saveToTempPrefs(); break;
-    case 6: stereoPanel->saveToTempPrefs(); break;
-    case 7: surfPanel->saveToTempPrefs(); break;
-    case 8: qd3dPanel->saveToTempPrefs(); break;
+  //  case 6: stereoPanel->saveToTempPrefs(); break;
+    case 6: surfPanel->saveToTempPrefs(); break;
+    case 7: qd3dPanel->saveToTempPrefs(); break;
     }
 }
 
@@ -321,9 +321,9 @@ void setPreference::copyCurrPrefs(int panelID, WinPrefs* newPrefs)
     case 3: mPrefs->CopyEnergyPrefs(newPrefs); break;
     case 4: mPrefs->CopyFilePrefs(newPrefs); break;
     case 5: mPrefs->CopyScalingPrefs(newPrefs); break;
-    case 6: mPrefs->CopyStereoPrefs(newPrefs); break;
-    case 7: mPrefs->CopySurfacePrefs(newPrefs); break;
-    case 8: mPrefs->CopyQD3DPrefs(newPrefs); break;
+ //   case 6: mPrefs->CopyStereoPrefs(newPrefs); break;
+    case 6: mPrefs->CopySurfacePrefs(newPrefs); break;
+    case 7: mPrefs->CopyQD3DPrefs(newPrefs); break;
     }
 
 }
@@ -364,17 +364,17 @@ void setPreference::updatePanels(int panelID)
       scalPanel->SetupPaneItems(mParent);
       m_choiceBook->InsertPage( panelID, scalPanel, wxT("Scaling/Speed"), true );
       break;
+//    case 6: 
+//      stereoPanel = new StereoPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
+//      stereoPanel->SetupPaneItems(mParent);
+//      m_choiceBook->InsertPage( panelID, stereoPanel, wxT("Stereo Options"), true ); 
+//      break;
     case 6: 
-      stereoPanel = new StereoPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
-      stereoPanel->SetupPaneItems(mParent);
-      m_choiceBook->InsertPage( panelID, stereoPanel, wxT("Stereo Options"), true ); 
-      break;
-    case 7: 
       surfPanel = new SurfacePrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
       surfPanel->SetupPaneItems(mParent);
       m_choiceBook->InsertPage( panelID, surfPanel, wxT("Surface Options"), true ); 
       break;
-    case 8: 
+    case 7: 
       qd3dPanel = new QD3DPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
       qd3dPanel->SetupPaneItems(mParent);
       m_choiceBook->InsertPage( panelID, qd3dPanel, wxT("3D Options"), true ); 
@@ -452,9 +452,9 @@ void setPreference::CreateInitialPages(wxBookCtrlBase *parent)
     scalPanel->SetupPaneItems(mParent);
     parent->AddPage( scalPanel, wxT("Scaling/Speed"), false );
 
-    stereoPanel = new StereoPrefsPane(mParent, parent, mPrefs, mIsGlobal);
-    stereoPanel->SetupPaneItems(mParent);
-    parent->AddPage( stereoPanel, wxT("Stereo Options"), false );
+//    stereoPanel = new StereoPrefsPane(mParent, parent, mPrefs, mIsGlobal);
+//    stereoPanel->SetupPaneItems(mParent);
+//    parent->AddPage( stereoPanel, wxT("Stereo Options"), false );
 
     surfPanel = new SurfacePrefsPane(mParent, parent, mPrefs, mIsGlobal);
     surfPanel->SetupPaneItems(mParent);
