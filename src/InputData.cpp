@@ -3755,6 +3755,11 @@ void OrbitalRec::WriteVecGroup(BufferFile * File, const long & NumBasisFuncs, co
 //Punch the Group title
 	File->WriteLine(" $VEC", true);
 //write out the vectors using the GAMESS format (I2,I3,5E15.8)
+#ifdef WIN32
+	//Visual studio defaults to using 3 digit exponent output which doesn't fit in the field
+	//This function changes that behavior to 2 digits.
+	_set_output_format(_TWO_DIGIT_EXPONENT);
+#endif
 		long iline, nVec, nn, nOrbs, pOrb;
 	if ((OrbCount > 0) && (OrbCount <= NumAlphaOrbs)) nOrbs = OrbCount;
 	else nOrbs = NumAlphaOrbs;
