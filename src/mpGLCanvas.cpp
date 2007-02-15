@@ -536,7 +536,11 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
      {
        selected = testPicking(tmpPnt.x, tmpPnt.y);
 
-       if (selected >= 0 && selected < NumAtoms + lFrame->NumBonds)
+       if (selected >= NumAtoms + lFrame->NumBonds) {
+          annoLengthPopupMenu(tmpPnt.x, tmpPnt.y);
+       }
+       
+       else if (selected >= 0 && selected < NumAtoms + lFrame->NumBonds)
          {
            interactPopupMenu(tmpPnt.x, tmpPnt.y, selected < NumAtoms);
 
@@ -932,10 +936,10 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
          select_stack_top--;
       }
 
-      printf("select_stack_top: %d\n", select_stack_top);
-      for (int i = 0; i < select_stack_top; i++) {
-         printf("select_stack[%d]: %d\n", i, select_stack[i]);
-      }
+      // printf("select_stack_top: %d\n", select_stack_top); 
+      // for (int i = 0; i < select_stack_top; i++) { 
+         // printf("select_stack[%d]: %d\n", i, select_stack[i]); 
+      // } 
 
       // If atom selections change, so might their bonds.
       for (int i = 0; i < lFrame->NumBonds; i++) {

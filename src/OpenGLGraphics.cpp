@@ -72,7 +72,7 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order);
 void DrawInversionPoint(void);
 void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2);
-void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width);
+void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, float m[16], const CPoint3D& x_world, float bond_size);
 
 const GLubyte stippleMask[128] =
 
@@ -1182,10 +1182,93 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
    glTexImage1D(GL_TEXTURE_1D, 0, GL_ALPHA, 8, 0, GL_ALPHA,
                 GL_UNSIGNED_BYTE, texture);
 
-	for (long ilength = 0; ilength < lFrame->NumAnnoLengths; ilength++) {
-		glLoadName(ilength + NumAtoms + NumBonds + 1);
-      DashedQuadFromLine(lFrame->Atoms[lFrame->AnnoLengths[ilength].atom1].Position,
-                         lFrame->Atoms[lFrame->AnnoLengths[ilength].atom2].Position, BondSize * 0.25);
+   if (lFrame->NumAnnoLengths) {
+      CPoint3D lookat_eye;
+      CPoint3D up_eye;
+      CPoint3D lookat_world;
+      CPoint3D up_world;
+      CPoint3D r;
+      float m[16];
+      Matrix4D mv_inv;
+
+      lookat_eye.x = 0.0f;
+      lookat_eye.y = 0.0f;
+      lookat_eye.z = 1.0f;
+      up_eye.x = 0.0f;
+      up_eye.y = 1.0f;
+      up_eye.z = 0.0f;
+
+      // Invert just the rotation portion of the modelview matrix.  We can't
+      // use InverseMatrix because it considers the translation factors.
+      // We don't want the translation factors because we want to transform
+      // a vector, and Rotate3DPt transforms only points (and not vectors).
+      mv_inv[0][0] = modelview[0];
+      mv_inv[0][1] = modelview[4];
+      mv_inv[0][2] = modelview[8];
+      mv_inv[0][3] = 0.0f;
+      mv_inv[1][0] = modelview[1];
+      mv_inv[1][1] = modelview[5];
+      mv_inv[1][2] = modelview[9];
+      mv_inv[1][3] = 0.0f;
+      mv_inv[2][0] = modelview[2];
+      mv_inv[2][1] = modelview[6];
+      mv_inv[2][2] = modelview[10];
+      mv_inv[2][3] = 0.0f;
+      mv_inv[3][0] = 0.0f;
+      mv_inv[3][1] = 0.0f;
+      mv_inv[3][2] = 0.0f;
+      mv_inv[3][3] = 1.0f;
+
+      // Transform the eye space vectors to world coordinates, and find 
+      // a third vector to form a basis set.
+      Rotate3DPt(mv_inv, lookat_eye, &lookat_world);
+      Rotate3DPt(mv_inv, up_eye, &up_world);
+      CrossProduct3D(&lookat_world, &up_world, &r);
+
+      m[0] = r.x;
+      m[1] = r.y;
+      m[2] = r.z;
+      m[3] = 0.0f;
+
+      m[4] = up_world.x;
+      m[5] = up_world.y;
+      m[6] = up_world.z;
+      m[7] = 0.0f;
+
+      m[8] = lookat_world.x;
+      m[9] = lookat_world.y;
+      m[10] = lookat_world.z;
+      m[11] = 0.0f;
+
+      m[12] = m[13] = m[14] = 0.0f;
+      m[15] = 1.0f;
+
+      CPoint3D x_eye;
+      CPoint3D x_world;
+      x_eye.x = 1.0f;
+      x_eye.y = 0.0f;
+      x_eye.z = 0.0f;
+
+      Rotate3DPt(mv_inv, x_eye, &x_world);
+
+      int atom1_id, atom2_id;
+      int bond_id;
+      float bond_size;
+
+      for (long ilength = 0; ilength < lFrame->NumAnnoLengths; ilength++) {
+         atom1_id = lFrame->AnnoLengths[ilength].atom1;
+         atom2_id = lFrame->AnnoLengths[ilength].atom2;
+         bond_id = lFrame->BondExists(atom1_id, atom2_id);
+         if (bond_id > -1) {
+            bond_size = BondSize / MAX(lBonds[bond_id].Order, 1);
+         } else {
+            bond_size = 0.0f;
+         }
+         glLoadName(ilength + NumAtoms + NumBonds + 1);
+         DashedQuadFromLine(lFrame->Atoms[atom1_id].Position,
+                            lFrame->Atoms[atom2_id].Position,
+                            BondSize * 0.25, m, x_world, bond_size);
+      }
    }
 
 		//bonds as cylinders
@@ -2651,7 +2734,8 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 }
 
 void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, 
-                        float width) {
+                        float width, float m[16], const CPoint3D& x_world,
+                        float offset) {
 
    float len;
    // CPoint3D vec; 
@@ -2700,11 +2784,7 @@ void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2,
    offset_vec.z = perp_obj[2] - pt1.z;
    offset_vec *= 1 / offset_vec.Magnitude();
 
-   // vec = pt2 - pt1; 
-
-   // len = vec.Magnitude(); 
    len = (pt2 - pt1).Magnitude();
-   printf("len: %f\n", len);
 
    CPoint3D new_pt1a;
    CPoint3D new_pt1b;
@@ -2742,14 +2822,16 @@ void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2,
    glEnable(GL_LIGHTING);
 
    char len_label[40];
-
    glPushMatrix();
-   sprintf(len_label, "%.4f", len);
-   glTranslatef((pt1.x + pt2.x) / 2.0f - offset_vec.x * 3 * width, 
-                (pt1.y + pt2.y) / 2.0f - offset_vec.y * 3 * width, 
-                (pt1.z + pt2.z) / 2.0f - offset_vec.z * 3 * width);
-   glScalef(0.1f, 0.1, 0.1f);
-   glRotatef(90.0f, 0.0f, 0.0f, 1.0f);
+   glTranslatef((pt1.x + pt2.x) / 2.0f,
+                (pt1.y + pt2.y) / 2.0f,
+                (pt1.z + pt2.z) / 2.0f);
+   glTranslatef(5 * width * x_world.x,
+                5 * width * x_world.y,
+                5 * width * x_world.z);
+   glMultMatrixf(m);
+   glScalef(-0.05f, 0.05f, 0.05f);
+   sprintf(len_label, "%.6f", len);
    glfDrawSolidString(len_label);
    glPopMatrix();
 
