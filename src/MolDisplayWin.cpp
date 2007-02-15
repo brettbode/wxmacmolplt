@@ -488,8 +488,10 @@ void MolDisplayWin::createMenuBar(void) {
     menuViewRotate->Append(MMP_ROTATEPRINC, wxT("to &Principle Orientation"));
     menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
 
+#ifdef ENABLE_INTERACTIVE_MODE
     menuView->AppendCheckItem(MMP_SHOWPATTERN, wxT("Show Patterns"));
-
+#endif
+	
     menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."));
     menuMolecule->Append(MMP_ENERGYEDIT, wxT("Set &Frame Energy..."));
     menuMolecule->Append(MMP_CREATELLMPATH, wxT("Create &LLM Path..."));

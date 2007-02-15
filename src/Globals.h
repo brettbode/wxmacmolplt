@@ -21,7 +21,7 @@
 
 //This needs to get put into the build system...
 #define __wxBuild__
-#define wxMacMolPlt_VERSION "6.3"
+#define wxMacMolPlt_VERSION "6.3.1"
 
 //activate the following line to use the interactive editor
 //#define ENABLE_INTERACTIVE_MODE
