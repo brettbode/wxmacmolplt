@@ -5,7 +5,7 @@
 %define debug_package %{nil}
 %define __check_files %{nil}
 Name: wxmacmolplt
-Version: 6.3.0
+Version: 6.3.1
 Release: 1
 Summary: MacMolPlt molecular visualization package
 Group: undefined
