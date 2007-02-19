@@ -254,11 +254,18 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 		snprintf(line, kMaxLineLength, "%f", Atoms[i].Position.z);
 		atomEle->addAttribute(CML_convert(Z3Attr), line);
 	}
+	bool	NonCMLBonds = false;
 	//Add the bonds next
 	if (NumBonds > 0) {
 		XMLElement * bondArrayEle = molElement->addChildElement(CML_convert(BondArrayElement));
 		for (int j=0; j<NumBonds; j++) {
 				//<bond id="b1" atomRefs2="a1 a2" order="S"/>
+				//CML only specifies single, double, triple, and aromatic bonds
+				//Need to handle hydrogen bonds as an extension
+			if ((Bonds[j].Order == kHydrogenBond)||(Bonds[j].Order > kTripleBond)) {
+				NonCMLBonds = true;
+				continue;
+			}
 			XMLElement * bondEle = bondArrayEle->addChildElement(CML_convert(BondElement));
 			snprintf(line, kMaxLineLength, "b%d", j);
 			bondEle->addAttribute(CML_convert(IdAttr), line);
@@ -271,8 +278,25 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 					//These are non-standard XML extensions to CML
 		XMLElement * listElement = NULL;
 		if ((Orbs.size() > 0)||(Energy != 0.0)||(KE != 0.0)||(MP2Energy != 0.0)||
-			(time != 0.0)||(IRCPt != 0)||Gradient||Vibs||SurfaceList) {
+			(time != 0.0)||(IRCPt != 0)||Gradient||Vibs||SurfaceList||NonCMLBonds) {
 			listElement = molElement->addChildElement(CML_convert(ListElement));
+		}
+		if (NonCMLBonds) {
+			XMLElement * bondArrayEle = listElement->addChildElement(CML_convert(MMP_BondArrayElement));
+			for (int j=0; j<NumBonds; j++) {
+				//<bond id="b1" atomRefs2="a1 a2" order="S"/>
+				//CML only specifies single, double, triple, and aromatic bonds
+				//Need to handle hydrogen bonds as an extension
+				if ((Bonds[j].Order >= kSingleBond)&&(Bonds[j].Order <= kTripleBond)) {
+					continue;
+				}
+				XMLElement * bondEle = bondArrayEle->addChildElement(CML_convert(BondElement));
+				snprintf(line, kMaxLineLength, "b%d", j);
+				bondEle->addAttribute(CML_convert(IdAttr), line);
+				snprintf(line, kMaxLineLength, "a%d a%d", Bonds[j].Atom1, Bonds[j].Atom2);
+				bondEle->addAttribute(CML_convert(atomRefs2Attr), line);
+				bondEle->addAttribute(CML_convert(orderAttr), CML_convert(Bonds[j].Order));
+			}
 		}
 		//items: gradient, SpecialAtoms, KE, Energy, MP2Energy, IRCPt, time, Vibs,
 		//       MOVectors, SurfaceList
@@ -721,7 +745,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 									firstFrame = false;
 									lFrame->ReadCMLMolecule(child);
 									if (Prefs->GetAutoBond())	//setup bonds, if needed
-										lFrame->SetBonds(Prefs, false);
+										lFrame->SetBonds(Prefs, true);
 									break;
 								case MatrixElement:
 								{	//The only Matrix element we expect here is the rotation matrix
@@ -975,6 +999,9 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
 										}
 									}
 								}
+									break;
+								case MMP_BondArrayElement:
+									ParseBondArrayXML(listChild, idList);
 									break;
 								case MMP_Gradient:
 									if (!Gradient) Gradient = new GradientData();
@@ -2173,14 +2200,18 @@ const char * CML_convert(BondOrder t)
 {       
     switch(t)
     {   //CML only maps to the three basic bond types
+        case kHydrogenBond:
+            return "H";
         case kSingleBond:
             return "S";
         case kDoubleBond:
             return "D";
         case kTripleBond:
             return "T";
-		default:	//Other bond types can be specified as an empty string meaning unknown
-            return "";
+        case kMixedBonds:
+            return "M";
+		default:
+            return "invalid";
     }
 }
 #pragma mark MMP_NameSpace
@@ -2281,6 +2312,8 @@ const char * CML_convert(MMP_MolListNameSpace t)
     {   //Items for inside the List item in Molecule elements
 		case MMP_ScalarElement:
 			return "scalar";
+		case MMP_BondArrayElement:
+            return "bondArray";
 		case MMP_Gradient:
 			return "Gradient";
 		case MMP_NormalModes:
@@ -2990,6 +3023,10 @@ bool CML_convert(const char * s, BondOrder & b) {
 		case '\0':
 			b = kUnknownBond;
 			break;
+		case 'H':
+			b = kHydrogenBond;
+			break;
+		case 'M':
 		case 'A':	//Currently I don't know what to map "Aromatic" bond types to"
 			b = kMixedBonds;
 			break;

@@ -112,6 +112,7 @@ enum MMP_MetadataNamespace {
 enum MMP_MolListNameSpace {
 	invalid_MMPMolList=0,
 	MMP_ScalarElement,
+	MMP_BondArrayElement,
 	MMP_Gradient,
 	MMP_NormalModes,
 	MMP_OrbitalSet,
