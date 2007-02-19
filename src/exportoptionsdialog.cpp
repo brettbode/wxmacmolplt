@@ -169,6 +169,7 @@ void ExportOptionsDialog::CreateControls()
 
     itemBoxSizer2->Add(itemStdDialogButtonSizer14, 0, wxALIGN_RIGHT|wxRIGHT|wxTOP|wxBOTTOM, 5);
     wxButton* itemButton15 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
+    itemButton15->SetDefault();
     itemStdDialogButtonSizer14->AddButton(itemButton15);
 
     wxButton* itemButton16 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
