@@ -322,7 +322,7 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
     glReadBuffer(GL_BACK);
 
 	GLdouble zNear = 0.1;
-	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV());
+	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV()*(kPi)/180.0);
     GLdouble hGLsize, vGLsize, GLLeft, GLTop;
     double aspect = ((double)canvasWidth)/((double)canvasHeight);
     if (aspect > 1.0) {

@@ -744,7 +744,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 									}
 									firstFrame = false;
 									lFrame->ReadCMLMolecule(child);
-									if (Prefs->GetAutoBond())	//setup bonds, if needed
+									if (Prefs->GetAutoBond() && (result < 10))	//setup bonds, if needed
 										lFrame->SetBonds(Prefs, true);
 									break;
 								case MatrixElement:
@@ -867,7 +867,10 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 														}
 															break;
 														case MMP_Preferences:
-															if (readPrefs) Prefs->ReadMMPPrefs(mdchild);
+															if (readPrefs) {
+																Prefs->ReadMMPPrefs(mdchild);
+																result = 10;
+															}
 															break;
 														case MMP_WindowData:
 															//if (wData) wData->ReadXML(mdchild);
@@ -882,14 +885,14 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 									break;
 							}
 						}
-						result = 1;
+						if (result <= 0) result = 1;
 					}
 					break;
 					case MoleculeElement:
 						lFrame->ReadCMLMolecule(root);
-						if (Prefs->GetAutoBond())	//setup bonds, if needed
+						if (Prefs->GetAutoBond() && (result < 10))	//setup bonds, if needed
 							lFrame->SetBonds(Prefs, true);
-						result = 1;
+						if (result <= 0) result = 1;
 					break;
 					default:
 						MessageAlert("Unknown root element.");

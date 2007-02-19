@@ -1025,6 +1025,7 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 #ifdef __WXMAC__
 		if (Prefs->CreateCustomIcon()) CreateCustomFileIcon(filePath);
 #endif
+		currFilePath = filePath;
 		SetTitle(filePath);
         fclose(currFile);
     }
@@ -2259,6 +2260,7 @@ void MolDisplayWin::ResetModel(bool Center) {
     frameScrollBar->SetScrollbar(MainData->CurrentFrame-1, 1, MainData->NumFrames, 1);
     UpdateFrameText();
     glCanvas->draw();
+    Dirty = true;
     AdjustMenus();
 }
 void MolDisplayWin::ResetAllWindows(void) {
@@ -2417,14 +2419,16 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
             AbortOpen("Unknown error reading the selected file. File open aborted.");
     }
     if (Buffer) delete Buffer;      //Done reading so free up the buffer
-    if (test) {//Note test is left 0 if any exception occurs(which causes Window to be deleted)
+	fclose(myfile);					//Text files are not used after opening so close it immediately
+	FinishOperation();				//Close the progress dialog, if opened
+
+	if (test && !append) {//Note test is left 0 if any exception occurs(which causes Window to be deleted)
 #ifdef __WXMAC__
       if (gPreferences->ChangeFileType()) {
 		  // Looks like this is a good file so set the creator type for the neat icon
 		  FSRef mFSRef;
 		  const char * t = fileName.mb_str(wxConvUTF8);
 		  OSStatus s = FSPathMakeRef((const UInt8 *) t, &mFSRef, false);
-//		  OSStatus s = FSPathMakeRef((const UInt8 *)(fileName.ToAscii()), &mFSRef, false);
 		  if (s == noErr) {
 			  FSCatalogInfoBitmap fields = kFSCatInfoFinderInfo;
 			  FSCatalogInfo info;
@@ -2438,15 +2442,8 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 		  }
 	  }
 #endif
-        //Text files are not used after opening so close it immediately
-        fclose(myfile);
-//      Window->CloseFile();    //Hmmm should this happen for CML files?
-//      if (!Window->IsSavedFile()) Window->SetFileType(5);
-        FinishOperation();  //Close the progress dialog, if opened
-//      if (!Window->IsSavedFile() && gPreferences->Default3DOn()) Window->Activate3D();
-        //Tell the window its data has changed so that it will be redrawn correctly
-//      if (!Window->IsSavedFile()) 
-        ResetModel(true);
+        if ((type != CMLFile) || (test < 10)) ResetModel(true);
+		else AdjustMenus();
 
         // Set the path for saving changes
         if(type == CMLFile) {
@@ -2470,8 +2467,10 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
 //      test = MainData->OpenCMLFile(Buffer, Prefs, &winData, readPrefs);
     else
         test = MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, readPrefs);
+	if (readPrefs && test >= 10) {
 		//Update the view since a CMLfile reads in user preferences
-	glCanvas->UpdateGLView();
+		glCanvas->UpdateGLView();
+	}
 /*  if (test == 0) AbortOpen(0);
     else {
         SetFileType(2);
