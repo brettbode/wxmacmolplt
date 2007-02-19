@@ -1025,6 +1025,7 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 #ifdef __WXMAC__
 		if (Prefs->CreateCustomIcon()) CreateCustomFileIcon(filePath);
 #endif
+		SetTitle(filePath);
         fclose(currFile);
     }
 }
