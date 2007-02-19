@@ -981,7 +981,7 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
     wxString filePath;
 
     filePath = wxFileSelector(wxT("Save As"), wxT(""), wxT(""), wxT(""),
-                              wxT("CML Files (*.cml)"),
+                              wxT("CML Files (*.cml)|*.inp"),
                               wxSAVE | wxOVERWRITE_PROMPT, this);
 
     if(!filePath.IsEmpty()) {
