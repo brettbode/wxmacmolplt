@@ -2469,6 +2469,8 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
 //      test = MainData->OpenCMLFile(Buffer, Prefs, &winData, readPrefs);
     else
         test = MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, readPrefs);
+		//Update the view since a CMLfile reads in user preferences
+	glCanvas->UpdateGLView();
 /*  if (test == 0) AbortOpen(0);
     else {
         SetFileType(2);
