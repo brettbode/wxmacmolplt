@@ -1035,25 +1035,35 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom)
 
 void MpGLCanvas::measurePopupMenu(int x, int y) {
 
-   wxMenu menu;
+	wxMenu menu;
+	Frame *lFrame = mMainData->cFrame;
 
-   if (select_stack_top > 1) {
-      switch (select_stack_top) {
-         case 2:
-            menu.Append(GL_Popup_Measure_Length, wxT("Measure length"));
-            break;
-         case 3:
-            menu.Append(GL_Popup_Measure_Angle, wxT("Measure angle"));
-            break;
-         case 4:
-            menu.Append(GL_Popup_Measure_Dihedral,
-                        wxT("Measure dihedral angle"));
-            break;
-         default:
-            printf("ouch\n");
-      }
-      PopupMenu(&menu, x, y);
-   }
+	if (select_stack_top > 1) {
+		switch (select_stack_top) {
+			case 2:
+			{
+				float length;
+				if (lFrame->GetBondLength(select_stack[0], select_stack[1], &length)) {
+					wxString lengthString;
+					lengthString.Printf(wxT("distance: %f"), length);
+					wxMenuItem * item = menu.Append(wxID_ANY, lengthString);
+					item->Enable(false);
+				}
+				menu.Append(GL_Popup_Measure_Length, wxT("Display length"));
+			}
+				break;
+			case 3:
+				menu.Append(GL_Popup_Measure_Angle, wxT("Measure angle"));
+				break;
+			case 4:
+				menu.Append(GL_Popup_Measure_Dihedral,
+							wxT("Measure dihedral angle"));
+				break;
+			default:
+				printf("ouch\n");
+		}
+		PopupMenu(&menu, x, y);
+	}
 
 }
 
