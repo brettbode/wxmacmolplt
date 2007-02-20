@@ -271,6 +271,8 @@ class MolDisplayWin : public wxFrame {
 	void DrawStaticLabel(const char* label, GLfloat x, GLfloat y);
 	void DrawLabel(void); //added by Song Li
 	void SelectionChanged(bool mode);
+		void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, float m[16],
+								const CPoint3D& x_world, float bond_size) const;
 
         void eventSize(wxSizeEvent &event);
         void SizeChanged(void);

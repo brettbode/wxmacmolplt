@@ -72,7 +72,6 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order);
 void DrawInversionPoint(void);
 void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2);
-void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, float m[16], const CPoint3D& x_world, float bond_size);
 
 const GLubyte stippleMask[128] =
 
@@ -1183,7 +1182,16 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
    glTexImage1D(GL_TEXTURE_1D, 0, GL_ALPHA, 8, 0, GL_ALPHA,
                 GL_UNSIGNED_BYTE, texture);
 
-   if (lFrame->NumAnnoLengths) {
+	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
+	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
+
+	//choose black or white based on the background color
+	if (backMagnitude > 70000)  //"light" background choose black
+	   glColor3f (0.0, 0.0, 0.0);
+	else
+		glColor3f (1.0, 1.0, 1.0);
+
+	if (lFrame->NumAnnoLengths) {
       CPoint3D lookat_eye;
       CPoint3D up_eye;
       CPoint3D lookat_world;
@@ -2734,9 +2742,9 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 	glPopMatrix();
 }
 
-void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, 
+void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, 
                         float width, float m[16], const CPoint3D& x_world,
-                        float offset) {
+                        float offset) const {
 
    float len;
    // CPoint3D vec; 
@@ -2809,7 +2817,6 @@ void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2,
    glEnable(GL_ALPHA_TEST);
    glAlphaFunc(GL_GREATER, 0.5f);
    glEnable(GL_TEXTURE_1D);
-   glColor3f(0.0f, 0.0f, 0.0f);
    glBegin(GL_QUADS);
       glTexCoord1f(0.0f);
       glVertex3f(new_pt1a.x, new_pt1a.y, new_pt1a.z);
@@ -2830,11 +2837,11 @@ void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2,
    glTranslatef(5 * width * x_world.x,
                 5 * width * x_world.y,
                 5 * width * x_world.z);
-   glMultMatrixf(m);
-   glScalef(-0.05f, 0.05f, 0.05f);
-   sprintf(len_label, "%.6f", len);
-   glfDrawSolidString(len_label);
-   glPopMatrix();
+	glMultMatrixf(m);
+	glScalef(-0.1f, 0.1f, 0.1f);
+	sprintf(len_label, " %.6f", len);
+	glfDrawSolidString(len_label);
+	glPopMatrix();
 
 }
 

@@ -978,7 +978,9 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
     lFrame->resetAllSelectState();
     MolWin->SetHighliteMode(false);
   }
-
+//  std::cerr << "selectid = " << select_id << " top = " << select_stack_top << std::endl;
+//  std::cerr << "select stack " << select_stack[0] << "  " << select_stack[1] << "  " << 
+//	  select_stack[2] << "  " << select_stack[3] << std::endl;
   glMatrixMode(GL_MODELVIEW);
 
 }
@@ -1037,6 +1039,13 @@ void MpGLCanvas::measurePopupMenu(int x, int y) {
 
 	wxMenu menu;
 	Frame *lFrame = mMainData->cFrame;
+	if ((selected > 0) && (selected < lFrame->GetNumAtoms())) {
+		wxString aLabel, nItem;
+		Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType()-1, nItem);
+		aLabel.Printf(wxT(" (%d)"), (selected+1));
+		nItem.Append(aLabel);
+		wxMenuItem * item = menu.Append(wxID_ANY, nItem);
+	}
 
 	if (select_stack_top > 1) {
 		switch (select_stack_top) {
@@ -1044,12 +1053,31 @@ void MpGLCanvas::measurePopupMenu(int x, int y) {
 			{
 				float length;
 				if (lFrame->GetBondLength(select_stack[0], select_stack[1], &length)) {
-					wxString lengthString;
-					lengthString.Printf(wxT("distance: %f"), length);
+					wxString lengthString, name;
+					Prefs->GetAtomLabel(lFrame->Atoms[select_stack[0]].GetType()-1, lengthString);
+					name.Printf(wxT(" (%d) to "), (select_stack[0]+1));
+					lengthString.Append(name);
+					Prefs->GetAtomLabel(lFrame->Atoms[select_stack[1]].GetType()-1, name);
+					lengthString.Append(name);
+					name.Printf(wxT(" (%d)"), (select_stack[1]+1));
+					lengthString.Append(name);
 					wxMenuItem * item = menu.Append(wxID_ANY, lengthString);
+					item->Enable(false);
+					
+					lengthString.Printf(wxT("distance: %f"), length);
+					item = menu.Append(wxID_ANY, lengthString);
 					item->Enable(false);
 				}
 				menu.Append(GL_Popup_Measure_Length, wxT("Display length"));
+				if (lFrame->BondExists(select_stack[0], select_stack[1]) < 0) {
+					menu.AppendSeparator();
+					wxMenu * submenu = new wxMenu();
+					submenu->Append(GL_Popup_To_Hydrogen_Bond, wxT("Hydrogen"));
+					submenu->Append(GL_Popup_To_Single_Bond, wxT("Single"));
+					submenu->Append(GL_Popup_To_Double_Bond, wxT("Double"));
+					submenu->Append(GL_Popup_To_Triple_Bond, wxT("Triple"));
+					menu.Append(wxID_ANY, wxT("Add bond"), submenu);
+				}
 			}
 				break;
 			case 3:
@@ -1086,93 +1114,77 @@ void MpGLCanvas::DeleteLengthAnnotation(wxCommandEvent& event) {
 
 void MpGLCanvas::bondPopupMenu(int x, int y) {
 
-  // This function shows a popup menu that shows some information and
-  // operations for the clicked-on bond.  It's assumed that selected is
-  // a valid index in the bonds lists, plus NumAtoms.
+	// This function shows a popup menu that shows some information and
+	// operations for the clicked-on bond.  It's assumed that selected is
+	// a valid index in the bonds lists, plus NumAtoms.
 
-  wxMenu menu;
-  wxMenuItem *item;
-  wxMenu *submenu;
-  Frame *lFrame = mMainData->cFrame;
-  long NumAtoms = lFrame->NumAtoms;
-  int bond_order;
-  submenu = new wxMenu();
-  wxString length_label;
+	wxMenu menu;
+	wxMenuItem *item;
+	wxMenu *submenu;
+	Frame *lFrame = mMainData->cFrame;
+	long NumAtoms = lFrame->NumAtoms;
+	int bond_order;
+	submenu = new wxMenu();
+	wxString length_label;
 
-  length_label.Printf(wxT("Bond length: %f"),
-                      lFrame->GetBondLength(selected - NumAtoms));
-  item = menu.Append(wxID_ANY, length_label);
-  item->Enable(false);
-  bond_order = lFrame->Bonds[selected - NumAtoms].Order;
-  item = submenu->AppendRadioItem(GL_Popup_To_Hydrogen_Bond,
-                                  wxT("Hydrogen"));
-  if (bond_order == kHydrogenBond) {
-     item->Check(true);
-  }
-  item = submenu->AppendRadioItem(GL_Popup_To_Single_Bond, wxT("Single"));
-  if (bond_order == kSingleBond) {
-     item->Check(true);
-  }
-  item = submenu->AppendRadioItem(GL_Popup_To_Double_Bond, wxT("Double"));
-  if (bond_order == kDoubleBond) {
-     item->Check(true);
-  }
-  item = submenu->AppendRadioItem(GL_Popup_To_Triple_Bond, wxT("Triple"));
-  if (bond_order == kTripleBond) {
-     item->Check(true);
-  }
-  menu.Append(wxID_ANY, wxT("Bond Order"), submenu);
+	length_label.Printf(wxT("Bond length: %f"),
+					  lFrame->GetBondLength(selected - NumAtoms));
+	item = menu.Append(wxID_ANY, length_label);
+	item->Enable(false);
+	bond_order = lFrame->Bonds[selected - NumAtoms].Order;
+	item = submenu->AppendRadioItem(GL_Popup_To_Hydrogen_Bond,
+								  wxT("Hydrogen"));
+	if (bond_order == kHydrogenBond) {
+		item->Check(true);
+	}
+	item = submenu->AppendRadioItem(GL_Popup_To_Single_Bond, wxT("Single"));
+	if (bond_order == kSingleBond) {
+		item->Check(true);
+	}
+	item = submenu->AppendRadioItem(GL_Popup_To_Double_Bond, wxT("Double"));
+	if (bond_order == kDoubleBond) {
+		item->Check(true);
+	}
+	item = submenu->AppendRadioItem(GL_Popup_To_Triple_Bond, wxT("Triple"));
+	if (bond_order == kTripleBond) {
+		item->Check(true);
+	}
+	menu.Append(wxID_ANY, wxT("Bond Order"), submenu);
+	
+	menu.AppendSeparator();
+	menu.Append(GL_Popup_Delete_Bond, wxT("Delete Bond"));
 
-  PopupMenu(&menu, x, y);
+	PopupMenu(&menu, x, y);
 
 }
 
-void MpGLCanvas::ToSingleBond(wxCommandEvent& event) {
-
-   // This function converts the selected bond to single order.  It is 
-   // assumed that selected contains the index of the bond plus the number
-   // of atoms in the frame.
-
-   Frame *lFrame = mMainData->cFrame;
-
-   lFrame->Bonds[selected - lFrame->NumAtoms].Order = kSingleBond;
-   MolWin->BondsChanged();
+void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
+	
+	// This is a multiple use function. Its action will depend on the menu id
+	// that generates the call. It will set the bond type of the selected bond
+	// to the desired order, creating a new bond if one didn't exist.
+	
+	Frame *lFrame = mMainData->cFrame;
+	BondOrder order = (BondOrder) ((event.GetId() - GL_Popup_To_Hydrogen_Bond) + kHydrogenBond);
+	
+	if (selected >= lFrame->GetNumAtoms()) {	//existing bond, change order
+		lFrame->Bonds[selected - lFrame->GetNumAtoms()].Order = order;
+		MolWin->BondsChanged();
+	} else if (select_stack_top == 2) { //new bond
+		lFrame->AddBond(select_stack[0], select_stack[1], order);
+		MolWin->BondsChanged();
+	}
 }
-
-void MpGLCanvas::ToDoubleBond(wxCommandEvent& event) {
-
-   // This function converts the selected bond to double order.  It is 
-   // assumed that selected contains the index of the bond plus the number
-   // of atoms in the frame.
-
-   Frame *lFrame = mMainData->cFrame;
-
-   lFrame->Bonds[selected - lFrame->NumAtoms].Order = kDoubleBond;
-   MolWin->BondsChanged();
-}
-
-void MpGLCanvas::ToTripleBond(wxCommandEvent& event) {
-
-   // This function converts the selected bond to triple order.  It is 
-   // assumed that selected contains the index of the bond plus the number
-   // of atoms in the frame.
-   
-   Frame *lFrame = mMainData->cFrame;
-
-   lFrame->Bonds[selected - lFrame->NumAtoms].Order = kTripleBond;
-   MolWin->BondsChanged();
-}
-
-void MpGLCanvas::ToHydrogenBond(wxCommandEvent& event) {
-
-   // This function converts the selected bond to hydrogen order.  It is 
-   // assumed that selected contains the index of the bond plus the number
-   // of atoms in the frame.
-   
-   Frame *lFrame = mMainData->cFrame;
-
-   lFrame->Bonds[selected - lFrame->NumAtoms].Order = kHydrogenBond;
-   MolWin->BondsChanged();
+void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
+	
+	// Delete the selected bond
+	
+	Frame *lFrame = mMainData->cFrame;
+	
+	if (selected >= lFrame->GetNumAtoms()) {
+		lFrame->DeleteBond(selected - lFrame->GetNumAtoms());
+		MolWin->BondsChanged();
+	}
 }
 
 void MpGLCanvas::AddLengthAnnotation(wxCommandEvent& event) {
@@ -1313,22 +1325,23 @@ void MpGLCanvas::ClosePeriodicDlg(void) {
 }
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
-   EVT_SIZE             (MpGLCanvas::eventSize)
-   EVT_PAINT            (MpGLCanvas::eventPaint)
-   EVT_ERASE_BACKGROUND (MpGLCanvas::eventErase)
-   EVT_MOUSE_EVENTS     (MpGLCanvas::eventMouse)
+	EVT_SIZE             (MpGLCanvas::eventSize)
+	EVT_PAINT            (MpGLCanvas::eventPaint)
+	EVT_ERASE_BACKGROUND (MpGLCanvas::eventErase)
+	EVT_MOUSE_EVENTS     (MpGLCanvas::eventMouse)
 
-   EVT_CHAR(MpGLCanvas::KeyHandler)
+	EVT_CHAR(MpGLCanvas::KeyHandler)
 
-   EVT_MENU(GL_Popup_Menu_Apply_All, MpGLCanvas::On_Apply_All)
-   EVT_MENU(GL_Popup_Delete_Item_Current_Frame, MpGLCanvas::On_Delete_Single_Frame)
-   EVT_MENU(GL_Popup_Delete_Item_All_Frames, MpGLCanvas::On_Delete_All_Frames)
-   EVT_MENU(GL_Popup_To_Single_Bond, MpGLCanvas::ToSingleBond)
-   EVT_MENU(GL_Popup_To_Double_Bond, MpGLCanvas::ToDoubleBond)
-   EVT_MENU(GL_Popup_To_Triple_Bond, MpGLCanvas::ToTripleBond)
-   EVT_MENU(GL_Popup_To_Hydrogen_Bond, MpGLCanvas::ToHydrogenBond)
-   EVT_MENU(GL_Popup_Measure_Length, MpGLCanvas::AddLengthAnnotation)
-   EVT_MENU(GL_Popup_Delete_AnnoLength, MpGLCanvas::DeleteLengthAnnotation)
+	EVT_MENU(GL_Popup_Menu_Apply_All, MpGLCanvas::On_Apply_All)
+	EVT_MENU(GL_Popup_Delete_Item_Current_Frame, MpGLCanvas::On_Delete_Single_Frame)
+	EVT_MENU(GL_Popup_Delete_Item_All_Frames, MpGLCanvas::On_Delete_All_Frames)
+	EVT_MENU(GL_Popup_To_Single_Bond, MpGLCanvas::ChangeBonding)
+	EVT_MENU(GL_Popup_To_Double_Bond, MpGLCanvas::ChangeBonding)
+	EVT_MENU(GL_Popup_To_Triple_Bond, MpGLCanvas::ChangeBonding)
+	EVT_MENU(GL_Popup_To_Hydrogen_Bond, MpGLCanvas::ChangeBonding)
+	EVT_MENU(GL_Popup_Delete_Bond, MpGLCanvas::DeleteBond)
+	EVT_MENU(GL_Popup_Measure_Length, MpGLCanvas::AddLengthAnnotation)
+	EVT_MENU(GL_Popup_Delete_AnnoLength, MpGLCanvas::DeleteLengthAnnotation)
 END_EVENT_TABLE()
 
 
