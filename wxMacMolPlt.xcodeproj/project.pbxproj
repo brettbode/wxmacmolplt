@@ -185,6 +185,9 @@
 		8BE9976C0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE997680B70485700F48AA3 /* periodic_table_dlg.cpp */; };
 		8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
 		8BEDFA000A09390700BF6F85 /* setbondlength.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */; };
+		8BEE8B630B8BA40F00E9A7BB /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */; };
+		8BEE8B640B8BA40F00E9A7BB /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */; };
+		8BEE8B650B8BA40F00E9A7BB /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */; };
 		8BF17D780A5328210059B71F /* windowparameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17D760A5328210059B71F /* windowparameters.cpp */; };
 		8BF17DA40A55D0910059B71F /* zmatrixcalculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */; };
 /* End PBXBuildFile section */
@@ -319,6 +322,7 @@
 		8BED377A09EDCC0E0003DF64 /* setscreenplane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setscreenplane.h; path = src/setscreenplane.h; sourceTree = "<group>"; };
 		8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setbondlength.cpp; path = src/setbondlength.cpp; sourceTree = "<group>"; };
 		8BEDF9FF0A09390700BF6F85 /* setbondlength.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setbondlength.h; path = src/setbondlength.h; sourceTree = "<group>"; };
+		8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		8BF17D760A5328210059B71F /* windowparameters.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = windowparameters.cpp; path = src/windowparameters.cpp; sourceTree = "<group>"; };
 		8BF17D770A5328210059B71F /* windowparameters.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = windowparameters.h; path = src/windowparameters.h; sourceTree = "<group>"; };
 		8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = zmatrixcalculator.cpp; path = src/zmatrixcalculator.cpp; sourceTree = "<group>"; };
@@ -330,6 +334,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8BEE8B630B8BA40F00E9A7BB /* QuickTime.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,6 +342,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8BEE8B650B8BA40F00E9A7BB /* QuickTime.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -344,6 +350,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8BEE8B640B8BA40F00E9A7BB /* QuickTime.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,6 +496,7 @@
 		1652DAC709D0B41400B7783F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */,
 				8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */,
 				8B45D25D0A700DB60005269A /* arial1.glf */,
 				1652DAC809D0B43700B7783F /* bindoc.icns */,
@@ -829,6 +837,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OBJROOT = "$(SYMROOT)";
@@ -873,6 +882,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
+				SDKROOT = "$(inherited)";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};

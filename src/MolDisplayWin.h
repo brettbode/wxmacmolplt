@@ -230,7 +230,11 @@ class MolDisplayWin : public wxFrame {
 		void WriteFrequencies(BufferFile * Buffer);
 		void WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllModes, bool AnimateMode);
 		void WriteMDLMolFile(BufferFile * Buffer);
-         //Call to dump the message and close the window
+#ifdef __WXMAC__
+		//quicktime movie export
+		void WriteMovie(wxString & filepath);
+#endif
+		//Call to dump the message and close the window
         void AbortOpen(const char * msg);
         
         //General Utility routines
