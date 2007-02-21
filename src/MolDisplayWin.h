@@ -31,6 +31,7 @@ typedef class InputBuilderWindow InputBuilderWindow;
 typedef class ModeAnimation ModeAnimation;
 typedef class ZMatrixCalculator ZMatrixCalculator;
 typedef class setPreference setPreference;
+typedef struct qtData;
 /**
  * Subclasses wxFrame to define the main application window.  This is a
  * document window.  There can be multiple instances of the window in the
@@ -233,6 +234,8 @@ class MolDisplayWin : public wxFrame {
 #ifdef __WXMAC__
 		//quicktime movie export
 		void WriteMovie(wxString & filepath);
+		void CreateFrameMovie(GWorldPtr lgWorld, Handle CompressedData,
+							  const qtData & myqtData, bool IncludeEPlot);
 #endif
 		//Call to dump the message and close the window
         void AbortOpen(const char * msg);

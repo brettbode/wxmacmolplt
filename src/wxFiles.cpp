@@ -84,6 +84,13 @@ BufferFile * OpenDatFile(void) {
 #include <wx/mac/carbon/private.h>
 #include <Movies.h>
 
+typedef struct qtData {
+	Media theMedia;
+	ImageDescriptionHandle imageDesc;
+	ImageSequence seqID;
+	Rect DisplayRect;
+};
+
 void MolDisplayWin::WriteMovie(wxString & filepath) {
 	//Create a QuickTime movie using the standard animation codecs with normal quality, and 
 	//temporal compression. The final file is flattened for cross platform compatability
@@ -115,6 +122,7 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 		MessageAlert("Error initializing QuickTime!");
 		return;
 	}
+	bool IncludeEPlot = false;
 		//Create the movie file and initialize file data
 		//Use Quicktime creator code 'TVOD' instead of simpletext 'ttxt'
 	short	resRefNum = 0;
@@ -124,6 +132,15 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 	if (myErr != noErr) {
 		MessageAlert("Error creating movie file!");
 	} else {
+		int width, height;
+		glCanvas->GetClientSize(&width, &height);
+		Rect lDisplayRect={0,0,0,0};
+		lDisplayRect.right = width;
+		lDisplayRect.bottom = height;
+		WindowRef * TempWindow;
+		s = CreateNewWindow(kDocumentWindowClass, kWindowNoAttributes, &lDisplayRect, TempWindow);
+		if (s != noErr) {
+		}
 //			WindowPtr	ScreenWindow = thisWindow;
 //			WindowPtr	TempWindow = GetNewCWindow(windowID, NULL, (WindowPtr) -1);
 //			if (!TempWindow) throw MemoryError();
@@ -152,8 +169,8 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 //			dv = lDisplayRect.bottom - lDisplayRect.top;
 //			::SizeWindow(TempWindow, dh, dv, true);	//Now correct size (but still hidden)
 													//Create the video track
-			Track theTrack = NewMovieTrack (theMovie, FixRatio(lDisplayRect.right,1),
-											FixRatio(lDisplayRect.bottom,1), kNoVolume);
+			Track theTrack = NewMovieTrack (theMovie, FixRatio(width,1),
+											FixRatio(height,1), kNoVolume);
 			if ((noErr == GetMoviesError())&&theTrack) {
 				Media theMedia = NewTrackMedia (theTrack, VideoMediaType,
 												60, // Video Time Scale
@@ -163,13 +180,18 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 					if (myErr == noErr) {
 						//create the actual movie frames
 						GWorldPtr	lgWorld=NULL;
-						if (! CheckOffscreenForWindow (&lgWorld, 0, TempWindow)) {
+						Rect		gRect = lDisplayRect;
+						LocalToGlobal ((Point *) &(gRect.top));
+						LocalToGlobal ((Point *) &(gRect.bottom));
+						
+						if (! NewGWorld (&lgWorld, 0, &gRect, (CTabHandle) NULL, (GDHandle) NULL,
+										 (GWorldFlags) (pixPurge + useTempMem))) {
 							long MaxCompressedSize;
 							ImageSequence seqID;
 							ImageDescriptionHandle imageDesc = (ImageDescriptionHandle)NewHandle(4);
 							PixMapHandle myPixMap = GetPortPixMap(lgWorld);
 							LockPixels (myPixMap);
-							myErr = CompressSequenceBegin(&seqID, myPixMap, NULL, &lDisplayRect, &DisplayRect, 0,
+							myErr = CompressSequenceBegin(&seqID, myPixMap, NULL, &lDisplayRect, &lDisplayRect, 0,
 														  'rle ', bestCompressionCodec, codecNormalQuality, codecNormalQuality, 2, NULL,
 														  codecFlagUpdatePreviousComp, imageDesc);
 							//						myErr = CompressSequenceBegin(&seqID, myPixMap, NULL, &lDisplayRect, &DisplayRect, 0,
@@ -181,16 +203,16 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 							if (!Buffer)
 								Buffer = NewHandle(MaxCompressedSize);
 							if (Buffer) {
-								qtData myqtData = {theMedia, imageDesc, seqID};
-								if (type == kQTFrameAnim) {
+								qtData myqtData = {theMedia, imageDesc, seqID, lDisplayRect};
+	//							if (type == kQTFrameAnim) {
 									CreateFrameMovie(lgWorld, Buffer, myqtData, IncludeEPlot);
-								} else {
-									CreateModeMovie(lgWorld, Buffer, myqtData);
-								}
+	//							} else {
+	//								CreateModeMovie(lgWorld, Buffer, myqtData);
+	//							}
 								DisposeHandle(Buffer);
 							}
 							myErr = CDSequenceEnd(seqID);
-							FreeOffscreen (&lgWorld);
+							if (lgWorld != NULL) DisposeGWorld (lgWorld);
 							if (imageDesc) DisposeHandle((Handle) imageDesc);
 						}
 						
@@ -228,5 +250,87 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 	ExitMovies();	//Close out quicktime as we are done with it for now
 	FinishOperation();
 }
+void MolDisplayWin::CreateFrameMovie(GWorldPtr lgWorld, Handle CompressedData,
+									 const qtData & myqtData, bool IncludeEPlot) {
+	OSErr	myErr;
+	long AnimateTime = Prefs->GetAnimateTime();
+	if (AnimateTime <= 0) AnimateTime = 1;
+	long SavedFrameNum = MainData->GetCurrentFrame();
+	Rect	lDisplayRect = myqtData.DisplayRect;
+	Rect	EPlotRect;
+	EPlotRect = myqtData.DisplayRect;;
+	EPlotRect.left = EPlotRect.right;
+	EPlotRect.right = EPlotRect.left + (EPlotRect.bottom - EPlotRect.top);
+	if (IncludeEPlot) lDisplayRect.right += (EPlotRect.bottom - EPlotRect.top);
+	ProgressInd->SetScaleFactor(100.0/((float) MainData->NumFrames));
+	for (long i=1; i<=MainData->NumFrames; i++) {
+		ProgressInd->UpdateProgress(i);
+		MainData->SetCurrentFrame(i);
+		//Check for and update any surfaces depending on the screen plane
+		Surface * temp = MainData->cFrame->SurfaceList;
+		while (temp) {
+			temp->RotateEvent(MainData);
+			temp = temp->GetNextSurface();
+		}
+		MainData->ResetRotation();
+		UpdateGLModel();
+		DrawGL();
+
+		//	create a pict of the current molecule display
+		wxImage mImage = glCanvas->getImage(0,0);
+		wxBitmap * mBitmap = new wxBitmap(mImage);
+		//The following utilizes a Mac specific internal pair of calls
+		//to get a PicHandle from a wxBitmap.
+		wxBitmapRefData * mBitmapData = mBitmap->GetBitmapData();
+		PicHandle tempPict = mBitmapData->GetPictHandle();
+
+		CGrafPtr	lSavedPort;
+		GDHandle	lSavedGDH;
+		long		dataSize;
+		unsigned char similarity;
+		
+		if (tempPict) {	//Got a PICT, now draw it into the printer port
+			HLock(CompressedData);
+			Ptr compressedDataPtr = *CompressedData;
+			GetGWorld (&lSavedPort, &lSavedGDH);
+			SetGWorld (lgWorld, NULL);
+			
+			EraseRect(&lDisplayRect);
+			DrawPicture(tempPict, &(lDisplayRect));
+			
+			delete mBitmap;
+			
+	//		if (IncludeEPlot) {
+	//			tempPict = EPlotWin->CreatePICT(72);
+	//			if (tempPict) {
+	//				SetGWorld (lgWorld, NULL);
+					
+	//				EraseRect(&EPlotRect);
+	//				DrawPicture(tempPict, &(EPlotRect));
+	//				KillPicture(tempPict);
+	//				delete mBitmap;
+	//			}
+	//		}
+			
+			SetGWorld (lSavedPort, lSavedGDH);
+			
+			PixMapHandle myPixMap = GetPortPixMap(lgWorld);
+			myErr = CompressSequenceFrame(myqtData.seqID, myPixMap, &lDisplayRect,
+										  codecFlagUpdatePreviousComp, compressedDataPtr, &dataSize, &similarity, NULL);
+			
+			TimeValue test;//I don't use this value, but Carbon requires it
+				myErr = AddMediaSample(myqtData.theMedia, CompressedData, 0,    /* no offset in data */
+					dataSize, AnimateTime,
+					(SampleDescriptionHandle)myqtData.imageDesc, 1,    /* one sample */
+					0,    /* self-contained samples */
+					&test);
+		}
+	}
+	MainData->SetCurrentFrame(SavedFrameNum);
+	MainData->ResetRotation();
+	UpdateGLModel();
+	DrawGL();
+}
+
 #endif
 #endif
