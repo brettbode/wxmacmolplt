@@ -1,7 +1,11 @@
 #ifndef __AtomPatterns__
 #define __AtomPatterns__
 
-#include "GL/glu.h"
+#ifdef __WXMAC__
+#include <AGL/glu.h>
+#else
+#include <GL/glu.h>
+#endif
 
 const int numPatterns = 9;
 
