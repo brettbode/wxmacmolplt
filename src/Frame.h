@@ -177,7 +177,8 @@ class Frame {
 		float GetMaxGradient(void) const;
 		void SetRMSGradient(float val);
 		void SetMaximumGradient(float val);
-		inline VibRec * GetFrequencies(void) {return Vibs;};
+		inline VibRec * GetFrequencies(void) const {return Vibs;};
+		inline long GetNumberNormalModes(void) const {return ((Vibs!=NULL)?Vibs->GetNumModes():0);}
 		void ParseNormalModes(BufferFile * Buffer, Progress *, WinPrefs *);
 		void ParseMolDenFrequencies(BufferFile * Buffer, WinPrefs *);
 		void DeleteOrbitals(void);

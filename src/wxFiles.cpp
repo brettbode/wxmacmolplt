@@ -97,16 +97,16 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 //	void MolDisplayWin::WriteMovie(FSSpec * targetFile, short type, bool IncludeEPlot) {
 
 	FSRef mFSRef;
+	OSStatus s;
 	OSErr myErr = myErr;
 	FSSpec targetSpec;
+	//ugh I need to get an FSSpec to hand to quicktime, but these calls only seem to work if
+	//the file already exists...
 	const char * t = filepath.mb_str(wxConvUTF8);
-	OSStatus s = FSPathMakeRef((const UInt8 *) t, &mFSRef, false);
-	FSCatalogInfoBitmap fields = kFSCatInfoFinderInfo;
-	FSCatalogInfo info;
-	if (s == noErr) {
-		myErr = FSGetCatalogInfo(&mFSRef, fields, &info, NULL, &targetSpec, NULL);
-	}
-	if (myErr != noErr) return;
+	FILE * temp = fopen(t, "wb");
+	fclose(temp);
+
+	wxMacFilename2FSSpec(filepath, &targetSpec);
 	
 	Movie	theMovie = NULL;
 		
@@ -119,6 +119,7 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 		
 	myErr = EnterMovies();	//initialize the quicktime manager
 	if (myErr != noErr) {
+		FinishOperation();
 		MessageAlert("Error initializing QuickTime!");
 		return;
 	}
@@ -137,10 +138,12 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 		Rect lDisplayRect={0,0,0,0};
 		lDisplayRect.right = width;
 		lDisplayRect.bottom = height;
-		WindowRef * TempWindow;
-		s = CreateNewWindow(kDocumentWindowClass, kWindowNoAttributes, &lDisplayRect, TempWindow);
-		if (s != noErr) {
-		}
+		Rect		gRect = lDisplayRect;
+		LocalToGlobal ((Point *) &(gRect.top));
+		LocalToGlobal ((Point *) &(gRect.bottom));
+		WindowRef TempWindow;
+		s = CreateNewWindow(kDocumentWindowClass, kWindowNoAttributes, &gRect, &TempWindow);
+		if (s == noErr) {
 //			WindowPtr	ScreenWindow = thisWindow;
 //			WindowPtr	TempWindow = GetNewCWindow(windowID, NULL, (WindowPtr) -1);
 //			if (!TempWindow) throw MemoryError();
@@ -180,9 +183,6 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 					if (myErr == noErr) {
 						//create the actual movie frames
 						GWorldPtr	lgWorld=NULL;
-						Rect		gRect = lDisplayRect;
-						LocalToGlobal ((Point *) &(gRect.top));
-						LocalToGlobal ((Point *) &(gRect.bottom));
 						
 						if (! NewGWorld (&lgWorld, 0, &gRect, (CTabHandle) NULL, (GDHandle) NULL,
 										 (GWorldFlags) (pixPurge + useTempMem))) {
@@ -225,18 +225,18 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 				}
 				myErr = AddMovieResource (theMovie, resRefNum, &resId, NULL);
 			}
-		if (resRefNum) {
-			//		short resID=0;
+			if (resRefNum) {
 						//Create the actual file as a flat data fork so it can be placed on the www
-			ProgressInd->ChangeText("Flattening movieÉ");
-			FlattenMovie(theMovie, flattenAddMovieToDataFork, &targetSpec, 'TVOD', smCurrentScript, 
-						 createMovieFileDeleteCurFile, &resId, NULL);
-			CloseMovieFile (resRefNum);
+				ProgressInd->ChangeText("Flattening movieÉ");
+				FlattenMovie(theMovie, flattenAddMovieToDataFork, &targetSpec, 'TVOD', smCurrentScript, 
+							 createMovieFileDeleteCurFile, &resId, NULL);
+				CloseMovieFile (resRefNum);
+			}
+			DisposeWindow(TempWindow);
 		}
 		DisposeMovie (theMovie);
 		DeleteMovieFile (&tempSpec);	//delete the temp file after disposing of the movie
-//		thisWindow = ScreenWindow;
-//		DisposeWindow(TempWindow);
+
 //		if (EPlotWin) {
 //			if (KillEPlot) delete EPlotWin;
 //			else {
@@ -244,7 +244,6 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 //				EPlotWin->Reset(1);
 //				EPlotWin->ShowWindow();
 //			}
-//			::SelectWindow(thisWindow);
 //		}
 	}
 	ExitMovies();	//Close out quicktime as we are done with it for now
@@ -263,6 +262,7 @@ void MolDisplayWin::CreateFrameMovie(GWorldPtr lgWorld, Handle CompressedData,
 	EPlotRect.right = EPlotRect.left + (EPlotRect.bottom - EPlotRect.top);
 	if (IncludeEPlot) lDisplayRect.right += (EPlotRect.bottom - EPlotRect.top);
 	ProgressInd->SetScaleFactor(100.0/((float) MainData->NumFrames));
+
 	for (long i=1; i<=MainData->NumFrames; i++) {
 		ProgressInd->UpdateProgress(i);
 		MainData->SetCurrentFrame(i);
@@ -289,7 +289,7 @@ void MolDisplayWin::CreateFrameMovie(GWorldPtr lgWorld, Handle CompressedData,
 		long		dataSize;
 		unsigned char similarity;
 		
-		if (tempPict) {	//Got a PICT, now draw it into the printer port
+		if (tempPict) {	//Got a PICT, draw it into the GWorld
 			HLock(CompressedData);
 			Ptr compressedDataPtr = *CompressedData;
 			GetGWorld (&lSavedPort, &lSavedGDH);

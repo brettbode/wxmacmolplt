@@ -754,15 +754,13 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 							 "|XMOL (*.xyz)|*.xyz"
 							 "|Tab delimited Energies (*.txt)|*.txt"));
 	bool vibs = false;
-	if (MainData->cFrame->Vibs) {
-		if (MainData->cFrame->Vibs->GetNumModes() > 0) {
-			vibs = true;
-			wildcards.Append(wxT("|Frequencies (*.txt)|*.txt"));
-		}
+	if (MainData->cFrame->GetNumberNormalModes() > 0) {
+		vibs = true;
+		wildcards.Append(wxT("|Frequencies (*.txt)|*.txt"));
 	}
 #ifdef __WXMAC__
 #ifdef __MAC_USE_QUICKTIME__
-	if (MainData->GetNumFrames() > 1) {
+	if ((MainData->GetNumFrames() > 1)||vibs) {
 		wildcards.Append(wxT("|QuickTime Movie (*.mov)|*.mov"));
 	}
 #endif
