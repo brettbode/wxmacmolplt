@@ -96,12 +96,14 @@ bool CoordinateOffset::Create( MolDisplayWin* parent, wxWindowID id, const wxStr
 	Parent = parent;
 
 ////@begin CoordinateOffset creation
-    SetExtraStyle(GetExtraStyle()|wxWS_EX_BLOCK_EVENTS);
+    SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
     wxDialog::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
-    GetSizer()->Fit(this);
-    GetSizer()->SetSizeHints(this);
+    if (GetSizer())
+    {
+        GetSizer()->SetSizeHints(this);
+    }
     Centre();
 ////@end CoordinateOffset creation
 	MoleculeData * MainData = Parent->GetData();
@@ -127,7 +129,7 @@ void CoordinateOffset::CreateControls()
     wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
     itemDialog1->SetSizer(itemBoxSizer2);
 
-    wxStaticText* itemStaticText3 = new wxStaticText( itemDialog1, wxID_STATIC, _("Move the slider to offset the coordinates\nalong the chosen normal mode."), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText* itemStaticText3 = new wxStaticText( itemDialog1, wxID_STATIC, _("Move the slider to offset the coordinates\nalong the chosen normal mode. Note the offset\nwill be performed in cartesian space rather than\nmass-weighted cartesian space as shown."), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
 
     wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
@@ -138,11 +140,10 @@ void CoordinateOffset::CreateControls()
         slider->SetToolTip(_("Adjust the slider to adjust the magnitude of the offset"));
     itemBoxSizer4->Add(slider, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    editField = new wxTextCtrl( itemDialog1, ID_TEXTCTRL1, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    editField = new wxTextCtrl( itemDialog1, ID_TEXTCTRL1, _("0.0"), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
         editField->SetToolTip(_("Type in a specific value for the offset percentage"));
     itemBoxSizer4->Add(editField, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-	editField->SetValue(_("0.0"));
 
     wxStaticText* itemStaticText7 = new wxStaticText( itemDialog1, wxID_STATIC, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer4->Add(itemStaticText7, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
@@ -236,10 +237,12 @@ void CoordinateOffset::ApplyOffset(float offset) {
 	
 		CPoint3D temp, temp2;
 		for (long iatom=0; iatom < lFrame->GetNumAtoms(); iatom++) {
+				//The modes are stored mass weighted. We want to remove that here.
+			float lmass = 1.0/Prefs->GetSqrtAtomMass(lFrame->GetAtomType(iatom)-1);
 			vibs->GetModeOffset(iatom+cmode, temp2);
-			temp.x = origCoords[iatom].x + offset*VectorScale*temp2.x;
-			temp.y = origCoords[iatom].y + offset*VectorScale*temp2.y;
-			temp.z = origCoords[iatom].z + offset*VectorScale*temp2.z;
+			temp.x = origCoords[iatom].x + offset*VectorScale*temp2.x*lmass;
+			temp.y = origCoords[iatom].y + offset*VectorScale*temp2.y*lmass;
+			temp.z = origCoords[iatom].z + offset*VectorScale*temp2.z*lmass;
 			lFrame->SetAtomPosition(iatom, temp);
 		}
 		Parent->ResetModel(false);

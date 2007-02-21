@@ -5552,6 +5552,14 @@ points read in:"</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Stretch factor">0</long>
+            <long name="proxy-Border">5</long>
+            <bool name="proxy-wxLEFT">1</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
+            <bool name="proxy-wxTOP">1</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -8584,14 +8592,6 @@ Modeling, 1998, 16, 133-138."</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -8612,7 +8612,9 @@ Modeling, 1998, 16, 133-138."</string>
               <string name="proxy-Class">"wxStaticText"</string>
               <string name="proxy-Member variable name">""</string>
               <string name="proxy-Label">"Move the slider to offset the coordinates
-along the chosen normal mode."</string>
+along the chosen normal mode. Note the offset
+will be performed in cartesian space rather than
+mass-weighted cartesian space as shown."</string>
               <long name="proxy-Wrapping width">-1</long>
               <string name="proxy-Help text">""</string>
               <string name="proxy-Tooltip text">""</string>
@@ -10507,14 +10509,6 @@ along the chosen normal mode."</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -10683,6 +10677,8 @@ along the chosen normal mode."</string>
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"Basis"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -10730,8 +10726,6 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"Basis"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -11646,6 +11640,8 @@ along the chosen normal mode."</string>
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"Control"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -11693,8 +11689,6 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"Control"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -13202,6 +13196,8 @@ along the chosen normal mode."</string>
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"Data"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -13249,8 +13245,6 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"Data"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -14167,6 +14161,8 @@ along the chosen normal mode."</string>
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"System"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -14214,8 +14210,6 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"System"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -15181,6 +15175,8 @@ along the chosen normal mode."</string>
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"DFT"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -15228,8 +15224,6 @@ along the chosen normal mode."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"DFT"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -15599,6 +15593,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"MO Guess"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -15646,8 +15642,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"MO Guess"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -16225,6 +16219,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"Hess. Options"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -16272,8 +16268,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"Hess. Options"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -16925,6 +16919,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"Misc. Prefs"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -16972,8 +16968,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"Misc. Prefs"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -17380,6 +17374,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"MP2 Options"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -17427,8 +17423,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"MP2 Options"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -18109,6 +18103,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"SCF Options"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -18156,8 +18152,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"SCF Options"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -18507,6 +18501,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"Stat. Point"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -18554,8 +18550,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"Stat. Point"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -20294,6 +20288,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Class">"wxPanel"</string>
                     <string name="proxy-Base class">"wxPanel"</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"Summary"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <bool name="proxy-External implementation">0</bool>
                     <bool name="proxy-Separate files">0</bool>
                     <string name="proxy-Implementation filename">""</string>
@@ -20341,8 +20337,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <string name="proxy-Tab label">"Summary"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>

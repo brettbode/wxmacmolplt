@@ -36,13 +36,13 @@
 
 ////@begin control identifiers
 #define ID_MYDIALOG2 10057
+#define ID_SLIDER 10058
+#define ID_TEXTCTRL1 10059
 #define SYMBOL_COORDINATEOFFSET_STYLE wxCAPTION|wxSYSTEM_MENU
 #define SYMBOL_COORDINATEOFFSET_TITLE _("Coordinate Offset")
 #define SYMBOL_COORDINATEOFFSET_IDNAME ID_MYDIALOG2
 #define SYMBOL_COORDINATEOFFSET_SIZE wxSize(400, 300)
 #define SYMBOL_COORDINATEOFFSET_POSITION wxDefaultPosition
-#define ID_SLIDER 10058
-#define ID_TEXTCTRL1 10059
 ////@end control identifiers
 
 /*!
