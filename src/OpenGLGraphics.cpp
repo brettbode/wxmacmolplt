@@ -1269,7 +1269,11 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
          atom2_id = lFrame->AnnoLengths[ilength].atom2;
          bond_id = lFrame->BondExists(atom1_id, atom2_id);
          if (bond_id > -1) {
-            bond_size = BondSize / MAX(lBonds[bond_id].Order, 1);
+            bond_size = BondSize / MAX(lBonds[bond_id].Order, 1.0f) *
+                        3.5f * lBonds[bond_id].Order / 2.0f;
+            if (lBonds[bond_id].Order > 1) {
+		         bond_size *= 1.5;
+            }
          } else {
             bond_size = 0.0f;
          }
@@ -2827,20 +2831,21 @@ void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2,
    glEnd();
    glDisable(GL_TEXTURE_1D);
    glDisable(GL_ALPHA_TEST);
-   glEnable(GL_LIGHTING);
 
    char len_label[40];
    glPushMatrix();
    glTranslatef((pt1.x + pt2.x) / 2.0f,
                 (pt1.y + pt2.y) / 2.0f,
                 (pt1.z + pt2.z) / 2.0f);
-   glTranslatef(5 * width * x_world.x,
-                5 * width * x_world.y,
-                5 * width * x_world.z);
+   glTranslatef(10 * width * x_world.x,
+                10 * width * x_world.y,
+                10 * width * x_world.z);
 	glMultMatrixf(m);
+   glTranslatef(-offset, 0.0f, 0.0f);
 	glScalef(-0.1f, 0.1f, 0.1f);
-	sprintf(len_label, " %.6f", len);
+	sprintf(len_label, "%.6f", len);
 	glfDrawSolidString(len_label);
+   glEnable(GL_LIGHTING);
 	glPopMatrix();
 
 }

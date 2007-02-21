@@ -1037,6 +1037,8 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom)
 
 void MpGLCanvas::measurePopupMenu(int x, int y) {
 
+   wxMenuItem *item;
+
 	wxMenu menu;
 	Frame *lFrame = mMainData->cFrame;
 	if ((selected > 0) && (selected < lFrame->GetNumAtoms())) {
@@ -1044,7 +1046,8 @@ void MpGLCanvas::measurePopupMenu(int x, int y) {
 		Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType()-1, nItem);
 		aLabel.Printf(wxT(" (%d)"), (selected+1));
 		nItem.Append(aLabel);
-		wxMenuItem * item = menu.Append(wxID_ANY, nItem);
+		item = menu.Append(wxID_ANY, nItem);
+      item->Enable(false);
 	}
 
 	if (select_stack_top > 1) {
@@ -1061,10 +1064,10 @@ void MpGLCanvas::measurePopupMenu(int x, int y) {
 					lengthString.Append(name);
 					name.Printf(wxT(" (%d)"), (select_stack[1]+1));
 					lengthString.Append(name);
-					wxMenuItem * item = menu.Append(wxID_ANY, lengthString);
+					item = menu.Append(wxID_ANY, lengthString);
 					item->Enable(false);
 					
-					lengthString.Printf(wxT("distance: %f"), length);
+					lengthString.Printf(wxT("Distance: %f"), length);
 					item = menu.Append(wxID_ANY, lengthString);
 					item->Enable(false);
 				}
@@ -1168,11 +1171,21 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 	BondOrder order = (BondOrder) ((event.GetId() - GL_Popup_To_Hydrogen_Bond) + kHydrogenBond);
 	
 	if (selected >= lFrame->GetNumAtoms()) {	//existing bond, change order
-		lFrame->Bonds[selected - lFrame->GetNumAtoms()].Order = order;
+      Bond *bond;
+      bond = &(lFrame->Bonds[selected - lFrame->GetNumAtoms()]);
+		bond->Order = order;
 		MolWin->BondsChanged();
+      lFrame->resetAllSelectState();
+      bond->SetSelectState(true);
+      lFrame->Atoms[bond->Atom1].SetSelectState(true);
+      lFrame->Atoms[bond->Atom2].SetSelectState(true);
 	} else if (select_stack_top == 2) { //new bond
 		lFrame->AddBond(select_stack[0], select_stack[1], order);
 		MolWin->BondsChanged();
+      lFrame->resetAllSelectState();
+      lFrame->Bonds[lFrame->GetNumBonds() - 1].SetSelectState(true);
+      lFrame->Atoms[select_stack[0]].SetSelectState(true);
+      lFrame->Atoms[select_stack[1]].SetSelectState(true);
 	}
 }
 void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
