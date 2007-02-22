@@ -1191,7 +1191,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 	else
 		glColor3f (1.0, 1.0, 1.0);
 
-	if (lFrame->NumAnnoLengths) {
+	if (!lFrame->AnnoLengths.empty()) {
       CPoint3D lookat_eye;
       CPoint3D up_eye;
       CPoint3D lookat_world;
@@ -1264,9 +1264,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
       int bond_id;
       float bond_size;
 
-      for (long ilength = 0; ilength < lFrame->NumAnnoLengths; ilength++) {
-         atom1_id = lFrame->AnnoLengths[ilength].atom1;
-         atom2_id = lFrame->AnnoLengths[ilength].atom2;
+      for (long anno_id = 0; anno_id < lFrame->AnnoLengths.size(); anno_id++) {
+         atom1_id = lFrame->AnnoLengths[anno_id].atom1_id;
+         atom2_id = lFrame->AnnoLengths[anno_id].atom2_id;
          bond_id = lFrame->BondExists(atom1_id, atom2_id);
          if (bond_id > -1) {
             bond_size = BondSize / MAX(lBonds[bond_id].Order, 1.0f) *
@@ -1277,7 +1277,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
          } else {
             bond_size = 0.0f;
          }
-         glLoadName(ilength + NumAtoms + NumBonds + 1);
+         glLoadName(anno_id + NumAtoms + NumBonds + 1);
          DashedQuadFromLine(lFrame->Atoms[atom1_id].Position,
                             lFrame->Atoms[atom2_id].Position,
                             BondSize * 0.25, m, x_world, bond_size);
