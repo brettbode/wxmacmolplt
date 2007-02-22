@@ -29,8 +29,8 @@ class colorArea : public wxPanel
 {
 public:
 	colorArea(wxWindow* parent, int id, const RGBColor* color);
-	~colorArea();
-	void draw(void);
+	virtual ~colorArea();
+	virtual void draw(void);
 	const wxColour& getColor(void) const;
 	void getColor(RGBColor * color) const;
 	void setColor(const RGBColor * color);
@@ -38,10 +38,30 @@ public:
 	// A wxEVT_COMMAND_ENTER event is generated if the color is changed.
 	void OnMouse(wxMouseEvent &event);
 
-private:
+protected:
 	wxColour mCurrentColor;
+
+	int mWidth;
+	int mHeight;
 
 	DECLARE_EVENT_TABLE()
 };
+
+class colorPatternArea : public colorArea
+{
+public:
+  colorPatternArea(wxWindow* parent, int id, const RGBColor* color, int patID = -1);
+  virtual ~colorPatternArea();
+
+  virtual void draw(void);
+  void OnPaint(wxPaintEvent &event);
+
+ private:
+  wxBitmap* mPattern;
+  int patID;
+
+  DECLARE_EVENT_TABLE()
+};
+
 
 #endif

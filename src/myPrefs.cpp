@@ -170,6 +170,7 @@ AtomPrefsPane::AtomPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent
   mLabels[2] = wxString(wxT("size(pm)"));
   mLabels[3] = wxString(wxT("mass"));
   mLabels[4] = wxString(wxT("Color"));
+  mLabels[5] = wxString(wxT("Pattern"));
 
   mMainSizer = new wxFlexGridSizer(kMaxAtomTypes, NUM_ATOM_LABELS, 3, 10);
 
@@ -188,6 +189,7 @@ AtomPrefsPane::~AtomPrefsPane()
       delete mEleSizes[i];
       delete mEleMasses[i];
       delete mColorArea[i];
+      delete mPatternArea[i];
     }
 }
 
@@ -234,6 +236,9 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
 
       mColorArea[i] = new colorArea(this, i, mTargetPrefs->GetAtomColorLoc(i));
       mMainSizer->Add(mColorArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+
+      mPatternArea[i] = new colorPatternArea(this, i, mTargetPrefs->GetAtomColorLoc(i),i);
+      mMainSizer->Add(mPatternArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
     }
 
   mMainSizer->Layout();

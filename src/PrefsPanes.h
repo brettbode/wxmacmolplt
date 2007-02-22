@@ -26,7 +26,7 @@
 
 class colorArea;
 
-#define NUM_ATOM_LABELS 5
+#define NUM_ATOM_LABELS 6
 
 class PrefsPane
 {
@@ -69,6 +69,7 @@ class AtomPrefsPane : public wxScrolledWindow, public PrefsPane
 		wxTextCtrl* mEleSizes[kMaxAtomTypes];
 		wxTextCtrl* mEleMasses[kMaxAtomTypes];
 		colorArea* mColorArea[kMaxAtomTypes];
+		colorArea* mPatternArea[kMaxAtomTypes];
 		//wxBoxSizer* mUpperSizer;
 		//wxBoxSizer* mLowerSizer;
 		//wxGridSizer* mInnerSizer;

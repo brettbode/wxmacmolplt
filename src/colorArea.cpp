@@ -12,6 +12,7 @@
 #include "wx/colordlg.h"
 
 #include "colorArea.h"
+#include "patterns.h"
 
 #ifdef __BORLANDC__
 #pragma hdrstop
@@ -21,9 +22,13 @@ BEGIN_EVENT_TABLE(colorArea, wxPanel)
     EVT_MOUSE_EVENTS(colorArea::OnMouse)
 END_EVENT_TABLE()
 
-colorArea::colorArea(wxWindow* parent, int id, const RGBColor* color)
+BEGIN_EVENT_TABLE(colorPatternArea, wxPanel)
+    EVT_PAINT  (colorPatternArea::OnPaint)
+END_EVENT_TABLE()
+
+  colorArea::colorArea(wxWindow* parent, int id, const RGBColor* color): mWidth(50), mHeight(20)
 {
-  Create(parent, id, wxDefaultPosition, wxSize(50, 20), wxSUNKEN_BORDER);
+  Create(parent, id, wxDefaultPosition, wxSize(mWidth, mHeight), wxSUNKEN_BORDER);
 
   mCurrentColor = RGB2WX(*color);
   SetBackgroundColour(mCurrentColor);
@@ -78,4 +83,31 @@ void colorArea::OnMouse(wxMouseEvent &event)
 			wxPostEvent(this, evt);
 		}
 	}
+}
+
+colorPatternArea::colorPatternArea(wxWindow* parent, int id, const RGBColor* color, int patID) : colorArea(parent, id, color)
+{
+  mPattern = new wxBitmap((const char*)atomMaskPatterns[id%numPatterns], 32, 32);
+  Refresh();
+}
+
+colorPatternArea::~colorPatternArea()
+{
+  delete mPattern;
+}
+
+void colorPatternArea::draw()
+{
+  Refresh();
+}
+
+void colorPatternArea::OnPaint(wxPaintEvent &WXUNUSED(event))
+{
+  wxPaintDC dc(this);
+  PrepareDC(dc);
+
+  dc.SetBrush(wxBrush(*mPattern));
+  //dc.SetBrush(wxBrush(*wxRED));
+  dc.DrawRectangle(0, 0, mWidth, mHeight);
+  //dc.DrawBitmap(*mPattern, 0, 0);
 }
