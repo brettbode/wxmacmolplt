@@ -18,6 +18,7 @@
 #include <wx/splash.h>
 #include <wx/config.h>
 #include <wx/stdpaths.h>
+#include <locale.h>
 
 //The global preferences settings
     WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
@@ -84,6 +85,9 @@ bool MpApp::OnInit() {
 								wxSIMPLE_BORDER|wxSTAY_ON_TOP);
 	splashTimer.SetOwner(this, splashT_ID);
 	splashTimer.Start(2000, wxTIMER_ONE_SHOT);
+	
+	//Set the numerical locale to "C" throughout
+	setlocale(LC_NUMERIC, "C");
 	
 	gPreferences = new WinPrefs;
 	gPrefDefaults = new WinPrefs;
