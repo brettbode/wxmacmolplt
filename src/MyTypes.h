@@ -77,23 +77,38 @@ enum TypeofEnergy {
 
 class AnnotateLength {
    public:
-      int atom1;
-      int atom2;
+      AnnotateLength(long atom1_id, long atom2_id) {
+         this->atom1_id = atom1_id;
+         this->atom2_id = atom2_id;
+      }
+      int atom1_id;
+      int atom2_id;
 };
 
 class AnnotateAngle {
    public:
-      int atom1;
-      int atom2;
-      int atom3;
+      AnnotateAngle(long atom1_id, long atom2_id, long atom3_id) {
+         this->atom1_id = atom1_id;
+         this->atom2_id = atom2_id;
+         this->atom3_id = atom3_id;
+      }
+      int atom1_id;
+      int atom2_id;
+      int atom3_id;
 };
 
-class AnnotateDihedrals {
+class AnnotateDihedral {
    public:
-      int atom1;
-      int atom2;
-      int atom3;
-      int atom4;
+      AnnotateDihedral(long atom1_id, long atom2_id, long atom3_id) {
+         this->atom1_id = atom1_id;
+         this->atom2_id = atom2_id;
+         this->atom3_id = atom3_id;
+         this->atom4_id = atom4_id;
+      }
+      int atom1_id;
+      int atom2_id;
+      int atom3_id;
+      int atom4_id;
 };
 
 class mpAtom {
