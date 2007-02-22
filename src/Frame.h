@@ -61,19 +61,20 @@ class Frame {
 		long		AtomAllocation;
 		long		NumBonds;
 		long		BondAllocation;
-		long		AnnoLengthAllocation;
 		CPoint3D *	SpecialAtoms;
 		VibRec *	Vibs;
 		std::vector<OrbitalRec *> Orbs;
 		Surface *	SurfaceList;
 		GradientData *	Gradient;
 
-      AnnotateLength *AnnoLengths;
-      AnnotateAngle *AnnoAngles;
-      AnnotateDihedrals *AnnoDihedrals;
-      long NumAnnoLengths;
-      long NumAnnoAngles;
-      long NumAnnoDihedrals;
+		/* long		AnnoLengthAllocation; */
+      std::vector<AnnotateLength> AnnoLengths;
+      /* AnnotateAngle *AnnoAngles; */
+      /* AnnotateDihedrals *AnnoDihedrals; */
+
+      /* long NumAnnoLengths; */
+      /* long NumAnnoAngles; */
+      /* long NumAnnoDihedrals; */
 
 		Frame *		NextFrame;
 		Frame *		PreviousFrame;
