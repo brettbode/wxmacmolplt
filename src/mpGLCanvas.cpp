@@ -536,6 +536,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
      {
        selected = testPicking(tmpPnt.x, tmpPnt.y);
 
+       // The selected index is after all atoms and bonds and must be a length
+       // annotation.
        if (selected >= NumAtoms + lFrame->NumBonds) {
           annoLengthPopupMenu(tmpPnt.x, tmpPnt.y);
        }
@@ -1041,7 +1043,7 @@ void MpGLCanvas::measurePopupMenu(int x, int y) {
 
 	wxMenu menu;
 	Frame *lFrame = mMainData->cFrame;
-	if ((selected > 0) && (selected < lFrame->GetNumAtoms())) {
+	if ((selected >= 0) && (selected < lFrame->GetNumAtoms())) {
 		wxString aLabel, nItem;
 		Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType()-1, nItem);
 		aLabel.Printf(wxT(" (%d)"), (selected+1));
@@ -1093,8 +1095,9 @@ void MpGLCanvas::measurePopupMenu(int x, int y) {
 			default:
 				printf("ouch\n");
 		}
-		PopupMenu(&menu, x, y);
 	}
+
+   PopupMenu(&menu, x, y);
 
 }
 
@@ -1111,7 +1114,8 @@ void MpGLCanvas::DeleteLengthAnnotation(wxCommandEvent& event) {
 
    Frame *lFrame = mMainData->cFrame;
 
-   lFrame->DeleteAnnoLength(selected - lFrame->NumAtoms - lFrame->NumBonds);
+   lFrame->AnnoLengths.erase(lFrame->AnnoLengths.begin() +
+                             selected - lFrame->NumAtoms - lFrame->NumBonds);
 
 }
 
@@ -1201,7 +1205,12 @@ void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::AddLengthAnnotation(wxCommandEvent& event) {
-   mMainData->cFrame->AddAnnotateLength(select_stack[0], select_stack[1]);
+
+   AnnotateLength new_anno = AnnotateLength(select_stack[0],
+                                            select_stack[1]);
+
+   mMainData->cFrame->AnnoLengths.push_back(new_anno);
+
 }
 
 void MpGLCanvas::On_Apply_All(wxCommandEvent& event)
