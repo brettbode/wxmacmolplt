@@ -14,7 +14,7 @@
     <bool name="translate_strings">1</bool>
     <bool name="extract_strings">0</bool>
     <string name="user_name">"Brett Bode"</string>
-    <string name="copyright_string">"(c) 2006 Iowa State University"</string>
+    <string name="copyright_string">"(c) 2007 Iowa State University"</string>
     <string name="resource_prefix">""</string>
     <bool name="use_two_step_construction">0</bool>
     <bool name="use_enums">0</bool>
@@ -92,11 +92,11 @@
     <bool name="generate_app_class">0</bool>
     <string name="external_symbol_filenames">""</string>
     <string name="configuration">"&lt;None&gt;"</string>
-    <string name="source_encoding">"&lt;System&gt;"</string>
-    <string name="project_encoding">"&lt;System&gt;"</string>
+    <string name="source_encoding">"utf-8"</string>
+    <string name="project_encoding">"utf-8"</string>
     <string name="resource_archive">""</string>
     <long name="text_file_type">0</long>
-    <bool name="use_tabs">0</bool>
+    <bool name="use_tabs">1</bool>
     <long name="indent_size">4</long>
     <string name="whitespace_after_return_type">" "</string>
     <string name="resource_xrc_cpp">""</string>
@@ -34093,7 +34093,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
           <string name="proxy-Class">"QTExport"</string>
           <string name="proxy-Base class">"wxDialog"</string>
           <string name="proxy-Window kind">"wxDialog"</string>
-          <string name="proxy-Implementation filename">"qtexport.cpp"</string>
+          <string name="proxy-Implementation filename">"qtexport-g.cpp"</string>
           <string name="proxy-Header filename">"qtexport.h"</string>
           <string name="proxy-XRC filename">""</string>
           <string name="proxy-Title">"Movie Options"</string>
@@ -34168,6 +34168,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
               <long name="locked">0</long>
               <string name="created">"22/2/2007"</string>
               <string name="proxy-type">"wbRadioBoxProxy"</string>
+              <string name="event-handler-0">"wxEVT_COMMAND_RADIOBOX_SELECTED|OnQtMovieRadioSelected"</string>
               <string name="proxy-Id name">"ID_QT_MOVIE_RADIO"</string>
               <long name="proxy-Id value">10247</long>
               <string name="proxy-Class">"wxRadioBox"</string>
@@ -34411,8 +34412,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                 <long name="proxy-Id value">10068</long>
                 <string name="proxy-Class">"wxChoice"</string>
                 <string name="proxy-Member variable name">"mQTChoice"</string>
-                <string name="proxy-Strings">"Raw|Cinepak|Graphics|Animation|Motion JPEGA|Motion JPEGB|MPEG4 Visual|H264
-"</string>
+                <string name="proxy-Strings">"Raw|Cinepak|Graphics|Animation|Motion JPEGA|Motion JPEGB|MPEG4 Visual|H264"</string>
                 <string name="proxy-Initial value">""</string>
                 <string name="proxy-Help text">""</string>
                 <string name="proxy-Tooltip text">""</string>
@@ -34691,7 +34691,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                 <long name="locked">0</long>
                 <string name="created">"22/2/2007"</string>
                 <string name="proxy-type">"wbButtonProxy"</string>
-                <string name="event-handler-0">"wxEVT_COMMAND_BUTTON_CLICKED|OnOKClick"</string>
                 <string name="proxy-Id name">"wxID_OK"</string>
                 <long name="proxy-Id value">5100</long>
                 <string name="proxy-Class">"wxButton"</string>

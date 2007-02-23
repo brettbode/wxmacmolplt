@@ -231,11 +231,13 @@ class MolDisplayWin : public wxFrame {
 		void WriteFrequencies(BufferFile * Buffer);
 		void WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllModes, bool AnimateMode);
 		void WriteMDLMolFile(BufferFile * Buffer);
-#ifdef __WXMAC__
+#ifdef __MAC_USE_QUICKTIME__
 		//quicktime movie export
 		void WriteMovie(wxString & filepath);
 		void CreateFrameMovie(GWorldPtr lgWorld, Handle CompressedData,
 							  const qtData & myqtData, bool IncludeEPlot);
+		void CreateModeMovie(GWorldPtr lgWorld, Handle CompressedData,
+							 const qtData & myqtData);
 #endif
 		//Call to dump the message and close the window
         void AbortOpen(const char * msg);

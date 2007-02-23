@@ -312,3 +312,16 @@ void EnergyPlotDialog::OnCopyClick( wxCommandEvent& event )
     
     tempDC.SelectObject(wxNullBitmap);
 }
+
+void EnergyPlotDialog::CopyToBitMap(wxBitmap ** target) {
+    int width = 0;
+    int height = 0;
+    epGraph->GetClientSize(&width, &height);
+    *target = new wxBitmap(width, height);
+    wxMemoryDC tempDC;
+	
+    tempDC.SelectObject(**target);
+    epGraph->draw(tempDC);
+
+    tempDC.SelectObject(wxNullBitmap);
+}

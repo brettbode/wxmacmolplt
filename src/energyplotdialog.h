@@ -103,6 +103,7 @@ public:
 
     void FrameChanged(void);
     void RegenData(void);
+	void CopyToBitMap(wxBitmap ** target);
 
     /// Should we show tooltips?
     static bool ShowToolTips();

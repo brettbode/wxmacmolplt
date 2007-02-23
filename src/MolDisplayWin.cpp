@@ -758,12 +758,10 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 		vibs = true;
 		wildcards.Append(wxT("|Frequencies (*.txt)|*.txt"));
 	}
-#ifdef __WXMAC__
 #ifdef __MAC_USE_QUICKTIME__
 	if ((MainData->GetNumFrames() > 1)||vibs) {
 		wildcards.Append(wxT("|QuickTime Movie (*.mov)|*.mov"));
 	}
-#endif
 #endif
     int        index = 0;
     int        type  = 0;
@@ -818,11 +816,9 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 			}
 			exportOptionsDlg->Destroy();
 		} else if ((index == 8) || (!vibs && (index==7))) {
-#ifdef __WXMAC__
 #ifdef __MAC_USE_QUICKTIME__
 			//quicktime movie export
 			WriteMovie(filepath);
-#endif
 #endif
 		} else {
 			FILE *currFile = NULL;
