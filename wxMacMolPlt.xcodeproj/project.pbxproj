@@ -112,6 +112,9 @@
 		8B45D25E0A700DB60005269A /* arial1.glf in Resources */ = {isa = PBXBuildFile; fileRef = 8B45D25D0A700DB60005269A /* arial1.glf */; };
 		8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
 		8B4FB3D40A3093470014F6B5 /* surfaceswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */; };
+		8B600B740B8F35C400084AF2 /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
+		8B600B750B8F35C400084AF2 /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
+		8B600B760B8F35C400084AF2 /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
 		8B6075B10A1A34B1008CC9FD /* printoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */; };
 		8B6AF30B0A13EAC8004D2E5F /* exportoptionsdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */; };
 		8B6C7BFB0A24E9C100B7358F /* energyplotdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */; };
@@ -294,6 +297,8 @@
 		8B4BB4410A0A7C9D00FE9CC6 /* appendframesoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = appendframesoptions.h; path = src/appendframesoptions.h; sourceTree = "<group>"; };
 		8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceswindow.cpp; path = src/surfaceswindow.cpp; sourceTree = "<group>"; };
 		8B4FB3D20A3093470014F6B5 /* surfaceswindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceswindow.h; path = src/surfaceswindow.h; sourceTree = "<group>"; };
+		8B600B720B8F35C400084AF2 /* qtexport.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = qtexport.cpp; path = src/qtexport.cpp; sourceTree = "<group>"; };
+		8B600B730B8F35C400084AF2 /* qtexport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = qtexport.h; path = src/qtexport.h; sourceTree = "<group>"; };
 		8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = printoptions.cpp; path = src/printoptions.cpp; sourceTree = "<group>"; };
 		8B6075B00A1A34B1008CC9FD /* printoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = printoptions.h; path = src/printoptions.h; sourceTree = "<group>"; };
 		8B641E370A472F8D0075F96C /* surfaceDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceDlg.cpp; path = src/surfaceDlg.cpp; sourceTree = "<group>"; };
@@ -461,6 +466,8 @@
 				8B6075B00A1A34B1008CC9FD /* printoptions.h */,
 				1652DA5009D0B12600B7783F /* Progress.cpp */,
 				1652DA5109D0B12600B7783F /* Progress.h */,
+				8B600B720B8F35C400084AF2 /* qtexport.cpp */,
+				8B600B730B8F35C400084AF2 /* qtexport.h */,
 				1652DA5209D0B12600B7783F /* RysPolynomial.cpp */,
 				1652DA5309D0B12600B7783F /* RysPolynomial.h */,
 				8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */,
@@ -686,6 +693,7 @@
 				8BF17DA40A55D0910059B71F /* zmatrixcalculator.cpp in Sources */,
 				8B3B899D0A6EAD7E0041EA88 /* glf.cpp in Sources */,
 				8BE9976A0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
+				8B600B740B8F35C400084AF2 /* qtexport.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -746,6 +754,7 @@
 				8B3B8B1B0A770A280041EA88 /* zmatrixcalculator.cpp in Sources */,
 				8B3B8B1C0A770A280041EA88 /* glf.cpp in Sources */,
 				8BE9976B0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
+				8B600B760B8F35C400084AF2 /* qtexport.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -806,6 +815,7 @@
 				8B8816E90A751FED00EC8791 /* zmatrixcalculator.cpp in Sources */,
 				8B8816EA0A751FED00EC8791 /* glf.cpp in Sources */,
 				8BE9976C0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
+				8B600B750B8F35C400084AF2 /* qtexport.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
