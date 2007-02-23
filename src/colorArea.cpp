@@ -26,12 +26,13 @@ BEGIN_EVENT_TABLE(colorPatternArea, wxPanel)
     EVT_PAINT  (colorPatternArea::OnPaint)
 END_EVENT_TABLE()
 
-  colorArea::colorArea(wxWindow* parent, int id, const RGBColor* color): mWidth(50), mHeight(20)
+  colorArea::colorArea(wxWindow* parent, int id, const RGBColor* color): mWidth(50), mHeight(20), mID(id)
 {
   Create(parent, id, wxDefaultPosition, wxSize(mWidth, mHeight), wxSUNKEN_BORDER);
 
   mCurrentColor = RGB2WX(*color);
   SetBackgroundColour(mCurrentColor);
+  mParent = dynamic_cast<AtomPrefsPane*>(parent);
 }
 
 colorArea::~colorArea()
@@ -50,6 +51,13 @@ void colorArea::setColor(const RGBColor * color) {
 	mCurrentColor = RGB2WX(*color);
 	SetBackgroundColour(mCurrentColor);
 	Refresh();
+}
+
+void colorArea::setColor(const wxColour* color)
+{
+  mCurrentColor = *color;
+  SetBackgroundColour(mCurrentColor);
+  Refresh();
 }
 
 const wxColour& colorArea::getColor() const
@@ -81,6 +89,8 @@ void colorArea::OnMouse(wxMouseEvent &event)
 
 			wxCommandEvent evt(wxEVT_COMMAND_ENTER, GetId());
 			wxPostEvent(this, evt);
+
+			mParent->syncColor(mID, &mCurrentColor);
 		}
 	}
 }

@@ -244,6 +244,11 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mMainSizer->Layout();
 }
 
+void AtomPrefsPane::syncColor(int id, wxColour* c)
+{
+  mPatternArea[id]->setColor(c);
+}
+
 void AtomPrefsPane::saveToTempPrefs()
 {
   long size;

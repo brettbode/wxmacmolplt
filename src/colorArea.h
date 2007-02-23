@@ -19,6 +19,7 @@
 
 ////@begin includes
 #include "wx/wx.h"
+#include "PrefsPanes.h"
 
 ////@end includes
 // Useful global functions to convert between RGBColor and wxColour
@@ -34,15 +35,18 @@ public:
 	const wxColour& getColor(void) const;
 	void getColor(RGBColor * color) const;
 	void setColor(const RGBColor * color);
+	void setColor(const wxColour* color);
 	// function that handles the actual color change
 	// A wxEVT_COMMAND_ENTER event is generated if the color is changed.
 	void OnMouse(wxMouseEvent &event);
 
 protected:
+	AtomPrefsPane* mParent;
 	wxColour mCurrentColor;
 
 	int mWidth;
 	int mHeight;
+	int mID;
 
 	DECLARE_EVENT_TABLE()
 };
