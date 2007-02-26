@@ -24,7 +24,7 @@
 #define wxMacMolPlt_VERSION "6.3.1"
 
 //activate the following line to use the interactive editor
-//#define ENABLE_INTERACTIVE_MODE
+#define ENABLE_INTERACTIVE_MODE
 //Activate to enable the show symmetry operators menu items
 //#define ENABLE_SHOWSYMMETRY_MODE
 //Activate to allow quicktime movie export on Mac
