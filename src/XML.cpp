@@ -12,14 +12,13 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <wx/gdicmn.h>
 #include "XML.hpp"
-//#include "qLog.h"
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <cctype>
-//#include "libbamboo.h"
 #ifdef UseXERCESC
 #include <xercesc/util/PlatformUtils.hpp>
 #if (XERCES_VERSION_MAJOR > 1)
@@ -854,6 +853,54 @@ void XMLElement::addAttribute(const char * n, const long & v) {
 	std::ostringstream bf;
 	bf << v;
 	addAttribute(n, bf.str().c_str());
+}
+void XMLElement::addBoolAttribute(const char * n, bool value) {
+	if (value)
+		addAttribute(n, trueXML);
+	else
+		addAttribute(n, falseXML);
+}
+#define WXRECT_X_XML	"x"
+#define WXRECT_Y_XML	"y"
+#define WXRECT_WIDTH_XML	"width"
+#define WXRECT_HEIGHT_XML	"height"
+void XMLElement::addwxRectAttribute(const wxRect & v) {
+	//Add the components of the wxRect as attributes if they are a non-default value
+	if (v.x != -1) {
+		std::ostringstream bf;
+		bf << v.x;
+		addAttribute(WXRECT_X_XML, bf.str().c_str());
+	}
+	if (v.y != -1) {
+		std::ostringstream bf;
+		bf << v.y;
+		addAttribute(WXRECT_Y_XML, bf.str().c_str());
+	}
+	if (v.width != -1) {
+		std::ostringstream bf;
+		bf << v.width;
+		addAttribute(WXRECT_WIDTH_XML, bf.str().c_str());
+	}
+	if (v.height != -1) {
+		std::ostringstream bf;
+		bf << v.height;
+		addAttribute(WXRECT_HEIGHT_XML, bf.str().c_str());
+	}
+}
+bool XMLElement::getwxRectAttribute(wxRect & v) const {
+	long temp;
+	if (getAttributeValue(WXRECT_X_XML, temp)) {
+		v.x = temp;
+	}
+	if (getAttributeValue(WXRECT_Y_XML, temp)) {
+		v.y = temp;
+	}
+	if (getAttributeValue(WXRECT_WIDTH_XML, temp)) {
+		if (temp > 0) v.width = temp;
+	}
+	if (getAttributeValue(WXRECT_HEIGHT_XML, temp)) {
+		if (temp > 0) v.height = temp;
+	}
 }
 void XMLElement::addAttribute(const char * n, const char * v) {
 #ifdef UseXERCESC

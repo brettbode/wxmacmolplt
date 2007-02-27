@@ -971,7 +971,8 @@ void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
         //}
 
         if(buffer) {
-            MainData->WriteCMLFile(buffer, Prefs, NULL, true, true);
+			UpdateWindowData();
+            MainData->WriteCMLFile(buffer, Prefs, &winData, true, true);
             Dirty = false;
             delete buffer;
         }
@@ -1000,8 +1001,9 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
             return;
         }
         try {
+			UpdateWindowData();
             buffer = new BufferFile(currFile, true);
-            MainData->WriteCMLFile(buffer, Prefs, NULL, true, true);
+            MainData->WriteCMLFile(buffer, Prefs, &winData, true, true);
             Dirty = false;
         }
         //catch (std::bad_alloc) {//Out of memory error
@@ -1490,7 +1492,6 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 							delete tdatap;
 						} else {
 							BufferFile *Buffer = new BufferFile(CML, strlen(CML));
-					//		WindowData tempData;
 							if (MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, true)) {
 							//if (MainData->OpenCMLFile(Buffer, Prefs, &tempData, true)) {
 				//				FileSave = 1;
@@ -1875,13 +1876,19 @@ void MolDisplayWin::menuPreferences(wxCommandEvent &event)
 		prefsDlg->Raise();
 	} else {
 		prefsDlg = new setPreference(this, isGlobal);
+		if (!isGlobal) {
+			winData.PrefsWindowVisible(true);
+			prefsDlg->SetSize(winData.GetPrefsWinRect());
+		}
 		prefsDlg->Show();
 	}
 }
 void MolDisplayWin::ClosePrefsWindow(void) {
     if (prefsDlg) {
+		winData.SetPrefsWinRect(prefsDlg->GetRect());
         prefsDlg->Destroy();
         prefsDlg = NULL;
+		winData.PrefsWindowVisible(false);
     }
 }
 
@@ -2007,28 +2014,36 @@ void MolDisplayWin::menuWindowBonds(wxCommandEvent &event) {
         bondsWindow->Raise();
     } else {
         bondsWindow = new BondsDlg(this);
+		bondsWindow->SetSize(winData.GetBondsWinRect());
         bondsWindow->Show();
     }
+	winData.BondsWindowVisible(true);
 }
 void MolDisplayWin::CloseBondsWindow(void) {
     if (bondsWindow) {
+		winData.SetBondsWinRect(bondsWindow->GetRect());
         bondsWindow->Destroy();
         bondsWindow = NULL;
     }
+	winData.BondsWindowVisible(false);
 }
 void MolDisplayWin::menuWindowCoordinates(wxCommandEvent &event) {
     if (coordsWindow) { //need to bring it to the front...
         coordsWindow->Raise();
     } else {
         coordsWindow = new CoordinatesWindow(this);
+		coordsWindow->SetSize(winData.GetCoordsWinRect());
         coordsWindow->Show();
     }
+	winData.CoordsWindowVisible(true);
 }
 void MolDisplayWin::CloseCoordsWindow(void) {
     if (coordsWindow) {
+		winData.SetCoordsWinRect(coordsWindow->GetRect());
         coordsWindow->Destroy();
         coordsWindow = NULL;
     }
+	winData.CoordsWindowVisible(false);
 }
 void MolDisplayWin::menuWindowEnergy_plot(wxCommandEvent &event) {
     if(energyPlotWindow) { // need to bring it to the front...
@@ -2036,14 +2051,18 @@ void MolDisplayWin::menuWindowEnergy_plot(wxCommandEvent &event) {
     }
     else {
         energyPlotWindow = new EnergyPlotDialog(this);
+		energyPlotWindow->SetSize(winData.GetEnergyWinRect());
         energyPlotWindow->Show();
     }
+	winData.EnergyWindowVisible(true);
 }
 void MolDisplayWin::CloseEnergy_plotWindow(void) {
     if(energyPlotWindow) {
+		winData.SetEnergyWinRect(energyPlotWindow->GetRect());
         energyPlotWindow->Destroy();
         energyPlotWindow = NULL;
     }
+	winData.EnergyWindowVisible(false);
 }
 void MolDisplayWin::menuWindowFrequencies(wxCommandEvent &event) {
     if(frequenciesWindow) { // need to bring it to the front...
@@ -2051,14 +2070,18 @@ void MolDisplayWin::menuWindowFrequencies(wxCommandEvent &event) {
     }
     else {
         frequenciesWindow = new FrequenciesDialog(this);
+		frequenciesWindow->SetSize(winData.GetFrequencyWinRect());
         frequenciesWindow->Show();
     }
+	winData.FreqWindowVisible(true);
 }
 void MolDisplayWin::CloseFrequenciesWindow(void) {
     if(frequenciesWindow) {
+		winData.SetFrequencyWinRect(frequenciesWindow->GetRect());
         frequenciesWindow->Destroy();
         frequenciesWindow = NULL;
     }
+	winData.FreqWindowVisible(false);
 }
 void MolDisplayWin::menuWindowInput_builder(wxCommandEvent &event) {
     if(inputBuilderWindow) {
@@ -2066,14 +2089,21 @@ void MolDisplayWin::menuWindowInput_builder(wxCommandEvent &event) {
     }
     else {
         inputBuilderWindow = new InputBuilderWindow(this);
+			//Since this window is not resizeable leave the width and height alone
+		wxRect temp = winData.GetInputBWinRect();
+		temp.width = temp.height = -1;
+		inputBuilderWindow->SetSize(temp);
         inputBuilderWindow->Show();
     }
+	winData.InputBWindowVisible(true);
 }
 void MolDisplayWin::CloseInputBuilderWindow(void) {
     if(inputBuilderWindow) {
+		winData.SetInputBWinRect(inputBuilderWindow->GetRect());
         inputBuilderWindow->Destroy();
         inputBuilderWindow = NULL;
     }
+	winData.InputBWindowVisible(false);
 }
 void MolDisplayWin::menuWindowSurfaces(wxCommandEvent &event) {
     if(surfacesWindow) { // need to bring it to the front...
@@ -2081,28 +2111,39 @@ void MolDisplayWin::menuWindowSurfaces(wxCommandEvent &event) {
     }
     else {
         surfacesWindow = new SurfacesWindow(this);
+		surfacesWindow->SetSize(winData.GetSurfacesWinRect());
         surfacesWindow->Show();
     }
+	winData.SurfacesWindowVisible(true);
 }
 void MolDisplayWin::CloseSurfacesWindow(void) {
     if(surfacesWindow) {
+		winData.SetSurfacesWinRect(surfacesWindow->GetRect());
         surfacesWindow->Destroy();
         surfacesWindow = NULL;
     }
+	winData.SurfacesWindowVisible(false);
 }
 void MolDisplayWin::menuWindowZMatrixCalc(wxCommandEvent &event) {
     if(zMatCalcDlg) { // need to bring it to the front...
 		zMatCalcDlg->Raise();
     } else {
         zMatCalcDlg = new ZMatrixCalculator(this);
+		//Since this window is not resizeable leave the width and height alone
+		wxRect temp = winData.GetZMatWinRect();
+		temp.width = temp.height = -1;
+		zMatCalcDlg->SetSize(temp);
         zMatCalcDlg->Show();
     }
+	winData.ZMatWindowVisible(true);
 }
 void MolDisplayWin::CloseZMatrixCalc(void) {
     if(zMatCalcDlg) {
+		winData.SetZMatWinRect(zMatCalcDlg->GetRect());
         zMatCalcDlg->Destroy();
         zMatCalcDlg = NULL;
     }
+	winData.ZMatWindowVisible(false);
 }
 
 void MolDisplayWin::AtomsChanged(void) {
@@ -2472,10 +2513,25 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
     }
     ProgressInd->ChangeText("Reading CML file...");
     long test = 0;
-    if (readWindows)
-        test = MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, readPrefs);
-//      test = MainData->OpenCMLFile(Buffer, Prefs, &winData, readPrefs);
-    else
+    if (readWindows) {
+		//This option reads in the saved window rects (if any) and the state of 
+		//the various subwindows. This option is normally only run when reading in
+		//a file to a new window.
+		test = MainData->OpenCMLFile(Buffer, Prefs, &winData, ProgressInd, readPrefs);
+		if (test) {
+			SetSize(winData.GetMolWinRect());
+			wxCommandEvent foo;	//just a placeholder so we can call the menu event functions
+			if (winData.BondsWindowVisible()) menuWindowBonds(foo);
+			if (winData.CoordsWindowVisible()) menuWindowCoordinates(foo);
+			if (winData.EnergyWindowVisible()) menuWindowEnergy_plot(foo);
+			if (winData.FreqWindowVisible()) menuWindowFrequencies(foo);
+			if (winData.InputBWindowVisible()) menuWindowInput_builder(foo);
+			if (winData.SurfacesWindowVisible()) menuWindowSurfaces(foo);
+				//I don't think the prefs window should reopen automatically?
+			if (winData.PrefsWindowVisible()) winData.PrefsWindowVisible(false);
+			if (winData.ZMatWindowVisible()) menuWindowZMatrixCalc(foo);
+		}
+    } else
         test = MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, readPrefs);
 	if (readPrefs && test >= 10) {
 		//Update the view since a CMLfile reads in user preferences
@@ -2497,6 +2553,55 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
             */
     if (localprogress) FinishOperation();
     return test;
+}
+WindowData::WindowData(void) {
+	//These are all used for windows where -1 indicates the default value that
+	//causes wx to compute appropriate values
+	BondsVis = CoordsVis = EnergyVis = FreqVis = SurfacesVis = InputBVis = PrefVis = ZMatVis = false;
+	MolWinRect.x = MolWinRect.y = MolWinRect.width = MolWinRect.height = -1;
+	BondsWinRect.x = BondsWinRect.y = BondsWinRect.width = BondsWinRect.height = -1;
+	CoordsWinRect.x = CoordsWinRect.y = CoordsWinRect.width = CoordsWinRect.height = -1;
+	EnergyWinRect.x = EnergyWinRect.y = EnergyWinRect.width = EnergyWinRect.height = -1;
+	FreqWinRect.x = FreqWinRect.y = FreqWinRect.width = FreqWinRect.height = -1;
+	SurfacesWinRect.x = SurfacesWinRect.y = SurfacesWinRect.width = SurfacesWinRect.height = -1;
+	InputBuilderRect.x = InputBuilderRect.y = InputBuilderRect.width = InputBuilderRect.height = -1;
+	ZMatRect.x = ZMatRect.y = ZMatRect.width = ZMatRect.height = -1;
+	PreferenceWinRect.x = PreferenceWinRect.y = PreferenceWinRect.width = PreferenceWinRect.height = -1;
+}
+void MolDisplayWin::UpdateWindowData(void) {
+	winData.SetMolWinRect(GetRect());
+	if (bondsWindow != NULL) {
+		winData.BondsWindowVisible(true);
+		winData.SetBondsWinRect(bondsWindow->GetRect());
+	} else winData.BondsWindowVisible(false);
+	if (coordsWindow != NULL) {
+		winData.CoordsWindowVisible(true);
+		winData.SetCoordsWinRect(coordsWindow->GetRect());
+	} else winData.CoordsWindowVisible(false);
+	if (energyPlotWindow != NULL) {
+		winData.EnergyWindowVisible(true);
+		winData.SetEnergyWinRect(energyPlotWindow->GetRect());
+	} else winData.EnergyWindowVisible(false);
+	if (frequenciesWindow != NULL) {
+		winData.FreqWindowVisible(true);
+		winData.SetFrequencyWinRect(frequenciesWindow->GetRect());
+	} else winData.FreqWindowVisible(false);
+	if (surfacesWindow != NULL) {
+		winData.SurfacesWindowVisible(true);
+		winData.SetSurfacesWinRect(surfacesWindow->GetRect());
+	} else winData.SurfacesWindowVisible(false);
+	if (inputBuilderWindow != NULL) {
+		winData.InputBWindowVisible(true);
+		winData.SetInputBWinRect(inputBuilderWindow->GetRect());
+	} else winData.InputBWindowVisible(false);
+	if (prefsDlg != NULL) {
+		winData.PrefsWindowVisible(true);
+		winData.SetPrefsWinRect(prefsDlg->GetRect());
+	} else winData.PrefsWindowVisible(false);
+	if (zMatCalcDlg != NULL) {
+		winData.ZMatWindowVisible(true);
+		winData.SetZMatWinRect(zMatCalcDlg->GetRect());
+	} else winData.ZMatWindowVisible(false);
 }
 
 void MolDisplayWin::Rotate(wxMouseEvent &event) {

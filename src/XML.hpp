@@ -161,6 +161,7 @@ class XMLElement {
 		bool getAttributeValue(const char * name, long & newvalue) const;
 		bool getAttributeValue(const char * name, float & newvalue) const;
 		bool getAttributeValue(const char * name, bool & result) const;
+		bool getwxRectAttribute(wxRect & v) const;
 		XMLElementList * getChildren(void);
 		XMLElementList * getElementsByName(const char * name) const;
 		bool isName(const char * name) const;
@@ -170,6 +171,8 @@ class XMLElement {
 		bool hasChildren(void) const {return ((firstChild != NULL)?true:false);};
 		void addAttribute(const char * name, const char * value);
 		void addAttribute(const char * name, const long & value);
+		void addBoolAttribute(const char * name, bool value);
+		void addwxRectAttribute(const wxRect & v);
 		void appendChild(XMLElement & child);
 		void prependChild(XMLElement & child);
 		void setNextChild(XMLElement & n) {nextChild = &n;};

@@ -32,6 +32,63 @@ typedef class ModeAnimation ModeAnimation;
 typedef class ZMatrixCalculator ZMatrixCalculator;
 typedef class setPreference setPreference;
 typedef struct qtData;
+
+//Simple class to save window visibility and positioning data
+class WindowData {
+public:
+	WindowData(void);
+	
+	void WriteXML(XMLElement * parent) const;
+	void ReadXML(XMLElement * parent);
+	
+	bool BondsWindowVisible(void) const {return BondsVis;};
+	void BondsWindowVisible(bool v) {BondsVis = v;};
+	bool CoordsWindowVisible(void) const {return CoordsVis;};
+	void CoordsWindowVisible(bool v) {CoordsVis = v;};
+	bool EnergyWindowVisible(void) const {return EnergyVis;};
+	void EnergyWindowVisible(bool v) {EnergyVis = v;};
+	bool FreqWindowVisible(void) const {return FreqVis;};
+	void FreqWindowVisible(bool v) {FreqVis = v;};
+	bool SurfacesWindowVisible(void) const {return SurfacesVis;};
+	void SurfacesWindowVisible(bool v) {SurfacesVis = v;};
+	bool InputBWindowVisible(void) const {return InputBVis;};
+	void InputBWindowVisible(bool v) {InputBVis = v;};
+	bool PrefsWindowVisible(void) const {return PrefVis;};
+	void PrefsWindowVisible(bool v) {PrefVis = v;};
+	bool ZMatWindowVisible(void) const {return ZMatVis;};
+	void ZMatWindowVisible(bool v) {ZMatVis = v;};
+	
+	const wxRect & GetMolWinRect(void) const {return MolWinRect;};
+	void SetMolWinRect(const wxRect & v) {MolWinRect = v;};
+	const wxRect & GetBondsWinRect(void) const {return BondsWinRect;};
+	void SetBondsWinRect(const wxRect & v) {BondsWinRect = v;};
+	const wxRect & GetCoordsWinRect(void) const {return CoordsWinRect;};
+	void SetCoordsWinRect(const wxRect & v) {CoordsWinRect = v;};
+	const wxRect & GetEnergyWinRect(void) const {return EnergyWinRect;};
+	void SetEnergyWinRect(const wxRect & v) {EnergyWinRect = v;};
+	const wxRect & GetFrequencyWinRect(void) const {return FreqWinRect;};
+	void SetFrequencyWinRect(const wxRect & v) {FreqWinRect = v;};
+	const wxRect & GetSurfacesWinRect(void) const {return SurfacesWinRect;};
+	void SetSurfacesWinRect(const wxRect & v) {SurfacesWinRect = v;};
+	const wxRect & GetInputBWinRect(void) const {return InputBuilderRect;};
+	void SetInputBWinRect(const wxRect & v) {InputBuilderRect = v;};
+	const wxRect & GetPrefsWinRect(void) const {return PreferenceWinRect;};
+	void SetPrefsWinRect(const wxRect & v) {PreferenceWinRect = v;};
+	const wxRect & GetZMatWinRect(void) const {return ZMatRect;};
+	void SetZMatWinRect(const wxRect & v) {ZMatRect = v;};
+private:
+	wxRect	MolWinRect;
+	wxRect	BondsWinRect;
+	wxRect	CoordsWinRect;
+	wxRect	EnergyWinRect;
+	wxRect	FreqWinRect;
+	wxRect	SurfacesWinRect;
+	wxRect	InputBuilderRect;
+	wxRect	PreferenceWinRect;
+	wxRect	ZMatRect;
+	bool	BondsVis, CoordsVis, EnergyVis, FreqVis, SurfacesVis, InputBVis, PrefVis, ZMatVis;
+};
+
 /**
  * Subclasses wxFrame to define the main application window.  This is a
  * document window.  There can be multiple instances of the window in the
@@ -74,6 +131,8 @@ class MolDisplayWin : public wxFrame {
         InputBuilderWindow  *inputBuilderWindow;
 		setPreference		*prefsDlg;
 		ZMatrixCalculator	*zMatCalcDlg;
+		
+		WindowData			winData;
         
         wxPageSetupDialogData *pageSetupData;
         wxPrintData           *printData;
@@ -82,9 +141,9 @@ class MolDisplayWin : public wxFrame {
         long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
                               long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
 
-	bool mHighliteState;
-	bool interactiveMode;
-	bool show2DPatternMode;
+		bool mHighliteState;
+		bool interactiveMode;
+		bool show2DPatternMode;
 
         DECLARE_EVENT_TABLE()
 
@@ -261,6 +320,11 @@ class MolDisplayWin : public wxFrame {
         void BeginOperation(void);
         void FinishOperation(void);
         bool OperInProgress(void) const {return OperationInProgress;};
+        /**
+		 * Updates the visibility and position information. This should
+         * be called before saving the state of the file.
+         */
+		void UpdateWindowData(void);
         
         //OpenGL drawing routines
         void InitGLData(void);
@@ -276,10 +340,10 @@ class MolDisplayWin : public wxFrame {
         void RotateMoleculeGL(bool);
 		void DrawHydrogenBond(long bondNum);
         void PrintGL(wxDC * dc, const float & scaleFactor);
-	void SetHighliteMode(bool state) { mHighliteState = state; }
-	void DrawStaticLabel(const char* label, GLfloat x, GLfloat y);
-	void DrawLabel(void); //added by Song Li
-	void SelectionChanged(bool mode);
+		void SetHighliteMode(bool state) { mHighliteState = state; }
+		void DrawStaticLabel(const char* label, GLfloat x, GLfloat y);
+		void DrawLabel(void); //added by Song Li
+		void SelectionChanged(bool mode);
 		void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, float m[16],
 								const CPoint3D& x_world, float bond_size) const;
 

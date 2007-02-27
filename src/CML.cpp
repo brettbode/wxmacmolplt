@@ -13,8 +13,6 @@
 #include "Frame.h"
 #include "BFiles.h"
 #include "myFiles.h"
-//#include "MyWindowClasses.h"
-//#include "MolDisplay.h"
 #include "Progress.h"
 #include "Prefs.h"
 #include "Gradient.h"
@@ -28,14 +26,10 @@
 
 #include "XML.hpp"
 #include "CML.h"
-//#include "BondsWin.h"
-//#include "CoordWin.h"
-//#include "EnergyPlotWin.h"
-//#include "FrequencyWin.h"
-//#include "IBWin.h"
 #include "Internals.h"
 #include "InputData.h"
 #include "Math3D.h"
+#include "MolDisplayWin.h"
 #ifdef WIN32
 #undef AddAtom
 #endif
@@ -154,7 +148,7 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 		if (wData) {
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_WindowData));
-			//wData->WriteXML(Ele);
+			wData->WriteXML(Ele);
 		}
 	}
 	if (allFrames) {
@@ -174,6 +168,51 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 	Buffer->Write(CMLtext.str().c_str(), CMLtext.str().length()); 
 	return CMLtext.str().length();
 }
+void WindowData::WriteXML(XMLElement * parent) const {
+	XMLElement * t = parent->addChildElement(CML_convert(MMP_WinDataMolWin));
+	t->addwxRectAttribute(MolWinRect);
+	if (BondsVis || (BondsWinRect.x >= 0)) {
+		t = parent->addChildElement(CML_convert(MMP_WinDataBondsWin));
+		t->addwxRectAttribute(BondsWinRect);
+		t->addBoolAttribute(VISIBLE_XML, BondsVis);
+	}
+	if (CoordsVis || (CoordsWinRect.x >= 0)) {
+		t = parent->addChildElement(CML_convert(MMP_WinDataCoordsWin));
+		t->addwxRectAttribute(CoordsWinRect);
+		t->addBoolAttribute(VISIBLE_XML, CoordsVis);
+	}
+	if (EnergyVis || (EnergyWinRect.x >= 0)) {
+		t = parent->addChildElement(CML_convert(MMP_WinDataEnergyWin));
+		t->addwxRectAttribute(EnergyWinRect);
+		t->addBoolAttribute(VISIBLE_XML, EnergyVis);
+	}
+	if (FreqVis || (FreqWinRect.x >= 0)) {
+		t = parent->addChildElement(CML_convert(MMP_WinDataFreqWin));
+		t->addwxRectAttribute(FreqWinRect);
+		t->addBoolAttribute(VISIBLE_XML, FreqVis);
+	}
+	if (SurfacesVis || (SurfacesWinRect.x >= 0)) {
+		t = parent->addChildElement(CML_convert(MMP_WinDataSurfacesWin));
+		t->addwxRectAttribute(SurfacesWinRect);
+		t->addBoolAttribute(VISIBLE_XML, SurfacesVis);
+	}
+	if (InputBVis || (InputBuilderRect.x >= 0)) {
+		t = parent->addChildElement(CML_convert(MMP_WinDataInputBWin));
+		t->addwxRectAttribute(InputBuilderRect);
+		t->addBoolAttribute(VISIBLE_XML, InputBVis);
+	}
+	if (PrefVis || (PreferenceWinRect.x >= 0)) {
+		t = parent->addChildElement(CML_convert(MMP_WinDataPrefWin));
+		t->addwxRectAttribute(PreferenceWinRect);
+		t->addBoolAttribute(VISIBLE_XML, PrefVis);
+	}
+	if (ZMatVis || (ZMatRect.x >= 0)) {
+		t = parent->addChildElement(CML_convert(MMP_WinDataZMatWin));
+		t->addwxRectAttribute(ZMatRect);
+		t->addBoolAttribute(VISIBLE_XML, ZMatVis);
+	}
+}
+
 void BasisSet::WriteXML(XMLElement * parent) const {
 	XMLElement * t = parent->addChildElement(CML_convert(MMP_BasisSetElement));
 	t->addAttribute(CML_convert(MMP_BSMapLength), MapLength);
@@ -873,7 +912,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 															}
 															break;
 														case MMP_WindowData:
-															//if (wData) wData->ReadXML(mdchild);
+															if (wData) wData->ReadXML(mdchild);
 															break;
 													}
 												}
@@ -926,6 +965,62 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 	return result;
 }
 
+void WindowData::ReadXML(XMLElement * parent) {
+	XMLElementList * children = parent->getChildren();
+	bool temp;
+	for (long i=0; i < children->length(); i++) {
+		XMLElement * child = children->item(i);
+		MMP_WindowDataNS childName;
+		if (CML_convert(child->getName(), childName)) {
+			switch (childName) {
+				case MMP_WinDataMolWin:
+					child->getwxRectAttribute(MolWinRect);
+					break;
+				case MMP_WinDataBondsWin:
+					child->getwxRectAttribute(BondsWinRect);
+					if (child->getAttributeValue(VISIBLE_XML,temp))
+						BondsVis = temp;
+					break;
+				case MMP_WinDataCoordsWin:
+					child->getwxRectAttribute(BondsWinRect);
+					if (child->getAttributeValue(VISIBLE_XML,temp))
+						BondsVis = temp;
+						break;
+				case MMP_WinDataEnergyWin:
+					child->getwxRectAttribute(EnergyWinRect);
+					if (child->getAttributeValue(VISIBLE_XML,temp))
+						EnergyVis = temp;
+						break;
+				case MMP_WinDataFreqWin:
+					child->getwxRectAttribute(FreqWinRect);
+					if (child->getAttributeValue(VISIBLE_XML,temp))
+						FreqVis = temp;
+						break;
+				case MMP_WinDataSurfacesWin:
+					child->getwxRectAttribute(SurfacesWinRect);
+					if (child->getAttributeValue(VISIBLE_XML,temp))
+						SurfacesVis = temp;
+						break;
+				case MMP_WinDataInputBWin:
+					child->getwxRectAttribute(InputBuilderRect);
+					if (child->getAttributeValue(VISIBLE_XML,temp))
+						InputBVis = temp;
+						break;
+				case MMP_WinDataPrefWin:
+					child->getwxRectAttribute(PreferenceWinRect);
+					if (child->getAttributeValue(VISIBLE_XML,temp))
+						PrefVis = temp;
+						break;
+				case MMP_WinDataZMatWin:
+					child->getwxRectAttribute(ZMatRect);
+					if (child->getAttributeValue(VISIBLE_XML,temp))
+						ZMatVis = temp;
+						break;
+			}
+		}
+	}
+	delete children;
+}
 bool Frame::ReadCMLMolecule(XMLElement * mol) {
 	//parse the contents of a Molecule element, each molecule is a different frame
 	
@@ -1039,6 +1134,7 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
 			}
 		}
 	}
+	delete children;
 	//release the memory occupied by the id array
     std::vector<char *>::const_iterator id = idList.begin();
     while (id != idList.end()) {
@@ -2864,6 +2960,32 @@ const char * CML_convert(MMP_IOStatPtGroupNS t)
             return "invalid";
     }
 }
+#pragma mark MMP_WindowDataNS
+const char * CML_convert(MMP_WindowDataNS t)
+{       
+    switch(t) {
+        case MMP_WinDataMolWin:
+            return "MoleculeDisplayWindow";
+		case MMP_WinDataBondsWin:
+			return "BondsWindow";
+        case MMP_WinDataCoordsWin:
+            return "CoordinatesWindow";
+		case MMP_WinDataEnergyWin:
+			return "EnergyPlotWindow";
+		case MMP_WinDataFreqWin:
+			return "FrequencyWindow";
+		case MMP_WinDataSurfacesWin:
+			return "SurfacesWindow";
+		case MMP_WinDataInputBWin:
+			return "InputBuilderWindow";
+		case MMP_WinDataPrefWin:
+			return "PreferencesWindow";
+		case MMP_WinDataZMatWin:
+			return "ZMatrixWindow";
+		default:
+            return "invalid";
+    }
+}
 const char * SurfaceTypeToText(const SurfaceType & s)
 {       
     switch(s)
@@ -2994,6 +3116,10 @@ bool CML_convert(const char * s, MMP_IOHessGroupNS & t)
 bool CML_convert(const char * s, MMP_IODFTGroupNS & t)
 {
     MATCH(s, t, 0, NumberMMPIODFTGroupItems, MMP_IODFTGroupNS)
+}
+bool CML_convert(const char * s, MMP_WindowDataNS & t)
+{
+    MATCH(s, t, 0, NumberMMPWindowDataItems, MMP_WindowDataNS)
 }
 bool TextToSurfaceType(const char * t, SurfaceType & s) {
 	if (!t || !*t) return false;

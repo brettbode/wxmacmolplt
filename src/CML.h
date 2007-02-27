@@ -425,6 +425,22 @@ enum MMP_IOStatPtGroupNS {
 	NumberMMPIOStatPtGroupItems
 };
 
+#define VISIBLE_XML	"visible"
+enum MMP_WindowDataNS {
+	MMP_WinDataInvalid=0,
+	MMP_WinDataMolWin,
+	MMP_WinDataBondsWin,
+	MMP_WinDataCoordsWin,
+	MMP_WinDataEnergyWin,
+	MMP_WinDataFreqWin,
+	MMP_WinDataSurfacesWin,
+	MMP_WinDataInputBWin,
+	MMP_WinDataPrefWin,
+	MMP_WinDataZMatWin,
+	
+	NumberMMPWindowDataItems
+};
+
 //convert enum to string
 const char * CML_convert(CML_Element t);
 const char * CML_convert(CML_Attribute t);
@@ -448,6 +464,7 @@ const char * CML_convert(MMP_IOMP2GroupNS b);
 const char * CML_convert(MMP_IOHessGroupNS b);
 const char * CML_convert(MMP_IODFTGroupNS b);
 const char * CML_convert(MMP_IOStatPtGroupNS b);
+const char * CML_convert(MMP_WindowDataNS b);
 const char * CML_convert(MMP_BasisSetNS b);
 const char * CML_TypetoName(short t);
 //convert string to enum id
@@ -473,6 +490,7 @@ bool CML_convert(const char * s, MMP_IOMP2GroupNS & b);
 bool CML_convert(const char * s, MMP_IOHessGroupNS & b);
 bool CML_convert(const char * s, MMP_IODFTGroupNS & b);
 bool CML_convert(const char * s, MMP_IOStatPtGroupNS & b);
+bool CML_convert(const char * s, MMP_WindowDataNS & b);
 bool CML_convert(const char * s, MMP_BasisSetNS & b);
 
 #endif
