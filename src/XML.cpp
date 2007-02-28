@@ -887,7 +887,7 @@ void XMLElement::addwxRectAttribute(const wxRect & v) {
 		addAttribute(WXRECT_HEIGHT_XML, bf.str().c_str());
 	}
 }
-bool XMLElement::getwxRectAttribute(wxRect & v) const {
+void XMLElement::getwxRectAttribute(wxRect & v) const {
 	long temp;
 	if (getAttributeValue(WXRECT_X_XML, temp)) {
 		v.x = temp;

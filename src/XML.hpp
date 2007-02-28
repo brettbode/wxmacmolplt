@@ -162,7 +162,7 @@ class XMLElement {
 		bool getAttributeValue(const char * name, long & newvalue) const;
 		bool getAttributeValue(const char * name, float & newvalue) const;
 		bool getAttributeValue(const char * name, bool & result) const;
-		bool getwxRectAttribute(wxRect & v) const;
+		void getwxRectAttribute(wxRect & v) const;
 		XMLElementList * getChildren(void);
 		XMLElementList * getElementsByName(const char * name) const;
 		bool isName(const char * name) const;
