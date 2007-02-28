@@ -538,7 +538,6 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 					if (Atoms[iatm].IsSIMOMMAtom() != Atoms[jatm].IsSIMOMMAtom())
 						continue;	//bonds are not allowed between SIMOMM and ab intio atoms
 					if (! AddBond(iatm, jatm, lOrder)) {
-							Str255	Errmsg;
 						MessageAlert("Insufficient Memory for Set Bond\nLength operation. Old Bonds left untouched.");
 						delete [] Bonds;
 						Bonds = OldBonds;
@@ -552,13 +551,17 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 	}
 	if (AutoBond && Prefs->AllowHydrogenBonds()) {
 		for (iatm=0; iatm<NumAtoms; iatm++) {
+			iType = Atoms[iatm].GetType();
+			//only consider H bonds with N, O, F, P, S, Cl, Se, and Br
+			if (!((iType==1)||((iType>=7)&&(iType<=9))||((iType>=15)&&(iType<=17))||
+				  (iType==34)||(iType==35))) continue;
 			for (jatm=iatm+1; jatm<NumAtoms; jatm++) {
-				iType = Atoms[iatm].GetType();
 				jType = Atoms[jatm].GetType();
+				if (!((jType==1)||((jType>=7)&&(jType<=9))||((jType>=15)&&(jType<=17))||
+					  (jType==34)||(jType==35))) continue;
 				if (((iType == 1)&&(jType != 1)) ||
 					((iType != 1)&&(jType == 1))) {//is one atom a hydrogen?
-					if ((iType > 115)||(jType > 115)) continue;
-					if (BondExists(iatm, jatm) < 0) {
+					if (BondExists(iatm, jatm) < 0) {	//can't be an existing bond
 						newBond = false;
 						offset.x = Atoms[iatm].Position.x - Atoms[jatm].Position.x;
 						offset.y = Atoms[iatm].Position.y - Atoms[jatm].Position.y;
@@ -569,7 +572,10 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 						long HBonder;
 						if (iType == 1) HBonder = jType;
 						else HBonder = iType;
-						if (HBonder==7 || HBonder == 15) {
+						float testDistance = 1.5*AutoDist;
+						if (distance <= testDistance) newBond = true;
+						
+		/*				if (HBonder==7 || HBonder == 15) {
 							if (distance <= 1.0+AutoDist) {
 								newBond = true;
 								lOrder = kHydrogenBond;
@@ -583,30 +589,44 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 								lOrder = kHydrogenBond;
 							}
 						}
+		*/
 						if (newBond) {
 							//scan the bond list, prevent h-bonds between any pair of
 							//atoms which are bonded to the same atom
 							for (long i=0; i<NumAtoms; i++) {
 								long ib = BondExists(i, iatm);
+								//Don't filter on preexisting hydrogen bonds
+								if (ib >= 0)
+									if (Bonds[ib].Order == kHydrogenBond) ib = -1;
 								long jb = BondExists(i,jatm);
-								if ((ib>=0) && (jb>=0)) {//one atom connection
+								if (jb >= 0)
+									if (Bonds[jb].Order == kHydrogenBond) jb = -1;
+								if ((ib>=0) && (jb>=0)) {
+									//Both atoms have an existing single (or higher) bond
+									//and it thus doesn't make sense for them to have an H bond
 									newBond = false;
 									break;
-								} else if ((ib>=0) || (jb>=0)) {
+		/*						} else if ((ib>=0) || (jb>=0)) {
 									long nBondedAtom = iatm;
 									if (ib>=0) nBondedAtom = jatm;
 									for (long j=0; j<NumAtoms; j++) {
-										if ((BondExists(j,i)>=0)&&(BondExists(j,nBondedAtom)>=0)) {
+										ib = BondExists(i, j);
+										if (ib >= 0)
+											if (Bonds[ib].Order == kHydrogenBond) ib = -1;
+										jb = BondExists(j,nBondedAtom);
+										if (jb >= 0)
+											if (Bonds[jb].Order == kHydrogenBond) jb = -1;
+										if ((ib>=0)&&(jb>=0)) {
 											newBond = false;
 											break;
 										}
 									}
+			*/
 								}
 								if (!newBond) break;
 							}
 							if (newBond) {
-								if (! AddBond(iatm, jatm, lOrder)) {
-										Str255	Errmsg;
+								if (! AddBond(iatm, jatm, kHydrogenBond)) {
 									MessageAlert("Insufficient Memory for Set Bond\nLength operation. Old Bonds left untouched.");
 									delete [] Bonds;
 									Bonds = OldBonds;
