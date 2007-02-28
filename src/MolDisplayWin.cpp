@@ -993,7 +993,7 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
     wxString filePath;
 
     filePath = wxFileSelector(wxT("Save As"), wxT(""), wxT(""), wxT(""),
-                              wxT("CML Files (*.cml)|*.inp"),
+                              wxT("CML Files (*.cml)|*.cml"),
                               wxSAVE | wxOVERWRITE_PROMPT, this);
 
     if(!filePath.IsEmpty()) {
@@ -1413,7 +1413,6 @@ void MolDisplayWin::CopyCoordinates(short ctype) const {
     
     try {
         if (ctype == 0) {
-            char    LineText[100];
             wxString    Label;
             for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
                 Prefs->GetAtomLabel(lFrame->Atoms[iatm].GetType()-1, Label);
@@ -2592,8 +2591,6 @@ void WindowData::Validate(wxRect & testRect) {
 			displayRect = iDisplay.GetGeometry();
 #endif
 		}
-		std::cerr << "displayrect.x " << displayRect.x << " y " << displayRect.y <<
-			" width " << displayRect.width << " height " << displayRect.height << std::endl;
 		//Test the sample rect to see if it lies (at least partially) on this display
 		if ((testRect.x >= displayRect.x)&&(testRect.y >= displayRect.y)&&
 			(testRect.x < (displayRect.x+displayRect.width))&&
