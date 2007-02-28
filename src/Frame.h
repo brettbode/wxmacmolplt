@@ -67,14 +67,8 @@ class Frame {
 		Surface *	SurfaceList;
 		GradientData *	Gradient;
 
-		/* long		AnnoLengthAllocation; */
       std::vector<AnnotateLength> AnnoLengths;
-      /* AnnotateAngle *AnnoAngles; */
-      /* AnnotateDihedrals *AnnoDihedrals; */
-
-      /* long NumAnnoLengths; */
-      /* long NumAnnoAngles; */
-      /* long NumAnnoDihedrals; */
+      std::vector<AnnotateAngle> AnnoAngles;
 
 		Frame *		NextFrame;
 		Frame *		PreviousFrame;
@@ -119,11 +113,6 @@ class Frame {
 		bool SetAtomType(long theAtom, short atmType);
 		bool GetAtomPosition(long theAtom, CPoint3D & p) const;
 		bool SetAtomPosition(long theAtom, const CPoint3D & p);
-
-		AnnotateLength *AddAnnotateLength(long atom1, long atom2);
-		bool IncreaseAnnoLengthAllocation(long NumAdditional);
-      void DeleteAnnoLength(long AnnoLengthNum);
-
 		mpAtom * AddAtom(long AtomType, CPoint3D AtomPosition);
 		bool IncreaseAtomAllocation(long NumAdditional);
 			//BondExists returns the id of the bond, -1 otherwise

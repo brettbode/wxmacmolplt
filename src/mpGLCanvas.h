@@ -36,8 +36,10 @@
 #define GL_Popup_Measure_Length 30018
 #define GL_Popup_Measure_Angle 30019
 #define GL_Popup_Measure_Dihedral 30020
-#define GL_Popup_Delete_AnnoLength 30021
-#define GL_Popup_Delete_Bond 30022
+#define GL_Popup_Delete_Length 30021
+#define GL_Popup_Delete_Angle 30022
+#define GL_Popup_Delete_Dihedral 30023
+#define GL_Popup_Delete_Bond 30024
 
 class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
@@ -90,7 +92,7 @@ class MpGLCanvas : public wxGLCanvas {
    void initGL(void);
    void interactPopupMenu(int x, int y, bool isAtom);
    void bondPopupMenu(int x, int y);
-   void annoLengthPopupMenu(int x, int y);
+   void annoPopupMenu(int x, int y, int event_id, wxString label);
    void measurePopupMenu(int x, int y);
    int select_stack[4];
    int select_stack_top;
@@ -222,8 +224,8 @@ class MpGLCanvas : public wxGLCanvas {
          void On_Delete_Single_Frame(wxCommandEvent& event);
          void On_Delete_All_Frames(wxCommandEvent& event);
          void ChangeBonding(wxCommandEvent& event);
-         void AddLengthAnnotation(wxCommandEvent& event);
-         void DeleteLengthAnnotation(wxCommandEvent& event);
+         void AddAnnotation(wxCommandEvent& event);
+         void DeleteAnnotation(wxCommandEvent& event);
 		 void DeleteBond(wxCommandEvent& event);
          //implementation of the correspondent popup-menu selection
          

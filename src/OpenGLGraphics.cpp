@@ -384,7 +384,7 @@ void MolDisplayWin::Create3DGLPICT(WindowPtr PrintWindow)
 	//the PICT).
 	int width = DisplayRect.right - DisplayRect.left;
 	int height = DisplayRect.bottom - DisplayRect.top;
-		Rect windowBounds;
+	Rect windowBounds;
 	GetWindowPortBounds(PrintWindow, &windowBounds);
 	int ScaledWidth = windowBounds.right - windowBounds.left;
 	int ScaledHeight = windowBounds.bottom - windowBounds.top;
@@ -397,7 +397,7 @@ void MolDisplayWin::Create3DGLPICT(WindowPtr PrintWindow)
 	unsigned char * array = new unsigned char[width*height*sizeof(GLbyte)*4];
 	unsigned char * arrayorder = new unsigned char[width*height*sizeof(GLbyte)*4];
 	GLvoid * pixels= (GLvoid *) array;
-		Rect	WorkingPrintRect;
+	Rect WorkingPrintRect;
 		
 	glReadBuffer(GL_BACK);
 	PixMapHandle myPixMap = NewPixMap();
@@ -1187,102 +1187,279 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 	//choose black or white based on the background color
 	if (backMagnitude > 70000)  //"light" background choose black
-	   glColor3f (0.0, 0.0, 0.0);
+		glColor3f (0.0, 0.0, 0.0);
 	else
 		glColor3f (1.0, 1.0, 1.0);
 
 	if (!lFrame->AnnoLengths.empty()) {
-      CPoint3D lookat_eye;
-      CPoint3D up_eye;
-      CPoint3D lookat_world;
-      CPoint3D up_world;
-      CPoint3D r;
-      float m[16];
-      Matrix4D mv_inv;
+		CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f};
+		CPoint3D up_eye = {0.0f, 1.0f, 0.0f};
+		CPoint3D lookat_world;
+		CPoint3D up_world;
+		CPoint3D r;
+		float m[16];
+		Matrix4D mv_inv;
 
-      lookat_eye.x = 0.0f;
-      lookat_eye.y = 0.0f;
-      lookat_eye.z = 1.0f;
-      up_eye.x = 0.0f;
-      up_eye.y = 1.0f;
-      up_eye.z = 0.0f;
+		// Invert just the rotation portion of the modelview matrix.  We can't
+		// use InverseMatrix because it considers the translation factors.
+		// We don't want the translation factors because we want to transform
+		// a vector, and Rotate3DPt transforms only points (and not vectors).
+		mv_inv[0][0] = modelview[0];
+		mv_inv[0][1] = modelview[4];
+		mv_inv[0][2] = modelview[8];
+		mv_inv[0][3] = 0.0f;
+		mv_inv[1][0] = modelview[1];
+		mv_inv[1][1] = modelview[5];
+		mv_inv[1][2] = modelview[9];
+		mv_inv[1][3] = 0.0f;
+		mv_inv[2][0] = modelview[2];
+		mv_inv[2][1] = modelview[6];
+		mv_inv[2][2] = modelview[10];
+		mv_inv[2][3] = 0.0f;
+		mv_inv[3][0] = 0.0f;
+		mv_inv[3][1] = 0.0f;
+		mv_inv[3][2] = 0.0f;
+		mv_inv[3][3] = 1.0f;
 
-      // Invert just the rotation portion of the modelview matrix.  We can't
-      // use InverseMatrix because it considers the translation factors.
-      // We don't want the translation factors because we want to transform
-      // a vector, and Rotate3DPt transforms only points (and not vectors).
-      mv_inv[0][0] = modelview[0];
-      mv_inv[0][1] = modelview[4];
-      mv_inv[0][2] = modelview[8];
-      mv_inv[0][3] = 0.0f;
-      mv_inv[1][0] = modelview[1];
-      mv_inv[1][1] = modelview[5];
-      mv_inv[1][2] = modelview[9];
-      mv_inv[1][3] = 0.0f;
-      mv_inv[2][0] = modelview[2];
-      mv_inv[2][1] = modelview[6];
-      mv_inv[2][2] = modelview[10];
-      mv_inv[2][3] = 0.0f;
-      mv_inv[3][0] = 0.0f;
-      mv_inv[3][1] = 0.0f;
-      mv_inv[3][2] = 0.0f;
-      mv_inv[3][3] = 1.0f;
+		// Transform the eye space vectors to world coordinates, and find 
+		// a third vector to form a basis set.
+		Rotate3DPt(mv_inv, lookat_eye, &lookat_world);
+		Rotate3DPt(mv_inv, up_eye, &up_world);
+		CrossProduct3D(&lookat_world, &up_world, &r);
 
-      // Transform the eye space vectors to world coordinates, and find 
-      // a third vector to form a basis set.
-      Rotate3DPt(mv_inv, lookat_eye, &lookat_world);
-      Rotate3DPt(mv_inv, up_eye, &up_world);
-      CrossProduct3D(&lookat_world, &up_world, &r);
+		m[0] = r.x;
+		m[1] = r.y;
+		m[2] = r.z;
+		m[3] = 0.0f;
 
-      m[0] = r.x;
-      m[1] = r.y;
-      m[2] = r.z;
-      m[3] = 0.0f;
+		m[4] = up_world.x;
+		m[5] = up_world.y;
+		m[6] = up_world.z;
+		m[7] = 0.0f;
 
-      m[4] = up_world.x;
-      m[5] = up_world.y;
-      m[6] = up_world.z;
-      m[7] = 0.0f;
+		m[8] = lookat_world.x;
+		m[9] = lookat_world.y;
+		m[10] = lookat_world.z;
+		m[11] = 0.0f;
 
-      m[8] = lookat_world.x;
-      m[9] = lookat_world.y;
-      m[10] = lookat_world.z;
-      m[11] = 0.0f;
+		m[12] = m[13] = m[14] = 0.0f;
+		m[15] = 1.0f;
 
-      m[12] = m[13] = m[14] = 0.0f;
-      m[15] = 1.0f;
+		CPoint3D x_eye;
+		CPoint3D x_world;
+		x_eye.x = 1.0f;
+		x_eye.y = 0.0f;
+		x_eye.z = 0.0f;
 
-      CPoint3D x_eye;
-      CPoint3D x_world;
-      x_eye.x = 1.0f;
-      x_eye.y = 0.0f;
-      x_eye.z = 0.0f;
+		Rotate3DPt(mv_inv, x_eye, &x_world);
 
-      Rotate3DPt(mv_inv, x_eye, &x_world);
+		int atom1_id, atom2_id;
+		int bond_id;
+		float bond_size;
 
-      int atom1_id, atom2_id;
-      int bond_id;
-      float bond_size;
+		for (long anno_id = 0; anno_id < lFrame->AnnoLengths.size(); anno_id++) {
+			atom1_id = lFrame->AnnoLengths[anno_id].atom1_id;
+			atom2_id = lFrame->AnnoLengths[anno_id].atom2_id;
+			bond_id = lFrame->BondExists(atom1_id, atom2_id);
+			if (bond_id > -1) {
+				bond_size = BondSize / MAX(lBonds[bond_id].Order, 1.0f) *
+					3.5f * lBonds[bond_id].Order / 2.0f;
+				if (lBonds[bond_id].Order > 1) {
+					bond_size *= 1.5;
+				}
+			} else {
+				bond_size = 0.0f;
+			}
+			glLoadName(anno_id + NumAtoms + NumBonds + 1);
+			DashedQuadFromLine(lFrame->Atoms[atom1_id].Position,
+									 lFrame->Atoms[atom2_id].Position,
+									 BondSize * 0.25, m, x_world, bond_size);
+		}
+	}
 
-      for (long anno_id = 0; anno_id < lFrame->AnnoLengths.size(); anno_id++) {
-         atom1_id = lFrame->AnnoLengths[anno_id].atom1_id;
-         atom2_id = lFrame->AnnoLengths[anno_id].atom2_id;
-         bond_id = lFrame->BondExists(atom1_id, atom2_id);
-         if (bond_id > -1) {
-            bond_size = BondSize / MAX(lBonds[bond_id].Order, 1.0f) *
-                        3.5f * lBonds[bond_id].Order / 2.0f;
-            if (lBonds[bond_id].Order > 1) {
-		         bond_size *= 1.5;
-            }
-         } else {
-            bond_size = 0.0f;
-         }
-         glLoadName(anno_id + NumAtoms + NumBonds + 1);
-         DashedQuadFromLine(lFrame->Atoms[atom1_id].Position,
-                            lFrame->Atoms[atom2_id].Position,
-                            BondSize * 0.25, m, x_world, bond_size);
-      }
-   }
+	if (!lFrame->AnnoAngles.empty()) {
+		CPoint3D vec1;
+		CPoint3D vec2;
+		Matrix4D plane2xy;
+		int atom1_id;
+		int atom2_id;
+		int atom3_id;
+		float min_len;
+		float len1;
+		float len2;
+		float angle;
+		float m[16];
+		float chord_len;
+		float x_eye[3];
+		float y_eye[3];
+
+		glDisable(GL_LIGHTING);
+		for (long anno_id = 0; anno_id < lFrame->AnnoAngles.size(); anno_id++) {
+
+			atom1_id = lFrame->AnnoAngles[anno_id].atom1_id;
+			atom2_id = lFrame->AnnoAngles[anno_id].atom2_id;
+			atom3_id = lFrame->AnnoAngles[anno_id].atom3_id;
+
+			vec1 = lFrame->Atoms[atom1_id].Position -
+					 lFrame->Atoms[atom2_id].Position;
+			vec2 = lFrame->Atoms[atom3_id].Position -
+					 lFrame->Atoms[atom2_id].Position;
+
+			len1 = vec1.Magnitude();
+			len2 = vec2.Magnitude();
+			min_len = MIN(len1, len2);
+
+			vec1 = vec1 * (1.0f / len1);
+			vec2 = vec2 * (1.0f / len2);
+
+			angle = acos(DotProduct3D(&vec1, &vec2));
+			SetPlaneRotation(plane2xy, vec1, vec2);
+
+			glPushMatrix();
+			glTranslatef(lFrame->Atoms[atom2_id].Position.x,
+							 lFrame->Atoms[atom2_id].Position.y,
+							 lFrame->Atoms[atom2_id].Position.z);
+
+			glMultMatrixf((const GLfloat *) &plane2xy);
+
+			glGetFloatv(GL_MODELVIEW_MATRIX, m);
+
+			x_eye[0] = m[0];
+			x_eye[1] = m[4];
+			x_eye[2] = m[8];
+
+			y_eye[0] = m[1];
+			y_eye[1] = m[5];
+			y_eye[2] = m[9];
+
+			chord_len = 0.02f;
+			float delta = 0.125 / min_len;
+
+			glLoadName(anno_id + lFrame->AnnoLengths.size() + NumAtoms +
+						  NumBonds + 1);
+
+
+			// glBegin(GL_LINES); 
+			// glVertex3f(0.0f, 0.0f, 0.0f); 
+			// glVertex3f(min_len, 0.0f, 0.0f); 
+			// glEnd(); 
+
+			glBegin(GL_QUADS);
+
+			float ca = cos(angle);
+			float sa = sin(angle);
+
+			for (float i = 0.0f; i <= min_len; i += delta) {
+				glVertex3f(i - (x_eye[0] + y_eye[0]) * chord_len,
+								 - (x_eye[1] + y_eye[1]) * chord_len,
+								 - (x_eye[2] + y_eye[2]) * chord_len);
+				glVertex3f(i + (x_eye[0] - y_eye[0]) * chord_len,
+								 + (x_eye[1] - y_eye[1]) * chord_len,
+									(x_eye[2] - y_eye[2]) * chord_len);
+				glVertex3f(i + (x_eye[0] + y_eye[0]) * chord_len,
+								 + (x_eye[1] + y_eye[1]) * chord_len,
+									(x_eye[2] + y_eye[2]) * chord_len);
+				glVertex3f(i - (x_eye[0] - y_eye[0]) * chord_len,
+								 - (x_eye[1] - y_eye[1]) * chord_len,
+								 - (x_eye[2] - y_eye[2]) * chord_len);
+
+				glVertex3f(i * ca - (x_eye[0] + y_eye[0]) * chord_len,
+							  i * sa - (x_eye[1] + y_eye[1]) * chord_len,
+										- (x_eye[2] + y_eye[2]) * chord_len);
+				glVertex3f(i * ca + (x_eye[0] - y_eye[0]) * chord_len,
+							  i * sa + (x_eye[1] - y_eye[1]) * chord_len,
+										  (x_eye[2] - y_eye[2]) * chord_len);
+				glVertex3f(i * ca + (x_eye[0] + y_eye[0]) * chord_len,
+							  i * sa + (x_eye[1] + y_eye[1]) * chord_len,
+										  (x_eye[2] + y_eye[2]) * chord_len);
+				glVertex3f(i * ca - (x_eye[0] - y_eye[0]) * chord_len,
+							  i * sa - (x_eye[1] - y_eye[1]) * chord_len,
+										- (x_eye[2] - y_eye[2]) * chord_len);
+			}
+
+			for (float i = 0.0f; i <= angle; i += delta) {
+				glVertex3f(min_len * cos(i) - (x_eye[0] + y_eye[0]) * chord_len,
+							  min_len * sin(i) - (x_eye[1] + y_eye[1]) * chord_len,
+													 - (x_eye[2] + y_eye[2]) * chord_len);
+				glVertex3f(min_len * cos(i) + (x_eye[0] - y_eye[0]) * chord_len,
+							  min_len * sin(i) + (x_eye[1] - y_eye[1]) * chord_len,
+														(x_eye[2] - y_eye[2]) * chord_len);
+				glVertex3f(min_len * cos(i) + (x_eye[0] + y_eye[0]) * chord_len,
+							  min_len * sin(i) + (x_eye[1] + y_eye[1]) * chord_len,
+														(x_eye[2] + y_eye[2]) * chord_len);
+				glVertex3f(min_len * cos(i) - (x_eye[0] - y_eye[0]) * chord_len,
+							  min_len * sin(i) - (x_eye[1] - y_eye[1]) * chord_len,
+													 - (x_eye[2] - y_eye[2]) * chord_len);
+			}
+			glEnd();
+
+			CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f};
+			CPoint3D up_eye = {0.0f, 1.0f, 0.0f};
+			CPoint3D lookat_world;
+			CPoint3D up_world;
+			CPoint3D r;
+
+			Matrix4D mv_inv;
+
+			// Invert just the rotation portion of the modelview matrix.  We can't
+			// use InverseMatrix because it considers the translation factors.
+			// We don't want the translation factors because we want to transform
+			// a vector, and Rotate3DPt transforms only points (and not vectors).
+			mv_inv[0][0] = m[0];
+			mv_inv[0][1] = m[4];
+			mv_inv[0][2] = m[8];
+			mv_inv[0][3] = 0.0f;
+			mv_inv[1][0] = m[1];
+			mv_inv[1][1] = m[5];
+			mv_inv[1][2] = m[9];
+			mv_inv[1][3] = 0.0f;
+			mv_inv[2][0] = m[2];
+			mv_inv[2][1] = m[6];
+			mv_inv[2][2] = m[10];
+			mv_inv[2][3] = 0.0f;
+			mv_inv[3][0] = 0.0f;
+			mv_inv[3][1] = 0.0f;
+			mv_inv[3][2] = 0.0f;
+			mv_inv[3][3] = 1.0f;
+
+			// Transform the eye space vectors to world coordinates, and find 
+			// a third vector to form a basis set.
+			Rotate3DPt(mv_inv, lookat_eye, &lookat_world);
+			Rotate3DPt(mv_inv, up_eye, &up_world);
+			CrossProduct3D(&lookat_world, &up_world, &r);
+
+			m[0] = r.x;
+			m[1] = r.y;
+			m[2] = r.z;
+			m[3] = 0.0f;
+
+			m[4] = up_world.x;
+			m[5] = up_world.y;
+			m[6] = up_world.z;
+			m[7] = 0.0f;
+
+			m[8] = lookat_world.x;
+			m[9] = lookat_world.y;
+			m[10] = lookat_world.z;
+			m[11] = 0.0f;
+
+			m[12] = m[13] = m[14] = 0.0f;
+			m[15] = 1.0f;
+
+			char angle_label[40];
+			sprintf(angle_label, "%.2f deg", angle * 180.f / 3.14159f);
+			glTranslatef(min_len * cos(angle * 0.5f),
+							 min_len * sin(angle * 0.5f), 0.0f);
+			glMultMatrixf(m);
+			glTranslatef(-0.175f + chord_len, 0.0f, 0.0f);
+			glScalef(-0.1f, 0.1f, 0.1f);
+			glfDrawSolidString(angle_label);
+
+			glPopMatrix();
+
+		}
+		glEnable(GL_LIGHTING);
+	}
 
 		//bonds as cylinders
 		//In wireframe mode with bonds colored by atom color we simply scink the atom radius to the bond
@@ -1293,7 +1470,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			Matrix4D	rotMat;
 		long atom1 = lBonds[ibond].Atom1;
 		long atom2 = lBonds[ibond].Atom2;
-		glLoadName(ibond+NumAtoms+1);   //bond names start after the last atom
+		glLoadName(ibond+NumAtoms+1);	//bond names start after the last atom
 		if ( mHighliteState && !lBonds[ibond].GetSelectState()) {
 			glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
 			glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
@@ -1320,66 +1497,66 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		if (lAtoms[atom1].GetInvisibility() || lAtoms[atom2].GetInvisibility()) continue;
 
 		//if both atoms are selected, the bond is automatically
-      
-      GLdouble scr_coords1[3];  // Screen coordinates of atom1
-      GLdouble scr_coords2[3];  // Screen coordinates of atom2
-      CPoint3D scr_vec;         // Screen space vector between atoms
-      GLdouble perp_obj[3];     // Object coords on vector perp. to scr_vec
-      CPoint3D offset_vec;      // Direction to shift bond cylinders
+		
+		GLdouble scr_coords1[3];  // Screen coordinates of atom1
+		GLdouble scr_coords2[3];  // Screen coordinates of atom2
+		CPoint3D scr_vec;			// Screen space vector between atoms
+		GLdouble perp_obj[3];	  // Object coords on vector perp. to scr_vec
+		CPoint3D offset_vec;		// Direction to shift bond cylinders
 
-      // Find screen coordinates of one atom.
-      gluProject(lAtoms[atom1].Position.x,
-                 lAtoms[atom1].Position.y,
-                 lAtoms[atom1].Position.z,
-                 modelview, proj, viewport,
-                 &(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2]));
+		// Find screen coordinates of one atom.
+		gluProject(lAtoms[atom1].Position.x,
+					  lAtoms[atom1].Position.y,
+					  lAtoms[atom1].Position.z,
+					  modelview, proj, viewport,
+					  &(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2]));
 
-      // Find screen coordinates of other atom.
-      gluProject(lAtoms[atom2].Position.x,
-                 lAtoms[atom2].Position.y,
-                 lAtoms[atom2].Position.z,
-                 modelview, proj, viewport,
-                 &(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2]));
+		// Find screen coordinates of other atom.
+		gluProject(lAtoms[atom2].Position.x,
+					  lAtoms[atom2].Position.y,
+					  lAtoms[atom2].Position.z,
+					  modelview, proj, viewport,
+					  &(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2]));
 
-      // Find vector perpendicular to vector between two screen points and
-      // normalize it so we can scalar multiply it later.  We flip and 
-      // negate the slope of the line between the two screen coordinates to
-      // get the slop of the perpendicular line.
-      scr_vec.x = scr_coords2[1] - scr_coords1[1];
-      scr_vec.y = scr_coords1[0] - scr_coords2[0];
-      scr_vec.z = 0;
-      scr_vec *= 1 / scr_vec.Magnitude();
+		// Find vector perpendicular to vector between two screen points and
+		// normalize it so we can scalar multiply it later.  We flip and 
+		// negate the slope of the line between the two screen coordinates to
+		// get the slop of the perpendicular line.
+		scr_vec.x = scr_coords2[1] - scr_coords1[1];
+		scr_vec.y = scr_coords1[0] - scr_coords2[0];
+		scr_vec.z = 0;
+		scr_vec *= 1 / scr_vec.Magnitude();
 
-      // Now find a point on the perpendicular vector with atom1's depth
-      // and get its object coordinates.
-      gluUnProject(scr_coords1[0] + scr_vec.x * 10,
-                   scr_coords1[1] + scr_vec.y * 10,
-                   scr_coords1[2],
-                   modelview, proj, viewport,
-                   &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
+		// Now find a point on the perpendicular vector with atom1's depth
+		// and get its object coordinates.
+		gluUnProject(scr_coords1[0] + scr_vec.x * 10,
+						 scr_coords1[1] + scr_vec.y * 10,
+						 scr_coords1[2],
+						 modelview, proj, viewport,
+						 &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
 
-      // Finally, we see what direction all bond cylinders must be offset
-      // so that they will always stay in view.
-      offset_vec.x = perp_obj[0] - lAtoms[atom1].Position.x;
-      offset_vec.y = perp_obj[1] - lAtoms[atom1].Position.y;
-      offset_vec.z = perp_obj[2] - lAtoms[atom1].Position.z;
-      offset_vec *= 1 / offset_vec.Magnitude();
-      
-      // For each "sub-bond" between these two atoms...
+		// Finally, we see what direction all bond cylinders must be offset
+		// so that they will always stay in view.
+		offset_vec.x = perp_obj[0] - lAtoms[atom1].Position.x;
+		offset_vec.y = perp_obj[1] - lAtoms[atom1].Position.y;
+		offset_vec.z = perp_obj[2] - lAtoms[atom1].Position.z;
+		offset_vec *= 1 / offset_vec.Magnitude();
+		
+		// For each "sub-bond" between these two atoms...
 		for (int ipipe = 0; ipipe < MAX(tmpOrder,1); ++ipipe) {
 
 			v1.x = lAtoms[atom1].Position.x + offset_vec.x * baseBondOffset +
-                3.5 * tmpBondSize * offset_vec.x * ipipe;
+					 3.5 * tmpBondSize * offset_vec.x * ipipe;
 			v1.y = lAtoms[atom1].Position.y + offset_vec.y * baseBondOffset +
-                3.5 * tmpBondSize * offset_vec.y * ipipe;
+					 3.5 * tmpBondSize * offset_vec.y * ipipe;
 			v1.z = lAtoms[atom1].Position.z + offset_vec.z * baseBondOffset +
-                3.5 * tmpBondSize * offset_vec.z * ipipe;
+					 3.5 * tmpBondSize * offset_vec.z * ipipe;
 			v2.x = lAtoms[atom2].Position.x + offset_vec.x * baseBondOffset +
-                3.5 * tmpBondSize * offset_vec.x * ipipe;
+					 3.5 * tmpBondSize * offset_vec.x * ipipe;
 			v2.y = lAtoms[atom2].Position.y + offset_vec.y * baseBondOffset +
-                3.5 * tmpBondSize * offset_vec.y * ipipe;
+					 3.5 * tmpBondSize * offset_vec.y * ipipe;
 			v2.z = lAtoms[atom2].Position.z + offset_vec.z * baseBondOffset +
-                3.5 * tmpBondSize * offset_vec.z * ipipe;
+					 3.5 * tmpBondSize * offset_vec.z * ipipe;
 
 			offset.x = v2.x - v1.x;
 			offset.y = v2.y - v1.y;
@@ -1391,7 +1568,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 				NormalOffset.z = offset.z/length;
 			} else {
 				NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
-         }
+			}
 
 			SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
 			rotMat[3][0] = v1.x;
@@ -1401,8 +1578,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			glPushMatrix();
 			glMultMatrixf((const GLfloat *) &rotMat);
 
-         // We may need to draw two cylinders if the user wants the bonds
-         // colored according to their element.
+			// We may need to draw two cylinders if the user wants the bonds
+			// colored according to their element.
 			if (Prefs->ColorBondHalves()) {
 					//center the color change at the middle of the visible part of the bond
 			  float radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
@@ -1464,32 +1641,32 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		//			gluDisk(qobj, 0.0, BondSize, (long)(Quality), 2);
 		//		}
 			}
-         
-         // We only need to draw one cylinder the whole length of a bond since
-         // the user's not interested in coloring each half differently.
-         else {
-            Prefs->ChangeColorBondColor(lBonds[ibond].Order);
-            for (int i = 0; i < MAX(tmpOrder,1); ++i) {
-              glPushMatrix();
-              gluCylinder(qobj, tmpBondSize, tmpBondSize, length, 
-                          (long) Quality, (long) (0.5f * Quality));
-              glPopMatrix();
-            }
+			
+			// We only need to draw one cylinder the whole length of a bond since
+			// the user's not interested in coloring each half differently.
+			else {
+				Prefs->ChangeColorBondColor(lBonds[ibond].Order);
+				for (int i = 0; i < MAX(tmpOrder,1); ++i) {
+				  glPushMatrix();
+				  gluCylinder(qobj, tmpBondSize, tmpBondSize, length, 
+								  (long) Quality, (long) (0.5f * Quality));
+				  glPopMatrix();
+				}
 
-            if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
-              gluDisk(qobj, 0.0, tmpBondSize, (long) Quality, 2);
-              glPopMatrix();
-              glPushMatrix();
-              rotMat[3][0] = v2.x;
-              rotMat[3][1] = v2.y;
-              rotMat[3][2] = v2.z;
-              glMultMatrixf((const GLfloat *) &rotMat);
-              gluDisk(qobj, 0.0, tmpBondSize, (long) Quality, 2);
-            }
-         }
+				if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
+				  gluDisk(qobj, 0.0, tmpBondSize, (long) Quality, 2);
+				  glPopMatrix();
+				  glPushMatrix();
+				  rotMat[3][0] = v2.x;
+				  rotMat[3][1] = v2.y;
+				  rotMat[3][2] = v2.z;
+				  glMultMatrixf((const GLfloat *) &rotMat);
+				  gluDisk(qobj, 0.0, tmpBondSize, (long) Quality, 2);
+				}
+			}
 
-         // Now, if a bond is selected but not this one, we need to draw an
-         // encapsulating cylinder to mask it out.
+			// Now, if a bond is selected but not this one, we need to draw an
+			// encapsulating cylinder to mask it out.
 			if (mHighliteState && !lBonds[ibond].GetSelectState()) {
 				glPopMatrix();
 				glPushMatrix();
@@ -1499,37 +1676,37 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 				rotMat[3][2] = v1.z;
 				glMultMatrixf((const GLfloat *) &rotMat);
 
-            // Display stippled cylinder and spheres slightly larger than bond
-            // cylinder and spheres.
+				// Display stippled cylinder and spheres slightly larger than bond
+				// cylinder and spheres.
 				glColor3f(0.0f, 0.0f, 0.0f);
 				glEnable(GL_POLYGON_STIPPLE);
 				glPolygonStipple(stippleMask);
 				gluCylinder(qobj, tmpBondSize * 1.01f, tmpBondSize * 1.01f,
-                        length, (long) Quality, (long) (0.5f * Quality));
+								length, (long) Quality, (long) (0.5f * Quality));
 				if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
 					gluSphere(qobj, tmpBondSize * 1.01f, (long) Quality,
-                         (long) (0.5f * Quality));
-               glPushMatrix();
-               glTranslatef(0.0f, 0.0f, length);
+								 (long) (0.5f * Quality));
+					glPushMatrix();
+					glTranslatef(0.0f, 0.0f, length);
 					gluSphere(qobj, tmpBondSize * 1.01f, (long) Quality,
-                         (long) (0.5f * Quality));
-               glPopMatrix();
+								 (long) (0.5f * Quality));
+					glPopMatrix();
 				}
 				glDisable(GL_POLYGON_STIPPLE);
 
-            // Display semi-transparent and non-stippled cylinder and spheres
-            // slightly larger than the bond and stippled cylinder and spheres.
+				// Display semi-transparent and non-stippled cylinder and spheres
+				// slightly larger than the bond and stippled cylinder and spheres.
 				glColor4f(0.5f, 0.5f, 0.5f, 0.7f);
 				glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 				glEnable(GL_BLEND);
-            gluCylinder(qobj, tmpBondSize * 1.02f, tmpBondSize * 1.02f,
-                        length, (long) Quality, (long) (0.5 * Quality));
+				gluCylinder(qobj, tmpBondSize * 1.02f, tmpBondSize * 1.02f,
+								length, (long) Quality, (long) (0.5 * Quality));
 				if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
 					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
-                         (long) (0.5 * Quality));
-               glTranslatef(0.0f, 0.0f, length);
+								 (long) (0.5 * Quality));
+					glTranslatef(0.0f, 0.0f, length);
 					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
-                         (long) (0.5 * Quality));
+								 (long) (0.5 * Quality));
 				}
 				glDisable(GL_BLEND);
 
@@ -2747,105 +2924,105 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 }
 
 void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, 
-                        float width, float m[16], const CPoint3D& x_world,
-                        float offset) const {
+							float width, float m[16], const CPoint3D& x_world,
+							float offset) const {
 
-   float len;
-   // CPoint3D vec; 
-   GLdouble scr_coords1[3];  // Screen coordinates of pt1
-   GLdouble scr_coords2[3];  // Screen coordinates of pt2
-   CPoint3D scr_vec;         // Screen space vector between atoms
-   GLdouble perp_obj[3];     // Object coords on vector perp. to scr_vec
-   CPoint3D offset_vec;      // Direction to shift bond cylinders
-   GLdouble modelview[16];
-   GLdouble proj[16];
-   GLint viewport[4];
+	float len;
+	// CPoint3D vec; 
+	GLdouble scr_coords1[3];  // Screen coordinates of pt1
+	GLdouble scr_coords2[3];  // Screen coordinates of pt2
+	CPoint3D scr_vec;			// Screen space vector between atoms
+	GLdouble perp_obj[3];	  // Object coords on vector perp. to scr_vec
+	CPoint3D offset_vec;		// Direction to shift bond cylinders
+	GLdouble modelview[16];
+	GLdouble proj[16];
+	GLint viewport[4];
 
-   glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-   glGetDoublev(GL_PROJECTION_MATRIX, proj);
-   glGetIntegerv(GL_VIEWPORT, viewport);
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, proj);
+	glGetIntegerv(GL_VIEWPORT, viewport);
 
-   // Find screen coordinates of one point.
-   gluProject(pt1.x, pt1.y, pt1.z, modelview, proj, viewport,
-              &(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2]));
+	// Find screen coordinates of one point.
+	gluProject(pt1.x, pt1.y, pt1.z, modelview, proj, viewport,
+				  &(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2]));
 
-   // Find screen coordinates of other atom.
-   gluProject(pt2.x, pt2.y, pt2.z, modelview, proj, viewport,
-              &(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2]));
+	// Find screen coordinates of other atom.
+	gluProject(pt2.x, pt2.y, pt2.z, modelview, proj, viewport,
+				  &(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2]));
 
-   // Find vector perpendicular to vector between two screen points and
-   // normalize it so we can scalar multiply it later.  We flip and 
-   // negate the slope of the line between the two screen coordinates to
-   // get the slop of the perpendicular line.
-   scr_vec.x = scr_coords2[1] - scr_coords1[1];
-   scr_vec.y = scr_coords1[0] - scr_coords2[0];
-   scr_vec.z = 0;
-   scr_vec *= 1 / scr_vec.Magnitude();
+	// Find vector perpendicular to vector between two screen points and
+	// normalize it so we can scalar multiply it later.  We flip and 
+	// negate the slope of the line between the two screen coordinates to
+	// get the slop of the perpendicular line.
+	scr_vec.x = scr_coords2[1] - scr_coords1[1];
+	scr_vec.y = scr_coords1[0] - scr_coords2[0];
+	scr_vec.z = 0;
+	scr_vec *= 1 / scr_vec.Magnitude();
 
-   // Now find a point on the perpendicular vector with pt1's depth
-   // and get its object coordinates.
-   gluUnProject(scr_coords1[0] + scr_vec.x * 10,
-                scr_coords1[1] + scr_vec.y * 10,
-                scr_coords1[2],
-                modelview, proj, viewport,
-                &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
+	// Now find a point on the perpendicular vector with pt1's depth
+	// and get its object coordinates.
+	gluUnProject(scr_coords1[0] + scr_vec.x * 10,
+					 scr_coords1[1] + scr_vec.y * 10,
+					 scr_coords1[2],
+					 modelview, proj, viewport,
+					 &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
 
-   // Finally, we see what direction all bond cylinders must be offset
-   // so that they will always stay in view.
-   offset_vec.x = perp_obj[0] - pt1.x;
-   offset_vec.y = perp_obj[1] - pt1.y;
-   offset_vec.z = perp_obj[2] - pt1.z;
-   offset_vec *= 1 / offset_vec.Magnitude();
+	// Finally, we see what direction all bond cylinders must be offset
+	// so that they will always stay in view.
+	offset_vec.x = perp_obj[0] - pt1.x;
+	offset_vec.y = perp_obj[1] - pt1.y;
+	offset_vec.z = perp_obj[2] - pt1.z;
+	offset_vec *= 1 / offset_vec.Magnitude();
 
-   len = (pt2 - pt1).Magnitude();
+	len = (pt2 - pt1).Magnitude();
 
-   CPoint3D new_pt1a;
-   CPoint3D new_pt1b;
-   CPoint3D new_pt2a;
-   CPoint3D new_pt2b;
+	CPoint3D new_pt1a;
+	CPoint3D new_pt1b;
+	CPoint3D new_pt2a;
+	CPoint3D new_pt2b;
 
-   new_pt1a.x = pt1.x + offset_vec.x * width;
-   new_pt1a.y = pt1.y + offset_vec.y * width;
-   new_pt1a.z = pt1.z + offset_vec.z * width;
-   new_pt1b.x = pt1.x - offset_vec.x * width;
-   new_pt1b.y = pt1.y - offset_vec.y * width;
-   new_pt1b.z = pt1.z - offset_vec.z * width;
-   new_pt2a.x = pt2.x + offset_vec.x * width;
-   new_pt2a.y = pt2.y + offset_vec.y * width;
-   new_pt2a.z = pt2.z + offset_vec.z * width;
-   new_pt2b.x = pt2.x - offset_vec.x * width;
-   new_pt2b.y = pt2.y - offset_vec.y * width;
-   new_pt2b.z = pt2.z - offset_vec.z * width;
+	new_pt1a.x = pt1.x + offset_vec.x * width;
+	new_pt1a.y = pt1.y + offset_vec.y * width;
+	new_pt1a.z = pt1.z + offset_vec.z * width;
+	new_pt1b.x = pt1.x - offset_vec.x * width;
+	new_pt1b.y = pt1.y - offset_vec.y * width;
+	new_pt1b.z = pt1.z - offset_vec.z * width;
+	new_pt2a.x = pt2.x + offset_vec.x * width;
+	new_pt2a.y = pt2.y + offset_vec.y * width;
+	new_pt2a.z = pt2.z + offset_vec.z * width;
+	new_pt2b.x = pt2.x - offset_vec.x * width;
+	new_pt2b.y = pt2.y - offset_vec.y * width;
+	new_pt2b.z = pt2.z - offset_vec.z * width;
 
-   glDisable(GL_LIGHTING);
-   glEnable(GL_ALPHA_TEST);
-   glAlphaFunc(GL_GREATER, 0.5f);
-   glEnable(GL_TEXTURE_1D);
-   glBegin(GL_QUADS);
-      glTexCoord1f(0.0f);
-      glVertex3f(new_pt1a.x, new_pt1a.y, new_pt1a.z);
-      glVertex3f(new_pt1b.x, new_pt1b.y, new_pt1b.z);
-      glTexCoord1f(len / 0.1f);
-      glVertex3f(new_pt2b.x, new_pt2b.y, new_pt2b.z);
-      glVertex3f(new_pt2a.x, new_pt2a.y, new_pt2a.z);
-   glEnd();
-   glDisable(GL_TEXTURE_1D);
-   glDisable(GL_ALPHA_TEST);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.5f);
+	glEnable(GL_TEXTURE_1D);
+	glBegin(GL_QUADS);
+		glTexCoord1f(0.0f);
+		glVertex3f(new_pt1a.x, new_pt1a.y, new_pt1a.z);
+		glVertex3f(new_pt1b.x, new_pt1b.y, new_pt1b.z);
+		glTexCoord1f(len / 0.1f);
+		glVertex3f(new_pt2b.x, new_pt2b.y, new_pt2b.z);
+		glVertex3f(new_pt2a.x, new_pt2a.y, new_pt2a.z);
+	glEnd();
+	glDisable(GL_TEXTURE_1D);
+	glDisable(GL_ALPHA_TEST);
 
-   char len_label[40];
-   glPushMatrix();
-   glTranslatef((pt1.x + pt2.x) / 2.0f,
-                (pt1.y + pt2.y) / 2.0f,
-                (pt1.z + pt2.z) / 2.0f);
-   glTranslatef(10 * width * x_world.x,
-                10 * width * x_world.y,
-                10 * width * x_world.z);
+	char len_label[40];
+	glPushMatrix();
+	glTranslatef((pt1.x + pt2.x) / 2.0f,
+					 (pt1.y + pt2.y) / 2.0f,
+					 (pt1.z + pt2.z) / 2.0f);
+	glTranslatef(10 * width * x_world.x,
+					 10 * width * x_world.y,
+					 10 * width * x_world.z);
 	glMultMatrixf(m);
-   glTranslatef(-offset, 0.0f, 0.0f);
+	glTranslatef(-offset, 0.0f, 0.0f);
 	glScalef(-0.1f, 0.1f, 0.1f);
 	sprintf(len_label, "%.6f", len);
 	glfDrawSolidString(len_label);
-   glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
 	glPopMatrix();
 
 }
