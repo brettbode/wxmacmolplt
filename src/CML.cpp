@@ -975,44 +975,53 @@ void WindowData::ReadXML(XMLElement * parent) {
 			switch (childName) {
 				case MMP_WinDataMolWin:
 					child->getwxRectAttribute(MolWinRect);
+					Validate(MolWinRect);
 					break;
 				case MMP_WinDataBondsWin:
 					child->getwxRectAttribute(BondsWinRect);
+					Validate(BondsWinRect);
 					if (child->getAttributeValue(VISIBLE_XML,temp))
 						BondsVis = temp;
 					break;
 				case MMP_WinDataCoordsWin:
-					child->getwxRectAttribute(BondsWinRect);
+					child->getwxRectAttribute(CoordsWinRect);
+					Validate(CoordsWinRect);
 					if (child->getAttributeValue(VISIBLE_XML,temp))
-						BondsVis = temp;
+						CoordsVis = temp;
 						break;
 				case MMP_WinDataEnergyWin:
 					child->getwxRectAttribute(EnergyWinRect);
+					Validate(EnergyWinRect);
 					if (child->getAttributeValue(VISIBLE_XML,temp))
 						EnergyVis = temp;
 						break;
 				case MMP_WinDataFreqWin:
 					child->getwxRectAttribute(FreqWinRect);
+					Validate(FreqWinRect);
 					if (child->getAttributeValue(VISIBLE_XML,temp))
 						FreqVis = temp;
 						break;
 				case MMP_WinDataSurfacesWin:
 					child->getwxRectAttribute(SurfacesWinRect);
+					Validate(SurfacesWinRect);
 					if (child->getAttributeValue(VISIBLE_XML,temp))
 						SurfacesVis = temp;
 						break;
 				case MMP_WinDataInputBWin:
 					child->getwxRectAttribute(InputBuilderRect);
+					Validate(InputBuilderRect);
 					if (child->getAttributeValue(VISIBLE_XML,temp))
 						InputBVis = temp;
 						break;
 				case MMP_WinDataPrefWin:
 					child->getwxRectAttribute(PreferenceWinRect);
+					Validate(PreferenceWinRect);
 					if (child->getAttributeValue(VISIBLE_XML,temp))
 						PrefVis = temp;
 						break;
 				case MMP_WinDataZMatWin:
 					child->getwxRectAttribute(ZMatRect);
+					Validate(ZMatRect);
 					if (child->getAttributeValue(VISIBLE_XML,temp))
 						ZMatVis = temp;
 						break;

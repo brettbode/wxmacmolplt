@@ -42,6 +42,7 @@
 #include <wx/image.h>
 #include <wx/printdlg.h>
 #include <wx/mstream.h>
+#include <wx/display.h>
 
 #ifdef __WXMSW__
 #include <stdio.h>
@@ -2530,6 +2531,7 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
 				//I don't think the prefs window should reopen automatically?
 			if (winData.PrefsWindowVisible()) winData.PrefsWindowVisible(false);
 			if (winData.ZMatWindowVisible()) menuWindowZMatrixCalc(foo);
+			Raise();
 		}
     } else
         test = MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, readPrefs);
@@ -2567,6 +2569,39 @@ WindowData::WindowData(void) {
 	InputBuilderRect.x = InputBuilderRect.y = InputBuilderRect.width = InputBuilderRect.height = -1;
 	ZMatRect.x = ZMatRect.y = ZMatRect.width = ZMatRect.height = -1;
 	PreferenceWinRect.x = PreferenceWinRect.y = PreferenceWinRect.width = PreferenceWinRect.height = -1;
+}
+void WindowData::Validate(wxRect & testRect) {
+	bool valid = false;
+	for (int i=0; i<wxDisplay::GetCount(); i++) { //iterate over the displays
+		//retrieve the usable rect for this display
+		//In theory wx 2.8 has a GetClientArea function that is equivelant to wxGetClientDisplayRect
+		//however in 2.8.0 it doesn't properly account for the Mac menu bar
+		wxRect displayRect;
+		if (i == 0) {
+			displayRect = wxGetClientDisplayRect();
+		} else {
+			wxDisplay iDisplay(i);
+			displayRect = iDisplay.GetGeometry();
+		}
+		std::cerr << "displayrect.x " << displayRect.x << " y " << displayRect.y <<
+			" width " << displayRect.width << " height " << displayRect.height << std::endl;
+		//Test the sample rect to see if it lies (at least partially) on this display
+		if ((testRect.x >= displayRect.x)&&(testRect.y >= displayRect.y)&&
+			(testRect.x < (displayRect.x+displayRect.width))&&
+			(testRect.y < (displayRect.y+displayRect.height))) {
+			//ok rect tests within this window
+			//now test the size to make sure the window can be placed fully on this screen
+			if (testRect.width < 1) testRect.width = -1;
+			else if (testRect.width > displayRect.width) testRect.width = displayRect.width;
+			if (testRect.height < 1) testRect.height = -1;
+			else if (testRect.height > displayRect.height) testRect.height = displayRect.height;
+			valid = true;
+			break;
+		}
+	}
+	if (!valid) {
+		testRect.x = testRect.y = testRect.width = testRect.height = -1;
+	}
 }
 void MolDisplayWin::UpdateWindowData(void) {
 	winData.SetMolWinRect(GetRect());

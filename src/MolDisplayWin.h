@@ -37,6 +37,7 @@ typedef struct qtData;
 class WindowData {
 public:
 	WindowData(void);
+	static void Validate(wxRect & t);
 	
 	void WriteXML(XMLElement * parent) const;
 	void ReadXML(XMLElement * parent);
