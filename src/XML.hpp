@@ -82,6 +82,7 @@ class XMLAttribute {
 
 std::ostream & operator << (std::ostream & target, const XMLAttribute & toWrite);
 class XMLElement;
+class wxRect;
 
 class XMLDocument {
 private:
