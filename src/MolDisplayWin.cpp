@@ -2572,7 +2572,13 @@ WindowData::WindowData(void) {
 }
 void WindowData::Validate(wxRect & testRect) {
 	bool valid = false;
-	for (int i=0; i<wxDisplay::GetCount(); i++) { //iterate over the displays
+		//bah... wxDisplay is not implemented on all platforms (doesn't seem to 
+		//be active on Windoze with wx 2.6.3)
+	int displayCount = 1;
+#if wxUSE_DISPLAY
+	displayCount = wxDisplay::GetCount();
+#endif
+	for (int i=0; i<displayCount; i++) { //iterate over the displays
 		//retrieve the usable rect for this display
 		//In theory wx 2.8 has a GetClientArea function that is equivelant to wxGetClientDisplayRect
 		//however in 2.8.0 it doesn't properly account for the Mac menu bar
@@ -2580,8 +2586,11 @@ void WindowData::Validate(wxRect & testRect) {
 		if (i == 0) {
 			displayRect = wxGetClientDisplayRect();
 		} else {
+#if wxUSE_DISPLAY
+	//There is no else here because of the #if above
 			wxDisplay iDisplay(i);
 			displayRect = iDisplay.GetGeometry();
+#endif
 		}
 		std::cerr << "displayrect.x " << displayRect.x << " y " << displayRect.y <<
 			" width " << displayRect.width << " height " << displayRect.height << std::endl;
