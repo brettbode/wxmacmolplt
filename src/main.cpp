@@ -192,6 +192,8 @@ int MpApp::OnExit() {
 		delete m_InstanceChecker;
 		m_InstanceChecker = NULL;
 	}
+	if (gPreferences) delete gPreferences;
+	if (gPrefDefaults) delete gPrefDefaults;
 
     delete wxConfigBase::Set((wxConfigBase *) NULL);
     //delete config object if there is one created before  -Song Li
