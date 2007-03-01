@@ -924,6 +924,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 									break;
 							}
 						}
+						delete children;
 						if (result <= 0) result = 1;
 					}
 					break;

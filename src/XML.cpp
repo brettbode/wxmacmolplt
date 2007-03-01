@@ -146,9 +146,9 @@ XMLDocument::~XMLDocument(void) {
 	}
 #endif
 	if (lSrc != NULL) delete lSrc;
-	if(root != NULL) delete root;
 	
 #endif
+	if(root != NULL) delete root;
 	if (uri) delete [] uri;
 	if (Buffer) delete [] Buffer;
 }
