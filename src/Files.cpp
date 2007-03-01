@@ -48,6 +48,10 @@
 #include <cctype>
 #include <new>
 
+#ifdef WIN32
+#undef AddAtom
+#endif
+
 extern WinPrefs *	gPreferences;
 #ifndef __wxBuild__
 extern Boolean		gQ3DAvail, gOpenGLAvailable;
