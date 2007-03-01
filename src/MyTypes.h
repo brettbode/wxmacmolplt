@@ -76,39 +76,89 @@ enum TypeofEnergy {
 };
 
 class AnnotateLength {
-   public:
-      AnnotateLength(long atom1_id, long atom2_id) {
-         this->atom1_id = atom1_id;
-         this->atom2_id = atom2_id;
-      }
-      int atom1_id;
-      int atom2_id;
+	public:
+		AnnotateLength(long atom1_id, long atom2_id) {
+			this->atom1_id = atom1_id;
+			this->atom2_id = atom2_id;
+		}
+
+		int getAtom1ID() { return atom1_id; }
+		int getAtom2ID() { return atom2_id; }
+
+		bool containsAtom(int atom_id) {
+			return atom1_id == atom_id || atom2_id == atom_id;
+		}
+
+		void adjustIDs(int atom_id) {
+			if (atom1_id > atom_id) atom1_id--;
+			if (atom2_id > atom_id) atom2_id--;
+		}
+
+	private:
+		int atom1_id;
+		int atom2_id;
 };
 
 class AnnotateAngle {
-   public:
-      AnnotateAngle(long atom1_id, long atom2_id, long atom3_id) {
-         this->atom1_id = atom1_id;
-         this->atom2_id = atom2_id;
-         this->atom3_id = atom3_id;
-      }
-      int atom1_id;
-      int atom2_id;
-      int atom3_id;
+	public:
+		AnnotateAngle(long atom1_id, long atom2_id, long atom3_id) {
+			this->atom1_id = atom1_id;
+			this->atom2_id = atom2_id;
+			this->atom3_id = atom3_id;
+		}
+
+		int getAtom1ID() { return atom1_id; }
+		int getAtom2ID() { return atom2_id; }
+		int getAtom3ID() { return atom3_id; }
+
+		bool containsAtom(int atom_id) {
+			return atom1_id == atom_id || atom2_id == atom_id ||
+				atom3_id == atom_id;
+		}
+
+		void adjustIDs(int atom_id) {
+			if (atom1_id > atom_id) atom1_id--;
+			if (atom2_id > atom_id) atom2_id--;
+			if (atom3_id > atom_id) atom3_id--;
+		}
+
+	private:
+		int atom1_id;
+		int atom2_id;
+		int atom3_id;
 };
 
 class AnnotateDihedral {
-   public:
-      AnnotateDihedral(long atom1_id, long atom2_id, long atom3_id) {
-         this->atom1_id = atom1_id;
-         this->atom2_id = atom2_id;
-         this->atom3_id = atom3_id;
-         this->atom4_id = atom4_id;
-      }
-      int atom1_id;
-      int atom2_id;
-      int atom3_id;
-      int atom4_id;
+	public:
+		AnnotateDihedral(long atom1_id, long atom2_id, long atom3_id) {
+			this->atom1_id = atom1_id;
+			this->atom2_id = atom2_id;
+			this->atom3_id = atom3_id;
+			this->atom4_id = atom4_id;
+		}
+
+		int getAtom1ID() { return atom1_id; }
+		int getAtom2ID() { return atom2_id; }
+		int getAtom3ID() { return atom3_id; }
+		int getAtom4ID() { return atom4_id; }
+
+		bool containsAtom(int atom_id) {
+			return atom1_id == atom_id || atom2_id == atom_id ||
+				atom3_id == atom_id || atom4_id == atom_id;
+		}
+
+		void adjustIDs(int atom_id) {
+			if (atom1_id > atom_id) atom1_id--;
+			if (atom2_id > atom_id) atom2_id--;
+			if (atom3_id > atom_id) atom3_id--;
+			if (atom4_id > atom_id) atom4_id--;
+		}
+
+	private:
+		int atom1_id;
+		int atom2_id;
+		int atom3_id;
+		int atom4_id;
 };
 
 class mpAtom {
