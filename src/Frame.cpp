@@ -411,11 +411,12 @@ bool Frame::IncreaseBondAllocation(long NumAdditional) {
 void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any higher atoms
 	if ((AtomNum>=0)&&(AtomNum<NumAtoms)) {
 		if ((AtomNum<(NumAtoms-1))&&(NumAtoms>1))
-            // BlockMoveData is Mac only
+			// BlockMoveData is Mac only
 			//BlockMoveData(&(Atoms[AtomNum+1]), &(Atoms[AtomNum]), (NumAtoms-AtomNum)*sizeof(mpAtom));
-            memcpy(&(Atoms[AtomNum]), &(Atoms[AtomNum+1]), (NumAtoms-AtomNum)*sizeof(mpAtom));
+			memcpy(&(Atoms[AtomNum]), &(Atoms[AtomNum+1]), (NumAtoms-AtomNum)*sizeof(mpAtom));
 		NumAtoms--;
-			//remove this atom from the bond list
+		//remove this atom from the bond list
+			
 		for (long ii=0; ii<NumBonds; ii++) {
 			if ((Bonds[ii].Atom1==AtomNum)||(Bonds[ii].Atom2==AtomNum)) {
 				DeleteBond(ii);
@@ -425,6 +426,34 @@ void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any highe
 				if (Bonds[ii].Atom2>AtomNum) Bonds[ii].Atom2 --;
 			}
 		}	//Delete any orbitals and normal modes
+
+		// We need to see if any annotations are affected by this delete.  An
+		// annotation may reference the atom, in which case we delete the
+		// annotation, or it may reference an atom with an index greater than the
+		// one being deleted, in which case we must adjust the annotation's IDs.
+		std::vector<AnnotateLength>::iterator length_anno;
+		length_anno = AnnoLengths.begin();
+		for (length_anno = AnnoLengths.begin();
+			  length_anno != AnnoLengths.end(); ) {
+			if ((*length_anno).containsAtom(AtomNum)) {
+				length_anno = AnnoLengths.erase(length_anno);
+			} else {
+				(*length_anno).adjustIDs(AtomNum);
+				length_anno++;
+			}
+		}
+
+		std::vector<AnnotateAngle>::iterator angle_anno;
+		for (angle_anno = AnnoAngles.begin();
+			  angle_anno != AnnoAngles.end(); ) {
+			if ((*angle_anno).containsAtom(AtomNum)) {
+				angle_anno = AnnoAngles.erase(angle_anno);
+			} else {
+				(*angle_anno).adjustIDs(AtomNum);
+				angle_anno++;
+			}
+		}
+
 		if (Vibs) {
 			delete Vibs;
 			Vibs = NULL;
