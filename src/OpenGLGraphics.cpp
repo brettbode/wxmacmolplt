@@ -1258,8 +1258,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		float bond_size;
 
 		for (long anno_id = 0; anno_id < lFrame->AnnoLengths.size(); anno_id++) {
-			atom1_id = lFrame->AnnoLengths[anno_id].atom1_id;
-			atom2_id = lFrame->AnnoLengths[anno_id].atom2_id;
+			atom1_id = lFrame->AnnoLengths[anno_id].getAtom1ID();
+			atom2_id = lFrame->AnnoLengths[anno_id].getAtom2ID();
 			bond_id = lFrame->BondExists(atom1_id, atom2_id);
 			if (bond_id > -1) {
 				bond_size = BondSize / MAX(lBonds[bond_id].Order, 1.0f) *
@@ -1296,9 +1296,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		glDisable(GL_LIGHTING);
 		for (long anno_id = 0; anno_id < lFrame->AnnoAngles.size(); anno_id++) {
 
-			atom1_id = lFrame->AnnoAngles[anno_id].atom1_id;
-			atom2_id = lFrame->AnnoAngles[anno_id].atom2_id;
-			atom3_id = lFrame->AnnoAngles[anno_id].atom3_id;
+			atom1_id = lFrame->AnnoAngles[anno_id].getAtom1ID();
+			atom2_id = lFrame->AnnoAngles[anno_id].getAtom2ID();
+			atom3_id = lFrame->AnnoAngles[anno_id].getAtom3ID();
 
 			vec1 = lFrame->Atoms[atom1_id].Position -
 					 lFrame->Atoms[atom2_id].Position;
