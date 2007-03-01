@@ -840,6 +840,7 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				break;
 		}
 	}
+	delete children;
 	return 1;
 }
 
