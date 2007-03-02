@@ -1525,6 +1525,8 @@ bool Frame::ParseBondXML(XMLElement * bondXML, const std::vector<char *> & idLis
 						AddBond(id1, id2, b); 
 					}
 				}
+				delete [] atm1;
+				delete [] atm2;
 			}
 		}
 	} else { // CML1 style bond info
@@ -2210,6 +2212,7 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 				}
 			}
 		}
+		delete children;
 	}
 	if (Vectors!= NULL) result = true;	//Probably should do some thing more...
 	return result;

@@ -1552,6 +1552,7 @@ void SystemGroup::ReadXML(XMLElement * parent) {
 				}
 			}
 		}
+		delete children;
 	}
 }
 long SystemGroup::ReadFromBuffer(BufferFile *Buffer) {
@@ -1950,6 +1951,7 @@ void BasisGroup::ReadXML(XMLElement * parent) {
 				}
 			}
 		}
+		delete children;
 	}
 }
 long BasisGroup::WriteToFile(BufferFile *File, MoleculeData * lData) {
@@ -2327,6 +2329,7 @@ void DataGroup::ReadXML(XMLElement * parent) {
 				}
 			}
 		}
+		delete children;
 	}
 }
 #pragma mark GuessGroup
@@ -2583,6 +2586,7 @@ void GuessGroup::ReadXML(XMLElement * parent) {
 				}
 			}
 		}
+		delete children;
 	}
 }
 #pragma mark SCFGroup
@@ -3646,6 +3650,7 @@ void StatPtGroup::ReadXML(XMLElement * parent) {
 				}
 			}
 		}
+		delete children;
 	}
 }
 
