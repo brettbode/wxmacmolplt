@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\wxWidgets-2.6.3\lib\vc_lib\mswd&quot;;&quot;C:\wxWidgets-2.6.3\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\wxWidgets-2.8.0\lib\vc_lib\mswd&quot;;&quot;C:\wxWidgets-2.8.0\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0400;wxUSE_GUI=1;__WXDEBUG__"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -61,9 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxmsw26d_adv.lib wxmsw26d_gl.lib wxmsw26d_core.lib wxbase26d.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexd.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib"
+				AdditionalDependencies="wxmsw28d_adv.lib wxmsw28d_gl.lib wxmsw28d_core.lib wxbase28d.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexd.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\wxWidgets-2.6.3\lib\vc_lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\wxWidgets-2.8.0\lib\vc_lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -116,7 +116,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\wxWidgets-2.6.3\lib\vc_lib\msw&quot;;&quot;C:\wxWidgets-2.6.3\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\wxWidgets-2.8.0\lib\vc_lib\msw&quot;;&quot;C:\wxWidgets-2.8.0\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x400;wxUSE_GUI=1"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -135,9 +135,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxmsw26_adv.lib wxmsw26_gl.lib wxmsw26_core.lib wxbase26.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregex.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib"
+				AdditionalDependencies="wxmsw28_adv.lib wxmsw28_gl.lib wxmsw28_core.lib wxbase28.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregex.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\wxWidgets-2.6.3\lib\vc_lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\wxWidgets-2.8.0\lib\vc_lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

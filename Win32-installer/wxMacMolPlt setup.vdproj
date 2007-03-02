@@ -63,12 +63,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_3C36A38F89E44B3A88AD5F22ACBCBCA4"
-        "OwnerKey" = "8:_661828A49604466FAAF27A185E4258FD"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_3DC39FA8E8A240609EB4C4B898CCA1D8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -93,6 +87,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_58EDE9C70AC74FCC9B791908DA5F5F90"
+        "OwnerKey" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_651548C912834A31B34AB532D0BE0112"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -101,12 +101,6 @@
         {
         "MsmKey" = "8:_65ABFBF120E74FC89A4D265E38C30CC9"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_661828A49604466FAAF27A185E4258FD"
-        "OwnerKey" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -225,6 +219,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_DF708C5899F6487BB9B4EFDBBF823CDE"
+        "OwnerKey" = "8:_58EDE9C70AC74FCC9B791908DA5F5F90"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_E7AF1EEF37004549849A155034C50B93"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -336,7 +336,7 @@
         {
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0531188D356D42948C8301D91CD9D4A4"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\3D_TED.jpg"
+            "SourcePath" = "8:..\\Manual_pages\\3D_TED.jpg"
             "TargetName" = "8:3D_TED.jpg"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -356,7 +356,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_06F1B158C55945C6966C1FCEFB902A31"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\2D_TED.gif"
+            "SourcePath" = "8:..\\Manual_pages\\2D_TED.gif"
             "TargetName" = "8:2D_TED.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -376,7 +376,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1D9390497F1B479C93A1A2B71BC8DF91"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\LLM.html"
+            "SourcePath" = "8:..\\Manual_pages\\LLM.html"
             "TargetName" = "8:LLM.html"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -416,7 +416,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_22209DEDA0B24F1680B185870C077A6F"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\2D_Orbital_Dialog.gif"
+            "SourcePath" = "8:..\\Manual_pages\\2D_Orbital_Dialog.gif"
             "TargetName" = "8:2D_Orbital_Dialog.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -436,7 +436,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2303C5FCE6374D219A3DDDB2600366CD"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\Coords_Win.gif"
+            "SourcePath" = "8:..\\Manual_pages\\Coords_Win.gif"
             "TargetName" = "8:Coords_Win.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -456,7 +456,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2B75538AA8164DA69A29D4507B1DC4AC"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\samples\\water.log"
+            "SourcePath" = "8:..\\samples\\water.log"
             "TargetName" = "8:water.log"
             "Tag" = "8:"
             "Folder" = "8:_D2A57A5D7ECE4109AD2C9375DABD1F68"
@@ -476,7 +476,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_36032819402641F497581EF89756094E"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\MacMolPlt_Surfaces.html"
+            "SourcePath" = "8:..\\Manual_pages\\MacMolPlt_Surfaces.html"
             "TargetName" = "8:MacMolPlt_Surfaces.html"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -496,7 +496,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3DC39FA8E8A240609EB4C4B898CCA1D8"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\MacMolPlt_Manual.html"
+            "SourcePath" = "8:..\\MacMolPlt_Manual.html"
             "TargetName" = "8:MacMolPlt_Manual.html"
             "Tag" = "8:"
             "Folder" = "8:_9EB3D9B8000942A3B75EA9188914B18B"
@@ -516,7 +516,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_41E72B4E86844CCA8B48DEFA3137373B"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\water.jpg"
+            "SourcePath" = "8:..\\Manual_pages\\water.jpg"
             "TargetName" = "8:water.jpg"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -536,7 +536,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_46EB442D8BFA49519AE9EBF4A0F0B6C3"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\2D_TED_Dialog.gif"
+            "SourcePath" = "8:..\\Manual_pages\\2D_TED_Dialog.gif"
             "TargetName" = "8:2D_TED_Dialog.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -556,7 +556,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_50D96125A53549D68670FA64948BB4F8"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\Create_Surface.gif"
+            "SourcePath" = "8:..\\Manual_pages\\Create_Surface.gif"
             "TargetName" = "8:Create_Surface.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -576,7 +576,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_651548C912834A31B34AB532D0BE0112"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\WalkThrough.html"
+            "SourcePath" = "8:..\\Manual_pages\\WalkThrough.html"
             "TargetName" = "8:WalkThrough.html"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -596,7 +596,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_65ABFBF120E74FC89A4D265E38C30CC9"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\2D_MEP.gif"
+            "SourcePath" = "8:..\\Manual_pages\\2D_MEP.gif"
             "TargetName" = "8:2D_MEP.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -616,7 +616,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_71F966BD5B5E474D9BD4F80C6DA7BCD2"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\sample-mol.jpg"
+            "SourcePath" = "8:..\\Manual_pages\\sample-mol.jpg"
             "TargetName" = "8:sample-mol.jpg"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -636,7 +636,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7A68E5E5C63347D3847DA4DCC0B2A6B4"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\3D_General_Dialog.gif"
+            "SourcePath" = "8:..\\Manual_pages\\3D_General_Dialog.gif"
             "TargetName" = "8:3D_General_Dialog.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -656,7 +656,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7EA66907A99046E38DAC51FEE02E6C45"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\resources\\MacMolPlt.Prefs.xml"
+            "SourcePath" = "8:..\\resources\\MacMolPlt.Prefs.xml"
             "TargetName" = "8:MacMolPlt.Prefs.xml"
             "Tag" = "8:"
             "Folder" = "8:_9EB3D9B8000942A3B75EA9188914B18B"
@@ -676,7 +676,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_84B9D147435E4EE2A01F045FE9E53A36"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\MEP_3D.jpg"
+            "SourcePath" = "8:..\\Manual_pages\\MEP_3D.jpg"
             "TargetName" = "8:MEP_3D.jpg"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -696,7 +696,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_86566269C79A4B2694F248458A2BFF74"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\samples\\sample.irc"
+            "SourcePath" = "8:..\\samples\\sample.irc"
             "TargetName" = "8:sample.irc"
             "Tag" = "8:"
             "Folder" = "8:_D2A57A5D7ECE4109AD2C9375DABD1F68"
@@ -716,7 +716,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8A9E3A8490D94636B9916B097E7704F6"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\resources\\MacMolPlt.ico"
+            "SourcePath" = "8:..\\resources\\MacMolPlt.ico"
             "TargetName" = "8:MacMolPlt.ico"
             "Tag" = "8:"
             "Folder" = "8:_9EB3D9B8000942A3B75EA9188914B18B"
@@ -736,7 +736,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8E65A2DDECCB4316AD383B550EDA0453"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\2D_Orbital.gif"
+            "SourcePath" = "8:..\\Manual_pages\\2D_Orbital.gif"
             "TargetName" = "8:2D_Orbital.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -756,7 +756,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_97FBA26FE67B4112A62EA5EAD6D01751"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\3D_Orbital_Dialog.gif"
+            "SourcePath" = "8:..\\Manual_pages\\3D_Orbital_Dialog.gif"
             "TargetName" = "8:3D_Orbital_Dialog.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -776,7 +776,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9D793021FC95472AB471CA96B95B4475"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\3D_TED_Dialog.gif"
+            "SourcePath" = "8:..\\Manual_pages\\3D_TED_Dialog.gif"
             "TargetName" = "8:3D_TED_Dialog.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -796,7 +796,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A58824D6A8C64E2681BA6AD313BA9D3C"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\General_Description.html"
+            "SourcePath" = "8:..\\Manual_pages\\General_Description.html"
             "TargetName" = "8:General_Description.html"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -816,7 +816,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B482828130E3458F82CC28729622DFF2"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\resources\\fonts\\arial1.glf"
+            "SourcePath" = "8:..\\resources\\fonts\\arial1.glf"
             "TargetName" = "8:arial1.glf"
             "Tag" = "8:"
             "Folder" = "8:_9EB3D9B8000942A3B75EA9188914B18B"
@@ -836,7 +836,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B4C5A3EDE8294273920D9BDFCBC608F0"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\MacMolPlt_Files.html"
+            "SourcePath" = "8:..\\Manual_pages\\MacMolPlt_Files.html"
             "TargetName" = "8:MacMolPlt_Files.html"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -896,7 +896,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CB4D45B5CA334CB9A47A873405C6DFA1"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\Version_History.html"
+            "SourcePath" = "8:..\\Manual_pages\\Version_History.html"
             "TargetName" = "8:Version_History.html"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -916,7 +916,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CD65CF4DD98F4404814BBD3081CD30A5"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\Bonds_Win.gif"
+            "SourcePath" = "8:..\\Manual_pages\\Bonds_Win.gif"
             "TargetName" = "8:Bonds_Win.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -936,7 +936,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D4A4DD92D45E46FDBED1963F652F6148"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\IB_Win.gif"
+            "SourcePath" = "8:..\\Manual_pages\\IB_Win.gif"
             "TargetName" = "8:IB_Win.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -956,7 +956,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D62F99690A5D49AC9E669C83854DE431"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\MEP_3D_Dialog.gif"
+            "SourcePath" = "8:..\\Manual_pages\\MEP_3D_Dialog.gif"
             "TargetName" = "8:MEP_3D_Dialog.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -976,7 +976,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E7AF1EEF37004549849A155034C50B93"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\2D_MEP_Dialog.gif"
+            "SourcePath" = "8:..\\Manual_pages\\2D_MEP_Dialog.gif"
             "TargetName" = "8:2D_MEP_Dialog.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -996,7 +996,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F6C9375C6F1A455E85915A70D4C4047C"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\MacMolPlt_Windows.html"
+            "SourcePath" = "8:..\\Manual_pages\\MacMolPlt_Windows.html"
             "TargetName" = "8:MacMolPlt_Windows.html"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -1016,7 +1016,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FD141E0AB1574A2B9D5DA657D7DCF811"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\2D_General_Dialog.gif"
+            "SourcePath" = "8:..\\Manual_pages\\2D_General_Dialog.gif"
             "TargetName" = "8:2D_General_Dialog.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -1036,7 +1036,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FDAC343CB0124119BD5A1E59D3FB4BB0"
             {
-            "SourcePath" = "8:C:\\wxMacMolPlt\\Manual_pages\\3D_Orbital.jpg"
+            "SourcePath" = "8:..\\Manual_pages\\3D_Orbital.jpg"
             "TargetName" = "8:3D_Orbital.jpg"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
@@ -1131,14 +1131,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:wxMacMolPlt"
-        "ProductCode" = "8:{F66C88AA-8196-446D-8117-FE5A9D44CE02}"
-        "PackageCode" = "8:{8E6071DE-6DA2-4E9D-B648-24A272BED7C1}"
+        "ProductCode" = "8:{2876670B-FEA4-4FC3-BAC6-9488836A114C}"
+        "PackageCode" = "8:{93C68BB2-8B9F-40FC-9C46-3BE37234DD39}"
         "UpgradeCode" = "8:{72B5F228-F1BD-4ED0-82D5-347629C06CC4}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:1.1.0"
         "Manufacturer" = "8:ISU"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1661,11 +1661,11 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_3C36A38F89E44B3A88AD5F22ACBCBCA4"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_58EDE9C70AC74FCC9B791908DA5F5F90"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_8_0_microsoft_vc80_crt_x86.msm"
+            "SourcePath" = "8:Microsoft_VC80_CRT_x86.msm"
                 "Properties"
                 {
                 }
@@ -1675,11 +1675,11 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_661828A49604466FAAF27A185E4258FD"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_DF708C5899F6487BB9B4EFDBBF823CDE"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:Microsoft_VC80_CRT_x86.msm"
+            "SourcePath" = "8:policy_8_0_microsoft_vc80_crt_x86.msm"
                 "Properties"
                 {
                 }
@@ -1694,7 +1694,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_DDE40DE35F3A4B93B842D1995C85DA5C"
             {
-            "SourcePath" = "8:c:\\wxMacMolPlt\\Release\\wxMacMolPlt.exe"
+            "SourcePath" = "8:..\\Release\\wxMacMolPlt.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_9EB3D9B8000942A3B75EA9188914B18B"
