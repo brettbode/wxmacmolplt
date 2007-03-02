@@ -94,28 +94,6 @@ GLfloat l_shininess[] = {80.0};
 GLfloat l_diffuse[] = {0.2,0.2,0.2,0.8};
 GLfloat l_ambient[] = {0.1,0.1,0.1,0.8};
 
-class OpenGLRec {
-	public:
-#ifndef __wxBuild__
-		AGLContext aglContext;
-		AGLPixelFormat	fmt;
-		GLuint fontList;
-#endif
-		
-		myGLTriangle *  transpTriList;
-		CPoint3D *		transpSortVertex;
-		long *			transpIndex;
-		long			triangleCount;
-		
-		GLuint			MainDisplayList;
-		GLuint			SurfaceDisplayList;
-		bool			MainListActive;
-		bool			SurfaceListActive;
-		bool			haveTransparentSurfaces;
-		
-		OpenGLRec(void);
-		~OpenGLRec(void);
-};
 OpenGLRec::OpenGLRec(void) {
 	transpTriList = NULL;
 	transpSortVertex = NULL;
@@ -191,8 +169,8 @@ void MolDisplayWin::OpenGLInitWindow(void)
 		else
 		{
 			aglSetCurrentContext (OpenGLData->aglContext);
-				//setup viewport to the appropriate area of the screen
-				//bufferRect seems to be x,y of lower left corner, then width and height
+			//setup viewport to the appropriate area of the screen
+			//bufferRect seems to be x,y of lower left corner, then width and height
 			GLint bufferRect[4];
 			bufferRect [0] = 0; 
 			bufferRect [1] = InfoRect.bottom - InfoRect.top;
@@ -205,7 +183,7 @@ void MolDisplayWin::OpenGLInitWindow(void)
 
 			glEnable(GL_DEPTH_TEST);
 
-		//	glShadeModel(GL_FLAT);
+			//	glShadeModel(GL_FLAT);
 			glShadeModel(GL_SMOOTH);
 			glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 			glPolygonOffset (1.0, 1.0);
@@ -218,7 +196,7 @@ void MolDisplayWin::OpenGLInitWindow(void)
 			glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
 			glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
 			glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
-				//setup the static lighting properties
+			//setup the static lighting properties
 			GLfloat ambient[4]  = {0.2,0.2,0.2,1.0};
 			GLfloat model_ambient[4]  = {0.1,0.1,0.1,0.1};
 			glEnable(GL_COLOR_MATERIAL);
@@ -234,10 +212,11 @@ void MolDisplayWin::OpenGLInitWindow(void)
 			glClear (GL_COLOR_BUFFER_BIT);
 			aglSwapBuffers (OpenGLData->aglContext);
 
-				//Setup a agl font so we can use it later
-				short fNum;
+			//Setup a agl font so we can use it later
+			short fNum;
 			GetFNum("\pMonaco", &fNum);									// build font
 			OpenGLData->fontList = BuildFontGL (OpenGLData->aglContext, fNum, normal, 9);
+
 		}		
 		
 		winData.is3DModeActive(true);
@@ -285,6 +264,7 @@ void MolDisplayWin::OpenGLExitWindow(void)
 
 void MolDisplayWin::UpdateGLView(void)
 {
+
 	if (OpenGLData) {
 		GLint bufferRect[4];
 		bufferRect [0] = 0; 
@@ -298,11 +278,11 @@ void MolDisplayWin::UpdateGLView(void)
 		float hsize = DisplayRect.right - DisplayRect.left;
 		float vsize = DisplayRect.bottom - DisplayRect.top;
 		GLdouble aspect = hsize/vsize;
-	//	GLdouble ysize = 60.0;
-	//	if (aspect > 1.0) ysize /= aspect;
+		//	GLdouble ysize = 60.0;
+		//	if (aspect > 1.0) ysize /= aspect;
 		glMatrixMode (GL_PROJECTION);	//Setup the model space to screen space mapping
 		glLoadIdentity ();
-//		gluPerspective(ysize, aspect, 0.1, 100.0);
+		//	gluPerspective(ysize, aspect, 0.1, 100.0);
 		GLdouble zNear = 0.1;
 		GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV());
 		GLdouble top, right;
@@ -339,6 +319,7 @@ void MolDisplayWin::UpdateGLView(void)
 		position[0] = -6.0;
 		glLightfv(GL_LIGHT1,GL_POSITION,position);
 		glEnable(GL_LIGHT1);
+
 	}
 }
 #endif
@@ -1172,16 +1153,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
    glGetDoublev(GL_PROJECTION_MATRIX, proj);
    glGetIntegerv(GL_VIEWPORT, viewport);
 
-   GLuint tex_id;
-   unsigned char texture[8] = {255, 0, 0, 255, 255, 0, 0, 255};
-   glGenTextures(1, &tex_id);
-   glBindTexture(GL_TEXTURE_1D, tex_id);
-   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-   glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-   glTexImage1D(GL_TEXTURE_1D, 0, GL_ALPHA, 8, 0, GL_ALPHA,
-                GL_UNSIGNED_BYTE, texture);
-
 	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
 	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
 
@@ -1200,10 +1171,13 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		float m[16];
 		Matrix4D mv_inv;
 
-		// Invert just the rotation portion of the modelview matrix.  We can't
-		// use InverseMatrix because it considers the translation factors.
-		// We don't want the translation factors because we want to transform
-		// a vector, and Rotate3DPt transforms only points (and not vectors).
+		// What we want to do here is make the annotation always face the viewer.
+		// The computations below compute a rotation matrix to align to the
+		// camera.  This only needs to be computed once for all annotations since
+		// the camera doesn't change positions.
+
+		// Invert just the rotation portion of the modelview matrix.  This is
+		// much faster than inverting an arbitrary matrix.
 		mv_inv[0][0] = modelview[0];
 		mv_inv[0][1] = modelview[4];
 		mv_inv[0][2] = modelview[8];
@@ -1245,12 +1219,14 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		m[12] = m[13] = m[14] = 0.0f;
 		m[15] = 1.0f;
 
+		// x_world will indicate what vector in world coordinates will effect
+		// a direction in the eye's x direction.  This is the direction in
+		// which the length label will appear.
 		CPoint3D x_eye;
 		CPoint3D x_world;
 		x_eye.x = 1.0f;
 		x_eye.y = 0.0f;
 		x_eye.z = 0.0f;
-
 		Rotate3DPt(mv_inv, x_eye, &x_world);
 
 		int atom1_id, atom2_id;
@@ -1261,6 +1237,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			atom1_id = lFrame->AnnoLengths[anno_id].getAtom1ID();
 			atom2_id = lFrame->AnnoLengths[anno_id].getAtom2ID();
 			bond_id = lFrame->BondExists(atom1_id, atom2_id);
+
+			// If a bond exists between the two atoms, we need to push out the
+			// length label accordingly.
 			if (bond_id > -1) {
 				bond_size = BondSize / MAX(lBonds[bond_id].Order, 1.0f) *
 					3.5f * lBonds[bond_id].Order / 2.0f;
@@ -1270,6 +1249,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			} else {
 				bond_size = 0.0f;
 			}
+
+			// Draw the dashed line and label.
 			glLoadName(anno_id + NumAtoms + NumBonds + 1);
 			DashedQuadFromLine(lFrame->Atoms[atom1_id].Position,
 									 lFrame->Atoms[atom2_id].Position,
@@ -1337,12 +1318,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 			glLoadName(anno_id + lFrame->AnnoLengths.size() + NumAtoms +
 						  NumBonds + 1);
-
-
-			// glBegin(GL_LINES); 
-			// glVertex3f(0.0f, 0.0f, 0.0f); 
-			// glVertex3f(min_len, 0.0f, 0.0f); 
-			// glEnd(); 
 
 			glBegin(GL_QUADS);
 
@@ -2997,6 +2972,7 @@ void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2,
 	glDisable(GL_LIGHTING);
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.5f);
+	glBindTexture(GL_TEXTURE_1D, OpenGLData->length_anno_tex_id);
 	glEnable(GL_TEXTURE_1D);
 	glBegin(GL_QUADS);
 		glTexCoord1f(0.0f);
