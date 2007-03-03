@@ -2726,6 +2726,7 @@ void SCFGroup::ReadXML(XMLElement * parent) {
 				}
 			}
 		}
+		delete children;
 	}
 }
 #pragma mark MP2Group
@@ -2943,6 +2944,7 @@ void MP2Group::ReadXML(XMLElement * parent) {
 				}
 			}
 		}
+		delete children;
 	}
 }
 #pragma mark HessianGroup
@@ -3088,6 +3090,7 @@ void HessianGroup::ReadXML(XMLElement * parent) {
 				}
 			}
 		}
+		delete children;
 	}
 }
 #pragma mark DFTGroup
@@ -3395,6 +3398,7 @@ void DFTGroup::ReadXML(XMLElement * parent) {
 				}
 			}
 		}
+		delete children;
 	}
 }
 #pragma mark StatPtGroup
