@@ -100,7 +100,7 @@ class BufferFile {
 		long GetNumLines(long size);
  		long BufferSkip(long NumBytes);
  		inline void SetColsPerLine(short newVal) {ColsPerLine = newVal;};
- 		inline float GetPercentRead(void) {return (float) GetFilePos()/GetFileLength();};
+ 		inline float GetPercentRead(void) {return (float) 100.0*GetFilePos()/GetFileLength();};
  		long Write(const char * Source, long NumBytes);
 		long WriteLine(Ptr text, bool newline);
  		bool SetOutput(bool State);
