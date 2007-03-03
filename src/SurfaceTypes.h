@@ -437,6 +437,10 @@ class TEDensity3DSurface : public Surf3DBase {
 			long NumOccupiedAlphaOrbs, long NumOccupiedBetaOrbs, long NumAtoms, Progress * progress,
 			long * PercentDone, bool MPTask);
 		void CalculateSurfaceValues(MoleculeData * MainData, Progress * progress);
+		void CalculateSurfaceValuesGrid(MoleculeData * MainData, Progress * progress,
+										AODensity * TotalDensity, long start, long end,
+										GaussHermiteData * GHData, float * grid,
+										CPoint3D * Contour, long * PercentDone, bool MPTask);
 		inline long getTargetOrbSet(void) const {return OrbSet;};
 		inline void setTargetOrbSet(const long & target) {OrbSet = target;};
 };

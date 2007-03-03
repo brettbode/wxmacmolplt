@@ -374,7 +374,7 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 				
 				//Create the actual thread
 				myThreads[i] = new MEP3DThread(&(DataPtrs[i]));
-				myThreads[i]->Create();
+				myThreads[i]->Create(16*1024);
 				//and fire it off, note my class is always a joinable thread so we will wait on it eventually
 				myThreads[i]->Run();
 			}
@@ -435,8 +435,42 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 	YGridInc *= kBohr2AngConversion;
 	ZGridInc *= kBohr2AngConversion;
 }
+#ifdef __wxBuild__
+typedef struct TED3DSurfGridData {
+	TEDensity3DSurface *	Surf;
+	MoleculeData *			MolData;
+	AODensity *				TotalDensity;
+	long					xStart;
+	long					xEnd;
+	long					PercentDone;
+	GaussHermiteData *		GHData;
+	float *					grid;
+	CPoint3D *				Contour;
+} TED3DSurfGridData;
+//derive a class from wxThread that we will use to create the child threads
+class TEDMEP3DThread : public wxThread {
+public:
+	TEDMEP3DThread(TED3DSurfGridData * data);
+	virtual void * Entry();
+	
+	long GetPercentDone(void) const {return myData->PercentDone;};
+	
+	TED3DSurfGridData * myData;
+};
+TEDMEP3DThread::TEDMEP3DThread(TED3DSurfGridData * data) : wxThread(wxTHREAD_JOINABLE) {
+	myData = data;
+}
+void * TEDMEP3DThread::Entry() {
+	myData->Surf->CalculateSurfaceValuesGrid(myData->MolData, NULL, myData->TotalDensity, 
+											 myData->xStart, myData->xEnd, myData->GHData,
+											 myData->grid, myData->Contour, 
+											 &(myData->PercentDone), true);
+	myData->PercentDone = 100;
+}
+typedef TEDMEP3DThread * TEDMEP3DThreadPtr;
+
+#endif
 void TEDensity3DSurface::CalculateSurfaceValues(MoleculeData *lData, Progress * lProgress) {
-	long		backpoint;
 	GaussHermiteData	GHData;
 
 	if (!ContourHndl) return;
@@ -467,33 +501,126 @@ void TEDensity3DSurface::CalculateSurfaceValues(MoleculeData *lData, Progress * 
 	lGrid = List;
 	Contour = ContourHndl;
 #endif
-		//Store the Grid mins and incs at the beginning of the grid
-		//loop over the plotting grid in the x, y, and z directions
-	float XGridValue, YGridValue, ZGridValue, junk1, junk2;
-	backpoint = 0;
-	for (long iPt=0; iPt<NumVertices; iPt++) {
-		if (backpoint > 30) {
-				//Give up the CPU and check for cancels
-			if (!lProgress->UpdateProgress(100*iPt/NumVertices)) {	//User canceled so clean things up and abort
-				FreeList();
-				return;
-			}
-			backpoint = 0;
+	
+#ifdef __wxBuild__
+	if (wxThread::GetCPUCount() > 1) {
+		int myCPUCount = wxThread::GetCPUCount();
+		//Ok we have multiple CPUs so create a worker thread for each CPU and split up the grid calculation
+		//not sure if this is needed. It appears the default is 1?
+		//		wxThread::SetConcurrency(myCPUCount);
+		
+		TED3DSurfGridData * DataPtrs = new TED3DSurfGridData[myCPUCount];
+		int i;
+		TEDMEP3DThreadPtr * myThreads = new TEDMEP3DThreadPtr[myCPUCount];
+		long start=0;
+		for (i=0; i<myCPUCount; i++) {
+			DataPtrs[i].Surf = this;
+			DataPtrs[i].MolData = lData;
+			DataPtrs[i].TotalDensity = TotalAODensity;
+			DataPtrs[i].xStart = start;
+			start += NumVertices/myCPUCount;
+			if (i+1 == myCPUCount) start = NumVertices;
+			DataPtrs[i].xEnd = start;
+			DataPtrs[i].GHData = &GHData;
+			DataPtrs[i].grid = lGrid;
+			DataPtrs[i].Contour = Contour;
+			DataPtrs[i].PercentDone = 0;
+			
+			//Create the actual thread
+			myThreads[i] = new TEDMEP3DThread(&(DataPtrs[i]));
+			myThreads[i]->Create(16*1024);
+			//and fire it off, note my class is always a joinable thread so we will wait on it eventually
+			myThreads[i]->Run();
 		}
-
-		XGridValue = Contour[iPt].x*kAng2BohrConversion;	//Contour values must be converted to bohrs
-		YGridValue = Contour[iPt].y*kAng2BohrConversion;
-		ZGridValue = Contour[iPt].z*kAng2BohrConversion;
-
-		lGrid[iPt] = lFrame->CalculateMEP(XGridValue, YGridValue, ZGridValue,
-			Basis, TotalAODensity, &GHData, &junk1, &junk2);
-		backpoint++;
+		
+		long NumTasksRunning=myCPUCount;
+		long	TotalPercent;
+		while (NumTasksRunning > 0) {
+			TotalPercent = 0;
+			for (i=0; i<myCPUCount; i++) {
+				TotalPercent += DataPtrs[i].PercentDone;
+				if (myThreads[i] != NULL) {
+					if (! myThreads[i]->IsAlive()) {
+						//The thread is terminating
+						myThreads[i]->Wait();
+						delete myThreads[i];
+						myThreads[i] = NULL;
+						NumTasksRunning --;
+					}
+				}
+			}
+			TotalPercent /= myCPUCount;
+			//Give up the CPU and check for cancels
+			if (!lProgress->UpdateProgress(TotalPercent)) {	//User canceled so clean things up and abort
+				for (i=0; i<myCPUCount; i++) {
+					if (myThreads[i] != NULL) {
+						//The docs seem to indicate that Wait causes a thread to terminate,
+						//however this does not seem to be true. Wait appears to have the 
+						//expected semantics that it blocks until the thread exits. Delete
+						//appears to be what is needed.
+						myThreads[i]->Delete();
+						delete myThreads[i];
+						myThreads[i] = NULL;
+						NumTasksRunning --;
+					}
+				}
+				FreeList();
+			} else {
+				wxMilliSleep(100);
+			}
+		}
+		
+		delete [] DataPtrs;
+	} else
+#endif
+	{
+		long PercentDone;
+		CalculateSurfaceValuesGrid(lData, lProgress, TotalAODensity, 0, NumVertices,
+							   &GHData, lGrid, Contour, &PercentDone, false);
 	}
 		//Unlock the grid handle and return
 #ifdef UseHandles
 	HUnlock(List);
 	HUnlock(ContourHndl);
 #endif
+}
+void TEDensity3DSurface::CalculateSurfaceValuesGrid(MoleculeData * lData, Progress * lProgress,
+													AODensity * TotalAODensity, long start, long end,
+													GaussHermiteData * GHData, float * lGrid,
+													CPoint3D * Contour, long * PercentDone, bool MPTask) {
+	Frame *	lFrame = lData->GetCurrentFramePtr();
+	BasisSet * Basis = lData->GetBasisSet();
+	//Store the Grid mins and incs at the beginning of the grid
+	//loop over the plotting grid in the x, y, and z directions
+	float XGridValue, YGridValue, ZGridValue, junk1, junk2;
+	long backpoint = 0;
+	for (long iPt=start; iPt<end; iPt++) {
+		*PercentDone = 100*(iPt-start)/(end-start);
+		if ((backpoint > 30)&&(lProgress != NULL)) {
+			//Give up the CPU and check for cancels
+			if (!lProgress->UpdateProgress(*PercentDone)) {	//User canceled so clean things up and abort
+				FreeList();
+				return;
+			}
+			backpoint = 0;
+		}
+		
+		XGridValue = Contour[iPt].x*kAng2BohrConversion;	//Contour values must be converted to bohrs
+		YGridValue = Contour[iPt].y*kAng2BohrConversion;
+		ZGridValue = Contour[iPt].z*kAng2BohrConversion;
+		
+		lGrid[iPt] = lFrame->CalculateMEP(XGridValue, YGridValue, ZGridValue,
+										  Basis, TotalAODensity, GHData, &junk1, &junk2);
+		backpoint++;
+#ifdef __wxBuild__
+		if (MPTask) {
+			if ((wxThread::This())->TestDestroy()) {
+				//Getting here means the caller has requested a cancel so exit
+				return;
+			}
+		}
+#endif
+	}
 }
 
 //Calculates the MEP value at the specified x,y,z coordinate

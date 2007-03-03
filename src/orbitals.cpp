@@ -2050,7 +2050,7 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 				
 				//Create the actual thread
 				myThreads[i] = new Orb3DThread(&(DataPtrs[i]));
-				myThreads[i]->Create();
+				myThreads[i]->Create(16*1024);
 				//and fire it off, note my class is always a joinable thread so we will wait on it eventually
 				myThreads[i]->Run();
 			}
@@ -2405,8 +2405,6 @@ void TEDensity3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 		FreeGrid();
 		return;
 	}
-	wxStopWatch myTimer;
-	myTimer.Start(0);
 		//Store the Grid mins and incs at the beginning of the grid
 	GridMax = -1.0e20;
 #if defined(powerc) && defined(MacintoshBuild)
@@ -2547,7 +2545,7 @@ void TEDensity3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 			
 			//Create the actual thread
 			myThreads[i] = new TED3DThread(&(DataPtrs[i]));
-			myThreads[i]->Create();
+			myThreads[i]->Create(16*1024);
 			//and fire it off, note my class is always a joinable thread so we will wait on it eventually
 			myThreads[i]->Run();
 		}
@@ -2604,7 +2602,6 @@ void TEDensity3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 			MOs->NumOccupiedAlphaOrbs, MOs->NumOccupiedBetaOrbs, lFrame->NumAtoms, lProgress, &junk, false);
 		delete [] AOVector;
 	}
-	std::cerr << "Time taken for 2 was " << myTimer.Time() << std::endl;
 		//Unlock the grid handle and return
 #ifdef UseHandles
 	if (Grid) HUnlock(Grid);
