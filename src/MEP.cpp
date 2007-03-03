@@ -145,6 +145,41 @@ static OSErr Calc3DMEPGrid(MEP3DGridData * Data) {
 	return noErr;
 }
 #endif
+#ifdef __wxBuild__
+typedef struct MEP3DGridData {
+	MEP3DSurface *	Surf;
+	long	xStart;
+	long	xEnd;
+	Frame *	lFrame;
+	BasisSet *	Basis;
+	AODensity	*	TotalAODensity;
+	GaussHermiteData *	GHData;
+	long		PercentDone;
+	float		GridMax;
+} MEP3DGridData;
+//derive a class from wxThread that we will use to create the child threads
+class MEP3DThread : public wxThread {
+public:
+	MEP3DThread(MEP3DGridData * data);
+	virtual void * Entry();
+	
+	long GetPercentDone(void) const {return myData->PercentDone;};
+	float GetGridMax(void) const {return myData->GridMax;};
+	
+	MEP3DGridData * myData;
+};
+MEP3DThread::MEP3DThread(MEP3DGridData * data) : wxThread(wxTHREAD_JOINABLE) {
+	myData = data;
+}
+void * MEP3DThread::Entry() {
+	myData->GridMax = myData->Surf->CalculateGrid(myData->xStart, myData->xEnd, myData->lFrame, myData->Basis,
+												  myData->TotalAODensity, myData->GHData,
+												  NULL, &(myData->PercentDone), true);
+	myData->PercentDone = 100;
+}
+typedef MEP3DThread * MEP3DThreadPtr;
+
+#endif
 float MEP3DSurface::CalculateGrid(long xStart, long xEnd, Frame * lFrame, BasisSet * Basis,
 			AODensity * TotalAODensity, GaussHermiteData * GHData,
 			Progress * lProgress, long * PercentDone, bool MPTask) {
@@ -180,6 +215,15 @@ float MEP3DSurface::CalculateGrid(long xStart, long xEnd, Frame * lFrame, BasisS
 				lGridMin = MIN(lGridMin, lGrid[n]);
 				n++;
 				ZGridValue += ZGridInc;
+#ifdef __wxBuild__
+				if (MPTask) {
+					if ((wxThread::This())->TestDestroy()) {
+						//Getting here means the caller has requested a cancel so exit
+						return 0.0;
+						//		Exit();	//Exit gracefully exits the thread
+					}
+				}
+#endif
 			}
 			YGridValue += YGridInc;
 		}
@@ -304,7 +348,80 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 		lProgress->ResetTimes();
 	} else 
 #endif
-	{
+#ifdef __wxBuild__
+		if (wxThread::GetCPUCount() > 1) {
+			int myCPUCount = wxThread::GetCPUCount();
+			//Ok we have multiple CPUs so create a worker thread for each CPU and split up the grid calculation
+			//not sure if this is needed. It appears the default is 1?
+			//		wxThread::SetConcurrency(myCPUCount);
+			
+			MEP3DGridData * DataPtrs = new MEP3DGridData[myCPUCount];
+			//Clear pointers in case allocation fails and I need to delete part of them
+			int i;
+			MEP3DThreadPtr * myThreads = new MEP3DThreadPtr[myCPUCount];
+			long start=0;
+			for (i=0; i<myCPUCount; i++) {
+				DataPtrs[i].Surf = this;
+				DataPtrs[i].xStart = start;
+				start += NumXGridPoints/myCPUCount;
+				if (i+1 == myCPUCount) start = NumXGridPoints;
+				DataPtrs[i].xEnd = start;
+				DataPtrs[i].lFrame = lFrame;
+				DataPtrs[i].Basis = Basis;
+				DataPtrs[i].TotalAODensity = TotalAODensity;
+				DataPtrs[i].GHData = &GHData;
+				DataPtrs[i].PercentDone = 0;
+				
+				//Create the actual thread
+				myThreads[i] = new MEP3DThread(&(DataPtrs[i]));
+				myThreads[i]->Create();
+				//and fire it off, note my class is always a joinable thread so we will wait on it eventually
+				myThreads[i]->Run();
+			}
+			
+			long NumTasksRunning=myCPUCount;
+			long	TotalPercent;
+			while (NumTasksRunning > 0) {
+				TotalPercent = 0;
+				for (i=0; i<myCPUCount; i++) {
+					TotalPercent += DataPtrs[i].PercentDone;
+					if (myThreads[i] != NULL) {
+						if (! myThreads[i]->IsAlive()) {
+							//The thread is terminating
+							myThreads[i]->Wait();
+							GridMax = MAX(GridMax, DataPtrs[i].GridMax);
+							delete myThreads[i];
+							myThreads[i] = NULL;
+							NumTasksRunning --;
+						}
+					}
+				}
+				TotalPercent /= myCPUCount;
+				//Give up the CPU and check for cancels
+				if (!lProgress->UpdateProgress(TotalPercent)) {	//User canceled so clean things up and abort
+					for (i=0; i<myCPUCount; i++) {
+						if (myThreads[i] != NULL) {
+							//The docs seem to indicate that Wait causes a thread to terminate,
+							//however this does not seem to be true. Wait appears to have the 
+							//expected semantics that it blocks until the thread exits. Delete
+							//appears to be what is needed.
+							myThreads[i]->Delete();
+							delete myThreads[i];
+							myThreads[i] = NULL;
+							NumTasksRunning --;
+						}
+					}
+					GridMax = 1.0;
+					FreeGrid();
+				} else {
+					wxMilliSleep(100);
+				}
+			}
+			
+			delete [] DataPtrs;
+		} else
+#endif
+		{
 		long junk;	//just a placeholder when cooperative task
 		GridMax = CalculateGrid(0,NumXGridPoints,lFrame,  Basis,
 			TotalAODensity, &GHData, lProgress, &junk, false);
@@ -319,7 +436,6 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 	ZGridInc *= kBohr2AngConversion;
 }
 void TEDensity3DSurface::CalculateSurfaceValues(MoleculeData *lData, Progress * lProgress) {
-//	long		NumPoints = 3*NumPosContourTriangles;
 	long		backpoint;
 	GaussHermiteData	GHData;
 

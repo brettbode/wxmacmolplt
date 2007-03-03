@@ -1806,6 +1806,42 @@ static OSErr CalcGrid(Orb3DGridData * Data) {
 	return noErr;
 }
 #endif
+#ifdef __wxBuild__
+typedef struct Orb3DGridData {
+	Orb3DSurface *	Surf;
+	long	xStart;
+	long	xEnd;
+	mpAtom *	Atoms;
+	BasisSet *	Basis;
+	float	*	MOVector;
+	long		NumAtoms;
+	float		GridMax;
+	long		PercentDone;
+} Orb3DGridData;
+//derive a class from wxThread that we will use to create the child threads
+class Orb3DThread : public wxThread {
+public:
+	Orb3DThread(Orb3DGridData * data);
+	virtual void * Entry();
+	
+	long GetPercentDone(void) const {return myData->PercentDone;};
+	float GetGridMax(void) const {return myData->GridMax;};
+	
+	Orb3DGridData * myData;
+};
+Orb3DThread::Orb3DThread(Orb3DGridData * data) : wxThread(wxTHREAD_JOINABLE) {
+	myData = data;
+}
+void * Orb3DThread::Entry() {
+	myData->GridMax = myData->Surf->CalculateGrid(myData->xStart, myData->xEnd, myData->Atoms, myData->Basis,
+												  myData->MOVector, myData->NumAtoms, NULL, &(myData->PercentDone),
+												  true);
+	myData->PercentDone = 100;
+}
+typedef Orb3DThread * Orb3DThreadPtr;
+
+#endif
+
 //Generates a 3D grid over the specified MO in the plane specified.
 //NOTE: This routine assumes that the atomic coordinates are in Angstroms and are thus
 //converted to Bohr when used.
@@ -1989,7 +2025,79 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 		lProgress->ResetTimes();
 	} else 
 #endif
-	{
+#ifdef __wxBuild__
+		if (wxThread::GetCPUCount() > 1) {
+			int myCPUCount = wxThread::GetCPUCount();
+			//Ok we have multiple CPUs so create a worker thread for each CPU and split up the grid calculation
+			//not sure if this is needed. It appears the default is 1?
+			//		wxThread::SetConcurrency(myCPUCount);
+			
+			Orb3DGridData * DataPtrs = new Orb3DGridData[myCPUCount];
+			int i;
+			Orb3DThreadPtr * myThreads = new Orb3DThreadPtr[myCPUCount];
+			long start=0;
+			for (i=0; i<myCPUCount; i++) {
+				DataPtrs[i].Surf = this;
+				DataPtrs[i].xStart = start;
+				start += NumXGridPoints/myCPUCount;
+				if (i+1 == myCPUCount) start = NumXGridPoints;
+				DataPtrs[i].xEnd = start;
+				DataPtrs[i].Atoms = lFrame->Atoms;
+				DataPtrs[i].Basis = Basis;
+				DataPtrs[i].MOVector = MOVector;
+				DataPtrs[i].NumAtoms = lFrame->NumAtoms;
+				DataPtrs[i].PercentDone = 0;
+				
+				//Create the actual thread
+				myThreads[i] = new Orb3DThread(&(DataPtrs[i]));
+				myThreads[i]->Create();
+				//and fire it off, note my class is always a joinable thread so we will wait on it eventually
+				myThreads[i]->Run();
+			}
+			
+			long NumTasksRunning=myCPUCount;
+			long	TotalPercent;
+			while (NumTasksRunning > 0) {
+				TotalPercent = 0;
+				for (i=0; i<myCPUCount; i++) {
+					TotalPercent += DataPtrs[i].PercentDone;
+					if (myThreads[i] != NULL) {
+						if (! myThreads[i]->IsAlive()) {
+							//The thread is terminating
+							myThreads[i]->Wait();
+							GridMax = MAX(GridMax, DataPtrs[i].GridMax);
+							delete myThreads[i];
+							myThreads[i] = NULL;
+							NumTasksRunning --;
+						}
+					}
+				}
+				TotalPercent /= myCPUCount;
+				//Give up the CPU and check for cancels
+				if (!lProgress->UpdateProgress(TotalPercent)) {	//User canceled so clean things up and abort
+					for (i=0; i<myCPUCount; i++) {
+						if (myThreads[i] != NULL) {
+							//The docs seem to indicate that Wait causes a thread to terminate,
+							//however this does not seem to be true. Wait appears to have the 
+							//expected semantics that it blocks until the thread exits. Delete
+							//appears to be what is needed.
+							myThreads[i]->Delete();
+							delete myThreads[i];
+							myThreads[i] = NULL;
+							NumTasksRunning --;
+						}
+					}
+					GridMax = 1.0;
+					FreeGrid();
+				} else {
+					wxMilliSleep(100);
+				}
+			}
+			
+			delete [] DataPtrs;
+		} else
+#endif
+		{
 			long junk;	//just a placeholder, not used for cooperative tasks
 		GridMax = CalculateGrid(0,NumXGridPoints,lFrame->Atoms, Basis, MOVector,
 			lFrame->NumAtoms, lProgress, &junk,false);
@@ -2034,7 +2142,14 @@ float Orb3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisS
 					return 0.0;
 				}
 			}
-
+#ifdef __wxBuild__
+			else {
+				if ((wxThread::This())->TestDestroy()) {
+					//Getting here means the caller has requested a cancel so exit
+					return 0.0;
+				}
+			}
+#endif
 			ZGridValue = Origin.z;
 			for (iZPt=0; iZPt<NumZGridPoints; iZPt++) {
 				lGrid[n] = PhaseChange * CalculateMOAmplitude(XGridValue, YGridValue, ZGridValue,
