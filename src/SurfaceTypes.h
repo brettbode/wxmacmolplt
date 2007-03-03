@@ -434,7 +434,8 @@ class TEDensity3DSurface : public Surf3DBase {
 		void CalculateMOGrid(MoleculeData * MainData, Progress * progress);
 		float CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisSet * Basis,
 			float * Vectors, float * VectorsB, float * OccupancyA, float * OccupancyB, float * AOVector,
-			long NumOccupiedAlphaOrbs, long NumOccupiedBetaOrbs, long NumAtoms, Progress * progress, long * PercentDone, bool MPTask);
+			long NumOccupiedAlphaOrbs, long NumOccupiedBetaOrbs, long NumAtoms, Progress * progress,
+			long * PercentDone, bool MPTask);
 		void CalculateSurfaceValues(MoleculeData * MainData, Progress * progress);
 		inline long getTargetOrbSet(void) const {return OrbSet;};
 		inline void setTargetOrbSet(const long & target) {OrbSet = target;};

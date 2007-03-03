@@ -28,10 +28,13 @@
 #include <string.h>
 #if defined(powerc) && defined(MacintoshBuild)
 #include <Multiprocessing.h>
-#endif
-
 extern Boolean		gMPAware;
 extern long			gNumProcessors;
+#endif
+#ifdef __wxBuild__
+#include <wx/thread.h>
+#endif
+#include <iostream>
 
 float CalculateMOAmplitude(float XValue, float YValue, float ZValue, mpAtom *Atoms,
 		BasisSet *Basis, float *MOVector, long NumAtoms, bool UseSphericalHarmonics);
@@ -2076,9 +2079,53 @@ static OSErr CalcTEGrid(TE3DGridData * Data) {
 	return noErr;
 }
 #endif
+#ifdef __wxBuild__
+typedef struct TE3DGridData {
+	TEDensity3DSurface *	Surf;
+	long	xStart;
+	long	xEnd;
+	mpAtom *	Atoms;
+	BasisSet *	Basis;
+	float	*	Vectors;
+	float	*	VectorsB;
+	float	*	OccupancyA;
+	float	*	OccupancyB;
+	float	*	AOVector;
+	long		NumOccupiedAlphaOrbs;
+	long		NumOccupiedBetaOrbs;
+	long		NumAtoms;
+	long		PercentDone;
+	float		GridMax;
+} TE3DGridData;
+//derive a class from wxThread that we will use to create the child threads
+class TED3DThread : public wxThread {
+public:
+	TED3DThread(TE3DGridData * data);
+	virtual void * Entry();
+	
+	long GetPercentDone(void) const {return myData->PercentDone;};
+	float GetGridMax(void) const {return myData->GridMax;};
+	
+	TE3DGridData * myData;
+};
+TED3DThread::TED3DThread(TE3DGridData * data) : wxThread(wxTHREAD_JOINABLE) {
+	myData = data;
+}
+void * TED3DThread::Entry() {
+	myData->GridMax = myData->Surf->CalculateGrid(myData->xStart, myData->xEnd, myData->Atoms, myData->Basis,
+								myData->Vectors, myData->VectorsB, myData->OccupancyA, myData->OccupancyB,
+								myData->AOVector, myData->NumOccupiedAlphaOrbs,
+								myData->NumOccupiedBetaOrbs, myData->NumAtoms, NULL, &(myData->PercentDone),
+								true);
+	myData->PercentDone = 100;
+}
+typedef TED3DThread * TED3DThreadPtr;
+
+#endif
 float TEDensity3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisSet * Basis,
 			float * Vectors, float * VectorsB, float * OccupancyA, float * OccupancyB, float * AOVector,
-			long NumOccupiedAlphaOrbs, long NumOccupiedBetaOrbs, long NumAtoms, Progress * lProgress, long * PercentDone, bool MPTask) {
+			long NumOccupiedAlphaOrbs, long NumOccupiedBetaOrbs, long NumAtoms, Progress * lProgress,
+			long * PercentDone, bool MPTask) {
 	float lGridMax = -1.0e20;
 	float lGridMin = 1.0e20;
 	float XGridValue, YGridValue, ZGridValue;
@@ -2095,7 +2142,6 @@ float TEDensity3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, 
 	XGridValue = Origin.x + xStart * XGridInc;
 	for (iXPt=xStart; iXPt<xEnd; iXPt++) {
 			//Note the percent done for MP tasks such that the progress dlog can be updated
-		if (MPTask) *PercentDone = 100*(iXPt-xStart)/(xEnd-xStart);
 		YGridValue = Origin.y;
 		for (iYPt=0; iYPt<NumYGridPoints; iYPt++) {
 			if (!MPTask) {
@@ -2104,6 +2150,8 @@ float TEDensity3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, 
 					FreeGrid();
 					return 0.0;
 				}
+			} else {
+				*PercentDone = 100*((iXPt-xStart)*NumYGridPoints + iYPt)/((xEnd-xStart)*NumYGridPoints);
 			}
 			ZGridValue = Origin.z;
 			for (iZPt=0; iZPt<NumZGridPoints; iZPt++) {
@@ -2136,6 +2184,15 @@ float TEDensity3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, 
 				lGridMin = MIN(lGridMin, lGrid[n]);
 				n++;
 				ZGridValue += ZGridInc;
+#ifdef __wxBuild__
+				if (MPTask) {
+					if ((wxThread::This())->TestDestroy()) {
+						//Getting here means the caller has requested a cancel so exit
+						return 0.0;
+						//		Exit();	//Exit gracefully exits the thread
+					}
+				}
+#endif
 			}
 			YGridValue += YGridInc;
 		}
@@ -2233,6 +2290,8 @@ void TEDensity3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 		FreeGrid();
 		return;
 	}
+	wxStopWatch myTimer;
+	myTimer.Start(0);
 		//Store the Grid mins and incs at the beginning of the grid
 	GridMax = -1.0e20;
 #if defined(powerc) && defined(MacintoshBuild)
@@ -2333,6 +2392,94 @@ void TEDensity3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 		lProgress->ResetTimes();
 	} else 
 #endif
+#ifdef __wxBuild__
+		if (wxThread::GetCPUCount() > 1) {
+		int myCPUCount = wxThread::GetCPUCount();
+		//Ok we have multiple CPUs so create a worker thread for each CPU and split up the grid calculation
+			//not sure if this is needed. It appears the default is 1?
+//		wxThread::SetConcurrency(myCPUCount);
+
+		TE3DGridData * DataPtrs = new TE3DGridData[myCPUCount];
+		//Clear pointers in case allocation fails and I need to delete part of them
+		int i;
+		for (i=0; i<myCPUCount; i++) DataPtrs[i].AOVector = NULL;
+		for (i=0; i<myCPUCount; i++) {
+			DataPtrs[i].AOVector = new float[NumBasisFuncs];
+			if (!DataPtrs[i].AOVector) {
+				for (int j=0; j<i; j++) if (DataPtrs[j].AOVector) delete [] DataPtrs[j].AOVector;
+				delete [] DataPtrs;
+				throw MemoryError();
+			}
+		}
+		TED3DThreadPtr * myThreads = new TED3DThreadPtr[myCPUCount];
+		long start=0;
+		for (i=0; i<myCPUCount; i++) {
+			DataPtrs[i].Surf = this;
+			DataPtrs[i].xStart = start;
+			start += NumXGridPoints/myCPUCount;
+			if (i+1 == myCPUCount) start = NumXGridPoints;
+			DataPtrs[i].xEnd = start;
+			DataPtrs[i].Atoms = lFrame->Atoms;
+			DataPtrs[i].Basis = Basis;
+			DataPtrs[i].Vectors = Vectors;
+			DataPtrs[i].VectorsB = VectorsB;
+			DataPtrs[i].OccupancyA = OccupancyA;
+			DataPtrs[i].OccupancyB = OccupancyB;
+			DataPtrs[i].NumOccupiedAlphaOrbs = MOs->NumOccupiedAlphaOrbs;
+			DataPtrs[i].NumOccupiedBetaOrbs = MOs->NumOccupiedBetaOrbs;
+			DataPtrs[i].NumAtoms = lFrame->NumAtoms;
+			DataPtrs[i].PercentDone = 0;
+			
+			//Create the actual thread
+			myThreads[i] = new TED3DThread(&(DataPtrs[i]));
+			myThreads[i]->Create();
+			//and fire it off, note my class is always a joinable thread so we will wait on it eventually
+			myThreads[i]->Run();
+		}
+
+		long NumTasksRunning=myCPUCount;
+		long	TotalPercent;
+		while (NumTasksRunning > 0) {
+			TotalPercent = 0;
+			for (i=0; i<myCPUCount; i++) {
+				TotalPercent += DataPtrs[i].PercentDone;
+				if (myThreads[i] != NULL) {
+					if (! myThreads[i]->IsAlive()) {
+						//The thread is terminating
+						myThreads[i]->Wait();
+						GridMax = MAX(GridMax, DataPtrs[i].GridMax);
+						delete myThreads[i];
+						myThreads[i] = NULL;
+						NumTasksRunning --;
+					}
+				}
+			}
+			TotalPercent /= myCPUCount;
+			//Give up the CPU and check for cancels
+			if (!lProgress->UpdateProgress(TotalPercent)) {	//User canceled so clean things up and abort
+				for (i=0; i<myCPUCount; i++) {
+					if (myThreads[i] != NULL) {
+						//The docs seem to indicate that Wait causes a thread to terminate,
+						//however this does not seem to be true. Wait appears to have the 
+						//expected semantics that it blocks until the thread exits. Delete
+						//appears to be what is needed.
+						myThreads[i]->Delete();
+						delete myThreads[i];
+						myThreads[i] = NULL;
+						NumTasksRunning --;
+					}
+				}
+				GridMax = 1.0;
+				FreeGrid();
+			} else {
+				wxMilliSleep(100);
+			}
+		}
+		
+		for (i=0; i<myCPUCount; i++) if (DataPtrs[i].AOVector) delete [] DataPtrs[i].AOVector;
+		delete [] DataPtrs;
+	} else
+#endif
 	{
 		long junk;	//just a placeholder when cooperative task
 		float * AOVector = new float[NumBasisFuncs];
@@ -2342,6 +2489,7 @@ void TEDensity3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 			MOs->NumOccupiedAlphaOrbs, MOs->NumOccupiedBetaOrbs, lFrame->NumAtoms, lProgress, &junk, false);
 		delete [] AOVector;
 	}
+	std::cerr << "Time taken for 2 was " << myTimer.Time() << std::endl;
 		//Unlock the grid handle and return
 #ifdef UseHandles
 	if (Grid) HUnlock(Grid);
