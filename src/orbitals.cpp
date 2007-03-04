@@ -1837,6 +1837,7 @@ void * Orb3DThread::Entry() {
 												  myData->MOVector, myData->NumAtoms, NULL, &(myData->PercentDone),
 												  true);
 	myData->PercentDone = 100;
+	return NULL;
 }
 typedef Orb3DThread * Orb3DThreadPtr;
 
@@ -2233,6 +2234,7 @@ void * TED3DThread::Entry() {
 								myData->NumOccupiedBetaOrbs, myData->NumAtoms, NULL, &(myData->PercentDone),
 								true);
 	myData->PercentDone = 100;
+	return NULL;
 }
 typedef TED3DThread * TED3DThreadPtr;
 

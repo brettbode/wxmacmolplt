@@ -176,6 +176,7 @@ void * MEP3DThread::Entry() {
 												  myData->TotalAODensity, myData->GHData,
 												  NULL, &(myData->PercentDone), true);
 	myData->PercentDone = 100;
+	return NULL;
 }
 typedef MEP3DThread * MEP3DThreadPtr;
 
@@ -466,6 +467,7 @@ void * TEDMEP3DThread::Entry() {
 											 myData->grid, myData->Contour, 
 											 &(myData->PercentDone), true);
 	myData->PercentDone = 100;
+	return NULL;
 }
 typedef TEDMEP3DThread * TEDMEP3DThreadPtr;
 
