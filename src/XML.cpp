@@ -854,6 +854,11 @@ void XMLElement::addAttribute(const char * n, const long & v) {
 	bf << v;
 	addAttribute(n, bf.str().c_str());
 }
+void XMLElement::addFloatAttribute(const char * n, const float & v) {
+	std::ostringstream bf;
+	bf << v;
+	addAttribute(n, bf.str().c_str());
+}
 void XMLElement::addBoolAttribute(const char * n, bool value) {
 	if (value)
 		addAttribute(n, trueXML);

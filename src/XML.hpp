@@ -172,6 +172,7 @@ class XMLElement {
 		bool hasChildren(void) const {return ((firstChild != NULL)?true:false);};
 		void addAttribute(const char * name, const char * value);
 		void addAttribute(const char * name, const long & value);
+		void addFloatAttribute(const char * name, const float & value);
 		void addBoolAttribute(const char * name, bool value);
 		void addwxRectAttribute(const wxRect & v);
 		void appendChild(XMLElement & child);
