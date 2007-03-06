@@ -601,7 +601,7 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 						long HBonder;
 						if (iType == 1) HBonder = jType;
 						else HBonder = iType;
-						float testDistance = 1.5*AutoDist;
+						float testDistance = 1.6*AutoDist;
 						if (distance <= testDistance) newBond = true;
 						
 		/*				if (HBonder==7 || HBonder == 15) {
