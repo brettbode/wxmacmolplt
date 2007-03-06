@@ -93,6 +93,8 @@ enum MMPMolDisplayElments {
 	MMPMolDisplay_3DLineWidth,
 	MMPMolDisplay_LabelFontID,
 	MMPMolDisplay_LabelSize,
+	MMPMolDisplay_AtomLabelSize,
+	MMPMolDisplay_AnnotateSize,
 	MMPMolDisplay_AnimationSpeed,
 	MMPMolDisplay_StereoOffset,
 	MMPMolDisplay_RotateMode,

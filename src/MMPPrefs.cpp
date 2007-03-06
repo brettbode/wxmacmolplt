@@ -254,8 +254,42 @@ float WinPrefs::SetAtomMass(long AtomNum, float NewMass) {
 
 WinPrefs::WinPrefs(void) {
 	RendererName = NULL;
+	for (int i=0; i< kMaxAtomTypes; i++) {
+		AtomColors[i].red = AtomColors[i].green = AtomColors[i].blue = 0;
+		AtomSizes[i] = 10;
+		AtomMasses[i] = 1.0;
+		AtomPatterns[i] = 0;
+		AtomLabels[i][0] = AtomLabels[i][1] = AtomLabels[i][2] = '\0';
+	}
+	for (int i=0; i<kMaxBondTypes; i++) {
+		BondColors[i].red = BondColors[i].green = BondColors[i].blue = 0;
+		BondPatterns[i]=0;
+	}
+	AtomLabels[0][0] = 'H';
+	AtomSizes[0] = 37;
+	AtomMasses[0] = 1.0039;
+	AtomLabels[5][0] = 'C';
+	AtomSizes[5] = 77;
+	AtomMasses[5] = 3.46569;
+	AtomLabels[6][0] = 'N';
+	AtomSizes[6] = 70;
+	AtomMasses[6] = 3.7426;
+	AtomLabels[7][0] = 'O';
+	AtomSizes[7] = 73;
+	AtomMasses[7] = 3.9999;
+	
+	VectorColor.red = 65532;
+	VectorColor.blue = VectorColor.green = 0;
+	AnimateTime = 7;
+	DRCnFileSkip = 0;
 	BitOptions = 0;
 	GLFOV = 30.0;
+	QD3DAtomQuality = 13;
+	BondWidth = 0.068;
+	AtomScale = 0.005;
+	AutoBondScale = 0.011;
+	MaxBondLength = 0.0;
+	AnnotationLabelSize = AtomLabelSize = 1.0;
 	BackColor.red = BackColor.green = BackColor.blue = 65532;
 	FitToPage = FrameOnPage = false;
 	SymbolLabels = NumberLabels = false;
@@ -350,8 +384,10 @@ void WinPrefs::ReadDefaultPrefs(void) {
 		
 		XMLShutdown();
 	} else {
-		std::cerr << "Unable to open default preferences file. MacMolPlt probably isn't installed properly!\n"
-		"Attempted to open file : " << pathname.mb_str(wxConvUTF8) << std::endl;
+		std::ostringstream buf;
+		buf << "Unable to open default preferences file. MacMolPlt probably isn't installed properly!\n"
+		"Attempted to open file : " << pathname.mb_str(wxConvUTF8);
+		MessageAlert(buf.str().c_str());
 	}
 #elif defined(CarbonBuild)
 	CFBundleRef myBundle = CFBundleGetMainBundle();
@@ -479,6 +515,16 @@ bool WinPrefs::ReadUserPrefs(void) {
 		}
 		
 		XMLShutdown();
+		//Perform a simple sanity check to see if the prefs read in seem ok
+		//I don't have anything definititive so check a few random elements to see if
+		//they have proper labels
+		if ((AtomLabels[0][0]!='H')&&(AtomLabels[5][0]!='C')&&(AtomLabels[14][0]!='P')) {
+			std::ostringstream buf;
+			buf << "Warning! Your user preferences file may be corrupt. If you experience "
+				"trouble please delete the file: " << pathname.mb_str(wxConvUTF8) <<
+				" and restart the application.";
+			MessageAlert(buf.str().c_str());
+		}
 	}
 #else
 	OSErr		myErr;
@@ -581,6 +627,10 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 #endif
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_LabelSize), longVal))
 					SetLabelSize(longVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AtomLabelSize), floatVal))
+					SetAtomLabelSize(floatVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AnnotateSize), floatVal))
+					SetAnnotationLabelSize(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AnimationSpeed),longVal))
 					SetAnimationSpeed(longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_StereoOffset),longVal))
@@ -977,6 +1027,8 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	outbuf.str("");
 	outbuf << GetLabelSize();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_LabelSize), outbuf.str().c_str());
+	molElement->addFloatAttribute(MMPPref_convert(MMPMolDisplay_AtomLabelSize), AtomLabelSize);
+	molElement->addFloatAttribute(MMPPref_convert(MMPMolDisplay_AnnotateSize), AnnotationLabelSize);
 	outbuf.str("");
 	outbuf << GetAnimationSpeed();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_AnimationSpeed), outbuf.str().c_str());
@@ -1378,6 +1430,10 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "LabelFontId";
         case MMPMolDisplay_LabelSize:
             return "LabelSize";
+        case MMPMolDisplay_AtomLabelSize:
+            return "AtomLabelSize";
+        case MMPMolDisplay_AnnotateSize:
+            return "AnnotationLabelSize";
         case MMPMolDisplay_AnimationSpeed:
             return "AnimationSpeed";
         case MMPMolDisplay_StereoOffset:

@@ -28,7 +28,7 @@
 //Activate to enable the show symmetry operators menu items
 //#define ENABLE_SHOWSYMMETRY_MODE
 //Activate to allow quicktime movie export on Mac
-//#ifdef __MAC_USE_QUICKTIME__
+#define __MAC_USE_QUICKTIME__
 /*
 #define MacintoshBuild		//define to build for Mac PPC or 68K
 #if __GNUC__

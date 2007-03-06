@@ -177,16 +177,16 @@ class WinPrefs {
 		RGBColor		AtomColors[kMaxAtomTypes], BondColors[kMaxBondTypes], VectorColor, BackColor;
 		long			AtomSizes[kMaxAtomTypes], AnimateTime, DRCnFileSkip,
 						QD3DAtomQuality, BitOptions;
-		//bit 1: prompt4save, bit 2: show angles, bit 3: use QD3D hardware
-														//bit 4: Stereo, bit 5: color bond halves, bit6: Wireframe mode
-														//bit 7: Outline bonds, bit 8: Use cylinders for lines
-														//bit 9: Look for H bonds, bit 10: determine bond order
-														//bit 11: Default for 3D mode, bit 12: native EOL chars
-														//bit 13: Create custom file icon
+				//bit 1: prompt4save, bit 2: show angles, bit 3: use QD3D hardware
+				//bit 4: Stereo, bit 5: color bond halves, bit6: Wireframe mode
+				//bit 7: Outline bonds, bit 8: Use cylinders for lines
+				//bit 9: Look for H bonds, bit 10: determine bond order
+				//bit 11: Default for 3D mode, bit 12: native EOL chars
+				//bit 13: Create custom file icon
 
 		float			AtomMasses[kMaxAtomTypes], AutoBondScale, BondWidth, AtomScale,
 						GLFOV, VectorScale, QD3DFillBrightness, QD3DPointBrightness,
-						MaxBondLength, QD3DLineWidth;
+						MaxBondLength, QD3DLineWidth, AtomLabelSize, AnnotationLabelSize;
 		short			AtomPatterns[kMaxAtomTypes], LabelFontID, LabelSize, VectorPattern,
 						BondPatterns[kMaxBondTypes], AnimationSpeed, StereoOffset;
 		unsigned char	AtomLabels[kMaxAtomTypes][3];
@@ -311,6 +311,10 @@ class WinPrefs {
 		inline Boolean SetHHBondFlag(Boolean state) {return HHBondFlag = state;};
 		inline float GetAutoBondScale(void) const {return AutoBondScale;};
 		inline float SetAutoBondScale(float NewValue) {return AutoBondScale = NewValue;};
+		inline float GetAtomLabelSize(void) const {return AtomLabelSize;};
+		inline void SetAtomLabelSize(const float & s) {if (s>0.0) AtomLabelSize = s;};
+		inline float GetAnnotationLabelSize(void) const {return AnnotationLabelSize;};
+		inline void SetAnnotationLabelSize(const float & s) {if (s>0.0) AnnotationLabelSize = s;};
 		inline long GetDRCSkip(void) const {return DRCnFileSkip;};
 		inline long SetDRCSkip(long NewValue) {return DRCnFileSkip=NewValue;};
 		inline short GetLabelFontID(void) const {return LabelFontID;};

@@ -396,7 +396,7 @@ void InputBuilderWindow::CreateControls()
     wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
     itemPanel3->SetSizer(itemBoxSizer4);
 
-    listBook = new wxListbook( itemPanel3, ID_IBNOTEBOOK, wxDefaultPosition, wxDefaultSize, wxLB_LEFT|wxLB_DEFAULT|wxSUNKEN_BORDER );
+    listBook = new wxListbook( itemPanel3, ID_IBNOTEBOOK, wxDefaultPosition, wxDefaultSize, wxLB_DEFAULT|wxLB_LEFT|wxSUNKEN_BORDER );
 
     wxPanel* itemPanel6 = new wxPanel( listBook, ID_IBBASISPANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
     wxBoxSizer* itemBoxSizer7 = new wxBoxSizer(wxVERTICAL);

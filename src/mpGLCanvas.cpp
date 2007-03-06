@@ -23,6 +23,7 @@
 #endif
 
 #include <iostream>
+#include <sstream>
 
 #include "periodic_table_dlg.h"
 
@@ -116,7 +117,10 @@ void MpGLCanvas::initGL(void) {
 			pathname += wxT("/arial1.glf");
 #endif
 			if (glfLoadFont(pathname.mb_str(wxConvUTF8)) < 0) {
-				std::cout<<"Warning: font file not found!"<<std::endl;
+				std::ostringstream buf;
+				buf <<"Warning: font file not found! This probably means wxmacmolplt is not"
+					"properly installed.";
+				MessageAlert(buf.str().c_str());
 				glfClose();
 			} else
 				glf_initialized = 1;

@@ -43,7 +43,6 @@ wxTimer splashTimer;
 #define splashT_ID 12399
 bool MpApp::OnInit() {
 	m_InstanceChecker = NULL;
-    const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
 	gPrefDlg = NULL;
 
 #ifdef __LINUX__
@@ -57,7 +56,9 @@ bool MpApp::OnInit() {
 	else
 		paths->SetInstallPrefix(wxString("/usr/local/",wxConvUTF8));
 #endif
+#ifdef __FORCE_SINGLE_INSTANCE__
 #ifndef __WXMAC__
+    const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
     m_InstanceChecker = new wxSingleInstanceChecker();
 	
     if(m_InstanceChecker->Create(appName) == true) {
@@ -77,6 +78,7 @@ bool MpApp::OnInit() {
             return false;
         }
     }
+#endif
 #endif
 		//Throw up a simple splash screen
 	wxBitmap sp_bitmap(sp_xpm);
