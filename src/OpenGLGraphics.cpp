@@ -933,70 +933,67 @@ void MolDisplayWin::DrawStaticLabel(const char* label, GLfloat x, GLfloat y)
   glMatrixMode (matrixMode);
 }
 
-void MolDisplayWin::DrawLabel()
-{
-  Frame * lFrame=MainData->cFrame;
-  mpAtom * lAtoms = lFrame->Atoms;
-  long NumAtoms = lFrame->NumAtoms;
-  float AtomScale = Prefs->GetAtomScale();
-  GLdouble BondSize = Prefs->GetQD3DBondWidth();
+void MolDisplayWin::DrawLabel() {
+	Frame * lFrame=MainData->cFrame;
+	mpAtom * lAtoms = lFrame->Atoms;
+	long NumAtoms = lFrame->NumAtoms;
+	float AtomScale = Prefs->GetAtomScale();
+	GLdouble BondSize = Prefs->GetQD3DBondWidth();
+	float LabelSize = Prefs->GetAtomLabelSize();
+	glfStringCentering(true);
 
-  wxString atomLabel;
-  long CurrentAtomType;
-  CPoint3D origPt, transPt;
-  long CurrentAtom;
+	wxString atomLabel;
+	long CurrentAtomType;
+	CPoint3D origPt, transPt;
+	long CurrentAtom;
+	if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) {
+		for (long iatom=0; iatom<NumAtoms; iatom++) {
+			if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
 
-  if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) 
-    {
-      for (long iatom=0; iatom<NumAtoms; iatom++) 
-	{
-	  if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
+			atomLabel.Clear();
 
-	  atomLabel.Clear();
+			CurrentAtomType = lAtoms[iatom].GetType() - 1;
 
-	  CurrentAtomType = lAtoms[iatom].GetType() - 1;
+			//!!! retrieve atom label
+			if ( Prefs->ShowAtomicSymbolLabels() )
+			Prefs->GetAtomLabel(CurrentAtomType, atomLabel);
 
-	  //!!! retrieve atom label
-	  if ( Prefs->ShowAtomicSymbolLabels() )
-	    Prefs->GetAtomLabel(CurrentAtomType, atomLabel);
+			if (Prefs->ShowAtomNumberLabels() ) {
+				wxString tmpStr;
 
-	  if (Prefs->ShowAtomNumberLabels() )
-	    {
-	      wxString tmpStr;
+				tmpStr.Printf(wxT("%d"), iatom+1);
+				atomLabel.Append(tmpStr);
+			}
 
-	      tmpStr.Printf(wxT("%d"), iatom+1);
-	      atomLabel.Append(tmpStr);
-	    }
+			float radius;
+			if (!Prefs->DrawWireFrame()) radius = AtomScale*Prefs->GetAtomSize(CurrentAtomType);
+			else radius = BondSize;
 
-	  float radius;
-	  if (!Prefs->DrawWireFrame()) radius = AtomScale*Prefs->GetAtomSize(CurrentAtomType);
-	  else radius = BondSize;
-			
-	  if (radius<0.01) continue;	//skip really small spheres
+			if (radius<0.01) continue;	//skip really small spheres
 
-	  RGBColor * AtomColor = Prefs->GetAtomColorLoc(CurrentAtomType);
-	  float red, green, blue;
-	  red = AtomColor->red/65536.0;
-	  green = AtomColor->green/65536.0;
-	  blue = AtomColor->blue/65536.0;
+			RGBColor * AtomColor = Prefs->GetAtomColorLoc(CurrentAtomType);
+			float red, green, blue;
+			red = AtomColor->red/65536.0;
+			green = AtomColor->green/65536.0;
+			blue = AtomColor->blue/65536.0;
 
-	  origPt.x = lAtoms[iatom].Position.x;
-	  origPt.y = lAtoms[iatom].Position.y;
-	  origPt.z = lAtoms[iatom].Position.z;
+			origPt.x = lAtoms[iatom].Position.x;
+			origPt.y = lAtoms[iatom].Position.y;
+			origPt.z = lAtoms[iatom].Position.z;
 
-	  Rotate3DPt(MainData->TotalRotation, origPt, &transPt );
+			Rotate3DPt(MainData->TotalRotation, origPt, &transPt );
 
-	  glPushMatrix();
-	  glTranslatef(0.0, 0.0, radius+0.01);
-	  glTranslatef(transPt.x, transPt.y, transPt.z);
+			glPushMatrix();
+			glTranslatef(transPt.x, transPt.y, transPt.z+(radius+0.01));
 
-	  glColor3f(1-red, 1-green, 1-blue);
-	  glScalef(0.1+0.08*radius, 0.1+0.08*radius, 1);
-	  glLoadName(iatom+1);
-	  glfDrawSolidString((const char*)atomLabel.mb_str(wxConvUTF8));
-	  glPopMatrix();
+			glColor3f(1-red, 1-green, 1-blue);
+			glScalef((0.1+0.08*radius)*LabelSize, (0.1+0.08*radius)*LabelSize, 1);
+			glLoadName(iatom+1);
+			glfDrawSolidString((const char*)atomLabel.mb_str(wxConvUTF8));
+			glPopMatrix();
+		}
 	}
-    }
+	glfStringCentering(false);
 }
 
 void MolDisplayWin::SortTransparentTriangles(void) {
@@ -1426,8 +1423,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			glTranslatef(min_len * cos(angle * 0.5f),
 							 min_len * sin(angle * 0.5f), 0.0f);
 			glMultMatrixf(m);
+			float LabelSize = Prefs->GetAnnotationLabelSize();
 			glTranslatef(-0.175f + chord_len, 0.0f, 0.0f);
-			glScalef(-0.1f, 0.1f, 0.1f);
+			glScalef(-0.1f*LabelSize, 0.1f*LabelSize, 0.1f);
 			glfDrawSolidString(angle_label);
 
 			glPopMatrix();
@@ -2995,7 +2993,8 @@ void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2,
 					 10 * width * x_world.z);
 	glMultMatrixf(m);
 	glTranslatef(-offset, 0.0f, 0.0f);
-	glScalef(-0.1f, 0.1f, 0.1f);
+	float LabelSize = Prefs->GetAnnotationLabelSize();
+	glScalef(-0.1f*LabelSize, 0.1f*LabelSize, 0.1f);
 	sprintf(len_label, "%.6f", len);
 	glfDrawSolidString(len_label);
 	glEnable(GL_LIGHTING);

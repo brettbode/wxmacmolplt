@@ -71,6 +71,8 @@
 #define ID_UNIT_RADIOBOX 5036
 #define ID_MISC_RADIOBOX 5037
 #define ID_DISPLAY_DEPTH_SLIDER	5038
+#define ID_ATOM_LABEL_SLIDER	5039
+#define ID_ANNOTATION_SLIDER	5040
 
 #include "GlobalExceptions.h"
 #include "MyTypes.h"
@@ -93,9 +95,11 @@ BEGIN_EVENT_TABLE(BondPrefsPane, wxPanel)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(DisplayPrefsPane, wxPanel)
-  EVT_RADIOBOX (ID_DISPLAY_MODE_RADIOBOX, DisplayPrefsPane::OnRadio)
-  EVT_CHECKBOX (ID_COLOR_BONDS_BY_ATOM_COLOR, DisplayPrefsPane::OnCheckBox)
-  EVT_RADIOBOX (ID_ATOM_LABELS_RADIO, DisplayPrefsPane::OnLabelsRadio)
+	EVT_RADIOBOX (ID_DISPLAY_MODE_RADIOBOX, DisplayPrefsPane::OnRadio)
+	EVT_CHECKBOX (ID_COLOR_BONDS_BY_ATOM_COLOR, DisplayPrefsPane::OnCheckBox)
+	EVT_RADIOBOX (ID_ATOM_LABELS_RADIO, DisplayPrefsPane::OnLabelsRadio)
+	EVT_SLIDER (ID_ATOM_LABEL_SLIDER, DisplayPrefsPane::OnAtomLabelSlider)
+	EVT_SLIDER (ID_ANNOTATION_SLIDER, DisplayPrefsPane::OnAnnotationLabelSlider)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(EnergyPrefsPane, wxPanel)
@@ -403,6 +407,23 @@ DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *
 	mMainSizer->Add(mRdoBox, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 	mMainSizer->Add(mChkColor, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
 	mMainSizer->Add(mAtomLabels, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+
+	wxGridSizer * lgridSizer = new wxGridSizer(2,2);
+	lgridSizer->Add(new wxStaticText(this, wxID_ANY, _("Size of atom labels:")), 0, wxALIGN_RIGHT | wxALL, 3);
+	mAtomLabelSizeSlider = new wxSlider( this, ID_ATOM_LABEL_SLIDER, 
+							(int)(mTargetPrefs->GetAtomLabelSize()*100), 25, 400,
+							wxDefaultPosition, wxSize(155,wxDefaultCoord));
+	mAtomLabelSizeSlider->SetToolTip(_("Changes the size of the atomic labels. Move left for smaller labels, right for larger ones."));
+	lgridSizer->Add(mAtomLabelSizeSlider, 0, wxALIGN_CENTER | wxALL, 3);
+
+	lgridSizer->Add(new wxStaticText(this, wxID_ANY, _("Size of annotation text:")), 0, wxALIGN_RIGHT | wxALL, 3);
+	mAnnotationLabelSizeSlider = new wxSlider( this, ID_ANNOTATION_SLIDER, 
+										 (int)(mTargetPrefs->GetAnnotationLabelSize()*100), 25, 400,
+										 wxDefaultPosition, wxSize(155,wxDefaultCoord));
+	mAnnotationLabelSizeSlider->SetToolTip(_("Changes the size of the annotation text. Move left for smaller labels, right for larger ones."));
+	lgridSizer->Add(mAnnotationLabelSizeSlider, 0, wxALIGN_CENTER | wxALL, 3);
+	mMainSizer->Add(lgridSizer, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	
 	SetSizer(mMainSizer);
 }
 
@@ -426,6 +447,9 @@ void DisplayPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 		mAtomLabels->SetSelection(1);
 	else
 		mAtomLabels->SetSelection(0);
+	
+	mAtomLabelSizeSlider->SetValue((int)(mTargetPrefs->GetAtomLabelSize()*100));
+	mAnnotationLabelSizeSlider->SetValue((int)(mTargetPrefs->GetAnnotationLabelSize()*100));
 }
 
 void DisplayPrefsPane::saveToTempPrefs()
@@ -475,7 +499,14 @@ void DisplayPrefsPane::OnCheckBox( wxCommandEvent &event)
   if (event.GetId() == ID_COLOR_BONDS_BY_ATOM_COLOR)
     mTargetPrefs->ColorBondHalves(mChkColor->GetValue());
 }
-
+void DisplayPrefsPane::OnAtomLabelSlider( wxCommandEvent &event)
+{
+	mTargetPrefs->SetAtomLabelSize((float)(mAtomLabelSizeSlider->GetValue())/100.0);
+}
+void DisplayPrefsPane::OnAnnotationLabelSlider( wxCommandEvent &event)
+{
+	mTargetPrefs->SetAnnotationLabelSize((float)(mAnnotationLabelSizeSlider->GetValue())/100.0);
+}
 
 EnergyPrefsPane::EnergyPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, targetPrefs, kEPrefsPane, GlobalPrefs) 
@@ -865,11 +896,11 @@ if (PrefsAreGlobal())
 
   mUpperSizer->Add(mChkBox[0], 0, wxALIGN_LEFT | wxALL, 3);
 
-  mSecondSizer->Add(30, 30);
+  mSecondSizer->Add(30, 0);
   mSecondSizer->Add(mChkBox[1], 0, wxALIGN_LEFT | wxALL, 3);
-  mSecondSizer->Add(30, 30);
+  mSecondSizer->Add(30, 0);
   mSecondSizer->Add(mChkBox[2], 0, wxALIGN_LEFT | wxALL, 3);
-  mSecondSizer->Add(30, 30);
+  mSecondSizer->Add(30, 0);
   mSecondSizer->Add(mChkBox[3], 0, wxALIGN_LEFT | wxALL, 3);
 
   mMiddleSizer->Add(mChkBox[4], 0, wxALIGN_LEFT | wxALL, 3);

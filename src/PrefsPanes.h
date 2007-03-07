@@ -71,10 +71,6 @@ class AtomPrefsPane : public wxScrolledWindow, public PrefsPane
 		wxTextCtrl* mEleMasses[kMaxAtomTypes];
 		colorArea* mColorArea[kMaxAtomTypes];
 		colorArea* mPatternArea[kMaxAtomTypes];
-		//wxBoxSizer* mUpperSizer;
-		//wxBoxSizer* mLowerSizer;
-		//wxGridSizer* mInnerSizer;
-		//wxScrolledWindow* mScrollWin;
 };
 
 
@@ -122,7 +118,8 @@ class DisplayPrefsPane : public wxPanel, public PrefsPane
 		void OnRadio( wxCommandEvent &event );
 		void OnLabelsRadio( wxCommandEvent &event );
 		void OnCheckBox( wxCommandEvent& WXUNUSED(event));
-		void OnDepthSlider(wxCommandEvent &event);
+		void OnAtomLabelSlider(wxCommandEvent &event);
+		void OnAnnotationLabelSlider(wxCommandEvent &event);
 
 	private:
 		wxBoxSizer* mMainSizer;
@@ -130,7 +127,8 @@ class DisplayPrefsPane : public wxPanel, public PrefsPane
 		wxRadioBox* mRdoBox;
 		wxCheckBox* mChkColor;
 		wxRadioBox*	mAtomLabels;
-		wxSlider*	mDepthSlider;
+		wxSlider*	mAtomLabelSizeSlider;
+		wxSlider*	mAnnotationLabelSizeSlider;
 
 		DECLARE_EVENT_TABLE()
 };

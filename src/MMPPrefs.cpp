@@ -109,6 +109,10 @@ void WinPrefs::CopyDisplayPrefs(WinPrefs * Orig) {
 	DrawWireFrame(Orig->DrawWireFrame());
 	ColorBondHalves(Orig->ColorBondHalves());
 	OutLineBonds(Orig->OutLineBonds());
+	ShowAtomicSymbolLabels(Orig->ShowAtomicSymbolLabels());
+	ShowAtomNumberLabels(Orig->ShowAtomNumberLabels());
+	SetAtomLabelSize(Orig->GetAtomLabelSize());
+	SetAnnotationLabelSize(Orig->GetAnnotationLabelSize());
 }
 
 void WinPrefs::ReadDisplayDefaults(void) {
