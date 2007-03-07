@@ -21,14 +21,14 @@
 
 //This needs to get put into the build system...
 #define __wxBuild__
-#define wxMacMolPlt_VERSION "6.3.1"
+#define wxMacMolPlt_VERSION "6.3.2"
 
 //activate the following line to use the interactive editor
-#define ENABLE_INTERACTIVE_MODE
+//#define ENABLE_INTERACTIVE_MODE
 //Activate to enable the show symmetry operators menu items
 //#define ENABLE_SHOWSYMMETRY_MODE
 //Activate to allow quicktime movie export on Mac
-#define __MAC_USE_QUICKTIME__
+//#define __MAC_USE_QUICKTIME__
 /*
 #define MacintoshBuild		//define to build for Mac PPC or 68K
 #if __GNUC__
