@@ -124,7 +124,7 @@ bool MpApp::OnInit() {
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 
 		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006 " 
-					   "Version %.2f, %s"), 7.0, (const wxChar*) date);
+					   "Version %s, %s"), wxMacMolPlt_VERSION, (const wxChar*) date);
 		wxLogMessage(msg); 
 		return false; 
 	} 
@@ -190,6 +190,7 @@ void MpApp::splashCleanup(wxTimerEvent & event) {
 }
 
 int MpApp::OnExit() {
+	//If we are using the instance checker we must delete it here or we will leave a stale lock behind
 	if (m_InstanceChecker) {
 		delete m_InstanceChecker;
 		m_InstanceChecker = NULL;
@@ -304,7 +305,14 @@ void MpApp::MacOpenFile(const wxString & filename) {
 #endif
 
 void MessageAlert(const char * message) {
-//wxLogMessage throws up a simple dialog alert and gives the user the option
+	//For some reason on windoze when the splash screen gets destroyed while the alert is
+	//up it hides the alert without releasing control so make sure its gone here before
+	//the alert is created.
+	if (splash) {
+		splash->Destroy();
+		splash = NULL;
+	}
+	//wxLogMessage throws up a simple dialog alert and gives the user the option
 //of viewing and saving the current complete log.
 	//We need to convert to a wxString first to allow for unicode environments
 	wxString str(message, wxConvUTF8);

@@ -921,15 +921,11 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
 		event.Skip();
 }
 void MolDisplayWin::menuFileAddFramesFromFile(wxCommandEvent &event) {
-	//First prompt for the file. I don't know if there is anyway to add the
-	//extra options to the open file dialog.
-	wxFileDialog * fdlg = new wxFileDialog(this, 
-		wxT("Choose a file containing points to be appended to the currently open file."),
-						wxString(wxT("")), wxString(wxT("")), wxString(wxT("*")), wxOPEN|wxOVERWRITE_PROMPT);
-	fdlg->ShowModal();
-	wxString filename = fdlg->GetPath();
+	//First prompt for the file.
+	wxString filename = wxFileSelector(_("Choose a file containing points to be appended to the currently open file."),
+									   _T(""), _T(""), _T(""), _T("*"), wxOPEN, this);
 	
-	//If the user chooses a file, create a window and have it process it.
+	//If the user chooses a file, popup the extra options dialog before processing it
 	if (filename.length() > 0) {
 		AppendFramesOptions * optDlg = new AppendFramesOptions(this);
 		optDlg->SetSkip(Prefs->GetDRCSkip());
@@ -2511,6 +2507,9 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 		} else {
 			currFilePath = wxT("");
 		}
+	}
+	if (append) {
+		if ((type != CMLFile) || (test < 10)) ResetModel(true);
 	}
 	return test;
 }
