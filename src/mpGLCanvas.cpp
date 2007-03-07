@@ -119,7 +119,7 @@ void MpGLCanvas::initGL(void) {
 			if (glfLoadFont(pathname.mb_str(wxConvUTF8)) < 0) {
 				std::ostringstream buf;
 				buf <<"Warning: font file not found! This probably means wxmacmolplt is not"
-					"properly installed.";
+					"properly installed. Looking for " << pathname.mb_str(wxConvUTF8);
 				MessageAlert(buf.str().c_str());
 				glfClose();
 			} else
