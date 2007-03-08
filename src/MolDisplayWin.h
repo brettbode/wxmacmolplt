@@ -54,6 +54,7 @@ typedef class ModeAnimation ModeAnimation;
 typedef class ZMatrixCalculator ZMatrixCalculator;
 typedef class setPreference setPreference;
 typedef struct qtData;
+typedef class MolStatusBar;
 
 //Simple class to save window visibility and positioning data
 class WindowData {
@@ -131,7 +132,6 @@ class MolDisplayWin : public wxFrame {
 		wxMenu    *menuHelp;
 
 		wxString		currFilePath;
-		wxPanel *		infoPanel;
 		MoleculeData	*MainData;
 		WinPrefs		*Prefs;
 		bool			Dirty;          //Flag to indicate a save is needed
@@ -141,8 +141,7 @@ class MolDisplayWin : public wxFrame {
 		Progress		*ProgressInd;    // Progress indicator window for long operations
 		OpenGLRec		*OpenGLData;     // Extra OpenGL data
 		MpGLCanvas		*glCanvas;
-		wxStaticText	*textBar;
-		wxScrollBar		*frameScrollBar;
+		MolStatusBar	*myStatus;
 		ModeAnimation	*ModeAnimationData;
 		wxTimer			m_timer;
 
@@ -373,8 +372,6 @@ class MolDisplayWin : public wxFrame {
 		void eventSize(wxSizeEvent &event);
 		void SizeChanged(void);
 		void OnFrameAnimationTimer(wxTimerEvent & event);
-			//Function to receive all changes to the scroll bar
-		void OnScrollBarChange(wxScrollEvent& event);
 			//Called during normal mode animations
 		void OnModeAnimation(wxTimerEvent & event);
 			//Function to be called when window loses focus to stop animations

@@ -101,7 +101,6 @@ enum MMP_EventID {
 	MMP_FREQUENCIESWINDOW,
 	MMP_INPUTBUILDERWINDOW,
 	MMP_SURFACESWINDOW,
-	MMP_STATUSBAR,
 	MMP_FRAMESCROLLBAR,
 	MMP_EXPORT,
 	MMP_PRINTOPTIONS,
@@ -195,7 +194,6 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
 	EVT_SIZE( MolDisplayWin::eventSize )
 	EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
-	EVT_COMMAND_SCROLL(MMP_FRAMESCROLLBAR, MolDisplayWin::OnScrollBarChange )
 	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen )
 	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 	EVT_ACTIVATE(MolDisplayWin::OnActivate)
@@ -213,6 +211,26 @@ public:
 	wxTimer                 m_timer;
 	bool                    SavedDrawMode;
 };
+
+//derive a status bar class so we can add the scrollbar
+class MolStatusBar : public wxStatusBar {
+public:
+	MolStatusBar(MolDisplayWin * parent);
+	
+	void OnScrollBarChange(wxScrollEvent & event);
+	void SetScrollBar(int pos, int range);
+	void SetScrollBarValue(int pos);
+	void OnSize(wxSizeEvent & event);
+private:
+		MolDisplayWin *	myParent;
+		wxScrollBar *	myScroll;
+		
+	DECLARE_EVENT_TABLE()
+};
+BEGIN_EVENT_TABLE(MolStatusBar, wxStatusBar)
+	EVT_SIZE(MolStatusBar::OnSize)
+	EVT_COMMAND_SCROLL(MMP_FRAMESCROLLBAR, MolStatusBar::OnScrollBarChange )
+END_EVENT_TABLE()
 
 //Class to hold CML data on the clipboard
 //This is really intended for internal use for copying data from one file to another.
@@ -240,7 +258,7 @@ private:
 	DECLARE_NO_COPY_CLASS(wxCMLDataObject)
 };
 
-
+#include <iostream>
 MolDisplayWin::MolDisplayWin(const wxString &title,
 						 const wxPoint  &position,
 						 const wxSize   &size,
@@ -268,7 +286,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	
 	pageSetupData = NULL;
 	printData = NULL;
-	infoPanel = NULL;
+//	infoPanel = NULL;
+	myStatus = NULL;
 
 	mHighliteState = false;
 	interactiveMode = false;
@@ -283,23 +302,16 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
 	InitGLData();
 	
+	myStatus = new MolStatusBar(this);
+	SetStatusBar(myStatus);
 	int width, height;
 	GetClientSize(&width, &height);
-	infoPanel = new wxPanel( this, 11004, wxPoint(0, height-20), wxSize(width, 20), wxNO_BORDER );
-	frameScrollBar = new wxScrollBar( infoPanel, MMP_FRAMESCROLLBAR, wxPoint(width-120, 0), wxSize(100,-1), wxSB_HORIZONTAL );
 	
-	int swidth, sheight;
-	frameScrollBar->GetClientSize(&swidth, &sheight);
-	
-	glCanvas = new MpGLCanvas(this, 11002, wxPoint(0,0), wxSize(height-sheight,width));
+	glCanvas = new MpGLCanvas(this, 11002, wxPoint(0,0), wxSize(height,width));
 	glCanvas->setPrefs(Prefs);
 	
-	textBar = new wxStaticText(infoPanel, 11003, wxString(wxT("")), wxDefaultPosition, wxDefaultSize,
-							   wxALIGN_LEFT | wxST_NO_AUTORESIZE);
-
 	SizeChanged();
 	glCanvas->SetFocus();
-	frameScrollBar->SetScrollbar(1, 1, 1, 1);
 	createMenuBar();
 	SetMenuBar(menuBar);
 
@@ -362,13 +374,9 @@ void MolDisplayWin::SizeChanged(void) {
 	int width, height;
 	GetClientSize(&width, &height);
 
-	int swidth, sheight;
-	frameScrollBar->GetClientSize(&swidth, &sheight);
-	infoPanel->SetSize(0, height-sheight, width, sheight, wxSIZE_USE_EXISTING);
-	frameScrollBar->Move(width-114, 0);
-	glCanvas->SetSize(wxSize(width, (height-sheight)));
-	
-	textBar->SetSize(0, 0, width-114, sheight, wxSIZE_USE_EXISTING);
+	int swidth, sheight=0;
+	//The status bar class effects the client size so no need to subtract it off here
+	glCanvas->SetSize(wxSize(width, height));
 }
 
 void MolDisplayWin::OnMenuOpen(wxMenuEvent & event) {
@@ -424,7 +432,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuHelp = new wxMenu;
 
 	menuFile->Append(wxID_NEW, wxT("&New\tCtrl+N"));
-	menuFile->Append(MMP_NEWFRAME, wxT("Append New Frame"));
+	menuFile->Append(MMP_NEWFRAME, wxT("Append New Frame"), wxT("Add a new, empty frame"));
 	menuFile->Append(wxID_OPEN, wxT("&Open ...\tCtrl+O"));
 	menuFile->Append(MMP_ADDFRAMES, wxT("Add Frames from File..."));
 	menuFile->Append(wxID_SAVE, wxT("&Save\tCtrl+S"));
@@ -482,7 +490,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewStyle->AppendRadioItem(MMP_BALLANDSTICKMODE, wxT("Ball and Stick"));
 	
 	menuView->Append(MMP_ANIMATEFRAMES, wxT("Animate &Frames\tCtrl+F"));
-	menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl-down"));
+	menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl-down"), _T("Reduce size by 10%"));
 	menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl-up"));
 	menuView->Append(MMP_CENTER, wxT("&Center View"));
 	
@@ -1936,17 +1944,6 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 	ResetModel(false);
 	Dirty = true;
 }
-void MolDisplayWin::OnScrollBarChange( wxScrollEvent& event ) {
-	StopAnimations();
-		//this function receives all events from the scroll bar and
-		//and thus provides live dragging.
-	int newpos = event.GetPosition() + 1;
-	if (newpos != MainData->CurrentFrame) {
-		ChangeFrames(newpos);
-	}
-	glCanvas->SetFocus();
-}
-
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 	StopAnimations();
 	int key = event.GetKeyCode();
@@ -2191,7 +2188,7 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
 		if (frequenciesWindow) frequenciesWindow->FrameChanged();
 		if (surfacesWindow) surfacesWindow->Reset();
 		if (zMatCalcDlg) zMatCalcDlg->UpdateValues();
-		frameScrollBar->SetThumbPosition(MainData->CurrentFrame-1);
+		myStatus->SetScrollBarValue(MainData->CurrentFrame-1);
 	}
 }
 void MolDisplayWin::ModeChanged(void) {
@@ -2282,7 +2279,7 @@ void MolDisplayWin::UpdateFrameText(void) {
 	ft.Printf(wxT(" Frame %d of %d"), MainData->GetCurrentFrame(), MainData->GetNumFrames());
 	output += ft;
 
-	textBar->SetLabel(output);
+	myStatus->SetStatusText(output);
 }
 void MolDisplayWin::UpdateModelDisplay(void) {
 	UpdateFrameText();
@@ -2313,7 +2310,7 @@ void MolDisplayWin::ResetModel(bool Center) {
 	}
 	UpdateGLModel();
 	// Reset the frame scroll bar
-	frameScrollBar->SetScrollbar(MainData->CurrentFrame-1, 1, MainData->NumFrames, 1);
+	myStatus->SetScrollBar(MainData->CurrentFrame-1, MainData->NumFrames);
 	UpdateFrameText();
 	glCanvas->draw();
 	Dirty = true;
@@ -2804,4 +2801,41 @@ void MolDisplayWin::SelectionChanged(bool mode)
 	coordsWindow->UpdateSelection(mode);
   if (bondsWindow)
 	bondsWindow->UpdateSelection(mode);
+}
+#ifdef __WXMAC__
+#define kMOLSCROLLOFFSET 16
+#else
+#define kMOLSCROLLOFFSET 0
+#endif
+#define kMOLSCROLLWIDTH	120
+MolStatusBar::MolStatusBar(MolDisplayWin * p) : wxStatusBar(p, wxID_ANY), myScroll(NULL),
+				myParent(p) {
+	SetFieldsCount(2);
+	const int widths[2] = {-1, kMOLSCROLLWIDTH + kMOLSCROLLOFFSET};
+	SetStatusWidths(2, widths);
+
+	myScroll = new wxScrollBar( this, MMP_FRAMESCROLLBAR, wxDefaultPosition, wxSize(kMOLSCROLLWIDTH, -1), wxSB_HORIZONTAL );
+	//wxStatusBar sets its window style to small, I don't want a small
+	//scroll bar so set its style to normal
+	myScroll->SetWindowVariant(wxWINDOW_VARIANT_NORMAL);
+	myScroll->SetScrollbar(0, 1, 1, 1);
+}
+void MolStatusBar::OnSize(wxSizeEvent & event) {
+	if (!myScroll) return;
+		//The size of the scroll bar is left fixed so we just move it around
+	wxRect rect;
+	GetFieldRect(1, rect);
+	myScroll->Move(rect.x, rect.y);
+
+	event.Skip();
+}
+void MolStatusBar::SetScrollBar(int pos, int range) {
+	myScroll->SetScrollbar(pos, 1, range, 1);
+}
+void MolStatusBar::SetScrollBarValue(int pos) {
+	myScroll->SetThumbPosition(pos);
+}
+void MolStatusBar::OnScrollBarChange(wxScrollEvent & event) {
+	myParent->StopAnimations();
+	myParent->ChangeFrames(event.GetPosition() + 1);
 }
