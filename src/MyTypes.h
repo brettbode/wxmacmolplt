@@ -130,7 +130,8 @@ class AnnotateAngle {
 
 class AnnotateDihedral {
 	public:
-		AnnotateDihedral(long atom1_id, long atom2_id, long atom3_id) {
+		AnnotateDihedral(long atom1_id, long atom2_id, long atom3_id,
+				         long atom4_id) {
 			this->atom1_id = atom1_id;
 			this->atom2_id = atom2_id;
 			this->atom3_id = atom3_id;
