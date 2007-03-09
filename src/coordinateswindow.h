@@ -23,6 +23,7 @@
 ////@begin includes
 #include "wx/frame.h"
 #include "wx/grid.h"
+#include "wx/statusbr.h"
 ////@end includes
 
 /*!
@@ -39,11 +40,6 @@ class wxGrid;
 
 ////@begin control identifiers
 #define ID_COORDINATESDIALOG 10021
-#define SYMBOL_COORDINATESWINDOW_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
-#define SYMBOL_COORDINATESWINDOW_TITLE _("Coordinates Window")
-#define SYMBOL_COORDINATESWINDOW_IDNAME ID_COORDINATESDIALOG
-#define SYMBOL_COORDINATESWINDOW_SIZE wxSize(400, 300)
-#define SYMBOL_COORDINATESWINDOW_POSITION wxDefaultPosition
 #define MMP_COPYCOORDSITEM 10027
 #define ID_STICKMENU 10028
 #define ID_PANEL3 10222
@@ -51,6 +47,12 @@ class wxGrid;
 #define ID_STICKBUTTON 10024
 #define ID_COORDCHOICE1 10025
 #define ID_COORDGRID 10026
+#define ID_STATUSBAR1 10250
+#define SYMBOL_COORDINATESWINDOW_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
+#define SYMBOL_COORDINATESWINDOW_TITLE _("Coordinates Window")
+#define SYMBOL_COORDINATESWINDOW_IDNAME ID_COORDINATESDIALOG
+#define SYMBOL_COORDINATESWINDOW_SIZE wxSize(400, 300)
+#define SYMBOL_COORDINATESWINDOW_POSITION wxDefaultPosition
 ////@end control identifiers
 
 /*!
@@ -84,71 +86,71 @@ public:
 
 ////@begin CoordinatesWindow event handler declarations
 
-    /// wxEVT_CLOSE_WINDOW event handler for ID_COORDINATESDIALOG
-    void OnCloseWindow( wxCloseEvent& event );
+	/// wxEVT_CLOSE_WINDOW event handler for ID_COORDINATESDIALOG
+	void OnCloseWindow( wxCloseEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE
-    void OnCloseClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE
+	void OnCloseClick( wxCommandEvent& event );
 
-    /// wxEVT_UPDATE_UI event handler for wxID_UNDO
-    void OnUndoUpdate( wxUpdateUIEvent& event );
+	/// wxEVT_UPDATE_UI event handler for wxID_UNDO
+	void OnUndoUpdate( wxUpdateUIEvent& event );
 
-    /// wxEVT_UPDATE_UI event handler for wxID_CUT
-    void OnCutUpdate( wxUpdateUIEvent& event );
+	/// wxEVT_UPDATE_UI event handler for wxID_CUT
+	void OnCutUpdate( wxUpdateUIEvent& event );
 
-    /// wxEVT_UPDATE_UI event handler for wxID_COPY
-    void OnCopyUpdate( wxUpdateUIEvent& event );
+	/// wxEVT_UPDATE_UI event handler for wxID_COPY
+	void OnCopyUpdate( wxUpdateUIEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for MMP_COPYCOORDSITEM
-    void OnMmpCopycoordsitemClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for MMP_COPYCOORDSITEM
+	void OnMmpCopycoordsitemClick( wxCommandEvent& event );
 
-    /// wxEVT_UPDATE_UI event handler for MMP_COPYCOORDSITEM
-    void OnMmpCopycoordsitemUpdate( wxUpdateUIEvent& event );
+	/// wxEVT_UPDATE_UI event handler for MMP_COPYCOORDSITEM
+	void OnMmpCopycoordsitemUpdate( wxUpdateUIEvent& event );
 
-    /// wxEVT_UPDATE_UI event handler for wxID_PASTE
-    void OnPasteUpdate( wxUpdateUIEvent& event );
+	/// wxEVT_UPDATE_UI event handler for wxID_PASTE
+	void OnPasteUpdate( wxUpdateUIEvent& event );
 
-    /// wxEVT_UPDATE_UI event handler for wxID_CLEAR
-    void OnClearUpdate( wxUpdateUIEvent& event );
+	/// wxEVT_UPDATE_UI event handler for wxID_CLEAR
+	void OnClearUpdate( wxUpdateUIEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_SELECTALL
-    void OnSelectallClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_SELECTALL
+	void OnSelectallClick( wxCommandEvent& event );
 
-    /// wxEVT_UPDATE_UI event handler for wxID_SELECTALL
-    void OnSelectallUpdate( wxUpdateUIEvent& event );
+	/// wxEVT_UPDATE_UI event handler for wxID_SELECTALL
+	void OnSelectallUpdate( wxUpdateUIEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_STICKMENU
-    void OnStickmenuClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_STICKMENU
+	void OnStickmenuClick( wxCommandEvent& event );
 
-    /// wxEVT_UPDATE_UI event handler for ID_STICKMENU
-    void OnStickmenuUpdate( wxUpdateUIEvent& event );
+	/// wxEVT_UPDATE_UI event handler for ID_STICKMENU
+	void OnStickmenuUpdate( wxUpdateUIEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
-    void OnAddClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
+	void OnAddClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE
-    void OnDeleteClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE
+	void OnDeleteClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BONDBUTTON
-    void OnBondbuttonClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BONDBUTTON
+	void OnBondbuttonClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_STICKBUTTON
-    void OnStickbuttonClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_STICKBUTTON
+	void OnStickbuttonClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_COORDCHOICE1
-    void OnCoordchoice1Selected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_COORDCHOICE1
+	void OnCoordchoice1Selected( wxCommandEvent& event );
 
-    /// wxEVT_GRID_CELL_CHANGE event handler for ID_COORDGRID
-    void OnCellChange( wxGridEvent& event );
+	/// wxEVT_GRID_CELL_CHANGE event handler for ID_COORDGRID
+	void OnCellChange( wxGridEvent& event );
 
-    /// wxEVT_GRID_SELECT_CELL event handler for ID_COORDGRID
-    void OnSelectCell( wxGridEvent& event );
+	/// wxEVT_GRID_SELECT_CELL event handler for ID_COORDGRID
+	void OnSelectCell( wxGridEvent& event );
 
-    /// wxEVT_GRID_RANGE_SELECT event handler for ID_COORDGRID
-    void OnRangeSelect( wxGridRangeSelectEvent& event );
+	/// wxEVT_GRID_RANGE_SELECT event handler for ID_COORDGRID
+	void OnRangeSelect( wxGridRangeSelectEvent& event );
 
-    /// wxEVT_SIZE event handler for ID_COORDGRID
-    void OnSize( wxSizeEvent& event );
+	/// wxEVT_SIZE event handler for ID_COORDGRID
+	void OnSize( wxSizeEvent& event );
 
 ////@end CoordinatesWindow event handler declarations
 	
@@ -156,20 +158,23 @@ public:
 
 ////@begin CoordinatesWindow member function declarations
 
-    MolDisplayWin * GetParent() const { return Parent ; }
-    void SetParent(MolDisplayWin * value) { Parent = value ; }
+	MolDisplayWin * GetParent() const { return Parent ; }
+	void SetParent(MolDisplayWin * value) { Parent = value ; }
 
-    int GetCoordType() const { return CoordType ; }
-    void SetCoordType(int value) { CoordType = value ; }
+	int GetCoordType() const { return CoordType ; }
+	void SetCoordType(int value) { CoordType = value ; }
 
-    WinPrefs * GetPrefs() const { return Prefs ; }
-    void SetPrefs(WinPrefs * value) { Prefs = value ; }
+	WinPrefs * GetPrefs() const { return Prefs ; }
+	void SetPrefs(WinPrefs * value) { Prefs = value ; }
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+	bool GetNeedClearAll() const { return needClearAll ; }
+	void SetNeedClearAll(bool value) { needClearAll = value ; }
 
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource( const wxString& name );
+
+	/// Retrieves icon resources
+	wxIcon GetIconResource( const wxString& name );
 ////@end CoordinatesWindow member function declarations
 
     /// Should we show tooltips?
@@ -183,15 +188,14 @@ public:
 	void UpdateSelection(bool mode);
 	
 ////@begin CoordinatesWindow member variables
-    wxButton* deleteButton;
-    wxButton* BondButton;
-    wxChoice* coordTypeChoice;
-    wxGrid* coordGrid;
-    MolDisplayWin * Parent;
-    int CoordType;
-    WinPrefs * Prefs;
-
-    bool needClearAll;
+	wxButton* deleteButton;
+	wxButton* BondButton;
+	wxChoice* coordTypeChoice;
+	wxGrid* coordGrid;
+	MolDisplayWin * Parent;
+	int CoordType;
+	WinPrefs * Prefs;
+	bool needClearAll;
 ////@end CoordinatesWindow member variables
 };
 

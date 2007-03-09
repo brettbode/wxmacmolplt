@@ -75,43 +75,42 @@ enum MMP_EventID {
 BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 
 ////@begin CoordinatesWindow event table entries
-    EVT_CLOSE( CoordinatesWindow::OnCloseWindow )
+	EVT_CLOSE( CoordinatesWindow::OnCloseWindow )
 
-    EVT_MENU( wxID_CLOSE, CoordinatesWindow::OnCloseClick )
+	EVT_MENU( wxID_CLOSE, CoordinatesWindow::OnCloseClick )
 
-    EVT_UPDATE_UI( wxID_UNDO, CoordinatesWindow::OnUndoUpdate )
+	EVT_UPDATE_UI( wxID_UNDO, CoordinatesWindow::OnUndoUpdate )
 
-    EVT_UPDATE_UI( wxID_CUT, CoordinatesWindow::OnCutUpdate )
+	EVT_UPDATE_UI( wxID_CUT, CoordinatesWindow::OnCutUpdate )
 
-    EVT_UPDATE_UI( wxID_COPY, CoordinatesWindow::OnCopyUpdate )
+	EVT_UPDATE_UI( wxID_COPY, CoordinatesWindow::OnCopyUpdate )
 
-    EVT_MENU( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemClick )
-    EVT_UPDATE_UI( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemUpdate )
+	EVT_MENU( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemClick )
+	EVT_UPDATE_UI( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemUpdate )
 
-    EVT_UPDATE_UI( wxID_PASTE, CoordinatesWindow::OnPasteUpdate )
+	EVT_UPDATE_UI( wxID_PASTE, CoordinatesWindow::OnPasteUpdate )
 
-    EVT_UPDATE_UI( wxID_CLEAR, CoordinatesWindow::OnClearUpdate )
+	EVT_UPDATE_UI( wxID_CLEAR, CoordinatesWindow::OnClearUpdate )
 
-    EVT_MENU( wxID_SELECTALL, CoordinatesWindow::OnSelectallClick )
-    EVT_UPDATE_UI( wxID_SELECTALL, CoordinatesWindow::OnSelectallUpdate )
+	EVT_MENU( wxID_SELECTALL, CoordinatesWindow::OnSelectallClick )
+	EVT_UPDATE_UI( wxID_SELECTALL, CoordinatesWindow::OnSelectallUpdate )
 
-    EVT_MENU( ID_STICKMENU, CoordinatesWindow::OnStickmenuClick )
-    EVT_UPDATE_UI( ID_STICKMENU, CoordinatesWindow::OnStickmenuUpdate )
+	EVT_MENU( ID_STICKMENU, CoordinatesWindow::OnStickmenuClick )
+	EVT_UPDATE_UI( ID_STICKMENU, CoordinatesWindow::OnStickmenuUpdate )
 
-    EVT_BUTTON( wxID_ADD, CoordinatesWindow::OnAddClick )
+	EVT_BUTTON( wxID_ADD, CoordinatesWindow::OnAddClick )
 
-    EVT_BUTTON( wxID_DELETE, CoordinatesWindow::OnDeleteClick )
+	EVT_BUTTON( wxID_DELETE, CoordinatesWindow::OnDeleteClick )
 
-    EVT_BUTTON( ID_BONDBUTTON, CoordinatesWindow::OnBondbuttonClick )
+	EVT_BUTTON( ID_BONDBUTTON, CoordinatesWindow::OnBondbuttonClick )
 
-    EVT_BUTTON( ID_STICKBUTTON, CoordinatesWindow::OnStickbuttonClick )
+	EVT_BUTTON( ID_STICKBUTTON, CoordinatesWindow::OnStickbuttonClick )
 
-    EVT_CHOICE( ID_COORDCHOICE1, CoordinatesWindow::OnCoordchoice1Selected )
+	EVT_CHOICE( ID_COORDCHOICE1, CoordinatesWindow::OnCoordchoice1Selected )
 
-    EVT_GRID_CELL_CHANGE( CoordinatesWindow::OnCellChange )
-    EVT_GRID_SELECT_CELL( CoordinatesWindow::OnSelectCell )
-    EVT_GRID_RANGE_SELECT( CoordinatesWindow::OnRangeSelect )
-    EVT_SIZE( CoordinatesWindow::OnSize )
+	EVT_GRID_CELL_CHANGE( CoordinatesWindow::OnCellChange )
+	EVT_GRID_SELECT_CELL( CoordinatesWindow::OnSelectCell )
+	EVT_GRID_RANGE_SELECT( CoordinatesWindow::OnRangeSelect )
 
 ////@end CoordinatesWindow event table entries
 
@@ -147,31 +146,25 @@ CoordinatesWindow::~CoordinatesWindow( )
 bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin CoordinatesWindow member initialisation
-    CoordType = 0;
-    deleteButton = NULL;
-    BondButton = NULL;
-    coordTypeChoice = NULL;
-    coordGrid = NULL;
-
-    needClearAll = true;
-    
+	CoordType = 0;
+	deleteButton = NULL;
+	BondButton = NULL;
+	coordTypeChoice = NULL;
+	coordGrid = NULL;
 ////@end CoordinatesWindow member initialisation
 	Parent = parent;
 	Prefs = Parent->GetPrefs();
 
 ////@begin CoordinatesWindow creation
-    SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
-    wxFrame::Create( parent, id, caption, pos, size, style );
+	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
+	wxFrame::Create( parent, id, caption, pos, size, style );
 
-    CreateControls();
-    if (GetSizer())
-    {
-        GetSizer()->SetSizeHints(this);
-    }
-
-    Parent->SetHighliteMode(true);
-
-    Centre();
+	CreateControls();
+	if (GetSizer())
+	{
+		GetSizer()->SetSizeHints(this);
+	}
+	Centre();
 ////@end CoordinatesWindow creation
     return true;
 }
@@ -183,89 +176,97 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
 void CoordinatesWindow::CreateControls()
 {    
 ////@begin CoordinatesWindow content construction
-    CoordinatesWindow* itemFrame1 = this;
+	CoordinatesWindow* itemFrame1 = this;
 
-    wxMenuBar* menuBar = new wxMenuBar;
-    wxMenu* itemMenu3 = new wxMenu;
-    itemMenu3->Append(wxID_NEW, _("&New\tCtrl+N"), _T(""), wxITEM_NORMAL);
-    itemMenu3->Append(wxID_OPEN, _("&Open ...\tCtrl+O"), _T(""), wxITEM_NORMAL);
-    itemMenu3->Append(wxID_CLOSE, _("&Close\tCtrl+W"), _T(""), wxITEM_NORMAL);
-    menuBar->Append(itemMenu3, _("File"));
-    wxMenu* itemMenu7 = new wxMenu;
-    itemMenu7->Append(wxID_UNDO, _("&Undo\tCtrl+Z"), _T(""), wxITEM_NORMAL);
-    itemMenu7->Enable(wxID_UNDO, false);
-    itemMenu7->AppendSeparator();
-    itemMenu7->Append(wxID_CUT, _("Cu&t\tCtrl+X"), _T(""), wxITEM_NORMAL);
-    itemMenu7->Enable(wxID_CUT, false);
-    itemMenu7->Append(wxID_COPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
-    itemMenu7->Enable(wxID_COPY, false);
-    itemMenu7->Append(MMP_COPYCOORDSITEM, _("Copy Coordinates"), _("Copy the full set of coordinates with the current coordinate type."), wxITEM_NORMAL);
-    itemMenu7->Enable(MMP_COPYCOORDSITEM, false);
-    itemMenu7->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
-    itemMenu7->Enable(wxID_PASTE, false);
-    itemMenu7->Append(wxID_CLEAR, _("&Delete\tDel"), _T(""), wxITEM_NORMAL);
-    itemMenu7->Enable(wxID_CLEAR, false);
-    itemMenu7->AppendSeparator();
-    itemMenu7->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
-    itemMenu7->Enable(wxID_SELECTALL, false);
-    menuBar->Append(itemMenu7, _("Edit"));
-    wxMenu* itemMenu17 = new wxMenu;
-    itemMenu17->Append(ID_STICKMENU, _("Use Coordinates for Reference"), _("Makes the current rotated coordinates the reference coordinates."), wxITEM_NORMAL);
-    menuBar->Append(itemMenu17, _("Coordinates"));
-    itemFrame1->SetMenuBar(menuBar);
+	wxMenuBar* menuBar = new wxMenuBar;
+	wxMenu* itemMenu3 = new wxMenu;
+	itemMenu3->Append(wxID_NEW, _("&New\tCtrl+N"), _T(""), wxITEM_NORMAL);
+	itemMenu3->Append(wxID_OPEN, _("&Open ...\tCtrl+O"), _T(""), wxITEM_NORMAL);
+	itemMenu3->Append(wxID_CLOSE, _("&Close\tCtrl+W"), _T(""), wxITEM_NORMAL);
+	menuBar->Append(itemMenu3, _("File"));
+	wxMenu* itemMenu7 = new wxMenu;
+	itemMenu7->Append(wxID_UNDO, _("&Undo\tCtrl+Z"), _T(""), wxITEM_NORMAL);
+	itemMenu7->Enable(wxID_UNDO, false);
+	itemMenu7->AppendSeparator();
+	itemMenu7->Append(wxID_CUT, _("Cu&t\tCtrl+X"), _T(""), wxITEM_NORMAL);
+	itemMenu7->Enable(wxID_CUT, false);
+	itemMenu7->Append(wxID_COPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
+	itemMenu7->Enable(wxID_COPY, false);
+	itemMenu7->Append(MMP_COPYCOORDSITEM, _("Copy Coordinates"), _("Copy the full set of coordinates with the current coordinate type."), wxITEM_NORMAL);
+	itemMenu7->Enable(MMP_COPYCOORDSITEM, false);
+	itemMenu7->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
+	itemMenu7->Enable(wxID_PASTE, false);
+	itemMenu7->Append(wxID_CLEAR, _("&Delete\tDel"), _T(""), wxITEM_NORMAL);
+	itemMenu7->Enable(wxID_CLEAR, false);
+	itemMenu7->AppendSeparator();
+	itemMenu7->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
+	itemMenu7->Enable(wxID_SELECTALL, false);
+	menuBar->Append(itemMenu7, _("Edit"));
+	wxMenu* itemMenu17 = new wxMenu;
+	itemMenu17->Append(ID_STICKMENU, _("Use Coordinates for Reference"), _("Makes the current rotated coordinates the reference coordinates."), wxITEM_NORMAL);
+	menuBar->Append(itemMenu17, _("Coordinates"));
+	itemFrame1->SetMenuBar(menuBar);
 
-    wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxVERTICAL);
-    itemFrame1->SetSizer(itemBoxSizer19);
+	wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxVERTICAL);
+	itemFrame1->SetSizer(itemBoxSizer19);
 
-    wxPanel* itemPanel20 = new wxPanel( itemFrame1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-    itemBoxSizer19->Add(itemPanel20, 1, wxGROW, 0);
+	wxPanel* itemPanel20 = new wxPanel( itemFrame1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	itemBoxSizer19->Add(itemPanel20, 1, wxGROW, 0);
 
-    wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxVERTICAL);
-    itemPanel20->SetSizer(itemBoxSizer21);
+	wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxVERTICAL);
+	itemPanel20->SetSizer(itemBoxSizer21);
 
-    wxBoxSizer* itemBoxSizer22 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer21->Add(itemBoxSizer22, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer22 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer21->Add(itemBoxSizer22, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxButton* itemButton23 = new wxButton( itemPanel20, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
-    if (ShowToolTips())
-        itemButton23->SetToolTip(_("Add a new atom to the list of coordinates."));
-    itemBoxSizer22->Add(itemButton23, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxButton* itemButton23 = new wxButton( itemPanel20, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (ShowToolTips())
+		itemButton23->SetToolTip(_("Add a new atom to the list of coordinates."));
+	itemBoxSizer22->Add(itemButton23, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    deleteButton = new wxButton( itemPanel20, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
-    if (ShowToolTips())
-        deleteButton->SetToolTip(_("Delete the selected atoms."));
-    itemBoxSizer22->Add(deleteButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	deleteButton = new wxButton( itemPanel20, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (ShowToolTips())
+		deleteButton->SetToolTip(_("Delete the selected atoms."));
+	itemBoxSizer22->Add(deleteButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    BondButton = new wxButton( itemPanel20, ID_BONDBUTTON, _("Bond"), wxDefaultPosition, wxDefaultSize, 0 );
-    if (ShowToolTips())
-        BondButton->SetToolTip(_("Apply the default bonding criteria."));
-    itemBoxSizer22->Add(BondButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	BondButton = new wxButton( itemPanel20, ID_BONDBUTTON, _("Bond"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (ShowToolTips())
+		BondButton->SetToolTip(_("Apply the default bonding criteria."));
+	itemBoxSizer22->Add(BondButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxButton* itemButton26 = new wxButton( itemPanel20, ID_STICKBUTTON, _("Stick"), wxDefaultPosition, wxDefaultSize, 0 );
-    if (ShowToolTips())
-        itemButton26->SetToolTip(_("Use the current screen rotation as the reference frame."));
-    itemBoxSizer22->Add(itemButton26, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxButton* itemButton26 = new wxButton( itemPanel20, ID_STICKBUTTON, _("Stick"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (ShowToolTips())
+		itemButton26->SetToolTip(_("Use the current screen rotation as the reference frame."));
+	itemBoxSizer22->Add(itemButton26, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticText* itemStaticText27 = new wxStaticText( itemPanel20, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer22->Add(itemStaticText27, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	wxStaticText* itemStaticText27 = new wxStaticText( itemPanel20, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer22->Add(itemStaticText27, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxString coordTypeChoiceStrings[] = {
-        _("Cartesian"),
-        _("Z-Matrix")
-    };
-    coordTypeChoice = new wxChoice( itemPanel20, ID_COORDCHOICE1, wxDefaultPosition, wxDefaultSize, 2, coordTypeChoiceStrings, 0 );
-    if (ShowToolTips())
-        coordTypeChoice->SetToolTip(_("Changes the displayed coordinate type."));
-    itemBoxSizer22->Add(coordTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxString coordTypeChoiceStrings[] = {
+		_("Cartesian"),
+		_("Z-Matrix")
+	};
+	coordTypeChoice = new wxChoice( itemPanel20, ID_COORDCHOICE1, wxDefaultPosition, wxDefaultSize, 2, coordTypeChoiceStrings, 0 );
+	if (ShowToolTips())
+		coordTypeChoice->SetToolTip(_("Changes the displayed coordinate type."));
+	itemBoxSizer22->Add(coordTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    coordGrid = new wxGrid( itemPanel20, ID_COORDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL );
-    coordGrid->SetDefaultColSize(50);
-    coordGrid->SetDefaultRowSize(25);
-    coordGrid->SetColLabelSize(25);
-    coordGrid->SetRowLabelSize(50);
-    coordGrid->CreateGrid(5, 5, wxGrid::wxGridSelectRows);
-    itemBoxSizer21->Add(coordGrid, 1, wxGROW|wxALL, 0);
+	coordGrid = new wxGrid( itemPanel20, ID_COORDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL );
+	if (ShowToolTips())
+		coordGrid->SetToolTip(_("Double click on a field to edit"));
+	coordGrid->SetDefaultColSize(50);
+	coordGrid->SetDefaultRowSize(25);
+	coordGrid->SetColLabelSize(25);
+	coordGrid->SetRowLabelSize(50);
+	coordGrid->CreateGrid(5, 5, wxGrid::wxGridSelectRows);
+	itemBoxSizer21->Add(coordGrid, 1, wxGROW|wxALL, 0);
 
+	wxStatusBar* itemStatusBar30 = new wxStatusBar( itemFrame1, ID_STATUSBAR1, wxST_SIZEGRIP|wxNO_BORDER );
+	itemStatusBar30->SetFieldsCount(1);
+	itemFrame1->SetStatusBar(itemStatusBar30);
+
+	// Connect events and objects
+	coordGrid->Connect(ID_COORDGRID, wxEVT_SIZE, wxSizeEventHandler(CoordinatesWindow::OnSize), NULL, this);
 ////@end CoordinatesWindow content construction
 	coordGrid->SetDefaultCellAlignment(wxALIGN_RIGHT, wxALIGN_CENTRE);
 	SetupGridColumns();
@@ -332,7 +333,8 @@ void CoordinatesWindow::SetupGridColumns(void) {
 
 void CoordinatesWindow::FrameChanged(void) {
 		//clear off the old rows
-	coordGrid->DeleteRows(0, coordGrid->GetNumberRows(), true);
+	if (coordGrid->GetNumberRows() > 0)
+		coordGrid->DeleteRows(0, coordGrid->GetNumberRows(), true);
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
@@ -461,8 +463,8 @@ wxBitmap CoordinatesWindow::GetBitmapResource( const wxString& name )
 {
     // Bitmap retrieval
 ////@begin CoordinatesWindow bitmap retrieval
-    wxUnusedVar(name);
-    return wxNullBitmap;
+	wxUnusedVar(name);
+	return wxNullBitmap;
 ////@end CoordinatesWindow bitmap retrieval
 }
 
@@ -474,8 +476,8 @@ wxIcon CoordinatesWindow::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 ////@begin CoordinatesWindow icon retrieval
-    wxUnusedVar(name);
-    return wxNullIcon;
+	wxUnusedVar(name);
+	return wxNullIcon;
 ////@end CoordinatesWindow icon retrieval
 }
 /*!
