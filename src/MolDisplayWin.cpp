@@ -286,7 +286,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	
 	pageSetupData = NULL;
 	printData = NULL;
-//	infoPanel = NULL;
 	myStatus = NULL;
 
 	mHighliteState = false;
@@ -374,7 +373,6 @@ void MolDisplayWin::SizeChanged(void) {
 	int width, height;
 	GetClientSize(&width, &height);
 
-	int swidth, sheight=0;
 	//The status bar class effects the client size so no need to subtract it off here
 	glCanvas->SetSize(wxSize(width, height));
 }
@@ -431,18 +429,18 @@ void MolDisplayWin::createMenuBar(void) {
 	menuWindow = new wxMenu;
 	menuHelp = new wxMenu;
 
-	menuFile->Append(wxID_NEW, wxT("&New\tCtrl+N"));
+	menuFile->Append(wxID_NEW, wxT("&New\tCtrl+N"), _("Open a new empty window"));
 	menuFile->Append(MMP_NEWFRAME, wxT("Append New Frame"), wxT("Add a new, empty frame"));
-	menuFile->Append(wxID_OPEN, wxT("&Open ...\tCtrl+O"));
-	menuFile->Append(MMP_ADDFRAMES, wxT("Add Frames from File..."));
+	menuFile->Append(wxID_OPEN, wxT("&Open ...\tCtrl+O"), wxT("Open a file into a new window"));
+	menuFile->Append(MMP_ADDFRAMES, wxT("Add Frames from File..."), wxT("Add additional geometries to this window from a file"));
 	menuFile->Append(wxID_SAVE, wxT("&Save\tCtrl+S"));
 	menuFile->Append(wxID_SAVEAS, wxT("Save &as ...\tCtrl+Shift+S"));
 	menuFile->Append(wxID_CLOSE, wxT("&Close\tCtrl+W"));
 	menuFile->AppendSeparator();
-	menuFile->Append(MMP_DELETEFRAME, wxT("Delete Frame"));
+	menuFile->Append(MMP_DELETEFRAME, wxT("Delete Frame"), wxT("Delete the visible geometry point"));
 	menuFile->AppendSeparator();
-	menuFile->Append(MMP_IMPORTMENU, wxT("Import..."));
-	menuFile->Append(MMP_EXPORT, wxT("Export..."));
+	menuFile->Append(MMP_IMPORTMENU, wxT("Import..."), wxT("Import a $VEC group from a GAMESS dat file"));
+	menuFile->Append(MMP_EXPORT, wxT("Export..."), wxT("Export this window to one of a variety of formats"));
 	menuFile->AppendSeparator();
 	menuFile->Append(wxID_PRINT_SETUP, wxT("Page Set&up ..."));
 	menuFile->Append(MMP_PRINTOPTIONS, wxT("Print Options ..."));
@@ -454,8 +452,8 @@ void MolDisplayWin::createMenuBar(void) {
 	menuEdit->Append(wxID_UNDO, wxT("&Undo\tCtrl+Z"));
 	menuEdit->AppendSeparator();
 	menuEdit->Append(wxID_CUT, wxT("Cu&t\tCtrl+X"));
-	menuEdit->Append(wxID_COPY, wxT("&Copy\tCtrl+C"));
-	menuEdit->Append(MMP_COPYCOORDS, wxT("Copy Coordinates"));
+	menuEdit->Append(wxID_COPY, wxT("&Copy\tCtrl+C"), wxT("Copy the display as an image"));
+	menuEdit->Append(MMP_COPYCOORDS, wxT("Copy Coordinates"), wxT("Copy the current set of coordinates as plain text"));
 	menuEdit->Append(wxID_PASTE, wxT("&Paste\tCtrl+V"));
 	menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
 	menuEdit->AppendSeparator();
@@ -464,15 +462,15 @@ void MolDisplayWin::createMenuBar(void) {
 #ifdef ENABLE_INTERACTIVE_MODE
 	menuEdit->AppendCheckItem(MMP_INTERACTIVE, wxT("Interactive Mode"));
 #endif
-	menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
+	menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"), wxT("Edit the default preferences for new windows"));
 
-	menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"));
-	menuView->Append(MMP_ANIMATEMODE, wxT("&Animate Mode\tShift+Ctrl+M"));
-	menuView->Append(MMP_OFFSETMODE, wxT("&Offset along mode..."));
+	menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"), wxT("Display the vibrational motion as mass-weighted vectors"));
+	menuView->Append(MMP_ANIMATEMODE, wxT("&Animate Mode\tShift+Ctrl+M"), wxT("Animate the vibration, click outside the window to stop"));
+	menuView->Append(MMP_OFFSETMODE, wxT("&Offset along mode..."), wxT("Generate a new set of coordinates by moving along the current mode"));
 	menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
 	menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
 	menuView->AppendSeparator();
-	menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show Ax&is"));
+	menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show Ax&is"), wxT("Display the cartesian axis"));
 #ifdef ENABLE_SHOWSYMMETRY_MODE
 	menuView->AppendCheckItem(MMP_SHOWSYMMETRYOPERATOR, wxT("Show S&ymmetry Operators"));
 #endif
@@ -489,10 +487,10 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewStyle->AppendRadioItem(MMP_WIREFRAMEMODE, wxT("Wire Frame"));
 	menuViewStyle->AppendRadioItem(MMP_BALLANDSTICKMODE, wxT("Ball and Stick"));
 	
-	menuView->Append(MMP_ANIMATEFRAMES, wxT("Animate &Frames\tCtrl+F"));
+	menuView->Append(MMP_ANIMATEFRAMES, wxT("Animate &Frames\tCtrl+F"), wxT("Run through the geometries producing an animation"));
 	menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl-down"), _T("Reduce size by 10%"));
-	menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl-up"));
-	menuView->Append(MMP_CENTER, wxT("&Center View"));
+	menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl-up"), _T("Enlarge size by 10%"));
+	menuView->Append(MMP_CENTER, wxT("&Center View"), _T("Center the molecule in the window"));
 	
 	menuViewRotate = new wxMenu;
 	menuView->Append(MMP_ROTATESUBMENU, wxT("&Rotate ..."), menuViewRotate);
@@ -510,24 +508,24 @@ void MolDisplayWin::createMenuBar(void) {
 	menuView->AppendCheckItem(MMP_SHOWPATTERN, wxT("Show Patterns"));
 #endif
 	
-	menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."));
+	menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."), _T("Apply the automated bond determination with several options"));
 	menuMolecule->Append(MMP_ENERGYEDIT, wxT("Set &Frame Energy..."));
-	menuMolecule->Append(MMP_CREATELLMPATH, wxT("Create &LLM Path..."));
-	menuMolecule->Append(MMP_MINFRAMEMOVEMENTS, wxT("&Minimize Frame Movements"));
+	menuMolecule->Append(MMP_CREATELLMPATH, wxT("Create &LLM Path..."), _T("Create a Linear Least Motion path between this geometry and the next one"));
+	menuMolecule->Append(MMP_MINFRAMEMOVEMENTS, wxT("&Minimize Frame Movements"), _T("Reorient each frame so as to minimize the movement of each atom"));
 	menuMolecule->AppendSeparator();
 	menuMolecule->Append(MMP_CONVERTTOBOHR, wxT("Convert to &Bohr"));
 	menuMolecule->Append(MMP_CONVERTTOANGSTROMS, wxT("Convert to &Angstroms"));
-	menuMolecule->Append(MMP_INVERTNORMALMODE, wxT("&Invert Normal Mode"));
+	menuMolecule->Append(MMP_INVERTNORMALMODE, wxT("&Invert Normal Mode"), _T("Multiply the normal mode by -1 to invert the direction of the vectors"));
 // TODO:  Create menu items for remaining menus
 
 	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"));
-	menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"));
-	menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"));
-	menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"));
-	menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"));
-	menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"));
+	menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"), _("View/edit cartesian or internal coordinates"));
+	menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"), _("A plot of the energy for each geometry"));
+	menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"), _("Plot the vibrational frequencies"));
+	menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"), _T("Generate a GAMESS input file"));
+	menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"), _T("Add/Edit/Remove various surface types"));
 	menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"));
-	menuWindow->Append(ID_LOCAL_PREFERENCES, wxT("Pr&eferences"));
+	menuWindow->Append(ID_LOCAL_PREFERENCES, wxT("Pr&eferences"), _T("Edit the preferences for this window"));
 
 	menuBar->Append(menuFile, wxT("&File"));
 	menuBar->Append(menuEdit, wxT("&Edit"));
@@ -535,7 +533,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuBar->Append(menuMolecule, wxT("&Molecule"));
 	menuBar->Append(menuWindow, wxT("&Subwindow"));
 
-	menuHelp->Append(wxID_ABOUT, wxT("&About MacMolPlt..."));
+	menuHelp->Append(wxID_ABOUT, wxT("&About MacMolPlt..."), _T("Learn about MacMolPlt"));
 	menuBar->Append(menuHelp, wxT("&Help"));
 }
 
@@ -2802,11 +2800,9 @@ void MolDisplayWin::SelectionChanged(bool mode)
   if (bondsWindow)
 	bondsWindow->UpdateSelection(mode);
 }
-#ifdef __WXMAC__
+//The following is the amount of space to leave for the window sizing box used by
+//many window maangers that takes some space away from the client area.
 #define kMOLSCROLLOFFSET 16
-#else
-#define kMOLSCROLLOFFSET 0
-#endif
 #define kMOLSCROLLWIDTH	120
 MolStatusBar::MolStatusBar(MolDisplayWin * p) : wxStatusBar(p, wxID_ANY), myScroll(NULL),
 				myParent(p) {
