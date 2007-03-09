@@ -390,14 +390,14 @@ void BackRotate3DPt(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoor
 				    ( incoord.z)*rotationMatrix[2][2]);
 	return ;
 }
-/*=================================================================================================
-/* OrthogonalizeRotationMatrix
-/*
-/* Orthogonalizes a pure rotation matrix (this is not checked!).
-/* Assumes the "y-axis" (2nd row) of the matrix is "correct"
-/* and make 1st and 3rd row orthogonal to it.
-/* Assumes matrix is already close to orthogonal.
-/*-------------------------------------------------------------------------------------------------*/
+/*=========================================================================
+ * OrthogonalizeRotationMatrix
+ *
+ * Orthogonalizes a pure rotation matrix (this is not checked!).
+ * Assumes the "y-axis" (2nd row) of the matrix is "correct"
+ * and make 1st and 3rd row orthogonal to it.
+ * Assumes matrix is already close to orthogonal.
+ *-------------------------------------------------------------------------*/
 void OrthogonalizeRotationMatrix (Matrix4D matrix)
 {
     CPoint3D xAxis, yAxis, zAxis;

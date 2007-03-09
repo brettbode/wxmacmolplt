@@ -67,8 +67,9 @@ class Frame {
 		Surface *	SurfaceList;
 		GradientData *	Gradient;
 
-      std::vector<AnnotateLength> AnnoLengths;
-      std::vector<AnnotateAngle> AnnoAngles;
+		std::vector<AnnotateLength> AnnoLengths;
+		std::vector<AnnotateAngle> AnnoAngles;
+		std::vector<AnnotateDihedral> AnnoDihedrals;
 
 		Frame *		NextFrame;
 		Frame *		PreviousFrame;

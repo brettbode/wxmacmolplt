@@ -550,14 +550,21 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Angle,
 				wxT("Delete angle"));
 		}
+
+		else if (selected < NumAtoms + lFrame->NumBonds +
+					lFrame->AnnoLengths.size() + lFrame->AnnoAngles.size() +
+					lFrame->AnnoDihedrals.size()) {
+			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Angle,
+							wxT("Delete dihedral"));
+		}
  
 	}
 
 	// How 'bout a right click?
 	else if (event.RightDown()) {
 
-		// See what was right-clicked on.  If it was a bond or atom, then we show
-		// a contextual menu.
+		// See what was right-clicked on.  If it was a bond or atom, then we
+		// show a contextual menu.
 		selected = testPicking(tmpPnt.x, tmpPnt.y);
 
 		if (selected < 0) {
@@ -575,14 +582,22 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		else if (selected < NumAtoms + lFrame->NumBonds +
 					lFrame->AnnoLengths.size()) {
 			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Length,
-							  wxT("Delete length"));
+							wxT("Delete length"));
 		}
 
 		else if (selected < NumAtoms + lFrame->NumBonds +
 					lFrame->AnnoLengths.size() + lFrame->AnnoAngles.size()) {
 			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Angle,
-							  wxT("Delete angle"));
+							wxT("Delete angle"));
 		}
+
+		else if (selected < NumAtoms + lFrame->NumBonds +
+					lFrame->AnnoLengths.size() + lFrame->AnnoAngles.size() +
+					lFrame->AnnoDihedrals.size()) {
+			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Angle,
+							wxT("Delete dihedral"));
+		}
+
 
 	}
 
@@ -597,7 +612,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			if (selected >= 0 && selected < NumAtoms) {
 				GLdouble newX, newY, newZ;
 
-				findReal3DCoord(tmpPnt.x-winDiffX, tmpPnt.y-winDiffY, atomDepth, newX, newY, newZ);
+				findReal3DCoord(tmpPnt.x-winDiffX, tmpPnt.y-winDiffY,
+								atomDepth, newX, newY, newZ);
 				lAtoms[selected].Position.x = newX;
 				lAtoms[selected].Position.y = newY;
 				lAtoms[selected].Position.z = newZ;
@@ -926,8 +942,8 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 
 			lAtoms[select_id].SetSelectState(newstate);
 			if (newstate) {
-				select_stack[select_stack_top] = select_id;
-				select_stack_top = (select_stack_top + 1) % 4;
+				select_stack[select_stack_top % 4] = select_id;
+				select_stack_top = (select_stack_top + 1) % 5;
 			} else {
 				select_stack_top--;
 			}
@@ -1217,7 +1233,13 @@ void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
 			break;
 		case GL_Popup_Measure_Angle:
 			mMainData->cFrame->AnnoAngles.push_back(
-				AnnotateAngle(select_stack[0], select_stack[1], select_stack[2]));
+				AnnotateAngle(select_stack[0], select_stack[1],
+					select_stack[2]));
+			break;
+		case GL_Popup_Measure_Dihedral:
+			mMainData->cFrame->AnnoDihedrals.push_back(
+				AnnotateDihedral(select_stack[0], select_stack[1],
+					select_stack[2], select_stack[3]));
 			break;
 		default:
 			printf("unknown event\n");

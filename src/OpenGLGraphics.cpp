@@ -1168,10 +1168,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		float m[16];
 		Matrix4D mv_inv;
 
-		// What we want to do here is make the annotation always face the viewer.
-		// The computations below compute a rotation matrix to align to the
-		// camera.  This only needs to be computed once for all annotations since
-		// the camera doesn't change positions.
+		// What we want to do here is make the annotation always face the
+		// viewer.  The computations below compute a rotation matrix to align
+		// to the camera.  This only needs to be computed once for all
+		// annotations since the camera doesn't change positions.
 
 		// Invert just the rotation portion of the modelview matrix.  This is
 		// much faster than inverting an arbitrary matrix.
@@ -1351,17 +1351,17 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 			for (float i = 0.0f; i <= angle; i += delta) {
 				glVertex3f(min_len * cos(i) - (x_eye[0] + y_eye[0]) * chord_len,
-							  min_len * sin(i) - (x_eye[1] + y_eye[1]) * chord_len,
-													 - (x_eye[2] + y_eye[2]) * chord_len);
+						   min_len * sin(i) - (x_eye[1] + y_eye[1]) * chord_len,
+										    - (x_eye[2] + y_eye[2]) * chord_len);
 				glVertex3f(min_len * cos(i) + (x_eye[0] - y_eye[0]) * chord_len,
-							  min_len * sin(i) + (x_eye[1] - y_eye[1]) * chord_len,
-														(x_eye[2] - y_eye[2]) * chord_len);
+						  min_len * sin(i) + (x_eye[1] - y_eye[1]) * chord_len,
+											(x_eye[2] - y_eye[2]) * chord_len);
 				glVertex3f(min_len * cos(i) + (x_eye[0] + y_eye[0]) * chord_len,
-							  min_len * sin(i) + (x_eye[1] + y_eye[1]) * chord_len,
-														(x_eye[2] + y_eye[2]) * chord_len);
+						  min_len * sin(i) + (x_eye[1] + y_eye[1]) * chord_len,
+											(x_eye[2] + y_eye[2]) * chord_len);
 				glVertex3f(min_len * cos(i) - (x_eye[0] - y_eye[0]) * chord_len,
-							  min_len * sin(i) - (x_eye[1] - y_eye[1]) * chord_len,
-													 - (x_eye[2] - y_eye[2]) * chord_len);
+						  min_len * sin(i) - (x_eye[1] - y_eye[1]) * chord_len,
+										 - (x_eye[2] - y_eye[2]) * chord_len);
 			}
 			glEnd();
 
@@ -1434,10 +1434,99 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		glEnable(GL_LIGHTING);
 	}
 
-		//bonds as cylinders
-		//In wireframe mode with bonds colored by atom color we simply scink the atom radius to the bond
-		//size and get a nice rounded end cap. If bonds are not colored by atom color then the sphere is
-		//skipped and a simple disk closes off the cylinder
+	if (!lFrame->AnnoDihedrals.empty()) {
+
+		int anno_id;
+		CPoint3D atom1_pos;
+		CPoint3D atom2_pos;
+		CPoint3D atom3_pos;
+		CPoint3D atom4_pos;
+		CPoint3D vec1;
+		CPoint3D vec2;
+		CPoint3D normal1;
+		CPoint3D normal2;
+		CPoint3D binormal1;
+		CPoint3D binormal2;
+		Matrix4D plane2xy;
+		float angle;
+		std::vector<AnnotateDihedral>::iterator anno;
+
+		for (anno = lFrame->AnnoDihedrals.begin();
+			 anno != lFrame->AnnoDihedrals.end(); anno++) {
+
+			lFrame->GetAtomPosition(anno->getAtom1ID(), atom1_pos);
+			lFrame->GetAtomPosition(anno->getAtom2ID(), atom2_pos);
+			lFrame->GetAtomPosition(anno->getAtom3ID(), atom3_pos);
+			lFrame->GetAtomPosition(anno->getAtom4ID(), atom4_pos);
+
+			// The first three atoms (1, 2, 3) form one plane.  The last three
+			// (2, 3, 4) form the second plane.  We want to find the angle
+			// between those two planes.
+
+			// Find the first plane.
+			vec1 = atom1_pos - atom3_pos;
+			Normalize3D(&vec1);
+
+			vec2 = atom2_pos - atom3_pos;
+			Normalize3D(&vec2);
+
+			CrossProduct3D(&vec1, &vec2, &normal1);
+
+			// Make this plane look like the x-y plane for easier circle
+			// drawing.  The vector from atom3 to atom2 should look like
+			// the positive x-axis.
+			SetPlaneRotation(plane2xy, vec2, vec1);
+
+			// Draw a half circle in the first plane.
+			glPushMatrix();
+			glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
+			glMultMatrixf((GLfloat *) plane2xy);
+			glColor4f(1.0f, 0.0f, 0.0f, 0.1f);
+			glBegin(GL_TRIANGLE_FAN);
+			glVertex3f(0.0f, 0.0f, 0.0f);
+			for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
+				glVertex3f(cos(angle), sin(angle), 0.0f);
+			}
+			glEnd();
+			glPopMatrix();
+
+			// Find the second plane.  The two planes share a vector between
+			// atoms 2 and 3, so we just reuse that from the first plane.
+			vec1 = atom4_pos - atom3_pos;
+			Normalize3D(&vec2);
+
+			CrossProduct3D(&vec1, &vec2, &normal2);
+
+			// Make this plane look like the x-y plane for easier circle
+			// drawing.  The vector from atom3 to atom2 should look like
+			// the positive x-axis.
+			SetPlaneRotation(plane2xy, vec2, vec1);
+
+			// Draw a half circle in the second plane.
+			glPushMatrix();
+			glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
+			glMultMatrixf((GLfloat *) plane2xy);
+			glColor4f(0.0f, 1.0f, 0.0f, 0.1f);
+			glBegin(GL_TRIANGLE_FAN);
+			glVertex3f(0.0f, 0.0f, 0.0f);
+			for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
+				glVertex3f(cos(angle), sin(angle), 0.0f);
+			}
+			glEnd();
+			glPopMatrix();
+
+			// Okay, we've drawn the planes.  Now we want to draw an angle
+			// annotation between them.  One vector that forms the angle ...
+			// CrossProduct3D(&vec2, &normal1, &binormal1); 
+			// CrossProduct3D(&vec2, &normal2, &binormal2); 
+
+		}
+	}
+
+	//bonds as cylinders
+	//In wireframe mode with bonds colored by atom color we simply scink the atom radius to the bond
+	//size and get a nice rounded end cap. If bonds are not colored by atom color then the sphere is
+	//skipped and a simple disk closes off the cylinder
 	for (long ibond=0; ibond<NumBonds; ibond++) {
 			CPoint3D	v1, v2,  offset, NormalOffset, NormEnd, NormStart={0,0,1};
 			Matrix4D	rotMat;
@@ -2896,9 +2985,9 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 	glPopMatrix();
 }
 
-void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, 
-							float width, float m[16], const CPoint3D& x_world,
-							float offset) const {
+void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1,
+						const CPoint3D& pt2, float width, float m[16],
+						const CPoint3D& x_world, float offset) const {
 
 	float len;
 	// CPoint3D vec; 
@@ -2917,11 +3006,11 @@ void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2,
 
 	// Find screen coordinates of one point.
 	gluProject(pt1.x, pt1.y, pt1.z, modelview, proj, viewport,
-				  &(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2]));
+				&(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2]));
 
 	// Find screen coordinates of other atom.
 	gluProject(pt2.x, pt2.y, pt2.z, modelview, proj, viewport,
-				  &(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2]));
+				&(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2]));
 
 	// Find vector perpendicular to vector between two screen points and
 	// normalize it so we can scalar multiply it later.  We flip and 
@@ -2935,10 +3024,10 @@ void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2,
 	// Now find a point on the perpendicular vector with pt1's depth
 	// and get its object coordinates.
 	gluUnProject(scr_coords1[0] + scr_vec.x * 10,
-					 scr_coords1[1] + scr_vec.y * 10,
-					 scr_coords1[2],
-					 modelview, proj, viewport,
-					 &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
+					scr_coords1[1] + scr_vec.y * 10,
+					scr_coords1[2],
+					modelview, proj, viewport,
+					&(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
 
 	// Finally, we see what direction all bond cylinders must be offset
 	// so that they will always stay in view.
@@ -2984,19 +3073,39 @@ void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2,
 	glDisable(GL_ALPHA_TEST);
 
 	char len_label[40];
+	float LabelSize = Prefs->GetAnnotationLabelSize();
+	printf("LabelSize: %f\n", LabelSize);
+
+	// We move the midpoint of the line and align the viewer to draw the 
+	// text.
 	glPushMatrix();
 	glTranslatef((pt1.x + pt2.x) / 2.0f,
-					 (pt1.y + pt2.y) / 2.0f,
-					 (pt1.z + pt2.z) / 2.0f);
-	glTranslatef(10 * width * x_world.x,
-					 10 * width * x_world.y,
-					 10 * width * x_world.z);
+					(pt1.y + pt2.y) / 2.0f,
+					(pt1.z + pt2.z) / 2.0f);
 	glMultMatrixf(m);
-	glTranslatef(-offset, 0.0f, 0.0f);
-	float LabelSize = Prefs->GetAnnotationLabelSize();
-	glScalef(-0.1f*LabelSize, 0.1f*LabelSize, 0.1f);
+
+	// Move out for the kind of bond that exists between the atoms.
+	glTranslatef(-offset - 0.01f, 0.0f, 0.0f);
+
+	glPointSize(5.0f);
+	glBegin(GL_POINTS);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	glEnd();
+
+	glScalef(-0.1f * LabelSize, 0.1f * LabelSize, 0.1f);
+	
+	// This apparently is some magic number.  GLF doesn't start drawing the
+	// string at the origin, doesn't consider the anchor point, and doesn't
+	// consider the bounding box it returns.  So, we have a magic number.  It
+	// is indirectly dependent on LabelSize from the scaling above, so it looks
+	// constant even though it is not.
+	glTranslatef(1.5f, 0.0f, 0.0f);
+
+	glColor3f(0.0f, 0.0f, 0.0f);
 	sprintf(len_label, "%.6f", len);
 	glfDrawSolidString(len_label);
+
 	glEnable(GL_LIGHTING);
 	glPopMatrix();
 

@@ -435,10 +435,10 @@ void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any highe
 		length_anno = AnnoLengths.begin();
 		for (length_anno = AnnoLengths.begin();
 			  length_anno != AnnoLengths.end(); ) {
-			if ((*length_anno).containsAtom(AtomNum)) {
+			if (length_anno->containsAtom(AtomNum)) {
 				length_anno = AnnoLengths.erase(length_anno);
 			} else {
-				(*length_anno).adjustIDs(AtomNum);
+				length_anno->adjustIDs(AtomNum);
 				length_anno++;
 			}
 		}
@@ -446,10 +446,10 @@ void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any highe
 		std::vector<AnnotateAngle>::iterator angle_anno;
 		for (angle_anno = AnnoAngles.begin();
 			  angle_anno != AnnoAngles.end(); ) {
-			if ((*angle_anno).containsAtom(AtomNum)) {
+			if (angle_anno->containsAtom(AtomNum)) {
 				angle_anno = AnnoAngles.erase(angle_anno);
 			} else {
-				(*angle_anno).adjustIDs(AtomNum);
+				angle_anno->adjustIDs(AtomNum);
 				angle_anno++;
 			}
 		}
