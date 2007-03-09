@@ -851,31 +851,30 @@ void Surface2DPane::OnNegColorChange(wxCommandEvent & event) {
 /* if the focus in the panel is changed between main panel and 
    two wxTextCtrls, read the content of two wxTextCtrls. */
 
-void Surface2DPane::OnIdle( wxIdleEvent& WXUNUSED(event) )
-{
-  static wxWindow *s_windowFocus = (wxWindow *)NULL;
-  wxWindow *focus = wxWindow::FindFocus();
+void Surface2DPane::OnIdle( wxIdleEvent& WXUNUSED(event) ) {
+	static wxWindow *s_windowFocus = (wxWindow *)NULL;
+	wxWindow *focus = wxWindow::FindFocus();
 
-  if ( focus && (focus != s_windowFocus) )
-    {
-      s_windowFocus = focus;
-      wxString className = s_windowFocus->GetClassInfo()->GetClassName();
+	if ( focus && (focus != s_windowFocus) ) {
+		s_windowFocus = focus;
+		wxString className = s_windowFocus->GetClassInfo()->GetClassName();
 
-      if (className.Cmp(_T("wxTextCtrl")) == 0 
-	  || className.Cmp(_T("Orbital2DSurfPane")) == 0 )
-	{
-	  NumContours = atol((const char *)(mNumContourText->GetValue()).c_str());
-	  MaxContourValue = atof((const char *)(mContourValText->GetValue()).c_str());
-	  setUpdateButton();
+		if (className.Cmp(_T("wxTextCtrl")) == 0 
+			|| className.Cmp(_T("Orbital2DSurfPane")) == 0 ) {
+			long t;
+			if ((mNumContourText->GetValue()).ToLong(&t))
+				NumContours = t;
+			double d;
+			if ((mContourValText->GetValue()).ToDouble(&d))
+				MaxContourValue = d;
+			setUpdateButton();
+		}
 	}
-    }
-
 }
 
-void Surface2DPane::OnDashChk(wxCommandEvent& event )
-{
-  DashLines = mDashCheck->GetValue();
-  setUpdateButton();
+void Surface2DPane::OnDashChk(wxCommandEvent& event ) {
+	DashLines = mDashCheck->GetValue();
+	setUpdateButton();
 }
 
 void Surface2DPane::OnShowZeroChk( wxCommandEvent &event )
@@ -1306,42 +1305,36 @@ void Orbital2DSurfPane::TargetToPane(void)
   UpdateTest = false;
 }
 
-bool Orbital2DSurfPane::UpdateNeeded(void) 
-{
-  bool result = false;
+bool Orbital2DSurfPane::UpdateNeeded(void) {
+	bool result = false;
 
-//  NumContours = atol((mNumContourText->GetValue()).c_str());
-//  MaxContourValue = atof((mContourValText->GetValue()).c_str());
+	if (PlotOrb >= 0) {	//Don't update unless a valid orbital is chosen
+		if (PlotOrb != mTarget->GetTargetOrb()) result=true;
+		if (Visible != mTarget->GetVisibility()) result = true;
+		if (AllFrames != (mTarget->GetSurfaceID() != 0)) result = true;
+		if (TargetSet != mTarget->GetTargetSet()) result = true;
+		if (OrbOptions != mTarget->GetOptions()) result = true;
+		if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
+		if (NumContours != mTarget->GetNumContours()) result = true;
+		if (MaxContourValue != mTarget->GetMaxValue()) result = true;
+		if (ShowZeroContour != mTarget->GetShowZeroContour()) result = true;
+		if (UseScreenPlane != mTarget->GetRotate2DMap()) result = true;
+		if (DashLines != mTarget->GetDashLine()) result = true;
+		if (PhaseChange != mTarget->GetPhaseChange()) result = true;
+		if (DisplayPlane != mTarget->ShowPlottingPlane()) result = true;
+		if (SphericalHarmonics != mTarget->UseSphericalHarmonics()) result = true;
 
-  if (PlotOrb >= 0) 
-    {	//Don't update unless a valid orbital is chosen
-      if (PlotOrb != mTarget->GetTargetOrb()) result=true;
-      if (Visible != mTarget->GetVisibility()) result = true;
-      if (AllFrames != (mTarget->GetSurfaceID() != 0)) result = true;
-      if (TargetSet != mTarget->GetTargetSet()) result = true;
-      if (OrbOptions != mTarget->GetOptions()) result = true;
-      if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
-      if (NumContours != mTarget->GetNumContours()) result = true;
-      if (MaxContourValue != mTarget->GetMaxValue()) result = true;
-      if (ShowZeroContour != mTarget->GetShowZeroContour()) result = true;
-      if (UseScreenPlane != mTarget->GetRotate2DMap()) result = true;
-      if (DashLines != mTarget->GetDashLine()) result = true;
-      if (PhaseChange != mTarget->GetPhaseChange()) result = true;
-      if (DisplayPlane != mTarget->ShowPlottingPlane()) result = true;
-      if (SphericalHarmonics != mTarget->UseSphericalHarmonics()) result = true;
-
-      if (!result) 
-	{
-	  RGBColor	testColor;
-	  mTarget->GetPosColor(&testColor);
-	  if ((PosColor.red != testColor.red)||(PosColor.green!=testColor.green)
-	      ||(PosColor.blue!=testColor.blue)) result=true;
-	  mTarget->GetNegColor(&testColor);
-	  if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)||
-	      (NegColor.blue!=testColor.blue)) result=true;
+		if (!result) {
+			RGBColor	testColor;
+			mTarget->GetPosColor(&testColor);
+			if ((PosColor.red != testColor.red)||(PosColor.green!=testColor.green)
+				||(PosColor.blue!=testColor.blue)) result=true;
+			mTarget->GetNegColor(&testColor);
+			if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)||
+				(NegColor.blue!=testColor.blue)) result=true;
+		}
 	}
-    }
-  return result;
+	return result;
 }
 
 void Orbital2DSurfPane::OnUpdate(wxCommandEvent &event ) 
@@ -1841,48 +1834,50 @@ void Orbital3DSurfPane::CreateControls()
   mainSizer->Add(bottomSizer);
 }
 
-bool Orbital3DSurfPane::UpdateNeeded(void) 
-{
-  bool result = false;
+bool Orbital3DSurfPane::UpdateNeeded(void) {
+	bool result = false;
 
-  ContourValue = atof((const char *)((mContourValueEdit->GetValue()).c_str()));
+	double newVal;
+	wxString tmpStr = mContourValueEdit->GetValue();
+	if (!tmpStr.ToDouble(&newVal)) {
+		tmpStr.Printf(wxT("%.4f"), ContourValue);
+		mContourValueEdit->SetValue(tmpStr);
+	} else ContourValue = newVal;
+		
+	if (PlotOrb >= 0) {	//Don't update unless a valid orbital is chosen
+		if (PlotOrb != mTarget->GetTargetOrb()) result=true;
+		if (Visible != mTarget->GetVisibility()) result = true;
+		if (AllFrames != (mTarget->GetSurfaceID() != 0)) result = true;
+		if (TargetSet != mTarget->GetTargetSet()) result = true;
+		if (OrbOptions != mTarget->GetOptions()) result = true;
+		if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
+		if (ContourValue != mTarget->GetContourValue()) result = true;
+		if (GridSize != mTarget->GetGridSize()) result = true;
+		if (UseSolidSurface != mTarget->SolidSurface()) result = true;
+		if (UseNormals != mTarget->UseSurfaceNormals()) result = true;
+		if (PhaseChange != mTarget->GetPhaseChange()) result = true;
+		if (SphericalHarmonics != mTarget->UseSphericalHarmonics()) result = true;
 
-  if (PlotOrb >= 0) 
-    {	//Don't update unless a valid orbital is chosen
-      if (PlotOrb != mTarget->GetTargetOrb()) result=true;
-      if (Visible != mTarget->GetVisibility()) result = true;
-      if (AllFrames != (mTarget->GetSurfaceID() != 0)) result = true;
-      if (TargetSet != mTarget->GetTargetSet()) result = true;
-      if (OrbOptions != mTarget->GetOptions()) result = true;
-      if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
-      if (ContourValue != mTarget->GetContourValue()) result = true;
-      if (GridSize != mTarget->GetGridSize()) result = true;
-      if (UseSolidSurface != mTarget->SolidSurface()) result = true;
-      if (UseNormals != mTarget->UseSurfaceNormals()) result = true;
-      if (PhaseChange != mTarget->GetPhaseChange()) result = true;
-      if (SphericalHarmonics != mTarget->UseSphericalHarmonics()) result = true;
+		if (!result) {
+		  RGBColor	testColor;
+		  mTarget->GetPosColor(&testColor);
+		  if ((PosColor.red != testColor.red)||(PosColor.green!=testColor.green)
+			  ||(PosColor.blue!=testColor.blue)) 
+			  result=true;
 
-      if (!result) 
-	{
-	  RGBColor	testColor;
-	  mTarget->GetPosColor(&testColor);
-	  if ((PosColor.red != testColor.red)||(PosColor.green!=testColor.green)
-	      ||(PosColor.blue!=testColor.blue)) 
-	    result=true;
+		  mTarget->GetNegColor(&testColor);
+		  if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)
+			  ||(NegColor.blue!=testColor.blue)) 
+			  result=true;
 
-	  mTarget->GetNegColor(&testColor);
-	  if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)
-	      ||(NegColor.blue!=testColor.blue)) 
-	    result=true;
-
-	  mTarget->GetTranspColor(&testColor);
-	  if ((TranspColor.red != testColor.red)
-	      ||(TranspColor.green!=testColor.green)
-	      ||(TranspColor.blue!=testColor.blue)) 
-	    result=true;
+		  mTarget->GetTranspColor(&testColor);
+		  if ((TranspColor.red != testColor.red)
+			  ||(TranspColor.green!=testColor.green)
+			  ||(TranspColor.blue!=testColor.blue)) 
+			  result=true;
+		}
 	}
-    }
-  return result;
+	return result;
 }
 
 void Orbital3DSurfPane::OnOrbFormatChoice( wxCommandEvent &event )
@@ -4481,56 +4476,68 @@ void Surface2DParamDlg::createControls()
   SetSizer(mainSizer);
 }
 
-void Surface2DParamDlg::OnClose(wxCommandEvent &event )
-{
-  wxString tmpStr;
-  long tempLong;
-  CPoint3D tempPt;
-  float	tempFlt;
+void Surface2DParamDlg::OnClose(wxCommandEvent &event ) {
+	wxString tmpStr;
+	long tempLong;
+	CPoint3D tempPt;
+	double	tempFlt;
 
-  tmpStr = numGridPoint->GetValue();
-  tempLong = atol((const char *)tmpStr.c_str());
-  mTargetSurf->SetNumGridPoints(tempLong);
+	tmpStr = numGridPoint->GetValue();
+	if (tmpStr.ToLong(&tempLong))
+		mTargetSurf->SetNumGridPoints(tempLong);
 
-  tmpStr = originText1->GetValue();
-  tempPt.x = atof((const char *)tmpStr.c_str());
-  tmpStr = originText2->GetValue();
-  tempPt.y = atof((const char *)tmpStr.c_str());
-  tmpStr = originText3->GetValue();
-  tempPt.z = atof((const char *)tmpStr.c_str());
+	tempPt.x = tempPt.y = tempPt.z = 0.0;
+	tmpStr = originText1->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.x = tempFlt;
+	tmpStr = originText2->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.y = tempFlt;
+	tmpStr = originText3->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.z = tempFlt;
 
-  mTargetSurf->SetOrigin(&tempPt);
+	mTargetSurf->SetOrigin(&tempPt);
 
-  tmpStr = vectorAxis1x->GetValue();
-  tempPt.x = atof((const char *)tmpStr.c_str());
-  tmpStr = vectorAxis1y->GetValue();
-  tempPt.y = atof((const char *)tmpStr.c_str());			     
-  tmpStr = vectorAxis1z->GetValue();
-  tempPt.z = atof((const char *)tmpStr.c_str());
+	tempPt.x = 0.1;
+	tempPt.y = tempPt.z = 0.0;
+	tmpStr = vectorAxis1x->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.x = tempFlt;
+	tmpStr = vectorAxis1y->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.y = tempFlt;
+	tmpStr = vectorAxis1z->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.z = tempFlt;
 
-  mTargetSurf->SetXIncrement(&tempPt);
+	mTargetSurf->SetXIncrement(&tempPt);
 
-  tmpStr = vectorAxis2x->GetValue();
-  tempPt.x = atof((const char *)tmpStr.c_str());
-  tmpStr = vectorAxis2y->GetValue();
-  tempPt.y = atof((const char *)tmpStr.c_str());			     
-  tmpStr = vectorAxis2z->GetValue();
-  tempPt.z = atof((const char *)tmpStr.c_str());
+	tempPt.x = tempPt.z = 0.0;
+	tempPt.y = 0.1;
+	tmpStr = vectorAxis2x->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.x = tempFlt;
+	tmpStr = vectorAxis2y->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.y = tempFlt;
+	tmpStr = vectorAxis2z->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.z = tempFlt;
 
-  mTargetSurf->SetYIncrement(&tempPt);
+	mTargetSurf->SetYIncrement(&tempPt);
 
-  mTargetSurf->SetRotate2DMap(false);
+	mTargetSurf->SetRotate2DMap(false);
 
-  mParent->TargetToPane();
-  mParent->refreshControls();
-  mParent->SetUpdateTest(true);
+	mParent->TargetToPane();
+	mParent->refreshControls();
+	mParent->SetUpdateTest(true);
 
-  Destroy();
+	Destroy();
 }
 
-void Surface2DParamDlg::OnCancel(wxCommandEvent &event )
-{
-  Destroy();
+void Surface2DParamDlg::OnCancel(wxCommandEvent &event ) {
+	Destroy();
 }
 
 /*!!! Use wxWidgets' config class to implement copyAll and pasteAll
@@ -4699,53 +4706,56 @@ void Surface3DParamDlg::createControls()
   SetSizer(mainSizer);
 }
 
-void Surface3DParamDlg::OnClose(wxCommandEvent &event )
-{
-  wxString tmpStr;
-  long tempLong;
-  CPoint3D tempPt;
-  float	tempFlt;
+void Surface3DParamDlg::OnClose(wxCommandEvent &event ) {
+	wxString tmpStr;
+	long tempLong;
+	CPoint3D tempPt;
+	double	tempFlt;
 
-  tmpStr = numGridPoint1->GetValue();
-  tempLong = atol((const char *)tmpStr.c_str());
-  mTargetSurf->SetNumXGridPoints(tempLong);
+	tmpStr = numGridPoint1->GetValue();
+	if (tmpStr.ToLong(&tempLong))
+		mTargetSurf->SetNumXGridPoints(tempLong);
 
-  tmpStr = numGridPoint2->GetValue();
-  tempLong = atol((const char *)tmpStr.c_str());		
-  mTargetSurf->SetNumYGridPoints(tempLong);
+	tmpStr = numGridPoint2->GetValue();
+	if (tmpStr.ToLong(&tempLong))
+		mTargetSurf->SetNumYGridPoints(tempLong);
 				
-  tmpStr = numGridPoint3->GetValue();
-  tempLong = atol((const char *)tmpStr.c_str());
-  mTargetSurf->SetNumZGridPoints(tempLong);
+	tmpStr = numGridPoint3->GetValue();
+	if (tmpStr.ToLong(&tempLong))
+		mTargetSurf->SetNumZGridPoints(tempLong);
 
-  tmpStr = originText1->GetValue();
-  tempPt.x = atof((const char *)tmpStr.c_str());
-  tmpStr = originText2->GetValue();
-  tempPt.y = atof((const char *)tmpStr.c_str());
-  tmpStr = originText3->GetValue();
-  tempPt.z = atof((const char *)tmpStr.c_str());
+	tempPt.x = tempPt.y = tempPt.z = 0.0;
+	tmpStr = originText1->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.x = tempFlt;
+	tmpStr = originText2->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.y = tempFlt;
+	tmpStr = originText3->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		tempPt.z = tempFlt;
 
-  mTargetSurf->SetOrigin(&tempPt);
+	mTargetSurf->SetOrigin(&tempPt);
 
-  tmpStr = gridIncText1->GetValue();
-  tempFlt = atof((const char *)tmpStr.c_str());
-  mTargetSurf->SetXGridInc(tempFlt);
+	tmpStr = gridIncText1->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		mTargetSurf->SetXGridInc(tempFlt);
 
-  tmpStr = gridIncText2->GetValue();
-  tempFlt = atof((const char *)tmpStr.c_str());
-  mTargetSurf->SetYGridInc(tempFlt);			
-			       
-  tmpStr = gridIncText3->GetValue();
-  tempFlt = atof((const char *)tmpStr.c_str());
-  mTargetSurf->SetZGridInc(tempFlt);
-	
-  mTargetSurf->SetFixGrid(true);
+	tmpStr = gridIncText2->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		mTargetSurf->SetYGridInc(tempFlt);			
+				   
+	tmpStr = gridIncText3->GetValue();
+	if (tmpStr.ToDouble(&tempFlt))
+		mTargetSurf->SetZGridInc(tempFlt);
 
-  mParent->TargetToPane();
-  mParent->refreshControls();
-  mParent->SetUpdateTest(true);
+	mTargetSurf->SetFixGrid(true);
 
-  Destroy();
+	mParent->TargetToPane();
+	mParent->refreshControls();
+	mParent->SetUpdateTest(true);
+
+	Destroy();
 }
 
 void Surface3DParamDlg::OnCancel(wxCommandEvent &event )
