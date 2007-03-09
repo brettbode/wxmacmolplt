@@ -273,6 +273,7 @@ void ZMatrixCalculator::OnAtom4editUpdated( wxCommandEvent& event )
 }
 
 void ZMatrixCalculator::UpdateValues(void) {
+
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	MoleculeData * 	MainData = parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
@@ -280,91 +281,126 @@ void ZMatrixCalculator::UpdateValues(void) {
 	long atm1, atm2, atm3, atm4;
 	CPoint3D	offset1, offset2, offset3;
 	
-	if ((mAtom1Edit->GetValue().ToLong(&atm1)) && (mAtom2Edit->GetValue().ToLong(&atm2))) {
-		atm1--;
-		atm2--;
-		if (MainData->ValidAtom(atm1) && MainData->ValidAtom(atm2) && (atm1 != atm2)) {
-				//Bond Length
-			CPoint3D	pos1, pos2;
-			lFrame->GetAtomPosition(atm1, pos1);
-			lFrame->GetAtomPosition(atm2, pos2);
-			offset1.x = pos2.x - pos1.x;
-			offset1.y = pos2.y - pos1.y;
-			offset1.z = pos2.z - pos1.z;
-			float BondLength = offset1.Magnitude();
-			wxString temp;
-			temp.Printf(wxT("%.5f"), BondLength);
-			mBondLength->SetValue(temp);
+	// Make sure first two atoms are valid numbers.  We only do the first two
+	// for now, since these establish the bond length, which we want to
+	// show as soon as possible.
+	if ((!mAtom1Edit->GetValue().ToLong(&atm1)) ||
+	    (!mAtom2Edit->GetValue().ToLong(&atm2))) {
+	   return;
+	}
 
-			if (mAtom3Edit->GetValue().ToLong(&atm3)) {
-				atm3--;
-				if (MainData->ValidAtom(atm3) && (atm1 != atm3) && (atm2 != atm3)) {
-						//Bond Angle
-					CPoint3D pos3;
-					lFrame->GetAtomPosition(atm3, pos3);
-					offset2.x = pos1.x - pos3.x;
-					offset2.y = pos1.y - pos3.y;
-					offset2.z = pos1.z - pos3.z;
-					float length3 = offset2.Magnitude();
-					offset2.x = pos3.x - pos2.x;
-					offset2.y = pos3.y - pos2.y;
-					offset2.z = pos3.z - pos2.z;
-					float length2 = offset2.Magnitude();
-					length3 = ((BondLength*BondLength+length2*length2-length3*length3)/
-							   (2*BondLength*length2));
-					if (length3 > 1.0) length3 = 1.0;
-					else if (length3 < -1.0) length3 = -1.0;
-					float BondAngle = acos(length3);
-					BondAngle *= kRadToDegree;
-					
-					temp.Printf(wxT("%.5f"), BondAngle);
-					mBondAngle->SetValue(temp);
-					
-					if (mAtom4Edit->GetValue().ToLong(&atm4)) {
-						atm4--;
-						if (MainData->ValidAtom(atm4) && (atm1 != atm4) && (atm2 != atm4)
-							&& (atm3 != atm4)) {
-								//Dihedral
-							CPoint3D pos4;
-							lFrame->GetAtomPosition(atm4, pos4);
-							offset3.x = pos4.x - pos3.x;
-							offset3.y = pos4.y - pos3.y;
-							offset3.z = pos4.z - pos3.z;
-							//	float length3 = offset3.Magnitude();
-							CPoint3D UnitIJ = offset1;
-							CPoint3D UnitJK = offset2;
-							CPoint3D UnitKL = offset3;
-							Normalize3D(&UnitIJ);
-							Normalize3D(&UnitJK);
-							Normalize3D(&UnitKL);
-							CPoint3D Normal1, Normal2;
-							CrossProduct3D(&UnitIJ, &UnitJK, &Normal1);
-							CrossProduct3D(&UnitJK, &UnitKL, &Normal2);
-							float DotPJ = -DotProduct3D(&UnitIJ, &UnitJK);
-							float DotPK = -DotProduct3D(&UnitJK, &UnitKL);
-							if ((fabs(DotPJ) < 1.0)&&(fabs(DotPK) < 1.0)) {	//3 of the atom are linear, Bad!
-								float SinPJ = sqrt(1.0-DotPJ*DotPJ);
-								float SinPK = sqrt(1.0-DotPK*DotPK);
-								float Dot = DotProduct3D(&Normal1, &Normal2)/(SinPJ*SinPK);
-								if (fabs(Dot) <= kCosErrorTolerance) {		//Bad value for a cos
-									if (Dot > 1.0) Dot += 1.0-Dot;
-									else if (Dot < -1.0) Dot -= 1.0+Dot;
-									float Dihedral = acos(Dot);
-									float Pi = acos(-1.0);
-									if (fabs(Dihedral) < kZeroTolerance) Dihedral = 0.0;
-									else if (fabs(Dihedral-Pi) < kZeroTolerance) Dihedral = Pi;
-									float Sense = DotProduct3D(&Normal2, &offset1);
-									if (Sense < 0.0) Dihedral = -Dihedral;
-									Dihedral *= 180.0/Pi;
-									
-									temp.Printf(wxT("%.5f"), Dihedral);
-									mDihedralAngle->SetValue(temp);
-								}
-							}
-						}
-					}
-				}
-			}
+	// Input atom numbers are 1-based.
+	atm1--;
+	atm2--;
+
+	// Make sure atoms 1 and 2 are valid and not equal.
+	if (!MainData->ValidAtom(atm1) || !MainData->ValidAtom(atm2) ||
+		(atm1 == atm2)) {
+		return;
+	}
+
+	// Calculate bond length.
+	CPoint3D pos1, pos2;
+	lFrame->GetAtomPosition(atm1, pos1);
+	lFrame->GetAtomPosition(atm2, pos2);
+	offset1.x = pos2.x - pos1.x;
+	offset1.y = pos2.y - pos1.y;
+	offset1.z = pos2.z - pos1.z;
+	float BondLength = offset1.Magnitude();
+	wxString temp;
+	temp.Printf(wxT("%.5f"), BondLength);
+	mBondLength->SetValue(temp);
+
+	// Now move to atom 3 and make sure it's valid.
+	if (!mAtom3Edit->GetValue().ToLong(&atm3)) {
+		return;
+	}
+
+	atm3--;
+
+	// Make sure atom 3 exists and is not equal to 1 or 2.
+	if (!MainData->ValidAtom(atm3) || (atm1 == atm3) || (atm2 == atm3)) {
+		return;
+	}
+
+	// Calculate angle between bond from atom 3 to atom 1 and bond from
+	// atom 2 to atom 3.
+	CPoint3D pos3;
+	lFrame->GetAtomPosition(atm3, pos3);
+	offset2.x = pos1.x - pos3.x;
+	offset2.y = pos1.y - pos3.y;
+	offset2.z = pos1.z - pos3.z;
+	float length3 = offset2.Magnitude();
+
+	offset2.x = pos3.x - pos2.x;
+	offset2.y = pos3.y - pos2.y;
+	offset2.z = pos3.z - pos2.z;
+	float length2 = offset2.Magnitude();
+
+	// Using the law of cosines, find cos(theta), with theta being the angle
+	// 123.
+	length3 = (BondLength * BondLength + length2 * length2 -
+				length3 * length3) / (2 * BondLength * length2);
+
+	if (length3 > 1.0) length3 = 1.0;
+	else if (length3 < -1.0) length3 = -1.0;
+
+	// BondAngle is the angle between atoms 1, 2, and 3.
+	float BondAngle = acos(length3);
+	BondAngle *= kRadToDegree;
+	
+	temp.Printf(wxT("%.5f"), BondAngle);
+	mBondAngle->SetValue(temp);
+	
+	// Make sure atom 4 is an integral value.
+	if (!mAtom4Edit->GetValue().ToLong(&atm4)) {
+		return;
+	}
+
+	atm4--;
+
+	// Make sure atom 4 exists and is not any of the other atoms.
+	if (!MainData->ValidAtom(atm4) || (atm1 == atm4) || (atm2 == atm4) ||
+		(atm3 == atm4)) {
+		return;
+	}
+
+	// Dihedral
+	CPoint3D pos4;
+	lFrame->GetAtomPosition(atm4, pos4);
+	offset3.x = pos4.x - pos3.x;
+	offset3.y = pos4.y - pos3.y;
+	offset3.z = pos4.z - pos3.z;
+
+	CPoint3D UnitIJ = offset1;
+	CPoint3D UnitJK = offset2;
+	CPoint3D UnitKL = offset3;
+	Normalize3D(&UnitIJ);
+	Normalize3D(&UnitJK);
+	Normalize3D(&UnitKL);
+	CPoint3D Normal1, Normal2;
+	CrossProduct3D(&UnitIJ, &UnitJK, &Normal1);
+	CrossProduct3D(&UnitJK, &UnitKL, &Normal2);
+	float DotPJ = -DotProduct3D(&UnitIJ, &UnitJK);
+	float DotPK = -DotProduct3D(&UnitJK, &UnitKL);
+
+	if ((fabs(DotPJ) < 1.0)&&(fabs(DotPK) < 1.0)) {	//3 of the atom are linear, Bad!
+		float SinPJ = sqrt(1.0-DotPJ*DotPJ);
+		float SinPK = sqrt(1.0-DotPK*DotPK);
+		float Dot = DotProduct3D(&Normal1, &Normal2)/(SinPJ*SinPK);
+		if (fabs(Dot) <= kCosErrorTolerance) {		//Bad value for a cos
+			if (Dot > 1.0) Dot += 1.0-Dot;
+			else if (Dot < -1.0) Dot -= 1.0+Dot;
+			float Dihedral = acos(Dot);
+			float Pi = acos(-1.0);
+			if (fabs(Dihedral) < kZeroTolerance) Dihedral = 0.0;
+			else if (fabs(Dihedral-Pi) < kZeroTolerance) Dihedral = Pi;
+			float Sense = DotProduct3D(&Normal2, &offset1);
+			if (Sense < 0.0) Dihedral = -Dihedral;
+			Dihedral *= 180.0/Pi;
+			
+			temp.Printf(wxT("%.5f"), Dihedral);
+			mDihedralAngle->SetValue(temp);
 		}
 	}
 }
