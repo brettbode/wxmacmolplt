@@ -368,6 +368,8 @@ class MolDisplayWin : public wxFrame {
 		void SelectionChanged(bool mode);
 		void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, float m[16],
 								const CPoint3D& x_world, float bond_size) const;
+		void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
+								 const CPoint3D *pt3);
 
 		void eventSize(wxSizeEvent &event);
 		void SizeChanged(void);

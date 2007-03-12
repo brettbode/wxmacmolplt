@@ -554,7 +554,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		else if (selected < NumAtoms + lFrame->NumBonds +
 					lFrame->AnnoLengths.size() + lFrame->AnnoAngles.size() +
 					lFrame->AnnoDihedrals.size()) {
-			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Angle,
+			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Dihedral,
 							wxT("Delete dihedral"));
 		}
  
@@ -594,7 +594,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		else if (selected < NumAtoms + lFrame->NumBonds +
 					lFrame->AnnoLengths.size() + lFrame->AnnoAngles.size() +
 					lFrame->AnnoDihedrals.size()) {
-			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Angle,
+			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Dihedral,
 							wxT("Delete dihedral"));
 		}
 
@@ -1130,6 +1130,11 @@ void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
 		case GL_Popup_Delete_Angle:
 			lFrame->AnnoAngles.erase(lFrame->AnnoAngles.begin() +
 				selected_anno - lFrame->AnnoLengths.size());
+			break;
+		case GL_Popup_Delete_Dihedral:
+			lFrame->AnnoDihedrals.erase(lFrame->AnnoDihedrals.begin() +
+				selected_anno - lFrame->AnnoLengths.size() -
+				lFrame->AnnoAngles.size());
 			break;
 		default:
 			printf("unknown event\n");

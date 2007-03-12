@@ -1256,180 +1256,25 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 	}
 
 	if (!lFrame->AnnoAngles.empty()) {
-		CPoint3D vec1;
-		CPoint3D vec2;
-		Matrix4D plane2xy;
-		int atom1_id;
-		int atom2_id;
-		int atom3_id;
-		float min_len;
-		float len1;
-		float len2;
-		float angle;
-		float m[16];
-		float chord_len;
-		float x_eye[3];
-		float y_eye[3];
+		CPoint3D atom1_pos;
+		CPoint3D atom2_pos;
+		CPoint3D atom3_pos;
+		std::vector<AnnotateAngle>::iterator anno;
+		int anno_id;
 
 		glDisable(GL_LIGHTING);
-		for (long anno_id = 0; anno_id < lFrame->AnnoAngles.size(); anno_id++) {
-
-			atom1_id = lFrame->AnnoAngles[anno_id].getAtom1ID();
-			atom2_id = lFrame->AnnoAngles[anno_id].getAtom2ID();
-			atom3_id = lFrame->AnnoAngles[anno_id].getAtom3ID();
-
-			vec1 = lFrame->Atoms[atom1_id].Position -
-					 lFrame->Atoms[atom2_id].Position;
-			vec2 = lFrame->Atoms[atom3_id].Position -
-					 lFrame->Atoms[atom2_id].Position;
-
-			len1 = vec1.Magnitude();
-			len2 = vec2.Magnitude();
-			min_len = MIN(len1, len2);
-
-			vec1 = vec1 * (1.0f / len1);
-			vec2 = vec2 * (1.0f / len2);
-
-			angle = acos(DotProduct3D(&vec1, &vec2));
-			SetPlaneRotation(plane2xy, vec1, vec2);
-
-			glPushMatrix();
-			glTranslatef(lFrame->Atoms[atom2_id].Position.x,
-							 lFrame->Atoms[atom2_id].Position.y,
-							 lFrame->Atoms[atom2_id].Position.z);
-
-			glMultMatrixf((const GLfloat *) &plane2xy);
-
-			glGetFloatv(GL_MODELVIEW_MATRIX, m);
-
-			x_eye[0] = m[0];
-			x_eye[1] = m[4];
-			x_eye[2] = m[8];
-
-			y_eye[0] = m[1];
-			y_eye[1] = m[5];
-			y_eye[2] = m[9];
-
-			chord_len = 0.02f;
-			float delta = 0.125 / min_len;
+		glColor3f(0.0f, 0.0f, 0.0f);
+		for (anno = lFrame->AnnoAngles.begin(), anno_id = 0;
+			 anno != lFrame->AnnoAngles.end(); anno++, anno_id++) {
 
 			glLoadName(anno_id + lFrame->AnnoLengths.size() + NumAtoms +
 						  NumBonds + 1);
 
-			glBegin(GL_QUADS);
+			lFrame->GetAtomPosition(anno->getAtom1ID(), atom1_pos);
+			lFrame->GetAtomPosition(anno->getAtom2ID(), atom2_pos);
+			lFrame->GetAtomPosition(anno->getAtom3ID(), atom3_pos);
 
-			float ca = cos(angle);
-			float sa = sin(angle);
-
-			for (float i = 0.0f; i <= min_len; i += delta) {
-				glVertex3f(i - (x_eye[0] + y_eye[0]) * chord_len,
-								 - (x_eye[1] + y_eye[1]) * chord_len,
-								 - (x_eye[2] + y_eye[2]) * chord_len);
-				glVertex3f(i + (x_eye[0] - y_eye[0]) * chord_len,
-								 + (x_eye[1] - y_eye[1]) * chord_len,
-									(x_eye[2] - y_eye[2]) * chord_len);
-				glVertex3f(i + (x_eye[0] + y_eye[0]) * chord_len,
-								 + (x_eye[1] + y_eye[1]) * chord_len,
-									(x_eye[2] + y_eye[2]) * chord_len);
-				glVertex3f(i - (x_eye[0] - y_eye[0]) * chord_len,
-								 - (x_eye[1] - y_eye[1]) * chord_len,
-								 - (x_eye[2] - y_eye[2]) * chord_len);
-
-				glVertex3f(i * ca - (x_eye[0] + y_eye[0]) * chord_len,
-							  i * sa - (x_eye[1] + y_eye[1]) * chord_len,
-										- (x_eye[2] + y_eye[2]) * chord_len);
-				glVertex3f(i * ca + (x_eye[0] - y_eye[0]) * chord_len,
-							  i * sa + (x_eye[1] - y_eye[1]) * chord_len,
-										  (x_eye[2] - y_eye[2]) * chord_len);
-				glVertex3f(i * ca + (x_eye[0] + y_eye[0]) * chord_len,
-							  i * sa + (x_eye[1] + y_eye[1]) * chord_len,
-										  (x_eye[2] + y_eye[2]) * chord_len);
-				glVertex3f(i * ca - (x_eye[0] - y_eye[0]) * chord_len,
-							  i * sa - (x_eye[1] - y_eye[1]) * chord_len,
-										- (x_eye[2] - y_eye[2]) * chord_len);
-			}
-
-			for (float i = 0.0f; i <= angle; i += delta) {
-				glVertex3f(min_len * cos(i) - (x_eye[0] + y_eye[0]) * chord_len,
-						   min_len * sin(i) - (x_eye[1] + y_eye[1]) * chord_len,
-										    - (x_eye[2] + y_eye[2]) * chord_len);
-				glVertex3f(min_len * cos(i) + (x_eye[0] - y_eye[0]) * chord_len,
-						  min_len * sin(i) + (x_eye[1] - y_eye[1]) * chord_len,
-											(x_eye[2] - y_eye[2]) * chord_len);
-				glVertex3f(min_len * cos(i) + (x_eye[0] + y_eye[0]) * chord_len,
-						  min_len * sin(i) + (x_eye[1] + y_eye[1]) * chord_len,
-											(x_eye[2] + y_eye[2]) * chord_len);
-				glVertex3f(min_len * cos(i) - (x_eye[0] - y_eye[0]) * chord_len,
-						  min_len * sin(i) - (x_eye[1] - y_eye[1]) * chord_len,
-										 - (x_eye[2] - y_eye[2]) * chord_len);
-			}
-			glEnd();
-
-			CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f};
-			CPoint3D up_eye = {0.0f, 1.0f, 0.0f};
-			CPoint3D lookat_world;
-			CPoint3D up_world;
-			CPoint3D r;
-
-			Matrix4D mv_inv;
-
-			// Invert just the rotation portion of the modelview matrix.  We can't
-			// use InverseMatrix because it considers the translation factors.
-			// We don't want the translation factors because we want to transform
-			// a vector, and Rotate3DPt transforms only points (and not vectors).
-			mv_inv[0][0] = m[0];
-			mv_inv[0][1] = m[4];
-			mv_inv[0][2] = m[8];
-			mv_inv[0][3] = 0.0f;
-			mv_inv[1][0] = m[1];
-			mv_inv[1][1] = m[5];
-			mv_inv[1][2] = m[9];
-			mv_inv[1][3] = 0.0f;
-			mv_inv[2][0] = m[2];
-			mv_inv[2][1] = m[6];
-			mv_inv[2][2] = m[10];
-			mv_inv[2][3] = 0.0f;
-			mv_inv[3][0] = 0.0f;
-			mv_inv[3][1] = 0.0f;
-			mv_inv[3][2] = 0.0f;
-			mv_inv[3][3] = 1.0f;
-
-			// Transform the eye space vectors to world coordinates, and find 
-			// a third vector to form a basis set.
-			Rotate3DPt(mv_inv, lookat_eye, &lookat_world);
-			Rotate3DPt(mv_inv, up_eye, &up_world);
-			CrossProduct3D(&lookat_world, &up_world, &r);
-
-			m[0] = r.x;
-			m[1] = r.y;
-			m[2] = r.z;
-			m[3] = 0.0f;
-
-			m[4] = up_world.x;
-			m[5] = up_world.y;
-			m[6] = up_world.z;
-			m[7] = 0.0f;
-
-			m[8] = lookat_world.x;
-			m[9] = lookat_world.y;
-			m[10] = lookat_world.z;
-			m[11] = 0.0f;
-
-			m[12] = m[13] = m[14] = 0.0f;
-			m[15] = 1.0f;
-
-			char angle_label[40];
-			sprintf(angle_label, "%.2f deg", angle * 180.f / 3.14159f);
-			glTranslatef(min_len * cos(angle * 0.5f),
-							 min_len * sin(angle * 0.5f), 0.0f);
-			glMultMatrixf(m);
-			float LabelSize = Prefs->GetAnnotationLabelSize();
-			glTranslatef(-0.175f + chord_len, 0.0f, 0.0f);
-			glScalef(-0.1f*LabelSize, 0.1f*LabelSize, 0.1f);
-			glfDrawSolidString(angle_label);
-
-			glPopMatrix();
-
+			DrawAngleAnnotation(&atom1_pos, &atom2_pos, &atom3_pos);
 		}
 		glEnable(GL_LIGHTING);
 	}
@@ -1451,8 +1296,14 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		float angle;
 		std::vector<AnnotateDihedral>::iterator anno;
 
-		for (anno = lFrame->AnnoDihedrals.begin();
-			 anno != lFrame->AnnoDihedrals.end(); anno++) {
+		glDisable(GL_LIGHTING);
+
+		glColor3f(0.0f, 0.0f, 0.0f);
+		for (anno = lFrame->AnnoDihedrals.begin(), anno_id = 0;
+			 anno != lFrame->AnnoDihedrals.end(); anno++, anno_id++) {
+
+			glLoadName(anno_id + lFrame->AnnoAngles.size() + 
+						lFrame->AnnoLengths.size() + NumAtoms + NumBonds + 1);
 
 			lFrame->GetAtomPosition(anno->getAtom1ID(), atom1_pos);
 			lFrame->GetAtomPosition(anno->getAtom2ID(), atom2_pos);
@@ -1461,9 +1312,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 			// The first three atoms (1, 2, 3) form one plane.  The last three
 			// (2, 3, 4) form the second plane.  We want to find the angle
-			// between those two planes.
+			// between those two planes, for that is the dihedral angle.
 
-			// Find the first plane.
+			// Find the first plane's normal by finding the vectors between its
+			// points and calculating the normal from them.
 			vec1 = atom1_pos - atom3_pos;
 			Normalize3D(&vec1);
 
@@ -1516,11 +1368,30 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			glPopMatrix();
 
 			// Okay, we've drawn the planes.  Now we want to draw an angle
-			// annotation between them.  One vector that forms the angle ...
-			// CrossProduct3D(&vec2, &normal1, &binormal1); 
-			// CrossProduct3D(&vec2, &normal2, &binormal2); 
+			// annotation between them.  The angle annotation should span 
+			// from the midpoint on one half-circle's arc to the midpoint on
+			// the other half circles arc.  These can be found by considering
+			// the vector between atoms 2 and 3 as the tangent vector, and
+			// find the the binormal as the crossproduct of tangent and normal.
+			CrossProduct3D(&vec2, &normal1, &binormal1);
+			CrossProduct3D(&vec2, &normal2, &binormal2);
+
+			Normalize3D(&binormal1);
+			Normalize3D(&binormal2);
+
+			// Figure out the actual points from the vector displacements.
+			CPoint3D pt1 = atom3_pos + binormal1;
+			CPoint3D pt3 = atom3_pos + binormal2;
+
+			// CreateCylinderFromLine(qobj, atom3_pos, pt1, 0.1f); 
+			// CreateCylinderFromLine(qobj, atom3_pos, pt3, 0.1f); 
+
+			glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+			DrawAngleAnnotation(&pt1, &atom3_pos, &pt3);
 
 		}
+
+		glEnable(GL_LIGHTING);
 	}
 
 	//bonds as cylinders
@@ -2959,7 +2830,7 @@ long Surf3DBase::CreateWireFrameSurfaceWithLines(CPoint3D * Vertices, long * vLi
 //Utility function to create a line made up of a variable width cylinder. the GLUquadricObj must be preallocated
 void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd, const float & lineWidth) {
 	if (qobj == NULL) return;
-	CPoint3D	offset, NormalOffset, NormEnd, NormStart={0,0,1};
+	CPoint3D	offset, NormalOffset, NormStart={0,0,1};
 	Matrix4D	rotMat;
 	
 	offset.x =  lineEnd.x - lineStart.x;
@@ -2972,8 +2843,11 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 		NormalOffset.z = offset.z/length;
 	} else
 		NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
-	NormEnd = lineEnd;
-	Normalize3D (&NormEnd);
+	// NormEnd isn't being used as far as I can tell, so I'm commenting these
+	// lines out.
+	// CPoint3D NormEnd;
+	// NormEnd = lineEnd; 
+	// Normalize3D (&NormEnd); 
 	SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
 	rotMat[3][0] = lineStart.x;
 	rotMat[3][1] = lineStart.y;
@@ -3289,6 +3163,7 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 	
 	glPopMatrix();
 }
+
 void DrawInversionPoint(void) {
 	GLUquadricObj * qobj = NULL;
 	qobj = gluNewQuadric();
@@ -3316,4 +3191,193 @@ void DrawInversionPoint(void) {
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, save_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, save_specular);
 	if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
+}
+
+void MolDisplayWin::DrawAngleAnnotation(const CPoint3D *pt1,
+		const CPoint3D *pt2, const CPoint3D *pt3) {
+
+	// This draws a dashed angle between the three specified points and
+	// marks the angle's degrees with a text label.  The angle goes from
+	// pt1 to pt2 to pt3.  To complicate things a bit, we draw each dash
+	// so that it is aligned to the screen so the viewer can always see it.
+
+	CPoint3D vec1;
+	CPoint3D vec2;
+	Matrix4D plane2xy;
+	float min_len;
+	float len1;
+	float len2;
+	float angle;
+	float m[16];
+	float chord_len;
+	float x_eye[3];
+	float y_eye[3];
+	float delta;
+
+	// First we get vectors representing the angle.
+	vec1 = *pt1 - *pt2;
+	vec2 = *pt3 - *pt2;
+
+	// We need to find the smaller length since so that we know how far along
+	// each vector we can draw the annotation.  As long as we have the lengths,
+	// we normalize here instead of calling a function to save some
+	// recomputation.
+	len1 = vec1.Magnitude();
+	len2 = vec2.Magnitude();
+	min_len = MIN(len1, len2);
+
+	vec1 = vec1 * (1.0f / len1);
+	vec2 = vec2 * (1.0f / len2);
+
+	angle = acos(DotProduct3D(&vec1, &vec2));
+
+	// We change the coordinate system so that the angle's plane looks like
+	// the xy-plane.  This makes drawing along a circular arc much easier.
+	SetPlaneRotation(plane2xy, vec1, vec2);
+
+	glPushMatrix();
+
+	// We move to the center vertex and transform as described above.
+	glTranslatef(pt2->x, pt2->y, pt2->z);
+	glMultMatrixf((const GLfloat *) &plane2xy);
+
+	// We want screen-aligned dashes.  So we want to draw quads that extend in
+	// the x- and y-directions in eye space.  Since we draw in object space, we
+	// must figure out what the eye's x- and y- axes are there.  To do that,
+	// all we have to do is grab the first two axes from the inverse of the
+	// modelview matrix.
+	glGetFloatv(GL_MODELVIEW_MATRIX, m);
+
+	x_eye[0] = m[0];
+	x_eye[1] = m[4];
+	x_eye[2] = m[8];
+
+	y_eye[0] = m[1];
+	y_eye[1] = m[5];
+	y_eye[2] = m[9];
+
+	// How long should each dash be, and how often do we want them?
+	chord_len = 0.02f;
+	delta = 0.125 / min_len;
+
+	glBegin(GL_QUADS);
+
+	float ca = cos(angle);
+	float sa = sin(angle);
+
+	// First we draw the dashes along each side.
+	for (float i = 0.0f; i <= min_len; i += delta) {
+
+		// One vector/side looks like the x-axis, so this one's pretty simple.
+		// We just step along the x-axis.
+		glVertex3f(i - (x_eye[0] + y_eye[0]) * chord_len,
+						 - (x_eye[1] + y_eye[1]) * chord_len,
+						 - (x_eye[2] + y_eye[2]) * chord_len);
+		glVertex3f(i + (x_eye[0] - y_eye[0]) * chord_len,
+						 + (x_eye[1] - y_eye[1]) * chord_len,
+							(x_eye[2] - y_eye[2]) * chord_len);
+		glVertex3f(i + (x_eye[0] + y_eye[0]) * chord_len,
+						 + (x_eye[1] + y_eye[1]) * chord_len,
+							(x_eye[2] + y_eye[2]) * chord_len);
+		glVertex3f(i - (x_eye[0] - y_eye[0]) * chord_len,
+						 - (x_eye[1] - y_eye[1]) * chord_len,
+						 - (x_eye[2] - y_eye[2]) * chord_len);
+
+		// The other looks like it has an endpoint at (cos(angle), sin(angle)),
+		// so we step along that vector.
+		glVertex3f(i * ca - (x_eye[0] + y_eye[0]) * chord_len,
+					  i * sa - (x_eye[1] + y_eye[1]) * chord_len,
+								- (x_eye[2] + y_eye[2]) * chord_len);
+		glVertex3f(i * ca + (x_eye[0] - y_eye[0]) * chord_len,
+					  i * sa + (x_eye[1] - y_eye[1]) * chord_len,
+								  (x_eye[2] - y_eye[2]) * chord_len);
+		glVertex3f(i * ca + (x_eye[0] + y_eye[0]) * chord_len,
+					  i * sa + (x_eye[1] + y_eye[1]) * chord_len,
+								  (x_eye[2] + y_eye[2]) * chord_len);
+		glVertex3f(i * ca - (x_eye[0] - y_eye[0]) * chord_len,
+					  i * sa - (x_eye[1] - y_eye[1]) * chord_len,
+								- (x_eye[2] - y_eye[2]) * chord_len);
+	}
+
+	for (float i = 0.0f; i <= angle; i += delta) {
+		glVertex3f(min_len * cos(i) - (x_eye[0] + y_eye[0]) * chord_len,
+				   min_len * sin(i) - (x_eye[1] + y_eye[1]) * chord_len,
+									- (x_eye[2] + y_eye[2]) * chord_len);
+		glVertex3f(min_len * cos(i) + (x_eye[0] - y_eye[0]) * chord_len,
+				  min_len * sin(i) + (x_eye[1] - y_eye[1]) * chord_len,
+									(x_eye[2] - y_eye[2]) * chord_len);
+		glVertex3f(min_len * cos(i) + (x_eye[0] + y_eye[0]) * chord_len,
+				  min_len * sin(i) + (x_eye[1] + y_eye[1]) * chord_len,
+									(x_eye[2] + y_eye[2]) * chord_len);
+		glVertex3f(min_len * cos(i) - (x_eye[0] - y_eye[0]) * chord_len,
+				  min_len * sin(i) - (x_eye[1] - y_eye[1]) * chord_len,
+								 - (x_eye[2] - y_eye[2]) * chord_len);
+	}
+	glEnd();
+
+	CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f};
+	CPoint3D up_eye = {0.0f, 1.0f, 0.0f};
+	CPoint3D lookat_world;
+	CPoint3D up_world;
+	CPoint3D r;
+
+	Matrix4D mv_inv;
+
+	// Invert just the rotation portion of the modelview matrix.  We can't
+	// use InverseMatrix because it considers the translation factors.
+	// We don't want the translation factors because we want to transform
+	// a vector, and Rotate3DPt transforms only points (and not vectors).
+	mv_inv[0][0] = m[0];
+	mv_inv[0][1] = m[4];
+	mv_inv[0][2] = m[8];
+	mv_inv[0][3] = 0.0f;
+	mv_inv[1][0] = m[1];
+	mv_inv[1][1] = m[5];
+	mv_inv[1][2] = m[9];
+	mv_inv[1][3] = 0.0f;
+	mv_inv[2][0] = m[2];
+	mv_inv[2][1] = m[6];
+	mv_inv[2][2] = m[10];
+	mv_inv[2][3] = 0.0f;
+	mv_inv[3][0] = 0.0f;
+	mv_inv[3][1] = 0.0f;
+	mv_inv[3][2] = 0.0f;
+	mv_inv[3][3] = 1.0f;
+
+	// Transform the eye space vectors to world coordinates, and find 
+	// a third vector to form a basis set.
+	Rotate3DPt(mv_inv, lookat_eye, &lookat_world);
+	Rotate3DPt(mv_inv, up_eye, &up_world);
+	CrossProduct3D(&lookat_world, &up_world, &r);
+
+	m[0] = r.x;
+	m[1] = r.y;
+	m[2] = r.z;
+	m[3] = 0.0f;
+
+	m[4] = up_world.x;
+	m[5] = up_world.y;
+	m[6] = up_world.z;
+	m[7] = 0.0f;
+
+	m[8] = lookat_world.x;
+	m[9] = lookat_world.y;
+	m[10] = lookat_world.z;
+	m[11] = 0.0f;
+
+	m[12] = m[13] = m[14] = 0.0f;
+	m[15] = 1.0f;
+
+	char angle_label[40];
+	sprintf(angle_label, "%.2f", angle * 180.f / 3.14159f);
+	glTranslatef(min_len * cos(angle * 0.5f),
+					 min_len * sin(angle * 0.5f), 0.0f);
+	glMultMatrixf(m);
+	float LabelSize = Prefs->GetAnnotationLabelSize();
+	glTranslatef(-0.175f + chord_len, 0.0f, 0.0f);
+	glScalef(-0.1f*LabelSize, 0.1f*LabelSize, 0.1f);
+	glfDrawSolidString(angle_label);
+
+	glPopMatrix();
+
 }
