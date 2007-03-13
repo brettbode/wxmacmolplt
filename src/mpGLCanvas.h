@@ -234,6 +234,7 @@ class MpGLCanvas : public wxGLCanvas {
 		void ClosePeriodicDlg(void);
 		/* MpGLCanvas *GetParent(void) { return parent; } */
 		WinPrefs *GetPrefs(void) { return Prefs; }
+		void insertAnnotationMenuItems(wxMenu& menu);
 
 	DECLARE_EVENT_TABLE()
 

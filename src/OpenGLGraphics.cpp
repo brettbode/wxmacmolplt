@@ -2961,11 +2961,11 @@ void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1,
 	// Move out for the kind of bond that exists between the atoms.
 	glTranslatef(-offset - 0.01f, 0.0f, 0.0f);
 
-	glPointSize(5.0f);
-	glBegin(GL_POINTS);
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	glEnd();
+	// glPointSize(5.0f); 
+	// glBegin(GL_POINTS); 
+	// glColor3f(0.0f, 0.0f, 1.0f); 
+	// glVertex3f(0.0f, 0.0f, 0.0f); 
+	// glEnd(); 
 
 	glScalef(-0.1f * LabelSize, 0.1f * LabelSize, 0.1f);
 	

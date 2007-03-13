@@ -945,7 +945,7 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 				select_stack[select_stack_top % 4] = select_id;
 				select_stack_top = (select_stack_top + 1) % 5;
 			} else {
-				select_stack_top--;
+				select_stack_top = 0;
 			}
 
 			// printf("select_stack_top: %d\n", select_stack_top); 
@@ -958,7 +958,8 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 				long atom1 = lBonds[i].Atom1;
 				long atom2 = lBonds[i].Atom2;
 
-				if (lAtoms[atom1].GetSelectState() && lAtoms[atom2].GetSelectState())
+				if (lAtoms[atom1].GetSelectState() &&
+					lAtoms[atom2].GetSelectState())
 					lBonds[i].SetSelectState(newstate);
 			}
 		}
@@ -988,15 +989,15 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 		MolWin->SetHighliteMode(result);
 	} else {
 		lFrame->resetAllSelectState();
+		select_stack_top = 0;
 		MolWin->SetHighliteMode(false);
 	}
-	// std::cerr << "selectid = " << select_id << " top = " << select_stack_top << std::endl;
-	// std::cerr << "select stack " << select_stack[0] << "  " << select_stack[1] << "  " << 
-	// select_stack[2] << "  " << select_stack[3] << std::endl;
+
 	glMatrixMode(GL_MODELVIEW);
 }
 
 void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
+
 	wxMenu menu;
 	wxMenuItem *item;
 	wxMenu *submenu;
@@ -1006,10 +1007,15 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 	submenu = new wxMenu();
 	wxString length_label;
 
+	if (isAtom) {
+		insertAnnotationMenuItems(menu);
+		menu.AppendSeparator();
+	}
+
 	// If a bond is clicked on, we show some bond specific items, like
 	// the length of the bond and the order.
 	if (!isAtom) {
-		length_label.Printf(wxT("Bond length): %f"),
+		length_label.Printf(wxT("Bond length: %f"),
 			lFrame->GetBondLength(selected - NumAtoms));
 		item = menu.Append(wxID_ANY, length_label);
 		item->Enable(false);
@@ -1045,12 +1051,11 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 }
 //make a popup menu editing the objets in the scene
 
-void MpGLCanvas::measurePopupMenu(int x, int y) {
+void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 
 	wxMenuItem *item;
-
-	wxMenu menu;
 	Frame *lFrame = mMainData->cFrame;
+
 	if ((selected >= 0) && (selected < lFrame->GetNumAtoms())) {
 		wxString aLabel, nItem;
 		Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType()-1, nItem);
@@ -1081,15 +1086,44 @@ void MpGLCanvas::measurePopupMenu(int x, int y) {
 					item = menu.Append(wxID_ANY, lengthString);
 					item->Enable(false);
 				}
-				menu.Append(GL_Popup_Measure_Length, wxT("Display length"));
-				if (lFrame->BondExists(select_stack[0], select_stack[1]) < 0) {
-					menu.AppendSeparator();
-					wxMenu * submenu = new wxMenu();
+				menu.Append(GL_Popup_Measure_Length, wxT("Measure length"));
+				
+				menu.AppendSeparator();
+				wxMenu * submenu = new wxMenu();
+				int bond_id = lFrame->BondExists(select_stack[0],
+												select_stack[1]);
+
+				if (bond_id < 0) {
 					submenu->Append(GL_Popup_To_Hydrogen_Bond, wxT("Hydrogen"));
 					submenu->Append(GL_Popup_To_Single_Bond, wxT("Single"));
 					submenu->Append(GL_Popup_To_Double_Bond, wxT("Double"));
 					submenu->Append(GL_Popup_To_Triple_Bond, wxT("Triple"));
 					menu.Append(wxID_ANY, wxT("Add bond"), submenu);
+				} else {
+					wxMenuItem *item;
+					int bond_order = lFrame->Bonds[bond_id].Order;
+					item = submenu->AppendRadioItem(GL_Popup_To_Hydrogen_Bond,
+													wxT("Hydrogen"));
+					if (bond_order == kHydrogenBond) {
+						item->Check(true);
+					}
+					item = submenu->AppendRadioItem(GL_Popup_To_Single_Bond,
+													wxT("Single"));
+					if (bond_order == kSingleBond) {
+						item->Check(true);
+					}
+					item = submenu->AppendRadioItem(GL_Popup_To_Double_Bond,
+													wxT("Double"));
+					if (bond_order == kDoubleBond) {
+						item->Check(true);
+					}
+					item = submenu->AppendRadioItem(GL_Popup_To_Triple_Bond,
+													wxT("Triple"));
+					if (bond_order == kTripleBond) {
+						item->Check(true);
+					}
+
+					menu.Append(wxID_ANY, wxT("Change bond"), submenu);
 				}
 			}
 				break;
@@ -1104,7 +1138,13 @@ void MpGLCanvas::measurePopupMenu(int x, int y) {
 				printf("ouch\n");
 		}
 	}
+}
 
+void MpGLCanvas::measurePopupMenu(int x, int y) {
+
+	wxMenu menu;
+
+	insertAnnotationMenuItems(menu);
 	PopupMenu(&menu, x, y);
 
 }
@@ -1195,11 +1235,11 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 	// that generates the call. It will set the bond type of the selected bond
 	// to the desired order, creating a new bond if one didn't exist.
 	
+	Bond *bond;
 	Frame *lFrame = mMainData->cFrame;
 	BondOrder order = (BondOrder) ((event.GetId() - GL_Popup_To_Hydrogen_Bond) + kHydrogenBond);
 	
 	if (selected >= lFrame->GetNumAtoms()) {	//existing bond, change order
-		Bond *bond;
 		bond = &(lFrame->Bonds[selected - lFrame->GetNumAtoms()]);
 		bond->Order = order;
 		MolWin->BondsChanged();
@@ -1208,7 +1248,13 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 		lFrame->Atoms[bond->Atom1].SetSelectState(true);
 		lFrame->Atoms[bond->Atom2].SetSelectState(true);
 	} else if (select_stack_top == 2) { //new bond
-		lFrame->AddBond(select_stack[0], select_stack[1], order);
+		int bond_id = lFrame->BondExists(select_stack[0], select_stack[1]);
+		if (bond_id >= 0) {
+			bond = &(lFrame->Bonds[bond_id]);
+			bond->Order = order;
+		} else {
+			lFrame->AddBond(select_stack[0], select_stack[1], order);
+		}
 		MolWin->BondsChanged();
 		lFrame->resetAllSelectState();
 		lFrame->Bonds[lFrame->GetNumBonds() - 1].SetSelectState(true);
