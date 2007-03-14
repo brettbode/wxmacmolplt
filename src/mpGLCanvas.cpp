@@ -945,13 +945,21 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 				select_stack[select_stack_top % 4] = select_id;
 				select_stack_top = (select_stack_top + 1) % 5;
 			} else {
-				select_stack_top = 0;
+				if (select_stack_top > 0) {
+					if (select_id == select_stack[select_stack_top - 1]) {
+						printf("removing last inserted.\n");
+						select_stack_top--;
+					} else {
+						printf("removing all.\n");
+						select_stack_top = 0;
+					}
+				}
 			}
 
-			// printf("select_stack_top: %d\n", select_stack_top); 
-			// for (int i = 0; i < select_stack_top; i++) { 
-				// printf("select_stack[%d]: %d\n", i, select_stack[i]); 
-			// } 
+			printf("select_stack_top: %d\n", select_stack_top);
+			for (int i = 0; i < select_stack_top; i++) {
+				printf("select_stack[%d]: %d\n", i, select_stack[i]);
+			}
 
 			// If atom selections change, so might their bonds.
 			for (int i = 0; i < lFrame->NumBonds; i++) {
