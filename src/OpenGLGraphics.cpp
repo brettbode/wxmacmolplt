@@ -1295,6 +1295,28 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		Matrix4D plane2xy;
 		float angle;
 		std::vector<AnnotateDihedral>::iterator anno;
+		GLuint stipple_tex;
+
+		float stipple_data[64] = {
+			0, 0, 1, 0, 0, 0, 1, 0,
+			1, 0, 0, 0, 1, 0, 0, 0,
+			0, 0, 1, 0, 0, 0, 1, 0,
+			1, 0, 0, 0, 1, 0, 0, 0,
+			0, 0, 1, 0, 0, 0, 1, 0,
+			1, 0, 0, 0, 1, 0, 0, 0,
+			0, 0, 1, 0, 0, 0, 1, 0,
+			1, 0, 0, 0, 1, 0, 0, 0,
+		};
+		glGenTextures(1, &stipple_tex);
+		glBindTexture(GL_TEXTURE_2D, stipple_tex);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 8, 8, 0, GL_ALPHA,
+			GL_FLOAT, stipple_data);
+
 
 		glDisable(GL_LIGHTING);
 
@@ -1330,13 +1352,20 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			SetPlaneRotation(plane2xy, vec2, vec1);
 
 			// Draw a half circle in the first plane.
+			glEnable(GL_ALPHA_TEST);
+			glAlphaFunc(GL_GREATER, 0.5f);
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, stipple_tex);
+
 			glPushMatrix();
 			glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
 			glMultMatrixf((GLfloat *) plane2xy);
-			glColor4f(1.0f, 0.0f, 0.0f, 0.1f);
+			glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
 			glBegin(GL_TRIANGLE_FAN);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(0.0f, 0.0f, 0.0f);
 			for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
+				glTexCoord2f(cos(angle) * 5.0f, sin(angle) * 5.0f);
 				glVertex3f(cos(angle), sin(angle), 0.0f);
 			}
 			glEnd();
@@ -1358,14 +1387,18 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			glPushMatrix();
 			glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
 			glMultMatrixf((GLfloat *) plane2xy);
-			glColor4f(0.0f, 1.0f, 0.0f, 0.1f);
+			glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
 			glBegin(GL_TRIANGLE_FAN);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(0.0f, 0.0f, 0.0f);
 			for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
+				glTexCoord2f(cos(angle) * 5.0f, sin(angle) * 5.0f);
 				glVertex3f(cos(angle), sin(angle), 0.0f);
 			}
 			glEnd();
 			glPopMatrix();
+			glDisable(GL_TEXTURE_2D);
+			glDisable(GL_ALPHA_TEST);
 
 			// Okay, we've drawn the planes.  Now we want to draw an angle
 			// annotation between them.  The angle annotation should span 
@@ -2948,7 +2981,6 @@ void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1,
 
 	char len_label[40];
 	float LabelSize = Prefs->GetAnnotationLabelSize();
-	printf("LabelSize: %f\n", LabelSize);
 
 	// We move the midpoint of the line and align the viewer to draw the 
 	// text.
@@ -2960,12 +2992,6 @@ void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1,
 
 	// Move out for the kind of bond that exists between the atoms.
 	glTranslatef(-offset - 0.01f, 0.0f, 0.0f);
-
-	// glPointSize(5.0f); 
-	// glBegin(GL_POINTS); 
-	// glColor3f(0.0f, 0.0f, 1.0f); 
-	// glVertex3f(0.0f, 0.0f, 0.0f); 
-	// glEnd(); 
 
 	glScalef(-0.1f * LabelSize, 0.1f * LabelSize, 0.1f);
 	
