@@ -518,7 +518,7 @@ void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 	long natoms = lFrame->GetNumAtoms();
 	for (int i=(natoms-1); i>=0; i--) {
 		if (lFrame->GetAtomSelectState(i)) {
-			lFrame->DeleteAtom(i);
+			MainData->DeleteAtom(i);
 			coordGrid->DeleteRows(i, 1, true);
 		}
 	}

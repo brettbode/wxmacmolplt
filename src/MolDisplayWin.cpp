@@ -56,7 +56,6 @@ using namespace std;
 //They are custom ids used to tie the event table to the menus
 
 #define ID_LOCAL_PREFERENCES 501
-//temporarily put ID definitions here   -Song Li
 
 enum MMP_EventID {
 	MMP_SHRINK10=wxID_HIGHEST+1,
@@ -75,6 +74,11 @@ enum MMP_EventID {
 	MMP_DISPLAYMODESUBMENU,
 	MMP_WIREFRAMEMODE,
 	MMP_BALLANDSTICKMODE,
+	MMP_ANNOTATIONSSUBMENU,
+	MMP_ADDLENGTHANNOTATION,
+	MMP_ADDANGLEANNOTATION,
+	MMP_ADDDIHEDRALANNOTATION,
+	MMP_DELETEALLANNOTATIONS,
 	MMP_CENTER,
 	MMP_ROTATESUBMENU,
 	MMP_ROTATETOXAXIS,
@@ -157,6 +161,14 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_SHOWATOMLABELS,   MolDisplayWin::menuViewShowAtomLabel)
 	EVT_MENU (MMP_SHOWATOMNUMBER,   MolDisplayWin::menuViewShowAtomNumber)
 	EVT_MENU (MMP_BOTHATOMLABELS,   MolDisplayWin::menuViewShowBothAtomLabels)
+	EVT_MENU (MMP_ADDLENGTHANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
+	EVT_MENU (MMP_ADDANGLEANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
+	EVT_MENU (MMP_ADDDIHEDRALANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
+	EVT_UPDATE_UI(MMP_ADDLENGTHANNOTATION, MolDisplayWin::OnAnnotationLengthUpdate )
+	EVT_UPDATE_UI(MMP_ADDANGLEANNOTATION, MolDisplayWin::OnAnnotationAngleUpdate )
+	EVT_UPDATE_UI(MMP_ADDDIHEDRALANNOTATION, MolDisplayWin::OnAnnotationDihedralUpdate )
+	EVT_MENU (MMP_DELETEALLANNOTATIONS,   MolDisplayWin::menuViewDeleteAllAnnotations)
+	EVT_UPDATE_UI(MMP_DELETEALLANNOTATIONS, MolDisplayWin::OnDeleteAnnotationsUpdate )
 	EVT_MENU (MMP_SHOWPATTERN,		MolDisplayWin::menuViewShow2DPattern)
 	EVT_MENU (MMP_WIREFRAMEMODE,	MolDisplayWin::menuViewWireFrameStyle)
 	EVT_MENU (MMP_BALLANDSTICKMODE,	MolDisplayWin::menuViewBallAndStickStyle)
@@ -484,8 +496,15 @@ void MolDisplayWin::createMenuBar(void) {
 	
 	menuViewStyle = new wxMenu;
 	menuView->Append(MMP_DISPLAYMODESUBMENU, wxT("&Display Style"), menuViewStyle);
-	menuViewStyle->AppendRadioItem(MMP_WIREFRAMEMODE, wxT("Wire Frame"));
+	menuViewStyle->AppendRadioItem(GL_Popup_Measure_Length, wxT("Wire Frame"));
 	menuViewStyle->AppendRadioItem(MMP_BALLANDSTICKMODE, wxT("Ball and Stick"));
+
+	menuViewAnnotations = new wxMenu;
+	menuViewAnnotations->Append(MMP_ADDLENGTHANNOTATION, _("Display &Length"), _("Select 2 atoms then right-click on one of them"));
+	menuViewAnnotations->Append(MMP_ADDANGLEANNOTATION, _("Display &Angle"), _("Select 3 atoms then right-click on one of them"));
+	menuViewAnnotations->Append(MMP_ADDDIHEDRALANNOTATION, _("Display Di&hedral"), _("Select 4 atoms then right-click on one of them"));
+	menuViewAnnotations->Append(MMP_DELETEALLANNOTATIONS, _("&Delete all annotations"), _("Remove all annotations or right-click on the annotation"));
+	menuView->Append(MMP_ANNOTATIONSSUBMENU, _("&Annotations"), menuViewAnnotations, _("Annotate the molecule display"));
 	
 	menuView->Append(MMP_ANIMATEFRAMES, wxT("Animate &Frames\tCtrl+F"), wxT("Run through the geometries producing an animation"));
 	menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl-down"), _T("Reduce size by 10%"));
@@ -554,6 +573,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuView->Enable(MMP_PREVMODE, false);
 	menuView->Enable(MMP_NEXTMODE, false);
 	menuView->Enable(MMP_OFFSETMODE, false);
+	menuView->Enable(MMP_ANNOTATIONSSUBMENU, false);
 	menuView->Enable(MMP_ANIMATEFRAMES, false);
 #ifdef ENABLE_SHOWSYMMETRY_MODE
 	menuView->Enable(MMP_SHOWSYMMETRYOPERATOR, false);
@@ -601,6 +621,7 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuMolecule->Enable(MMP_ENERGYEDIT, true);
 		menuMolecule->Enable(MMP_SETBONDLENGTH, true);
 		menuFile->Enable(MMP_EXPORT, true);
+		menuView->Enable(MMP_ANNOTATIONSSUBMENU, true);
 	}
 	if (MainData->NumFrames > 1 ) {
 		menuFile->Enable(MMP_DELETEFRAME, true);
@@ -644,6 +665,18 @@ void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event ) {
 			wxTheClipboard->Close();
 		}
 	}
+}
+void MolDisplayWin::OnAnnotationLengthUpdate( wxUpdateUIEvent& event ) {
+	event.Enable(glCanvas->NumberSelectedAtoms()==2);
+}
+void MolDisplayWin::OnAnnotationAngleUpdate( wxUpdateUIEvent& event ) {
+	event.Enable(glCanvas->NumberSelectedAtoms()==3);
+}
+void MolDisplayWin::OnAnnotationDihedralUpdate( wxUpdateUIEvent& event ) {
+	event.Enable(glCanvas->NumberSelectedAtoms()==4);
+}
+void MolDisplayWin::OnDeleteAnnotationsUpdate( wxUpdateUIEvent& event ) {
+	event.Enable(MainData->GetAnnotationCount() > 0);
 }
 
 /* Event handler functions */
@@ -1759,6 +1792,14 @@ void MolDisplayWin::menuViewShowBothAtomLabels(wxCommandEvent &event)
 	Prefs->ShowAtomNumberLabels(true);
 	UpdateModelDisplay();
 	Dirty = true;
+}
+void MolDisplayWin::menuViewAddAnnotation(wxCommandEvent &event) {
+	wxCommandEvent foo;
+	foo.SetId(event.GetId()-MMP_ADDLENGTHANNOTATION+GL_Popup_Measure_Length);
+	glCanvas->AddAnnotation(foo);
+}
+void MolDisplayWin::menuViewDeleteAllAnnotations(wxCommandEvent &event) {
+	MainData->DeleteAllAnnotations();
 }
 
 void MolDisplayWin::menuViewShow2DPattern(wxCommandEvent &event)

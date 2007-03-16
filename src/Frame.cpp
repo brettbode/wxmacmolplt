@@ -427,33 +427,6 @@ void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any highe
 			}
 		}	//Delete any orbitals and normal modes
 
-		// We need to see if any annotations are affected by this delete.  An
-		// annotation may reference the atom, in which case we delete the
-		// annotation, or it may reference an atom with an index greater than the
-		// one being deleted, in which case we must adjust the annotation's IDs.
-		std::vector<AnnotateLength>::iterator length_anno;
-		length_anno = AnnoLengths.begin();
-		for (length_anno = AnnoLengths.begin();
-			  length_anno != AnnoLengths.end(); ) {
-			if (length_anno->containsAtom(AtomNum)) {
-				length_anno = AnnoLengths.erase(length_anno);
-			} else {
-				length_anno->adjustIDs(AtomNum);
-				length_anno++;
-			}
-		}
-
-		std::vector<AnnotateAngle>::iterator angle_anno;
-		for (angle_anno = AnnoAngles.begin();
-			  angle_anno != AnnoAngles.end(); ) {
-			if (angle_anno->containsAtom(AtomNum)) {
-				angle_anno = AnnoAngles.erase(angle_anno);
-			} else {
-				angle_anno->adjustIDs(AtomNum);
-				angle_anno++;
-			}
-		}
-
 		if (Vibs) {
 			delete Vibs;
 			Vibs = NULL;
@@ -682,7 +655,7 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 		}
 	}
 } /* SetBonds */
-long Frame::BondExists(long a1, long a2) {
+long Frame::BondExists(long a1, long a2) const {
 	long result = -1;
 
 	for (long i=0; i<NumBonds; i++) {

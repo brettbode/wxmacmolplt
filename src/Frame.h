@@ -67,10 +67,6 @@ class Frame {
 		Surface *	SurfaceList;
 		GradientData *	Gradient;
 
-		std::vector<AnnotateLength> AnnoLengths;
-		std::vector<AnnotateAngle> AnnoAngles;
-		std::vector<AnnotateDihedral> AnnoDihedrals;
-
 		Frame *		NextFrame;
 		Frame *		PreviousFrame;
 
@@ -117,7 +113,7 @@ class Frame {
 		mpAtom * AddAtom(long AtomType, CPoint3D AtomPosition);
 		bool IncreaseAtomAllocation(long NumAdditional);
 			//BondExists returns the id of the bond, -1 otherwise
-		long BondExists(long atom1, long atom2);
+		long BondExists(long atom1, long atom2) const;
 		void DeleteAtom(long AtomNum);
 			//AddBond validates the two atom references and increases the BondAllocation as
 			//necessary, but does not check the uniqueness of the bond
@@ -140,13 +136,13 @@ class Frame {
 		bool GetBondAngle(long atom1, long BondAtom, long AngleAtom, float * angle);
 		bool GetBondDihedral(long atom1, long BondAtom, long AngleAtom, long DihedralAtom,
 			float * angle);
-		inline bool GetBondSelectState(long BondNum) {return ((BondNum<NumBonds)?Bonds[BondNum].GetSelectState():false);};
+		inline bool GetBondSelectState(long BondNum) const {return ((BondNum<NumBonds)?Bonds[BondNum].GetSelectState():false);};
 		inline void SetBondSelectState(long BondNum, bool state)
 			{if (BondNum<NumBonds) Bonds[BondNum].SetSelectState(state);};
-		inline bool GetAtomSelectState(long AtomNum) {return ((AtomNum<NumAtoms)?Atoms[AtomNum].GetSelectState():false);};
+		inline bool GetAtomSelectState(long AtomNum) const {return ((AtomNum<NumAtoms)?Atoms[AtomNum].GetSelectState():false);};
 		inline void SetAtomSelectState(long AtomNum, bool state)
 			{if (AtomNum<NumAtoms) Atoms[AtomNum].SetSelectState(state);};
-		inline BondOrder GetBondOrder(long BondNum) {return Bonds[BondNum].Order;};
+		inline BondOrder GetBondOrder(long BondNum) const {return Bonds[BondNum].Order;};
 		long GetNumElectrons(void) const;
 		inline void SetBondOrder(long BondNum, BondOrder NewOrder) {Bonds[BondNum].Order = NewOrder;};
 		void ParseGAMESSGuessVectors(BufferFile * Buffer, long NumFuncs, TypeOfWavefunction t, Progress * lProgress);

@@ -39,7 +39,7 @@ class OpenGLRec {
 		bool			MainListActive;
 		bool			SurfaceListActive;
 		bool			haveTransparentSurfaces;
-		GLuint length_anno_tex_id;
+		GLuint			length_anno_tex_id;
 		
 		OpenGLRec(void);
 		~OpenGLRec(void);
@@ -120,16 +120,17 @@ private:
  */
 class MolDisplayWin : public wxFrame {
 	private:
-		wxMenuBar *menuBar;
-		wxMenu    *menuFile;
-		wxMenu    *menuEdit;
-		wxMenu    *menuView;
-		wxMenu    *menuViewLabels;
-		wxMenu    *menuViewStyle;
-		wxMenu    *menuViewRotate;
-		wxMenu    *menuMolecule;
-		wxMenu    *menuWindow;
-		wxMenu    *menuHelp;
+		wxMenuBar	*menuBar;
+		wxMenu		*menuFile;
+		wxMenu		*menuEdit;
+		wxMenu		*menuView;
+		wxMenu		*menuViewLabels;
+		wxMenu		*menuViewStyle;
+		wxMenu		*menuViewAnnotations;
+		wxMenu		*menuViewRotate;
+		wxMenu		*menuMolecule;
+		wxMenu		*menuWindow;
+		wxMenu		*menuHelp;
 
 		wxString		currFilePath;
 		MoleculeData	*MainData;
@@ -247,6 +248,12 @@ class MolDisplayWin : public wxFrame {
 		void menuViewShowAtomLabel(wxCommandEvent &event);
 		void menuViewShowAtomNumber(wxCommandEvent &event);
 		void menuViewShowBothAtomLabels(wxCommandEvent &event);
+		void menuViewAddAnnotation(wxCommandEvent &event);
+		void OnAnnotationLengthUpdate(wxUpdateUIEvent &event);
+		void OnAnnotationAngleUpdate(wxUpdateUIEvent &event);
+		void OnAnnotationDihedralUpdate(wxUpdateUIEvent &event);
+		void menuViewDeleteAllAnnotations(wxCommandEvent &event);
+		void OnDeleteAnnotationsUpdate(wxUpdateUIEvent &event);
 		void menuViewShow2DPattern(wxCommandEvent &event);
 		void menuViewWireFrameStyle(wxCommandEvent &event);
 		void menuViewBallAndStickStyle(wxCommandEvent &event);
@@ -364,12 +371,9 @@ class MolDisplayWin : public wxFrame {
 		void PrintGL(wxDC * dc, const float & scaleFactor);
 		void SetHighliteMode(bool state) { mHighliteState = state; }
 		void DrawStaticLabel(const char* label, GLfloat x, GLfloat y);
-		void DrawLabel(void); //added by Song Li
+		void DrawLabel(void);
 		void SelectionChanged(bool mode);
-		void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, float m[16],
-								const CPoint3D& x_world, float bond_size) const;
-		void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
-								 const CPoint3D *pt3);
+		GLuint GetLengthTexId(void) const {return OpenGLData->length_anno_tex_id;};
 
 		void eventSize(wxSizeEvent &event);
 		void SizeChanged(void);

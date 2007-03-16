@@ -47,6 +47,7 @@ MoleculeData::MoleculeData(void) {
 	DrawLabels = 0;
 }
 MoleculeData::~MoleculeData(void) {
+	DeleteAllAnnotations();
 	while (Frames) {
 		cFrame = Frames->GetNextFrame();
 		delete Frames;
@@ -1187,8 +1188,27 @@ bool MoleculeData::ModeVisible(void) const {
 long MoleculeData::GetNumBonds(void) const {
 	return cFrame->GetNumBonds();
 }
-void MoleculeData::DeleteAtom(long AtomNum) {
-	cFrame->DeleteAtom(AtomNum);
+void MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
+	if (allFrames) {
+		Frame * lFrame = Frames;
+		while (lFrame) {
+			lFrame->DeleteAtom(AtomNum);
+			lFrame = lFrame->NextFrame;
+		}
+	} else
+		cFrame->DeleteAtom(AtomNum);
+	std::vector<Annotation *>::iterator anno;
+	anno = Annotations.begin();
+	for (anno = Annotations.begin(); anno != Annotations.end(); ) {
+		if ((*anno)->containsAtom(AtomNum)) {
+			delete (*anno);
+			anno = Annotations.erase(anno);
+		} else {
+			(*anno)->adjustIds(AtomNum);
+			anno++;
+		}
+	}
+	
 	ResetRotation();
 }
 bool MoleculeData::ValidAtom(long AtomNum) {
@@ -1197,4 +1217,13 @@ bool MoleculeData::ValidAtom(long AtomNum) {
 AtomTypeList * MoleculeData::GetAtomTypes(void) {return cFrame->GetAtomTypes();}
 long MoleculeData::GetNumBasisFunctions(void) const {
 	return ((Basis!=NULL)?Basis->NumFuncs : 0);
+}
+void MoleculeData::DeleteAllAnnotations(void) {
+	std::vector<Annotation *>::const_iterator anno;
+	anno = Annotations.begin();
+	for (anno = Annotations.begin(); anno != Annotations.end(); ) {
+		delete (*anno);
+		anno++;
+	}
+	Annotations.clear();
 }

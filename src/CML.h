@@ -102,6 +102,7 @@ enum MMP_MetadataNamespace {
 	MMP_InternalCoordinates,
 	MMP_BasisSet,
 	MMP_InputOptions,
+	MMP_Annotations,
 	MMP_Preferences,
 	MMP_WindowData,
 	MMP_Use3DMode,
@@ -441,6 +442,20 @@ enum MMP_WindowDataNS {
 	NumberMMPWindowDataItems
 };
 
+#define kAnnotationXML "Annotation"
+#define kAnnAtom1XML "Atom-1"
+#define kAnnAtom2XML "Atom-2"
+#define kAnnAtom3XML "Atom-3"
+#define kAnnAtom4XML "Atom-4"
+enum MMP_AnnotationTypesNS {
+	MMP_InvalidAnnotation=0,
+	MMP_AnnotationLength,
+	MMP_AnnotationAngle,
+	MMP_AnnotationDihedral,
+	
+	NumberMMPAnnotationTypes
+};
+
 //convert enum to string
 const char * CML_convert(CML_Element t);
 const char * CML_convert(CML_Attribute t);
@@ -466,6 +481,7 @@ const char * CML_convert(MMP_IODFTGroupNS b);
 const char * CML_convert(MMP_IOStatPtGroupNS b);
 const char * CML_convert(MMP_WindowDataNS b);
 const char * CML_convert(MMP_BasisSetNS b);
+const char * CML_convert(MMP_AnnotationTypesNS b);
 const char * CML_TypetoName(short t);
 //convert string to enum id
 bool CML_convert(const char * s, CML_Element & t);
@@ -492,6 +508,7 @@ bool CML_convert(const char * s, MMP_IODFTGroupNS & b);
 bool CML_convert(const char * s, MMP_IOStatPtGroupNS & b);
 bool CML_convert(const char * s, MMP_WindowDataNS & b);
 bool CML_convert(const char * s, MMP_BasisSetNS & b);
+bool CML_convert(const char * s, MMP_AnnotationTypesNS & b);
 
 #endif
 

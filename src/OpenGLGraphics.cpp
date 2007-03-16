@@ -68,6 +68,10 @@ extern Boolean	gOpenGLAvailable;
 
 //#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
 
+void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, float m[16],
+						const CPoint3D& x_world, float offset, GLuint length_anno_tex_id, const WinPrefs * Prefs);
+void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
+						 const CPoint3D *pt3, const WinPrefs * Prefs);
 void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd, const float & lineWidth);
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order);
 void DrawInversionPoint(void);
@@ -807,6 +811,26 @@ void MolDisplayWin::DrawGL(void)
 			// OpenGLData->MainListActive = true; 
 		}
 	}
+	if (MainData->GetAnnotationCount() > 0) {
+		RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
+		long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
+		
+		//choose black or white based on the background color
+		if (backMagnitude > 70000)  //"light" background choose black
+			glColor3f (0.0, 0.0, 0.0);
+		else
+			glColor3f (1.0, 1.0, 1.0);
+		
+		std::vector<Annotation *>::const_iterator anno;
+		int anno_id = 0;
+		for (anno = MainData->Annotations.begin();
+			 anno != MainData->Annotations.end(); anno++) {
+			glLoadName(anno_id + MainData->cFrame->GetNumAtoms() + MainData->cFrame->GetNumBonds() + 1);
+			(*anno)->draw(this);
+			anno_id++;
+		}
+	}
+	
 		
 	if (MainData->ShowAxis()) AddAxisGL();
 
@@ -893,6 +917,280 @@ void MolDisplayWin::DrawGL(void)
 		glDisable(GL_BLEND);
 	}
 	glDisable(GL_LIGHTING);
+}
+void AnnotationLength::draw(const MolDisplayWin * win) const {
+	MoleculeData * maindata = win->GetData();
+	Frame * cFrame = maindata->GetCurrentFramePtr();
+	WinPrefs * Prefs = win->GetPrefs();
+	//validate the atom references for this frame
+	if ((atom_1 < 0)||(atom_1 >= cFrame->GetNumAtoms())) return;
+	if ((atom_2 < 0)||(atom_2 >= cFrame->GetNumAtoms())) return;
+
+	GLdouble modelview[16];
+	GLdouble proj[16];
+	GLint viewport[4];
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, proj);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	
+	CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f};
+	CPoint3D up_eye = {0.0f, 1.0f, 0.0f};
+	CPoint3D lookat_world;
+	CPoint3D up_world;
+	CPoint3D r;
+	float m[16];
+	Matrix4D mv_inv;
+
+	// What we want to do here is make the annotation always face the
+	// viewer.  The computations below compute a rotation matrix to align
+	// to the camera.  This only needs to be computed once for all
+	// annotations since the camera doesn't change positions.
+
+	// Invert just the rotation portion of the modelview matrix.  This is
+	// much faster than inverting an arbitrary matrix.
+	mv_inv[0][0] = modelview[0];
+	mv_inv[0][1] = modelview[4];
+	mv_inv[0][2] = modelview[8];
+	mv_inv[0][3] = 0.0f;
+	mv_inv[1][0] = modelview[1];
+	mv_inv[1][1] = modelview[5];
+	mv_inv[1][2] = modelview[9];
+	mv_inv[1][3] = 0.0f;
+	mv_inv[2][0] = modelview[2];
+	mv_inv[2][1] = modelview[6];
+	mv_inv[2][2] = modelview[10];
+	mv_inv[2][3] = 0.0f;
+	mv_inv[3][0] = 0.0f;
+	mv_inv[3][1] = 0.0f;
+	mv_inv[3][2] = 0.0f;
+	mv_inv[3][3] = 1.0f;
+
+	// Transform the eye space vectors to world coordinates, and find 
+	// a third vector to form a basis set.
+	Rotate3DPt(mv_inv, lookat_eye, &lookat_world);
+	Rotate3DPt(mv_inv, up_eye, &up_world);
+	CrossProduct3D(&lookat_world, &up_world, &r);
+
+	m[0] = r.x;
+	m[1] = r.y;
+	m[2] = r.z;
+	m[3] = 0.0f;
+
+	m[4] = up_world.x;
+	m[5] = up_world.y;
+	m[6] = up_world.z;
+	m[7] = 0.0f;
+
+	m[8] = lookat_world.x;
+	m[9] = lookat_world.y;
+	m[10] = lookat_world.z;
+	m[11] = 0.0f;
+
+	m[12] = m[13] = m[14] = 0.0f;
+	m[15] = 1.0f;
+
+	// x_world will indicate what vector in world coordinates will effect
+	// a direction in the eye's x direction.  This is the direction in
+	// which the length label will appear.
+	CPoint3D x_eye;
+	CPoint3D x_world;
+	x_eye.x = 1.0f;
+	x_eye.y = 0.0f;
+	x_eye.z = 0.0f;
+	Rotate3DPt(mv_inv, x_eye, &x_world);
+
+	int bond_id;
+	float bond_size;
+
+	bond_id = cFrame->BondExists(atom_1, atom_2);
+
+	// If a bond exists between the two atoms, we need to push out the
+	// length label accordingly.
+	GLdouble BondSize = Prefs->GetQD3DBondWidth();
+	if (bond_id > -1) {
+		bond_size = BondSize / MAX(cFrame->GetBondOrder(bond_id), 1.0f) *
+		3.5f * cFrame->GetBondOrder(bond_id) / 2.0f;
+		if (cFrame->GetBondOrder(bond_id) > 1) {
+			bond_size *= 1.5;
+		}
+	} else {
+		bond_size = 0.0f;
+	}
+	
+	CPoint3D pt1, pt2;
+	cFrame->GetAtomPosition(atom_1, pt1);
+	cFrame->GetAtomPosition(atom_2, pt2);
+
+	// Draw the dashed line and label.
+	DashedQuadFromLine(pt1, pt2,
+					   BondSize * 0.25, m, x_world, bond_size, win->GetLengthTexId(), Prefs);
+}
+void AnnotationAngle::draw(const MolDisplayWin * win) const {
+	MoleculeData * maindata = win->GetData();
+	Frame * cFrame = maindata->GetCurrentFramePtr();
+
+	//validate the atom references for this frame
+	if ((atom_1 < 0)||(atom_1 >= cFrame->GetNumAtoms())) return;
+	if ((atom_2 < 0)||(atom_2 >= cFrame->GetNumAtoms())) return;
+	if ((atom_3 < 0)||(atom_3 >= cFrame->GetNumAtoms())) return;
+
+	CPoint3D atom1_pos, atom2_pos, atom3_pos;
+
+	glDisable(GL_LIGHTING);
+//	glColor3f(0.0f, 0.0f, 0.0f);
+
+	cFrame->GetAtomPosition(atom_1, atom1_pos);
+	cFrame->GetAtomPosition(atom_2, atom2_pos);
+	cFrame->GetAtomPosition(atom_3, atom3_pos);
+	
+	DrawAngleAnnotation(&atom1_pos, &atom2_pos, &atom3_pos, win->GetPrefs());
+	glEnable(GL_LIGHTING);
+}
+void AnnotationDihedral::draw(const MolDisplayWin * win) const {
+	MoleculeData * maindata = win->GetData();
+	Frame * cFrame = maindata->GetCurrentFramePtr();
+
+	//validate the atom references for this frame
+	if ((atom_1 < 0)||(atom_1 >= cFrame->GetNumAtoms())) return;
+	if ((atom_2 < 0)||(atom_2 >= cFrame->GetNumAtoms())) return;
+	if ((atom_3 < 0)||(atom_3 >= cFrame->GetNumAtoms())) return;
+	if ((atom_4 < 0)||(atom_4 >= cFrame->GetNumAtoms())) return;
+
+	CPoint3D atom1_pos;
+	CPoint3D atom2_pos;
+	CPoint3D atom3_pos;
+	CPoint3D atom4_pos;
+	CPoint3D vec1;
+	CPoint3D vec2;
+	CPoint3D normal1;
+	CPoint3D normal2;
+	CPoint3D binormal1;
+	CPoint3D binormal2;
+	Matrix4D plane2xy;
+	float angle;
+	GLuint stipple_tex;
+	
+	float stipple_data[64] = {
+		0, 0, 1, 0, 0, 0, 1, 0,
+		1, 0, 0, 0, 1, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 1, 0,
+		1, 0, 0, 0, 1, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 1, 0,
+		1, 0, 0, 0, 1, 0, 0, 0,
+		0, 0, 1, 0, 0, 0, 1, 0,
+		1, 0, 0, 0, 1, 0, 0, 0,
+	};
+	glGenTextures(1, &stipple_tex);
+	glBindTexture(GL_TEXTURE_2D, stipple_tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 8, 8, 0, GL_ALPHA,
+				 GL_FLOAT, stipple_data);
+	
+	
+	glDisable(GL_LIGHTING);
+	
+	glColor3f(0.0f, 0.0f, 0.0f);
+		
+	cFrame->GetAtomPosition(atom_1, atom1_pos);
+	cFrame->GetAtomPosition(atom_2, atom2_pos);
+	cFrame->GetAtomPosition(atom_3, atom3_pos);
+	cFrame->GetAtomPosition(atom_4, atom4_pos);
+	
+	// The first three atoms (1, 2, 3) form one plane.  The last three
+	// (2, 3, 4) form the second plane.  We want to find the angle
+	// between those two planes, for that is the dihedral angle.
+	
+	// Find the first plane's normal by finding the vectors between its
+	// points and calculating the normal from them.
+	vec1 = atom1_pos - atom3_pos;
+	Normalize3D(&vec1);
+	
+	vec2 = atom2_pos - atom3_pos;
+	Normalize3D(&vec2);
+	
+	CrossProduct3D(&vec1, &vec2, &normal1);
+	
+	// Make this plane look like the x-y plane for easier circle
+	// drawing.  The vector from atom3 to atom2 should look like
+	// the positive x-axis.
+	SetPlaneRotation(plane2xy, vec2, vec1);
+	
+	// Draw a half circle in the first plane.
+	glEnable(GL_ALPHA_TEST);
+	glAlphaFunc(GL_GREATER, 0.5f);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, stipple_tex);
+	
+	glPushMatrix();
+	glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
+	glMultMatrixf((GLfloat *) plane2xy);
+	glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
+	glBegin(GL_TRIANGLE_FAN);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
+		glTexCoord2f(cos(angle) * 5.0f, sin(angle) * 5.0f);
+		glVertex3f(cos(angle), sin(angle), 0.0f);
+	}
+	glEnd();
+	glPopMatrix();
+	
+	// Find the second plane.  The two planes share a vector between
+	// atoms 2 and 3, so we just reuse that from the first plane.
+	vec1 = atom4_pos - atom3_pos;
+	Normalize3D(&vec2);
+	
+	CrossProduct3D(&vec1, &vec2, &normal2);
+	
+	// Make this plane look like the x-y plane for easier circle
+	// drawing.  The vector from atom3 to atom2 should look like
+	// the positive x-axis.
+	SetPlaneRotation(plane2xy, vec2, vec1);
+	
+	// Draw a half circle in the second plane.
+	glPushMatrix();
+	glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
+	glMultMatrixf((GLfloat *) plane2xy);
+	glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
+	glBegin(GL_TRIANGLE_FAN);
+	glTexCoord2f(0.0f, 0.0f);
+	glVertex3f(0.0f, 0.0f, 0.0f);
+	for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
+		glTexCoord2f(cos(angle) * 5.0f, sin(angle) * 5.0f);
+		glVertex3f(cos(angle), sin(angle), 0.0f);
+	}
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_ALPHA_TEST);
+	
+	// Okay, we've drawn the planes.  Now we want to draw an angle
+	// annotation between them.  The angle annotation should span 
+	// from the midpoint on one half-circle's arc to the midpoint on
+	// the other half circles arc.  These can be found by considering
+	// the vector between atoms 2 and 3 as the tangent vector, and
+	// find the the binormal as the crossproduct of tangent and normal.
+	CrossProduct3D(&vec2, &normal1, &binormal1);
+	CrossProduct3D(&vec2, &normal2, &binormal2);
+	
+	Normalize3D(&binormal1);
+	Normalize3D(&binormal2);
+	
+	// Figure out the actual points from the vector displacements.
+	CPoint3D pt1 = atom3_pos + binormal1;
+	CPoint3D pt3 = atom3_pos + binormal2;
+	
+	// CreateCylinderFromLine(qobj, atom3_pos, pt1, 0.1f); 
+	// CreateCylinderFromLine(qobj, atom3_pos, pt3, 0.1f); 
+	
+	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+	DrawAngleAnnotation(&pt1, &atom3_pos, &pt3, win->GetPrefs());
+	
+	glEnable(GL_LIGHTING);
 }
 
 void MolDisplayWin::DrawStaticLabel(const char* label, GLfloat x, GLfloat y)
@@ -1152,280 +1450,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
 	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
-
-	//choose black or white based on the background color
-	if (backMagnitude > 70000)  //"light" background choose black
-		glColor3f (0.0, 0.0, 0.0);
-	else
-		glColor3f (1.0, 1.0, 1.0);
-
-	if (!lFrame->AnnoLengths.empty()) {
-		CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f};
-		CPoint3D up_eye = {0.0f, 1.0f, 0.0f};
-		CPoint3D lookat_world;
-		CPoint3D up_world;
-		CPoint3D r;
-		float m[16];
-		Matrix4D mv_inv;
-
-		// What we want to do here is make the annotation always face the
-		// viewer.  The computations below compute a rotation matrix to align
-		// to the camera.  This only needs to be computed once for all
-		// annotations since the camera doesn't change positions.
-
-		// Invert just the rotation portion of the modelview matrix.  This is
-		// much faster than inverting an arbitrary matrix.
-		mv_inv[0][0] = modelview[0];
-		mv_inv[0][1] = modelview[4];
-		mv_inv[0][2] = modelview[8];
-		mv_inv[0][3] = 0.0f;
-		mv_inv[1][0] = modelview[1];
-		mv_inv[1][1] = modelview[5];
-		mv_inv[1][2] = modelview[9];
-		mv_inv[1][3] = 0.0f;
-		mv_inv[2][0] = modelview[2];
-		mv_inv[2][1] = modelview[6];
-		mv_inv[2][2] = modelview[10];
-		mv_inv[2][3] = 0.0f;
-		mv_inv[3][0] = 0.0f;
-		mv_inv[3][1] = 0.0f;
-		mv_inv[3][2] = 0.0f;
-		mv_inv[3][3] = 1.0f;
-
-		// Transform the eye space vectors to world coordinates, and find 
-		// a third vector to form a basis set.
-		Rotate3DPt(mv_inv, lookat_eye, &lookat_world);
-		Rotate3DPt(mv_inv, up_eye, &up_world);
-		CrossProduct3D(&lookat_world, &up_world, &r);
-
-		m[0] = r.x;
-		m[1] = r.y;
-		m[2] = r.z;
-		m[3] = 0.0f;
-
-		m[4] = up_world.x;
-		m[5] = up_world.y;
-		m[6] = up_world.z;
-		m[7] = 0.0f;
-
-		m[8] = lookat_world.x;
-		m[9] = lookat_world.y;
-		m[10] = lookat_world.z;
-		m[11] = 0.0f;
-
-		m[12] = m[13] = m[14] = 0.0f;
-		m[15] = 1.0f;
-
-		// x_world will indicate what vector in world coordinates will effect
-		// a direction in the eye's x direction.  This is the direction in
-		// which the length label will appear.
-		CPoint3D x_eye;
-		CPoint3D x_world;
-		x_eye.x = 1.0f;
-		x_eye.y = 0.0f;
-		x_eye.z = 0.0f;
-		Rotate3DPt(mv_inv, x_eye, &x_world);
-
-		int atom1_id, atom2_id;
-		int bond_id;
-		float bond_size;
-
-		for (long anno_id = 0; anno_id < lFrame->AnnoLengths.size(); anno_id++) {
-			atom1_id = lFrame->AnnoLengths[anno_id].getAtom1ID();
-			atom2_id = lFrame->AnnoLengths[anno_id].getAtom2ID();
-			bond_id = lFrame->BondExists(atom1_id, atom2_id);
-
-			// If a bond exists between the two atoms, we need to push out the
-			// length label accordingly.
-			if (bond_id > -1) {
-				bond_size = BondSize / MAX(lBonds[bond_id].Order, 1.0f) *
-					3.5f * lBonds[bond_id].Order / 2.0f;
-				if (lBonds[bond_id].Order > 1) {
-					bond_size *= 1.5;
-				}
-			} else {
-				bond_size = 0.0f;
-			}
-
-			// Draw the dashed line and label.
-			glLoadName(anno_id + NumAtoms + NumBonds + 1);
-			DashedQuadFromLine(lFrame->Atoms[atom1_id].Position,
-									 lFrame->Atoms[atom2_id].Position,
-									 BondSize * 0.25, m, x_world, bond_size);
-		}
-	}
-
-	if (!lFrame->AnnoAngles.empty()) {
-		CPoint3D atom1_pos;
-		CPoint3D atom2_pos;
-		CPoint3D atom3_pos;
-		std::vector<AnnotateAngle>::iterator anno;
-		int anno_id;
-
-		glDisable(GL_LIGHTING);
-		glColor3f(0.0f, 0.0f, 0.0f);
-		for (anno = lFrame->AnnoAngles.begin(), anno_id = 0;
-			 anno != lFrame->AnnoAngles.end(); anno++, anno_id++) {
-
-			glLoadName(anno_id + lFrame->AnnoLengths.size() + NumAtoms +
-						  NumBonds + 1);
-
-			lFrame->GetAtomPosition(anno->getAtom1ID(), atom1_pos);
-			lFrame->GetAtomPosition(anno->getAtom2ID(), atom2_pos);
-			lFrame->GetAtomPosition(anno->getAtom3ID(), atom3_pos);
-
-			DrawAngleAnnotation(&atom1_pos, &atom2_pos, &atom3_pos);
-		}
-		glEnable(GL_LIGHTING);
-	}
-
-	if (!lFrame->AnnoDihedrals.empty()) {
-
-		int anno_id;
-		CPoint3D atom1_pos;
-		CPoint3D atom2_pos;
-		CPoint3D atom3_pos;
-		CPoint3D atom4_pos;
-		CPoint3D vec1;
-		CPoint3D vec2;
-		CPoint3D normal1;
-		CPoint3D normal2;
-		CPoint3D binormal1;
-		CPoint3D binormal2;
-		Matrix4D plane2xy;
-		float angle;
-		std::vector<AnnotateDihedral>::iterator anno;
-		GLuint stipple_tex;
-
-		float stipple_data[64] = {
-			0, 0, 1, 0, 0, 0, 1, 0,
-			1, 0, 0, 0, 1, 0, 0, 0,
-			0, 0, 1, 0, 0, 0, 1, 0,
-			1, 0, 0, 0, 1, 0, 0, 0,
-			0, 0, 1, 0, 0, 0, 1, 0,
-			1, 0, 0, 0, 1, 0, 0, 0,
-			0, 0, 1, 0, 0, 0, 1, 0,
-			1, 0, 0, 0, 1, 0, 0, 0,
-		};
-		glGenTextures(1, &stipple_tex);
-		glBindTexture(GL_TEXTURE_2D, stipple_tex);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 8, 8, 0, GL_ALPHA,
-			GL_FLOAT, stipple_data);
-
-
-		glDisable(GL_LIGHTING);
-
-		glColor3f(0.0f, 0.0f, 0.0f);
-		for (anno = lFrame->AnnoDihedrals.begin(), anno_id = 0;
-			 anno != lFrame->AnnoDihedrals.end(); anno++, anno_id++) {
-
-			glLoadName(anno_id + lFrame->AnnoAngles.size() + 
-						lFrame->AnnoLengths.size() + NumAtoms + NumBonds + 1);
-
-			lFrame->GetAtomPosition(anno->getAtom1ID(), atom1_pos);
-			lFrame->GetAtomPosition(anno->getAtom2ID(), atom2_pos);
-			lFrame->GetAtomPosition(anno->getAtom3ID(), atom3_pos);
-			lFrame->GetAtomPosition(anno->getAtom4ID(), atom4_pos);
-
-			// The first three atoms (1, 2, 3) form one plane.  The last three
-			// (2, 3, 4) form the second plane.  We want to find the angle
-			// between those two planes, for that is the dihedral angle.
-
-			// Find the first plane's normal by finding the vectors between its
-			// points and calculating the normal from them.
-			vec1 = atom1_pos - atom3_pos;
-			Normalize3D(&vec1);
-
-			vec2 = atom2_pos - atom3_pos;
-			Normalize3D(&vec2);
-
-			CrossProduct3D(&vec1, &vec2, &normal1);
-
-			// Make this plane look like the x-y plane for easier circle
-			// drawing.  The vector from atom3 to atom2 should look like
-			// the positive x-axis.
-			SetPlaneRotation(plane2xy, vec2, vec1);
-
-			// Draw a half circle in the first plane.
-			glEnable(GL_ALPHA_TEST);
-			glAlphaFunc(GL_GREATER, 0.5f);
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, stipple_tex);
-
-			glPushMatrix();
-			glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
-			glMultMatrixf((GLfloat *) plane2xy);
-			glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
-			glBegin(GL_TRIANGLE_FAN);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(0.0f, 0.0f, 0.0f);
-			for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
-				glTexCoord2f(cos(angle) * 5.0f, sin(angle) * 5.0f);
-				glVertex3f(cos(angle), sin(angle), 0.0f);
-			}
-			glEnd();
-			glPopMatrix();
-
-			// Find the second plane.  The two planes share a vector between
-			// atoms 2 and 3, so we just reuse that from the first plane.
-			vec1 = atom4_pos - atom3_pos;
-			Normalize3D(&vec2);
-
-			CrossProduct3D(&vec1, &vec2, &normal2);
-
-			// Make this plane look like the x-y plane for easier circle
-			// drawing.  The vector from atom3 to atom2 should look like
-			// the positive x-axis.
-			SetPlaneRotation(plane2xy, vec2, vec1);
-
-			// Draw a half circle in the second plane.
-			glPushMatrix();
-			glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
-			glMultMatrixf((GLfloat *) plane2xy);
-			glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
-			glBegin(GL_TRIANGLE_FAN);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(0.0f, 0.0f, 0.0f);
-			for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
-				glTexCoord2f(cos(angle) * 5.0f, sin(angle) * 5.0f);
-				glVertex3f(cos(angle), sin(angle), 0.0f);
-			}
-			glEnd();
-			glPopMatrix();
-			glDisable(GL_TEXTURE_2D);
-			glDisable(GL_ALPHA_TEST);
-
-			// Okay, we've drawn the planes.  Now we want to draw an angle
-			// annotation between them.  The angle annotation should span 
-			// from the midpoint on one half-circle's arc to the midpoint on
-			// the other half circles arc.  These can be found by considering
-			// the vector between atoms 2 and 3 as the tangent vector, and
-			// find the the binormal as the crossproduct of tangent and normal.
-			CrossProduct3D(&vec2, &normal1, &binormal1);
-			CrossProduct3D(&vec2, &normal2, &binormal2);
-
-			Normalize3D(&binormal1);
-			Normalize3D(&binormal2);
-
-			// Figure out the actual points from the vector displacements.
-			CPoint3D pt1 = atom3_pos + binormal1;
-			CPoint3D pt3 = atom3_pos + binormal2;
-
-			// CreateCylinderFromLine(qobj, atom3_pos, pt1, 0.1f); 
-			// CreateCylinderFromLine(qobj, atom3_pos, pt3, 0.1f); 
-
-			glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-			DrawAngleAnnotation(&pt1, &atom3_pos, &pt3);
-
-		}
-
-		glEnable(GL_LIGHTING);
-	}
 
 	//bonds as cylinders
 	//In wireframe mode with bonds colored by atom color we simply scink the atom radius to the bond
@@ -2892,9 +2916,10 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 	glPopMatrix();
 }
 
-void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1,
+void DashedQuadFromLine(const CPoint3D& pt1,
 						const CPoint3D& pt2, float width, float m[16],
-						const CPoint3D& x_world, float offset) const {
+						const CPoint3D& x_world, float offset, GLuint length_anno_tex_id,
+						const WinPrefs * Prefs) {
 
 	float len;
 	// CPoint3D vec; 
@@ -2966,7 +2991,7 @@ void MolDisplayWin::DashedQuadFromLine(const CPoint3D& pt1,
 	glDisable(GL_LIGHTING);
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.5f);
-	glBindTexture(GL_TEXTURE_1D, OpenGLData->length_anno_tex_id);
+	glBindTexture(GL_TEXTURE_1D, length_anno_tex_id);
 	glEnable(GL_TEXTURE_1D);
 	glBegin(GL_QUADS);
 		glTexCoord1f(0.0f);
@@ -3219,8 +3244,8 @@ void DrawInversionPoint(void) {
 	if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
 }
 
-void MolDisplayWin::DrawAngleAnnotation(const CPoint3D *pt1,
-		const CPoint3D *pt2, const CPoint3D *pt3) {
+void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
+		const CPoint3D *pt3, const WinPrefs * Prefs) {
 
 	// This draws a dashed angle between the three specified points and
 	// marks the angle's degrees with a text label.  The angle goes from

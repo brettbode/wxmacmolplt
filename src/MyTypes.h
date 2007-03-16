@@ -39,6 +39,7 @@ typedef class Frame Frame;
 typedef class InputData InputData;
 typedef class Internals Internals;
 typedef class XMLElement XMLElement;
+typedef class MolDisplayWin;
 
 
 enum TypeOfPointGroup {
@@ -75,91 +76,82 @@ enum TypeofEnergy {
 	NumberEnergyTypes
 };
 
-class AnnotateLength {
-	public:
-		AnnotateLength(long atom1_id, long atom2_id) {
-			this->atom1_id = atom1_id;
-			this->atom2_id = atom2_id;
-		}
-
-		int getAtom1ID() { return atom1_id; }
-		int getAtom2ID() { return atom2_id; }
-
-		bool containsAtom(int atom_id) {
-			return atom1_id == atom_id || atom2_id == atom_id;
-		}
-
-		void adjustIDs(int atom_id) {
-			if (atom1_id > atom_id) atom1_id--;
-			if (atom2_id > atom_id) atom2_id--;
-		}
-
-	private:
-		int atom1_id;
-		int atom2_id;
+class Annotation {
+public:
+	virtual ~Annotation(void) {};
+	
+	virtual void draw(const MolDisplayWin * win) const = 0;
+	virtual bool containsAtom(int atom_id) const {return false;};
+	virtual void adjustIds(int atom_id) {};
+	virtual void WriteXML(XMLElement * parent) const = 0;
+	virtual bool ReadXML(XMLElement * p) = 0;
+private:
 };
-
-class AnnotateAngle {
-	public:
-		AnnotateAngle(long atom1_id, long atom2_id, long atom3_id) {
-			this->atom1_id = atom1_id;
-			this->atom2_id = atom2_id;
-			this->atom3_id = atom3_id;
-		}
-
-		int getAtom1ID() { return atom1_id; }
-		int getAtom2ID() { return atom2_id; }
-		int getAtom3ID() { return atom3_id; }
-
-		bool containsAtom(int atom_id) {
-			return atom1_id == atom_id || atom2_id == atom_id ||
-				atom3_id == atom_id;
-		}
-
-		void adjustIDs(int atom_id) {
-			if (atom1_id > atom_id) atom1_id--;
-			if (atom2_id > atom_id) atom2_id--;
-			if (atom3_id > atom_id) atom3_id--;
-		}
-
-	private:
-		int atom1_id;
-		int atom2_id;
-		int atom3_id;
+class AnnotationLength : public Annotation {
+public:
+	AnnotationLength(void) : Annotation(), atom_1(-1), atom_2(-1) {};
+	AnnotationLength(long atom1_id, long atom2_id) : Annotation(), atom_1(atom1_id), atom_2(atom2_id) {};
+	virtual ~AnnotationLength(void) {};
+	
+	virtual void draw(const MolDisplayWin * win) const;
+	virtual bool containsAtom(int atom_id) const {return ((atom_1 == atom_id)||(atom_2 == atom_id));}
+	virtual void adjustIds(int atom_id) {
+		if (atom_1 > atom_id) atom_1 --;
+		if (atom_2 > atom_id) atom_2 --;
+	}
+	virtual void WriteXML(XMLElement * parent) const;
+	virtual bool ReadXML(XMLElement * p);
+private:
+	long	atom_1;
+	long	atom_2;
 };
-
-class AnnotateDihedral {
-	public:
-		AnnotateDihedral(long atom1_id, long atom2_id, long atom3_id,
-				         long atom4_id) {
-			this->atom1_id = atom1_id;
-			this->atom2_id = atom2_id;
-			this->atom3_id = atom3_id;
-			this->atom4_id = atom4_id;
-		}
-
-		int getAtom1ID() { return atom1_id; }
-		int getAtom2ID() { return atom2_id; }
-		int getAtom3ID() { return atom3_id; }
-		int getAtom4ID() { return atom4_id; }
-
-		bool containsAtom(int atom_id) {
-			return atom1_id == atom_id || atom2_id == atom_id ||
-				atom3_id == atom_id || atom4_id == atom_id;
-		}
-
-		void adjustIDs(int atom_id) {
-			if (atom1_id > atom_id) atom1_id--;
-			if (atom2_id > atom_id) atom2_id--;
-			if (atom3_id > atom_id) atom3_id--;
-			if (atom4_id > atom_id) atom4_id--;
-		}
-
-	private:
-		int atom1_id;
-		int atom2_id;
-		int atom3_id;
-		int atom4_id;
+class AnnotationAngle : public Annotation {
+public:
+	AnnotationAngle(void) : Annotation(), 
+		atom_1(-1), atom_2(-1), atom_3(-1) {};
+	AnnotationAngle(long atom1_id, long atom2_id, long atom3_id) : Annotation(), 
+		atom_1(atom1_id), atom_2(atom2_id), atom_3(atom3_id) {};
+	virtual ~AnnotationAngle(void) {};
+	
+	virtual void draw(const MolDisplayWin * win) const;
+	virtual bool containsAtom(int atom_id) const 
+		{return ((atom_1 == atom_id)||(atom_2 == atom_id)||(atom_3 == atom_id));}
+	virtual void adjustIds(int atom_id) {
+		if (atom_1 > atom_id) atom_1 --;
+		if (atom_2 > atom_id) atom_2 --;
+		if (atom_3 > atom_id) atom_3 --;
+	}
+	virtual void WriteXML(XMLElement * parent) const;
+	virtual bool ReadXML(XMLElement * p);
+private:
+	long	atom_1;
+	long	atom_2;
+	long	atom_3;
+};
+class AnnotationDihedral : public Annotation {
+public:
+	AnnotationDihedral(void) : Annotation(), 
+		atom_1(-1), atom_2(-1), atom_3(-1), atom_4(-1) {};
+	AnnotationDihedral(long atom1_id, long atom2_id, long atom3_id, long atom4_id) : Annotation(), 
+		atom_1(atom1_id), atom_2(atom2_id), atom_3(atom3_id), atom_4(atom4_id) {};
+	virtual ~AnnotationDihedral(void) {};
+	
+	virtual void draw(const MolDisplayWin * win) const;
+	virtual bool containsAtom(int atom_id) const 
+		{return ((atom_1 == atom_id)||(atom_2 == atom_id)||(atom_3 == atom_id)||(atom_4 == atom_id));}
+	virtual void adjustIds(int atom_id) {
+		if (atom_1 > atom_id) atom_1 --;
+		if (atom_2 > atom_id) atom_2 --;
+		if (atom_3 > atom_id) atom_3 --;
+		if (atom_4 > atom_id) atom_4 --;
+	}
+	virtual void WriteXML(XMLElement * parent) const;
+	virtual bool ReadXML(XMLElement * p);
+private:
+	long	atom_1;
+	long	atom_2;
+	long	atom_3;
+	long	atom_4;
 };
 
 class mpAtom {

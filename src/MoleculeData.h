@@ -1,5 +1,5 @@
 /*
- *  (c) 2004 Iowa State University
+ *  (c) 2004-2007 Iowa State University
  *      see the LICENSE file in the top level directory
  */
 
@@ -29,6 +29,7 @@ class MoleculeData {
 		friend class Surf3DBase;
 		friend class MpGLCanvas;
 	private:
+		std::vector<Annotation *> Annotations;	//Set of annotations
 		CPoint3D	*RotCoords;				// The currently displayed, rotated coordinates
 		long		*zBuffer;				// the sorting order for RotCoords
 		Frame *		cFrame;					// pointer to the currently drawn frame
@@ -129,10 +130,11 @@ class MoleculeData {
 		void StickCoordinates(void);
 		void InitializeInternals(void);
 		inline Internals * GetInternalCoordinates(void) const {return IntCoords;};
-		void DeleteAtom(long AtomNum);
+		void DeleteAtom(long AtomNum, bool allFrames=false);
 		bool ValidAtom(long AtomNum);
 		void GetRotationMatrix(Matrix4D copy);
-
+		int GetAnnotationCount(void) const {return Annotations.size();};
+		void DeleteAllAnnotations(void);
 };
 
 #endif

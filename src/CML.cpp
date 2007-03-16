@@ -138,6 +138,16 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_InputOptions));
 			InputOptions->WriteXML(Ele);
 		}
+		if (Annotations.size() > 0) {
+			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
+			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_Annotations));
+			std::vector<Annotation *>::const_iterator anno;
+			anno = Annotations.begin();
+			for (anno = Annotations.begin(); anno != Annotations.end(); ) {
+				(*anno)->WriteXML(Ele);
+				anno++;
+			}
+		}
 		//Prefs
 		if (Prefs) {
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
@@ -735,6 +745,27 @@ void GradientData::WriteXML(XMLElement * parent) {
 		grad->addAttribute(CML_convert(rowsAttr), line);
 	}
 }
+void AnnotationLength::WriteXML(XMLElement * parent) const {
+	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
+	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationLength));
+	Elem->addAttribute(kAnnAtom1XML, atom_1);
+	Elem->addAttribute(kAnnAtom2XML, atom_2);
+}
+void AnnotationAngle::WriteXML(XMLElement * parent) const {
+	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
+	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationAngle));
+	Elem->addAttribute(kAnnAtom1XML, atom_1);
+	Elem->addAttribute(kAnnAtom2XML, atom_2);
+	Elem->addAttribute(kAnnAtom3XML, atom_3);
+}
+void AnnotationDihedral::WriteXML(XMLElement * parent) const {
+	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
+	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationDihedral));
+	Elem->addAttribute(kAnnAtom1XML, atom_1);
+	Elem->addAttribute(kAnnAtom2XML, atom_2);
+	Elem->addAttribute(kAnnAtom3XML, atom_3);
+	Elem->addAttribute(kAnnAtom4XML, atom_4);
+}
 
 #pragma mark -
 
@@ -903,6 +934,51 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 															if (InputOptions) delete InputOptions;
 															InputOptions = new InputData;
 															InputOptions->ReadXML(mdchild);
+														}
+															break;
+														case MMP_Annotations:
+														{
+															XMLElement * AnnChild = mdchild->getFirstChild();
+															while (AnnChild) {
+																if (AnnChild->isName(kAnnotationXML)) {
+																	const char * childtype = mdchild->getAttributeValue(CML_convert(titleAttr));
+																	if (childtype) {
+																		MMP_AnnotationTypesNS attr;
+																		if (CML_convert(childtype, attr)) {
+																			switch (attr) {
+																				case MMP_AnnotationLength:
+																				{
+																					AnnotationLength * t = new AnnotationLength();
+																					if (t->ReadXML(AnnChild))
+																						Annotations.push_back(t);
+																					else
+																						delete t;
+																				}
+																					break;
+																				case MMP_AnnotationAngle:
+																				{
+																					AnnotationAngle * t = new AnnotationAngle();
+																					if (t->ReadXML(AnnChild))
+																						Annotations.push_back(t);
+																					else
+																						delete t;
+																				}
+																					break;
+																				case MMP_AnnotationDihedral:
+																				{
+																					AnnotationDihedral * t = new AnnotationDihedral();
+																					if (t->ReadXML(AnnChild))
+																						Annotations.push_back(t);
+																					else
+																						delete t;
+																				}
+																					break;
+																			}
+																		}
+																	}
+																}
+																AnnChild = AnnChild->getNextChild();
+															}
 														}
 															break;
 														case MMP_Preferences:
@@ -2217,6 +2293,27 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 	if (Vectors!= NULL) result = true;	//Probably should do some thing more...
 	return result;
 }
+bool AnnotationLength::ReadXML(XMLElement * Annotation) {
+	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom_1);
+	result = result && Annotation->getAttributeValue(kAnnAtom2XML, atom_2);
+
+	return result;
+}
+bool AnnotationAngle::ReadXML(XMLElement * Annotation) {
+	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom_1);
+	result = result && Annotation->getAttributeValue(kAnnAtom2XML, atom_2);
+	result = result && Annotation->getAttributeValue(kAnnAtom3XML, atom_3);
+	
+	return result;
+}
+bool AnnotationDihedral::ReadXML(XMLElement * Annotation) {
+	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom_1);
+	result = result && Annotation->getAttributeValue(kAnnAtom2XML, atom_2);
+	result = result && Annotation->getAttributeValue(kAnnAtom3XML, atom_3);
+	result = result && Annotation->getAttributeValue(kAnnAtom4XML, atom_4);
+	
+	return result;
+}
 #pragma mark -
 #pragma mark CML_Element
 const char * CML_convert(CML_Element t)
@@ -2407,6 +2504,8 @@ const char * CML_convert(MMP_MetadataNamespace t)
 			return "BasisSet";
 		case MMP_InputOptions:
 			return "InputOptions";
+		case MMP_Annotations:
+			return "Annotations";
 		case MMP_Preferences:
 			return "Preferences";
 		case MMP_WindowData:
@@ -2999,6 +3098,20 @@ const char * CML_convert(MMP_WindowDataNS t)
             return "invalid";
     }
 }
+#pragma mark MMP_AnnotationTypesNS
+const char * CML_convert(MMP_AnnotationTypesNS t)
+{       
+    switch(t) {
+        case MMP_AnnotationLength:
+            return "Length";
+		case MMP_AnnotationAngle:
+			return "Angle";
+        case MMP_AnnotationDihedral:
+            return "Dihedral";
+		default:
+            return "invalid";
+    }
+}
 const char * SurfaceTypeToText(const SurfaceType & s)
 {       
     switch(s)
@@ -3133,6 +3246,10 @@ bool CML_convert(const char * s, MMP_IODFTGroupNS & t)
 bool CML_convert(const char * s, MMP_WindowDataNS & t)
 {
     MATCH(s, t, 0, NumberMMPWindowDataItems, MMP_WindowDataNS)
+}
+bool CML_convert(const char * s, MMP_AnnotationTypesNS & t)
+{
+    MATCH(s, t, 0, NumberMMPAnnotationTypes, MMP_AnnotationTypesNS)
 }
 bool TextToSurfaceType(const char * t, SurfaceType & s) {
 	if (!t || !*t) return false;

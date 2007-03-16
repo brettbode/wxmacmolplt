@@ -540,6 +540,11 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		}
 
 		else if (selected < NumAtoms + lFrame->NumBonds +
+				 mMainData->GetAnnotationCount()) {
+			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Length,
+						  wxT("Delete Annotation"));
+		}
+/*		else if (selected < NumAtoms + lFrame->NumBonds +
 			lFrame->AnnoLengths.size()) {
 			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Length,
 				wxT("Delete length"));
@@ -557,7 +562,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Dihedral,
 							wxT("Delete dihedral"));
 		}
- 
+ */
 	}
 
 	// How 'bout a right click?
@@ -580,6 +585,11 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		}
 
 		else if (selected < NumAtoms + lFrame->NumBonds +
+				 mMainData->GetAnnotationCount()) {
+			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Length,
+						  wxT("Delete Annotation"));
+		}
+/*		else if (selected < NumAtoms + lFrame->NumBonds +
 					lFrame->AnnoLengths.size()) {
 			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Length,
 							wxT("Delete length"));
@@ -597,7 +607,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Dihedral,
 							wxT("Delete dihedral"));
 		}
-
+*/
 
 	}
 
@@ -1000,6 +1010,7 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 	}
 
 	glMatrixMode(GL_MODELVIEW);
+//	MolWin->AdjustMenus();
 }
 
 void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
@@ -1168,25 +1179,11 @@ void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
 	Frame *lFrame = mMainData->cFrame;
 	int selected_anno = selected - lFrame->NumAtoms - lFrame->NumBonds;
 
-	switch (event.GetId()) {
-		case GL_Popup_Delete_Length:
-			lFrame->AnnoLengths.erase(lFrame->AnnoLengths.begin() +
-				selected_anno);
-			break;
-		case GL_Popup_Delete_Angle:
-			lFrame->AnnoAngles.erase(lFrame->AnnoAngles.begin() +
-				selected_anno - lFrame->AnnoLengths.size());
-			break;
-		case GL_Popup_Delete_Dihedral:
-			lFrame->AnnoDihedrals.erase(lFrame->AnnoDihedrals.begin() +
-				selected_anno - lFrame->AnnoLengths.size() -
-				lFrame->AnnoAngles.size());
-			break;
-		default:
-			printf("unknown event\n");
-			break;
+	if ((selected_anno >= 0)&&(selected_anno < mMainData->Annotations.size())) {
+		Annotation * t = mMainData->Annotations[selected_anno];
+		mMainData->Annotations.erase(mMainData->Annotations.begin() + selected_anno);
+		delete t;
 	}
-
 }
 
 void MpGLCanvas::bondPopupMenu(int x, int y) {
@@ -1285,18 +1282,24 @@ void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
 
 	switch (event.GetId()) {
 		case GL_Popup_Measure_Length:
-			mMainData->cFrame->AnnoLengths.push_back(
-				AnnotateLength(select_stack[0], select_stack[1]));
+		{
+			AnnotationLength * t = new AnnotationLength(select_stack[0], select_stack[1]);
+			mMainData->Annotations.push_back(t);
+		}
 			break;
 		case GL_Popup_Measure_Angle:
-			mMainData->cFrame->AnnoAngles.push_back(
-				AnnotateAngle(select_stack[0], select_stack[1],
-					select_stack[2]));
+		{
+			AnnotationAngle * t = new AnnotationAngle(select_stack[0], select_stack[1],
+													  select_stack[2]);
+			mMainData->Annotations.push_back(t);
+		}
 			break;
 		case GL_Popup_Measure_Dihedral:
-			mMainData->cFrame->AnnoDihedrals.push_back(
-				AnnotateDihedral(select_stack[0], select_stack[1],
-					select_stack[2], select_stack[3]));
+		{
+			AnnotationDihedral * t = new AnnotationDihedral(select_stack[0], select_stack[1],
+													  select_stack[2], select_stack[3]);
+			mMainData->Annotations.push_back(t);
+		}
 			break;
 		default:
 			printf("unknown event\n");
@@ -1331,7 +1334,7 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 	long NumAtoms = lFrame->NumAtoms;
 
 	if (selected >= 0 && selected < NumAtoms)
-		lFrame->DeleteAtom(selected);
+		mMainData->DeleteAtom(selected);
 
 	if (selected >= NumAtoms)
 		lFrame->DeleteBond(selected - NumAtoms);
@@ -1340,17 +1343,20 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 
 void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
 	Frame * lFrame = mMainData->Frames;
+	long NumAtoms = mMainData->cFrame->NumAtoms;
+	if (selected >= 0 && selected < NumAtoms)
+		mMainData->DeleteAtom(selected, true);
 
-	while (lFrame) {
-		long NumAtoms = lFrame->NumAtoms;
+	else if (selected < (NumAtoms+lFrame->GetNumBonds())) {
+		while (lFrame) {
+			long NumAtoms = lFrame->NumAtoms;
 
-		if (selected >= 0 && selected < NumAtoms)
-			lFrame->DeleteAtom(selected);
 
-		if (selected >= NumAtoms)
-			lFrame->DeleteBond(selected - NumAtoms);
+			if (selected >= NumAtoms)
+				lFrame->DeleteBond(selected - NumAtoms);
 
-			lFrame = lFrame->NextFrame;
+				lFrame = lFrame->NextFrame;
+		}
 	}
 }
 
