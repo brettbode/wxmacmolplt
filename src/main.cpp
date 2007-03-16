@@ -21,7 +21,8 @@
 #include <locale.h>
 
 //The global preferences settings
-    WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
+WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
+PeriodicTableDlg *periodic_dlg;
 
 int glf_initialized = 0;
 
@@ -91,6 +92,7 @@ bool MpApp::OnInit() {
 	//Set the numerical locale to "C" throughout
 	setlocale(LC_NUMERIC, "C");
 	
+	periodic_dlg = NULL;
 	gPreferences = new WinPrefs;
 	gPrefDefaults = new WinPrefs;
 
