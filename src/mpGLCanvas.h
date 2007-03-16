@@ -40,6 +40,7 @@
 #define GL_Popup_Delete_Angle 30022
 #define GL_Popup_Delete_Dihedral 30023
 #define GL_Popup_Delete_Bond 30024
+#define GL_Popup_Toggle_Mark_Atom 30025
 
 class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
@@ -75,7 +76,6 @@ class MpGLCanvas : public wxGLCanvas {
 		MolDisplayWin * MolWin;
 		WinPrefs * Prefs;
 		bool initialized;
-		PeriodicTableDlg *periodic_dlg;
 
 		MoleculeData *mMainData;
 		//coordPopup* lPopup;

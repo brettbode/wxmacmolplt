@@ -27,6 +27,7 @@
 
 #include "periodic_table_dlg.h"
 
+extern PeriodicTableDlg *periodic_dlg;
 extern int glf_initialized;
 
 int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
@@ -530,13 +531,27 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	}
 	
 	// If not left, try right click in edit mode.
-	else if (event.RightDown() && interactiveMode) {
+	else if (event.RightDown()) {
 		selected = testPicking(tmpPnt.x, tmpPnt.y);
 
 		if (selected >= 0 && selected < NumAtoms + lFrame->NumBonds) {
-			interactPopupMenu(tmpPnt.x, tmpPnt.y, selected < NumAtoms);
-			MolWin->SelectionChanged(deSelectAll);
-			MolWin->UpdateGLModel();
+			if (interactiveMode) {
+				interactPopupMenu(tmpPnt.x, tmpPnt.y, 1);
+				MolWin->SelectionChanged(deSelectAll);
+				MolWin->UpdateGLModel();
+			} else {
+				measurePopupMenu(tmpPnt.x, tmpPnt.y);
+			}
+		}
+
+		else if (selected < NumAtoms + lFrame->NumBonds) {
+			if (interactiveMode) {
+				interactPopupMenu(tmpPnt.x, tmpPnt.y, 0);
+				MolWin->SelectionChanged(deSelectAll);
+				MolWin->UpdateGLModel();
+			} else {
+				bondPopupMenu(tmpPnt.x, tmpPnt.y);
+			}
 		}
 
 		else if (selected < NumAtoms + lFrame->NumBonds +
@@ -563,52 +578,6 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 							wxT("Delete dihedral"));
 		}
  */
-	}
-
-	// How 'bout a right click?
-	else if (event.RightDown()) {
-
-		// See what was right-clicked on.  If it was a bond or atom, then we
-		// show a contextual menu.
-		selected = testPicking(tmpPnt.x, tmpPnt.y);
-
-		if (selected < 0) {
-
-		}
-
-		else if (selected < NumAtoms) {
-			measurePopupMenu(tmpPnt.x, tmpPnt.y);
-		}
-
-		else if (selected < NumAtoms + lFrame->NumBonds) {
-			bondPopupMenu(tmpPnt.x, tmpPnt.y);
-		}
-
-		else if (selected < NumAtoms + lFrame->NumBonds +
-				 mMainData->GetAnnotationCount()) {
-			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Length,
-						  wxT("Delete Annotation"));
-		}
-/*		else if (selected < NumAtoms + lFrame->NumBonds +
-					lFrame->AnnoLengths.size()) {
-			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Length,
-							wxT("Delete length"));
-		}
-
-		else if (selected < NumAtoms + lFrame->NumBonds +
-					lFrame->AnnoLengths.size() + lFrame->AnnoAngles.size()) {
-			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Angle,
-							wxT("Delete angle"));
-		}
-
-		else if (selected < NumAtoms + lFrame->NumBonds +
-					lFrame->AnnoLengths.size() + lFrame->AnnoAngles.size() +
-					lFrame->AnnoDihedrals.size()) {
-			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Dihedral,
-							wxT("Delete dihedral"));
-		}
-*/
-
 	}
 
 	// If we made it this far, button states haven't changed.  Are we dragging?
@@ -1080,9 +1049,17 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 		nItem.Append(aLabel);
 		item = menu.Append(wxID_ANY, nItem);
 		item->Enable(false);
+		menu.Append(GL_Popup_Toggle_Mark_Atom, wxT("Toggle Mark"));
 	}
 
 	if (select_stack_top > 1) {
+
+		// If user clicked on an atom and some things are selected, let's
+		// separate the items added above and the annotation items.
+		if (selected >= 0 && selected < lFrame->GetNumAtoms()) {
+			menu.AppendSeparator();
+		}
+
 		switch (select_stack_top) {
 			case 2:
 			{
@@ -1281,6 +1258,10 @@ void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
 void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
 
 	switch (event.GetId()) {
+		case GL_Popup_Toggle_Mark_Atom:
+			printf("selected: %d\n", selected);
+			mMainData->cFrame->Atoms[selected].ToggleMark();
+			break;
 		case GL_Popup_Measure_Length:
 		{
 			AnnotationLength * t = new AnnotationLength(select_stack[0], select_stack[1]);
@@ -1452,6 +1433,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_Measure_Length, MpGLCanvas::AddAnnotation)
 	EVT_MENU(GL_Popup_Measure_Angle, MpGLCanvas::AddAnnotation)
 	EVT_MENU(GL_Popup_Measure_Dihedral, MpGLCanvas::AddAnnotation)
+	EVT_MENU(GL_Popup_Toggle_Mark_Atom, MpGLCanvas::AddAnnotation)
 	EVT_MENU(GL_Popup_Delete_Length, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Delete_Angle, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Delete_Dihedral, MpGLCanvas::DeleteAnnotation)
