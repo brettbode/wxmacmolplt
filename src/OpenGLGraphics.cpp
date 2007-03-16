@@ -1432,7 +1432,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			    glColor3f(0.0f,0.0f,0.0f);
 			    glEnable(GL_POLYGON_STIPPLE);
 			    //glPolygonStipple(atomMaskPatterns[lAtoms[iatom].GetType()%numPatterns]);
-			    glPolygonStipple(atomMaskPatterns[9]); //for test
+			    glPolygonStipple(atomMaskPatterns[11]); //for test
 			    gluSphere(qobj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
 			    glDisable(GL_POLYGON_STIPPLE);
 			  }
