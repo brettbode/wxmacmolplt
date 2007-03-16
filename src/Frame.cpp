@@ -230,6 +230,7 @@ mpAtom * Frame::AddAtom(long AtomType, CPoint3D AtomPosition) {
 	  Atoms[NumAtoms].Type = AtomType;
 	  Atoms[NumAtoms].Position = AtomPosition;
 	  Atoms[NumAtoms].Highlite = 0;
+	  Atoms[NumAtoms].isMarked = false;
 	  result = &Atoms[NumAtoms];
 	  NumAtoms++;
 	}

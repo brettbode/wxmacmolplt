@@ -160,9 +160,10 @@ class mpAtom {
 		short		Type;	//Low byte stores normal atom type, high byte store special bits
 		char		Highlite;
 		char		Label[16];
-			//Type bit 9 - indicates EFP, first 4 bytes of label give fragment number
-			//Type bit 10 - pdb style biomolecule, label gives res, res #, atom type (alpha, beta...)
-			//Type bit 11 - SIMOMM MM atom
+		bool		isMarked;
+		//Type bit 9 - indicates EFP, first 4 bytes of label give fragment number
+		//Type bit 10 - pdb style biomolecule, label gives res, res #, atom type (alpha, beta...)
+		//Type bit 11 - SIMOMM MM atom
 		inline bool GetInvisibility(void) const {return (Highlite & 1);};	//Bit 1 sets invisibility
 		bool SetInvisibility(bool State) {if (Highlite&1) Highlite-=1; if (State) Highlite+=1;return GetInvisibility();};
 		inline bool GetSelectState(void) const {return ((Highlite&2)!=0);};	//Bit 2 sets selected
@@ -177,6 +178,8 @@ class mpAtom {
 		inline void SetFragmentNumber(long fragNum) {IsEffectiveFragment(true); *((long *) &Label[12]) = fragNum;};
 		inline long GetFragmentNumber(void) const {return *((long *) &Label[12]);};
 		inline long GetNuclearCharge(void) const {return (GetType());};	//NOT correct for ECP's!!!!!
+		void ToggleMark(void) { isMarked = !isMarked; }
+		bool IsMarked(void) { return isMarked; }
 };
 
 enum BondOrder {
@@ -454,7 +457,7 @@ class Surface {
 void ApplyRotation(Matrix4D RotMat, long Axis, float AngleDegrees);
 void CalculateCenterOfMass(mpAtom * AtomList, long NumAtoms, float * AtomMasses, CPoint3D * Center);
 void MinimizeDifferences(mpAtom * FixedAtoms, mpAtom * targetAtoms, long NumAtoms,
-		WinPrefs * Prefs, long NumOptAtoms);
+	WinPrefs * Prefs, long NumOptAtoms);
 float CalculateSquaresValue(long NumOptAtoms, mpAtom CoordSetA[], CPoint3D CoordSet[]);
 
 #endif
