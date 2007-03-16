@@ -1353,7 +1353,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 	qobj = gluNewQuadric();
 	if (!qobj) throw std::bad_alloc();
 
-//	gluQuadricDrawStyle(qobj, GLU_FILL); //or GLU_LINE
+	//	gluQuadricDrawStyle(qobj, GLU_FILL); //or GLU_LINE
 	gluQuadricOrientation(qobj, GLU_OUTSIDE);
 	gluQuadricNormals(qobj, GLU_SMOOTH); //GLU_FLAT GLU_NONE
 
@@ -1365,32 +1365,141 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 	float AtomScale = Prefs->GetAtomScale();
 	float Quality = Prefs->GetQD3DAtomQuality();
 	GLdouble BondSize = Prefs->GetQD3DBondWidth();
+	GLfloat bg_invert[3];
+
+	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
+	long backMagnitude = BackgroundColor->red + BackgroundColor->green +
+		BackgroundColor->blue;
+
+	//choose black or white based on the background color
+	if (backMagnitude > 70000) { //"light" background choose black
+		bg_invert[0] = bg_invert[1] = bg_invert[2] = 0.0f;
+	} else {
+		bg_invert[0] = bg_invert[1] = bg_invert[2] = 1.0f;
+	}
 
 	if (!Prefs->DrawWireFrame()) {
-//	if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) {
+	//	if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) {
 		for (long iatom=0; iatom<NumAtoms; iatom++) {
 
 			if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
 			long curAtomType = lAtoms[iatom].GetType() - 1;
 
 			float radius;
-			if (!Prefs->DrawWireFrame()) radius = AtomScale*Prefs->GetAtomSize(curAtomType);
-			else radius = BondSize;
+			if (!Prefs->DrawWireFrame()) {
+				radius = AtomScale*Prefs->GetAtomSize(curAtomType);
+			} else {
+				radius = BondSize;
+			}
 			
-			if (radius<0.01) continue;	//skip really small spheres
+			if (radius < 0.01) continue;	//skip really small spheres
 
-		//	RGBColor * AtomColor = Prefs->GetAtomColorLoc(curAtomType);
-		//		float red, green, blue;
-		//	red = AtomColor->red/65536.0;
-		//	green = AtomColor->green/65536.0;
-		//	blue = AtomColor->blue/65536.0;
+			//	RGBColor * AtomColor = Prefs->GetAtomColorLoc(curAtomType);
+			//		float red, green, blue;
+			//	red = AtomColor->red/65536.0;
+			//	green = AtomColor->green/65536.0;
+			//	blue = AtomColor->blue/65536.0;
 
 			glPushMatrix();
 			glTranslatef(lAtoms[iatom].Position.x, 
 				     lAtoms[iatom].Position.y,
 				     lAtoms[iatom].Position.z);
+
+			if (lAtoms[iatom].IsMarked()) {
+				// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+				// glLineWidth(6.0f); 
+				// glDisable(GL_LIGHTING); 
+				// glDepthMask(GL_FALSE); 
+				// gluSphere(qobj, radius, 1.5f * Quality, Quality); 
+				// glDepthMask(GL_TRUE); 
+				// glEnable(GL_LIGHTING); 
+				// glLineWidth(1.0f); 
+				// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
+
+				float m[16];
+				float angle;
+				float ca1, sa1;
+				float ca2, sa2;
+				float invert1[3];
+				float invert2[3];
+
+				invert1[0] = 1.0f - BackgroundColor->red / 65536.0f;
+				invert1[1] = 1.0f - BackgroundColor->green / 65536.0f;
+				invert1[2] = 1.0f - BackgroundColor->blue / 65536.0f;
+
+				glGetFloatv(GL_MODELVIEW_MATRIX, m);
+				glDisable(GL_LIGHTING);
+				glLineWidth(3.0f);
+				// Prefs->GetAtomColorInverse(curAtomType + 1, invert2); 
+				// atom_invert[0] = 1.0f - bg_invert[0]; 
+				// atom_invert[1] = 1.0f - bg_invert[1]; 
+				// atom_invert[2] = 1.0f - bg_invert[2]; 
+				invert2[0] = 0.0f;
+				invert2[1] = 1.0f;
+				invert2[2] = 0.0f;
+
+				glBegin(GL_QUAD_STRIP);
+				for (angle = 0.0f; angle <= 6.24f; angle += 0.1f) {
+					ca1 = cos(angle) * (radius + 0.03f);
+					sa1 = sin(angle) * (radius + 0.03f);
+					ca2 = cos(angle) * (radius + 0.08f);
+					sa2 = sin(angle) * (radius + 0.08f);
+					glColor3fv(invert1);
+					glVertex3f(ca1 * m[0] + sa1 * m[1],
+								ca1 * m[4] + sa1 * m[5],
+								ca1 * m[8] + sa1 * m[9]);
+					glColor3fv(invert2);
+					glVertex3f(ca2 * m[0] + sa2 * m[1],
+								ca2 * m[4] + sa2 * m[5],
+								ca2 * m[8] + sa2 * m[9]);
+				}
+				ca1 = cos(0.0f) * (radius + 0.03f);
+				sa1 = sin(0.0f) * (radius + 0.03f);
+				ca2 = cos(0.0f) * (radius + 0.08f);
+				sa2 = sin(0.0f) * (radius + 0.08f);
+				glColor3fv(invert1);
+				glVertex3f(ca1 * m[0] + sa1 * m[1],
+							ca1 * m[4] + sa1 * m[5],
+							ca1 * m[8] + sa1 * m[9]);
+				glColor3fv(invert2);
+				glVertex3f(ca2 * m[0] + sa2 * m[1],
+							ca2 * m[4] + sa2 * m[5],
+							ca2 * m[8] + sa2 * m[9]);
+				glEnd();
+
+				glBegin(GL_QUAD_STRIP);
+				for (angle = 0.0f; angle <= 6.24f; angle += 0.1f) {
+					ca1 = cos(angle) * (radius + 0.08f);
+					sa1 = sin(angle) * (radius + 0.08f);
+					ca2 = cos(angle) * (radius + 0.13f);
+					sa2 = sin(angle) * (radius + 0.13f);
+					glColor3fv(invert2);
+					glVertex3f(ca1 * m[0] + sa1 * m[1],
+								ca1 * m[4] + sa1 * m[5],
+								ca1 * m[8] + sa1 * m[9]);
+					glColor3fv(invert1);
+					glVertex3f(ca2 * m[0] + sa2 * m[1],
+								ca2 * m[4] + sa2 * m[5],
+								ca2 * m[8] + sa2 * m[9]);
+				}
+				ca1 = cos(0.0f) * (radius + 0.08f);
+				sa1 = sin(0.0f) * (radius + 0.08f);
+				ca2 = cos(0.0f) * (radius + 0.13f);
+				sa2 = sin(0.0f) * (radius + 0.13f);
+				glColor3fv(invert2);
+				glVertex3f(ca1 * m[0] + sa1 * m[1],
+							ca1 * m[4] + sa1 * m[5],
+							ca1 * m[8] + sa1 * m[9]);
+				glColor3fv(invert1);
+				glVertex3f(ca2 * m[0] + sa2 * m[1],
+							ca2 * m[4] + sa2 * m[5],
+							ca2 * m[8] + sa2 * m[9]);
+				glEnd();
+				glLineWidth(1.0f);
+				glEnable(GL_LIGHTING);
+			}
 			
-		//	glColor3f(red, green, blue);
+			//	glColor3f(red, green, blue);
 			Prefs->ChangeColorAtomColor(curAtomType+1);
 			
 			if ( mHighliteState && !lAtoms[iatom].GetSelectState())
@@ -1409,7 +1518,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			  }
 
 			glLoadName(iatom+1);
-
+			
 			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere
 
 			if ( mHighliteState && !lAtoms[iatom].GetSelectState())
@@ -1441,16 +1550,286 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 		}
 	}
 
-   GLdouble modelview[16];
-   GLdouble proj[16];
-   GLint viewport[4];
-   glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
-   glGetDoublev(GL_PROJECTION_MATRIX, proj);
-   glGetIntegerv(GL_VIEWPORT, viewport);
+	GLdouble modelview[16];
+	GLdouble proj[16];
+	GLint viewport[4];
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, proj);
+	glGetIntegerv(GL_VIEWPORT, viewport);
 
-	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
-	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
+// <<<<<<< OpenGLGraphics.cpp 
+	// glColor3fv(bg_invert); 
 
+	// if (!lFrame->AnnoLengths.empty()) { 
+		// CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f}; 
+		// CPoint3D up_eye = {0.0f, 1.0f, 0.0f}; 
+		// CPoint3D lookat_world; 
+		// CPoint3D up_world; 
+		// CPoint3D r; 
+		// float m[16]; 
+		// Matrix4D mv_inv; 
+
+		// What we want to do here is make the annotation always face the
+		// viewer.  The computations below compute a rotation matrix to align
+		// to the camera.  This only needs to be computed once for all
+		// annotations since the camera doesn't change positions.
+
+		// Invert just the rotation portion of the modelview matrix.  This is
+		// much faster than inverting an arbitrary matrix.
+		// mv_inv[0][0] = modelview[0]; 
+		// mv_inv[0][1] = modelview[4]; 
+		// mv_inv[0][2] = modelview[8]; 
+		// mv_inv[0][3] = 0.0f; 
+		// mv_inv[1][0] = modelview[1]; 
+		// mv_inv[1][1] = modelview[5]; 
+		// mv_inv[1][2] = modelview[9]; 
+		// mv_inv[1][3] = 0.0f; 
+		// mv_inv[2][0] = modelview[2]; 
+		// mv_inv[2][1] = modelview[6]; 
+		// mv_inv[2][2] = modelview[10]; 
+		// mv_inv[2][3] = 0.0f; 
+		// mv_inv[3][0] = 0.0f; 
+		// mv_inv[3][1] = 0.0f; 
+		// mv_inv[3][2] = 0.0f; 
+		// mv_inv[3][3] = 1.0f; 
+
+		// Transform the eye space vectors to world coordinates, and find 
+		// a third vector to form a basis set.
+		// Rotate3DPt(mv_inv, lookat_eye, &lookat_world); 
+		// Rotate3DPt(mv_inv, up_eye, &up_world); 
+		// CrossProduct3D(&lookat_world, &up_world, &r); 
+
+		// m[0] = r.x; 
+		// m[1] = r.y; 
+		// m[2] = r.z; 
+		// m[3] = 0.0f; 
+
+		// m[4] = up_world.x; 
+		// m[5] = up_world.y; 
+		// m[6] = up_world.z; 
+		// m[7] = 0.0f; 
+
+		// m[8] = lookat_world.x; 
+		// m[9] = lookat_world.y; 
+		// m[10] = lookat_world.z; 
+		// m[11] = 0.0f; 
+
+		// m[12] = m[13] = m[14] = 0.0f; 
+		// m[15] = 1.0f; 
+
+		// x_world will indicate what vector in world coordinates will effect
+		// a direction in the eye's x direction.  This is the direction in
+		// which the length label will appear.
+		// CPoint3D x_eye; 
+		// CPoint3D x_world; 
+		// x_eye.x = 1.0f; 
+		// x_eye.y = 0.0f; 
+		// x_eye.z = 0.0f; 
+		// Rotate3DPt(mv_inv, x_eye, &x_world); 
+
+		// int atom1_id, atom2_id; 
+		// int bond_id; 
+		// float bond_size; 
+
+		// for (long anno_id = 0; anno_id < lFrame->AnnoLengths.size(); anno_id++) { 
+			// atom1_id = lFrame->AnnoLengths[anno_id].getAtom1ID(); 
+			// atom2_id = lFrame->AnnoLengths[anno_id].getAtom2ID(); 
+			// bond_id = lFrame->BondExists(atom1_id, atom2_id); 
+
+			// If a bond exists between the two atoms, we need to push out the
+			// length label accordingly.
+			// if (bond_id > -1) { 
+				// bond_size = BondSize / MAX(lBonds[bond_id].Order, 1.0f) * 
+					// 3.5f * lBonds[bond_id].Order / 2.0f; 
+				// if (lBonds[bond_id].Order > 1) { 
+					// bond_size *= 1.5; 
+				// } 
+			// } else { 
+				// bond_size = 0.0f; 
+			// } 
+
+			// Draw the dashed line and label.
+			// glLoadName(anno_id + NumAtoms + NumBonds + 1); 
+			// DashedQuadFromLine(lFrame->Atoms[atom1_id].Position, 
+									 // lFrame->Atoms[atom2_id].Position, 
+									 // BondSize * 0.25, m, x_world, bond_size); 
+		// } 
+	// } 
+
+	// if (!lFrame->AnnoAngles.empty()) { 
+		// CPoint3D atom1_pos; 
+		// CPoint3D atom2_pos; 
+		// CPoint3D atom3_pos; 
+		// std::vector<AnnotateAngle>::iterator anno; 
+		// int anno_id; 
+
+		// glDisable(GL_LIGHTING); 
+		// glColor3f(0.0f, 0.0f, 0.0f); 
+		// for (anno = lFrame->AnnoAngles.begin(), anno_id = 0; 
+			 // anno != lFrame->AnnoAngles.end(); anno++, anno_id++) { 
+
+			// glLoadName(anno_id + lFrame->AnnoLengths.size() + NumAtoms + 
+						  // NumBonds + 1); 
+
+			// lFrame->GetAtomPosition(anno->getAtom1ID(), atom1_pos); 
+			// lFrame->GetAtomPosition(anno->getAtom2ID(), atom2_pos); 
+			// lFrame->GetAtomPosition(anno->getAtom3ID(), atom3_pos); 
+
+			// DrawAngleAnnotation(&atom1_pos, &atom2_pos, &atom3_pos); 
+		// } 
+		// glEnable(GL_LIGHTING); 
+	// } 
+
+	// if (!lFrame->AnnoDihedrals.empty()) { 
+
+		// int anno_id; 
+		// CPoint3D atom1_pos; 
+		// CPoint3D atom2_pos; 
+		// CPoint3D atom3_pos; 
+		// CPoint3D atom4_pos; 
+		// CPoint3D vec1; 
+		// CPoint3D vec2; 
+		// CPoint3D normal1; 
+		// CPoint3D normal2; 
+		// CPoint3D binormal1; 
+		// CPoint3D binormal2; 
+		// Matrix4D plane2xy; 
+		// float angle; 
+		// std::vector<AnnotateDihedral>::iterator anno; 
+		// GLuint stipple_tex; 
+
+		// float stipple_data[64] = { 
+			// 0, 0, 1, 0, 0, 0, 1, 0, 
+			// 1, 0, 0, 0, 1, 0, 0, 0, 
+			// 0, 0, 1, 0, 0, 0, 1, 0, 
+			// 1, 0, 0, 0, 1, 0, 0, 0, 
+			// 0, 0, 1, 0, 0, 0, 1, 0, 
+			// 1, 0, 0, 0, 1, 0, 0, 0, 
+			// 0, 0, 1, 0, 0, 0, 1, 0, 
+			// 1, 0, 0, 0, 1, 0, 0, 0, 
+		// }; 
+		// glGenTextures(1, &stipple_tex); 
+		// glBindTexture(GL_TEXTURE_2D, stipple_tex); 
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
+		// glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); 
+		// glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 8, 8, 0, GL_ALPHA, 
+			// GL_FLOAT, stipple_data); 
+
+
+		// glDisable(GL_LIGHTING); 
+
+		// glColor3f(0.0f, 0.0f, 0.0f); 
+		// for (anno = lFrame->AnnoDihedrals.begin(), anno_id = 0; 
+			 // anno != lFrame->AnnoDihedrals.end(); anno++, anno_id++) { 
+
+			// glLoadName(anno_id + lFrame->AnnoAngles.size() +  
+						// lFrame->AnnoLengths.size() + NumAtoms + NumBonds + 1); 
+
+			// lFrame->GetAtomPosition(anno->getAtom1ID(), atom1_pos); 
+			// lFrame->GetAtomPosition(anno->getAtom2ID(), atom2_pos); 
+			// lFrame->GetAtomPosition(anno->getAtom3ID(), atom3_pos); 
+			// lFrame->GetAtomPosition(anno->getAtom4ID(), atom4_pos); 
+
+			// The first three atoms (1, 2, 3) form one plane.  The last three
+			// (2, 3, 4) form the second plane.  We want to find the angle
+			// between those two planes, for that is the dihedral angle.
+
+			// Find the first plane's normal by finding the vectors between its
+			// points and calculating the normal from them.
+			// vec1 = atom1_pos - atom3_pos; 
+			// Normalize3D(&vec1); 
+
+			// vec2 = atom2_pos - atom3_pos; 
+			// Normalize3D(&vec2); 
+
+			// CrossProduct3D(&vec1, &vec2, &normal1); 
+
+			// Make this plane look like the x-y plane for easier circle
+			// drawing.  The vector from atom3 to atom2 should look like
+			// the positive x-axis.
+			// SetPlaneRotation(plane2xy, vec2, vec1); 
+
+			// Draw a half circle in the first plane.
+			// glEnable(GL_ALPHA_TEST); 
+			// glAlphaFunc(GL_GREATER, 0.5f); 
+			// glEnable(GL_TEXTURE_2D); 
+			// glBindTexture(GL_TEXTURE_2D, stipple_tex); 
+
+			// glPushMatrix(); 
+			// glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z); 
+			// glMultMatrixf((GLfloat *) plane2xy); 
+			// glColor4f(0.3f, 0.3f, 0.3f, 0.2f); 
+			// glBegin(GL_TRIANGLE_FAN); 
+			// glTexCoord2f(0.0f, 0.0f); 
+			// glVertex3f(0.0f, 0.0f, 0.0f); 
+			// for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) { 
+				// glTexCoord2f(cos(angle) * 5.0f, sin(angle) * 5.0f); 
+				// glVertex3f(cos(angle), sin(angle), 0.0f); 
+			// } 
+			// glEnd(); 
+			// glPopMatrix(); 
+
+			// Find the second plane.  The two planes share a vector between
+			// atoms 2 and 3, so we just reuse that from the first plane.
+			// vec1 = atom4_pos - atom3_pos; 
+			// Normalize3D(&vec2); 
+
+			// CrossProduct3D(&vec1, &vec2, &normal2); 
+
+			// Make this plane look like the x-y plane for easier circle
+			// drawing.  The vector from atom3 to atom2 should look like
+			// the positive x-axis.
+			// SetPlaneRotation(plane2xy, vec2, vec1); 
+
+			// Draw a half circle in the second plane.
+			// glPushMatrix(); 
+			// glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z); 
+			// glMultMatrixf((GLfloat *) plane2xy); 
+			// glColor4f(0.3f, 0.3f, 0.3f, 0.2f); 
+			// glBegin(GL_TRIANGLE_FAN); 
+			// glTexCoord2f(0.0f, 0.0f); 
+			// glVertex3f(0.0f, 0.0f, 0.0f); 
+			// for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) { 
+				// glTexCoord2f(cos(angle) * 5.0f, sin(angle) * 5.0f); 
+				// glVertex3f(cos(angle), sin(angle), 0.0f); 
+			// } 
+			// glEnd(); 
+			// glPopMatrix(); 
+			// glDisable(GL_TEXTURE_2D); 
+			// glDisable(GL_ALPHA_TEST); 
+
+			// Okay, we've drawn the planes.  Now we want to draw an angle
+			// annotation between them.  The angle annotation should span 
+			// from the midpoint on one half-circle's arc to the midpoint on
+			// the other half circles arc.  These can be found by considering
+			// the vector between atoms 2 and 3 as the tangent vector, and
+			// find the the binormal as the crossproduct of tangent and normal.
+			// CrossProduct3D(&vec2, &normal1, &binormal1); 
+			// CrossProduct3D(&vec2, &normal2, &binormal2); 
+
+			// Normalize3D(&binormal1); 
+			// Normalize3D(&binormal2); 
+
+			// Figure out the actual points from the vector displacements.
+			// CPoint3D pt1 = atom3_pos + binormal1; 
+			// CPoint3D pt3 = atom3_pos + binormal2; 
+
+			// CreateCylinderFromLine(qobj, atom3_pos, pt1, 0.1f); 
+			// CreateCylinderFromLine(qobj, atom3_pos, pt3, 0.1f); 
+
+			// glColor4f(0.0f, 0.0f, 0.0f, 1.0f); 
+			// DrawAngleAnnotation(&pt1, &atom3_pos, &pt3); 
+
+		// } 
+
+		// glEnable(GL_LIGHTING); 
+	// } 
+
+// ======= 
+// >>>>>>> 1.54 
 	//bonds as cylinders
 	//In wireframe mode with bonds colored by atom color we simply scink the atom radius to the bond
 	//size and get a nice rounded end cap. If bonds are not colored by atom color then the sphere is
@@ -1847,6 +2226,12 @@ void WinPrefs::ChangeColorVectorColor(void) const {
 	green = VectorColor.green/65536.0;
 	blue = VectorColor.blue/65536.0;
 	glColor3f(red, green, blue);
+}
+
+void WinPrefs::GetAtomColorInverse(long atomtype, float rgb[3]) {
+	rgb[0] = 1.0f - AtomColors[atomtype-1].red / 65536.0f;
+	rgb[1] = 1.0f - AtomColors[atomtype-1].green / 65536.0f;
+	rgb[2] = 1.0f - AtomColors[atomtype-1].blue / 65536.0f;
 }
 
 void MolDisplayWin::DrawHydrogenBond(long bondNum) {
