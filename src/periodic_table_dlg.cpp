@@ -60,9 +60,8 @@ bool PeriodicTableDlg::Create(
 #endif
 
 	wxDialog::Create(parent, wxID_ANY, title, wxPoint(xpos, ypos),
-						  wxSize(BUTTON_SIZE * 18,
-									BUTTON_SIZE * 10 + platform_offset),
-						  wxCLOSE_BOX | wxCAPTION);
+		wxSize(BUTTON_SIZE * 18, BUTTON_SIZE * 10 + platform_offset),
+		wxCLOSE_BOX | wxCAPTION);
 
 	nelements = 112;
 
@@ -74,7 +73,7 @@ bool PeriodicTableDlg::Create(
 	elements = (element_t *) malloc(sizeof(element_t) * nelements);
 	if (elements == NULL) {
 		fprintf(stderr, "[%s:%d] Couldn't make room for buttons.\n",
-				  __FILE__, __LINE__);
+			__FILE__, __LINE__);
 		perror("");
 		exit(1);
 	}
@@ -83,8 +82,7 @@ bool PeriodicTableDlg::Create(
 	 * offscreen renderer. */
 	mem_dc = new wxMemoryDC();
 	font = new wxFont(font_size, wxSWISS, wxFONTSTYLE_NORMAL,
-							wxFONTWEIGHT_NORMAL, false, wxT(""),
-							wxFONTENCODING_SYSTEM);
+		wxFONTWEIGHT_NORMAL, false, wxT(""), wxFONTENCODING_SYSTEM);
 	mem_dc->SetFont(*font);
 
 	for (i = 0; i < nelements; i++) {
@@ -104,8 +102,8 @@ bool PeriodicTableDlg::Create(
 		mem_dc->Clear();
 		mem_dc->SetTextForeground(*wxBLACK);
 		mem_dc->DrawText(symbol,
-							  (BUTTON_SIZE - symbol_width) / 2,
-							  (BUTTON_SIZE - symbol_height) / 2);
+			(BUTTON_SIZE - symbol_width) / 2,
+			(BUTTON_SIZE - symbol_height) / 2);
 
 		// Create selected version with black background, white text.
 		mem_dc->SelectObject(*(elements[i].on_bmp));
@@ -113,18 +111,18 @@ bool PeriodicTableDlg::Create(
 		mem_dc->Clear();
 		mem_dc->SetTextForeground(*wxWHITE);
 		mem_dc->DrawText(symbol,
-							  (BUTTON_SIZE - symbol_width) / 2,
-							  (BUTTON_SIZE - symbol_height) / 2);
+			(BUTTON_SIZE - symbol_width) / 2,
+			(BUTTON_SIZE - symbol_height) / 2);
 
 		elements[i].button =
 			new wxBitmapButton(this, i, *(elements[i].off_bmp),
-									 wxPoint(col * BUTTON_SIZE, row * BUTTON_SIZE),
-									 wxSize(BUTTON_SIZE, BUTTON_SIZE));
+			wxPoint(col * BUTTON_SIZE, row * BUTTON_SIZE),
+			wxSize(BUTTON_SIZE, BUTTON_SIZE));
 
 		// Display a quick note when user hovers over button.
 		wxString tool_tip;
 		tool_tip.Printf(wxT("Number: %d, Mass: %f"), i + 1,
-							 parent->GetPrefs()->GetAtomMass(i));
+			parent->GetPrefs()->GetAtomMass(i));
 		elements[i].button->SetToolTip(tool_tip);
 
 	}
