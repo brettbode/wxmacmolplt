@@ -496,7 +496,7 @@ void MolDisplayWin::createMenuBar(void) {
 	
 	menuViewStyle = new wxMenu;
 	menuView->Append(MMP_DISPLAYMODESUBMENU, wxT("&Display Style"), menuViewStyle);
-	menuViewStyle->AppendRadioItem(GL_Popup_Measure_Length, wxT("Wire Frame"));
+	menuViewStyle->AppendRadioItem(MMP_WIREFRAMEMODE, wxT("Wire Frame"));
 	menuViewStyle->AppendRadioItem(MMP_BALLANDSTICKMODE, wxT("Ball and Stick"));
 
 	menuViewAnnotations = new wxMenu;
