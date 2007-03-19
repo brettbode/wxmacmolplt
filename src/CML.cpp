@@ -745,6 +745,11 @@ void GradientData::WriteXML(XMLElement * parent) {
 		grad->addAttribute(CML_convert(rowsAttr), line);
 	}
 }
+void AnnotationMarker::WriteXML(XMLElement * parent) const {
+	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
+	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationMarker));
+	Elem->addAttribute(kAnnAtom1XML, atom);
+}
 void AnnotationLength::WriteXML(XMLElement * parent) const {
 	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
 	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationLength));
@@ -946,6 +951,15 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 																		MMP_AnnotationTypesNS attr;
 																		if (CML_convert(childtype, attr)) {
 																			switch (attr) {
+																				case MMP_AnnotationMarker:
+																				{
+																					AnnotationMarker * t = new AnnotationMarker();
+																					if (t->ReadXML(AnnChild))
+																						Annotations.push_back(t);
+																					else
+																						delete t;
+																				}
+																					break;
 																				case MMP_AnnotationLength:
 																				{
 																					AnnotationLength * t = new AnnotationLength();
@@ -2293,6 +2307,11 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 	if (Vectors!= NULL) result = true;	//Probably should do some thing more...
 	return result;
 }
+bool AnnotationMarker::ReadXML(XMLElement * Annotation) {
+	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom);
+
+	return result;
+}
 bool AnnotationLength::ReadXML(XMLElement * Annotation) {
 	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom_1);
 	result = result && Annotation->getAttributeValue(kAnnAtom2XML, atom_2);
@@ -3102,6 +3121,8 @@ const char * CML_convert(MMP_WindowDataNS t)
 const char * CML_convert(MMP_AnnotationTypesNS t)
 {       
     switch(t) {
+        case MMP_AnnotationMarker:
+            return "Marker";
         case MMP_AnnotationLength:
             return "Length";
 		case MMP_AnnotationAngle:

@@ -449,6 +449,7 @@ enum MMP_WindowDataNS {
 #define kAnnAtom4XML "Atom-4"
 enum MMP_AnnotationTypesNS {
 	MMP_InvalidAnnotation=0,
+	MMP_AnnotationMarker,
 	MMP_AnnotationLength,
 	MMP_AnnotationAngle,
 	MMP_AnnotationDihedral,

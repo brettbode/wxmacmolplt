@@ -825,7 +825,8 @@ void MolDisplayWin::DrawGL(void)
 		int anno_id = 0;
 		for (anno = MainData->Annotations.begin();
 			 anno != MainData->Annotations.end(); anno++) {
-			glLoadName(anno_id + MainData->cFrame->GetNumAtoms() + MainData->cFrame->GetNumBonds() + 1);
+			glLoadName(anno_id + MainData->cFrame->GetNumAtoms() +
+						MainData->cFrame->GetNumBonds() + 1);
 			(*anno)->draw(this);
 			anno_id++;
 		}
@@ -918,6 +919,7 @@ void MolDisplayWin::DrawGL(void)
 	}
 	glDisable(GL_LIGHTING);
 }
+
 void AnnotationLength::draw(const MolDisplayWin * win) const {
 	MoleculeData * maindata = win->GetData();
 	Frame * cFrame = maindata->GetCurrentFramePtr();
@@ -1025,6 +1027,7 @@ void AnnotationLength::draw(const MolDisplayWin * win) const {
 	DashedQuadFromLine(pt1, pt2,
 					   BondSize * 0.25, m, x_world, bond_size, win->GetLengthTexId(), Prefs);
 }
+
 void AnnotationAngle::draw(const MolDisplayWin * win) const {
 	MoleculeData * maindata = win->GetData();
 	Frame * cFrame = maindata->GetCurrentFramePtr();
@@ -1046,6 +1049,7 @@ void AnnotationAngle::draw(const MolDisplayWin * win) const {
 	DrawAngleAnnotation(&atom1_pos, &atom2_pos, &atom3_pos, win->GetPrefs());
 	glEnable(GL_LIGHTING);
 }
+
 void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	MoleculeData * maindata = win->GetData();
 	Frame * cFrame = maindata->GetCurrentFramePtr();
@@ -1191,6 +1195,110 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	DrawAngleAnnotation(&pt1, &atom3_pos, &pt3, win->GetPrefs());
 	
 	glEnable(GL_LIGHTING);
+}
+
+void AnnotationMarker::draw(const MolDisplayWin * win) const {
+
+	float m[16];
+	float angle;
+	float ca1, sa1;
+	float ca2, sa2;
+	float invert1[3];
+	float invert2[3];
+	CPoint3D atom_pos;
+	float radius;
+
+	MoleculeData *maindata = win->GetData();
+	Frame *cFrame = maindata->GetCurrentFramePtr();
+	WinPrefs * Prefs = win->GetPrefs();
+
+	// Validate the atom reference for this frame.
+	if (atom < 0 || atom >= cFrame->GetNumAtoms()) return;
+
+	float AtomScale = Prefs->GetAtomScale();
+	long curAtomType = cFrame->GetAtomType(atom) - 1;
+
+	radius = AtomScale * Prefs->GetAtomSize(curAtomType);
+
+	cFrame->GetAtomPosition(atom, atom_pos);
+
+	glPushMatrix();
+	glTranslatef(atom_pos.x, atom_pos.y, atom_pos.z);
+
+	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
+
+	invert1[0] = 1.0f - BackgroundColor->red / 65536.0f;
+	invert1[1] = 1.0f - BackgroundColor->green / 65536.0f;
+	invert1[2] = 1.0f - BackgroundColor->blue / 65536.0f;
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, m);
+	glDisable(GL_LIGHTING);
+	glLineWidth(3.0f);
+
+	invert2[0] = 0.0f;
+	invert2[1] = 1.0f;
+	invert2[2] = 0.0f;
+
+	glBegin(GL_QUAD_STRIP);
+	for (angle = 0.0f; angle <= 6.24f; angle += 0.1f) {
+		ca1 = cos(angle) * (radius + 0.03f);
+		sa1 = sin(angle) * (radius + 0.03f);
+		ca2 = cos(angle) * (radius + 0.08f);
+		sa2 = sin(angle) * (radius + 0.08f);
+		glColor3fv(invert1);
+		glVertex3f(ca1 * m[0] + sa1 * m[1],
+					ca1 * m[4] + sa1 * m[5],
+					ca1 * m[8] + sa1 * m[9]);
+		glColor3fv(invert2);
+		glVertex3f(ca2 * m[0] + sa2 * m[1],
+					ca2 * m[4] + sa2 * m[5],
+					ca2 * m[8] + sa2 * m[9]);
+	}
+	ca1 = cos(0.0f) * (radius + 0.03f);
+	sa1 = sin(0.0f) * (radius + 0.03f);
+	ca2 = cos(0.0f) * (radius + 0.08f);
+	sa2 = sin(0.0f) * (radius + 0.08f);
+	glColor3fv(invert1);
+	glVertex3f(ca1 * m[0] + sa1 * m[1],
+				ca1 * m[4] + sa1 * m[5],
+				ca1 * m[8] + sa1 * m[9]);
+	glColor3fv(invert2);
+	glVertex3f(ca2 * m[0] + sa2 * m[1],
+				ca2 * m[4] + sa2 * m[5],
+				ca2 * m[8] + sa2 * m[9]);
+	glEnd();
+
+	glBegin(GL_QUAD_STRIP);
+	for (angle = 0.0f; angle <= 6.24f; angle += 0.1f) {
+		ca1 = cos(angle) * (radius + 0.08f);
+		sa1 = sin(angle) * (radius + 0.08f);
+		ca2 = cos(angle) * (radius + 0.13f);
+		sa2 = sin(angle) * (radius + 0.13f);
+		glColor3fv(invert2);
+		glVertex3f(ca1 * m[0] + sa1 * m[1],
+					ca1 * m[4] + sa1 * m[5],
+					ca1 * m[8] + sa1 * m[9]);
+		glColor3fv(invert1);
+		glVertex3f(ca2 * m[0] + sa2 * m[1],
+					ca2 * m[4] + sa2 * m[5],
+					ca2 * m[8] + sa2 * m[9]);
+	}
+	ca1 = cos(0.0f) * (radius + 0.08f);
+	sa1 = sin(0.0f) * (radius + 0.08f);
+	ca2 = cos(0.0f) * (radius + 0.13f);
+	sa2 = sin(0.0f) * (radius + 0.13f);
+	glColor3fv(invert2);
+	glVertex3f(ca1 * m[0] + sa1 * m[1],
+				ca1 * m[4] + sa1 * m[5],
+				ca1 * m[8] + sa1 * m[9]);
+	glColor3fv(invert1);
+	glVertex3f(ca2 * m[0] + sa2 * m[1],
+				ca2 * m[4] + sa2 * m[5],
+				ca2 * m[8] + sa2 * m[9]);
+	glEnd();
+	glLineWidth(1.0f);
+	glEnable(GL_LIGHTING);
+	glPopMatrix();
 }
 
 void MolDisplayWin::DrawStaticLabel(const char* label, GLfloat x, GLfloat y)
@@ -1386,11 +1494,11 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			long curAtomType = lAtoms[iatom].GetType() - 1;
 
 			float radius;
-			if (!Prefs->DrawWireFrame()) {
-				radius = AtomScale*Prefs->GetAtomSize(curAtomType);
-			} else {
-				radius = BondSize;
-			}
+			// if (!Prefs->DrawWireFrame()) { 
+			radius = AtomScale*Prefs->GetAtomSize(curAtomType);
+			// } else { 
+				// radius = BondSize; 
+			// } 
 			
 			if (radius < 0.01) continue;	//skip really small spheres
 
@@ -1405,100 +1513,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 				     lAtoms[iatom].Position.y,
 				     lAtoms[iatom].Position.z);
 
-			if (lAtoms[iatom].IsMarked()) {
-				// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
-				// glLineWidth(6.0f); 
-				// glDisable(GL_LIGHTING); 
-				// glDepthMask(GL_FALSE); 
-				// gluSphere(qobj, radius, 1.5f * Quality, Quality); 
-				// glDepthMask(GL_TRUE); 
-				// glEnable(GL_LIGHTING); 
-				// glLineWidth(1.0f); 
-				// glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
-
-				float m[16];
-				float angle;
-				float ca1, sa1;
-				float ca2, sa2;
-				float invert1[3];
-				float invert2[3];
-
-				invert1[0] = 1.0f - BackgroundColor->red / 65536.0f;
-				invert1[1] = 1.0f - BackgroundColor->green / 65536.0f;
-				invert1[2] = 1.0f - BackgroundColor->blue / 65536.0f;
-
-				glGetFloatv(GL_MODELVIEW_MATRIX, m);
-				glDisable(GL_LIGHTING);
-				glLineWidth(3.0f);
-				// Prefs->GetAtomColorInverse(curAtomType + 1, invert2); 
-				// atom_invert[0] = 1.0f - bg_invert[0]; 
-				// atom_invert[1] = 1.0f - bg_invert[1]; 
-				// atom_invert[2] = 1.0f - bg_invert[2]; 
-				invert2[0] = 0.0f;
-				invert2[1] = 1.0f;
-				invert2[2] = 0.0f;
-
-				glBegin(GL_QUAD_STRIP);
-				for (angle = 0.0f; angle <= 6.24f; angle += 0.1f) {
-					ca1 = cos(angle) * (radius + 0.03f);
-					sa1 = sin(angle) * (radius + 0.03f);
-					ca2 = cos(angle) * (radius + 0.08f);
-					sa2 = sin(angle) * (radius + 0.08f);
-					glColor3fv(invert1);
-					glVertex3f(ca1 * m[0] + sa1 * m[1],
-								ca1 * m[4] + sa1 * m[5],
-								ca1 * m[8] + sa1 * m[9]);
-					glColor3fv(invert2);
-					glVertex3f(ca2 * m[0] + sa2 * m[1],
-								ca2 * m[4] + sa2 * m[5],
-								ca2 * m[8] + sa2 * m[9]);
-				}
-				ca1 = cos(0.0f) * (radius + 0.03f);
-				sa1 = sin(0.0f) * (radius + 0.03f);
-				ca2 = cos(0.0f) * (radius + 0.08f);
-				sa2 = sin(0.0f) * (radius + 0.08f);
-				glColor3fv(invert1);
-				glVertex3f(ca1 * m[0] + sa1 * m[1],
-							ca1 * m[4] + sa1 * m[5],
-							ca1 * m[8] + sa1 * m[9]);
-				glColor3fv(invert2);
-				glVertex3f(ca2 * m[0] + sa2 * m[1],
-							ca2 * m[4] + sa2 * m[5],
-							ca2 * m[8] + sa2 * m[9]);
-				glEnd();
-
-				glBegin(GL_QUAD_STRIP);
-				for (angle = 0.0f; angle <= 6.24f; angle += 0.1f) {
-					ca1 = cos(angle) * (radius + 0.08f);
-					sa1 = sin(angle) * (radius + 0.08f);
-					ca2 = cos(angle) * (radius + 0.13f);
-					sa2 = sin(angle) * (radius + 0.13f);
-					glColor3fv(invert2);
-					glVertex3f(ca1 * m[0] + sa1 * m[1],
-								ca1 * m[4] + sa1 * m[5],
-								ca1 * m[8] + sa1 * m[9]);
-					glColor3fv(invert1);
-					glVertex3f(ca2 * m[0] + sa2 * m[1],
-								ca2 * m[4] + sa2 * m[5],
-								ca2 * m[8] + sa2 * m[9]);
-				}
-				ca1 = cos(0.0f) * (radius + 0.08f);
-				sa1 = sin(0.0f) * (radius + 0.08f);
-				ca2 = cos(0.0f) * (radius + 0.13f);
-				sa2 = sin(0.0f) * (radius + 0.13f);
-				glColor3fv(invert2);
-				glVertex3f(ca1 * m[0] + sa1 * m[1],
-							ca1 * m[4] + sa1 * m[5],
-							ca1 * m[8] + sa1 * m[9]);
-				glColor3fv(invert1);
-				glVertex3f(ca2 * m[0] + sa2 * m[1],
-							ca2 * m[4] + sa2 * m[5],
-							ca2 * m[8] + sa2 * m[9]);
-				glEnd();
-				glLineWidth(1.0f);
-				glEnable(GL_LIGHTING);
-			}
-			
 			//	glColor3f(red, green, blue);
 			Prefs->ChangeColorAtomColor(curAtomType+1);
 			

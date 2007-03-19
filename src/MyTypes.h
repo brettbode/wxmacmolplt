@@ -87,6 +87,7 @@ public:
 	virtual bool ReadXML(XMLElement * p) = 0;
 private:
 };
+
 class AnnotationLength : public Annotation {
 public:
 	AnnotationLength(void) : Annotation(), atom_1(-1), atom_2(-1) {};
@@ -105,6 +106,24 @@ private:
 	long	atom_1;
 	long	atom_2;
 };
+
+class AnnotationMarker : public Annotation {
+public:
+	AnnotationMarker(void) : Annotation(), atom(-1) {};
+	AnnotationMarker(long atom_id) : Annotation(), atom(atom_id) {};
+	virtual ~AnnotationMarker(void) {};
+	
+	virtual void draw(const MolDisplayWin * win) const;
+	virtual bool containsAtom(int atom_id) const {return atom == atom_id;}
+	virtual void adjustIds(int atom_id) {
+		if (atom > atom_id) atom--;
+	}
+	virtual void WriteXML(XMLElement * parent) const;
+	virtual bool ReadXML(XMLElement * p);
+private:
+	long	atom;
+};
+
 class AnnotationAngle : public Annotation {
 public:
 	AnnotationAngle(void) : Annotation(), 
@@ -128,6 +147,7 @@ private:
 	long	atom_2;
 	long	atom_3;
 };
+
 class AnnotationDihedral : public Annotation {
 public:
 	AnnotationDihedral(void) : Annotation(), 

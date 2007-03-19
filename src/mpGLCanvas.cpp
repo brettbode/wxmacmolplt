@@ -1049,7 +1049,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 		nItem.Append(aLabel);
 		item = menu.Append(wxID_ANY, nItem);
 		item->Enable(false);
-		menu.Append(GL_Popup_Toggle_Mark_Atom, wxT("Toggle Mark"));
+		menu.Append(GL_Popup_Mark_Atom, wxT("Mark atom"));
 	}
 
 	if (select_stack_top > 1) {
@@ -1258,9 +1258,11 @@ void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
 void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
 
 	switch (event.GetId()) {
-		case GL_Popup_Toggle_Mark_Atom:
-			printf("selected: %d\n", selected);
-			mMainData->cFrame->Atoms[selected].ToggleMark();
+		case GL_Popup_Mark_Atom:
+		{
+			AnnotationMarker * t = new AnnotationMarker(selected);
+			mMainData->Annotations.push_back(t);
+		}
 			break;
 		case GL_Popup_Measure_Length:
 		{
@@ -1433,7 +1435,8 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_Measure_Length, MpGLCanvas::AddAnnotation)
 	EVT_MENU(GL_Popup_Measure_Angle, MpGLCanvas::AddAnnotation)
 	EVT_MENU(GL_Popup_Measure_Dihedral, MpGLCanvas::AddAnnotation)
-	EVT_MENU(GL_Popup_Toggle_Mark_Atom, MpGLCanvas::AddAnnotation)
+	EVT_MENU(GL_Popup_Mark_Atom, MpGLCanvas::AddAnnotation)
+	EVT_MENU(GL_Popup_Unmark_Atom, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Delete_Length, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Delete_Angle, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Delete_Dihedral, MpGLCanvas::DeleteAnnotation)

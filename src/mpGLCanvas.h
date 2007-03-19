@@ -33,14 +33,15 @@
 #define GL_Popup_To_Single_Bond 30015
 #define GL_Popup_To_Double_Bond 30016
 #define GL_Popup_To_Triple_Bond 30017
-#define GL_Popup_Measure_Length 30018
-#define GL_Popup_Measure_Angle 30019
-#define GL_Popup_Measure_Dihedral 30020
-#define GL_Popup_Delete_Length 30021
-#define GL_Popup_Delete_Angle 30022
-#define GL_Popup_Delete_Dihedral 30023
-#define GL_Popup_Delete_Bond 30024
-#define GL_Popup_Toggle_Mark_Atom 30025
+#define GL_Popup_Mark_Atom 30018
+#define GL_Popup_Measure_Length 30019
+#define GL_Popup_Measure_Angle 30020
+#define GL_Popup_Measure_Dihedral 30021
+#define GL_Popup_Unmark_Atom 30022
+#define GL_Popup_Delete_Length 30023
+#define GL_Popup_Delete_Angle 30024
+#define GL_Popup_Delete_Dihedral 30025
+#define GL_Popup_Delete_Bond 30026
 
 class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
