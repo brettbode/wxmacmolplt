@@ -58,7 +58,6 @@ class AtomPrefsPane : public wxScrolledWindow, public PrefsPane
 		~AtomPrefsPane();
 		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
-		void syncColor(int id, wxColour* c);
 
 	private:
 		short	ActiveEdit;

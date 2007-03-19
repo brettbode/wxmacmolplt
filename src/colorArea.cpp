@@ -32,7 +32,8 @@ END_EVENT_TABLE()
 
   mCurrentColor = RGB2WX(*color);
   SetBackgroundColour(mCurrentColor);
-  mParent = dynamic_cast<AtomPrefsPane*>(parent);
+  
+  mPeer = NULL;
 }
 
 colorArea::~colorArea()
@@ -87,10 +88,11 @@ void colorArea::OnMouse(wxMouseEvent &event)
 
 			Refresh();
 
+			if (mPeer)
+			  mPeer->setColor(&mCurrentColor);
+
 			wxCommandEvent evt(wxEVT_COMMAND_ENTER, GetId());
 			wxPostEvent(this, evt);
-
-			mParent->syncColor(mID, &mCurrentColor);
 		}
 	}
 }

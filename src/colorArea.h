@@ -36,12 +36,15 @@ public:
 	void getColor(RGBColor * color) const;
 	void setColor(const RGBColor * color);
 	void setColor(const wxColour* color);
+
+	void setPeer(colorArea* peer) { mPeer = peer; }
+
 	// function that handles the actual color change
 	// A wxEVT_COMMAND_ENTER event is generated if the color is changed.
 	void OnMouse(wxMouseEvent &event);
 
 protected:
-	AtomPrefsPane* mParent;
+	colorArea* mPeer;
 	wxColour mCurrentColor;
 
 	int mWidth;

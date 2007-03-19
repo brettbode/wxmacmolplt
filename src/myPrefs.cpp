@@ -243,14 +243,11 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
 
       mPatternArea[i] = new colorPatternArea(this, i, mTargetPrefs->GetAtomColorLoc(i),i);
       mMainSizer->Add(mPatternArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+      mColorArea[i]->setPeer(mPatternArea[i]);
+      mPatternArea[i]->setPeer(mColorArea[i]); //need to synchronize color if needed
     }
 
   mMainSizer->Layout();
-}
-
-void AtomPrefsPane::syncColor(int id, wxColour* c)
-{
-  mPatternArea[id]->setColor(c);
 }
 
 void AtomPrefsPane::saveToTempPrefs()
@@ -334,9 +331,13 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
   mInnerSizer->Add(mColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
   mInnerSizer->Add(mPatternArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
+  mColorArea->setPeer(mPatternArea);
+
   mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Modes:"))), 0, wxALIGN_RIGHT | wxALL, 3);
   mInnerSizer->Add(mNormColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
   mInnerSizer->Add(mNormPatternArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+
+  mNormColorArea->setPeer(mNormPatternArea);
 
   mBox->Add(mInnerSizer);
   mLowerSizer->Add(mBox);
