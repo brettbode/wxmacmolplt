@@ -120,7 +120,15 @@ class Frame {
 		bool AddBond(long Atom1, long Atom2, const BondOrder & b=kSingleBond);
 		bool IncreaseBondAllocation(long NumAdditional);
 		void DeleteBond(long BondNum);
-		void SetBonds(WinPrefs * Prefs, bool KeepOldBonds);
+			/**
+			 * Autmatically determines bonds based in atomic radii and interatomic distances
+			 * along with user selected tolerances.
+			 * @param Prefs The user preferences object.
+			 * @param KeepOldBonds If true bonds will only be added to the existing set.
+			 * @param selectedOnly If true bonds for the currently selected set of atoms will be
+			 *                     erased and redetermined.
+			 */
+		void SetBonds(WinPrefs * Prefs, bool KeepOldBonds, bool selectedOnly=false);
 		bool AddSpecialAtom(CPoint3D Vector, long AtomNum);
 		bool SurfaceExportPossible(void);
 		void ExportSurface(BufferFile * Buffer);

@@ -471,7 +471,7 @@ long Frame::GetNumElectrons(void) const {
 	return result;
 };
 
-void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
+void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds, bool selectedOnly)
 {	long		iatm, jatm, maxbonds;
 	CPoint3D	offset;
 	float		distance, AutoDist=-1.0;
@@ -490,9 +490,21 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 	NumBonds = 0;
 	BondAllocation = maxbonds;
 	if (KeepOldBonds) {
-		for (long ibond=0; ibond<NumOldBonds; ibond++)
-			Bonds[ibond] = OldBonds[ibond];
-		NumBonds = NumOldBonds;
+		//Here we copy the old bond array over preserving the existing bonds
+		NumBonds = 0;
+		for (long ibond=0; ibond<NumOldBonds; ibond++) {
+			if (selectedOnly) {
+				//In selectedOnly mode we do not copy bonds with selected atoms
+				if (!Atoms[Bonds[ibond].Atom1].GetSelectState()
+					&& !Atoms[Bonds[ibond].Atom2].GetSelectState()) {
+					Bonds[NumBonds] = OldBonds[ibond];
+					NumBonds++;
+				}
+			} else {
+				Bonds[NumBonds] = OldBonds[ibond];
+				NumBonds++;
+			}
+		}
 	}
 	float AutoScale = Prefs->GetAutoBondScale();
 	bool AutoBond = Prefs->GetAutoBond();
@@ -502,12 +514,15 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 	BondOrder lOrder;
 	long iType, jType;
 	for (iatm=0; iatm<NumAtoms; iatm++) {
+		iType = Atoms[iatm].GetType();
+		if (iType > 115) continue;
 		for (jatm=iatm+1; jatm<NumAtoms; jatm++) {
-			iType = Atoms[iatm].GetType();
+			if (selectedOnly && !Atoms[iatm].GetSelectState() && !Atoms[jatm].GetSelectState())
+				continue;
 			jType = Atoms[jatm].GetType();
 			if (HHBondFlag)	/*if both atoms are H's don't allow bonds if HHBondFlag is set*/
 				if ((iType == 1)&&(jType == 1)) continue;
-			if ((iType > 115)||(jType > 115)) continue;
+			if (jType > 115) continue;
 			offset.x = Atoms[iatm].Position.x - Atoms[jatm].Position.x;
 			offset.y = Atoms[iatm].Position.y - Atoms[jatm].Position.y;
 			offset.z = Atoms[iatm].Position.z - Atoms[jatm].Position.z;
@@ -559,6 +574,8 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds)
 			if (!((iType==1)||((iType>=7)&&(iType<=9))||((iType>=15)&&(iType<=17))||
 				  (iType==34)||(iType==35))) continue;
 			for (jatm=iatm+1; jatm<NumAtoms; jatm++) {
+				if (selectedOnly && !Atoms[iatm].GetSelectState() && !Atoms[jatm].GetSelectState())
+					continue;
 				jType = Atoms[jatm].GetType();
 				if (!((jType==1)||((jType>=7)&&(jType<=9))||((jType>=15)&&(jType<=17))||
 					  (jType==34)||(jType==35))) continue;
