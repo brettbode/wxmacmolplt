@@ -328,6 +328,9 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	glCanvas->SetFocus();
 	createMenuBar();
 	SetMenuBar(menuBar);
+	
+	Show(true);
+	AdjustMenus();
 
 	unsigned char texture[8] = {255, 0, 0, 255, 255, 0, 0, 255};
 	glGenTextures(1, &(OpenGLData->length_anno_tex_id));
@@ -336,10 +339,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage1D(GL_TEXTURE_1D, 0, GL_ALPHA, 8, 0, GL_ALPHA,
-					 GL_UNSIGNED_BYTE, texture);
-	
-	Show(true);
-	AdjustMenus();
+		GL_UNSIGNED_BYTE, texture);
 }
 
 MolDisplayWin::~MolDisplayWin() {
