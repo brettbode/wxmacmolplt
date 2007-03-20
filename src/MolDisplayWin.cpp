@@ -75,6 +75,7 @@ enum MMP_EventID {
 	MMP_WIREFRAMEMODE,
 	MMP_BALLANDSTICKMODE,
 	MMP_ANNOTATIONSSUBMENU,
+	MMP_ADDMARKANNOTATION,
 	MMP_ADDLENGTHANNOTATION,
 	MMP_ADDANGLEANNOTATION,
 	MMP_ADDDIHEDRALANNOTATION,
@@ -161,9 +162,11 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_SHOWATOMLABELS,   MolDisplayWin::menuViewShowAtomLabel)
 	EVT_MENU (MMP_SHOWATOMNUMBER,   MolDisplayWin::menuViewShowAtomNumber)
 	EVT_MENU (MMP_BOTHATOMLABELS,   MolDisplayWin::menuViewShowBothAtomLabels)
+	EVT_MENU (MMP_ADDMARKANNOTATION,   MolDisplayWin::menuViewAddMarkAnnotation)
 	EVT_MENU (MMP_ADDLENGTHANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
 	EVT_MENU (MMP_ADDANGLEANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
 	EVT_MENU (MMP_ADDDIHEDRALANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
+	EVT_UPDATE_UI(MMP_ADDMARKANNOTATION, MolDisplayWin::OnAnnotationMarkUpdate )
 	EVT_UPDATE_UI(MMP_ADDLENGTHANNOTATION, MolDisplayWin::OnAnnotationLengthUpdate )
 	EVT_UPDATE_UI(MMP_ADDANGLEANNOTATION, MolDisplayWin::OnAnnotationAngleUpdate )
 	EVT_UPDATE_UI(MMP_ADDDIHEDRALANNOTATION, MolDisplayWin::OnAnnotationDihedralUpdate )
@@ -500,6 +503,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewStyle->AppendRadioItem(MMP_BALLANDSTICKMODE, wxT("Ball and Stick"));
 
 	menuViewAnnotations = new wxMenu;
+	menuViewAnnotations->Append(MMP_ADDMARKANNOTATION, _("&Mark Selected"), _("Mark the selected atom(s), right-click to remove"));
 	menuViewAnnotations->Append(MMP_ADDLENGTHANNOTATION, _("Display &Length"), _("Select 2 atoms then right-click on one of them"));
 	menuViewAnnotations->Append(MMP_ADDANGLEANNOTATION, _("Display &Angle"), _("Select 3 atoms then right-click on one of them"));
 	menuViewAnnotations->Append(MMP_ADDDIHEDRALANNOTATION, _("Display Di&hedral"), _("Select 4 atoms then right-click on one of them"));
@@ -665,6 +669,9 @@ void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event ) {
 			wxTheClipboard->Close();
 		}
 	}
+}
+void MolDisplayWin::OnAnnotationMarkUpdate( wxUpdateUIEvent& event ) {
+	event.Enable(glCanvas->NumberSelectedAtoms()>0);
 }
 void MolDisplayWin::OnAnnotationLengthUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(glCanvas->NumberSelectedAtoms()==2);
@@ -1793,9 +1800,17 @@ void MolDisplayWin::menuViewShowBothAtomLabels(wxCommandEvent &event)
 	UpdateModelDisplay();
 	Dirty = true;
 }
+void MolDisplayWin::menuViewAddMarkAnnotation(wxCommandEvent &event) {
+	for (int i=0; i<MainData->cFrame->GetNumAtoms(); i++) {
+		if (MainData->cFrame->GetAtomSelectState(i)) {
+			AnnotationMarker * t = new AnnotationMarker(i);
+			MainData->Annotations.push_back(t);
+		}
+	}
+}
 void MolDisplayWin::menuViewAddAnnotation(wxCommandEvent &event) {
 	wxCommandEvent foo;
-	foo.SetId(event.GetId()-MMP_ADDLENGTHANNOTATION+GL_Popup_Measure_Length);
+	foo.SetId(event.GetId()-MMP_ADDMARKANNOTATION+GL_Popup_Mark_Atom);
 	glCanvas->AddAnnotation(foo);
 }
 void MolDisplayWin::menuViewDeleteAllAnnotations(wxCommandEvent &event) {

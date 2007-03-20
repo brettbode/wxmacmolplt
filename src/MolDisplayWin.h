@@ -249,6 +249,8 @@ class MolDisplayWin : public wxFrame {
 		void menuViewShowAtomNumber(wxCommandEvent &event);
 		void menuViewShowBothAtomLabels(wxCommandEvent &event);
 		void menuViewAddAnnotation(wxCommandEvent &event);
+		void menuViewAddMarkAnnotation(wxCommandEvent &event);
+		void OnAnnotationMarkUpdate(wxUpdateUIEvent &event);
 		void OnAnnotationLengthUpdate(wxUpdateUIEvent &event);
 		void OnAnnotationAngleUpdate(wxUpdateUIEvent &event);
 		void OnAnnotationDihedralUpdate(wxUpdateUIEvent &event);
