@@ -12,9 +12,9 @@
 
 #include "periodic_table_dlg.h"
 
-IMPLEMENT_DYNAMIC_CLASS(PeriodicTableDlg, wxDialog)
+IMPLEMENT_DYNAMIC_CLASS(PeriodicTableDlg, wxMiniFrame)
 
-BEGIN_EVENT_TABLE(PeriodicTableDlg, wxDialog)
+BEGIN_EVENT_TABLE(PeriodicTableDlg, wxMiniFrame)
 	EVT_CLOSE(PeriodicTableDlg::OnClose)
 	EVT_BUTTON(wxID_ANY, PeriodicTableDlg::ElementSelected)
 END_EVENT_TABLE()
@@ -59,9 +59,9 @@ bool PeriodicTableDlg::Create(
 	font_size = 10;
 #endif
 
-	wxDialog::Create(parent, wxID_ANY, title, wxPoint(xpos, ypos),
+	wxMiniFrame::Create(parent, wxID_ANY, title, wxPoint(xpos, ypos),
 		wxSize(BUTTON_SIZE * 18, BUTTON_SIZE * 10 + platform_offset),
-		wxCLOSE_BOX | wxCAPTION);
+		wxCLOSE_BOX);
 
 	nelements = 112;
 

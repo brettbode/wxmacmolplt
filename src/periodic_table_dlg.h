@@ -22,6 +22,7 @@
 #include "wx/image.h"
 #include "wx/dcmemory.h"
 #include "wx/brush.h"
+#include "wx/minifram.h"
 
 #include <stdio.h>
 
@@ -45,18 +46,18 @@ typedef struct {
 /* CLASSES                                                                   */
 /* ------------------------------------------------------------------------- */
 
-class PeriodicTableDlg: public wxDialog {    
+class PeriodicTableDlg: public wxMiniFrame {    
 
 	public:
 		PeriodicTableDlg();
 		PeriodicTableDlg(MpGLCanvas *parent,
-							  const wxChar *title = wxT("Periodic Table"),
-							  int xpos = 100, int ypos = 100);
+			const wxChar *title = wxT("Periodic Table"), int xpos = 100,
+			int ypos = 100);
 		~PeriodicTableDlg();
 
 		bool Create(MpGLCanvas *parent,
-						const wxChar *title = wxT("Periodic Table"),
-						int xpos = 100, int ypos = 100);
+			const wxChar *title = wxT("Periodic Table"), int xpos = 100,
+			int ypos = 100);
 		void New(wxCommandEvent& WXUNUSED(event));
 		void ElementSelected(wxCommandEvent& event);
 		void MouseMoved(wxMouseEvent& event);
