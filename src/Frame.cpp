@@ -495,8 +495,8 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds, bool selectedOnly)
 		for (long ibond=0; ibond<NumOldBonds; ibond++) {
 			if (selectedOnly) {
 				//In selectedOnly mode we do not copy bonds with selected atoms
-				if (!Atoms[Bonds[ibond].Atom1].GetSelectState()
-					&& !Atoms[Bonds[ibond].Atom2].GetSelectState()) {
+				if (!Atoms[OldBonds[ibond].Atom1].GetSelectState()
+					&& !Atoms[OldBonds[ibond].Atom2].GetSelectState()) {
 					Bonds[NumBonds] = OldBonds[ibond];
 					NumBonds++;
 				}
