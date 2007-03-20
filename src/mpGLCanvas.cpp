@@ -534,7 +534,13 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	else if (event.RightDown()) {
 		selected = testPicking(tmpPnt.x, tmpPnt.y);
 
-		if (selected >= 0 && selected < NumAtoms + lFrame->NumBonds) {
+		if (selected < 0) {
+			// We don't really do anything here, since the user didn't 
+			// click on anything.  But by including this null block, we
+			// don't need to test for this anymore.
+		}
+
+		else if (selected < NumAtoms + lFrame->NumBonds) {
 			if (interactiveMode) {
 				interactPopupMenu(tmpPnt.x, tmpPnt.y, 1);
 				MolWin->SelectionChanged(deSelectAll);
@@ -559,25 +565,6 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Length,
 						  wxT("Delete Annotation"));
 		}
-/*		else if (selected < NumAtoms + lFrame->NumBonds +
-			lFrame->AnnoLengths.size()) {
-			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Length,
-				wxT("Delete length"));
-		}
-
-		else if (selected < NumAtoms + lFrame->NumBonds +
-			lFrame->AnnoLengths.size() + lFrame->AnnoAngles.size()) {
-			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Angle,
-				wxT("Delete angle"));
-		}
-
-		else if (selected < NumAtoms + lFrame->NumBonds +
-					lFrame->AnnoLengths.size() + lFrame->AnnoAngles.size() +
-					lFrame->AnnoDihedrals.size()) {
-			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Dihedral,
-							wxT("Delete dihedral"));
-		}
- */
 	}
 
 	// If we made it this far, button states haven't changed.  Are we dragging?
