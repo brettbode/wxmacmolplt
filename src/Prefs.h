@@ -341,7 +341,7 @@ class WinPrefs {
 		void ChangeColorBondColor(long BondOrder) const;
 		void ChangeColorVectorColor(void) const;
 		void ChangeColorAtomColor(long atomtype) const;
-		void WinPrefs::GetAtomColorInverse(long atomtype, float rgb[3]);
+		void GetAtomColorInverse(long atomtype, float rgb[3]);
 #endif
 		inline void SetBondColor(long BondOrder, const RGBColor & color) {BondColors[BondOrder] = color;};
 		inline void SetVectorColor(const RGBColor & color) {VectorColor = color; };
