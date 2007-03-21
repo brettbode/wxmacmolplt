@@ -73,12 +73,11 @@ class AtomPrefsPane : public wxScrolledWindow, public PrefsPane
 };
 
 
-class BondPrefsPane : public wxPanel, public PrefsPane
-{
+class BondPrefsPane : public wxPanel, public PrefsPane {
 	public:
 
-                BondPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
-                ~BondPrefsPane();
+		BondPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
+		~BondPrefsPane();
 		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
@@ -99,8 +98,8 @@ class BondPrefsPane : public wxPanel, public PrefsPane
 		wxCheckBox* mChkRotation;
 		wxSlider* mSldScale;
 		wxChoice* mBondChoice;
-		colorArea *mColorArea, *mPatternArea, *mNormColorArea, *mNormPatternArea;
-		
+		colorArea *mColorArea, *mNormColorArea;
+
 		int mChoiceId;
 
 		DECLARE_EVENT_TABLE()

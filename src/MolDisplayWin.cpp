@@ -172,9 +172,10 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_UPDATE_UI(MMP_ADDDIHEDRALANNOTATION, MolDisplayWin::OnAnnotationDihedralUpdate )
 	EVT_MENU (MMP_DELETEALLANNOTATIONS,   MolDisplayWin::menuViewDeleteAllAnnotations)
 	EVT_UPDATE_UI(MMP_DELETEALLANNOTATIONS, MolDisplayWin::OnDeleteAnnotationsUpdate )
-	EVT_MENU (MMP_SHOWPATTERN,		MolDisplayWin::menuViewShow2DPattern)
 	EVT_MENU (MMP_WIREFRAMEMODE,	MolDisplayWin::menuViewWireFrameStyle)
 	EVT_MENU (MMP_BALLANDSTICKMODE,	MolDisplayWin::menuViewBallAndStickStyle)
+	EVT_MENU (MMP_SHOWPATTERN,		MolDisplayWin::menuViewShow2DPattern)
+	EVT_UPDATE_UI(MMP_SHOWPATTERN,	MolDisplayWin::OnShowPatternUpdate )
 	EVT_MENU (MMP_ANIMATEFRAMES,    MolDisplayWin::menuViewAnimateFrames)
 	EVT_MENU (MMP_SHRINK10,         MolDisplayWin::menuViewShrink_10)
 	EVT_MENU (MMP_ENLARGE10,        MolDisplayWin::menuViewEnlarge_10)
@@ -305,7 +306,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
 	mHighliteState = false;
 	interactiveMode = false;
-	show2DPatternMode = false;
 
 #ifdef __WXMSW__
 	//Visual studio is a total pile.
@@ -498,10 +498,12 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewLabels->AppendRadioItem(MMP_BOTHATOMLABELS, wxT("S&ymbols and Numbers"));
 	
 	menuViewStyle = new wxMenu;
-	menuView->Append(MMP_DISPLAYMODESUBMENU, wxT("&Display Style"), menuViewStyle);
-	menuViewStyle->AppendRadioItem(MMP_WIREFRAMEMODE, wxT("Wire Frame"));
-	menuViewStyle->AppendRadioItem(MMP_BALLANDSTICKMODE, wxT("Ball and Stick"));
-
+	menuView->Append(MMP_DISPLAYMODESUBMENU, _("&Display Style"), menuViewStyle);
+	menuViewStyle->AppendRadioItem(MMP_WIREFRAMEMODE, _("Wire Frame"), _("Display as bonds only"));
+	menuViewStyle->AppendRadioItem(MMP_BALLANDSTICKMODE, _("Ball and Stick"), _("Tradiational display mode, sphere size can be adjusted in the preferences"));
+	menuViewStyle->AppendSeparator();
+	menuViewStyle->AppendCheckItem(MMP_SHOWPATTERN, _("Show Atom Patterns"), _("Overlay a 2D pattern on the atom spheres (Ball and Stick mode only)"));
+	
 	menuViewAnnotations = new wxMenu;
 	menuViewAnnotations->Append(MMP_ADDMARKANNOTATION, _("&Mark Selected"), _("Mark the selected atom(s), right-click to remove"));
 	menuViewAnnotations->Append(MMP_ADDLENGTHANNOTATION, _("Display &Length"), _("Select 2 atoms then right-click on one of them"));
@@ -527,10 +529,6 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewRotate->Append(MMP_ROTATEPRINC, wxT("to &Principle Orientation"));
 	menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
 
-#ifdef ENABLE_INTERACTIVE_MODE
-	menuView->AppendCheckItem(MMP_SHOWPATTERN, wxT("Show Patterns"));
-#endif
-	
 	menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."), _T("Apply the automated bond determination with several options"));
 	menuMolecule->Append(MMP_ENERGYEDIT, wxT("Set &Frame Energy..."));
 	menuMolecule->Append(MMP_CREATELLMPATH, wxT("Create &LLM Path..."), _T("Create a Linear Least Motion path between this geometry and the next one"));
@@ -684,6 +682,10 @@ void MolDisplayWin::OnAnnotationDihedralUpdate( wxUpdateUIEvent& event ) {
 }
 void MolDisplayWin::OnDeleteAnnotationsUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(MainData->GetAnnotationCount() > 0);
+}
+void MolDisplayWin::OnShowPatternUpdate( wxUpdateUIEvent& event ) {
+	event.Enable(!Prefs->DrawWireFrame());
+	event.Check(Prefs->Show2DPattern());
 }
 
 /* Event handler functions */
@@ -1817,14 +1819,10 @@ void MolDisplayWin::menuViewDeleteAllAnnotations(wxCommandEvent &event) {
 	MainData->DeleteAllAnnotations();
 }
 
-void MolDisplayWin::menuViewShow2DPattern(wxCommandEvent &event)
-{
-  show2DPatternMode = 1 - show2DPatternMode;
-
-  if (show2DPatternMode)
-	SetHighliteMode(false);  //automatically disable highlighting atoms if showing 2D patterns
-  UpdateModelDisplay();
-  Dirty = true;
+void MolDisplayWin::menuViewShow2DPattern(wxCommandEvent &event) {
+	Prefs->Show2DPattern(1-Prefs->Show2DPattern());
+	UpdateModelDisplay();
+	Dirty = true;
 }
 
 void MolDisplayWin::menuViewWireFrameStyle(wxCommandEvent &event)

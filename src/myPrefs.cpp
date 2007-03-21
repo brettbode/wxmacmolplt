@@ -241,7 +241,8 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
       mColorArea[i] = new colorArea(this, i, mTargetPrefs->GetAtomColorLoc(i));
       mMainSizer->Add(mColorArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-      mPatternArea[i] = new colorPatternArea(this, i, mTargetPrefs->GetAtomColorLoc(i),i);
+      mPatternArea[i] = new colorPatternArea(this, i, mTargetPrefs->GetAtomColorLoc(i),
+											 mTargetPrefs->GetAtomPattern(i));
       mMainSizer->Add(mPatternArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
       mColorArea[i]->setPeer(mPatternArea[i]);
       mPatternArea[i]->setPeer(mColorArea[i]); //need to synchronize color if needed
@@ -267,83 +268,68 @@ void AtomPrefsPane::saveToTempPrefs()
 }
 
 BondPrefsPane::BondPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean Global)
-	: PrefsPane(targetWindow, targetPrefs, kBondPrefsPane, Global) 
-{
+	: PrefsPane(targetWindow, targetPrefs, kBondPrefsPane, Global) {
+
 	Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
 
 	mMainSizer = new wxBoxSizer(wxVERTICAL);
 	mUpperSizer = new wxBoxSizer(wxVERTICAL);
 	mSldSizer = new wxBoxSizer(wxHORIZONTAL);
 	mBox = new wxStaticBoxSizer(wxHORIZONTAL, this);
-	mInnerSizer = new wxFlexGridSizer(3, 3, 0, 0);
+	mInnerSizer = new wxFlexGridSizer(3, 2, 0, 0);
 	mLowerSizer = new wxBoxSizer(wxVERTICAL);
 
 	SetSizer(mMainSizer);
 }
 
-BondPrefsPane::~BondPrefsPane()
-{
-  delete mColorArea;
-  delete mPatternArea;
-  delete mNormColorArea;
-  delete mNormPatternArea;
+BondPrefsPane::~BondPrefsPane() {
+	delete mColorArea;
+	delete mNormColorArea;
 }
 
-void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) 
-{
-  mChkAnim = new wxCheckBox(this, ID_SHOW_NORMAL_MODE_ANIMATION, _T("Show Normal Mode During Animation"), wxDefaultPosition);
-  mChkAnim->SetValue(mTargetPrefs->GetAnimateMode());
-  mChkRotation = new wxCheckBox(this, ID_SHOW_NORMAL_MODE_ROTATION, _T("Show Normal Mode During Rotation"), wxDefaultPosition);
-  mChkRotation->SetValue(mTargetPrefs->GetRotateMode());
+void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+	mChkAnim = new wxCheckBox(this, ID_SHOW_NORMAL_MODE_ANIMATION, _T("Show Normal Mode During Animation"), wxDefaultPosition);
+	mChkAnim->SetValue(mTargetPrefs->GetAnimateMode());
+	mChkRotation = new wxCheckBox(this, ID_SHOW_NORMAL_MODE_ROTATION, _T("Show Normal Mode During Rotation"), wxDefaultPosition);
+	mChkRotation->SetValue(mTargetPrefs->GetRotateMode());
 
-  mSldScale = new wxSlider( this, ID_NORMAL_MODE_SCALING_SLIDER, 
-			    (int)(mTargetPrefs->GetVectorScale()*10 - 1), 0, 25,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
+	mSldScale = new wxSlider( this, ID_NORMAL_MODE_SCALING_SLIDER, 
+				(int)(mTargetPrefs->GetVectorScale()*10 - 1), 0, 25,
+							 wxDefaultPosition, wxSize(155,wxDefaultCoord));
 
-  mUpperSizer->Add(mChkAnim, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-  mUpperSizer->Add(mChkRotation, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-  mSldSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Mode Scaling:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-  mSldSizer->Add(mSldScale, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-  mUpperSizer->Add(mSldSizer);
+	mUpperSizer->Add(mChkAnim, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	mUpperSizer->Add(mChkRotation, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	mSldSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Mode Scaling:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	mSldSizer->Add(mSldScale, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	mUpperSizer->Add(mSldSizer);
 
-  wxString choices[] = { _T("Hydrogen Bonds"),
-		       _T("Single Bonds"),
-		       _T("Double Bonds"),
-		       _T("Triple Bonds")
-  };
+	wxString choices[] = { _T("Hydrogen Bonds"),
+						_T("Single Bonds"),
+						_T("Double Bonds"),
+						_T("Triple Bonds") };
 
-  mBondChoice = new wxChoice(this, ID_BOND_MODE_CHOICE, wxPoint(10,10), wxSize(150,wxDefaultCoord), 4, choices);
-  mBondChoice->SetSelection(1);
-  mChoiceId = 1;
+	mBondChoice = new wxChoice(this, ID_BOND_MODE_CHOICE, wxPoint(10,10), wxSize(150,wxDefaultCoord), 4, choices);
+	mBondChoice->SetSelection(1);
+	mChoiceId = 1;
 
-  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT(""))), 0, wxALIGN_RIGHT | wxALL, 3);
-  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Color"))), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Pattern"))), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-  mInnerSizer->Add(mBondChoice, 0, wxALIGN_RIGHT | wxALL, 3);
+	mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT(""))), 0, wxALIGN_RIGHT | wxALL, 3);
+	mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Color"))), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	mInnerSizer->Add(mBondChoice, 0, wxALIGN_RIGHT | wxALL, 3);
 
-  mColorArea = new colorArea(this, 1, mTargetPrefs->GetBondColorLoc(1));
-  mPatternArea = new colorArea(this, 2, mTargetPrefs->GetBondColorLoc(1));
-  //!!! don't know where to get patterns, use color 
+	mColorArea = new colorArea(this, 1, mTargetPrefs->GetBondColorLoc(1));
 
-  mNormColorArea = new colorArea(this, 3, mTargetPrefs->GetVectorColorLoc());
-  mNormPatternArea = new colorArea(this, 4, mTargetPrefs->GetVectorColorLoc());
+	mNormColorArea = new colorArea(this, 3, mTargetPrefs->GetVectorColorLoc());
 
-  mInnerSizer->Add(mColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-  mInnerSizer->Add(mPatternArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	mInnerSizer->Add(mColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-  mColorArea->setPeer(mPatternArea);
+	mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Modes:"))), 0, wxALIGN_RIGHT | wxALL, 3);
+	mInnerSizer->Add(mNormColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-  mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Modes:"))), 0, wxALIGN_RIGHT | wxALL, 3);
-  mInnerSizer->Add(mNormColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-  mInnerSizer->Add(mNormPatternArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	mBox->Add(mInnerSizer);
+	mLowerSizer->Add(mBox);
 
-  mNormColorArea->setPeer(mNormPatternArea);
-
-  mBox->Add(mInnerSizer);
-  mLowerSizer->Add(mBox);
-
-  mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER | wxALL, 3);
-  mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER | wxALL, 3);
+	mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER | wxALL, 3);
+	mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER | wxALL, 3);
 }
 
 void BondPrefsPane::saveToTempPrefs()
@@ -385,7 +371,6 @@ void BondPrefsPane::OnChoice( wxCommandEvent &event )
 		mChoiceId = 3;
 
 	mColorArea->setColor(mTargetPrefs->GetBondColorLoc(mChoiceId));
-	mPatternArea->setColor(mTargetPrefs->GetBondColorLoc(mChoiceId));
 }
 
 

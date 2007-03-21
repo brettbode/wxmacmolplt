@@ -96,30 +96,29 @@ void colorArea::OnMouse(wxMouseEvent &event)
 		}
 	}
 }
-
-colorPatternArea::colorPatternArea(wxWindow* parent, int id, const RGBColor* color, int patID) : colorArea(parent, id, color)
-{
-  mPattern = new wxBitmap((const char*)atomMaskPatterns[id%numPatterns], 32, 32);
-  Refresh();
+colorPatternArea::colorPatternArea(wxWindow* parent, int id, const RGBColor* color, int patID)
+		: colorArea(parent, id, color) {
+	if ((patID>=0)&&(patID<numPatterns))
+		mPattern = new wxBitmap((const char*)atomMaskPatterns[patID], 32, 32);
+	else
+		mPattern = new wxBitmap((const char*)atomMaskPatterns[0], 32, 32);
+	Refresh();
 }
 
-colorPatternArea::~colorPatternArea()
-{
-  delete mPattern;
+colorPatternArea::~colorPatternArea() {
+	delete mPattern;
 }
 
-void colorPatternArea::draw()
-{
-  Refresh();
+void colorPatternArea::draw() {
+	Refresh();
 }
 
-void colorPatternArea::OnPaint(wxPaintEvent &WXUNUSED(event))
-{
-  wxPaintDC dc(this);
-  PrepareDC(dc);
+void colorPatternArea::OnPaint(wxPaintEvent &WXUNUSED(event)) {
+	wxPaintDC dc(this);
+	PrepareDC(dc);
 
-  dc.SetBrush(wxBrush(*mPattern));
-  //dc.SetBrush(wxBrush(*wxRED));
-  dc.DrawRectangle(0, 0, mWidth, mHeight);
-  //dc.DrawBitmap(*mPattern, 0, 0);
+	dc.SetBrush(wxBrush(*mPattern));
+	//dc.SetBrush(wxBrush(*wxRED));
+	dc.DrawRectangle(0, 0, mWidth, mHeight);
+	//dc.DrawBitmap(*mPattern, 0, 0);
 }

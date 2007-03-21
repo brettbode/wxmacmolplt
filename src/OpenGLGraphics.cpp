@@ -1550,15 +1550,19 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			    glDisable(GL_BLEND);
 			  }
 
-			if (show2DPatternMode && lAtoms[iatom].GetType() > 6)
-			  {
-			    glColor3f(0.0f,0.0f,0.0f);
-			    glEnable(GL_POLYGON_STIPPLE);
-			    //glPolygonStipple(atomMaskPatterns[lAtoms[iatom].GetType()%numPatterns]);
-			    glPolygonStipple(atomMaskPatterns[11]); //for test
-			    gluSphere(qobj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
-			    glDisable(GL_POLYGON_STIPPLE);
-			  }
+			if (Prefs->Show2DPattern()) {
+				short patternindex = Prefs->GetAtomPattern(lAtoms[iatom].GetType()-1);
+				std::cerr << "Pattern id for " << lAtoms[iatom].GetType() << " is "
+				<< patternindex << std::endl;
+				//The 0th pattern is assumed to be solid so no need to draw
+				if ((patternindex>0)&&(patternindex<numPatterns)) {
+					glColor3f(0.0f,0.0f,0.0f);
+					glEnable(GL_POLYGON_STIPPLE);
+					glPolygonStipple(atomMaskPatterns[patternindex]);
+					gluSphere(qobj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
+					glDisable(GL_POLYGON_STIPPLE);
+				}
+			}
 
 			glPopMatrix();
 		}
