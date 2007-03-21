@@ -50,8 +50,8 @@ bool PeriodicTableDlg::Create(
 	int platform_height_offset;
 
 #ifdef __WXMAC__
-#define BUTTON_SIZE 34
-#define IMAGE_SIZE 34
+#define BUTTON_SIZE 26
+#define IMAGE_SIZE 26
 	platform_height_offset = 22;
 	platform_width_offset = 0;
 	font_size = 12;
