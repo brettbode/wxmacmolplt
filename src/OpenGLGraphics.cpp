@@ -1552,8 +1552,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 			if (Prefs->Show2DPattern()) {
 				short patternindex = Prefs->GetAtomPattern(lAtoms[iatom].GetType()-1);
-				std::cerr << "Pattern id for " << lAtoms[iatom].GetType() << " is "
-				<< patternindex << std::endl;
 				//The 0th pattern is assumed to be solid so no need to draw
 				if ((patternindex>0)&&(patternindex<numPatterns)) {
 					glColor3f(0.0f,0.0f,0.0f);
