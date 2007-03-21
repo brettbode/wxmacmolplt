@@ -46,21 +46,26 @@ bool PeriodicTableDlg::Create(
 	int row;
 	int col;
 	int font_size;
+	int platform_width_offset;
+	int platform_height_offset;
 
 #ifdef __WXMAC__
 #define BUTTON_SIZE 34
-#define IMAGE_SIZE 32
-	platform_offset = 22;
+#define IMAGE_SIZE 34
+	platform_height_offset = 22;
+	platform_width_offset = 0;
 	font_size = 12;
 #else
 #define BUTTON_SIZE 34
-#define IMAGE_SIZE 32
-	platform_offset = 0;
+#define IMAGE_SIZE 20
+	platform_height_offset = 22;
+	platform_width_offset = 5;
 	font_size = 10;
 #endif
 
 	wxMiniFrame::Create(parent, wxID_ANY, title, wxPoint(xpos, ypos),
-		wxSize(BUTTON_SIZE * 18, BUTTON_SIZE * 10 + platform_offset),
+		wxSize(BUTTON_SIZE * 18 + platform_width_offset,
+			BUTTON_SIZE * 10 + platform_height_offset),
 		wxCLOSE_BOX);
 
 	nelements = 112;
@@ -92,8 +97,8 @@ bool PeriodicTableDlg::Create(
 
 		NumberToTableCoords(i + 1, &row, &col);
 
-		elements[i].on_bmp = new wxBitmap(BUTTON_SIZE, BUTTON_SIZE);
-		elements[i].off_bmp = new wxBitmap(BUTTON_SIZE, BUTTON_SIZE);
+		elements[i].on_bmp = new wxBitmap(IMAGE_SIZE, IMAGE_SIZE);
+		elements[i].off_bmp = new wxBitmap(IMAGE_SIZE, IMAGE_SIZE);
 
 		// Create unselected version with white background, black text.
 		mem_dc->SelectObject(*(elements[i].off_bmp));
@@ -102,8 +107,8 @@ bool PeriodicTableDlg::Create(
 		mem_dc->Clear();
 		mem_dc->SetTextForeground(*wxBLACK);
 		mem_dc->DrawText(symbol,
-			(BUTTON_SIZE - symbol_width) / 2,
-			(BUTTON_SIZE - symbol_height) / 2);
+			(IMAGE_SIZE - symbol_width) / 2,
+			(IMAGE_SIZE - symbol_height) / 2);
 
 		// Create selected version with black background, white text.
 		mem_dc->SelectObject(*(elements[i].on_bmp));
@@ -111,8 +116,8 @@ bool PeriodicTableDlg::Create(
 		mem_dc->Clear();
 		mem_dc->SetTextForeground(*wxWHITE);
 		mem_dc->DrawText(symbol,
-			(BUTTON_SIZE - symbol_width) / 2,
-			(BUTTON_SIZE - symbol_height) / 2);
+			(IMAGE_SIZE - symbol_width) / 2,
+			(IMAGE_SIZE - symbol_height) / 2);
 
 		elements[i].button =
 			new wxBitmapButton(this, i, *(elements[i].off_bmp),
