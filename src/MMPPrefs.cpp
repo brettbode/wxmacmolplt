@@ -684,6 +684,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					ShowAtomNumberLabels(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowSymmetryOps), boolVal))
 					ShowSymmetryOperators(boolVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowAtomPatterns), boolVal))
+					Show2DPattern(boolVal);
 				XMLElementList * molChildren = child->getChildren();
 				for (int im=0; im<molChildren->length(); im++) {
 					XMLElement * molchild = molChildren->item(im);
@@ -1071,6 +1073,7 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowSymbolLabels), (ShowAtomicSymbolLabels()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowAtomNumbers), (ShowAtomNumberLabels()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowSymmetryOps), (ShowSymmetryOperators()?trueXML:falseXML));
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowAtomPatterns), (Show2DPattern()?trueXML:falseXML));
 	
 	XMLElement * color = molElement->addChildElement(MMPPref_convert(MMPMolDisplay_BackColor));
 	outbuf.str("");
@@ -1487,6 +1490,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "ShowAtomNumbers";
         case MMPMolDisplay_ShowSymmetryOps:
             return "ShowSymmetryOperators";
+        case MMPMolDisplay_ShowAtomPatterns:
+            return "ShowAtomPatterns";
 		default:
             return "invalid";
     }

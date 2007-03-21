@@ -110,6 +110,7 @@ enum MMPMolDisplayElments {
 	MMPMolDisplay_ShowSymbolLabels,
 	MMPMolDisplay_ShowAtomNumbers,
 	MMPMolDisplay_ShowSymmetryOps,
+	MMPMolDisplay_ShowAtomPatterns,
 	
 	NumberMMPMolDisplayElements
 };

@@ -182,7 +182,7 @@ class WinPrefs {
 				//bit 7: Outline bonds, bit 8: Use cylinders for lines
 				//bit 9: Look for H bonds, bit 10: determine bond order
 				//bit 11: Default for 3D mode, bit 12: native EOL chars
-				//bit 13: Create custom file icon
+				//bit 13: Create custom file icon, bit 14: Show 2D atom patterns
 
 		float			AtomMasses[kMaxAtomTypes], AutoBondScale, BondWidth, AtomScale,
 						GLFOV, VectorScale, QD3DFillBrightness, QD3DPointBrightness,
@@ -277,6 +277,9 @@ class WinPrefs {
 			//Set to indicate a custom thumbnail should be created when saving
 		inline bool CreateCustomIcon(void) const {return ((BitOptions & (1<<12))?false:true); };
 		inline void CreateCustomIcon(bool newVal) {BitOptions = (BitOptions & 0xFFFFEFFF) + (newVal?0:(1<<12));};
+			//Set to overlay a 2D pattern on the atoms in ball and stick mode
+		inline bool Show2DPattern(void) const {return ((BitOptions & (1<<13))?true:false); };
+		inline void Show2DPattern(bool newVal) {BitOptions = (BitOptions & 0xFFFFDFFF) + (newVal?(1<<13):0);};
 		inline Boolean ChangeFileType(void) const {return (SetCreator); };
 		inline void ChangeFileType(Boolean newVal) {SetCreator = (newVal != 0);};
 		inline short GetStereoOffset(void) const {return StereoOffset;};
@@ -327,6 +330,11 @@ class WinPrefs {
 		inline void SetAtomColor(long AtomNum, const RGBColor & color) {AtomColors[AtomNum] = color; };
 
 		void SetAtomPattern(long AtomNum);
+		short GetAtomPattern(long AtomType) const {
+			if ((AtomType>=0)&&(AtomType<kMaxAtomTypes))
+				return AtomPatterns[AtomType];
+			return 0;
+		};
 		inline RGBColor * GetAtomColorLoc(long AtomNum) {return &(AtomColors[AtomNum]);};
 		inline short * GetAtomPatternLoc(long AtomNum) {return &(AtomPatterns[AtomNum]);};
 		inline RGBColor * GetBondColorLoc(long BondOrder) {return &(BondColors[BondOrder]);};
