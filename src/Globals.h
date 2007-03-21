@@ -21,10 +21,12 @@
 
 //This needs to get put into the build system...
 #define __wxBuild__
-#define wxMacMolPlt_VERSION "6.3.2"
+#define wxMacMolPlt_VERSION "6.4"
 
 //activate the following line to use the interactive editor
-#define ENABLE_INTERACTIVE_MODE
+// please add CXXFLAGS=-DENABLE_INTERACTIVE_MODE to your configure step rather
+// than changing this file!
+//#define ENABLE_INTERACTIVE_MODE
 //Activate to enable the show symmetry operators menu items
 //#define ENABLE_SHOWSYMMETRY_MODE
 //Activate to allow quicktime movie export on Mac
