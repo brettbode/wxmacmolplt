@@ -87,12 +87,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_58EDE9C70AC74FCC9B791908DA5F5F90"
-        "OwnerKey" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_651548C912834A31B34AB532D0BE0112"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -159,6 +153,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_A2D4014D47A84B839DA3D92F49C26328"
+        "OwnerKey" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A58824D6A8C64E2681BA6AD313BA9D3C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -195,6 +195,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_CB973062E41140A8B9F3BFFA719DE1DB"
+        "OwnerKey" = "8:_A2D4014D47A84B839DA3D92F49C26328"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_CD65CF4DD98F4404814BBD3081CD30A5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -215,12 +221,6 @@
         {
         "MsmKey" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_DF708C5899F6487BB9B4EFDBBF823CDE"
-        "OwnerKey" = "8:_58EDE9C70AC74FCC9B791908DA5F5F90"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1057,6 +1057,144 @@
         }
         "FileType"
         {
+            "{5EB83D71-FA18-4901-BE56-DE22E13CC478}:_1858D1417DC848F89A29D0F7FD22B3B5"
+            {
+            "Name" = "8:GAMESS IRC file"
+            "Description" = "8:"
+            "Extensions" = "8:irc IRC"
+            "MIME" = "8:"
+            "Icon" = "8:"
+            "IconIndex" = "3:0"
+                "Command"
+                {
+                "Command" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
+                }
+                "Verbs"
+                {
+                    "{95C0C507-CBF0-42B8-B119-07219E384A4A}:_AA8F1598516D48B0BECE249E8A66AFB8"
+                    {
+                    "Command" = "8:&Open"
+                    "Verb" = "8:open"
+                    "Arguments" = "8:\"%1\""
+                    "Order" = "3:0"
+                    }
+                }
+            }
+            "{5EB83D71-FA18-4901-BE56-DE22E13CC478}:_3EBCD145860049979691B511EA1AB1EB"
+            {
+            "Name" = "8:xMol .mol file"
+            "Description" = "8:"
+            "Extensions" = "8:mol MOL"
+            "MIME" = "8:"
+            "Icon" = "8:"
+            "IconIndex" = "3:0"
+                "Command"
+                {
+                "Command" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
+                }
+                "Verbs"
+                {
+                    "{95C0C507-CBF0-42B8-B119-07219E384A4A}:_583FB6CEE7C94D638E2F13DE4DC84E00"
+                    {
+                    "Command" = "8:&Open"
+                    "Verb" = "8:open"
+                    "Arguments" = "8:\"%1\""
+                    "Order" = "3:0"
+                    }
+                }
+            }
+            "{5EB83D71-FA18-4901-BE56-DE22E13CC478}:_64E4CB07CF72491F9B56ED4FDD9E0D62"
+            {
+            "Name" = "8:XYZ file"
+            "Description" = "8:"
+            "Extensions" = "8:xyz XYZ"
+            "MIME" = "8:"
+            "Icon" = "8:"
+            "IconIndex" = "3:0"
+                "Command"
+                {
+                "Command" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
+                }
+                "Verbs"
+                {
+                    "{95C0C507-CBF0-42B8-B119-07219E384A4A}:_92344EFAA45D400D8AEA8C4893F82629"
+                    {
+                    "Command" = "8:&Open"
+                    "Verb" = "8:open"
+                    "Arguments" = "8:\"%1\""
+                    "Order" = "3:0"
+                    }
+                }
+            }
+            "{5EB83D71-FA18-4901-BE56-DE22E13CC478}:_76F268CFA12D4E159C35F466594532FB"
+            {
+            "Name" = "8:GAMESS input file"
+            "Description" = "8:"
+            "Extensions" = "8:inp INP"
+            "MIME" = "8:"
+            "Icon" = "8:"
+            "IconIndex" = "3:0"
+                "Command"
+                {
+                "Command" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
+                }
+                "Verbs"
+                {
+                    "{95C0C507-CBF0-42B8-B119-07219E384A4A}:_0683788CC842410999AF755720D016A5"
+                    {
+                    "Command" = "8:&Open"
+                    "Verb" = "8:open"
+                    "Arguments" = "8:\"%1\""
+                    "Order" = "3:0"
+                    }
+                }
+            }
+            "{5EB83D71-FA18-4901-BE56-DE22E13CC478}:_B54FBF67FBAD4111977F2C035B5C57F7"
+            {
+            "Name" = "8:GAMESS log file"
+            "Description" = "8:"
+            "Extensions" = "8:log LOG"
+            "MIME" = "8:"
+            "Icon" = "8:"
+            "IconIndex" = "3:0"
+                "Command"
+                {
+                "Command" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
+                }
+                "Verbs"
+                {
+                    "{95C0C507-CBF0-42B8-B119-07219E384A4A}:_FBFDC6BE854B430AACD4EABB1F0583D8"
+                    {
+                    "Command" = "8:&Open"
+                    "Verb" = "8:open"
+                    "Arguments" = "8:\"%1\""
+                    "Order" = "3:0"
+                    }
+                }
+            }
+            "{5EB83D71-FA18-4901-BE56-DE22E13CC478}:_E12F06B11CB64316BC11C29653AA23A6"
+            {
+            "Name" = "8:Chemical Markup Language"
+            "Description" = "8:"
+            "Extensions" = "8:cml CML"
+            "MIME" = "8:"
+            "Icon" = "8:"
+            "IconIndex" = "3:0"
+                "Command"
+                {
+                "Command" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
+                }
+                "Verbs"
+                {
+                    "{95C0C507-CBF0-42B8-B119-07219E384A4A}:_CFCF108DBF234FD1858A1D3E66D1E7D0"
+                    {
+                    "Command" = "8:&Open"
+                    "Verb" = "8:open"
+                    "Arguments" = "8:\"%1\""
+                    "Order" = "3:0"
+                    }
+                }
+            }
         }
         "Folder"
         {
@@ -1131,14 +1269,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:wxMacMolPlt"
-        "ProductCode" = "8:{2876670B-FEA4-4FC3-BAC6-9488836A114C}"
-        "PackageCode" = "8:{93C68BB2-8B9F-40FC-9C46-3BE37234DD39}"
+        "ProductCode" = "8:{B6C2E04B-6F6D-4094-BEA6-EA1A1E54F82F}"
+        "PackageCode" = "8:{EEF06F8F-D4A1-422C-8698-31C0A0922C10}"
         "UpgradeCode" = "8:{72B5F228-F1BD-4ED0-82D5-347629C06CC4}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.1.0"
+        "ProductVersion" = "8:1.3.0"
         "Manufacturer" = "8:ISU"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1661,7 +1799,7 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_58EDE9C70AC74FCC9B791908DA5F5F90"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_A2D4014D47A84B839DA3D92F49C26328"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
@@ -1675,7 +1813,7 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_DF708C5899F6487BB9B4EFDBBF823CDE"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_CB973062E41140A8B9F3BFFA719DE1DB"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
