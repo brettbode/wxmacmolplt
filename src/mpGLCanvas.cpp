@@ -631,21 +631,21 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 							lAtoms[i].Position.y = newY;
 							lAtoms[i].Position.z = newZ;
 						}
-					}
+				}
 
 					// Otherwise, if shift is down, we modify selected atoms' depth.
-					else if (event.ShiftDown()) { //move along z-axis
-						for ( int i = 0; i < NumAtoms; i++)
-							if (lAtoms[i].GetSelectState()) {
-								findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ);
-								tmpZ -= (float)dy/(float)(25*hsize/mMainData->WindowSize);
-								findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ);
-								lAtoms[i].Position.x = newX;
-								lAtoms[i].Position.y = newY;
-								lAtoms[i].Position.z = newZ;
-							}
-					}
+				else if (event.ShiftDown()) { //move along z-axis
+					for ( int i = 0; i < NumAtoms; i++)
+						if (lAtoms[i].GetSelectState()) {
+							findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ);
+							tmpZ -= (float)dy/(float)(25*hsize/mMainData->WindowSize);
+							findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ);
+							lAtoms[i].Position.x = newX;
+							lAtoms[i].Position.y = newY;
+							lAtoms[i].Position.z = newZ;
+						}
 				}
+			}
 			/*
 			} else {
 				wxRect window_rect = GetRect();
@@ -681,6 +681,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			if (deSelectAll && tmpBondStatus == -1)
 				lFrame->AddBond(oldSelect,selected);
 */
+			
+			lFrame->SetBonds(Prefs, true, true);
 
 			MolWin->UpdateGLModel();
 		}
