@@ -132,7 +132,7 @@ bool SetScreenPlane::Create( MolDisplayWin* p, wxWindowID id, const wxString& ca
     parent = p;
 
 ////@begin SetScreenPlane creation
-    SetExtraStyle(GetExtraStyle()|wxWS_EX_BLOCK_EVENTS);
+    SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
     wxDialog::Create( parent, id, caption, pos, size, style );
 
     CreateControls();
