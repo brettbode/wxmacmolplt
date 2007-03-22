@@ -47,8 +47,6 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 	MolWin = parent;
 	initialized = false;
 
-	periodic_dlg = NULL;
-
 	mMainData = parent->GetData();
 
 	mSelectState = -1;
@@ -1030,6 +1028,9 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 
 	wxMenuItem *item;
 	Frame *lFrame = mMainData->cFrame;
+	bool already_exists = false;
+	std::vector<Annotation *>::const_iterator anno;
+	int anno_id = 0;
 
 	if ((selected >= 0) && (selected < lFrame->GetNumAtoms())) {
 		wxString aLabel, nItem;
@@ -1038,8 +1039,27 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 		nItem.Append(aLabel);
 		item = menu.Append(wxID_ANY, nItem);
 		item->Enable(false);
-		menu.Append(GL_Popup_Mark_Atom, wxT("Mark atom"));
+
+		for (anno = mMainData->Annotations.begin(), anno_id = 0;
+			 anno != mMainData->Annotations.end() && !already_exists;
+			 anno++) {
+			if ((*anno)->isEquivalent(selected)) {
+				already_exists = true;
+			}
+			anno_id++;
+		}
+
+		item = menu.Append(GL_Popup_Mark_Atom, wxT("Mark atom"));
+		if (already_exists) {
+			item->Enable(false);
+		} else {
+			item->Enable(true);
+		}
 	}
+
+	// We need to restore this to false since the atom marker check may have
+	// set it to true, which shouldn't affect the availability of annotations.
+	already_exists = false;
 
 	if (select_stack_top > 1) {
 
@@ -1069,7 +1089,22 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 					item = menu.Append(wxID_ANY, lengthString);
 					item->Enable(false);
 				}
-				menu.Append(GL_Popup_Measure_Length, wxT("Measure length"));
+
+				for (anno = mMainData->Annotations.begin(), anno_id = 0;
+					 anno != mMainData->Annotations.end() && !already_exists;
+					 anno++) {
+					if ((*anno)->isEquivalent(select_stack[0], select_stack[1])) {
+						already_exists = true;
+					}
+					anno_id++;
+				}
+
+				item = menu.Append(GL_Popup_Measure_Length, wxT("Measure length"));
+				if (already_exists) {
+					item->Enable(false);
+				} else {
+					item->Enable(true);
+				}
 				
 				menu.AppendSeparator();
 				wxMenu * submenu = new wxMenu();
@@ -1111,11 +1146,40 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 			}
 				break;
 			case 3:
-				menu.Append(GL_Popup_Measure_Angle, wxT("Measure angle"));
+				for (anno = mMainData->Annotations.begin(), anno_id = 0;
+					 anno != mMainData->Annotations.end() && !already_exists;
+					 anno++) {
+					if ((*anno)->isEquivalent(select_stack[0], select_stack[1], select_stack[2])) {
+						already_exists = true;
+					}
+					anno_id++;
+				}
+
+				item = menu.Append(GL_Popup_Measure_Angle, wxT("Measure angle"));
+				if (already_exists) {
+					item->Enable(false);
+				} else {
+					item->Enable(true);
+				}
+
 				break;
 			case 4:
-				menu.Append(GL_Popup_Measure_Dihedral,
-							wxT("Measure dihedral angle"));
+				for (anno = mMainData->Annotations.begin(), anno_id = 0;
+					 anno != mMainData->Annotations.end() && !already_exists;
+					 anno++) {
+					if ((*anno)->isEquivalent(select_stack[0], select_stack[1], select_stack[2], select_stack[3])) {
+						already_exists = true;
+					}
+					anno_id++;
+				}
+
+				item = menu.Append(GL_Popup_Measure_Dihedral, wxT("Measure dihedral"));
+				if (already_exists) {
+					item->Enable(false);
+				} else {
+					item->Enable(true);
+				}
+
 				break;
 			default:
 				printf("ouch\n");
