@@ -41,6 +41,33 @@ WX_LIBS="`$WXCONFIG --libs base,core,gl,adv,core,base`"
 AC_SUBST([WX_CXXFLAGS])
 AC_SUBST([WX_LIBS])
 
+# The purpose here is to test for a working wx install
+# before the GL test. This should give the user a better error
+# when the install is broken rather than saying wx lacks GL support
+AC_MSG_CHECKING([for wxWidgets libraries])
+AC_LANG_SAVE()
+AC_LANG_CPLUSPLUS()
+TEMP_CXXFLAGS=$CXXFLAGS
+CXXFLAGS="$CXXFLAGS `$WXCONFIG --cxxflags`"
+TEMP_LIBS=$LIBS
+LIBS="$LIBS `$WXCONFIG --libs`"
+AC_TRY_RUN([
+      #include <cstdlib>
+      #include "wx/wx.h"
+      using namespace std;
+      int main() {
+          wxWindow *win;
+          exit(0);
+          return 0;
+      }
+],
+AC_MSG_RESULT([yes]),
+AC_MSG_RESULT([not found])
+AC_MSG_ERROR([have you set LD_LIBRARY_PATH correctly?]))
+CXXFLAGS=$TEMP_CXXFLAGS
+LIBS=$TEMP_LIBS
+AC_LANG_RESTORE()
+
 AC_MSG_CHECKING([for OpenGL support in wxWidgets])
 AC_LANG_SAVE()
 AC_LANG_CPLUSPLUS()
