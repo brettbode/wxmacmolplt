@@ -85,26 +85,34 @@ public:
 	virtual void adjustIds(int atom_id) {};
 	virtual void WriteXML(XMLElement * parent) const = 0;
 	virtual bool ReadXML(XMLElement * p) = 0;
+	virtual bool isEquivalent(int new_atom) const {return false;}
+	virtual bool isEquivalent(int new_atom1, int new_atom2) const {return false;}
+	virtual bool isEquivalent(int new_atom1, int new_atom2, int new_atom3) const {return false;}
+	virtual bool isEquivalent(int new_atom1, int new_atom2, int new_atom3, int new_atom4) const {return false;}
 private:
 };
 
 class AnnotationLength : public Annotation {
 public:
-	AnnotationLength(void) : Annotation(), atom_1(-1), atom_2(-1) {};
-	AnnotationLength(long atom1_id, long atom2_id) : Annotation(), atom_1(atom1_id), atom_2(atom2_id) {};
+	AnnotationLength(void) : Annotation(), atom1(-1), atom2(-1) {};
+	AnnotationLength(long atom1_id, long atom2_id) : Annotation(), atom1(atom1_id), atom2(atom2_id) {};
 	virtual ~AnnotationLength(void) {};
 	
 	virtual void draw(const MolDisplayWin * win) const;
-	virtual bool containsAtom(int atom_id) const {return ((atom_1 == atom_id)||(atom_2 == atom_id));}
+	virtual bool containsAtom(int atom_id) const {return ((atom1 == atom_id)||(atom2 == atom_id));}
 	virtual void adjustIds(int atom_id) {
-		if (atom_1 > atom_id) atom_1 --;
-		if (atom_2 > atom_id) atom_2 --;
+		if (atom1 > atom_id) atom1 --;
+		if (atom2 > atom_id) atom2 --;
+	}
+	bool isEquivalent(int new_atom1, int new_atom2) const {
+		return (new_atom1 == atom1 && new_atom2 == atom2) ||
+			   (new_atom2 == atom1 && new_atom1 == atom2);
 	}
 	virtual void WriteXML(XMLElement * parent) const;
 	virtual bool ReadXML(XMLElement * p);
 private:
-	long	atom_1;
-	long	atom_2;
+	long	atom1;
+	long	atom2;
 };
 
 class AnnotationMarker : public Annotation {
@@ -118,6 +126,9 @@ public:
 	virtual void adjustIds(int atom_id) {
 		if (atom > atom_id) atom--;
 	}
+	bool isEquivalent(int new_atom) const {
+		return new_atom == atom;
+	}
 	virtual void WriteXML(XMLElement * parent) const;
 	virtual bool ReadXML(XMLElement * p);
 private:
@@ -127,51 +138,61 @@ private:
 class AnnotationAngle : public Annotation {
 public:
 	AnnotationAngle(void) : Annotation(), 
-		atom_1(-1), atom_2(-1), atom_3(-1) {};
+		atom1(-1), atom2(-1), atom3(-1) {};
 	AnnotationAngle(long atom1_id, long atom2_id, long atom3_id) : Annotation(), 
-		atom_1(atom1_id), atom_2(atom2_id), atom_3(atom3_id) {};
+		atom1(atom1_id), atom2(atom2_id), atom3(atom3_id) {};
 	virtual ~AnnotationAngle(void) {};
 	
 	virtual void draw(const MolDisplayWin * win) const;
 	virtual bool containsAtom(int atom_id) const 
-		{return ((atom_1 == atom_id)||(atom_2 == atom_id)||(atom_3 == atom_id));}
+		{return ((atom1 == atom_id)||(atom2 == atom_id)||(atom3 == atom_id));}
 	virtual void adjustIds(int atom_id) {
-		if (atom_1 > atom_id) atom_1 --;
-		if (atom_2 > atom_id) atom_2 --;
-		if (atom_3 > atom_id) atom_3 --;
+		if (atom1 > atom_id) atom1 --;
+		if (atom2 > atom_id) atom2 --;
+		if (atom3 > atom_id) atom3 --;
+	}
+	bool isEquivalent(int new_atom1, int new_atom2, int new_atom3) const {
+		return new_atom2 == atom2 &&
+			   (new_atom1 == atom1 && new_atom3 == atom3) ||
+			   (new_atom3 == atom1 && new_atom1 == atom3);
 	}
 	virtual void WriteXML(XMLElement * parent) const;
 	virtual bool ReadXML(XMLElement * p);
 private:
-	long	atom_1;
-	long	atom_2;
-	long	atom_3;
+	long	atom1;
+	long	atom2;
+	long	atom3;
 };
 
 class AnnotationDihedral : public Annotation {
 public:
 	AnnotationDihedral(void) : Annotation(), 
-		atom_1(-1), atom_2(-1), atom_3(-1), atom_4(-1) {};
+		atom1(-1), atom2(-1), atom3(-1), atom4(-1) {};
 	AnnotationDihedral(long atom1_id, long atom2_id, long atom3_id, long atom4_id) : Annotation(), 
-		atom_1(atom1_id), atom_2(atom2_id), atom_3(atom3_id), atom_4(atom4_id) {};
+		atom1(atom1_id), atom2(atom2_id), atom3(atom3_id), atom4(atom4_id) {};
 	virtual ~AnnotationDihedral(void) {};
 	
 	virtual void draw(const MolDisplayWin * win) const;
 	virtual bool containsAtom(int atom_id) const 
-		{return ((atom_1 == atom_id)||(atom_2 == atom_id)||(atom_3 == atom_id)||(atom_4 == atom_id));}
+		{return ((atom1 == atom_id)||(atom2 == atom_id)||(atom3 == atom_id)||(atom4 == atom_id));}
 	virtual void adjustIds(int atom_id) {
-		if (atom_1 > atom_id) atom_1 --;
-		if (atom_2 > atom_id) atom_2 --;
-		if (atom_3 > atom_id) atom_3 --;
-		if (atom_4 > atom_id) atom_4 --;
+		if (atom1 > atom_id) atom1 --;
+		if (atom2 > atom_id) atom2 --;
+		if (atom3 > atom_id) atom3 --;
+		if (atom4 > atom_id) atom4 --;
+	}
+	bool isEquivalent(int new_atom1, int new_atom2, int new_atom3, int new_atom4) const {
+		return new_atom3 == atom3 && new_atom2 == atom2 &&
+				((new_atom4 == atom4 && new_atom1 == atom1) ||
+				 (new_atom4 == atom1 && new_atom1 == atom4));
 	}
 	virtual void WriteXML(XMLElement * parent) const;
 	virtual bool ReadXML(XMLElement * p);
 private:
-	long	atom_1;
-	long	atom_2;
-	long	atom_3;
-	long	atom_4;
+	long	atom1;
+	long	atom2;
+	long	atom3;
+	long	atom4;
 };
 
 class mpAtom {

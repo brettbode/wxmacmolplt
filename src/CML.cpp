@@ -753,23 +753,23 @@ void AnnotationMarker::WriteXML(XMLElement * parent) const {
 void AnnotationLength::WriteXML(XMLElement * parent) const {
 	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
 	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationLength));
-	Elem->addAttribute(kAnnAtom1XML, atom_1);
-	Elem->addAttribute(kAnnAtom2XML, atom_2);
+	Elem->addAttribute(kAnnAtom1XML, atom1);
+	Elem->addAttribute(kAnnAtom2XML, atom2);
 }
 void AnnotationAngle::WriteXML(XMLElement * parent) const {
 	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
 	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationAngle));
-	Elem->addAttribute(kAnnAtom1XML, atom_1);
-	Elem->addAttribute(kAnnAtom2XML, atom_2);
-	Elem->addAttribute(kAnnAtom3XML, atom_3);
+	Elem->addAttribute(kAnnAtom1XML, atom1);
+	Elem->addAttribute(kAnnAtom2XML, atom2);
+	Elem->addAttribute(kAnnAtom3XML, atom3);
 }
 void AnnotationDihedral::WriteXML(XMLElement * parent) const {
 	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
 	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationDihedral));
-	Elem->addAttribute(kAnnAtom1XML, atom_1);
-	Elem->addAttribute(kAnnAtom2XML, atom_2);
-	Elem->addAttribute(kAnnAtom3XML, atom_3);
-	Elem->addAttribute(kAnnAtom4XML, atom_4);
+	Elem->addAttribute(kAnnAtom1XML, atom1);
+	Elem->addAttribute(kAnnAtom2XML, atom2);
+	Elem->addAttribute(kAnnAtom3XML, atom3);
+	Elem->addAttribute(kAnnAtom4XML, atom4);
 }
 
 #pragma mark -
@@ -2313,23 +2313,23 @@ bool AnnotationMarker::ReadXML(XMLElement * Annotation) {
 	return result;
 }
 bool AnnotationLength::ReadXML(XMLElement * Annotation) {
-	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom_1);
-	result = result && Annotation->getAttributeValue(kAnnAtom2XML, atom_2);
+	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom1);
+	result = result && Annotation->getAttributeValue(kAnnAtom2XML, atom2);
 
 	return result;
 }
 bool AnnotationAngle::ReadXML(XMLElement * Annotation) {
-	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom_1);
-	result = result && Annotation->getAttributeValue(kAnnAtom2XML, atom_2);
-	result = result && Annotation->getAttributeValue(kAnnAtom3XML, atom_3);
+	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom1);
+	result = result && Annotation->getAttributeValue(kAnnAtom2XML, atom2);
+	result = result && Annotation->getAttributeValue(kAnnAtom3XML, atom3);
 	
 	return result;
 }
 bool AnnotationDihedral::ReadXML(XMLElement * Annotation) {
-	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom_1);
-	result = result && Annotation->getAttributeValue(kAnnAtom2XML, atom_2);
-	result = result && Annotation->getAttributeValue(kAnnAtom3XML, atom_3);
-	result = result && Annotation->getAttributeValue(kAnnAtom4XML, atom_4);
+	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom1);
+	result = result && Annotation->getAttributeValue(kAnnAtom2XML, atom2);
+	result = result && Annotation->getAttributeValue(kAnnAtom3XML, atom3);
+	result = result && Annotation->getAttributeValue(kAnnAtom4XML, atom4);
 	
 	return result;
 }
