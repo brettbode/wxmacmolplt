@@ -925,8 +925,8 @@ void AnnotationLength::draw(const MolDisplayWin * win) const {
 	Frame * cFrame = maindata->GetCurrentFramePtr();
 	WinPrefs * Prefs = win->GetPrefs();
 	//validate the atom references for this frame
-	if ((atom_1 < 0)||(atom_1 >= cFrame->GetNumAtoms())) return;
-	if ((atom_2 < 0)||(atom_2 >= cFrame->GetNumAtoms())) return;
+	if ((atom1 < 0)||(atom1 >= cFrame->GetNumAtoms())) return;
+	if ((atom2 < 0)||(atom2 >= cFrame->GetNumAtoms())) return;
 
 	GLdouble modelview[16];
 	GLdouble proj[16];
@@ -1004,7 +1004,7 @@ void AnnotationLength::draw(const MolDisplayWin * win) const {
 	int bond_id;
 	float bond_size;
 
-	bond_id = cFrame->BondExists(atom_1, atom_2);
+	bond_id = cFrame->BondExists(atom1, atom2);
 
 	// If a bond exists between the two atoms, we need to push out the
 	// length label accordingly.
@@ -1020,8 +1020,8 @@ void AnnotationLength::draw(const MolDisplayWin * win) const {
 	}
 	
 	CPoint3D pt1, pt2;
-	cFrame->GetAtomPosition(atom_1, pt1);
-	cFrame->GetAtomPosition(atom_2, pt2);
+	cFrame->GetAtomPosition(atom1, pt1);
+	cFrame->GetAtomPosition(atom2, pt2);
 
 	// Draw the dashed line and label.
 	DashedQuadFromLine(pt1, pt2, BondSize * 0.25, m, x_world, bond_size,
@@ -1033,18 +1033,18 @@ void AnnotationAngle::draw(const MolDisplayWin * win) const {
 	Frame * cFrame = maindata->GetCurrentFramePtr();
 
 	//validate the atom references for this frame
-	if ((atom_1 < 0)||(atom_1 >= cFrame->GetNumAtoms())) return;
-	if ((atom_2 < 0)||(atom_2 >= cFrame->GetNumAtoms())) return;
-	if ((atom_3 < 0)||(atom_3 >= cFrame->GetNumAtoms())) return;
+	if ((atom1 < 0)||(atom1 >= cFrame->GetNumAtoms())) return;
+	if ((atom2 < 0)||(atom2 >= cFrame->GetNumAtoms())) return;
+	if ((atom3 < 0)||(atom3 >= cFrame->GetNumAtoms())) return;
 
 	CPoint3D atom1_pos, atom2_pos, atom3_pos;
 
 	glDisable(GL_LIGHTING);
 //	glColor3f(0.0f, 0.0f, 0.0f);
 
-	cFrame->GetAtomPosition(atom_1, atom1_pos);
-	cFrame->GetAtomPosition(atom_2, atom2_pos);
-	cFrame->GetAtomPosition(atom_3, atom3_pos);
+	cFrame->GetAtomPosition(atom1, atom1_pos);
+	cFrame->GetAtomPosition(atom2, atom2_pos);
+	cFrame->GetAtomPosition(atom3, atom3_pos);
 	
 	DrawAngleAnnotation(&atom1_pos, &atom2_pos, &atom3_pos, win->GetPrefs());
 	glEnable(GL_LIGHTING);
@@ -1055,10 +1055,10 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	Frame * cFrame = maindata->GetCurrentFramePtr();
 
 	//validate the atom references for this frame
-	if ((atom_1 < 0)||(atom_1 >= cFrame->GetNumAtoms())) return;
-	if ((atom_2 < 0)||(atom_2 >= cFrame->GetNumAtoms())) return;
-	if ((atom_3 < 0)||(atom_3 >= cFrame->GetNumAtoms())) return;
-	if ((atom_4 < 0)||(atom_4 >= cFrame->GetNumAtoms())) return;
+	if ((atom1 < 0)||(atom1 >= cFrame->GetNumAtoms())) return;
+	if ((atom2 < 0)||(atom2 >= cFrame->GetNumAtoms())) return;
+	if ((atom3 < 0)||(atom3 >= cFrame->GetNumAtoms())) return;
+	if ((atom4 < 0)||(atom4 >= cFrame->GetNumAtoms())) return;
 
 	CPoint3D atom1_pos;
 	CPoint3D atom2_pos;
@@ -1099,10 +1099,10 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	
 	glColor3f(0.0f, 0.0f, 0.0f);
 		
-	cFrame->GetAtomPosition(atom_1, atom1_pos);
-	cFrame->GetAtomPosition(atom_2, atom2_pos);
-	cFrame->GetAtomPosition(atom_3, atom3_pos);
-	cFrame->GetAtomPosition(atom_4, atom4_pos);
+	cFrame->GetAtomPosition(atom1, atom1_pos);
+	cFrame->GetAtomPosition(atom2, atom2_pos);
+	cFrame->GetAtomPosition(atom3, atom3_pos);
+	cFrame->GetAtomPosition(atom4, atom4_pos);
 	
 	// The first three atoms (1, 2, 3) form one plane.  The last three
 	// (2, 3, 4) form the second plane.  We want to find the angle
