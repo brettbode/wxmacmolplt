@@ -317,7 +317,6 @@ void MoleculeData::NewAtom(void) {
 		cFrame->Atoms[cFrame->NumAtoms].Position.x = 0;
 		cFrame->Atoms[cFrame->NumAtoms].Position.y = 0;
 		cFrame->Atoms[cFrame->NumAtoms].Position.z = 0;
-		cFrame->Atoms[cFrame->NumAtoms].Highlite = 0;
 		cFrame->NumAtoms++;
 			//Delete any orbitals and normal modes
 		if (cFrame->Vibs) {
@@ -1058,7 +1057,6 @@ void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
 		NewFrame = AddFrame(NumAtoms, lFrame->NumBonds);
 		for (long iatm=0; iatm<NumAtoms; iatm++) {
 			NewFrame->Atoms[iatm].Type = lFrame->Atoms[iatm].Type;
-			NewFrame->Atoms[iatm].Highlite = 0;
 			NewFrame->Atoms[iatm].Position.x = NewFrame2->Atoms[iatm].Position.x + offset[iatm].x;
 			NewFrame->Atoms[iatm].Position.y = NewFrame2->Atoms[iatm].Position.y + offset[iatm].y;
 			NewFrame->Atoms[iatm].Position.z = NewFrame2->Atoms[iatm].Position.z + offset[iatm].z;
@@ -1123,7 +1121,6 @@ void MoleculeData::CreateInternalLLM(long NumPts, WinPrefs * Prefs) {
 		NewFrame = AddFrame(NumAtoms, lFrame->NumBonds);
 		for (long iatm=0; iatm<NumAtoms; iatm++) {
 			NewFrame->Atoms[iatm].Type = lFrame->Atoms[iatm].Type;
-			NewFrame->Atoms[iatm].Highlite = 0;
 			NewFrame->Atoms[iatm].Position.x = NewFrame2->Atoms[iatm].Position.x;
 			NewFrame->Atoms[iatm].Position.y = NewFrame2->Atoms[iatm].Position.y;
 			NewFrame->Atoms[iatm].Position.z = NewFrame2->Atoms[iatm].Position.z;

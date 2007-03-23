@@ -198,25 +198,26 @@ private:
 class mpAtom {
 	public:
 		CPoint3D	Position;
+		long		fragmentId;
 		short		Type;	//Low byte stores normal atom type, high byte store special bits
-		char		Highlite;
-		char		Label[16];
-		//Type bit 9 - indicates EFP, first 4 bytes of label give fragment number
-		//Type bit 10 - pdb style biomolecule, label gives res, res #, atom type (alpha, beta...)
-		//Type bit 11 - SIMOMM MM atom
-		inline bool GetInvisibility(void) const {return (Highlite & 1);};	//Bit 1 sets invisibility
-		bool SetInvisibility(bool State) {if (Highlite&1) Highlite-=1; if (State) Highlite+=1;return GetInvisibility();};
-		inline bool GetSelectState(void) const {return ((Highlite&2)!=0);};	//Bit 2 sets selected
-		bool SetSelectState(bool State) {if (Highlite&2) Highlite-=2; if (State) Highlite+=2; return GetSelectState();};
-		inline long GetType(void) const {return (Type & 0xFF);};
+		char		flags;	//bit 0: invisibility, bit 1: select state, bit 2: Is effective fragment
+							//bit 3: Is SIMOMM atom
+		mpAtom(void) : Type(0), flags(0) {};
+		inline bool GetInvisibility(void) const {return ((flags & 1)? true: false);};	//Bit 1 sets invisibility
+		bool SetInvisibility(bool State) {flags = (flags & 0xFE) + (State? 1:0);return GetInvisibility();};
+		inline bool GetSelectState(void) const {return ((flags&2)?true:false);};	//Bit 2 sets selected
+		bool SetSelectState(bool State) {flags = (flags & 0xFD) + (State?2:0); return GetSelectState();};
+		inline long GetType(void) const {return Type;};
 		inline bool SetType(short atmType) {if ((atmType>0)&&(atmType<107)) {Type = atmType; return true;} return false;};
-		inline bool IsEffectiveFragment(void) const {return ((Type & (1<<8)) != 0);};
-		inline void IsEffectiveFragment(bool state) {Type = (Type & 0xFEFF) + (state ? (1<<8) : 0);};
-		inline bool HasBiolabel(void) const {return ((Type & (1<<9)) != 0);};
-		inline void IsSIMOMMAtom(bool state) {Type = (Type & 0xFBFF) + (state ? (1<<10) : 0);};
-		inline bool IsSIMOMMAtom(void) const {return ((Type & (1<<10)) != 0);};
-		inline void SetFragmentNumber(long fragNum) {IsEffectiveFragment(true); *((long *) &Label[12]) = fragNum;};
-		inline long GetFragmentNumber(void) const {return *((long *) &Label[12]);};
+		inline bool IsEffectiveFragment(void) const {return ((flags & (1<<2))?true:false);};
+		inline void IsEffectiveFragment(bool state) {flags = (Type & 0xFB) + (flags ? (1<<2) : 0);};
+		inline void IsSIMOMMAtom(bool state) {flags = (flags & 0xF7) + (state ? (1<<3) : 0);};
+		inline bool IsSIMOMMAtom(void) const {return ((flags & (1<<3))?true:false);};
+	// the idea for this one was to have a text label to store pdb style biomolecule, label gives res, res #,
+	// atom type (alpha, beta...), but its not currently implemented
+	//	inline bool HasBiolabel(void) const {return ((Type & (1<<9)) != 0);};
+		inline void SetFragmentNumber(long fragNum) {if (fragNum>=0) fragmentId = fragNum;};
+		inline long GetFragmentNumber(void) const {return fragmentId;};
 		inline long GetNuclearCharge(void) const {return (GetType());};	//NOT correct for ECP's!!!!!
 };
 

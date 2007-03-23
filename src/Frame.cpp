@@ -152,7 +152,6 @@ void Frame::ConvertCode3(BufferFile * Buffer, long length) {
 		Buffer->Read((Ptr) temp, length);
 		for (long i=0; i<NumAtoms; i++) {
 			Atoms[i].Type = temp[i];
-			Atoms[i].Highlite = 0;
 		}
 		delete [] temp;
 	} else throw MemoryError();
@@ -229,7 +228,6 @@ mpAtom * Frame::AddAtom(long AtomType, CPoint3D AtomPosition) {
 	if (NumAtoms<AtomAllocation) {
 	  Atoms[NumAtoms].Type = AtomType;
 	  Atoms[NumAtoms].Position = AtomPosition;
-	  Atoms[NumAtoms].Highlite = 0;
 	  result = &Atoms[NumAtoms];
 	  NumAtoms++;
 	}
