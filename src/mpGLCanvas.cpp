@@ -515,7 +515,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		selected = testPicking(tmpPnt.x, tmpPnt.y);
 
 		if (interactiveMode)
-			if ( selected >= 0 && selected < NumAtoms ) {
+			if (selected >= 0 && selected < NumAtoms) {
 				GLdouble tmpWinX, tmpWinY;
 
 				findWinCoord(lAtoms[selected].Position.x,
@@ -538,7 +538,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			// don't need to test for this anymore.
 		}
 
-		else if (selected < NumAtoms + lFrame->NumBonds) {
+		else if (selected < NumAtoms) {
 			if (interactiveMode) {
 				interactPopupMenu(tmpPnt.x, tmpPnt.y, 1);
 				MolWin->SelectionChanged(deSelectAll);
@@ -576,14 +576,57 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			if (selected >= 0 && selected < NumAtoms) {
 				GLdouble newX, newY, newZ;
 
-				findReal3DCoord(tmpPnt.x-winDiffX, tmpPnt.y-winDiffY,
-								atomDepth, newX, newY, newZ);
-				lAtoms[selected].Position.x = newX;
-				lAtoms[selected].Position.y = newY;
-				lAtoms[selected].Position.z = newZ;
+				// If shift is held when an atom is clicked on, we want to
+				// change the depths of either the clicked on or selected
+				// atoms.
+				if (event.ShiftDown()) {
+					GLdouble tmpX, tmpY, tmpZ;
+					float depth_offset;
+					float dy = tmpPnt.y - oldTmpPnt.y;
 
-				SelectObj(selected, deSelectAll);
-				MolWin->SelectionChanged(deSelectAll);
+					findWinCoord(lAtoms[selected].Position.x,
+						lAtoms[selected].Position.y,
+						lAtoms[selected].Position.z, tmpX, tmpY, tmpZ);
+					depth_offset = (dy * mMainData->WindowSize) /
+									(25.0f * GetRect().GetWidth());
+					findReal3DCoord(tmpX, tmpY, tmpZ - depth_offset,
+									newX, newY, newZ);
+				}
+				
+				// If no shift, just translate.
+				else {
+					findReal3DCoord(tmpPnt.x - winDiffX, tmpPnt.y - winDiffY,
+									atomDepth, newX, newY, newZ);
+				}
+
+				// If that atom is a member of the selected atom set, move all
+				// atoms that are currently selected.
+				if (lFrame->GetAtomSelectState(selected)) {
+					GLdouble offset_x, offset_y, offset_z;
+
+					offset_x = lAtoms[selected].Position.x - newX;
+					offset_y = lAtoms[selected].Position.y - newY;
+					offset_z = lAtoms[selected].Position.z - newZ;
+
+					for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
+						if (lFrame->GetAtomSelectState(i)) {
+							lAtoms[i].Position.x -= offset_x;
+							lAtoms[i].Position.y -= offset_y;
+							lAtoms[i].Position.z -= offset_z;
+						}
+					}
+				}
+				
+				// If it's not selected, make it the only selected one and
+				// move only it.
+				else {
+					lAtoms[selected].Position.x = newX;
+					lAtoms[selected].Position.y = newY;
+					lAtoms[selected].Position.z = newZ;
+
+					SelectObj(selected, deSelectAll);
+					MolWin->SelectionChanged(deSelectAll);
+				}
 
 				if (mDragWin) {
 					mDragWin->EndDrag();
@@ -607,43 +650,43 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			}
 
 			// If an atom is not clicked on, but some are selected, move those.
-			else {
+			// else { 
 
-				GLdouble tmpX, tmpY, tmpZ;
-				GLdouble newX, newY, newZ;
-				int dx = tmpPnt.x - oldTmpPnt.x;
-				int dy = tmpPnt.y - oldTmpPnt.y;
-				int hsize = GetRect().GetWidth();
+				// GLdouble tmpX, tmpY, tmpZ; 
+				// GLdouble newX, newY, newZ; 
+				// int dx = tmpPnt.x - oldTmpPnt.x; 
+				// int dy = tmpPnt.y - oldTmpPnt.y; 
+				// int hsize = GetRect().GetWidth(); 
 
 				// If command key or right mouse button is down, we simply
 				// translate the selected atoms.
-				if (event.CmdDown() || event.RightIsDown()) { //translate 
-					for ( int i = 0; i < NumAtoms; i++)
-						if (lAtoms[i].GetSelectState()) {
-							findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ);
+				// if (event.CmdDown() || event.RightIsDown()) { //translate  
+					// for ( int i = 0; i < NumAtoms; i++) 
+						// if (lAtoms[i].GetSelectState()) { 
+							// findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ); 
 
-							tmpX += (float)dx/(float)(0.05*hsize/mMainData->WindowSize);
-							tmpY += (float)dy/(float)(0.05*hsize/mMainData->WindowSize);
-							findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ);
-							lAtoms[i].Position.x = newX;
-							lAtoms[i].Position.y = newY;
-							lAtoms[i].Position.z = newZ;
-						}
-				}
+							// tmpX += (float)dx/(float)(0.05*hsize/mMainData->WindowSize); 
+							// tmpY += (float)dy/(float)(0.05*hsize/mMainData->WindowSize); 
+							// findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ); 
+							// lAtoms[i].Position.x = newX; 
+							// lAtoms[i].Position.y = newY; 
+							// lAtoms[i].Position.z = newZ; 
+						// } 
+				// } 
 
 					// Otherwise, if shift is down, we modify selected atoms' depth.
-				else if (event.ShiftDown()) { //move along z-axis
-					for ( int i = 0; i < NumAtoms; i++)
-						if (lAtoms[i].GetSelectState()) {
-							findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ);
-							tmpZ -= (float)dy/(float)(25*hsize/mMainData->WindowSize);
-							findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ);
-							lAtoms[i].Position.x = newX;
-							lAtoms[i].Position.y = newY;
-							lAtoms[i].Position.z = newZ;
-						}
-				}
-			}
+				// else if (event.ShiftDown()) { //move along z-axis 
+					// for ( int i = 0; i < NumAtoms; i++) 
+						// if (lAtoms[i].GetSelectState()) { 
+							// findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ); 
+							// tmpZ -= (float)dy/(float)(25*hsize/mMainData->WindowSize); 
+							// findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ); 
+							// lAtoms[i].Position.x = newX; 
+							// lAtoms[i].Position.y = newY; 
+							// lAtoms[i].Position.z = newZ; 
+						// } 
+				// } 
+			// } 
 			/*
 			} else {
 				wxRect window_rect = GetRect();
