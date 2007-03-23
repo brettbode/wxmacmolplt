@@ -477,7 +477,7 @@ void JacobiDiagonalization(double * Matrix, double * EigenVectors, long Dimensio
 		if ((i>0)&&(i>=Start)) {
 			long ii = (i*(i+1))/2;
 			long j = MIN(i, End);
-			for (long k=0; k<j; j++) {
+			for (long k=0; k<j; k++) {
 				if (fabs(big[i]) < fabs(Matrix[ii+k])) {
 					big[i] = Matrix[ii+k];
 					jbig[i] = k;
@@ -497,7 +497,7 @@ void JacobiDiagonalization(double * Matrix, double * EigenVectors, long Dimensio
 		jj = -1;
 		for (j=0; j<Dimension; j++) {
 			jj += j + 1;
-			SD = MIN(eps, fabs(Matrix[jj]));
+			SD = MIN(SD, fabs(Matrix[jj]));
 		}
 		double test = MAX(eps, (1.0e-12)*MAX(SD, 3.0e-06));
 			//Find the largest off-diagonal element
