@@ -201,7 +201,6 @@ class mpAtom {
 		short		Type;	//Low byte stores normal atom type, high byte store special bits
 		char		Highlite;
 		char		Label[16];
-		bool		isMarked;
 		//Type bit 9 - indicates EFP, first 4 bytes of label give fragment number
 		//Type bit 10 - pdb style biomolecule, label gives res, res #, atom type (alpha, beta...)
 		//Type bit 11 - SIMOMM MM atom
@@ -219,8 +218,6 @@ class mpAtom {
 		inline void SetFragmentNumber(long fragNum) {IsEffectiveFragment(true); *((long *) &Label[12]) = fragNum;};
 		inline long GetFragmentNumber(void) const {return *((long *) &Label[12]);};
 		inline long GetNuclearCharge(void) const {return (GetType());};	//NOT correct for ECP's!!!!!
-		void ToggleMark(void) { isMarked = !isMarked; }
-		bool IsMarked(void) { return isMarked; }
 };
 
 enum BondOrder {
