@@ -1910,7 +1910,9 @@ void MolDisplayWin::menuViewRotate180_vertical(wxCommandEvent &event) {
 	Dirty = true;
 }
 void MolDisplayWin::menuViewRotatePrinciple_orientation(wxCommandEvent &event) {
-	MessageAlert("Sure would be nice if this was implemented...");
+	MainData->RotateToPrincipleOrientation(Prefs);
+	ResetView();
+	Dirty = true;
 }
 void MolDisplayWin::menuViewRotateOther(wxCommandEvent &event) {
 	SetScreenPlane * temp = new SetScreenPlane(this);

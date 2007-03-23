@@ -1032,6 +1032,53 @@ void MoleculeData::SetModelRotation(float Psi, float Phi, float Theta) {
 	EulerAnglesToMatrix(TotalRotation, Psi, Phi, Theta);
 	SetModelCenter(&Center);
 }
+void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
+	//Setup the rotation matrix to present the molecule in the priciple orientation
+	
+	InitRotationMatrix(TotalRotation);
+	//First compute and offset to the center of mass
+	CPoint3D centerOfMass;
+	CalculateCenterOfMass(cFrame->Atoms, cFrame->GetNumAtoms(),
+						  Prefs->GetAtomMassLoc(), &centerOfMass);
+	
+	TotalRotation[3][0] = -centerOfMass.x;
+	TotalRotation[3][1] = -centerOfMass.y;
+	TotalRotation[3][2] = -centerOfMass.z;
+	//Compute the moment of interia tensor
+	double xx=0.0, xy=0.0, yy=0.0, xz=0.0, yz=0.0, zz=0.0;
+	for (int i=0; i<cFrame->GetNumAtoms(); i++) {
+		double atmMass = Prefs->GetAtomMass(cFrame->Atoms[i].GetType());
+		double xc = cFrame->Atoms[i].Position.x - centerOfMass.x;
+		double yc = cFrame->Atoms[i].Position.y - centerOfMass.y;
+		double zc = cFrame->Atoms[i].Position.z - centerOfMass.z;
+		xx += atmMass*yc*yc + atmMass*zc*zc;
+		yy += atmMass*xc*xc + atmMass*zc*zc;
+		zz += atmMass*xc*xc + atmMass*yc*yc;
+		xy += atmMass*xc*yc;
+		xz += atmMass*xc*zc;
+		yz += atmMass*yc*zc;
+	}
+	if ((abs(xy)>1.0e-8)||(abs(xz)>1.0e-8)||(abs(yz)>1.0e-8)) {
+		//Diagonalize the moment of interia tensor to yield the
+		//rotation into the principle axis.
+		double tri[6];
+		tri[0] = xx;
+		tri[1] = xy;
+		tri[2] = yy;
+		tri[3] = xz;
+		tri[4] = yz;
+		tri[5] = zz;
+		double rot[9], eig[3];
+		SymmetricJacobiDiagonalization(tri, rot, eig, 3, 3);
+		for (int ii=0; ii<3; ii++) {
+			for (int j=0; j<3; j++) {
+				TotalRotation[ii][j] = rot[3*ii + j];
+			}
+		}
+		OrthogonalizeRotationMatrix(TotalRotation);
+	}
+	ResetRotation();
+}
 void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
 	Frame *	NewFrame, * NewFrame2;
 	
