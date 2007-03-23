@@ -500,6 +500,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	static wxPoint oldTmpPnt;
 	bool deSelectAll = true;
+	bool transform_scene = false;
 
 	wxPoint tmpPnt = event.GetPosition();
 
@@ -647,7 +648,20 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 					mDragWin->Move(event.GetPosition());
 					mDragWin->Show();
 				}
+
+				lFrame->SetBonds(Prefs, true, true);
+				MolWin->UpdateGLModel();
+
+			} else {
+				transform_scene = true;
+				mSelectState = -1;
 			}
+			
+		} else {
+			transform_scene = true;
+			mSelectState = -1;
+		}
+	}
 
 			// If an atom is not clicked on, but some are selected, move those.
 			// else { 
@@ -722,17 +736,10 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			if (deSelectAll && tmpBondStatus == -1)
 				lFrame->AddBond(oldSelect,selected);
 */
-			
-			lFrame->SetBonds(Prefs, true, true);
-
-			MolWin->UpdateGLModel();
-		}
-	}
 
 	// If the left mouse button is released, the user is either done dragging,
 	// in which case we do nothing, or the user has selected an item.
 	else if (event.LeftUp()) {
-
 		if (event.CmdDown())
 			deSelectAll = false;
 
@@ -811,10 +818,16 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	oldTmpPnt = tmpPnt;
 
 	// Pass mouse event to MolDisplayWin::Rotate for processing
-	if (interactiveMode)
+	if (interactiveMode && !transform_scene) {
 		draw();
-	else
+	} else {
 		MolWin->Rotate(event);
+	}
+	
+	// if (transform_scene) 
+		// MolWin->Rotate(event); 
+	// else if (interactiveMode) 
+		// draw(); 
 
 }
 
