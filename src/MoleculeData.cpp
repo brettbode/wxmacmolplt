@@ -1032,6 +1032,7 @@ void MoleculeData::SetModelRotation(float Psi, float Phi, float Theta) {
 	EulerAnglesToMatrix(TotalRotation, Psi, Phi, Theta);
 	SetModelCenter(&Center);
 }
+#include <iostream>
 void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 	//Setup the rotation matrix to present the molecule in the priciple orientation
 	
@@ -1040,25 +1041,24 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 	CPoint3D centerOfMass;
 	CalculateCenterOfMass(cFrame->Atoms, cFrame->GetNumAtoms(),
 						  Prefs->GetAtomMassLoc(), &centerOfMass);
+	CPoint3D rotatedCenterOfMass = centerOfMass;
 	
-	TotalRotation[3][0] = -centerOfMass.x;
-	TotalRotation[3][1] = -centerOfMass.y;
-	TotalRotation[3][2] = -centerOfMass.z;
 	//Compute the moment of interia tensor
 	double xx=0.0, xy=0.0, yy=0.0, xz=0.0, yz=0.0, zz=0.0;
 	for (int i=0; i<cFrame->GetNumAtoms(); i++) {
-		double atmMass = Prefs->GetAtomMass(cFrame->Atoms[i].GetType());
+		double atmMass = Prefs->GetAtomMass(cFrame->Atoms[i].GetType()-1);
 		double xc = cFrame->Atoms[i].Position.x - centerOfMass.x;
 		double yc = cFrame->Atoms[i].Position.y - centerOfMass.y;
 		double zc = cFrame->Atoms[i].Position.z - centerOfMass.z;
+		std::cout << "atom "<<i<<" mass "<<atmMass<< " coords "<<xc<<" "<<yc<<" "<<zc<<std::endl;
 		xx += atmMass*yc*yc + atmMass*zc*zc;
 		yy += atmMass*xc*xc + atmMass*zc*zc;
 		zz += atmMass*xc*xc + atmMass*yc*yc;
-		xy += atmMass*xc*yc;
-		xz += atmMass*xc*zc;
-		yz += atmMass*yc*zc;
+		xy -= atmMass*xc*yc;
+		xz -= atmMass*xc*zc;
+		yz -= atmMass*yc*zc;
 	}
-	if ((abs(xy)>1.0e-8)||(abs(xz)>1.0e-8)||(abs(yz)>1.0e-8)) {
+	if ((fabs(xy)>1.0e-8)||(fabs(xz)>1.0e-8)||(fabs(yz)>1.0e-8)) {
 		//Diagonalize the moment of interia tensor to yield the
 		//rotation into the principle axis.
 		double tri[6];
@@ -1075,9 +1075,36 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 				TotalRotation[ii][j] = rot[3*ii + j];
 			}
 		}
+		float det = DeterminantMatrix(TotalRotation);
+			//The determinate should be positive, multiple by -1 if not
+		if (det < 0.0) {
+			for (int ii=0; ii<3; ii++) {
+				TotalRotation[ii][0] *= -1.0;
+			}
+		}
 		OrthogonalizeRotationMatrix(TotalRotation);
+		Rotate3DOffset(TotalRotation,centerOfMass,&rotatedCenterOfMass);
 	}
+	TotalRotation[3][0] = -rotatedCenterOfMass.x;
+	TotalRotation[3][1] = -rotatedCenterOfMass.y;
+	TotalRotation[3][2] = -rotatedCenterOfMass.z;
 	ResetRotation();
+	
+	//generate the moments of inertia
+	xx = yy = zz = xy = xz = yz = 0.0;
+	for (int i=0; i<cFrame->GetNumAtoms(); i++) {
+		double atmMass = Prefs->GetAtomMass(cFrame->Atoms[i].GetType()-1);
+		double xc = RotCoords[i].x;
+		double yc = RotCoords[i].y;
+		double zc = RotCoords[i].z;
+		xx += atmMass*xc*xc;
+		yy += atmMass*yc*yc;
+		zz += atmMass*zc*zc;
+		xy += atmMass*xc*yc;
+		xz += atmMass*xc*zc;
+		yz += atmMass*yc*zc;
+	}
+//	std::cout << "moments of inertia ixx = " << (yy+zz) << " iyy = " << (xx+zz) << " izz = "<<(xx+yy) << std::endl;
 }
 void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
 	Frame *	NewFrame, * NewFrame2;
