@@ -40,7 +40,7 @@ MoleculeData::MoleculeData(void) {
 	Description = NULL;
 	MaxAtoms = 0;
 	MaxSize=0.5;
-	WindowSize=1.0;
+	WindowSize=3.0;
 	InitRotationMatrix(TotalRotation);
 	InputOptions = NULL;
 	DrawMode = 0;
