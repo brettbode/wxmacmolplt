@@ -958,23 +958,32 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 
 		// select_id indicates an atom
 		if (select_id < NumAtoms) {
-			bool newstate = true;
+			bool atom_is_selected = true;
 
 			// If we're to keep other selected items and atom is already
 			// selected, then we must be unselecting this atom.
 			if (!unselect_all && lAtoms[select_id].GetSelectState())
-				newstate = false;
+				atom_is_selected = false;
 
-			lAtoms[select_id].SetSelectState(newstate);
-			if (newstate) {
+			lAtoms[select_id].SetSelectState(atom_is_selected);
+			if (atom_is_selected) {
+				// In order to know how many atoms are selected, we let 
+				// select_stack_top grow indefinitely, though the stack itself
+				// only contains 4 indices.  Action should only be taken when
+				// the top is in [0, 3].
 				select_stack[select_stack_top % 4] = select_id;
-				select_stack_top = (select_stack_top + 1) % 5;
+				select_stack_top++;
 			} else {
-				if (select_stack_top > 0) {
+				// If the stack hasn't filled up, we let the user's deselection
+				// of the atom just added remove it from the stack.  If a
+				// different atom was deselected, the stack is in ruins since
+				// the order is messed up, and we invalidate it by making it
+				// over capacity.
+				if (select_stack_top > 0 && select_stack_top <= 4) {
 					if (select_id == select_stack[select_stack_top - 1]) {
 						select_stack_top--;
 					} else {
-						select_stack_top = 0;
+						select_stack_top = 5;
 					}
 				}
 			}
@@ -991,7 +1000,7 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 
 				if (lAtoms[atom1].GetSelectState() &&
 					lAtoms[atom2].GetSelectState())
-					lBonds[i].SetSelectState(newstate);
+					lBonds[i].SetSelectState(atom_is_selected);
 			}
 		}
 		
@@ -1124,7 +1133,8 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 
 		// If user clicked on an atom and some things are selected, let's
 		// separate the items added above and the annotation items.
-		if (selected >= 0 && selected < lFrame->GetNumAtoms()) {
+		if (selected >= 0 && selected < lFrame->GetNumAtoms() &&
+			select_stack_top >= 2 && select_stack_top <= 4) {
 			menu.AppendSeparator();
 		}
 
@@ -1241,7 +1251,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 
 				break;
 			default:
-				printf("ouch\n");
+				break;
 		}
 	}
 }
