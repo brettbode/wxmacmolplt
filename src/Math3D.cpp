@@ -439,16 +439,16 @@ void UnitCrossProduct3D (const CPoint3D *a, const CPoint3D *b, CPoint3D *aCrossB
 
 void SymmetricJacobiDiagonalization(double * SymMatrix, double * EigenVectors,
 	double * EigenValues, long NumVectors, long Dimension) {
-	long i, MLength;
+	long i;
 	
-	MLength = NumVectors * Dimension;
+	long MLength = NumVectors * Dimension;
 	for (i=0; i<MLength; i++) EigenVectors[i] = 0.0;
 	for (i=0; i<NumVectors; i++) EigenVectors[i+i*Dimension] = 1.0;
 	
 	JacobiDiagonalization(SymMatrix, EigenVectors, Dimension, NumVectors, 0,
 		Dimension);
 	for (i=0; i<NumVectors; i++)	//Copy over the eigenvalues
-		EigenValues[i] = SymMatrix[(i+i*i)/2];
+		EigenValues[i] = SymMatrix[((i+1+(i+1)*(i+1))/2) - 1];
 	
 	SortEigenValues(EigenVectors, EigenValues, Dimension);
 }
@@ -588,7 +588,7 @@ void JacobiDiagonalization(double * Matrix, double * EigenVectors, long Dimensio
 						if ((IA != jbig[ir]) && (IB != jbig[ir])) goto l220;
 					}
 				}
-				long kq = IEAR-ir-IA+1;
+				long kq = IEAR-ir-IA;
 				big[ir] = 0.0;
 				long ir1 = MIN(ir, End);
 				for (i=0; i<ir1; i++) {
@@ -603,10 +603,10 @@ l220:		IEAR++;
 			IEBR++;
 		}
 		for (i=0; i<Dimension; i++) {
-			double T1 = EigenVectors[IA+i]*CX + EigenVectors[IB+i]*SX;
-			double T2 = EigenVectors[IA+i]*SX - EigenVectors[IB+i]*CX;
-			EigenVectors[IA+i] = T1;
-			EigenVectors[IB+i] = T2;
+			double T1 = EigenVectors[(i*Dimension)+IA]*CX + EigenVectors[IB+(i*Dimension)]*SX;
+			double T2 = EigenVectors[IA+(i*Dimension)]*SX - EigenVectors[IB+(i*Dimension)]*CX;
+			EigenVectors[IA+(i*Dimension)] = T1;
+			EigenVectors[IB+(i*Dimension)] = T2;
 		}
 	}
 	
@@ -615,6 +615,7 @@ l220:		IEAR++;
 }
 
 void SortEigenValues(double * EigenVectors, double * EigenValues, long Dimension) {
+	//Sort the eigenvectors in order of accending eigenvalues
 		long i, j, jj;
 	for (i=0; i<Dimension; i++) {
 		jj = i;
@@ -626,9 +627,9 @@ void SortEigenValues(double * EigenVectors, double * EigenValues, long Dimension
 			EigenValues[jj] = EigenValues[i];
 			EigenValues[i] = tempValue;
 			for (j=0; j<Dimension; j++) {
-				tempValue = EigenVectors[j+jj*Dimension];
-				EigenVectors[j+jj*Dimension] = EigenVectors[j+i*Dimension];
-				EigenVectors[j+i*Dimension] = tempValue;
+				tempValue = EigenVectors[jj+j*Dimension];
+				EigenVectors[jj+j*Dimension] = EigenVectors[i+j*Dimension];
+				EigenVectors[i+j*Dimension] = tempValue;
 			}
 		}
 	}
