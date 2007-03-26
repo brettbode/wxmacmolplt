@@ -22,17 +22,17 @@
 #define __MATH3D__
 
 void InitRotationMatrix(Matrix4D RotationM);
-void Rotate3DPt(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoord);
-void Rotate3DOffset(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoord);
-void SortzBuffer(CPoint3D coord[], long zBuffer[], long natoms);
-void BackRotate3DOffset(Matrix4D rotMatrix, CPoint3D * in, CPoint3D * out);
+void Rotate3DPt(const Matrix4D rotationMatrix, const CPoint3D & incoord, CPoint3D *outcoord);
+void Rotate3DOffset(const Matrix4D rotationMatrix, const CPoint3D & incoord, CPoint3D *outcoord);
+void SortzBuffer(const CPoint3D coord[], long zBuffer[], long natoms);
+void BackRotate3DOffset(const Matrix4D rotMatrix, const CPoint3D * in, CPoint3D * out);
 void MatrixToEulerAngles(Matrix4D rotMatrix, float * phi, float * psi, float * theta);
 void EulerAnglesToMatrix(Matrix4D rotMatrix, float phi, float psi, float theta);
 void CopyMatrix (Matrix4D fromMatrix, Matrix4D toMatrix);
 void CrossProduct3D (const CPoint3D *a, const CPoint3D *b, CPoint3D *aCrossB);
 float DotProduct3D (const CPoint3D *a, const CPoint3D *b);
-float DeterminantMatrix(Matrix4D A);
-void InverseMatrix(Matrix4D A, Matrix4D AInverse);
+float DeterminantMatrix(const Matrix4D A);
+void InverseMatrix(const Matrix4D A, Matrix4D AInverse);
 void MultiplyMatrix (Matrix4D a, Matrix4D b, Matrix4D aTimesB);
 void Normalize3D (CPoint3D *v);
 void OrthogonalizeRotationMatrix(Matrix4D a);

@@ -169,6 +169,38 @@ void MinimizeDifferences(mpAtom * FixedAtoms, mpAtom * targetAtoms, long NumAtom
 	delete [] RotCoords;
 }	/*MinimizeDifferences*/
 
+SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
+	//setup a series of 3x3 transformation matrices that will map source 
+	//points to any symmetry dependent copy. Note that in general this results
+	//in more matrices than there are symmetry operators
+	Matrix4D work;
+
+	//All point groups have an identity operator so toss one on here.
+	InitRotationMatrix(work);
+	AddMatrix(work);
+	
+}
+void SymmetryOps::AddMatrix(const Matrix4D work) {
+	for (int i=0; i<3; i++) {
+		for (int j=0; j<3; j++) {
+			operations.push_back(work[i][j]);
+		}
+	}
+}
+void SymmetryOps::ApplyOperator(const CPoint3D & source, CPoint3D & dest, long theOp) const {
+	if ((theOp >= 0)&&(theOp < (operations.size()/9))) {
+		long base = theOp*9;
+		dest.x = ((source.x)*operations[theOp] +
+				( source.y)*operations[theOp+3] +
+				( source.z)*operations[theOp+6]);
+		dest.y = ((source.x)*operations[theOp+1] +
+				( source.y)*operations[theOp+4] +
+				( source.z)*operations[theOp+5]);
+		dest.z = ((source.x)*operations[theOp+2] +
+				( source.y)*operations[theOp+5] +
+				( source.z)*operations[theOp+6]);
+	}
+}
 
 VibRec::VibRec(const long & NumVibs, const long & NumAtoms) {
 	init();

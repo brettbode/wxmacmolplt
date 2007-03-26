@@ -32,7 +32,7 @@ void InitRotationMatrix(Matrix4D RotationM)
 
  Simple routine to rotate a 3D point 
 -------------------------------------*/
-void Rotate3DPt(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoord)
+void Rotate3DPt(const Matrix4D rotationMatrix, const CPoint3D & incoord, CPoint3D *outcoord)
 {
 	(*outcoord).x = ((incoord.x)*rotationMatrix[0][0] +
 				    ( incoord.y)*rotationMatrix[1][0] +
@@ -55,7 +55,7 @@ void Rotate3DPt(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoord)
  Useful for the normal mode vectors which are just offset from the atom center. Thus the
  translation is already taken into account in the atom center. 
 -------------------------------------*/
-void Rotate3DOffset(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoord)
+void Rotate3DOffset(const Matrix4D rotationMatrix, const CPoint3D & incoord, CPoint3D *outcoord)
 {
 	(*outcoord).x = ((incoord.x)*rotationMatrix[0][0] +
 				    ( incoord.y)*rotationMatrix[1][0] +
@@ -67,7 +67,7 @@ void Rotate3DOffset(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoor
 				    ( incoord.y)*rotationMatrix[1][2] +
 				    ( incoord.z)*rotationMatrix[2][2]);
 }
-void SortzBuffer(CPoint3D coord[], long zBuffer[], long natoms)	{
+void SortzBuffer(const CPoint3D coord[], long zBuffer[], long natoms)	{
 	int			itemp, iatm;
 	bool		done=false;
 
@@ -84,7 +84,7 @@ void SortzBuffer(CPoint3D coord[], long zBuffer[], long natoms)	{
 		natoms--;			// The max is now at the end so we don't need to check it again
 	} while (!done);
 } /* SortzBuffer */
-void BackRotate3DOffset(Matrix4D rotMatrix, CPoint3D * in, CPoint3D * out) {
+void BackRotate3DOffset(const Matrix4D rotMatrix, const CPoint3D * in, CPoint3D * out) {
 	out->x = (in->x * rotMatrix[0][0] + in->y * rotMatrix[0][1] + in->z * rotMatrix[0][2]);
 	out->y = (in->x * rotMatrix[1][0] + in->y * rotMatrix[1][1] + in->z * rotMatrix[1][2]);
 	out->z = (in->x * rotMatrix[2][0] + in->y * rotMatrix[2][1] + in->z * rotMatrix[2][2]);
@@ -196,12 +196,12 @@ float DotProduct3D (const CPoint3D *a, const CPoint3D *b)
 	return (a->x*b->x + a->y*b->y + a->z*b->z);
 }
 
-float DeterminantMatrix(Matrix4D A) {
+float DeterminantMatrix(const Matrix4D A) {
 	return A[0][0]*(A[1][1]*A[2][2] - A[1][2]*A[2][1]) - A[0][1]*(A[1][0]*A[2][2] - A[1][2]*A[2][0])
 					+ A[0][2]*(A[1][0]*A[2][1] - A[1][1]*A[2][0]);
 }
 
-void InverseMatrix(Matrix4D A, Matrix4D AInverse) {
+void InverseMatrix(const Matrix4D A, Matrix4D AInverse) {
 	float DetA = DeterminantMatrix(A);
 	
 	AInverse[0][0] = (A[1][1]*A[2][2]-A[1][2]*A[2][1])/DetA;

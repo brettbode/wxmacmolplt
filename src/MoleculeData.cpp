@@ -1050,7 +1050,6 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 		double xc = cFrame->Atoms[i].Position.x - centerOfMass.x;
 		double yc = cFrame->Atoms[i].Position.y - centerOfMass.y;
 		double zc = cFrame->Atoms[i].Position.z - centerOfMass.z;
-		std::cout << "atom "<<i<<" mass "<<atmMass<< " coords "<<xc<<" "<<yc<<" "<<zc<<std::endl;
 		xx += atmMass*yc*yc + atmMass*zc*zc;
 		yy += atmMass*xc*xc + atmMass*zc*zc;
 		zz += atmMass*xc*xc + atmMass*yc*yc;
@@ -1088,6 +1087,8 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 	TotalRotation[3][0] = -rotatedCenterOfMass.x;
 	TotalRotation[3][1] = -rotatedCenterOfMass.y;
 	TotalRotation[3][2] = -rotatedCenterOfMass.z;
+	
+	//If we are in C1 symmetry we are done.
 	ResetRotation();
 	
 	//generate the moments of inertia
@@ -1105,6 +1106,52 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 		yz += atmMass*yc*zc;
 	}
 //	std::cout << "moments of inertia ixx = " << (yy+zz) << " iyy = " << (xx+zz) << " izz = "<<(xx+yy) << std::endl;
+	//To complete the determination of the principle axis we must apply all of the symmetry
+	//operators to each of the permutations of the axis. When we find a set that results in an
+	//unchanged set of coordinates we are done.
+	GAMESSPointGroup pg = GAMESS_C1;
+	long pgOrder = 1;
+	if (InputOptions) {
+		pg = InputOptions->Data->GetPointGroup();
+		pgOrder = InputOptions->Data->GetPointGroupOrder();
+	}
+	SymmetryOps symOps(pg, pgOrder);
+	Matrix4D permuteMatrix;
+	for (int pass=0; pass<6; pass++) {
+		switch (pass) {
+			case 0:	//default axis
+				InitRotationMatrix(permuteMatrix);
+				break;
+			case 1: //x, z, y
+				permuteMatrix[1][1] = permuteMatrix[2][2] = 0.0;
+				permuteMatrix[1][2] = permuteMatrix[2][1] = 1.0;
+				break;
+			case 2: //y, x, z
+				permuteMatrix[0][0] = permuteMatrix[1][2] = permuteMatrix[2][1] = 0.0;
+				permuteMatrix[0][1] = permuteMatrix[1][0] = permuteMatrix[2][2] = 1.0;
+				break;
+			case 3: //y, z, x
+				permuteMatrix[0][1] = permuteMatrix[2][2] = 0.0;
+				permuteMatrix[0][2] = permuteMatrix[2][1] = 1.0;
+				break;
+			case 4: //z, x, y
+				permuteMatrix[0][2] = permuteMatrix[1][0] = permuteMatrix[2][1] = 0.0;
+				permuteMatrix[0][1] = permuteMatrix[1][2] = permuteMatrix[2][0] = 1.0;
+				break;
+			case 5: //z, y, x
+				permuteMatrix[0][1] = permuteMatrix[1][2] = 0.0;
+				permuteMatrix[0][2] = permuteMatrix[1][1] = 1.0;
+				break;
+		}
+		for (int iOp=0; iOp<symOps.getOperationCount(); iOp++) {
+			for (int atm=0; atm<cFrame->GetNumAtoms(); atm++) {
+				CPoint3D test;
+				Rotate3DPt(permuteMatrix, RotCoords[atm], &test);
+				CPoint3D result;
+				symOps.ApplyOperator(test, result, iOp);
+			}
+		}
+	}
 }
 void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
 	Frame *	NewFrame, * NewFrame2;

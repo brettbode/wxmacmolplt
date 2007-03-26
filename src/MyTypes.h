@@ -243,6 +243,38 @@ enum EnergyUnit {
 	kDefault,
 	kKCalPerMole
 };
+
+enum GAMESSPointGroup {
+	invalidPGroup=0,
+	GAMESS_C1,
+	GAMESS_CS,
+	GAMESS_CI,
+	GAMESS_CNH,
+	GAMESS_CNV,
+	GAMESS_CN,
+	GAMESS_S2N,
+	GAMESS_DND,
+	GAMESS_DNH,
+	GAMESS_DN,
+	GAMESS_TD,
+	GAMESS_TH,
+	GAMESS_T,
+	GAMESS_OH,
+	GAMESS_O,
+	
+	NumberGAMESSPointGroups
+};
+// Class to abstract out symmetry operations
+class SymmetryOps {
+public:
+	SymmetryOps(GAMESSPointGroup pg, short pgOrder);
+	long getOperationCount(void) const {return (operations.size()/9);};
+	void ApplyOperator(const CPoint3D & source, CPoint3D & dest, long theOp) const;
+private:
+		std::vector<float> operations;
+	
+	void AddMatrix(const Matrix4D source);
+};
 // Surface Types - Add new items to the end only since this constant is saved in binary files
 // to correctly type the surface upon loading from file.
 typedef enum SurfaceType {

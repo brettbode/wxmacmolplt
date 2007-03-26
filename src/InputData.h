@@ -462,26 +462,6 @@ enum CoordinateType {
 	
 	NumberCoordinateTypes
 };
-enum GAMESSPointGroup {
-	invalidPGroup=0,
-	GAMESS_C1,
-	GAMESS_CS,
-	GAMESS_CI,
-	GAMESS_CNH,
-	GAMESS_CNV,
-	GAMESS_CN,
-	GAMESS_S2N,
-	GAMESS_DND,
-	GAMESS_DNH,
-	GAMESS_DN,
-	GAMESS_TD,
-	GAMESS_TH,
-	GAMESS_T,
-	GAMESS_OH,
-	GAMESS_O,
-	
-	NumberGAMESSPointGroups
-};
 class DataGroup {
 	private:
 		char		*Title;
