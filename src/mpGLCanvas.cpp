@@ -500,7 +500,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	static wxPoint oldTmpPnt;
 	bool deSelectAll = true;
-	bool transform_scene = false;
+	bool edited_atoms = false;
 
 	wxPoint tmpPnt = event.GetPosition();
 
@@ -575,6 +575,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 			// If an atom is clicked on...
 			if (selected >= 0 && selected < NumAtoms) {
+
+				edited_atoms = true;
 				GLdouble newX, newY, newZ;
 
 				// If shift is held when an atom is clicked on, we want to
@@ -652,15 +654,19 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 				lFrame->SetBonds(Prefs, true, true);
 				MolWin->UpdateGLModel();
 
-			} else {
-				transform_scene = true;
-				mSelectState = -1;
 			}
 			
-		} else {
-			transform_scene = true;
-			mSelectState = -1;
+			// else { 
+				// transform_scene = true; 
+				// mSelectState = -1; 
+			// } 
+			
 		}
+		
+		// else { 
+			// transform_scene = true; 
+			// mSelectState = -1; 
+		// } 
 	}
 
 			// If an atom is not clicked on, but some are selected, move those.
@@ -817,17 +823,14 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	
 	oldTmpPnt = tmpPnt;
 
-	// Pass mouse event to MolDisplayWin::Rotate for processing
-	if (interactiveMode && !transform_scene) {
+	if (interactiveMode && edited_atoms) {
 		draw();
-	} else {
+	}
+
+	// Pass mouse event to MolDisplayWin::Rotate for processing
+	else {
 		MolWin->Rotate(event);
 	}
-	
-	// if (transform_scene) 
-		// MolWin->Rotate(event); 
-	// else if (interactiveMode) 
-		// draw(); 
 
 }
 
