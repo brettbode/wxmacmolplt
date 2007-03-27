@@ -26,6 +26,7 @@
 #include <sstream>
 
 #include "periodic_table_dlg.h"
+#include "Math3D.h"
 
 extern PeriodicTableDlg *periodic_dlg;
 extern int glf_initialized;
@@ -654,6 +655,81 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 				lFrame->SetBonds(Prefs, true, true);
 				MolWin->UpdateGLModel();
 
+			}
+			
+			// If the user's dragging after selecting a bond, we want to
+			// rotated the selected set of atoms around that bond.
+			else if (selected >= NumAtoms && selected < NumAtoms + lFrame->NumBonds) {
+				// if we're a bond
+				//   translate to one of bond atoms
+				//   rotate selected atoms around bond according to distance
+				//     of move by translating to either atom on bond and 
+				//     rotating around vector represented by bond
+				
+				CPoint3D pivot_pt;     // The atom pos to act as origin
+				CPoint3D other_pt;     // The pos of pivot atom's bondmate
+				CPoint3D new_pt;       // Each atom's pos rotated, untranslated
+				CPoint3D axis;         // Vector of rotation bond
+				float radians;         // Amount to rotate by
+				float cosine;          // Used to rotate around axis
+				float sine;
+				float c_inv;
+				Matrix4D rot_mat;
+				float dy;              // No. pixels of mouse change in y-dir
+				float angle_offset;    // Corresponding amount of rotation
+			   
+				// Calculate the amount of rotation according to the amount
+				// of mouse change along the y-axis of the viewport.
+				dy = tmpPnt.y - oldTmpPnt.y;
+				angle_offset= dy / GetRect().GetHeight() * 540.0f;
+
+				// Get all trig together for rotating around the bond that
+				// was just clicked on.
+				radians = angle_offset * kPi / 180.0f;
+				sine = sin(radians);
+				cosine = cos(radians);
+				c_inv = 1.0f - cosine;
+
+				// The axis of rotation is a vector from one atom of the
+				// bond to the other.
+				lFrame->GetAtomPosition(
+					lFrame->GetBondAtom(selected - NumAtoms, 1), pivot_pt);
+				lFrame->GetAtomPosition(
+					lFrame->GetBondAtom(selected - NumAtoms, 2), other_pt);
+				axis = other_pt	- pivot_pt;
+				Normalize3D(&axis);
+
+				rot_mat[0][0] = c_inv * axis.x * axis.x + cosine;
+				rot_mat[1][0] = c_inv * axis.x * axis.y - sine * axis.z;
+				rot_mat[2][0] = c_inv * axis.x * axis.z + sine * axis.y;
+
+				rot_mat[0][1] = c_inv * axis.y * axis.x + sine * axis.z;
+				rot_mat[1][1] = c_inv * axis.y * axis.y + cosine;
+				rot_mat[2][1] = c_inv * axis.y * axis.z - sine * axis.x;
+
+				rot_mat[0][2] = c_inv * axis.z * axis.x - sine * axis.y;
+				rot_mat[1][2] = c_inv * axis.z * axis.y + sine * axis.x;
+				rot_mat[2][2] = c_inv * axis.z * axis.z + cosine;
+
+				rot_mat[3][0] = rot_mat[3][1] = rot_mat[3][3] = 0.0f;
+				rot_mat[0][3] = rot_mat[1][3] = rot_mat[2][3] = 0.0f;
+				rot_mat[3][3] = 1.0f;
+
+				// For each selected atom, we need to rotate it around the
+				// bond.  We want one of the bond atom's to act as the origin,
+				// so we translate our coordinate system there,
+				// perform the rotation, and then translate back.
+				for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
+					if (lFrame->GetAtomSelectState(i)) {
+						lAtoms[i].Position -= pivot_pt;
+						Rotate3DPt(rot_mat, lAtoms[i].Position, &new_pt);
+						lAtoms[i].Position = new_pt;
+						lAtoms[i].Position += pivot_pt;
+					}
+				}
+
+				// We need to update our data.
+				edited_atoms = true;
 			}
 			
 			// else { 
