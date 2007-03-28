@@ -515,15 +515,15 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom * lAtoms = lFrame->Atoms;
 
-	printf("---------------\n");
-	printf("event.LeftDown(): %d\n", event.LeftDown());
-	printf("event.LeftUp(): %d\n", event.LeftUp());
-	printf("event.RightDown(): %d\n", event.RightDown());
-	printf("event.RightUp(): %d\n", event.RightUp());
-	printf("event.Dragging(): %d\n", event.Dragging());
-	printf("event.ShiftDown(): %d\n", event.ShiftDown());
-	printf("event.CmdDown(): %d\n", event.CmdDown());
-	printf("interactiveMode: %d\n", interactiveMode);
+	// printf("---------------\n"); 
+	// printf("event.LeftDown(): %d\n", event.LeftDown()); 
+	// printf("event.LeftUp(): %d\n", event.LeftUp()); 
+	// printf("event.RightDown(): %d\n", event.RightDown()); 
+	// printf("event.RightUp(): %d\n", event.RightUp()); 
+	// printf("event.Dragging(): %d\n", event.Dragging()); 
+	// printf("event.ShiftDown(): %d\n", event.ShiftDown()); 
+	// printf("event.CmdDown(): %d\n", event.CmdDown()); 
+	// printf("interactiveMode: %d\n", interactiveMode); 
 
 	// First handle left mouse down.
 	if (event.LeftDown()) {
@@ -744,6 +744,43 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 				// We need to update our data.
 				edited_atoms = true;
+			}
+
+			else if (selected >= NumAtoms + lFrame->NumBonds) {
+
+				AnnotationLength *length_anno;
+				int anno_id = selected - NumAtoms - lFrame->NumBonds;
+				
+				length_anno =
+					dynamic_cast<AnnotationLength *>
+						(mMainData->Annotations[anno_id]);
+
+				if (length_anno) {
+					float dy;           // No. pixels of mouse change in y-dir
+					float offset;       // Corresponding amount of translation
+					CPoint3D atom1_pos;
+					CPoint3D atom2_pos;
+					CPoint3D offset_vec;
+				   
+					// Calculate the amount of rotation according to the amount
+					// of mouse change along the y-axis of the viewport.
+					dy = tmpPnt.y - oldTmpPnt.y;
+					offset = 1.0f - dy / (GetRect().GetHeight()) * 2.0f;
+
+					lFrame->GetAtomPosition(length_anno->getAtom1(), atom1_pos);
+					lFrame->GetAtomPosition(length_anno->getAtom2(), atom2_pos);
+
+					offset_vec = atom2_pos - atom1_pos;
+
+					// get atom2
+					atom2_pos.x = atom1_pos.x + offset_vec.x * offset;
+					atom2_pos.y = atom1_pos.y + offset_vec.y * offset;
+					atom2_pos.z = atom1_pos.z + offset_vec.z * offset;
+
+					lFrame->SetAtomPosition(length_anno->getAtom2(), atom2_pos);
+
+					edited_atoms = true;
+				}
 			}
 			
 			// else { 
@@ -1603,18 +1640,12 @@ void MpGLCanvas::AtomTypeDialog::OnChoice( wxCommandEvent &event ) {
 
 void MpGLCanvas::toggleInteractiveMode(void) {
 
-	printf("toggle a: interactiveMode: %d\n", interactiveMode);
 	interactiveMode = 1 - interactiveMode;
-	printf("toggle b: interactiveMode: %d\n", interactiveMode);
 
-	printf("periodic_dlg: %x\n", (unsigned int) periodic_dlg);
 	if (interactiveMode) {
-		printf("in interactive\n");
 		if (periodic_dlg) {
-			printf("in raise\n");
 			periodic_dlg->Raise();
 		} else {
-			printf("in show new\n");
 			wxRect window_rect = GetRect();
 			periodic_dlg = new PeriodicTableDlg(
 				this, wxT("Periodic Table"), window_rect.x + window_rect.width,
@@ -1622,7 +1653,6 @@ void MpGLCanvas::toggleInteractiveMode(void) {
 			periodic_dlg->Show();
 		}
 	} else {
-		printf("in close\n");
 		ClosePeriodicDlg();
 	}
 

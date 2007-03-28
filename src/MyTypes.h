@@ -89,6 +89,10 @@ public:
 	virtual bool isEquivalent(int new_atom1, int new_atom2) const {return false;}
 	virtual bool isEquivalent(int new_atom1, int new_atom2, int new_atom3) const {return false;}
 	virtual bool isEquivalent(int new_atom1, int new_atom2, int new_atom3, int new_atom4) const {return false;}
+	virtual int getAtom1() {return -1;}
+	virtual int getAtom2() {return -1;}
+	virtual int getAtom3() {return -1;}
+	virtual int getAtom4() {return -1;}
 private:
 };
 
@@ -110,6 +114,8 @@ public:
 	}
 	virtual void WriteXML(XMLElement * parent) const;
 	virtual bool ReadXML(XMLElement * p);
+	virtual int getAtom1() {return atom1;}
+	virtual int getAtom2() {return atom2;}
 private:
 	long	atom1;
 	long	atom2;
@@ -131,6 +137,7 @@ public:
 	}
 	virtual void WriteXML(XMLElement * parent) const;
 	virtual bool ReadXML(XMLElement * p);
+	virtual int getAtom1() {return atom;}
 private:
 	long	atom;
 };
@@ -158,6 +165,9 @@ public:
 	}
 	virtual void WriteXML(XMLElement * parent) const;
 	virtual bool ReadXML(XMLElement * p);
+	virtual int getAtom1() {return atom1;}
+	virtual int getAtom2() {return atom2;}
+	virtual int getAtom3() {return atom3;}
 private:
 	long	atom1;
 	long	atom2;
@@ -188,6 +198,10 @@ public:
 	}
 	virtual void WriteXML(XMLElement * parent) const;
 	virtual bool ReadXML(XMLElement * p);
+	virtual int getAtom1() {return atom1;}
+	virtual int getAtom2() {return atom2;}
+	virtual int getAtom3() {return atom3;}
+	virtual int getAtom4() {return atom4;}
 private:
 	long	atom1;
 	long	atom2;
