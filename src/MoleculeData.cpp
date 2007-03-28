@@ -1074,8 +1074,64 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 				TotalRotation[ii][j] = rot[3*ii + j];
 			}
 		}
-		float det = DeterminantMatrix(TotalRotation);
+		double det = rot[0]*(rot[4]*rot[8]-rot[5]*rot[7])-rot[3]*(rot[1]*rot[8]-rot[7]*rot[2])
+			+ rot[6]*(rot[1]*rot[5]-rot[2]*rot[4]);
 			//The determinate should be positive, multiple by -1 if not
+		if (det < 0.0) {
+			for (int ii=0; ii<3; ii++) {
+				TotalRotation[ii][0] *= -1.0;
+			}
+		}
+		OrthogonalizeRotationMatrix(TotalRotation);
+		Rotate3DOffset(TotalRotation,centerOfMass,&rotatedCenterOfMass);
+	}
+	TotalRotation[3][0] = -rotatedCenterOfMass.x;
+	TotalRotation[3][1] = -rotatedCenterOfMass.y;
+	TotalRotation[3][2] = -rotatedCenterOfMass.z;
+	
+	//If we are in C1 symmetry we are done.
+	ResetRotation();
+
+	xx = yy = zz = xy = xz = yz = 0.0;
+	for (int i=0; i<cFrame->GetNumAtoms(); i++) {
+		double atmMass = Prefs->GetAtomMass(cFrame->Atoms[i].GetType()-1);
+		double xc = RotCoords[i].x;
+		double yc = RotCoords[i].y;
+		double zc = RotCoords[i].z;
+		xx += atmMass*yc*yc + atmMass*zc*zc;
+		yy += atmMass*xc*xc + atmMass*zc*zc;
+		zz += atmMass*xc*xc + atmMass*yc*yc;
+		xy -= atmMass*xc*yc;
+		xz -= atmMass*xc*zc;
+		yz -= atmMass*yc*zc;
+	}
+	if ((fabs(xy)>1.0e-8)||(fabs(xz)>1.0e-8)||(fabs(yz)>1.0e-8)) {
+		//Diagonalize the moment of interia tensor to yield the
+		//rotation into the principle axis.
+		double tri[6];
+		tri[0] = xx;
+		tri[1] = xy;
+		tri[2] = yy;
+		tri[3] = xz;
+		tri[4] = yz;
+		tri[5] = zz;
+		double rot[9], eig[3];
+		SymmetricJacobiDiagonalization(tri, rot, eig, 3, 3);
+		Matrix4D temp1;
+		InitRotationMatrix(temp1);
+		for (int ii=0; ii<3; ii++) {
+			for (int j=0; j<3; j++) {
+				temp1[ii][j] = rot[3*ii + j];
+			}
+		}
+		Matrix4D temp2;
+		TotalRotation[3][0] = 0.0;
+		TotalRotation[3][1] = 0.0;
+		TotalRotation[3][2] = 0.0;
+		MultiplyMatrix(TotalRotation,temp1,temp2);
+		CopyMatrix(temp2,TotalRotation);
+		double det = DeterminantMatrix(TotalRotation);
+		//The determinate should be positive, multiple by -1 if not
 		if (det < 0.0) {
 			for (int ii=0; ii<3; ii++) {
 				TotalRotation[ii][0] *= -1.0;
@@ -1143,13 +1199,51 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 				permuteMatrix[0][2] = permuteMatrix[1][1] = 1.0;
 				break;
 		}
+		bool success = true;
 		for (int iOp=0; iOp<symOps.getOperationCount(); iOp++) {
+			bool SymMatch = true;
 			for (int atm=0; atm<cFrame->GetNumAtoms(); atm++) {
 				CPoint3D test;
 				Rotate3DPt(permuteMatrix, RotCoords[atm], &test);
 				CPoint3D result;
 				symOps.ApplyOperator(test, result, iOp);
+				bool match = false;
+				for (int testatom=0; testatom<cFrame->GetNumAtoms(); testatom++) {
+					if (cFrame->Atoms[atm].GetType() != cFrame->Atoms[testatom].GetType())
+						continue;
+					CPoint3D testpt;
+					Rotate3DPt(permuteMatrix, RotCoords[testatom], &testpt);
+					CPoint3D offset = result - testpt;
+						//test the difference in position. They should be quite close!
+					if (offset.Magnitude() < 1.0e-3) {
+						match = true;
+						break;
+					}
+				}
+				if (!match) { //No matching atom so this permutation fails
+					SymMatch = false;
+					break;
+				}
 			}
+			if (!SymMatch) {
+				success = false;
+				break;
+			}
+		}
+		if (success) { //we are done
+			//combine the permutation with the rotation matrix
+			TotalRotation[3][0] = 0.0;
+			TotalRotation[3][1] = 0.0;
+			TotalRotation[3][2] = 0.0;
+			Matrix4D temp;
+			MultiplyMatrix(TotalRotation,permuteMatrix,temp);
+			CopyMatrix(temp,TotalRotation);
+			OrthogonalizeRotationMatrix(TotalRotation);
+			Rotate3DOffset(TotalRotation,centerOfMass,&rotatedCenterOfMass);
+			TotalRotation[3][0] = -rotatedCenterOfMass.x;
+			TotalRotation[3][1] = -rotatedCenterOfMass.y;
+			TotalRotation[3][2] = -rotatedCenterOfMass.z;
+			break;
 		}
 	}
 }

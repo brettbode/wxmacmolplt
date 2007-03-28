@@ -178,7 +178,97 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 	//All point groups have an identity operator so toss one on here.
 	InitRotationMatrix(work);
 	AddMatrix(work);
+	if (pg == GAMESS_C1) return;	//That's it for C1
 	
+	double pi2 = 2.0*acos(-1.0);
+
+	//Start with the rotation around the primary axis (everything except C1, CI, and CS)
+	if ((pg >= GAMESS_CNH) && (pgOrder > 0)) {
+		for (int i=1; i<pgOrder; i++) {
+			double alpha = i*pi2/((double) pgOrder);
+			double cosa = cos(alpha);
+			double sina = sin(alpha);
+			operations.push_back(cosa);
+			operations.push_back(-sina);
+			operations.push_back(0.0);
+			operations.push_back(sina);
+			operations.push_back(cosa);
+			operations.push_back(0.0);
+			operations.push_back(0.0);
+			operations.push_back(0.0);
+			operations.push_back(1.0);
+		}
+		if (pg == GAMESS_CN) return; //Done with Cn
+		if ((pg == GAMESS_CNH) || (pg == GAMESS_DNH)) {
+			//Add the sigma-H plane (z=0) by repeating the rotations
+			//and inverting the z coordinate
+			int count = operations.size()/9;
+			for (int i=0; i<count; i++) {
+				operations.push_back(operations[9*i]);
+				operations.push_back(operations[9*i+1]);
+				operations.push_back(operations[9*i+2]);
+				operations.push_back(operations[9*i+3]);
+				operations.push_back(operations[9*i+4]);
+				operations.push_back(operations[9*i+5]);
+				operations.push_back(operations[9*i+6]);
+				operations.push_back(operations[9*i+7]);
+				operations.push_back(-operations[9*i+8]);
+			}
+			if (pg == GAMESS_CNH) return; //Done with CNH
+		}
+		if ((pg >= GAMESS_DND) && (pg <= GAMESS_DN)) {
+			//Dn, DnH and DnD have a two fold axis as the x axis
+			int count = operations.size()/9;
+			for (int i=0; i<count; i++) {
+				operations.push_back(operations[9*i]);
+				operations.push_back(-operations[9*i+1]);
+				operations.push_back(-operations[9*i+2]);
+				operations.push_back(operations[9*i+3]);
+				operations.push_back(-operations[9*i+4]);
+				operations.push_back(-operations[9*i+5]);
+				operations.push_back(operations[9*i+6]);
+				operations.push_back(-operations[9*i+7]);
+				operations.push_back(-operations[9*i+8]);
+			}
+			if (pg == GAMESS_DND) {
+				//DnD has a sigma-D plane with equation
+				//sin(2*pi/4*pgorder)*x-cos(2*pi/4*n)*y=0
+				double beta = pi2/(2.0*((double) pgOrder));
+				double cosb = cos(beta);
+				double sinb = sin(beta);
+			}
+			//Done with Dn, DnH, and DnD
+			return;
+		}
+		if (pg == GAMESS_CNV) {
+			//sigma V plane is XZ plane
+			int count = operations.size()/9;
+			for (int i=0; i<count; i++) {
+				operations.push_back(operations[9*i]);
+				operations.push_back(-operations[9*i+1]);
+				operations.push_back(operations[9*i+2]);
+				operations.push_back(operations[9*i+3]);
+				operations.push_back(-operations[9*i+4]);
+				operations.push_back(operations[9*i+5]);
+				operations.push_back(operations[9*i+6]);
+				operations.push_back(-operations[9*i+7]);
+				operations.push_back(operations[9*i+8]);
+			}
+			//Done with CNV
+			return;
+		}
+	}
+	if (pg == GAMESS_CS) {
+		//X-Y plane
+		InitRotationMatrix(work);
+		work[2][2] = -1.0;
+		AddMatrix(work);
+	} else if (pg == GAMESS_CI) {
+		InitRotationMatrix(work);
+		work[0][0] = work[1][1] = work[2][2] = -1.0;
+		AddMatrix(work);
+	} else {	//still working on S2N, T and O groups
+	}
 }
 void SymmetryOps::AddMatrix(const Matrix4D work) {
 	for (int i=0; i<3; i++) {
@@ -190,15 +280,15 @@ void SymmetryOps::AddMatrix(const Matrix4D work) {
 void SymmetryOps::ApplyOperator(const CPoint3D & source, CPoint3D & dest, long theOp) const {
 	if ((theOp >= 0)&&(theOp < (operations.size()/9))) {
 		long base = theOp*9;
-		dest.x = ((source.x)*operations[theOp] +
-				( source.y)*operations[theOp+3] +
-				( source.z)*operations[theOp+6]);
-		dest.y = ((source.x)*operations[theOp+1] +
-				( source.y)*operations[theOp+4] +
-				( source.z)*operations[theOp+5]);
-		dest.z = ((source.x)*operations[theOp+2] +
-				( source.y)*operations[theOp+5] +
-				( source.z)*operations[theOp+6]);
+		dest.x = ((source.x)*operations[base] +
+				( source.y)*operations[base+3] +
+				( source.z)*operations[base+6]);
+		dest.y = ((source.x)*operations[base+1] +
+				( source.y)*operations[base+4] +
+				( source.z)*operations[base+7]);
+		dest.z = ((source.x)*operations[base+2] +
+				( source.y)*operations[base+5] +
+				( source.z)*operations[base+8]);
 	}
 }
 
