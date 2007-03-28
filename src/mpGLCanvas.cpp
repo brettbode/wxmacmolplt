@@ -65,6 +65,10 @@ MpGLCanvas::~MpGLCanvas()
 		glfClose();
 		glf_initialized = 0;
 	}
+
+	if (periodic_dlg && periodic_dlg->GetParent() == this) {
+		ClosePeriodicDlg();
+	}
 }
 
 void MpGLCanvas::initGL(void) {
@@ -510,6 +514,16 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	Frame *  lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom * lAtoms = lFrame->Atoms;
+
+	printf("---------------\n");
+	printf("event.LeftDown(): %d\n", event.LeftDown());
+	printf("event.LeftUp(): %d\n", event.LeftUp());
+	printf("event.RightDown(): %d\n", event.RightDown());
+	printf("event.RightUp(): %d\n", event.RightUp());
+	printf("event.Dragging(): %d\n", event.Dragging());
+	printf("event.ShiftDown(): %d\n", event.ShiftDown());
+	printf("event.CmdDown(): %d\n", event.CmdDown());
+	printf("interactiveMode: %d\n", interactiveMode);
 
 	// First handle left mouse down.
 	if (event.LeftDown()) {
@@ -1589,22 +1603,29 @@ void MpGLCanvas::AtomTypeDialog::OnChoice( wxCommandEvent &event ) {
 
 void MpGLCanvas::toggleInteractiveMode(void) {
 
+	printf("toggle a: interactiveMode: %d\n", interactiveMode);
 	interactiveMode = 1 - interactiveMode;
+	printf("toggle b: interactiveMode: %d\n", interactiveMode);
 
+	printf("periodic_dlg: %x\n", (unsigned int) periodic_dlg);
 	if (interactiveMode) {
+		printf("in interactive\n");
 		if (periodic_dlg) {
+			printf("in raise\n");
 			periodic_dlg->Raise();
 		} else {
+			printf("in show new\n");
 			wxRect window_rect = GetRect();
 			periodic_dlg = new PeriodicTableDlg(
 				this, wxT("Periodic Table"), window_rect.x + window_rect.width,
 				window_rect.y + 30);
-
 			periodic_dlg->Show();
 		}
 	} else {
+		printf("in close\n");
 		ClosePeriodicDlg();
 	}
+
 } 
 
 void MpGLCanvas::ClosePeriodicDlg(void) {

@@ -1665,10 +1665,10 @@ void MolDisplayWin::menuEditSelect_all(wxCommandEvent &event) {
 
 void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 {
-  interactiveMode = 1 - interactiveMode;
+	interactiveMode = 1 - interactiveMode;
 
-  if (glCanvas)
-	glCanvas->toggleInteractiveMode();
+	if (glCanvas)
+		glCanvas->toggleInteractiveMode();
 
   //DrawGL();
 }

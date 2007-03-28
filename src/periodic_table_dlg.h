@@ -60,6 +60,7 @@ class PeriodicTableDlg: public wxMiniFrame {
 			int ypos = 100);
 		void New(wxCommandEvent& WXUNUSED(event));
 		int GetSelectedID(void);
+		MpGLCanvas *GetParent() {return parent;};
 
 	private:
 		wxButton *button;
