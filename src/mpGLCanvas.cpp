@@ -767,8 +767,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 					dy = tmpPnt.y - oldTmpPnt.y;
 					offset = 1.0f - dy / (GetRect().GetHeight()) * 2.0f;
 
-					lFrame->GetAtomPosition(length_anno->getAtom1(), atom1_pos);
-					lFrame->GetAtomPosition(length_anno->getAtom2(), atom2_pos);
+					lFrame->GetAtomPosition(length_anno->getAtom(0), atom1_pos);
+					lFrame->GetAtomPosition(length_anno->getAtom(1), atom2_pos);
 
 					offset_vec = atom2_pos - atom1_pos;
 
@@ -777,7 +777,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 					atom2_pos.y = atom1_pos.y + offset_vec.y * offset;
 					atom2_pos.z = atom1_pos.z + offset_vec.z * offset;
 
-					lFrame->SetAtomPosition(length_anno->getAtom2(), atom2_pos);
+					lFrame->SetAtomPosition(length_anno->getAtom(1), atom2_pos);
 
 					edited_atoms = true;
 				}
@@ -1238,7 +1238,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 		for (anno = mMainData->Annotations.begin(), anno_id = 0;
 			 anno != mMainData->Annotations.end() && !already_exists;
 			 anno++) {
-			if ((*anno)->isEquivalent(selected)) {
+			if ((*anno)->isEquivalent(1, &selected)) {
 				already_exists = true;
 			}
 			anno_id++;
@@ -1289,7 +1289,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 				for (anno = mMainData->Annotations.begin(), anno_id = 0;
 					 anno != mMainData->Annotations.end() && !already_exists;
 					 anno++) {
-					if ((*anno)->isEquivalent(select_stack[0], select_stack[1])) {
+					if ((*anno)->isEquivalent(2, select_stack)) {
 						already_exists = true;
 					}
 					anno_id++;
@@ -1345,7 +1345,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 				for (anno = mMainData->Annotations.begin(), anno_id = 0;
 					 anno != mMainData->Annotations.end() && !already_exists;
 					 anno++) {
-					if ((*anno)->isEquivalent(select_stack[0], select_stack[1], select_stack[2])) {
+					if ((*anno)->isEquivalent(3, select_stack)) {
 						already_exists = true;
 					}
 					anno_id++;
@@ -1363,7 +1363,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 				for (anno = mMainData->Annotations.begin(), anno_id = 0;
 					 anno != mMainData->Annotations.end() && !already_exists;
 					 anno++) {
-					if ((*anno)->isEquivalent(select_stack[0], select_stack[1], select_stack[2], select_stack[3])) {
+					if ((*anno)->isEquivalent(4, select_stack)) {
 						already_exists = true;
 					}
 					anno_id++;
