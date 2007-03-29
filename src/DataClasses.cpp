@@ -236,6 +236,19 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 				double beta = pi2/(2.0*((double) pgOrder));
 				double cosb = cos(beta);
 				double sinb = sin(beta);
+				//replicate all the preceding operations with an x/y rotation
+				int count = operations.size()/9;
+				for (int i=0; i<count; i++) {
+					operations.push_back(cosb*operations[9*i]+sinb*operations[9*i+1]);
+					operations.push_back(-(-sinb*operations[9*i]+cosb*operations[9*i+1]));
+					operations.push_back(operations[9*i+2]);
+					operations.push_back(cosb*operations[9*i+3]+sinb*operations[9*i+4]);
+					operations.push_back(-(-sinb*operations[9*i+3]+cosb*operations[9*i+4]));
+					operations.push_back(operations[9*i+5]);
+					operations.push_back(cosb*operations[9*i+6]+sinb*operations[9*i+7]);
+					operations.push_back(-(-sinb*operations[9*i+6]+cosb*operations[9*i+7]));
+					operations.push_back(operations[9*i+8]);
+				}
 			}
 			//Done with Dn, DnH, and DnD
 			return;
@@ -267,7 +280,76 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 		InitRotationMatrix(work);
 		work[0][0] = work[1][1] = work[2][2] = -1.0;
 		AddMatrix(work);
-	} else {	//still working on S2N, T and O groups
+	} else if (pg == GAMESS_S2N) {
+		//The X-Y plane is the plane for the improper rotation
+		double beta = pi2/(2.0*((double) pgOrder));
+		double cosb = cos(beta);
+		double sinb = sin(beta);
+		int count = operations.size()/9;
+		for (int i=0; i<count; i++) {
+			operations.push_back(cosb*operations[9*i]+sinb*operations[9*i+1]);
+			operations.push_back(-sinb*operations[9*i]+cosb*operations[9*i+1]);
+			operations.push_back(-operations[9*i+2]);
+			operations.push_back(cosb*operations[9*i+3]+sinb*operations[9*i+4]);
+			operations.push_back(-sinb*operations[9*i+3]+cosb*operations[9*i+4]);
+			operations.push_back(-operations[9*i+5]);
+			operations.push_back(cosb*operations[9*i+6]+sinb*operations[9*i+7]);
+			operations.push_back(-sinb*operations[9*i+6]+cosb*operations[9*i+7]);
+			operations.push_back(-operations[9*i+8]);
+		}
+	} else { //T and O related groups
+		//Here we are taking care of the common subgroup T
+		InitRotationMatrix(work);
+		work[1][1] = work[2][2] = -1.0;
+		AddMatrix(work);
+		work[1][1] = 1.0;
+		work[0][0] = work[2][2] = -1.0;
+		AddMatrix(work);
+		work[0][0] = work[1][1] = 1.0;
+		work[2][2] = 1.0;
+		AddMatrix(work);
+		for (int i=0; i<7; i++) {
+			operations.push_back(operations[9*i+6]);
+			operations.push_back(operations[9*i+7]);
+			operations.push_back(operations[9*i+9]);
+			operations.push_back(operations[9*i]);
+			operations.push_back(operations[9*i+1]);
+			operations.push_back(operations[9*i+2]);
+			operations.push_back(operations[9*i+4]);
+			operations.push_back(operations[9*i+5]);
+			operations.push_back(operations[9*i+6]);
+		}
+		//Done with T continue on for others
+		if (pg == GAMESS_TH) {
+			//TH is finished off with a direct product with CI
+			int count = operations.size();
+			for (int i=0; i<count; i++) {
+				operations.push_back( - operations[i]);
+			}
+		} else if (pg >= GAMESS_TD) {
+			//Octahedral groups are a direct product of T and a C4 rotation
+			//TD group is direct product of T and a reflection plane (X=Y)
+			double sign = -1.0;
+			if (pg == GAMESS_TD) sign = 1.0;
+			for (int i=0; i<12; i++) {
+				operations.push_back(operations[9*i+3]*sign);
+				operations.push_back(operations[9*i+4]*sign);
+				operations.push_back(operations[9*i+5]*sign);
+				operations.push_back(operations[9*i]);
+				operations.push_back(operations[9*i+1]);
+				operations.push_back(operations[9*i+2]);
+				operations.push_back(operations[9*i+6]);
+				operations.push_back(operations[9*i+7]);
+				operations.push_back(operations[9*i+8]);
+			}
+			if (pg == GAMESS_OH) {
+				//OH is a direct product of O and CI
+				int count = operations.size();
+				for (int i=0; i<count; i++) {
+					operations.push_back( - operations[i]);
+				}
+			}
+		}
 	}
 }
 void SymmetryOps::AddMatrix(const Matrix4D work) {
