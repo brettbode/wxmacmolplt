@@ -1041,15 +1041,20 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 	CPoint3D centerOfMass;
 	CalculateCenterOfMass(cFrame->Atoms, cFrame->GetNumAtoms(),
 						  Prefs->GetAtomMassLoc(), &centerOfMass);
+	centerOfMass *= -1.0;
+//	for (int ii=0; ii<cFrame->GetNumAtoms(); ii++) {
+//		cFrame->Atoms[ii].Position += centerOfMass;
+//	}
+//	centerOfMass.x = centerOfMass.y = centerOfMass.z = 0.0;
 	CPoint3D rotatedCenterOfMass = centerOfMass;
 	
 	//Compute the moment of interia tensor
 	double xx=0.0, xy=0.0, yy=0.0, xz=0.0, yz=0.0, zz=0.0;
 	for (int i=0; i<cFrame->GetNumAtoms(); i++) {
 		double atmMass = Prefs->GetAtomMass(cFrame->Atoms[i].GetType()-1);
-		double xc = cFrame->Atoms[i].Position.x - centerOfMass.x;
-		double yc = cFrame->Atoms[i].Position.y - centerOfMass.y;
-		double zc = cFrame->Atoms[i].Position.z - centerOfMass.z;
+		double xc = cFrame->Atoms[i].Position.x + centerOfMass.x;
+		double yc = cFrame->Atoms[i].Position.y + centerOfMass.y;
+		double zc = cFrame->Atoms[i].Position.z + centerOfMass.z;
 		xx += atmMass*yc*yc + atmMass*zc*zc;
 		yy += atmMass*xc*xc + atmMass*zc*zc;
 		zz += atmMass*xc*xc + atmMass*yc*yc;
@@ -1074,25 +1079,55 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 				TotalRotation[ii][j] = rot[3*ii + j];
 			}
 		}
-		double det = rot[0]*(rot[4]*rot[8]-rot[5]*rot[7])-rot[3]*(rot[1]*rot[8]-rot[7]*rot[2])
-			+ rot[6]*(rot[1]*rot[5]-rot[2]*rot[4]);
-			//The determinate should be positive, multiple by -1 if not
+		float det = DeterminantMatrix(TotalRotation);
+		//The determinate should be positive, multiple by -1 if not
 		if (det < 0.0) {
 			for (int ii=0; ii<3; ii++) {
 				TotalRotation[ii][0] *= -1.0;
 			}
 		}
-		OrthogonalizeRotationMatrix(TotalRotation);
+//		OrthogonalizeRotationMatrix(TotalRotation);
+		CPoint3D a, b, c;
+		a.x = TotalRotation[0][0];
+		a.y = TotalRotation[0][1];
+		a.z = TotalRotation[0][2];
+		b.x = TotalRotation[1][0];
+		b.y = TotalRotation[1][1];
+		b.z = TotalRotation[1][2];
+		c.x = TotalRotation[2][0];
+		c.y = TotalRotation[2][1];
+		c.z = TotalRotation[2][2];
+		std::cout << "|a|="<<a.Magnitude() << " |b|="<<b.Magnitude() << " |c|="<<c.Magnitude() <<std::endl;
+		std::cout << "a.b="<<DotProduct3D(&a,&b)<< " a.c="<<DotProduct3D(&a, &c)<<
+			" b.c="<<DotProduct3D(&b, &c)<<std::endl;
+		float phi, psi, theta;
+		std::cout << "prior to euler total rotation" << std::endl <<
+			TotalRotation[0][0] << " , " << TotalRotation[0][1] << " , " << TotalRotation[0][2] << " , " << TotalRotation[0][3] <<std::endl<<
+			TotalRotation[1][0] << " , " << TotalRotation[1][1] << " , " << TotalRotation[1][2] << " , " << TotalRotation[1][3] <<std::endl<<
+			TotalRotation[2][0] << " , " << TotalRotation[2][1] << " , " << TotalRotation[2][2] << " , " << TotalRotation[2][3] <<std::endl<<
+			TotalRotation[3][0] << " , " << TotalRotation[3][1] << " , " << TotalRotation[3][2] << " , " << TotalRotation[3][3] << std::endl;
+		MatrixToEulerAngles(TotalRotation,&phi,&psi,&theta);
+		EulerAnglesToMatrix(TotalRotation,phi,psi,theta);
+		std::cout << "euler angles phi="<<phi<<" psi="<<psi<<" theta="<<theta<<std::endl;
+		std::cout << "after euler total rotation" << std::endl <<
+			TotalRotation[0][0] << " , " << TotalRotation[0][1] << " , " << TotalRotation[0][2] << " , " << TotalRotation[0][3] <<std::endl<<
+			TotalRotation[1][0] << " , " << TotalRotation[1][1] << " , " << TotalRotation[1][2] << " , " << TotalRotation[1][3] <<std::endl<<
+			TotalRotation[2][0] << " , " << TotalRotation[2][1] << " , " << TotalRotation[2][2] << " , " << TotalRotation[2][3] <<std::endl<<
+			TotalRotation[3][0] << " , " << TotalRotation[3][1] << " , " << TotalRotation[3][2] << " , " << TotalRotation[3][3] << std::endl;
 		Rotate3DOffset(TotalRotation,centerOfMass,&rotatedCenterOfMass);
 	}
-	TotalRotation[3][0] = -rotatedCenterOfMass.x;
-	TotalRotation[3][1] = -rotatedCenterOfMass.y;
-	TotalRotation[3][2] = -rotatedCenterOfMass.z;
+//	TotalRotation[3][0] = rotatedCenterOfMass.x;
+//	TotalRotation[3][1] = rotatedCenterOfMass.y;
+//	TotalRotation[3][2] = rotatedCenterOfMass.z;
 	
 	//If we are in C1 symmetry we are done.
-	ResetRotation();
+	for (long i=0; i<cFrame->GetNumAtoms(); i++) {
+		CPoint3D temp = (cFrame->Atoms[i].Position) + centerOfMass;
+		Rotate3DPt(TotalRotation, temp, &(RotCoords[i]));
+	}
+//	ResetRotation();
 
-	xx = yy = zz = xy = xz = yz = 0.0;
+/*	xx = yy = zz = xy = xz = yz = 0.0;
 	for (int i=0; i<cFrame->GetNumAtoms(); i++) {
 		double atmMass = Prefs->GetAtomMass(cFrame->Atoms[i].GetType()-1);
 		double xc = RotCoords[i].x;
@@ -1130,14 +1165,14 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 		TotalRotation[3][2] = 0.0;
 		MultiplyMatrix(TotalRotation,temp1,temp2);
 		CopyMatrix(temp2,TotalRotation);
-		double det = DeterminantMatrix(TotalRotation);
-		//The determinate should be positive, multiple by -1 if not
-		if (det < 0.0) {
-			for (int ii=0; ii<3; ii++) {
-				TotalRotation[ii][0] *= -1.0;
-			}
-		}
-		OrthogonalizeRotationMatrix(TotalRotation);
+//		double det = DeterminantMatrix(TotalRotation);
+//		//The determinate should be positive, multiple by -1 if not
+//		if (det < 0.0) {
+//			for (int ii=0; ii<3; ii++) {
+//				TotalRotation[ii][0] *= -1.0;
+//			}
+//		}
+//		OrthogonalizeRotationMatrix(TotalRotation);
 		Rotate3DOffset(TotalRotation,centerOfMass,&rotatedCenterOfMass);
 	}
 	TotalRotation[3][0] = -rotatedCenterOfMass.x;
@@ -1146,7 +1181,7 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 	
 	//If we are in C1 symmetry we are done.
 	ResetRotation();
-	
+*/	
 	//generate the moments of inertia
 	xx = yy = zz = xy = xz = yz = 0.0;
 	for (int i=0; i<cFrame->GetNumAtoms(); i++) {
@@ -1180,11 +1215,13 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 				break;
 			case 1: //x, z, y
 				permuteMatrix[1][1] = permuteMatrix[2][2] = 0.0;
-				permuteMatrix[1][2] = permuteMatrix[2][1] = 1.0;
+				permuteMatrix[1][2] = -1.0;
+				permuteMatrix[2][1] = 1.0;
 				break;
 			case 2: //y, x, z
 				permuteMatrix[0][0] = permuteMatrix[1][2] = permuteMatrix[2][1] = 0.0;
-				permuteMatrix[0][1] = permuteMatrix[1][0] = permuteMatrix[2][2] = 1.0;
+				permuteMatrix[0][1] = -1.0;
+				permuteMatrix[1][0] = permuteMatrix[2][2] = 1.0;
 				break;
 			case 3: //y, z, x
 				permuteMatrix[0][1] = permuteMatrix[2][2] = 0.0;
@@ -1192,11 +1229,12 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 				break;
 			case 4: //z, x, y
 				permuteMatrix[0][2] = permuteMatrix[1][0] = permuteMatrix[2][1] = 0.0;
-				permuteMatrix[0][1] = permuteMatrix[1][2] = permuteMatrix[2][0] = 1.0;
+				permuteMatrix[0][2] = permuteMatrix[1][0] = permuteMatrix[2][1] = 1.0;
 				break;
 			case 5: //z, y, x
-				permuteMatrix[0][1] = permuteMatrix[1][2] = 0.0;
-				permuteMatrix[0][2] = permuteMatrix[1][1] = 1.0;
+				permuteMatrix[1][0] = permuteMatrix[2][1] = 0.0;
+				permuteMatrix[2][0] = -1.0;
+				permuteMatrix[1][1] = 1.0;
 				break;
 		}
 		bool success = true;
@@ -1232,17 +1270,46 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 		}
 		if (success) { //we are done
 			//combine the permutation with the rotation matrix
-			TotalRotation[3][0] = 0.0;
-			TotalRotation[3][1] = 0.0;
-			TotalRotation[3][2] = 0.0;
+//			TotalRotation[3][0] = 0.0;
+//			TotalRotation[3][1] = 0.0;
+//			TotalRotation[3][2] = 0.0;
 			Matrix4D temp;
+			std::cout << "initial total rotation" << std::endl <<
+			TotalRotation[0][0] << " , " << TotalRotation[0][1] << " , " << TotalRotation[0][2] << " , " << TotalRotation[0][3] <<std::endl<<
+			TotalRotation[1][0] << " , " << TotalRotation[1][1] << " , " << TotalRotation[1][2] << " , " << TotalRotation[1][3] <<std::endl<<
+			TotalRotation[2][0] << " , " << TotalRotation[2][1] << " , " << TotalRotation[2][2] << " , " << TotalRotation[2][3] <<std::endl<<
+			TotalRotation[3][0] << " , " << TotalRotation[3][1] << " , " << TotalRotation[3][2] << " , " << TotalRotation[3][3] << std::endl;
+			std::cout << "permutation" << std::endl <<
+			permuteMatrix[0][0] << " , " << permuteMatrix[0][1] << " , " << permuteMatrix[0][2] << " , " << permuteMatrix[0][3] <<std::endl<<
+			permuteMatrix[1][0] << " , " << permuteMatrix[1][1] << " , " << permuteMatrix[1][2] << " , " << permuteMatrix[1][3] <<std::endl<<
+			permuteMatrix[2][0] << " , " << permuteMatrix[2][1] << " , " << permuteMatrix[2][2] << " , " << permuteMatrix[2][3] <<std::endl<<
+			permuteMatrix[3][0] << " , " << permuteMatrix[3][1] << " , " << permuteMatrix[3][2] << " , " << permuteMatrix[3][3] << std::endl;
+			
 			MultiplyMatrix(TotalRotation,permuteMatrix,temp);
+			std::cout << "resulting matrix" << std::endl <<
+				temp[0][0] << " , " << temp[0][1] << " , " << temp[0][2] << " , " << temp[0][3] <<std::endl<<
+				temp[1][0] << " , " << temp[1][1] << " , " << temp[1][2] << " , " << temp[1][3] <<std::endl<<
+				temp[2][0] << " , " << temp[2][1] << " , " << temp[2][2] << " , " << temp[2][3] <<std::endl<<
+				temp[3][0] << " , " << temp[3][1] << " , " << temp[3][2] << " , " << temp[3][3] << std::endl;
 			CopyMatrix(temp,TotalRotation);
-			OrthogonalizeRotationMatrix(TotalRotation);
+//			double det = DeterminantMatrix(TotalRotation);
+			//The determinate should be positive, multiple by -1 if not
+//			if (det < 0.0) {
+//				for (int ii=0; ii<3; ii++) {
+//					TotalRotation[ii][0] *= -1.0;
+//				}
+//			}
+//			OrthogonalizeRotationMatrix(TotalRotation);
+			// (vector-vector)*matrix = vector = vector*matrix - vector*matrix?
 			Rotate3DOffset(TotalRotation,centerOfMass,&rotatedCenterOfMass);
-			TotalRotation[3][0] = -rotatedCenterOfMass.x;
-			TotalRotation[3][1] = -rotatedCenterOfMass.y;
-			TotalRotation[3][2] = -rotatedCenterOfMass.z;
+			TotalRotation[3][0] = rotatedCenterOfMass.x;
+			TotalRotation[3][1] = rotatedCenterOfMass.y;
+			TotalRotation[3][2] = rotatedCenterOfMass.z;
+			std::cout << "final total rotation" << std::endl <<
+				TotalRotation[0][0] << " , " << TotalRotation[0][1] << " , " << TotalRotation[0][2] << " , " << TotalRotation[0][3] <<std::endl<<
+				TotalRotation[1][0] << " , " << TotalRotation[1][1] << " , " << TotalRotation[1][2] << " , " << TotalRotation[1][3] <<std::endl<<
+				TotalRotation[2][0] << " , " << TotalRotation[2][1] << " , " << TotalRotation[2][2] << " , " << TotalRotation[2][3] <<std::endl<<
+				TotalRotation[3][0] << " , " << TotalRotation[3][1] << " , " << TotalRotation[3][2] << " , " << TotalRotation[3][3] << std::endl;
 			break;
 		}
 	}
