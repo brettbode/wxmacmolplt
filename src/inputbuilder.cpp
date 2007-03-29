@@ -780,9 +780,9 @@ void InputBuilderWindow::CreateControls()
     itemFlexGridSizer72->Add(itemStaticText75, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
     wxString paxisOrderChoiceStrings[] = {
-        _("2"),
-        _("3"),
-        _("4")
+        _T("2"),
+        _T("3"),
+        _T("4")
     };
     paxisOrderChoice = new wxUglyChoice( itemPanel58, ID_ORDER_CHOICE, wxDefaultPosition, wxDefaultSize, 3, paxisOrderChoiceStrings, 0 );
     if (ShowToolTips())

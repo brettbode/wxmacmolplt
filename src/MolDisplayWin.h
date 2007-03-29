@@ -279,6 +279,8 @@ class MolDisplayWin : public wxFrame {
 		void menuMoleculeSetFrameEnergy(wxCommandEvent &event);
 		void menuMoleculeCreateLLMPath(wxCommandEvent &event);
 		void menuMoleculeMinimizeFrameMovements(wxCommandEvent &event);
+		void menuMoleculeDetermineSym(wxCommandEvent &event);
+		void menuMoleculeSymCoords(wxCommandEvent &event);
 		void menuMoleculeConvertToBohr(wxCommandEvent &event);
 		void menuMoleculeConvertToAngstroms(wxCommandEvent &event);
 		void menuMoleculeInvertNormalMode(wxCommandEvent &event);

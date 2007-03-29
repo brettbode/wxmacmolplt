@@ -92,6 +92,9 @@ enum MMP_EventID {
 	MMP_SETBONDLENGTH,
 	MMP_CREATELLMPATH,
 	MMP_MINFRAMEMOVEMENTS,
+	MMP_SYMPOINTGROUP,
+	MMP_DETERMINEPG,
+	MMP_SYMADAPTCOORDS,
 	MMP_CONVERTTOBOHR,
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
@@ -193,6 +196,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_ENERGYEDIT,         MolDisplayWin::menuMoleculeSetFrameEnergy)
 	EVT_MENU (MMP_CREATELLMPATH,      MolDisplayWin::menuMoleculeCreateLLMPath)
 	EVT_MENU (MMP_MINFRAMEMOVEMENTS,  MolDisplayWin::menuMoleculeMinimizeFrameMovements)
+	EVT_MENU (MMP_DETERMINEPG,			MolDisplayWin::menuMoleculeDetermineSym)
+	EVT_MENU (MMP_SYMADAPTCOORDS,		MolDisplayWin::menuMoleculeSymCoords)
 	EVT_MENU (MMP_CONVERTTOBOHR,      MolDisplayWin::menuMoleculeConvertToBohr)
 	EVT_MENU (MMP_CONVERTTOANGSTROMS, MolDisplayWin::menuMoleculeConvertToAngstroms)
 	EVT_MENU (MMP_INVERTNORMALMODE,   MolDisplayWin::menuMoleculeInvertNormalMode)
@@ -529,10 +534,12 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewRotate->Append(MMP_ROTATEPRINC, wxT("to &Principle Orientation"));
 	menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
 
-	menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."), _T("Apply the automated bond determination with several options"));
+	menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."), _("Apply the automated bond determination with several options"));
 	menuMolecule->Append(MMP_ENERGYEDIT, wxT("Set &Frame Energy..."));
-	menuMolecule->Append(MMP_CREATELLMPATH, wxT("Create &LLM Path..."), _T("Create a Linear Least Motion path between this geometry and the next one"));
-	menuMolecule->Append(MMP_MINFRAMEMOVEMENTS, wxT("&Minimize Frame Movements"), _T("Reorient each frame so as to minimize the movement of each atom"));
+	menuMolecule->Append(MMP_CREATELLMPATH, wxT("Create &LLM Path..."), _("Create a Linear Least Motion path between this geometry and the next one"));
+	menuMolecule->Append(MMP_MINFRAMEMOVEMENTS, wxT("&Minimize Frame Movements"), _("Reorient each frame so as to minimize the movement of each atom"));
+	menuMolecule->Append(MMP_DETERMINEPG, wxT("Determine Point Groupt"), _("Compute the point group for the current coordinates"));
+	menuMolecule->Append(MMP_SYMADAPTCOORDS, wxT("Set &Coordinates to Principle Orientation"), _("Transform coordinates to the symmetry adapted principle orientation"));
 	menuMolecule->AppendSeparator();
 	menuMolecule->Append(MMP_CONVERTTOBOHR, wxT("Convert to &Bohr"));
 	menuMolecule->Append(MMP_CONVERTTOANGSTROMS, wxT("Convert to &Angstroms"));
@@ -585,6 +592,8 @@ void MolDisplayWin::ClearMenus(void) {
 	menuMolecule->Enable(MMP_ENERGYEDIT, false);
 	menuMolecule->Enable(MMP_CREATELLMPATH, false);
 	menuMolecule->Enable(MMP_MINFRAMEMOVEMENTS, false);
+	menuMolecule->Enable(MMP_DETERMINEPG, false);
+	menuMolecule->Enable(MMP_SYMADAPTCOORDS, false);
 	menuMolecule->Enable(MMP_INVERTNORMALMODE, false);
 }
 void MolDisplayWin::AdjustMenus(void) {
@@ -622,6 +631,8 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuEdit->Enable(MMP_COPYCOORDS, true);
 		menuMolecule->Enable(MMP_ENERGYEDIT, true);
 		menuMolecule->Enable(MMP_SETBONDLENGTH, true);
+		menuMolecule->Enable(MMP_DETERMINEPG, true);
+		menuMolecule->Enable(MMP_SYMADAPTCOORDS, true);
 		menuFile->Enable(MMP_EXPORT, true);
 		menuView->Enable(MMP_ANNOTATIONSSUBMENU, true);
 	}
@@ -1981,6 +1992,16 @@ void MolDisplayWin::menuMoleculeMinimizeFrameMovements(wxCommandEvent &event) {
 	BeginOperation();
 	MainData->LinearLeastSquaresFit(ProgressInd);
 	FinishOperation();
+	Dirty = true;
+}
+void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &event) {
+//	Dirty = true;
+}
+void MolDisplayWin::menuMoleculeSymCoords(wxCommandEvent &event) {
+	MainData->RotateToPrincipleOrientation(Prefs);
+	MainData->StickCoordinates();
+	if (coordsWindow) coordsWindow->FrameChanged();
+	ResetView();
 	Dirty = true;
 }
 void MolDisplayWin::menuMoleculeConvertToBohr(wxCommandEvent &event) {
