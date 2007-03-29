@@ -102,6 +102,7 @@ class MoleculeData {
 		void UnitConversion(bool AngToBohr);
 		void FlipRotation(short theItem);
 		void RotateToPrincipleOrientation(WinPrefs * Prefs);
+		bool DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs) const;
 		bool SetScreenPlane(CPoint3D *Points);
 		void LinearLeastSquaresFit(Progress * lProgress);
 		void CreateLLM(long NumPts, WinPrefs * Prefs);

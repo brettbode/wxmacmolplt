@@ -1034,18 +1034,20 @@ void MoleculeData::SetModelRotation(float Psi, float Phi, float Theta) {
 }
 #include <iostream>
 void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
+	if (!DeterminePrincipleOrientation(TotalRotation, Prefs)) {
+		MessageAlert("Unable to determine the proper symmetry adapated rotation. This"
+					 " may mean your selected point group is incorrect.");
+	}
+}
+bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs) const {
 	//Setup the rotation matrix to present the molecule in the priciple orientation
 	
-	InitRotationMatrix(TotalRotation);
+	InitRotationMatrix(result);
 	//First compute and offset to the center of mass
 	CPoint3D centerOfMass;
 	CalculateCenterOfMass(cFrame->Atoms, cFrame->GetNumAtoms(),
 						  Prefs->GetAtomMassLoc(), &centerOfMass);
 	centerOfMass *= -1.0;
-//	for (int ii=0; ii<cFrame->GetNumAtoms(); ii++) {
-//		cFrame->Atoms[ii].Position += centerOfMass;
-//	}
-//	centerOfMass.x = centerOfMass.y = centerOfMass.z = 0.0;
 	CPoint3D rotatedCenterOfMass = centerOfMass;
 	
 	//Compute the moment of interia tensor
@@ -1076,114 +1078,22 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 		SymmetricJacobiDiagonalization(tri, rot, eig, 3, 3);
 		for (int ii=0; ii<3; ii++) {
 			for (int j=0; j<3; j++) {
-				TotalRotation[ii][j] = rot[3*ii + j];
+				result[ii][j] = rot[3*ii + j];
 			}
 		}
-		float det = DeterminantMatrix(TotalRotation);
+		float det = DeterminantMatrix(result);
 		//The determinate should be positive, multiple by -1 if not
+		//I think this is to ensure the rotation is right-handed
 		if (det < 0.0) {
 			for (int ii=0; ii<3; ii++) {
-				TotalRotation[ii][0] *= -1.0;
+				result[ii][0] *= -1.0;
 			}
 		}
-//		OrthogonalizeRotationMatrix(TotalRotation);
-		CPoint3D a, b, c;
-		a.x = TotalRotation[0][0];
-		a.y = TotalRotation[0][1];
-		a.z = TotalRotation[0][2];
-		b.x = TotalRotation[1][0];
-		b.y = TotalRotation[1][1];
-		b.z = TotalRotation[1][2];
-		c.x = TotalRotation[2][0];
-		c.y = TotalRotation[2][1];
-		c.z = TotalRotation[2][2];
-		std::cout << "|a|="<<a.Magnitude() << " |b|="<<b.Magnitude() << " |c|="<<c.Magnitude() <<std::endl;
-		std::cout << "a.b="<<DotProduct3D(&a,&b)<< " a.c="<<DotProduct3D(&a, &c)<<
-			" b.c="<<DotProduct3D(&b, &c)<<std::endl;
-		float phi, psi, theta;
-		std::cout << "prior to euler total rotation" << std::endl <<
-			TotalRotation[0][0] << " , " << TotalRotation[0][1] << " , " << TotalRotation[0][2] << " , " << TotalRotation[0][3] <<std::endl<<
-			TotalRotation[1][0] << " , " << TotalRotation[1][1] << " , " << TotalRotation[1][2] << " , " << TotalRotation[1][3] <<std::endl<<
-			TotalRotation[2][0] << " , " << TotalRotation[2][1] << " , " << TotalRotation[2][2] << " , " << TotalRotation[2][3] <<std::endl<<
-			TotalRotation[3][0] << " , " << TotalRotation[3][1] << " , " << TotalRotation[3][2] << " , " << TotalRotation[3][3] << std::endl;
-		MatrixToEulerAngles(TotalRotation,&phi,&psi,&theta);
-		EulerAnglesToMatrix(TotalRotation,phi,psi,theta);
-		std::cout << "euler angles phi="<<phi<<" psi="<<psi<<" theta="<<theta<<std::endl;
-		std::cout << "after euler total rotation" << std::endl <<
-			TotalRotation[0][0] << " , " << TotalRotation[0][1] << " , " << TotalRotation[0][2] << " , " << TotalRotation[0][3] <<std::endl<<
-			TotalRotation[1][0] << " , " << TotalRotation[1][1] << " , " << TotalRotation[1][2] << " , " << TotalRotation[1][3] <<std::endl<<
-			TotalRotation[2][0] << " , " << TotalRotation[2][1] << " , " << TotalRotation[2][2] << " , " << TotalRotation[2][3] <<std::endl<<
-			TotalRotation[3][0] << " , " << TotalRotation[3][1] << " , " << TotalRotation[3][2] << " , " << TotalRotation[3][3] << std::endl;
-		Rotate3DOffset(TotalRotation,centerOfMass,&rotatedCenterOfMass);
+		Rotate3DOffset(result,centerOfMass,&rotatedCenterOfMass);
 	}
-//	TotalRotation[3][0] = rotatedCenterOfMass.x;
-//	TotalRotation[3][1] = rotatedCenterOfMass.y;
-//	TotalRotation[3][2] = rotatedCenterOfMass.z;
-	
-	//If we are in C1 symmetry we are done.
-	for (long i=0; i<cFrame->GetNumAtoms(); i++) {
-		CPoint3D temp = (cFrame->Atoms[i].Position) + centerOfMass;
-		Rotate3DPt(TotalRotation, temp, &(RotCoords[i]));
-	}
-//	ResetRotation();
 
-/*	xx = yy = zz = xy = xz = yz = 0.0;
-	for (int i=0; i<cFrame->GetNumAtoms(); i++) {
-		double atmMass = Prefs->GetAtomMass(cFrame->Atoms[i].GetType()-1);
-		double xc = RotCoords[i].x;
-		double yc = RotCoords[i].y;
-		double zc = RotCoords[i].z;
-		xx += atmMass*yc*yc + atmMass*zc*zc;
-		yy += atmMass*xc*xc + atmMass*zc*zc;
-		zz += atmMass*xc*xc + atmMass*yc*yc;
-		xy -= atmMass*xc*yc;
-		xz -= atmMass*xc*zc;
-		yz -= atmMass*yc*zc;
-	}
-	if ((fabs(xy)>1.0e-8)||(fabs(xz)>1.0e-8)||(fabs(yz)>1.0e-8)) {
-		//Diagonalize the moment of interia tensor to yield the
-		//rotation into the principle axis.
-		double tri[6];
-		tri[0] = xx;
-		tri[1] = xy;
-		tri[2] = yy;
-		tri[3] = xz;
-		tri[4] = yz;
-		tri[5] = zz;
-		double rot[9], eig[3];
-		SymmetricJacobiDiagonalization(tri, rot, eig, 3, 3);
-		Matrix4D temp1;
-		InitRotationMatrix(temp1);
-		for (int ii=0; ii<3; ii++) {
-			for (int j=0; j<3; j++) {
-				temp1[ii][j] = rot[3*ii + j];
-			}
-		}
-		Matrix4D temp2;
-		TotalRotation[3][0] = 0.0;
-		TotalRotation[3][1] = 0.0;
-		TotalRotation[3][2] = 0.0;
-		MultiplyMatrix(TotalRotation,temp1,temp2);
-		CopyMatrix(temp2,TotalRotation);
-//		double det = DeterminantMatrix(TotalRotation);
-//		//The determinate should be positive, multiple by -1 if not
-//		if (det < 0.0) {
-//			for (int ii=0; ii<3; ii++) {
-//				TotalRotation[ii][0] *= -1.0;
-//			}
-//		}
-//		OrthogonalizeRotationMatrix(TotalRotation);
-		Rotate3DOffset(TotalRotation,centerOfMass,&rotatedCenterOfMass);
-	}
-	TotalRotation[3][0] = -rotatedCenterOfMass.x;
-	TotalRotation[3][1] = -rotatedCenterOfMass.y;
-	TotalRotation[3][2] = -rotatedCenterOfMass.z;
-	
-	//If we are in C1 symmetry we are done.
-	ResetRotation();
-*/	
 	//generate the moments of inertia
-	xx = yy = zz = xy = xz = yz = 0.0;
+/*	xx = yy = zz = xy = xz = yz = 0.0;
 	for (int i=0; i<cFrame->GetNumAtoms(); i++) {
 		double atmMass = Prefs->GetAtomMass(cFrame->Atoms[i].GetType()-1);
 		double xc = RotCoords[i].x;
@@ -1196,7 +1106,8 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 		xz += atmMass*xc*zc;
 		yz += atmMass*yc*zc;
 	}
-//	std::cout << "moments of inertia ixx = " << (yy+zz) << " iyy = " << (xx+zz) << " izz = "<<(xx+yy) << std::endl;
+	*/
+
 	//To complete the determination of the principle axis we must apply all of the symmetry
 	//operators to each of the permutations of the axis. When we find a set that results in an
 	//unchanged set of coordinates we are done.
@@ -1206,113 +1117,91 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 		pg = InputOptions->Data->GetPointGroup();
 		pgOrder = InputOptions->Data->GetPointGroupOrder();
 	}
-	SymmetryOps symOps(pg, pgOrder);
-	Matrix4D permuteMatrix;
-	for (int pass=0; pass<6; pass++) {
-		switch (pass) {
-			case 0:	//default axis
-				InitRotationMatrix(permuteMatrix);
-				break;
-			case 1: //x, z, y
-				permuteMatrix[1][1] = permuteMatrix[2][2] = 0.0;
-				permuteMatrix[1][2] = -1.0;
-				permuteMatrix[2][1] = 1.0;
-				break;
-			case 2: //y, x, z
-				permuteMatrix[0][0] = permuteMatrix[1][2] = permuteMatrix[2][1] = 0.0;
-				permuteMatrix[0][1] = -1.0;
-				permuteMatrix[1][0] = permuteMatrix[2][2] = 1.0;
-				break;
-			case 3: //y, z, x
-				permuteMatrix[0][1] = permuteMatrix[2][2] = 0.0;
-				permuteMatrix[0][2] = permuteMatrix[2][1] = 1.0;
-				break;
-			case 4: //z, x, y
-				permuteMatrix[0][2] = permuteMatrix[1][0] = permuteMatrix[2][1] = 0.0;
-				permuteMatrix[0][2] = permuteMatrix[1][0] = permuteMatrix[2][1] = 1.0;
-				break;
-			case 5: //z, y, x
-				permuteMatrix[1][0] = permuteMatrix[2][1] = 0.0;
-				permuteMatrix[2][0] = -1.0;
-				permuteMatrix[1][1] = 1.0;
-				break;
+	bool success = true;
+	//If we are in C1 symmetry we are done.
+	if (pg != GAMESS_C1) {
+		
+		for (long i=0; i<cFrame->GetNumAtoms(); i++) {
+			CPoint3D temp = (cFrame->Atoms[i].Position) + centerOfMass;
+			Rotate3DPt(result, temp, &(RotCoords[i]));
 		}
-		bool success = true;
-		for (int iOp=0; iOp<symOps.getOperationCount(); iOp++) {
-			bool SymMatch = true;
-			for (int atm=0; atm<cFrame->GetNumAtoms(); atm++) {
-				CPoint3D test;
-				Rotate3DPt(permuteMatrix, RotCoords[atm], &test);
-				CPoint3D result;
-				symOps.ApplyOperator(test, result, iOp);
-				bool match = false;
-				for (int testatom=0; testatom<cFrame->GetNumAtoms(); testatom++) {
-					if (cFrame->Atoms[atm].GetType() != cFrame->Atoms[testatom].GetType())
-						continue;
-					CPoint3D testpt;
-					Rotate3DPt(permuteMatrix, RotCoords[testatom], &testpt);
-					CPoint3D offset = result - testpt;
-						//test the difference in position. They should be quite close!
-					if (offset.Magnitude() < 1.0e-3) {
-						match = true;
+
+		SymmetryOps symOps(pg, pgOrder);
+		Matrix4D permuteMatrix;
+		for (int pass=0; pass<6; pass++) {
+			switch (pass) {
+				case 0:	//default axis
+					InitRotationMatrix(permuteMatrix);
+					break;
+				case 1: //x, z, y
+					permuteMatrix[1][1] = permuteMatrix[2][2] = 0.0;
+					permuteMatrix[1][2] = -1.0;
+					permuteMatrix[2][1] = 1.0;
+					break;
+				case 2: //y, x, z
+					permuteMatrix[0][0] = permuteMatrix[1][2] = permuteMatrix[2][1] = 0.0;
+					permuteMatrix[0][1] = -1.0;
+					permuteMatrix[1][0] = permuteMatrix[2][2] = 1.0;
+					break;
+				case 3: //y, z, x
+					permuteMatrix[0][1] = permuteMatrix[2][2] = 0.0;
+					permuteMatrix[0][2] = permuteMatrix[2][1] = 1.0;
+					break;
+				case 4: //z, x, y
+					permuteMatrix[0][2] = permuteMatrix[1][0] = permuteMatrix[2][1] = 0.0;
+					permuteMatrix[0][2] = permuteMatrix[1][0] = permuteMatrix[2][1] = 1.0;
+					break;
+				case 5: //z, y, x
+					permuteMatrix[1][0] = permuteMatrix[2][1] = 0.0;
+					permuteMatrix[2][0] = -1.0;
+					permuteMatrix[1][1] = 1.0;
+					break;
+			}
+			success = true;
+			for (int iOp=0; iOp<symOps.getOperationCount(); iOp++) {
+				bool SymMatch = true;
+				for (int atm=0; atm<cFrame->GetNumAtoms(); atm++) {
+					CPoint3D test;
+					Rotate3DPt(permuteMatrix, RotCoords[atm], &test);
+					CPoint3D result;
+					symOps.ApplyOperator(test, result, iOp);
+					bool match = false;
+					for (int testatom=0; testatom<cFrame->GetNumAtoms(); testatom++) {
+						if (cFrame->Atoms[atm].GetType() != cFrame->Atoms[testatom].GetType())
+							continue;
+						CPoint3D testpt;
+						Rotate3DPt(permuteMatrix, RotCoords[testatom], &testpt);
+						CPoint3D offset = result - testpt;
+							//test the difference in position. They should be quite close!
+						if (offset.Magnitude() < 1.0e-3) {
+							match = true;
+							break;
+						}
+					}
+					if (!match) { //No matching atom so this permutation fails
+						SymMatch = false;
 						break;
 					}
 				}
-				if (!match) { //No matching atom so this permutation fails
-					SymMatch = false;
+				if (!SymMatch) {
+					success = false;
 					break;
 				}
 			}
-			if (!SymMatch) {
-				success = false;
+			if (success) { //we are done
+				//combine the permutation with the rotation matrix
+				Matrix4D temp;
+				MultiplyMatrix(result,permuteMatrix,temp);
+				CopyMatrix(temp,result);
+				Rotate3DOffset(result,centerOfMass,&rotatedCenterOfMass);
 				break;
 			}
 		}
-		if (success) { //we are done
-			//combine the permutation with the rotation matrix
-//			TotalRotation[3][0] = 0.0;
-//			TotalRotation[3][1] = 0.0;
-//			TotalRotation[3][2] = 0.0;
-			Matrix4D temp;
-			std::cout << "initial total rotation" << std::endl <<
-			TotalRotation[0][0] << " , " << TotalRotation[0][1] << " , " << TotalRotation[0][2] << " , " << TotalRotation[0][3] <<std::endl<<
-			TotalRotation[1][0] << " , " << TotalRotation[1][1] << " , " << TotalRotation[1][2] << " , " << TotalRotation[1][3] <<std::endl<<
-			TotalRotation[2][0] << " , " << TotalRotation[2][1] << " , " << TotalRotation[2][2] << " , " << TotalRotation[2][3] <<std::endl<<
-			TotalRotation[3][0] << " , " << TotalRotation[3][1] << " , " << TotalRotation[3][2] << " , " << TotalRotation[3][3] << std::endl;
-			std::cout << "permutation" << std::endl <<
-			permuteMatrix[0][0] << " , " << permuteMatrix[0][1] << " , " << permuteMatrix[0][2] << " , " << permuteMatrix[0][3] <<std::endl<<
-			permuteMatrix[1][0] << " , " << permuteMatrix[1][1] << " , " << permuteMatrix[1][2] << " , " << permuteMatrix[1][3] <<std::endl<<
-			permuteMatrix[2][0] << " , " << permuteMatrix[2][1] << " , " << permuteMatrix[2][2] << " , " << permuteMatrix[2][3] <<std::endl<<
-			permuteMatrix[3][0] << " , " << permuteMatrix[3][1] << " , " << permuteMatrix[3][2] << " , " << permuteMatrix[3][3] << std::endl;
-			
-			MultiplyMatrix(TotalRotation,permuteMatrix,temp);
-			std::cout << "resulting matrix" << std::endl <<
-				temp[0][0] << " , " << temp[0][1] << " , " << temp[0][2] << " , " << temp[0][3] <<std::endl<<
-				temp[1][0] << " , " << temp[1][1] << " , " << temp[1][2] << " , " << temp[1][3] <<std::endl<<
-				temp[2][0] << " , " << temp[2][1] << " , " << temp[2][2] << " , " << temp[2][3] <<std::endl<<
-				temp[3][0] << " , " << temp[3][1] << " , " << temp[3][2] << " , " << temp[3][3] << std::endl;
-			CopyMatrix(temp,TotalRotation);
-//			double det = DeterminantMatrix(TotalRotation);
-			//The determinate should be positive, multiple by -1 if not
-//			if (det < 0.0) {
-//				for (int ii=0; ii<3; ii++) {
-//					TotalRotation[ii][0] *= -1.0;
-//				}
-//			}
-//			OrthogonalizeRotationMatrix(TotalRotation);
-			// (vector-vector)*matrix = vector = vector*matrix - vector*matrix?
-			Rotate3DOffset(TotalRotation,centerOfMass,&rotatedCenterOfMass);
-			TotalRotation[3][0] = rotatedCenterOfMass.x;
-			TotalRotation[3][1] = rotatedCenterOfMass.y;
-			TotalRotation[3][2] = rotatedCenterOfMass.z;
-			std::cout << "final total rotation" << std::endl <<
-				TotalRotation[0][0] << " , " << TotalRotation[0][1] << " , " << TotalRotation[0][2] << " , " << TotalRotation[0][3] <<std::endl<<
-				TotalRotation[1][0] << " , " << TotalRotation[1][1] << " , " << TotalRotation[1][2] << " , " << TotalRotation[1][3] <<std::endl<<
-				TotalRotation[2][0] << " , " << TotalRotation[2][1] << " , " << TotalRotation[2][2] << " , " << TotalRotation[2][3] <<std::endl<<
-				TotalRotation[3][0] << " , " << TotalRotation[3][1] << " , " << TotalRotation[3][2] << " , " << TotalRotation[3][3] << std::endl;
-			break;
-		}
 	}
+	result[3][0] = rotatedCenterOfMass.x;
+	result[3][1] = rotatedCenterOfMass.y;
+	result[3][2] = rotatedCenterOfMass.z;
+	return success;
 }
 void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
 	Frame *	NewFrame, * NewFrame2;
