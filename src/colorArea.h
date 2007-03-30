@@ -13,6 +13,10 @@
 #pragma interface "colorArea.h"
 #endif
 
+#define PATTERN_SELECT_DIALOG 30001
+#define PATTERN_SELECT_TITLE _("Select a pattern")
+#define ID_BITMAP_SLT 30010
+        
 /*!
  * Includes
  */
@@ -20,6 +24,7 @@
 ////@begin includes
 #include "wx/wx.h"
 #include "PrefsPanes.h"
+#include "patterns.h"
 
 ////@end includes
 // Useful global functions to convert between RGBColor and wxColour
@@ -29,7 +34,7 @@ RGBColor WX2RGB(const wxColour &c);
 class colorArea : public wxPanel
 {
 public:
-	colorArea(wxWindow* parent, int id, const RGBColor* color);
+	colorArea(wxWindow* parent, int id, const RGBColor* color, int w = 50, int h = 20);
 	virtual ~colorArea();
 	virtual void draw(void);
 	const wxColour& getColor(void) const;
@@ -57,18 +62,49 @@ protected:
 class colorPatternArea : public colorArea
 {
 public:
-  colorPatternArea(wxWindow* parent, int id, const RGBColor* color, int patID = -1);
+  colorPatternArea(wxWindow* parent, int id, const RGBColor* color, int patID = -1, int w = 50, int h = 20);
   virtual ~colorPatternArea();
 
   virtual void draw(void);
   void OnPaint(wxPaintEvent &event);
+  void OnMouse(wxMouseEvent &event);
+  void reset();
+  int getPatID() { return mPatID; }
 
  private:
   wxBitmap* mPattern;
-  int patID;
+  int mPatID;
+  wxWindow* mParent;
 
   DECLARE_EVENT_TABLE()
 };
+
+class patternSelectDlg : public wxDialog {
+
+  public:
+    patternSelectDlg() {}
+    patternSelectDlg( colorPatternArea * parent, wxWindowID id = PATTERN_SELECT_DIALOG, const wxString& caption = PATTERN_SELECT_TITLE);
+    ~patternSelectDlg();
+
+    void OnOK( wxCommandEvent& WXUNUSED(event) );
+    void OnCancel( wxCommandEvent& WXUNUSED(event) );
+
+    void setSltId(int id);
+    int getSltId() { return mSltId; }
+    int getSltPatId() {return mSltPatId;}
+
+  private:
+    void Create(colorPatternArea * parent, wxWindowID id, const wxString& caption);
+
+    wxBoxSizer *mainSizer, *lowerSizer;
+    wxGridSizer* upperSizer;
+    wxButton *mButtOK, *mButtCancel;
+    colorPatternArea* patSlt[numPatterns];
+    int mSltId;
+    int mSltPatId;
+
+    DECLARE_EVENT_TABLE()
+ };
 
 
 #endif
