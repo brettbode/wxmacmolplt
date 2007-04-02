@@ -177,12 +177,9 @@ void patternSelectDlg::Create(colorPatternArea * parent, wxWindowID id, const wx
   RGBColor tmpColor;
   for (int i = 0; i < numPatterns; i++)
     {
-      if ( i == parent->getPatID())
-	tmpColor = WX2RGB(defaultColor);
-      else
-	tmpColor = WX2RGB(parent->getColor());
+      tmpColor = WX2RGB(parent->getColor());
 
-      patSlt[i] = new colorPatternArea(this, ID_BITMAP_SLT+i, &WX2RGB(parent->getColor()), i, 64, 64);
+      patSlt[i] = new colorPatternArea(this, ID_BITMAP_SLT+i, &tmpColor, i, 64, 64);
       if ( i == parent->getPatID())
 	patSlt[i]->SetBackgroundColour(defaultColor);
       //if the pattern is the one already has been set, use another color
