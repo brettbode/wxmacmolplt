@@ -14,7 +14,7 @@ If your distribution does not offer a prebuilt wxWidgets package you will need
 to grab the latest source copy from www.wxwidgets.org and install it. You 
 should be able to do this using the following (opengl is required, unicode is
 optional, but should be used if you use non ascii chars in your file system):
-   ./configure --with-opengl --enable-unicode
+   ./configure --with-gtk --with-opengl --enable-unicode
    make
    make install
 
