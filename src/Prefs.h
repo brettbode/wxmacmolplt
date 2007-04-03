@@ -329,7 +329,11 @@ class WinPrefs {
 #endif
 		inline void SetAtomColor(long AtomNum, const RGBColor & color) {AtomColors[AtomNum] = color; };
 
-		void SetAtomPattern(long AtomNum);
+		//void SetAtomPattern(long AtomNum);
+		void SetAtomPattern(long AtomType, short pat) {
+		  AtomPatterns[AtomType] = pat;
+		}
+
 		short GetAtomPattern(long AtomType) const {
 			if ((AtomType>=0)&&(AtomType<kMaxAtomTypes))
 				return AtomPatterns[AtomType];

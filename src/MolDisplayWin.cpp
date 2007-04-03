@@ -1941,7 +1941,7 @@ void MolDisplayWin::menuViewDeleteAllAnnotations(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuViewShow2DPattern(wxCommandEvent &event) {
-	Prefs->Show2DPattern(1-Prefs->Show2DPattern());
+  Prefs->Show2DPattern(1-Prefs->Show2DPattern());
 	UpdateModelDisplay();
 	Dirty = true;
 }

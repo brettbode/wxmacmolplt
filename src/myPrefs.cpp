@@ -264,6 +264,7 @@ void AtomPrefsPane::saveToTempPrefs()
       (mEleMasses[i]->GetValue()).ToDouble(&mass);
       mTargetPrefs->SetAtomMass(i, mass);
 	  mColorArea[i]->getColor(mTargetPrefs->GetAtomColorLoc(i));
+	  mTargetPrefs->SetAtomPattern(i, mPatternArea[i]->getPattern());
     }
 }
 

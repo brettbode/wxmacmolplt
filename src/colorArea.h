@@ -46,7 +46,7 @@ public:
 
 	// function that handles the actual color change
 	// A wxEVT_COMMAND_ENTER event is generated if the color is changed.
-	void OnMouse(wxMouseEvent &event);
+	virtual void OnMouse(wxMouseEvent &event);
 
 protected:
 	colorArea* mPeer;
@@ -66,10 +66,11 @@ public:
   virtual ~colorPatternArea();
 
   virtual void draw(void);
-  void OnPaint(wxPaintEvent &event);
-  void OnMouse(wxMouseEvent &event);
+  virtual void OnPaint(wxPaintEvent &event);
+  virtual void OnMouse(wxMouseEvent &event);
   void reset();
-  int getPatID() { return mPatID; }
+  void setPattern(int patID);
+  int getPattern() { return mPatID; }
 
  private:
   wxBitmap* mPattern;
@@ -102,6 +103,7 @@ class patternSelectDlg : public wxDialog {
     colorPatternArea* patSlt[numPatterns];
     int mSltId;
     int mSltPatId;
+    colorPatternArea * mParent;
 
     DECLARE_EVENT_TABLE()
  };

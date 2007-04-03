@@ -129,6 +129,15 @@ void colorPatternArea::reset() {
 	Refresh();
 }
 
+void colorPatternArea::setPattern(int patID)
+{
+  delete mPattern;
+
+  mPatID = patID;
+  mPattern = new wxBitmap((const char*)atomMaskPatterns[mPatID], 32, 32);
+  Refresh();
+}
+
 void colorPatternArea::OnMouse(wxMouseEvent &event)
 {
   if (event.LeftDClick()) {
@@ -163,7 +172,8 @@ void colorPatternArea::OnPaint(wxPaintEvent &WXUNUSED(event)) {
 }
 
 patternSelectDlg::patternSelectDlg(colorPatternArea * parent, wxWindowID id, const wxString& caption) {
-  mSltPatId = parent->getPatID();
+  mParent = parent;
+  mSltPatId = parent->getPattern();
   Create(parent, id, caption);
 }
 
@@ -180,7 +190,7 @@ void patternSelectDlg::Create(colorPatternArea * parent, wxWindowID id, const wx
       tmpColor = WX2RGB(parent->getColor());
 
       patSlt[i] = new colorPatternArea(this, ID_BITMAP_SLT+i, &tmpColor, i, 64, 64);
-      if ( i == parent->getPatID())
+      if ( i == parent->getPattern())
 	patSlt[i]->SetBackgroundColour(defaultColor);
       //if the pattern is the one already has been set, use another color
 
@@ -210,7 +220,7 @@ patternSelectDlg::~patternSelectDlg()
 
 void patternSelectDlg::OnOK( wxCommandEvent& WXUNUSED(event) )
 {
-  std::cout<<mSltId<<"\n";
+  mParent->setPattern(mSltPatId);
   Close();
 }
 
