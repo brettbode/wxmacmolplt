@@ -129,6 +129,9 @@ class MolDisplayWin : public wxFrame {
 		wxMenu		*menuViewAnnotations;
 		wxMenu		*menuViewRotate;
 		wxMenu		*menuMolecule;
+		wxMenu		*menuSetPG;
+		wxMenu		*menuPointGroup;
+		wxMenu		*menuPGOrder;
 		wxMenu		*menuWindow;
 		wxMenu		*menuHelp;
 
@@ -279,6 +282,9 @@ class MolDisplayWin : public wxFrame {
 		void menuMoleculeSetFrameEnergy(wxCommandEvent &event);
 		void menuMoleculeCreateLLMPath(wxCommandEvent &event);
 		void menuMoleculeMinimizeFrameMovements(wxCommandEvent &event);
+		void OnShowPointGroupUpdate(wxUpdateUIEvent &event);
+		void menuSetPointGroup(wxCommandEvent &event);
+		void menuSetPointGroupOrder(wxCommandEvent &event);
 		void menuMoleculeDetermineSym(wxCommandEvent &event);
 		void menuMoleculeSymCoords(wxCommandEvent &event);
 		void menuMoleculeConvertToBohr(wxCommandEvent &event);

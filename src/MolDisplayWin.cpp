@@ -92,7 +92,6 @@ enum MMP_EventID {
 	MMP_SETBONDLENGTH,
 	MMP_CREATELLMPATH,
 	MMP_MINFRAMEMOVEMENTS,
-	MMP_SYMPOINTGROUP,
 	MMP_DETERMINEPG,
 	MMP_SYMADAPTCOORDS,
 	MMP_CONVERTTOBOHR,
@@ -121,6 +120,30 @@ enum MMP_EventID {
 	MMP_WINDOWPARAMETERS,
 	MMP_ZMATRIXCALC,
 	MMP_INTERACTIVE,
+	MMP_CURPOINTGROUP,
+	MMP_POINTGROUPORDER,
+	MMP_PGC1,
+	MMP_PGCS,
+	MMP_PGCI,
+	MMP_PGCNH,
+	MMP_PGCNV,
+	MMP_PGCN,
+	MMP_PGS2N,
+	MMP_PGDND,
+	MMP_PGDNH,
+	MMP_PGDN,
+	MMP_PGTD,
+	MMP_PGTH,
+	MMP_PGT,
+	MMP_PGOH,
+	MMP_PGO,
+	MMP_PGORDER2,
+	MMP_PGORDER3,
+	MMP_PGORDER4,
+	MMP_PGORDER5,
+	MMP_PGORDER6,
+	MMP_PGORDER7,
+	MMP_PGORDER8,
 	
 	Number_MMP_Ids
 };
@@ -196,6 +219,29 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_ENERGYEDIT,         MolDisplayWin::menuMoleculeSetFrameEnergy)
 	EVT_MENU (MMP_CREATELLMPATH,      MolDisplayWin::menuMoleculeCreateLLMPath)
 	EVT_MENU (MMP_MINFRAMEMOVEMENTS,  MolDisplayWin::menuMoleculeMinimizeFrameMovements)
+	EVT_UPDATE_UI(MMP_CURPOINTGROUP,	MolDisplayWin::OnShowPointGroupUpdate )
+	EVT_MENU (MMP_PGC1,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGCS,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGCI,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGCNH,				MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGCNV,				MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGCN,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGS2N,				MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGDND,				MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGDNH,				MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGDN,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGTD,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGTH,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGT,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGOH,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGO,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGORDER2,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER3,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER4,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER5,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER6,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER7,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER8,				MolDisplayWin::menuSetPointGroupOrder)
 	EVT_MENU (MMP_DETERMINEPG,			MolDisplayWin::menuMoleculeDetermineSym)
 	EVT_MENU (MMP_SYMADAPTCOORDS,		MolDisplayWin::menuMoleculeSymCoords)
 	EVT_MENU (MMP_CONVERTTOBOHR,      MolDisplayWin::menuMoleculeConvertToBohr)
@@ -538,8 +584,39 @@ void MolDisplayWin::createMenuBar(void) {
 	menuMolecule->Append(MMP_ENERGYEDIT, wxT("Set &Frame Energy..."));
 	menuMolecule->Append(MMP_CREATELLMPATH, wxT("Create &LLM Path..."), _("Create a Linear Least Motion path between this geometry and the next one"));
 	menuMolecule->Append(MMP_MINFRAMEMOVEMENTS, wxT("&Minimize Frame Movements"), _("Reorient each frame so as to minimize the movement of each atom"));
-	menuMolecule->Append(MMP_DETERMINEPG, wxT("Determine Point Groupt"), _("Compute the point group for the current coordinates"));
-	menuMolecule->Append(MMP_SYMADAPTCOORDS, wxT("Set &Coordinates to Principle Orientation"), _("Transform coordinates to the symmetry adapted principle orientation"));
+	menuMolecule->AppendSeparator();
+	menuSetPG = new wxMenu;
+	menuSetPG->Append(MMP_CURPOINTGROUP, _("cur pg"), _("Currently selected point group"));
+	menuPointGroup = new wxMenu;
+	menuPointGroup->AppendRadioItem(MMP_PGC1, _("C1"));
+	menuPointGroup->AppendRadioItem(MMP_PGCS, _("Cs"));
+	menuPointGroup->AppendRadioItem(MMP_PGCI, _("Ci"));
+	menuPointGroup->AppendRadioItem(MMP_PGCNH, _("Cnh"));
+	menuPointGroup->AppendRadioItem(MMP_PGCNV, _("Cnv"));
+	menuPointGroup->AppendRadioItem(MMP_PGCN, _("Cn"));
+	menuPointGroup->AppendRadioItem(MMP_PGS2N, _("S2n"));
+	menuPointGroup->AppendRadioItem(MMP_PGDND, _("Dnd"));
+	menuPointGroup->AppendRadioItem(MMP_PGDNH, _("Dnh"));
+	menuPointGroup->AppendRadioItem(MMP_PGDN, _("Dn"));
+	menuPointGroup->AppendRadioItem(MMP_PGTD, _("Td"));
+	menuPointGroup->AppendRadioItem(MMP_PGTH, _("Th"));
+	menuPointGroup->AppendRadioItem(MMP_PGT, _("T"));
+	menuPointGroup->AppendRadioItem(MMP_PGOH, _("Oh"));
+	menuPointGroup->AppendRadioItem(MMP_PGO, _("O"));
+	menuPGOrder = new wxMenu;
+	menuPGOrder->AppendRadioItem(MMP_PGORDER2, _("2"));
+	menuPGOrder->AppendRadioItem(MMP_PGORDER3, _("3"));
+	menuPGOrder->AppendRadioItem(MMP_PGORDER4, _("4"));
+	menuPGOrder->AppendRadioItem(MMP_PGORDER5, _("5"));
+	menuPGOrder->AppendRadioItem(MMP_PGORDER6, _("6"));
+	menuPGOrder->AppendRadioItem(MMP_PGORDER7, _("7"));
+	menuPGOrder->AppendRadioItem(MMP_PGORDER8, _("8"));
+	
+	menuSetPG->Append(wxID_ANY, _("&Point Group"), menuPointGroup, _("Select the Point Group"));
+	menuSetPG->Append(MMP_POINTGROUPORDER, _("&Order of Principle Axis"), menuPGOrder, _("Set the order of the principle rotation axis, if any"));
+	menuMolecule->Append(wxID_ANY, _("Set &Point Group"), menuSetPG, _("Manually set the point group"));
+	menuMolecule->Append(MMP_DETERMINEPG, _("Determine Point Group"), _("Compute the point group for the current coordinates"));
+	menuMolecule->Append(MMP_SYMADAPTCOORDS, _("Set &Coordinates to Principle Orientation"), _("Transform coordinates to the symmetry adapted principle orientation"));
 	menuMolecule->AppendSeparator();
 	menuMolecule->Append(MMP_CONVERTTOBOHR, wxT("Convert to &Bohr"));
 	menuMolecule->Append(MMP_CONVERTTOANGSTROMS, wxT("Convert to &Angstroms"));
@@ -697,6 +774,39 @@ void MolDisplayWin::OnDeleteAnnotationsUpdate( wxUpdateUIEvent& event ) {
 void MolDisplayWin::OnShowPatternUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(!Prefs->DrawWireFrame());
 	event.Check(Prefs->Show2DPattern());
+}
+void MolDisplayWin::OnShowPointGroupUpdate( wxUpdateUIEvent& event ) {
+	event.Enable(false);
+	GAMESSPointGroup pg = GAMESS_C1;
+	int pgOrder = 1;
+	if (MainData->InputOptions) {
+		pg = MainData->InputOptions->Data->GetPointGroup();
+		pgOrder = MainData->InputOptions->Data->GetPointGroupOrder();
+	}
+	if ((pg<GAMESS_C1)||(pg>NumberGAMESSPointGroups)) pg = GAMESS_C1;
+	wxString pgString;
+	const char * pgt = DataGroup::GetGAMESSPointGroupText(pg);
+	if ((pg >=GAMESS_CNH)&&(pg<=GAMESS_DN)) {
+		if (pgOrder<2) pgOrder = 2;
+		menuSetPG->Enable(MMP_POINTGROUPORDER, true);
+		menuPGOrder->Check((MMP_PGORDER2+pgOrder-2), true);
+		int i=0;
+		while (pgt[i]) {
+			if (pgt[i] == 'N') {
+				wxString temp;
+				temp.Printf(wxT("%d"), pgOrder);
+				pgString.Append(temp);
+			} else {
+				pgString.Append((char)(pgt[i]), 1);
+			}
+			i++;
+		}
+	} else {
+		menuSetPG->Enable(MMP_POINTGROUPORDER, false);
+		pgString = wxString(pgt, wxConvUTF8);
+	}
+	menuPointGroup->Check((MMP_PGC1+pg-GAMESS_C1), true);
+	event.SetText(pgString);
 }
 
 /* Event handler functions */
@@ -1992,6 +2102,20 @@ void MolDisplayWin::menuMoleculeMinimizeFrameMovements(wxCommandEvent &event) {
 	BeginOperation();
 	MainData->LinearLeastSquaresFit(ProgressInd);
 	FinishOperation();
+	Dirty = true;
+}
+void MolDisplayWin::menuSetPointGroup(wxCommandEvent &event) {
+	GAMESSPointGroup pg = (GAMESSPointGroup)(event.GetId() - MMP_PGC1 + GAMESS_C1);
+	if (! MainData->InputOptions) MainData->InputOptions = new InputData;
+	MainData->InputOptions->Data->SetPointGroup(pg);
+	ResetView();
+	Dirty = true;
+}
+void MolDisplayWin::menuSetPointGroupOrder(wxCommandEvent &event) {
+	int order = event.GetId() - MMP_PGORDER2 + 2;
+	if (! MainData->InputOptions) MainData->InputOptions = new InputData;
+	MainData->InputOptions->Data->SetPointGroupOrder(order);
+	ResetView();
 	Dirty = true;
 }
 void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &event) {
