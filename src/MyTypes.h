@@ -76,19 +76,28 @@ enum TypeofEnergy {
 	NumberEnergyTypes
 };
 
+enum AnnotationType {
+	MP_ANNOTATION,
+	MP_ANNOTATION_MARKER,
+	MP_ANNOTATION_LENGTH,
+	MP_ANNOTATION_ANGLE,
+	MP_ANNOTATION_DIHEDRAL
+};
+
 class Annotation {
 public:
 	virtual ~Annotation(void) {};
 	
 	virtual void draw(const MolDisplayWin * win) const = 0;
-	virtual bool containsAtom(int atom_id) const {return false;};
-	virtual void adjustIds(int atom_id) {};
-	virtual void WriteXML(XMLElement * parent) const = 0;
-	virtual bool ReadXML(XMLElement * p) = 0;
-	virtual bool isEquivalent(int natoms, int *new_list) const {
+	virtual bool containsAtom(const int atom_id) const {return false;};
+	virtual void adjustIds(const int atom_id) {};
+	virtual void WriteXML(XMLElement *parent) const = 0;
+	virtual bool ReadXML(XMLElement *p) = 0;
+	virtual bool isEquivalent(const int natoms, const int *new_list) const {
 		return false;
 	}
-	virtual int getAtom(int index) const = 0;
+	virtual int getAtom(const int index) const = 0;
+	virtual int getType(void) const {return MP_ANNOTATION;}
 private:
 };
 
@@ -98,29 +107,32 @@ public:
 		atoms[0] = -1;
 		atoms[1] = -1;
 	};
-	AnnotationLength(long atom1_id, long atom2_id) : Annotation() {
+	AnnotationLength(const long atom1_id, const long atom2_id) : Annotation() {
 		atoms[0] = atom1_id;
 		atoms[1] = atom2_id;
 	}
 	virtual ~AnnotationLength(void) {};
 	
 	virtual void draw(const MolDisplayWin * win) const;
-	virtual bool containsAtom(int atom_id) const {return ((atoms[0] == atom_id)||(atoms[1] == atom_id));}
-	virtual void adjustIds(int atom_id) {
+	virtual bool containsAtom(const int atom_id) const {
+		return ((atoms[0] == atom_id)||(atoms[1] == atom_id));
+	}
+	virtual void adjustIds(const int atom_id) {
 		if (atoms[0] > atom_id) atoms[0]--;
 		if (atoms[1] > atom_id) atoms[1]--;
 	}
-	bool isEquivalent(int natoms, int *new_list) const {
+	bool isEquivalent(const int natoms, const int *new_list) const {
 		return natoms == 2 &&
 		       ((new_list[0] == atoms[0] && new_list[1] == atoms[1]) ||
 			    (new_list[1] == atoms[0] && new_list[0] == atoms[1]));
 	}
 	virtual void WriteXML(XMLElement * parent) const;
 	virtual bool ReadXML(XMLElement * p);
-	int getAtom(int index) const {
+	int getAtom(const int index) const {
 		if (index < 0 || index > 1) return -1;
 		return atoms[index];
 	}
+	int getType(void) const {return MP_ANNOTATION_LENGTH;}
 private:
 	long atoms[2];
 };
@@ -128,23 +140,26 @@ private:
 class AnnotationMarker : public Annotation {
 public:
 	AnnotationMarker(void) : Annotation(), atom(-1) {};
-	AnnotationMarker(long atom_id) : Annotation(), atom(atom_id) {};
-	virtual ~AnnotationMarker(void) {};
+	AnnotationMarker(const long atom_id) : Annotation(), atom(atom_id) {};
+	~AnnotationMarker(void) {};
 	
-	virtual void draw(const MolDisplayWin * win) const;
-	virtual bool containsAtom(int atom_id) const {return atom == atom_id;}
-	virtual void adjustIds(int atom_id) {
+	void draw(const MolDisplayWin * win) const;
+	bool containsAtom(const int atom_id) const {
+		return atom == atom_id;
+	}
+	void adjustIds(const int atom_id) {
 		if (atom > atom_id) atom--;
 	}
 	bool isEquivalent(int natoms, int *new_list) const {
 		return natoms == 1 && new_list[0] == atom;
 	}
-	virtual void WriteXML(XMLElement * parent) const;
-	virtual bool ReadXML(XMLElement * p);
-	int getAtom(int index) const {
+	void WriteXML(XMLElement * parent) const;
+	bool ReadXML(XMLElement * p);
+	int getAtom(const int index) const {
 		if (index != 0) return -1;
 		return atom;
 	}
+	int getType(void) const {return MP_ANNOTATION_MARKER;}
 private:
 	long atom;
 };
@@ -156,32 +171,35 @@ public:
 		atoms[1] = -1;
 		atoms[2] = -1;
 	}
-	AnnotationAngle(long atom1_id, long atom2_id, long atom3_id) : Annotation() { 
+	AnnotationAngle(const long atom1_id, const long atom2_id,
+		const long atom3_id) : Annotation() { 
 		atoms[0] = atom1_id;
 		atoms[1] = atom2_id;
 		atoms[2] = atom3_id;
 	}
-	virtual ~AnnotationAngle(void) {};
+	~AnnotationAngle(void) {};
 	
-	virtual void draw(const MolDisplayWin * win) const;
-	virtual bool containsAtom(int atom_id) const 
-		{return ((atoms[0] == atom_id)||(atoms[1] == atom_id)||(atoms[2] == atom_id));}
-	virtual void adjustIds(int atom_id) {
+	void draw(const MolDisplayWin * win) const;
+	bool containsAtom(const int atom_id) const {
+		return ((atoms[0] == atom_id)||(atoms[1] == atom_id)||(atoms[2] == atom_id));
+	}
+	void adjustIds(const int atom_id) {
 		if (atoms[0] > atom_id) atoms[0] --;
 		if (atoms[1] > atom_id) atoms[1] --;
 		if (atoms[2] > atom_id) atoms[2] --;
 	}
-	bool isEquivalent(int natoms, int *new_list) const {
+	bool isEquivalent(const int natoms, const int *new_list) const {
 		return natoms == 3 && new_list[1] == atoms[1] &&
 			   ((new_list[0] == atoms[0] && new_list[2] == atoms[2]) ||
 			    (new_list[2] == atoms[0] && new_list[0] == atoms[2]));
 	}
-	virtual void WriteXML(XMLElement * parent) const;
-	virtual bool ReadXML(XMLElement * p);
-	int getAtom(int index) const {
+	void WriteXML(XMLElement * parent) const;
+	bool ReadXML(XMLElement * p);
+	int getAtom(const int index) const {
 		if (index < 0 || index > 2) return -1;
 		return atoms[index];
 	}
+	int getType(void) const {return MP_ANNOTATION_ANGLE;}
 private:
 	long atoms[3];
 };
@@ -194,36 +212,42 @@ public:
 		atoms[2] = -1;
 		atoms[3] = -1;
 	}
-	AnnotationDihedral(long atom1_id, long atom2_id, long atom3_id, long atom4_id) : Annotation() { 
+	AnnotationDihedral(const long atom1_id, const long atom2_id, 
+		const long atom3_id, const long atom4_id) : Annotation() { 
 		atoms[0] = atom1_id;
 		atoms[1] = atom2_id;
 		atoms[2] = atom3_id;
 		atoms[3] = atom4_id;
 	}
-	virtual ~AnnotationDihedral(void) {};
+	~AnnotationDihedral(void) {};
 	
-	virtual void draw(const MolDisplayWin * win) const;
-	virtual bool containsAtom(int atom_id) const 
-		{return ((atoms[0] == atom_id)||(atoms[1] == atom_id)||(atoms[2] == atom_id)||(atoms[3] == atom_id));}
-	virtual void adjustIds(int atom_id) {
+	void draw(const MolDisplayWin * win) const;
+	bool containsAtom(const int atom_id) const {
+		return (atoms[0] == atom_id ||
+				atoms[1] == atom_id || 
+				atoms[2] == atom_id ||
+				atoms[3] == atom_id);
+	}
+	void adjustIds(const int atom_id) {
 		if (atoms[0] > atom_id) atoms[0] --;
 		if (atoms[1] > atom_id) atoms[1] --;
 		if (atoms[2] > atom_id) atoms[2] --;
 		if (atoms[3] > atom_id) atoms[3] --;
 	}
-	bool isEquivalent(int natoms, int *new_list) const {
+	bool isEquivalent(const int natoms, const int *new_list) const {
 		return natoms == 4 &&
 				new_list[2] == atoms[2] &&
 				new_list[1] == atoms[1] &&
 				((new_list[3] == atoms[3] && new_list[0] == atoms[0]) ||
 				 (new_list[3] == atoms[0] && new_list[0] == atoms[3]));
 	}
-	virtual void WriteXML(XMLElement * parent) const;
-	virtual bool ReadXML(XMLElement * p);
-	int getAtom(int index) const {
+	void WriteXML(XMLElement * parent) const;
+	bool ReadXML(XMLElement * p);
+	int getAtom(const int index) const {
 		if (index < 0 || index > 3) return -1;
 		return atoms[index];
 	}
+	int getType(void) const {return MP_ANNOTATION_DIHEDRAL;}
 private:
 	long atoms[4];
 };
