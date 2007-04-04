@@ -55,6 +55,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 	oldSelect = -1;
 	mDragWin = NULL;
 	select_stack_top = 0;
+	stale_click = false;
 	//Hmm is this the right spot to initialize our GL settings?
 	//initGL();
 }
@@ -498,7 +499,18 @@ void MpGLCanvas::eventErase(wxEraseEvent &event) {
 	// This avoids flashing on Windows.
 }
 
+void MpGLCanvas::eventActivate(wxActivateEvent &event) {
+	if (event.GetActive()) {
+		stale_click = true;
+		wxMouseEvent mouse_event(wxEVT_LEFT_DOWN);
+		AddPendingEvent(mouse_event);
+	}
+}
+
 void MpGLCanvas::eventMouse(wxMouseEvent &event) {
+
+	wxPoint tmpPnt;
+
 	if (!GetContext()) {
 		return;
 	}
@@ -507,7 +519,11 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	bool deSelectAll = true;
 	bool edited_atoms = false;
 
-	wxPoint tmpPnt = event.GetPosition();
+	if (stale_click) {
+		tmpPnt = MolWin->ScreenToClient(wxGetMousePosition());
+	} else {
+		tmpPnt = event.GetPosition();
+	}
 
 	SetCurrent();
 
@@ -515,18 +531,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom * lAtoms = lFrame->Atoms;
 
-	// printf("---------------\n"); 
-	// printf("event.LeftDown(): %d\n", event.LeftDown()); 
-	// printf("event.LeftUp(): %d\n", event.LeftUp()); 
-	// printf("event.RightDown(): %d\n", event.RightDown()); 
-	// printf("event.RightUp(): %d\n", event.RightUp()); 
-	// printf("event.Dragging(): %d\n", event.Dragging()); 
-	// printf("event.ShiftDown(): %d\n", event.ShiftDown()); 
-	// printf("event.CmdDown(): %d\n", event.CmdDown()); 
-	// printf("interactiveMode: %d\n", interactiveMode); 
-
 	// First handle left mouse down.
-	if (event.LeftDown()) {
+	if (event.LeftDown() || (event.LeftIsDown() && stale_click)) {
 		mSelectState = 0;
 		selected = testPicking(tmpPnt.x, tmpPnt.y);
 
@@ -748,19 +754,19 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 			else if (selected >= NumAtoms + lFrame->NumBonds) {
 
-				AnnotationLength *length_anno;
 				int anno_id = selected - NumAtoms - lFrame->NumBonds;
 				
-				length_anno =
-					dynamic_cast<AnnotationLength *>
-						(mMainData->Annotations[anno_id]);
-
-				if (length_anno) {
+				if (mMainData->Annotations[anno_id]->getType() == MP_ANNOTATION_LENGTH) {
 					float dy;           // No. pixels of mouse change in y-dir
 					float offset;       // Corresponding amount of translation
 					CPoint3D atom1_pos;
 					CPoint3D atom2_pos;
 					CPoint3D offset_vec;
+					AnnotationLength *length_anno;
+
+					length_anno =
+						dynamic_cast<AnnotationLength *>
+							(mMainData->Annotations[anno_id]);
 				   
 					// Calculate the amount of rotation according to the amount
 					// of mouse change along the y-axis of the viewport.
@@ -949,6 +955,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	}
 	
 	oldTmpPnt = tmpPnt;
+	stale_click = false;
 
 	if (interactiveMode && edited_atoms) {
 		draw();
@@ -1592,51 +1599,51 @@ void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
 	}
 }
 
-MpGLCanvas::AtomTypeDialog::AtomTypeDialog(MpGLCanvas * parent, wxWindowID id, const wxString& caption) : typeID(1) {
-	Create(parent, id, caption);
-}
+// MpGLCanvas::AtomTypeDialog::AtomTypeDialog(MpGLCanvas * parent, wxWindowID id, const wxString& caption) : typeID(1) { 
+	// Create(parent, id, caption); 
+// } 
 
-void MpGLCanvas::AtomTypeDialog::Create(MpGLCanvas * parent, wxWindowID id, const wxString& caption) {
-	wxDialog::Create( parent, id, caption, wxDefaultPosition, wxSize(250, 125), wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX);
+// void MpGLCanvas::AtomTypeDialog::Create(MpGLCanvas * parent, wxWindowID id, const wxString& caption) { 
+	// wxDialog::Create( parent, id, caption, wxDefaultPosition, wxSize(250, 125), wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX); 
 
-	std::vector<wxString> atomTypes;
+	// std::vector<wxString> atomTypes; 
 
-	for (int i = 0; i < kMaxAtomTypes; i++) {
-		wxString tmp;
+	// for (int i = 0; i < kMaxAtomTypes; i++) { 
+		// wxString tmp; 
 
-		parent->Prefs->GetAtomLabel(i, tmp);
+		// parent->Prefs->GetAtomLabel(i, tmp); 
 
-		if (tmp.Length() > 0)
-			atomTypes.push_back(tmp);
-	}
+		// if (tmp.Length() > 0) 
+			// atomTypes.push_back(tmp); 
+	// } 
 
-	mainSizer = new wxBoxSizer(wxVERTICAL);
-	upperSizer = new wxBoxSizer(wxVERTICAL);
-	lowerSizer = new wxBoxSizer(wxHORIZONTAL);
+	// mainSizer = new wxBoxSizer(wxVERTICAL); 
+	// upperSizer = new wxBoxSizer(wxVERTICAL); 
+	// lowerSizer = new wxBoxSizer(wxHORIZONTAL); 
 
-	mTypeChoice = new wxChoice(this, ID_NEW_ATOM_TYPE_CHOICE, wxPoint(30,30), wxSize(200,wxDefaultCoord), atomTypes.size(), &atomTypes.front());
-	mTypeChoice->SetSelection(0);
+	// mTypeChoice = new wxChoice(this, ID_NEW_ATOM_TYPE_CHOICE, wxPoint(30,30), wxSize(200,wxDefaultCoord), atomTypes.size(), &atomTypes.front()); 
+	// mTypeChoice->SetSelection(0); 
 
-	mButtOK = new wxButton(this, wxID_OK, wxT("OK") );
-	mButtCancel = new wxButton(this, wxID_CANCEL, wxT("Cancel"));
+	// mButtOK = new wxButton(this, wxID_OK, wxT("OK") ); 
+	// mButtCancel = new wxButton(this, wxID_CANCEL, wxT("Cancel")); 
 
-	upperSizer->Add(mTypeChoice, 0, wxALIGN_CENTRE | wxALL, 20);
-	upperSizer->Add(8,8);
-	lowerSizer->Add(10,10);
-	lowerSizer->Add(mButtOK, 0, wxALIGN_CENTRE | wxALL, 10);
-	lowerSizer->Add(mButtCancel, 0, wxALIGN_CENTRE | wxALL, 10);
+	// upperSizer->Add(mTypeChoice, 0, wxALIGN_CENTRE | wxALL, 20); 
+	// upperSizer->Add(8,8); 
+	// lowerSizer->Add(10,10); 
+	// lowerSizer->Add(mButtOK, 0, wxALIGN_CENTRE | wxALL, 10); 
+	// lowerSizer->Add(mButtCancel, 0, wxALIGN_CENTRE | wxALL, 10); 
 
-	mainSizer->Add(upperSizer);
-	mainSizer->Add(lowerSizer);
+	// mainSizer->Add(upperSizer); 
+	// mainSizer->Add(lowerSizer); 
 
-	mainSizer->Layout();
-	SetSizer(mainSizer);
-	Centre(wxBOTH);
-}
+	// mainSizer->Layout(); 
+	// SetSizer(mainSizer); 
+	// Centre(wxBOTH); 
+// } 
 
-void MpGLCanvas::AtomTypeDialog::OnChoice( wxCommandEvent &event ) {
-	typeID = event.GetInt() + 1;
-}
+// void MpGLCanvas::AtomTypeDialog::OnChoice( wxCommandEvent &event ) { 
+	// typeID = event.GetInt() + 1; 
+// } 
 
 void MpGLCanvas::toggleInteractiveMode(void) {
 
@@ -1670,6 +1677,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_PAINT(MpGLCanvas::eventPaint)
 	EVT_ERASE_BACKGROUND(MpGLCanvas::eventErase)
 	EVT_MOUSE_EVENTS(MpGLCanvas::eventMouse)
+	EVT_ACTIVATE_APP(MpGLCanvas::eventActivate)
 
 	EVT_CHAR(MpGLCanvas::KeyHandler)
 
@@ -1692,6 +1700,6 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 END_EVENT_TABLE()
 
 
-BEGIN_EVENT_TABLE(MpGLCanvas::AtomTypeDialog, wxDialog)
-	EVT_CHOICE(ID_NEW_ATOM_TYPE_CHOICE, AtomTypeDialog::OnChoice)
-END_EVENT_TABLE()
+// BEGIN_EVENT_TABLE(MpGLCanvas::AtomTypeDialog, wxDialog) 
+	// EVT_CHOICE(ID_NEW_ATOM_TYPE_CHOICE, AtomTypeDialog::OnChoice) 
+// END_EVENT_TABLE() 

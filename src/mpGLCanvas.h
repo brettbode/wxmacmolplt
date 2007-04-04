@@ -52,6 +52,7 @@ typedef class MolDisplayWin MolDisplayWin;
 class MpGLCanvas : public wxGLCanvas {
 	private:
 
+		/*
 		class AtomTypeDialog : public wxDialog {
 			public:
 				AtomTypeDialog() {}
@@ -73,6 +74,7 @@ class MpGLCanvas : public wxGLCanvas {
 
 			DECLARE_EVENT_TABLE()
 		};
+		*/
 		  
 		MolDisplayWin * MolWin;
 		WinPrefs * Prefs;
@@ -96,6 +98,8 @@ class MpGLCanvas : public wxGLCanvas {
 		void measurePopupMenu(int x, int y);
 		int select_stack[4];
 		int select_stack_top;
+
+		bool stale_click;
 
 	public:
 		/**
@@ -205,6 +209,7 @@ class MpGLCanvas : public wxGLCanvas {
 		* \param event The event to handle.
 		*/
 		void eventMouse(wxMouseEvent &event);
+		void eventActivate(wxActivateEvent &event);
 		  
 		/**
 		* Handles Char events received by the widget. 

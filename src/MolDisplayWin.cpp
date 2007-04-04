@@ -452,8 +452,10 @@ void MolDisplayWin::OnKillFocus(wxFocusEvent & event) {
 	event.Skip();
 }
 void MolDisplayWin::OnActivate(wxActivateEvent & event) {
-	if (! event.GetActive()) {
+	if (!event.GetActive()) {
 		StopAnimations();
+	} else {
+		glCanvas->eventActivate(event);
 	}
 	event.Skip();
 }
