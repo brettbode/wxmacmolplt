@@ -532,6 +532,11 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		oldTmpPnt = tmpPnt;
 	} else {
 		tmpPnt = event.GetPosition();
+		if (tmpPnt.x == 0 && tmpPnt.y == 0) {
+			tmpPnt = MolWin->ScreenToClient(wxGetMousePosition());
+			oldTmpPnt = tmpPnt;
+			stale_click = true;
+		}
 	}
 
 	SetCurrent();

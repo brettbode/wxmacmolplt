@@ -2902,6 +2902,9 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	if (event.ButtonDown()) {
 		// initial drag setup, just save the initial cursor position
 		p = event.GetPosition();
+		if (p.x == 0 && p.y == 0) {
+			p = ScreenToClient(wxGetMousePosition());
+		}
 	} else if (stale_click) {
 		p = ScreenToClient(wxGetMousePosition());
 		stale_click = false;
