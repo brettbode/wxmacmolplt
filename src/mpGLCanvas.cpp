@@ -519,24 +519,34 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	bool deSelectAll = true;
 	bool edited_atoms = false;
 
+	// stale_click will be true when the window gains focus after having not
+	// had it, i.e., when the application first starts or is backgrounded.  If
+	// this is the case, the former mouse position will be invalid.
+	// Furthermore, on the Mac at least, if the same click that brings focus to
+	// the window is used to change the scene, no mouse event is triggered for
+	// the first click.  So, we fake a mouse event on focus.  The position has
+	// to be acquired a bit differently, then, since the fake event will hold
+	// the wrong position.
 	if (stale_click) {
 		tmpPnt = MolWin->ScreenToClient(wxGetMousePosition());
+		oldTmpPnt = tmpPnt;
 	} else {
 		tmpPnt = event.GetPosition();
 	}
 
 	SetCurrent();
 
-	Frame *  lFrame = mMainData->cFrame;
+	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
-	mpAtom * lAtoms = lFrame->Atoms;
+	mpAtom *lAtoms = lFrame->Atoms;
 
 	// First handle left mouse down.
 	if (event.LeftDown() || (event.LeftIsDown() && stale_click)) {
+
 		mSelectState = 0;
 		selected = testPicking(tmpPnt.x, tmpPnt.y);
 
-		if (interactiveMode)
+		if (interactiveMode) {
 			if (selected >= 0 && selected < NumAtoms) {
 				GLdouble tmpWinX, tmpWinY;
 
@@ -548,6 +558,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 				winDiffX = tmpPnt.x - (int)tmpWinX;
 				winDiffY = tmpPnt.y - (int)tmpWinY;
 			}
+		}
 	}
 	
 	// If not left, try right click in edit mode.
@@ -789,92 +800,13 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 				}
 			}
 			
-			// else { 
-				// transform_scene = true; 
-				// mSelectState = -1; 
-			// } 
+			else {
+				mSelectState = -1;
+			}
 			
 		}
 		
-		// else { 
-			// transform_scene = true; 
-			// mSelectState = -1; 
-		// } 
 	}
-
-			// If an atom is not clicked on, but some are selected, move those.
-			// else { 
-
-				// GLdouble tmpX, tmpY, tmpZ; 
-				// GLdouble newX, newY, newZ; 
-				// int dx = tmpPnt.x - oldTmpPnt.x; 
-				// int dy = tmpPnt.y - oldTmpPnt.y; 
-				// int hsize = GetRect().GetWidth(); 
-
-				// If command key or right mouse button is down, we simply
-				// translate the selected atoms.
-				// if (event.CmdDown() || event.RightIsDown()) { //translate  
-					// for ( int i = 0; i < NumAtoms; i++) 
-						// if (lAtoms[i].GetSelectState()) { 
-							// findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ); 
-
-							// tmpX += (float)dx/(float)(0.05*hsize/mMainData->WindowSize); 
-							// tmpY += (float)dy/(float)(0.05*hsize/mMainData->WindowSize); 
-							// findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ); 
-							// lAtoms[i].Position.x = newX; 
-							// lAtoms[i].Position.y = newY; 
-							// lAtoms[i].Position.z = newZ; 
-						// } 
-				// } 
-
-					// Otherwise, if shift is down, we modify selected atoms' depth.
-				// else if (event.ShiftDown()) { //move along z-axis 
-					// for ( int i = 0; i < NumAtoms; i++) 
-						// if (lAtoms[i].GetSelectState()) { 
-							// findWinCoord(lAtoms[i].Position.x, lAtoms[i].Position.y, lAtoms[i].Position.z, tmpX, tmpY, tmpZ); 
-							// tmpZ -= (float)dy/(float)(25*hsize/mMainData->WindowSize); 
-							// findReal3DCoord(tmpX, tmpY, tmpZ, newX, newY, newZ); 
-							// lAtoms[i].Position.x = newX; 
-							// lAtoms[i].Position.y = newY; 
-							// lAtoms[i].Position.z = newZ; 
-						// } 
-				// } 
-			// } 
-			/*
-			} else {
-				wxRect window_rect = GetRect();
-				periodic_dlg = new PeriodicTableDlg(
-										this, wxT("Periodic Table"),
-										window_rect.x + window_rect.width,
-										window_rect.y + 30);
-										
-				periodic_dlg->Show();
-			}
-
-			if (periodic_dlg->GetSelectedID() != 0) {
-				GLdouble newX, newY, newZ;
-
-				findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
-				//estimate an atomDepth value, X and Y values are of no use 
-				CPoint3D newPnt;
-				findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y,
-									atomDepth, newX, newY, newZ);
-				newPnt.x = newX;
-				newPnt.y = newY;
-				newPnt.z = newZ;
-				
-				lFrame->AddAtom(periodic_dlg->GetSelectedID(), newPnt);
-			}
-
-			oldSelect = -1;
-		}
-
-		else if (selected != oldSelect) {
-			int tmpBondStatus = lFrame->BondExists(oldSelect,selected);
- 
-			if (deSelectAll && tmpBondStatus == -1)
-				lFrame->AddBond(oldSelect,selected);
-*/
 
 	// If the left mouse button is released, the user is either done dragging,
 	// in which case we do nothing, or the user has selected an item.
@@ -925,20 +857,26 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 					oldSelect = -1;
 				}
 
+				// This functionality prevents selecting one atom, and then
+				// selecting a different one -- without creating a bond
+				// between them.  Since we have contextual menus now, I'm
+				// commenting this code out since I always end up with bonds
+				// I don't want.
+				
 				// If two different items were selected in sequence, try to
 				// add a bond between them.  Seems like it'd be wise to see
 				// if selected indicates an atom (and not a bond) here...
-				else if (selected != oldSelect) {
-					int tmpBondStatus = lFrame->BondExists(oldSelect,selected);
+				// else if (selected != oldSelect) { 
+					// int tmpBondStatus = lFrame->BondExists(oldSelect,selected); 
 
-					if (deSelectAll && tmpBondStatus == -1)
-						lFrame->AddBond(oldSelect,selected);
+					// if (deSelectAll && tmpBondStatus == -1) 
+						// lFrame->AddBond(oldSelect,selected); 
 
-					oldSelect = selected;
+					// oldSelect = selected; 
 
-					if (deSelectAll && tmpBondStatus == -1)
-						selected = -1;
-				}
+					// if (deSelectAll && tmpBondStatus == -1) 
+						// selected = -1; 
+				// } 
 			}
 
 			SelectObj(selected, deSelectAll);
@@ -963,6 +901,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	// Pass mouse event to MolDisplayWin::Rotate for processing
 	else {
+		// printf("rotated scene\n"); 
 		MolWin->Rotate(event);
 	}
 

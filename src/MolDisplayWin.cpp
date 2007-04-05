@@ -357,6 +357,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
 	mHighliteState = false;
 	interactiveMode = false;
+	stale_click = true;
 
 #ifdef __WXMSW__
 	//Visual studio is a total pile.
@@ -455,6 +456,7 @@ void MolDisplayWin::OnActivate(wxActivateEvent & event) {
 	if (!event.GetActive()) {
 		StopAnimations();
 	} else {
+		stale_click = true;
 		glCanvas->eventActivate(event);
 	}
 	event.Skip();
@@ -2897,10 +2899,13 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	sphereRect.SetX(sphereCenter.x - sphereRadius);
 	sphereRect.SetY(sphereCenter.y - sphereRadius);
 	
-	if(event.ButtonDown()) {
+	if (event.ButtonDown()) {
 		// initial drag setup, just save the initial cursor position
 		p = event.GetPosition();
-	} else if(event.Dragging()) {                               
+	} else if (stale_click) {
+		p = ScreenToClient(wxGetMousePosition());
+		stale_click = false;
+	} else if (event.Dragging()) {                               
 		// main drag
 		q = event.GetPosition();
 		dx = q.x - p.x;

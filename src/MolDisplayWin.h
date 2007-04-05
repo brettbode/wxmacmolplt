@@ -169,6 +169,7 @@ class MolDisplayWin : public wxFrame {
 
 		bool mHighliteState;
 		bool interactiveMode;
+		bool stale_click;
 
 		DECLARE_EVENT_TABLE()
 
