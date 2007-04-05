@@ -86,6 +86,7 @@ enum AnnotationType {
 
 class Annotation {
 public:
+	Annotation(void) {};
 	virtual ~Annotation(void) {};
 	
 	virtual void draw(const MolDisplayWin * win) const = 0;
@@ -111,13 +112,13 @@ public:
 		atoms[0] = atom1_id;
 		atoms[1] = atom2_id;
 	}
-	virtual ~AnnotationLength(void) {};
+	~AnnotationLength(void) {};
 	
-	virtual void draw(const MolDisplayWin * win) const;
-	virtual bool containsAtom(const int atom_id) const {
+	void draw(const MolDisplayWin * win) const;
+	bool containsAtom(const int atom_id) const {
 		return ((atoms[0] == atom_id)||(atoms[1] == atom_id));
 	}
-	virtual void adjustIds(const int atom_id) {
+	void adjustIds(const int atom_id) {
 		if (atoms[0] > atom_id) atoms[0]--;
 		if (atoms[1] > atom_id) atoms[1]--;
 	}
@@ -126,8 +127,8 @@ public:
 		       ((new_list[0] == atoms[0] && new_list[1] == atoms[1]) ||
 			    (new_list[1] == atoms[0] && new_list[0] == atoms[1]));
 	}
-	virtual void WriteXML(XMLElement * parent) const;
-	virtual bool ReadXML(XMLElement * p);
+	void WriteXML(XMLElement * parent) const;
+	bool ReadXML(XMLElement * p);
 	int getAtom(const int index) const {
 		if (index < 0 || index > 1) return -1;
 		return atoms[index];
@@ -139,8 +140,12 @@ private:
 
 class AnnotationMarker : public Annotation {
 public:
-	AnnotationMarker(void) : Annotation(), atom(-1) {};
-	AnnotationMarker(const long atom_id) : Annotation(), atom(atom_id) {};
+	AnnotationMarker(void) : Annotation() {
+		atom = -1;
+	};
+	AnnotationMarker(const long atom_id) : Annotation() {
+		atom = atom_id;
+	}
 	~AnnotationMarker(void) {};
 	
 	void draw(const MolDisplayWin * win) const;
