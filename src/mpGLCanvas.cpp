@@ -52,6 +52,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 
 	mSelectState = -1;
 	interactiveMode = false;
+	show_periodic_dlg = false;
 	oldSelect = -1;
 	mDragWin = NULL;
 	select_stack_top = 0;
@@ -828,23 +829,25 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 				// If the user clicked on nothing, we try to add an atom given
 				// the selected element on the periodic table palette.
-				if (selected < 0) {
-					if (periodic_dlg) {
-						if (periodic_dlg->GetSelectedID() == 0) {
-							periodic_dlg->Raise();
-						}
-					} else {
-						wxRect window_rect = GetRect();
-						periodic_dlg = new PeriodicTableDlg(
-												this, wxT("Periodic Table"),
-												window_rect.x + window_rect.width,
-												window_rect.y + 30);
+				if (selected < 0 && periodic_dlg &&
+					periodic_dlg->GetSelectedID() != 0) {
+
+					// if (periodic_dlg) { 
+						// if (periodic_dlg->GetSelectedID() == 0) { 
+							// periodic_dlg->Raise(); 
+						// } 
+					// } else { 
+						// wxRect window_rect = GetRect(); 
+						// periodic_dlg = new PeriodicTableDlg( 
+												// this, wxT("Periodic Table"), 
+												// window_rect.x + window_rect.width, 
+												// window_rect.y + 30); 
 												
-						periodic_dlg->Show();
-					}
+						// periodic_dlg->Show(); 
+					// } 
   
 					// If an element is selected, add an instance of it.
-					if (periodic_dlg->GetSelectedID() != 0) {
+					// if (periodic_dlg->GetSelectedID() != 0) { 
 							GLdouble newX, newY, newZ;
   
 							findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
@@ -857,7 +860,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 							newPnt.z = newZ;
   
 							lFrame->AddAtom(periodic_dlg->GetSelectedID(), newPnt);
-						}
+						// } 
   
 					oldSelect = -1;
 				}
@@ -1593,7 +1596,12 @@ void MpGLCanvas::toggleInteractiveMode(void) {
 
 	interactiveMode = 1 - interactiveMode;
 
-	if (interactiveMode) {
+}
+
+void MpGLCanvas::togglePeriodicDialog(void) {
+	show_periodic_dlg = !show_periodic_dlg;
+
+	if (show_periodic_dlg) {
 		if (periodic_dlg) {
 			periodic_dlg->Raise();
 		} else {
@@ -1606,7 +1614,6 @@ void MpGLCanvas::toggleInteractiveMode(void) {
 	} else {
 		ClosePeriodicDlg();
 	}
-
 } 
 
 void MpGLCanvas::ClosePeriodicDlg(void) {

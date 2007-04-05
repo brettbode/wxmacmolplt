@@ -88,6 +88,7 @@ class MpGLCanvas : public wxGLCanvas {
 		int selected;
 		int oldSelect;
 		bool interactiveMode;
+		bool show_periodic_dlg;
 		GLdouble atomDepth;
 		GLint winDiffX, winDiffY;
 
@@ -235,6 +236,7 @@ class MpGLCanvas : public wxGLCanvas {
 		int testPicking(int x, int y);
 		void SelectObj(int select_id, bool mode);
 		void toggleInteractiveMode();
+		void togglePeriodicDialog();
 		void findReal3DCoord(GLdouble x, GLdouble y, GLdouble z, GLdouble& realX, GLdouble& realY, GLdouble& realZ);
 		void findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, GLdouble& winY, GLdouble& winZ);
 		void ClosePeriodicDlg(void);

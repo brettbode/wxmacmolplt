@@ -64,6 +64,7 @@ enum MMP_EventID {
 	MMP_PREVMODE,
 	MMP_NEXTMODE,
 	MMP_SHOWAXIS,
+	MMP_SHOWPERIODICDLG,
 	MMP_SHOWSYMMETRYOPERATOR,
 	MMP_ATOMLABELSSUBMENU,
 	MMP_NO_ATOMLABEL,
@@ -183,6 +184,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
 	EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
 	EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
+	EVT_MENU (MMP_SHOWPERIODICDLG,  MolDisplayWin::menuViewShowPeriodicDlg)
 	EVT_MENU (MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::menuViewShowSymmetryOperators)
 	EVT_MENU (MMP_NO_ATOMLABEL,		MolDisplayWin::menuViewHideAtomLabels)
 	EVT_MENU (MMP_SHOWATOMLABELS,   MolDisplayWin::menuViewShowAtomLabel)
@@ -541,6 +543,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
 	menuView->AppendSeparator();
 	menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show Ax&is"), wxT("Display the cartesian axis"));
+	menuView->AppendCheckItem(MMP_SHOWPERIODICDLG, wxT("Show Periodic Table"), wxT("Display a period table"));
 #ifdef ENABLE_SHOWSYMMETRY_MODE
 	menuView->AppendCheckItem(MMP_SHOWSYMMETRYOPERATOR, wxT("Show S&ymmetry Operators"));
 #endif
@@ -1796,6 +1799,11 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 		glCanvas->toggleInteractiveMode();
 
   //DrawGL();
+}
+
+void MolDisplayWin::menuViewShowPeriodicDlg(wxCommandEvent &event) {
+	if (glCanvas)
+		glCanvas->togglePeriodicDialog();
 }
 
 void MolDisplayWin::menuViewShowNormalMode(wxCommandEvent &event) {

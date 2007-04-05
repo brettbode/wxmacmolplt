@@ -246,6 +246,7 @@ class MolDisplayWin : public wxFrame {
 		//void menuViewShow_special_atoms(wxCommandEvent &event);
 		//void menuVeiwShow_hydrogen_labels(wxCommandEvent &event);
 		void menuViewShowAxis(wxCommandEvent &event);
+		void menuViewShowPeriodicDlg(wxCommandEvent &event);
 		void menuViewShowSymmetryOperators(wxCommandEvent &event);
 		void menuViewHideAtomLabels(wxCommandEvent &event);
 		void menuViewShowAtomLabel(wxCommandEvent &event);
