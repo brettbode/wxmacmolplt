@@ -166,14 +166,20 @@ void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
 
 	id = event.GetId();
 
-	/* If the user has selected the same button, we don't need to change 
-	 * anything. */
+	// If the user selects a new button, we want to turn the old one off and
+	// the new one one.
 	if (id != prev_id) {
 		elements[id].button->SetBitmapLabel(*(elements[id].on_bmp));
 		if (prev_id >= 0) {
 			elements[prev_id].button->SetBitmapLabel(*(elements[prev_id].off_bmp));
 		}
 		prev_id = id;
+	}
+
+	// If the user has selected the same button, we want to turn it off.
+   	else {
+		elements[id].button->SetBitmapLabel(*(elements[id].off_bmp));
+		prev_id = -1;
 	}
 
 	Refresh();

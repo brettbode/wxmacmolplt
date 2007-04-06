@@ -119,6 +119,7 @@ class MpApp : public wxApp {
         void menuFileOpen(wxCommandEvent &event);
 		void menuPreferences(wxCommandEvent &event);
 		void ApplyPrefsToAll(WinPrefs * prefs);
+		void AdjustAllMenus(void);
 		void CloseGlobalPrefs(void);
 		void splashCleanup(wxTimerEvent & event);
 #ifdef __WXMAC__

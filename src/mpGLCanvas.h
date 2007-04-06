@@ -88,7 +88,6 @@ class MpGLCanvas : public wxGLCanvas {
 		int selected;
 		int oldSelect;
 		bool interactiveMode;
-		bool show_periodic_dlg;
 		GLdouble atomDepth;
 		GLint winDiffX, winDiffY;
 

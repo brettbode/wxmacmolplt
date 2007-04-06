@@ -22,7 +22,9 @@
 
 //The global preferences settings
 WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
+
 PeriodicTableDlg *periodic_dlg;
+bool show_periodic_dlg = false;
 
 int glf_initialized = 0;
 
@@ -228,6 +230,15 @@ void MpApp::ApplyPrefsToAll(WinPrefs * prefs) {
 	while (win != MolWinList.end()) {
 		MolDisplayWin * temp = (*win);
 		(*win)->ChangePrefs(prefs);
+		win++;
+	}
+}
+
+void MpApp::AdjustAllMenus(void) {
+	std::list<MolDisplayWin *>::iterator win = MolWinList.begin();
+	while (win != MolWinList.end()) {
+		MolDisplayWin * temp = (*win);
+		(*win)->AdjustMenus();
 		win++;
 	}
 }

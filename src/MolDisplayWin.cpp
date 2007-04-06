@@ -49,6 +49,7 @@
 #endif
 
 extern WinPrefs * gPreferences;
+extern bool show_periodic_dlg;
 
 using namespace std;
 
@@ -707,6 +708,12 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuViewStyle->Check(MMP_WIREFRAMEMODE, true);
 	else
 		menuViewStyle->Check(MMP_BALLANDSTICKMODE, true);
+
+	if (show_periodic_dlg) {
+		menuView->Check(MMP_SHOWPERIODICDLG, true);
+	} else {
+		menuView->Check(MMP_SHOWPERIODICDLG, false);
+	}
 	
 	if (MainData->cFrame->NumAtoms == 0) {
 	} else {

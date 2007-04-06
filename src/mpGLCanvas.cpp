@@ -25,10 +25,12 @@
 #include <iostream>
 #include <sstream>
 
+#include "main.h"
 #include "periodic_table_dlg.h"
 #include "Math3D.h"
 
 extern PeriodicTableDlg *periodic_dlg;
+extern bool show_periodic_dlg;
 extern int glf_initialized;
 
 int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
@@ -52,7 +54,6 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 
 	mSelectState = -1;
 	interactiveMode = false;
-	show_periodic_dlg = false;
 	oldSelect = -1;
 	mDragWin = NULL;
 	select_stack_top = 0;
@@ -1600,6 +1601,8 @@ void MpGLCanvas::toggleInteractiveMode(void) {
 
 void MpGLCanvas::togglePeriodicDialog(void) {
 	show_periodic_dlg = !show_periodic_dlg;
+
+	((MpApp &) wxGetApp()).AdjustAllMenus();
 
 	if (show_periodic_dlg) {
 		if (periodic_dlg) {
