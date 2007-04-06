@@ -150,7 +150,13 @@ void colorPatternArea::OnMouse(wxMouseEvent &event)
   }
 
   if ( mID >= ID_BITMAP_SLT && (event.Entering() || mID == dynamic_cast<patternSelectDlg*>(mParent)->getSltId()) )
-    SetBackgroundColour(defaultColor);
+    {
+      //"distance" of two colors
+      if ( pow((int)(mCurrentColor.Red()-defaultColor.Red()),2) + pow((int)(mCurrentColor.Green()-defaultColor.Green()),2) + pow((int)(mCurrentColor.Blue()-defaultColor.Blue()),2) < 500)
+	SetBackgroundColour(wxColour(68,68,68));
+      else
+	SetBackgroundColour(defaultColor);
+    }
 
   if ( event.Leaving() && mID >= ID_BITMAP_SLT && mPatID != dynamic_cast<patternSelectDlg*>(mParent)->getSltPatId() )
     SetBackgroundColour(mCurrentColor);
