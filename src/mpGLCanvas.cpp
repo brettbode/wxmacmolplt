@@ -62,8 +62,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 	//initGL();
 }
 
-MpGLCanvas::~MpGLCanvas()
-{
+MpGLCanvas::~MpGLCanvas() {
 	if (glf_initialized) {
 		glfClose();
 		glf_initialized = 0;
@@ -1602,8 +1601,6 @@ void MpGLCanvas::toggleInteractiveMode(void) {
 void MpGLCanvas::togglePeriodicDialog(void) {
 	show_periodic_dlg = !show_periodic_dlg;
 
-	((MpApp &) wxGetApp()).AdjustAllMenus();
-
 	if (show_periodic_dlg) {
 		if (periodic_dlg) {
 			periodic_dlg->Raise();
@@ -1614,6 +1611,7 @@ void MpGLCanvas::togglePeriodicDialog(void) {
 				window_rect.y + 30);
 			periodic_dlg->Show();
 		}
+		((MpApp &) wxGetApp()).AdjustAllMenus();
 	} else {
 		ClosePeriodicDlg();
 	}

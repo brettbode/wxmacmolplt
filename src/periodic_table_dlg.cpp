@@ -10,7 +10,10 @@
 #pragma implementation "periodic_table_dlg.h"
 #endif
 
+#include "main.h"
 #include "periodic_table_dlg.h"
+
+extern bool show_periodic_dlg;
 
 IMPLEMENT_DYNAMIC_CLASS(PeriodicTableDlg, wxMiniFrame)
 
@@ -151,6 +154,9 @@ PeriodicTableDlg::~PeriodicTableDlg() {
 	}
 
 	free(elements);
+
+	show_periodic_dlg = false;
+	((MpApp &) wxGetApp()).AdjustAllMenus();
 }
 
 /* ------------------------------------------------------------------------- */
