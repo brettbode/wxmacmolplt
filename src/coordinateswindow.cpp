@@ -346,6 +346,8 @@ void CoordinatesWindow::FrameChanged(void) {
 		lFrame->SetAtomSelectState(0, temp);
 		wxString buf;
 		for (long i=0; i<natoms; i++) {
+			buf.Printf(wxT("%d"), (i+1));
+			coordGrid->SetRowLabelValue(i, buf);
 			Prefs->GetAtomLabel(lFrame->GetAtomType(i)-1, buf);
 			coordGrid->SetCellValue(i, 0, buf);
 			if (lFrame->GetAtomSelectState(i)) coordGrid->SelectRow(i, true);
