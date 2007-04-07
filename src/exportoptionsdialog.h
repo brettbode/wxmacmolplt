@@ -40,15 +40,15 @@ class wxSpinCtrl;
 
 ////@begin control identifiers
 #define ID_EXPORTOPTIONSDIALOG 10044
-#define ID_RES_PANEL 10045
-#define ID_RES_CHOICE 10047
-#define ID_RESWIDTHSPIN 10051
-#define ID_RESHEIGHTSPIN 10049
 #define SYMBOL_EXPORTOPTIONSDIALOG_STYLE wxDEFAULT_DIALOG_STYLE|wxCAPTION|wxSYSTEM_MENU|wxSTAY_ON_TOP|wxDIALOG_MODAL
 #define SYMBOL_EXPORTOPTIONSDIALOG_TITLE _("Export Options")
 #define SYMBOL_EXPORTOPTIONSDIALOG_IDNAME ID_EXPORTOPTIONSDIALOG
 #define SYMBOL_EXPORTOPTIONSDIALOG_SIZE wxSize(400, 300)
 #define SYMBOL_EXPORTOPTIONSDIALOG_POSITION wxDefaultPosition
+#define ID_RES_PANEL 10045
+#define ID_RES_CHOICE 10047
+#define ID_RESWIDTHSPIN 10051
+#define ID_RESHEIGHTSPIN 10049
 ////@end control identifiers
 
 /*!
@@ -81,17 +81,17 @@ public:
 
 ////@begin ExportOptionsDialog event handler declarations
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_RES_CHOICE
-    void OnResChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_RES_CHOICE
+	void OnResChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_RESWIDTHSPIN
-    void OnReswidthspinUpdated( wxSpinEvent& event );
+	/// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_RESWIDTHSPIN
+	void OnReswidthspinUpdated( wxSpinEvent& event );
 
-    /// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_RESHEIGHTSPIN
-    void OnResheightspinUpdated( wxSpinEvent& event );
+	/// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_RESHEIGHTSPIN
+	void OnResheightspinUpdated( wxSpinEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
-    void OnOkClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
+	void OnOkClick( wxCommandEvent& event );
 
 ////@end ExportOptionsDialog event handler declarations
 

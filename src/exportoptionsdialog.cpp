@@ -49,13 +49,13 @@ IMPLEMENT_DYNAMIC_CLASS( ExportOptionsDialog, wxDialog )
 BEGIN_EVENT_TABLE( ExportOptionsDialog, wxDialog )
 
 ////@begin ExportOptionsDialog event table entries
-    EVT_CHOICE( ID_RES_CHOICE, ExportOptionsDialog::OnResChoiceSelected )
+	EVT_CHOICE( ID_RES_CHOICE, ExportOptionsDialog::OnResChoiceSelected )
 
-    EVT_SPINCTRL( ID_RESWIDTHSPIN, ExportOptionsDialog::OnReswidthspinUpdated )
+	EVT_SPINCTRL( ID_RESWIDTHSPIN, ExportOptionsDialog::OnReswidthspinUpdated )
 
-    EVT_SPINCTRL( ID_RESHEIGHTSPIN, ExportOptionsDialog::OnResheightspinUpdated )
+	EVT_SPINCTRL( ID_RESHEIGHTSPIN, ExportOptionsDialog::OnResheightspinUpdated )
 
-    EVT_BUTTON( wxID_OK, ExportOptionsDialog::OnOkClick )
+	EVT_BUTTON( wxID_OK, ExportOptionsDialog::OnOkClick )
 
 ////@end ExportOptionsDialog event table entries
 
@@ -81,14 +81,14 @@ ExportOptionsDialog::ExportOptionsDialog( wxWindow* parent, wxWindowID id, const
 bool ExportOptionsDialog::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin ExportOptionsDialog member initialisation
-    panelRes = NULL;
-    resChoice = NULL;
-    txt0 = NULL;
-    resWidthSpin = NULL;
-    txt1 = NULL;
-    txt2 = NULL;
-    resHeightSpin = NULL;
-    txt3 = NULL;
+	panelRes = NULL;
+	resChoice = NULL;
+	txt0 = NULL;
+	resWidthSpin = NULL;
+	txt1 = NULL;
+	txt2 = NULL;
+	resHeightSpin = NULL;
+	txt3 = NULL;
 ////@end ExportOptionsDialog member initialisation
     width = 0;
     height = 0;
@@ -121,61 +121,61 @@ bool ExportOptionsDialog::Create( wxWindow* parent, wxWindowID id, const wxStrin
 void ExportOptionsDialog::CreateControls()
 {
 ////@begin ExportOptionsDialog content construction
-    ExportOptionsDialog* itemDialog1 = this;
+	ExportOptionsDialog* itemDialog1 = this;
 
-    wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
-    itemDialog1->SetSizer(itemBoxSizer2);
+	wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
+	itemDialog1->SetSizer(itemBoxSizer2);
 
-    panelRes = new wxPanel( itemDialog1, ID_RES_PANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER );
-    itemBoxSizer2->Add(panelRes, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	panelRes = new wxPanel( itemDialog1, ID_RES_PANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER );
+	itemBoxSizer2->Add(panelRes, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
-    panelRes->SetSizer(itemBoxSizer4);
+	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
+	panelRes->SetSizer(itemBoxSizer4);
 
-    wxString resChoiceStrings[] = {
-        _("72dpi (Screen)"),
-        _("300dpi (Print)"),
-        _("Custom")
-    };
-    resChoice = new wxChoice( panelRes, ID_RES_CHOICE, wxDefaultPosition, wxDefaultSize, 3, resChoiceStrings, 0 );
-    resChoice->SetStringSelection(_("72dpi (Screen)"));
-    itemBoxSizer4->Add(resChoice, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxString resChoiceStrings[] = {
+		_("72dpi (Screen)"),
+		_("300dpi (Print)"),
+		_("Custom")
+	};
+	resChoice = new wxChoice( panelRes, ID_RES_CHOICE, wxDefaultPosition, wxDefaultSize, 3, resChoiceStrings, 0 );
+	resChoice->SetStringSelection(_("72dpi (Screen)"));
+	itemBoxSizer4->Add(resChoice, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer4->Add(itemBoxSizer6, 0, wxALIGN_RIGHT, 5);
+	wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer4->Add(itemBoxSizer6, 0, wxALIGN_RIGHT, 5);
 
-    txt0 = new wxStaticText( panelRes, wxID_STATIC, _("Width:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer6->Add(txt0, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+	txt0 = new wxStaticText( panelRes, wxID_STATIC, _("Width:"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer6->Add(txt0, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    resWidthSpin = new wxSpinCtrl( panelRes, ID_RESWIDTHSPIN, _T("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 999999999, 300 );
-    itemBoxSizer6->Add(resWidthSpin, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
+	resWidthSpin = new wxSpinCtrl( panelRes, ID_RESWIDTHSPIN, _T("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 999999999, 300 );
+	itemBoxSizer6->Add(resWidthSpin, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
 
-    txt1 = new wxStaticText( panelRes, wxID_STATIC, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer6->Add(txt1, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+	txt1 = new wxStaticText( panelRes, wxID_STATIC, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer6->Add(txt1, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxBoxSizer* itemBoxSizer10 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer4->Add(itemBoxSizer10, 0, wxALIGN_RIGHT, 5);
+	wxBoxSizer* itemBoxSizer10 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer4->Add(itemBoxSizer10, 0, wxALIGN_RIGHT, 5);
 
-    txt2 = new wxStaticText( panelRes, wxID_STATIC, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer10->Add(txt2, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+	txt2 = new wxStaticText( panelRes, wxID_STATIC, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer10->Add(txt2, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    resHeightSpin = new wxSpinCtrl( panelRes, ID_RESHEIGHTSPIN, _T("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 999999999, 300 );
-    itemBoxSizer10->Add(resHeightSpin, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
+	resHeightSpin = new wxSpinCtrl( panelRes, ID_RESHEIGHTSPIN, _T("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 999999999, 300 );
+	itemBoxSizer10->Add(resHeightSpin, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
 
-    txt3 = new wxStaticText( panelRes, wxID_STATIC, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer10->Add(txt3, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+	txt3 = new wxStaticText( panelRes, wxID_STATIC, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer10->Add(txt3, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-    wxStdDialogButtonSizer* itemStdDialogButtonSizer14 = new wxStdDialogButtonSizer;
+	wxStdDialogButtonSizer* itemStdDialogButtonSizer14 = new wxStdDialogButtonSizer;
 
-    itemBoxSizer2->Add(itemStdDialogButtonSizer14, 0, wxALIGN_RIGHT|wxRIGHT|wxTOP|wxBOTTOM, 5);
-    wxButton* itemButton15 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemButton15->SetDefault();
-    itemStdDialogButtonSizer14->AddButton(itemButton15);
+	itemBoxSizer2->Add(itemStdDialogButtonSizer14, 0, wxALIGN_RIGHT|wxRIGHT|wxTOP|wxBOTTOM, 5);
+	wxButton* itemButton15 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemButton15->SetDefault();
+	itemStdDialogButtonSizer14->AddButton(itemButton15);
 
-    wxButton* itemButton16 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStdDialogButtonSizer14->AddButton(itemButton16);
+	wxButton* itemButton16 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemStdDialogButtonSizer14->AddButton(itemButton16);
 
-    itemStdDialogButtonSizer14->Realize();
+	itemStdDialogButtonSizer14->Realize();
 
 ////@end ExportOptionsDialog content construction
 }
@@ -187,8 +187,8 @@ void ExportOptionsDialog::CreateControls()
 void ExportOptionsDialog::OnOkClick( wxCommandEvent& event )
 {
 ////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK in ExportOptionsDialog.
-    // Before editing this code, remove the block markers.
-    event.Skip();
+	// Before editing this code, remove the block markers.
+	event.Skip();
 ////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK in ExportOptionsDialog. 
 }
 
@@ -210,8 +210,8 @@ wxBitmap ExportOptionsDialog::GetBitmapResource( const wxString& name )
 {
     // Bitmap retrieval
 ////@begin ExportOptionsDialog bitmap retrieval
-    wxUnusedVar(name);
-    return wxNullBitmap;
+	wxUnusedVar(name);
+	return wxNullBitmap;
 ////@end ExportOptionsDialog bitmap retrieval
 }
 
@@ -223,8 +223,8 @@ wxIcon ExportOptionsDialog::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 ////@begin ExportOptionsDialog icon retrieval
-    wxUnusedVar(name);
-    return wxNullIcon;
+	wxUnusedVar(name);
+	return wxNullIcon;
 ////@end ExportOptionsDialog icon retrieval
 }
 

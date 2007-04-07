@@ -10,8 +10,8 @@
 #pragma implementation "periodic_table_dlg.h"
 #endif
 
-#include "main.h"
 #include "periodic_table_dlg.h"
+#include "main.h"
 
 extern bool show_periodic_dlg;
 

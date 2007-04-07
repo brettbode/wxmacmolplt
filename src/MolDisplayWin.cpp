@@ -955,6 +955,12 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 	if ((MainData->GetNumFrames() > 1)||vibs) {
 		wildcards.Append(wxT("|QuickTime Movie (*.mov)|*.mov"));
 	}
+#else
+#ifdef HAVE_LIBMING
+    if ((MainData->GetNumFrames() > 1)||vibs) {
+        wildcards.Append(wxT("|Flash Movie (*.swf)|*.swf"));
+    }
+#endif
 #endif
 	int        index = 0;
 	int        type  = 0;
@@ -1012,6 +1018,11 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 #ifdef __MAC_USE_QUICKTIME__
 			//quicktime movie export
 			WriteMovie(filepath);
+#else
+#ifdef HAVE_LIBMING
+            //TODO:  Write Flash Movie
+            CreateFrameMovie();
+#endif
 #endif
 		} else {
 			FILE *currFile = NULL;

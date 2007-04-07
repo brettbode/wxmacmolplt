@@ -338,6 +338,10 @@ class MolDisplayWin : public wxFrame {
 							  const qtData & myqtData, bool IncludeEPlot);
 		void CreateModeMovie(GWorldPtr lgWorld, Handle CompressedData,
 							 const qtData & myqtData);
+#else
+#ifdef HAVE_LIBMING
+        void CreateFrameMovie();
+#endif
 #endif
 		//Call to dump the message and close the window
 		void AbortOpen(const char * msg);

@@ -16,6 +16,7 @@ wxmacmolplt_SOURCES =                             \
 	energyplotdialog.cpp    energyplotdialog.h    \
 	exportoptionsdialog.cpp exportoptionsdialog.h \
 	Files.cpp                                     \
+	flashexport.cpp                               \
 	Frame.cpp               Frame.h               \
 	frameenergy.cpp         frameenergy.h         \
 	frequenciesdialog.cpp   frequenciesdialog.h   \
@@ -64,6 +65,6 @@ wxmacmolplt_SOURCES =                             \
 	zmatrixcalculator.cpp   zmatrixcalculator.h
 
 AM_CXXFLAGS = $(WX_CXXFLAGS)
-wxmacmolplt_LDADD = $(WX_LIBS)
+wxmacmolplt_LDADD = $(WX_LIBS) $(LIBMING)
 wxmacmolplt_LDFLAGS = $(WX_CXXFLAGS)
 EXTRA_DIST = wxMacMolPlt.pjd sp.xpm arrow.xpm

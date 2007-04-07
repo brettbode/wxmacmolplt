@@ -7,10 +7,23 @@ dnl AC_REVISION
 AM_MAINTAINER_MODE
 
 
+AC_ARG_WITH(ming,
+[[  --with-ming             Include support for exporting flash animations
+                          using the ming library; (default=yes)]],
+[],
+[with_ming=yes])
+LIBMING=
+AS_IF([test "x$with_ming" != xno],
+[AC_CHECK_LIB([ming], [Ming_init],
+    [AC_SUBST([LIBMING], ["-lming"]) AC_DEFINE([HAVE_LIBMING])],
+    [if test "x$with_ming" != xyes; then
+        AC_MSG_FAILURE([--with-ming was given, but test for ming failed])
+    fi])])
+
 WXCONFIG=wx-config
 AC_ARG_WITH(wx-config,
 [[  --with-wx-config=FILE   Use the given path to wx-config when determining
-                            wxWidgets configuration; defaults to "wx-config"]],
+                          wxWidgets configuration; defaults to "wx-config"]],
 [
     if test "$withval" != "yes" -a "$withval" != ""; then
         WXCONFIG=$withval
