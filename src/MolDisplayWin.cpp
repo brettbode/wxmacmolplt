@@ -1020,8 +1020,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 			WriteMovie(filepath);
 #else
 #ifdef HAVE_LIBMING
-            //TODO:  Write Flash Movie
-            CreateFrameMovie();
+            CreateFrameMovie(filepath);
 #endif
 #endif
 		} else {
@@ -1998,7 +1997,7 @@ void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &event) {
 		m_timer.Stop();
 		timerRunning = false;
 	} else {
-		if (MainData->CurrentFrame>=MainData->NumFrames)
+		if (MainData->CurrentFrame >= MainData->NumFrames)
 			ChangeFrames(1);
 		else
 			ChangeFrames(MainData->CurrentFrame+1);

@@ -18,7 +18,7 @@
 #endif
 
 #ifdef HAVE_LIBMING
-void MolDisplayWin::CreateFrameMovie() {
+void MolDisplayWin::CreateFrameMovie(wxString &filePath) {
     long SavedFrameNum = MainData->GetCurrentFrame();
     long i;
     SWFMovie *movie = new SWFMovie();
@@ -27,11 +27,14 @@ void MolDisplayWin::CreateFrameMovie() {
     SWFDisplayItem *di = NULL;
     long width;
     long height;
+    long AnimateTime = 10*Prefs->GetAnimateTime();
+
+    if(AnimateTime < 1) AnimateTime = 1;
 
     getCanvasSize(&width, &height);
 
     movie->setBackground(0xFF, 0xFF, 0xFF);
-    movie->setRate(30); // TODO: Fixme
+    movie->setRate(1000.0/(double)AnimateTime);
     movie->setDimension(width, height);
 
     for(i = 1; i <= MainData->NumFrames; ++i) {
@@ -62,7 +65,9 @@ void MolDisplayWin::CreateFrameMovie() {
         //delete jpegData;
     }
 
-    movie->save("test.swf", 0); // TODO: Fixme
+    movie->save(filePath.mb_str(wxConvUTF8), 0);
+    delete movie;
+    MainData->SetCurrentFrame(SavedFrameNum);
 }
 #endif
 
