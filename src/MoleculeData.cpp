@@ -1039,6 +1039,107 @@ void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 					 " may mean your selected point group is incorrect.");
 	}
 }
+void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs) {
+	pgFlags[0] = true;
+	for (int i=0; i<kNumSymmetryPointGroups; i++) pgFlags[i] = false;
+	//order of the flags
+	//c1, cs, ci, c2h-c8h (3-9), c2v-c8v (10-16), c2-c8 (17-23), s2-s8 (24-27),
+	//D2d-d8d (28-34), d2h-d8h (35-41), d2-d8 (42-48), Td, Th, T, Oh, O
+	int PrincAxisOrder = 1;
+	Matrix4D temp;
+	
+	GAMESSPointGroup savedpg = GAMESS_C1;
+	long savedpgOrder = 1;
+	if (InputOptions) {
+		savedpg = InputOptions->Data->GetPointGroup();
+		savedpgOrder = InputOptions->Data->GetPointGroupOrder();
+	} else {
+		InputOptions = new InputData;
+	}
+	//First determine the rotation axis orders and store in Cn
+	for (int i=2; i<=8; i++) {
+		InputOptions->Data->SetPointGroup(GAMESS_CN);
+		InputOptions->Data->SetPointGroupOrder(i);
+		if (DeterminePrincipleOrientation(temp, Prefs)) {
+			pgFlags[17 - 2 + i] = true;
+			PrincAxisOrder = i;
+			std::cout << "C "<< i << " is valid."<<std::endl;
+			InputOptions->Data->SetPointGroup(GAMESS_CNH);
+			if (DeterminePrincipleOrientation(temp, Prefs)) {
+				pgFlags[3 - 2 + i] = true;
+				std::cout << "C "<< i << "h is valid."<<std::endl;
+			}
+			InputOptions->Data->SetPointGroup(GAMESS_CNV);
+			if (DeterminePrincipleOrientation(temp, Prefs)) {
+				pgFlags[10 - 2 + i] = true;
+				std::cout << "C "<< i << "v is valid."<<std::endl;
+			}
+			InputOptions->Data->SetPointGroup(GAMESS_DN);
+			if (DeterminePrincipleOrientation(temp, Prefs)) {
+				pgFlags[42 - 2 + i] = true;
+				std::cout << "D "<< i << " is valid."<<std::endl;
+				InputOptions->Data->SetPointGroup(GAMESS_DND);
+				if (DeterminePrincipleOrientation(temp, Prefs)) {
+					pgFlags[28 - 2 + i] = true;
+					std::cout << "D "<< i << "d is valid."<<std::endl;
+				}
+				InputOptions->Data->SetPointGroup(GAMESS_DNH);
+				if (DeterminePrincipleOrientation(temp, Prefs)) {
+					pgFlags[35 - 2 + i] = true;
+					std::cout << "D "<< i << "h is valid."<<std::endl;
+				}
+			}
+			if (i < 6) {
+				InputOptions->Data->SetPointGroup(GAMESS_S2N);
+				InputOptions->Data->SetPointGroupOrder(i-1);
+				if (DeterminePrincipleOrientation(temp, Prefs)) {
+					pgFlags[24 - 2 + i] = true;
+					std::cout << "S2 "<< i << " is valid."<<std::endl;
+				}
+			}
+		}
+	}
+	if (PrincAxisOrder > 1) {
+		InputOptions->Data->SetPointGroup(GAMESS_T);
+		if (DeterminePrincipleOrientation(temp, Prefs)) {
+			pgFlags[51] = true;
+			std::cout << "T is valid."<<std::endl;
+			InputOptions->Data->SetPointGroup(GAMESS_O);
+			if (DeterminePrincipleOrientation(temp, Prefs)) {
+				pgFlags[53] = true;
+				std::cout << "O is valid."<<std::endl;
+				InputOptions->Data->SetPointGroup(GAMESS_OH);
+				if (DeterminePrincipleOrientation(temp, Prefs)) {
+					pgFlags[52] = true;
+					std::cout << "Oh is valid."<<std::endl;
+				}
+			}
+			InputOptions->Data->SetPointGroup(GAMESS_TD);
+			if (DeterminePrincipleOrientation(temp, Prefs)) {
+				pgFlags[49] = true;
+				std::cout << "Td is valid."<<std::endl;
+			}
+			InputOptions->Data->SetPointGroup(GAMESS_TH);
+			if (DeterminePrincipleOrientation(temp, Prefs)) {
+				pgFlags[50] = true;
+				std::cout << "Th is valid."<<std::endl;
+			}
+		}
+	}
+	InputOptions->Data->SetPointGroup(GAMESS_CS);
+	if (DeterminePrincipleOrientation(temp, Prefs)) {
+		pgFlags[1] = true;
+		std::cout << "Cs is valid."<<std::endl;
+	}
+	InputOptions->Data->SetPointGroup(GAMESS_CI);
+	if (DeterminePrincipleOrientation(temp, Prefs)) {
+		pgFlags[2] = true;
+		std::cout << "Ci is valid."<<std::endl;
+	}
+	//restore the entry point group
+	InputOptions->Data->SetPointGroup(savedpg);
+	InputOptions->Data->SetPointGroupOrder(savedpgOrder);
+}
 bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs) const {
 	//Setup the rotation matrix to present the molecule in the priciple orientation
 	

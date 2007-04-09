@@ -306,6 +306,7 @@ enum EnergyUnit {
 	kKCalPerMole
 };
 
+#define kNumSymmetryPointGroups 54
 enum GAMESSPointGroup {
 	invalidPGroup=0,
 	GAMESS_C1,
