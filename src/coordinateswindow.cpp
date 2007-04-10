@@ -306,6 +306,9 @@ void CoordinatesWindow::SetupGridColumns(void) {
 	long natoms = lFrame->GetNumAtoms();
 	bool temp = false;
 	if (natoms>0) temp = lFrame->GetAtomSelectState(0);
+	coordGrid->Freeze();
+	if (coordGrid->GetNumberRows() > 0)
+		coordGrid->DeleteRows(0, coordGrid->GetNumberRows(), true);
 	coordGrid->DeleteCols(0, coordGrid->GetNumberCols(), true);
 	if (CoordType == 0) {
 		coordGrid->InsertCols(0, 4, true);
@@ -329,6 +332,7 @@ void CoordinatesWindow::SetupGridColumns(void) {
 		coordGrid->ClearSelection();
 		lFrame->SetAtomSelectState(0, temp);
 	}
+	coordGrid->Thaw();
 }
 
 void CoordinatesWindow::FrameChanged(void) {
@@ -492,15 +496,8 @@ void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
 	for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
-	MainData->NewAtom();
-	if (CoordType == 1) {
-		Internals * internals = MainData->GetInternalCoordinates();
-		if (internals) {
-			MOPacInternals * mInts = internals->GetMOPacStyle();
-			if (mInts)
-				mInts->AddAtom(MainData);
-		}
-	}
+	CPoint3D p={0.0,0.0,0.0};
+	MainData->NewAtom(1, p);
 	lFrame->SetAtomSelectState(natoms, true);
 	Parent->FrameChanged();
 	FrameChanged();

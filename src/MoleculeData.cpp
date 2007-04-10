@@ -302,30 +302,8 @@ void MoleculeData::StickCoordinates(void) {
 	}
 	InitRotationMatrix(TotalRotation);
 }
-void MoleculeData::NewAtom(void) {
-	if (cFrame->NumAtoms>=cFrame->AtomAllocation) {
-		mpAtom * temp = new mpAtom[cFrame->NumAtoms+10];
-		if (temp) {
-			memcpy(temp, cFrame->Atoms, cFrame->NumAtoms*sizeof(mpAtom));
-			if (cFrame->Atoms) delete [] cFrame->Atoms;
-			cFrame->Atoms = temp;
-			cFrame->AtomAllocation += 10;
-		}
-	}
-	if (cFrame->NumAtoms<cFrame->AtomAllocation) {
-		cFrame->Atoms[cFrame->NumAtoms].Type = 1;
-		cFrame->Atoms[cFrame->NumAtoms].Position.x = 0;
-		cFrame->Atoms[cFrame->NumAtoms].Position.y = 0;
-		cFrame->Atoms[cFrame->NumAtoms].Position.z = 0;
-		cFrame->NumAtoms++;
-			//Delete any orbitals and normal modes
-		if (cFrame->Vibs) {
-			delete cFrame->Vibs;
-			cFrame->Vibs = NULL;
-		}
-		cFrame->DeleteOrbitals();
-		while (cFrame->SurfaceList) cFrame->DeleteSurface(0);
-	}
+void MoleculeData::NewAtom(long AtomType, CPoint3D AtomPosition) {
+	cFrame->AddAtom(AtomType, AtomPosition);
 	if (cFrame->AtomAllocation>MaxAtoms) {
 		if (RotCoords) delete [] RotCoords;
 		if (zBuffer) delete [] zBuffer;
@@ -333,6 +311,10 @@ void MoleculeData::NewAtom(void) {
 		zBuffer = new long[cFrame->AtomAllocation];
 		if (!RotCoords || !zBuffer) throw MemoryError();
 		MaxAtoms = cFrame->AtomAllocation;
+	}
+	if (IntCoords) {
+		MOPacInternals * mInts = IntCoords->GetMOPacStyle();
+		if (mInts) mInts->AddAtom(this);
 	}
 	ResetRotation();
 }
@@ -1466,6 +1448,10 @@ void MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
 		}
 	} else
 		cFrame->DeleteAtom(AtomNum);
+	if (IntCoords) {
+		MOPacInternals * mInts = IntCoords->GetMOPacStyle();
+		if (mInts) mInts->DeleteAtom(this, AtomNum);
+	}
 	std::vector<Annotation *>::iterator anno;
 	anno = Annotations.begin();
 	for (anno = Annotations.begin(); anno != Annotations.end(); ) {

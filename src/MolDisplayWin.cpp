@@ -2148,6 +2148,8 @@ void MolDisplayWin::menuSetPointGroupOrder(wxCommandEvent &event) {
 	Dirty = true;
 }
 void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &event) {
+	bool pgFlags[kNumSymmetryPointGroups];
+	MainData->DeterminePointGroup(pgFlags, Prefs);
 //	Dirty = true;
 }
 void MolDisplayWin::menuMoleculeSymCoords(wxCommandEvent &event) {

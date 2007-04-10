@@ -859,7 +859,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 							newPnt.y = newY;
 							newPnt.z = newZ;
   
-							lFrame->AddAtom(periodic_dlg->GetSelectedID(), newPnt);
+							mMainData->NewAtom(periodic_dlg->GetSelectedID(), newPnt);
 						// } 
   
 					oldSelect = -1;

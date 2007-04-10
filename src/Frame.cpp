@@ -231,6 +231,13 @@ mpAtom * Frame::AddAtom(long AtomType, CPoint3D AtomPosition) {
 	  result = &Atoms[NumAtoms];
 	  NumAtoms++;
 	}
+	//Delete any orbitals and normal modes
+	if (Vibs) {
+		delete Vibs;
+		Vibs = NULL;
+	}
+	DeleteOrbitals();
+	while (SurfaceList) DeleteSurface(0);
 	return result;
 }
 bool Frame::IncreaseAtomAllocation(long NumAdditional) {
