@@ -2064,6 +2064,10 @@ const char * DataGroup::GetGAMESSPointGroupText(GAMESSPointGroup p) {
 short DataGroup::SetPointGroup(char *GroupText) {
 	GAMESSPointGroup NewPGroup=invalidPGroup;
 	
+	for (int i=0; i<5; i++) {
+		if (!GroupText[i]) break;
+		if ((GroupText[i]>96)&&(GroupText[i]<123)) GroupText[i] = GroupText[i] - 32;
+	}
 	if (GroupText[0] == 'S') {
 		PGroupOrder = GroupText[2] - 48;
 		GroupText[2]='N';
