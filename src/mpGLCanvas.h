@@ -42,6 +42,7 @@
 #define GL_Popup_Delete_Angle 30024
 #define GL_Popup_Delete_Dihedral 30025
 #define GL_Popup_Delete_Bond 30026
+#define GL_Popup_Lock_To_Annotation 30027
 
 class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
@@ -94,12 +95,13 @@ class MpGLCanvas : public wxGLCanvas {
 		void initGL(void);
 		void interactPopupMenu(int x, int y, bool isAtom);
 		void bondPopupMenu(int x, int y);
-		void annoPopupMenu(int x, int y, int event_id, wxString label);
+		void annoPopupMenu(int x, int y);
 		void measurePopupMenu(int x, int y);
 		int select_stack[4];
 		int select_stack_top;
 
 		bool stale_click;
+		void constrain_position(const int anno_id, double *x, double *y, double *z);
 
 	public:
 		/**
@@ -243,6 +245,7 @@ class MpGLCanvas : public wxGLCanvas {
 		WinPrefs *GetPrefs(void) { return Prefs; }
 		int NumberSelectedAtoms(void) const {return select_stack_top;};
 		void insertAnnotationMenuItems(wxMenu& menu);
+		void ConstrainToAnnotation(wxCommandEvent& event);
 
 	DECLARE_EVENT_TABLE()
 

@@ -30,6 +30,7 @@ class MoleculeData {
 		friend class MpGLCanvas;
 	private:
 		std::vector<Annotation *> Annotations;	//Set of annotations
+		int constrain_anno_id;
 		CPoint3D	*RotCoords;				// The currently displayed, rotated coordinates
 		long		*zBuffer;				// the sorting order for RotCoords
 		Frame *		cFrame;					// pointer to the currently drawn frame
@@ -138,6 +139,13 @@ class MoleculeData {
 		void GetRotationMatrix(Matrix4D copy);
 		int GetAnnotationCount(void) const {return Annotations.size();};
 		void DeleteAllAnnotations(void);
+		void ConstrainToAnnotation(int anno_id) {
+			constrain_anno_id = anno_id;
+		}
+		int GetConstrainAnnotation(void) {
+			return constrain_anno_id;
+		}
+		void RemoveAnnotationConstraint(void) { constrain_anno_id = -1; }
 };
 
 #endif

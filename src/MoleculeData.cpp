@@ -45,6 +45,7 @@ MoleculeData::MoleculeData(void) {
 	InputOptions = NULL;
 	DrawMode = 0;
 	DrawLabels = 0;
+	constrain_anno_id = -1;
 }
 MoleculeData::~MoleculeData(void) {
 	DeleteAllAnnotations();

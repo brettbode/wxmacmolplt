@@ -58,6 +58,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 	mDragWin = NULL;
 	select_stack_top = 0;
 	stale_click = false;
+
 	//Hmm is this the right spot to initialize our GL settings?
 	//initGL();
 }
@@ -508,6 +509,145 @@ void MpGLCanvas::eventActivate(wxActivateEvent &event) {
 	}
 }
 
+void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
+									double *z) {
+
+	Frame *lFrame = mMainData->cFrame;
+	Annotation *anno = mMainData->Annotations[anno_id];
+
+	if (!anno->containsAtom(selected)) {
+		return;
+	}
+
+	int origin_id;
+	CPoint3D origin_pos;
+
+	switch (anno->getType()) {
+		case MP_ANNOTATION_LENGTH:
+			int shifter_id;
+			CPoint3D origin_pos;
+			CPoint3D shifter_pos;
+			float len;
+
+			/* Figure out which atom is moving and
+			 * which is planted. */
+			shifter_id = anno->getAtom(0);
+			if (shifter_id == selected) {
+				origin_id = anno->getAtom(1);
+			} else {
+				origin_id = shifter_id;
+				shifter_id = anno->getAtom(1);
+			}
+
+			lFrame->GetAtomPosition(origin_id, origin_pos);
+			lFrame->GetAtomPosition(shifter_id, shifter_pos);
+
+			CPoint3D bond_vec = origin_pos - shifter_pos;
+			CPoint3D bond_vec2 = shifter_pos - origin_pos;
+			CPoint3D new_vec;
+
+			new_vec.x = origin_pos.x - *x;
+			new_vec.y = origin_pos.y - *y;
+			new_vec.z = origin_pos.z - *z;
+
+			float mu;
+			len = bond_vec.Magnitude();
+			mu = DotProduct3D(&bond_vec, &new_vec) /
+				 (len * len);
+
+			if (fabs(mu) > 1e-6) {
+				*x = origin_pos.x + bond_vec2.x * mu;
+				*y = origin_pos.y + bond_vec2.y * mu;
+				*z = origin_pos.z + bond_vec2.z * mu;
+			}
+
+			break;
+		case MP_ANNOTATION_ANGLE:
+
+			int atom1_id;;
+			int atom2_id;;
+			CPoint3D vec1;
+			CPoint3D vec2;
+			CPoint3D atom1_pos;
+			CPoint3D atom2_pos;
+			CPoint3D new_pos;
+			float radius;
+			CPoint3D normal;
+			CPoint3D vec_new;
+			float dist;
+
+			// Grab the vertex atom for the angle.  If it's also the one trying
+			// to be moved, the user must not be trying to constrain anything,
+			// so we let it move freely.  Or if its not being moved but is
+			// selected, we don't constrain anything.
+			origin_id = anno->getAtom(1);
+			if (selected == origin_id || lFrame->GetAtomSelectState(origin_id)) {
+				return;
+			}
+
+			// Grab other two atoms and all positions.
+			atom1_id = anno->getAtom(0);
+			atom2_id = anno->getAtom(2);
+
+			lFrame->GetAtomPosition(origin_id, origin_pos);
+			lFrame->GetAtomPosition(atom1_id, atom1_pos);
+			lFrame->GetAtomPosition(atom2_id, atom2_pos);
+
+			// Find vectors from vertex atoms to other atoms.
+			vec1 = atom1_pos - origin_pos;
+			vec2 = atom2_pos - origin_pos;
+
+			// We want to find the distance between the vertex atom and the
+			// one clicked on.  That distance will serve as the radius of
+			// the circle that the atom will follow.
+			if (selected == atom1_id) {
+				radius = vec1.Magnitude();
+				if (lFrame->GetAtomSelectState(atom2_id)) {
+					return;
+				}
+			} else {
+				radius = vec2.Magnitude();
+				if (lFrame->GetAtomSelectState(atom1_id)) {
+					return;
+				}
+			}
+
+			// We need to take the mouse point in object space and find the
+			// nearest point on the plane defined by the three angle atoms.
+			// Once that point is on the plane, we can more easily bring it
+			// onto the circle path that the atom can move along.
+			
+			// Calculate the plane's normal.
+			CrossProduct3D(&vec1, &vec2, &normal);
+			Normalize3D(&normal);
+
+			new_pos.x = *x;
+			new_pos.y = *y;
+			new_pos.z = *z;
+
+			// Find vector between point on plane and vertex.  The point's
+			// distance from the plain is just the dot product.
+			vec_new = new_pos - origin_pos;
+			dist = DotProduct3D(&normal, &vec_new);
+
+			// Now, drop that point down to the plane in the direction reverse
+			// to the normal, by the correct distance.  After this, the 
+			// point is on the plane.
+			new_pos = vec_new - normal * dist;
+
+			// Now, we need to reel (or cast) the plane point so it's the
+			// same distance away as the atom originally was.
+			vec_new = new_pos - origin_pos;
+			Normalize3D(&vec_new);
+
+			*x = origin_pos.x + radius * vec_new.x;
+			*y = origin_pos.y + radius * vec_new.y;
+			*z = origin_pos.z + radius * vec_new.z;
+
+			break;
+	}
+}
+
 void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	wxPoint tmpPnt;
@@ -545,6 +685,16 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
+
+	// if (1) { 
+		// printf("event.LeftDown(): %d\n", event.LeftDown()); 
+		// printf("event.LeftUp(): %d\n", event.LeftUp()); 
+		// printf("event.RightDown(): %d\n", event.RightDown()); 
+		// printf("event.RightUp(): %d\n", event.RightUp()); 
+		// printf("event.Dragging(): %d\n", event.Dragging()); 
+		// printf("event.CmdDown(): %d\n", event.CmdDown()); 
+		// printf("event.ShiftDown(): %d\n", event.ShiftDown()); 
+	// } 
 
 	// First handle left mouse down.
 	if (event.LeftDown() || (event.LeftIsDown() && stale_click)) {
@@ -599,9 +749,14 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 		else if (selected < NumAtoms + lFrame->NumBonds +
 				 mMainData->GetAnnotationCount()) {
-			annoPopupMenu(tmpPnt.x, tmpPnt.y, GL_Popup_Delete_Length,
-						  wxT("Delete Annotation"));
+			annoPopupMenu(tmpPnt.x, tmpPnt.y);
 		}
+	}
+
+	else if (event.MiddleDown()) {
+
+		selected = testPicking(tmpPnt.x, tmpPnt.y);
+
 	}
 
 	// If we made it this far, button states haven't changed.  Are we dragging?
@@ -619,8 +774,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 				// If shift is held when an atom is clicked on, we want to
 				// change the depths of either the clicked on or selected
-				// atoms.
-				if (event.ShiftDown()) {
+				// atoms.  Also do this for the middle mouse button.
+				if (event.ShiftDown() || event.MiddleIsDown()) {
 					GLdouble tmpX, tmpY, tmpZ;
 					float depth_offset;
 					float dy = tmpPnt.y - oldTmpPnt.y;
@@ -638,6 +793,12 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 				else {
 					findReal3DCoord(tmpPnt.x - winDiffX, tmpPnt.y - winDiffY,
 									atomDepth, newX, newY, newZ);
+
+					int constrain_anno_id = mMainData->GetConstrainAnnotation();
+					if (constrain_anno_id != -1) {
+						constrain_position(constrain_anno_id, &newX, &newY,
+							&newZ);
+					}
 				}
 
 				// If that atom is a member of the selected atom set, move all
@@ -898,6 +1059,10 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			delete mDragWin;
 			mDragWin = NULL;
 		}
+	}
+
+	else if (event.ButtonUp()) {
+		selected = -1;
 	}
 	
 	oldTmpPnt = tmpPnt;
@@ -1346,11 +1511,37 @@ void MpGLCanvas::measurePopupMenu(int x, int y) {
 
 }
 
-void MpGLCanvas::annoPopupMenu(int x, int y, int event_id, wxString label) {
+void MpGLCanvas::annoPopupMenu(int x, int y) {
 
+	Frame *lFrame = mMainData->cFrame;
 	wxMenu menu;
-	menu.Append(event_id, label);
+	wxMenuItem *item;
+	int anno_id = selected - lFrame->NumAtoms - lFrame->NumBonds;
+
+	if (interactiveMode &&
+		mMainData->Annotations[anno_id]->getType() != MP_ANNOTATION_MARKER) {
+		item = menu.AppendCheckItem(GL_Popup_Lock_To_Annotation,
+				                    "Constrain atoms");
+		if (anno_id == mMainData->GetConstrainAnnotation()) {
+			item->Check(true);
+		}
+	}
+	menu.Append(GL_Popup_Delete_Length, "Delete annotation");
 	PopupMenu(&menu, x, y);
+
+}
+
+void MpGLCanvas::ConstrainToAnnotation(wxCommandEvent& event) {
+
+	Frame *lFrame = mMainData->cFrame;
+	int anno_id = selected - lFrame->NumAtoms - lFrame->NumBonds;
+
+	if (mMainData->GetConstrainAnnotation() != anno_id) {
+		mMainData->ConstrainToAnnotation(selected - lFrame->NumAtoms -
+			lFrame->NumBonds);
+	} else {
+		mMainData->RemoveAnnotationConstraint();
+	}
 
 }
 
@@ -1359,10 +1550,28 @@ void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
 	Frame *lFrame = mMainData->cFrame;
 	int selected_anno = selected - lFrame->NumAtoms - lFrame->NumBonds;
 
-	if ((selected_anno >= 0)&&(selected_anno < mMainData->Annotations.size())) {
-		Annotation * t = mMainData->Annotations[selected_anno];
-		mMainData->Annotations.erase(mMainData->Annotations.begin() + selected_anno);
-		delete t;
+	if (selected_anno < 0 || selected_anno >= mMainData->Annotations.size()) {
+		return;
+	}
+
+	Annotation * t = mMainData->Annotations[selected_anno];
+	mMainData->Annotations.erase(mMainData->Annotations.begin() + selected_anno);
+	delete t;
+
+	int constrain_anno_id = mMainData->GetConstrainAnnotation();
+	if (constrain_anno_id != -1) {
+		/* If we're deleting an annotation that appears earlier in the
+		 * annotation list, we need to shift the id of the constrained
+		 * annotation. */
+		if (constrain_anno_id > selected_anno) {
+			mMainData->ConstrainToAnnotation(constrain_anno_id - 1);
+		}
+		
+		/* Or, we may be deleting the constrained annotation itself, in which
+		 * case, we have no more constraints. */
+		else if (constrain_anno_id == selected_anno) {
+			mMainData->RemoveAnnotationConstraint();
+		}
 	}
 }
 
@@ -1649,6 +1858,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_Delete_Length, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Delete_Angle, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Delete_Dihedral, MpGLCanvas::DeleteAnnotation)
+	EVT_MENU(GL_Popup_Lock_To_Annotation, MpGLCanvas::ConstrainToAnnotation)
 END_EVENT_TABLE()
 
 
