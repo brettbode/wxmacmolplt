@@ -183,7 +183,7 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 	double pi2 = 2.0*acos(-1.0);
 
 	//Start with the rotation around the primary axis (everything except C1, CI, and CS)
-	if ((pg >= GAMESS_CNH) && (pgOrder > 0)) {
+	if ((pg >= GAMESS_CNH)&&(pg<=GAMESS_DN) && (pgOrder > 0)) {
 		for (int i=1; i<pgOrder; i++) {
 			double alpha = i*pi2/((double) pgOrder);
 			double cosa = cos(alpha);
@@ -308,7 +308,7 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 		work[0][0] = work[1][1] = -1.0;
 		work[2][2] = 1.0;
 		AddMatrix(work);
-		for (int i=0; i<7; i++) {
+		for (int i=0; i<8; i++) {
 			operations.push_back(operations[9*i+6]);
 			operations.push_back(operations[9*i+7]);
 			operations.push_back(operations[9*i+8]);
@@ -318,6 +318,11 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 			operations.push_back(operations[9*i+3]);
 			operations.push_back(operations[9*i+4]);
 			operations.push_back(operations[9*i+5]);
+			std::cout << "i = " << i << std::endl <<
+				operations[9*i+6] << " " << operations[9*i+7] << " " << operations[9*i+8] << std::endl <<
+				operations[9*i] << " " << operations[9*i+1] << " " << operations[9*i+2] << std::endl <<
+				operations[9*i+3] << " " << operations[9*i+4] << " " << operations[9*i+5] << std::endl;
+				
 		}
 		//Done with T continue on for others
 		if (pg == GAMESS_TH) {
