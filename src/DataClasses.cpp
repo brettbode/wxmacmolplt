@@ -305,19 +305,19 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 		work[1][1] = 1.0;
 		work[0][0] = work[2][2] = -1.0;
 		AddMatrix(work);
-		work[0][0] = work[1][1] = 1.0;
+		work[0][0] = work[1][1] = -1.0;
 		work[2][2] = 1.0;
 		AddMatrix(work);
 		for (int i=0; i<7; i++) {
 			operations.push_back(operations[9*i+6]);
 			operations.push_back(operations[9*i+7]);
-			operations.push_back(operations[9*i+9]);
+			operations.push_back(operations[9*i+8]);
 			operations.push_back(operations[9*i]);
 			operations.push_back(operations[9*i+1]);
 			operations.push_back(operations[9*i+2]);
+			operations.push_back(operations[9*i+3]);
 			operations.push_back(operations[9*i+4]);
 			operations.push_back(operations[9*i+5]);
-			operations.push_back(operations[9*i+6]);
 		}
 		//Done with T continue on for others
 		if (pg == GAMESS_TH) {
