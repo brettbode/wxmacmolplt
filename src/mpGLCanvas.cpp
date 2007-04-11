@@ -1521,12 +1521,12 @@ void MpGLCanvas::annoPopupMenu(int x, int y) {
 	if (interactiveMode &&
 		mMainData->Annotations[anno_id]->getType() != MP_ANNOTATION_MARKER) {
 		item = menu.AppendCheckItem(GL_Popup_Lock_To_Annotation,
-				                    "Constrain atoms");
+				                    _("Constrain atoms"));
 		if (anno_id == mMainData->GetConstrainAnnotation()) {
 			item->Check(true);
 		}
 	}
-	menu.Append(GL_Popup_Delete_Length, "Delete annotation");
+	menu.Append(GL_Popup_Delete_Length, _("Delete annotation"));
 	PopupMenu(&menu, x, y);
 
 }
