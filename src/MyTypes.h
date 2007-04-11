@@ -263,7 +263,7 @@ class mpAtom {
 		long		fragmentId;
 		short		Type;	//Low byte stores normal atom type, high byte store special bits
 		char		flags;	//bit 0: invisibility, bit 1: select state, bit 2: Is effective fragment
-							//bit 3: Is SIMOMM atom
+							//bit 3: Is SIMOMM atom, bit 4: symmetry unique
 		mpAtom(void) : Type(0), flags(0) {};
 		inline bool GetInvisibility(void) const {return ((flags & 1)? true: false);};	//Bit 1 sets invisibility
 		bool SetInvisibility(bool State) {flags = (flags & 0xFE) + (State? 1:0);return GetInvisibility();};
@@ -275,6 +275,8 @@ class mpAtom {
 		inline void IsEffectiveFragment(bool state) {flags = (Type & 0xFB) + (flags ? (1<<2) : 0);};
 		inline void IsSIMOMMAtom(bool state) {flags = (flags & 0xF7) + (state ? (1<<3) : 0);};
 		inline bool IsSIMOMMAtom(void) const {return ((flags & (1<<3))?true:false);};
+		inline void IsSymmetryUnique(bool state) {flags = (flags & 0xEF) + (state ? (1<<4) : 0);};
+		inline bool IsSymmetryUnique(void) const {return ((flags & (1<<4))?true:false);};
 	// the idea for this one was to have a text label to store pdb style biomolecule, label gives res, res #,
 	// atom type (alpha, beta...), but its not currently implemented
 	//	inline bool HasBiolabel(void) const {return ((Type & (1<<9)) != 0);};

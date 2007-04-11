@@ -633,6 +633,15 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					Buffer->SkipnLines(1);
 				}
 			}
+			if (((MainData->InputOptions->Data->GetCoordType() == UniqueCoordType)||
+				 (MainData->InputOptions->Data->GetCoordType() == 0))&&
+				(MainData->InputOptions->Data->GetPointGroup()>GAMESS_C1)&&
+				(lFrame->GetNumAtoms() > 0)) {
+				//Generate symmetry dependant atoms
+				for (int i=0; i<lFrame->GetNumAtoms(); i++)
+					lFrame->Atoms[i].IsSymmetryUnique(true);
+				MainData->GenerateSymmetryDependantAtoms();
+			}
 		} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTCoordType) {
 			long bPos = Buffer->FindBlankLine();
 			if ((bPos > 0)&&(bPos < EndPos)) {
