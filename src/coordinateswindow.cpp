@@ -136,7 +136,7 @@ CoordinatesWindow::CoordinatesWindow( MolDisplayWin* parent, wxWindowID id, cons
 
 CoordinatesWindow::~CoordinatesWindow( )
 {
-  Parent->SetHighliteMode(false);
+//  Parent->SetHighliteMode(false);
 }
 
 /*!
@@ -151,6 +151,7 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
 	BondButton = NULL;
 	coordTypeChoice = NULL;
 	coordGrid = NULL;
+	needClearAll = true;
 ////@end CoordinatesWindow member initialisation
 	Parent = parent;
 	Prefs = Parent->GetPrefs();
@@ -404,6 +405,7 @@ void CoordinatesWindow::FrameChanged(void) {
 }
 
 void CoordinatesWindow::SizeCols(wxSize & s) {
+	if (coordGrid->GetNumberCols()<=0) return;
 	int width = s.GetWidth() - 66;	//subtract off the row labels and scroll
 	if (CoordType == 0) {
 		int a = (int) (width/6.0);
@@ -433,6 +435,7 @@ void CoordinatesWindow::UpdateSelection(bool mode)
   long natoms = lFrame->GetNumAtoms();
 
   needClearAll = mode;
+
   std::vector<int> selected_ids;
   int visibleRow = 0;
 
@@ -458,6 +461,8 @@ void CoordinatesWindow::UpdateSelection(bool mode)
 
   Layout();
   coordGrid->MakeCellVisible(visibleRow, 0);
+  
+  needClearAll = true;
 
 }
 
@@ -760,7 +765,6 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 
 void CoordinatesWindow::OnSelectCell( wxGridEvent& event )
 {
-  //needClearAll = true;
   if (!needClearAll)
     return;
 
