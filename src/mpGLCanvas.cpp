@@ -562,10 +562,11 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			}
 
 			break;
+
 		case MP_ANNOTATION_ANGLE:
 
-			int atom1_id;;
-			int atom2_id;;
+			int atom1_id;
+			int atom2_id;
 			CPoint3D vec1;
 			CPoint3D vec2;
 			CPoint3D atom1_pos;
@@ -633,7 +634,7 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			// Now, drop that point down to the plane in the direction reverse
 			// to the normal, by the correct distance.  After this, the 
 			// point is on the plane.
-			new_pos = vec_new - normal * dist;
+			new_pos = new_pos - normal * dist;
 
 			// Now, we need to reel (or cast) the plane point so it's the
 			// same distance away as the atom originally was.
@@ -643,6 +644,97 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			*x = origin_pos.x + radius * vec_new.x;
 			*y = origin_pos.y + radius * vec_new.y;
 			*z = origin_pos.z + radius * vec_new.z;
+
+			break;
+		case MP_ANNOTATION_DIHEDRAL:
+
+			{
+			int atom2_id;
+			int atom3_id;
+			CPoint3D vec1;
+			CPoint3D vec2;
+			CPoint3D vec3;
+			CPoint3D atom1_pos;
+			CPoint3D atom2_pos;
+			CPoint3D atom3_pos;
+			CPoint3D new_pos;
+			CPoint3D center_pos;
+			float radius;
+			CPoint3D normal;
+			CPoint3D vec_new;
+			float vec1_len;
+
+			if (selected == anno->getAtom(0)) {
+				if (lFrame->GetAtomSelectState(anno->getAtom(3))) {
+					return;
+				}
+				atom2_id = anno->getAtom(1);
+				atom3_id = anno->getAtom(2);
+			} else if (selected == anno->getAtom(3)) {
+				if (lFrame->GetAtomSelectState(anno->getAtom(0))) {
+					return;
+				}
+				atom2_id = anno->getAtom(2);
+				atom3_id = anno->getAtom(1);
+			} else {
+				return;
+			}
+
+			if (lFrame->GetAtomSelectState(atom2_id) ||
+				lFrame->GetAtomSelectState(atom3_id)) {
+				return;
+			}
+
+			lFrame->GetAtomPosition(selected, atom1_pos);
+			lFrame->GetAtomPosition(atom2_id, atom2_pos);
+			lFrame->GetAtomPosition(atom3_id, atom3_pos);
+
+			vec1 = atom2_pos - atom3_pos;
+			vec2 = atom1_pos - atom3_pos;
+
+			vec1_len = vec1.Magnitude();
+			mu = DotProduct3D(&vec1, &vec2) / (vec1_len * vec1_len);
+
+			if (fabs(mu) > 1e-6f) {
+				center_pos = atom3_pos + vec1 * mu;
+			} else {
+				center_pos = atom1_pos;
+			}
+
+			vec2 = atom1_pos - center_pos;
+			radius = vec2.Magnitude();
+
+			// We need to take the mouse point in object space and find the
+			// nearest point on the plane defined by the three angle atoms.
+			// Once that point is on the plane, we can more easily bring it
+			// onto the circle path that the atom can move along.
+			
+			// Calculate the plane's normal.
+			Normalize3D(&vec1);
+
+			new_pos.x = *x;
+			new_pos.y = *y;
+			new_pos.z = *z;
+
+			// Find vector between point on plane and vertex.  The point's
+			// distance from the plain is just the dot product.
+			vec_new = new_pos - center_pos;
+			dist = DotProduct3D(&vec1, &vec_new);
+
+			// Now, drop that point down to the plane in the direction reverse
+			// to the normal, by the correct distance.  After this, the 
+			// point is on the plane.
+			new_pos = new_pos - vec1 * dist;
+
+			// Now, we need to reel (or cast) the plane point so it's the
+			// same distance away as the atom originally was.
+			vec_new = new_pos - center_pos;
+			Normalize3D(&vec_new);
+
+			*x = center_pos.x + radius * vec_new.x;
+			*y = center_pos.y + radius * vec_new.y;
+			*z = center_pos.z + radius * vec_new.z;
+			}
 
 			break;
 	}
