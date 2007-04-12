@@ -524,6 +524,7 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 
 	switch (anno->getType()) {
 		case MP_ANNOTATION_LENGTH:
+			{
 			int shifter_id;
 			CPoint3D origin_pos;
 			CPoint3D shifter_pos;
@@ -560,11 +561,12 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 				*y = origin_pos.y + bond_vec2.y * mu;
 				*z = origin_pos.z + bond_vec2.z * mu;
 			}
+			}
 
 			break;
 
 		case MP_ANNOTATION_ANGLE:
-
+			{
 			int atom1_id;
 			int atom2_id;
 			CPoint3D vec1;
@@ -644,10 +646,11 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			*x = origin_pos.x + radius * vec_new.x;
 			*y = origin_pos.y + radius * vec_new.y;
 			*z = origin_pos.z + radius * vec_new.z;
+			}
 
 			break;
-		case MP_ANNOTATION_DIHEDRAL:
 
+		case MP_ANNOTATION_DIHEDRAL:
 			{
 			int atom2_id;
 			int atom3_id;
@@ -663,6 +666,7 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			CPoint3D normal;
 			CPoint3D vec_new;
 			float vec1_len;
+			float dist;
 
 			if (selected == anno->getAtom(0)) {
 				if (lFrame->GetAtomSelectState(anno->getAtom(3))) {
@@ -692,6 +696,7 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			vec1 = atom2_pos - atom3_pos;
 			vec2 = atom1_pos - atom3_pos;
 
+			float mu;
 			vec1_len = vec1.Magnitude();
 			mu = DotProduct3D(&vec1, &vec2) / (vec1_len * vec1_len);
 
