@@ -16,7 +16,6 @@ wxmacmolplt_SOURCES =                             \
 	energyplotdialog.cpp    energyplotdialog.h    \
 	exportoptionsdialog.cpp exportoptionsdialog.h \
 	Files.cpp                                     \
-	flashexport.cpp                               \
 	Frame.cpp               Frame.h               \
 	frameenergy.cpp         frameenergy.h         \
 	frequenciesdialog.cpp   frequenciesdialog.h   \
@@ -56,6 +55,8 @@ wxmacmolplt_SOURCES =                             \
 	surfaceswindow.cpp      surfaceswindow.h      \
 							SurfaceTypes.h        \
 	SurfWin.cpp                                   \
+	swfexport.cpp                                 \
+	swfexport-g.cpp         swfexport.h           \
     VirtualSphere.cpp       VirtualSphere.h       \
 	windowparameters.cpp    windowparameters.h    \
 	wxFiles.cpp                                   \

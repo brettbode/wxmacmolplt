@@ -93,6 +93,7 @@
     <string name="external_symbol_filenames">""</string>
     <string name="configuration">"&lt;None&gt;"</string>
     <string name="source_encoding">"utf-8"</string>
+    <string name="xrc_encoding">"utf-8"</string>
     <string name="project_encoding">"utf-8"</string>
     <string name="resource_archive">""</string>
     <long name="text_file_type">0</long>
@@ -183,7 +184,7 @@
       <long name="is-transient">1</long>
       <long name="owns-file">1</long>
       <long name="title-mode">0</long>
-      <long name="locked">0</long>
+      <long name="locked">1</long>
       <document>
         <string name="title">"Windows"</string>
         <string name="type">"html-document"</string>
@@ -207,6 +208,8 @@
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"atom1|int|Atom1|-1"</string>
           <string name="variable-1">"atom2|int|Atom2|-1"</string>
@@ -2144,6 +2147,8 @@
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"Parent|MolDisplayWin *|Parent|"</string>
           <string name="event-handler-0">"wxEVT_CLOSE_WINDOW|OnCloseWindow"</string>
@@ -2581,6 +2586,8 @@
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"Parent|MolDisplayWin *|Parent|"</string>
           <string name="variable-1">"CoordType|int|CoordType|0"</string>
@@ -2985,6 +2992,14 @@
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Stretch factor">0</long>
+            <long name="proxy-Border">5</long>
+            <bool name="proxy-wxLEFT">1</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
+            <bool name="proxy-wxTOP">1</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -3572,6 +3587,8 @@
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"Parent|MolDisplayWin *|Parent|"</string>
           <string name="proxy-Id name">"ID_LLMDIALOG"</string>
@@ -4046,6 +4063,8 @@ geometry with the next geometry."</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"Parent|MolDisplayWin *|Parent|"</string>
           <string name="proxy-Id name">"ID_MYDIALOG"</string>
@@ -4874,6 +4893,8 @@ considered a bond:"</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"flip|bool|Flip|false"</string>
           <string name="variable-1">"skip|long|Skip|"</string>
@@ -5529,6 +5550,8 @@ points read in:"</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"width|int|Width|"</string>
           <string name="variable-1">"height|int|Height|"</string>
@@ -6315,6 +6338,8 @@ points read in:"</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"Parent|MolDisplayWin *|Parent|"</string>
           <string name="proxy-Id name">"ID_MYDIALOG1"</string>
@@ -6703,6 +6728,8 @@ points read in:"</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="proxy-Id name">"ID_DIALOG"</string>
           <long name="proxy-Id value">10053</long>
@@ -7352,6 +7379,8 @@ Modeling, 1998, 16, 133-138."</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="event-handler-0">"wxEVT_CLOSE_WINDOW|OnCloseWindow"</string>
           <string name="proxy-Id name">"ID_EPLOTDIALOG"</string>
@@ -7589,9 +7618,7 @@ Modeling, 1998, 16, 133-138."</string>
                   <string name="proxy-Id name">"ID_EPGRAPH"</string>
                   <long name="proxy-Id value">10000</long>
                   <string name="proxy-Class">"wxMolGraph"</string>
-                  <string name="proxy-Base class">"wxMolGraph"</string>
                   <string name="proxy-Member variable name">"epGraph"</string>
-                  <bool name="proxy-External implementation">1</bool>
                   <string name="proxy-Help text">""</string>
                   <string name="proxy-Tooltip text">""</string>
                   <string name="proxy-Background colour">""</string>
@@ -7634,6 +7661,8 @@ Modeling, 1998, 16, 133-138."</string>
                   <string name="proxy-Event sources">""</string>
                   <string name="proxy-Custom arguments">""</string>
                   <string name="proxy-Custom ctor arguments">"%PARENT%, %IDENTIFIER%"</string>
+                  <string name="proxy-Base class">"wxMolGraph"</string>
+                  <bool name="proxy-External implementation">1</bool>
                 </document>
               </document>
             </document>
@@ -7653,6 +7682,8 @@ Modeling, 1998, 16, 133-138."</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="event-handler-0">"wxEVT_CLOSE_WINDOW|OnCloseWindow"</string>
           <string name="proxy-Id name">"ID_FREQDIALOG"</string>
@@ -8151,9 +8182,7 @@ Modeling, 1998, 16, 133-138."</string>
                     <string name="proxy-Id name">"ID_CUSTOM"</string>
                     <long name="proxy-Id value">10066</long>
                     <string name="proxy-Class">"wxMolGraph"</string>
-                    <string name="proxy-Base class">"wxMolGraph"</string>
                     <string name="proxy-Member variable name">"fGraph"</string>
-                    <bool name="proxy-External implementation">1</bool>
                     <string name="proxy-Help text">""</string>
                     <string name="proxy-Tooltip text">""</string>
                     <string name="proxy-Background colour">""</string>
@@ -8196,6 +8225,8 @@ Modeling, 1998, 16, 133-138."</string>
                     <string name="proxy-Event sources">""</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">"%PARENT%, %IDENTIFIER%"</string>
+                    <string name="proxy-Base class">"wxMolGraph"</string>
+                    <bool name="proxy-External implementation">1</bool>
                     <bool name="proxy-wxCLIP_CHILDREN ">0</bool>
                   </document>
                 </document>
@@ -8217,6 +8248,8 @@ Modeling, 1998, 16, 133-138."</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="proxy-Id name">"ID_DIALOG"</string>
           <long name="proxy-Id value">10055</long>
@@ -8572,6 +8605,8 @@ Modeling, 1998, 16, 133-138."</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"Parent|MolDisplayWin *|Parent|NULL"</string>
           <string name="variable-1">"origCoords|std::vector&lt;CPoint3D&gt;|OrigCoords|"</string>
@@ -9085,6 +9120,8 @@ mass-weighted cartesian space as shown."</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"Parent|MolDisplayWin *|Parent|"</string>
           <string name="proxy-Id name">"ID_MYDIALOG3"</string>
@@ -9831,6 +9868,8 @@ mass-weighted cartesian space as shown."</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"Parent|MolDisplayWin *|Parent|"</string>
           <string name="proxy-Id name">"ID_FRAME"</string>
@@ -10494,6 +10533,8 @@ mass-weighted cartesian space as shown."</string>
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="event-handler-0">"wxEVT_CLOSE_WINDOW|OnCloseWindow"</string>
           <string name="proxy-Id name">"ID_INPUTBUILDERWINDOW"</string>
@@ -11790,13 +11831,14 @@ mass-weighted cartesian space as shown."</string>
                         <string name="proxy-Id name">"wxID_ANY"</string>
                         <string name="proxy-Id value">"-1"</string>
                         <string name="proxy-Label">""</string>
+                        <string name="proxy-Member variable name">""</string>
                         <string name="proxy-Sizer member variable name">""</string>
                         <string name="proxy-Foreground colour">""</string>
                         <string name="proxy-Font">""</string>
                         <bool name="proxy-Hidden">0</bool>
                         <bool name="proxy-Enabled">1</bool>
+                        <string name="proxy-Static box class">"wxStaticBox"</string>
                         <string name="proxy-Orientation">"Vertical"</string>
-                        <string name="proxy-Member variable name">""</string>
                         <string name="proxy-AlignH">"Left"</string>
                         <string name="proxy-AlignV">"Centre"</string>
                         <long name="proxy-Stretch factor">0</long>
@@ -12232,13 +12274,14 @@ mass-weighted cartesian space as shown."</string>
                             <string name="proxy-Id name">"wxID_ANY"</string>
                             <string name="proxy-Id value">"-1"</string>
                             <string name="proxy-Label">""</string>
+                            <string name="proxy-Member variable name">""</string>
                             <string name="proxy-Sizer member variable name">""</string>
                             <string name="proxy-Foreground colour">""</string>
                             <string name="proxy-Font">""</string>
                             <bool name="proxy-Hidden">0</bool>
                             <bool name="proxy-Enabled">1</bool>
+                            <string name="proxy-Static box class">"wxStaticBox"</string>
                             <string name="proxy-Orientation">"Vertical"</string>
-                            <string name="proxy-Member variable name">""</string>
                             <string name="proxy-AlignH">"Expand"</string>
                             <string name="proxy-AlignV">"Centre"</string>
                             <long name="proxy-Stretch factor">0</long>
@@ -12557,13 +12600,14 @@ mass-weighted cartesian space as shown."</string>
                             <string name="proxy-Id name">"wxID_ANY"</string>
                             <string name="proxy-Id value">"-1"</string>
                             <string name="proxy-Label">""</string>
+                            <string name="proxy-Member variable name">""</string>
                             <string name="proxy-Sizer member variable name">""</string>
                             <string name="proxy-Foreground colour">""</string>
                             <string name="proxy-Font">""</string>
                             <bool name="proxy-Hidden">0</bool>
                             <bool name="proxy-Enabled">1</bool>
+                            <string name="proxy-Static box class">"wxStaticBox"</string>
                             <string name="proxy-Orientation">"Vertical"</string>
-                            <string name="proxy-Member variable name">""</string>
                             <string name="proxy-AlignH">"Expand"</string>
                             <string name="proxy-AlignV">"Centre"</string>
                             <long name="proxy-Stretch factor">0</long>
@@ -12862,13 +12906,14 @@ mass-weighted cartesian space as shown."</string>
                           <string name="proxy-Id name">"wxID_ANY"</string>
                           <string name="proxy-Id value">"-1"</string>
                           <string name="proxy-Label">""</string>
+                          <string name="proxy-Member variable name">""</string>
                           <string name="proxy-Sizer member variable name">""</string>
                           <string name="proxy-Foreground colour">""</string>
                           <string name="proxy-Font">""</string>
                           <bool name="proxy-Hidden">0</bool>
                           <bool name="proxy-Enabled">1</bool>
+                          <string name="proxy-Static box class">"wxStaticBox"</string>
                           <string name="proxy-Orientation">"Vertical"</string>
-                          <string name="proxy-Member variable name">""</string>
                           <string name="proxy-AlignH">"Centre"</string>
                           <string name="proxy-AlignV">"Top"</string>
                           <long name="proxy-Stretch factor">0</long>
@@ -13442,13 +13487,14 @@ mass-weighted cartesian space as shown."</string>
                           <string name="proxy-Id name">"wxID_ANY"</string>
                           <string name="proxy-Id value">"-1"</string>
                           <string name="proxy-Label">""</string>
+                          <string name="proxy-Member variable name">""</string>
                           <string name="proxy-Sizer member variable name">""</string>
                           <string name="proxy-Foreground colour">""</string>
                           <string name="proxy-Font">""</string>
                           <bool name="proxy-Hidden">0</bool>
                           <bool name="proxy-Enabled">1</bool>
+                          <string name="proxy-Static box class">"wxStaticBox"</string>
                           <string name="proxy-Orientation">"Vertical"</string>
-                          <string name="proxy-Member variable name">""</string>
                           <string name="proxy-AlignH">"Left"</string>
                           <string name="proxy-AlignV">"Centre"</string>
                           <long name="proxy-Stretch factor">0</long>
@@ -13881,13 +13927,14 @@ mass-weighted cartesian space as shown."</string>
                           <string name="proxy-Id name">"wxID_ANY"</string>
                           <string name="proxy-Id value">"-1"</string>
                           <string name="proxy-Label">""</string>
+                          <string name="proxy-Member variable name">""</string>
                           <string name="proxy-Sizer member variable name">""</string>
                           <string name="proxy-Foreground colour">""</string>
                           <string name="proxy-Font">""</string>
                           <bool name="proxy-Hidden">0</bool>
                           <bool name="proxy-Enabled">1</bool>
+                          <string name="proxy-Static box class">"wxStaticBox"</string>
                           <string name="proxy-Orientation">"Vertical"</string>
-                          <string name="proxy-Member variable name">""</string>
                           <string name="proxy-AlignH">"Left"</string>
                           <string name="proxy-AlignV">"Centre"</string>
                           <long name="proxy-Stretch factor">0</long>
@@ -17128,13 +17175,14 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         <string name="proxy-Id name">"wxID_ANY"</string>
                         <string name="proxy-Id value">"-1"</string>
                         <string name="proxy-Label">""</string>
+                        <string name="proxy-Member variable name">""</string>
                         <string name="proxy-Sizer member variable name">""</string>
                         <string name="proxy-Foreground colour">""</string>
                         <string name="proxy-Font">""</string>
                         <bool name="proxy-Hidden">0</bool>
                         <bool name="proxy-Enabled">1</bool>
+                        <string name="proxy-Static box class">"wxStaticBox"</string>
                         <string name="proxy-Orientation">"Vertical"</string>
-                        <string name="proxy-Member variable name">""</string>
                         <string name="proxy-AlignH">"Left"</string>
                         <string name="proxy-AlignV">"Centre"</string>
                         <long name="proxy-Stretch factor">0</long>
@@ -21704,6 +21752,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"psi|wxString|Psi|"</string>
           <string name="variable-1">"phi|wxString|Phi|"</string>
@@ -23070,6 +23120,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"atom1|wxString|Atom1|"</string>
           <string name="variable-1">"atom2|wxString|Atom2|"</string>
@@ -24336,6 +24388,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="proxy-Id name">"ID_FRAME"</string>
           <long name="proxy-Id value">10070</long>
@@ -25532,9 +25586,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Id name">"ID_3D_COLOR_POSITIVE"</string>
                             <long name="proxy-Id value">10199</long>
                             <string name="proxy-Class">"colorArea"</string>
-                            <string name="proxy-Base class">"colorArea"</string>
                             <string name="proxy-Member variable name">"mOrbColor1"</string>
-                            <bool name="proxy-External implementation">1</bool>
                             <string name="proxy-Help text">""</string>
                             <string name="proxy-Tooltip text">""</string>
                             <string name="proxy-Background colour">""</string>
@@ -25577,6 +25629,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Event sources">""</string>
                             <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                             <string name="proxy-Custom ctor arguments">""</string>
+                            <string name="proxy-Base class">"colorArea"</string>
+                            <bool name="proxy-External implementation">1</bool>
                           </document>
                         </document>
                         <document>
@@ -25677,9 +25731,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Id name">"ID_3D_COLOR_NEGATIVE"</string>
                             <long name="proxy-Id value">10200</long>
                             <string name="proxy-Class">"colorArea"</string>
-                            <string name="proxy-Base class">"colorArea"</string>
                             <string name="proxy-Member variable name">"mOrbColor2"</string>
-                            <bool name="proxy-External implementation">1</bool>
                             <string name="proxy-Help text">""</string>
                             <string name="proxy-Tooltip text">""</string>
                             <string name="proxy-Background colour">""</string>
@@ -25722,6 +25774,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Event sources">""</string>
                             <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                             <string name="proxy-Custom ctor arguments">""</string>
+                            <string name="proxy-Base class">"colorArea"</string>
+                            <bool name="proxy-External implementation">1</bool>
                           </document>
                         </document>
                         <document>
@@ -25822,9 +25876,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Id name">"ID_TRANSPARENCY_COLOR"</string>
                             <long name="proxy-Id value">10201</long>
                             <string name="proxy-Class">"colorArea"</string>
-                            <string name="proxy-Base class">"colorArea"</string>
                             <string name="proxy-Member variable name">"mTransColor"</string>
-                            <bool name="proxy-External implementation">1</bool>
                             <string name="proxy-Help text">""</string>
                             <string name="proxy-Tooltip text">""</string>
                             <string name="proxy-Background colour">""</string>
@@ -25867,6 +25919,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Event sources">""</string>
                             <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                             <string name="proxy-Custom ctor arguments">""</string>
+                            <string name="proxy-Base class">"colorArea"</string>
+                            <bool name="proxy-External implementation">1</bool>
                           </document>
                         </document>
                       </document>
@@ -27105,9 +27159,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Id name">"ID_2D_COLOR_POSITIVE"</string>
                             <long name="proxy-Id value">10008</long>
                             <string name="proxy-Class">"colorArea"</string>
-                            <string name="proxy-Base class">"colorArea"</string>
                             <string name="proxy-Member variable name">"mOrbColor1"</string>
-                            <bool name="proxy-External implementation">1</bool>
                             <string name="proxy-Help text">""</string>
                             <string name="proxy-Tooltip text">""</string>
                             <string name="proxy-Background colour">""</string>
@@ -27150,6 +27202,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Event sources">""</string>
                             <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                             <string name="proxy-Custom ctor arguments">""</string>
+                            <string name="proxy-Base class">"colorArea"</string>
+                            <bool name="proxy-External implementation">1</bool>
                           </document>
                         </document>
                         <document>
@@ -27250,9 +27304,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Id name">"ID_2D_COLOR_NEGATIVE"</string>
                             <long name="proxy-Id value">10208</long>
                             <string name="proxy-Class">"colorArea"</string>
-                            <string name="proxy-Base class">"colorArea"</string>
                             <string name="proxy-Member variable name">"mOrbColor2"</string>
-                            <bool name="proxy-External implementation">1</bool>
                             <string name="proxy-Help text">""</string>
                             <string name="proxy-Tooltip text">""</string>
                             <string name="proxy-Background colour">""</string>
@@ -27295,6 +27347,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Event sources">""</string>
                             <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                             <string name="proxy-Custom ctor arguments">""</string>
+                            <string name="proxy-Base class">"colorArea"</string>
+                            <bool name="proxy-External implementation">1</bool>
                           </document>
                         </document>
                       </document>
@@ -28479,9 +28533,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                           <string name="proxy-Id name">"ID_2D_COLOR_POSITIVE"</string>
                           <long name="proxy-Id value">10008</long>
                           <string name="proxy-Class">"colorArea"</string>
-                          <string name="proxy-Base class">"colorArea"</string>
                           <string name="proxy-Member variable name">"mOrbColor1"</string>
-                          <bool name="proxy-External implementation">1</bool>
                           <string name="proxy-Help text">""</string>
                           <string name="proxy-Tooltip text">""</string>
                           <string name="proxy-Background colour">""</string>
@@ -28524,6 +28576,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                           <string name="proxy-Event sources">""</string>
                           <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                           <string name="proxy-Custom ctor arguments">""</string>
+                          <string name="proxy-Base class">"colorArea"</string>
+                          <bool name="proxy-External implementation">1</bool>
                         </document>
                       </document>
                       <document>
@@ -30272,9 +30326,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Id name">"ID_3D_COLOR_POSITIVE"</string>
                               <long name="proxy-Id value">10199</long>
                               <string name="proxy-Class">"colorArea"</string>
-                              <string name="proxy-Base class">"colorArea"</string>
                               <string name="proxy-Member variable name">"mOrbColor1"</string>
-                              <bool name="proxy-External implementation">1</bool>
                               <string name="proxy-Help text">""</string>
                               <string name="proxy-Tooltip text">""</string>
                               <string name="proxy-Background colour">""</string>
@@ -30317,6 +30369,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Event sources">""</string>
                               <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                               <string name="proxy-Custom ctor arguments">""</string>
+                              <string name="proxy-Base class">"colorArea"</string>
+                              <bool name="proxy-External implementation">1</bool>
                             </document>
                             <document>
                               <string name="title">"colorArea: ID_3D_COLOR_NEGATIVE"</string>
@@ -30332,9 +30386,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Id name">"ID_3D_COLOR_NEGATIVE"</string>
                               <long name="proxy-Id value">10200</long>
                               <string name="proxy-Class">"colorArea"</string>
-                              <string name="proxy-Base class">"colorArea"</string>
                               <string name="proxy-Member variable name">"mOrbColor2"</string>
-                              <bool name="proxy-External implementation">0</bool>
                               <string name="proxy-Help text">""</string>
                               <string name="proxy-Tooltip text">""</string>
                               <string name="proxy-Background colour">""</string>
@@ -30377,6 +30429,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Event sources">""</string>
                               <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                               <string name="proxy-Custom ctor arguments">""</string>
+                              <string name="proxy-Base class">"colorArea"</string>
+                              <bool name="proxy-External implementation">0</bool>
                             </document>
                           </document>
                           <document>
@@ -30477,9 +30531,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Id name">"ID_TRANSPARENCY_COLOR"</string>
                               <long name="proxy-Id value">10201</long>
                               <string name="proxy-Class">"colorArea"</string>
-                              <string name="proxy-Base class">"colorArea"</string>
                               <string name="proxy-Member variable name">"mTransColor"</string>
-                              <bool name="proxy-External implementation">1</bool>
                               <string name="proxy-Help text">""</string>
                               <string name="proxy-Tooltip text">""</string>
                               <string name="proxy-Background colour">""</string>
@@ -30522,6 +30574,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Event sources">""</string>
                               <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                               <string name="proxy-Custom ctor arguments">""</string>
+                              <string name="proxy-Base class">"colorArea"</string>
+                              <bool name="proxy-External implementation">1</bool>
                             </document>
                           </document>
                           <document>
@@ -31917,9 +31971,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Id name">"ID_2D_COLOR_POSITIVE"</string>
                             <long name="proxy-Id value">10008</long>
                             <string name="proxy-Class">"colorArea"</string>
-                            <string name="proxy-Base class">"colorArea"</string>
                             <string name="proxy-Member variable name">"mOrbColor1"</string>
-                            <bool name="proxy-External implementation">1</bool>
                             <string name="proxy-Help text">""</string>
                             <string name="proxy-Tooltip text">""</string>
                             <string name="proxy-Background colour">""</string>
@@ -31962,6 +32014,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Event sources">""</string>
                             <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                             <string name="proxy-Custom ctor arguments">""</string>
+                            <string name="proxy-Base class">"colorArea"</string>
+                            <bool name="proxy-External implementation">1</bool>
                           </document>
                         </document>
                         <document>
@@ -32062,9 +32116,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Id name">"ID_2D_COLOR_NEGATIVE"</string>
                             <long name="proxy-Id value">10208</long>
                             <string name="proxy-Class">"colorArea"</string>
-                            <string name="proxy-Base class">"colorArea"</string>
                             <string name="proxy-Member variable name">"mOrbColor2"</string>
-                            <bool name="proxy-External implementation">1</bool>
                             <string name="proxy-Help text">""</string>
                             <string name="proxy-Tooltip text">""</string>
                             <string name="proxy-Background colour">""</string>
@@ -32107,6 +32159,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                             <string name="proxy-Event sources">""</string>
                             <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                             <string name="proxy-Custom ctor arguments">""</string>
+                            <string name="proxy-Base class">"colorArea"</string>
+                            <bool name="proxy-External implementation">1</bool>
                           </document>
                         </document>
                       </document>
@@ -33490,9 +33544,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Id name">"ID_3D_COLOR_POSITIVE"</string>
                               <long name="proxy-Id value">10199</long>
                               <string name="proxy-Class">"colorArea"</string>
-                              <string name="proxy-Base class">"colorArea"</string>
                               <string name="proxy-Member variable name">"mOrbColor1"</string>
-                              <bool name="proxy-External implementation">1</bool>
                               <string name="proxy-Help text">""</string>
                               <string name="proxy-Tooltip text">""</string>
                               <string name="proxy-Background colour">""</string>
@@ -33535,6 +33587,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Event sources">""</string>
                               <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                               <string name="proxy-Custom ctor arguments">""</string>
+                              <string name="proxy-Base class">"colorArea"</string>
+                              <bool name="proxy-External implementation">1</bool>
                             </document>
                             <document>
                               <string name="title">"colorArea: ID_3D_COLOR_NEGATIVE"</string>
@@ -33550,9 +33604,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Id name">"ID_3D_COLOR_NEGATIVE"</string>
                               <long name="proxy-Id value">10200</long>
                               <string name="proxy-Class">"colorArea"</string>
-                              <string name="proxy-Base class">"colorArea"</string>
                               <string name="proxy-Member variable name">"mOrbColor2"</string>
-                              <bool name="proxy-External implementation">0</bool>
                               <string name="proxy-Help text">""</string>
                               <string name="proxy-Tooltip text">""</string>
                               <string name="proxy-Background colour">""</string>
@@ -33595,6 +33647,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Event sources">""</string>
                               <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                               <string name="proxy-Custom ctor arguments">""</string>
+                              <string name="proxy-Base class">"colorArea"</string>
+                              <bool name="proxy-External implementation">0</bool>
                             </document>
                           </document>
                           <document>
@@ -33695,9 +33749,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Id name">"ID_TRANSPARENCY_COLOR"</string>
                               <long name="proxy-Id value">10201</long>
                               <string name="proxy-Class">"colorArea"</string>
-                              <string name="proxy-Base class">"colorArea"</string>
                               <string name="proxy-Member variable name">"mTransColor"</string>
-                              <bool name="proxy-External implementation">1</bool>
                               <string name="proxy-Help text">""</string>
                               <string name="proxy-Tooltip text">""</string>
                               <string name="proxy-Background colour">""</string>
@@ -33740,6 +33792,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                               <string name="proxy-Event sources">""</string>
                               <string name="proxy-Custom arguments">"%PARENT%, %IDENTIFIER%, %POSITION%, %SIZE%, %STYLE%"</string>
                               <string name="proxy-Custom ctor arguments">""</string>
+                              <string name="proxy-Base class">"colorArea"</string>
+                              <bool name="proxy-External implementation">1</bool>
                             </document>
                           </document>
                           <document>
@@ -34135,6 +34189,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
           <long name="base-id">10000</long>
           <bool name="use-id-prefix">0</bool>
           <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="proxy-Id name">"ID_QTEXPORT"</string>
           <long name="proxy-Id value">10246</long>
@@ -34201,14 +34257,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -34753,6 +34801,332 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                 <string name="proxy-Member variable name">""</string>
                 <string name="proxy-Label">"&amp;OK"</string>
                 <bool name="proxy-Default">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Background colour">""</string>
+                <string name="proxy-Foreground colour">""</string>
+                <string name="proxy-Font">""</string>
+                <bool name="proxy-Hidden">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <bool name="proxy-wxBU_LEFT">0</bool>
+                <bool name="proxy-wxBU_RIGHT">0</bool>
+                <bool name="proxy-wxBU_TOP">0</bool>
+                <bool name="proxy-wxBU_BOTTOM">0</bool>
+                <bool name="proxy-wxBU_EXACTFIT">0</bool>
+                <bool name="proxy-wxNO_BORDER">0</bool>
+                <bool name="proxy-wxWANTS_CHARS">0</bool>
+                <bool name="proxy-wxNO_FULL_REPAINT_ON_RESIZE">0</bool>
+                <bool name="proxy-wxFULL_REPAINT_ON_RESIZE">0</bool>
+                <string name="proxy-Custom styles">""</string>
+                <long name="proxy-X">-1</long>
+                <long name="proxy-Y">-1</long>
+                <long name="proxy-Width">-1</long>
+                <long name="proxy-Height">-1</long>
+                <string name="proxy-AlignH">"Centre"</string>
+                <string name="proxy-AlignV">"Centre"</string>
+                <long name="proxy-Stretch factor">0</long>
+                <long name="proxy-Border">5</long>
+                <bool name="proxy-wxLEFT">1</bool>
+                <bool name="proxy-wxRIGHT">1</bool>
+                <bool name="proxy-wxTOP">1</bool>
+                <bool name="proxy-wxBOTTOM">1</bool>
+                <bool name="proxy-wxSHAPED">0</bool>
+                <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+                <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+                <string name="proxy-Custom arguments">""</string>
+                <string name="proxy-Custom ctor arguments">""</string>
+              </document>
+            </document>
+          </document>
+        </document>
+        <document>
+          <string name="title">"SWFExport"</string>
+          <string name="type">"dialog-document"</string>
+          <string name="filename">""</string>
+          <string name="icon-name">"dialog"</string>
+          <long name="is-transient">0</long>
+          <long name="owns-file">1</long>
+          <long name="title-mode">0</long>
+          <long name="locked">0</long>
+          <string name="created">"12/4/2007"</string>
+          <string name="proxy-type">"wbDialogProxy"</string>
+          <long name="base-id">10000</long>
+          <bool name="use-id-prefix">0</bool>
+          <string name="id-prefix">""</string>
+          <bool name="use-id-suffix">0</bool>
+          <string name="id-suffix">""</string>
+          <long name="use-xrc">0</long>
+          <string name="proxy-Id name">"ID_SWFEXPORT"</string>
+          <long name="proxy-Id value">10251</long>
+          <string name="proxy-Class">"SWFExport"</string>
+          <string name="proxy-Base class">"wxDialog"</string>
+          <string name="proxy-Window kind">"wxDialog"</string>
+          <string name="proxy-Implementation filename">"swfexport-g.cpp"</string>
+          <string name="proxy-Header filename">"swfexport.h"</string>
+          <string name="proxy-XRC filename">""</string>
+          <string name="proxy-Title">"Movie Options"</string>
+          <bool name="proxy-Centre">1</bool>
+          <string name="proxy-Icon">""</string>
+          <bool name="proxy-Dialog units">0</bool>
+          <string name="proxy-Help text">""</string>
+          <string name="proxy-Tooltip text">""</string>
+          <string name="proxy-Background colour">""</string>
+          <string name="proxy-Foreground colour">""</string>
+          <string name="proxy-Font">""</string>
+          <bool name="proxy-Hidden">0</bool>
+          <bool name="proxy-Enabled">1</bool>
+          <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+          <bool name="proxy-wxDEFAULT_DIALOG_STYLE">0</bool>
+          <bool name="proxy-wxCAPTION">1</bool>
+          <bool name="proxy-wxRESIZE_BORDER">1</bool>
+          <bool name="proxy-wxTHICK_FRAME">0</bool>
+          <bool name="proxy-wxSYSTEM_MENU">1</bool>
+          <bool name="proxy-wxSTAY_ON_TOP">0</bool>
+          <bool name="proxy-wxDIALOG_NO_PARENT">0</bool>
+          <bool name="proxy-wxCLOSE_BOX">1</bool>
+          <bool name="proxy-wxMAXIMIZE_BOX">0</bool>
+          <bool name="proxy-wxMINIMIZE_BOX">0</bool>
+          <bool name="proxy-wxDIALOG_MODAL">1</bool>
+          <bool name="proxy-wxNO_BORDER">0</bool>
+          <bool name="proxy-wxSIMPLE_BORDER">0</bool>
+          <bool name="proxy-wxDOUBLE_BORDER">0</bool>
+          <bool name="proxy-wxSUNKEN_BORDER">0</bool>
+          <bool name="proxy-wxRAISED_BORDER">0</bool>
+          <bool name="proxy-wxSTATIC_BORDER">0</bool>
+          <bool name="proxy-wxWANTS_CHARS">0</bool>
+          <bool name="proxy-wxNO_FULL_REPAINT_ON_RESIZE">0</bool>
+          <bool name="proxy-wxFULL_REPAINT_ON_RESIZE">0</bool>
+          <bool name="proxy-wxCLIP_CHILDREN">0</bool>
+          <bool name="proxy-wxTAB_TRAVERSAL">0</bool>
+          <bool name="proxy-wxWS_EX_VALIDATE_RECURSIVELY">0</bool>
+          <bool name="proxy-wxWS_EX_BLOCK_EVENTS">1</bool>
+          <bool name="proxy-wxWS_EX_TRANSIENT">0</bool>
+          <string name="proxy-Custom styles">""</string>
+          <bool name="proxy-wxDIALOG_EX_CONTEXTHELP">0</bool>
+          <bool name="proxy-Fit to content">1</bool>
+          <long name="proxy-X">-1</long>
+          <long name="proxy-Y">-1</long>
+          <long name="proxy-Width">400</long>
+          <long name="proxy-Height">300</long>
+          <string name="proxy-Event sources">""</string>
+          <document>
+            <string name="title">"wxBoxSizer V"</string>
+            <string name="type">"dialog-control-document"</string>
+            <string name="filename">""</string>
+            <string name="icon-name">"sizer"</string>
+            <long name="is-transient">0</long>
+            <long name="owns-file">1</long>
+            <long name="title-mode">0</long>
+            <long name="locked">0</long>
+            <string name="proxy-type">"wbBoxSizerProxy"</string>
+            <string name="proxy-Orientation">"Vertical"</string>
+            <string name="proxy-Member variable name">""</string>
+            <bool name="proxy-wxSHAPED">0</bool>
+            <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+            <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+            <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+            <document>
+              <string name="title">"wxRadioBox: ID_SWF_MOVIE_RADIO"</string>
+              <string name="type">"dialog-control-document"</string>
+              <string name="filename">""</string>
+              <string name="icon-name">"radiobox"</string>
+              <long name="is-transient">0</long>
+              <long name="owns-file">1</long>
+              <long name="title-mode">0</long>
+              <long name="locked">0</long>
+              <string name="created">"12/4/2007"</string>
+              <string name="proxy-type">"wbRadioBoxProxy"</string>
+              <string name="proxy-Id name">"ID_SWF_MOVIE_RADIO"</string>
+              <long name="proxy-Id value">10252</long>
+              <string name="proxy-Class">"wxRadioBox"</string>
+              <string name="proxy-Member variable name">"mMovieType"</string>
+              <string name="proxy-Label">"Radiobox"</string>
+              <long name="proxy-Major dimension count">0</long>
+              <string name="proxy-Items">"&amp;Frame Animation|&amp;Normal Mode animation"</string>
+              <long name="proxy-Initial value">0</long>
+              <string name="proxy-Help text">""</string>
+              <string name="proxy-Tooltip text">""</string>
+              <string name="proxy-Background colour">""</string>
+              <string name="proxy-Foreground colour">""</string>
+              <string name="proxy-Font">""</string>
+              <bool name="proxy-Hidden">0</bool>
+              <bool name="proxy-Enabled">1</bool>
+              <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              <string name="proxy-Data variable">""</string>
+              <string name="proxy-Data validator">""</string>
+              <bool name="proxy-wxRA_SPECIFY_ROWS">1</bool>
+              <bool name="proxy-wxRA_SPECIFY_COLS">0</bool>
+              <bool name="proxy-wxWANTS_CHARS">0</bool>
+              <bool name="proxy-wxNO_FULL_REPAINT_ON_RESIZE">0</bool>
+              <bool name="proxy-wxFULL_REPAINT_ON_RESIZE">0</bool>
+              <string name="proxy-Custom styles">""</string>
+              <long name="proxy-X">-1</long>
+              <long name="proxy-Y">-1</long>
+              <long name="proxy-Width">-1</long>
+              <long name="proxy-Height">-1</long>
+              <string name="proxy-AlignH">"Centre"</string>
+              <string name="proxy-AlignV">"Centre"</string>
+              <long name="proxy-Stretch factor">0</long>
+              <long name="proxy-Border">5</long>
+              <bool name="proxy-wxLEFT">1</bool>
+              <bool name="proxy-wxRIGHT">1</bool>
+              <bool name="proxy-wxTOP">1</bool>
+              <bool name="proxy-wxBOTTOM">1</bool>
+              <bool name="proxy-wxSHAPED">0</bool>
+              <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+              <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+              <string name="proxy-Custom arguments">""</string>
+              <string name="proxy-Custom ctor arguments">""</string>
+            </document>
+            <document>
+              <string name="title">"wxCheckBox: ID_EPLOT_CHECK"</string>
+              <string name="type">"dialog-control-document"</string>
+              <string name="filename">""</string>
+              <string name="icon-name">"checkbox"</string>
+              <long name="is-transient">0</long>
+              <long name="owns-file">1</long>
+              <long name="title-mode">0</long>
+              <long name="locked">0</long>
+              <string name="created">"12/4/2007"</string>
+              <string name="proxy-type">"wbCheckBoxProxy"</string>
+              <string name="proxy-Id name">"ID_EPLOT_CHECK"</string>
+              <long name="proxy-Id value">10253</long>
+              <string name="proxy-Class">"wxCheckBox"</string>
+              <string name="proxy-Member variable name">"mEPlotCheck"</string>
+              <string name="proxy-Label">"Include Energy Plot"</string>
+              <bool name="proxy-Initial value">0</bool>
+              <string name="proxy-Help text">""</string>
+              <string name="proxy-Tooltip text">"click to display the energy plot next to the animation for the frame animation."</string>
+              <string name="proxy-Data variable">""</string>
+              <string name="proxy-Data validator">""</string>
+              <string name="proxy-Background colour">""</string>
+              <string name="proxy-Foreground colour">""</string>
+              <string name="proxy-Font">""</string>
+              <bool name="proxy-Hidden">0</bool>
+              <bool name="proxy-Enabled">1</bool>
+              <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              <bool name="proxy-wxALIGN_RIGHT">0</bool>
+              <bool name="proxy-wxCHK_2STATE">0</bool>
+              <bool name="proxy-wxCHK_3STATE">0</bool>
+              <bool name="proxy-wxCHK_ALLOW_3RD_STATE_FOR_USER">0</bool>
+              <bool name="proxy-wxWANTS_CHARS">0</bool>
+              <bool name="proxy-wxNO_FULL_REPAINT_ON_RESIZE">0</bool>
+              <bool name="proxy-wxFULL_REPAINT_ON_RESIZE">0</bool>
+              <string name="proxy-Custom styles">""</string>
+              <long name="proxy-X">-1</long>
+              <long name="proxy-Y">-1</long>
+              <long name="proxy-Width">-1</long>
+              <long name="proxy-Height">-1</long>
+              <string name="proxy-AlignH">"Centre"</string>
+              <string name="proxy-AlignV">"Centre"</string>
+              <long name="proxy-Stretch factor">0</long>
+              <long name="proxy-Border">5</long>
+              <bool name="proxy-wxLEFT">1</bool>
+              <bool name="proxy-wxRIGHT">1</bool>
+              <bool name="proxy-wxTOP">1</bool>
+              <bool name="proxy-wxBOTTOM">1</bool>
+              <bool name="proxy-wxSHAPED">0</bool>
+              <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+              <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+              <string name="proxy-Custom arguments">""</string>
+              <string name="proxy-Custom ctor arguments">""</string>
+            </document>
+            <document>
+              <string name="title">"wxBoxSizer H"</string>
+              <string name="type">"dialog-control-document"</string>
+              <string name="filename">""</string>
+              <string name="icon-name">"sizer"</string>
+              <long name="is-transient">0</long>
+              <long name="owns-file">1</long>
+              <long name="title-mode">0</long>
+              <long name="locked">0</long>
+              <string name="created">"12/4/2007"</string>
+              <string name="proxy-type">"wbBoxSizerProxy"</string>
+              <string name="proxy-Orientation">"Horizontal"</string>
+              <string name="proxy-Member variable name">""</string>
+              <string name="proxy-AlignH">"Right"</string>
+              <string name="proxy-AlignV">"Centre"</string>
+              <long name="proxy-Stretch factor">0</long>
+              <long name="proxy-Border">5</long>
+              <bool name="proxy-wxLEFT">1</bool>
+              <bool name="proxy-wxRIGHT">1</bool>
+              <bool name="proxy-wxTOP">1</bool>
+              <bool name="proxy-wxBOTTOM">1</bool>
+              <bool name="proxy-wxSHAPED">0</bool>
+              <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+              <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+              <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              <document>
+                <string name="title">"wxButton: wxID_CANCEL"</string>
+                <string name="type">"dialog-control-document"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"dialogcontrol"</string>
+                <long name="is-transient">0</long>
+                <long name="owns-file">1</long>
+                <long name="title-mode">0</long>
+                <long name="locked">0</long>
+                <string name="created">"12/4/2007"</string>
+                <string name="proxy-type">"wbButtonProxy"</string>
+                <string name="proxy-Id name">"wxID_CANCEL"</string>
+                <long name="proxy-Id value">5101</long>
+                <string name="proxy-Class">"wxButton"</string>
+                <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Label">"&amp;Cancel"</string>
+                <bool name="proxy-Default">0</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Background colour">""</string>
+                <string name="proxy-Foreground colour">""</string>
+                <string name="proxy-Font">""</string>
+                <bool name="proxy-Hidden">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <bool name="proxy-wxBU_LEFT">0</bool>
+                <bool name="proxy-wxBU_RIGHT">0</bool>
+                <bool name="proxy-wxBU_TOP">0</bool>
+                <bool name="proxy-wxBU_BOTTOM">0</bool>
+                <bool name="proxy-wxBU_EXACTFIT">0</bool>
+                <bool name="proxy-wxNO_BORDER">0</bool>
+                <bool name="proxy-wxWANTS_CHARS">0</bool>
+                <bool name="proxy-wxNO_FULL_REPAINT_ON_RESIZE">0</bool>
+                <bool name="proxy-wxFULL_REPAINT_ON_RESIZE">0</bool>
+                <string name="proxy-Custom styles">""</string>
+                <long name="proxy-X">-1</long>
+                <long name="proxy-Y">-1</long>
+                <long name="proxy-Width">-1</long>
+                <long name="proxy-Height">-1</long>
+                <string name="proxy-AlignH">"Centre"</string>
+                <string name="proxy-AlignV">"Centre"</string>
+                <long name="proxy-Stretch factor">0</long>
+                <long name="proxy-Border">5</long>
+                <bool name="proxy-wxLEFT">1</bool>
+                <bool name="proxy-wxRIGHT">1</bool>
+                <bool name="proxy-wxTOP">1</bool>
+                <bool name="proxy-wxBOTTOM">1</bool>
+                <bool name="proxy-wxSHAPED">0</bool>
+                <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+                <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+                <string name="proxy-Custom arguments">""</string>
+                <string name="proxy-Custom ctor arguments">""</string>
+              </document>
+              <document>
+                <string name="title">"wxButton: wxID_OK"</string>
+                <string name="type">"dialog-control-document"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"dialogcontrol"</string>
+                <long name="is-transient">0</long>
+                <long name="owns-file">1</long>
+                <long name="title-mode">0</long>
+                <long name="locked">0</long>
+                <string name="created">"12/4/2007"</string>
+                <string name="proxy-type">"wbButtonProxy"</string>
+                <string name="proxy-Id name">"wxID_OK"</string>
+                <long name="proxy-Id value">5100</long>
+                <string name="proxy-Class">"wxButton"</string>
+                <string name="proxy-Member variable name">""</string>
+                <string name="proxy-Label">"&amp;OK"</string>
+                <bool name="proxy-Default">0</bool>
                 <string name="proxy-Help text">""</string>
                 <string name="proxy-Tooltip text">""</string>
                 <string name="proxy-Background colour">""</string>
