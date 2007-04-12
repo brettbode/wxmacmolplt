@@ -318,11 +318,6 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 			operations.push_back(operations[9*i+3]);
 			operations.push_back(operations[9*i+4]);
 			operations.push_back(operations[9*i+5]);
-			std::cout << "i = " << i << std::endl <<
-				operations[9*i+6] << " " << operations[9*i+7] << " " << operations[9*i+8] << std::endl <<
-				operations[9*i] << " " << operations[9*i+1] << " " << operations[9*i+2] << std::endl <<
-				operations[9*i+3] << " " << operations[9*i+4] << " " << operations[9*i+5] << std::endl;
-				
 		}
 		//Done with T continue on for others
 		if (pg == GAMESS_TH) {
@@ -331,7 +326,7 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 			for (int i=0; i<count; i++) {
 				operations.push_back( - operations[i]);
 			}
-		} else if (pg >= GAMESS_TD) {
+		} else if ((pg == GAMESS_TD)||(pg == GAMESS_OH)||(pg == GAMESS_O)) {
 			//Octahedral groups are a direct product of T and a C4 rotation
 			//TD group is direct product of T and a reflection plane (X=Y)
 			double sign = -1.0;
