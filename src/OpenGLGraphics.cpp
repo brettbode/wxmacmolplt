@@ -814,12 +814,14 @@ void MolDisplayWin::DrawGL(void)
 	if (MainData->GetAnnotationCount() > 0) {
 		RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
 		long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
+		float anno_color[3];
 		
 		//choose black or white based on the background color
-		if (backMagnitude > 70000)  //"light" background choose black
-			glColor3f (0.0, 0.0, 0.0);
-		else
-			glColor3f (1.0, 1.0, 1.0);
+		if (backMagnitude > 70000) {  //"light" background choose black
+			anno_color[0] = anno_color[1] = anno_color[2] = 0.0f;
+		} else {
+			anno_color[0] = anno_color[1] = anno_color[2] = 1.0f;
+		}
 		
 		std::vector<Annotation *>::const_iterator anno;
 		int anno_id = 0;
@@ -827,6 +829,7 @@ void MolDisplayWin::DrawGL(void)
 			 anno != MainData->Annotations.end(); anno++) {
 			glLoadName(anno_id + MainData->cFrame->GetNumAtoms() +
 						MainData->cFrame->GetNumBonds() + 1);
+			glColor3fv(anno_color);
 			(*anno)->draw(this);
 			anno_id++;
 		}
@@ -1064,7 +1067,7 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	CPoint3D atom2_pos;
 	CPoint3D atom3_pos;
 	CPoint3D atom4_pos;
-	CPoint3D vec1;
+	CPoint3D vec[2];
 	CPoint3D vec2;
 	CPoint3D normal1;
 	CPoint3D normal2;
@@ -1073,27 +1076,6 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	Matrix4D plane2xy;
 	float angle;
 	GLuint stipple_tex;
-	
-	float stipple_data[64] = {
-		0, 0, 1, 0, 0, 0, 1, 0,
-		1, 0, 0, 0, 1, 0, 0, 0,
-		0, 0, 1, 0, 0, 0, 1, 0,
-		1, 0, 0, 0, 1, 0, 0, 0,
-		0, 0, 1, 0, 0, 0, 1, 0,
-		1, 0, 0, 0, 1, 0, 0, 0,
-		0, 0, 1, 0, 0, 0, 1, 0,
-		1, 0, 0, 0, 1, 0, 0, 0,
-	};
-
-	glGenTextures(1, &stipple_tex);
-	glBindTexture(GL_TEXTURE_2D, stipple_tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 8, 8, 0, GL_ALPHA,
-				 GL_FLOAT, stipple_data);
 	
 	glDisable(GL_LIGHTING);
 	
@@ -1110,67 +1092,20 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	
 	// Find the first plane's normal by finding the vectors between its
 	// points and calculating the normal from them.
-	vec1 = atom1_pos - atom3_pos;
-	Normalize3D(&vec1);
+	vec[0] = atom1_pos - atom3_pos;
+	Normalize3D(&vec[0]);
 	
 	vec2 = atom2_pos - atom3_pos;
 	Normalize3D(&vec2);
 	
-	CrossProduct3D(&vec1, &vec2, &normal1);
-	
-	// Make this plane look like the x-y plane for easier circle
-	// drawing.  The vector from atom3 to atom2 should look like
-	// the positive x-axis.
-	SetPlaneRotation(plane2xy, vec2, vec1);
-	
-	// Draw a half circle in the first plane.
-	glEnable(GL_ALPHA_TEST);
-	glAlphaFunc(GL_GREATER, 0.5f);
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, stipple_tex);
-	
-	glPushMatrix();
-	glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
-	glMultMatrixf((GLfloat *) plane2xy);
-	glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
-	glBegin(GL_TRIANGLE_FAN);
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
-		glTexCoord2f(cos(angle) * 5.0f, sin(angle) * 5.0f);
-		glVertex3f(cos(angle), sin(angle), 0.0f);
-	}
-	glEnd();
-	glPopMatrix();
+	CrossProduct3D(&vec[0], &vec2, &normal1);
 	
 	// Find the second plane.  The two planes share a vector between
 	// atoms 2 and 3, so we just reuse that from the first plane.
-	vec1 = atom4_pos - atom3_pos;
-	Normalize3D(&vec2);
+	vec[1] = atom4_pos - atom3_pos;
+	Normalize3D(&vec[1]);
 	
-	CrossProduct3D(&vec1, &vec2, &normal2);
-	
-	// Make this plane look like the x-y plane for easier circle
-	// drawing.  The vector from atom3 to atom2 should look like
-	// the positive x-axis.
-	SetPlaneRotation(plane2xy, vec2, vec1);
-	
-	// Draw a half circle in the second plane.
-	glPushMatrix();
-	glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
-	glMultMatrixf((GLfloat *) plane2xy);
-	glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
-	glBegin(GL_TRIANGLE_FAN);
-	glTexCoord2f(0.0f, 0.0f);
-	glVertex3f(0.0f, 0.0f, 0.0f);
-	for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
-		glTexCoord2f(cos(angle) * 5.0f, sin(angle) * 5.0f);
-		glVertex3f(cos(angle), sin(angle), 0.0f);
-	}
-	glEnd();
-	glPopMatrix();
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_ALPHA_TEST);
+	CrossProduct3D(&vec[1], &vec2, &normal2);
 	
 	// Okay, we've drawn the planes.  Now we want to draw an angle
 	// annotation between them.  The angle annotation should span 
@@ -1188,11 +1123,53 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	CPoint3D pt1 = atom3_pos + binormal1;
 	CPoint3D pt3 = atom3_pos + binormal2;
 	
-	// CreateCylinderFromLine(qobj, atom3_pos, pt1, 0.1f); 
-	// CreateCylinderFromLine(qobj, atom3_pos, pt3, 0.1f); 
-	
 	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 	DrawAngleAnnotation(&pt1, &atom3_pos, &pt3, win->GetPrefs());
+
+	Matrix4D m;
+	CPoint3D pt1_eye;
+	CPoint3D pt3_eye;
+	int id;
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, (float *) m);
+	Rotate3DPt(m, pt1, &pt1_eye);
+	Rotate3DPt(m, pt3, &pt3_eye);
+
+	id = pt3_eye.z < pt1_eye.z;
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+	for (int j = 0; j <= 1; j++, id = (id + 1) % 2) {
+		// Make this plane look like the x-y plane for easier circle
+		// drawing.  The vector from atom3 to atom2 should look like
+		// the positive x-axis.
+		SetPlaneRotation(plane2xy, vec2, vec[id]);
+		
+		glPushMatrix();
+		glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
+		glMultMatrixf((GLfloat *) plane2xy);
+
+		glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
+		glBegin(GL_TRIANGLE_FAN);
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
+			glVertex3f(cos(angle), sin(angle), 0.0f);
+		}
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glEnd();
+
+		glColor4f(0.6f, 0.06f, 0.06f, 0.2f);
+		glLineWidth(2.0f);
+		glBegin(GL_LINES);
+			glVertex3f(-1.0f, 0.0f, 0.0f);
+			glVertex3f(1.0f, 0.0f, 0.0f);
+		glEnd();
+		glLineWidth(1.0f);
+
+		glPopMatrix();
+	}
+	
+	glDisable(GL_BLEND);
 	
 	glEnable(GL_LIGHTING);
 }

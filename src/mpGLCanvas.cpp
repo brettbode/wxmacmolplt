@@ -515,94 +515,133 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 	Frame *lFrame = mMainData->cFrame;
 	Annotation *anno = mMainData->Annotations[anno_id];
 
+	// If the lock annotation doesn't contain the clicked on atom, don't
+	// constrain its translation.
 	if (!anno->containsAtom(selected)) {
 		return;
 	}
 
-	int origin_id;
-	CPoint3D origin_pos;
-
+	// Now, how we constrain the translation is dependent on the annotation
+	// type.
 	switch (anno->getType()) {
-		case MP_ANNOTATION_LENGTH:
-			{
-			int shifter_id;
-			CPoint3D origin_pos;
-			CPoint3D shifter_pos;
-			float len;
 
-			/* Figure out which atom is moving and
-			 * which is planted. */
+		// If we're dealing with a length annotation, we confine translation
+		// to occur only along the vector defined by the two atoms.  That is,
+		// only the magnitude of the vector can change.  We do this by
+		// project the mouse's position in object space onto the vector between
+		// the two atoms.
+		case MP_ANNOTATION_LENGTH: {
+
+			int shifter_id;          // The id of the atom being moved 
+			CPoint3D shifter_pos;    //   and its position.
+			int anchor_id;           // The id of the anchored atom 
+			CPoint3D anchor_pos;     //   and its position.
+			float len;               // Length of vector between two atoms.
+			CPoint3D bond_vec;       // Vector from anchor atom to shift atom.
+			CPoint3D new_vec;        // Vector from anchor atom to mouse pt.
+			float mu;
+
+			// Figure out which atom is moving and which is planted.
 			shifter_id = anno->getAtom(0);
 			if (shifter_id == selected) {
-				origin_id = anno->getAtom(1);
+				anchor_id = anno->getAtom(1);
 			} else {
-				origin_id = shifter_id;
+				anchor_id = shifter_id;
 				shifter_id = anno->getAtom(1);
 			}
 
-			lFrame->GetAtomPosition(origin_id, origin_pos);
+			lFrame->GetAtomPosition(anchor_id, anchor_pos);
 			lFrame->GetAtomPosition(shifter_id, shifter_pos);
 
-			CPoint3D bond_vec = origin_pos - shifter_pos;
-			CPoint3D bond_vec2 = shifter_pos - origin_pos;
-			CPoint3D new_vec;
+			// Determine vectors from anchor atom to the shift atom and the
+			// mouse point in object coordinates.
+			bond_vec = shifter_pos - anchor_pos;
 
-			new_vec.x = origin_pos.x - *x;
-			new_vec.y = origin_pos.y - *y;
-			new_vec.z = origin_pos.z - *z;
+			new_vec.x = *x - anchor_pos.x;
+			new_vec.y = *y - anchor_pos.y;
+			new_vec.z = *z - anchor_pos.z;
 
-			float mu;
+			// Now we project the mouse point onto the vector between the
+			// atoms, provided the mouse point is sufficiently far away from
+			// the vector already.  If it's not, mu will be zero and the
+			// shifted atom will be coincident with the anchor atom, and we'll
+			// thereby lose all direction information.
+			
 			len = bond_vec.Magnitude();
-			mu = DotProduct3D(&bond_vec, &new_vec) /
-				 (len * len);
+			if (len < 1e-6) {
+				return;
+			}
+
+			mu = DotProduct3D(&bond_vec, &new_vec) / (len * len);
 
 			if (fabs(mu) > 1e-6) {
-				*x = origin_pos.x + bond_vec2.x * mu;
-				*y = origin_pos.y + bond_vec2.y * mu;
-				*z = origin_pos.z + bond_vec2.z * mu;
-			}
+				*x = anchor_pos.x + bond_vec.x * mu;
+				*y = anchor_pos.y + bond_vec.y * mu;
+				*z = anchor_pos.z + bond_vec.z * mu;
 			}
 
 			break;
 
-		case MP_ANNOTATION_ANGLE:
-			{
-			int atom1_id;
-			int atom2_id;
-			CPoint3D vec1;
-			CPoint3D vec2;
-			CPoint3D atom1_pos;
-			CPoint3D atom2_pos;
-			CPoint3D new_pos;
-			float radius;
-			CPoint3D normal;
-			CPoint3D vec_new;
-			float dist;
+		}
+
+		// If we're dealing with an angle annotation, we confine translation to
+		// occur only along the circumference of the circle defined with the
+		// angle's vertex atom at its center and its radius the length of the
+		// vector between the vertex atom and the shift atom.  That is, only
+		// the angle between the shifting atom, vertex atom, and the third atom
+		// can change.  Lengths between atoms do not change.  We do this by
+		// projecting the mouse's position in object space onto the plane
+		// defined by the three atoms, and projecting that plane position onto
+		// the circle.
+		case MP_ANNOTATION_ANGLE: {
+
+			int atom1_id;         // ID of one non-vertex atom
+			CPoint3D atom1_pos;   //   and its position.
+			int atom2_id;         // ID of other non-vertex atom
+			CPoint3D atom2_pos;   //   and its position.
+			int vertex_id;        // ID of vertex atom 
+			CPoint3D vertex_pos;  //   and its position.
+			CPoint3D vec1;        // Vector from vertex atom to atom1.
+			CPoint3D vec2;        // Vector from vertex atom to atom2.
+			CPoint3D new_pos;     // Position of mouse point on angle's plane.
+			float radius;         // Length between shift atom and vertex.
+			CPoint3D normal;      // Normal of angle's plane.
+			CPoint3D vec_new;     // Vector between vertex and new_pos.
+			float dist;           // Mouse point's distance from plane.
 
 			// Grab the vertex atom for the angle.  If it's also the one trying
 			// to be moved, the user must not be trying to constrain anything,
 			// so we let it move freely.  Or if its not being moved but is
-			// selected, we don't constrain anything.
-			origin_id = anno->getAtom(1);
-			if (selected == origin_id || lFrame->GetAtomSelectState(origin_id)) {
+			// selected, we don't constrain anything.  Doing otherwise would
+			// really mess up the goal of constrained movement, since this atom
+			// serves as the basis for the constraints.
+			vertex_id = anno->getAtom(1);
+			if (selected == vertex_id || lFrame->GetAtomSelectState(vertex_id)) {
 				return;
 			}
 
-			// Grab other two atoms and all positions.
+			// Grab other two atoms and all positions.  It doesn't really
+			// matter which position is selected and which isn't, except for
+			// determining whose length from the vertex will serve as the
+			// radius.  We mostly want to determine the normal's plane, which
+			// only considers the two vectors to these positions.
 			atom1_id = anno->getAtom(0);
 			atom2_id = anno->getAtom(2);
 
-			lFrame->GetAtomPosition(origin_id, origin_pos);
+			lFrame->GetAtomPosition(vertex_id, vertex_pos);
 			lFrame->GetAtomPosition(atom1_id, atom1_pos);
 			lFrame->GetAtomPosition(atom2_id, atom2_pos);
 
-			// Find vectors from vertex atoms to other atoms.
-			vec1 = atom1_pos - origin_pos;
-			vec2 = atom2_pos - origin_pos;
+			// Find vectors from vertex atom to other atoms.
+			vec1 = atom1_pos - vertex_pos;
+			vec2 = atom2_pos - vertex_pos;
 
 			// We want to find the distance between the vertex atom and the
 			// one clicked on.  That distance will serve as the radius of
-			// the circle that the atom will follow.
+			// the circle whose circumference the atom will follow.  If the
+			// other atom is selected, we abandon the constraints because
+			// moving both atoms undoes the work of the constrained
+			// translation.
 			if (selected == atom1_id) {
 				radius = vec1.Magnitude();
 				if (lFrame->GetAtomSelectState(atom2_id)) {
@@ -618,7 +657,7 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			// We need to take the mouse point in object space and find the
 			// nearest point on the plane defined by the three angle atoms.
 			// Once that point is on the plane, we can more easily bring it
-			// onto the circle path that the atom can move along.
+			// onto the circle's circumference that the atom can move along.
 			
 			// Calculate the plane's normal.
 			CrossProduct3D(&vec1, &vec2, &normal);
@@ -628,9 +667,10 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			new_pos.y = *y;
 			new_pos.z = *z;
 
-			// Find vector between point on plane and vertex.  The point's
-			// distance from the plain is just the dot product.
-			vec_new = new_pos - origin_pos;
+			// Find vector between the mouse point and vertex atom.  The
+			// point's distance from the plane is just the dot product of the
+			// plane's normal and the vector.
+			vec_new = new_pos - vertex_pos;
 			dist = DotProduct3D(&normal, &vec_new);
 
 			// Now, drop that point down to the plane in the direction reverse
@@ -639,27 +679,33 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			new_pos = new_pos - normal * dist;
 
 			// Now, we need to reel (or cast) the plane point so it's the
-			// same distance away as the atom originally was.
-			vec_new = new_pos - origin_pos;
+			// same distance away as the atom originally was from the vertex.
+			vec_new = new_pos - vertex_pos;
 			Normalize3D(&vec_new);
 
-			*x = origin_pos.x + radius * vec_new.x;
-			*y = origin_pos.y + radius * vec_new.y;
-			*z = origin_pos.z + radius * vec_new.z;
-			}
+			*x = vertex_pos.x + radius * vec_new.x;
+			*y = vertex_pos.y + radius * vec_new.y;
+			*z = vertex_pos.z + radius * vec_new.z;
 
 			break;
 
-		case MP_ANNOTATION_DIHEDRAL:
-			{
+		}
+
+		// If we're dealing with a dihedral annotation, we confine translation
+		// to occur only for the first and fourth atoms along the circumference
+		// of the circle defined with the atom's projection onto the dihedral's
+		// central axis and with the radius determined by the atom's distance
+		// to this projection.  Effectively, this allows only the angle of
+		// the dihedral to change, with all other lengths preserved.
+		case MP_ANNOTATION_DIHEDRAL: {
+
+			CPoint3D shifted_pos;
 			int atom2_id;
+			CPoint3D atom2_pos;
 			int atom3_id;
+			CPoint3D atom3_pos;
 			CPoint3D vec1;
 			CPoint3D vec2;
-			CPoint3D vec3;
-			CPoint3D atom1_pos;
-			CPoint3D atom2_pos;
-			CPoint3D atom3_pos;
 			CPoint3D new_pos;
 			CPoint3D center_pos;
 			float radius;
@@ -667,7 +713,15 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			CPoint3D vec_new;
 			float vec1_len;
 			float dist;
+			int origin_id;
+			CPoint3D origin_pos;
+			float mu;
 
+			// First we need to figure out if its the first or fourth atom
+			// of the annotation that's being moved.  We allow only one atom
+			// of the annotation to be selected.  If this is not true, or
+			// its the second or third atom being shifted, then we impose
+			// no constraints.
 			if (selected == anno->getAtom(0)) {
 				if (lFrame->GetAtomSelectState(anno->getAtom(3))) {
 					return;
@@ -689,24 +743,35 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 				return;
 			}
 
-			lFrame->GetAtomPosition(selected, atom1_pos);
+			// This process is essentially an adaptation of the angle
+			// annotation constraint.  The difference is that the circle is
+			// centered not necessarily on an atom, but on the shifted atom's
+			// projection onto the dihedral set's shared axis.  (A dihedral set
+			// of atoms has four atoms, three vectors, and two angles.  The
+			// shared axis is the vector between the second and third atoms.)
+			// So, we first project the shifted atom onto this vector.
+			lFrame->GetAtomPosition(selected, shifted_pos);
 			lFrame->GetAtomPosition(atom2_id, atom2_pos);
 			lFrame->GetAtomPosition(atom3_id, atom3_pos);
 
 			vec1 = atom2_pos - atom3_pos;
-			vec2 = atom1_pos - atom3_pos;
+			vec2 = shifted_pos - atom3_pos;
 
-			float mu;
 			vec1_len = vec1.Magnitude();
 			mu = DotProduct3D(&vec1, &vec2) / (vec1_len * vec1_len);
 
 			if (fabs(mu) > 1e-6f) {
 				center_pos = atom3_pos + vec1 * mu;
 			} else {
-				center_pos = atom1_pos;
+				center_pos = shifted_pos;
 			}
 
-			vec2 = atom1_pos - center_pos;
+			// center_pos now contains the projected point.  We need to figure
+			// out the circle's radius, which is just the distance between
+			// the center and the atom being shifted.  center_pos is considered
+			// the vertex, and the plane passes through this point and is
+			// perpendicular to the shared vector.
+			vec2 = shifted_pos - center_pos;
 			radius = vec2.Magnitude();
 
 			// We need to take the mouse point in object space and find the
@@ -714,15 +779,17 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			// Once that point is on the plane, we can more easily bring it
 			// onto the circle path that the atom can move along.
 			
-			// Calculate the plane's normal.
+			// Calculate the plane's normal.  We already calculated the normal
+			// above -- it's the shared vector.
 			Normalize3D(&vec1);
 
 			new_pos.x = *x;
 			new_pos.y = *y;
 			new_pos.z = *z;
 
-			// Find vector between point on plane and vertex.  The point's
-			// distance from the plain is just the dot product.
+			// Find vector between the mouse point and vertex atom.  The
+			// point's distance from the plane is just the dot product of the
+			// plane's normal and the vector.
 			vec_new = new_pos - center_pos;
 			dist = DotProduct3D(&vec1, &vec_new);
 
@@ -739,9 +806,9 @@ void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
 			*x = center_pos.x + radius * vec_new.x;
 			*y = center_pos.y + radius * vec_new.y;
 			*z = center_pos.z + radius * vec_new.z;
-			}
 
 			break;
+		}
 	}
 }
 
