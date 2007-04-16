@@ -1178,8 +1178,12 @@ bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Pre
 		Rotate3DOffset(result,centerOfMass,&rotatedCenterOfMass);
 	}
 
+	for (long i=0; i<cFrame->GetNumAtoms(); i++) {
+		CPoint3D temp = (cFrame->Atoms[i].Position) + centerOfMass;
+		Rotate3DPt(result, temp, &(RotCoords[i]));
+	}
 	//generate the moments of inertia
-/*	xx = yy = zz = xy = xz = yz = 0.0;
+	xx = yy = zz = xy = xz = yz = 0.0;
 	for (int i=0; i<cFrame->GetNumAtoms(); i++) {
 		double atmMass = Prefs->GetAtomMass(cFrame->Atoms[i].GetType()-1);
 		double xc = RotCoords[i].x;
@@ -1192,7 +1196,43 @@ bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Pre
 		xz += atmMass*xc*zc;
 		yz += atmMass*yc*zc;
 	}
-	*/
+	if ((xx>0.1)&&(fabs(xx - yy)<1.0e-4)) {
+		//The x and y axis do not appear to be unique, Try to rotate an atom onto the x axis
+		//loop through and look for atoms not on the z-axis. If there is already an atom on the
+		//x or y axis we can skip as well
+		bool needRot = true;
+		for (int i=0; i<cFrame->GetNumAtoms(); i++) {
+			if (fabs(RotCoords[i].x)>1.0e-4) {
+				if (fabs(RotCoords[i].y)<1.0e-4) {
+					needRot = false;	//Atom already on y-axis
+					break;
+				}
+			} else if (fabs(RotCoords[i].y)>1.0e-4) {
+				needRot	= false;	//Atom already on x-axis
+				break;
+			}
+		}
+		if (needRot) {
+			//ok pick the first atom off of the z-axis
+			for (int i=0; i<cFrame->GetNumAtoms(); i++) {
+				if ((fabs(RotCoords[i].x)>1.0e-4)||(fabs(RotCoords[i].y)>1.0e-4)) {
+					double theta = atan(RotCoords[i].y/RotCoords[i].x);
+					double costh = cos(theta);
+					double sinth = sin(theta);
+					Matrix4D rotation;
+					InitRotationMatrix(rotation);
+					rotation[0][0] = costh;
+					rotation[0][1] = sinth;
+					rotation[1][0] = sinth;
+					rotation[1][1] = costh;
+					Matrix4D temp;
+					MultiplyMatrix(result,rotation,temp);
+					CopyMatrix(temp,result);
+					break;
+				}
+			}
+		}
+	}
 
 	//To complete the determination of the principle axis we must apply all of the symmetry
 	//operators to each of the permutations of the axis. When we find a set that results in an
