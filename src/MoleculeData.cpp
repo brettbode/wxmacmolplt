@@ -1217,13 +1217,13 @@ bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Pre
 			for (int i=0; i<cFrame->GetNumAtoms(); i++) {
 				if ((fabs(RotCoords[i].x)>1.0e-4)||(fabs(RotCoords[i].y)>1.0e-4)) {
 					double theta = atan(RotCoords[i].y/RotCoords[i].x);
-					double costh = cos(theta);
-					double sinth = sin(theta);
+					double costh = cos(-theta);
+					double sinth = sin(-theta);
 					Matrix4D rotation;
 					InitRotationMatrix(rotation);
 					rotation[0][0] = costh;
 					rotation[0][1] = sinth;
-					rotation[1][0] = sinth;
+					rotation[1][0] = -sinth;
 					rotation[1][1] = costh;
 					Matrix4D temp;
 					MultiplyMatrix(result,rotation,temp);
