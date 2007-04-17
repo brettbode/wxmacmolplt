@@ -1028,8 +1028,8 @@ void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs) {
 	pgFlags[0] = true;
 	for (int i=0; i<kNumSymmetryPointGroups; i++) pgFlags[i] = false;
 	//order of the flags
-	//c1, cs, ci, c2h-c8h (3-9), c2v-c8v (10-16), c2-c8 (17-23), s2-s8 (24-27),
-	//D2d-d8d (28-34), d2h-d8h (35-41), d2-d8 (42-48), Td, Th, T, Oh, O
+	//c1, cs, ci, c2h-c8h (3-9), c2v-c8v (10-16), c2-c8 (17-23), s2-s8 (24-26),
+	//D2d-d8d (27-33), d2h-d8h (34-40), d2-d8 (41-47), Td, Th, T, Oh, O
 	int PrincAxisOrder = 1;
 	Matrix4D temp;
 	
@@ -1061,20 +1061,20 @@ void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs) {
 			}
 			InputOptions->Data->SetPointGroup(GAMESS_DN);
 			if (DeterminePrincipleOrientation(temp, Prefs)) {
-				pgFlags[42 - 2 + i] = true;
+				pgFlags[41 - 2 + i] = true;
 				std::cout << "D "<< i << " is valid."<<std::endl;
 				InputOptions->Data->SetPointGroup(GAMESS_DND);
 				if (DeterminePrincipleOrientation(temp, Prefs)) {
-					pgFlags[28 - 2 + i] = true;
+					pgFlags[27 - 2 + i] = true;
 					std::cout << "D "<< i << "d is valid."<<std::endl;
 				}
 				InputOptions->Data->SetPointGroup(GAMESS_DNH);
 				if (DeterminePrincipleOrientation(temp, Prefs)) {
-					pgFlags[35 - 2 + i] = true;
+					pgFlags[34 - 2 + i] = true;
 					std::cout << "D "<< i << "h is valid."<<std::endl;
 				}
 			}
-			if (i < 6) {
+			if (i < 5) {
 				InputOptions->Data->SetPointGroup(GAMESS_S2N);
 				InputOptions->Data->SetPointGroupOrder(i-1);
 				if (DeterminePrincipleOrientation(temp, Prefs)) {
@@ -1087,26 +1087,26 @@ void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs) {
 	if (PrincAxisOrder > 1) {
 		InputOptions->Data->SetPointGroup(GAMESS_T);
 		if (DeterminePrincipleOrientation(temp, Prefs)) {
-			pgFlags[51] = true;
+			pgFlags[50] = true;
 			std::cout << "T is valid."<<std::endl;
 			InputOptions->Data->SetPointGroup(GAMESS_O);
 			if (DeterminePrincipleOrientation(temp, Prefs)) {
-				pgFlags[53] = true;
+				pgFlags[52] = true;
 				std::cout << "O is valid."<<std::endl;
 				InputOptions->Data->SetPointGroup(GAMESS_OH);
 				if (DeterminePrincipleOrientation(temp, Prefs)) {
-					pgFlags[52] = true;
+					pgFlags[51] = true;
 					std::cout << "Oh is valid."<<std::endl;
 				}
 			}
 			InputOptions->Data->SetPointGroup(GAMESS_TD);
 			if (DeterminePrincipleOrientation(temp, Prefs)) {
-				pgFlags[49] = true;
+				pgFlags[48] = true;
 				std::cout << "Td is valid."<<std::endl;
 			}
 			InputOptions->Data->SetPointGroup(GAMESS_TH);
 			if (DeterminePrincipleOrientation(temp, Prefs)) {
-				pgFlags[50] = true;
+				pgFlags[49] = true;
 				std::cout << "Th is valid."<<std::endl;
 			}
 		}

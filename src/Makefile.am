@@ -55,6 +55,7 @@ wxmacmolplt_SOURCES =                             \
 	surfaceswindow.cpp      surfaceswindow.h      \
 							SurfaceTypes.h        \
 	SurfWin.cpp                                   \
+	symmetrypointgroupdlg.cpp  symmetrypointgroupdlg.h \
 	swfexport.cpp                                 \
 	swfexport-g.cpp         swfexport.h           \
     VirtualSphere.cpp       VirtualSphere.h       \

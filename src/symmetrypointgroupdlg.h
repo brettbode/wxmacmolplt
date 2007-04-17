@@ -38,9 +38,9 @@ class wxListCtrl;
 
 ////@begin control identifiers
 #define ID_SYMMETRYPOINTGROUPDLG 10251
-#define ID_LISTCTRL1 10253
+#define ID_LISTCTRL1 10255
 #define ID_SETBUTTON 10254
-#define SYMBOL_SYMMETRYPOINTGROUPDLG_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
+#define SYMBOL_SYMMETRYPOINTGROUPDLG_STYLE wxCAPTION|wxSYSTEM_MENU
 #define SYMBOL_SYMMETRYPOINTGROUPDLG_TITLE _("Symmetry Point Group")
 #define SYMBOL_SYMMETRYPOINTGROUPDLG_IDNAME ID_SYMMETRYPOINTGROUPDLG
 #define SYMBOL_SYMMETRYPOINTGROUPDLG_SIZE wxSize(400, 300)
@@ -83,6 +83,12 @@ public:
 
 ////@begin SymmetryPointGroupDlg event handler declarations
 
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_SETBUTTON
+	void OnSetbuttonClick( wxCommandEvent& event );
+
+	/// wxEVT_UPDATE_UI event handler for ID_SETBUTTON
+	void OnSetbuttonUpdate( wxUpdateUIEvent& event );
+
 ////@end SymmetryPointGroupDlg event handler declarations
 
 ////@begin SymmetryPointGroupDlg member function declarations
@@ -99,6 +105,9 @@ public:
 
 	/// Should we show tooltips?
 	static bool ShowToolTips();
+	
+	void setup(const bool * pgs);
+	bool GetSelectedPointGroup(const bool * pgs, GAMESSPointGroup & pg, int & pgOrder) const;
 
 ////@begin SymmetryPointGroupDlg member variables
 	wxStaticText* mHighestPGText;
