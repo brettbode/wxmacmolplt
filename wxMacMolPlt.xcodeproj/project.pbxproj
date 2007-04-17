@@ -112,6 +112,9 @@
 		8B45D25E0A700DB60005269A /* arial1.glf in Resources */ = {isa = PBXBuildFile; fileRef = 8B45D25D0A700DB60005269A /* arial1.glf */; };
 		8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
 		8B4FB3D40A3093470014F6B5 /* surfaceswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */; };
+		8B5D0D6C0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */; };
+		8B5D0D6D0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */; };
+		8B5D0D6E0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */; };
 		8B600B740B8F35C400084AF2 /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
 		8B600B750B8F35C400084AF2 /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
 		8B600B760B8F35C400084AF2 /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
@@ -297,6 +300,9 @@
 		8B4BB4410A0A7C9D00FE9CC6 /* appendframesoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = appendframesoptions.h; path = src/appendframesoptions.h; sourceTree = "<group>"; };
 		8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceswindow.cpp; path = src/surfaceswindow.cpp; sourceTree = "<group>"; };
 		8B4FB3D20A3093470014F6B5 /* surfaceswindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceswindow.h; path = src/surfaceswindow.h; sourceTree = "<group>"; };
+		8B5D0D060BC54AE000CE2A4B /* Info copy 2.plist */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "Info copy 2.plist"; path = "resources/Info copy 2.plist"; sourceTree = "<group>"; };
+		8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = symmetrypointgroupdlg.cpp; path = src/symmetrypointgroupdlg.cpp; sourceTree = "<group>"; };
+		8B5D0D6B0BC7ECA100CE2A4B /* symmetrypointgroupdlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = symmetrypointgroupdlg.h; path = src/symmetrypointgroupdlg.h; sourceTree = "<group>"; };
 		8B600B720B8F35C400084AF2 /* qtexport.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = qtexport.cpp; path = src/qtexport.cpp; sourceTree = "<group>"; };
 		8B600B730B8F35C400084AF2 /* qtexport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = qtexport.h; path = src/qtexport.h; sourceTree = "<group>"; };
 		8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = printoptions.cpp; path = src/printoptions.cpp; sourceTree = "<group>"; };
@@ -485,6 +491,8 @@
 				1652DA5609D0B12600B7783F /* SurfWin.cpp */,
 				8B641E370A472F8D0075F96C /* surfaceDlg.cpp */,
 				8B641E380A472F8D0075F96C /* surfaceDlg.h */,
+				8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */,
+				8B5D0D6B0BC7ECA100CE2A4B /* symmetrypointgroupdlg.h */,
 				1652DA5709D0B12600B7783F /* VirtualSphere.cpp */,
 				1652DA5809D0B12600B7783F /* VirtualSphere.h */,
 				8BF17D760A5328210059B71F /* windowparameters.cpp */,
@@ -513,6 +521,7 @@
 				1652DACC09D0B43700B7783F /* text-doc.icns */,
 				8B8816F10A751FED00EC8791 /* Info copy.plist */,
 				8B3B8B230A770A280041EA88 /* Info copy.plist */,
+				8B5D0D060BC54AE000CE2A4B /* Info copy 2.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -694,6 +703,7 @@
 				8B3B899D0A6EAD7E0041EA88 /* glf.cpp in Sources */,
 				8BE9976A0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
 				8B600B740B8F35C400084AF2 /* qtexport.cpp in Sources */,
+				8B5D0D6C0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -755,6 +765,7 @@
 				8B3B8B1C0A770A280041EA88 /* glf.cpp in Sources */,
 				8BE9976B0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
 				8B600B760B8F35C400084AF2 /* qtexport.cpp in Sources */,
+				8B5D0D6D0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -816,6 +827,7 @@
 				8B8816EA0A751FED00EC8791 /* glf.cpp in Sources */,
 				8BE9976C0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
 				8B600B750B8F35C400084AF2 /* qtexport.cpp in Sources */,
+				8B5D0D6E0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1045,10 +1057,10 @@
 				INFOPLIST_FILE = /Users/brett/software/wxMacMolPlt/resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				MACOSX_DEPLOYMENT_TARGET_i386 = 10.4;
-				MACOSX_DEPLOYMENT_TARGET_ppc = 10.2;
+				MACOSX_DEPLOYMENT_TARGET_ppc = 10.3;
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I$(HOME)/software/wx/wx-universal/lib/",
+					"-I$(HOME)/software/wx/wx-universal/lib",
 					"-I$(HOME)/software/wx/wx-universal/include",
 					"-D__WXMAC__",
 					"-D_FILE_OFFSET_BITS=64",
