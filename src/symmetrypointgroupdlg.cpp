@@ -27,6 +27,7 @@
 ////@begin includes
 ////@end includes
 
+#include "Globals.h"
 #include "MolDisplayWin.h"
 #include "symmetrypointgroupdlg.h"
 
