@@ -368,7 +368,7 @@ class WinPrefs {
 		void GetAtomLabel(long AtomNum, Str255 text);
 #ifdef __wxBuild__
 		void GetAtomLabel(long AtomNum, wxString & text) const;
-		void SetAtomLabel(long AtomNum, wxString text);
+		void SetAtomLabel(long AtomNum, const wxString& text);
 #endif
 		void SetAtomLabel(long AtomNum, Str255 text);
 		inline long * GetAtomSizeLoc(void) {return AtomSizes;};

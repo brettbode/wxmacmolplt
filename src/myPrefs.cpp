@@ -241,8 +241,8 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
       mColorArea[i] = new colorArea(this, i, mTargetPrefs->GetAtomColorLoc(i));
       mMainSizer->Add(mColorArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-      mPatternArea[i] = new colorPatternArea(this, i, mTargetPrefs->GetAtomColorLoc(i),
-											 mTargetPrefs->GetAtomPattern(i));
+      mPatternArea[i] = new colorPatternArea(this, i, mTargetPrefs->GetAtomColorLoc(i), mTargetPrefs->GetAtomPattern(i));
+
       mMainSizer->Add(mPatternArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
       mColorArea[i]->setPeer(mPatternArea[i]);
       mPatternArea[i]->setPeer(mColorArea[i]); //need to synchronize color if needed
@@ -255,6 +255,8 @@ void AtomPrefsPane::saveToTempPrefs()
 {
   long size;
   double mass;
+
+  wxString tmp;
 
   for ( int i = 0; i < kMaxAtomTypes; i++)
     {

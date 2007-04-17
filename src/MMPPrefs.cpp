@@ -211,18 +211,21 @@ void WinPrefs::GetAtomLabel(long AtomNum, wxString & text) const {
 	text = wxString(t1.c_str(), wxConvUTF8);
 }
 
-void WinPrefs::SetAtomLabel(long AtomNum, wxString text) 
+void WinPrefs::SetAtomLabel(long AtomNum, const wxString& text) 
 {
   int TextLength = text.Length();
   int pos=0;
 
   if (TextLength > 3) TextLength = 3;		//truncate labels longer than 3 char
 
-  const char * t = (const char *) text.mb_str();
+  const char * t = strdup(text.mb_str());
+
 	for (; pos < TextLength; pos++) {
 		AtomLabels[AtomNum][pos] = t[pos];
 	}
   if (pos < 3) AtomLabels[AtomNum][pos] = '\0';
+
+  free((char*)t);
 }
 #endif
 
