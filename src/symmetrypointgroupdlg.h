@@ -83,6 +83,9 @@ public:
 
 ////@begin SymmetryPointGroupDlg event handler declarations
 
+	/// wxEVT_COMMAND_LIST_ITEM_SELECTED event handler for ID_LISTCTRL1
+	void OnListctrl1Selected( wxListEvent& event );
+
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_SETBUTTON
 	void OnSetbuttonClick( wxCommandEvent& event );
 
@@ -95,6 +98,9 @@ public:
 
 	MolDisplayWin * GetParent() const { return Parent ; }
 	void SetParent(MolDisplayWin * value) { Parent = value ; }
+
+	long GetSelection() const { return selection ; }
+	void SetSelection(long value) { selection = value ; }
 
 	/// Retrieves bitmap resources
 	wxBitmap GetBitmapResource( const wxString& name );
@@ -114,6 +120,8 @@ public:
 	wxStaticText* mAbelianPGText;
 	wxListCtrl* mPGListCntl;
 	MolDisplayWin * Parent;
+public:
+	long selection;
 ////@end SymmetryPointGroupDlg member variables
 };
 

@@ -47,6 +47,8 @@ IMPLEMENT_DYNAMIC_CLASS( SymmetryPointGroupDlg, wxDialog )
 BEGIN_EVENT_TABLE( SymmetryPointGroupDlg, wxDialog )
 
 ////@begin SymmetryPointGroupDlg event table entries
+	EVT_LIST_ITEM_SELECTED( ID_LISTCTRL1, SymmetryPointGroupDlg::OnListctrl1Selected )
+
 	EVT_BUTTON( ID_SETBUTTON, SymmetryPointGroupDlg::OnSetbuttonClick )
 	EVT_UPDATE_UI( ID_SETBUTTON, SymmetryPointGroupDlg::OnSetbuttonUpdate )
 
@@ -505,19 +507,14 @@ void SymmetryPointGroupDlg::setup (const bool * pgs) {
 		mPGListCntl->InsertItem(itemCount, wxT("Oh"));
 		itemCount++;
 	}
+	selection = itemCount-1;
 	mPGListCntl->SetItemState(itemCount-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
 
 bool SymmetryPointGroupDlg::GetSelectedPointGroup(const bool * pgs, GAMESSPointGroup & pg, int & order) const {
 	bool result = false;
-	int selectedItem = -1;
+	int selectedItem = selection;
 	int itemCount = 1;
-	for (int i=0; i<mPGListCntl->GetItemCount(); i++) {
-		if (mPGListCntl->GetItemState(i, wxLIST_STATE_SELECTED)) {
-			selectedItem = i;
-			break;
-		}
-	}
 	order = 1;
 	pg = GAMESS_C1;
 	if (selectedItem == 0) return true;
@@ -937,7 +934,6 @@ bool SymmetryPointGroupDlg::GetSelectedPointGroup(const bool * pgs, GAMESSPointG
 /*!
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_SETBUTTON
  */
-
 void SymmetryPointGroupDlg::OnSetbuttonClick( wxCommandEvent& event )
 {
 	EndModal(ID_SETBUTTON);
@@ -954,3 +950,16 @@ void SymmetryPointGroupDlg::OnSetbuttonUpdate( wxUpdateUIEvent& event )
 	event.Skip();
 }
 
+/*!
+ * wxEVT_COMMAND_LIST_ITEM_SELECTED event handler for ID_LISTCTRL1
+ */
+
+void SymmetryPointGroupDlg::OnListctrl1Selected( wxListEvent& event )
+{
+	if (selection != event.GetIndex()) {
+		mPGListCntl->SetItemState(selection, 0, wxLIST_STATE_SELECTED);
+		selection =	event.GetIndex();
+		mPGListCntl->SetItemState(selection, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+	}
+	event.Skip();
+}

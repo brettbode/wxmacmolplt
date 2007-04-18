@@ -37029,6 +37029,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
           <string name="id-suffix">""</string>
           <long name="use-xrc">0</long>
           <string name="variable-0">"Parent|MolDisplayWin *|Parent|NULL|0"</string>
+          <string name="variable-1">"selection|long|Selection||1"</string>
           <string name="proxy-Id name">"ID_SYMMETRYPOINTGROUPDLG"</string>
           <long name="proxy-Id value">10251</long>
           <string name="proxy-Class">"SymmetryPointGroupDlg"</string>
@@ -37507,6 +37508,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                 <long name="locked">0</long>
                 <string name="created">"17/4/2007"</string>
                 <string name="proxy-type">"wbListCtrlProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_LIST_ITEM_SELECTED|OnListctrl1Selected|NONE||"</string>
                 <string name="proxy-Id name">"ID_LISTCTRL1"</string>
                 <long name="proxy-Id value">10255</long>
                 <string name="proxy-Class">"wxListCtrl"</string>
