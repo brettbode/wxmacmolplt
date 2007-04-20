@@ -57,11 +57,11 @@ bool MpApp::OnInit() {
 	if (strcmp(INSTALL_PREFIX, "NONE"))
 		paths->SetInstallPrefix(wxString(INSTALL_PREFIX,wxConvUTF8));
 	else
-		paths->SetInstallPrefix(wxString("/usr/local/",wxConvUTF8));
+		paths->SetInstallPrefix(wxString("/usr/local",wxConvUTF8));
 #endif
 #ifdef __FORCE_SINGLE_INSTANCE__
 #ifndef __WXMAC__
-    const wxString appName = wxString::Format(wxT("wxMacMolPlt-%s"), wxGetUserId().c_str());
+    const wxString appName = wxString::Format(wxT("wxmacmolplt-%s"), wxGetUserId().c_str());
     m_InstanceChecker = new wxSingleInstanceChecker();
 	
     if(m_InstanceChecker->Create(appName) == true) {
