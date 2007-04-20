@@ -170,6 +170,9 @@ class MolDisplayWin : public wxFrame {
 		bool mHighliteState;
 		bool interactiveMode;
 		bool stale_click;
+		wxToolBar *toolbar;
+
+		void OnToggleTool(wxCommandEvent& event);
 
 		DECLARE_EVENT_TABLE()
 

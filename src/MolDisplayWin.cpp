@@ -44,6 +44,7 @@
 #include <wx/printdlg.h>
 #include <wx/mstream.h>
 #include <wx/display.h>
+#include <wx/stdpaths.h>
 
 #ifdef __WXMSW__
 #include <stdio.h>
@@ -147,6 +148,8 @@ enum MMP_EventID {
 	MMP_PGORDER6,
 	MMP_PGORDER7,
 	MMP_PGORDER8,
+	MMP_TOOL_LASSO,
+	MMP_TOOL_OTHER,
 	
 	Number_MMP_Ids
 };
@@ -268,6 +271,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen )
 	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 	EVT_ACTIVATE(MolDisplayWin::OnActivate)
+	EVT_TOOL_RANGE(MMP_TOOL_LASSO, MMP_TOOL_OTHER, MolDisplayWin::OnToggleTool)
 END_EVENT_TABLE()
 
 	//Local use class to hold data during the animation of normal modes
@@ -1813,10 +1817,45 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 {
 	interactiveMode = 1 - interactiveMode;
 
+	if (interactiveMode) {
+		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_TEXT | wxTB_TOP);
+
+		wxStandardPathsBase &gStdPaths = wxStandardPaths::Get();
+		wxString pathname = gStdPaths.GetDataDir();
+
+#ifdef __WXMAC__
+		// wxWidgets has a funny idea of where the resources are stored. It
+		// locates them as "SharedSupport" but xcode is putting them in
+		// Resources.
+		pathname.Remove(pathname.Length() - 13);
+		pathname += wxT("Resources");
+#endif
+
+		pathname += wxT("/rect_lasso.bmp");
+
+		wxBitmap enabled_bmp = wxBitmap();
+		enabled_bmp.LoadFile(pathname, wxBITMAP_TYPE_BMP);
+
+		toolbar->SetToolBitmapSize(wxSize(enabled_bmp.GetWidth(),
+			enabled_bmp.GetHeight()));
+		toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select Tool"),
+				              enabled_bmp, wxNullBitmap);
+		toolbar->AddRadioTool(MMP_TOOL_OTHER, wxT("Dummy Tool"),
+				              enabled_bmp, wxNullBitmap);
+		toolbar->Realize();
+
+	} else {
+		delete toolbar;
+
+		SetToolBar(NULL);
+	}
+
 	if (glCanvas)
 		glCanvas->toggleInteractiveMode();
 
-  //DrawGL();
+	wxSizeEvent size_event;
+	glCanvas->AddPendingEvent(size_event);
+
 }
 
 void MolDisplayWin::menuViewShowPeriodicDlg(wxCommandEvent &event) {
@@ -2679,9 +2718,9 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 			default:    //Should only get here for unknown file types.
 			{
 				Buffer->SetFilePos(0);
-				long test;
-				Buffer->Read((char *) &test, sizeof(long));
-				if ((test == 'BMBm')||(test == 'mBMB')) {
+				char test[4];
+				Buffer->Read(test, sizeof(char) * 4);
+				if (strcmp(test, "BMBm") == 0 || strcmp(test, "mBMB") == 0) {
 					if (append) MessageAlert("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
 					else AbortOpen("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
 				} else {
@@ -3090,4 +3129,14 @@ void MolStatusBar::SetScrollBarValue(int pos) {
 void MolStatusBar::OnScrollBarChange(wxScrollEvent & event) {
 	myParent->StopAnimations();
 	myParent->ChangeFrames(event.GetPosition() + 1);
+}
+
+void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
+	// printf("event.GetId(): %d\n", event.GetId()); 
+	// printf("MMP_TOOL_LASSO: %d\n", MMP_TOOL_LASSO); 
+	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", toolbar->GetToolState(MMP_TOOL_LASSO)); 
+	// printf("toolbar->GetToolState(MMP_TOOL_OTHER): %d\n", toolbar->GetToolState(MMP_TOOL_OTHER)); 
+	// toolbar->ToggleTool(event.GetId(), true); 
+	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", toolbar->GetToolState(MMP_TOOL_LASSO)); 
+	// printf("toolbar->GetToolState(MMP_TOOL_OTHER): %d\n", toolbar->GetToolState(MMP_TOOL_OTHER)); 
 }
