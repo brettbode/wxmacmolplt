@@ -823,6 +823,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	static wxPoint oldTmpPnt;
 	bool deSelectAll = true;
 	bool edited_atoms = false;
+	int width, height;
 
 	// stale_click will be true when the window gains focus after having not
 	// had it, i.e., when the application first starts or is backgrounded.  If
@@ -850,6 +851,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
 
+	GetClientSize(&width, &height);
+
 	// if (1) { 
 		// printf("event.LeftDown(): %d\n", event.LeftDown()); 
 		// printf("event.LeftUp(): %d\n", event.LeftUp()); 
@@ -862,12 +865,13 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	// First handle left mouse down.
 	if (event.LeftDown() || (event.LeftIsDown() && stale_click)) {
-
 		mSelectState = 0;
 		selected = testPicking(tmpPnt.x, tmpPnt.y);
 
 		if (interactiveMode) {
-			if (selected >= 0 && selected < NumAtoms) {
+			if (MolWin->LassoSelected()) {
+				MolWin->LassoStart(tmpPnt.x, height - tmpPnt.y);
+			} else if (selected >= 0 && selected < NumAtoms) {
 				GLdouble tmpWinX, tmpWinY;
 
 				findWinCoord(lAtoms[selected].Position.x,
@@ -927,8 +931,36 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	else if (event.Dragging()) {
 		mSelectState++;
 
+		if (MolWin->LassoSelected()) {
+			GLdouble mv[16];
+			GLdouble proj[16];
+			GLint viewport[4];
+			GLdouble win_x, win_y, win_z;
+
+			glGetIntegerv(GL_VIEWPORT, viewport);
+			glGetDoublev(GL_MODELVIEW_MATRIX, mv);
+			glGetDoublev(GL_PROJECTION_MATRIX, proj);
+
+			MolWin->LassoGrown(tmpPnt.x, height - tmpPnt.y);
+			edited_atoms = true;
+
+			for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
+				gluProject(lAtoms[i].Position.x,
+						   lAtoms[i].Position.y,
+						   lAtoms[i].Position.z,
+						   mv, proj, viewport, &win_x, &win_y, &win_z);
+				if (MolWin->LassoContains((int) win_x, (int) win_y)) {
+					SelectObj(i, false);
+				}
+			}
+
+			// for each atom
+			//    project into window coordinates
+			//    if contained in lasso area, select it
+		}
+
 		// Are we dragging in edit mode?
-		if (interactiveMode) {
+		else if (interactiveMode) {
 
 			// If an atom is clicked on...
 			if (selected >= 0 && selected < NumAtoms) {
@@ -1145,8 +1177,13 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		if (event.CmdDown())
 			deSelectAll = false;
 
+		if (MolWin->LassoSelected()) {
+			MolWin->LassoEnd(tmpPnt.x, height - tmpPnt.y);
+			edited_atoms = true;
+		}
+
 		// Allow a little bit of dragging to be interpreted as selection.
-		if (mSelectState >= 0 && mSelectState < 3) {
+		else if (mSelectState >= 0 && mSelectState < 3) {
 			mSelectState = -1;
 
 			// If editing, we  

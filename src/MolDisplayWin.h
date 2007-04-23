@@ -172,6 +172,11 @@ class MolDisplayWin : public wxFrame {
 		bool stale_click;
 		wxToolBar *toolbar;
 
+		bool is_lassoing;
+		bool lasso_has_area;
+		wxPoint lasso_start;
+		wxPoint lasso_end;
+
 		void OnToggleTool(wxCommandEvent& event);
 
 		DECLARE_EVENT_TABLE()
@@ -403,6 +408,11 @@ class MolDisplayWin : public wxFrame {
 		void OnMenuOpen(wxMenuEvent & event);
 		void OnKillFocus(wxFocusEvent & event);
 		void StopAnimations(void);
+		bool LassoSelected(void);
+		void LassoStart(const int x, const int y);
+		void LassoGrown(const int x, const int y);
+		void LassoEnd(const int x, const int y);
+		bool LassoContains(const int x, const int y);
 };
 
 class MolPrintOut : public wxPrintout {

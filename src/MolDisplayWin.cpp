@@ -367,6 +367,9 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	interactiveMode = false;
 	stale_click = true;
 
+	is_lassoing = false;
+	lasso_has_area = false;
+
 #ifdef __WXMSW__
 	//Visual studio is a total pile.
 	//The %n format specifier is disabled by default and
@@ -1843,6 +1846,8 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 		toolbar->AddRadioTool(MMP_TOOL_OTHER, wxT("Dummy Tool"),
 				              enabled_bmp, wxNullBitmap);
 		toolbar->Realize();
+		is_lassoing = true;
+		lasso_has_area = false;
 
 	} else {
 		delete toolbar;
@@ -3139,4 +3144,42 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 	// toolbar->ToggleTool(event.GetId(), true); 
 	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", toolbar->GetToolState(MMP_TOOL_LASSO)); 
 	// printf("toolbar->GetToolState(MMP_TOOL_OTHER): %d\n", toolbar->GetToolState(MMP_TOOL_OTHER)); 
+	
+	is_lassoing = false;
+
+	switch (event.GetId()) {
+		case MMP_TOOL_LASSO:
+			is_lassoing = true;
+			lasso_has_area = false;
+			break;
+	}
+}
+
+bool MolDisplayWin::LassoSelected(void) {
+	return is_lassoing;
+}
+
+void MolDisplayWin::LassoStart(const int x, const int y) {
+	lasso_start.x = x;
+	lasso_start.y = y;
+	lasso_end.x = x;
+	lasso_end.y = y;
+	lasso_has_area = false;
+}
+
+void MolDisplayWin::LassoGrown(const int x, const int y) {
+	lasso_end.x = x;
+	lasso_end.y = y;
+	lasso_has_area = true;
+}
+
+void MolDisplayWin::LassoEnd(const int x, const int y) {
+	lasso_has_area = false;
+}
+
+bool MolDisplayWin::LassoContains(const int x, const int y) {
+	return ((x >= lasso_start.x && x <= lasso_end.x) ||
+			(x <= lasso_start.x && x >= lasso_end.x)) &&
+	       ((y >= lasso_start.y && y <= lasso_end.y) ||
+			(y <= lasso_start.y && x >= lasso_end.y));
 }

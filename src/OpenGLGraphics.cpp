@@ -920,6 +920,50 @@ void MolDisplayWin::DrawGL(void)
 		DrawTransparentTriangles();
 		glDisable(GL_BLEND);
 	}
+
+	if (is_lassoing && lasso_has_area) {
+		int canvas_width, canvas_height;
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glPushMatrix();
+		glLoadIdentity();
+
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+
+		glCanvas->GetClientSize(&canvas_width, &canvas_height);
+		gluOrtho2D(0, canvas_width, 0, canvas_height);
+
+		glColor4f(0.5f, 0.5f, 0.5f, 0.4f);
+		glRectf(lasso_start.x, lasso_start.y,
+				lasso_end.x, lasso_end.y);
+
+		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_LINE_STIPPLE);
+		glLineStipple(2, (GLushort) 43690);
+		glColor4f(0.0f, 0.0f, 0.0f, 0.8f);
+		glLineWidth(2.0f);
+		glBegin(GL_LINE_LOOP);
+			glVertex2f(lasso_start.x, lasso_start.y);
+			glVertex2f(lasso_end.x, lasso_start.y);
+			glVertex2f(lasso_end.x, lasso_end.y);
+			glVertex2f(lasso_start.x, lasso_end.y);
+		glEnd();
+		glLineWidth(1.0f);
+		glDisable(GL_LINE_STIPPLE);
+		glEnable(GL_DEPTH_TEST);
+
+		glPopMatrix();
+
+		glMatrixMode(GL_MODELVIEW);
+		glPopMatrix();
+
+		glDisable(GL_BLEND);
+	}
+
 	glDisable(GL_LIGHTING);
 }
 
