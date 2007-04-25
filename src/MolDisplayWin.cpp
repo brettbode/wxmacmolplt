@@ -45,6 +45,7 @@
 #include <wx/mstream.h>
 #include <wx/display.h>
 #include <wx/stdpaths.h>
+#include <wx/toolbar.h>
 
 #ifdef __WXMSW__
 #include <stdio.h>
@@ -1839,12 +1840,17 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 		wxBitmap enabled_bmp = wxBitmap();
 		enabled_bmp.LoadFile(pathname, wxBITMAP_TYPE_BMP);
 
-		toolbar->SetToolBitmapSize(wxSize(enabled_bmp.GetWidth(),
-			enabled_bmp.GetHeight()));
-		toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select Tool"),
-				              enabled_bmp, wxNullBitmap);
-		toolbar->AddRadioTool(MMP_TOOL_OTHER, wxT("Dummy Tool"),
-				              enabled_bmp, wxNullBitmap);
+		toolbar->SetToolBitmapSize(wxSize(enabled_bmp.GetWidth() * 2,
+			enabled_bmp.GetHeight() * 2));
+		toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select Tool"), enabled_bmp);
+		toolbar->AddRadioTool(MMP_TOOL_OTHER, wxT("Dummy Tool"), enabled_bmp);
+		// toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select Tool"), enabled_bmp, 
+			// enabled_bmp, wxITEM_RADIO, wxT("Select"), 
+			// wxT("Select atoms by bounding box")); 
+		// toolbar->AddTool(MMP_TOOL_OTHER, wxT("Dummy Tool"), enabled_bmp, 
+			// enabled_bmp, wxITEM_RADIO, wxT("Dummy"), 
+			// wxT("Don't do anything")); 
+		toolbar->AddSeparator();
 		toolbar->Realize();
 		is_lassoing = true;
 		lasso_has_area = false;
@@ -3116,6 +3122,7 @@ MolStatusBar::MolStatusBar(MolDisplayWin * p) : wxStatusBar(p, wxID_ANY), myScro
 	myScroll->SetWindowVariant(wxWINDOW_VARIANT_NORMAL);
 	myScroll->SetScrollbar(0, 1, 1, 1);
 }
+
 void MolStatusBar::OnSize(wxSizeEvent & event) {
 	if (!myScroll) return;
 		//The size of the scroll bar is left fixed so we just move it around
@@ -3125,12 +3132,15 @@ void MolStatusBar::OnSize(wxSizeEvent & event) {
 
 	event.Skip();
 }
+
 void MolStatusBar::SetScrollBar(int pos, int range) {
 	myScroll->SetScrollbar(pos, 1, range, 1);
 }
+
 void MolStatusBar::SetScrollBarValue(int pos) {
 	myScroll->SetThumbPosition(pos);
 }
+
 void MolStatusBar::OnScrollBarChange(wxScrollEvent & event) {
 	myParent->StopAnimations();
 	myParent->ChangeFrames(event.GetPosition() + 1);
@@ -3177,9 +3187,22 @@ void MolDisplayWin::LassoEnd(const int x, const int y) {
 	lasso_has_area = false;
 }
 
+bool MolDisplayWin::LassoHasArea(void) {
+	return fabs(lasso_end.x - lasso_start.x) > 3 &&
+		   fabs(lasso_end.y - lasso_start.y) > 3;
+}
+
 bool MolDisplayWin::LassoContains(const int x, const int y) {
 	return ((x >= lasso_start.x && x <= lasso_end.x) ||
 			(x <= lasso_start.x && x >= lasso_end.x)) &&
 	       ((y >= lasso_start.y && y <= lasso_end.y) ||
-			(y <= lasso_start.y && x >= lasso_end.y));
+			(y <= lasso_start.y && y >= lasso_end.y));
 }
+
+// wxToolBar *MolDisplayWin::OnCreateToolBar(long style, wxWindowID id, 
+	// const wxString& name) { 
+
+	// return (wxToolBar *) new wxToolbarSimple(this, id, wxDefaultPosition, 
+			// wxDefaultSize, style, name); 
+
+// } 

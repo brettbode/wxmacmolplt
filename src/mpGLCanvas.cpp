@@ -944,13 +944,17 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			MolWin->LassoGrown(tmpPnt.x, height - tmpPnt.y);
 			edited_atoms = true;
 
+			if (!event.ShiftDown()) {
+				lFrame->resetAllSelectState();
+			}
+			MolWin->SetHighliteMode(true);
 			for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
 				gluProject(lAtoms[i].Position.x,
 						   lAtoms[i].Position.y,
 						   lAtoms[i].Position.z,
 						   mv, proj, viewport, &win_x, &win_y, &win_z);
 				if (MolWin->LassoContains((int) win_x, (int) win_y)) {
-					SelectObj(i, false);
+					lAtoms[i].SetSelectState(true);
 				}
 			}
 
@@ -1075,7 +1079,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 				// Calculate the amount of rotation according to the amount
 				// of mouse change along the y-axis of the viewport.
 				dy = tmpPnt.y - oldTmpPnt.y;
-				angle_offset= dy / GetRect().GetHeight() * 540.0f;
+				angle_offset = dy / GetClientSize().GetHeight() * 540.0f;
 
 				// Get all trig together for rotating around the bond that
 				// was just clicked on.
@@ -1086,6 +1090,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 				// The axis of rotation is a vector from one atom of the
 				// bond to the other.
+
 				lFrame->GetAtomPosition(
 					lFrame->GetBondAtom(selected - NumAtoms, 1), pivot_pt);
 				lFrame->GetAtomPosition(
@@ -1105,7 +1110,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 				rot_mat[1][2] = c_inv * axis.z * axis.y + sine * axis.x;
 				rot_mat[2][2] = c_inv * axis.z * axis.z + cosine;
 
-				rot_mat[3][0] = rot_mat[3][1] = rot_mat[3][3] = 0.0f;
+				rot_mat[3][0] = rot_mat[3][1] = rot_mat[3][2] = 0.0f;
 				rot_mat[0][3] = rot_mat[1][3] = rot_mat[2][3] = 0.0f;
 				rot_mat[3][3] = 1.0f;
 
@@ -1179,6 +1184,9 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 		if (MolWin->LassoSelected()) {
 			MolWin->LassoEnd(tmpPnt.x, height - tmpPnt.y);
+			if (!MolWin->LassoHasArea()) {
+				SelectObj(selected, deSelectAll);
+			}
 			edited_atoms = true;
 		}
 

@@ -943,8 +943,8 @@ void MolDisplayWin::DrawGL(void)
 
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_LINE_STIPPLE);
-		glLineStipple(2, (GLushort) 43690);
-		glColor4f(0.0f, 0.0f, 0.0f, 0.8f);
+		glLineStipple(3, (GLushort) 43690);
+		glColor4f(0.0f, 0.0f, 0.0f, 0.9f);
 		glLineWidth(2.0f);
 		glBegin(GL_LINE_LOOP);
 			glVertex2f(lasso_start.x, lasso_start.y);

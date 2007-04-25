@@ -413,6 +413,7 @@ class MolDisplayWin : public wxFrame {
 		void LassoGrown(const int x, const int y);
 		void LassoEnd(const int x, const int y);
 		bool LassoContains(const int x, const int y);
+		bool LassoHasArea(void);
 };
 
 class MolPrintOut : public wxPrintout {
