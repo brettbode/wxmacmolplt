@@ -1822,7 +1822,7 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 	interactiveMode = 1 - interactiveMode;
 
 	if (interactiveMode) {
-		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_TEXT | wxTB_TOP);
+		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_TEXT);
 
 		wxStandardPathsBase &gStdPaths = wxStandardPaths::Get();
 		wxString pathname = gStdPaths.GetDataDir();
@@ -1838,18 +1838,18 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 		pathname += wxT("/rect_lasso.bmp");
 
 		wxBitmap enabled_bmp = wxBitmap();
-		enabled_bmp.LoadFile(pathname, wxBITMAP_TYPE_BMP);
+		enabled_bmp.LoadFile(pathname, wxBITMAP_TYPE_XPM);
 
-		toolbar->SetToolBitmapSize(wxSize(enabled_bmp.GetWidth() * 2,
-			enabled_bmp.GetHeight() * 2));
-		toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select Tool"), enabled_bmp);
-		toolbar->AddRadioTool(MMP_TOOL_OTHER, wxT("Dummy Tool"), enabled_bmp);
-		// toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select Tool"), enabled_bmp, 
-			// enabled_bmp, wxITEM_RADIO, wxT("Select"), 
-			// wxT("Select atoms by bounding box")); 
-		// toolbar->AddTool(MMP_TOOL_OTHER, wxT("Dummy Tool"), enabled_bmp, 
-			// enabled_bmp, wxITEM_RADIO, wxT("Dummy"), 
-			// wxT("Don't do anything")); 
+		// toolbar->SetToolBitmapSize(wxSize(enabled_bmp.GetWidth() * 2, 
+			// enabled_bmp.GetHeight() * 2)); 
+		// toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select Tool"), enabled_bmp); 
+		// toolbar->AddRadioTool(MMP_TOOL_OTHER, wxT("Dummy Tool"), enabled_bmp); 
+		toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select Tool"), enabled_bmp,
+			wxNullBitmap, wxITEM_RADIO, wxT("Select"),
+			wxT("Select atoms by bounding box"));
+		toolbar->AddTool(MMP_TOOL_OTHER, wxT("Dummy Tool"), enabled_bmp,
+			wxNullBitmap, wxITEM_RADIO, wxT("Dummy"),
+			wxT("Don't do anything"));
 		toolbar->AddSeparator();
 		toolbar->Realize();
 		is_lassoing = true;
@@ -3151,6 +3151,8 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 	// printf("MMP_TOOL_LASSO: %d\n", MMP_TOOL_LASSO); 
 	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", toolbar->GetToolState(MMP_TOOL_LASSO)); 
 	// printf("toolbar->GetToolState(MMP_TOOL_OTHER): %d\n", toolbar->GetToolState(MMP_TOOL_OTHER)); 
+	// toolbar->ToggleTool(MMP_TOOL_LASSO, true); 
+	// toolbar->EnableTool(MMP_TOOL_LASSO, true); 
 	// toolbar->ToggleTool(event.GetId(), true); 
 	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", toolbar->GetToolState(MMP_TOOL_LASSO)); 
 	// printf("toolbar->GetToolState(MMP_TOOL_OTHER): %d\n", toolbar->GetToolState(MMP_TOOL_OTHER)); 
@@ -3161,6 +3163,10 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 		case MMP_TOOL_LASSO:
 			is_lassoing = true;
 			lasso_has_area = false;
+			glCanvas->SetCursor(wxCursor(*wxCROSS_CURSOR));
+			break;
+		default:
+			glCanvas->SetCursor(wxCursor(*wxSTANDARD_CURSOR));
 			break;
 	}
 }
@@ -3199,10 +3205,3 @@ bool MolDisplayWin::LassoContains(const int x, const int y) {
 			(y <= lasso_start.y && y >= lasso_end.y));
 }
 
-// wxToolBar *MolDisplayWin::OnCreateToolBar(long style, wxWindowID id, 
-	// const wxString& name) { 
-
-	// return (wxToolBar *) new wxToolbarSimple(this, id, wxDefaultPosition, 
-			// wxDefaultSize, style, name); 
-
-// } 
