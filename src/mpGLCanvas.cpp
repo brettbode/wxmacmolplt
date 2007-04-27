@@ -964,7 +964,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		}
 
 		// Are we dragging in edit mode?
-		else if (interactiveMode) {
+		else if (MolWin->HandSelected()) {
 
 			// If an atom is clicked on...
 			if (selected >= 0 && selected < NumAtoms) {
@@ -1260,6 +1260,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			SelectObj(selected, deSelectAll);
 			MolWin->SelectionChanged(deSelectAll);
 			MolWin->UpdateGLModel();
+			edited_atoms = true;
 
 		}
 
@@ -1277,14 +1278,15 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	oldTmpPnt = tmpPnt;
 	stale_click = false;
 
-	if (interactiveMode && edited_atoms) {
-		draw();
+	// Pass mouse event to MolDisplayWin::Rotate for processing
+	if (!interactiveMode || MolWin->ArrowSelected()) {
+		MolWin->Rotate(event);
 	}
 
-	// Pass mouse event to MolDisplayWin::Rotate for processing
 	else {
-		// printf("rotated scene\n"); 
-		MolWin->Rotate(event);
+		draw();
+		// if (!interactiveMode || MolWin->ArrowSelected()) { 
+		// } 
 	}
 
 }

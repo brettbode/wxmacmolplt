@@ -408,12 +408,14 @@ class MolDisplayWin : public wxFrame {
 		void OnMenuOpen(wxMenuEvent & event);
 		void OnKillFocus(wxFocusEvent & event);
 		void StopAnimations(void);
-		bool LassoSelected(void);
 		void LassoStart(const int x, const int y);
 		void LassoGrown(const int x, const int y);
 		void LassoEnd(const int x, const int y);
 		bool LassoContains(const int x, const int y);
 		bool LassoHasArea(void);
+		bool LassoSelected(void);
+		bool ArrowSelected(void);
+		bool HandSelected(void);
 };
 
 class MolPrintOut : public wxPrintout {

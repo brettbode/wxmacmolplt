@@ -921,7 +921,7 @@ void MolDisplayWin::DrawGL(void)
 		glDisable(GL_BLEND);
 	}
 
-	if (is_lassoing && lasso_has_area) {
+	if (lasso_has_area) {
 		int canvas_width, canvas_height;
 
 		glEnable(GL_BLEND);
