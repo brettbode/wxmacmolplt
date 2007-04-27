@@ -149,7 +149,7 @@ void colorPatternArea::OnMouse(wxMouseEvent &event)
       }
   }
 
-  if ( mID >= ID_BITMAP_SLT && (event.Entering() || mID == dynamic_cast<patternSelectDlg*>(mParent)->getSltId()) )
+  if ( mID >= ID_BITMAP_SLT && (event.Entering() || mID == dynamic_cast<patternSelectDlg*>(mParent->GetParent())->getSltId()) )
     {
       //"distance" of two colors
       if ( pow((int)(mCurrentColor.Red()-defaultColor.Red()),2) + pow((int)(mCurrentColor.Green()-defaultColor.Green()),2) + pow((int)(mCurrentColor.Blue()-defaultColor.Blue()),2) < 500)
@@ -158,12 +158,12 @@ void colorPatternArea::OnMouse(wxMouseEvent &event)
 	SetBackgroundColour(defaultColor);
     }
 
-  if ( event.Leaving() && mID >= ID_BITMAP_SLT && mPatID != dynamic_cast<patternSelectDlg*>(mParent)->getSltPatId() )
+  if ( event.Leaving() && mID >= ID_BITMAP_SLT && mPatID != dynamic_cast<patternSelectDlg*>(mParent->GetParent())->getSltPatId() )
     SetBackgroundColour(mCurrentColor);
 
   if (event.LeftDown() && mID >= ID_BITMAP_SLT)
     {
-      dynamic_cast<patternSelectDlg*>(mParent)->setSltId(mID);
+      dynamic_cast<patternSelectDlg*>(mParent->GetParent())->setSltId(mID);
     }
 }
 
@@ -184,24 +184,33 @@ patternSelectDlg::patternSelectDlg(colorPatternArea * parent, wxWindowID id, con
 }
 
 void patternSelectDlg::Create(colorPatternArea * parent, wxWindowID id, const wxString& caption ) {
-  wxDialog::Create( parent, id, caption, wxDefaultPosition, wxSize(250, 500), wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX);
+  wxDialog::Create( parent, id, caption, wxDefaultPosition, wxSize(300,500), wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX);
 
   mainSizer = new wxBoxSizer(wxVERTICAL);
-  upperSizer = new wxGridSizer(3, numPatterns/3+1);
+  innerSizer = new wxGridSizer(3, numPatterns/3+1);
+  upperSizer = new wxBoxSizer(wxHORIZONTAL);
   lowerSizer = new wxBoxSizer(wxHORIZONTAL);
 
   RGBColor tmpColor;
+
+  sltArea = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxSize(260,400), wxVSCROLL|wxEXPAND);
+
   for (int i = 0; i < numPatterns; i++)
     {
       tmpColor = WX2RGB(parent->getColor());
 
-      patSlt[i] = new colorPatternArea(this, ID_BITMAP_SLT+i, &tmpColor, i, 64, 64);
+      patSlt[i] = new colorPatternArea(sltArea, ID_BITMAP_SLT+i, &tmpColor, i, 64, 64);
       if ( i == parent->getPattern())
 	patSlt[i]->SetBackgroundColour(defaultColor);
       //if the pattern is the one already has been set, use another color
 
-      upperSizer->Add(patSlt[i], 0, wxALIGN_CENTRE | wxALL, 10);
+      innerSizer->Add(patSlt[i], 0, wxALIGN_CENTRE | wxALL, 10);
     }
+
+  sltArea->SetSizer(innerSizer);
+  sltArea->SetScrollRate(10,10);
+  
+  upperSizer->Add(sltArea, 0, wxALIGN_CENTRE | wxALL, 10);
 
   mButtOK = new wxButton(this, wxID_OK, wxT("OK") );
   mButtCancel = new wxButton(this, wxID_CANCEL, wxT("Cancel"));
