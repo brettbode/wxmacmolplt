@@ -149,8 +149,9 @@ enum MMP_EventID {
 	MMP_PGORDER6,
 	MMP_PGORDER7,
 	MMP_PGORDER8,
+	MMP_TOOL_ARROW,
 	MMP_TOOL_LASSO,
-	MMP_TOOL_OTHER,
+	MMP_TOOL_HAND,
 	
 	Number_MMP_Ids
 };
@@ -272,7 +273,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen )
 	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 	EVT_ACTIVATE(MolDisplayWin::OnActivate)
-	EVT_TOOL_RANGE(MMP_TOOL_LASSO, MMP_TOOL_OTHER, MolDisplayWin::OnToggleTool)
+	EVT_TOOL_RANGE(MMP_TOOL_ARROW, MMP_TOOL_HAND, MolDisplayWin::OnToggleTool)
 END_EVENT_TABLE()
 
 	//Local use class to hold data during the animation of normal modes
@@ -368,7 +369,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	interactiveMode = false;
 	stale_click = true;
 
-	is_lassoing = false;
+	toolbar = NULL;
 	lasso_has_area = false;
 
 #ifdef __WXMSW__
@@ -1029,7 +1030,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 			WriteMovie(filepath);
 #else
 #ifdef HAVE_LIBMING
-            CreateFrameMovie(filepath);
+            // CreateFrameMovie(filepath); 
 #endif
 #endif
 		} else {
@@ -1824,26 +1825,39 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 	if (interactiveMode) {
 		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_TEXT);
 
+#include "xpms/arrow.xpm"
 #include "xpms/rect_lasso.xpm"
-		wxBitmap enabled_bmp = wxBitmap(rect_lasso_xpm);
+#include "xpms/hand.xpm"
+
+		wxBitmap enabled_bmp;
 
 		// toolbar->SetToolBitmapSize(wxSize(enabled_bmp.GetWidth() * 2, 
 			// enabled_bmp.GetHeight() * 2)); 
 		// toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select Tool"), enabled_bmp); 
 		// toolbar->AddRadioTool(MMP_TOOL_OTHER, wxT("Dummy Tool"), enabled_bmp); 
-		toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select Tool"), enabled_bmp,
-			wxNullBitmap, wxITEM_RADIO, wxT("Select"),
-			wxT("Select atoms by bounding box"));
-		toolbar->AddTool(MMP_TOOL_OTHER, wxT("Dummy Tool"), enabled_bmp,
+
+		enabled_bmp = wxBitmap(arrow_xpm);
+		toolbar->AddTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp,
 			wxNullBitmap, wxITEM_RADIO, wxT("Dummy"),
 			wxT("Don't do anything"));
+
+		enabled_bmp = wxBitmap(rect_lasso_xpm);
+		toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select"), enabled_bmp,
+			wxNullBitmap, wxITEM_RADIO, wxT("Select"),
+			wxT("Select atoms by bounding box"));
+
+		enabled_bmp = wxBitmap(hand_xpm);
+		toolbar->AddTool(MMP_TOOL_HAND, wxT("Edit"), enabled_bmp,
+			wxNullBitmap, wxITEM_RADIO, wxT("Translate atoms"),
+			wxT("Don't do anything"));
+
 		toolbar->AddSeparator();
 		toolbar->Realize();
-		is_lassoing = true;
 		lasso_has_area = false;
 
 	} else {
 		delete toolbar;
+		toolbar = NULL;
 
 		SetToolBar(NULL);
 	}
@@ -3140,17 +3154,19 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 	// printf("toolbar->GetToolState(MMP_TOOL_OTHER): %d\n", toolbar->GetToolState(MMP_TOOL_OTHER)); 
 	// toolbar->ToggleTool(MMP_TOOL_LASSO, true); 
 	// toolbar->EnableTool(MMP_TOOL_LASSO, true); 
-	// toolbar->ToggleTool(event.GetId(), true); 
+	toolbar->ToggleTool(event.GetId(), true);
 	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", toolbar->GetToolState(MMP_TOOL_LASSO)); 
 	// printf("toolbar->GetToolState(MMP_TOOL_OTHER): %d\n", toolbar->GetToolState(MMP_TOOL_OTHER)); 
 	
-	is_lassoing = false;
-
 	switch (event.GetId()) {
+		case MMP_TOOL_ARROW:
+			glCanvas->SetCursor(wxCursor(wxCURSOR_ARROW));
+			break;
 		case MMP_TOOL_LASSO:
-			is_lassoing = true;
-			lasso_has_area = false;
 			glCanvas->SetCursor(wxCursor(*wxCROSS_CURSOR));
+			break;
+		case MMP_TOOL_HAND:
+			glCanvas->SetCursor(wxCursor(wxCURSOR_HAND));
 			break;
 		default:
 			glCanvas->SetCursor(wxCursor(*wxSTANDARD_CURSOR));
@@ -3158,8 +3174,16 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 	}
 }
 
+bool MolDisplayWin::ArrowSelected(void) {
+	return toolbar && toolbar->GetToolState(MMP_TOOL_ARROW);
+}
+
 bool MolDisplayWin::LassoSelected(void) {
-	return is_lassoing;
+	return toolbar && toolbar->GetToolState(MMP_TOOL_LASSO);
+}
+
+bool MolDisplayWin::HandSelected(void) {
+	return toolbar && toolbar->GetToolState(MMP_TOOL_HAND);
 }
 
 void MolDisplayWin::LassoStart(const int x, const int y) {
