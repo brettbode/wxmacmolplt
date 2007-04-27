@@ -1824,21 +1824,8 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 	if (interactiveMode) {
 		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_TEXT);
 
-		wxStandardPathsBase &gStdPaths = wxStandardPaths::Get();
-		wxString pathname = gStdPaths.GetDataDir();
-
-#ifdef __WXMAC__
-		// wxWidgets has a funny idea of where the resources are stored. It
-		// locates them as "SharedSupport" but xcode is putting them in
-		// Resources.
-		pathname.Remove(pathname.Length() - 13);
-		pathname += wxT("Resources");
-#endif
-
-		pathname += wxT("/rect_lasso.bmp");
-
-		wxBitmap enabled_bmp = wxBitmap();
-		enabled_bmp.LoadFile(pathname, wxBITMAP_TYPE_XPM);
+#include "xpms/rect_lasso.xpm"
+		wxBitmap enabled_bmp = wxBitmap(rect_lasso_xpm);
 
 		// toolbar->SetToolBitmapSize(wxSize(enabled_bmp.GetWidth() * 2, 
 			// enabled_bmp.GetHeight() * 2)); 
