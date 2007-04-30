@@ -1823,37 +1823,38 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 	interactiveMode = 1 - interactiveMode;
 
 	if (interactiveMode) {
-		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_TEXT);
+		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE |
+				                wxTB_TEXT, 5423); // | wxTB_TEXT);
 
 #include "xpms/arrow.xpm"
 #include "xpms/rect_lasso.xpm"
 #include "xpms/hand.xpm"
 
-		wxBitmap enabled_bmp;
+		toolbar->SetToolBitmapSize(wxSize(32, 32));
 
-		// toolbar->SetToolBitmapSize(wxSize(enabled_bmp.GetWidth() * 2, 
-			// enabled_bmp.GetHeight() * 2)); 
-		// toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select Tool"), enabled_bmp); 
-		// toolbar->AddRadioTool(MMP_TOOL_OTHER, wxT("Dummy Tool"), enabled_bmp); 
+		toolbar->AddRadioTool(MMP_TOOL_ARROW, wxT("View"), wxBITMAP(arrow));
+		toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select"), wxBITMAP(rect_lasso));
+		toolbar->AddRadioTool(MMP_TOOL_HAND, wxT("Edit"), wxBITMAP(hand));
 
-		enabled_bmp = wxBitmap(arrow_xpm);
-		toolbar->AddTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp,
-			wxNullBitmap, wxITEM_RADIO, wxT("Dummy"),
-			wxT("Don't do anything"));
+		// wxBitmap enabled_bmp; 
 
-		enabled_bmp = wxBitmap(rect_lasso_xpm);
-		toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select"), enabled_bmp,
-			wxNullBitmap, wxITEM_RADIO, wxT("Select"),
-			wxT("Select atoms by bounding box"));
+		// enabled_bmp = wxBitmap(arrow_xpm); 
+		// toolbar->AddTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp, 
+			// wxNullBitmap, wxITEM_RADIO, wxT("Dummy"), 
+			// wxT("Don't do anything")); 
 
-		enabled_bmp = wxBitmap(hand_xpm);
-		toolbar->AddTool(MMP_TOOL_HAND, wxT("Edit"), enabled_bmp,
-			wxNullBitmap, wxITEM_RADIO, wxT("Translate atoms"),
-			wxT("Don't do anything"));
+		// enabled_bmp = wxBitmap(rect_lasso_xpm); 
+		// toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select"), enabled_bmp, 
+			// wxNullBitmap, wxITEM_RADIO, wxT("Select"), 
+			// wxT("Select atoms by bounding box")); 
+
+		// enabled_bmp = wxBitmap(hand_xpm); 
+		// toolbar->AddTool(MMP_TOOL_HAND, wxT("Edit"), enabled_bmp, 
+			// wxNullBitmap, wxITEM_RADIO, wxT("Translate atoms"), 
+			// wxT("Don't do anything")); 
 
 		toolbar->AddSeparator();
 		toolbar->Realize();
-		lasso_has_area = false;
 
 	} else {
 		delete toolbar;
@@ -3154,9 +3155,10 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 	// printf("toolbar->GetToolState(MMP_TOOL_OTHER): %d\n", toolbar->GetToolState(MMP_TOOL_OTHER)); 
 	// toolbar->ToggleTool(MMP_TOOL_LASSO, true); 
 	// toolbar->EnableTool(MMP_TOOL_LASSO, true); 
-	toolbar->ToggleTool(event.GetId(), true);
 	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", toolbar->GetToolState(MMP_TOOL_LASSO)); 
 	// printf("toolbar->GetToolState(MMP_TOOL_OTHER): %d\n", toolbar->GetToolState(MMP_TOOL_OTHER)); 
+
+	toolbar->ToggleTool(event.GetId(), true);
 	
 	switch (event.GetId()) {
 		case MMP_TOOL_ARROW:
