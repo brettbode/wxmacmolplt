@@ -111,12 +111,16 @@ void MpGLCanvas::initGL(void) {
 			glfInit();
 
 			wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
+#if wxCHECK_VERSION(2, 8, 0)
+			wxString pathname = gStdPaths.GetResourcesDir();
+#else
 			wxString pathname = gStdPaths.GetDataDir();
 #ifdef __WXMAC__
 			//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
 			//but xcode is putting them in Resources.
 			pathname.Remove(pathname.Length() - 13);
 			pathname += wxT("Resources");
+#endif
 #endif
 #ifdef __WXMSW__
 			pathname += wxT("\\arial1.glf");
