@@ -31,7 +31,6 @@
 
 extern PeriodicTableDlg *periodic_dlg;
 extern bool show_periodic_dlg;
-extern int glf_initialized;
 
 int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 
@@ -64,11 +63,6 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 }
 
 MpGLCanvas::~MpGLCanvas() {
-	if (glf_initialized) {
-		glfClose();
-		glf_initialized = 0;
-	}
-
 	if (periodic_dlg && periodic_dlg->GetParent() == this) {
 		ClosePeriodicDlg();
 	}
@@ -105,37 +99,6 @@ void MpGLCanvas::initGL(void) {
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
 		glEnable(GL_LIGHT0);
 		initialized = true;
-
-		/*!!! GL font initialization  */
-		if (!glf_initialized) {
-			glfInit();
-
-			wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
-#if wxCHECK_VERSION(2, 8, 0)
-			wxString pathname = gStdPaths.GetResourcesDir();
-#else
-			wxString pathname = gStdPaths.GetDataDir();
-#ifdef __WXMAC__
-			//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
-			//but xcode is putting them in Resources.
-			pathname.Remove(pathname.Length() - 13);
-			pathname += wxT("Resources");
-#endif
-#endif
-#ifdef __WXMSW__
-			pathname += wxT("\\arial1.glf");
-#else
-			pathname += wxT("/arial1.glf");
-#endif
-			if (glfLoadFont(pathname.mb_str(wxConvUTF8)) < 0) {
-				std::ostringstream buf;
-				buf <<"Warning: font file not found! This probably means wxmacmolplt is not "
-					"properly installed. Looking for " << pathname.mb_str(wxConvUTF8);
-				MessageAlert(buf.str().c_str());
-				glfClose();
-			} else
-				glf_initialized = 1;
-		}
 	}
 }
 
