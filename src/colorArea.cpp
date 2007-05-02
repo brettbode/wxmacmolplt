@@ -31,6 +31,7 @@ END_EVENT_TABLE()
 BEGIN_EVENT_TABLE(patternSelectDlg, wxDialog)
   EVT_BUTTON( wxID_OK, patternSelectDlg::OnOK )
   EVT_BUTTON( wxID_CANCEL, patternSelectDlg::OnCancel )
+  EVT_SIZE(patternSelectDlg::OnSize)
 END_EVENT_TABLE()
 
   colorArea::colorArea(wxWindow* parent, int id, const RGBColor* color,int w, int h): mWidth(w), mHeight(h), mID(id)
@@ -193,7 +194,7 @@ void patternSelectDlg::Create(colorPatternArea * parent, wxWindowID id, const wx
 
   RGBColor tmpColor;
 
-  sltArea = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxSize(260,400), wxVSCROLL|wxEXPAND);
+  sltArea = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxSize(265,400), wxVSCROLL|wxEXPAND);
 
   for (int i = 0; i < numPatterns; i++)
     {
@@ -222,8 +223,12 @@ void patternSelectDlg::Create(colorPatternArea * parent, wxWindowID id, const wx
   mainSizer->Add(upperSizer);
   mainSizer->Add(lowerSizer);
 
-  mainSizer->Layout();
   SetSizer(mainSizer);
+
+  mainSizer->Fit(this);
+  mainSizer->SetSizeHints(this);
+  mainSizer->Layout();
+
   Centre(wxBOTH);
 }
 
@@ -242,6 +247,15 @@ void patternSelectDlg::OnOK( wxCommandEvent& WXUNUSED(event) )
 void patternSelectDlg::OnCancel( wxCommandEvent& WXUNUSED(event) )
 {
   Destroy();
+}
+
+void patternSelectDlg::OnSize(wxSizeEvent & event)
+{
+  wxSize s = event.GetSize();
+  sltArea->SetSize(MIN(260, s.x-35), s.y-100);
+  
+  mainSizer->Layout();
+  Refresh(); 
 }
 
 void patternSelectDlg::setSltId(int id)
