@@ -595,6 +595,26 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		} while (!EndOfGroup);
 	}
 	Buffer->SetFilePos(0);	//restart search from beginning of file
+	EndOfGroup = false;
+	if (Buffer->FindGroup("SCF")) {
+		do {
+			Buffer->GetLine(Line);
+			if (ReadBooleanKeyword(Line, "DIRSCF", &BoolTest))
+				MainData->InputOptions->SCF->SetDirectSCF(BoolTest);
+			if (ReadBooleanKeyword(Line, "FDIFF", &BoolTest))
+				MainData->InputOptions->SCF->SetFockDiff(BoolTest);
+			if (ReadLongKeyword(Line, "NCONV", &nAtoms))
+				MainData->InputOptions->SCF->SetConvergance(nAtoms);
+			if (ReadBooleanKeyword(Line, "UHFNOS", &BoolTest))
+				MainData->InputOptions->SCF->SetUHFNO(BoolTest);
+			
+			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
+														//scan for multiple occurances of this group
+				if (!Buffer->FindGroup("SCF")) EndOfGroup = true;
+			}
+		} while (!EndOfGroup);
+	}
+	Buffer->SetFilePos(0);	//restart search from beginning of file
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	if (Buffer->FindGroup("DATA")) {
 		Buffer->SkipnLines(1);
