@@ -1765,15 +1765,24 @@ GAMESS_BS_Polarization BasisGroup::SetPolar(const char *PolarText) {
 			break;
 		}
 	}
+	if (NewPolar == GAMESS_BS_Invalid_Polar) {	//test against the old POPLE flag
+		if (!strcasecmp(PolarText, PolarToText(GAMESS_BS_Pople_Polar))) {
+			NewPolar = GAMESS_BS_Common_Polar;
+		}
+	}
 	if (NewPolar>=0) Polar = NewPolar;
 	return NewPolar;
 }
 const char * BasisGroup::PolarToText(GAMESS_BS_Polarization p) {
 	switch (p) {
+		case GAMESS_BS_Pople_Polar:	//this is retained to read old output
+			return "POPLE";
 		case GAMESS_BS_No_Polarization:
 			return "none";
-		case GAMESS_BS_Pople_Polar:
-			return "POPLE";
+		case GAMESS_BS_Common_Polar:
+			return "COMMON";
+		case GAMESS_BS_PopN31_Polar:
+			return "POPN31";
 		case GAMESS_BS_PopN311_Polar:
 			return "POPN311";
 		case GAMESS_BS_Dunning_Polar:
@@ -1791,8 +1800,8 @@ const char * BasisGroup::GAMESSECPToText(GAMESS_BS_ECPotential p) {
 			return "NONE";
 		case GAMESS_BS_ECP_Read:
 			return "READ";
-		case GAMESS_BS_ECP_SBK:
-			return "SBK";
+		case GAMESS_BS_ECP_SBKJC:
+			return "SBKJC";
 		case GAMESS_BS_ECP_HW:
 			return "HW";
 	}
@@ -1805,6 +1814,11 @@ GAMESS_BS_ECPotential BasisGroup::SetECPPotential(const char *ECPText) {
 		if (!strcasecmp(ECPText, GAMESSECPToText((GAMESS_BS_ECPotential)i))) {
 			NewPot = (GAMESS_BS_ECPotential) i;
 			break;
+		}
+	}
+	if (NewPot == GAMESS_BS_Invalid_ECP) {	//test against the old spelling of sbkjc
+		if (!strcasecmp(ECPText, "SBK")) {
+			NewPot = GAMESS_BS_ECP_SBKJC;
 		}
 	}
 	if (NewPot>=0) ECPPotential = NewPot;

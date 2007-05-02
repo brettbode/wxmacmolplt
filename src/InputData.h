@@ -377,9 +377,11 @@ enum GAMESS_BasisSet {
 	NumGAMESSBasisSetsItem
 };
 enum GAMESS_BS_Polarization {
+	GAMESS_BS_Pople_Polar=-2,	//old one, should not be output
 	GAMESS_BS_Invalid_Polar=-1,
 	GAMESS_BS_No_Polarization=0,
-	GAMESS_BS_Pople_Polar,
+	GAMESS_BS_Common_Polar,
+	GAMESS_BS_PopN31_Polar,
 	GAMESS_BS_PopN311_Polar,
 	GAMESS_BS_Dunning_Polar,
 	GAMESS_BS_Huzinaga_Polar,
@@ -391,7 +393,7 @@ enum GAMESS_BS_ECPotential {
 	GAMESS_BS_Invalid_ECP=-1,
 	GAMESS_BS_ECP_None=0,
 	GAMESS_BS_ECP_Read,
-	GAMESS_BS_ECP_SBK,
+	GAMESS_BS_ECP_SBKJC,
 	GAMESS_BS_ECP_HW,
 	
 	NumGAMESSBSECPItems

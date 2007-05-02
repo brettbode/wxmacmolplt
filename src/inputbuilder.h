@@ -206,279 +206,279 @@ public:
 
 ////@begin InputBuilderWindow event handler declarations
 
-    /// wxEVT_CLOSE_WINDOW event handler for ID_INPUTBUILDERWINDOW
-    void OnCloseWindow( wxCloseEvent& event );
+	/// wxEVT_CLOSE_WINDOW event handler for ID_INPUTBUILDERWINDOW
+	void OnCloseWindow( wxCloseEvent& event );
 
-    /// wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED event handler for ID_IBNOTEBOOK
-    void OnIblistbookPageChanged( wxListbookEvent& event );
+	/// wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED event handler for ID_IBNOTEBOOK
+	void OnIblistbookPageChanged( wxListbookEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_BASIS_CHOICE
-    void OnBasisChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_BASIS_CHOICE
+	void OnBasisChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ECPT_CHOICE
-    void OnEcptChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ECPT_CHOICE
+	void OnEcptChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMD_CHOICE
-    void OnNumdChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMD_CHOICE
+	void OnNumdChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMF_CHOICE
-    void OnNumfChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMF_CHOICE
+	void OnNumfChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMP_CHOICE
-    void OnNumpChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMP_CHOICE
+	void OnNumpChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POLAR_CHOICE
-    void OnPolarChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POLAR_CHOICE
+	void OnPolarChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIFFL_CHECKBOX
-    void OnDifflCheckboxClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIFFL_CHECKBOX
+	void OnDifflCheckboxClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIFFS_CHECKBOX
-    void OnDiffsCheckboxClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIFFS_CHECKBOX
+	void OnDiffsCheckboxClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_RUN_CHOICE
-    void OnRunChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_RUN_CHOICE
+	void OnRunChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_SCF_CHOICE
-    void OnScfChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_SCF_CHOICE
+	void OnScfChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_LOCAL_CHOICE
-    void OnLocalChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_LOCAL_CHOICE
+	void OnLocalChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MCHARGE_TEXTCTRL
-    void OnMchargeTextctrlUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MCHARGE_TEXTCTRL
+	void OnMchargeTextctrlUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MULT_TEXTCTRL
-    void OnMultTextctrlUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MULT_TEXTCTRL
+	void OnMultTextctrlUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_EXE_CHOICE
-    void OnExeChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_EXE_CHOICE
+	void OnExeChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MAXIT_TEXTCTRL
-    void OnMaxitTextctrlUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MAXIT_TEXTCTRL
+	void OnMaxitTextctrlUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_MP2_CHECKBOX
-    void OnMp2CheckboxClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_MP2_CHECKBOX
+	void OnMp2CheckboxClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DFT_CHECKBOX
-    void OnDftCheckboxClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DFT_CHECKBOX
+	void OnDftCheckboxClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CI_CHOICE
-    void OnCiChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CI_CHOICE
+	void OnCiChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CC_CHOICE
-    void OnCcChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CC_CHOICE
+	void OnCcChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TITLE_TEXTCTRL
-    void OnTitleTextctrlUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TITLE_TEXTCTRL
+	void OnTitleTextctrlUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_COORD_CHOICE
-    void OnCoordChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_COORD_CHOICE
+	void OnCoordChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_UNIT_CHOICE
-    void OnUnitChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_UNIT_CHOICE
+	void OnUnitChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ZMAT_VARS_TEXT
-    void OnZmatVarsTextUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ZMAT_VARS_TEXT
+	void OnZmatVarsTextUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POINTGROUP_CHOICE
-    void OnPointgroupChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POINTGROUP_CHOICE
+	void OnPointgroupChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ORDER_CHOICE
-    void OnOrderChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ORDER_CHOICE
+	void OnOrderChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_SYMMETRY_CHECKBOX
-    void OnSymmetryCheckboxClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_SYMMETRY_CHECKBOX
+	void OnSymmetryCheckboxClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TIMELIMIT_TEXT
-    void OnTimelimitTextUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TIMELIMIT_TEXT
+	void OnTimelimitTextUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_TIMELIMITUNITS_CHOICE
-    void OnTimelimitunitsChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_TIMELIMITUNITS_CHOICE
+	void OnTimelimitunitsChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MEMORY_TEXT
-    void OnMemoryTextUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MEMORY_TEXT
+	void OnMemoryTextUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_MEMORYUNITS_CHOICE
-    void OnMemoryunitsChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_MEMORYUNITS_CHOICE
+	void OnMemoryunitsChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MEMDDI_EDIT
-    void OnMemddiEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MEMDDI_EDIT
+	void OnMemddiEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_MEMDDICHOICE
-    void OnMemddichoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_MEMDDICHOICE
+	void OnMemddichoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_DIAGONALIZATION_CHOICE
-    void OnDiagonalizationChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_DIAGONALIZATION_CHOICE
+	void OnDiagonalizationChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CORE_CHECKBOX
-    void OnCoreCheckboxClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CORE_CHECKBOX
+	void OnCoreCheckboxClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_PLBALANCE_RADIOBOX
-    void OnPlbalanceRadioboxSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_PLBALANCE_RADIOBOX
+	void OnPlbalanceRadioboxSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_EXTERNDATAREP_CHECKBOX
-    void OnExterndatarepCheckboxClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_EXTERNDATAREP_CHECKBOX
+	void OnExterndatarepCheckboxClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PARALL_CHECK
-    void OnParallCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PARALL_CHECK
+	void OnParallCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_DFTMETHOD_CHOICE
-    void OnDftmethodChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_DFTMETHOD_CHOICE
+	void OnDftmethodChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_GRID_FUNCTIONAL_CHOICE
-    void OnGridFunctionalChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_GRID_FUNCTIONAL_CHOICE
+	void OnGridFunctionalChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_GRIDFREE_FUNCTIONAL_CHOICE
-    void OnGridfreeFunctionalChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_GRIDFREE_FUNCTIONAL_CHOICE
+	void OnGridfreeFunctionalChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_INITGUESS_CHOICE
-    void OnInitguessChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_INITGUESS_CHOICE
+	void OnInitguessChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_MOGUESS_VECSOURCE_CHOICE
-    void OnMoguessVecsourceChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_MOGUESS_VECSOURCE_CHOICE
+	void OnMoguessVecsourceChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MOGUESS_VECORBCOUNT_TEXT
-    void OnMoguessVecorbcountTextUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MOGUESS_VECORBCOUNT_TEXT
+	void OnMoguessVecorbcountTextUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PRINTINITGUESS_CHECKBOX
-    void OnPrintinitguessCheckboxClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PRINTINITGUESS_CHECKBOX
+	void OnPrintinitguessCheckboxClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_ROTORBITALS_CHECKBOX
-    void OnRotorbitalsCheckboxClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_ROTORBITALS_CHECKBOX
+	void OnRotorbitalsCheckboxClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_HESSMETHOD_RADIO
-    void OnHessmethodRadioSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_HESSMETHOD_RADIO
+	void OnHessmethodRadioSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_FORCEDISPLACE_EDIT
-    void OnForcedisplaceEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_FORCEDISPLACE_EDIT
+	void OnForcedisplaceEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSDOUBLEDIFFCHECK
-    void OnHessdoublediffcheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSDOUBLEDIFFCHECK
+	void OnHessdoublediffcheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSPURIFYCHECK
-    void OnHesspurifycheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSPURIFYCHECK
+	void OnHesspurifycheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSPRTINTFC_CHECK
-    void OnHessprtintfcCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSPRTINTFC_CHECK
+	void OnHessprtintfcCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSVIBANL_CHECK
-    void OnHessvibanlCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSVIBANL_CHECK
+	void OnHessvibanlCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_HESSFREQSCALE_EDIT
-    void OnHessfreqscaleEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_HESSFREQSCALE_EDIT
+	void OnHessfreqscaleEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_MOLPLT_CHECK
-    void OnMolpltCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_MOLPLT_CHECK
+	void OnMolpltCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PLTORB_CHECK
-    void OnPltorbCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PLTORB_CHECK
+	void OnPltorbCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_AIMPAC_CHECK
-    void OnAimpacCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_AIMPAC_CHECK
+	void OnAimpacCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_RPAC_CHECK
-    void OnRpacCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_RPAC_CHECK
+	void OnRpacCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_MISC_PROG_RADIO
-    void OnMiscProgRadioSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_MISC_PROG_RADIO
+	void OnMiscProgRadioSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MP2_CORE_EDIT
-    void OnMp2CoreEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MP2_CORE_EDIT
+	void OnMp2CoreEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MP2MEM_EDIT
-    void OnMp2memEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MP2MEM_EDIT
+	void OnMp2memEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MP2INTCUTOFF_EDIT
-    void OnMp2intcutoffEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MP2INTCUTOFF_EDIT
+	void OnMp2intcutoffEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_LMOMP2_CHECK
-    void OnLmomp2CheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_LMOMP2_CHECK
+	void OnLmomp2CheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_MP2PROP_CHECK
-    void OnMp2propCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_MP2PROP_CHECK
+	void OnMp2propCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_MP2TRANS_RADIO
-    void OnMp2transRadioSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_MP2TRANS_RADIO
+	void OnMp2transRadioSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_MP2AOSTORAGE_RADIO
-    void OnMp2aostorageRadioSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_MP2AOSTORAGE_RADIO
+	void OnMp2aostorageRadioSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIRECTSCF_CHECK
-    void OnDirectscfCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIRECTSCF_CHECK
+	void OnDirectscfCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_FDIFF_CHECK
-    void OnFdiffCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_FDIFF_CHECK
+	void OnFdiffCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_UHF_NO_CHECK
-    void OnUhfNoCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_UHF_NO_CHECK
+	void OnUhfNoCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_SCF_CONV_SPIN
-    void OnScfConvSpinUpdated( wxSpinEvent& event );
+	/// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_SCF_CONV_SPIN
+	void OnScfConvSpinUpdated( wxSpinEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MAXSTEPCOUNT_EDIT
-    void OnMaxstepcountEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MAXSTEPCOUNT_EDIT
+	void OnMaxstepcountEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_GRADCONVCRITERIA_EDIT
-    void OnGradconvcriteriaEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_GRADCONVCRITERIA_EDIT
+	void OnGradconvcriteriaEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_OPTMETHOD_CHOICE
-    void OnOptmethodChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_OPTMETHOD_CHOICE
+	void OnOptmethodChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_INITSTEPSIZE_EDIT
-    void OnInitstepsizeEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_INITSTEPSIZE_EDIT
+	void OnInitstepsizeEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MINSTEPSIZE_EDIT
-    void OnMinstepsizeEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MINSTEPSIZE_EDIT
+	void OnMinstepsizeEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MAXSTEPSIZE_CHECK
-    void OnMaxstepsizeEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_MAXSTEPSIZE_CHECK
+	void OnMaxstepsizeEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_UPDATESTEPSIZE_CHECK
-    void OnUpdatestepsizeCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_UPDATESTEPSIZE_CHECK
+	void OnUpdatestepsizeCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_STATPT_CHECK
-    void OnStatptCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_STATPT_CHECK
+	void OnStatptCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_STATPT_JUMP_EDIT
-    void OnStatptJumpEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_STATPT_JUMP_EDIT
+	void OnStatptJumpEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_INIT_HESS_RADIO
-    void OnInitHessRadioSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_INIT_HESS_RADIO
+	void OnInitHessRadioSelected( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_HESS_RECALC_EDIT
-    void OnHessRecalcEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_HESS_RECALC_EDIT
+	void OnHessRecalcEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_STATPT_MODE_EDIT
-    void OnStatptModeEditUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_STATPT_MODE_EDIT
+	void OnStatptModeEditUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PRINTORBS_CHECK
-    void OnPrintorbsCheckClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PRINTORBS_CHECK
+	void OnPrintorbsCheckClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
-    void OnDefaultsbuttonClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
+	void OnDefaultsbuttonClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_REVERTBUTTON
-    void OnRevertbuttonClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_REVERTBUTTON
+	void OnRevertbuttonClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_WRITEFILEBUTTON
-    void OnWritefilebuttonClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_WRITEFILEBUTTON
+	void OnWritefilebuttonClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
-    void OnCancelClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
+	void OnCancelClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
-    void OnOkClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
+	void OnOkClick( wxCommandEvent& event );
 
 ////@end InputBuilderWindow event handler declarations
 
 ////@begin InputBuilderWindow member function declarations
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource( const wxString& name );
 
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+	/// Retrieves icon resources
+	wxIcon GetIconResource( const wxString& name );
 ////@end InputBuilderWindow member function declarations
 
     /// Should we show tooltips?
@@ -501,102 +501,102 @@ public:
 	void SetupPointGroupOrder(void);
 
 ////@begin InputBuilderWindow member variables
-    wxListbook* listBook;
-    wxUglyChoice* basisChoice;
-    wxStaticText* ecpTypeLabel;
-    wxUglyChoice* ecpTypeChoice;
-    wxUglyChoice* numDChoice;
-    wxUglyChoice* numFChoice;
-    wxUglyChoice* numPChoice;
-    wxStaticText* polarLabel;
-    wxUglyChoice* polarChoice;
-    wxCheckBox* diffuseLCheck;
-    wxCheckBox* diffuseSCheck;
-    wxUglyChoice* runChoice;
-    wxUglyChoice* scfChoice;
-    wxUglyChoice* localChoice;
-    wxTextCtrl* mchargeText;
-    wxTextCtrl* multText;
-    wxUglyChoice* exeChoice;
-    wxTextCtrl* scfIterText;
-    wxCheckBox* mp2Check;
-    wxCheckBox* dftCheck;
-    wxStaticText* ciLabel;
-    wxUglyChoice* ciChoice;
-    wxStaticText* ccLabel;
-    wxUglyChoice* ccChoice;
-    wxTextCtrl* titleText;
-    wxUglyChoice* coordTypeChoice;
-    wxUglyChoice* unitChoice;
-    wxTextCtrl* zmatrixVarsText;
-    wxUglyChoice* pointGroupChoice;
-    wxUglyChoice* paxisOrderChoice;
-    wxCheckBox* symmetryCheck;
-    wxTextCtrl* timeLimitText;
-    wxUglyChoice* timeLimitUnitChoice;
-    wxTextCtrl* memoryText;
-    wxUglyChoice* memoryUnitChoice;
-    wxTextCtrl* memddiText;
-    wxUglyChoice* memddiUnitChoice;
-    wxUglyChoice* diagChoice;
-    wxCheckBox* coreCheck;
-    wxRadioBox* plBalanceRadio;
-    wxCheckBox* externDataRepCheck;
-    wxCheckBox* mSGParallCheck;
-    wxUglyChoice* dftMethodChoice;
-    wxBoxSizer* funcSizer;
-    wxUglyChoice* dftGridFuncChoice;
-    wxUglyChoice* dftGridFreeFuncChoice;
-    wxUglyChoice* initGuessChoice;
-    wxUglyChoice* mMOSourceChoice;
-    wxTextCtrl* mVecOrbCountText;
-    wxCheckBox* printInitGuessCheck;
-    wxCheckBox* rotOrbitalsCheck;
-    wxRadioBox* mHessMethodRadio;
-    wxTextCtrl* mHESSDisplaceEdit;
-    wxCheckBox* mHessDblDiffCheck;
-    wxCheckBox* mHessPurifyCheck;
-    wxCheckBox* mHessPrintIntFCCheck;
-    wxCheckBox* mHessVibAnlCheck;
-    wxTextCtrl* mHessFreqScaleEdit;
-    wxCheckBox* mMolPltCheck;
-    wxCheckBox* mPltOrbCheck;
-    wxCheckBox* aimpacCheck;
-    wxCheckBox* rpacCheck;
-    wxRadioBox* mMiscProgRadio;
-    wxTextCtrl* mMP2CoreEleEdit;
-    wxTextCtrl* mMP2MemEdit;
-    wxTextCtrl* mMP2IntCutoffEdit;
-    wxCheckBox* mLMOMP2Check;
-    wxCheckBox* mMP2PropCheck;
-    wxRadioBox* mMP2TransRadio;
-    wxRadioBox* mMP2AOStorageRadio;
-    wxCheckBox* mDirectSCFCheck;
-    wxCheckBox* mFDiffCheck;
-    wxCheckBox* mUHFNOCheck;
-    wxSpinCtrl* mSCFConvSpin;
-    wxTextCtrl* mMaxStepCountEdit;
-    wxTextCtrl* mGradConvEdit;
-    wxUglyChoice* mOptMethodChoice;
-    wxTextCtrl* mInitStepSizeEdit;
-    wxTextCtrl* mMinStepSizeEdit;
-    wxTextCtrl* mMaxStepSizeEdit;
-    wxCheckBox* mUpdateStepSizeCheck;
-    wxCheckBox* mIsStatPtCheck;
-    wxTextCtrl* mStatPtJumpSizeEdit;
-    wxRadioBox* mInitHessRadio;
-    wxTextCtrl* mHessRecalcEdit;
-    wxTextCtrl* mStatPtModeEdit;
-    wxCheckBox* mPrintOrbsCheck;
-    wxTextCtrl* mTitleText;
-    wxTextCtrl* mBasisSetText;
-    wxTextCtrl* mSCFTypeText;
-    wxTextCtrl* mRunTypeText;
-    wxTextCtrl* mPointGroupText;
-    wxTextCtrl* mElectronCorr;
-    wxButton* defaultsBtn;
-    wxButton* revertBtn;
-    wxButton* writeBtn;
+	wxListbook* listBook;
+	wxUglyChoice* basisChoice;
+	wxStaticText* ecpTypeLabel;
+	wxUglyChoice* ecpTypeChoice;
+	wxUglyChoice* numDChoice;
+	wxUglyChoice* numFChoice;
+	wxUglyChoice* numPChoice;
+	wxStaticText* polarLabel;
+	wxUglyChoice* polarChoice;
+	wxCheckBox* diffuseLCheck;
+	wxCheckBox* diffuseSCheck;
+	wxUglyChoice* runChoice;
+	wxUglyChoice* scfChoice;
+	wxUglyChoice* localChoice;
+	wxTextCtrl* mchargeText;
+	wxTextCtrl* multText;
+	wxUglyChoice* exeChoice;
+	wxTextCtrl* scfIterText;
+	wxCheckBox* mp2Check;
+	wxCheckBox* dftCheck;
+	wxStaticText* ciLabel;
+	wxUglyChoice* ciChoice;
+	wxStaticText* ccLabel;
+	wxUglyChoice* ccChoice;
+	wxTextCtrl* titleText;
+	wxUglyChoice* coordTypeChoice;
+	wxUglyChoice* unitChoice;
+	wxTextCtrl* zmatrixVarsText;
+	wxUglyChoice* pointGroupChoice;
+	wxUglyChoice* paxisOrderChoice;
+	wxCheckBox* symmetryCheck;
+	wxTextCtrl* timeLimitText;
+	wxUglyChoice* timeLimitUnitChoice;
+	wxTextCtrl* memoryText;
+	wxUglyChoice* memoryUnitChoice;
+	wxTextCtrl* memddiText;
+	wxUglyChoice* memddiUnitChoice;
+	wxUglyChoice* diagChoice;
+	wxCheckBox* coreCheck;
+	wxRadioBox* plBalanceRadio;
+	wxCheckBox* externDataRepCheck;
+	wxCheckBox* mSGParallCheck;
+	wxUglyChoice* dftMethodChoice;
+	wxBoxSizer* funcSizer;
+	wxUglyChoice* dftGridFuncChoice;
+	wxUglyChoice* dftGridFreeFuncChoice;
+	wxUglyChoice* initGuessChoice;
+	wxUglyChoice* mMOSourceChoice;
+	wxTextCtrl* mVecOrbCountText;
+	wxCheckBox* printInitGuessCheck;
+	wxCheckBox* rotOrbitalsCheck;
+	wxRadioBox* mHessMethodRadio;
+	wxTextCtrl* mHESSDisplaceEdit;
+	wxCheckBox* mHessDblDiffCheck;
+	wxCheckBox* mHessPurifyCheck;
+	wxCheckBox* mHessPrintIntFCCheck;
+	wxCheckBox* mHessVibAnlCheck;
+	wxTextCtrl* mHessFreqScaleEdit;
+	wxCheckBox* mMolPltCheck;
+	wxCheckBox* mPltOrbCheck;
+	wxCheckBox* aimpacCheck;
+	wxCheckBox* rpacCheck;
+	wxRadioBox* mMiscProgRadio;
+	wxTextCtrl* mMP2CoreEleEdit;
+	wxTextCtrl* mMP2MemEdit;
+	wxTextCtrl* mMP2IntCutoffEdit;
+	wxCheckBox* mLMOMP2Check;
+	wxCheckBox* mMP2PropCheck;
+	wxRadioBox* mMP2TransRadio;
+	wxRadioBox* mMP2AOStorageRadio;
+	wxCheckBox* mDirectSCFCheck;
+	wxCheckBox* mFDiffCheck;
+	wxCheckBox* mUHFNOCheck;
+	wxSpinCtrl* mSCFConvSpin;
+	wxTextCtrl* mMaxStepCountEdit;
+	wxTextCtrl* mGradConvEdit;
+	wxUglyChoice* mOptMethodChoice;
+	wxTextCtrl* mInitStepSizeEdit;
+	wxTextCtrl* mMinStepSizeEdit;
+	wxTextCtrl* mMaxStepSizeEdit;
+	wxCheckBox* mUpdateStepSizeCheck;
+	wxCheckBox* mIsStatPtCheck;
+	wxTextCtrl* mStatPtJumpSizeEdit;
+	wxRadioBox* mInitHessRadio;
+	wxTextCtrl* mHessRecalcEdit;
+	wxTextCtrl* mStatPtModeEdit;
+	wxCheckBox* mPrintOrbsCheck;
+	wxTextCtrl* mTitleText;
+	wxTextCtrl* mBasisSetText;
+	wxTextCtrl* mSCFTypeText;
+	wxTextCtrl* mRunTypeText;
+	wxTextCtrl* mPointGroupText;
+	wxTextCtrl* mElectronCorr;
+	wxButton* defaultsBtn;
+	wxButton* revertBtn;
+	wxButton* writeBtn;
 ////@end InputBuilderWindow member variables
 
     InputData * TmpInputRec;
