@@ -196,6 +196,7 @@ void ZMatrixCalculator::CreateControls()
     mAtom3Edit->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & atom3) );
     mAtom4Edit->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & atom4) );
 ////@end ZMatrixCalculator content construction
+	mAtom1Edit->SetFocus();
 }
 
 /*!
