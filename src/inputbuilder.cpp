@@ -427,6 +427,37 @@ void InputBuilderWindow::CreateControls()
 		_("Triple Zeta Valence"),
 		_("McLean/Chandler"),
 		_T(""),
+		_("Dunning cc-pVDZ"),
+		_("Dunning cc-pVTZ"),
+		_("Dunning cc-pVQZ"),
+		_("Dunning cc-pV5Z"),
+		_("Dunning cc-pV6Z"),
+		_("Dunning aug-cc-pVDZ"),
+		_("Dunning aug-cc-pVTZ"),
+		_("Dunning aug-cc-pVQZ"),
+		_("Dunning aug-cc-pV5Z"),
+		_("Dunning aug-cc-pV6Z"),
+		_("Dunning cc-pCVDZ"),
+		_("Dunning cc-pCVTZ"),
+		_("Dunning cc-pCVQZ"),
+		_("Dunning cc-pCV5Z"),
+		_("Dunning cc-pCV6Z"),
+		_("Dunning aug-cc-pCVDZ"),
+		_("Dunning aug-cc-pCVTZ"),
+		_("Dunning aug-cc-pCVQZ"),
+		_("Dunning aug-cc-pCV5Z"),
+		_("Dunning aug-cc-pCV6Z"),
+		_("Jensen PC0"),
+		_("Jensen PC1"),
+		_("Jensen PC2"),
+		_("Jensen PC3"),
+		_("Jensen PC4"),
+		_("Jensen aug-PC0"),
+		_("Jensen aug-PC1"),
+		_("Jensen aug-PC2"),
+		_("Jensen aug-PC3"),
+		_("Jensen aug-PC4"),
+		_T(""),
 		_("SBKJC Valance"),
 		_("Hay/Wadt Valance"),
 		_T(""),
@@ -434,7 +465,7 @@ void InputBuilderWindow::CreateControls()
 		_("AM1"),
 		_("PM3")
 	};
-	basisChoice = new wxUglyChoice( itemPanel6, ID_BASIS_CHOICE, wxDefaultPosition, wxDefaultSize, 25, basisChoiceStrings, 0 );
+	basisChoice = new wxUglyChoice( itemPanel6, ID_BASIS_CHOICE, wxDefaultPosition, wxDefaultSize, 56, basisChoiceStrings, 0 );
 	basisChoice->SetStringSelection(_("MINI"));
 	itemBoxSizer8->Add(basisChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
@@ -1580,24 +1611,24 @@ void InputBuilderWindow::SetupBasisItems() {
     // basisChoice
     itemValue = BasisValue;
     if(itemValue == 0) itemValue = 1;
-    else if(itemValue == 3) itemValue = NumGauss + 1;
-    else if(itemValue == 4) {
+    else if(itemValue == GAMESS_BS_STO) itemValue = NumGauss + 1;
+    else if(itemValue == GAMESS_BS_N21) {
         itemValue += 4;
         if(NumGauss == 6) itemValue++;
     }
-    else if(itemValue == 5) itemValue = NumGauss + 6;
-    else if(itemValue > 5) itemValue += 7;
+    else if(itemValue == GAMESS_BS_N31) itemValue = NumGauss + 6;
+    else if(itemValue > GAMESS_BS_N311) itemValue += 7;
     basisChoice->SetSelection(itemValue - 1);
     CheckBasisMenu();
     
     // ecpTypeChoice
-    if(BasisValue == 12 || BasisValue == 13) {
+    if(BasisValue == GAMESS_BS_SBKJC || BasisValue == GAMESS_BS_HW) {
         ecpTypeChoice->Enable(true);
         ecpTypeLabel->Enable(true);
         itemValue = TmpInputRec->Basis->GetECPPotential();
         if(itemValue == 0) {
-            if(BasisValue == 12) itemValue = 2;
-            else itemValue = 3;
+            if(BasisValue == GAMESS_BS_SBKJC) itemValue = GAMESS_BS_ECP_SBKJC;
+            else itemValue = GAMESS_BS_ECP_HW;
         }
         ecpTypeChoice->SetSelection(itemValue);
     }
@@ -2258,22 +2289,21 @@ void InputBuilderWindow::OnBasisChoiceSelected( wxCommandEvent& event )
         BasisValue = itemValue + 1;
     }
     else if(itemValue < 7) {
-        BasisValue = 3;
+        BasisValue = GAMESS_BS_STO;
         NumGauss = itemValue;
     }
     else if(itemValue < 9) {
-        BasisValue = 4;
+        BasisValue = GAMESS_BS_N21;
         NumGauss = ((itemValue==7) ? 3 : 6);
     }
     else if(itemValue < 12) {
-        BasisValue = 5;
+        BasisValue = GAMESS_BS_N31;
         NumGauss = itemValue - 5;
     }
     else if(itemValue < 18) {
         BasisValue = itemValue - 6;
         if(itemValue == 12) NumGauss = 6;
-    }
-    else {
+    } else {
         BasisValue = itemValue - 6;
     }
     

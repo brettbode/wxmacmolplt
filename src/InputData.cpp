@@ -1657,8 +1657,68 @@ const char * BasisGroup::GAMESSBasisSetToText(GAMESS_BasisSet bs) {
 			return "TZV";
 		case GAMESS_BS_MC:
 			return "MC";
-		case GAMESS_BS_SBK:
-			return "SBK";
+		case GAMESS_BS_CC_PVDZ:
+			return "CCD";
+		case GAMESS_BS_CC_PVTZ:
+			return "CCT";
+		case GAMESS_BS_CC_PVQZ:
+			return "CCQ";
+		case GAMESS_BS_CC_PV5Z:
+			return "CC5";
+		case GAMESS_BS_CC_PV6Z:
+			return "CC6";
+		case GAMESS_BS_AUG_CC_PVDZ:
+			return "ACCD";
+		case GAMESS_BS_AUG_CC_PVTZ:
+			return "ACCT";
+		case GAMESS_BS_AUG_CC_PVQZ:
+			return "ACCQ";
+		case GAMESS_BS_AUG_CC_PV5Z:
+			return "ACC5";
+		case GAMESS_BS_AUG_CC_PV6Z:
+			return "ACC6";
+		case GAMESS_BS_CC_PCVDZ:
+			return "CCDC";
+		case GAMESS_BS_CC_PCVTZ:
+			return "CCTC";
+		case GAMESS_BS_CC_PCVQZ:
+			return "CCQC";
+		case GAMESS_BS_CC_PCV5Z:
+			return "CC5C";
+		case GAMESS_BS_CC_PCV6Z:
+			return "CC6C";
+		case GAMESS_BS_AUG_CC_PCVDZ:
+			return "ACCDC";
+		case GAMESS_BS_AUG_CC_PCVTZ:
+			return "ACCTC";
+		case GAMESS_BS_AUG_CC_PCVQZ:
+			return "ACCQC";
+		case GAMESS_BS_AUG_CC_PCV5Z:
+			return "ACC5C";
+		case GAMESS_BS_AUG_CC_PCV6Z:
+			return "ACC6C";
+		case GAMESS_BS_PC0:
+			return "PC0";
+		case GAMESS_BS_PC1:
+			return "PC1";
+		case GAMESS_BS_PC2:
+			return "PC2";
+		case GAMESS_BS_PC3:
+			return "PC3";
+		case GAMESS_BS_PC4:
+			return "PC4";
+		case GAMESS_BS_APC0:
+			return "APC0";
+		case GAMESS_BS_APC1:
+			return "APC1";
+		case GAMESS_BS_APC2:
+			return "APC2";
+		case GAMESS_BS_APC3:
+			return "APC3";
+		case GAMESS_BS_APC4:
+			return "APC4";
+		case GAMESS_BS_SBKJC:
+			return "SBKJC";
 		case GAMESS_BS_HW:
 			return "HW";
 		case GAMESS_BS_MNDO:
@@ -1826,22 +1886,22 @@ GAMESS_BS_ECPotential BasisGroup::SetECPPotential(const char *ECPText) {
 }
 short BasisGroup::GetECPPotential(void) const {
 	short value = ECPPotential;
-	if (value == 0) {
-		if (Basis == 12) value = 2;
-		if (Basis == 13) value = 3;
+	if (value <= GAMESS_BS_ECP_None) {
+		if (Basis == GAMESS_BS_SBKJC) value = GAMESS_BS_ECP_SBKJC;
+		if (Basis == GAMESS_BS_HW) value = GAMESS_BS_ECP_HW;
 	}
 	return value;
 }
 const char * BasisGroup::GetECPPotentialText(void) const {
 	short value = ECPPotential;
-	if (value == 0) {
-		if (Basis == 12) value = 2;
-		if (Basis == 13) value = 3;
+	if (value <= GAMESS_BS_ECP_None) {
+		if (Basis == GAMESS_BS_SBKJC) value = GAMESS_BS_ECP_SBKJC;
+		if (Basis == GAMESS_BS_HW) value = GAMESS_BS_ECP_HW;
 	}
 	return GAMESSECPToText((GAMESS_BS_ECPotential) value);
 }
 short BasisGroup::SetECPPotential(short NewType) {
-	if ((NewType<0)||(NewType>3)) return -1;
+	if ((NewType<GAMESS_BS_ECP_None)||(NewType>NumGAMESSBSECPItems)) return -1;
 	ECPPotential = NewType;
 	return ECPPotential;
 }

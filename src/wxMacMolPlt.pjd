@@ -11391,7 +11391,6 @@ mass-weighted cartesian space as shown."</string>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
-                    <bool name="proxy-AUI manager">0</bool>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -11522,7 +11521,7 @@ mass-weighted cartesian space as shown."</string>
                           <long name="proxy-Id value">10098</long>
                           <string name="proxy-Class">"wxUglyChoice"</string>
                           <string name="proxy-Member variable name">"basisChoice"</string>
-                          <string name="proxy-Strings">"MINI|MIDI|STO-2G|STO-3G|STO-4G|STO-5G|STO-6G|3-21G|6-21G|4-31G|5-31G|6-31G|6-311G|Double Zeta Valance|Dunning/Hay DZ|Binning/Curtiss DZ|Triple Zeta Valence|McLean/Chandler||SBKJC Valance|Hay/Wadt Valance||MNDO|AM1|PM3"</string>
+                          <string name="proxy-Strings">"MINI|MIDI|STO-2G|STO-3G|STO-4G|STO-5G|STO-6G|3-21G|6-21G|4-31G|5-31G|6-31G|6-311G|Double Zeta Valance|Dunning/Hay DZ|Binning/Curtiss DZ|Triple Zeta Valence|McLean/Chandler||Dunning cc-pVDZ|Dunning cc-pVTZ|Dunning cc-pVQZ|Dunning cc-pV5Z|Dunning cc-pV6Z|Dunning aug-cc-pVDZ|Dunning aug-cc-pVTZ|Dunning aug-cc-pVQZ|Dunning aug-cc-pV5Z|Dunning aug-cc-pV6Z|Dunning cc-pCVDZ|Dunning cc-pCVTZ|Dunning cc-pCVQZ|Dunning cc-pCV5Z|Dunning cc-pCV6Z|Dunning aug-cc-pCVDZ|Dunning aug-cc-pCVTZ|Dunning aug-cc-pCVQZ|Dunning aug-cc-pCV5Z|Dunning aug-cc-pCV6Z|Jensen PC0|Jensen PC1|Jensen PC2|Jensen PC3|Jensen PC4|Jensen aug-PC0|Jensen aug-PC1|Jensen aug-PC2|Jensen aug-PC3|Jensen aug-PC4||SBKJC Valance|Hay/Wadt Valance||MNDO|AM1|PM3"</string>
                           <string name="proxy-Initial value">"MINI"</string>
                           <string name="proxy-Help text">""</string>
                           <string name="proxy-Tooltip text">""</string>
@@ -11555,11 +11554,6 @@ mass-weighted cartesian space as shown."</string>
                           <bool name="proxy-wxFIXED_MINSIZE">0</bool>
                           <string name="proxy-Custom arguments">""</string>
                           <string name="proxy-Custom ctor arguments">""</string>
-                          <string name="proxy-Base class">"wxChoice"</string>
-                          <bool name="proxy-External implementation">1</bool>
-                          <bool name="proxy-Separate files">0</bool>
-                          <string name="proxy-Implementation filename">""</string>
-                          <string name="proxy-Header filename">""</string>
                         </document>
                         <document>
                           <string name="title">"Spacer"</string>
@@ -11795,11 +11789,6 @@ mass-weighted cartesian space as shown."</string>
                           <bool name="proxy-wxFIXED_MINSIZE">0</bool>
                           <string name="proxy-Custom arguments">""</string>
                           <string name="proxy-Custom ctor arguments">""</string>
-                          <string name="proxy-Base class">"wxStaticText"</string>
-                          <bool name="proxy-External implementation">1</bool>
-                          <bool name="proxy-Separate files">0</bool>
-                          <string name="proxy-Implementation filename">""</string>
-                          <string name="proxy-Header filename">""</string>
                         </document>
                         <document>
                           <string name="title">"wxUglyChoice: ID_NUMD_CHOICE"</string>
