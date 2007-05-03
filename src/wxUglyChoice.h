@@ -41,6 +41,16 @@ class wxUglyChoice : public wxPanel {
                  long style = 0);
 
     /**
+		* Constructor.
+     */
+    wxUglyChoice(wxWindow* parent,
+                 wxWindowID id = -1,
+                 const wxPoint &pos = wxDefaultPosition,
+                 const wxSize &size = wxDefaultSize,
+                 const wxArrayString & choices=wxArrayString(),
+                 long style = 0);
+	
+    /**
      * Destructor.  TODO
      */
     ~wxUglyChoice();

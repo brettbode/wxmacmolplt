@@ -196,7 +196,7 @@ class ControlGroup {
 			//bit 3		AIMPAC;
 			//bit 4		RPAC;
 			//bit 5		DFT active;
-			//bit 6		IntType;
+			//bit 6		Spherical Harmonic flag;
 			//bit 7		NormF;
 			//bit 8		NormP;
 	public:		//Public data access functions
@@ -247,8 +247,8 @@ class ControlGroup {
 		inline bool GetRPAC(void) const {return ((Options & (1<<3))?true:false);};
 		bool UseDFT(bool state);
 		bool UseDFT(void) const;
-		bool SetIntType(bool State);
-		inline bool GetIntType(void) const {return ((Options & (1<<5))?true:false);};
+		bool UseSphericalHarmonics(bool State);
+		inline bool UseSphericalHarmonics(void) const {return ((Options & (1<<5))?true:false);};
 		bool SetNormF(bool State);
 		inline bool GetNormF(void) const {return ((Options & (1<<6))?true:false);};
 		bool SetNormP(bool State);
@@ -403,6 +403,14 @@ enum GAMESS_BasisSet {
 	GAMESS_BS_SBKJC,
 	GAMESS_BS_HW,
 	
+	GAMESS_BS_MCP_DZP,
+	GAMESS_BS_MCP_TZP,
+	GAMESS_BS_MCP_QZP,
+	GAMESS_BS_IMCP_SR1,
+	GAMESS_BS_IMCP_SR2,
+	GAMESS_BS_IMCP_NR1,
+	GAMESS_BS_IMCP_NR2,
+	
 	GAMESS_BS_MNDO,
 	GAMESS_BS_AM1,
 	GAMESS_BS_PM3,
@@ -428,6 +436,7 @@ enum GAMESS_BS_ECPotential {
 	GAMESS_BS_ECP_Read,
 	GAMESS_BS_ECP_SBKJC,
 	GAMESS_BS_ECP_HW,
+	GAMESS_BS_ECP_MCP,
 	
 	NumGAMESSBSECPItems
 };

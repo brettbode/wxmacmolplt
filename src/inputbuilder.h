@@ -57,6 +57,7 @@ class wxSpinCtrl;
 #define ID_POLAR_CHOICE 10103
 #define ID_DIFFL_CHECKBOX 10104
 #define ID_DIFFS_CHECKBOX 10105
+#define ID_SPHERE_CHECK 10256
 #define ID_IBCONTROLPANEL 10092
 #define ID_RUN_CHOICE 10106
 #define ID_SCF_CHOICE 10107
@@ -235,6 +236,9 @@ public:
 
 	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_DIFFS_CHECKBOX
 	void OnDiffsCheckboxClick( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_SPHERE_CHECK
+	void OnSphereCheckClick( wxCommandEvent& event );
 
 	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_RUN_CHOICE
 	void OnRunChoiceSelected( wxCommandEvent& event );
@@ -512,6 +516,7 @@ public:
 	wxUglyChoice* polarChoice;
 	wxCheckBox* diffuseLCheck;
 	wxCheckBox* diffuseSCheck;
+	wxCheckBox* spherHarmCheck;
 	wxUglyChoice* runChoice;
 	wxUglyChoice* scfChoice;
 	wxUglyChoice* localChoice;

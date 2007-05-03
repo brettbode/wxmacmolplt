@@ -527,7 +527,16 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				MainData->InputOptions->Control->SetMaxIt(nAtoms);
 			if (ReadStringKeyword(Line, "ECP", token))
 				MainData->InputOptions->Basis->SetECPPotential(token);
-
+			if (ReadStringKeyword(Line, "PP", token))
+				MainData->InputOptions->Basis->SetECPPotential(token);
+			if (ReadLongKeyword(Line, "ISPHER", &nAtoms)) {
+				if (nAtoms == 1)
+					MainData->InputOptions->Control->UseSphericalHarmonics(true);
+			}
+			if (ReadLongKeyword(Line, "NOSYM", &nAtoms)) {
+				MainData->InputOptions->Data->SetUseSym((nAtoms==0));
+			}
+			
 			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
 					//scan for multiple occurances of this group
 				if (!Buffer->FindGroup("CONTRL")) EndOfGroup = true;
@@ -597,6 +606,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	Buffer->SetFilePos(0);	//restart search from beginning of file
 	EndOfGroup = false;
 	if (Buffer->FindGroup("SCF")) {
+		if (!MainData->InputOptions->SCF) MainData->InputOptions->SCF = new SCFGroup;
 		do {
 			Buffer->GetLine(Line);
 			if (ReadBooleanKeyword(Line, "DIRSCF", &BoolTest))
@@ -2672,13 +2682,28 @@ void MoleculeData::ReadControlOptions(BufferFile * Buffer) {
 		Buffer->SetFilePos(StartPos);
 	}
 
-	if (Buffer->LocateKeyWord("ECP", 3, EndPos)) {
+	bool foo = Buffer->LocateKeyWord("ECP", 3, EndPos);
+	if (!foo) test = Buffer->LocateKeyWord("PP  ", 4, EndPos);
+	if (foo) {
 		Buffer->GetLine(LineText);
 		sscanf(&(LineText[7]),"%s", token);
 		InputOptions->Basis->SetECPPotential(token);
 		Buffer->SetFilePos(StartPos);
 	}
 
+	if (Buffer->LocateKeyWord("ISPHER", 6, EndPos)) {
+		Buffer->GetLine(LineText);
+		sscanf(&(LineText[7]),"%ld", &test);
+		if (test == 1) InputOptions->Control->UseSphericalHarmonics(true);
+		Buffer->SetFilePos(StartPos);
+	}
+	if (Buffer->LocateKeyWord("NOSYM", 5, EndPos)) {
+		Buffer->GetLine(LineText);
+		sscanf(&(LineText[7]),"%ld", &test);
+		InputOptions->Data->SetUseSym((test==0));
+		Buffer->SetFilePos(StartPos);
+	}
+	
 	if (Buffer->LocateKeyWord("NORMF", 5, EndPos)) {
 		Buffer->GetLine(LineText);
 		sscanf(&(LineText[7]),"%ld", &test);

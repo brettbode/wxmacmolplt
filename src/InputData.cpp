@@ -729,7 +729,7 @@ bool ControlGroup::SetRPAC(bool State) {
 	if (State) Options += (1<<3);
 	return ((Options & (1<<3))?true:false);
 }
-bool ControlGroup::SetIntType(bool State) {
+bool ControlGroup::UseSphericalHarmonics(bool State) {
 	if (Options & (1<<5)) Options -= (1<<5);
 	if (State) Options += (1<<5);
 	return ((Options & (1<<5))?true:false);
@@ -986,9 +986,9 @@ void ControlGroup::ReadXML(XMLElement * parent) {
 						if (child->getBoolValue(tb))
 							UseDFT(tb);
 						break;
-					case MMP_IOCGIntType:
+					case MMP_IOCGSphericalHarm:
 						if (child->getBoolValue(tb))
-							SetIntType(tb);
+							UseSphericalHarmonics(tb);
 						break;
 					case MMP_IOCGNormF:
 						if (child->getBoolValue(tb))
@@ -1051,7 +1051,7 @@ void ControlGroup::WriteXML(XMLElement * parent) const {
 	if (GetAIMPAC()) Ele->addChildElement(CML_convert(MMP_IOCGAIMPac), trueXML);
 	if (GetRPAC()) Ele->addChildElement(CML_convert(MMP_IOCGRPac), trueXML);
 	if (UseDFT()) Ele->addChildElement(CML_convert(MMP_IOCGDFTActive), trueXML);
-	if (GetIntType()) Ele->addChildElement(CML_convert(MMP_IOCGIntType), trueXML);
+	if (UseSphericalHarmonics()) Ele->addChildElement(CML_convert(MMP_IOCGSphericalHarm), trueXML);
 	if (GetNormF()) Ele->addChildElement(CML_convert(MMP_IOCGNormF), trueXML);
 	if (GetNormP()) Ele->addChildElement(CML_convert(MMP_IOCGNormP), trueXML);
 }
@@ -1117,9 +1117,18 @@ void ControlGroup::WriteToFile(BufferFile *File, InputData *IData, long NumElect
 	}
 	if (IData->Basis) {
 		if (IData->Basis->GetECPPotential()) {
-			sprintf(Out, "ECP=%s ",IData->Basis->GetECPPotentialText());
+			sprintf(Out, "PP=%s ",IData->Basis->GetECPPotentialText());
 	 		File->WriteLine(Out, false);
 		}
+	}
+	bool tempSphere = UseSphericalHarmonics();
+	if (!tempSphere && IData->Basis) {
+		if ((IData->Basis->GetBasis()>=GAMESS_BS_CC_PVDZ)&&(IData->Basis->GetBasis()<=GAMESS_BS_APC4))
+			tempSphere = true;
+	}
+	if (tempSphere) {
+		sprintf(Out, "ISPHER=1 ", IData->Data->GetCoordText());
+		File->WriteLine(Out, false);
 	}
 	if (IData->Data) {
 		if (IData->Data->GetCoordType()) {
@@ -1721,6 +1730,20 @@ const char * BasisGroup::GAMESSBasisSetToText(GAMESS_BasisSet bs) {
 			return "SBKJC";
 		case GAMESS_BS_HW:
 			return "HW";
+		case GAMESS_BS_MCP_DZP:
+			return "MCP-DZP";
+		case GAMESS_BS_MCP_TZP:
+			return "MCP-TZP";
+		case GAMESS_BS_MCP_QZP:
+			return "MCP-QZP";
+		case GAMESS_BS_IMCP_SR1:
+			return "IMCP-SR1";
+		case GAMESS_BS_IMCP_SR2:
+			return "IMCP-SR2";
+		case GAMESS_BS_IMCP_NR1:
+			return "IMCP-NR1";
+		case GAMESS_BS_IMCP_NR2:
+			return "IMCP-NR2";
 		case GAMESS_BS_MNDO:
 			return "MNDO";
 		case GAMESS_BS_AM1:
@@ -1745,7 +1768,7 @@ short BasisGroup::SetBasis(const char *BasisText) {
 	return Basis;
 }
 short BasisGroup::SetBasis(short NewBasis) {
-	if ((NewBasis<-1)||(NewBasis>16)) return -1;
+	if ((NewBasis<-1)||(NewBasis>NumGAMESSBasisSetsItem)) return -1;
 	
 	Basis = NewBasis;
 	return Basis;
@@ -1864,6 +1887,8 @@ const char * BasisGroup::GAMESSECPToText(GAMESS_BS_ECPotential p) {
 			return "SBKJC";
 		case GAMESS_BS_ECP_HW:
 			return "HW";
+		case GAMESS_BS_ECP_MCP:
+			return "MCP";
 	}
 	return "invalid";
 }
@@ -1889,16 +1914,13 @@ short BasisGroup::GetECPPotential(void) const {
 	if (value <= GAMESS_BS_ECP_None) {
 		if (Basis == GAMESS_BS_SBKJC) value = GAMESS_BS_ECP_SBKJC;
 		if (Basis == GAMESS_BS_HW) value = GAMESS_BS_ECP_HW;
+		if ((Basis >= GAMESS_BS_MCP_DZP)&&(Basis <= GAMESS_BS_IMCP_NR2))
+			value = GAMESS_BS_ECP_MCP;
 	}
 	return value;
 }
 const char * BasisGroup::GetECPPotentialText(void) const {
-	short value = ECPPotential;
-	if (value <= GAMESS_BS_ECP_None) {
-		if (Basis == GAMESS_BS_SBKJC) value = GAMESS_BS_ECP_SBKJC;
-		if (Basis == GAMESS_BS_HW) value = GAMESS_BS_ECP_HW;
-	}
-	return GAMESSECPToText((GAMESS_BS_ECPotential) value);
+	return GAMESSECPToText((GAMESS_BS_ECPotential) GetECPPotential());
 }
 short BasisGroup::SetECPPotential(short NewType) {
 	if ((NewType<GAMESS_BS_ECP_None)||(NewType>NumGAMESSBSECPItems)) return -1;

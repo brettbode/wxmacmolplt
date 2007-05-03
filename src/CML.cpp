@@ -2859,8 +2859,8 @@ const char * CML_convert(MMP_IOControlGroupNS t)
 			return "RPac";
 		case MMP_IOCGDFTActive:
 			return "DFTActive";
-		case MMP_IOCGIntType:
-			return "IntegralType";
+		case MMP_IOCGSphericalHarm:
+			return "SphericalHarmonics";
 		case MMP_IOCGNormF:
 			return "NormalizeF";
 		case MMP_IOCGNormP:

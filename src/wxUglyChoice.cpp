@@ -61,6 +61,60 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
     }
 }
 
+wxUglyChoice::wxUglyChoice(wxWindow* parent,
+                           wxWindowID id,
+                           const wxPoint &pos,
+                           const wxSize &size,
+                           const wxArrayString & choices,
+                           long style) :
+						wxPanel(parent,
+								id,
+								pos,
+								size,
+								wxTAB_TRAVERSAL,
+								wxT("ugly_choice")) {
+	
+    this->SetSizeHints(size.GetWidth(), size.GetHeight());
+	
+    /* Initialize control elements */
+	
+    m_txt = new wxTextCtrl(this,
+                           wxID_ANY,
+                           wxT(""),
+                           wxDefaultPosition,
+                           wxDefaultSize,
+                           wxTE_READONLY);
+	
+    wxBitmap btnBitmap(arrow_xpm);
+    m_btn = new wxBitmapButton(this, wxID_ANY, btnBitmap);
+    wxSize tSize = m_txt->GetSize();
+    m_btn->SetSize(tSize.GetHeight(), tSize.GetHeight());
+    btnID = m_btn->GetId();
+    Connect(btnID,
+            wxEVT_COMMAND_BUTTON_CLICKED,
+            wxCommandEventHandler(wxUglyChoice::onButtonClick));
+	
+    m_menu = new wxMenu();
+	
+    item.clear();
+    selection = -1;
+	
+    /* Add components to panel */
+	
+    wxBoxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
+    sizer->Add(m_txt, 1, wxEXPAND);
+    sizer->Add(m_btn);
+    SetSizer(sizer);
+	
+    /* Add initial items to control */
+    
+    if(!choices.IsEmpty()) {
+        for(int i = 0; i < choices.GetCount(); ++i) {
+            Append(choices.Item(i));
+        }
+    }
+}
+
 wxUglyChoice::~wxUglyChoice() {
 }
 

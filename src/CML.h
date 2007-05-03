@@ -287,7 +287,7 @@ enum MMP_IOControlGroupNS {
 	MMP_IOCGAIMPac,
 	MMP_IOCGRPac,
 	MMP_IOCGDFTActive,
-	MMP_IOCGIntType,
+	MMP_IOCGSphericalHarm,
 	MMP_IOCGNormF,
 	MMP_IOCGNormP,
 	
