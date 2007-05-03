@@ -3207,8 +3207,8 @@ void MolDisplayWin::LassoEnd(const int x, const int y) {
 }
 
 bool MolDisplayWin::LassoHasArea(void) {
-	return fabs(lasso_end.x - lasso_start.x) > 3 &&
-		   fabs(lasso_end.y - lasso_start.y) > 3;
+	return abs(lasso_end.x - lasso_start.x) > 3 &&
+		   abs(lasso_end.y - lasso_start.y) > 3;
 }
 
 bool MolDisplayWin::LassoContains(const int x, const int y) {
