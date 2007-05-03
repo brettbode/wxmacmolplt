@@ -915,6 +915,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 				lFrame->resetAllSelectState();
 			}
 			MolWin->SetHighliteMode(true);
+
+			int nselected = 0;
 			for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
 				gluProject(lAtoms[i].Position.x,
 						   lAtoms[i].Position.y,
@@ -922,7 +924,12 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						   mv, proj, viewport, &win_x, &win_y, &win_z);
 				if (MolWin->LassoContains((int) win_x, (int) win_y)) {
 					lAtoms[i].SetSelectState(true);
+					nselected++;
 				}
+			}
+
+			if (nselected >= 4) {
+				select_stack_top = 5;
 			}
 
 			// for each atom
@@ -1166,7 +1173,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 				// If the user clicked on nothing, we try to add an atom given
 				// the selected element on the periodic table palette.
-				if (selected < 0 && periodic_dlg &&
+				if (selected < 0 && periodic_dlg && MolWin->HandSelected() &&
 					periodic_dlg->GetSelectedID() != 0) {
 
 					// if (periodic_dlg) { 
@@ -1475,6 +1482,11 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 	if (isAtom) {
 		insertAnnotationMenuItems(menu);
 		menu.AppendSeparator();
+
+		if (select_stack_top >= 4) {
+			menu.Append(wxID_ANY, wxT("Fit atoms to plane"));
+			menu.AppendSeparator();
+		}
 	}
 
 	// If a bond is clicked on, we show some bond specific items, like
