@@ -829,6 +829,10 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		// printf("event.CmdDown(): %d\n", event.CmdDown()); 
 		// printf("event.ShiftDown(): %d\n", event.ShiftDown()); 
 	// } 
+	
+	if (event.Entering() && MolWin->LassoSelected()) {
+		stale_click = true;
+	}
 
 	// First handle left mouse down.
 	if (event.LeftDown() || (event.LeftIsDown() && stale_click)) {
@@ -838,6 +842,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		if (interactiveMode) {
 			if (MolWin->LassoSelected()) {
 				MolWin->LassoStart(tmpPnt.x, height - tmpPnt.y);
+				select_stack_top = 5;
 			} else if (selected >= 0 && selected < NumAtoms) {
 				GLdouble tmpWinX, tmpWinY;
 
@@ -894,11 +899,15 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	}
 
+	else if (event.Leaving() && event.LeftIsDown() && MolWin->LassoSelected()) {
+		MolWin->LassoEnd(tmpPnt.x, height - tmpPnt.y);
+	}
+
 	// If we made it this far, button states haven't changed.  Are we dragging?
 	else if (event.Dragging()) {
 		mSelectState++;
 
-		if (MolWin->LassoSelected()) {
+		if (MolWin->LassoSelected() && event.LeftIsDown()) {
 			GLdouble mv[16];
 			GLdouble proj[16];
 			GLint viewport[4];

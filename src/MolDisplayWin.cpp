@@ -268,9 +268,9 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 
 	EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
 	EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
-	EVT_SIZE( MolDisplayWin::eventSize )
+	EVT_SIZE(MolDisplayWin::eventSize)
 	EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
-	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen )
+	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen)
 	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 	EVT_ACTIVATE(MolDisplayWin::OnActivate)
 	EVT_TOOL_RANGE(MMP_TOOL_ARROW, MMP_TOOL_HAND, MolDisplayWin::OnToggleTool)
@@ -298,12 +298,14 @@ public:
 	void SetScrollBar(int pos, int range);
 	void SetScrollBarValue(int pos);
 	void OnSize(wxSizeEvent & event);
+
 private:
-		MolDisplayWin *	myParent;
-		wxScrollBar *	myScroll;
+	MolDisplayWin *	myParent;
+	wxScrollBar *	myScroll;
 		
 	DECLARE_EVENT_TABLE()
 };
+
 BEGIN_EVENT_TABLE(MolStatusBar, wxStatusBar)
 	EVT_SIZE(MolStatusBar::OnSize)
 	EVT_COMMAND_SCROLL(MMP_FRAMESCROLLBAR, MolStatusBar::OnScrollBarChange )
@@ -424,10 +426,11 @@ MolDisplayWin::~MolDisplayWin() {
 		ProgressInd = NULL;
 	}
 	
-	if(MainData != NULL) {
+	if (MainData != NULL) {
 		delete MainData;
 		MainData = NULL;
 	}
+
 	if (Prefs != NULL) {
 		delete Prefs;
 		Prefs = NULL;
@@ -1823,8 +1826,7 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 	interactiveMode = 1 - interactiveMode;
 
 	if (interactiveMode) {
-		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE |
-				                wxTB_TEXT, 5423); // | wxTB_TEXT);
+		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT);
 
 #include "xpms/arrow.xpm"
 #include "xpms/rect_lasso.xpm"
@@ -1832,26 +1834,28 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 
 		toolbar->SetToolBitmapSize(wxSize(32, 32));
 
-		toolbar->AddRadioTool(MMP_TOOL_ARROW, wxT("View"), wxBITMAP(arrow));
-		toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select"), wxBITMAP(rect_lasso));
-		toolbar->AddRadioTool(MMP_TOOL_HAND, wxT("Edit"), wxBITMAP(hand));
+		// toolbar->AddRadioTool(MMP_TOOL_ARROW, wxT("View"), wxBITMAP(arrow)); 
+		// toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select"), wxBITMAP(rect_lasso)); 
+		// toolbar->AddRadioTool(MMP_TOOL_HAND, wxT("Edit"), wxBITMAP(hand)); 
 
-		// wxBitmap enabled_bmp; 
+		wxBitmap enabled_bmp;
+		wxBitmap enabled_bmp2;
 
-		// enabled_bmp = wxBitmap(arrow_xpm); 
-		// toolbar->AddTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp, 
-			// wxNullBitmap, wxITEM_RADIO, wxT("Dummy"), 
-			// wxT("Don't do anything")); 
+		enabled_bmp = wxBitmap(arrow_xpm);
+		enabled_bmp2 = wxBitmap(hand_xpm);
+		toolbar->AddTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp,
+			enabled_bmp2, wxITEM_RADIO, wxT("Dummy"),
+			wxT("Don't do anything"));
 
-		// enabled_bmp = wxBitmap(rect_lasso_xpm); 
-		// toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select"), enabled_bmp, 
-			// wxNullBitmap, wxITEM_RADIO, wxT("Select"), 
-			// wxT("Select atoms by bounding box")); 
+		enabled_bmp = wxBitmap(rect_lasso_xpm);
+		toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select"), enabled_bmp,
+			wxNullBitmap, wxITEM_RADIO, wxT("Select"),
+			wxT("Select atoms by bounding box"));
 
-		// enabled_bmp = wxBitmap(hand_xpm); 
-		// toolbar->AddTool(MMP_TOOL_HAND, wxT("Edit"), enabled_bmp, 
-			// wxNullBitmap, wxITEM_RADIO, wxT("Translate atoms"), 
-			// wxT("Don't do anything")); 
+		enabled_bmp = wxBitmap(hand_xpm);
+		toolbar->AddTool(MMP_TOOL_HAND, wxT("Edit"), enabled_bmp,
+			wxNullBitmap, wxITEM_RADIO, wxT("Translate atoms"),
+			wxT("Don't do anything"));
 
 		toolbar->AddSeparator();
 		toolbar->Realize();
@@ -3149,16 +3153,21 @@ void MolStatusBar::OnScrollBarChange(wxScrollEvent & event) {
 }
 
 void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
-	// printf("event.GetId(): %d\n", event.GetId()); 
-	// printf("MMP_TOOL_LASSO: %d\n", MMP_TOOL_LASSO); 
-	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", toolbar->GetToolState(MMP_TOOL_LASSO)); 
-	// printf("toolbar->GetToolState(MMP_TOOL_OTHER): %d\n", toolbar->GetToolState(MMP_TOOL_OTHER)); 
-	// toolbar->ToggleTool(MMP_TOOL_LASSO, true); 
-	// toolbar->EnableTool(MMP_TOOL_LASSO, true); 
-	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", toolbar->GetToolState(MMP_TOOL_LASSO)); 
-	// printf("toolbar->GetToolState(MMP_TOOL_OTHER): %d\n", toolbar->GetToolState(MMP_TOOL_OTHER)); 
 
-	toolbar->ToggleTool(event.GetId(), true);
+	// The tool is toggled automatically by wx, but we don't really want to
+	// allow it to be toggled off.  So, we explicitly force any click on the
+	// button to be a toggle on.
+	// toolbar->ToggleTool(event.GetId(), true); 
+
+	printf("toolbar->GetToolState(MMP_TOOL_ARROW): %d\n",
+		toolbar->GetToolState(MMP_TOOL_ARROW));
+
+	printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n",
+		toolbar->GetToolState(MMP_TOOL_LASSO));
+
+	printf("toolbar->GetToolState(MMP_TOOL_HAND): %d\n",
+		toolbar->GetToolState(MMP_TOOL_HAND));
+
 	
 	switch (event.GetId()) {
 		case MMP_TOOL_ARROW:
@@ -3217,4 +3226,3 @@ bool MolDisplayWin::LassoContains(const int x, const int y) {
 	       ((y >= lasso_start.y && y <= lasso_end.y) ||
 			(y <= lasso_start.y && y >= lasso_end.y));
 }
-
