@@ -3537,6 +3537,50 @@ long StatPtGroup::ReadFromBuffer(BufferFile *Buffer) {
 	size += Buffer->Read((Ptr) this, mylength);
 	return size;
 }
+const char * StatPtGroup::GetMethodText(OptMethod type) {
+	switch (type) {
+		case StatPt_OptMethod_NR:
+			return "NR";
+		case StatPt_OptMethod_RFO:
+			return "RFO";
+		case StatPt_OptMethod_QA:
+			return "QA";
+		case StatPt_OptMethod_Schlegel:
+			return "SCHLEGEL";
+		case StatPt_OptMethod_ConOpt:
+			return "CONOPT";
+	}
+	return "invalid";
+}
+bool StatPtGroup::SetMethod(const char * text) {
+	for (int i=StatPt_OptMethod_NR; i<NumberStatPtOptMethods; i++) {
+		if (!strcasecmp(text, GetMethodText((OptMethod) i))) {
+			SetMethod(i);
+			return true;
+		}
+	}
+	return false;
+}
+const char * StatPtGroup::GetHessUpdateMethodText(HessUpdateMethod type) {
+	switch (type) {
+		case StatPt_HessUpdateMethod_Guess:
+			return "GUESS";
+		case StatPt_HessUpdateMethod_Read:
+			return "READ";
+		case StatPt_HessUpdateMethod_Calc:
+			return "CALC";
+	}
+	return "invalid";
+}
+bool StatPtGroup::SetHessMethod(const char * text) {
+	for (int i=StatPt_HessUpdateMethod_Guess; i<NumberStatPtHessUpdateMethods; i++) {
+		if (!strcasecmp(text, GetHessUpdateMethodText((HessUpdateMethod) i))) {
+			SetHessMethod(i);
+			return true;
+		}
+	}
+	return false;
+}
 void StatPtGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	char	Out[133];
 
@@ -3554,24 +3598,8 @@ void StatPtGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	File->WriteLine(Out, false);
 		//Method
 	if (GetMethod() != 3) {
-		File->WriteLine("Method=", false);
-		switch (GetMethod()) {
-			case 1:
-				File->WriteLine("NR ", false);
-			break;
-			case 2:
-				File->WriteLine("RFO ", false);
-			break;
-			case 3:
-				File->WriteLine("QA ", false);
-			break;
-			case 4:
-				File->WriteLine("SCHLEGEL ", false);
-			break;
-			case 5:
-				File->WriteLine("CONOPT ", false);
-			break;
-		}
+		sprintf(Out, "Method=%s ", GetMethodText((OptMethod) GetMethod()));
+		File->WriteLine(Out, false);
 	}	//DXMAX if non-default and method is not NR
 	if ((GetInitRadius() != 0.0)&&(GetMethod() !=1)) {
 		sprintf(Out, "DXMAX=%g ", GetInitRadius());
@@ -3600,18 +3628,8 @@ void StatPtGroup::WriteToFile(BufferFile *File, InputData *IData) {
 		}
 	}
 	if (GetHessMethod()) {
-		File->WriteLine("HESS=", false);
-		switch (GetHessMethod()) {
-			case 1:
-				File->WriteLine("GUESS ", false);
-			break;
-			case 2:
-				File->WriteLine("READ ", false);
-			break;
-			case 3:
-				File->WriteLine("CALC ", false);
-			break;
-		}
+		sprintf(Out, "HESS=%s ", GetHessUpdateMethodText((HessUpdateMethod) GetHessMethod()));
+		File->WriteLine(Out, false);
 	}
 	if (GetHessRecalcInterval()) {
 		sprintf(Out, "IHREP=%d ", GetHessRecalcInterval());

@@ -605,6 +605,27 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	}
 	Buffer->SetFilePos(0);	//restart search from beginning of file
 	EndOfGroup = false;
+	if (Buffer->FindGroup("GUESS")) {
+		if (!MainData->InputOptions->Guess) MainData->InputOptions->Guess = new GuessGroup;
+		do {
+			Buffer->GetLine(Line);
+			if (ReadStringKeyword(Line, "GUESS", token))
+				MainData->InputOptions->Guess->SetGuess(token);
+			if (ReadLongKeyword(Line, "NORB", &nAtoms))
+				MainData->InputOptions->Guess->SetNumOrbs(nAtoms);
+			if (ReadBooleanKeyword(Line, "PRTMO", &BoolTest))
+				MainData->InputOptions->Guess->SetPrintMO(BoolTest);
+			if (ReadBooleanKeyword(Line, "MIX", &BoolTest))
+				MainData->InputOptions->Guess->SetMix(BoolTest);
+			
+			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
+														//scan for multiple occurances of this group
+				if (!Buffer->FindGroup("GUESS")) EndOfGroup = true;
+			}
+		} while (!EndOfGroup);
+	}
+	Buffer->SetFilePos(0);	//restart search from beginning of file
+	EndOfGroup = false;
 	if (Buffer->FindGroup("SCF")) {
 		if (!MainData->InputOptions->SCF) MainData->InputOptions->SCF = new SCFGroup;
 		do {
@@ -621,6 +642,117 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
 														//scan for multiple occurances of this group
 				if (!Buffer->FindGroup("SCF")) EndOfGroup = true;
+			}
+		} while (!EndOfGroup);
+	}
+	Buffer->SetFilePos(0);	//restart search from beginning of file
+	EndOfGroup = false;
+	if (Buffer->FindGroup("MP2")) {
+		if (!MainData->InputOptions->Guess) MainData->InputOptions->MP2 = new MP2Group;
+		do {
+			float tempf;
+			Buffer->GetLine(Line);
+			if (ReadLongKeyword(Line, "NACORE", &nAtoms))
+				MainData->InputOptions->MP2->SetNumCoreElectrons(nAtoms);
+			if (ReadBooleanKeyword(Line, "MP2PRP", &BoolTest))
+				MainData->InputOptions->MP2->SetMP2Prop(BoolTest);
+			if (ReadBooleanKeyword(Line, "LMOMP2", &BoolTest))
+				MainData->InputOptions->MP2->SetLMOMP2(BoolTest);
+			if (ReadLongKeyword(Line, "NWORD", &nAtoms))
+				MainData->InputOptions->MP2->SetMemory(nAtoms);
+			if (ReadLongKeyword(Line, "METHOD", &nAtoms))
+				MainData->InputOptions->MP2->SetMethod(nAtoms);
+			if (ReadStringKeyword(Line, "AOINTS", token))
+				MainData->InputOptions->MP2->SetAOIntMethod(token);
+			if (ReadFloatKeyword(Line, "CUTOFF", &tempf))
+				MainData->InputOptions->MP2->SetIntCutoff(tempf);
+			
+			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
+														//scan for multiple occurances of this group
+				if (!Buffer->FindGroup("MP2")) EndOfGroup = true;
+			}
+		} while (!EndOfGroup);
+	}
+	Buffer->SetFilePos(0);	//restart search from beginning of file
+	EndOfGroup = false;
+	if (Buffer->FindGroup("FORCE")) {
+		if (!MainData->InputOptions->Hessian) MainData->InputOptions->Hessian = new HessianGroup;
+		do {
+			float tempf;
+			Buffer->GetLine(Line);
+			if (ReadStringKeyword(Line, "METHOD", token))
+				MainData->InputOptions->Hessian->SetAnalyticMethod(
+						strncasecmp(token, "ANALYTIC", 8) == 0);
+			if (ReadLongKeyword(Line, "NVIB", &nAtoms))
+				MainData->InputOptions->Hessian->SetDoubleDiff(nAtoms==2);
+			if (ReadFloatKeyword(Line, "VIBSIZ", &tempf))
+				MainData->InputOptions->Hessian->SetDisplacementSize(tempf);
+			if (ReadBooleanKeyword(Line, "PURIFY", &BoolTest))
+				MainData->InputOptions->Hessian->SetPurify(BoolTest);
+			if (ReadBooleanKeyword(Line, "PRTIFC", &BoolTest))
+				MainData->InputOptions->Hessian->SetPrintFC(BoolTest);
+			if (ReadBooleanKeyword(Line, "VIBANL", &BoolTest))
+				MainData->InputOptions->Hessian->SetVibAnalysis(BoolTest);
+			if (ReadFloatKeyword(Line, "SCLFAC", &tempf))
+				MainData->InputOptions->Hessian->SetFreqScale(tempf);
+			
+			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
+														//scan for multiple occurances of this group
+				if (!Buffer->FindGroup("FORCE")) EndOfGroup = true;
+			}
+		} while (!EndOfGroup);
+	}
+	Buffer->SetFilePos(0);	//restart search from beginning of file
+	EndOfGroup = false;
+	if (Buffer->FindGroup("STATPT")) {
+		if (!MainData->InputOptions->StatPt) MainData->InputOptions->StatPt = new StatPtGroup;
+		do {
+			float tempf;
+			Buffer->GetLine(Line);
+			if (ReadFloatKeyword(Line, "OPTTOL", &tempf))
+				MainData->InputOptions->StatPt->SetOptConvergance(tempf);
+			if (ReadLongKeyword(Line, "NSTEP", &nAtoms))
+				MainData->InputOptions->StatPt->SetMaxSteps(nAtoms);
+			if (ReadStringKeyword(Line, "METHOD", token))
+				MainData->InputOptions->StatPt->SetMethod(token);
+			if (ReadFloatKeyword(Line, "DXMAX", &tempf))
+				MainData->InputOptions->StatPt->SetInitRadius(tempf);
+			if (ReadFloatKeyword(Line, "TRMAX", &tempf))
+				MainData->InputOptions->StatPt->SetMaxRadius(tempf);
+			if (ReadFloatKeyword(Line, "TRMIN", &tempf))
+				MainData->InputOptions->StatPt->SetMinRadius(tempf);
+			if (ReadLongKeyword(Line, "IFOLOW", &nAtoms))
+				MainData->InputOptions->StatPt->SetModeFollow(nAtoms);
+			if (ReadBooleanKeyword(Line, "STPT", &BoolTest))
+				MainData->InputOptions->StatPt->SetStatPoint(BoolTest);
+			if (ReadFloatKeyword(Line, "STSTEP", &tempf))
+				MainData->InputOptions->StatPt->SetStatJump(tempf);
+			if (ReadLongKeyword(Line, "IHREP", &nAtoms))
+				MainData->InputOptions->StatPt->SetHessRecalcInterval(nAtoms);
+			if (ReadLongKeyword(Line, "NPRT", &nAtoms))
+				MainData->InputOptions->StatPt->SetAlwaysPrintOrbs(nAtoms==1);
+			if (ReadStringKeyword(Line, "HESS", token))
+				MainData->InputOptions->StatPt->SetHessMethod(token);
+			
+			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
+														//scan for multiple occurances of this group
+				if (!Buffer->FindGroup("STATPT")) EndOfGroup = true;
+			}
+		} while (!EndOfGroup);
+	}
+	Buffer->SetFilePos(0);	//restart search from beginning of file
+	EndOfGroup = false;
+	if (Buffer->FindGroup("DFT")) {
+		if (!MainData->InputOptions->DFT) MainData->InputOptions->DFT = new DFTGroup;
+		do {
+			Buffer->GetLine(Line);
+			if (ReadStringKeyword(Line, "METHOD", token))
+				MainData->InputOptions->DFT->SetMethodGrid(
+					   strncasecmp(token, "GRIDFREE", 8) != 0);
+			
+			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
+														//scan for multiple occurances of this group
+				if (!Buffer->FindGroup("DFT")) EndOfGroup = true;
 			}
 		} while (!EndOfGroup);
 	}

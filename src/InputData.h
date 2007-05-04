@@ -805,6 +805,24 @@ class DFTGroup {
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
 };
+enum OptMethod {
+	invalidOptMethodType=0,
+	StatPt_OptMethod_NR,
+	StatPt_OptMethod_RFO,
+	StatPt_OptMethod_QA,
+	StatPt_OptMethod_Schlegel,
+	StatPt_OptMethod_ConOpt,
+	
+	NumberStatPtOptMethods
+};
+enum HessUpdateMethod {
+	invalidHessUpdateMethodType=0,
+	StatPt_HessUpdateMethod_Guess,
+	StatPt_HessUpdateMethod_Read,
+	StatPt_HessUpdateMethod_Calc,
+	
+	NumberStatPtHessUpdateMethods
+};
 class StatPtGroup {
 	private:
 		float		OptConvergance;
@@ -834,8 +852,10 @@ class StatPtGroup {
 		inline void SetStatJump(float NewVal) {if (NewVal>0.0) StatJumpSize = NewVal;};
 		inline long GetModeFollow(void) const {return ModeFollow;};
 		inline void SetModeFollow(long NewVal) {if (NewVal>0) ModeFollow = 1;};
+		static const char * GetMethodText(OptMethod d);
 		inline short GetMethod(void) const {return method;};
-		inline void SetMethod(short NewVal) {if ((NewVal>0)&&(NewVal<=5)) method = NewVal;};
+		inline void SetMethod(short NewVal) {if ((NewVal>0)&&(NewVal<=NumberStatPtOptMethods)) method = NewVal;};
+		bool SetMethod(const char * text);
 		inline short GetMaxSteps(void) const {return MaxSteps;};
 		inline void SetMaxSteps(short NewVal) {if (NewVal>0) MaxSteps = NewVal;};
 		inline short GetHessRecalcInterval(void) const {return nRecalcHess;};
@@ -846,6 +866,8 @@ class StatPtGroup {
 		inline void SetStatPoint(bool NewVal) {BitOptions = (BitOptions & 0xFD) + (NewVal ? 2 : 0);};
 		inline short GetHessMethod(void) const {return ((BitOptions & 28) >> 2);};
 		inline void SetHessMethod(short NewVal) {if ((NewVal>=1)&&(NewVal<=3)) BitOptions = (BitOptions & 0xE3) + (NewVal << 2);};
+		bool SetHessMethod(const char * text);
+		static const char * GetHessUpdateMethodText(HessUpdateMethod d);
 		inline bool AlwaysPrintOrbs(void) const {return ((BitOptions & 32) != 0);};
 		inline void SetAlwaysPrintOrbs(bool NewVal) {BitOptions = (BitOptions & 0xDF) + (NewVal ? 32 : 0);};
 
