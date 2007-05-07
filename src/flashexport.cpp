@@ -15,9 +15,7 @@
 
 #ifdef HAVE_LIBMING
 #include <mingpp.h>
-#endif
 
-#ifdef HAVE_LIBMING
 void MolDisplayWin::CreateFrameMovie(wxString &filePath) {
     long SavedFrameNum = MainData->GetCurrentFrame();
     long i;

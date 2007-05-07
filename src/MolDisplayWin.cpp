@@ -1033,7 +1033,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 			WriteMovie(filepath);
 #else
 #ifdef HAVE_LIBMING
-            // CreateFrameMovie(filepath); 
+            CreateFrameMovie(filepath); 
 #endif
 #endif
 		} else {
