@@ -106,6 +106,7 @@ class MoleculeData {
 		void DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs);
 		bool DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs) const;
 		void GenerateSymmetryDependantAtoms(void);
+		void GenerateSymmetryUniqueAtoms(void);
 		bool SetScreenPlane(CPoint3D *Points);
 		void LinearLeastSquaresFit(Progress * lProgress);
 		void CreateLLM(long NumPts, WinPrefs * Prefs);

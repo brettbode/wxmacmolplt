@@ -1330,8 +1330,8 @@ void MoleculeData::GenerateSymmetryDependantAtoms(void) {
 	if ((pg != GAMESS_C1)&&(cFrame->GetNumAtoms()>0)) {
 		SymmetryOps symOps(pg, pgOrder);
 		//loop over the symmetry operations
-		for (int iOp=0; iOp<symOps.getOperationCount(); iOp++) {
-			for (int atm=0; atm<cFrame->GetNumAtoms(); atm++) {
+		for (int atm=0; atm<cFrame->GetNumAtoms(); atm++) {
+			for (int iOp=0; iOp<symOps.getOperationCount(); iOp++) {
 				if (cFrame->Atoms[atm].IsSymmetryUnique()) {
 					//Apply the operator to each atom
 					CPoint3D result;
@@ -1344,6 +1344,59 @@ void MoleculeData::GenerateSymmetryDependantAtoms(void) {
 						float dist = offset.Magnitude();
 						if (dist < 1.0e-3) {	//this cutoff might need tuning
 							//If we have a match the atoms had better be the same type
+							if (cFrame->Atoms[atm].GetType() != cFrame->Atoms[testatom].GetType())
+								conflicts = true;
+							match = true;
+						} else if (dist < 0.2) {
+							//GAMESS would consider this an error
+							closeAtoms = true;
+							match = true;
+						}
+					}
+					if (!match) {
+						NewAtom(cFrame->Atoms[atm].GetType(), result);
+					}
+				}
+			}
+		}
+	}
+	if (conflicts) {
+		MessageAlert("Found conflicts during generation of symmetry dependent coordinates. Your starting coordinates are probably incorrect for the chosen symmetry point group.");
+	}
+	if (closeAtoms) {
+		MessageAlert("Atoms closer than 0.2 Angstroms have been removed. Your coordinates may be incorrect for the chosen symmetry point group.");
+	}
+}
+void MoleculeData::GenerateSymmetryUniqueAtoms(void) {
+	//On input the coordinates should contain the full set of atoms in the correct orientation for the
+	//selected symmetry point group. The coordinates will not be changed, just "marked" as symmetry unique or not.
+	//If a symmetery operation generates a new atom an error is generated and the operation fails.
+	GAMESSPointGroup pg = GAMESS_C1;
+	long pgOrder = 1;
+	if (InputOptions) {
+		pg = InputOptions->Data->GetPointGroup();
+		pgOrder = InputOptions->Data->GetPointGroupOrder();
+	}
+	bool conflicts = false;
+	bool closeAtoms = false;
+	//If we are in C1 symmetry we are done.
+	if ((pg != GAMESS_C1)&&(cFrame->GetNumAtoms()>0)) {
+		SymmetryOps symOps(pg, pgOrder);
+		//loop over the symmetry operations
+		for (int atm=0; atm<cFrame->GetNumAtoms(); atm++) {
+			for (int iOp=0; iOp<symOps.getOperationCount(); iOp++) {
+				if (cFrame->Atoms[atm].IsSymmetryUnique()) {
+					//Apply the operator to each atom
+					CPoint3D result;
+					symOps.ApplyOperator(cFrame->Atoms[atm].Position, result, iOp);
+					bool match = false;
+					for (int testatom=0; testatom<cFrame->GetNumAtoms(); testatom++) {
+						//Now loop over the atoms to see if this generates a new atom
+						//or if there are any conflicts
+						CPoint3D offset = result - cFrame->Atoms[testatom].Position;
+						float dist = offset.Magnitude();
+						if (dist < 1.0e-3) {	//this cutoff might need tuning
+												//If we have a match the atoms had better be the same type
 							if (cFrame->Atoms[atm].GetType() != cFrame->Atoms[testatom].GetType())
 								conflicts = true;
 							match = true;
