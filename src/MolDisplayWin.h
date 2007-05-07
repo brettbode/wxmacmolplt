@@ -348,7 +348,9 @@ class MolDisplayWin : public wxFrame {
 							 const qtData & myqtData);
 #else
 #ifdef HAVE_LIBMING
-        void CreateFrameMovie(wxString &filePath);
+		void WriteMovie(wxString & filepath);
+        void CreateFrameMovie(wxString & filePath);
+		void CreateModeMovie();
 #endif
 #endif
 		//Call to dump the message and close the window

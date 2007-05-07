@@ -92,6 +92,13 @@ public:
 	wxIcon GetIconResource( const wxString& name );
 ////@end SWFExport member function declarations
 
+	void SetMovieChoice(int v);
+	void EnableFrameMovie(bool v);
+	void EnableModeMovie(bool b);
+
+	int GetMovieChoice(void) const;
+	bool AddEnergyPlot(void) const;
+
 	/// Should we show tooltips?
 	static bool ShowToolTips();
 
