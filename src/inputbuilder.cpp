@@ -587,7 +587,9 @@ void InputBuilderWindow::CreateControls()
 	runChoiceStrings.Add(_("Optimization"));
 	runChoiceStrings.Add(_("Trudge"));
 	runChoiceStrings.Add(_("Saddle Point"));
+	runChoiceStrings.Add(_("Min. Energy Crossing"));
 	runChoiceStrings.Add(_("IRC"));
+	runChoiceStrings.Add(_("Molecular Dynamics"));
 	runChoiceStrings.Add(_("Gradient Extremal"));
 	runChoiceStrings.Add(_("DRC"));
 	runChoiceStrings.Add(_("Energy Surface"));
@@ -597,12 +599,14 @@ void InputBuilderWindow::CreateControls()
 	runChoiceStrings.Add(_("Spin Orbit"));
 	runChoiceStrings.Add(_("Finite Electric Field"));
 	runChoiceStrings.Add(_("TDHF"));
+	runChoiceStrings.Add(_("extended TDHF"));
 	runChoiceStrings.Add(_("Global Optimization"));
 	runChoiceStrings.Add(_("VSCF"));
 	runChoiceStrings.Add(_("FMO Optimization"));
 	runChoiceStrings.Add(_("Raman Intensities"));
 	runChoiceStrings.Add(_("NMR"));
 	runChoiceStrings.Add(_("Make EFP"));
+	runChoiceStrings.Add(_("Free state FMO"));
 	runChoice = new wxUglyChoice( itemPanel27, ID_RUN_CHOICE, wxDefaultPosition, wxDefaultSize, runChoiceStrings, 0 );
 	runChoice->SetStringSelection(_("Energy"));
 	itemFlexGridSizer30->Add(runChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);

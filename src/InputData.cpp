@@ -460,6 +460,12 @@ TypeOfRun ControlGroup::SetRunType(const char *RunText) {
 		const char * test = GetGAMESSRunText((TypeOfRun)i);
 		if (-1<LocateKeyWord(RunText, test, strlen(test), 9)) {
 			NewType = (TypeOfRun)i;
+			if (NewType == TDHFRun) {
+				test = GetGAMESSRunText(TDHFXRun);
+				if (-1<LocateKeyWord(RunText, test, strlen(test), 9)) {
+					NewType = TDHFXRun;
+				}
+			}
 			break;
 		}
 	}
@@ -483,8 +489,12 @@ const char * ControlGroup::GetGAMESSRunText(const TypeOfRun & r) {
 			return "TRUDGE";
 		case SadPointRun:
 			return "SADPOINT";
+		case MinEnergyCrossing:
+			return "MEX";
 		case IRCRun:
 			return "IRC";
+		case MolDynamics:
+			return "MD";
 		case GradExtrRun:
 			return "GRADEXTR";
 		case DRCRun:
@@ -503,6 +513,8 @@ const char * ControlGroup::GetGAMESSRunText(const TypeOfRun & r) {
 			return "FFIELD";
 		case TDHFRun:
 			return "TDHF";
+		case TDHFXRun:
+			return "TDHFX";
 		case GLOBOPRun:
 			return "GLOBOP";
 		case VSCFRun:
@@ -515,6 +527,8 @@ const char * ControlGroup::GetGAMESSRunText(const TypeOfRun & r) {
 			return "NMR";
 		case MakeEFPRun:
 			return "MAKEFP";
+		case FreeStateFMORun:
+			return "FMO0";
 		default:
 			return "unknown";
 	}
