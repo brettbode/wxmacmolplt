@@ -49,6 +49,7 @@ bool SWFExport::AddEnergyPlot(void) const {
 
 #ifdef HAVE_LIBMING
 #include "MolDisplayWin.h"
+#include "energyplotdialog.h"
 
 void MolDisplayWin::WriteMovie(wxString & filepath) {
 	SWFExport * SWFOptions = new SWFExport(this);
@@ -59,29 +60,48 @@ void MolDisplayWin::WriteMovie(wxString & filepath) {
 	}
 
 	int movieType = SWFOptions->GetMovieChoice();
+	bool includeEP = SWFOptions->AddEnergyPlot();
 
 	if(movieType == 0) {
-		CreateFrameMovie(filepath);
+		CreateFrameMovie(filepath, includeEP);
 	}
 	else {
-		CreateModeMovie();
+		CreateModeMovie(filepath);
 	}
 }
 
-void MolDisplayWin::CreateFrameMovie(wxString &filePath) {
+void MolDisplayWin::CreateFrameMovie(wxString &filePath,
+		const bool includeEP) {
     long SavedFrameNum = MainData->GetCurrentFrame();
     long i;
     SWFMovie *movie = new SWFMovie();
     SWFInput *in;
     SWFBitmap *bm;
     SWFDisplayItem *di = NULL;
+    SWFDisplayItem *di2 = NULL;
     long width;
     long height;
     long AnimateTime = 10*Prefs->GetAnimateTime();
+	bool killEPlotWin = false;
+	int savedEPlotWidth, savedEPlotHeight;
 
     if(AnimateTime < 1) AnimateTime = 1;
 
     getCanvasSize(&width, &height);
+
+	if(includeEP) {
+		width += height;
+		if(!energyPlotWindow) {
+			energyPlotWindow = new EnergyPlotDialog(this);
+			killEPlotWin = true;
+		}
+		else {
+			energyPlotWindow->GetSize(&savedEPlotWidth, &savedEPlotHeight);
+		}
+		energyPlotWindow->SetSize(height, height);
+		energyPlotWindow->Show(true);
+		energyPlotWindow->Update();
+	}
 
     movie->setBackground(0xFF, 0xFF, 0xFF);
     movie->setRate(1000.0/(double)AnimateTime);
@@ -108,19 +128,52 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath) {
         delete memOutStream;
         in = new SWFInput(jpegData, datLen);
         bm = new SWFBitmap(in);
-        
         di = movie->add((SWFBlock *)bm);
+
+		if(includeEP) {
+			energyPlotWindow->FrameChanged();
+			wxBitmap *epBitmap = NULL;
+			energyPlotWindow->CopyToBitMap(&epBitmap);
+			if(epBitmap != NULL) {
+				memOutStream = new wxMemoryOutputStream();
+				frame = epBitmap->ConvertToImage();
+				frame.SaveFile(*(wxOutputStream *)memOutStream,
+						(int)wxBITMAP_TYPE_JPEG);
+				datLen = memOutStream->GetSize();
+				char unsigned *epJpegData = new unsigned char [datLen];
+				memOutStream->CopyTo(epJpegData, datLen);
+				delete memOutStream;
+				in = new SWFInput(epJpegData, datLen);
+				bm = new SWFBitmap(in);
+				di2 = movie->add((SWFBlock *)bm);
+				di2->moveTo(width - height, 0);
+			}
+			delete epBitmap;
+		}
+
         movie->nextFrame();
         movie->remove(di);
+        movie->remove(di2);
         //delete jpegData;
     }
 
     movie->save(filePath.mb_str(wxConvUTF8), 0);
     delete movie;
     MainData->SetCurrentFrame(SavedFrameNum);
+
+	if(includeEP) {
+		if(killEPlotWin) {
+			delete energyPlotWindow;
+			energyPlotWindow = NULL;
+		}
+		else {
+			energyPlotWindow->SetSize(savedEPlotWidth, savedEPlotHeight);
+			energyPlotWindow->FrameChanged();
+		}
+	}
 }
 
-void MolDisplayWin::CreateModeMovie() {
+void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	bool savedrawmode=false;
     long i;
     SWFMovie *movie;
@@ -166,6 +219,53 @@ void MolDisplayWin::CreateModeMovie() {
     movie->setBackground(0xFF, 0xFF, 0xFF);
     movie->setRate(1000.0/(double)AnimateTime);
     movie->setDimension(width, height);
+
+	long npoint = 0;
+	long inc = 1;
+
+	for(long i = 0; i < (4 * AnimationSpeed); i++) {
+		if((npoint == AnimationSpeed) || (npoint == -AnimationSpeed)) {
+			inc *= -1;
+			offsetFactor *= -1.0;
+		}
+		npoint += inc;
+
+        wxImage mImage = glCanvas->getImage(0, 0);
+        wxMemoryOutputStream *memOutStream = new wxMemoryOutputStream();
+        mImage.SaveFile(*(wxOutputStream *)memOutStream, (int)wxBITMAP_TYPE_JPEG);
+        long datLen = memOutStream->GetSize();
+        char unsigned *jpegData = new unsigned char [datLen];
+        memOutStream->CopyTo(jpegData, datLen);
+        delete memOutStream;
+        in = new SWFInput(jpegData, datLen);
+        bm = new SWFBitmap(in);
+
+        di = movie->add((SWFBlock *)bm);
+        movie->nextFrame();
+        movie->remove(di);
+        //delete jpegData;
+
+		for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
+			lAtoms[iatm].Position.x += offsetFactor*(ModeOffset[iatm].x);
+			lAtoms[iatm].Position.y += offsetFactor*(ModeOffset[iatm].y);
+			lAtoms[iatm].Position.z += offsetFactor*(ModeOffset[iatm].z);
+		}
+
+		MainData->ResetRotation();
+		UpdateGLModel();
+		DrawGL();
+	}
+
+	for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
+		lAtoms[iatm].Position = SavedAtoms[iatm];	
+	}
+	MainData->ResetRotation();
+
+	if (ModeOffset) delete [] ModeOffset;
+	if (SavedAtoms) delete [] SavedAtoms;
+	MainData->SetDrawMode(savedrawmode);
+	UpdateGLModel();
+	DrawGL();
 }
 #endif
 

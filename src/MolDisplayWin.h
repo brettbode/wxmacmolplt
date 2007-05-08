@@ -349,8 +349,8 @@ class MolDisplayWin : public wxFrame {
 #else
 #ifdef HAVE_LIBMING
 		void WriteMovie(wxString & filepath);
-        void CreateFrameMovie(wxString & filePath);
-		void CreateModeMovie();
+        void CreateFrameMovie(wxString & filePath, const bool includeEP);
+		void CreateModeMovie(wxString & filePath);
 #endif
 #endif
 		//Call to dump the message and close the window
