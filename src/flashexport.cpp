@@ -154,7 +154,6 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
         movie->nextFrame();
         movie->remove(di);
         movie->remove(di2);
-        //delete jpegData;
     }
 
     movie->save(filePath.mb_str(wxConvUTF8), 0);
@@ -243,7 +242,6 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
         di = movie->add((SWFBlock *)bm);
         movie->nextFrame();
         movie->remove(di);
-        //delete jpegData;
 
 		for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
 			lAtoms[iatm].Position.x += offsetFactor*(ModeOffset[iatm].x);

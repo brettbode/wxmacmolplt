@@ -81,6 +81,9 @@ public:
 
 ////@begin SWFExport event handler declarations
 
+	/// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_SWF_MOVIE_RADIO
+	void OnSwfMovieRadioSelected( wxCommandEvent& event );
+
 ////@end SWFExport event handler declarations
 
 ////@begin SWFExport member function declarations

@@ -45,6 +45,8 @@ IMPLEMENT_DYNAMIC_CLASS( SWFExport, wxDialog )
 BEGIN_EVENT_TABLE( SWFExport, wxDialog )
 
 ////@begin SWFExport event table entries
+	EVT_RADIOBOX( ID_SWF_MOVIE_RADIO, SWFExport::OnSwfMovieRadioSelected )
+
 ////@end SWFExport event table entries
 
 END_EVENT_TABLE()
@@ -177,3 +179,19 @@ wxIcon SWFExport::GetIconResource( const wxString& name )
 	return wxNullIcon;
 ////@end SWFExport icon retrieval
 }
+
+/*!
+ * wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_SWF_MOVIE_RADIO
+ */
+
+void SWFExport::OnSwfMovieRadioSelected( wxCommandEvent& event )
+{
+    if(event.GetInt() == 0) {
+        mEPlotCheck->Enable(true);
+    }
+    else {
+        mEPlotCheck->SetValue(false);
+        mEPlotCheck->Enable(false);
+    }
+}
+
