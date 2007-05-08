@@ -153,7 +153,9 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 
         movie->nextFrame();
         movie->remove(di);
-        movie->remove(di2);
+        if(includeEP) {
+			movie->remove(di2);
+		}
     }
 
     movie->save(filePath.mb_str(wxConvUTF8), 0);
@@ -170,6 +172,13 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 			energyPlotWindow->FrameChanged();
 		}
 	}
+
+	wxString msg = wxString::Format(wxT("Optimal viewing dimensions are %ld pixels wide by %ld pixels high."), width, height);
+	wxString title = wxString(wxT("Flash Video Info"));
+	wxMessageDialog *sizeDlg = NULL;
+	sizeDlg = new wxMessageDialog(this, msg, title, wxOK);
+	sizeDlg->ShowModal();
+	delete sizeDlg;
 }
 
 void MolDisplayWin::CreateModeMovie(wxString &filePath) {
@@ -183,7 +192,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
     long height;
     long AnimateTime = 10*Prefs->GetAnimateTime();
 
-	if(!MainData->cFrame->Vibs) return;
+	if(!MainData->cFrame->Vibs) return; // Should spit out a message.
 	Frame * lFrame = MainData->cFrame;
 	if (MainData->GetDrawMode()) {
 		savedrawmode=true;
@@ -264,6 +273,13 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	MainData->SetDrawMode(savedrawmode);
 	UpdateGLModel();
 	DrawGL();
+
+	wxString msg = wxString::Format(wxT("Optimal viewing dimensions are %ld pixels wide by %ld pixels high."), width, height);
+	wxString title = wxString(wxT("Flash Video Info"));
+	wxMessageDialog *sizeDlg = NULL;
+	sizeDlg = new wxMessageDialog(this, msg, title, wxOK);
+	sizeDlg->ShowModal();
+	delete sizeDlg;
 }
 #endif
 
