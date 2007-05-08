@@ -222,14 +222,25 @@ void Frame::SetPreviousFrame(Frame * previous) { PreviousFrame = previous; }
 Frame * Frame::GetNextFrame(void) { return NextFrame; }
 Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
 
-mpAtom * Frame::AddAtom(long AtomType, CPoint3D AtomPosition) {
+mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index) {
         mpAtom * result = NULL;
 	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(10);
 	if (NumAtoms<AtomAllocation) {
-	  Atoms[NumAtoms].Type = AtomType;
-	  Atoms[NumAtoms].Position = AtomPosition;
-	  result = &Atoms[NumAtoms];
-	  NumAtoms++;
+		if ((index<=-1)||(index>=NumAtoms)) {//Add to the end of the list
+			Atoms[NumAtoms].Type = AtomType;
+			Atoms[NumAtoms].Position = AtomPosition;
+			Atoms[NumAtoms].flags = 0;
+			result = &Atoms[NumAtoms];
+		} else {	//insert the atom into the middle of the list
+			for (int i=NumAtoms; i>index; i--) {
+				Atoms[i] = Atoms[i-1];
+			}
+			Atoms[index].Type = AtomType;
+			Atoms[index].Position = AtomPosition;
+			Atoms[index].flags = 0;
+			result = &Atoms[index];
+		}
+		NumAtoms++;
 	}
 	//Delete any orbitals and normal modes
 	if (Vibs) {

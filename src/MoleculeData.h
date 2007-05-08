@@ -132,7 +132,7 @@ class MoleculeData {
 		void WriteInputFile(MolDisplayWin * owner);
 		InputData * GetInputData(void);
 		InputData * SetInputData(InputData * NewData);
-		void NewAtom(long AtomType, CPoint3D Position);
+		void NewAtom(long AtomType, const CPoint3D & Position, long index=-1);
 		void StickCoordinates(void);
 		void InitializeInternals(void);
 		inline Internals * GetInternalCoordinates(void) const {return IntCoords;};

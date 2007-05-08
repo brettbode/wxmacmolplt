@@ -1069,7 +1069,9 @@ void ControlGroup::WriteToFile(BufferFile *File, InputData *IData, long NumElect
 		else sprintf(Out, "SCFTYP=RHF ");
 		File->WriteLine(Out, false);
 	}
-	sprintf(Out,"RUNTYP=%s ", GetGAMESSRunText(GetRunType()));
+	TypeOfRun t = GetRunType();
+	if (t <= InvalidRunType) t = Energy;
+	sprintf(Out,"RUNTYP=%s ", GetGAMESSRunText(t));
 	File->WriteLine(Out, false);
 	if ((ExeType)&&(!Friend)) {	//punch out ExeType if it is other than run
 		sprintf(Out, "EXETYP=%s ", ExeType);
@@ -2342,16 +2344,19 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 		Internals * IntCoords = MainData->GetInternalCoordinates();
 		if (IntCoords) IntCoords->WriteMPCZMatCoordinatesToFile(File, MainData, Prefs);
 	} else {
+		if (Coord <= UniqueCoordType) MainData->GenerateSymmetryUniqueAtoms();
 		for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
-			Str255 AtomLabel;
-			Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
-			AtomLabel[AtomLabel[0]+1] = 0;
-			sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
-				(char *) &(AtomLabel[1]), (float) (cFrame->Atoms[iatom].GetType()), 
-				cFrame->Atoms[iatom].Position.x, cFrame->Atoms[iatom].Position.y,
-				cFrame->Atoms[iatom].Position.z);
-			File->WriteLine(Out, true);
-			if (BasisTest) lBasis->WriteBasis(File, iatom);
+			if ((Coord > UniqueCoordType)||(cFrame->Atoms[iatom].IsSymmetryUnique())) {
+				Str255 AtomLabel;
+				Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
+				AtomLabel[AtomLabel[0]+1] = 0;
+				sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
+					(char *) &(AtomLabel[1]), (float) (cFrame->Atoms[iatom].GetType()), 
+					cFrame->Atoms[iatom].Position.x, cFrame->Atoms[iatom].Position.y,
+					cFrame->Atoms[iatom].Position.z);
+				File->WriteLine(Out, true);
+				if (BasisTest) lBasis->WriteBasis(File, iatom);
+			}
 		}
 	}
 	
