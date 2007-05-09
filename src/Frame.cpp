@@ -586,89 +586,74 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds, bool selectedOnly)
 		for (iatm=0; iatm<NumAtoms; iatm++) {
 			iType = Atoms[iatm].GetType();
 			//only consider H bonds with N, O, F, P, S, Cl, Se, and Br
-			if (!((iType==1)||((iType>=7)&&(iType<=9))||((iType>=15)&&(iType<=17))||
-				  (iType==34)||(iType==35))) continue;
-			for (jatm=iatm+1; jatm<NumAtoms; jatm++) {
-				if (selectedOnly && !Atoms[iatm].GetSelectState() && !Atoms[jatm].GetSelectState())
-					continue;
+			if (iType != 1) continue;	//Loop over hydrogens
+			if (selectedOnly && !Atoms[iatm].GetSelectState()) continue;
+			for (jatm=0; jatm<NumAtoms; jatm++) {
+				if (selectedOnly && !Atoms[jatm].GetSelectState()) continue;
 				jType = Atoms[jatm].GetType();
-				if (!((jType==1)||((jType>=7)&&(jType<=9))||((jType>=15)&&(jType<=17))||
+				if (!(((jType>=7)&&(jType<=9))||((jType>=15)&&(jType<=17))||
 					  (jType==34)||(jType==35))) continue;
-				if (((iType == 1)&&(jType != 1)) ||
-					((iType != 1)&&(jType == 1))) {//is one atom a hydrogen?
-					if (BondExists(iatm, jatm) < 0) {	//can't be an existing bond
-						newBond = false;
-						offset.x = Atoms[iatm].Position.x - Atoms[jatm].Position.x;
-						offset.y = Atoms[iatm].Position.y - Atoms[jatm].Position.y;
-						offset.z = Atoms[iatm].Position.z - Atoms[jatm].Position.z;
-						distance = offset.Magnitude();
-						AutoDist = AutoScale*((float) (Prefs->GetAtomSize(iType-1) + 
-							Prefs->GetAtomSize(jType-1)));
-						long HBonder;
-						if (iType == 1) HBonder = jType;
-						else HBonder = iType;
-						float testDistance = 1.6*AutoDist;
-						if (distance <= testDistance) newBond = true;
-						
-		/*				if (HBonder==7 || HBonder == 15) {
-							if (distance <= 1.0+AutoDist) {
-								newBond = true;
-								lOrder = kHydrogenBond;
-							}
-						} else if (distance <= (1.3 + 1.5*AutoDist)) {
-							//distance criteria is met, see if the other atom is a
-							//reasonable hydrogen bonder
-							if (((HBonder>=8)&&(HBonder<=9))||((HBonder>=16)&&
-								(HBonder<=17))||((HBonder>=34)&&(HBonder<=35))) {
-								newBond = true;
-								lOrder = kHydrogenBond;
-							}
-						}
-		*/
-						if (newBond) {
-							//scan the bond list, prevent h-bonds between any pair of
-							//atoms which are bonded to the same atom
-							for (long i=0; i<NumAtoms; i++) {
-								long ib = BondExists(i, iatm);
-								//Don't filter on preexisting hydrogen bonds
-								if (ib >= 0)
-									if (Bonds[ib].Order == kHydrogenBond) ib = -1;
-								long jb = BondExists(i,jatm);
-								if (jb >= 0)
-									if (Bonds[jb].Order == kHydrogenBond) jb = -1;
-								if ((ib>=0) && (jb>=0)) {
-									//Both atoms have an existing single (or higher) bond
-									//and it thus doesn't make sense for them to have an H bond
-									newBond = false;
-									break;
-		/*						} else if ((ib>=0) || (jb>=0)) {
-									long nBondedAtom = iatm;
-									if (ib>=0) nBondedAtom = jatm;
-									for (long j=0; j<NumAtoms; j++) {
-										ib = BondExists(i, j);
-										if (ib >= 0)
-											if (Bonds[ib].Order == kHydrogenBond) ib = -1;
-										jb = BondExists(j,nBondedAtom);
-										if (jb >= 0)
-											if (Bonds[jb].Order == kHydrogenBond) jb = -1;
-										if ((ib>=0)&&(jb>=0)) {
-											newBond = false;
-											break;
+				
+				//At this point iatm is a Hydrogen and jatm is a N, O, F, P, S, Cl, Se, or Br
+				if (BondExists(iatm, jatm) < 0) {	//can't be an existing bond
+					newBond = false;
+					offset.x = Atoms[iatm].Position.x - Atoms[jatm].Position.x;
+					offset.y = Atoms[iatm].Position.y - Atoms[jatm].Position.y;
+					offset.z = Atoms[iatm].Position.z - Atoms[jatm].Position.z;
+					distance = offset.Magnitude();
+					AutoDist = AutoScale*((float) (Prefs->GetAtomSize(iType-1) + 
+						Prefs->GetAtomSize(jType-1)));
+					float testDistance = 1.6*AutoDist;
+					if (distance <= testDistance) newBond = true;
+					
+					if (newBond) {
+						//scan the bond list, prevent h-bonds between any pair of
+						//atoms which are bonded to the same atom
+						for (long i=0; i<NumAtoms; i++) {
+							long ib = BondExists(i, iatm);
+							long jb = BondExists(i,jatm);
+							//Don't filter on preexisting hydrogen bonds
+							if (ib >= 0)
+								if (Bonds[ib].Order == kHydrogenBond) {
+									//already a H-bond to this H. This is ok if the H
+									//is between the heavy atoms. However, if one distance
+									//is much bigger than the other the longer one should
+									//be dropped.
+									float angle;
+									GetBondAngle(i, iatm, jatm, &angle);
+									if (angle < 70.0) {
+										GetBondLength(i, iatm, &testDistance);
+										float angle2;
+										GetBondAngle(i, jatm, iatm, &angle2);
+										if (angle2 > 95.0) {
+											if (distance > testDistance) {
+												newBond = false;
+												break;
+											} else {	//delete the other bond
+												DeleteBond(ib);
+											}
 										}
 									}
-			*/
+									ib = -1;
 								}
-								if (!newBond) break;
+							if (jb >= 0)
+								if (Bonds[jb].Order == kHydrogenBond) jb = -1;
+							if ((ib>=0) && (jb>=0)) {
+								//Both atoms have an existing single (or higher) bond
+								//and it thus doesn't make sense for them to have an H bond
+								newBond = false;
+								break;
 							}
-							if (newBond) {
-								if (! AddBond(iatm, jatm, kHydrogenBond)) {
-									MessageAlert("Insufficient Memory for Set Bond\nLength operation. Old Bonds left untouched.");
-									delete [] Bonds;
-									Bonds = OldBonds;
-									NumBonds = NumOldBonds;
-									BondAllocation = OldBondAllocation;
-									return;
-								}
+							if (!newBond) break;
+						}
+						if (newBond) {
+							if (! AddBond(iatm, jatm, kHydrogenBond)) {
+								MessageAlert("Insufficient Memory for Set Bond\nLength operation. Old Bonds left untouched.");
+								delete [] Bonds;
+								Bonds = OldBonds;
+								NumBonds = NumOldBonds;
+								BondAllocation = OldBondAllocation;
+								return;
 							}
 						}
 					}
