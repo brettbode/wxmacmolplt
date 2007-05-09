@@ -2801,7 +2801,7 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 	  }
 #endif
 		if ((type != CMLFile) || (test < 10)) ResetModel(true);
-		else AdjustMenus();
+		else ResetModel(false);
 
 		// Set the path for saving changes
 		if(type == CMLFile) {
