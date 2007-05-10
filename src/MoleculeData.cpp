@@ -1181,10 +1181,10 @@ bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Pre
 		xz += atmMass*xc*zc;
 		yz += atmMass*yc*zc;
 	}
-	if ((xx>0.1)&&(fabs(xx - yy)<1.0e-4)) {
+	if ((xx>0.1)&&(fabs(xx - yy)<1.0e-4)&&(fabs(zz-xx)>1.0e-4)) {
 		//The x and y axis do not appear to be unique, Try to rotate an atom onto the x axis
 		//loop through and look for atoms not on the z-axis. If there is already an atom on the
-		//x or y axis we can skip as well
+		//x or y axis we can skip as well. If the z axis is not unique we skip as well
 		bool needRot = true;
 		for (int i=0; i<cFrame->GetNumAtoms(); i++) {
 			if (fabs(RotCoords[i].x)>1.0e-4) {
@@ -1420,12 +1420,12 @@ void MoleculeData::GenerateSymmetryUniqueAtoms(void) {
 		}
 		if (match == false) cFrame->Atoms[atm].IsSymmetryUnique(true);
 	}
-	if (conflicts) {
-		MessageAlert("Found conflicts during generation of symmetry dependent coordinates. Your starting coordinates are probably incorrect for the chosen symmetry point group.");
-	}
-	if (closeAtoms) {
-		MessageAlert("Atoms closer than 0.2 Angstroms have been removed. Your coordinates may be incorrect for the chosen symmetry point group.");
-	}
+//	if (conflicts) {
+//		MessageAlert("Found conflicts during generation of symmetry dependent coordinates. Your starting coordinates are probably incorrect for the chosen symmetry point group.");
+//	}
+//	if (closeAtoms) {
+//		MessageAlert("Atoms closer than 0.2 Angstroms have been removed. Your coordinates may be incorrect for the chosen symmetry point group.");
+//	}
 }
 void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
 	Frame *	NewFrame, * NewFrame2;

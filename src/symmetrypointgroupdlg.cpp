@@ -497,7 +497,7 @@ void SymmetryPointGroupDlg::setup (const bool * pgs) {
 		mPGListCntl->InsertItem(itemCount, wxT("Td"));
 		itemCount++;
 	}
-	if (pgs[50]) {
+	if (pgs[52]) {
 		mHighestPGText->SetLabel(wxT("O"));
 		mPGListCntl->InsertItem(itemCount, wxT("O"));
 		itemCount++;
