@@ -795,7 +795,10 @@ void MolDisplayWin::DrawGL(void)
 	glMultMatrixf((const GLfloat *) &(MainData->TotalRotation));
 
 	glEnable(GL_LIGHTING);
-		//Draw the main molecular geometry
+
+	if (MainData->ShowAxis()) AddAxisGL();
+	
+	//Draw the main molecular geometry
 
 	if (MainData->cFrame->NumAtoms > 0) {
 		if (OpenGLData->MainListActive) {
@@ -835,9 +838,6 @@ void MolDisplayWin::DrawGL(void)
 		}
 	}
 	
-		
-	if (MainData->ShowAxis()) AddAxisGL();
-
 		//Add any surfaces
 	Surface * lSurface = MainData->cFrame->SurfaceList;
 	error = glGetError();
@@ -2076,9 +2076,19 @@ void MolDisplayWin::AddAxisGL(void)
 	GLUquadricObj * qobj;
 	qobj = gluNewQuadric();
 	if (!qobj) throw std::bad_alloc();
-	glColor3f(0.0, 0.0, 0.0);
+	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
+	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
+	float anno_color[3];
+	
+	//choose black or white based on the background color
+	if (backMagnitude > 70000) {  //"light" background choose black
+		anno_color[0] = anno_color[1] = anno_color[2] = 0.0f;
+	} else {
+		anno_color[0] = anno_color[1] = anno_color[2] = 1.0f;
+	}
+	glColor3f(anno_color[0], anno_color[1], anno_color[2]);
 	long Quality = (long)(Prefs->GetQD3DAtomQuality());
-	float VectorWidth = 0.05;
+	float VectorWidth = 0.02;
 	float HeadRadius = 2*VectorWidth;
 
 	CPoint3D			vector = {1.0,0.0,0.0}, NormStart={0.0,0.0,1.0};
@@ -2087,7 +2097,7 @@ void MolDisplayWin::AddAxisGL(void)
 		// Z-axis
 	glTranslatef(0.0, 0.0, -MainData->MaxSize);
 	gluDisk(qobj, 0.0, VectorWidth, (long)(Quality), 2);
-	gluCylinder(qobj, 0.05, 0.05, (2*MainData->MaxSize - 2*VectorWidth), Quality, (long)(0.5*Quality));
+	gluCylinder(qobj, VectorWidth, VectorWidth, (2*MainData->MaxSize - 2*VectorWidth), Quality, (long)(0.5*Quality));
 	glPopMatrix();
 	glPushMatrix();
 	glTranslatef(0.0, 0.0, (MainData->MaxSize - 2*VectorWidth));
@@ -2101,7 +2111,7 @@ void MolDisplayWin::AddAxisGL(void)
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
 	gluDisk(qobj, 0.0, VectorWidth, Quality, 2);
-	gluCylinder(qobj, 0.05, 0.05, (2*MainData->MaxSize - 2*VectorWidth), Quality, (long)(0.5*Quality));
+	gluCylinder(qobj, VectorWidth, VectorWidth, (2*MainData->MaxSize - 2*VectorWidth), Quality, (long)(0.5*Quality));
 	glPopMatrix();
 	glPushMatrix();
 	rotMat[3][0] = MainData->MaxSize - 2*VectorWidth;
@@ -2117,7 +2127,7 @@ void MolDisplayWin::AddAxisGL(void)
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
 	gluDisk(qobj, 0.0, VectorWidth, Quality, 2);
-	gluCylinder(qobj, 0.05, 0.05, (2*MainData->MaxSize - 2*VectorWidth), Quality, (long)(0.5*Quality));
+	gluCylinder(qobj, VectorWidth, VectorWidth, (2*MainData->MaxSize - 2*VectorWidth), Quality, (long)(0.5*Quality));
 	glPopMatrix();
 	glPushMatrix();
 	rotMat[3][1] = MainData->MaxSize - 2*VectorWidth;
@@ -2260,7 +2270,7 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 			}
 		}
 			break;
-		case GAMESS_TD:
+/*		case GAMESS_TD:
 			break;
 		case GAMESS_TH:
 		{
@@ -2276,6 +2286,7 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 			break;
 		case GAMESS_O:
 			break;
+			*/
 	}
 }
 long Surf2DBase::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle *)
