@@ -27,8 +27,6 @@
 // please add CXXFLAGS=-DENABLE_INTERACTIVE_MODE to your configure step rather
 // than changing this file!
 //#define ENABLE_INTERACTIVE_MODE
-//Activate to enable the show symmetry operators menu items
-//#define ENABLE_SHOWSYMMETRY_MODE
 //Activate to allow quicktime movie export on Mac
 //#define __MAC_USE_QUICKTIME__
 /*

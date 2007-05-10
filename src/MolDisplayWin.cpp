@@ -557,10 +557,8 @@ void MolDisplayWin::createMenuBar(void) {
 	menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
 	menuView->AppendSeparator();
 	menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show Ax&is"), wxT("Display the cartesian axis"));
-	menuView->AppendCheckItem(MMP_SHOWPERIODICDLG, wxT("Show Periodic Table"), wxT("Display a period table"));
-#ifdef ENABLE_SHOWSYMMETRY_MODE
-	menuView->AppendCheckItem(MMP_SHOWSYMMETRYOPERATOR, wxT("Show S&ymmetry Operators"));
-#endif
+	menuView->AppendCheckItem(MMP_SHOWPERIODICDLG, _("Show Periodic Table"), _("Display a periodic table"));
+	menuView->AppendCheckItem(MMP_SHOWSYMMETRYOPERATOR, _("Show S&ymmetry Operators"), _("Overlays the symmetry operators for the current point group. Not all point groups are supported."));
 	
 	menuViewLabels = new wxMenu;
 	menuView->Append(MMP_ATOMLABELSSUBMENU, wxT("Atom &Labels"), menuViewLabels);
@@ -682,10 +680,8 @@ void MolDisplayWin::ClearMenus(void) {
 	menuView->Enable(MMP_OFFSETMODE, false);
 	menuView->Enable(MMP_ANNOTATIONSSUBMENU, false);
 	menuView->Enable(MMP_ANIMATEFRAMES, false);
-#ifdef ENABLE_SHOWSYMMETRY_MODE
 	menuView->Enable(MMP_SHOWSYMMETRYOPERATOR, false);
 	menuView->Check(MMP_SHOWSYMMETRYOPERATOR, false);
-#endif
 	menuMolecule->Enable(MMP_SETBONDLENGTH, false);
 	menuMolecule->Enable(MMP_ENERGYEDIT, false);
 	menuMolecule->Enable(MMP_CREATELLMPATH, false);
@@ -706,16 +702,15 @@ void MolDisplayWin::AdjustMenus(void) {
 	else
 		menuViewLabels->Check(MMP_NO_ATOMLABEL, true);
 
-#ifdef ENABLE_SHOWSYMMETRY_MODE
 	if (MainData->InputOptions) {
 		if (MainData->InputOptions->Data) {
-			if (MainData->InputOptions->Data->GetPointGroup() > GAMESS_C1) {
+			GAMESSPointGroup pg = MainData->InputOptions->Data->GetPointGroup();
+			if ((pg > GAMESS_C1)&&(pg!=GAMESS_S2N)&&(pg <GAMESS_TD)) {
 				menuView->Enable(MMP_SHOWSYMMETRYOPERATOR, true);
 				menuView->Check(MMP_SHOWSYMMETRYOPERATOR, Prefs->ShowSymmetryOperators());
 			}
 		}
 	}
-#endif
 
 	if (Prefs->DrawWireFrame())
 		menuViewStyle->Check(MMP_WIREFRAMEMODE, true);
