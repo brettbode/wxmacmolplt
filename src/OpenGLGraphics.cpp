@@ -76,6 +76,7 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order);
 void DrawInversionPoint(void);
 void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2);
+void DrawArrow(const float & length, const float & width, const int & quality);
 
 const GLubyte stippleMask[128] =
 
@@ -2073,9 +2074,6 @@ void MolDisplayWin::DrawHydrogenBond(long bondNum) {
 
 void MolDisplayWin::AddAxisGL(void)
 {
-	GLUquadricObj * qobj;
-	qobj = gluNewQuadric();
-	if (!qobj) throw std::bad_alloc();
 	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
 	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
 	float anno_color[3];
@@ -2089,35 +2087,27 @@ void MolDisplayWin::AddAxisGL(void)
 	glColor3f(anno_color[0], anno_color[1], anno_color[2]);
 	long Quality = (long)(Prefs->GetQD3DAtomQuality());
 	float VectorWidth = 0.02;
-	float HeadRadius = 2*VectorWidth;
+	float LabelSize = Prefs->GetAnnotationLabelSize();
 
 	CPoint3D			vector = {1.0,0.0,0.0}, NormStart={0.0,0.0,1.0};
 	glPushMatrix();
 	
 		// Z-axis
 	glTranslatef(0.0, 0.0, -MainData->MaxSize);
-	gluDisk(qobj, 0.0, VectorWidth, (long)(Quality), 2);
-	gluCylinder(qobj, VectorWidth, VectorWidth, (2*MainData->MaxSize - 2*VectorWidth), Quality, (long)(0.5*Quality));
+	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
 	glPopMatrix();
-	glPushMatrix();
-	glTranslatef(0.0, 0.0, (MainData->MaxSize - 2*VectorWidth));
-	gluDisk(qobj, 0.0, 2*VectorWidth, Quality, 2);
-	gluCylinder(qobj, 2*VectorWidth, 0.0, HeadRadius, Quality, 3);
-	glPopMatrix();
+//	glPushMatrix();
+//	glTranslatef(2*VectorWidth, 0.0, (MainData->MaxSize - 3*VectorWidth));
+//	glScalef(-0.1f * LabelSize, 0.1f * LabelSize, 0.1f);
+//	glfDrawSolidString("Z");
+//	glPopMatrix();
 		// X-axis
 		Matrix4D	rotMat;
 	SetRotationMatrix(rotMat, &NormStart, &vector);
 	rotMat[3][0] = -MainData->MaxSize;
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
-	gluDisk(qobj, 0.0, VectorWidth, Quality, 2);
-	gluCylinder(qobj, VectorWidth, VectorWidth, (2*MainData->MaxSize - 2*VectorWidth), Quality, (long)(0.5*Quality));
-	glPopMatrix();
-	glPushMatrix();
-	rotMat[3][0] = MainData->MaxSize - 2*VectorWidth;
-	glMultMatrixf((const GLfloat *) &rotMat);
-	gluDisk(qobj, 0.0, 2*VectorWidth, Quality, 2);
-	gluCylinder(qobj, 2*VectorWidth, 0.0, HeadRadius, Quality, 3);
+	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
 	glPopMatrix();
 		// Y-axis
 	vector.x = 0.0;
@@ -2126,17 +2116,9 @@ void MolDisplayWin::AddAxisGL(void)
 	rotMat[3][1] = -MainData->MaxSize;
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
-	gluDisk(qobj, 0.0, VectorWidth, Quality, 2);
-	gluCylinder(qobj, VectorWidth, VectorWidth, (2*MainData->MaxSize - 2*VectorWidth), Quality, (long)(0.5*Quality));
-	glPopMatrix();
-	glPushMatrix();
-	rotMat[3][1] = MainData->MaxSize - 2*VectorWidth;
-	glMultMatrixf((const GLfloat *) &rotMat);
-	gluDisk(qobj, 0.0, 2*VectorWidth, Quality, 2);
-	gluCylinder(qobj, 2*VectorWidth, 0.0, HeadRadius, Quality, 3);
+	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
 
 	glPopMatrix();
-	gluDeleteQuadric(qobj);	//finally delete the quadric object
 }
 
 void MolDisplayWin::AddSymmetryOperators(void) {
@@ -3380,9 +3362,9 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 void DrawInversionPoint(void) {
 	GLUquadricObj * qobj = NULL;
 	qobj = gluNewQuadric();
-	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
-	float plane_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-	float plane_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	float sphere_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
+	float sphere_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+	float sphere_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 	float save_emissive[4], save_diffuse[4], save_specular[4], shininess;
 	
 	glGetMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
@@ -3391,18 +3373,82 @@ void DrawInversionPoint(void) {
 	glGetMaterialfv(GL_FRONT, GL_SPECULAR, save_specular);
 
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 128.0);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, plane_diffuse);
-//	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, sphere_diffuse);
+//	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, sphere_emissive);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, sphere_specular);
 	glColor4f(.7, .7, .7, 1.0);
 
 	//Assume the inversion point is at the origin
 	gluSphere(qobj, 0.2, 30, 20);	//Create and draw the sphere
 	
+	//Add several arrows to indicate the inversion...
+	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
+	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
+	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, plane_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
+	glColor4f(0, .64, .85, 0.7);
+	glEnable(GL_BLEND);
+
+	gluCylinder(qobj, 0.02, 0.02, 0.6, 12, 1);
+	glPushMatrix();
+	glTranslatef(0.0, 0.0, 0.6);
+	gluDisk(qobj, 0.0, 0.06, 12, 2);
+	gluCylinder(qobj, 0.06, 0.0, 0.07, 12, 3);
+	glPopMatrix();
+
+	glPushMatrix();
+	Matrix4D	rotMat;
+	CPoint3D			vector = {1.0,0.0,0.0}, NormStart={0.0,0.0,1.0};
+	InitRotationMatrix(rotMat);
+	rotMat[2][2] = -1;
+	glMultMatrixf((const GLfloat *) &rotMat);
+	DrawArrow(0.7, 0.02, 12);
+	glPopMatrix();
+	glPushMatrix();
+	SetRotationMatrix(rotMat, &NormStart, &vector);
+	glMultMatrixf((const GLfloat *) &rotMat);
+	DrawArrow(0.7, 0.02, 12);
+	glPopMatrix();
+	glPushMatrix();
+	rotMat[2][0] *= -1.0;
+	glMultMatrixf((const GLfloat *) &rotMat);
+	DrawArrow(0.7, 0.02, 12);
+	glPopMatrix();
+	vector.x = 0.0;
+	vector.y = 1.0;
+	glPushMatrix();
+	SetRotationMatrix(rotMat, &NormStart, &vector);
+	glMultMatrixf((const GLfloat *) &rotMat);
+	DrawArrow(0.7, 0.02, 12);
+	glPopMatrix();
+	glPushMatrix();
+	rotMat[2][1] *= -1.0;
+	glMultMatrixf((const GLfloat *) &rotMat);
+	DrawArrow(0.7, 0.02, 12);
+	glPopMatrix();
+
+	glDisable(GL_BLEND);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, save_diffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, save_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, save_specular);
+	if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
+}
+
+void DrawArrow(const float & length, const float & width, const int & quality) {
+		//Draw an arrow with arrow head at far end.
+
+	GLUquadricObj * qobj = NULL;
+	qobj = gluNewQuadric();
+	gluDisk(qobj, 0.0, width, quality, 2);
+	gluCylinder(qobj, width, width, length-3.5*width, quality, 1);
+	glPushMatrix();
+	glTranslatef(0.0, 0.0, length-2.5*width);
+	gluDisk(qobj, 0.0, 3*width, quality, 2);
+	gluCylinder(qobj, 3*width, 0.0, 3.5*width, quality, 2);
+	glPopMatrix();
 	if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
 }
 
