@@ -266,6 +266,7 @@ class MolDisplayWin : public wxFrame {
 		void OnAnnotationLengthUpdate(wxUpdateUIEvent &event);
 		void OnAnnotationAngleUpdate(wxUpdateUIEvent &event);
 		void OnAnnotationDihedralUpdate(wxUpdateUIEvent &event);
+		void OnShowSymOpsUpdate(wxUpdateUIEvent &event);
 		void menuViewDeleteAllAnnotations(wxCommandEvent &event);
 		void OnDeleteAnnotationsUpdate(wxUpdateUIEvent &event);
 		void menuViewShow2DPattern(wxCommandEvent &event);

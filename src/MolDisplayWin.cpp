@@ -193,6 +193,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
 	EVT_MENU (MMP_SHOWPERIODICDLG,  MolDisplayWin::menuViewShowPeriodicDlg)
 	EVT_MENU (MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::menuViewShowSymmetryOperators)
+	EVT_UPDATE_UI(MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::OnShowSymOpsUpdate )
 	EVT_MENU (MMP_NO_ATOMLABEL,		MolDisplayWin::menuViewHideAtomLabels)
 	EVT_MENU (MMP_SHOWATOMLABELS,   MolDisplayWin::menuViewShowAtomLabel)
 	EVT_MENU (MMP_SHOWATOMNUMBER,   MolDisplayWin::menuViewShowAtomNumber)
@@ -680,8 +681,6 @@ void MolDisplayWin::ClearMenus(void) {
 	menuView->Enable(MMP_OFFSETMODE, false);
 	menuView->Enable(MMP_ANNOTATIONSSUBMENU, false);
 	menuView->Enable(MMP_ANIMATEFRAMES, false);
-	menuView->Enable(MMP_SHOWSYMMETRYOPERATOR, false);
-	menuView->Check(MMP_SHOWSYMMETRYOPERATOR, false);
 	menuMolecule->Enable(MMP_SETBONDLENGTH, false);
 	menuMolecule->Enable(MMP_ENERGYEDIT, false);
 	menuMolecule->Enable(MMP_CREATELLMPATH, false);
@@ -701,16 +700,6 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuViewLabels->Check(MMP_SHOWATOMNUMBER, true);
 	else
 		menuViewLabels->Check(MMP_NO_ATOMLABEL, true);
-
-	if (MainData->InputOptions) {
-		if (MainData->InputOptions->Data) {
-			GAMESSPointGroup pg = MainData->InputOptions->Data->GetPointGroup();
-			if ((pg > GAMESS_C1)&&(pg!=GAMESS_S2N)&&(pg <GAMESS_TD)) {
-				menuView->Enable(MMP_SHOWSYMMETRYOPERATOR, true);
-				menuView->Check(MMP_SHOWSYMMETRYOPERATOR, Prefs->ShowSymmetryOperators());
-			}
-		}
-	}
 
 	if (Prefs->DrawWireFrame())
 		menuViewStyle->Check(MMP_WIREFRAMEMODE, true);
@@ -789,6 +778,19 @@ void MolDisplayWin::OnAnnotationAngleUpdate( wxUpdateUIEvent& event ) {
 }
 void MolDisplayWin::OnAnnotationDihedralUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(glCanvas->NumberSelectedAtoms()==4);
+}
+void MolDisplayWin::OnShowSymOpsUpdate( wxUpdateUIEvent& event ) {
+	bool state = false;
+	if (MainData->InputOptions) {
+		if (MainData->InputOptions->Data) {
+			GAMESSPointGroup pg = MainData->InputOptions->Data->GetPointGroup();
+			if ((pg > GAMESS_C1)&&(pg!=GAMESS_S2N)&&(pg <GAMESS_TD)) {
+				state = true;
+			}
+		}
+	}
+	event.Enable(state);
+	event.Check(state && Prefs->ShowSymmetryOperators());
 }
 void MolDisplayWin::OnDeleteAnnotationsUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(MainData->GetAnnotationCount() > 0);
