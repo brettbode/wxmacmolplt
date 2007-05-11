@@ -30,7 +30,6 @@ END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(patternSelectDlg, wxDialog)
   EVT_BUTTON( wxID_OK, patternSelectDlg::OnOK )
-  EVT_BUTTON( wxID_CANCEL, patternSelectDlg::OnCancel )
   EVT_SIZE(patternSelectDlg::OnSize)
 END_EVENT_TABLE()
 
@@ -238,15 +237,9 @@ patternSelectDlg::~patternSelectDlg()
     delete patSlt[i];
 }
 
-void patternSelectDlg::OnOK( wxCommandEvent& WXUNUSED(event) )
-{
-  mParent->setPattern(mSltPatId);
-  Close();
-}
-
-void patternSelectDlg::OnCancel( wxCommandEvent& WXUNUSED(event) )
-{
-  Destroy();
+void patternSelectDlg::OnOK( wxCommandEvent& event ) {
+	mParent->setPattern(mSltPatId);
+	event.Skip();
 }
 
 void patternSelectDlg::OnSize(wxSizeEvent & event)

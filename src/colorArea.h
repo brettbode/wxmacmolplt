@@ -88,7 +88,6 @@ class patternSelectDlg : public wxDialog {
     ~patternSelectDlg();
 
     void OnOK( wxCommandEvent& WXUNUSED(event) );
-    void OnCancel( wxCommandEvent& WXUNUSED(event) );
     void OnSize(wxSizeEvent & event);
 
     void setSltId(int id);
