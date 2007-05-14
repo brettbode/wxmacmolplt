@@ -277,7 +277,7 @@ typedef struct qtData {
 	Rect FullRect;
 };
 
-void MolDisplayWin::WriteMovie(wxString & filepath) {
+void MolDisplayWin::WriteQTMovie(wxString & filepath) {
 	//Create a QuickTime movie using the standard animation codecs with normal quality, and 
 	//temporal compression. The final file is flattened for cross platform compatability
 	

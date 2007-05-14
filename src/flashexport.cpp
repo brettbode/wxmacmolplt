@@ -51,7 +51,7 @@ bool SWFExport::AddEnergyPlot(void) const {
 #include "MolDisplayWin.h"
 #include "energyplotdialog.h"
 
-void MolDisplayWin::WriteMovie(wxString & filepath) {
+void MolDisplayWin::WriteFlashMovie(wxString & filepath) {
 	SWFExport * SWFOptions = new SWFExport(this);
 
 	if(SWFOptions->ShowModal() != wxID_OK) {

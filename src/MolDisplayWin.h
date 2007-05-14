@@ -342,17 +342,16 @@ class MolDisplayWin : public wxFrame {
 		void WriteMDLMolFile(BufferFile * Buffer);
 #ifdef __MAC_USE_QUICKTIME__
 		//quicktime movie export
-		void WriteMovie(wxString & filepath);
+		void WriteQTMovie(wxString & filepath);
 		void CreateFrameMovie(GWorldPtr lgWorld, Handle CompressedData,
 							  const qtData & myqtData, bool IncludeEPlot);
 		void CreateModeMovie(GWorldPtr lgWorld, Handle CompressedData,
 							 const qtData & myqtData);
-#else
+#endif
 #ifdef HAVE_LIBMING
-		void WriteMovie(wxString & filepath);
+		void WriteFlashMovie(wxString & filepath);
         void CreateFrameMovie(wxString & filePath, const bool includeEP);
 		void CreateModeMovie(wxString & filePath);
-#endif
 #endif
 		//Call to dump the message and close the window
 		void AbortOpen(const char * msg);

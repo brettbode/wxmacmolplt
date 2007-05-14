@@ -957,20 +957,27 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 							 "|XMOL (*.xyz)|*.xyz"
 							 "|Tab delimited Energies (*.txt)|*.txt"));
 	bool vibs = false;
+	int itemCount = 7;
 	if (MainData->cFrame->GetNumberNormalModes() > 0) {
 		vibs = true;
 		wildcards.Append(wxT("|Frequencies (*.txt)|*.txt"));
+		itemCount++;
 	}
 #ifdef __MAC_USE_QUICKTIME__
+	int QTindex = -1;
 	if ((MainData->GetNumFrames() > 1)||vibs) {
 		wildcards.Append(wxT("|QuickTime Movie (*.mov)|*.mov"));
+		QTindex = itemCount;
+		itemCount++;
 	}
-#else
+#endif
 #ifdef HAVE_LIBMING
+	int FlashIndex = -1;
     if ((MainData->GetNumFrames() > 1)||vibs) {
         wildcards.Append(wxT("|Flash Movie (*.swf)|*.swf"));
+		FlashIndex = itemCount;
+		itemCount++;
     }
-#endif
 #endif
 	int        index = 0;
 	int        type  = 0;
@@ -1024,17 +1031,18 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 				}
 			}
 			exportOptionsDlg->Destroy();
-		} else if ((index == 8) || (!vibs && (index==7))) {
+		}
 #ifdef __MAC_USE_QUICKTIME__
+		  else if (index == QTindex)
 			//quicktime movie export
-			WriteMovie(filepath);
-#else
+			WriteQTMovie(filepath);
+#endif
 #ifdef HAVE_LIBMING
+		  else if (index == FlashIndex)
 			//flash movie export
-            WriteMovie(filepath);
+            WriteFlashMovie(filepath);
 #endif
-#endif
-		} else {
+		else {
 			FILE *currFile = NULL;
 
 			if((currFile = fopen(filepath.mb_str(wxConvUTF8), "w")) != NULL) {
@@ -2025,7 +2033,7 @@ void MolDisplayWin::menuViewDeleteAllAnnotations(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuViewShow2DPattern(wxCommandEvent &event) {
-  Prefs->Show2DPattern(1-Prefs->Show2DPattern());
+	Prefs->Show2DPattern(1-Prefs->Show2DPattern());
 	UpdateModelDisplay();
 	Dirty = true;
 }
