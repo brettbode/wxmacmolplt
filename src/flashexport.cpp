@@ -117,6 +117,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 
     for(i = 1; i <= MainData->NumFrames; ++i) {
 		if(!ProgressInd->UpdateProgress((float)i)) {
+			delete movie;
 			return;
 		}
 
@@ -247,6 +248,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 
 	for(long i = 0; i < (4 * AnimationSpeed); i++) {
 		if(!ProgressInd->UpdateProgress((float)i)) {
+			delete movie;
 			return;
 		}
 		if((npoint == AnimationSpeed) || (npoint == -AnimationSpeed)) {
