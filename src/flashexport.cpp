@@ -50,6 +50,7 @@ bool SWFExport::AddEnergyPlot(void) const {
 #ifdef HAVE_LIBMING
 #include "MolDisplayWin.h"
 #include "energyplotdialog.h"
+#include "Progress.h"
 
 void MolDisplayWin::WriteFlashMovie(wxString & filepath) {
 	SWFExport * SWFOptions = new SWFExport(this);
@@ -62,12 +63,17 @@ void MolDisplayWin::WriteFlashMovie(wxString & filepath) {
 	int movieType = SWFOptions->GetMovieChoice();
 	bool includeEP = SWFOptions->AddEnergyPlot();
 
+	BeginOperation();
+	ProgressInd->ChangeText("Creating movieÉ");
+
 	if(movieType == 0) {
 		CreateFrameMovie(filepath, includeEP);
 	}
 	else {
 		CreateModeMovie(filepath);
 	}
+
+	FinishOperation();
 }
 
 void MolDisplayWin::CreateFrameMovie(wxString &filePath,
@@ -107,7 +113,13 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
     movie->setRate(1000.0/(double)AnimateTime);
     movie->setDimension(width, height);
 
+	ProgressInd->SetScaleFactor(100.0 / (float)(MainData->NumFrames));
+
     for(i = 1; i <= MainData->NumFrames; ++i) {
+		if(!ProgressInd->UpdateProgress((float)i)) {
+			return;
+		}
+
         MainData->SetCurrentFrame(i);
 
         Surface *temp = MainData->cFrame->SurfaceList;
@@ -231,7 +243,12 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	long npoint = 0;
 	long inc = 1;
 
+	ProgressInd->SetScaleFactor(100.0 / (float)(4 * AnimationSpeed));
+
 	for(long i = 0; i < (4 * AnimationSpeed); i++) {
+		if(!ProgressInd->UpdateProgress((float)i)) {
+			return;
+		}
 		if((npoint == AnimationSpeed) || (npoint == -AnimationSpeed)) {
 			inc *= -1;
 			offsetFactor *= -1.0;
