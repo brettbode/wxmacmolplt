@@ -77,6 +77,9 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 void DrawInversionPoint(void);
 void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2);
 void DrawArrow(const float & length, const float & width, const int & quality);
+void DrawSceneString(const float scale_factor, const float shift_x,
+		             const float shift_y, const float shift_z,
+					 const wxString& label);
 
 const GLubyte stippleMask[128] =
 
@@ -924,6 +927,11 @@ void MolDisplayWin::DrawGL(void)
 
 	if (lasso_has_area) {
 		int canvas_width, canvas_height;
+
+		glPushMatrix();
+		glTranslatef(-1.1f, -2.1f, 0.0f);
+		DrawSceneString(1.0f, 0.0f, 0.0f, 0.0f, wxT("hello, merle!"));
+		glPopMatrix();
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -2095,21 +2103,36 @@ void MolDisplayWin::AddAxisGL(void)
 		// Z-axis
 	glTranslatef(0.0, 0.0, -MainData->MaxSize);
 	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
+	glPushMatrix();
+	glTranslatef(0.0, 0.0, 2.0f * MainData->MaxSize);
+	DrawSceneString(0.1f, 0.0f, 0.0f, 0.0f, wxT("z"));
+	glPopMatrix();
 	glPopMatrix();
 //	glPushMatrix();
 //	glTranslatef(2*VectorWidth, 0.0, (MainData->MaxSize - 3*VectorWidth));
 //	glScalef(-0.1f * LabelSize, 0.1f * LabelSize, 0.1f);
 //	glfDrawSolidString("Z");
 //	glPopMatrix();
-		// X-axis
-		Matrix4D	rotMat;
+
+	// X-axis
+	Matrix4D	rotMat;
 	SetRotationMatrix(rotMat, &NormStart, &vector);
 	rotMat[3][0] = -MainData->MaxSize;
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
+	// glPointSize(5.0f); 
+	// glBegin(GL_POINTS); 
+	// glVertex3f(0.0f, 0.0f, 0.0f); 
+	// glVertex3f(0.0f, 0.0f, 3.0f); 
+	// glEnd(); 
+	glPushMatrix();
+	glTranslatef(0.0, 0.0, 2.0f * MainData->MaxSize);
+	DrawSceneString(0.1f, 0.0f, 0.0f, 0.0f, wxT("x"));
+	glPopMatrix();
 	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
 	glPopMatrix();
-		// Y-axis
+
+	// Y-axis
 	vector.x = 0.0;
 	vector.y = 1.0;
 	SetRotationMatrix(rotMat, &NormStart, &vector);
@@ -2117,7 +2140,10 @@ void MolDisplayWin::AddAxisGL(void)
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
 	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
-
+	glPushMatrix();
+	glTranslatef(0.0, 0.0, 2.0f * MainData->MaxSize);
+	DrawSceneString(0.1f, 0.0f, 0.0f, 0.0f, wxT("y"));
+	glPopMatrix();
 	glPopMatrix();
 }
 
@@ -3634,9 +3660,78 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 	glMultMatrixf(m);
 	float LabelSize = Prefs->GetAnnotationLabelSize();
 	glTranslatef(-0.175f + chord_len, 0.0f, 0.0f);
-	glScalef(-0.1f*LabelSize, 0.1f*LabelSize, 0.1f);
+	glScalef(-0.1f * LabelSize, 0.1f * LabelSize, 0.1f);
 	glfDrawSolidString(angle_label);
 
 	glPopMatrix();
+
+}
+
+void DrawSceneString(const float scale_factor, const float shift_x,
+		             const float shift_y, const float shift_z,
+					 const wxString& label) {
+
+	float m[16];
+	Matrix4D mv_inv;
+	CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f};
+	CPoint3D up_eye = {0.0f, 1.0f, 0.0f};
+	CPoint3D lookat_world;
+	CPoint3D up_world;
+	CPoint3D r;
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, m);
+
+	// Invert just the rotation portion of the modelview matrix.  This is
+	// much faster than inverting an arbitrary matrix.
+	mv_inv[0][0] = m[0];
+	mv_inv[0][1] = m[4];
+	mv_inv[0][2] = m[8];
+	mv_inv[0][3] = 0.0f;
+	mv_inv[1][0] = m[1];
+	mv_inv[1][1] = m[5];
+	mv_inv[1][2] = m[9];
+	mv_inv[1][3] = 0.0f;
+	mv_inv[2][0] = m[2];
+	mv_inv[2][1] = m[6];
+	mv_inv[2][2] = m[10];
+	mv_inv[2][3] = 0.0f;
+	mv_inv[3][0] = 0.0f;
+	mv_inv[3][1] = 0.0f;
+	mv_inv[3][2] = 0.0f;
+	mv_inv[3][3] = 1.0f;
+
+	// Transform the eye space vectors to world coordinates, and find 
+	// a third vector to form a basis set.
+	Rotate3DPt(mv_inv, lookat_eye, &lookat_world);
+	Rotate3DPt(mv_inv, up_eye, &up_world);
+	CrossProduct3D(&lookat_world, &up_world, &r);
+
+	m[0] = r.x;
+	m[1] = r.y;
+	m[2] = r.z;
+	m[3] = 0.0f;
+
+	m[4] = up_world.x;
+	m[5] = up_world.y;
+	m[6] = up_world.z;
+	m[7] = 0.0f;
+
+	m[8] = lookat_world.x;
+	m[9] = lookat_world.y;
+	m[10] = lookat_world.z;
+	m[11] = 0.0f;
+
+	m[12] = m[13] = m[14] = 0.0f;
+	m[15] = 1.0f;
+
+	glDisable(GL_LIGHTING);
+	glColor3f(0.0f, 0.0f, 0.0f);
+	glPushMatrix();
+	glMultMatrixf(m);
+	glTranslatef(shift_x, shift_y, shift_z);
+	glScalef(-scale_factor, scale_factor, scale_factor);
+	glfDrawSolidString(label.mb_str());
+	glPopMatrix();
+	glEnable(GL_LIGHTING);
 
 }
