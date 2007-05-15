@@ -43,6 +43,8 @@
 #define GL_Popup_Delete_Dihedral 30025
 #define GL_Popup_Delete_Bond 30026
 #define GL_Popup_Lock_To_Annotation 30027
+#define GL_Popup_Fit_To_Plane 30028
+#define GL_Popup_Change_Atom 30029
 
 class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
@@ -101,7 +103,8 @@ class MpGLCanvas : public wxGLCanvas {
 		int select_stack_top;
 
 		bool stale_click;
-		void constrain_position(const int anno_id, double *x, double *y, double *z);
+		void ConstrainPosition(const int anno_id, double *x, double *y, double *z);
+		void ChangeAtom(wxCommandEvent& event);
 
 	public:
 		/**
@@ -131,6 +134,8 @@ class MpGLCanvas : public wxGLCanvas {
 		~MpGLCanvas();
 
 		void setPrefs(WinPrefs *newPrefs);
+
+		void DoPCA(wxCommandEvent& event);
 
 		/**
 		* Updates GL parameters for changes in the window shape or

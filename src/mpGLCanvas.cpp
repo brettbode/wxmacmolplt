@@ -476,7 +476,7 @@ void MpGLCanvas::eventActivate(wxActivateEvent &event) {
 	}
 }
 
-void MpGLCanvas::constrain_position(const int anno_id, double *x, double *y,
+void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 									double *z) {
 
 	Frame *lFrame = mMainData->cFrame;
@@ -979,7 +979,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 					int constrain_anno_id = mMainData->GetConstrainAnnotation();
 					if (constrain_anno_id != -1) {
-						constrain_position(constrain_anno_id, &newX, &newY,
+						ConstrainPosition(constrain_anno_id, &newX, &newY,
 							&newZ);
 					}
 				}
@@ -1185,35 +1185,18 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 				if (selected < 0 && periodic_dlg && MolWin->HandSelected() &&
 					periodic_dlg->GetSelectedID() != 0) {
 
-					// if (periodic_dlg) { 
-						// if (periodic_dlg->GetSelectedID() == 0) { 
-							// periodic_dlg->Raise(); 
-						// } 
-					// } else { 
-						// wxRect window_rect = GetRect(); 
-						// periodic_dlg = new PeriodicTableDlg( 
-												// this, wxT("Periodic Table"), 
-												// window_rect.x + window_rect.width, 
-												// window_rect.y + 30); 
-												
-						// periodic_dlg->Show(); 
-					// } 
-  
-					// If an element is selected, add an instance of it.
-					// if (periodic_dlg->GetSelectedID() != 0) { 
-							GLdouble newX, newY, newZ;
-  
-							findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
-							//estimate an atomDepth value, X and Y values are of no use 
-							CPoint3D newPnt;
-							findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y,
-												atomDepth, newX, newY, newZ);
-							newPnt.x = newX;
-							newPnt.y = newY;
-							newPnt.z = newZ;
-  
-							mMainData->NewAtom(periodic_dlg->GetSelectedID(), newPnt);
-						// } 
+					GLdouble newX, newY, newZ;
+
+					findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
+					//estimate an atomDepth value, X and Y values are of no use 
+					CPoint3D newPnt;
+					findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y,
+										atomDepth, newX, newY, newZ);
+					newPnt.x = newX;
+					newPnt.y = newY;
+					newPnt.z = newZ;
+
+					mMainData->NewAtom(periodic_dlg->GetSelectedID(), newPnt);
   
 					oldSelect = -1;
 				}
@@ -1262,14 +1245,12 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	stale_click = false;
 
 	// Pass mouse event to MolDisplayWin::Rotate for processing
-	if (!interactiveMode || MolWin->ArrowSelected()) {
+	if (!interactiveMode || !edited_atoms) {
 		MolWin->Rotate(event);
 	}
 
 	else {
 		draw();
-		// if (!interactiveMode || MolWin->ArrowSelected()) { 
-		// } 
 	}
 
 }
@@ -1477,6 +1458,50 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 //	MolWin->AdjustMenus();
 }
 
+void MpGLCanvas::DoPCA(wxCommandEvent& event) {
+
+	Frame *lFrame = mMainData->cFrame;
+	long NumAtoms = lFrame->NumAtoms;
+	mpAtom *lAtoms = lFrame->Atoms;
+	CPoint3D centroid;
+	int i;
+	Matrix2D locs;
+	Matrix2D trans_locs;
+	std::vector<mpAtom *> atoms;
+	std::vector<mpAtom *>::const_iterator atom;
+
+	// First we need a list of all the selected atoms.  It doesn't seem right
+	// to put all these in a vector because we just trash it right after this
+	// when we drop all the atom coordinates in a matrix, but by doing this, 
+	// we don't have to iterate through all the atoms twice.
+	for (i = 0; i < NumAtoms; i++) {
+		if (lAtoms[i].GetSelectState()) {
+			atoms.push_back(&lAtoms[i]);
+		}
+	}
+	printf("atoms.size(): %d\n", atoms.size());
+
+	// Now store all selected atoms' coordinates in a matrix.
+	locs = Matrix2D(atoms.size(), 3);
+	for (atom = atoms.begin(), i = 0; atom != atoms.end(); atom++, i++) {
+		locs.data[i * 3 + 0] = (*atom)->Position.x;
+		locs.data[i * 3 + 1] = (*atom)->Position.y;
+		locs.data[i * 3 + 2] = (*atom)->Position.z;
+	}
+
+	// Transpose the matrix.
+	trans_locs = locs.Transpose();
+
+	// Multiply the two to get the covariance matrix.
+	
+	// Perform SVD on covariance matrix.  Sort the vectors by their scale
+	// factors and use the largest two as the axes of the plane to fit the
+	// selected atoms into.
+	
+	// Project the atoms onto the plane.
+
+}
+
 void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 
 	wxMenu menu;
@@ -1493,7 +1518,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 		menu.AppendSeparator();
 
 		if (select_stack_top >= 4) {
-			menu.Append(wxID_ANY, wxT("Fit atoms to plane"));
+			menu.Append(GL_Popup_Fit_To_Plane, wxT("Fit atoms to plane"));
 			menu.AppendSeparator();
 		}
 	}
@@ -1526,6 +1551,23 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 		menu.Append(wxID_ANY, wxT("Bond Order"), submenu);
 		menu.AppendSeparator();
 	} else {
+
+		// If the periodic table is shown and an atom is selected, offer an
+		// option to change the clicked-on atom to the selected type.
+		if (periodic_dlg && periodic_dlg->GetSelectedID() !=
+			lFrame->Atoms[selected].GetType()) {
+			wxString label;
+			wxString atom_name;
+			Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1,
+				atom_name);
+			label.Printf(wxT("Change %s to "), atom_name.mb_str());
+			Prefs->GetAtomLabel(periodic_dlg->GetSelectedID() - 1, atom_name);
+			label.Append(atom_name);
+
+			menu.Append(GL_Popup_Change_Atom, label);
+			menu.AppendSeparator();
+		}
+
 		menu.Append(GL_Popup_Menu_Apply_All, _T("&Apply to All Frames"));
 	}
 
@@ -1536,6 +1578,10 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 
 }
 //make a popup menu editing the objets in the scene
+
+void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
+	mMainData->cFrame->SetAtomType(selected, periodic_dlg->GetSelectedID());
+}
 
 void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 
@@ -2058,6 +2104,8 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_Delete_Angle, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Delete_Dihedral, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Lock_To_Annotation, MpGLCanvas::ConstrainToAnnotation)
+	EVT_MENU(GL_Popup_Fit_To_Plane, MpGLCanvas::DoPCA)
+	EVT_MENU(GL_Popup_Change_Atom, MpGLCanvas::ChangeAtom)
 END_EVENT_TABLE()
 
 

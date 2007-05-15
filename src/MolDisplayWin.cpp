@@ -1834,7 +1834,7 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 	if (interactiveMode) {
 		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT);
 
-#include "xpms/arrow.xpm"
+#include "xpms/view.xpm"
 #include "xpms/rect_lasso.xpm"
 #include "xpms/hand.xpm"
 
@@ -1847,7 +1847,7 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 		wxBitmap enabled_bmp;
 		wxBitmap enabled_bmp2;
 
-		enabled_bmp = wxBitmap(arrow_xpm);
+		enabled_bmp = wxBitmap(view_xpm);
 		enabled_bmp2 = wxBitmap(hand_xpm);
 		toolbar->AddTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp,
 			enabled_bmp2, wxITEM_RADIO, wxT("Dummy"),
@@ -3165,15 +3165,14 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 	// button to be a toggle on.
 	// toolbar->ToggleTool(event.GetId(), true); 
 
-	printf("toolbar->GetToolState(MMP_TOOL_ARROW): %d\n",
-		toolbar->GetToolState(MMP_TOOL_ARROW));
+	// printf("toolbar->GetToolState(MMP_TOOL_ARROW): %d\n", 
+		// toolbar->GetToolState(MMP_TOOL_ARROW)); 
 
-	printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n",
-		toolbar->GetToolState(MMP_TOOL_LASSO));
+	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", 
+		// toolbar->GetToolState(MMP_TOOL_LASSO)); 
 
-	printf("toolbar->GetToolState(MMP_TOOL_HAND): %d\n",
-		toolbar->GetToolState(MMP_TOOL_HAND));
-
+	// printf("toolbar->GetToolState(MMP_TOOL_HAND): %d\n", 
+		// toolbar->GetToolState(MMP_TOOL_HAND)); 
 	
 	switch (event.GetId()) {
 		case MMP_TOOL_ARROW:

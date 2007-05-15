@@ -928,11 +928,6 @@ void MolDisplayWin::DrawGL(void)
 	if (lasso_has_area) {
 		int canvas_width, canvas_height;
 
-		glPushMatrix();
-		glTranslatef(-1.1f, -2.1f, 0.0f);
-		DrawSceneString(1.0f, 0.0f, 0.0f, 0.0f, wxT("hello, merle!"));
-		glPopMatrix();
-
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -1255,11 +1250,12 @@ void AnnotationMarker::draw(const MolDisplayWin * win) const {
 	glPushMatrix();
 	glTranslatef(atom_pos.x, atom_pos.y, atom_pos.z);
 
-	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
+	// RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc(); 
 
-	invert1[0] = 1.0f - BackgroundColor->red / 65536.0f;
-	invert1[1] = 1.0f - BackgroundColor->green / 65536.0f;
-	invert1[2] = 1.0f - BackgroundColor->blue / 65536.0f;
+	// invert1[0] = 1.0f - BackgroundColor->red / 65536.0f; 
+	// invert1[1] = 1.0f - BackgroundColor->green / 65536.0f; 
+	// invert1[2] = 1.0f - BackgroundColor->blue / 65536.0f; 
+	invert1[0] = invert1[1] = invert1[2] = 0.0f;
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, m);
 	glDisable(GL_LIGHTING);
@@ -3671,18 +3667,27 @@ void DrawSceneString(const float scale_factor, const float shift_x,
 		             const float shift_y, const float shift_z,
 					 const wxString& label) {
 
-	float m[16];
-	Matrix4D mv_inv;
-	CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f};
-	CPoint3D up_eye = {0.0f, 1.0f, 0.0f};
-	CPoint3D lookat_world;
-	CPoint3D up_world;
-	CPoint3D r;
+	// This function draws a string (label) at the origin of the current
+	// coordinate system, offset by shift_[xyz] and aligned with the screen.
+	// Right before the string is drawn, the coordinate system is uniformly
+	// scaled by scale_factor (since glf draws in a larger coordinate system
+	// than we want).
+	//
+	// It's assumed that the color and coordinate system are in the correct
+	// state when this function is called.  It's also assumed that lighting is
+	// turned on.  The assumed state is restored before the function returns.
 
-	glGetFloatv(GL_MODELVIEW_MATRIX, m);
+	float m[16];                              // OpenGL matrix
+	Matrix4D mv_inv;                          // Inverse of modelview matrix
+	CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f}; // Lookat vector in eye-space
+	CPoint3D lookat_world;                    //   transformed to world-space
+	CPoint3D up_eye = {0.0f, 1.0f, 0.0f};     // Up vector in eye-space
+	CPoint3D up_world;                        //   transformed to world-space
+	CPoint3D r;                               // Right vector in world-space
 
 	// Invert just the rotation portion of the modelview matrix.  This is
 	// much faster than inverting an arbitrary matrix.
+	glGetFloatv(GL_MODELVIEW_MATRIX, m);
 	mv_inv[0][0] = m[0];
 	mv_inv[0][1] = m[4];
 	mv_inv[0][2] = m[8];
@@ -3706,6 +3711,7 @@ void DrawSceneString(const float scale_factor, const float shift_x,
 	Rotate3DPt(mv_inv, up_eye, &up_world);
 	CrossProduct3D(&lookat_world, &up_world, &r);
 
+	// Enter the basis into a new modelview matrix.
 	m[0] = r.x;
 	m[1] = r.y;
 	m[2] = r.z;
@@ -3725,13 +3731,16 @@ void DrawSceneString(const float scale_factor, const float shift_x,
 	m[15] = 1.0f;
 
 	glDisable(GL_LIGHTING);
-	glColor3f(0.0f, 0.0f, 0.0f);
+
+	// Undo the rotation by multiplying by the inverse.  Then shift, scale, and
+	// draw the string.
 	glPushMatrix();
 	glMultMatrixf(m);
 	glTranslatef(shift_x, shift_y, shift_z);
 	glScalef(-scale_factor, scale_factor, scale_factor);
 	glfDrawSolidString(label.mb_str());
 	glPopMatrix();
+
 	glEnable(GL_LIGHTING);
 
 }
