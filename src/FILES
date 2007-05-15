@@ -1,9 +1,0 @@
-main.[cpp|h] - The wxApp.  This is where the program starts.
-
-##################################################
-## Stuff will be appearing/changing below here. ##
-##################################################
-
-MolDisplayWin.[cpp|h] - Main frame (child of wxFrame).
-
-mpGLCanvas.[cpp|h] - Widget for displaying an OpenGL canvas.
