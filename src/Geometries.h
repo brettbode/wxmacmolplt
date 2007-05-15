@@ -13,7 +13,10 @@ Created for other header files 4-98	BMB
 #include <string.h>
 #include <math.h>
 
+#include <ostream>
+
 class Matrix2D {
+		friend std::ostream& operator<<(std::ostream& stream, const Matrix2D& m);
 	public:
 		Matrix2D();
 		Matrix2D(const int nrows, const int ncols);
@@ -23,6 +26,7 @@ class Matrix2D {
 
 		const Matrix2D& operator=(const Matrix2D& m);
 
+		void Init(const int nrows, const int ncols, const float *data);
 		Matrix2D Transpose(void) const;
 
 		float *data;

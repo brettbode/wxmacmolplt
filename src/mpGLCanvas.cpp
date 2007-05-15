@@ -1466,7 +1466,7 @@ void MpGLCanvas::DoPCA(wxCommandEvent& event) {
 	CPoint3D centroid;
 	int i;
 	Matrix2D locs;
-	Matrix2D trans_locs;
+	// Matrix2D trans_locs; 
 	std::vector<mpAtom *> atoms;
 	std::vector<mpAtom *>::const_iterator atom;
 
@@ -1479,6 +1479,7 @@ void MpGLCanvas::DoPCA(wxCommandEvent& event) {
 			atoms.push_back(&lAtoms[i]);
 		}
 	}
+
 	printf("atoms.size(): %d\n", atoms.size());
 
 	// Now store all selected atoms' coordinates in a matrix.
@@ -1489,8 +1490,12 @@ void MpGLCanvas::DoPCA(wxCommandEvent& event) {
 		locs.data[i * 3 + 2] = (*atom)->Position.z;
 	}
 
+	std::cout << "locs:" << std::endl << locs;
+
 	// Transpose the matrix.
-	trans_locs = locs.Transpose();
+	// trans_locs = locs.Transpose(); 
+
+	// std::cout << "trans_locs:" << std::endl << trans_locs; 
 
 	// Multiply the two to get the covariance matrix.
 	
