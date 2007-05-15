@@ -23,13 +23,13 @@ void error_default(const char *msg, ...);
 SWFMsgFunc setSWFWarnFunction(SWFMsgFunc warn);
 SWFMsgFunc setSWFErrorFunction(SWFMsgFunc error);
 
-#define SWF_warnOnce(msg, va...)	\
+#define SWF_warnOnce(msg, ...)	\
 {					\
 	static int __warned = 0;	\
 					\
 	if(!__warned)			\
 	{				\
-		SWF_warn((msg), ##va);	\
+		SWF_warn((msg), #__VA_ARGS__);	\
 		__warned = 1;		\
 	}				\
 }					\
