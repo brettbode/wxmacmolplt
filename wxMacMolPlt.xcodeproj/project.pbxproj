@@ -49,11 +49,8 @@
 		8B279D000A4B6F0D00994DD5 /* inputbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF70A4B6F0D00994DD5 /* inputbuilder.cpp */; };
 		8B279D010A4B6F0D00994DD5 /* surfaceDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */; };
 		8B279D030A4B6F0D00994DD5 /* wxUglyChoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CFD0A4B6F0D00994DD5 /* wxUglyChoice.cpp */; };
-		8B33B7B70BF8DBEB0056C79E /* flashexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B30BF8DBEB0056C79E /* flashexport.cpp */; };
 		8B33B7B80BF8DBEB0056C79E /* swfexport-g.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */; };
-		8B33B7B90BF8DBEB0056C79E /* flashexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B30BF8DBEB0056C79E /* flashexport.cpp */; };
 		8B33B7BA0BF8DBEB0056C79E /* swfexport-g.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */; };
-		8B33B7BB0BF8DBEB0056C79E /* flashexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B30BF8DBEB0056C79E /* flashexport.cpp */; };
 		8B33B7BC0BF8DBEB0056C79E /* swfexport-g.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */; };
 		8B33B80E0BF8EC1F0056C79E /* displaylist.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7F60BF8EC1F0056C79E /* displaylist.c */; };
 		8B33B80F0BF8EC1F0056C79E /* fill.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7F80BF8EC1F0056C79E /* fill.c */; };
@@ -241,10 +238,8 @@
 		8B33B9490BF8EDA20056C79E /* assembler.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B93C0BF8EDA20056C79E /* assembler.c */; };
 		8B33B94A0BF8EDA20056C79E /* compile.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B93E0BF8EDA20056C79E /* compile.c */; };
 		8B33B94B0BF8EDA20056C79E /* compileaction.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9400BF8EDA20056C79E /* compileaction.c */; };
-		8B33B94C0BF8EDA20056C79E /* lex.swf4.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9410BF8EDA20056C79E /* lex.swf4.c */; };
 		8B33B94D0BF8EDA20056C79E /* lex.swf5.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9420BF8EDA20056C79E /* lex.swf5.c */; };
 		8B33B94E0BF8EDA20056C79E /* listaction.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9430BF8EDA20056C79E /* listaction.c */; };
-		8B33B9500BF8EDA20056C79E /* swf4compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9450BF8EDA20056C79E /* swf4compiler.tab.c */; };
 		8B33B9510BF8EDA20056C79E /* swf5compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9470BF8EDA20056C79E /* swf5compiler.tab.c */; };
 		8B33B9520BF8EDA20056C79E /* assembler.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B93C0BF8EDA20056C79E /* assembler.c */; };
 		8B33B9530BF8EDA20056C79E /* compile.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B93E0BF8EDA20056C79E /* compile.c */; };
@@ -402,6 +397,14 @@
 		8BE9976A0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE997680B70485700F48AA3 /* periodic_table_dlg.cpp */; };
 		8BE9976B0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE997680B70485700F48AA3 /* periodic_table_dlg.cpp */; };
 		8BE9976C0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE997680B70485700F48AA3 /* periodic_table_dlg.cpp */; };
+		8BEA48DC0BFA076D00C660A3 /* lex.swf4.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9410BF8EDA20056C79E /* lex.swf4.c */; };
+		8BEA48E00BFA078600C660A3 /* swf4compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9450BF8EDA20056C79E /* swf4compiler.tab.c */; };
+		8BEA48E90BFA0BE900C660A3 /* swfexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */; };
+		8BEA48EA0BFA0BE900C660A3 /* swfexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */; };
+		8BEA48EB0BFA0BE900C660A3 /* swfexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */; };
+		8BEA48F10BFA0F7300C660A3 /* Geometries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48F00BFA0F7300C660A3 /* Geometries.cpp */; };
+		8BEA48F20BFA0F7300C660A3 /* Geometries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48F00BFA0F7300C660A3 /* Geometries.cpp */; };
+		8BEA48F30BFA0F7300C660A3 /* Geometries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48F00BFA0F7300C660A3 /* Geometries.cpp */; };
 		8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
 		8BEDFA000A09390700BF6F85 /* setbondlength.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */; };
 		8BEE8B630B8BA40F00E9A7BB /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */; };
@@ -504,7 +507,6 @@
 		8B279CFA0A4B6F0D00994DD5 /* surfaceDlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceDlg.h; path = src/surfaceDlg.h; sourceTree = "<group>"; };
 		8B279CFD0A4B6F0D00994DD5 /* wxUglyChoice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = wxUglyChoice.cpp; path = src/wxUglyChoice.cpp; sourceTree = "<group>"; };
 		8B279CFE0A4B6F0D00994DD5 /* wxUglyChoice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = wxUglyChoice.h; path = src/wxUglyChoice.h; sourceTree = "<group>"; };
-		8B33B7B30BF8DBEB0056C79E /* flashexport.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = flashexport.cpp; path = src/flashexport.cpp; sourceTree = "<group>"; };
 		8B33B7B40BF8DBEB0056C79E /* patterns.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = patterns.h; path = src/patterns.h; sourceTree = "<group>"; };
 		8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = "swfexport-g.cpp"; path = "src/swfexport-g.cpp"; sourceTree = "<group>"; };
 		8B33B7B60BF8DBEB0056C79E /* swfexport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = swfexport.h; path = src/swfexport.h; sourceTree = "<group>"; };
@@ -677,6 +679,8 @@
 		8BE7C29C0A273D9700DACA25 /* choosevecgroup.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = choosevecgroup.h; path = src/choosevecgroup.h; sourceTree = "<group>"; };
 		8BE997680B70485700F48AA3 /* periodic_table_dlg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = periodic_table_dlg.cpp; path = src/periodic_table_dlg.cpp; sourceTree = "<group>"; };
 		8BE997690B70485700F48AA3 /* periodic_table_dlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = periodic_table_dlg.h; path = src/periodic_table_dlg.h; sourceTree = "<group>"; };
+		8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = swfexport.cpp; path = src/swfexport.cpp; sourceTree = "<group>"; };
+		8BEA48F00BFA0F7300C660A3 /* Geometries.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Geometries.cpp; path = src/Geometries.cpp; sourceTree = "<group>"; };
 		8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setscreenplane.cpp; path = src/setscreenplane.cpp; sourceTree = "<group>"; };
 		8BED377A09EDCC0E0003DF64 /* setscreenplane.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = setscreenplane.h; path = src/setscreenplane.h; sourceTree = "<group>"; };
 		8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setbondlength.cpp; path = src/setbondlength.cpp; sourceTree = "<group>"; };
@@ -777,6 +781,7 @@
 				1652DA3409D0B12600B7783F /* GaussHermite.cpp */,
 				1652DA3509D0B12600B7783F /* GaussHermite.h */,
 				1652DA3609D0B12600B7783F /* Geometries.h */,
+				8BEA48F00BFA0F7300C660A3 /* Geometries.cpp */,
 				8B3B89720A6EAB540041EA88 /* glf.h */,
 				8B3B899C0A6EAD7E0041EA88 /* glf.cpp */,
 				1652DA3709D0B12600B7783F /* GlobalExceptions.h */,
@@ -841,8 +846,8 @@
 				1652DA5609D0B12600B7783F /* SurfWin.cpp */,
 				8B641E370A472F8D0075F96C /* surfaceDlg.cpp */,
 				8B641E380A472F8D0075F96C /* surfaceDlg.h */,
-				8B33B7B30BF8DBEB0056C79E /* flashexport.cpp */,
 				8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */,
+				8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */,
 				8B33B7B60BF8DBEB0056C79E /* swfexport.h */,
 				8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */,
 				8B5D0D6B0BC7ECA100CE2A4B /* symmetrypointgroupdlg.h */,
@@ -1218,7 +1223,6 @@
 				8BE9976A0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
 				8B600B740B8F35C400084AF2 /* qtexport.cpp in Sources */,
 				8B5D0D6C0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */,
-				8B33B7B70BF8DBEB0056C79E /* flashexport.cpp in Sources */,
 				8B33B7B80BF8DBEB0056C79E /* swfexport-g.cpp in Sources */,
 				8B33B80E0BF8EC1F0056C79E /* displaylist.c in Sources */,
 				8B33B80F0BF8EC1F0056C79E /* fill.c in Sources */,
@@ -1282,11 +1286,13 @@
 				8B33B9490BF8EDA20056C79E /* assembler.c in Sources */,
 				8B33B94A0BF8EDA20056C79E /* compile.c in Sources */,
 				8B33B94B0BF8EDA20056C79E /* compileaction.c in Sources */,
-				8B33B94C0BF8EDA20056C79E /* lex.swf4.c in Sources */,
 				8B33B94D0BF8EDA20056C79E /* lex.swf5.c in Sources */,
 				8B33B94E0BF8EDA20056C79E /* listaction.c in Sources */,
-				8B33B9500BF8EDA20056C79E /* swf4compiler.tab.c in Sources */,
 				8B33B9510BF8EDA20056C79E /* swf5compiler.tab.c in Sources */,
+				8BEA48DC0BFA076D00C660A3 /* lex.swf4.c in Sources */,
+				8BEA48E00BFA078600C660A3 /* swf4compiler.tab.c in Sources */,
+				8BEA48E90BFA0BE900C660A3 /* swfexport.cpp in Sources */,
+				8BEA48F10BFA0F7300C660A3 /* Geometries.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1349,7 +1355,6 @@
 				8BE9976B0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
 				8B600B760B8F35C400084AF2 /* qtexport.cpp in Sources */,
 				8B5D0D6D0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */,
-				8B33B7BB0BF8DBEB0056C79E /* flashexport.cpp in Sources */,
 				8B33B7BC0BF8DBEB0056C79E /* swfexport-g.cpp in Sources */,
 				8B33B8240BF8EC1F0056C79E /* displaylist.c in Sources */,
 				8B33B8250BF8EC1F0056C79E /* fill.c in Sources */,
@@ -1418,6 +1423,8 @@
 				8B33B9600BF8EDA20056C79E /* listaction.c in Sources */,
 				8B33B9620BF8EDA20056C79E /* swf4compiler.tab.c in Sources */,
 				8B33B9630BF8EDA20056C79E /* swf5compiler.tab.c in Sources */,
+				8BEA48EB0BFA0BE900C660A3 /* swfexport.cpp in Sources */,
+				8BEA48F30BFA0F7300C660A3 /* Geometries.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1480,7 +1487,6 @@
 				8BE9976C0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
 				8B600B750B8F35C400084AF2 /* qtexport.cpp in Sources */,
 				8B5D0D6E0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */,
-				8B33B7B90BF8DBEB0056C79E /* flashexport.cpp in Sources */,
 				8B33B7BA0BF8DBEB0056C79E /* swfexport-g.cpp in Sources */,
 				8B33B8190BF8EC1F0056C79E /* displaylist.c in Sources */,
 				8B33B81A0BF8EC1F0056C79E /* fill.c in Sources */,
@@ -1549,6 +1555,8 @@
 				8B33B9570BF8EDA20056C79E /* listaction.c in Sources */,
 				8B33B9590BF8EDA20056C79E /* swf4compiler.tab.c in Sources */,
 				8B33B95A0BF8EDA20056C79E /* swf5compiler.tab.c in Sources */,
+				8BEA48EA0BFA0BE900C660A3 /* swfexport.cpp in Sources */,
+				8BEA48F20BFA0F7300C660A3 /* Geometries.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
