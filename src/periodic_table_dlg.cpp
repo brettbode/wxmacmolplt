@@ -78,7 +78,8 @@ bool PeriodicTableDlg::Create(
 	/* No element has been selected yet. */
 	prev_id = -1;
 
-	elements = (element_t *) malloc(sizeof(element_t) * nelements);
+	// elements = (element_t *) malloc(sizeof(element_t) * nelements); 
+	elements = new element_t[nelements];
 	if (elements == NULL) {
 		fprintf(stderr, "[%s:%d] Couldn't make room for buttons.\n",
 			__FILE__, __LINE__);
@@ -153,7 +154,8 @@ PeriodicTableDlg::~PeriodicTableDlg() {
 		delete elements[i].on_bmp;
 	}
 
-	free(elements);
+	// free(elements); 
+	delete elements;
 
 	show_periodic_dlg = false;
 	((MpApp &) wxGetApp()).AdjustAllMenus();
