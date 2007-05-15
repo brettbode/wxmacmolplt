@@ -9,7 +9,28 @@ Created for other header files 4-98	BMB
 */
 #ifndef __MyGeometries__
 #define __MyGeometries__
+
+#include <string.h>
 #include <math.h>
+
+class Matrix2D {
+	public:
+		Matrix2D();
+		Matrix2D(const int nrows, const int ncols);
+		Matrix2D(const int nrows, const int ncols, const float *data);
+		Matrix2D(const Matrix2D& src);
+		~Matrix2D();
+
+		const Matrix2D& operator=(const Matrix2D& m);
+
+		Matrix2D Transpose(void) const;
+
+		float *data;
+		int nrows;
+		int ncols;
+
+	private:
+};
 
 class CPoint3D {
 	public:
@@ -60,5 +81,7 @@ class CPoint3D {
 
 typedef float Matrix3D[3][3]; 
 typedef float Matrix4D[4][4];
+
+
 
 #endif
