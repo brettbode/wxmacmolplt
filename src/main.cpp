@@ -42,7 +42,7 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] =
 { wxCMD_LINE_NONE } 
 };
 
-#include "sp.xpm"
+#include "xpms/sp.xpm"
 wxSplashScreen * splash = NULL;
 wxTimer splashTimer;
 #define splashT_ID 12399

@@ -1,5 +1,5 @@
 #include "wxUglyChoice.h"
-#include "arrow.xpm"
+#include "xpms/arrow.xpm"
 
 IMPLEMENT_DYNAMIC_CLASS(wxUglyChoice,wxPanel)
 
