@@ -2076,8 +2076,7 @@ void MolDisplayWin::DrawHydrogenBond(long bondNum) {
 	if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
 }
 
-void MolDisplayWin::AddAxisGL(void)
-{
+void MolDisplayWin::AddAxisGL(void) {
 	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
 	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
 	float anno_color[3];
@@ -2096,19 +2095,14 @@ void MolDisplayWin::AddAxisGL(void)
 	CPoint3D			vector = {1.0,0.0,0.0}, NormStart={0.0,0.0,1.0};
 	glPushMatrix();
 	
-		// Z-axis
+	// Z-axis
 	glTranslatef(0.0, 0.0, -MainData->MaxSize);
 	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
 	glPushMatrix();
 	glTranslatef(0.0, 0.0, 2.0f * MainData->MaxSize);
-	DrawSceneString(0.1f, 0.0f, 0.0f, 0.0f, wxT("z"));
+	DrawSceneString(0.3f, 0.0f, 0.0f, 0.0f, wxT("z"));
 	glPopMatrix();
 	glPopMatrix();
-//	glPushMatrix();
-//	glTranslatef(2*VectorWidth, 0.0, (MainData->MaxSize - 3*VectorWidth));
-//	glScalef(-0.1f * LabelSize, 0.1f * LabelSize, 0.1f);
-//	glfDrawSolidString("Z");
-//	glPopMatrix();
 
 	// X-axis
 	Matrix4D	rotMat;
@@ -2116,14 +2110,9 @@ void MolDisplayWin::AddAxisGL(void)
 	rotMat[3][0] = -MainData->MaxSize;
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
-	// glPointSize(5.0f); 
-	// glBegin(GL_POINTS); 
-	// glVertex3f(0.0f, 0.0f, 0.0f); 
-	// glVertex3f(0.0f, 0.0f, 3.0f); 
-	// glEnd(); 
 	glPushMatrix();
 	glTranslatef(0.0, 0.0, 2.0f * MainData->MaxSize);
-	DrawSceneString(0.1f, 0.0f, 0.0f, 0.0f, wxT("x"));
+	DrawSceneString(0.3f, 0.0f, 0.0f, 0.0f, wxT("x"));
 	glPopMatrix();
 	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
 	glPopMatrix();
@@ -2138,7 +2127,7 @@ void MolDisplayWin::AddAxisGL(void)
 	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
 	glPushMatrix();
 	glTranslatef(0.0, 0.0, 2.0f * MainData->MaxSize);
-	DrawSceneString(0.1f, 0.0f, 0.0f, 0.0f, wxT("y"));
+	DrawSceneString(0.3f, 0.0f, 0.0f, 0.0f, wxT("y"));
 	glPopMatrix();
 	glPopMatrix();
 }
