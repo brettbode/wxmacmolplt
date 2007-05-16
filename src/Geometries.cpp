@@ -121,9 +121,6 @@ Matrix2D Matrix2D::operator*(const Matrix2D& b) const {
   	int i, j, k;
   	int c_i;
 
-	printf("this->nrows: %d\n", this->nrows);
-	printf("b.ncols: %d\n", b.ncols);
-
 	new_m = Matrix2D(this->nrows, b.ncols);
 
   	for (i = 0; i < this->nrows; i++) {
