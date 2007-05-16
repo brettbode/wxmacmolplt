@@ -92,7 +92,7 @@
 #ifdef WIN32
 #define USE_ZLIB 0
 #else
-#define USE_ZLIB 1
+#define USE_ZLIB 0
 #endif
 
 /* Version number of package */
