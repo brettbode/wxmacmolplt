@@ -69,18 +69,19 @@ AboutwxMacMolPlt::AboutwxMacMolPlt( wxWindow* parent, wxWindowID id, const wxStr
 bool AboutwxMacMolPlt::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin AboutwxMacMolPlt member initialisation
+	mVersionText = NULL;
 ////@end AboutwxMacMolPlt member initialisation
 
 ////@begin AboutwxMacMolPlt creation
-    SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
-    wxDialog::Create( parent, id, caption, pos, size, style );
+	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
+	wxDialog::Create( parent, id, caption, pos, size, style );
 
-    CreateControls();
-    if (GetSizer())
-    {
-        GetSizer()->SetSizeHints(this);
-    }
-    Centre();
+	CreateControls();
+	if (GetSizer())
+	{
+		GetSizer()->SetSizeHints(this);
+	}
+	Centre();
 ////@end AboutwxMacMolPlt creation
     return true;
 }
@@ -92,52 +93,66 @@ bool AboutwxMacMolPlt::Create( wxWindow* parent, wxWindowID id, const wxString& 
 void AboutwxMacMolPlt::CreateControls()
 {    
 ////@begin AboutwxMacMolPlt content construction
-    AboutwxMacMolPlt* itemDialog1 = this;
+	AboutwxMacMolPlt* itemDialog1 = this;
 
-    wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
-    itemDialog1->SetSizer(itemBoxSizer2);
+	wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
+	itemDialog1->SetSizer(itemBoxSizer2);
 
-    wxStaticText* itemStaticText3 = new wxStaticText( itemDialog1, wxID_STATIC, _("wxMacMolPlt"), wxDefaultPosition, wxDefaultSize, 0 );
-    if (ShowToolTips())
-        itemStaticText3->SetToolTip(_("based on the wxWidgets toolkit"));
-    itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	mVersionText = new wxStaticText( itemDialog1, wxID_STATIC, _("MacMolPlt v6.0\nBy Brett Bode"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE );
+	itemBoxSizer2->Add(mVersionText, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer4, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer4, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxStaticText* itemStaticText5 = new wxStaticText( itemDialog1, wxID_STATIC, _("PostCardWare--Please let me\nknow if you use MacMolPlt. If you\nwish to see further future\ndevelopment then let me know\nthat you use my program!"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer4->Add(itemStaticText5, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	wxStaticText* itemStaticText5 = new wxStaticText( itemDialog1, wxID_STATIC, _("FreeWare--Please let me\nknow if you use MacMolPlt. If you\nwish to see further future\ndevelopment then let me know\nthat you use my program!"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer4->Add(itemStaticText5, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxStaticText* itemStaticText6 = new wxStaticText( itemDialog1, wxID_STATIC, _("Available via the WWW URL:\nhttp://www.scl.ameslab.gov/MacMolPlt/"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer4->Add(itemStaticText6, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxVERTICAL);
+	itemBoxSizer4->Add(itemBoxSizer6, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer7 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer7, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxStaticText* itemStaticText7 = new wxStaticText( itemDialog1, wxID_STATIC, _("Available via the WWW URL:"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer6->Add(itemStaticText7, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxStaticText* itemStaticText8 = new wxStaticText( itemDialog1, wxID_STATIC, _("Dr. Brett Bode\n329 Wilhelm Hall\nIowa State University\nAmes, IA 50011\nbrett@scl.ameslab.gov"), wxDefaultPosition, wxDefaultSize, 0 );
-    if (ShowToolTips())
-        itemStaticText8->SetToolTip(_("Just send an email"));
-    itemBoxSizer7->Add(itemStaticText8, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	wxHyperlinkCtrl* itemHyperlinkCtrl8 = new wxHyperlinkCtrl( itemDialog1, ID_HYPERLINKCTRL2, _("http://www.scl.ameslab.gov/MacMolPlt/"), _T("http://www.scl.ameslab.gov/MacMolPlt/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	itemBoxSizer6->Add(itemHyperlinkCtrl8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    itemBoxSizer7->Add(15, 5, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer9 = new wxBoxSizer(wxVERTICAL);
+	itemBoxSizer2->Add(itemBoxSizer9, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxStaticText* itemStaticText10 = new wxStaticText( itemDialog1, wxID_STATIC, _("MacMolPlt v6.0\nBy Brett Bode"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer7->Add(itemStaticText10, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	wxBoxSizer* itemBoxSizer10 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer9->Add(itemBoxSizer10, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxStaticText* itemStaticText11 = new wxStaticText( itemDialog1, wxID_STATIC, _("Please reference: Bode, B. M. and Gordon, M. S. J. Mol. Graphics and\nModeling, 1998, 16, 133-138."), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer2->Add(itemStaticText11, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	wxStaticText* itemStaticText11 = new wxStaticText( itemDialog1, wxID_STATIC, _("Please take the:"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (ShowToolTips())
+		itemStaticText11->SetToolTip(_("Just send an email"));
+	itemBoxSizer10->Add(itemStaticText11, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxStaticText* itemStaticText12 = new wxStaticText( itemDialog1, wxID_STATIC, _("Thanks to the Gordon Group at Iowa State University, Apple Computer and the National Science Foundation for providing programming support."), wxDefaultPosition, wxDefaultSize, 0 );
-    itemStaticText12->Wrap(300);
-    if (ShowToolTips())
-        itemStaticText12->SetToolTip(_("Thanks even to Kurt..."));
-    itemBoxSizer2->Add(itemStaticText12, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	wxHyperlinkCtrl* itemHyperlinkCtrl12 = new wxHyperlinkCtrl( itemDialog1, ID_HYPERLINKCTRL1, _("MacMolPlt survey"), _T("http://www.scl.ameslab.gov/MacMolPlt/MacMolPltSurvey.html"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	itemBoxSizer10->Add(itemHyperlinkCtrl12, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxButton* itemButton13 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer2->Add(itemButton13, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer13 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer9->Add(itemBoxSizer13, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+	wxStaticText* itemStaticText14 = new wxStaticText( itemDialog1, wxID_STATIC, _("or send an email to "), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer13->Add(itemStaticText14, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+
+	wxHyperlinkCtrl* itemHyperlinkCtrl15 = new wxHyperlinkCtrl( itemDialog1, ID_HYPERLINKCTRL3, _("Brett."), _T("mailto:brett@scl.ameslab.gov"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	itemBoxSizer13->Add(itemHyperlinkCtrl15, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxStaticText* itemStaticText16 = new wxStaticText( itemDialog1, wxID_STATIC, _("Please reference: Bode, B. M. and Gordon, M. S. J. Mol. Graphics and\nModeling, 1998, 16, 133-138."), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer2->Add(itemStaticText16, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+
+	wxStaticText* itemStaticText17 = new wxStaticText( itemDialog1, wxID_STATIC, _("The primary developer of MacMolPlt is Brett Bode with assistance over the past couple of years from several talented students including Chris Johnson, Song Li, and Steven Schulteis.\n\nThanks to the Gordon Group at Iowa State University, Apple Computer and the National Science Foundation for providing programming support."), wxDefaultPosition, wxDefaultSize, 0 );
+	itemStaticText17->Wrap(300);
+	if (ShowToolTips())
+		itemStaticText17->SetToolTip(_("Thanks even to Kurt..."));
+	itemBoxSizer2->Add(itemStaticText17, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+
+	wxButton* itemButton18 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer2->Add(itemButton18, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 ////@end AboutwxMacMolPlt content construction
-    itemStaticText10->SetLabel(_("MacMolPlt v"wxMacMolPlt_VERSION"\nBy Brett Bode"));
+    mVersionText->SetLabel(_("MacMolPlt v"wxMacMolPlt_VERSION"\nBy Brett Bode"));
 }
 
 /*!
@@ -157,8 +172,8 @@ wxBitmap AboutwxMacMolPlt::GetBitmapResource( const wxString& name )
 {
     // Bitmap retrieval
 ////@begin AboutwxMacMolPlt bitmap retrieval
-    wxUnusedVar(name);
-    return wxNullBitmap;
+	wxUnusedVar(name);
+	return wxNullBitmap;
 ////@end AboutwxMacMolPlt bitmap retrieval
 }
 
@@ -170,7 +185,7 @@ wxIcon AboutwxMacMolPlt::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 ////@begin AboutwxMacMolPlt icon retrieval
-    wxUnusedVar(name);
-    return wxNullIcon;
+	wxUnusedVar(name);
+	return wxNullIcon;
 ////@end AboutwxMacMolPlt icon retrieval
 }

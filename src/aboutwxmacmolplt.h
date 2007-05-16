@@ -22,6 +22,7 @@
  */
 
 ////@begin includes
+#include "wx/hyperlink.h"
 ////@end includes
 
 /*!
@@ -37,6 +38,9 @@
 
 ////@begin control identifiers
 #define ID_DIALOG 10053
+#define ID_HYPERLINKCTRL2 10258
+#define ID_HYPERLINKCTRL1 10257
+#define ID_HYPERLINKCTRL3 10259
 #define SYMBOL_ABOUTWXMACMOLPLT_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_ABOUTWXMACMOLPLT_TITLE _("About wxMacMolPlt")
 #define SYMBOL_ABOUTWXMACMOLPLT_IDNAME ID_DIALOG
@@ -78,17 +82,18 @@ public:
 
 ////@begin AboutwxMacMolPlt member function declarations
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource( const wxString& name );
 
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+	/// Retrieves icon resources
+	wxIcon GetIconResource( const wxString& name );
 ////@end AboutwxMacMolPlt member function declarations
 
     /// Should we show tooltips?
     static bool ShowToolTips();
 
 ////@begin AboutwxMacMolPlt member variables
+	wxStaticText* mVersionText;
 ////@end AboutwxMacMolPlt member variables
 };
 
