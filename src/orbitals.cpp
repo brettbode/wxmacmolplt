@@ -623,7 +623,8 @@ void OrbitalRec::RotateVectors(Matrix4D rotationMatrix, BasisSet * Basis, long N
 						case LShell:
 							ivec++;	//Skip the S portion
 						case PShell:
-								CPoint3D PVec, resultVec;
+							{
+							CPoint3D PVec, resultVec;
 							PVec.x = MOVector[ivec];
 							PVec.y = MOVector[ivec+1];
 							PVec.z = MOVector[ivec+2];
@@ -632,6 +633,7 @@ void OrbitalRec::RotateVectors(Matrix4D rotationMatrix, BasisSet * Basis, long N
 							MOVector[ivec+1] = resultVec.y;
 							MOVector[ivec+2] = resultVec.z;
 							ivec += 3;
+							}
 						break;
 							//D, F, and G shells require higher order tensors. For simplicity the
 							//resulting multiplications are expanded out below.

@@ -986,8 +986,8 @@ void AnnotationLength::draw(const MolDisplayWin * win) const {
 	glGetDoublev(GL_PROJECTION_MATRIX, proj);
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	
-	CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f};
-	CPoint3D up_eye = {0.0f, 1.0f, 0.0f};
+	CPoint3D lookat_eye = CPoint3D(0.0f, 0.0f, 1.0f);
+	CPoint3D up_eye = CPoint3D(0.0f, 1.0f, 0.0f);
 	CPoint3D lookat_world;
 	CPoint3D up_world;
 	CPoint3D r;
@@ -1605,7 +1605,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 	// are not colored by atom color then the sphere is skipped and a simple
 	// disk closes off the cylinder
 	for (long ibond=0; ibond<NumBonds; ibond++) {
-			CPoint3D	v1, v2,  offset, NormalOffset, NormEnd, NormStart={0,0,1};
+			CPoint3D	v1, v2,  offset, NormalOffset, NormEnd, NormStart = CPoint3D(0,0,1);
 			Matrix4D	rotMat;
 		long atom1 = lBonds[ibond].Atom1;
 		long atom2 = lBonds[ibond].Atom2;
@@ -1867,7 +1867,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 		Prefs->ChangeColorVectorColor();
 
-		CPoint3D NormStart={0,0,1};
+		CPoint3D NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
 		for (long iatom=0; iatom<NumAtoms; iatom++) {
 
 			if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
@@ -2030,7 +2030,7 @@ void MolDisplayWin::DrawHydrogenBond(long bondNum) {
 //	glVertex3d(v2.x, v2.y, v2.z);
 //	glEnd();
 	//Plot as a series of spheres
-	CPoint3D	NormalOffset, NormEnd, NormStart={0,0,1};
+	CPoint3D	NormalOffset, NormEnd, NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
 	Matrix4D	rotMat;
 	
 	float length = offset.Magnitude();
@@ -2092,7 +2092,8 @@ void MolDisplayWin::AddAxisGL(void) {
 	float VectorWidth = 0.02;
 	float LabelSize = Prefs->GetAnnotationLabelSize();
 
-	CPoint3D			vector = {1.0,0.0,0.0}, NormStart={0.0,0.0,1.0};
+	CPoint3D vector = CPoint3D(1.0f, 0.0f, 0.0f);
+	CPoint3D NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
 	glPushMatrix();
 	
 	// Z-axis
@@ -2142,7 +2143,8 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 	
 	if (!MainData->InputOptions) return;
 	if (!MainData->InputOptions->Data) return;
-	CPoint3D origin={0,0,0}, p1={0,0,0}, p2={0,0,0};
+	CPoint3D origin = CPoint3D(0.0f, 0.0f, 0.0f);
+	CPoint3D p1 = CPoint3D(0.0f, 0.0f, 0.0f), p2 = CPoint3D(0.0f, 0.0f, 0.0f);
 	switch (MainData->InputOptions->Data->GetPointGroup()) {
 		case GAMESS_CS: //single sigma-h plane - XY plane
 			origin.x = origin.y = - MainData->MaxSize;
@@ -3041,7 +3043,7 @@ long Surf3DBase::CreateWireFrameSurfaceWithLines(CPoint3D * Vertices, long * vLi
 //Utility function to create a line made up of a variable width cylinder. the GLUquadricObj must be preallocated
 void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd, const float & lineWidth) {
 	if (qobj == NULL) return;
-	CPoint3D	offset, NormalOffset, NormStart={0,0,1};
+	CPoint3D	offset, NormalOffset, NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
 	Matrix4D	rotMat;
 	
 	offset.x =  lineEnd.x - lineStart.x;
@@ -3277,7 +3279,7 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	GLUquadricObj * qobj = NULL;
 	qobj = gluNewQuadric();
 
-	CPoint3D	offset, NormalOffset, NormEnd, NormStart={0,0,1};
+	CPoint3D	offset, NormalOffset, NormEnd, NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
 	Matrix4D	rotMat;
 	
 	offset.x =  lineEnd.x - lineStart.x;
@@ -3411,7 +3413,7 @@ void DrawInversionPoint(void) {
 
 	glPushMatrix();
 	Matrix4D	rotMat;
-	CPoint3D			vector = {1.0,0.0,0.0}, NormStart={0.0,0.0,1.0};
+	CPoint3D			vector = CPoint3D(1.0f, 0.0f, 0.0), NormStart = CPoint3D(0.0f, 0.0f,1.0f);
 	InitRotationMatrix(rotMat);
 	rotMat[2][2] = -1;
 	glMultMatrixf((const GLfloat *) &rotMat);
@@ -3585,8 +3587,8 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 	}
 	glEnd();
 
-	CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f};
-	CPoint3D up_eye = {0.0f, 1.0f, 0.0f};
+	CPoint3D lookat_eye = CPoint3D(0.0f, 0.0f, 1.0f);
+	CPoint3D up_eye = CPoint3D(0.0f, 1.0f, 0.0f);
 	CPoint3D lookat_world;
 	CPoint3D up_world;
 	CPoint3D r;
@@ -3668,9 +3670,9 @@ void DrawSceneString(const float scale_factor, const float shift_x,
 
 	float m[16];                              // OpenGL matrix
 	Matrix4D mv_inv;                          // Inverse of modelview matrix
-	CPoint3D lookat_eye = {0.0f, 0.0f, 1.0f}; // Lookat vector in eye-space
+	CPoint3D lookat_eye = CPoint3D(0.0f, 0.0f, 1.0f); // Lookat vector in eye-space
 	CPoint3D lookat_world;                    //   transformed to world-space
-	CPoint3D up_eye = {0.0f, 1.0f, 0.0f};     // Up vector in eye-space
+	CPoint3D up_eye = CPoint3D(0.0f, 1.0f, 0.0f);     // Up vector in eye-space
 	CPoint3D up_world;                        //   transformed to world-space
 	CPoint3D r;                               // Right vector in world-space
 

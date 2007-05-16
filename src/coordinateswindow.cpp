@@ -501,7 +501,7 @@ void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
 	for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
-	CPoint3D p={0.0,0.0,0.0};
+	CPoint3D p = CPoint3D(0.0f, 0.0f, 0.0);
 	MainData->NewAtom(1, p);
 	lFrame->SetAtomSelectState(natoms, true);
 	Parent->FrameChanged();

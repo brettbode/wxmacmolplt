@@ -695,7 +695,7 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 	}
 	
 	while ((Buffer->GetFilePos() < EndPos)&&(iline<nAtoms)) {
-		CPoint3D	pos = {0,0,0};	//This is just a placeholder
+		CPoint3D	pos = CPoint3D(0.0f, 0.0f, 0.0f);	//This is just a placeholder
 		char		token[kMaxLineLength], Line[kMaxLineLength], bondText[kMaxLineLength],
 					angleText[kMaxLineLength], dihedralText[kMaxLineLength];
 		float		bondLength, bondAngle, bondDihedral;
@@ -851,7 +851,7 @@ void MoleculeData::ParseGAMESSUKZMatrix(BufferFile * Buffer, WinPrefs * Prefs) {
 	
 	int iline=0;
 	while ((Buffer->GetFilePos() < LastAtomPos)&&(iline<atmCount)) {
-		CPoint3D	pos = {0,0,0};	//This is just a placeholder
+		CPoint3D	pos = CPoint3D(0.0f, 0.0f, 0.0f);	//This is just a placeholder
 		char		token[kMaxLineLength], bondText[kMaxLineLength],
 			angleText[kMaxLineLength], dihedralText[kMaxLineLength];
 		float		bondLength, bondAngle, bondDihedral;
@@ -948,7 +948,7 @@ void MoleculeData::ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, W
 	int iline=0;
 	long EndPos = Buffer->GetFileSize();
 	while ((Buffer->GetFilePos() < EndPos)&&(iline<nAtoms)) {
-		CPoint3D	pos = {0,0,0};	//This is just a placeholder
+		CPoint3D	pos = CPoint3D(0.0f, 0.0f, 0.0f);	//This is just a placeholder
 		char		token[kMaxLineLength], Line[kMaxLineLength];
 		float		bondLength, bondAngle, bondDihedral;
 		long		AtomType;
