@@ -194,7 +194,9 @@ struct Point { short h; short v; };
 
 #ifdef WIN32
 #define snprintf _snprintf
-#define strcasecmp strcmp
+	//VS apparently lacks these functions
+int strcasecmp(const char * a, const char * b);
+int strncasecmp(const char * a, const char * b, int l);
 #endif
 
 #define UseOpenGL

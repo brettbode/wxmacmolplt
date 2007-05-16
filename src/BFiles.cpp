@@ -676,3 +676,25 @@ void BufferFile::FinishBlock(void) {
 		BlockCount--;
 	}
 }
+
+#ifdef WIN32
+//functions Visual studio lacks...
+int strcasecmp(const char * a, const char * b) {
+	int pos = 0, result = -1;
+	while ((a[pos] != '\0')&&(b[pos]!='\0')) {
+		if (toupper(a[pos]) != toupper(b[pos])) break;
+		pos ++;
+	}
+	if ((a[pos] == '\0')&&(b[pos]=='\0')) result = 0;	//strings matched
+	return result;
+}
+int strncasecmp(const char * a, const char * b, int max) {
+	int pos = 0, result = -1;
+	while ((a[pos] != '\0')&&(b[pos]!='\0')&&(pos<max)) {
+		if (toupper(a[pos]) != toupper(b[pos])) break;
+		pos ++;
+	}
+	if ((a[pos] == '\0')&&(b[pos]=='\0')) result = 0;	//strings matched
+	return result;
+}
+#endif
