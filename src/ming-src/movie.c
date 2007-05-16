@@ -53,8 +53,10 @@
 #include "blocks/tabindex.h"
 #include "libming.h"
 
+#ifndef WIN32
 #ifdef HAVE_ZLIB_H
 # include <zlib.h>
+#endif
 #endif
 
 #include <stdlib.h>
@@ -589,6 +591,7 @@ SWFMovie_toOutput(SWFMovie movie, int level)
 	SWFOutput header, tempbuffer=0, buffer, swfbuffer;
 	SWFBlock backgroundBlock;
 	unsigned long compresslength;
+	SWFBlock lastBlock;
 
 	if ( movie->nExports > 0 )
 		SWFMovie_writeExports(movie);
@@ -600,7 +603,7 @@ SWFMovie_toOutput(SWFMovie movie, int level)
 	}
 
 	/* Add a terminating SHOWFRAME tag if not already there */
-	SWFBlock lastBlock = SWFBlockList_getLastBlock(movie->blockList);
+	lastBlock = SWFBlockList_getLastBlock(movie->blockList);
 	if ( ! lastBlock || SWFBlock_getType(lastBlock) != SWF_SHOWFRAME )
 	{
 		SWFMovie_nextFrame(movie);

@@ -31,9 +31,9 @@
 
 #include <stdlib.h>
 #include <string.h>
-#ifdef HAVE_ZLIB_H
-#include <zlib.h>
-#endif
+//#ifdef HAVE_ZLIB_H
+//#include <zlib.h>
+//#endif
 
 static void
 writeSWFPrebuiltClipToMethod(SWFBlock block, SWFByteOutputMethod method, void *data)

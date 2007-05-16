@@ -1,7 +1,7 @@
 #ifndef __FILTER_H
 #define __FILTER_H
 
-static inline int SWFFilter_testBlockType(int type)
+static int SWFFilter_testBlockType(int type)
 {
 	switch(type)
 	{

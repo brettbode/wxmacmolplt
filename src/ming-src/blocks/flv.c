@@ -27,7 +27,7 @@
 #include "error.h"
 #include "flv.h"
 
-static inline int readAudioHdr(FLVStream *flv, FLVTag *tag)
+static int readAudioHdr(FLVStream *flv, FLVTag *tag)
 {
 	int ichar;
 	ichar = SWFInput_getChar(flv->input);
@@ -40,7 +40,7 @@ static inline int readAudioHdr(FLVStream *flv, FLVTag *tag)
 	return 0;
 }
 
-static inline int readVideoHdr(FLVStream *flv, FLVTag *tag)
+static int readVideoHdr(FLVStream *flv, FLVTag *tag)
 {
 	int ichar;
 	ichar = SWFInput_getChar(flv->input);
@@ -203,10 +203,11 @@ int FLVStream_getNumFrames(FLVStream *flv, int type)
 SWFInput FLVTag_getPayloadInput(FLVTag *tag)
 {
 	int length;
+	SWFInput input;
 	if(tag == NULL || tag->stream == NULL)
 		return NULL;
 	
-	SWFInput input = tag->stream->input;
+	input = tag->stream->input;
 
 	/* screen video needs this extra byte undocumented! */
 	if(tag->tagType == FLV_VIDEOTAG 

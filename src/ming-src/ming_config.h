@@ -38,13 +38,17 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#define HAVE_UNISTD_H 1
+#define HAVE_UNISTD_H 0
 
 /* Define to 1 if you have the `vasprintf' function. */
 #define HAVE_VASPRINTF 1
 
 /* Define to 1 if you have the <zlib.h> header file. */
+#ifdef WIN32
+#define HAVE_ZLIB_H 0
+#else
 #define HAVE_ZLIB_H 1
+#endif
 
 /* Name of package */
 #define PACKAGE "ming"
@@ -85,7 +89,11 @@
 #define USE_PNG 0
 
 /* Use zlib */
+#ifdef WIN32
+#define USE_ZLIB 0
+#else
 #define USE_ZLIB 1
+#endif
 
 /* Version number of package */
 #define VERSION "0.4.0.beta4"
@@ -93,3 +101,9 @@
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */
 #define YYTEXT_POINTER 1
+
+#ifdef WIN32
+#ifndef __STRING
+#define __STRING(x) #x
+#endif
+#endif

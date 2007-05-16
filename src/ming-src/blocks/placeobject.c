@@ -226,7 +226,7 @@ destroySWFPlaceObject2Block(SWFPlaceObject2Block place)
 }
 
 
-static inline void
+static void
 setPlaceObjectVersion(SWFPlaceObject2Block block, int version)
 {
 	switch(version)
