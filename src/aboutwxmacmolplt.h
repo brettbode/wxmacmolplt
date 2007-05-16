@@ -22,7 +22,9 @@
  */
 
 ////@begin includes
+#if wxCHECK_VERSION(2, 8, 0)
 #include "wx/hyperlink.h"
+#endif
 ////@end includes
 
 /*!

@@ -113,7 +113,11 @@ void AboutwxMacMolPlt::CreateControls()
 	wxStaticText* itemStaticText7 = new wxStaticText( itemDialog1, wxID_STATIC, _("Available via the WWW URL:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer6->Add(itemStaticText7, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
 
+#if wxCHECK_VERSION(2, 8, 0)
 	wxHyperlinkCtrl* itemHyperlinkCtrl8 = new wxHyperlinkCtrl( itemDialog1, ID_HYPERLINKCTRL2, _("http://www.scl.ameslab.gov/MacMolPlt/"), _T("http://www.scl.ameslab.gov/MacMolPlt/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+#else
+	wxStaticText* itemHyperlinkCtrl8 = new wxStaticText( itemDialog1, ID_HYPERLINKCTRL2, _("http://www.scl.ameslab.gov/MacMolPlt/"), wxDefaultPosition, wxDefaultSize);
+#endif
 	itemBoxSizer6->Add(itemHyperlinkCtrl8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer9 = new wxBoxSizer(wxVERTICAL);
@@ -127,7 +131,11 @@ void AboutwxMacMolPlt::CreateControls()
 		itemStaticText11->SetToolTip(_("Just send an email"));
 	itemBoxSizer10->Add(itemStaticText11, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
+#if wxCHECK_VERSION(2, 8, 0)
 	wxHyperlinkCtrl* itemHyperlinkCtrl12 = new wxHyperlinkCtrl( itemDialog1, ID_HYPERLINKCTRL1, _("MacMolPlt survey"), _T("http://www.scl.ameslab.gov/MacMolPlt/MacMolPltSurvey.html"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+#else
+	wxStaticText* itemHyperlinkCtrl12 = new wxStaticText( itemDialog1, ID_HYPERLINKCTRL1, _("http://www.scl.ameslab.gov/MacMolPlt/MacMolPltSurvey.html"), wxDefaultPosition, wxDefaultSize);
+#endif
 	itemBoxSizer10->Add(itemHyperlinkCtrl12, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer13 = new wxBoxSizer(wxHORIZONTAL);
@@ -136,7 +144,11 @@ void AboutwxMacMolPlt::CreateControls()
 	wxStaticText* itemStaticText14 = new wxStaticText( itemDialog1, wxID_STATIC, _("or send an email to "), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer13->Add(itemStaticText14, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
+#if wxCHECK_VERSION(2, 8, 0)
 	wxHyperlinkCtrl* itemHyperlinkCtrl15 = new wxHyperlinkCtrl( itemDialog1, ID_HYPERLINKCTRL3, _("Brett."), _T("mailto:brett@scl.ameslab.gov"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+#else
+	wxStaticText* itemHyperlinkCtrl15 = new wxStaticText( itemDialog1, ID_HYPERLINKCTRL3, _("brett@scl.ameslab.gov"), wxDefaultPosition, wxDefaultSize);
+#endif
 	itemBoxSizer13->Add(itemHyperlinkCtrl15, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxStaticText* itemStaticText16 = new wxStaticText( itemDialog1, wxID_STATIC, _("Please reference: Bode, B. M. and Gordon, M. S. J. Mol. Graphics and\nModeling, 1998, 16, 133-138."), wxDefaultPosition, wxDefaultSize, 0 );
