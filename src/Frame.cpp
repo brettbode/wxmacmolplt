@@ -53,6 +53,7 @@ Frame::Frame(void) {
 	NextFrame = NULL;
 	PreviousFrame = NULL;
  
+	natoms_selected = 0;
 }
 
 long Frame::Write(BufferFile * Buffer) {
@@ -426,6 +427,9 @@ bool Frame::IncreaseBondAllocation(long NumAdditional) {
 }
 void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any higher atoms
 	if ((AtomNum>=0)&&(AtomNum<NumAtoms)) {
+		if (GetAtomSelection(AtomNum)) {
+			natoms_selected--;
+		}
 		if ((AtomNum<(NumAtoms-1))&&(NumAtoms>1))
 			// BlockMoveData is Mac only
 			//BlockMoveData(&(Atoms[AtomNum+1]), &(Atoms[AtomNum]), (NumAtoms-AtomNum)*sizeof(mpAtom));
@@ -480,6 +484,41 @@ bool Frame::SetAtomPosition(long theAtom, const CPoint3D & pos) {
 	}
 	return result;
 }
+
+bool Frame::SetAtomSelection(long atom_id, bool select_it) {
+
+	// In order to properly maintain the number of atoms that are selected, all
+	// atom selection should be done by calling this function.  Calculating the
+	// number of atoms selected on the fly is computationally wasteful and is
+	// needed frequently, so we want to keep track of the number here.
+	
+	// If the atom_id is out of bounds, return false.
+	if (atom_id < 0 || atom_id >= NumAtoms) {
+		return false;
+	}
+
+	// Otherwise, select or deselect the atom and return true.
+	if (select_it != Atoms[atom_id].GetSelectState()) {
+		if (select_it) {
+			natoms_selected++;
+		} else {
+			natoms_selected--;
+		}
+	}
+	Atoms[atom_id].SetSelectState(select_it);
+	return true;
+
+}
+
+bool Frame::GetAtomSelection(long atom_id) const {
+	return atom_id >= 0 && atom_id < NumAtoms &&
+		Atoms[atom_id].GetSelectState();
+}
+
+int Frame::GetNumAtomsSelected(void) const {
+	return natoms_selected;
+}
+
 long Frame::GetNumElectrons(void) const {
 	long	result=0;
 	for (long i=0; i<NumAtoms; i++) result += Atoms[i].Type;
@@ -1878,9 +1917,10 @@ void Frame::toggleAbInitioVisibility(void) {
 
 void Frame::resetAllSelectState()
 {
-  for ( int i = 0; i < NumAtoms; i++)
-    Atoms[i].SetSelectState(false);
+	for ( int i = 0; i < NumAtoms; i++)
+		Atoms[i].SetSelectState(false);
+	natoms_selected = 0;
 
-  for ( int i = 0; i < NumBonds; i++)
-    Bonds[i].SetSelectState(false);
+	for ( int i = 0; i < NumBonds; i++)
+		Bonds[i].SetSelectState(false);
 }

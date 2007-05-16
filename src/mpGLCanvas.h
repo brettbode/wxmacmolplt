@@ -135,7 +135,7 @@ class MpGLCanvas : public wxGLCanvas {
 
 		void setPrefs(WinPrefs *newPrefs);
 
-		void DoPCA(wxCommandEvent& event);
+		void FitToPlane(wxCommandEvent& event);
 
 		/**
 		* Updates GL parameters for changes in the window shape or

@@ -583,7 +583,7 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 			// really mess up the goal of constrained movement, since this atom
 			// serves as the basis for the constraints.
 			vertex_id = anno->getAtom(1);
-			if (selected == vertex_id || lFrame->GetAtomSelectState(vertex_id)) {
+			if (selected == vertex_id || lFrame->GetAtomSelection(vertex_id)) {
 				return;
 			}
 
@@ -611,12 +611,12 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 			// translation.
 			if (selected == atom1_id) {
 				radius = vec1.Magnitude();
-				if (lFrame->GetAtomSelectState(atom2_id)) {
+				if (lFrame->GetAtomSelection(atom2_id)) {
 					return;
 				}
 			} else {
 				radius = vec2.Magnitude();
-				if (lFrame->GetAtomSelectState(atom1_id)) {
+				if (lFrame->GetAtomSelection(atom1_id)) {
 					return;
 				}
 			}
@@ -690,13 +690,13 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 			// its the second or third atom being shifted, then we impose
 			// no constraints.
 			if (selected == anno->getAtom(0)) {
-				if (lFrame->GetAtomSelectState(anno->getAtom(3))) {
+				if (lFrame->GetAtomSelection(anno->getAtom(3))) {
 					return;
 				}
 				atom2_id = anno->getAtom(1);
 				atom3_id = anno->getAtom(2);
 			} else if (selected == anno->getAtom(3)) {
-				if (lFrame->GetAtomSelectState(anno->getAtom(0))) {
+				if (lFrame->GetAtomSelection(anno->getAtom(0))) {
 					return;
 				}
 				atom2_id = anno->getAtom(2);
@@ -705,8 +705,8 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 				return;
 			}
 
-			if (lFrame->GetAtomSelectState(atom2_id) ||
-				lFrame->GetAtomSelectState(atom3_id)) {
+			if (lFrame->GetAtomSelection(atom2_id) ||
+				lFrame->GetAtomSelection(atom3_id)) {
 				return;
 			}
 
@@ -817,6 +817,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
+
+	std::cout << "num atoms selected: " << lFrame->GetNumAtomsSelected() << std::endl;
 
 	GetClientSize(&width, &height);
 
@@ -932,7 +934,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						   lAtoms[i].Position.z,
 						   mv, proj, viewport, &win_x, &win_y, &win_z);
 				if (MolWin->LassoContains((int) win_x, (int) win_y)) {
-					lAtoms[i].SetSelectState(true);
+					lFrame->SetAtomSelection(i, true);
 					nselected++;
 				}
 			}
@@ -986,7 +988,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 				// If that atom is a member of the selected atom set, move all
 				// atoms that are currently selected.
-				if (lFrame->GetAtomSelectState(selected)) {
+				if (lFrame->GetAtomSelection(selected)) {
 					GLdouble offset_x, offset_y, offset_z;
 
 					offset_x = lAtoms[selected].Position.x - newX;
@@ -994,7 +996,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 					offset_z = lAtoms[selected].Position.z - newZ;
 
 					for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
-						if (lFrame->GetAtomSelectState(i)) {
+						if (lFrame->GetAtomSelection(i)) {
 							lAtoms[i].Position.x -= offset_x;
 							lAtoms[i].Position.y -= offset_y;
 							lAtoms[i].Position.z -= offset_z;
@@ -1102,7 +1104,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 				// so we translate our coordinate system there,
 				// perform the rotation, and then translate back.
 				for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
-					if (lFrame->GetAtomSelectState(i)) {
+					if (lFrame->GetAtomSelection(i)) {
 						lAtoms[i].Position -= pivot_pt;
 						Rotate3DPt(rot_mat, lAtoms[i].Position, &new_pt);
 						lAtoms[i].Position = new_pt;
@@ -1383,10 +1385,10 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 
 			// If we're to keep other selected items and atom is already
 			// selected, then we must be unselecting this atom.
-			if (!unselect_all && lAtoms[select_id].GetSelectState())
+			if (!unselect_all && lFrame->GetAtomSelection(select_id))
 				atom_is_selected = false;
 
-			lAtoms[select_id].SetSelectState(atom_is_selected);
+			lFrame->SetAtomSelection(select_id, atom_is_selected);
 			if (atom_is_selected) {
 				// In order to know how many atoms are selected, we let 
 				// select_stack_top grow indefinitely, though the stack itself
@@ -1419,8 +1421,8 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 				long atom1 = lBonds[i].Atom1;
 				long atom2 = lBonds[i].Atom2;
 
-				if (lAtoms[atom1].GetSelectState() &&
-					lAtoms[atom2].GetSelectState())
+				if (lFrame->GetAtomSelection(atom1) &&
+					lFrame->GetAtomSelection(atom2))
 					lBonds[i].SetSelectState(atom_is_selected);
 			}
 		}
@@ -1436,13 +1438,13 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 			long atom1 = lBonds[select_id].Atom1;
 			long atom2 = lBonds[select_id].Atom2;
 
-			lAtoms[atom1].SetSelectState(newstate);
-			lAtoms[atom2].SetSelectState(newstate); //select atoms that this bond connect
+			lFrame->SetAtomSelection(atom1, newstate);
+			lFrame->SetAtomSelection(atom2, newstate); //select atoms that this bond connect
 		}
 
 		bool result = false;
 		for (long i=0; i<NumAtoms; i++) {
-			if (lAtoms[i].GetSelectState()) {
+			if (lFrame->GetAtomSelection(i)) {
 				result = true;
 				break;
 			}
@@ -1483,7 +1485,7 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 	// when we drop all the atom coordinates in a matrix, but by doing this, 
 	// we don't have to iterate through all the atoms twice.
 	for (i = 0; i < NumAtoms; i++) {
-		if (lAtoms[i].GetSelectState()) {
+		if (lFrame->GetAtomSelection(i)) {
 			atoms.push_back(&lAtoms[i]);
 		}
 	}
@@ -1511,9 +1513,7 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 	// Project the atoms onto the plane.
 	CPoint3D normal = CPoint3D(out.data[2], out.data[5], out.data[8]);
 	for (atom = atoms.begin(); atom != atoms.end(); atom++) {
-		std::cout << "Pre: " << (*atom)->Position;
 		ProjectToPlane(normal, centroid, (*atom)->Position);
-		std::cout << "Post: " << (*atom)->Position;
 	}
 
 	// std::cout << "locs:" << std::endl << locs; 
@@ -1905,8 +1905,8 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 		MolWin->BondsChanged();
 		lFrame->resetAllSelectState();
 		bond->SetSelectState(true);
-		lFrame->Atoms[bond->Atom1].SetSelectState(true);
-		lFrame->Atoms[bond->Atom2].SetSelectState(true);
+		lFrame->SetAtomSelection(bond->Atom1, true);
+		lFrame->SetAtomSelection(bond->Atom2, true);
 	} else if (select_stack_top == 2) { //new bond
 		int bond_id = lFrame->BondExists(select_stack[0], select_stack[1]);
 		if (bond_id >= 0) {
@@ -1918,8 +1918,8 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 		MolWin->BondsChanged();
 		lFrame->resetAllSelectState();
 		lFrame->Bonds[lFrame->GetNumBonds() - 1].SetSelectState(true);
-		lFrame->Atoms[select_stack[0]].SetSelectState(true);
-		lFrame->Atoms[select_stack[1]].SetSelectState(true);
+		lFrame->SetAtomSelection(select_stack[0], true);
+		lFrame->SetAtomSelection(select_stack[1], true);
 	}
 }
 
@@ -2127,7 +2127,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_Delete_Angle, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Delete_Dihedral, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Lock_To_Annotation, MpGLCanvas::ConstrainToAnnotation)
-	EVT_MENU(GL_Popup_Fit_To_Plane, MpGLCanvas::DoPCA)
+	EVT_MENU(GL_Popup_Fit_To_Plane, MpGLCanvas::FitToPlane)
 	EVT_MENU(GL_Popup_Change_Atom, MpGLCanvas::ChangeAtom)
 END_EVENT_TABLE()
 

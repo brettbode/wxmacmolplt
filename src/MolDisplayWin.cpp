@@ -2017,7 +2017,7 @@ void MolDisplayWin::menuViewShowBothAtomLabels(wxCommandEvent &event)
 }
 void MolDisplayWin::menuViewAddMarkAnnotation(wxCommandEvent &event) {
 	for (int i=0; i<MainData->cFrame->GetNumAtoms(); i++) {
-		if (MainData->cFrame->GetAtomSelectState(i)) {
+		if (MainData->cFrame->GetAtomSelection(i)) {
 			AnnotationMarker * t = new AnnotationMarker(i);
 			MainData->Annotations.push_back(t);
 		}

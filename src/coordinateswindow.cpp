@@ -294,7 +294,7 @@ void CoordinatesWindow::UpdateControls(void) {
 	long natoms = lFrame->GetNumAtoms();
 	bool selectionActive = false;
 	for (long i=0; i<natoms; i++) {
-		if (lFrame->GetAtomSelectState(i)) {
+		if (lFrame->GetAtomSelection(i)) {
 			selectionActive = true;
 		}
 	}
@@ -306,7 +306,7 @@ void CoordinatesWindow::SetupGridColumns(void) {
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
 	bool temp = false;
-	if (natoms>0) temp = lFrame->GetAtomSelectState(0);
+	if (natoms>0) temp = lFrame->GetAtomSelection(0);
 	coordGrid->Freeze();
 	if (coordGrid->GetNumberRows() > 0)
 		coordGrid->DeleteRows(0, coordGrid->GetNumberRows(), true);
@@ -331,7 +331,7 @@ void CoordinatesWindow::SetupGridColumns(void) {
 	SizeCols(s);
 	if (natoms>0) {
 		coordGrid->ClearSelection();
-		lFrame->SetAtomSelectState(0, temp);
+		lFrame->SetAtomSelection(0, temp);
 	}
 	coordGrid->Thaw();
 }
@@ -344,18 +344,18 @@ void CoordinatesWindow::FrameChanged(void) {
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
 	if (natoms > 0) {
-		bool temp = lFrame->GetAtomSelectState(0);
+		bool temp = lFrame->GetAtomSelection(0);
 		coordGrid->InsertRows(0, natoms, true);
 		coordGrid->HideCellEditControl();
 		coordGrid->ClearSelection();
-		lFrame->SetAtomSelectState(0, temp);
+		lFrame->SetAtomSelection(0, temp);
 		wxString buf;
 		for (long i=0; i<natoms; i++) {
 			buf.Printf(wxT("%d"), (i+1));
 			coordGrid->SetRowLabelValue(i, buf);
 			Prefs->GetAtomLabel(lFrame->GetAtomType(i)-1, buf);
 			coordGrid->SetCellValue(i, 0, buf);
-			if (lFrame->GetAtomSelectState(i)) coordGrid->SelectRow(i, true);
+			if (lFrame->GetAtomSelection(i)) coordGrid->SelectRow(i, true);
 			if (CoordType == 0) {
 				CPoint3D pos;
 				lFrame->GetAtomPosition(i, pos);
@@ -440,7 +440,7 @@ void CoordinatesWindow::UpdateSelection(bool mode)
   int visibleRow = 0;
 
   for (long i=0; i<natoms; i++) 
-    if (lFrame->GetAtomSelectState(i))
+    if (lFrame->GetAtomSelection(i))
       {
 	  selected_ids.push_back(i);
 	  visibleRow = i;
@@ -500,10 +500,10 @@ void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
-	for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
+	for (int i=0; i<natoms; i++) lFrame->SetAtomSelection(i, false);
 	CPoint3D p = CPoint3D(0.0f, 0.0f, 0.0);
 	MainData->NewAtom(1, p);
-	lFrame->SetAtomSelectState(natoms, true);
+	lFrame->SetAtomSelection(natoms, true);
 	Parent->FrameChanged();
 	FrameChanged();
 	coordGrid->SelectRow(natoms, true);
@@ -521,7 +521,7 @@ void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
 	for (int i=(natoms-1); i>=0; i--) {
-		if (lFrame->GetAtomSelectState(i)) {
+		if (lFrame->GetAtomSelection(i)) {
 			MainData->DeleteAtom(i);
 			coordGrid->DeleteRows(i, 1, true);
 		}
@@ -775,10 +775,10 @@ void CoordinatesWindow::OnSelectCell( wxGridEvent& event )
 	//we seem to only get selection events and not also deselection events
 	//so first clear off the list of selected cells
 	for (int i=0; i<natoms; i++) {
-		lFrame->SetAtomSelectState(i, false);
+		lFrame->SetAtomSelection(i, false);
 	}
 	if ((row>=0)&&(row<natoms)) {
-		lFrame->SetAtomSelectState(row, event.Selecting());
+		lFrame->SetAtomSelection(row, event.Selecting());
 	}
 	UpdateControls();
 
@@ -802,13 +802,13 @@ void CoordinatesWindow::OnRangeSelect( wxGridRangeSelectEvent& event )
 	long natoms = lFrame->GetNumAtoms();
 	//we seem to only get selection events and not also deselection events
 	//so first clear off the list of selected cells
-	//for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
+	//for (int i=0; i<natoms; i++) lFrame->SetAtomSelection(i, false);
 
 	if(event.Selecting()) {
-	  for (int i=0; i<natoms; i++) lFrame->SetAtomSelectState(i, false);
+	  for (int i=0; i<natoms; i++) lFrame->SetAtomSelection(i, false);
 
 	  for (int i=event.GetTopRow(); i<=event.GetBottomRow(); i++) {
-	    lFrame->SetAtomSelectState(i, true);
+	    lFrame->SetAtomSelection(i, true);
 	  }
 	
 	  UpdateControls();
@@ -945,7 +945,7 @@ void CoordinatesWindow::OnSelectallClick( wxCommandEvent& event )
 	//we seem to only get selection events and not also deselection events
 	//so first clear off the list of selected cells
 	for (int i=0; i<natoms; i++) {
-		lFrame->SetAtomSelectState(i, true);
+		lFrame->SetAtomSelection(i, true);
 		coordGrid->SelectRow(i, true);
 	}
 	
