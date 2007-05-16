@@ -25,9 +25,12 @@ class Matrix2D {
 		~Matrix2D();
 
 		const Matrix2D& operator=(const Matrix2D& m);
+		const Matrix2D& operator=(float x);
+		Matrix2D operator*(const Matrix2D& b) const;
 
 		void Init(const int nrows, const int ncols, const float *data);
 		Matrix2D Transpose(void) const;
+		void SVD(Matrix2D *out, Matrix2D *gain, Matrix2D *in) const;
 
 		float *data;
 		int nrows;
@@ -37,10 +40,22 @@ class Matrix2D {
 };
 
 class CPoint3D {
+		friend std::ostream& operator<<(std::ostream& stream, const CPoint3D& m);
 	public:
 		float x;
 		float y;
 		float z;
+
+		CPoint3D() {
+			x = y = z = 0.0f;
+		}
+
+		CPoint3D(float x, float y, float z) {
+			this->x = x;
+			this->y = y;
+			this->z = z;
+		}
+
 		CPoint3D operator+=(CPoint3D pt) {
 			x += pt.x;
 			y += pt.y;
