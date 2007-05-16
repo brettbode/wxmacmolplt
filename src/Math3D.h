@@ -47,5 +47,6 @@ void SortEigenValues(double * EigenVectors, double * EigenValues, long Dimension
 void JacobiDiagonalization(double * Matrix, double * EigenVectors, long Dimension,
 	long NumVectors, long Start, long End);
 double EPSLON(double x);
+void ProjectToPlane(const CPoint3D& normal, const CPoint3D& origin, CPoint3D& pt);
 
 #endif /*__MATH3D__*/

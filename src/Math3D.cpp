@@ -694,3 +694,13 @@ C
 	return result;
 }
 
+void ProjectToPlane(const CPoint3D& normal, const CPoint3D& origin, CPoint3D& pt) {
+
+	CPoint3D vec;
+	float dist;
+
+	vec = pt - origin;
+	dist = DotProduct3D(&normal, &vec);
+	pt = vec - normal * dist;
+
+}
