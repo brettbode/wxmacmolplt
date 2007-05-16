@@ -37,8 +37,8 @@
 
 SWFAction compileSWFActionCode(const char *script)
 {
-	SWF_warnOnce("Please do not use compileSWFActionCode() anymore\n"
-	"Use newSWFAction(script) instead\n");
+//	SWF_warnOnce("Please do not use compileSWFActionCode() anymore\n"
+//		"Use newSWFAction(script) instead\n");
 	return newSWFAction(script);
 }
 
