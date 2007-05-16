@@ -1458,7 +1458,14 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 //	MolWin->AdjustMenus();
 }
 
-void MpGLCanvas::DoPCA(wxCommandEvent& event) {
+void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
+
+	// This function fits the selected atoms to their nearest plane (as
+	// calculated by minimizing the atom's orthogonal distances to the plane).
+	// It does this by finding the principle components of the atom set and
+	// using the third axis as the plane's normal and the centroid as a 
+	// point on the plane.  The principle component basis is calculated
+	// using singular value decomposition.
 
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
@@ -1466,7 +1473,8 @@ void MpGLCanvas::DoPCA(wxCommandEvent& event) {
 	CPoint3D centroid;
 	int i;
 	Matrix2D locs;
-	// Matrix2D trans_locs; 
+	Matrix2D trans_locs;
+	Matrix2D cov;
 	std::vector<mpAtom *> atoms;
 	std::vector<mpAtom *>::const_iterator atom;
 
@@ -1480,8 +1488,6 @@ void MpGLCanvas::DoPCA(wxCommandEvent& event) {
 		}
 	}
 
-	printf("atoms.size(): %d\n", atoms.size());
-
 	// Now store all selected atoms' coordinates in a matrix.
 	locs = Matrix2D(atoms.size(), 3);
 	for (atom = atoms.begin(), i = 0; atom != atoms.end(); atom++, i++) {
@@ -1490,21 +1496,33 @@ void MpGLCanvas::DoPCA(wxCommandEvent& event) {
 		locs.data[i * 3 + 2] = (*atom)->Position.z;
 	}
 
-	std::cout << "locs:" << std::endl << locs;
-
 	// Transpose the matrix.
-	// trans_locs = locs.Transpose(); 
-
-	// std::cout << "trans_locs:" << std::endl << trans_locs; 
+	trans_locs = locs.Transpose();
 
 	// Multiply the two to get the covariance matrix.
+	cov = trans_locs * locs;
 	
 	// Perform SVD on covariance matrix.  Sort the vectors by their scale
 	// factors and use the largest two as the axes of the plane to fit the
 	// selected atoms into.
-	
-	// Project the atoms onto the plane.
+	Matrix2D out, gain, in;
+	cov.SVD(&out, &gain, &in);
 
+	// Project the atoms onto the plane.
+	CPoint3D normal = CPoint3D(out.data[2], out.data[5], out.data[8]);
+	for (atom = atoms.begin(); atom != atoms.end(); atom++) {
+		std::cout << "Pre: " << (*atom)->Position;
+		ProjectToPlane(normal, centroid, (*atom)->Position);
+		std::cout << "Post: " << (*atom)->Position;
+	}
+
+	// std::cout << "locs:" << std::endl << locs; 
+	// std::cout << "trans_locs:" << std::endl << trans_locs; 
+	// std::cout << "cov:" << std::endl << cov; 
+	// std::cout << "out:" << std::endl << out; 
+	// std::cout << "gain:" << std::endl << gain; 
+	// std::cout << "in:" << std::endl << in; 
+	
 }
 
 void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
