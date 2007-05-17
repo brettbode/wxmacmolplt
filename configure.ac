@@ -1,4 +1,4 @@
-AC_INIT(wxmacmolplt, 6.4, brett@scl.ameslab.gov)
+AC_INIT(wxmacmolplt, 6.5, brett@scl.ameslab.gov)
 AC_CONFIG_SRCDIR(src/main.cpp)
 AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE([1.9 foreign])
