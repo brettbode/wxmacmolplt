@@ -818,8 +818,6 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
 
-	// std::cout << "num atoms selected: " << lFrame->GetNumAtomsSelected() << std::endl; 
-
 	GetClientSize(&width, &height);
 
 	// if (1) { 
@@ -896,9 +894,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	}
 
 	else if (event.MiddleDown()) {
-
 		selected = testPicking(tmpPnt.x, tmpPnt.y);
-
 	}
 
 	else if (event.Leaving() && event.LeftIsDown() && MolWin->LassoSelected()) {
@@ -909,254 +905,17 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	else if (event.Dragging()) {
 		mSelectState++;
 
+		// Lassoing should only be done with the left mouse button.
 		if (MolWin->LassoSelected() && event.LeftIsDown()) {
-			GLdouble mv[16];
-			GLdouble proj[16];
-			GLint viewport[4];
-			GLdouble win_x, win_y, win_z;
-
-			glGetIntegerv(GL_VIEWPORT, viewport);
-			glGetDoublev(GL_MODELVIEW_MATRIX, mv);
-			glGetDoublev(GL_PROJECTION_MATRIX, proj);
-
-			MolWin->LassoGrown(tmpPnt.x, height - tmpPnt.y);
+			HandleLassoing(event, wxPoint(tmpPnt.x, height - tmpPnt.y));
 			edited_atoms = true;
-
-			if (!event.ShiftDown()) {
-				lFrame->resetAllSelectState();
-			}
-			MolWin->SetHighliteMode(true);
-
-			int nselected = 0;
-			for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
-				gluProject(lAtoms[i].Position.x,
-						   lAtoms[i].Position.y,
-						   lAtoms[i].Position.z,
-						   mv, proj, viewport, &win_x, &win_y, &win_z);
-				if (MolWin->LassoContains((int) win_x, (int) win_y)) {
-					lFrame->SetAtomSelection(i, true);
-					nselected++;
-				}
-			}
-
-			if (nselected >= 4) {
-				select_stack_top = 5;
-			}
-
-			// for each atom
-			//    project into window coordinates
-			//    if contained in lasso area, select it
 		}
 
-		// Are we dragging in edit mode?
-		else if (MolWin->HandSelected()) {
-
-			// If an atom is clicked on...
-			if (selected >= 0 && selected < NumAtoms) {
-
-				edited_atoms = true;
-				GLdouble newX, newY, newZ;
-
-				// If shift is held when an atom is clicked on, we want to
-				// change the depths of either the clicked on or selected
-				// atoms.  Also do this for the middle mouse button.
-				if (event.ShiftDown() || event.MiddleIsDown()) {
-					GLdouble tmpX, tmpY, tmpZ;
-					float depth_offset;
-					float dy = tmpPnt.y - oldTmpPnt.y;
-
-					findWinCoord(lAtoms[selected].Position.x,
-						lAtoms[selected].Position.y,
-						lAtoms[selected].Position.z, tmpX, tmpY, tmpZ);
-					depth_offset = (dy * mMainData->WindowSize) /
-									(25.0f * GetRect().GetWidth());
-					findReal3DCoord(tmpX, tmpY, tmpZ - depth_offset,
-									newX, newY, newZ);
-				}
-				
-				// If no shift, just translate.
-				else {
-					findReal3DCoord(tmpPnt.x - winDiffX, tmpPnt.y - winDiffY,
-									atomDepth, newX, newY, newZ);
-
-					int constrain_anno_id = mMainData->GetConstrainAnnotation();
-					if (constrain_anno_id != -1) {
-						ConstrainPosition(constrain_anno_id, &newX, &newY,
-							&newZ);
-					}
-				}
-
-				// If that atom is a member of the selected atom set, move all
-				// atoms that are currently selected.
-				if (lFrame->GetAtomSelection(selected)) {
-					GLdouble offset_x, offset_y, offset_z;
-
-					offset_x = lAtoms[selected].Position.x - newX;
-					offset_y = lAtoms[selected].Position.y - newY;
-					offset_z = lAtoms[selected].Position.z - newZ;
-
-					for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
-						if (lFrame->GetAtomSelection(i)) {
-							lAtoms[i].Position.x -= offset_x;
-							lAtoms[i].Position.y -= offset_y;
-							lAtoms[i].Position.z -= offset_z;
-						}
-					}
-				}
-				
-				// If it's not selected, make it the only selected one and
-				// move only it.
-				else {
-					lAtoms[selected].Position.x = newX;
-					lAtoms[selected].Position.y = newY;
-					lAtoms[selected].Position.z = newZ;
-
-					SelectObj(selected, deSelectAll);
-					MolWin->SelectionChanged(deSelectAll);
-				}
-
-				if (mDragWin) {
-					mDragWin->EndDrag();
-					delete mDragWin;
-					mDragWin = (wxDragImage*) NULL;
-				}
-
-				wxString tmp3Dcoord;
-
-				tmp3Dcoord.Printf(wxT("%.2f,%.2f,%.2f"), newX, newY, newZ);
-
-				mDragWin = new wxDragImage(tmp3Dcoord, wxCursor(wxCURSOR_HAND));
-
-				if (!mDragWin->BeginDrag(wxPoint(0,30), this)) {
-					delete mDragWin;
-					mDragWin = (wxDragImage*) NULL;
-				} else {
-					mDragWin->Move(event.GetPosition());
-					mDragWin->Show();
-				}
-
-				lFrame->SetBonds(Prefs, true, true);
-				MolWin->UpdateGLModel();
-
-			}
-			
-			// If the user's dragging after selecting a bond, we want to
-			// rotated the selected set of atoms around that bond.
-			else if (selected >= NumAtoms && selected < NumAtoms + lFrame->NumBonds) {
-				// if we're a bond
-				//   translate to one of bond atoms
-				//   rotate selected atoms around bond according to distance
-				//     of move by translating to either atom on bond and 
-				//     rotating around vector represented by bond
-				
-				CPoint3D pivot_pt;     // The atom pos to act as origin
-				CPoint3D other_pt;     // The pos of pivot atom's bondmate
-				CPoint3D new_pt;       // Each atom's pos rotated, untranslated
-				CPoint3D axis;         // Vector of rotation bond
-				float radians;         // Amount to rotate by
-				float cosine;          // Used to rotate around axis
-				float sine;
-				float c_inv;
-				Matrix4D rot_mat;
-				float dy;              // No. pixels of mouse change in y-dir
-				float angle_offset;    // Corresponding amount of rotation
-			   
-				// Calculate the amount of rotation according to the amount
-				// of mouse change along the y-axis of the viewport.
-				dy = tmpPnt.y - oldTmpPnt.y;
-				angle_offset = dy / GetClientSize().GetHeight() * 540.0f;
-
-				// Get all trig together for rotating around the bond that
-				// was just clicked on.
-				radians = angle_offset * kPi / 180.0f;
-				sine = sin(radians);
-				cosine = cos(radians);
-				c_inv = 1.0f - cosine;
-
-				// The axis of rotation is a vector from one atom of the
-				// bond to the other.
-
-				lFrame->GetAtomPosition(
-					lFrame->GetBondAtom(selected - NumAtoms, 1), pivot_pt);
-				lFrame->GetAtomPosition(
-					lFrame->GetBondAtom(selected - NumAtoms, 2), other_pt);
-				axis = other_pt	- pivot_pt;
-				Normalize3D(&axis);
-
-				rot_mat[0][0] = c_inv * axis.x * axis.x + cosine;
-				rot_mat[1][0] = c_inv * axis.x * axis.y - sine * axis.z;
-				rot_mat[2][0] = c_inv * axis.x * axis.z + sine * axis.y;
-
-				rot_mat[0][1] = c_inv * axis.y * axis.x + sine * axis.z;
-				rot_mat[1][1] = c_inv * axis.y * axis.y + cosine;
-				rot_mat[2][1] = c_inv * axis.y * axis.z - sine * axis.x;
-
-				rot_mat[0][2] = c_inv * axis.z * axis.x - sine * axis.y;
-				rot_mat[1][2] = c_inv * axis.z * axis.y + sine * axis.x;
-				rot_mat[2][2] = c_inv * axis.z * axis.z + cosine;
-
-				rot_mat[3][0] = rot_mat[3][1] = rot_mat[3][2] = 0.0f;
-				rot_mat[0][3] = rot_mat[1][3] = rot_mat[2][3] = 0.0f;
-				rot_mat[3][3] = 1.0f;
-
-				// For each selected atom, we need to rotate it around the
-				// bond.  We want one of the bond atom's to act as the origin,
-				// so we translate our coordinate system there,
-				// perform the rotation, and then translate back.
-				for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
-					if (lFrame->GetAtomSelection(i)) {
-						lAtoms[i].Position -= pivot_pt;
-						Rotate3DPt(rot_mat, lAtoms[i].Position, &new_pt);
-						lAtoms[i].Position = new_pt;
-						lAtoms[i].Position += pivot_pt;
-					}
-				}
-
-				// We need to update our data.
-				edited_atoms = true;
-			}
-
-			else if (selected >= NumAtoms + lFrame->NumBonds) {
-
-				int anno_id = selected - NumAtoms - lFrame->NumBonds;
-				
-				if (mMainData->Annotations[anno_id]->getType() == MP_ANNOTATION_LENGTH) {
-					float dy;           // No. pixels of mouse change in y-dir
-					float offset;       // Corresponding amount of translation
-					CPoint3D atom1_pos;
-					CPoint3D atom2_pos;
-					CPoint3D offset_vec;
-					AnnotationLength *length_anno;
-
-					length_anno =
-						dynamic_cast<AnnotationLength *>
-							(mMainData->Annotations[anno_id]);
-				   
-					// Calculate the amount of rotation according to the amount
-					// of mouse change along the y-axis of the viewport.
-					dy = tmpPnt.y - oldTmpPnt.y;
-					offset = 1.0f - dy / (GetRect().GetHeight()) * 2.0f;
-
-					lFrame->GetAtomPosition(length_anno->getAtom(0), atom1_pos);
-					lFrame->GetAtomPosition(length_anno->getAtom(1), atom2_pos);
-
-					offset_vec = atom2_pos - atom1_pos;
-
-					// get atom2
-					atom2_pos.x = atom1_pos.x + offset_vec.x * offset;
-					atom2_pos.y = atom1_pos.y + offset_vec.y * offset;
-					atom2_pos.z = atom1_pos.z + offset_vec.z * offset;
-
-					lFrame->SetAtomPosition(length_anno->getAtom(1), atom2_pos);
-
-					edited_atoms = true;
-				}
-			}
-			
-			else {
-				mSelectState = -1;
-			}
-			
+		// User must be wanting to translate or rotate atoms.
+		else if (MolWin->HandSelected() && selected >= 0 &&
+				 selected < NumAtoms + lFrame->NumBonds) {
+			HandleEditing(event, tmpPnt, oldTmpPnt);
+			edited_atoms = true;
 		}
 		
 	}
@@ -1255,6 +1014,271 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		draw();
 	}
 
+}
+
+void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
+		                       const wxPoint& prev_pt) {
+
+	Frame *lFrame = mMainData->cFrame;
+	long NumAtoms = lFrame->NumAtoms;
+	mpAtom *lAtoms = lFrame->Atoms;
+	// bool edited_atoms = false; 
+
+	// If an atom is clicked on...
+	if (selected >= 0 && selected < NumAtoms) {
+
+		// edited_atoms = true; 
+		GLdouble newX, newY, newZ;
+
+		if (event.ControlDown() || event.CmdDown()) {
+			std::cout << "rotate set" << std::endl;
+		}
+
+		// If shift is held when an atom is clicked on, we want to
+		// change the depths of either the clicked on or selected
+		// atoms.  Also do this for the middle mouse button.
+		else if (event.ShiftDown() || event.MiddleIsDown()) {
+			GLdouble tmpX, tmpY, tmpZ;
+			float depth_offset;
+			float dy = curr_pt.y - prev_pt.y;
+
+			findWinCoord(lAtoms[selected].Position.x,
+				lAtoms[selected].Position.y,
+				lAtoms[selected].Position.z, tmpX, tmpY, tmpZ);
+			depth_offset = (dy * mMainData->WindowSize) /
+							(25.0f * GetRect().GetWidth());
+			findReal3DCoord(tmpX, tmpY, tmpZ - depth_offset,
+							newX, newY, newZ);
+		}
+
+		// If no shift, just translate.
+		else {
+			findReal3DCoord(curr_pt.x - winDiffX, curr_pt.y - winDiffY,
+							atomDepth, newX, newY, newZ);
+
+			int constrain_anno_id = mMainData->GetConstrainAnnotation();
+			if (constrain_anno_id != -1) {
+				ConstrainPosition(constrain_anno_id, &newX, &newY,
+					&newZ);
+			}
+		}
+
+		// If that atom is a member of the selected atom set, move all
+		// atoms that are currently selected.
+		if (lFrame->GetAtomSelection(selected)) {
+			GLdouble offset_x, offset_y, offset_z;
+
+			offset_x = lAtoms[selected].Position.x - newX;
+			offset_y = lAtoms[selected].Position.y - newY;
+			offset_z = lAtoms[selected].Position.z - newZ;
+
+			for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
+				if (lFrame->GetAtomSelection(i)) {
+					lAtoms[i].Position.x -= offset_x;
+					lAtoms[i].Position.y -= offset_y;
+					lAtoms[i].Position.z -= offset_z;
+				}
+			}
+		}
+		
+		// If it's not selected, make it the only selected one and
+		// move only it.
+		else {
+			lAtoms[selected].Position.x = newX;
+			lAtoms[selected].Position.y = newY;
+			lAtoms[selected].Position.z = newZ;
+
+			SelectObj(selected, true);
+			MolWin->SelectionChanged(true);
+		}
+
+		if (mDragWin) {
+			mDragWin->EndDrag();
+			delete mDragWin;
+			mDragWin = (wxDragImage*) NULL;
+		}
+
+		wxString tmp3Dcoord;
+
+		tmp3Dcoord.Printf(wxT("%.2f,%.2f,%.2f"), newX, newY, newZ);
+
+		mDragWin = new wxDragImage(tmp3Dcoord, wxCursor(wxCURSOR_HAND));
+
+		if (!mDragWin->BeginDrag(wxPoint(0,30), this)) {
+			delete mDragWin;
+			mDragWin = (wxDragImage*) NULL;
+		} else {
+			mDragWin->Move(event.GetPosition());
+			mDragWin->Show();
+		}
+
+		lFrame->SetBonds(Prefs, true, true);
+		MolWin->UpdateGLModel();
+
+	}
+	
+	// If the user's dragging after selecting a bond, we want to
+	// rotated the selected set of atoms around that bond.
+	else if (selected >= NumAtoms && selected < NumAtoms + lFrame->NumBonds) {
+		// if we're a bond
+		//   translate to one of bond atoms
+		//   rotate selected atoms around bond according to distance
+		//     of move by translating to either atom on bond and 
+		//     rotating around vector represented by bond
+		
+		CPoint3D pivot_pt;     // The atom pos to act as origin
+		CPoint3D other_pt;     // The pos of pivot atom's bondmate
+		CPoint3D new_pt;       // Each atom's pos rotated, untranslated
+		CPoint3D axis;         // Vector of rotation bond
+		float radians;         // Amount to rotate by
+		float cosine;          // Used to rotate around axis
+		float sine;
+		float c_inv;
+		Matrix4D rot_mat;
+		float dy;              // No. pixels of mouse change in y-dir
+		float angle_offset;    // Corresponding amount of rotation
+	   
+		// Calculate the amount of rotation according to the amount
+		// of mouse change along the y-axis of the viewport.
+		dy = curr_pt.y - prev_pt.y;
+		angle_offset = dy / GetClientSize().GetHeight() * 540.0f;
+
+		// Get all trig together for rotating around the bond that
+		// was just clicked on.
+		radians = angle_offset * kPi / 180.0f;
+		sine = sin(radians);
+		cosine = cos(radians);
+		c_inv = 1.0f - cosine;
+
+		// The axis of rotation is a vector from one atom of the
+		// bond to the other.
+
+		lFrame->GetAtomPosition(
+			lFrame->GetBondAtom(selected - NumAtoms, 1), pivot_pt);
+		lFrame->GetAtomPosition(
+			lFrame->GetBondAtom(selected - NumAtoms, 2), other_pt);
+		axis = other_pt	- pivot_pt;
+		Normalize3D(&axis);
+
+		rot_mat[0][0] = c_inv * axis.x * axis.x + cosine;
+		rot_mat[1][0] = c_inv * axis.x * axis.y - sine * axis.z;
+		rot_mat[2][0] = c_inv * axis.x * axis.z + sine * axis.y;
+
+		rot_mat[0][1] = c_inv * axis.y * axis.x + sine * axis.z;
+		rot_mat[1][1] = c_inv * axis.y * axis.y + cosine;
+		rot_mat[2][1] = c_inv * axis.y * axis.z - sine * axis.x;
+
+		rot_mat[0][2] = c_inv * axis.z * axis.x - sine * axis.y;
+		rot_mat[1][2] = c_inv * axis.z * axis.y + sine * axis.x;
+		rot_mat[2][2] = c_inv * axis.z * axis.z + cosine;
+
+		rot_mat[3][0] = rot_mat[3][1] = rot_mat[3][2] = 0.0f;
+		rot_mat[0][3] = rot_mat[1][3] = rot_mat[2][3] = 0.0f;
+		rot_mat[3][3] = 1.0f;
+
+		// For each selected atom, we need to rotate it around the
+		// bond.  We want one of the bond atom's to act as the origin,
+		// so we translate our coordinate system there,
+		// perform the rotation, and then translate back.
+		for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
+			if (lFrame->GetAtomSelection(i)) {
+				lAtoms[i].Position -= pivot_pt;
+				Rotate3DPt(rot_mat, lAtoms[i].Position, &new_pt);
+				lAtoms[i].Position = new_pt;
+				lAtoms[i].Position += pivot_pt;
+			}
+		}
+
+		// We need to update our data.
+		// edited_atoms = true; 
+	}
+
+	// else if (selected >= NumAtoms + lFrame->NumBonds) { 
+
+		// int anno_id = selected - NumAtoms - lFrame->NumBonds; 
+		
+		// if (mMainData->Annotations[anno_id]->getType() == MP_ANNOTATION_LENGTH) { 
+			// float dy;           // No. pixels of mouse change in y-dir 
+			// float offset;       // Corresponding amount of translation 
+			// CPoint3D atom1_pos; 
+			// CPoint3D atom2_pos; 
+			// CPoint3D offset_vec; 
+			// AnnotationLength *length_anno; 
+
+			// length_anno = 
+				// dynamic_cast<AnnotationLength *> 
+					// (mMainData->Annotations[anno_id]); 
+		   
+			// Calculate the amount of rotation according to the amount
+			// of mouse change along the y-axis of the viewport.
+			// dy = tmpPnt.y - oldTmpPnt.y; 
+			// offset = 1.0f - dy / (GetRect().GetHeight()) * 2.0f; 
+
+			// lFrame->GetAtomPosition(length_anno->getAtom(0), atom1_pos); 
+			// lFrame->GetAtomPosition(length_anno->getAtom(1), atom2_pos); 
+
+			// offset_vec = atom2_pos - atom1_pos; 
+
+			// get atom2
+			// atom2_pos.x = atom1_pos.x + offset_vec.x * offset; 
+			// atom2_pos.y = atom1_pos.y + offset_vec.y * offset; 
+			// atom2_pos.z = atom1_pos.z + offset_vec.z * offset; 
+
+			// lFrame->SetAtomPosition(length_anno->getAtom(1), atom2_pos); 
+
+			// edited_atoms = true; 
+		// } 
+	// } 
+	
+	else {
+		mSelectState = -1;
+	}
+
+	// return edited_atoms; 
+
+}
+			
+void MpGLCanvas::HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt) {
+
+	GLdouble mv[16];
+	GLdouble proj[16];
+	GLint viewport[4];
+	GLdouble win_x, win_y, win_z;
+	Frame *lFrame = mMainData->cFrame;
+	long NumAtoms = lFrame->NumAtoms;
+	mpAtom *lAtoms = lFrame->Atoms;
+
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glGetDoublev(GL_MODELVIEW_MATRIX, mv);
+	glGetDoublev(GL_PROJECTION_MATRIX, proj);
+
+	MolWin->LassoGrown(curr_pt.x, curr_pt.y);
+	// edited_atoms = true; 
+
+	if (!event.ShiftDown()) {
+		lFrame->resetAllSelectState();
+	}
+	MolWin->SetHighliteMode(true);
+
+	int nselected = 0;
+	for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
+		gluProject(lAtoms[i].Position.x,
+				   lAtoms[i].Position.y,
+				   lAtoms[i].Position.z,
+				   mv, proj, viewport, &win_x, &win_y, &win_z);
+		if (MolWin->LassoContains((int) win_x, (int) win_y)) {
+			lFrame->SetAtomSelection(i, true);
+			nselected++;
+		}
+	}
+
+	if (nselected >= 4) {
+		select_stack_top = 5;
+	}
+
+	// for each atom
+	//    project into window coordinates
+	//    if contained in lasso area, select it
 }
 
 void MpGLCanvas::KeyHandler(wxKeyEvent & event) {
