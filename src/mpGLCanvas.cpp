@@ -818,7 +818,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
 
-	std::cout << "num atoms selected: " << lFrame->GetNumAtomsSelected() << std::endl;
+	// std::cout << "num atoms selected: " << lFrame->GetNumAtomsSelected() << std::endl; 
 
 	GetClientSize(&width, &height);
 
@@ -1540,7 +1540,10 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 		insertAnnotationMenuItems(menu);
 		menu.AppendSeparator();
 
-		if (select_stack_top >= 4) {
+		// A plane is defined by exactly 3 atoms.  With any more than that, we 
+		// can have noncoplanar atoms.  Only then do we allow the user to fit
+		// the atoms to a plane.
+		if (lFrame->GetNumAtomsSelected() >= 4) {
 			menu.Append(GL_Popup_Fit_To_Plane, wxT("Fit atoms to plane"));
 			menu.AppendSeparator();
 		}
