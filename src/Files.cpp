@@ -790,7 +790,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
 				lFrame->AddAtom((long) AtomType, pos);
 				StartPos = Buffer->FindBlankLine();
-				if ((StartPos < EndPos)&&(StartPos>-1)) {	//basis set is inlined in $DATA
+				if ((StartPos <= EndPos)&&(StartPos>-1)) {	//basis set is inlined in $DATA
 					Buffer->SetFilePos(StartPos);	//just skip over it
 					Buffer->SkipnLines(1);
 				}
