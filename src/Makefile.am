@@ -69,4 +69,5 @@ wxmacmolplt_SOURCES =                                  \
 AM_CXXFLAGS = $(WX_CXXFLAGS)
 wxmacmolplt_LDADD = $(WX_LIBS) $(LIBMING)
 wxmacmolplt_LDFLAGS = $(WX_CXXFLAGS)
-EXTRA_DIST = wxMacMolPlt.pjd sp.xpm arrow.xpm
+EXTRA_DIST = wxMacMolPlt.pjd xpms/sp.xpm xpms/arrow.xpm \
+	xpms/hand.xpm xpms/rect_lasso.xpm xpms/view.xpm

@@ -18,7 +18,7 @@ AS_IF([test "x$with_ming" != xno],
     [AC_SUBST([LIBMING], ["-lming"]) AC_DEFINE([HAVE_LIBMING])],
     [if test "x$with_ming" != xyes; then
         AC_MSG_FAILURE([--with-ming was given, but test for ming failed])
-    fi])])
+    fi], -lpng)])
 
 WXCONFIG=wx-config
 AC_ARG_WITH(wx-config,
