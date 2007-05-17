@@ -354,6 +354,7 @@ void SetScreenPlane::OnAtom1Updated( wxCommandEvent& event )
 		wxString text = Atom1Ctl->GetValue();
 		unsigned long temp;
 		if (text.ToULong(&temp)) {
+			temp --;	//convert to zero indexing
 			MoleculeData * MainData = parent->GetData();
 			Frame * lFrame = MainData->GetCurrentFramePtr();
 			if (temp < lFrame->GetNumAtoms()) {
@@ -458,6 +459,7 @@ void SetScreenPlane::OnAtom2Updated( wxCommandEvent& event )
 		wxString text = Atom2Ctl->GetValue();
 		unsigned long temp;
 		if (text.ToULong(&temp)) {
+			temp --;	//convert to zero indexing
 			MoleculeData * MainData = parent->GetData();
 			Frame * lFrame = MainData->GetCurrentFramePtr();
 			if (temp < lFrame->GetNumAtoms()) {
@@ -562,6 +564,7 @@ void SetScreenPlane::OnAtom3Updated( wxCommandEvent& event )
 		wxString text = Atom3Ctl->GetValue();
 		unsigned long temp;
 		if (text.ToULong(&temp)) {
+			temp --;	//convert to zero indexing
 			MoleculeData * MainData = parent->GetData();
 			Frame * lFrame = MainData->GetCurrentFramePtr();
 			if (temp < lFrame->GetNumAtoms()) {
