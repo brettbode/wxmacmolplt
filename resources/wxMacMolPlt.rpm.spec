@@ -16,8 +16,8 @@ BuildRoot: %{_tmppath}/wxmacmolplt-%{version}-root
 BuildRequires: wxGTK-devel >= 2.6.3
 #FC
 Requires: wxGTK >= 2.6.3 wxGTK-gl >= 2.6.3
-#Mandriva 2007.0 naming
-#Requires: libwxgtk2.6 >= 2.6.3
+#Mandriva 2007.1 naming
+#Requires: libwxgtk2.6 >= 2.6.3 libming0
 
 %description
 wxMacMolPlt is a molecular visualization tool for use with GAMESS
