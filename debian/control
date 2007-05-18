@@ -2,7 +2,7 @@ Source: wxmacmolplt
 Section: science
 Priority: optional
 Maintainer: Brett Bode <brett@scl.ameslab.gov>
-Build-Depends: debhelper (>= 5), autotools-dev, libwxgtk2.6-dev (>= 2.6.3), wx2.6-headers (>= 2.6.3), libgl1-mesa-dev | libgl-dev, libglu1-mesa-dev | libglu-dev
+Build-Depends: debhelper (>= 5), autotools-dev, libwxgtk2.6-dev (>= 2.6.3), wx2.6-headers (>= 2.6.3), libming-dev, libgl1-mesa-dev | libgl-dev, libglu1-mesa-dev | libglu-dev
 Standards-Version: 3.7.2
 
 Package: wxmacmolplt
