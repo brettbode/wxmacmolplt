@@ -18,11 +18,12 @@
       <LI><A HREF="#GAMESSLog">GAMESS log files</A>
       
       <LI><A HREF="#GAMESSIRC">GAMESS irc files</A>
-      
-      <LI><A HREF="#mol_files">MolPlt .mol files</A>
+				<li><A HREF="#GAMESSInput">GAMESS input files</A>
+				<LI><A HREF="#mol_files">MolPlt .mol files</A>
       
       <LI><A HREF="#pdb">Protein Data Bank .pdb files</A>
-   </UL>
+				<li><a href="#molden">MolDen format files</a>
+			</UL>
    
    <LI>Import only - through the Import file dialog
    
@@ -33,12 +34,11 @@
    <LI>Output only - through Export dialog or the input builder
    
    <UL>
-      <LI><A HREF="#GAMESSInput">GAMESS input files</A>
-      
-      <LI><A HREF="#image">BMP, PNG or JPEG image</A>
-	<LI>tab-delimited energies
-      
-   </UL>
+				<LI><A HREF="#image">BMP, PNG or JPEG image</A>
+				<li><a href="#movies">Flash or QuickTime movies</a>
+				<LI>tab-delimited energies
+
+			</UL>
    
    <LI>Input and Output capable
    
@@ -57,14 +57,7 @@
 <HR>
 Input only formats:</H3>
 
-<P>The following text format files can be read in directly with
-MacMolPlt via the Open and Append menus. MacMolPlt will automatically
-determine the type of file by looking first for a file extension. If
-it finds .PDB or .XYZ then it treats the files as Protein Data Bank
-and XMol XYZ files. If these extenstions are not found then it
-searchs the file for certain phrases such as "GAMESS version" for log
-files, "IRC information packet" for IRC files and "NATOMS=" on the
-first line of .mol files.</P>
+<P>The following text format files can be read in directly with MacMolPlt via the Open and Append menus. MacMolPlt will automatically determine the type of file by looking first for a file extension. If it finds .PDB or .XYZ then it treats the files as Protein Data Bank and XMol XYZ files. If these extenstions are not found then it searchs the file for certain phrases such as &quot;GAMESS version&quot; for log files, &quot;IRC information packet&quot; for IRC files and &quot;NATOMS=&quot; on the first line of .mol files. In general MacMolPlt automatically determines the file type based first on the file extension and then based on the file content. If MacMolPlt appears to be having trouble determining the file type try appending the appropriate file extension from the above list.</P>
 
 <H3>Output only formats:</H3>
 
@@ -317,19 +310,20 @@ that if you define a set of internal coordinates in the Coordinates
 window and set the number of Z-matrix variables correctly MacMolPlt
 will automatically punch out a $ZMAT group.</P>
 
-<P>MacMolPlt can read in some GAMESS input files. It will only parse
-files containing Cartesian coordinates in $DATA.</P>
+<P>MacMolPlt can read in GAMESS input files, but does not preserve all of the GAMESS options. It does correctly handle most of the supported coordinate formats for both input and output including CART, UNIQUE, and ZMAT.</P>
 
 <H4>
 <HR WIDTH="70%">
 <A NAME="image"></A>images</H4>
-
-<P>The current display window can be exported in several image formats
+		<P>The current display window can be exported in several image formats
 including Windows bitmap, portable network graphics, and JPEG. You will
 also be given the option of specifying the size (resolution) of the exported
 image. This can be used to generate hi-res images suitable for printing.
 </P>
-
+		<h4>
+			<hr width="70%">
+			<a name="movies"></a>Movies</h4>
+		<p>The current molecular display, with an optional energy plot, can be exported to a movie suitable for use on a web site, in a presentation, etc. Currently two formats are supported. On MacOS X only you can export to a QuickTime movie (by default in mpeg4 format). On all platforms you may also choose to use the Shockwave Flash format. In both cases the resulting movie will look best at the same size as the display window that created it.</p>
 		<h4>
 			<hr width="70%">
 			<a name="CML"></a>Chemical Markup Language (CML)</h4>
@@ -348,10 +342,15 @@ information only. Further information about this format can be found
 on <A HREF="http://en.wikipedia.org/wiki/MDL_Molfile">MDL's file format</A>.</P>
 
 <H4>
-<HR WIDTH="70%">
-<A NAME="XYZ"></A>XMol style XYZ files</H4>
-
-<P>MacMolPlt can read and write (via the export menu) XMol style XYZ
+			<HR WIDTH="70%">
+		</H4>
+		<h4><a name="molden"></a>MolDen format files</h4>
+		<p>MolDen format files are a loosely doucmented text file format supported by several applications. MacMolPlt should be able to read most information, including orbitals and multiple geometries. Note that STO type basis sets are not supported.</p>
+		<h4>
+			<hr width="70%">
+		</h4>
+		<h4><A NAME="XYZ"></A>XMol style XYZ files</h4>
+		<P>MacMolPlt can read and write (via the export menu) XMol style XYZ
 files. The XYZ format is a very simple format for storing molecular
 structures and can have multiple frames. The basic format is:</P>
 
