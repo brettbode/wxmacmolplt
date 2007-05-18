@@ -28,13 +28,14 @@ Matrix2D::Matrix2D(const int nrows, const int ncols) {
 // --------------------------------------------------------------------------- 
 
 Matrix2D::Matrix2D(const int nrows, const int ncols, const float *data) {
-	data = NULL;
+	this->data = NULL;
 	Init(nrows, ncols, data);
 }
 
 // --------------------------------------------------------------------------- 
 
 void Matrix2D::Init(const int nrows, const int ncols, const float *data) {
+
 	this->nrows = nrows;
 	this->ncols = ncols;
 
@@ -53,6 +54,7 @@ void Matrix2D::Init(const int nrows, const int ncols, const float *data) {
 
 Matrix2D::~Matrix2D() {
 	delete data;
+	data = NULL;
 }
 
 // --------------------------------------------------------------------------- 

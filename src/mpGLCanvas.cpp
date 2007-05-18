@@ -28,6 +28,7 @@
 #include "main.h"
 #include "periodic_table_dlg.h"
 #include "Math3D.h"
+#include "VirtualSphere.h"
 
 extern PeriodicTableDlg *periodic_dlg;
 extern bool show_periodic_dlg;
@@ -1022,8 +1023,6 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
-	std::vector<mpAtom *> atoms;
-	CPoint3D centroid;
 
 	// If an atom is clicked on...
 	if (selected >= 0 && selected < NumAtoms) {
@@ -1032,13 +1031,54 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 
 		if (event.ControlDown() || event.CmdDown()) {
 
+			std::vector<mpAtom *> atoms;
+			std::vector<mpAtom *>::const_iterator atom;
+			CPoint3D centroid = CPoint3D(0.0f, 0.0f, 0.0f);
+			CPoint3D sphere_center;
+
 			for (int i = 0; i < NumAtoms; i++) {
 				if (lFrame->GetAtomSelection(i)) {
 					atoms.push_back(&lAtoms[i]);
 					centroid += lAtoms[i].Position;
 				}
+			}
+			centroid *= 1.0f / atoms.size();
 
-				centroid *= 1.0f / atoms.size();
+			GLdouble proj[16];
+			GLdouble mv[16];
+			GLint viewport[4];
+
+			glGetDoublev(GL_PROJECTION_MATRIX, proj);
+			glGetDoublev(GL_MODELVIEW_MATRIX, mv);
+			glGetIntegerv(GL_VIEWPORT, viewport);
+
+			Point prev, curr;
+			Point cent;
+			prev.h = prev_pt.x;
+			prev.v = prev_pt.y;
+			curr.h = curr_pt.x;
+			curr.v = curr_pt.y;
+
+			double proj_pt[3];
+			gluProject(centroid.x, centroid.y, centroid.z,
+					   mv, proj, viewport,
+					   &(proj_pt[0]), &(proj_pt[1]), &(proj_pt[2]));
+
+			cent.h = (unsigned short) proj_pt[0];
+			cent.v = (unsigned short) proj_pt[1];
+
+			Matrix4D rot_matrix;
+			Matrix4D rot;
+			glGetFloatv(GL_MODELVIEW_MATRIX, (float *) rot);
+
+			VirtualSphereQD3D(prev, curr, cent, 40, rot_matrix, rot);
+
+			CPoint3D new_pt;
+			for (atom = atoms.begin(); atom != atoms.end(); atom++) {
+				(*atom)->Position -= centroid;
+				Rotate3DPt(rot_matrix, (*atom)->Position, &new_pt);
+				(*atom)->Position = new_pt;
+				(*atom)->Position += centroid;
 			}
 
 		} else {
