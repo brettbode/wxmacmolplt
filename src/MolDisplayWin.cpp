@@ -3022,7 +3022,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 		dy = q.y - p.y;
 		if (dx != 0 || dy != 0) {
 			if (event.CmdDown() || event.RightIsDown()) {   //Command key: translate instead of rotate
-		  CPoint3D offset;
+				CPoint3D offset;
 				if (event.ShiftDown()) {    /*The shift key is down so move into/out of the screen*/
 					offset.z = dy/(hsize/MainData->WindowSize);
 					MainData->TotalRotation[3][2] += offset.z;
@@ -3047,10 +3047,10 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 					sp.h = sphereCenter.x;
 					sp.v = sphereCenter.y;
 					VirtualSphereQD3D (pr, cur, sp, sphereRadius, rotationMatrix, MainData->TotalRotation);
-			//      VirtualSphereQD3D (p, q, sphereCenter, sphereRadius, rotationMatrix, MainData->TotalRotation);
+					// VirtualSphereQD3D (p, q, sphereCenter, sphereRadius, rotationMatrix, MainData->TotalRotation);
 
 					CPoint3D    InitialTrans, FinalTrans;
-//First back rotate the translation to get the inital translation
+					//First back rotate the translation to get the inital translation
 					InitialTrans.x = ((MainData->TotalRotation[3][0])*MainData->TotalRotation[0][0] +
 						( MainData->TotalRotation[3][1])*MainData->TotalRotation[0][1] +
 						( MainData->TotalRotation[3][2])*MainData->TotalRotation[0][2]);
@@ -3060,13 +3060,13 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 					InitialTrans.z = ((MainData->TotalRotation[3][0])*MainData->TotalRotation[2][0] +
 						( MainData->TotalRotation[3][1])*MainData->TotalRotation[2][1] +
 						( MainData->TotalRotation[3][2])*MainData->TotalRotation[2][2]);
-//Now zero out the translation part of the matrix
+					//Now zero out the translation part of the matrix
 					MainData->TotalRotation[3][0] = MainData->TotalRotation[3][1] =
 					MainData->TotalRotation[3][2] = 0.0;
-			/* Concatenate the new rotation with the current rotation */
+					/* Concatenate the new rotation with the current rotation */
 					MultiplyMatrix (rotationMatrix, MainData->TotalRotation, tempcopyMatrix);
 					CopyMatrix (tempcopyMatrix, MainData->TotalRotation);
-//Now rotate the translation to the new orientation
+					//Now rotate the translation to the new orientation
 					Rotate3DPt(MainData->TotalRotation, InitialTrans, &FinalTrans);
 					MainData->TotalRotation[3][0] = FinalTrans.x;
 					MainData->TotalRotation[3][1] = FinalTrans.y;
