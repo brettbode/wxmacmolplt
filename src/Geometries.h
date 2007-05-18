@@ -27,6 +27,7 @@ class Matrix2D {
 		const Matrix2D& operator=(const Matrix2D& m);
 		const Matrix2D& operator=(float x);
 		Matrix2D operator*(const Matrix2D& b) const;
+		Matrix2D operator*=(float x);
 
 		void Init(const int nrows, const int ncols, const float *data);
 		Matrix2D Transpose(void) const;

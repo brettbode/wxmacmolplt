@@ -1022,74 +1022,85 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
-	// bool edited_atoms = false; 
+	std::vector<mpAtom *> atoms;
+	CPoint3D centroid;
 
 	// If an atom is clicked on...
 	if (selected >= 0 && selected < NumAtoms) {
 
-		// edited_atoms = true; 
 		GLdouble newX, newY, newZ;
 
 		if (event.ControlDown() || event.CmdDown()) {
-			std::cout << "rotate set" << std::endl;
-		}
 
-		// If shift is held when an atom is clicked on, we want to
-		// change the depths of either the clicked on or selected
-		// atoms.  Also do this for the middle mouse button.
-		else if (event.ShiftDown() || event.MiddleIsDown()) {
-			GLdouble tmpX, tmpY, tmpZ;
-			float depth_offset;
-			float dy = curr_pt.y - prev_pt.y;
-
-			findWinCoord(lAtoms[selected].Position.x,
-				lAtoms[selected].Position.y,
-				lAtoms[selected].Position.z, tmpX, tmpY, tmpZ);
-			depth_offset = (dy * mMainData->WindowSize) /
-							(25.0f * GetRect().GetWidth());
-			findReal3DCoord(tmpX, tmpY, tmpZ - depth_offset,
-							newX, newY, newZ);
-		}
-
-		// If no shift, just translate.
-		else {
-			findReal3DCoord(curr_pt.x - winDiffX, curr_pt.y - winDiffY,
-							atomDepth, newX, newY, newZ);
-
-			int constrain_anno_id = mMainData->GetConstrainAnnotation();
-			if (constrain_anno_id != -1) {
-				ConstrainPosition(constrain_anno_id, &newX, &newY,
-					&newZ);
-			}
-		}
-
-		// If that atom is a member of the selected atom set, move all
-		// atoms that are currently selected.
-		if (lFrame->GetAtomSelection(selected)) {
-			GLdouble offset_x, offset_y, offset_z;
-
-			offset_x = lAtoms[selected].Position.x - newX;
-			offset_y = lAtoms[selected].Position.y - newY;
-			offset_z = lAtoms[selected].Position.z - newZ;
-
-			for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
+			for (int i = 0; i < NumAtoms; i++) {
 				if (lFrame->GetAtomSelection(i)) {
-					lAtoms[i].Position.x -= offset_x;
-					lAtoms[i].Position.y -= offset_y;
-					lAtoms[i].Position.z -= offset_z;
+					atoms.push_back(&lAtoms[i]);
+					centroid += lAtoms[i].Position;
+				}
+
+				centroid *= 1.0f / atoms.size();
+			}
+
+		} else {
+
+			// If shift is held when an atom is clicked on, we want to
+			// change the depths of either the clicked on or selected
+			// atoms.  Also do this for the middle mouse button.
+			if (event.ShiftDown() || event.MiddleIsDown()) {
+				GLdouble tmpX, tmpY, tmpZ;
+				float depth_offset;
+				float dy = curr_pt.y - prev_pt.y;
+
+				findWinCoord(lAtoms[selected].Position.x,
+					lAtoms[selected].Position.y,
+					lAtoms[selected].Position.z, tmpX, tmpY, tmpZ);
+				depth_offset = (dy * mMainData->WindowSize) /
+								(25.0f * GetRect().GetWidth());
+				findReal3DCoord(tmpX, tmpY, tmpZ - depth_offset,
+								newX, newY, newZ);
+			}
+
+			// If no shift, just translate.
+			else {
+				findReal3DCoord(curr_pt.x - winDiffX, curr_pt.y - winDiffY,
+								atomDepth, newX, newY, newZ);
+
+				int constrain_anno_id = mMainData->GetConstrainAnnotation();
+				if (constrain_anno_id != -1) {
+					ConstrainPosition(constrain_anno_id, &newX, &newY,
+						&newZ);
 				}
 			}
-		}
-		
-		// If it's not selected, make it the only selected one and
-		// move only it.
-		else {
-			lAtoms[selected].Position.x = newX;
-			lAtoms[selected].Position.y = newY;
-			lAtoms[selected].Position.z = newZ;
 
-			SelectObj(selected, true);
-			MolWin->SelectionChanged(true);
+			// If that atom is a member of the selected atom set, move all
+			// atoms that are currently selected.
+			if (lFrame->GetAtomSelection(selected)) {
+				GLdouble offset_x, offset_y, offset_z;
+
+				offset_x = lAtoms[selected].Position.x - newX;
+				offset_y = lAtoms[selected].Position.y - newY;
+				offset_z = lAtoms[selected].Position.z - newZ;
+
+				for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
+					if (lFrame->GetAtomSelection(i)) {
+						lAtoms[i].Position.x -= offset_x;
+						lAtoms[i].Position.y -= offset_y;
+						lAtoms[i].Position.z -= offset_z;
+					}
+				}
+			}
+			
+			// If it's not selected, make it the only selected one and
+			// move only it.
+			else {
+				lAtoms[selected].Position.x = newX;
+				lAtoms[selected].Position.y = newY;
+				lAtoms[selected].Position.z = newZ;
+
+				SelectObj(selected, true);
+				MolWin->SelectionChanged(true);
+			}
+
 		}
 
 		if (mDragWin) {
@@ -1492,11 +1503,14 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 	// using the third axis as the plane's normal and the centroid as a 
 	// point on the plane.  The principle component basis is calculated
 	// using singular value decomposition.
+	//
+	// It's assumed that at least 4 atoms are selected when this function is
+	// called.
 
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
-	CPoint3D centroid;
+	CPoint3D centroid = CPoint3D(0.0f, 0.0f, 0.0f);
 	int i;
 	Matrix2D locs;
 	Matrix2D trans_locs;
@@ -1511,15 +1525,18 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 	for (i = 0; i < NumAtoms; i++) {
 		if (lFrame->GetAtomSelection(i)) {
 			atoms.push_back(&lAtoms[i]);
+			centroid += lAtoms[i].Position;
 		}
 	}
+
+	centroid *= (1.0f / atoms.size());
 
 	// Now store all selected atoms' coordinates in a matrix.
 	locs = Matrix2D(atoms.size(), 3);
 	for (atom = atoms.begin(), i = 0; atom != atoms.end(); atom++, i++) {
-		locs.data[i * 3 + 0] = (*atom)->Position.x;
-		locs.data[i * 3 + 1] = (*atom)->Position.y;
-		locs.data[i * 3 + 2] = (*atom)->Position.z;
+		locs.data[i * 3 + 0] = (*atom)->Position.x - centroid.x;
+		locs.data[i * 3 + 1] = (*atom)->Position.y - centroid.y;
+		locs.data[i * 3 + 2] = (*atom)->Position.z - centroid.z;
 	}
 
 	// Transpose the matrix.
@@ -1527,19 +1544,22 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 
 	// Multiply the two to get the covariance matrix.
 	cov = trans_locs * locs;
+	cov *= 1.0f / atoms.size();
 	
-	// Perform SVD on covariance matrix.  Sort the vectors by their scale
-	// factors and use the largest two as the axes of the plane to fit the
-	// selected atoms into.
+	// Perform SVD on covariance matrix.
 	Matrix2D out, gain, in;
 	cov.SVD(&out, &gain, &in);
 
-	// Project the atoms onto the plane.
+	// Project the atoms onto the plane.  The plane's normal is the eigenvector
+	// with the smallest eigenvalue.  The other two vectors are more principle,
+	// lying in the plane.
 	CPoint3D normal = CPoint3D(out.data[2], out.data[5], out.data[8]);
 	for (atom = atoms.begin(); atom != atoms.end(); atom++) {
 		ProjectToPlane(normal, centroid, (*atom)->Position);
 	}
 
+	// std::cout << "normal: " << normal << std::endl; 
+	// std::cout << "normal.Mag(): " << normal.Magnitude() << std::endl; 
 	// std::cout << "locs:" << std::endl << locs; 
 	// std::cout << "trans_locs:" << std::endl << trans_locs; 
 	// std::cout << "cov:" << std::endl << cov; 

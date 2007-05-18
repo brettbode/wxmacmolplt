@@ -74,6 +74,15 @@ Matrix2D Matrix2D::Transpose(void) const {
 
 // --------------------------------------------------------------------------- 
 
+Matrix2D Matrix2D::operator*=(float x) {
+	for (int i = 0; i < nrows * ncols; i++) {
+		data[i] *= x;
+	}
+	return *this;
+}
+
+// --------------------------------------------------------------------------- 
+
 const Matrix2D& Matrix2D::operator=(const Matrix2D& m) {
 	
 	if (this != &m) {
