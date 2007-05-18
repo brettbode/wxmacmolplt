@@ -2,7 +2,7 @@ Currently wxMacMolPlt includes build files and has been tested on Mac OS X,
 Linux and Windows. Since most people building from source will be running
 Linux this file focuses on the build instructions for Linux. To build from
 source on any OS you must have a C++ compiler such as g++ and an install
-of wxWidgets with OpenGL support enabled. wxWidgets 2.6 through 2.8.0 
+of wxWidgets with OpenGL support enabled. wxWidgets 2.6 through 2.8.x 
 should work.
 Prebuilt packages should also work. We have tested against the version 2.6.3
 prebuilt package within Debian and found it to work. If you are building on
@@ -17,6 +17,13 @@ optional, but should be used if you use non ascii chars in your file system):
    ./configure --with-gtk --with-opengl --enable-unicode
    make
    make install
+
+Optional: MacMolPlt includes the ability to use the Ming library to export
+animations to Flash movies. The configure script checks for the presence of
+libming and enables it if present. Thus if you wish to have the Flash movie
+support you must first install libming either from a vendor supplied binary
+package (along with the associated dev package) or by building ming from
+source yourself. The ming source can be obtained from: www.libming.net
 
 To install MacMolPlt run:
   ./configure
