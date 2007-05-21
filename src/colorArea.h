@@ -16,6 +16,8 @@
 #define PATTERN_SELECT_DIALOG 30001
 #define PATTERN_SELECT_TITLE _("Select a pattern")
 #define ID_BITMAP_SLT 30010
+#define ID_OLD_PAT 30100
+#define ID_NEW_PAT 30101
         
 /*!
  * Includes
@@ -97,10 +99,11 @@ class patternSelectDlg : public wxDialog {
   private:
     void Create(colorPatternArea * parent, wxWindowID id, const wxString& caption);
 
-    wxBoxSizer *mainSizer, *lowerSizer, *upperSizer;
+    wxBoxSizer *mainSizer, *lowerSizer, *upperSizer, *upperLeftSizer, *upperRightSizer;
     wxGridSizer* innerSizer;
     wxButton *mButtOK, *mButtCancel;
     colorPatternArea* patSlt[numPatterns];
+    colorPatternArea  *oldPat, *newPat;
     wxScrolledWindow* sltArea;
     int mSltId;
     int mSltPatId;

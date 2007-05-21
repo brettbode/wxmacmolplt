@@ -184,21 +184,22 @@ patternSelectDlg::patternSelectDlg(colorPatternArea * parent, wxWindowID id, con
 }
 
 void patternSelectDlg::Create(colorPatternArea * parent, wxWindowID id, const wxString& caption ) {
-  wxDialog::Create( parent, id, caption, wxDefaultPosition, wxSize(300,500), wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX);
+  wxDialog::Create( parent, id, caption, wxDefaultPosition, wxSize(450,500), wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX);
 
   mainSizer = new wxBoxSizer(wxVERTICAL);
-  innerSizer = new wxGridSizer(3, numPatterns/3+1);
+  innerSizer = new wxGridSizer(5, numPatterns/5+1);
   upperSizer = new wxBoxSizer(wxHORIZONTAL);
+  upperLeftSizer = new wxBoxSizer(wxVERTICAL);
+  upperRightSizer = new wxBoxSizer(wxHORIZONTAL);
   lowerSizer = new wxBoxSizer(wxHORIZONTAL);
 
   RGBColor tmpColor;
 
-  sltArea = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxSize(265,400), wxVSCROLL|wxEXPAND);
+  sltArea = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxSize(415,400), wxVSCROLL|wxEXPAND);
+  tmpColor = WX2RGB(parent->getColor());
 
   for (int i = 0; i < numPatterns; i++)
     {
-      tmpColor = WX2RGB(parent->getColor());
-
       patSlt[i] = new colorPatternArea(sltArea, ID_BITMAP_SLT+i, &tmpColor, i, 64, 64);
       if ( i == parent->getPattern())
 	patSlt[i]->SetBackgroundColour(defaultColor);
@@ -209,8 +210,15 @@ void patternSelectDlg::Create(colorPatternArea * parent, wxWindowID id, const wx
 
   sltArea->SetSizer(innerSizer);
   sltArea->SetScrollRate(10,10);
-  
-  upperSizer->Add(sltArea, 0, wxALIGN_CENTRE | wxALL, 10);
+
+  oldPat = new colorPatternArea(this, ID_OLD_PAT, &tmpColor, 1, 64, 64);
+  newPat = new colorPatternArea(this, ID_NEW_PAT, &tmpColor, 1, 64, 64);
+  upperLeftSizer->Add(oldPat, 0, wxALIGN_CENTRE | wxALL, 10);
+  upperLeftSizer->Add(newPat, 0, wxALIGN_CENTRE | wxALL, 10);
+
+  upperRightSizer->Add(sltArea, 0, wxALIGN_CENTRE | wxALL, 10);
+  upperSizer->Add(upperLeftSizer, 0, wxALIGN_CENTRE | wxALL, 10);
+  upperSizer->Add(upperRightSizer, 0, wxALIGN_CENTRE | wxALL, 10);
 
   mButtOK = new wxButton(this, wxID_OK, wxT("OK") );
   mButtCancel = new wxButton(this, wxID_CANCEL, wxT("Cancel"));
@@ -245,7 +253,7 @@ void patternSelectDlg::OnOK( wxCommandEvent& event ) {
 void patternSelectDlg::OnSize(wxSizeEvent & event)
 {
   wxSize s = event.GetSize();
-  sltArea->SetSize(MIN(260, s.x-35), s.y-100);
+  sltArea->SetSize(MIN(410, s.x-35), s.y-100);
   
   mainSizer->Layout();
   Refresh(); 
