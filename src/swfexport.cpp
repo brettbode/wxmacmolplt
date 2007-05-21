@@ -82,9 +82,6 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 	wxMessageDialog *sizeDlg = NULL;
 	wxString title;
 	wxString msg;
-	wxString tmp;
-	const char *tchar1 = NULL;
-	const char *tchar2 = NULL;
 	long SavedFrameNum = MainData->GetCurrentFrame();
 	long i;
 	SWFMovie *movie = new SWFMovie();
@@ -198,11 +195,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 			delete epBitmap;
 		}
 
-		tmp = wxString::Format(wxT("%d/%d"), MainData->NumFrames,
-				MainData->NumFrames);
 		frameNumStr = wxString::Format(wxT("%d/%d"), i, MainData->NumFrames);
-		tchar1 = tmp.fn_str();
-		tchar2 = frameNumStr.fn_str();
 		frameNumText = new SWFText();
 		frameNumText->setFont(font);
 		frameNumText->setHeight(24);
@@ -249,8 +242,6 @@ CLEANUP:
 			energyPlotWindow->FrameChanged();
 		}
 	}
-
-	return;
 }
 
 void MolDisplayWin::CreateModeMovie(wxString &filePath) {
@@ -263,6 +254,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	SWFInput *in = NULL;
 	SWFBitmap *bm = NULL;
 	SWFDisplayItem *di = NULL;
+	SWFDisplayItem *textDI = NULL;
 	long width;
 	long height;
 	long AnimateTime = 10*Prefs->GetAnimateTime();
@@ -283,9 +275,12 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 #else
 	fontPath += wxT("/BsVeraSans.fdb");
 #endif
-	SWFFont *font = new SWFFont(fontPath.fn_str());
+	FILE *fontFile = NULL;
+	SWFFont *font = NULL;
+	SWFText *frameNumText = NULL;
+	wxString frameNumStr;
 
-	if(!MainData->cFrame->Vibs) return; // Should spit out a message.
+	if(!MainData->cFrame->Vibs) return; // TODO: Should spit out a message.
 	Frame * lFrame = MainData->cFrame;
 	if (MainData->GetDrawMode()) {
 		savedrawmode=true;
@@ -297,9 +292,15 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	float offsetFactor = 1.0/(4.5*AnimationSpeed);
 	float VectorScale = Prefs->GetVectorScale();
 	CPoint3D *ModeOffset = new CPoint3D[lFrame->NumAtoms];
+	if(!ModeOffset) {
+		/* TODO:  Error message */
+		return;
+	}
 	CPoint3D *SavedAtoms = new CPoint3D[lFrame->NumAtoms];
-	if(!ModeOffset || !SavedAtoms) {
-		return; //insufficient memory
+	if(!SavedAtoms) {
+		/* TODO:  Error message */
+		delete ModeOffset;
+		return;
 	}
 	mpAtom *lAtoms = lFrame->Atoms;
 	long iatm;
@@ -315,6 +316,14 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	if(AnimateTime < 1) AnimateTime = 1;
 
 	getCanvasSize(&width, &height);
+
+	fontFile = fopen(fontPath.fn_str(), "r");
+	if(fontFile == NULL) {
+		/* TODO:  Display an error message */
+		/* OR, just disable drawing text */
+		return;
+	}
+	font = new SWFFont(fontFile);
 
 	movie = new SWFMovie();
 	movie->setBackground(0xFF, 0xFF, 0xFF);
@@ -346,14 +355,28 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 		in = new SWFInput(jpegData, datLen);
 		bm = new SWFBitmap(in);
 
+		frameNumStr = wxString::Format(wxT("%d/%d"), i+1, (4 * AnimationSpeed));
+		frameNumText = new SWFText();
+		frameNumText->setFont(font);
+		frameNumText->setHeight(24);
+		frameNumText->setColor(0x00, 0x00, 0x00); /* TODO:  Get from wxMMP config */
+		frameNumText->moveTo(0,
+				height - ((24.0 / 1024.0) * font->getAscent() + 3));
+		frameNumText->addString(frameNumStr.fn_str());
+
 		di = movie->add((SWFBlock *)bm);
+		textDI = movie->add((SWFBlock *)frameNumText);
+
 		movie->nextFrame();
 		movie->remove(di);
+		movie->remove(textDI);
+		delete di;
+		delete textDI;
 
 		for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
-			lAtoms[iatm].Position.x += offsetFactor*(ModeOffset[iatm].x);
-			lAtoms[iatm].Position.y += offsetFactor*(ModeOffset[iatm].y);
-			lAtoms[iatm].Position.z += offsetFactor*(ModeOffset[iatm].z);
+			lAtoms[iatm].Position.x += offsetFactor * (ModeOffset[iatm].x);
+			lAtoms[iatm].Position.y += offsetFactor * (ModeOffset[iatm].y);
+			lAtoms[iatm].Position.z += offsetFactor * (ModeOffset[iatm].z);
 		}
 
 		MainData->ResetRotation();
@@ -381,6 +404,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 CLEANUP:
 	delete movie;
 	delete font;
+	fclose(fontFile);
 	if (ModeOffset) delete [] ModeOffset;
 	if (SavedAtoms) delete [] SavedAtoms;
 }
