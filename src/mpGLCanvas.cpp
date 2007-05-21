@@ -1029,6 +1029,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 
 		GLdouble newX, newY, newZ;
 
+		// If control is held down, we rotate the selection only around itself.
 		if (event.ControlDown() || event.CmdDown()) {
 
 			std::vector<mpAtom *> atoms;
@@ -1036,6 +1037,8 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			CPoint3D centroid = CPoint3D(0.0f, 0.0f, 0.0f);
 			CPoint3D sphere_center;
 
+			// First, we find the selection set's center of gravity which
+			// we'll rotate the set around.
 			for (int i = 0; i < NumAtoms; i++) {
 				if (lFrame->GetAtomSelection(i)) {
 					atoms.push_back(&lAtoms[i]);
@@ -1043,6 +1046,23 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				}
 			}
 			centroid *= 1.0f / atoms.size();
+
+			// Now, we need to find the radius of the trackball we'll use to
+			// compute the rotation.  This is a little tricky.  What we do is
+			// find the maximum distance between the center of gravity and the
+			// atoms in the set.  We throw away the position and keep only the
+			// distance.  We then calculate a new point along the x-vector in
+			// eye space that's that distance away from the center of gravity.
+			// The distance between these two points in screen space is the
+			// radius of virtual sphere.
+			float max_distance = 0.0f;
+			float distance;
+			for (atom = atoms.begin(); atom != atoms.end(); atom++) {
+				distance = ((*atom)->Position - centroid).Magnitude();
+				if (distance > max_distance) {
+					max_distance = distance;
+				}
+			}
 
 			GLdouble proj[16];
 			GLdouble mv[16];
@@ -1052,6 +1072,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			glGetDoublev(GL_MODELVIEW_MATRIX, mv);
 			glGetIntegerv(GL_VIEWPORT, viewport);
 
+			// The virtual sphere current and previous mouse locations.
 			Point prev, curr;
 			Point cent;
 			prev.h = prev_pt.x;
@@ -1059,19 +1080,41 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			curr.h = curr_pt.x;
 			curr.v = curr_pt.y;
 
+			// Calculate a point at maximal distance in along the x-axis in
+			// eye space.
+			CPoint3D max_point;
+			max_point.x = centroid.x + max_distance * mv[0];
+			max_point.y = centroid.y + max_distance * mv[4];
+			max_point.z = centroid.z + max_distance * mv[8];
+
+			// Now project the centroid and max point into screen space.
 			double proj_pt[3];
+			double proj_max[3];
+			int radius;
 			gluProject(centroid.x, centroid.y, centroid.z,
 					   mv, proj, viewport,
 					   &(proj_pt[0]), &(proj_pt[1]), &(proj_pt[2]));
+			gluProject(max_point.x, max_point.y, max_point.z,
+					   mv, proj, viewport,
+					   &(proj_max[0]), &(proj_max[1]), &(proj_max[2]));
 
+			// The centroid's project is the center of the virtual sphere.
 			cent.h = (unsigned short) proj_pt[0];
 			cent.v = (unsigned short) proj_pt[1];
 
+			// The distance between the two projected points is the radius.
+			proj_pt[0] = proj_pt[0] - proj_max[0];
+			proj_pt[1] = proj_pt[1] - proj_max[1];
+			radius = (int) sqrt(proj_pt[0] * proj_pt[0] +
+								proj_pt[1] * proj_pt[1]);
+
+			// Now we assemble the rotation matrix and rotate all the selected
+			// atoms.
 			Matrix4D rot_matrix;
 			Matrix4D rot;
 			glGetFloatv(GL_MODELVIEW_MATRIX, (float *) rot);
 
-			VirtualSphereQD3D(prev, curr, cent, 40, rot_matrix, rot);
+			VirtualSphereQD3D(prev, curr, cent, radius, rot_matrix, rot);
 
 			CPoint3D new_pt;
 			for (atom = atoms.begin(); atom != atoms.end(); atom++) {
