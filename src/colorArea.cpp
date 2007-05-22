@@ -149,21 +149,26 @@ void colorPatternArea::OnMouse(wxMouseEvent &event)
       }
   }
 
-  if ( mID >= ID_BITMAP_SLT && (event.Entering() || mID == dynamic_cast<patternSelectDlg*>(mParent->GetParent())->getSltId()) )
+  if (mID >= ID_BITMAP_SLT && mID < ID_BITMAP_SLT + numPatterns)  //exclude color areas in the left panel
     {
-      //"distance" of two colors
-      if ( pow((float)(mCurrentColor.Red()-defaultColor.Red()),2.0f) + pow((float)(mCurrentColor.Green()-defaultColor.Green()),2.0f) + pow((float)(mCurrentColor.Blue()-defaultColor.Blue()),2.0f) < 500)
-	SetBackgroundColour(wxColour(68,68,68));
-      else
-	SetBackgroundColour(defaultColor);
-    }
 
-  if ( event.Leaving() && mID >= ID_BITMAP_SLT && mPatID != dynamic_cast<patternSelectDlg*>(mParent->GetParent())->getSltPatId() )
-    SetBackgroundColour(mCurrentColor);
+      if ( mID >= ID_BITMAP_SLT && (event.Entering() || mID == dynamic_cast<patternSelectDlg*>(mParent->GetParent())->getSltId()) )
+	{
+	  //"distance" of two colors
+	  if ( pow((float)(mCurrentColor.Red()-defaultColor.Red()),2.0f) + pow((float)(mCurrentColor.Green()-defaultColor.Green()),2.0f) + pow((float)(mCurrentColor.Blue()-defaultColor.Blue()),2.0f) < 500)
+	    SetBackgroundColour(wxColour(68,68,68));
+	  else
+	    SetBackgroundColour(defaultColor);
+	}
 
-  if (event.LeftDown() && mID >= ID_BITMAP_SLT)
-    {
-      dynamic_cast<patternSelectDlg*>(mParent->GetParent())->setSltId(mID);
+      if ( event.Leaving() && mID >= ID_BITMAP_SLT && mPatID != dynamic_cast<patternSelectDlg*>(mParent->GetParent())->getSltPatId() )
+	SetBackgroundColour(mCurrentColor);
+
+      if (event.LeftDown() && mID >= ID_BITMAP_SLT)
+	{
+	  dynamic_cast<patternSelectDlg*>(mParent->GetParent())->setSltId(mID);
+	  //std::cout<<"!!!\n";
+	}
     }
 }
 
@@ -213,7 +218,9 @@ void patternSelectDlg::Create(colorPatternArea * parent, wxWindowID id, const wx
 
   oldPat = new colorPatternArea(this, ID_OLD_PAT, &tmpColor, 1, 64, 64);
   newPat = new colorPatternArea(this, ID_NEW_PAT, &tmpColor, 1, 64, 64);
+  upperLeftSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Old Pattern:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   upperLeftSizer->Add(oldPat, 0, wxALIGN_CENTRE | wxALL, 10);
+  upperLeftSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("New Pattern:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   upperLeftSizer->Add(newPat, 0, wxALIGN_CENTRE | wxALL, 10);
 
   upperRightSizer->Add(sltArea, 0, wxALIGN_CENTRE | wxALL, 10);
