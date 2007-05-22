@@ -140,7 +140,7 @@ void colorPatternArea::setPattern(int patID)
 
 void colorPatternArea::OnMouse(wxMouseEvent &event)
 {
-  if (event.LeftDClick()) {
+  if (mID < numPatterns && event.LeftDClick()) {
     patternSelectDlg selector(this);
 
     if (selector.ShowModal() == wxOK)
@@ -273,4 +273,6 @@ void patternSelectDlg::setSltId(int id)
 
   for (int i = 0; i < numPatterns; i++)
     patSlt[i]->reset();
+
+  newPat->setPattern(mSltPatId);
 }
