@@ -167,7 +167,6 @@ void colorPatternArea::OnMouse(wxMouseEvent &event)
       if (event.LeftDown() && mID >= ID_BITMAP_SLT)
 	{
 	  dynamic_cast<patternSelectDlg*>(mParent->GetParent())->setSltId(mID);
-	  //std::cout<<"!!!\n";
 	}
     }
 }
@@ -216,8 +215,8 @@ void patternSelectDlg::Create(colorPatternArea * parent, wxWindowID id, const wx
   sltArea->SetSizer(innerSizer);
   sltArea->SetScrollRate(10,10);
 
-  oldPat = new colorPatternArea(this, ID_OLD_PAT, &tmpColor, 1, 64, 64);
-  newPat = new colorPatternArea(this, ID_NEW_PAT, &tmpColor, 1, 64, 64);
+  oldPat = new colorPatternArea(this, ID_OLD_PAT, &tmpColor, mSltPatId, 64, 64);
+  newPat = new colorPatternArea(this, ID_NEW_PAT, &tmpColor, mSltPatId, 64, 64);
   upperLeftSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Old Pattern:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   upperLeftSizer->Add(oldPat, 0, wxALIGN_CENTRE | wxALL, 10);
   upperLeftSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("New Pattern:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -230,8 +229,9 @@ void patternSelectDlg::Create(colorPatternArea * parent, wxWindowID id, const wx
   mButtOK = new wxButton(this, wxID_OK, wxT("OK") );
   mButtCancel = new wxButton(this, wxID_CANCEL, wxT("Cancel"));
 
-  lowerSizer->Add(10,10);
+  lowerSizer->Add(150,10);
   lowerSizer->Add(mButtOK, 0, wxALIGN_CENTRE | wxALL, 10);
+  lowerSizer->Add(50,10);
   lowerSizer->Add(mButtCancel, 0, wxALIGN_CENTRE | wxALL, 10);
 
   mainSizer->Add(upperSizer);
