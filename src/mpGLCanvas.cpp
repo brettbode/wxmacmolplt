@@ -946,23 +946,35 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			// If editing, we  
 			if (interactiveMode) {
 
-				// If the user clicked on nothing, we try to add an atom given
-				// the selected element on the periodic table palette.
-				if (selected < 0 && periodic_dlg && MolWin->HandSelected() &&
+				if (periodic_dlg && MolWin->HandSelected() &&
 					periodic_dlg->GetSelectedID() != 0) {
 
-					GLdouble newX, newY, newZ;
 
-					findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
-					//estimate an atomDepth value, X and Y values are of no use 
-					CPoint3D newPnt;
-					findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y,
-										atomDepth, newX, newY, newZ);
-					newPnt.x = newX;
-					newPnt.y = newY;
-					newPnt.z = newZ;
+					if (selected_site >= 0) {
+						// std::cout << "selected: " << selected << std::endl; 
+						// std::cout << "selected_site: " << selected_site << std::endl; 
 
-					mMainData->NewAtom(periodic_dlg->GetSelectedID(), newPnt);
+						CPoint3D newPnt;
+						newPnt.x = newPnt.y = newPnt.z = 0.0f;
+						mMainData->NewAtom(periodic_dlg->GetSelectedID(), newPnt);
+					}
+
+					// If the user clicked on nothing, we try to add an atom given
+					// the selected element on the periodic table palette.
+					else if (selected < 0) {
+
+						CPoint3D newPnt;
+						GLdouble newX, newY, newZ;
+
+						findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
+						//estimate an atomDepth value, X and Y values are of no use 
+						findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y,
+											atomDepth, newX, newY, newZ);
+						newPnt.x = newX;
+						newPnt.y = newY;
+						newPnt.z = newZ;
+						mMainData->NewAtom(periodic_dlg->GetSelectedID(), newPnt);
+					}
   
 					oldSelect = -1;
 				}
