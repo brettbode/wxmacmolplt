@@ -3091,8 +3091,10 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 			p = q;      /* Remember previous mouse point for next iteration. */
 		}
 	}
-	if (event.LeftIsDown()) {
-			//This will draw with the angles and circle displayed
+
+	// We want to draw a circle showing the virtual sphere, but only if
+	// the scene is being rotated.
+	if (event.LeftIsDown() && (!interactiveMode || ArrowSelected())) {
 		RotateMoleculeGL(Prefs->GetShowAngles());
 		glCanvas->SwapBuffers();
 	} else {
