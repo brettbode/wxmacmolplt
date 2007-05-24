@@ -664,6 +664,7 @@ void MolDisplayWin::DrawMoleculeGL(void)
 	aglSwapBuffers(OpenGLData->aglContext);	// finally swap buffers to display our work
 }
 #endif
+
 void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 {
 #ifndef __wxBuild__
@@ -675,10 +676,11 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 	}
 	DrawGL();	//actual drawing
 
-	{	//Now add stuff specific to rotations
-//		glDisable(GL_DEPTH_TEST);	//These are not strictly neccessary, but probably increase speed
-//		glShadeModel(GL_FLAT);
-//		glDisable(GL_LIGHTING);
+	{
+		// Now add stuff specific to rotations
+		// glDisable(GL_DEPTH_TEST);	//These are not strictly neccessary, but probably increase speed
+		// glShadeModel(GL_FLAT);
+		// glDisable(GL_LIGHTING);
 
 		GLint matrixMode;
 		glGetIntegerv (GL_MATRIX_MODE, &matrixMode);
@@ -702,45 +704,45 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 		RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
 		long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
 
-	//choose black or white based on the background color
+		//choose black or white based on the background color
 		if (backMagnitude > 70000)  //"light" background choose black
-		  glColor3f (0.0, 0.0, 0.0);
+			glColor3f (0.0, 0.0, 0.0);
 		else
-		  glColor3f (1.0, 1.0, 1.0);
+			glColor3f (1.0, 1.0, 1.0);
 
 		if (ShowAngles) {
-		  char AngleString[50];
-		  float psi, phi, theta;
-		  MatrixToEulerAngles(MainData->TotalRotation, &psi, &phi, &theta);
-		  sprintf((char *)AngleString, "%.2f, %.2f, %.2f, Scale:%.2f",
-			  psi, phi, theta, MainData->WindowSize);
+			char AngleString[50];
+			float psi, phi, theta;
+			MatrixToEulerAngles(MainData->TotalRotation, &psi, &phi, &theta);
+			sprintf((char *)AngleString, "%.2f, %.2f, %.2f, Scale:%.2f",
+					psi, phi, theta, MainData->WindowSize);
 
-		  int canvasWidth, canvasHeight;
-		  glCanvas->GetSize(&canvasWidth, &canvasHeight);
-		  float sclX = 20/(float)canvasWidth;
-		  float sclY = 20/(float)canvasHeight;
+			int canvasWidth, canvasHeight;
+			glCanvas->GetSize(&canvasWidth, &canvasHeight);
+			float sclX = 20/(float)canvasWidth;
+			float sclY = 20/(float)canvasHeight;
 
-		  glPushMatrix();
-		  glLoadIdentity();
-		  glTranslatef(-0.85, 0.95, 0);
-		  glScalef(sclX, sclY, 1);
-		  glfDrawSolidString(AngleString);
-		  glPopMatrix();
+			glPushMatrix();
+			glLoadIdentity();
+			glTranslatef(-0.85, 0.95, 0);
+			glScalef(sclX, sclY, 1);
+			glfDrawSolidString(AngleString);
+			glPopMatrix();
 
-		  glFlush();
-		  //glCanvas->SwapBuffers();
+			glFlush();
+			//glCanvas->SwapBuffers();
 		}
 #ifndef __wxBuild__
 				if (ShowAngles) {
 					glRasterPos3d (10, 12, 0); 
-						char AngleString[50];
-						float psi, phi, theta;
+					char AngleString[50];
+					float psi, phi, theta;
 					MatrixToEulerAngles(MainData->TotalRotation, &psi, &phi, &theta);
 					sprintf((char *)AngleString, "%.2f, %.2f, %.2f, Scale:%.2f",
-						psi, phi, theta, MainData->WindowSize);
+							psi, phi, theta, MainData->WindowSize);
 					DrawCStringGL (AngleString, OpenGLData->fontList);
-			//		glRasterPos3d (10, (DisplayRect.bottom - DisplayRect.top) - 3, 0); 
-			//		DrawCStringGL ((char*) glGetString (GL_RENDER), OpenGLData->fontList);
+					// glRasterPos3d (10, (DisplayRect.bottom - DisplayRect.top) - 3, 0); 
+					// DrawCStringGL ((char*) glGetString (GL_RENDER), OpenGLData->fontList);
 				}
 #endif
 				//Draw the trackball outline
@@ -781,20 +783,20 @@ void MolDisplayWin::DrawGL(void)
 	GLenum error = glGetError();	//clear the error code
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear out the buffer
 
-		// Setup the rotation matrix
+	// Setup the rotation matrix
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
 	glTranslatef(0.0, 0.0, -(MainData->WindowSize));
 
-	if (Prefs->ShowAtomicSymbolLabels() || Prefs->ShowAtomNumberLabels() )
-	  DrawLabel();
+	if (Prefs->ShowAtomicSymbolLabels() || Prefs->ShowAtomNumberLabels()) {
+		DrawLabel();
+	}
 
-	if (interactiveMode)
-	  {
+	if (interactiveMode) {
 	    const char modeString[] = "editing";
 
 	    DrawStaticLabel(modeString, 0.75, 0.95);
-	  }
+	}
 
 	glMultMatrixf((const GLfloat *) &(MainData->TotalRotation));
 
@@ -803,14 +805,13 @@ void MolDisplayWin::DrawGL(void)
 	if (MainData->ShowAxis()) AddAxisGL();
 	
 	//Draw the main molecular geometry
-
 	if (MainData->cFrame->NumAtoms > 0) {
 		if (OpenGLData->MainListActive) {
 			glCallList(OpenGLData->MainDisplayList);
-		} else {	//build the main display list
-         // Suppress this temporarily because double- and triple-bond display
-         // requires a transformation depending on the current viewing 
-         // transformation.
+		} else { // build the main display list
+			// Suppress this temporarily because double- and triple-bond display
+			// requires a transformation depending on the current viewing 
+			// transformation.
 			// OpenGLData->MainDisplayList = glGenLists(1); 
 			// glNewList(OpenGLData->MainDisplayList, GL_COMPILE_AND_EXECUTE); 
 			DrawMoleculeCoreGL();
@@ -818,34 +819,37 @@ void MolDisplayWin::DrawGL(void)
 			// OpenGLData->MainListActive = true; 
 		}
 	}
+
 	if (MainData->GetAnnotationCount() > 0) {
-		RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
+		RGBColor *BackgroundColor = Prefs->GetBackgroundColorLoc();
 		long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
 		float anno_color[3];
 		
-		//choose black or white based on the background color
+		// choose black or white based on the background color
 		if (backMagnitude > 70000) {  //"light" background choose black
 			anno_color[0] = anno_color[1] = anno_color[2] = 0.0f;
 		} else {
 			anno_color[0] = anno_color[1] = anno_color[2] = 1.0f;
 		}
 		
+		glLoadName(MMP_ANNOTATION);
+		glPushName(0);
 		std::vector<Annotation *>::const_iterator anno;
 		int anno_id = 0;
 		for (anno = MainData->Annotations.begin();
 			 anno != MainData->Annotations.end(); anno++) {
-			glLoadName(anno_id + MainData->cFrame->GetNumAtoms() +
-						MainData->cFrame->GetNumBonds() + 1);
+			glLoadName(anno_id + 1);
 			glColor3fv(anno_color);
 			(*anno)->draw(this);
 			anno_id++;
 		}
+		glPopName();
 	}
 	
-		//Add any surfaces
+	// Add any surfaces
 	Surface * lSurface = MainData->cFrame->SurfaceList;
 	error = glGetError();
-		//draw all the normal opaque surfaces
+	//draw all the normal opaque surfaces
 	//Ok the following works fine on all my systems, but for some reason it fails to work
 	//on for a few other folks. I sort of think this is really an OpenGL bug, but the difference
 	//in performance is probably not enough to worry about...
@@ -1091,7 +1095,7 @@ void AnnotationAngle::draw(const MolDisplayWin * win) const {
 	CPoint3D atom1_pos, atom2_pos, atom3_pos;
 
 	glDisable(GL_LIGHTING);
-//	glColor3f(0.0f, 0.0f, 0.0f);
+	// glColor3f(0.0f, 0.0f, 0.0f);
 
 	cFrame->GetAtomPosition(atoms[0], atom1_pos);
 	cFrame->GetAtomPosition(atoms[1], atom2_pos);
@@ -1379,6 +1383,8 @@ void MolDisplayWin::DrawLabel() {
 	CPoint3D origPt, transPt;
 	long CurrentAtom;
 	if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) {
+		glLoadName(MMP_ATOM);
+		glPushName(0);
 		for (long iatom=0; iatom<NumAtoms; iatom++) {
 			if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
 
@@ -1424,6 +1430,7 @@ void MolDisplayWin::DrawLabel() {
 			glfDrawSolidString((const char*)atomLabel.mb_str(wxConvUTF8));
 			glPopMatrix();
 		}
+		glPopName();
 	}
 	glfStringCentering(false);
 }
@@ -1481,13 +1488,13 @@ void MolDisplayWin::DrawTransparentTriangles(void) {
 	glEnd();	//End of triangle creation
 }
 
-void MolDisplayWin::DrawMoleculeCoreGL(void)
-{
+void MolDisplayWin::DrawMoleculeCoreGL(void) {
+
 	GLUquadricObj * qobj;
 	qobj = gluNewQuadric();
 	if (!qobj) throw std::bad_alloc();
 
-	//	gluQuadricDrawStyle(qobj, GLU_FILL); //or GLU_LINE
+	// gluQuadricDrawStyle(qobj, GLU_FILL); //or GLU_LINE
 	gluQuadricOrientation(qobj, GLU_OUTSIDE);
 	gluQuadricNormals(qobj, GLU_SMOOTH); //GLU_FLAT GLU_NONE
 
@@ -1514,6 +1521,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 	if (!Prefs->DrawWireFrame()) {
 	//	if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) {
+		glLoadName(MMP_ATOM);
+		glPushName(0);
 		for (long iatom=0; iatom<NumAtoms; iatom++) {
 
 			if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
@@ -1542,39 +1551,132 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			//	glColor3f(red, green, blue);
 			Prefs->ChangeColorAtomColor(curAtomType+1);
 			
-			if ( mHighliteState && !lAtoms[iatom].GetSelectState())
-			  {
-			    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
-			    glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-			    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
-			    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
-			  }
-			else
-			  {
-			    glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
-			    glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
-			    glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
-			    glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
-			  }
+			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
+				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+			} else {
+				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
+			}
 
 			glLoadName(iatom+1);
 			
 			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere
 
-			if ( mHighliteState && !lAtoms[iatom].GetSelectState())
-			  {
-			    glColor3f(0.0f,0.0f,0.0f);
-			    glEnable(GL_POLYGON_STIPPLE);
-			    glPolygonStipple(stippleMask);
-			    gluSphere(qobj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
-			    glDisable(GL_POLYGON_STIPPLE);
+#if 0
+#define CYL_RADIUS 0.1f
+			glPushName(0);
+			wxString ox_num;
+			ox_num.Printf("%d", Prefs->GetOxidationNumber(curAtomType));
+			glColor3f(0.0f, 0.0f, 0.0f);
+			// DrawSceneString(0.1f, radius + 0.01f, 0.0f, 0.0f, ox_num); 
+			CPoint3D origin = CPoint3D(0.0f, 0.0f, 0.0f);
+			float c, s, b, d;
 
-			    glColor4f(0.5,0.5,0.5,0.7f);
-			    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-			    glEnable(GL_BLEND);
-			    gluSphere(qobj, radius*1.02, (long)(1.5*Quality), (long)(Quality));
-			    glDisable(GL_BLEND);
-			  }
+			switch (Prefs->GetOxidationNumber(curAtomType)) {
+				case 1:
+					glLoadName(1);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(0.0f, -radius * 2.0f, 0.0f), CYL_RADIUS);
+					break;
+				case 2:
+					glLoadName(1);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(-radius * 2.0f, 0.0f, 0.0f), CYL_RADIUS);
+					glLoadName(2);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(radius * 2.0f, 0.0f, 0.0f), CYL_RADIUS);
+					break;
+				case 3:
+					b = sqrt(3.0f / 4.0f);
+					glLoadName(1);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(0.0f, 2.0f * radius, 0.0f), CYL_RADIUS);
+					glLoadName(2);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(2.0f * radius * -b, 2.0f * -0.5f * radius, 0.0f), CYL_RADIUS);
+					glLoadName(3);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(2.0f * radius * b, 2.0f * -0.5f * radius, 0.0f), CYL_RADIUS);
+					break;
+				case 4:
+					c = cos(109.5f / 180.0f * kPi);
+					s = sin(109.5f / 180.0f * kPi);
+					b = c / s - c * c / s;
+					d = sqrt(s * s - b * b);
+					glLoadName(1);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(0.0f, 2.0f * radius, 0.0f), CYL_RADIUS);
+					glLoadName(2);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(0.0f, 2.0f * radius * c, -2.0f * radius * s), CYL_RADIUS);
+					glLoadName(3);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(2.0f * radius * d, 2 * radius * c, -2.0f * radius * b), CYL_RADIUS);
+					glLoadName(4);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(-2.0f * radius * d, 2 * radius * c, -2.0f * radius * b), CYL_RADIUS);
+					break;
+				case 5:
+					b = sqrt(3.0f / 4.0f);
+					glLoadName(1);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(0.0f, 0.0f, 2.0f * radius), CYL_RADIUS);
+					glLoadName(2);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(2.0f * radius * -b, 0.0f, 2.0f * -0.5f * radius), CYL_RADIUS);
+					glLoadName(3);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(2.0f * radius * b, 0.0f, 2.0f * -0.5f * radius), CYL_RADIUS);
+					glLoadName(4);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(0.0f, 2.0f * radius, 0.0f), CYL_RADIUS);
+					glLoadName(5);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(0.0f, -2.0f * radius, 0.0f), CYL_RADIUS);
+					break;
+				case 6:
+					b = cos(kPi / 4.0f);
+					glLoadName(1);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(2.0f * radius * b, 0.0f, 2.0f * radius * b), CYL_RADIUS);
+					glLoadName(2);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(-2.0f * radius * b, 0.0f, 2.0f * radius * b), CYL_RADIUS);
+					glLoadName(3);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(-2.0f * radius * b, 0.0f, -2.0f * radius * b), CYL_RADIUS);
+					glLoadName(4);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(2.0f * radius * b, 0.0f, -2.0f * radius * b), CYL_RADIUS);
+					glLoadName(5);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(0.0f, 2.0f * radius, 0.0f), CYL_RADIUS);
+					glLoadName(6);
+					CreateCylinderFromLine(qobj, origin,
+						CPoint3D(0.0f, -2.0f * radius, 0.0f), CYL_RADIUS);
+					break;
+			}
+			glPopName();
+#endif
+
+			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
+				glColor3f(0.0f,0.0f,0.0f);
+				glEnable(GL_POLYGON_STIPPLE);
+				glPolygonStipple(stippleMask);
+				gluSphere(qobj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
+				glDisable(GL_POLYGON_STIPPLE);
+
+				glColor4f(0.5,0.5,0.5,0.7f);
+				glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+				glEnable(GL_BLEND);
+				gluSphere(qobj, radius*1.02, (long)(1.5*Quality), (long)(Quality));
+				glDisable(GL_BLEND);
+			}
 
 			if (Prefs->Show2DPattern()) {
 				short patternindex = Prefs->GetAtomPattern(lAtoms[iatom].GetType()-1);
@@ -1590,6 +1692,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 
 			glPopMatrix();
 		}
+		glPopName();
 	}
 
 	GLdouble modelview[16];
@@ -1604,22 +1707,24 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 	// atom radius to the bond size and get a nice rounded end cap. If bonds
 	// are not colored by atom color then the sphere is skipped and a simple
 	// disk closes off the cylinder
+	glLoadName(MMP_BOND);
+	glPushName(0);
 	for (long ibond=0; ibond<NumBonds; ibond++) {
-			CPoint3D	v1, v2,  offset, NormalOffset, NormEnd, NormStart = CPoint3D(0,0,1);
-			Matrix4D	rotMat;
+		CPoint3D v1, v2, offset, NormalOffset, NormEnd, NormStart = CPoint3D(0,0,1);
+		Matrix4D rotMat;
 		long atom1 = lBonds[ibond].Atom1;
 		long atom2 = lBonds[ibond].Atom2;
-		glLoadName(ibond+NumAtoms+1);	//bond names start after the last atom
+		glLoadName(ibond + 1);	//bond names start after the last atom
 		if ( mHighliteState && !lBonds[ibond].GetSelectState()) {
-			glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
-			glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-			glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
-			glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
 		} else {
-			glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
-			glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
-			glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
-			glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
 		}
 		
 		BondOrder tmpOrder = lBonds[ibond].Order;
@@ -1853,6 +1958,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void)
 			glPopMatrix();
 		}
 	}
+	glPopName();
 
 	if ( mHighliteState )
 	  glEnable(GL_POLYGON_STIPPLE);

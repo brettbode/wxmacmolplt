@@ -89,6 +89,8 @@ class MpGLCanvas : public wxGLCanvas {
 		
 		int mSelectState;
 		int selected;
+		int selected_type;
+		int selected_site;
 		int oldSelect;
 		bool interactiveMode;
 		GLdouble atomDepth;
@@ -243,8 +245,8 @@ class MpGLCanvas : public wxGLCanvas {
 		void DeleteBond(wxCommandEvent& event);
 		//implementation of the correspondent popup-menu selection
 			
-		int testPicking(int x, int y);
-		void SelectObj(int select_id, bool mode);
+		void testPicking(int x, int y);
+		void SelectObj(int selected_type, int select_id, bool mode);
 		void toggleInteractiveMode();
 		void togglePeriodicDialog();
 		void findReal3DCoord(GLdouble x, GLdouble y, GLdouble z, GLdouble& realX, GLdouble& realY, GLdouble& realZ);

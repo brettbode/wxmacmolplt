@@ -838,13 +838,18 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	// First handle left mouse down.
 	if (event.LeftDown() || (event.LeftIsDown() && stale_click)) {
 		mSelectState = 0;
-		selected = testPicking(tmpPnt.x, tmpPnt.y);
+		testPicking(tmpPnt.x, tmpPnt.y);
 
 		if (interactiveMode) {
-			if (MolWin->LassoSelected()) {
+			// If the mouse left the window while the user was already
+			// lassoing, stale_click will be true and this code will get
+			// executed, and the lassoing already in progress will be lost.
+			// So, we force that a new lasso is started only when the mouse
+			// button has just gone down.
+			if (MolWin->LassoSelected() && event.LeftDown()) {
 				MolWin->LassoStart(tmpPnt.x, height - tmpPnt.y);
 				select_stack_top = 5;
-			} else if (selected >= 0 && selected < NumAtoms) {
+			} else if (selected_type == MMP_ATOM) {
 				GLdouble tmpWinX, tmpWinY;
 
 				findWinCoord(lAtoms[selected].Position.x,
@@ -860,15 +865,15 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	
 	// If not left, try right click in edit mode.
 	else if (event.RightDown()) {
-		selected = testPicking(tmpPnt.x, tmpPnt.y);
+		testPicking(tmpPnt.x, tmpPnt.y);
 
-		if (selected < 0) {
+		// if (selected < 0) { 
 			// We don't really do anything here, since the user didn't 
 			// click on anything.  But by including this null block, we
 			// don't need to test for this anymore.
-		}
+		// } 
 
-		else if (selected < NumAtoms) {
+		if (selected_type == MMP_ATOM) {
 			if (interactiveMode) {
 				interactPopupMenu(tmpPnt.x, tmpPnt.y, 1);
 				MolWin->SelectionChanged(deSelectAll);
@@ -878,7 +883,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			}
 		}
 
-		else if (selected < NumAtoms + lFrame->NumBonds) {
+		else if (selected_type == MMP_BOND) {
 			if (interactiveMode) {
 				interactPopupMenu(tmpPnt.x, tmpPnt.y, 0);
 				MolWin->SelectionChanged(deSelectAll);
@@ -888,14 +893,13 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			}
 		}
 
-		else if (selected < NumAtoms + lFrame->NumBonds +
-				 mMainData->GetAnnotationCount()) {
+		else if (selected_type == MMP_ANNOTATION) {
 			annoPopupMenu(tmpPnt.x, tmpPnt.y);
 		}
 	}
 
 	else if (event.MiddleDown()) {
-		selected = testPicking(tmpPnt.x, tmpPnt.y);
+		testPicking(tmpPnt.x, tmpPnt.y);
 	}
 
 	else if (event.Leaving() && event.LeftIsDown() && MolWin->LassoSelected()) {
@@ -913,8 +917,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		}
 
 		// User must be wanting to translate or rotate atoms.
-		else if (MolWin->HandSelected() && selected >= 0 &&
-				 selected < NumAtoms + lFrame->NumBonds) {
+		else if (MolWin->HandSelected() &&
+				 (selected_type == MMP_BOND || selected_type == MMP_ATOM)) {
 			HandleEditing(event, tmpPnt, oldTmpPnt);
 			edited_atoms = true;
 		}
@@ -930,7 +934,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		if (MolWin->LassoSelected()) {
 			MolWin->LassoEnd(tmpPnt.x, height - tmpPnt.y);
 			if (!MolWin->LassoHasArea()) {
-				SelectObj(selected, deSelectAll);
+				SelectObj(selected_type, selected, deSelectAll);
 			}
 			edited_atoms = true;
 		}
@@ -985,7 +989,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 				// } 
 			}
 
-			SelectObj(selected, deSelectAll);
+			SelectObj(selected_type, selected, deSelectAll);
 			MolWin->SelectionChanged(deSelectAll);
 			MolWin->UpdateGLModel();
 			edited_atoms = true;
@@ -1000,6 +1004,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	}
 
 	else if (event.ButtonUp()) {
+		selected_type = MMP_NULL;
 		selected = -1;
 	}
 	
@@ -1023,14 +1028,26 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
+	int width, height;
+
+	GetClientSize(&width, &height);
 
 	// If an atom is clicked on...
-	if (selected >= 0 && selected < NumAtoms) {
+	if (selected_type == MMP_ATOM) {
 
 		GLdouble newX, newY, newZ;
 
-		// If control is held down, we rotate the selection only around itself.
+		// If control is held down while a selected atom is clicked on, we
+		// rotate the selection only around itself.
 		if (event.ControlDown() || event.CmdDown()) {
+
+			// If the clicked on atom isn't selected, or if it's the only one
+			// selected, we return immediately since rotating around itself
+			// would be silly.
+			if (!lFrame->GetAtomSelection(selected) ||
+				lFrame->GetNumAtomsSelected() <= 1) {
+				return;
+			}
 
 			std::vector<mpAtom *> atoms;
 			std::vector<mpAtom *>::const_iterator atom;
@@ -1100,7 +1117,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 
 			// The centroid's project is the center of the virtual sphere.
 			cent.h = (unsigned short) proj_pt[0];
-			cent.v = (unsigned short) proj_pt[1];
+			cent.v = height - (unsigned short) proj_pt[1];
 
 			// The distance between the two projected points is the radius.
 			proj_pt[0] = proj_pt[0] - proj_max[0];
@@ -1180,7 +1197,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				lAtoms[selected].Position.y = newY;
 				lAtoms[selected].Position.z = newZ;
 
-				SelectObj(selected, true);
+				SelectObj(selected_type, selected, true);
 				MolWin->SelectionChanged(true);
 			}
 
@@ -1213,7 +1230,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	
 	// If the user's dragging after selecting a bond, we want to
 	// rotated the selected set of atoms around that bond.
-	else if (selected >= NumAtoms && selected < NumAtoms + lFrame->NumBonds) {
+	else if (selected_type == MMP_BOND) {
 		// if we're a bond
 		//   translate to one of bond atoms
 		//   rotate selected atoms around bond according to distance
@@ -1247,10 +1264,8 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 		// The axis of rotation is a vector from one atom of the
 		// bond to the other.
 
-		lFrame->GetAtomPosition(
-			lFrame->GetBondAtom(selected - NumAtoms, 1), pivot_pt);
-		lFrame->GetAtomPosition(
-			lFrame->GetBondAtom(selected - NumAtoms, 2), other_pt);
+		lFrame->GetAtomPosition(lFrame->GetBondAtom(selected, 1), pivot_pt);
+		lFrame->GetAtomPosition(lFrame->GetBondAtom(selected, 2), other_pt);
 		axis = other_pt	- pivot_pt;
 		Normalize3D(&axis);
 
@@ -1410,12 +1425,13 @@ void MpGLCanvas::findReal3DCoord(GLdouble x, GLdouble y, GLdouble z, GLdouble& r
 	gluUnProject (winX, winY, z, mvMatrix, projMatrix, viewport, &realX, &realY, &realZ);
 }
 
-int MpGLCanvas::testPicking(int x, int y) {
-	GLuint buff[128];
+#define SELECT_BUFFER_SIZE 128
+void MpGLCanvas::testPicking(int x, int y) {
+	GLuint buff[SELECT_BUFFER_SIZE];
 	GLint hits, view[4];
 	int id;
 
-	glSelectBuffer(128, buff);
+	glSelectBuffer(SELECT_BUFFER_SIZE, buff);
 	glGetIntegerv(GL_VIEWPORT, view);
 
 	glRenderMode(GL_SELECT);
@@ -1469,20 +1485,34 @@ int MpGLCanvas::testPicking(int x, int y) {
  
 	hits = glRenderMode(GL_RENDER);
 
-	int select_id = -1;
+	selected = -1;
+	selected_type = MMP_NULL;
+	selected_site = -1;
 	unsigned int min_depth = 0xFFFFFFFF;
 
-	for (int i = 0; i < hits; i++) {
-		if (buff[i*4+1] < min_depth) {
-			min_depth = buff[i*4+1];
-			select_id = buff[i*4+3];
+	// Each hit record has number of names, min depth, max depth, and a list of
+	// names on the stack for the hit.  For atoms, bonds, and annotations,
+	// there'll be a type identifier and then an item identifier.  For 
+	// bonding sites, they'll be the atom type id, the element id, and then
+	// the bond id.
+	int i, j;
+	for (i = 0, j = 0; i < hits; i++) {
+		if (buff[j + 1] < min_depth) {
+			min_depth = buff[j + 1];
+			selected_type = buff[j + 3];
+			if (buff[j] > 1) {
+				selected = buff[j + 4] - 1;
+				if (buff[j] > 2) {
+					selected_site = buff[j + 5] - 1;	
+				}
+			}
 		}
+		j += buff[j] + 3;
 	}
 
-	return (select_id-1);
 }
 
-void MpGLCanvas::SelectObj(int select_id, bool unselect_all) 
+void MpGLCanvas::SelectObj(int selected_type, int select_id, bool unselect_all) 
 {
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
@@ -1498,7 +1528,7 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 	if (select_id >= 0) {
 
 		// select_id indicates an atom
-		if (select_id < NumAtoms) {
+		if (selected_type == MMP_ATOM) {
 			bool atom_is_selected = true;
 
 			// If we're to keep other selected items and atom is already
@@ -1546,8 +1576,7 @@ void MpGLCanvas::SelectObj(int select_id, bool unselect_all)
 		}
 		
 		// If select_id indicates a bond
-		else if (select_id < (NumAtoms + lFrame->NumBonds)) {
-			select_id -= NumAtoms;
+		else if (selected_type == MMP_BOND) {
 			bool newstate = true;
 			if (!unselect_all && lBonds[select_id].GetSelectState())
 				newstate = false;
@@ -1680,10 +1709,10 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 	// the length of the bond and the order.
 	if (!isAtom) {
 		length_label.Printf(wxT("Bond length: %f"),
-			lFrame->GetBondLength(selected - NumAtoms));
+			lFrame->GetBondLength(selected));
 		item = menu.Append(wxID_ANY, length_label);
 		item->Enable(false);
-		bond_order = lFrame->Bonds[selected - NumAtoms].Order;
+		bond_order = lFrame->Bonds[selected].Order;
 		item = submenu->AppendRadioItem(GL_Popup_To_Hydrogen_Bond,
 			wxT("Hydrogen"));
 		if (bond_order == kHydrogenBond) {
@@ -1744,7 +1773,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 	std::vector<Annotation *>::const_iterator anno;
 	int anno_id = 0;
 
-	if ((selected >= 0) && (selected < lFrame->GetNumAtoms())) {
+	if (selected_type == MMP_ATOM) {
 		wxString aLabel, nItem;
 		Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType()-1, nItem);
 		aLabel.Printf(wxT(" (%d)"), (selected+1));
@@ -1777,7 +1806,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 
 		// If user clicked on an atom and some things are selected, let's
 		// separate the items added above and the annotation items.
-		if (selected >= 0 && selected < lFrame->GetNumAtoms() &&
+		if (selected_type == MMP_ATOM &&
 			select_stack_top >= 2 && select_stack_top <= 4) {
 			menu.AppendSeparator();
 		}
@@ -1914,13 +1943,12 @@ void MpGLCanvas::annoPopupMenu(int x, int y) {
 	Frame *lFrame = mMainData->cFrame;
 	wxMenu menu;
 	wxMenuItem *item;
-	int anno_id = selected - lFrame->NumAtoms - lFrame->NumBonds;
 
 	if (interactiveMode &&
-		mMainData->Annotations[anno_id]->getType() != MP_ANNOTATION_MARKER) {
+		mMainData->Annotations[selected]->getType() != MP_ANNOTATION_MARKER) {
 		item = menu.AppendCheckItem(GL_Popup_Lock_To_Annotation,
 				                    _("Constrain atoms"));
-		if (anno_id == mMainData->GetConstrainAnnotation()) {
+		if (selected == mMainData->GetConstrainAnnotation()) {
 			item->Check(true);
 		}
 	}
@@ -1932,11 +1960,9 @@ void MpGLCanvas::annoPopupMenu(int x, int y) {
 void MpGLCanvas::ConstrainToAnnotation(wxCommandEvent& event) {
 
 	Frame *lFrame = mMainData->cFrame;
-	int anno_id = selected - lFrame->NumAtoms - lFrame->NumBonds;
 
-	if (mMainData->GetConstrainAnnotation() != anno_id) {
-		mMainData->ConstrainToAnnotation(selected - lFrame->NumAtoms -
-			lFrame->NumBonds);
+	if (mMainData->GetConstrainAnnotation() != selected) {
+		mMainData->ConstrainToAnnotation(selected);
 	} else {
 		mMainData->RemoveAnnotationConstraint();
 	}
@@ -1946,14 +1972,9 @@ void MpGLCanvas::ConstrainToAnnotation(wxCommandEvent& event) {
 void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
 
 	Frame *lFrame = mMainData->cFrame;
-	int selected_anno = selected - lFrame->NumAtoms - lFrame->NumBonds;
 
-	if (selected_anno < 0 || selected_anno >= mMainData->Annotations.size()) {
-		return;
-	}
-
-	Annotation * t = mMainData->Annotations[selected_anno];
-	mMainData->Annotations.erase(mMainData->Annotations.begin() + selected_anno);
+	Annotation * t = mMainData->Annotations[selected];
+	mMainData->Annotations.erase(mMainData->Annotations.begin() + selected);
 	delete t;
 
 	int constrain_anno_id = mMainData->GetConstrainAnnotation();
@@ -1961,13 +1982,13 @@ void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
 		/* If we're deleting an annotation that appears earlier in the
 		 * annotation list, we need to shift the id of the constrained
 		 * annotation. */
-		if (constrain_anno_id > selected_anno) {
+		if (constrain_anno_id > selected) {
 			mMainData->ConstrainToAnnotation(constrain_anno_id - 1);
 		}
 		
 		/* Or, we may be deleting the constrained annotation itself, in which
 		 * case, we have no more constraints. */
-		else if (constrain_anno_id == selected_anno) {
+		else if (constrain_anno_id == selected) {
 			mMainData->RemoveAnnotationConstraint();
 		}
 	}
@@ -1977,7 +1998,7 @@ void MpGLCanvas::bondPopupMenu(int x, int y) {
 
 	// This function shows a popup menu that shows some information and
 	// operations for the clicked-on bond.  It's assumed that selected is
-	// a valid index in the bonds lists, plus NumAtoms.
+	// a valid index in the bonds lists.
 
 	wxMenu menu;
 	wxMenuItem *item;
@@ -1989,10 +2010,10 @@ void MpGLCanvas::bondPopupMenu(int x, int y) {
 	wxString length_label;
 
 	length_label.Printf(wxT("Bond length: %f"),
-					lFrame->GetBondLength(selected - NumAtoms));
+					lFrame->GetBondLength(selected));
 	item = menu.Append(wxID_ANY, length_label);
 	item->Enable(false);
-	bond_order = lFrame->Bonds[selected - NumAtoms].Order;
+	bond_order = lFrame->Bonds[selected].Order;
 	item = submenu->AppendRadioItem(GL_Popup_To_Hydrogen_Bond,
 								wxT("Hydrogen"));
 	if (bond_order == kHydrogenBond) {
@@ -2029,8 +2050,8 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 	Frame *lFrame = mMainData->cFrame;
 	BondOrder order = (BondOrder) ((event.GetId() - GL_Popup_To_Hydrogen_Bond) + kHydrogenBond);
 	
-	if (selected >= lFrame->GetNumAtoms()) {	//existing bond, change order
-		bond = &(lFrame->Bonds[selected - lFrame->GetNumAtoms()]);
+	if (selected_type == MMP_BOND) {	//existing bond, change order
+		bond = &(lFrame->Bonds[selected]);
 		bond->Order = order;
 		MolWin->BondsChanged();
 		lFrame->resetAllSelectState();
@@ -2059,8 +2080,8 @@ void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
 	
 	Frame *lFrame = mMainData->cFrame;
 	
-	if (selected >= lFrame->GetNumAtoms()) {
-		lFrame->DeleteBond(selected - lFrame->GetNumAtoms());
+	if (selected_type == MMP_BOND) {
+		lFrame->DeleteBond(selected);
 		MolWin->BondsChanged();
 	}
 }
@@ -2105,12 +2126,9 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 	Frame *  lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 
-	if (selected < 0 || selected >= NumAtoms)
-		return;
-
 	Frame * cFrame = mMainData->Frames;
 
-	for ( int i = 0; i < mMainData->NumFrames; i++) {
+	for (int i = 0; i < mMainData->NumFrames; i++) {
 		if (mMainData->CurrentFrame-1 != i) {
 			if (selected >= cFrame->NumAtoms)
 				cFrame->AddAtom(lFrame->Atoms[selected].Type, lFrame->Atoms[selected].Position);
@@ -2126,29 +2144,27 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 	Frame * lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 
-	if (selected >= 0 && selected < NumAtoms)
+	if (selected_type == MMP_ATOM) {
 		mMainData->DeleteAtom(selected);
-
-	if (selected >= NumAtoms)
+	} else if (selected_type == MMP_BOND) {
 		lFrame->DeleteBond(selected - NumAtoms);
+	}
 
 }
 
 void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
+
 	Frame * lFrame = mMainData->Frames;
 	long NumAtoms = mMainData->cFrame->NumAtoms;
-	if (selected >= 0 && selected < NumAtoms)
+
+	if (selected_type == MMP_ATOM)
 		mMainData->DeleteAtom(selected, true);
 
-	else if (selected < (NumAtoms+lFrame->GetNumBonds())) {
+	else if (selected_type == MMP_BOND) {
 		while (lFrame) {
-			long NumAtoms = lFrame->NumAtoms;
-
-
-			if (selected >= NumAtoms)
-				lFrame->DeleteBond(selected - NumAtoms);
-
-				lFrame = lFrame->NextFrame;
+			if (selected < lFrame->NumBonds)
+				lFrame->DeleteBond(selected);
+			lFrame = lFrame->NextFrame;
 		}
 	}
 }
