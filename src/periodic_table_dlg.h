@@ -61,6 +61,7 @@ class PeriodicTableDlg: public wxMiniFrame {
 		void New(wxCommandEvent& WXUNUSED(event));
 		int GetSelectedID(void);
 		MpGLCanvas *GetParent() {return parent;};
+		static void NumberToTableCoords(int atomic_number, int *row, int *col);
 
 	private:
 		wxButton *button;
@@ -68,7 +69,6 @@ class PeriodicTableDlg: public wxMiniFrame {
 		int nelements;
 		int prev_id;
 		MpGLCanvas *parent;
-		void NumberToTableCoords(int atomic_number, int *row, int *col);
 		void ElementSelected(wxCommandEvent& event);
 		void MouseMoved(wxMouseEvent& event);
 		void OnClose(wxCloseEvent& event);

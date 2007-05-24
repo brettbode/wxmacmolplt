@@ -130,8 +130,9 @@ bool PeriodicTableDlg::Create(
 
 		// Display a quick note when user hovers over button.
 		wxString tool_tip;
-		tool_tip.Printf(wxT("Number: %d, Mass: %f"), i + 1,
-			parent->GetPrefs()->GetAtomMass(i));
+		tool_tip.Printf(wxT("Number: %d, Mass: %f, Oxidation #: %d"), i + 1,
+			parent->GetPrefs()->GetAtomMass(i),
+			parent->GetPrefs()->GetOxidationNumber(i));
 		elements[i].button->SetToolTip(tool_tip);
 
 	}
@@ -213,8 +214,8 @@ void PeriodicTableDlg::OnClose(wxCloseEvent& event) {
 
 /* ------------------------------------------------------------------------- */
 
-void PeriodicTableDlg::NumberToTableCoords(int atomic_number, int *row,
-														 int *col) {
+void PeriodicTableDlg::NumberToTableCoords(int atomic_number,
+										   int *row, int *col) {
 
 	/* This function calculates the row and column position within the periodic
 	 * table of the element indicated by atomic_number.  This information
