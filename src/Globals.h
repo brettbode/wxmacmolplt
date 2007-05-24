@@ -223,4 +223,11 @@ void MessageAlert (const char * message);
 #define kCosErrorTolerance	1.0001			//Dihedral tolerance for converting
 #define kZeroTolerance		1.0e-7			//to/from internal coords
 
+typedef enum {
+	MMP_NULL,
+	MMP_ATOM,
+	MMP_BOND,
+	MMP_ANNOTATION
+} MMP_object_t;
+
 #endif
