@@ -155,7 +155,7 @@ public:
 	void adjustIds(const int atom_id) {
 		if (atom > atom_id) atom--;
 	}
-	bool isEquivalent(int natoms, int *new_list) const {
+	bool isEquivalent(const int natoms, const int *new_list) const {
 		return natoms == 1 && new_list[0] == atom;
 	}
 	void WriteXML(XMLElement * parent) const;
@@ -277,9 +277,9 @@ class mpAtom {
 		inline bool IsSIMOMMAtom(void) const {return ((flags & (1<<3))?true:false);};
 		inline void IsSymmetryUnique(bool state) {flags = (flags & 0xEF) + (state ? (1<<4) : 0);};
 		inline bool IsSymmetryUnique(void) const {return ((flags & (1<<4))?true:false);};
-	// the idea for this one was to have a text label to store pdb style biomolecule, label gives res, res #,
-	// atom type (alpha, beta...), but its not currently implemented
-	//	inline bool HasBiolabel(void) const {return ((Type & (1<<9)) != 0);};
+		// the idea for this one was to have a text label to store pdb style biomolecule, label gives res, res #,
+		// atom type (alpha, beta...), but its not currently implemented
+		//	inline bool HasBiolabel(void) const {return ((Type & (1<<9)) != 0);};
 		inline void SetFragmentNumber(long fragNum) {if (fragNum>=0) fragmentId = fragNum;};
 		inline long GetFragmentNumber(void) const {return fragmentId;};
 		inline long GetNuclearCharge(void) const {return (GetType());};	//NOT correct for ECP's!!!!!
