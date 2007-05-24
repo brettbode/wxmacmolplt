@@ -274,10 +274,10 @@ class WinPrefs {
 		//Note the meaning of the Native EOL bit is reversed
 		inline bool NativeEOLChar(void) const {return ((BitOptions & (1<<11))?false:true); };
 		inline void NativeEOLChar(bool newVal) {BitOptions = (BitOptions & 0xFFFFF7FF) + (newVal?0:(1<<11));};
-			//Set to indicate a custom thumbnail should be created when saving
+		//Set to indicate a custom thumbnail should be created when saving
 		inline bool CreateCustomIcon(void) const {return ((BitOptions & (1<<12))?false:true); };
 		inline void CreateCustomIcon(bool newVal) {BitOptions = (BitOptions & 0xFFFFEFFF) + (newVal?0:(1<<12));};
-			//Set to overlay a 2D pattern on the atoms in ball and stick mode
+		//Set to overlay a 2D pattern on the atoms in ball and stick mode
 		inline bool Show2DPattern(void) const {return ((BitOptions & (1<<13))?true:false); };
 		inline void Show2DPattern(bool newVal) {BitOptions = (BitOptions & 0xFFFFDFFF) + (newVal?(1<<13):0);};
 		inline Boolean ChangeFileType(void) const {return (SetCreator); };
@@ -301,7 +301,7 @@ class WinPrefs {
 		inline float SetQD3DPointBrightness(float NewValue) {return QD3DPointBrightness = NewValue;};
 		inline float GetAtomScale(void) const {return AtomScale;};
 		inline float SetAtomScale(float NewValue) {return AtomScale=NewValue;};
-			//Note the GL FOV is really stored as FOV/2
+		//Note the GL FOV is really stored as FOV/2
 		inline float GetGLFOV(void) const {return GLFOV;};
 		inline float SetGLFOV(float NewValue) {return GLFOV=((NewValue>0)&&(NewValue<90)?NewValue:30);};
 		inline long GetAnimateTime(void) const {return AnimateTime;};
@@ -383,6 +383,7 @@ class WinPrefs {
 		inline Boolean GetAnimateMode(void) const {return AnimateMode;};
 		inline Boolean SetAnimateMode(Boolean state) {return AnimateMode=state;};
 		inline long GetBitOpt() { return  BitOptions; } //for debugging
+		unsigned char GetOxidationNumber(int atom_type);
 };
 
 // New preferences classes below here..
