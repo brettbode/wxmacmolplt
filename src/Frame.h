@@ -190,6 +190,7 @@ class Frame {
 		bool SetAtomSelection(long atom_id, bool select_it);
 		bool GetAtomSelection(long atom_id) const;
 		int GetNumAtomsSelected(void) const;
+		int GetAtomNumBonds(int atom_id) const;
 };
 
 #endif

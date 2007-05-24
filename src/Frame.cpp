@@ -1915,12 +1915,27 @@ void Frame::toggleAbInitioVisibility(void) {
 	}
 }
 
-void Frame::resetAllSelectState()
-{
-	for ( int i = 0; i < NumAtoms; i++)
+void Frame::resetAllSelectState() {
+	for (int i = 0; i < NumAtoms; i++)
 		Atoms[i].SetSelectState(false);
 	natoms_selected = 0;
 
-	for ( int i = 0; i < NumBonds; i++)
+	for (int i = 0; i < NumBonds; i++)
 		Bonds[i].SetSelectState(false);
+}
+
+int Frame::GetAtomNumBonds(int atom_id) const {
+
+	int num_bonds = 0;
+	int order;
+
+	for (int i = 0; i < NumBonds; i++) {
+		if (Bonds[i].Atom1 == atom_id || Bonds[i].Atom2 == atom_id) {
+			order = Bonds[i].Order - kHydrogenBond - 1;
+			num_bonds += MAX(0, order);
+		}
+	}
+
+	return num_bonds;
+
 }
