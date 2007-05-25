@@ -16,6 +16,12 @@
 #include "wx/wx.h"
 #include <wx/print.h>
 
+#ifdef __WXMAC__
+#include <AGL/glu.h>
+#else
+#include <GL/glu.h>
+#endif
+
 #include "mpGLCanvas.h"
 #include "MoleculeData.h"
 #include "Prefs.h"
