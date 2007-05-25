@@ -951,12 +951,21 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 
 					if (selected_site >= 0) {
-						// std::cout << "selected: " << selected << std::endl; 
-						// std::cout << "selected_site: " << selected_site << std::endl; 
-
 						CPoint3D newPnt;
 						newPnt.x = newPnt.y = newPnt.z = 0.0f;
-						mMainData->NewAtom(periodic_dlg->GetSelectedID(), newPnt);
+
+						int ox_num = Prefs->GetOxidationNumber(lFrame->GetAtomType(selected) - 1);
+						CPoint3D site_vec = Prefs->BondingSite(ox_num, selected_site);
+						CPoint3D origin;
+					   	lFrame->GetAtomPosition(selected, origin);
+
+						// std::cout << "ox_num: " << ox_num << std::endl; 
+						// std::cout << "selected: " << selected << std::endl; 
+						// std::cout << "selected_site: " << selected_site << std::endl; 
+						// std::cout << "site_vec: " << site_vec << std::endl; 
+
+						mMainData->NewAtom(periodic_dlg->GetSelectedID(),
+							origin + site_vec);
 					}
 
 					// If the user clicked on nothing, we try to add an atom given
@@ -1754,7 +1763,12 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 			wxString atom_name;
 			Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1,
 				atom_name);
-			label.Printf(wxT("Change %s to "), atom_name.mb_str());
+
+			// wx is giving me a compile error with the Printf function, so
+			// lets try an alternate route.
+			// label.Printf(wxT("Change %s to "), atom_name.mb_str()); 
+			label = wxT("Change ") + atom_name + " to ";
+
 			Prefs->GetAtomLabel(periodic_dlg->GetSelectedID() - 1, atom_name);
 			label.Append(atom_name);
 
