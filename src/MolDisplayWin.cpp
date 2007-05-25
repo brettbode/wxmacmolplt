@@ -3172,14 +3172,14 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 	// button to be a toggle on.
 	toolbar->ToggleTool(event.GetId(), true);
 
-	printf("toolbar->GetToolState(MMP_TOOL_ARROW): %d\n",
-		toolbar->GetToolState(MMP_TOOL_ARROW));
+	// printf("toolbar->GetToolState(MMP_TOOL_ARROW): %d\n", 
+		// toolbar->GetToolState(MMP_TOOL_ARROW)); 
 
-	printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n",
-		toolbar->GetToolState(MMP_TOOL_LASSO));
+	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", 
+		// toolbar->GetToolState(MMP_TOOL_LASSO)); 
 
-	printf("toolbar->GetToolState(MMP_TOOL_HAND): %d\n",
-		toolbar->GetToolState(MMP_TOOL_HAND));
+	// printf("toolbar->GetToolState(MMP_TOOL_HAND): %d\n", 
+		// toolbar->GetToolState(MMP_TOOL_HAND)); 
 	
 	switch (event.GetId()) {
 		case MMP_TOOL_ARROW:
