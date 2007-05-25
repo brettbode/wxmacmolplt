@@ -80,6 +80,7 @@ void DrawArrow(const float & length, const float & width, const int & quality);
 void DrawSceneString(const float scale_factor, const float shift_x,
 		             const float shift_y, const float shift_z,
 					 const wxString& label);
+void DrawBondingSites(int atom_type);
 
 const GLubyte stippleMask[128] =
 
@@ -1567,102 +1568,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			
 			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere
 
-#if 0
-#define CYL_RADIUS 0.1f
-			glPushName(0);
-			wxString ox_num;
-			ox_num.Printf("%d", Prefs->GetOxidationNumber(curAtomType));
-			glColor3f(0.0f, 0.0f, 0.0f);
-			// DrawSceneString(0.1f, radius + 0.01f, 0.0f, 0.0f, ox_num); 
-			CPoint3D origin = CPoint3D(0.0f, 0.0f, 0.0f);
-			float c, s, b, d;
-
-			switch (Prefs->GetOxidationNumber(curAtomType)) {
-				case 1:
-					glLoadName(1);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(0.0f, -radius * 2.0f, 0.0f), CYL_RADIUS);
-					break;
-				case 2:
-					glLoadName(1);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(-radius * 2.0f, 0.0f, 0.0f), CYL_RADIUS);
-					glLoadName(2);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(radius * 2.0f, 0.0f, 0.0f), CYL_RADIUS);
-					break;
-				case 3:
-					b = sqrt(3.0f / 4.0f);
-					glLoadName(1);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(0.0f, 2.0f * radius, 0.0f), CYL_RADIUS);
-					glLoadName(2);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(2.0f * radius * -b, 2.0f * -0.5f * radius, 0.0f), CYL_RADIUS);
-					glLoadName(3);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(2.0f * radius * b, 2.0f * -0.5f * radius, 0.0f), CYL_RADIUS);
-					break;
-				case 4:
-					c = cos(109.5f / 180.0f * kPi);
-					s = sin(109.5f / 180.0f * kPi);
-					b = c / s - c * c / s;
-					d = sqrt(s * s - b * b);
-					glLoadName(1);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(0.0f, 2.0f * radius, 0.0f), CYL_RADIUS);
-					glLoadName(2);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(0.0f, 2.0f * radius * c, -2.0f * radius * s), CYL_RADIUS);
-					glLoadName(3);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(2.0f * radius * d, 2 * radius * c, -2.0f * radius * b), CYL_RADIUS);
-					glLoadName(4);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(-2.0f * radius * d, 2 * radius * c, -2.0f * radius * b), CYL_RADIUS);
-					break;
-				case 5:
-					b = sqrt(3.0f / 4.0f);
-					glLoadName(1);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(0.0f, 0.0f, 2.0f * radius), CYL_RADIUS);
-					glLoadName(2);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(2.0f * radius * -b, 0.0f, 2.0f * -0.5f * radius), CYL_RADIUS);
-					glLoadName(3);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(2.0f * radius * b, 0.0f, 2.0f * -0.5f * radius), CYL_RADIUS);
-					glLoadName(4);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(0.0f, 2.0f * radius, 0.0f), CYL_RADIUS);
-					glLoadName(5);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(0.0f, -2.0f * radius, 0.0f), CYL_RADIUS);
-					break;
-				case 6:
-					b = cos(kPi / 4.0f);
-					glLoadName(1);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(2.0f * radius * b, 0.0f, 2.0f * radius * b), CYL_RADIUS);
-					glLoadName(2);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(-2.0f * radius * b, 0.0f, 2.0f * radius * b), CYL_RADIUS);
-					glLoadName(3);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(-2.0f * radius * b, 0.0f, -2.0f * radius * b), CYL_RADIUS);
-					glLoadName(4);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(2.0f * radius * b, 0.0f, -2.0f * radius * b), CYL_RADIUS);
-					glLoadName(5);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(0.0f, 2.0f * radius, 0.0f), CYL_RADIUS);
-					glLoadName(6);
-					CreateCylinderFromLine(qobj, origin,
-						CPoint3D(0.0f, -2.0f * radius, 0.0f), CYL_RADIUS);
-					break;
-			}
-			glPopName();
-#endif
+			// DrawBondingSites(curAtomType, radius, qobj); 
 
 			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
 				glColor3f(0.0f,0.0f,0.0f);
@@ -3839,5 +3745,102 @@ void DrawSceneString(const float scale_factor, const float shift_x,
 	glPopMatrix();
 
 	glEnable(GL_LIGHTING);
+
+}
+
+#define CYL_RADIUS 0.1f
+void MolDisplayWin::DrawBondingSites(int atom_type, float radius, GLUquadricObj *qobj) {
+	CPoint3D origin = CPoint3D(0.0f, 0.0f, 0.0f);
+	float c, s, b, d;
+	int ox_num = Prefs->GetOxidationNumber(atom_type);
+
+	glPushName(0);
+	glColor3f(0.0f, 0.0f, 0.0f);
+
+	switch (Prefs->GetOxidationNumber(atom_type)) {
+		case 1:
+			glLoadName(1);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+			break;
+		case 2:
+			glLoadName(1);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(2);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS);
+			break;
+		case 3:
+			b = sqrt(3.0f / 4.0f);
+			glLoadName(1);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(2);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(3);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS);
+			break;
+		case 4:
+			c = cos(109.5f / 180.0f * kPi);
+			s = sin(109.5f / 180.0f * kPi);
+			b = c / s - c * c / s;
+			d = sqrt(s * s - b * b);
+			glLoadName(1);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(2);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(3);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(4);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS);
+			break;
+		case 5:
+			b = sqrt(3.0f / 4.0f);
+			glLoadName(1);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(2);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(3);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(4);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(5);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 4) * 2.0f * radius, CYL_RADIUS);
+			break;
+		case 6:
+			b = cos(kPi / 4.0f);
+			glLoadName(1);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(2);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(3);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(4);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(5);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 4) * 2.0f * radius, CYL_RADIUS);
+			glLoadName(6);
+			CreateCylinderFromLine(qobj, origin,
+				Prefs->BondingSite(ox_num, 5) * 2.0f * radius, CYL_RADIUS);
+			break;
+	}
+	glPopName();
 
 }

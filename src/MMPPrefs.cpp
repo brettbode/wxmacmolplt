@@ -1655,3 +1655,86 @@ unsigned char WinPrefs::GetOxidationNumber(int atom_type) {
 	return oxidation_numbers[atom_type];
 
 }
+
+CPoint3D WinPrefs::BondingSite(int oxidation_num, int site_id) {
+
+	if (site_id >= oxidation_num) {
+		return CPoint3D(0.0f, 0.0f, 0.0f);
+	}
+
+	switch (oxidation_num) {
+		case 1:
+			{
+				CPoint3D pts[] = {
+					CPoint3D(0.0f, 1.0f, 0.0f)
+				};
+				return pts[site_id];
+			}
+			break;
+		case 2:
+			{
+				CPoint3D pts[] = {
+					CPoint3D(-1.0f, 0.0f, 0.0f),
+					CPoint3D(1.0f, 0.0f, 0.0f)
+				};
+				return pts[site_id];
+			}
+			break;
+		case 3:
+			{
+				float b = sqrt(3.0f / 4.0f);
+				CPoint3D pts[] = {
+					CPoint3D(0.0f, 1.0f, 0.0f),
+					CPoint3D(-b, -0.5f, 0.0f),
+					CPoint3D(b, -0.5f, 0.0f)
+				};
+				return pts[site_id];
+			}
+			break;
+		case 4:
+			{
+				float c = cos(109.5f / 180.0f * kPi);
+				float s = sin(109.5f / 180.0f * kPi);
+				float b = c / s - c * c / s;
+				float d = sqrt(s * s - b * b);
+				CPoint3D pts[] = {
+					CPoint3D(0.0f, 1.0f, 0.0f),
+					CPoint3D(0.0f, c, s),
+					CPoint3D(d, c, b),
+					CPoint3D(d, c, b)
+				};
+				return pts[site_id];
+			}
+			break;
+		case 5:
+			{
+				float b = sqrt(3.0f / 4.0f);
+				CPoint3D pts[] = {
+					CPoint3D(0.0f, 0.0f, 1.0f),
+					CPoint3D(-b, 0.0f, -0.5f),
+					CPoint3D(b, 0.0f, -0.5f),
+					CPoint3D(0.0f, 1.0f, 0.0f),
+					CPoint3D(0.0f, -1.0f, 0.0f)
+				};
+				return pts[site_id];
+			}
+			break;
+		case 6:
+			{
+				float b = cos(kPi / 4.0f);
+				CPoint3D pts[] = {
+					CPoint3D(b, 0.0f, b),
+					CPoint3D(-b, 0.0f, b),
+					CPoint3D(-b, 0.0f, -b),
+					CPoint3D(b, 0.0f, -b),
+					CPoint3D(0.0f, 1.0f, 0.0f),
+					CPoint3D(0.0f, -1.0f, 0.0f)
+				};
+				return pts[site_id];
+			}
+			break;
+	}
+
+	return CPoint3D(0.0f, 0.0f, 0.0f);
+
+}

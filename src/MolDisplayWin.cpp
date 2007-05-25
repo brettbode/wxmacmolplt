@@ -277,7 +277,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_TOOL_RANGE(MMP_TOOL_ARROW, MMP_TOOL_HAND, MolDisplayWin::OnToggleTool)
 END_EVENT_TABLE()
 
-	//Local use class to hold data during the animation of normal modes
+//Local use class to hold data during the animation of normal modes
 class ModeAnimation {
 public:
 	std::vector<CPoint3D>   SavedCoordinates;
@@ -1848,20 +1848,25 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 		wxBitmap enabled_bmp2;
 
 		enabled_bmp = wxBitmap(view_xpm);
-		enabled_bmp2 = wxBitmap(hand_xpm);
-		toolbar->AddTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp,
-			enabled_bmp2, wxITEM_RADIO, wxT("Dummy"),
-			wxT("Don't do anything"));
+		toolbar->AddRadioTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp,
+			wxNullBitmap);
+		// toolbar->AddTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp, 
+			// wxNullBitmap, wxITEM_RADIO, wxT("Dummy"), 
+			// wxT("Don't do anything")); 
 
 		enabled_bmp = wxBitmap(rect_lasso_xpm);
-		toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select"), enabled_bmp,
-			wxNullBitmap, wxITEM_RADIO, wxT("Select"),
-			wxT("Select atoms by bounding box"));
+		toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select"), enabled_bmp,
+			wxNullBitmap);
+		// toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select"), enabled_bmp, 
+			// wxNullBitmap, wxITEM_RADIO, wxT("Select"), 
+			// wxT("Select atoms by bounding box")); 
 
 		enabled_bmp = wxBitmap(hand_xpm);
-		toolbar->AddTool(MMP_TOOL_HAND, wxT("Edit"), enabled_bmp,
-			wxNullBitmap, wxITEM_RADIO, wxT("Translate atoms"),
-			wxT("Don't do anything"));
+		toolbar->AddRadioTool(MMP_TOOL_HAND, wxT("Edit"), enabled_bmp,
+			wxNullBitmap);
+		// toolbar->AddTool(MMP_TOOL_HAND, wxT("Edit"), enabled_bmp, 
+			// wxNullBitmap, wxITEM_RADIO, wxT("Translate atoms"), 
+			// wxT("Don't do anything")); 
 
 		toolbar->AddSeparator();
 		toolbar->Realize();
@@ -3165,16 +3170,16 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 	// The tool is toggled automatically by wx, but we don't really want to
 	// allow it to be toggled off.  So, we explicitly force any click on the
 	// button to be a toggle on.
-	// toolbar->ToggleTool(event.GetId(), true); 
+	toolbar->ToggleTool(event.GetId(), true);
 
-	// printf("toolbar->GetToolState(MMP_TOOL_ARROW): %d\n", 
-		// toolbar->GetToolState(MMP_TOOL_ARROW)); 
+	printf("toolbar->GetToolState(MMP_TOOL_ARROW): %d\n",
+		toolbar->GetToolState(MMP_TOOL_ARROW));
 
-	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", 
-		// toolbar->GetToolState(MMP_TOOL_LASSO)); 
+	printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n",
+		toolbar->GetToolState(MMP_TOOL_LASSO));
 
-	// printf("toolbar->GetToolState(MMP_TOOL_HAND): %d\n", 
-		// toolbar->GetToolState(MMP_TOOL_HAND)); 
+	printf("toolbar->GetToolState(MMP_TOOL_HAND): %d\n",
+		toolbar->GetToolState(MMP_TOOL_HAND));
 	
 	switch (event.GetId()) {
 		case MMP_TOOL_ARROW:

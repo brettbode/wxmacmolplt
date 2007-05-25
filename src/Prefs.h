@@ -384,6 +384,7 @@ class WinPrefs {
 		inline Boolean SetAnimateMode(Boolean state) {return AnimateMode=state;};
 		inline long GetBitOpt() { return  BitOptions; } //for debugging
 		unsigned char GetOxidationNumber(int atom_type);
+		CPoint3D BondingSite(int oxidation_num, int site_id);
 };
 
 // New preferences classes below here..
