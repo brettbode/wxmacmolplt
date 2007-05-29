@@ -928,8 +928,9 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	// If the left mouse button is released, the user is either done dragging,
 	// in which case we do nothing, or the user has selected an item.
 	else if (event.LeftUp()) {
-		if (event.CmdDown())
+		if (event.CmdDown() || event.ShiftDown()) {
 			deSelectAll = false;
+		}
 
 		if (MolWin->LassoSelected()) {
 			MolWin->LassoEnd(tmpPnt.x, height - tmpPnt.y);
@@ -954,7 +955,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						CPoint3D newPnt;
 						newPnt.x = newPnt.y = newPnt.z = 0.0f;
 
-						int ox_num = Prefs->GetOxidationNumber(lFrame->GetAtomType(selected) - 1);
+						int base_type = lFrame->GetAtomType(selected) - 1;
+						int ox_num = Prefs->GetOxidationNumber(base_type);
 						CPoint3D site_vec = Prefs->BondingSite(ox_num, selected_site);
 						CPoint3D origin;
 					   	lFrame->GetAtomPosition(selected, origin);
@@ -964,8 +966,17 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						// std::cout << "selected_site: " << selected_site << std::endl; 
 						// std::cout << "site_vec: " << site_vec << std::endl; 
 
+						// need to calculate radius
 						mMainData->NewAtom(periodic_dlg->GetSelectedID(),
-							origin + site_vec);
+							origin + site_vec * Prefs->GetAutoBondScale() *
+							(Prefs->GetAtomSize(base_type) +
+							 Prefs->GetAtomSize(periodic_dlg->GetSelectedID() - 1)));
+
+						// std::cout << "Prefs->GetAutoBondScale(): " << Prefs->GetAutoBondScale() << std::endl; 
+						// std::cout << "base_type: " << base_type << std::endl; 
+						// std::cout << "lFrame->GetAtomType(lFrame->NumAtoms - 1): " << lFrame->GetAtomType(lFrame->NumAtoms - 1) << std::endl; 
+
+						lFrame->AddBond(selected, lFrame->NumAtoms - 1);
 					}
 
 					// If the user clicked on nothing, we try to add an atom given
@@ -982,6 +993,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						newPnt.x = newX;
 						newPnt.y = newY;
 						newPnt.z = newZ;
+
 						mMainData->NewAtom(periodic_dlg->GetSelectedID(), newPnt);
 					}
   
@@ -1175,8 +1187,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				findWinCoord(lAtoms[selected].Position.x,
 					lAtoms[selected].Position.y,
 					lAtoms[selected].Position.z, tmpX, tmpY, tmpZ);
-				depth_offset = (dy * mMainData->WindowSize) /
-								(25.0f * GetRect().GetWidth());
+				depth_offset = dy / (10.0f * GetClientSize().GetHeight());
 				findReal3DCoord(tmpX, tmpY, tmpZ - depth_offset,
 								newX, newY, newZ);
 			}
@@ -2171,7 +2182,24 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 	long NumAtoms = lFrame->NumAtoms;
 
 	if (selected_type == MMP_ATOM) {
-		mMainData->DeleteAtom(selected);
+
+		// If the clicked-on atom is selected, delete all selected atoms.
+		if (lFrame->GetAtomSelection(selected)) {
+			for (int i = 0; i < lFrame->NumAtoms; i++) {
+				if (lFrame->GetAtomSelection(i)) {
+					mMainData->DeleteAtom(i);
+					// Deleting an atom will shift its successor to current
+					// position, so we must adjust i.
+					i--;
+				}
+			}
+		}
+		
+		// If it's not selected, delete only it.
+		else {
+			mMainData->DeleteAtom(selected);
+		}
+
 	} else if (selected_type == MMP_BOND) {
 		lFrame->DeleteBond(selected - NumAtoms);
 	}
