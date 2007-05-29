@@ -673,7 +673,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuEdit->Enable(wxID_COPY, false);
 	menuEdit->Enable(MMP_COPYCOORDS, false);
 	menuEdit->Enable(wxID_CLEAR, false);
-	menuEdit->Enable(wxID_SELECTALL, false);
+	// menuEdit->Enable(wxID_SELECTALL, false); 
 	menuView->Enable(MMP_SHOWMODE, false);
 	menuView->Enable(MMP_ANIMATEMODE, false);
 	menuView->Enable(MMP_PREVMODE, false);
@@ -1806,11 +1806,11 @@ void MolDisplayWin::PasteText(void) {
 				return;
 			}
 
-	//If there were special atoms found turn on drawing by default
+			//If there were special atoms found turn on drawing by default
 			if (MainData->cFrame->SpecialAtoms) MainData->SetSpecialAtomDrawMode(true);
 
 			if (Prefs->GetAutoBond())
-			MainData->cFrame->SetBonds(Prefs, false);
+				MainData->cFrame->SetBonds(Prefs, false);
 			//Now reset the display to take into account the new atoms
 			MainData->CenterModelWindow();
 			MainData->WindowSize = 2.0*MainData->MaxSize;
@@ -1825,6 +1825,13 @@ void MolDisplayWin::menuEditClear(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuEditSelect_all(wxCommandEvent &event) {
+
+	// Select each atom in the current frame and update.
+	for (int i = 0; i < MainData->cFrame->NumAtoms; i++) {
+		MainData->cFrame->SetAtomSelection(i, true);
+	}
+	SelectionChanged(false);
+	UpdateModelDisplay();
 }
 
 void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
