@@ -1778,7 +1778,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 			// wx is giving me a compile error with the Printf function, so
 			// lets try an alternate route.
 			// label.Printf(wxT("Change %s to "), atom_name.mb_str()); 
-			label = wxT("Change ") + atom_name + " to ";
+			label = wxT("Change ") + atom_name + wxT(" to ");
 
 			Prefs->GetAtomLabel(periodic_dlg->GetSelectedID() - 1, atom_name);
 			label.Append(atom_name);
