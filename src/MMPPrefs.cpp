@@ -1700,7 +1700,7 @@ CPoint3D WinPrefs::BondingSite(int oxidation_num, int site_id) {
 				CPoint3D pts[] = {
 					CPoint3D(0.0f, 1.0f, 0.0f),
 					CPoint3D(0.0f, c, s),
-					CPoint3D(d, c, b),
+					CPoint3D(-d, c, b),
 					CPoint3D(d, c, b)
 				};
 				return pts[site_id];
