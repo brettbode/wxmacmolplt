@@ -936,6 +936,7 @@ void MolDisplayWin::DrawGL(void)
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glLoadIdentity();
 
@@ -1648,25 +1649,25 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 		//if both atoms are selected, the bond is automatically
 		
-		GLdouble scr_coords1[3];  // Screen coordinates of atom1
-		GLdouble scr_coords2[3];  // Screen coordinates of atom2
-		CPoint3D scr_vec;			// Screen space vector between atoms
-		GLdouble perp_obj[3];	  // Object coords on vector perp. to scr_vec
-		CPoint3D offset_vec;		// Direction to shift bond cylinders
+		GLdouble scr_coords1[3]; // Screen coordinates of atom1
+		GLdouble scr_coords2[3]; // Screen coordinates of atom2
+		CPoint3D scr_vec;        // Screen space vector between atoms
+		GLdouble perp_obj[3];    // Object coords on vector perp. to scr_vec
+		CPoint3D offset_vec;     // Direction to shift bond cylinders
 
 		// Find screen coordinates of one atom.
 		gluProject(lAtoms[atom1].Position.x,
-					  lAtoms[atom1].Position.y,
-					  lAtoms[atom1].Position.z,
-					  modelview, proj, viewport,
-					  &(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2]));
+				   lAtoms[atom1].Position.y,
+				   lAtoms[atom1].Position.z,
+				   modelview, proj, viewport,
+				   &(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2]));
 
 		// Find screen coordinates of other atom.
 		gluProject(lAtoms[atom2].Position.x,
-					  lAtoms[atom2].Position.y,
-					  lAtoms[atom2].Position.z,
-					  modelview, proj, viewport,
-					  &(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2]));
+				   lAtoms[atom2].Position.y,
+				   lAtoms[atom2].Position.z,
+				   modelview, proj, viewport,
+				   &(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2]));
 
 		// Find vector perpendicular to vector between two screen points and
 		// normalize it so we can scalar multiply it later.  We flip and 
@@ -1680,10 +1681,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		// Now find a point on the perpendicular vector with atom1's depth
 		// and get its object coordinates.
 		gluUnProject(scr_coords1[0] + scr_vec.x * 10,
-						 scr_coords1[1] + scr_vec.y * 10,
-						 scr_coords1[2],
-						 modelview, proj, viewport,
-						 &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
+					 scr_coords1[1] + scr_vec.y * 10,
+					 scr_coords1[2],
+					 modelview, proj, viewport,
+					 &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
 
 		// Finally, we see what direction all bond cylinders must be offset
 		// so that they will always stay in view.
@@ -1696,17 +1697,17 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		for (int ipipe = 0; ipipe < MAX(tmpOrder,1); ++ipipe) {
 
 			v1.x = lAtoms[atom1].Position.x + offset_vec.x * baseBondOffset +
-					 3.5 * tmpBondSize * offset_vec.x * ipipe;
+					3.5 * tmpBondSize * offset_vec.x * ipipe;
 			v1.y = lAtoms[atom1].Position.y + offset_vec.y * baseBondOffset +
-					 3.5 * tmpBondSize * offset_vec.y * ipipe;
+					3.5 * tmpBondSize * offset_vec.y * ipipe;
 			v1.z = lAtoms[atom1].Position.z + offset_vec.z * baseBondOffset +
-					 3.5 * tmpBondSize * offset_vec.z * ipipe;
+					3.5 * tmpBondSize * offset_vec.z * ipipe;
 			v2.x = lAtoms[atom2].Position.x + offset_vec.x * baseBondOffset +
-					 3.5 * tmpBondSize * offset_vec.x * ipipe;
+					3.5 * tmpBondSize * offset_vec.x * ipipe;
 			v2.y = lAtoms[atom2].Position.y + offset_vec.y * baseBondOffset +
-					 3.5 * tmpBondSize * offset_vec.y * ipipe;
+					3.5 * tmpBondSize * offset_vec.y * ipipe;
 			v2.z = lAtoms[atom2].Position.z + offset_vec.z * baseBondOffset +
-					 3.5 * tmpBondSize * offset_vec.z * ipipe;
+					3.5 * tmpBondSize * offset_vec.z * ipipe;
 
 			offset.x = v2.x - v1.x;
 			offset.y = v2.y - v1.y;
@@ -1731,46 +1732,46 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			// We may need to draw two cylinders if the user wants the bonds
 			// colored according to their element.
 			if (Prefs->ColorBondHalves()) {
-					//center the color change at the middle of the visible part of the bond
-			  float radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
-			  float radius2 = AtomScale*Prefs->GetAtomSize(lAtoms[atom2].GetType() - 1);
-			  float percent1 = radius1/length;
-			  float percent2 = radius2/length;
-			  float centerPercent = 0.5 + 0.5*(percent1-percent2);
-			
-			  CPoint3D v3;		//first half bond from atom 1
-			  v3.x = centerPercent*(v2.x - v1.x)+v1.x;
-			  v3.y = centerPercent*(v2.y - v1.y)+v1.y;
-			  v3.z = centerPercent*(v2.z - v1.z)+v1.z;
+				//center the color change at the middle of the visible part of the bond
+				float radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
+				float radius2 = AtomScale*Prefs->GetAtomSize(lAtoms[atom2].GetType() - 1);
+				float percent1 = radius1/length;
+				float percent2 = radius2/length;
+				float centerPercent = 0.5 + 0.5*(percent1-percent2);
+				
+				CPoint3D v3; //first half bond from atom 1
+				v3.x = centerPercent*(v2.x - v1.x)+v1.x;
+				v3.y = centerPercent*(v2.y - v1.y)+v1.y;
+				v3.z = centerPercent*(v2.z - v1.z)+v1.z;
 
-			  Prefs->ChangeColorAtomColor(lAtoms[atom1].GetType());
-	//		  RGBColor * BondColor = Prefs->GetAtomColorLoc(lAtoms[atom1].GetType() - 1);
-	//		  float red, green, blue;
-	//		  red = BondColor->red/65536.0;
-	//		  green = BondColor->green/65536.0;
-	//		  blue = BondColor->blue/65536.0;
-	//		  glColor3f(red, green, blue);
-			  glPushMatrix();
-			  gluCylinder(qobj, tmpBondSize, tmpBondSize, length*centerPercent, (long)(Quality), (long)(0.5*Quality));
-			  if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
-				  gluSphere(qobj, tmpBondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
-			  }
-			  glPopMatrix();
+				Prefs->ChangeColorAtomColor(lAtoms[atom1].GetType());
+				// RGBColor * BondColor = Prefs->GetAtomColorLoc(lAtoms[atom1].GetType() - 1);
+				// float red, green, blue;
+				// red = BondColor->red/65536.0;
+				// green = BondColor->green/65536.0;
+				// blue = BondColor->blue/65536.0;
+				// glColor3f(red, green, blue);
+				glPushMatrix();
+				gluCylinder(qobj, tmpBondSize, tmpBondSize, length*centerPercent, (long)(Quality), (long)(0.5*Quality));
+				if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
+					gluSphere(qobj, tmpBondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
+				}
+				glPopMatrix();
 
-			  Prefs->ChangeColorAtomColor(lAtoms[atom2].GetType());
-	//		  BondColor = Prefs->GetAtomColorLoc(lAtoms[atom2].GetType() - 1);
-	//		  red = BondColor->red/65536.0;
-	//		  green = BondColor->green/65536.0;
-	//		  blue = BondColor->blue/65536.0;
-	//		  glColor3f(red, green, blue);
-			  glPopMatrix();
-			  glPushMatrix();
-			  rotMat[3][0] = v3.x;
-			  rotMat[3][1] = v3.y;
-			  rotMat[3][2] = v3.z;
-			  glMultMatrixf((const GLfloat *) &rotMat);
-			  gluCylinder(qobj, tmpBondSize, tmpBondSize, length*(1-centerPercent), (long)(Quality), (long)(0.5*Quality));
-			  if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
+				Prefs->ChangeColorAtomColor(lAtoms[atom2].GetType());
+				// BondColor = Prefs->GetAtomColorLoc(lAtoms[atom2].GetType() - 1);
+				// red = BondColor->red/65536.0;
+				// green = BondColor->green/65536.0;
+				// blue = BondColor->blue/65536.0;
+				// glColor3f(red, green, blue);
+				glPopMatrix();
+				glPushMatrix();
+				rotMat[3][0] = v3.x;
+				rotMat[3][1] = v3.y;
+				rotMat[3][2] = v3.z;
+				glMultMatrixf((const GLfloat *) &rotMat);
+				gluCylinder(qobj, tmpBondSize, tmpBondSize, length*(1-centerPercent), (long)(Quality), (long)(0.5*Quality));
+				if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
 					glPopMatrix();
 					glPushMatrix();
 					rotMat[3][0] = v2.x;
@@ -1779,17 +1780,17 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 					glMultMatrixf((const GLfloat *) &rotMat);
 					// glTranslatef(0.0, baseBondOffset+ipipe*3.5*tmpBondSize, 0.0);
 					gluSphere(qobj, tmpBondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
-			  }
-			  glPopMatrix();
-		//		if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
-		//			glPopMatrix();
-		//			glPushMatrix();
-		//			rotMat[3][0] = v2.x;
-		//			rotMat[3][1] = v2.y;
-		//			rotMat[3][2] = v2.z;
-		//			glMultMatrixf((const GLfloat *) &rotMat);
-		//			gluDisk(qobj, 0.0, BondSize, (long)(Quality), 2);
-		//		}
+				}
+				// glPopMatrix(); 
+				// if (Prefs->DrawWireFrame()) { //Add end caps if no spheres 
+					// glPopMatrix(); 
+					// glPushMatrix(); 
+					// rotMat[3][0] = v2.x; 
+					// rotMat[3][1] = v2.y; 
+					// rotMat[3][2] = v2.z; 
+					// glMultMatrixf((const GLfloat *) &rotMat); 
+					// gluDisk(qobj, 0.0, BondSize, (long)(Quality), 2); 
+				// } 
 			}
 			
 			// We only need to draw one cylinder the whole length of a bond since
@@ -1797,21 +1798,21 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			else {
 				Prefs->ChangeColorBondColor(lBonds[ibond].Order);
 				for (int i = 0; i < MAX(tmpOrder,1); ++i) {
-				  glPushMatrix();
-				  gluCylinder(qobj, tmpBondSize, tmpBondSize, length, 
-								  (long) Quality, (long) (0.5f * Quality));
-				  glPopMatrix();
+					glPushMatrix();
+					gluCylinder(qobj, tmpBondSize, tmpBondSize, length, 
+								(long) Quality, (long) (0.5f * Quality));
+					glPopMatrix();
 				}
 
 				if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
-				  gluDisk(qobj, 0.0, tmpBondSize, (long) Quality, 2);
-				  glPopMatrix();
-				  glPushMatrix();
-				  rotMat[3][0] = v2.x;
-				  rotMat[3][1] = v2.y;
-				  rotMat[3][2] = v2.z;
-				  glMultMatrixf((const GLfloat *) &rotMat);
-				  gluDisk(qobj, 0.0, tmpBondSize, (long) Quality, 2);
+					gluDisk(qobj, 0.0, tmpBondSize, (long) Quality, 2);
+					glPopMatrix();
+					glPushMatrix();
+					rotMat[3][0] = v2.x;
+					rotMat[3][1] = v2.y;
+					rotMat[3][2] = v2.z;
+					glMultMatrixf((const GLfloat *) &rotMat);
+					gluDisk(qobj, 0.0, tmpBondSize, (long) Quality, 2);
 				}
 			}
 
@@ -1832,14 +1833,14 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glEnable(GL_POLYGON_STIPPLE);
 				glPolygonStipple(stippleMask);
 				gluCylinder(qobj, tmpBondSize * 1.01f, tmpBondSize * 1.01f,
-								length, (long) Quality, (long) (0.5f * Quality));
-				if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
+							length, (long) Quality, (long) (0.5f * Quality));
+				if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
 					gluSphere(qobj, tmpBondSize * 1.01f, (long) Quality,
-								 (long) (0.5f * Quality));
+							  (long) (0.5f * Quality));
 					glPushMatrix();
 					glTranslatef(0.0f, 0.0f, length);
 					gluSphere(qobj, tmpBondSize * 1.01f, (long) Quality,
-								 (long) (0.5f * Quality));
+							  (long) (0.5f * Quality));
 					glPopMatrix();
 				}
 				glDisable(GL_POLYGON_STIPPLE);
@@ -1851,12 +1852,12 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glEnable(GL_BLEND);
 				gluCylinder(qobj, tmpBondSize * 1.02f, tmpBondSize * 1.02f,
 								length, (long) Quality, (long) (0.5 * Quality));
-				if (Prefs->DrawWireFrame()) {	//Add end caps if no spheres
+				if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
 					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
 								 (long) (0.5 * Quality));
 					glTranslatef(0.0f, 0.0f, length);
 					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
-								 (long) (0.5 * Quality));
+							  (long) (0.5 * Quality));
 				}
 				glDisable(GL_BLEND);
 
@@ -1866,14 +1867,14 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 	}
 	glPopName();
 
-	if ( mHighliteState )
-	  glEnable(GL_POLYGON_STIPPLE);
+	if (mHighliteState)
+		glEnable(GL_POLYGON_STIPPLE);
 
 	glLoadName(0);  //only atoms and bonds are selectable
 	                 //so give a NULL name value to the rest of the geometries
 
-	if (MainData->GetDrawMode() && lFrame->Vibs) {	//Add the current normal mode, if active
-			float	VectorScale=Prefs->GetVectorScale();
+	if (MainData->GetDrawMode() && lFrame->Vibs) { //Add the current normal mode, if active
+		float VectorScale = Prefs->GetVectorScale();
 
 		long cmode = (lFrame->NumAtoms)*(lFrame->Vibs->CurrentMode);
 
@@ -1887,13 +1888,13 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			NMode *= VectorScale;
 			float length = NMode.Magnitude();
 			if (length > 0.1) {
-					CPoint3D NModeVector;
-					Matrix4D	rotMat;
+				CPoint3D NModeVector;
+				Matrix4D rotMat;
 				NModeVector.x = NMode.x/length;
 				NModeVector.y = NMode.y/length;
 				NModeVector.z = NMode.z/length;
 				float VectorWidth = (0.03 + 0.005*length);
-					//Set up vectors for the shaft of the normal mode
+				//Set up vectors for the shaft of the normal mode
 				CPoint3D VStart;
 				long curAtomType = lAtoms[iatom].Type - 1;
 
@@ -1905,7 +1906,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				VStart.z = lAtoms[iatom].Position.z + NModeVector.z*0.95*radius;
 				float HeadRadius = 2 * VectorWidth;
 				if (2*HeadRadius > length) HeadRadius = length/2.0;
-	//			float HeadRatio = (length-HeadRadius)/length;
+				// float HeadRatio = (length-HeadRadius)/length;
 				GLfloat ShaftLength = length - HeadRadius;
 
 				SetRotationMatrix(rotMat, &NormStart, &NModeVector);
