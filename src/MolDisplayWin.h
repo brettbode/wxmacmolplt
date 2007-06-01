@@ -410,9 +410,9 @@ class MolDisplayWin : public wxFrame {
 		void eventSize(wxSizeEvent &event);
 		void SizeChanged(void);
 		void OnFrameAnimationTimer(wxTimerEvent & event);
-			//Called during normal mode animations
+		//Called during normal mode animations
 		void OnModeAnimation(wxTimerEvent & event);
-			//Function to be called when window loses focus to stop animations
+		//Function to be called when window loses focus to stop animations
 		void OnMenuOpen(wxMenuEvent & event);
 		void OnKillFocus(wxFocusEvent & event);
 		void StopAnimations(void);
@@ -425,6 +425,7 @@ class MolDisplayWin : public wxFrame {
 		bool ArrowSelected(void);
 		bool HandSelected(void);
 		void DrawBondingSites(int atom_type, float radius, GLUquadricObj *qobj);
+		void SetStatusText(const wxString& label);
 };
 
 class MolPrintOut : public wxPrintout {

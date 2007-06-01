@@ -26,6 +26,7 @@ Added OpenGL version of Draw3D to Surface 6/2001 BMB
 #endif
 #include <vector>
 #include <string>
+#include "Math3D.h"
 /* General Use Types independant of my data structures */
 #define kMaxAtomTypes		130
 #define kMaxBondTypes		4
@@ -264,7 +265,10 @@ class mpAtom {
 		short		Type;	//Low byte stores normal atom type, high byte store special bits
 		char		flags;	//bit 0: invisibility, bit 1: select state, bit 2: Is effective fragment
 							//bit 3: Is SIMOMM atom, bit 4: symmetry unique
-		mpAtom(void) : Type(0), flags(0) {};
+		Matrix4D rot;
+		mpAtom(void) : Type(0), flags(0) {
+			InitRotationMatrix(rot);
+		};
 		inline bool GetInvisibility(void) const {return ((flags & 1)? true: false);};	//Bit 1 sets invisibility
 		bool SetInvisibility(bool State) {flags = (flags & 0xFE) + (State? 1:0);return GetInvisibility();};
 		inline bool GetSelectState(void) const {return ((flags&2)?true:false);};	//Bit 2 sets selected

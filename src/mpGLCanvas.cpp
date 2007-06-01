@@ -947,36 +947,62 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			// If editing, we  
 			if (interactiveMode) {
 
-				if (periodic_dlg && MolWin->HandSelected() &&
-					periodic_dlg->GetSelectedID() != 0) {
+				if (MolWin->HandSelected()) {
 
+					// If no periodic table is shown or not atom is selected,
+					// but the user seems to be trying to add an atom, give
+					// them a message.
+					if (periodic_dlg == NULL) {
+						if (selected_site >= 0 || selected < 0) {
+							MolWin->SetStatusText(wxT("Open periodic table dialog to add an atom."));
+						}
+					}
 
-					if (selected_site >= 0) {
+					else if (periodic_dlg->GetSelectedID() == 0) {
+						if (selected_site >= 0 || selected < 0) {
+							MolWin->SetStatusText(wxT("Select an atom in the periodic table."));
+						}
+					} 
+
+					// If the user is adding a new atom based on the bonding
+					// site skeleton, add the atom in the direction of the
+					// bonding site.
+					else if (selected_site >= 0) {
 						CPoint3D newPnt;
 						newPnt.x = newPnt.y = newPnt.z = 0.0f;
 
 						int base_type = lFrame->GetAtomType(selected) - 1;
 						int ox_num = Prefs->GetOxidationNumber(base_type);
 						CPoint3D site_vec = Prefs->BondingSite(ox_num, selected_site);
+						CPoint3D trans_site_vec;
 						CPoint3D origin;
+
 					   	lFrame->GetAtomPosition(selected, origin);
+						Rotate3DOffset(lFrame->Atoms[selected].rot,
+								       site_vec, &trans_site_vec);
 
-						// std::cout << "ox_num: " << ox_num << std::endl; 
-						// std::cout << "selected: " << selected << std::endl; 
-						// std::cout << "selected_site: " << selected_site << std::endl; 
-						// std::cout << "site_vec: " << site_vec << std::endl; 
-
-						// need to calculate radius
 						mMainData->NewAtom(periodic_dlg->GetSelectedID(),
-							origin + site_vec * Prefs->GetAutoBondScale() *
+							origin + trans_site_vec * Prefs->GetAutoBondScale() *
 							(Prefs->GetAtomSize(base_type) +
 							 Prefs->GetAtomSize(periodic_dlg->GetSelectedID() - 1)));
 
-						// std::cout << "Prefs->GetAutoBondScale(): " << Prefs->GetAutoBondScale() << std::endl; 
-						// std::cout << "base_type: " << base_type << std::endl; 
-						// std::cout << "lFrame->GetAtomType(lFrame->NumAtoms - 1): " << lFrame->GetAtomType(lFrame->NumAtoms - 1) << std::endl; 
+						int new_type = lFrame->GetAtomType(lFrame->NumAtoms - 1) - 1;
+
+						Matrix4D rot_copy;
+						Matrix4D new_rot;
+						CPoint3D new_site_vec;
+
+						new_site_vec = Prefs->BondingSite(
+							Prefs->GetOxidationNumber(new_type), 0) * -1.0f;
+
+						SetRotationMatrix(new_rot, &new_site_vec, &trans_site_vec);
+						MultiplyMatrix(lFrame->Atoms[lFrame->NumAtoms - 1].rot,
+								       new_rot, rot_copy);
+						memcpy(lFrame->Atoms[lFrame->NumAtoms - 1].rot,
+							   rot_copy, sizeof(float) * 16);
 
 						lFrame->AddBond(selected, lFrame->NumAtoms - 1);
+						MolWin->SetStatusText(wxT("Added new atom."));
 					}
 
 					// If the user clicked on nothing, we try to add an atom given
@@ -995,6 +1021,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						newPnt.z = newZ;
 
 						mMainData->NewAtom(periodic_dlg->GetSelectedID(), newPnt);
+
+						MolWin->SetStatusText(wxT("Added new atom."));
 					}
   
 					oldSelect = -1;
@@ -1768,8 +1796,8 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 
 		// If the periodic table is shown and an atom is selected, offer an
 		// option to change the clicked-on atom to the selected type.
-		if (periodic_dlg && periodic_dlg->GetSelectedID() !=
-			lFrame->Atoms[selected].GetType()) {
+		if (periodic_dlg && periodic_dlg->GetSelectedID() != 0 &&
+			periodic_dlg->GetSelectedID() != lFrame->Atoms[selected].GetType()) {
 			wxString label;
 			wxString atom_name;
 			Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1,

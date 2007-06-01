@@ -547,7 +547,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuEdit->Append(wxID_SELECTALL, wxT("&Select all\tCtrl+A"));
 	menuEdit->AppendSeparator();
 #ifdef ENABLE_INTERACTIVE_MODE
-	menuEdit->AppendCheckItem(MMP_INTERACTIVE, wxT("Interactive Mode"));
+	menuEdit->AppendCheckItem(MMP_INTERACTIVE, wxT("&Interactive Mode\tCtrl+I"));
 #endif
 	menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"), wxT("Edit the default preferences for new windows"));
 
@@ -558,7 +558,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
 	menuView->AppendSeparator();
 	menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show Ax&is"), wxT("Display the cartesian axis"));
-	menuView->AppendCheckItem(MMP_SHOWPERIODICDLG, _("Show Periodic Table"), _("Display a periodic table"));
+	menuView->AppendCheckItem(MMP_SHOWPERIODICDLG, _("Show Periodic &Table\tCtrl+T"), _("Display a periodic table"));
 	menuView->AppendCheckItem(MMP_SHOWSYMMETRYOPERATOR, _("Show S&ymmetry Operators"), _("Overlays the symmetry operators for the current point group. Not all point groups are supported."));
 	
 	menuViewLabels = new wxMenu;
@@ -2513,6 +2513,11 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
 		myStatus->SetScrollBarValue(MainData->CurrentFrame-1);
 	}
 }
+
+void MolDisplayWin::SetStatusText(const wxString& label) {
+	myStatus->SetStatusText(label);
+}
+
 void MolDisplayWin::ModeChanged(void) {
 	StopAnimations();
 	if(frequenciesWindow != NULL) {

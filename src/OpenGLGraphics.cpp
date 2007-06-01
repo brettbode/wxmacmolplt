@@ -793,7 +793,7 @@ void MolDisplayWin::DrawGL(void)
 		DrawLabel();
 	}
 
-	if (interactiveMode) {
+	if (false && interactiveMode) {
 	    const char modeString[] = "editing";
 
 	    DrawStaticLabel(modeString, 0.75, 0.95);
@@ -1569,7 +1569,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			
 			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere
 
+			// glPushMatrix(); 
+			// glMultMatrixf((float *) &lAtoms[iatom].rot); 
 			// DrawBondingSites(curAtomType, radius, qobj); 
+			// glPopMatrix(); 
 
 			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
 				glColor3f(0.0f,0.0f,0.0f);
@@ -3751,6 +3754,7 @@ void DrawSceneString(const float scale_factor, const float shift_x,
 
 #define CYL_RADIUS 0.1f
 void MolDisplayWin::DrawBondingSites(int atom_type, float radius, GLUquadricObj *qobj) {
+
 	CPoint3D origin = CPoint3D(0.0f, 0.0f, 0.0f);
 	float c, s, b, d;
 	int ox_num = Prefs->GetOxidationNumber(atom_type);
