@@ -821,15 +821,15 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	GetClientSize(&width, &height);
 
-	// if (1) { 
-		// printf("event.LeftDown(): %d\n", event.LeftDown()); 
-		// printf("event.LeftUp(): %d\n", event.LeftUp()); 
-		// printf("event.RightDown(): %d\n", event.RightDown()); 
-		// printf("event.RightUp(): %d\n", event.RightUp()); 
-		// printf("event.Dragging(): %d\n", event.Dragging()); 
-		// printf("event.CmdDown(): %d\n", event.CmdDown()); 
-		// printf("event.ShiftDown(): %d\n", event.ShiftDown()); 
-	// } 
+#if 0
+	printf("event.LeftDown(): %d\n", event.LeftDown());
+	printf("event.LeftUp(): %d\n", event.LeftUp());
+	printf("event.RightDown(): %d\n", event.RightDown());
+	printf("event.RightUp(): %d\n", event.RightUp());
+	printf("event.Dragging(): %d\n", event.Dragging());
+	printf("event.CmdDown(): %d\n", event.CmdDown());
+	printf("event.ShiftDown(): %d\n", event.ShiftDown());
+#endif
 	
 	if (event.Entering() && MolWin->LassoSelected()) {
 		stale_click = true;

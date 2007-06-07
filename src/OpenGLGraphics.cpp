@@ -1569,8 +1569,19 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			
 			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere
 
+			// float *m; 
+			// m = (float *) &lAtoms[iatom].rot; 
 			// glPushMatrix(); 
 			// glMultMatrixf((float *) &lAtoms[iatom].rot); 
+			// printf("m[<0-15>]:\n" 
+				   // "%f %f %f %f\n" 
+				   // "%f %f %f %f\n" 
+				   // "%f %f %f %f\n" 
+				   // "%f %f %f %f\n", 
+				   // m[0], m[1], m[2], m[3], 
+				   // m[4], m[5], m[6], m[7], 
+				   // m[8], m[9], m[10], m[11], 
+				   // m[12], m[13], m[14], m[15]); 
 			// DrawBondingSites(curAtomType, radius, qobj); 
 			// glPopMatrix(); 
 

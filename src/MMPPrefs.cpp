@@ -1710,11 +1710,11 @@ CPoint3D WinPrefs::BondingSite(int oxidation_num, int site_id) {
 			{
 				float b = sqrt(3.0f / 4.0f);
 				CPoint3D pts[] = {
+					CPoint3D(0.0f, 1.0f, 0.0f),
+					CPoint3D(0.0f, -1.0f, 0.0f),
 					CPoint3D(0.0f, 0.0f, 1.0f),
 					CPoint3D(-b, 0.0f, -0.5f),
-					CPoint3D(b, 0.0f, -0.5f),
-					CPoint3D(0.0f, 1.0f, 0.0f),
-					CPoint3D(0.0f, -1.0f, 0.0f)
+					CPoint3D(b, 0.0f, -0.5f)
 				};
 				return pts[site_id];
 			}
@@ -1723,12 +1723,12 @@ CPoint3D WinPrefs::BondingSite(int oxidation_num, int site_id) {
 			{
 				float b = cos(kPi / 4.0f);
 				CPoint3D pts[] = {
+					CPoint3D(0.0f, 1.0f, 0.0f),
+					CPoint3D(0.0f, -1.0f, 0.0f),
 					CPoint3D(b, 0.0f, b),
 					CPoint3D(-b, 0.0f, b),
 					CPoint3D(-b, 0.0f, -b),
-					CPoint3D(b, 0.0f, -b),
-					CPoint3D(0.0f, 1.0f, 0.0f),
-					CPoint3D(0.0f, -1.0f, 0.0f)
+					CPoint3D(b, 0.0f, -b)
 				};
 				return pts[site_id];
 			}
