@@ -224,13 +224,16 @@ Frame * Frame::GetNextFrame(void) { return NextFrame; }
 Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
 
 mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index) {
-        mpAtom * result = NULL;
+	mpAtom * result = NULL;
+
 	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(10);
+
 	if (NumAtoms<AtomAllocation) {
 		if ((index<=-1)||(index>=NumAtoms)) {//Add to the end of the list
 			Atoms[NumAtoms].Type = AtomType;
 			Atoms[NumAtoms].Position = AtomPosition;
 			Atoms[NumAtoms].flags = 0;
+			InitRotationMatrix(Atoms[NumAtoms].rot);
 			result = &Atoms[NumAtoms];
 		} else {	//insert the atom into the middle of the list
 			for (int i=NumAtoms; i>index; i--) {
@@ -239,6 +242,7 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 			Atoms[index].Type = AtomType;
 			Atoms[index].Position = AtomPosition;
 			Atoms[index].flags = 0;
+			InitRotationMatrix(Atoms[index].rot);
 			result = &Atoms[index];
 		}
 		NumAtoms++;
@@ -252,16 +256,17 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 	while (SurfaceList) DeleteSurface(0);
 	return result;
 }
+
 bool Frame::IncreaseAtomAllocation(long NumAdditional) {
 	if (AtomAllocation+NumAdditional < NumAtoms) return false;
- mpAtom * temp = new mpAtom[AtomAllocation+NumAdditional];
+	mpAtom * temp = new mpAtom[AtomAllocation+NumAdditional];
 	if (temp) {
 		if (Atoms != NULL) {
-            // BlockMoveData is Mac only.
+			// BlockMoveData is Mac only.
 			//BlockMoveData(Atoms, temp, NumAtoms*sizeof(mpAtom));
 
-            memcpy(temp, Atoms, NumAtoms*sizeof(mpAtom));
-	    delete [] Atoms;
+			memcpy(temp, Atoms, NumAtoms*sizeof(mpAtom));
+			delete [] Atoms;
 		}
 		Atoms = temp;
 		AtomAllocation += NumAdditional;
