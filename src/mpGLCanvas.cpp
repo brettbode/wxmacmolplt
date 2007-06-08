@@ -29,6 +29,7 @@
 #include "periodic_table_dlg.h"
 #include "Math3D.h"
 #include "VirtualSphere.h"
+#include "ChooseDialog.h"
 
 extern PeriodicTableDlg *periodic_dlg;
 extern bool show_periodic_dlg;
@@ -470,11 +471,11 @@ void MpGLCanvas::eventErase(wxEraseEvent &event) {
 }
 
 void MpGLCanvas::eventActivate(wxActivateEvent &event) {
-	if (event.GetActive()) {
-		stale_click = true;
-		wxMouseEvent mouse_event(wxEVT_LEFT_DOWN);
-		AddPendingEvent(mouse_event);
-	}
+	// if (event.GetActive()) { 
+		// stale_click = true; 
+		// wxMouseEvent mouse_event(wxEVT_LEFT_DOWN); 
+		// AddPendingEvent(mouse_event); 
+	// } 
 }
 
 void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
@@ -793,25 +794,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	bool edited_atoms = false;
 	int width, height;
 
-	// stale_click will be true when the window gains focus after having not
-	// had it, i.e., when the application first starts or is backgrounded.  If
-	// this is the case, the former mouse position will be invalid.
-	// Furthermore, on the Mac at least, if the same click that brings focus to
-	// the window is used to change the scene, no mouse event is triggered for
-	// the first click.  So, we fake a mouse event on focus.  The position has
-	// to be acquired a bit differently, then, since the fake event will hold
-	// the wrong position.
-	if (stale_click) {
-		tmpPnt = MolWin->ScreenToClient(wxGetMousePosition());
-		oldTmpPnt = tmpPnt;
-	} else {
-		tmpPnt = event.GetPosition();
-		if (tmpPnt.x == 0 && tmpPnt.y == 0) {
-			tmpPnt = MolWin->ScreenToClient(wxGetMousePosition());
-			oldTmpPnt = tmpPnt;
-			stale_click = true;
-		}
-	}
+	tmpPnt = event.GetPosition();
 
 	SetCurrent();
 
@@ -829,14 +812,15 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	printf("event.Dragging(): %d\n", event.Dragging());
 	printf("event.CmdDown(): %d\n", event.CmdDown());
 	printf("event.ShiftDown(): %d\n", event.ShiftDown());
+	std::cout << "event.Entering(): " << event.Entering() << std::endl;
+	std::cout << "event.Leaving(): " << event.Leaving() << std::endl;
+	std::cout << "event.LeftIsDown(): " << event.LeftIsDown() << std::endl;
+	std::cout << "event.RightIsDown(): " << event.RightIsDown() << std::endl;
 #endif
 	
-	if (event.Entering() && MolWin->LassoSelected()) {
-		stale_click = true;
-	}
-
 	// First handle left mouse down.
-	if (event.LeftDown() || (event.LeftIsDown() && stale_click)) {
+	if (event.LeftDown() || (event.LeftIsDown() && stale_click) ||
+		event.Entering()) {
 		mSelectState = 0;
 		testPicking(tmpPnt.x, tmpPnt.y);
 
@@ -862,16 +846,19 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			}
 		}
 	}
+
+	// else if (event.Entering()) { 
+		// testPicking(tmpPnt.x, tmpPnt.y);		 
+		// mSelectState = 0; 
+	// } 
+
+	else if (event.Leaving()) {
+		stale_click = true;
+	}
 	
 	// If not left, try right click in edit mode.
 	else if (event.RightDown()) {
 		testPicking(tmpPnt.x, tmpPnt.y);
-
-		// if (selected < 0) { 
-			// We don't really do anything here, since the user didn't 
-			// click on anything.  But by including this null block, we
-			// don't need to test for this anymore.
-		// } 
 
 		if (selected_type == MMP_ATOM) {
 			if (interactiveMode) {
@@ -900,10 +887,6 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	else if (event.MiddleDown()) {
 		testPicking(tmpPnt.x, tmpPnt.y);
-	}
-
-	else if (event.Leaving() && event.LeftIsDown() && MolWin->LassoSelected()) {
-		MolWin->LassoEnd(tmpPnt.x, height - tmpPnt.y);
 	}
 
 	// If we made it this far, button states haven't changed.  Are we dragging?
@@ -985,6 +968,9 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 							origin + trans_site_vec * Prefs->GetAutoBondScale() *
 							(Prefs->GetAtomSize(base_type) +
 							 Prefs->GetAtomSize(periodic_dlg->GetSelectedID() - 1)));
+
+						lFrame->SetAtomBondingSite(selected, selected_site, true);
+						lFrame->SetAtomBondingSite(lFrame->NumAtoms, 0, true);
 
 						int new_type = lFrame->GetAtomType(lFrame->NumAtoms - 1) - 1;
 
@@ -1421,8 +1407,11 @@ void MpGLCanvas::HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt) {
 	glGetDoublev(GL_MODELVIEW_MATRIX, mv);
 	glGetDoublev(GL_PROJECTION_MATRIX, proj);
 
+	if (!MolWin->LassoHasArea()) {
+		MolWin->LassoStart(curr_pt.x, curr_pt.y);
+	}
+
 	MolWin->LassoGrown(curr_pt.x, curr_pt.y);
-	// edited_atoms = true; 
 
 	if (!event.ShiftDown()) {
 		lFrame->resetAllSelectState();
@@ -1798,22 +1787,19 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 		// option to change the clicked-on atom to the selected type.
 		if (periodic_dlg && periodic_dlg->GetSelectedID() != 0 &&
 			periodic_dlg->GetSelectedID() != lFrame->Atoms[selected].GetType()) {
+
 			wxString label;
 			wxString atom_name;
 			Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1,
 				atom_name);
-
-			// wx is giving me a compile error with the Printf function, so
-			// lets try an alternate route.
-			// label.Printf(wxT("Change %s to "), atom_name.mb_str()); 
 			label = wxT("Change ") + atom_name + wxT(" to ");
-
 			Prefs->GetAtomLabel(periodic_dlg->GetSelectedID() - 1, atom_name);
 			label.Append(atom_name);
-
 			menu.Append(GL_Popup_Change_Atom, label);
-			menu.AppendSeparator();
 		}
+
+		menu.Append(GL_Popup_Change_Ox_Num, wxT("Change oxidation"));
+		menu.AppendSeparator();
 
 		menu.Append(GL_Popup_Menu_Apply_All, _T("&Apply to All Frames"));
 	}
@@ -1828,6 +1814,29 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 
 void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
 	mMainData->cFrame->SetAtomType(selected, periodic_dlg->GetSelectedID());
+}
+
+void MpGLCanvas::ChangeOxidationNumber(wxCommandEvent& event) {
+
+	Frame *lFrame = mMainData->cFrame;
+
+	wxString items[] = {
+		wxT("0"), wxT("1"), wxT("2"), wxT("3"), wxT("4"),
+		wxT("5"), wxT("6"), wxT("7")
+	};
+	wxString message = wxString(wxT("Select an oxidation number:"));
+	std::cout << "selected: " << selected << std::endl;
+
+	ChooseDialog *dlg = new ChooseDialog(this, (wxWindowID) 503, message,
+								8, items);
+	dlg->SetSelectedIndex(lFrame->Atoms[selected].ox_num);
+
+	if (dlg->ShowModal() == wxID_OK) {
+		std::cout << "selected: " << selected << std::endl;
+		lFrame->SetAtomOxidationNumber(selected, dlg->GetSelectedIndex());
+		std::cout << "dlg->GetSelectedIndex(): " << dlg->GetSelectedIndex() << std::endl;
+	}
+
 }
 
 void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
@@ -2357,6 +2366,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_Lock_To_Annotation, MpGLCanvas::ConstrainToAnnotation)
 	EVT_MENU(GL_Popup_Fit_To_Plane, MpGLCanvas::FitToPlane)
 	EVT_MENU(GL_Popup_Change_Atom, MpGLCanvas::ChangeAtom)
+	EVT_MENU(GL_Popup_Change_Ox_Num, MpGLCanvas::ChangeOxidationNumber)
 END_EVENT_TABLE()
 
 
