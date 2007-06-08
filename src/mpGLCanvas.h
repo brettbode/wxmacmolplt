@@ -45,6 +45,7 @@
 #define GL_Popup_Lock_To_Annotation 30027
 #define GL_Popup_Fit_To_Plane 30028
 #define GL_Popup_Change_Atom 30029
+#define GL_Popup_Change_Ox_Num 30030
 
 class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
@@ -108,6 +109,7 @@ class MpGLCanvas : public wxGLCanvas {
 		void ConstrainPosition(const int anno_id, double *x, double *y,
 							   double *z);
 		void ChangeAtom(wxCommandEvent& event);
+		void ChangeOxidationNumber(wxCommandEvent& event);
 		void HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt);
 		void HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 						   const wxPoint& prev_pt);

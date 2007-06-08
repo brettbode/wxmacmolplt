@@ -1637,6 +1637,8 @@ bool MMPPref_convert(const char * s, MMPEnergyOptions & t)
 
 unsigned char WinPrefs::GetOxidationNumber(int atom_type) {
 
+	/* atom_type is the atomic_number - 1.  So, hydrogen is 0, helium 1... */
+
 	static unsigned char oxidation_numbers[kMaxAtomTypes] = {
 		1, 0,                                                 // H - He
 		1, 2, 3, 4, 3, 2, 1, 0,                               // Li - Ne

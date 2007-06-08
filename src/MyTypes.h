@@ -265,10 +265,15 @@ class mpAtom {
 		short		Type;	//Low byte stores normal atom type, high byte store special bits
 		char		flags;	//bit 0: invisibility, bit 1: select state, bit 2: Is effective fragment
 							//bit 3: Is SIMOMM atom, bit 4: symmetry unique
+		unsigned char paired_sites;
 		Matrix4D rot;
+		int ox_num;
 		mpAtom(void) : Type(0), flags(0) {
+			paired_sites = 0;
 			InitRotationMatrix(rot);
+			ox_num = 0;
 		};
+		inline int GetOxidationNumber(void) const {return ox_num;}
 		inline bool GetInvisibility(void) const {return ((flags & 1)? true: false);};	//Bit 1 sets invisibility
 		bool SetInvisibility(bool State) {flags = (flags & 0xFE) + (State? 1:0);return GetInvisibility();};
 		inline bool GetSelectState(void) const {return ((flags&2)?true:false);};	//Bit 2 sets selected

@@ -191,6 +191,9 @@ class Frame {
 		bool GetAtomSelection(long atom_id) const;
 		int GetNumAtomsSelected(void) const;
 		int GetAtomNumBonds(int atom_id) const;
+		bool SetAtomOxidationNumber(int atom_id, int ox_num);
+		void SetAtomBondingSite(int atom_id, unsigned char site_id, bool is_bonded);
+
 };
 
 #endif

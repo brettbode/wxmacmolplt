@@ -1845,7 +1845,7 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 #include "xpms/rect_lasso.xpm"
 #include "xpms/hand.xpm"
 
-		toolbar->SetToolBitmapSize(wxSize(32, 32));
+		toolbar->SetToolBitmapSize(wxSize(16, 15));
 
 		// toolbar->AddRadioTool(MMP_TOOL_ARROW, wxT("View"), wxBITMAP(arrow)); 
 		// toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select"), wxBITMAP(rect_lasso)); 
@@ -3029,7 +3029,8 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 		if (p.x == 0 && p.y == 0) {
 			p = ScreenToClient(wxGetMousePosition());
 		}
-	} else if (stale_click) {
+	}
+	else if (stale_click) {
 		p = ScreenToClient(wxGetMousePosition());
 		stale_click = false;
 	} else if (event.Dragging()) {                               
@@ -3179,6 +3180,16 @@ void MolStatusBar::OnScrollBarChange(wxScrollEvent & event) {
 
 void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 
+	// std::cout << "toolbar->GetToolState(event.GetId()): " << toolbar->GetToolState(event.GetId()) << std::endl; 
+	// printf("toolbar->GetToolState(MMP_TOOL_ARROW): %d\n", 
+		// toolbar->GetToolState(MMP_TOOL_ARROW)); 
+
+	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", 
+		// toolbar->GetToolState(MMP_TOOL_LASSO)); 
+
+	// printf("toolbar->GetToolState(MMP_TOOL_HAND): %d\n", 
+		// toolbar->GetToolState(MMP_TOOL_HAND)); 
+
 	// The tool is toggled automatically by wx, but we don't really want to
 	// allow it to be toggled off.  So, we explicitly force any click on the
 	// button to be a toggle on.
@@ -3240,8 +3251,9 @@ void MolDisplayWin::LassoEnd(const int x, const int y) {
 }
 
 bool MolDisplayWin::LassoHasArea(void) {
-	return abs(lasso_end.x - lasso_start.x) > 3 &&
-		   abs(lasso_end.y - lasso_start.y) > 3;
+	return lasso_has_area;
+	// return abs(lasso_end.x - lasso_start.x) > 3 && 
+		   // abs(lasso_end.y - lasso_start.y) > 3; 
 }
 
 bool MolDisplayWin::LassoContains(const int x, const int y) {

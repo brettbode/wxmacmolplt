@@ -8,6 +8,7 @@ wxmacmolplt_SOURCES =                                  \
     bondsdlg.cpp               bondsdlg.h              \
                                cell_table.h            \
     choosevecgroup.cpp         choosevecgroup.h        \
+    ChooseDialog.cpp           ChooseDialog.h          \
     CML.cpp                    CML.h                   \
     colorArea.cpp              colorArea.h             \
     coordinateoffset.cpp       coordinateoffset.h      \

@@ -33,6 +33,8 @@
 #undef AddAtom
 #endif
 
+extern WinPrefs *gPreferences;
+
 Frame::Frame(void) {
 	Energy = 0.0;
 	KE = 0.0;
@@ -224,27 +226,27 @@ Frame * Frame::GetNextFrame(void) { return NextFrame; }
 Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
 
 mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index) {
+
+	/* AtomType is the atom's atomic number, starting with hydrogen at 1. */
+
 	mpAtom * result = NULL;
 
 	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(10);
 
 	if (NumAtoms<AtomAllocation) {
 		if ((index<=-1)||(index>=NumAtoms)) {//Add to the end of the list
-			Atoms[NumAtoms].Type = AtomType;
-			Atoms[NumAtoms].Position = AtomPosition;
-			Atoms[NumAtoms].flags = 0;
-			InitRotationMatrix(Atoms[NumAtoms].rot);
-			result = &Atoms[NumAtoms];
+			index = NumAtoms;
 		} else {	//insert the atom into the middle of the list
 			for (int i=NumAtoms; i>index; i--) {
 				Atoms[i] = Atoms[i-1];
 			}
-			Atoms[index].Type = AtomType;
-			Atoms[index].Position = AtomPosition;
-			Atoms[index].flags = 0;
-			InitRotationMatrix(Atoms[index].rot);
-			result = &Atoms[index];
 		}
+		Atoms[index].Type = AtomType;
+		Atoms[index].Position = AtomPosition;
+		Atoms[index].flags = 0;
+		InitRotationMatrix(Atoms[index].rot);
+		Atoms[index].ox_num = gPreferences->GetOxidationNumber(AtomType - 1);
+		result = &Atoms[index];
 		NumAtoms++;
 	}
 	//Delete any orbitals and normal modes
@@ -522,6 +524,32 @@ bool Frame::GetAtomSelection(long atom_id) const {
 
 int Frame::GetNumAtomsSelected(void) const {
 	return natoms_selected;
+}
+
+bool Frame::SetAtomOxidationNumber(int atom_id, int ox_num) {
+
+	// This function sets the oxidation number for an atom in this frame.
+	// If the atom doesn't exist, it returns false without changing anything.
+	// If it does exist, the number is changed and true is returned.
+
+	// If the atom_id is out of bounds, return false.
+	if (atom_id < 0 || atom_id >= NumAtoms) {
+		return false;
+	}
+
+	Atoms[atom_id].ox_num = ox_num;
+	return true;
+
+}
+
+void Frame::SetAtomBondingSite(int atom_id, unsigned char site_id, bool is_bonded) {
+
+	if (is_bonded) {
+		Atoms[atom_id].paired_sites |= 1 << site_id;
+	} else {
+		Atoms[atom_id].paired_sites &= ~(1 << site_id);
+	}
+
 }
 
 long Frame::GetNumElectrons(void) const {

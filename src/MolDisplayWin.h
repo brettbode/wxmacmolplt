@@ -424,7 +424,7 @@ class MolDisplayWin : public wxFrame {
 		bool LassoSelected(void);
 		bool ArrowSelected(void);
 		bool HandSelected(void);
-		void DrawBondingSites(int atom_type, float radius, GLUquadricObj *qobj);
+		void DrawBondingSites(int atom_type, unsigned char paired_sites, float radius, GLUquadricObj *qobj);
 		void SetStatusText(const wxString& label);
 };
 
