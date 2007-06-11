@@ -72,7 +72,7 @@ void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, f
 						const CPoint3D& x_world, float offset, GLuint length_anno_tex_id, const WinPrefs * Prefs);
 void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 						 const CPoint3D *pt3, const WinPrefs * Prefs);
-void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd, const float & lineWidth);
+void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd, float lineWidth, int nslices = 4, int nstacks = 1);
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order);
 void DrawInversionPoint(void);
 void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2);
@@ -1570,8 +1570,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 			// float *m; 
 			// m = (float *) &lAtoms[iatom].rot; 
-			// glPushMatrix(); 
-			// glMultMatrixf((float *) &lAtoms[iatom].rot); 
+			glPushMatrix();
+			glMultMatrixf((float *) &lAtoms[iatom].rot);
 			// printf("m[<0-15>]:\n" 
 				   // "%f %f %f %f\n" 
 				   // "%f %f %f %f\n" 
@@ -1581,9 +1581,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				   // m[4], m[5], m[6], m[7], 
 				   // m[8], m[9], m[10], m[11], 
 				   // m[12], m[13], m[14], m[15]); 
-			// DrawBondingSites(lAtoms[iatom].GetOxidationNumber(), 
-							 // lAtoms[iatom].paired_sites, radius, qobj); 
-			// glPopMatrix(); 
+			DrawBondingSites(lAtoms[iatom].GetOxidationNumber(),
+							 lAtoms[iatom].paired_sites, radius, qobj);
+			glPopMatrix();
 
 			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
 				glColor3f(0.0f,0.0f,0.0f);
@@ -3068,7 +3068,7 @@ long Surf3DBase::CreateWireFrameSurfaceWithLines(CPoint3D * Vertices, long * vLi
 }
 
 //Utility function to create a line made up of a variable width cylinder. the GLUquadricObj must be preallocated
-void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd, const float & lineWidth) {
+void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd, float lineWidth, int nslices, int nstacks) {
 	if (qobj == NULL) return;
 	CPoint3D	offset, NormalOffset, NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
 	Matrix4D	rotMat;
@@ -3095,7 +3095,7 @@ void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, co
 	
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
-	gluCylinder(qobj, lineWidth, lineWidth, length, 4, 1);
+	gluCylinder(qobj, lineWidth, lineWidth, length, nslices, nstacks);
 	glPopMatrix();
 }
 
@@ -3763,34 +3763,33 @@ void DrawSceneString(const float scale_factor, const float shift_x,
 
 }
 
-#define CYL_RADIUS 0.1f
+#define CYL_RADIUS 0.05f
 void MolDisplayWin::DrawBondingSites(int ox_num, unsigned char paired_sites, float radius, GLUquadricObj *qobj) {
 
 	CPoint3D origin = CPoint3D(0.0f, 0.0f, 0.0f);
 	float c, s, b, d;
-	// int ox_num = Prefs->GetOxidationNumber(atom_type); 
 
 	glPushName(0);
-	glColor3f(0.0f, 0.0f, 0.0f);
+	glColor3f(0.4f, 0.4f, 0.4f);
 
 	switch (ox_num) {
 		case 1:
 			if (!(paired_sites & 1)) {
 				glLoadName(1);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			break;
 		case 2:
 			if (!(paired_sites & 1)) {
 				glLoadName(1);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 2)) {
 				glLoadName(2);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			break;
 		case 3:
@@ -3798,17 +3797,17 @@ void MolDisplayWin::DrawBondingSites(int ox_num, unsigned char paired_sites, flo
 			if (!(paired_sites & 1)) {
 				glLoadName(1);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 2)) {
 				glLoadName(2);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 4)) {
 				glLoadName(3);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			break;
 		case 4:
@@ -3819,22 +3818,22 @@ void MolDisplayWin::DrawBondingSites(int ox_num, unsigned char paired_sites, flo
 			if (!(paired_sites & 1)) {
 				glLoadName(1);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 2)) {
 				glLoadName(2);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 4)) {
 				glLoadName(3);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 8)) {
 				glLoadName(4);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			break;
 		case 5:
@@ -3842,27 +3841,27 @@ void MolDisplayWin::DrawBondingSites(int ox_num, unsigned char paired_sites, flo
 			if (!(paired_sites & 1)) {
 				glLoadName(1);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 2)) {
 				glLoadName(2);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 4)) {
 				glLoadName(3);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 8)) {
 				glLoadName(4);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 16)) {
 				glLoadName(5);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 4) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 4) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			break;
 		case 6:
@@ -3870,32 +3869,32 @@ void MolDisplayWin::DrawBondingSites(int ox_num, unsigned char paired_sites, flo
 			if (!(paired_sites & 1)) {
 				glLoadName(1);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 2)) {
 				glLoadName(2);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 4)) {
 				glLoadName(3);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 8)) {
 				glLoadName(4);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 16)) {
 				glLoadName(5);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 4) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 4) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			if (!(paired_sites & 32)) {
 				glLoadName(6);
 				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 5) * 2.0f * radius, CYL_RADIUS);
+					Prefs->BondingSite(ox_num, 5) * 2.0f * radius, CYL_RADIUS, 10, 1);
 			}
 			break;
 	}
