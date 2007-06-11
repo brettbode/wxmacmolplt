@@ -274,6 +274,7 @@ class mpAtom {
 			ox_num = 0;
 		};
 		inline int GetOxidationNumber(void) const {return ox_num;}
+		inline int SetOxidationNumber(int new_ox_num) {ox_num = new_ox_num; paired_sites = 0;}
 		inline bool GetInvisibility(void) const {return ((flags & 1)? true: false);};	//Bit 1 sets invisibility
 		bool SetInvisibility(bool State) {flags = (flags & 0xFE) + (State? 1:0);return GetInvisibility();};
 		inline bool GetSelectState(void) const {return ((flags&2)?true:false);};	//Bit 2 sets selected
