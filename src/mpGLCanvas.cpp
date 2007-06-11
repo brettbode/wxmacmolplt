@@ -917,7 +917,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 		if (MolWin->LassoSelected()) {
 			MolWin->LassoEnd(tmpPnt.x, height - tmpPnt.y);
-			if (!MolWin->LassoHasArea()) {
+			if (mSelectState <= 0) {
 				SelectObj(selected_type, selected, deSelectAll);
 			}
 			edited_atoms = true;
@@ -955,7 +955,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						newPnt.x = newPnt.y = newPnt.z = 0.0f;
 
 						int base_type = lFrame->GetAtomType(selected) - 1;
-						int ox_num = Prefs->GetOxidationNumber(base_type);
+						int ox_num = lFrame->GetAtomOxidationNumber(selected);
 						CPoint3D site_vec = Prefs->BondingSite(ox_num, selected_site);
 						CPoint3D trans_site_vec;
 						CPoint3D origin;
@@ -970,7 +970,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 							 Prefs->GetAtomSize(periodic_dlg->GetSelectedID() - 1)));
 
 						lFrame->SetAtomBondingSite(selected, selected_site, true);
-						lFrame->SetAtomBondingSite(lFrame->NumAtoms, 0, true);
+						lFrame->SetAtomBondingSite(lFrame->NumAtoms - 1, 0, true);
 
 						int new_type = lFrame->GetAtomType(lFrame->NumAtoms - 1) - 1;
 
@@ -1006,7 +1006,10 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						newPnt.y = newY;
 						newPnt.z = newZ;
 
-						mMainData->NewAtom(periodic_dlg->GetSelectedID(), newPnt);
+						int type = periodic_dlg->GetSelectedID();
+						mMainData->NewAtom(type, newPnt);
+						lFrame->SetAtomOxidationNumber(lFrame->NumAtoms - 1,
+							Prefs->GetOxidationNumber(type - 1));
 
 						MolWin->SetStatusText(wxT("Added new atom."));
 					}
@@ -2322,7 +2325,7 @@ void MpGLCanvas::togglePeriodicDialog(void) {
 			wxRect window_rect = GetRect();
 			periodic_dlg = new PeriodicTableDlg(
 				this, wxT("Periodic Table"), window_rect.x + window_rect.width,
-				window_rect.y + 30);
+				window_rect.y + 22);
 			periodic_dlg->Show();
 		}
 		((MpApp &) wxGetApp()).AdjustAllMenus();
