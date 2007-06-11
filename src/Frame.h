@@ -114,11 +114,11 @@ class Frame {
 		bool SetAtomPosition(long theAtom, const CPoint3D & p);
 		mpAtom * AddAtom(long AtomType, const CPoint3D & AtomPosition, long index=-1);
 		bool IncreaseAtomAllocation(long NumAdditional);
-			//BondExists returns the id of the bond, -1 otherwise
+		//BondExists returns the id of the bond, -1 otherwise
 		long BondExists(long atom1, long atom2) const;
 		void DeleteAtom(long AtomNum);
-			//AddBond validates the two atom references and increases the BondAllocation as
-			//necessary, but does not check the uniqueness of the bond
+		//AddBond validates the two atom references and increases the BondAllocation as
+		//necessary, but does not check the uniqueness of the bond
 		bool AddBond(long Atom1, long Atom2, const BondOrder & b=kSingleBond);
 		bool IncreaseBondAllocation(long NumAdditional);
 		void DeleteBond(long BondNum);
@@ -192,6 +192,7 @@ class Frame {
 		int GetNumAtomsSelected(void) const;
 		int GetAtomNumBonds(int atom_id) const;
 		bool SetAtomOxidationNumber(int atom_id, int ox_num);
+		int GetAtomOxidationNumber(int atom_id);
 		void SetAtomBondingSite(int atom_id, unsigned char site_id, bool is_bonded);
 
 };

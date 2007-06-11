@@ -241,11 +241,12 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 				Atoms[i] = Atoms[i-1];
 			}
 		}
+		Atoms[index].paired_sites = 0;
 		Atoms[index].Type = AtomType;
 		Atoms[index].Position = AtomPosition;
 		Atoms[index].flags = 0;
 		InitRotationMatrix(Atoms[index].rot);
-		Atoms[index].ox_num = gPreferences->GetOxidationNumber(AtomType - 1);
+		Atoms[index].ox_num = 0; //gPreferences->GetOxidationNumber(AtomType - 1);
 		result = &Atoms[index];
 		NumAtoms++;
 	}
@@ -537,8 +538,26 @@ bool Frame::SetAtomOxidationNumber(int atom_id, int ox_num) {
 		return false;
 	}
 
-	Atoms[atom_id].ox_num = ox_num;
+	// Turn off all bonds.  We do this because generally changing the 
+	// bonding sites will invalidate previous structures.
+	for (long i = 0; i < NumBonds; i++) {
+		if (Bonds[i].Atom1 == atom_id || Bonds[i].Atom2 == atom_id) {
+			DeleteBond(i);
+			i--;
+		}
+	}
+
+	Atoms[atom_id].SetOxidationNumber(ox_num);
+	
 	return true;
+
+}
+
+int Frame::GetAtomOxidationNumber(int atom_id) {
+
+	// This function returns the oxidation number for an atom in this frame.
+
+	return Atoms[atom_id].ox_num;
 
 }
 
