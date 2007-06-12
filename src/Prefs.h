@@ -383,7 +383,8 @@ class WinPrefs {
 		inline Boolean GetAnimateMode(void) const {return AnimateMode;};
 		inline Boolean SetAnimateMode(Boolean state) {return AnimateMode=state;};
 		inline long GetBitOpt() { return  BitOptions; } //for debugging
-		unsigned char GetOxidationNumber(int atom_type);
+		unsigned char GetOxidationNumber(int atomic_number);
+		void SetOxidationNumber(int atomic_number, int ox_num);
 		CPoint3D BondingSite(int oxidation_num, int site_id);
 };
 
