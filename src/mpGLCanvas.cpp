@@ -793,6 +793,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	bool deSelectAll = true;
 	bool edited_atoms = false;
 	int width, height;
+	static int first_site = -1;
+	static int first_atom = -1;
 
 	tmpPnt = event.GetPosition();
 
@@ -843,6 +845,9 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	   
 				winDiffX = tmpPnt.x - (int)tmpWinX;
 				winDiffY = tmpPnt.y - (int)tmpWinY;
+
+				first_site = selected_site;
+				first_atom = selected;
 			}
 		}
 	}
@@ -902,7 +907,9 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		// User must be wanting to translate or rotate atoms.
 		else if (MolWin->HandSelected() &&
 				 (selected_type == MMP_BOND || selected_type == MMP_ATOM)) {
-			HandleEditing(event, tmpPnt, oldTmpPnt);
+			if (selected_site < 0) {
+				HandleEditing(event, tmpPnt, oldTmpPnt);
+			}
 			edited_atoms = true;
 		}
 		
@@ -954,40 +961,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						CPoint3D newPnt;
 						newPnt.x = newPnt.y = newPnt.z = 0.0f;
 
-						int base_type = lFrame->GetAtomType(selected) - 1;
-						int ox_num = lFrame->GetAtomOxidationNumber(selected);
-						CPoint3D site_vec = Prefs->BondingSite(ox_num, selected_site);
-						CPoint3D trans_site_vec;
-						CPoint3D origin;
+						lFrame->AddAtomAtSite(selected, selected_site, periodic_dlg->GetSelectedID());
 
-					   	lFrame->GetAtomPosition(selected, origin);
-						Rotate3DOffset(lFrame->Atoms[selected].rot,
-								       site_vec, &trans_site_vec);
-
-						mMainData->NewAtom(periodic_dlg->GetSelectedID(),
-							origin + trans_site_vec * Prefs->GetAutoBondScale() *
-							(Prefs->GetAtomSize(base_type) +
-							 Prefs->GetAtomSize(periodic_dlg->GetSelectedID() - 1)));
-
-						lFrame->SetAtomBondingSite(selected, selected_site, true);
-						lFrame->SetAtomBondingSite(lFrame->NumAtoms - 1, 0, true);
-
-						int new_type = lFrame->GetAtomType(lFrame->NumAtoms - 1) - 1;
-
-						Matrix4D rot_copy;
-						Matrix4D new_rot;
-						CPoint3D new_site_vec;
-
-						new_site_vec = Prefs->BondingSite(
-							Prefs->GetOxidationNumber(new_type), 0) * -1.0f;
-
-						SetRotationMatrix(new_rot, &new_site_vec, &trans_site_vec);
-						MultiplyMatrix(lFrame->Atoms[lFrame->NumAtoms - 1].rot,
-								       new_rot, rot_copy);
-						memcpy(lFrame->Atoms[lFrame->NumAtoms - 1].rot,
-							   rot_copy, sizeof(float) * 16);
-
-						lFrame->AddBond(selected, lFrame->NumAtoms - 1);
 						MolWin->SetStatusText(wxT("Added new atom."));
 					}
 
@@ -1009,7 +984,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						int type = periodic_dlg->GetSelectedID();
 						mMainData->NewAtom(type, newPnt);
 						lFrame->SetAtomOxidationNumber(lFrame->NumAtoms - 1,
-							Prefs->GetOxidationNumber(type - 1));
+							Prefs->GetOxidationNumber(type));
 
 						MolWin->SetStatusText(wxT("Added new atom."));
 					}
@@ -1044,6 +1019,13 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			MolWin->UpdateGLModel();
 			edited_atoms = true;
 
+		} else if (first_site >= 0) {
+			testPicking(tmpPnt.x, tmpPnt.y);
+			if (selected_site >= 0) {
+				lFrame->AddBondBetweenSites(first_atom, first_site,
+											selected, selected_site);
+			}
+			first_site = -1;
 		}
 
 		if (mDragWin) {
@@ -1821,23 +1803,30 @@ void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
 
 void MpGLCanvas::ChangeOxidationNumber(wxCommandEvent& event) {
 
-	Frame *lFrame = mMainData->cFrame;
+	/* This function changes the oxidation number for the clicked-on
+	 * atom.  It prompts the user for a new oxidation number with a
+	 * popup dialog with a select menu.  Any future atoms of this element
+	 * will have this new oxidation number. */
 
+	Frame *lFrame = mMainData->cFrame;
 	wxString items[] = {
 		wxT("0"), wxT("1"), wxT("2"), wxT("3"), wxT("4"),
-		wxT("5"), wxT("6"), wxT("7")
+		wxT("5"), wxT("6")
 	};
-	wxString message = wxString(wxT("Select an oxidation number:"));
-	std::cout << "selected: " << selected << std::endl;
 
-	ChooseDialog *dlg = new ChooseDialog(this, (wxWindowID) 503, message,
-								8, items);
+	wxString message = wxString(wxT("Select an oxidation number:"));
+
+	ChooseDialog *dlg = new ChooseDialog(this, wxID_ANY, message, 7, items);
 	dlg->SetSelectedIndex(lFrame->Atoms[selected].ox_num);
 
 	if (dlg->ShowModal() == wxID_OK) {
-		std::cout << "selected: " << selected << std::endl;
-		lFrame->SetAtomOxidationNumber(selected, dlg->GetSelectedIndex());
-		std::cout << "dlg->GetSelectedIndex(): " << dlg->GetSelectedIndex() << std::endl;
+		int ox_num = dlg->GetSelectedIndex();
+
+		/* Change both the atom that was clicked on and the oxidation number
+		 * table, so any future atoms of this element have the same
+		 * oxidation number. */
+		lFrame->SetAtomOxidationNumber(selected, ox_num);
+		Prefs->SetOxidationNumber(lFrame->GetAtomType(selected), ox_num);
 	}
 
 }

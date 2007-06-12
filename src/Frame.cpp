@@ -246,7 +246,7 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 		Atoms[index].Position = AtomPosition;
 		Atoms[index].flags = 0;
 		InitRotationMatrix(Atoms[index].rot);
-		Atoms[index].ox_num = 0; //gPreferences->GetOxidationNumber(AtomType - 1);
+		Atoms[index].ox_num = 0;
 		result = &Atoms[index];
 		NumAtoms++;
 	}
@@ -540,12 +540,12 @@ bool Frame::SetAtomOxidationNumber(int atom_id, int ox_num) {
 
 	// Turn off all bonds.  We do this because generally changing the 
 	// bonding sites will invalidate previous structures.
-	for (long i = 0; i < NumBonds; i++) {
-		if (Bonds[i].Atom1 == atom_id || Bonds[i].Atom2 == atom_id) {
-			DeleteBond(i);
-			i--;
-		}
-	}
+	// for (long i = 0; i < NumBonds; i++) { 
+		// if (Bonds[i].Atom1 == atom_id || Bonds[i].Atom2 == atom_id) { 
+			// DeleteBond(i); 
+			// i--; 
+		// } 
+	// } 
 
 	Atoms[atom_id].SetOxidationNumber(ox_num);
 	
@@ -1991,3 +1991,68 @@ int Frame::GetAtomNumBonds(int atom_id) const {
 	return num_bonds;
 
 }
+
+void Frame::AddHydrogens(void) {
+
+	int i, j;
+
+	for (i = 0; i < NumAtoms; i++) {
+		// if Carbon
+		//   for each site to ox_num
+		//      if unpaired
+		//         add H
+		if (Atoms[i].Type == 6) {
+			for (j = 0; j < Atoms[i].ox_num; j++) {
+				if (!(Atoms[i].paired_sites & (1 << j))) {
+					AddAtomAtSite(i, j, 1);
+				}
+			}
+		}
+	}
+}
+
+void Frame::AddAtomAtSite(int atom_id, int site_id, int new_atom_type) {
+
+	int base_type = GetAtomType(atom_id) - 1;
+	int ox_num = GetAtomOxidationNumber(atom_id);
+	WinPrefs *Prefs = gPreferences;
+	CPoint3D site_vec = Prefs->BondingSite(ox_num, site_id);
+	CPoint3D trans_site_vec;
+	CPoint3D origin;
+
+	SetAtomBondingSite(atom_id, site_id, true);
+
+	GetAtomPosition(atom_id, origin);
+	Rotate3DOffset(Atoms[atom_id].rot, site_vec, &trans_site_vec);
+
+	AddAtom(new_atom_type,
+			origin + trans_site_vec * Prefs->GetAutoBondScale() *
+			(Prefs->GetAtomSize(base_type) + Prefs->GetAtomSize(new_atom_type - 1)));
+
+	SetAtomOxidationNumber(NumAtoms - 1,
+						   Prefs->GetOxidationNumber(new_atom_type));
+	SetAtomBondingSite(NumAtoms - 1, 0, true);
+
+	Matrix4D rot_copy;
+	Matrix4D new_rot;
+	CPoint3D new_site_vec;
+
+	new_site_vec = Prefs->BondingSite(
+		Prefs->GetOxidationNumber(new_atom_type), 0) * -1.0f;
+
+	SetRotationMatrix(new_rot, &new_site_vec, &trans_site_vec);
+	MultiplyMatrix(Atoms[NumAtoms - 1].rot, new_rot, rot_copy);
+	memcpy(Atoms[NumAtoms - 1].rot, rot_copy, sizeof(float) * 16);
+
+	AddBond(atom_id, NumAtoms - 1);
+}
+
+void Frame::AddBondBetweenSites(int atom1_id, int site1_id,
+								int atom2_id, int site2_id) {
+
+	SetAtomBondingSite(atom1_id, site1_id, true);
+	SetAtomBondingSite(atom2_id, site2_id, true);
+	AddBond(atom1_id, atom2_id);
+
+}
+
