@@ -102,6 +102,7 @@ enum MMP_EventID {
 	MMP_CONVERTTOBOHR,
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
+	MMP_ADDHYDROGENS,
 	MMP_NEWFRAME,
 	MMP_ADDFRAMES,
 	MMP_DELETEFRAME,
@@ -254,9 +255,10 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_PGORDER8,				MolDisplayWin::menuSetPointGroupOrder)
 	EVT_MENU (MMP_DETERMINEPG,			MolDisplayWin::menuMoleculeDetermineSym)
 	EVT_MENU (MMP_SYMADAPTCOORDS,		MolDisplayWin::menuMoleculeSymCoords)
-	EVT_MENU (MMP_CONVERTTOBOHR,      MolDisplayWin::menuMoleculeConvertToBohr)
-	EVT_MENU (MMP_CONVERTTOANGSTROMS, MolDisplayWin::menuMoleculeConvertToAngstroms)
-	EVT_MENU (MMP_INVERTNORMALMODE,   MolDisplayWin::menuMoleculeInvertNormalMode)
+	EVT_MENU (MMP_CONVERTTOBOHR,		MolDisplayWin::menuMoleculeConvertToBohr)
+	EVT_MENU (MMP_CONVERTTOANGSTROMS,	MolDisplayWin::menuMoleculeConvertToAngstroms)
+	EVT_MENU (MMP_INVERTNORMALMODE,		MolDisplayWin::menuMoleculeInvertNormalMode)
+	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuMoleculeAddHydrogens)
 
 	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
 	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)
@@ -641,6 +643,9 @@ void MolDisplayWin::createMenuBar(void) {
 	menuMolecule->Append(MMP_CONVERTTOBOHR, wxT("Convert to &Bohr"));
 	menuMolecule->Append(MMP_CONVERTTOANGSTROMS, wxT("Convert to &Angstroms"));
 	menuMolecule->Append(MMP_INVERTNORMALMODE, wxT("&Invert Normal Mode"), _T("Multiply the normal mode by -1 to invert the direction of the vectors"));
+#ifdef ENABLE_INTERACTIVE_MODE
+	menuMolecule->Append(MMP_ADDHYDROGENS, wxT("Add &Hydrogens"), _T("Complete hydrocarbons by adding hydrogens to unbonded carbon atoms"));
+#endif
 // TODO:  Create menu items for remaining menus
 
 	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"));
@@ -688,6 +693,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuMolecule->Enable(MMP_DETERMINEPG, false);
 	menuMolecule->Enable(MMP_SYMADAPTCOORDS, false);
 	menuMolecule->Enable(MMP_INVERTNORMALMODE, false);
+	// menuMolecule->Enable(MMP_ADDHYDROGENS, false); 
 }
 void MolDisplayWin::AdjustMenus(void) {
 	ClearMenus();
@@ -2266,6 +2272,11 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 	ResetModel(false);
 	Dirty = true;
 }
+
+void MolDisplayWin::menuMoleculeAddHydrogens(wxCommandEvent &event) {
+	MainData->cFrame->AddHydrogens();
+}
+
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 	StopAnimations();
 	int key = event.GetKeyCode();

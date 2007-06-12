@@ -307,6 +307,7 @@ class MolDisplayWin : public wxFrame {
 		void menuMoleculeConvertToBohr(wxCommandEvent &event);
 		void menuMoleculeConvertToAngstroms(wxCommandEvent &event);
 		void menuMoleculeInvertNormalMode(wxCommandEvent &event);
+		void menuMoleculeAddHydrogens(wxCommandEvent &event);
 		
 		//Commands to open (or raise) the various data subviews.
 		//void menuWindowMain_display(wxCommandEvent &event);
