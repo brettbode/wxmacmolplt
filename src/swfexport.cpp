@@ -65,7 +65,7 @@ void MolDisplayWin::WriteFlashMovie(wxString & filepath) {
 	bool includeEP = SWFOptions->AddEnergyPlot();
 
 	BeginOperation();
-	ProgressInd->ChangeText("Creating movieÉ");
+	ProgressInd->ChangeText("Creating movie...");
 
 	if(movieType == 0) {
 		CreateFrameMovie(filepath, includeEP);
