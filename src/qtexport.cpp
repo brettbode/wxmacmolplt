@@ -341,7 +341,7 @@ void MolDisplayWin::WriteQTMovie(wxString & filepath) {
 	tempSpec.name[0] = 22;
 
 	BeginOperation();
-	ProgressInd->ChangeText("Creating movieÉ");
+	ProgressInd->ChangeText("Creating movie...");
 		
 	myErr = EnterMovies();	//initialize the quicktime manager
 	if (myErr != noErr) {
