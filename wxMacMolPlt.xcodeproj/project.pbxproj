@@ -331,6 +331,9 @@
 		8B6C7BFB0A24E9C100B7358F /* energyplotdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */; };
 		8B6C7BFF0A24E9E800B7358F /* wxMolGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */; };
 		8B7145C90A23983200435951 /* aboutwxmacmolplt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */; };
+		8B74487B0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7448790C1EF9E600A74512 /* ChooseDialog.cpp */; };
+		8B74487C0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7448790C1EF9E600A74512 /* ChooseDialog.cpp */; };
+		8B74487D0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7448790C1EF9E600A74512 /* ChooseDialog.cpp */; };
 		8B8816AF0A751FED00EC8791 /* bindoc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC809D0B43700B7783F /* bindoc.icns */; };
 		8B8816B00A751FED00EC8791 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC909D0B43700B7783F /* Info.plist */; };
 		8B8816B10A751FED00EC8791 /* MacMolPlt.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACA09D0B43700B7783F /* MacMolPlt.icns */; };
@@ -668,6 +671,8 @@
 		8B6C7BFE0A24E9E800B7358F /* wxMolGraph.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = wxMolGraph.h; path = src/wxMolGraph.h; sourceTree = "<group>"; };
 		8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = aboutwxmacmolplt.cpp; path = src/aboutwxmacmolplt.cpp; sourceTree = "<group>"; };
 		8B7145C80A23983200435951 /* aboutwxmacmolplt.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = aboutwxmacmolplt.h; path = src/aboutwxmacmolplt.h; sourceTree = "<group>"; };
+		8B7448790C1EF9E600A74512 /* ChooseDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ChooseDialog.cpp; path = src/ChooseDialog.cpp; sourceTree = "<group>"; };
+		8B74487A0C1EF9E600A74512 /* ChooseDialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ChooseDialog.h; path = src/ChooseDialog.h; sourceTree = "<group>"; };
 		8B8816EF0A751FED00EC8791 /* wxMacMolPlt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wxMacMolPlt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
 		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
@@ -756,6 +761,8 @@
 				16FB432E09F026A300E84C6B /* bondsdlg.cpp */,
 				16FB432F09F026A300E84C6B /* bondsdlg.h */,
 				1652DA2D09D0B12600B7783F /* cell_table.h */,
+				8B7448790C1EF9E600A74512 /* ChooseDialog.cpp */,
+				8B74487A0C1EF9E600A74512 /* ChooseDialog.h */,
 				8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */,
 				8BE7C29C0A273D9700DACA25 /* choosevecgroup.h */,
 				1652DA2E09D0B12600B7783F /* CML.cpp */,
@@ -1293,6 +1300,7 @@
 				8BEA48E00BFA078600C660A3 /* swf4compiler.tab.c in Sources */,
 				8BEA48E90BFA0BE900C660A3 /* swfexport.cpp in Sources */,
 				8BEA48F10BFA0F7300C660A3 /* Geometries.cpp in Sources */,
+				8B74487B0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1425,6 +1433,7 @@
 				8B33B9630BF8EDA20056C79E /* swf5compiler.tab.c in Sources */,
 				8BEA48EB0BFA0BE900C660A3 /* swfexport.cpp in Sources */,
 				8BEA48F30BFA0F7300C660A3 /* Geometries.cpp in Sources */,
+				8B74487D0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1557,6 +1566,7 @@
 				8B33B95A0BF8EDA20056C79E /* swf5compiler.tab.c in Sources */,
 				8BEA48EA0BFA0BE900C660A3 /* swfexport.cpp in Sources */,
 				8BEA48F20BFA0F7300C660A3 /* Geometries.cpp in Sources */,
+				8B74487C0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
