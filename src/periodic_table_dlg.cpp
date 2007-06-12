@@ -132,7 +132,7 @@ bool PeriodicTableDlg::Create(
 		wxString tool_tip;
 		tool_tip.Printf(wxT("Number: %d, Mass: %f, Oxidation #: %d"), i + 1,
 			parent->GetPrefs()->GetAtomMass(i),
-			parent->GetPrefs()->GetOxidationNumber(i));
+			parent->GetPrefs()->GetOxidationNumber(i + 1));
 		elements[i].button->SetToolTip(tool_tip);
 
 	}
