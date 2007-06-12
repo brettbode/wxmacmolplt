@@ -535,6 +535,7 @@ public:
 	wxUglyChoice* unitChoice;
 	wxTextCtrl* zmatrixVarsText;
 	wxUglyChoice* pointGroupChoice;
+	wxStaticText* paxisOrderText;
 	wxUglyChoice* paxisOrderChoice;
 	wxCheckBox* symmetryCheck;
 	wxTextCtrl* timeLimitText;

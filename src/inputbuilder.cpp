@@ -294,6 +294,7 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
 	unitChoice = NULL;
 	zmatrixVarsText = NULL;
 	pointGroupChoice = NULL;
+	paxisOrderText = NULL;
 	paxisOrderChoice = NULL;
 	symmetryCheck = NULL;
 	timeLimitText = NULL;
@@ -814,14 +815,18 @@ void InputBuilderWindow::CreateControls()
 	pointGroupChoice = new wxUglyChoice( itemPanel59, ID_POINTGROUP_CHOICE, wxDefaultPosition, wxDefaultSize, pointGroupChoiceStrings, 0 );
 	itemFlexGridSizer73->Add(pointGroupChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);
 
-	wxStaticText* itemStaticText76 = new wxStaticText( itemPanel59, wxID_STATIC, _("Order of Principle Axis:"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemStaticText76->Enable(false);
-	itemFlexGridSizer73->Add(itemStaticText76, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
+	paxisOrderText = new wxStaticText( itemPanel59, wxID_STATIC, _("Order of Principle Axis:"), wxDefaultPosition, wxDefaultSize, 0 );
+	paxisOrderText->Enable(false);
+	itemFlexGridSizer73->Add(paxisOrderText, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
 	wxArrayString paxisOrderChoiceStrings;
 	paxisOrderChoiceStrings.Add(_("2"));
 	paxisOrderChoiceStrings.Add(_("3"));
 	paxisOrderChoiceStrings.Add(_("4"));
+	paxisOrderChoiceStrings.Add(_("5"));
+	paxisOrderChoiceStrings.Add(_("6"));
+	paxisOrderChoiceStrings.Add(_("7"));
+	paxisOrderChoiceStrings.Add(_("8"));
 	paxisOrderChoice = new wxUglyChoice( itemPanel59, ID_ORDER_CHOICE, wxDefaultPosition, wxDefaultSize, paxisOrderChoiceStrings, 0 );
 	if (ShowToolTips())
 		paxisOrderChoice->SetToolTip(_("Replaces the 'n' above."));
@@ -1836,13 +1841,17 @@ void InputBuilderWindow::SetupPointGroupOrder(void) {
 	if (itemValue == 0) itemValue = 1;
 	if ((itemValue>3)&&(itemValue<11)) {
 		paxisOrderChoice->Enable(true);
+		paxisOrderText->Enable(true);
 		itemValue = TmpInputRec->Data->GetPointGroupOrder()-1;
 		if (itemValue <= 0) {
 			itemValue = 1;
 			TmpInputRec->Data->SetPointGroupOrder(2);
 		}
 		paxisOrderChoice->SetSelection(itemValue-1);
-	} else paxisOrderChoice->Enable(false);
+	} else  {
+		paxisOrderChoice->Enable(false);
+		paxisOrderText->Enable(false);
+	}
 }
 
 void InputBuilderWindow::SetupSystemItems() {
