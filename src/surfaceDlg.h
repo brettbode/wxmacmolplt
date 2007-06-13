@@ -362,6 +362,7 @@ class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
     void OnAtomList( wxCommandEvent &event );
     void OnOrbFormatChoice( wxCommandEvent &event );
     void OnReversePhase(wxCommandEvent &event );
+    void OnSphHarmonicChk(wxCommandEvent &event );
     void OnCoefList( wxCommandEvent &event );
 
  private:

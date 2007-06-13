@@ -76,6 +76,7 @@ BEGIN_EVENT_TABLE( Orbital2DSurfPane, wxPanel )
 	EVT_CHECKBOX (ID_DISPLAY_PLANE_CHECKBOX, Surface2DPane::OnDisplayPlaneChk)
 	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface2DPane::OnContourValueText)
 	EVT_TEXT (ID_NUM_CONTOUR_TEXT, Surface2DPane::OnNumContoursText)
+	EVT_CHECKBOX (ID_SPH_HARMONICS_CHECKBOX, Orbital2DSurfPane::OnSphHarmonicChk)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
@@ -1186,21 +1187,14 @@ void Orbital2DSurfPane::CreateControls()
   makeAOList(choices3);
 
   mAtomList = new wxListBox( this, ID_ATOM_LIST,
-                             wxDefaultPosition, wxSize(130,180),
+                             wxDefaultPosition, wxSize(150,180),
                              choices2.size(), &choices2.front(), 
 			     wxLB_SINGLE |wxLB_ALWAYS_SB );
 
-  mOrbCoef = new wxListBox( this, ID_ORB_COEF, wxPoint(20,160), wxSize(150,200), choices3.size(), &choices3.front(), wxLB_SINGLE |wxLB_ALWAYS_SB);
+  mOrbCoef = new wxListBox( this, ID_ORB_COEF, wxPoint(20,160), wxSize(170,200), choices3.size(), &choices3.front(), wxLB_SINGLE |wxLB_ALWAYS_SB);
 
   mSphHarmonicsChk->SetValue(SphericalHarmonics);
   upperLeftMiddleSizer->Add(mSphHarmonicsChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-
-  if (OrbOptions & 1 && PlotOrb >= 0)
-    upperLeftMiddleSizer->Show(mSphHarmonicsChk, true);
-  else
-    upperLeftMiddleSizer->Show(mSphHarmonicsChk, false);
-
-  upperLeftMiddleSizer->Layout();
 
   lowerLeftMiddleSizer->Add(label1, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   lowerLeftMiddleSizer->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -1288,6 +1282,9 @@ void Orbital2DSurfPane::CreateControls()
   mainSizer->Add(upperSizer);
   mainSizer->Add(middleSizer);
   mainSizer->Add(bottomSizer);
+  
+  wxCommandEvent foo;
+  OnOrbSetChoice(foo);
 }
 
 void Orbital2DSurfPane::TargetToPane(void) 
@@ -1361,6 +1358,10 @@ void Orbital2DSurfPane::OnUpdate(wxCommandEvent &event )
   if (UseScreenPlane && !mTarget->GetRotate2DMap()) updateGrid = true;
   mTarget->SetRotate2DMap(UseScreenPlane);
   mTarget->SetDashLine(DashLines);
+  if (SphericalHarmonics != mTarget->UseSphericalHarmonics()) {
+	  mTarget->UseSphericalHarmonics(SphericalHarmonics);
+	  updateGrid = true;
+  }
   if (PhaseChange != mTarget->GetPhaseChange()) {
     updateGrid = true;
     mTarget->SetPhaseChange(PhaseChange);
@@ -1444,54 +1445,39 @@ void Orbital2DSurfPane::refreshControls()
   mOrbColor2->setColor(&NegColor);
 }
 
-void Orbital2DSurfPane::OnOrbSetChoice( wxCommandEvent &event )
-{
-  int item = mOrbSetChoice->GetSelection()+1;
-  int itemtype = orbSetChangeEvt(item, owner);
-
-  if (itemtype) 
-    {	//TargetSet has been choosen
-      PlotOrb = -1;
-
-      //BasisSet * lBasis = MainData->GetBasisSet();
-      //LAddRow(lBasis->GetNumBasisFuncs(SphericalHarmonics), 0, AOList);
-
-      if (!(OrbOptions&1)) 
-	{	//add some MO rows!
-	  //don't know what's this adding rows for  -Song
-
-	  upperLeftMiddleSizer->Show(mSphHarmonicsChk, false);	  
-	  SphericalHarmonics = false;
-	} 
-      else 
-	{	//Must be looking for AOs
-	  upperLeftMiddleSizer->Show(mSphHarmonicsChk, true);
-	  mSphHarmonicsChk->SetValue(SphericalHarmonics);
+void Orbital2DSurfPane::OnOrbSetChoice( wxCommandEvent &event ) {
+	int item = mOrbSetChoice->GetSelection()+1;
+	int itemtype = orbSetChangeEvt(item, owner);
+	
+	if (itemtype) {	//TargetSet has been choosen
+		PlotOrb = -1;
+		
+		if (!(OrbOptions&1)) {	//An MO set is selected
+			mSphHarmonicsChk->Enable(false);
+			SphericalHarmonics = false;
+			mOrbFormatChoice->Enable(true);
+		} else {	//Must be looking for AOs
+			mSphHarmonicsChk->Enable(true);
+			mSphHarmonicsChk->SetValue(SphericalHarmonics);
+			mOrbFormatChoice->Enable(false);
+		}
 	}
-
-      upperLeftMiddleSizer->Layout();
-    }
-
-  if (item <= 1)
-    {
-      mAtomList->Clear();
-      PlotOrb = -1;
-      coefIsEnabled = true;
-
-      vector<wxString> choice;
-      makeAOList(choice);
-      mOrbCoef->Set(choice.size(), &choice.front());
-    }
-  else
-    {
-      coefIsEnabled = false;
-
-      vector<wxString> newChoice;
-      makeMOList(newChoice);
-
-      mAtomList->Set(newChoice.size(), &newChoice.front());
-    }
-
+	
+	if (item <= 1) {
+		mAtomList->Clear();
+		PlotOrb = -1;
+		coefIsEnabled = true;
+	} else {
+		coefIsEnabled = false;
+		
+		vector<wxString> newChoice;
+		makeMOList(newChoice);
+		
+		mAtomList->Set(newChoice.size(), &newChoice.front());
+	}
+	vector<wxString> choice;
+	makeAOList(choice);
+	mOrbCoef->Set(choice.size(), &choice.front());
 }
 
 void Orbital2DSurfPane::OnCoefList( wxCommandEvent &event )
@@ -1536,6 +1522,17 @@ void Orbital2DSurfPane::OnReversePhase(wxCommandEvent &event )
   setUpdateButton();
 }
 
+void Orbital2DSurfPane::OnSphHarmonicChk(wxCommandEvent &event ) {
+	SphericalHarmonics = mSphHarmonicsChk->GetValue();
+	mAtomList->Clear();
+	PlotOrb = -1;
+	coefIsEnabled = true;
+	
+	vector<wxString> choice;
+	makeAOList(choice);
+	mOrbCoef->Set(choice.size(), &choice.front());
+}
+
 /*!
  * Orbital3D class
  */
@@ -1544,12 +1541,11 @@ Orbital3DSurfPane::Orbital3DSurfPane( wxWindow* parent, Orb3DSurface* target,
 				      SurfacesWindow* o, wxWindowID id,
 				      const wxPoint& pos, const wxSize& size, 
 				      long style ) 
-  : Surface3DPane(parent, target, o, id, pos, size, style), OrbSurfacePane(target, o)
-{
-  mTarget = target;
+  : Surface3DPane(parent, target, o, id, pos, size, style), OrbSurfacePane(target, o) {
+	mTarget = target;
 
-  TargetToPane();
-  CreateControls();
+	TargetToPane();
+	CreateControls();
 }
 
 Orbital3DSurfPane::~Orbital3DSurfPane()
@@ -1557,41 +1553,38 @@ Orbital3DSurfPane::~Orbital3DSurfPane()
 
 }
 
-void Orbital3DSurfPane::TargetToPane(void) 
-{
-  NumGridPoints = mTarget->GetNumGridPoints();
-  mTarget->GetPosColor(&PosColor);
-  mTarget->GetNegColor(&NegColor);
-  mTarget->GetTranspColor(&TranspColor);
-  GridSize = mTarget->GetGridSize();
-  ContourValue = mTarget->GetContourValue();
-  UseSolidSurface = mTarget->SolidSurface();
-  UseNormals = mTarget->UseSurfaceNormals();
-  UpdateTest = false;
-  SwitchFixGrid = false;
+void Orbital3DSurfPane::TargetToPane(void) {
+	NumGridPoints = mTarget->GetNumGridPoints();
+	mTarget->GetPosColor(&PosColor);
+	mTarget->GetNegColor(&NegColor);
+	mTarget->GetTranspColor(&TranspColor);
+	GridSize = mTarget->GetGridSize();
+	ContourValue = mTarget->GetContourValue();
+	UseSolidSurface = mTarget->SolidSurface();
+	UseNormals = mTarget->UseSurfaceNormals();
+	SphericalHarmonics = mTarget->UseSphericalHarmonics();
+	UpdateTest = false;
+	SwitchFixGrid = false;
 }
 
-void Orbital3DSurfPane::refreshControls()
-{
-  float GridMax = mTarget->GetGridMax();
+void Orbital3DSurfPane::refreshControls() {
+	float GridMax = mTarget->GetGridMax();
 
-  mNumGridPntSld->SetValue(NumGridPoints);
-  mGridSizeSld->SetValue((short)(100*GridSize));
-  mContourValSld->SetValue((short)(100*(ContourValue/((fabs(GridMax)>=0.001)?GridMax:0.25))));
-  m3DRdoBox->SetSelection(1-UseSolidSurface);
-  mSmoothChkBox->SetValue(UseNormals);
+	mNumGridPntSld->SetValue(NumGridPoints);
+	mGridSizeSld->SetValue((short)(100*GridSize));
+	mContourValSld->SetValue((short)(100*(ContourValue/((fabs(GridMax)>=0.001)?GridMax:0.25))));
+	m3DRdoBox->SetSelection(1-UseSolidSurface);
+	mSmoothChkBox->SetValue(UseNormals);
+	mSphHarmonicsChk->SetValue(SphericalHarmonics);
 
-  if (UseSolidSurface)
-    mSmoothChkBox->Enable();
-  else
-    mSmoothChkBox->Disable();
+	if (UseSolidSurface)
+		mSmoothChkBox->Enable();
+	else
+		mSmoothChkBox->Disable();
 
-  mOrbColor1->setColor(&PosColor);
-  mOrbColor2->setColor(&NegColor);
-  mTransColor->setColor(&TranspColor);
-//  mOrbColor1->draw(&PosColor);
-  //mOrbColor2->draw(&NegColor);
- // mTransColor->draw(&TranspColor);
+	mOrbColor1->setColor(&PosColor);
+	mOrbColor2->setColor(&NegColor);
+	mTransColor->setColor(&TranspColor);
 }
 
 /*!
@@ -1723,21 +1716,14 @@ void Orbital3DSurfPane::CreateControls()
   makeAOList(choices3);
 
   mAtomList = new wxListBox( this, ID_ATOM_LIST,
-                             wxDefaultPosition, wxSize(140,180),
+                             wxDefaultPosition, wxSize(160,180),
                              choices2.size(), &choices2.front(), 
 			     wxLB_SINGLE |wxLB_ALWAYS_SB );
 
-  mOrbCoef = new wxListBox( this, ID_ORB_COEF, wxPoint(20,160), wxSize(150,200), choices3.size(), &choices3.front(), wxLB_SINGLE |wxLB_ALWAYS_SB );
+  mOrbCoef = new wxListBox( this, ID_ORB_COEF, wxPoint(20,160), wxSize(170,200), choices3.size(), &choices3.front(), wxLB_SINGLE |wxLB_ALWAYS_SB );
 
   mSphHarmonicsChk->SetValue(SphericalHarmonics);
   upperLeftMiddleSizer->Add(mSphHarmonicsChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-
-  if (OrbOptions & 1 && PlotOrb >= 0)
-    upperLeftMiddleSizer->Show(mSphHarmonicsChk, true);
-  else
-    upperLeftMiddleSizer->Show(mSphHarmonicsChk, false);
-
-  upperLeftMiddleSizer->Layout();
 
   lowerLeftMiddleSizer->Add(label1, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   lowerLeftMiddleSizer->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -1832,6 +1818,9 @@ void Orbital3DSurfPane::CreateControls()
   mainSizer->Add(upperSizer);
   mainSizer->Add(middleSizer);
   mainSizer->Add(bottomSizer);
+  
+  wxCommandEvent foo;
+  OnOrbSetChoice(foo);
 }
 
 bool Orbital3DSurfPane::UpdateNeeded(void) {
@@ -1892,66 +1881,48 @@ void Orbital3DSurfPane::OnOrbFormatChoice( wxCommandEvent &event )
 
 }
 
-void Orbital3DSurfPane::OnOrbSetChoice( wxCommandEvent &event )
-{
-  int item = mOrbSetChoice->GetSelection()+1;
-  int itemtype = orbSetChangeEvt(item, owner);
+void Orbital3DSurfPane::OnOrbSetChoice( wxCommandEvent &event ) {
+	int item = mOrbSetChoice->GetSelection()+1;
+	int itemtype = orbSetChangeEvt(item, owner);
 
-  if (itemtype) 
-    {	//TargetSet has been choosen
-      PlotOrb = -1;
+	if (itemtype) {	//TargetSet has been choosen
+		PlotOrb = -1;
 
-      //BasisSet * lBasis = MainData->GetBasisSet();
-      //LAddRow(lBasis->GetNumBasisFuncs(SphericalHarmonics), 0, AOList);
-
-      if (!(OrbOptions&1)) 
-	{	//add some MO rows!
-	  //don't know what's this adding rows for  -Song
-
-	  upperLeftMiddleSizer->Show(mSphHarmonicsChk, false);	  
-	  SphericalHarmonics = false;
-	} 
-      else 
-	{	//Must be looking for AOs
-	  upperLeftMiddleSizer->Show(mSphHarmonicsChk, true);
-	  mSphHarmonicsChk->SetValue(SphericalHarmonics);
+		if (!(OrbOptions&1)) {	//An MO set is selected
+			mSphHarmonicsChk->Enable(false);
+			SphericalHarmonics = false;
+			mOrbFormatChoice->Enable(true);
+		} else {	//Must be looking for AOs
+			mSphHarmonicsChk->Enable(true);
+			mSphHarmonicsChk->SetValue(SphericalHarmonics);
+			mOrbFormatChoice->Enable(false);
+		}
 	}
 
-      upperLeftMiddleSizer->Layout();
-    }
+	if (item <= 1) {
+		mAtomList->Clear();
+		PlotOrb = -1;
+		coefIsEnabled = true;
+	} else {
+		coefIsEnabled = false;
 
-  if (item <= 1)
-    {
-      mAtomList->Clear();
-      PlotOrb = -1;
-      coefIsEnabled = true;
+		vector<wxString> newChoice;
+		makeMOList(newChoice);
 
-      vector<wxString> choice;
-      makeAOList(choice);
-      mOrbCoef->Set(choice.size(), &choice.front());
-    }
-  else
-    {
-      coefIsEnabled = false;
-
-      vector<wxString> newChoice;
-      makeMOList(newChoice);
-
-      mAtomList->Set(newChoice.size(), &newChoice.front());
-    }
-
+		mAtomList->Set(newChoice.size(), &newChoice.front());
+	}
+	vector<wxString> choice;
+	makeAOList(choice);
+	mOrbCoef->Set(choice.size(), &choice.front());
 }
 
-void Orbital3DSurfPane::OnCoefList( wxCommandEvent &event )
-{
-  if (coefIsEnabled)
-    {
-      if (OrbOptions&1)
-	PlotOrb = mOrbCoef->GetSelection();
+void Orbital3DSurfPane::OnCoefList( wxCommandEvent &event ) {
+	if (coefIsEnabled) {
+		if (OrbOptions&1)
+			PlotOrb = mOrbCoef->GetSelection();
 
-      setUpdateButton();
-    }
-
+		setUpdateButton();
+	}
 }
 
 void Orbital3DSurfPane::OnAtomList( wxCommandEvent &event )
@@ -1965,9 +1936,15 @@ void Orbital3DSurfPane::OnAtomList( wxCommandEvent &event )
   setUpdateButton();  
 }
 
-void Orbital3DSurfPane::OnSphHarmonicChk(wxCommandEvent &event )
-{
-  SphericalHarmonics = mSphHarmonicsChk->GetValue();
+void Orbital3DSurfPane::OnSphHarmonicChk(wxCommandEvent &event ) {
+	SphericalHarmonics = mSphHarmonicsChk->GetValue();
+	mAtomList->Clear();
+	PlotOrb = -1;
+	coefIsEnabled = true;
+	
+	vector<wxString> choice;
+	makeAOList(choice);
+	mOrbCoef->Set(choice.size(), &choice.front());
 }
 
 void Orbital3DSurfPane::OnReversePhase(wxCommandEvent &event )
@@ -2036,6 +2013,7 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event )
   mTarget->SetTranspColor(&TranspColor);
   mTarget->SetPhaseChange(PhaseChange);
   mTarget->UseSurfaceNormals(UseNormals);
+  mTarget->UseSphericalHarmonics(SphericalHarmonics);
 
   OrbSurfacePane::UpdateEvent();
   
