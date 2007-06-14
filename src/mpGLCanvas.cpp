@@ -101,6 +101,9 @@ void MpGLCanvas::initGL(void) {
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
 		glEnable(GL_LIGHT0);
 		initialized = true;
+
+		glEnable(GL_ARB_multisample);
+
 	}
 }
 
