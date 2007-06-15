@@ -1557,29 +1557,20 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			  short patternindex = Prefs->GetAtomPattern(lAtoms[iatom].GetType()-1);
 			  //The 0th pattern is assumed to be solid so no need to draw
 			  if ((patternindex>0)&&(patternindex<numPatterns)) {
-			    glDisable(GL_LIGHTING);
+			    //glDisable(GL_LIGHTING);
 			    glColor3f(0.0f,0.0f,0.0f);
-			    glEnable(GL_BLEND);
-			    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+			    //glEnable(GL_BLEND);
+			    //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 			    glEnable(GL_POLYGON_STIPPLE);
 			    glPolygonStipple(atomMaskPatterns[patternindex]);
 			    gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));//Create and draw the sphere
 			    glDisable(GL_POLYGON_STIPPLE);
-			    Prefs->ChangeColorAtomColor(curAtomType+1, 0.5);
 			  }
-			  else
-			    Prefs->ChangeColorAtomColor(curAtomType+1, 1);
 			}
-			else
-			  Prefs->ChangeColorAtomColor(curAtomType+1, 1);
-			
-			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));//Create and draw the sphere
 
-			if (Prefs->Show2DPattern()) { 
-			  glDisable(GL_BLEND);
-			  glEnable(GL_LIGHTING);
-			}
-			  
+			Prefs->ChangeColorAtomColor(curAtomType+1);
+			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));//Create and draw the sphere
+	  
 			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
 				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
 				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
@@ -1594,7 +1585,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere
 
-			if (Prefs->Show2DPattern()) glDisable(GL_BLEND);
+			//if (Prefs->Show2DPattern()) glDisable(GL_BLEND);
 
 			glPushMatrix();
 			glMultMatrixf((float *) &lAtoms[iatom].rot);
