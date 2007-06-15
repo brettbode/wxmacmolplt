@@ -437,13 +437,10 @@ void MpGLCanvas::UpdateGLView(void) {
 }
 
 void MpGLCanvas::eventSize(wxSizeEvent &event) {
-	int width, height;
-
 	wxGLCanvas::OnSize(event);
-
-	GetClientSize(&width, &height);
-
 	UpdateGLView();
+	Update();
+	Refresh();
 }
 
 void MpGLCanvas::eventPaint(wxPaintEvent &event) {
@@ -451,6 +448,7 @@ void MpGLCanvas::eventPaint(wxPaintEvent &event) {
 
 	draw();
 }
+
 void MpGLCanvas::draw(void) {
 	if(!GetContext()||!MolWin->IsShown()||(Prefs==NULL)) {
 		return;
@@ -462,24 +460,27 @@ void MpGLCanvas::draw(void) {
 	}
 	//Only do the drawing if there is not an operation in progress
 	//otherwise the underlying data may not be complete.
-	if (!MolWin->OperInProgress()) MolWin->DrawGL();
-	else
+	if (!MolWin->OperInProgress()) {
+		MolWin->DrawGL();
+	} else {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear out the buffer
+	}
 	
 	SwapBuffers();
 }
+
 void MpGLCanvas::eventErase(wxEraseEvent &event) {
 	// Don't mess with this.  It's supposed to be empty.
 	// This avoids flashing on Windows.
 }
 
-void MpGLCanvas::eventActivate(wxActivateEvent &event) {
+// void MpGLCanvas::eventActivate(wxActivateEvent &event) { 
 	// if (event.GetActive()) { 
 		// stale_click = true; 
 		// wxMouseEvent mouse_event(wxEVT_LEFT_DOWN); 
 		// AddPendingEvent(mouse_event); 
 	// } 
-}
+// } 
 
 void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 									double *z) {
@@ -821,10 +822,17 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	std::cout << "event.Leaving(): " << event.Leaving() << std::endl;
 	std::cout << "event.LeftIsDown(): " << event.LeftIsDown() << std::endl;
 	std::cout << "event.RightIsDown(): " << event.RightIsDown() << std::endl;
+	std::cout << "event.ButtonDClick(): " << event.ButtonDClick() << std::endl;
 #endif
+
+	if (interactiveMode && event.ButtonDClick()) {
+		if (!show_periodic_dlg) {
+			togglePeriodicDialog();
+		}
+	}
 	
-	// First handle left mouse down.
-	if (event.LeftDown() || (event.LeftIsDown() && stale_click) ||
+	// Handle left mouse down.
+	else if (event.LeftDown() || (event.LeftIsDown() && stale_click) ||
 		event.Entering()) {
 		mSelectState = 0;
 		testPicking(tmpPnt.x, tmpPnt.y);
@@ -910,6 +918,9 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		// User must be wanting to translate or rotate atoms.
 		else if (MolWin->HandSelected() &&
 				 (selected_type == MMP_BOND || selected_type == MMP_ATOM)) {
+
+			// But if the user clicked on a bonding site, we don't want
+			// to shift anything.
 			if (selected_site < 0) {
 				HandleEditing(event, tmpPnt, oldTmpPnt);
 			}
@@ -2338,7 +2349,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_PAINT(MpGLCanvas::eventPaint)
 	EVT_ERASE_BACKGROUND(MpGLCanvas::eventErase)
 	EVT_MOUSE_EVENTS(MpGLCanvas::eventMouse)
-	EVT_ACTIVATE_APP(MpGLCanvas::eventActivate)
+	// EVT_ACTIVATE_APP(MpGLCanvas::eventActivate) 
 
 	EVT_CHAR(MpGLCanvas::KeyHandler)
 
