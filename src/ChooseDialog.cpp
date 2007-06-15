@@ -47,32 +47,34 @@ void ChooseDialog::Create(wxWindow *parent, wxWindowID id, wxString& message,
 	wxButton *button_ok, *button_cancel;
 
 	wxDialog::Create(parent, id, wxT("select..."), wxDefaultPosition,
-					 wxDefaultSize);
+					 wxSize(-1, -1));
 
 	selected_idx = 0;
 
-	choices = new wxChoice(this, CHOICES_ID, wxPoint(30, 30),
-						   wxSize(200, wxDefaultCoord), nitems, items);
+	choices = new wxChoice(this, CHOICES_ID, wxPoint(-1, -1),
+						   wxSize(-1, -1), nitems, items);
 	choices->SetSelection(0);
 
 	button_ok = new wxButton(this, wxID_OK, wxT("OK"));
 	button_cancel = new wxButton(this, wxID_CANCEL, wxT("Cancel"));
 
-	main_sizer = new wxBoxSizer(wxVERTICAL); 
 	upper_sizer = new wxBoxSizer(wxVERTICAL); 
 	lower_sizer = new wxBoxSizer(wxHORIZONTAL); 
 
+	upper_sizer->AddSpacer(1);
+	upper_sizer->Add(new wxStaticText(this, -1, message), 0, 
+		wxALL | wxALIGN_LEFT, 3);
 	upper_sizer->Add(choices, 0, wxALIGN_CENTRE | wxALL, 20); 
-	upper_sizer->Add(8, 8); 
-	lower_sizer->Add(10, 10); 
-	lower_sizer->Add(button_ok, 0, wxALIGN_CENTRE | wxALL, 10); 
-	lower_sizer->Add(button_cancel, 0, wxALIGN_CENTRE | wxALL, 10); 
 
-	main_sizer->Add(upper_sizer); 
-	main_sizer->Add(lower_sizer); 
+	lower_sizer->Add(button_ok, 0, wxALIGN_CENTRE | wxALL, 0); 
+	lower_sizer->AddSpacer(3);
+	lower_sizer->Add(button_cancel, 0, wxALIGN_CENTRE | wxALL, 0); 
 
-	main_sizer->Layout(); 
-	SetSizer(main_sizer); 
+	upper_sizer->Add(lower_sizer, 0, wxALIGN_CENTRE | wxALL, 0);
+
+	// main_sizer->Layout();  
+	upper_sizer->Fit(this);
+	SetSizer(upper_sizer); 
 	Centre(wxBOTH); 
 
 }
@@ -87,5 +89,8 @@ void ChooseDialog::OnMouse(wxMouseEvent& event) {
 
 BEGIN_EVENT_TABLE(ChooseDialog, wxDialog)
 	EVT_CHOICE(CHOICES_ID, ChooseDialog::OnChange)
-	EVT_MOUSE_EVENTS(ChooseDialog::OnMouse)
+	// EVT_MOUSE_EVENTS(ChooseDialog::OnMouse) 
 END_EVENT_TABLE()
+
+// --------------------------------------------------------------------------- 
+
