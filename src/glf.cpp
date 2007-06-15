@@ -1425,7 +1425,7 @@ unsigned* texture_to_mask(unsigned* tex, int width, int height)
 }
 
 /* Load BMF file format, function return bitmap font descriptor */
-int glfLoadBMFFont(char *FName)
+int glfLoadBMFFont(const char *FName)
 {
 	FILE *f;
 	char Header[4];
@@ -1623,7 +1623,7 @@ void glfDrawBSymbol(char s)
 }
 
 /* Draw bitmapped string */
-void glfDrawBString(char *s)
+void glfDrawBString(const char *s)
 {
 	GLfloat temp_trans;
 	int i;
