@@ -476,7 +476,7 @@ void MolDisplayWin::OnActivate(wxActivateEvent & event) {
 		StopAnimations();
 	} else {
 		stale_click = true;
-		glCanvas->eventActivate(event);
+		// glCanvas->eventActivate(event); 
 	}
 	event.Skip();
 }
