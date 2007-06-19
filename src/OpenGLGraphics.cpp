@@ -1557,19 +1557,39 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			  short patternindex = Prefs->GetAtomPattern(lAtoms[iatom].GetType()-1);
 			  //The 0th pattern is assumed to be solid so no need to draw
 			  if ((patternindex>0)&&(patternindex<numPatterns)) {
-			    //glDisable(GL_LIGHTING);
+			    //glEnable(GL_DEPTH_TEST);
+			    //glEnable(GL_STENCIL_TEST);
+			    //glStencilFunc(GL_ALWAYS, 1, 1);
+			    //glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+			    //glDepthFunc(GL_LESS);
+
 			    glColor3f(0.0f,0.0f,0.0f);
-			    //glEnable(GL_BLEND);
-			    //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 			    glEnable(GL_POLYGON_STIPPLE);
 			    glPolygonStipple(atomMaskPatterns[patternindex]);
 			    gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));//Create and draw the sphere
 			    glDisable(GL_POLYGON_STIPPLE);
+
+			    //glStencilFunc(GL_EQUAL, 1, 1);
+			    //glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+			    //glDepthFunc(GL_ALWAYS);
 			  }
 			}
 
+			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
+			  glColor3f(0.0f,0.0f,0.0f);
+			  glEnable(GL_POLYGON_STIPPLE);
+			  glPolygonStipple(stippleMask);
+			  gluSphere(qobj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
+			  glDisable(GL_POLYGON_STIPPLE);
+
+			  glColor4f(0.5,0.5,0.5,0.7f);
+			  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+			  glEnable(GL_BLEND);
+			  gluSphere(qobj, radius*1.02, (long)(1.5*Quality), (long)(Quality));
+			  glDisable(GL_BLEND);
+			}
+
 			Prefs->ChangeColorAtomColor(curAtomType+1);
-			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));//Create and draw the sphere
 	  
 			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
 				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
@@ -1585,27 +1605,16 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 			gluSphere(qobj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere
 
-			//if (Prefs->Show2DPattern()) glDisable(GL_BLEND);
+			//if (Prefs->Show2DPattern()) {
+			//  glDisable(GL_STENCIL_TEST);
+			//  glDisable(GL_DEPTH_TEST);
+			//}
 
 			glPushMatrix();
 			glMultMatrixf((float *) &lAtoms[iatom].rot);
 			DrawBondingSites(lAtoms[iatom].GetOxidationNumber(),
 							 lAtoms[iatom].paired_sites, radius, qobj);
 			glPopMatrix();
-
-			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
-				glColor3f(0.0f,0.0f,0.0f);
-				glEnable(GL_POLYGON_STIPPLE);
-				glPolygonStipple(stippleMask);
-				gluSphere(qobj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
-				glDisable(GL_POLYGON_STIPPLE);
-
-				glColor4f(0.5,0.5,0.5,0.7f);
-				glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-				glEnable(GL_BLEND);
-				gluSphere(qobj, radius*1.02, (long)(1.5*Quality), (long)(Quality));
-				glDisable(GL_BLEND);
-			}
 
 			glPopMatrix();
 		}
@@ -1739,6 +1748,54 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			glPushMatrix();
 			glMultMatrixf((const GLfloat *) &rotMat);
 
+
+			// Now, if a bond is selected but not this one, we need to draw an
+			// encapsulating cylinder to mask it out.
+			if (mHighliteState && !lBonds[ibond].GetSelectState()) {
+				glPopMatrix();
+				glPushMatrix();
+
+				rotMat[3][0] = v1.x;
+				rotMat[3][1] = v1.y;
+				rotMat[3][2] = v1.z;
+				glMultMatrixf((const GLfloat *) &rotMat);
+
+				// Display stippled cylinder and spheres slightly larger than bond
+				// cylinder and spheres.
+				glColor3f(0.0f, 0.0f, 0.0f);
+				glEnable(GL_POLYGON_STIPPLE);
+				glPolygonStipple(stippleMask);
+				gluCylinder(qobj, tmpBondSize * 1.01f, tmpBondSize * 1.01f,
+							length, (long) Quality, (long) (0.5f * Quality));
+				if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
+					gluSphere(qobj, tmpBondSize * 1.01f, (long) Quality,
+							  (long) (0.5f * Quality));
+					glPushMatrix();
+					glTranslatef(0.0f, 0.0f, length);
+					gluSphere(qobj, tmpBondSize * 1.01f, (long) Quality,
+							  (long) (0.5f * Quality));
+					glPopMatrix();
+				}
+				glDisable(GL_POLYGON_STIPPLE);
+
+				// Display semi-transparent and non-stippled cylinder and spheres
+				// slightly larger than the bond and stippled cylinder and spheres.
+				glColor4f(0.5f, 0.5f, 0.5f, 0.7f);
+				glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+				glEnable(GL_BLEND);
+				gluCylinder(qobj, tmpBondSize * 1.02f, tmpBondSize * 1.02f,
+								length, (long) Quality, (long) (0.5 * Quality));
+				if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
+					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
+								 (long) (0.5 * Quality));
+					glTranslatef(0.0f, 0.0f, length);
+					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
+							  (long) (0.5 * Quality));
+				}
+				glDisable(GL_BLEND);
+
+			}
+
 			// We may need to draw two cylinders if the user wants the bonds
 			// colored according to their element.
 			if (Prefs->ColorBondHalves()) {
@@ -1826,52 +1883,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				}
 			}
 
-			// Now, if a bond is selected but not this one, we need to draw an
-			// encapsulating cylinder to mask it out.
-			if (mHighliteState && !lBonds[ibond].GetSelectState()) {
-				glPopMatrix();
-				glPushMatrix();
-
-				rotMat[3][0] = v1.x;
-				rotMat[3][1] = v1.y;
-				rotMat[3][2] = v1.z;
-				glMultMatrixf((const GLfloat *) &rotMat);
-
-				// Display stippled cylinder and spheres slightly larger than bond
-				// cylinder and spheres.
-				glColor3f(0.0f, 0.0f, 0.0f);
-				glEnable(GL_POLYGON_STIPPLE);
-				glPolygonStipple(stippleMask);
-				gluCylinder(qobj, tmpBondSize * 1.01f, tmpBondSize * 1.01f,
-							length, (long) Quality, (long) (0.5f * Quality));
-				if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
-					gluSphere(qobj, tmpBondSize * 1.01f, (long) Quality,
-							  (long) (0.5f * Quality));
-					glPushMatrix();
-					glTranslatef(0.0f, 0.0f, length);
-					gluSphere(qobj, tmpBondSize * 1.01f, (long) Quality,
-							  (long) (0.5f * Quality));
-					glPopMatrix();
-				}
-				glDisable(GL_POLYGON_STIPPLE);
-
-				// Display semi-transparent and non-stippled cylinder and spheres
-				// slightly larger than the bond and stippled cylinder and spheres.
-				glColor4f(0.5f, 0.5f, 0.5f, 0.7f);
-				glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-				glEnable(GL_BLEND);
-				gluCylinder(qobj, tmpBondSize * 1.02f, tmpBondSize * 1.02f,
-								length, (long) Quality, (long) (0.5 * Quality));
-				if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
-					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
-								 (long) (0.5 * Quality));
-					glTranslatef(0.0f, 0.0f, length);
-					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
-							  (long) (0.5 * Quality));
-				}
-				glDisable(GL_BLEND);
-
-			}
 			glPopMatrix();
 		}
 	}
