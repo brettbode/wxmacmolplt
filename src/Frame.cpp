@@ -1997,15 +1997,12 @@ void Frame::AddHydrogens(void) {
 	int i, j;
 
 	for (i = 0; i < NumAtoms; i++) {
-		// if Carbon
-		//   for each site to ox_num
-		//      if unpaired
-		//         add H
-		if (Atoms[i].Type == 6) {
-			for (j = 0; j < Atoms[i].ox_num; j++) {
-				if (!(Atoms[i].paired_sites & (1 << j))) {
-					AddAtomAtSite(i, j, 1);
-				}
+		// for each site to ox_num
+		//    if unpaired
+		//       add H
+		for (j = 0; j < Atoms[i].ox_num; j++) {
+			if (!(Atoms[i].paired_sites & (1 << j))) {
+				AddAtomAtSite(i, j, 1);
 			}
 		}
 	}
