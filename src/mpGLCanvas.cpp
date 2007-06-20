@@ -837,19 +837,19 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	GetClientSize(&width, &height);
 
-#if 1
+#if 0
 	printf("event.LeftDown(): %d\n", event.LeftDown());
 	printf("event.LeftUp(): %d\n", event.LeftUp());
-	// printf("event.RightDown(): %d\n", event.RightDown()); 
-	// printf("event.RightUp(): %d\n", event.RightUp()); 
-	// printf("event.Dragging(): %d\n", event.Dragging()); 
-	// printf("event.CmdDown(): %d\n", event.CmdDown()); 
-	// printf("event.ShiftDown(): %d\n", event.ShiftDown()); 
-	// std::cout << "event.Entering(): " << event.Entering() << std::endl; 
-	// std::cout << "event.Leaving(): " << event.Leaving() << std::endl; 
-	// std::cout << "event.LeftIsDown(): " << event.LeftIsDown() << std::endl; 
-	// std::cout << "event.RightIsDown(): " << event.RightIsDown() << std::endl; 
-	// std::cout << "event.ButtonDClick(): " << event.ButtonDClick() << std::endl; 
+	printf("event.RightDown(): %d\n", event.RightDown());
+	printf("event.RightUp(): %d\n", event.RightUp());
+	printf("event.Dragging(): %d\n", event.Dragging());
+	printf("event.CmdDown(): %d\n", event.CmdDown());
+	printf("event.ShiftDown(): %d\n", event.ShiftDown());
+	std::cout << "event.Entering(): " << event.Entering() << std::endl;
+	std::cout << "event.Leaving(): " << event.Leaving() << std::endl;
+	std::cout << "event.LeftIsDown(): " << event.LeftIsDown() << std::endl;
+	std::cout << "event.RightIsDown(): " << event.RightIsDown() << std::endl;
+	std::cout << "event.ButtonDClick(): " << event.ButtonDClick() << std::endl;
 #endif
 
 	if (interactiveMode && event.ButtonDClick()) {
@@ -1059,9 +1059,9 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			MolWin->UpdateGLModel();
 			edited_atoms = true;
 
-		} else if (first_site >= 0) {
+		} else if (MolWin->HandSelected() && first_site >= 0) {
 			testPicking(tmpPnt.x, tmpPnt.y);
-			if (selected_site >= 0) {
+			if (selected_site >= 0 && selected_site != first_site) {
 				lFrame->AddBondBetweenSites(first_atom, first_site,
 											selected, selected_site);
 			}
