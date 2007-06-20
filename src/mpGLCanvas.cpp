@@ -72,6 +72,43 @@ MpGLCanvas::~MpGLCanvas() {
 
 void MpGLCanvas::initGL(void) {
 	if(GetContext()) {
+
+		wxString vector_font, bitmap_font;
+		wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
+#if wxCHECK_VERSION(2, 8, 0)
+		wxString pathname = gStdPaths.GetResourcesDir();
+#else
+		wxString pathname = gStdPaths.GetDataDir();
+#ifdef __WXMAC__
+		//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
+		//but xcode is putting them in Resources.
+		pathname.Remove(pathname.Length() - 13);
+		pathname += wxT("Resources");
+#endif
+#endif
+#ifdef __WXMSW__
+		vector_font = pathname + wxT("\\arial1.glf");
+		bitmap_font = pathname + wxT("\\arial1.bmf");
+#else
+		vector_font = pathname + wxT("/arial1.glf");
+		bitmap_font = pathname + wxT("/arial1.bmf");
+#endif
+		if (glfLoadBMFFont(bitmap_font.mb_str(wxConvUTF8)) < 0) {
+			std::ostringstream buf;
+			buf << "Warning: font file not found! This probably means wxmacmolplt is not "
+				   "properly installed. Looking for " << bitmap_font.mb_str(wxConvUTF8);
+			MessageAlert(buf.str().c_str());
+			glfClose();
+		} else {
+			if (glfLoadFont(vector_font.mb_str(wxConvUTF8)) < 0) {
+				std::ostringstream buf;
+				buf << "Warning: font file not found! This probably means wxmacmolplt is not "
+					   "properly installed. Looking for " << vector_font.mb_str(wxConvUTF8);
+				MessageAlert(buf.str().c_str());
+				glfClose();
+			}
+		}
+
 		// Initialize the OpenGL context here.
 		glEnable(GL_DEPTH_TEST);
 		
@@ -946,7 +983,6 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		else if (mSelectState >= 0 && mSelectState < 3) {
 			mSelectState = -1;
 
-			// If editing, we  
 			if (interactiveMode) {
 
 				if (MolWin->HandSelected()) {
@@ -1543,7 +1579,7 @@ void MpGLCanvas::testPicking(int x, int y) {
 	// the bond id.
 	int i, j;
 	for (i = 0, j = 0; i < hits; i++) {
-		if (buff[j + 1] < min_depth) {
+		if (buff[j + 1] < min_depth && buff[j + 3] != MMP_NULL) {
 			min_depth = buff[j + 1];
 			selected_type = buff[j + 3];
 			if (buff[j] > 1) {
@@ -1555,6 +1591,12 @@ void MpGLCanvas::testPicking(int x, int y) {
 		}
 		j += buff[j] + 3;
 	}
+
+#if 0
+	std::cout << "selected_type: " << selected_type << std::endl;
+	std::cout << "selected: " << selected << std::endl;
+	std::cout << "selected_site: " << selected_site << std::endl;
+#endif
 
 }
 
@@ -1740,20 +1782,38 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 
 	if (isAtom) {
 		insertAnnotationMenuItems(menu);
-		menu.AppendSeparator();
+
+		// If the periodic table is shown and an atom is selected, offer an
+		// option to change the clicked-on atom to the selected type.
+		if (periodic_dlg && periodic_dlg->GetSelectedID() != 0 &&
+			periodic_dlg->GetSelectedID() != lFrame->Atoms[selected].GetType()) {
+
+			wxString label;
+			wxString atom_name;
+			Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1,
+				atom_name);
+			label = wxT("Change ") + atom_name + wxT(" to ");
+			Prefs->GetAtomLabel(periodic_dlg->GetSelectedID() - 1, atom_name);
+			label.Append(atom_name);
+			menu.Append(GL_Popup_Change_Atom, label);
+		}
+
+		menu.Append(GL_Popup_Change_Ox_Num, wxT("Change oxidation"));
 
 		// A plane is defined by exactly 3 atoms.  With any more than that, we 
 		// can have noncoplanar atoms.  Only then do we allow the user to fit
 		// the atoms to a plane.
 		if (lFrame->GetNumAtomsSelected() >= 4) {
 			menu.Append(GL_Popup_Fit_To_Plane, wxT("Fit atoms to plane"));
-			menu.AppendSeparator();
 		}
+
+		menu.AppendSeparator();
+
 	}
 
 	// If a bond is clicked on, we show some bond specific items, like
 	// the length of the bond and the order.
-	if (!isAtom) {
+	else  {
 		length_label.Printf(wxT("Bond length: %f"),
 			lFrame->GetBondLength(selected));
 		item = menu.Append(wxID_ANY, length_label);
@@ -1778,26 +1838,9 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 		}
 		menu.Append(wxID_ANY, wxT("Bond Order"), submenu);
 		menu.AppendSeparator();
-	} else {
-
-		// If the periodic table is shown and an atom is selected, offer an
-		// option to change the clicked-on atom to the selected type.
-		if (periodic_dlg && periodic_dlg->GetSelectedID() != 0 &&
-			periodic_dlg->GetSelectedID() != lFrame->Atoms[selected].GetType()) {
-
-			wxString label;
-			wxString atom_name;
-			Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1,
-				atom_name);
-			label = wxT("Change ") + atom_name + wxT(" to ");
-			Prefs->GetAtomLabel(periodic_dlg->GetSelectedID() - 1, atom_name);
-			label.Append(atom_name);
-			menu.Append(GL_Popup_Change_Atom, label);
-		}
-
-		menu.Append(GL_Popup_Change_Ox_Num, wxT("Change oxidation"));
-		menu.AppendSeparator();
-
+	}
+   
+	if (isAtom) {
 		menu.Append(GL_Popup_Menu_Apply_All, _T("&Apply to All Frames"));
 	}
 
@@ -1884,10 +1927,10 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 
 		// If user clicked on an atom and some things are selected, let's
 		// separate the items added above and the annotation items.
-		if (selected_type == MMP_ATOM &&
-			select_stack_top >= 2 && select_stack_top <= 4) {
-			menu.AppendSeparator();
-		}
+		// if (selected_type == MMP_ATOM && 
+			// select_stack_top >= 2 && select_stack_top <= 4) { 
+			// menu.AppendSeparator(); 
+		// } 
 
 		switch (select_stack_top) {
 			case 2:
