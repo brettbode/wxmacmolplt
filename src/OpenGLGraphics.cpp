@@ -80,6 +80,7 @@ void DrawArrow(const float & length, const float & width, const int & quality);
 void DrawSceneString(const float scale_factor, const float shift_x,
 		             const float shift_y, const float shift_z,
 					 const wxString& label);
+void DrawString(const char *str);
 
 const GLubyte stippleMask[128] =
 
@@ -717,20 +718,7 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 			sprintf((char *)AngleString, "%.2f, %.2f, %.2f, Scale:%.2f",
 					psi, phi, theta, MainData->WindowSize);
 
-			int canvasWidth, canvasHeight;
-			glCanvas->GetSize(&canvasWidth, &canvasHeight);
-			float sclX = 20/(float)canvasWidth;
-			float sclY = 20/(float)canvasHeight;
-
-			glPushMatrix();
-			glLoadIdentity();
-			glTranslatef(-0.85, 0.95, 0);
-			glScalef(sclX, sclY, 1);
-			glfDrawSolidString(AngleString);
-			glPopMatrix();
-
-			glFlush();
-			//glCanvas->SwapBuffers();
+			DrawStaticLabel(AngleString, 10, -20);
 		}
 #ifndef __wxBuild__
 				if (ShowAngles) {
@@ -780,6 +768,18 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 }
 
 void MolDisplayWin::DrawGL(void) {
+
+	float anno_color[3];
+	RGBColor *BackgroundColor = Prefs->GetBackgroundColorLoc();
+	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
+	
+	// choose black or white based on the background color
+	if (backMagnitude > 70000) {  //"light" background choose black
+		anno_color[0] = anno_color[1] = anno_color[2] = 0.0f;
+	} else {
+		anno_color[0] = anno_color[1] = anno_color[2] = 1.0f;
+	}
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear out the buffer
 
 	GLenum error = glGetError();	//clear the error code
@@ -795,7 +795,7 @@ void MolDisplayWin::DrawGL(void) {
 
 	if (interactiveMode) {
 	    const char modeString[] = "editing";
-	    DrawStaticLabel(modeString, 0.75, 0.95);
+	    DrawStaticLabel(modeString, -50, -20);
 	}
 
 	glMultMatrixf((const GLfloat *) &(MainData->TotalRotation));
@@ -821,17 +821,6 @@ void MolDisplayWin::DrawGL(void) {
 	}
 
 	if (MainData->GetAnnotationCount() > 0) {
-		RGBColor *BackgroundColor = Prefs->GetBackgroundColorLoc();
-		long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
-		float anno_color[3];
-		
-		// choose black or white based on the background color
-		if (backMagnitude > 70000) {  //"light" background choose black
-			anno_color[0] = anno_color[1] = anno_color[2] = 0.0f;
-		} else {
-			anno_color[0] = anno_color[1] = anno_color[2] = 1.0f;
-		}
-		
 		glLoadName(MMP_ANNOTATION);
 		glPushName(0);
 		std::vector<Annotation *>::const_iterator anno;
@@ -953,7 +942,7 @@ void MolDisplayWin::DrawGL(void) {
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_LINE_STIPPLE);
 		glLineStipple(3, (GLushort) 43690);
-		glColor4f(0.0f, 0.0f, 0.0f, 0.9f);
+		glColor4f(anno_color[0], anno_color[1], anno_color[2], 0.9f);
 		glLineWidth(2.0f);
 		glBegin(GL_LINE_LOOP);
 			glVertex2f(lasso_start.x, lasso_start.y);
@@ -1176,9 +1165,6 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	CPoint3D pt1 = atom3_pos + binormal1;
 	CPoint3D pt3 = atom3_pos + binormal2;
 	
-	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-	DrawAngleAnnotation(&pt1, &atom3_pos, &pt3, win->GetPrefs());
-
 	Matrix4D m;
 	CPoint3D pt1_eye;
 	CPoint3D pt3_eye;
@@ -1192,6 +1178,7 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
+	glDepthMask(GL_FALSE);
 	for (int j = 0; j <= 1; j++, id = (id + 1) % 2) {
 		// Make this plane look like the x-y plane for easier circle
 		// drawing.  The vector from atom3 to atom2 should look like
@@ -1222,7 +1209,11 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 		glPopMatrix();
 	}
 	
+	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
+
+	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+	DrawAngleAnnotation(&pt1, &atom3_pos, &pt3, win->GetPrefs());
 	
 	glEnable(GL_LIGHTING);
 }
@@ -1332,42 +1323,62 @@ void AnnotationMarker::draw(const MolDisplayWin * win) const {
 	glPopMatrix();
 }
 
-void MolDisplayWin::DrawStaticLabel(const char* label, GLfloat x, GLfloat y)
-{
-  int canvasWidth, canvasHeight;
+void MolDisplayWin::DrawStaticLabel(const char *label, GLfloat x, GLfloat y) {
+	int canvasWidth, canvasHeight;
+	
+	glCanvas->GetSize(&canvasWidth, &canvasHeight);
+	
+	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
+	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
+	
+	if (backMagnitude > 70000) {
+		glColor3f(0.0, 0.0, 0.0);
+	} else {
+		glColor3f(1.0, 1.0, 1.0);
+	}
+	
+	GLint matrixMode;
+	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
 
-  glCanvas->GetSize(&canvasWidth, &canvasHeight);
-  float sclX = 20/(float)canvasWidth;
-  float sclY = 20/(float)canvasHeight;
+	glMatrixMode(GL_PROJECTION);
 
-  RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
-  long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
+	glPushMatrix();
+	glLoadIdentity();
 
-  if (backMagnitude > 70000)
-    glColor3f (0.0, 0.0, 0.0);
-  else
-    glColor3f (1.0, 1.0, 1.0);
+	gluOrtho2D(0, canvasWidth, 0, canvasHeight);
 
-  GLint matrixMode;
-  glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
 
-  glTranslatef(x, y, 0.999999);
-  glLoadName(0);
-  glScalef(sclX, sclY, 1);
-  glfDrawSolidString(label);
+	if (x < 0) x = canvasWidth + x;
+	if (y < 0) y = canvasHeight + y;
 
-  glFlush();
+	glTranslatef(x, y, 0.0f);
+	glScalef(300, 300, 1);
+	
+	glLoadName(MMP_NULL);
 
-  glPopMatrix(); // GL_MODELVIEW
-  glMatrixMode (GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode (matrixMode);
+	// glDisable(GL_DEPTH_TEST); 
+	glfStartBitmapDrawing();
+
+	glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
+	glEnable(GL_BLEND);
+	glfDrawBMaskString(label);
+	glDisable(GL_BLEND);
+
+	glfStopBitmapDrawing();
+	// glEnable(GL_DEPTH_TEST); 
+
+	glFlush();
+	
+	glPopMatrix(); // GL_MODELVIEW
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glPopMatrix();
+
+	glMatrixMode(matrixMode);
 }
 
 void MolDisplayWin::DrawLabel() {
@@ -1428,7 +1439,7 @@ void MolDisplayWin::DrawLabel() {
 			glColor3f(1-red, 1-green, 1-blue);
 			glScalef((0.1+0.08*radius)*LabelSize, (0.1+0.08*radius)*LabelSize, 1);
 			glLoadName(iatom+1);
-			glfDrawSolidString((const char*)atomLabel.mb_str(wxConvUTF8));
+			glfDrawSolidString(atomLabel.mb_str(wxConvUTF8));
 			glPopMatrix();
 		}
 		glPopName();
@@ -1552,6 +1563,18 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			//	glColor3f(red, green, blue);
 
 			glLoadName(iatom+1);
+			  
+			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
+				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+			} else {
+				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
+				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
+			}
 
 			if (Prefs->Show2DPattern()) {
 			  short patternindex = Prefs->GetAtomPattern(lAtoms[iatom].GetType()-1);
@@ -3210,17 +3233,18 @@ void DashedQuadFromLine(const CPoint3D& pt1,
 	// Move out for the kind of bond that exists between the atoms.
 	glTranslatef(-offset - 0.01f, 0.0f, 0.0f);
 
-	glScalef(-0.1f * LabelSize, 0.1f * LabelSize, 0.1f);
+	glScalef(-5.0f * LabelSize, 5.0f * LabelSize, 0.1f);
 	
 	// This apparently is some magic number.  GLF doesn't start drawing the
 	// string at the origin, doesn't consider the anchor point, and doesn't
 	// consider the bounding box it returns.  So, we have a magic number.  It
 	// is indirectly dependent on LabelSize from the scaling above, so it looks
 	// constant even though it is not.
-	glTranslatef(1.5f, 0.0f, 0.0f);
+	glTranslatef(0.004f, 0.0f, 0.0f);
 
 	sprintf(len_label, "%.6f", len);
-	glfDrawSolidString(len_label);
+
+	DrawString(len_label);
 
 	glEnable(GL_LIGHTING);
 	glPopMatrix();
@@ -3535,11 +3559,29 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 	vec1 = vec1 * (1.0f / len1);
 	vec2 = vec2 * (1.0f / len2);
 
-	angle = acos(DotProduct3D(&vec1, &vec2));
+	float dot = DotProduct3D(&vec1, &vec2);
+	angle = acos(dot);
 
-	// We change the coordinate system so that the angle's plane looks like
-	// the xy-plane.  This makes drawing along a circular arc much easier.
-	SetPlaneRotation(plane2xy, vec1, vec2);
+	if (fabs(dot) < 1.0f) {
+		// We change the coordinate system so that the angle's plane looks like
+		// the xy-plane.  This makes drawing along a circular arc much easier.
+		SetPlaneRotation(plane2xy, vec1, vec2);
+	} else {
+		glGetFloatv(GL_MODELVIEW_MATRIX, m);
+		CPoint3D vec3;
+		vec3.x = m[0];
+		vec3.y = m[4];
+		vec3.z = m[8];
+
+		if (DotProduct3D(&vec1, &vec2) < 1.0f) {
+			SetPlaneRotation(plane2xy, vec1, vec3);
+		} else {
+			vec3.x = m[1];
+			vec3.y = m[5];
+			vec3.z = m[9];
+			SetPlaneRotation(plane2xy, vec1, vec3);
+		}
+	}
 
 	glPushMatrix();
 
@@ -3577,32 +3619,32 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 		// One vector/side looks like the x-axis, so this one's pretty simple.
 		// We just step along the x-axis.
 		glVertex3f(i - (x_eye[0] + y_eye[0]) * chord_len,
-						 - (x_eye[1] + y_eye[1]) * chord_len,
-						 - (x_eye[2] + y_eye[2]) * chord_len);
+					 - (x_eye[1] + y_eye[1]) * chord_len,
+					 - (x_eye[2] + y_eye[2]) * chord_len);
 		glVertex3f(i + (x_eye[0] - y_eye[0]) * chord_len,
-						 + (x_eye[1] - y_eye[1]) * chord_len,
-							(x_eye[2] - y_eye[2]) * chord_len);
+					   (x_eye[1] - y_eye[1]) * chord_len,
+					   (x_eye[2] - y_eye[2]) * chord_len);
 		glVertex3f(i + (x_eye[0] + y_eye[0]) * chord_len,
-						 + (x_eye[1] + y_eye[1]) * chord_len,
-							(x_eye[2] + y_eye[2]) * chord_len);
+					   (x_eye[1] + y_eye[1]) * chord_len,
+					   (x_eye[2] + y_eye[2]) * chord_len);
 		glVertex3f(i - (x_eye[0] - y_eye[0]) * chord_len,
-						 - (x_eye[1] - y_eye[1]) * chord_len,
-						 - (x_eye[2] - y_eye[2]) * chord_len);
+					 - (x_eye[1] - y_eye[1]) * chord_len,
+					 - (x_eye[2] - y_eye[2]) * chord_len);
 
 		// The other looks like it has an endpoint at (cos(angle), sin(angle)),
 		// so we step along that vector.
 		glVertex3f(i * ca - (x_eye[0] + y_eye[0]) * chord_len,
-					  i * sa - (x_eye[1] + y_eye[1]) * chord_len,
-								- (x_eye[2] + y_eye[2]) * chord_len);
+				   i * sa - (x_eye[1] + y_eye[1]) * chord_len,
+						  - (x_eye[2] + y_eye[2]) * chord_len);
 		glVertex3f(i * ca + (x_eye[0] - y_eye[0]) * chord_len,
-					  i * sa + (x_eye[1] - y_eye[1]) * chord_len,
-								  (x_eye[2] - y_eye[2]) * chord_len);
+				   i * sa + (x_eye[1] - y_eye[1]) * chord_len,
+							(x_eye[2] - y_eye[2]) * chord_len);
 		glVertex3f(i * ca + (x_eye[0] + y_eye[0]) * chord_len,
-					  i * sa + (x_eye[1] + y_eye[1]) * chord_len,
-								  (x_eye[2] + y_eye[2]) * chord_len);
+				   i * sa + (x_eye[1] + y_eye[1]) * chord_len,
+							(x_eye[2] + y_eye[2]) * chord_len);
 		glVertex3f(i * ca - (x_eye[0] - y_eye[0]) * chord_len,
-					  i * sa - (x_eye[1] - y_eye[1]) * chord_len,
-								- (x_eye[2] - y_eye[2]) * chord_len);
+				   i * sa - (x_eye[1] - y_eye[1]) * chord_len,
+						  - (x_eye[2] - y_eye[2]) * chord_len);
 	}
 
 	for (float i = 0.0f; i <= angle; i += delta) {
@@ -3680,9 +3722,11 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 					 min_len * sin(angle * 0.5f), 0.0f);
 	glMultMatrixf(m);
 	float LabelSize = Prefs->GetAnnotationLabelSize();
-	glTranslatef(-0.175f + chord_len, 0.0f, 0.0f);
-	glScalef(-0.1f * LabelSize, 0.1f * LabelSize, 0.1f);
-	glfDrawSolidString(angle_label);
+	glTranslatef(-0.1f + chord_len, 0.0f, 0.0f);
+	glScalef(-5.0f * LabelSize, 5.0f * LabelSize, 0.1f);
+
+	// glfDrawSolidString(angle_label); 
+	DrawString(angle_label);
 
 	glPopMatrix();
 
@@ -3768,6 +3812,19 @@ void DrawSceneString(const float scale_factor, const float shift_x,
 
 	glEnable(GL_LIGHTING);
 
+}
+
+void DrawString(const char *str) {
+	// glfDrawSolidString(str); 
+
+	glfStartBitmapDrawing();
+
+	glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
+	glEnable(GL_BLEND);
+	glfDrawBMaskString(str);
+	glDisable(GL_BLEND);
+
+	glfStopBitmapDrawing();
 }
 
 #define CYL_RADIUS 0.05f
