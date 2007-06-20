@@ -224,7 +224,9 @@ class MpGLCanvas : public wxGLCanvas {
 		* \param event The event to handle.
 		*/
 		void eventMouse(wxMouseEvent &event);
+#if wxCHECK_VERSION(2, 8, 0)
 		void eventMouseCaptureLost(wxMouseCaptureLostEvent& event);
+#endif
 		  
 		/**
 		* Handles Char events received by the widget. 

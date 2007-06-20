@@ -2378,16 +2378,20 @@ void MpGLCanvas::ClosePeriodicDlg(void) {
 	}
 }
 
+#if wxCHECK_VERSION(2, 8, 0)
 void MpGLCanvas::eventMouseCaptureLost(wxMouseCaptureLostEvent& event) {
 	ReleaseMouse();
 }
+#endif
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_SIZE(MpGLCanvas::eventSize)
 	EVT_PAINT(MpGLCanvas::eventPaint)
 	EVT_ERASE_BACKGROUND(MpGLCanvas::eventErase)
 	EVT_MOUSE_EVENTS(MpGLCanvas::eventMouse)
+#if wxCHECK_VERSION(2, 8, 0)
 	EVT_MOUSE_CAPTURE_LOST(MpGLCanvas::eventMouseCaptureLost)
+#endif
 
 	EVT_CHAR(MpGLCanvas::KeyHandler)
 
