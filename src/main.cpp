@@ -134,42 +134,18 @@ bool MpApp::OnInit() {
 		wxLogMessage(msg); 
 		return false; 
 	} 
+
 	// Check for debug level 
-//	long debugLevel = 0; 
-//	if (cmdParser.Found(wxT(“d”), & debugLevel)) 
-//	{        
-//	} 
-	/*!!! GL font initialization  */
-	//GLF needs to be initialized before any GL windows are opened.
-	if (!glf_initialized) {
-		glfInit();
-		
-		wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
-#if wxCHECK_VERSION(2, 8, 0)
-		wxString pathname = gStdPaths.GetResourcesDir();
-#else
-		wxString pathname = gStdPaths.GetDataDir();
-#ifdef __WXMAC__
-		//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
-		//but xcode is putting them in Resources.
-		pathname.Remove(pathname.Length() - 13);
-		pathname += wxT("Resources");
-#endif
-#endif
-#ifdef __WXMSW__
-		pathname += wxT("\\arial1.glf");
-#else
-		pathname += wxT("/arial1.glf");
-#endif
-		if (glfLoadFont(pathname.mb_str(wxConvUTF8)) < 0) {
-			std::ostringstream buf;
-			buf <<"Warning: font file not found! This probably means wxmacmolplt is not "
-				"properly installed. Looking for " << pathname.mb_str(wxConvUTF8);
-			MessageAlert(buf.str().c_str());
-			glfClose();
-		} else
-			glf_initialized = 1;
-	}
+	//	long debugLevel = 0; 
+	//	if (cmdParser.Found(wxT(“d”), & debugLevel)) 
+	//	{        
+	//	} 
+
+	// GLF needs to be initialized before any fonts are loaded.  The fonts
+	// are loaded in the GL canvas since the display lists need to be loaded
+	// in the right contexts.
+	glfInit();
+	glf_initialized = 1;
 	
 	// Check for a project filename 
 	if (cmdParser.GetParamCount() > 0) {
@@ -220,6 +196,7 @@ bool MpApp::OnInit() {
 
     return true;
 }
+
 void MpApp::splashCleanup(wxTimerEvent & event) {
 	if (splash) {
 		splash->Destroy();
