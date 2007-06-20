@@ -71,6 +71,7 @@ void ChooseDialog::Create(wxWindow *parent, wxWindowID id, wxString& message,
 	lower_sizer->Add(button_cancel, 0, wxALIGN_CENTRE | wxALL, 0); 
 
 	upper_sizer->Add(lower_sizer, 0, wxALIGN_CENTRE | wxALL, 0);
+	upper_sizer->AddSpacer(4);
 
 	// main_sizer->Layout();  
 	upper_sizer->Fit(this);
