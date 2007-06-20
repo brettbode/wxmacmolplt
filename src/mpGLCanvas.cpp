@@ -509,14 +509,6 @@ void MpGLCanvas::eventErase(wxEraseEvent &event) {
 	// This avoids flashing on Windows.
 }
 
-// void MpGLCanvas::eventActivate(wxActivateEvent &event) { 
-	// if (event.GetActive()) { 
-		// stale_click = true; 
-		// wxMouseEvent mouse_event(wxEVT_LEFT_DOWN); 
-		// AddPendingEvent(mouse_event); 
-	// } 
-// } 
-
 void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 									double *z) {
 
@@ -972,6 +964,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		}
 
 		if (MolWin->LassoSelected()) {
+			ReleaseMouse();
 			MolWin->LassoEnd(tmpPnt.x, height - tmpPnt.y);
 			if (mSelectState <= 0) {
 				SelectObj(selected_type, selected, deSelectAll);
@@ -1441,6 +1434,7 @@ void MpGLCanvas::HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt) {
 	glGetDoublev(GL_PROJECTION_MATRIX, proj);
 
 	if (!MolWin->LassoHasArea()) {
+		CaptureMouse();
 		MolWin->LassoStart(curr_pt.x, curr_pt.y);
 	}
 
@@ -2385,12 +2379,16 @@ void MpGLCanvas::ClosePeriodicDlg(void) {
 	}
 }
 
+void MpGLCanvas::eventMouseCaptureLost(wxMouseCaptureLostEvent& event) {
+	ReleaseMouse();
+}
+
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_SIZE(MpGLCanvas::eventSize)
 	EVT_PAINT(MpGLCanvas::eventPaint)
 	EVT_ERASE_BACKGROUND(MpGLCanvas::eventErase)
 	EVT_MOUSE_EVENTS(MpGLCanvas::eventMouse)
-	// EVT_ACTIVATE_APP(MpGLCanvas::eventActivate) 
+	EVT_MOUSE_CAPTURE_LOST(MpGLCanvas::eventMouseCaptureLost)
 
 	EVT_CHAR(MpGLCanvas::KeyHandler)
 
