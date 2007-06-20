@@ -3257,7 +3257,7 @@ void MolDisplayWin::LassoGrown(const int x, const int y) {
 	lasso_has_area = true;
 }
 
-void MolDisplayWin::LassoEnd(const int x, const int y) {
+void MolDisplayWin::LassoEnd(void) {
 	lasso_has_area = false;
 }
 

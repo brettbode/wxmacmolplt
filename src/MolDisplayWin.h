@@ -419,7 +419,7 @@ class MolDisplayWin : public wxFrame {
 		void StopAnimations(void);
 		void LassoStart(const int x, const int y);
 		void LassoGrown(const int x, const int y);
-		void LassoEnd(const int x, const int y);
+		void LassoEnd(void);
 		bool LassoContains(const int x, const int y);
 		bool LassoHasArea(void);
 		bool LassoSelected(void);

@@ -837,19 +837,19 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	GetClientSize(&width, &height);
 
-#if 0
+#if 1
 	printf("event.LeftDown(): %d\n", event.LeftDown());
 	printf("event.LeftUp(): %d\n", event.LeftUp());
-	printf("event.RightDown(): %d\n", event.RightDown());
-	printf("event.RightUp(): %d\n", event.RightUp());
-	printf("event.Dragging(): %d\n", event.Dragging());
-	printf("event.CmdDown(): %d\n", event.CmdDown());
-	printf("event.ShiftDown(): %d\n", event.ShiftDown());
-	std::cout << "event.Entering(): " << event.Entering() << std::endl;
-	std::cout << "event.Leaving(): " << event.Leaving() << std::endl;
-	std::cout << "event.LeftIsDown(): " << event.LeftIsDown() << std::endl;
-	std::cout << "event.RightIsDown(): " << event.RightIsDown() << std::endl;
-	std::cout << "event.ButtonDClick(): " << event.ButtonDClick() << std::endl;
+	// printf("event.RightDown(): %d\n", event.RightDown()); 
+	// printf("event.RightUp(): %d\n", event.RightUp()); 
+	// printf("event.Dragging(): %d\n", event.Dragging()); 
+	// printf("event.CmdDown(): %d\n", event.CmdDown()); 
+	// printf("event.ShiftDown(): %d\n", event.ShiftDown()); 
+	// std::cout << "event.Entering(): " << event.Entering() << std::endl; 
+	// std::cout << "event.Leaving(): " << event.Leaving() << std::endl; 
+	// std::cout << "event.LeftIsDown(): " << event.LeftIsDown() << std::endl; 
+	// std::cout << "event.RightIsDown(): " << event.RightIsDown() << std::endl; 
+	// std::cout << "event.ButtonDClick(): " << event.ButtonDClick() << std::endl; 
 #endif
 
 	if (interactiveMode && event.ButtonDClick()) {
@@ -890,9 +890,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		}
 	}
 
-	// else if (event.Entering()) { 
-		// testPicking(tmpPnt.x, tmpPnt.y);		 
-		// mSelectState = 0; 
+	// else if (event.Entering() && !event.LeftIsDown() && MolWin->LassoHasArea()) { 
+		// MolWin->LassoEnd(); 
 	// } 
 
 	else if (event.Leaving()) {
@@ -965,7 +964,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 		if (MolWin->LassoSelected()) {
 			ReleaseMouse();
-			MolWin->LassoEnd(tmpPnt.x, height - tmpPnt.y);
+			MolWin->LassoEnd();
 			if (mSelectState <= 0) {
 				SelectObj(selected_type, selected, deSelectAll);
 			}
