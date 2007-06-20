@@ -84,7 +84,7 @@ void glfStopBitmapDrawing();        /* Must be called after bitmap text drawing 
 void glfDrawBSymbol(char s);        /* Draw one symbol by bitmapped font */
 void glfDrawBString(const char *s);       /* Draw string by bitmapped font */
 void glfDrawBMaskSymbol(char s);	/* Draw one symbol by bitmapped font (using mask) */
-void glfDrawBMaskString(char *s);	/* Draw string by bitmapped font (using mask) */
+void glfDrawBMaskString(const char *s);	/* Draw string by bitmapped font (using mask) */
 
 
 /* Text drawing functions by specified font */

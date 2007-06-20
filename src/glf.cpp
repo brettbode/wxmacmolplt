@@ -1519,7 +1519,6 @@ int glfLoadBMFFont(const char *FName)
 	glGenTextures(1, &bmf_texture[bmf_curfont]);
 	glGenTextures(1, &bmf_mask[bmf_curfont]);
 
-
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	/* Build font texture */
@@ -1671,7 +1670,7 @@ void glfDrawBMaskSymbol(char s)
 	glCallList(list_base[bmf_curfont]+(unsigned char)s);
 }
 
-void glfDrawBMaskString(char *s)
+void glfDrawBMaskString(const char *s)
 {
 	GLfloat temp_trans;
 	int i;
@@ -1698,15 +1697,18 @@ void glfDrawBMaskString(char *s)
 		glPushMatrix();
 		glTranslatef(-temp_trans/2, 0, 0);
 	}
+	glDepthMask(GL_FALSE);
 	glCallLists(strlen(s), GL_UNSIGNED_BYTE, (unsigned char *)s);
+	glDepthMask(GL_TRUE);
 	if (m_bitmap_string_center == GL_TRUE)	glPopMatrix();
 
 	glPopAttrib();
 	glPopMatrix();
 
 	glBindTexture(GL_TEXTURE_2D, bmf_texture[bmf_curfont]);
-	
+
 	/* Now draw the text over only the black bits in the requested color */
+	glPushMatrix();
 	glBlendFunc(GL_ONE, GL_ONE);
 	glListBase(list_base[bmf_curfont]);
 	if (m_bitmap_string_center == GL_TRUE)
@@ -1716,6 +1718,7 @@ void glfDrawBMaskString(char *s)
 	}
 	glCallLists(strlen(s), GL_UNSIGNED_BYTE, (unsigned char *)s);
 	if (m_bitmap_string_center == GL_TRUE)	glPopMatrix();
+	glPopMatrix();
 }
 
 /* Set string centering for bitmap fonts */
