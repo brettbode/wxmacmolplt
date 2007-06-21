@@ -89,9 +89,6 @@ class MpGLCanvas : public wxGLCanvas {
 		wxDragImage *mDragWin;
 		
 		int mSelectState;
-		int selected;
-		int selected_type;
-		int selected_site;
 		int oldSelect;
 		bool interactiveMode;
 		GLdouble atomDepth;
@@ -105,7 +102,6 @@ class MpGLCanvas : public wxGLCanvas {
 		int select_stack[4];
 		int select_stack_top;
 
-		bool stale_click;
 		void ConstrainPosition(const int anno_id, double *x, double *y,
 							   double *z);
 		void ChangeAtom(wxCommandEvent& event);
@@ -113,6 +109,18 @@ class MpGLCanvas : public wxGLCanvas {
 		void HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt);
 		void HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 						   const wxPoint& prev_pt);
+
+		int selected;           // Id of object clicked on, -1 if invalid
+		int selected_type;      // Type of object clicked on
+		int selected_site;      // Id of bond site clicked on, -1 if no site
+		bool stale_click;       // True if previous mouse pos is invalid
+		wxPoint curr_mouse;     // Current mouse position
+		wxPoint prev_mouse;     // Previous mouse position
+		int site_clicked_on;    // Id of bonding site clicked on by user
+		int site_atom;          // Atom connected to clicked on site
+		int width;              // Width of canvas in pixels
+		int height;             // Height of canvas in pixels
+		int ndrag_events;       // Number of drag events in current drag
 
 	public:
 		/**
@@ -261,6 +269,17 @@ class MpGLCanvas : public wxGLCanvas {
 		int NumberSelectedAtoms(void) const {return select_stack_top;};
 		void insertAnnotationMenuItems(wxMenu& menu);
 		void ConstrainToAnnotation(wxCommandEvent& event);
+
+		void eventMouseMiddleWentUp(wxMouseEvent& event);
+		void eventMouseRightWentUp(wxMouseEvent& event);
+		void eventMouseLeftWentUp(wxMouseEvent& event);
+		void eventMouseDragging(wxMouseEvent& event);
+		void eventMouseMiddleWentDown(wxMouseEvent& event);
+		void eventMouseRightWentDown(wxMouseEvent& event);
+		void eventMouseLeftWentDown(wxMouseEvent& event);
+		void eventMouseLeaveWindow(wxMouseEvent& event);
+		void eventMouseLeftDoubleClick(wxMouseEvent& event);
+		void eventMouseWheel(wxMouseEvent& event);
 
 	DECLARE_EVENT_TABLE()
 

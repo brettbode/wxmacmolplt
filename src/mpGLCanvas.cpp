@@ -58,7 +58,14 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 	oldSelect = -1;
 	mDragWin = NULL;
 	select_stack_top = 0;
-	stale_click = false;
+	// stale_click = false; 
+	
+	selected = -1;
+	selected_type = MMP_NULL;
+	selected_site = -1;
+	site_clicked_on = -1;
+	site_atom = -1;
+	ndrag_events = 0;
 
 	//Hmm is this the right spot to initialize our GL settings?
 	//initGL();
@@ -407,10 +414,10 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 	UpdateGLView();
 }
 void MpGLCanvas::UpdateGLView(void) {
-	int width, height;
+	// int width, height; 
 	if(GetContext()&&(Prefs!=NULL)&&MolWin->IsShown()) {
 		SetCurrent();
-		GetClientSize(&width, &height);
+		// GetClientSize(&width, &height); 
 		glViewport(0, 0, (GLint)width, (GLint)height);
 		GLdouble aspect = ((float)width)/height;
 		//  GLdouble ysize = 60.0;
@@ -472,16 +479,20 @@ void MpGLCanvas::UpdateGLView(void) {
 }
 
 void MpGLCanvas::eventSize(wxSizeEvent &event) {
+
 	wxGLCanvas::OnSize(event);
+	GetClientSize(&width, &height);
 	UpdateGLView();
 	Update();
 	Refresh();
+
 }
 
 void MpGLCanvas::eventPaint(wxPaintEvent &event) {
-	wxPaintDC paintDC(this);
 
+	wxPaintDC paintDC(this);
 	draw();
+
 }
 
 void MpGLCanvas::draw(void) {
@@ -812,6 +823,334 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 	}
 }
 
+void MpGLCanvas::eventMouseLeftDoubleClick(wxMouseEvent& event) {
+
+	prev_mouse = curr_mouse;
+	curr_mouse = event.GetPosition();
+
+	// If we're in edit mode, we display the periodic table dialog.
+	if (MolWin->HandSelected()) {
+		if (!show_periodic_dlg) {
+			togglePeriodicDialog();
+		}
+	}
+
+}
+
+// void MpGLCanvas::eventMouseLeaveWindow(wxMouseEvent& event) { 
+
+	// If the mouse left the window, we want to invalidate the previous mouse
+	// position, since using an irrelevant position may throw off some 
+	// calculations.
+	// stale_click = true; 
+
+// } 
+
+void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
+
+	mpAtom *lAtoms = mMainData->cFrame->Atoms;
+
+	prev_mouse = curr_mouse;
+	curr_mouse = event.GetPosition();
+
+	ndrag_events = 0;
+	testPicking(curr_mouse.x, curr_mouse.y);
+
+	if (interactiveMode) {
+		// If the mouse left the window while the user was already
+		// lassoing, stale_click will be true and this code will get
+		// executed, and the lassoing already in progress will be lost.
+		// So, we force that a new lasso is started only when the mouse
+		// button has just gone down.
+		if (MolWin->LassoSelected()) {
+			MolWin->LassoStart(curr_mouse.x, height - curr_mouse.y);
+			select_stack_top = 5;
+		} else if (selected_type == MMP_ATOM) {
+			GLdouble tmpWinX, tmpWinY;
+
+			findWinCoord(lAtoms[selected].Position.x,
+				lAtoms[selected].Position.y,
+				lAtoms[selected].Position.z,
+				tmpWinX, tmpWinY, atomDepth);
+   
+			winDiffX = curr_mouse.x - (int) tmpWinX;
+			winDiffY = curr_mouse.y - (int) tmpWinY;
+
+			site_clicked_on = selected_site;
+			site_atom = selected;
+		}
+	} 
+
+	// Though nothing's rotating on a single mousedown event, we need to
+	// register this first mouse click position.
+	SetCurrent();
+	MolWin->Rotate(event);
+
+	// std::cout << "captured" << std::endl; 
+	CaptureMouse();
+
+}
+
+void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
+
+	bool deSelectAll = true;
+
+	prev_mouse = curr_mouse;
+	curr_mouse = event.GetPosition();
+	testPicking(curr_mouse.x, curr_mouse.y);
+
+	if (selected_type == MMP_ATOM) {
+		if (interactiveMode) {
+			interactPopupMenu(curr_mouse.x, curr_mouse.y, 1);
+			MolWin->SelectionChanged(deSelectAll);
+			MolWin->UpdateGLModel();
+		} else {
+			measurePopupMenu(curr_mouse.x, curr_mouse.y);
+		}
+	}
+
+	else if (selected_type == MMP_BOND) {
+		if (interactiveMode) {
+			interactPopupMenu(curr_mouse.x, curr_mouse.y, 0);
+			MolWin->SelectionChanged(deSelectAll);
+			MolWin->UpdateGLModel();
+		} else {
+			bondPopupMenu(curr_mouse.x, curr_mouse.y);
+		}
+	}
+
+	else if (selected_type == MMP_ANNOTATION) {
+		annoPopupMenu(curr_mouse.x, curr_mouse.y);
+	}
+
+	else {
+		// Though nothing's rotating on a single mousedown event, we need to
+		// register this first mouse click position.
+		SetCurrent();
+		MolWin->Rotate(event);
+
+		// std::cout << "captured" << std::endl; 
+		CaptureMouse();
+	}
+
+}
+
+void MpGLCanvas::eventMouseMiddleWentDown(wxMouseEvent& event) {
+
+	prev_mouse = curr_mouse;
+	curr_mouse = event.GetPosition();
+	testPicking(curr_mouse.x, curr_mouse.y);
+
+	// Though nothing's rotating on a single mousedown event, we need to
+	// register this first mouse click position.
+	SetCurrent();
+	MolWin->Rotate(event);
+
+	// std::cout << "captured" << std::endl; 
+	CaptureMouse();
+
+}
+
+void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
+
+	// This function handles all mouse movement, no matter the button being
+	// held (or even no button being down).
+
+	// We don't do anything if a button isn't held down.
+	if (!event.Dragging()) {
+		return;
+	}
+
+	prev_mouse = curr_mouse;
+	curr_mouse = event.GetPosition();
+
+	// We want to allow some mouse drift when the user's trying to simply
+	// click on the canvas.  By recording the number of drag events that have
+	// occurred, we can classify drags with a limited number of events as
+	// clicks.
+	ndrag_events++;
+
+	SetCurrent();
+
+	// Lassoing should only be done with the left mouse button.
+	if (MolWin->LassoSelected() && event.LeftIsDown()) {
+		HandleLassoing(event, wxPoint(curr_mouse.x, height - curr_mouse.y));
+		draw();
+	}
+
+	// User must be wanting to translate or rotate atoms.  This isn't the
+	// case if something that's not a bond or atom is clicked on, like a
+	// bonding site or an annotation or the background.
+	else if (MolWin->HandSelected() &&
+			 (selected_type == MMP_BOND || selected_type == MMP_ATOM)) {
+
+		// If a bond site is clicked on, it may be part of drag operation to
+		// join two sites.  We aren't editing in such a case, nor do we want
+		// to rotate the scene.
+		if (selected_site < 0) {
+			HandleEditing(event, curr_mouse, prev_mouse);
+			draw();
+		}
+
+	}
+	
+	// Otherwise the user must be transforming the whole scene.
+	else {
+		MolWin->Rotate(event);
+	}
+
+}
+
+void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
+
+	bool deSelectAll = true;
+
+	Frame *lFrame = mMainData->cFrame;
+
+	prev_mouse = curr_mouse;
+	curr_mouse = event.GetPosition();
+
+	ReleaseMouse();
+	SetCurrent();
+
+	// If either the command or shift keys are held, we want to add to the
+	// selection, not replace it.
+	if (event.CmdDown() || event.ShiftDown()) {
+		deSelectAll = false;
+	}
+
+	// If the lasso tool is being used, we want to end close off it's region.
+	if (MolWin->LassoSelected()) {
+		MolWin->LassoEnd();
+		if (ndrag_events <= 0) {
+			SelectObj(selected_type, selected, deSelectAll);
+		}
+		draw();
+	}
+
+	// Otherwise, if this mouse operation can be considered a stationary click
+	// and not a drag, we try to do selection or respond to an action.
+	else if (ndrag_events >= 0 && ndrag_events < 3) {
+
+		// If we're in edit mode, the user may be trying to add an atom,
+		// possibly to a bonding site.
+		if (MolWin->HandSelected()) {
+
+			// If no periodic table is shown or an atom is not selected, but
+			// the user seems to be trying to add an atom, give them a message.
+			if (periodic_dlg == NULL) {
+				if (selected_site >= 0 || selected < 0) {
+					MolWin->SetStatusText(wxT("Open periodic table dialog to add an atom."));
+				}
+			}
+
+			else if (periodic_dlg->GetSelectedID() == 0) {
+				if (selected_site >= 0 || selected < 0) {
+					MolWin->SetStatusText(wxT("Select an atom in the periodic table."));
+				}
+			} 
+
+			// If the user is adding a new atom based on the bonding site
+			// skeleton, add the atom in the direction of the bonding site.
+			else if (selected_site >= 0) {
+				lFrame->AddAtomAtSite(selected, selected_site, periodic_dlg->GetSelectedID());
+				MolWin->SetStatusText(wxT("Added new atom."));
+				MolWin->UpdateGLModel();
+			}
+
+			// If the user clicked on nothing, we try to add an atom given
+			// the selected element on the periodic table palette.
+			else if (selected < 0) {
+
+				CPoint3D newPnt;
+				GLdouble newX, newY, newZ;
+				int type;
+
+				// Guess atom's depth value by projecting the center of scene
+				// to window coordinates.  The mouse coordinates and window
+				// depth will be used to place the atom into the scene.
+				findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
+				findReal3DCoord(curr_mouse.x, curr_mouse.y, atomDepth,
+								newX, newY, newZ);
+				newPnt = CPoint3D(newX, newY, newZ);
+
+				type = periodic_dlg->GetSelectedID();
+				mMainData->NewAtom(type, newPnt);
+				lFrame->SetAtomOxidationNumber(lFrame->NumAtoms - 1,
+					Prefs->GetOxidationNumber(type));
+
+				MolWin->SetStatusText(wxT("Added new atom."));
+				MolWin->UpdateGLModel();
+			}
+
+		}
+
+		// Since we're dealing with a click, it's likely that something was
+		// selected.
+		SelectObj(selected_type, selected, deSelectAll);
+		MolWin->SelectionChanged(deSelectAll);
+		draw();
+
+	}
+	
+	// If a drag occurred between two bonding sites, we pair them up with
+	// a bond.
+	else if (MolWin->HandSelected() && site_clicked_on >= 0) {
+		testPicking(curr_mouse.x, curr_mouse.y);
+		if (selected_site >= 0 && selected_site != site_clicked_on) {
+			lFrame->AddBondBetweenSites(site_atom, site_clicked_on,
+										selected, selected_site);
+		}
+		site_clicked_on = -1;
+		draw();
+	}
+	
+	// Otherwise, the drag must have been to transform the whole scene.  We
+	// need to call rotate one more time to get rid of the rotation circle
+	// that appears.
+	else {
+		MolWin->Rotate(event);
+	}
+
+	if (mDragWin) {
+		mDragWin->EndDrag();
+		delete mDragWin;
+		mDragWin = NULL;
+	}
+}
+
+void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
+
+	ReleaseMouse();
+
+	// We call this to erase the transformation circle that would otherwise
+	// stay when the user releases the mouse.
+	SetCurrent();
+	MolWin->Rotate(event);
+
+}
+
+void MpGLCanvas::eventMouseMiddleWentUp(wxMouseEvent& event) {
+
+	// std::cout << "released" << std::endl; 
+	ReleaseMouse();
+
+	// We call this to erase the transformation circle that would otherwise
+	// stay when the user releases the mouse.
+	SetCurrent();
+	MolWin->Rotate(event);
+
+}
+
+void MpGLCanvas::eventMouseWheel(wxMouseEvent& event) {
+
+	// The display window will calculate the appropriate action for mouse 
+	// wheel movement.
+	SetCurrent();
+	MolWin->Rotate(event);
+
+}
+
 void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	wxPoint tmpPnt;
@@ -823,7 +1162,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	static wxPoint oldTmpPnt;
 	bool deSelectAll = true;
 	bool edited_atoms = false;
-	int width, height;
+	// int width, height; 
 	static int first_site = -1;
 	static int first_atom = -1;
 
@@ -835,7 +1174,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
 
-	GetClientSize(&width, &height);
+	// GetClientSize(&width, &height); 
 
 #if 0
 	printf("event.LeftDown(): %d\n", event.LeftDown());
@@ -889,10 +1228,6 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			}
 		}
 	}
-
-	// else if (event.Entering() && !event.LeftIsDown() && MolWin->LassoHasArea()) { 
-		// MolWin->LassoEnd(); 
-	// } 
 
 	else if (event.Leaving()) {
 		stale_click = true;
@@ -1100,9 +1435,9 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
-	int width, height;
+	// int width, height; 
 
-	GetClientSize(&width, &height);
+	// GetClientSize(&width, &height); 
 
 	// If an atom is clicked on...
 	if (selected_type == MMP_ATOM) {
@@ -1226,7 +1561,8 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				findWinCoord(lAtoms[selected].Position.x,
 					lAtoms[selected].Position.y,
 					lAtoms[selected].Position.z, tmpX, tmpY, tmpZ);
-				depth_offset = dy / (10.0f * GetClientSize().GetHeight());
+				// depth_offset = dy / (10.0f * GetClientSize().GetHeight()); 
+				depth_offset = dy / (10.0f * height);
 				findReal3DCoord(tmpX, tmpY, tmpZ - depth_offset,
 								newX, newY, newZ);
 			}
@@ -1323,7 +1659,8 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 		// Calculate the amount of rotation according to the amount
 		// of mouse change along the y-axis of the viewport.
 		dy = curr_pt.y - prev_pt.y;
-		angle_offset = dy / GetClientSize().GetHeight() * 540.0f;
+		angle_offset = dy / height * 540.0f;
+		// angle_offset = dy / GetClientSize().GetHeight() * 540.0f; 
 
 		// Get all trig together for rotating around the bond that
 		// was just clicked on.
@@ -1433,7 +1770,7 @@ void MpGLCanvas::HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt) {
 	glGetDoublev(GL_PROJECTION_MATRIX, proj);
 
 	if (!MolWin->LassoHasArea()) {
-		CaptureMouse();
+		// CaptureMouse(); 
 		MolWin->LassoStart(curr_pt.x, curr_pt.y);
 	}
 
@@ -1522,9 +1859,9 @@ void MpGLCanvas::testPicking(int x, int y) {
 	//gluPerspective(60, 1.0, 0.0001, 1000.0);
 
 	GLdouble top, right;
-	int width, height;
+	// int width, height; 
 
-	GetClientSize(&width, &height);
+	// GetClientSize(&width, &height); 
 
 	GLdouble aspect = ((float)width)/height;
 
@@ -2300,52 +2637,6 @@ void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
 	}
 }
 
-// MpGLCanvas::AtomTypeDialog::AtomTypeDialog(MpGLCanvas * parent, wxWindowID id, const wxString& caption) : typeID(1) { 
-	// Create(parent, id, caption); 
-// } 
-
-// void MpGLCanvas::AtomTypeDialog::Create(MpGLCanvas * parent, wxWindowID id, const wxString& caption) { 
-	// wxDialog::Create( parent, id, caption, wxDefaultPosition, wxSize(250, 125), wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX); 
-
-	// std::vector<wxString> atomTypes; 
-
-	// for (int i = 0; i < kMaxAtomTypes; i++) { 
-		// wxString tmp; 
-
-		// parent->Prefs->GetAtomLabel(i, tmp); 
-
-		// if (tmp.Length() > 0) 
-			// atomTypes.push_back(tmp); 
-	// } 
-
-	// mainSizer = new wxBoxSizer(wxVERTICAL); 
-	// upperSizer = new wxBoxSizer(wxVERTICAL); 
-	// lowerSizer = new wxBoxSizer(wxHORIZONTAL); 
-
-	// mTypeChoice = new wxChoice(this, ID_NEW_ATOM_TYPE_CHOICE, wxPoint(30,30), wxSize(200,wxDefaultCoord), atomTypes.size(), &atomTypes.front()); 
-	// mTypeChoice->SetSelection(0); 
-
-	// mButtOK = new wxButton(this, wxID_OK, wxT("OK") ); 
-	// mButtCancel = new wxButton(this, wxID_CANCEL, wxT("Cancel")); 
-
-	// upperSizer->Add(mTypeChoice, 0, wxALIGN_CENTRE | wxALL, 20); 
-	// upperSizer->Add(8,8); 
-	// lowerSizer->Add(10,10); 
-	// lowerSizer->Add(mButtOK, 0, wxALIGN_CENTRE | wxALL, 10); 
-	// lowerSizer->Add(mButtCancel, 0, wxALIGN_CENTRE | wxALL, 10); 
-
-	// mainSizer->Add(upperSizer); 
-	// mainSizer->Add(lowerSizer); 
-
-	// mainSizer->Layout(); 
-	// SetSizer(mainSizer); 
-	// Centre(wxBOTH); 
-// } 
-
-// void MpGLCanvas::AtomTypeDialog::OnChoice( wxCommandEvent &event ) { 
-	// typeID = event.GetInt() + 1; 
-// } 
-
 void MpGLCanvas::toggleInteractiveMode(void) {
 
 	interactiveMode = 1 - interactiveMode;
@@ -2388,7 +2679,17 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_SIZE(MpGLCanvas::eventSize)
 	EVT_PAINT(MpGLCanvas::eventPaint)
 	EVT_ERASE_BACKGROUND(MpGLCanvas::eventErase)
-	EVT_MOUSE_EVENTS(MpGLCanvas::eventMouse)
+	// EVT_MOUSE_EVENTS(MpGLCanvas::eventMouse) 
+	EVT_LEFT_DOWN(MpGLCanvas::eventMouseLeftWentDown)
+	EVT_RIGHT_DOWN(MpGLCanvas::eventMouseRightWentDown)
+	EVT_MIDDLE_DOWN(MpGLCanvas::eventMouseMiddleWentDown)
+	EVT_MOTION(MpGLCanvas::eventMouseDragging)
+	// EVT_LEAVE_WINDOW(MpGLCanvas::eventMouseLeaveWindow) 
+	EVT_LEFT_UP(MpGLCanvas::eventMouseLeftWentUp)
+	EVT_RIGHT_UP(MpGLCanvas::eventMouseRightWentUp)
+	EVT_MIDDLE_UP(MpGLCanvas::eventMouseMiddleWentUp)
+	EVT_LEFT_DCLICK(MpGLCanvas::eventMouseLeftDoubleClick)
+	EVT_MOUSEWHEEL(MpGLCanvas::eventMouseWheel)
 #if wxCHECK_VERSION(2, 8, 0)
 	EVT_MOUSE_CAPTURE_LOST(MpGLCanvas::eventMouseCaptureLost)
 #endif
@@ -2417,7 +2718,3 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_Change_Ox_Num, MpGLCanvas::ChangeOxidationNumber)
 END_EVENT_TABLE()
 
-
-// BEGIN_EVENT_TABLE(MpGLCanvas::AtomTypeDialog, wxDialog) 
-	// EVT_CHOICE(ID_NEW_ATOM_TYPE_CHOICE, AtomTypeDialog::OnChoice) 
-// END_EVENT_TABLE() 
