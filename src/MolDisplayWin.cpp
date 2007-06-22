@@ -121,6 +121,8 @@ enum MMP_EventID {
 	MMP_ANIMATEFRAMESTIMER,
 	MMP_ANIMATEMODE,
 	MMP_ANIMATEMODETIMER,
+	MMP_STATUS_TIMER,
+	MMP_ROTATE_TIMER,
 	MMP_OFFSETMODE,
 	MMP_ENERGYEDIT,
 	MMP_WINDOWPARAMETERS,
@@ -271,6 +273,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 
 	EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
 	EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
+	EVT_TIMER(MMP_STATUS_TIMER, MolDisplayWin::OnStatusTimer)
+	EVT_TIMER(MMP_ROTATE_TIMER, MolDisplayWin::OnRotateTimer)
 	EVT_SIZE(MolDisplayWin::eventSize)
 	EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
 	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen)
@@ -376,6 +380,9 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
 	toolbar = NULL;
 	lasso_has_area = false;
+
+	status_timer.SetOwner(this, MMP_STATUS_TIMER);
+	rotate_timer.SetOwner(this, MMP_ROTATE_TIMER);
 
 #ifdef __WXMSW__
 	//Visual studio is a total pile.
@@ -2526,7 +2533,12 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
 }
 
 void MolDisplayWin::SetStatusText(const wxString& label) {
+	status_timer.Start(5000, true);
 	myStatus->SetStatusText(label);
+}
+
+void MolDisplayWin::OnStatusTimer(wxTimerEvent& event) {
+	myStatus->SetStatusText("");
 }
 
 void MolDisplayWin::ModeChanged(void) {
@@ -2988,16 +3000,22 @@ void MolDisplayWin::UpdateWindowData(void) {
 	} else winData.ZMatWindowVisible(false);
 }
 
+void MolDisplayWin::OnRotateTimer(wxTimerEvent& event) {
+	wxMouseEvent mouse_event = wxMouseEvent(wxEVT_MOTION);
+	mouse_event.m_leftDown = true;
+	Rotate(mouse_event);
+}
+
 void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	static wxPoint      p;
 	wxPoint             q, sphereCenter;
 	int                 dx, dy;
 	Matrix4D            rotationMatrix, tempcopyMatrix;
 	wxRect              sphereRect;
-//  static wxString     AngleString;
 	long                hsize, vsize, width, hoffset, sphereRadius;
 	Surface *           lSurface;
 	bool                UpdateSurface = false;
+	static wxPoint      inertia;
 
 	int wheel = event.GetWheelRotation();
 	if (wheel != 0) { //zoom
@@ -3033,22 +3051,38 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	sphereRect.SetWidth(sphereRadius);
 	sphereRect.SetX(sphereCenter.x - sphereRadius);
 	sphereRect.SetY(sphereCenter.y - sphereRadius);
-	
+
 	if (event.ButtonDown()) {
 		// initial drag setup, just save the initial cursor position
 		p = event.GetPosition();
 		if (p.x == 0 && p.y == 0) {
 			p = ScreenToClient(wxGetMousePosition());
 		}
-	}
-	else if (stale_click) {
+		inertia.x = 0;
+		inertia.y = 0;
+		if (rotate_timer.IsRunning()) {
+			rotate_timer.Stop();
+		}
+	} else if (stale_click) {
 		p = ScreenToClient(wxGetMousePosition());
 		stale_click = false;
-	} else if (event.Dragging()) {                               
+	} else if (event.Dragging()) {
 		// main drag
 		q = event.GetPosition();
 		dx = q.x - p.x;
 		dy = q.y - p.y;
+
+		if (rotate_timer.IsRunning()) {
+			dx = inertia.x;
+			dy = inertia.y;
+			p = sphereCenter;
+			q.x = p.x + inertia.x;
+			q.y = p.y + inertia.y;
+		} else {
+			inertia.x = dx;
+			inertia.y = dy;
+		}
+
 		if (dx != 0 || dy != 0) {
 			if (event.CmdDown() || event.RightIsDown()) {   //Command key: translate instead of rotate
 				CPoint3D offset;
@@ -3119,6 +3153,10 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 
 			p = q;      /* Remember previous mouse point for next iteration. */
 		}
+	} else if (event.LeftUp()) {
+		if (fabs(inertia.x) > 3 || fabs(inertia.y) > 3) {
+			rotate_timer.Start(33, false);
+		} 
 	}
 
 	// We want to draw a circle showing the virtual sphere, but only if

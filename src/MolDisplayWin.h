@@ -154,6 +154,8 @@ class MolDisplayWin : public wxFrame {
 		MolStatusBar	*myStatus;
 		ModeAnimation	*ModeAnimationData;
 		wxTimer			m_timer;
+		wxTimer			status_timer;
+		wxTimer			rotate_timer;
 
 		BondsDlg			*bondsWindow;
 		CoordinatesWindow	*coordsWindow;
@@ -184,6 +186,8 @@ class MolDisplayWin : public wxFrame {
 		wxPoint lasso_end;
 
 		void OnToggleTool(wxCommandEvent& event);
+		void OnStatusTimer(wxTimerEvent& event);
+		void OnRotateTimer(wxTimerEvent& event);
 
 		DECLARE_EVENT_TABLE()
 
