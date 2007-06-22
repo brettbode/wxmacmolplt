@@ -3633,6 +3633,15 @@ void MolDisplayWin::WriteMDLMolFile(BufferFile * Buffer) {
 		//Final line needs to be end line to terminate properties block
 	Buffer->PutText("M  END\r");
 }
+
+void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
+{
+  Buffer->PutText("#VRML V2.0 utf8\n");  //VRML header
+
+  Frame * lFrame = MainData->GetCurrentFramePtr();
+  mpAtom * lAtoms = lFrame->Atoms;
+}
+
 void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const double & MultValue) {
 #ifdef __wxBuild__
     wxString filename = wxFileSelector(wxT("Choose a file containing the surface data."));

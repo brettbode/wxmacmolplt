@@ -1605,11 +1605,11 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			  gluSphere(qobj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
 			  glDisable(GL_POLYGON_STIPPLE);
 
-			  glColor4f(0.5,0.5,0.5,0.7f);
-			  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-			  glEnable(GL_BLEND);
-			  gluSphere(qobj, radius*1.02, (long)(1.5*Quality), (long)(Quality));
-			  glDisable(GL_BLEND);
+			  //glColor4f(0.5,0.5,0.5,0.7f);
+			  //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+			  //glEnable(GL_BLEND);
+			  //gluSphere(qobj, radius*1.02, (long)(1.5*Quality), (long)(Quality));
+			  //glDisable(GL_BLEND);
 			}
 
 			Prefs->ChangeColorAtomColor(curAtomType+1);
@@ -1803,11 +1803,12 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 				// Display semi-transparent and non-stippled cylinder and spheres
 				// slightly larger than the bond and stippled cylinder and spheres.
-				glColor4f(0.5f, 0.5f, 0.5f, 0.7f);
-				glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-				glEnable(GL_BLEND);
-				gluCylinder(qobj, tmpBondSize * 1.02f, tmpBondSize * 1.02f,
-								length, (long) Quality, (long) (0.5 * Quality));
+				//glColor4f(0.5f, 0.5f, 0.5f, 0.7f);
+				//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+				//glEnable(GL_BLEND);
+				//gluCylinder(qobj, tmpBondSize * 1.02f, tmpBondSize * 1.02f,
+				//length, (long) Quality, (long) (0.5 * Quality));
+
 				if (Prefs->DrawWireFrame()) { //Add end caps if no spheres
 					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
 								 (long) (0.5 * Quality));
@@ -1815,7 +1816,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 					gluSphere(qobj, tmpBondSize * 1.02f, (long) Quality,
 							  (long) (0.5 * Quality));
 				}
-				glDisable(GL_BLEND);
+				//glDisable(GL_BLEND);
 
 			}
 

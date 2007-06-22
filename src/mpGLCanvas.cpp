@@ -33,6 +33,7 @@
 
 extern PeriodicTableDlg *periodic_dlg;
 extern bool show_periodic_dlg;
+extern int glf_initialized;
 
 int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 
@@ -106,6 +107,7 @@ void MpGLCanvas::initGL(void) {
 				   "properly installed. Looking for " << bitmap_font.mb_str(wxConvUTF8);
 			MessageAlert(buf.str().c_str());
 			glfClose();
+			glf_initialized = 0;
 		} else {
 			if (glfLoadFont(vector_font.mb_str(wxConvUTF8)) < 0) {
 				std::ostringstream buf;
@@ -113,6 +115,7 @@ void MpGLCanvas::initGL(void) {
 					   "properly installed. Looking for " << vector_font.mb_str(wxConvUTF8);
 				MessageAlert(buf.str().c_str());
 				glfClose();
+				glf_initialized = 0;
 			}
 		}
 

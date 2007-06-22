@@ -351,6 +351,7 @@ class MolDisplayWin : public wxFrame {
 		void WriteFrequencies(BufferFile * Buffer);
 		void WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllModes, bool AnimateMode);
 		void WriteMDLMolFile(BufferFile * Buffer);
+		void WriteVRMLFile(BufferFile * Buffer);
 #ifdef __MAC_USE_QUICKTIME__
 		//quicktime movie export
 		void WriteQTMovie(wxString & filepath);
