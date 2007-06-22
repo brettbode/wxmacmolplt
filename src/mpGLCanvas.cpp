@@ -946,7 +946,6 @@ void MpGLCanvas::eventMouseMiddleWentDown(wxMouseEvent& event) {
 	SetCurrent();
 	MolWin->Rotate(event);
 
-	// std::cout << "captured" << std::endl; 
 	CaptureMouse();
 
 }
@@ -1010,7 +1009,9 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
 
-	ReleaseMouse();
+	if (HasCapture()) {
+		ReleaseMouse();
+	}
 	SetCurrent();
 
 	// If either the command or shift keys are held, we want to add to the
@@ -1121,7 +1122,9 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 
-	ReleaseMouse();
+	if (HasCapture()) {
+		ReleaseMouse();
+	}
 
 	// We call this to erase the transformation circle that would otherwise
 	// stay when the user releases the mouse.
@@ -1132,8 +1135,9 @@ void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 
 void MpGLCanvas::eventMouseMiddleWentUp(wxMouseEvent& event) {
 
-	// std::cout << "released" << std::endl; 
-	ReleaseMouse();
+	if (HasCapture()) {
+		ReleaseMouse();
+	}
 
 	// We call this to erase the transformation circle that would otherwise
 	// stay when the user releases the mouse.
@@ -1151,6 +1155,7 @@ void MpGLCanvas::eventMouseWheel(wxMouseEvent& event) {
 
 }
 
+#if 0
 void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 	wxPoint tmpPnt;
@@ -1428,6 +1433,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 	}
 
 }
+#endif
 
 void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 		                       const wxPoint& prev_pt) {
@@ -1435,9 +1441,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
-	// int width, height; 
-
-	// GetClientSize(&width, &height); 
+	static bool was_zooming = false;
 
 	// If an atom is clicked on...
 	if (selected_type == MMP_ATOM) {
@@ -1522,7 +1526,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 					   mv, proj, viewport,
 					   &(proj_max[0]), &(proj_max[1]), &(proj_max[2]));
 
-			// The centroid's project is the center of the virtual sphere.
+			// The centroid's projection is the center of the virtual sphere.
 			cent.h = (unsigned short) proj_pt[0];
 			cent.v = height - (unsigned short) proj_pt[1];
 
@@ -1549,28 +1553,42 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			}
 
 		} else {
+			GLdouble tmpX, tmpY, tmpZ;
+			findWinCoord(lAtoms[selected].Position.x,
+				lAtoms[selected].Position.y,
+				lAtoms[selected].Position.z, tmpX, tmpY, tmpZ);
 
 			// If shift is held when an atom is clicked on, we want to
 			// change the depths of either the clicked on or selected
 			// atoms.  Also do this for the middle mouse button.
 			if (event.ShiftDown() || event.MiddleIsDown()) {
-				GLdouble tmpX, tmpY, tmpZ;
 				float depth_offset;
 				float dy = curr_pt.y - prev_pt.y;
 
-				findWinCoord(lAtoms[selected].Position.x,
-					lAtoms[selected].Position.y,
-					lAtoms[selected].Position.z, tmpX, tmpY, tmpZ);
 				// depth_offset = dy / (10.0f * GetClientSize().GetHeight()); 
 				depth_offset = dy / (10.0f * height);
 				findReal3DCoord(tmpX, tmpY, tmpZ - depth_offset,
 								newX, newY, newZ);
+				was_zooming = true;
 			}
 
 			// If no shift, just translate.
 			else {
+				if (was_zooming == true) {
+					GLdouble tmpWinX, tmpWinY;
+
+					findWinCoord(lAtoms[selected].Position.x,
+						lAtoms[selected].Position.y,
+						lAtoms[selected].Position.z,
+						tmpWinX, tmpWinY, atomDepth);
+		   
+					winDiffX = curr_mouse.x - (int) tmpWinX;
+					winDiffY = curr_mouse.y - (int) tmpWinY;
+					was_zooming = false;
+				}
 				findReal3DCoord(curr_pt.x - winDiffX, curr_pt.y - winDiffY,
-								atomDepth, newX, newY, newZ);
+								tmpZ, newX, newY, newZ);
+				// findReal3DCoord(curr_pt.x, curr_pt.y, tmpZ, newX, newY, newZ); 
 
 				int constrain_anno_id = mMainData->GetConstrainAnnotation();
 				if (constrain_anno_id != -1) {

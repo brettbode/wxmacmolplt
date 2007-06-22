@@ -121,6 +121,7 @@ class MpGLCanvas : public wxGLCanvas {
 		int width;              // Width of canvas in pixels
 		int height;             // Height of canvas in pixels
 		int ndrag_events;       // Number of drag events in current drag
+		bool is_depth_zooming;  // True if user is changing atom's depth
 
 	public:
 		/**
