@@ -1006,42 +1006,64 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 		filepath = fileDlg->GetPath();
 		index    = fileDlg->GetFilterIndex();
 		if (index <= 2) {
-			exportOptionsDlg = new ExportOptionsDialog(this);
-			if(exportOptionsDlg->ShowModal() == wxID_OK) {
-				switch(index) {
-					case 0:
-						if(!type) {
-							type = wxBITMAP_TYPE_BMP;
-							if(!filepath.Lower().Matches(wxT("*.bmp"))) {
-								filepath.Append(wxT(".bmp"));
-							}
-						}
-					case 1:
-						if(!type) {
-							type = wxBITMAP_TYPE_PNG;
-							if(!filepath.Lower().Matches(wxT("*.png"))) {
-								filepath.Append(wxT(".png"));
-							}
-						}
-					case 2:
-						if(!type) {
-							type = wxBITMAP_TYPE_JPEG;
-							if(!filepath.Lower().Matches(wxT("*.jpg")) &&
-							   !filepath.Lower().Matches(wxT("*.jpeg"))) {
+			switch(index) {
+				case 0:
+					type = wxBITMAP_TYPE_BMP;
+					if(!filepath.Lower().Matches(wxT("*.bmp"))) {
+						filepath.Append(wxT(".bmp"));
+					}
+					break;
+				case 1:
+					type = wxBITMAP_TYPE_PNG;
+					if(!filepath.Lower().Matches(wxT("*.png"))) {
+						filepath.Append(wxT(".png"));
+					}
+					break;
+				case 2:
+					type = wxBITMAP_TYPE_JPEG;
+					if(!filepath.Lower().Matches(wxT("*.jpg")) &&
+					   !filepath.Lower().Matches(wxT("*.jpeg"))) {
 
-								filepath.Append(wxT(".jpg"));
-							}
-						}
-						bmp = new wxBitmap(exportOptionsDlg->getWidth(),
-										   exportOptionsDlg->getHeight());
-						memDC.SelectObject(*bmp);
-						glCanvas->GenerateHiResImageForExport(&memDC);
-						exportImage = bmp->ConvertToImage();
-						exportImage.SaveFile(filepath, type);
-						memDC.SelectObject(wxNullBitmap); // bmp has now been
-														  // destroyed.
-						break;
+						filepath.Append(wxT(".jpg"));
+					}
+					break;
+			}
+			exportOptionsDlg = new ExportOptionsDialog(this);
+			exportOptionsDlg->setFileType(type);
+			if(exportOptionsDlg->ShowModal() == wxID_OK) {
+				bmp = new wxBitmap(exportOptionsDlg->getWidth(),
+								   exportOptionsDlg->getHeight());
+				memDC.SelectObject(*bmp);
+				glCanvas->GenerateHiResImageForExport(&memDC);
+				exportImage = bmp->ConvertToImage();
+				if(exportOptionsDlg->getTransparency()) {
+					// This gets really hairy, since there isn't a good way to
+					// determine what the actual value of the background color
+					// ends up being after it's pumped through both GL and WX.
+					//
+					// In the end we just compare our "ideal" value with the
+					// upper left corner of the image.  If the two are
+					// reasonably close, we use the value from the corner.
+
+					RGBColor *bgColor = Prefs->GetBackgroundColorLoc();
+					unsigned char red, green, blue;
+					short dRed, dGreen, dBlue;
+
+					red = exportImage.GetRed(0, 0);
+					green = exportImage.GetGreen(0, 0);
+					blue = exportImage.GetBlue(0, 0);
+
+					dRed = abs((short)((bgColor->red) >> 8) - red);
+					dGreen = abs((short)((bgColor->green) >> 8) - green);
+					dBlue = abs((short)((bgColor->blue) >> 8) - blue);
+
+					if(dRed < 3 && dGreen < 3 && dBlue < 3) {
+						exportImage.SetMaskColour(red, green, blue);
+					}
 				}
+				exportImage.SaveFile(filepath, type);
+				memDC.SelectObject(wxNullBitmap); // bmp has now been
+												  // destroyed.
 			}
 			exportOptionsDlg->Destroy();
 		}

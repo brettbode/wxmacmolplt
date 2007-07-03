@@ -40,15 +40,16 @@ class wxSpinCtrl;
 
 ////@begin control identifiers
 #define ID_EXPORTOPTIONSDIALOG 10044
+#define ID_RES_PANEL 10045
+#define ID_RES_CHOICE 10047
+#define ID_RESWIDTHSPIN 10051
+#define ID_RESHEIGHTSPIN 10049
+#define ID_CHECKBOX3 10260
 #define SYMBOL_EXPORTOPTIONSDIALOG_STYLE wxDEFAULT_DIALOG_STYLE|wxCAPTION|wxSYSTEM_MENU|wxSTAY_ON_TOP|wxDIALOG_MODAL
 #define SYMBOL_EXPORTOPTIONSDIALOG_TITLE _("Export Options")
 #define SYMBOL_EXPORTOPTIONSDIALOG_IDNAME ID_EXPORTOPTIONSDIALOG
 #define SYMBOL_EXPORTOPTIONSDIALOG_SIZE wxSize(400, 300)
 #define SYMBOL_EXPORTOPTIONSDIALOG_POSITION wxDefaultPosition
-#define ID_RES_PANEL 10045
-#define ID_RES_CHOICE 10047
-#define ID_RESWIDTHSPIN 10051
-#define ID_RESHEIGHTSPIN 10049
 ////@end control identifiers
 
 /*!
@@ -90,6 +91,9 @@ public:
 	/// wxEVT_COMMAND_SPINCTRL_UPDATED event handler for ID_RESHEIGHTSPIN
 	void OnResheightspinUpdated( wxSpinEvent& event );
 
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX3
+	void OnCheckbox3Click( wxCommandEvent& event );
+
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
 	void OnOkClick( wxCommandEvent& event );
 
@@ -97,6 +101,9 @@ public:
 
     int getWidth() const { return width; }
     int getHeight() const { return height; }
+    bool getTransparency() const { return transparency; }
+    
+    void setFileType(int ft);
 
     /// Retrieves bitmap resources
     wxBitmap GetBitmapResource( const wxString& name );
@@ -114,6 +121,7 @@ private:
     long screenHeight;
     double H2Wratio;
     int filetype;
+    bool transparency;
 
     wxChoice        *fileTypeChoice;
     wxChoice        *resChoice;
@@ -124,6 +132,7 @@ private:
     wxSpinCtrl      *resWidthSpin;
     wxSpinCtrl      *resHeightSpin;
     wxPanel         *panelRes;
+    wxCheckBox      *resTBGCheck;
 };
 
 #endif

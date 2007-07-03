@@ -55,6 +55,8 @@ BEGIN_EVENT_TABLE( ExportOptionsDialog, wxDialog )
 
 	EVT_SPINCTRL( ID_RESHEIGHTSPIN, ExportOptionsDialog::OnResheightspinUpdated )
 
+	EVT_CHECKBOX( ID_CHECKBOX3, ExportOptionsDialog::OnCheckbox3Click )
+
 	EVT_BUTTON( wxID_OK, ExportOptionsDialog::OnOkClick )
 
 ////@end ExportOptionsDialog event table entries
@@ -89,6 +91,7 @@ bool ExportOptionsDialog::Create( wxWindow* parent, wxWindowID id, const wxStrin
 	txt2 = NULL;
 	resHeightSpin = NULL;
 	txt3 = NULL;
+	resTBGCheck = NULL;
 ////@end ExportOptionsDialog member initialisation
     width = 0;
     height = 0;
@@ -132,12 +135,11 @@ void ExportOptionsDialog::CreateControls()
 	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
 	panelRes->SetSizer(itemBoxSizer4);
 
-	wxString resChoiceStrings[] = {
-		_("72dpi (Screen)"),
-		_("300dpi (Print)"),
-		_("Custom")
-	};
-	resChoice = new wxChoice( panelRes, ID_RES_CHOICE, wxDefaultPosition, wxDefaultSize, 3, resChoiceStrings, 0 );
+	wxArrayString resChoiceStrings;
+	resChoiceStrings.Add(_("72dpi (Screen)"));
+	resChoiceStrings.Add(_("300dpi (Print)"));
+	resChoiceStrings.Add(_("Custom"));
+	resChoice = new wxChoice( panelRes, ID_RES_CHOICE, wxDefaultPosition, wxDefaultSize, resChoiceStrings, 0 );
 	resChoice->SetStringSelection(_("72dpi (Screen)"));
 	itemBoxSizer4->Add(resChoice, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
@@ -165,19 +167,34 @@ void ExportOptionsDialog::CreateControls()
 	txt3 = new wxStaticText( panelRes, wxID_STATIC, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer10->Add(txt3, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
 
-	wxStdDialogButtonSizer* itemStdDialogButtonSizer14 = new wxStdDialogButtonSizer;
+	resTBGCheck = new wxCheckBox( panelRes, ID_CHECKBOX3, _("Enable background transparency"), wxDefaultPosition, wxDefaultSize, 0 );
+	resTBGCheck->SetValue(false);
+	resTBGCheck->Enable(false);
+	itemBoxSizer4->Add(resTBGCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	itemBoxSizer2->Add(itemStdDialogButtonSizer14, 0, wxALIGN_RIGHT|wxRIGHT|wxTOP|wxBOTTOM, 5);
-	wxButton* itemButton15 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemButton15->SetDefault();
-	itemStdDialogButtonSizer14->AddButton(itemButton15);
+	wxStdDialogButtonSizer* itemStdDialogButtonSizer15 = new wxStdDialogButtonSizer;
 
-	wxButton* itemButton16 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemStdDialogButtonSizer14->AddButton(itemButton16);
+	itemBoxSizer2->Add(itemStdDialogButtonSizer15, 0, wxALIGN_RIGHT|wxRIGHT|wxTOP|wxBOTTOM, 5);
+	wxButton* itemButton16 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemButton16->SetDefault();
+	itemStdDialogButtonSizer15->AddButton(itemButton16);
 
-	itemStdDialogButtonSizer14->Realize();
+	wxButton* itemButton17 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemStdDialogButtonSizer15->AddButton(itemButton17);
+
+	itemStdDialogButtonSizer15->Realize();
 
 ////@end ExportOptionsDialog content construction
+}
+
+void ExportOptionsDialog::setFileType(int ft) {
+    filetype = ft;
+    if(filetype == wxBITMAP_TYPE_PNG) {
+        resTBGCheck->Enable(true);
+    }
+    else {
+        resTBGCheck->Enable(false);
+    }
 }
 
 /*!
@@ -291,4 +308,14 @@ void ExportOptionsDialog::OnResheightspinUpdated( wxSpinEvent& event )
     height = tempHeight;
 }
 
+
+
+/*!
+ * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX3
+ */
+
+void ExportOptionsDialog::OnCheckbox3Click( wxCommandEvent& event )
+{
+    transparency = resTBGCheck->GetValue();
+}
 
