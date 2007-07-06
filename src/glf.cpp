@@ -1683,6 +1683,8 @@ void glfDrawBMaskString(const char *s)
 	for (i=0; i<(int)strlen(s); i++)
 		temp_trans += m_widths[bmf_curfont].width[s[i]] + sym_space;
 
+	glDepthMask(GL_FALSE);
+
 	glPushMatrix();
 	glPushAttrib(GL_CURRENT_BIT);
 	
@@ -1697,9 +1699,7 @@ void glfDrawBMaskString(const char *s)
 		glPushMatrix();
 		glTranslatef(-temp_trans/2, 0, 0);
 	}
-	glDepthMask(GL_FALSE);
 	glCallLists(strlen(s), GL_UNSIGNED_BYTE, (unsigned char *)s);
-	glDepthMask(GL_TRUE);
 	if (m_bitmap_string_center == GL_TRUE)	glPopMatrix();
 
 	glPopAttrib();
@@ -1711,14 +1711,15 @@ void glfDrawBMaskString(const char *s)
 	glPushMatrix();
 	glBlendFunc(GL_ONE, GL_ONE);
 	glListBase(list_base[bmf_curfont]);
-	if (m_bitmap_string_center == GL_TRUE)
-	{
+	if (m_bitmap_string_center == GL_TRUE) {
 		glPushMatrix();
 		glTranslatef(-temp_trans/2, 0, 0);
 	}
 	glCallLists(strlen(s), GL_UNSIGNED_BYTE, (unsigned char *)s);
 	if (m_bitmap_string_center == GL_TRUE)	glPopMatrix();
 	glPopMatrix();
+
+	glDepthMask(GL_TRUE);
 }
 
 /* Set string centering for bitmap fonts */
