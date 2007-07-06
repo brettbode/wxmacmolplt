@@ -793,11 +793,6 @@ void MolDisplayWin::DrawGL(void) {
 		DrawLabel();
 	}
 
-	if (interactiveMode) {
-	    const char modeString[] = "editing";
-	    DrawStaticLabel(modeString, -50, -20);
-	}
-
 	glMultMatrixf((const GLfloat *) &(MainData->TotalRotation));
 
 	glEnable(GL_LIGHTING);
@@ -963,6 +958,11 @@ void MolDisplayWin::DrawGL(void) {
 	}
 
 	glDisable(GL_LIGHTING);
+
+	if (interactiveMode) {
+	    const char modeString[] = "editing";
+	    DrawStaticLabel(modeString, -50, -20);
+	}
 }
 
 void AnnotationLength::draw(const MolDisplayWin * win) const {
@@ -3835,7 +3835,8 @@ void MolDisplayWin::DrawBondingSites(int ox_num, unsigned char paired_sites, flo
 	float c, s, b, d;
 
 	glPushName(0);
-	glColor3f(0.4f, 0.4f, 0.4f);
+
+	glColor3f(0.9f, 0.1f, 0.1f);
 
 	switch (ox_num) {
 		case 1:
