@@ -2008,20 +2008,25 @@ void Frame::AddHydrogens(void) {
 	}
 }
 
+#include <iostream>
 void Frame::AddAtomAtSite(int atom_id, int site_id, int new_atom_type) {
 
 	int base_type = GetAtomType(atom_id) - 1;
 	int ox_num = GetAtomOxidationNumber(atom_id);
 	WinPrefs *Prefs = gPreferences;
+	CPoint3D origin;
 	CPoint3D site_vec = Prefs->BondingSite(ox_num, site_id);
 	CPoint3D trans_site_vec;
-	CPoint3D origin;
 
+	// Report clicked on site as full.
 	SetAtomBondingSite(atom_id, site_id, true);
 
+	// Transform the site vector by the atom's rotation.
 	GetAtomPosition(atom_id, origin);
 	Rotate3DOffset(Atoms[atom_id].rot, site_vec, &trans_site_vec);
 
+	// The new atom is displaced from the clicked on atom along the transformed
+	// site vector's direction.
 	AddAtom(new_atom_type,
 			origin + trans_site_vec * Prefs->GetAutoBondScale() *
 			(Prefs->GetAtomSize(base_type) + Prefs->GetAtomSize(new_atom_type - 1)));
@@ -2034,13 +2039,10 @@ void Frame::AddAtomAtSite(int atom_id, int site_id, int new_atom_type) {
 	Matrix4D new_rot;
 	CPoint3D new_site_vec;
 
-	new_site_vec = Prefs->BondingSite(
-		Prefs->GetOxidationNumber(new_atom_type), 0) * -1.0f;
+	new_site_vec = Prefs->BondingSite(Prefs->GetOxidationNumber(new_atom_type), 0);
+	new_site_vec.y *= -1.0f;
 
-	SetRotationMatrix(new_rot, &new_site_vec, &trans_site_vec);
-	MultiplyMatrix(Atoms[NumAtoms - 1].rot, new_rot, rot_copy);
-	memcpy(Atoms[NumAtoms - 1].rot, rot_copy, sizeof(float) * 16);
-
+	SetRotationMatrix(Atoms[NumAtoms - 1].rot, &new_site_vec, &trans_site_vec);
 	AddBond(atom_id, NumAtoms - 1);
 }
 
