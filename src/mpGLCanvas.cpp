@@ -140,8 +140,8 @@ void MpGLCanvas::initGL(void) {
 		//setup the static lighting properties
 		GLfloat ambient[4]  = {0.2,0.2,0.2,1.0};
 		GLfloat model_ambient[4]  = {0.1,0.1,0.1,0.1};
+		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 		glEnable(GL_COLOR_MATERIAL);
-		glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
 		glLightfv(GL_LIGHT0,GL_AMBIENT,ambient);
 		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_TRUE);
 		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,GL_TRUE);
@@ -960,6 +960,19 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 
 	// We don't do anything if a button isn't held down.
 	if (!event.Dragging()) {
+		prev_mouse = curr_mouse;
+		curr_mouse = event.GetPosition();
+		testPicking(curr_mouse.x, curr_mouse.y);
+		// std::cout << "selected: " << selected << std::endl; 
+		// std::cout << "selected_site: " << selected_site << std::endl; 
+		// std::cout << "selected_type: " << selected_type << std::endl; 
+		if (MolWin->HandSelected() && selected_site > 0) {
+			MolWin->SetStatusText(wxT("Bond an atom here."));
+		} else if (MolWin->HandSelected() && selected < 0) {
+			MolWin->SetStatusText(wxT("Add new atom."));
+		} else {
+			MolWin->SetStatusText(wxT(""));
+		}
 		return;
 	}
 
@@ -2636,7 +2649,7 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 		}
 
 	} else if (selected_type == MMP_BOND) {
-		lFrame->DeleteBond(selected - NumAtoms);
+		lFrame->DeleteBond(selected);
 	}
 
 }
