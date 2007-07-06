@@ -273,63 +273,124 @@ void Normalize3D (CPoint3D *v)
  Modification of Michael Pique's formula in 
  Graphics Gems Vol. 1.  Andrew Glassner, Ed.  Addison-Wesley.
 -------------------------------------------------------------------------------------------------*/
-void SetRotationMatrix (Matrix4D rotationMatrix, const CPoint3D *op, const CPoint3D *oq)
-{
+// #include <iostream> 
+void SetRotationMatrix (Matrix4D rotationMatrix, const CPoint3D *op, const CPoint3D *oq) {
+
 	float		s, c, t;
 	CPoint3D	a;
 	
-	#define ax	(-(a.x))
-	#define ay	(-(a.y))
-	#define az	(-(a.z))
-	#define ax2	(ax * ax)
-	#define ay2	(ay * ay)
-	#define az2	(az * az)
-
-	CrossProduct3D (op, oq, &a);
+	CrossProduct3D(op, oq, &a);
 	s = a.Magnitude();
-	c = DotProduct3D (op, oq);
-	t = 1 - c;
+	c = DotProduct3D(op, oq);
 
+	if (s < 1e-6f) {
+		if (c < 0.0f) {
+			a.x = op->x;
+			a.y = op->z;
+			a.z = op->y;
+			s = a.Magnitude();
+		} else {
+			InitRotationMatrix(rotationMatrix);
+			return;
+		}
+	}
+
+	Normalize3D(&a);
+	float degrees = acos(c) * 180.0f / kPi;
+	RotateAroundAxis(rotationMatrix, a, degrees);
+	// printf("rotationMatrix[0][<0-15>]:\n" 
+		   // "%f %f %f %f\n" 
+		   // "%f %f %f %f\n" 
+		   // "%f %f %f %f\n" 
+		   // "%f %f %f %f\n", 
+		   // rotationMatrix[0][0], rotationMatrix[1][0], 
+		   // rotationMatrix[2][0], rotationMatrix[3][0], 
+		   // rotationMatrix[0][1], rotationMatrix[1][1], 
+		   // rotationMatrix[2][1], rotationMatrix[3][1], 
+		   // rotationMatrix[0][2], rotationMatrix[1][2], 
+		   // rotationMatrix[2][2], rotationMatrix[3][2], 
+		   // rotationMatrix[0][3], rotationMatrix[1][3], 
+		   // rotationMatrix[2][3], rotationMatrix[3][3]); 
+
+#if 0
 	if (s > 0) {
 		a.x /= s;
 		a.y /= s;
 		a.z /= s;
+		t = 1 - c;
+
+#define ax	(-(a.x))
+#define ay	(-(a.y))
+#define az	(-(a.z))
+#define ax2	(ax * ax)
+#define ay2	(ay * ay)
+#define az2	(az * az)
+		rotationMatrix[0][0] = t*ax2+c;
+		rotationMatrix[1][0] = t*ax*ay+s*az;
+		rotationMatrix[2][0] = t*ax*az-s*ay;
+
+		rotationMatrix[0][1] = t*ax*ay-s*az;
+		rotationMatrix[1][1] = t*ay2+c;
+		rotationMatrix[2][1] = t*ay*az+s*ax;
+
+		rotationMatrix[0][2] = t*ax*az+s*ay;
+		rotationMatrix[1][2] = t*ay*az-s*ax;
+		rotationMatrix[2][2] = t*az2+c;
+#undef ax
+#undef ay
+#undef az
+#undef ax2
+#undef ay2
+#undef az2
+		// OrthogonalizeRotationMatrix(rotationMatrix); 
+
+	} else {
+
+		InitRotationMatrix(rotationMatrix);
+		// if (c < 0.0f) { 
+			// rotationMatrix[0][0] *= -1; 
+			// rotationMatrix[1][1] *= -1; 
+			// rotationMatrix[2][2] *= -1; 
+		// } 
 	}
-
-	rotationMatrix[0][0] = t*ax2+c;
-	rotationMatrix[1][0] = t*ax*ay+s*az;
-	rotationMatrix[2][0] = t*ax*az-s*ay;
-
-	rotationMatrix[0][1] = t*ax*ay-s*az;
-	rotationMatrix[1][1] = t*ay2+c;
-	rotationMatrix[2][1] = t*ay*az+s*ax;
-
-	rotationMatrix[0][2] = t*ax*az+s*ay;
-	rotationMatrix[1][2] = t*ay*az-s*ax;
-	rotationMatrix[2][2] = t*az2+c;
-/*	rotationMatrix[0][0] = t*ax2+c;
-	rotationMatrix[0][1] = t*ax*ay+s*az;
-	rotationMatrix[0][2] = t*ax*az-s*ay;
-
-	rotationMatrix[1][0] = t*ax*ay-s*az;
-	rotationMatrix[1][1] = t*ay2+c;
-	rotationMatrix[1][2] = t*ay*az+s*ax;
-
-	rotationMatrix[2][0] = t*ax*az+s*ay;
-	rotationMatrix[2][1] = t*ay*az-s*ax;
-	rotationMatrix[2][2] = t*az2+c;*/
 
 	rotationMatrix[0][3] = rotationMatrix[1][3] = rotationMatrix[2][3] = 
 	rotationMatrix[3][0] = rotationMatrix[3][1] = rotationMatrix[3][2] = 0.0;
 	rotationMatrix[3][3] = 1.0;
+#endif
 
-	#undef ax
-	#undef ay
-	#undef az
-	#undef ax2
-	#undef ay2
-	#undef az2
 }
+
+void RotateAroundAxis(Matrix4D m, const CPoint3D& axis, float degrees) {
+
+   float radians;
+   float cosine;
+   float sine;
+   float cos_rec;
+
+   radians = degrees * kPi / 180.0f;
+
+   sine = sin(radians);
+   cosine = cos(radians);
+   cos_rec = 1.0f - cosine;
+
+   m[0][0] = cos_rec * axis.x * axis.x + cosine;
+   m[1][0] = cos_rec * axis.x * axis.y - sine * axis.z;
+   m[2][0] = cos_rec * axis.x * axis.z + sine * axis.y;
+
+   m[0][1] = cos_rec * axis.y * axis.x + sine * axis.z;
+   m[1][1] = cos_rec * axis.y * axis.y + cosine;
+   m[2][1] = cos_rec * axis.y * axis.z - sine * axis.x;
+
+   m[0][2] = cos_rec * axis.z * axis.x - sine * axis.y;
+   m[1][2] = cos_rec * axis.z * axis.y + sine * axis.x;
+   m[2][2] = cos_rec * axis.z * axis.z + cosine;
+
+   m[3][0] = m[3][1] = m[3][2] = m[0][3] = m[1][3] = m[2][3] = 0.0f;
+   m[3][3] = 1.0f;
+
+}
+
 //Generate a rotation matrix to rotate the x-y plane to the plane defined by vectors op and oq
 void SetPlaneRotation(Matrix4D rotationMatrix, const CPoint3D & op, const CPoint3D & oq) {
 	CPoint3D	Vector1, Vector2, Vector3;
