@@ -486,7 +486,7 @@ void Matrix2D::SVD(Matrix2D *out, Matrix2D *gain, Matrix2D *in) const {
 std::ostream& operator<<(std::ostream& stream, const CPoint3D& p) {
 	
 	stream << std::fixed << std::showpoint << std::setprecision(4) <<
-		   p.x << ", " << p.y << ", " << p.z << std::endl;
+		   p.x << ", " << p.y << ", " << p.z;
 
 	return stream;
 }
