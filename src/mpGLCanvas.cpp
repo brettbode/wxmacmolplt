@@ -957,6 +957,8 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 
 	// This function handles all mouse movement, no matter the button being
 	// held (or even no button being down).
+	
+	Frame *lFrame = mMainData->cFrame;
 
 	// We don't do anything if a button isn't held down.
 	if (!event.Dragging()) {
@@ -966,10 +968,19 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 		// std::cout << "selected: " << selected << std::endl; 
 		// std::cout << "selected_site: " << selected_site << std::endl; 
 		// std::cout << "selected_type: " << selected_type << std::endl; 
-		if (MolWin->HandSelected() && selected_site > 0) {
+		if (MolWin->HandSelected() && selected_site >= 0) {
 			MolWin->SetStatusText(wxT("Bond an atom here."));
-		} else if (MolWin->HandSelected() && selected < 0) {
-			MolWin->SetStatusText(wxT("Add new atom."));
+		} else if (MolWin->HandSelected() && selected < 0 && 
+				   periodic_dlg && periodic_dlg->GetSelectedID()) {
+			MolWin->SetStatusText(wxT("Add new atom here."));
+		} else if (selected_type == MMP_ATOM) {
+			wxString info, id;
+			Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1, info);
+			id.Printf(wxT(" (%d)"), selected + 1);
+			info.Append(id);
+			MolWin->SetStatusText(info);
+		} else if (selected_type == MMP_BOND) {
+			MolWin->SetStatusText(wxT("a bond"));
 		} else {
 			MolWin->SetStatusText(wxT(""));
 		}
