@@ -155,6 +155,7 @@ enum MMP_EventID {
 	MMP_TOOL_ARROW,
 	MMP_TOOL_LASSO,
 	MMP_TOOL_HAND,
+	MMP_SELECT_NONE,
 	
 	Number_MMP_Ids
 };
@@ -186,6 +187,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
 	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
 	EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
+	EVT_MENU (MMP_SELECT_NONE,     MolDisplayWin::menuEditSelectNone)
 	EVT_MENU (MMP_INTERACTIVE,      MolDisplayWin::menuEditInteractive_mode)
 
 	EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
@@ -554,6 +556,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
 	menuEdit->AppendSeparator();
 	menuEdit->Append(wxID_SELECTALL, wxT("&Select all\tCtrl+A"));
+	menuEdit->Append(MMP_SELECT_NONE, wxT("Select none"));
 	menuEdit->AppendSeparator();
 #ifdef ENABLE_INTERACTIVE_MODE
 	menuEdit->AppendCheckItem(MMP_INTERACTIVE, wxT("&Interactive Mode\tCtrl+I"));
@@ -1865,8 +1868,20 @@ void MolDisplayWin::menuEditSelect_all(wxCommandEvent &event) {
 	for (int i = 0; i < MainData->cFrame->NumAtoms; i++) {
 		MainData->cFrame->SetAtomSelection(i, true);
 	}
-	SelectionChanged(false);
+	SelectionChanged(true);
 	UpdateModelDisplay();
+
+}
+
+void MolDisplayWin::menuEditSelectNone(wxCommandEvent &event) {
+
+	// Deselect each atom in the current frame and update.
+	for (int i = 0; i < MainData->cFrame->NumAtoms; i++) {
+		MainData->cFrame->SetAtomSelection(i, false);
+	}
+	SelectionChanged(true);
+	UpdateModelDisplay();
+
 }
 
 void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
