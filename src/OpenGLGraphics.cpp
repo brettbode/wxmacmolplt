@@ -959,7 +959,7 @@ void MolDisplayWin::DrawGL(void) {
 
 	glDisable(GL_LIGHTING);
 
-	if (interactiveMode) {
+	if (interactiveMode && HandSelected()) {
 	    const char modeString[] = "editing";
 	    DrawStaticLabel(modeString, -50, -20);
 	}
