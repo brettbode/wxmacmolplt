@@ -555,8 +555,8 @@ void MolDisplayWin::createMenuBar(void) {
 	menuEdit->Append(wxID_PASTE, wxT("&Paste\tCtrl+V"));
 	menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
 	menuEdit->AppendSeparator();
-	menuEdit->Append(wxID_SELECTALL, wxT("&Select all\tCtrl+A"));
-	menuEdit->Append(MMP_SELECT_NONE, wxT("Select none"));
+	menuEdit->Append(wxID_SELECTALL, wxT("&Select All\tCtrl+A"));
+	menuEdit->Append(MMP_SELECT_NONE, wxT("Select &None"));
 	menuEdit->AppendSeparator();
 #ifdef ENABLE_INTERACTIVE_MODE
 	menuEdit->AppendCheckItem(MMP_INTERACTIVE, wxT("&Interactive Mode\tCtrl+I"));
@@ -1876,9 +1876,8 @@ void MolDisplayWin::menuEditSelect_all(wxCommandEvent &event) {
 void MolDisplayWin::menuEditSelectNone(wxCommandEvent &event) {
 
 	// Deselect each atom in the current frame and update.
-	for (int i = 0; i < MainData->cFrame->NumAtoms; i++) {
-		MainData->cFrame->SetAtomSelection(i, false);
-	}
+	MainData->cFrame->resetAllSelectState();
+	SetHighliteMode(false);
 	SelectionChanged(true);
 	UpdateModelDisplay();
 
@@ -1897,33 +1896,20 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 
 		toolbar->SetToolBitmapSize(wxSize(16, 15));
 
-		// toolbar->AddRadioTool(MMP_TOOL_ARROW, wxT("View"), wxBITMAP(arrow)); 
-		// toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select"), wxBITMAP(rect_lasso)); 
-		// toolbar->AddRadioTool(MMP_TOOL_HAND, wxT("Edit"), wxBITMAP(hand)); 
-
 		wxBitmap enabled_bmp;
 		wxBitmap enabled_bmp2;
 
 		enabled_bmp = wxBitmap(view_xpm);
 		toolbar->AddRadioTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp,
 			wxNullBitmap);
-		// toolbar->AddTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp, 
-			// wxNullBitmap, wxITEM_RADIO, wxT("Dummy"), 
-			// wxT("Don't do anything")); 
 
 		enabled_bmp = wxBitmap(rect_lasso_xpm);
 		toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select"), enabled_bmp,
 			wxNullBitmap);
-		// toolbar->AddTool(MMP_TOOL_LASSO, wxT("Select"), enabled_bmp, 
-			// wxNullBitmap, wxITEM_RADIO, wxT("Select"), 
-			// wxT("Select atoms by bounding box")); 
 
 		enabled_bmp = wxBitmap(hand_xpm);
 		toolbar->AddRadioTool(MMP_TOOL_HAND, wxT("Edit"), enabled_bmp,
 			wxNullBitmap);
-		// toolbar->AddTool(MMP_TOOL_HAND, wxT("Edit"), enabled_bmp, 
-			// wxNullBitmap, wxITEM_RADIO, wxT("Translate atoms"), 
-			// wxT("Don't do anything")); 
 
 		toolbar->AddSeparator();
 		toolbar->Realize();

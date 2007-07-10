@@ -46,6 +46,7 @@
 #define GL_Popup_Fit_To_Plane 30028
 #define GL_Popup_Change_Atom 30029
 #define GL_Popup_Change_Ox_Num 30030
+#define GL_Popup_Set_Anno_Param 30031
 
 class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
@@ -270,6 +271,7 @@ class MpGLCanvas : public wxGLCanvas {
 		int NumberSelectedAtoms(void) const {return select_stack_top;};
 		void insertAnnotationMenuItems(wxMenu& menu);
 		void ConstrainToAnnotation(wxCommandEvent& event);
+		void SetAnnotationParameter(wxCommandEvent& event);
 
 		void eventMouseMiddleWentUp(wxMouseEvent& event);
 		void eventMouseRightWentUp(wxMouseEvent& event);

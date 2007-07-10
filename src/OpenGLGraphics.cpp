@@ -3718,7 +3718,7 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 	m[15] = 1.0f;
 
 	char angle_label[40];
-	sprintf(angle_label, "%.2f", angle * 180.f / 3.14159f);
+	sprintf(angle_label, "%.2f", angle * 180.f / kPi);
 	glTranslatef(min_len * cos(angle * 0.5f),
 					 min_len * sin(angle * 0.5f), 0.0f);
 	glMultMatrixf(m);

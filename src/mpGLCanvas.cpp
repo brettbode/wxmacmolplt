@@ -1084,6 +1084,10 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				lFrame->AddAtomAtSite(selected, selected_site, periodic_dlg->GetSelectedID());
 				MolWin->SetStatusText(wxT("Added new atom."));
 				MolWin->UpdateGLModel();
+
+				// Let's select the new atom.
+				selected = lFrame->NumAtoms - 1;
+				deSelectAll = true;
 			}
 
 			// If the user clicked on nothing, we try to add an atom given
@@ -1110,7 +1114,6 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				MolWin->SetStatusText(wxT("Added new atom."));
 				MolWin->UpdateGLModel();
 			}
-
 		}
 
 		// Since we're dealing with a click, it's likely that something was
@@ -1118,7 +1121,6 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		SelectObj(selected_type, selected, deSelectAll);
 		MolWin->SelectionChanged(deSelectAll);
 		draw();
-
 	}
 	
 	// If a drag occurred between two bonding sites, we pair them up with
@@ -2443,13 +2445,54 @@ void MpGLCanvas::annoPopupMenu(int x, int y) {
 	if (interactiveMode &&
 		mMainData->Annotations[selected]->getType() != MP_ANNOTATION_MARKER) {
 		item = menu.AppendCheckItem(GL_Popup_Lock_To_Annotation,
-				                    _("Constrain atoms"));
+				                    wxT("Constrain atoms"));
 		if (selected == mMainData->GetConstrainAnnotation()) {
 			item->Check(true);
 		}
+
+		switch (mMainData->Annotations[selected]->getType()) {
+			case MP_ANNOTATION_LENGTH:
+				menu.Append(GL_Popup_Set_Anno_Param, wxT("Set length"));
+				break;
+			case MP_ANNOTATION_ANGLE:
+				menu.Append(GL_Popup_Set_Anno_Param, wxT("Set angle"));
+				break;
+			case MP_ANNOTATION_DIHEDRAL:
+				menu.Append(GL_Popup_Set_Anno_Param, wxT("Set angle"));
+				break;
+		}
 	}
-	menu.Append(GL_Popup_Delete_Length, _("Delete annotation"));
+	menu.Append(GL_Popup_Delete_Length, wxT("Delete annotation"));
 	PopupMenu(&menu, x, y);
+
+}
+
+void MpGLCanvas::SetAnnotationParameter(wxCommandEvent& event) {
+
+	wxTextEntryDialog *dlg;
+	double new_value;
+	Frame *lFrame = mMainData->cFrame;
+	wxString default_value;
+	Annotation *anno = mMainData->Annotations[selected];
+
+	// switch (anno->getType()) { 
+		// case MP_ANNOTATION_LENGTH: 
+			// break; 
+	// } 
+
+	if (anno->getType() == MP_ANNOTATION_MARKER) {
+		return;
+	}
+
+	default_value.Printf(wxT("%f"), anno->getParam(*lFrame));
+	dlg = new wxTextEntryDialog(this, wxT("Enter length"),
+			wxT("Annotation Tweaker"), default_value);
+	if (dlg->ShowModal() == wxID_OK &&
+		dlg->GetValue().ToDouble(&new_value)) {
+		anno->setParam(*lFrame, new_value);
+	}
+
+	delete dlg;
 
 }
 
@@ -2757,6 +2800,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_Delete_Length, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Delete_Angle, MpGLCanvas::DeleteAnnotation)
 	EVT_MENU(GL_Popup_Delete_Dihedral, MpGLCanvas::DeleteAnnotation)
+	EVT_MENU(GL_Popup_Set_Anno_Param, MpGLCanvas::SetAnnotationParameter)
 	EVT_MENU(GL_Popup_Lock_To_Annotation, MpGLCanvas::ConstrainToAnnotation)
 	EVT_MENU(GL_Popup_Fit_To_Plane, MpGLCanvas::FitToPlane)
 	EVT_MENU(GL_Popup_Change_Atom, MpGLCanvas::ChangeAtom)
