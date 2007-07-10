@@ -14,6 +14,7 @@
 #ifndef __BFILE__	//make sure this header is not already included
 #define __BFILE__
 #include <stdio.h>
+#include "Globals.h"
 
 #define	kBufferSize		262144		//default file buffer size
 #define kMaxLineLength	180			//arbitrary Max line length (should handle 132 col lines)
