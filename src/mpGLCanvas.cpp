@@ -832,7 +832,7 @@ void MpGLCanvas::eventMouseLeftDoubleClick(wxMouseEvent& event) {
 	curr_mouse = event.GetPosition();
 
 	// If we're in edit mode, we display the periodic table dialog.
-	if (MolWin->HandSelected()) {
+	if (MolWin->HandSelected() && selected_type == MMP_NULL) {
 		if (!show_periodic_dlg) {
 			togglePeriodicDialog();
 		}
@@ -1036,9 +1036,6 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
 
-	if (HasCapture()) {
-		ReleaseMouse();
-	}
 	SetCurrent();
 
 	// If either the command or shift keys are held, we want to add to the
@@ -1147,6 +1144,14 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		delete mDragWin;
 		mDragWin = NULL;
 	}
+
+	// The drag image also captures mouse but doesn't check for that it
+	// still has it captured before releasing it.  So, our check and release
+	// must occur after ending the drag.
+	if (HasCapture()) {
+		ReleaseMouse();
+	}
+
 }
 
 void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
@@ -1669,7 +1674,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 
 		mDragWin = new wxDragImage(tmp3Dcoord, wxCursor(wxCURSOR_HAND));
 
-		if (!mDragWin->BeginDrag(wxPoint(0,30), this)) {
+		if (!mDragWin->BeginDrag(wxPoint(0, 30), this)) {
 			delete mDragWin;
 			mDragWin = (wxDragImage*) NULL;
 		} else {
@@ -2473,22 +2478,32 @@ void MpGLCanvas::SetAnnotationParameter(wxCommandEvent& event) {
 	double new_value;
 	Frame *lFrame = mMainData->cFrame;
 	wxString default_value;
+	wxString prompt;
 	Annotation *anno = mMainData->Annotations[selected];
 
-	// switch (anno->getType()) { 
-		// case MP_ANNOTATION_LENGTH: 
-			// break; 
-	// } 
-
+	// Markers have no parameter.
 	if (anno->getType() == MP_ANNOTATION_MARKER) {
 		return;
 	}
 
+	// Set an appropriate prompt.
+	switch (anno->getType()) {
+		case MP_ANNOTATION_LENGTH:
+			prompt.Printf(wxT("Enter length:"));
+			break;
+		case MP_ANNOTATION_ANGLE:
+		case MP_ANNOTATION_DIHEDRAL:
+			prompt.Printf(wxT("Enter angle:"));
+			break;
+	}
+
 	default_value.Printf(wxT("%f"), anno->getParam(*lFrame));
-	dlg = new wxTextEntryDialog(this, wxT("Enter length"),
-			wxT("Annotation Tweaker"), default_value);
-	if (dlg->ShowModal() == wxID_OK &&
-		dlg->GetValue().ToDouble(&new_value)) {
+	dlg = new wxTextEntryDialog(this, prompt, wxT("Edit Annotation"),
+			default_value);
+
+	// Only if a valid number was entered and OK was clicked do we change the
+	// annotation parameter.
+	if (dlg->ShowModal() == wxID_OK && dlg->GetValue().ToDouble(&new_value)) {
 		anno->setParam(*lFrame, new_value);
 	}
 
