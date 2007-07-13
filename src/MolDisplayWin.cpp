@@ -971,9 +971,10 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 							 "|GAMESS $DATA group (*.inp)|*.inp"
 							 "|MDL MolFile|*.mol"
 							 "|XMOL (*.xyz)|*.xyz"
-							 "|Tab delimited Energies (*.txt)|*.txt"));
+							 "|Tab delimited Energies (*.txt)|*.txt"
+				                         "|VRML (*.wrl)|*.wrl"));
 	bool vibs = false;
-	int itemCount = 7;
+	int itemCount = 8;
 	if (MainData->cFrame->GetNumberNormalModes() > 0) {
 		vibs = true;
 		wildcards.Append(wxT("|Frequencies (*.txt)|*.txt"));
@@ -1128,7 +1129,10 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 							}
 							WriteTabbedEnergies(buffer, AllFrames);
 							break;
-						case 7:
+					        case 7:
+						  WriteVRMLFile(buffer);
+						  break;
+						case 8:
 							WriteFrequencies(buffer);
 							break;
 					}

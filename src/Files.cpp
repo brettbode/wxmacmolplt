@@ -3637,9 +3637,174 @@ void MolDisplayWin::WriteMDLMolFile(BufferFile * Buffer) {
 void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
 {
   Buffer->PutText("#VRML V2.0 utf8\n");  //VRML header
+  Buffer->PutText("\n");
 
   Frame * lFrame = MainData->GetCurrentFramePtr();
   mpAtom * lAtoms = lFrame->Atoms;
+
+  //drawing atoms
+  long NumAtoms = lFrame->NumAtoms;
+  float AtomScale = Prefs->GetAtomScale();
+  long curAtomType;
+  RGBColor * AtomColor;
+  wxString tmpStr;
+  float red, green, blue;
+
+  for (long iatom=0; iatom<NumAtoms; iatom++) {
+    if (lAtoms[iatom].GetInvisibility()) continue;
+
+    curAtomType = lAtoms[iatom].GetType() - 1;
+    AtomColor = Prefs->GetAtomColorLoc(curAtomType);
+    red = AtomColor->red/65536.0;
+    green = AtomColor->green/65536.0;
+    blue = AtomColor->blue/65536.0;
+
+    float radius = AtomScale*Prefs->GetAtomSize(curAtomType);
+    Buffer->PutText("Transform {\n");
+    tmpStr.Printf(wxT("\ttranslation %f %f %f\n"), lAtoms[iatom].Position.x, 
+		  lAtoms[iatom].Position.y, lAtoms[iatom].Position.z);
+    Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+    Buffer->PutText("\tchildren [\n");
+    Buffer->PutText("\t\tShape {\n");
+    tmpStr.Printf(wxT("\t\t\tgeometry Sphere { radius %f }\n"), radius);
+    Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+    Buffer->PutText("\t\t\tappearance Appearance {\n");
+    tmpStr.Printf(wxT("\t\t\t\tmaterial Material { diffuseColor %f %f %f }\n"),
+		  red, green, blue);
+    Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+    Buffer->PutText("\t\t\t}\n");
+    Buffer->PutText("\t\t}\n");
+    Buffer->PutText("\t]\n");
+    Buffer->PutText("}\n");
+  }
+
+  //drawing bonds
+  Bond * lBonds = lFrame->Bonds;
+  long NumBonds = lFrame->NumBonds;
+  double BondSize = Prefs->GetQD3DBondWidth();
+  float dotProd;
+  //CPoint3D NormX = CPoint3D(1,0,0);
+  //CPoint3D NormY = CPoint3D(0,1,0);
+  //CPoint3D NormZ = CPoint3D(0,0,1);
+  float angleX, angleY, angleZ;
+  float tmpMag;
+  int sign;
+
+  for (long ibond=0; ibond<NumBonds; ibond++) {
+    CPoint3D v1, v2, offset;
+    long atom1 = lBonds[ibond].Atom1;
+    long atom2 = lBonds[ibond].Atom2;
+    //BondOrder tmpOrder = lBonds[ibond].Order;
+
+    //for (int ipipe = 0; ipipe < MAX(tmpOrder,1); ++ipipe) {
+
+      v1.x = lAtoms[atom1].Position.x; // + offset_vec.x * baseBondOffset +
+      //3.5 * tmpBondSize * offset_vec.x * ipipe;
+      v1.y = lAtoms[atom1].Position.y; //+ offset_vec.y * baseBondOffset +
+      //3.5 * tmpBondSize * offset_vec.y * ipipe;
+      v1.z = lAtoms[atom1].Position.z; //+ offset_vec.z * baseBondOffset +
+      //3.5 * tmpBondSize * offset_vec.z * ipipe;
+      v2.x = lAtoms[atom2].Position.x; //+ offset_vec.x * baseBondOffset +
+      //3.5 * tmpBondSize * offset_vec.x * ipipe;
+      v2.y = lAtoms[atom2].Position.y; //+ offset_vec.y * baseBondOffset +
+      //3.5 * tmpBondSize * offset_vec.y * ipipe;
+      v2.z = lAtoms[atom2].Position.z; //+ offset_vec.z * baseBondOffset +
+      //3.5 * tmpBondSize * offset_vec.z * ipipe;
+
+      offset.x = v2.x - v1.x;
+      offset.y = v2.y - v1.y;
+      offset.z = v2.z - v1.z;
+
+      float length = offset.Magnitude();
+      float radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
+      float radius2 = AtomScale*Prefs->GetAtomSize(lAtoms[atom2].GetType() - 1);
+      float percent1 = radius1/length;
+      float percent2 = radius2/length;
+      float centerPercent = 0.5 + 0.5*(percent1-percent2);
+
+      CPoint3D v3; //first half bond from atom 1
+      v3.x = centerPercent*(v2.x - v1.x)+v1.x;
+      v3.y = centerPercent*(v2.y - v1.y)+v1.y;
+      v3.z = centerPercent*(v2.z - v1.z)+v1.z;
+
+      /*offset.x = v3.x - v1.x;
+      offset.y = v3.y - v1.y;
+      offset.z = v3.z - v1.z;*/
+
+      //dotProd = fabs(offset.y);
+      dotProd = offset.y;
+      tmpMag = sqrt(offset.y*offset.y+offset.z*offset.z);
+      offset.z > 0 ? sign = -1 : sign = 1;
+
+      if (tmpMag > 0.00000001)
+	angleX = sign * acos(dotProd/tmpMag);
+      else
+	angleX = 0;
+
+      //dotProd = -1 * fabs(offset.y);
+      dotProd = offset.y;
+      tmpMag = sqrt(offset.y*offset.y+offset.x*offset.x);
+      offset.x > 0 ? sign = -1 : sign = 1;
+
+      if (tmpMag > 0.00000001)
+	angleZ = sign * acos(dotProd/tmpMag);
+      else
+	angleZ = 0;
+
+      curAtomType = lAtoms[atom1].GetType() - 1;
+      AtomColor = Prefs->GetAtomColorLoc(curAtomType);
+      red = AtomColor->red/65536.0;
+      green = AtomColor->green/65536.0;
+      blue = AtomColor->blue/65536.0;
+
+      Buffer->PutText("Transform {\n");
+      tmpStr.Printf(wxT("\trotation 1 0 0 %f\n"), angleX);
+      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      tmpStr.Printf(wxT("\trotation 0 0 1 %f\n"), angleZ);
+      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      //tmpStr.Printf(wxT("\trotation 0 1 0 %f\n"), angleY);
+      //Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      tmpStr.Printf(wxT("\ttranslation %f %f %f\n"), (v1.x+v3.x)/2, (v1.y+v3.y)/2, (v1.z+v3.z)/2);
+      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      Buffer->PutText("\tchildren [\n");
+      Buffer->PutText("\t\tShape {\n");
+      tmpStr.Printf(wxT("\t\t\tgeometry Cylinder { radius %f height %f}\n"), BondSize, centerPercent*length);
+      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      Buffer->PutText("\t\t\tappearance Appearance {\n");
+      tmpStr.Printf(wxT("\t\t\t\tmaterial Material { diffuseColor %f %f %f }\n"),
+		  red, green, blue);
+      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      Buffer->PutText("\t\t\t}\n");
+      Buffer->PutText("\t\t}\n");
+      Buffer->PutText("\t]\n");
+      Buffer->PutText("}\n");
+
+      curAtomType = lAtoms[atom2].GetType() - 1;
+      AtomColor = Prefs->GetAtomColorLoc(curAtomType);
+      red = AtomColor->red/65536.0;
+      green = AtomColor->green/65536.0;
+      blue = AtomColor->blue/65536.0;
+
+      Buffer->PutText("Transform {\n");
+      tmpStr.Printf(wxT("\trotation 1 0 0 %f\n"), angleX);
+      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      tmpStr.Printf(wxT("\trotation 0 0 1 %f\n"), angleZ);
+      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      tmpStr.Printf(wxT("\ttranslation %f %f %f\n"), (v2.x+v3.x)/2, (v2.y+v3.y)/2, (v2.z+v3.z)/2);
+      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      Buffer->PutText("\tchildren [\n");
+      Buffer->PutText("\t\tShape {\n");
+      tmpStr.Printf(wxT("\t\t\tgeometry Cylinder { radius %f height %f}\n"), BondSize, (1-centerPercent)*length);
+      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      Buffer->PutText("\t\t\tappearance Appearance {\n");
+      tmpStr.Printf(wxT("\t\t\t\tmaterial Material { diffuseColor %f %f %f }\n"),
+		  red, green, blue);
+      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      Buffer->PutText("\t\t\t}\n");
+      Buffer->PutText("\t\t}\n");
+      Buffer->PutText("\t]\n");
+      Buffer->PutText("}\n");
+  }
 }
 
 void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const double & MultValue) {
