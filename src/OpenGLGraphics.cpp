@@ -893,7 +893,7 @@ void MolDisplayWin::DrawGL(void) {
 				lSurface = lSurface->GetNextSurface();
 			}
 			OpenGLData->transpTriList = new myGLTriangle[totalTriCount];
-			OpenGLData->transpSortVertex = new CPoint3D[totalTriCount];
+			OpenGLData->transpSortVertex = new float[totalTriCount];
 			OpenGLData->transpIndex = new long[totalTriCount];
 			OpenGLData->triangleCount = totalTriCount;
 			
@@ -1448,22 +1448,22 @@ void MolDisplayWin::DrawLabel() {
 }
 
 void MolDisplayWin::SortTransparentTriangles(void) {
+	CPoint3D tempV;
 	for (int i=0; i<OpenGLData->triangleCount; i++) {
-		Rotate3DPt(MainData->TotalRotation, OpenGLData->transpTriList[OpenGLData->transpIndex[i]].v1,
-			&(OpenGLData->transpSortVertex[i]));	
+		Rotate3DPt(MainData->TotalRotation, OpenGLData->transpTriList[i].v1,
+			&(tempV));
+		OpenGLData->transpSortVertex[i] = tempV.z;	//We only need to save the z coordinate to sort
 	}
 	bool done = false;
 	long maxcount = OpenGLData->triangleCount-1;
 	while (!done) {
 		done = true;
 		for (int i=0; i<maxcount; i++) {
-			if (OpenGLData->transpSortVertex[i].z > OpenGLData->transpSortVertex[i+1].z) {
-				CPoint3D temp = OpenGLData->transpSortVertex[i];
-				long tempIndex = OpenGLData->transpIndex[i];
-				OpenGLData->transpSortVertex[i] = OpenGLData->transpSortVertex[i+1];
-				OpenGLData->transpIndex[i] = OpenGLData->transpIndex[i+1];
-				OpenGLData->transpSortVertex[i+1] = temp;
-				OpenGLData->transpIndex[i+1] = tempIndex;
+			long tempi = OpenGLData->transpIndex[i];
+			long tempj = OpenGLData->transpIndex[i+1];
+			if (OpenGLData->transpSortVertex[tempi] > OpenGLData->transpSortVertex[tempj]) {
+				OpenGLData->transpIndex[i] = tempj;
+				OpenGLData->transpIndex[i+1] = tempi;
 				done = false;
 			}
 		}

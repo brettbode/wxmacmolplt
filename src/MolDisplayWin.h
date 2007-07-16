@@ -36,7 +36,7 @@ class OpenGLRec {
 #endif
 		
 		myGLTriangle *  transpTriList;
-		CPoint3D *		transpSortVertex;
+		float *			transpSortVertex;
 		long *			transpIndex;
 		long			triangleCount;
 		
