@@ -52,6 +52,8 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 	MolWin = parent;
 	initialized = false;
 
+	was_zooming = false;
+
 	mMainData = parent->GetData();
 
 	mSelectState = -1;
@@ -884,6 +886,12 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 		}
 	} 
 
+	if (MolWin->IsRotating()) {
+		was_just_rotating = true;
+	} else {
+		was_just_rotating = false;
+	}
+
 	// Though nothing's rotating on a single mousedown event, we need to
 	// register this first mouse click position.
 	SetCurrent();
@@ -1089,7 +1097,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 			// If the user clicked on nothing, we try to add an atom given
 			// the selected element on the periodic table palette.
-			else if (selected < 0) {
+			else if (selected < 0 && !was_just_rotating) {
 
 				CPoint3D newPnt;
 				GLdouble newX, newY, newZ;
@@ -1475,7 +1483,6 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
-	static bool was_zooming = false;
 
 	// If an atom is clicked on...
 	if (selected_type == MMP_ATOM) {
@@ -2140,14 +2147,7 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 		ProjectToPlane(normal, centroid, (*atom)->Position);
 	}
 
-	// std::cout << "normal: " << normal << std::endl; 
-	// std::cout << "normal.Mag(): " << normal.Magnitude() << std::endl; 
-	// std::cout << "locs:" << std::endl << locs; 
-	// std::cout << "trans_locs:" << std::endl << trans_locs; 
-	// std::cout << "cov:" << std::endl << cov; 
-	// std::cout << "out:" << std::endl << out; 
-	// std::cout << "gain:" << std::endl << gain; 
-	// std::cout << "in:" << std::endl << in; 
+	MolWin->UpdateModelDisplay();
 	
 }
 
@@ -2236,6 +2236,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 
 void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
 	mMainData->cFrame->SetAtomType(selected, periodic_dlg->GetSelectedID());
+	MolWin->UpdateModelDisplay();
 }
 
 void MpGLCanvas::ChangeOxidationNumber(wxCommandEvent& event) {
@@ -2265,6 +2266,8 @@ void MpGLCanvas::ChangeOxidationNumber(wxCommandEvent& event) {
 		lFrame->SetAtomOxidationNumber(selected, ox_num);
 		Prefs->SetOxidationNumber(lFrame->GetAtomType(selected), ox_num);
 	}
+
+	MolWin->UpdateModelDisplay();
 
 }
 
@@ -2509,6 +2512,8 @@ void MpGLCanvas::SetAnnotationParameter(wxCommandEvent& event) {
 
 	delete dlg;
 
+	MolWin->UpdateModelDisplay();
+
 }
 
 void MpGLCanvas::ConstrainToAnnotation(wxCommandEvent& event) {
@@ -2546,6 +2551,8 @@ void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
 			mMainData->RemoveAnnotationConstraint();
 		}
 	}
+
+	MolWin->UpdateModelDisplay();
 }
 
 void MpGLCanvas::bondPopupMenu(int x, int y) {
@@ -2607,11 +2614,11 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 	if (selected_type == MMP_BOND) {	//existing bond, change order
 		bond = &(lFrame->Bonds[selected]);
 		bond->Order = order;
-		MolWin->BondsChanged();
 		lFrame->resetAllSelectState();
 		bond->SetSelectState(true);
 		lFrame->SetAtomSelection(bond->Atom1, true);
 		lFrame->SetAtomSelection(bond->Atom2, true);
+		MolWin->BondsChanged();
 	} else if (select_stack_top == 2) { //new bond
 		int bond_id = lFrame->BondExists(select_stack[0], select_stack[1]);
 		if (bond_id >= 0) {
@@ -2620,11 +2627,11 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 		} else {
 			lFrame->AddBond(select_stack[0], select_stack[1], order);
 		}
-		MolWin->BondsChanged();
 		lFrame->resetAllSelectState();
 		lFrame->Bonds[lFrame->GetNumBonds() - 1].SetSelectState(true);
 		lFrame->SetAtomSelection(select_stack[0], true);
 		lFrame->SetAtomSelection(select_stack[1], true);
+		MolWin->BondsChanged();
 	}
 }
 
@@ -2638,6 +2645,7 @@ void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
 		lFrame->DeleteBond(selected);
 		MolWin->BondsChanged();
 	}
+
 }
 
 void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
@@ -2674,6 +2682,8 @@ void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
 			break;
 	}
 
+	MolWin->UpdateModelDisplay();
+
 }
 
 void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
@@ -2692,6 +2702,8 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 
 		cFrame = cFrame->NextFrame;
 	}
+
+	MolWin->UpdateModelDisplay();
 }
 
 void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
@@ -2721,6 +2733,8 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 		lFrame->DeleteBond(selected);
 	}
 
+	MolWin->UpdateModelDisplay();
+
 }
 
 void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
@@ -2738,6 +2752,9 @@ void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
 			lFrame = lFrame->NextFrame;
 		}
 	}
+
+	MolWin->UpdateModelDisplay();
+
 }
 
 void MpGLCanvas::toggleInteractiveMode(void) {

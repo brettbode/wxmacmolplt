@@ -185,6 +185,9 @@ class MolDisplayWin : public wxFrame {
 		wxPoint lasso_start;
 		wxPoint lasso_end;
 
+		wxPoint mouse_start;
+		wxPoint inertia;
+
 		void OnToggleTool(wxCommandEvent& event);
 		void OnStatusTimer(wxTimerEvent& event);
 		void OnRotateTimer(wxTimerEvent& event);
@@ -414,6 +417,7 @@ class MolDisplayWin : public wxFrame {
 		void SelectionChanged(bool mode);
 		GLuint GetLengthTexId(void) const {return OpenGLData->length_anno_tex_id;};
 
+		bool IsRotating(void);
 		void eventSize(wxSizeEvent &event);
 		void SizeChanged(void);
 		void OnFrameAnimationTimer(wxTimerEvent & event);

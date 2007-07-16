@@ -94,6 +94,8 @@ class MpGLCanvas : public wxGLCanvas {
 		bool interactiveMode;
 		GLdouble atomDepth;
 		GLint winDiffX, winDiffY;
+		bool was_zooming;
+		bool was_just_rotating;
 
 		void initGL(void);
 		void interactPopupMenu(int x, int y, bool isAtom);

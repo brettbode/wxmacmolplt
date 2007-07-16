@@ -2658,11 +2658,13 @@ void MolDisplayWin::UpdateFrameText(void) {
 
 	myStatus->SetStatusText(output);
 }
+
 void MolDisplayWin::UpdateModelDisplay(void) {
 	UpdateFrameText();
 	UpdateGLModel();
 	glCanvas->draw();
 }
+
 void MolDisplayWin::ResetView(void) {
 	//Check for and update any surfaces depending on the screen plane
 	Surface * lSurface = MainData->cFrame->SurfaceList;
@@ -3034,7 +3036,6 @@ void MolDisplayWin::OnRotateTimer(wxTimerEvent& event) {
 }
 
 void MolDisplayWin::Rotate(wxMouseEvent &event) {
-	static wxPoint      p;
 	wxPoint             q, sphereCenter;
 	int                 dx, dy;
 	Matrix4D            rotationMatrix, tempcopyMatrix;
@@ -3042,7 +3043,6 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	long                hsize, vsize, width, hoffset, sphereRadius;
 	Surface *           lSurface;
 	bool                UpdateSurface = false;
-	static wxPoint      inertia;
 
 	int wheel = event.GetWheelRotation();
 	if (wheel != 0) { //zoom
@@ -3069,9 +3069,9 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 		sphereRadius   = (long)((float) (sphereCenter.y)*0.9);
 	hoffset = sphereCenter.x;
 #if wxCHECK_VERSION(2, 8, 0)
-	if (Stereo && ! DisplayRect.Contains(p)) sphereCenter.x += hsize;
+	if (Stereo && ! DisplayRect.Contains(mouse_start)) sphereCenter.x += hsize;
 #else
-	if (Stereo && ! DisplayRect.Inside(p)) sphereCenter.x += hsize;
+	if (Stereo && ! DisplayRect.Inside(mouse_start)) sphereCenter.x += hsize;
 #endif
 	hsize = MAX(hsize, vsize);
 	sphereRect.SetHeight(sphereRadius);
@@ -3081,30 +3081,32 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 
 	if (event.ButtonDown()) {
 		// initial drag setup, just save the initial cursor position
-		p = event.GetPosition();
-		if (p.x == 0 && p.y == 0) {
-			p = ScreenToClient(wxGetMousePosition());
+		mouse_start = event.GetPosition();
+		if (mouse_start.x == 0 && mouse_start.y == 0) {
+			mouse_start = ScreenToClient(wxGetMousePosition());
 		}
 		inertia.x = 0;
 		inertia.y = 0;
 		if (rotate_timer.IsRunning()) {
 			rotate_timer.Stop();
 		}
+		// std::cout << "button down" << std::endl; 
 	} else if (stale_click) {
-		p = ScreenToClient(wxGetMousePosition());
+		mouse_start = ScreenToClient(wxGetMousePosition());
 		stale_click = false;
+		// std::cout << "button down" << std::endl; 
 	} else if (event.Dragging()) {
 		// main drag
 		q = event.GetPosition();
-		dx = q.x - p.x;
-		dy = q.y - p.y;
+		dx = q.x - mouse_start.x;
+		dy = q.y - mouse_start.y;
 
 		if (rotate_timer.IsRunning()) {
 			dx = inertia.x;
 			dy = inertia.y;
-			p = sphereCenter;
-			q.x = p.x + inertia.x;
-			q.y = p.y + inertia.y;
+			mouse_start = sphereCenter;
+			q.x = mouse_start.x + inertia.x;
+			q.y = mouse_start.y + inertia.y;
 		} else {
 			inertia.x = dx;
 			inertia.y = dy;
@@ -3130,14 +3132,14 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 					glCanvas->UpdateGLView();
 				} else {
 					Point pr, cur, sp;
-					pr.h = p.x;
-					pr.v = p.y;
+					pr.h = mouse_start.x;
+					pr.v = mouse_start.y;
 					cur.h = q.x;
 					cur.v = q.y;
 					sp.h = sphereCenter.x;
 					sp.v = sphereCenter.y;
 					VirtualSphereQD3D (pr, cur, sp, sphereRadius, rotationMatrix, MainData->TotalRotation);
-					// VirtualSphereQD3D (p, q, sphereCenter, sphereRadius, rotationMatrix, MainData->TotalRotation);
+					// VirtualSphereQD3D (mouse_start, q, sphereCenter, sphereRadius, rotationMatrix, MainData->TotalRotation);
 
 					CPoint3D    InitialTrans, FinalTrans;
 					//First back rotate the translation to get the inital translation
@@ -3178,7 +3180,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 			if (UpdateSurface) UpdateGLModel();
 #endif
 
-			p = q;      /* Remember previous mouse point for next iteration. */
+			mouse_start = q;      /* Remember previous mouse point for next iteration. */
 		}
 	} else if (event.LeftUp()) {
 		if (fabs(inertia.x) > 3 || fabs(inertia.y) > 3) {
@@ -3201,8 +3203,11 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	}
 }
 
-void MolDisplayWin::ChangePrefs(WinPrefs * newPrefs) 
-{
+bool MolDisplayWin::IsRotating(void) {
+	return rotate_timer.IsRunning();
+}
+
+void MolDisplayWin::ChangePrefs(WinPrefs * newPrefs) {
 	SetWindowPreferences(newPrefs);
 	ResetAllWindows();
 	//if (PrefsDlog) PrefsDlog->PrefsChanged();
