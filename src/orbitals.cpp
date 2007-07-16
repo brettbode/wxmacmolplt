@@ -33,6 +33,7 @@ extern long			gNumProcessors;
 #endif
 #ifdef __wxBuild__
 #include <wx/thread.h>
+#include <wx/stopwatch.h>
 #endif
 #include <iostream>
 
@@ -2124,6 +2125,10 @@ float Orb3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisS
 	long	iXPt, iYPt, iZPt;
 	long n=xStart*(NumYGridPoints*NumZGridPoints);
 	float * lGrid;
+#ifdef __wxBuild__
+	wxStopWatch timer;
+	long CheckTime = timer.Time();
+#endif
 #ifdef UseHandles
 	lGrid = (float *) *Grid;	//The Grid should already be locked down
 #else
@@ -2147,9 +2152,13 @@ float Orb3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisS
 			}
 #ifdef __wxBuild__
 			else {
-				if ((wxThread::This())->TestDestroy()) {
-					//Getting here means the caller has requested a cancel so exit
-					return 0.0;
+				long tempTime  = timer.Time();
+				if ((tempTime - CheckTime) > 50) {
+					CheckTime = tempTime;
+					if ((wxThread::This())->TestDestroy()) {
+						//Getting here means the caller has requested a cancel so exit
+						return 0.0;
+					}
 				}
 			}
 #endif
@@ -2252,6 +2261,10 @@ float TEDensity3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, 
 	long NumBasisFuncs = Basis->GetNumBasisFuncs(false);
 	long n=xStart*(NumYGridPoints*NumZGridPoints);
 	float * lGrid;
+#ifdef __wxBuild__
+	wxStopWatch timer;
+	long CheckTime = timer.Time();
+#endif
 #ifdef UseHandles
 	lGrid = (float *) *Grid;	//The Grid should already be locked down
 #else
@@ -2305,10 +2318,14 @@ float TEDensity3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, 
 				ZGridValue += ZGridInc;
 #ifdef __wxBuild__
 				if (MPTask) {
-					if ((wxThread::This())->TestDestroy()) {
-						//Getting here means the caller has requested a cancel so exit
-						return 0.0;
-						//		Exit();	//Exit gracefully exits the thread
+					long tempTime  = timer.Time();
+					if ((tempTime - CheckTime) > 50) {
+						CheckTime = tempTime;
+						if ((wxThread::This())->TestDestroy()) {
+							//Getting here means the caller has requested a cancel so exit
+							return 0.0;
+							//		Exit();	//Exit gracefully exits the thread
+						}
 					}
 				}
 #endif

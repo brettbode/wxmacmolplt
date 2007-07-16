@@ -23,6 +23,9 @@
 #if defined(powerc) && defined(MacintoshBuild)
 #include <Multiprocessing.h>
 #endif
+#ifdef __wxBuild__
+#include <wx/stopwatch.h>
+#endif
 
 extern Boolean		gMPAware;
 extern long			gNumProcessors;
@@ -592,6 +595,10 @@ void TEDensity3DSurface::CalculateSurfaceValuesGrid(MoleculeData * lData, Progre
 													CPoint3D * Contour, long * PercentDone, bool MPTask) {
 	Frame *	lFrame = lData->GetCurrentFramePtr();
 	BasisSet * Basis = lData->GetBasisSet();
+#ifdef __wxBuild__
+	wxStopWatch timer;
+	long CheckTime = timer.Time();
+#endif
 	//Store the Grid mins and incs at the beginning of the grid
 	//loop over the plotting grid in the x, y, and z directions
 	float XGridValue, YGridValue, ZGridValue, junk1, junk2;
@@ -616,9 +623,13 @@ void TEDensity3DSurface::CalculateSurfaceValuesGrid(MoleculeData * lData, Progre
 		backpoint++;
 #ifdef __wxBuild__
 		if (MPTask) {
-			if ((wxThread::This())->TestDestroy()) {
-				//Getting here means the caller has requested a cancel so exit
-				return;
+			long tempTime  = timer.Time();
+			if ((tempTime - CheckTime) > 50) {
+				CheckTime = tempTime;
+				if ((wxThread::This())->TestDestroy()) {
+					//Getting here means the caller has requested a cancel so exit
+					return;
+				}
 			}
 		}
 #endif
