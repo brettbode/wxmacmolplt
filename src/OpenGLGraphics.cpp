@@ -666,7 +666,7 @@ void MolDisplayWin::DrawMoleculeGL(void)
 }
 #endif
 
-void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
+void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball)
 {
 #ifndef __wxBuild__
 	aglSetCurrentContext (OpenGLData->aglContext);
@@ -734,7 +734,7 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles)
 				}
 #endif
 				//Draw the trackball outline
-				{
+				if (ShowTrackball) {
 					Point			sphereCenter;
 					long			sphereRadius; 
 					sphereCenter.h = hsize/2; 

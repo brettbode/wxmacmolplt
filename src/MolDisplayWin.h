@@ -408,7 +408,7 @@ class MolDisplayWin : public wxFrame {
 		void AddSymmetryOperators(void);
 		void UpdateGLModel(void);
 		void Rotate(wxMouseEvent&);
-		void RotateMoleculeGL(bool);
+		void RotateMoleculeGL(bool ShowAngles, bool ShowTrackball);
 		void DrawHydrogenBond(long bondNum);
 		void PrintGL(wxDC * dc, const float & scaleFactor);
 		void SetHighliteMode(bool state) { mHighliteState = state; }
