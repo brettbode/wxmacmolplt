@@ -1086,6 +1086,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 			// If the user is adding a new atom based on the bonding site
 			// skeleton, add the atom in the direction of the bonding site.
 			else if (selected_site >= 0) {
+				MolWin->CreateFrameSnapShot();
 				lFrame->AddAtomAtSite(selected, selected_site, periodic_dlg->GetSelectedID());
 				MolWin->SetStatusText(wxT("Added new atom."));
 				MolWin->UpdateGLModel();
@@ -1112,6 +1113,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				newPnt = CPoint3D(newX, newY, newZ);
 
 				type = periodic_dlg->GetSelectedID();
+				MolWin->CreateFrameSnapShot();
 				mMainData->NewAtom(type, newPnt);
 				lFrame->SetAtomOxidationNumber(lFrame->NumAtoms - 1,
 					Prefs->GetOxidationNumber(type));
@@ -1133,6 +1135,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	else if (MolWin->HandSelected() && site_clicked_on >= 0) {
 		testPicking(curr_mouse.x, curr_mouse.y);
 		if (selected_site >= 0 && selected_site != site_clicked_on) {
+			MolWin->CreateFrameSnapShot();
 			lFrame->AddBondBetweenSites(site_atom, site_clicked_on,
 										selected, selected_site);
 		}
@@ -2235,6 +2238,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 //make a popup menu editing the objets in the scene
 
 void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
+	MolWin->CreateFrameSnapShot();
 	mMainData->cFrame->SetAtomType(selected, periodic_dlg->GetSelectedID());
 	MolWin->UpdateModelDisplay();
 }
@@ -2603,6 +2607,7 @@ void MpGLCanvas::bondPopupMenu(int x, int y) {
 
 void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 	
+	MolWin->CreateFrameSnapShot();
 	// This is a multiple use function. Its action will depend on the menu id
 	// that generates the call. It will set the bond type of the selected bond
 	// to the desired order, creating a new bond if one didn't exist.
@@ -2637,6 +2642,7 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 
 void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
 	
+	MolWin->CreateFrameSnapShot();
 	// Delete the selected bond
 	
 	Frame *lFrame = mMainData->cFrame;
@@ -2707,6 +2713,7 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
+	MolWin->CreateFrameSnapShot();
 	Frame * lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 

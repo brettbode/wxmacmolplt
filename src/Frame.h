@@ -49,6 +49,7 @@ class Frame {
 		friend class DataGroup;
 		friend class ImportVecDlg;
 		friend class MpGLCanvas;
+		friend class FrameSnapShot;
 	private:
 		double		Energy;
 		double		KE;

@@ -180,6 +180,9 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (wxID_PRINT,           MolDisplayWin::menuFilePrint)
 
 	EVT_MENU (wxID_UNDO,            MolDisplayWin::menuEditUndo)
+	EVT_MENU (wxID_REDO,            MolDisplayWin::menuEditRedo)
+	EVT_UPDATE_UI(wxID_UNDO,		MolDisplayWin::OnUndoUpdate )
+	EVT_UPDATE_UI(wxID_REDO,		MolDisplayWin::OnRedoUpdate )
 	EVT_MENU (wxID_CUT,             MolDisplayWin::menuEditCut)
 	EVT_MENU (wxID_COPY,            MolDisplayWin::menuEditCopy)
 	EVT_MENU (MMP_COPYCOORDS,       MolDisplayWin::menuEditCopyCoordinates)
@@ -549,6 +552,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuFile->Append(wxID_EXIT, wxT("&Quit\tCtrl+Q"));
 	
 	menuEdit->Append(wxID_UNDO, wxT("&Undo\tCtrl+Z"));
+	menuEdit->Append(wxID_REDO, wxT("&Redo\tCtrl+Shift+Z"));
 	menuEdit->AppendSeparator();
 	menuEdit->Append(wxID_CUT, wxT("Cu&t\tCtrl+X"));
 	menuEdit->Append(wxID_COPY, wxT("&Copy\tCtrl+C"), wxT("Copy the display as an image"));
@@ -686,7 +690,6 @@ void MolDisplayWin::ClearMenus(void) {
 	menuFile->Enable(MMP_DELETEFRAME, false);
 	menuFile->Enable(MMP_EXPORT, false);
 	
-	menuEdit->Enable(wxID_UNDO, false);
 	menuEdit->Enable(wxID_CUT, false);
 	menuEdit->Enable(wxID_COPY, false);
 	menuEdit->Enable(MMP_COPYCOORDS, false);
@@ -773,6 +776,12 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuView->Enable(MMP_OFFSETMODE, true);
 		menuMolecule->Enable(MMP_INVERTNORMALMODE, true);
 	}
+}
+void MolDisplayWin::OnUndoUpdate( wxUpdateUIEvent& event ) {
+	event.Enable(mUndoBuffer.undoPossible());
+}
+void MolDisplayWin::OnRedoUpdate( wxUpdateUIEvent& event ) {
+	event.Enable(mUndoBuffer.redoPossible());
 }
 /*!
 * wxEVT_UPDATE_UI event handler for wxID_PASTE
@@ -1629,6 +1638,16 @@ void MolDisplayWin::PrintGL(wxDC * dc, const float & sFactor) {
 /* Edit menu */
 
 void MolDisplayWin::menuEditUndo(wxCommandEvent &event) {
+	if (mUndoBuffer.GetPosition() == mUndoBuffer.GetOperationCount()) {
+		CreateFrameSnapShot();
+		mUndoBuffer.SetPosition(mUndoBuffer.GetOperationCount()-1);
+	}
+	mUndoBuffer.UndoOperation();
+	ResetModel(false);
+}
+void MolDisplayWin::menuEditRedo(wxCommandEvent &event) {
+	mUndoBuffer.RedoOperation();
+	ResetModel(false);
 }
 
 void MolDisplayWin::menuEditCut(wxCommandEvent &event) {
@@ -2315,6 +2334,7 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuMoleculeAddHydrogens(wxCommandEvent &event) {
+	CreateFrameSnapShot();
 	MainData->cFrame->AddHydrogens();
 	ResetModel(false);
 	Dirty = true;
@@ -3351,4 +3371,83 @@ bool MolDisplayWin::LassoContains(const int x, const int y) {
 			(x <= lasso_start.x && x >= lasso_end.x)) &&
 	       ((y >= lasso_start.y && y <= lasso_end.y) ||
 			(y <= lasso_start.y && y >= lasso_end.y));
+}
+
+void UndoData::AddSnapshot(UndoSnapShot * s) {
+	while (position < operationCount) {
+		//If we are not at the end of the list delete the remaining items
+		UndoSnapShot * t = UndoList.back();
+		delete t;
+		UndoList.pop_back();
+		operationCount --;
+	}
+	UndoList.push_back(s);
+	operationCount++;
+	position++;
+}
+
+void UndoData::Clear(void) {
+	while (UndoList.size() > 0) {
+		UndoSnapShot * t = UndoList.back();
+		delete t;
+		UndoList.pop_back();
+	}
+	operationCount = 0;
+	position = 0;
+}
+
+void UndoData::UndoOperation(void) {
+	if ((position > 0)&&(position<=UndoList.size())) {
+		UndoList[position-1]->Restore();
+		position --;
+	}
+}
+
+void UndoData::RedoOperation(void) {
+	if ((position >= 0)&&((position+1)<UndoList.size())) {
+		position++;
+		UndoList[position]->Restore();
+	}
+}
+
+FrameSnapShot::FrameSnapShot(Frame * target) {
+	mTarget = target;
+	NumAtoms = target->GetNumAtoms();
+	NumBonds = target->GetNumBonds();
+	Atoms = new mpAtom[NumAtoms];
+	Bonds = new Bond[NumBonds];
+	for (int i=0; i<NumAtoms; i++)
+		Atoms[i] = target->Atoms[i];
+	for (int i=0; i<NumBonds; i++)
+		Bonds[i] = target->Bonds[i];
+}
+FrameSnapShot::~FrameSnapShot(void) {
+	if (Atoms) delete [] Atoms;
+	if (Bonds) delete [] Bonds;
+}
+void FrameSnapShot::Restore(void) {
+	//Ok this makes a gross assumption on the validity of the frame pointer
+	if (mTarget) {
+		if (mTarget->AtomAllocation < NumAtoms) {
+			delete [] mTarget->Atoms;
+			mTarget->Atoms = new mpAtom[NumAtoms];
+			mTarget->AtomAllocation = NumAtoms;
+		}
+		if (mTarget->BondAllocation < NumBonds) {
+			delete [] mTarget->Bonds;
+			mTarget->Bonds = new Bond[NumBonds];
+			mTarget->BondAllocation = NumBonds;
+		}
+		for (int i=0; i<NumAtoms; i++)
+			mTarget->Atoms[i] = Atoms[i];
+		mTarget->NumAtoms = NumAtoms;
+		for (int i=0; i<NumBonds; i++)
+			mTarget->Bonds[i] = Bonds[i];
+		mTarget->NumBonds = NumBonds;
+	}
+}
+
+void MolDisplayWin::CreateFrameSnapShot(void) {
+	FrameSnapShot * f = new FrameSnapShot(MainData->cFrame);
+	mUndoBuffer.AddSnapshot(f);
 }

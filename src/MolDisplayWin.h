@@ -26,6 +26,7 @@
 #include "MoleculeData.h"
 #include "Prefs.h"
 #include "Progress.h"
+#include <deque>
 
 class OpenGLRec {
 	public:
@@ -61,6 +62,46 @@ typedef class ZMatrixCalculator ZMatrixCalculator;
 typedef class setPreference setPreference;
 typedef struct qtData;
 typedef class MolStatusBar;
+typedef class UndoSnapShot;
+
+class UndoSnapShot {
+public:
+	virtual ~UndoSnapShot(void) {};
+	virtual void Restore(void) {};
+};
+
+class FrameSnapShot : public UndoSnapShot {
+public:
+	FrameSnapShot(Frame * target);
+	virtual ~FrameSnapShot(void);
+	virtual void Restore(void);
+private:
+	Frame *		mTarget;
+	mpAtom *	Atoms;
+	Bond *		Bonds;
+	long		NumAtoms;
+	long		NumBonds;
+};
+
+//Container class for undo/redo data
+class UndoData {
+public:
+	UndoData(void) : operationCount(0), position(0) {};
+	~UndoData(void) {Clear();};
+	int GetOperationCount(void) const {return operationCount;};
+	int GetPosition(void) const {return position;};
+	void SetPosition(int p) {if ((p>=0)&&(p<operationCount)) position = p;};
+	bool undoPossible(void) const {return ((operationCount > 0)&&(position > 0));};
+	bool redoPossible(void) const {return ((position+1) < operationCount);};
+	void Clear(void);
+	void AddSnapshot(UndoSnapShot *);
+	void UndoOperation(void);
+	void RedoOperation(void);
+private:
+	std::deque<UndoSnapShot *>	UndoList;
+	int	operationCount;
+	int position;
+};
 
 //Simple class to save window visibility and positioning data
 class WindowData {
@@ -145,6 +186,7 @@ class MolDisplayWin : public wxFrame {
 		wxString		currFilePath;
 		MoleculeData	*MainData;
 		WinPrefs		*Prefs;
+		UndoData		mUndoBuffer;
 		bool			Dirty;          //Flag to indicate a save is needed
 		bool			OperationInProgress;
 		bool			timerRunning;
@@ -246,6 +288,9 @@ class MolDisplayWin : public wxFrame {
 		void menuFilePrint(wxCommandEvent &event);
 		
 		void menuEditUndo(wxCommandEvent &event);
+		void menuEditRedo(wxCommandEvent &event);
+		void OnUndoUpdate( wxUpdateUIEvent& event );
+		void OnRedoUpdate( wxUpdateUIEvent& event );
 		void menuEditCut(wxCommandEvent &event);
 		void menuEditCopy(wxCommandEvent &event);
 		void menuEditCopyCoordinates(wxCommandEvent &event);
@@ -438,6 +483,7 @@ class MolDisplayWin : public wxFrame {
 		bool HandSelected(void);
 		void DrawBondingSites(int atom_type, unsigned char paired_sites, float radius, GLUquadricObj *qobj);
 		void SetStatusText(const wxString& label);
+		void CreateFrameSnapShot(void);
 };
 
 class MolPrintOut : public wxPrintout {
