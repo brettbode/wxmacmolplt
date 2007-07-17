@@ -134,6 +134,7 @@ class MolDisplayWin : public wxFrame {
 		wxMenu		*menuViewStyle;
 		wxMenu		*menuViewAnnotations;
 		wxMenu		*menuViewRotate;
+		wxMenu		*menuBuild;
 		wxMenu		*menuMolecule;
 		wxMenu		*menuSetPG;
 		wxMenu		*menuPointGroup;

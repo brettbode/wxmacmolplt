@@ -523,6 +523,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuFile = new wxMenu;
 	menuEdit = new wxMenu;
 	menuView = new wxMenu;
+	menuBuild = new wxMenu;
 	menuMolecule = new wxMenu;
 	menuWindow = new wxMenu;
 	menuHelp = new wxMenu;
@@ -558,9 +559,6 @@ void MolDisplayWin::createMenuBar(void) {
 	menuEdit->Append(wxID_SELECTALL, wxT("&Select All\tCtrl+A"));
 	menuEdit->Append(MMP_SELECT_NONE, wxT("Select &None"));
 	menuEdit->AppendSeparator();
-#ifdef ENABLE_INTERACTIVE_MODE
-	menuEdit->AppendCheckItem(MMP_INTERACTIVE, wxT("&Interactive Mode\tCtrl+I"));
-#endif
 	menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"), wxT("Edit the default preferences for new windows"));
 
 	menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"), wxT("Display the vibrational motion as mass-weighted vectors"));
@@ -570,7 +568,6 @@ void MolDisplayWin::createMenuBar(void) {
 	menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
 	menuView->AppendSeparator();
 	menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show Ax&is"), wxT("Display the cartesian axis"));
-	menuView->AppendCheckItem(MMP_SHOWPERIODICDLG, _("Show Periodic &Table\tCtrl+T"), _("Display a periodic table"));
 	menuView->AppendCheckItem(MMP_SHOWSYMMETRYOPERATOR, _("Show S&ymmetry Operators"), _("Overlays the symmetry operators for the current point group. Not all point groups are supported."));
 	
 	menuViewLabels = new wxMenu;
@@ -612,6 +609,14 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewRotate->Append(MMP_ROTATEPRINC, wxT("to &Principle Orientation"));
 	menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
 
+#ifdef ENABLE_INTERACTIVE_MODE
+	menuBuild->AppendCheckItem(MMP_INTERACTIVE, _("Enable Molecule Builder\tCtrl+I"), _("Interactive graphical molecular editor"));
+#endif
+	menuBuild->AppendCheckItem(MMP_SHOWPERIODICDLG, _("Show Periodic &Table\tCtrl+T"), _("Display a periodic table"));
+#ifdef ENABLE_INTERACTIVE_MODE
+	menuBuild->Append(MMP_ADDHYDROGENS, wxT("Add &Hydrogens"), _T("Complete hydrocarbons by adding hydrogens to unbonded carbon atoms"));
+#endif
+	
 	menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."), _("Apply the automated bond determination with several options"));
 	menuMolecule->Append(MMP_ENERGYEDIT, wxT("Set &Frame Energy..."));
 	menuMolecule->Append(MMP_CREATELLMPATH, wxT("Create &LLM Path..."), _("Create a Linear Least Motion path between this geometry and the next one"));
@@ -653,9 +658,6 @@ void MolDisplayWin::createMenuBar(void) {
 	menuMolecule->Append(MMP_CONVERTTOBOHR, wxT("Convert to &Bohr"));
 	menuMolecule->Append(MMP_CONVERTTOANGSTROMS, wxT("Convert to &Angstroms"));
 	menuMolecule->Append(MMP_INVERTNORMALMODE, wxT("&Invert Normal Mode"), _T("Multiply the normal mode by -1 to invert the direction of the vectors"));
-#ifdef ENABLE_INTERACTIVE_MODE
-	menuMolecule->Append(MMP_ADDHYDROGENS, wxT("Add &Hydrogens"), _T("Complete hydrocarbons by adding hydrogens to unbonded carbon atoms"));
-#endif
 // TODO:  Create menu items for remaining menus
 
 	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"));
@@ -670,6 +672,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuBar->Append(menuFile, wxT("&File"));
 	menuBar->Append(menuEdit, wxT("&Edit"));
 	menuBar->Append(menuView, wxT("&View"));
+	menuBar->Append(menuBuild, wxT("&Builder"));
 	menuBar->Append(menuMolecule, wxT("&Molecule"));
 	menuBar->Append(menuWindow, wxT("&Subwindow"));
 
@@ -696,6 +699,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuView->Enable(MMP_OFFSETMODE, false);
 	menuView->Enable(MMP_ANNOTATIONSSUBMENU, false);
 	menuView->Enable(MMP_ANIMATEFRAMES, false);
+	menuBuild->Enable(MMP_ADDHYDROGENS, false);
 	menuMolecule->Enable(MMP_SETBONDLENGTH, false);
 	menuMolecule->Enable(MMP_ENERGYEDIT, false);
 	menuMolecule->Enable(MMP_CREATELLMPATH, false);
@@ -723,9 +727,9 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuViewStyle->Check(MMP_BALLANDSTICKMODE, true);
 
 	if (show_periodic_dlg) {
-		menuView->Check(MMP_SHOWPERIODICDLG, true);
+		menuBuild->Check(MMP_SHOWPERIODICDLG, true);
 	} else {
-		menuView->Check(MMP_SHOWPERIODICDLG, false);
+		menuBuild->Check(MMP_SHOWPERIODICDLG, false);
 	}
 	
 	if (MainData->cFrame->NumAtoms == 0) {
@@ -739,6 +743,9 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuMolecule->Enable(MMP_SYMADAPTCOORDS, true);
 		menuFile->Enable(MMP_EXPORT, true);
 		menuView->Enable(MMP_ANNOTATIONSSUBMENU, true);
+		if (interactiveMode) {
+			menuBuild->Enable(MMP_ADDHYDROGENS, true);
+		}
 	}
 	if (MainData->NumFrames > 1 ) {
 		menuFile->Enable(MMP_DELETEFRAME, true);
@@ -2309,6 +2316,8 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 
 void MolDisplayWin::menuMoleculeAddHydrogens(wxCommandEvent &event) {
 	MainData->cFrame->AddHydrogens();
+	ResetModel(false);
+	Dirty = true;
 }
 
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
