@@ -52,6 +52,8 @@
 #undef AddAtom
 #endif
 
+#define PI 3.14159265
+
 extern WinPrefs *	gPreferences;
 #ifndef __wxBuild__
 extern Boolean		gQ3DAvail, gOpenGLAvailable;
@@ -3688,7 +3690,7 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
   //CPoint3D NormZ = CPoint3D(0,0,1);
   float angleX, angleY, angleZ;
   float tmpMag;
-  int sign;
+  int sign = 1;
 
   for (long ibond=0; ibond<NumBonds; ibond++) {
     CPoint3D v1, v2, offset;
@@ -3727,14 +3729,10 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
       v3.y = centerPercent*(v2.y - v1.y)+v1.y;
       v3.z = centerPercent*(v2.z - v1.z)+v1.z;
 
-      /*offset.x = v3.x - v1.x;
-      offset.y = v3.y - v1.y;
-      offset.z = v3.z - v1.z;*/
-
       //dotProd = fabs(offset.y);
       dotProd = offset.y;
       tmpMag = sqrt(offset.y*offset.y+offset.z*offset.z);
-      offset.z > 0 ? sign = -1 : sign = 1;
+      offset.z > 0 ? sign = 1 : sign = -1;
 
       if (tmpMag > 0.00000001)
 	angleX = sign * acos(dotProd/tmpMag);
@@ -3745,7 +3743,7 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
       dotProd = offset.y;
       tmpMag = sqrt(offset.y*offset.y+offset.x*offset.x);
       offset.x > 0 ? sign = -1 : sign = 1;
-
+      
       if (tmpMag > 0.00000001)
 	angleZ = sign * acos(dotProd/tmpMag);
       else
@@ -3758,10 +3756,15 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
       blue = AtomColor->blue/65536.0;
 
       Buffer->PutText("Transform {\n");
-      tmpStr.Printf(wxT("\trotation 1 0 0 %f\n"), angleX);
-      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      tmpStr.Printf(wxT("\trotation 0 0 1 %f\n"), angleZ);
-      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      if ( fabs(angleX) > 0.000001 && fabs(angleX) < PI) {
+	tmpStr.Printf(wxT("\trotation 1 0 0 %f\n"), angleX);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      }
+
+      if ( fabs(angleZ) > 0.000001 && fabs(angleZ) < PI) {
+	tmpStr.Printf(wxT("\trotation 0 0 1 %f\n"), angleZ);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      }
       //tmpStr.Printf(wxT("\trotation 0 1 0 %f\n"), angleY);
       //Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
       tmpStr.Printf(wxT("\ttranslation %f %f %f\n"), (v1.x+v3.x)/2, (v1.y+v3.y)/2, (v1.z+v3.z)/2);
@@ -3786,10 +3789,15 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
       blue = AtomColor->blue/65536.0;
 
       Buffer->PutText("Transform {\n");
-      tmpStr.Printf(wxT("\trotation 1 0 0 %f\n"), angleX);
-      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      if ( fabs(angleX) > 0.000001 && fabs(angleX) < PI) {
+	tmpStr.Printf(wxT("\trotation 1 0 0 %f\n"), angleX);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      }
+
+      if ( fabs(angleZ) > 0.000001 && fabs(angleZ) < PI) {
       tmpStr.Printf(wxT("\trotation 0 0 1 %f\n"), angleZ);
       Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+      }
       tmpStr.Printf(wxT("\ttranslation %f %f %f\n"), (v2.x+v3.x)/2, (v2.y+v3.y)/2, (v2.z+v3.z)/2);
       Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
       Buffer->PutText("\tchildren [\n");
