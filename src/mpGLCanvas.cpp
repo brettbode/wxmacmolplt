@@ -1088,6 +1088,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 			else if (selected_site >= 0) {
 				MolWin->CreateFrameSnapShot();
 				lFrame->AddAtomAtSite(selected, selected_site, periodic_dlg->GetSelectedID());
+				mMainData->AtomAdded();
 				MolWin->SetStatusText(wxT("Added new atom."));
 				MolWin->UpdateGLModel();
 

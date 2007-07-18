@@ -133,6 +133,10 @@ class MoleculeData {
 		InputData * GetInputData(void);
 		InputData * SetInputData(InputData * NewData);
 		void NewAtom(long AtomType, const CPoint3D & Position, long index=-1);
+		/**
+		 * Updates internal data structures to make sure they are consistent with the current atom count.
+		 */
+		void AtomAdded(void);
 		void StickCoordinates(void);
 		void InitializeInternals(void);
 		inline Internals * GetInternalCoordinates(void) const {return IntCoords;};

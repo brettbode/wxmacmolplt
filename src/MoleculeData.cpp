@@ -307,6 +307,9 @@ void MoleculeData::StickCoordinates(void) {
 }
 void MoleculeData::NewAtom(long AtomType, const CPoint3D & AtomPosition, long index) {
 	cFrame->AddAtom(AtomType, AtomPosition, index);
+	AtomAdded();
+}
+void MoleculeData::AtomAdded(void) {
 	if (cFrame->AtomAllocation>MaxAtoms) {
 		if (RotCoords) delete [] RotCoords;
 		if (zBuffer) delete [] zBuffer;

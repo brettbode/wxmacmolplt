@@ -2028,9 +2028,12 @@ void Frame::AddAtomAtSite(int atom_id, int site_id, int new_atom_type) {
 	// The new atom is displaced from the clicked on atom along the transformed
 	// site vector's direction.
 	AddAtom(new_atom_type,
-			origin + trans_site_vec * Prefs->GetAutoBondScale() *
+			origin + trans_site_vec * 0.01 *
 			(Prefs->GetAtomSize(base_type) + Prefs->GetAtomSize(new_atom_type - 1)));
-
+//	AddAtom(new_atom_type,
+//			origin + trans_site_vec * Prefs->GetAutoBondScale() *
+//			(Prefs->GetAtomSize(base_type) + Prefs->GetAtomSize(new_atom_type - 1)));
+	
 	SetAtomOxidationNumber(NumAtoms - 1,
 						   Prefs->GetOxidationNumber(new_atom_type));
 	SetAtomBondingSite(NumAtoms - 1, 0, true);

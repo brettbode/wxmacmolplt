@@ -1949,6 +1949,9 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 		toolbar = NULL;
 
 		SetToolBar(NULL);
+		
+		//Default to not allowing undo once out of edit mode
+		mUndoBuffer.Clear();
 	}
 
 	if (glCanvas)
