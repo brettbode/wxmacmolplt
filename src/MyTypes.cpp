@@ -368,3 +368,62 @@ void AnnotationDihedral::setParam(Frame& frame, float value) {
 	// form of the vector between them.
 	frame.SetAtomPosition(atoms[3], atom3_pos + rotated_vec);
 }
+
+void mpAtom::SetDefaultHybridization(void) {
+	//Setup the default orbital hybridization based on the atom type
+	hybridization = OH_NONE;
+	if (((Type>=6)&&(Type<=9))||((Type>=14)&&(Type<=17))||((Type>=32)&&(Type<=35))||
+		((Type>=50)&&(Type<=53))||((Type>=82)&&(Type<=85))) {
+		hybridization = OH_SP3;
+		return;
+	}
+	switch (Type) {
+		case 1:
+		case 3:
+		case 11:
+		case 19:
+		case 37:
+		case 55:
+		case 87:
+			hybridization = OH_S;
+			break;
+		case 4:
+		case 12:
+		case 20:
+		case 38:
+		case 56:
+		case 88:
+			hybridization = OH_SP;
+			break;
+		case 5:
+		case 13:
+		case 31:
+		case 49:
+		case 81:
+			hybridization = OH_SP2;
+			break;
+	}
+}
+int mpAtom::GetLonePairCount(void) const {
+	switch (Type) {
+		case 7:
+		case 15:
+		case 33:
+		case 51:
+		case 83:
+			return 1;
+		case 8:
+		case 16:
+		case 34:
+		case 52:
+		case 84:
+			return 2;
+		case 9:
+		case 17:
+		case 35:
+		case 53:
+		case 85:
+			return 3;
+	}
+	return 0;
+}

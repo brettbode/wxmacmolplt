@@ -247,6 +247,7 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 		Atoms[index].flags = 0;
 		InitRotationMatrix(Atoms[index].rot);
 		Atoms[index].ox_num = 0;
+		Atoms[index].SetDefaultHybridization();
 		result = &Atoms[index];
 		NumAtoms++;
 	}
@@ -1992,59 +1993,7 @@ int Frame::GetAtomNumBonds(int atom_id) const {
 
 }
 
-void Frame::AddHydrogens(void) {
-
-	int i, j;
-
-	for (i = 0; i < NumAtoms; i++) {
-		// for each site to ox_num
-		//    if unpaired
-		//       add H
-		for (j = 0; j < Atoms[i].ox_num; j++) {
-			if (!(Atoms[i].paired_sites & (1 << j))) {
-				AddAtomAtSite(i, j, 1);
-			}
-		}
-	}
-}
-
 #include <iostream>
-void Frame::AddAtomAtSite(int atom_id, int site_id, int new_atom_type) {
-
-	int base_type = GetAtomType(atom_id) - 1;
-	int ox_num = GetAtomOxidationNumber(atom_id);
-	WinPrefs *Prefs = gPreferences;
-	CPoint3D origin;
-	CPoint3D site_vec = Prefs->BondingSite(ox_num, site_id);
-	CPoint3D trans_site_vec;
-
-	// Report clicked on site as full.
-	SetAtomBondingSite(atom_id, site_id, true);
-
-	// Transform the site vector by the atom's rotation.
-	GetAtomPosition(atom_id, origin);
-	Rotate3DOffset(Atoms[atom_id].rot, site_vec, &trans_site_vec);
-
-	// The new atom is displaced from the clicked on atom along the transformed
-	// site vector's direction.
-	AddAtom(new_atom_type,
-			origin + trans_site_vec * 0.01 *
-			(Prefs->GetAtomSize(base_type) + Prefs->GetAtomSize(new_atom_type - 1)));
-	
-	SetAtomOxidationNumber(NumAtoms - 1,
-						   Prefs->GetOxidationNumber(new_atom_type));
-	SetAtomBondingSite(NumAtoms - 1, 0, true);
-
-	Matrix4D rot_copy;
-	Matrix4D new_rot;
-	CPoint3D new_site_vec;
-
-	new_site_vec = Prefs->BondingSite(Prefs->GetOxidationNumber(new_atom_type), 0);
-	new_site_vec.y *= -1.0f;
-
-	SetRotationMatrix(Atoms[NumAtoms - 1].rot, &new_site_vec, &trans_site_vec);
-	AddBond(atom_id, NumAtoms - 1);
-}
 
 void Frame::AddBondBetweenSites(int atom1_id, int site1_id,
 								int atom2_id, int site2_id) {
@@ -2054,4 +2003,3 @@ void Frame::AddBondBetweenSites(int atom1_id, int site1_id,
 	AddBond(atom1_id, atom2_id);
 
 }
-

@@ -266,6 +266,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_CONVERTTOANGSTROMS,	MolDisplayWin::menuMoleculeConvertToAngstroms)
 	EVT_MENU (MMP_INVERTNORMALMODE,		MolDisplayWin::menuMoleculeInvertNormalMode)
 	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuMoleculeAddHydrogens)
+	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate )
 
 	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
 	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)
@@ -702,7 +703,6 @@ void MolDisplayWin::ClearMenus(void) {
 	menuView->Enable(MMP_OFFSETMODE, false);
 	menuView->Enable(MMP_ANNOTATIONSSUBMENU, false);
 	menuView->Enable(MMP_ANIMATEFRAMES, false);
-	menuBuild->Enable(MMP_ADDHYDROGENS, false);
 	menuMolecule->Enable(MMP_SETBONDLENGTH, false);
 	menuMolecule->Enable(MMP_ENERGYEDIT, false);
 	menuMolecule->Enable(MMP_CREATELLMPATH, false);
@@ -746,9 +746,6 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuMolecule->Enable(MMP_SYMADAPTCOORDS, true);
 		menuFile->Enable(MMP_EXPORT, true);
 		menuView->Enable(MMP_ANNOTATIONSSUBMENU, true);
-		if (interactiveMode) {
-			menuBuild->Enable(MMP_ADDHYDROGENS, true);
-		}
 	}
 	if (MainData->NumFrames > 1 ) {
 		menuFile->Enable(MMP_DELETEFRAME, true);
@@ -782,6 +779,9 @@ void MolDisplayWin::OnUndoUpdate( wxUpdateUIEvent& event ) {
 }
 void MolDisplayWin::OnRedoUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(mUndoBuffer.redoPossible());
+}
+void MolDisplayWin::OnAddHydrogensUpdate( wxUpdateUIEvent& event ) {
+	event.Enable((interactiveMode && (MainData->cFrame->GetNumAtoms()>0)));
 }
 /*!
 * wxEVT_UPDATE_UI event handler for wxID_PASTE
@@ -2338,7 +2338,35 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 
 void MolDisplayWin::menuMoleculeAddHydrogens(wxCommandEvent &event) {
 	CreateFrameSnapShot();
-	MainData->cFrame->AddHydrogens();
+	Frame *	lFrame=MainData->cFrame;
+	mpAtom * lAtoms = lFrame->Atoms;
+	Bond * lBonds = lFrame->Bonds;
+	long NumAtoms = lFrame->NumAtoms;
+	long NumBonds = lFrame->NumBonds;
+	
+	for (int iatom=0; iatom<NumAtoms; iatom++) {
+		int baseHybrid = lAtoms[iatom].hybridization;
+		int bondCount = 0;
+		for (long i=0; i<NumBonds; i++) {
+			if (((iatom == lBonds[i].Atom1)||(iatom == lBonds[i].Atom2))&&
+				(lBonds[i].Order > kHydrogenBond)) {
+				bondCount++;
+				if ((lBonds[i].Order > kSingleBond)&&(lBonds[i].Order <= kTripleBond)) {
+					baseHybrid -= (lBonds[i].Order - kSingleBond);
+				}
+			}
+		}
+		int lpCount = lAtoms[iatom].GetLonePairCount();
+		for (int k=(bondCount); k<(baseHybrid-lpCount); k++) {
+			CPoint3D vector, origin;
+			DrawBondingSites(iatom, 0, NULL, k+1, &vector);
+			lFrame->GetAtomPosition(iatom, origin);
+			lFrame->AddAtom(1, origin + vector * 0.01 *
+							(Prefs->GetAtomSize(lFrame->GetAtomType(iatom)-1) + Prefs->GetAtomSize(0)));
+			MainData->AtomAdded();
+			lFrame->AddBond(iatom,lFrame->GetNumAtoms()-1,kSingleBond);
+		}
+	}
 	ResetModel(false);
 	Dirty = true;
 }

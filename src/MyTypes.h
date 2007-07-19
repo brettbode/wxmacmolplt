@@ -185,6 +185,23 @@ private:
 	long atoms[4];
 };
 
+enum OrbitalGeometry {
+	OG_SINGLE,
+	OG_LINEAR,
+	OG_TRIGONALPLANAR,
+	OG_BENT,
+	OG_TETRAHEDRAL
+};
+enum OrbitalHybridization {
+	OH_NONE=0,
+	OH_S=1,
+	OH_SP,
+	OH_SP2,
+	OH_SP3,
+	OH_SP3D,
+	OH_SP3D2
+};
+
 class mpAtom {
 	public:
 		CPoint3D	Position;
@@ -195,10 +212,12 @@ class mpAtom {
 		unsigned char paired_sites;
 		Matrix4D rot;
 		int ox_num;
+		OrbitalHybridization	hybridization;
 		mpAtom(void) : Type(0), flags(0) {
 			paired_sites = 0;
 			InitRotationMatrix(rot);
 			ox_num = 0;
+			hybridization = OH_NONE;
 		};
 		inline int GetOxidationNumber(void) const {return ox_num;}
 		inline int SetOxidationNumber(int new_ox_num) {
@@ -224,6 +243,10 @@ class mpAtom {
 		inline void SetFragmentNumber(long fragNum) {if (fragNum>=0) fragmentId = fragNum;};
 		inline long GetFragmentNumber(void) const {return fragmentId;};
 		inline long GetNuclearCharge(void) const {return (GetType());};	//NOT correct for ECP's!!!!!
+		inline OrbitalHybridization GetHybridization(void) const {return hybridization;};
+		void SetDefaultHybridization(void);
+		inline void SetHybridization(OrbitalHybridization p) {hybridization = p;};
+		int GetLonePairCount(void) const;
 };
 
 enum BondOrder {

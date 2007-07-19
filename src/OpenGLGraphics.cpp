@@ -1635,9 +1635,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			//}
 
 			glPushMatrix();
-			glMultMatrixf((float *) &lAtoms[iatom].rot);
-			DrawBondingSites(lAtoms[iatom].GetOxidationNumber(),
-							 lAtoms[iatom].paired_sites, radius, qobj);
+	//		glMultMatrixf((float *) &lAtoms[iatom].rot);
+	//		DrawBondingSites(lAtoms[iatom].GetOxidationNumber(),
+	//						 lAtoms[iatom].paired_sites, radius, qobj);
+			DrawBondingSites(iatom, radius, qobj);
 			glPopMatrix();
 
 			glPopMatrix();
@@ -3835,80 +3836,224 @@ void DrawString(const char *str) {
 }
 
 #define CYL_RADIUS 0.05f
-void MolDisplayWin::DrawBondingSites(int ox_num, unsigned char paired_sites, float radius, GLUquadricObj *qobj) {
+void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qobj, int site_id, CPoint3D * vector) {
+
+	Frame *	lFrame=MainData->cFrame;
+	mpAtom * lAtoms = lFrame->Atoms;
+	Bond * lBonds = lFrame->Bonds;
+	long NumAtoms = lFrame->NumAtoms;
+	long NumBonds = lFrame->NumBonds;
+	
+	int baseHybrid = lAtoms[iatom].hybridization;
+	int bondCount = 0;
+	BondOrder highestBO = kHydrogenBond;
+	long primaryBondedAtm = -1;
+	long secondaryBondedAtm = -1;
+	for (long i=0; i<NumBonds; i++) {
+		if (((iatom == lBonds[i].Atom1)||(iatom == lBonds[i].Atom2))&&
+			(lBonds[i].Order > kHydrogenBond)) {
+			bondCount++;
+			if (lBonds[i].Order > highestBO) {
+				highestBO = lBonds[i].Order;
+				secondaryBondedAtm = primaryBondedAtm;
+				primaryBondedAtm = (lBonds[i].Atom1 == iatom)?lBonds[i].Atom2:lBonds[i].Atom1;
+			} else if (secondaryBondedAtm < 0) {
+				secondaryBondedAtm = (lBonds[i].Atom1 == iatom)?lBonds[i].Atom2:lBonds[i].Atom1;
+			}
+			if ((lBonds[i].Order > kSingleBond)&&(lBonds[i].Order <= kTripleBond)) {
+				baseHybrid -= (lBonds[i].Order - kSingleBond);
+			}
+		}
+	}
+	int lpCount = lAtoms[iatom].GetLonePairCount();
+	
+	//Test to see if any bond sites are unused, if not return
+	if ((baseHybrid - (lpCount+bondCount))<=0) return;
 
 	CPoint3D origin = CPoint3D(0.0f, 0.0f, 0.0f);
 	float c, s, b, d;
 
-	glPushName(0);
+	Matrix4D rot;
+	InitRotationMatrix(rot);
+	CPoint3D b1Offset;
+	if (bondCount > 0) {	//orient our frame to the primary bond
+		b1Offset = lAtoms[primaryBondedAtm].Position - lAtoms[iatom].Position;
+		Normalize3D(&b1Offset);
+		CPoint3D target(0.0f, 1.0f, 0.0f);
+		
+		SetRotationMatrix(rot, &target, &b1Offset);
+	}
 
-	glColor3f(0.9f, 0.1f, 0.1f);
+	if (site_id == 0) {
+		glPushName(0);
 
-	switch (ox_num) {
-		case 1:
-			if (!(paired_sites & 1)) {
-				glLoadName(1);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+		glColor3f(0.9f, 0.1f, 0.1f);
+	}
+
+	if (bondCount == 0) {	//all cases share this
+		CPoint3D v(0.0f, 1.0f, 0.0f);
+		if (site_id == 0) {
+			glLoadName(1);
+			CreateCylinderFromLine(qobj, origin,
+								   v * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+		} else if (site_id == 1) {
+			*vector = v;
+		}
+	}
+				
+	switch (baseHybrid) {
+//		case OH_S:	//handled above
+//			break;
+		case OH_SP:
+			{
+				CPoint3D v2 = b1Offset*-1.0;
+				if (site_id == 0) {
+					glLoadName(2);
+					CreateCylinderFromLine(qobj, origin,
+					v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+				} else if (site_id == 2) {
+					*vector = v2;
+				}
 			}
 			break;
-		case 2:
-			if (!(paired_sites & 1)) {
-				glLoadName(1);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+		case OH_SP2:
+		{
+			if (lpCount < 2) {
+				CPoint3D v3;
+				if (bondCount >= 2) {	//Setup the 3rd vector to have an equal angle to both bonds
+						//Just add the two bond vectors and invert
+					CPoint3D offset = lAtoms[secondaryBondedAtm].Position - lAtoms[iatom].Position;
+					Normalize3D(&offset);
+					v3 = b1Offset + offset;
+					Normalize3D(&v3);
+					v3 *= -1.0;
+				} else { //Draw the 2nd position
+					b = sqrt(3.0f / 4.0f);
+					CPoint3D v2(-b, -0.5f, 0.0f), temp(b, -0.5f, 0.0f);
+					Rotate3DOffset(rot,temp,&v3);
+					temp = v2;
+					Rotate3DOffset(rot,temp,&v2);
+					if (site_id == 0) {
+						glLoadName(2);
+						CreateCylinderFromLine(qobj, origin,
+										   v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 2) {
+						*vector = v2;
+					}
+				}
+				if ((lpCount+bondCount) < 3) {
+					if (site_id == 0) {
+						glLoadName(3);
+						CreateCylinderFromLine(qobj, origin,
+										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 0) {
+						*vector = v3;
+					}
+				}
 			}
-			if (!(paired_sites & 2)) {
-				glLoadName(2);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
+		}
 			break;
-		case 3:
-			b = sqrt(3.0f / 4.0f);
-			if (!(paired_sites & 1)) {
-				glLoadName(1);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+		case OH_SP3:
+		{
+			if (lpCount < 3) {
+				if (bondCount == 3) {
+					//obtain the bond vector by summing the bond vectors, normalize and invert
+					CPoint3D sum(0.0,0.0,0.0), temp;
+					for (int i=0; i<NumBonds; i++) {
+						if (lBonds[i].Atom1 == iatom) {
+							temp = lAtoms[lBonds[i].Atom2].Position - lAtoms[iatom].Position;
+							Normalize3D(&temp);
+							sum += temp;
+							Normalize3D(&sum);
+						} else if (lBonds[i].Atom2 == iatom) {
+							temp = lAtoms[lBonds[i].Atom1].Position - lAtoms[iatom].Position;
+							Normalize3D(&temp);
+							sum += temp;
+							Normalize3D(&sum);
+						}
+					}
+					sum *= -1.0f;
+					if (site_id == 0) {
+						glLoadName(4);
+						CreateCylinderFromLine(qobj, origin,
+										   sum * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 4) {
+						*vector = sum;
+					}
+				} else {
+					if (bondCount < 2) {
+						c = cos(109.5f / 180.0f * kPi);
+						s = sin(109.5f / 180.0f * kPi);
+						b = c / s - c * c / s;
+						d = sqrt(s * s - b * b);
+						CPoint3D v2, temp(0.0f, c, s), v3(-d, c, b), v4(d, c, b);
+						Rotate3DOffset(rot,temp,&v2);
+						if (site_id == 0) {
+							glLoadName(2);
+							CreateCylinderFromLine(qobj, origin,
+											   v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+						} else if (site_id == 2) {
+							*vector = v2;
+						}
+						if (lpCount < 2) {
+							temp = v3;
+							Rotate3DOffset(rot,temp,&v3);
+							if (site_id == 0) {
+								glLoadName(3);
+								CreateCylinderFromLine(qobj, origin,
+												   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+							} else if (site_id == 3) {
+								*vector = v3;
+							}
+							if (lpCount < 1) {
+								temp = v4;
+								Rotate3DOffset(rot,temp,&v4);
+								if (site_id == 0) {
+									glLoadName(4);
+									CreateCylinderFromLine(qobj, origin,
+													   v4 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+								} else if (site_id == 4) {
+									*vector = v4;
+								}
+							}
+						}
+					} else {
+						CPoint3D offset = lAtoms[secondaryBondedAtm].Position - lAtoms[iatom].Position;
+						Normalize3D(&offset);
+						CPoint3D cross;
+						CrossProduct3D(&b1Offset,&offset,&cross);
+						offset += b1Offset;
+						offset *= -1.0f;
+						Normalize3D(&offset);
+						CPoint3D v3t;
+						float c = cos(109.5f/360.0f * kPi);
+						float s = sin(109.5f/360.0f * kPi);
+						v3t = offset*c + cross*s;
+						Normalize3D(&v3t);
+						if (site_id == 0) {
+							glLoadName(3);
+							CreateCylinderFromLine(qobj, origin,
+											   v3t * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+						} else if (site_id == 3) {
+							*vector = v3t;
+						}
+						if (lpCount == 0) {
+							v3t = offset*c - cross*s;
+							Normalize3D(&v3t);
+							if (site_id == 0) {
+								glLoadName(4);
+								CreateCylinderFromLine(qobj, origin,
+												   v3t * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+							} else if (site_id == 4) {
+								*vector = v3t;
+							}
+						}
+					}
+				}
 			}
-			if (!(paired_sites & 2)) {
-				glLoadName(2);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			if (!(paired_sites & 4)) {
-				glLoadName(3);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
+		}
 			break;
-		case 4:
-			c = cos(109.5f / 180.0f * kPi);
-			s = sin(109.5f / 180.0f * kPi);
-			b = c / s - c * c / s;
-			d = sqrt(s * s - b * b);
-			if (!(paired_sites & 1)) {
-				glLoadName(1);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			if (!(paired_sites & 2)) {
-				glLoadName(2);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			if (!(paired_sites & 4)) {
-				glLoadName(3);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			if (!(paired_sites & 8)) {
-				glLoadName(4);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			break;
-		case 5:
+/*		case OH_SP3D:
 			b = sqrt(3.0f / 4.0f);
 			if (!(paired_sites & 1)) {
 				glLoadName(1);
@@ -3936,7 +4081,7 @@ void MolDisplayWin::DrawBondingSites(int ox_num, unsigned char paired_sites, flo
 					Prefs->BondingSite(ox_num, 4) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
 			}
 			break;
-		case 6:
+		case OH_SP3D2:
 			b = cos(kPi / 4.0f);
 			if (!(paired_sites & 1)) {
 				glLoadName(1);
@@ -3969,7 +4114,13 @@ void MolDisplayWin::DrawBondingSites(int ox_num, unsigned char paired_sites, flo
 					Prefs->BondingSite(ox_num, 5) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
 			}
 			break;
+			*/
 	}
-	glPopName();
+	if (site_id == 0) {
+		glPopName();
+//	} else {
+//		Rotate3DOffset(rot,*vector,&origin);
+//		*vector = origin;
+	}
 
 }

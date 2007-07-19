@@ -362,6 +362,7 @@ class MolDisplayWin : public wxFrame {
 		void menuMoleculeConvertToAngstroms(wxCommandEvent &event);
 		void menuMoleculeInvertNormalMode(wxCommandEvent &event);
 		void menuMoleculeAddHydrogens(wxCommandEvent &event);
+		void OnAddHydrogensUpdate( wxUpdateUIEvent& event );
 		
 		//Commands to open (or raise) the various data subviews.
 		//void menuWindowMain_display(wxCommandEvent &event);
@@ -481,7 +482,7 @@ class MolDisplayWin : public wxFrame {
 		bool LassoSelected(void);
 		bool ArrowSelected(void);
 		bool HandSelected(void);
-		void DrawBondingSites(int atom_type, unsigned char paired_sites, float radius, GLUquadricObj *qobj);
+		void DrawBondingSites(long iatom, float radius, GLUquadricObj *qobj, int site_id=0, CPoint3D * vector=NULL);
 		void SetStatusText(const wxString& label);
 		void CreateFrameSnapShot(void);
 };

@@ -1087,8 +1087,13 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 			// skeleton, add the atom in the direction of the bonding site.
 			else if (selected_site >= 0) {
 				MolWin->CreateFrameSnapShot();
-				lFrame->AddAtomAtSite(selected, selected_site, periodic_dlg->GetSelectedID());
+				CPoint3D vector, origin;
+				MolWin->DrawBondingSites(selected, 0, NULL, selected_site+1, &vector);
+				lFrame->GetAtomPosition(selected, origin);
+				lFrame->AddAtom(periodic_dlg->GetSelectedID(), origin + vector * 0.01 *
+								(Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(periodic_dlg->GetSelectedID() - 1)));
 				mMainData->AtomAdded();
+				lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
 				MolWin->SetStatusText(wxT("Added new atom."));
 				MolWin->UpdateGLModel();
 
@@ -1384,10 +1389,20 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 					// site skeleton, add the atom in the direction of the
 					// bonding site.
 					else if (selected_site >= 0) {
-						CPoint3D newPnt;
-						newPnt.x = newPnt.y = newPnt.z = 0.0f;
-
-						lFrame->AddAtomAtSite(selected, selected_site, periodic_dlg->GetSelectedID());
+						MolWin->CreateFrameSnapShot();
+						CPoint3D vector, origin;
+						MolWin->DrawBondingSites(selected, 0, NULL, selected_site+1, &vector);
+						lFrame->GetAtomPosition(selected, origin);
+						lFrame->AddAtom(periodic_dlg->GetSelectedID(), origin + vector * 0.01 *
+										(Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(periodic_dlg->GetSelectedID() - 1)));
+						mMainData->AtomAdded();
+						lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
+						MolWin->SetStatusText(wxT("Added new atom."));
+						MolWin->UpdateGLModel();
+						
+						// Let's select the new atom.
+						selected = lFrame->NumAtoms - 1;
+						deSelectAll = true;
 
 						MolWin->SetStatusText(wxT("Added new atom."));
 					}
@@ -1409,8 +1424,6 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 						int type = periodic_dlg->GetSelectedID();
 						mMainData->NewAtom(type, newPnt);
-						lFrame->SetAtomOxidationNumber(lFrame->NumAtoms - 1,
-							Prefs->GetOxidationNumber(type));
 
 						MolWin->SetStatusText(wxT("Added new atom."));
 					}
