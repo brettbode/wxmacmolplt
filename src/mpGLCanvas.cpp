@@ -1141,9 +1141,15 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	else if (MolWin->HandSelected() && site_clicked_on >= 0) {
 		testPicking(curr_mouse.x, curr_mouse.y);
 		if (selected_site >= 0 && selected_site != site_clicked_on) {
-			MolWin->CreateFrameSnapShot();
-			lFrame->AddBondBetweenSites(site_atom, site_clicked_on,
-										selected, selected_site);
+			int ibond = lFrame->BondExists(site_atom, selected);
+			if (ibond >=0) {
+				int t = lFrame->GetBondOrder(ibond);
+				if (t <= kTripleBond) t ++;
+				lFrame->SetBondOrder(ibond, (BondOrder) t);
+			} else {
+				MolWin->CreateFrameSnapShot();
+				lFrame->AddBond(site_atom, selected);
+			}
 		}
 		site_clicked_on = -1;
 		draw();
@@ -1461,8 +1467,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		} else if (MolWin->HandSelected() && first_site >= 0) {
 			testPicking(tmpPnt.x, tmpPnt.y);
 			if (selected_site >= 0 && selected_site != first_site) {
-				lFrame->AddBondBetweenSites(first_atom, first_site,
-											selected, selected_site);
+				MolWin->CreateFrameSnapShot();
+				lFrame->AddBond(first_atom, selected);
 			}
 			first_site = -1;
 		}
@@ -2637,6 +2643,21 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 		bond->SetSelectState(true);
 		lFrame->SetAtomSelection(bond->Atom1, true);
 		lFrame->SetAtomSelection(bond->Atom2, true);
+		//If one of the atoms has no additional bonds adjust its position for the new bond order
+		float scale = 0.01;
+		if (order == kDoubleBond) scale = 0.0087;
+		if (order == kTripleBond) scale = 0.0079;
+		if (lFrame->GetAtomNumBonds(bond->Atom2) == 1) {
+			CPoint3D offset = lFrame->Atoms[bond->Atom2].Position - lFrame->Atoms[bond->Atom1].Position;
+			Normalize3D(&offset);
+			lFrame->Atoms[bond->Atom2].Position = lFrame->Atoms[bond->Atom1].Position + offset * scale *
+				(Prefs->GetAtomSize(lFrame->Atoms[bond->Atom1].Type-1) + Prefs->GetAtomSize(lFrame->Atoms[bond->Atom2].Type-1));
+		} else if (lFrame->GetAtomNumBonds(bond->Atom1) == 1) {
+			CPoint3D offset = lFrame->Atoms[bond->Atom1].Position - lFrame->Atoms[bond->Atom2].Position;
+			Normalize3D(&offset);
+			lFrame->Atoms[bond->Atom1].Position = lFrame->Atoms[bond->Atom2].Position + offset * scale *
+				(Prefs->GetAtomSize(lFrame->Atoms[bond->Atom1].Type-1) + Prefs->GetAtomSize(lFrame->Atoms[bond->Atom2].Type-1));
+		}
 		MolWin->BondsChanged();
 	} else if (select_stack_top == 2) { //new bond
 		int bond_id = lFrame->BondExists(select_stack[0], select_stack[1]);

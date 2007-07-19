@@ -195,10 +195,6 @@ class Frame {
 		bool SetAtomOxidationNumber(int atom_id, int ox_num);
 		int GetAtomOxidationNumber(int atom_id);
 		void SetAtomBondingSite(int atom_id, unsigned char site_id, bool is_bonded);
-
-		void AddBondBetweenSites(int atom1_id, int site1_id,
-								 int atom2_id, int site2_id);
-
 };
 
 #endif

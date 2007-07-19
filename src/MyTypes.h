@@ -210,12 +210,10 @@ class mpAtom {
 		char		flags;	//bit 0: invisibility, bit 1: select state, bit 2: Is effective fragment
 							//bit 3: Is SIMOMM atom, bit 4: symmetry unique
 		unsigned char paired_sites;
-		Matrix4D rot;
 		int ox_num;
 		OrbitalHybridization	hybridization;
 		mpAtom(void) : Type(0), flags(0) {
 			paired_sites = 0;
-			InitRotationMatrix(rot);
 			ox_num = 0;
 			hybridization = OH_NONE;
 		};

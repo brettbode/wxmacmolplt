@@ -245,8 +245,6 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 		Atoms[index].Type = AtomType;
 		Atoms[index].Position = AtomPosition;
 		Atoms[index].flags = 0;
-		InitRotationMatrix(Atoms[index].rot);
-		Atoms[index].ox_num = 0;
 		Atoms[index].SetDefaultHybridization();
 		result = &Atoms[index];
 		NumAtoms++;
@@ -468,6 +466,7 @@ bool Frame::SetAtomType(long theAtom, short atmType) {
 	bool result = false;
 	if ((theAtom>=0)&&(theAtom<NumAtoms)) {
 		result = Atoms[theAtom].SetType(atmType);
+		Atoms[theAtom].SetDefaultHybridization();
 	}
 	return result;
 }
@@ -1984,22 +1983,10 @@ int Frame::GetAtomNumBonds(int atom_id) const {
 
 	for (int i = 0; i < NumBonds; i++) {
 		if (Bonds[i].Atom1 == atom_id || Bonds[i].Atom2 == atom_id) {
-			order = Bonds[i].Order - kHydrogenBond - 1;
-			num_bonds += MAX(0, order);
+			if (Bonds[i].Order > kHydrogenBond) num_bonds++;
 		}
 	}
 
 	return num_bonds;
-
-}
-
-#include <iostream>
-
-void Frame::AddBondBetweenSites(int atom1_id, int site1_id,
-								int atom2_id, int site2_id) {
-
-	SetAtomBondingSite(atom1_id, site1_id, true);
-	SetAtomBondingSite(atom2_id, site2_id, true);
-	AddBond(atom1_id, atom2_id);
 
 }

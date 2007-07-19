@@ -372,6 +372,14 @@ void AnnotationDihedral::setParam(Frame& frame, float value) {
 void mpAtom::SetDefaultHybridization(void) {
 	//Setup the default orbital hybridization based on the atom type
 	hybridization = OH_NONE;
+	if (Type == 15) {
+		hybridization = OH_SP3D;
+		return;
+	}
+	if (Type == 16) {
+		hybridization = OH_SP3D2;
+		return;
+	}
 	if (((Type>=6)&&(Type<=9))||((Type>=14)&&(Type<=17))||((Type>=32)&&(Type<=35))||
 		((Type>=50)&&(Type<=53))||((Type>=82)&&(Type<=85))) {
 		hybridization = OH_SP3;
@@ -407,13 +415,13 @@ void mpAtom::SetDefaultHybridization(void) {
 int mpAtom::GetLonePairCount(void) const {
 	switch (Type) {
 		case 7:
-		case 15:
+	//	case 15:
 		case 33:
 		case 51:
 		case 83:
 			return 1;
 		case 8:
-		case 16:
+	//	case 16:
 		case 34:
 		case 52:
 		case 84:

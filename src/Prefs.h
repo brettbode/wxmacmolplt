@@ -385,7 +385,6 @@ class WinPrefs {
 		inline long GetBitOpt() { return  BitOptions; } //for debugging
 		unsigned char GetOxidationNumber(int atomic_number);
 		void SetOxidationNumber(int atomic_number, int ox_num);
-		CPoint3D BondingSite(int oxidation_num, int site_id);
 };
 
 // New preferences classes below here..

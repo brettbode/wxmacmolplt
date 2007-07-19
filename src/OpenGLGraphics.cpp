@@ -3875,7 +3875,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 	Matrix4D rot;
 	InitRotationMatrix(rot);
-	CPoint3D b1Offset;
+	CPoint3D b1Offset(0.0f, 1.0f, 0.0f);
 	if (bondCount > 0) {	//orient our frame to the primary bond
 		b1Offset = lAtoms[primaryBondedAtm].Position - lAtoms[iatom].Position;
 		Normalize3D(&b1Offset);
@@ -3931,22 +3931,24 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					b = sqrt(3.0f / 4.0f);
 					CPoint3D v2(-b, -0.5f, 0.0f), temp(b, -0.5f, 0.0f);
 					Rotate3DOffset(rot,temp,&v3);
-					temp = v2;
-					Rotate3DOffset(rot,temp,&v2);
-					if (site_id == 0) {
-						glLoadName(2);
-						CreateCylinderFromLine(qobj, origin,
-										   v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-					} else if (site_id == 2) {
-						*vector = v2;
+					if (bondCount <= 1) {
+						temp = v2;
+						Rotate3DOffset(rot,temp,&v2);
+						if (site_id == 0) {
+							glLoadName(2);
+							CreateCylinderFromLine(qobj, origin,
+											   v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+						} else if (site_id == 2) {
+							*vector = v2;
+						}
 					}
 				}
-				if ((lpCount+bondCount) < 3) {
+				if (lpCount < 1) {
 					if (site_id == 0) {
 						glLoadName(3);
 						CreateCylinderFromLine(qobj, origin,
 										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-					} else if (site_id == 0) {
+					} else if (site_id == 3) {
 						*vector = v3;
 					}
 				}
@@ -4053,74 +4055,102 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 			}
 		}
 			break;
-/*		case OH_SP3D:
-			b = sqrt(3.0f / 4.0f);
-			if (!(paired_sites & 1)) {
-				glLoadName(1);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+		case OH_SP3D:
+		{	//Here axial and equitorial sites are different. LPs should go in axial sites first
+			if (bondCount <= 1) {
+				b = sqrt(3.0f / 4.0f);
+				CPoint3D v2 = b1Offset*-1.0;
+				if (site_id == 0) {
+					glLoadName(2);
+					CreateCylinderFromLine(qobj, origin,
+										   v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+				} else if (site_id == 2) {
+					*vector = v2;
+				}
+				CPoint3D temp(0.0f, 0.0f, 1.0f), v3;
+				Rotate3DOffset(rot,temp,&v3);
+				if (site_id == 0) {
+					glLoadName(3);
+					CreateCylinderFromLine(qobj, origin,
+										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+				} else if (site_id == 3) {
+					*vector = v3;
+				}
+				CPoint3D v4t(-b, 0.0f, -0.5f);
+				Rotate3DOffset(rot,v4t,&v3);
+				if (site_id == 0) {
+					glLoadName(4);
+					CreateCylinderFromLine(qobj, origin,
+										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+				} else if (site_id == 4) {
+					*vector = v3;
+				}
+				CPoint3D v5t(b, 0.0f, -0.5f);
+				Rotate3DOffset(rot,v5t,&v3);
+				if (site_id == 0) {
+					glLoadName(5);
+					CreateCylinderFromLine(qobj, origin,
+										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+				} else if (site_id == 5) {
+					*vector = v3;
+				}
 			}
-			if (!(paired_sites & 2)) {
-				glLoadName(2);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			if (!(paired_sites & 4)) {
-				glLoadName(3);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			if (!(paired_sites & 8)) {
-				glLoadName(4);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			if (!(paired_sites & 16)) {
-				glLoadName(5);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 4) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
+		}
 			break;
 		case OH_SP3D2:
-			b = cos(kPi / 4.0f);
-			if (!(paired_sites & 1)) {
-				glLoadName(1);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 0) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+		{
+			if (bondCount <= 1) {
+				b = sqrt(kPi / 4.0f);
+				CPoint3D v2 = b1Offset*-1.0;
+				if (site_id == 0) {
+					glLoadName(2);
+					CreateCylinderFromLine(qobj, origin,
+										   v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+				} else if (site_id == 2) {
+					*vector = v2;
+				}
+				CPoint3D temp(b, 0.0f, b), v3;
+				Rotate3DOffset(rot,temp,&v3);
+				if (site_id == 0) {
+					glLoadName(3);
+					CreateCylinderFromLine(qobj, origin,
+										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+				} else if (site_id == 3) {
+					*vector = v3;
+				}
+				CPoint3D v4t(-b, 0.0f, b);
+				Rotate3DOffset(rot,v4t,&v3);
+				if (site_id == 0) {
+					glLoadName(4);
+					CreateCylinderFromLine(qobj, origin,
+										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+				} else if (site_id == 4) {
+					*vector = v3;
+				}
+				CPoint3D v5t(-b, 0.0f, -b);
+				Rotate3DOffset(rot,v5t,&v3);
+				if (site_id == 0) {
+					glLoadName(5);
+					CreateCylinderFromLine(qobj, origin,
+										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+				} else if (site_id == 5) {
+					*vector = v3;
+				}
+				CPoint3D v6t(b, 0.0f, -b);
+				Rotate3DOffset(rot,v6t,&v3);
+				if (site_id == 0) {
+					glLoadName(6);
+					CreateCylinderFromLine(qobj, origin,
+										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+				} else if (site_id == 6) {
+					*vector = v3;
+				}
 			}
-			if (!(paired_sites & 2)) {
-				glLoadName(2);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 1) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			if (!(paired_sites & 4)) {
-				glLoadName(3);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 2) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			if (!(paired_sites & 8)) {
-				glLoadName(4);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 3) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			if (!(paired_sites & 16)) {
-				glLoadName(5);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 4) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
-			if (!(paired_sites & 32)) {
-				glLoadName(6);
-				CreateCylinderFromLine(qobj, origin,
-					Prefs->BondingSite(ox_num, 5) * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-			}
+		}
 			break;
-			*/
 	}
 	if (site_id == 0) {
 		glPopName();
-//	} else {
-//		Rotate3DOffset(rot,*vector,&origin);
-//		*vector = origin;
 	}
 
 }
