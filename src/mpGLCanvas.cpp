@@ -525,10 +525,11 @@ void MpGLCanvas::eventErase(wxEraseEvent &event) {
 	// This avoids flashing on Windows.
 }
 
-void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
-									double *z) {
+void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
+								   double z) {
 
 	Frame *lFrame = mMainData->cFrame;
+	mpAtom *lAtoms = mMainData->cFrame->Atoms;
 	Annotation *anno = mMainData->Annotations[anno_id];
 
 	// If the lock annotation doesn't contain the clicked on atom, don't
@@ -573,9 +574,9 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 			// mouse point in object coordinates.
 			bond_vec = shifter_pos - anchor_pos;
 
-			new_vec.x = *x - anchor_pos.x;
-			new_vec.y = *y - anchor_pos.y;
-			new_vec.z = *z - anchor_pos.z;
+			new_vec.x = x - anchor_pos.x;
+			new_vec.y = y - anchor_pos.y;
+			new_vec.z = z - anchor_pos.z;
 
 			// Now we project the mouse point onto the vector between the
 			// atoms, provided the mouse point is sufficiently far away from
@@ -591,9 +592,22 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 			mu = DotProduct3D(&bond_vec, &new_vec) / (len * len);
 
 			if (fabs(mu) > 1e-6) {
-				*x = anchor_pos.x + bond_vec.x * mu;
-				*y = anchor_pos.y + bond_vec.y * mu;
-				*z = anchor_pos.z + bond_vec.z * mu;
+				x = anchor_pos.x + bond_vec.x * mu;
+				y = anchor_pos.y + bond_vec.y * mu;
+				z = anchor_pos.z + bond_vec.z * mu;
+			}
+
+			float offset_x, offset_y, offset_z;
+			offset_x = x - shifter_pos.x;
+			offset_y = y - shifter_pos.y;
+			offset_z = z - shifter_pos.z;
+
+			for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
+				if (lFrame->GetAtomSelection(i)) {
+					lAtoms[i].Position.x += offset_x;
+					lAtoms[i].Position.y += offset_y;
+					lAtoms[i].Position.z += offset_z;
+				}
 			}
 
 			break;
@@ -652,6 +666,8 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 			vec1 = atom1_pos - vertex_pos;
 			vec2 = atom2_pos - vertex_pos;
 
+			CPoint3D vec_old;
+
 			// We want to find the distance between the vertex atom and the
 			// one clicked on.  That distance will serve as the radius of
 			// the circle whose circumference the atom will follow.  If the
@@ -663,11 +679,13 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 				if (lFrame->GetAtomSelection(atom2_id)) {
 					return;
 				}
+				vec_old = CPoint3D(vec1);
 			} else {
 				radius = vec2.Magnitude();
 				if (lFrame->GetAtomSelection(atom1_id)) {
 					return;
 				}
+				vec_old = CPoint3D(vec2);
 			}
 
 			// We need to take the mouse point in object space and find the
@@ -679,9 +697,9 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 			CrossProduct3D(&vec1, &vec2, &normal);
 			Normalize3D(&normal);
 
-			new_pos.x = *x;
-			new_pos.y = *y;
-			new_pos.z = *z;
+			new_pos.x = x;
+			new_pos.y = y;
+			new_pos.z = z;
 
 			// Find vector between the mouse point and vertex atom.  The
 			// point's distance from the plane is just the dot product of the
@@ -697,11 +715,26 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 			// Now, we need to reel (or cast) the plane point so it's the
 			// same distance away as the atom originally was from the vertex.
 			vec_new = new_pos - vertex_pos;
-			Normalize3D(&vec_new);
 
-			*x = vertex_pos.x + radius * vec_new.x;
-			*y = vertex_pos.y + radius * vec_new.y;
-			*z = vertex_pos.z + radius * vec_new.z;
+			Normalize3D(&vec_new);
+			Normalize3D(&vec_old);
+			float dot = DotProduct3D(&vec_new, &vec_old);
+
+			CrossProduct3D(&vec_old, &vec_new, &normal);
+			Normalize3D(&normal);
+
+			Matrix4D rotate;
+			RotateAroundAxis(rotate, normal, acos(dot) * 180.0f / kPi);
+
+			CPoint3D pt;
+			for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
+				if (lFrame->GetAtomSelection(i)) {
+					lFrame->GetAtomPosition(i, pt);
+					vec_old = pt - vertex_pos;
+					Rotate3DPt(rotate, vec_old, &vec_new);
+					lFrame->SetAtomPosition(i, vertex_pos + vec_new);
+				}
+			}
 
 			break;
 
@@ -716,22 +749,29 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 		case MP_ANNOTATION_DIHEDRAL: {
 
 			CPoint3D shifted_pos;
+			int atom1_id;
 			int atom2_id;
-			CPoint3D atom2_pos;
 			int atom3_id;
+			int atom4_id;
+			CPoint3D atom1_pos;
+			CPoint3D atom2_pos;
 			CPoint3D atom3_pos;
+			CPoint3D atom4_pos;
 			CPoint3D vec1;
 			CPoint3D vec2;
 			CPoint3D new_pos;
 			CPoint3D center_pos;
 			float radius;
-			CPoint3D normal;
+			CPoint3D normal1;
+			CPoint3D normal2;
 			CPoint3D vec_new;
 			float vec1_len;
 			float dist;
 			int origin_id;
 			CPoint3D origin_pos;
 			float mu;
+			CPoint3D vec3;
+			CPoint3D vec4;
 
 			// First we need to figure out if its the first or fourth atom
 			// of the annotation that's being moved.  We allow only one atom
@@ -742,14 +782,18 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 				if (lFrame->GetAtomSelection(anno->getAtom(3))) {
 					return;
 				}
+				atom1_id = anno->getAtom(0);
 				atom2_id = anno->getAtom(1);
 				atom3_id = anno->getAtom(2);
+				atom4_id = anno->getAtom(3);
 			} else if (selected == anno->getAtom(3)) {
 				if (lFrame->GetAtomSelection(anno->getAtom(0))) {
 					return;
 				}
+				atom1_id = anno->getAtom(3);
 				atom2_id = anno->getAtom(2);
 				atom3_id = anno->getAtom(1);
+				atom4_id = anno->getAtom(0);
 			} else {
 				return;
 			}
@@ -767,8 +811,10 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 			// shared axis is the vector between the second and third atoms.)
 			// So, we first project the shifted atom onto this vector.
 			lFrame->GetAtomPosition(selected, shifted_pos);
+			lFrame->GetAtomPosition(atom1_id, atom1_pos);
 			lFrame->GetAtomPosition(atom2_id, atom2_pos);
 			lFrame->GetAtomPosition(atom3_id, atom3_pos);
+			lFrame->GetAtomPosition(atom4_id, atom4_pos);
 
 			vec1 = atom2_pos - atom3_pos;
 			vec2 = shifted_pos - atom3_pos;
@@ -799,9 +845,9 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 			// above -- it's the shared vector.
 			Normalize3D(&vec1);
 
-			new_pos.x = *x;
-			new_pos.y = *y;
-			new_pos.z = *z;
+			new_pos.x = x;
+			new_pos.y = y;
+			new_pos.z = z;
 
 			// Find vector between the mouse point and vertex atom.  The
 			// point's distance from the plane is just the dot product of the
@@ -819,9 +865,68 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double *x, double *y,
 			vec_new = new_pos - center_pos;
 			Normalize3D(&vec_new);
 
-			*x = center_pos.x + radius * vec_new.x;
-			*y = center_pos.y + radius * vec_new.y;
-			*z = center_pos.z + radius * vec_new.z;
+			// x = center_pos.x + radius * vec_new.x; 
+			// y = center_pos.y + radius * vec_new.y; 
+			// z = center_pos.z + radius * vec_new.z; 
+
+			// std::cout << "vec2: " << vec2 << std::endl; 
+			Normalize3D(&vec2);
+			float dot = DotProduct3D(&vec2, &vec_new);
+			// std::cout << "dot: " << dot << std::endl; 
+
+			// anno->setParam(*lFrame, acos(dot) * 180.0f / kPi); 
+			// return; 
+
+			Matrix4D rotate;
+
+			// { 
+				// SetCurrent(); 
+				// glPushMatrix(); 
+				// glTranslatef(center_pos.x, center_pos.y, center_pos.z); 
+				// glBegin(GL_LINES); 
+					// glVertex3f(0.0f, 0.0f, 0.0f); 
+					// glVertex3f(vec2.x, vec2.y, vec2.z);	 
+				// glEnd(); 
+				// glPopMatrix(); 
+			// } 
+
+			CPoint3D axis;
+			vec1 = atom2_pos - center_pos;
+			Normalize3D(&vec1);
+
+			vec3 = atom1_pos - center_pos;
+			vec4 = atom4_pos - center_pos;
+
+			Normalize3D(&vec3);
+			Normalize3D(&vec4);
+
+			CrossProduct3D(&vec1, &vec3, &normal1);
+			CrossProduct3D(&vec4, &vec1, &normal2);
+			CrossProduct3D(&normal1, &normal2, &axis);
+			Normalize3D(&axis);
+
+			// std::cout << "DotProduct3D(&axis, &vec1): " << DotProduct3D(&axis, &vec1) << std::endl; 
+
+			RotateAroundAxis(rotate, axis, acos(dot) * 180.0f / kPi);
+
+			CPoint3D pt;
+			CPoint3D vec_old;
+			CPoint3D rotated_vec;
+			for (int i = 0; i < lFrame->GetNumAtoms(); i++) {
+				if (lFrame->GetAtomSelection(i)) {
+					lFrame->GetAtomPosition(i, pt);
+					vec_old = pt - center_pos;
+					// std::cout << "vec_old: " << vec_old << std::endl; 
+					Rotate3DPt(rotate, vec_old, &rotated_vec);
+					lFrame->SetAtomPosition(i, center_pos + rotated_vec);
+					
+					// Keeps atom in same direction.
+					// lFrame->SetAtomPosition(i, center_pos + vec2); 
+
+					// Moves atom to correct new location.
+					// lFrame->SetAtomPosition(i, center_pos + vec_new); 
+				}
+			}
 
 			break;
 		}
@@ -905,23 +1010,28 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 
 	bool deSelectAll = true;
+	Frame *lFrame = mMainData->cFrame;
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
 	testPicking(curr_mouse.x, curr_mouse.y);
 
 	if (selected_type == MMP_ATOM) {
-		if (interactiveMode) {
+		if (MolWin->HandSelected()) {
+			if (!lFrame->GetAtomSelection(selected)) {
+				SelectObj(selected_type, selected, deSelectAll);
+				MolWin->SelectionChanged(deSelectAll);
+				MolWin->UpdateGLModel();
+				draw();
+			}
 			interactPopupMenu(curr_mouse.x, curr_mouse.y, 1);
-			MolWin->SelectionChanged(deSelectAll);
-			MolWin->UpdateGLModel();
 		} else {
 			measurePopupMenu(curr_mouse.x, curr_mouse.y);
 		}
 	}
 
 	else if (selected_type == MMP_BOND) {
-		if (interactiveMode) {
+		if (MolWin->HandSelected()) {
 			interactPopupMenu(curr_mouse.x, curr_mouse.y, 0);
 			MolWin->SelectionChanged(deSelectAll);
 			MolWin->UpdateGLModel();
@@ -1636,7 +1746,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				was_zooming = true;
 			}
 
-			// If no shift, just translate.
+			// If no shift, just transform.
 			else {
 				if (was_zooming == true) {
 					GLdouble tmpWinX, tmpWinY;
@@ -1650,20 +1760,24 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 					winDiffY = curr_mouse.y - (int) tmpWinY;
 					was_zooming = false;
 				}
+
 				findReal3DCoord(curr_pt.x - winDiffX, curr_pt.y - winDiffY,
 								tmpZ, newX, newY, newZ);
-				// findReal3DCoord(curr_pt.x, curr_pt.y, tmpZ, newX, newY, newZ); 
-
-				int constrain_anno_id = mMainData->GetConstrainAnnotation();
-				if (constrain_anno_id != -1) {
-					ConstrainPosition(constrain_anno_id, &newX, &newY,
-						&newZ);
-				}
 			}
 
-			// If that atom is a member of the selected atom set, move all
-			// atoms that are currently selected.
-			if (lFrame->GetAtomSelection(selected)) {
+			if (!lFrame->GetAtomSelection(selected)) {
+				SelectObj(selected_type, selected, true);
+				MolWin->SelectionChanged(true);
+			}
+
+			int constrain_anno_id = mMainData->GetConstrainAnnotation();
+			if (!event.ShiftDown() && !event.MiddleIsDown() &&
+				constrain_anno_id != -1 &&
+				mMainData->Annotations[constrain_anno_id]->containsAtom(selected)) {
+				ConstrainPosition(constrain_anno_id, newX, newY, newZ);
+			}
+
+			else {
 				GLdouble offset_x, offset_y, offset_z;
 
 				offset_x = lAtoms[selected].Position.x - newX;
@@ -1677,17 +1791,6 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 						lAtoms[i].Position.z -= offset_z;
 					}
 				}
-			}
-			
-			// If it's not selected, make it the only selected one and
-			// move only it.
-			else {
-				lAtoms[selected].Position.x = newX;
-				lAtoms[selected].Position.y = newY;
-				lAtoms[selected].Position.z = newZ;
-
-				SelectObj(selected_type, selected, true);
-				MolWin->SelectionChanged(true);
 			}
 
 		}

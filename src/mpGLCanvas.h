@@ -105,8 +105,8 @@ class MpGLCanvas : public wxGLCanvas {
 		int select_stack[4];
 		int select_stack_top;
 
-		void ConstrainPosition(const int anno_id, double *x, double *y,
-							   double *z);
+		void ConstrainPosition(const int anno_id, double x, double y,
+							   double z);
 		void ChangeAtom(wxCommandEvent& event);
 		void ChangeOxidationNumber(wxCommandEvent& event);
 		void HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt);
