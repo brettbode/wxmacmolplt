@@ -12,6 +12,9 @@
 
 #ifndef __Frame__
 #define __Frame__
+
+#include "MyTypes.h"
+
 typedef class MoleculeData MoleculeData;
 typedef class WinPrefs WinPrefs;
 typedef class Progress Progress;
@@ -120,7 +123,7 @@ class Frame {
 		void DeleteAtom(long AtomNum);
 		//AddBond validates the two atom references and increases the BondAllocation as
 		//necessary, but does not check the uniqueness of the bond
-		bool AddBond(long Atom1, long Atom2, const BondOrder & b=kSingleBond);
+		bool AddBond(long Atom1, long Atom2, const BondOrder& b=kSingleBond);
 		bool IncreaseBondAllocation(long NumAdditional);
 		void DeleteBond(long BondNum);
 			/**
