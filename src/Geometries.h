@@ -57,6 +57,12 @@ class CPoint3D {
 			this->z = z;
 		}
 
+		const CPoint3D& operator=(const CPoint3D& other) {
+			this->x = other.x;
+			this->y = other.y;
+			this->z = other.z;
+		}
+
 		CPoint3D operator+=(CPoint3D pt) {
 			x += pt.x;
 			y += pt.y;
@@ -101,7 +107,5 @@ class CPoint3D {
 
 typedef float Matrix3D[3][3]; 
 typedef float Matrix4D[4][4];
-
-
 
 #endif
