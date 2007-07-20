@@ -946,7 +946,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 															XMLElement * AnnChild = mdchild->getFirstChild();
 															while (AnnChild) {
 																if (AnnChild->isName(kAnnotationXML)) {
-																	const char * childtype = mdchild->getAttributeValue(CML_convert(titleAttr));
+																	const char * childtype = AnnChild->getAttributeValue(CML_convert(titleAttr));
 																	if (childtype) {
 																		MMP_AnnotationTypesNS attr;
 																		if (CML_convert(childtype, attr)) {
@@ -2318,7 +2318,9 @@ bool AnnotationLength::ReadXML(XMLElement * Annotation) {
 
 	return result;
 }
+
 bool AnnotationAngle::ReadXML(XMLElement * Annotation) {
+
 	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atoms[0]);
 	result = result && Annotation->getAttributeValue(kAnnAtom2XML, atoms[1]);
 	result = result && Annotation->getAttributeValue(kAnnAtom3XML, atoms[2]);
@@ -2374,8 +2376,8 @@ const char * CML_convert(CML_Element t)
     }
 }
 #pragma mark CML_Attribute
-const char * CML_convert(CML_Attribute t)
-{       
+const char * CML_convert(CML_Attribute t) {
+
     switch(t)
     {   
         case IdAttr:
