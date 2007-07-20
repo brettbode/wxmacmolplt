@@ -222,6 +222,7 @@ class mpAtom {
 			ox_num = new_ox_num;
 			/* Only retain pairs at lower ox_num. */
 			paired_sites &= 255 >> (8 - ox_num);
+			return ox_num;
 		}
 		inline bool GetInvisibility(void) const {return ((flags & 1)? true: false);};	//Bit 1 sets invisibility
 		bool SetInvisibility(bool State) {flags = (flags & 0xFE) + (State? 1:0);return GetInvisibility();};

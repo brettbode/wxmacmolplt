@@ -3259,7 +3259,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 			mouse_start = q;      /* Remember previous mouse point for next iteration. */
 		}
 	} else if (event.LeftUp()) {
-		if (fabs(inertia.x) > 3 || fabs(inertia.y) > 3) {
+		if (abs(inertia.x) > 3 || abs(inertia.y) > 3) {
 			rotate_timer.Start(33, false);
 		} 
 	}
