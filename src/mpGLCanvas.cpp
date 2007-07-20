@@ -865,47 +865,14 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
 			vec_new = new_pos - center_pos;
 			Normalize3D(&vec_new);
 
-			// x = center_pos.x + radius * vec_new.x; 
-			// y = center_pos.y + radius * vec_new.y; 
-			// z = center_pos.z + radius * vec_new.z; 
-
-			// std::cout << "vec2: " << vec2 << std::endl; 
 			Normalize3D(&vec2);
 			float dot = DotProduct3D(&vec2, &vec_new);
-			// std::cout << "dot: " << dot << std::endl; 
-
-			// anno->setParam(*lFrame, acos(dot) * 180.0f / kPi); 
-			// return; 
 
 			Matrix4D rotate;
-
-			// { 
-				// SetCurrent(); 
-				// glPushMatrix(); 
-				// glTranslatef(center_pos.x, center_pos.y, center_pos.z); 
-				// glBegin(GL_LINES); 
-					// glVertex3f(0.0f, 0.0f, 0.0f); 
-					// glVertex3f(vec2.x, vec2.y, vec2.z);	 
-				// glEnd(); 
-				// glPopMatrix(); 
-			// } 
-
 			CPoint3D axis;
-			vec1 = atom2_pos - center_pos;
-			Normalize3D(&vec1);
 
-			vec3 = atom1_pos - center_pos;
-			vec4 = atom4_pos - center_pos;
-
-			Normalize3D(&vec3);
-			Normalize3D(&vec4);
-
-			CrossProduct3D(&vec1, &vec3, &normal1);
-			CrossProduct3D(&vec4, &vec1, &normal2);
-			CrossProduct3D(&normal1, &normal2, &axis);
+			CrossProduct3D(&vec2, &vec_new, &axis);
 			Normalize3D(&axis);
-
-			// std::cout << "DotProduct3D(&axis, &vec1): " << DotProduct3D(&axis, &vec1) << std::endl; 
 
 			RotateAroundAxis(rotate, axis, acos(dot) * 180.0f / kPi);
 
@@ -916,15 +883,8 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
 				if (lFrame->GetAtomSelection(i)) {
 					lFrame->GetAtomPosition(i, pt);
 					vec_old = pt - center_pos;
-					// std::cout << "vec_old: " << vec_old << std::endl; 
 					Rotate3DPt(rotate, vec_old, &rotated_vec);
 					lFrame->SetAtomPosition(i, center_pos + rotated_vec);
-					
-					// Keeps atom in same direction.
-					// lFrame->SetAtomPosition(i, center_pos + vec2); 
-
-					// Moves atom to correct new location.
-					// lFrame->SetAtomPosition(i, center_pos + vec_new); 
 				}
 			}
 
