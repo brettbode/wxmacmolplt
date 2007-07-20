@@ -2641,7 +2641,7 @@ void MolDisplayWin::SetStatusText(const wxString& label) {
 }
 
 void MolDisplayWin::OnStatusTimer(wxTimerEvent& event) {
-	myStatus->SetStatusText(wxT(""));
+	UpdateFrameText();
 }
 
 void MolDisplayWin::ModeChanged(void) {
