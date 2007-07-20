@@ -63,9 +63,17 @@ void AnnotationLength::setParam(Frame& frame, float value) {
 	// the second atom along this vector the appropriate length.
 	vec = pt2 - pt1;
 	Normalize3D(&vec);
-	pt2 = pt1 + vec * value;
+	vec = (pt1 + vec * value) - pt2;
 
-	frame.SetAtomPosition(atoms[1], pt2);
+	if (!frame.GetAtomSelection(atoms[0])) {
+		for (int i = 0; i < frame.GetNumAtoms(); i++) {
+			if (frame.GetAtomSelection(i)) {
+				frame.GetAtomPosition(i, pt1);
+				frame.SetAtomPosition(i, pt1 + vec);
+			}
+		}
+	}
+
 }
 
 AnnotationMarker::AnnotationMarker(void) : Annotation() {
@@ -169,6 +177,7 @@ float AnnotationAngle::getParam(const Frame& frame) const {
 
 }
 
+#include <iostream>
 void AnnotationAngle::setParam(Frame& frame, float value) {
 
 	// This function sets exactly the angle between the three atoms of this
@@ -195,7 +204,6 @@ void AnnotationAngle::setParam(Frame& frame, float value) {
 	// pushing the atom along it the same length that it was to begin with.
 	// So, we don't even really consider the vector from the third atom to the
 	// angle's vertex.
-	len = vec2.Magnitude();
 	Normalize3D(&vec1);
 
 	// The axis of rotation is the normal of the plane formed by the three
@@ -203,12 +211,21 @@ void AnnotationAngle::setParam(Frame& frame, float value) {
 	CrossProduct3D(&vec1, &vec2, &normal);
 	Normalize3D(&normal);
 
-	RotateAroundAxis(rotate, normal, value);
+	CPoint3D new_vec;
+	float angle_diff = value - getParam(frame);
 
-	Rotate3DPt(rotate, vec1, &vec2);
-	vec2 = vec2 * len;
+	RotateAroundAxis(rotate, normal, angle_diff);
 
-	frame.SetAtomPosition(atoms[2], pt2 + vec2);
+	if (!frame.GetAtomSelection(atoms[0])) {
+		for (int i = 0; i < frame.GetNumAtoms(); i++) {
+			if (frame.GetAtomSelection(i)) {
+				frame.GetAtomPosition(i, pt3);
+				vec2 = pt3 - pt2;
+				Rotate3DPt(rotate, vec2, &new_vec);
+				frame.SetAtomPosition(i, pt2 + new_vec);
+			}
+		}
+	}
 
 }
 
@@ -258,7 +275,6 @@ int AnnotationDihedral::getType(void) const {
 	return MP_ANNOTATION_DIHEDRAL;
 }
 
-#include <iostream>
 float AnnotationDihedral::getParam(const Frame& frame) const {
 
 	// This function returns the dihedral angle between the planes of the four
@@ -319,6 +335,7 @@ void AnnotationDihedral::setParam(Frame& frame, float value) {
 	CPoint3D atom2_pos;
 	CPoint3D atom3_pos;
 	CPoint3D atom4_pos;
+	CPoint3D pt;
 	CPoint3D axis;
 	CPoint3D vec1;
 	CPoint3D vec2;
@@ -333,20 +350,19 @@ void AnnotationDihedral::setParam(Frame& frame, float value) {
 	frame.GetAtomPosition(atoms[2], atom3_pos);
 	frame.GetAtomPosition(atoms[3], atom4_pos);
 
-	// The axis to rotate around is between the 2nd and 3rd atoms.
+	// The angle's central axis is between the 2nd and 3rd atoms.
 	axis = atom2_pos - atom3_pos;
 	Normalize3D(&axis);
 
-	// The vector we want to rotate around the axis is from the 3rd to the 4th
-	// atoms.
+	// The vector we want to rotate is from the 3rd to the 4th atoms.
 	vec2 = atom4_pos - atom3_pos;
 
-	// The direction that we rotate depends on how the angle is oriented.
-	// The direction of rotation depends on the winding (CW or CCW) of the
-	// atoms.  To determine this, we compare the crossproduct of the two
-	// planes' normals with the shared axis.  These two vectors should either
-	// point in the same direction or in opposite directions.
+	// The axis we want to rotate around is between the 2nd and 3rd atoms,
+	// but we have to get the direction of the vector right.  So, instead
+	// of using axis, we find the two planes' normals and use their cross
+	// product as the axis of rotation.
 	vec1 = atom1_pos - atom3_pos;
+
 	CrossProduct3D(&vec1, &axis, &normal1);
 	Normalize3D(&normal1);
 
@@ -355,18 +371,28 @@ void AnnotationDihedral::setParam(Frame& frame, float value) {
 
 	CrossProduct3D(&normal1, &normal2, &cross);
 	Normalize3D(&cross);
-	
-	if (DotProduct3D(&cross, &axis) > 0.0f) {
-		RotateAroundAxis(rotate, axis, getParam(frame) - value);
-	} else {
-		RotateAroundAxis(rotate, axis, value - getParam(frame));
-	}
 
-	Rotate3DPt(rotate, vec2, &rotated_vec);
+	RotateAroundAxis(rotate, cross, getParam(frame) - value);
+
+	// Rotate3DPt(rotate, vec2, &rotated_vec); 
 
 	// Now we push the fourth atom away from the third along the rotated
 	// form of the vector between them.
-	frame.SetAtomPosition(atoms[3], atom3_pos + rotated_vec);
+	// frame.SetAtomPosition(atoms[3], atom3_pos + rotated_vec); 
+
+	CPoint3D new_vec;
+	if (!frame.GetAtomSelection(atoms[0]) &&
+		!frame.GetAtomSelection(atoms[1]) &&
+		!frame.GetAtomSelection(atoms[2])) {
+		for (int i = 0; i < frame.GetNumAtoms(); i++) {
+			if (frame.GetAtomSelection(i)) {
+				frame.GetAtomPosition(i, pt);
+				vec2 = pt - atom3_pos;
+				Rotate3DPt(rotate, vec2, &new_vec);
+				frame.SetAtomPosition(i, atom3_pos + new_vec);
+			}
+		}
+	}
 }
 
 void mpAtom::SetDefaultHybridization(void) {
@@ -385,6 +411,7 @@ void mpAtom::SetDefaultHybridization(void) {
 		hybridization = OH_SP3;
 		return;
 	}
+
 	switch (Type) {
 		case 1:
 		case 3:
@@ -412,6 +439,7 @@ void mpAtom::SetDefaultHybridization(void) {
 			break;
 	}
 }
+
 int mpAtom::GetLonePairCount(void) const {
 	switch (Type) {
 		case 7:
