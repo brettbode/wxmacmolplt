@@ -1634,12 +1634,14 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			//  glDisable(GL_DEPTH_TEST);
 			//}
 
-			glPushMatrix();
-	//		glMultMatrixf((float *) &lAtoms[iatom].rot);
-	//		DrawBondingSites(lAtoms[iatom].GetOxidationNumber(),
-	//						 lAtoms[iatom].paired_sites, radius, qobj);
-			DrawBondingSites(iatom, radius, qobj);
-			glPopMatrix();
+			if (HandSelected() && show_bond_sites) {
+				glPushMatrix();
+		//		glMultMatrixf((float *) &lAtoms[iatom].rot);
+		//		DrawBondingSites(lAtoms[iatom].GetOxidationNumber(),
+		//						 lAtoms[iatom].paired_sites, radius, qobj);
+				DrawBondingSites(iatom, radius, qobj);
+				glPopMatrix();
+			}
 
 			glPopMatrix();
 		}
