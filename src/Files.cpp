@@ -2605,9 +2605,9 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 	Frame * lFrame = GetCurrentFramePtr();
 	iatom = lFrame->GetNumAtoms();
 
-	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS=", 33)) {
+	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS", 32)) {
 		Buffer->GetLine(Line);
-		sscanf(&(Line[33]), "%ld", &NumMultipoles);
+		sscanf(&(Line[32]), " =%ld", &NumMultipoles);
 	}
 		//Mike finally fixed the spelling of coordinates
 	if ((NumMultipoles>0) && (Buffer->LocateKeyWord("MULTIPOLE COORDINATES", 20) ||
