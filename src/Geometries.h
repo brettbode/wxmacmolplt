@@ -61,6 +61,7 @@ class CPoint3D {
 			this->x = other.x;
 			this->y = other.y;
 			this->z = other.z;
+			return *this;
 		}
 
 		CPoint3D operator+=(CPoint3D pt) {
