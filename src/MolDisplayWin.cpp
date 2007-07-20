@@ -156,6 +156,7 @@ enum MMP_EventID {
 	MMP_TOOL_LASSO,
 	MMP_TOOL_HAND,
 	MMP_SELECT_NONE,
+	MMP_SHOWBONDSITES,
 	
 	Number_MMP_Ids
 };
@@ -191,7 +192,6 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
 	EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
 	EVT_MENU (MMP_SELECT_NONE,     MolDisplayWin::menuEditSelectNone)
-	EVT_MENU (MMP_INTERACTIVE,      MolDisplayWin::menuEditInteractive_mode)
 
 	EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
 	EVT_MENU (MMP_ANIMATEMODE,      MolDisplayWin::menuViewAnimateMode)
@@ -199,7 +199,6 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
 	EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
 	EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
-	EVT_MENU (MMP_SHOWPERIODICDLG,  MolDisplayWin::menuViewShowPeriodicDlg)
 	EVT_MENU (MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::menuViewShowSymmetryOperators)
 	EVT_UPDATE_UI(MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::OnShowSymOpsUpdate )
 	EVT_MENU (MMP_NO_ATOMLABEL,		MolDisplayWin::menuViewHideAtomLabels)
@@ -265,8 +264,12 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_CONVERTTOBOHR,		MolDisplayWin::menuMoleculeConvertToBohr)
 	EVT_MENU (MMP_CONVERTTOANGSTROMS,	MolDisplayWin::menuMoleculeConvertToAngstroms)
 	EVT_MENU (MMP_INVERTNORMALMODE,		MolDisplayWin::menuMoleculeInvertNormalMode)
-	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuMoleculeAddHydrogens)
+	EVT_MENU (MMP_INTERACTIVE,			MolDisplayWin::menuBuilderInteractive_mode)
+	EVT_MENU (MMP_SHOWPERIODICDLG,		MolDisplayWin::menuBuilderShowPeriodicDlg)
+	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuBuilderAddHydrogens)
+	EVT_MENU (MMP_SHOWBONDSITES,		MolDisplayWin::menuBuilderShowBondSites)
 	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate )
+	// EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuMoleculeAddHydrogens) 
 
 	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
 	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)
@@ -386,6 +389,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
 	toolbar = NULL;
 	lasso_has_area = false;
+
+	show_bond_sites = true;
 
 	status_timer.SetOwner(this, MMP_STATUS_TIMER);
 	rotate_timer.SetOwner(this, MMP_ROTATE_TIMER);
@@ -562,7 +567,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
 	menuEdit->AppendSeparator();
 	menuEdit->Append(wxID_SELECTALL, wxT("&Select All\tCtrl+A"));
-	menuEdit->Append(MMP_SELECT_NONE, wxT("Select &None"));
+	menuEdit->Append(MMP_SELECT_NONE, wxT("Select &None\tShift+Ctrl+A"));
 	menuEdit->AppendSeparator();
 	menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"), wxT("Edit the default preferences for new windows"));
 
@@ -619,7 +624,9 @@ void MolDisplayWin::createMenuBar(void) {
 #endif
 	menuBuild->AppendCheckItem(MMP_SHOWPERIODICDLG, _("Show Periodic &Table\tCtrl+T"), _("Display a periodic table"));
 #ifdef ENABLE_INTERACTIVE_MODE
-	menuBuild->Append(MMP_ADDHYDROGENS, wxT("Add &Hydrogens"), _T("Complete hydrocarbons by adding hydrogens to unbonded carbon atoms"));
+	menuBuild->Append(MMP_ADDHYDROGENS, wxT("Add &Hydrogens"), _T("Complete moleclues by adding hydrogens to incomplete bonds"));
+	menuBuild->AppendCheckItem(MMP_SHOWBONDSITES, wxT("Show Bonding Sites"), _T(""));
+	// menuBuild->Enable(MMP_SHOWBONDSITES, true); 
 #endif
 	
 	menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."), _("Apply the automated bond determination with several options"));
@@ -695,7 +702,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuEdit->Enable(wxID_COPY, false);
 	menuEdit->Enable(MMP_COPYCOORDS, false);
 	menuEdit->Enable(wxID_CLEAR, false);
-	// menuEdit->Enable(wxID_SELECTALL, false); 
+
 	menuView->Enable(MMP_SHOWMODE, false);
 	menuView->Enable(MMP_ANIMATEMODE, false);
 	menuView->Enable(MMP_PREVMODE, false);
@@ -703,6 +710,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuView->Enable(MMP_OFFSETMODE, false);
 	menuView->Enable(MMP_ANNOTATIONSSUBMENU, false);
 	menuView->Enable(MMP_ANIMATEFRAMES, false);
+	menuBuild->Enable(MMP_ADDHYDROGENS, false);
 	menuMolecule->Enable(MMP_SETBONDLENGTH, false);
 	menuMolecule->Enable(MMP_ENERGYEDIT, false);
 	menuMolecule->Enable(MMP_CREATELLMPATH, false);
@@ -710,8 +718,8 @@ void MolDisplayWin::ClearMenus(void) {
 	menuMolecule->Enable(MMP_DETERMINEPG, false);
 	menuMolecule->Enable(MMP_SYMADAPTCOORDS, false);
 	menuMolecule->Enable(MMP_INVERTNORMALMODE, false);
-	// menuMolecule->Enable(MMP_ADDHYDROGENS, false); 
 }
+
 void MolDisplayWin::AdjustMenus(void) {
 	ClearMenus();
 	menuFile->Enable(wxID_SAVE, Dirty);
@@ -729,11 +737,9 @@ void MolDisplayWin::AdjustMenus(void) {
 	else
 		menuViewStyle->Check(MMP_BALLANDSTICKMODE, true);
 
-	if (show_periodic_dlg) {
-		menuBuild->Check(MMP_SHOWPERIODICDLG, true);
-	} else {
-		menuBuild->Check(MMP_SHOWPERIODICDLG, false);
-	}
+	menuBuild->Check(MMP_SHOWPERIODICDLG, show_periodic_dlg);
+	menuBuild->Check(MMP_SHOWBONDSITES, show_bond_sites);
+	menuBuild->Enable(MMP_ADDHYDROGENS, HandSelected());
 	
 	if (MainData->cFrame->NumAtoms == 0) {
 	} else {
@@ -747,6 +753,7 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuFile->Enable(MMP_EXPORT, true);
 		menuView->Enable(MMP_ANNOTATIONSSUBMENU, true);
 	}
+
 	if (MainData->NumFrames > 1 ) {
 		menuFile->Enable(MMP_DELETEFRAME, true);
 		menuView->Enable(MMP_ANIMATEFRAMES, true);
@@ -774,15 +781,19 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuMolecule->Enable(MMP_INVERTNORMALMODE, true);
 	}
 }
+
 void MolDisplayWin::OnUndoUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(mUndoBuffer.undoPossible());
 }
+
 void MolDisplayWin::OnRedoUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(mUndoBuffer.redoPossible());
 }
+
 void MolDisplayWin::OnAddHydrogensUpdate( wxUpdateUIEvent& event ) {
-	event.Enable((interactiveMode && (MainData->cFrame->GetNumAtoms()>0)));
+	event.Enable((HandSelected() && (MainData->cFrame->GetNumAtoms()>0)));
 }
+
 /*!
 * wxEVT_UPDATE_UI event handler for wxID_PASTE
  */
@@ -1913,7 +1924,7 @@ void MolDisplayWin::menuEditSelectNone(wxCommandEvent &event) {
 
 }
 
-void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
+void MolDisplayWin::menuBuilderInteractive_mode(wxCommandEvent &event)
 {
 	interactiveMode = 1 - interactiveMode;
 
@@ -1962,7 +1973,7 @@ void MolDisplayWin::menuEditInteractive_mode(wxCommandEvent &event)
 
 }
 
-void MolDisplayWin::menuViewShowPeriodicDlg(wxCommandEvent &event) {
+void MolDisplayWin::menuBuilderShowPeriodicDlg(wxCommandEvent &event) {
 	if (glCanvas)
 		glCanvas->togglePeriodicDialog();
 }
@@ -2336,7 +2347,7 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 	Dirty = true;
 }
 
-void MolDisplayWin::menuMoleculeAddHydrogens(wxCommandEvent &event) {
+void MolDisplayWin::menuBuilderAddHydrogens(wxCommandEvent &event) {
 	CreateFrameSnapShot();
 	Frame *	lFrame=MainData->cFrame;
 	mpAtom * lAtoms = lFrame->Atoms;
@@ -2369,6 +2380,11 @@ void MolDisplayWin::menuMoleculeAddHydrogens(wxCommandEvent &event) {
 	}
 	ResetModel(false);
 	Dirty = true;
+}
+
+void MolDisplayWin::menuBuilderShowBondSites(wxCommandEvent &event) {
+	show_bond_sites = !show_bond_sites;
+	UpdateModelDisplay();
 }
 
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
@@ -3250,8 +3266,9 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 
 	// We want to draw a circle showing the virtual sphere, but only if
 	// the scene is being rotated.
-	if (event.LeftIsDown() && (!interactiveMode || ArrowSelected())) {
-		RotateMoleculeGL(Prefs->GetShowAngles(), !rotate_timer.IsRunning());
+	if (event.LeftIsDown()) { // && (!interactiveMode || ArrowSelected())) {
+		RotateMoleculeGL(Prefs->GetShowAngles() && !rotate_timer.IsRunning(),
+						 !rotate_timer.IsRunning());
 		glCanvas->SwapBuffers();
 	} else {
 		// drag finished
@@ -3321,30 +3338,11 @@ void MolStatusBar::OnScrollBarChange(wxScrollEvent & event) {
 
 void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 
-	// std::cout << "toolbar->GetToolState(event.GetId()): " << toolbar->GetToolState(event.GetId()) << std::endl; 
-	// printf("toolbar->GetToolState(MMP_TOOL_ARROW): %d\n", 
-		// toolbar->GetToolState(MMP_TOOL_ARROW)); 
-
-	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", 
-		// toolbar->GetToolState(MMP_TOOL_LASSO)); 
-
-	// printf("toolbar->GetToolState(MMP_TOOL_HAND): %d\n", 
-		// toolbar->GetToolState(MMP_TOOL_HAND)); 
-
 	// The tool is toggled automatically by wx, but we don't really want to
 	// allow it to be toggled off.  So, we explicitly force any click on the
 	// button to be a toggle on.
 	toolbar->ToggleTool(event.GetId(), true);
 
-	// printf("toolbar->GetToolState(MMP_TOOL_ARROW): %d\n", 
-		// toolbar->GetToolState(MMP_TOOL_ARROW)); 
-
-	// printf("toolbar->GetToolState(MMP_TOOL_LASSO): %d\n", 
-		// toolbar->GetToolState(MMP_TOOL_LASSO)); 
-
-	// printf("toolbar->GetToolState(MMP_TOOL_HAND): %d\n", 
-		// toolbar->GetToolState(MMP_TOOL_HAND)); 
-	
 	switch (event.GetId()) {
 		case MMP_TOOL_ARROW:
 			glCanvas->SetCursor(wxCursor(wxCURSOR_ARROW));
@@ -3359,6 +3357,10 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 			glCanvas->SetCursor(wxCursor(*wxSTANDARD_CURSOR));
 			break;
 	}
+
+	AdjustMenus();
+	UpdateModelDisplay();
+
 }
 
 bool MolDisplayWin::ArrowSelected(void) {

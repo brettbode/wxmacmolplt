@@ -231,6 +231,8 @@ class MolDisplayWin : public wxFrame {
 		wxPoint mouse_start;
 		wxPoint inertia;
 
+		bool show_bond_sites;
+
 		void OnToggleTool(wxCommandEvent& event);
 		void OnStatusTimer(wxTimerEvent& event);
 		void OnRotateTimer(wxTimerEvent& event);
@@ -302,7 +304,6 @@ class MolDisplayWin : public wxFrame {
 		void menuEditClear(wxCommandEvent &event);
 		void menuEditSelect_all(wxCommandEvent &event);
 		void menuEditSelectNone(wxCommandEvent &event);
-		void menuEditInteractive_mode(wxCommandEvent &event);
 
 		void menuViewShowNormalMode(wxCommandEvent &event);
 		void menuViewPrevNormalMode(wxCommandEvent &event);
@@ -314,7 +315,6 @@ class MolDisplayWin : public wxFrame {
 		//void menuViewShow_special_atoms(wxCommandEvent &event);
 		//void menuVeiwShow_hydrogen_labels(wxCommandEvent &event);
 		void menuViewShowAxis(wxCommandEvent &event);
-		void menuViewShowPeriodicDlg(wxCommandEvent &event);
 		void menuViewShowSymmetryOperators(wxCommandEvent &event);
 		void menuViewHideAtomLabels(wxCommandEvent &event);
 		void menuViewShowAtomLabel(wxCommandEvent &event);
@@ -361,7 +361,12 @@ class MolDisplayWin : public wxFrame {
 		void menuMoleculeConvertToBohr(wxCommandEvent &event);
 		void menuMoleculeConvertToAngstroms(wxCommandEvent &event);
 		void menuMoleculeInvertNormalMode(wxCommandEvent &event);
-		void menuMoleculeAddHydrogens(wxCommandEvent &event);
+
+		void menuBuilderAddHydrogens(wxCommandEvent &event);
+		void menuBuilderShowBondSites(wxCommandEvent &event);
+		void menuBuilderInteractive_mode(wxCommandEvent &event);
+		void menuBuilderShowPeriodicDlg(wxCommandEvent &event);
+		/* void menuMoleculeAddHydrogens(wxCommandEvent &event); */
 		void OnAddHydrogensUpdate( wxUpdateUIEvent& event );
 		
 		//Commands to open (or raise) the various data subviews.
