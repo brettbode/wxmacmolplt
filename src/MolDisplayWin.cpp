@@ -269,7 +269,6 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuBuilderAddHydrogens)
 	EVT_MENU (MMP_SHOWBONDSITES,		MolDisplayWin::menuBuilderShowBondSites)
 	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate )
-	// EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuMoleculeAddHydrogens) 
 
 	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
 	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)
@@ -624,9 +623,9 @@ void MolDisplayWin::createMenuBar(void) {
 #endif
 	menuBuild->AppendCheckItem(MMP_SHOWPERIODICDLG, _("Show Periodic &Table\tCtrl+T"), _("Display a periodic table"));
 #ifdef ENABLE_INTERACTIVE_MODE
+	menuBuild->AppendSeparator();
 	menuBuild->Append(MMP_ADDHYDROGENS, wxT("Add &Hydrogens"), _T("Complete moleclues by adding hydrogens to incomplete bonds"));
-	menuBuild->AppendCheckItem(MMP_SHOWBONDSITES, wxT("Show Bonding Sites"), _T(""));
-	// menuBuild->Enable(MMP_SHOWBONDSITES, true); 
+	menuBuild->AppendCheckItem(MMP_SHOWBONDSITES, wxT("Show Bonding Sites"), _T("Click on a site to add an atom."));
 #endif
 	
 	menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."), _("Apply the automated bond determination with several options"));
@@ -710,7 +709,6 @@ void MolDisplayWin::ClearMenus(void) {
 	menuView->Enable(MMP_OFFSETMODE, false);
 	menuView->Enable(MMP_ANNOTATIONSSUBMENU, false);
 	menuView->Enable(MMP_ANIMATEFRAMES, false);
-	menuBuild->Enable(MMP_ADDHYDROGENS, false);
 	menuMolecule->Enable(MMP_SETBONDLENGTH, false);
 	menuMolecule->Enable(MMP_ENERGYEDIT, false);
 	menuMolecule->Enable(MMP_CREATELLMPATH, false);
@@ -738,8 +736,6 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuViewStyle->Check(MMP_BALLANDSTICKMODE, true);
 
 	menuBuild->Check(MMP_SHOWPERIODICDLG, show_periodic_dlg);
-	menuBuild->Check(MMP_SHOWBONDSITES, show_bond_sites);
-	menuBuild->Enable(MMP_ADDHYDROGENS, HandSelected());
 	
 	if (MainData->cFrame->NumAtoms == 0) {
 	} else {
@@ -791,7 +787,9 @@ void MolDisplayWin::OnRedoUpdate( wxUpdateUIEvent& event ) {
 }
 
 void MolDisplayWin::OnAddHydrogensUpdate( wxUpdateUIEvent& event ) {
-	event.Enable((HandSelected() && (MainData->cFrame->GetNumAtoms()>0)));
+	event.Enable(MainData->cFrame->GetNumAtoms()>0);
+	menuBuild->Enable(MMP_SHOWBONDSITES, HandSelected());
+	menuBuild->Check(MMP_SHOWBONDSITES, show_bond_sites&&HandSelected());
 }
 
 /*!
