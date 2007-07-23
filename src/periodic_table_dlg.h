@@ -51,12 +51,12 @@ class PeriodicTableDlg: public wxMiniFrame {
 	public:
 		PeriodicTableDlg();
 		PeriodicTableDlg(MpGLCanvas *parent,
-			const wxChar *title = wxT("Periodic Table"), int xpos = 100,
+			const wxString& title = _("Periodic Table"), int xpos = 100,
 			int ypos = 100);
 		~PeriodicTableDlg();
 
 		bool Create(MpGLCanvas *parent,
-			const wxChar *title = wxT("Periodic Table"), int xpos = 100,
+			const wxString& title = _("Periodic Table"), int xpos = 100,
 			int ypos = 100);
 		void New(wxCommandEvent& WXUNUSED(event));
 		int GetSelectedID(void);
