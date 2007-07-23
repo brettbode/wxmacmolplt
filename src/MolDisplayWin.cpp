@@ -470,6 +470,7 @@ void MolDisplayWin::getCanvasSize(long *width, long *height) {
 
 void MolDisplayWin::eventSize(wxSizeEvent &event) {
 	SizeChanged();
+	event.Skip();
 }
 
 void MolDisplayWin::SizeChanged(void) {
@@ -1939,6 +1940,7 @@ void MolDisplayWin::menuBuilderInteractive_mode(wxCommandEvent &event)
 #include "xpms/rect_lasso.xpm"
 #include "xpms/hand.xpm"
 
+		toolbar->SetMargins(5,5);
 		toolbar->SetToolBitmapSize(wxSize(16, 15));
 
 		wxBitmap enabled_bmp;
