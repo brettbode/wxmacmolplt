@@ -920,6 +920,8 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 
 	mpAtom *lAtoms = mMainData->cFrame->Atoms;
 
+	// MolWin->CreateFrameSnapShot(); 
+
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
 
@@ -1038,14 +1040,12 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	
 	Frame *lFrame = mMainData->cFrame;
 
+	prev_mouse = curr_mouse;
+	curr_mouse = event.GetPosition();
+
 	// We don't do anything if a button isn't held down.
 	if (!event.Dragging()) {
-		prev_mouse = curr_mouse;
-		curr_mouse = event.GetPosition();
 		testPicking(curr_mouse.x, curr_mouse.y);
-		// std::cout << "selected: " << selected << std::endl; 
-		// std::cout << "selected_site: " << selected_site << std::endl; 
-		// std::cout << "selected_type: " << selected_type << std::endl; 
 		if (MolWin->HandSelected() && selected_site >= 0) {
 			MolWin->SetStatusText(_("Bond an atom here."));
 		} else if (MolWin->HandSelected() && selected < 0 && 
@@ -1064,9 +1064,6 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 		}
 		return;
 	}
-
-	prev_mouse = curr_mouse;
-	curr_mouse = event.GetPosition();
 
 	// We want to allow some mouse drift when the user's trying to simply
 	// click on the canvas.  By recording the number of drag events that have
@@ -1092,6 +1089,11 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 		// join two sites.  We aren't editing in such a case, nor do we want
 		// to rotate the scene.
 		if (selected_site < 0) {
+
+			// We create a snapsot only when the drag has just started and
+			// when molecular state will be changed.
+			if (ndrag_events == 1) MolWin->CreateFrameSnapShot();
+
 			HandleEditing(event, curr_mouse, prev_mouse);
 			draw();
 		}
