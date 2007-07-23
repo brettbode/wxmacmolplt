@@ -163,6 +163,8 @@ class MpGLCanvas : public wxGLCanvas {
 		*/
 		void UpdateGLView(void);
 		void draw(void);
+
+		MolDisplayWin *GetParent(void) { return MolWin; }
 		  
 		/**
 		* Creates an image of the canvas for purposes such as printing or

@@ -66,7 +66,7 @@ bool PeriodicTableDlg::Create(
 	font_size = 10;
 #endif
 
-	wxMiniFrame::Create(parent, wxID_ANY, title, wxPoint(xpos, ypos),
+	wxMiniFrame::Create(parent->GetParent(), wxID_ANY, title, wxPoint(xpos, ypos),
 		wxSize(BUTTON_SIZE * 18 + platform_width_offset,
 			BUTTON_SIZE * 10 + platform_height_offset),
 		wxCLOSE_BOX | wxCAPTION);
