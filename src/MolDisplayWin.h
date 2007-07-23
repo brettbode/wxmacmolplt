@@ -368,6 +368,7 @@ class MolDisplayWin : public wxFrame {
 		void menuBuilderShowPeriodicDlg(wxCommandEvent &event);
 		/* void menuMoleculeAddHydrogens(wxCommandEvent &event); */
 		void OnAddHydrogensUpdate( wxUpdateUIEvent& event );
+		void OnShowBondSitesUpdate(wxUpdateUIEvent& event);
 		
 		//Commands to open (or raise) the various data subviews.
 		//void menuWindowMain_display(wxCommandEvent &event);

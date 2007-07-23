@@ -268,7 +268,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_SHOWPERIODICDLG,		MolDisplayWin::menuBuilderShowPeriodicDlg)
 	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuBuilderAddHydrogens)
 	EVT_MENU (MMP_SHOWBONDSITES,		MolDisplayWin::menuBuilderShowBondSites)
-	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate )
+	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate)
+	EVT_UPDATE_UI(MMP_SHOWBONDSITES,	MolDisplayWin::OnShowBondSitesUpdate)
 
 	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
 	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)
@@ -709,6 +710,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuView->Enable(MMP_OFFSETMODE, false);
 	menuView->Enable(MMP_ANNOTATIONSSUBMENU, false);
 	menuView->Enable(MMP_ANIMATEFRAMES, false);
+
 	menuMolecule->Enable(MMP_SETBONDLENGTH, false);
 	menuMolecule->Enable(MMP_ENERGYEDIT, false);
 	menuMolecule->Enable(MMP_CREATELLMPATH, false);
@@ -787,9 +789,13 @@ void MolDisplayWin::OnRedoUpdate( wxUpdateUIEvent& event ) {
 }
 
 void MolDisplayWin::OnAddHydrogensUpdate( wxUpdateUIEvent& event ) {
-	event.Enable(MainData->cFrame->GetNumAtoms()>0);
-	menuBuild->Enable(MMP_SHOWBONDSITES, HandSelected());
-	menuBuild->Check(MMP_SHOWBONDSITES, show_bond_sites&&HandSelected());
+	event.Enable((MainData->cFrame->GetNumAtoms() > 0) &&
+				 HandSelected());
+}
+
+void MolDisplayWin::OnShowBondSitesUpdate(wxUpdateUIEvent& event) {
+	event.Check(show_bond_sites);
+	event.Enable(HandSelected());
 }
 
 /*!
