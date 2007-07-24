@@ -55,9 +55,6 @@ class PeriodicTableDlg: public wxMiniFrame {
 			int ypos = 100);
 		~PeriodicTableDlg();
 
-		bool Create(MolDisplayWin *parent,
-			const wxString& title = _("Periodic Table"), int xpos = 100,
-			int ypos = 100);
 		void New(wxCommandEvent& WXUNUSED(event));
 		int GetSelectedID(void);
 		/* MolDisplayWin *GetParent() {return parent;}; */

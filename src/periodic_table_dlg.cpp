@@ -31,15 +31,28 @@ PeriodicTableDlg::PeriodicTableDlg() {
 
 /* ------------------------------------------------------------------------- */
 
-PeriodicTableDlg::PeriodicTableDlg(MolDisplayWin *parent, const wxString& title,
-								   int xpos, int ypos) {
-	Create(parent, title, xpos, ypos);
-}
+// PeriodicTableDlg::PeriodicTableDlg(MolDisplayWin *parent, const wxString& title, 
+								   // int xpos, int ypos) { 
+	// Create(parent, title, xpos, ypos); 
+// } 
 
 /* ------------------------------------------------------------------------- */
 
-bool PeriodicTableDlg::Create(MolDisplayWin *parent, const wxString& title,
-							  int xpos, int ypos) {
+PeriodicTableDlg::PeriodicTableDlg(MolDisplayWin *parent, const wxString& title,
+								   int xpos, int ypos) :
+#ifdef __WXMAC__
+#define BUTTON_SIZE 26
+	wxMiniFrame(parent, wxID_ANY, title, wxPoint(xpos, ypos),
+		wxSize(BUTTON_SIZE * 18, BUTTON_SIZE * 10 + 22),
+		wxCLOSE_BOX | wxCAPTION)
+#else
+#define BUTTON_SIZE 34
+	wxMiniFrame(parent, wxID_ANY, title, wxPoint(xpos, ypos),
+		wxSize(BUTTON_SIZE * 18 + 5, BUTTON_SIZE * 10 + 22),
+		wxCLOSE_BOX | wxCAPTION)
+#endif
+
+{
 
 	wxFont *font;            // Font of atomic symbol
 	wxMemoryDC *mem_dc;      // Offscreen renderer for button bitmaps
@@ -49,27 +62,14 @@ bool PeriodicTableDlg::Create(MolDisplayWin *parent, const wxString& title,
 	int row;
 	int col;
 	int font_size;
-	int platform_width_offset;
-	int platform_height_offset;
 
 #ifdef __WXMAC__
-#define BUTTON_SIZE 26
 #define IMAGE_SIZE 26
-	platform_height_offset = 22;
-	platform_width_offset = 0;
 	font_size = 12;
 #else
-#define BUTTON_SIZE 34
 #define IMAGE_SIZE 20
-	platform_height_offset = 22;
-	platform_width_offset = 5;
 	font_size = 10;
 #endif
-
-	wxMiniFrame::Create(parent, wxID_ANY, title, wxPoint(xpos, ypos),
-		wxSize(BUTTON_SIZE * 18 + platform_width_offset,
-			BUTTON_SIZE * 10 + platform_height_offset),
-		wxCLOSE_BOX | wxCAPTION);
 
 	nelements = 112;
 
@@ -139,8 +139,6 @@ bool PeriodicTableDlg::Create(MolDisplayWin *parent, const wxString& title,
 
 	delete font;
 	delete mem_dc;
-
-	return true;
 
 }
 
