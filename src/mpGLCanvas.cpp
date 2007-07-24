@@ -75,9 +75,6 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 }
 
 MpGLCanvas::~MpGLCanvas() {
-	if (periodic_dlg && periodic_dlg->GetParent() == this) {
-		MolWin->ClosePeriodicDlg();
-	}
 }
 
 void MpGLCanvas::initGL(void) {

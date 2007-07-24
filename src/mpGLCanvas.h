@@ -21,7 +21,6 @@
 
 #include "MoleculeData.h"
 #include "Frame.h"
-#include "periodic_table_dlg.h"
 
 #define NEW_ATOM_TYPE_DIALOG 30001
 #define NEW_ATOM_TYPE_TITLE _("Select an Atom type")

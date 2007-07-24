@@ -27,10 +27,11 @@
 #include <stdio.h>
 
 #include "Globals.h"
-#include "mpGLCanvas.h"
+#ifndef __MyTypes__
+#include "MyTypes.h"
+#endif
+//#include "mpGLCanvas.h"
 #include "Prefs.h"
-
-class MolDisplayWin;
 
 /* ------------------------------------------------------------------------- */
 /* TYPES                                                                     */
@@ -49,8 +50,7 @@ typedef struct {
 class PeriodicTableDlg: public wxMiniFrame {    
 
 	public:
-		PeriodicTableDlg();
-		PeriodicTableDlg(MolDisplayWin *parent,
+		PeriodicTableDlg(
 			const wxString& title = _("Periodic Table"), int xpos = 100,
 			int ypos = 100);
 		~PeriodicTableDlg();
@@ -65,7 +65,6 @@ class PeriodicTableDlg: public wxMiniFrame {
 		element_t *elements;
 		int nelements;
 		int prev_id;
-		MolDisplayWin *parent;
 		void ElementSelected(wxCommandEvent& event);
 		void MouseMoved(wxMouseEvent& event);
 		void OnClose(wxCloseEvent& event);

@@ -33,6 +33,7 @@
 #include "choosevecgroup.h"
 #include "coordinateoffset.h"
 #include "frameenergy.h"
+#include "periodic_table_dlg.h"
 #include "printoptions.h"
 #include "windowparameters.h"
 #include "zmatrixcalculator.h"
@@ -3530,19 +3531,12 @@ void MolDisplayWin::TogglePeriodicDialog(void) {
 		} else {
 			wxRect window_rect = GetRect();
 			periodic_dlg = new PeriodicTableDlg(
-				this, wxT("Periodic Table"), window_rect.x + window_rect.width,
+				wxT("Periodic Table"), window_rect.x + window_rect.width,
 				window_rect.y + 22);
 			periodic_dlg->Show();
 		}
 		((MpApp &) wxGetApp()).AdjustAllMenus();
 	} else {
-		ClosePeriodicDlg();
+		periodic_dlg->Destroy();
 	}
 } 
-
-void MolDisplayWin::ClosePeriodicDlg(void) {
-	if (periodic_dlg) {
-		periodic_dlg->Destroy();
-		periodic_dlg = NULL;
-	}
-}

@@ -498,7 +498,6 @@ class MolDisplayWin : public wxFrame {
 		void SetStatusText(const wxString& label);
 		void CreateFrameSnapShot(void);
 		void TogglePeriodicDialog();
-		void ClosePeriodicDlg(void);
 		WinPrefs *GetPrefs(void) {return Prefs;}
 };
 

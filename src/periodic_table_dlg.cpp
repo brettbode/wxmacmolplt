@@ -14,6 +14,8 @@
 #include "main.h"
 
 extern bool show_periodic_dlg;
+extern WinPrefs * gPreferences;
+extern PeriodicTableDlg *periodic_dlg;
 
 IMPLEMENT_DYNAMIC_CLASS(PeriodicTableDlg, wxMiniFrame)
 
@@ -26,28 +28,18 @@ END_EVENT_TABLE()
 /* FUNCTIONS                                                                 */
 /* ------------------------------------------------------------------------- */
 
-PeriodicTableDlg::PeriodicTableDlg() {
-}
-
 /* ------------------------------------------------------------------------- */
 
-// PeriodicTableDlg::PeriodicTableDlg(MolDisplayWin *parent, const wxString& title, 
-								   // int xpos, int ypos) { 
-	// Create(parent, title, xpos, ypos); 
-// } 
-
-/* ------------------------------------------------------------------------- */
-
-PeriodicTableDlg::PeriodicTableDlg(MolDisplayWin *parent, const wxString& title,
+PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 								   int xpos, int ypos) :
 #ifdef __WXMAC__
 #define BUTTON_SIZE 26
-	wxMiniFrame(parent, wxID_ANY, title, wxPoint(xpos, ypos),
+	wxMiniFrame(NULL, wxID_ANY, title, wxPoint(xpos, ypos),
 		wxSize(BUTTON_SIZE * 18, BUTTON_SIZE * 10 + 22),
 		wxCLOSE_BOX | wxCAPTION)
 #else
 #define BUTTON_SIZE 34
-	wxMiniFrame(parent, wxID_ANY, title, wxPoint(xpos, ypos),
+	wxMiniFrame(NULL, wxID_ANY, title, wxPoint(xpos, ypos),
 		wxSize(BUTTON_SIZE * 18 + 5, BUTTON_SIZE * 10 + 22),
 		wxCLOSE_BOX | wxCAPTION)
 #endif
@@ -73,8 +65,6 @@ PeriodicTableDlg::PeriodicTableDlg(MolDisplayWin *parent, const wxString& title,
 
 	nelements = 112;
 
-	this->parent = parent;
-
 	/* No element has been selected yet. */
 	prev_id = -1;
 
@@ -97,7 +87,7 @@ PeriodicTableDlg::PeriodicTableDlg(MolDisplayWin *parent, const wxString& title,
 	for (i = 0; i < nelements; i++) {
 		wxString symbol;
 
-		parent->GetPrefs()->GetAtomLabel(i, symbol);
+		gPreferences->GetAtomLabel(i, symbol);
 
 		NumberToTableCoords(i + 1, &row, &col);
 
@@ -131,8 +121,8 @@ PeriodicTableDlg::PeriodicTableDlg(MolDisplayWin *parent, const wxString& title,
 		// Display a quick note when user hovers over button.
 		wxString tool_tip;
 		tool_tip.Printf(wxT("Number: %d, Mass: %f, Oxidation #: %d"), i + 1,
-			parent->GetPrefs()->GetAtomMass(i),
-			parent->GetPrefs()->GetOxidationNumber(i + 1));
+			gPreferences->GetAtomMass(i),
+			gPreferences->GetOxidationNumber(i + 1));
 		elements[i].button->SetToolTip(tool_tip);
 
 	}
@@ -157,6 +147,7 @@ PeriodicTableDlg::~PeriodicTableDlg() {
 	delete elements;
 
 	show_periodic_dlg = false;
+	periodic_dlg = NULL;
 	((MpApp &) wxGetApp()).AdjustAllMenus();
 }
 
@@ -207,7 +198,7 @@ int PeriodicTableDlg::GetSelectedID(void) {
 /* ------------------------------------------------------------------------- */
 
 void PeriodicTableDlg::OnClose(wxCloseEvent& event) {
-	parent->ClosePeriodicDlg();
+//	parent->ClosePeriodicDlg();
 }
 
 /* ------------------------------------------------------------------------- */
