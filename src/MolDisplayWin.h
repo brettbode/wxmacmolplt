@@ -222,6 +222,7 @@ class MolDisplayWin : public wxFrame {
 		bool interactiveMode;
 		bool stale_click;
 		wxToolBar *toolbar;
+		bool mAltModifyingToolBar;
 
 		bool is_lassoing;
 		bool lasso_has_area;
@@ -380,6 +381,11 @@ class MolDisplayWin : public wxFrame {
 		void menuWindowSurfaces(wxCommandEvent &event);
 		void menuWindowZMatrixCalc(wxCommandEvent &event);
 		void KeyHandler(wxKeyEvent &event);
+		/**
+		 * Handles KEY_UP events received by the window. 
+		 * \param event The event to handle.
+		 */
+		void KeyUpHandler(wxKeyEvent &event);
 		void CloseBondsWindow(void);
 		void CloseCoordsWindow(void);
 		void CloseEnergy_plotWindow(void);

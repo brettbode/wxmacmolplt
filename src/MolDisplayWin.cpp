@@ -287,6 +287,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_TIMER(MMP_ROTATE_TIMER, MolDisplayWin::OnRotateTimer)
 	EVT_SIZE(MolDisplayWin::eventSize)
 	EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
+	EVT_KEY_UP (MolDisplayWin::KeyUpHandler)
 	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen)
 	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 	EVT_ACTIVATE(MolDisplayWin::OnActivate)
@@ -387,6 +388,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	mHighliteState = false;
 	interactiveMode = false;
 	stale_click = true;
+	mAltModifyingToolBar = false;
 
 	toolbar = NULL;
 	lasso_has_area = false;
@@ -1948,15 +1950,15 @@ void MolDisplayWin::menuBuilderInteractive_mode(wxCommandEvent &event)
 		wxBitmap enabled_bmp2;
 
 		enabled_bmp = wxBitmap(view_xpm);
-		toolbar->AddRadioTool(MMP_TOOL_ARROW, wxT("View"), enabled_bmp,
+		toolbar->AddRadioTool(MMP_TOOL_ARROW, _("View"), enabled_bmp,
 			wxNullBitmap);
 
 		enabled_bmp = wxBitmap(rect_lasso_xpm);
-		toolbar->AddRadioTool(MMP_TOOL_LASSO, wxT("Select"), enabled_bmp,
+		toolbar->AddRadioTool(MMP_TOOL_LASSO, _("Select"), enabled_bmp,
 			wxNullBitmap);
 
 		enabled_bmp = wxBitmap(hand_xpm);
-		toolbar->AddRadioTool(MMP_TOOL_HAND, wxT("Edit"), enabled_bmp,
+		toolbar->AddRadioTool(MMP_TOOL_HAND, _("Edit"), enabled_bmp,
 			wxNullBitmap);
 
 		toolbar->AddSeparator();
@@ -2446,6 +2448,14 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 				}
 				break;
 		}
+	} else if (key == WXK_ALT && interactiveMode) {
+		if (HandSelected()) {
+			toolbar->ToggleTool(MMP_TOOL_LASSO, true);
+			glCanvas->SetCursor(wxCursor(*wxCROSS_CURSOR));
+			UpdateModelDisplay();
+			
+			mAltModifyingToolBar = true;
+		}
 	} else if (event.AltDown()) {
 		switch (key) {
 			case 140:   //option - a
@@ -2456,6 +2466,21 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 				MainData->cFrame->toggleMMAtomVisibility();
 				ResetModel(false);
 				break;
+		}
+	}
+	event.Skip();
+}
+void MolDisplayWin::KeyUpHandler(wxKeyEvent & event) {
+	//the only keyup event we care about at the moment is alt up when in edit/select mode
+	int key = event.GetKeyCode();
+	if (key == WXK_ALT && interactiveMode) {
+		if (mAltModifyingToolBar) {
+			toolbar->ToggleTool(MMP_TOOL_HAND, true);
+			glCanvas->SetCursor(wxCursor(wxCURSOR_HAND));
+			LassoEnd();
+			UpdateModelDisplay();
+			
+			mAltModifyingToolBar = false;
 		}
 	}
 	event.Skip();
@@ -3348,6 +3373,7 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 	// allow it to be toggled off.  So, we explicitly force any click on the
 	// button to be a toggle on.
 	toolbar->ToggleTool(event.GetId(), true);
+	mAltModifyingToolBar = false;
 
 	switch (event.GetId()) {
 		case MMP_TOOL_ARROW:

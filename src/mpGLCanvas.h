@@ -249,6 +249,18 @@ class MpGLCanvas : public wxGLCanvas {
 		void KeyHandler(wxKeyEvent & event);
 
 		/**
+		 * Handles KEYDOWN events received by the widget. 
+		 * \param event The event to handle.
+		 */
+		void KeyDownHandler(wxKeyEvent & event);
+		
+		/**
+		 * Handles KEYUP events received by the widget. 
+		 * \param event The event to handle.
+		 */
+		void KeyUpHandler(wxKeyEvent & event);
+		
+		/**
 		* Translates a mouse click into a selection of an atom or bond 
 		* \param x x coordinate of the click.
 		* \param y y coordinate of the click.

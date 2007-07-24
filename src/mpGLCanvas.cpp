@@ -1949,9 +1949,16 @@ void MpGLCanvas::HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt) {
 	//    if contained in lasso area, select it
 }
 
+//Keyboard events are normally only passed to the focused "window". Thus we need to grab them and
+//explicitely pass them up to our parent
 void MpGLCanvas::KeyHandler(wxKeyEvent & event) {
-	//char events are passed up the parent chain so se need to explicitely pass them
 	MolWin->KeyHandler(event);
+}
+void MpGLCanvas::KeyDownHandler(wxKeyEvent & event) {
+	MolWin->KeyHandler(event);
+}
+void MpGLCanvas::KeyUpHandler(wxKeyEvent & event) {
+	MolWin->KeyUpHandler(event);
 }
 
 void MpGLCanvas::findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, GLdouble& winY, GLdouble& winZ) {
@@ -2896,6 +2903,8 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 #endif
 
 	EVT_CHAR(MpGLCanvas::KeyHandler)
+	EVT_KEY_DOWN(MpGLCanvas::KeyDownHandler)
+	EVT_KEY_UP(MpGLCanvas::KeyUpHandler)
 
 	EVT_MENU(GL_Popup_Menu_Apply_All, MpGLCanvas::On_Apply_All)
 	EVT_MENU(GL_Popup_Delete_Item_Current_Frame, MpGLCanvas::On_Delete_Single_Frame)
