@@ -3520,6 +3520,10 @@ void MolDisplayWin::CreateFrameSnapShot(void) {
 void MolDisplayWin::TogglePeriodicDialog(void) {
 	show_periodic_dlg = !show_periodic_dlg;
 
+	// Have to make a top-level window for the miniframe to show the right toolbar
+	// under OS X.
+	wxGetApp().SetTopWindow(this);
+
 	if (show_periodic_dlg) {
 		if (periodic_dlg) {
 			periodic_dlg->Raise();
