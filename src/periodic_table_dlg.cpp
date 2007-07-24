@@ -20,7 +20,6 @@ extern PeriodicTableDlg *periodic_dlg;
 IMPLEMENT_DYNAMIC_CLASS(PeriodicTableDlg, wxMiniFrame)
 
 BEGIN_EVENT_TABLE(PeriodicTableDlg, wxMiniFrame)
-	EVT_CLOSE(PeriodicTableDlg::OnClose)
 	EVT_BUTTON(wxID_ANY, PeriodicTableDlg::ElementSelected)
 END_EVENT_TABLE()
 
