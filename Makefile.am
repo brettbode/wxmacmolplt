@@ -17,8 +17,8 @@ nobase_dist_pkgdata_DATA = MacMolPlt_Manual.html \
     Manual_pages/MEP_3D_Dialog.gif Manual_pages/MacMolPlt_Files.html \
     Manual_pages/MacMolPlt_Surfaces.html Manual_pages/MacMolPlt_Windows.html \
     Manual_pages/Version_History.html Manual_pages/water.jpg \
-    Manual_pages/sample-mol.jpg \
-    samples/water.log samples/sample.irc
+    Manual_pages/sample-mol.jpg Manual_pages/builder.html \
+    Manual_pages/bonding_sites.jpg samples/water.log samples/sample.irc
 EXTRA_DIST = wxMacMolPlt.kdevelop LICENSE  \
     wxMacMolPlt.vcproj     wxMacMolPlt.rc \
     wxMacMolPlt.xcodeproj/project.pbxproj \

@@ -120,7 +120,7 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 
 		// Display a quick note when user hovers over button.
 		wxString tool_tip;
-		tool_tip.Printf(wxT("Number: %d, Mass: %f, Oxidation #: %d"), i + 1,
+		tool_tip.Printf(wxT("Atomic #: %d, Mass: %f, Oxidation #: %d"), i + 1,
 			gPreferences->GetAtomMass(i),
 			gPreferences->GetOxidationNumber(i + 1));
 		elements[i].button->SetToolTip(tool_tip);
