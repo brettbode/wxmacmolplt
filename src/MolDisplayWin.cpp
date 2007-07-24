@@ -53,6 +53,7 @@
 
 extern WinPrefs * gPreferences;
 extern bool show_periodic_dlg;
+extern PeriodicTableDlg *periodic_dlg;
 
 using namespace std;
 
@@ -1980,8 +1981,7 @@ void MolDisplayWin::menuBuilderInteractive_mode(wxCommandEvent &event)
 }
 
 void MolDisplayWin::menuBuilderShowPeriodicDlg(wxCommandEvent &event) {
-	if (glCanvas)
-		glCanvas->togglePeriodicDialog();
+	TogglePeriodicDialog();
 }
 
 void MolDisplayWin::menuViewShowNormalMode(wxCommandEvent &event) {
@@ -3489,4 +3489,30 @@ void FrameSnapShot::Restore(void) {
 void MolDisplayWin::CreateFrameSnapShot(void) {
 	FrameSnapShot * f = new FrameSnapShot(MainData->cFrame);
 	mUndoBuffer.AddSnapshot(f);
+}
+
+void MolDisplayWin::TogglePeriodicDialog(void) {
+	show_periodic_dlg = !show_periodic_dlg;
+
+	if (show_periodic_dlg) {
+		if (periodic_dlg) {
+			periodic_dlg->Raise();
+		} else {
+			wxRect window_rect = GetRect();
+			periodic_dlg = new PeriodicTableDlg(
+				this, wxT("Periodic Table"), window_rect.x + window_rect.width,
+				window_rect.y + 22);
+			periodic_dlg->Show();
+		}
+		((MpApp &) wxGetApp()).AdjustAllMenus();
+	} else {
+		ClosePeriodicDlg();
+	}
+} 
+
+void MolDisplayWin::ClosePeriodicDlg(void) {
+	if (periodic_dlg) {
+		periodic_dlg->Destroy();
+		periodic_dlg = NULL;
+	}
 }

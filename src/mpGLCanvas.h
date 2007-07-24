@@ -266,10 +266,8 @@ class MpGLCanvas : public wxGLCanvas {
 		void testPicking(int x, int y);
 		void SelectObj(int selected_type, int select_id, bool mode);
 		void toggleInteractiveMode();
-		void togglePeriodicDialog();
 		void findReal3DCoord(GLdouble x, GLdouble y, GLdouble z, GLdouble& realX, GLdouble& realY, GLdouble& realZ);
 		void findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, GLdouble& winY, GLdouble& winZ);
-		void ClosePeriodicDlg(void);
 		/* MpGLCanvas *GetParent(void) { return parent; } */
 		WinPrefs *GetPrefs(void) { return Prefs; }
 		int NumberSelectedAtoms(void) const {return select_stack_top;};

@@ -31,15 +31,15 @@ PeriodicTableDlg::PeriodicTableDlg() {
 
 /* ------------------------------------------------------------------------- */
 
-PeriodicTableDlg::PeriodicTableDlg(
-		MpGLCanvas *parent, const wxString& title, int xpos, int ypos) {
+PeriodicTableDlg::PeriodicTableDlg(MolDisplayWin *parent, const wxString& title,
+								   int xpos, int ypos) {
 	Create(parent, title, xpos, ypos);
 }
 
 /* ------------------------------------------------------------------------- */
 
-bool PeriodicTableDlg::Create(
-		MpGLCanvas *parent, const wxString& title, int xpos, int ypos) {
+bool PeriodicTableDlg::Create(MolDisplayWin *parent, const wxString& title,
+							  int xpos, int ypos) {
 
 	wxFont *font;            // Font of atomic symbol
 	wxMemoryDC *mem_dc;      // Offscreen renderer for button bitmaps
@@ -66,7 +66,7 @@ bool PeriodicTableDlg::Create(
 	font_size = 10;
 #endif
 
-	wxMiniFrame::Create(parent->GetParent(), wxID_ANY, title, wxPoint(xpos, ypos),
+	wxMiniFrame::Create(parent, wxID_ANY, title, wxPoint(xpos, ypos),
 		wxSize(BUTTON_SIZE * 18 + platform_width_offset,
 			BUTTON_SIZE * 10 + platform_height_offset),
 		wxCLOSE_BOX | wxCAPTION);

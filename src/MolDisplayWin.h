@@ -491,6 +491,9 @@ class MolDisplayWin : public wxFrame {
 		void DrawBondingSites(long iatom, float radius, GLUquadricObj *qobj, int site_id=0, CPoint3D * vector=NULL);
 		void SetStatusText(const wxString& label);
 		void CreateFrameSnapShot(void);
+		void TogglePeriodicDialog();
+		void ClosePeriodicDlg(void);
+		WinPrefs *GetPrefs(void) {return Prefs;}
 };
 
 class MolPrintOut : public wxPrintout {

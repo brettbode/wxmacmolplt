@@ -31,9 +31,9 @@
 #include "VirtualSphere.h"
 #include "ChooseDialog.h"
 
-extern PeriodicTableDlg *periodic_dlg;
-extern bool show_periodic_dlg;
 extern int glf_initialized;
+extern bool show_periodic_dlg;
+extern PeriodicTableDlg *periodic_dlg;
 
 int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 
@@ -76,7 +76,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 
 MpGLCanvas::~MpGLCanvas() {
 	if (periodic_dlg && periodic_dlg->GetParent() == this) {
-		ClosePeriodicDlg();
+		MolWin->ClosePeriodicDlg();
 	}
 }
 
@@ -900,8 +900,8 @@ void MpGLCanvas::eventMouseLeftDoubleClick(wxMouseEvent& event) {
 
 	// If we're in edit mode, we display the periodic table dialog.
 	if (MolWin->HandSelected() && selected_type == MMP_NULL) {
-		if (!show_periodic_dlg) {
-			togglePeriodicDialog();
+		if (show_periodic_dlg) {
+			MolWin->TogglePeriodicDialog();
 		}
 	}
 
@@ -2868,32 +2868,6 @@ void MpGLCanvas::toggleInteractiveMode(void) {
 
 	interactiveMode = 1 - interactiveMode;
 
-}
-
-void MpGLCanvas::togglePeriodicDialog(void) {
-	show_periodic_dlg = !show_periodic_dlg;
-
-	if (show_periodic_dlg) {
-		if (periodic_dlg) {
-			periodic_dlg->Raise();
-		} else {
-			wxRect window_rect = GetRect();
-			periodic_dlg = new PeriodicTableDlg(
-				this, wxT("Periodic Table"), window_rect.x + window_rect.width,
-				window_rect.y + 22);
-			periodic_dlg->Show();
-		}
-		((MpApp &) wxGetApp()).AdjustAllMenus();
-	} else {
-		ClosePeriodicDlg();
-	}
-} 
-
-void MpGLCanvas::ClosePeriodicDlg(void) {
-	if (periodic_dlg) {
-		periodic_dlg->Destroy();
-		periodic_dlg = NULL;
-	}
 }
 
 #if wxCHECK_VERSION(2, 8, 0)

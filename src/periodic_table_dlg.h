@@ -30,7 +30,7 @@
 #include "mpGLCanvas.h"
 #include "Prefs.h"
 
-class MpGLCanvas;
+class MolDisplayWin;
 
 /* ------------------------------------------------------------------------- */
 /* TYPES                                                                     */
@@ -50,17 +50,17 @@ class PeriodicTableDlg: public wxMiniFrame {
 
 	public:
 		PeriodicTableDlg();
-		PeriodicTableDlg(MpGLCanvas *parent,
+		PeriodicTableDlg(MolDisplayWin *parent,
 			const wxString& title = _("Periodic Table"), int xpos = 100,
 			int ypos = 100);
 		~PeriodicTableDlg();
 
-		bool Create(MpGLCanvas *parent,
+		bool Create(MolDisplayWin *parent,
 			const wxString& title = _("Periodic Table"), int xpos = 100,
 			int ypos = 100);
 		void New(wxCommandEvent& WXUNUSED(event));
 		int GetSelectedID(void);
-		MpGLCanvas *GetParent() {return parent;};
+		/* MolDisplayWin *GetParent() {return parent;}; */
 		static void NumberToTableCoords(int atomic_number, int *row, int *col);
 
 	private:
@@ -68,7 +68,7 @@ class PeriodicTableDlg: public wxMiniFrame {
 		element_t *elements;
 		int nelements;
 		int prev_id;
-		MpGLCanvas *parent;
+		MolDisplayWin *parent;
 		void ElementSelected(wxCommandEvent& event);
 		void MouseMoved(wxMouseEvent& event);
 		void OnClose(wxCloseEvent& event);
