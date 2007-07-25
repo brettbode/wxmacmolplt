@@ -1775,7 +1775,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 
 		lFrame->SetBonds(Prefs, true, true);
 		MolWin->UpdateGLModel();
-
+		MolWin->AtomsChanged(true, false);
 	}
 	
 	// If the user's dragging after selecting a bond, we want to
@@ -1849,6 +1849,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			}
 		}
 
+		MolWin->AtomsChanged(true, false);
 		// We need to update our data.
 		// edited_atoms = true; 
 	}
@@ -1933,6 +1934,7 @@ void MpGLCanvas::HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt) {
 		if (MolWin->LassoContains((int) win_x, (int) win_y)) {
 			lFrame->SetAtomSelection(i, true);
 			nselected++;
+			MolWin->AtomsChanged(true, false);
 		}
 	}
 
@@ -2329,6 +2331,7 @@ void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
 	MolWin->CreateFrameSnapShot();
 	mMainData->cFrame->SetAtomType(selected, periodic_dlg->GetSelectedID());
 	MolWin->UpdateModelDisplay();
+	MolWin->AtomsChanged(true,false);
 }
 
 void MpGLCanvas::ChangeOxidationNumber(wxCommandEvent& event) {
@@ -2844,11 +2847,12 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 	}
 
 	MolWin->UpdateModelDisplay();
-
+	MolWin->AtomsChanged(true, false);
 }
 
 void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
 
+	MolWin->CreateFrameSnapShot();
 	Frame * lFrame = mMainData->Frames;
 	long NumAtoms = mMainData->cFrame->NumAtoms;
 
@@ -2864,7 +2868,7 @@ void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
 	}
 
 	MolWin->UpdateModelDisplay();
-
+	MolWin->AtomsChanged(true, false);
 }
 
 void MpGLCanvas::toggleInteractiveMode(void) {

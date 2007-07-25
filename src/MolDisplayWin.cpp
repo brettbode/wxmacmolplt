@@ -467,13 +467,14 @@ MolDisplayWin::~MolDisplayWin() {
 	// will stay open if the dialog is open but no MolDisplayWins are.  So,
 	// if this is the last MolDisplayWin that's open, we close the periodic
 	// dialog in order for the whole application to close.
+#ifndef __WXMAC__
 	MpApp& app = wxGetApp();
 	if (app.WindowCount() == 0) {
 		if (periodic_dlg) {
 			periodic_dlg->Destroy();
 		}
 	}
-
+#endif
 }
 
 void MolDisplayWin::getCanvasSize(long *width, long *height) {
@@ -1675,10 +1676,12 @@ void MolDisplayWin::menuEditUndo(wxCommandEvent &event) {
 	}
 	mUndoBuffer.UndoOperation();
 	ResetModel(false);
+	AtomsChanged(true, false);
 }
 void MolDisplayWin::menuEditRedo(wxCommandEvent &event) {
 	mUndoBuffer.RedoOperation();
 	ResetModel(false);
+	AtomsChanged(true, false);
 }
 
 void MolDisplayWin::menuEditCut(wxCommandEvent &event) {
@@ -2370,24 +2373,22 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 void MolDisplayWin::menuBuilderAddHydrogens(wxCommandEvent &event) {
 	CreateFrameSnapShot();
 	Frame *	lFrame=MainData->cFrame;
-	mpAtom * lAtoms = lFrame->Atoms;
-	Bond * lBonds = lFrame->Bonds;
 	long NumAtoms = lFrame->NumAtoms;
 	long NumBonds = lFrame->NumBonds;
 	
 	for (int iatom=0; iatom<NumAtoms; iatom++) {
-		int baseHybrid = lAtoms[iatom].hybridization;
+		int baseHybrid = lFrame->Atoms[iatom].hybridization;
 		int bondCount = 0;
 		for (long i=0; i<NumBonds; i++) {
-			if (((iatom == lBonds[i].Atom1)||(iatom == lBonds[i].Atom2))&&
-				(lBonds[i].Order > kHydrogenBond)) {
+			if (((iatom == lFrame->Bonds[i].Atom1)||(iatom == lFrame->Bonds[i].Atom2))&&
+				(lFrame->Bonds[i].Order > kHydrogenBond)) {
 				bondCount++;
-				if ((lBonds[i].Order > kSingleBond)&&(lBonds[i].Order <= kTripleBond)) {
-					baseHybrid -= (lBonds[i].Order - kSingleBond);
+				if ((lFrame->Bonds[i].Order > kSingleBond)&&(lFrame->Bonds[i].Order <= kTripleBond)) {
+					baseHybrid -= (lFrame->Bonds[i].Order - kSingleBond);
 				}
 			}
 		}
-		int lpCount = lAtoms[iatom].GetLonePairCount();
+		int lpCount = lFrame->Atoms[iatom].GetLonePairCount();
 		for (int k=(bondCount); k<(baseHybrid-lpCount); k++) {
 			CPoint3D vector, origin;
 			DrawBondingSites(iatom, 0, NULL, k+1, &vector);
@@ -2399,6 +2400,7 @@ void MolDisplayWin::menuBuilderAddHydrogens(wxCommandEvent &event) {
 		}
 	}
 	ResetModel(false);
+	AtomsChanged(true, false);
 	Dirty = true;
 }
 
@@ -2634,10 +2636,11 @@ void MolDisplayWin::CloseZMatrixCalc(void) {
 	winData.ZMatWindowVisible(false);
 }
 
-void MolDisplayWin::AtomsChanged(void) {
+void MolDisplayWin::AtomsChanged(bool updateCoordsWin, bool updateDisplay) {
+	if (updateCoordsWin && coordsWindow) coordsWindow->FrameChanged();
 	if (bondsWindow) bondsWindow->ResetList();
 	if (surfacesWindow) surfacesWindow->Reset();
-	FrameChanged();
+	if (updateDisplay) FrameChanged();
 }
 void MolDisplayWin::BondsChanged(void) {
 	if (bondsWindow) bondsWindow->ResetList();
@@ -3525,8 +3528,10 @@ void FrameSnapShot::Restore(void) {
 }
 
 void MolDisplayWin::CreateFrameSnapShot(void) {
-	FrameSnapShot * f = new FrameSnapShot(MainData->cFrame);
-	mUndoBuffer.AddSnapshot(f);
+	if (interactiveMode) {
+		FrameSnapShot * f = new FrameSnapShot(MainData->cFrame);
+		mUndoBuffer.AddSnapshot(f);
+	}
 }
 
 void MolDisplayWin::TogglePeriodicDialog(void) {

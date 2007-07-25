@@ -432,7 +432,7 @@ class MolDisplayWin : public wxFrame {
 		void AbortOpen(const char * msg);
 		
 		//General Utility routines
-		void AtomsChanged(void);
+		void AtomsChanged(bool updateCoordsWin=false, bool updateDisplay=false);
 		void BondsChanged(void);
 		void FrameChanged(void);
 		void ChangeFrames(long NewFrame);

@@ -177,7 +177,8 @@ void BondsDlg::CreateControls()
 
 void BondsDlg::ResetList(void) {
 		//Clear off the old rows
-	bondGrid->DeleteRows(0, bondGrid->GetNumberRows(), true);
+	if (bondGrid->GetNumberRows()>0)
+		bondGrid->DeleteRows(0, bondGrid->GetNumberRows(), true);
 	//loop through the bonds and add each with SetItem(row, col, string)
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();

@@ -302,6 +302,8 @@ void CoordinatesWindow::UpdateControls(void) {
 	coordTypeChoice->SetSelection(CoordType);
 }
 void CoordinatesWindow::SetupGridColumns(void) {
+	bool save = needClearAll;
+	needClearAll = false;
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
@@ -334,21 +336,24 @@ void CoordinatesWindow::SetupGridColumns(void) {
 		lFrame->SetAtomSelection(0, temp);
 	}
 	coordGrid->Thaw();
+	needClearAll = save;
 }
 
 void CoordinatesWindow::FrameChanged(void) {
-		//clear off the old rows
-	if (coordGrid->GetNumberRows() > 0)
-		coordGrid->DeleteRows(0, coordGrid->GetNumberRows(), true);
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
+	bool save = needClearAll;
+	needClearAll = false;
+	coordGrid->Freeze();
+	//clear off any extra rows
+	if (coordGrid->GetNumberRows() > natoms)
+		coordGrid->DeleteRows(0, coordGrid->GetNumberRows()-natoms, true);
+	coordGrid->HideCellEditControl();
 	if (natoms > 0) {
-		bool temp = lFrame->GetAtomSelection(0);
-		coordGrid->InsertRows(0, natoms, true);
-		coordGrid->HideCellEditControl();
+		if (coordGrid->GetNumberRows() < natoms)
+			coordGrid->InsertRows(0, natoms - coordGrid->GetNumberRows(), true);
 		coordGrid->ClearSelection();
-		lFrame->SetAtomSelection(0, temp);
 		wxString buf;
 		for (long i=0; i<natoms; i++) {
 			buf.Printf(wxT("%d"), (i+1));
@@ -371,6 +376,7 @@ void CoordinatesWindow::FrameChanged(void) {
 				if (internals)
 					mInts = internals->GetMOPacStyle();
 				if (mInts) {
+					mInts->CartesiansToInternals(MainData);
 					if (i>0) {
 						buf.Printf(wxT("%d"), mInts->GetConnection(i,0)+1);
 						coordGrid->SetCellValue(i, 1, buf);
@@ -402,6 +408,8 @@ void CoordinatesWindow::FrameChanged(void) {
 			}
 		}
 	}
+	coordGrid->Thaw();
+	needClearAll = save;
 }
 
 void CoordinatesWindow::SizeCols(wxSize & s) {
@@ -497,6 +505,7 @@ wxIcon CoordinatesWindow::GetIconResource( const wxString& name )
 
 void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 {
+	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
@@ -517,6 +526,7 @@ void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 {
+	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
@@ -537,6 +547,7 @@ void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnBondbuttonClick( wxCommandEvent& event )
 {
+	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	lFrame->SetBonds(Prefs, true);
@@ -549,6 +560,7 @@ void CoordinatesWindow::OnBondbuttonClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnStickbuttonClick( wxCommandEvent& event )
 {
+	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	MainData->StickCoordinates();
@@ -598,7 +610,6 @@ void CoordinatesWindow::OnCoordchoice1Selected( wxCommandEvent& event )
 /*!
  * wxEVT_GRID_CELL_CHANGE event handler for ID_GRID
  */
-
 void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 {
 	int row = event.GetRow();
@@ -618,6 +629,7 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 			if ((atomnum < 1)||(atomnum>107)) atomnum = -1;//Not a correct Atomic label
 		}
 		if ((atomnum > -1)&&(atomnum!=lFrame->GetAtomType(row))) {//A atom type was found so change the type
+			Parent->CreateFrameSnapShot();
 			lFrame->SetAtomType(row, atomnum);
 			Changed = true;
 		}
@@ -639,7 +651,10 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 					pos.z = fval;
 					Changed = true;
 				}
-				if (Changed) lFrame->SetAtomPosition(row, pos);
+				if (Changed) {
+					Parent->CreateFrameSnapShot();
+					lFrame->SetAtomPosition(row, pos);
+				}
 			} else {	//invalid text, just veto the change
 				event.Veto();
 				return;
@@ -663,6 +678,7 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 				switch (col) {
 					case 1:
 						if (newid != mInts->GetConnection(row, 0)) {
+							Parent->CreateFrameSnapShot();
 							//We need to make sure that the 3 reference atom ids are unique
 							//If we are already using the requested id, swap them
 							if (newid == mInts->GetConnection(row, 1))
@@ -675,12 +691,14 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 						break;
 					case 2:
 						if (fval != mInts->GetValue(row, 0)) {
+							Parent->CreateFrameSnapShot();
 							mInts->SetValue(row, 0, fval);
 							Changed = true;
 						}
 						break;
 					case 3:
 						if (newid != mInts->GetConnection(row, 1)) {
+							Parent->CreateFrameSnapShot();
 							//We need to make sure that the 3 reference atom ids are unique
 							//If we are already using the requested id, swap them
 							if (newid == mInts->GetConnection(row, 0))
@@ -693,12 +711,14 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 						break;
 					case 4:
 						if (fval != mInts->GetValue(row, 1)) {
+							Parent->CreateFrameSnapShot();
 							mInts->SetValue(row, 1, fval);
 							Changed = true;
 						}
 						break;
 					case 5:
 						if (newid != mInts->GetConnection(row, 2)) {
+							Parent->CreateFrameSnapShot();
 							//We need to make sure that the 3 reference atom ids are unique
 							//If we are already using the requested id, swap them
 							if (newid == mInts->GetConnection(row, 0))
@@ -711,6 +731,7 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 						break;
 					case 6:
 						if (fval != mInts->GetValue(row, 2)) {
+							Parent->CreateFrameSnapShot();
 							mInts->SetValue(row, 2, fval);
 							Changed = true;
 						}
