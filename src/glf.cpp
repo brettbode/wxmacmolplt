@@ -198,8 +198,8 @@ static int LittleEndian()
 |	Return: GLF_OK - if all OK
 |	Return: GLF_ERROR - if any error 
 */
-static int ReadFont(const char *font_name, struct glf_font *glff)
-{
+
+static int ReadFont(const char *font_name, struct glf_font *glff) {
 
 	FILE *fontf;
 	char buffer[64];
@@ -212,10 +212,9 @@ static int ReadFont(const char *font_name, struct glf_font *glff)
 	fontf = fopen(font_name, "rb");
 	if (fontf == NULL) return GLF_ERROR;
 
-	fread(buffer, 3, 1, fontf);
+	fread(buffer, 1, 3, fontf);
 	buffer[3] = 0;
-	if (strcmp(buffer, "GLF"))
-	{
+	if (strcmp(buffer, "GLF")) {
 		/* If header is not "GLF" */
 		if (console_msg) printf("Error reading font file: incorrect file format\n");
 		return GLF_ERROR;
@@ -224,7 +223,7 @@ static int ReadFont(const char *font_name, struct glf_font *glff)
 	/* Check for machine type */
 	LEndian = LittleEndian();
 
-	fread(glff->font_name, 96, 1, fontf);
+	fread(glff->font_name, 1, 96, fontf);
 	glff->font_name[96] = 0;
 
 	fread(&glff->sym_total, 1, 1, fontf); /* Read total symbols in font */
@@ -270,8 +269,7 @@ static int ReadFont(const char *font_name, struct glf_font *glff)
           
 			/* If machine is bigendian -> swap low and high words in
 			tempfx and tempfy */
-			if (!LEndian) 
-			{
+			if (!LEndian) {
 				tp = (unsigned char *)&tempfx;
 				temp = tp[0]; tp[0] = tp[3]; tp[3] = temp;
 				temp = tp[1]; tp[1] = tp[2]; tp[2] = temp;
@@ -288,7 +286,7 @@ static int ReadFont(const char *font_name, struct glf_font *glff)
 			if (tempfy > glff->symbols[code]->bottomy) glff->symbols[code]->bottomy = tempfy;
 		}
 		for (j=0; j<fcets; j++)
-			fread(&glff->symbols[code]->fdata[j*3], 3, 1, fontf);
+			fread(&glff->symbols[code]->fdata[j*3], 1, 3, fontf);
 		for (j=0; j<lns; j++)
 			fread(&glff->symbols[code]->ldata[j], 1, 1, fontf);
 	}
@@ -1233,25 +1231,16 @@ static void ConvertLong(unsigned *array, long length)
 }
 
 /* Open RGB Image */
-static ImageRec *ImageOpen(FILE *f)
-{
-    union
-	{
-		int testWord;
-		char testByte[4];
-    } endianTest;
+static ImageRec *ImageOpen(FILE *f) {
 
     ImageRec *image;
     int swapFlag;
     int x;
 
-    endianTest.testWord = 1;
-    if (endianTest.testByte[0] == 1) swapFlag = 1;
-	else swapFlag = 0;
+	swapFlag = LittleEndian();
 
     image = (ImageRec *)malloc(sizeof(ImageRec));
-    if (image == NULL)
-	{
+    if (image == NULL) {
 		fprintf(stderr, "Out of memory!\n");
 		exit(1);
     }
@@ -1267,14 +1256,12 @@ static ImageRec *ImageOpen(FILE *f)
     image->tmpG = (unsigned char *)malloc(image->xsize*256);
     image->tmpB = (unsigned char *)malloc(image->xsize*256);
     if (image->tmp == NULL || image->tmpR == NULL || image->tmpG == NULL ||
-	image->tmpB == NULL) 
-	{
+		image->tmpB == NULL) {
 		fprintf(stderr, "Out of memory!\n");
 		exit(1);
     }
 
-    if ((image->type & 0xFF00) == 0x0100)
-	{
+    if ((image->type & 0xFF00) == 0x0100) {
 		x = image->ysize * image->zsize * sizeof(unsigned);
 		image->rowStart = (unsigned *)malloc(x);
 		image->rowSize = (int *)malloc(x);
@@ -1292,9 +1279,7 @@ static ImageRec *ImageOpen(FILE *f)
 			ConvertLong(image->rowStart, x/(int)sizeof(unsigned));
 			ConvertLong((unsigned *)image->rowSize, x/(int)sizeof(int));
 		}
-    }
-	else
-	{
+    } else {
 		image->rowStart = NULL;
 		image->rowSize = NULL;
     }
@@ -1412,14 +1397,22 @@ static unsigned *read_texture(FILE *f, int *width, int *height, int *components)
 }
 
 /* Font texture conversion to mask texture */
-unsigned* texture_to_mask(unsigned* tex, int width, int height)
+unsigned int *texture_to_mask(unsigned int *tex, int width, int height)
 {
 	int nSize, i;
 	unsigned *ret;
 
 	nSize = width * height;
-	ret = (unsigned *)malloc(nSize * sizeof(unsigned));
-	for (i=0; i<nSize; i++)	ret[i] = tex[i] & 0x00ffffff ? 0 : 0x00ffffff;
+	ret = (unsigned int *) malloc(nSize * sizeof(unsigned int));
+	if (LittleEndian()) {
+		for (i = 0; i < nSize; i++) {
+			ret[i] = tex[i] & 0x00ffffff ? 0 : 0x00ffffff;
+		}
+	} else {
+		for (i = 0; i < nSize; i++) {
+			ret[i] = tex[i] & 0xffffff00 ? 0 : 0xffffff00;
+		}
+	}
 
 	return ret;
 }
@@ -1458,15 +1451,13 @@ int glfLoadBMFFont(const char *FName)
 	temp_width = (float *)malloc(sizeof(float)*256);
 
 	/* Read all 256 symbols information */
-	for (i=0; i<256; i++)
-	{
+	for (i=0; i<256; i++) {
 		fread(&tx, 4, 1, f);
 		fread(&ty, 4, 1, f);
 		fread(&tw, 4, 1, f);
 		fread(&th, 4, 1, f);
 
-		if (!LEndian)
-		{
+		if (!LEndian) {
 			tp = (unsigned char *)&tx;
 			temp = tp[0]; tp[0] = tp[3]; tp[3] = temp;
 			temp = tp[1]; tp[1] = tp[2]; tp[2] = temp;
