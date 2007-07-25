@@ -896,10 +896,9 @@ void MpGLCanvas::eventMouseLeftDoubleClick(wxMouseEvent& event) {
 	curr_mouse = event.GetPosition();
 
 	// If we're in edit mode, we display the periodic table dialog.
-	if (MolWin->HandSelected() && selected_type == MMP_NULL) {
-		if (show_periodic_dlg) {
-			MolWin->TogglePeriodicDialog();
-		}
+	if (MolWin->HandSelected() && selected_type == MMP_NULL &&
+		!show_periodic_dlg) {
+		MolWin->TogglePeriodicDialog();
 	}
 
 }
