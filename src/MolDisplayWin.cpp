@@ -463,6 +463,17 @@ MolDisplayWin::~MolDisplayWin() {
 
 	DeleteGLData();
 
+	// Since the periodic table dialog no longer has a parent, the application
+	// will stay open if the dialog is open but no MolDisplayWins are.  So,
+	// if this is the last MolDisplayWin that's open, we close the periodic
+	// dialog in order for the whole application to close.
+	MpApp& app = wxGetApp();
+	if (app.WindowCount() == 0) {
+		if (periodic_dlg) {
+			periodic_dlg->Destroy();
+		}
+	}
+
 }
 
 void MolDisplayWin::getCanvasSize(long *width, long *height) {
