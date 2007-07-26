@@ -3962,21 +3962,32 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 			if (lpCount < 3) {
 				if (bondCount == 3) {
 					//obtain the bond vector by summing the bond vectors, normalize and invert
-					CPoint3D sum(0.0,0.0,0.0), temp;
+					CPoint3D sum(0.0,0.0,0.0), temp, bonds[3];
+					int found=0;
 					for (int i=0; i<NumBonds; i++) {
 						if (lBonds[i].Atom1 == iatom) {
 							temp = lAtoms[lBonds[i].Atom2].Position - lAtoms[iatom].Position;
 							Normalize3D(&temp);
-							sum += temp;
-							Normalize3D(&sum);
+							bonds[found] = temp;
+							found++;
 						} else if (lBonds[i].Atom2 == iatom) {
 							temp = lAtoms[lBonds[i].Atom1].Position - lAtoms[iatom].Position;
 							Normalize3D(&temp);
-							sum += temp;
-							Normalize3D(&sum);
+							bonds[found] = temp;
+							found++;
 						}
 					}
-					sum *= -1.0f;
+					CrossProduct3D(&(bonds[0]),&(bonds[1]),&sum);
+					float direction = DotProduct3D(&sum,&(bonds[2]));
+					if (direction > 0.0) direction = -1.0;
+					else direction = 1.0;
+					CrossProduct3D(&(bonds[1]),&(bonds[2]),&temp);
+					sum += temp;
+					Normalize3D(&sum);
+					CrossProduct3D(&(bonds[2]),&(bonds[0]),&temp);
+					sum += temp;
+					Normalize3D(&sum);
+					sum *= direction;
 					if (site_id == 0) {
 						glLoadName(4);
 						CreateCylinderFromLine(qobj, origin,
