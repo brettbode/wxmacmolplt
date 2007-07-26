@@ -2441,6 +2441,14 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 					}
 				}
 				break;
+			case WXK_BACK:
+			case WXK_DELETE:
+				if (interactiveMode && HandSelected()) {
+					wxCommandEvent foo;
+					glCanvas->On_Delete_Single_Frame(foo);
+					return;
+				}
+				break;
 			case WXK_LEFT:
 				if (MainData->CurrentFrame>1) {
 					ChangeFrames(MainData->CurrentFrame - 1);
@@ -3312,7 +3320,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 
 	// We want to draw a circle showing the virtual sphere, but only if
 	// the scene is being rotated.
-	if (event.LeftIsDown()) { // && (!interactiveMode || ArrowSelected())) {
+	if (event.LeftIsDown()&&(event.Dragging() || !HandSelected())) { // && (!interactiveMode || ArrowSelected())) {
 		RotateMoleculeGL(Prefs->GetShowAngles() && !rotate_timer.IsRunning(),
 						 !rotate_timer.IsRunning());
 		glCanvas->SwapBuffers();

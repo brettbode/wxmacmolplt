@@ -916,7 +916,8 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 
 	mpAtom *lAtoms = mMainData->cFrame->Atoms;
 
-	// MolWin->CreateFrameSnapShot(); 
+	// MolWin->CreateFrameSnapShot();
+	leftDown = true;
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
@@ -1135,7 +1136,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 		// If we're in edit mode, the user may be trying to add an atom,
 		// possibly to a bonding site.
-		if (MolWin->HandSelected()) {
+		if (MolWin->HandSelected() && leftDown) {
 
 			// If no periodic table is shown or an atom is not selected, but
 			// the user seems to be trying to add an atom, give them a message.
@@ -1199,9 +1200,11 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 		// Since we're dealing with a click, it's likely that something was
 		// selected.
-		SelectObj(selected_type, selected, deSelectAll);
-		MolWin->SelectionChanged(deSelectAll);
-		draw();
+		if (leftDown) {
+			SelectObj(selected_type, selected, deSelectAll);
+			MolWin->SelectionChanged(deSelectAll);
+			draw();
+		}
 	}
 	
 	// If a drag occurred between two bonding sites, we pair them up with
@@ -1242,7 +1245,8 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	if (HasCapture()) {
 		ReleaseMouse();
 	}
-
+	
+	leftDown = false;
 }
 
 void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
@@ -2846,6 +2850,8 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 		lFrame->DeleteBond(selected);
 	}
 
+	MolWin->SetHighliteMode(false);
+	select_stack_top = 0;
 	MolWin->UpdateModelDisplay();
 	MolWin->AtomsChanged(true, false);
 }
