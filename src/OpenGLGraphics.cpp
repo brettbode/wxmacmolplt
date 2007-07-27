@@ -3851,17 +3851,39 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	BondOrder highestBO = kHydrogenBond;
 	long primaryBondedAtm = -1;
 	long secondaryBondedAtm = -1;
+	int bond_ids[6];
+	int bonded_atoms[6];
+
+	// The primary bond will be the bond with the highest order and it
+	// will be assumed to be the axial bond.  We traverse the bonds list
+	// and examine all that contain the atom...
 	for (long i=0; i<NumBonds; i++) {
-		if (((iatom == lBonds[i].Atom1)||(iatom == lBonds[i].Atom2))&&
+		if (((iatom == lBonds[i].Atom1) || (iatom == lBonds[i].Atom2)) &&
 			(lBonds[i].Order > kHydrogenBond)) {
+
+			// We keep track of this atom's bonds.
+			bond_ids[bondCount] = i;
+			bonded_atoms[bondCount] = (iatom == lBonds[i].Atom1) ?
+				lBonds[i].Atom2 : lBonds[i].Atom1;
 			bondCount++;
+
+			// If we have a bond of higher order, record it as such and
+			// demote the previous.
 			if (lBonds[i].Order > highestBO) {
 				highestBO = lBonds[i].Order;
 				secondaryBondedAtm = primaryBondedAtm;
 				primaryBondedAtm = (lBonds[i].Atom1 == iatom)?lBonds[i].Atom2:lBonds[i].Atom1;
-			} else if (secondaryBondedAtm < 0) {
+			}
+			
+			// Otherwise, if the order is the same or less, and we haven't
+			// seen another bond yet, record the bond as the secondary.
+			// Do we want to check that this order is sufficient?  For example,
+			// if we have bonds of order 1,1,2,2, the secondary bond will be
+			// from the second SINGLE bond.
+			else if (secondaryBondedAtm < 0) {
 				secondaryBondedAtm = (lBonds[i].Atom1 == iatom)?lBonds[i].Atom2:lBonds[i].Atom1;
 			}
+
 			if ((lBonds[i].Order > kSingleBond)&&(lBonds[i].Order <= kTripleBond)) {
 				baseHybrid -= (lBonds[i].Order - kSingleBond);
 			}
@@ -3888,7 +3910,6 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 	if (site_id == 0) {
 		glPushName(0);
-
 		glColor3f(0.9f, 0.1f, 0.1f);
 	}
 
@@ -3919,7 +3940,6 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 			}
 			break;
 		case OH_SP2:
-		{
 			if (lpCount < 2) {
 				CPoint3D v3;
 				if (bondCount >= 2) {	//Setup the 3rd vector to have an equal angle to both bonds
@@ -3955,11 +3975,12 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					}
 				}
 			}
-		}
 			break;
 		case OH_SP3:
-		{
 			if (lpCount < 3) {
+
+				// If three bonds are already formed, we calculate the fourth
+				// as the sum of the three, inverted.
 				if (bondCount == 3) {
 					//obtain the bond vector by summing the bond vectors, normalize and invert
 					CPoint3D sum(0.0,0.0,0.0), temp, bonds[3];
@@ -3995,81 +4016,86 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					} else if (site_id == 4) {
 						*vector = sum;
 					}
-				} else {
-					if (bondCount < 2) {
-						c = cos(109.5f / 180.0f * kPi);
-						s = sin(109.5f / 180.0f * kPi);
-						b = c / s - c * c / s;
-						d = sqrt(s * s - b * b);
-						CPoint3D v2, temp(0.0f, c, s), v3(-d, c, b), v4(d, c, b);
-						Rotate3DOffset(rot,temp,&v2);
-						if (site_id == 0) {
-							glLoadName(2);
-							CreateCylinderFromLine(qobj, origin,
-											   v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-						} else if (site_id == 2) {
-							*vector = v2;
-						}
-						if (lpCount < 2) {
-							temp = v3;
-							Rotate3DOffset(rot,temp,&v3);
-							if (site_id == 0) {
-								glLoadName(3);
-								CreateCylinderFromLine(qobj, origin,
-												   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-							} else if (site_id == 3) {
-								*vector = v3;
-							}
-							if (lpCount < 1) {
-								temp = v4;
-								Rotate3DOffset(rot,temp,&v4);
-								if (site_id == 0) {
-									glLoadName(4);
-									CreateCylinderFromLine(qobj, origin,
-													   v4 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-								} else if (site_id == 4) {
-									*vector = v4;
-								}
-							}
-						}
-					} else {
-						CPoint3D offset = lAtoms[secondaryBondedAtm].Position - lAtoms[iatom].Position;
-						Normalize3D(&offset);
-						CPoint3D cross;
-						CrossProduct3D(&b1Offset,&offset,&cross);
-						offset += b1Offset;
-						offset *= -1.0f;
-						Normalize3D(&offset);
-						CPoint3D v3t;
-						float c = cos(109.5f/360.0f * kPi);
-						float s = sin(109.5f/360.0f * kPi);
-						v3t = offset*c + cross*s;
-						Normalize3D(&v3t);
+				}
+				
+				// If only two bonds are already formed, we calculate the third
+				// and fourth as ....
+				else if (bondCount < 2) {
+					c = cos(109.5f / 180.0f * kPi);
+					s = sin(109.5f / 180.0f * kPi);
+					b = c / s - c * c / s;
+					d = sqrt(s * s - b * b);
+					CPoint3D v2, temp(0.0f, c, s), v3(-d, c, b), v4(d, c, b);
+					Rotate3DOffset(rot,temp,&v2);
+					if (site_id == 0) {
+						glLoadName(2);
+						CreateCylinderFromLine(qobj, origin,
+										   v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 2) {
+						*vector = v2;
+					}
+					if (lpCount < 2) {
+						temp = v3;
+						Rotate3DOffset(rot,temp,&v3);
 						if (site_id == 0) {
 							glLoadName(3);
 							CreateCylinderFromLine(qobj, origin,
-											   v3t * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+											   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
 						} else if (site_id == 3) {
-							*vector = v3t;
+							*vector = v3;
 						}
-						if (lpCount == 0) {
-							v3t = offset*c - cross*s;
-							Normalize3D(&v3t);
+						if (lpCount < 1) {
+							temp = v4;
+							Rotate3DOffset(rot,temp,&v4);
 							if (site_id == 0) {
 								glLoadName(4);
 								CreateCylinderFromLine(qobj, origin,
-												   v3t * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+												   v4 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
 							} else if (site_id == 4) {
-								*vector = v3t;
+								*vector = v4;
 							}
 						}
 					}
 				}
+				
+				// If only one bond is already formed, we calculate the 
+				// remaining three as ...
+				else {
+					CPoint3D offset = lAtoms[secondaryBondedAtm].Position - lAtoms[iatom].Position;
+					Normalize3D(&offset);
+					CPoint3D cross;
+					CrossProduct3D(&b1Offset,&offset,&cross);
+					offset += b1Offset;
+					offset *= -1.0f;
+					Normalize3D(&offset);
+					CPoint3D v3t;
+					float c = cos(109.5f/360.0f * kPi);
+					float s = sin(109.5f/360.0f * kPi);
+					v3t = offset*c + cross*s;
+					Normalize3D(&v3t);
+					if (site_id == 0) {
+						glLoadName(3);
+						CreateCylinderFromLine(qobj, origin,
+										   v3t * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 3) {
+						*vector = v3t;
+					}
+					if (lpCount == 0) {
+						v3t = offset*c - cross*s;
+						Normalize3D(&v3t);
+						if (site_id == 0) {
+							glLoadName(4);
+							CreateCylinderFromLine(qobj, origin,
+											   v3t * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+						} else if (site_id == 4) {
+							*vector = v3t;
+						}
+					}
+				}
 			}
-		}
 			break;
 		case OH_SP3D:
-		{	//Here axial and equitorial sites are different. LPs should go in axial sites first
+			//Here axial and equitorial sites are different. LPs should go in axial sites first
 			if (bondCount <= 1) {
 				b = sqrt(3.0f / 4.0f);
 				CPoint3D v2 = b1Offset*-1.0;
@@ -4108,10 +4134,8 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					*vector = v3;
 				}
 			}
-		}
 			break;
 		case OH_SP3D2:
-		{
 			if (bondCount <= 1) {
 				b = sqrt(kPi / 4.0f);
 				CPoint3D v2 = b1Offset*-1.0;
@@ -4124,6 +4148,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 				CPoint3D temp(b, 0.0f, b), v3;
 				Rotate3DOffset(rot,temp,&v3);
+				Normalize3D(&v3);
 				if (site_id == 0) {
 					glLoadName(3);
 					CreateCylinderFromLine(qobj, origin,
@@ -4133,6 +4158,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 				CPoint3D v4t(-b, 0.0f, b);
 				Rotate3DOffset(rot,v4t,&v3);
+				Normalize3D(&v3);
 				if (site_id == 0) {
 					glLoadName(4);
 					CreateCylinderFromLine(qobj, origin,
@@ -4142,6 +4168,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 				CPoint3D v5t(-b, 0.0f, -b);
 				Rotate3DOffset(rot,v5t,&v3);
+				Normalize3D(&v3);
 				if (site_id == 0) {
 					glLoadName(5);
 					CreateCylinderFromLine(qobj, origin,
@@ -4151,6 +4178,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 				CPoint3D v6t(b, 0.0f, -b);
 				Rotate3DOffset(rot,v6t,&v3);
+				Normalize3D(&v3);
 				if (site_id == 0) {
 					glLoadName(6);
 					CreateCylinderFromLine(qobj, origin,
@@ -4159,9 +4187,406 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					*vector = v3;
 				}
 			}
-		}
+
+			else if (bondCount == 2) {
+
+				// Find the two vectors from central atom to bonded atoms.  Use
+				// their dot product to determine if they're orthogonal or 
+				// otherwise.
+				CPoint3D vec1 = lAtoms[bonded_atoms[0]].Position -
+								lAtoms[iatom].Position;
+				CPoint3D vec2 = lAtoms[bonded_atoms[1]].Position -
+								lAtoms[iatom].Position;
+				Normalize3D(&vec1);
+				Normalize3D(&vec2);
+
+				float dot = DotProduct3D(&vec1, &vec2);
+
+				// If the two existing bonds are closer to being orthogonal
+				// than parallel (or antiparallel), then we have four bonds
+				// to compute.  One bond will be the inverse of the primary
+				// bond, two will be the cross product and its inverse of the
+				// two bonds, and the fourth will be another cross product, 
+				// this time using the primary bond and the first cross
+				// product.  It might make more sense to use the inverse of
+				// the secondary bond instead, but doing it this way makes at
+				// least 5 of the 6 bonds octahedrally aligned.
+				if (fabs(dot) < 0.7f) {
+					CPoint3D cross;
+					CPoint3D cross2;
+					CrossProduct3D(&vec1, &vec2, &cross);
+					Normalize3D(&cross);
+					CrossProduct3D(&vec1, &cross, &cross2);
+					Normalize3D(&cross2);
+
+					if (site_id == 0) {
+						glLoadName(3);
+						CreateCylinderFromLine(qobj, origin,
+							vec1 * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 3) {
+						*vector = vec1 * -1.0f;
+					}
+
+					if (site_id == 0) {
+						glLoadName(4);
+						CreateCylinderFromLine(qobj, origin,
+							cross2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 4) {
+						*vector = cross2 * -1.0f;
+					}
+
+					if (site_id == 0) {
+						glLoadName(5);
+						CreateCylinderFromLine(qobj, origin,
+							cross * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 5) {
+						*vector = cross;
+					}
+
+					if (site_id == 0) {
+						glLoadName(6);
+						CreateCylinderFromLine(qobj, origin,
+							cross * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 6) {
+						*vector = cross * -1.0f;
+					}
+
+				}
+
+				// Otherwise, the two existing bonds must be antiparallel.
+				// In that case, we calculate the other four bonds like so:
+				// one bond is chosen from the many that are orthogonal to
+				// the primary bond, the next is its inverse, and the last
+				// two are the crossproduct and its inverse of the primary
+				// bond and its orthogonal mate.
+				else {
+					CPoint3D ortho;
+					CPoint3D cross;
+
+					OrthoVector(vec1, ortho);
+					CrossProduct3D(&vec1, &ortho, &cross);
+					Normalize3D(&cross);
+
+					if (site_id == 0) {
+						glLoadName(3);
+						CreateCylinderFromLine(qobj, origin,
+							ortho * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 3) {
+						*vector = ortho;
+					}
+
+					if (site_id == 0) {
+						glLoadName(4);
+						CreateCylinderFromLine(qobj, origin,
+							ortho * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 4) {
+						*vector = cross * -1.0f;
+					}
+
+					if (site_id == 0) {
+						glLoadName(5);
+						CreateCylinderFromLine(qobj, origin,
+							cross * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 5) {
+						*vector = cross;
+					}
+
+					if (site_id == 0) {
+						glLoadName(6);
+						CreateCylinderFromLine(qobj, origin,
+							cross * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 6) {
+						*vector = cross * -1.0f;
+					}
+
+
+				}
+
+			}
+
+			else if (bondCount == 3) {
+
+				// Find the three vectors from central atom to bonded atoms.
+				// Use their dot product to determine if they're orthogonal or
+				// otherwise.
+				CPoint3D vec1 = lAtoms[bonded_atoms[0]].Position -
+								lAtoms[iatom].Position;
+				CPoint3D vec2 = lAtoms[bonded_atoms[1]].Position -
+								lAtoms[iatom].Position;
+				CPoint3D vec3 = lAtoms[bonded_atoms[2]].Position -
+								lAtoms[iatom].Position;
+
+				Normalize3D(&vec1);
+				Normalize3D(&vec2);
+				Normalize3D(&vec3);
+
+				float dot12 = DotProduct3D(&vec1, &vec2);
+				float dot13 = DotProduct3D(&vec1, &vec3);
+				float dot23 = DotProduct3D(&vec2, &vec3);
+
+				// If all three vectors are close to pairwise orthogonal, then
+				// they form a basis.  Unfortunately, they may not be exactly
+				// independent.  Since we want to suggest orthogonal sites, we
+				// choose the primary vector's inverse as the first site.  The
+				// second is calculated as the cross product of the primary
+				// and secondary bonds, and the third is the cross product of
+				// the primary bond and the first cross product.  This makes
+				// all three orthogonal.
+				if (fabs(dot12) < 0.7f && fabs(dot13) < 0.7f &&
+					fabs(dot23) < 0.7f) {
+
+					CPoint3D cross1, cross2;
+					CrossProduct3D(&vec1, &vec2, &cross1);
+					Normalize3D(&cross1);
+					CrossProduct3D(&vec1, &cross1, &cross2);
+					Normalize3D(&cross2);
+
+					// The cross products should point in the opposite
+					// direction of the existing bonds, so we may need to
+					// flip them since they can end up coincident with them.
+					if (DotProduct3D(&cross1, &vec3) > 0.0f) {
+						cross1 = cross1 * -1.0f;
+					}
+
+					if (DotProduct3D(&cross2, &vec2) > 0.0f) {
+						cross2 = cross2 * -1.0f;
+					}
+
+					if (site_id == 0) {
+						glLoadName(4);
+						CreateCylinderFromLine(qobj, origin,
+							vec1 * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 4) {
+						*vector = vec1 * -1.0f;
+					}
+
+					if (site_id == 0) {
+						glLoadName(5);
+						CreateCylinderFromLine(qobj, origin,
+							cross1 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 5) {
+						*vector = cross1;
+					}
+
+					if (site_id == 0) {
+						glLoadName(6);
+						CreateCylinderFromLine(qobj, origin,
+							cross2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 6) {
+						*vector = cross2;
+					}
+
+				}
+
+				// Otherwise, two of the three bonds are antiparallel.  In this
+				// case, we figure out which bond doesn't have an inverse and
+				// one that does.  The first suggested bond is the inverse of
+				// the unopposed bond, and the second and third are the cross
+				// product and its inverse of the unpaired bond and one of the
+				// paired bonds.
+				else {
+					CPoint3D paired_vec;
+					CPoint3D ortho_vec;
+
+					if (dot12 < -0.7f) {
+						paired_vec = vec1;
+						ortho_vec = vec3;
+					} else if (dot13 < -0.7f) {
+						paired_vec = vec1;
+						ortho_vec = vec2;
+					} else {
+						paired_vec = vec3;
+						ortho_vec = vec1;
+					}
+
+					CPoint3D cross;
+					CrossProduct3D(&paired_vec, &ortho_vec, &cross);
+					Normalize3D(&cross);
+
+					if (site_id == 0) {
+						glLoadName(4);
+						CreateCylinderFromLine(qobj, origin,
+							ortho_vec * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 4) {
+						*vector = ortho_vec * -1.0f;
+					}
+
+					if (site_id == 0) {
+						glLoadName(5);
+						CreateCylinderFromLine(qobj, origin,
+							cross * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 5) {
+						*vector = cross;
+					}
+
+					if (site_id == 0) {
+						glLoadName(6);
+						CreateCylinderFromLine(qobj, origin,
+							cross * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 6) {
+						*vector = cross * -1.0f;
+					}
+
+				}
+
+			}
+
+			else if (bondCount == 4) {
+
+				// Find the three vectors from central atom to bonded atoms.
+				// Use their dot product to determine if they're orthogonal or
+				// otherwise.
+				CPoint3D vecs[4];
+				vecs[0] = lAtoms[bonded_atoms[0]].Position -
+						  lAtoms[iatom].Position;
+				vecs[1] = lAtoms[bonded_atoms[1]].Position -
+					 	  lAtoms[iatom].Position;
+				vecs[2] = lAtoms[bonded_atoms[2]].Position -
+						  lAtoms[iatom].Position;
+				vecs[3] = lAtoms[bonded_atoms[3]].Position -
+						  lAtoms[iatom].Position;
+
+				Normalize3D(&vecs[0]);
+				Normalize3D(&vecs[1]);
+				Normalize3D(&vecs[2]);
+				Normalize3D(&vecs[3]);
+
+				float dot12 = DotProduct3D(&vecs[0], &vecs[2]);
+				float dot13 = DotProduct3D(&vecs[0], &vecs[3]);
+				float dot14 = DotProduct3D(&vecs[0], &vecs[4]);
+
+				int i, j;
+				int nuninverted = 0;
+				int uninverted[2];
+				int ortho1 = -1, ortho2 = -1;
+				bool has_no_inverse;
+
+				for (i = 0; i < 4; i++) {
+					has_no_inverse = true;
+					for (j = 0; j < 4; j++) {
+						if (i != j) {
+							if (DotProduct3D(&vecs[i], &vecs[j]) < -0.7f) {
+								has_no_inverse = false;
+								break;
+							} else {
+								ortho1 = i;
+								ortho2 = j;
+							}
+						}
+					}
+					if (has_no_inverse) {
+						uninverted[nuninverted] = i;
+						nuninverted++;
+					}
+				}
+
+				if (nuninverted == 2) {
+					if (site_id == 0) {
+						glLoadName(5);
+						CreateCylinderFromLine(qobj, origin,
+							vecs[uninverted[0]] * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 5) {
+						*vector = vecs[uninverted[0]] * -1.0f;
+					}
+
+					if (site_id == 0) {
+						glLoadName(6);
+						CreateCylinderFromLine(qobj, origin,
+							vecs[uninverted[1]] * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 6) {
+						*vector = vecs[uninverted[1]] * -1.0f;
+					}
+				}
+				
+				else {
+					CPoint3D cross;
+					CrossProduct3D(&vecs[ortho1], &vecs[ortho2], &cross);
+					Normalize3D(&cross);
+
+					if (site_id == 0) {
+						glLoadName(5);
+						CreateCylinderFromLine(qobj, origin,
+							cross * 2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 5) {
+						*vector = cross;
+					}
+
+					if (site_id == 0) {
+						glLoadName(6);
+						CreateCylinderFromLine(qobj, origin,
+							cross * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 6) {
+						*vector = cross * -1.0f;
+					}
+				}
+
+			}
+
+			else if (bondCount == 5) {
+
+				// Find the three vectors from central atom to bonded atoms.
+				// Use their dot product to determine if they're orthogonal or
+				// otherwise.
+				CPoint3D vecs[5];
+				vecs[0] = lAtoms[bonded_atoms[0]].Position -
+						  lAtoms[iatom].Position;
+				vecs[1] = lAtoms[bonded_atoms[1]].Position -
+					 	  lAtoms[iatom].Position;
+				vecs[2] = lAtoms[bonded_atoms[2]].Position -
+						  lAtoms[iatom].Position;
+				vecs[3] = lAtoms[bonded_atoms[3]].Position -
+						  lAtoms[iatom].Position;
+				vecs[4] = lAtoms[bonded_atoms[4]].Position -
+						  lAtoms[iatom].Position;
+
+				Normalize3D(&vecs[0]);
+				Normalize3D(&vecs[1]);
+				Normalize3D(&vecs[2]);
+				Normalize3D(&vecs[3]);
+				Normalize3D(&vecs[4]);
+
+				int i, j;
+				int uninverted = -1;
+				bool has_no_inverse;
+
+				for (i = 0; i < 5; i++) {
+					has_no_inverse = true;
+					for (j = 0; j < 5; j++) {
+						if (i != j) {
+							if (DotProduct3D(&vecs[i], &vecs[j]) < -0.7f) {
+								has_no_inverse = false;
+								break;
+							}
+						}
+					}
+					if (has_no_inverse) {
+						uninverted = i;
+						break;
+					}
+				}
+
+				if (uninverted != -1) {
+					if (site_id == 0) {
+						glLoadName(6);
+						CreateCylinderFromLine(qobj, origin,
+							vecs[uninverted] * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 6) {
+						*vector = vecs[uninverted] * -1.0f;
+					}
+				} else {
+					if (site_id == 0) {
+						glLoadName(6);
+						CreateCylinderFromLine(qobj, origin,
+							vecs[0] * -2.0f * radius, CYL_RADIUS, 10, 1, true);
+					} else if (site_id == 6) {
+						*vector = vecs[0] * -1.0f;
+					}
+				}
+			}
+
 			break;
 	}
+
 	if (site_id == 0) {
 		glPopName();
 	}
