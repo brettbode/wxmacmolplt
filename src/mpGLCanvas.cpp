@@ -976,13 +976,18 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 	testPicking(curr_mouse.x, curr_mouse.y);
 
 	if (selected_type == MMP_ATOM) {
+
+		// If the clicked-on atom wasn't selected, let's select it.  Otherwise
+		// another atom may be selected while we're operating on an unselected
+		// one, which is odd.
+		if (!lFrame->GetAtomSelection(selected)) {
+			SelectObj(selected_type, selected, deSelectAll);
+			MolWin->SelectionChanged(deSelectAll);
+			MolWin->UpdateGLModel();
+			draw();
+		}
+
 		if (MolWin->HandSelected()) {
-			if (!lFrame->GetAtomSelection(selected)) {
-				SelectObj(selected_type, selected, deSelectAll);
-				MolWin->SelectionChanged(deSelectAll);
-				MolWin->UpdateGLModel();
-				draw();
-			}
 			interactPopupMenu(curr_mouse.x, curr_mouse.y, 1);
 		} else {
 			measurePopupMenu(curr_mouse.x, curr_mouse.y);
