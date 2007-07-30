@@ -49,5 +49,6 @@ void JacobiDiagonalization(double * Matrix, double * EigenVectors, long Dimensio
 double EPSLON(double x);
 void ProjectToPlane(const CPoint3D& normal, const CPoint3D& origin, CPoint3D& pt);
 void RotateAroundAxis(Matrix4D m, const CPoint3D& axis, float degrees);
+void OrthoVector(const CPoint3D& base_vec, CPoint3D& ortho_vec);
 
 #endif /*__MATH3D__*/

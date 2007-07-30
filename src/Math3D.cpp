@@ -765,3 +765,28 @@ void ProjectToPlane(const CPoint3D& normal, const CPoint3D& origin, CPoint3D& pt
 	pt = pt - normal * dist;
 
 }
+
+void OrthoVector(const CPoint3D& base_vec, CPoint3D& ortho_vec) {
+
+	// This function finds a vector orthogonal to another.  There are
+	// infinitely many choices, but we choose one that can be calculated
+	// simply.  It's assumed that base_vec is non-zero.  The returned
+	// ortho_vec is normalized.
+
+	ortho_vec = CPoint3D(1.0f, 1.0f, 1.0f);
+
+	if (base_vec.x != 0.0f) {
+		ortho_vec.x = -(base_vec.y + base_vec.z) / base_vec.x;
+	}
+
+	else if (base_vec.y != 0.0f) {
+		ortho_vec.x = -(base_vec.x + base_vec.z) / base_vec.y;
+	}
+
+	else if (base_vec.z != 0.0f) {
+		ortho_vec.x = -(base_vec.x + base_vec.y) / base_vec.z;
+	}
+
+	Normalize3D(&ortho_vec);
+
+}
