@@ -4577,6 +4577,9 @@ long SetAtomType(const unsigned char *TestLabel) {
 				case 'u':			/* Ruthenium */
 					result = 44;
 					break;
+				case 'g':
+					result = 111;	//Roentgenium
+					break;
 				case 'h':			/* Rhodium */
 					result = 45;
 					break;
@@ -4640,6 +4643,9 @@ long SetAtomType(const unsigned char *TestLabel) {
 					break;
 				case 'b':
 					result = 105;
+					break;
+				case 's':	//Darmstadtium
+					result = 110;
 					break;
 			}
 			break;
