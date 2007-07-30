@@ -1400,18 +1400,18 @@ static unsigned *read_texture(FILE *f, int *width, int *height, int *components)
 unsigned int *texture_to_mask(unsigned int *tex, int width, int height)
 {
 	int nSize, i;
+	unsigned int mask;
 	unsigned *ret;
 
 	nSize = width * height;
 	ret = (unsigned int *) malloc(nSize * sizeof(unsigned int));
-	if (LittleEndian()) {
-		for (i = 0; i < nSize; i++) {
-			ret[i] = tex[i] & 0x00ffffff ? 0 : 0x00ffffff;
-		}
-	} else {
-		for (i = 0; i < nSize; i++) {
-			ret[i] = tex[i] & 0xffffff00 ? 0 : 0xffffff00;
-		}
+
+	// The literal is ordered internally according to the architecture, but tex
+	// is an array of four color channels which may be in a different order.
+	mask = LittleEndian() ? 0x00ffffff : mask = 0xffffff00;
+
+	for (i = 0; i < nSize; i++) {
+		ret[i] = tex[i] & mask ? 0 : mask;
 	}
 
 	return ret;
