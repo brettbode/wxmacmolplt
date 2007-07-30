@@ -3953,9 +3953,40 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					b = sqrt(3.0f / 4.0f);
 					CPoint3D v2(-b, -0.5f, 0.0f), temp(b, -0.5f, 0.0f);
 					Rotate3DOffset(rot,temp,&v3);
+					temp = v2;
+					Rotate3DOffset(rot,temp,&v2);
+					//When dealing with a single bond check the bonded atom for bonds and align them as
+					//appropriate
+					if (bondCount == 1) {
+						bool test = false;
+						CPoint3D OtherBondVector;
+						for (long i=0; i<NumBonds; i++) {
+							if ((primaryBondedAtm == lBonds[i].Atom1)&&(lBonds[i].Order > kHydrogenBond)&&
+								(lBonds[i].Atom2 != iatom)) {
+								OtherBondVector = lAtoms[lBonds[i].Atom2].Position - lAtoms[primaryBondedAtm].Position;
+								test = true;
+								break;
+							} else if ((primaryBondedAtm == lBonds[i].Atom2)&&(lBonds[i].Order > kHydrogenBond)&&
+									   (lBonds[i].Atom1 != iatom)) {
+								OtherBondVector = lAtoms[lBonds[i].Atom1].Position - lAtoms[primaryBondedAtm].Position;
+								test = true;
+								break;
+							}
+						}
+						if (test) {
+							Normalize3D(&OtherBondVector);
+							float dp = DotProduct3D(&OtherBondVector, &b1Offset);
+							if (fabs(dp) < 0.99) {
+								CPoint3D cross;
+								CrossProduct3D(&b1Offset, &OtherBondVector, &cross);
+								Normalize3D(&cross);
+								CrossProduct3D(&b1Offset, &cross, &OtherBondVector);
+								v2 = b1Offset*-0.5 + OtherBondVector*-0.866025;
+								v3 = b1Offset*-0.5 + OtherBondVector*0.866025;
+							}
+						}
+					}
 					if (bondCount <= 1) {
-						temp = v2;
-						Rotate3DOffset(rot,temp,&v2);
 						if (site_id == 0) {
 							glLoadName(2);
 							CreateCylinderFromLine(qobj, origin,

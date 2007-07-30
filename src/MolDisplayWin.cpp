@@ -1990,6 +1990,12 @@ void MolDisplayWin::menuBuilderInteractive_mode(wxCommandEvent &event)
 		toolbar->AddSeparator();
 		toolbar->Realize();
 
+		if (!periodic_dlg) {
+			wxRect window_rect = GetRect();
+			periodic_dlg = new PeriodicTableDlg(
+												wxT("Periodic Table"), window_rect.x + window_rect.width,
+												window_rect.y + 22);
+		}
 	} else {
 		delete toolbar;
 		toolbar = NULL;
@@ -2478,6 +2484,13 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 			case WXK_END:
 				if (MainData->CurrentFrame<MainData->NumFrames) {
 					ChangeFrames(MainData->NumFrames);
+				}
+				break;
+			default:
+				if (interactiveMode && HandSelected()) {
+					//Pass general chars to the periodic table to set the atom type
+					periodic_dlg->KeyHandler(event);
+					return; //I don't think there is any reason to skip on this case?
 				}
 				break;
 		}
@@ -3560,6 +3573,7 @@ void MolDisplayWin::TogglePeriodicDialog(void) {
 
 	if (show_periodic_dlg) {
 		if (periodic_dlg) {
+			periodic_dlg->Show();
 			periodic_dlg->Raise();
 		} else {
 			wxRect window_rect = GetRect();
@@ -3570,7 +3584,7 @@ void MolDisplayWin::TogglePeriodicDialog(void) {
 		}
 		((MpApp &) wxGetApp()).AdjustAllMenus();
 	} else {
-		periodic_dlg->Destroy();
+		periodic_dlg->Hide();
 	}
 } 
 

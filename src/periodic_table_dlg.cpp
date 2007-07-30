@@ -21,6 +21,7 @@ IMPLEMENT_DYNAMIC_CLASS(PeriodicTableDlg, wxMiniFrame)
 
 BEGIN_EVENT_TABLE(PeriodicTableDlg, wxMiniFrame)
 	EVT_BUTTON(wxID_ANY, PeriodicTableDlg::ElementSelected)
+	EVT_CHAR (PeriodicTableDlg::KeyHandler)
 END_EVENT_TABLE()
 
 /* ------------------------------------------------------------------------- */
@@ -66,6 +67,7 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 
 	/* No element has been selected yet. */
 	prev_id = -1;
+	keyBuffer[0] = keyBuffer[1] = keyBuffer[2] = '/0';
 
 	// elements = (element_t *) malloc(sizeof(element_t) * nelements); 
 	elements = new element_t[nelements];
@@ -129,6 +131,8 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 	delete font;
 	delete mem_dc;
 
+	wxCommandEvent foo(0, 6-1);
+	ElementSelected(foo);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -174,15 +178,38 @@ void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
 	}
 
 	// If the user has selected the same button, we want to turn it off.
-   	else {
-		elements[id].button->SetBitmapLabel(*(elements[id].off_bmp));
-		prev_id = -1;
-	}
+//   	else {
+//		elements[id].button->SetBitmapLabel(*(elements[id].off_bmp));
+//		prev_id = -1;
+//	}
 
 	Refresh();
 
 }
-
+#include "myFiles.h"
+void PeriodicTableDlg::KeyHandler(wxKeyEvent & event) {
+	if (!event.HasModifiers()) {
+		int key = event.GetKeyCode();
+		if (isalpha(key)) {
+			int id = -1;
+			if (secondKeytimer.Time() < 400) {
+				keyBuffer[1] = key;
+				//if less than three seconds try to interpert as the 2nd letter of a two letter element symbol
+				id = SetAtomType(keyBuffer);
+			}
+			if (id < 0) {	//interpert as the first letter of an element symbol
+				keyBuffer[0] = key;
+				keyBuffer[1] = '\0';
+				id = SetAtomType(keyBuffer);
+				secondKeytimer.Start();	//start the timer for a 2nd keystroke
+			}
+			if (id > 0) {
+				wxCommandEvent foo(0, id-1);
+				ElementSelected(foo);
+			}
+		}
+	}
+}	
 /* ------------------------------------------------------------------------- */
 
 int PeriodicTableDlg::GetSelectedID(void) {

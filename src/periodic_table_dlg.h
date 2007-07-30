@@ -57,10 +57,12 @@ class PeriodicTableDlg: public wxMiniFrame {
 
 		void New(wxCommandEvent& WXUNUSED(event));
 		int GetSelectedID(void);
-		/* MolDisplayWin *GetParent() {return parent;}; */
 		static void NumberToTableCoords(int atomic_number, int *row, int *col);
+		void KeyHandler(wxKeyEvent &event);
 
 	private:
+		wxStopWatch	secondKeytimer;
+		unsigned char keyBuffer[3];
 		wxButton *button;
 		element_t *elements;
 		int nelements;
