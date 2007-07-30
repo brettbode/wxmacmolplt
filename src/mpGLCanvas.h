@@ -116,7 +116,6 @@ class MpGLCanvas : public wxGLCanvas {
 		int selected;           // Id of object clicked on, -1 if invalid
 		int selected_type;      // Type of object clicked on
 		int selected_site;      // Id of bond site clicked on, -1 if no site
-		bool stale_click;       // True if previous mouse pos is invalid
 		wxPoint curr_mouse;     // Current mouse position
 		wxPoint prev_mouse;     // Previous mouse position
 		int site_clicked_on;    // Id of bonding site clicked on by user
@@ -125,6 +124,9 @@ class MpGLCanvas : public wxGLCanvas {
 		int height;             // Height of canvas in pixels
 		int ndrag_events;       // Number of drag events in current drag
 		bool is_depth_zooming;  // True if user is changing atom's depth
+		bool window_just_focused; // Flag indicating window getting focus
+		wxStopWatch mouse_activate_timer;
+		bool ignore_next_up;
 
 	public:
 		/**
@@ -295,6 +297,7 @@ class MpGLCanvas : public wxGLCanvas {
 		void eventMouseRightWentDown(wxMouseEvent& event);
 		void eventMouseLeftWentDown(wxMouseEvent& event);
 		void eventMouseLeaveWindow(wxMouseEvent& event);
+		void eventWindowActivated(wxActivateEvent& event);
 		void eventMouseLeftDoubleClick(wxMouseEvent& event);
 		void eventMouseWheel(wxMouseEvent& event);
 

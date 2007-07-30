@@ -233,10 +233,15 @@ class MolDisplayWin : public wxFrame {
 		wxPoint inertia;
 
 		bool show_bond_sites;
+		bool window_just_focused;
 
 		void OnToggleTool(wxCommandEvent& event);
 		void OnStatusTimer(wxTimerEvent& event);
 		void OnRotateTimer(wxTimerEvent& event);
+
+		void eventMouseRightWentUp(wxMouseEvent& event);
+		void eventMouseMiddleWentUp(wxMouseEvent& event);
+		void eventMouseLeftWentUp(wxMouseEvent& event);
 
 		DECLARE_EVENT_TABLE()
 
@@ -499,6 +504,7 @@ class MolDisplayWin : public wxFrame {
 		void CreateFrameSnapShot(void);
 		void TogglePeriodicDialog();
 		WinPrefs *GetPrefs(void) {return Prefs;}
+		bool JustFocused(void);
 };
 
 class MolPrintOut : public wxPrintout {

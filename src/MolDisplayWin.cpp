@@ -293,6 +293,11 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 	EVT_ACTIVATE(MolDisplayWin::OnActivate)
 	EVT_TOOL_RANGE(MMP_TOOL_ARROW, MMP_TOOL_HAND, MolDisplayWin::OnToggleTool)
+
+	EVT_LEFT_UP(MolDisplayWin::eventMouseLeftWentUp)
+	EVT_RIGHT_UP(MolDisplayWin::eventMouseRightWentUp)
+	EVT_MIDDLE_UP(MolDisplayWin::eventMouseMiddleWentUp)
+
 END_EVENT_TABLE()
 
 //Local use class to hold data during the animation of normal modes
@@ -388,7 +393,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
 	mHighliteState = false;
 	interactiveMode = false;
-	stale_click = true;
+	window_just_focused = false;
 	mAltModifyingToolBar = false;
 
 	toolbar = NULL;
@@ -502,18 +507,24 @@ void MolDisplayWin::OnMenuOpen(wxMenuEvent & event) {
 	StopAnimations();
 	event.Skip();
 }
+
 void MolDisplayWin::OnKillFocus(wxFocusEvent & event) {
 	StopAnimations();
 	event.Skip();
 }
+
 void MolDisplayWin::OnActivate(wxActivateEvent & event) {
-	if (!event.GetActive()) {
-		StopAnimations();
+	if (event.GetActive()) {
+		window_just_focused = true;
+		glCanvas->eventWindowActivated(event);
 	} else {
-		stale_click = true;
-		// glCanvas->eventActivate(event); 
+		StopAnimations();
 	}
 	event.Skip();
+}
+
+bool MolDisplayWin::JustFocused(void) {
+	return window_just_focused;
 }
 
 void MolDisplayWin::StopAnimations(void) {
@@ -3220,11 +3231,9 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 		if (rotate_timer.IsRunning()) {
 			rotate_timer.Stop();
 		}
-		// std::cout << "button down" << std::endl; 
-	} else if (stale_click) {
+	} else if (window_just_focused) {
 		mouse_start = ScreenToClient(wxGetMousePosition());
-		stale_click = false;
-		// std::cout << "button down" << std::endl; 
+		window_just_focused = false;
 	} else if (event.Dragging()) {
 		// main drag
 		q = event.GetPosition();
@@ -3564,3 +3573,15 @@ void MolDisplayWin::TogglePeriodicDialog(void) {
 		periodic_dlg->Destroy();
 	}
 } 
+
+void MolDisplayWin::eventMouseMiddleWentUp(wxMouseEvent& event) {
+	std::cout << "window_just_focused: " << window_just_focused << std::endl;
+}
+
+void MolDisplayWin::eventMouseLeftWentUp(wxMouseEvent& event) {
+	std::cout << "window_just_focused: " << window_just_focused << std::endl;
+}
+
+void MolDisplayWin::eventMouseRightWentUp(wxMouseEvent& event) {
+	std::cout << "window_just_focused: " << window_just_focused << std::endl;
+}

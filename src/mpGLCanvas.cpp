@@ -61,7 +61,8 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 	oldSelect = -1;
 	mDragWin = NULL;
 	select_stack_top = 0;
-	// stale_click = false; 
+	// window_just_focused = false; 
+	ignore_next_up = false;
 	
 	selected = -1;
 	selected_type = MMP_NULL;
@@ -903,13 +904,15 @@ void MpGLCanvas::eventMouseLeftDoubleClick(wxMouseEvent& event) {
 
 }
 
+void MpGLCanvas::eventWindowActivated(wxActivateEvent& event) {
+	if (event.GetActive()) {
+		mouse_activate_timer.Start();
+		ignore_next_up = true;
+	}
+	event.Skip();
+}
+
 // void MpGLCanvas::eventMouseLeaveWindow(wxMouseEvent& event) { 
-
-	// If the mouse left the window, we want to invalidate the previous mouse
-	// position, since using an irrelevant position may throw off some 
-	// calculations.
-	// stale_click = true; 
-
 // } 
 
 void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
@@ -917,7 +920,16 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 	mpAtom *lAtoms = mMainData->cFrame->Atoms;
 
 	// MolWin->CreateFrameSnapShot();
-	leftDown = true;
+	// std::cout << "left mouse went down" << std::endl; 
+	
+	long time_between = mouse_activate_timer.Time();
+	if (time_between < 10) {
+		ignore_next_up = true;
+		return;
+	}
+	ignore_next_up = false;
+
+	// leftDown = true; 
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
@@ -1140,8 +1152,9 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	else if (ndrag_events >= 0 && ndrag_events < 3) {
 
 		// If we're in edit mode, the user may be trying to add an atom,
-		// possibly to a bonding site.
-		if (MolWin->HandSelected() && leftDown) {
+		// possibly to a bonding site.  However, if the mouse click was part
+		// of bringing the window to focus, we don't add anything.
+		if (MolWin->HandSelected() && !ignore_next_up) {
 
 			// If no periodic table is shown or an atom is not selected, but
 			// the user seems to be trying to add an atom, give them a message.
@@ -1205,11 +1218,10 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 		// Since we're dealing with a click, it's likely that something was
 		// selected.
-		if (leftDown) {
-			SelectObj(selected_type, selected, deSelectAll);
-			MolWin->SelectionChanged(deSelectAll);
-			draw();
-		}
+		SelectObj(selected_type, selected, deSelectAll);
+		MolWin->SelectionChanged(deSelectAll);
+		draw();
+
 	}
 	
 	// If a drag occurred between two bonding sites, we pair them up with
@@ -1251,6 +1263,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		ReleaseMouse();
 	}
 	
+	ignore_next_up = false;
 	leftDown = false;
 }
 
@@ -2904,6 +2917,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MIDDLE_DOWN(MpGLCanvas::eventMouseMiddleWentDown)
 	EVT_MOTION(MpGLCanvas::eventMouseDragging)
 	// EVT_LEAVE_WINDOW(MpGLCanvas::eventMouseLeaveWindow) 
+	EVT_ACTIVATE(MpGLCanvas::eventWindowActivated)
 	EVT_LEFT_UP(MpGLCanvas::eventMouseLeftWentUp)
 	EVT_RIGHT_UP(MpGLCanvas::eventMouseRightWentUp)
 	EVT_MIDDLE_UP(MpGLCanvas::eventMouseMiddleWentUp)
