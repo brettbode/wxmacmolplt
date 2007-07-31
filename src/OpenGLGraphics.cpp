@@ -4026,13 +4026,15 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 						}
 					}
 					CrossProduct3D(&(bonds[0]),&(bonds[1]),&sum);
+					Normalize3D(&sum);
 					float direction = DotProduct3D(&sum,&(bonds[2]));
 					if (direction > 0.0) direction = -1.0;
 					else direction = 1.0;
 					CrossProduct3D(&(bonds[1]),&(bonds[2]),&temp);
+					Normalize3D(&temp);
 					sum += temp;
-					Normalize3D(&sum);
 					CrossProduct3D(&(bonds[2]),&(bonds[0]),&temp);
+					Normalize3D(&temp);
 					sum += temp;
 					Normalize3D(&sum);
 					sum *= direction;
@@ -4045,14 +4047,13 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					}
 				}
 				
-				// If only two bonds are already formed, we calculate the third
+				// If only one bond is already formed, we calculate the second, third
 				// and fourth as ....
 				else if (bondCount < 2) {
-					c = cos(109.5f / 180.0f * kPi);
-					s = sin(109.5f / 180.0f * kPi);
-					b = c / s - c * c / s;
-					d = sqrt(s * s - b * b);
-					CPoint3D v2, temp(0.0f, c, s), v3(-d, c, b), v4(d, c, b);
+					c = -1.0f/3.0f;	//cos(109.5)
+					s = sqrt(1.0f-(c*c)); //sin(109.5)
+					b = s * sin(kPi/3.0);
+					CPoint3D v2, temp(0.0f, c, s), v3(b, c, -0.5*s), v4(-b, c, -0.5*s);
 					Rotate3DOffset(rot,temp,&v2);
 					if (site_id == 0) {
 						glLoadName(2);
@@ -4085,8 +4086,8 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					}
 				}
 				
-				// If only one bond is already formed, we calculate the 
-				// remaining three as ...
+				// If two bonds is already formed, we calculate the 
+				// remaining two as ...
 				else {
 					CPoint3D offset = lAtoms[secondaryBondedAtm].Position - lAtoms[iatom].Position;
 					Normalize3D(&offset);
@@ -4095,9 +4096,10 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					offset += b1Offset;
 					offset *= -1.0f;
 					Normalize3D(&offset);
+					Normalize3D(&cross);
 					CPoint3D v3t;
-					float c = cos(109.5f/360.0f * kPi);
-					float s = sin(109.5f/360.0f * kPi);
+					float c = cos(0.5*acos(-1.0f/3.0f));	//cos(109.5/2)
+					float s = sqrt(1.0f-(c*c)); //sin(109.5/2)
 					v3t = offset*c + cross*s;
 					Normalize3D(&v3t);
 					if (site_id == 0) {
