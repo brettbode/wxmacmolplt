@@ -294,10 +294,6 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_ACTIVATE(MolDisplayWin::OnActivate)
 	EVT_TOOL_RANGE(MMP_TOOL_ARROW, MMP_TOOL_HAND, MolDisplayWin::OnToggleTool)
 
-	EVT_LEFT_UP(MolDisplayWin::eventMouseLeftWentUp)
-	EVT_RIGHT_UP(MolDisplayWin::eventMouseRightWentUp)
-	EVT_MIDDLE_UP(MolDisplayWin::eventMouseMiddleWentUp)
-
 END_EVENT_TABLE()
 
 //Local use class to hold data during the animation of normal modes
@@ -3584,15 +3580,3 @@ void MolDisplayWin::TogglePeriodicDialog(void) {
 		periodic_dlg->Hide();
 	}
 } 
-
-void MolDisplayWin::eventMouseMiddleWentUp(wxMouseEvent& event) {
-	std::cout << "window_just_focused: " << window_just_focused << std::endl;
-}
-
-void MolDisplayWin::eventMouseLeftWentUp(wxMouseEvent& event) {
-	std::cout << "window_just_focused: " << window_just_focused << std::endl;
-}
-
-void MolDisplayWin::eventMouseRightWentUp(wxMouseEvent& event) {
-	std::cout << "window_just_focused: " << window_just_focused << std::endl;
-}

@@ -239,10 +239,6 @@ class MolDisplayWin : public wxFrame {
 		void OnStatusTimer(wxTimerEvent& event);
 		void OnRotateTimer(wxTimerEvent& event);
 
-		void eventMouseRightWentUp(wxMouseEvent& event);
-		void eventMouseMiddleWentUp(wxMouseEvent& event);
-		void eventMouseLeftWentUp(wxMouseEvent& event);
-
 		DECLARE_EVENT_TABLE()
 
 	public:
