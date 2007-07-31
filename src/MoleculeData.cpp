@@ -200,6 +200,7 @@ void MoleculeData::GetRotationMatrix(Matrix4D copy) {
 	CopyMatrix(TotalRotation, copy);
 }
 
+#include <iostream>
 //routine calculates the cartesian center of the molecule and offsets the 
 //coordinate system of the window to match the moleculer center.
 void MoleculeData::CenterModelWindow(void) {
@@ -318,6 +319,24 @@ void MoleculeData::AtomAdded(void) {
 		if (!RotCoords || !zBuffer) throw MemoryError();
 		MaxAtoms = cFrame->AtomAllocation;
 	}
+	float	XMin, XMax, YMin, YMax, ZMin, ZMax;
+	//first set the Min and Max to big and small values
+	XMin=YMin=ZMin=1.0E10;
+	XMax=YMax=ZMax=-1.0E10;
+	
+	for (long iatom=0; iatom<cFrame->NumAtoms; iatom++) {
+		XMin = MIN(XMin, cFrame->Atoms[iatom].Position.x);
+		XMax = MAX(XMax, cFrame->Atoms[iatom].Position.x);
+		YMin = MIN(YMin, cFrame->Atoms[iatom].Position.y);
+		YMax = MAX(YMax, cFrame->Atoms[iatom].Position.y);
+		ZMin = MIN(ZMin, cFrame->Atoms[iatom].Position.z);
+		ZMax = MAX(ZMax, cFrame->Atoms[iatom].Position.z);
+	}
+	//Recompute the maximum width of the molecule
+	MaxSize = MAX(MaxSize, (XMax-XMin));
+	MaxSize = MAX(MaxSize, (YMax-YMin));
+	MaxSize = MAX(MaxSize, (ZMax-ZMin));
+
 	if (IntCoords) {
 		MOPacInternals * mInts = IntCoords->GetMOPacStyle();
 		if (mInts) mInts->AddAtom(this);
