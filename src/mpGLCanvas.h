@@ -134,8 +134,8 @@ class MpGLCanvas : public wxGLCanvas {
 		int selected_site;      // Id of bond site clicked on, -1 if no site
 		wxPoint curr_mouse;     // Current mouse position
 		wxPoint prev_mouse;     // Previous mouse position
-		int site_clicked_on;    // Id of bonding site clicked on by user
-		int site_atom;          // Atom connected to clicked on site
+		int first_site_clicked; // Id of bonding site clicked on by user
+		int first_atom_clicked; // Atom connected to clicked on site
 		int width;              // Width of canvas in pixels
 		int height;             // Height of canvas in pixels
 		int ndrag_events;       // Number of drag events in current drag
