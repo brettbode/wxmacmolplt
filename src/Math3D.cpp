@@ -780,11 +780,11 @@ void OrthoVector(const CPoint3D& base_vec, CPoint3D& ortho_vec) {
 	}
 
 	else if (base_vec.y != 0.0f) {
-		ortho_vec.x = -(base_vec.x + base_vec.z) / base_vec.y;
+		ortho_vec.y = -(base_vec.x + base_vec.z) / base_vec.y;
 	}
 
 	else if (base_vec.z != 0.0f) {
-		ortho_vec.x = -(base_vec.x + base_vec.y) / base_vec.z;
+		ortho_vec.z = -(base_vec.x + base_vec.y) / base_vec.z;
 	}
 
 	Normalize3D(&ortho_vec);
