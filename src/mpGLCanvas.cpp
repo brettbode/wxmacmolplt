@@ -67,8 +67,8 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 	selected = -1;
 	selected_type = MMP_NULL;
 	selected_site = -1;
-	site_clicked_on = -1;
-	site_atom = -1;
+	first_site_clicked = -1;
+	first_atom_clicked = -1;
 	ndrag_events = 0;
 
 	//Hmm is this the right spot to initialize our GL settings?
@@ -957,8 +957,8 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 			winDiffX = curr_mouse.x - (int) tmpWinX;
 			winDiffY = curr_mouse.y - (int) tmpWinY;
 
-			site_clicked_on = selected_site;
-			site_atom = selected;
+			first_site_clicked = selected_site;
+			first_atom_clicked = selected;
 		}
 	} 
 
@@ -1228,20 +1228,21 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	
 	// If a drag occurred between two bonding sites, we pair them up with
 	// a bond.
-	else if (MolWin->HandSelected() && site_clicked_on >= 0) {
+	else if (MolWin->HandSelected() && first_site_clicked >= 0) {
 		testPicking(curr_mouse.x, curr_mouse.y);
-		if (selected_site >= 0 && selected_site != site_clicked_on) {
-			int ibond = lFrame->BondExists(site_atom, selected);
+		if (selected != first_atom_clicked ||
+			selected_site >= 0 && selected_site != first_site_clicked) {
+			int ibond = lFrame->BondExists(first_atom_clicked, selected);
 			if (ibond >=0) {
 				int t = lFrame->GetBondOrder(ibond);
 				if (t <= kTripleBond) t ++;
 				lFrame->SetBondOrder(ibond, (BondOrder) t);
 			} else {
 				MolWin->CreateFrameSnapShot();
-				lFrame->AddBond(site_atom, selected);
+				lFrame->AddBond(first_atom_clicked, selected);
 			}
 		}
-		site_clicked_on = -1;
+		first_site_clicked = -1;
 		draw();
 	}
 	
