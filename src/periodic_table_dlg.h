@@ -30,8 +30,9 @@
 #ifndef __MyTypes__
 #include "MyTypes.h"
 #endif
-//#include "mpGLCanvas.h"
 #include "Prefs.h"
+
+#define kNumTableElements	112
 
 /* ------------------------------------------------------------------------- */
 /* TYPES                                                                     */
@@ -56,13 +57,17 @@ class PeriodicTableDlg: public wxMiniFrame {
 		~PeriodicTableDlg();
 
 		void New(wxCommandEvent& WXUNUSED(event));
-		int GetSelectedID(void);
+		int GetSelectedID(void) const;
+		short GetSelectedCoordination(void) const;
+		short GetSelectedLonePairCount(void) const;
 		static void NumberToTableCoords(int atomic_number, int *row, int *col);
 		void KeyHandler(wxKeyEvent &event);
 
 	private:
 		wxStopWatch	secondKeytimer;
 		unsigned char keyBuffer[3];
+		short coordinationNumber[kNumTableElements];
+		short LonePairCount[kNumTableElements];
 		wxButton *button;
 		element_t *elements;
 		int nelements;

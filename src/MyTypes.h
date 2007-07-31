@@ -210,20 +210,17 @@ class mpAtom {
 		char		flags;	//bit 0: invisibility, bit 1: select state, bit 2: Is effective fragment
 							//bit 3: Is SIMOMM atom, bit 4: symmetry unique
 		unsigned char paired_sites;
-		int ox_num;
-		OrbitalHybridization	hybridization;
+		short	coordinationNumber;
+		short	LPCount;
 		mpAtom(void) : Type(0), flags(0) {
 			paired_sites = 0;
-			ox_num = 0;
-			hybridization = OH_NONE;
+			coordinationNumber = 0;
+			LPCount = 0;
 		};
-		inline int GetOxidationNumber(void) const {return ox_num;}
-		inline int SetOxidationNumber(int new_ox_num) {
-			ox_num = new_ox_num;
-			/* Only retain pairs at lower ox_num. */
-			paired_sites &= 255 >> (8 - ox_num);
-			return ox_num;
-		}
+		inline short GetCoordinationNumber(void) const {return coordinationNumber;};
+		inline short SetCoordinationNumber(short new_num) {return (coordinationNumber = new_num);};
+		inline short SetLonePairCount(short new_num) {return (LPCount = new_num);};
+		inline short GetLonePairCount(void) const {return LPCount;};
 		inline bool GetInvisibility(void) const {return ((flags & 1)? true: false);};	//Bit 1 sets invisibility
 		bool SetInvisibility(bool State) {flags = (flags & 0xFE) + (State? 1:0);return GetInvisibility();};
 		inline bool GetSelectState(void) const {return ((flags&2)?true:false);};	//Bit 2 sets selected
@@ -242,10 +239,9 @@ class mpAtom {
 		inline void SetFragmentNumber(long fragNum) {if (fragNum>=0) fragmentId = fragNum;};
 		inline long GetFragmentNumber(void) const {return fragmentId;};
 		inline long GetNuclearCharge(void) const {return (GetType());};	//NOT correct for ECP's!!!!!
-		inline OrbitalHybridization GetHybridization(void) const {return hybridization;};
-		void SetDefaultHybridization(void);
-		inline void SetHybridization(OrbitalHybridization p) {hybridization = p;};
-		int GetLonePairCount(void) const;
+//		void SetDefaultHybridization(void);
+		void SetDefaultCoordinationNumber(void);
+		void SetDefaultLonePairCount(void);
 };
 
 enum BondOrder {

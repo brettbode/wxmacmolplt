@@ -44,8 +44,23 @@
 #define GL_Popup_Lock_To_Annotation 30027
 #define GL_Popup_Fit_To_Plane 30028
 #define GL_Popup_Change_Atom 30029
-#define GL_Popup_Change_Ox_Num 30030
+#define GL_Popup_Change_Coord_Num 30030
 #define GL_Popup_Set_Anno_Param 30031
+#define GL_Popup_Change_LPCount 30032
+#define GL_Popup_To_Coordination_Zero 30033
+#define GL_Popup_To_Coordination_One 30034
+#define GL_Popup_To_Coordination_Two 30035
+#define GL_Popup_To_Coordination_Three 30036
+#define GL_Popup_To_Coordination_Four 30037
+#define GL_Popup_To_Coordination_Five 30038
+#define GL_Popup_To_Coordination_Six 30039
+#define GL_Popup_To_Coordination_Seven 30040
+#define GL_Popup_To_LPCount_Zero 30041
+#define GL_Popup_To_LPCount_One 30042
+#define GL_Popup_To_LPCount_Two 30043
+#define GL_Popup_To_LPCount_Three 30044
+#define GL_Popup_To_LPCount_Four 30045
+#define GL_Popup_To_LPCount_Five 30046
 
 class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
@@ -108,7 +123,8 @@ class MpGLCanvas : public wxGLCanvas {
 		void ConstrainPosition(const int anno_id, double x, double y,
 							   double z);
 		void ChangeAtom(wxCommandEvent& event);
-		void ChangeOxidationNumber(wxCommandEvent& event);
+		void ChangeCoordinationNumber(wxCommandEvent& event);
+		void ChangeLPCount(wxCommandEvent& event);
 		void HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt);
 		void HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 						   const wxPoint& prev_pt);

@@ -245,7 +245,8 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 		Atoms[index].Type = AtomType;
 		Atoms[index].Position = AtomPosition;
 		Atoms[index].flags = 0;
-		Atoms[index].SetDefaultHybridization();
+		Atoms[index].SetDefaultCoordinationNumber();
+		Atoms[index].SetDefaultLonePairCount();
 		result = &Atoms[index];
 		NumAtoms++;
 	}
@@ -466,7 +467,8 @@ bool Frame::SetAtomType(long theAtom, short atmType) {
 	bool result = false;
 	if ((theAtom>=0)&&(theAtom<NumAtoms)) {
 		result = Atoms[theAtom].SetType(atmType);
-		Atoms[theAtom].SetDefaultHybridization();
+		Atoms[theAtom].SetDefaultCoordinationNumber();
+		Atoms[theAtom].SetDefaultLonePairCount();
 	}
 	return result;
 }
@@ -525,40 +527,6 @@ bool Frame::GetAtomSelection(long atom_id) const {
 
 int Frame::GetNumAtomsSelected(void) const {
 	return natoms_selected;
-}
-
-bool Frame::SetAtomOxidationNumber(int atom_id, int ox_num) {
-
-	// This function sets the oxidation number for an atom in this frame.
-	// If the atom doesn't exist, it returns false without changing anything.
-	// If it does exist, the number is changed and true is returned.
-
-	// If the atom_id is out of bounds, return false.
-	if (atom_id < 0 || atom_id >= NumAtoms) {
-		return false;
-	}
-
-	// Turn off all bonds.  We do this because generally changing the 
-	// bonding sites will invalidate previous structures.
-	// for (long i = 0; i < NumBonds; i++) { 
-		// if (Bonds[i].Atom1 == atom_id || Bonds[i].Atom2 == atom_id) { 
-			// DeleteBond(i); 
-			// i--; 
-		// } 
-	// } 
-
-	Atoms[atom_id].SetOxidationNumber(ox_num);
-	
-	return true;
-
-}
-
-int Frame::GetAtomOxidationNumber(int atom_id) {
-
-	// This function returns the oxidation number for an atom in this frame.
-
-	return Atoms[atom_id].ox_num;
-
 }
 
 void Frame::SetAtomBondingSite(int atom_id, unsigned char site_id, bool is_bonded) {

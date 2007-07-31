@@ -2394,24 +2394,21 @@ void MolDisplayWin::menuBuilderAddHydrogens(wxCommandEvent &event) {
 	long NumBonds = lFrame->NumBonds;
 	
 	for (int iatom=0; iatom<NumAtoms; iatom++) {
-		int baseHybrid = lFrame->Atoms[iatom].hybridization;
+		short coordination = lFrame->Atoms[iatom].GetCoordinationNumber();
 		int bondCount = 0;
 		for (long i=0; i<NumBonds; i++) {
 			if (((iatom == lFrame->Bonds[i].Atom1)||(iatom == lFrame->Bonds[i].Atom2))&&
 				(lFrame->Bonds[i].Order > kHydrogenBond)) {
 				bondCount++;
-				if ((lFrame->Bonds[i].Order > kSingleBond)&&(lFrame->Bonds[i].Order <= kTripleBond)) {
-					baseHybrid -= (lFrame->Bonds[i].Order - kSingleBond);
-				}
 			}
 		}
-		int lpCount = lFrame->Atoms[iatom].GetLonePairCount();
-		for (int k=(bondCount); k<(baseHybrid-lpCount); k++) {
+		for (int k=bondCount; k<coordination; k++) {
 			CPoint3D vector, origin;
 			DrawBondingSites(iatom, 0, NULL, k+1, &vector);
 			lFrame->GetAtomPosition(iatom, origin);
 			lFrame->AddAtom(1, origin + vector * 0.01 *
 							(Prefs->GetAtomSize(lFrame->GetAtomType(iatom)-1) + Prefs->GetAtomSize(0)));
+			lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(1);
 			MainData->AtomAdded();
 			lFrame->AddBond(iatom,lFrame->GetNumAtoms()-1,kSingleBond);
 		}

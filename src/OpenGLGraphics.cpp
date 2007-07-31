@@ -3846,7 +3846,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	long NumAtoms = lFrame->NumAtoms;
 	long NumBonds = lFrame->NumBonds;
 	
-	int baseHybrid = lAtoms[iatom].hybridization;
+	short coordination = lAtoms[iatom].GetCoordinationNumber();
 	int bondCount = 0;
 	BondOrder highestBO = kHydrogenBond;
 	long primaryBondedAtm = -1;
@@ -3883,16 +3883,12 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 			else if (secondaryBondedAtm < 0) {
 				secondaryBondedAtm = (lBonds[i].Atom1 == iatom)?lBonds[i].Atom2:lBonds[i].Atom1;
 			}
-
-			if ((lBonds[i].Order > kSingleBond)&&(lBonds[i].Order <= kTripleBond)) {
-				baseHybrid -= (lBonds[i].Order - kSingleBond);
-			}
 		}
 	}
 	int lpCount = lAtoms[iatom].GetLonePairCount();
 	
 	//Test to see if any bond sites are unused, if not return
-	if ((baseHybrid - (lpCount+bondCount))<=0) return;
+	if (bondCount >= coordination) return;
 
 	CPoint3D origin = CPoint3D(0.0f, 0.0f, 0.0f);
 	float c, s, b, d;
@@ -3924,10 +3920,10 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 		}
 	}
 				
-	switch (baseHybrid) {
-//		case OH_S:	//handled above
+	switch (coordination+lpCount) {
+//		case 1:	//handled above
 //			break;
-		case OH_SP:
+		case 2:
 			{
 				CPoint3D v2 = b1Offset*-1.0;
 				if (site_id == 0) {
@@ -3939,7 +3935,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 			}
 			break;
-		case OH_SP2:
+		case 3:
 			if (lpCount < 2) {
 				CPoint3D v3;
 				if (bondCount >= 2) {	//Setup the 3rd vector to have an equal angle to both bonds
@@ -4007,7 +4003,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 			}
 			break;
-		case OH_SP3:
+		case 4:
 			if (lpCount < 3) {
 
 				// If three bonds are already formed, we calculate the fourth
@@ -4125,7 +4121,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 			}
 			break;
-		case OH_SP3D:
+		case 5:
 			//Here axial and equitorial sites are different. LPs should go in axial sites first
 			if (bondCount <= 1) {
 				b = sqrt(3.0f / 4.0f);
@@ -4166,7 +4162,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 			}
 			break;
-		case OH_SP3D2:
+		case 7:
 			if (bondCount <= 1) {
 				b = sqrt(kPi / 4.0f);
 				CPoint3D v2 = b1Offset*-1.0;

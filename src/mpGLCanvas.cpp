@@ -1180,6 +1180,8 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				lFrame->AddAtom(periodic_dlg->GetSelectedID(), origin + vector * 0.01 *
 								(Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(periodic_dlg->GetSelectedID() - 1)));
 				mMainData->AtomAdded();
+				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(periodic_dlg->GetSelectedCoordination());
+				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
 				lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
 				MolWin->SetStatusText(wxT("Added new atom."));
 				MolWin->UpdateGLModel();
@@ -1208,8 +1210,8 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				type = periodic_dlg->GetSelectedID();
 				MolWin->CreateFrameSnapShot();
 				mMainData->NewAtom(type, newPnt);
-				lFrame->SetAtomOxidationNumber(lFrame->NumAtoms - 1,
-					Prefs->GetOxidationNumber(type));
+				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(periodic_dlg->GetSelectedCoordination());
+				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
 
 				MolWin->SetStatusText(wxT("Added new atom."));
 				MolWin->UpdateGLModel();
@@ -1493,6 +1495,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 										(Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(periodic_dlg->GetSelectedID() - 1)));
 						mMainData->AtomAdded();
 						lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
+						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(periodic_dlg->GetSelectedCoordination());
+						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
 						MolWin->SetStatusText(wxT("Added new atom."));
 						MolWin->UpdateGLModel();
 						
@@ -1520,6 +1524,8 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 						int type = periodic_dlg->GetSelectedID();
 						mMainData->NewAtom(type, newPnt);
+						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(periodic_dlg->GetSelectedCoordination());
+						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
 
 						MolWin->SetStatusText(wxT("Added new atom."));
 					}
@@ -2295,7 +2301,38 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 			menu.Append(GL_Popup_Change_Atom, label);
 		}
 
-		menu.Append(GL_Popup_Change_Ox_Num, wxT("Change oxidation"));
+		short cNum = lFrame->Atoms[selected].GetCoordinationNumber();
+		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Zero, wxT("0"));
+		if (cNum == 0) item->Check(true);
+		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_One, wxT("1"));
+		if (cNum == 1) item->Check(true);
+		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Two, wxT("2"));
+		if (cNum == 2) item->Check(true);
+		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Three, wxT("3"));
+		if (cNum == 3) item->Check(true);
+		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Four, wxT("4"));
+		if (cNum == 4) item->Check(true);
+		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Five, wxT("5"));
+		if (cNum == 5) item->Check(true);
+		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Six, wxT("6"));
+		if (cNum == 6) item->Check(true);
+		menu.Append(GL_Popup_Change_Coord_Num, _("Change coordination #"), submenu);
+
+		short LPNum = lFrame->Atoms[selected].GetLonePairCount();
+		submenu = new wxMenu();
+		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Zero, wxT("0"));
+		if (LPNum == 0) item->Check(true);
+		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_One, wxT("1"));
+		if (LPNum == 1) item->Check(true);
+		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Two, wxT("2"));
+		if (LPNum == 2) item->Check(true);
+		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Three, wxT("3"));
+		if (LPNum == 3) item->Check(true);
+		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Four, wxT("4"));
+		if (LPNum == 4) item->Check(true);
+		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Five, wxT("5"));
+		if (LPNum == 5) item->Check(true);
+		menu.Append(GL_Popup_Change_LPCount, _("Change lone pair count"), submenu);
 
 		// A plane is defined by exactly 3 atoms.  With any more than that, we 
 		// can have noncoplanar atoms.  Only then do we allow the user to fit
@@ -2356,36 +2393,36 @@ void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
 	MolWin->AtomsChanged(true,false);
 }
 
-void MpGLCanvas::ChangeOxidationNumber(wxCommandEvent& event) {
-
-	/* This function changes the oxidation number for the clicked-on
-	 * atom.  It prompts the user for a new oxidation number with a
-	 * popup dialog with a select menu.  Any future atoms of this element
-	 * will have this new oxidation number. */
-
+void MpGLCanvas::ChangeCoordinationNumber(wxCommandEvent& event) {
+	
+	/* This function changes the coordination number for the clicked-on atom. */
+	
 	Frame *lFrame = mMainData->cFrame;
-	wxString items[] = {
-		wxT("0"), wxT("1"), wxT("2"), wxT("3"), wxT("4"),
-		wxT("5"), wxT("6")
-	};
-
-	wxString message = wxString(wxT("Select an oxidation number:"));
-
-	ChooseDialog *dlg = new ChooseDialog(this, wxID_ANY, message, 7, items);
-	dlg->SetSelectedIndex(lFrame->Atoms[selected].ox_num);
-
-	if (dlg->ShowModal() == wxID_OK) {
-		int ox_num = dlg->GetSelectedIndex();
-
+	lFrame->Atoms[selected].SetCoordinationNumber(event.GetId() - GL_Popup_To_Coordination_Zero);
+	
 		/* Change both the atom that was clicked on and the oxidation number
-		 * table, so any future atoms of this element have the same
-		 * oxidation number. */
-		lFrame->SetAtomOxidationNumber(selected, ox_num);
-		Prefs->SetOxidationNumber(lFrame->GetAtomType(selected), ox_num);
-	}
-
+		* table, so any future atoms of this element have the same
+		* oxidation number. */
+//		Prefs->SetOxidationNumber(lFrame->GetAtomType(selected), ox_num);
+	
 	MolWin->UpdateModelDisplay();
+	
+}
 
+void MpGLCanvas::ChangeLPCount(wxCommandEvent& event) {
+	
+	/* This function changes the coordination number for the clicked-on atom. */
+	
+	Frame *lFrame = mMainData->cFrame;
+	lFrame->Atoms[selected].SetLonePairCount(event.GetId() - GL_Popup_To_LPCount_Zero);
+	
+	/* Change both the atom that was clicked on and the oxidation number
+		* table, so any future atoms of this element have the same
+		* oxidation number. */
+	//		Prefs->SetOxidationNumber(lFrame->GetAtomType(selected), ox_num);
+	
+	MolWin->UpdateModelDisplay();
+	
 }
 
 void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
@@ -2951,6 +2988,18 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_Lock_To_Annotation, MpGLCanvas::ConstrainToAnnotation)
 	EVT_MENU(GL_Popup_Fit_To_Plane, MpGLCanvas::FitToPlane)
 	EVT_MENU(GL_Popup_Change_Atom, MpGLCanvas::ChangeAtom)
-	EVT_MENU(GL_Popup_Change_Ox_Num, MpGLCanvas::ChangeOxidationNumber)
+	EVT_MENU(GL_Popup_To_Coordination_Zero, MpGLCanvas::ChangeCoordinationNumber)
+	EVT_MENU(GL_Popup_To_Coordination_One, MpGLCanvas::ChangeCoordinationNumber)
+	EVT_MENU(GL_Popup_To_Coordination_Two, MpGLCanvas::ChangeCoordinationNumber)
+	EVT_MENU(GL_Popup_To_Coordination_Three, MpGLCanvas::ChangeCoordinationNumber)
+	EVT_MENU(GL_Popup_To_Coordination_Four, MpGLCanvas::ChangeCoordinationNumber)
+	EVT_MENU(GL_Popup_To_Coordination_Five, MpGLCanvas::ChangeCoordinationNumber)
+	EVT_MENU(GL_Popup_To_Coordination_Six, MpGLCanvas::ChangeCoordinationNumber)
+	EVT_MENU(GL_Popup_To_LPCount_Zero, MpGLCanvas::ChangeLPCount)
+	EVT_MENU(GL_Popup_To_LPCount_One, MpGLCanvas::ChangeLPCount)
+	EVT_MENU(GL_Popup_To_LPCount_Two, MpGLCanvas::ChangeLPCount)
+	EVT_MENU(GL_Popup_To_LPCount_Three, MpGLCanvas::ChangeLPCount)
+	EVT_MENU(GL_Popup_To_LPCount_Four, MpGLCanvas::ChangeLPCount)
+	EVT_MENU(GL_Popup_To_LPCount_Five, MpGLCanvas::ChangeLPCount)
 END_EVENT_TABLE()
 

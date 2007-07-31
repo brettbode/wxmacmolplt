@@ -43,7 +43,6 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 		wxSize(BUTTON_SIZE * 18 + 5, BUTTON_SIZE * 10 + 22),
 		wxCLOSE_BOX | wxCAPTION)
 #endif
-
 {
 
 	wxFont *font;            // Font of atomic symbol
@@ -54,7 +53,32 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 	int row;
 	int col;
 	int font_size;
-
+	short lcoordination[] = {1,                                0,
+							 1,2,                    3,4,3,2,1,0,
+							 1,2,                    3,4,5,6,1,0,
+							 1,2,3,2,5,3,2,3,2,2,2,2,3,4,3,4,1,0,
+							 1,2,3,4,5,6,6,3,3,2,1,2,3,4,3,4,1,0,
+							 1,2,
+								3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+								 4,5,6,6,4,4,4,3,2,1,2,3,2,1,0,
+							 1,2,
+								3,4,5,6,5,4,3,3,3,3,3,3,3,3,3,
+								 4,0,6,0,3,0,0,0,0};
+	short lLPCount[] = {0,                                0,
+						0,0,                    0,0,1,2,3,4,
+						0,0,                    0,0,0,0,3,4,
+						0,0,0,1,0,2,3,3,3,2,2,2,0,0,1,0,3,4,
+						0,0,0,0,0,0,0,3,3,2,2,2,0,0,1,0,3,4,
+						0,0,
+						   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+							0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,
+						0,0,
+						   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+							0,0,0,0,0,0,0,0,0};
+	for (int i=0; i<kNumTableElements; i++) {
+		coordinationNumber[i] = lcoordination[i];
+		LonePairCount[i] = lLPCount[i];
+	}
 #ifdef __WXMAC__
 #define IMAGE_SIZE 26
 	font_size = 12;
@@ -63,7 +87,7 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 	font_size = 10;
 #endif
 
-	nelements = 112;
+	nelements = kNumTableElements;
 
 	/* No element has been selected yet. */
 	prev_id = -1;
@@ -212,13 +236,25 @@ void PeriodicTableDlg::KeyHandler(wxKeyEvent & event) {
 }	
 /* ------------------------------------------------------------------------- */
 
-int PeriodicTableDlg::GetSelectedID(void) {
+int PeriodicTableDlg::GetSelectedID(void) const {
 
 	/* This function returns the atomic number of the currently selected atom,
 	 * or 0 if no atom is selected. */
 
 	return prev_id + 1;
 
+}
+
+short PeriodicTableDlg::GetSelectedCoordination(void) const {
+	short result = 0;
+	if (prev_id >= 0) result = coordinationNumber[prev_id];
+	return result;
+}
+
+short PeriodicTableDlg::GetSelectedLonePairCount(void) const {
+	short result = 0;
+	if (prev_id >= 0) result = LonePairCount[prev_id];
+	return result;
 }
 
 /* ------------------------------------------------------------------------- */

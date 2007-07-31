@@ -395,7 +395,7 @@ void AnnotationDihedral::setParam(Frame& frame, float value) {
 	}
 }
 
-void mpAtom::SetDefaultHybridization(void) {
+/*void mpAtom::SetDefaultHybridization(void) {
 	//Setup the default orbital hybridization based on the atom type
 	hybridization = OH_NONE;
 	if (Type == 15) {
@@ -439,27 +439,75 @@ void mpAtom::SetDefaultHybridization(void) {
 			break;
 	}
 }
+*/
+void mpAtom::SetDefaultCoordinationNumber(void) {
+	//Setup the default coordination based on the atom type
+	coordinationNumber = 0;
+	if (Type == 15) {
+		coordinationNumber = 5;
+		return;
+	}
+	if (Type == 16) {
+		coordinationNumber = 6;
+		return;
+	}
+	if (((Type>=6)&&(Type<=9))||((Type>=14)&&(Type<=17))||((Type>=32)&&(Type<=35))||
+		((Type>=50)&&(Type<=53))||((Type>=82)&&(Type<=85))) {
+		coordinationNumber = 4;
+		return;
+	}
+	
+	switch (Type) {
+		case 1:
+		case 3:
+		case 11:
+		case 19:
+		case 37:
+		case 55:
+		case 87:
+			coordinationNumber = 1;
+			break;
+		case 4:
+		case 12:
+		case 20:
+		case 38:
+		case 56:
+		case 88:
+			coordinationNumber = 2;
+			break;
+		case 5:
+		case 13:
+		case 31:
+		case 49:
+		case 81:
+			coordinationNumber = 3;
+			break;
+	}
+}
 
-int mpAtom::GetLonePairCount(void) const {
+void mpAtom::SetDefaultLonePairCount(void) {
+	LPCount = 0;
 	switch (Type) {
 		case 7:
 	//	case 15:
 		case 33:
 		case 51:
 		case 83:
-			return 1;
+			LPCount = 1;
+			break;
 		case 8:
 	//	case 16:
 		case 34:
 		case 52:
 		case 84:
-			return 2;
+			LPCount = 2;
+			break;
 		case 9:
 		case 17:
 		case 35:
 		case 53:
 		case 85:
-			return 3;
+			LPCount = 3;
+			break;
 	}
-	return 0;
 }
