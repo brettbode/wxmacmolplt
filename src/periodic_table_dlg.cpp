@@ -178,8 +178,10 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 	mCoordinationChoice = new wxChoice(this, kPeriodicCoordinationChoice,
 									   wxPoint(label2Pos.x+label2Size.GetWidth() + 2, label2Pos.y),
 									   wxSize(-1,-1), 7, coordinationChoices);
+	wxSize CoordSize = mCoordinationChoice->GetSize();
+	int h = (label2Size.GetHeight() > CoordSize.GetHeight()) ? label2Size.GetHeight() : CoordSize.GetHeight();
 	wxStaticText * label3 = new wxStaticText(this, wxID_ANY, wxT("Number of lone pairs:"), 
-											 wxPoint(label1Pos.x, label2Pos.y+label2Size.GetHeight()+8));
+											 wxPoint(label1Pos.x, label2Pos.y+h+2));
 	wxSize label3Size = label3->GetSize();
 	wxPoint label3Pos = label3->GetPosition();
 	wxString LPChoices[] = {_T("0"), _T("1"), _T("2"), _T("3"), _T("4"), _T("5")};
