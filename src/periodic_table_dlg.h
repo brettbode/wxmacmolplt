@@ -75,6 +75,9 @@ class PeriodicTableDlg: public wxMiniFrame {
 		void ElementSelected(wxCommandEvent& event);
 		void MouseMoved(wxMouseEvent& event);
 		void OnClose(wxCloseEvent& event);
+		void OnFocusGained(wxFocusEvent& event);
+		void OnFocusLost(wxFocusEvent& event);
+		bool AcceptsFocus(void) const;
 
 	DECLARE_DYNAMIC_CLASS(PeriodicTableDlg)
 	DECLARE_EVENT_TABLE()
