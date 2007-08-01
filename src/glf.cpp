@@ -1577,6 +1577,7 @@ void glfStartBitmapDrawing()
 	/* Enable 2D Texturing */
 	glGetBooleanv(GL_TEXTURE_2D, &bmf_texturing);
 	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	glBindTexture(GL_TEXTURE_2D, bmf_texture[bmf_curfont]);
 }
