@@ -17,9 +17,14 @@ extern bool show_periodic_dlg;
 extern WinPrefs * gPreferences;
 extern PeriodicTableDlg *periodic_dlg;
 
+#define kPeriodicCoordinationChoice 13800
+#define kPeriodicLPChoice			13801
+
 IMPLEMENT_DYNAMIC_CLASS(PeriodicTableDlg, wxMiniFrame)
 
 BEGIN_EVENT_TABLE(PeriodicTableDlg, wxMiniFrame)
+	EVT_CHOICE(kPeriodicCoordinationChoice, PeriodicTableDlg::OnCoordinationChoice)
+	EVT_CHOICE(kPeriodicLPChoice, PeriodicTableDlg::OnLPChoice)
 	EVT_BUTTON(wxID_ANY, PeriodicTableDlg::ElementSelected)
 	EVT_CHAR(PeriodicTableDlg::KeyHandler)
 	EVT_SET_FOCUS(PeriodicTableDlg::OnFocusGained)
@@ -157,7 +162,31 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 
 	delete font;
 	delete mem_dc;
-
+	
+	wxStaticText * label1 = new wxStaticText(this, wxID_ANY, wxT("Selected Element:"), 
+											 wxPoint(BUTTON_SIZE*2.5, 3));
+	wxSize label1Size = label1->GetSize();
+	wxPoint label1Pos = label1->GetPosition();
+	mTextArea = new wxStaticText(this, wxID_ANY, wxT("foo"), 
+								 wxPoint(label1Pos.x+label1Size.GetWidth() + 2, label1Pos.y));
+	
+	wxStaticText * label2 = new wxStaticText(this, wxID_ANY, wxT("Coordination number:"), 
+											 wxPoint(label1Pos.x, label1Pos.y+label1Size.GetHeight()+8));
+	wxSize label2Size = label2->GetSize();
+	wxPoint label2Pos = label2->GetPosition();
+	wxString coordinationChoices[] = {_T("0"), _T("1"), _T("2"), _T("3"), _T("4"), _T("5"), _T("6")};
+	mCoordinationChoice = new wxChoice(this, kPeriodicCoordinationChoice,
+									   wxPoint(label2Pos.x+label2Size.GetWidth() + 2, label2Pos.y),
+									   wxSize(-1,-1), 7, coordinationChoices);
+	wxStaticText * label3 = new wxStaticText(this, wxID_ANY, wxT("Number of lone pairs:"), 
+											 wxPoint(label1Pos.x, label2Pos.y+label2Size.GetHeight()+8));
+	wxSize label3Size = label3->GetSize();
+	wxPoint label3Pos = label3->GetPosition();
+	wxString LPChoices[] = {_T("0"), _T("1"), _T("2"), _T("3"), _T("4"), _T("5")};
+	mLPChoice = new wxChoice(this, kPeriodicLPChoice,
+									   wxPoint(label2Pos.x+label3Size.GetWidth() + 2, label3Pos.y),
+									   wxSize(-1,-1), 6, LPChoices);
+	
 	wxCommandEvent foo(0, 6-1);
 	ElementSelected(foo);
 }
@@ -214,9 +243,23 @@ void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
 //		elements[id].button->SetBitmapLabel(*(elements[id].off_bmp));
 //		prev_id = -1;
 //	}
-
+	if (prev_id >= 0) {
+		wxString symbol;
+		gPreferences->GetAtomLabel(prev_id, symbol);
+		mTextArea->SetLabel(symbol);
+		
+		mCoordinationChoice->SetSelection(coordinationNumber[prev_id]);
+		mLPChoice->SetSelection(LonePairCount[prev_id]);
+	}
+	
 	Refresh();
 
+}
+void PeriodicTableDlg::OnCoordinationChoice(wxCommandEvent& event) {
+	coordinationNumber[prev_id] = event.GetSelection();
+}
+void PeriodicTableDlg::OnLPChoice(wxCommandEvent& event) {
+	LonePairCount[prev_id] = event.GetSelection();
 }
 #include "myFiles.h"
 void PeriodicTableDlg::KeyHandler(wxKeyEvent & event) {

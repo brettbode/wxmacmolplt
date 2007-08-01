@@ -65,14 +65,18 @@ class PeriodicTableDlg: public wxMiniFrame {
 
 	private:
 		wxStopWatch	secondKeytimer;
+		wxStaticText * mTextArea;
+		wxChoice * mCoordinationChoice;
+		wxChoice * mLPChoice;
 		unsigned char keyBuffer[3];
 		short coordinationNumber[kNumTableElements];
 		short LonePairCount[kNumTableElements];
-		wxButton *button;
 		element_t *elements;
 		int nelements;
 		int prev_id;
 		void ElementSelected(wxCommandEvent& event);
+		void OnCoordinationChoice(wxCommandEvent& event);
+		void OnLPChoice(wxCommandEvent& event);
 		void MouseMoved(wxMouseEvent& event);
 		void OnClose(wxCloseEvent& event);
 		void OnFocusGained(wxFocusEvent& event);
