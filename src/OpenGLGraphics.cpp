@@ -2247,6 +2247,7 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 		case GAMESS_CNH:
 		{
 			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			if (order <= 2) order = 2;
 			if ((order == 2)||(order == 4)||(order == 6)) DrawInversionPoint();
 			origin.x = origin.y = - MainData->MaxSize;
 			p1.x = MainData->MaxSize;
@@ -2263,6 +2264,7 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 		case GAMESS_CNV:	//CN axis plus N sigma-v planes
 		{
 			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			if (order <= 2) order = 2;
 			for (int i=0; i<order; i++) {
 				origin.x = - cos(kPi * i/order) * MainData->MaxSize;
 				origin.y = - sin(kPi * i/order) * MainData->MaxSize;
@@ -2277,10 +2279,11 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 			}
 			origin.x = origin.y = p1.x = p1.y = 0.0;
 		}
-		//	break;	//let this rool through to pick up the axis
+		//	break;	//let this roll through to pick up the axis
 		case GAMESS_CN:
 		{
 			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			if (order <= 2) order = 2;
 			origin.z = -MainData->MaxSize;
 			p1.z = MainData->MaxSize;
 			DrawRotationAxis(origin, p1, order);
@@ -2291,6 +2294,7 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 		case GAMESS_DND:
 		{
 			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			if (order <= 2) order = 2;
 			if ((order == 3)||(order == 5)) DrawInversionPoint();
 			origin.x = origin.y = p1.x = p1.y = 0.0;
 			origin.z = -MainData->MaxSize;
@@ -2324,6 +2328,7 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 		case GAMESS_DNH:
 		{
 			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			if (order <= 2) order = 2;
 			if ((order == 2)||(order == 4)||(order == 6)) DrawInversionPoint();
 			origin.x = origin.y = - MainData->MaxSize;
 			p1.x = MainData->MaxSize;
@@ -2336,6 +2341,7 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 		case GAMESS_DN:
 		{
 			int order = MainData->InputOptions->Data->GetPointGroupOrder();
+			if (order <= 2) order = 2;
 			origin.x = origin.y = p1.x = p1.y = 0.0;
 			origin.z = -MainData->MaxSize;
 			p1.z = MainData->MaxSize;
@@ -3301,6 +3307,7 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	//must be padded out to the next higher power of two.
 	int repeat = order;
 	if (order == 3) repeat = 4;
+	if (order > 4) repeat = 8;
 	GLubyte bw[16][16] ={	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0},
@@ -3318,6 +3325,8 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 	GLubyte * testimage = new GLubyte[imageWidth*imageWidth*repeat*4];
+	int padding = ((repeat - order)*16)/order;
+	int remainder = ((repeat - order)*16)-(padding*order);
 	int p = 0;
 	for (int i=0; i<imageWidth; i++) {
 		for (int o=0; o<order; o++) {
@@ -3329,17 +3338,15 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 				if (bw[i][j] == 0) testimage[p + 3]=178;
 				p+=4;
 			}
-			if (order == 3) {
-				for (int t=0; t<5; t++) {
-					testimage[p] = 0;
-					testimage[p + 1] = 0;
-					testimage[p + 2] = 0;
-					testimage[p + 3] = 178;
-					p+=4;
-				}
+			for (int t=0; t<padding; t++) {
+				testimage[p] = 0;
+				testimage[p + 1] = 0;
+				testimage[p + 2] = 0;
+				testimage[p + 3] = 178;
+				p+=4;
 			}
 		}
-		if (order == 3) {
+		for (int t=0; t<remainder; t++) {
 			testimage[p] = 0;
 			testimage[p + 1] = 0;
 			testimage[p + 2] = 0;
