@@ -2438,6 +2438,8 @@ const char * CML_convert(BondOrder t)
             return "D";
         case kTripleBond:
             return "T";
+        case kAromaticBond:
+            return "A";
         case kMixedBonds:
             return "M";
 		default:
@@ -3308,8 +3310,10 @@ bool CML_convert(const char * s, BondOrder & b) {
 		case 'H':
 			b = kHydrogenBond;
 			break;
+		case 'A':
+			b = kAromaticBond;
+			break;
 		case 'M':
-		case 'A':	//Currently I don't know what to map "Aromatic" bond types to"
 			b = kMixedBonds;
 			break;
 		default:

@@ -32,7 +32,8 @@
 #define GL_Popup_To_Single_Bond 30015
 #define GL_Popup_To_Double_Bond 30016
 #define GL_Popup_To_Triple_Bond 30017
-#define GL_Popup_Mark_Atom 30018
+#define GL_Popup_To_Aromatic_Bond 30018
+#define GL_Popup_Mark_Atom 30009
 #define GL_Popup_Measure_Length 30019
 #define GL_Popup_Measure_Angle 30020
 #define GL_Popup_Measure_Dihedral 30021

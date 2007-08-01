@@ -1636,9 +1636,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 			if (HandSelected() && show_bond_sites) {
 				glPushMatrix();
-		//		glMultMatrixf((float *) &lAtoms[iatom].rot);
-		//		DrawBondingSites(lAtoms[iatom].GetOxidationNumber(),
-		//						 lAtoms[iatom].paired_sites, radius, qobj);
 				DrawBondingSites(iatom, radius, qobj);
 				glPopMatrix();
 			}
@@ -1685,6 +1682,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			DrawHydrogenBond(ibond);
 			continue;
 		}
+		if (tmpOrder == kAromaticBond) tmpOrder = kDoubleBond;
 		if (!Prefs->ColorBondHalves()) tmpOrder = kSingleBond;	//only generate multiple pipes when colored by atom color
 		//!!! take hydrogen bond as single bond for now
 		GLdouble tmpBondSize = BondSize/MAX(tmpOrder,1);
@@ -1775,7 +1773,34 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			glPushMatrix();
 			glMultMatrixf((const GLfloat *) &rotMat);
 
-
+			if ((lBonds[ibond].Order == kAromaticBond)&&(ipipe == 1)) {
+				// plot the 2nd part of an aromatic bond as a series of spheres similar to a hydrogen bond
+				Prefs->ChangeColorBondColor(kHydrogenBond);
+				//Plot as a series of spheres
+				float pos=0.75*BondSize;
+				glTranslatef(0.0, 0.0, pos);
+				while (pos < length) {
+					gluSphere(qobj, BondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
+					if ( mHighliteState && !lBonds[ibond].GetSelectState()) {
+						glColor3f(0.0f,0.0f,0.0f);
+						glEnable(GL_POLYGON_STIPPLE);
+						glPolygonStipple(stippleMask);
+						gluSphere(qobj, BondSize*1.01, (long)(Quality), (long)(0.5*Quality));
+						glDisable(GL_POLYGON_STIPPLE);
+						
+						glColor4f(0.5,0.5,0.5,0.7f);
+						glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+						glEnable(GL_BLEND);
+						gluSphere(qobj, BondSize*1.02, (long)(Quality), (long)(0.5*Quality));
+						glDisable(GL_BLEND);
+					}
+					glTranslatef(0.0, 0.0, 2.5*BondSize);
+					pos += 2.5*BondSize;
+				}
+				glPopMatrix();
+				continue;
+			}
+			
 			// Now, if a bond is selected but not this one, we need to draw an
 			// encapsulating cylinder to mask it out.
 			if (mHighliteState && !lBonds[ibond].GetSelectState()) {

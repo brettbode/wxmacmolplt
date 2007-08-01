@@ -2371,6 +2371,10 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 		if (bond_order == kTripleBond) {
 			item->Check(true);
 		}
+		item = submenu->AppendRadioItem(GL_Popup_To_Aromatic_Bond, wxT("Aromatic"));
+		if (bond_order == kAromaticBond) {
+			item->Check(true);
+		}
 		menu.Append(wxID_ANY, wxT("Bond Order"), submenu);
 		menu.AppendSeparator();
 	}
@@ -2519,6 +2523,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 					submenu->Append(GL_Popup_To_Single_Bond, wxT("Single"));
 					submenu->Append(GL_Popup_To_Double_Bond, wxT("Double"));
 					submenu->Append(GL_Popup_To_Triple_Bond, wxT("Triple"));
+					submenu->Append(GL_Popup_To_Aromatic_Bond, wxT("Aromatic"));
 					menu.Append(wxID_ANY, wxT("Add bond"), submenu);
 				} else {
 					wxMenuItem *item;
@@ -2543,7 +2548,12 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 					if (bond_order == kTripleBond) {
 						item->Check(true);
 					}
-
+					item = submenu->AppendRadioItem(GL_Popup_To_Aromatic_Bond,
+													wxT("Aromatic"));
+					if (bond_order == kAromaticBond) {
+						item->Check(true);
+					}
+					
 					menu.Append(wxID_ANY, wxT("Change bond"), submenu);
 				}
 			}
@@ -2747,6 +2757,10 @@ void MpGLCanvas::bondPopupMenu(int x, int y) {
 	if (bond_order == kTripleBond) {
 		item->Check(true);
 	}
+	item = submenu->AppendRadioItem(GL_Popup_To_Aromatic_Bond, wxT("Aromatic"));
+	if (bond_order == kAromaticBond) {
+		item->Check(true);
+	}
 	menu.Append(wxID_ANY, wxT("Bond Order"), submenu);
 	
 	menu.AppendSeparator();
@@ -2778,6 +2792,7 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 		float scale = 0.01;
 		if (order == kDoubleBond) scale = 0.0087;
 		if (order == kTripleBond) scale = 0.0079;
+		if (order == kAromaticBond) scale = 0.0093;
 		if (lFrame->GetAtomNumBonds(bond->Atom2) == 1) {
 			CPoint3D offset = lFrame->Atoms[bond->Atom2].Position - lFrame->Atoms[bond->Atom1].Position;
 			Normalize3D(&offset);
@@ -2975,6 +2990,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_To_Single_Bond, MpGLCanvas::ChangeBonding)
 	EVT_MENU(GL_Popup_To_Double_Bond, MpGLCanvas::ChangeBonding)
 	EVT_MENU(GL_Popup_To_Triple_Bond, MpGLCanvas::ChangeBonding)
+	EVT_MENU(GL_Popup_To_Aromatic_Bond, MpGLCanvas::ChangeBonding)
 	EVT_MENU(GL_Popup_To_Hydrogen_Bond, MpGLCanvas::ChangeBonding)
 	EVT_MENU(GL_Popup_Delete_Bond, MpGLCanvas::DeleteBond)
 	EVT_MENU(GL_Popup_Measure_Length, MpGLCanvas::AddAnnotation)

@@ -48,18 +48,17 @@ IMPLEMENT_DYNAMIC_CLASS( BondsDlg, wxDialog )
 BEGIN_EVENT_TABLE( BondsDlg, wxDialog )
 
 ////@begin BondsDlg event table entries
-    EVT_CLOSE( BondsDlg::OnCloseWindow )
+	EVT_CLOSE( BondsDlg::OnCloseWindow )
 
-    EVT_BUTTON( wxID_ADD, BondsDlg::OnAddClick )
+	EVT_BUTTON( wxID_ADD, BondsDlg::OnAddClick )
 
-    EVT_BUTTON( wxID_DELETE, BondsDlg::OnDeleteClick )
+	EVT_BUTTON( wxID_DELETE, BondsDlg::OnDeleteClick )
 
-    EVT_CHOICE( ID_CHOICE, BondsDlg::OnChoiceSelected )
+	EVT_CHOICE( ID_CHOICE, BondsDlg::OnChoiceSelected )
 
-    EVT_GRID_CELL_CHANGE( BondsDlg::OnCellChange )
-    EVT_GRID_SELECT_CELL( BondsDlg::OnSelectCell )
-    EVT_GRID_RANGE_SELECT( BondsDlg::OnRangeSelect )
-    EVT_SIZE( BondsDlg::OnSize )
+	EVT_GRID_CELL_CHANGE( BondsDlg::OnCellChange )
+	EVT_GRID_SELECT_CELL( BondsDlg::OnSelectCell )
+	EVT_GRID_RANGE_SELECT( BondsDlg::OnRangeSelect )
 
 ////@end BondsDlg event table entries
 
@@ -85,24 +84,24 @@ BondsDlg::BondsDlg( MolDisplayWin * parent, wxWindowID id, const wxString& capti
 bool BondsDlg::Create( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin BondsDlg member initialisation
-    AddBtn = NULL;
-    DeleteBtn = NULL;
-    bondText = NULL;
-    BondOrderCtl = NULL;
-    bondGrid = NULL;
+	AddBtn = NULL;
+	DeleteBtn = NULL;
+	bondText = NULL;
+	BondOrderCtl = NULL;
+	bondGrid = NULL;
 ////@end BondsDlg member initialisation
     Parent = parent;
 
 ////@begin BondsDlg creation
-    SetExtraStyle(GetExtraStyle()|wxWS_EX_BLOCK_EVENTS);
-    wxDialog::Create( parent, id, caption, pos, size, style );
+	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
+	wxDialog::Create( parent, id, caption, pos, size, style );
 
-    CreateControls();
-    if (GetSizer())
-    {
-        GetSizer()->SetSizeHints(this);
-    }
-    Centre();
+	CreateControls();
+	if (GetSizer())
+	{
+		GetSizer()->SetSizeHints(this);
+	}
+	Centre();
 ////@end BondsDlg creation
     return true;
 }
@@ -114,53 +113,55 @@ bool BondsDlg::Create( MolDisplayWin* parent, wxWindowID id, const wxString& cap
 void BondsDlg::CreateControls()
 {    
 ////@begin BondsDlg content construction
-    BondsDlg* itemDialog1 = this;
+	BondsDlg* itemDialog1 = this;
 
-    wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
-    itemDialog1->SetSizer(itemBoxSizer2);
+	wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
+	itemDialog1->SetSizer(itemBoxSizer2);
 
-    wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    AddBtn = new wxButton( itemDialog1, wxID_ADD, _("&Add"), wxDefaultPosition, wxDefaultSize, 0 );
-    if (ShowToolTips())
-        AddBtn->SetToolTip(_("Add a new bond"));
-    itemBoxSizer3->Add(AddBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	AddBtn = new wxButton( itemDialog1, wxID_ADD, _("&Add"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (ShowToolTips())
+		AddBtn->SetToolTip(_("Add a new bond"));
+	itemBoxSizer3->Add(AddBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    DeleteBtn = new wxButton( itemDialog1, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
-    if (ShowToolTips())
-        DeleteBtn->SetToolTip(_("deletes the selected bond(s)"));
-    DeleteBtn->Enable(false);
-    itemBoxSizer3->Add(DeleteBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	DeleteBtn = new wxButton( itemDialog1, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (ShowToolTips())
+		DeleteBtn->SetToolTip(_("deletes the selected bond(s)"));
+	DeleteBtn->Enable(false);
+	itemBoxSizer3->Add(DeleteBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    bondText = new wxStaticText( itemDialog1, wxID_STATIC, _("Bond Type:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-    bondText->Enable(false);
-    itemBoxSizer3->Add(bondText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	bondText = new wxStaticText( itemDialog1, wxID_STATIC, _("Bond Type:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+	bondText->Enable(false);
+	itemBoxSizer3->Add(bondText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-    wxString BondOrderCtlStrings[] = {
-        _("Hydrogen Bond"),
-        _("Single Bond"),
-        _("Double Bond"),
-        _("Triple Bond")
-    };
-    BondOrderCtl = new wxChoice( itemDialog1, ID_CHOICE, wxDefaultPosition, wxDefaultSize, 4, BondOrderCtlStrings, 0 );
-    BondOrderCtl->SetStringSelection(_("Single Bond"));
-    if (ShowToolTips())
-        BondOrderCtl->SetToolTip(_("Bond Order"));
-    BondOrderCtl->Enable(false);
-    itemBoxSizer3->Add(BondOrderCtl, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxArrayString BondOrderCtlStrings;
+	BondOrderCtlStrings.Add(_("Hydrogen Bond"));
+	BondOrderCtlStrings.Add(_("Single Bond"));
+	BondOrderCtlStrings.Add(_("Double Bond"));
+	BondOrderCtlStrings.Add(_("Triple Bond"));
+	BondOrderCtlStrings.Add(_("Aromatic Bond"));
+	BondOrderCtl = new wxChoice( itemDialog1, ID_CHOICE, wxDefaultPosition, wxDefaultSize, BondOrderCtlStrings, 0 );
+	BondOrderCtl->SetStringSelection(_("Single Bond"));
+	if (ShowToolTips())
+		BondOrderCtl->SetToolTip(_("Bond Order"));
+	BondOrderCtl->Enable(false);
+	itemBoxSizer3->Add(BondOrderCtl, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer8 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer8, 5, wxGROW, 5);
+	wxBoxSizer* itemBoxSizer8 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer8, 5, wxGROW, 5);
 
-    bondGrid = new wxGrid( itemDialog1, ID_BONDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxVSCROLL );
-    bondGrid->SetDefaultColSize(100);
-    bondGrid->SetDefaultRowSize(25);
-    bondGrid->SetColLabelSize(25);
-    bondGrid->SetRowLabelSize(0);
-    bondGrid->CreateGrid(5, 4, wxGrid::wxGridSelectRows);
-    itemBoxSizer8->Add(bondGrid, 1, wxGROW|wxALL, 0);
+	bondGrid = new wxGrid( itemDialog1, ID_BONDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxVSCROLL );
+	bondGrid->SetDefaultColSize(100);
+	bondGrid->SetDefaultRowSize(25);
+	bondGrid->SetColLabelSize(25);
+	bondGrid->SetRowLabelSize(0);
+	bondGrid->CreateGrid(5, 4, wxGrid::wxGridSelectRows);
+	itemBoxSizer8->Add(bondGrid, 1, wxGROW|wxALL, 0);
 
+	// Connect events and objects
+	bondGrid->Connect(ID_BONDGRID, wxEVT_SIZE, wxSizeEventHandler(BondsDlg::OnSize), NULL, this);
 ////@end BondsDlg content construction
 	 //Setup the columns to store integers and floats
 	bondGrid->SetColFormatNumber(0);
@@ -214,6 +215,9 @@ void BondsDlg::ResetList(void) {
 				case kTripleBond:
 					buf.Printf(wxT("%s"), _T("Triple"));
 					break;
+				case kAromaticBond:
+					buf.Printf(wxT("%s"), _T("Aromatic"));
+					break;
 			}
 			bondGrid->SetCellValue(i, 3, buf);
 			bondGrid->SetReadOnly(i, 3, true);
@@ -265,8 +269,8 @@ wxBitmap BondsDlg::GetBitmapResource( const wxString& name )
 {
     // Bitmap retrieval
 ////@begin BondsDlg bitmap retrieval
-    wxUnusedVar(name);
-    return wxNullBitmap;
+	wxUnusedVar(name);
+	return wxNullBitmap;
 ////@end BondsDlg bitmap retrieval
 }
 
@@ -278,8 +282,8 @@ wxIcon BondsDlg::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 ////@begin BondsDlg icon retrieval
-    wxUnusedVar(name);
-    return wxNullIcon;
+	wxUnusedVar(name);
+	return wxNullIcon;
 ////@end BondsDlg icon retrieval
 }
 /*!
@@ -313,6 +317,9 @@ void BondsDlg::OnAddClick( wxCommandEvent& event )
 				break;
 			case kTripleBond:
 				buf.Printf(wxT("%s"), _T("Triple"));
+				break;
+			case kAromaticBond:
+				buf.Printf(wxT("%s"), _T("Aromatic"));
 				break;
 		}
 		bondGrid->SetCellValue(nbonds, 3, buf);
@@ -379,6 +386,10 @@ void BondsDlg::OnChoiceSelected( wxCommandEvent& event )
 				case kTripleBond:
 					lFrame->SetBondOrder(i, kTripleBond);
 					order.Printf(wxT("%s"), _T("Triple"));
+					break;
+				case kAromaticBond:
+					lFrame->SetBondOrder(i, kAromaticBond);
+					order.Printf(wxT("%s"), _T("Aromatic"));
 					break;
 			}
 			bondGrid->SetCellValue(i, 3, order);

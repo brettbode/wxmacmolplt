@@ -39,13 +39,13 @@ class MolDisplayWin;
 
 ////@begin control identifiers
 #define ID_BONDSDIALOG 10019
+#define ID_CHOICE 10022
+#define ID_BONDGRID 10020
 #define SYMBOL_BONDSDLG_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_BONDSDLG_TITLE _("BondsDlg")
 #define SYMBOL_BONDSDLG_IDNAME ID_BONDSDIALOG
 #define SYMBOL_BONDSDLG_SIZE wxDefaultSize
 #define SYMBOL_BONDSDLG_POSITION wxDefaultPosition
-#define ID_CHOICE 10022
-#define ID_BONDGRID 10020
 ////@end control identifiers
 
 /*!
@@ -78,42 +78,42 @@ public:
 
 ////@begin BondsDlg event handler declarations
 
-    /// wxEVT_CLOSE_WINDOW event handler for ID_BONDSDIALOG
-    void OnCloseWindow( wxCloseEvent& event );
+	/// wxEVT_CLOSE_WINDOW event handler for ID_BONDSDIALOG
+	void OnCloseWindow( wxCloseEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
-    void OnAddClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
+	void OnAddClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE
-    void OnDeleteClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE
+	void OnDeleteClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CHOICE
-    void OnChoiceSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CHOICE
+	void OnChoiceSelected( wxCommandEvent& event );
 
-    /// wxEVT_GRID_CELL_CHANGE event handler for ID_BONDGRID
-    void OnCellChange( wxGridEvent& event );
+	/// wxEVT_GRID_CELL_CHANGE event handler for ID_BONDGRID
+	void OnCellChange( wxGridEvent& event );
 
-    /// wxEVT_GRID_SELECT_CELL event handler for ID_BONDGRID
-    void OnSelectCell( wxGridEvent& event );
+	/// wxEVT_GRID_SELECT_CELL event handler for ID_BONDGRID
+	void OnSelectCell( wxGridEvent& event );
 
-    /// wxEVT_GRID_RANGE_SELECT event handler for ID_BONDGRID
-    void OnRangeSelect( wxGridRangeSelectEvent& event );
+	/// wxEVT_GRID_RANGE_SELECT event handler for ID_BONDGRID
+	void OnRangeSelect( wxGridRangeSelectEvent& event );
 
-    /// wxEVT_SIZE event handler for ID_BONDGRID
-    void OnSize( wxSizeEvent& event );
+	/// wxEVT_SIZE event handler for ID_BONDGRID
+	void OnSize( wxSizeEvent& event );
 
 ////@end BondsDlg event handler declarations
 
 ////@begin BondsDlg member function declarations
 
-    MolDisplayWin * GetParent() const { return Parent ; }
-    void SetParent(MolDisplayWin * value) { Parent = value ; }
+	MolDisplayWin * GetParent() const { return Parent ; }
+	void SetParent(MolDisplayWin * value) { Parent = value ; }
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource( const wxString& name );
 
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+	/// Retrieves icon resources
+	wxIcon GetIconResource( const wxString& name );
 ////@end BondsDlg member function declarations
 
     /// Should we show tooltips?
@@ -127,12 +127,12 @@ public:
 
 	void UpdateSelection(bool mode);
 ////@begin BondsDlg member variables
-    wxButton* AddBtn;
-    wxButton* DeleteBtn;
-    wxStaticText* bondText;
-    wxChoice* BondOrderCtl;
-    wxGrid* bondGrid;
-    MolDisplayWin * Parent;
+	wxButton* AddBtn;
+	wxButton* DeleteBtn;
+	wxStaticText* bondText;
+	wxChoice* BondOrderCtl;
+	wxGrid* bondGrid;
+	MolDisplayWin * Parent;
 ////@end BondsDlg member variables
 };
 

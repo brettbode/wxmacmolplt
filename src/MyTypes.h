@@ -239,7 +239,6 @@ class mpAtom {
 		inline void SetFragmentNumber(long fragNum) {if (fragNum>=0) fragmentId = fragNum;};
 		inline long GetFragmentNumber(void) const {return fragmentId;};
 		inline long GetNuclearCharge(void) const {return (GetType());};	//NOT correct for ECP's!!!!!
-//		void SetDefaultHybridization(void);
 		void SetDefaultCoordinationNumber(void);
 		void SetDefaultLonePairCount(void);
 };
@@ -249,6 +248,7 @@ enum BondOrder {
 	kSingleBond,
 	kDoubleBond,
 	kTripleBond,
+	kAromaticBond,
 	kMixedBonds,
 	kUnknownBond
 };
