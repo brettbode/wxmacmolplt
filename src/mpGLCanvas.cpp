@@ -1185,6 +1185,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
 				MolWin->SetStatusText(wxT("Added new atom."));
 				MolWin->UpdateGLModel();
+				MolWin->AdjustMenus();
 
 				// Let's select the new atom.
 				selected = lFrame->NumAtoms - 1;
@@ -2925,6 +2926,7 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 	select_stack_top = 0;
 	MolWin->UpdateModelDisplay();
 	MolWin->AtomsChanged(true, false);
+	MolWin->AdjustMenus();
 }
 
 void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
@@ -2946,6 +2948,7 @@ void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
 
 	MolWin->UpdateModelDisplay();
 	MolWin->AtomsChanged(true, false);
+	MolWin->AdjustMenus();
 }
 
 void MpGLCanvas::toggleInteractiveMode(void) {

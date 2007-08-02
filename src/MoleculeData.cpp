@@ -77,11 +77,6 @@ bool MoleculeData::SetupFrameMemory(long NumAtoms, long NumBonds) {
 		if (tempBonds) delete [] tempBonds;
 		return false;
 	}
-//	if (!tempAtoms || !tempBonds) {
-//		if (tempAtoms) delete [] tempAtoms;
-//		if (tempBonds) delete [] tempBonds;
-//		return false;
-//	}
 	memcpy(tempAtoms, cFrame->Atoms, cFrame->NumAtoms*sizeof(mpAtom));
 	memcpy(tempBonds, cFrame->Bonds, cFrame->NumBonds*sizeof(Bond));
 	if (cFrame->Atoms) delete [] cFrame->Atoms;	//delete old arrays, if any
@@ -104,13 +99,6 @@ bool MoleculeData::SetupFrameMemory(long NumAtoms, long NumBonds) {
 			zBuffer = new long[MaxAtoms];
 			return false;
 		}
-//		if (!RotCoords || !zBuffer) {
-//			if (RotCoords) delete [] RotCoords;
-//			if (zBuffer) delete [] zBuffer;	//Attempt to restore the zBuffer
-//			RotCoords = new CPoint3D[MaxAtoms];
-//			zBuffer = new long[MaxAtoms];
-//			return false;
-//		}
 		MaxAtoms = NumAtoms;
 	}
 	return true;

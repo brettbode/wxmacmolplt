@@ -311,7 +311,7 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 				//<bond id="b1" atomRefs2="a1 a2" order="S"/>
 				//CML only specifies single, double, triple, and aromatic bonds
 				//Need to handle hydrogen bonds as an extension
-			if ((Bonds[j].Order == kHydrogenBond)||(Bonds[j].Order > kTripleBond)) {
+			if ((Bonds[j].Order == kHydrogenBond)||(Bonds[j].Order > kAromaticBond)) {
 				NonCMLBonds = true;
 				continue;
 			}

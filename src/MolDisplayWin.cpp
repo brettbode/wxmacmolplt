@@ -828,7 +828,8 @@ void MolDisplayWin::OnShowBondSitesUpdate(wxUpdateUIEvent& event) {
 
 void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(false);
-	if (MainData->cFrame->NumAtoms == 0) {
+	//paste is allowed for empty frames or while in edit mode
+	if ((MainData->cFrame->NumAtoms == 0)||HandSelected()) {
 		if (wxTheClipboard->Open()) {
 			if (wxTheClipboard->IsSupported(wxDF_TEXT) ||
 				wxTheClipboard->IsSupported(_("CML"))) {
@@ -1682,13 +1683,29 @@ void MolDisplayWin::menuEditUndo(wxCommandEvent &event) {
 		mUndoBuffer.SetPosition(mUndoBuffer.GetOperationCount()-1);
 	}
 	mUndoBuffer.UndoOperation();
+	mHighliteState = false;
+	for (long i=0; i<MainData->cFrame->NumAtoms; i++) {
+		if (MainData->cFrame->Atoms[i].GetSelectState()) {
+			mHighliteState = true;
+			break;
+		}
+	}
 	ResetModel(false);
 	AtomsChanged(true, false);
+	AdjustMenus();
 }
 void MolDisplayWin::menuEditRedo(wxCommandEvent &event) {
 	mUndoBuffer.RedoOperation();
+	mHighliteState = false;
+	for (long i=0; i<MainData->cFrame->NumAtoms; i++) {
+		if (MainData->cFrame->Atoms[i].GetSelectState()) {
+			mHighliteState = true;
+			break;
+		}
+	}
 	ResetModel(false);
 	AtomsChanged(true, false);
+	AdjustMenus();
 }
 
 void MolDisplayWin::menuEditCut(wxCommandEvent &event) {
@@ -1723,7 +1740,6 @@ void MolDisplayWin::menuEditCopy(wxCommandEvent &event) {
 			if (Buffer) delete Buffer;
 			if (CML) delete [] CML;
 		}
-//        wxTheClipboard->SetData(new wxBitmapDataObject(glCanvas->getImage(0,0)));
 		wxTheClipboard->SetData(comp);
 		wxTheClipboard->Close();
 	}
@@ -1741,6 +1757,7 @@ void MolDisplayWin::CopyCoordinates(short ctype) const {
 		if (ctype == 0) {
 			wxString    Label;
 			for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
+				if (mHighliteState && !lFrame->Atoms[iatm].GetSelectState()) continue;
 				Prefs->GetAtomLabel(lFrame->Atoms[iatm].GetType()-1, Label);
 				textBuffer.Append(Label);
 				Label.Printf(wxT("   %5.1f  %13.8f  %13.8f  %13.8f\r"),
@@ -1784,35 +1801,64 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 				if (CML) {
 					BeginOperation();
 					try {
-						if (MainData->NumFrames > 1) {
+						if ((MainData->NumFrames > 1)||HandSelected()) {
 							MoleculeData *	tdatap = new MoleculeData();
 							if (!tdatap) return;
 							BufferFile *Buffer = new BufferFile(CML, strlen(CML));
 							if (tdatap->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, false)) {
-								tdatap->cFrame->PreviousFrame = MainData->cFrame->PreviousFrame;
-								tdatap->cFrame->NextFrame = MainData->cFrame->NextFrame;
-								if (MainData->cFrame->PreviousFrame)
-									MainData->cFrame->PreviousFrame->NextFrame = tdatap->cFrame;
-								if (MainData->cFrame->NextFrame)
-									MainData->cFrame->NextFrame->PreviousFrame = tdatap->cFrame;
-								MainData->cFrame->PreviousFrame = MainData->cFrame->NextFrame = NULL;
-								if (MainData->cFrame == MainData->Frames) MainData->Frames = tdatap->cFrame;
-								delete MainData->cFrame;
-								MainData->cFrame = tdatap->cFrame;
-								if (tdatap->MaxAtoms > MainData->MaxAtoms) {
-									MainData->MaxAtoms = tdatap->MaxAtoms;
-									if (MainData->RotCoords) delete [] MainData->RotCoords;
-									if (MainData->zBuffer) delete [] MainData->zBuffer;
-									MainData->RotCoords = tdatap->RotCoords;
-									MainData->zBuffer = tdatap->zBuffer;
-									tdatap->RotCoords = NULL;
-									tdatap->zBuffer = NULL;
+								if (HandSelected()) {
+									CreateFrameSnapShot();
+									//In builder mode copy the selected atoms over
+									bool CopyAllAtoms = true;
+									for (long i=0; i<tdatap->cFrame->NumAtoms; i++) {
+										if (tdatap->cFrame->Atoms[i].GetSelectState()) {
+											CopyAllAtoms = false;
+											break;
+										}
+									}
+									long initialAtomCount = MainData->cFrame->NumAtoms;
+									for (long i=0; i<tdatap->cFrame->NumAtoms; i++) {
+										if (CopyAllAtoms || tdatap->cFrame->Atoms[i].GetSelectState()) {
+											MainData->cFrame->AddAtom(tdatap->cFrame->Atoms[i].GetType(),
+																	  tdatap->cFrame->Atoms[i].Position);
+											MainData->AtomAdded();
+										}
+									}
+									for (long i=0; i<initialAtomCount; i++) {
+										MainData->cFrame->Atoms[i].SetSelectState(false);
+									}
+									for (long i=initialAtomCount; i<MainData->cFrame->NumAtoms; i++) {
+										MainData->cFrame->Atoms[i].SetSelectState(true);
+									}
+									if (Prefs->GetAutoBond())
+										MainData->cFrame->SetBonds(Prefs, false);
+									mHighliteState = true;
+								} else {
+									tdatap->cFrame->PreviousFrame = MainData->cFrame->PreviousFrame;
+									tdatap->cFrame->NextFrame = MainData->cFrame->NextFrame;
+									if (MainData->cFrame->PreviousFrame)
+										MainData->cFrame->PreviousFrame->NextFrame = tdatap->cFrame;
+									if (MainData->cFrame->NextFrame)
+										MainData->cFrame->NextFrame->PreviousFrame = tdatap->cFrame;
+									MainData->cFrame->PreviousFrame = MainData->cFrame->NextFrame = NULL;
+									if (MainData->cFrame == MainData->Frames) MainData->Frames = tdatap->cFrame;
+									delete MainData->cFrame;
+									MainData->cFrame = tdatap->cFrame;
+									if (tdatap->MaxAtoms > MainData->MaxAtoms) {
+										MainData->MaxAtoms = tdatap->MaxAtoms;
+										if (MainData->RotCoords) delete [] MainData->RotCoords;
+										if (MainData->zBuffer) delete [] MainData->zBuffer;
+										MainData->RotCoords = tdatap->RotCoords;
+										MainData->zBuffer = tdatap->zBuffer;
+										tdatap->RotCoords = NULL;
+										tdatap->zBuffer = NULL;
+									}
+									if (tdatap->Basis && !MainData->Basis) {
+										MainData->Basis = tdatap->Basis;
+										tdatap->Basis = NULL;
+									}
+									tdatap->cFrame = tdatap->Frames = NULL; //this frame is now in use in MainData
 								}
-								if (tdatap->Basis && !MainData->Basis) {
-									MainData->Basis = tdatap->Basis;
-									tdatap->Basis = NULL;
-								}
-								tdatap->cFrame = tdatap->Frames = NULL; //this frame is now in use in MainData
 							}
 							if (Buffer) delete Buffer;
 							delete tdatap;
@@ -1850,11 +1896,13 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 }
 void MolDisplayWin::PasteText(void) {
 	//relax this restriction later (while in build mode)
-	if (MainData->cFrame->NumAtoms != 0) return;    //Do not allow pasting if there are already atoms in this frame
+	if ((MainData->cFrame->NumAtoms != 0)&&!HandSelected()) return;    //Do not allow pasting if there are already atoms in this frame
 	if (wxTheClipboard->Open()) {
 		if (wxTheClipboard->IsSupported(wxDF_TEXT)) {
+			if (HandSelected()) CreateFrameSnapShot();
 			long        iline, test, Type;
 			CPoint3D    Position, offset;
+			long initialAtomCount = MainData->cFrame->NumAtoms;
 			
 			wxTextDataObject data;
 			wxTheClipboard->GetData(data);
@@ -1864,12 +1912,13 @@ void MolDisplayWin::PasteText(void) {
 			BufferFile * TextBuffer=NULL;
 			try {
 				TextBuffer = new BufferFile(tbuf, text.Length());
-				if (MainData->NumFrames == 1) { //If this is the only frame, make sure it is init'ed
+				if ((MainData->NumFrames == 1)&&(MainData->cFrame->NumAtoms==0)) {
+					//If this is the only frame, make sure it is init'ed
 					InitRotationMatrix(MainData->TotalRotation);
 				}
 				long NumLines = TextBuffer->GetNumLines(-1);
 				// There may be up to NumLines atoms so dimension memory accordingly
-				if (!MainData->SetupFrameMemory(NumLines, 0)) {
+				if (!MainData->SetupFrameMemory(NumLines+initialAtomCount, 0)) {
 					delete TextBuffer;
 					delete [] tbuf;
 					wxTheClipboard->Close();
@@ -1895,9 +1944,7 @@ void MolDisplayWin::PasteText(void) {
 						}
 						
 						MainData->cFrame->AddAtom(Type, Position);
-						MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.x));
-						MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.y));
-						MainData->MaxSize = MAX(MainData->MaxSize, fabs(Position.z));
+						MainData->AtomAdded();
 					}
 				}
 				//Done with the text handle so unlock it
@@ -1910,7 +1957,6 @@ void MolDisplayWin::PasteText(void) {
 			delete [] tbuf;
 		   
 			if (iline == 0) {   /*No atoms were found so clear the memory I just allocated*/
-		//      MainData->ResetFrameMemory();
 				wxTheClipboard->Close();
 				return;
 			}
@@ -1918,12 +1964,22 @@ void MolDisplayWin::PasteText(void) {
 			//If there were special atoms found turn on drawing by default
 			if (MainData->cFrame->SpecialAtoms) MainData->SetSpecialAtomDrawMode(true);
 
+			for (long i=0; i<initialAtomCount; i++) {
+				MainData->cFrame->Atoms[i].SetSelectState(false);
+			}
+			for (long i=initialAtomCount; i<MainData->cFrame->NumAtoms; i++) {
+				MainData->cFrame->Atoms[i].SetSelectState(true);
+			}
 			if (Prefs->GetAutoBond())
 				MainData->cFrame->SetBonds(Prefs, false);
 			//Now reset the display to take into account the new atoms
-			MainData->CenterModelWindow();
-			MainData->WindowSize = 2.0*MainData->MaxSize;
-			MainData->ResetRotation();
+			if (initialAtomCount == 0) {
+				MainData->CenterModelWindow();
+				MainData->WindowSize = 2.0*MainData->MaxSize;
+				MainData->ResetRotation();
+			} else {
+				mHighliteState = true;
+			}
 			FrameChanged();
 		}
 		wxTheClipboard->Close();
@@ -2454,8 +2510,18 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 			case WXK_BACK:
 			case WXK_DELETE:
 				if (interactiveMode && HandSelected()) {
-					wxCommandEvent foo;
-					glCanvas->On_Delete_Single_Frame(foo);
+					if (mHighliteState) {
+						CreateFrameSnapShot();
+						for (long i=MainData->cFrame->NumAtoms-1; i>=0; i--) {
+							if (MainData->cFrame->Atoms[i].GetSelectState()) {
+								MainData->DeleteAtom(i, false);
+							}
+						}
+						mHighliteState = false;
+						UpdateModelDisplay();
+						AtomsChanged(true, false);
+						AdjustMenus();
+					}
 					return;
 				}
 				break;
