@@ -1800,7 +1800,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			mDragWin = (wxDragImage*) NULL;
 		} else {
 			mDragWin->Move(event.GetPosition());
-			mDragWin->Show();
+	//		mDragWin->Show();
 		}
 
 		lFrame->SetBonds(Prefs, true, true);
