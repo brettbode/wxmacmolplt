@@ -1766,6 +1766,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			}
 
 			SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
+
 			rotMat[3][0] = v1.x;
 			rotMat[3][1] = v1.y;
 			rotMat[3][2] = v1.z;

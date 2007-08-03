@@ -41,6 +41,8 @@
 #else
 #include "MolDisplayWin.h"
 #endif
+
+//#include "mat2quat.h"
 #include "InputData.h"
 #include "Prefs.h"
 #include <string.h>
@@ -3645,6 +3647,7 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
   mpAtom * lAtoms = lFrame->Atoms;
 
   //drawing atoms
+
   long NumAtoms = lFrame->NumAtoms;
   float AtomScale = Prefs->GetAtomScale();
   long curAtomType;
@@ -3684,13 +3687,11 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
   Bond * lBonds = lFrame->Bonds;
   long NumBonds = lFrame->NumBonds;
   double BondSize = Prefs->GetQD3DBondWidth();
-  float dotProd;
-  //CPoint3D NormX = CPoint3D(1,0,0);
-  //CPoint3D NormY = CPoint3D(0,1,0);
-  //CPoint3D NormZ = CPoint3D(0,0,1);
-  float angleX, angleY, angleZ;
-  float tmpMag;
-  int sign = 1;
+  //float dotProd;
+  Matrix4D rotMat;
+  CPoint3D	NormalOffset, NormStart = CPoint3D(0.0f, 1.0f, 0.0f);
+  double theta;
+  double axisX, axisY, axisZ;
 
   for (long ibond=0; ibond<NumBonds; ibond++) {
     CPoint3D v1, v2, offset;
@@ -3717,37 +3718,39 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
       offset.y = v2.y - v1.y;
       offset.z = v2.z - v1.z;
 
-      float length = offset.Magnitude();
-      float radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
-      float radius2 = AtomScale*Prefs->GetAtomSize(lAtoms[atom2].GetType() - 1);
-      float percent1 = radius1/length;
-      float percent2 = radius2/length;
-      float centerPercent = 0.5 + 0.5*(percent1-percent2);
+      double length = offset.Magnitude();
+      double radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
+      double radius2 = AtomScale*Prefs->GetAtomSize(lAtoms[atom2].GetType() - 1);
+      double percent1 = radius1/length;
+      double percent2 = radius2/length;
+      double centerPercent = 0.5 + 0.5*(percent1-percent2);
+
+      if (length>0.00001) {
+	NormalOffset.x = offset.x/length;
+	NormalOffset.y = offset.y/length;
+	NormalOffset.z = offset.z/length;
+      } else {
+	NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
+      }
+
+      SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
+
+      double tmp1 = rotMat[2][1]-rotMat[1][2];
+      double tmp2 = rotMat[0][2]-rotMat[2][0];
+      double tmp3 = rotMat[1][0]-rotMat[0][1];
+      double dev = sqrt(tmp1*tmp1+tmp2*tmp2+tmp3*tmp3);
+      theta = -1 * acos((rotMat[0][0] + rotMat[1][1] + rotMat[2][2] - 1)/2);
+
+      if ( fabs(dev) > 0.0000001 ) {
+	axisX = (rotMat[2][1] - rotMat[1][2]) / dev;
+	axisY = (rotMat[0][2] - rotMat[2][0]) / dev;
+	axisZ = (rotMat[1][0] - rotMat[0][1]) / dev;
+      }
 
       CPoint3D v3; //first half bond from atom 1
       v3.x = centerPercent*(v2.x - v1.x)+v1.x;
       v3.y = centerPercent*(v2.y - v1.y)+v1.y;
       v3.z = centerPercent*(v2.z - v1.z)+v1.z;
-
-      //dotProd = fabs(offset.y);
-      dotProd = offset.y;
-      tmpMag = sqrt(offset.y*offset.y+offset.z*offset.z);
-      offset.z > 0 ? sign = 1 : sign = -1;
-
-      if (tmpMag > 0.00000001)
-	angleX = sign * acos(dotProd/tmpMag);
-      else
-	angleX = 0;
-
-      //dotProd = -1 * fabs(offset.y);
-      dotProd = offset.y;
-      tmpMag = sqrt(offset.y*offset.y+offset.x*offset.x);
-      offset.x > 0 ? sign = -1 : sign = 1;
-      
-      if (tmpMag > 0.00000001)
-	angleZ = sign * acos(dotProd/tmpMag);
-      else
-	angleZ = 0;
 
       curAtomType = lAtoms[atom1].GetType() - 1;
       AtomColor = Prefs->GetAtomColorLoc(curAtomType);
@@ -3756,22 +3759,16 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
       blue = AtomColor->blue/65536.0;
 
       Buffer->PutText("Transform {\n");
-      if ( fabs(angleX) > 0.000001 && fabs(angleX) < PI) {
-	tmpStr.Printf(wxT("\trotation 1 0 0 %f\n"), angleX);
-	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      }
 
-      if ( fabs(angleZ) > 0.000001 && fabs(angleZ) < PI) {
-	tmpStr.Printf(wxT("\trotation 0 0 1 %f\n"), angleZ);
+      if (fabs(dev) > 0.000001) {
+	tmpStr.Printf(wxT("\trotation %lf %lf %lf %lf\n"), axisX, axisY, axisZ, theta);
 	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
       }
-      //tmpStr.Printf(wxT("\trotation 0 1 0 %f\n"), angleY);
-      //Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      tmpStr.Printf(wxT("\ttranslation %f %f %f\n"), (v1.x+v3.x)/2, (v1.y+v3.y)/2, (v1.z+v3.z)/2);
+      tmpStr.Printf(wxT("\ttranslation %lf %lf %lf\n"), (v1.x+v3.x)/2, (v1.y+v3.y)/2, (v1.z+v3.z)/2);
       Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
       Buffer->PutText("\tchildren [\n");
       Buffer->PutText("\t\tShape {\n");
-      tmpStr.Printf(wxT("\t\t\tgeometry Cylinder { radius %f height %f}\n"), BondSize, centerPercent*length);
+      tmpStr.Printf(wxT("\t\t\tgeometry Cylinder { radius %lf height %lf}\n"), BondSize, (centerPercent)*length);
       Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
       Buffer->PutText("\t\t\tappearance Appearance {\n");
       tmpStr.Printf(wxT("\t\t\t\tmaterial Material { diffuseColor %f %f %f }\n"),
@@ -3789,20 +3786,16 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
       blue = AtomColor->blue/65536.0;
 
       Buffer->PutText("Transform {\n");
-      if ( fabs(angleX) > 0.000001 && fabs(angleX) < PI) {
-	tmpStr.Printf(wxT("\trotation 1 0 0 %f\n"), angleX);
+
+      if (fabs(dev) > 0.000001) {
+	tmpStr.Printf(wxT("\trotation %lf %lf %lf %lf\n"), axisX, axisY, axisZ, theta);
 	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
       }
-
-      if ( fabs(angleZ) > 0.000001 && fabs(angleZ) < PI) {
-      tmpStr.Printf(wxT("\trotation 0 0 1 %f\n"), angleZ);
-      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      }
-      tmpStr.Printf(wxT("\ttranslation %f %f %f\n"), (v2.x+v3.x)/2, (v2.y+v3.y)/2, (v2.z+v3.z)/2);
+      tmpStr.Printf(wxT("\ttranslation %lf %lf %lf\n"), (v2.x+v3.x)/2, (v2.y+v3.y)/2, (v2.z+v3.z)/2);
       Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
       Buffer->PutText("\tchildren [\n");
       Buffer->PutText("\t\tShape {\n");
-      tmpStr.Printf(wxT("\t\t\tgeometry Cylinder { radius %f height %f}\n"), BondSize, (1-centerPercent)*length);
+      tmpStr.Printf(wxT("\t\t\tgeometry Cylinder { radius %lf height %lf}\n"), BondSize, (1-centerPercent)*length);
       Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
       Buffer->PutText("\t\t\tappearance Appearance {\n");
       tmpStr.Printf(wxT("\t\t\t\tmaterial Material { diffuseColor %f %f %f }\n"),
