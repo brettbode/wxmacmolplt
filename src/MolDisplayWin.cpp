@@ -2206,6 +2206,8 @@ void MolDisplayWin::menuViewAddMarkAnnotation(wxCommandEvent &event) {
 			MainData->Annotations.push_back(t);
 		}
 	}
+	UpdateModelDisplay();
+	Dirty = true;
 }
 void MolDisplayWin::menuViewAddAnnotation(wxCommandEvent &event) {
 	wxCommandEvent foo;
@@ -2214,6 +2216,8 @@ void MolDisplayWin::menuViewAddAnnotation(wxCommandEvent &event) {
 }
 void MolDisplayWin::menuViewDeleteAllAnnotations(wxCommandEvent &event) {
 	MainData->DeleteAllAnnotations();
+	UpdateModelDisplay();
+	Dirty = true;
 }
 
 void MolDisplayWin::menuViewShow2DPattern(wxCommandEvent &event) {
