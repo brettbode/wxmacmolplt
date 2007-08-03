@@ -3885,6 +3885,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	long secondaryBondedAtm = -1;
 	int bond_ids[6];
 	int bonded_atoms[6];
+	CPoint3D vecs[6];
 
 	// The primary bond will be the bond with the highest order and it
 	// will be assumed to be the axial bond.  We traverse the bonds list
@@ -3892,6 +3893,12 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	for (long i=0; i<NumBonds; i++) {
 		if (((iatom == lBonds[i].Atom1) || (iatom == lBonds[i].Atom2)) &&
 			(lBonds[i].Order > kHydrogenBond)) {
+
+			// If we already have 6 bonds and just found another, we've
+			// got no new sites to show.
+			if (bondCount == 6) {
+				return;
+			}
 
 			// We keep track of this atom's bonds.
 			bond_ids[bondCount] = i;
@@ -3917,11 +3924,18 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 			}
 		}
 	}
-	int lpCount = lAtoms[iatom].GetLonePairCount();
-	
+
 	//Test to see if any bond sites are unused, if not return
 	if (bondCount >= coordination) return;
 
+	// Calculate vectors from central atom to each bonded atom.
+	for (int i = 0; i < bondCount; i++) {
+		vecs[i] = lAtoms[bonded_atoms[i]].Position - lAtoms[iatom].Position;
+		Normalize3D(&vecs[i]);
+	}
+
+	int lpCount = lAtoms[iatom].GetLonePairCount();
+	
 	CPoint3D origin = CPoint3D(0.0f, 0.0f, 0.0f);
 	float c, s, b, d;
 
@@ -3932,7 +3946,6 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 		b1Offset = lAtoms[primaryBondedAtm].Position - lAtoms[iatom].Position;
 		Normalize3D(&b1Offset);
 		CPoint3D target(0.0f, 1.0f, 0.0f);
-		
 		SetRotationMatrix(rot, &target, &b1Offset);
 	}
 
@@ -3941,17 +3954,6 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 		glColor3f(0.9f, 0.1f, 0.1f);
 	}
 
-	// if (bondCount == 0) {	//all cases share this 
-		// CPoint3D v(0.0f, 1.0f, 0.0f); 
-		// if (site_id == 0) { 
-			// glLoadName(1); 
-			// CreateCylinderFromLine(qobj, origin, 
-								   // v * 2.0f * radius, CYL_RADIUS, 10, 1, true); 
-		// } else if (site_id == 1) { 
-			// *vector = v; 
-		// } 
-	// } 
-				
 #define DO_SITE(vec, vec_site) \
 				if (site_id == 0) { \
 					glLoadName(vec_site); \
@@ -3960,42 +3962,51 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				} else if (site_id == vec_site) { \
 					*vector = vec; \
 				}
+
+	// If we get here, we know that there are some unbonded sites.
 	switch (coordination+lpCount) {
+
+		// Configuarion will be linear.
 		case 1:
-			if (bondCount == 0) {
+			{
 				CPoint3D v(0.0f, 1.0f, 0.0f);
-					// std::cout << "vec[" << vec_site << "]: " << vec << std::endl; \ 
 				DO_SITE(v, 1);
 			}
 			break;
+
+		// Configuration will be linear.
 		case 2:
 			{
+				// If we have no bonds yet of the 2 possible, we draw a site
+				// along the y-axis and its inverse.
 				if (bondCount == 0) {
 					CPoint3D v(0.0f, 1.0f, 0.0f);
 					DO_SITE(v, 1);
+					if (lpCount < 1) DO_SITE(v * -1.0f, 2);
 				}
-				CPoint3D v2 = b1Offset*-1.0;
-				if (site_id == 0) {
-					glLoadName(2);
-					CreateCylinderFromLine(qobj, origin,
-					v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-				} else if (site_id == 2) {
-					*vector = v2;
+
+				else if (bondCount == 1) {
+					DO_SITE(vecs[0] * -1.0f, 2);
 				}
 			}
 			break;
+
+		// Configuration will be planar triangular.
 		case 3:
 			if (bondCount == 0) {
 				CPoint3D v(0.0f, 1.0f, 0.0f);
 				DO_SITE(v, 1);
 			}
+
 			if (lpCount < 2) {
 				CPoint3D v3;
 				if (bondCount >= 2) {	//Setup the 3rd vector to have an equal angle to both bonds
-						//Just add the two bond vectors and invert
-					CPoint3D offset = lAtoms[secondaryBondedAtm].Position - lAtoms[iatom].Position;
-					Normalize3D(&offset);
-					v3 = b1Offset + offset;
+					//Just add the two bond vectors and invert
+					// CPoint3D offset = lAtoms[secondaryBondedAtm].Position - lAtoms[iatom].Position; 
+					// Normalize3D(&offset); 
+					// v3 = b1Offset + offset; 
+					// Normalize3D(&v3); 
+					v3 = (vecs[0] + vecs[1]) * -1.0f;
 					Normalize3D(&v3);
 					v3 *= -1.0;
 				} else { //Draw the 2nd position
@@ -4036,26 +4047,15 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 						}
 					}
 					if (bondCount <= 1) {
-						if (site_id == 0) {
-							glLoadName(2);
-							CreateCylinderFromLine(qobj, origin,
-											   v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-						} else if (site_id == 2) {
-							*vector = v2;
-						}
+						DO_SITE(v2, 2);
 					}
 				}
 				if (lpCount < 1) {
-					if (site_id == 0) {
-						glLoadName(3);
-						CreateCylinderFromLine(qobj, origin,
-										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-					} else if (site_id == 3) {
-						*vector = v3;
-					}
+					DO_SITE(v3, 3);
 				}
 			}
 			break;
+
 		case 4:
 			if (bondCount == 0) {
 				CPoint3D v(0.0f, 1.0f, 0.0f);
@@ -4095,13 +4095,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					sum += temp;
 					Normalize3D(&sum);
 					sum *= direction;
-					if (site_id == 0) {
-						glLoadName(4);
-						CreateCylinderFromLine(qobj, origin,
-										   sum * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-					} else if (site_id == 4) {
-						*vector = sum;
-					}
+					DO_SITE(sum, 4);
 				}
 				
 				// If only one bond is already formed, we calculate the second, third
@@ -4112,33 +4106,15 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					b = s * sin(kPi/3.0);
 					CPoint3D v2, temp(0.0f, c, s), v3(b, c, -0.5*s), v4(-b, c, -0.5*s);
 					Rotate3DOffset(rot,temp,&v2);
-					if (site_id == 0) {
-						glLoadName(2);
-						CreateCylinderFromLine(qobj, origin,
-										   v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-					} else if (site_id == 2) {
-						*vector = v2;
-					}
+					DO_SITE(v2, 2);
 					if (lpCount < 2) {
 						temp = v3;
 						Rotate3DOffset(rot,temp,&v3);
-						if (site_id == 0) {
-							glLoadName(3);
-							CreateCylinderFromLine(qobj, origin,
-											   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-						} else if (site_id == 3) {
-							*vector = v3;
-						}
+						DO_SITE(v3, 3);
 						if (lpCount < 1) {
 							temp = v4;
 							Rotate3DOffset(rot,temp,&v4);
-							if (site_id == 0) {
-								glLoadName(4);
-								CreateCylinderFromLine(qobj, origin,
-												   v4 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-							} else if (site_id == 4) {
-								*vector = v4;
-							}
+							DO_SITE(v4, 4);
 						}
 					}
 				}
@@ -4159,27 +4135,16 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					float s = sqrt(1.0f-(c*c)); //sin(109.5/2)
 					v3t = offset*c + cross*s;
 					Normalize3D(&v3t);
-					if (site_id == 0) {
-						glLoadName(3);
-						CreateCylinderFromLine(qobj, origin,
-										   v3t * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-					} else if (site_id == 3) {
-						*vector = v3t;
-					}
+					DO_SITE(v3t, 3);
 					if (lpCount == 0) {
 						v3t = offset*c - cross*s;
 						Normalize3D(&v3t);
-						if (site_id == 0) {
-							glLoadName(4);
-							CreateCylinderFromLine(qobj, origin,
-											   v3t * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-						} else if (site_id == 4) {
-							*vector = v3t;
-						}
+						DO_SITE(v3t, 4);
 					}
 				}
 			}
 			break;
+
 		case 5:
 			// Here axial and equitorial sites are different. LPs should go in
 			// axial sites first.
@@ -4192,43 +4157,44 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				CPoint3D equat3(-c, 0.0f, 0.5f);
 
 				DO_SITE(equat1, 1);
-				DO_SITE(equat2, 2);
-				DO_SITE(equat3, 3);
-				DO_SITE(axial, 4);
-				DO_SITE(axial * -1.0f, 5);
+				if (lpCount < 4) {
+					DO_SITE(equat2, 2);
+					if (lpCount < 3) {
+						DO_SITE(equat3, 3);
+						if (lpCount < 2) {
+							DO_SITE(axial, 4);
+							if (lpCount < 1) DO_SITE(axial * -1.0f, 5);
+						}
+					}
+				}
 			}
 			
 			else if (bondCount == 1) {
-				CPoint3D vec1 = lAtoms[bonded_atoms[0]].Position -
-								lAtoms[iatom].Position;
-				Normalize3D(&vec1);
 
 				CPoint3D axial;
 				CPoint3D equat1;
 				CPoint3D equat2;
 				Matrix4D rotate_mat;
 
-				OrthoVector(vec1, axial);
+				OrthoVector(vecs[0], axial);
 				RotateAroundAxis(rotate_mat, axial, 120.0f);
-				Rotate3DPt(rotate_mat, vec1, &equat1);
-				equat2 = (equat1 + vec1) * -1.0f;
+				Rotate3DPt(rotate_mat, vecs[0], &equat1);
+				equat2 = (equat1 + vecs[0]) * -1.0f;
 				Normalize3D(&equat2);
 
 				DO_SITE(equat1, 2);
-				DO_SITE(equat2, 3);
-				DO_SITE(axial, 4);
-				DO_SITE(axial * -1.0f, 5);
+				if (lpCount < 3) {
+					DO_SITE(equat2, 3);
+					if (lpCount < 2) {
+						DO_SITE(axial, 4);
+						if (lpCount < 1) DO_SITE(axial * -1.0f, 5);
+					}
+				}
 			}
 
 			else if (bondCount == 2) {
-				CPoint3D vec1 = lAtoms[bonded_atoms[0]].Position -
-								lAtoms[iatom].Position;
-				CPoint3D vec2 = lAtoms[bonded_atoms[1]].Position -
-								lAtoms[iatom].Position;
-				Normalize3D(&vec1);
-				Normalize3D(&vec2);
 
-				float dot = DotProduct3D(&vec1, &vec2);
+				float dot = DotProduct3D(&vecs[0], &vecs[1]);
 
 				// If the two vectors are close to orthogonal, we assume the
 				// primary bond is equatorial and the secondary axial.
@@ -4239,51 +4205,45 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					CPoint3D equat2;
 					CPoint3D equat3;
 
-					CrossProduct3D(&vec1, &vec2, &cross1);
-					CrossProduct3D(&vec1, &cross1, &cross2);
+					CrossProduct3D(&vecs[0], &vecs[1], &cross1);
+					CrossProduct3D(&vecs[0], &cross1, &cross2);
 					Normalize3D(&cross2);
 
-					if (DotProduct3D(&vec2, &cross2) > 0.0f) {
+					if (DotProduct3D(&vecs[1], &cross2) > 0.0f) {
 						cross2 *= -1.0f;
 					}
 
 					RotateAroundAxis(rotate_mat, cross2, 120.0f);
-					Rotate3DPt(rotate_mat, vec1, &equat2);
-					equat3 = (vec1 + equat2) * -1.0f;
+					Rotate3DPt(rotate_mat, vecs[0], &equat2);
+					equat3 = (vecs[0] + equat2) * -1.0f;
 					Normalize3D(&equat3);
 
 					DO_SITE(equat2, 3);
-					DO_SITE(equat3, 4);
-					DO_SITE(cross2, 5);
+					if (lpCount < 2) {
+						DO_SITE(equat3, 4);
+						if (lpCount < 1) DO_SITE(cross2, 5);
+					}
 				}
 
 				else {
 					CPoint3D axial;
 					CPoint3D equat3;
 
-					equat3 = (vec1 + vec2) * -1.0f;
+					equat3 = (vecs[0] + vecs[1]) * -1.0f;
 					Normalize3D(&equat3);
 
-					CrossProduct3D(&vec1, &vec2, &axial);
+					CrossProduct3D(&vecs[0], &vecs[1], &axial);
 					Normalize3D(&axial);
 
 					DO_SITE(equat3, 3);
-					DO_SITE(axial, 4);
-					DO_SITE(axial * -1.0f, 5);
+					if (lpCount < 2) {
+						DO_SITE(axial, 4);
+						if (lpCount < 1) DO_SITE(axial * -1.0f, 5);
+					}
 				}
 			}
 
 			else if (bondCount == 3) {
-				CPoint3D vecs[3];
-				vecs[0] = lAtoms[bonded_atoms[0]].Position -
-						  lAtoms[iatom].Position;
-				vecs[1] = lAtoms[bonded_atoms[1]].Position -
-						  lAtoms[iatom].Position;
-				vecs[2] = lAtoms[bonded_atoms[2]].Position -
-						  lAtoms[iatom].Position;
-				Normalize3D(&vecs[0]);
-				Normalize3D(&vecs[1]);
-				Normalize3D(&vecs[2]);
 
 				float dot12 = DotProduct3D(&vecs[0], &vecs[1]);
 				float dot13 = DotProduct3D(&vecs[0], &vecs[2]);
@@ -4322,7 +4282,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					// construction.
 
 					DO_SITE(equat2, 4);
-					DO_SITE(equat3, 5);
+					if (lpCount < 1) DO_SITE(equat3, 5);
 				}
 
 				else if (fabs(dot12) < 0.25f || fabs(dot13) < 0.25f ||
@@ -4374,7 +4334,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					Normalize3D(&equat3);
 
 					DO_SITE(equat3, 4);
-					DO_SITE(cross, 5);
+					if (lpCount < 1) DO_SITE(cross, 5);
 				}
 
 				else {
@@ -4384,28 +4344,12 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					Normalize3D(&cross);
 
 					DO_SITE(cross, 4);
-					DO_SITE(cross * -1.0f, 5);
+					if (lpCount < 1) DO_SITE(cross * -1.0f, 5);
 				}
-
 
 			}
 
 			else if (bondCount == 4) {
-
-				CPoint3D vecs[4];
-				vecs[0] = lAtoms[bonded_atoms[0]].Position -
-						  lAtoms[iatom].Position;
-				vecs[1] = lAtoms[bonded_atoms[1]].Position -
-						  lAtoms[iatom].Position;
-				vecs[2] = lAtoms[bonded_atoms[2]].Position -
-						  lAtoms[iatom].Position;
-				vecs[3] = lAtoms[bonded_atoms[3]].Position -
-						  lAtoms[iatom].Position;
-
-				Normalize3D(&vecs[0]);
-				Normalize3D(&vecs[1]);
-				Normalize3D(&vecs[2]);
-				Normalize3D(&vecs[3]);
 
 				float dot_ij;
 				bool is_axial = false;
@@ -4422,7 +4366,6 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 						// Vector has an antiparallel mate, so we can't stop
 						// now.
 						if (dot_ij < -0.75) {
-							// std::cout << "dot_ij: " << dot_ij << std::endl; 
 							is_axial = true;
 							break;
 						}
@@ -4437,7 +4380,6 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					}
 
 					if (is_axial) {
-						// std::cout << "found axial pair" << std::endl; 
 						CPoint3D equat3;
 						int ids[4] = {0, 1, 2, 3};
 						int tmp;
@@ -4448,7 +4390,6 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 						DO_SITE(equat3, 5);
 						break;
 					} else if (!is_equatorial) {
-						// std::cout << "found axial single" << std::endl; 
 						DO_SITE(vecs[i] * -1.0f, 5);
 						break;
 					}
@@ -4464,76 +4405,53 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 			break;
 		case 6:
+
 			if (bondCount == 0) {
-				CPoint3D vec(0.0f, 1.0f, 0.0f);
-				DO_SITE(vec, 1);
+				CPoint3D e1(1.0f, 0.0f, 0.0f);
+				CPoint3D e2(0.0f, 1.0f, 0.0f);
+				CPoint3D e3(0.0f, 0.0f, 1.0f);
+
+				DO_SITE(e1, 1);
+				if (lpCount < 5) {
+					DO_SITE(e1 * -1.0f, 2);
+					if (lpCount < 4) {
+						DO_SITE(e2, 3);
+						if (lpCount < 3) {
+							DO_SITE(e2 * -1.0f, 4);
+							if (lpCount < 2) {
+								DO_SITE(e3, 5);
+								if (lpCount < 1) DO_SITE(e3 * -1.0f, 6);
+							}
+						}
+					}
+				}
 			}
 
-			if (bondCount <= 1) {
-				b = sqrt(kPi / 4.0f);
-				CPoint3D v2 = b1Offset*-1.0;
-				if (site_id == 0) {
-					glLoadName(2);
-					CreateCylinderFromLine(qobj, origin,
-										   v2 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-				} else if (site_id == 2) {
-					*vector = v2;
-				}
-				CPoint3D temp(b, 0.0f, b), v3;
-				Rotate3DOffset(rot,temp,&v3);
-				Normalize3D(&v3);
-				if (site_id == 0) {
-					glLoadName(3);
-					CreateCylinderFromLine(qobj, origin,
-										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-				} else if (site_id == 3) {
-					*vector = v3;
-				}
-				CPoint3D v4t(-b, 0.0f, b);
-				Rotate3DOffset(rot,v4t,&v3);
-				Normalize3D(&v3);
-				if (site_id == 0) {
-					glLoadName(4);
-					CreateCylinderFromLine(qobj, origin,
-										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-				} else if (site_id == 4) {
-					*vector = v3;
-				}
-				CPoint3D v5t(-b, 0.0f, -b);
-				Rotate3DOffset(rot,v5t,&v3);
-				Normalize3D(&v3);
-				if (site_id == 0) {
-					glLoadName(5);
-					CreateCylinderFromLine(qobj, origin,
-										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-				} else if (site_id == 5) {
-					*vector = v3;
-				}
-				CPoint3D v6t(b, 0.0f, -b);
-				Rotate3DOffset(rot,v6t,&v3);
-				Normalize3D(&v3);
-				if (site_id == 0) {
-					glLoadName(6);
-					CreateCylinderFromLine(qobj, origin,
-										   v3 * 2.0f * radius, CYL_RADIUS, 10, 1, true);
-				} else if (site_id == 6) {
-					*vector = v3;
+			else if (bondCount == 1) {
+				CPoint3D ortho;
+				CPoint3D cross;
+
+				OrthoVector(vecs[0], ortho);
+				CrossProduct3D(&vecs[0], &ortho, &cross);
+
+				DO_SITE(vecs[0] * -1.0f, 2);
+				if (lpCount < 4) {
+					DO_SITE(ortho, 3);
+					if (lpCount < 3) {
+						DO_SITE(ortho * -1.0f, 4);
+						if (lpCount < 2) {
+							DO_SITE(cross, 5);
+							if (lpCount < 1) DO_SITE(cross * -1.0f, 6);
+						}
+					}
 				}
 			}
 
 			else if (bondCount == 2) {
 
-				// Find the two vectors from central atom to bonded atoms.
-				CPoint3D vec1 = lAtoms[bonded_atoms[0]].Position -
-								lAtoms[iatom].Position;
-				CPoint3D vec2 = lAtoms[bonded_atoms[1]].Position -
-								lAtoms[iatom].Position;
-				Normalize3D(&vec1);
-				Normalize3D(&vec2);
-
 				// Use their dot product to determine if they're orthogonal or
 				// otherwise.
-				float dot = DotProduct3D(&vec1, &vec2);
+				float dot = DotProduct3D(&vecs[0], &vecs[1]);
 
 				// If the two existing bonds are closer to being orthogonal
 				// than parallel (or antiparallel), then we have four bonds
@@ -4547,19 +4465,23 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				if (fabs(dot) < 0.7f) {
 					CPoint3D cross;
 					CPoint3D cross2;
-					CrossProduct3D(&vec1, &vec2, &cross);
+					CrossProduct3D(&vecs[0], &vecs[1], &cross);
 					Normalize3D(&cross);
-					CrossProduct3D(&vec1, &cross, &cross2);
+					CrossProduct3D(&vecs[0], &cross, &cross2);
 					Normalize3D(&cross2);
 
-					if (DotProduct3D(&cross2, &vec2) > 0.0f) {
+					if (DotProduct3D(&cross2, &vecs[1]) > 0.0f) {
 						cross2 *= -1.0f;
 					}
 
-					DO_SITE(vec1 * -1.0f, 3);
-					DO_SITE(cross2, 4);
-					DO_SITE(cross, 5);
-					DO_SITE(cross * -1.0f, 6);
+					DO_SITE(vecs[0] * -1.0f, 3);
+					if (lpCount < 3) {
+						DO_SITE(cross2, 4);
+						if (lpCount < 2) {
+							DO_SITE(cross, 5);
+							if (lpCount < 1) DO_SITE(cross * -1.0f, 6);
+						}
+					}
 				}
 
 				// Otherwise, the two existing bonds must be antiparallel.
@@ -4572,37 +4494,27 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					CPoint3D ortho;
 					CPoint3D cross;
 
-					OrthoVector(vec1, ortho);
-					CrossProduct3D(&vec1, &ortho, &cross);
+					OrthoVector(vecs[0], ortho);
+					CrossProduct3D(&vecs[0], &ortho, &cross);
 					Normalize3D(&cross);
 
 					DO_SITE(ortho, 3);
-					DO_SITE(ortho * -1.0f, 4);
-					DO_SITE(cross, 5);
-					DO_SITE(cross * -1.0f, 6);
+					if (lpCount < 3) {
+						DO_SITE(ortho * -1.0f, 4);
+						if (lpCount < 2) {
+							DO_SITE(cross, 5);
+							if (lpCount < 1) DO_SITE(cross * -1.0f, 6);
+						}
+					}
 				}
 
 			}
 
 			else if (bondCount == 3) {
 
-				// Find the three vectors from central atom to bonded atoms.
-				// Use their dot product to determine if they're orthogonal or
-				// otherwise.
-				CPoint3D vec1 = lAtoms[bonded_atoms[0]].Position -
-								lAtoms[iatom].Position;
-				CPoint3D vec2 = lAtoms[bonded_atoms[1]].Position -
-								lAtoms[iatom].Position;
-				CPoint3D vec3 = lAtoms[bonded_atoms[2]].Position -
-								lAtoms[iatom].Position;
-
-				Normalize3D(&vec1);
-				Normalize3D(&vec2);
-				Normalize3D(&vec3);
-
-				float dot12 = DotProduct3D(&vec1, &vec2);
-				float dot13 = DotProduct3D(&vec1, &vec3);
-				float dot23 = DotProduct3D(&vec2, &vec3);
+				float dot12 = DotProduct3D(&vecs[0], &vecs[1]);
+				float dot13 = DotProduct3D(&vecs[0], &vecs[2]);
+				float dot23 = DotProduct3D(&vecs[1], &vecs[2]);
 
 				// If all three vectors are close to pairwise orthogonal, then
 				// they form a basis.  Unfortunately, they may not be exactly
@@ -4616,25 +4528,27 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					fabs(dot23) < 0.7f) {
 
 					CPoint3D cross1, cross2;
-					CrossProduct3D(&vec1, &vec2, &cross1);
+					CrossProduct3D(&vecs[0], &vecs[1], &cross1);
 					Normalize3D(&cross1);
-					CrossProduct3D(&vec1, &cross1, &cross2);
+					CrossProduct3D(&vecs[0], &cross1, &cross2);
 					Normalize3D(&cross2);
 
 					// The cross products should point in the opposite
 					// direction of the existing bonds, so we may need to
 					// flip them since they can end up coincident with them.
-					if (DotProduct3D(&cross1, &vec3) > 0.0f) {
+					if (DotProduct3D(&cross1, &vecs[2]) > 0.0f) {
 						cross1 = cross1 * -1.0f;
 					}
 
-					if (DotProduct3D(&cross2, &vec2) > 0.0f) {
+					if (DotProduct3D(&cross2, &vecs[1]) > 0.0f) {
 						cross2 = cross2 * -1.0f;
 					}
 
-					DO_SITE(vec1 * -1.0f, 4);
-					DO_SITE(cross1, 5);
-					DO_SITE(cross2, 6);
+					DO_SITE(vecs[0] * -1.0f, 4);
+					if (lpCount < 2) {
+						DO_SITE(cross1, 5);
+						if (lpCount < 1) DO_SITE(cross2, 6);
+					}
 				}
 
 				// Otherwise, two of the three bonds are antiparallel.  In this
@@ -4648,14 +4562,14 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					CPoint3D ortho_vec;
 
 					if (dot12 < -0.7f) {
-						paired_vec = vec1;
-						ortho_vec = vec3;
+						paired_vec = vecs[0];
+						ortho_vec = vecs[2];
 					} else if (dot13 < -0.7f) {
-						paired_vec = vec1;
-						ortho_vec = vec2;
+						paired_vec = vecs[0];
+						ortho_vec = vecs[1];
 					} else {
-						paired_vec = vec3;
-						ortho_vec = vec1;
+						paired_vec = vecs[2];
+						ortho_vec = vecs[0];
 					}
 
 					CPoint3D cross;
@@ -4663,29 +4577,15 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					Normalize3D(&cross);
 
 					DO_SITE(ortho_vec * -1.0f, 4);
-					DO_SITE(cross, 5);
-					DO_SITE(cross * -1.0f, 6);
+					if (lpCount < 2) {
+						DO_SITE(cross, 5);
+						if (lpCount < 1) DO_SITE(cross * -1.0f, 6);
+					}
 				}
 
 			}
 
 			else if (bondCount == 4) {
-
-				// Find the four vectors from the central atom to bonded atoms.
-				CPoint3D vecs[4];
-				vecs[0] = lAtoms[bonded_atoms[0]].Position -
-						  lAtoms[iatom].Position;
-				vecs[1] = lAtoms[bonded_atoms[1]].Position -
-					 	  lAtoms[iatom].Position;
-				vecs[2] = lAtoms[bonded_atoms[2]].Position -
-						  lAtoms[iatom].Position;
-				vecs[3] = lAtoms[bonded_atoms[3]].Position -
-						  lAtoms[iatom].Position;
-
-				Normalize3D(&vecs[0]);
-				Normalize3D(&vecs[1]);
-				Normalize3D(&vecs[2]);
-				Normalize3D(&vecs[3]);
 
 				int i, j;
 				int nuninverted = 0;
@@ -4713,8 +4613,8 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 
 				if (nuninverted == 2) {
-					DO_SITE(vecs[uninverted[0]] * -1.0f, 6);
-					DO_SITE(vecs[uninverted[1]] * -1.0f, 6);
+					DO_SITE(vecs[uninverted[0]] * -1.0f, 5);
+					if (lpCount == 0) DO_SITE(vecs[uninverted[1]] * -1.0f, 6);
 				}
 				
 				else {
@@ -4723,31 +4623,12 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					Normalize3D(&cross);
 
 					DO_SITE(cross, 5);
-					DO_SITE(cross * -1.0f, 6);
+					if (lpCount == 0) DO_SITE(cross * -1.0f, 6);
 				}
 
 			}
 
 			else if (bondCount == 5) {
-
-				// Find the five vectors from the central atom to bonded atoms.
-				CPoint3D vecs[5];
-				vecs[0] = lAtoms[bonded_atoms[0]].Position -
-						  lAtoms[iatom].Position;
-				vecs[1] = lAtoms[bonded_atoms[1]].Position -
-					 	  lAtoms[iatom].Position;
-				vecs[2] = lAtoms[bonded_atoms[2]].Position -
-						  lAtoms[iatom].Position;
-				vecs[3] = lAtoms[bonded_atoms[3]].Position -
-						  lAtoms[iatom].Position;
-				vecs[4] = lAtoms[bonded_atoms[4]].Position -
-						  lAtoms[iatom].Position;
-
-				Normalize3D(&vecs[0]);
-				Normalize3D(&vecs[1]);
-				Normalize3D(&vecs[2]);
-				Normalize3D(&vecs[3]);
-				Normalize3D(&vecs[4]);
 
 				int i, j;
 				bool has_no_inverse;
