@@ -1184,12 +1184,14 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
 				lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
 				MolWin->SetStatusText(wxT("Added new atom."));
-				MolWin->UpdateGLModel();
-				MolWin->AdjustMenus();
 
 				// Let's select the new atom.
 				selected = lFrame->NumAtoms - 1;
 				deSelectAll = true;
+				SelectObj(selected_type, selected, deSelectAll);
+				lFrame->SetBonds(Prefs, true, true);
+				MolWin->UpdateGLModel();
+				MolWin->AdjustMenus();
 			}
 
 			// If the user clicked on nothing, we try to add an atom given
@@ -1214,6 +1216,12 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(periodic_dlg->GetSelectedCoordination());
 				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
 
+				// Let's select the new atom.
+				selected = lFrame->NumAtoms - 1;
+				deSelectAll = true;
+				selected_type = MMP_ATOM;
+				SelectObj(selected_type, selected, deSelectAll);
+				lFrame->SetBonds(Prefs, true, true);
 				MolWin->SetStatusText(wxT("Added new atom."));
 				MolWin->UpdateGLModel();
 			}
@@ -1499,6 +1507,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
 						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(periodic_dlg->GetSelectedCoordination());
 						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
+						lFrame->SetBonds(Prefs, true, true);
 						MolWin->SetStatusText(wxT("Added new atom."));
 						MolWin->UpdateGLModel();
 						
@@ -1529,6 +1538,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(periodic_dlg->GetSelectedCoordination());
 						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
 
+						lFrame->SetBonds(Prefs, true, true);
 						MolWin->SetStatusText(wxT("Added new atom."));
 					}
   

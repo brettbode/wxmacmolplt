@@ -572,7 +572,6 @@ long Frame::GetNumElectrons(void) const {
 	for (long i=0; i<NumAtoms; i++) result += Atoms[i].Type;
 	return result;
 };
-
 void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds, bool selectedOnly)
 {	long		iatm, jatm, maxbonds;
 	CPoint3D	offset;

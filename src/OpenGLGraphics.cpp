@@ -4008,7 +4008,6 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					// Normalize3D(&v3); 
 					v3 = (vecs[0] + vecs[1]) * -1.0f;
 					Normalize3D(&v3);
-					v3 *= -1.0;
 				} else { //Draw the 2nd position
 					b = sqrt(3.0f / 4.0f);
 					CPoint3D v2(-b, -0.5f, 0.0f), temp(b, -0.5f, 0.0f);
