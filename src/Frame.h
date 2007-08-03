@@ -23,6 +23,9 @@ typedef class BasisSet BasisSet;
 typedef class GradientData GradientData;
 typedef class AtomTypeList AtomTypeList;
 typedef class XMLElement XMLElement;
+#ifdef USE_OPENBABEL
+typedef class OBMol OBMol;
+#endif
 
 #ifdef WIN32
 #undef AddAtom
@@ -197,6 +200,10 @@ class Frame {
 		bool GetAtomSelection(long atom_id) const;
 		int GetNumAtomsSelected(void) const;
 		int GetAtomNumBonds(int atom_id) const;
+#ifdef USE_OPENBABEL
+		OBMol * ConvertToOBMol(void) const;
+		bool ConvertFromOBMol(const OBMol & mol);
+#endif
 		bool SetAtomOxidationNumber(int atom_id, int ox_num);
 		int GetAtomOxidationNumber(int atom_id);
 		void SetAtomBondingSite(int atom_id, unsigned char site_id, bool is_bonded);

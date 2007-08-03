@@ -1513,7 +1513,7 @@ void MoleculeData::CreateInternalLLM(long NumPts, WinPrefs * Prefs) {
 					//180 to -180 and the shorest rotation might be through 180.
 				OffsetValues[3*i+2] = lInternals->GetValue(i, 2) - StartValues[3*i+2];
 				if (OffsetValues[3*i+2] > 180.0) OffsetValues[3*i+2] = OffsetValues[3*i+2] - 360.0;
-				else if (OffsetValues[3*i+2] < -180.0) OffsetValues[3*i+2] = 360 - OffsetValues[3*i+2];
+				else if (OffsetValues[3*i+2] < -180.0) OffsetValues[3*i+2] = 360 + OffsetValues[3*i+2];
 				OffsetValues[3*i+2] /= NumPts;
 			}
 		}

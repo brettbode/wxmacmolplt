@@ -190,14 +190,18 @@ void MOPacInternals::GuessInit(MoleculeData * MainData) {
 		Values[3*iatom] = BondLength;
 		Type[3*iatom] = 0;
 			//Bond angle - atom -> BondedAtom -> AngleAtom
-		if (BondedAtom > 0)
+		if ((BondedAtom > 0)&&(ConnectionAtoms[3*BondedAtom]!=BondedAtom)&&(lFrame->Atoms[iatom].Type>1)&&
+			(lFrame->Atoms[ConnectionAtoms[3*BondedAtom]].Type>1)) {
 			ConnectionAtoms[3*iatom+1] = ConnectionAtoms[3*BondedAtom];
-		else
+			if (DihedralAtom == ConnectionAtoms[3*BondedAtom]) DihedralAtom = AngleAtom;
+			AngleAtom = ConnectionAtoms[3*BondedAtom];
+		} else
 			ConnectionAtoms[3*iatom+1] = AngleAtom;
 		Type[3*iatom+1] = 1;
 		if (iatom>2) {
 				//Dihedral Angle
-			if (BondedAtom > 2)
+			if ((BondedAtom > 2)&&(ConnectionAtoms[3*BondedAtom+1]!=AngleAtom)&&(lFrame->Atoms[iatom].Type>1)&&
+				(lFrame->Atoms[ConnectionAtoms[3*BondedAtom+1]].Type>1))
 				ConnectionAtoms[3*iatom+2] = ConnectionAtoms[3*BondedAtom+1];
 			else {
 				if (DihedralAtom != ConnectionAtoms[3*iatom+1])

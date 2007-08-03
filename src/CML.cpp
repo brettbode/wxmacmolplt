@@ -742,7 +742,7 @@ void MOPacInternals::WriteXML(XMLElement * parent) const {
 	}
 	if (Type) {
 		std::ostringstream buf;
-		for (int i=0; i<Count; i++) buf << Type[i] << " ";
+		for (int i=0; i<Count; i++) buf << (int)Type[i] << " ";
 		XMLElement * con = t->addChildElement(CML_convert(ArrayElement), buf.str().c_str());
 		con->addAttribute(CML_convert(dataTypeAttr), "xsd:char");
 		con->addAttribute(CML_convert(titleAttr), CML_convert(MMP_MOPacStyleTypes));
@@ -1770,6 +1770,7 @@ void Internals::ReadXML(XMLElement * parent) {
 			const char * name = child->getName();
 			if (!strcmp(name, CML_convert(MMP_MOPacStyleInternals))) {
 				if (!MOPacStyle) {
+					MOPacStyle = new MOPacInternals(child);
 				}
 			}
 		}
@@ -1791,8 +1792,9 @@ MOPacInternals::MOPacInternals(XMLElement * parent) {
 		if (children) {
 			for (int i=0; i<children->length(); i++) {
 				XMLElement * child = children->item(i);
+				const char * title = child->getAttributeValue(CML_convert(titleAttr));
 				MMP_InternalCoordNS attr;
-				if (CML_convert(child->getName(), attr)) {
+				if (CML_convert(title, attr)) {
 					const char * val = child->getValue();
 					int nchar=0, pos=0;
 					switch (attr) {
@@ -1815,7 +1817,9 @@ MOPacInternals::MOPacInternals(XMLElement * parent) {
 						case MMP_MOPacStyleTypes:
 						{
 							for (int j=0; j<Count; j++) {
-								sscanf(&(val[pos]), "%c%n", &(Type[j]), &nchar);
+								int temp;
+								sscanf(&(val[pos]), "%d%n", &temp, &nchar);
+								Type[j] = temp;
 								pos += nchar;
 							}
 						}
