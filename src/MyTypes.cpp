@@ -440,74 +440,63 @@ void AnnotationDihedral::setParam(Frame& frame, float value) {
 	}
 }
 */
+static short gCoordination[] = {1,                                0,
+								1,2,                    3,4,3,2,1,0,
+								1,2,                    3,4,5,6,1,0,
+								1,2,3,2,5,3,2,3,2,2,2,2,3,4,3,4,1,0,
+								1,2,3,4,5,6,6,3,3,2,1,2,3,4,3,4,1,0,
+								1,2,
+									3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+									  4,5,6,6,4,4,4,3,2,1,2,3,2,1,0,
+								1,2,
+									3,4,5,6,5,4,3,3,3,3,3,3,3,3,3,
+									  4,0,6,0,3,0,0,0,0};
+
 void mpAtom::SetDefaultCoordinationNumber(void) {
 	//Setup the default coordination based on the atom type
 	coordinationNumber = 0;
-	if (Type == 15) {
-		coordinationNumber = 5;
-		return;
-	}
-	if (Type == 16) {
-		coordinationNumber = 6;
-		return;
-	}
-	if (((Type>=6)&&(Type<=9))||((Type>=14)&&(Type<=17))||((Type>=32)&&(Type<=35))||
-		((Type>=50)&&(Type<=53))||((Type>=82)&&(Type<=85))) {
-		coordinationNumber = 4;
-		return;
-	}
-	
-	switch (Type) {
-		case 1:
-		case 3:
-		case 11:
-		case 19:
-		case 37:
-		case 55:
-		case 87:
-			coordinationNumber = 1;
-			break;
-		case 4:
-		case 12:
-		case 20:
-		case 38:
-		case 56:
-		case 88:
-			coordinationNumber = 2;
-			break;
-		case 5:
-		case 13:
-		case 31:
-		case 49:
-		case 81:
-			coordinationNumber = 3;
-			break;
-	}
+	if ((Type>0)&&(Type<=112)) coordinationNumber = gCoordination[Type-1];
 }
 
 void mpAtom::SetDefaultLonePairCount(void) {
 	LPCount = 0;
 	switch (Type) {
 		case 7:
-	//	case 15:
+		case 22:
 		case 33:
 		case 51:
 		case 83:
 			LPCount = 1;
 			break;
 		case 8:
-	//	case 16:
-		case 34:
-		case 52:
+		case 24:
+		case 28:
+		case 29:
+		case 30:
+		case 46:
+		case 47:
+		case 48:
 		case 84:
 			LPCount = 2;
 			break;
 		case 9:
 		case 17:
+		case 25:
+		case 26:
+		case 27:
 		case 35:
+		case 44:
+		case 45:
 		case 53:
 		case 85:
 			LPCount = 3;
+			break;
+		case 10:
+		case 18:
+		case 36:
+		case 54:
+		case 86:
+			LPCount = 4;
 			break;
 	}
 }

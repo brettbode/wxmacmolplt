@@ -77,10 +77,10 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 						0,0,0,0,0,0,0,3,3,2,2,2,0,0,1,0,3,4,
 						0,0,
 						   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-							0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,
+							  0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,
 						0,0,
 						   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-							0,0,0,0,0,0,0,0,0};
+							  0,0,0,0,0,0,0,0,0};
 	for (int i=0; i<kNumTableElements; i++) {
 		coordinationNumber[i] = lcoordination[i];
 		LonePairCount[i] = lLPCount[i];
