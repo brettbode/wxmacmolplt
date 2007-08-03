@@ -193,7 +193,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
 	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
 	EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
-	EVT_MENU (MMP_SELECT_NONE,     MolDisplayWin::menuEditSelectNone)
+	EVT_MENU (MMP_SELECT_NONE,		MolDisplayWin::menuEditSelectNone)
+	EVT_UPDATE_UI(MMP_SELECT_NONE,	MolDisplayWin::OnSelectionUpdate )
 
 	EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
 	EVT_MENU (MMP_ANIMATEMODE,      MolDisplayWin::menuViewAnimateMode)
@@ -838,6 +839,14 @@ void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event ) {
 			wxTheClipboard->Close();
 		}
 	}
+}
+/*!
+* wxEVT_UPDATE_UI event handler for Edit menu items
+ */
+
+void MolDisplayWin::OnSelectionUpdate( wxUpdateUIEvent& event ) {
+	menuEdit->Enable(wxID_CLEAR, mHighliteState&&HandSelected());
+	menuEdit->Enable(MMP_SELECT_NONE, mHighliteState);
 }
 void MolDisplayWin::OnAnnotationMarkUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(glCanvas->NumberSelectedAtoms()>0);
@@ -1819,8 +1828,7 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 									long initialAtomCount = MainData->cFrame->NumAtoms;
 									for (long i=0; i<tdatap->cFrame->NumAtoms; i++) {
 										if (CopyAllAtoms || tdatap->cFrame->Atoms[i].GetSelectState()) {
-											MainData->cFrame->AddAtom(tdatap->cFrame->Atoms[i].GetType(),
-																	  tdatap->cFrame->Atoms[i].Position);
+											MainData->cFrame->AddAtom(tdatap->cFrame->Atoms[i]);
 											MainData->AtomAdded();
 										}
 									}
@@ -3135,6 +3143,12 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
 		}
 	} else
 		test = MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, readPrefs);
+	for (long i=0; i<MainData->cFrame->NumAtoms; i++) {
+		if (MainData->cFrame->Atoms[i].GetSelectState()) {
+			mHighliteState = true;
+			break;
+		}
+	}
 	if (readPrefs && test >= 10) {
 		//Update the view since a CMLfile reads in user preferences
 		glCanvas->UpdateGLView();

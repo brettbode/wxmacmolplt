@@ -259,6 +259,34 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 	while (SurfaceList) DeleteSurface(0);
 	return result;
 }
+mpAtom * Frame::AddAtom(const mpAtom & atm, long index) {
+	
+	mpAtom * result = NULL;
+	
+	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(10);
+	
+	if (NumAtoms<AtomAllocation) {
+		if ((index<=-1)||(index>=NumAtoms)) {//Add to the end of the list
+			index = NumAtoms;
+		} else {	//insert the atom into the middle of the list
+			for (int i=NumAtoms; i>index; i--) {
+				Atoms[i] = Atoms[i-1];
+			}
+		}
+		Atoms[index] = atm;
+		Atoms[index].paired_sites = 0;
+		result = &Atoms[index];
+		NumAtoms++;
+	}
+	//Delete any orbitals and normal modes
+	if (Vibs) {
+		delete Vibs;
+		Vibs = NULL;
+	}
+	DeleteOrbitals();
+	while (SurfaceList) DeleteSurface(0);
+	return result;
+}
 
 bool Frame::IncreaseAtomAllocation(long NumAdditional) {
 	if (AtomAllocation+NumAdditional < NumAtoms) return false;

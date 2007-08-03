@@ -287,6 +287,7 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 	XMLElement * molElement = parent->addChildElement(CML_convert(MoleculeElement));
 	XMLElement * AArrayElement = molElement->addChildElement(CML_convert(AtomArrayElement));
 	char line[kMaxLineLength];
+	bool	AtomAttributes=false;
 	for (int i=0; i<NumAtoms; i++) {
 			//output CML2 style atom information of the form:
 			//<atom id="a1" elementType="C" x3="-0.0167" y3="1.3781" z3="0.0096"/>
@@ -302,6 +303,10 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 		atomEle->addAttribute(CML_convert(Y3Attr), line);
 		snprintf(line, kMaxLineLength, "%f", Atoms[i].Position.z);
 		atomEle->addAttribute(CML_convert(Z3Attr), line);
+		if (Atoms[i].GetSelectState() || Atoms[i].IsSIMOMMAtom() || Atoms[i].IsEffectiveFragment()
+			|| Atoms[i].GetInvisibility() || Atoms[i].IsSymmetryUnique() ||
+			Atoms[i].GetCoordinationNumber() || Atoms[i].GetLonePairCount())
+			AtomAttributes = true;
 	}
 	bool	NonCMLBonds = false;
 	//Add the bonds next
@@ -327,8 +332,43 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 					//These are non-standard XML extensions to CML
 		XMLElement * listElement = NULL;
 		if ((Orbs.size() > 0)||(Energy != 0.0)||(KE != 0.0)||(MP2Energy != 0.0)||
-			(time != 0.0)||(IRCPt != 0)||Gradient||Vibs||SurfaceList||NonCMLBonds) {
+			(time != 0.0)||(IRCPt != 0)||Gradient||Vibs||SurfaceList||NonCMLBonds||
+			 AtomAttributes) {
 			listElement = molElement->addChildElement(CML_convert(ListElement));
+		}
+		if (AtomAttributes) {
+			//Store non-standard attributes of atoms such as selection, effective fragment id, SIMOMM type
+			XMLElement * AArrayElement = listElement->addChildElement(CML_convert(MMP_AtomAttrArrayElement));
+			for (int i=0; i<NumAtoms; i++) {
+				if (Atoms[i].GetSelectState() || Atoms[i].IsSIMOMMAtom() || Atoms[i].IsEffectiveFragment()
+					|| Atoms[i].GetInvisibility() || Atoms[i].IsSymmetryUnique() ||
+					Atoms[i].GetCoordinationNumber() || Atoms[i].GetLonePairCount()) {
+					XMLElement * atomEle = AArrayElement->addChildElement(CML_convert(AtomElement));
+					snprintf(line, kMaxLineLength, "a%d", i);
+					atomEle->addAttribute(CML_convert(IdAttr), line);
+					if (Atoms[i].GetSelectState())
+						atomEle->addAttribute(CML_convert(selectedAttr), "true");
+					if (Atoms[i].IsSIMOMMAtom())
+						atomEle->addAttribute(CML_convert(SIMOMMFlagAttr), "true");
+					if (Atoms[i].GetInvisibility())
+						atomEle->addAttribute(CML_convert(invisibleAttr), "true");
+					if (Atoms[i].IsSymmetryUnique())
+						atomEle->addAttribute(CML_convert(symmetryUniqueAttr), "true");
+					if (Atoms[i].IsEffectiveFragment()) {
+						snprintf(line, kMaxLineLength, "%ld", Atoms[i].GetFragmentNumber());
+						atomEle->addAttribute(CML_convert(effectiveFragmentIdAttr), line);
+					}
+					if (Atoms[i].GetCoordinationNumber()) {
+						snprintf(line, kMaxLineLength, "%d", Atoms[i].GetCoordinationNumber());
+						atomEle->addAttribute(CML_convert(coordinationNumberAttr), line);
+					}
+					if (Atoms[i].GetLonePairCount()) {
+						snprintf(line, kMaxLineLength, "%d", Atoms[i].GetLonePairCount());
+						atomEle->addAttribute(CML_convert(lonePairCountAttr), line);
+					}
+				}
+			}
+			
 		}
 		if (NonCMLBonds) {
 			XMLElement * bondArrayEle = listElement->addChildElement(CML_convert(MMP_BondArrayElement));
@@ -1198,6 +1238,9 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
 									}
 								}
 									break;
+								case MMP_AtomAttrArrayElement:	//"extra" atom attributes
+									ParseAtomAttributeArrayXML(listChild, idList);
+									break;
 								case MMP_BondArrayElement:
 									ParseBondArrayXML(listChild, idList);
 									break;
@@ -1382,6 +1425,57 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::vector<char *> & idList) 
 			if (idstr) delete [] idstr;
 		}
 	}
+}
+void Frame::ParseAtomAttributeArrayXML(XMLElement * arrayXML, const std::vector<char *> & idList) {
+	//The atom information can be in the form of Atom subelements or (gross) string attributes.
+	const char * etype = NULL, *xcoord = NULL, *ycoord = NULL, *zcoord=NULL, *idresult=NULL;
+	//Parse the subelements
+	XMLElementList * children = arrayXML->getChildren();
+	for (int i=0; i<children->length(); i++) {
+		XMLElement * child = children->item(i);
+		if (child != NULL) {
+			const char * nm = child->getName();
+			if (nm != NULL) {
+				CML_Element elem;
+				if (CML_convert(nm, elem)) {
+					if (elem == AtomElement) {
+						const char * idresult = child->getAttributeValue(CML_convert(IdAttr));
+						if (!idresult) continue;
+						long atomId=-1;
+						for (i=0; i<idList.size(); i++) {
+							if (!strcmp(idresult, idList[i])) {
+								atomId = i;
+								break;
+							}
+						}
+						if ((atomId>=0)&&(atomId<NumAtoms)) {
+							bool temp;
+							if (child->getAttributeValue(CML_convert(selectedAttr),temp))
+								Atoms[atomId].SetSelectState(temp);
+							if (child->getAttributeValue(CML_convert(invisibleAttr),temp))
+								Atoms[atomId].SetInvisibility(temp);
+							if (child->getAttributeValue(CML_convert(symmetryUniqueAttr),temp))
+								Atoms[atomId].IsSymmetryUnique(temp);
+							if (child->getAttributeValue(CML_convert(SIMOMMFlagAttr),temp))
+								Atoms[atomId].IsSIMOMMAtom(temp);
+							long templ;
+							if (child->getAttributeValue(CML_convert(effectiveFragmentIdAttr),templ)) {
+								if (templ>0) {
+									Atoms[atomId].IsEffectiveFragment(true);
+									Atoms[atomId].SetFragmentNumber(templ);
+								}
+							}
+							if (child->getAttributeValue(CML_convert(coordinationNumberAttr),templ))
+								Atoms[atomId].SetCoordinationNumber(templ);
+							if (child->getAttributeValue(CML_convert(lonePairCountAttr),templ))
+								Atoms[atomId].SetLonePairCount(templ);
+						}
+					}
+				}
+			}
+		}
+	}
+	delete children;
 }
 
 bool Frame::ParseAtomXML(XMLElement * atomXML, std::vector<char *> & idList) {
@@ -2422,6 +2516,20 @@ const char * CML_convert(CML_Attribute t) {
 			return "name";
 		case contentAttr:
 			return "content";
+		case selectedAttr:
+			return "selected";
+		case invisibleAttr:
+			return "invisible";
+		case symmetryUniqueAttr:
+			return "symmetryUnique";
+		case effectiveFragmentIdAttr:
+			return "effectiveFragmentId";
+		case SIMOMMFlagAttr:
+			return "IsSIMOMMAtom";
+		case coordinationNumberAttr:
+			return "coordinationNumber";
+		case lonePairCountAttr:
+			return "lonePairCount";
         default:
             return "invalid";
     }
@@ -2556,6 +2664,8 @@ const char * CML_convert(MMP_MolListNameSpace t)
             return "OrbitalSet";
         case MMP_SurfaceDescription:
             return "Surface";
+        case MMP_AtomAttrArrayElement:
+            return "atomArray";
 		default:
             return "invalid";
     }

@@ -117,6 +117,7 @@ class Frame {
 		bool GetAtomPosition(long theAtom, CPoint3D & p) const;
 		bool SetAtomPosition(long theAtom, const CPoint3D & p);
 		mpAtom * AddAtom(long AtomType, const CPoint3D & AtomPosition, long index=-1);
+		mpAtom * AddAtom(const mpAtom & atm, long index=-1);
 		bool IncreaseAtomAllocation(long NumAdditional);
 		//BondExists returns the id of the bond, -1 otherwise
 		long BondExists(long atom1, long atom2) const;
@@ -188,6 +189,7 @@ class Frame {
 		void ParseAtomArray(XMLElement * arrayXML, std::vector<char *> & idList);
 		bool ParseBondXML(XMLElement * bondXML, const std::vector<char *> & idList);
 		void ParseBondArrayXML(XMLElement * arrayXML, const std::vector<char *> & idList);
+		void ParseAtomAttributeArrayXML(XMLElement * atomXML, const std::vector<char *> & idList);
 		long WriteCMLFrame(XMLElement * parent, bool AllData);
 
 		void resetAllSelectState();

@@ -55,6 +55,13 @@ enum CML_Attribute {
 	sizeAttr,
 	nameAttr,
 	contentAttr,
+	selectedAttr,
+	invisibleAttr,
+	symmetryUniqueAttr,
+	effectiveFragmentIdAttr,
+	SIMOMMFlagAttr,
+	coordinationNumberAttr,
+	lonePairCountAttr,
 	
 	NumberCMLAttributes
 };
@@ -118,6 +125,7 @@ enum MMP_MolListNameSpace {
 	MMP_NormalModes,
 	MMP_OrbitalSet,
 	MMP_SurfaceDescription,
+	MMP_AtomAttrArrayElement,
 	
 	NumberMMPMolListItems
 };
