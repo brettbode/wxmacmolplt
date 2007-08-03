@@ -27,8 +27,6 @@ BEGIN_EVENT_TABLE(PeriodicTableDlg, wxMiniFrame)
 	EVT_CHOICE(kPeriodicLPChoice, PeriodicTableDlg::OnLPChoice)
 	EVT_BUTTON(wxID_ANY, PeriodicTableDlg::ElementSelected)
 	EVT_CHAR(PeriodicTableDlg::KeyHandler)
-	EVT_SET_FOCUS(PeriodicTableDlg::OnFocusGained)
-	EVT_KILL_FOCUS(PeriodicTableDlg::OnFocusLost)
 	EVT_CLOSE(PeriodicTableDlg::OnClose)
 END_EVENT_TABLE()
 
@@ -164,7 +162,7 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 	delete mem_dc;
 	
 	wxStaticText * label1 = new wxStaticText(this, wxID_ANY, wxT("Selected Element:"), 
-											 wxPoint(BUTTON_SIZE*2.5, 3));
+											 wxPoint(BUTTON_SIZE*3, 3));
 	wxSize label1Size = label1->GetSize();
 	wxPoint label1Pos = label1->GetPosition();
 	mTextArea = new wxStaticText(this, wxID_ANY, wxT("foo"), 
@@ -204,7 +202,6 @@ PeriodicTableDlg::~PeriodicTableDlg() {
 		delete elements[i].on_bmp;
 	}
 
-	// free(elements); 
 	delete elements;
 
 	periodic_dlg = NULL;
@@ -221,7 +218,7 @@ void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
 	 * hold state.  We internally track the button's state and invert and
 	 * revert images accordingly. */
 
-	int id;                /* The atomic number and index of element. */
+	int id;                /* The atomic number - 1 and index of element. */
 
 	id = event.GetId();
 
@@ -231,13 +228,14 @@ void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
 	}
 
 	// If the user selects a new button, we want to turn the old one off and
-	// the new one one.
+	// the new one on.
 	if (id != prev_id) {
 		elements[id].button->SetBitmapLabel(*(elements[id].on_bmp));
 		if (prev_id >= 0) {
 			elements[prev_id].button->SetBitmapLabel(*(elements[prev_id].off_bmp));
 		}
 		prev_id = id;
+		elements[id].button->SetFocus();
 	}
 
 	// If the user has selected the same button, we want to turn it off.
@@ -313,8 +311,9 @@ short PeriodicTableDlg::GetSelectedLonePairCount(void) const {
 /* ------------------------------------------------------------------------- */
 
 void PeriodicTableDlg::OnClose(wxCloseEvent& event) {
-//	parent->ClosePeriodicDlg();
 
+	// If possible, we want to try to hide the periodic dialog rather than
+	// fully close it.
 	if (event.CanVeto()) {
 		show_periodic_dlg = false;
 		((MpApp &) wxGetApp()).AdjustAllMenus();
@@ -367,25 +366,6 @@ void PeriodicTableDlg::NumberToTableCoords(int atomic_number,
 		*col = 3 + (atomic_number - 104) % 15;
 	}
 
-}
-
-// --------------------------------------------------------------------------- 
-
-void PeriodicTableDlg::OnFocusGained(wxFocusEvent& event) {
-	// std::cout << "gained focus" << std::endl; 
-}
-
-// --------------------------------------------------------------------------- 
-
-void PeriodicTableDlg::OnFocusLost(wxFocusEvent& event) {
-	// std::cout << "lost focus" << std::endl; 
-}
-
-// --------------------------------------------------------------------------- 
-
-bool PeriodicTableDlg::AcceptsFocus(void) const {
-	// std::cout << "called acceptsfocus()" << std::endl; 
-	return true;
 }
 
 // --------------------------------------------------------------------------- 
