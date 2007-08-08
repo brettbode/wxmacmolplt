@@ -23,6 +23,7 @@
 #include "wx/dcmemory.h"
 #include "wx/brush.h"
 #include "wx/minifram.h"
+#include "wx/notebook.h"
 
 #include <stdio.h>
 
@@ -64,21 +65,24 @@ class PeriodicTableDlg: public wxMiniFrame {
 		void KeyHandler(wxKeyEvent &event);
 
 	private:
-		wxStopWatch	secondKeytimer;
-		wxStaticText * mTextArea;
-		wxChoice * mCoordinationChoice;
-		wxChoice * mLPChoice;
-		unsigned char keyBuffer[3];
-		short coordinationNumber[kNumTableElements];
-		short LonePairCount[kNumTableElements];
-		element_t *elements;
-		int nelements;
-		int prev_id;
 		void ElementSelected(wxCommandEvent& event);
 		void OnCoordinationChoice(wxCommandEvent& event);
 		void OnLPChoice(wxCommandEvent& event);
 		void MouseMoved(wxMouseEvent& event);
 		void OnClose(wxCloseEvent& event);
+		wxPanel *GetPeriodicPanel(void);
+
+		short coordinationNumber[kNumTableElements];
+		short LonePairCount[kNumTableElements];
+		int nelements;
+		int prev_id;
+		unsigned char keyBuffer[3];
+		wxStopWatch	secondKeytimer;
+		wxStaticText *mTextArea;
+		wxChoice *mCoordinationChoice;
+		wxChoice *mLPChoice;
+		element_t *elements;
+		wxNotebook *tabs;
 
 	DECLARE_DYNAMIC_CLASS(PeriodicTableDlg)
 	DECLARE_EVENT_TABLE()

@@ -1,17 +1,10 @@
-/* ------------------------------------------------------------------------- */
-/* FILE:   periodic_table_dlg.cpp                                            */
-/* AUTHOR: Chris Johnson                                                     */
-/* DATE:   Jan 24 2007                                                       */
-/*                                                                           */
-/*                                                                           */
-/* ------------------------------------------------------------------------- */
-
 #if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
 #pragma implementation "periodic_table_dlg.h"
 #endif
 
 #include "periodic_table_dlg.h"
 #include "main.h"
+#include "wx/gbsizer.h"
 
 extern bool show_periodic_dlg;
 extern WinPrefs * gPreferences;
@@ -30,26 +23,40 @@ BEGIN_EVENT_TABLE(PeriodicTableDlg, wxMiniFrame)
 	EVT_CLOSE(PeriodicTableDlg::OnClose)
 END_EVENT_TABLE()
 
-/* ------------------------------------------------------------------------- */
-/* FUNCTIONS                                                                 */
-/* ------------------------------------------------------------------------- */
-
-/* ------------------------------------------------------------------------- */
+// --------------------------------------------------------------------------- 
+// FUNCTIONS
+// --------------------------------------------------------------------------- 
 
 PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 								   int xpos, int ypos) :
-#ifdef __WXMAC__
-#define BUTTON_SIZE 26
 	wxMiniFrame(NULL, wxID_ANY, title, wxPoint(xpos, ypos),
-		wxSize(BUTTON_SIZE * 18, BUTTON_SIZE * 10 + 22),
-		wxCLOSE_BOX | wxCAPTION)
-#else
-#define BUTTON_SIZE 34
-	wxMiniFrame(NULL, wxID_ANY, title, wxPoint(xpos, ypos),
-		wxSize(BUTTON_SIZE * 18 + 5, BUTTON_SIZE * 10 + 22),
-		wxCLOSE_BOX | wxCAPTION)
-#endif
-{
+		wxSize(-1, -1), wxCLOSE_BOX | wxCAPTION) {
+
+	wxPanel *panel = new wxPanel(this);
+	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
+	tabs = new wxNotebook(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+
+	wxPanel *rings_panel = new wxPanel(tabs);
+	wxPanel *solvents_panel = new wxPanel(tabs);
+
+	tabs->AddPage(GetPeriodicPanel(), _("Periodic Table"), true);
+	tabs->AddPage(rings_panel, _("Rings"), false);
+	tabs->AddPage(solvents_panel, _("Solvents"), false);
+
+	box_sizer->Add(tabs, 1, wxEXPAND);
+	box_sizer->Fit(this);
+	panel->SetSizerAndFit(box_sizer);
+
+	Fit();
+
+	wxCommandEvent foo(0, 6-1);
+	ElementSelected(foo);
+
+}
+
+// --------------------------------------------------------------------------- 
+
+wxPanel *PeriodicTableDlg::GetPeriodicPanel(void) {
 
 	wxFont *font;            // Font of atomic symbol
 	wxMemoryDC *mem_dc;      // Offscreen renderer for button bitmaps
@@ -81,25 +88,29 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 						0,0,
 						   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 							  0,0,0,0,0,0,0,0,0};
+
+	wxPanel *periodic_panel = new wxPanel(tabs, wxID_ANY);
+	wxGridBagSizer *sizer = new wxGridBagSizer();
+	
 	for (int i=0; i<kNumTableElements; i++) {
 		coordinationNumber[i] = lcoordination[i];
 		LonePairCount[i] = lLPCount[i];
 	}
+
 #ifdef __WXMAC__
 #define IMAGE_SIZE 26
 	font_size = 12;
 #else
-#define IMAGE_SIZE 20
+#define IMAGE_SIZE 23
 	font_size = 10;
 #endif
 
 	nelements = kNumTableElements;
 
-	/* No element has been selected yet. */
+	// No element has been selected yet.
 	prev_id = -1;
 	keyBuffer[0] = keyBuffer[1] = keyBuffer[2] = '\0';
 
-	// elements = (element_t *) malloc(sizeof(element_t) * nelements); 
 	elements = new element_t[nelements];
 	if (elements == NULL) {
 		fprintf(stderr, "[%s:%d] Couldn't make room for buttons.\n",
@@ -108,8 +119,8 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 		exit(1);
 	}
 
-	/* All button images are generated dynamically.  So, we need a font and an
-	 * offscreen renderer. */
+	// All button images are generated dynamically.  So, we need a font and an
+	// offscreen renderer.
 	mem_dc = new wxMemoryDC();
 	font = new wxFont(font_size, wxSWISS, wxFONTSTYLE_NORMAL,
 		wxFONTWEIGHT_NORMAL, false, wxT(""), wxFONTENCODING_SYSTEM);
@@ -145,55 +156,59 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 			(IMAGE_SIZE - symbol_height) / 2);
 
 		elements[i].button =
-			new wxBitmapButton(this, i, *(elements[i].off_bmp),
-			wxPoint(col * BUTTON_SIZE, row * BUTTON_SIZE),
-			wxSize(BUTTON_SIZE, BUTTON_SIZE));
+			new wxBitmapButton(periodic_panel, i, *(elements[i].off_bmp));
+
+		sizer->Add(elements[i].button, wxGBPosition(row, col));
 
 		// Display a quick note when user hovers over button.
 		wxString tool_tip;
-		tool_tip.Printf(wxT("Atomic #: %d, Mass: %f, Oxidation #: %d"), i + 1,
-			gPreferences->GetAtomMass(i),
-			gPreferences->GetOxidationNumber(i + 1));
+		tool_tip.Printf(wxT("Atomic #: %d, Mass: %f"), i + 1,
+			gPreferences->GetAtomMass(i));
 		elements[i].button->SetToolTip(tool_tip);
 
 	}
 
 	delete font;
 	delete mem_dc;
+
+	int lflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
+	int rflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
 	
-	wxStaticText * label1 = new wxStaticText(this, wxID_ANY, wxT("Selected Element:"), 
-											 wxPoint(BUTTON_SIZE*3, 3));
-	wxSize label1Size = label1->GetSize();
-	wxPoint label1Pos = label1->GetPosition();
-	mTextArea = new wxStaticText(this, wxID_ANY, wxT("foo"), 
-								 wxPoint(label1Pos.x+label1Size.GetWidth() + 2, label1Pos.y));
-	
-	wxStaticText * label2 = new wxStaticText(this, wxID_ANY, wxT("Coordination number:"), 
-											 wxPoint(label1Pos.x, label1Pos.y+label1Size.GetHeight()+8));
-	wxSize label2Size = label2->GetSize();
-	wxPoint label2Pos = label2->GetPosition();
+	// Show atomic symbol.
+	wxStaticText * label1 = new wxStaticText(periodic_panel, wxID_ANY, wxT("Selected Element: "));
+	sizer->Add(label1, wxGBPosition(0, 2), wxGBSpan(1, 6), lflags);
+
+	mTextArea = new wxStaticText(periodic_panel, wxID_ANY, wxT("foo"));
+	sizer->Add(mTextArea, wxGBPosition(0, 8), wxGBSpan(1, 4), rflags);
+
+	// Show coordination number drop down menu.
+	wxStaticText * label2 = new wxStaticText(periodic_panel, wxID_ANY, wxT("Coordination number: "));
+	sizer->Add(label2, wxGBPosition(1, 2), wxGBSpan(1, 6), lflags);
+
 	wxString coordinationChoices[] = {_T("0"), _T("1"), _T("2"), _T("3"), _T("4"), _T("5"), _T("6")};
-	mCoordinationChoice = new wxChoice(this, kPeriodicCoordinationChoice,
-									   wxPoint(label2Pos.x+label2Size.GetWidth() + 2, label2Pos.y),
-									   wxSize(-1,-1), 7, coordinationChoices);
-	wxSize CoordSize = mCoordinationChoice->GetSize();
-	int h = (label2Size.GetHeight() > CoordSize.GetHeight()) ? label2Size.GetHeight() : CoordSize.GetHeight();
-	wxStaticText * label3 = new wxStaticText(this, wxID_ANY, wxT("Number of lone pairs:"), 
-											 wxPoint(label1Pos.x, label2Pos.y+h+2));
-	wxSize label3Size = label3->GetSize();
-	wxPoint label3Pos = label3->GetPosition();
+	mCoordinationChoice = new wxChoice(periodic_panel, kPeriodicCoordinationChoice, wxPoint(-1, -1),
+									   wxSize(-1, -1), 7, coordinationChoices);
+	sizer->Add(mCoordinationChoice, wxGBPosition(1, 8), wxGBSpan(1, 4), rflags);
+
+	// Show lone pair count drop down menu.
+	wxStaticText * label3 = new wxStaticText(periodic_panel, wxID_ANY, wxT("Number of lone pairs: "));
+	sizer->Add(label3, wxGBPosition(2, 2), wxGBSpan(1, 6), lflags);
+
 	wxString LPChoices[] = {_T("0"), _T("1"), _T("2"), _T("3"), _T("4"), _T("5")};
-	mLPChoice = new wxChoice(this, kPeriodicLPChoice,
-									   wxPoint(label2Pos.x+label3Size.GetWidth() + 2, label3Pos.y),
-									   wxSize(-1,-1), 6, LPChoices);
+	mLPChoice = new wxChoice(periodic_panel, kPeriodicLPChoice, wxPoint(-1, -1),
+							 wxSize(-1, -1), 6, LPChoices);
+	sizer->Add(mLPChoice, wxGBPosition(2, 8), wxGBSpan(1, 4), rflags);
+
+	periodic_panel->SetSizerAndFit(sizer);
 	
-	wxCommandEvent foo(0, 6-1);
-	ElementSelected(foo);
+	return periodic_panel;
+
 }
 
-/* ------------------------------------------------------------------------- */
+// --------------------------------------------------------------------------- 
 
 PeriodicTableDlg::~PeriodicTableDlg() {
+
 	int i;
 
 	for (i = 0; i < nelements; i++) {
@@ -209,7 +224,7 @@ PeriodicTableDlg::~PeriodicTableDlg() {
 	((MpApp &) wxGetApp()).AdjustAllMenus();
 }
 
-/* ------------------------------------------------------------------------- */
+// --------------------------------------------------------------------------- 
 
 void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
 
@@ -255,16 +270,25 @@ void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
 	Refresh();
 
 }
+
+// --------------------------------------------------------------------------- 
+
 void PeriodicTableDlg::OnCoordinationChoice(wxCommandEvent& event) {
 	coordinationNumber[prev_id] = event.GetSelection();
 }
+
+// --------------------------------------------------------------------------- 
+
 void PeriodicTableDlg::OnLPChoice(wxCommandEvent& event) {
 	LonePairCount[prev_id] = event.GetSelection();
 }
+
+// --------------------------------------------------------------------------- 
+
 #include "myFiles.h"
-void PeriodicTableDlg::KeyHandler(wxKeyEvent & event) {
+void PeriodicTableDlg::KeyHandler(wxKeyEvent& event) {
+	int key = event.GetKeyCode();
 	if (!event.HasModifiers()) {
-		int key = event.GetKeyCode();
 		if (isalpha(key)) {
 			int id = -1;
 			if (secondKeytimer.Time() < 400) {
@@ -282,10 +306,16 @@ void PeriodicTableDlg::KeyHandler(wxKeyEvent & event) {
 				wxCommandEvent foo(0, id-1);
 				ElementSelected(foo);
 			}
+		} else if (key == 309) {
+		}
+	} else {
+		if (key == 23) {
+			Close();
 		}
 	}
 }	
-/* ------------------------------------------------------------------------- */
+
+// --------------------------------------------------------------------------- 
 
 int PeriodicTableDlg::GetSelectedID(void) const {
 
@@ -296,11 +326,15 @@ int PeriodicTableDlg::GetSelectedID(void) const {
 
 }
 
+// --------------------------------------------------------------------------- 
+
 short PeriodicTableDlg::GetSelectedCoordination(void) const {
 	short result = 0;
 	if (prev_id >= 0) result = coordinationNumber[prev_id];
 	return result;
 }
+
+// --------------------------------------------------------------------------- 
 
 short PeriodicTableDlg::GetSelectedLonePairCount(void) const {
 	short result = 0;
@@ -308,7 +342,7 @@ short PeriodicTableDlg::GetSelectedLonePairCount(void) const {
 	return result;
 }
 
-/* ------------------------------------------------------------------------- */
+// --------------------------------------------------------------------------- 
 
 void PeriodicTableDlg::OnClose(wxCloseEvent& event) {
 
@@ -324,7 +358,7 @@ void PeriodicTableDlg::OnClose(wxCloseEvent& event) {
 	}
 }
 
-/* ------------------------------------------------------------------------- */
+// --------------------------------------------------------------------------- 
 
 void PeriodicTableDlg::NumberToTableCoords(int atomic_number,
 										   int *row, int *col) {
