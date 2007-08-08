@@ -4,7 +4,6 @@
 
 #include "periodic_table_dlg.h"
 #include "main.h"
-#include "wx/gbsizer.h"
 
 extern bool show_periodic_dlg;
 extern WinPrefs * gPreferences;
@@ -43,8 +42,8 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 	tabs->AddPage(rings_panel, _("Rings"), false);
 	tabs->AddPage(solvents_panel, _("Solvents"), false);
 
-	box_sizer->Add(tabs, 1, wxEXPAND);
-	box_sizer->Fit(this);
+	box_sizer->Add(tabs);
+	// box_sizer->Fit(this); 
 	panel->SetSizerAndFit(box_sizer);
 
 	Fit();
@@ -90,7 +89,7 @@ wxPanel *PeriodicTableDlg::GetPeriodicPanel(void) {
 							  0,0,0,0,0,0,0,0,0};
 
 	wxPanel *periodic_panel = new wxPanel(tabs, wxID_ANY);
-	wxGridBagSizer *sizer = new wxGridBagSizer();
+	sizer = new wxGridBagSizer();
 	
 	for (int i=0; i<kNumTableElements; i++) {
 		coordinationNumber[i] = lcoordination[i];
@@ -98,7 +97,7 @@ wxPanel *PeriodicTableDlg::GetPeriodicPanel(void) {
 	}
 
 #ifdef __WXMAC__
-#define IMAGE_SIZE 26
+#define IMAGE_SIZE 20
 	font_size = 12;
 #else
 #define IMAGE_SIZE 23
@@ -199,6 +198,7 @@ wxPanel *PeriodicTableDlg::GetPeriodicPanel(void) {
 							 wxSize(-1, -1), 6, LPChoices);
 	sizer->Add(mLPChoice, wxGBPosition(2, 8), wxGBSpan(1, 4), rflags);
 
+	sizer->Fit(this);
 	periodic_panel->SetSizerAndFit(sizer);
 	
 	return periodic_panel;
