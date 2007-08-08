@@ -4,6 +4,7 @@
 
 #include "periodic_table_dlg.h"
 #include "main.h"
+#include <wx/gbsizer.h>
 
 extern bool show_periodic_dlg;
 extern WinPrefs * gPreferences;
@@ -89,7 +90,7 @@ wxPanel *PeriodicTableDlg::GetPeriodicPanel(void) {
 							  0,0,0,0,0,0,0,0,0};
 
 	wxPanel *periodic_panel = new wxPanel(tabs, wxID_ANY);
-	sizer = new wxGridBagSizer();
+	wxGridBagSizer *sizer = new wxGridBagSizer();
 	
 	for (int i=0; i<kNumTableElements; i++) {
 		coordinationNumber[i] = lcoordination[i];
