@@ -815,12 +815,12 @@ void MolDisplayWin::OnRedoUpdate( wxUpdateUIEvent& event ) {
 
 void MolDisplayWin::OnAddHydrogensUpdate( wxUpdateUIEvent& event ) {
 	event.Enable((MainData->cFrame->GetNumAtoms() > 0) &&
-				 HandSelected());
+				 InEditMode());
 }
 
 void MolDisplayWin::OnShowBondSitesUpdate(wxUpdateUIEvent& event) {
 	event.Check(show_bond_sites);
-	event.Enable(HandSelected());
+	event.Enable(InEditMode());
 }
 
 /*!
@@ -830,7 +830,7 @@ void MolDisplayWin::OnShowBondSitesUpdate(wxUpdateUIEvent& event) {
 void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(false);
 	//paste is allowed for empty frames or while in edit mode
-	if ((MainData->cFrame->NumAtoms == 0)||HandSelected()) {
+	if ((MainData->cFrame->NumAtoms == 0)||InEditMode()) {
 		if (wxTheClipboard->Open()) {
 			if (wxTheClipboard->IsSupported(wxDF_TEXT) ||
 				wxTheClipboard->IsSupported(_("CML"))) {
@@ -845,7 +845,7 @@ void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event ) {
  */
 
 void MolDisplayWin::OnSelectionUpdate( wxUpdateUIEvent& event ) {
-	menuEdit->Enable(wxID_CLEAR, mHighliteState&&HandSelected());
+	menuEdit->Enable(wxID_CLEAR, mHighliteState&&InEditMode());
 	menuEdit->Enable(MMP_SELECT_NONE, mHighliteState);
 }
 void MolDisplayWin::OnAnnotationMarkUpdate( wxUpdateUIEvent& event ) {
@@ -1810,12 +1810,12 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 				if (CML) {
 					BeginOperation();
 					try {
-						if ((MainData->NumFrames > 1)||HandSelected()) {
+						if ((MainData->NumFrames > 1)||InEditMode()) {
 							MoleculeData *	tdatap = new MoleculeData();
 							if (!tdatap) return;
 							BufferFile *Buffer = new BufferFile(CML, strlen(CML));
 							if (tdatap->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, false)) {
-								if (HandSelected()) {
+								if (InEditMode()) {
 									CreateFrameSnapShot();
 									//In builder mode copy the selected atoms over
 									bool CopyAllAtoms = true;
@@ -1904,10 +1904,10 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 }
 void MolDisplayWin::PasteText(void) {
 	//relax this restriction later (while in build mode)
-	if ((MainData->cFrame->NumAtoms != 0)&&!HandSelected()) return;    //Do not allow pasting if there are already atoms in this frame
+	if ((MainData->cFrame->NumAtoms != 0)&&!InEditMode()) return;    //Do not allow pasting if there are already atoms in this frame
 	if (wxTheClipboard->Open()) {
 		if (wxTheClipboard->IsSupported(wxDF_TEXT)) {
-			if (HandSelected()) CreateFrameSnapShot();
+			if (InEditMode()) CreateFrameSnapShot();
 			long        iline, test, Type;
 			CPoint3D    Position, offset;
 			long initialAtomCount = MainData->cFrame->NumAtoms;
@@ -2050,12 +2050,6 @@ void MolDisplayWin::menuBuilderInteractive_mode(wxCommandEvent &event)
 		toolbar->AddSeparator();
 		toolbar->Realize();
 
-		if (!periodic_dlg) {
-			wxRect window_rect = GetRect();
-			periodic_dlg = new PeriodicTableDlg(
-												wxT("Periodic Table"), window_rect.x + window_rect.width,
-												window_rect.y + 22);
-		}
 	} else {
 		delete toolbar;
 		toolbar = NULL;
@@ -2521,7 +2515,7 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 				break;
 			case WXK_BACK:
 			case WXK_DELETE:
-				if (interactiveMode && HandSelected()) {
+				if (InEditMode()) {
 					if (mHighliteState) {
 						CreateFrameSnapShot();
 						for (long i=MainData->cFrame->NumAtoms-1; i>=0; i--) {
@@ -2558,21 +2552,19 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 				}
 				break;
 			default:
-				if (interactiveMode && HandSelected()) {
+				if (InEditMode()) {
 					//Pass general chars to the periodic table to set the atom type
 					periodic_dlg->KeyHandler(event);
 					return; //I don't think there is any reason to skip on this case?
 				}
 				break;
 		}
-	} else if (key == WXK_ALT && interactiveMode) {
-		if (HandSelected()) {
-			toolbar->ToggleTool(MMP_TOOL_LASSO, true);
-			glCanvas->SetCursor(wxCursor(*wxCROSS_CURSOR));
-			UpdateModelDisplay();
-			
-			mAltModifyingToolBar = true;
-		}
+	} else if (key == WXK_ALT && InEditMode()) {
+		toolbar->ToggleTool(MMP_TOOL_LASSO, true);
+		glCanvas->SetCursor(wxCursor(*wxCROSS_CURSOR));
+		UpdateModelDisplay();
+		
+		mAltModifyingToolBar = true;
 	} else if (event.AltDown()) {
 		switch (key) {
 			case 140:   //option - a
@@ -3517,15 +3509,15 @@ void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 
 }
 
-bool MolDisplayWin::ArrowSelected(void) {
+bool MolDisplayWin::InViewMode(void) {
 	return toolbar && toolbar->GetToolState(MMP_TOOL_ARROW);
 }
 
-bool MolDisplayWin::LassoSelected(void) {
+bool MolDisplayWin::InSelectionMode(void) {
 	return toolbar && toolbar->GetToolState(MMP_TOOL_LASSO);
 }
 
-bool MolDisplayWin::HandSelected(void) {
+bool MolDisplayWin::InEditMode(void) {
 	return toolbar && toolbar->GetToolState(MMP_TOOL_HAND);
 }
 
@@ -3655,7 +3647,7 @@ void MolDisplayWin::TogglePeriodicDialog(void) {
 		} else {
 			wxRect window_rect = GetRect();
 			periodic_dlg = new PeriodicTableDlg(
-				wxT("Periodic Table"), window_rect.x + window_rect.width,
+				wxT("Builder Tools"), window_rect.x + window_rect.width,
 				window_rect.y + 22);
 			periodic_dlg->Show();
 		}
