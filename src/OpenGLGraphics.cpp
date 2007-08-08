@@ -960,7 +960,7 @@ void MolDisplayWin::DrawGL(void) {
 
 	glDisable(GL_LIGHTING);
 
-	if (interactiveMode && HandSelected()) {
+	if (InEditMode()) {
 	    const char modeString[] = "editing";
 	    DrawStaticLabel(modeString, -50, -20);
 	}
@@ -1634,7 +1634,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			//  glDisable(GL_DEPTH_TEST);
 			//}
 
-			if (HandSelected() && show_bond_sites) {
+			if (InEditMode() && show_bond_sites) {
 				glPushMatrix();
 				DrawBondingSites(iatom, radius, qobj);
 				glPopMatrix();
