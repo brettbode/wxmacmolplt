@@ -62,6 +62,7 @@
 #define GL_Popup_To_LPCount_Three 30045
 #define GL_Popup_To_LPCount_Four 30046
 #define GL_Popup_To_LPCount_Five 30047
+#define GL_Popup_Paste_At 30048
 
 class PeriodicTableDlg;
 typedef class MolDisplayWin MolDisplayWin;
@@ -120,6 +121,9 @@ class MpGLCanvas : public wxGLCanvas {
 		void measurePopupMenu(int x, int y);
 		int select_stack[4];
 		int select_stack_top;
+
+		void ShowViewPopup(int x, int y);
+		void PasteAtMouse(wxCommandEvent& event);
 
 		void ConstrainPosition(const int anno_id, double x, double y,
 							   double z);

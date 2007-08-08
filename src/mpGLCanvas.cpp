@@ -59,9 +59,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 	mSelectState = -1;
 	interactiveMode = false;
 	oldSelect = -1;
-	mDragWin = NULL;
 	select_stack_top = 0;
-	// window_just_focused = false; 
 	ignore_next_up = false;
 	
 	selected = -1;
@@ -148,7 +146,6 @@ void MpGLCanvas::initGL(void) {
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
 		glEnable(GL_LIGHT0);
 		initialized = true;
-
 	}
 }
 
@@ -897,7 +894,7 @@ void MpGLCanvas::eventMouseLeftDoubleClick(wxMouseEvent& event) {
 	curr_mouse = event.GetPosition();
 
 	// If we're in edit mode, we display the periodic table dialog.
-	if (MolWin->HandSelected() && selected_type == MMP_NULL &&
+	if (MolWin->InEditMode() && selected_type == MMP_NULL &&
 		!show_periodic_dlg) {
 		MolWin->TogglePeriodicDialog();
 	}
@@ -943,7 +940,7 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 		// executed, and the lassoing already in progress will be lost.
 		// So, we force that a new lasso is started only when the mouse
 		// button has just gone down.
-		if (MolWin->LassoSelected()) {
+		if (MolWin->InSelectionMode()) {
 			MolWin->LassoStart(curr_mouse.x, height - curr_mouse.y);
 			select_stack_top = 5;
 		} else if (selected_type == MMP_ATOM) {
@@ -983,6 +980,8 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 	bool deSelectAll = true;
 	Frame *lFrame = mMainData->cFrame;
 
+	ndrag_events = 0;
+
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
 	testPicking(curr_mouse.x, curr_mouse.y);
@@ -999,7 +998,7 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 			draw();
 		}
 
-		if (MolWin->HandSelected()) {
+		if (MolWin->InEditMode()) {
 			interactPopupMenu(curr_mouse.x, curr_mouse.y, 1);
 		} else {
 			measurePopupMenu(curr_mouse.x, curr_mouse.y);
@@ -1007,7 +1006,7 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 	}
 
 	else if (selected_type == MMP_BOND) {
-		if (MolWin->HandSelected()) {
+		if (MolWin->InEditMode()) {
 			interactPopupMenu(curr_mouse.x, curr_mouse.y, 0);
 			MolWin->SelectionChanged(deSelectAll);
 			MolWin->UpdateGLModel();
@@ -1026,7 +1025,6 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 		SetCurrent();
 		MolWin->Rotate(event);
 
-		// std::cout << "captured" << std::endl; 
 		CaptureMouse();
 	}
 
@@ -1060,9 +1058,9 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	// We don't do anything if a button isn't held down.
 	if (!event.Dragging()) {
 		testPicking(curr_mouse.x, curr_mouse.y);
-		if (MolWin->HandSelected() && selected_site >= 0) {
+		if (MolWin->InEditMode() && selected_site >= 0) {
 			MolWin->SetStatusText(_("Bond an atom here."));
-		} else if (MolWin->HandSelected() && selected < 0 && 
+		} else if (MolWin->InEditMode() && selected < 0 && 
 				   periodic_dlg && periodic_dlg->GetSelectedID()) {
 			MolWin->SetStatusText(_("Add new atom here."));
 		} else if (selected_type == MMP_ATOM) {
@@ -1088,7 +1086,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	SetCurrent();
 
 	// Lassoing should only be done with the left mouse button.
-	if (MolWin->LassoSelected() && event.LeftIsDown()) {
+	if (MolWin->InSelectionMode() && event.LeftIsDown()) {
 		HandleLassoing(event, wxPoint(curr_mouse.x, height - curr_mouse.y));
 		draw();
 	}
@@ -1096,7 +1094,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	// User must be wanting to translate or rotate atoms.  This isn't the
 	// case if something that's not a bond or atom is clicked on, like a
 	// bonding site or an annotation or the background.
-	else if (MolWin->HandSelected() &&
+	else if (MolWin->InEditMode() &&
 			 (selected_type == MMP_BOND || selected_type == MMP_ATOM)) {
 
 		// If a bond site is clicked on, it may be part of drag operation to
@@ -1139,7 +1137,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	}
 
 	// If the lasso tool is being used, we want to end close off it's region.
-	if (MolWin->LassoSelected()) {
+	if (MolWin->InSelectionMode()) {
 		MolWin->LassoEnd();
 		if (ndrag_events <= 0) {
 			SelectObj(selected_type, selected, deSelectAll);
@@ -1154,7 +1152,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		// If we're in edit mode, the user may be trying to add an atom,
 		// possibly to a bonding site.  However, if the mouse click was part
 		// of bringing the window to focus, we don't add anything.
-		if (MolWin->HandSelected() && !ignore_next_up) {
+		if (MolWin->InEditMode() && !ignore_next_up) {
 
 			// If no periodic table is shown or an atom is not selected, but
 			// the user seems to be trying to add an atom, give them a message.
@@ -1237,7 +1235,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	
 	// If a drag occurred between two bonding sites, we pair them up with
 	// a bond.
-	else if (MolWin->HandSelected() && first_site_clicked >= 0) {
+	else if (MolWin->InEditMode() && first_site_clicked >= 0) {
 		testPicking(curr_mouse.x, curr_mouse.y);
 		if (selected != first_atom_clicked ||
 			selected_site >= 0 && selected_site != first_site_clicked) {
@@ -1262,12 +1260,6 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		MolWin->Rotate(event);
 	}
 
-	if (mDragWin) {
-		mDragWin->EndDrag();
-		delete mDragWin;
-		mDragWin = NULL;
-	}
-
 	// The drag image also captures mouse but doesn't check for that it
 	// still has it captured before releasing it.  So, our check and release
 	// must occur after ending the drag.
@@ -1281,14 +1273,21 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 
+	prev_mouse = curr_mouse;
+	curr_mouse = event.GetPosition();
+
 	if (HasCapture()) {
 		ReleaseMouse();
 	}
 
-	// We call this to erase the transformation circle that would otherwise
-	// stay when the user releases the mouse.
-	SetCurrent();
-	MolWin->Rotate(event);
+	if (ndrag_events) {
+		// We call this to erase the transformation circle that would otherwise
+		// stay when the user releases the mouse.
+		SetCurrent();
+		MolWin->Rotate(event);
+	} else {
+		ShowViewPopup(curr_mouse.x, curr_mouse.y);
+	}
 
 }
 
@@ -1373,7 +1372,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			// executed, and the lassoing already in progress will be lost.
 			// So, we force that a new lasso is started only when the mouse
 			// button has just gone down.
-			if (MolWin->LassoSelected() && event.LeftDown()) {
+			if (MolWin->InSelectionMode() && event.LeftDown()) {
 				MolWin->LassoStart(tmpPnt.x, height - tmpPnt.y);
 				select_stack_top = 5;
 			} else if (selected_type == MMP_ATOM) {
@@ -1435,13 +1434,13 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 		mSelectState++;
 
 		// Lassoing should only be done with the left mouse button.
-		if (MolWin->LassoSelected() && event.LeftIsDown()) {
+		if (MolWin->InSelectionMode() && event.LeftIsDown()) {
 			HandleLassoing(event, wxPoint(tmpPnt.x, height - tmpPnt.y));
 			edited_atoms = true;
 		}
 
 		// User must be wanting to translate or rotate atoms.
-		else if (MolWin->HandSelected() &&
+		else if (MolWin->InEditMode() &&
 				 (selected_type == MMP_BOND || selected_type == MMP_ATOM)) {
 
 			// But if the user clicked on a bonding site, we don't want
@@ -1461,7 +1460,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			deSelectAll = false;
 		}
 
-		if (MolWin->LassoSelected()) {
+		if (MolWin->InSelectionMode()) {
 			ReleaseMouse();
 			MolWin->LassoEnd();
 			if (mSelectState <= 0) {
@@ -1476,7 +1475,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 
 			if (interactiveMode) {
 
-				if (MolWin->HandSelected()) {
+				if (MolWin->InEditMode()) {
 
 					// If no periodic table is shown or not atom is selected,
 					// but the user seems to be trying to add an atom, give
@@ -1572,7 +1571,7 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			MolWin->UpdateGLModel();
 			edited_atoms = true;
 
-		} else if (MolWin->HandSelected() && first_site >= 0) {
+		} else if (MolWin->InEditMode() && first_site >= 0) {
 			testPicking(tmpPnt.x, tmpPnt.y);
 			if (selected_site >= 0 && selected_site != first_site) {
 				MolWin->CreateFrameSnapShot();
@@ -1581,11 +1580,6 @@ void MpGLCanvas::eventMouse(wxMouseEvent &event) {
 			first_site = -1;
 		}
 
-		if (mDragWin) {
-			mDragWin->EndDrag();
-			delete mDragWin;
-			mDragWin = NULL;
-		}
 	}
 
 	else if (event.ButtonUp()) {
@@ -1793,25 +1787,9 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 
 		}
 
-		if (mDragWin) {
-			mDragWin->EndDrag();
-			delete mDragWin;
-			mDragWin = (wxDragImage*) NULL;
-		}
-
 		wxString tmp3Dcoord;
 
 		tmp3Dcoord.Printf(wxT("%.2f,%.2f,%.2f"), newX, newY, newZ);
-
-		mDragWin = new wxDragImage(tmp3Dcoord, wxCursor(wxCURSOR_HAND));
-
-		if (!mDragWin->BeginDrag(wxPoint(0, 30), this)) {
-			delete mDragWin;
-			mDragWin = (wxDragImage*) NULL;
-		} else {
-			mDragWin->Move(event.GetPosition());
-	//		mDragWin->Show();
-		}
 
 		lFrame->SetBonds(Prefs, true, true);
 		MolWin->UpdateGLModel();
@@ -2731,6 +2709,68 @@ void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
 	MolWin->UpdateModelDisplay();
 }
 
+void MpGLCanvas::PasteAtMouse(wxCommandEvent& event) {
+
+	// This function will paste all atoms selected in the clipboard into the
+	// scene relative to the mouse location.  This is in contrast to the
+	// normal paste operation, which retains atom locations exactly.  Here,
+	// the first atom in the selected list is placed at the mouse position and
+	// its fellow atoms are placed relatively.
+
+	Frame *lFrame = mMainData->cFrame;
+	int new_atom_idx = lFrame->NumAtoms;
+	CPoint3D pos;
+	CPoint3D offset;
+	CPoint3D mouse_pos;
+	double mouse_x, mouse_y, mouse_z;
+	double atom_depth;
+
+	// First we call the normal paste which exactly replicates the selected
+	// atoms, position and all.
+	MolWin->menuEditPaste(event);
+
+	// Make sure some atoms were added.
+	if (new_atom_idx >= lFrame->NumAtoms) {
+		return;
+	}
+
+	// Now, we want to find the difference between the first atom in the
+	// replicated list and the mouse coordinates in model space at the same
+	// depth as the first atom.  This will give us an offset vector that we
+	// displace all atoms by so we can paste the set relative to the mouse.
+	// The first atom will, of course, get placed at the mouse position.
+	lFrame->GetAtomPosition(new_atom_idx, pos);
+	findWinCoord(pos.x, pos.y, pos.z, mouse_x, mouse_y, atom_depth);
+	findReal3DCoord(curr_mouse.x, curr_mouse.y, atom_depth,
+					mouse_x, mouse_y, mouse_z);
+	mouse_pos = CPoint3D(mouse_x, mouse_y, mouse_z);
+	offset = mouse_pos - pos;
+
+	// Now we offset all the new atoms.
+	for (int i = new_atom_idx; i < lFrame->NumAtoms; i++) {
+		lFrame->GetAtomPosition(i, pos);
+		lFrame->SetAtomPosition(i, pos + offset);
+	}
+
+}
+
+void MpGLCanvas::ShowViewPopup(int x, int y) {
+
+	// This function shows a popup menu that shows some information and
+	// operations for the clicked-on bond.  It's assumed that selected is
+	// a valid index in the bonds lists.
+
+	wxMenu menu;
+	// wxMenuItem *item; 
+	// wxMenu *submenu; 
+	// Frame *lFrame = mMainData->cFrame; 
+	
+	menu.Append(GL_Popup_Paste_At, _("Paste at Mouse Position"));
+
+	PopupMenu(&menu, x, y);
+
+}
+
 void MpGLCanvas::bondPopupMenu(int x, int y) {
 
 	// This function shows a popup menu that shows some information and
@@ -3031,5 +3071,6 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_To_LPCount_Three, MpGLCanvas::ChangeLPCount)
 	EVT_MENU(GL_Popup_To_LPCount_Four, MpGLCanvas::ChangeLPCount)
 	EVT_MENU(GL_Popup_To_LPCount_Five, MpGLCanvas::ChangeLPCount)
+	EVT_MENU(GL_Popup_Paste_At, MpGLCanvas::PasteAtMouse)
 END_EVENT_TABLE()
 
