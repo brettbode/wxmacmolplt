@@ -1559,6 +1559,7 @@ int glfUnloadBMFFontD(int bmf_descriptor)
 
 	glDeleteTextures(1, &bmf_texture[bmf_descriptor]);
 	glDeleteTextures(1, &bmf_mask[bmf_descriptor]);
+	free(m_widths[bmf_descriptor].width);
 
 	if (bmf_descriptor == bmf_curfont) bmf_curfont = -1;
 
