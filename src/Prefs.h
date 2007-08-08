@@ -33,6 +33,7 @@ class SurfaceOptions {
 											// bit 2 - rotate 2D map
 											// bit 3 - show 2D hash marks
 	public:
+		SurfaceOptions() { Options = 0; }
 		long GetNumContours(void) const {return NumContours;};
 		long SetNumContours(long NewNum);
 		long GetNumGridPoints(void) const {return NumGridPoints;};
