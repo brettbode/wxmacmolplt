@@ -494,9 +494,9 @@ class MolDisplayWin : public wxFrame {
 		void LassoEnd(void);
 		bool LassoContains(const int x, const int y);
 		bool LassoHasArea(void);
-		bool LassoSelected(void);
-		bool ArrowSelected(void);
-		bool HandSelected(void);
+		bool InSelectionMode(void);
+		bool InViewMode(void);
+		bool InEditMode(void);
 		void DrawBondingSites(long iatom, float radius, GLUquadricObj *qobj, int site_id=0, CPoint3D * vector=NULL);
 		void SetStatusText(const wxString& label);
 		void CreateFrameSnapShot(void);
