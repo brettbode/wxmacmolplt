@@ -26,7 +26,7 @@
 #include <sstream>
 
 #include "main.h"
-#include "periodic_table_dlg.h"
+#include "build_palette.h"
 #include "Math3D.h"
 #include "VirtualSphere.h"
 #include "ChooseDialog.h"
