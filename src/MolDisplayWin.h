@@ -190,6 +190,7 @@ class MolDisplayWin : public wxFrame {
 		bool			Dirty;          //Flag to indicate a save is needed
 		bool			OperationInProgress;
 		bool			timerRunning;
+		bool			show_fullscreen;
 		
 		Progress		*ProgressInd;    // Progress indicator window for long operations
 		OpenGLRec		*OpenGLData;     // Extra OpenGL data
@@ -238,6 +239,7 @@ class MolDisplayWin : public wxFrame {
 		void OnToggleTool(wxCommandEvent& event);
 		void OnStatusTimer(wxTimerEvent& event);
 		void OnRotateTimer(wxTimerEvent& event);
+		void OnShowNormalScreen(wxUpdateUIEvent& event);
 
 		DECLARE_EVENT_TABLE()
 
@@ -309,6 +311,7 @@ class MolDisplayWin : public wxFrame {
 		/// wxEVT_UPDATE_UI event handler for selection changes
 		void OnSelectionUpdate( wxUpdateUIEvent& event );
 
+		void menuViewShowFullScreen(wxCommandEvent &event);
 		void menuViewShowNormalMode(wxCommandEvent &event);
 		void menuViewPrevNormalMode(wxCommandEvent &event);
 		void menuViewNextNormalMode(wxCommandEvent &event);

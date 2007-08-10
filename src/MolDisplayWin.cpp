@@ -33,7 +33,7 @@
 #include "choosevecgroup.h"
 #include "coordinateoffset.h"
 #include "frameenergy.h"
-#include "periodic_table_dlg.h"
+#include "build_palette.h"
 #include "printoptions.h"
 #include "windowparameters.h"
 #include "zmatrixcalculator.h"
@@ -159,6 +159,7 @@ enum MMP_EventID {
 	MMP_TOOL_HAND,
 	MMP_SELECT_NONE,
 	MMP_SHOWBONDSITES,
+	MMP_SHOW_FULLSCREEN,
 	
 	Number_MMP_Ids
 };
@@ -196,6 +197,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_SELECT_NONE,		MolDisplayWin::menuEditSelectNone)
 	EVT_UPDATE_UI(MMP_SELECT_NONE,	MolDisplayWin::OnSelectionUpdate )
 
+	EVT_MENU (MMP_SHOW_FULLSCREEN,  MolDisplayWin::menuViewShowFullScreen)
+	EVT_UPDATE_UI(MMP_SHOW_FULLSCREEN, MolDisplayWin::OnShowNormalScreen)
 	EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
 	EVT_MENU (MMP_ANIMATEMODE,      MolDisplayWin::menuViewAnimateMode)
 	EVT_MENU (MMP_OFFSETMODE,       MolDisplayWin::menuViewOffsetAlongMode)
@@ -388,6 +391,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	printData = NULL;
 	myStatus = NULL;
 
+	show_fullscreen = false;
 	mHighliteState = false;
 	interactiveMode = false;
 	window_just_focused = false;
@@ -596,6 +600,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuEdit->AppendSeparator();
 	menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"), wxT("Edit the default preferences for new windows"));
 
+	menuView->AppendCheckItem(MMP_SHOW_FULLSCREEN, _("Show Fullscreen"), _("Display in full screen mode"));
 	menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"), wxT("Display the vibrational motion as mass-weighted vectors"));
 	menuView->Append(MMP_ANIMATEMODE, wxT("&Animate Mode\tShift+Ctrl+M"), wxT("Animate the vibration, click outside the window to stop"));
 	menuView->Append(MMP_OFFSETMODE, wxT("&Offset along mode..."), wxT("Generate a new set of coordinates by moving along the current mode"));
@@ -2029,7 +2034,7 @@ void MolDisplayWin::menuBuilderInteractive_mode(wxCommandEvent &event)
 #include "xpms/rect_lasso.xpm"
 #include "xpms/hand.xpm"
 
-		toolbar->SetMargins(5,5);
+		// toolbar->SetMargins(5,5); 
 		toolbar->SetToolBitmapSize(wxSize(16, 15));
 
 		wxBitmap enabled_bmp;
@@ -2072,11 +2077,22 @@ void MolDisplayWin::menuBuilderShowPeriodicDlg(wxCommandEvent &event) {
 	TogglePeriodicDialog();
 }
 
+void MolDisplayWin::OnShowNormalScreen(wxUpdateUIEvent& event) {
+	event.Check(show_fullscreen);
+}
+
+void MolDisplayWin::menuViewShowFullScreen(wxCommandEvent &event) {
+	show_fullscreen = !show_fullscreen;
+	ShowFullScreen(show_fullscreen,
+				   wxFULLSCREEN_NOCAPTION | wxFULLSCREEN_NOBORDER);
+}
+
 void MolDisplayWin::menuViewShowNormalMode(wxCommandEvent &event) {
 	MainData->SetDrawMode(1-MainData->GetDrawMode());
 	ResetModel(false);
 	Dirty = true;
 }
+
 void MolDisplayWin::menuViewPrevNormalMode(wxCommandEvent &event) {
 	if (MainData->cFrame->Vibs) {
 		if (MainData->cFrame->Vibs->CurrentMode>0) {
@@ -2549,6 +2565,12 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 			case WXK_END:
 				if (MainData->CurrentFrame<MainData->NumFrames) {
 					ChangeFrames(MainData->NumFrames);
+				}
+				break;
+			case WXK_ESCAPE:
+				if (show_fullscreen) {
+					show_fullscreen = false;
+					ShowFullScreen(false);
 				}
 				break;
 			default:
