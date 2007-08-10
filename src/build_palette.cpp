@@ -1,9 +1,6 @@
-#if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
-#pragma implementation "periodic_table_dlg.h"
-#endif
-
-#include "periodic_table_dlg.h"
+#include "build_palette.h"
 #include "main.h"
+
 #include <wx/gbsizer.h>
 
 extern bool show_periodic_dlg;
