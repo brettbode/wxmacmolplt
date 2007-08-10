@@ -42,7 +42,7 @@ wxmacmolplt_SOURCES =                                  \
     MyTypes.cpp                MyTypes.h               \
     OpenGLGraphics.cpp                                 \
     orbitals.cpp                                       \
-    periodic_table_dlg.h       periodic_table_dlg.cpp  \
+    build_palette.h            build_palette.cpp       \
     patterns.h                 Prefs.h                 \
                                PrefsPanes.h            \
     printoptions.cpp           printoptions.h          \
