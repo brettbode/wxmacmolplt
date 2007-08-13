@@ -257,6 +257,9 @@
 		8B33B9600BF8EDA20056C79E /* listaction.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9430BF8EDA20056C79E /* listaction.c */; };
 		8B33B9620BF8EDA20056C79E /* swf4compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9450BF8EDA20056C79E /* swf4compiler.tab.c */; };
 		8B33B9630BF8EDA20056C79E /* swf5compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9470BF8EDA20056C79E /* swf5compiler.tab.c */; };
+		8B396E710C70AA8C009690AF /* build_palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B396E6F0C70AA8C009690AF /* build_palette.cpp */; };
+		8B396E720C70AA8C009690AF /* build_palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B396E6F0C70AA8C009690AF /* build_palette.cpp */; };
+		8B396E730C70AA8C009690AF /* build_palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B396E6F0C70AA8C009690AF /* build_palette.cpp */; };
 		8B3B899D0A6EAD7E0041EA88 /* glf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B899C0A6EAD7E0041EA88 /* glf.cpp */; };
 		8B3B8AE10A770A280041EA88 /* bindoc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC809D0B43700B7783F /* bindoc.icns */; };
 		8B3B8AE20A770A280041EA88 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC909D0B43700B7783F /* Info.plist */; };
@@ -327,6 +330,12 @@
 		8B600B750B8F35C400084AF2 /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
 		8B600B760B8F35C400084AF2 /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
 		8B6075B10A1A34B1008CC9FD /* printoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */; };
+		8B6716380C44015B0067A3C9 /* arial1.bmf in Resources */ = {isa = PBXBuildFile; fileRef = 8B6716370C44015B0067A3C9 /* arial1.bmf */; };
+		8B6716390C44015B0067A3C9 /* arial1.bmf in Resources */ = {isa = PBXBuildFile; fileRef = 8B6716370C44015B0067A3C9 /* arial1.bmf */; };
+		8B67163A0C44015B0067A3C9 /* arial1.bmf in Resources */ = {isa = PBXBuildFile; fileRef = 8B6716370C44015B0067A3C9 /* arial1.bmf */; };
+		8B6716520C4BF1290067A3C9 /* MyTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6716510C4BF1290067A3C9 /* MyTypes.cpp */; };
+		8B6716530C4BF1290067A3C9 /* MyTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6716510C4BF1290067A3C9 /* MyTypes.cpp */; };
+		8B6716540C4BF1290067A3C9 /* MyTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6716510C4BF1290067A3C9 /* MyTypes.cpp */; };
 		8B6AF30B0A13EAC8004D2E5F /* exportoptionsdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */; };
 		8B6C7BFB0A24E9C100B7358F /* energyplotdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */; };
 		8B6C7BFF0A24E9E800B7358F /* wxMolGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */; };
@@ -397,9 +406,6 @@
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
 		8BDC5DDD0A29F25F0060517F /* coordinateoffset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */; };
 		8BE7C29D0A273D9700DACA25 /* choosevecgroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */; };
-		8BE9976A0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE997680B70485700F48AA3 /* periodic_table_dlg.cpp */; };
-		8BE9976B0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE997680B70485700F48AA3 /* periodic_table_dlg.cpp */; };
-		8BE9976C0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE997680B70485700F48AA3 /* periodic_table_dlg.cpp */; };
 		8BEA48DC0BFA076D00C660A3 /* lex.swf4.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9410BF8EDA20056C79E /* lex.swf4.c */; };
 		8BEA48E00BFA078600C660A3 /* swf4compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9450BF8EDA20056C79E /* swf4compiler.tab.c */; };
 		8BEA48E90BFA0BE900C660A3 /* swfexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */; };
@@ -647,6 +653,8 @@
 		8B33B9460BF8EDA20056C79E /* swf4compiler.tab.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = swf4compiler.tab.h; path = actioncompiler/swf4compiler.tab.h; sourceTree = "<group>"; };
 		8B33B9470BF8EDA20056C79E /* swf5compiler.tab.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = swf5compiler.tab.c; path = actioncompiler/swf5compiler.tab.c; sourceTree = "<group>"; };
 		8B33B9480BF8EDA20056C79E /* swf5compiler.tab.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = swf5compiler.tab.h; path = actioncompiler/swf5compiler.tab.h; sourceTree = "<group>"; };
+		8B396E6F0C70AA8C009690AF /* build_palette.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = build_palette.cpp; path = src/build_palette.cpp; sourceTree = "<group>"; };
+		8B396E700C70AA8C009690AF /* build_palette.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = build_palette.h; path = src/build_palette.h; sourceTree = "<group>"; };
 		8B3B89720A6EAB540041EA88 /* glf.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = glf.h; path = src/glf.h; sourceTree = "<group>"; };
 		8B3B899C0A6EAD7E0041EA88 /* glf.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = glf.cpp; path = src/glf.cpp; sourceTree = "<group>"; };
 		8B3B8B210A770A280041EA88 /* wxMacMolPlt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wxMacMolPlt.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -663,6 +671,8 @@
 		8B6075B00A1A34B1008CC9FD /* printoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = printoptions.h; path = src/printoptions.h; sourceTree = "<group>"; };
 		8B641E370A472F8D0075F96C /* surfaceDlg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceDlg.cpp; path = src/surfaceDlg.cpp; sourceTree = "<group>"; };
 		8B641E380A472F8D0075F96C /* surfaceDlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceDlg.h; path = src/surfaceDlg.h; sourceTree = "<group>"; };
+		8B6716370C44015B0067A3C9 /* arial1.bmf */ = {isa = PBXFileReference; lastKnownFileType = file; name = arial1.bmf; path = resources/fonts/arial1.bmf; sourceTree = "<group>"; };
+		8B6716510C4BF1290067A3C9 /* MyTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MyTypes.cpp; path = src/MyTypes.cpp; sourceTree = "<group>"; };
 		8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = exportoptionsdialog.cpp; path = src/exportoptionsdialog.cpp; sourceTree = "<group>"; };
 		8B6AF30A0A13EAC8004D2E5F /* exportoptionsdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = exportoptionsdialog.h; path = src/exportoptionsdialog.h; sourceTree = "<group>"; };
 		8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = energyplotdialog.cpp; path = src/energyplotdialog.cpp; sourceTree = "<group>"; };
@@ -682,8 +692,6 @@
 		8BDC5DDC0A29F25F0060517F /* coordinateoffset.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = coordinateoffset.h; path = src/coordinateoffset.h; sourceTree = "<group>"; };
 		8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = choosevecgroup.cpp; path = src/choosevecgroup.cpp; sourceTree = "<group>"; };
 		8BE7C29C0A273D9700DACA25 /* choosevecgroup.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = choosevecgroup.h; path = src/choosevecgroup.h; sourceTree = "<group>"; };
-		8BE997680B70485700F48AA3 /* periodic_table_dlg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = periodic_table_dlg.cpp; path = src/periodic_table_dlg.cpp; sourceTree = "<group>"; };
-		8BE997690B70485700F48AA3 /* periodic_table_dlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = periodic_table_dlg.h; path = src/periodic_table_dlg.h; sourceTree = "<group>"; };
 		8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = swfexport.cpp; path = src/swfexport.cpp; sourceTree = "<group>"; };
 		8BEA48F00BFA0F7300C660A3 /* Geometries.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Geometries.cpp; path = src/Geometries.cpp; sourceTree = "<group>"; };
 		8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = setscreenplane.cpp; path = src/setscreenplane.cpp; sourceTree = "<group>"; };
@@ -760,6 +768,8 @@
 				1652DA2C09D0B12600B7783F /* BFiles.h */,
 				16FB432E09F026A300E84C6B /* bondsdlg.cpp */,
 				16FB432F09F026A300E84C6B /* bondsdlg.h */,
+				8B396E6F0C70AA8C009690AF /* build_palette.cpp */,
+				8B396E700C70AA8C009690AF /* build_palette.h */,
 				1652DA2D09D0B12600B7783F /* cell_table.h */,
 				8B7448790C1EF9E600A74512 /* ChooseDialog.cpp */,
 				8B74487A0C1EF9E600A74512 /* ChooseDialog.h */,
@@ -822,11 +832,10 @@
 				8B6C7BFE0A24E9E800B7358F /* wxMolGraph.h */,
 				1652DA4C09D0B12600B7783F /* myFiles.h */,
 				1652DA4D09D0B12600B7783F /* MyTypes.h */,
+				8B6716510C4BF1290067A3C9 /* MyTypes.cpp */,
 				8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */,
 				1652DA4E09D0B12600B7783F /* orbitals.cpp */,
 				8B33B7B40BF8DBEB0056C79E /* patterns.h */,
-				8BE997680B70485700F48AA3 /* periodic_table_dlg.cpp */,
-				8BE997690B70485700F48AA3 /* periodic_table_dlg.h */,
 				1652DA4F09D0B12600B7783F /* Prefs.h */,
 				8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */,
 				8B1DA4820A2E6A17009DFD94 /* PrefsPanes.h */,
@@ -879,6 +888,7 @@
 				8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */,
 				8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */,
 				8B45D25D0A700DB60005269A /* arial1.glf */,
+				8B6716370C44015B0067A3C9 /* arial1.bmf */,
 				1652DAC809D0B43700B7783F /* bindoc.icns */,
 				1652DAC909D0B43700B7783F /* Info.plist */,
 				1652DACA09D0B43700B7783F /* MacMolPlt.icns */,
@@ -1133,6 +1143,7 @@
 				8B45D25E0A700DB60005269A /* arial1.glf in Resources */,
 				8B33B8AE0BF8ED280056C79E /* Makefile.am in Resources */,
 				8B33B8AF0BF8ED280056C79E /* Makefile.in in Resources */,
+				8B6716380C44015B0067A3C9 /* arial1.bmf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1149,6 +1160,7 @@
 				8B3B8AE70A770A280041EA88 /* arial1.glf in Resources */,
 				8B33B9100BF8ED280056C79E /* Makefile.am in Resources */,
 				8B33B9110BF8ED280056C79E /* Makefile.in in Resources */,
+				8B6716390C44015B0067A3C9 /* arial1.bmf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1165,6 +1177,7 @@
 				8B8816B50A751FED00EC8791 /* arial1.glf in Resources */,
 				8B33B8DF0BF8ED280056C79E /* Makefile.am in Resources */,
 				8B33B8E00BF8ED280056C79E /* Makefile.in in Resources */,
+				8B67163A0C44015B0067A3C9 /* arial1.bmf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1227,7 +1240,6 @@
 				8BF17D780A5328210059B71F /* windowparameters.cpp in Sources */,
 				8BF17DA40A55D0910059B71F /* zmatrixcalculator.cpp in Sources */,
 				8B3B899D0A6EAD7E0041EA88 /* glf.cpp in Sources */,
-				8BE9976A0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
 				8B600B740B8F35C400084AF2 /* qtexport.cpp in Sources */,
 				8B5D0D6C0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */,
 				8B33B7B80BF8DBEB0056C79E /* swfexport-g.cpp in Sources */,
@@ -1301,6 +1313,8 @@
 				8BEA48E90BFA0BE900C660A3 /* swfexport.cpp in Sources */,
 				8BEA48F10BFA0F7300C660A3 /* Geometries.cpp in Sources */,
 				8B74487B0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */,
+				8B6716520C4BF1290067A3C9 /* MyTypes.cpp in Sources */,
+				8B396E710C70AA8C009690AF /* build_palette.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1360,7 +1374,6 @@
 				8B3B8B1A0A770A280041EA88 /* windowparameters.cpp in Sources */,
 				8B3B8B1B0A770A280041EA88 /* zmatrixcalculator.cpp in Sources */,
 				8B3B8B1C0A770A280041EA88 /* glf.cpp in Sources */,
-				8BE9976B0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
 				8B600B760B8F35C400084AF2 /* qtexport.cpp in Sources */,
 				8B5D0D6D0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */,
 				8B33B7BC0BF8DBEB0056C79E /* swfexport-g.cpp in Sources */,
@@ -1434,6 +1447,8 @@
 				8BEA48EB0BFA0BE900C660A3 /* swfexport.cpp in Sources */,
 				8BEA48F30BFA0F7300C660A3 /* Geometries.cpp in Sources */,
 				8B74487D0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */,
+				8B6716530C4BF1290067A3C9 /* MyTypes.cpp in Sources */,
+				8B396E720C70AA8C009690AF /* build_palette.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1493,7 +1508,6 @@
 				8B8816E80A751FED00EC8791 /* windowparameters.cpp in Sources */,
 				8B8816E90A751FED00EC8791 /* zmatrixcalculator.cpp in Sources */,
 				8B8816EA0A751FED00EC8791 /* glf.cpp in Sources */,
-				8BE9976C0B70485700F48AA3 /* periodic_table_dlg.cpp in Sources */,
 				8B600B750B8F35C400084AF2 /* qtexport.cpp in Sources */,
 				8B5D0D6E0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */,
 				8B33B7BA0BF8DBEB0056C79E /* swfexport-g.cpp in Sources */,
@@ -1567,6 +1581,8 @@
 				8BEA48EA0BFA0BE900C660A3 /* swfexport.cpp in Sources */,
 				8BEA48F20BFA0F7300C660A3 /* Geometries.cpp in Sources */,
 				8B74487C0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */,
+				8B6716540C4BF1290067A3C9 /* MyTypes.cpp in Sources */,
+				8B396E730C70AA8C009690AF /* build_palette.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
