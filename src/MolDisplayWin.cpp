@@ -105,6 +105,7 @@ enum MMP_EventID {
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
 	MMP_ADDHYDROGENS,
+	MMP_DELETEHYDROGENS,
 	MMP_NEWFRAME,
 	MMP_ADDFRAMES,
 	MMP_DELETEFRAME,
@@ -273,6 +274,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_INTERACTIVE,			MolDisplayWin::menuBuilderInteractive_mode)
 	EVT_MENU (MMP_SHOWPERIODICDLG,		MolDisplayWin::menuBuilderShowPeriodicDlg)
 	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuBuilderAddHydrogens)
+	EVT_MENU (MMP_DELETEHYDROGENS,		MolDisplayWin::menuBuilderDeleteHydrogens)
 	EVT_MENU (MMP_SHOWBONDSITES,		MolDisplayWin::menuBuilderShowBondSites)
 	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate)
 	EVT_UPDATE_UI(MMP_SHOWBONDSITES,	MolDisplayWin::OnShowBondSitesUpdate)
@@ -650,13 +652,14 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
 
 #ifdef ENABLE_INTERACTIVE_MODE
-	menuBuild->AppendCheckItem(MMP_INTERACTIVE, _("Enable Molecule Builder\tCtrl+I"), _("Interactive graphical molecular editor"));
+	menuBuild->AppendCheckItem(MMP_INTERACTIVE, _("Enable Molecule &Builder\tCtrl+I"), _("Interactive graphical molecular editor"));
 #endif
 	menuBuild->AppendCheckItem(MMP_SHOWPERIODICDLG, _("Show Periodic &Table\tCtrl+T"), _("Display a periodic table"));
 #ifdef ENABLE_INTERACTIVE_MODE
 	menuBuild->AppendSeparator();
 	menuBuild->Append(MMP_ADDHYDROGENS, wxT("Add &Hydrogens"), _T("Complete moleclues by adding hydrogens to incomplete bonds"));
-	menuBuild->AppendCheckItem(MMP_SHOWBONDSITES, wxT("Show Bonding Sites"), _T("Click on a site to add an atom."));
+	menuBuild->Append(MMP_DELETEHYDROGENS, wxT("&Delete Hydrogens"), _T("Remove terminal hydrogens (Does not apply to effective fragments or SIMOMM atoms)."));
+	menuBuild->AppendCheckItem(MMP_SHOWBONDSITES, wxT("&Show Bonding Sites"), _T("Click on a site to add an atom."));
 #endif
 	
 	menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."), _("Apply the automated bond determination with several options"));
@@ -2462,21 +2465,24 @@ void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuBuilderAddHydrogens(wxCommandEvent &event) {
-	CreateFrameSnapShot();
+	bool snapshotCreated=false;
 	Frame *	lFrame=MainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
-	long NumBonds = lFrame->NumBonds;
 	
 	for (int iatom=0; iatom<NumAtoms; iatom++) {
 		short coordination = lFrame->Atoms[iatom].GetCoordinationNumber();
 		int bondCount = 0;
-		for (long i=0; i<NumBonds; i++) {
+		for (long i=0; i<lFrame->NumBonds; i++) {
 			if (((iatom == lFrame->Bonds[i].Atom1)||(iatom == lFrame->Bonds[i].Atom2))&&
 				(lFrame->Bonds[i].Order > kHydrogenBond)) {
 				bondCount++;
 			}
 		}
 		for (int k=bondCount; k<coordination; k++) {
+			if (!snapshotCreated) {
+				CreateFrameSnapShot();
+				snapshotCreated = true;
+			}
 			CPoint3D vector, origin;
 			DrawBondingSites(iatom, 0, NULL, k+1, &vector);
 			lFrame->GetAtomPosition(iatom, origin);
@@ -2487,9 +2493,45 @@ void MolDisplayWin::menuBuilderAddHydrogens(wxCommandEvent &event) {
 			lFrame->AddBond(iatom,lFrame->GetNumAtoms()-1,kSingleBond);
 		}
 	}
-	ResetModel(false);
-	AtomsChanged(true, false);
-	Dirty = true;
+	if (snapshotCreated) {
+		ResetModel(false);
+		AtomsChanged(true, false);
+		Dirty = true;
+	}
+}
+void MolDisplayWin::menuBuilderDeleteHydrogens(wxCommandEvent &event) {
+	//Strip off hydrogen atoms from the system. Leave non-bonded hydrogens alone and leave
+	//hydrogens that are part of fragments alone. I am tempted to leave hydrogens that are
+	//added as part of a precomputed fragment as well. I don't have the infrastructure for that
+	//in place yet though.
+	bool snapshotCreated=false;
+	Frame *	lFrame=MainData->cFrame;
+	
+	for (int iatom=0; iatom<lFrame->NumAtoms; iatom++) {
+		if (lFrame->Atoms[iatom].Type == 1 ) {
+			if (lFrame->Atoms[iatom].IsEffectiveFragment() || lFrame->Atoms[iatom].IsSIMOMMAtom()) continue;
+			bool hasBonds=false;
+			for (long i=0; i<lFrame->NumBonds; i++) {
+				if (((iatom == lFrame->Bonds[i].Atom1)||(iatom == lFrame->Bonds[i].Atom2))&&
+					(lFrame->Bonds[i].Order > kHydrogenBond)) {
+					hasBonds = true;
+					break;
+				}
+			}
+			if (hasBonds) {
+				if (!snapshotCreated) {
+					CreateFrameSnapShot();
+					snapshotCreated = true;
+				}
+				MainData->DeleteAtom(iatom, false);
+			}
+		}
+	}
+	if (snapshotCreated) {
+		ResetModel(false);
+		AtomsChanged(true, false);
+		Dirty = true;
+	}
 }
 
 void MolDisplayWin::menuBuilderShowBondSites(wxCommandEvent &event) {

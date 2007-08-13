@@ -369,12 +369,43 @@ class MolDisplayWin : public wxFrame {
 		void menuMoleculeConvertToAngstroms(wxCommandEvent &event);
 		void menuMoleculeInvertNormalMode(wxCommandEvent &event);
 
+		/**
+		 * Fills out the coordination of every atom with hydrogens.
+		 * @param event The command event (not used).
+		 */
 		void menuBuilderAddHydrogens(wxCommandEvent &event);
+		/**
+		 * Deletes all hydrogen atoms, except non-bonded atoms, and atoms that are
+		 * part of fragments or SIMOMM.
+		 * @param event The command event (not used).
+		 */
+		void menuBuilderDeleteHydrogens(wxCommandEvent &event);
+		/**
+		 * Toggles the display of bonding sites when in edit mode in the molecule builder.
+		 * @param event The command event (not used).
+		 */
 		void menuBuilderShowBondSites(wxCommandEvent &event);
+		/**
+		 * Toggles the molecule builder. When active a toolbar is added to the main display
+		 * window.
+		 * @param event The command event (not used).
+		 */
 		void menuBuilderInteractive_mode(wxCommandEvent &event);
+		/**
+		 * Toggles the periodic table palatte.
+		 * @param event The command event (not used).
+		 */
 		void menuBuilderShowPeriodicDlg(wxCommandEvent &event);
-		/* void menuMoleculeAddHydrogens(wxCommandEvent &event); */
+		/**
+		 * Updates the add hydrogens menu item based on the current edit mode and ability to add
+		 * hydrogens.
+		 * @param event The UpdateUI event.
+		 */
 		void OnAddHydrogensUpdate( wxUpdateUIEvent& event );
+		/**
+		 * Updates the show bond sites menu item based on the edit mode.
+		 * @param event The UpdateUI event.
+		 */
 		void OnShowBondSitesUpdate(wxUpdateUIEvent& event);
 		
 		//Commands to open (or raise) the various data subviews.
