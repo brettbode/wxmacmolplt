@@ -1627,7 +1627,6 @@
 					"-D_LARGE_FILES",
 					"-DNO_GCC_PRAGMA",
 					"-D__MAC_USE_QUICKTIME__",
-					"-DENABLE_INTERACTIVE_MODE",
 					"-DHAVE_LIBMING",
 				);
 				OTHER_LDFLAGS = (
@@ -1691,7 +1690,6 @@
 					"-D_LARGE_FILES",
 					"-DNO_GCC_PRAGMA",
 					"-D__MAC_USE_QUICKTIME__",
-					"-DENABLE_INTERACTIVE_MODE",
 					"-DHAVE_LIBMING",
 				);
 				OTHER_LDFLAGS = (

@@ -8,7 +8,7 @@
 <BondColor BondOrder="3" red="0.0065156" green="0.0517891" blue="0.573175" pattern="0"></BondColor>
 <BondColor BondOrder="4" red="0.00840772" green="0.455375" blue="0.0945907" pattern="0"></BondColor>
 </MoleculeDisplayPreferences>
-<FileOptions SetFileCreator="true" CreateCustomIcon="true" PromptToSaveChanges="true" UseNativeEOLChars="true" SetBondOrder="false" CreateHydrogenBonds="false" ReadEverynDRCPoints="0" AutoCreateBonds="true" AutoBondTolerance="0.011" MaxBondLength="0" PreventHHBonds="true"></FileOptions>
+<FileOptions SetFileCreator="true" CreateCustomIcon="true" PromptToSaveChanges="true" UseNativeEOLChars="true" SetBondOrder="true" CreateHydrogenBonds="true" ReadEverynDRCPoints="0" AutoCreateBonds="true" AutoBondTolerance="0.011" MaxBondLength="0" PreventHHBonds="true"></FileOptions>
 <AtomPreferences>
 <Atom Number="1" Size="37" Mass="1.0039" Label="H">
 <Color red="1" green="1" blue="1" pattern="0"></Color>
