@@ -602,7 +602,6 @@ void MolDisplayWin::createMenuBar(void) {
 	menuEdit->AppendSeparator();
 	menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"), wxT("Edit the default preferences for new windows"));
 
-	menuView->AppendCheckItem(MMP_SHOW_FULLSCREEN, _("Show Fullscreen"), _("Display in full screen mode"));
 	menuView->AppendCheckItem(MMP_SHOWMODE, wxT("Show &Normal Mode\tCtrl+D"), wxT("Display the vibrational motion as mass-weighted vectors"));
 	menuView->Append(MMP_ANIMATEMODE, wxT("&Animate Mode\tShift+Ctrl+M"), wxT("Animate the vibration, click outside the window to stop"));
 	menuView->Append(MMP_OFFSETMODE, wxT("&Offset along mode..."), wxT("Generate a new set of coordinates by moving along the current mode"));
@@ -642,6 +641,9 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewRotate = new wxMenu;
 	menuView->Append(MMP_ROTATESUBMENU, wxT("&Rotate ..."), menuViewRotate);
 	menuView->Append(MMP_WINDOWPARAMETERS, wxT("Set &Window Parameters..."));
+
+	menuView->AppendSeparator();
+	menuView->AppendCheckItem(MMP_SHOW_FULLSCREEN, _("Show Fullscreen"), _("Display in full screen mode"));
 
 	menuViewRotate->Append(MMP_ROTATETOXAXIS, wxT("to &X-axis"));
 	menuViewRotate->Append(MMP_ROTATETOYAXIS, wxT("to &Y-axis"));
@@ -824,6 +826,8 @@ void MolDisplayWin::OnRedoUpdate( wxUpdateUIEvent& event ) {
 void MolDisplayWin::OnAddHydrogensUpdate( wxUpdateUIEvent& event ) {
 	event.Enable((MainData->cFrame->GetNumAtoms() > 0) &&
 				 InEditMode());
+	menuBuild->Enable(MMP_DELETEHYDROGENS, (MainData->cFrame->GetNumAtoms() > 0) &&
+					  InEditMode());
 }
 
 void MolDisplayWin::OnShowBondSitesUpdate(wxUpdateUIEvent& event) {
@@ -2524,6 +2528,7 @@ void MolDisplayWin::menuBuilderDeleteHydrogens(wxCommandEvent &event) {
 					snapshotCreated = true;
 				}
 				MainData->DeleteAtom(iatom, false);
+				iatom --;
 			}
 		}
 	}
@@ -2618,6 +2623,12 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 			default:
 				if (InEditMode()) {
 					//Pass general chars to the periodic table to set the atom type
+					if (!periodic_dlg) {
+						wxRect window_rect = GetRect();
+						periodic_dlg = new PeriodicTableDlg(
+															wxT("Builder Tools"), window_rect.x + window_rect.width,
+															window_rect.y + 22);
+					}
 					periodic_dlg->KeyHandler(event);
 					return; //I don't think there is any reason to skip on this case?
 				}
