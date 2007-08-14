@@ -31,16 +31,16 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 
 	wxPanel *panel = new wxPanel(this);
 	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
-	tabs = new wxNotebook(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	// tabs = new wxNotebook(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1)); 
 
-	wxPanel *rings_panel = new wxPanel(tabs);
-	wxPanel *solvents_panel = new wxPanel(tabs);
+	// wxPanel *rings_panel = new wxPanel(tabs); 
+	// wxPanel *solvents_panel = new wxPanel(tabs); 
 
-	tabs->AddPage(GetPeriodicPanel(), _("Periodic Table"), true);
-	tabs->AddPage(rings_panel, _("Rings"), false);
-	tabs->AddPage(solvents_panel, _("Solvents"), false);
+	// tabs->AddPage(GetPeriodicPanel(), _("Periodic Table"), true); 
+	// tabs->AddPage(rings_panel, _("Rings"), false); 
+	// tabs->AddPage(solvents_panel, _("Solvents"), false); 
 
-	box_sizer->Add(tabs);
+	box_sizer->Add(GetPeriodicPanel());
 	// box_sizer->Fit(this); 
 	panel->SetSizerAndFit(box_sizer);
 
@@ -86,7 +86,8 @@ wxPanel *PeriodicTableDlg::GetPeriodicPanel(void) {
 						   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 							  0,0,0,0,0,0,0,0,0};
 
-	wxPanel *periodic_panel = new wxPanel(tabs, wxID_ANY);
+	// wxPanel *periodic_panel = new wxPanel(tabs, wxID_ANY); 
+	wxPanel *periodic_panel = new wxPanel(this, wxID_ANY);
 	wxGridBagSizer *sizer = new wxGridBagSizer();
 	
 	for (int i=0; i<kNumTableElements; i++) {
