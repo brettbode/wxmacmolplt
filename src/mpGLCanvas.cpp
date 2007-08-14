@@ -7,6 +7,7 @@
  * mpGLCanvas.cpp
  ***************************************/
 
+
 #include "Globals.h"
 #include "mpGLCanvas.h"
 #include <wx/image.h>
@@ -915,9 +916,6 @@ void MpGLCanvas::eventWindowActivated(wxActivateEvent& event) {
 void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 
 	mpAtom *lAtoms = mMainData->cFrame->Atoms;
-
-	// MolWin->CreateFrameSnapShot();
-	// std::cout << "left mouse went down" << std::endl; 
 	
 	long time_between = mouse_activate_timer.Time();
 	if (time_between < 10) {
@@ -925,8 +923,6 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 		return;
 	}
 	ignore_next_up = false;
-
-	// leftDown = true; 
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
@@ -970,7 +966,6 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 	SetCurrent();
 	MolWin->Rotate(event);
 
-	// std::cout << "captured" << std::endl; 
 	CaptureMouse();
 
 }
@@ -1285,8 +1280,8 @@ void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 		// stay when the user releases the mouse.
 		SetCurrent();
 		MolWin->Rotate(event);
-	} else {
-		ShowViewPopup(curr_mouse.x, curr_mouse.y);
+	} else if (MolWin->InEditMode()) {
+		ShowBlankPopup(curr_mouse.x, curr_mouse.y);
 	}
 
 }
@@ -1312,295 +1307,6 @@ void MpGLCanvas::eventMouseWheel(wxMouseEvent& event) {
 	MolWin->Rotate(event);
 
 }
-
-#if 0
-void MpGLCanvas::eventMouse(wxMouseEvent &event) {
-
-	wxPoint tmpPnt;
-
-	if (!GetContext()) {
-		return;
-	}
-
-	static wxPoint oldTmpPnt;
-	bool deSelectAll = true;
-	bool edited_atoms = false;
-	// int width, height; 
-	static int first_site = -1;
-	static int first_atom = -1;
-
-	tmpPnt = event.GetPosition();
-
-	SetCurrent();
-
-	Frame *lFrame = mMainData->cFrame;
-	long NumAtoms = lFrame->NumAtoms;
-	mpAtom *lAtoms = lFrame->Atoms;
-
-	// GetClientSize(&width, &height); 
-
-#if 0
-	printf("event.LeftDown(): %d\n", event.LeftDown());
-	printf("event.LeftUp(): %d\n", event.LeftUp());
-	printf("event.RightDown(): %d\n", event.RightDown());
-	printf("event.RightUp(): %d\n", event.RightUp());
-	printf("event.Dragging(): %d\n", event.Dragging());
-	printf("event.CmdDown(): %d\n", event.CmdDown());
-	printf("event.ShiftDown(): %d\n", event.ShiftDown());
-	std::cout << "event.Entering(): " << event.Entering() << std::endl;
-	std::cout << "event.Leaving(): " << event.Leaving() << std::endl;
-	std::cout << "event.LeftIsDown(): " << event.LeftIsDown() << std::endl;
-	std::cout << "event.RightIsDown(): " << event.RightIsDown() << std::endl;
-	std::cout << "event.ButtonDClick(): " << event.ButtonDClick() << std::endl;
-#endif
-
-	if (interactiveMode && event.ButtonDClick()) {
-		if (!show_periodic_dlg) {
-			togglePeriodicDialog();
-		}
-	}
-	
-	// Handle left mouse down.
-	else if (event.LeftDown() || (event.LeftIsDown() && stale_click) ||
-		event.Entering()) {
-		mSelectState = 0;
-		testPicking(tmpPnt.x, tmpPnt.y);
-
-		if (interactiveMode) {
-			// If the mouse left the window while the user was already
-			// lassoing, stale_click will be true and this code will get
-			// executed, and the lassoing already in progress will be lost.
-			// So, we force that a new lasso is started only when the mouse
-			// button has just gone down.
-			if (MolWin->InSelectionMode() && event.LeftDown()) {
-				MolWin->LassoStart(tmpPnt.x, height - tmpPnt.y);
-				select_stack_top = 5;
-			} else if (selected_type == MMP_ATOM) {
-				GLdouble tmpWinX, tmpWinY;
-
-				findWinCoord(lAtoms[selected].Position.x,
-					lAtoms[selected].Position.y,
-					lAtoms[selected].Position.z,
-					tmpWinX, tmpWinY, atomDepth);
-	   
-				winDiffX = tmpPnt.x - (int)tmpWinX;
-				winDiffY = tmpPnt.y - (int)tmpWinY;
-
-				first_site = selected_site;
-				first_atom = selected;
-			}
-		}
-	}
-
-	else if (event.Leaving()) {
-		stale_click = true;
-	}
-	
-	// If not left, try right click in edit mode.
-	else if (event.RightDown()) {
-		testPicking(tmpPnt.x, tmpPnt.y);
-
-		if (selected_type == MMP_ATOM) {
-			if (interactiveMode) {
-				interactPopupMenu(tmpPnt.x, tmpPnt.y, 1);
-				MolWin->SelectionChanged(deSelectAll);
-				MolWin->UpdateGLModel();
-			} else {
-				measurePopupMenu(tmpPnt.x, tmpPnt.y);
-			}
-		}
-
-		else if (selected_type == MMP_BOND) {
-			if (interactiveMode) {
-				interactPopupMenu(tmpPnt.x, tmpPnt.y, 0);
-				MolWin->SelectionChanged(deSelectAll);
-				MolWin->UpdateGLModel();
-			} else {
-				bondPopupMenu(tmpPnt.x, tmpPnt.y);
-			}
-		}
-
-		else if (selected_type == MMP_ANNOTATION) {
-			annoPopupMenu(tmpPnt.x, tmpPnt.y);
-		}
-	}
-
-	else if (event.MiddleDown()) {
-		testPicking(tmpPnt.x, tmpPnt.y);
-	}
-
-	// If we made it this far, button states haven't changed.  Are we dragging?
-	else if (event.Dragging()) {
-		mSelectState++;
-
-		// Lassoing should only be done with the left mouse button.
-		if (MolWin->InSelectionMode() && event.LeftIsDown()) {
-			HandleLassoing(event, wxPoint(tmpPnt.x, height - tmpPnt.y));
-			edited_atoms = true;
-		}
-
-		// User must be wanting to translate or rotate atoms.
-		else if (MolWin->InEditMode() &&
-				 (selected_type == MMP_BOND || selected_type == MMP_ATOM)) {
-
-			// But if the user clicked on a bonding site, we don't want
-			// to shift anything.
-			if (selected_site < 0) {
-				HandleEditing(event, tmpPnt, oldTmpPnt);
-			}
-			edited_atoms = true;
-		}
-		
-	}
-
-	// If the left mouse button is released, the user is either done dragging,
-	// in which case we do nothing, or the user has selected an item.
-	else if (event.LeftUp()) {
-		if (event.CmdDown() || event.ShiftDown()) {
-			deSelectAll = false;
-		}
-
-		if (MolWin->InSelectionMode()) {
-			ReleaseMouse();
-			MolWin->LassoEnd();
-			if (mSelectState <= 0) {
-				SelectObj(selected_type, selected, deSelectAll);
-			}
-			edited_atoms = true;
-		}
-
-		// Allow a little bit of dragging to be interpreted as selection.
-		else if (mSelectState >= 0 && mSelectState < 3) {
-			mSelectState = -1;
-
-			if (interactiveMode) {
-
-				if (MolWin->InEditMode()) {
-
-					// If no periodic table is shown or not atom is selected,
-					// but the user seems to be trying to add an atom, give
-					// them a message.
-					if (periodic_dlg == NULL) {
-						if (selected_site >= 0 || selected < 0) {
-							MolWin->SetStatusText(wxT("Open periodic table dialog to add an atom."));
-						}
-					}
-
-					else if (periodic_dlg->GetSelectedID() == 0) {
-						if (selected_site >= 0 || selected < 0) {
-							MolWin->SetStatusText(wxT("Select an atom in the periodic table."));
-						}
-					} 
-
-					// If the user is adding a new atom based on the bonding
-					// site skeleton, add the atom in the direction of the
-					// bonding site.
-					else if (selected_site >= 0) {
-						MolWin->CreateFrameSnapShot();
-						CPoint3D vector, origin;
-						MolWin->DrawBondingSites(selected, 0, NULL, selected_site+1, &vector);
-						lFrame->GetAtomPosition(selected, origin);
-						lFrame->AddAtom(periodic_dlg->GetSelectedID(), origin + vector * 0.01 *
-										(Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(periodic_dlg->GetSelectedID() - 1)));
-						mMainData->AtomAdded();
-						lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
-						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(periodic_dlg->GetSelectedCoordination());
-						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
-						lFrame->SetBonds(Prefs, true, true);
-						MolWin->SetStatusText(wxT("Added new atom."));
-						MolWin->UpdateGLModel();
-						
-						// Let's select the new atom.
-						selected = lFrame->NumAtoms - 1;
-						deSelectAll = true;
-
-						MolWin->SetStatusText(wxT("Added new atom."));
-					}
-
-					// If the user clicked on nothing, we try to add an atom given
-					// the selected element on the periodic table palette.
-					else if (selected < 0) {
-
-						CPoint3D newPnt;
-						GLdouble newX, newY, newZ;
-
-						findWinCoord(0.0, 0.0, 0.0, newX, newY, atomDepth);
-						//estimate an atomDepth value, X and Y values are of no use 
-						findReal3DCoord((GLdouble)tmpPnt.x, (GLdouble)tmpPnt.y,
-											atomDepth, newX, newY, newZ);
-						newPnt.x = newX;
-						newPnt.y = newY;
-						newPnt.z = newZ;
-
-						int type = periodic_dlg->GetSelectedID();
-						mMainData->NewAtom(type, newPnt);
-						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(periodic_dlg->GetSelectedCoordination());
-						lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
-
-						lFrame->SetBonds(Prefs, true, true);
-						MolWin->SetStatusText(wxT("Added new atom."));
-					}
-  
-					oldSelect = -1;
-				}
-
-				// This functionality prevents selecting one atom, and then
-				// selecting a different one -- without creating a bond
-				// between them.  Since we have contextual menus now, I'm
-				// commenting this code out since I always end up with bonds
-				// I don't want.
-				
-				// If two different items were selected in sequence, try to
-				// add a bond between them.  Seems like it'd be wise to see
-				// if selected indicates an atom (and not a bond) here...
-				// else if (selected != oldSelect) { 
-					// int tmpBondStatus = lFrame->BondExists(oldSelect,selected); 
-
-					// if (deSelectAll && tmpBondStatus == -1) 
-						// lFrame->AddBond(oldSelect,selected); 
-
-					// oldSelect = selected; 
-
-					// if (deSelectAll && tmpBondStatus == -1) 
-						// selected = -1; 
-				// } 
-			}
-
-			SelectObj(selected_type, selected, deSelectAll);
-			MolWin->SelectionChanged(deSelectAll);
-			MolWin->UpdateGLModel();
-			edited_atoms = true;
-
-		} else if (MolWin->InEditMode() && first_site >= 0) {
-			testPicking(tmpPnt.x, tmpPnt.y);
-			if (selected_site >= 0 && selected_site != first_site) {
-				MolWin->CreateFrameSnapShot();
-				lFrame->AddBond(first_atom, selected);
-			}
-			first_site = -1;
-		}
-
-	}
-
-	else if (event.ButtonUp()) {
-		selected_type = MMP_NULL;
-		selected = -1;
-	}
-	
-	oldTmpPnt = tmpPnt;
-	stale_click = false;
-
-	// Pass mouse event to MolDisplayWin::Rotate for processing
-	if (!interactiveMode || !edited_atoms) {
-		MolWin->Rotate(event);
-	}
-
-	else {
-		draw();
-	}
-
-}
-#endif
 
 void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 		                       const wxPoint& prev_pt) {
@@ -2725,6 +2431,8 @@ void MpGLCanvas::PasteAtMouse(wxCommandEvent& event) {
 	double mouse_x, mouse_y, mouse_z;
 	double atom_depth;
 
+	MolWin->CreateFrameSnapShot();
+
 	// First we call the normal paste which exactly replicates the selected
 	// atoms, position and all.
 	MolWin->menuEditPaste(event);
@@ -2751,24 +2459,19 @@ void MpGLCanvas::PasteAtMouse(wxCommandEvent& event) {
 		lFrame->GetAtomPosition(i, pos);
 		lFrame->SetAtomPosition(i, pos + offset);
 	}
-
+	
 	lFrame->SetBonds(Prefs, false, false);
 
 }
 
-void MpGLCanvas::ShowViewPopup(int x, int y) {
+void MpGLCanvas::ShowBlankPopup(int x, int y) {
 
-	// This function shows a popup menu that shows some information and
-	// operations for the clicked-on bond.  It's assumed that selected is
-	// a valid index in the bonds lists.
+	// This function shows a popup menu that contains items pertaining to
+	// clicking on the blank part of the GL canvas.
 
 	wxMenu menu;
-	// wxMenuItem *item; 
-	// wxMenu *submenu; 
-	// Frame *lFrame = mMainData->cFrame; 
 	
 	menu.Append(GL_Popup_Paste_At, _("Paste at Mouse Position"));
-
 	PopupMenu(&menu, x, y);
 
 }

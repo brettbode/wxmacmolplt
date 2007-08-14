@@ -122,7 +122,7 @@ class MpGLCanvas : public wxGLCanvas {
 		int select_stack[4];
 		int select_stack_top;
 
-		void ShowViewPopup(int x, int y);
+		void ShowBlankPopup(int x, int y);
 		void PasteAtMouse(wxCommandEvent& event);
 
 		void ConstrainPosition(const int anno_id, double x, double y,
