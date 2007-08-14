@@ -2752,6 +2752,8 @@ void MpGLCanvas::PasteAtMouse(wxCommandEvent& event) {
 		lFrame->SetAtomPosition(i, pos + offset);
 	}
 
+	lFrame->SetBonds(Prefs, false, false);
+
 }
 
 void MpGLCanvas::ShowViewPopup(int x, int y) {
