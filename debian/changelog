@@ -1,3 +1,9 @@
+wxmacmolplt (7.0.0-1) unstable; urgency=low
+
+  * New major upstream release
+
+ -- Brett Bode <brett@scl.ameslab.gov>  Tue, 14 Aug 2007 15:51:33 -0500
+
 wxmacmolplt (6.5-1) unstable; urgency=low
 
   * New upstream release 
