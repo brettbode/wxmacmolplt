@@ -115,6 +115,8 @@ class MpGLCanvas : public wxGLCanvas {
 		bool leftDown;
 
 		void initGL(void);
+		int bitmap_fontd;
+
 		void interactPopupMenu(int x, int y, bool isAtom);
 		void bondPopupMenu(int x, int y);
 		void annoPopupMenu(int x, int y);

@@ -38,14 +38,11 @@ extern PeriodicTableDlg *periodic_dlg;
 
 int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 
-MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
-							  wxWindowID id,
-							  const wxPoint  &position,
-							  const wxSize &size,
-							  long style,
-							  const wxString &name)
+MpGLCanvas::MpGLCanvas(MolDisplayWin *parent, wxWindowID id,
+					   const wxPoint& position, const wxSize& size,
+					   long style, const wxString& name)
 			  :wxGLCanvas((wxWindow *)parent, id, position, size,
-							  style|wxFULL_REPAINT_ON_RESIZE, name, defAttribs) {
+						  style|wxFULL_REPAINT_ON_RESIZE, name, defAttribs) {
 	//There is an additional parameter to wxGLCanvas that is an int array
 	//of GL options we might need. Might need to use WX_GL_RGBA and
 	//WX_GL_DOUBLEBUFFER?
@@ -69,17 +66,28 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin  *parent,
 	first_site_clicked = -1;
 	first_atom_clicked = -1;
 	ndrag_events = 0;
+	bitmap_fontd = -1;
 
 	//Hmm is this the right spot to initialize our GL settings?
 	//initGL();
 }
 
 MpGLCanvas::~MpGLCanvas() {
+
+	// This function frees any resources created by the canvas.
+	
+	// Since each canvas has its own bitmap font textures, we free those
+	// resources.  Since GLF tries to free some OpenGL resources, we need to
+	// bring the canvas' context back up -- otherwise another canvas' textures
+	// will be deleted.
+	SetCurrent();
+	glfUnloadBMFFontD(bitmap_fontd);
+
 }
 
 void MpGLCanvas::initGL(void) {
-	if(GetContext()) {
 
+	if(GetContext()) {
 		wxString vector_font, bitmap_font;
 		wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
 #if wxCHECK_VERSION(2, 8, 0)
@@ -100,6 +108,7 @@ void MpGLCanvas::initGL(void) {
 		vector_font = pathname + wxT("/arial1.glf");
 		bitmap_font = pathname + wxT("/arial1.bmf");
 #endif
+
 		if (glfLoadBMFFont(bitmap_font.mb_str(wxConvUTF8)) < 0) {
 			std::ostringstream buf;
 			buf << "Warning: font file not found! This probably means wxmacmolplt is not "
@@ -108,14 +117,7 @@ void MpGLCanvas::initGL(void) {
 			glfClose();
 			glf_initialized = 0;
 		} else {
-			if (glfLoadFont(vector_font.mb_str(wxConvUTF8)) < 0) {
-				std::ostringstream buf;
-				buf << "Warning: font file not found! This probably means wxmacmolplt is not "
-					   "properly installed. Looking for " << vector_font.mb_str(wxConvUTF8);
-				MessageAlert(buf.str().c_str());
-				glfClose();
-				glf_initialized = 0;
-			}
+			bitmap_fontd = glfGetCurrentBMFFont();
 		}
 
 		// Initialize the OpenGL context here.
@@ -159,6 +161,7 @@ wxImage MpGLCanvas::getImage(const int width, const int height) {
 		return wxImage();
 	}
 	SetCurrent();
+	glfSetCurrentBMFFont(bitmap_fontd);
 	// TODO:  respect width/height
 	// TODO:  avoid grabbing the menu
 	GLint view[4];
@@ -194,6 +197,7 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 		return;
 	}
 	SetCurrent();
+	glfSetCurrentBMFFont(bitmap_fontd);
 
 	GLint view[4];
 	GLint width,height;
@@ -324,6 +328,7 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 		return;
 	}
 	SetCurrent();
+	glfSetCurrentBMFFont(bitmap_fontd);
 
 	glGetIntegerv(GL_VIEWPORT, glViewport);
 	canvasWidth  = glViewport[2];
@@ -418,6 +423,7 @@ void MpGLCanvas::UpdateGLView(void) {
 	// int width, height; 
 	if(GetContext()&&(Prefs!=NULL)&&MolWin->IsShown()) {
 		SetCurrent();
+		glfSetCurrentBMFFont(bitmap_fontd);
 		// GetClientSize(&width, &height); 
 		glViewport(0, 0, (GLint)width, (GLint)height);
 		GLdouble aspect = ((float)width)/height;
@@ -505,6 +511,7 @@ void MpGLCanvas::draw(void) {
 		initGL();
 		UpdateGLView();
 	}
+	glfSetCurrentBMFFont(bitmap_fontd);
 	//Only do the drawing if there is not an operation in progress
 	//otherwise the underlying data may not be complete.
 	if (!MolWin->OperInProgress()) {
@@ -964,6 +971,7 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 	// Though nothing's rotating on a single mousedown event, we need to
 	// register this first mouse click position.
 	SetCurrent();
+	glfSetCurrentBMFFont(bitmap_fontd);
 	MolWin->Rotate(event);
 
 	CaptureMouse();
@@ -1018,6 +1026,7 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 		// Though nothing's rotating on a single mousedown event, we need to
 		// register this first mouse click position.
 		SetCurrent();
+		glfSetCurrentBMFFont(bitmap_fontd);
 		MolWin->Rotate(event);
 
 		CaptureMouse();
@@ -1034,6 +1043,7 @@ void MpGLCanvas::eventMouseMiddleWentDown(wxMouseEvent& event) {
 	// Though nothing's rotating on a single mousedown event, we need to
 	// register this first mouse click position.
 	SetCurrent();
+	glfSetCurrentBMFFont(bitmap_fontd);
 	MolWin->Rotate(event);
 
 	CaptureMouse();
@@ -1079,6 +1089,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	ndrag_events++;
 
 	SetCurrent();
+	glfSetCurrentBMFFont(bitmap_fontd);
 
 	// Lassoing should only be done with the left mouse button.
 	if (MolWin->InSelectionMode() && event.LeftIsDown()) {
@@ -1124,6 +1135,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	curr_mouse = event.GetPosition();
 
 	SetCurrent();
+	glfSetCurrentBMFFont(bitmap_fontd);
 
 	// If either the command or shift keys are held, we want to add to the
 	// selection, not replace it.
@@ -1279,6 +1291,7 @@ void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 		// We call this to erase the transformation circle that would otherwise
 		// stay when the user releases the mouse.
 		SetCurrent();
+		glfSetCurrentBMFFont(bitmap_fontd);
 		MolWin->Rotate(event);
 	} else if (MolWin->InEditMode()) {
 		ShowBlankPopup(curr_mouse.x, curr_mouse.y);
@@ -1295,6 +1308,7 @@ void MpGLCanvas::eventMouseMiddleWentUp(wxMouseEvent& event) {
 	// We call this to erase the transformation circle that would otherwise
 	// stay when the user releases the mouse.
 	SetCurrent();
+	glfSetCurrentBMFFont(bitmap_fontd);
 	MolWin->Rotate(event);
 
 }
@@ -1304,6 +1318,7 @@ void MpGLCanvas::eventMouseWheel(wxMouseEvent& event) {
 	// The display window will calculate the appropriate action for mouse 
 	// wheel movement.
 	SetCurrent();
+	glfSetCurrentBMFFont(bitmap_fontd);
 	MolWin->Rotate(event);
 
 }
