@@ -532,6 +532,7 @@ bool MolDisplayWin::JustFocused(void) {
 
 void MolDisplayWin::StopAnimations(void) {
 	bool resetNeeded = false;
+
 	if (m_timer.IsRunning()) {
 		m_timer.Stop();
 		timerRunning = false;
@@ -548,6 +549,12 @@ void MolDisplayWin::StopAnimations(void) {
 		resetNeeded = true;
 	}
 	if (resetNeeded) ResetModel(false);
+
+	// It's kind of nice to the auto-rotation running.  Otherwise, if we leave
+	// the window, we've got to start it going again.
+	// if (rotate_timer.IsRunning()) { 
+		// rotate_timer.Stop(); 
+	// } 
 }
 
 void MolDisplayWin::OnFrameAnimationTimer(wxTimerEvent & event) {
