@@ -53,8 +53,8 @@ bool MpApp::OnInit() {
 #ifdef __LINUX__
 	//It has become apparent that wx is not determining the install prefix
 	//correctly on linux. So set it here as a workaround
-        wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
-		// Ok I don't know how else to get the wxStandardPaths class?
+	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
+	// Ok I don't know how else to get the wxStandardPaths class?
 	wxStandardPaths * paths = (wxStandardPaths * ) &gStdPaths;
 	if (strcmp(INSTALL_PREFIX, "NONE"))
 		paths->SetInstallPrefix(wxString(INSTALL_PREFIX,wxConvUTF8));
@@ -146,6 +146,31 @@ bool MpApp::OnInit() {
 	// in the right contexts.
 	glfInit();
 	glf_initialized = 1;
+	wxString vector_font;
+#if wxCHECK_VERSION(2, 8, 0)
+	wxString pathname = gStdPaths.GetResourcesDir();
+#else
+	wxString pathname = gStdPaths.GetDataDir();
+#ifdef __WXMAC__
+	//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
+	//but xcode is putting them in Resources.
+	pathname.Remove(pathname.Length() - 13);
+	pathname += wxT("Resources");
+#endif
+#endif
+#ifdef __WXMSW__
+	vector_font = pathname + wxT("\\arial1.glf");
+#else
+	vector_font = pathname + wxT("/arial1.glf");
+#endif
+	if (glfLoadFont(vector_font.mb_str(wxConvUTF8)) < 0) {
+		std::ostringstream buf;
+		buf << "Warning: font file not found! This probably means wxmacmolplt is not "
+			   "properly installed. Looking for " << vector_font.mb_str(wxConvUTF8);
+		MessageAlert(buf.str().c_str());
+		glfClose();
+		glf_initialized = 0;
+	}
 	
 	// Check for a project filename 
 	if (cmdParser.GetParamCount() > 0) {
@@ -215,6 +240,7 @@ int MpApp::OnExit() {
 
     delete wxConfigBase::Set((wxConfigBase *) NULL);
     //delete config object if there is one created before  -Song Li
+	
 	//Free up the memory used by glf
 	if (glf_initialized) {
 		glfClose();
