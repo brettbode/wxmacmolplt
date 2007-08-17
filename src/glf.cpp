@@ -1549,10 +1549,8 @@ int glfLoadBMFFont(const char *FName)
 	}
 	return bmf_curfont;
 }
-
 /* Unloads bitmap font by descriptor */
-int glfUnloadBMFFontD(int bmf_descriptor)
-{
+int glfUnloadBMFFontD(int bmf_descriptor) {
 	if ((bmf_descriptor < 0) || (bmf_in_use[bmf_descriptor] == 0)) return GLF_ERROR;
 
 	bmf_in_use[bmf_descriptor] = 0;
@@ -1567,14 +1565,12 @@ int glfUnloadBMFFontD(int bmf_descriptor)
 }
 
 /* Unloads current bitmap font */
-int glfUnloadBMFFont()
-{
+int glfUnloadBMFFont() {
 	return glfUnloadBMFFontD(bmf_curfont);
 }
 
 /* Start bitmap drawing function */
-void glfStartBitmapDrawing()
-{
+void glfStartBitmapDrawing() {
 	/* Enable 2D Texturing */
 	glGetBooleanv(GL_TEXTURE_2D, &bmf_texturing);
 	glEnable(GL_TEXTURE_2D);
