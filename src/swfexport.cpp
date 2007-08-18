@@ -112,7 +112,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 #else
 	fontPath += wxT("/BsVeraSans.fdb");
 #endif
-	FILE *fontFile = fopen(fontPath.fn_str(), "r");
+	FILE *fontFile = fopen(fontPath.fn_str(), "rb");
 	if(fontFile == NULL) {
 		delete movie;
 		/* TODO:  Display an error message */
