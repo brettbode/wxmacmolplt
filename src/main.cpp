@@ -50,10 +50,10 @@ bool MpApp::OnInit() {
 	m_InstanceChecker = NULL;
 	gPrefDlg = NULL;
 
+	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
 #ifdef __LINUX__
 	//It has become apparent that wx is not determining the install prefix
 	//correctly on linux. So set it here as a workaround
-	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
 	// Ok I don't know how else to get the wxStandardPaths class?
 	wxStandardPaths * paths = (wxStandardPaths * ) &gStdPaths;
 	if (strcmp(INSTALL_PREFIX, "NONE"))
