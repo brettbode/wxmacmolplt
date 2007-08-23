@@ -1,5 +1,5 @@
-#ifndef _PERIODIC_TABLE_DLG_H_
-#define _PERIODIC_TABLE_DLG_H_
+#ifndef BUILD_PALETTE_H
+#define BUILD_PALETTE_H
 
 #include "wx/wxprec.h"
 #ifndef WX_PRECOMP
@@ -33,24 +33,53 @@ typedef struct {
 	wxBitmap *on_bmp;
 } element_t;
 
+class Structure {
+	public:
+		mpAtom *atoms;
+		int natoms;
+		Bond *bonds;
+		int nbonds;
+
+		Structure() {
+			atoms = NULL;
+			bonds = NULL;
+		}
+
+		~Structure() {
+			if (atoms) {
+				delete atoms;
+			}
+
+			if (bonds) {
+				delete bonds;
+			}
+		}
+
+	private:
+};
+
 /* ------------------------------------------------------------------------- */
 /* CLASSES                                                                   */
 /* ------------------------------------------------------------------------- */
 
-class PeriodicTableDlg: public wxMiniFrame {    
+class BuilderDlg: public wxMiniFrame {    
 
 	public:
-		PeriodicTableDlg(
+		BuilderDlg(
 			const wxString& title = _("Periodic Table"), int xpos = 100,
 			int ypos = 100);
-		~PeriodicTableDlg();
+		~BuilderDlg();
 
 		void New(wxCommandEvent& WXUNUSED(event));
-		int GetSelectedID(void) const;
+		int GetSelectedElement(void) const;
+		Structure *GetSelectedStructure(void);
 		short GetSelectedCoordination(void) const;
 		short GetSelectedLonePairCount(void) const;
 		static void NumberToTableCoords(int atomic_number, int *row, int *col);
 		void KeyHandler(wxKeyEvent &event);
+		bool InStructuresMode(void) const;
+		bool InPeriodicMode(void) const;
+		void AddStructure(const wxString& menu_label, Structure *structure);
 
 	private:
 		void ElementSelected(wxCommandEvent& event);
@@ -59,6 +88,7 @@ class PeriodicTableDlg: public wxMiniFrame {
 		void MouseMoved(wxMouseEvent& event);
 		void OnClose(wxCloseEvent& event);
 		wxPanel *GetPeriodicPanel(void);
+		wxPanel *GetStructuresPanel(void);
 
 		short coordinationNumber[kNumTableElements];
 		short LonePairCount[kNumTableElements];
@@ -71,8 +101,12 @@ class PeriodicTableDlg: public wxMiniFrame {
 		wxChoice *mLPChoice;
 		element_t *elements;
 		wxNotebook *tabs;
+		wxPanel *periodic_panel;
+		wxPanel *structures_panel;
+		wxChoice *mStructureChoice;
+		std::vector<Structure *> structures;
 
-	DECLARE_DYNAMIC_CLASS(PeriodicTableDlg)
+	DECLARE_DYNAMIC_CLASS(BuilderDlg)
 	DECLARE_EVENT_TABLE()
 
 };

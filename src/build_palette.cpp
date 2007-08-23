@@ -3,48 +3,57 @@
 
 #include <wx/gbsizer.h>
 
-extern bool show_periodic_dlg;
+extern bool show_build_palette;
 extern WinPrefs * gPreferences;
-extern PeriodicTableDlg *periodic_dlg;
+extern BuilderDlg *build_palette;
 
 #define kPeriodicCoordinationChoice 13800
 #define kPeriodicLPChoice			13801
 
-IMPLEMENT_DYNAMIC_CLASS(PeriodicTableDlg, wxMiniFrame)
+IMPLEMENT_DYNAMIC_CLASS(BuilderDlg, wxMiniFrame)
 
-BEGIN_EVENT_TABLE(PeriodicTableDlg, wxMiniFrame)
-	EVT_CHOICE(kPeriodicCoordinationChoice, PeriodicTableDlg::OnCoordinationChoice)
-	EVT_CHOICE(kPeriodicLPChoice, PeriodicTableDlg::OnLPChoice)
-	EVT_BUTTON(wxID_ANY, PeriodicTableDlg::ElementSelected)
-	EVT_CHAR(PeriodicTableDlg::KeyHandler)
-	EVT_CLOSE(PeriodicTableDlg::OnClose)
+BEGIN_EVENT_TABLE(BuilderDlg, wxMiniFrame)
+	EVT_CHOICE(kPeriodicCoordinationChoice, BuilderDlg::OnCoordinationChoice)
+	EVT_CHOICE(kPeriodicLPChoice, BuilderDlg::OnLPChoice)
+	EVT_BUTTON(wxID_ANY, BuilderDlg::ElementSelected)
+	EVT_CHAR(BuilderDlg::KeyHandler)
+	EVT_CLOSE(BuilderDlg::OnClose)
 END_EVENT_TABLE()
 
 // --------------------------------------------------------------------------- 
 // FUNCTIONS
 // --------------------------------------------------------------------------- 
 
-PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
-								   int xpos, int ypos) :
+BuilderDlg::BuilderDlg(const wxString& title,
+					   int xpos, int ypos) :
 	wxMiniFrame(NULL, wxID_ANY, title, wxPoint(xpos, ypos),
 		wxSize(-1, -1), wxCLOSE_BOX | wxCAPTION) {
 
 	wxPanel *panel = new wxPanel(this);
 	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
-	// tabs = new wxNotebook(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1)); 
+	tabs = new wxNotebook(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
 
-	// wxPanel *rings_panel = new wxPanel(tabs); 
-	// wxPanel *solvents_panel = new wxPanel(tabs); 
+	wxPanel *solvents_panel = new wxPanel(tabs);
 
-	// tabs->AddPage(GetPeriodicPanel(), _("Periodic Table"), true); 
-	// tabs->AddPage(rings_panel, _("Rings"), false); 
-	// tabs->AddPage(solvents_panel, _("Solvents"), false); 
+	periodic_panel = GetPeriodicPanel();
+	structures_panel = GetStructuresPanel();
 
-	box_sizer->Add(GetPeriodicPanel());
-	// box_sizer->Fit(this); 
+	tabs->AddPage(periodic_panel, _("Periodic Table"), true);
+	tabs->AddPage(structures_panel, _("Structures"), false);
+	tabs->AddPage(solvents_panel, _("Solvents"), false);
+
+	box_sizer->Add(tabs);
 	panel->SetSizerAndFit(box_sizer);
 
 	Fit();
+
+	Structure *new_structure = new Structure;
+	mpAtom *atom = new mpAtom;
+	atom->Type = 8;
+	atom->Position = CPoint3D(0.0f, 0.0f, 0.0f);
+	new_structure->atoms = atom;
+	new_structure->natoms = 1;
+	structures.push_back(new_structure);
 
 	wxCommandEvent foo(0, 6-1);
 	ElementSelected(foo);
@@ -53,7 +62,7 @@ PeriodicTableDlg::PeriodicTableDlg(const wxString& title,
 
 // --------------------------------------------------------------------------- 
 
-wxPanel *PeriodicTableDlg::GetPeriodicPanel(void) {
+wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 
 	wxFont *font;            // Font of atomic symbol
 	wxMemoryDC *mem_dc;      // Offscreen renderer for button bitmaps
@@ -86,8 +95,8 @@ wxPanel *PeriodicTableDlg::GetPeriodicPanel(void) {
 						   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 							  0,0,0,0,0,0,0,0,0};
 
-	// wxPanel *periodic_panel = new wxPanel(tabs, wxID_ANY); 
-	wxPanel *periodic_panel = new wxPanel(this, wxID_ANY);
+	wxPanel *periodic_panel = new wxPanel(tabs, wxID_ANY);
+	// wxPanel *periodic_panel = new wxPanel(this, wxID_ANY); 
 	wxGridBagSizer *sizer = new wxGridBagSizer();
 	
 	for (int i=0; i<kNumTableElements; i++) {
@@ -206,7 +215,46 @@ wxPanel *PeriodicTableDlg::GetPeriodicPanel(void) {
 
 // --------------------------------------------------------------------------- 
 
-PeriodicTableDlg::~PeriodicTableDlg() {
+wxPanel *BuilderDlg::GetStructuresPanel(void) {
+
+	// wxPanel *panel2 = new wxPanel(tabs, wxID_ANY); 
+	wxPanel *panel = new wxPanel(tabs, wxID_ANY);
+	wxGridBagSizer *sizer = new wxGridBagSizer();
+
+	int lflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
+	int rflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
+
+	int nstructures = 1;
+	wxString structure_labels[] = {
+			_("Carbon Atom"),
+		};
+
+	sizer->SetFlexibleDirection(wxHORIZONTAL);
+	sizer->SetCols(2);
+	sizer->SetRows(1);
+	sizer->AddGrowableCol(0, 1);
+	sizer->AddGrowableCol(1, 1);
+	
+	wxStaticText *label =
+		new wxStaticText(panel, wxID_ANY, wxT("Structure: "));
+	sizer->Add(label, wxGBPosition(0, 0), wxGBSpan(1, 1), lflags);
+	
+	mStructureChoice = new wxChoice(panel, wxID_ANY, wxPoint(-1, -1),
+									wxSize(-1, -1), nstructures,
+									structure_labels);
+	mStructureChoice->SetSelection(0);
+
+	sizer->Add(mStructureChoice, wxGBPosition(0, 1), wxGBSpan(1, 1), rflags);
+
+	panel->SetSizerAndFit(sizer);
+	
+	return panel;
+
+}
+
+// --------------------------------------------------------------------------- 
+
+BuilderDlg::~BuilderDlg() {
 
 	int i;
 
@@ -218,14 +266,14 @@ PeriodicTableDlg::~PeriodicTableDlg() {
 
 	delete elements;
 
-	periodic_dlg = NULL;
-	show_periodic_dlg = false;
+	build_palette = NULL;
+	show_build_palette = false;
 	((MpApp &) wxGetApp()).AdjustAllMenus();
 }
 
 // --------------------------------------------------------------------------- 
 
-void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
+void BuilderDlg::ElementSelected(wxCommandEvent& event) {
 
 	/* This function is called when one of the element buttons is pushed.  
 	 * The selected button's image is inverted since wxBitmapButton's do not
@@ -272,20 +320,20 @@ void PeriodicTableDlg::ElementSelected(wxCommandEvent& event) {
 
 // --------------------------------------------------------------------------- 
 
-void PeriodicTableDlg::OnCoordinationChoice(wxCommandEvent& event) {
+void BuilderDlg::OnCoordinationChoice(wxCommandEvent& event) {
 	coordinationNumber[prev_id] = event.GetSelection();
 }
 
 // --------------------------------------------------------------------------- 
 
-void PeriodicTableDlg::OnLPChoice(wxCommandEvent& event) {
+void BuilderDlg::OnLPChoice(wxCommandEvent& event) {
 	LonePairCount[prev_id] = event.GetSelection();
 }
 
 // --------------------------------------------------------------------------- 
 
 #include "myFiles.h"
-void PeriodicTableDlg::KeyHandler(wxKeyEvent& event) {
+void BuilderDlg::KeyHandler(wxKeyEvent& event) {
 	int key = event.GetKeyCode();
 	if (!event.HasModifiers()) {
 		if (isalpha(key)) {
@@ -316,7 +364,7 @@ void PeriodicTableDlg::KeyHandler(wxKeyEvent& event) {
 
 // --------------------------------------------------------------------------- 
 
-int PeriodicTableDlg::GetSelectedID(void) const {
+int BuilderDlg::GetSelectedElement(void) const {
 
 	/* This function returns the atomic number of the currently selected atom,
 	 * or 0 if no atom is selected. */
@@ -327,7 +375,15 @@ int PeriodicTableDlg::GetSelectedID(void) const {
 
 // --------------------------------------------------------------------------- 
 
-short PeriodicTableDlg::GetSelectedCoordination(void) const {
+Structure *BuilderDlg::GetSelectedStructure(void) {
+
+	return structures[mStructureChoice->GetSelection()];
+
+}
+
+// --------------------------------------------------------------------------- 
+
+short BuilderDlg::GetSelectedCoordination(void) const {
 	short result = 0;
 	if (prev_id >= 0) result = coordinationNumber[prev_id];
 	return result;
@@ -335,7 +391,7 @@ short PeriodicTableDlg::GetSelectedCoordination(void) const {
 
 // --------------------------------------------------------------------------- 
 
-short PeriodicTableDlg::GetSelectedLonePairCount(void) const {
+short BuilderDlg::GetSelectedLonePairCount(void) const {
 	short result = 0;
 	if (prev_id >= 0) result = LonePairCount[prev_id];
 	return result;
@@ -343,12 +399,12 @@ short PeriodicTableDlg::GetSelectedLonePairCount(void) const {
 
 // --------------------------------------------------------------------------- 
 
-void PeriodicTableDlg::OnClose(wxCloseEvent& event) {
+void BuilderDlg::OnClose(wxCloseEvent& event) {
 
 	// If possible, we want to try to hide the periodic dialog rather than
 	// fully close it.
 	if (event.CanVeto()) {
-		show_periodic_dlg = false;
+		show_build_palette = false;
 		((MpApp &) wxGetApp()).AdjustAllMenus();
 		Hide();
 		event.Veto();
@@ -359,7 +415,7 @@ void PeriodicTableDlg::OnClose(wxCloseEvent& event) {
 
 // --------------------------------------------------------------------------- 
 
-void PeriodicTableDlg::NumberToTableCoords(int atomic_number,
+void BuilderDlg::NumberToTableCoords(int atomic_number,
 										   int *row, int *col) {
 
 	/* This function calculates the row and column position within the periodic
@@ -398,6 +454,37 @@ void PeriodicTableDlg::NumberToTableCoords(int atomic_number,
 		*row = 6 + (atomic_number - 104) / 18;
 		*col = 3 + (atomic_number - 104) % 15;
 	}
+
+}
+
+// --------------------------------------------------------------------------- 
+
+bool BuilderDlg::InPeriodicMode(void) const {
+
+	return tabs->GetCurrentPage() == periodic_panel;
+
+}
+
+// --------------------------------------------------------------------------- 
+
+bool BuilderDlg::InStructuresMode(void) const {
+
+	return tabs->GetCurrentPage() == structures_panel;
+
+}
+
+// --------------------------------------------------------------------------- 
+
+void BuilderDlg::AddStructure(const wxString& menu_label, 
+							  Structure *structure) {
+
+	structures.push_back(structure);
+
+	mStructureChoice->Append(menu_label);
+
+	// Under GTK at least, the menu doesn't expand to accommodate the new,
+	// possibly longer label.  We force that expansion now.
+	mStructureChoice->SetSize(mStructureChoice->GetBestSize());
 
 }
 
