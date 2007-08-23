@@ -58,9 +58,11 @@ class CPoint3D {
 		}
 
 		const CPoint3D& operator=(const CPoint3D& other) {
-			this->x = other.x;
-			this->y = other.y;
-			this->z = other.z;
+			if (this != &other) {
+				this->x = other.x;
+				this->y = other.y;
+				this->z = other.z;
+			}
 			return *this;
 		}
 
