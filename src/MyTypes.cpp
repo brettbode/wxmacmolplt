@@ -500,3 +500,25 @@ void mpAtom::SetDefaultLonePairCount(void) {
 			break;
 	}
 }
+
+// --------------------------------------------------------------------------- 
+
+std::ostream& operator<<(std::ostream& stream, const mpAtom& a) {
+	
+	stream << "Atomic number: " << a.Type << ", Position: " << a.Position;
+	return stream;
+
+}
+
+// --------------------------------------------------------------------------- 
+
+std::ostream& operator<<(std::ostream& stream, const Bond& b) {
+	
+	stream << "Atom1: " << b.Atom1 << ", Atom2: " << b.Atom2 <<
+			  ", Order: " << b.Order;
+	return stream;
+
+}
+
+// --------------------------------------------------------------------------- 
+

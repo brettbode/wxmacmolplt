@@ -203,6 +203,8 @@ enum OrbitalHybridization {
 };
 
 class mpAtom {
+	friend std::ostream& operator<<(std::ostream& stream, const mpAtom& m);
+
 	public:
 		CPoint3D	Position;
 		long		fragmentId;
@@ -212,11 +214,35 @@ class mpAtom {
 		unsigned char paired_sites;
 		short	coordinationNumber;
 		short	LPCount;
+
 		mpAtom(void) : Type(0), flags(0) {
 			paired_sites = 0;
 			coordinationNumber = 0;
 			LPCount = 0;
 		};
+
+		mpAtom(const mpAtom& src) {
+			Position = src.Position;
+			coordinationNumber = src.coordinationNumber;
+			LPCount = src.LPCount;
+			fragmentId = src.fragmentId;
+			Type = src.Type;
+			flags = src.flags;
+		}
+
+		const mpAtom& operator=(const mpAtom& src) {
+			if (this != &src) {
+				Position = src.Position;
+				coordinationNumber = src.coordinationNumber;
+				LPCount = src.LPCount;
+				fragmentId = src.fragmentId;
+				Type = src.Type;
+				flags = src.flags;
+			}
+
+			return *this;
+		}
+
 		inline short GetCoordinationNumber(void) const {return coordinationNumber;};
 		inline short SetCoordinationNumber(short new_num) {return (coordinationNumber = new_num);};
 		inline short SetLonePairCount(short new_num) {return (LPCount = new_num);};
@@ -254,11 +280,38 @@ enum BondOrder {
 };
 
 class Bond {
+	friend std::ostream& operator<<(std::ostream& stream, const Bond& b);
+
 	public:
 		long		Atom1;
 		long		Atom2;
 		BondOrder	Order;
 		char		Highlite;
+
+		Bond(void) {
+			Atom1 = -1;
+			Atom2 = -1;
+			Order = kSingleBond;
+			Highlite = 0;
+		}
+
+		Bond(const Bond& src) {
+			Atom1 = src.Atom1;
+			Atom2 = src.Atom2;
+			Order = src.Order;
+			Highlite = src.Highlite;
+		}
+
+		const Bond& operator=(const Bond& src) {
+			if (this != &src) {
+				Atom1 = src.Atom1;
+				Atom2 = src.Atom2;
+				Order = src.Order;
+				Highlite = src.Highlite;
+			}
+
+			return *this;
+		}
 
 		bool GetSelectState(void) const {return (Highlite & 1);};
 		void SetSelectState(bool state) {if (Highlite & 1) Highlite--; if (state) Highlite++;}
