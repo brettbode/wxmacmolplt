@@ -19,14 +19,16 @@
 #include <wx/config.h>
 #include <wx/stdpaths.h>
 #include <locale.h>
-#include "glf.h"
 #include <sstream>
+
+#include "glf.h"
+#include "build_palette.h"
 
 //The global preferences settings
 WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
 
-PeriodicTableDlg *periodic_dlg;
-bool show_periodic_dlg = false;
+BuilderDlg *build_palette;
+bool show_build_palette = false;
 
 int glf_initialized = 0;
 
@@ -50,7 +52,7 @@ bool MpApp::OnInit() {
 	m_InstanceChecker = NULL;
 	gPrefDlg = NULL;
 
-	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
+	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
 #ifdef __LINUX__
 	//It has become apparent that wx is not determining the install prefix
 	//correctly on linux. So set it here as a workaround
@@ -96,7 +98,6 @@ bool MpApp::OnInit() {
 	//Set the numerical locale to "C" throughout
 	setlocale(LC_NUMERIC, "C");
 	
-	periodic_dlg = NULL;
 	gPreferences = new WinPrefs;
 	gPrefDefaults = new WinPrefs;
 
@@ -218,6 +219,11 @@ bool MpApp::OnInit() {
 	}
 	SetExitOnFrameDelete(true);
 #endif
+
+	// build_palette = NULL; 
+	build_palette = new BuilderDlg(wxT("Builder Tools"));
+								   // window_rect.x + window_rect.width, 
+								   // window_rect.y + 22); 
 
     return true;
 }
