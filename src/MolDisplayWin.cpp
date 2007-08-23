@@ -53,8 +53,8 @@
 #endif
 
 extern WinPrefs * gPreferences;
-extern bool show_periodic_dlg;
-extern PeriodicTableDlg *periodic_dlg;
+extern bool show_build_palette;
+extern BuilderDlg *build_palette;
 
 using namespace std;
 
@@ -70,7 +70,7 @@ enum MMP_EventID {
 	MMP_PREVMODE,
 	MMP_NEXTMODE,
 	MMP_SHOWAXIS,
-	MMP_SHOWPERIODICDLG,
+	MMP_SHOWBUILDTOOLS,
 	MMP_SHOWSYMMETRYOPERATOR,
 	MMP_ATOMLABELSSUBMENU,
 	MMP_NO_ATOMLABEL,
@@ -160,6 +160,7 @@ enum MMP_EventID {
 	MMP_TOOL_HAND,
 	MMP_SELECT_NONE,
 	MMP_SHOWBONDSITES,
+	MMP_SAVESTRUCTURE,
 	MMP_SHOW_FULLSCREEN,
 	
 	Number_MMP_Ids
@@ -272,11 +273,13 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_CONVERTTOANGSTROMS,	MolDisplayWin::menuMoleculeConvertToAngstroms)
 	EVT_MENU (MMP_INVERTNORMALMODE,		MolDisplayWin::menuMoleculeInvertNormalMode)
 	EVT_MENU (MMP_INTERACTIVE,			MolDisplayWin::menuBuilderInteractive_mode)
-	EVT_MENU (MMP_SHOWPERIODICDLG,		MolDisplayWin::menuBuilderShowPeriodicDlg)
+	EVT_MENU (MMP_SHOWBUILDTOOLS,		MolDisplayWin::menuBuilderShowBuildTools)
 	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuBuilderAddHydrogens)
 	EVT_MENU (MMP_DELETEHYDROGENS,		MolDisplayWin::menuBuilderDeleteHydrogens)
 	EVT_MENU (MMP_SHOWBONDSITES,		MolDisplayWin::menuBuilderShowBondSites)
+	EVT_MENU (MMP_SAVESTRUCTURE,		MolDisplayWin::menuBuilderSaveStructure)
 	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate)
+	EVT_UPDATE_UI(MMP_SAVESTRUCTURE,	MolDisplayWin::OnSaveStructureUpdate)
 	EVT_UPDATE_UI(MMP_SHOWBONDSITES,	MolDisplayWin::OnShowBondSitesUpdate)
 
 	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
@@ -478,8 +481,8 @@ MolDisplayWin::~MolDisplayWin() {
 #ifndef __WXMAC__
 	MpApp& app = wxGetApp();
 	if (app.WindowCount() == 0) {
-		if (periodic_dlg) {
-			periodic_dlg->Destroy();
+		if (build_palette) {
+			build_palette->Destroy();
 		}
 	}
 #endif
@@ -663,12 +666,13 @@ void MolDisplayWin::createMenuBar(void) {
 #ifdef ENABLE_INTERACTIVE_MODE
 	menuBuild->AppendCheckItem(MMP_INTERACTIVE, _("Enable Molecule &Builder\tCtrl+I"), _("Interactive graphical molecular editor"));
 #endif
-	menuBuild->AppendCheckItem(MMP_SHOWPERIODICDLG, _("Show Periodic &Table\tCtrl+T"), _("Display a periodic table"));
+	menuBuild->AppendCheckItem(MMP_SHOWBUILDTOOLS, _("Show Build &Tools\tCtrl+T"), _("Display build tools palette"));
 #ifdef ENABLE_INTERACTIVE_MODE
 	menuBuild->AppendSeparator();
 	menuBuild->Append(MMP_ADDHYDROGENS, wxT("Add &Hydrogens"), _T("Complete moleclues by adding hydrogens to incomplete bonds"));
-	menuBuild->Append(MMP_DELETEHYDROGENS, wxT("&Delete Hydrogens"), _T("Remove terminal hydrogens (Does not apply to effective fragments or SIMOMM atoms)."));
-	menuBuild->AppendCheckItem(MMP_SHOWBONDSITES, wxT("&Show Bonding Sites"), _T("Click on a site to add an atom."));
+	menuBuild->Append(MMP_DELETEHYDROGENS, wxT("&Delete Hydrogens"), _T("Remove terminal hydrogens (Does not apply to effective fragments or SIMOMM atoms)"));
+	menuBuild->AppendCheckItem(MMP_SHOWBONDSITES, wxT("&Show Bonding Sites"), _T("Click on a site to add an atom"));
+	menuBuild->Append(MMP_SAVESTRUCTURE, wxT("Save Structure"), _T("Save structure as a prototype in builder"));
 #endif
 	
 	menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."), _("Apply the automated bond determination with several options"));
@@ -779,7 +783,7 @@ void MolDisplayWin::AdjustMenus(void) {
 	else
 		menuViewStyle->Check(MMP_BALLANDSTICKMODE, true);
 
-	menuBuild->Check(MMP_SHOWPERIODICDLG, show_periodic_dlg);
+	menuBuild->Check(MMP_SHOWBUILDTOOLS, show_build_palette);
 	
 	if (MainData->cFrame->NumAtoms == 0) {
 	} else {
@@ -2087,8 +2091,81 @@ void MolDisplayWin::menuBuilderInteractive_mode(wxCommandEvent &event)
 
 }
 
-void MolDisplayWin::menuBuilderShowPeriodicDlg(wxCommandEvent &event) {
-	TogglePeriodicDialog();
+void MolDisplayWin::menuBuilderShowBuildTools(wxCommandEvent &event) {
+	ToggleBuilderPalette();
+}
+
+void MolDisplayWin::OnSaveStructureUpdate(wxUpdateUIEvent& event) {
+	event.Enable((MainData->cFrame->GetNumAtomsSelected() > 0) &&
+				 InEditMode());
+}
+
+void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
+
+	Frame *frame = MainData->cFrame;
+	mpAtom *atoms = frame->Atoms;
+	Bond *bonds = frame->Bonds;
+	Structure *struc;
+	mpAtom *structure_atoms;
+	Bond *structure_bonds;
+	int si = 0;
+	int ai, bi;
+	int *new_ids;
+	int natoms_selected = frame->GetNumAtomsSelected();
+
+	if (natoms_selected) {
+		struc = new Structure;	
+		struc->natoms = natoms_selected;
+		struc->atoms = new mpAtom[struc->natoms];
+		new_ids = new int[frame->NumAtoms];
+
+		for (ai = 0; ai < frame->NumAtoms; ai++) {
+			if (frame->GetAtomSelection(ai)) {
+				struc->atoms[si] = atoms[ai];
+				new_ids[ai] = si;
+				si++;
+			} else {
+				new_ids[ai] = -1;
+			}
+		}
+
+		Bond new_bond;
+		std::vector<Bond> new_bonds;
+		for (bi = 0; bi < frame->NumBonds; bi++) {
+			if (frame->GetAtomSelection(bonds[bi].Atom1) &&
+				frame->GetAtomSelection(bonds[bi].Atom2)) {
+				new_bond = Bond(bonds[bi]);
+				new_bond.Atom1 = new_ids[new_bond.Atom1];
+				new_bond.Atom2 = new_ids[new_bond.Atom2];
+				new_bonds.push_back(bonds[bi]);
+			}
+		}
+
+		struc->nbonds = new_bonds.size();
+		struc->bonds = new Bond[struc->nbonds];
+		memcpy(struc->bonds, &(new_bonds[0]), sizeof(Bond) * struc->nbonds);
+
+		// for (si = 0; si < natoms_selected; si++) { 
+			// std::cout << "structure_atoms[si]: " << structure_atoms[si] << std::endl; 
+		// } 
+		
+		wxTextEntryDialog *dlg =
+			new wxTextEntryDialog(this,
+					_("Please enter a name for this custom structure:"),
+					_("Add Structure"));
+		int result;
+		do {
+			result = dlg->ShowModal();
+		} while (result != wxID_CANCEL && dlg->GetValue().Len() <= 0);
+
+		if (result == wxID_OK) {
+			build_palette->AddStructure(dlg->GetValue(), struc);
+		} else {
+			delete struc;
+			delete new_ids;
+		}
+	}
+
 }
 
 void MolDisplayWin::OnShowNormalScreen(wxUpdateUIEvent& event) {
@@ -2630,13 +2707,14 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 			default:
 				if (InEditMode()) {
 					//Pass general chars to the periodic table to set the atom type
-					if (!periodic_dlg) {
-						wxRect window_rect = GetRect();
-						periodic_dlg = new PeriodicTableDlg(
-															wxT("Builder Tools"), window_rect.x + window_rect.width,
-															window_rect.y + 22);
-					}
-					periodic_dlg->KeyHandler(event);
+					// if (!build_palette) { 
+						// wxRect window_rect = GetRect(); 
+						// build_palette = 
+							// new BuilderDlg(wxT("Builder Tools"), 
+								// window_rect.x + window_rect.width, 
+								// window_rect.y + 22); 
+					// } 
+					build_palette->KeyHandler(event);
 					return; //I don't think there is any reason to skip on this case?
 				}
 				break;
@@ -3715,26 +3793,26 @@ void MolDisplayWin::CreateFrameSnapShot(void) {
 	}
 }
 
-void MolDisplayWin::TogglePeriodicDialog(void) {
-	show_periodic_dlg = !show_periodic_dlg;
+void MolDisplayWin::ToggleBuilderPalette(void) {
+	show_build_palette = !show_build_palette;
 
-	// Have to make a top-level window for the miniframe to show the right toolbar
-	// under OS X.
+	// Have to make a top-level window for the miniframe to show the right
+	// toolbar under OS X.
 	wxGetApp().SetTopWindow(this);
 
-	if (show_periodic_dlg) {
-		if (periodic_dlg) {
-			periodic_dlg->Show();
-			periodic_dlg->Raise();
-		} else {
-			wxRect window_rect = GetRect();
-			periodic_dlg = new PeriodicTableDlg(
-				wxT("Builder Tools"), window_rect.x + window_rect.width,
-				window_rect.y + 22);
-			periodic_dlg->Show();
-		}
+	if (show_build_palette) {
+		// if (build_palette) { 
+			build_palette->Show();
+			build_palette->Raise();
+		// } else { 
+			// wxRect window_rect = GetRect(); 
+			// build_palette = new BuilderDlg( 
+				// wxT("Builder Tools"), window_rect.x + window_rect.width, 
+				// window_rect.y + 22); 
+			// build_palette->Show(); 
+		// } 
 		((MpApp &) wxGetApp()).AdjustAllMenus();
 	} else {
-		periodic_dlg->Hide();
+		build_palette->Hide();
 	}
 } 

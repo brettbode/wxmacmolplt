@@ -241,6 +241,9 @@ class MolDisplayWin : public wxFrame {
 		void OnRotateTimer(wxTimerEvent& event);
 		void OnShowNormalScreen(wxUpdateUIEvent& event);
 
+		void menuBuilderSaveStructure(wxCommandEvent &event);
+		void OnSaveStructureUpdate(wxUpdateUIEvent& event);
+
 		DECLARE_EVENT_TABLE()
 
 	public:
@@ -392,10 +395,10 @@ class MolDisplayWin : public wxFrame {
 		 */
 		void menuBuilderInteractive_mode(wxCommandEvent &event);
 		/**
-		 * Toggles the periodic table palatte.
+		 * Toggles the build tools palette.
 		 * @param event The command event (not used).
 		 */
-		void menuBuilderShowPeriodicDlg(wxCommandEvent &event);
+		void menuBuilderShowBuildTools(wxCommandEvent &event);
 		/**
 		 * Updates the add hydrogens menu item based on the current edit mode and ability to add
 		 * hydrogens.
@@ -534,7 +537,7 @@ class MolDisplayWin : public wxFrame {
 		void DrawBondingSites(long iatom, float radius, GLUquadricObj *qobj, int site_id=0, CPoint3D * vector=NULL);
 		void SetStatusText(const wxString& label);
 		void CreateFrameSnapShot(void);
-		void TogglePeriodicDialog();
+		void ToggleBuilderPalette();
 		WinPrefs *GetPrefs(void) {return Prefs;}
 		bool JustFocused(void);
 };

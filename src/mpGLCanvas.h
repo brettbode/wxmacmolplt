@@ -64,7 +64,8 @@
 #define GL_Popup_To_LPCount_Five 30047
 #define GL_Popup_Paste_At 30048
 
-class PeriodicTableDlg;
+class BuilderDlg;
+
 typedef class MolDisplayWin MolDisplayWin;
 /**
  * Defines a widget for displaying an OpenGL canvas.	At this time it is a

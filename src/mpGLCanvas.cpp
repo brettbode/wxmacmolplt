@@ -33,8 +33,8 @@
 #include "ChooseDialog.h"
 
 extern int glf_initialized;
-extern bool show_periodic_dlg;
-extern PeriodicTableDlg *periodic_dlg;
+extern bool show_build_palette;
+extern BuilderDlg *build_palette;
 
 int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 
@@ -903,8 +903,8 @@ void MpGLCanvas::eventMouseLeftDoubleClick(wxMouseEvent& event) {
 
 	// If we're in edit mode, we display the periodic table dialog.
 	if (MolWin->InEditMode() && selected_type == MMP_NULL &&
-		!show_periodic_dlg) {
-		MolWin->TogglePeriodicDialog();
+		!show_build_palette) {
+		MolWin->ToggleBuilderPalette();
 	}
 
 }
@@ -1066,7 +1066,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 		if (MolWin->InEditMode() && selected_site >= 0) {
 			MolWin->SetStatusText(_("Bond an atom here."));
 		} else if (MolWin->InEditMode() && selected < 0 && 
-				   periodic_dlg && periodic_dlg->GetSelectedID()) {
+				   build_palette && build_palette->GetSelectedElement()) {
 			MolWin->SetStatusText(_("Add new atom here."));
 		} else if (selected_type == MMP_ATOM) {
 			wxString info, id;
@@ -1163,17 +1163,17 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 			// If no periodic table is shown or an atom is not selected, but
 			// the user seems to be trying to add an atom, give them a message.
-			if (periodic_dlg == NULL) {
+			if (build_palette == NULL) {
 				if (selected_site >= 0 || selected < 0) {
 					MolWin->SetStatusText(wxT("Open periodic table dialog to add an atom."));
 				}
 			}
 
-			else if (periodic_dlg->GetSelectedID() == 0) {
+			else if (build_palette->GetSelectedElement() == 0) {
 				if (selected_site >= 0 || selected < 0) {
 					MolWin->SetStatusText(wxT("Select an atom in the periodic table."));
 				}
-			} 
+			}
 
 			// If the user is adding a new atom based on the bonding site
 			// skeleton, add the atom in the direction of the bonding site.
@@ -1182,11 +1182,11 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				CPoint3D vector, origin;
 				MolWin->DrawBondingSites(selected, 0, NULL, selected_site+1, &vector);
 				lFrame->GetAtomPosition(selected, origin);
-				lFrame->AddAtom(periodic_dlg->GetSelectedID(), origin + vector * 0.01 *
-								(Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(periodic_dlg->GetSelectedID() - 1)));
+				lFrame->AddAtom(build_palette->GetSelectedElement(), origin + vector * 0.01 *
+								(Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1)));
 				mMainData->AtomAdded();
-				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(periodic_dlg->GetSelectedCoordination());
-				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
+				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
+				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
 				lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
 				MolWin->SetStatusText(wxT("Added new atom."));
 
@@ -1215,27 +1215,77 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 								newX, newY, newZ);
 				newPnt = CPoint3D(newX, newY, newZ);
 
-				type = periodic_dlg->GetSelectedID();
 				MolWin->CreateFrameSnapShot();
-				mMainData->NewAtom(type, newPnt);
-				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(periodic_dlg->GetSelectedCoordination());
-				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(periodic_dlg->GetSelectedLonePairCount());
 
-				// Let's select the new atom.
-				selected = lFrame->NumAtoms - 1;
-				deSelectAll = true;
-				selected_type = MMP_ATOM;
-				SelectObj(selected_type, selected, deSelectAll);
-				lFrame->SetBonds(Prefs, true, true);
-				MolWin->SetStatusText(wxT("Added new atom."));
+				if (build_palette->InPeriodicMode()) {
+					type = build_palette->GetSelectedElement();
+					mMainData->NewAtom(type, newPnt);
+					lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
+					lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
+
+					// Let's select the new atom.
+					selected = lFrame->NumAtoms - 1;
+					deSelectAll = true;
+					selected_type = MMP_ATOM;
+					SelectObj(selected_type, selected, deSelectAll);
+					MolWin->SetStatusText(wxT("Added new atom."));
+				} else if (build_palette->InStructuresMode()) {
+					Structure *structure; 
+					structure = build_palette->GetSelectedStructure();
+
+					if (structure) {
+						CPoint3D pos = structure->atoms[0].Position;
+						CPoint3D offset;
+						CPoint3D mouse_pos;
+						double mouse_x, mouse_y, mouse_z;
+						double atom_depth;
+						mpAtom *new_atom;
+
+						findWinCoord(pos.x, pos.y, pos.z,
+									 mouse_x, mouse_y, atom_depth);
+						findReal3DCoord(curr_mouse.x, curr_mouse.y, atom_depth,
+										mouse_x, mouse_y, mouse_z);
+						mouse_pos = CPoint3D(mouse_x, mouse_y, mouse_z);
+						offset = mouse_pos - pos;
+
+						int prev_natoms = lFrame->NumAtoms;
+
+						lFrame->resetAllSelectState();
+						MolWin->SetHighliteMode(true);
+						for (int i = 0; i < structure->natoms; i++) {
+							new_atom = new mpAtom(structure->atoms[i]);
+							lFrame->AddAtom(*new_atom, lFrame->NumAtoms);
+							lFrame->GetAtomPosition(lFrame->NumAtoms - 1, pos);
+							lFrame->SetAtomPosition(lFrame->NumAtoms - 1, pos + offset);
+							lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
+						}
+
+						Bond *bond;
+						for (int i = 0; i < structure->nbonds; i++) {
+							bond = &structure->bonds[i];
+							lFrame->AddBond(bond->Atom1 + prev_natoms,
+											bond->Atom2 + prev_natoms,
+											bond->Order);
+						}
+
+						MolWin->BondsChanged();
+						MolWin->SelectionChanged(true);
+					}
+
+				}
+				lFrame->SetBonds(Prefs, true, false);
 				MolWin->UpdateGLModel();
+			} else {
+				SelectObj(selected_type, selected, deSelectAll);
+				MolWin->SelectionChanged(deSelectAll);
 			}
+		} else {
+			// Since we're dealing with a click, it's likely that something was
+			// selected.
+			SelectObj(selected_type, selected, deSelectAll);
+			MolWin->SelectionChanged(deSelectAll);
 		}
 
-		// Since we're dealing with a click, it's likely that something was
-		// selected.
-		SelectObj(selected_type, selected, deSelectAll);
-		MolWin->SelectionChanged(deSelectAll);
 		draw();
 
 	}
@@ -1999,15 +2049,15 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 
 		// If the periodic table is shown and an atom is selected, offer an
 		// option to change the clicked-on atom to the selected type.
-		if (periodic_dlg && periodic_dlg->GetSelectedID() != 0 &&
-			periodic_dlg->GetSelectedID() != lFrame->Atoms[selected].GetType()) {
+		if (build_palette && build_palette->GetSelectedElement() != 0 &&
+			build_palette->GetSelectedElement() != lFrame->Atoms[selected].GetType()) {
 
 			wxString label;
 			wxString atom_name;
 			Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1,
 				atom_name);
 			label = wxT("Change ") + atom_name + wxT(" to ");
-			Prefs->GetAtomLabel(periodic_dlg->GetSelectedID() - 1, atom_name);
+			Prefs->GetAtomLabel(build_palette->GetSelectedElement() - 1, atom_name);
 			label.Append(atom_name);
 			menu.Append(GL_Popup_Change_Atom, label);
 		}
@@ -2103,7 +2153,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 
 void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
 	MolWin->CreateFrameSnapShot();
-	mMainData->cFrame->SetAtomType(selected, periodic_dlg->GetSelectedID());
+	mMainData->cFrame->SetAtomType(selected, build_palette->GetSelectedElement());
 	MolWin->UpdateModelDisplay();
 	MolWin->AtomsChanged(true,false);
 }
