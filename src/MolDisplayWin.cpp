@@ -1856,10 +1856,10 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 										}
 									}
 									for (long i=0; i<initialAtomCount; i++) {
-										MainData->cFrame->Atoms[i].SetSelectState(false);
+										MainData->cFrame->SetAtomSelection(i, false);
 									}
 									for (long i=initialAtomCount; i<MainData->cFrame->NumAtoms; i++) {
-										MainData->cFrame->Atoms[i].SetSelectState(true);
+										MainData->cFrame->SetAtomSelection(i, true);
 									}
 									if (Prefs->GetAutoBond())
 										MainData->cFrame->SetBonds(Prefs, false);
@@ -1996,10 +1996,10 @@ void MolDisplayWin::PasteText(void) {
 			if (MainData->cFrame->SpecialAtoms) MainData->SetSpecialAtomDrawMode(true);
 
 			for (long i=0; i<initialAtomCount; i++) {
-				MainData->cFrame->Atoms[i].SetSelectState(false);
+				MainData->cFrame->SetAtomSelection(i, false);
 			}
 			for (long i=initialAtomCount; i<MainData->cFrame->NumAtoms; i++) {
-				MainData->cFrame->Atoms[i].SetSelectState(true);
+				MainData->cFrame->SetAtomSelection(i, true);
 			}
 			if (Prefs->GetAutoBond())
 				MainData->cFrame->SetBonds(Prefs, false);
@@ -2158,8 +2158,10 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 			result = dlg->ShowModal();
 		} while (result != wxID_CANCEL && dlg->GetValue().Len() <= 0);
 
+		struc->name = dlg->GetValue();
+
 		if (result == wxID_OK) {
-			build_palette->AddStructure(dlg->GetValue(), struc);
+			build_palette->AddStructure(struc);
 		} else {
 			delete struc;
 			delete new_ids;
