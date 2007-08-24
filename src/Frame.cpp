@@ -1963,6 +1963,9 @@ void Frame::toggleAbInitioVisibility(void) {
 }
 
 void Frame::resetAllSelectState() {
+	
+	// Typically, atom selection should be done through SetAtomSelection, but
+	// we can simulate the effect here.
 	for (int i = 0; i < NumAtoms; i++)
 		Atoms[i].SetSelectState(false);
 	natoms_selected = 0;
