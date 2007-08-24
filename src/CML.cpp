@@ -30,9 +30,12 @@
 #include "InputData.h"
 #include "Math3D.h"
 #include "MolDisplayWin.h"
+#include "build_palette.h"
 #ifdef WIN32
 #undef AddAtom
 #endif
+
+extern BuilderDlg *build_palette;
 
 //notes on extending CML
 //anything can go inside the CML tag.
@@ -159,6 +162,16 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_WindowData));
 			wData->WriteXML(Ele);
+		}
+
+		if (build_palette->GetNumStructures()) {
+			Structure *struc;
+			XMLElement *el = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
+			el->addAttribute(CML_convert(nameAttr), CML_convert(MMP_Structures));
+			for (int i = 0; i < build_palette->GetNumStructures(); i++) {
+				struc = build_palette->GetStructure(i);
+				struc->WriteXML(el);
+			}
 		}
 	}
 	if (allFrames) {
@@ -785,17 +798,69 @@ void GradientData::WriteXML(XMLElement * parent) {
 		grad->addAttribute(CML_convert(rowsAttr), line);
 	}
 }
+
+void Structure::WriteXML(XMLElement *parent) const {
+
+	int i;
+	char line[kMaxLineLength];
+
+	XMLElement *struc_el = parent->addChildElement(kStructureXML);
+
+	snprintf(line, kMaxLineLength, "%ls", name.c_str());
+	struc_el->addAttribute(CML_convert(nameAttr), line);
+
+	XMLElement *atoms_el = struc_el->addChildElement("atoms");
+	atoms_el->addAttribute(CML_convert(sizeAttr), natoms);
+
+	XMLElement *atom_el;
+	for (i = 0; i < natoms; i++) {
+		atom_el = atoms_el->addChildElement("atom");
+
+		snprintf(line, kMaxLineLength, "a%d", i);
+		atom_el->addAttribute(CML_convert(IdAttr), line);
+
+		atom_el->addAttribute(CML_convert(elementTypeAttr),
+							  CML_TypetoName(atoms[i].GetType()));
+
+		snprintf(line, kMaxLineLength, "%f", atoms[i].Position.x);
+		atom_el->addAttribute(CML_convert(X3Attr), line);
+		snprintf(line, kMaxLineLength, "%f", atoms[i].Position.y);
+		atom_el->addAttribute(CML_convert(Y3Attr), line);
+		snprintf(line, kMaxLineLength, "%f", atoms[i].Position.z);
+		atom_el->addAttribute(CML_convert(Z3Attr), line);
+	}
+
+	XMLElement *bonds_el = struc_el->addChildElement("bonds");
+	bonds_el->addAttribute(CML_convert(sizeAttr), nbonds);
+
+	XMLElement *bond_el;
+	for (i = 0; i < nbonds; i++) {
+		bond_el = bonds_el->addChildElement("bond");
+
+		snprintf(line, kMaxLineLength, "b%d", i);
+		bond_el->addAttribute(CML_convert(IdAttr), line);
+
+		snprintf(line, kMaxLineLength, "a%d a%d", bonds[i].Atom1,
+				 bonds[i].Atom2);
+		bond_el->addAttribute(CML_convert(atomRefs2Attr), line);
+		bond_el->addAttribute(CML_convert(orderAttr),
+							  CML_convert(bonds[i].Order));
+	}
+}
+
 void AnnotationMarker::WriteXML(XMLElement * parent) const {
 	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
 	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationMarker));
 	Elem->addAttribute(kAnnAtom1XML, atom);
 }
+
 void AnnotationLength::WriteXML(XMLElement * parent) const {
 	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
 	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationLength));
 	Elem->addAttribute(kAnnAtom1XML, atoms[0]);
 	Elem->addAttribute(kAnnAtom2XML, atoms[1]);
 }
+
 void AnnotationAngle::WriteXML(XMLElement * parent) const {
 	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
 	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationAngle));
@@ -803,6 +868,7 @@ void AnnotationAngle::WriteXML(XMLElement * parent) const {
 	Elem->addAttribute(kAnnAtom2XML, atoms[1]);
 	Elem->addAttribute(kAnnAtom3XML, atoms[2]);
 }
+
 void AnnotationDihedral::WriteXML(XMLElement * parent) const {
 	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
 	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationDihedral));
@@ -1451,7 +1517,8 @@ void Frame::ParseAtomAttributeArrayXML(XMLElement * arrayXML, const std::vector<
 						if ((atomId>=0)&&(atomId<NumAtoms)) {
 							bool temp;
 							if (child->getAttributeValue(CML_convert(selectedAttr),temp))
-								Atoms[atomId].SetSelectState(temp);
+								SetAtomSelection(atomId, temp);
+								// Atoms[atomId].SetSelectState(temp); 
 							if (child->getAttributeValue(CML_convert(invisibleAttr),temp))
 								Atoms[atomId].SetInvisibility(temp);
 							if (child->getAttributeValue(CML_convert(symmetryUniqueAttr),temp))
@@ -2641,6 +2708,8 @@ const char * CML_convert(MMP_MetadataNamespace t)
 			return "InputOptions";
 		case MMP_Annotations:
 			return "Annotations";
+		case MMP_Structures:
+			return "Structures";
 		case MMP_Preferences:
 			return "Preferences";
 		case MMP_WindowData:

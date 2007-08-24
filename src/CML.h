@@ -110,6 +110,7 @@ enum MMP_MetadataNamespace {
 	MMP_BasisSet,
 	MMP_InputOptions,
 	MMP_Annotations,
+	MMP_Structures,
 	MMP_Preferences,
 	MMP_WindowData,
 	MMP_Use3DMode,
@@ -449,6 +450,8 @@ enum MMP_WindowDataNS {
 	
 	NumberMMPWindowDataItems
 };
+
+#define kStructureXML "Structure"
 
 #define kAnnotationXML "Annotation"
 #define kAnnAtom1XML "Atom-1"
