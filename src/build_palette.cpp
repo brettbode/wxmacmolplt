@@ -29,6 +29,15 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	wxMiniFrame(NULL, wxID_ANY, title, wxPoint(xpos, ypos),
 		wxSize(-1, -1), wxCLOSE_BOX | wxCAPTION) {
 
+	Structure *new_structure = new Structure;
+	mpAtom *atom = new mpAtom;
+	atom->Type = 8;
+	atom->Position = CPoint3D(0.0f, 0.0f, 0.0f);
+	new_structure->name = wxString(_("Carbon Atom"));
+	new_structure->atoms = atom;
+	new_structure->natoms = 1;
+	structures.push_back(new_structure);
+
 	wxPanel *panel = new wxPanel(this);
 	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
 	tabs = new wxNotebook(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
@@ -46,14 +55,6 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	panel->SetSizerAndFit(box_sizer);
 
 	Fit();
-
-	Structure *new_structure = new Structure;
-	mpAtom *atom = new mpAtom;
-	atom->Type = 8;
-	atom->Position = CPoint3D(0.0f, 0.0f, 0.0f);
-	new_structure->atoms = atom;
-	new_structure->natoms = 1;
-	structures.push_back(new_structure);
 
 	wxCommandEvent foo(0, 6-1);
 	ElementSelected(foo);
@@ -224,11 +225,6 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	int lflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
 	int rflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
 
-	int nstructures = 1;
-	wxString structure_labels[] = {
-			_("Carbon Atom"),
-		};
-
 	sizer->SetFlexibleDirection(wxHORIZONTAL);
 	sizer->SetCols(2);
 	sizer->SetRows(1);
@@ -240,8 +236,8 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	sizer->Add(label, wxGBPosition(0, 0), wxGBSpan(1, 1), lflags);
 	
 	mStructureChoice = new wxChoice(panel, wxID_ANY, wxPoint(-1, -1),
-									wxSize(-1, -1), nstructures,
-									structure_labels);
+									wxSize(-1, -1), 1,
+									&structures[0]->name);
 	mStructureChoice->SetSelection(0);
 
 	sizer->Add(mStructureChoice, wxGBPosition(0, 1), wxGBSpan(1, 1), rflags);
@@ -475,16 +471,51 @@ bool BuilderDlg::InStructuresMode(void) const {
 
 // --------------------------------------------------------------------------- 
 
-void BuilderDlg::AddStructure(const wxString& menu_label, 
-							  Structure *structure) {
+Structure::Structure() {
+
+	atoms = NULL;
+	bonds = NULL;
+	natoms = 0;
+	nbonds = 0;
+
+}
+
+// --------------------------------------------------------------------------- 
+
+Structure::~Structure() {
+
+	if (atoms) delete atoms;
+	if (bonds) delete bonds;
+
+}
+
+// --------------------------------------------------------------------------- 
+
+void BuilderDlg::AddStructure(Structure *structure) {
 
 	structures.push_back(structure);
 
-	mStructureChoice->Append(menu_label);
+	mStructureChoice->Append(structure->name);
 
 	// Under GTK at least, the menu doesn't expand to accommodate the new,
 	// possibly longer label.  We force that expansion now.
 	mStructureChoice->SetSize(mStructureChoice->GetBestSize());
+
+}
+
+// --------------------------------------------------------------------------- 
+
+int BuilderDlg::GetNumStructures() {
+	
+	return structures.size();
+
+}
+
+// --------------------------------------------------------------------------- 
+
+Structure *BuilderDlg::GetStructure(int i) {
+
+	return structures[i];
 
 }
 

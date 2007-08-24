@@ -39,21 +39,12 @@ class Structure {
 		int natoms;
 		Bond *bonds;
 		int nbonds;
+		wxString name;
 
-		Structure() {
-			atoms = NULL;
-			bonds = NULL;
-		}
+		Structure();
+		~Structure();
 
-		~Structure() {
-			if (atoms) {
-				delete atoms;
-			}
-
-			if (bonds) {
-				delete bonds;
-			}
-		}
+		void WriteXML(XMLElement *parent) const;
 
 	private:
 };
@@ -73,13 +64,15 @@ class BuilderDlg: public wxMiniFrame {
 		void New(wxCommandEvent& WXUNUSED(event));
 		int GetSelectedElement(void) const;
 		Structure *GetSelectedStructure(void);
+		int GetNumStructures(void);
+		Structure *GetStructure(int i);
 		short GetSelectedCoordination(void) const;
 		short GetSelectedLonePairCount(void) const;
 		static void NumberToTableCoords(int atomic_number, int *row, int *col);
 		void KeyHandler(wxKeyEvent &event);
 		bool InStructuresMode(void) const;
 		bool InPeriodicMode(void) const;
-		void AddStructure(const wxString& menu_label, Structure *structure);
+		void AddStructure(Structure *structure);
 
 	private:
 		void ElementSelected(wxCommandEvent& event);
