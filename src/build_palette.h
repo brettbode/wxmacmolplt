@@ -45,6 +45,7 @@ class Structure {
 		~Structure();
 
 		void WriteXML(XMLElement *parent) const;
+		bool ReadXML(XMLElement *struc_el);
 
 	private:
 };

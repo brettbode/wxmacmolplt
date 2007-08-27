@@ -1047,6 +1047,25 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 															InputOptions->ReadXML(mdchild);
 														}
 															break;
+														case MMP_Structures: {
+															XMLElement *struc_el = mdchild->getFirstChild();
+															Structure *struc;
+															while (struc_el) {
+																std::cout << "found structure" << std::endl;
+																if (struc_el->isName(kStructureXML)) {
+																	struc = new Structure;
+																	if (struc->ReadXML(struc_el)) {
+																		std::cout << "structure read" << std::endl;
+																		build_palette->AddStructure(struc);
+																	} else {
+																		std::cout << "structure bad" << std::endl;
+																		delete struc;
+																	}
+																}
+																struc_el = struc_el->getNextChild();
+															}
+															break;
+														}
 														case MMP_Annotations:
 														{
 															XMLElement * AnnChild = mdchild->getFirstChild();
@@ -2500,6 +2519,105 @@ bool AnnotationDihedral::ReadXML(XMLElement * Annotation) {
 	
 	return result;
 }
+
+bool Structure::ReadXML(XMLElement *struc_el) {
+
+	const char *attr;
+	XMLElement *atoms_el;
+	XMLElement *atom_el;
+	XMLElement *bonds_el;
+	XMLElement *bond_el;
+	int i;
+
+	// First we get structure's name.
+	attr = struc_el->getAttributeValue(CML_convert(nameAttr));
+	if (!attr) return false;
+	name = wxString(attr, wxConvUTF8);
+
+	std::cout << "attr: " << attr << std::endl;
+
+	// Then we get an atoms element which contains some number of
+	// atom elements.
+	atoms_el = struc_el->getFirstChild();
+	if (!atoms_el) return false;
+
+	std::cout << "got atoms" << std::endl;
+
+	attr = atoms_el->getAttributeValue(CML_convert(sizeAttr));
+	if (!attr) return false;
+	sscanf(attr, "%d", &natoms);
+	if (!natoms) return true;
+
+	atoms = new mpAtom[natoms];
+
+	i = 0;
+	atom_el = atoms_el->getFirstChild();
+	while (atom_el) {
+		attr = atom_el->getAttributeValue(CML_convert(elementTypeAttr));
+		if (!attr) return false;
+
+		std::cout << "got an atom" << std::endl;
+
+		atoms[i].Type = ::SetAtomType((const unsigned char *) attr);
+		if (atoms[i].Type <= 0) return false;
+
+		attr = atom_el->getAttributeValue(CML_convert(X3Attr));
+		if (!attr) return false;
+		sscanf(attr, "%f", &atoms[i].Position.x);
+
+		attr = atom_el->getAttributeValue(CML_convert(Y3Attr));
+		if (!attr) return false;
+		sscanf(attr, "%f", &atoms[i].Position.y);
+
+		attr = atom_el->getAttributeValue(CML_convert(Z3Attr));
+		if (!attr) return false;
+		sscanf(attr, "%f", &atoms[i].Position.z);
+
+		std::cout << "atoms[i]: " << atoms[i] << std::endl;
+
+		atom_el = atom_el->getNextChild();
+		i++;
+	}
+
+	std::cout << "got all atoms" << std::endl;
+
+	// Then we get a bonds element which contains some number of
+	// bond elements.
+	bonds_el = atoms_el->getNextChild();
+	if (!bonds_el) return false;
+
+	attr = atoms_el->getAttributeValue(CML_convert(sizeAttr));
+	if (!attr) return false;
+	sscanf(attr, "%d", &nbonds);
+
+	// Nothing else to do if there aren't any bonds.
+	if (!nbonds) return true;
+
+	std::cout << "nbonds: " << nbonds << std::endl;
+
+	bonds = new Bond[nbonds];
+	i = 0;
+	bond_el = bonds_el->getFirstChild();
+	while (bond_el) {
+		std::cout << "getting bond i: " << i << std::endl;
+
+		attr = bond_el->getAttributeValue(CML_convert(atomRefs2Attr));
+		if (!attr) return false;
+		sscanf(attr, "a%d a%d", &bonds[i].Atom1, &bonds[i].Atom2);
+
+		attr = bond_el->getAttributeValue(CML_convert(orderAttr));
+		if (!attr) return false;
+		CML_convert(attr, bonds[i].Order);
+
+		std::cout << "bonds[i]: " << bonds[i] << std::endl;
+
+		bond_el = bond_el->getNextChild();
+		i++;
+	}
+
+	return true;
+}
+
 #pragma mark -
 #pragma mark CML_Element
 const char * CML_convert(CML_Element t)
