@@ -104,8 +104,10 @@ bool MpApp::OnInit() {
 	// Now read in the users preferences file from the system:preferences folder if present
 	gPrefDefaults->ReadDefaultPrefs();
 	*gPreferences = *gPrefDefaults;
-		//attempt to read new xml pref file
+	//attempt to read new xml pref file
 	gPreferences->ReadUserPrefs();
+
+	build_palette = new BuilderDlg(wxT("Builder Tools"));
 
     // Parse command line 
 	wxString cmdFilename; 
@@ -219,11 +221,6 @@ bool MpApp::OnInit() {
 	}
 	SetExitOnFrameDelete(true);
 #endif
-
-	// build_palette = NULL; 
-	build_palette = new BuilderDlg(wxT("Builder Tools"));
-								   // window_rect.x + window_rect.width, 
-								   // window_rect.y + 22); 
 
     return true;
 }
