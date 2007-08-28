@@ -3880,57 +3880,42 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	long NumBonds = lFrame->NumBonds;
 	
 	short coordination = lAtoms[iatom].GetCoordinationNumber();
-	int bondCount = 0;
-	BondOrder highestBO = kHydrogenBond;
-	long primaryBondedAtm = -1;
-	long secondaryBondedAtm = -1;
-	int bond_ids[6];
+	std::vector<Bond *> bonds;
 	int bonded_atoms[6];
 	CPoint3D vecs[6];
+	int i;
 
-	// The primary bond will be the bond with the highest order and it
-	// will be assumed to be the axial bond.  We traverse the bonds list
-	// and examine all that contain the atom...
-	for (long i=0; i<NumBonds; i++) {
+	bonds.reserve(6);
+
+	// First we grab all bonds pertaining to the atom.  If the number of bonds
+	// exceeds five, then there's no point in showing any bonding sites since
+	// the atom is either full or overfull.
+	for (i = 0; i < NumBonds; i++) {
 		if (((iatom == lBonds[i].Atom1) || (iatom == lBonds[i].Atom2)) &&
 			(lBonds[i].Order > kHydrogenBond)) {
 
-			// If we already have 6 bonds and just found another, we've
-			// got no new sites to show.
-			if (bondCount == 6) {
+			bonds.push_back(&lBonds[i]);
+
+			if (bonds.size() == 6) {
 				return;
-			}
-
-			// We keep track of this atom's bonds.
-			bond_ids[bondCount] = i;
-			bonded_atoms[bondCount] = (iatom == lBonds[i].Atom1) ?
-				lBonds[i].Atom2 : lBonds[i].Atom1;
-			bondCount++;
-
-			// If we have a bond of higher order, record it as such and
-			// demote the previous.
-			if (lBonds[i].Order > highestBO) {
-				highestBO = lBonds[i].Order;
-				secondaryBondedAtm = primaryBondedAtm;
-				primaryBondedAtm = (lBonds[i].Atom1 == iatom)?lBonds[i].Atom2:lBonds[i].Atom1;
-			}
-			
-			// Otherwise, if the order is the same or less, and we haven't
-			// seen another bond yet, record the bond as the secondary.
-			// Do we want to check that this order is sufficient?  For example,
-			// if we have bonds of order 1,1,2,2, the secondary bond will be
-			// from the second SINGLE bond.
-			else if (secondaryBondedAtm < 0) {
-				secondaryBondedAtm = (lBonds[i].Atom1 == iatom)?lBonds[i].Atom2:lBonds[i].Atom1;
 			}
 		}
 	}
 
-	//Test to see if any bond sites are unused, if not return
-	if (bondCount >= coordination) return;
+	// Test to see if any bond sites are unused, if not return.
+	if (bonds.size() >= coordination) return;
+
+	// We sort the bonds by bond order, and figure out what the atom opposite
+	// this one is.  We'll need this info to find the vector between the two
+	// atoms.
+	std::sort(bonds.begin(), bonds.end(), Bond::RefLessThan);
+	for (i = 0; i < bonds.size(); i++) {
+		bonded_atoms[i] = (iatom == bonds[i]->Atom1) ?
+							bonds[i]->Atom2 : bonds[i]->Atom1;
+	}
 
 	// Calculate vectors from central atom to each bonded atom.
-	for (int i = 0; i < bondCount; i++) {
+	for (i = 0; i < bonds.size(); i++) {
 		vecs[i] = lAtoms[bonded_atoms[i]].Position - lAtoms[iatom].Position;
 		Normalize3D(&vecs[i]);
 	}
@@ -3943,8 +3928,8 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	Matrix4D rot;
 	InitRotationMatrix(rot);
 	CPoint3D b1Offset(0.0f, 1.0f, 0.0f);
-	if (bondCount > 0) {	//orient our frame to the primary bond
-		b1Offset = lAtoms[primaryBondedAtm].Position - lAtoms[iatom].Position;
+	if (bonds.size() > 0) {	//orient our frame to the primary bond
+		b1Offset = lAtoms[bonded_atoms[0]].Position - lAtoms[iatom].Position;
 		Normalize3D(&b1Offset);
 		CPoint3D target(0.0f, 1.0f, 0.0f);
 		SetRotationMatrix(rot, &target, &b1Offset);
@@ -3980,13 +3965,13 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 			{
 				// If we have no bonds yet of the 2 possible, we draw a site
 				// along the y-axis and its inverse.
-				if (bondCount == 0) {
+				if (bonds.size() == 0) {
 					CPoint3D v(0.0f, 1.0f, 0.0f);
 					DO_SITE(v, 1);
 					if (lpCount < 1) DO_SITE(v * -1.0f, 2);
 				}
 
-				else if (bondCount == 1) {
+				else if (bonds.size() == 1) {
 					DO_SITE(vecs[0] * -1.0f, 2);
 				}
 			}
@@ -3994,14 +3979,14 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 		// Configuration will be planar triangular.
 		case 3:
-			if (bondCount == 0) {
+			if (bonds.size() == 0) {
 				CPoint3D v(0.0f, 1.0f, 0.0f);
 				DO_SITE(v, 1);
 			}
 
 			if (lpCount < 2) {
 				CPoint3D v3;
-				if (bondCount >= 2) {	//Setup the 3rd vector to have an equal angle to both bonds
+				if (bonds.size() >= 2) {	//Setup the 3rd vector to have an equal angle to both bonds
 					//Just add the two bond vectors and invert
 					// CPoint3D offset = lAtoms[secondaryBondedAtm].Position - lAtoms[iatom].Position; 
 					// Normalize3D(&offset); 
@@ -4017,18 +4002,18 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					Rotate3DOffset(rot,temp,&v2);
 					//When dealing with a single bond check the bonded atom for bonds and align them as
 					//appropriate
-					if (bondCount == 1) {
+					if (bonds.size() == 1) {
 						bool test = false;
 						CPoint3D OtherBondVector;
 						for (long i=0; i<NumBonds; i++) {
-							if ((primaryBondedAtm == lBonds[i].Atom1)&&(lBonds[i].Order > kHydrogenBond)&&
+							if ((bonded_atoms[0] == lBonds[i].Atom1)&&(lBonds[i].Order > kHydrogenBond)&&
 								(lBonds[i].Atom2 != iatom)) {
-								OtherBondVector = lAtoms[lBonds[i].Atom2].Position - lAtoms[primaryBondedAtm].Position;
+								OtherBondVector = lAtoms[lBonds[i].Atom2].Position - lAtoms[bonded_atoms[0]].Position;
 								test = true;
 								break;
-							} else if ((primaryBondedAtm == lBonds[i].Atom2)&&(lBonds[i].Order > kHydrogenBond)&&
+							} else if ((bonded_atoms[0] == lBonds[i].Atom2)&&(lBonds[i].Order > kHydrogenBond)&&
 									   (lBonds[i].Atom1 != iatom)) {
-								OtherBondVector = lAtoms[lBonds[i].Atom1].Position - lAtoms[primaryBondedAtm].Position;
+								OtherBondVector = lAtoms[lBonds[i].Atom1].Position - lAtoms[bonded_atoms[0]].Position;
 								test = true;
 								break;
 							}
@@ -4046,7 +4031,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 							}
 						}
 					}
-					if (bondCount <= 1) {
+					if (bonds.size() <= 1) {
 						DO_SITE(v2, 2);
 					}
 				}
@@ -4057,7 +4042,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 			break;
 
 		case 4:
-			if (bondCount == 0) {
+			if (bonds.size() == 0) {
 				CPoint3D v(0.0f, 1.0f, 0.0f);
 				DO_SITE(v, 1);
 			}
@@ -4065,7 +4050,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 				// If three bonds are already formed, we calculate the fourth
 				// as the sum of the three, inverted.
-				if (bondCount == 3) {
+				if (bonds.size() == 3) {
 					//obtain the bond vector by summing the bond vectors, normalize and invert
 					CPoint3D sum(0.0,0.0,0.0), temp, bonds[3];
 					int found=0;
@@ -4100,7 +4085,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				
 				// If only one bond is already formed, we calculate the second, third
 				// and fourth as ....
-				else if (bondCount < 2) {
+				else if (bonds.size() < 2) {
 					c = -1.0f/3.0f;	//cos(109.5)
 					s = sqrt(1.0f-(c*c)); //sin(109.5)
 					b = s * sin(kPi/3.0);
@@ -4119,10 +4104,10 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					}
 				}
 				
-				// If two bonds is already formed, we calculate the 
+				// If two bonds are already formed, we calculate the 
 				// remaining two as ...
 				else {
-					CPoint3D offset = lAtoms[secondaryBondedAtm].Position - lAtoms[iatom].Position;
+					CPoint3D offset = lAtoms[bonded_atoms[1]].Position - lAtoms[iatom].Position;
 					Normalize3D(&offset);
 					CPoint3D cross;
 					CrossProduct3D(&b1Offset,&offset,&cross);
@@ -4149,7 +4134,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 			// Here axial and equitorial sites are different. LPs should go in
 			// axial sites first.
 
-			if (bondCount == 0) {
+			if (bonds.size() == 0) {
 				float c = sqrtf(3) / 2.0f;
 				CPoint3D axial(0.0f, 1.0f, 0.0f);
 				CPoint3D equat1(0.0f, 0.0f, -1.0f);
@@ -4169,7 +4154,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 			}
 			
-			else if (bondCount == 1) {
+			else if (bonds.size() == 1) {
 
 				CPoint3D axial;
 				CPoint3D equat1;
@@ -4192,7 +4177,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 			}
 
-			else if (bondCount == 2) {
+			else if (bonds.size() == 2) {
 
 				float dot = DotProduct3D(&vecs[0], &vecs[1]);
 
@@ -4243,7 +4228,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 			}
 
-			else if (bondCount == 3) {
+			else if (bonds.size() == 3) {
 
 				float dot12 = DotProduct3D(&vecs[0], &vecs[1]);
 				float dot13 = DotProduct3D(&vecs[0], &vecs[2]);
@@ -4349,7 +4334,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 			}
 
-			else if (bondCount == 4) {
+			else if (bonds.size() == 4) {
 
 				float dot_ij;
 				bool is_axial = false;
@@ -4406,7 +4391,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 			break;
 		case 6:
 
-			if (bondCount == 0) {
+			if (bonds.size() == 0) {
 				CPoint3D e1(1.0f, 0.0f, 0.0f);
 				CPoint3D e2(0.0f, 1.0f, 0.0f);
 				CPoint3D e3(0.0f, 0.0f, 1.0f);
@@ -4427,7 +4412,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 			}
 
-			else if (bondCount == 1) {
+			else if (bonds.size() == 1) {
 				CPoint3D ortho;
 				CPoint3D cross;
 
@@ -4447,7 +4432,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				}
 			}
 
-			else if (bondCount == 2) {
+			else if (bonds.size() == 2) {
 
 				// Use their dot product to determine if they're orthogonal or
 				// otherwise.
@@ -4510,7 +4495,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 			}
 
-			else if (bondCount == 3) {
+			else if (bonds.size() == 3) {
 
 				float dot12 = DotProduct3D(&vecs[0], &vecs[1]);
 				float dot13 = DotProduct3D(&vecs[0], &vecs[2]);
@@ -4585,7 +4570,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 			}
 
-			else if (bondCount == 4) {
+			else if (bonds.size() == 4) {
 
 				int i, j;
 				int nuninverted = 0;
@@ -4628,7 +4613,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 			}
 
-			else if (bondCount == 5) {
+			else if (bonds.size() == 5) {
 
 				int i, j;
 				bool has_no_inverse;

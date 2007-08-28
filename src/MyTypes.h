@@ -313,6 +313,16 @@ class Bond {
 			return *this;
 		}
 
+		static const bool RefLessThan(const Bond *a, const Bond *b) {
+			if (a == NULL) {
+				return b != NULL;
+			} else if (b == NULL) {
+				return false;
+			} else {
+				return a->Order < b->Order;
+			}
+		}
+
 		bool GetSelectState(void) const {return (Highlite & 1);};
 		void SetSelectState(bool state) {if (Highlite & 1) Highlite--; if (state) Highlite++;}
 };
