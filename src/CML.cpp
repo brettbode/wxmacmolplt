@@ -2546,6 +2546,11 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 	i = 0;
 	atom_el = atoms_el->getFirstChild();
 	while (atom_el) {
+		if (i >= natoms) {
+			std::cerr << "Malformed structure!" << std::endl;
+			return false;
+		}
+
 		attr = atom_el->getAttributeValue(CML_convert(elementTypeAttr));
 		if (!attr) return false;
 
@@ -2573,7 +2578,7 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 	bonds_el = atoms_el->getNextChild();
 	if (!bonds_el) return false;
 
-	attr = atoms_el->getAttributeValue(CML_convert(sizeAttr));
+	attr = bonds_el->getAttributeValue(CML_convert(sizeAttr));
 	if (!attr) return false;
 	sscanf(attr, "%d", &nbonds);
 
@@ -2584,6 +2589,11 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 	i = 0;
 	bond_el = bonds_el->getFirstChild();
 	while (bond_el) {
+		if (i >= nbonds) {
+			std::cerr << "Malformed structure!" << std::endl;
+			return false;
+		}
+
 		attr = bond_el->getAttributeValue(CML_convert(atomRefs2Attr));
 		if (!attr) return false;
 		sscanf(attr, "a%d a%d", &bonds[i].Atom1, &bonds[i].Atom2);
