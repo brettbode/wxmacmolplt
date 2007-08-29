@@ -34,6 +34,8 @@ typedef struct {
 } element_t;
 
 class Structure {
+	friend std::ostream& operator<<(std::ostream& stream, const Structure& s);
+
 	public:
 		mpAtom *atoms;
 		int natoms;

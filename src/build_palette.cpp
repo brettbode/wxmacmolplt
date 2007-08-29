@@ -97,7 +97,6 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 							  0,0,0,0,0,0,0,0,0};
 
 	wxPanel *periodic_panel = new wxPanel(tabs, wxID_ANY);
-	// wxPanel *periodic_panel = new wxPanel(this, wxID_ANY); 
 	wxGridBagSizer *sizer = new wxGridBagSizer();
 	
 	for (int i=0; i<kNumTableElements; i++) {
@@ -293,7 +292,13 @@ void BuilderDlg::ElementSelected(wxCommandEvent& event) {
 			elements[prev_id].button->SetBitmapLabel(*(elements[prev_id].off_bmp));
 		}
 		prev_id = id;
+#ifdef __WXGTK__
+		// On GTK, subsequent keypresses won't get handled to change
+		// selected elements because nothing in the frame has focus.  We
+		// force focus here.  Doing this under Windows gives the whole
+		// frame focus, so we do this for GTK only.
 		elements[id].button->SetFocus();
+#endif
 	}
 
 	// If the user has selected the same button, we want to turn it off.
@@ -493,6 +498,7 @@ Structure::~Structure() {
 
 void BuilderDlg::AddStructure(Structure *structure) {
 
+	// std::cout << "*structure: " << *structure << std::endl; 
 	structures.push_back(structure);
 
 	mStructureChoice->Append(structure->name);
@@ -516,6 +522,29 @@ int BuilderDlg::GetNumStructures() {
 Structure *BuilderDlg::GetStructure(int i) {
 
 	return structures[i];
+
+}
+
+// --------------------------------------------------------------------------- 
+
+std::ostream& operator<<(std::ostream& stream, const Structure& s) {
+
+	int i;
+	
+	std::cout << "------------------------" << std::endl;
+	// std::cout << "name: " << s.name.c_str() << std::endl; 
+	printf("%ls\n", s.name.c_str());
+	std::cout << "natoms: " << s.natoms << std::endl;
+	for (i = 0; i < s.natoms; i++) {
+		std::cout << "s.atoms[" << i << "]: " << s.atoms[i] << std::endl;
+	}
+	std::cout << "nbonds: " << s.nbonds << std::endl;
+	for (i = 0; i < s.nbonds; i++) {
+		std::cout << "s.bonds[" << i << "]: " << s.bonds[i] << std::endl;
+	}
+	std::cout << "------------------------" << std::endl << std::endl;
+
+	return stream;
 
 }
 
