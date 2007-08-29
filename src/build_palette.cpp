@@ -38,9 +38,8 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	new_structure->natoms = 1;
 	structures.push_back(new_structure);
 
-	wxPanel *panel = new wxPanel(this);
 	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
-	tabs = new wxNotebook(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	tabs = new wxNotebook(this, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
 
 	wxPanel *solvents_panel = new wxPanel(tabs);
 
@@ -52,9 +51,7 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	tabs->AddPage(solvents_panel, _("Solvents"), false);
 
 	box_sizer->Add(tabs);
-	panel->SetSizerAndFit(box_sizer);
-
-	Fit();
+	SetSizerAndFit(box_sizer);
 
 	wxCommandEvent foo(0, 6-1);
 	ElementSelected(foo);
