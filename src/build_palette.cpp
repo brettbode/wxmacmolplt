@@ -1,5 +1,6 @@
 #include "build_palette.h"
 #include "main.h"
+#include <iostream>
 
 #include <wx/gbsizer.h>
 
@@ -321,7 +322,7 @@ void BuilderDlg::ElementSelected(wxCommandEvent& event) {
 			elements[prev_id].button->SetBitmapLabel(*(elements[prev_id].off_bmp));
 		}
 		prev_id = id;
-#ifdef __WXGTK__
+#if defined(__WXGTK__)
 		// On GTK, subsequent keypresses won't get handled to change
 		// selected elements because nothing in the frame has focus.  We
 		// force focus here.  Doing this under Windows gives the whole
