@@ -80,7 +80,7 @@ MpGLCanvas::~MpGLCanvas() {
 	// resources.  Since GLF tries to free some OpenGL resources, we need to
 	// bring the canvas' context back up -- otherwise another canvas' textures
 	// will be deleted.
-	SetCurrent();
+	// SetCurrent(); 
 	glfUnloadBMFFontD(bitmap_fontd);
 
 }

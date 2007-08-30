@@ -77,6 +77,9 @@ class BuilderDlg: public wxMiniFrame {
 		bool InPeriodicMode(void) const;
 		void AddStructure(Structure *structure);
 
+		int GetNumUserStructures();
+		Structure *GetUserStructure(int i);
+
 	private:
 		void ElementSelected(wxCommandEvent& event);
 		void OnCoordinationChoice(wxCommandEvent& event);
@@ -105,6 +108,7 @@ class BuilderDlg: public wxMiniFrame {
 		wxStaticText *element_label;
 		wxStaticText *coord_num_label;
 		wxStaticText *lp_num_label;
+		int nglobal_structures;
 
 
 	DECLARE_DYNAMIC_CLASS(BuilderDlg)

@@ -39,6 +39,8 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	new_structure->natoms = 1;
 	structures.push_back(new_structure);
 
+	nglobal_structures = structures.size();
+
 	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
 	tabs = new wxNotebook(this, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
 
@@ -95,6 +97,9 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 							  0,0,0,0,0,0,0,0,0};
 
 	wxPanel *periodic_panel = new wxPanel(tabs, wxID_ANY);
+	periodic_panel->Connect(wxEVT_CHAR,
+							wxKeyEventHandler(BuilderDlg::KeyHandler),
+							NULL, this);
 	wxGridBagSizer *sizer = new wxGridBagSizer();
 	
 	for (int i=0; i<kNumTableElements; i++) {
@@ -322,13 +327,16 @@ void BuilderDlg::ElementSelected(wxCommandEvent& event) {
 			elements[prev_id].button->SetBitmapLabel(*(elements[prev_id].off_bmp));
 		}
 		prev_id = id;
-#if defined(__WXGTK__)
+// #if defined(__WXGTK__) 
 		// On GTK, subsequent keypresses won't get handled to change
 		// selected elements because nothing in the frame has focus.  We
 		// force focus here.  Doing this under Windows gives the whole
 		// frame focus, so we do this for GTK only.
-		elements[id].button->SetFocus();
-#endif
+
+		if (!event.GetInt()) {
+			elements[id].button->SetFocus();
+		}
+// #endif 
 	}
 
 	// If the user has selected the same button, we want to turn it off.
@@ -382,6 +390,10 @@ void BuilderDlg::KeyHandler(wxKeyEvent& event) {
 			}
 			if (id > 0) {
 				wxCommandEvent foo(0, id-1);
+				/* TODO: fix this! */
+				if (event.GetX() == -50 && event.GetY() == -50) {
+					foo.SetInt(1);
+				}
 				ElementSelected(foo);
 			}
 		} else if (key == 309) {
@@ -552,6 +564,22 @@ int BuilderDlg::GetNumStructures() {
 Structure *BuilderDlg::GetStructure(int i) {
 
 	return structures[i];
+
+}
+
+// --------------------------------------------------------------------------- 
+
+int BuilderDlg::GetNumUserStructures() {
+	
+	return structures.size() - nglobal_structures;
+
+}
+
+// --------------------------------------------------------------------------- 
+
+Structure *BuilderDlg::GetUserStructure(int i) {
+
+	return structures[i + nglobal_structures];
 
 }
 

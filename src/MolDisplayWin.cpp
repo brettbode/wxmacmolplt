@@ -2709,13 +2709,9 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 			default:
 				if (InEditMode()) {
 					//Pass general chars to the periodic table to set the atom type
-					// if (!build_palette) { 
-						// wxRect window_rect = GetRect(); 
-						// build_palette = 
-							// new BuilderDlg(wxT("Builder Tools"), 
-								// window_rect.x + window_rect.width, 
-								// window_rect.y + 22); 
-					// } 
+					// TODO: A temporary hack to register outside event.
+					event.m_x = -50;
+					event.m_y = -50;
 					build_palette->KeyHandler(event);
 					return; //I don't think there is any reason to skip on this case?
 				}
