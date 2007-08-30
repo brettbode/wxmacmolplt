@@ -166,7 +166,8 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 			(IMAGE_SIZE - symbol_height) / 2);
 
 		elements[i].button =
-			new wxBitmapButton(periodic_panel, i, *(elements[i].off_bmp));
+			new wxBitmapButton(periodic_panel, i, *(elements[i].off_bmp),
+					wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | wxWANTS_CHARS);
 		elements[i].button->Connect(wxEVT_CHAR,
 									wxKeyEventHandler(BuilderDlg::KeyHandler),
 									NULL, this);
