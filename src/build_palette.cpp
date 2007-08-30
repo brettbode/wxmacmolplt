@@ -161,6 +161,9 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 
 		elements[i].button =
 			new wxBitmapButton(periodic_panel, i, *(elements[i].off_bmp));
+		elements[i].button->Connect(wxEVT_CHAR,
+									wxKeyEventHandler(BuilderDlg::KeyHandler),
+									NULL, this);
 
 		sizer->Add(elements[i].button, wxGBPosition(row, col));
 
@@ -178,30 +181,44 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 	int lflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
 	int rflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
 	
+#if 1
 	// Show atomic symbol.
-	wxStaticText * label1 = new wxStaticText(periodic_panel, wxID_ANY, wxT("Selected Element: "));
-	sizer->Add(label1, wxGBPosition(0, 2), wxGBSpan(1, 6), lflags);
+	wxStaticText *element_label = new wxStaticText(periodic_panel, wxID_ANY, wxT("Selected Element: "));
+	sizer->Add(element_label, wxGBPosition(0, 2), wxGBSpan(1, 6), lflags);
+	// element_label->Connect(wxEVT_CHAR, 
+		// wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); 
 
 	mTextArea = new wxStaticText(periodic_panel, wxID_ANY, wxT("foo"));
 	sizer->Add(mTextArea, wxGBPosition(0, 8), wxGBSpan(1, 4), rflags);
+	mTextArea->Connect(wxEVT_CHAR,
+		wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this);
 
 	// Show coordination number drop down menu.
-	wxStaticText * label2 = new wxStaticText(periodic_panel, wxID_ANY, wxT("Coordination number: "));
-	sizer->Add(label2, wxGBPosition(1, 2), wxGBSpan(1, 6), lflags);
+	wxStaticText *coord_num_label = new wxStaticText(periodic_panel, wxID_ANY, wxT("Coordination number: "));
+	sizer->Add(coord_num_label, wxGBPosition(1, 2), wxGBSpan(1, 6), lflags);
+	// coord_num_label->Connect(wxEVT_CHAR, 
+		// wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); 
 
 	wxString coordinationChoices[] = {_T("0"), _T("1"), _T("2"), _T("3"), _T("4"), _T("5"), _T("6")};
 	mCoordinationChoice = new wxChoice(periodic_panel, kPeriodicCoordinationChoice, wxPoint(-1, -1),
 									   wxSize(-1, -1), 7, coordinationChoices);
 	sizer->Add(mCoordinationChoice, wxGBPosition(1, 8), wxGBSpan(1, 4), rflags);
+	mCoordinationChoice->Connect(wxEVT_CHAR,
+		wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this);
 
 	// Show lone pair count drop down menu.
-	wxStaticText * label3 = new wxStaticText(periodic_panel, wxID_ANY, wxT("Number of lone pairs: "));
-	sizer->Add(label3, wxGBPosition(2, 2), wxGBSpan(1, 6), lflags);
+	wxStaticText *lp_num_label = new wxStaticText(periodic_panel, wxID_ANY, wxT("Number of lone pairs: "));
+	sizer->Add(lp_num_label, wxGBPosition(2, 2), wxGBSpan(1, 6), lflags);
+	// lp_num_label->Connect(wxEVT_CHAR, 
+		// wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); 
 
 	wxString LPChoices[] = {_T("0"), _T("1"), _T("2"), _T("3"), _T("4"), _T("5")};
 	mLPChoice = new wxChoice(periodic_panel, kPeriodicLPChoice, wxPoint(-1, -1),
 							 wxSize(-1, -1), 6, LPChoices);
 	sizer->Add(mLPChoice, wxGBPosition(2, 8), wxGBSpan(1, 4), rflags);
+	mLPChoice->Connect(wxEVT_CHAR,
+		wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this);
+#endif
 
 	sizer->Fit(this);
 	periodic_panel->SetSizerAndFit(sizer);
@@ -251,12 +268,27 @@ BuilderDlg::~BuilderDlg() {
 	int i;
 
 	for (i = 0; i < nelements; i++) {
+		elements[i].button->Disconnect(wxEVT_CHAR,
+			wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this);
 		delete elements[i].button;
 		delete elements[i].off_bmp;
 		delete elements[i].on_bmp;
 	}
 
 	delete elements;
+
+	// element_label->Disconnect(wxEVT_CHAR, 
+		// wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); 
+	// coord_num_label->Disconnect(wxEVT_CHAR, 
+		// wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); 
+	// lp_num_label->Disconnect(wxEVT_CHAR, 
+		// wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); 
+	mTextArea->Disconnect(wxEVT_CHAR,
+		wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this);
+	mLPChoice->Disconnect(wxEVT_CHAR,
+		wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this);
+	mCoordinationChoice->Disconnect(wxEVT_CHAR,
+		wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this);
 
 	build_palette = NULL;
 	show_build_palette = false;

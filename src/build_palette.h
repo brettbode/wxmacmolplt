@@ -102,6 +102,11 @@ class BuilderDlg: public wxMiniFrame {
 		wxChoice *mStructureChoice;
 		std::vector<Structure *> structures;
 
+		wxStaticText *element_label;
+		wxStaticText *coord_num_label;
+		wxStaticText *lp_num_label;
+
+
 	DECLARE_DYNAMIC_CLASS(BuilderDlg)
 	DECLARE_EVENT_TABLE()
 
