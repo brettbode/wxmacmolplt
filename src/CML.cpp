@@ -168,8 +168,8 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 			Structure *struc;
 			XMLElement *el = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 			el->addAttribute(CML_convert(nameAttr), CML_convert(MMP_Structures));
-			for (int i = 0; i < build_palette->GetNumStructures(); i++) {
-				struc = build_palette->GetStructure(i);
+			for (int i = 0; i < build_palette->GetNumUserStructures(); i++) {
+				struc = build_palette->GetUserStructure(i);
 				struc->WriteXML(el);
 			}
 		}
