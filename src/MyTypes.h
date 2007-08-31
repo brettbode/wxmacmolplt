@@ -211,12 +211,10 @@ class mpAtom {
 		short		Type;	//Low byte stores normal atom type, high byte store special bits
 		char		flags;	//bit 0: invisibility, bit 1: select state, bit 2: Is effective fragment
 							//bit 3: Is SIMOMM atom, bit 4: symmetry unique
-		unsigned char paired_sites;
 		short	coordinationNumber;
 		short	LPCount;
 
 		mpAtom(void) : Type(0), flags(0) {
-			paired_sites = 0;
 			coordinationNumber = 0;
 			LPCount = 0;
 		};
