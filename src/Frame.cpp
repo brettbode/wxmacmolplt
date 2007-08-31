@@ -241,7 +241,6 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 				Atoms[i] = Atoms[i-1];
 			}
 		}
-		Atoms[index].paired_sites = 0;
 		Atoms[index].Type = AtomType;
 		Atoms[index].Position = AtomPosition;
 		Atoms[index].flags = 0;
@@ -274,7 +273,6 @@ mpAtom * Frame::AddAtom(const mpAtom & atm, long index) {
 			}
 		}
 		Atoms[index] = atm;
-		Atoms[index].paired_sites = 0;
 		result = &Atoms[index];
 		NumAtoms++;
 	}
@@ -557,21 +555,12 @@ int Frame::GetNumAtomsSelected(void) const {
 	return natoms_selected;
 }
 
-void Frame::SetAtomBondingSite(int atom_id, unsigned char site_id, bool is_bonded) {
-
-	if (is_bonded) {
-		Atoms[atom_id].paired_sites |= 1 << site_id;
-	} else {
-		Atoms[atom_id].paired_sites &= ~(1 << site_id);
-	}
-
-}
-
 long Frame::GetNumElectrons(void) const {
 	long	result=0;
 	for (long i=0; i<NumAtoms; i++) result += Atoms[i].Type;
 	return result;
 };
+
 void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds, bool selectedOnly)
 {	long		iatm, jatm, maxbonds;
 	CPoint3D	offset;
