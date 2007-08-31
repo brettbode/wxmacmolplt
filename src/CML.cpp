@@ -828,6 +828,12 @@ void Structure::WriteXML(XMLElement *parent) const {
 		atom_el->addAttribute(CML_convert(Y3Attr), line);
 		snprintf(line, kMaxLineLength, "%f", atoms[i].Position.z);
 		atom_el->addAttribute(CML_convert(Z3Attr), line);
+
+		snprintf(line, kMaxLineLength, "%d", atoms[i].coordinationNumber);
+		atom_el->addAttribute(CML_convert(coordinationNumberAttr), line);
+
+		snprintf(line, kMaxLineLength, "%d", atoms[i].LPCount);
+		atom_el->addAttribute(CML_convert(lonePairCountAttr), line);
 	}
 
 	XMLElement *bonds_el = struc_el->addChildElement("bonds");
@@ -2568,6 +2574,14 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 		attr = atom_el->getAttributeValue(CML_convert(Z3Attr));
 		if (!attr) return false;
 		sscanf(attr, "%f", &atoms[i].Position.z);
+
+		attr = atom_el->getAttributeValue(CML_convert(coordinationNumberAttr));
+		if (!attr) return false;
+		sscanf(attr, "%d", &atoms[i].coordinationNumber);
+
+		attr = atom_el->getAttributeValue(CML_convert(lonePairCountAttr));
+		if (!attr) return false;
+		sscanf(attr, "%d", &atoms[i].LPCount);
 
 		atom_el = atom_el->getNextChild();
 		i++;
