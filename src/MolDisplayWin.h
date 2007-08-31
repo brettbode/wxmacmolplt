@@ -240,6 +240,7 @@ class MolDisplayWin : public wxFrame {
 		void OnStatusTimer(wxTimerEvent& event);
 		void OnRotateTimer(wxTimerEvent& event);
 		void OnShowNormalScreen(wxUpdateUIEvent& event);
+		void OnSaveUpdate(wxUpdateUIEvent& event);
 
 		void menuBuilderSaveStructure(wxCommandEvent &event);
 		void OnSaveStructureUpdate(wxUpdateUIEvent& event);
@@ -540,6 +541,10 @@ class MolDisplayWin : public wxFrame {
 		void ToggleBuilderPalette();
 		WinPrefs *GetPrefs(void) {return Prefs;}
 		bool JustFocused(void);
+
+		// This function should be called whenever there's something new to
+		// save in the CML file.
+		inline void ContentChanged() {Dirty = true;}
 };
 
 class MolPrintOut : public wxPrintout {

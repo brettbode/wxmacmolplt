@@ -419,6 +419,7 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 	MolWin->UpdateGLModel();
 	UpdateGLView();
 }
+
 void MpGLCanvas::UpdateGLView(void) {
 	// int width, height; 
 	if(GetContext()&&(Prefs!=NULL)&&MolWin->IsShown()) {
@@ -999,6 +1000,7 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 			MolWin->SelectionChanged(deSelectAll);
 			MolWin->UpdateGLModel();
 			draw();
+			MolWin->ContentChanged();
 		}
 
 		if (MolWin->InEditMode()) {
@@ -1013,6 +1015,7 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 			interactPopupMenu(curr_mouse.x, curr_mouse.y, 0);
 			MolWin->SelectionChanged(deSelectAll);
 			MolWin->UpdateGLModel();
+			MolWin->ContentChanged();
 		} else {
 			bondPopupMenu(curr_mouse.x, curr_mouse.y);
 		}
@@ -1149,6 +1152,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		if (ndrag_events <= 0) {
 			SelectObj(selected_type, selected, deSelectAll);
 		}
+		MolWin->ContentChanged();
 		draw();
 	}
 
@@ -1197,6 +1201,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				lFrame->SetBonds(Prefs, true, true);
 				MolWin->UpdateGLModel();
 				MolWin->AdjustMenus();
+				MolWin->ContentChanged();
 			}
 
 			// If the user clicked on nothing, we try to add an atom given
@@ -1229,6 +1234,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					selected_type = MMP_ATOM;
 					SelectObj(selected_type, selected, deSelectAll);
 					MolWin->SetStatusText(wxT("Added new atom."));
+					MolWin->SelectionChanged(true);
 				} else if (build_palette->InStructuresMode()) {
 					Structure *structure; 
 					structure = build_palette->GetSelectedStructure();
@@ -1297,14 +1303,15 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		if (selected != first_atom_clicked ||
 			selected_site >= 0 && selected_site != first_site_clicked) {
 			int ibond = lFrame->BondExists(first_atom_clicked, selected);
+			MolWin->CreateFrameSnapShot();
 			if (ibond >=0) {
 				int t = lFrame->GetBondOrder(ibond);
 				if (t <= kTripleBond) t ++;
 				lFrame->SetBondOrder(ibond, (BondOrder) t);
 			} else {
-				MolWin->CreateFrameSnapShot();
 				lFrame->AddBond(first_atom_clicked, selected);
 			}
+			MolWin->BondsChanged();
 		}
 		first_site_clicked = -1;
 		draw();
@@ -1557,10 +1564,6 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			}
 
 		}
-
-		wxString tmp3Dcoord;
-
-		tmp3Dcoord.Printf(wxT("%.2f,%.2f,%.2f"), newX, newY, newZ);
 
 		lFrame->SetBonds(Prefs, true, true);
 		MolWin->UpdateGLModel();
@@ -2030,6 +2033,7 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 	}
 
 	MolWin->UpdateModelDisplay();
+	MolWin->ContentChanged();
 	
 }
 
@@ -2171,6 +2175,7 @@ void MpGLCanvas::ChangeCoordinationNumber(wxCommandEvent& event) {
 //		Prefs->SetOxidationNumber(lFrame->GetAtomType(selected), ox_num);
 	
 	MolWin->UpdateModelDisplay();
+	MolWin->ContentChanged();
 	
 }
 
@@ -2187,6 +2192,7 @@ void MpGLCanvas::ChangeLPCount(wxCommandEvent& event) {
 	//		Prefs->SetOxidationNumber(lFrame->GetAtomType(selected), ox_num);
 	
 	MolWin->UpdateModelDisplay();
+	MolWin->ContentChanged();
 	
 }
 
@@ -2478,6 +2484,7 @@ void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
 	}
 
 	MolWin->UpdateModelDisplay();
+	MolWin->ContentChanged();
 }
 
 void MpGLCanvas::PasteAtMouse(wxCommandEvent& event) {
@@ -2526,6 +2533,7 @@ void MpGLCanvas::PasteAtMouse(wxCommandEvent& event) {
 	}
 	
 	lFrame->SetBonds(Prefs, false, false);
+	MolWin->BondsChanged();
 
 }
 
@@ -2691,6 +2699,7 @@ void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
 	}
 
 	MolWin->UpdateModelDisplay();
+	MolWin->ContentChanged();
 
 }
 
@@ -2712,6 +2721,7 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 	}
 
 	MolWin->UpdateModelDisplay();
+	MolWin->ContentChanged();
 }
 
 void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {

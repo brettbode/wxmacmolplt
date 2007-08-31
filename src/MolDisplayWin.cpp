@@ -174,6 +174,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 #endif
 	EVT_MENU (MMP_ADDFRAMES,        MolDisplayWin::menuFileAddFramesFromFile)
 	EVT_MENU (wxID_SAVE,            MolDisplayWin::menuFileSave)
+	EVT_UPDATE_UI(wxID_SAVE,		MolDisplayWin::OnSaveUpdate)
 	EVT_MENU (wxID_SAVEAS,          MolDisplayWin::menuFileSave_as)
 	EVT_MENU (wxID_CLOSE,           MolDisplayWin::menuFileClose)
 	EVT_CLOSE(                      MolDisplayWin::FileClose)
@@ -187,8 +188,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 
 	EVT_MENU (wxID_UNDO,            MolDisplayWin::menuEditUndo)
 	EVT_MENU (wxID_REDO,            MolDisplayWin::menuEditRedo)
-	EVT_UPDATE_UI(wxID_UNDO,		MolDisplayWin::OnUndoUpdate )
-	EVT_UPDATE_UI(wxID_REDO,		MolDisplayWin::OnRedoUpdate )
+	EVT_UPDATE_UI(wxID_UNDO,		MolDisplayWin::OnUndoUpdate)
+	EVT_UPDATE_UI(wxID_REDO,		MolDisplayWin::OnRedoUpdate)
 	EVT_MENU (wxID_CUT,             MolDisplayWin::menuEditCut)
 	EVT_MENU (wxID_COPY,            MolDisplayWin::menuEditCopy)
 	EVT_MENU (MMP_COPYCOORDS,       MolDisplayWin::menuEditCopyCoordinates)
@@ -824,6 +825,10 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuView->Enable(MMP_OFFSETMODE, true);
 		menuMolecule->Enable(MMP_INVERTNORMALMODE, true);
 	}
+}
+
+void MolDisplayWin::OnSaveUpdate(wxUpdateUIEvent& event) {
+	event.Enable(Dirty);
 }
 
 void MolDisplayWin::OnUndoUpdate( wxUpdateUIEvent& event ) {
@@ -2909,6 +2914,7 @@ void MolDisplayWin::FrameChanged(void) {
 		temp = temp->GetNextSurface();
 	}
 	UpdateModelDisplay();
+	Dirty = true;
 	AdjustMenus();
 }
 void MolDisplayWin::ChangeFrames(long NewFrame) {
@@ -3051,6 +3057,7 @@ void MolDisplayWin::ResetView(void) {
 	glCanvas->draw();
 }
 void MolDisplayWin::ResetModel(bool Center) {
+	std::cout << "reset model called" << std::endl;
 	if (Center) {
 		MainData->CenterModelWindow();
 		MainData->WindowSize = 1.25*(MainData->MaxSize+1.0);
@@ -3573,6 +3580,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 		RotateMoleculeGL(Prefs->GetShowAngles() && !rotate_timer.IsRunning(),
 						 !rotate_timer.IsRunning());
 		glCanvas->SwapBuffers();
+		ContentChanged();
 	} else {
 		// drag finished
 		//"clean up" the rotation matrix make the rotation part orthogonal and magnitude 1
@@ -3598,6 +3606,7 @@ void MolDisplayWin::SelectionChanged(bool mode)
 	coordsWindow->UpdateSelection(mode);
   if (bondsWindow)
 	bondsWindow->UpdateSelection(mode);
+  ContentChanged();
 }
 //The following is the amount of space to leave for the window sizing box used by
 //many window maangers that takes some space away from the client area.
@@ -3814,3 +3823,4 @@ void MolDisplayWin::ToggleBuilderPalette(void) {
 		build_palette->Hide();
 	}
 } 
+
