@@ -3057,7 +3057,6 @@ void MolDisplayWin::ResetView(void) {
 	glCanvas->draw();
 }
 void MolDisplayWin::ResetModel(bool Center) {
-	std::cout << "reset model called" << std::endl;
 	if (Center) {
 		MainData->CenterModelWindow();
 		MainData->WindowSize = 1.25*(MainData->MaxSize+1.0);
