@@ -1067,10 +1067,16 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	if (!event.Dragging()) {
 		testPicking(curr_mouse.x, curr_mouse.y);
 		if (MolWin->InEditMode() && selected_site >= 0) {
-			MolWin->SetStatusText(_("Bond an atom here."));
+			if (build_palette->InPeriodicMode()) {
+				MolWin->SetStatusText(_("Bond an atom here."));
+			}
 		} else if (MolWin->InEditMode() && selected < 0 && 
 				   build_palette && build_palette->GetSelectedElement()) {
-			MolWin->SetStatusText(_("Add new atom here."));
+			if (build_palette->InPeriodicMode()) {
+				MolWin->SetStatusText(_("Add new atom here."));
+			} else {
+				MolWin->SetStatusText(_("Add new structure here."));
+			}
 		} else if (selected_type == MMP_ATOM) {
 			wxString info, id;
 			Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1, info);
@@ -1183,25 +1189,32 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 			// skeleton, add the atom in the direction of the bonding site.
 			else if (selected_site >= 0) {
 				MolWin->CreateFrameSnapShot();
-				CPoint3D vector, origin;
-				MolWin->DrawBondingSites(selected, 0, NULL, selected_site+1, &vector);
-				lFrame->GetAtomPosition(selected, origin);
-				lFrame->AddAtom(build_palette->GetSelectedElement(), origin + vector * 0.01 *
-								(Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1)));
-				mMainData->AtomAdded();
-				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
-				lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
-				lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
-				MolWin->SetStatusText(wxT("Added new atom."));
 
-				// Let's select the new atom.
-				selected = lFrame->NumAtoms - 1;
-				deSelectAll = true;
-				SelectObj(selected_type, selected, deSelectAll);
-				lFrame->SetBonds(Prefs, true, true);
-				MolWin->UpdateGLModel();
-				MolWin->AdjustMenus();
-				MolWin->ContentChanged();
+				if (build_palette->InPeriodicMode()) {
+					CPoint3D vector, origin;
+					MolWin->DrawBondingSites(selected, 0, NULL, selected_site+1, &vector);
+					lFrame->GetAtomPosition(selected, origin);
+					lFrame->AddAtom(build_palette->GetSelectedElement(), origin + vector * 0.01 *
+									(Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1)));
+					mMainData->AtomAdded();
+					lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
+					lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
+					lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
+					MolWin->SetStatusText(wxT("Added new atom."));
+
+					// Let's select the new atom.
+					selected = lFrame->NumAtoms - 1;
+					deSelectAll = true;
+					SelectObj(selected_type, selected, deSelectAll);
+
+					lFrame->SetBonds(Prefs, true, true);
+					MolWin->UpdateGLModel();
+					MolWin->AdjustMenus();
+					MolWin->ContentChanged();
+				} else {
+					MolWin->SetStatusText(wxT("Structures cannot be dropped in directly to a bonding site."));
+				}
+
 			}
 
 			// If the user clicked on nothing, we try to add an atom given
@@ -1298,15 +1311,68 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	
 	// If a drag occurred between two bonding sites, we pair them up with
 	// a bond.
-	else if (MolWin->InEditMode() && first_site_clicked >= 0) {
+	else if (MolWin->InEditMode() && first_site_clicked >= 0 &&
+			 selected_site >= 0) {
+
 		testPicking(curr_mouse.x, curr_mouse.y);
-		if (selected != first_atom_clicked ||
-			selected_site >= 0 && selected_site != first_site_clicked) {
+
+		// We don't allow two sites of the same atom to bond.
+		if (selected != first_atom_clicked) {
+			// selected_site >= 0 && selected_site != first_site_clicked) { 
+
+			// If control/command is down, we translate and rotate all
+			// selected atoms so the second site is aligned with the first.
+			if (event.ControlDown() || event.CmdDown()) {
+				CPoint3D atom_pos;
+				CPoint3D new_atom_pos;
+				CPoint3D offset;
+				CPoint3D origin;
+				CPoint3D vector1;
+				CPoint3D vector2;
+				Matrix4D rotmat;
+
+				lFrame->GetAtomPosition(first_atom_clicked, origin);
+				lFrame->GetAtomPosition(selected, atom_pos);
+
+				// We want to rotate the selected set so that the dragged-to
+				// bonding site will meet up with the dragged-from bonding
+				// site.  So, we need a rotation matrix that will make these
+				// sites point to each other.  To compute that with 
+				// SetRotationMatrix, which makes vectors point in the same
+				// direction, we have to invert one of them.
+				MolWin->DrawBondingSites(first_atom_clicked, 0, NULL, first_site_clicked + 1, &vector1);
+				MolWin->DrawBondingSites(selected, 0, NULL, selected_site + 1, &vector2);
+				vector2 *= -1.0f;
+				SetRotationMatrix(rotmat, &vector2, &vector1);
+
+				// We translate each selected atom by the distance between
+				// the bond offset and the dragged-to atom.
+				offset = origin - atom_pos +
+					vector1 * 0.01 *
+					(Prefs->GetAtomSize(lFrame->GetAtomType(first_atom_clicked) - 1) +
+					 Prefs->GetAtomSize(lFrame->GetAtomType(selected) - 1));
+
+				// We rotate the selected the atoms using the dragged-to atom
+				// as the origin.  The rotation is done first, and then the
+				// translation.
+				origin = atom_pos;
+				MolWin->CreateFrameSnapShot();
+				for (int i = 0; i < lFrame->NumAtoms; i++) {
+					if (lFrame->GetAtomSelection(i)) {
+						lFrame->GetAtomPosition(i, atom_pos);
+						atom_pos = (atom_pos) - origin;
+						Rotate3DPt(rotmat, atom_pos, &new_atom_pos);
+						new_atom_pos += origin;
+						lFrame->SetAtomPosition(i, new_atom_pos + offset);
+					}
+				}
+			}
+			
 			int ibond = lFrame->BondExists(first_atom_clicked, selected);
 			MolWin->CreateFrameSnapShot();
-			if (ibond >=0) {
+			if (ibond >= 0) {
 				int t = lFrame->GetBondOrder(ibond);
-				if (t <= kTripleBond) t ++;
+				if (t <= kTripleBond) t++;
 				lFrame->SetBondOrder(ibond, (BondOrder) t);
 			} else {
 				lFrame->AddBond(first_atom_clicked, selected);
@@ -1595,7 +1661,6 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 		// of mouse change along the y-axis of the viewport.
 		dy = curr_pt.y - prev_pt.y;
 		angle_offset = dy / height * 540.0f;
-		// angle_offset = dy / GetClientSize().GetHeight() * 540.0f; 
 
 		// Get all trig together for rotating around the bond that
 		// was just clicked on.
@@ -1642,52 +1707,11 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 		}
 
 		MolWin->AtomsChanged(true, false);
-		// We need to update our data.
-		// edited_atoms = true; 
 	}
-
-	// else if (selected >= NumAtoms + lFrame->NumBonds) { 
-
-		// int anno_id = selected - NumAtoms - lFrame->NumBonds; 
-		
-		// if (mMainData->Annotations[anno_id]->getType() == MP_ANNOTATION_LENGTH) { 
-			// float dy;           // No. pixels of mouse change in y-dir 
-			// float offset;       // Corresponding amount of translation 
-			// CPoint3D atom1_pos; 
-			// CPoint3D atom2_pos; 
-			// CPoint3D offset_vec; 
-			// AnnotationLength *length_anno; 
-
-			// length_anno = 
-				// dynamic_cast<AnnotationLength *> 
-					// (mMainData->Annotations[anno_id]); 
-		   
-			// Calculate the amount of rotation according to the amount
-			// of mouse change along the y-axis of the viewport.
-			// dy = tmpPnt.y - oldTmpPnt.y; 
-			// offset = 1.0f - dy / (GetRect().GetHeight()) * 2.0f; 
-
-			// lFrame->GetAtomPosition(length_anno->getAtom(0), atom1_pos); 
-			// lFrame->GetAtomPosition(length_anno->getAtom(1), atom2_pos); 
-
-			// offset_vec = atom2_pos - atom1_pos; 
-
-			// get atom2
-			// atom2_pos.x = atom1_pos.x + offset_vec.x * offset; 
-			// atom2_pos.y = atom1_pos.y + offset_vec.y * offset; 
-			// atom2_pos.z = atom1_pos.z + offset_vec.z * offset; 
-
-			// lFrame->SetAtomPosition(length_anno->getAtom(1), atom2_pos); 
-
-			// edited_atoms = true; 
-		// } 
-	// } 
 	
 	else {
 		mSelectState = -1;
 	}
-
-	// return edited_atoms; 
 
 }
 			
