@@ -32,7 +32,7 @@ BuilderDlg::BuilderDlg(const wxString& title,
 
 	Structure *new_structure = new Structure;
 	mpAtom *atom = new mpAtom;
-	atom->Type = 8;
+	atom->Type = 6;
 	atom->Position = CPoint3D(0.0f, 0.0f, 0.0f);
 	new_structure->name = wxString(_("Carbon Atom"));
 	new_structure->atoms = atom;
