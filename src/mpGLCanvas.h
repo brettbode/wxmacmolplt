@@ -63,6 +63,7 @@
 #define GL_Popup_To_LPCount_Four 30046
 #define GL_Popup_To_LPCount_Five 30047
 #define GL_Popup_Paste_At 30048
+#define GL_Popup_Add_Plane_Normal 30049
 
 class BuilderDlg;
 
@@ -151,6 +152,10 @@ class MpGLCanvas : public wxGLCanvas {
 		bool window_just_focused; // Flag indicating window getting focus
 		wxStopWatch mouse_activate_timer;
 		bool ignore_next_up;
+
+		void AddPlaneNormal(wxCommandEvent& event);
+		void ConnectSelectedToSite(int src_atom, int src_site,
+								   int dst_atom, int dst_site);
 
 	public:
 		/**

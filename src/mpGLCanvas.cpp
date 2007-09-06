@@ -1320,64 +1320,32 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		if (selected != first_atom_clicked) {
 			// selected_site >= 0 && selected_site != first_site_clicked) { 
 
+			bool okay_to_continue = true;
+
 			// If control/command is down, we translate and rotate all
 			// selected atoms so the second site is aligned with the first.
 			if (event.ControlDown() || event.CmdDown()) {
-				CPoint3D atom_pos;
-				CPoint3D new_atom_pos;
-				CPoint3D offset;
-				CPoint3D origin;
-				CPoint3D vector1;
-				CPoint3D vector2;
-				Matrix4D rotmat;
-
-				lFrame->GetAtomPosition(first_atom_clicked, origin);
-				lFrame->GetAtomPosition(selected, atom_pos);
-
-				// We want to rotate the selected set so that the dragged-to
-				// bonding site will meet up with the dragged-from bonding
-				// site.  So, we need a rotation matrix that will make these
-				// sites point to each other.  To compute that with 
-				// SetRotationMatrix, which makes vectors point in the same
-				// direction, we have to invert one of them.
-				MolWin->DrawBondingSites(first_atom_clicked, 0, NULL, first_site_clicked + 1, &vector1);
-				MolWin->DrawBondingSites(selected, 0, NULL, selected_site + 1, &vector2);
-				vector2 *= -1.0f;
-				SetRotationMatrix(rotmat, &vector2, &vector1);
-
-				// We translate each selected atom by the distance between
-				// the bond offset and the dragged-to atom.
-				offset = origin - atom_pos +
-					vector1 * 0.01 *
-					(Prefs->GetAtomSize(lFrame->GetAtomType(first_atom_clicked) - 1) +
-					 Prefs->GetAtomSize(lFrame->GetAtomType(selected) - 1));
-
-				// We rotate the selected the atoms using the dragged-to atom
-				// as the origin.  The rotation is done first, and then the
-				// translation.
-				origin = atom_pos;
-				MolWin->CreateFrameSnapShot();
-				for (int i = 0; i < lFrame->NumAtoms; i++) {
-					if (lFrame->GetAtomSelection(i)) {
-						lFrame->GetAtomPosition(i, atom_pos);
-						atom_pos = (atom_pos) - origin;
-						Rotate3DPt(rotmat, atom_pos, &new_atom_pos);
-						new_atom_pos += origin;
-						lFrame->SetAtomPosition(i, new_atom_pos + offset);
-					}
+				if (lFrame->GetAtomSelection(selected)) {
+					MolWin->SetStatusText(_("Destination atom must not be selected."));
+					okay_to_continue = false;
+				} else {
+					ConnectSelectedToSite(first_atom_clicked, first_site_clicked,
+										  selected, selected_site);
 				}
 			}
 			
-			int ibond = lFrame->BondExists(first_atom_clicked, selected);
-			MolWin->CreateFrameSnapShot();
-			if (ibond >= 0) {
-				int t = lFrame->GetBondOrder(ibond);
-				if (t <= kTripleBond) t++;
-				lFrame->SetBondOrder(ibond, (BondOrder) t);
-			} else {
-				lFrame->AddBond(first_atom_clicked, selected);
+			if (okay_to_continue) {
+				int ibond = lFrame->BondExists(first_atom_clicked, selected);
+				MolWin->CreateFrameSnapShot();
+				if (ibond >= 0) {
+					int t = lFrame->GetBondOrder(ibond);
+					if (t <= kTripleBond) t++;
+					lFrame->SetBondOrder(ibond, (BondOrder) t);
+				} else {
+					lFrame->AddBond(first_atom_clicked, selected);
+				}
+				MolWin->BondsChanged();
 			}
-			MolWin->BondsChanged();
 		}
 		first_site_clicked = -1;
 		draw();
@@ -2130,6 +2098,10 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 			menu.Append(GL_Popup_Fit_To_Plane, wxT("Fit atoms to plane"));
 		}
 
+		if (lFrame->GetNumAtomsSelected() == 3) {
+			item = menu.Append(GL_Popup_Add_Plane_Normal, wxT("Add plane normal"));
+		}
+
 		menu.AppendSeparator();
 
 	}
@@ -2297,11 +2269,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 				}
 
 				item = menu.Append(GL_Popup_Measure_Length, wxT("Measure length"));
-				if (already_exists) {
-					item->Enable(false);
-				} else {
-					item->Enable(true);
-				}
+				item->Enable(!already_exists);
 				
 				menu.AppendSeparator();
 				wxMenu * submenu = new wxMenu();
@@ -2359,11 +2327,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 				}
 
 				item = menu.Append(GL_Popup_Measure_Angle, wxT("Measure angle"));
-				if (already_exists) {
-					item->Enable(false);
-				} else {
-					item->Enable(true);
-				}
+				item->Enable(!already_exists);
 
 				break;
 			case 4:
@@ -2377,11 +2341,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 				}
 
 				item = menu.Append(GL_Popup_Measure_Dihedral, wxT("Measure dihedral"));
-				if (already_exists) {
-					item->Enable(false);
-				} else {
-					item->Enable(true);
-				}
+				item->Enable(!already_exists);
 
 				break;
 			default:
@@ -2688,6 +2648,34 @@ void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
 
 }
 
+void MpGLCanvas::AddPlaneNormal(wxCommandEvent& event) {
+
+	Frame *lFrame = mMainData->cFrame;
+	CPoint3D pos1;
+	CPoint3D pos2;
+	CPoint3D pos3;
+	CPoint3D vec1;
+	CPoint3D vec2;
+	CPoint3D normal;
+
+	lFrame->GetAtomPosition(select_stack[0], pos1);
+	lFrame->GetAtomPosition(select_stack[1], pos2);
+	lFrame->GetAtomPosition(select_stack[2], pos3);
+
+	vec1 = pos2 - pos1;
+	Normalize3D(&vec1);
+
+	vec2 = pos3 - pos1;
+	Normalize3D(&vec2);
+
+	UnitCrossProduct3D(&vec1, &vec2, &normal);
+
+	lFrame->AddAtom(1, pos3 + normal);
+	lFrame->AddBond(select_stack[2], lFrame->NumAtoms - 1);
+	MolWin->AtomsChanged();
+
+}
+
 void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
 
 	switch (event.GetId()) {
@@ -2811,6 +2799,54 @@ void MpGLCanvas::toggleInteractiveMode(void) {
 
 }
 
+void MpGLCanvas::ConnectSelectedToSite(int src_atom, int src_site,
+									   int dst_atom, int dst_site) {
+	CPoint3D atom_pos;
+	CPoint3D new_atom_pos;
+	CPoint3D offset;
+	CPoint3D origin;
+	CPoint3D dst_vec;
+	CPoint3D src_vec;
+	Matrix4D rotmat;
+	Frame *lFrame = mMainData->cFrame;
+
+	lFrame->GetAtomPosition(src_atom, atom_pos);
+	lFrame->GetAtomPosition(dst_atom, origin);
+
+	// We want to rotate the selected set so that the dragged-to
+	// bonding site will meet up with the dragged-from bonding
+	// site.  So, we need a rotation matrix that will make these
+	// sites point to each other.  To compute that with 
+	// SetRotationMatrix, which makes vectors point in the same
+	// direction, we have to invert one of them.
+	MolWin->DrawBondingSites(src_atom, 0, NULL, src_site + 1, &src_vec);
+	MolWin->DrawBondingSites(dst_atom, 0, NULL, dst_site + 1, &dst_vec);
+	src_vec *= -1.0f;
+	SetRotationMatrix(rotmat, &src_vec, &dst_vec);
+
+	// We translate each selected atom by the distance between
+	// the bond offset and the dragged-to atom.
+	offset = origin - atom_pos +
+		dst_vec * 0.01 *
+		(Prefs->GetAtomSize(lFrame->GetAtomType(src_atom) - 1) +
+		 Prefs->GetAtomSize(lFrame->GetAtomType(dst_atom) - 1));
+
+	// We rotate the selected the atoms using the dragged-to atom
+	// as the origin.  The rotation is done first, and then the
+	// translation.
+	origin = atom_pos;
+	MolWin->CreateFrameSnapShot();
+	for (int i = 0; i < lFrame->NumAtoms; i++) {
+		if (lFrame->GetAtomSelection(i)) {
+			lFrame->GetAtomPosition(i, atom_pos);
+			atom_pos = (atom_pos) - origin;
+			Rotate3DPt(rotmat, atom_pos, &new_atom_pos);
+			new_atom_pos += origin;
+			lFrame->SetAtomPosition(i, new_atom_pos + offset);
+		}
+	}
+}
+
 #if wxCHECK_VERSION(2, 8, 0)
 void MpGLCanvas::eventMouseCaptureLost(wxMouseCaptureLostEvent& event) {
 	ReleaseMouse();
@@ -2850,6 +2886,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_To_Aromatic_Bond, MpGLCanvas::ChangeBonding)
 	EVT_MENU(GL_Popup_To_Hydrogen_Bond, MpGLCanvas::ChangeBonding)
 	EVT_MENU(GL_Popup_Delete_Bond, MpGLCanvas::DeleteBond)
+	EVT_MENU(GL_Popup_Add_Plane_Normal, MpGLCanvas::AddPlaneNormal)
 	EVT_MENU(GL_Popup_Measure_Length, MpGLCanvas::AddAnnotation)
 	EVT_MENU(GL_Popup_Measure_Angle, MpGLCanvas::AddAnnotation)
 	EVT_MENU(GL_Popup_Measure_Dihedral, MpGLCanvas::AddAnnotation)
