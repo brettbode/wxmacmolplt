@@ -1171,6 +1171,8 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		// of bringing the window to focus, we don't add anything.
 		if (MolWin->InEditMode() && !ignore_next_up) {
 
+			testPicking(curr_mouse.x, curr_mouse.y);
+
 			// If no periodic table is shown or an atom is not selected, but
 			// the user seems to be trying to add an atom, give them a message.
 			if (build_palette == NULL) {
@@ -1212,7 +1214,39 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					MolWin->AdjustMenus();
 					MolWin->ContentChanged();
 				} else {
-					MolWin->SetStatusText(wxT("Structures cannot be dropped in directly to a bonding site."));
+					// MolWin->SetStatusText(wxT("Structures cannot be dropped in directly to a bonding site.")); 
+					mpAtom *new_atom;
+					int prev_natoms = lFrame->NumAtoms;
+					Structure *structure;
+
+					structure = build_palette->GetSelectedStructure();
+
+					lFrame->resetAllSelectState();
+					MolWin->SetHighliteMode(true);
+					for (int i = 0; i < structure->natoms; i++) {
+						new_atom = new mpAtom(structure->atoms[i]);
+						lFrame->AddAtom(*new_atom, lFrame->NumAtoms);
+						lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
+					}
+					MolWin->AtomsChanged();
+
+					Bond *bond;
+					bool result;
+					for (int i = 0; i < structure->nbonds; i++) {
+						bond = &structure->bonds[i];
+						result = lFrame->AddBond(bond->Atom1 + prev_natoms,
+										bond->Atom2 + prev_natoms,
+										bond->Order);
+					}
+
+					ConnectSelectedToSite(lFrame->NumAtoms - 1, 1,
+										  selected, selected_site);
+
+					lFrame->AddBond(selected, lFrame->NumAtoms - 1,
+									kSingleBond);
+
+					MolWin->BondsChanged();
+					MolWin->SelectionChanged(true);
 				}
 
 			}
@@ -2847,6 +2881,11 @@ void MpGLCanvas::ConnectSelectedToSite(int src_atom, int src_site,
 	}
 }
 
+void MpGLCanvas::OnIdleEvent(wxIdleEvent& event) {
+	draw();
+	event.RequestMore();
+}
+
 #if wxCHECK_VERSION(2, 8, 0)
 void MpGLCanvas::eventMouseCaptureLost(wxMouseCaptureLostEvent& event) {
 	ReleaseMouse();
@@ -2854,6 +2893,7 @@ void MpGLCanvas::eventMouseCaptureLost(wxMouseCaptureLostEvent& event) {
 #endif
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
+	EVT_IDLE(MpGLCanvas::OnIdleEvent)
 	EVT_SIZE(MpGLCanvas::eventSize)
 	EVT_PAINT(MpGLCanvas::eventPaint)
 	EVT_ERASE_BACKGROUND(MpGLCanvas::eventErase)

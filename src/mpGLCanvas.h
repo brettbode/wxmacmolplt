@@ -156,6 +156,7 @@ class MpGLCanvas : public wxGLCanvas {
 		void AddPlaneNormal(wxCommandEvent& event);
 		void ConnectSelectedToSite(int src_atom, int src_site,
 								   int dst_atom, int dst_site);
+		void OnIdleEvent(wxIdleEvent& event);
 
 	public:
 		/**
