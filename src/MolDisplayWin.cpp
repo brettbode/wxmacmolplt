@@ -2124,6 +2124,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 		struc->atoms = new mpAtom[struc->natoms];
 		new_ids = new int[frame->NumAtoms];
 
+		si = 0;
 		for (ai = 0; ai < frame->NumAtoms; ai++) {
 			if (frame->GetAtomSelection(ai)) {
 				struc->atoms[si] = atoms[ai];
@@ -2142,7 +2143,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 				new_bond = Bond(bonds[bi]);
 				new_bond.Atom1 = new_ids[new_bond.Atom1];
 				new_bond.Atom2 = new_ids[new_bond.Atom2];
-				new_bonds.push_back(bonds[bi]);
+				new_bonds.push_back(new_bond);
 			}
 		}
 
