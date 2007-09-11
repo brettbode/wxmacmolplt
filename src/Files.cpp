@@ -2532,7 +2532,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				ProgressInd->ChangeText("Reading localized orbitals");
 				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 					{ throw UserCancel();}
-				OrbitalRec * OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), NumOccAlpha,
+				OrbitalRec * OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
 					NumBetaUHFOrbs, ProgressInd, false);
 				if (OrbSet != NULL) {
 					OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
@@ -2547,7 +2547,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 					ProgressInd->ChangeText("Reading oriented localized orbitals");
 					if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 						{ throw UserCancel();}
-					OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), NumOccAlpha,
+					OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
 						NumBetaUHFOrbs, ProgressInd, true);
 					if (OrbSet != NULL) {
 						OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
