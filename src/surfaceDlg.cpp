@@ -1982,6 +1982,7 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event )
 
   if (PlotOrb >= 0) 
     {	//Don't update unless a valid orbital is chosen
+	  if (TargetSet != mTarget->GetTargetSet()) updateGrid = true;
       if (PlotOrb != mTarget->GetTargetOrb()) updateGrid=true;
       if (SphericalHarmonics != mTarget->UseSphericalHarmonics()) updateGrid = true;
       if (OrbOptions != mTarget->GetOptions()) updateGrid = true;
