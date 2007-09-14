@@ -80,26 +80,26 @@ BEGIN_EVENT_TABLE( Orbital2DSurfPane, wxPanel )
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
-  EVT_CHOICE  (ID_ORB_FORMAT_CHOICE,  Orbital3DSurfPane::OnOrbFormatChoice)
-  EVT_CHOICE  (ID_ORB_CHOICE, Orbital3DSurfPane::OnOrbSetChoice)
-  EVT_LISTBOX (ID_ATOM_LIST, Orbital3DSurfPane::OnAtomList)
-  EVT_LISTBOX (ID_ORB_COEF, Orbital3DSurfPane::OnCoefList)
-  EVT_CHECKBOX (ID_SPH_HARMONICS_CHECKBOX, Orbital3DSurfPane::OnSphHarmonicChk)
-  EVT_RADIOBOX (ID_3D_RADIOBOX, Surface3DPane::On3DRadioBox)
-  EVT_CHECKBOX (ID_SMOOTH_CHECKBOX, Surface3DPane::OnSmoothCheck)
-  EVT_CHECKBOX (ID_REVERSE_PHASE_CHECKBOX, Orbital3DSurfPane::OnReversePhase)
-  EVT_SLIDER (ID_CONTOUR_VALUE_SLIDER, Orbital3DSurfPane::OnContourValueSld)
-  EVT_SLIDER (ID_GRID_SIZE_SLIDER, Orbital3DSurfPane::OnGridSizeSld)
-  EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
-  EVT_BUTTON (ID_SURFACE_UPDATE_BUT, Orbital3DSurfPane::OnUpdate)
-  EVT_TEXT_ENTER (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
-  EVT_BUTTON (ID_SET_PARAM_BUT, Surface3DPane::OnSetParam)
-  EVT_BUTTON (ID_FREE_MEM_BUT, Surface3DPane::OnFreeMem)
-  EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
-  EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
-  EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
-  EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
-  EVT_IDLE(Surface3DPane::OnIdle)
+	EVT_CHOICE  (ID_ORB_FORMAT_CHOICE,  Orbital3DSurfPane::OnOrbFormatChoice)
+	EVT_CHOICE  (ID_ORB_CHOICE, Orbital3DSurfPane::OnOrbSetChoice)
+	EVT_LISTBOX (ID_ATOM_LIST, Orbital3DSurfPane::OnAtomList)
+	EVT_LISTBOX (ID_ORB_COEF, Orbital3DSurfPane::OnCoefList)
+	EVT_CHECKBOX (ID_SPH_HARMONICS_CHECKBOX, Orbital3DSurfPane::OnSphHarmonicChk)
+	EVT_RADIOBOX (ID_3D_RADIOBOX, Surface3DPane::On3DRadioBox)
+	EVT_CHECKBOX (ID_SMOOTH_CHECKBOX, Surface3DPane::OnSmoothCheck)
+	EVT_CHECKBOX (ID_REVERSE_PHASE_CHECKBOX, Orbital3DSurfPane::OnReversePhase)
+	EVT_SLIDER (ID_CONTOUR_VALUE_SLIDER, Orbital3DSurfPane::OnContourValueSld)
+	EVT_SLIDER (ID_GRID_SIZE_SLIDER, Orbital3DSurfPane::OnGridSizeSld)
+	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
+	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, Orbital3DSurfPane::OnUpdate)
+	EVT_TEXT_ENTER (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
+	EVT_BUTTON (ID_SET_PARAM_BUT, Surface3DPane::OnSetParam)
+	EVT_BUTTON (ID_FREE_MEM_BUT, Surface3DPane::OnFreeMem)
+	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
+	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
+	EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
+	EVT_IDLE(Surface3DPane::OnIdle)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE( General3DSurfPane, wxPanel )
@@ -1478,6 +1478,12 @@ void Orbital2DSurfPane::OnOrbSetChoice( wxCommandEvent &event ) {
 	vector<wxString> choice;
 	makeAOList(choice);
 	mOrbCoef->Set(choice.size(), &choice.front());
+
+	if (!coefIsEnabled) {
+		mAtomList->SetFocus();
+	} else {
+		mOrbCoef->SetFocus();
+	}
 }
 
 void Orbital2DSurfPane::OnCoefList( wxCommandEvent &event )
@@ -1801,6 +1807,7 @@ void Orbital3DSurfPane::CreateControls()
   mSubRightBot5Sizer->Add(mExportBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   mSubRightBot5Sizer->Add(mFreeMemBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
   mSubRightBot5Sizer->Add(mUpdateBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+  mUpdateBut->SetDefault();
 
   rightBottomSizer->Add(mSubRightBot0Sizer);
   rightBottomSizer->Add(20, 20);
@@ -1914,6 +1921,12 @@ void Orbital3DSurfPane::OnOrbSetChoice( wxCommandEvent &event ) {
 	vector<wxString> choice;
 	makeAOList(choice);
 	mOrbCoef->Set(choice.size(), &choice.front());
+
+	if (!coefIsEnabled) {
+		mAtomList->SetFocus();
+	} else {
+		mOrbCoef->SetFocus();
+	}
 }
 
 void Orbital3DSurfPane::OnCoefList( wxCommandEvent &event ) {
@@ -1975,180 +1988,164 @@ void Orbital3DSurfPane::OnGridSizeSld(wxCommandEvent &event )
   setUpdateButton();
 }
 
-void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event )
-{
-  bool updateGrid=UpdateTest;
-  bool updateContour=false;
-
-  if (PlotOrb >= 0) 
-    {	//Don't update unless a valid orbital is chosen
-	  if (TargetSet != mTarget->GetTargetSet()) updateGrid = true;
-      if (PlotOrb != mTarget->GetTargetOrb()) updateGrid=true;
-      if (SphericalHarmonics != mTarget->UseSphericalHarmonics()) updateGrid = true;
-      if (OrbOptions != mTarget->GetOptions()) updateGrid = true;
-      if (NumGridPoints != mTarget->GetNumGridPoints()) updateGrid = true;
-      if (ContourValue != mTarget->GetContourValue()) updateContour = true;
-      if (GridSize != mTarget->GetGridSize()) updateGrid = true;
-      if (PhaseChange != mTarget->GetPhaseChange()) updateGrid = true;
-    }
-
-  if (SwitchFixGrid) 
-    {
-      mTarget->SetFixGrid(false);
-      SwitchFixGrid = false;
-      updateGrid = true;
-    }
-
-  if (Visible && !mTarget->ContourAvail()) updateContour = true;
-  //test to see if grid or contour must calculated anyway
-  if (updateContour && ! mTarget->GridAvailable()) updateGrid = true;
-  if (updateGrid) updateContour = true;
-
-  mTarget->SetVisibility(Visible);
-  mTarget->SolidSurface(UseSolidSurface);
-  mTarget->SetNumGridPoints(NumGridPoints);
-  mTarget->SetContourValue(ContourValue);
-  mTarget->SetGridSize(GridSize);
-  mTarget->SetPosColor(&PosColor);
-  mTarget->SetNegColor(&NegColor);
-  mTarget->SetTranspColor(&TranspColor);
-  mTarget->SetPhaseChange(PhaseChange);
-  mTarget->UseSurfaceNormals(UseNormals);
-  mTarget->UseSphericalHarmonics(SphericalHarmonics);
-
-  OrbSurfacePane::UpdateEvent();
+void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event ) {
+	bool updateGrid=UpdateTest;
+	bool updateContour=false;
   
-  MoleculeData * mData = owner->GetMoleculeData();
+	wxWindow * focusWindow = wxWindow::FindFocus();
 
-  //update this surface's data on all frames if necessary
-  if (AllFrames != (mTarget->GetSurfaceID() != 0)) 
-    {	//update all frames
-      long	SurfaceID;
-      Frame *	lFrame = mData->GetFirstFrame();
-      updateGrid = updateContour = true;
-      if (AllFrames) 
-	{	//adding the surface to all frames
-	  SurfaceID = mTarget->SetSurfaceID();
-	  while (lFrame) 
-	    {
-	      if (lFrame != mData->GetCurrentFramePtr()) 
-		{
-		  Orb3DSurface * NewSurface = new Orb3DSurface(mTarget);
-		  lFrame->AppendSurface(NewSurface);
-		}
-	      lFrame = lFrame->GetNextFrame();
-	    }
-	} 
-      else 
-	{			//deleting the surface from other frames
-	  SurfaceID = mTarget->GetSurfaceID();
-	  mTarget->SetSurfaceID(0);	//Unmark this frames surface so it doesn't get deleted
-	  while (lFrame) 
-	    {
-	      lFrame->DeleteSurfaceWithID(SurfaceID);
-	      lFrame = lFrame->GetNextFrame();
-	    }
-	}
+	if (PlotOrb >= 0) {	//Don't update unless a valid orbital is chosen
+		if (TargetSet != mTarget->GetTargetSet()) updateGrid = true;
+		if (PlotOrb != mTarget->GetTargetOrb()) updateGrid=true;
+		if (SphericalHarmonics != mTarget->UseSphericalHarmonics()) updateGrid = true;
+		if (OrbOptions != mTarget->GetOptions()) updateGrid = true;
+		if (NumGridPoints != mTarget->GetNumGridPoints()) updateGrid = true;
+		if (ContourValue != mTarget->GetContourValue()) updateContour = true;
+		if (GridSize != mTarget->GetGridSize()) updateGrid = true;
+		if (PhaseChange != mTarget->GetPhaseChange()) updateGrid = true;
     }
 
-  Progress * lProgress = new Progress();
+	if (SwitchFixGrid) {
+		mTarget->SetFixGrid(false);
+		SwitchFixGrid = false;
+		updateGrid = true;
+    }
+
+	if (Visible && !mTarget->ContourAvail()) updateContour = true;
+	//test to see if grid or contour must calculated anyway
+	if (updateContour && ! mTarget->GridAvailable()) updateGrid = true;
+	if (updateGrid) updateContour = true;
+
+	mTarget->SetVisibility(Visible);
+	mTarget->SolidSurface(UseSolidSurface);
+	mTarget->SetNumGridPoints(NumGridPoints);
+	mTarget->SetContourValue(ContourValue);
+	mTarget->SetGridSize(GridSize);
+	mTarget->SetPosColor(&PosColor);
+	mTarget->SetNegColor(&NegColor);
+	mTarget->SetTranspColor(&TranspColor);
+	mTarget->SetPhaseChange(PhaseChange);
+	mTarget->UseSurfaceNormals(UseNormals);
+	mTarget->UseSphericalHarmonics(SphericalHarmonics);
+
+	OrbSurfacePane::UpdateEvent();
+
+	MoleculeData * mData = owner->GetMoleculeData();
+
+	//update this surface's data on all frames if necessary
+	if (AllFrames != (mTarget->GetSurfaceID() != 0)) {	//update all frames
+		long	SurfaceID;
+		Frame *	lFrame = mData->GetFirstFrame();
+		updateGrid = updateContour = true;
+		if (AllFrames) {	//adding the surface to all frames
+			SurfaceID = mTarget->SetSurfaceID();
+			while (lFrame) {
+				if (lFrame != mData->GetCurrentFramePtr()) {
+					Orb3DSurface * NewSurface = new Orb3DSurface(mTarget);
+					lFrame->AppendSurface(NewSurface);
+				}
+				lFrame = lFrame->GetNextFrame();
+			}
+		} else {			//deleting the surface from other frames
+			SurfaceID = mTarget->GetSurfaceID();
+			mTarget->SetSurfaceID(0);	//Unmark this frames surface so it doesn't get deleted
+			while (lFrame) {
+				lFrame->DeleteSurfaceWithID(SurfaceID);
+				lFrame = lFrame->GetNextFrame();
+			}
+		}
+	}
+
+	Progress * lProgress = new Progress();
 //  if (!lProgress) 
   //  cout<<"Cannot allocate the pregress bar!"<<endl;
 
-  if (AllFrames) 
-    {	//compute the contour for each frame, no grid is kept
-      long SurfaceID = mTarget->GetSurfaceID();
-      long CurrentFrame = mData->GetCurrentFrame();
-      long NumFrames = mData->GetNumFrames();
+	if (AllFrames) {	//compute the contour for each frame, no grid is kept
+		long SurfaceID = mTarget->GetSurfaceID();
+		long CurrentFrame = mData->GetCurrentFrame();
+		long NumFrames = mData->GetNumFrames();
 
-      for (int i=0; i<NumFrames; i++) 
-	{
-	  Orb3DSurface * lSurf;
-	  lSurf = NULL;
-	  mData->SetCurrentFrame(i+1);
-	  Frame * lFrame = mData->GetCurrentFramePtr();
+		for (int i=0; i<NumFrames; i++) {
+			Orb3DSurface * lSurf;
+			lSurf = NULL;
+			mData->SetCurrentFrame(i+1);
+			Frame * lFrame = mData->GetCurrentFramePtr();
 
-	  if (CurrentFrame != mData->GetCurrentFrame()) 
-	    {
-	      Surface * temp = lFrame->GetSurfaceWithID(SurfaceID);
-	      //Confirm that the surface is the correct type
+			if (CurrentFrame != mData->GetCurrentFrame()) {
+				Surface * temp = lFrame->GetSurfaceWithID(SurfaceID);
+				//Confirm that the surface is the correct type
 
-	      if (temp)
-		if (temp->GetSurfaceType() == kOrb3DType)
-		  lSurf = (Orb3DSurface *) temp;
+				if (temp)
+					if (temp->GetSurfaceType() == kOrb3DType)
+						lSurf = (Orb3DSurface *) temp;
 
-	      if (lSurf) lSurf->UpdateData(mTarget);
-	    } 
-	  else lSurf = mTarget;
+				if (lSurf) lSurf->UpdateData(mTarget);
+			} else lSurf = mTarget;
 
-	  if (lSurf) 
-	    {
-	      if (Visible) 
-		{
-		  lProgress->ChangeText("Calculating 3D Grid...");
-		  lProgress->SetBaseValue(100*i/NumFrames);
-		  lProgress->SetScaleFactor((float) 0.9/NumFrames);
-		  if (updateGrid) mTarget->CalculateMOGrid(mData, lProgress);
-		  lProgress->ChangeText("Contouring grid...");
-		  lProgress->SetBaseValue((long)(100*i/NumFrames + 90.0/NumFrames));
-		  lProgress->SetScaleFactor((float) 0.1/NumFrames);
-		  if (updateContour) mTarget->Contour3DGrid(lProgress);
-		  lSurf->FreeGrid();
-		} 
-	      else 
-		{
-		  if (updateGrid) mTarget->FreeGrid();
-		  if (updateContour) mTarget->FreeContour();
+			if (lSurf) {
+				if (Visible) {
+					lProgress->ChangeText("Calculating 3D Grid...");
+					lProgress->SetBaseValue(100*i/NumFrames);
+					lProgress->SetScaleFactor((float) 0.9/NumFrames);
+					if (updateGrid) mTarget->CalculateMOGrid(mData, lProgress);
+					lProgress->ChangeText("Contouring grid...");
+					lProgress->SetBaseValue((long)(100*i/NumFrames + 90.0/NumFrames));
+					lProgress->SetScaleFactor((float) 0.1/NumFrames);
+					if (updateContour) mTarget->Contour3DGrid(lProgress);
+					lSurf->FreeGrid();
+				} else {
+					if (updateGrid) mTarget->FreeGrid();
+					if (updateContour) mTarget->FreeContour();
+				}
+			}
 		}
-	    }
+		mData->SetCurrentFrame(CurrentFrame);
+	} else {	//simply update this surface
+		if (Visible) {
+			lProgress->ChangeText("Calculating 3D Grid...");
+			lProgress->SetScaleFactor(0.9);
+			if (updateGrid) mTarget->CalculateMOGrid(mData, lProgress);
+			lProgress->ChangeText("Contouring grid...");
+			lProgress->SetBaseValue(90);
+			lProgress->SetScaleFactor(0.1);
+			if (updateContour) mTarget->Contour3DGrid(lProgress);
+		} else {
+			if (updateGrid) mTarget->FreeGrid();
+			if (updateContour) mTarget->FreeContour();
+		}
 	}
-      mData->SetCurrentFrame(CurrentFrame);
-    } 
-  else 
-    {	//simply update this surface
-      if (Visible) 
-	{
-	  lProgress->ChangeText("Calculating 3D Grid...");
-	  lProgress->SetScaleFactor(0.9);
-	  if (updateGrid) mTarget->CalculateMOGrid(mData, lProgress);
-	  lProgress->ChangeText("Contouring grid...");
-	  lProgress->SetBaseValue(90);
-	  lProgress->SetScaleFactor(0.1);
-	  if (updateContour) mTarget->Contour3DGrid(lProgress);
-	} 
-      else 
-	{
-	  if (updateGrid) mTarget->FreeGrid();
-	  if (updateContour) mTarget->FreeContour();
-	}
-    }
-  if (lProgress) delete lProgress;
+	if (lProgress) delete lProgress;
 
-  if (mTarget->GridAvailable())
-    mFreeMemBut->Enable();
-  else
-    mFreeMemBut->Disable();
+	if (mTarget->GridAvailable())
+		mFreeMemBut->Enable();
+	else
+		mFreeMemBut->Disable();
 
-  float GridMax = mTarget->GetGridMax();
+	float GridMax = mTarget->GetGridMax();
 
-  wxString tmpStr;
-  tmpStr.Printf(wxT("%.4f"), GridMax);
-  mGridMaxText->SetLabel(tmpStr);
+	wxString tmpStr;
+	tmpStr.Printf(wxT("%.4f"), GridMax);
+	mGridMaxText->SetLabel(tmpStr);
 
-  setContourValueSld();
+	setContourValueSld();
 
 //Setup the contour value and grid max text items
 
-  UpdateTest = false;
+	UpdateTest = false;
 
-  if (mTarget->ExportPossible())
-    mExportBut->Enable();
-  else
-    mExportBut->Disable();
+	if (mTarget->ExportPossible())
+		mExportBut->Enable();
+	else
+		mExportBut->Disable();
 
-  mUpdateBut->Disable();
+	mUpdateBut->Disable();
 
-  owner->SurfaceUpdated();
+	owner->SurfaceUpdated();
+  
+	if (!coefIsEnabled)
+		mAtomList->SetFocus();
+	else
+		mOrbCoef->SetFocus();
 }
 
 bool Orbital3DSurfPane::ShowToolTips()
