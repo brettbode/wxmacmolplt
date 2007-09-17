@@ -42,6 +42,8 @@ class Structure {
 		Bond *bonds;
 		int nbonds;
 		wxString name;
+		int link_atom;
+		int link_site;
 
 		Structure();
 		~Structure();
@@ -66,9 +68,9 @@ class BuilderDlg: public wxMiniFrame {
 
 		void New(wxCommandEvent& WXUNUSED(event));
 		int GetSelectedElement(void) const;
-		Structure *GetSelectedStructure(void);
-		int GetNumStructures(void);
-		Structure *GetStructure(int i);
+		Structure *GetSelectedStructure(void) const;
+		int GetNumStructures(void) const;
+		Structure *GetStructure(int i) const;
 		short GetSelectedCoordination(void) const;
 		short GetSelectedLonePairCount(void) const;
 		static void NumberToTableCoords(int atomic_number, int *row, int *col);
@@ -77,8 +79,8 @@ class BuilderDlg: public wxMiniFrame {
 		bool InPeriodicMode(void) const;
 		void AddStructure(Structure *structure);
 
-		int GetNumUserStructures();
-		Structure *GetUserStructure(int i);
+		int GetNumUserStructures() const;
+		Structure *GetUserStructure(int i) const;
 
 	private:
 		void ElementSelected(wxCommandEvent& event);
@@ -88,6 +90,14 @@ class BuilderDlg: public wxMiniFrame {
 		void OnClose(wxCloseEvent& event);
 		wxPanel *GetPeriodicPanel(void);
 		wxPanel *GetStructuresPanel(void);
+		void SaveStructuresAs(wxCommandEvent& event);
+		void SaveStructures(wxCommandEvent& event);
+		long WriteCMLFile(BufferFile *Buffer) const;
+		long ReadCMLFile(BufferFile *Buffer);
+		void LoadStructures(wxCommandEvent& event);
+		void UpdateSaveStructures(wxUpdateUIEvent& event);
+		void UpdateDeleteStructure(wxUpdateUIEvent& event);
+		void DeleteStructure(wxCommandEvent& event);
 
 		short coordinationNumber[kNumTableElements];
 		short LonePairCount[kNumTableElements];
@@ -110,6 +120,9 @@ class BuilderDlg: public wxMiniFrame {
 		wxStaticText *lp_num_label;
 		int nglobal_structures;
 
+		bool structures_dirty;
+
+		wxString load_file_path;
 
 	DECLARE_DYNAMIC_CLASS(BuilderDlg)
 	DECLARE_EVENT_TABLE()

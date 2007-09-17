@@ -3,10 +3,10 @@
  *      see the LICENSE file in the top level directory
  */
 
-/*¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥
-  ¥   routines to implement OpenGL graphics	¥
-  ¥	  Brett Bode							¥
-  ¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥¥
+/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+  ï¿½   routines to implement OpenGL graphics	ï¿½
+  ï¿½	  Brett Bode							ï¿½
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	Added RotateMoleculeGL routine and code to generate the angle strings and trackball - BMB July 2001
 	Corrected Create3DGLPICT for resolutions other than 72 dpi - BMB Feb 2002
@@ -3873,6 +3873,11 @@ void DrawString(const char *str) {
 #define CYL_RADIUS 0.05f
 void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qobj, int site_id, CPoint3D * vector) {
 
+	// This function either draws remaining bonding sites for the specified
+	// atom or returns the vector along the atom's specified bonding site.  If
+	// site_vec is 0, drawing is done.  Otherwise, the normalized vector for
+	// the site_vec is returned.
+
 	Frame *	lFrame=MainData->cFrame;
 	mpAtom * lAtoms = lFrame->Atoms;
 	Bond * lBonds = lFrame->Bonds;
@@ -3887,6 +3892,8 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 	bonds.reserve(6);
 
+	if (coordination == 0) return;
+
 	// First we grab all bonds pertaining to the atom.  If the number of bonds
 	// exceeds five, then there's no point in showing any bonding sites since
 	// the atom is either full or overfull.
@@ -3896,14 +3903,14 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 			bonds.push_back(&lBonds[i]);
 
-			if (bonds.size() == 6) {
+			if (bonds.size() >= coordination) {
 				return;
 			}
 		}
 	}
 
 	// Test to see if any bond sites are unused, if not return.
-	if (bonds.size() >= coordination) return;
+	// if (bonds.size() >= coordination) return; 
 
 	// We sort the bonds by bond order, and figure out what the atom opposite
 	// this one is.  We'll need this info to find the vector between the two
@@ -3947,6 +3954,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 										   vec * 2.0f * radius, CYL_RADIUS, 10, 1, true); \
 				} else if (site_id == vec_site) { \
 					*vector = vec; \
+					return; \
 				}
 
 	// If we get here, we know that there are some unbonded sites.

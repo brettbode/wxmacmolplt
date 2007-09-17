@@ -10,15 +10,26 @@ extern BuilderDlg *build_palette;
 
 #define kPeriodicCoordinationChoice 13800
 #define kPeriodicLPChoice			13801
+#define kPeriodicSaveStructures     13802
+#define kPeriodicSaveStructuresAs   13803
+#define kPeriodicLoadStructures     13804
+#define kPeriodicDeleteStructure    13805
 
 IMPLEMENT_DYNAMIC_CLASS(BuilderDlg, wxMiniFrame)
 
 BEGIN_EVENT_TABLE(BuilderDlg, wxMiniFrame)
 	EVT_CHOICE(kPeriodicCoordinationChoice, BuilderDlg::OnCoordinationChoice)
 	EVT_CHOICE(kPeriodicLPChoice, BuilderDlg::OnLPChoice)
-	EVT_BUTTON(wxID_ANY, BuilderDlg::ElementSelected)
+	EVT_COMMAND_RANGE(0, kNumTableElements - 1, wxEVT_COMMAND_BUTTON_CLICKED,
+					  BuilderDlg::ElementSelected)
+	EVT_BUTTON(kPeriodicSaveStructures, BuilderDlg::SaveStructures)
+	EVT_BUTTON(kPeriodicSaveStructuresAs, BuilderDlg::SaveStructuresAs)
+	EVT_BUTTON(kPeriodicLoadStructures, BuilderDlg::LoadStructures)
+	EVT_BUTTON(kPeriodicDeleteStructure, BuilderDlg::DeleteStructure)
 	EVT_CHAR(BuilderDlg::KeyHandler)
 	EVT_CLOSE(BuilderDlg::OnClose)
+	EVT_UPDATE_UI(kPeriodicSaveStructures, BuilderDlg::UpdateSaveStructures)
+	EVT_UPDATE_UI(kPeriodicDeleteStructure, BuilderDlg::UpdateDeleteStructure)
 END_EVENT_TABLE()
 
 // --------------------------------------------------------------------------- 
@@ -38,6 +49,8 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	new_structure->atoms = atom;
 	new_structure->natoms = 1;
 	structures.push_back(new_structure);
+
+	structures_dirty = false;
 
 	nglobal_structures = structures.size();
 
@@ -238,29 +251,46 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 
 wxPanel *BuilderDlg::GetStructuresPanel(void) {
 
-	// wxPanel *panel2 = new wxPanel(tabs, wxID_ANY); 
 	wxPanel *panel = new wxPanel(tabs, wxID_ANY);
 	wxGridBagSizer *sizer = new wxGridBagSizer();
 
-	int lflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
-	int rflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
+	int lflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
+	int rflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
+	int cflags = wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL;
 
 	sizer->SetFlexibleDirection(wxHORIZONTAL);
-	sizer->SetCols(2);
-	sizer->SetRows(1);
+	sizer->SetCols(3);
+	sizer->SetRows(2);
 	sizer->AddGrowableCol(0, 1);
 	sizer->AddGrowableCol(1, 1);
 	
 	wxStaticText *label =
 		new wxStaticText(panel, wxID_ANY, wxT("Structure: "));
-	sizer->Add(label, wxGBPosition(0, 0), wxGBSpan(1, 1), lflags);
 	
-	mStructureChoice = new wxChoice(panel, wxID_ANY, wxPoint(-1, -1),
-									wxSize(-1, -1), 1,
-									&structures[0]->name);
+	mStructureChoice =
+		new wxChoice(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1), 1,
+					 &structures[0]->name);
 	mStructureChoice->SetSelection(0);
 
-	sizer->Add(mStructureChoice, wxGBPosition(0, 1), wxGBSpan(1, 1), rflags);
+	wxButton *save_button =
+		new wxButton(panel, kPeriodicSaveStructures, _("Save Structures"));
+
+	wxButton *save_as_button =
+		new wxButton(panel, kPeriodicSaveStructuresAs,
+					 _("Save Structures As"));
+
+	wxButton *load_button =
+		new wxButton(panel, kPeriodicLoadStructures, _("Load Structures"));
+
+	wxButton *delete_button =
+		new wxButton(panel, kPeriodicDeleteStructure, _("Delete Structure"));
+
+	sizer->Add(label, wxGBPosition(0, 0), wxGBSpan(1, 1), rflags);
+	sizer->Add(mStructureChoice, wxGBPosition(0, 1), wxGBSpan(1, 1), lflags);
+	sizer->Add(save_button, wxGBPosition(0, 2), wxGBSpan(1, 1), cflags | wxEXPAND);
+	sizer->Add(save_as_button, wxGBPosition(1, 2), wxGBSpan(1, 1), cflags | wxEXPAND);
+	sizer->Add(load_button, wxGBPosition(2, 2), wxGBSpan(1, 1), cflags | wxEXPAND);
+	sizer->Add(delete_button, wxGBPosition(3, 2), wxGBSpan(1, 1), cflags | wxEXPAND);
 
 	panel->SetSizerAndFit(sizer);
 	
@@ -282,7 +312,7 @@ BuilderDlg::~BuilderDlg() {
 		delete elements[i].on_bmp;
 	}
 
-	delete elements;
+	delete[] elements;
 
 	// element_label->Disconnect(wxEVT_CHAR, 
 		// wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); 
@@ -419,7 +449,7 @@ int BuilderDlg::GetSelectedElement(void) const {
 
 // --------------------------------------------------------------------------- 
 
-Structure *BuilderDlg::GetSelectedStructure(void) {
+Structure *BuilderDlg::GetSelectedStructure(void) const {
 
 	return structures[mStructureChoice->GetSelection()];
 
@@ -532,14 +562,37 @@ Structure::Structure() {
 
 Structure::~Structure() {
 
-	if (atoms) delete atoms;
-	if (bonds) delete bonds;
+	if (atoms) delete[] atoms;
+	if (bonds) delete[] bonds;
 
 }
 
 // --------------------------------------------------------------------------- 
 
 void BuilderDlg::AddStructure(Structure *structure) {
+
+	int i;
+	Bond *bond;
+
+	for (i = 0; i < structure->nbonds; i++) {
+		bond = &structure->bonds[i];
+		if (bond->Atom1 == structure->natoms - 1) {
+			structure->link_atom = bond->Atom2;
+			break;
+		} else if (bond->Atom2 == structure->natoms - 1) {
+			structure->link_atom = bond->Atom1;
+			break;
+		}
+	}
+
+	structure->link_site = 0;
+	for (i = 0; i < structure->nbonds; i++) {
+		bond = &structure->bonds[i];
+		if (bond->Atom1 == structure->link_atom ||
+			bond->Atom2 == structure->link_atom) {
+			structure->link_site++;
+		}
+	}
 
 	// std::cout << "*structure: " << *structure << std::endl; 
 	structures.push_back(structure);
@@ -550,11 +603,13 @@ void BuilderDlg::AddStructure(Structure *structure) {
 	// possibly longer label.  We force that expansion now.
 	mStructureChoice->SetSize(mStructureChoice->GetBestSize());
 
+	structures_dirty = true;
+
 }
 
 // --------------------------------------------------------------------------- 
 
-int BuilderDlg::GetNumStructures() {
+int BuilderDlg::GetNumStructures() const {
 	
 	return structures.size();
 
@@ -562,7 +617,7 @@ int BuilderDlg::GetNumStructures() {
 
 // --------------------------------------------------------------------------- 
 
-Structure *BuilderDlg::GetStructure(int i) {
+Structure *BuilderDlg::GetStructure(int i) const {
 
 	return structures[i];
 
@@ -570,7 +625,7 @@ Structure *BuilderDlg::GetStructure(int i) {
 
 // --------------------------------------------------------------------------- 
 
-int BuilderDlg::GetNumUserStructures() {
+int BuilderDlg::GetNumUserStructures() const {
 	
 	return structures.size() - nglobal_structures;
 
@@ -578,7 +633,7 @@ int BuilderDlg::GetNumUserStructures() {
 
 // --------------------------------------------------------------------------- 
 
-Structure *BuilderDlg::GetUserStructure(int i) {
+Structure *BuilderDlg::GetUserStructure(int i) const {
 
 	return structures[i + nglobal_structures];
 
@@ -604,6 +659,110 @@ std::ostream& operator<<(std::ostream& stream, const Structure& s) {
 	std::cout << "------------------------" << std::endl << std::endl;
 
 	return stream;
+
+}
+
+// --------------------------------------------------------------------------- 
+
+void BuilderDlg::SaveStructuresAs(wxCommandEvent& event) {
+
+	load_file_path = wxFileSelector(wxT("Save As"), wxT(""), wxT(""), wxT(""),
+									wxT("CML Files (*.cml)|*.cml"),
+									wxSAVE | wxOVERWRITE_PROMPT, this);
+
+	SaveStructures(event);
+
+}
+
+// --------------------------------------------------------------------------- 
+
+void BuilderDlg::SaveStructures(wxCommandEvent& event) {
+
+	FILE *save_file = NULL;
+	BufferFile *buffer = NULL;
+
+	if (!load_file_path.IsEmpty()) {
+		save_file = fopen(load_file_path.mb_str(wxConvUTF8), "w");
+		if (save_file == NULL) {
+			MessageAlert("Unable to access the file.");
+			return;
+		}
+
+		buffer = new BufferFile(save_file, true);
+		WriteCMLFile(buffer);
+
+		if (buffer) {
+			delete buffer;
+		}
+		fclose(save_file);
+
+		structures_dirty = false;
+	}
+
+}
+
+// --------------------------------------------------------------------------- 
+
+void BuilderDlg::LoadStructures(wxCommandEvent& event) {
+
+	FILE *load_file = NULL;
+	BufferFile *buffer = NULL;
+
+	load_file_path = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
+									wxT(""), wxT("CML Files (*.cml)|*.cml"));
+
+	if (structures.size() > nglobal_structures) {
+		structures.erase(structures.begin() + nglobal_structures,
+						 structures.end());
+	}
+
+	if (!load_file_path.IsEmpty()) {
+		load_file = fopen(load_file_path.mb_str(wxConvUTF8), "r");
+		if (load_file == NULL) {
+			MessageAlert("Unable to access the file.");
+			return;
+		}
+
+		buffer = new BufferFile(load_file, false);
+		ReadCMLFile(buffer);
+
+		if (buffer) {
+			delete buffer;
+		}
+
+		fclose(load_file);
+
+		structures_dirty = false;
+	}
+
+}
+
+// --------------------------------------------------------------------------- 
+
+void BuilderDlg::UpdateSaveStructures(wxUpdateUIEvent& event) {
+
+	event.Enable(structures_dirty);
+
+}
+
+// --------------------------------------------------------------------------- 
+
+void BuilderDlg::UpdateDeleteStructure(wxUpdateUIEvent& event) {
+
+	event.Enable(mStructureChoice->GetSelection() >= nglobal_structures);
+
+}
+
+// --------------------------------------------------------------------------- 
+
+void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
+
+	int id = mStructureChoice->GetSelection();
+
+	structures.erase(structures.begin() + id);
+	mStructureChoice->Delete(id);
+	mStructureChoice->SetSelection(0);
+	structures_dirty = true;
 
 }
 

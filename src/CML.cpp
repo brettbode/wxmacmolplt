@@ -42,6 +42,119 @@ extern BuilderDlg *build_palette;
 //Molecule can be extended via scalar, array, matrix, list and metadata
 //There appear to be types for atomic basis function, gradient and symmetry, but
 //not sure they do what I need.
+
+// --------------------------------------------------------------------------- 
+
+long BuilderDlg::WriteCMLFile(BufferFile *Buffer) const {
+
+	XMLSetup();
+	XMLDocument *xDoc = new XMLDocument(CML_convert(CMLElement), true, "CML uri");
+	XMLElement *xmlRoot = xDoc->getDocumentRoot();
+	xmlRoot->addAttribute("xmlns", "http://www.xml-cml.org/schema/cml2/core");
+
+	XMLElement *MetaDataListXML = xmlRoot->addChildElement(CML_convert(MetaDataListElement));
+	Structure *struc;
+	XMLElement *el = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
+	el->addAttribute(CML_convert(nameAttr), CML_convert(MMP_Structures));
+	for (int i = 0; i < build_palette->GetNumUserStructures(); i++) {
+		struc = GetUserStructure(i);
+		struc->WriteXML(el);
+	}
+
+	std::ostringstream CMLtext;
+	CMLtext << *xDoc;
+	delete xDoc;
+	XMLShutdown();
+	Buffer->Write(CMLtext.str().c_str(), CMLtext.str().length()); 
+	return CMLtext.str().length();
+
+}
+
+// --------------------------------------------------------------------------- 
+
+long BuilderDlg::ReadCMLFile(BufferFile *Buffer) {
+
+	short errors = 0;
+	long result = 0;
+	long fsize = Buffer->GetFileSize();
+	char *xmlbuffer = new char[fsize + 1];
+
+	Buffer->SetFilePos(0);
+	Buffer->Read(xmlbuffer, fsize);
+	XMLSetup();
+	XMLDocument *xDoc = NULL;
+
+	try {
+		xDoc = new XMLDocument(xmlbuffer, fsize, true);
+		if (xDoc->parse()) {
+			XMLElement *root = xDoc->getDocumentRoot();
+			CML_Element rootname;
+			if (CML_convert(root->getName(), rootname)) {
+
+				if (rootname != CMLElement) {
+					throw 1;
+				}
+
+				XMLElement *child = root->getFirstChild();
+				CML_Element elName;
+				CML_convert(child->getName(), elName);
+
+				if (elName != MetaDataListElement) {
+					throw 1;
+				}
+
+				XMLElement * mdchild = child->getFirstChild();
+				if (mdchild != NULL) {
+					const char *name = mdchild->getAttributeValue(CML_convert(nameAttr));
+					if (name) {
+						MMP_MetadataNamespace attr;
+						CML_convert(name, attr);
+						if (attr != MMP_Structures) {
+							throw 1;
+						}
+
+						XMLElement *struc_el = mdchild->getFirstChild();
+						Structure *struc;
+						while (struc_el) {
+							if (struc_el->isName(kStructureXML)) {
+								struc = new Structure;
+								if (struc->ReadXML(struc_el)) {
+									build_palette->AddStructure(struc);
+								} else {
+									delete struc;
+								}
+							}
+							struc_el = struc_el->getNextChild();
+						}
+					}
+				}
+
+			} else {
+				MessageAlert("Unable to parse XML.");
+				errors++;
+			}
+		} else {
+			errors++;
+			MessageAlert("An error occurred in parsing the structures file.");
+		}
+		delete xDoc;
+	} catch (...) {
+		if (xDoc) delete xDoc;
+		MessageAlert("XML Exception");
+		errors++;
+	}
+
+	XMLShutdown();
+	if (errors > 0){
+		result = 0;
+	}
+
+	return result;
+
+}
+
+// --------------------------------------------------------------------------- 
+
 long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData *wData, 
 								bool allFrames, bool AllData) {
 	XMLSetup();
@@ -191,6 +304,7 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 	Buffer->Write(CMLtext.str().c_str(), CMLtext.str().length()); 
 	return CMLtext.str().length();
 }
+
 void WindowData::WriteXML(XMLElement * parent) const {
 	XMLElement * t = parent->addChildElement(CML_convert(MMP_WinDataMolWin));
 	t->addwxRectAttribute(MolWinRect);
@@ -812,6 +926,7 @@ void Structure::WriteXML(XMLElement *parent) const {
 	XMLElement *atoms_el = struc_el->addChildElement("atoms");
 	atoms_el->addAttribute(CML_convert(sizeAttr), natoms);
 
+	// Export all atoms.
 	XMLElement *atom_el;
 	for (i = 0; i < natoms; i++) {
 		atom_el = atoms_el->addChildElement("atom");
@@ -836,6 +951,7 @@ void Structure::WriteXML(XMLElement *parent) const {
 		atom_el->addAttribute(CML_convert(lonePairCountAttr), line);
 	}
 
+	// Export all bonds.
 	XMLElement *bonds_el = struc_el->addChildElement("bonds");
 	bonds_el->addAttribute(CML_convert(sizeAttr), nbonds);
 

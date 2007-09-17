@@ -1214,7 +1214,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					MolWin->AdjustMenus();
 					MolWin->ContentChanged();
 				} else {
-					// MolWin->SetStatusText(wxT("Structures cannot be dropped in directly to a bonding site.")); 
+
 					mpAtom *new_atom;
 					int prev_natoms = lFrame->NumAtoms;
 					Structure *structure;
@@ -1223,7 +1223,10 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 					lFrame->resetAllSelectState();
 					MolWin->SetHighliteMode(true);
-					for (int i = 0; i < structure->natoms; i++) {
+					
+					// Add all atoms but the last one, which we remove to get an empty
+					// bonding site.
+					for (int i = 0; i < structure->natoms - 1; i++) {
 						new_atom = new mpAtom(structure->atoms[i]);
 						lFrame->AddAtom(*new_atom, lFrame->NumAtoms);
 						lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
@@ -1239,10 +1242,16 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 										bond->Order);
 					}
 
-					ConnectSelectedToSite(lFrame->NumAtoms - 1, 1,
+					lFrame->DeleteAtom(lFrame->NumAtoms - 1);
+
+					std::cout << "prev_natoms: " << prev_natoms << std::endl;
+					std::cout << "structure->link_atom: " << structure->link_atom << std::endl;
+					ConnectSelectedToSite(prev_natoms + structure->link_atom,
+										  structure->link_site - 1,
 										  selected, selected_site);
 
-					lFrame->AddBond(selected, lFrame->NumAtoms - 1,
+					lFrame->AddBond(selected,
+									prev_natoms + structure->link_atom,
 									kSingleBond);
 
 					MolWin->BondsChanged();
@@ -1294,9 +1303,14 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						double atom_depth;
 						mpAtom *new_atom;
 
+						// The placement of the structure will be at the mouse
+						// x,y coordinates in object space, with the z 
+						// coordinate set to origin's depth.
 						findWinCoord(pos.x, pos.y, pos.z,
 									 mouse_x, mouse_y, atom_depth);
-						findReal3DCoord(curr_mouse.x, curr_mouse.y, atom_depth,
+						double tmp, center_depth;
+						findWinCoord(0.0, 0.0, 0.0, tmp, tmp, center_depth);
+						findReal3DCoord(curr_mouse.x, curr_mouse.y, center_depth,
 										mouse_x, mouse_y, mouse_z);
 						mouse_pos = CPoint3D(mouse_x, mouse_y, mouse_z);
 						offset = mouse_pos - pos;
@@ -2893,7 +2907,7 @@ void MpGLCanvas::eventMouseCaptureLost(wxMouseCaptureLostEvent& event) {
 #endif
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
-	EVT_IDLE(MpGLCanvas::OnIdleEvent)
+	// EVT_IDLE(MpGLCanvas::OnIdleEvent) 
 	EVT_SIZE(MpGLCanvas::eventSize)
 	EVT_PAINT(MpGLCanvas::eventPaint)
 	EVT_ERASE_BACKGROUND(MpGLCanvas::eventErase)
