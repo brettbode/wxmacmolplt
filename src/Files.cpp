@@ -1379,7 +1379,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 	if (Buffer->LocateKeyWord("[ATOMS]", 7, -1)) {
 		float unitConv = 1.0;	//default to angstroms
 		Buffer->GetLine(LineText);
-		if (FindKeyWord(LineText, "AU", 2) > 0) unitConv = kAng2BohrConversion;
+		if (FindKeyWord(LineText, "AU", 2) > 0) unitConv = kBohr2AngConversion;
 		if (lFrame->NumAtoms > 0) lFrame = MainData->AddFrame(lFrame->NumAtoms, 0);
 		//ugh why does everybody have to create their own cartesian format...
 		Buffer->GetLine(LineText);
@@ -1390,6 +1390,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 			//name # atomic_# x y z
 			int count = sscanf(LineText, "%s %ld %ld %f %f %f", token, &junk, &atomNum,
 							   &(pos.x), &(pos.y), &(pos.z));
+			pos *= unitConv;
 			if ((count == 6)&&((atomNum>0)&&(atomNum<120))) {
 				lFrame->AddAtom(atomNum, pos);
 			} else {
