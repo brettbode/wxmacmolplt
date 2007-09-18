@@ -22,7 +22,6 @@
 
 ////@begin includes
 #include "wx/frame.h"
-//#include "wx/notebook.h"
 ////@end includes
 
 /*!
@@ -62,8 +61,9 @@ class wxListbookEvent;
 #endif
   
 
-/*!
- * SurfacesWindow class declaration
+/**
+ * SurfacesWindow class declaration. The surfaces window consists mainly of a listbook that
+ * contains one page for each surface. The surface panes (pages of the book) do most of the work.
  */
 
 class SurfacesWindow: public wxFrame
@@ -112,7 +112,7 @@ public:
 		//surface title to update and the main display to redraw.
 	void SurfaceUpdated(void);
 	
-		//Called when the list book page gets changed 
+		/// Called when the list book page gets changed.
 	void OnPageChanged(wxListbookEvent & event);
 	void OnTitleChanged(wxCommandEvent& event );
 	void OnVisibleCheck( wxCommandEvent& event );

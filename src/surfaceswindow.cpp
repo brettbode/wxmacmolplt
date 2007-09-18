@@ -451,23 +451,23 @@ void SurfacesWindow::OnPageChanged(wxListbookEvent & event) {
 	wxString temp(_("No surface chosen."));
 	BaseSurfacePane* tempPane = (BaseSurfacePane * ) listBook->GetCurrentPage();
 	if (tempPane) {
-	  //GetSizer()->Fit(this);
-	  MainPanel->Fit();
-	  Fit();
+		//GetSizer()->Fit(this);
+		MainPanel->Fit();
+		Fit();
 
-	  Surface * tempSurf = tempPane->GetTargetSurface();
-	  wxString t2(tempSurf->GetLabel(), wxConvUTF8);
-	  temp = t2;
-	  visibleCheck->SetValue(tempPane->GetVisibility());
+		Surface * tempSurf = tempPane->GetTargetSurface();
+		wxString t2(tempSurf->GetLabel(), wxConvUTF8);
+		temp = t2;
+		visibleCheck->SetValue(tempPane->GetVisibility());
 
-	  int surfType = tempSurf->GetSurfaceType();
-	  if ( surfType == kGeneral2DSurface || surfType == kGeneral3DSurface)
-	    allFrameCheck->Disable();
-	  else
-	    {
-	      allFrameCheck->Enable();
-	      allFrameCheck->SetValue(tempPane->GetAllFrames());
-	    }
+		int surfType = tempSurf->GetSurfaceType();
+		if ( surfType == kGeneral2DSurface || surfType == kGeneral3DSurface)
+			allFrameCheck->Disable();
+		else {
+			allFrameCheck->Enable();
+			allFrameCheck->SetValue(tempPane->GetAllFrames());
+		}
+		tempPane->PageIsNowActive();	//make sure the update button is the default
 	}
 	surfTitleEdit->SetValue(temp);
 }

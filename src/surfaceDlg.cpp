@@ -92,7 +92,7 @@ BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
 	EVT_SLIDER (ID_GRID_SIZE_SLIDER, Orbital3DSurfPane::OnGridSizeSld)
 	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, Orbital3DSurfPane::OnUpdate)
-	EVT_TEXT_ENTER (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
+	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
 	EVT_BUTTON (ID_SET_PARAM_BUT, Surface3DPane::OnSetParam)
 	EVT_BUTTON (ID_FREE_MEM_BUT, Surface3DPane::OnFreeMem)
 	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
@@ -110,8 +110,8 @@ BEGIN_EVENT_TABLE( General3DSurfPane, wxPanel )
 	EVT_RADIOBOX (ID_3D_RADIOBOX, Surface3DPane::On3DRadioBox)
 	EVT_CHECKBOX (ID_SMOOTH_CHECKBOX, Surface3DPane::OnSmoothCheck)
 	EVT_SLIDER (ID_CONTOUR_VALUE_SLIDER, General3DSurfPane::OnContourValueSld)
-	EVT_TEXT_ENTER (ID_CONTOUR_VALUE_EDIT, General3DSurfPane::OnContourValueEnter)
-	EVT_TEXT_ENTER (ID_GENMULTEDIT, General3DSurfPane::OnMultValueEnter)
+	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
+	EVT_TEXT (ID_GENMULTEDIT, General3DSurfPane::OnMultValueEdit)
 	EVT_BUTTON (ID_FREE_MEM_BUT, Surface3DPane::OnFreeMem)
 	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
@@ -258,19 +258,21 @@ bool BaseSurfacePane::Create( wxWindow* parent, wxWindowID id, const wxPoint& po
  * leave the adding operation to the final classes
  */
 
-void BaseSurfacePane::CreateControls()
-{
-  mainSizer = new wxBoxSizer(wxVERTICAL);
+void BaseSurfacePane::CreateControls() {
+	mainSizer = new wxBoxSizer(wxVERTICAL);
 
-  SetSizer(mainSizer);
+	SetSizer(mainSizer);
 }
 
-void BaseSurfacePane::OnGridPointSld( wxCommandEvent &event )
-{
-  NumGridPoints = mNumGridPntSld->GetValue();
-  SwitchFixGrid = true;
+void BaseSurfacePane::PageIsNowActive(void) {
+	if (mUpdateBut) mUpdateBut->SetDefault();
+}
 
-  setUpdateButton();
+void BaseSurfacePane::OnGridPointSld( wxCommandEvent &event ) {
+	NumGridPoints = mNumGridPntSld->GetValue();
+	SwitchFixGrid = true;
+
+	setUpdateButton();
 }
 
 void BaseSurfacePane::OnExport( wxCommandEvent &event ) {
@@ -302,42 +304,34 @@ void BaseSurfacePane::OnExport( wxCommandEvent &event ) {
 }
 
 //Call to change the visibilty for the active surface
-void BaseSurfacePane::SetVisibility(bool state) 
-{
-  Visible = state;
+void BaseSurfacePane::SetVisibility(bool state) {
+	Visible = state;
 
-  setUpdateButton();
+	setUpdateButton();
 }
 
-void BaseSurfacePane::setAllFrames(bool state) 
-{
-  AllFrames = state;
+void BaseSurfacePane::setAllFrames(bool state) {
+	AllFrames = state;
 
-  setUpdateButton();
+	setUpdateButton();
 }
 
-void BaseSurfacePane::SetUpdateTest(bool test) 
-{
-  UpdateTest = test;
-	
-  if (test)
-    mUpdateBut->Enable();
-  else
-    mUpdateBut->Disable();
+void BaseSurfacePane::SetUpdateTest(bool test) {
+	UpdateTest = test;
+
+	if (test)
+		mUpdateBut->Enable();
+	else
+		mUpdateBut->Disable();
 
 }
 
-void BaseSurfacePane::setUpdateButton()
-{
-  if (UpdateNeeded())
-    mUpdateBut->Enable();
-  else
-    mUpdateBut->Disable();
+void BaseSurfacePane::setUpdateButton() {
+	if (UpdateNeeded())
+		mUpdateBut->Enable();
+	else
+		mUpdateBut->Disable();
 }
-
-//bool BaseSurfacePane::UpdateNeeded(void) {return false;}	//By default update is unavailable
-// maybe UpdateNeeded can be pure virtual
-
 
 OrbSurfacePane::OrbSurfacePane( OrbSurfBase* target, SurfacesWindow* o)
 {
@@ -1007,7 +1001,7 @@ void Surface3DPane::changeContourValue() {
 
 void Surface3DPane::OnContourValueEnter(wxCommandEvent& event )
 {
-  changeContourValue();
+	changeContourValue();
 }
 void Surface3DPane::SetContourValueText(void)
 {
@@ -2516,35 +2510,6 @@ void General3DSurfPane::OnContourPosNegCheck( wxCommandEvent &event )
 	refreshControls();
 	setUpdateButton();
 }
-void General3DSurfPane::OnContourValueEnter(wxCommandEvent& event )
-{
-	double newVal=0.0;
-	
-	if (mTarget->GetGridMax() > 0.000001 ) {
-		wxString tmpStr = mContourValueEdit->GetValue();
-		if (!tmpStr.ToDouble(&newVal)) {
-			tmpStr.Printf(wxT("%.4f"), ContourValue);
-			mContourValueEdit->SetValue(tmpStr);
-			return;
-		}
-		
-		if (ContourPosNeg && (newVal < 0.0)) newVal *= -1.0;
-		if (fabs(newVal) > mTarget->GetGridMax()) newVal = mTarget->GetGridMax();
-		ContourValue = newVal;
-
-		tmpStr.Printf(wxT("%.4f"), newVal);
-		mContourValueEdit->SetValue(tmpStr);
-		
-		float GridMax = mTarget->GetGridMax();
-		float GridMin = mTarget->GetGridMin();
-		if (ContourPosNeg) GridMin = 0.0;
-		float Range = GridMax - GridMin;
-		if (fabs(Range)< ContourValue) Range = ContourValue;
-		
-		mContourValSld->SetValue((short) (100*((ContourValue-GridMin)/Range)));
-    }
-	setUpdateButton();
-}
 void General3DSurfPane::OnContourValueSld(wxCommandEvent &event )
 {
 	float GridMax = mTarget->GetGridMax();
@@ -2561,16 +2526,15 @@ void General3DSurfPane::OnContourValueSld(wxCommandEvent &event )
 	
 	setUpdateButton();
 }
-void General3DSurfPane::OnMultValueEnter(wxCommandEvent& event )
-{
+void General3DSurfPane::OnMultValueEdit(wxCommandEvent& event ) {
 	double newVal=0.0;
 	wxString temp = mGenMultValue->GetValue();
 	
 	if (temp.ToDouble(&newVal)) {
 		MultValue = newVal;
 	}
-	temp.Printf(wxT("%.4f"), MultValue);
-	mGenMultValue->SetValue(temp);
+//	temp.Printf(wxT("%.4f"), MultValue);
+//	mGenMultValue->SetValue(temp);
 	setUpdateButton();
 }
 void General3DSurfPane::OnFileButton(wxCommandEvent& event ) {

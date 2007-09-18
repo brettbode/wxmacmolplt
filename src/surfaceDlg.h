@@ -138,65 +138,79 @@ class SurfacesWindow;
 #endif
 
 /*!
- * base class declaration
+ * The base class for all the surface types for the Surfaces Window ListBook.
+ * This class contains and manages the controls common to all surfaces such
+ * as title, visibility, update button, etc.
  */
 
 class BaseSurfacePane : public wxPanel
 {
-  DECLARE_CLASS(BaseSurfacePane)
+	DECLARE_CLASS(BaseSurfacePane)
 
- public:
+public:
 
-  BaseSurfacePane() {}
-  BaseSurfacePane( wxWindow* parent, Surface * target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
-  ~BaseSurfacePane();
+	BaseSurfacePane() {}
+	BaseSurfacePane( wxWindow* parent, Surface * target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+	~BaseSurfacePane();
 
-  bool Create( wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+	bool Create( wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
 
-  virtual void TargetToPane() = 0;
-  virtual void refreshControls() = 0;
-  virtual bool UpdateNeeded(void) = 0;
+	virtual void TargetToPane() = 0;	//< Call to update the display with new data in the target surface.
+	virtual void refreshControls() = 0;	//< Updates the control state, call when data changes.
+	virtual bool UpdateNeeded(void) = 0;	//< Should the update button be activated?
 
-  void SetVisibility(bool state);
-  void setAllFrames(bool state);
+	void SetVisibility(bool state);	//< Toggle the surface visibility.
+	void setAllFrames(bool state);	//< Should the surface be applied to all frames?
 
-  bool GetVisibility(void) const {return Visible;};
-  bool GetAllFrames(void) const {return AllFrames;};
+	bool GetVisibility(void) const {return Visible;};	//< Is the surface visible?
+	bool GetAllFrames(void) const {return AllFrames;};	//< Is the surface applies to all frames?
 
-  void SetUpdateTest(bool test);
-  void setUpdateButton();
-  Surface * GetTargetSurface(void) const {return mTarget;};
+	void SetUpdateTest(bool test);	//< Set flag to force an update (overrides the automatic tests).
+	void setUpdateButton();			//< Updates the state of the update button comparing the current and saved states.
+	/**
+		Call when the page becomes the active page. Right now this just makes sure the
+		update button is the default button.
+	 */
+	void PageIsNowActive(void);
+	Surface * GetTargetSurface(void) const {return mTarget;};	//< Return a pointer to the surface data.
 
-  void OnGridPointSld( wxCommandEvent &event );
-  void OnSetParam( wxCommandEvent &event );
-  void OnExport( wxCommandEvent &event );
-  void BuildOrbSetPopup(void);
-  void OnOrbSetChoice( wxCommandEvent &event );
+	void OnGridPointSld( wxCommandEvent &event );	//< Call back when the grid points slider is changed.
+	/**
+	 * Call back for the Set Param button.
+	 * Displays the appropriate surface parameters dialog.
+	 */
+	void OnSetParam( wxCommandEvent &event );
+	/**
+		Call back for the Export button.
+		Prompts the user for a file name, then exports the surface to that file.
+	 */
+	void OnExport( wxCommandEvent &event );
+	void BuildOrbSetPopup(void);
+	void OnOrbSetChoice( wxCommandEvent &event );
 
 protected:
-  wxBoxSizer* mainSizer;
+	wxBoxSizer* mainSizer;	//< A primary BoxSizer for the page.
 
-  wxSlider* mNumGridPntSld;
-  wxButton* mSetParamBut;
-  wxButton* mExportBut;
-  wxButton* mUpdateBut;
+	wxSlider* mNumGridPntSld;
+	wxButton* mSetParamBut;
+	wxButton* mExportBut;
+	wxButton* mUpdateBut;
 
-  bool Visible;
-  bool AllFrames;
-  bool UpdateTest;
-  long NumGridPoints;
-  bool SwitchFixGrid;
-  long TargetOrbSet;
-  wxChoice* mOrbSetChoice;
+	bool Visible;			//< Should the surface be visible?
+	bool AllFrames;			//< flag to apply the surface to all frames.
+	bool UpdateTest;		//< flag to force an update.
+	long NumGridPoints;
+	bool SwitchFixGrid;
+	long TargetOrbSet;
+	wxChoice* mOrbSetChoice;
 
-  SurfacesWindow * owner;
+	SurfacesWindow * owner;	//< Our parent window.
 
  private:
-  void CreateControls();
+	void CreateControls();	//< Create the controls (currently just the main sizer).
 
-  Surface* mTarget;
+	Surface* mTarget;	//< Pointer to the target surface.
 
-  //DECLARE_EVENT_TABLE()
 };
 
 class OrbSurfacePane
@@ -468,27 +482,6 @@ public:
    DECLARE_EVENT_TABLE()
 };
 
-/*class TEDensity2DSurfPane : public Surface2DPane
-{    
-  DECLARE_CLASS( TEDensity2DSurfPane )
-
- public:
-  TEDensity2DSurfPane() { }
-  TEDensity2DSurfPane( wxWindow* parent, TEDensity2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_TED2D_IDNAME, const wxPoint& pos = SYMBOL_TED2D_POSITION, const wxSize& size = SYMBOL_TED2D_SIZE, long style = SYMBOL_TED2D_STYLE );
-  ~TEDensity2DSurfPane();
-
-  virtual void TargetToPane();
-  virtual void refreshControls();
-
-  void CreateControls();
-
- private:
-  long	TargetOrbSet;
-
-  TEDensity2DSurface* mTarget;
-
-};*/
-
 class General3DSurfPane : public Surface3DPane
 {    
 	DECLARE_CLASS( General3DSurfPane )
@@ -515,16 +508,22 @@ public:
     static bool ShowToolTips();
 	
 private:
+	/// Do the displayed values differ from the saved values.
 	virtual bool UpdateNeeded(void);
 	
 	void OnMultCheck(wxCommandEvent &event);
 	void OnSquareCheck(wxCommandEvent &event);
 	void OnContourPosNegCheck(wxCommandEvent &event);
+	/// Call back function for when the file button is pressed.
+	
+	/// Prompts the user for the file and then attempts to read it in.
 	void OnFileButton(wxCommandEvent &event);
+	/// Call back function for when the Update button is pressed.
 	void OnUpdate(wxCommandEvent &event );
+	/// Call back function for changes in the counter value slider.
     void OnContourValueSld(wxCommandEvent &event );
-	void OnContourValueEnter(wxCommandEvent& event );
-	void OnMultValueEnter(wxCommandEvent& event );
+	/// Call back function for when the text field is changed.
+	void OnMultValueEdit(wxCommandEvent& event );
 	
     wxCheckBox* mMultCheck;
     wxTextCtrl* mGenMultValue;
