@@ -3959,8 +3959,6 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 	//First prompt the user for the file
 #ifdef __wxBuild__
     wxString filename = wxFileSelector(wxT("Choose a file containing the surface data."));
-    //We are looking for $ VEC groups. Scan to see how many are there. If more than 1 the user will
-    //have to choose.
 	FILE * myfile = NULL;
     if (!filename.empty()) {
         myfile = fopen(filename.mb_str(wxConvUTF8), "rb");
