@@ -277,15 +277,15 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 			wData->WriteXML(Ele);
 		}
 
-		if (build_palette->GetNumStructures()) {
-			Structure *struc;
-			XMLElement *el = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
-			el->addAttribute(CML_convert(nameAttr), CML_convert(MMP_Structures));
-			for (int i = 0; i < build_palette->GetNumUserStructures(); i++) {
-				struc = build_palette->GetUserStructure(i);
-				struc->WriteXML(el);
-			}
-		}
+		/* if (build_palette->GetNumStructures()) { */
+			/* Structure *struc; */
+			/* XMLElement *el = MetaDataListXML->addChildElement(CML_convert(MetaDataElement)); */
+			/* el->addAttribute(CML_convert(nameAttr), CML_convert(MMP_Structures)); */
+			/* for (int i = 0; i < build_palette->GetNumUserStructures(); i++) { */
+				/* struc = build_palette->GetUserStructure(i); */
+				/* struc->WriteXML(el); */
+			/* } */
+		/* } */
 	}
 	if (allFrames) {
 		Frame * lFrame;
@@ -1169,22 +1169,22 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 															InputOptions->ReadXML(mdchild);
 														}
 															break;
-														case MMP_Structures: {
-															XMLElement *struc_el = mdchild->getFirstChild();
-															Structure *struc;
-															while (struc_el) {
-																if (struc_el->isName(kStructureXML)) {
-																	struc = new Structure;
-																	if (struc->ReadXML(struc_el)) {
-																		build_palette->AddStructure(struc);
-																	} else {
-																		delete struc;
-																	}
-																}
-																struc_el = struc_el->getNextChild();
-															}
-															break;
-														}
+														/* case MMP_Structures: { */
+															/* XMLElement *struc_el = mdchild->getFirstChild(); */
+															/* Structure *struc; */
+															/* while (struc_el) { */
+																/* if (struc_el->isName(kStructureXML)) { */
+																	/* struc = new Structure; */
+																	/* if (struc->ReadXML(struc_el)) { */
+																		/* build_palette->AddStructure(struc); */
+																	/* } else { */
+																		/* delete struc; */
+																	/* } */
+																/* } */
+																/* struc_el = struc_el->getNextChild(); */
+															/* } */
+															/* break; */
+														/* } */
 														case MMP_Annotations:
 														{
 															XMLElement * AnnChild = mdchild->getFirstChild();
