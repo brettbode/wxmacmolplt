@@ -45,6 +45,7 @@ wxmacmolplt_SOURCES =                                  \
     build_palette.h            build_palette.cpp       \
     patterns.h                 Prefs.h                 \
                                PrefsPanes.h            \
+    preview_canvas.cpp         preview_canvas.h        \
     printoptions.cpp           printoptions.h          \
     Progress.cpp               Progress.h              \
     RysPolynomial.cpp          RysPolynomial.h         \

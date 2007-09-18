@@ -1,8 +1,9 @@
-#include "build_palette.h"
-#include "main.h"
 #include <iostream>
 
-#include <wx/gbsizer.h>
+#include "wx/sizer.h"
+
+#include "build_palette.h"
+#include "main.h"
 
 extern bool show_build_palette;
 extern WinPrefs * gPreferences;
@@ -14,6 +15,7 @@ extern BuilderDlg *build_palette;
 #define kPeriodicSaveStructuresAs   13803
 #define kPeriodicLoadStructures     13804
 #define kPeriodicDeleteStructure    13805
+#define kNotebookID                 13806
 
 IMPLEMENT_DYNAMIC_CLASS(BuilderDlg, wxMiniFrame)
 
@@ -28,8 +30,10 @@ BEGIN_EVENT_TABLE(BuilderDlg, wxMiniFrame)
 	EVT_BUTTON(kPeriodicDeleteStructure, BuilderDlg::DeleteStructure)
 	EVT_CHAR(BuilderDlg::KeyHandler)
 	EVT_CLOSE(BuilderDlg::OnClose)
+	EVT_UPDATE_UI(kPeriodicSaveStructuresAs, BuilderDlg::UpdateSaveStructuresAs)
 	EVT_UPDATE_UI(kPeriodicSaveStructures, BuilderDlg::UpdateSaveStructures)
 	EVT_UPDATE_UI(kPeriodicDeleteStructure, BuilderDlg::UpdateDeleteStructure)
+	EVT_NOTEBOOK_PAGE_CHANGED(kNotebookID, BuilderDlg::TabChanged)
 END_EVENT_TABLE()
 
 // --------------------------------------------------------------------------- 
@@ -55,7 +59,7 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	nglobal_structures = structures.size();
 
 	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
-	tabs = new wxNotebook(this, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1));
+	tabs = new wxNotebook(this, kNotebookID, wxPoint(-1, -1), wxSize(-1, -1));
 
 	wxPanel *solvents_panel = new wxPanel(tabs);
 
@@ -252,17 +256,20 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 wxPanel *BuilderDlg::GetStructuresPanel(void) {
 
 	wxPanel *panel = new wxPanel(tabs, wxID_ANY);
-	wxGridBagSizer *sizer = new wxGridBagSizer();
+	/* wxBoxSizer *buttons_sizer = new wxBoxSizer(wxVERTICAL); */
+
+	struc_sizer = new wxGridBagSizer();
 
 	int lflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
 	int rflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
 	int cflags = wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL;
 
-	sizer->SetFlexibleDirection(wxHORIZONTAL);
-	sizer->SetCols(3);
-	sizer->SetRows(2);
-	sizer->AddGrowableCol(0, 1);
-	sizer->AddGrowableCol(1, 1);
+	struc_sizer->SetFlexibleDirection(wxBOTH);
+	struc_sizer->SetCols(3);
+	struc_sizer->SetRows(5);
+	struc_sizer->AddGrowableCol(0, 1);
+	struc_sizer->AddGrowableCol(1, 1);
+	struc_sizer->AddGrowableRow(4, 1);
 	
 	wxStaticText *label =
 		new wxStaticText(panel, wxID_ANY, wxT("Structure: "));
@@ -285,15 +292,21 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	wxButton *delete_button =
 		new wxButton(panel, kPeriodicDeleteStructure, _("Delete Structure"));
 
-	sizer->Add(label, wxGBPosition(0, 0), wxGBSpan(1, 1), rflags);
-	sizer->Add(mStructureChoice, wxGBPosition(0, 1), wxGBSpan(1, 1), lflags);
-	sizer->Add(save_button, wxGBPosition(0, 2), wxGBSpan(1, 1), cflags | wxEXPAND);
-	sizer->Add(save_as_button, wxGBPosition(1, 2), wxGBSpan(1, 1), cflags | wxEXPAND);
-	sizer->Add(load_button, wxGBPosition(2, 2), wxGBSpan(1, 1), cflags | wxEXPAND);
-	sizer->Add(delete_button, wxGBPosition(3, 2), wxGBSpan(1, 1), cflags | wxEXPAND);
+	struc_sizer->Add(label, wxGBPosition(0, 0), wxGBSpan(1, 1), rflags);
+	struc_sizer->Add(mStructureChoice, wxGBPosition(0, 1), wxGBSpan(1, 1), lflags);
 
-	panel->SetSizerAndFit(sizer);
-	
+	struc_sizer->Add(save_button, wxGBPosition(0, 2), wxGBSpan(1, 1), wxEXPAND);
+	struc_sizer->Add(save_as_button, wxGBPosition(1, 2), wxGBSpan(1, 1), wxEXPAND);
+	struc_sizer->Add(load_button, wxGBPosition(2, 2), wxGBSpan(1, 1), wxEXPAND);
+	struc_sizer->Add(delete_button, wxGBPosition(3, 2), wxGBSpan(1, 1), wxEXPAND);
+
+	/* buttons_sizer->Add(save_button, wxEXPAND | cflags); */
+	/* buttons_sizer->Add(save_as_button, wxEXPAND | cflags); */
+	/* buttons_sizer->Add(load_button, wxEXPAND | cflags); */
+	/* buttons_sizer->Add(delete_button, wxEXPAND | cflags); */
+
+	panel->SetSizerAndFit(struc_sizer);
+
 	return panel;
 
 }
@@ -603,6 +616,9 @@ void BuilderDlg::AddStructure(Structure *structure) {
 	// possibly longer label.  We force that expansion now.
 	mStructureChoice->SetSize(mStructureChoice->GetBestSize());
 
+	// Select the just added structure.
+	mStructureChoice->SetSelection(mStructureChoice->GetCount() - 1);
+
 	structures_dirty = true;
 
 }
@@ -707,6 +723,7 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 
 	FILE *load_file = NULL;
 	BufferFile *buffer = NULL;
+	int i;
 
 	load_file_path = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
 									wxT(""), wxT("CML Files (*.cml)|*.cml"));
@@ -714,6 +731,9 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 	if (structures.size() > nglobal_structures) {
 		structures.erase(structures.begin() + nglobal_structures,
 						 structures.end());
+		for (i = nglobal_structures; i < mStructureChoice->GetCount(); i++) {
+			mStructureChoice->Delete(nglobal_structures);
+		}
 	}
 
 	if (!load_file_path.IsEmpty()) {
@@ -737,15 +757,39 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
+/**
+ * This function updates the Save Structures As button's enabled state.  It is
+ * only enabled when at least one user-defined structure has been created.
+ * @param event The update event sent in by wxWidgets.
+ */
+
+void BuilderDlg::UpdateSaveStructuresAs(wxUpdateUIEvent& event) {
+
+	event.Enable(GetNumUserStructures() > 0);
+
+}
+
+/* ------------------------------------------------------------------------- */
+/**
+ * This function updates the Save Structures button's enabled state.  It is
+ * only enabled when the structures come from an existing file and have been
+ * changed in some way.
+ * @param event The update event sent in by wxWidgets.
+ */
 
 void BuilderDlg::UpdateSaveStructures(wxUpdateUIEvent& event) {
 
-	event.Enable(structures_dirty);
+	event.Enable(!load_file_path.IsEmpty() && structures_dirty);
 
 }
 
 // --------------------------------------------------------------------------- 
+/**
+ * This function updates the Delete Structure button's enabled state.  It is
+ * only enabled when a non-system structure is selected.
+ * @param event The update event sent in by wxWidgets.
+ */
 
 void BuilderDlg::UpdateDeleteStructure(wxUpdateUIEvent& event) {
 
@@ -754,6 +798,12 @@ void BuilderDlg::UpdateDeleteStructure(wxUpdateUIEvent& event) {
 }
 
 // --------------------------------------------------------------------------- 
+/**
+ * This function handles clicks on the Delete Structure button.  The current
+ * non-system structure is deleted and the first structure in the list is
+ * selected in its place.
+ * @param event The click event sent in by wxWidgets.
+ */
 
 void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 
@@ -766,5 +816,24 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
+
+void BuilderDlg::TabChanged(wxNotebookEvent& event) {
+
+	if (event.GetOldSelection() == 1) {
+		delete canvas;
+	}
+
+	if (event.GetSelection() == 1) {
+		canvas = new PreviewCanvas(structures_panel);
+		struc_sizer->Add(canvas, wxGBPosition(1, 0), wxGBSpan(4, 2), wxEXPAND);
+		structures_panel->SetSizerAndFit(struc_sizer);
+		canvas->InitGL();
+		canvas->Render();
+		/* struc_sizer->Layout(); */
+	}
+
+}
+
+/* ------------------------------------------------------------------------- */
 

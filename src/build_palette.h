@@ -5,6 +5,7 @@
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif
+#include <wx/gbsizer.h>
 
 #include "wx/bitmap.h"
 #include "wx/image.h"
@@ -20,6 +21,7 @@
 #include "MyTypes.h"
 #endif
 #include "Prefs.h"
+#include "preview_canvas.h"
 
 #define kNumTableElements	112
 
@@ -96,8 +98,10 @@ class BuilderDlg: public wxMiniFrame {
 		long ReadCMLFile(BufferFile *Buffer);
 		void LoadStructures(wxCommandEvent& event);
 		void UpdateSaveStructures(wxUpdateUIEvent& event);
+		void UpdateSaveStructuresAs(wxUpdateUIEvent& event);
 		void UpdateDeleteStructure(wxUpdateUIEvent& event);
 		void DeleteStructure(wxCommandEvent& event);
+		void TabChanged(wxNotebookEvent& event);
 
 		short coordinationNumber[kNumTableElements];
 		short LonePairCount[kNumTableElements];
@@ -114,6 +118,7 @@ class BuilderDlg: public wxMiniFrame {
 		wxPanel *structures_panel;
 		wxChoice *mStructureChoice;
 		std::vector<Structure *> structures;
+		PreviewCanvas *canvas;
 
 		wxStaticText *element_label;
 		wxStaticText *coord_num_label;
@@ -121,6 +126,7 @@ class BuilderDlg: public wxMiniFrame {
 		int nglobal_structures;
 
 		bool structures_dirty;
+		wxGridBagSizer *struc_sizer;
 
 		wxString load_file_path;
 
