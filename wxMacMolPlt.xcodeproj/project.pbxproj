@@ -45,6 +45,9 @@
 		8B1DA4750A2E189B009DFD94 /* setPreference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4730A2E189B009DFD94 /* setPreference.cpp */; };
 		8B1DA4830A2E6A18009DFD94 /* frequenciesdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA47F0A2E6A17009DFD94 /* frequenciesdialog.cpp */; };
 		8B1DA4840A2E6A18009DFD94 /* myPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */; };
+		8B24B31E0CA0731B00E92838 /* preview_canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B24B31C0CA0731B00E92838 /* preview_canvas.cpp */; };
+		8B24B31F0CA0731B00E92838 /* preview_canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B24B31C0CA0731B00E92838 /* preview_canvas.cpp */; };
+		8B24B3200CA0731B00E92838 /* preview_canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B24B31C0CA0731B00E92838 /* preview_canvas.cpp */; };
 		8B279CFF0A4B6F0D00994DD5 /* colorArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF50A4B6F0D00994DD5 /* colorArea.cpp */; };
 		8B279D000A4B6F0D00994DD5 /* inputbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF70A4B6F0D00994DD5 /* inputbuilder.cpp */; };
 		8B279D010A4B6F0D00994DD5 /* surfaceDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */; };
@@ -511,6 +514,8 @@
 		8B1DA4800A2E6A17009DFD94 /* frequenciesdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = frequenciesdialog.h; path = src/frequenciesdialog.h; sourceTree = "<group>"; };
 		8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = myPrefs.cpp; path = src/myPrefs.cpp; sourceTree = "<group>"; };
 		8B1DA4820A2E6A17009DFD94 /* PrefsPanes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PrefsPanes.h; path = src/PrefsPanes.h; sourceTree = "<group>"; };
+		8B24B31C0CA0731B00E92838 /* preview_canvas.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = preview_canvas.cpp; path = src/preview_canvas.cpp; sourceTree = "<group>"; };
+		8B24B31D0CA0731B00E92838 /* preview_canvas.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = preview_canvas.h; path = src/preview_canvas.h; sourceTree = "<group>"; };
 		8B279CF50A4B6F0D00994DD5 /* colorArea.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = colorArea.cpp; path = src/colorArea.cpp; sourceTree = "<group>"; };
 		8B279CF60A4B6F0D00994DD5 /* colorArea.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = colorArea.h; path = src/colorArea.h; sourceTree = "<group>"; };
 		8B279CF70A4B6F0D00994DD5 /* inputbuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = inputbuilder.cpp; path = src/inputbuilder.cpp; sourceTree = "<group>"; };
@@ -1042,6 +1047,8 @@
 				1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */,
 				1652DA4909D0B12600B7783F /* mpGLCanvas.h */,
 				8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */,
+				8B24B31C0CA0731B00E92838 /* preview_canvas.cpp */,
+				8B24B31D0CA0731B00E92838 /* preview_canvas.h */,
 				1652DA5709D0B12600B7783F /* VirtualSphere.cpp */,
 				1652DA5809D0B12600B7783F /* VirtualSphere.h */,
 			);
@@ -1363,6 +1370,7 @@
 				8B74487B0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */,
 				8B6716520C4BF1290067A3C9 /* MyTypes.cpp in Sources */,
 				8B396E710C70AA8C009690AF /* build_palette.cpp in Sources */,
+				8B24B31E0CA0731B00E92838 /* preview_canvas.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1497,6 +1505,7 @@
 				8B74487D0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */,
 				8B6716530C4BF1290067A3C9 /* MyTypes.cpp in Sources */,
 				8B396E720C70AA8C009690AF /* build_palette.cpp in Sources */,
+				8B24B31F0CA0731B00E92838 /* preview_canvas.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1631,6 +1640,7 @@
 				8B74487C0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */,
 				8B6716540C4BF1290067A3C9 /* MyTypes.cpp in Sources */,
 				8B396E730C70AA8C009690AF /* build_palette.cpp in Sources */,
+				8B24B3200CA0731B00E92838 /* preview_canvas.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
