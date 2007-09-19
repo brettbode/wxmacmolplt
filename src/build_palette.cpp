@@ -824,6 +824,7 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 	structures.erase(structures.begin() + id);
 	mStructureChoice->Delete(id);
 	mStructureChoice->SetSelection(0);
+	canvas->SetStructure(structures[0]);
 	structures_dirty = true;
 
 }

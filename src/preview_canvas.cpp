@@ -10,6 +10,8 @@
 #include <GL/glu.h>
 #endif
 
+#include <iostream>
+
 /* ------------------------------------------------------------------------- */
 
 PreviewCanvas::PreviewCanvas(
@@ -181,12 +183,23 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
 
-	Point prev_pt = {prev_mouse.x, prev_mouse.y};
-	Point curr_pt = {curr_mouse.x, curr_mouse.y};
-	Point sphere_center = {width / 2, height / 2};
+	Point prev_pt;
+    prev_pt.h = prev_mouse.x;
+    prev_pt.v = prev_mouse.y;
+
+	Point curr_pt;
+    curr_pt.h = curr_mouse.x;
+    curr_pt.v = curr_mouse.y;
+
+	Point sphere_center;
+	sphere_center.h = width / 2;
+	sphere_center.v = height / 2;
+
 	long sphere_radius = (long) (MAX(sphere_center.h, sphere_center.v) * 0.9f);
 	Matrix4D local_rotation;
 	Matrix4D tempcopyMatrix;
+	std::cout << "curr_pt.h: " << curr_pt.h << std::endl;
+	std::cout << "curr_pt.v: " << curr_pt.v << std::endl;
 
 	VirtualSphereQD3D(prev_pt, curr_pt, sphere_center, sphere_radius,
 					  local_rotation, global_rotation);
