@@ -3,6 +3,7 @@
 
 #include "wx/wx.h"
 #include "wx/glcanvas.h"
+#include "Geometries.h"
 
 class PreviewCanvas : public wxGLCanvas {
 	public:
@@ -24,7 +25,7 @@ class PreviewCanvas : public wxGLCanvas {
 		wxGLContext *context;
 		wxPoint curr_mouse;
 		wxPoint prev_mouse;
-
+		Matrix4D global_rotation;
 
 	DECLARE_EVENT_TABLE()
 };

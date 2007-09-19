@@ -1,5 +1,15 @@
 #include "preview_canvas.h"
 
+#include "Math3D.h"
+#include "Globals.h"
+#include "VirtualSphere.h"
+
+#ifdef __WXMAC__
+#include <OpenGL/glu.h>
+#else
+#include <GL/glu.h>
+#endif
+
 /* ------------------------------------------------------------------------- */
 
 PreviewCanvas::PreviewCanvas(
@@ -8,6 +18,7 @@ PreviewCanvas::PreviewCanvas(
 	: wxGLCanvas(parent, id, attributes, position, size, style, name) {
 
 	context = NULL;
+	InitRotationMatrix(global_rotation);
 
 }
 
@@ -78,12 +89,29 @@ void PreviewCanvas::OnSize(wxSizeEvent& event) {
 void PreviewCanvas::Render() {
 
 	SetCurrent(*context);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0f, 1.0, 0.1f, 1000.0f);
+	glMatrixMode(GL_MODELVIEW);
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	glLoadIdentity();
 	gluLookAt(0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
-	
+
+	float *rot = (float *) global_rotation;
+	printf("rot[<0-15>]:\n"
+			"%f %f %f %f\n"
+			"%f %f %f %f\n"
+			"%f %f %f %f\n"
+			"%f %f %f %f\n",
+			rot[0], rot[1], rot[2], rot[3],
+			rot[4], rot[5], rot[6], rot[7],
+			rot[8], rot[9], rot[10], rot[11],
+			rot[12], rot[13], rot[14], rot[15]);
+
+	glMultMatrixf((float *) global_rotation);
 	GLUquadric *quad;
 	glPushMatrix();
 	glColor3f(0.0f, 1.0f, 0.0f);
@@ -107,8 +135,6 @@ void PreviewCanvas::OnLeftMouseDown(wxMouseEvent& event) {
 	
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
-	std::cout << "width: " << width << std::endl;
-	std::cout << "height: " << height << std::endl;
 
 	Render();
 
@@ -130,7 +156,19 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
 
-	/* Rotate */
+	Point prev_pt = {prev_mouse.x, prev_mouse.y};
+	Point curr_pt = {curr_mouse.x, curr_mouse.y};
+	Point sphere_center = {width / 2, height / 2};
+	long sphere_radius = (long) (MAX(sphere_center.h, sphere_center.v) * 0.9f);
+	Matrix4D local_rotation;
+	Matrix4D tempcopyMatrix;
+
+	VirtualSphereQD3D(prev_pt, curr_pt, sphere_center, sphere_radius,
+					  local_rotation, global_rotation);
+	MultiplyMatrix(local_rotation, global_rotation, tempcopyMatrix);
+	CopyMatrix(tempcopyMatrix, global_rotation);
+	OrthogonalizeRotationMatrix(global_rotation);
+
 	Render();
 
 }
