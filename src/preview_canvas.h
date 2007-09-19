@@ -4,6 +4,9 @@
 #include "wx/wx.h"
 #include "wx/glcanvas.h"
 #include "Geometries.h"
+#include "build_palette.h"
+
+class Structure;
 
 class PreviewCanvas : public wxGLCanvas {
 	public:
@@ -14,6 +17,7 @@ class PreviewCanvas : public wxGLCanvas {
 					  long style = 0, const wxString& name = _T("GL Canvas"));
 		void Render();
 		void InitGL();
+		void SetStructure(Structure *structure);
 
 	private:
 		void OnPaint(wxPaintEvent& event);
@@ -26,6 +30,8 @@ class PreviewCanvas : public wxGLCanvas {
 		wxPoint curr_mouse;
 		wxPoint prev_mouse;
 		Matrix4D global_rotation;
+		Structure *struc;
+		CPoint3D centroid;
 
 	DECLARE_EVENT_TABLE()
 };

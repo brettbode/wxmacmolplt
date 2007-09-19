@@ -35,6 +35,8 @@ typedef struct {
 	wxBitmap *on_bmp;
 } element_t;
 
+class PreviewCanvas;
+
 class Structure {
 	friend std::ostream& operator<<(std::ostream& stream, const Structure& s);
 
@@ -101,6 +103,7 @@ class BuilderDlg: public wxMiniFrame {
 		void UpdateSaveStructuresAs(wxUpdateUIEvent& event);
 		void UpdateDeleteStructure(wxUpdateUIEvent& event);
 		void DeleteStructure(wxCommandEvent& event);
+		void OnStructureChoice(wxCommandEvent& event);
 		void TabChanged(wxNotebookEvent& event);
 
 		short coordinationNumber[kNumTableElements];

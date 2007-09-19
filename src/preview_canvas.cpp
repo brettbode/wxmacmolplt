@@ -15,10 +15,12 @@
 PreviewCanvas::PreviewCanvas(
 	wxWindow *parent, wxWindowID id, int *attributes, const wxPoint& position,
 	const wxSize& size, long style, const wxString& name)
-	: wxGLCanvas(parent, id, position, size, style, name, attributes) {
+	: wxGLCanvas(parent, id, position, size, style, name, attributes),
+	  centroid(0, 0, 0) {
 
 	// context = NULL; 
 	InitRotationMatrix(global_rotation);
+	struc = NULL;
 
 }
 
@@ -92,37 +94,58 @@ void PreviewCanvas::Render() {
 	// SetCurrent(*context); 
 	SetCurrent();
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0f, 1.0, 0.1f, 1000.0f);
-	glMatrixMode(GL_MODELVIEW);
-	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	glLoadIdentity();
 	gluLookAt(0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
-	float *rot = (float *) global_rotation;
-	printf("rot[<0-15>]:\n"
-			"%f %f %f %f\n"
-			"%f %f %f %f\n"
-			"%f %f %f %f\n"
-			"%f %f %f %f\n",
-			rot[0], rot[1], rot[2], rot[3],
-			rot[4], rot[5], rot[6], rot[7],
-			rot[8], rot[9], rot[10], rot[11],
-			rot[12], rot[13], rot[14], rot[15]);
-
 	glMultMatrixf((float *) global_rotation);
-	GLUquadric *quad;
-	glPushMatrix();
+	glTranslatef(-centroid.x, -centroid.y, -centroid.z);
 	glColor3f(0.0f, 1.0f, 0.0f);
-	quad = gluNewQuadric();
-	gluSphere(quad, 1.0f, 5, 5);
-	glPopMatrix();
-	gluDeleteQuadric(quad);
+
+	if (struc) {
+		int i;
+		GLUquadric *quad;
+		mpAtom *atom;
+
+		quad = gluNewQuadric();
+		for (i = 0; i < struc->natoms; i++) {
+			atom = &struc->atoms[i];
+			glPushMatrix();
+			glTranslatef(atom->Position.x, atom->Position.y, atom->Position.z);
+			gluSphere(quad, 0.3f, 10, 10);
+			glPopMatrix();
+		}
+
+		CPoint3D *pos1, *pos2;
+		glBegin(GL_LINES);
+		for (i = 0; i < struc->nbonds; i++) {
+			pos1 = &struc->atoms[struc->bonds[i].Atom1].Position;
+			pos2 = &struc->atoms[struc->bonds[i].Atom2].Position;
+			glVertex3f(pos1->x, pos1->y, pos1->z);
+			glVertex3f(pos2->x, pos2->y, pos2->z);
+		}
+		glEnd();
+		gluDeleteQuadric(quad);
+	}
 	
 	SwapBuffers();
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+void PreviewCanvas::SetStructure(Structure *structure) {
+
+	struc = structure;
+
+	centroid = CPoint3D(0, 0, 0);
+	for (int i = 0; i < struc->natoms; i++) {
+		centroid += struc->atoms[i].Position;
+	}
+	centroid *= 1.0f / struc->natoms;
+
+	Render();
 
 }
 

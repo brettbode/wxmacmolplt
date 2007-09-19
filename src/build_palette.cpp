@@ -15,11 +15,13 @@ extern BuilderDlg *build_palette;
 #define kPeriodicSaveStructuresAs   13803
 #define kPeriodicLoadStructures     13804
 #define kPeriodicDeleteStructure    13805
-#define kNotebookID                 13806
+#define kPeriodicNotebookID         13806
+#define kPeriodicStructureChoice    13807
 
 IMPLEMENT_DYNAMIC_CLASS(BuilderDlg, wxMiniFrame)
 
 BEGIN_EVENT_TABLE(BuilderDlg, wxMiniFrame)
+	EVT_CHOICE(kPeriodicStructureChoice, BuilderDlg::OnStructureChoice)
 	EVT_CHOICE(kPeriodicCoordinationChoice, BuilderDlg::OnCoordinationChoice)
 	EVT_CHOICE(kPeriodicLPChoice, BuilderDlg::OnLPChoice)
 	EVT_COMMAND_RANGE(0, kNumTableElements - 1, wxEVT_COMMAND_BUTTON_CLICKED,
@@ -33,7 +35,7 @@ BEGIN_EVENT_TABLE(BuilderDlg, wxMiniFrame)
 	EVT_UPDATE_UI(kPeriodicSaveStructuresAs, BuilderDlg::UpdateSaveStructuresAs)
 	EVT_UPDATE_UI(kPeriodicSaveStructures, BuilderDlg::UpdateSaveStructures)
 	EVT_UPDATE_UI(kPeriodicDeleteStructure, BuilderDlg::UpdateDeleteStructure)
-	EVT_NOTEBOOK_PAGE_CHANGED(kNotebookID, BuilderDlg::TabChanged)
+	EVT_NOTEBOOK_PAGE_CHANGED(kPeriodicNotebookID, BuilderDlg::TabChanged)
 END_EVENT_TABLE()
 
 // --------------------------------------------------------------------------- 
@@ -59,7 +61,8 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	nglobal_structures = structures.size();
 
 	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
-	tabs = new wxNotebook(this, kNotebookID, wxPoint(-1, -1), wxSize(-1, -1));
+	tabs = new wxNotebook(this, kPeriodicNotebookID, wxPoint(-1, -1),
+						  wxSize(-1, -1));
 
 	wxPanel *solvents_panel = new wxPanel(tabs);
 
@@ -275,8 +278,8 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 		new wxStaticText(panel, wxID_ANY, wxT("Structure: "));
 	
 	mStructureChoice =
-		new wxChoice(panel, wxID_ANY, wxPoint(-1, -1), wxSize(-1, -1), 1,
-					 &structures[0]->name);
+		new wxChoice(panel, kPeriodicStructureChoice, wxPoint(-1, -1),
+					 wxSize(-1, -1), 1, &structures[0]->name);
 	mStructureChoice->SetSelection(0);
 
 	wxButton *save_button =
@@ -413,7 +416,15 @@ void BuilderDlg::OnLPChoice(wxCommandEvent& event) {
 	LonePairCount[prev_id] = event.GetSelection();
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
+
+void BuilderDlg::OnStructureChoice(wxCommandEvent& event) {
+
+	canvas->SetStructure(structures[event.GetSelection()]);
+
+}
+
+/* ------------------------------------------------------------------------- */
 
 #include "myFiles.h"
 void BuilderDlg::KeyHandler(wxKeyEvent& event) {
@@ -449,7 +460,7 @@ void BuilderDlg::KeyHandler(wxKeyEvent& event) {
 	}
 }	
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 int BuilderDlg::GetSelectedElement(void) const {
 
@@ -460,7 +471,7 @@ int BuilderDlg::GetSelectedElement(void) const {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 Structure *BuilderDlg::GetSelectedStructure(void) const {
 
@@ -468,7 +479,7 @@ Structure *BuilderDlg::GetSelectedStructure(void) const {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 short BuilderDlg::GetSelectedCoordination(void) const {
 	short result = 0;
@@ -476,7 +487,7 @@ short BuilderDlg::GetSelectedCoordination(void) const {
 	return result;
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 short BuilderDlg::GetSelectedLonePairCount(void) const {
 	short result = 0;
@@ -484,7 +495,7 @@ short BuilderDlg::GetSelectedLonePairCount(void) const {
 	return result;
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 void BuilderDlg::OnClose(wxCloseEvent& event) {
 
@@ -500,7 +511,7 @@ void BuilderDlg::OnClose(wxCloseEvent& event) {
 	}
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 void BuilderDlg::NumberToTableCoords(int atomic_number,
 										   int *row, int *col) {
@@ -544,7 +555,7 @@ void BuilderDlg::NumberToTableCoords(int atomic_number,
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 bool BuilderDlg::InPeriodicMode(void) const {
 
@@ -552,7 +563,7 @@ bool BuilderDlg::InPeriodicMode(void) const {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 bool BuilderDlg::InStructuresMode(void) const {
 
@@ -560,7 +571,7 @@ bool BuilderDlg::InStructuresMode(void) const {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 Structure::Structure() {
 
@@ -571,7 +582,7 @@ Structure::Structure() {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 Structure::~Structure() {
 
@@ -580,7 +591,7 @@ Structure::~Structure() {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 void BuilderDlg::AddStructure(Structure *structure) {
 
@@ -618,12 +629,13 @@ void BuilderDlg::AddStructure(Structure *structure) {
 
 	// Select the just added structure.
 	mStructureChoice->SetSelection(mStructureChoice->GetCount() - 1);
+	canvas->SetStructure(structures[structures.size() - 1]);
 
 	structures_dirty = true;
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 int BuilderDlg::GetNumStructures() const {
 	
@@ -631,7 +643,7 @@ int BuilderDlg::GetNumStructures() const {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 Structure *BuilderDlg::GetStructure(int i) const {
 
@@ -639,7 +651,7 @@ Structure *BuilderDlg::GetStructure(int i) const {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 int BuilderDlg::GetNumUserStructures() const {
 	
@@ -647,7 +659,7 @@ int BuilderDlg::GetNumUserStructures() const {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 Structure *BuilderDlg::GetUserStructure(int i) const {
 
@@ -655,7 +667,7 @@ Structure *BuilderDlg::GetUserStructure(int i) const {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
 
 std::ostream& operator<<(std::ostream& stream, const Structure& s) {
 
@@ -829,6 +841,9 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 		struc_sizer->Add(canvas, wxGBPosition(1, 0), wxGBSpan(4, 2), wxEXPAND);
 		structures_panel->SetSizerAndFit(struc_sizer);
 		canvas->InitGL();
+		if (structures.size()) {
+			canvas->SetStructure(structures[0]);
+		}
 		canvas->Render();
 		/* struc_sizer->Layout(); */
 	}
