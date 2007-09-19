@@ -15,9 +15,9 @@
 PreviewCanvas::PreviewCanvas(
 	wxWindow *parent, wxWindowID id, int *attributes, const wxPoint& position,
 	const wxSize& size, long style, const wxString& name)
-	: wxGLCanvas(parent, id, attributes, position, size, style, name) {
+	: wxGLCanvas(parent, id, position, size, style, name, attributes) {
 
-	context = NULL;
+	// context = NULL; 
 	InitRotationMatrix(global_rotation);
 
 }
@@ -26,8 +26,9 @@ PreviewCanvas::PreviewCanvas(
 
 void PreviewCanvas::InitGL() {
 
-	context = new wxGLContext(this);
-	context->SetCurrent(*this);
+	// context = new wxGLContext(this); 
+	SetCurrent();
+	// context->SetCurrent(*this); 
 	
 	glShadeModel(GL_SMOOTH);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -88,7 +89,8 @@ void PreviewCanvas::OnSize(wxSizeEvent& event) {
 
 void PreviewCanvas::Render() {
 
-	SetCurrent(*context);
+	// SetCurrent(*context); 
+	SetCurrent();
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
