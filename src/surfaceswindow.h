@@ -53,8 +53,9 @@ class wxChoicebookEvent;
 ////@end control identifiers
 
 
-/*!
- * SurfacesWindow class declaration
+/**
+ * SufacesWindow is the main window managing the creation and editing of surfaces. All
+ * surfaces are pages in a note book with subclasses handling the controls for each page.
  */
 
 class SurfacesWindow: public wxFrame
@@ -138,6 +139,7 @@ private:
 ////@end SurfacesWindow member variables
     MoleculeData* mData;
     WinPrefs* mPrefs;
+	bool	setValueCalled;	//< Flag to enable a workaround for setvalue generating a text event.
 	
 	///Display a dialog for the user to select the type of a new surface.
 	int selectSurfaceType();

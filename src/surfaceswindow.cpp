@@ -140,6 +140,7 @@ void SurfacesWindow::Init()
 	book = NULL;
 	mDeleteButton = NULL;
 ////@end SurfacesWindow member initialisation
+	setValueCalled = false;
 }
 
 
@@ -327,7 +328,12 @@ void SurfacesWindow::Reset(void) {
 		}
 	} else {
 		wxString temp(_("No surface chosen."));
+#if wxCHECK_VERSION(2, 8, 0)
 		surfTitleEdit->ChangeValue(temp);
+#else
+		setValueCalled = true;
+		surfTitleEdit->SetValue(temp);
+#endif
 	}
 	book->Fit();
 	
@@ -348,7 +354,12 @@ void SurfacesWindow::OnDeleteClick( wxCommandEvent& event ) {
 	if (book->GetPageCount()<= 0) {
 		visibleCheck->Disable();
 		allFrameCheck->Disable();
+#if wxCHECK_VERSION(2, 8, 0)
 		surfTitleEdit->ChangeValue(wxT(""));
+#else
+		setValueCalled = true;
+		surfTitleEdit->SetValue(wxT(""));
+#endif
 	}
 	book->Fit();
 	
@@ -419,7 +430,12 @@ void SurfacesWindow::OnSurflistbookPageChanged( wxChoicebookEvent& event )
 		}
 		tempPane->PageIsNowActive();	//make sure the update button is the default
 	}
+#if wxCHECK_VERSION(2, 8, 0)
 	surfTitleEdit->ChangeValue(temp);
+#else
+	setValueCalled = true;
+	surfTitleEdit->SetValue(temp);
+#endif
 }
 
 /*!
@@ -466,7 +482,12 @@ void SurfacesWindow::SurfaceUpdated(void) {
 	if (tempPane) {
 		Surface * tempSurf = tempPane->GetTargetSurface();
 		wxString temp(tempSurf->GetLabel(), wxConvUTF8);
+#if wxCHECK_VERSION(2, 8, 0)
 		surfTitleEdit->ChangeValue(temp);
+#else
+		setValueCalled = true;
+		surfTitleEdit->SetValue(temp);
+#endif
 		book->SetPageText(book->GetSelection(), temp);
 		//The previous line does not immediately update the list text???
 	} 
@@ -534,19 +555,25 @@ int SurfacesWindow::selectSurfaceType()
 
 void SurfacesWindow::OnSurftitleUpdated( wxCommandEvent& event )
 {
-	int id = book->GetSelection();
-	wxString newLabel = surfTitleEdit->GetValue();
-	
-	BaseSurfacePane* tempPane = (BaseSurfacePane * ) book->GetCurrentPage();
-	if (tempPane) {
-		Surface * tempSurf = tempPane->GetTargetSurface();
-		if (tempSurf) {
-			wxString test(tempSurf->GetLabel(), wxConvUTF8);
-			if (newLabel.Cmp(test) != 0) {
-				tempSurf->SetLabel((const char *)newLabel.mb_str(wxConvUTF8));
-				book->SetPageText(book->GetSelection(), newLabel);
+	//Prior to wx v2.7 you had to call SetValue to change a textCtrl which generates
+	//a TEXT_UPDATED event. To avoid treating these as actual edits I set the setValueCalled
+	//flag before calling SetValue and then clear it here instead of looking at the value.
+	if (!setValueCalled) {
+		int id = book->GetSelection();
+		wxString newLabel = surfTitleEdit->GetValue();
+		
+		BaseSurfacePane* tempPane = (BaseSurfacePane * ) book->GetCurrentPage();
+		if (tempPane) {
+			Surface * tempSurf = tempPane->GetTargetSurface();
+			if (tempSurf) {
+				wxString test(tempSurf->GetLabel(), wxConvUTF8);
+				if (newLabel.Cmp(test) != 0) {
+					tempSurf->SetLabel((const char *)newLabel.mb_str(wxConvUTF8));
+					book->SetPageText(book->GetSelection(), newLabel);
+				}
 			}
 		}
-    }
+	} else
+		setValueCalled = false;
 	
 }
