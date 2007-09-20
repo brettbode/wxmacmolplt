@@ -1022,6 +1022,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 	XMLDocument * xDoc = NULL;
 	try{
 		xDoc = new XMLDocument(xmlbuffer, fsize, true);
+		if (ProgressInd) ProgressInd->ChangeText("Parsing CML...");
 		if (xDoc->parse()) {
 			XMLElement * root = xDoc->getDocumentRoot();
 			//need to handle cases where <CML> and <Molecule> are both present
@@ -1035,7 +1036,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 							XMLElement * child = children->item(i);
 							CML_Element elName;
 							CML_convert(child->getName(), elName);
-					//		ProgressInd->ChangeText("Reading Basis information");
+							if (ProgressInd) ProgressInd->ChangeText("Reading CML elements...");
 							if (!ProgressInd->UpdateProgress((100*i)/children->length())) { 
 								delete xDoc;
 								throw UserCancel();
