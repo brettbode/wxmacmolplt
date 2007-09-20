@@ -924,6 +924,8 @@ void MpGLCanvas::eventWindowActivated(wxActivateEvent& event) {
 void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 
 	mpAtom *lAtoms = mMainData->cFrame->Atoms;
+
+	SetCurrent();
 	
 	long time_between = mouse_activate_timer.Time();
 	if (time_between < 10) {
@@ -936,6 +938,7 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 	curr_mouse = event.GetPosition();
 
 	ndrag_events = 0;
+
 	testPicking(curr_mouse.x, curr_mouse.y);
 
 	if (interactiveMode) {
@@ -971,7 +974,6 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 
 	// Though nothing's rotating on a single mousedown event, we need to
 	// register this first mouse click position.
-	SetCurrent();
 	glfSetCurrentBMFFont(bitmap_fontd);
 	MolWin->Rotate(event);
 
@@ -984,10 +986,13 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 	bool deSelectAll = true;
 	Frame *lFrame = mMainData->cFrame;
 
+	SetCurrent();
+
 	ndrag_events = 0;
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+
 	testPicking(curr_mouse.x, curr_mouse.y);
 
 	if (selected_type == MMP_ATOM) {
@@ -1028,7 +1033,6 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 	else {
 		// Though nothing's rotating on a single mousedown event, we need to
 		// register this first mouse click position.
-		SetCurrent();
 		glfSetCurrentBMFFont(bitmap_fontd);
 		MolWin->Rotate(event);
 
@@ -1039,13 +1043,15 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 
 void MpGLCanvas::eventMouseMiddleWentDown(wxMouseEvent& event) {
 
+	SetCurrent();
+
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+
 	testPicking(curr_mouse.x, curr_mouse.y);
 
 	// Though nothing's rotating on a single mousedown event, we need to
 	// register this first mouse click position.
-	SetCurrent();
 	glfSetCurrentBMFFont(bitmap_fontd);
 	MolWin->Rotate(event);
 
@@ -1059,6 +1065,8 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	// held (or even no button being down).
 	
 	Frame *lFrame = mMainData->cFrame;
+
+	SetCurrent();
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
@@ -1097,7 +1105,6 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	// clicks.
 	ndrag_events++;
 
-	SetCurrent();
 	glfSetCurrentBMFFont(bitmap_fontd);
 
 	// Lassoing should only be done with the left mouse button.
@@ -1419,6 +1426,8 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 
+	SetCurrent();
+
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
 
@@ -1429,7 +1438,6 @@ void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 	if (ndrag_events) {
 		// We call this to erase the transformation circle that would otherwise
 		// stay when the user releases the mouse.
-		SetCurrent();
 		glfSetCurrentBMFFont(bitmap_fontd);
 		MolWin->Rotate(event);
 	} else if (MolWin->InEditMode()) {
@@ -1440,24 +1448,26 @@ void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 
 void MpGLCanvas::eventMouseMiddleWentUp(wxMouseEvent& event) {
 
+	SetCurrent();
+	glfSetCurrentBMFFont(bitmap_fontd);
+
 	if (HasCapture()) {
 		ReleaseMouse();
 	}
 
 	// We call this to erase the transformation circle that would otherwise
 	// stay when the user releases the mouse.
-	SetCurrent();
-	glfSetCurrentBMFFont(bitmap_fontd);
 	MolWin->Rotate(event);
 
 }
 
 void MpGLCanvas::eventMouseWheel(wxMouseEvent& event) {
 
-	// The display window will calculate the appropriate action for mouse 
-	// wheel movement.
 	SetCurrent();
 	glfSetCurrentBMFFont(bitmap_fontd);
+
+	// The display window will calculate the appropriate action for mouse 
+	// wheel movement.
 	MolWin->Rotate(event);
 
 }
