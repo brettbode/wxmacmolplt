@@ -5,12 +5,6 @@
 #include "VirtualSphere.h"
 #include "Prefs.h"
 
-#ifdef __WXMAC__
-#include <OpenGL/glu.h>
-#else
-#include <GL/glu.h>
-#endif
-
 #include <iostream>
 
 extern WinPrefs *gPreferences;

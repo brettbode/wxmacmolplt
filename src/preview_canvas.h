@@ -1,6 +1,12 @@
 #ifndef PREVIEW_CANVAS_H
 #define PREVIEW_CANVAS_H
 
+#ifdef __WXMAC__
+#include <OpenGL/glu.h>
+#else
+#include <GL/glu.h>
+#endif
+
 #include "wx/wx.h"
 #include "wx/glcanvas.h"
 #include "Geometries.h"
