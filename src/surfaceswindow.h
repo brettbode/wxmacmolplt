@@ -101,7 +101,7 @@ public:
 ////@end SurfacesWindow event handler declarations
 	/// Event handler for page changes in the choice book.
 	// DialogBlocks doesn't know about ChoiceBookEvents so I need this outside of its code.
-	void SurfacesWindow::OnSurflistbookPageChanged( wxChoicebookEvent& event );
+	void OnSurflistbookPageChanged( wxChoicebookEvent& event );
 
 ////@begin SurfacesWindow member function declarations
 
