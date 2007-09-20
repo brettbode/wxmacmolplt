@@ -6,7 +6,7 @@
 #include "main.h"
 
 extern bool show_build_palette;
-extern WinPrefs * gPreferences;
+extern WinPrefs *gPreferences;
 extern BuilderDlg *build_palette;
 
 #define kPeriodicCoordinationChoice 13800
@@ -843,7 +843,7 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 		structures_panel->SetSizerAndFit(struc_sizer);
 		canvas->InitGL();
 		if (structures.size()) {
-			canvas->SetStructure(structures[0]);
+			canvas->SetStructure(structures[mStructureChoice->GetSelection()]);
 		}
 		canvas->Render();
 		/* struc_sizer->Layout(); */
