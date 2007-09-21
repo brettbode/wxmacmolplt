@@ -739,32 +739,38 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 	load_file_path = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
 									wxT(""), wxT("CML Files (*.cml)|*.cml"));
 
+	// If a file wasn't selected or can't be opened, let's not change anything.
+	if (load_file_path.IsEmpty()) {
+		return;
+	}
+
+	load_file = fopen(load_file_path.mb_str(wxConvUTF8), "r");
+	if (load_file == NULL) {
+		MessageAlert("Unable to access the file.");
+		return;
+	}
+
+	// Before we load the new user structures in, we want to remove any
+	// previously loaded user structures from both the structures dropdown
+	// menu and the vector.
 	if (structures.size() > nglobal_structures) {
 		structures.erase(structures.begin() + nglobal_structures,
 						 structures.end());
-		for (i = nglobal_structures; i < mStructureChoice->GetCount(); i++) {
-			mStructureChoice->Delete(nglobal_structures);
+		for (i = mStructureChoice->GetCount() - 1; i >= nglobal_structures; i--) {
+			mStructureChoice->Delete(i);
 		}
 	}
 
-	if (!load_file_path.IsEmpty()) {
-		load_file = fopen(load_file_path.mb_str(wxConvUTF8), "r");
-		if (load_file == NULL) {
-			MessageAlert("Unable to access the file.");
-			return;
-		}
+	buffer = new BufferFile(load_file, false);
+	ReadCMLFile(buffer);
 
-		buffer = new BufferFile(load_file, false);
-		ReadCMLFile(buffer);
-
-		if (buffer) {
-			delete buffer;
-		}
-
-		fclose(load_file);
-
-		structures_dirty = false;
+	if (buffer) {
+		delete buffer;
 	}
+
+	fclose(load_file);
+
+	structures_dirty = false;
 
 }
 
@@ -829,6 +835,14 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 }
 
 /* ------------------------------------------------------------------------- */
+/**
+ * This function handles page change events for the builder palette notebook.
+ * It exists so the Structures panel can have a dynamically generated OpenGL
+ * canvas.  The alternative is to create the canvas statically and let it sit
+ * around and take up memory.  To avoid this, we create and destroy it as
+ * needed in this function.
+ * @param event The notebook's page changed event.
+ */
 
 void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 

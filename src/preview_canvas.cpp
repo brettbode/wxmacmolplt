@@ -88,11 +88,22 @@ void PreviewCanvas::OnSize(wxSizeEvent& event) {
 }
 
 /* ------------------------------------------------------------------------- */
+/**
+ * This function draws the preview of the currently selected structure, if
+ * any.  It makes and leaves the canvas' own OpenGL context current.  The
+ * background color of the canvas and all other parameters are set by the
+ * global preferences for now.
+ */
 
 void PreviewCanvas::Render() {
 
 	// SetCurrent(*context); 
 	SetCurrent();
+
+	RGBColor *BackgroundColor = gPreferences->GetBackgroundColorLoc();
+	glClearColor(BackgroundColor->red / 65536.0f,
+				 BackgroundColor->green / 65536.0f,
+				 BackgroundColor->blue / 65536.0f, 1.0f);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
@@ -103,16 +114,25 @@ void PreviewCanvas::Render() {
 	glTranslatef(-centroid.x, -centroid.y, -centroid.z);
 	glColor3f(0.0f, 1.0f, 0.0f);
 
+	// If a structure has been set, draw it.
 	if (struc) {
-		int i;
-		GLUquadric *quad;
-		mpAtom *atom;
-		float radius;
 
+		int i;                 // Index variable
+		mpAtom *atom;          // Shortcut to atom
+		float radius;          // Radius of atom
+
+		// Get the global material properties set.  Each atom has its
+		// own ambient and diffuse color that we'll set later with glColor.
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
         glEnable(GL_COLOR_MATERIAL);
+		GLfloat l_specular[] = {0.8, 0.8, 0.8, 1.0};
+		GLfloat l_shininess[] = {80.0};
+		glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+		glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
 
-		quad = gluNewQuadric();
+		quadric = gluNewQuadric();
+
+		// Draw all the atoms.
 		for (i = 0; i < struc->natoms; i++) {
 			atom = &struc->atoms[i];
 			glPushMatrix();
@@ -120,37 +140,28 @@ void PreviewCanvas::Render() {
 			radius = gPreferences->GetAtomScale() * gPreferences->GetAtomSize(atom->Type - 1);
 			gPreferences->ChangeColorAtomColor(atom->Type);
 
-			/* glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular); */
-			/* glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess); */
-			/* glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse); */
-			/* glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient); */
-
-			gluSphere(quad, radius, 10, 10);
+			gluSphere(quadric, radius,
+					  (long) (1.5 * gPreferences->GetQD3DAtomQuality()),
+					  gPreferences->GetQD3DAtomQuality());
 			glPopMatrix();
 		}
 
+		// We need these for calculating the offsets for double- and triple-
+		// bonds.  But we only want to retrieve them once, so we do so outside
+		// the loop.
 		glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 		glGetDoublev(GL_PROJECTION_MATRIX, proj);
 		glGetIntegerv(GL_VIEWPORT, viewport);
 
-		quadric = gluNewQuadric();
+		// Draw all the bonds.
 		for (i = 0; i < struc->nbonds; i++) {
 			DrawBond(struc->bonds[i],
 					 struc->atoms[struc->bonds[i].Atom1],
 					 struc->atoms[struc->bonds[i].Atom2]);
 		}
+
 		gluDeleteQuadric(quadric);
 
-		CPoint3D *pos1, *pos2;
-		glBegin(GL_LINES);
-		for (i = 0; i < struc->nbonds; i++) {
-			pos1 = &struc->atoms[struc->bonds[i].Atom1].Position;
-			pos2 = &struc->atoms[struc->bonds[i].Atom2].Position;
-			glVertex3f(pos1->x, pos1->y, pos1->z);
-			glVertex3f(pos2->x, pos2->y, pos2->z);
-		}
-		glEnd();
-		gluDeleteQuadric(quad);
 	}
 	
 	SwapBuffers();
