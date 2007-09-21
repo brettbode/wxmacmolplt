@@ -255,13 +255,18 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 }
 
 // --------------------------------------------------------------------------- 
+/**
+ * This function encapsulates the creation of a panel that displays a 
+ * library of system- and user-defined molecular structures.  A structure in
+ * the library can be interactively previewed or deleted, and the user
+ * library can be saved to a file.
+ */
 
 wxPanel *BuilderDlg::GetStructuresPanel(void) {
 
 	wxPanel *panel = new wxPanel(tabs, wxID_ANY);
-	/* wxBoxSizer *buttons_sizer = new wxBoxSizer(wxVERTICAL); */
 
-	struc_sizer = new wxGridBagSizer();
+	struc_sizer = new wxGridBagSizer(3);
 
 	int lflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
 	int rflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
@@ -270,10 +275,6 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	struc_sizer->SetFlexibleDirection(wxBOTH);
 	struc_sizer->SetCols(3);
 	struc_sizer->SetRows(5);
-	struc_sizer->AddGrowableCol(0, 1);
-	struc_sizer->AddGrowableCol(1, 1);
-	struc_sizer->AddGrowableRow(4, 1);
-	
 	wxStaticText *label =
 		new wxStaticText(panel, wxID_ANY, wxT("Structure: "));
 	
@@ -286,8 +287,7 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 		new wxButton(panel, kPeriodicSaveStructures, _("Save Structures"));
 
 	wxButton *save_as_button =
-		new wxButton(panel, kPeriodicSaveStructuresAs,
-					 _("Save Structures As"));
+		new wxButton(panel, kPeriodicSaveStructuresAs, _("Save Structures As"));
 
 	wxButton *load_button =
 		new wxButton(panel, kPeriodicLoadStructures, _("Load Structures"));
@@ -303,10 +303,9 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	struc_sizer->Add(load_button, wxGBPosition(2, 2), wxGBSpan(1, 1), wxEXPAND);
 	struc_sizer->Add(delete_button, wxGBPosition(3, 2), wxGBSpan(1, 1), wxEXPAND);
 
-	/* buttons_sizer->Add(save_button, wxEXPAND | cflags); */
-	/* buttons_sizer->Add(save_as_button, wxEXPAND | cflags); */
-	/* buttons_sizer->Add(load_button, wxEXPAND | cflags); */
-	/* buttons_sizer->Add(delete_button, wxEXPAND | cflags); */
+	struc_sizer->AddGrowableCol(0, 1);
+	struc_sizer->AddGrowableCol(1, 1);
+	struc_sizer->AddGrowableRow(4, 1);
 
 	panel->SetSizerAndFit(struc_sizer);
 
@@ -840,13 +839,12 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 	if (event.GetSelection() == 1) {
 		canvas = new PreviewCanvas(structures_panel);
 		struc_sizer->Add(canvas, wxGBPosition(1, 0), wxGBSpan(4, 2), wxEXPAND);
-		structures_panel->SetSizerAndFit(struc_sizer);
 		canvas->InitGL();
 		if (structures.size()) {
 			canvas->SetStructure(structures[mStructureChoice->GetSelection()]);
 		}
 		canvas->Render();
-		/* struc_sizer->Layout(); */
+		struc_sizer->Layout();
 	}
 
 }
