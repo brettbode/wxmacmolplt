@@ -76,14 +76,16 @@ void PreviewCanvas::OnSize(wxSizeEvent& event) {
 	
 	wxGLCanvas::OnSize(event);
 	
-	GetClientSize(&width, &height);
-	
-	glViewport(0, 0, width, height);
-	
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0f, ((float) width) / height, 0.1f, 1000.0f);
-	glMatrixMode(GL_MODELVIEW);
+	if (GetContext()) {
+		GetClientSize(&width, &height);
+		
+		glViewport(0, 0, width, height);
+		
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(45.0f, ((float) width) / height, 0.1f, 1000.0f);
+		glMatrixMode(GL_MODELVIEW);
+	}
 
 }
 

@@ -48,11 +48,10 @@ BuilderDlg::BuilderDlg(const wxString& title,
 		wxSize(-1, -1), wxCLOSE_BOX | wxCAPTION) {
 
 	Structure *new_structure = new Structure;
-	mpAtom *atom = new mpAtom;
-	atom->Type = 6;
-	atom->Position = CPoint3D(0.0f, 0.0f, 0.0f);
+	new_structure->atoms = new mpAtom[1];
+	new_structure->atoms[0].Type = 6;
+	new_structure->atoms[0].Position = CPoint3D(0.0f, 0.0f, 0.0f);
 	new_structure->name = wxString(_("Carbon Atom"));
-	new_structure->atoms = atom;
 	new_structure->natoms = 1;
 	structures.push_back(new_structure);
 
@@ -78,6 +77,8 @@ BuilderDlg::BuilderDlg(const wxString& title,
 
 	wxCommandEvent foo(0, 6-1);
 	ElementSelected(foo);
+
+	canvas = NULL;
 
 }
 
@@ -329,22 +330,24 @@ BuilderDlg::~BuilderDlg() {
 
 	delete[] elements;
 
+	std::vector<Structure *>::iterator struc;
+	for (struc = structures.begin(); struc != structures.end(); struc++) {
+		delete *struc;
+	}
+
 	// element_label->Disconnect(wxEVT_CHAR, 
 		// wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); 
 	// coord_num_label->Disconnect(wxEVT_CHAR, 
 		// wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); 
 	// lp_num_label->Disconnect(wxEVT_CHAR, 
 		// wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); 
-	mTextArea->Disconnect(wxEVT_CHAR,
-		wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this);
-	mLPChoice->Disconnect(wxEVT_CHAR,
-		wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this);
-	mCoordinationChoice->Disconnect(wxEVT_CHAR,
-		wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this);
+	/* mTextArea->Disconnect(wxEVT_CHAR, */
+		/* wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); */
+	/* mLPChoice->Disconnect(wxEVT_CHAR, */
+		/* wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); */
+	/* mCoordinationChoice->Disconnect(wxEVT_CHAR, */
+		/* wxKeyEventHandler(BuilderDlg::KeyHandler), NULL, this); */
 
-	build_palette = NULL;
-	show_build_palette = false;
-	((MpApp &) wxGetApp()).AdjustAllMenus();
 }
 
 // --------------------------------------------------------------------------- 
@@ -846,13 +849,23 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 
 void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 
-	if (event.GetOldSelection() == 1) {
+	if (event.GetOldSelection() == 1 && canvas) {
 		delete canvas;
 	}
 
 	if (event.GetSelection() == 1) {
+
+		/* GTK has a problem with gtk_widget_set_colormap being called within
+		 * wx.  (GTK wants it called before the widget is made, but wx calls 
+		 * it afterward.  So, we work around that by hiding the parent and
+		 * showing it again.  In the hiding, we must also reselect the tab
+		 * since the selection is lost. */
+		structures_panel->Hide();
 		canvas = new PreviewCanvas(structures_panel);
 		struc_sizer->Add(canvas, wxGBPosition(1, 0), wxGBSpan(4, 2), wxEXPAND);
+		structures_panel->Show();
+		tabs->ChangeSelection(1);
+
 		canvas->InitGL();
 		if (structures.size()) {
 			canvas->SetStructure(structures[mStructureChoice->GetSelection()]);
