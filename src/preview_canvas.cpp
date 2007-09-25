@@ -64,6 +64,7 @@ void PreviewCanvas::InitGL() {
 
 void PreviewCanvas::OnPaint(wxPaintEvent& event) {
 
+	wxPaintDC paintDC(this);
 	Render();
 
 }  
@@ -77,6 +78,8 @@ void PreviewCanvas::OnSize(wxSizeEvent& event) {
 	wxGLCanvas::OnSize(event);
 	
 	if (GetContext()) {
+		SetCurrent();
+
 		GetClientSize(&width, &height);
 		
 		glViewport(0, 0, width, height);
@@ -86,6 +89,8 @@ void PreviewCanvas::OnSize(wxSizeEvent& event) {
 		gluPerspective(45.0f, ((float) width) / height, 0.1f, 1000.0f);
 		glMatrixMode(GL_MODELVIEW);
 	}
+
+	Update();
 
 }
 
@@ -241,6 +246,8 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 	OrthogonalizeRotationMatrix(global_rotation);
 
 	Render();
+	Refresh(false);
+	/* Update(); */
 
 }
 
@@ -369,5 +376,8 @@ BEGIN_EVENT_TABLE(PreviewCanvas, wxGLCanvas)
 	EVT_SIZE(PreviewCanvas::OnSize)
 	EVT_LEFT_DOWN(PreviewCanvas::OnLeftMouseDown)
 	EVT_MOTION(PreviewCanvas::OnMouseDrag)
+	EVT_ERASE_BACKGROUND(PreviewCanvas::OnErase)
 END_EVENT_TABLE()
+
+/* ------------------------------------------------------------------------- */
 

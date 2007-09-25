@@ -554,8 +554,9 @@ void MolDisplayWin::StopAnimations(void) {
 	}
 	if (resetNeeded) ResetModel(false);
 
-	// It's kind of nice to the auto-rotation running.  Otherwise, if we leave
-	// the window, we've got to start it going again.
+	// It's kind of nice to leave the auto-rotation running.  Otherwise, if we
+	// leave the window, we've got to start it going again.  If you don't like
+	// this, uncomment the next lines.
 	// if (rotate_timer.IsRunning()) { 
 		// rotate_timer.Stop(); 
 	// } 

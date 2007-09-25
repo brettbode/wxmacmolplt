@@ -1332,6 +1332,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 							lFrame->GetAtomPosition(lFrame->NumAtoms - 1, pos);
 							lFrame->SetAtomPosition(lFrame->NumAtoms - 1, pos + offset);
 							lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
+							delete new_atom;
 						}
 
 						Bond *bond;

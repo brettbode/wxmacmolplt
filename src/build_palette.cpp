@@ -757,6 +757,9 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 	// previously loaded user structures from both the structures dropdown
 	// menu and the vector.
 	if (structures.size() > nglobal_structures) {
+		for (i = nglobal_structures; i < structures.size(); i++) {
+			delete structures[i];
+		}
 		structures.erase(structures.begin() + nglobal_structures,
 						 structures.end());
 		for (i = mStructureChoice->GetCount() - 1; i >= nglobal_structures; i--) {
@@ -829,6 +832,7 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 
 	int id = mStructureChoice->GetSelection();
 
+	delete structures[id];
 	structures.erase(structures.begin() + id);
 	mStructureChoice->Delete(id);
 	mStructureChoice->SetSelection(0);
@@ -856,7 +860,7 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 	if (event.GetSelection() == 1) {
 
 		/* GTK has a problem with gtk_widget_set_colormap being called within
-		 * wx.  (GTK wants it called before the widget is made, but wx calls 
+		 * wx.  GTK wants it called before the widget is made, but wx calls 
 		 * it afterward.  So, we work around that by hiding the parent and
 		 * showing it again.  In the hiding, we must also reselect the tab
 		 * since the selection is lost. */

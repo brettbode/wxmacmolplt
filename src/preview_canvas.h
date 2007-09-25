@@ -21,12 +21,14 @@ class PreviewCanvas : public wxGLCanvas {
 					  wxWindowID id = wxID_ANY, int *attributes = 0,
 					  const wxPoint& position = wxDefaultPosition,
 					  const wxSize& size = wxDefaultSize,
-					  long style = 0, const wxString& name = _T("GL Canvas"));
+					  long style = wxFULL_REPAINT_ON_RESIZE,
+					  const wxString& name = _T("GL Canvas"));
 		void Render();
 		void InitGL();
 		void SetStructure(Structure *structure);
 
 	private:
+		void OnErase(wxEraseEvent& event) {}
 		void OnPaint(wxPaintEvent& event);
 		void OnSize(wxSizeEvent& event);
 		void OnIdle(wxIdleEvent& event);
