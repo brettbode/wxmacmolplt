@@ -21,15 +21,19 @@
 
 /// MOPacInterals handles the conversion of coordinates to/from MOPac style internal coordinates
 
-/// Stores the connectivity information for MOPac style internal coordinates. Methods also
-/// provide for the conversion of cartesian coordinates to/from MOPac internals coordinates.
-/// MOPac internals have the form:
-/// label1
-/// label2 1 distance1
-/// label3 2 distance2 1 angle1
-/// label4 2 distance3 1 angle2 3 dihedral1
-/// and so on.
-/// The connectivity indexes must reference an atom earlier in the list.
+/**
+	Stores the connectivity information for MOPac style internal coordinates. Methods also
+	provide for the conversion of cartesian coordinates to/from MOPac internals coordinates.
+	MOPac internals have the form:\n
+ \verbatim
+	label1 \n
+	label2 1 distance1 \n
+	label3 2 distance2 1 angle1 \n
+	label4 2 distance3 1 angle2 3 dihedral1 \n
+	and so on. \n
+ \endverbatim
+	The connectivity indexes must reference an atom earlier in the list.
+ */
 
 class MOPacInternals {
 	private:
@@ -93,6 +97,13 @@ class MOPacInternals {
 		 */
 		void CartesiansToInternals(MoleculeData * MainData);
 		/**
+		 * Update the current internal coordinate values for a single atom. Computes the internal coordinate values
+		 * based on the cartesian coordinates for the current frame.
+		 * @param MainData The coordinate information.
+		 * @param theAtom The atom to update.
+		 */
+		void UpdateInternalValuesAtom(MoleculeData * MainData, long theAtom);
+		/**
 		 * Update the current cartesian coordinates. Computes the cartesian coordinates
 		 * based on the current internal coordinate values. The coordinates are aligned with
 		 * the previous set to keep the display from jumping around.
@@ -155,11 +166,23 @@ class MOPacInternals {
 		 */
 		inline void SetValue(long i, short part, float val) {
 			if ((i>=0)&&(i<Count)&&(part>=0)&&(part<3)) Values[3*i+part]=val;};
+		/**
+		 * Change the atom order. Call when the order of the atoms changes. Note the
+		 * order of the cartesians should be changed first!
+		 * @param MainData The coordinate information.
+		 * @param OldPosition The orignal atom index.
+		 * @param NewPosition The new atom position.
+		 */
+		void ChangeAtomIndex(MoleculeData * MainData, long OldPosition, long NewPosition);
 };
 class GeneralInternals {
 	private:
 	public:
 };
+/**
+	Wrapper class for internal coordinates. Currently it only supports the zmatrix style
+	internals, but it could be expanded to support other methods.
+*/
 class Internals {
 	private:
 		MOPacInternals *	MOPacStyle;
