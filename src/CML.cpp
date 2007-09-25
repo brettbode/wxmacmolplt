@@ -2694,11 +2694,11 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 
 		attr = atom_el->getAttributeValue(CML_convert(coordinationNumberAttr));
 		if (!attr) return false;
-		sscanf(attr, "%d", &atoms[i].coordinationNumber);
+		sscanf(attr, "%hd", &atoms[i].coordinationNumber);
 
 		attr = atom_el->getAttributeValue(CML_convert(lonePairCountAttr));
 		if (!attr) return false;
-		sscanf(attr, "%d", &atoms[i].LPCount);
+		sscanf(attr, "%hd", &atoms[i].LPCount);
 
 		atom_el = atom_el->getNextChild();
 		i++;
