@@ -1217,6 +1217,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					SelectObj(selected_type, selected, deSelectAll);
 
 					lFrame->SetBonds(Prefs, true, true);
+					MolWin->AtomsChanged(true, false);
 					MolWin->UpdateGLModel();
 					MolWin->AdjustMenus();
 					MolWin->ContentChanged();
@@ -1238,7 +1239,6 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						lFrame->AddAtom(*new_atom, lFrame->NumAtoms);
 						lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
 					}
-					MolWin->AtomsChanged();
 
 					Bond *bond;
 					bool result;
@@ -1261,7 +1261,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 									prev_natoms + structure->link_atom,
 									kSingleBond);
 
-					MolWin->BondsChanged();
+					MolWin->AtomsChanged(true, false);
 					MolWin->SelectionChanged(true);
 				}
 
@@ -1296,6 +1296,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					deSelectAll = true;
 					selected_type = MMP_ATOM;
 					SelectObj(selected_type, selected, deSelectAll);
+					MolWin->AtomsChanged(true, false);
 					MolWin->SetStatusText(wxT("Added new atom."));
 					MolWin->SelectionChanged(true);
 				} else if (build_palette->InStructuresMode()) {
@@ -1343,7 +1344,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 											bond->Order);
 						}
 
-						MolWin->BondsChanged();
+						MolWin->AtomsChanged(true, false);
 						MolWin->SelectionChanged(true);
 					}
 
