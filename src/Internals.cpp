@@ -229,86 +229,14 @@ void MOPacInternals::CartesiansToInternals(MoleculeData * MainData) {
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	if (3*lFrame->NumAtoms > Count) return;
 	if (lFrame->NumAtoms < 2) return;
-		long BondedAtom, AngleAtom, DihedralAtom;
-		float BondLength, BondAngle, Dihedral;
-		// First pair of atoms
-	BondedAtom = ConnectionAtoms[3];
-		CPoint3D BondVector, offset2, offset3;
-	BondVector.x = lFrame->Atoms[1].Position.x - lFrame->Atoms[BondedAtom].Position.x;
-	BondVector.y = lFrame->Atoms[1].Position.y - lFrame->Atoms[BondedAtom].Position.y;
-	BondVector.z = lFrame->Atoms[1].Position.z - lFrame->Atoms[BondedAtom].Position.z;
-	Values[3] = BondVector.Magnitude();
-	for (long iatom=2; iatom<lFrame->NumAtoms; iatom++) {
-			//Bond Length
-		BondedAtom = ConnectionAtoms[3*iatom];
-		BondVector.x = lFrame->Atoms[BondedAtom].Position.x - lFrame->Atoms[iatom].Position.x;
-		BondVector.y = lFrame->Atoms[BondedAtom].Position.y - lFrame->Atoms[iatom].Position.y;
-		BondVector.z = lFrame->Atoms[BondedAtom].Position.z - lFrame->Atoms[iatom].Position.z;
-		BondLength = BondVector.Magnitude();
-		Values[3*iatom] = BondLength;
-			//Bond angle
-		AngleAtom = ConnectionAtoms[3*iatom+1];
-		offset2.x = lFrame->Atoms[iatom].Position.x - lFrame->Atoms[AngleAtom].Position.x;
-		offset2.y = lFrame->Atoms[iatom].Position.y - lFrame->Atoms[AngleAtom].Position.y;
-		offset2.z = lFrame->Atoms[iatom].Position.z - lFrame->Atoms[AngleAtom].Position.z;
-		float length3 = offset2.Magnitude();
-		offset2.x = lFrame->Atoms[AngleAtom].Position.x - lFrame->Atoms[BondedAtom].Position.x;
-		offset2.y = lFrame->Atoms[AngleAtom].Position.y - lFrame->Atoms[BondedAtom].Position.y;
-		offset2.z = lFrame->Atoms[AngleAtom].Position.z - lFrame->Atoms[BondedAtom].Position.z;
-		float length2 = offset2.Magnitude();
-		if ((fabs(BondLength)>0.0001)&&(fabs(length3)>0.0001)&&(fabs(length2)>0.0001)) {
-			float Radians = (BondLength*BondLength+length2*length2-length3*length3)/
-							(2*BondLength*length2);
-				//Make sure the angle is within the allowable values for acos (-1 to 1)
-			if (Radians > 1.0) Radians = 1.0;
-			else if (Radians < -1.0) Radians = -1.0;
-			BondAngle = acos(Radians);
-			BondAngle *= kRadToDegree;
-		} else BondAngle = 0.0;
-		Values[3*iatom+1] = BondAngle;
-			//Dihedral angle
-		if (iatom > 2) {
-			DihedralAtom = ConnectionAtoms[3*iatom+2];
-			offset3.x = lFrame->Atoms[DihedralAtom].Position.x - lFrame->Atoms[AngleAtom].Position.x;
-			offset3.y = lFrame->Atoms[DihedralAtom].Position.y - lFrame->Atoms[AngleAtom].Position.y;
-			offset3.z = lFrame->Atoms[DihedralAtom].Position.z - lFrame->Atoms[AngleAtom].Position.z;
-		//	float length3 = offset3.Magnitude();
-			CPoint3D UnitIJ = BondVector;
-			CPoint3D UnitJK = offset2;
-			CPoint3D UnitKL = offset3;
-			Normalize3D(&UnitIJ);
-			Normalize3D(&UnitJK);
-			Normalize3D(&UnitKL);
-			CPoint3D Normal1, Normal2;
-			CrossProduct3D(&UnitIJ, &UnitJK, &Normal1);
-			CrossProduct3D(&UnitJK, &UnitKL, &Normal2);
-			float DotPJ = DotProduct3D(&UnitIJ, &UnitJK);
-			float DotPK = DotProduct3D(&UnitJK, &UnitKL);
-			DotPJ = 1.0 - DotPJ*DotPJ;
-			DotPK = 1.0 - DotPK*DotPK;
-			if ((DotPJ > 0.0)||(DotPK > 0.0)) {	//3 of the atom are linear, Bad!
-				float SinPJ = sqrt(DotPJ);
-				float SinPK = sqrt(DotPK);
-				float Dot = DotProduct3D(&Normal1, &Normal2)/(SinPJ*SinPK);
-				if (fabs(Dot) <= kCosErrorTolerance) {		//Bad value for a cos
-					if (Dot > 0.9999) Dot = 1.0;
-					else if (Dot < -0.9999) Dot = -1.0;
-					Dihedral = acos(Dot);
-					float Pi = acos(-1.0);
-					if (fabs(Dihedral) < kZeroTolerance) Dihedral = 0.0;
-					else if (fabs(Dihedral-Pi) < kZeroTolerance) Dihedral = Pi;
-					float Sense = DotProduct3D(&Normal2, &BondVector);
-					if (Sense < 0.0) Dihedral = -Dihedral;
-					Dihedral *= 180.0/Pi;
-				}
-				Values[3*iatom+2] = Dihedral;
-			}
-		}
+	
+	for (long i=1; i<lFrame->NumAtoms; i++) {
+		UpdateInternalValuesAtom(MainData, i);
 	}
 }
 void MOPacInternals::UpdateInternalValuesAtom(MoleculeData * MainData, long theAtom) {
 	Frame * lFrame = MainData->GetCurrentFramePtr();
-	if ((theAtom < 0)||(theAtom*3 > Count)) return;	//sanity check
+	if ((theAtom <= 0)||(theAtom*3 > Count)) return;	//sanity check
 	long BondedAtom, AngleAtom, DihedralAtom;
 	float BondLength, BondAngle, Dihedral;
 	CPoint3D BondVector, offset2, offset3;
@@ -319,6 +247,7 @@ void MOPacInternals::UpdateInternalValuesAtom(MoleculeData * MainData, long theA
 	BondVector.z = lFrame->Atoms[BondedAtom].Position.z - lFrame->Atoms[theAtom].Position.z;
 	BondLength = BondVector.Magnitude();
 	Values[3*theAtom] = BondLength;
+	if (theAtom <= 1) return;
 	//Bond angle
 	AngleAtom = ConnectionAtoms[3*theAtom+1];
 	offset2.x = lFrame->Atoms[theAtom].Position.x - lFrame->Atoms[AngleAtom].Position.x;
@@ -517,7 +446,6 @@ void MOPacInternals::AddAtom(MoleculeData * MainData) {
 	ConnectionAtoms[3*newAtom+2] = 2;
 	Count += 3;
 	UpdateInternalValuesAtom(MainData, newAtom);
-//	CartesiansToInternals(MainData);	//Calculate the values for the new atom
 }
 void MOPacInternals::DeleteAtom(MoleculeData * MainData, long WhichAtom) {
 	for (long i=3*WhichAtom; i<(Count-3); i+=3) {	//pull down the atoms higher in the list
@@ -577,13 +505,13 @@ void MOPacInternals::ChangeAtomIndex(MoleculeData * MainData, long OldPosition, 
 			ConnectionAtoms[i*3] = ConnectionAtoms[(i-1)*3];
 				//update the index to the new index for the same atom.
 			if (ConnectionAtoms[i*3] == OldPosition) ConnectionAtoms[3*i] = NewPosition;
-			else if ((ConnectionAtoms[i*3] >= NewPosition)&&(ConnectionAtoms[i*3] < NewPosition)) ConnectionAtoms[i*3] ++;
+			else if ((ConnectionAtoms[i*3] >= NewPosition)&&(ConnectionAtoms[i*3] < OldPosition)) ConnectionAtoms[i*3] ++;
 			ConnectionAtoms[i*3+1] = ConnectionAtoms[(i-1)*3+1];
 			if (ConnectionAtoms[i*3+1] == OldPosition) ConnectionAtoms[3*i+1] = NewPosition;
-			else if ((ConnectionAtoms[i*3+1] >= NewPosition)&&(ConnectionAtoms[i*3+1] < NewPosition)) ConnectionAtoms[i*3+1] ++;
+			else if ((ConnectionAtoms[i*3+1] >= NewPosition)&&(ConnectionAtoms[i*3+1] < OldPosition)) ConnectionAtoms[i*3+1] ++;
 			ConnectionAtoms[i*3+2] = ConnectionAtoms[(i-1)*3+2];
 			if (ConnectionAtoms[i*3+2] == OldPosition) ConnectionAtoms[3*i+2] = NewPosition;
-			else if ((ConnectionAtoms[i*3+2] >= NewPosition)&&(ConnectionAtoms[i*3+2] < NewPosition)) ConnectionAtoms[i*3+2] ++;
+			else if ((ConnectionAtoms[i*3+2] >= NewPosition)&&(ConnectionAtoms[i*3+2] < OldPosition)) ConnectionAtoms[i*3+2] ++;
 			Values[i*3] = Values[(i-1)*3];
 			Values[i*3+1] = Values[(i-1)*3+1];
 			Values[i*3+2] = Values[(i-1)*3+2];
@@ -625,6 +553,16 @@ void MOPacInternals::ChangeAtomIndex(MoleculeData * MainData, long OldPosition, 
 			update = true;
 		}
 		if (update) UpdateInternalValuesAtom(MainData, NewPosition);
+		//Now update references for atoms higher up in the list
+		for (long i=(OldPosition+1); (i*3)<Count; i++) {
+			for (long j=0; j<3; j++) {
+				if (ConnectionAtoms[3*i+j] == OldPosition)
+					ConnectionAtoms[3*i+j] = NewPosition;
+				else if ((ConnectionAtoms[3*i+j] >= NewPosition) &&
+						 (ConnectionAtoms[3*i+j] < OldPosition))
+					ConnectionAtoms[3*i+j]++;
+			}
+		}
 	} else if (NewPosition > OldPosition) {
 		//When moving down the list the atom being moved does not change, but any atom that references it
 		//before the NewPosition will have to be changed.
@@ -638,6 +576,7 @@ void MOPacInternals::ChangeAtomIndex(MoleculeData * MainData, long OldPosition, 
 		char t1 = Type[OldPosition*3 + 1];
 		char t2 = Type[OldPosition*3 + 2];
 		for (long i=OldPosition; i<NewPosition; i++) {
+			bool update = false;
 			ConnectionAtoms[i*3] = ConnectionAtoms[(i+1)*3];
 			ConnectionAtoms[i*3+1] = ConnectionAtoms[(i+1)*3+1];
 			ConnectionAtoms[i*3+2] = ConnectionAtoms[(i+1)*3+2];
@@ -648,12 +587,42 @@ void MOPacInternals::ChangeAtomIndex(MoleculeData * MainData, long OldPosition, 
 			Type[i*3+1] = Type[(i+1)*3+1];
 			Type[i*3+2] = Type[(i+1)*3+2];
 			//update the index to the new index for the same atom.
-			if (ConnectionAtoms[i*3] == OldPosition) ConnectionAtoms[3*i] = OldPosition;
-			else if ((ConnectionAtoms[i*3] >= NewPosition)&&(ConnectionAtoms[i*3] < NewPosition)) ConnectionAtoms[i*3] ++;
-			if (ConnectionAtoms[i*3+1] == OldPosition) ConnectionAtoms[3*i+1] = NewPosition;
-			else if ((ConnectionAtoms[i*3+1] >= NewPosition)&&(ConnectionAtoms[i*3+1] < NewPosition)) ConnectionAtoms[i*3+1] ++;
-			if (ConnectionAtoms[i*3+2] == OldPosition) ConnectionAtoms[3*i+2] = NewPosition;
-			else if ((ConnectionAtoms[i*3+2] >= NewPosition)&&(ConnectionAtoms[i*3+2] < NewPosition)) ConnectionAtoms[i*3+2] ++;
+			if (ConnectionAtoms[i*3] == OldPosition) {
+				//Since the newposition is later in the list this reference must change
+				ConnectionAtoms[3*i] = i-1;
+				update = true;
+			} else if ((ConnectionAtoms[i*3] > OldPosition)&&(ConnectionAtoms[i*3] <= NewPosition)) 
+				ConnectionAtoms[i*3] --;
+			if (ConnectionAtoms[i*3+1] == OldPosition) {
+				ConnectionAtoms[3*i+1] = i-1;
+				update = true;
+			} else if ((ConnectionAtoms[i*3+1] > OldPosition)&&(ConnectionAtoms[i*3+1] <= NewPosition))
+				ConnectionAtoms[i*3+1] --;
+			if (ConnectionAtoms[i*3+2] == OldPosition) {
+				ConnectionAtoms[3*i+2] = i-1;
+				update = true;
+			} else if ((ConnectionAtoms[i*3+2] > OldPosition)&&(ConnectionAtoms[i*3+2] <= NewPosition))
+				ConnectionAtoms[i*3+2] --;
+
+			if (update) {
+				//A reference has changed. Confirm that the three index references are unique
+				//then compute the new values for this atom.
+				if (ConnectionAtoms[i*3] == ConnectionAtoms[i*3+1]) {
+					if (ConnectionAtoms[i*3] == (i-1)) ConnectionAtoms[i*3+1] = i-2;
+					else ConnectionAtoms[i*3+1] = i-1;
+				}
+				if ((ConnectionAtoms[i*3] == ConnectionAtoms[i*3+2])||
+					(ConnectionAtoms[i*3+1] == ConnectionAtoms[i*3+2])) {
+					if ((ConnectionAtoms[i*3] != (i-1)) &&
+						(ConnectionAtoms[i*3+1] != (i-1))) ConnectionAtoms[i*3+2] = i-1;
+					else if ((ConnectionAtoms[i*3] != (i-2)) &&
+							 (ConnectionAtoms[i*3+1] != (i-2))) ConnectionAtoms[i*3+2] = i-2;
+					else
+						ConnectionAtoms[i*3+2] = i-3;
+
+				}
+				UpdateInternalValuesAtom(MainData, i);
+			}
 		}
 		ConnectionAtoms[NewPosition*3] = i0;
 		ConnectionAtoms[NewPosition*3+1] = i1;
@@ -664,5 +633,15 @@ void MOPacInternals::ChangeAtomIndex(MoleculeData * MainData, long OldPosition, 
 		Type[NewPosition*3] = t0;
 		Type[NewPosition*3+1] = t1;
 		Type[NewPosition*3+2] = t2;
+		//Now update references for atoms higher up in the list
+		for (long i=(NewPosition+1); (i*3)<Count; i++) {
+			for (long j=0; j<3; j++) {
+				if (ConnectionAtoms[3*i+j] == OldPosition)
+					ConnectionAtoms[3*i+j] = NewPosition;
+				else if ((ConnectionAtoms[3*i+j] <= NewPosition) &&
+						 (ConnectionAtoms[3*i+j] > OldPosition))
+					ConnectionAtoms[3*i+j]--;
+			}
+		}
 	}
 }
