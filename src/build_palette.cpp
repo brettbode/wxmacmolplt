@@ -296,6 +296,18 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	wxButton *delete_button =
 		new wxButton(panel, kPeriodicDeleteStructure, _("Delete Structure"));
 
+	// It seems more sensible to just add the canvas directly to the grid
+	// bag sizer, but GTK requires us to hide its parent widget before adding
+	// it.  But hiding the structure panel causes some page change events
+	// in the notebook that we want to avoid.  So, we create an intermediate
+	// panel and add the canvas to that.
+	canvas_panel = new wxPanel(panel, wxID_ANY);
+	canvas_panel_sizer = new wxFlexGridSizer(1, 1, 0, 0);
+	canvas_panel_sizer->AddGrowableCol(0);
+	canvas_panel_sizer->AddGrowableRow(0);
+	canvas_panel_sizer->SetFlexibleDirection(wxBOTH);
+	canvas_panel->SetSizerAndFit(canvas_panel_sizer);
+
 	struc_sizer->Add(label, wxGBPosition(0, 0), wxGBSpan(1, 1), rflags);
 	struc_sizer->Add(mStructureChoice, wxGBPosition(0, 1), wxGBSpan(1, 1), lflags);
 
@@ -303,6 +315,8 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	struc_sizer->Add(save_as_button, wxGBPosition(1, 2), wxGBSpan(1, 1), wxEXPAND);
 	struc_sizer->Add(load_button, wxGBPosition(2, 2), wxGBSpan(1, 1), wxEXPAND);
 	struc_sizer->Add(delete_button, wxGBPosition(3, 2), wxGBSpan(1, 1), wxEXPAND);
+
+	struc_sizer->Add(canvas_panel, wxGBPosition(1, 0), wxGBSpan(4, 2), wxEXPAND);
 
 	struc_sizer->AddGrowableCol(0, 1);
 	struc_sizer->AddGrowableCol(1, 1);
@@ -855,27 +869,29 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 
 	if (event.GetOldSelection() == 1 && canvas) {
 		delete canvas;
+		canvas = NULL;
 	}
 
 	if (event.GetSelection() == 1) {
-
 		/* GTK has a problem with gtk_widget_set_colormap being called within
 		 * wx.  GTK wants it called before the widget is made, but wx calls 
 		 * it afterward.  So, we work around that by hiding the parent and
 		 * showing it again.  In the hiding, we must also reselect the tab
 		 * since the selection is lost. */
-		structures_panel->Hide();
-		canvas = new PreviewCanvas(structures_panel);
-		struc_sizer->Add(canvas, wxGBPosition(1, 0), wxGBSpan(4, 2), wxEXPAND);
-		structures_panel->Show();
-		tabs->ChangeSelection(1);
+		canvas_panel->Hide();
+		int attrs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0};
+		canvas = new PreviewCanvas(canvas_panel, wxID_ANY, attrs);
+		canvas_panel_sizer->Add(canvas, wxSizerFlags().Expand());
+		canvas_panel_sizer->Layout();
+		canvas_panel->Show();
 
-		canvas->InitGL();
-		if (structures.size()) {
-			canvas->SetStructure(structures[mStructureChoice->GetSelection()]);
+		if (event.GetSelection() == 1) {
+			canvas->InitGL();
+			if (structures.size()) {
+				canvas->SetStructure(structures[mStructureChoice->GetSelection()]);
+			}
+			canvas->Render();
 		}
-		canvas->Render();
-		struc_sizer->Layout();
 	}
 
 }

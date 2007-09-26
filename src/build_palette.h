@@ -119,6 +119,8 @@ class BuilderDlg: public wxMiniFrame {
 		wxNotebook *tabs;
 		wxPanel *periodic_panel;
 		wxPanel *structures_panel;
+		wxPanel *canvas_panel;
+		wxFlexGridSizer *canvas_panel_sizer;
 		wxChoice *mStructureChoice;
 		std::vector<Structure *> structures;
 		PreviewCanvas *canvas;

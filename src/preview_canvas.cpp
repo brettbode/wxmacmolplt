@@ -32,12 +32,15 @@ void PreviewCanvas::InitGL() {
 	SetCurrent();
 	// context->SetCurrent(*this); 
 	
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	
 	glShadeModel(GL_SMOOTH);
-	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glClearDepth(1.0);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glEnable(GL_CULL_FACE);
 	
 	GLfloat light_position[4];
 	GLfloat ambient_color[] = {0.2, 0.2, 0.2, 1.0};
@@ -90,6 +93,7 @@ void PreviewCanvas::OnSize(wxSizeEvent& event) {
 		glMatrixMode(GL_MODELVIEW);
 	}
 
+	Refresh();
 	Update();
 
 }
@@ -104,7 +108,6 @@ void PreviewCanvas::OnSize(wxSizeEvent& event) {
 
 void PreviewCanvas::Render() {
 
-	// SetCurrent(*context); 
 	SetCurrent();
 
 	RGBColor *BackgroundColor = gPreferences->GetBackgroundColorLoc();
@@ -113,8 +116,8 @@ void PreviewCanvas::Render() {
 				 BackgroundColor->blue / 65536.0f, 1.0f);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
 	glLoadIdentity();
+
 	gluLookAt(0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
 	glMultMatrixf((float *) global_rotation);
@@ -211,12 +214,12 @@ void PreviewCanvas::OnLeftMouseDown(wxMouseEvent& event) {
 
 void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 
-	const wxPoint& pt = event.GetPosition();
-	int width, height;
-
 	if (!event.Dragging()) {
 		return;
 	}
+
+	const wxPoint& pt = event.GetPosition();
+	int width, height;
 
 	GetClientSize(&width, &height);
 
@@ -371,12 +374,22 @@ void PreviewCanvas::DrawBond(const Bond& bond, const mpAtom& atom1,
 
 /* ------------------------------------------------------------------------- */
 
+void PreviewCanvas::OnIdle(wxIdleEvent& event) {
+
+	Render();
+	event.RequestMore();
+
+}
+
+/* ------------------------------------------------------------------------- */
+
 BEGIN_EVENT_TABLE(PreviewCanvas, wxGLCanvas)
 	EVT_PAINT(PreviewCanvas::OnPaint)
 	EVT_SIZE(PreviewCanvas::OnSize)
 	EVT_LEFT_DOWN(PreviewCanvas::OnLeftMouseDown)
 	EVT_MOTION(PreviewCanvas::OnMouseDrag)
 	EVT_ERASE_BACKGROUND(PreviewCanvas::OnErase)
+	/* EVT_IDLE(PreviewCanvas::OnIdle) */
 END_EVENT_TABLE()
 
 /* ------------------------------------------------------------------------- */
