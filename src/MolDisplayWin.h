@@ -509,7 +509,16 @@ class MolDisplayWin : public wxFrame {
 		void UpdateGLModel(void);
 		void Rotate(wxMouseEvent&);
 		void RotateMoleculeGL(bool ShowAngles, bool ShowTrackball);
-		void DrawHydrogenBond(long bondNum);
+		static void DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
+									 const mpAtom& atom2,
+									 const WinPrefs& Prefs,
+									 GLUquadric *quadric,
+									 bool highlighting_on = false);
+		static void DrawBond(const Bond& bond, const mpAtom& atom1,
+							 const mpAtom& atom2, const WinPrefs& Prefs,
+							 GLUquadric *quadric, GLdouble *modelview,
+							 GLdouble *proj, GLint *viewport,
+							 bool highlighting_on = false);
 		void PrintGL(wxDC * dc, const float & scaleFactor);
 		void SetHighliteMode(bool state) { mHighliteState = state; }
 		void DrawStaticLabel(const char* label, GLfloat x, GLfloat y);

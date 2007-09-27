@@ -102,7 +102,9 @@ class BuilderDlg: public wxMiniFrame {
 		void UpdateSaveStructures(wxUpdateUIEvent& event);
 		void UpdateSaveStructuresAs(wxUpdateUIEvent& event);
 		void UpdateDeleteStructure(wxUpdateUIEvent& event);
+		void UpdateRenameStructure(wxUpdateUIEvent& event);
 		void DeleteStructure(wxCommandEvent& event);
+		void RenameStructure(wxCommandEvent& event);
 		void OnStructureChoice(wxCommandEvent& event);
 		void TabChanged(wxNotebookEvent& event);
 

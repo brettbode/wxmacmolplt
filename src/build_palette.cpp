@@ -17,6 +17,7 @@ extern BuilderDlg *build_palette;
 #define kPeriodicDeleteStructure    13805
 #define kPeriodicNotebookID         13806
 #define kPeriodicStructureChoice    13807
+#define kPeriodicRenameStructure    13808
 
 IMPLEMENT_DYNAMIC_CLASS(BuilderDlg, wxMiniFrame)
 
@@ -30,11 +31,13 @@ BEGIN_EVENT_TABLE(BuilderDlg, wxMiniFrame)
 	EVT_BUTTON(kPeriodicSaveStructuresAs, BuilderDlg::SaveStructuresAs)
 	EVT_BUTTON(kPeriodicLoadStructures, BuilderDlg::LoadStructures)
 	EVT_BUTTON(kPeriodicDeleteStructure, BuilderDlg::DeleteStructure)
+	EVT_BUTTON(kPeriodicRenameStructure, BuilderDlg::RenameStructure)
 	EVT_CHAR(BuilderDlg::KeyHandler)
 	EVT_CLOSE(BuilderDlg::OnClose)
 	EVT_UPDATE_UI(kPeriodicSaveStructuresAs, BuilderDlg::UpdateSaveStructuresAs)
 	EVT_UPDATE_UI(kPeriodicSaveStructures, BuilderDlg::UpdateSaveStructures)
 	EVT_UPDATE_UI(kPeriodicDeleteStructure, BuilderDlg::UpdateDeleteStructure)
+	EVT_UPDATE_UI(kPeriodicRenameStructure, BuilderDlg::UpdateRenameStructure)
 	EVT_NOTEBOOK_PAGE_CHANGED(kPeriodicNotebookID, BuilderDlg::TabChanged)
 END_EVENT_TABLE()
 
@@ -275,7 +278,7 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 
 	struc_sizer->SetFlexibleDirection(wxBOTH);
 	struc_sizer->SetCols(3);
-	struc_sizer->SetRows(5);
+	struc_sizer->SetRows(6);
 	wxStaticText *label =
 		new wxStaticText(panel, wxID_ANY, wxT("Structure: "));
 	
@@ -296,6 +299,9 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	wxButton *delete_button =
 		new wxButton(panel, kPeriodicDeleteStructure, _("Delete Structure"));
 
+	wxButton *rename_button =
+		new wxButton(panel, kPeriodicRenameStructure, _("Rename Structure"));
+
 	// It seems more sensible to just add the canvas directly to the grid
 	// bag sizer, but GTK requires us to hide its parent widget before adding
 	// it.  But hiding the structure panel causes some page change events
@@ -315,12 +321,13 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	struc_sizer->Add(save_as_button, wxGBPosition(1, 2), wxGBSpan(1, 1), wxEXPAND);
 	struc_sizer->Add(load_button, wxGBPosition(2, 2), wxGBSpan(1, 1), wxEXPAND);
 	struc_sizer->Add(delete_button, wxGBPosition(3, 2), wxGBSpan(1, 1), wxEXPAND);
+	struc_sizer->Add(rename_button, wxGBPosition(4, 2), wxGBSpan(1, 1), wxEXPAND);
 
-	struc_sizer->Add(canvas_panel, wxGBPosition(1, 0), wxGBSpan(4, 2), wxEXPAND);
+	struc_sizer->Add(canvas_panel, wxGBPosition(1, 0), wxGBSpan(5, 2), wxEXPAND);
 
 	struc_sizer->AddGrowableCol(0, 1);
 	struc_sizer->AddGrowableCol(1, 1);
-	struc_sizer->AddGrowableRow(4, 1);
+	struc_sizer->AddGrowableRow(5, 1);
 
 	panel->SetSizerAndFit(struc_sizer);
 
@@ -645,7 +652,10 @@ void BuilderDlg::AddStructure(Structure *structure) {
 
 	// Select the just added structure.
 	mStructureChoice->SetSelection(mStructureChoice->GetCount() - 1);
-	canvas->SetStructure(structures[structures.size() - 1]);
+
+	if (canvas) {
+		canvas->SetStructure(structures[structures.size() - 1]);
+	}
 
 	structures_dirty = true;
 
@@ -834,6 +844,14 @@ void BuilderDlg::UpdateDeleteStructure(wxUpdateUIEvent& event) {
 
 }
 
+/* ------------------------------------------------------------------------- */
+
+void BuilderDlg::UpdateRenameStructure(wxUpdateUIEvent& event) {
+
+	event.Enable(mStructureChoice->GetSelection() >= nglobal_structures);
+
+}
+
 // --------------------------------------------------------------------------- 
 /**
  * This function handles clicks on the Delete Structure button.  The current
@@ -846,12 +864,34 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 
 	int id = mStructureChoice->GetSelection();
 
+	if (id < nglobal_structures) return;
+
 	delete structures[id];
 	structures.erase(structures.begin() + id);
 	mStructureChoice->Delete(id);
 	mStructureChoice->SetSelection(0);
 	canvas->SetStructure(structures[0]);
 	structures_dirty = true;
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+void BuilderDlg::RenameStructure(wxCommandEvent& event) {
+
+	int id = mStructureChoice->GetSelection();
+
+	if (id < nglobal_structures) return;
+
+	wxString new_name = wxGetTextFromUser(_("Enter structure name:"),
+										  _("Rename Structure"),
+										  _(""), this);
+
+	if (!new_name.IsEmpty()) {
+		structures[id]->name = new_name;
+		mStructureChoice->SetString(id, structures[id]->name);
+		structures_dirty = true;
+	}
 
 }
 
