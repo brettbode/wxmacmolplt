@@ -30,97 +30,6 @@ void Internals::CreateMOPacInternals(long Num) {
 		MOPacStyle = new MOPacInternals(Num);
 	}
 }
-long Internals::GetSize(BufferFile * Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long length = Write(Buffer);
-	Buffer->SetOutput(cState);
-	return length;
-}
-long Internals::Write(BufferFile * Buffer) {
-	long total = 0;
-	
-	if (MOPacStyle) {
-		long code = 1;
-		total = Buffer->Write((Ptr) &code, sizeof(long));
-		long length = MOPacStyle->GetSize(Buffer);
-		total += Buffer->Write((Ptr) &length, sizeof(long));
-		total += MOPacStyle->Write(Buffer);
-	}
-	return total;
-}
-Internals * Internals::Read(BufferFile * Buffer) {
-		long code;
-		Internals * temp=NULL;
-	Buffer->Read((Ptr) &code, sizeof(long));
-	if (code == 1) {
-		temp = new Internals;
-		if (!temp) throw DataError();
-		Buffer->Read((Ptr) &code, sizeof(long));
-		temp->MOPacStyle = new MOPacInternals(Buffer);
-	}
-	return temp;
-}
-long MOPacInternals::GetSize(BufferFile * Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long length = Write(Buffer);
-	Buffer->SetOutput(cState);
-	return length;
-}
-long MOPacInternals::Write(BufferFile * Buffer) {
-	long code = 1;
-	long total = Buffer->Write((Ptr) &code, sizeof(long));
-	long length = sizeof(MOPacInternals);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) this, length);
-
-	code = 2;
-	total += Buffer->Write((Ptr) &code, sizeof(long));
-	length = Count * sizeof(long);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) ConnectionAtoms, length);
-	
-	code = 3;
-	total += Buffer->Write((Ptr) &code, sizeof(long));
-	length = Count * sizeof(float);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) Values, length);
-	
-	code = 4;
-	total += Buffer->Write((Ptr) &code, sizeof(long));
-	length = Count * sizeof(char);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) Type, length);
-	
-	return total;
-}
-MOPacInternals::MOPacInternals(BufferFile * Buffer) {
-		long code;
-	Buffer->Read((Ptr) &code, sizeof(long));
-	if (code != 1) throw DataError();
-	Buffer->Read((Ptr) &code, sizeof(long));
-	if (code != sizeof(MOPacInternals)) throw DataError();
-	Buffer->Read((Ptr) this, sizeof(MOPacInternals));
-	ConnectionAtoms = new long[Count];
-	Values = new float[Count];
-	Type = new char[Count];
-	if (!ConnectionAtoms || !Values || !Type) throw MemoryError();
-	Allocation = Count;
-
-	Buffer->Read((Ptr) &code, sizeof(long));
-	if (code != 2) throw DataError();
-	Buffer->Read((Ptr) &code, sizeof(long));
-	Buffer->Read((Ptr) ConnectionAtoms, code);
-	Buffer->Read((Ptr) &code, sizeof(long));
-	if (code != 3) throw DataError();
-	Buffer->Read((Ptr) &code, sizeof(long));
-	Buffer->Read((Ptr) Values, code);
-	Buffer->Read((Ptr) &code, sizeof(long));
-	if (code != 4) throw DataError();
-	Buffer->Read((Ptr) &code, sizeof(long));
-	Buffer->Read((Ptr) Type, code);
-}
 MOPacInternals::MOPacInternals(long Num) {
 	ConnectionAtoms = new long[Num];
 	Values = new float[Num];
@@ -135,21 +44,22 @@ MOPacInternals::~MOPacInternals(void) {
 	if (Type) delete [] Type;
 }
 //Guess the connection atom set, then setup the values
-void MOPacInternals::GuessInit(MoleculeData * MainData) {
+void MOPacInternals::GuessInit(MoleculeData * MainData, long theAtom, bool keepOld) {
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	if (3*lFrame->NumAtoms > Allocation) return;
 	if (lFrame->NumAtoms < 2) return;
+	long StartAtom=1, EndAtom=lFrame->NumAtoms;
+	//Nothing to do for the first atom
+	if (theAtom == 0) return;
+	if (theAtom>0) {
+		StartAtom=theAtom;
+		EndAtom=StartAtom+1;
+	}
 		// First pair of atoms
-	ConnectionAtoms[3] = 0;
 		CPoint3D BondVector, testVector;
-	BondVector.x = lFrame->Atoms[1].Position.x - lFrame->Atoms[0].Position.x;
-	BondVector.y = lFrame->Atoms[1].Position.y - lFrame->Atoms[0].Position.y;
-	BondVector.z = lFrame->Atoms[1].Position.z - lFrame->Atoms[0].Position.z;
-	Values[3] = BondVector.Magnitude();
-	Type[3] = 0;
 		long BondedAtom, AngleAtom, DihedralAtom, i;
 		float BondLength, SecondLength, ThirdLength, testLength;
-	for (long iatom=2; iatom<lFrame->NumAtoms; iatom++) {
+	for (long iatom=StartAtom; iatom<EndAtom; iatom++) {
 			//Find the closest atom to choose as the bonded atom
 		BondedAtom = 0;
 		BondVector.x = lFrame->Atoms[iatom].Position.x - lFrame->Atoms[0].Position.x;
@@ -186,34 +96,59 @@ void MOPacInternals::GuessInit(MoleculeData * MainData) {
 			fold back on themselves, especially those with hydrogen bonds.
 			So instead try using the connection list for the atom defining the bond.
 		*/
+		if (keepOld) {
+			if ((ConnectionAtoms[3*iatom]>=0)&&(ConnectionAtoms[3*iatom]<iatom)) {
+				if (AngleAtom == ConnectionAtoms[3*iatom]) AngleAtom = BondedAtom;
+				if (DihedralAtom == ConnectionAtoms[3*iatom]) DihedralAtom = BondedAtom;
+				BondedAtom = ConnectionAtoms[3*iatom];
+			}
+		}
 		ConnectionAtoms[3*iatom] = BondedAtom;
 		Values[3*iatom] = BondLength;
 		Type[3*iatom] = 0;
-			//Bond angle - atom -> BondedAtom -> AngleAtom
-		if ((BondedAtom > 0)&&(ConnectionAtoms[3*BondedAtom]!=BondedAtom)&&(lFrame->Atoms[iatom].Type>1)&&
-			(lFrame->Atoms[ConnectionAtoms[3*BondedAtom]].Type>1)) {
-			ConnectionAtoms[3*iatom+1] = ConnectionAtoms[3*BondedAtom];
-			if (DihedralAtom == ConnectionAtoms[3*BondedAtom]) DihedralAtom = AngleAtom;
-			AngleAtom = ConnectionAtoms[3*BondedAtom];
-		} else
-			ConnectionAtoms[3*iatom+1] = AngleAtom;
-		Type[3*iatom+1] = 1;
-		if (iatom>2) {
-				//Dihedral Angle
-			if ((BondedAtom > 2)&&(ConnectionAtoms[3*BondedAtom+1]!=AngleAtom)&&(lFrame->Atoms[iatom].Type>1)&&
-				(lFrame->Atoms[ConnectionAtoms[3*BondedAtom+1]].Type>1))
-				ConnectionAtoms[3*iatom+2] = ConnectionAtoms[3*BondedAtom+1];
-			else {
-				if (DihedralAtom != ConnectionAtoms[3*iatom+1])
-					ConnectionAtoms[3*iatom+2] = DihedralAtom;
-				else
-					ConnectionAtoms[3*iatom+2] = AngleAtom;
+		if (iatom >= 2) {
+			if (keepOld &&(ConnectionAtoms[3*iatom+1]>=0)&&(ConnectionAtoms[3*iatom+1]<iatom)&&
+				(ConnectionAtoms[3*iatom+1]!=BondedAtom)) {
+				if (DihedralAtom == ConnectionAtoms[3*iatom+1]) DihedralAtom = BondedAtom;
+				AngleAtom = ConnectionAtoms[3*iatom+1];
+			} else {
+					//Bond angle - atom -> BondedAtom -> AngleAtom
+				if ((BondedAtom > 0)&&(ConnectionAtoms[3*BondedAtom]!=BondedAtom)&&(lFrame->Atoms[iatom].Type>1)&&
+					(lFrame->Atoms[ConnectionAtoms[3*BondedAtom]].Type>1)) {
+					ConnectionAtoms[3*iatom+1] = ConnectionAtoms[3*BondedAtom];
+					if (DihedralAtom == ConnectionAtoms[3*BondedAtom]) DihedralAtom = AngleAtom;
+					AngleAtom = ConnectionAtoms[3*BondedAtom];
+				} else
+					ConnectionAtoms[3*iatom+1] = AngleAtom;
 			}
-			Type[3*iatom+2] = 2;
+			Type[3*iatom+1] = 1;
+			if (iatom >= 3) {
+				if (keepOld &&(ConnectionAtoms[3*iatom+2]>=0)&&(ConnectionAtoms[3*iatom+2]<iatom)&&
+					(ConnectionAtoms[3*iatom+2]!=BondedAtom)&&(ConnectionAtoms[3*iatom+2]!=AngleAtom)) {
+					if (DihedralAtom == ConnectionAtoms[3*iatom+1]) DihedralAtom = BondedAtom;
+					DihedralAtom = ConnectionAtoms[3*iatom+2];
+				} else {
+						//Dihedral Angle
+					if ((BondedAtom > 2)&&(ConnectionAtoms[3*BondedAtom+1]!=AngleAtom)&&(lFrame->Atoms[iatom].Type>1)&&
+						(lFrame->Atoms[ConnectionAtoms[3*BondedAtom+1]].Type>1))
+						ConnectionAtoms[3*iatom+2] = ConnectionAtoms[3*BondedAtom+1];
+					else {
+						if (DihedralAtom != ConnectionAtoms[3*iatom+1])
+							ConnectionAtoms[3*iatom+2] = DihedralAtom;
+						else
+							ConnectionAtoms[3*iatom+2] = AngleAtom;
+					}
+				}
+				Type[3*iatom+2] = 2;
+			}
 		}
 	}
-	Count = 3*lFrame->NumAtoms;
-	CartesiansToInternals(MainData);
+	if (theAtom > 0)
+		UpdateInternalValuesAtom(MainData, theAtom);
+	else {	//update all the atoms
+		Count = 3*lFrame->NumAtoms;
+		CartesiansToInternals(MainData);
+	}
 }
 void MOPacInternals::AddInternalCoordinate(long whichAtom, long connectedAtom, short type, float value) {
 	if (3*whichAtom > Allocation) return;
@@ -441,38 +376,25 @@ void MOPacInternals::AddAtom(MoleculeData * MainData) {
 		//Now add the new atoms connections to the end of the list - valid since
 		//new atoms are always appended to the end of the atom list
 	long newAtom = Count/3;
-	ConnectionAtoms[3*newAtom] = 0;		//Just put in some valid defaults
-	ConnectionAtoms[3*newAtom+1] = 1;
-	ConnectionAtoms[3*newAtom+2] = 2;
 	Count += 3;
-	UpdateInternalValuesAtom(MainData, newAtom);
+	GuessInit(MainData, newAtom, false);
 }
 void MOPacInternals::DeleteAtom(MoleculeData * MainData, long WhichAtom) {
-	for (long i=3*WhichAtom; i<(Count-3); i+=3) {	//pull down the atoms higher in the list
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	for (long i=WhichAtom; i<lFrame->NumAtoms; i++) {	//pull down the atoms higher in the list
 		bool update = false;
 		for (long j=0; j<3; j++) {
-			ConnectionAtoms[i+j] = ConnectionAtoms[i+j+3];
-			Values[i+j] = Values[i+j+3];
-			Type[i+j] = Type[i+j+3];
-			if (ConnectionAtoms[i+j] == WhichAtom) {
+			ConnectionAtoms[3*i+j] = ConnectionAtoms[3*i+j+3];
+			Values[3*i+j] = Values[3*i+j+3];
+			Type[3*i+j] = Type[3*i+j+3];
+			if (ConnectionAtoms[3*i+j] == WhichAtom) {
 				//Have to change the reference to a different atom
 				update = true;
-				ConnectionAtoms[i+j]--;
-			} else if (ConnectionAtoms[i+j] > WhichAtom) ConnectionAtoms[i+j]--;	//reduce connection atom count
+				ConnectionAtoms[3*i+j] = -1;
+			} else if (ConnectionAtoms[3*i+j] > WhichAtom) ConnectionAtoms[3*i+j]--;	//reduce connection atom count
 		}
-		if (update) {
-			//first confirm the three references are unique
-			if (ConnectionAtoms[i] == ConnectionAtoms[i+1]) ConnectionAtoms[i+1] --;
-			if ((ConnectionAtoms[i] == ConnectionAtoms[i+2])||(ConnectionAtoms[i+1] == ConnectionAtoms[i+2])) {
-				if ((ConnectionAtoms[i] != (WhichAtom-1))&&(ConnectionAtoms[i+1]!=(WhichAtom-1)))
-					ConnectionAtoms[i+2] = WhichAtom-1;
-				else if ((ConnectionAtoms[i] != (WhichAtom-2))&&(ConnectionAtoms[i+1]!=(WhichAtom-2)))
-					ConnectionAtoms[i+2] = WhichAtom-2;
-				else
-					ConnectionAtoms[i+2] = WhichAtom-3;
-				UpdateInternalValuesAtom(MainData, i/3);
-			}
-		}
+		if (update)
+			GuessInit(MainData, i, true);
 	}
 	if (Count > 0) Count -= 3;	//reduce the number of internal coordinates
 }
@@ -531,28 +453,20 @@ void MOPacInternals::ChangeAtomIndex(MoleculeData * MainData, long OldPosition, 
 		bool update=false;
 		//make sure the moved atoms references point to atoms prior to it in the list
 		if (ConnectionAtoms[3*NewPosition] >= NewPosition) {
-			ConnectionAtoms[3*NewPosition] = NewPosition - 1;
+			ConnectionAtoms[3*NewPosition] = -1;
 			update = true;
 		}
 		if ((ConnectionAtoms[3*NewPosition+1] >= NewPosition)||(ConnectionAtoms[3*NewPosition]==ConnectionAtoms[3*NewPosition+1])) {
-			if (ConnectionAtoms[3*NewPosition] == (NewPosition - 1))
-				ConnectionAtoms[3*NewPosition+1] = NewPosition - 2;
-			else
-				ConnectionAtoms[3*NewPosition+1] = NewPosition - 1;
+			ConnectionAtoms[3*NewPosition+1] = -1;
 			update = true;
 		}
 		if ((ConnectionAtoms[3*NewPosition+2] >= NewPosition)||
 			(ConnectionAtoms[3*NewPosition]==ConnectionAtoms[3*NewPosition+2])||
 			(ConnectionAtoms[3*NewPosition+1]==ConnectionAtoms[3*NewPosition+2])) {
-			if (ConnectionAtoms[3*NewPosition] != (NewPosition - 1)&&(ConnectionAtoms[3*NewPosition+1] != (NewPosition - 1)))
-				ConnectionAtoms[3*NewPosition+2] = NewPosition - 1;
-			else if (ConnectionAtoms[3*NewPosition] != (NewPosition - 2)&&(ConnectionAtoms[3*NewPosition+1] != (NewPosition - 2)))
-				ConnectionAtoms[3*NewPosition+2] = NewPosition - 2;
-			else 
-				ConnectionAtoms[3*NewPosition+1] = NewPosition - 3;
+			ConnectionAtoms[3*NewPosition+2] = -1;
 			update = true;
 		}
-		if (update) UpdateInternalValuesAtom(MainData, NewPosition);
+		if (update) GuessInit(MainData, NewPosition, true);
 		//Now update references for atoms higher up in the list
 		for (long i=(OldPosition+1); (i*3)<Count; i++) {
 			for (long j=0; j<3; j++) {
@@ -589,17 +503,17 @@ void MOPacInternals::ChangeAtomIndex(MoleculeData * MainData, long OldPosition, 
 			//update the index to the new index for the same atom.
 			if (ConnectionAtoms[i*3] == OldPosition) {
 				//Since the newposition is later in the list this reference must change
-				ConnectionAtoms[3*i] = i-1;
+				ConnectionAtoms[3*i] = -1;
 				update = true;
 			} else if ((ConnectionAtoms[i*3] > OldPosition)&&(ConnectionAtoms[i*3] <= NewPosition)) 
 				ConnectionAtoms[i*3] --;
 			if (ConnectionAtoms[i*3+1] == OldPosition) {
-				ConnectionAtoms[3*i+1] = i-1;
+				ConnectionAtoms[3*i+1] = -1;
 				update = true;
 			} else if ((ConnectionAtoms[i*3+1] > OldPosition)&&(ConnectionAtoms[i*3+1] <= NewPosition))
 				ConnectionAtoms[i*3+1] --;
 			if (ConnectionAtoms[i*3+2] == OldPosition) {
-				ConnectionAtoms[3*i+2] = i-1;
+				ConnectionAtoms[3*i+2] = -1;
 				update = true;
 			} else if ((ConnectionAtoms[i*3+2] > OldPosition)&&(ConnectionAtoms[i*3+2] <= NewPosition))
 				ConnectionAtoms[i*3+2] --;
@@ -607,21 +521,7 @@ void MOPacInternals::ChangeAtomIndex(MoleculeData * MainData, long OldPosition, 
 			if (update) {
 				//A reference has changed. Confirm that the three index references are unique
 				//then compute the new values for this atom.
-				if (ConnectionAtoms[i*3] == ConnectionAtoms[i*3+1]) {
-					if (ConnectionAtoms[i*3] == (i-1)) ConnectionAtoms[i*3+1] = i-2;
-					else ConnectionAtoms[i*3+1] = i-1;
-				}
-				if ((ConnectionAtoms[i*3] == ConnectionAtoms[i*3+2])||
-					(ConnectionAtoms[i*3+1] == ConnectionAtoms[i*3+2])) {
-					if ((ConnectionAtoms[i*3] != (i-1)) &&
-						(ConnectionAtoms[i*3+1] != (i-1))) ConnectionAtoms[i*3+2] = i-1;
-					else if ((ConnectionAtoms[i*3] != (i-2)) &&
-							 (ConnectionAtoms[i*3+1] != (i-2))) ConnectionAtoms[i*3+2] = i-2;
-					else
-						ConnectionAtoms[i*3+2] = i-3;
-
-				}
-				UpdateInternalValuesAtom(MainData, i);
+				GuessInit(MainData, i, true);
 			}
 		}
 		ConnectionAtoms[NewPosition*3] = i0;

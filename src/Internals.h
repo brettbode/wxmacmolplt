@@ -48,7 +48,6 @@ class MOPacInternals {
 		 * @param count The initial number of coordinates to expect.
 		 */
 		MOPacInternals(long count);
-		MOPacInternals(BufferFile * Buffer);
 		/**
 		 * Constructor with initial data from CML.
 		 * @param Parent The XML parent element containing the internal coordinate data.
@@ -75,8 +74,6 @@ class MOPacInternals {
 		 * @param File The output file buffer.
 		 */
 		void WriteMPCZMatCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs);
-		long GetSize(BufferFile * Buffer);
-		long Write(BufferFile * Buffer);
 		/**
 		 * Output the class in XML for saving to file. Save the class data in XML suitable for
 		 * the XML based constructor to read back in.
@@ -88,8 +85,10 @@ class MOPacInternals {
 		 * be setup based on distances and other information, then the current internal coordinate
 		 * values computed.
 		 * @param MainData The coordinate information.
+		 * @param theAtom If provided, the single atom to initialize.
+		 * @param keepOld If parts of the old connection list are valid preserve them.
 		 */
-		void GuessInit(MoleculeData * MainData);
+		void GuessInit(MoleculeData * MainData, long theAtom=-1, bool keepOld=false);
 		/**
 		 * Update the current internal coordinate values. Computes the internal coordinate values
 		 * based on the cartesian coordinates for the current frame.
@@ -191,11 +190,8 @@ class Internals {
 		Internals(void);
 		~Internals(void);
 		inline MOPacInternals * GetMOPacStyle(void) {return MOPacStyle;};
-		long GetSize(BufferFile * Buffer);
-		long Write(BufferFile * Buffer);
 		void ReadXML(XMLElement * parent);
 		void WriteXML(XMLElement * parent) const;
-		Internals * Read(BufferFile * Buffer);
 		void CreateMOPacInternals(long Num);
 		inline void WriteZMATToFile(BufferFile * File) {if (MOPacStyle) MOPacStyle->WriteZMATToFile(File);};
 		inline void WriteCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) 
