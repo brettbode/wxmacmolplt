@@ -33,6 +33,7 @@ class PreviewCanvas : public wxGLCanvas {
 		void OnSize(wxSizeEvent& event);
 		void OnIdle(wxIdleEvent& event);
 		void OnLeftMouseDown(wxMouseEvent& event);
+		void OnMiddleMouseDown(wxMouseEvent& event);
 		void OnMouseDrag(wxMouseEvent& event);
 		void DrawBond(const Bond& bond, const mpAtom& atom1,
 					  const mpAtom& atom2);
@@ -47,6 +48,7 @@ class PreviewCanvas : public wxGLCanvas {
 		GLdouble proj[16];
 		GLint viewport[4];
 		GLUquadric *quadric;
+		float fov;
 
 	DECLARE_EVENT_TABLE()
 };

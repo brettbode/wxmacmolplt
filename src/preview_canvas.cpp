@@ -22,6 +22,7 @@ PreviewCanvas::PreviewCanvas(
 	// context = NULL; 
 	InitRotationMatrix(global_rotation);
 	struc = NULL;
+	fov = 45.0f;
 
 }
 
@@ -41,6 +42,8 @@ void PreviewCanvas::InitGL() {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LEQUAL);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 	glEnable(GL_CULL_FACE);
 	
 	GLfloat light_position[4];
@@ -77,22 +80,8 @@ void PreviewCanvas::OnPaint(wxPaintEvent& event) {
    
 void PreviewCanvas::OnSize(wxSizeEvent& event) {
 
-	int width, height;
 	
 	wxGLCanvas::OnSize(event);
-	
-	if (GetContext()) {
-		SetCurrent();
-
-		GetClientSize(&width, &height);
-		
-		glViewport(0, 0, width, height);
-		
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluPerspective(45.0f, ((float) width) / height, 0.1f, 1000.0f);
-		glMatrixMode(GL_MODELVIEW);
-	}
 
 	Refresh();
 	Update();
@@ -117,6 +106,16 @@ void PreviewCanvas::Render() {
 				 BackgroundColor->blue / 65536.0f, 1.0f);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	int width, height;
+	GetClientSize(&width, &height);
+	glViewport(0, 0, width, height);
+		
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(fov, ((float) width) / height, 0.1f, 1000.0f);
+
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	gluLookAt(0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
@@ -142,6 +141,8 @@ void PreviewCanvas::Render() {
 		glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
 
 		quadric = gluNewQuadric();
+		gluQuadricOrientation(quadric, GLU_OUTSIDE);
+		gluQuadricNormals(quadric, GLU_SMOOTH); //GLU_FLAT GLU_NONE
 
 		// Draw all the atoms.
 		for (i = 0; i < struc->natoms; i++) {
@@ -206,11 +207,20 @@ void PreviewCanvas::OnLeftMouseDown(wxMouseEvent& event) {
 	
 	GetClientSize(&width, &height);
 	
-	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+	prev_mouse = curr_mouse;
 
 	Render();
 
+}
+
+/* ------------------------------------------------------------------------- */
+
+void PreviewCanvas::OnMiddleMouseDown(wxMouseEvent& event) {
+
+	curr_mouse = event.GetPosition();
+	prev_mouse = curr_mouse;
+	
 }
 
 /* ------------------------------------------------------------------------- */
@@ -229,27 +239,36 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
 
-	Point prev_pt;
-    prev_pt.h = prev_mouse.x;
-    prev_pt.v = prev_mouse.y;
+	if (event.MiddleIsDown() || (event.LeftIsDown() && event.ShiftDown())) {
+		fov += curr_mouse.y - prev_mouse.y;
+		if (fov < 1e-6f) {
+			fov = 1e-6f;
+		}
+	}
 
-	Point curr_pt;
-    curr_pt.h = curr_mouse.x;
-    curr_pt.v = curr_mouse.y;
+	else if (event.LeftIsDown()) {
+		Point prev_pt;
+		prev_pt.h = prev_mouse.x;
+		prev_pt.v = prev_mouse.y;
 
-	Point sphere_center;
-	sphere_center.h = width / 2;
-	sphere_center.v = height / 2;
+		Point curr_pt;
+		curr_pt.h = curr_mouse.x;
+		curr_pt.v = curr_mouse.y;
 
-	long sphere_radius = (long) (MAX(sphere_center.h, sphere_center.v) * 0.9f);
-	Matrix4D local_rotation;
-	Matrix4D tempcopyMatrix;
+		Point sphere_center;
+		sphere_center.h = width / 2;
+		sphere_center.v = height / 2;
 
-	VirtualSphereQD3D(prev_pt, curr_pt, sphere_center, sphere_radius,
-					  local_rotation, global_rotation);
-	MultiplyMatrix(local_rotation, global_rotation, tempcopyMatrix);
-	CopyMatrix(tempcopyMatrix, global_rotation);
-	OrthogonalizeRotationMatrix(global_rotation);
+		long sphere_radius = (long) (MAX(sphere_center.h, sphere_center.v) * 0.9f);
+		Matrix4D local_rotation;
+		Matrix4D tempcopyMatrix;
+
+		VirtualSphereQD3D(prev_pt, curr_pt, sphere_center, sphere_radius,
+						  local_rotation, global_rotation);
+		MultiplyMatrix(local_rotation, global_rotation, tempcopyMatrix);
+		CopyMatrix(tempcopyMatrix, global_rotation);
+		OrthogonalizeRotationMatrix(global_rotation);
+	}
 
 	Render();
 	Refresh(false);
@@ -391,6 +410,7 @@ BEGIN_EVENT_TABLE(PreviewCanvas, wxGLCanvas)
 	EVT_PAINT(PreviewCanvas::OnPaint)
 	EVT_SIZE(PreviewCanvas::OnSize)
 	EVT_LEFT_DOWN(PreviewCanvas::OnLeftMouseDown)
+	EVT_MIDDLE_DOWN(PreviewCanvas::OnMiddleMouseDown)
 	EVT_MOTION(PreviewCanvas::OnMouseDrag)
 	EVT_ERASE_BACKGROUND(PreviewCanvas::OnErase)
 	/* EVT_IDLE(PreviewCanvas::OnIdle) */

@@ -919,7 +919,7 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 		 * showing it again.  In the hiding, we must also reselect the tab
 		 * since the selection is lost. */
 		canvas_panel->Hide();
-		int attrs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0};
+		int attrs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 		canvas = new PreviewCanvas(canvas_panel, wxID_ANY, attrs);
 		canvas_panel_sizer->Add(canvas, wxSizerFlags().Expand());
 		canvas_panel_sizer->Layout();
