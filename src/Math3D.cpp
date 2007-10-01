@@ -273,7 +273,7 @@ void Normalize3D (CPoint3D *v)
  Modification of Michael Pique's formula in 
  Graphics Gems Vol. 1.  Andrew Glassner, Ed.  Addison-Wesley.
 -------------------------------------------------------------------------------------------------*/
-// #include <iostream> 
+#include <iostream> 
 void SetRotationMatrix (Matrix4D rotationMatrix, const CPoint3D *op, const CPoint3D *oq) {
 
 	float		s, c, t;
@@ -284,12 +284,20 @@ void SetRotationMatrix (Matrix4D rotationMatrix, const CPoint3D *op, const CPoin
 	c = DotProduct3D(op, oq);
 
 	if (s < 1e-6f) {
+		std::cout << "s: " << s << std::endl;
+		std::cout << "c: " << c << std::endl;
+
+		// If the two vectors are antiparallel.
 		if (c < 0.0f) {
-			a.x = op->x;
-			a.y = op->z;
-			a.z = op->y;
+			/* a.x = op->x; */
+			/* a.y = op->z; */
+			/* a.z = op->y; */
+			OrthoVector(*op, a);
 			s = a.Magnitude();
-		} else {
+		}
+		
+		// If the vectors are parallel, we just need an identity transform.
+		else {
 			InitRotationMatrix(rotationMatrix);
 			return;
 		}
