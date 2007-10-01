@@ -1232,9 +1232,8 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					lFrame->resetAllSelectState();
 					MolWin->SetHighliteMode(true);
 					
-					// Add all atoms but the last one, which we remove to get an empty
-					// bonding site.
-					for (int i = 0; i < structure->natoms - 1; i++) {
+					// Add all atoms and select them so they can be adjusted.
+					for (int i = 0; i < structure->natoms; i++) {
 						new_atom = new mpAtom(structure->atoms[i]);
 						lFrame->AddAtom(*new_atom, lFrame->NumAtoms);
 						lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
@@ -1245,14 +1244,12 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					for (int i = 0; i < structure->nbonds; i++) {
 						bond = &structure->bonds[i];
 						result = lFrame->AddBond(bond->Atom1 + prev_natoms,
-										bond->Atom2 + prev_natoms,
-										bond->Order);
+												 bond->Atom2 + prev_natoms,
+												 bond->Order);
 					}
 
 					lFrame->DeleteAtom(lFrame->NumAtoms - 1);
 
-					std::cout << "prev_natoms: " << prev_natoms << std::endl;
-					std::cout << "structure->link_atom: " << structure->link_atom << std::endl;
 					ConnectSelectedToSite(prev_natoms + structure->link_atom,
 										  structure->link_site - 1,
 										  selected, selected_site);
@@ -2859,6 +2856,16 @@ void MpGLCanvas::toggleInteractiveMode(void) {
 
 }
 
+/**
+ * This function translates and rotates the selected atoms so that the atom
+ * index by dst_atom is bonded to the atom indexed by src_atom.  The exact
+ * rotation and direction of translation is determined by the two bonding site
+ * vectors, which are made to point toward each other.
+ * @param src_atom Index of atom to transform toward.
+ * @param src_site Index of bonding site on src_atom to bond selection to.
+ * @param dst_atom Index of atom within selected set to bond to src_atom.
+ * @param dst_site Index of bonding site on dst_atom to bond selection to.
+ */
 void MpGLCanvas::ConnectSelectedToSite(int src_atom, int src_site,
 									   int dst_atom, int dst_site) {
 	CPoint3D atom_pos;
@@ -2899,7 +2906,7 @@ void MpGLCanvas::ConnectSelectedToSite(int src_atom, int src_site,
 	for (int i = 0; i < lFrame->NumAtoms; i++) {
 		if (lFrame->GetAtomSelection(i)) {
 			lFrame->GetAtomPosition(i, atom_pos);
-			atom_pos = (atom_pos) - origin;
+			atom_pos = atom_pos - origin;
 			Rotate3DPt(rotmat, atom_pos, &new_atom_pos);
 			new_atom_pos += origin;
 			lFrame->SetAtomPosition(i, new_atom_pos + offset);
