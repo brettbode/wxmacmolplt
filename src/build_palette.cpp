@@ -621,7 +621,12 @@ void BuilderDlg::AddStructure(Structure *structure) {
 	int i;
 	Bond *bond;
 
-	for (i = 0; i < structure->nbonds; i++) {
+	// In the case where the user drops the structure in to a bonding site,
+	// we strip off the last atom of the structure and connect the clicked
+	// on bonding site to the one released by stripping off the last atom.  So,
+	// first we figure out what atom has the released bonding site -- it's the 
+	// one whose bond with the deleted atom was formed last.
+	for (i = structure->nbonds - 1; i >= 0; i--) {
 		bond = &structure->bonds[i];
 		if (bond->Atom1 == structure->natoms - 1) {
 			structure->link_atom = bond->Atom2;
@@ -632,6 +637,7 @@ void BuilderDlg::AddStructure(Structure *structure) {
 		}
 	}
 
+	// Now we figure out what the bonding site number of unpaired atom is.
 	structure->link_site = 0;
 	for (i = 0; i < structure->nbonds; i++) {
 		bond = &structure->bonds[i];
@@ -763,6 +769,31 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 	BufferFile *buffer = NULL;
 	int i;
 
+	// Before we load the new user structures in, we may want to remove any
+	// previously loaded user structures from both the structures dropdown
+	// menu and the vector.  We let the user decide if they want to replace
+	// or append.
+	if (structures.size() > nglobal_structures) {
+		int response = wxMessageBox(_("Replace the current structures?"),
+									_("Load Structures"), wxYES_NO | wxCANCEL,
+									this);
+
+		if (response == wxYES) {
+			mStructureChoice->SetSelection(0);
+			canvas->SetStructure(structures[0]);
+			for (i = nglobal_structures; i < structures.size(); i++) {
+				delete structures[i];
+			}
+			structures.erase(structures.begin() + nglobal_structures,
+							 structures.end());
+			for (i = mStructureChoice->GetCount() - 1; i >= nglobal_structures; i--) {
+				mStructureChoice->Delete(i);
+			}
+		} else if (response == wxCANCEL) {
+			return;
+		}
+	}
+
 	load_file_path = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
 									wxT(""), wxT("CML Files (*.cml)|*.cml"));
 
@@ -775,20 +806,6 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 	if (load_file == NULL) {
 		MessageAlert("Unable to access the file.");
 		return;
-	}
-
-	// Before we load the new user structures in, we want to remove any
-	// previously loaded user structures from both the structures dropdown
-	// menu and the vector.
-	if (structures.size() > nglobal_structures) {
-		for (i = nglobal_structures; i < structures.size(); i++) {
-			delete structures[i];
-		}
-		structures.erase(structures.begin() + nglobal_structures,
-						 structures.end());
-		for (i = mStructureChoice->GetCount() - 1; i >= nglobal_structures; i--) {
-			mStructureChoice->Delete(i);
-		}
 	}
 
 	buffer = new BufferFile(load_file, false);
