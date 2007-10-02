@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<cml xmlns="http://www.xml-cml.org/schema/cml2/core">
+<metadataList>
+<metadata name="Structures">
+<Structure name="Phenol">
+<atoms size="13">
+<atom id="a0" elementType="C" x3="-0.210285" y3="1.419420" z3="0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="1.123395" y3="0.649421" z3="0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="1.123395" y3="-0.890579" z3="0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a3" elementType="C" x3="-1.543963" y3="0.649421" z3="0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a4" elementType="C" x3="-1.543964" y3="-0.890578" z3="0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a5" elementType="C" x3="-0.210286" y3="-1.660578" z3="0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a6" elementType="O" x3="-0.210284" y3="2.919420" z3="0.000000" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a7" elementType="H" x3="2.110664" y3="1.219421" z3="0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="2.110663" y3="-1.460580" z3="0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="-2.531232" y3="1.219422" z3="0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="H" x3="-2.531233" y3="-1.460577" z3="0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a11" elementType="H" x3="-0.210287" y3="-2.800578" z3="0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a12" elementType="H" x3="0.826805" y3="3.286087" z3="-0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="13">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a3" order="S"></bond>
+<bond id="b2" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b3" atomRefs2="a2 a5" order="S"></bond>
+<bond id="b4" atomRefs2="a3 a4" order="S"></bond>
+<bond id="b5" atomRefs2="a4 a5" order="S"></bond>
+<bond id="b6" atomRefs2="a0 a6" order="S"></bond>
+<bond id="b7" atomRefs2="a1 a7" order="S"></bond>
+<bond id="b8" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b9" atomRefs2="a3 a9" order="S"></bond>
+<bond id="b10" atomRefs2="a4 a10" order="S"></bond>
+<bond id="b11" atomRefs2="a5 a11" order="S"></bond>
+<bond id="b12" atomRefs2="a6 a12" order="S"></bond>
+</bonds>
+</Structure>
+</metadata>
+</metadataList>
+</cml>
