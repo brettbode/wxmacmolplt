@@ -137,10 +137,31 @@ class MoleculeData {
 		 * Updates internal data structures to make sure they are consistent with the current atom count.
 		 */
 		void AtomAdded(void);
+		/**
+			Make the current rotated view the reference orientation.
+		 */
 		void StickCoordinates(void);
 		void InitializeInternals(void);
+		/**
+			Accessor for the internal coordinates class.
+		 */
 		inline Internals * GetInternalCoordinates(void) const {return IntCoords;};
+		/**
+			Delete an atom.
+			\param AtomNum The index of the atom to delete.
+			\param allFrames If true the atom with the same index will be removed from all frames.
+		 */
 		void DeleteAtom(long AtomNum, bool allFrames=false);
+		/**
+			Reorders the atom list.
+			\param index1 The initial index of the atom
+			\param index2 The final index of the atom
+		 */
+		void ReorderAtomList(long index1, long index2);
+		/**
+			Is the provided atom index valid for the current frame?
+			\param AtomNum The atom index to test
+		 */
 		bool ValidAtom(long AtomNum);
 		void GetRotationMatrix(Matrix4D copy);
 		int GetAnnotationCount(void) const {return Annotations.size();};

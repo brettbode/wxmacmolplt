@@ -1617,6 +1617,53 @@ void MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
 	
 	ResetRotation();
 }
+void MoleculeData::ReorderAtomList(long index1, long targetindex) {
+	//Sanity check the move
+	if ((index1 < 0)||(targetindex < 0)||(index1 >= cFrame->NumAtoms)||
+		(targetindex >= cFrame->NumAtoms)||(index1 == targetindex)) return;
+	//This should really remove basis set, orbitals, etc unless they are also updated
+	//Move the atom
+	mpAtom temp;
+	if (targetindex > index1) {
+		temp = cFrame->Atoms[index1];
+		for (long i=index1; i<targetindex; i++) {
+			cFrame->Atoms[i] = cFrame->Atoms[i+1];
+		}
+		cFrame->Atoms[targetindex] = temp;
+		//update the bonds list
+		for (long i=0; i<cFrame->NumBonds; i++) {
+			if (cFrame->Bonds[i].Atom1 == index1)
+				cFrame->Bonds[i].Atom1 = targetindex;
+			else if ((cFrame->Bonds[i].Atom1 > index1)&&(cFrame->Bonds[i].Atom1 <= targetindex))
+				cFrame->Bonds[i].Atom1 --;
+			if (cFrame->Bonds[i].Atom2 == index1)
+				cFrame->Bonds[i].Atom2 = targetindex;
+			else if ((cFrame->Bonds[i].Atom2 > index1)&&(cFrame->Bonds[i].Atom2 <= targetindex))
+				cFrame->Bonds[i].Atom2 --;
+		}
+	} else {
+		temp = cFrame->Atoms[index1];
+		for (long i=index1; i<targetindex; i--) {
+			cFrame->Atoms[i] = cFrame->Atoms[i-1];
+		}
+		cFrame->Atoms[targetindex] = temp;
+		//update the bonds list
+		for (long i=0; i<cFrame->NumBonds; i++) {
+			if (cFrame->Bonds[i].Atom1 == index1)
+				cFrame->Bonds[i].Atom1 = targetindex;
+			else if ((cFrame->Bonds[i].Atom1 < index1)&&(cFrame->Bonds[i].Atom1 >= targetindex))
+				cFrame->Bonds[i].Atom1 ++;
+			if (cFrame->Bonds[i].Atom2 == index1)
+				cFrame->Bonds[i].Atom2 = targetindex;
+			else if ((cFrame->Bonds[i].Atom2 < index1)&&(cFrame->Bonds[i].Atom2 >= targetindex))
+				cFrame->Bonds[i].Atom2 ++;
+		}
+	}
+	//update the internals list
+	if (IntCoords) {
+		IntCoords->ChangeAtomIndex(this, index1, targetindex);
+	}
+}
 bool MoleculeData::ValidAtom(long AtomNum) {
 	return ((AtomNum>=0)&&(AtomNum<cFrame->NumAtoms));
 }

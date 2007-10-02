@@ -28,6 +28,9 @@
 #include "Progress.h"
 #include <deque>
 
+/** This class holds all the window specific OpenGL data. It currently
+	functions more like a struct. None of this data is saved to file.
+*/
 class OpenGLRec {
 	public:
 #ifndef __wxBuild__
@@ -36,17 +39,17 @@ class OpenGLRec {
 		GLuint fontList;
 #endif
 		
-		myGLTriangle *  transpTriList;
-		float *			transpSortVertex;
-		long *			transpIndex;
-		long			triangleCount;
+		myGLTriangle *  transpTriList;		///< The list of transparent triangles
+		float *			transpSortVertex;	///< The rotated screen Z coordinate to sort on.
+		long *			transpIndex;		///< The sorted triangle list
+		long			triangleCount;		///< The number of transparent triangles
 		
-		GLuint			MainDisplayList;
+		GLuint			MainDisplayList;	///< id for a main display list
 		GLuint			SurfaceDisplayList;
 		bool			MainListActive;
 		bool			SurfaceListActive;
-		bool			haveTransparentSurfaces;
-		GLuint			length_anno_tex_id;
+		bool			haveTransparentSurfaces;	///< Flag if there are transparent surfaces
+		GLuint			length_anno_tex_id;			///< texture id for length annotations
 		GLuint			sphere_list;
 		
 		OpenGLRec(void);
@@ -65,38 +68,64 @@ typedef struct qtData;
 typedef class MolStatusBar;
 typedef class UndoSnapShot;
 
+/**
+	Abstract class to hold snapshot data. All you can do with a snapshot is
+	create it and restore it.
+*/
 class UndoSnapShot {
 public:
 	virtual ~UndoSnapShot(void) {};
 	virtual void Restore(void) {};
 };
 
+/**
+	Class to hold snapshot data based on a single frame. This class will save/restore the basic
+	data of a single frame, ie atoms and bonds.
+ */
 class FrameSnapShot : public UndoSnapShot {
 public:
+	/** Create a snapshot from the provided frame pointer.
+	*/
 	FrameSnapShot(Frame * target);
 	virtual ~FrameSnapShot(void);
+	/** Restore the saved data. Note the frame point is stored here
+		so you can't restore if the original frame memory has been
+		destroyed.
+	*/
 	virtual void Restore(void);
 private:
-	Frame *		mTarget;
-	mpAtom *	Atoms;
-	Bond *		Bonds;
-	long		NumAtoms;
-	long		NumBonds;
+	Frame *		mTarget;	///< The target Frame.
+	mpAtom *	Atoms;		///< Saved atom list
+	Bond *		Bonds;		///< Saved bond list
+	long		NumAtoms;	///< atom count
+	long		NumBonds;	///< bond count
 };
 
-//Container class for undo/redo data
+/** Container class for undo/redo data. This class manages the list of
+	snapshots such that the program just needs to add or retrieve snapshots.
+	Normally each of the MolDisplayWins will contain one of these classes.
+*/
 class UndoData {
 public:
 	UndoData(void) : operationCount(0), position(0) {};
 	~UndoData(void) {Clear();};
+	///How many snapshots are saved.
 	int GetOperationCount(void) const {return operationCount;};
+	///Obtains the position in the snapshot list.
 	int GetPosition(void) const {return position;};
+	///Move the snapshot position manually (not normally needed).
 	void SetPosition(int p) {if ((p>=0)&&(p<operationCount)) position = p;};
+	///Is undo possible?
 	bool undoPossible(void) const {return ((operationCount > 0)&&(position > 0));};
+	///Is redo possible?
 	bool redoPossible(void) const {return ((position+1) < operationCount);};
+	///Remove all snapshots and free their memory.
 	void Clear(void);
+	///Add a snapshot to the stack.
 	void AddSnapshot(UndoSnapShot *);
+	///Undo to the previous snapshot.
 	void UndoOperation(void);
+	///Redo to the next snapshot.
 	void RedoOperation(void);
 private:
 	std::deque<UndoSnapShot *>	UndoList;
@@ -188,13 +217,13 @@ class MolDisplayWin : public wxFrame {
 		MoleculeData	*MainData;
 		WinPrefs		*Prefs;
 		UndoData		mUndoBuffer;
-		bool			Dirty;          //Flag to indicate a save is needed
+		bool			Dirty;          ///< Flag to indicate a save is needed
 		bool			OperationInProgress;
 		bool			timerRunning;
 		bool			show_fullscreen;
 		
-		Progress		*ProgressInd;    // Progress indicator window for long operations
-		OpenGLRec		*OpenGLData;     // Extra OpenGL data
+		Progress		*ProgressInd;    ///< Progress indicator window for long operations
+		OpenGLRec		*OpenGLData;     ///< Extra OpenGL data
 		MpGLCanvas		*glCanvas;
 		MolStatusBar	*myStatus;
 		ModeAnimation	*ModeAnimationData;
@@ -474,10 +503,27 @@ class MolDisplayWin : public wxFrame {
 		void AbortOpen(const char * msg);
 		
 		//General Utility routines
+		/**
+			Call when the atoms list is updated to cause all subwindows to update.
+			\param updateCoordsWin	Should the coordinates window be updated (if open)?
+			\param updateDisplay Should the main molecule display be updated?
+		 */
 		void AtomsChanged(bool updateCoordsWin=false, bool updateDisplay=false);
+		/**
+			Call when the bonds list is changed to update the bonds subwindow and the main display.
+		 */
 		void BondsChanged(void);
+		/**
+			Call to update surfaces (as needed) and the main display window. Generally this
+			is called after the frame is changed or after a significant change to the frame data.
+		 */
 		void FrameChanged(void);
 		void ChangeFrames(long NewFrame);
+		/**
+			Call to insert the selected atoms at the provided index.
+			\param index The position in the atom list to insert the 1st selected atom.
+		 */
+		void ChangeAtomOrder(long index);
 		void ModeChanged(void);
 		void ChangeModes(long NewMode);
 		void UpdateModelDisplay(void);
@@ -547,13 +593,17 @@ class MolDisplayWin : public wxFrame {
 		bool InEditMode(void);
 		void DrawBondingSites(long iatom, float radius, GLUquadricObj *qobj, int site_id=0, CPoint3D * vector=NULL);
 		void SetStatusText(const wxString& label);
+		/**
+			Call to push a snapshot of the current coordinates to the undo stack.
+		 */
 		void CreateFrameSnapShot(void);
 		void ToggleBuilderPalette();
 		WinPrefs *GetPrefs(void) {return Prefs;}
 		bool JustFocused(void);
 
-		// This function should be called whenever there's something new to
-		// save in the CML file.
+		/** This function should be called whenever there's something new to
+			save in the CML file.
+			*/
 		inline void ContentChanged() {Dirty = true;}
 };
 

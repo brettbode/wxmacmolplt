@@ -3651,6 +3651,11 @@ void MolStatusBar::OnScrollBarChange(wxScrollEvent & event) {
 	myParent->ChangeFrames(event.GetPosition() + 1);
 }
 
+void MolDisplayWin::ChangeAtomOrder(long index) {
+	//first make a list of the selected atoms to move.
+	//we have to be careful since the initial index may move around as atoms are moved.
+}
+
 void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {
 
 	// The tool is toggled automatically by wx, but we don't really want to

@@ -42,6 +42,7 @@ class wxGrid;
 #define ID_COORDINATESDIALOG 10021
 #define MMP_COPYCOORDSITEM 10027
 #define ID_STICKMENU 10028
+#define ID_REORDERCOORDITEM 10089
 #define ID_PANEL3 10222
 #define ID_BONDBUTTON 10023
 #define ID_STICKBUTTON 10024
@@ -124,6 +125,12 @@ public:
 
 	/// wxEVT_UPDATE_UI event handler for ID_STICKMENU
 	void OnStickmenuUpdate( wxUpdateUIEvent& event );
+
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_REORDERCOORDITEM
+	void OnReordercoorditemClick( wxCommandEvent& event );
+
+	/// wxEVT_UPDATE_UI event handler for ID_REORDERCOORDITEM
+	void OnReordercoorditemUpdate( wxUpdateUIEvent& event );
 
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
 	void OnAddClick( wxCommandEvent& event );

@@ -33,6 +33,7 @@
 #include "myFiles.h"
 
 #include "coordinateswindow.h"
+#include "changeatomorderdialog.h"
 
 ////@begin XPM images
 ////@end XPM images
@@ -98,6 +99,9 @@ BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 	EVT_MENU( ID_STICKMENU, CoordinatesWindow::OnStickmenuClick )
 	EVT_UPDATE_UI( ID_STICKMENU, CoordinatesWindow::OnStickmenuUpdate )
 
+	EVT_MENU( ID_REORDERCOORDITEM, CoordinatesWindow::OnReordercoorditemClick )
+	EVT_UPDATE_UI( ID_REORDERCOORDITEM, CoordinatesWindow::OnReordercoorditemUpdate )
+
 	EVT_BUTTON( wxID_ADD, CoordinatesWindow::OnAddClick )
 
 	EVT_BUTTON( wxID_DELETE, CoordinatesWindow::OnDeleteClick )
@@ -151,7 +155,6 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
 	BondButton = NULL;
 	coordTypeChoice = NULL;
 	coordGrid = NULL;
-	needClearAll = true;
 ////@end CoordinatesWindow member initialisation
 	Parent = parent;
 	Prefs = Parent->GetPrefs();
@@ -205,66 +208,66 @@ void CoordinatesWindow::CreateControls()
 	menuBar->Append(itemMenu7, _("Edit"));
 	wxMenu* itemMenu17 = new wxMenu;
 	itemMenu17->Append(ID_STICKMENU, _("Use Coordinates for Reference"), _("Makes the current rotated coordinates the reference coordinates."), wxITEM_NORMAL);
+	itemMenu17->Append(ID_REORDERCOORDITEM, _("&Change selected atoms order..."), _T(""), wxITEM_NORMAL);
 	menuBar->Append(itemMenu17, _("Coordinates"));
 	itemFrame1->SetMenuBar(menuBar);
 
-	wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxVERTICAL);
-	itemFrame1->SetSizer(itemBoxSizer19);
+	wxBoxSizer* itemBoxSizer20 = new wxBoxSizer(wxVERTICAL);
+	itemFrame1->SetSizer(itemBoxSizer20);
 
-	wxPanel* itemPanel20 = new wxPanel( itemFrame1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-	itemBoxSizer19->Add(itemPanel20, 1, wxGROW, 0);
+	wxPanel* itemPanel21 = new wxPanel( itemFrame1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	itemBoxSizer20->Add(itemPanel21, 1, wxGROW, 0);
 
-	wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxVERTICAL);
-	itemPanel20->SetSizer(itemBoxSizer21);
+	wxBoxSizer* itemBoxSizer22 = new wxBoxSizer(wxVERTICAL);
+	itemPanel21->SetSizer(itemBoxSizer22);
 
-	wxBoxSizer* itemBoxSizer22 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer21->Add(itemBoxSizer22, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer23 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer22->Add(itemBoxSizer23, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	wxButton* itemButton23 = new wxButton( itemPanel20, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
-	if (ShowToolTips())
-		itemButton23->SetToolTip(_("Add a new atom to the list of coordinates."));
-	itemBoxSizer22->Add(itemButton23, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxButton* itemButton24 = new wxButton( itemPanel21, wxID_ADD, _("Add"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (CoordinatesWindow::ShowToolTips())
+		itemButton24->SetToolTip(_("Add a new atom to the list of coordinates."));
+	itemBoxSizer23->Add(itemButton24, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	deleteButton = new wxButton( itemPanel20, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
-	if (ShowToolTips())
+	deleteButton = new wxButton( itemPanel21, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (CoordinatesWindow::ShowToolTips())
 		deleteButton->SetToolTip(_("Delete the selected atoms."));
-	itemBoxSizer22->Add(deleteButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	itemBoxSizer23->Add(deleteButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	BondButton = new wxButton( itemPanel20, ID_BONDBUTTON, _("Bond"), wxDefaultPosition, wxDefaultSize, 0 );
-	if (ShowToolTips())
+	BondButton = new wxButton( itemPanel21, ID_BONDBUTTON, _("Bond"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (CoordinatesWindow::ShowToolTips())
 		BondButton->SetToolTip(_("Apply the default bonding criteria."));
-	itemBoxSizer22->Add(BondButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	itemBoxSizer23->Add(BondButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	wxButton* itemButton26 = new wxButton( itemPanel20, ID_STICKBUTTON, _("Stick"), wxDefaultPosition, wxDefaultSize, 0 );
-	if (ShowToolTips())
-		itemButton26->SetToolTip(_("Use the current screen rotation as the reference frame."));
-	itemBoxSizer22->Add(itemButton26, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxButton* itemButton27 = new wxButton( itemPanel21, ID_STICKBUTTON, _("Stick"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (CoordinatesWindow::ShowToolTips())
+		itemButton27->SetToolTip(_("Use the current screen rotation as the reference frame."));
+	itemBoxSizer23->Add(itemButton27, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	wxStaticText* itemStaticText27 = new wxStaticText( itemPanel20, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer22->Add(itemStaticText27, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	wxStaticText* itemStaticText28 = new wxStaticText( itemPanel21, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer23->Add(itemStaticText28, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-	wxString coordTypeChoiceStrings[] = {
-		_("Cartesian"),
-		_("Z-Matrix")
-	};
-	coordTypeChoice = new wxChoice( itemPanel20, ID_COORDCHOICE1, wxDefaultPosition, wxDefaultSize, 2, coordTypeChoiceStrings, 0 );
-	if (ShowToolTips())
+	wxArrayString coordTypeChoiceStrings;
+	coordTypeChoiceStrings.Add(_("Cartesian"));
+	coordTypeChoiceStrings.Add(_("Z-Matrix"));
+	coordTypeChoice = new wxChoice( itemPanel21, ID_COORDCHOICE1, wxDefaultPosition, wxDefaultSize, coordTypeChoiceStrings, 0 );
+	if (CoordinatesWindow::ShowToolTips())
 		coordTypeChoice->SetToolTip(_("Changes the displayed coordinate type."));
-	itemBoxSizer22->Add(coordTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	itemBoxSizer23->Add(coordTypeChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	coordGrid = new wxGrid( itemPanel20, ID_COORDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL );
-	if (ShowToolTips())
+	coordGrid = new wxGrid( itemPanel21, ID_COORDGRID, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL );
+	if (CoordinatesWindow::ShowToolTips())
 		coordGrid->SetToolTip(_("Double click on a field to edit"));
 	coordGrid->SetDefaultColSize(50);
 	coordGrid->SetDefaultRowSize(25);
 	coordGrid->SetColLabelSize(25);
 	coordGrid->SetRowLabelSize(50);
 	coordGrid->CreateGrid(5, 5, wxGrid::wxGridSelectRows);
-	itemBoxSizer21->Add(coordGrid, 1, wxGROW|wxALL, 0);
+	itemBoxSizer22->Add(coordGrid, 1, wxGROW|wxALL, 0);
 
-	wxStatusBar* itemStatusBar30 = new wxStatusBar( itemFrame1, ID_STATUSBAR1, wxST_SIZEGRIP|wxNO_BORDER );
-	itemStatusBar30->SetFieldsCount(1);
-	itemFrame1->SetStatusBar(itemStatusBar30);
+	wxStatusBar* itemStatusBar31 = new wxStatusBar( itemFrame1, ID_STATUSBAR1, wxST_SIZEGRIP|wxNO_BORDER );
+	itemStatusBar31->SetFieldsCount(1);
+	itemFrame1->SetStatusBar(itemStatusBar31);
 
 	// Connect events and objects
 	coordGrid->Connect(ID_COORDGRID, wxEVT_SIZE, wxSizeEventHandler(CoordinatesWindow::OnSize), NULL, this);
@@ -1024,3 +1027,29 @@ void CoordinatesWindow::OnActivate(wxActivateEvent & event) {
 	}
 	event.Skip();
 }
+
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_REORDERCOORDITEM
+ */
+
+void CoordinatesWindow::OnReordercoorditemClick( wxCommandEvent& event )
+{
+	ChangeAtomOrderDialog * dlg = new ChangeAtomOrderDialog(Parent);
+	dlg->ShowModal();
+	dlg->Destroy();
+}
+
+
+/*!
+ * wxEVT_UPDATE_UI event handler for ID_REORDERCOORDITEM
+ */
+
+void CoordinatesWindow::OnReordercoorditemUpdate( wxUpdateUIEvent& event )
+{
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	event.Enable((natoms>0)&&coordGrid->IsSelection());
+}
+

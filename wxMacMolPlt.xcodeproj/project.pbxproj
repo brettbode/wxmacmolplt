@@ -410,6 +410,9 @@
 		8B8816EA0A751FED00EC8791 /* glf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B899C0A6EAD7E0041EA88 /* glf.cpp */; };
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
+		8BDC58C20CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */; };
+		8BDC58C30CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */; };
+		8BDC58C40CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */; };
 		8BDC5DDD0A29F25F0060517F /* coordinateoffset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */; };
 		8BE7C29D0A273D9700DACA25 /* choosevecgroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */; };
 		8BEA48DC0BFA076D00C660A3 /* lex.swf4.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9410BF8EDA20056C79E /* lex.swf4.c */; };
@@ -697,6 +700,8 @@
 		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
 		8BD5BA820A41E01800FF9CAE /* inputbuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = inputbuilder.cpp; path = src/inputbuilder.cpp; sourceTree = "<group>"; };
 		8BD5BA830A41E01800FF9CAE /* inputbuilder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = inputbuilder.h; path = src/inputbuilder.h; sourceTree = "<group>"; };
+		8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = changeatomorderdialog.cpp; path = src/changeatomorderdialog.cpp; sourceTree = "<group>"; };
+		8BDC58C10CB2A965000BE0A6 /* changeatomorderdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = changeatomorderdialog.h; path = src/changeatomorderdialog.h; sourceTree = "<group>"; };
 		8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = coordinateoffset.cpp; path = src/coordinateoffset.cpp; sourceTree = "<group>"; };
 		8BDC5DDC0A29F25F0060517F /* coordinateoffset.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = coordinateoffset.h; path = src/coordinateoffset.h; sourceTree = "<group>"; };
 		8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = choosevecgroup.cpp; path = src/choosevecgroup.cpp; sourceTree = "<group>"; };
@@ -1077,6 +1082,8 @@
 			children = (
 				8B7145C80A23983200435951 /* aboutwxmacmolplt.h */,
 				8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */,
+				8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */,
+				8BDC58C10CB2A965000BE0A6 /* changeatomorderdialog.h */,
 				8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */,
 				8B6C7BFE0A24E9E800B7358F /* wxMolGraph.h */,
 				8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */,
@@ -1371,6 +1378,7 @@
 				8B6716520C4BF1290067A3C9 /* MyTypes.cpp in Sources */,
 				8B396E710C70AA8C009690AF /* build_palette.cpp in Sources */,
 				8B24B31E0CA0731B00E92838 /* preview_canvas.cpp in Sources */,
+				8BDC58C20CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1506,6 +1514,7 @@
 				8B6716530C4BF1290067A3C9 /* MyTypes.cpp in Sources */,
 				8B396E720C70AA8C009690AF /* build_palette.cpp in Sources */,
 				8B24B31F0CA0731B00E92838 /* preview_canvas.cpp in Sources */,
+				8BDC58C30CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1641,6 +1650,7 @@
 				8B6716540C4BF1290067A3C9 /* MyTypes.cpp in Sources */,
 				8B396E730C70AA8C009690AF /* build_palette.cpp in Sources */,
 				8B24B3200CA0731B00E92838 /* preview_canvas.cpp in Sources */,
+				8BDC58C40CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

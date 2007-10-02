@@ -198,6 +198,15 @@ class Internals {
 			{if (MOPacStyle) MOPacStyle->WriteCoordinatesToFile(File, MainData, Prefs);};
 		inline void WriteMPCZMatCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) 
 		{if (MOPacStyle) MOPacStyle->WriteMPCZMatCoordinatesToFile(File, MainData, Prefs);};
+		/**
+		 * Change the atom order. Call when the order of the atoms changes. Note the
+		 * order of the cartesians should be changed first!
+		 * @param MainData The coordinate information.
+		 * @param OldPosition The orignal atom index.
+		 * @param NewPosition The new atom position.
+		 */
+		void ChangeAtomIndex(MoleculeData * MainData, long OldPosition, long NewPosition)
+		{ if (MOPacStyle) MOPacStyle->ChangeAtomIndex(MainData, OldPosition, NewPosition); };
 };
 
 #endif
