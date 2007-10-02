@@ -770,6 +770,18 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball)
 
 void MolDisplayWin::DrawGL(void) {
 
+	GLUquadric *quad = gluNewQuadric();
+	gluQuadricOrientation(quad, GLU_OUTSIDE);
+	gluQuadricNormals(quad, GLU_SMOOTH);
+
+	OpenGLData->sphere_list = glGenLists(1);
+	glNewList(OpenGLData->sphere_list, GL_COMPILE);
+	gluSphere(quad, 1.0f, (long) (1.5f * Prefs->GetQD3DAtomQuality()),
+			  (long) (Prefs->GetQD3DAtomQuality()));
+	glEndList();
+
+	gluDeleteQuadric(quad);
+
 	float anno_color[3];
 	RGBColor *BackgroundColor = Prefs->GetBackgroundColorLoc();
 	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
@@ -964,6 +976,8 @@ void MolDisplayWin::DrawGL(void) {
 	    const char modeString[] = "editing";
 	    DrawStaticLabel(modeString, -50, -20);
 	}
+
+	glDeleteLists(OpenGLData->sphere_list, 1);
 }
 
 void AnnotationLength::draw(const MolDisplayWin * win) const {
@@ -1627,7 +1641,11 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
 			}
 
-			gluSphere(core_obj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere
+			glPushMatrix();
+			glScalef(radius, radius, radius);
+			glCallList(OpenGLData->sphere_list);
+			glPopMatrix();
+			/* gluSphere(core_obj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere */
 
 			//if (Prefs->Show2DPattern()) {
 			//  glDisable(GL_STENCIL_TEST);
@@ -1679,7 +1697,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 		DrawBond(lBonds[ibond], lAtoms[lBonds[ibond].Atom1],
 				 lAtoms[lBonds[ibond].Atom2], *Prefs, core_obj,
-				 modelview, proj, viewport, true);
+				 modelview, proj, viewport, OpenGLData->sphere_list, true);
 
 	}
 	glPopName();
@@ -1837,7 +1855,7 @@ void WinPrefs::GetAtomColorInverse(long atomtype, float rgb[3]) {
 void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 									 const mpAtom& atom2,
 									 const WinPrefs& Prefs,
-									 GLUquadric *quadric,
+									 GLUquadric *quadric, GLuint sphere_list,
 									 bool highlighting_on) {
 	CPoint3D	v1, v2, offset;
 
@@ -1887,20 +1905,34 @@ void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 	float pos=0.75*BondSize;
 	glTranslatef(0.0, 0.0, pos);
 	while (pos < length) {
-		gluSphere(quadric, BondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
+		glPushMatrix();
+		glScalef(BondSize, BondSize, BondSize);
+		glCallList(sphere_list);
+		/* gluSphere(quadric, BondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere */
 		if (highlighting_on && bond.GetSelectState()) {
 			glColor3f(0.0f,0.0f,0.0f);
 			glEnable(GL_POLYGON_STIPPLE);
 			glPolygonStipple(stippleMask);
-			gluSphere(quadric, BondSize*1.01, (long)(Quality), (long)(0.5*Quality));
+
+			glPushMatrix();
+			glScalef(1.01f, 1.01f, 1.01f);
+			glCallList(sphere_list);
+			glPopMatrix();
+			/* gluSphere(quadric, BondSize*1.01, (long)(Quality), (long)(0.5*Quality)); */
 			glDisable(GL_POLYGON_STIPPLE);
 			
 			glColor4f(0.5,0.5,0.5,0.7f);
 			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 			glEnable(GL_BLEND);
-			gluSphere(quadric, BondSize*1.02, (long)(Quality), (long)(0.5*Quality));
+			glPushMatrix();
+			glScalef(1.02f, 1.02f, 1.02f);
+			glCallList(sphere_list);
+			glPopMatrix();
+			/* gluSphere(quadric, BondSize*1.02, (long)(Quality), (long)(0.5*Quality)); */
 			glDisable(GL_BLEND);
+
 		}
+		glPopMatrix();
 		glTranslatef(0.0, 0.0, 2.5*BondSize);
 		pos += 2.5*BondSize;
 	}
@@ -4407,7 +4439,7 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 							 const mpAtom& atom2, const WinPrefs& Prefs,
 							 GLUquadric *quadric, GLdouble *modelview,
 							 GLdouble *proj, GLint *viewport,
-							 bool highlighting_on) {
+							 GLuint sphere_list, bool highlighting_on) {
 
 	CPoint3D v1, v2, offset, NormalOffset, NormEnd;
 	CPoint3D NormStart(0, 0, 1);
@@ -4504,20 +4536,32 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 			float pos = 0.75*BondSize;
 			glTranslatef(0.0, 0.0, pos);
 			while (pos < length) {
-				gluSphere(quadric, BondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
+				glPushMatrix();
+				glScalef(BondSize, BondSize, BondSize);
+				glCallList(sphere_list);
+				/* gluSphere(quadric, BondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere */
 				if (highlighting_on && !bond.GetSelectState()) {
 					glColor3f(0.0f,0.0f,0.0f);
 					glEnable(GL_POLYGON_STIPPLE);
 					glPolygonStipple(stippleMask);
-					gluSphere(quadric, BondSize * 1.01, (long)(Quality), (long)(0.5*Quality));
+					glPushMatrix();
+					glScalef(1.01f, 1.01f, 1.01f);
+					glCallList(sphere_list);
+					glPopMatrix();
+					/* gluSphere(quadric, BondSize * 1.01, (long)(Quality), (long)(0.5*Quality)); */
 					glDisable(GL_POLYGON_STIPPLE);
 					
 					glColor4f(0.5,0.5,0.5,0.7f);
 					glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 					glEnable(GL_BLEND);
-					gluSphere(quadric, BondSize*1.02, (long)(Quality), (long)(0.5*Quality));
+					glPushMatrix();
+					glScalef(1.02f, 1.02f, 1.02f);
+					glCallList(sphere_list);
+					glPopMatrix();
+					/* gluSphere(quadric, BondSize*1.02, (long)(Quality), (long)(0.5*Quality)); */
 					glDisable(GL_BLEND);
 				}
+				glPopMatrix();
 				glTranslatef(0.0, 0.0, 2.5*BondSize);
 				pos += 2.5*BondSize;
 			}
@@ -4544,12 +4588,23 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 			gluCylinder(quadric, tmpBondSize * 1.01f, tmpBondSize * 1.01f,
 						length, (long) Quality, (long) (0.5f * Quality));
 			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres
-				gluSphere(quadric, tmpBondSize * 1.01f, (long) Quality,
-						  (long) (0.5f * Quality));
+				glPushMatrix();
+				glScalef(tmpBondSize * 1.01f, tmpBondSize * 1.01f,
+						 tmpBondSize * 1.01f);
+				glCallList(sphere_list);
+				glPopMatrix();
+				/* gluSphere(quadric, tmpBondSize * 1.01f, (long) Quality, */
+						  /* (long) (0.5f * Quality)); */
 				glPushMatrix();
 				glTranslatef(0.0f, 0.0f, length);
-				gluSphere(quadric, tmpBondSize * 1.01f, (long) Quality,
-						  (long) (0.5f * Quality));
+				/* glTranslatef(0.0f, 0.0f, 1.0f); */
+				glPushMatrix();
+				glScalef(tmpBondSize * 1.01f, tmpBondSize * 1.01f,
+						 tmpBondSize * 1.01f);
+				glCallList(sphere_list);
+				glPopMatrix();
+				/* gluSphere(quadric, tmpBondSize * 1.01f, (long) Quality, */
+						  /* (long) (0.5f * Quality)); */
 				glPopMatrix();
 			}
 			glDisable(GL_POLYGON_STIPPLE);
@@ -4563,11 +4618,21 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 			//length, (long) Quality, (long) (0.5 * Quality));
 
 			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres
-				gluSphere(quadric, tmpBondSize * 1.02f, (long) Quality,
-							 (long) (0.5 * Quality));
+				glPushMatrix();
+				glScalef(tmpBondSize * 1.02f, tmpBondSize * 1.02f,
+						 tmpBondSize * 1.02f);
+				glCallList(sphere_list);
+				glPopMatrix();
+				/* gluSphere(quadric, tmpBondSize * 1.02f, (long) Quality, */
+							 /* (long) (0.5 * Quality)); */
 				glTranslatef(0.0f, 0.0f, length);
-				gluSphere(quadric, tmpBondSize * 1.02f, (long) Quality,
-						  (long) (0.5 * Quality));
+				glPushMatrix();
+				glScalef(tmpBondSize * 1.02f, tmpBondSize * 1.02f,
+						 tmpBondSize * 1.02f);
+				glCallList(sphere_list);
+				glPopMatrix();
+				/* gluSphere(quadric, tmpBondSize * 1.02f, (long) Quality, */
+						  /* (long) (0.5 * Quality)); */
 			}
 			//glDisable(GL_BLEND);
 
@@ -4589,12 +4654,14 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 			v3.z = centerPercent*(v2.z - v1.z)+v1.z;
 
 			Prefs.ChangeColorAtomColor(atom1.GetType());
-			glPushMatrix();
 			gluCylinder(quadric, tmpBondSize, tmpBondSize, length*centerPercent, (long)(Quality), (long)(0.5*Quality));
 			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres
-				gluSphere(quadric, tmpBondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
+				glPushMatrix();
+				glScalef(tmpBondSize, tmpBondSize, tmpBondSize);
+				glCallList(sphere_list);
+				glPopMatrix();
+				/* gluSphere(quadric, tmpBondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere */
 			}
-			glPopMatrix();
 
 			Prefs.ChangeColorAtomColor(atom2.GetType());
 			glPopMatrix();
@@ -4612,7 +4679,11 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 				rotMat[3][2] = v2.z;
 				glMultMatrixf((const GLfloat *) &rotMat);
 				// glTranslatef(0.0, baseBondOffset+ipipe*3.5*tmpBondSize, 0.0);
-				gluSphere(quadric, tmpBondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere
+				glPushMatrix();
+				glScalef(tmpBondSize, tmpBondSize, tmpBondSize);
+				glCallList(sphere_list);
+				glPopMatrix();
+				/* gluSphere(quadric, tmpBondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere */
 			}
 			// glPopMatrix(); 
 			// if (Prefs.DrawWireFrame()) { //Add end caps if no spheres 
@@ -4631,10 +4702,8 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 		else {
 			Prefs.ChangeColorBondColor(bond.Order);
 			for (int i = 0; i < MAX(logical_order, 1); ++i) {
-				glPushMatrix();
-				gluCylinder(quadric, tmpBondSize, tmpBondSize, length, 
+				gluCylinder(quadric, tmpBondSize, tmpBondSize, length,
 							(long) Quality, (long) (0.5f * Quality));
-				glPopMatrix();
 			}
 
 			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres

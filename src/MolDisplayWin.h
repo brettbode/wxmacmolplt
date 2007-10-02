@@ -47,6 +47,7 @@ class OpenGLRec {
 		bool			SurfaceListActive;
 		bool			haveTransparentSurfaces;
 		GLuint			length_anno_tex_id;
+		GLuint			sphere_list;
 		
 		OpenGLRec(void);
 		~OpenGLRec(void);
@@ -512,13 +513,13 @@ class MolDisplayWin : public wxFrame {
 		static void DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 									 const mpAtom& atom2,
 									 const WinPrefs& Prefs,
-									 GLUquadric *quadric,
+									 GLUquadric *quadric, GLuint sphere_list,
 									 bool highlighting_on = false);
 		static void DrawBond(const Bond& bond, const mpAtom& atom1,
 							 const mpAtom& atom2, const WinPrefs& Prefs,
 							 GLUquadric *quadric, GLdouble *modelview,
 							 GLdouble *proj, GLint *viewport,
-							 bool highlighting_on = false);
+							 GLuint sphere_list, bool highlighting_on = false);
 		void PrintGL(wxDC * dc, const float & scaleFactor);
 		void SetHighliteMode(bool state) { mHighliteState = state; }
 		void DrawStaticLabel(const char* label, GLfloat x, GLfloat y);
