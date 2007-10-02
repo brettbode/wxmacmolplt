@@ -24,6 +24,17 @@ PreviewCanvas::PreviewCanvas(
 	struc = NULL;
 	fov = 45.0f;
 
+	gl_initialized = false;
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+PreviewCanvas::~PreviewCanvas() {
+
+	gluDeleteQuadric(quadric);
+	quadric = NULL;
+
 }
 
 /* ------------------------------------------------------------------------- */
@@ -64,6 +75,10 @@ void PreviewCanvas::InitGL() {
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHTING);
 
+	glEnable(GL_RESCALE_NORMAL);
+
+	quadric = gluNewQuadric();
+
 }
 
 
@@ -79,7 +94,6 @@ void PreviewCanvas::OnPaint(wxPaintEvent& event) {
 /* ------------------------------------------------------------------------- */
    
 void PreviewCanvas::OnSize(wxSizeEvent& event) {
-
 	
 	wxGLCanvas::OnSize(event);
 
@@ -97,6 +111,20 @@ void PreviewCanvas::OnSize(wxSizeEvent& event) {
  */
 
 void PreviewCanvas::Render() {
+
+	if (!GetContext()) {
+		return;
+	}
+
+	if (!gl_initialized) {
+		InitGL();
+	}
+
+	sphere_list = glGenLists(1);
+	glNewList(sphere_list, GL_COMPILE);
+	gluSphere(quadric, 1.0f, (long) (1.5f * gPreferences->GetQD3DAtomQuality()),
+			  (long) (gPreferences->GetQD3DAtomQuality()));
+	glEndList();
 
 	SetCurrent();
 
@@ -140,9 +168,9 @@ void PreviewCanvas::Render() {
 		glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 		glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
 
-		quadric = gluNewQuadric();
-		gluQuadricOrientation(quadric, GLU_OUTSIDE);
-		gluQuadricNormals(quadric, GLU_SMOOTH); //GLU_FLAT GLU_NONE
+		/* quadric = gluNewQuadric(); */
+		/* gluQuadricOrientation(quadric, GLU_OUTSIDE); */
+		/* gluQuadricNormals(quadric, GLU_SMOOTH); //GLU_FLAT GLU_NONE */
 
 		// Draw all the atoms.
 		for (i = 0; i < struc->natoms; i++) {
@@ -152,9 +180,13 @@ void PreviewCanvas::Render() {
 			radius = gPreferences->GetAtomScale() * gPreferences->GetAtomSize(atom->Type - 1);
 			gPreferences->ChangeColorAtomColor(atom->Type);
 
-			gluSphere(quadric, radius,
-					  (long) (1.5 * gPreferences->GetQD3DAtomQuality()),
-					  gPreferences->GetQD3DAtomQuality());
+			glPushMatrix();
+			glScalef(radius, radius, radius);
+			glCallList(sphere_list);
+			glPopMatrix();
+			/* gluSphere(quadric, radius, */
+					  /* (long) (1.5 * gPreferences->GetQD3DAtomQuality()), */
+					  /* gPreferences->GetQD3DAtomQuality()); */
 			glPopMatrix();
 		}
 
@@ -171,28 +203,42 @@ void PreviewCanvas::Render() {
 								    struc->atoms[struc->bonds[i].Atom1],
 								    struc->atoms[struc->bonds[i].Atom2],
 									*gPreferences, quadric, modelview,
-									proj, viewport);
+									proj, viewport, sphere_list);
 		}
 
-		gluDeleteQuadric(quadric);
+		/* gluDeleteQuadric(quadric); */
 
 	}
+
+	glDeleteLists(sphere_list, 1);
 	
 	SwapBuffers();
 
 }
 
 /* ------------------------------------------------------------------------- */
-
+/**
+ * This function causes the preview canvas to display the specified structure.
+ * The canvas does not make its own copy of the structure and will not free
+ * the structure on deletion.  The parent control should manage this (as
+ * the BuilderDlg does).
+ * @param structure A pointer to the structure to display.
+ */
 void PreviewCanvas::SetStructure(Structure *structure) {
 
 	struc = structure;
 
-	centroid = CPoint3D(0, 0, 0);
-	for (int i = 0; i < struc->natoms; i++) {
-		centroid += struc->atoms[i].Position;
+	// If we have a new structure to show, let's figure out its centroid so
+	// we make sure it's in view.
+	// TODO: We also need to get the projection set correctly.  For very large
+	// structures, we need to consider the spatial extent in setting the fov.
+	if (struc) {
+		centroid = CPoint3D(0, 0, 0);
+		for (int i = 0; i < struc->natoms; i++) {
+			centroid += struc->atoms[i].Position;
+		}
+		centroid *= 1.0f / struc->natoms;
 	}
-	centroid *= 1.0f / struc->natoms;
 
 	Render();
 

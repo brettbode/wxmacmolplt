@@ -23,6 +23,7 @@ class PreviewCanvas : public wxGLCanvas {
 					  const wxSize& size = wxDefaultSize,
 					  long style = wxFULL_REPAINT_ON_RESIZE,
 					  const wxString& name = _T("GL Canvas"));
+		~PreviewCanvas();
 		void Render();
 		void InitGL();
 		void SetStructure(Structure *structure);
@@ -48,7 +49,9 @@ class PreviewCanvas : public wxGLCanvas {
 		GLdouble proj[16];
 		GLint viewport[4];
 		GLUquadric *quadric;
+		GLuint sphere_list;
 		float fov;
+		bool gl_initialized;
 
 	DECLARE_EVENT_TABLE()
 };
