@@ -119,7 +119,7 @@ long BuilderDlg::ReadCMLFile(BufferFile *Buffer) {
 							if (struc_el->isName(kStructureXML)) {
 								struc = new Structure;
 								if (struc->ReadXML(struc_el)) {
-									build_palette->AddStructure(struc);
+									AddStructure(struc);
 								} else {
 									delete struc;
 								}
