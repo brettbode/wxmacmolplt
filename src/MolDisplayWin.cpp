@@ -3433,6 +3433,8 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	Surface *           lSurface;
 	bool                UpdateSurface = false;
 
+	glCanvas->SetCurrent();
+
 	int wheel = event.GetWheelRotation();
 	if (wheel != 0) { //zoom
 		MainData->WindowSize *= 1.0 + 0.01*wheel/event.GetWheelDelta();
