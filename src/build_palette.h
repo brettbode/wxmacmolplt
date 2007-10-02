@@ -99,6 +99,7 @@ class BuilderDlg: public wxMiniFrame {
 		long WriteCMLFile(BufferFile *Buffer) const;
 		long ReadCMLFile(BufferFile *Buffer);
 		void LoadStructures(wxCommandEvent& event);
+		void LoadStructuresFromFile(const wxString& load_file_path);
 		void UpdateSaveStructures(wxUpdateUIEvent& event);
 		void UpdateSaveStructuresAs(wxUpdateUIEvent& event);
 		void UpdateDeleteStructure(wxUpdateUIEvent& event);

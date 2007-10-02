@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "wx/sizer.h"
+#include <wx/stdpaths.h>
 
 #include "build_palette.h"
 #include "main.h"
@@ -50,17 +51,16 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	wxMiniFrame(NULL, wxID_ANY, title, wxPoint(xpos, ypos),
 		wxSize(-1, -1), wxCLOSE_BOX | wxCAPTION) {
 
-	Structure *new_structure = new Structure;
-	new_structure->atoms = new mpAtom[1];
-	new_structure->atoms[0].Type = 6;
-	new_structure->atoms[0].Position = CPoint3D(0.0f, 0.0f, 0.0f);
-	new_structure->name = wxString(_("Carbon Atom"));
-	new_structure->natoms = 1;
-	structures.push_back(new_structure);
+	/* Structure *new_structure = new Structure; */
+	/* new_structure->atoms = new mpAtom[1]; */
+	/* new_structure->atoms[0].Type = 6; */
+	/* new_structure->atoms[0].Position = CPoint3D(0.0f, 0.0f, 0.0f); */
+	/* new_structure->name = wxString(_("Carbon Atom")); */
+	/* new_structure->natoms = 1; */
+	/* structures.push_back(new_structure); */
 
 	structures_dirty = false;
-
-	nglobal_structures = structures.size();
+	canvas = NULL;
 
 	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
 	tabs = new wxNotebook(this, kPeriodicNotebookID, wxPoint(-1, -1),
@@ -81,7 +81,26 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	wxCommandEvent foo(0, 6-1);
 	ElementSelected(foo);
 
-	canvas = NULL;
+	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
+#if wxCHECK_VERSION(2, 8, 0)
+	wxString pathname = gStdPaths.GetResourcesDir();
+#else
+	wxString pathname = gStdPaths.GetDataDir();
+#ifdef __WXMAC__
+	//wxWidgets has a funny idea of where the resources are stored. It locates
+	//them as "SharedSupport" but xcode is putting them in Resources.
+	pathname.Remove(pathname.Length() - 13);
+	pathname += wxT("Resources");
+#endif
+#endif
+#ifdef __WXMSW__
+	pathname += wxT("\\system_structures.cml");
+#else
+	pathname += wxT("/system_structures.cml");
+#endif
+
+	LoadStructuresFromFile(pathname);
+	nglobal_structures = structures.size();
 
 }
 
@@ -283,9 +302,9 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 		new wxStaticText(panel, wxID_ANY, wxT("Structure: "));
 	
 	mStructureChoice =
-		new wxChoice(panel, kPeriodicStructureChoice, wxPoint(-1, -1),
-					 wxSize(-1, -1), 1, &structures[0]->name);
-	mStructureChoice->SetSelection(0);
+		new wxChoice(panel, kPeriodicStructureChoice);//, wxPoint(-1, -1),
+					 /* wxSize(-1, -1), 1, &structures[0]->name); */
+	/* mStructureChoice->SetSelection(0); */
 
 	wxButton *save_button =
 		new wxButton(panel, kPeriodicSaveStructures, _("Save Structures"));
@@ -498,7 +517,11 @@ int BuilderDlg::GetSelectedElement(void) const {
 
 Structure *BuilderDlg::GetSelectedStructure(void) const {
 
-	return structures[mStructureChoice->GetSelection()];
+	if (mStructureChoice->GetSelection() == wxNOT_FOUND) {
+		return NULL;
+	} else {
+		return structures[mStructureChoice->GetSelection()];
+	}
 
 }
 
@@ -679,6 +702,10 @@ int BuilderDlg::GetNumStructures() const {
 
 Structure *BuilderDlg::GetStructure(int i) const {
 
+	if (i < 0 || i >= structures.size()) {
+		return NULL;
+	}
+
 	return structures[i];
 
 }
@@ -694,6 +721,11 @@ int BuilderDlg::GetNumUserStructures() const {
 /* ------------------------------------------------------------------------- */
 
 Structure *BuilderDlg::GetUserStructure(int i) const {
+
+	// Check that is in valid range for user structures.
+	if (i < 0 || i >= structures.size() - nglobal_structures) {
+		return NULL;
+	}
 
 	return structures[i + nglobal_structures];
 
@@ -765,8 +797,6 @@ void BuilderDlg::SaveStructures(wxCommandEvent& event) {
 
 void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 
-	FILE *load_file = NULL;
-	BufferFile *buffer = NULL;
 	int i;
 
 	// Before we load the new user structures in, we may want to remove any
@@ -779,14 +809,20 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 									this);
 
 		if (response == wxYES) {
-			mStructureChoice->SetSelection(0);
-			canvas->SetStructure(structures[0]);
+			if (nglobal_structures) {
+				mStructureChoice->SetSelection(0);
+				canvas->SetStructure(structures[0]);
+			} else {
+				mStructureChoice->SetSelection(wxNOT_FOUND);
+				canvas->SetStructure(NULL);
+			}
 			for (i = nglobal_structures; i < structures.size(); i++) {
 				delete structures[i];
 			}
 			structures.erase(structures.begin() + nglobal_structures,
 							 structures.end());
-			for (i = mStructureChoice->GetCount() - 1; i >= nglobal_structures; i--) {
+			for (i = mStructureChoice->GetCount() - 1;
+				 i >= nglobal_structures; i--) {
 				mStructureChoice->Delete(i);
 			}
 		} else if (response == wxCANCEL) {
@@ -802,6 +838,24 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 		return;
 	}
 
+	LoadStructuresFromFile(load_file_path);
+
+	structures_dirty = false;
+
+}
+
+/* ------------------------------------------------------------------------- */
+/**
+ * This function loads structures from the file indicated by the specified
+ * pathname.
+ * @param load_file_path The pathname to the structures file.
+ */
+
+void BuilderDlg::LoadStructuresFromFile(const wxString& load_file_path) {
+
+	FILE *load_file = NULL;
+	BufferFile *buffer = NULL;
+
 	load_file = fopen(load_file_path.mb_str(wxConvUTF8), "r");
 	if (load_file == NULL) {
 		MessageAlert("Unable to access the file.");
@@ -816,8 +870,6 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 	}
 
 	fclose(load_file);
-
-	structures_dirty = false;
 
 }
 
@@ -886,8 +938,14 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 	delete structures[id];
 	structures.erase(structures.begin() + id);
 	mStructureChoice->Delete(id);
-	mStructureChoice->SetSelection(0);
-	canvas->SetStructure(structures[0]);
+	if (mStructureChoice->GetCount() == 0) {
+		mStructureChoice->SetSelection(wxNOT_FOUND);
+		canvas->SetStructure(NULL);
+	} else {
+		id = (id == 0) ? 0 : id - 1;
+		mStructureChoice->SetSelection(id);
+		canvas->SetStructure(structures[id]);
+	}
 	structures_dirty = true;
 
 }
@@ -943,7 +1001,6 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 		canvas_panel->Show();
 
 		if (event.GetSelection() == 1) {
-			canvas->InitGL();
 			if (structures.size()) {
 				canvas->SetStructure(structures[mStructureChoice->GetSelection()]);
 			}
