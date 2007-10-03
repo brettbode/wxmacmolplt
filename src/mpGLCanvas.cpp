@@ -1095,7 +1095,9 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 			info.Append(id);
 			MolWin->SetStatusText(info);
 		} else if (selected_type == MMP_BOND) {
-			MolWin->SetStatusText(_("a bond"));
+			wxString msg;
+			msg.Printf(_("Bond (%d)"), selected + 1);
+			MolWin->SetStatusText(msg);
 		} else {
 			MolWin->UpdateFrameText();
 		}
@@ -1242,6 +1244,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 							lFrame->AddAtom(*new_atom, lFrame->NumAtoms);
 							lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
 						}
+						mMainData->AtomAdded();
 
 						Bond *bond;
 						bool result;
@@ -1337,6 +1340,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 							lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
 							delete new_atom;
 						}
+						mMainData->AtomAdded();
 
 						Bond *bond;
 						for (int i = 0; i < structure->nbonds; i++) {
@@ -2733,6 +2737,7 @@ void MpGLCanvas::AddPlaneNormal(wxCommandEvent& event) {
 	UnitCrossProduct3D(&vec1, &vec2, &normal);
 
 	lFrame->AddAtom(1, pos3 + normal);
+	mMainData->AtomAdded();
 	lFrame->AddBond(select_stack[2], lFrame->NumAtoms - 1);
 	MolWin->AtomsChanged();
 
@@ -2793,6 +2798,7 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 
 		cFrame = cFrame->NextFrame;
 	}
+	mMainData->AtomAdded();
 
 	MolWin->UpdateModelDisplay();
 	MolWin->ContentChanged();
