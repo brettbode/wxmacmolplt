@@ -59,7 +59,6 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	/* new_structure->natoms = 1; */
 	/* structures.push_back(new_structure); */
 
-	structures_dirty = false;
 	canvas = NULL;
 
 	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
@@ -101,6 +100,7 @@ BuilderDlg::BuilderDlg(const wxString& title,
 
 	LoadStructuresFromFile(pathname);
 	nglobal_structures = structures.size();
+	structures_dirty = false;
 
 }
 
@@ -297,7 +297,7 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 
 	struc_sizer->SetFlexibleDirection(wxBOTH);
 	struc_sizer->SetCols(3);
-	struc_sizer->SetRows(6);
+	struc_sizer->SetRows(7);
 	wxStaticText *label =
 		new wxStaticText(panel, wxID_ANY, wxT("Structure: "));
 	
@@ -305,6 +305,12 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 		new wxChoice(panel, kPeriodicStructureChoice);//, wxPoint(-1, -1),
 					 /* wxSize(-1, -1), 1, &structures[0]->name); */
 	/* mStructureChoice->SetSelection(0); */
+
+	wxStaticText *label2 =
+		new wxStaticText(panel, wxID_ANY, wxT("User Structures File: "));
+
+	struc_filename_label =
+		new wxStaticText(panel, wxID_ANY, wxT("None"));
 
 	wxButton *save_button =
 		new wxButton(panel, kPeriodicSaveStructures, _("Save Structures"));
@@ -336,13 +342,16 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	struc_sizer->Add(label, wxGBPosition(0, 0), wxGBSpan(1, 1), rflags);
 	struc_sizer->Add(mStructureChoice, wxGBPosition(0, 1), wxGBSpan(1, 1), lflags);
 
+	struc_sizer->Add(label2, wxGBPosition(1, 0), wxGBSpan(1, 1), rflags);
+	struc_sizer->Add(struc_filename_label, wxGBPosition(1, 1), wxGBSpan(1, 1), lflags);
+
 	struc_sizer->Add(save_button, wxGBPosition(0, 2), wxGBSpan(1, 1), wxEXPAND);
 	struc_sizer->Add(save_as_button, wxGBPosition(1, 2), wxGBSpan(1, 1), wxEXPAND);
 	struc_sizer->Add(load_button, wxGBPosition(2, 2), wxGBSpan(1, 1), wxEXPAND);
 	struc_sizer->Add(delete_button, wxGBPosition(3, 2), wxGBSpan(1, 1), wxEXPAND);
 	struc_sizer->Add(rename_button, wxGBPosition(4, 2), wxGBSpan(1, 1), wxEXPAND);
 
-	struc_sizer->Add(canvas_panel, wxGBPosition(1, 0), wxGBSpan(5, 2), wxEXPAND);
+	struc_sizer->Add(canvas_panel, wxGBPosition(2, 0), wxGBSpan(5, 2), wxEXPAND);
 
 	struc_sizer->AddGrowableCol(0, 1);
 	struc_sizer->AddGrowableCol(1, 1);
@@ -758,11 +767,15 @@ std::ostream& operator<<(std::ostream& stream, const Structure& s) {
 
 void BuilderDlg::SaveStructuresAs(wxCommandEvent& event) {
 
-	load_file_path = wxFileSelector(wxT("Save As"), wxT(""), wxT(""), wxT(""),
-									wxT("CML Files (*.cml)|*.cml"),
-									wxSAVE | wxOVERWRITE_PROMPT, this);
+	wxString filename;
+	filename = wxFileSelector(wxT("Save As"), wxT(""), wxT(""), wxT(""),
+							  wxT("CML Files (*.cml)|*.cml"),
+							  wxSAVE | wxOVERWRITE_PROMPT, this);
 
-	SaveStructures(event);
+	if (!filename.IsEmpty()) {
+		struc_filename = filename;
+		SaveStructures(event);
+	}
 
 }
 
@@ -773,8 +786,8 @@ void BuilderDlg::SaveStructures(wxCommandEvent& event) {
 	FILE *save_file = NULL;
 	BufferFile *buffer = NULL;
 
-	if (!load_file_path.IsEmpty()) {
-		save_file = fopen(load_file_path.mb_str(wxConvUTF8), "w");
+	if (!struc_filename.IsEmpty()) {
+		save_file = fopen(struc_filename.mb_str(wxConvUTF8), "w");
 		if (save_file == NULL) {
 			MessageAlert("Unable to access the file.");
 			return;
@@ -798,22 +811,22 @@ void BuilderDlg::SaveStructures(wxCommandEvent& event) {
 void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 
 	int i;
+	int response = wxYES;
+	wxString filename;
 
 	// Before we load the new user structures in, we may want to remove any
 	// previously loaded user structures from both the structures dropdown
 	// menu and the vector.  We let the user decide if they want to replace
 	// or append.
 	if (structures.size() > nglobal_structures) {
-		int response = wxMessageBox(_("Replace the current structures?"),
-									_("Load Structures"), wxYES_NO | wxCANCEL,
-									this);
+		response = wxMessageBox(_("Replace the current structures?"),
+								_("Load Structures"), wxYES_NO | wxCANCEL,
+								this);
 
 		if (response == wxYES) {
 			if (nglobal_structures) {
-				mStructureChoice->SetSelection(0);
 				canvas->SetStructure(structures[0]);
 			} else {
-				mStructureChoice->SetSelection(wxNOT_FOUND);
 				canvas->SetStructure(NULL);
 			}
 			for (i = nglobal_structures; i < structures.size(); i++) {
@@ -825,22 +838,39 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 				 i >= nglobal_structures; i--) {
 				mStructureChoice->Delete(i);
 			}
+
+			// Apparently the selection has to be done after the deletion, 
+			// otherwise it won't stick.
+			if (nglobal_structures) {
+				mStructureChoice->SetSelection(0);
+			} else {
+				mStructureChoice->SetSelection(wxNOT_FOUND);
+			}
+
+			struc_filename_label->SetLabel(_("None"));
 		} else if (response == wxCANCEL) {
 			return;
 		}
 	}
 
-	load_file_path = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
-									wxT(""), wxT("CML Files (*.cml)|*.cml"));
+	filename = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
+							  wxT(""), wxT("CML Files (*.cml)|*.cml"));
 
 	// If a file wasn't selected or can't be opened, let's not change anything.
-	if (load_file_path.IsEmpty()) {
+	if (filename.IsEmpty()) {
 		return;
 	}
 
-	LoadStructuresFromFile(load_file_path);
+	int prev_size = structures.size();
+	bool success = LoadStructuresFromFile(filename);
 
-	structures_dirty = false;
+	structures_dirty = (response != wxYES) && (structures.size() != prev_size);
+
+	if (success && response == wxYES) {
+		struc_filename = filename;
+		struc_filename_label->SetLabel(struc_filename.AfterLast('/'));
+	}
+
 
 }
 
@@ -848,28 +878,30 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 /**
  * This function loads structures from the file indicated by the specified
  * pathname.
- * @param load_file_path The pathname to the structures file.
+ * @param filename The pathname to the structures file.
  */
 
-void BuilderDlg::LoadStructuresFromFile(const wxString& load_file_path) {
+bool BuilderDlg::LoadStructuresFromFile(const wxString& filename) {
 
 	FILE *load_file = NULL;
 	BufferFile *buffer = NULL;
 
-	load_file = fopen(load_file_path.mb_str(wxConvUTF8), "r");
+	load_file = fopen(filename.mb_str(wxConvUTF8), "r");
 	if (load_file == NULL) {
 		MessageAlert("Unable to access the file.");
-		return;
+		return false;
 	}
 
 	buffer = new BufferFile(load_file, false);
-	ReadCMLFile(buffer);
+	int result = ReadCMLFile(buffer);
 
 	if (buffer) {
 		delete buffer;
 	}
 
 	fclose(load_file);
+
+	return result == 0;
 
 }
 
@@ -882,7 +914,7 @@ void BuilderDlg::LoadStructuresFromFile(const wxString& load_file_path) {
 
 void BuilderDlg::UpdateSaveStructuresAs(wxUpdateUIEvent& event) {
 
-	event.Enable(GetNumUserStructures() > 0);
+	event.Enable(structures_dirty);
 
 }
 
@@ -896,7 +928,7 @@ void BuilderDlg::UpdateSaveStructuresAs(wxUpdateUIEvent& event) {
 
 void BuilderDlg::UpdateSaveStructures(wxUpdateUIEvent& event) {
 
-	event.Enable(!load_file_path.IsEmpty() && structures_dirty);
+	event.Enable(!struc_filename.IsEmpty() && structures_dirty);
 
 }
 

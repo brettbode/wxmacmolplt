@@ -99,7 +99,7 @@ class BuilderDlg: public wxMiniFrame {
 		long WriteCMLFile(BufferFile *Buffer) const;
 		long ReadCMLFile(BufferFile *Buffer);
 		void LoadStructures(wxCommandEvent& event);
-		void LoadStructuresFromFile(const wxString& load_file_path);
+		bool LoadStructuresFromFile(const wxString& filename);
 		void UpdateSaveStructures(wxUpdateUIEvent& event);
 		void UpdateSaveStructuresAs(wxUpdateUIEvent& event);
 		void UpdateDeleteStructure(wxUpdateUIEvent& event);
@@ -136,7 +136,8 @@ class BuilderDlg: public wxMiniFrame {
 		bool structures_dirty;
 		wxGridBagSizer *struc_sizer;
 
-		wxString load_file_path;
+		wxString struc_filename;
+		wxStaticText *struc_filename_label;
 
 	DECLARE_DYNAMIC_CLASS(BuilderDlg)
 	DECLARE_EVENT_TABLE()
