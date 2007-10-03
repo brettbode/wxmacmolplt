@@ -283,20 +283,20 @@ void SetRotationMatrix (Matrix4D rotationMatrix, const CPoint3D *op, const CPoin
 	s = a.Magnitude();
 	c = DotProduct3D(op, oq);
 
+	// The cross product will be invalid if the vectors are parallel or 
+	// antiparallel.  But, we can still make this rotation work...
 	if (s < 1e-6f) {
-		std::cout << "s: " << s << std::endl;
-		std::cout << "c: " << c << std::endl;
 
-		// If the two vectors are antiparallel.
+		// If the two vectors are antiparallel, we can just choose an
+		// arbitrary vector orthogonal the vectors and use it as the axis to
+		// rotate one vector around to the other.
 		if (c < 0.0f) {
-			/* a.x = op->x; */
-			/* a.y = op->z; */
-			/* a.z = op->y; */
 			OrthoVector(*op, a);
 			s = a.Magnitude();
 		}
 		
-		// If the vectors are parallel, we just need an identity transform.
+		// If the vectors are parallel, we just need an identity transform
+		// since the vectors are already aligned.
 		else {
 			InitRotationMatrix(rotationMatrix);
 			return;

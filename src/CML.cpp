@@ -75,7 +75,6 @@ long BuilderDlg::WriteCMLFile(BufferFile *Buffer) const {
 long BuilderDlg::ReadCMLFile(BufferFile *Buffer) {
 
 	short errors = 0;
-	long result = 0;
 	long fsize = Buffer->GetFileSize();
 	char *xmlbuffer = new char[fsize + 1];
 
@@ -145,11 +144,8 @@ long BuilderDlg::ReadCMLFile(BufferFile *Buffer) {
 	}
 
 	XMLShutdown();
-	if (errors > 0){
-		result = 0;
-	}
 
-	return result;
+	return errors;
 
 }
 
