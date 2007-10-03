@@ -828,18 +828,13 @@ void CoordinatesWindow::OnRangeSelect( wxGridRangeSelectEvent& event )
 	//so first clear off the list of selected cells
 	//for (int i=0; i<natoms; i++) lFrame->SetAtomSelection(i, false);
 
-	if(event.Selecting()) {
-	  for (int i=0; i<natoms; i++) lFrame->SetAtomSelection(i, false);
+	for (int i=0; i<natoms; i++) 
+		lFrame->SetAtomSelection(i, coordGrid->IsInSelection(i, 1));
 
-	  for (int i=event.GetTopRow(); i<=event.GetBottomRow(); i++) {
-	    lFrame->SetAtomSelection(i, true);
-	  }
-	
-	  UpdateControls();
+	UpdateControls();
 
-	  Parent->UpdateGLModel();
-	  Parent->ResetView();
-	}
+	Parent->UpdateGLModel();
+	Parent->ResetView();
 
 	event.Skip();
 }

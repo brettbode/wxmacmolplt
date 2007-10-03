@@ -216,7 +216,7 @@ void ChangeAtomOrderDialog::OnTextctrl5Updated( wxCommandEvent& event )
 
 void ChangeAtomOrderDialog::OnOkClick( wxCommandEvent& event )
 {
-	Parent->ChangeAtomOrder(index);
+	Parent->ChangeAtomOrder(index-1);
 	event.Skip();
 }
 

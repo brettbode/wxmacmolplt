@@ -3055,6 +3055,14 @@ void MolDisplayWin::ResetView(void) {
 		lSurface->RotateEvent(MainData);
 		lSurface = lSurface->GetNextSurface();
 	}
+	//Check the select state
+	mHighliteState = false;
+	for (long i=0; i<MainData->cFrame->NumAtoms; i++) {
+		if (MainData->cFrame->Atoms[i].GetSelectState()) {
+			mHighliteState = true;
+			break;
+		}
+	}
 	glCanvas->UpdateGLView();
 	glCanvas->draw();
 }
@@ -3654,6 +3662,66 @@ void MolStatusBar::OnScrollBarChange(wxScrollEvent & event) {
 void MolDisplayWin::ChangeAtomOrder(long index) {
 	//first make a list of the selected atoms to move.
 	//we have to be careful since the initial index may move around as atoms are moved.
+	long sel1atom=-1;
+	for (long i=0; i < MainData->cFrame->NumAtoms; i++) {
+		if (MainData->cFrame->Atoms[i].GetSelectState()) {
+			sel1atom = i;
+			break;
+		}
+	}
+	if (sel1atom < 0) return;	//no selected atoms found
+	if (sel1atom >= index) {
+		//if we are moving atoms closer to the beginning of the list it is
+		//simple as we just need to find each selected atom and move it.
+		while (sel1atom >= 0) {
+			MainData->ReorderAtomList(sel1atom, index);
+			if (sel1atom == index) sel1atom ++;
+			index++;
+			long i = sel1atom;
+			sel1atom = -1;
+			for ( ; i<MainData->cFrame->NumAtoms; i++) {
+				if (MainData->cFrame->Atoms[i].GetSelectState()) {
+					sel1atom = i;
+					break;
+				}
+			}
+		}
+	} else {
+		//ok moving the atom later in the list. The catch is we don't want to process the
+		//same atom twice and the initial atom may not stay put.
+		MainData->ReorderAtomList(sel1atom, index);
+		long skipstart = index;
+		long skipcount = 1;
+		while (sel1atom > 0) {
+			long i = sel1atom;
+			sel1atom = -1;
+			for ( ; i<MainData->cFrame->NumAtoms; i++) {
+				if (i == skipstart) {
+					i += skipcount;
+					index++;
+					while (MainData->cFrame->Atoms[i].GetSelectState()) {
+						//selected atoms immediately after the already moved atoms are fine
+						//where they are.
+						i++;
+						index++;
+					}
+					continue;
+				}
+				if (MainData->cFrame->Atoms[i].GetSelectState()) {
+					sel1atom = i;
+					break;
+				}
+			}
+			if (sel1atom > 0)
+				MainData->ReorderAtomList(sel1atom, index);
+			if (sel1atom > index) index++;
+			else {
+				skipcount++;
+				skipstart--;
+			}
+		}
+	}
+	AtomsChanged(true, true);	//update all the windows
 }
 
 void MolDisplayWin::OnToggleTool(wxCommandEvent& event) {

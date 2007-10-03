@@ -1643,7 +1643,7 @@ void MoleculeData::ReorderAtomList(long index1, long targetindex) {
 		}
 	} else {
 		temp = cFrame->Atoms[index1];
-		for (long i=index1; i<targetindex; i--) {
+		for (long i=index1; i>targetindex; i--) {
 			cFrame->Atoms[i] = cFrame->Atoms[i-1];
 		}
 		cFrame->Atoms[targetindex] = temp;
