@@ -1696,7 +1696,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 		DrawBond(lBonds[ibond], lAtoms[lBonds[ibond].Atom1],
 				 lAtoms[lBonds[ibond].Atom2], *Prefs, core_obj,
-				 modelview, proj, viewport, OpenGLData->sphere_list, true);
+				 modelview, proj, viewport, OpenGLData->sphere_list,
+				 mHighliteState);
 
 	}
 	glPopName();
