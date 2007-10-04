@@ -149,8 +149,6 @@ void MpGLCanvas::initGL(void) {
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
 		glEnable(GL_LIGHT0);
 
-		glEnable(GL_RESCALE_NORMAL);
-
 		initialized = true;
 	}
 }
