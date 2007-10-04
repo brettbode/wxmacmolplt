@@ -1546,8 +1546,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		bg_invert[0] = bg_invert[1] = bg_invert[2] = 1.0f;
 	}
 
+	glEnable(GL_RESCALE_NORMAL);
 	if (!Prefs->DrawWireFrame()) {
-	//	if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) {
 		glLoadName(MMP_ATOM);
 		glPushName(0);
 		for (long iatom=0; iatom<NumAtoms; iatom++) {
@@ -1663,7 +1663,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		glPopName();
 	}
 
-
 	GLdouble modelview[16];
 	GLdouble proj[16];
 	GLint viewport[4];
@@ -1701,6 +1700,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 	}
 	glPopName();
+	glDisable(GL_RESCALE_NORMAL);
 
 	if (mHighliteState)
 		glEnable(GL_POLYGON_STIPPLE);
@@ -3262,7 +3262,7 @@ void DrawInversionPoint(void) {
 	glGetMaterialfv(GL_FRONT, GL_SPECULAR, save_specular);
 
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 128.0);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, sphere_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, sphere_diffuse);
 //	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, sphere_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, sphere_specular);
 	glColor4f(.7, .7, .7, 1.0);
@@ -3274,10 +3274,12 @@ void DrawInversionPoint(void) {
 	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
 	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
 	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, plane_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
 	glColor4f(0, .64, .85, 0.7);
+
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 
 	gluCylinder(qobj, 0.02, 0.02, 0.6, 12, 1);
