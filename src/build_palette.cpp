@@ -102,6 +102,10 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	nglobal_structures = structures.size();
 	structures_dirty = false;
 
+	if (nglobal_structures) {
+		mStructureChoice->SetSelection(0);
+	}
+
 }
 
 // --------------------------------------------------------------------------- 
@@ -914,7 +918,7 @@ bool BuilderDlg::LoadStructuresFromFile(const wxString& filename) {
 
 void BuilderDlg::UpdateSaveStructuresAs(wxUpdateUIEvent& event) {
 
-	event.Enable(structures_dirty);
+	event.Enable(GetNumUserStructures() > 0 || !struc_filename.IsEmpty());
 
 }
 
@@ -978,6 +982,7 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 		mStructureChoice->SetSelection(id);
 		canvas->SetStructure(structures[id]);
 	}
+
 	structures_dirty = true;
 
 }
