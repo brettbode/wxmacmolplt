@@ -143,6 +143,68 @@
 <bond id="b18" atomRefs2="a5 a19" order="S"></bond>
 </bonds>
 </Structure>
+<Structure name="Water">
+<atoms size="3">
+<atom id="a0" elementType="O" x3="-0.000000" y3="0.071058" z3="0.000000" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a1" elementType="H" x3="-0.898146" y3="-0.564027" z3="0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a2" elementType="H" x3="0.898146" y3="-0.564027" z3="0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="2">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a2" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Ethane">
+<atoms size="8">
+<atom id="a0" elementType="C" x3="0.770000" y3="0.000000" z3="-0.000000" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-0.770000" y3="0.000000" z3="0.000000" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="H" x3="1.149999" y3="0.675393" z3="-0.836087" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a3" elementType="H" x3="1.149999" y3="-1.061770" z3="-0.166864" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a4" elementType="H" x3="1.150000" y3="0.386377" z3="1.002951" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a5" elementType="H" x3="-1.150000" y3="-1.061770" z3="-0.166863" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a6" elementType="H" x3="-1.150000" y3="0.386376" z3="1.002951" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-1.150000" y3="0.675393" z3="-0.836088" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="7">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a2" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a3" order="S"></bond>
+<bond id="b3" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a5" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a1 a7" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Benzene">
+<atoms size="12">
+<atom id="a0" elementType="C" x3="-1.398154" y3="0.217306" z3="-0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-0.628154" y3="-1.116373" z3="-0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="0.911846" y3="-1.116373" z3="-0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a3" elementType="C" x3="1.681846" y3="0.217306" z3="-0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a4" elementType="C" x3="0.911846" y3="1.550984" z3="-0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a5" elementType="C" x3="-0.628153" y3="1.550985" z3="-0.000000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a6" elementType="H" x3="-2.538154" y3="0.217306" z3="-0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-1.198154" y3="-2.103642" z3="-0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="1.481846" y3="-2.103642" z3="-0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="2.821846" y3="0.217305" z3="-0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="H" x3="1.481847" y3="2.538253" z3="-0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a11" elementType="H" x3="-1.198153" y3="2.538254" z3="-0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="12">
+<bond id="b0" atomRefs2="a0 a1" order="D"></bond>
+<bond id="b1" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b2" atomRefs2="a2 a3" order="D"></bond>
+<bond id="b3" atomRefs2="a3 a4" order="S"></bond>
+<bond id="b4" atomRefs2="a0 a5" order="S"></bond>
+<bond id="b5" atomRefs2="a4 a5" order="D"></bond>
+<bond id="b6" atomRefs2="a0 a6" order="S"></bond>
+<bond id="b7" atomRefs2="a1 a7" order="S"></bond>
+<bond id="b8" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b9" atomRefs2="a3 a9" order="S"></bond>
+<bond id="b10" atomRefs2="a4 a10" order="S"></bond>
+<bond id="b11" atomRefs2="a5 a11" order="S"></bond>
+</bonds>
+</Structure>
 </metadata>
 </metadataList>
 </cml>
