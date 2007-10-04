@@ -158,6 +158,7 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
 ////@end CoordinatesWindow member initialisation
 	Parent = parent;
 	Prefs = Parent->GetPrefs();
+	needClearAll = true;
 
 ////@begin CoordinatesWindow creation
 	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
@@ -786,13 +787,11 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 /*!
  * wxEVT_GRID_SELECT_CELL event handler for ID_GRID
  */
+void CoordinatesWindow::OnSelectCell( wxGridEvent& event ) {
+	if (!needClearAll)
+		return;
 
-void CoordinatesWindow::OnSelectCell( wxGridEvent& event )
-{
-  if (!needClearAll)
-    return;
-
-  int row = event.GetRow();
+	int row = event.GetRow();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
@@ -816,10 +815,9 @@ void CoordinatesWindow::OnSelectCell( wxGridEvent& event )
  * wxEVT_GRID_RANGE_SELECT event handler for ID_GRID
  */
 
-void CoordinatesWindow::OnRangeSelect( wxGridRangeSelectEvent& event )
-{
-  if (!needClearAll)
-    return;
+void CoordinatesWindow::OnRangeSelect( wxGridRangeSelectEvent& event ) {
+	if (!needClearAll)
+		return;
 
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
