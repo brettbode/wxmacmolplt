@@ -440,6 +440,8 @@ void MOPacInternals::ChangeAtomIndex(MoleculeData * MainData, long OldPosition, 
 			Type[i*3] = Type[(i-1)*3];
 			Type[i*3+1] = Type[(i-1)*3+1];
 			Type[i*3+2] = Type[(i-1)*3+2];
+			if ((i-1)<3)	//The first three atoms do not have fully validated lists yet
+				GuessInit(MainData, i, true);
 		}
 		ConnectionAtoms[NewPosition*3] = i0;
 		ConnectionAtoms[NewPosition*3+1] = i1;
