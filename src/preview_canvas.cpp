@@ -19,7 +19,6 @@ PreviewCanvas::PreviewCanvas(
 	: wxGLCanvas(parent, id, position, size, style, name, attributes),
 	  centroid(0, 0, 0) {
 
-	// context = NULL; 
 	InitRotationMatrix(global_rotation);
 	struc = NULL;
 	fov = 45.0f;
@@ -41,9 +40,7 @@ PreviewCanvas::~PreviewCanvas() {
 
 void PreviewCanvas::InitGL() {
 
-	// context = new wxGLContext(this); 
 	SetCurrent();
-	// context->SetCurrent(*this); 
 	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -74,8 +71,6 @@ void PreviewCanvas::InitGL() {
 	
 	glEnable(GL_LIGHT0);
 	glEnable(GL_LIGHTING);
-
-	glEnable(GL_RESCALE_NORMAL);
 
 	quadric = gluNewQuadric();
 
@@ -168,11 +163,8 @@ void PreviewCanvas::Render() {
 		glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 		glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
 
-		/* quadric = gluNewQuadric(); */
-		/* gluQuadricOrientation(quadric, GLU_OUTSIDE); */
-		/* gluQuadricNormals(quadric, GLU_SMOOTH); //GLU_FLAT GLU_NONE */
-
 		// Draw all the atoms.
+		glEnable(GL_RESCALE_NORMAL);
 		for (i = 0; i < struc->natoms; i++) {
 			atom = &struc->atoms[i];
 			glPushMatrix();
@@ -184,9 +176,6 @@ void PreviewCanvas::Render() {
 			glScalef(radius, radius, radius);
 			glCallList(sphere_list);
 			glPopMatrix();
-			/* gluSphere(quadric, radius, */
-					  /* (long) (1.5 * gPreferences->GetQD3DAtomQuality()), */
-					  /* gPreferences->GetQD3DAtomQuality()); */
 			glPopMatrix();
 		}
 
@@ -205,8 +194,7 @@ void PreviewCanvas::Render() {
 									*gPreferences, quadric, modelview,
 									proj, viewport, sphere_list);
 		}
-
-		/* gluDeleteQuadric(quadric); */
+		glDisable(GL_RESCALE_NORMAL);
 
 	}
 
@@ -318,128 +306,8 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 
 	Render();
 	Refresh(false);
-	/* Update(); */
 
 }
-
-/* ------------------------------------------------------------------------- */
-
-/* void PreviewCanvas::DrawBond(const Bond& bond, const mpAtom& atom1, */
-							 /* const mpAtom& atom2) { */
-
-	/* CPoint3D v1, v2, offset, NormalOffset, NormEnd, NormStart = CPoint3D(0,0,1); */
-	/* Matrix4D rotMat; */
-	/* BondOrder logical_order = bond.Order; */
-
-	/* if (bond.Order == kHydrogenBond) { */
-		/* MolDisplayWin::DrawHydrogenBond(bond, atom1, atom2, *gPreferences); */
-		/* return; */
-	/* } */
-
-	/* DrawBond(bond, atom1, atom2, *gPreferences); */
-
-	/* if (bond.Order == kAromaticBond) logical_order = kDoubleBond; */
-	/* if (!gPreferences->ColorBondHalves()) logical_order = kSingleBond; */
-
-	/* GLdouble tmpBondSize = gPreferences->GetQD3DBondWidth() / */
-						   /* MAX(logical_order, 1); */
-	/* if (logical_order > 1) tmpBondSize *= 1.5; */
-	/* GLdouble baseBondOffset = -1.75 * tmpBondSize * (MAX(logical_order, 1) - 1); */
-
-	/* GLdouble scr_coords1[3]; // Screen coordinates of atom1 */
-	/* GLdouble scr_coords2[3]; // Screen coordinates of atom2 */
-	/* CPoint3D scr_vec;        // Screen space vector between atoms */
-	/* GLdouble perp_obj[3];    // Object coords on vector perp. to scr_vec */
-	/* CPoint3D offset_vec;     // Direction to shift bond cylinders */
-
-	/* // Find screen coordinates of one atom. */
-	/* gluProject(atom1.Position.x, atom1.Position.y, atom1.Position.z, */
-			   /* modelview, proj, viewport, */
-			   /* &(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2])); */
-
-	/* // Find screen coordinates of other atom. */
-	/* gluProject(atom2.Position.x, atom2.Position.y, atom2.Position.z, */
-			   /* modelview, proj, viewport, */
-			   /* &(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2])); */
-
-	/* // Find vector perpendicular to vector between two screen points and */
-	/* // normalize it so we can scalar multiply it later.  We flip and  */
-	/* // negate the slope of the line between the two screen coordinates to */
-	/* // get the slop of the perpendicular line. */
-	/* scr_vec.x = scr_coords2[1] - scr_coords1[1]; */
-	/* scr_vec.y = scr_coords1[0] - scr_coords2[0]; */
-	/* scr_vec.z = 0; */
-	/* scr_vec *= 1 / scr_vec.Magnitude(); */
-
-	/* // Now find a point on the perpendicular vector with atom1's depth */
-	/* // and get its object coordinates. */
-	/* gluUnProject(scr_coords1[0] + scr_vec.x * 10, */
-				 /* scr_coords1[1] + scr_vec.y * 10, */
-				 /* scr_coords1[2], */
-				 /* modelview, proj, viewport, */
-				 /* &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2])); */
-
-	/* // Finally, we see what direction all bond cylinders must be offset */
-	/* // so that they will always stay in view. */
-	/* offset_vec = CPoint3D(perp_obj[0], perp_obj[1], perp_obj[2]) - */
-				 /* atom1.Position; */
-	/* offset_vec *= 1 / offset_vec.Magnitude(); */
-	
-	/* // For each "sub-bond" between these two atoms... */
-	/* for (int ipipe = 0; ipipe < MAX(logical_order, 1); ++ipipe) { */
-
-		/* v1 = atom1.Position + offset_vec * baseBondOffset + */
-			 /* offset_vec * tmpBondSize * ipipe * 3.5; */
-		/* v2 = atom2.Position + offset_vec * baseBondOffset + */
-			 /* offset_vec * tmpBondSize * ipipe * 3.5; */
-
-		/* offset = v2 - v1; */
-		/* float length = offset.Magnitude(); */
-		/* if (length > 0.00001) { */
-			/* NormalOffset = offset * (1.0f / length); */
-		/* } else { */
-			/* NormalOffset = CPoint3D(0, 0, 0); */
-		/* } */
-
-		/* SetRotationMatrix(rotMat, &NormStart, &NormalOffset); */
-
-		/* rotMat[3][0] = v1.x; */
-		/* rotMat[3][1] = v1.y; */
-		/* rotMat[3][2] = v1.z; */
-
-		/* glPushMatrix(); */
-		/* glMultMatrixf((const GLfloat *) &rotMat); */
-
-		/* //center the color change at the middle of the visible part of the bond */
-		/* float radius1 = gPreferences->GetAtomScale() * gPreferences->GetAtomSize(atom1.GetType() - 1); */
-		/* float radius2 = gPreferences->GetAtomScale() * gPreferences->GetAtomSize(atom2.GetType() - 1); */
-		/* float percent1 = radius1 / length; */
-		/* float percent2 = radius2 / length; */
-		/* float centerPercent = 0.5 + 0.5 * (percent1 - percent2); */
-		
-		/* CPoint3D v3; //first half bond from atom 1 */
-		/* v3 = v1 + (v2 - v1) * centerPercent; */
-
-		/* gPreferences->ChangeColorAtomColor(atom1.GetType()); */
-		/* glPushMatrix(); */
-		/* gluCylinder(quadric, tmpBondSize, tmpBondSize, length * centerPercent, */
-					/* (long) gPreferences->GetQD3DAtomQuality(), (long) (0.5 * gPreferences->GetQD3DAtomQuality())); */
-		/* glPopMatrix(); */
-
-		/* gPreferences->ChangeColorAtomColor(atom2.GetType()); */
-		/* glPopMatrix(); */
-		/* glPushMatrix(); */
-		/* rotMat[3][0] = v3.x; */
-		/* rotMat[3][1] = v3.y; */
-		/* rotMat[3][2] = v3.z; */
-		/* glMultMatrixf((const GLfloat *) &rotMat); */
-		/* gluCylinder(quadric, tmpBondSize, tmpBondSize, */
-					/* length * (1 - centerPercent), (long) gPreferences->GetQD3DAtomQuality(), */
-					/* (long) (0.5 * gPreferences->GetQD3DAtomQuality())); */
-
-		/* glPopMatrix(); */
-	/* } */
-/* } */
 
 /* ------------------------------------------------------------------------- */
 
