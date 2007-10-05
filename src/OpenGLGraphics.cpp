@@ -3070,14 +3070,12 @@ void DashedQuadFromLine(const CPoint3D& pt1,
 }
 
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order) {
+
 	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
 	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
 	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
-	float save_emissive[4], save_diffuse[4], save_specular[4];
-	
-	glGetMaterialfv(GL_FRONT, GL_DIFFUSE, save_diffuse);
-	glGetMaterialfv(GL_FRONT, GL_EMISSION, save_emissive);
-	glGetMaterialfv(GL_FRONT, GL_SPECULAR, save_specular);
+
+	glPushAttrib(GL_LIGHTING_BIT);
 
 	int imageWidth =16;
 	//Our width needs to be a power of two. So orders 1, 2 and 4 are no problem. Other orders such as 3
@@ -3144,12 +3142,14 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth*repeat, imageWidth, 0, GL_RGBA,
 				 GL_UNSIGNED_BYTE, testimage);
 	
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, plane_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
 	glColor4f(0, .64, .85, 0.7);
 
 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
 	
@@ -3181,8 +3181,10 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	gluQuadricTexture(qobj, GL_TRUE);
 	gluCylinder(qobj, 0.1, 0.1, 0.2, 12, 1);
 	glTranslatef(0, 0, 0.2);
+	glDisable(GL_TEXTURE_2D);
 	gluQuadricTexture(qobj, GL_FALSE);
 	gluCylinder(qobj, 0.1, 0.1, length-0.4, 12, 1);
+	glEnable(GL_TEXTURE_2D);
 	glTranslatef(0, 0, length-0.4);
 	gluQuadricTexture(qobj, GL_TRUE);
 	gluCylinder(qobj, 0.1, 0.1, 0.2, 12, 1);
@@ -3193,22 +3195,18 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_BLEND);
 	glDeleteTextures(1, &texname);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, save_diffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, save_emissive);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, save_specular);
+
+	glPopAttrib();
 }
 
 //Draw a transluecent plane
 void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2) {
+
 	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
 	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
 	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
-	float save_emissive[4], save_diffuse[4], save_specular[4];
+	glPushAttrib(GL_LIGHTING_BIT);
 	Matrix4D rotationMatrix;
-
-	glGetMaterialfv(GL_FRONT, GL_DIFFUSE, save_diffuse);
-	glGetMaterialfv(GL_FRONT, GL_EMISSION, save_emissive);
-	glGetMaterialfv(GL_FRONT, GL_SPECULAR, save_specular);
 
 	CPoint3D vec1 = p1 - origin;
 	CPoint3D vec2 = p2 - origin;
@@ -3224,7 +3222,7 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 	glEnable(GL_BLEND);
 	glDepthMask(GL_FALSE);
 
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, plane_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
 	glColor4f(0, .64, .85, 0.3);
@@ -3242,9 +3240,7 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	glDepthMask(GL_TRUE);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, save_diffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, save_emissive);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, save_specular);
+	glPopAttrib();
 	
 	glPopMatrix();
 }
@@ -3255,12 +3251,8 @@ void DrawInversionPoint(void) {
 	float sphere_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
 	float sphere_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	float sphere_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	float save_emissive[4], save_diffuse[4], save_specular[4], shininess;
 	
-	glGetMaterialfv(GL_FRONT, GL_SHININESS, &shininess);
-	glGetMaterialfv(GL_FRONT, GL_DIFFUSE, save_diffuse);
-	glGetMaterialfv(GL_FRONT, GL_EMISSION, save_emissive);
-	glGetMaterialfv(GL_FRONT, GL_SPECULAR, save_specular);
+	glPushAttrib(GL_LIGHTING_BIT);
 
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 128.0);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, sphere_diffuse);
@@ -3322,10 +3314,7 @@ void DrawInversionPoint(void) {
 	glPopMatrix();
 
 	glDisable(GL_BLEND);
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, save_diffuse);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, save_emissive);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, save_specular);
+	glPopAttrib();
 	if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
 }
 
