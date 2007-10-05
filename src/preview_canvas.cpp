@@ -244,6 +244,7 @@ void PreviewCanvas::OnLeftMouseDown(wxMouseEvent& event) {
 	curr_mouse = event.GetPosition();
 	prev_mouse = curr_mouse;
 
+	CaptureMouse();
 	Render();
 
 }
@@ -254,6 +255,8 @@ void PreviewCanvas::OnMiddleMouseDown(wxMouseEvent& event) {
 
 	curr_mouse = event.GetPosition();
 	prev_mouse = curr_mouse;
+
+	CaptureMouse();
 	
 }
 
@@ -309,6 +312,31 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 
 }
 
+// --------------------------------------------------------------------------- 
+
+void PreviewCanvas::OnMiddleMouseUp(wxMouseEvent& event) {
+
+	ReleaseMouse();
+
+}
+
+// --------------------------------------------------------------------------- 
+
+void PreviewCanvas::OnLeftMouseUp(wxMouseEvent& event) {
+
+	ReleaseMouse();
+
+}
+
+// --------------------------------------------------------------------------- 
+
+void PreviewCanvas::OnMouseEnterWindow(wxMouseEvent& event) {
+
+	curr_mouse = event.GetPosition();
+	prev_mouse = curr_mouse;
+
+}
+
 /* ------------------------------------------------------------------------- */
 
 void PreviewCanvas::OnIdle(wxIdleEvent& event) {
@@ -325,8 +353,11 @@ BEGIN_EVENT_TABLE(PreviewCanvas, wxGLCanvas)
 	EVT_SIZE(PreviewCanvas::OnSize)
 	EVT_LEFT_DOWN(PreviewCanvas::OnLeftMouseDown)
 	EVT_MIDDLE_DOWN(PreviewCanvas::OnMiddleMouseDown)
+	EVT_LEFT_UP(PreviewCanvas::OnLeftMouseUp)
+	EVT_MIDDLE_UP(PreviewCanvas::OnMiddleMouseUp)
 	EVT_MOTION(PreviewCanvas::OnMouseDrag)
 	EVT_ERASE_BACKGROUND(PreviewCanvas::OnErase)
+	EVT_ENTER_WINDOW(PreviewCanvas::OnMouseEnterWindow)
 	/* EVT_IDLE(PreviewCanvas::OnIdle) */
 END_EVENT_TABLE()
 

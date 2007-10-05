@@ -326,7 +326,7 @@ class MpGLCanvas : public wxGLCanvas {
 		void eventMouseMiddleWentDown(wxMouseEvent& event);
 		void eventMouseRightWentDown(wxMouseEvent& event);
 		void eventMouseLeftWentDown(wxMouseEvent& event);
-		void eventMouseLeaveWindow(wxMouseEvent& event);
+		void eventMouseEnterWindow(wxMouseEvent& event);
 		void eventWindowActivated(wxActivateEvent& event);
 		void eventMouseLeftDoubleClick(wxMouseEvent& event);
 		void eventMouseWheel(wxMouseEvent& event);

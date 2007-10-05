@@ -35,6 +35,9 @@ class PreviewCanvas : public wxGLCanvas {
 		void OnIdle(wxIdleEvent& event);
 		void OnLeftMouseDown(wxMouseEvent& event);
 		void OnMiddleMouseDown(wxMouseEvent& event);
+		void OnLeftMouseUp(wxMouseEvent& event);
+		void OnMiddleMouseUp(wxMouseEvent& event);
+		void OnMouseEnterWindow(wxMouseEvent& event);
 		void OnMouseDrag(wxMouseEvent& event);
 		void DrawBond(const Bond& bond, const mpAtom& atom1,
 					  const mpAtom& atom2);

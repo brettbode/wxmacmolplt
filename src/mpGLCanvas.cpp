@@ -919,8 +919,12 @@ void MpGLCanvas::eventWindowActivated(wxActivateEvent& event) {
 	event.Skip();
 }
 
-// void MpGLCanvas::eventMouseLeaveWindow(wxMouseEvent& event) { 
-// } 
+void MpGLCanvas::eventMouseEnterWindow(wxMouseEvent& event) {
+
+	curr_mouse = event.GetPosition();
+	prev_mouse = curr_mouse;
+
+}
 
 void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 
@@ -935,8 +939,8 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 	}
 	ignore_next_up = false;
 
-	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+	prev_mouse = curr_mouse;
 
 	ndrag_events = 0;
 
@@ -991,8 +995,8 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 
 	ndrag_events = 0;
 
-	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+	prev_mouse = curr_mouse;
 
 	testPicking(curr_mouse.x, curr_mouse.y);
 
@@ -1046,8 +1050,8 @@ void MpGLCanvas::eventMouseMiddleWentDown(wxMouseEvent& event) {
 
 	SetCurrent();
 
-	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+	prev_mouse = curr_mouse;
 
 	testPicking(curr_mouse.x, curr_mouse.y);
 
@@ -1150,8 +1154,8 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 	Frame *lFrame = mMainData->cFrame;
 
-	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+	prev_mouse = curr_mouse;
 
 	SetCurrent();
 	glfSetCurrentBMFFont(bitmap_fontd);
@@ -2949,7 +2953,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_RIGHT_DOWN(MpGLCanvas::eventMouseRightWentDown)
 	EVT_MIDDLE_DOWN(MpGLCanvas::eventMouseMiddleWentDown)
 	EVT_MOTION(MpGLCanvas::eventMouseDragging)
-	// EVT_LEAVE_WINDOW(MpGLCanvas::eventMouseLeaveWindow) 
+	EVT_ENTER_WINDOW(MpGLCanvas::eventMouseEnterWindow)
 	EVT_ACTIVATE(MpGLCanvas::eventWindowActivated)
 	EVT_LEFT_UP(MpGLCanvas::eventMouseLeftWentUp)
 	EVT_RIGHT_UP(MpGLCanvas::eventMouseRightWentUp)
