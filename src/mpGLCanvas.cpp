@@ -1206,9 +1206,11 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					CPoint3D vector, origin;
 					MolWin->DrawBondingSites(selected, 0, NULL, selected_site+1, &vector);
 					lFrame->GetAtomPosition(selected, origin);
-					lFrame->AddAtom(build_palette->GetSelectedElement(), origin + vector * 0.01 *
-									(Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1)));
-					mMainData->AtomAdded();
+					/* lFrame->AddAtom(build_palette->GetSelectedElement(), origin + vector * 0.01 * */
+									/* (Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1))); */
+					/* mMainData->AtomAdded(); */
+					mMainData->NewAtom(build_palette->GetSelectedElement(), origin + vector * 0.01 *
+									   (Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1)));
 					lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
 					lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
 					lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
@@ -1226,7 +1228,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					MolWin->ContentChanged();
 				} else {
 
-					mpAtom *new_atom;
+					mpAtom new_atom;
 					int prev_natoms = lFrame->NumAtoms;
 					Structure *structure;
 
@@ -1238,11 +1240,12 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						
 						// Add all atoms and select them so they can be adjusted.
 						for (int i = 0; i < structure->natoms; i++) {
-							new_atom = new mpAtom(structure->atoms[i]);
-							lFrame->AddAtom(*new_atom, lFrame->NumAtoms);
+							new_atom = mpAtom(structure->atoms[i]);
+							/* lFrame->AddAtom(*new_atom, lFrame->NumAtoms); */
+							mMainData->NewAtom(new_atom);
 							lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
 						}
-						mMainData->AtomAdded();
+						/* mMainData->AtomAdded(); */
 
 						Bond *bond;
 						bool result;
@@ -1312,7 +1315,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						CPoint3D mouse_pos;
 						double mouse_x, mouse_y, mouse_z;
 						double atom_depth;
-						mpAtom *new_atom;
+						mpAtom new_atom;
 
 						// The placement of the structure will be at the mouse
 						// x,y coordinates in object space, with the z 
@@ -1331,14 +1334,14 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						lFrame->resetAllSelectState();
 						MolWin->SetHighliteMode(true);
 						for (int i = 0; i < structure->natoms; i++) {
-							new_atom = new mpAtom(structure->atoms[i]);
-							lFrame->AddAtom(*new_atom, lFrame->NumAtoms);
+							new_atom = mpAtom(structure->atoms[i]);
+							/* lFrame->AddAtom(new_atom, lFrame->NumAtoms); */
+							mMainData->NewAtom(new_atom);
 							lFrame->GetAtomPosition(lFrame->NumAtoms - 1, pos);
 							lFrame->SetAtomPosition(lFrame->NumAtoms - 1, pos + offset);
 							lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
-							delete new_atom;
 						}
-						mMainData->AtomAdded();
+						/* mMainData->AtomAdded(); */
 
 						Bond *bond;
 						for (int i = 0; i < structure->nbonds; i++) {
@@ -2734,8 +2737,9 @@ void MpGLCanvas::AddPlaneNormal(wxCommandEvent& event) {
 
 	UnitCrossProduct3D(&vec1, &vec2, &normal);
 
-	lFrame->AddAtom(1, pos3 + normal);
-	mMainData->AtomAdded();
+	mMainData->NewAtom(1, pos3 + normal);
+	/* lFrame->AddAtom(1, pos3 + normal); */
+	/* mMainData->AtomAdded(); */
 	lFrame->AddBond(select_stack[2], lFrame->NumAtoms - 1);
 	MolWin->AtomsChanged();
 
@@ -2788,15 +2792,16 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 
 	for (int i = 0; i < mMainData->NumFrames; i++) {
 		if (mMainData->CurrentFrame-1 != i) {
-			if (selected >= cFrame->NumAtoms)
-				cFrame->AddAtom(lFrame->Atoms[selected].Type, lFrame->Atoms[selected].Position);
-			else
+			if (selected >= cFrame->NumAtoms) {
+				/* cFrame->AddAtom(lFrame->Atoms[selected].Type, lFrame->Atoms[selected].Position); */
+				mMainData->NewAtom(lFrame->Atoms[selected].Type, lFrame->Atoms[selected].Position);
+			} else
 				cFrame->Atoms[selected] = lFrame->Atoms[selected];
 		}
 
 		cFrame = cFrame->NextFrame;
 	}
-	mMainData->AtomAdded();
+	/* mMainData->AtomAdded(); */
 
 	MolWin->UpdateModelDisplay();
 	MolWin->ContentChanged();
