@@ -294,10 +294,17 @@ void MoleculeData::StickCoordinates(void) {
 	}
 	InitRotationMatrix(TotalRotation);
 }
+
+void MoleculeData::NewAtom(const mpAtom& atom, long index) {
+	cFrame->AddAtom(atom, index);
+	AtomAdded();
+}
+
 void MoleculeData::NewAtom(long AtomType, const CPoint3D & AtomPosition, long index) {
 	cFrame->AddAtom(AtomType, AtomPosition, index);
 	AtomAdded();
 }
+
 void MoleculeData::AtomAdded(void) {
 	if (cFrame->AtomAllocation>MaxAtoms) {
 		if (RotCoords) delete [] RotCoords;
