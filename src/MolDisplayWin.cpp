@@ -1857,8 +1857,7 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 									long initialAtomCount = MainData->cFrame->NumAtoms;
 									for (long i=0; i<tdatap->cFrame->NumAtoms; i++) {
 										if (CopyAllAtoms || tdatap->cFrame->Atoms[i].GetSelectState()) {
-											MainData->cFrame->AddAtom(tdatap->cFrame->Atoms[i]);
-											MainData->AtomAdded();
+											MainData->NewAtom(tdatap->cFrame->Atoms[i]);
 										}
 									}
 									for (long i=0; i<initialAtomCount; i++) {
@@ -1980,8 +1979,7 @@ void MolDisplayWin::PasteText(void) {
 							if (!MainData->cFrame->AddSpecialAtom(offset, iline)) break;
 						}
 						
-						MainData->cFrame->AddAtom(Type, Position);
-						MainData->AtomAdded();
+						MainData->NewAtom(Type, Position);
 					}
 				}
 				//Done with the text handle so unlock it
@@ -2583,10 +2581,9 @@ void MolDisplayWin::menuBuilderAddHydrogens(wxCommandEvent &event) {
 			CPoint3D vector, origin;
 			DrawBondingSites(iatom, 0, NULL, k+1, &vector);
 			lFrame->GetAtomPosition(iatom, origin);
-			lFrame->AddAtom(1, origin + vector * 0.01 *
-							(Prefs->GetAtomSize(lFrame->GetAtomType(iatom)-1) + Prefs->GetAtomSize(0)));
+			MainData->NewAtom(1, origin + vector * 0.01 *
+							  (Prefs->GetAtomSize(lFrame->GetAtomType(iatom)-1) + Prefs->GetAtomSize(0)));
 			lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(1);
-			MainData->AtomAdded();
 			lFrame->AddBond(iatom,lFrame->GetNumAtoms()-1,kSingleBond);
 		}
 	}
