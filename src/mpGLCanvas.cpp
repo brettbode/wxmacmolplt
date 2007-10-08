@@ -1210,9 +1210,6 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					CPoint3D vector, origin;
 					MolWin->DrawBondingSites(selected, 0, NULL, selected_site+1, &vector);
 					lFrame->GetAtomPosition(selected, origin);
-					/* lFrame->AddAtom(build_palette->GetSelectedElement(), origin + vector * 0.01 * */
-									/* (Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1))); */
-					/* mMainData->AtomAdded(); */
 					mMainData->NewAtom(build_palette->GetSelectedElement(), origin + vector * 0.01 *
 									   (Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1)));
 					lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
@@ -1245,11 +1242,9 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						// Add all atoms and select them so they can be adjusted.
 						for (int i = 0; i < structure->natoms; i++) {
 							new_atom = mpAtom(structure->atoms[i]);
-							/* lFrame->AddAtom(*new_atom, lFrame->NumAtoms); */
 							mMainData->NewAtom(new_atom);
 							lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
 						}
-						/* mMainData->AtomAdded(); */
 
 						Bond *bond;
 						bool result;
@@ -1339,13 +1334,11 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						MolWin->SetHighliteMode(true);
 						for (int i = 0; i < structure->natoms; i++) {
 							new_atom = mpAtom(structure->atoms[i]);
-							/* lFrame->AddAtom(new_atom, lFrame->NumAtoms); */
 							mMainData->NewAtom(new_atom);
 							lFrame->GetAtomPosition(lFrame->NumAtoms - 1, pos);
 							lFrame->SetAtomPosition(lFrame->NumAtoms - 1, pos + offset);
 							lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
 						}
-						/* mMainData->AtomAdded(); */
 
 						Bond *bond;
 						for (int i = 0; i < structure->nbonds; i++) {
@@ -2493,6 +2486,7 @@ void MpGLCanvas::SetAnnotationParameter(wxCommandEvent& event) {
 	// Only if a valid number was entered and OK was clicked do we change the
 	// annotation parameter.
 	if (dlg->ShowModal() == wxID_OK && dlg->GetValue().ToDouble(&new_value)) {
+		MolWin->CreateFrameSnapShot();
 		anno->setParam(*lFrame, new_value);
 	}
 
@@ -2742,8 +2736,6 @@ void MpGLCanvas::AddPlaneNormal(wxCommandEvent& event) {
 	UnitCrossProduct3D(&vec1, &vec2, &normal);
 
 	mMainData->NewAtom(1, pos3 + normal);
-	/* lFrame->AddAtom(1, pos3 + normal); */
-	/* mMainData->AtomAdded(); */
 	lFrame->AddBond(select_stack[2], lFrame->NumAtoms - 1);
 	MolWin->AtomsChanged();
 
@@ -2797,7 +2789,6 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 	for (int i = 0; i < mMainData->NumFrames; i++) {
 		if (mMainData->CurrentFrame-1 != i) {
 			if (selected >= cFrame->NumAtoms) {
-				/* cFrame->AddAtom(lFrame->Atoms[selected].Type, lFrame->Atoms[selected].Position); */
 				mMainData->NewAtom(lFrame->Atoms[selected].Type, lFrame->Atoms[selected].Position);
 			} else
 				cFrame->Atoms[selected] = lFrame->Atoms[selected];
@@ -2805,7 +2796,6 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 
 		cFrame = cFrame->NextFrame;
 	}
-	/* mMainData->AtomAdded(); */
 
 	MolWin->UpdateModelDisplay();
 	MolWin->ContentChanged();
