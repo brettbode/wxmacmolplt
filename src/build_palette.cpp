@@ -1049,3 +1049,34 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 
 /* ------------------------------------------------------------------------- */
 
+void BuilderDlg::StructuresSaveCheck() {
+
+	if (structures_dirty) {
+		Show();
+
+		if (!struc_filename.IsEmpty()) {
+			int r = wxMessageBox(wxT("The structures file ") + struc_filename +
+								 wxT(" has unsaved changes.  Do you wish to "
+									 "save the changes to this file before "
+									 "closing?"), wxT("Structures Modified"),
+								 wxICON_QUESTION | wxYES_NO, this);
+			if (r == wxYES) {
+				wxCommandEvent event;
+				SaveStructures(event);
+			}
+		} else {
+			int r = wxMessageBox(wxT("The structures have unsaved changes. Do "
+									 "you wish to save these changes before "
+									 "closing?"), wxT("Structures Modified"),
+								 wxICON_QUESTION | wxYES_NO, this);
+			if (r == wxYES) {
+				wxCommandEvent event;
+				SaveStructuresAs(event);
+			}
+		}
+	}
+
+}
+
+/* ------------------------------------------------------------------------- */
+

@@ -85,6 +85,7 @@ class BuilderDlg: public wxMiniFrame {
 
 		int GetNumUserStructures() const;
 		Structure *GetUserStructure(int i) const;
+		void StructuresSaveCheck();
 
 	private:
 		void ElementSelected(wxCommandEvent& event);

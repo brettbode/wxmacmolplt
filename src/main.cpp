@@ -294,6 +294,8 @@ void MpApp::CloseGlobalPrefs(void) {
 }
 
 void MpApp::destroyMainFrame(MolDisplayWin *frame) {
+
+	build_palette->StructuresSaveCheck();
 	MolWinList.remove(frame);
 #ifdef __WXMAC__
 	if (MolWinList.size() <= 0) {
