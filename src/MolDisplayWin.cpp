@@ -1088,7 +1088,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 							 "|VRML (*.wrl)|*.wrl"
 							 "|Pov-RAY (*.pov)|*.pov"));
 	bool vibs = false;
-	int itemCount = 8;
+	int itemCount = 9;
 	if (MainData->cFrame->GetNumberNormalModes() > 0) {
 		vibs = true;
 		wildcards.Append(wxT("|Frequencies (*.txt)|*.txt"));
