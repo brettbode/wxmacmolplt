@@ -317,7 +317,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 
 	getCanvasSize(&width, &height);
 
-	fontFile = fopen(fontPath.fn_str(), "r");
+	fontFile = fopen(fontPath.fn_str(), "rb");
 	if(fontFile == NULL) {
 		/* TODO:  Display an error message */
 		/* OR, just disable drawing text */
