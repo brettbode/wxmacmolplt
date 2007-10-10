@@ -441,6 +441,7 @@ class MolDisplayWin : public wxFrame {
 		 * @param event The UpdateUI event.
 		 */
 		void OnShowBondSitesUpdate(wxUpdateUIEvent& event);
+		void UpdateAtomsOptions(wxUpdateUIEvent& event);
 		
 		//Commands to open (or raise) the various data subviews.
 		//void menuWindowMain_display(wxCommandEvent &event);
@@ -486,6 +487,7 @@ class MolDisplayWin : public wxFrame {
 		void WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllModes, bool AnimateMode);
 		void WriteMDLMolFile(BufferFile * Buffer);
 		void WriteVRMLFile(BufferFile * Buffer);
+		void WritePOVFile(BufferFile *Buffer);
 #ifdef __MAC_USE_QUICKTIME__
 		//quicktime movie export
 		void WriteQTMovie(wxString & filepath);

@@ -81,7 +81,6 @@ enum MMP_EventID {
 	MMP_DISPLAYMODESUBMENU,
 	MMP_WIREFRAMEMODE,
 	MMP_BALLANDSTICKMODE,
-	MMP_ANNOTATIONSSUBMENU,
 	MMP_ADDMARKANNOTATION,
 	MMP_ADDLENGTHANNOTATION,
 	MMP_ADDANGLEANNOTATION,
@@ -96,21 +95,28 @@ enum MMP_EventID {
 	MMP_ROTATE180VER,
 	MMP_ROTATEPRINC,
 	MMP_ROTATEOTHER,
-	MMP_SETBONDLENGTH,
 	MMP_CREATELLMPATH,
 	MMP_MINFRAMEMOVEMENTS,
-	MMP_DETERMINEPG,
-	MMP_SYMADAPTCOORDS,
 	MMP_CONVERTTOBOHR,
 	MMP_CONVERTTOANGSTROMS,
 	MMP_INVERTNORMALMODE,
 	MMP_ADDHYDROGENS,
 	MMP_DELETEHYDROGENS,
+
+	// On when NumAtoms != 0.  LEAVE MMP_NEWFRAME FIRST AND
+	// MMP_ANNOTATIONSSUBMENU LAST!
 	MMP_NEWFRAME,
+	MMP_COPYCOORDS,
+	MMP_ENERGYEDIT,
+	MMP_SETBONDLENGTH,
+	MMP_DETERMINEPG,
+	MMP_SYMADAPTCOORDS,
+	MMP_EXPORT,
+	MMP_ANNOTATIONSSUBMENU,
+
 	MMP_ADDFRAMES,
 	MMP_DELETEFRAME,
 	MMP_IMPORTMENU,
-	MMP_COPYCOORDS,
 	MMP_BONDSWINDOW,
 	MMP_COORDSWINDOW,
 	MMP_ENERGYPLOTWINDOW,
@@ -118,7 +124,6 @@ enum MMP_EventID {
 	MMP_INPUTBUILDERWINDOW,
 	MMP_SURFACESWINDOW,
 	MMP_FRAMESCROLLBAR,
-	MMP_EXPORT,
 	MMP_PRINTOPTIONS,
 	MMP_ANIMATEFRAMES,
 	MMP_ANIMATEFRAMESTIMER,
@@ -127,7 +132,6 @@ enum MMP_EventID {
 	MMP_STATUS_TIMER,
 	MMP_ROTATE_TIMER,
 	MMP_OFFSETMODE,
-	MMP_ENERGYEDIT,
 	MMP_WINDOWPARAMETERS,
 	MMP_ZMATRIXCALC,
 	MMP_INTERACTIVE,
@@ -282,7 +286,9 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate)
 	EVT_UPDATE_UI(MMP_SAVESTRUCTURE,	MolDisplayWin::OnSaveStructureUpdate)
 	EVT_UPDATE_UI(MMP_SHOWBONDSITES,	MolDisplayWin::OnShowBondSitesUpdate)
-
+	EVT_UPDATE_UI_RANGE(MMP_NEWFRAME, MMP_ANNOTATIONSSUBMENU,
+						MolDisplayWin::UpdateAtomsOptions)
+	EVT_UPDATE_UI(wxID_COPY,			MolDisplayWin::UpdateAtomsOptions)
 	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
 	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)
 	EVT_MENU (MMP_ENERGYPLOTWINDOW,		MolDisplayWin::menuWindowEnergy_plot)
@@ -303,7 +309,6 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 	EVT_ACTIVATE(MolDisplayWin::OnActivate)
 	EVT_TOOL_RANGE(MMP_TOOL_ARROW, MMP_TOOL_HAND, MolDisplayWin::OnToggleTool)
-
 END_EVENT_TABLE()
 
 //Local use class to hold data during the animation of normal modes
@@ -787,18 +792,19 @@ void MolDisplayWin::AdjustMenus(void) {
 
 	menuBuild->Check(MMP_SHOWBUILDTOOLS, show_build_palette);
 	
-	if (MainData->cFrame->NumAtoms == 0) {
-	} else {
-		menuFile->Enable(MMP_NEWFRAME, true);
-		menuEdit->Enable(wxID_COPY, true);
-		menuEdit->Enable(MMP_COPYCOORDS, true);
-		menuMolecule->Enable(MMP_ENERGYEDIT, true);
-		menuMolecule->Enable(MMP_SETBONDLENGTH, true);
-		menuMolecule->Enable(MMP_DETERMINEPG, true);
-		menuMolecule->Enable(MMP_SYMADAPTCOORDS, true);
-		menuFile->Enable(MMP_EXPORT, true);
-		menuView->Enable(MMP_ANNOTATIONSSUBMENU, true);
-	}
+	/* This should be handled by an UpdateUI event handler now. */
+	/* if (MainData->cFrame->NumAtoms == 0) { */
+	/* } else { */
+		/* menuFile->Enable(MMP_NEWFRAME, true); */
+		/* menuEdit->Enable(wxID_COPY, true); */
+		/* menuEdit->Enable(MMP_COPYCOORDS, true); */
+		/* menuMolecule->Enable(MMP_ENERGYEDIT, true); */
+		/* menuMolecule->Enable(MMP_SETBONDLENGTH, true); */
+		/* menuMolecule->Enable(MMP_DETERMINEPG, true); */
+		/* menuMolecule->Enable(MMP_SYMADAPTCOORDS, true); */
+		/* menuFile->Enable(MMP_EXPORT, true); */
+		/* menuView->Enable(MMP_ANNOTATIONSSUBMENU, true); */
+	/* } */
 
 	if (MainData->NumFrames > 1 ) {
 		menuFile->Enable(MMP_DELETEFRAME, true);
@@ -850,6 +856,17 @@ void MolDisplayWin::OnAddHydrogensUpdate( wxUpdateUIEvent& event ) {
 void MolDisplayWin::OnShowBondSitesUpdate(wxUpdateUIEvent& event) {
 	event.Check(show_bond_sites);
 	event.Enable(InEditMode());
+}
+
+/**
+ * This function updates a variety of controls that should be enabled when
+ * at least one atom is in the current frame and disabled otherwise.  To
+ * register a control with this update function, insert its window ID into
+ * the range of IDs this function handles.
+ * @param event The update event.
+ */
+void MolDisplayWin::UpdateAtomsOptions(wxUpdateUIEvent& event) {
+	event.Enable(MainData->cFrame->GetNumAtoms() > 0);
 }
 
 /*!
@@ -1061,12 +1078,15 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 	wxMemoryDC memDC;
 	wxImage    exportImage;
 	wxBitmap  *bmp;
-	wxString   wildcards(wxT("Windows Bitmap (*.bmp)|*.bmp|Portable Network Graphics (*.png)|*.png|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg"
+	wxString   wildcards(wxT("Windows Bitmap (*.bmp)|*.bmp"
+							 "|Portable Network Graphics (*.png)|*.png"
+							 "|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg"
 							 "|GAMESS $DATA group (*.inp)|*.inp"
 							 "|MDL MolFile|*.mol"
 							 "|XMOL (*.xyz)|*.xyz"
 							 "|Tab delimited Energies (*.txt)|*.txt"
-				                         "|VRML (*.wrl)|*.wrl"));
+							 "|VRML (*.wrl)|*.wrl"
+							 "|Pov-RAY (*.pov)|*.pov"));
 	bool vibs = false;
 	int itemCount = 8;
 	if (MainData->cFrame->GetNumberNormalModes() > 0) {
@@ -1166,12 +1186,12 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 			exportOptionsDlg->Destroy();
 		}
 #ifdef __MAC_USE_QUICKTIME__
-		  else if (index == QTindex)
+		else if (index == QTindex)
 			//quicktime movie export
 			WriteQTMovie(filepath);
 #endif
 #ifdef HAVE_LIBMING
-		  else if (index == FlashIndex)
+		else if (index == FlashIndex)
 			//flash movie export
             WriteFlashMovie(filepath);
 #endif
@@ -1223,10 +1243,13 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 							}
 							WriteTabbedEnergies(buffer, AllFrames);
 							break;
-					        case 7:
-						  WriteVRMLFile(buffer);
-						  break;
+						case 7:
+							WriteVRMLFile(buffer);
+							break;
 						case 8:
+							WritePOVFile(buffer);
+							break;
+						case 9:
 							WriteFrequencies(buffer);
 							break;
 					}
