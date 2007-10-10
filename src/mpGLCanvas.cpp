@@ -1255,7 +1255,8 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 													 bond->Order);
 						}
 
-						lFrame->DeleteAtom(lFrame->NumAtoms - 1);
+						lFrame->DeleteAtom(prev_natoms +
+										   structure->atom_to_prune);
 
 						ConnectSelectedToSite(prev_natoms + structure->link_atom,
 											  structure->link_site - 1,

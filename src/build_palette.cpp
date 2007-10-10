@@ -662,24 +662,30 @@ void BuilderDlg::AddStructure(Structure *structure) {
 	// on bonding site to the one released by stripping off the last atom.  So,
 	// first we figure out what atom has the released bonding site -- it's the 
 	// one whose bond with the deleted atom was formed last.
-	for (i = structure->nbonds - 1; i >= 0; i--) {
-		bond = &structure->bonds[i];
-		if (bond->Atom1 == structure->natoms - 1) {
-			structure->link_atom = bond->Atom2;
-			break;
-		} else if (bond->Atom2 == structure->natoms - 1) {
-			structure->link_atom = bond->Atom1;
-			break;
-		}
-	}
+	/* for (i = structure->nbonds - 1; i >= 0; i--) { */
+		/* bond = &structure->bonds[i]; */
+		/* if (bond->Atom1 == structure->natoms - 1) { */
+			/* structure->link_atom = bond->Atom2; */
+			/* break; */
+		/* } else if (bond->Atom2 == structure->natoms - 1) { */
+			/* structure->link_atom = bond->Atom1; */
+			/* break; */
+		/* } */
+	/* } */
 
 	// Now we figure out what the bonding site number of unpaired atom is.
-	structure->link_site = 0;
-	for (i = 0; i < structure->nbonds; i++) {
-		bond = &structure->bonds[i];
-		if (bond->Atom1 == structure->link_atom ||
-			bond->Atom2 == structure->link_atom) {
-			structure->link_site++;
+	/* structure->link_site = 0; */
+	/* for (i = 0; i < structure->nbonds; i++) { */
+		/* bond = &structure->bonds[i]; */
+		/* if (bond->Atom1 == structure->link_atom || */
+			/* bond->Atom2 == structure->link_atom) { */
+			/* structure->link_site++; */
+		/* } */
+	/* } */
+	for (i = structure->natoms - 1; i >= 0; i--) {
+		if (structure->atoms[i].Type == 1) {
+			structure->SetPruneAtom(i);
+			break;
 		}
 	}
 
@@ -1073,6 +1079,48 @@ void BuilderDlg::StructuresSaveCheck() {
 				wxCommandEvent event;
 				SaveStructuresAs(event);
 			}
+		}
+	}
+
+}
+
+/* ------------------------------------------------------------------------- */
+/**
+ * This function sets the atom within the structure that should be removed
+ * when the structure's dropped in at a bonding site.  The caller of this
+ * function should make sure that atom_id refers to a hydrogen atom as this
+ * function makes no such check.
+ * @param atom_id Index into atoms array of atom to prune.
+ */
+
+void Structure::SetPruneAtom(int atom_id) {
+
+	int i;
+
+	// Do nothing if id is out of range.
+	if (atom_id < 0 || atom_id >= natoms) {
+		return;
+	}
+
+	atom_to_prune = atom_id;
+
+	// Find the atom the hydrogen is bonded to.  Since it's a hydrogen atom
+	// we're pruning, there should only be one bond for it, and the atom to
+	// link to the bonding site should be on the opposite end.
+	link_atom = -1;
+	for (i = 0; i < nbonds && link_atom == -1; i++) {
+		if (bonds[i].Atom1 == atom_to_prune) {
+			link_atom = bonds[i].Atom2;
+		} else if (bonds[i].Atom2 == atom_to_prune) {
+			link_atom = bonds[i].Atom1;
+		}
+	}
+
+	// Now we figure out what the bonding site number of opposite atom is.
+	link_site = 0;
+	for (i = 0; i < nbonds; i++) {
+		if (bonds[i].Atom1 == link_atom || bonds[i].Atom2 == link_atom) {
+			link_site++;
 		}
 	}
 

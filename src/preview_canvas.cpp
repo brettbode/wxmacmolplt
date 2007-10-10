@@ -24,6 +24,8 @@ PreviewCanvas::PreviewCanvas(
 	fov = 45.0f;
 
 	gl_initialized = false;
+	was_dragging = false;
+	selected = -1;
 
 }
 
@@ -74,6 +76,15 @@ void PreviewCanvas::InitGL() {
 
 	quadric = gluNewQuadric();
 
+	glGenTextures(1, &mask_texture_id);
+	glBindTexture(GL_TEXTURE_2D, mask_texture_id);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 16, 16, 0, GL_LUMINANCE,
+				 GL_UNSIGNED_BYTE, mask);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+
 }
 
 
@@ -117,6 +128,7 @@ void PreviewCanvas::Render() {
 
 	sphere_list = glGenLists(1);
 	glNewList(sphere_list, GL_COMPILE);
+	gluQuadricTexture(quadric, GL_TRUE);
 	gluSphere(quadric, 1.0f, (long) (1.5f * gPreferences->GetQD3DAtomQuality()),
 			  (long) (gPreferences->GetQD3DAtomQuality()));
 	glEndList();
@@ -151,8 +163,6 @@ void PreviewCanvas::Render() {
 	if (struc) {
 
 		int i;                 // Index variable
-		mpAtom *atom;          // Shortcut to atom
-		float radius;          // Radius of atom
 
 		// Get the global material properties set.  Each atom has its
 		// own ambient and diffuse color that we'll set later with glColor.
@@ -163,20 +173,28 @@ void PreviewCanvas::Render() {
 		glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 		glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
 
-		// Draw all the atoms.
-		glEnable(GL_RESCALE_NORMAL);
-		for (i = 0; i < struc->natoms; i++) {
-			atom = &struc->atoms[i];
+		DrawAtoms();
+
+		if (struc->atom_to_prune >= 0) {
+			mpAtom *atom = &struc->atoms[struc->atom_to_prune];
+			float radius;
+
+			glBindTexture(GL_TEXTURE_2D, mask_texture_id);
+			glEnable(GL_TEXTURE_2D);
+
 			glPushMatrix();
 			glTranslatef(atom->Position.x, atom->Position.y, atom->Position.z);
-			radius = gPreferences->GetAtomScale() * gPreferences->GetAtomSize(atom->Type - 1);
 			gPreferences->ChangeColorAtomColor(atom->Type);
+			radius = gPreferences->GetAtomScale() *
+					 gPreferences->GetAtomSize(atom->Type - 1);
 
 			glPushMatrix();
 			glScalef(radius, radius, radius);
 			glCallList(sphere_list);
 			glPopMatrix();
 			glPopMatrix();
+
+			glDisable(GL_TEXTURE_2D);
 		}
 
 		// We need these for calculating the offsets for double- and triple-
@@ -199,8 +217,41 @@ void PreviewCanvas::Render() {
 	}
 
 	glDeleteLists(sphere_list, 1);
+
+	GLenum err = glGetError();
+	if (err != GL_NO_ERROR) {
+		std::cout << "gluErrorString(err): " << gluErrorString(err) << std::endl;
+	}
 	
 	SwapBuffers();
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+void PreviewCanvas::DrawAtoms() {
+
+	mpAtom *atom;          // Shortcut to atom
+	float radius;          // Radius of atom
+
+	// Draw all the atoms.
+	glEnable(GL_RESCALE_NORMAL);
+	for (int i = 0; i < struc->natoms; i++) {
+		atom = &struc->atoms[i];
+		glPushMatrix();
+		glTranslatef(atom->Position.x, atom->Position.y, atom->Position.z);
+		radius = gPreferences->GetAtomScale() * gPreferences->GetAtomSize(atom->Type - 1);
+		gPreferences->ChangeColorAtomColor(atom->Type);
+
+		glPushMatrix();
+		glScalef(radius, radius, radius);
+		glLoadName(i + 1);
+		glCallList(sphere_list);
+		glPopMatrix();
+		glPopMatrix();
+	}
+
+	glLoadName(0);
 
 }
 
@@ -228,6 +279,8 @@ void PreviewCanvas::SetStructure(Structure *structure) {
 		centroid *= 1.0f / struc->natoms;
 	}
 
+	selected = -1;
+
 	Render();
 
 }
@@ -243,9 +296,75 @@ void PreviewCanvas::OnLeftMouseDown(wxMouseEvent& event) {
 	
 	curr_mouse = event.GetPosition();
 	prev_mouse = curr_mouse;
+	was_dragging = false;
 
 	CaptureMouse();
 	Render();
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+#define SELECT_BUFFER_SIZE 128
+int PreviewCanvas::Pick() {
+
+	GLuint buff[SELECT_BUFFER_SIZE];
+	GLint hits, view[4];
+	int id;
+	int selected = -1;
+
+	glSelectBuffer(SELECT_BUFFER_SIZE, buff);
+	glGetIntegerv(GL_VIEWPORT, view);
+
+	sphere_list = glGenLists(1);
+	glNewList(sphere_list, GL_COMPILE);
+	gluSphere(quadric, 1.0f, (long) (1.5f * gPreferences->GetQD3DAtomQuality()),
+			  (long) (gPreferences->GetQD3DAtomQuality()));
+	glEndList();
+
+	glRenderMode(GL_SELECT);
+	glInitNames();
+	glPushName(0);
+
+	int width, height;
+	GetClientSize(&width, &height);
+
+	// Set narrow window around mouse point.
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPickMatrix(curr_mouse.x, view[3] - curr_mouse.y, 2.0, 2.0, view);
+	gluPerspective(fov, ((float) width) / height, 0.1f, 1000.0f);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	gluLookAt(0.0f, 0.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+	glMultMatrixf((float *) global_rotation);
+	glTranslatef(-centroid.x, -centroid.y, -centroid.z);
+
+	// Now render the atoms only.
+	DrawAtoms();
+
+	hits = glRenderMode(GL_RENDER);
+
+	// Each hit record has number of names, min depth, max depth, and a list of
+	// names on the stack for the hit.
+	if (hits) {
+		int i;
+		unsigned int min_depth;
+
+		selected = buff[3] - 1;
+		min_depth = buff[1];
+		for (i = 1; i < hits; i++) {
+			if (buff[i * 4 + 1] < min_depth) {
+				min_depth = buff[i * 4 + 1];
+				selected = buff[i * 4 + 3] - 1;
+			}
+		}
+	}
+
+	glDeleteLists(sphere_list, 1);
+
+	return selected;
 
 }
 
@@ -255,6 +374,7 @@ void PreviewCanvas::OnMiddleMouseDown(wxMouseEvent& event) {
 
 	curr_mouse = event.GetPosition();
 	prev_mouse = curr_mouse;
+	was_dragging = false;
 
 	CaptureMouse();
 	
@@ -275,6 +395,8 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
+
+	was_dragging = true;
 
 	if (event.MiddleIsDown() || (event.LeftIsDown() && event.ShiftDown())) {
 		fov += curr_mouse.y - prev_mouse.y;
@@ -316,7 +438,9 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 
 void PreviewCanvas::OnMiddleMouseUp(wxMouseEvent& event) {
 
-	ReleaseMouse();
+	if (HasCapture()) {
+		ReleaseMouse();
+	}
 
 }
 
@@ -324,7 +448,18 @@ void PreviewCanvas::OnMiddleMouseUp(wxMouseEvent& event) {
 
 void PreviewCanvas::OnLeftMouseUp(wxMouseEvent& event) {
 
-	ReleaseMouse();
+	if (HasCapture()) {
+		ReleaseMouse();
+	}
+
+	if (!event.ShiftDown() && !was_dragging) {
+		int selected = Pick();
+		if (selected >= 0 && struc->atoms[selected].Type == 1) {
+			struc->SetPruneAtom(selected);
+		}
+	}
+
+	Render();
 
 }
 
@@ -345,6 +480,43 @@ void PreviewCanvas::OnIdle(wxIdleEvent& event) {
 	event.RequestMore();
 
 }
+
+/* ------------------------------------------------------------------------- */
+
+const GLubyte PreviewCanvas::mask[16 * 16] = {
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff,
+	0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff
+};
 
 /* ------------------------------------------------------------------------- */
 

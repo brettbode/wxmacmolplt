@@ -39,8 +39,8 @@ class PreviewCanvas : public wxGLCanvas {
 		void OnMiddleMouseUp(wxMouseEvent& event);
 		void OnMouseEnterWindow(wxMouseEvent& event);
 		void OnMouseDrag(wxMouseEvent& event);
-		void DrawBond(const Bond& bond, const mpAtom& atom1,
-					  const mpAtom& atom2);
+		void DrawAtoms();
+		int Pick();
 		
 		wxGLContext *context;
 		wxPoint curr_mouse;
@@ -55,6 +55,10 @@ class PreviewCanvas : public wxGLCanvas {
 		GLuint sphere_list;
 		float fov;
 		bool gl_initialized;
+		int selected;
+		bool was_dragging;
+		static const GLubyte mask[16 * 16];
+		GLuint mask_texture_id;
 
 	DECLARE_EVENT_TABLE()
 };

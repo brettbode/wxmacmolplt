@@ -46,6 +46,7 @@ class Structure {
 		Bond *bonds;
 		int nbonds;
 		wxString name;
+		int atom_to_prune;
 		int link_atom;
 		int link_site;
 
@@ -54,6 +55,7 @@ class Structure {
 
 		void WriteXML(XMLElement *parent) const;
 		bool ReadXML(XMLElement *struc_el);
+		void SetPruneAtom(int atom_id);
 
 	private:
 };
