@@ -3639,8 +3639,7 @@ void MolDisplayWin::WriteMDLMolFile(BufferFile * Buffer) {
 	Buffer->PutText("M  END\r");
 }
 
-void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
-{
+void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer) {
   Buffer->PutText("#VRML V2.0 utf8\n");  //VRML header
   Buffer->PutText("\n");
 
@@ -3807,6 +3806,61 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer)
       Buffer->PutText("\t]\n");
       Buffer->PutText("}\n");
   }
+}
+
+void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
+	/* Buffer->PutText("#VRML V2.0 utf8\n");  //VRML header */
+	/* Buffer->PutText("\n"); */
+
+	Frame *lFrame = MainData->GetCurrentFramePtr();
+	mpAtom *lAtoms = lFrame->Atoms;
+
+	long NumAtoms = lFrame->NumAtoms;
+	float AtomScale = Prefs->GetAtomScale();
+	long curAtomType;
+	RGBColor * AtomColor;
+	wxString tmpStr;
+	float red, green, blue;
+
+	tmpStr.Printf(wxT("camera {\n"
+					  "\tlocation <5, 5, 5>\n"
+					  "\tsky <0, 1, 0>\n"
+					  "\tlook_at <0, 0, 0>\n"
+					  "}\n\n"));
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+
+	tmpStr.Printf(wxT("light_source {\n"
+					  "\t<5, 5, 5>, rgb <1, 1, 1>\n"
+					  "}\n\n"));
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+
+	tmpStr.Printf(wxT("background {\n"
+					  "\trgb <1, 1, 1>\n"
+					  "}\n\n"));
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+
+	for (long iatom = 0; iatom < NumAtoms; iatom++) {
+		if (lAtoms[iatom].GetInvisibility()) continue;
+
+		curAtomType = lAtoms[iatom].GetType() - 1;
+		AtomColor = Prefs->GetAtomColorLoc(curAtomType);
+		red = AtomColor->red / 65536.0;
+		green = AtomColor->green / 65536.0;
+		blue = AtomColor->blue / 65536.0;
+
+		float radius = AtomScale*Prefs->GetAtomSize(curAtomType);
+		Buffer->PutText("sphere {\n");
+		tmpStr.Printf(wxT("\t<%f, %f, %f>, %f\n"),
+					  lAtoms[iatom].Position.x,
+					  lAtoms[iatom].Position.y,
+					  lAtoms[iatom].Position.z, radius);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		tmpStr.Printf(wxT("\ttexture {pigment {color rgb <%f, %f, %f>}}\n"),
+					  red, green, blue);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("}\n\n");
+	}
+
 }
 
 void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const double & MultValue) {
