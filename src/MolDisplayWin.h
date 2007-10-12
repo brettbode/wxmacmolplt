@@ -480,11 +480,36 @@ class MolDisplayWin : public wxFrame {
 		long OpenGAMESSInput(BufferFile * Buffer);
 		long OpenMolPltFile(BufferFile *Buffer);
 		long OpenMoldenFile(BufferFile * Buffer);
+		/**
+		 Open an MKL format filee. 
+		 \param Buffer The buffer connected to the MKL file.
+		 */
+		long OpenMKLFile(BufferFile * Buffer);
 		long ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos);
 		void ExportGAMESS(BufferFile * Buffer, bool AllFrames);
+		/**
+		 Output the plotted energies for the system to a tab de-limited text file. 
+		 \param Buffer A buffer to write the text to.
+		 \param AllFrames Should the data for all frames be included or just the current frame?
+		 */
 		void WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames);
+		/**
+		 Output the frequencies for the current frame to a text file. 
+		 \param Buffer A buffer to write the text to.
+		 */
 		void WriteFrequencies(BufferFile * Buffer);
+		/**
+		 Export the current system to an XYZ format file. 
+		 \param Buffer A buffer to write the text to.
+		 \param AllFrames Should the data for all frames be included or just the current frame?
+		 \param AllModes Should the normal modes be output or just the current one?
+		 \param AnimateMode Flag to produce a sequence of geometries animating the current normal mode.
+		 */
 		void WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllModes, bool AnimateMode);
+		/**
+		 Export the current system to an MDL mol file. 
+		 \param Buffer A buffer to write the text to.
+		 */
 		void WriteMDLMolFile(BufferFile * Buffer);
 		void WriteVRMLFile(BufferFile * Buffer);
 		void WritePOVFile(BufferFile *Buffer);
