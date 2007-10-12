@@ -20,6 +20,7 @@
 	3/2002 - Redid ReadControlOptions to remove any order dependance among keywords BMB
 	4/2002 - Modified initial fragment parser and fragment energy search BMB
 	5/2004 - Modified atomic label parsing to fix conflict between Zr/ZN and fragments BMB
+	10/2007 - Added import support for Molkel (.MKL) files
 */
 
 #include "Globals.h"
@@ -48,6 +49,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <cctype>
+//#include <iostream>
+//using namespace std;
 #include <new>
 
 #ifdef WIN32
@@ -416,6 +419,7 @@ void OpenTEXTFile(FSSpec *myFile, long flip, float offset, long nSkip) {
 		SpinCursor(0);
 				// Attempt to identify the file type by looking for key words
 		TextFileType type = Buffer->GetFileType((char *) myFile->name);
+		
 		Window->BeginOperation();
 		switch (type) {
 			case kMolType:
@@ -451,6 +455,9 @@ void OpenTEXTFile(FSSpec *myFile, long flip, float offset, long nSkip) {
 			case MolDenFile:
 				test = Window->OpenMoldenFile(Buffer);
 				break;
+			//case MolekelFile:
+				//test = Window->OpenMolekelFile(Buffer);
+				//break;
 			default:	//Should only get here for unknown file types.
 				Window->AbortOpen(34);
 		}
@@ -955,6 +962,130 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 	}
 	return 1;
 }
+
+
+
+/**
+  * Adds support for opening the MKL file extension. 
+  * @param Buffer A BufferFileObject which the .MKL file is buffered into
+  * to make parsing the file easier.  See the BufferFile object for valid
+  * BufferFile operations.
+*/
+long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
+	char Line[kMaxLineLength];
+	long	nAtoms;
+	short	scanerr;
+	
+	ProgressInd->ChangeText("Reading MKL file...");
+	Frame * lFrame = MainData->cFrame;
+	//First scan the file to determine the number of atoms
+	nAtoms = 0;
+	long startOfCOORD = 0;
+	//look throughout the file for the $COORD or the last $$
+	//and count the number of lines between the two keywords 
+	//(each line is another atom in the molecule)
+	while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
+		Buffer->GetLine(Line);
+		if (0==FindKeyWord(Line, "$COORD", 5))
+   			{
+   				startOfCOORD = Buffer->GetFilePos();
+   				//the first possible set of coordinates has been found
+   				//count the lines (each line is an atom) until $end
+   				//or if a $$ is found start over and look for $end, because
+   				//the last $$ is the actual frame of the molecule
+  				while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
+					Buffer->GetLine(Line);
+					//check for any other keywords inside $COORD keyword
+					if(0==FindKeyWord(Line, "$CHAR_MULT", 10) || 
+						0==FindKeyWord(Line, "$CHARGES", 8) || 
+						0==FindKeyWord(Line, "$BASIS", 6) || 
+						0==FindKeyWord(Line, "$COEFF_ALPHA", 12) || 
+						0==FindKeyWord(Line, "$COEFF_BETA", 11) || 
+						0==FindKeyWord(Line, "$OCC_ALPHA", 10) ||
+						0==FindKeyWord(Line, "$OCC_BETA", 9) || 
+						0==FindKeyWord(Line, "$FREQ", 5) || 
+						0==FindKeyWord(Line, "$DIPOLE", 7)
+					)
+					{
+						//there cannot be any other keywords inside $COORD keyword, file is corrupt
+						throw DataError(18);
+					}
+					else if (0==FindKeyWord(Line, "$$", 2)) 
+   					{
+	 					//Begin parse out frame info 
+						if (nAtoms<=0) throw DataError(15);
+						//reset the Buffer to the start of the last atoms frame 
+						Buffer->SetFilePos(startOfCOORD);
+						//allocate memory for the atoms
+						if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
+						//parse for atom and coordinate information
+						for(long i=0; i<nAtoms; i++)
+						{
+							CPoint3D Pos;
+							long AtomType;
+							Buffer->GetLine(Line);
+							//parse line for atom type and x,y,z positions
+							sscanf (Line,"%lu %f %f %f",&AtomType,&Pos.x,&Pos.y,&Pos.z);
+							//add atom to the molecule
+							lFrame->AddAtom(AtomType, Pos);
+						}
+						//setup bonds, if needed
+						if (Prefs->GetAutoBond()){lFrame->SetBonds(Prefs, false);}  
+						//add frame
+						lFrame = MainData->AddFrame(nAtoms,0);
+						if (!lFrame) throw MemoryError();
+						//reset for next frame
+						nAtoms=0;
+						Buffer->GetLine(Line);
+						startOfCOORD = Buffer->GetFilePos();
+	 					//End parse out frame info 
+   					}
+   					else if (0==FindKeyWord(Line, "$END", 4)) 
+   					{
+	 					//Begin parse out frame info 
+	 					//if there is no atoms in the molecule for this frame, the file is corrupted
+						if (nAtoms<=0) throw DataError(15);
+						//reset the Buffer to the start of the last atoms frame 
+						Buffer->SetFilePos(startOfCOORD);
+						//allocate memory for the atoms
+						if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
+						//parse for atom and coordinate information
+						for(long i=0; i<nAtoms; i++)
+						{
+							CPoint3D Pos;
+							long AtomType;
+							Buffer->GetLine(Line);
+							//parse line for atom type and x,y,z positions
+							sscanf (Line,"%lu %f %f %f",&AtomType,&Pos.x,&Pos.y,&Pos.z);
+							//add atom to the molecule
+							lFrame->AddAtom(AtomType, Pos);
+						}
+						//setup bonds, if needed
+						if (Prefs->GetAutoBond()){lFrame->SetBonds(Prefs, false);}  
+						//add frame
+						lFrame = MainData->AddFrame(nAtoms,0);
+						if (!lFrame) throw MemoryError();
+						//reset for next frame
+						nAtoms=0;
+						Buffer->GetLine(Line);
+	 					//End parse out frame info 
+   						
+   						break;  //break out of the loop, the end of all the coordinate sets has been reached
+   					}
+   					else 
+   					{
+						nAtoms++;
+   					} 
+				}
+   			}
+	}
+	//This is wierd, but an extra frame is appended, so just delete the extra frame
+	MainData->DeleteFrame();
+	
+	return 1;
+}
+
+
 
 long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 	char	Line[kMaxLineLength];

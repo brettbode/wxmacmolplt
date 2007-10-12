@@ -3218,6 +3218,9 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 			case MolDenFile:
 				test = OpenMoldenFile(Buffer);
 				break;
+			case MolekelFile:
+				test = OpenMKLFile(Buffer);
+				break;
 			default:    //Should only get here for unknown file types.
 			{
 				Buffer->SetFilePos(0);
