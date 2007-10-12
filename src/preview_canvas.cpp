@@ -80,8 +80,8 @@ void PreviewCanvas::InitGL() {
 	glBindTexture(GL_TEXTURE_2D, mask_texture_id);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 16, 16, 0, GL_LUMINANCE,
 				 GL_UNSIGNED_BYTE, mask);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 
@@ -122,6 +122,8 @@ void PreviewCanvas::Render() {
 		return;
 	}
 
+	SetCurrent();
+
 	if (!gl_initialized) {
 		InitGL();
 	}
@@ -132,8 +134,6 @@ void PreviewCanvas::Render() {
 	gluSphere(quadric, 1.0f, (long) (1.5f * gPreferences->GetQD3DAtomQuality()),
 			  (long) (gPreferences->GetQD3DAtomQuality()));
 	glEndList();
-
-	SetCurrent();
 
 	RGBColor *BackgroundColor = gPreferences->GetBackgroundColorLoc();
 	glClearColor(BackgroundColor->red / 65536.0f,
@@ -181,6 +181,8 @@ void PreviewCanvas::Render() {
 
 			glBindTexture(GL_TEXTURE_2D, mask_texture_id);
 			glEnable(GL_TEXTURE_2D);
+			glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,
+						  GL_SEPARATE_SPECULAR_COLOR);
 
 			glPushMatrix();
 			glTranslatef(atom->Position.x, atom->Position.y, atom->Position.z);
@@ -194,6 +196,8 @@ void PreviewCanvas::Render() {
 			glPopMatrix();
 			glPopMatrix();
 
+			glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,
+						  GL_SINGLE_COLOR);
 			glDisable(GL_TEXTURE_2D);
 		}
 
@@ -342,7 +346,9 @@ int PreviewCanvas::Pick() {
 	glTranslatef(-centroid.x, -centroid.y, -centroid.z);
 
 	// Now render the atoms only.
-	DrawAtoms();
+	if (struc) {
+		DrawAtoms();
+	}
 
 	hits = glRenderMode(GL_RENDER);
 

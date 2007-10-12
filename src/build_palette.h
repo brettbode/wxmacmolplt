@@ -111,6 +111,8 @@ class BuilderDlg: public wxMiniFrame {
 		void RenameStructure(wxCommandEvent& event);
 		void OnStructureChoice(wxCommandEvent& event);
 		void TabChanged(wxNotebookEvent& event);
+		void ChangeStructureGroup(wxCommandEvent& event);
+		void DeleteAllStructures();
 
 		short coordinationNumber[kNumTableElements];
 		short LonePairCount[kNumTableElements];
@@ -127,9 +129,10 @@ class BuilderDlg: public wxMiniFrame {
 		wxPanel *structures_panel;
 		wxPanel *canvas_panel;
 		wxFlexGridSizer *canvas_panel_sizer;
-		wxChoice *mStructureChoice;
+		wxListBox *mStructureChoice;
 		std::vector<Structure *> structures;
 		PreviewCanvas *canvas;
+		wxString sys_prefs_path;
 
 		wxStaticText *element_label;
 		wxStaticText *coord_num_label;
@@ -141,6 +144,8 @@ class BuilderDlg: public wxMiniFrame {
 
 		wxString struc_filename;
 		wxStaticText *struc_filename_label;
+		wxBoxSizer *struc_custom_sizer;
+		wxChoice *struc_groups;
 
 	DECLARE_DYNAMIC_CLASS(BuilderDlg)
 	DECLARE_EVENT_TABLE()

@@ -17,13 +17,14 @@ extern BuilderDlg *build_palette;
 #define kPeriodicLoadStructures     13804
 #define kPeriodicDeleteStructure    13805
 #define kPeriodicNotebookID         13806
-#define kPeriodicStructureChoice    13807
+#define kPeriodicStrucChoice        13807
 #define kPeriodicRenameStructure    13808
+#define kPeriodicStrucGroups        13809
 
 IMPLEMENT_DYNAMIC_CLASS(BuilderDlg, wxMiniFrame)
 
 BEGIN_EVENT_TABLE(BuilderDlg, wxMiniFrame)
-	EVT_CHOICE(kPeriodicStructureChoice, BuilderDlg::OnStructureChoice)
+	EVT_LISTBOX(kPeriodicStrucChoice, BuilderDlg::OnStructureChoice)
 	EVT_CHOICE(kPeriodicCoordinationChoice, BuilderDlg::OnCoordinationChoice)
 	EVT_CHOICE(kPeriodicLPChoice, BuilderDlg::OnLPChoice)
 	EVT_COMMAND_RANGE(0, kNumTableElements - 1, wxEVT_COMMAND_BUTTON_CLICKED,
@@ -40,6 +41,7 @@ BEGIN_EVENT_TABLE(BuilderDlg, wxMiniFrame)
 	EVT_UPDATE_UI(kPeriodicDeleteStructure, BuilderDlg::UpdateDeleteStructure)
 	EVT_UPDATE_UI(kPeriodicRenameStructure, BuilderDlg::UpdateRenameStructure)
 	EVT_NOTEBOOK_PAGE_CHANGED(kPeriodicNotebookID, BuilderDlg::TabChanged)
+	EVT_CHOICE(kPeriodicStrucGroups, BuilderDlg::ChangeStructureGroup)
 END_EVENT_TABLE()
 
 // --------------------------------------------------------------------------- 
@@ -82,27 +84,25 @@ BuilderDlg::BuilderDlg(const wxString& title,
 
 	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
 #if wxCHECK_VERSION(2, 8, 0)
-	wxString pathname = gStdPaths.GetResourcesDir();
+	sys_prefs_path = gStdPaths.GetResourcesDir();
 #else
-	wxString pathname = gStdPaths.GetDataDir();
+	sys_prefs_path = gStdPaths.GetDataDir();
 #ifdef __WXMAC__
 	//wxWidgets has a funny idea of where the resources are stored. It locates
 	//them as "SharedSupport" but xcode is putting them in Resources.
-	pathname.Remove(pathname.Length() - 13);
-	pathname += wxT("Resources");
+	sys_prefs_path.Remove(pathname.Length() - 13);
+	sys_prefs_path += wxT("Resources");
 #endif
-#endif
-#ifdef __WXMSW__
-	pathname += wxT("\\system_structures.cml");
-#else
-	pathname += wxT("/system_structures.cml");
 #endif
 
-	LoadStructuresFromFile(pathname);
+	wxCommandEvent event;
+	ChangeStructureGroup(event);
+
+	/* LoadStructuresFromFile(pathname); */
 	nglobal_structures = structures.size();
 	structures_dirty = false;
 
-	if (nglobal_structures) {
+	if (mStructureChoice->GetCount()) {
 		mStructureChoice->SetSelection(0);
 	}
 
@@ -299,37 +299,49 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	int rflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
 	int cflags = wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL;
 
-	struc_sizer->SetFlexibleDirection(wxBOTH);
-	struc_sizer->SetCols(3);
-	struc_sizer->SetRows(7);
-	wxStaticText *label =
-		new wxStaticText(panel, wxID_ANY, wxT("Structure: "));
+	struc_sizer->SetFlexibleDirection(wxVERTICAL);
+	struc_sizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+	struc_sizer->SetCols(2);
+	struc_sizer->SetRows(3);
+
+	struc_groups = new wxChoice(panel, kPeriodicStrucGroups);
+	struc_groups->Append(_T("Miscellaneous"));
+	struc_groups->Append(_T("Solvents"));
+	struc_groups->Append(_T("Peptides"));
+	struc_groups->Append(_T("Amino Acids"));
+	struc_groups->Append(_T("User-defined"));
+	struc_sizer->Add(struc_groups, wxGBPosition(0, 0), wxGBSpan(1, 1),
+					 wxEXPAND);
+	struc_groups->SetSelection(0);
+
+	mStructureChoice = new wxListBox(panel, kPeriodicStrucChoice);
+	struc_sizer->Add(mStructureChoice, wxGBPosition(1, 0), wxGBSpan(1, 1),
+					 wxEXPAND);
 	
-	mStructureChoice =
-		new wxChoice(panel, kPeriodicStructureChoice);//, wxPoint(-1, -1),
-					 /* wxSize(-1, -1), 1, &structures[0]->name); */
-	/* mStructureChoice->SetSelection(0); */
+	struc_custom_sizer = new wxBoxSizer(wxHORIZONTAL);
+	wxButton *button;
 
-	wxStaticText *label2 =
-		new wxStaticText(panel, wxID_ANY, wxT("User Structures File: "));
+	button = new wxButton(panel, kPeriodicSaveStructures, _("Save Structures"));
+	struc_custom_sizer->Add(button, wxSizerFlags().Expand());
 
-	struc_filename_label =
-		new wxStaticText(panel, wxID_ANY, wxT("None"));
+	button = new wxButton(panel, kPeriodicSaveStructuresAs,
+						  _("Save Structures As"));
+	struc_custom_sizer->Add(button, wxSizerFlags().Expand());
 
-	wxButton *save_button =
-		new wxButton(panel, kPeriodicSaveStructures, _("Save Structures"));
+	button = new wxButton(panel, kPeriodicLoadStructures, _("Load Structures"));
+	struc_custom_sizer->Add(button, wxSizerFlags().Expand());
 
-	wxButton *save_as_button =
-		new wxButton(panel, kPeriodicSaveStructuresAs, _("Save Structures As"));
+	button = new wxButton(panel, kPeriodicDeleteStructure,
+						  _("Delete Structure"));
+	struc_custom_sizer->Add(button, wxSizerFlags().Expand());
 
-	wxButton *load_button =
-		new wxButton(panel, kPeriodicLoadStructures, _("Load Structures"));
+	button = new wxButton(panel, kPeriodicRenameStructure,
+						  _("Rename Structure"));
+	struc_custom_sizer->Add(button, wxSizerFlags().Expand());
 
-	wxButton *delete_button =
-		new wxButton(panel, kPeriodicDeleteStructure, _("Delete Structure"));
-
-	wxButton *rename_button =
-		new wxButton(panel, kPeriodicRenameStructure, _("Rename Structure"));
+	struc_sizer->Add(struc_custom_sizer, wxGBPosition(2, 0), wxGBSpan(1, 2),
+					 wxALIGN_CENTER);
+	struc_sizer->Hide(struc_custom_sizer);
 
 	// It seems more sensible to just add the canvas directly to the grid
 	// bag sizer, but GTK requires us to hide its parent widget before adding
@@ -343,23 +355,11 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	canvas_panel_sizer->SetFlexibleDirection(wxBOTH);
 	canvas_panel->SetSizerAndFit(canvas_panel_sizer);
 
-	struc_sizer->Add(label, wxGBPosition(0, 0), wxGBSpan(1, 1), rflags);
-	struc_sizer->Add(mStructureChoice, wxGBPosition(0, 1), wxGBSpan(1, 1), lflags);
+	struc_sizer->Add(canvas_panel, wxGBPosition(0, 1), wxGBSpan(2, 1),
+					 wxEXPAND);
 
-	struc_sizer->Add(label2, wxGBPosition(1, 0), wxGBSpan(1, 1), rflags);
-	struc_sizer->Add(struc_filename_label, wxGBPosition(1, 1), wxGBSpan(1, 1), lflags);
-
-	struc_sizer->Add(save_button, wxGBPosition(0, 2), wxGBSpan(1, 1), wxEXPAND);
-	struc_sizer->Add(save_as_button, wxGBPosition(1, 2), wxGBSpan(1, 1), wxEXPAND);
-	struc_sizer->Add(load_button, wxGBPosition(2, 2), wxGBSpan(1, 1), wxEXPAND);
-	struc_sizer->Add(delete_button, wxGBPosition(3, 2), wxGBSpan(1, 1), wxEXPAND);
-	struc_sizer->Add(rename_button, wxGBPosition(4, 2), wxGBSpan(1, 1), wxEXPAND);
-
-	struc_sizer->Add(canvas_panel, wxGBPosition(2, 0), wxGBSpan(5, 2), wxEXPAND);
-
-	struc_sizer->AddGrowableCol(0, 1);
 	struc_sizer->AddGrowableCol(1, 1);
-	struc_sizer->AddGrowableRow(5, 1);
+	struc_sizer->AddGrowableRow(1, 1);
 
 	panel->SetSizerAndFit(struc_sizer);
 
@@ -475,7 +475,9 @@ void BuilderDlg::OnLPChoice(wxCommandEvent& event) {
 
 void BuilderDlg::OnStructureChoice(wxCommandEvent& event) {
 
-	canvas->SetStructure(structures[event.GetSelection()]);
+	if (event.GetSelection() != wxNOT_FOUND) {
+		canvas->SetStructure(structures[event.GetSelection()]);
+	}
 
 }
 
@@ -638,6 +640,7 @@ Structure::Structure() {
 	bonds = NULL;
 	natoms = 0;
 	nbonds = 0;
+	atom_to_prune = -1;
 
 }
 
@@ -696,7 +699,7 @@ void BuilderDlg::AddStructure(Structure *structure) {
 
 	// Under GTK at least, the menu doesn't expand to accommodate the new,
 	// possibly longer label.  We force that expansion now.
-	mStructureChoice->SetSize(mStructureChoice->GetBestSize());
+	/* mStructureChoice->SetSize(mStructureChoice->GetBestSize()); */
 
 	// Select the just added structure.
 	mStructureChoice->SetSelection(mStructureChoice->GetCount() - 1);
@@ -845,7 +848,7 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 			structures.erase(structures.begin() + nglobal_structures,
 							 structures.end());
 			for (i = mStructureChoice->GetCount() - 1;
-				 i >= nglobal_structures; i--) {
+				 i >= 0; i--) {
 				mStructureChoice->Delete(i);
 			}
 
@@ -886,6 +889,28 @@ void BuilderDlg::LoadStructures(wxCommandEvent& event) {
 
 /* ------------------------------------------------------------------------- */
 /**
+ * This function removes all the current structures in the structures list.
+ */
+
+void BuilderDlg::DeleteAllStructures() {
+
+	int i;
+
+	// Remove current structures.
+	if (canvas) {
+		canvas->SetStructure(NULL);
+	}
+	for (i = structures.size() - 1; i >= 0; i--) {
+		delete structures[i];
+	}
+	structures.erase(structures.begin(), structures.end());
+	mStructureChoice->Clear();
+	mStructureChoice->SetSelection(wxNOT_FOUND);
+
+}
+
+/* ------------------------------------------------------------------------- */
+/**
  * This function loads structures from the file indicated by the specified
  * pathname.
  * @param filename The pathname to the structures file.
@@ -896,6 +921,7 @@ bool BuilderDlg::LoadStructuresFromFile(const wxString& filename) {
 	FILE *load_file = NULL;
 	BufferFile *buffer = NULL;
 
+	// Open file of new structures.
 	load_file = fopen(filename.mb_str(wxConvUTF8), "r");
 	if (load_file == NULL) {
 		MessageAlert("Unable to access the file.");
@@ -1122,6 +1148,43 @@ void Structure::SetPruneAtom(int atom_id) {
 		if (bonds[i].Atom1 == link_atom || bonds[i].Atom2 == link_atom) {
 			link_site++;
 		}
+	}
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+void BuilderDlg::ChangeStructureGroup(wxCommandEvent& event) {
+
+	// delete structures
+	// add new structures
+	// select first structure
+	wxString pathname;
+
+	int selection = struc_groups->GetSelection();
+	switch (selection) {
+		case 0:
+			pathname = sys_prefs_path + wxT("/system_structures.cml");
+			break;
+		case 1: case 2: case 3:
+			break;
+		default:
+			pathname = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
+									  wxT(""), wxT("CML Files (*.cml)|*.cml"));
+			break;
+	}
+
+	DeleteAllStructures();
+	if (!pathname.IsEmpty()) {
+		LoadStructuresFromFile(pathname);
+	}
+
+	if (selection == struc_groups->GetCount() - 1) {
+		struc_sizer->Show(struc_custom_sizer);
+		struc_sizer->Layout();
+	} else {
+		struc_sizer->Hide(struc_custom_sizer);
+		struc_sizer->Layout();
 	}
 
 }
