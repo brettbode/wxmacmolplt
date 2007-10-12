@@ -3527,7 +3527,7 @@ void MolDisplayWin::WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames) {
 		sprintf(text, "\tAngle %ld-%ld-%ld", a1+1, a2+1, a3+1);
 		Buffer->PutText(text);
 	}
-	Buffer->PutText("\n");
+	Buffer->WriteLine("", true);
 
 	Frame * lFrame = MainData->Frames;
 	float	UnitFactor = 1.0;
@@ -3578,7 +3578,7 @@ void MolDisplayWin::WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames) {
 				Buffer->PutText(text);
 			} Buffer->PutText("\t");
 		}
-		Buffer->PutText("\n");
+		Buffer->WriteLine("", true);
 
 		lFrame = lFrame->NextFrame;
 		if (!lFrame) break;
@@ -3596,7 +3596,7 @@ void MolDisplayWin::WriteFrequencies(BufferFile * Buffer) {
 
 	Buffer->PutText("Frequency\tIntensity");
 	if (haveRaman) Buffer->PutText("\tRaman Intensity");
-	Buffer->PutText("\n");
+	Buffer->WriteLine("", true);
 	for (long i=0; i<lFrame->Vibs->GetNumModes(); i++) {
 		sprintf(text, "%s", lFrame->Vibs->Frequencies[i].c_str());
 		Buffer->PutText(text);
@@ -3608,7 +3608,7 @@ void MolDisplayWin::WriteFrequencies(BufferFile * Buffer) {
 			sprintf(text, "\t%f", lFrame->Vibs->GetRamanIntensity(i));
 			Buffer->PutText(text);
 		}
-		Buffer->PutText("\n");
+		Buffer->WriteLine("", true);
 	}
 }
 void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllModes,
@@ -3647,11 +3647,11 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 				tempAtoms[iatm].y += offsetFactor*(ModeOffset[iatm].y);
 				tempAtoms[iatm].z += offsetFactor*(ModeOffset[iatm].z);
 			}	//Now punch out the XYZ frame
-			sprintf(text, "%ld\r", lFrame->NumAtoms);
-			Buffer->PutText(text);
-			sprintf(text, "Frequency %s Frame %ld\r", 
+			sprintf(text, "%ld", lFrame->NumAtoms);
+			Buffer->WriteLine(text, true);
+			sprintf(text, "Frequency %s Frame %ld", 
 					lFrame->Vibs->Frequencies[lFrame->Vibs->CurrentMode].c_str(), i+1);
-			Buffer->PutText(text);
+			Buffer->WriteLine(text, true);
 			for (long j=0; j<lFrame->NumAtoms; j++) {
 					Str255	Label;
 				Prefs->GetAtomLabel(lAtoms[j].Type-1, Label);
@@ -3661,9 +3661,7 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 				Buffer->PutText(text);
 				CPoint3D * lMode = &(lFrame->Vibs->NormMode[(j + cmode)]);
 				sprintf(text," %.4f %.4f %.4f", lMode->x, lMode->y, lMode->z);
-				Buffer->PutText(text);
-
-				Buffer->PutText("\r");
+				Buffer->WriteLine(text, true);
 			}
 		}
 		delete [] tempAtoms;
@@ -3673,11 +3671,11 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 			mpAtom * lAtoms = lFrame->Atoms;
 			char Line[kMaxLineLength];
 		for (long i=0; i<lFrame->Vibs->GetNumModes(); i++) {
-			sprintf(text, "%ld\r", lFrame->NumAtoms);
-			Buffer->PutText(text);
-			sprintf(text, "Frequency %s\r", 
+			sprintf(text, "%ld", lFrame->NumAtoms);
+			Buffer->WriteLine(text, true);
+			sprintf(text, "Frequency %s", 
 					lFrame->Vibs->Frequencies[i].c_str());
-			Buffer->PutText(text);
+			Buffer->WriteLine(text, true);
 			for (long j=0; j<lFrame->NumAtoms; j++) {
 					Str255	Label;
 				Prefs->GetAtomLabel(lAtoms[j].Type-1, Label);
@@ -3688,18 +3686,16 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 				long cmode = (lFrame->NumAtoms)*i;
 				CPoint3D * lMode = &(lFrame->Vibs->NormMode[(j + cmode)]);
 				sprintf(text," %.4f %.4f %.4f", lMode->x, lMode->y, lMode->z);
-				Buffer->PutText(text);
-
-				Buffer->PutText("\r");
+				Buffer->WriteLine(text, true);
 			}
 		}
 	} else {	
 		for (long i=0; i<NumFrames; i++) {
 				mpAtom * lAtoms = lFrame->Atoms;
-			sprintf(text, "%ld\r", lFrame->NumAtoms);
-			Buffer->PutText(text);
-			sprintf(text, "Frame %ld\r", i+1);
-			Buffer->PutText(text);
+			sprintf(text, "%ld", lFrame->NumAtoms);
+			Buffer->WriteLine(text, true);
+			sprintf(text, "Frame %ld", i+1);
+			Buffer->WriteLine(text, true);
 			for (long j=0; j<lFrame->NumAtoms; j++) {
 					Str255	Label;
 				Prefs->GetAtomLabel(lAtoms[j].GetType()-1, Label);
@@ -3715,7 +3711,7 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 						Buffer->PutText(text);
 					}
 				}
-				Buffer->PutText("\r");
+				Buffer->WriteLine("", true);
 			}
 			lFrame = lFrame->NextFrame;
 			if (!lFrame) break;
@@ -3734,40 +3730,41 @@ void MolDisplayWin::WriteMDLMolFile(BufferFile * Buffer) {
 			Buffer->PutText(temp);
 		}
 	}
-	Buffer->PutText("\r");
+	Buffer->WriteLine("", true);
 		//2nd line may contain various program data
 	Buffer->PutText("  MacMolPlt                       ");
 	if (lFrame->Energy != 0.0) {
 		sprintf(Line, "%12.5f", lFrame->Energy);
 		Buffer->PutText(Line);
 	}
-	Buffer->PutText("\r\r");	//finish off 2nd line and leave 3rd line blank
-	sprintf(Line, "%3ld%3ld  0  0  0  0  0  0  0  0  0 v2000\r",
+	Buffer->WriteLine("", true);	//finish off 2nd line and leave 3rd line blank
+	Buffer->WriteLine("", true);
+	sprintf(Line, "%3ld%3ld  0  0  0  0  0  0  0  0  0 v2000",
 		lFrame->GetNumAtoms(), lFrame->GetNumBonds());
-	Buffer->PutText(Line);
+	Buffer->WriteLine(Line, true);
 		mpAtom * lAtoms = lFrame->Atoms;
 		long i;
 	for (i=0; i<lFrame->GetNumAtoms(); i++) {
 			Str255	Label;
 		Prefs->GetAtomLabel(lAtoms[i].GetType()-1, Label);
 		Label[Label[0]+1]=0;
-		sprintf(Line, "%10.4f%10.4f%10.4f %-3s 0  0  0  0  0  0  0  0  0  0  0  0\r",
+		sprintf(Line, "%10.4f%10.4f%10.4f %-3s 0  0  0  0  0  0  0  0  0  0  0  0",
 			lAtoms[i].Position.x, lAtoms[i].Position.y,
 			lAtoms[i].Position.z, &(Label[1]));
-		Buffer->PutText(Line);
+		Buffer->WriteLine(Line, true);
 	}
 	if (lFrame->GetNumBonds() > 0) {
 		Bond * lBonds = lFrame->Bonds;
 		for (i=0; i<lFrame->GetNumBonds(); i++) {
 			int	type = lBonds[i].Order;
 			if (type>3 || type<=0) type = 1;
-			sprintf(Line, "%3ld%3ld%3d  0  0  0  0\r", lBonds[i].Atom1+1,
+			sprintf(Line, "%3ld%3ld%3d  0  0  0  0", lBonds[i].Atom1+1,
 				lBonds[i].Atom2+1, type);
-			Buffer->PutText(Line);
+			Buffer->WriteLine(Line, true);
 		}
 	}
 		//Final line needs to be end line to terminate properties block
-	Buffer->PutText("M  END\r");
+	Buffer->WriteLine("M  END", true);
 }
 
 void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer) {
