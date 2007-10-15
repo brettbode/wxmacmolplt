@@ -2189,7 +2189,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 		struc->name = dlg->GetValue();
 
 		if (result == wxID_OK) {
-			build_palette->AddStructure(struc);
+			build_palette->AddUserStructure(struc);
 		} else {
 			delete struc;
 			delete new_ids;
