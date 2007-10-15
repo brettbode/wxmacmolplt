@@ -38,7 +38,7 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
         try {
             buffer = new BufferFile(currFile, true);
 			long BasisTest=0;
-			buffer->WriteLine("!   File created by MacMolPlt 6", true);
+			buffer->WriteLine("!   File created by MacMolPlt "wxMacMolPlt_VERSION, true);
 			if (Control) Control->WriteToFile(buffer, this, lData->GetNumElectrons());
 			if (DFT) DFT->WriteToFile(buffer, this);
 			if (System) System->WriteToFile(buffer);
