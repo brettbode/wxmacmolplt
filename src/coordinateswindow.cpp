@@ -384,18 +384,24 @@ void CoordinatesWindow::FrameChanged(void) {
 					if (i>0) {
 						buf.Printf(wxT("%d"), mInts->GetConnection(i,0)+1);
 						coordGrid->SetCellValue(i, 1, buf);
+						coordGrid->SetReadOnly(i, 1, false);
 						buf.Printf(wxT("%f"), mInts->GetValue(i,0));
 						coordGrid->SetCellValue(i, 2, buf);
+						coordGrid->SetReadOnly(i, 2, false);
 						if (i>1) {
 							buf.Printf(wxT("%d"), mInts->GetConnection(i,1)+1);
 							coordGrid->SetCellValue(i, 3, buf);
+							coordGrid->SetReadOnly(i, 3, false);
 							buf.Printf(wxT("%.2f"), mInts->GetValue(i,1));
 							coordGrid->SetCellValue(i, 4, buf);
+							coordGrid->SetReadOnly(i, 4, false);
 							if (i>2) {
 								buf.Printf(wxT("%d"), mInts->GetConnection(i,2)+1);
 								coordGrid->SetCellValue(i, 5, buf);
+								coordGrid->SetReadOnly(i, 5, false);
 								buf.Printf(wxT("%.2f"), mInts->GetValue(i,2));
 								coordGrid->SetCellValue(i, 6, buf);
+								coordGrid->SetReadOnly(i, 6, false);
 							} else {
 								for (int j=5; j<7; j++)
 									coordGrid->SetReadOnly(i, j, true);
