@@ -2,6 +2,7 @@
 
 #include "wx/sizer.h"
 #include <wx/stdpaths.h>
+#include <wx/clntdata.h>
 
 #include "build_palette.h"
 #include "main.h"
@@ -14,7 +15,7 @@ extern BuilderDlg *build_palette;
 #define kPeriodicLPChoice			13801
 #define kPeriodicSaveStructures     13802
 #define kPeriodicSaveStructuresAs   13803
-#define kPeriodicLoadStructures     13804
+/* #define kPeriodicLoadStructures     13804 */
 #define kPeriodicDeleteStructure    13805
 #define kPeriodicNotebookID         13806
 #define kPeriodicStrucChoice        13807
@@ -31,18 +32,35 @@ BEGIN_EVENT_TABLE(BuilderDlg, wxMiniFrame)
 					  BuilderDlg::ElementSelected)
 	EVT_BUTTON(kPeriodicSaveStructures, BuilderDlg::SaveStructures)
 	EVT_BUTTON(kPeriodicSaveStructuresAs, BuilderDlg::SaveStructuresAs)
-	EVT_BUTTON(kPeriodicLoadStructures, BuilderDlg::LoadStructures)
+	/* EVT_BUTTON(kPeriodicLoadStructures, BuilderDlg::LoadStructures) */
 	EVT_BUTTON(kPeriodicDeleteStructure, BuilderDlg::DeleteStructure)
 	EVT_BUTTON(kPeriodicRenameStructure, BuilderDlg::RenameStructure)
 	EVT_CHAR(BuilderDlg::KeyHandler)
 	EVT_CLOSE(BuilderDlg::OnClose)
-	EVT_UPDATE_UI(kPeriodicSaveStructuresAs, BuilderDlg::UpdateSaveStructuresAs)
 	EVT_UPDATE_UI(kPeriodicSaveStructures, BuilderDlg::UpdateSaveStructures)
-	EVT_UPDATE_UI(kPeriodicDeleteStructure, BuilderDlg::UpdateDeleteStructure)
-	EVT_UPDATE_UI(kPeriodicRenameStructure, BuilderDlg::UpdateRenameStructure)
+	EVT_UPDATE_UI(kPeriodicDeleteStructure, BuilderDlg::UpdateDeleteStructures)
+	EVT_UPDATE_UI(kPeriodicRenameStructure, BuilderDlg::UpdateRenameStructures)
 	EVT_NOTEBOOK_PAGE_CHANGED(kPeriodicNotebookID, BuilderDlg::TabChanged)
 	EVT_CHOICE(kPeriodicStrucGroups, BuilderDlg::ChangeStructureGroup)
 END_EVENT_TABLE()
+
+/* ------------------------------------------------------------------------- */
+
+class StrucGroupClientData : public wxClientData {
+
+	public:
+		StrucGroupClientData()
+			: wxClientData(), filename(), is_dirty(false), is_custom(false) {}
+
+		StrucGroupClientData(const wxString& filename, bool is_custom = false)
+			: wxClientData(), filename(filename), is_dirty(false),
+			  is_custom(is_custom) {}
+
+		wxString filename;
+		bool is_dirty;
+		bool is_custom;
+
+};
 
 // --------------------------------------------------------------------------- 
 // FUNCTIONS
@@ -52,35 +70,6 @@ BuilderDlg::BuilderDlg(const wxString& title,
 					   int xpos, int ypos) :
 	wxMiniFrame(NULL, wxID_ANY, title, wxPoint(xpos, ypos),
 		wxSize(-1, -1), wxCLOSE_BOX | wxCAPTION) {
-
-	/* Structure *new_structure = new Structure; */
-	/* new_structure->atoms = new mpAtom[1]; */
-	/* new_structure->atoms[0].Type = 6; */
-	/* new_structure->atoms[0].Position = CPoint3D(0.0f, 0.0f, 0.0f); */
-	/* new_structure->name = wxString(_("Carbon Atom")); */
-	/* new_structure->natoms = 1; */
-	/* structures.push_back(new_structure); */
-
-	canvas = NULL;
-
-	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
-	tabs = new wxNotebook(this, kPeriodicNotebookID, wxPoint(-1, -1),
-						  wxSize(-1, -1));
-
-	wxPanel *solvents_panel = new wxPanel(tabs);
-
-	periodic_panel = GetPeriodicPanel();
-	structures_panel = GetStructuresPanel();
-
-	tabs->AddPage(periodic_panel, _("Periodic Table"), true);
-	tabs->AddPage(structures_panel, _("Structures"), false);
-	tabs->AddPage(solvents_panel, _("Solvents"), false);
-
-	box_sizer->Add(tabs);
-	SetSizerAndFit(box_sizer);
-
-	wxCommandEvent foo(0, 6-1);
-	ElementSelected(foo);
 
 	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
 #if wxCHECK_VERSION(2, 8, 0)
@@ -95,16 +84,29 @@ BuilderDlg::BuilderDlg(const wxString& title,
 #endif
 #endif
 
+	canvas = NULL;
+
+	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
+	tabs = new wxNotebook(this, kPeriodicNotebookID, wxPoint(-1, -1),
+						  wxSize(-1, -1));
+
+	wxPanel *solvents_panel = new wxPanel(tabs);
+
+	periodic_panel = GetPeriodicPanel();
+	structures_panel = GetStructuresPanel();
+	strucs_in_mem = false;
+
+	tabs->AddPage(periodic_panel, _("Periodic Table"), true);
+	tabs->AddPage(structures_panel, _("Structures"), false);
+
+	box_sizer->Add(tabs);
+	SetSizerAndFit(box_sizer);
+
+	wxCommandEvent foo(0, 6-1);
+	ElementSelected(foo);
+
 	wxCommandEvent event;
 	ChangeStructureGroup(event);
-
-	/* LoadStructuresFromFile(pathname); */
-	nglobal_structures = structures.size();
-	structures_dirty = false;
-
-	if (mStructureChoice->GetCount()) {
-		mStructureChoice->SetSelection(0);
-	}
 
 }
 
@@ -293,23 +295,32 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 
 	wxPanel *panel = new wxPanel(tabs, wxID_ANY);
 
-	struc_sizer = new wxGridBagSizer(3);
+	struc_sizer = new wxGridBagSizer();
 
 	int lflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
 	int rflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
 	int cflags = wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL;
 
-	struc_sizer->SetFlexibleDirection(wxVERTICAL);
-	struc_sizer->SetNonFlexibleGrowMode(wxFLEX_GROWMODE_SPECIFIED);
+	struc_sizer->SetFlexibleDirection(wxBOTH);
 	struc_sizer->SetCols(2);
-	struc_sizer->SetRows(3);
+	struc_sizer->SetRows(2);
 
 	struc_groups = new wxChoice(panel, kPeriodicStrucGroups);
-	struc_groups->Append(_T("Miscellaneous"));
-	struc_groups->Append(_T("Solvents"));
-	struc_groups->Append(_T("Peptides"));
-	struc_groups->Append(_T("Amino Acids"));
-	struc_groups->Append(_T("User-defined"));
+	struc_groups->Append(_T("Miscellaneous"),
+						 new StrucGroupClientData(sys_prefs_path +
+							 				  _T("/system_structures.cml")));
+	struc_groups->Append(_T("Solvents"),
+						 new StrucGroupClientData(sys_prefs_path +
+							 				  _T("/solvents.cml")));
+	struc_groups->Append(_T("Peptides"),
+						 new StrucGroupClientData(sys_prefs_path +
+							 				  _T("/peptides.cml")));
+	struc_groups->Append(_T("Amino Acids"),
+						 new StrucGroupClientData(sys_prefs_path +
+							 				  _T("/amino_acids.cml")));
+	struc_groups->Append(_T("User-defined"),
+						 new StrucGroupClientData(_T(""), true));
+	struc_groups->Append(_T("Load Custom..."), new StrucGroupClientData());
 	struc_sizer->Add(struc_groups, wxGBPosition(0, 0), wxGBSpan(1, 1),
 					 wxEXPAND);
 	struc_groups->SetSelection(0);
@@ -317,31 +328,6 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	mStructureChoice = new wxListBox(panel, kPeriodicStrucChoice);
 	struc_sizer->Add(mStructureChoice, wxGBPosition(1, 0), wxGBSpan(1, 1),
 					 wxEXPAND);
-	
-	struc_custom_sizer = new wxBoxSizer(wxHORIZONTAL);
-	wxButton *button;
-
-	button = new wxButton(panel, kPeriodicSaveStructures, _("Save Structures"));
-	struc_custom_sizer->Add(button, wxSizerFlags().Expand());
-
-	button = new wxButton(panel, kPeriodicSaveStructuresAs,
-						  _("Save Structures As"));
-	struc_custom_sizer->Add(button, wxSizerFlags().Expand());
-
-	button = new wxButton(panel, kPeriodicLoadStructures, _("Load Structures"));
-	struc_custom_sizer->Add(button, wxSizerFlags().Expand());
-
-	button = new wxButton(panel, kPeriodicDeleteStructure,
-						  _("Delete Structure"));
-	struc_custom_sizer->Add(button, wxSizerFlags().Expand());
-
-	button = new wxButton(panel, kPeriodicRenameStructure,
-						  _("Rename Structure"));
-	struc_custom_sizer->Add(button, wxSizerFlags().Expand());
-
-	struc_sizer->Add(struc_custom_sizer, wxGBPosition(2, 0), wxGBSpan(1, 2),
-					 wxALIGN_CENTER);
-	struc_sizer->Hide(struc_custom_sizer);
 
 	// It seems more sensible to just add the canvas directly to the grid
 	// bag sizer, but GTK requires us to hide its parent widget before adding
@@ -355,8 +341,29 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	canvas_panel_sizer->SetFlexibleDirection(wxBOTH);
 	canvas_panel->SetSizerAndFit(canvas_panel_sizer);
 
-	struc_sizer->Add(canvas_panel, wxGBPosition(0, 1), wxGBSpan(2, 1),
+	struc_sizer->Add(canvas_panel, wxGBPosition(1, 1), wxGBSpan(1, 1),
 					 wxEXPAND);
+	
+	struc_custom_sizer = new wxBoxSizer(wxHORIZONTAL);
+
+	save_button = new wxButton(panel, kPeriodicSaveStructures,
+							   _("Save Structures"));
+	struc_custom_sizer->Add(save_button, wxSizerFlags().Expand());
+
+	save_as_button = new wxButton(panel, kPeriodicSaveStructuresAs,
+								  _("Save Structures As"));
+	struc_custom_sizer->Add(save_as_button, wxSizerFlags().Expand());
+
+	delete_button = new wxButton(panel, kPeriodicDeleteStructure,
+								 _("Delete Structure"));
+	struc_custom_sizer->Add(delete_button, wxSizerFlags().Expand());
+
+	rename_button = new wxButton(panel, kPeriodicRenameStructure,
+								 _("Rename Structure"));
+	struc_custom_sizer->Add(rename_button, wxSizerFlags().Expand());
+
+	struc_sizer->Add(struc_custom_sizer, wxGBPosition(0, 1), wxGBSpan(1, 1),
+					 wxEXPAND | wxALIGN_CENTER);
 
 	struc_sizer->AddGrowableCol(1, 1);
 	struc_sizer->AddGrowableRow(1, 1);
@@ -641,6 +648,7 @@ Structure::Structure() {
 	natoms = 0;
 	nbonds = 0;
 	atom_to_prune = -1;
+	link_atom = -1;
 
 }
 
@@ -658,33 +666,7 @@ Structure::~Structure() {
 void BuilderDlg::AddStructure(Structure *structure) {
 
 	int i;
-	Bond *bond;
 
-	// In the case where the user drops the structure in to a bonding site,
-	// we strip off the last atom of the structure and connect the clicked
-	// on bonding site to the one released by stripping off the last atom.  So,
-	// first we figure out what atom has the released bonding site -- it's the 
-	// one whose bond with the deleted atom was formed last.
-	/* for (i = structure->nbonds - 1; i >= 0; i--) { */
-		/* bond = &structure->bonds[i]; */
-		/* if (bond->Atom1 == structure->natoms - 1) { */
-			/* structure->link_atom = bond->Atom2; */
-			/* break; */
-		/* } else if (bond->Atom2 == structure->natoms - 1) { */
-			/* structure->link_atom = bond->Atom1; */
-			/* break; */
-		/* } */
-	/* } */
-
-	// Now we figure out what the bonding site number of unpaired atom is.
-	/* structure->link_site = 0; */
-	/* for (i = 0; i < structure->nbonds; i++) { */
-		/* bond = &structure->bonds[i]; */
-		/* if (bond->Atom1 == structure->link_atom || */
-			/* bond->Atom2 == structure->link_atom) { */
-			/* structure->link_site++; */
-		/* } */
-	/* } */
 	for (i = structure->natoms - 1; i >= 0; i--) {
 		if (structure->atoms[i].Type == 1) {
 			structure->SetPruneAtom(i);
@@ -692,14 +674,40 @@ void BuilderDlg::AddStructure(Structure *structure) {
 		}
 	}
 
-	// std::cout << "*structure: " << *structure << std::endl; 
 	structures.push_back(structure);
-
 	mStructureChoice->Append(structure->name);
 
-	// Under GTK at least, the menu doesn't expand to accommodate the new,
-	// possibly longer label.  We force that expansion now.
-	/* mStructureChoice->SetSize(mStructureChoice->GetBestSize()); */
+}
+
+/* ------------------------------------------------------------------------- */
+/**
+ * This function adds a structure to either the currently selected user
+ * structures file or the memory-stored User-defined structures.
+ */
+
+void BuilderDlg::AddUserStructure(Structure *structure) {
+
+	Bond *bond;
+
+	// If we're not currently viewing either a custom structure file or
+	// the memory-stored structures, let's switch to the memory-stored
+	// structure group.
+	if (struc_groups->GetSelection() <= 3) {
+		struc_groups->SetSelection(4);
+		wxCommandEvent event;
+		ChangeStructureGroup(event);
+	}
+
+	if (struc_groups->GetSelection() == 4) {
+		user_strucs.push_back(structure);
+	}
+
+	AddStructure(structure);
+
+	StrucGroupClientData *data = 
+		reinterpret_cast<StrucGroupClientData *>
+		(struc_groups->GetClientObject(struc_groups->GetSelection()));
+	data->is_dirty = true;
 
 	// Select the just added structure.
 	mStructureChoice->SetSelection(mStructureChoice->GetCount() - 1);
@@ -707,8 +715,6 @@ void BuilderDlg::AddStructure(Structure *structure) {
 	if (canvas) {
 		canvas->SetStructure(structures[structures.size() - 1]);
 	}
-
-	structures_dirty = true;
 
 }
 
@@ -729,27 +735,6 @@ Structure *BuilderDlg::GetStructure(int i) const {
 	}
 
 	return structures[i];
-
-}
-
-/* ------------------------------------------------------------------------- */
-
-int BuilderDlg::GetNumUserStructures() const {
-	
-	return structures.size() - nglobal_structures;
-
-}
-
-/* ------------------------------------------------------------------------- */
-
-Structure *BuilderDlg::GetUserStructure(int i) const {
-
-	// Check that is in valid range for user structures.
-	if (i < 0 || i >= structures.size() - nglobal_structures) {
-		return NULL;
-	}
-
-	return structures[i + nglobal_structures];
 
 }
 
@@ -786,7 +771,10 @@ void BuilderDlg::SaveStructuresAs(wxCommandEvent& event) {
 							  wxSAVE | wxOVERWRITE_PROMPT, this);
 
 	if (!filename.IsEmpty()) {
-		struc_filename = filename;
+		struc_groups->Append(filename.AfterLast('/'),
+							 new StrucGroupClientData(filename, true));
+		struc_groups->SetSelection(struc_groups->GetCount() - 1);
+		user_strucs.erase(user_strucs.begin(), user_strucs.end());
 		SaveStructures(event);
 	}
 
@@ -798,92 +786,26 @@ void BuilderDlg::SaveStructures(wxCommandEvent& event) {
 
 	FILE *save_file = NULL;
 	BufferFile *buffer = NULL;
+	StrucGroupClientData *data;
 
-	if (!struc_filename.IsEmpty()) {
-		save_file = fopen(struc_filename.mb_str(wxConvUTF8), "w");
-		if (save_file == NULL) {
-			MessageAlert("Unable to access the file.");
-			return;
-		}
+	data = reinterpret_cast<StrucGroupClientData *>
+		   (struc_groups->GetClientObject(struc_groups->GetSelection()));
 
-		buffer = new BufferFile(save_file, true);
-		WriteCMLFile(buffer);
-
-		if (buffer) {
-			delete buffer;
-		}
-		fclose(save_file);
-
-		structures_dirty = false;
-	}
-
-}
-
-// --------------------------------------------------------------------------- 
-
-void BuilderDlg::LoadStructures(wxCommandEvent& event) {
-
-	int i;
-	int response = wxYES;
-	wxString filename;
-
-	// Before we load the new user structures in, we may want to remove any
-	// previously loaded user structures from both the structures dropdown
-	// menu and the vector.  We let the user decide if they want to replace
-	// or append.
-	if (structures.size() > nglobal_structures) {
-		response = wxMessageBox(_("Replace the current structures?"),
-								_("Load Structures"), wxYES_NO | wxCANCEL,
-								this);
-
-		if (response == wxYES) {
-			if (nglobal_structures) {
-				canvas->SetStructure(structures[0]);
-			} else {
-				canvas->SetStructure(NULL);
-			}
-			for (i = nglobal_structures; i < structures.size(); i++) {
-				delete structures[i];
-			}
-			structures.erase(structures.begin() + nglobal_structures,
-							 structures.end());
-			for (i = mStructureChoice->GetCount() - 1;
-				 i >= 0; i--) {
-				mStructureChoice->Delete(i);
-			}
-
-			// Apparently the selection has to be done after the deletion, 
-			// otherwise it won't stick.
-			if (nglobal_structures) {
-				mStructureChoice->SetSelection(0);
-			} else {
-				mStructureChoice->SetSelection(wxNOT_FOUND);
-			}
-
-			struc_filename_label->SetLabel(_("None"));
-		} else if (response == wxCANCEL) {
-			return;
-		}
-	}
-
-	filename = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
-							  wxT(""), wxT("CML Files (*.cml)|*.cml"));
-
-	// If a file wasn't selected or can't be opened, let's not change anything.
-	if (filename.IsEmpty()) {
+	save_file = fopen(data->filename.mb_str(wxConvUTF8), "w");
+	if (save_file == NULL) {
+		MessageAlert("Unable to access the file.");
 		return;
 	}
 
-	int prev_size = structures.size();
-	bool success = LoadStructuresFromFile(filename);
+	buffer = new BufferFile(save_file, true);
+	WriteCMLFile(buffer);
 
-	structures_dirty = (response != wxYES) && (structures.size() != prev_size);
-
-	if (success && response == wxYES) {
-		struc_filename = filename;
-		struc_filename_label->SetLabel(struc_filename.AfterLast('/'));
+	if (buffer) {
+		delete buffer;
 	}
+	fclose(save_file);
 
+	data->is_dirty = false;
 
 }
 
@@ -900,9 +822,13 @@ void BuilderDlg::DeleteAllStructures() {
 	if (canvas) {
 		canvas->SetStructure(NULL);
 	}
-	for (i = structures.size() - 1; i >= 0; i--) {
-		delete structures[i];
+
+	if (!strucs_in_mem) {
+		for (i = structures.size() - 1; i >= 0; i--) {
+			delete structures[i];
+		}
 	}
+
 	structures.erase(structures.begin(), structures.end());
 	mStructureChoice->Clear();
 	mStructureChoice->SetSelection(wxNOT_FOUND);
@@ -941,55 +867,8 @@ bool BuilderDlg::LoadStructuresFromFile(const wxString& filename) {
 
 }
 
-/* ------------------------------------------------------------------------- */
-/**
- * This function updates the Save Structures As button's enabled state.  It is
- * only enabled when at least one user-defined structure has been created.
- * @param event The update event sent in by wxWidgets.
- */
-
-void BuilderDlg::UpdateSaveStructuresAs(wxUpdateUIEvent& event) {
-
-	event.Enable(GetNumUserStructures() > 0 || !struc_filename.IsEmpty());
-
-}
 
 /* ------------------------------------------------------------------------- */
-/**
- * This function updates the Save Structures button's enabled state.  It is
- * only enabled when the structures come from an existing file and have been
- * changed in some way.
- * @param event The update event sent in by wxWidgets.
- */
-
-void BuilderDlg::UpdateSaveStructures(wxUpdateUIEvent& event) {
-
-	event.Enable(!struc_filename.IsEmpty() && structures_dirty);
-
-}
-
-// --------------------------------------------------------------------------- 
-/**
- * This function updates the Delete Structure button's enabled state.  It is
- * only enabled when a non-system structure is selected.
- * @param event The update event sent in by wxWidgets.
- */
-
-void BuilderDlg::UpdateDeleteStructure(wxUpdateUIEvent& event) {
-
-	event.Enable(mStructureChoice->GetSelection() >= nglobal_structures);
-
-}
-
-/* ------------------------------------------------------------------------- */
-
-void BuilderDlg::UpdateRenameStructure(wxUpdateUIEvent& event) {
-
-	event.Enable(mStructureChoice->GetSelection() >= nglobal_structures);
-
-}
-
-// --------------------------------------------------------------------------- 
 /**
  * This function handles clicks on the Delete Structure button.  The current
  * non-system structure is deleted and the first structure in the list is
@@ -1000,8 +879,6 @@ void BuilderDlg::UpdateRenameStructure(wxUpdateUIEvent& event) {
 void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 
 	int id = mStructureChoice->GetSelection();
-
-	if (id < nglobal_structures) return;
 
 	delete structures[id];
 	structures.erase(structures.begin() + id);
@@ -1015,7 +892,10 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 		canvas->SetStructure(structures[id]);
 	}
 
-	structures_dirty = true;
+	StrucGroupClientData *data;
+	data = reinterpret_cast<StrucGroupClientData *>
+		   (struc_groups->GetClientObject(struc_groups->GetSelection()));
+	data->is_dirty = true;
 
 }
 
@@ -1025,8 +905,6 @@ void BuilderDlg::RenameStructure(wxCommandEvent& event) {
 
 	int id = mStructureChoice->GetSelection();
 
-	if (id < nglobal_structures) return;
-
 	wxString new_name = wxGetTextFromUser(_("Enter structure name:"),
 										  _("Rename Structure"),
 										  _(""), this);
@@ -1034,7 +912,11 @@ void BuilderDlg::RenameStructure(wxCommandEvent& event) {
 	if (!new_name.IsEmpty()) {
 		structures[id]->name = new_name;
 		mStructureChoice->SetString(id, structures[id]->name);
-		structures_dirty = true;
+
+		StrucGroupClientData *data;
+		data = reinterpret_cast<StrucGroupClientData *>
+			   (struc_groups->GetClientObject(struc_groups->GetSelection()));
+		data->is_dirty = true;
 	}
 
 }
@@ -1070,7 +952,7 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 		canvas_panel->Show();
 
 		if (event.GetSelection() == 1) {
-			if (structures.size()) {
+			if (mStructureChoice->GetSelection() != wxNOT_FOUND) {
 				canvas->SetStructure(structures[mStructureChoice->GetSelection()]);
 			}
 			canvas->Render();
@@ -1083,30 +965,30 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 
 void BuilderDlg::StructuresSaveCheck() {
 
-	if (structures_dirty) {
-		Show();
+	/* if (structures_dirty) { */
+		/* Show(); */
 
-		if (!struc_filename.IsEmpty()) {
-			int r = wxMessageBox(wxT("The structures file ") + struc_filename +
-								 wxT(" has unsaved changes.  Do you wish to "
-									 "save the changes to this file before "
-									 "closing?"), wxT("Structures Modified"),
-								 wxICON_QUESTION | wxYES_NO, this);
-			if (r == wxYES) {
-				wxCommandEvent event;
-				SaveStructures(event);
-			}
-		} else {
-			int r = wxMessageBox(wxT("The structures have unsaved changes. Do "
-									 "you wish to save these changes before "
-									 "closing?"), wxT("Structures Modified"),
-								 wxICON_QUESTION | wxYES_NO, this);
-			if (r == wxYES) {
-				wxCommandEvent event;
-				SaveStructuresAs(event);
-			}
-		}
-	}
+		/* if (!struc_filename.IsEmpty()) { */
+			/* int r = wxMessageBox(wxT("The structures file ") + struc_filename + */
+								 /* wxT(" has unsaved changes.  Do you wish to " */
+									 /* "save the changes to this file before " */
+									 /* "closing?"), wxT("Structures Modified"), */
+								 /* wxICON_QUESTION | wxYES_NO, this); */
+			/* if (r == wxYES) { */
+				/* wxCommandEvent event; */
+				/* SaveStructures(event); */
+			/* } */
+		/* } else { */
+			/* int r = wxMessageBox(wxT("The structures have unsaved changes. Do " */
+									 /* "you wish to save these changes before " */
+									 /* "closing?"), wxT("Structures Modified"), */
+								 /* wxICON_QUESTION | wxYES_NO, this); */
+			/* if (r == wxYES) { */
+				/* wxCommandEvent event; */
+				/* SaveStructuresAs(event); */
+			/* } */
+		/* } */
+	/* } */
 
 }
 
@@ -1153,6 +1035,48 @@ void Structure::SetPruneAtom(int atom_id) {
 }
 
 /* ------------------------------------------------------------------------- */
+/**
+ * This function updates the Save Structures button's enabled state.  It is
+ * only enabled when the structures come from an existing file and have been
+ * changed in some way.
+ * @param event The update event sent in by wxWidgets.
+ */
+
+void BuilderDlg::UpdateSaveStructures(wxUpdateUIEvent& event) {
+
+	StrucGroupClientData *data =
+		reinterpret_cast<StrucGroupClientData *>
+		(struc_groups->GetClientObject(struc_groups->GetSelection()));
+	event.Enable(data->is_dirty &&
+				 struc_groups->GetStringSelection() != _("User-defined"));
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+void BuilderDlg::UpdateDeleteStructures(wxUpdateUIEvent& event) {
+
+	StrucGroupClientData *data =
+		reinterpret_cast<StrucGroupClientData *>
+		(struc_groups->GetClientObject(struc_groups->GetSelection()));
+	event.Enable(data->is_custom &&
+				 mStructureChoice->GetSelection() != wxNOT_FOUND);
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+void BuilderDlg::UpdateRenameStructures(wxUpdateUIEvent& event) {
+
+	StrucGroupClientData *data =
+		reinterpret_cast<StrucGroupClientData *>
+		(struc_groups->GetClientObject(struc_groups->GetSelection()));
+	event.Enable(data->is_custom &&
+				 mStructureChoice->GetSelection() != wxNOT_FOUND);
+
+}
+
+/* ------------------------------------------------------------------------- */
 
 void BuilderDlg::ChangeStructureGroup(wxCommandEvent& event) {
 
@@ -1161,30 +1085,43 @@ void BuilderDlg::ChangeStructureGroup(wxCommandEvent& event) {
 	// select first structure
 	wxString pathname;
 
+	if (struc_groups->GetStringSelection() == _T("Load Custom...")) {
+		pathname = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
+								  wxT(""), wxT("CML Files (*.cml)|*.cml"),
+								  wxOPEN, this);
+		if (!pathname.IsEmpty()) {
+			struc_groups->Append(pathname.AfterLast('/'),
+								 new StrucGroupClientData(pathname, true));
+			struc_groups->SetSelection(struc_groups->GetCount() - 1);
+		}
+	}
+
 	int selection = struc_groups->GetSelection();
-	switch (selection) {
-		case 0:
-			pathname = sys_prefs_path + wxT("/system_structures.cml");
-			break;
-		case 1: case 2: case 3:
-			break;
-		default:
-			pathname = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
-									  wxT(""), wxT("CML Files (*.cml)|*.cml"));
-			break;
-	}
-
 	DeleteAllStructures();
-	if (!pathname.IsEmpty()) {
-		LoadStructuresFromFile(pathname);
+	strucs_in_mem = false;
+
+	// Load user-defined structures not yet saved to a file.
+	if (selection == 4) {
+		for (int i = 0; i < user_strucs.size(); i++) {
+			structures.push_back(user_strucs[i]);
+			mStructureChoice->Append(user_strucs[i]->name);
+		}
+		strucs_in_mem = true;
+	}
+	
+	// Load structures from a file.
+	else if (selection != 5) {
+		StrucGroupClientData *client_data =
+			reinterpret_cast<StrucGroupClientData *>
+			(struc_groups->GetClientObject(selection));
+		LoadStructuresFromFile(client_data->filename);
 	}
 
-	if (selection == struc_groups->GetCount() - 1) {
-		struc_sizer->Show(struc_custom_sizer);
-		struc_sizer->Layout();
-	} else {
-		struc_sizer->Hide(struc_custom_sizer);
-		struc_sizer->Layout();
+	if (mStructureChoice->GetCount()) {
+		mStructureChoice->SetSelection(0);
+		if (canvas) {
+			canvas->SetStructure(structures[0]);
+		}
 	}
 
 }

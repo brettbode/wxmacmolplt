@@ -1236,38 +1236,42 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					structure = build_palette->GetSelectedStructure();
 
 					if (structure) {
-						lFrame->resetAllSelectState();
-						MolWin->SetHighliteMode(true);
-						
-						// Add all atoms and select them so they can be adjusted.
-						for (int i = 0; i < structure->natoms; i++) {
-							new_atom = mpAtom(structure->atoms[i]);
-							mMainData->NewAtom(new_atom);
-							lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
+						if (structure->link_atom == -1) {
+							MolWin->SetStatusText(wxT("Structure has no connecting bonding site."));
+						} else {
+							lFrame->resetAllSelectState();
+							MolWin->SetHighliteMode(true);
+							
+							// Add all atoms and select them so they can be adjusted.
+							for (int i = 0; i < structure->natoms; i++) {
+								new_atom = mpAtom(structure->atoms[i]);
+								mMainData->NewAtom(new_atom);
+								lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
+							}
+
+							Bond *bond;
+							bool result;
+							for (int i = 0; i < structure->nbonds; i++) {
+								bond = &structure->bonds[i];
+								result = lFrame->AddBond(bond->Atom1 + prev_natoms,
+														 bond->Atom2 + prev_natoms,
+														 bond->Order);
+							}
+
+							lFrame->DeleteAtom(prev_natoms +
+											   structure->atom_to_prune);
+
+							ConnectSelectedToSite(prev_natoms + structure->link_atom,
+												  structure->link_site - 1,
+												  selected, selected_site);
+
+							lFrame->AddBond(selected,
+											prev_natoms + structure->link_atom,
+											kSingleBond);
+
+							MolWin->AtomsChanged(true, false);
+							MolWin->SelectionChanged(true);
 						}
-
-						Bond *bond;
-						bool result;
-						for (int i = 0; i < structure->nbonds; i++) {
-							bond = &structure->bonds[i];
-							result = lFrame->AddBond(bond->Atom1 + prev_natoms,
-													 bond->Atom2 + prev_natoms,
-													 bond->Order);
-						}
-
-						lFrame->DeleteAtom(prev_natoms +
-										   structure->atom_to_prune);
-
-						ConnectSelectedToSite(prev_natoms + structure->link_atom,
-											  structure->link_site - 1,
-											  selected, selected_site);
-
-						lFrame->AddBond(selected,
-										prev_natoms + structure->link_atom,
-										kSingleBond);
-
-						MolWin->AtomsChanged(true, false);
-						MolWin->SelectionChanged(true);
 					}
 				}
 

@@ -56,9 +56,8 @@ long BuilderDlg::WriteCMLFile(BufferFile *Buffer) const {
 	Structure *struc;
 	XMLElement *el = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 	el->addAttribute(CML_convert(nameAttr), CML_convert(MMP_Structures));
-	for (int i = 0; i < build_palette->GetNumUserStructures(); i++) {
-		struc = GetUserStructure(i);
-		struc->WriteXML(el);
+	for (int i = 0; i < structures.size(); i++) {
+		structures[i]->WriteXML(el);
 	}
 
 	std::ostringstream CMLtext;

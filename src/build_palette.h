@@ -84,9 +84,8 @@ class BuilderDlg: public wxMiniFrame {
 		bool InStructuresMode(void) const;
 		bool InPeriodicMode(void) const;
 		void AddStructure(Structure *structure);
+		void AddUserStructure(Structure *structure);
 
-		int GetNumUserStructures() const;
-		Structure *GetUserStructure(int i) const;
 		void StructuresSaveCheck();
 
 	private:
@@ -101,12 +100,10 @@ class BuilderDlg: public wxMiniFrame {
 		void SaveStructures(wxCommandEvent& event);
 		long WriteCMLFile(BufferFile *Buffer) const;
 		long ReadCMLFile(BufferFile *Buffer);
-		void LoadStructures(wxCommandEvent& event);
 		bool LoadStructuresFromFile(const wxString& filename);
 		void UpdateSaveStructures(wxUpdateUIEvent& event);
-		void UpdateSaveStructuresAs(wxUpdateUIEvent& event);
-		void UpdateDeleteStructure(wxUpdateUIEvent& event);
-		void UpdateRenameStructure(wxUpdateUIEvent& event);
+		void UpdateRenameStructures(wxUpdateUIEvent& event);
+		void UpdateDeleteStructures(wxUpdateUIEvent& event);
 		void DeleteStructure(wxCommandEvent& event);
 		void RenameStructure(wxCommandEvent& event);
 		void OnStructureChoice(wxCommandEvent& event);
@@ -131,21 +128,27 @@ class BuilderDlg: public wxMiniFrame {
 		wxFlexGridSizer *canvas_panel_sizer;
 		wxListBox *mStructureChoice;
 		std::vector<Structure *> structures;
+		std::vector<Structure *> user_strucs;
 		PreviewCanvas *canvas;
 		wxString sys_prefs_path;
+
+		bool strucs_in_mem;
 
 		wxStaticText *element_label;
 		wxStaticText *coord_num_label;
 		wxStaticText *lp_num_label;
-		int nglobal_structures;
 
-		bool structures_dirty;
 		wxGridBagSizer *struc_sizer;
 
 		wxString struc_filename;
 		wxStaticText *struc_filename_label;
 		wxBoxSizer *struc_custom_sizer;
 		wxChoice *struc_groups;
+
+		wxButton *save_button;
+		wxButton *save_as_button;
+		wxButton *delete_button;
+		wxButton *rename_button;
 
 	DECLARE_DYNAMIC_CLASS(BuilderDlg)
 	DECLARE_EVENT_TABLE()
