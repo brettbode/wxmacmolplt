@@ -86,6 +86,7 @@ class BuilderDlg: public wxMiniFrame {
 		void AddStructure(Structure *structure);
 		void AddUserStructure(Structure *structure);
 
+		void StructuresSaveCheck(int id);
 		void StructuresSaveCheck();
 
 	private:
@@ -149,6 +150,8 @@ class BuilderDlg: public wxMiniFrame {
 		wxButton *save_as_button;
 		wxButton *delete_button;
 		wxButton *rename_button;
+
+		int prev_group_id;
 
 	DECLARE_DYNAMIC_CLASS(BuilderDlg)
 	DECLARE_EVENT_TABLE()

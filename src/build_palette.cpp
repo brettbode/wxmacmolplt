@@ -85,6 +85,7 @@ BuilderDlg::BuilderDlg(const wxString& title,
 #endif
 
 	canvas = NULL;
+	prev_group_id = wxNOT_FOUND;
 
 	wxBoxSizer *box_sizer = new wxBoxSizer(wxVERTICAL);
 	tabs = new wxNotebook(this, kPeriodicNotebookID, wxPoint(-1, -1),
@@ -850,7 +851,7 @@ bool BuilderDlg::LoadStructuresFromFile(const wxString& filename) {
 	// Open file of new structures.
 	load_file = fopen(filename.mb_str(wxConvUTF8), "r");
 	if (load_file == NULL) {
-		MessageAlert("Unable to access the file.");
+		MessageAlert("Unable to open the structures file.");
 		return false;
 	}
 
@@ -900,6 +901,10 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 }
 
 /* ------------------------------------------------------------------------- */
+/**
+ * This function prompts the user to rename the currently selected structure.
+ * @param event The click event for the Rename Structure button.
+ */
 
 void BuilderDlg::RenameStructure(wxCommandEvent& event) {
 
@@ -909,6 +914,9 @@ void BuilderDlg::RenameStructure(wxCommandEvent& event) {
 										  _("Rename Structure"),
 										  _(""), this);
 
+	// As long as the new name isn't the empty string, we make the change.
+	// We have to change the structure list, the dropdown menu, and set the
+	// group's dirty flag.
 	if (!new_name.IsEmpty()) {
 		structures[id]->name = new_name;
 		mStructureChoice->SetString(id, structures[id]->name);
@@ -965,30 +973,54 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 
 void BuilderDlg::StructuresSaveCheck() {
 
-	/* if (structures_dirty) { */
-		/* Show(); */
-
-		/* if (!struc_filename.IsEmpty()) { */
-			/* int r = wxMessageBox(wxT("The structures file ") + struc_filename + */
-								 /* wxT(" has unsaved changes.  Do you wish to " */
-									 /* "save the changes to this file before " */
-									 /* "closing?"), wxT("Structures Modified"), */
-								 /* wxICON_QUESTION | wxYES_NO, this); */
-			/* if (r == wxYES) { */
-				/* wxCommandEvent event; */
-				/* SaveStructures(event); */
-			/* } */
-		/* } else { */
-			/* int r = wxMessageBox(wxT("The structures have unsaved changes. Do " */
-									 /* "you wish to save these changes before " */
-									 /* "closing?"), wxT("Structures Modified"), */
-								 /* wxICON_QUESTION | wxYES_NO, this); */
-			/* if (r == wxYES) { */
-				/* wxCommandEvent event; */
-				/* SaveStructuresAs(event); */
-			/* } */
-		/* } */
+	/* int selection = struc_groups->GetSelection(); */
+	/* if (selection >= 4) { */
+		/* StructuresSaveCheck(selection); */
 	/* } */
+
+	struc_groups->SetSelection(4);
+	wxCommandEvent event;
+	ChangeStructureGroup(event);
+
+	StructuresSaveCheck(4);
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+void BuilderDlg::StructuresSaveCheck(int id) {
+
+	StrucGroupClientData *data;
+
+	data = reinterpret_cast<StrucGroupClientData *>
+		   (struc_groups->GetClientObject(id));
+
+	if (data->is_dirty) {
+		struc_groups->SetSelection(id);
+
+		if (struc_groups->GetString(id) != _("User-defined")) {
+			int r = wxMessageBox(wxT("The structures file ") + data->filename +
+								 wxT(" has unsaved changes.  Do you wish to "
+									 "save the changes to this file?"),
+								 wxT("Structures Modified"),
+								 wxICON_QUESTION | wxYES_NO, this);
+			if (r == wxYES) {
+				wxCommandEvent event;
+				SaveStructures(event);
+			}
+		} else {
+			int r = wxMessageBox(wxT("The user-defined structures have "
+									 "unsaved changes. Do you wish to save "
+									 "these changes?"),
+								 wxT("Structures Modified"),
+								 wxICON_QUESTION | wxYES_NO, this);
+			if (r == wxYES) {
+				wxCommandEvent event;
+				SaveStructuresAs(event);
+			}
+		}
+		data->is_dirty = false;
+	}
 
 }
 
@@ -1053,6 +1085,11 @@ void BuilderDlg::UpdateSaveStructures(wxUpdateUIEvent& event) {
 }
 
 /* ------------------------------------------------------------------------- */
+/**
+ * This function updates the Delete Structure button.  The button is enabled
+ * only when a user-defined structure is being viewed.
+ * @param event The update event.
+ */
 
 void BuilderDlg::UpdateDeleteStructures(wxUpdateUIEvent& event) {
 
@@ -1065,6 +1102,11 @@ void BuilderDlg::UpdateDeleteStructures(wxUpdateUIEvent& event) {
 }
 
 /* ------------------------------------------------------------------------- */
+/**
+ * This function updates the Rename Structure button.  The button is enabled
+ * only when a user-defined structure is being viewed.
+ * @param event The update event.
+ */
 
 void BuilderDlg::UpdateRenameStructures(wxUpdateUIEvent& event) {
 
@@ -1077,52 +1119,86 @@ void BuilderDlg::UpdateRenameStructures(wxUpdateUIEvent& event) {
 }
 
 /* ------------------------------------------------------------------------- */
+/**
+ * This function handles events on the structure group dropdown menu.  With
+ * the structure group set, we need to load the appropriate structures for
+ * the group.  If the item "Load Custom..." is selected, the user is prompted
+ * for a file of structures to read.  If "User-defined" is selected, the
+ * structures are pulled from a collection in memory.  Any other selection
+ * is associated with a file whose name is known already.  In this last case,
+ * the file is loaded automatically.
+ * @param event The change event on the structure choice.
+ */
 
 void BuilderDlg::ChangeStructureGroup(wxCommandEvent& event) {
 
-	// delete structures
-	// add new structures
-	// select first structure
 	wxString pathname;
+	StrucGroupClientData *data;
+	int selection;
 
-	if (struc_groups->GetStringSelection() == _T("Load Custom...")) {
-		pathname = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
-								  wxT(""), wxT("CML Files (*.cml)|*.cml"),
-								  wxOPEN, this);
-		if (!pathname.IsEmpty()) {
-			struc_groups->Append(pathname.AfterLast('/'),
-								 new StrucGroupClientData(pathname, true));
-			struc_groups->SetSelection(struc_groups->GetCount() - 1);
+	selection = struc_groups->GetSelection();
+	if (prev_group_id != wxNOT_FOUND) {
+		data = reinterpret_cast<StrucGroupClientData *>
+			   (struc_groups->GetClientObject(prev_group_id));
+		if (data->is_custom && data->is_dirty &&
+			struc_groups->GetString(prev_group_id) != _("User-defined")) {
+			StructuresSaveCheck(prev_group_id);
 		}
+		struc_groups->SetSelection(selection);
 	}
 
-	int selection = struc_groups->GetSelection();
 	DeleteAllStructures();
 	strucs_in_mem = false;
 
-	// Load user-defined structures not yet saved to a file.
-	if (selection == 4) {
+	// As long as the selection isn't User-defined, the structures are stored
+	// in the filesystem, so we need to open the file and load the structures
+	// in.
+	if (struc_groups->GetStringSelection() != _T("User-defined")) {
+
+		// See if we need to get a filename for custom structures.  If the user
+		// selects a file, we add the tail of the pathname to the structure
+		// groups list.
+		if (struc_groups->GetStringSelection() == _T("Load Custom...")) {
+			pathname = wxFileSelector(wxT("Open File"), wxT(""), wxT(""),
+									  wxT(""), wxT("CML Files (*.cml)|*.cml"),
+									  wxOPEN, this);
+			if (!pathname.IsEmpty()) {
+				struc_groups->Append(pathname.AfterLast('/'),
+									 new StrucGroupClientData(pathname, true));
+				struc_groups->SetSelection(struc_groups->GetCount() - 1);
+				selection = struc_groups->GetSelection();
+			}
+		}
+
+		// Load structures from the file using the path associated with the
+		// menu item.
+		data = reinterpret_cast<StrucGroupClientData *>
+			   (struc_groups->GetClientObject(selection));
+		LoadStructuresFromFile(data->filename);
+	}
+
+	// Load user-defined structures not yet associated with a file.  These are
+	// stored in a separate list.
+	else {
 		for (int i = 0; i < user_strucs.size(); i++) {
 			structures.push_back(user_strucs[i]);
 			mStructureChoice->Append(user_strucs[i]->name);
 		}
 		strucs_in_mem = true;
 	}
-	
-	// Load structures from a file.
-	else if (selection != 5) {
-		StrucGroupClientData *client_data =
-			reinterpret_cast<StrucGroupClientData *>
-			(struc_groups->GetClientObject(selection));
-		LoadStructuresFromFile(client_data->filename);
-	}
 
+	// If there are some structures that were loaded in, select the first one
+	// in the list.
 	if (mStructureChoice->GetCount()) {
 		mStructureChoice->SetSelection(0);
 		if (canvas) {
 			canvas->SetStructure(structures[0]);
 		}
+	} else if (canvas) {
+		canvas->SetStructure(NULL);
 	}
+
+	prev_group_id = struc_groups->GetSelection();
 
 }
 
