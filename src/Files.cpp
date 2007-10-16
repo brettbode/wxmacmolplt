@@ -987,13 +987,13 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
 		Buffer->GetLine(Line);
 		if (0==FindKeyWord(Line, "$COORD", 5))
-   			{
-   				startOfCOORD = Buffer->GetFilePos();
-   				//the first possible set of coordinates has been found
-   				//count the lines (each line is an atom) until $end
-   				//or if a $$ is found start over and look for $end, because
-   				//the last $$ is the actual frame of the molecule
-  				while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
+			{
+				startOfCOORD = Buffer->GetFilePos();
+				//the first possible set of coordinates has been found
+				//count the lines (each line is an atom) until $end
+				//or if a $$ is found start over and look for $end, because
+				//the last $$ is the actual frame of the molecule
+				while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
 					Buffer->GetLine(Line);
 					//check for any other keywords inside $COORD keyword
 					if(0==FindKeyWord(Line, "$CHAR_MULT", 10) || 
@@ -1011,8 +1011,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						throw DataError(18);
 					}
 					else if (0==FindKeyWord(Line, "$$", 2)) 
-   					{
-	 					//Begin parse out frame info 
+					{
+						//Begin parse out frame info 
 						if (nAtoms<=0) throw DataError(15);
 						//reset the Buffer to the start of the last atoms frame 
 						Buffer->SetFilePos(startOfCOORD);
@@ -1038,12 +1038,12 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						nAtoms=0;
 						Buffer->GetLine(Line);
 						startOfCOORD = Buffer->GetFilePos();
-	 					//End parse out frame info 
-   					}
-   					else if (0==FindKeyWord(Line, "$END", 4)) 
-   					{
-	 					//Begin parse out frame info 
-	 					//if there is no atoms in the molecule for this frame, the file is corrupted
+						//End parse out frame info 
+					}
+					else if (0==FindKeyWord(Line, "$END", 4)) 
+					{
+						//Begin parse out frame info 
+						//if there is no atoms in the molecule for this frame, the file is corrupted
 						if (nAtoms<=0) throw DataError(15);
 						//reset the Buffer to the start of the last atoms frame 
 						Buffer->SetFilePos(startOfCOORD);
@@ -1068,16 +1068,16 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						//reset for next frame
 						nAtoms=0;
 						Buffer->GetLine(Line);
-	 					//End parse out frame info 
-   						
-   						break;  //break out of the loop, the end of all the coordinate sets has been reached
-   					}
-   					else 
-   					{
+						//End parse out frame info 
+						
+						break;  //break out of the loop, the end of all the coordinate sets has been reached
+					}
+					else 
+					{
 						nAtoms++;
-   					} 
+					} 
 				}
-   			}
+			}
 	}
 	//This is wierd, but an extra frame is appended, so just delete the extra frame
 	MainData->DeleteFrame();
@@ -1586,7 +1586,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 }
 
 long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
-	long 	ElectronsRemoved = 0, ProtonsRemoved=0, LinePos, atom;
+	long	ElectronsRemoved = 0, ProtonsRemoved=0, LinePos, atom;
 	char	LineText[kMaxLineLength];
 	long *	zcore = new long[cFrame->NumAtoms];
 	if (!zcore) throw MemoryError();
@@ -3768,177 +3768,175 @@ void MolDisplayWin::WriteMDLMolFile(BufferFile * Buffer) {
 }
 
 void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer) {
-  Buffer->PutText("#VRML V2.0 utf8\n");  //VRML header
-  Buffer->PutText("\n");
+	Buffer->PutText("#VRML V2.0 utf8\n");  //VRML header
+	Buffer->PutText("\n");
 
-  Frame * lFrame = MainData->GetCurrentFramePtr();
-  mpAtom * lAtoms = lFrame->Atoms;
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	mpAtom * lAtoms = lFrame->Atoms;
 
-  //drawing atoms
+	//drawing atoms
 
-  long NumAtoms = lFrame->NumAtoms;
-  float AtomScale = Prefs->GetAtomScale();
-  long curAtomType;
-  RGBColor * AtomColor;
-  wxString tmpStr;
-  float red, green, blue;
+	long NumAtoms = lFrame->NumAtoms;
+	float AtomScale = Prefs->GetAtomScale();
+	long curAtomType;
+	RGBColor * AtomColor;
+	wxString tmpStr;
+	float red, green, blue;
 
-  for (long iatom=0; iatom<NumAtoms; iatom++) {
-    if (lAtoms[iatom].GetInvisibility()) continue;
+	for (long iatom=0; iatom<NumAtoms; iatom++) {
+		if (lAtoms[iatom].GetInvisibility()) continue;
+		
+		curAtomType = lAtoms[iatom].GetType() - 1;
+		AtomColor = Prefs->GetAtomColorLoc(curAtomType);
+		red = AtomColor->red/65536.0;
+		green = AtomColor->green/65536.0;
+		blue = AtomColor->blue/65536.0;
+		
+		float radius = AtomScale*Prefs->GetAtomSize(curAtomType);
+		Buffer->PutText("Transform {\n");
+		tmpStr.Printf(wxT("\ttranslation %f %f %f\n"), lAtoms[iatom].Position.x, 
+					  lAtoms[iatom].Position.y, lAtoms[iatom].Position.z);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("\tchildren [\n");
+		Buffer->PutText("\t\tShape {\n");
+		tmpStr.Printf(wxT("\t\t\tgeometry Sphere { radius %f }\n"), radius);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("\t\t\tappearance Appearance {\n");
+		tmpStr.Printf(wxT("\t\t\t\tmaterial Material { diffuseColor %f %f %f }\n"),
+					  red, green, blue);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("\t\t\t}\n");
+		Buffer->PutText("\t\t}\n");
+		Buffer->PutText("\t]\n");
+		Buffer->PutText("}\n");
+	}
 
-    curAtomType = lAtoms[iatom].GetType() - 1;
-    AtomColor = Prefs->GetAtomColorLoc(curAtomType);
-    red = AtomColor->red/65536.0;
-    green = AtomColor->green/65536.0;
-    blue = AtomColor->blue/65536.0;
+	//drawing bonds
+	Bond * lBonds = lFrame->Bonds;
+	long NumBonds = lFrame->NumBonds;
+	double BondSize = Prefs->GetQD3DBondWidth();
+	//float dotProd;
+	Matrix4D rotMat;
+	CPoint3D NormalOffset, NormStart = CPoint3D(0.0f, 1.0f, 0.0f);
+	double theta;
+	double axisX, axisY, axisZ;
+	
+	for (long ibond=0; ibond<NumBonds; ibond++) {
+		CPoint3D v1, v2, offset;
+		long atom1 = lBonds[ibond].Atom1;
+		long atom2 = lBonds[ibond].Atom2;
+		//BondOrder tmpOrder = lBonds[ibond].Order;
+		
+		//for (int ipipe = 0; ipipe < MAX(tmpOrder,1); ++ipipe) {
+		
+		v1.x = lAtoms[atom1].Position.x; // + offset_vec.x * baseBondOffset +
+		//3.5 * tmpBondSize * offset_vec.x * ipipe;
+		v1.y = lAtoms[atom1].Position.y; //+ offset_vec.y * baseBondOffset +
+		//3.5 * tmpBondSize * offset_vec.y * ipipe;
+		v1.z = lAtoms[atom1].Position.z; //+ offset_vec.z * baseBondOffset +
+		//3.5 * tmpBondSize * offset_vec.z * ipipe;
+		v2.x = lAtoms[atom2].Position.x; //+ offset_vec.x * baseBondOffset +
+		//3.5 * tmpBondSize * offset_vec.x * ipipe;
+		v2.y = lAtoms[atom2].Position.y; //+ offset_vec.y * baseBondOffset +
+		//3.5 * tmpBondSize * offset_vec.y * ipipe;
+		v2.z = lAtoms[atom2].Position.z; //+ offset_vec.z * baseBondOffset +
+		//3.5 * tmpBondSize * offset_vec.z * ipipe;
+		
+		offset.x = v2.x - v1.x;
+		offset.y = v2.y - v1.y;
+		offset.z = v2.z - v1.z;
+		
+		double length = offset.Magnitude();
+		double radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
+		double radius2 = AtomScale*Prefs->GetAtomSize(lAtoms[atom2].GetType() - 1);
+		double percent1 = radius1/length;
+		double percent2 = radius2/length;
+		double centerPercent = 0.5 + 0.5*(percent1-percent2);
+		
+		if (length>0.00001) {
+			NormalOffset.x = offset.x/length;
+			NormalOffset.y = offset.y/length;
+			NormalOffset.z = offset.z/length;
+		} else {
+			NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
+		}
 
-    float radius = AtomScale*Prefs->GetAtomSize(curAtomType);
-    Buffer->PutText("Transform {\n");
-    tmpStr.Printf(wxT("\ttranslation %f %f %f\n"), lAtoms[iatom].Position.x, 
-		  lAtoms[iatom].Position.y, lAtoms[iatom].Position.z);
-    Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-    Buffer->PutText("\tchildren [\n");
-    Buffer->PutText("\t\tShape {\n");
-    tmpStr.Printf(wxT("\t\t\tgeometry Sphere { radius %f }\n"), radius);
-    Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-    Buffer->PutText("\t\t\tappearance Appearance {\n");
-    tmpStr.Printf(wxT("\t\t\t\tmaterial Material { diffuseColor %f %f %f }\n"),
-		  red, green, blue);
-    Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-    Buffer->PutText("\t\t\t}\n");
-    Buffer->PutText("\t\t}\n");
-    Buffer->PutText("\t]\n");
-    Buffer->PutText("}\n");
-  }
+		SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
 
-  //drawing bonds
-  Bond * lBonds = lFrame->Bonds;
-  long NumBonds = lFrame->NumBonds;
-  double BondSize = Prefs->GetQD3DBondWidth();
-  //float dotProd;
-  Matrix4D rotMat;
-  CPoint3D	NormalOffset, NormStart = CPoint3D(0.0f, 1.0f, 0.0f);
-  double theta;
-  double axisX, axisY, axisZ;
+		double tmp1 = rotMat[2][1]-rotMat[1][2];
+		double tmp2 = rotMat[0][2]-rotMat[2][0];
+		double tmp3 = rotMat[1][0]-rotMat[0][1];
+		double dev = sqrt(tmp1*tmp1+tmp2*tmp2+tmp3*tmp3);
+		theta = -1 * acos((rotMat[0][0] + rotMat[1][1] + rotMat[2][2] - 1)/2);
 
-  for (long ibond=0; ibond<NumBonds; ibond++) {
-    CPoint3D v1, v2, offset;
-    long atom1 = lBonds[ibond].Atom1;
-    long atom2 = lBonds[ibond].Atom2;
-    //BondOrder tmpOrder = lBonds[ibond].Order;
+		if (fabs(dev) > 0.0000001 ) {
+			axisX = (rotMat[2][1] - rotMat[1][2]) / dev;
+			axisY = (rotMat[0][2] - rotMat[2][0]) / dev;
+			axisZ = (rotMat[1][0] - rotMat[0][1]) / dev;
+		}
 
-    //for (int ipipe = 0; ipipe < MAX(tmpOrder,1); ++ipipe) {
-
-      v1.x = lAtoms[atom1].Position.x; // + offset_vec.x * baseBondOffset +
-      //3.5 * tmpBondSize * offset_vec.x * ipipe;
-      v1.y = lAtoms[atom1].Position.y; //+ offset_vec.y * baseBondOffset +
-      //3.5 * tmpBondSize * offset_vec.y * ipipe;
-      v1.z = lAtoms[atom1].Position.z; //+ offset_vec.z * baseBondOffset +
-      //3.5 * tmpBondSize * offset_vec.z * ipipe;
-      v2.x = lAtoms[atom2].Position.x; //+ offset_vec.x * baseBondOffset +
-      //3.5 * tmpBondSize * offset_vec.x * ipipe;
-      v2.y = lAtoms[atom2].Position.y; //+ offset_vec.y * baseBondOffset +
-      //3.5 * tmpBondSize * offset_vec.y * ipipe;
-      v2.z = lAtoms[atom2].Position.z; //+ offset_vec.z * baseBondOffset +
-      //3.5 * tmpBondSize * offset_vec.z * ipipe;
-
-      offset.x = v2.x - v1.x;
-      offset.y = v2.y - v1.y;
-      offset.z = v2.z - v1.z;
-
-      double length = offset.Magnitude();
-      double radius1 = AtomScale*Prefs->GetAtomSize(lAtoms[atom1].GetType() - 1);
-      double radius2 = AtomScale*Prefs->GetAtomSize(lAtoms[atom2].GetType() - 1);
-      double percent1 = radius1/length;
-      double percent2 = radius2/length;
-      double centerPercent = 0.5 + 0.5*(percent1-percent2);
-
-      if (length>0.00001) {
-	NormalOffset.x = offset.x/length;
-	NormalOffset.y = offset.y/length;
-	NormalOffset.z = offset.z/length;
-      } else {
-	NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
-      }
-
-      SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
-
-      double tmp1 = rotMat[2][1]-rotMat[1][2];
-      double tmp2 = rotMat[0][2]-rotMat[2][0];
-      double tmp3 = rotMat[1][0]-rotMat[0][1];
-      double dev = sqrt(tmp1*tmp1+tmp2*tmp2+tmp3*tmp3);
-      theta = -1 * acos((rotMat[0][0] + rotMat[1][1] + rotMat[2][2] - 1)/2);
-
-      if ( fabs(dev) > 0.0000001 ) {
-	axisX = (rotMat[2][1] - rotMat[1][2]) / dev;
-	axisY = (rotMat[0][2] - rotMat[2][0]) / dev;
-	axisZ = (rotMat[1][0] - rotMat[0][1]) / dev;
-      }
-
-      CPoint3D v3; //first half bond from atom 1
-      v3.x = centerPercent*(v2.x - v1.x)+v1.x;
-      v3.y = centerPercent*(v2.y - v1.y)+v1.y;
-      v3.z = centerPercent*(v2.z - v1.z)+v1.z;
-
-      curAtomType = lAtoms[atom1].GetType() - 1;
-      AtomColor = Prefs->GetAtomColorLoc(curAtomType);
-      red = AtomColor->red/65536.0;
-      green = AtomColor->green/65536.0;
-      blue = AtomColor->blue/65536.0;
-
-      Buffer->PutText("Transform {\n");
-
-      if (fabs(dev) > 0.000001) {
-	tmpStr.Printf(wxT("\trotation %lf %lf %lf %lf\n"), axisX, axisY, axisZ, theta);
-	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      }
-      tmpStr.Printf(wxT("\ttranslation %lf %lf %lf\n"), (v1.x+v3.x)/2, (v1.y+v3.y)/2, (v1.z+v3.z)/2);
-      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      Buffer->PutText("\tchildren [\n");
-      Buffer->PutText("\t\tShape {\n");
-      tmpStr.Printf(wxT("\t\t\tgeometry Cylinder { radius %lf height %lf}\n"), BondSize, (centerPercent)*length);
-      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      Buffer->PutText("\t\t\tappearance Appearance {\n");
-      tmpStr.Printf(wxT("\t\t\t\tmaterial Material { diffuseColor %f %f %f }\n"),
-		  red, green, blue);
-      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      Buffer->PutText("\t\t\t}\n");
-      Buffer->PutText("\t\t}\n");
-      Buffer->PutText("\t]\n");
-      Buffer->PutText("}\n");
-
-      curAtomType = lAtoms[atom2].GetType() - 1;
-      AtomColor = Prefs->GetAtomColorLoc(curAtomType);
-      red = AtomColor->red/65536.0;
-      green = AtomColor->green/65536.0;
-      blue = AtomColor->blue/65536.0;
-
-      Buffer->PutText("Transform {\n");
-
-      if (fabs(dev) > 0.000001) {
-	tmpStr.Printf(wxT("\trotation %lf %lf %lf %lf\n"), axisX, axisY, axisZ, theta);
-	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      }
-      tmpStr.Printf(wxT("\ttranslation %lf %lf %lf\n"), (v2.x+v3.x)/2, (v2.y+v3.y)/2, (v2.z+v3.z)/2);
-      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      Buffer->PutText("\tchildren [\n");
-      Buffer->PutText("\t\tShape {\n");
-      tmpStr.Printf(wxT("\t\t\tgeometry Cylinder { radius %lf height %lf}\n"), BondSize, (1-centerPercent)*length);
-      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      Buffer->PutText("\t\t\tappearance Appearance {\n");
-      tmpStr.Printf(wxT("\t\t\t\tmaterial Material { diffuseColor %f %f %f }\n"),
-		  red, green, blue);
-      Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-      Buffer->PutText("\t\t\t}\n");
-      Buffer->PutText("\t\t}\n");
-      Buffer->PutText("\t]\n");
-      Buffer->PutText("}\n");
-  }
+		CPoint3D v3; //first half bond from atom 1
+		v3.x = centerPercent*(v2.x - v1.x)+v1.x;
+		v3.y = centerPercent*(v2.y - v1.y)+v1.y;
+		v3.z = centerPercent*(v2.z - v1.z)+v1.z;
+		
+		curAtomType = lAtoms[atom1].GetType() - 1;
+		AtomColor = Prefs->GetAtomColorLoc(curAtomType);
+		red = AtomColor->red/65536.0;
+		green = AtomColor->green/65536.0;
+		blue = AtomColor->blue/65536.0;
+		
+		Buffer->PutText("Transform {\n");
+		
+		if (fabs(dev) > 0.000001) {
+			tmpStr.Printf(wxT("\trotation %lf %lf %lf %lf\n"), axisX, axisY, axisZ, theta);
+			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		}
+		tmpStr.Printf(wxT("\ttranslation %lf %lf %lf\n"), (v1.x+v3.x)/2, (v1.y+v3.y)/2, (v1.z+v3.z)/2);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("\tchildren [\n");
+		Buffer->PutText("\t\tShape {\n");
+		tmpStr.Printf(wxT("\t\t\tgeometry Cylinder { radius %lf height %lf}\n"), BondSize, (centerPercent)*length);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("\t\t\tappearance Appearance {\n");
+		tmpStr.Printf(wxT("\t\t\t\tmaterial Material { diffuseColor %f %f %f }\n"),
+					  red, green, blue);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("\t\t\t}\n");
+		Buffer->PutText("\t\t}\n");
+		Buffer->PutText("\t]\n");
+		Buffer->PutText("}\n");
+		
+		curAtomType = lAtoms[atom2].GetType() - 1;
+		AtomColor = Prefs->GetAtomColorLoc(curAtomType);
+		red = AtomColor->red/65536.0;
+		green = AtomColor->green/65536.0;
+		blue = AtomColor->blue/65536.0;
+		
+		Buffer->PutText("Transform {\n");
+		
+		if (fabs(dev) > 0.000001) {
+			tmpStr.Printf(wxT("\trotation %lf %lf %lf %lf\n"), axisX, axisY, axisZ, theta);
+			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		}
+		tmpStr.Printf(wxT("\ttranslation %lf %lf %lf\n"), (v2.x+v3.x)/2, (v2.y+v3.y)/2, (v2.z+v3.z)/2);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("\tchildren [\n");
+		Buffer->PutText("\t\tShape {\n");
+		tmpStr.Printf(wxT("\t\t\tgeometry Cylinder { radius %lf height %lf}\n"), BondSize, (1-centerPercent)*length);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("\t\t\tappearance Appearance {\n");
+		tmpStr.Printf(wxT("\t\t\t\tmaterial Material { diffuseColor %f %f %f }\n"),
+					  red, green, blue);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("\t\t\t}\n");
+		Buffer->PutText("\t\t}\n");
+		Buffer->PutText("\t]\n");
+		Buffer->PutText("}\n");
+	}
 }
 
 void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
-	/* Buffer->PutText("#VRML V2.0 utf8\n");  //VRML header */
-	/* Buffer->PutText("\n"); */
 
 	Frame *lFrame = MainData->GetCurrentFramePtr();
 	mpAtom *lAtoms = lFrame->Atoms;
@@ -3951,14 +3949,19 @@ void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
 	float red, green, blue;
 
 	tmpStr.Printf(wxT("camera {\n"
-					  "\tlocation <5, 5, 5>\n"
+					  "\tlocation <0, 0, %f>\n"
 					  "\tsky <0, 1, 0>\n"
 					  "\tlook_at <0, 0, 0>\n"
+					  "}\n\n"), -MainData->WindowSize);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+
+	tmpStr.Printf(wxT("light_source {\n"
+					  "\t<6, 6, -12>, rgb <1, 1, 1>\n"
 					  "}\n\n"));
 	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 
 	tmpStr.Printf(wxT("light_source {\n"
-					  "\t<5, 5, 5>, rgb <1, 1, 1>\n"
+					  "\t<-6, 6, -12>, rgb <1, 1, 1>\n"
 					  "}\n\n"));
 	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 
@@ -3983,7 +3986,64 @@ void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
 					  lAtoms[iatom].Position.y,
 					  lAtoms[iatom].Position.z, radius);
 		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-		tmpStr.Printf(wxT("\ttexture {pigment {color rgb <%f, %f, %f>}}\n"),
+		tmpStr.Printf(wxT("\ttexture {\n"
+						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
+						  "\t\tfinish {specular 0.95 roughness 0.005}\n"
+						  "\t}\n"),
+					  red, green, blue);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("}\n\n");
+	}
+
+	Bond *lBonds = lFrame->Bonds;
+	long NumBonds = lFrame->NumBonds;
+	double BondSize = Prefs->GetQD3DBondWidth();
+	for (long ibond = 0; ibond < NumBonds; ibond++) {
+		const mpAtom& atom1 = lAtoms[lBonds[ibond].Atom1];
+		const mpAtom& atom2 = lAtoms[lBonds[ibond].Atom2];
+
+		CPoint3D offset = atom2.Position - atom1.Position;
+		double length = offset.Magnitude();
+
+		double radius1 = AtomScale * Prefs->GetAtomSize(atom1.GetType() - 1);
+		double radius2 = AtomScale * Prefs->GetAtomSize(atom2.GetType() - 1);
+		double percent1 = radius1 / length;
+		double percent2 = radius2 / length;
+		double centerPercent = 0.5 + 0.5*(percent1-percent2);
+		CPoint3D halfway = atom1.Position + offset * centerPercent;
+
+		AtomColor = Prefs->GetAtomColorLoc(atom1.GetType() - 1);
+		red = AtomColor->red / 65536.0;
+		green = AtomColor->green / 65536.0;
+		blue = AtomColor->blue / 65536.0;
+
+		Buffer->PutText("cylinder {\n");
+		tmpStr.Printf(wxT("\t<%f, %f, %f>, <%f, %f, %f>, %f\n"),
+					  atom1.Position.x, atom1.Position.y, atom1.Position.z,
+					  halfway.x, halfway.y, halfway.z, BondSize);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		tmpStr.Printf(wxT("\ttexture {\n"
+						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
+						  "\t\tfinish {specular 0.95 roughness 0.005}\n"
+						  "\t}\n"),
+					  red, green, blue);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("}\n\n");
+
+		AtomColor = Prefs->GetAtomColorLoc(atom2.GetType() - 1);
+		red = AtomColor->red / 65536.0;
+		green = AtomColor->green / 65536.0;
+		blue = AtomColor->blue / 65536.0;
+
+		Buffer->PutText("cylinder {\n");
+		tmpStr.Printf(wxT("\t<%f, %f, %f>, <%f, %f, %f> %f\n"),
+					  atom2.Position.x, atom2.Position.y, atom2.Position.z,
+					  halfway.x, halfway.y, halfway.z, BondSize);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		tmpStr.Printf(wxT("\ttexture {\n"
+						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
+						  "\t\tfinish {specular 0.95 roughness 0.005}\n"
+						  "\t}\n"),
 					  red, green, blue);
 		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		Buffer->PutText("}\n\n");
