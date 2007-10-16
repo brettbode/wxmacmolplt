@@ -1086,7 +1086,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 							 "|XMOL (*.xyz)|*.xyz"
 							 "|Tab delimited Energies (*.txt)|*.txt"
 							 "|VRML (*.wrl)|*.wrl"
-							 "|Pov-RAY (*.pov)|*.pov"));
+							 "|POV-Ray (*.pov)|*.pov"));
 	bool vibs = false;
 	int itemCount = 9;
 	if (MainData->cFrame->GetNumberNormalModes() > 0) {
