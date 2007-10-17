@@ -343,11 +343,11 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 
 	delete_button = new wxButton(panel, kPeriodicDeleteStructure,
 								 _("Delete Structure"));
-	struc_custom_sizer->Add(delete_button, wxSizerFlags().Expand());
+	struc_custom_sizer->Add(delete_button, wxSizerFlags().Expand().Border(wxALL, 3));
 
 	rename_button = new wxButton(panel, kPeriodicRenameStructure,
 								 _("Rename Structure"));
-	struc_custom_sizer->Add(rename_button, wxSizerFlags().Expand());
+	struc_custom_sizer->Add(rename_button, wxSizerFlags().Expand().Border(wxALL, 3));
 
 	struc_sizer->Add(struc_custom_sizer, wxGBPosition(2, 0), wxGBSpan(1, 1),
 					 wxEXPAND | wxALIGN_CENTER);
