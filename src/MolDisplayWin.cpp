@@ -202,7 +202,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
 	EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
 	EVT_MENU (MMP_SELECT_NONE,		MolDisplayWin::menuEditSelectNone)
-	EVT_UPDATE_UI(MMP_SELECT_NONE,	MolDisplayWin::OnSelectionUpdate )
+	EVT_UPDATE_UI(MMP_SELECT_NONE,	MolDisplayWin::OnSelectionUpdate)
 
 	EVT_MENU (MMP_SHOW_FULLSCREEN,  MolDisplayWin::menuViewShowFullScreen)
 	EVT_UPDATE_UI(MMP_SHOW_FULLSCREEN, MolDisplayWin::OnShowNormalScreen)
@@ -891,10 +891,11 @@ void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event ) {
 * wxEVT_UPDATE_UI event handler for Edit menu items
  */
 
-void MolDisplayWin::OnSelectionUpdate( wxUpdateUIEvent& event ) {
-	menuEdit->Enable(wxID_CLEAR, mHighliteState&&InEditMode());
-	menuEdit->Enable(MMP_SELECT_NONE, mHighliteState);
+void MolDisplayWin::OnSelectionUpdate(wxUpdateUIEvent& event) {
+	menuEdit->Enable(wxID_CLEAR, mHighliteState && InEditMode());
+	event.Enable(MainData->cFrame->GetNumAtomsSelected() > 0);
 }
+
 void MolDisplayWin::OnAnnotationMarkUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(glCanvas->NumberSelectedAtoms()>0);
 }
