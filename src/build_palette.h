@@ -86,9 +86,6 @@ class BuilderDlg: public wxMiniFrame {
 		void AddStructure(Structure *structure);
 		void AddUserStructure(Structure *structure);
 
-		void StructuresSaveCheck(int id);
-		void StructuresSaveCheck();
-
 	private:
 		void ElementSelected(wxCommandEvent& event);
 		void OnCoordinationChoice(wxCommandEvent& event);
@@ -97,12 +94,10 @@ class BuilderDlg: public wxMiniFrame {
 		void OnClose(wxCloseEvent& event);
 		wxPanel *GetPeriodicPanel(void);
 		wxPanel *GetStructuresPanel(void);
-		void SaveStructuresAs(wxCommandEvent& event);
-		void SaveStructures(wxCommandEvent& event);
+		void SaveStructures();
 		long WriteCMLFile(BufferFile *Buffer) const;
 		long ReadCMLFile(BufferFile *Buffer);
 		bool LoadStructuresFromFile(const wxString& filename);
-		void UpdateSaveStructures(wxUpdateUIEvent& event);
 		void UpdateRenameStructures(wxUpdateUIEvent& event);
 		void UpdateDeleteStructures(wxUpdateUIEvent& event);
 		void DeleteStructure(wxCommandEvent& event);
@@ -133,25 +128,17 @@ class BuilderDlg: public wxMiniFrame {
 		PreviewCanvas *canvas;
 		wxString sys_prefs_path;
 
-		bool strucs_in_mem;
-
 		wxStaticText *element_label;
 		wxStaticText *coord_num_label;
 		wxStaticText *lp_num_label;
 
 		wxGridBagSizer *struc_sizer;
 
-		wxString struc_filename;
-		wxStaticText *struc_filename_label;
 		wxBoxSizer *struc_custom_sizer;
 		wxChoice *struc_groups;
 
-		wxButton *save_button;
-		wxButton *save_as_button;
 		wxButton *delete_button;
 		wxButton *rename_button;
-
-		int prev_group_id;
 
 	DECLARE_DYNAMIC_CLASS(BuilderDlg)
 	DECLARE_EVENT_TABLE()
