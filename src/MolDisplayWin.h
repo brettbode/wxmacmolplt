@@ -272,7 +272,6 @@ class MolDisplayWin : public wxFrame {
 		void OnShowNormalScreen(wxUpdateUIEvent& event);
 		void OnSaveUpdate(wxUpdateUIEvent& event);
 
-		void menuBuilderSaveStructure(wxCommandEvent &event);
 		void OnSaveStructureUpdate(wxUpdateUIEvent& event);
 
 		DECLARE_EVENT_TABLE()
@@ -387,6 +386,8 @@ class MolDisplayWin : public wxFrame {
 		void menuViewSetWindowParameters(wxCommandEvent &event);
 		//void menuViewStereo(wxCommandEvent &event);
 		
+		void menuBuilderSaveStructure(wxCommandEvent &event);
+
 		void menuPreferences(wxCommandEvent &event);
 		void ClosePrefsWindow(void);
 

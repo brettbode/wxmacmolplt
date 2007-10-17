@@ -679,7 +679,8 @@ void MolDisplayWin::createMenuBar(void) {
 	menuBuild->Append(MMP_ADDHYDROGENS, wxT("Add &Hydrogens"), _T("Complete moleclues by adding hydrogens to incomplete bonds"));
 	menuBuild->Append(MMP_DELETEHYDROGENS, wxT("&Delete Hydrogens"), _T("Remove terminal hydrogens (Does not apply to effective fragments or SIMOMM atoms)"));
 	menuBuild->AppendCheckItem(MMP_SHOWBONDSITES, wxT("&Show Bonding Sites"), _T("Click on a site to add an atom"));
-	menuBuild->Append(MMP_SAVESTRUCTURE, wxT("Save Structure"), _T("Save structure as a prototype in builder"));
+	menuBuild->AppendSeparator();
+	menuBuild->Append(MMP_SAVESTRUCTURE, wxT("Prototype Selection"), _T("Save structure as a prototype in builder"));
 #endif
 	
 	menuMolecule->Append(MMP_SETBONDLENGTH, wxT("Set Bonds..."), _("Apply the automated bond determination with several options"));
@@ -2179,8 +2180,8 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 		
 		wxTextEntryDialog *dlg =
 			new wxTextEntryDialog(this,
-					_("Please enter a name for this custom structure:"),
-					_("Add Structure"));
+					_("Please enter a name for this custom prototype:"),
+					_("Add Prototype"));
 		int result;
 		do {
 			result = dlg->ShowModal();

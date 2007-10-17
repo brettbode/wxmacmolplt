@@ -2171,6 +2171,9 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 			item = menu.Append(GL_Popup_Add_Plane_Normal, wxT("Add plane normal"));
 		}
 
+		item = menu.Append(GL_Popup_Save_Prototype, wxT("Prototype selection"));
+		item->Enable(lFrame->GetNumAtomsSelected() > 0);
+
 		menu.AppendSeparator();
 
 	}
@@ -2539,6 +2542,12 @@ void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
 
 	MolWin->UpdateModelDisplay();
 	MolWin->ContentChanged();
+}
+
+void MpGLCanvas::SavePrototype(wxCommandEvent& event) {
+
+	MolWin->menuBuilderSaveStructure(event);
+
 }
 
 void MpGLCanvas::PasteAtMouse(wxCommandEvent& event) {
@@ -2999,5 +3008,6 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_To_LPCount_Four, MpGLCanvas::ChangeLPCount)
 	EVT_MENU(GL_Popup_To_LPCount_Five, MpGLCanvas::ChangeLPCount)
 	EVT_MENU(GL_Popup_Paste_At, MpGLCanvas::PasteAtMouse)
+	EVT_MENU(GL_Popup_Save_Prototype, MpGLCanvas::SavePrototype)
 END_EVENT_TABLE()
 

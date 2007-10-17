@@ -64,6 +64,7 @@
 #define GL_Popup_To_LPCount_Five 30047
 #define GL_Popup_Paste_At 30048
 #define GL_Popup_Add_Plane_Normal 30049
+#define GL_Popup_Save_Prototype 30050
 
 class BuilderDlg;
 
@@ -157,6 +158,7 @@ class MpGLCanvas : public wxGLCanvas {
 		void ConnectSelectedToSite(int src_atom, int src_site,
 								   int dst_atom, int dst_site);
 		void OnIdleEvent(wxIdleEvent& event);
+		void SavePrototype(wxCommandEvent& event);
 
 	public:
 		/**
