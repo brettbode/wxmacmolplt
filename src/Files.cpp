@@ -3012,7 +3012,7 @@ void SystemGroup::ReadSystemOptions(BufferFile * Buffer) {
 		sscanf(&(LineText[7]), "%lf%s", &temp, token);
 		if (FindKeyWord(token, "SECONDS", 7)>=0)
 			temp /= 60.0;	//For some odd reason TIMLIM is printed in seconds...
-		SetTimeLimit(temp);
+		SetTimeLimit((long) temp);
 		Buffer->SetFilePos(StartPos);
 	}
 	if (Buffer->LocateKeyWord("PARALL=", 7, EndPos)) {
@@ -3948,20 +3948,24 @@ void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
 	wxString tmpStr;
 	float red, green, blue;
 
+	/* float x_angle, y_angle, z_angle; */
+	/* MatrixToEulerAngles(MainData->TotalRotation, &x_angle, &y_angle, */
+						/* &z_angle); */
+
 	tmpStr.Printf(wxT("camera {\n"
-					  "\tlocation <0, 0, %f>\n"
+					  "\tlocation <0, 0, 0>\n"
 					  "\tsky <0, 1, 0>\n"
-					  "\tlook_at <0, 0, 0>\n"
-					  "}\n\n"), -MainData->WindowSize);
+					  "\tlook_at <0, 0, -1>\n"
+					  "}\n\n"));//, MainData->WindowSize);
 	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 
 	tmpStr.Printf(wxT("light_source {\n"
-					  "\t<6, 6, -12>, rgb <1, 1, 1>\n"
+					  "\t<6, 6, 12>, rgb <1, 1, 1>\n"
 					  "}\n\n"));
 	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 
 	tmpStr.Printf(wxT("light_source {\n"
-					  "\t<-6, 6, -12>, rgb <1, 1, 1>\n"
+					  "\t<-6, 6, 12>, rgb <1, 1, 1>\n"
 					  "}\n\n"));
 	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 
@@ -3970,6 +3974,7 @@ void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
 					  "}\n\n"));
 	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 
+	Buffer->PutText("union {\n");
 	for (long iatom = 0; iatom < NumAtoms; iatom++) {
 		if (lAtoms[iatom].GetInvisibility()) continue;
 
@@ -4048,6 +4053,70 @@ void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
 		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		Buffer->PutText("}\n\n");
 	}
+
+	Surface *lSurface = lFrame->SurfaceList;
+	if (false) {
+		Buffer->PutText("mesh2 {\n");
+		Buffer->PutText("\tvertex_vectors {\n");
+		tmpStr.Printf(wxT("\t\t3 * %d"), OpenGLData->triangleCount);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		for (long i = 0; i < OpenGLData->triangleCount; i++) {
+			tmpStr.Printf(wxT(",\n\t\t<%f, %f, %f>, <%f, %f, %f>, <%f, %f, %f>"),
+						  OpenGLData->transpTriList[i].v1.x,
+						  OpenGLData->transpTriList[i].v1.y,
+						  OpenGLData->transpTriList[i].v1.z,
+						  OpenGLData->transpTriList[i].v2.x,
+						  OpenGLData->transpTriList[i].v2.y,
+						  OpenGLData->transpTriList[i].v2.z,
+						  OpenGLData->transpTriList[i].v3.x,
+						  OpenGLData->transpTriList[i].v3.y,
+						  OpenGLData->transpTriList[i].v3.z);
+			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		}
+		Buffer->PutText("\n\t}\n\n");
+		Buffer->PutText("\tnormal_vectors {\n");
+		tmpStr.Printf(wxT("\t\t3 * %d"), OpenGLData->triangleCount);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		for (long i = 0; i < OpenGLData->triangleCount; i++) {
+			tmpStr.Printf(wxT(",\n\t\t<%f, %f, %f>, <%f, %f, %f>, <%f, %f, %f>"),
+						  OpenGLData->transpTriList[i].n1.x,
+						  OpenGLData->transpTriList[i].n1.y,
+						  OpenGLData->transpTriList[i].n1.z,
+						  OpenGLData->transpTriList[i].n2.x,
+						  OpenGLData->transpTriList[i].n2.y,
+						  OpenGLData->transpTriList[i].n2.z,
+						  OpenGLData->transpTriList[i].n3.x,
+						  OpenGLData->transpTriList[i].n3.y,
+						  OpenGLData->transpTriList[i].n3.z);
+			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		}
+		Buffer->PutText("\n\t}\n\n");
+		Buffer->PutText("\tface_indices {\n");
+		tmpStr.Printf(wxT("\t\t%d"), OpenGLData->triangleCount);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		for (long i = 0; i < OpenGLData->triangleCount; i++) {
+			tmpStr.Printf(wxT(",\n\t\t<%d, %d, %d>"),
+						  OpenGLData->transpIndex[i] + 0,
+						  OpenGLData->transpIndex[i] + 1,
+						  OpenGLData->transpIndex[i] + 2);
+			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		}
+		Buffer->PutText("\n\t}\n");
+		Buffer->PutText("}\n");
+	}
+	float *m = (float *) MainData->TotalRotation;
+	tmpStr.Printf(wxT("\n\tmatrix <%f, %f, %f,"
+			   		  "\n\t        %f, %f, %f,"
+					  "\n\t        %f, %f, %f,"
+					  "\n\t        %f, %f, %f>\n"),
+				  m[0], m[1], m[2], m[4], m[5], m[6],
+				  m[8], m[9], m[10], m[12], m[13], m[14]);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	Buffer->PutText("\n\tscale <-1, 1, 1>\n");
+	tmpStr.Printf(wxT("\n\ttranslate <0, 0, %f>\n"),
+				  -MainData->WindowSize);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	Buffer->PutText("}\n");
 
 }
 
