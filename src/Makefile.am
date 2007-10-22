@@ -70,7 +70,7 @@ wxmacmolplt_SOURCES =                                  \
     zmatrixcalculator.cpp      zmatrixcalculator.h
 
 AM_CXXFLAGS = $(WX_CXXFLAGS)
-wxmacmolplt_LDADD = $(WX_LIBS) $(LIBMING)
+wxmacmolplt_LDADD = $(WX_LIBS) $(LIBMING) $(LIBGL)
 wxmacmolplt_LDFLAGS = $(WX_CXXFLAGS)
 EXTRA_DIST = wxMacMolPlt.pjd xpms/sp.xpm xpms/arrow.xpm \
 	xpms/hand.xpm xpms/rect_lasso.xpm xpms/view.xpm
