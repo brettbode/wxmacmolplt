@@ -6,6 +6,17 @@ dnl AC_CONFIG_HEADER
 dnl AC_REVISION
 AM_MAINTAINER_MODE
 
+#
+# There isn't a reliable way to know we should use the Apple OpenGL framework
+# without a configure option.  A Mac OS X user may have installed an
+# alternative GL implementation (e.g., Mesa), which may or may not depend on X.
+#
+AC_ARG_WITH([apple-opengl-framework],
+            [AC_HELP_STRING([--with-apple-opengl-framework],
+                            [use Apple OpenGL framework (Mac OS X only)])])
+LIBGL=
+AS_IF([test "x$with_apple_opengl_framework" != xno],
+      [AC_SUBST([LIBGL], ["-framework OpenGL"])])
 
 AC_ARG_WITH(ming,
 [[  --with-ming             Include support for exporting flash animations
