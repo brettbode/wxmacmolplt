@@ -1430,6 +1430,310 @@ void Surf3DBase::AdjustSurfaceNormals(void) {
 #endif
 }
 
+/* ------------------------------------------------------------------------- */
+
+long General3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
+								 BufferFile *Buffer) {
+
+	long result=0;
+	if (Visible) {
+		if (ContourHndl && VertexList) {
+			if (UseSurfaceNormals() && SurfaceNormals) {
+				result = ExportPOVSurface(ContourHndl, SurfaceNormals,
+										  VertexList, NumPosContourTriangles,
+										  &PosColor, NULL, NULL, 1.0, MainData,
+										  Buffer);
+				if ((Mode & 4) && NumNegContourTriangles > 0)
+					result += ExportPOVSurface(ContourHndl,
+											   SurfaceNormals,
+											   &VertexList[3 * NumPosContourTriangles],
+											   NumNegContourTriangles,
+											   &NegColor, NULL, NULL, 1.0,
+											   MainData, Buffer);
+			} else {
+				result = ExportPOVSurface(ContourHndl, NULL, VertexList,
+										  NumPosContourTriangles, &PosColor,
+										  NULL, NULL, 1.0, MainData, Buffer);
+				if ((Mode & 4) && NumNegContourTriangles > 0)
+					result += ExportPOVSurface(ContourHndl, NULL,
+											   &VertexList[3 * NumPosContourTriangles],
+											   NumNegContourTriangles,
+											   &NegColor, NULL, NULL, 1.0,
+											   MainData, Buffer);
+			}
+		}
+	}
+
+	return result;
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+long TEDensity3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
+								   BufferFile *Buffer) {
+
+	long result = 0;
+	if (Visible) {
+		if (ContourHndl && VertexList) {
+			if ((UseSurfaceNormals())&&SurfaceNormals) {
+				result = ExportPOVSurface(ContourHndl, SurfaceNormals, VertexList,
+										  NumPosContourTriangles,
+										  &PosColor, List, &NegColor, MaxMEPValue,
+										  MainData, Buffer);
+			} else {
+				result = ExportPOVSurface(ContourHndl, NULL, VertexList,
+										  NumPosContourTriangles,
+										  &PosColor, List, &NegColor, MaxMEPValue,
+										  MainData, Buffer);
+			}
+		}
+	}
+
+	return result;
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+long Orb3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
+							 BufferFile *Buffer) {
+
+	long result=0;
+	if (Visible && PlotOrb >=0) {
+		if (ContourHndl && VertexList) {
+			if ((UseSurfaceNormals())&&SurfaceNormals) {
+				result = ExportPOVSurface(ContourHndl,
+										  SurfaceNormals, VertexList, NumPosContourTriangles,
+										  &PosColor, NULL, NULL, 1.0, MainData, Buffer);
+				result += ExportPOVSurface(ContourHndl,
+										   SurfaceNormals,
+										   &(VertexList[3*NumPosContourTriangles]),
+										   NumNegContourTriangles, &NegColor,
+										   NULL, NULL, 1.0, MainData, Buffer);
+			} else {
+				result = ExportPOVSurface(ContourHndl, NULL, VertexList,
+										  NumPosContourTriangles,
+										  &PosColor, NULL, NULL, 1.0, MainData, Buffer);
+				result += ExportPOVSurface(ContourHndl,
+										   NULL, &(VertexList[3*NumPosContourTriangles]),
+										   NumNegContourTriangles, &NegColor, NULL, NULL,
+										   1.0, MainData, Buffer);
+			}
+		}
+	}
+
+	return result;
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+long MEP3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
+							 BufferFile *Buffer) {
+
+	long result=0;
+	if (Visible) {
+		if (ContourHndl && VertexList) {
+			if (UseSurfaceNormals() && SurfaceNormals) {
+				result = ExportPOVSurface(ContourHndl, SurfaceNormals,
+										  VertexList, NumPosContourTriangles,
+										  &PosColor, NULL, NULL, 1.0, MainData,
+										  Buffer);
+				result += ExportPOVSurface(ContourHndl, SurfaceNormals,
+										   &(VertexList[3*NumPosContourTriangles]), 
+										   NumNegContourTriangles, &NegColor, NULL,
+										   NULL, 1.0, MainData, Buffer);
+			} else {
+				result = ExportPOVSurface(ContourHndl, NULL, VertexList, NumPosContourTriangles,
+										  &PosColor, NULL, NULL, 1.0, MainData, Buffer);
+				result += ExportPOVSurface(ContourHndl,
+										   NULL, &(VertexList[3*NumPosContourTriangles]),
+										   NumNegContourTriangles, &NegColor, NULL, NULL,
+										   1.0, MainData, Buffer);
+			}
+		}
+	}
+
+	return result;
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+long Surf3DBase::ExportPOVSurface(CPoint3D *Vertices, CPoint3D *Normals,
+								  long *vList, long NumTriangles,
+								  RGBColor *SurfaceColor, float *SurfaceValue,
+								  RGBColor *NColor, float MaxSurfaceValue,
+								  MoleculeData *MainData, BufferFile *Buffer) {
+
+	long v1, v2, v3, result = 0;
+	float alpha = 1.0, red, green, blue, xnorm, ynorm, znorm;
+	wxString tmpStr;
+
+	red = (float) SurfaceColor->red / 65536.0;
+	green = (float) SurfaceColor->green / 65536.0;
+	blue = (float) SurfaceColor->blue / 65536.0;
+	red = MIN(red, 1.0);
+	blue = MIN(blue, 1.0);
+	green = MIN(green, 1.0);
+	red = MAX(red, 0.0);
+	blue = MAX(blue, 0.0);
+	green = MAX(green, 0.0);
+	long *VertexList = vList;
+	myGLTriangle *transpTri;
+
+	transpTri = new myGLTriangle[NumTriangles];
+
+	if (isTransparent()) {
+		alpha = (((float) TranspColor.red / 65536.0) +
+				 ((float) TranspColor.green / 65536.0) + 
+				 ((float) TranspColor.blue / 65536.0)) / 3.0f;
+		result = NumTriangles;
+	}
+
+	for (long itri = 0; itri < NumTriangles; itri++) {
+		v1 = VertexList[3 * itri];
+		v2 = VertexList[3 * itri + 1];
+		v3 = VertexList[3 * itri + 2];
+		
+		// Triangle 1
+		if (Normals) {
+			xnorm = Normals[v1].x;
+			ynorm = Normals[v1].y;
+			znorm = Normals[v1].z;
+		} else {	//compute a simple triangle normal for all three vertices
+			float qx = Vertices[v2].x - Vertices[v1].x;
+			float qy = Vertices[v2].y - Vertices[v1].y;
+			float qz = Vertices[v2].z - Vertices[v1].z;
+			float px = Vertices[v3].x - Vertices[v1].x;
+			float py = Vertices[v3].y - Vertices[v1].y;
+			float pz = Vertices[v3].z - Vertices[v1].z;
+			xnorm = -(py*qz - pz*qy);
+			ynorm = -(pz*qx - px*qz);
+			znorm = -(px*qy - py*qx);
+
+			float len = 1.0f / sqrt(xnorm * xnorm + ynorm * ynorm + znorm * znorm);
+			xnorm *= len;
+			ynorm *= len;
+			znorm *= len;
+		}
+
+		if (SurfaceValue) {
+			float temp = SurfaceValue[v1];
+			temp /= MaxSurfaceValue;
+			SetSurfaceColor(temp, SurfaceColor, NColor, red, green, blue);
+		}
+
+		transpTri[itri].v1 = Vertices[v1];
+		transpTri[itri].n1.x = xnorm;
+		transpTri[itri].n1.y = ynorm;
+		transpTri[itri].n1.z = znorm;
+		transpTri[itri].r1 = red;
+		transpTri[itri].g1 = green;
+		transpTri[itri].b1 = blue;
+		transpTri[itri].a1 = alpha;
+
+		// Triangle 2
+		if (Normals) {
+			xnorm = Normals[v2].x;
+			ynorm = Normals[v2].y;
+			znorm = Normals[v2].z;
+		}
+
+		if (SurfaceValue) {
+			float temp = SurfaceValue[v2];
+			temp /= MaxSurfaceValue;
+			SetSurfaceColor(temp, SurfaceColor, NColor, red, green, blue);
+		}
+
+		transpTri[itri].v2 = Vertices[v2];
+		transpTri[itri].n2.x = xnorm;
+		transpTri[itri].n2.y = ynorm;
+		transpTri[itri].n2.z = znorm;
+		transpTri[itri].r2 = red;
+		transpTri[itri].g2 = green;
+		transpTri[itri].b2 = blue;
+		transpTri[itri].a2 = alpha;
+		
+		// Triangle 3
+		if (Normals) {
+			xnorm = Normals[v3].x;
+			ynorm = Normals[v3].y;
+			znorm = Normals[v3].z;
+		}
+
+		if (SurfaceValue) {
+			float temp = SurfaceValue[v3];
+			temp /= MaxSurfaceValue;
+			SetSurfaceColor(temp, SurfaceColor, NColor, red, green, blue);
+		}
+
+		transpTri[itri].v3 = Vertices[v3];
+		transpTri[itri].n3.x = xnorm;
+		transpTri[itri].n3.y = ynorm;
+		transpTri[itri].n3.z = znorm;
+		transpTri[itri].r3 = red;
+		transpTri[itri].g3 = green;
+		transpTri[itri].b3 = blue;
+		transpTri[itri].a3 = alpha;
+	}
+
+	Buffer->PutText("mesh2 {\n");
+	Buffer->PutText("\tvertex_vectors {\n");
+	tmpStr.Printf(wxT("\t\t3 * %d"), NumTriangles);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	for (long i = 0; i < NumTriangles; i++) {
+		tmpStr.Printf(wxT(",\n\t\t<%f, %f, %f>, <%f, %f, %f>, <%f, %f, %f>"),
+					  transpTri[i].v1.x, transpTri[i].v1.y, transpTri[i].v1.z,
+					  transpTri[i].v2.x, transpTri[i].v2.y, transpTri[i].v2.z,
+					  transpTri[i].v3.x, transpTri[i].v3.y, transpTri[i].v3.z);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	}
+	Buffer->PutText("\n\t}\n\n");
+	Buffer->PutText("\tnormal_vectors {\n");
+	tmpStr.Printf(wxT("\t\t3 * %d"), NumTriangles);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	for (long i = 0; i < NumTriangles; i++) {
+		tmpStr.Printf(wxT(",\n\t\t<%f, %f, %f>, <%f, %f, %f>, <%f, %f, %f>"),
+					  transpTri[i].n1.x, transpTri[i].n1.y, transpTri[i].n1.z,
+					  transpTri[i].n2.x, transpTri[i].n2.y, transpTri[i].n2.z,
+					  transpTri[i].n3.x, transpTri[i].n3.y, transpTri[i].n3.z);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	}
+	Buffer->PutText("\n\t}\n\n");
+	Buffer->PutText("\ttexture_list {\n");
+	tmpStr.Printf(wxT("\t\t3 * %d"), NumTriangles);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	for (long i = 0; i < NumTriangles; i++) {
+		tmpStr.Printf(wxT(",\n\t\ttexture {pigment {color rgbt <%f, %f, %f, %f>} finish{SurfaceFinish}},"
+						   "\n\t\ttexture {pigment {color rgbt <%f, %f, %f, %f>} finish{SurfaceFinish}},"
+						   "\n\t\ttexture {pigment {color rgbt <%f, %f, %f, %f>} finish{SurfaceFinish}}"),
+					  transpTri[i].r1, transpTri[i].g1, transpTri[i].b1, 1.0f - transpTri[i].a1,
+					  transpTri[i].r2, transpTri[i].g2, transpTri[i].b2, 1.0f - transpTri[i].a2,
+					  transpTri[i].r3, transpTri[i].g3, transpTri[i].b3, 1.0f - transpTri[i].a3);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	}
+	Buffer->PutText("\n\t}\n\n");
+	Buffer->PutText("\tface_indices {\n");
+	tmpStr.Printf(wxT("\t\t%d"), NumTriangles);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	for (long i = 0; i < NumTriangles * 3; i += 3) {
+		tmpStr.Printf(wxT(",\n\t\t<%d, %d, %d>, %d, %d, %d"),
+					  i, i + 1, i + 2, i, i + 1, i + 2);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	}
+	Buffer->PutText("\n\t}\n");
+	Buffer->PutText("}\n");
+
+	delete[] transpTri;
+
+	return result;
+
+}
+
+/* ------------------------------------------------------------------------- */
+
 //Routine to sort a set of points into a set of triangles
 	//Definition of the triangle look-up table
 typedef struct {

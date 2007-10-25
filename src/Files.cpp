@@ -3936,7 +3936,7 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer) {
 	}
 }
 
-void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
+void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 
 	Frame *lFrame = MainData->GetCurrentFramePtr();
 	mpAtom *lAtoms = lFrame->Atoms;
@@ -3974,6 +3974,9 @@ void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
 					  "}\n\n"));
 	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 
+	Buffer->PutText("#declare AtomBondFinish = finish {specular 0.95 roughness 0.005}\n");
+	Buffer->PutText("#declare SurfaceFinish = finish {specular 0.95 roughness 0.001}\n\n");
+
 	Buffer->PutText("union {\n");
 	for (long iatom = 0; iatom < NumAtoms; iatom++) {
 		if (lAtoms[iatom].GetInvisibility()) continue;
@@ -3993,7 +3996,7 @@ void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
 		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		tmpStr.Printf(wxT("\ttexture {\n"
 						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
-						  "\t\tfinish {specular 0.95 roughness 0.005}\n"
+						  "\t\tfinish {AtomBondFinish}\n"
 						  "\t}\n"),
 					  red, green, blue);
 		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
@@ -4029,7 +4032,7 @@ void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
 		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		tmpStr.Printf(wxT("\ttexture {\n"
 						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
-						  "\t\tfinish {specular 0.95 roughness 0.005}\n"
+						  "\t\tfinish {AtomBondFinish}\n"
 						  "\t}\n"),
 					  red, green, blue);
 		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
@@ -4047,63 +4050,25 @@ void MolDisplayWin::WritePOVFile(BufferFile * Buffer) {
 		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		tmpStr.Printf(wxT("\ttexture {\n"
 						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
-						  "\t\tfinish {specular 0.95 roughness 0.005}\n"
+						  "\t\tfinish {AtomBondFinish}\n"
 						  "\t}\n"),
 					  red, green, blue);
 		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		Buffer->PutText("}\n\n");
 	}
 
+	// Export any surfaces.
 	Surface *lSurface = lFrame->SurfaceList;
-	if (false) {
-		Buffer->PutText("mesh2 {\n");
-		Buffer->PutText("\tvertex_vectors {\n");
-		tmpStr.Printf(wxT("\t\t3 * %d"), OpenGLData->triangleCount);
+	while (lSurface) {
+		tmpStr.Printf(_T("// "));
+		tmpStr.Append(wxString(lSurface->GetLabel(), wxConvUTF8));
+		tmpStr.Append(_T("\n"));
 		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-		for (long i = 0; i < OpenGLData->triangleCount; i++) {
-			tmpStr.Printf(wxT(",\n\t\t<%f, %f, %f>, <%f, %f, %f>, <%f, %f, %f>"),
-						  OpenGLData->transpTriList[i].v1.x,
-						  OpenGLData->transpTriList[i].v1.y,
-						  OpenGLData->transpTriList[i].v1.z,
-						  OpenGLData->transpTriList[i].v2.x,
-						  OpenGLData->transpTriList[i].v2.y,
-						  OpenGLData->transpTriList[i].v2.z,
-						  OpenGLData->transpTriList[i].v3.x,
-						  OpenGLData->transpTriList[i].v3.y,
-						  OpenGLData->transpTriList[i].v3.z);
-			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-		}
-		Buffer->PutText("\n\t}\n\n");
-		Buffer->PutText("\tnormal_vectors {\n");
-		tmpStr.Printf(wxT("\t\t3 * %d"), OpenGLData->triangleCount);
-		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-		for (long i = 0; i < OpenGLData->triangleCount; i++) {
-			tmpStr.Printf(wxT(",\n\t\t<%f, %f, %f>, <%f, %f, %f>, <%f, %f, %f>"),
-						  OpenGLData->transpTriList[i].n1.x,
-						  OpenGLData->transpTriList[i].n1.y,
-						  OpenGLData->transpTriList[i].n1.z,
-						  OpenGLData->transpTriList[i].n2.x,
-						  OpenGLData->transpTriList[i].n2.y,
-						  OpenGLData->transpTriList[i].n2.z,
-						  OpenGLData->transpTriList[i].n3.x,
-						  OpenGLData->transpTriList[i].n3.y,
-						  OpenGLData->transpTriList[i].n3.z);
-			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-		}
-		Buffer->PutText("\n\t}\n\n");
-		Buffer->PutText("\tface_indices {\n");
-		tmpStr.Printf(wxT("\t\t%d"), OpenGLData->triangleCount);
-		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-		for (long i = 0; i < OpenGLData->triangleCount; i++) {
-			tmpStr.Printf(wxT(",\n\t\t<%d, %d, %d>"),
-						  OpenGLData->transpIndex[i] + 0,
-						  OpenGLData->transpIndex[i] + 1,
-						  OpenGLData->transpIndex[i] + 2);
-			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-		}
-		Buffer->PutText("\n\t}\n");
-		Buffer->PutText("}\n");
+		lSurface->ExportPOV(MainData, Prefs, Buffer);
+		lSurface = lSurface->GetNextSurface();
 	}
+
+	// Now, transform scene to mimic current rotation and translation.
 	float *m = (float *) MainData->TotalRotation;
 	tmpStr.Printf(wxT("\n\tmatrix <%f, %f, %f,"
 			   		  "\n\t        %f, %f, %f,"

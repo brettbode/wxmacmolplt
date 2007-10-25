@@ -355,6 +355,12 @@ class Surf3DBase : public Surface {
 								RGBColor * NColor, float MaxSurfaceValue, MoleculeData * );
 			virtual long getTriangleCount(void) const {return (NumPosContourTriangles+NumNegContourTriangles);};
 #endif
+		/* virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer) { */
+		/* } */
+		long ExportPOVSurface(CPoint3D *Vertices, CPoint3D *Normals, long *VertexList,
+							  long NumTriangles, RGBColor *SurfaceColor, float *SurfaceValue,
+							  RGBColor *NegColor, float MaxSurfaceValue, MoleculeData *MainData,
+							  BufferFile *Buffer);
 		void SetupGridParameters(Frame * lFrame);
 		void Contour3DGrid(Progress * lProgress);
 		void AdjustSurfaceNormals(void);
@@ -399,6 +405,7 @@ class General3DSurface : public Surf3DBase {
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
 		virtual long getTriangleCount(void) const;
 #endif
+		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		inline void GetMaxColor(RGBColor *temp) const {*temp=PosColor;};
@@ -429,6 +436,7 @@ class TEDensity3DSurface : public Surf3DBase {
 #ifdef UseOpenGL
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
 #endif
+		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * progress);
@@ -523,6 +531,7 @@ class MEP3DSurface : public Surf3DBase {
 #ifdef UseOpenGL
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
 #endif
+		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMEPGrid(MoleculeData * MainData, Progress * progress);
@@ -548,6 +557,7 @@ class Orb3DSurface : public Surf3DBase, public OrbSurfBase {
 #ifdef UseOpenGL
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
 #endif
+		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * lProgress);
