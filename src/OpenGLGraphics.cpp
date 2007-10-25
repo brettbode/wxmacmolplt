@@ -4442,7 +4442,7 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 	
 	BondOrder logical_order = bond.Order;
 	if (logical_order == kHydrogenBond) {
-		DrawHydrogenBond(bond, atom1, atom2, Prefs, quadric, true);
+		DrawHydrogenBond(bond, atom1, atom2, Prefs, quadric, sphere_list, true);
 		return;
 	}
 
