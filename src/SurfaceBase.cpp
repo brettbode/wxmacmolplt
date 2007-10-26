@@ -1567,6 +1567,10 @@ long Surf3DBase::ExportPOVSurface(CPoint3D *Vertices, CPoint3D *Normals,
 								  RGBColor *NColor, float MaxSurfaceValue,
 								  MoleculeData *MainData, BufferFile *Buffer) {
 
+	if (!NumTriangles) {
+		return 0;
+	}
+
 	long v1, v2, v3, result = 0;
 	float alpha = 1.0, red, green, blue, xnorm, ynorm, znorm;
 	wxString tmpStr;
