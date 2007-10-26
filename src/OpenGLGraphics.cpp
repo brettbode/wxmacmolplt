@@ -30,12 +30,8 @@
 #else
 #include "MolDisplayWin.h"
 #include "mpGLCanvas.h"
+#include "mmp_gl.h"
 #include "glf.h"
-#ifdef __WXMAC__
-#include <AGL/glu.h>
-#else
-#include "GL/glu.h"
-#endif
 #endif
 
 #include "Prefs.h"

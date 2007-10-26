@@ -20,6 +20,8 @@
 #ifndef GLF_H
 #define GLF_H
 
+#include "mmp_gl.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
