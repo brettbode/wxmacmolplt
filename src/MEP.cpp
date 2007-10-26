@@ -26,6 +26,7 @@
 #ifdef __wxBuild__
 #include <wx/stopwatch.h>
 #endif
+#include <iostream>
 
 extern Boolean		gMPAware;
 extern long			gNumProcessors;
@@ -35,12 +36,11 @@ extern long			gNumProcessors;
 class AngularIndeces {
 	public:
 		short	x[kMaxAngularMomentum], y[kMaxAngularMomentum], z[kMaxAngularMomentum];
-
-	AngularIndeces(void);
+		AngularIndeces();
 };
 
 //setup arrays of x, y, z powers for each angular momenta (through g)
-AngularIndeces::AngularIndeces(void) {
+AngularIndeces::AngularIndeces() {
 	for (long i=0; i<kMaxAngularMomentum; i++)
 		x[i] = y[i] = z[i] = 0;
 	x[1] = y[2] = z[3] = 1;	//P x, y, z
@@ -378,7 +378,7 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 				
 				//Create the actual thread
 				myThreads[i] = new MEP3DThread(&(DataPtrs[i]));
-				myThreads[i]->Create(16*1024);
+				myThreads[i]->Create(32*1024);
 				//and fire it off, note my class is always a joinable thread so we will wait on it eventually
 				myThreads[i]->Run();
 			}
@@ -533,7 +533,7 @@ void TEDensity3DSurface::CalculateSurfaceValues(MoleculeData *lData, Progress * 
 			
 			//Create the actual thread
 			myThreads[i] = new TEDMEP3DThread(&(DataPtrs[i]));
-			myThreads[i]->Create(16*1024);
+			myThreads[i]->Create(32*1024);
 			//and fire it off, note my class is always a joinable thread so we will wait on it eventually
 			myThreads[i]->Run();
 		}
