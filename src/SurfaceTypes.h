@@ -184,6 +184,7 @@ class Surf2DBase : public Surface {
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
 		void Contour2DGrid3DGL(MoleculeData * lData, WinPrefs * Prefs);
 #endif
+		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 };
 class Surf3DBase : public Surface {
 	protected:
@@ -380,7 +381,7 @@ class General2DSurface : public Surf2DBase {
 #endif
 		virtual char * GetLabel(void) const;
 		virtual SurfaceType GetSurfaceType(void) const {return kGeneral2DSurface;};
-			//pick and read a file containing the 2D grid
+		//pick and read a file containing the 2D grid
 		void ReadGrid(const bool Square, const bool UseMult, const double & MultValue);
 		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;

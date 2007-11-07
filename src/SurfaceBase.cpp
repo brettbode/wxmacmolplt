@@ -533,8 +533,206 @@ void Surf2DBase::Contour2DGrid(MoleculeData * lData, long hoffset, long voffset,
 #endif	//end of wxBuild ifdef
 }
 
-/* member functions for the base 3D surface class */
+long Surf2DBase::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
+						   BufferFile *Buffer) {
+	// Scan the Grid producing the contours
+	float TestPoint1, TestPoint2, TestPoint3, TestPoint4, XGridValue, YGridValue, ZGridValue;
+	CPoint3D Contour[4];
+	Boolean HasPoint[4];
+	wxString tmpStr;
 
+	long NumPoints = NumGridPoints;
+	float * lGrid = Grid;
+	
+	CPoint3D	XGridMin, XGridInc, YGridInc;
+	XGridMin = Origin;
+	XGridInc = XInc;
+	YGridInc = YInc;
+
+	float ContourValueInc = MaxContourValue/(NumContours+1);
+	long NumPosContours = (long)(fabs(GridMax)/ContourValueInc) + 1;
+	long NumNegContours = (long)(fabs(GridMin)/ContourValueInc) + 1;
+	
+	CPoint3D lineStart, lineEnd;
+	float ContourValue = 0.0;
+	float lineWidth = Prefs->GetQD3DLineWidth();
+	long n;
+
+	if (lineWidth < 1e-6f) {
+		lineWidth = 0.005;
+	}
+
+	float color[3];
+	color[0] = color[1] = color[2] = 0.65f;
+	
+	// Go up to NumContours+1 to allow for the zero contour
+	for (long iContour = 0; iContour <= NumContours; iContour++) {
+		for (int pass = 0; pass < 2; pass++) {
+			if (iContour==0) {	//0 value contour
+				pass++;	//only need one 0 contour!
+				//Plot zero value contour only if requested
+				if (!(SurfOptions&1)) continue;
+			} else {
+				ContourValue *= -1.0;
+				if (pass==0) {
+					if (!ContourBothPosNeg()) continue;
+					if (iContour > NumNegContours) continue;
+					color[0] = NegColor.red / 65535.0f;
+					color[1] = NegColor.green / 65535.0f;
+					color[2] = NegColor.blue / 65535.0f;
+				} else {
+					if (iContour > NumPosContours) continue;
+					color[0] = PosColor.red / 65535.0f;
+					color[1] = PosColor.green / 65535.0f;
+					color[2] = PosColor.blue / 65535.0f;
+				}
+			}
+			n=NumGridPoints;
+			for (long i=1; i<NumPoints; i++) {
+				XGridValue = XGridMin.x + i*XGridInc.x;
+				YGridValue = XGridMin.y + i*XGridInc.y;
+				ZGridValue = XGridMin.z + i*XGridInc.z;
+				for (long j=1; j<NumPoints; j++) {
+					XGridValue += YGridInc.x;
+					YGridValue += YGridInc.y;
+					ZGridValue += YGridInc.z;
+					n++;
+					for (int i=0; i<4; i++) HasPoint[i]=false;
+					
+					TestPoint1 = lGrid[n]-ContourValue;
+					TestPoint2 = lGrid[n-1]-ContourValue;
+					TestPoint3 = lGrid[n-NumPoints]-ContourValue;
+					TestPoint4 = lGrid[n-1-NumPoints]-ContourValue;
+
+					if ((TestPoint1*TestPoint2)<0.0) {
+						HasPoint[0]=true;
+						Contour[0].x = XGridValue - YGridInc.x*(TestPoint1/(TestPoint1-TestPoint2));
+						Contour[0].y = YGridValue - YGridInc.y*(TestPoint1/(TestPoint1-TestPoint2));
+						Contour[0].z = ZGridValue - YGridInc.z*(TestPoint1/(TestPoint1-TestPoint2));
+					}
+					if ((TestPoint1*TestPoint3)<0.0) {
+						HasPoint[1]=true;
+						Contour[1].x = XGridValue - XGridInc.x*(TestPoint1/(TestPoint1-TestPoint3));
+						Contour[1].y = YGridValue - XGridInc.y*(TestPoint1/(TestPoint1-TestPoint3));
+						Contour[1].z = ZGridValue - XGridInc.z*(TestPoint1/(TestPoint1-TestPoint3));
+					}
+					if ((TestPoint2*TestPoint4)<0.0) {
+						HasPoint[2]=true;
+						Contour[2].x = XGridValue-YGridInc.x - XGridInc.x*(TestPoint2/(TestPoint2-TestPoint4));
+						Contour[2].y = YGridValue-YGridInc.y - XGridInc.y*(TestPoint2/(TestPoint2-TestPoint4));
+						Contour[2].z = ZGridValue-YGridInc.z - XGridInc.z*(TestPoint2/(TestPoint2-TestPoint4));
+					}
+					if ((TestPoint3*TestPoint4)<0.0) {
+						HasPoint[3]=true;
+						Contour[3].x = XGridValue-XGridInc.x - YGridInc.x*(TestPoint3/(TestPoint3-TestPoint4));
+						Contour[3].y = YGridValue-XGridInc.y - YGridInc.y*(TestPoint3/(TestPoint3-TestPoint4));
+						Contour[3].z = ZGridValue-XGridInc.z - YGridInc.z*(TestPoint3/(TestPoint3-TestPoint4));
+					}
+					
+					if (HasPoint[0]) {
+						lineStart = Contour[0];
+						if (HasPoint[1] || HasPoint[2]) {
+							if (HasPoint[1]) {
+								lineEnd = Contour[1];
+								tmpStr.Printf(wxT("cylinder {\n"
+												  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
+												  "   texture {\n"
+												  "      pigment {color rgb<%f, %f, %f>}\n"
+												  "      finish {SurfaceFinish}\n"
+												  "   }\n"
+												  "}\n"),
+											  lineStart.x, lineStart.y, lineStart.z,
+											  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
+											  color[0], color[1], color[2]);
+								Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+							}
+							if (HasPoint[2]) {
+								lineEnd = Contour[2];
+								tmpStr.Printf(wxT("cylinder {\n"
+												  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
+												  "   texture {\n"
+												  "      pigment {color rgb<%f, %f, %f>}\n"
+												  "      finish {SurfaceFinish}\n"
+												  "   }\n"
+												  "}\n"),
+											  lineStart.x, lineStart.y, lineStart.z,
+											  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
+											  color[0], color[1], color[2]);
+								Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+							}
+						} else if (HasPoint[3]) {
+							lineEnd = Contour[3];
+							tmpStr.Printf(wxT("cylinder {\n"
+											  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
+											  "   texture {\n"
+											  "      pigment {color rgb<%f, %f, %f>}\n"
+											  "      finish {SurfaceFinish}\n"
+											  "   }\n"
+											  "}\n"),
+										  lineStart.x, lineStart.y, lineStart.z,
+										  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
+										  color[0], color[1], color[2]);
+							Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+						}
+					}
+					if (HasPoint[1]) {
+						if (HasPoint[3]) {
+							lineStart = Contour[1];
+							lineEnd = Contour[3];
+							tmpStr.Printf(wxT("cylinder {\n"
+											  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
+											  "   texture {\n"
+											  "      pigment {color rgb<%f, %f, %f>}\n"
+											  "      finish {SurfaceFinish}\n"
+											  "   }\n"
+											  "}\n"),
+										  lineStart.x, lineStart.y, lineStart.z,
+										  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
+										  color[0], color[1], color[2]);
+							Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+						} else if (HasPoint[2] && !HasPoint[0]) {
+							lineStart = Contour[1];
+							lineEnd = Contour[2];
+							tmpStr.Printf(wxT("cylinder {\n"
+											  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
+											  "   texture {\n"
+											  "      pigment {color rgb<%f, %f, %f>}\n"
+											  "      finish {SurfaceFinish}\n"
+											  "   }\n"
+											  "}\n"),
+										  lineStart.x, lineStart.y, lineStart.z,
+										  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
+										  color[0], color[1], color[2]);
+							Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+						}
+					}
+					if (HasPoint[2]&&HasPoint[3]) {
+						lineStart = Contour[2];
+						lineEnd = Contour[3];
+						tmpStr.Printf(wxT("cylinder {\n"
+										  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
+										  "   texture {\n"
+										  "      pigment {color rgb<%f, %f, %f>}\n"
+										  "      finish {SurfaceFinish}\n"
+										  "   }\n"
+										  "}\n"),
+									  lineStart.x, lineStart.y, lineStart.z,
+									  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
+									  color[0], color[1], color[2]);
+						Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+					}
+				}
+				n++;
+			}
+		}
+		ContourValue += ContourValueInc;
+	}
+
+	return 0;
+
+}
+
+/* member functions for the base 3D surface class */
 Surf3DBase::Surf3DBase(WinPrefs * Prefs) {
 	ContourHndl = NULL;
 #ifdef UseHandles
