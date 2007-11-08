@@ -13,7 +13,9 @@ AM_MAINTAINER_MODE
 #
 AC_ARG_WITH([apple-opengl-framework],
             [AC_HELP_STRING([--with-apple-opengl-framework],
-                            [use Apple OpenGL framework (Mac OS X only)])])
+                            [use Apple OpenGL framework (Mac OS X only)])],
+            [],
+            [with_apple_opengl_framework=no])
 LIBGL=
 AS_IF([test "x$with_apple_opengl_framework" != xno],
       [AC_SUBST([LIBGL], ["-framework OpenGL"])])
