@@ -161,11 +161,7 @@ bool MpApp::OnInit() {
 	pathname += wxT("Resources");
 #endif
 #endif
-#ifdef __WXMSW__
-	vector_font = pathname + wxT("\\arial1.glf");
-#else
 	vector_font = pathname + wxT("/arial1.glf");
-#endif
 	if (glfLoadFont(vector_font.mb_str(wxConvUTF8)) < 0) {
 		std::ostringstream buf;
 		buf << "Warning: font file not found! This probably means wxmacmolplt is not "

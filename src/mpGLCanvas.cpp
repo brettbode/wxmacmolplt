@@ -101,13 +101,8 @@ void MpGLCanvas::initGL(void) {
 		pathname += wxT("Resources");
 #endif
 #endif
-#ifdef __WXMSW__
-		vector_font = pathname + wxT("\\arial1.glf");
-		bitmap_font = pathname + wxT("\\arial1.bmf");
-#else
 		vector_font = pathname + wxT("/arial1.glf");
 		bitmap_font = pathname + wxT("/arial1.bmf");
-#endif
 
 		if (glfLoadBMFFont(bitmap_font.mb_str(wxConvUTF8)) < 0) {
 			std::ostringstream buf;

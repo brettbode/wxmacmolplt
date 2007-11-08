@@ -376,11 +376,7 @@ void WinPrefs::ReadDefaultPrefs(void) {
 	pathname += wxT("Resources");
 #endif
 #endif
-#ifdef __WXMSW__
-	pathname += wxT("\\MacMolPlt.Prefs.xml");
-#else
 	pathname += wxT("/MacMolPlt.Prefs.xml");
-#endif
 	
 	FILE * preffile = fopen(pathname.mb_str(wxConvUTF8), "r");
 	if (preffile) {
