@@ -315,7 +315,7 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 	SetFilePos(EntryPos);
 	return Type;
 }
-long BufferFile::FindGroup(char * GroupName) {
+long BufferFile::FindGroup(const char * GroupName) {
 	long result = 0, InitialPos, LineStartPos;
 	char Line[kMaxLineLength];
 
@@ -601,7 +601,7 @@ long BufferFile::Write(const char * Source, long NumBytes) {
 	}
 	return NumBytes;
 }
-long BufferFile::WriteLine(Ptr text, bool NewLine) {
+long BufferFile::WriteLine(const char *text, bool NewLine) {
 	long nchar = strlen(text);
 	if (DoIt) {
 		if ((nchar+BufferPos)>(BufferSize-10)) {//Make sure there is room in the buffer

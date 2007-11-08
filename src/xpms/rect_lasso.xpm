@@ -1,5 +1,5 @@
 /* XPM */
-static char * rect_lasso_xpm[] = {
+static const char * rect_lasso_xpm[] = {
 "16 15 3 1",
 " 	c None",
 ".	c #000000",

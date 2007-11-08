@@ -1,5 +1,5 @@
 /* XPM */
-static char *sp_xpm[] = {
+static const char *sp_xpm[] = {
 /* columns rows colors chars-per-pixel */
 "288 419 256 2",
 "Z  c #B15709",

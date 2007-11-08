@@ -87,24 +87,24 @@ class BufferFile {
 		void SetFilePos(long NewPos);
 		inline long GetFileLength(void) {return ((ByteCount>GetFilePos())?ByteCount:GetFilePos());};
 		TextFileType GetFileType(const char * fileName);
-		long FindGroup(char * GroupName);
+		long FindGroup(const char * GroupName);
  		long Read(Ptr Target, long NumBytes);
  		long GetLine(char * Line);
 		long PutText(const char * Text);
 		void BackupnLines(long nBack);
 		void SkipnLines(long nSkip);
-		inline bool LocateKeyWord(char Keyword[], long NumByte) {return LocateKeyWord(Keyword, NumByte, -1);};
+		/* inline bool LocateKeyWord(char Keyword[], long NumByte) {return LocateKeyWord(Keyword, NumByte, -1);}; */
 			//Search the file for the specified keyword until found, EOF, or the limit is reached
 			//Returns true or false, the file position upon exit will be the start of the keyword,
 			//or the starting position if the keyword is not found.
-		bool LocateKeyWord(const char Keyword[], long NumByte, long Limit);
+		bool LocateKeyWord(const char Keyword[], long NumByte, long Limit = -1);
 		long FindBlankLine(void);
 		long GetNumLines(long size);
  		long BufferSkip(long NumBytes);
  		inline void SetColsPerLine(short newVal) {ColsPerLine = newVal;};
  		inline float GetPercentRead(void) {return (float) 100.0*GetFilePos()/GetFileLength();};
  		long Write(const char * Source, long NumBytes);
-		long WriteLine(Ptr text, bool newline);
+		long WriteLine(const char *text, bool newline);
  		bool SetOutput(bool State);
  		bool GetOutput(void);
  		void AbnormalCleanup(void);
