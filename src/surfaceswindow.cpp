@@ -348,10 +348,14 @@ void SurfacesWindow::OnDeleteClick( wxCommandEvent& event ) {
 	Frame * lFrame = mData->GetCurrentFramePtr();
 	
 	int targetSurf = book->GetSelection();
+	if (targetSurf == wxNOT_FOUND) {
+		return;
+	}
+
 	lFrame->DeleteSurface(targetSurf);
 	book->DeletePage(targetSurf);
 	Parent->UpdateModelDisplay();
-	if (book->GetPageCount()<= 0) {
+	if (book->GetPageCount() <= 0) {
 		visibleCheck->Disable();
 		allFrameCheck->Disable();
 #if wxCHECK_VERSION(2, 8, 0)
