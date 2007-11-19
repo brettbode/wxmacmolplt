@@ -342,7 +342,8 @@ class MolDisplayWin : public wxFrame {
 		void menuEditSelect_all(wxCommandEvent &event);
 		void menuEditSelectNone(wxCommandEvent &event);
 		/// wxEVT_UPDATE_UI event handler for selection changes
-		void OnSelectionUpdate( wxUpdateUIEvent& event );
+		void OnSelectionUpdate(wxUpdateUIEvent& event);
+		void OnDeleteUpdate(wxUpdateUIEvent& event);
 
 		void menuViewShowFullScreen(wxCommandEvent &event);
 		void menuViewShowNormalMode(wxCommandEvent &event);

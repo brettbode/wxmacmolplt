@@ -200,6 +200,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (wxID_PASTE,           MolDisplayWin::menuEditPaste)
 	EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
 	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
+	EVT_UPDATE_UI(wxID_CLEAR,       MolDisplayWin::OnDeleteUpdate)
 	EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
 	EVT_MENU (MMP_SELECT_NONE,		MolDisplayWin::menuEditSelectNone)
 	EVT_UPDATE_UI(MMP_SELECT_NONE,	MolDisplayWin::OnSelectionUpdate)
@@ -755,7 +756,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuEdit->Enable(wxID_CUT, false);
 	menuEdit->Enable(wxID_COPY, false);
 	menuEdit->Enable(MMP_COPYCOORDS, false);
-	menuEdit->Enable(wxID_CLEAR, false);
+	/* menuEdit->Enable(wxID_CLEAR, false); */
 
 	menuView->Enable(MMP_SHOWMODE, false);
 	menuView->Enable(MMP_ANIMATEMODE, false);
@@ -894,6 +895,15 @@ void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event ) {
 void MolDisplayWin::OnSelectionUpdate(wxUpdateUIEvent& event) {
 	menuEdit->Enable(wxID_CLEAR, mHighliteState && InEditMode());
 	event.Enable(MainData->cFrame->GetNumAtomsSelected() > 0);
+}
+
+/**
+ * Handles enable/disabling of the Edit -> Delete menu item.  The menu item is
+ * enabled when highlighting is in effect and we're in edit mode.
+ * @param event The update event.
+ **/
+void MolDisplayWin::OnDeleteUpdate(wxUpdateUIEvent& event) {
+	event.Enable(mHighliteState && InEditMode());
 }
 
 void MolDisplayWin::OnAnnotationMarkUpdate( wxUpdateUIEvent& event ) {
@@ -2052,6 +2062,7 @@ void MolDisplayWin::menuEditClear(wxCommandEvent &event) {
 void MolDisplayWin::menuEditSelect_all(wxCommandEvent &event) {
 
 	// Select each atom in the current frame and update.
+	SetHighliteMode(true);
 	for (int i = 0; i < MainData->cFrame->NumAtoms; i++) {
 		MainData->cFrame->SetAtomSelection(i, true);
 	}
