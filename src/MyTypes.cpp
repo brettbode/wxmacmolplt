@@ -65,12 +65,18 @@ void AnnotationLength::setParam(Frame& frame, float value) {
 	Normalize3D(&vec);
 	vec = (pt1 + vec * value) - pt2;
 
-	if (!frame.GetAtomSelection(atoms[0])) {
-		for (int i = 0; i < frame.GetNumAtoms(); i++) {
-			if (frame.GetAtomSelection(i)) {
-				frame.GetAtomPosition(i, pt1);
-				frame.SetAtomPosition(i, pt1 + vec);
-			}
+	// The first atom must stay put for the annotation adjustment to be of any
+	// merit.  So, we deselect it explicitly, which may surprise the user.
+	// I think this is what the user would really want, however.  We also
+	// select the second atom explicitly, 'cuz this is the atom that should
+	// move.
+	frame.SetAtomSelection(atoms[0], false);
+	frame.SetAtomSelection(atoms[1], true);
+
+	for (int i = 0; i < frame.GetNumAtoms(); i++) {
+		if (frame.GetAtomSelection(i)) {
+			frame.GetAtomPosition(i, pt1);
+			frame.SetAtomPosition(i, pt1 + vec);
 		}
 	}
 
@@ -177,7 +183,6 @@ float AnnotationAngle::getParam(const Frame& frame) const {
 
 }
 
-#include <iostream>
 void AnnotationAngle::setParam(Frame& frame, float value) {
 
 	// This function sets exactly the angle between the three atoms of this
@@ -216,14 +221,23 @@ void AnnotationAngle::setParam(Frame& frame, float value) {
 
 	RotateAroundAxis(rotate, normal, angle_diff);
 
-	if (!frame.GetAtomSelection(atoms[0])) {
-		for (int i = 0; i < frame.GetNumAtoms(); i++) {
-			if (frame.GetAtomSelection(i)) {
-				frame.GetAtomPosition(i, pt3);
-				vec2 = pt3 - pt2;
-				Rotate3DPt(rotate, vec2, &new_vec);
-				frame.SetAtomPosition(i, pt2 + new_vec);
-			}
+	// The first atom must stay put for the annotation adjustment to be of any
+	// merit.  So, we deselect it explicitly, which may surprise the user.
+	// I think this is what the user would really want, however.  We also
+	// select the third atom explicitly, 'cuz this is the atom that should
+	// move.  The second atom, the vertex of the angle, doesn't need to be
+	// selected though it shouldn't hurt if it is since it is the origin of
+	// the rotation.
+	frame.SetAtomSelection(atoms[0], false);
+	frame.SetAtomSelection(atoms[1], false);
+	frame.SetAtomSelection(atoms[2], true);
+
+	for (int i = 0; i < frame.GetNumAtoms(); i++) {
+		if (frame.GetAtomSelection(i)) {
+			frame.GetAtomPosition(i, pt3);
+			vec2 = pt3 - pt2;
+			Rotate3DPt(rotate, vec2, &new_vec);
+			frame.SetAtomPosition(i, pt2 + new_vec);
 		}
 	}
 
@@ -380,19 +394,21 @@ void AnnotationDihedral::setParam(Frame& frame, float value) {
 	// form of the vector between them.
 	// frame.SetAtomPosition(atoms[3], atom3_pos + rotated_vec); 
 
+	frame.SetAtomSelection(atoms[0], false);
+	frame.SetAtomSelection(atoms[1], false);
+	frame.SetAtomSelection(atoms[2], false);
+	frame.SetAtomSelection(atoms[3], true);
+
 	CPoint3D new_vec;
-	if (!frame.GetAtomSelection(atoms[0]) &&
-		!frame.GetAtomSelection(atoms[1]) &&
-		!frame.GetAtomSelection(atoms[2])) {
-		for (int i = 0; i < frame.GetNumAtoms(); i++) {
-			if (frame.GetAtomSelection(i)) {
-				frame.GetAtomPosition(i, pt);
-				vec2 = pt - atom3_pos;
-				Rotate3DPt(rotate, vec2, &new_vec);
-				frame.SetAtomPosition(i, atom3_pos + new_vec);
-			}
+	for (int i = 0; i < frame.GetNumAtoms(); i++) {
+		if (frame.GetAtomSelection(i)) {
+			frame.GetAtomPosition(i, pt);
+			vec2 = pt - atom3_pos;
+			Rotate3DPt(rotate, vec2, &new_vec);
+			frame.SetAtomPosition(i, atom3_pos + new_vec);
 		}
 	}
+
 }
 
 /*void mpAtom::SetDefaultHybridization(void) {

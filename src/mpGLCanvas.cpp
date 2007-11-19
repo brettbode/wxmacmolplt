@@ -508,6 +508,12 @@ void MpGLCanvas::draw(void) {
 		initGL();
 		UpdateGLView();
 	}
+		
+	/* static int ii = 0; */
+	/* glTranslatef((2 * ii - 1) / 50.0f, 0.0f, 0.0f); */
+	/* std::cout << "2 * ii - 1: " << 2 * ii - 1 << std::endl; */
+	/* ii = (ii + 1) % 2; */
+
 	glfSetCurrentBMFFont(bitmap_fontd);
 	//Only do the drawing if there is not an operation in progress
 	//otherwise the underlying data may not be complete.
@@ -646,7 +652,7 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
 			// really mess up the goal of constrained movement, since this atom
 			// serves as the basis for the constraints.
 			vertex_id = anno->getAtom(1);
-			if (selected == vertex_id || lFrame->GetAtomSelection(vertex_id)) {
+			if (selected == vertex_id) {
 				return;
 			}
 
@@ -668,6 +674,10 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
 
 			CPoint3D vec_old;
 
+			if (lFrame->GetAtomSelection(vertex_id)) {
+				lFrame->SetAtomSelection(vertex_id, false);
+			}
+
 			// We want to find the distance between the vertex atom and the
 			// one clicked on.  That distance will serve as the radius of
 			// the circle whose circumference the atom will follow.  If the
@@ -677,13 +687,13 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
 			if (selected == atom1_id) {
 				radius = vec1.Magnitude();
 				if (lFrame->GetAtomSelection(atom2_id)) {
-					return;
+					lFrame->SetAtomSelection(atom2_id, false);
 				}
 				vec_old = CPoint3D(vec1);
 			} else {
 				radius = vec2.Magnitude();
 				if (lFrame->GetAtomSelection(atom1_id)) {
-					return;
+					lFrame->SetAtomSelection(atom1_id, false);
 				}
 				vec_old = CPoint3D(vec2);
 			}
@@ -779,17 +789,11 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
 			// its the second or third atom being shifted, then we impose
 			// no constraints.
 			if (selected == anno->getAtom(0)) {
-				if (lFrame->GetAtomSelection(anno->getAtom(3))) {
-					return;
-				}
 				atom1_id = anno->getAtom(0);
 				atom2_id = anno->getAtom(1);
 				atom3_id = anno->getAtom(2);
 				atom4_id = anno->getAtom(3);
 			} else if (selected == anno->getAtom(3)) {
-				if (lFrame->GetAtomSelection(anno->getAtom(0))) {
-					return;
-				}
 				atom1_id = anno->getAtom(3);
 				atom2_id = anno->getAtom(2);
 				atom3_id = anno->getAtom(1);
@@ -798,10 +802,10 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
 				return;
 			}
 
-			if (lFrame->GetAtomSelection(atom2_id) ||
-				lFrame->GetAtomSelection(atom3_id)) {
-				return;
-			}
+			/* lFrame->SetAtomSelection(atom1_id, true); */
+			lFrame->SetAtomSelection(atom2_id, false);
+			lFrame->SetAtomSelection(atom3_id, false);
+			lFrame->SetAtomSelection(atom4_id, false);
 
 			// This process is essentially an adaptation of the angle
 			// annotation constraint.  The difference is that the circle is
@@ -2943,7 +2947,7 @@ void MpGLCanvas::eventMouseCaptureLost(wxMouseCaptureLostEvent& event) {
 #endif
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
-	// EVT_IDLE(MpGLCanvas::OnIdleEvent) 
+	/* EVT_IDLE(MpGLCanvas::OnIdleEvent)  */
 	EVT_SIZE(MpGLCanvas::eventSize)
 	EVT_PAINT(MpGLCanvas::eventPaint)
 	EVT_ERASE_BACKGROUND(MpGLCanvas::eventErase)
