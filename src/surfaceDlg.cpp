@@ -279,9 +279,9 @@ void BaseSurfacePane::OnExport( wxCommandEvent &event ) {
 	FILE *currFile = NULL;
 	BufferFile *buffer = NULL;
 
-	wxString filePath = wxFileSelector(wxT("Export As"), wxT(""), wxT(""), wxT(""),
-									 wxT(""),
-									 wxSAVE | wxOVERWRITE_PROMPT, owner);
+	wxString filePath = wxFileSelector(wxT("Export As"), wxT(""), wxT(""),
+									   wxT(""), wxT("*.*"),
+									   wxSAVE | wxOVERWRITE_PROMPT, owner);
 
 	if(!filePath.IsEmpty()) {
 		if((currFile = fopen(filePath.mb_str(wxConvUTF8), "wb")) == NULL) {
