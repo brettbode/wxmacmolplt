@@ -442,14 +442,25 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	Show(true);
 	AdjustMenus();
 
-	unsigned char texture[8] = {255, 0, 0, 255, 255, 0, 0, 255};
+	unsigned char texture[16 * 8] = {
+		255,   0,   0,   0, 0, 0, 0, 0, 255,   0,   0,   0, 0, 0, 0, 0,
+		255, 255,   0,   0, 0, 0, 0, 0, 255, 255,   0,   0, 0, 0, 0, 0,
+		255, 255, 255,   0, 0, 0, 0, 0, 255, 255, 255,   0, 0, 0, 0, 0,
+		255, 255, 255, 255, 0, 0, 0, 0, 255, 255, 255, 255, 0, 0, 0, 0,
+		255, 255, 255, 255, 0, 0, 0, 0, 255, 255, 255, 255, 0, 0, 0, 0,
+		255, 255, 255,   0, 0, 0, 0, 0, 255, 255, 255,   0, 0, 0, 0, 0,
+		255, 255,   0,   0, 0, 0, 0, 0, 255, 255,   0,   0, 0, 0, 0, 0,
+		255,   0,   0,   0, 0, 0, 0, 0, 255,   0,   0,   0, 0, 0, 0, 0
+	};
+
 	glGenTextures(1, &(OpenGLData->length_anno_tex_id));
-	glBindTexture(GL_TEXTURE_1D, OpenGLData->length_anno_tex_id);
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage1D(GL_TEXTURE_1D, 0, GL_ALPHA, 8, 0, GL_ALPHA,
-		GL_UNSIGNED_BYTE, texture);
+	glBindTexture(GL_TEXTURE_2D, OpenGLData->length_anno_tex_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 16, 8, 0, GL_ALPHA,
+				 GL_UNSIGNED_BYTE, texture);
 }
 
 MolDisplayWin::~MolDisplayWin() {

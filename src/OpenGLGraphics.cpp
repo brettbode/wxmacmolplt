@@ -65,9 +65,10 @@ extern Boolean	gOpenGLAvailable;
 //#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
 
 void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, float m[16],
-						const CPoint3D& x_world, float offset, GLuint length_anno_tex_id, const WinPrefs * Prefs);
+						const CPoint3D& x_world, float offset, GLuint length_anno_tex_id, const WinPrefs * Prefs, bool draw_label = true);
 void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
-						 const CPoint3D *pt3, const WinPrefs * Prefs);
+						 const CPoint3D *pt3, const WinPrefs *Prefs,
+						 GLuint length_anno_tex_id);
 void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd,
 							float lineWidth, int nslices = 4, int nstacks = 1, bool cap = false);
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order);
@@ -827,6 +828,7 @@ void MolDisplayWin::DrawGL(void) {
 	if (MainData->GetAnnotationCount() > 0) {
 		glLoadName(MMP_ANNOTATION);
 		glPushName(0);
+		glDisable(GL_LIGHTING);
 		std::vector<Annotation *>::const_iterator anno;
 		int anno_id = 0;
 		for (anno = MainData->Annotations.begin();
@@ -836,7 +838,9 @@ void MolDisplayWin::DrawGL(void) {
 			(*anno)->draw(this);
 			anno_id++;
 		}
+		glDisable(GL_BLEND);
 		glPopName();
+		glDisable(GL_LIGHTING);
 	}
 	
 	// Add any surfaces
@@ -1085,25 +1089,24 @@ void AnnotationLength::draw(const MolDisplayWin * win) const {
 }
 
 void AnnotationAngle::draw(const MolDisplayWin * win) const {
-	MoleculeData * maindata = win->GetData();
-	Frame * cFrame = maindata->GetCurrentFramePtr();
 
-	//validate the atom references for this frame
+	MoleculeData *maindata = win->GetData();
+	Frame *cFrame = maindata->GetCurrentFramePtr();
+
+	// Validate the atom references for this frame
 	if ((atoms[0] < 0)||(atoms[0] >= cFrame->GetNumAtoms())) return;
 	if ((atoms[1] < 0)||(atoms[1] >= cFrame->GetNumAtoms())) return;
 	if ((atoms[2] < 0)||(atoms[2] >= cFrame->GetNumAtoms())) return;
 
 	CPoint3D atom1_pos, atom2_pos, atom3_pos;
 
-	glDisable(GL_LIGHTING);
-	// glColor3f(0.0f, 0.0f, 0.0f);
-
 	cFrame->GetAtomPosition(atoms[0], atom1_pos);
 	cFrame->GetAtomPosition(atoms[1], atom2_pos);
 	cFrame->GetAtomPosition(atoms[2], atom3_pos);
 	
-	DrawAngleAnnotation(&atom1_pos, &atom2_pos, &atom3_pos, win->GetPrefs());
-	glEnable(GL_LIGHTING);
+	DrawAngleAnnotation(&atom1_pos, &atom2_pos, &atom3_pos, win->GetPrefs(),
+						win->GetLengthTexId());
+
 }
 
 void AnnotationDihedral::draw(const MolDisplayWin * win) const {
@@ -1129,8 +1132,6 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	Matrix4D plane2xy;
 	float angle;
 	GLuint stipple_tex;
-	
-	glDisable(GL_LIGHTING);
 	
 	glColor3f(0.0f, 0.0f, 0.0f);
 		
@@ -1224,9 +1225,9 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	glDisable(GL_BLEND);
 
 	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-	DrawAngleAnnotation(&pt1, &atom3_pos, &pt3, win->GetPrefs());
+	DrawAngleAnnotation(&pt1, &atom3_pos, &pt3, win->GetPrefs(),
+						win->GetLengthTexId());
 	
-	glEnable(GL_LIGHTING);
 }
 
 void AnnotationMarker::draw(const MolDisplayWin * win) const {
@@ -2947,14 +2948,14 @@ void DashedQuadFromLine(const CPoint3D& pt1,
 						const CPoint3D& pt2, float width, float m[16],
 						const CPoint3D& x_world, float offset,
 						GLuint length_anno_tex_id,
-						const WinPrefs * Prefs) {
+						const WinPrefs * Prefs, bool draw_label) {
 
 	float len;
 	GLdouble scr_coords1[3];  // Screen coordinates of pt1
 	GLdouble scr_coords2[3];  // Screen coordinates of pt2
-	CPoint3D scr_vec;			// Screen space vector between atoms
+	CPoint3D scr_vec;		  // Screen space vector between atoms
 	GLdouble perp_obj[3];	  // Object coords on vector perp. to scr_vec
-	CPoint3D offset_vec;		// Direction to shift bond cylinders
+	CPoint3D offset_vec;	  // Direction to shift bond cylinders
 	GLdouble modelview[16];
 	GLdouble proj[16];
 	GLint viewport[4];
@@ -2974,7 +2975,7 @@ void DashedQuadFromLine(const CPoint3D& pt1,
 	// Find vector perpendicular to vector between two screen points and
 	// normalize it so we can scalar multiply it later.  We flip and 
 	// negate the slope of the line between the two screen coordinates to
-	// get the slop of the perpendicular line.
+	// get the slope of the perpendicular line.
 	scr_vec.x = scr_coords2[1] - scr_coords1[1];
 	scr_vec.y = scr_coords1[0] - scr_coords2[0];
 	scr_vec.z = 0;
@@ -3015,53 +3016,53 @@ void DashedQuadFromLine(const CPoint3D& pt1,
 	new_pt2b.y = pt2.y - offset_vec.y * width;
 	new_pt2b.z = pt2.z - offset_vec.z * width;
 
-	glDisable(GL_LIGHTING);
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.5f);
 
-	glBindTexture(GL_TEXTURE_1D, length_anno_tex_id);
-
-	glEnable(GL_TEXTURE_1D);
+	glBindTexture(GL_TEXTURE_2D, length_anno_tex_id);
+	glEnable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
-		glTexCoord1f(0.0f);
+		glTexCoord2f(0.0f, 1.0f);
 		glVertex3f(new_pt1a.x, new_pt1a.y, new_pt1a.z);
+		glTexCoord2f(0.0f, 0.0f);
 		glVertex3f(new_pt1b.x, new_pt1b.y, new_pt1b.z);
-		glTexCoord1f(len / 0.1f);
+		glTexCoord2f(len / 0.1f, 0.0f);
 		glVertex3f(new_pt2b.x, new_pt2b.y, new_pt2b.z);
+		glTexCoord2f(len / 0.1f, 1.0f);
 		glVertex3f(new_pt2a.x, new_pt2a.y, new_pt2a.z);
 	glEnd();
-	glDisable(GL_TEXTURE_1D);
+	glDisable(GL_TEXTURE_2D);
 	glDisable(GL_ALPHA_TEST);
 
-	char len_label[40];
-	float LabelSize = Prefs->GetAnnotationLabelSize();
+	if (draw_label) {
+		char len_label[40];
+		float LabelSize = Prefs->GetAnnotationLabelSize();
 
-	// We move the midpoint of the line and align the viewer to draw the 
-	// text.
-	glPushMatrix();
-	glTranslatef((pt1.x + pt2.x) / 2.0f,
-					(pt1.y + pt2.y) / 2.0f,
-					(pt1.z + pt2.z) / 2.0f);
-	glMultMatrixf(m);
+		// We move the midpoint of the line and align the viewer to draw the 
+		// text.
+		glPushMatrix();
+		glTranslatef((pt1.x + pt2.x) / 2.0f,
+						(pt1.y + pt2.y) / 2.0f,
+						(pt1.z + pt2.z) / 2.0f);
+		glMultMatrixf(m);
 
-	// Move out for the kind of bond that exists between the atoms.
-	glTranslatef(-offset - 0.01f, 0.0f, 0.0f);
+		// Move out for the kind of bond that exists between the atoms.
+		glTranslatef(-offset - 0.01f, 0.0f, 0.0f);
 
-	glScalef(-5.0f * LabelSize, 5.0f * LabelSize, 0.1f);
-	
-	// This apparently is some magic number.  GLF doesn't start drawing the
-	// string at the origin, doesn't consider the anchor point, and doesn't
-	// consider the bounding box it returns.  So, we have a magic number.  It
-	// is indirectly dependent on LabelSize from the scaling above, so it looks
-	// constant even though it is not.
-	glTranslatef(0.004f, 0.0f, 0.0f);
+		glScalef(-5.0f * LabelSize, 5.0f * LabelSize, 0.1f);
+		
+		// This apparently is some magic number.  GLF doesn't start drawing the
+		// string at the origin, doesn't consider the anchor point, and doesn't
+		// consider the bounding box it returns.  So, we have a magic number.
+		// It is indirectly dependent on LabelSize from the scaling above, so
+		// it looks constant even though it is not.
+		glTranslatef(0.004f, 0.0f, 0.0f);
 
-	sprintf(len_label, "%.6f", len);
+		sprintf(len_label, "%.2f", len);
+		DrawString(len_label);
 
-	DrawString(len_label);
-
-	glEnable(GL_LIGHTING);
-	glPopMatrix();
+		glPopMatrix();
+	}
 
 }
 
@@ -3330,7 +3331,8 @@ void DrawArrow(const float & length, const float & width, const int & quality) {
 }
 
 void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
-		const CPoint3D *pt3, const WinPrefs * Prefs) {
+						 const CPoint3D *pt3, const WinPrefs *Prefs,
+						 GLuint length_anno_tex_id) {
 
 	// This draws a dashed angle between the three specified points and
 	// marks the angle's degrees with a text label.  The angle goes from
@@ -3411,63 +3413,45 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 	y_eye[2] = m[9];
 
 	// How long should each dash be, and how often do we want them?
-	chord_len = 0.02f;
-	delta = 0.125 / min_len;
+	chord_len = 0.1f;
+	delta = acos((2 * min_len * min_len - chord_len * chord_len) /
+				 (2 * min_len * min_len));
 
-	glBegin(GL_QUADS);
+	/* glBegin(GL_QUADS); */
 
 	float ca = cos(angle);
 	float sa = sin(angle);
 
+	GLdouble BondSize = Prefs->GetQD3DBondWidth();
+	CPoint3D origin(0.0f, 0.0f, 0.0f);
+
 	// First we draw the dashes along each side.
-	for (float i = 0.0f; i <= min_len; i += delta) {
+	DashedQuadFromLine(origin, CPoint3D(min_len, 0.0f, 0.0f),
+					   BondSize * 0.25f, m,
+					   CPoint3D(x_eye[0], x_eye[1], x_eye[2]),
+					   0.0f, length_anno_tex_id, Prefs, false);
+	DashedQuadFromLine(CPoint3D(min_len * ca, min_len * sa, 0.0f), origin,
+					   BondSize * 0.25f, m,
+					   CPoint3D(x_eye[0], x_eye[1], x_eye[2]),
+					   0.0f, length_anno_tex_id, Prefs, false);
 
-		// One vector/side looks like the x-axis, so this one's pretty simple.
-		// We just step along the x-axis.
-		glVertex3f(i - (x_eye[0] + y_eye[0]) * chord_len,
-					 - (x_eye[1] + y_eye[1]) * chord_len,
-					 - (x_eye[2] + y_eye[2]) * chord_len);
-		glVertex3f(i + (x_eye[0] - y_eye[0]) * chord_len,
-					   (x_eye[1] - y_eye[1]) * chord_len,
-					   (x_eye[2] - y_eye[2]) * chord_len);
-		glVertex3f(i + (x_eye[0] + y_eye[0]) * chord_len,
-					   (x_eye[1] + y_eye[1]) * chord_len,
-					   (x_eye[2] + y_eye[2]) * chord_len);
-		glVertex3f(i - (x_eye[0] - y_eye[0]) * chord_len,
-					 - (x_eye[1] - y_eye[1]) * chord_len,
-					 - (x_eye[2] - y_eye[2]) * chord_len);
+	// Then we draw a series of chords that approximates the angle's arc.
+	float next_delta;
+	for (float i = 0.0f; i < angle; i += delta) {
 
-		// The other looks like it has an endpoint at (cos(angle), sin(angle)),
-		// so we step along that vector.
-		glVertex3f(i * ca - (x_eye[0] + y_eye[0]) * chord_len,
-				   i * sa - (x_eye[1] + y_eye[1]) * chord_len,
-						  - (x_eye[2] + y_eye[2]) * chord_len);
-		glVertex3f(i * ca + (x_eye[0] - y_eye[0]) * chord_len,
-				   i * sa + (x_eye[1] - y_eye[1]) * chord_len,
-							(x_eye[2] - y_eye[2]) * chord_len);
-		glVertex3f(i * ca + (x_eye[0] + y_eye[0]) * chord_len,
-				   i * sa + (x_eye[1] + y_eye[1]) * chord_len,
-							(x_eye[2] + y_eye[2]) * chord_len);
-		glVertex3f(i * ca - (x_eye[0] - y_eye[0]) * chord_len,
-				   i * sa - (x_eye[1] - y_eye[1]) * chord_len,
-						  - (x_eye[2] - y_eye[2]) * chord_len);
+		// We want the chord to go from the current slice of the pie to the
+		// next, but since the slice angle is constant and the anno angle may
+		// not be a multiple of the slice angle, we don't want to overshoot the
+		// anno angle.  Also, we subtract off an epsilon so that the texture 
+		// doesn't start to repeat.
+		next_delta = MIN(i + delta, angle) - 0.01f;
+
+		DashedQuadFromLine(CPoint3D(min_len * cos(i), min_len * sin(i), 0.0f),
+						   CPoint3D(min_len * cos(next_delta), min_len * sin(next_delta), 0.0f),
+						   BondSize * 0.25f, m,
+						   CPoint3D(x_eye[0], x_eye[1], x_eye[2]),
+						   0.0f, length_anno_tex_id, Prefs, false);
 	}
-
-	for (float i = 0.0f; i <= angle; i += delta) {
-		glVertex3f(min_len * cos(i) - (x_eye[0] + y_eye[0]) * chord_len,
-				   min_len * sin(i) - (x_eye[1] + y_eye[1]) * chord_len,
-									- (x_eye[2] + y_eye[2]) * chord_len);
-		glVertex3f(min_len * cos(i) + (x_eye[0] - y_eye[0]) * chord_len,
-				  min_len * sin(i) + (x_eye[1] - y_eye[1]) * chord_len,
-									(x_eye[2] - y_eye[2]) * chord_len);
-		glVertex3f(min_len * cos(i) + (x_eye[0] + y_eye[0]) * chord_len,
-				  min_len * sin(i) + (x_eye[1] + y_eye[1]) * chord_len,
-									(x_eye[2] + y_eye[2]) * chord_len);
-		glVertex3f(min_len * cos(i) - (x_eye[0] - y_eye[0]) * chord_len,
-				  min_len * sin(i) - (x_eye[1] - y_eye[1]) * chord_len,
-								 - (x_eye[2] - y_eye[2]) * chord_len);
-	}
-	glEnd();
 
 	CPoint3D lookat_eye = CPoint3D(0.0f, 0.0f, 1.0f);
 	CPoint3D up_eye = CPoint3D(0.0f, 1.0f, 0.0f);
