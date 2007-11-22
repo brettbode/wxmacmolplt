@@ -777,15 +777,14 @@ void EnergyPrefsPane::OnRadio( wxCommandEvent& event )
   mRightBottomSizer->Hide(mRight1BottomSizer);
   mRightBottomSizer->Hide(mRight2BottomSizer);
 
-  if ( tmpStr.Cmp(_T("Bond Length")) == 0 || tmpStr.Cmp(_T("Bond Angle")) == 0)
-    {
-      mRightBottomSizer->Show(mRight1BottomSizer, true, true);
+	if ( tmpStr.Cmp(_T("Bond Length")) == 0 || tmpStr.Cmp(_T("Bond Angle")) == 0) {
+		mRightBottomSizer->Show(mRight1BottomSizer, true, true);
 
-      if (tmpStr.Cmp(_T("Bond Angle")) == 0 )
-	mRightBottomSizer->Show(mRight2BottomSizer, true, true);
+		if (tmpStr.Cmp(_T("Bond Angle")) == 0 )
+			mRightBottomSizer->Show(mRight2BottomSizer, true, true);
 
-      mRightBottomSizer->Layout();
-    }
+ 		mMainSizer->Layout();
+	}
 
   EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
   GraphOptions * lPOpts = mTargetPrefs->GetGraphOptions();
