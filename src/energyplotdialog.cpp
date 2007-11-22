@@ -191,13 +191,13 @@ void EnergyPlotDialog::RegenData(void) {
     vector< pair< int, double > > kineticEnergyData;
     vector< pair< int, double > > rmsGradData;
     vector< pair< int, double > > maxGradData;
-    //vector< pair< int, double > > bondLenData;
-    //vector< pair< int, double > > bondAngleData;
+    vector< pair< int, double > > bondLenData;
+    vector< pair< int, double > > bondAngleData;
     Frame *currFrame = NULL;
     float temp;
-    //long atom1 = 0;
-    //long atom2 = 0;
-    //long atom3 = 0;
+    long atom1 = gOpts->Get1stAtom();
+    long atom2 = gOpts->Get2ndAtom();
+    long atom3 = gOpts->Get3rdAtom();
     int i = 0;
     int size = (int)(eOpts->GetEPlotPointSize());
 
@@ -212,8 +212,12 @@ void EnergyPlotDialog::RegenData(void) {
         kineticEnergyData.push_back(make_pair(i, currFrame->KE));
         if(currFrame->Gradient != NULL) rmsGradData.push_back(make_pair(i, (double)(currFrame->Gradient->GetRMS())));
         if(currFrame->Gradient != NULL) maxGradData.push_back(make_pair(i, (double)(currFrame->Gradient->GetMaximum())));
-        //bondLenData.push_back(make_pair(i, ));
-        //bondAngleData.push_back(make_pair(i, ));
+		float length;
+		if (currFrame->GetBondLength(atom1, atom2, &length))
+			bondLenData.push_back(make_pair(i, length));
+		float angle;
+ 		if (currFrame->GetBondAngle(atom1, atom2, atom3, &angle))
+			bondAngleData.push_back(make_pair(i, angle));
     }
     epGraph->addXSet(xSetData, true);
     
@@ -223,6 +227,8 @@ void EnergyPlotDialog::RegenData(void) {
     epGraph->addYSet(kineticEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
     epGraph->addYSet(rmsGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
     epGraph->addYSet(maxGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
+    epGraph->addYSet(bondLenData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
+    epGraph->addYSet(bondAngleData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
     if(!eOpts->PlotEnergy()) {
         epGraph->setVisible(0, 0, false);
     }
@@ -241,19 +247,20 @@ void EnergyPlotDialog::RegenData(void) {
     if(!gOpts->PlotMaxGradient()) {
         epGraph->setVisible(0, 5, false);
     }
-    /*
+    
     if(!gOpts->PlotBondLength()) {
         epGraph->setVisible(0, 6, false);
     }
     if(!gOpts->PlotBondAngle()) {
         epGraph->setVisible(0, 7, false);
     }
-    */
+    
     
     epGraph->setOffsetY(MG_AXIS_Y1, eOpts->GetY1Zero());
     epGraph->setOffsetY(MG_AXIS_Y2, eOpts->GetY2Zero());
     epGraph->setPrecision(eOpts->GetNumDigits());
     epGraph->autoScaleY(MG_AXIS_Y1);
+    epGraph->autoScaleY(MG_AXIS_Y2);
     epGraph->setSelection(0, mData->CurrentFrame - 1);
 }
 
