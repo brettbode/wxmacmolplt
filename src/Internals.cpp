@@ -103,6 +103,30 @@ void MOPacInternals::GuessInit(MoleculeData * MainData, long theAtom, bool keepO
 				BondedAtom = ConnectionAtoms[3*iatom];
 			}
 		}
+		//I ran into an issue in an Oh struture where the three defining atoms are linear.
+		//Needless to say this doesn't result in a good definition so test for that here.
+		//Get the angle between the three defining atoms, if its 0 or 180 they are linear.
+		float angle;
+		lFrame->GetBondAngle(BondedAtom, AngleAtom, DihedralAtom, &angle);
+		if ((fabs(angle)>179.9)||(fabs(angle)<0.1)) {
+			float newLength = 1.0E10;
+			//find the closest atom that isn't linear with the other two
+			for (i=1; i<iatom; i++) {
+				if ((i!=BondedAtom)&&(i!=AngleAtom)&&(i!=DihedralAtom)) {
+					testVector.x = lFrame->Atoms[iatom].Position.x - lFrame->Atoms[i].Position.x;
+					testVector.y = lFrame->Atoms[iatom].Position.y - lFrame->Atoms[i].Position.y;
+					testVector.z = lFrame->Atoms[iatom].Position.z - lFrame->Atoms[i].Position.z;
+					testLength = testVector.Magnitude();
+					if (testLength < newLength) {
+						lFrame->GetBondAngle(BondedAtom, AngleAtom, i, &angle);
+						if (!((fabs(angle)>179.9)||(fabs(angle)<0.1))) {
+							DihedralAtom = i;
+							newLength = testLength;
+						}
+					}
+				}
+			}
+		}
 		ConnectionAtoms[3*iatom] = BondedAtom;
 		Values[3*iatom] = BondLength;
 		Type[3*iatom] = 0;
