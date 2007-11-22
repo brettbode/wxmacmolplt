@@ -412,6 +412,65 @@ bool Frame::GetBondAngle(long atom1, long atom2, long atom3, float * result) {
 	}
 	return Success;
 }
+bool Frame::GetBondDihedral(long atom1, long bondAtom, long AngleAtom, long DihedralAtom,
+					 float * angle) {
+	bool	Success = false;
+	
+	if ((atom1 >= 0)&&(bondAtom>=0)&&(AngleAtom>=0)&&(DihedralAtom>=0)&&(atom1<NumAtoms)&&
+		(bondAtom<NumAtoms)&&(AngleAtom<NumAtoms)&&(DihedralAtom<NumAtoms)&&
+		(atom1!=bondAtom)&&(atom1!=AngleAtom)&&(atom1!=DihedralAtom)&&
+		(bondAtom!=AngleAtom)&&(bondAtom!=DihedralAtom)&&(AngleAtom!=DihedralAtom)) {
+
+		CPoint3D BondVector, offset2, offset3;
+		//Bond Length
+		BondVector.x = Atoms[bondAtom].Position.x - Atoms[atom1].Position.x;
+		BondVector.y = Atoms[bondAtom].Position.y - Atoms[atom1].Position.y;
+		BondVector.z = Atoms[bondAtom].Position.z - Atoms[atom1].Position.z;
+		//Bond angle
+		offset2.x = Atoms[atom1].Position.x - Atoms[AngleAtom].Position.x;
+		offset2.y = Atoms[atom1].Position.y - Atoms[AngleAtom].Position.y;
+		offset2.z = Atoms[atom1].Position.z - Atoms[AngleAtom].Position.z;
+		offset2.x = Atoms[AngleAtom].Position.x - Atoms[bondAtom].Position.x;
+		offset2.y = Atoms[AngleAtom].Position.y - Atoms[bondAtom].Position.y;
+		offset2.z = Atoms[AngleAtom].Position.z - Atoms[bondAtom].Position.z;
+		//Dihedral angle
+		offset3.x = Atoms[DihedralAtom].Position.x - Atoms[AngleAtom].Position.x;
+		offset3.y = Atoms[DihedralAtom].Position.y - Atoms[AngleAtom].Position.y;
+		offset3.z = Atoms[DihedralAtom].Position.z - Atoms[AngleAtom].Position.z;
+		//	float length3 = offset3.Magnitude();
+		CPoint3D UnitIJ = BondVector;
+		CPoint3D UnitJK = offset2;
+		CPoint3D UnitKL = offset3;
+		Normalize3D(&UnitIJ);
+		Normalize3D(&UnitJK);
+		Normalize3D(&UnitKL);
+		CPoint3D Normal1, Normal2;
+		CrossProduct3D(&UnitIJ, &UnitJK, &Normal1);
+		CrossProduct3D(&UnitJK, &UnitKL, &Normal2);
+		float DotPJ = DotProduct3D(&UnitIJ, &UnitJK);
+		float DotPK = DotProduct3D(&UnitJK, &UnitKL);
+		DotPJ = 1.0 - DotPJ*DotPJ;
+		DotPK = 1.0 - DotPK*DotPK;
+		if ((DotPJ > 0.0)||(DotPK > 0.0)) {	//3 of the atom are linear, Bad!
+			float SinPJ = sqrt(DotPJ);
+			float SinPK = sqrt(DotPK);
+			float Dot = DotProduct3D(&Normal1, &Normal2)/(SinPJ*SinPK);
+			if (fabs(Dot) <= kCosErrorTolerance) {		//Bad value for a cos
+				if (Dot > 0.9999) Dot = 1.0;
+				else if (Dot < -0.9999) Dot = -1.0;
+				*angle = acos(Dot);
+				float Pi = acos(-1.0);
+				if (fabs(*angle) < kZeroTolerance) *angle = 0.0;
+				else if (fabs((*angle)-Pi) < kZeroTolerance) *angle = Pi;
+				float Sense = DotProduct3D(&Normal2, &BondVector);
+				if (Sense < 0.0) *angle = -*angle;
+				*angle *= 180.0/Pi;
+				Success = true;
+			}
+		}
+	}
+	return Success;
+}
 float Frame::GetBondLength(long ibond) {
 	CPoint3D offset;
 	long atom1 = Bonds[ibond].Atom1;
