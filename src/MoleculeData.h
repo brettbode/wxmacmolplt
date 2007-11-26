@@ -37,6 +37,7 @@ class MoleculeData {
 		Frame *		Frames;					// pointer to the first frame
 		Internals *	IntCoords;
 		BasisSet *	Basis;
+		std::vector<std::string> FragmentNames;	//< Effective Fragment name for each fragment (FRAGNAME)
 		char *		Description;			// Simple one line label
 		long		CurrentFrame;			// Number of the current frame
 		long		NumFrames;				// Current number of Frames
@@ -164,6 +165,11 @@ class MoleculeData {
 			\param AtomNum The atom index to test
 		 */
 		bool ValidAtom(long AtomNum);
+		/**
+		 Returns the FRAGNAME for the indicated effective fragment.
+		 \param index The atom index to test
+		 */
+		const char * GetFragmentName(long index) const;
 		void GetRotationMatrix(Matrix4D copy);
 		int GetAnnotationCount(void) const {return Annotations.size();};
 		void DeleteAllAnnotations(void);

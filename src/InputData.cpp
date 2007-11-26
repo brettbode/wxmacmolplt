@@ -2340,6 +2340,15 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 	BasisTest = BasisTest && lBasis;	//Make sure there really is a basis set defined
 //	if (BasisTest) File->WriteLine(" $CONTRL NORMP=1 $END", true);
 		//Punch the group label
+	//Check the number of ab initio atoms. If zero and we have effective fragments force
+	//Coord = fragonly
+	long abInitioCount=0, fragAtomCount=0;
+	for (long iatom=0; iatom<cFrame->NumAtoms; iatom++) {
+		if (cFrame->Atoms[iatom].IsEffectiveFragment()) fragAtomCount++;
+		else abInitioCount++;
+	}
+	if ((abInitioCount==0)&&(fragAtomCount>0))
+		File->WriteLine(" $CONTRL COORD=FRAGONLY $END", true);
 	File->WriteLine(" $DATA ", true);
 		//title
 	if (Title == NULL) File->WriteLine("Title goes here", true);
@@ -2378,6 +2387,34 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 	if (NumZVar) {	//punch out the current connectivity in a $ZMAT group
 		Internals * IntCoords = MainData->GetInternalCoordinates();
 		if (IntCoords) IntCoords->WriteZMATToFile(File);
+	}
+	if (fragAtomCount > 0) {	//Now add on any effective fragments
+		File->WriteLine(" $EFRAG ", true);
+		File->WriteLine("COORD=CART", true);
+
+		long fragmentIndex = 0, atomsWritten=0;
+		for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
+			if (cFrame->Atoms[iatom].IsEffectiveFragment()) {
+				if (cFrame->Atoms[iatom].GetFragmentNumber() != fragmentIndex) {
+					//start of a new fragment, punch FRAGNAME
+					fragmentIndex = cFrame->Atoms[iatom].GetFragmentNumber();
+					File->WriteLine("FRAGNAME=", false);
+					File->WriteLine(MainData->GetFragmentName(iatom-1), true);
+				}
+			}
+			if ((Coord > UniqueCoordType)||(cFrame->Atoms[iatom].IsSymmetryUnique())) {
+				Str255 AtomLabel;
+				Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
+				AtomLabel[AtomLabel[0]+1] = 0;
+				sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
+						(char *) &(AtomLabel[1]), (float) (cFrame->Atoms[iatom].GetType()), 
+						cFrame->Atoms[iatom].Position.x, cFrame->Atoms[iatom].Position.y,
+						cFrame->Atoms[iatom].Position.z);
+				File->WriteLine(Out, true);
+				if (BasisTest) lBasis->WriteBasis(File, iatom);
+			}
+		}
+		File->WriteLine(" $END", true);
 	}
 }
 void DataGroup::WriteXML(XMLElement * parent) const {

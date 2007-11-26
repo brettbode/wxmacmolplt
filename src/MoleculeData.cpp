@@ -1687,3 +1687,9 @@ void MoleculeData::DeleteAllAnnotations(void) {
 	}
 	Annotations.clear();
 }
+const char * MoleculeData::GetFragmentName(long index) const {
+	if (index < FragmentNames.size())
+		return FragmentNames[index].c_str();
+	else
+		return "H2ORHF";
+}
