@@ -2762,6 +2762,7 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 					//may or may not be present, then try to avoid non-atom positions which most of
 					//the time have negative charge and often seem to start with 'B'.
 				if (eCharge>0.5 || nCharge > 0.5) {
+					long AtomType = -1;
 					if (std::toupper(Label[0]) == 'B') {
 						//a 'B' almost always not an atom
 						if ((std::isalpha(Label[1]))) {
@@ -2775,9 +2776,12 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 							Label[2] = 0;
 						} else Label[1] = 0;
 					}
+					AtomType = SetAtomType((unsigned char *) &(Label[0]));
+					if ((std::toupper(Label[0]) == 'A')&&(AtomType < 0)) {
+						AtomType = nCharge;
+					}
 					if (lFrame->NumAtoms + 1 > lFrame->AtomAllocation)
 						SetupFrameMemory(lFrame->NumAtoms + 10, 0);
-					long AtomType = SetAtomType((unsigned char *) &(Label[0]));
 					if (AtomType > 0) {
 						if (lastAtom < i-1) FragmentNumber ++;
 						lastAtom = i;
@@ -2802,12 +2806,15 @@ void MoleculeData::ReadFragmentCoordinates(BufferFile * Buffer, long NumFragment
 	CPoint3D	Pos;
 	char		Label[kMaxLineLength], Line[kMaxLineLength];
 	Frame *		lFrame = GetCurrentFramePtr();
+	Frame *		startFrame = Frames;
+	long		referenceFragAtom=0;
 
 	while (iatom<NumFragmentAtoms) {
 		Buffer->GetLine(Line);
 		if (-1<LocateKeyWord(Line, "FRAGNAME=",9, strlen(Line))) {FragmentNumber++; continue;}
 		int iscan = sscanf(Line, "%s%f%f%f", Label, &Pos.x, &Pos.y, &Pos.z);
 		if (iscan == 4) {
+			long AtomType = -1;
 			if ((Label[0] == 'Z') || (Label[0] == 'z')) {	//z represents an atom pos
 				Label[0] = Label[1];
 				if (std::isalpha(Label[2])) {
@@ -2815,7 +2822,19 @@ void MoleculeData::ReadFragmentCoordinates(BufferFile * Buffer, long NumFragment
 					Label[2] = 0;
 				} else Label[1] = 0;
 			}
-			long AtomType = SetAtomType((unsigned char *) &(Label[0]));
+			AtomType = SetAtomType((unsigned char *) &(Label[0]));
+			//In the late-2007 style we get only the useless label (starting with an 'A')
+			//and the x, y, and z coords. So in order to determine the atomtype we have
+			//to reference the initial frame.
+			if ((std::toupper(Label[0]) == 'A')&&(AtomType < 0)) {
+				while ((referenceFragAtom < startFrame->GetNumAtoms())&&
+					   !startFrame->Atoms[referenceFragAtom].IsEffectiveFragment())
+					referenceFragAtom++;
+				if (referenceFragAtom < startFrame->GetNumAtoms()) {
+					AtomType = startFrame->Atoms[referenceFragAtom].Type;
+					referenceFragAtom++;
+				}
+			}
 			if (AtomType > 0) {
 				mpAtom * newAtom = lFrame->AddAtom(AtomType, Pos);
 				if (newAtom) newAtom->SetFragmentNumber(FragmentNumber);
