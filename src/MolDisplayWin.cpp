@@ -441,7 +441,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	
 	Show(true);
 	AdjustMenus();
-
+				
 	unsigned char texture[16 * 8] = {
 		255,   0,   0,   0, 0, 0, 0, 0, 255,   0,   0,   0, 0, 0, 0, 0,
 		255, 255,   0,   0, 0, 0, 0, 0, 255, 255,   0,   0, 0, 0, 0, 0,
@@ -461,6 +461,14 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 16, 8, 0, GL_ALPHA,
 				 GL_UNSIGNED_BYTE, texture);
+	//If this is a new/empty window default to edit mode (title should be "Untitled")
+	if (!title.Cmp(wxT("Untitled"))) {
+		wxCommandEvent foo;
+		menuBuilderInteractive_mode(foo);	//active the builder by default on new/empty windows
+		menuBuild->Check(MMP_INTERACTIVE, true);
+		foo.SetId(MMP_TOOL_HAND);
+		OnToggleTool(foo);
+	}
 }
 
 MolDisplayWin::~MolDisplayWin() {
