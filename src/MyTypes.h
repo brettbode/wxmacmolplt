@@ -252,7 +252,7 @@ class mpAtom {
 		inline long GetType(void) const {return Type;};
 		inline bool SetType(short atmType) {if ((atmType>0)&&(atmType<107)) {Type = atmType; return true;} return false;};
 		inline bool IsEffectiveFragment(void) const {return ((flags & (1<<2))?true:false);};
-		inline void IsEffectiveFragment(bool state) {flags = (Type & 0xFB) + (flags ? (1<<2) : 0);};
+		inline void IsEffectiveFragment(bool state) {flags = (flags & 0xFB) + (state ? (1<<2) : 0);};
 		inline void IsSIMOMMAtom(bool state) {flags = (flags & 0xF7) + (state ? (1<<3) : 0);};
 		inline bool IsSIMOMMAtom(void) const {return ((flags & (1<<3))?true:false);};
 		inline void IsSymmetryUnique(bool state) {flags = (flags & 0xEF) + (state ? (1<<4) : 0);};
@@ -260,7 +260,7 @@ class mpAtom {
 		// the idea for this one was to have a text label to store pdb style biomolecule, label gives res, res #,
 		// atom type (alpha, beta...), but its not currently implemented
 		//	inline bool HasBiolabel(void) const {return ((Type & (1<<9)) != 0);};
-		inline void SetFragmentNumber(long fragNum) {if (fragNum>=0) fragmentId = fragNum;};
+		inline void SetFragmentNumber(long fragNum) {if (fragNum>=0) fragmentId = fragNum; IsEffectiveFragment(true);};
 		inline long GetFragmentNumber(void) const {return fragmentId;};
 		inline long GetNuclearCharge(void) const {return (GetType());};	//NOT correct for ECP's!!!!!
 		void SetDefaultCoordinationNumber(void);
