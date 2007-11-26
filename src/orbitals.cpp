@@ -2306,6 +2306,7 @@ float TEDensity3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, 
 				if (OccupancyB) {
 					for (MONum=0; MONum<NumOccupiedBetaOrbs; MONum++) {
 						MOVector = &(VectorsB[NumBasisFuncs*MONum]);
+						Density = 0.0;
 						for (long ivec=0; ivec<NumBasisFuncs; ivec++)
 							Density += MOVector[ivec]*AOVector[ivec];
 						Sum += Density*Density*OccupancyB[MONum];
