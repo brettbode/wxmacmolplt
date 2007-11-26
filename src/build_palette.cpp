@@ -301,7 +301,7 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	struc_sizer->SetRows(3);
 
 	struc_groups = new wxChoice(panel, kPeriodicStrucGroups);
-	struc_groups->Append(_T("Miscellaneous"),
+	struc_groups->Append(_T("Organics"),
 						 new StrucGroupClientData(sys_prefs_path +
 							 				  _T("/system_structures.cml")));
 	struc_groups->Append(_T("Solvents"),
