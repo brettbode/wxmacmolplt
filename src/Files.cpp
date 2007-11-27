@@ -2734,10 +2734,19 @@ bool ReadGVBOccupancy(BufferFile * Buffer, long NumPairOrbs, long MaxOrbs, float
 //routine to parse initial fragment coordinates which are in a real ugly
 //format with all of the multipole expantion points
 long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
-	long NumFragmentAtoms = 0, iatom, NumMultipoles=0, lastAtom=0, FragmentNumber=1;
+	long NumFragmentAtoms = 0, iatom, NumMultipoles=0, FragmentNumber=0;
 	char Label[kMaxLineLength], Line[kMaxLineLength];
 	Frame * lFrame = GetCurrentFramePtr();
 	iatom = lFrame->GetNumAtoms();
+	
+	//First read in the fragment names which are separate from the coordinates
+	while (Buffer->LocateKeyWord("COORDINATES FOR FRAGMENT", 24)) {
+		if (Buffer->LocateKeyWord("NAMED", 5, 80)) {
+			Buffer->GetLine(Line);
+			sscanf(Line, "%s", Label);
+			FragmentNames.push_back(std::string(Label));
+		}
+	}
 
 	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS", 32)) {
 		Buffer->GetLine(Line);
@@ -2748,6 +2757,7 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 			Buffer->LocateKeyWord("MULTIPOLE CORDINATES", 19))) {
 		Buffer->SkipnLines(3);
 		SetupFrameMemory(lFrame->NumAtoms + 10, 0);
+		bool workingFragment=false;
 		for (int i=0; i<NumMultipoles; i++) {
 				CPoint3D	Pos;
 				float		eCharge, nCharge;
@@ -2765,6 +2775,7 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 					long AtomType = -1;
 					if (std::toupper(Label[0]) == 'B') {
 						//a 'B' almost always not an atom
+						if (workingFragment) workingFragment=false;	//flag to indicate end of fragment
 						if ((std::isalpha(Label[1]))) {
 							if (eCharge<3.5 || nCharge < 3.5) continue;
 						}
@@ -2783,8 +2794,10 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 					if (lFrame->NumAtoms + 1 > lFrame->AtomAllocation)
 						SetupFrameMemory(lFrame->NumAtoms + 10, 0);
 					if (AtomType > 0) {
-						if (lastAtom < i-1) FragmentNumber ++;
-						lastAtom = i;
+						if (!workingFragment) {
+							FragmentNumber ++;
+							workingFragment = true;
+						}
 						Pos.x *= kBohr2AngConversion;
 						Pos.y *= kBohr2AngConversion;
 						Pos.z *= kBohr2AngConversion;
