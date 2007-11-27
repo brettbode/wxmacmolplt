@@ -2392,7 +2392,7 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 		File->WriteLine(" $EFRAG ", true);
 		File->WriteLine("COORD=CART", true);
 
-		long fragmentIndex = 0, atomsWritten=0;
+		long fragmentIndex = 0, atomsWritten=0, HydrogenIndex;
 		for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
 			if (cFrame->Atoms[iatom].IsEffectiveFragment()) {
 				if (cFrame->Atoms[iatom].GetFragmentNumber() != fragmentIndex) {
@@ -2400,18 +2400,23 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 					fragmentIndex = cFrame->Atoms[iatom].GetFragmentNumber();
 					File->WriteLine("FRAGNAME=", false);
 					File->WriteLine(MainData->GetFragmentName(iatom-1), true);
+					atomsWritten=0;
+					HydrogenIndex=1;
 				}
-			}
-			if ((Coord > UniqueCoordType)||(cFrame->Atoms[iatom].IsSymmetryUnique())) {
-				Str255 AtomLabel;
-				Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
-				AtomLabel[AtomLabel[0]+1] = 0;
-				sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
-						(char *) &(AtomLabel[1]), (float) (cFrame->Atoms[iatom].GetType()), 
-						cFrame->Atoms[iatom].Position.x, cFrame->Atoms[iatom].Position.y,
-						cFrame->Atoms[iatom].Position.z);
-				File->WriteLine(Out, true);
-				if (BasisTest) lBasis->WriteBasis(File, iatom);
+				if (atomsWritten < 3) {	//the EFRAG group only punchs the first three atoms
+					//special case the atom labels for now. Eventually I think this should
+					//be done via a FRAGNAME database. 
+					if (cFrame->Atoms[iatom].GetType() == 8)
+						File->WriteLine("O1 ", false);
+					else {
+						sprintf(Out, "H%d ", HydrogenIndex);
+						File->WriteLine(Out, false);
+					}
+					sprintf(Out, "%10.5f  %10.5f  %10.5f",
+							cFrame->Atoms[iatom].Position.x, cFrame->Atoms[iatom].Position.y,
+							cFrame->Atoms[iatom].Position.z);
+					File->WriteLine(Out, true);
+				}
 			}
 		}
 		File->WriteLine(" $END", true);
