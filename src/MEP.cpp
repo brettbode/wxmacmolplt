@@ -859,14 +859,14 @@ AODensity::AODensity(void) {
 	Dimension = 0;
 }
 AODensity::~AODensity(void) {
-	if (DensityArray) delete DensityArray;
-	if (IndexArray) delete IndexArray;
-	if (DensityCheckArray) delete DensityCheckArray;
+	if (DensityArray) delete[] DensityArray;
+	if (IndexArray) delete[] IndexArray;
+	if (DensityCheckArray) delete[] DensityCheckArray;
 }
 void AODensity::SetupMemory(long NumBasisFunctions) {
-	if (DensityArray) {delete DensityArray; DensityArray = NULL;}
-	if (IndexArray) {delete IndexArray; IndexArray = NULL;}
-	if (DensityCheckArray) {delete DensityCheckArray; DensityCheckArray=NULL;}
+	if (DensityArray) {delete[] DensityArray; DensityArray = NULL;}
+	if (IndexArray) {delete[] IndexArray; IndexArray = NULL;}
+	if (DensityCheckArray) {delete[] DensityCheckArray; DensityCheckArray=NULL;}
 	if (NumBasisFunctions > 0) {
 		DensityArray = new float[(NumBasisFunctions*(NumBasisFunctions+1))/2];
 		IndexArray = new long[NumBasisFunctions];
@@ -1044,7 +1044,7 @@ void OrbitalRec::GetAODensityMatrix(float * AODensityArray, long NumOccAlpha, lo
 	}
 	if ((BaseWavefunction != MCSCF)&&(BaseWavefunction != RHFMP2)&&
 		!((BaseWavefunction == UHF)&&(OrbitalType == NaturalOrbital)))
-		delete OccupancyA;
-	if (OccupancyB) delete OccupancyB;
+		delete[] OccupancyA;
+	if (OccupancyB) delete[] OccupancyB;
 }
 
