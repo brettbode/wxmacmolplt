@@ -41,7 +41,7 @@ wxmacmolplt_SOURCES =                                  \
                                myFiles.h               \
     myPrefs.cpp                                        \
     MyTypes.cpp                MyTypes.h               \
-    OpenGLGraphics.cpp                                 \
+    OpenGLGraphics.cpp         mmp_gl.h                \
     orbitals.cpp                                       \
     build_palette.h            build_palette.cpp       \
     patterns.h                 Prefs.h                 \
