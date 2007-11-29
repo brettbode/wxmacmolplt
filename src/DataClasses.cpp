@@ -1604,16 +1604,15 @@ void MEP2DSurface::UpdateData(MEP2DSurface * target) {
 		Label = target->GetLabel();
 	OrbSet = target->getTargetOrbitalSet();
 }
-char * MEP2DSurface::GetLabel(void) const {
-		char * text=NULL;
-	if (Label) text = Surface::GetLabel();
-	else {
-		text = new char[100];
+char * MEP2DSurface::GetLabel(void) {
+	if (DefaultLabel()) {
+		if (Label) delete[] Label;
+		Label = new char[100];
 		int nchar;
-		sprintf(text, "2D Molecular Electrostatic Potential%n", &nchar);
-		if (Visible) sprintf(&(text[nchar]), " Visible");
+		sprintf(Label, "2D Molecular Electrostatic Potential%n", &nchar);
+		if (Visible) sprintf(&(Label[nchar]), " Visible");
 	}
-	return text;
+	return Surface::GetLabel();
 }
 
 MEP3DSurface::MEP3DSurface(WinPrefs * Prefs) : Surf3DBase(Prefs) {
@@ -1717,16 +1716,15 @@ long MEP2DSurface::Write(BufferFile * Buffer) {
 	return total;
 }
 
-char * MEP3DSurface::GetLabel(void) const {
-		char * text=NULL;
-	if (Label) text = Surface::GetLabel();
-	else {
-		text = new char[100];
+char * MEP3DSurface::GetLabel(void) {
+	if (DefaultLabel()) {
+		if (Label) delete[] Label;
+		Label = new char[100];
 		int nchar;
-		sprintf(text, "3D Molecular Electrostatic Potential%n", &nchar);
-		if (Visible) sprintf(&(text[nchar]), " Visible");
+		sprintf(Label, "3D Molecular Electrostatic Potential%n", &nchar);
+		if (Visible) sprintf(&(Label[nchar]), " Visible");
 	}
-	return text;
+	return Surface::GetLabel();
 }
 void MEP3DSurface::UpdateData(MEP3DSurface * target) {
 	ID = target->GetSurfaceID();
@@ -1837,24 +1835,23 @@ void Orb2DSurface::UpdateData(Orb2DSurface * target) {
 	if (!target->DefaultLabel())
 		Label = target->GetLabel();
 }
-char * Orb2DSurface::GetLabel(void) const {
-		char * text=NULL;
-	if (Label) text = Surface::GetLabel();
-	else {
-		text = new char[100];
+char * Orb2DSurface::GetLabel(void) {
+	if (DefaultLabel()) {
+		if (Label) delete[] Label;
+		Label = new char[100];
 		int nchar, nchar2=0;
-		sprintf(text, "2D Orbital%n", &nchar);
-		if (Options&1) sprintf(&(text[nchar]), " AO #%n",&nchar2);
-		else if (Options&2) sprintf(&(text[nchar]), " MO #%n",&nchar2);
-		else if (Options&4) sprintf(&(text[nchar]), " LMO #%n", &nchar2);
+		sprintf(Label, "2D Orbital%n", &nchar);
+		if (Options&1) sprintf(&(Label[nchar]), " AO #%n",&nchar2);
+		else if (Options&2) sprintf(&(Label[nchar]), " MO #%n",&nchar2);
+		else if (Options&4) sprintf(&(Label[nchar]), " LMO #%n", &nchar2);
 		nchar += nchar2;
 		if (PlotOrb >= 0) {
-			sprintf(&(text[nchar]), " %d%n", PlotOrb+1, &nchar2);
+			sprintf(&(Label[nchar]), " %d%n", PlotOrb+1, &nchar2);
 			nchar += nchar2;
 		}
-		if (Visible) sprintf(&(text[nchar]), " Visible");
+		if (Visible) sprintf(&(Label[nchar]), " Visible");
 	}
-	return text;
+	return Surface::GetLabel();
 }
 Orb3DSurface::Orb3DSurface(WinPrefs * Prefs) : Surf3DBase(Prefs) {
 	SetContourBothPosNeg(true);
@@ -1975,24 +1972,23 @@ void Orb3DSurface::UpdateData(Orb3DSurface * target) {
 	if (!target->DefaultLabel())
 		Label = target->GetLabel();
 }
-char * Orb3DSurface::GetLabel(void) const {
-		char * text=NULL;
-	if (Label) text = Surface::GetLabel();
-	else {
-		text = new char[100];
+char * Orb3DSurface::GetLabel(void) {
+	if (DefaultLabel()) {
+		if (Label) delete[] Label;
+		Label = new char[100];
 		int nchar, nchar2=0;
-		sprintf(text, "3D Orbital%n", &nchar);
-		if (Options&1) sprintf(&(text[nchar]), " AO #%n",&nchar2);
-		else if (Options&2) sprintf(&(text[nchar]), " MO #%n",&nchar2);
-		else if (Options&4) sprintf(&(text[nchar]), " LMO #%n", &nchar2);
+		sprintf(Label, "3D Orbital%n", &nchar);
+		if (Options&1) sprintf(&(Label[nchar]), " AO #%n",&nchar2);
+		else if (Options&2) sprintf(&(Label[nchar]), " MO #%n",&nchar2);
+		else if (Options&4) sprintf(&(Label[nchar]), " LMO #%n", &nchar2);
 		nchar += nchar2;
 		if (PlotOrb >= 0) {
-			sprintf(&(text[nchar]), " %d%n", PlotOrb+1, &nchar2);
+			sprintf(&(Label[nchar]), " %d%n", PlotOrb+1, &nchar2);
 			nchar += nchar2;
 		}
-		if (Visible) sprintf(&(text[nchar]), " Visible");
+		if (Visible) sprintf(&(Label[nchar]), " Visible");
 	}
-	return text;
+	return Surface::GetLabel();
 }
 General3DSurface::General3DSurface(WinPrefs * Prefs) : Surf3DBase(Prefs) {
 }
@@ -2078,16 +2074,15 @@ long General3DSurface::Write(BufferFile * Buffer) {
 	total += Surf3DBase::Write3D(Buffer, true);
 	return total;
 }
-char * General3DSurface::GetLabel(void) const {
-		char * text=NULL;
-	if (Label) text = Surface::GetLabel();
-	else {
-		text = new char[100];
+char * General3DSurface::GetLabel(void) {
+	if (DefaultLabel()) {
+		if (Label) delete[] Label;
+		Label = new char[100];
 		int nchar;
-		sprintf(text, "General 3D surface%n", &nchar);
-		if (Visible) sprintf(&(text[nchar]), " Visible");
+		sprintf(Label, "General 3D surface%n", &nchar);
+		if (Visible) sprintf(&(Label[nchar]), " Visible");
 	}
-	return text;
+	return Surface::GetLabel();
 }
 General2DSurface::General2DSurface(BufferFile * Buffer, long length) {
 		long size;
@@ -2131,16 +2126,15 @@ General2DSurface::General2DSurface(BufferFile * Buffer, long length) {
 }
 General2DSurface::General2DSurface(WinPrefs * Prefs) : Surf2DBase(Prefs) {
 }
-char * General2DSurface::GetLabel(void) const {
-		char * text=NULL;
-	if (Label) text = Surface::GetLabel();
-	else {
-		text = new char[100];
+char * General2DSurface::GetLabel(void) {
+	if (DefaultLabel()) {
+		if (Label) delete[] Label;
+		Label = new char[100];
 		int nchar;
-		sprintf(text, "General 2D surface%n", &nchar);
-		if (Visible) sprintf(&(text[nchar]), " Visible");
+		sprintf(Label, "General 2D surface%n", &nchar);
+		if (Visible) sprintf(&(Label[nchar]), " Visible");
 	}
-	return text;
+	return Surface::GetLabel();
 }
 long General2DSurface::Write(BufferFile * Buffer) {
 	long code, length, total=0;
@@ -2183,16 +2177,15 @@ TEDensity3DSurface::TEDensity3DSurface(WinPrefs * Prefs) : Surf3DBase(Prefs) {
 	SetContourBothPosNeg(false);
 }
 
-char * TEDensity3DSurface::GetLabel(void) const {
-		char * text=NULL;
-	if (Label) text = Surface::GetLabel();
-	else {
-		text = new char[100];
+char * TEDensity3DSurface::GetLabel(void) {
+	if (DefaultLabel()) {
+		if (Label) delete[] Label;
+		Label = new char[100];
 		int nchar;
-		sprintf(text, "3D Total Electron Density%n", &nchar);
-		if (Visible) sprintf(&(text[nchar]), " Visible");
+		sprintf(Label, "3D Total Electron Density%n", &nchar);
+		if (Visible) sprintf(&(Label[nchar]), " Visible");
 	}
-	return text;
+	return Surface::GetLabel();
 }
 void TEDensity3DSurface::UpdateData(TEDensity3DSurface * target) {
 	ID = target->GetSurfaceID();
@@ -2413,16 +2406,15 @@ TEDensity2DSurface::TEDensity2DSurface(WinPrefs * Prefs) : Surf2DBase(Prefs) {
 	OrbSet = -1;
 }
 
-char * TEDensity2DSurface::GetLabel(void) const {
-		char * text=NULL;
-	if (Label) text = Surface::GetLabel();
-	else {
-		text = new char[100];
+char * TEDensity2DSurface::GetLabel(void) {
+	if (DefaultLabel()) {
+		if (Label) delete[] Label;
+		Label = new char[100];
 		int nchar;
-		sprintf(text, "2D Total Electron Density%n", &nchar);
-		if (Visible) sprintf(&(text[nchar]), " Visible");
+		sprintf(Label, "2D Total Electron Density%n", &nchar);
+		if (Visible) sprintf(&(Label[nchar]), " Visible");
 	}
-	return text;
+	return Surface::GetLabel();
 }
 void TEDensity2DSurface::Update(MoleculeData * MainData) {
 	if (Visible) {
@@ -2446,7 +2438,7 @@ void TEDensity2DSurface::UpdateData(TEDensity2DSurface * target) {
 	target->GetXIncrement(&XInc);
 	target->GetYIncrement(&YInc);
 	target->setTargetOrbSet(OrbSet);
-	if (Label) {delete [] Label; Label = NULL;}
+	if (Label) {delete[] Label; Label = NULL;}
 	if (!target->DefaultLabel())
 		Label = target->GetLabel();
 }

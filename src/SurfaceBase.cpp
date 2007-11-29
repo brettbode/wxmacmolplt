@@ -35,21 +35,22 @@ Surface::Surface(void) {
 	NextSurface = NULL;
 	Label = NULL;
 	Visible = false;
+	has_default_label = true;
 }
 Surface::~Surface(void) {
-	if (Label) delete [] Label;
+	if (Label) delete[] Label;
 }
 bool Surface::Needs2DPlane(void) const {return false;}
 void Surface::RotateEvent(MoleculeData * /*MainData*/) {
 }
-char * Surface::GetLabel(void) const {
-		char * ltext = NULL;
-	if (Label) {
-		long textLength = strlen(Label)+1;
-		ltext = new char[textLength];
-		strcpy(ltext, Label);
-	}
-	return ltext;
+char * Surface::GetLabel(void) {
+	/* char *ltext = NULL; */
+	/* if (Label) { */
+		/* long textLength = strlen(Label)+1; */
+		/* ltext = new char[textLength]; */
+		/* strcpy(ltext, Label); */
+	/* } */
+	return Label;
 }
 long Surface::GetSize(BufferFile * Buffer) {
 	bool	cState = Buffer->GetOutput();
@@ -64,6 +65,9 @@ void Surface::SetLabel(const char * NewLabel) {
 		long length = strlen(NewLabel) + 1;
 		Label = new char[length];
 		if (Label) strcpy(Label, NewLabel);
+		has_default_label = false;
+	} else {
+		has_default_label = true;
 	}
 }
 void Surface::Draw2D(MoleculeData * /*lData*/, long /*hoffset*/, long /*voffset*/, float /*scale*/) {
@@ -71,7 +75,7 @@ void Surface::Draw2D(MoleculeData * /*lData*/, long /*hoffset*/, long /*voffset*
 }
 void Surface::Update(MoleculeData * /*lData*/) {
 }
-void Surface::Export(BufferFile * Buffer) const {
+void Surface::Export(BufferFile * Buffer) {
 	Buffer->Write("Export not supported for the chosen surface type", true);
 }
 void Surface::RotateSurface(Matrix4D /*RotationMatrix*/) {
@@ -155,7 +159,7 @@ long Surface::WriteSurface(BufferFile * Buffer) {
 	
 	total += Buffer->Write((Ptr) &ID, sizeof(long));
 	total += Buffer->Write((Ptr) &Visible, sizeof(Boolean));
-	if (Label) {
+	if (Label && !has_default_label) {
 		code = 101;
 		total += Buffer->Write((Ptr) &code, sizeof(long));
 		length = strlen(Label)+1;
@@ -177,6 +181,7 @@ long Surface::Read(BufferFile * Buffer, long ObjectLength) {
 		if (code != 101) return total;
 		total += Buffer->Read((Ptr) &length, sizeof(long));
 		Label = new char[length];
+		has_default_label = false;
 		if (Label)
 			total += Buffer->Read((Ptr) Label, length);
 	}
@@ -285,7 +290,7 @@ void Surf2DBase::RotateSurface(Matrix4D RotationMatrix) {
 	Rotate3DOffset(RotationMatrix, YInc, &temp);
 	YInc = temp;
 }
-void Surf2DBase::Export(BufferFile * Buffer) const {
+void Surf2DBase::Export(BufferFile * Buffer) {
 	float * lGrid;
 	char * label = GetLabel();
 #ifdef UseHandles
@@ -295,7 +300,7 @@ void Surf2DBase::Export(BufferFile * Buffer) const {
 	lGrid = Grid;
 #endif
 	Surface::Export2D(lGrid, NumGridPoints, &Origin, &XInc, &YInc, label, Buffer);
-	if (label) delete [] label;
+	/* if (label) delete [] label; */
 #ifdef UseHandles
 	HUnlock(Grid);
 #endif
@@ -780,7 +785,7 @@ Surf3DBase::~Surf3DBase(void) {
 	FreeContour();
 	FreeGrid();
 }
-void Surf3DBase::Export(BufferFile * Buffer) const {
+void Surf3DBase::Export(BufferFile * Buffer) {
 	float * lGrid;
 #ifdef UseHandles
 	HLock(Grid);
@@ -791,7 +796,7 @@ void Surf3DBase::Export(BufferFile * Buffer) const {
 	char * label = GetLabel();
 	Surface::Export3D(lGrid, NumXGridPoints, NumYGridPoints, NumZGridPoints, &Origin,
 		XGridInc, YGridInc, ZGridInc, label, Buffer);
-	if (label) delete [] label;
+	/* if (label) delete [] label; */
 #ifdef UseHandles
 	HUnlock(Grid);
 #endif

@@ -571,7 +571,11 @@ void SurfacesWindow::OnSurftitleUpdated( wxCommandEvent& event )
 			Surface * tempSurf = tempPane->GetTargetSurface();
 			if (tempSurf) {
 				wxString test(tempSurf->GetLabel(), wxConvUTF8);
-				if (newLabel.Cmp(test) != 0) {
+				if (newLabel.IsEmpty()) {
+					tempSurf->SetLabel(NULL);
+					newLabel = wxString(tempSurf->GetLabel(), wxConvUTF8);
+					book->SetPageText(book->GetSelection(), newLabel);
+				} else if (newLabel.Cmp(test) != 0) {
 					tempSurf->SetLabel((const char *)newLabel.mb_str(wxConvUTF8));
 					book->SetPageText(book->GetSelection(), newLabel);
 				}

@@ -2099,6 +2099,7 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 			}
 			
 			delete [] DataPtrs;
+			delete[] myThreads;
 		} else
 #endif
 		{
@@ -2613,6 +2614,7 @@ void TEDensity3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 		
 		for (i=0; i<myCPUCount; i++) if (DataPtrs[i].AOVector) delete [] DataPtrs[i].AOVector;
 		delete [] DataPtrs;
+		delete[] myThreads;
 	} else
 #endif
 	{

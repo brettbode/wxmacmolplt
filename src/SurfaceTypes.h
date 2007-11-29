@@ -79,7 +79,7 @@ class Surf1DBase : public Surface {
 		void SetNumGridPoints(long newNum);
 		inline bool GridAvailable(void) const {return (Grid!=NULL);};
 		virtual bool ExportPossible(void) const {return GridAvailable();};
-		virtual void Export(BufferFile * Buffer) const;
+		virtual void Export(BufferFile * Buffer);
 		inline void FreeGrid(void) {
 			if (Grid) {
 				delete [] Grid;
@@ -149,7 +149,7 @@ class Surf2DBase : public Surface {
 		virtual void RotateSurface(Matrix4D RotationMatrix);
 		inline bool GridAvailable(void) const {return (Grid!=NULL);};
 		virtual bool ExportPossible(void) const {return GridAvailable();};
-		virtual void Export(BufferFile * Buffer) const;
+		virtual void Export(BufferFile * Buffer);
 		void Write2DXML(XMLElement * parent, bool writeGrid) const;
 		void Read2DXML(XMLElement * sxml);
 		inline void FreeGrid(void) {
@@ -340,7 +340,7 @@ class Surf3DBase : public Surface {
 		void AllocateNormals(long NumPoints);
 		inline bool ContourAvail(void) const {return (ContourHndl != NULL);};
 		virtual bool ExportPossible(void) const {return GridAvailable();};
-		virtual void Export(BufferFile * Buffer) const;
+		virtual void Export(BufferFile * Buffer);
 		virtual void RotateSurface(Matrix4D RotationMatrix);
 #ifdef UseOpenGL
 		void SetSurfaceColor(const float & surfaceValue, const RGBColor * pColor, const RGBColor * nColor, float & red, float & green, float & blue) const; //Pass the value/Max, does not need to between 1 and -1
@@ -379,7 +379,7 @@ class General2DSurface : public Surf2DBase {
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
 #endif
-		virtual char * GetLabel(void) const;
+		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kGeneral2DSurface;};
 		//pick and read a file containing the 2D grid
 		void ReadGrid(const bool Square, const bool UseMult, const double & MultValue);
@@ -392,7 +392,7 @@ class General3DSurface : public Surf3DBase {
 		General3DSurface(WinPrefs * Prefs);
 		General3DSurface(BufferFile * Buffer, long length);
 		General3DSurface(XMLElement * x);
-		virtual char * GetLabel(void) const;
+		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kGeneral3DSurface;};
 			//pick and read a file containing the 3D grid
 		void ReadGrid(const bool Square, const bool UseValue, const double & MultValue);
@@ -422,7 +422,7 @@ class TEDensity3DSurface : public Surf3DBase {
 		TEDensity3DSurface(WinPrefs * Prefs);
 		TEDensity3DSurface(BufferFile * Buffer, long length);
 		TEDensity3DSurface(XMLElement * x);
-		virtual char * GetLabel(void) const;
+		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity3D;};
 		void UpdateData(TEDensity3DSurface * target);
 		inline void SetMaxSurfaceValue(float NewVal) {MaxMEPValue = NewVal;};
@@ -464,7 +464,7 @@ class TEDensity2DSurface : public Surf2DBase {
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
 #endif
-		virtual char * GetLabel(void) const;
+		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity2D;};
 		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
@@ -481,7 +481,7 @@ class TEDensity1DSurface : public Surf1DBase {
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
 #endif
-		virtual char * GetLabel(void) const;
+		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity1D;};
 		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
@@ -502,7 +502,7 @@ class MEP2DSurface : public Surf2DBase {
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
 #endif
-		virtual char * GetLabel(void) const;
+		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kMEP2D;};
 		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
@@ -520,7 +520,7 @@ class MEP3DSurface : public Surf3DBase {
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
 #endif
-		virtual char * GetLabel(void) const;
+		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kMEP3D;};
 		void UpdateData(MEP3DSurface * target);
 		inline long getTargetOrbitalSet(void) const { return OrbSet;};
@@ -546,7 +546,7 @@ class Orb3DSurface : public Surf3DBase, public OrbSurfBase {
 		Orb3DSurface(BufferFile * Buffer, long length);
 		Orb3DSurface(Orb3DSurface * target);
 		Orb3DSurface(XMLElement * s);
-		virtual char * GetLabel(void) const;
+		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kOrb3DType;};
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
@@ -575,7 +575,7 @@ class Orb2DSurface : public Surf2DBase, public OrbSurfBase {
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
 #endif
-		virtual char * GetLabel(void) const;
+		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kOrb2DType;};
 		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;

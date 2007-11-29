@@ -576,6 +576,7 @@ void TEDensity3DSurface::CalculateSurfaceValues(MoleculeData *lData, Progress * 
 		}
 		
 		delete [] DataPtrs;
+		delete[] myThreads;
 	} else
 #endif
 	{

@@ -561,6 +561,7 @@ class Surface {
 		Surface *	NextSurface;
 		char *		Label;
 		bool		Visible;
+		bool		has_default_label;
 
 		void Export3D(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
 			float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const;
@@ -571,9 +572,9 @@ class Surface {
 		virtual ~Surface(void);
 		Surface * GetNextSurface(void) const {return NextSurface;};
 		void SetNextSurface(Surface * target) {NextSurface = target;}
-		virtual char * GetLabel(void) const;
+		virtual char *GetLabel(void);
 		void SetLabel(const char * NewLabel);
-		inline bool DefaultLabel(void) {return (Label == NULL);};
+		inline bool DefaultLabel(void) {return has_default_label;};
 		virtual bool Needs2DPlane(void) const;
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window)=0;
@@ -596,7 +597,7 @@ class Surface {
 		long GetSizeofSurface(BufferFile * Buffer);
 		long WriteSurface(BufferFile * Buffer);
 		long Read(BufferFile * Buffer, long length);
-		virtual void Export(BufferFile * Buffer) const;
+		virtual void Export(BufferFile * Buffer);
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer) {
 		}
 	//	void ExportToFile(void);
