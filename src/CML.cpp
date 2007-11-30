@@ -1166,7 +1166,21 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 														case MMP_BasisSet:
 															if (!Basis) Basis = BasisSet::ReadXML(mdchild);
 															break;
-														case MMP_InputOptions:
+														case MMP_FragmentNameList:
+														{
+															XMLElement * frags = mdchild->getFirstChild();
+															while (frags != NULL) {
+																const char * name = frags->getName();
+																if (name) {
+																	if (!strcmp(name, "FRAGNAME")) {
+																		FragmentNames.push_back(std::string(frags->getValue()));
+																	}
+																}
+																frags = frags->getNextChild();
+															}
+														}
+															break;
+															case MMP_InputOptions:
 														{
 															if (InputOptions) delete InputOptions;
 															InputOptions = new InputData;
