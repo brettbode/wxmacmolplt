@@ -108,6 +108,7 @@ enum MMP_MetadataNamespace {
 	MMP_ShowAtomNumbers,
 	MMP_InternalCoordinates,
 	MMP_BasisSet,
+	MMP_FragmentNameList,
 	MMP_InputOptions,
 	MMP_Annotations,
 	MMP_Structures,

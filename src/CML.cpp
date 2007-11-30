@@ -243,6 +243,14 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_BasisSet));
 			Basis->WriteXML(Ele);
 		}
+		//List of Effective Fragment names
+		if (FragmentNames.size() > 0) {
+			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
+			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_FragmentNameList));
+			for (int i=0; i<FragmentNames.size(); i++) {
+				XMLElement * FN = Ele->addChildElement("FRAGNAME", FragmentNames[i].c_str());
+			}
+		}
 		//InputOptions
 		if (InputOptions) {
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
@@ -2939,6 +2947,8 @@ const char * CML_convert(MMP_MetadataNamespace t)
 			return "InternalCoordinates";
 		case MMP_BasisSet:
 			return "BasisSet";
+		case MMP_FragmentNameList:
+			return "FRAGNAMEList";
 		case MMP_InputOptions:
 			return "InputOptions";
 		case MMP_Annotations:
