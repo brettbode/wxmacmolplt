@@ -526,7 +526,7 @@ void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any highe
 		if ((AtomNum<(NumAtoms-1))&&(NumAtoms>1))
 			// BlockMoveData is Mac only
 			//BlockMoveData(&(Atoms[AtomNum+1]), &(Atoms[AtomNum]), (NumAtoms-AtomNum)*sizeof(mpAtom));
-			memcpy(&(Atoms[AtomNum]), &(Atoms[AtomNum+1]), (NumAtoms-AtomNum)*sizeof(mpAtom));
+			memcpy(&(Atoms[AtomNum]), &(Atoms[AtomNum+1]), (NumAtoms-AtomNum - 1)*sizeof(mpAtom));
 		NumAtoms--;
 		//remove this atom from the bond list
 			
