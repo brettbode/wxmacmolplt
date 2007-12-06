@@ -42,6 +42,11 @@ long ReadBooleanKeyword(const char * Line, const char * Keyword, bool * Value);
 long LocateForValue(const char * Line, const char * KeyWord);
 bool IsBlank(const char * Line);
 
+/** BufferFile is a class to abstract out file handling calls.
+	It was originally written to get around file buffering issues on MacOS 9 and earlier,
+	but still is handy to deal with the issues of searching through files for keywords
+	while a text file is parsed.
+*/
 class BufferFile {
 	private:
 #ifdef UseHandles

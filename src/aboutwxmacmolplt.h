@@ -58,8 +58,8 @@
 #define wxCLOSE_BOX 0x1000
 #endif
 
-/*!
- * AboutwxMacMolPlt class declaration
+/**
+ * The about dialog. Just a simple modal dialog.
  */
 
 class AboutwxMacMolPlt: public wxDialog

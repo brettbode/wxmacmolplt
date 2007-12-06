@@ -627,8 +627,7 @@ long BufferFile::WriteLine(const char *text, bool NewLine) {
 		BufferPos += nchar;
 		LinePos += nchar;
 		if (NewLine) {	//User requested a newline (no blanks for the next line)
-						//Using Macintosh style '\r' EOL char. UNIX uses '\n'
-						//but they should get converted by an FTP program normally
+						//Tack on an EOL char as set when the Buffer was initialized.
 #ifdef UseHandles
 			(*Buffer)[BufferPos] = EOLchar;
 #else
