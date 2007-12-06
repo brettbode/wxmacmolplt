@@ -837,7 +837,33 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		if (Prefs->GetAutoBond())	//setup bonds, if needed
 			lFrame->SetBonds(Prefs, false);
 	}
-	
+	if (Buffer->FindGroup("EFRAG")) {
+		Buffer->SkipnLines(1);
+		Buffer->GetLine(Line);	//1st line has all of the options
+		if (ReadStringKeyword(Line, "METHOD", token)) {
+			MainData->InputOptions->EFP.SetCoordinatesType(token);
+		}
+		if (ReadStringKeyword(Line, "POLMETHD", token)) {
+			MainData->InputOptions->EFP.SetPolMethod(token);
+		}
+		if (ReadStringKeyword(Line, "POSITION", token)) {
+			MainData->InputOptions->EFP.SetPositionType(token);
+		}
+		long tag;
+		if (ReadLongKeyword(Line, "COORD", &tag))
+			MainData->InputOptions->EFP.SetMaxMOs(tag);
+		if (ReadLongKeyword(Line, "MXBF", &tag))
+			MainData->InputOptions->EFP.SetMaxBasisFunctions(tag);
+		if (ReadLongKeyword(Line, "NBUFFMO", &tag))
+			MainData->InputOptions->EFP.SetNumBufferMOs(tag);
+		//Now tackle the individual fragment definitions
+		//These should consist of 4 line blocks of Fragname=xxx followed by three atom lines
+		Buffer->GetLine(Line);
+		while (ReadStringKeyword(Line, "FRAGNAME", token)) {
+			if (!strcasecmp(token, "H2ORHF")||!strcasecmp(token, "H2ODFT") {	//builtin EFP1 style is limited to H2O with known labels
+			}
+		}
+	}
 	return 1;
 }
 long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {

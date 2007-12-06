@@ -553,17 +553,56 @@ class DataGroup {
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
 };
-class EffectiveFragments {
+typedef enum EFRAG_PolMethods {
+	invalidPolMethod=0,
+	FRGSCF_PolMethod,
+	SCF_PolMethod,
+	
+	NumEFragPolMethods
+};
+typedef enum EFRAG_PositionTypes {
+	invalidEFragPositionType=0,
+	Optimize_Position,
+	Fixed_Position,
+	EFOPT_Position,
+	
+	NumEFragPositionTypes
+};
+class EffectiveFragmentsGroup {
 	private:
-		
 		long MaxBasisFuncs;	//< MXBF - max number of basis functions in any of the EFP2 potentials
 		long MaxMOs;		//< MXMO - Max number of MOs in any EFP2's PROJECTION section
 		long NumBufferMOs;	//< NBUFFMO - First n orbs in the MO matrix belong to the QM/MM buffer - see $MOFRZ
+		char flags;			//< Set of bits to handle the 3 text fields
 	public:
-		bool UseCartesianCoordinates(void) const {};
-		void UseCartesianCoordinates(bool v) {};
-		bool UseInternalCoordinates(void) const {};
-		void UseInternalCoordinates(bool v) {};
+		EffectiveFragmentsGroup(void) {flags=0; MaxBasisFuncs = MaxMOs = NumBufferMOs = -1;};
+		bool UseCartesianCoordinates(void) const {return (flags & 1);};
+		void UseCartesianCoordinates(bool v) {flags = (flags & 0xFE) + (v ? 1 : 0);};
+		bool UseInternalCoordinates(void) const {return !(flags & 1);};
+		void UseInternalCoordinates(bool v) {flags = (flags & 0xFE) + (v ? 0 : 1);};
+		bool SetCoordinatesType(const char * v);
+		const char * GetGAMESSCoordText(void) const {return ConvertCoordToText(UseInternalCoordinates()?1:0);};
+		static const char * ConvertCoordToText(int v);
+		static const char * ConvertPolMethodToText(EFRAG_PolMethods v);
+		static const char * ConvertPositionMethodToText(EFRAG_PositionTypes v);
+		bool SetPolMethod(const char * v);
+		bool PolMethodIsDefault(void) const {return ((flags & 2)?false:true);};
+		void PolMethodIsDefault(bool v) {flags = (flags & 0xFD) + (v ? 2 : 0);};
+		EFRAG_PolMethods PolMethod(void) const {return ((flags & 4)?SCF_PolMethod:FRGSCF_PolMethod);};
+		void PolMethod(EFRAG_PolMethods v) {flags = (flags & 0xFB) + ((v==SCF_PolMethod) ? 4 : 0); PolMethodIsDefault(false);};
+		bool PositionIsDefault(void) const {return ((flags & 8)?false:true);};
+		void PositionIsDefault(bool v) {flags = (flags & 0xF7) + (v ? 8 : 0);};
+		bool SetPositionType(const char * v);
+		EFRAG_PositionTypes PositionMethod(void) const {return (EFRAG_PositionTypes)(((flags & 48)>>4)+1);};
+		void PositionMethod(EFRAG_PositionTypes v) {flags = (flags & 0xCF) + ((v-1)<<4);PositionIsDefault(false);};
+		long GetMaxMOs(void) const {return MaxMOs;};
+		void SetMaxMOs(long v) {MaxMOs = v;};
+		long GetNumBufferMOs(void) const {return NumBufferMOs;};
+		void SetNumBufferMOs(long v) {NumBufferMOs = v;};
+		long GetMaxBasisFunctions(void) const {return MaxBasisFuncs;};
+		void SetMaxBasisFunctions(long v) {MaxBasisFuncs = v;};
+		void WriteXML(XMLElement * parent) const;
+		void ReadXML(XMLElement * parent);
 };
 
 typedef enum TypeOfGuess {
@@ -909,6 +948,7 @@ class InputData {
 		HessianGroup	*Hessian;
 		StatPtGroup		*StatPt;
 		DFTGroup		*DFT;
+		EffectiveFragmentsGroup	EFP;
 			//member functions
 		InputData(void);
 		InputData(InputData *Copy);

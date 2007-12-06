@@ -3562,6 +3562,65 @@ void DFTGroup::ReadXML(XMLElement * parent) {
 		delete children;
 	}
 }
+#pragma mark EffectiveFragmentsGroup
+const char * EffectiveFragmentsGroup::ConvertCoordToText(int t) {
+	switch (t) {
+		case 0:
+			return "CART";
+		case 1:
+			return "INT";
+	}
+	return "invalid";
+}
+const char * EffectiveFragmentsGroup::ConvertPolMethodToText(EFRAG_PolMethods t) {
+	switch (t) {
+		case FRGSCF_PolMethod:
+			return "FRGSCF";
+		case SCF_PolMethod:
+			return "SCF";
+	}
+	return "invalid";
+}
+const char * EffectiveFragmentsGroup::ConvertPositionMethodToText(EFRAG_PositionTypes t) {
+	switch (t) {
+		case Optimize_Position:
+			return "OPTIMIZE";
+		case Fixed_Position:
+			return "FIXED";
+		case EFOPT_Position:
+			return "EFOPT";
+	}
+	return "invalid";
+}
+bool EffectiveFragmentsGroup::SetCoordinatesType(const char * tag) {
+	if (!strcasecmp(tag, ConvertCoordToText(0))) {
+		UseCartesianCoordinates(true);
+		return true;
+	} else if (!strcasecmp(tag, ConvertCoordToText(1))) {
+		UseInternalCoordinates(true);
+		return true;
+	}
+	return false;
+}
+bool EffectiveFragmentsGroup::SetPolMethod(const char * tag) {
+	for (int i=FRGSCF_PolMethod; i<NumEFragPolMethods; i++) {
+		if (!strcasecmp(tag, ConvertPolMethodToText((EFRAG_PolMethods) i))) {
+			PolMethod((EFRAG_PolMethods) i);
+			return true;
+		}
+	}
+	return false;
+}
+bool EffectiveFragmentsGroup::SetPositionType(const char * tag) {
+	for (int i=Optimize_Position; i<NumEFragPositionTypes; i++) {
+		if (!strcasecmp(tag, ConvertPositionMethodToText((EFRAG_PositionTypes) i))) {
+			PositionMethod((EFRAG_PositionTypes) i);
+			return true;
+		}
+	}
+	return false;
+}
+
 #pragma mark StatPtGroup
 void StatPtGroup::InitData(void) {
 	OptConvergance = 0.0001;
