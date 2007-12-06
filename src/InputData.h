@@ -553,6 +553,19 @@ class DataGroup {
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
 };
+class EffectiveFragments {
+	private:
+		
+		long MaxBasisFuncs;	//< MXBF - max number of basis functions in any of the EFP2 potentials
+		long MaxMOs;		//< MXMO - Max number of MOs in any EFP2's PROJECTION section
+		long NumBufferMOs;	//< NBUFFMO - First n orbs in the MO matrix belong to the QM/MM buffer - see $MOFRZ
+	public:
+		bool UseCartesianCoordinates(void) const {};
+		void UseCartesianCoordinates(bool v) {};
+		bool UseInternalCoordinates(void) const {};
+		void UseInternalCoordinates(bool v) {};
+};
+
 typedef enum TypeOfGuess {
 	invalidGuessType=0,
 	HUCKELGuessType=1,
