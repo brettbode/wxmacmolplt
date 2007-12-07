@@ -68,7 +68,7 @@ void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, f
 						const CPoint3D& x_world, float offset, GLuint length_anno_tex_id, const WinPrefs * Prefs, bool draw_label = true);
 void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 						 const CPoint3D *pt3, const WinPrefs *Prefs,
-						 GLuint length_anno_tex_id);
+						 GLuint length_anno_tex_id, CPoint3D *ambig_axis = NULL);
 void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd,
 							float lineWidth, int nslices = 4, int nstacks = 1, bool cap = false);
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order);
@@ -931,8 +931,7 @@ void MolDisplayWin::DrawGL(void) {
 		gluOrtho2D(0, canvas_width, 0, canvas_height);
 
 		glColor4f(0.5f, 0.5f, 0.5f, 0.4f);
-		glRectf(lasso_start.x, lasso_start.y,
-				lasso_end.x, lasso_end.y);
+		glRectf(lasso_start.x, lasso_start.y, lasso_end.x, lasso_end.y);
 
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_LINE_STIPPLE);
@@ -1213,7 +1212,7 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 
 	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
 	DrawAngleAnnotation(&pt1, &atom3_pos, &pt3, win->GetPrefs(),
-						win->GetLengthTexId());
+						win->GetLengthTexId(), &normal1);
 	
 }
 
@@ -3317,14 +3316,15 @@ void DrawArrow(const float & length, const float & width, const int & quality) {
 	if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
 }
 
+/**
+ * This draws a dashed angle between the three specified points and
+ * marks the angle's degrees with a text label.  The angle goes from
+ * pt1 to pt2 to pt3.  To complicate things a bit, we draw each dash
+ * so that it is aligned to the screen so the viewer can always see it.
+ */
 void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 						 const CPoint3D *pt3, const WinPrefs *Prefs,
-						 GLuint length_anno_tex_id) {
-
-	// This draws a dashed angle between the three specified points and
-	// marks the angle's degrees with a text label.  The angle goes from
-	// pt1 to pt2 to pt3.  To complicate things a bit, we draw each dash
-	// so that it is aligned to the screen so the viewer can always see it.
+						 GLuint length_anno_tex_id, CPoint3D *ambig_axis) {
 
 	CPoint3D vec1;
 	CPoint3D vec2;
@@ -3343,10 +3343,9 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 	vec1 = *pt1 - *pt2;
 	vec2 = *pt3 - *pt2;
 
-	// We need to find the smaller length since so that we know how far along
-	// each vector we can draw the annotation.  As long as we have the lengths,
-	// we normalize here instead of calling a function to save some
-	// recomputation.
+	// We need to find the shorter of the two vectors so that we know how far
+	// along each vector we can draw the annotation.  And with the lengths
+	// saved, we can go ahead and normalize.
 	len1 = vec1.Magnitude();
 	len2 = vec2.Magnitude();
 	min_len = MIN(len1, len2);
@@ -3354,33 +3353,57 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 	vec1 = vec1 * (1.0f / len1);
 	vec2 = vec2 * (1.0f / len2);
 
+	// Grab the angle.
 	float dot = DotProduct3D(&vec1, &vec2);
 	angle = acos(dot);
 
-	if (fabs(dot) < 1.0f) {
-		// We change the coordinate system so that the angle's plane looks like
-		// the xy-plane.  This makes drawing along a circular arc much easier.
+	// If two vectors are not (anti-)parallel, drawing the annotation is easy.
+	// We move into the space where vec1 is the x-axis and vec2 is in the
+	// xy-plane.  In this space we can draw a circular segment with simple
+	// geometry.
+	if (fabs(dot) < 0.999999f) {
 		SetPlaneRotation(plane2xy, vec1, vec2);
-	} else {
-		glGetFloatv(GL_MODELVIEW_MATRIX, m);
-		CPoint3D vec3;
-		vec3.x = m[0];
-		vec3.y = m[4];
-		vec3.z = m[8];
+	}
+	
+	// If they are (anti-)parallel, there're many possible planes we can move
+	// into.
+	else {
 
-		if (DotProduct3D(&vec1, &vec2) < 1.0f) {
-			SetPlaneRotation(plane2xy, vec1, vec3);
-		} else {
-			vec3.x = m[1];
-			vec3.y = m[5];
-			vec3.z = m[9];
-			SetPlaneRotation(plane2xy, vec1, vec3);
+		// acos doesn't tolerate values whose absolute values are > 1, which 
+		// might happen because of precision errors.  So, we fix the angle.
+		angle = dot > 0.0f ? 0.0f : kPi;
+
+		// For dihedral annotations, we push the normal of the dihedral planes
+		// into the new space's xy-plane.
+		if (ambig_axis) {
+			SetPlaneRotation(plane2xy, vec1, *ambig_axis);
+		}
+		
+		// For angle annotations, we try to keep them as visible as possible.
+		// We keep vec1 as the x-axis in our new space, and we try to put
+		// either the screen's x- or y-axis in the new space's xy-plane.
+		else {
+			glGetFloatv(GL_MODELVIEW_MATRIX, m);
+			CPoint3D vec3;
+			vec3.x = m[0];
+			vec3.y = m[4];
+			vec3.z = m[8];
+
+			if (fabs(DotProduct3D(&vec1, &vec2)) < 0.999999f) {
+				SetPlaneRotation(plane2xy, vec1, vec3);
+			} else {
+				vec3.x = m[1];
+				vec3.y = m[5];
+				vec3.z = m[9];
+				SetPlaneRotation(plane2xy, vec1, vec3);
+			}
 		}
 	}
 
 	glPushMatrix();
 
-	// We move to the center vertex and transform as described above.
+	// We move to the center vertex and transform into the space described
+	// above.
 	glTranslatef(pt2->x, pt2->y, pt2->z);
 	glMultMatrixf((const GLfloat *) &plane2xy);
 
@@ -3403,8 +3426,6 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 	chord_len = 0.1f;
 	delta = acos((2 * min_len * min_len - chord_len * chord_len) /
 				 (2 * min_len * min_len));
-
-	/* glBegin(GL_QUADS); */
 
 	float ca = cos(angle);
 	float sa = sin(angle);
@@ -3492,11 +3513,16 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 
 	m[12] = m[13] = m[14] = 0.0f;
 	m[15] = 1.0f;
+	/* std::cout << "m[#](# in 0,16): " */
+			  /* << m[0] << ", " << m[1] << ", " << m[2] << ", " << m[3] << ", " << std::endl */
+			  /* << m[4] << ", " << m[5] << ", " << m[6] << ", " << m[7] << ", " << std::endl */
+			  /* << m[8] << ", " << m[9] << ", " << m[10] << ", " << m[11] << ", " << std::endl */
+			  /* << m[12] << ", " << m[13] << ", " << m[14] << ", " << m[15] << std::endl; */
 
 	char angle_label[40];
 	sprintf(angle_label, "%.2f", angle * 180.f / kPi);
 	glTranslatef(min_len * cos(angle * 0.5f),
-					 min_len * sin(angle * 0.5f), 0.0f);
+				 min_len * sin(angle * 0.5f), 0.0f);
 	glMultMatrixf(m);
 	float LabelSize = Prefs->GetAnnotationLabelSize();
 	glTranslatef(-0.1f + chord_len, 0.0f, 0.0f);

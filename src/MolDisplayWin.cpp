@@ -773,7 +773,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuFile->Enable(MMP_EXPORT, false);
 	
 	menuEdit->Enable(wxID_CUT, false);
-	menuEdit->Enable(wxID_COPY, false);
+	/* menuEdit->Enable(wxID_COPY, false); */
 	menuEdit->Enable(MMP_COPYCOORDS, false);
 	/* menuEdit->Enable(wxID_CLEAR, false); */
 
@@ -3615,7 +3615,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 				// If shift is also held down, we depth-translate along the
 				// viewing direction.
 				if (event.ShiftDown()) {
-					offset.z = dy/(hsize/MainData->WindowSize);
+					offset.z = dy / (hsize / MainData->WindowSize);
 					MainData->TotalRotation[3][2] += offset.z;
 				}
 				
@@ -3706,20 +3706,22 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 		} 
 	}
 
-	// We want to draw a circle showing the virtual sphere, but only if
-	// the scene is being rotated.
+	// If the scene is actively being rotated, we call a function that sorts
+	// transparent triangles, draws the atoms and some rotation annotations.
+	// For autorotation, a left mouse click is faked, but we don't want to
+	// annotate then.
 	if (event.LeftIsDown() && event.Dragging()) {
 		RotateMoleculeGL(Prefs->GetShowAngles() && !rotate_timer.IsRunning(),
 						 !rotate_timer.IsRunning());
 		glCanvas->SwapBuffers();
-		ContentChanged();
-	} else {
-		// drag finished
-		//"clean up" the rotation matrix make the rotation part orthogonal and magnitude 1
-		/* OrthogonalizeRotationMatrix (MainData->TotalRotation); */
-		/* Draw once again to get rid of the rotation sphere */
+		ContentChanged(); // Dirty should probably be set for the other case too
+	}
+	
+	// Otherwise we do a plain drawing of the atoms.
+	else {
 		glCanvas->draw();
 	}
+
 }
 
 bool MolDisplayWin::IsRotating(void) {
@@ -3732,14 +3734,14 @@ void MolDisplayWin::ChangePrefs(WinPrefs * newPrefs) {
 	//if (PrefsDlog) PrefsDlog->PrefsChanged();
 }
 
-void MolDisplayWin::SelectionChanged(bool mode)
-{
+void MolDisplayWin::SelectionChanged(bool mode) {
   if (coordsWindow)
 	coordsWindow->UpdateSelection(mode);
   if (bondsWindow)
 	bondsWindow->UpdateSelection(mode);
   ContentChanged();
 }
+
 //The following is the amount of space to leave for the window sizing box used by
 //many window maangers that takes some space away from the client area.
 #define kMOLSCROLLOFFSET 16
@@ -3964,10 +3966,12 @@ FrameSnapShot::FrameSnapShot(Frame * target) {
 	for (int i=0; i<NumBonds; i++)
 		Bonds[i] = target->Bonds[i];
 }
+
 FrameSnapShot::~FrameSnapShot(void) {
 	if (Atoms) delete [] Atoms;
 	if (Bonds) delete [] Bonds;
 }
+
 void FrameSnapShot::Restore(void) {
 	//Ok this makes a gross assumption on the validity of the frame pointer
 	if (mTarget) {

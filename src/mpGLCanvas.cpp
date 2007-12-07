@@ -500,9 +500,11 @@ void MpGLCanvas::eventPaint(wxPaintEvent &event) {
 }
 
 void MpGLCanvas::draw(void) {
-	if(!GetContext()||!MolWin->IsShown()||(Prefs==NULL)) {
+
+	if (!GetContext() || !MolWin->IsShown() || Prefs == NULL) {
 		return;
 	}
+
 	SetCurrent();
 	if (!initialized) {
 		initGL();
@@ -524,6 +526,7 @@ void MpGLCanvas::draw(void) {
 	}
 	
 	SwapBuffers();
+
 }
 
 void MpGLCanvas::eventErase(wxEraseEvent &event) {
