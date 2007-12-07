@@ -267,9 +267,6 @@ class ControlGroup {
 		~ControlGroup(void);
 		void InitControlPaneData(void);
 		void InitProgPaneData(void);
-		long GetSize(BufferFile *Buffer);
-		long WriteToBuffer(BufferFile *Buffer);
-		long ReadFromBuffer(BufferFile *Buffer, long length);
 		void WriteToFile(BufferFile *File, InputData *IData, long NumElectrons);
 		void RevertControlPane(ControlGroup *OrgData);
 		void RevertProgPane(ControlGroup *OrgData);
@@ -351,9 +348,6 @@ class SystemGroup {
 		SystemGroup(void);
 		SystemGroup(SystemGroup *Copy);
 		void InitData(void);
-		long GetSize(BufferFile *Buffer);
-		long WriteToBuffer(BufferFile *Buffer);
-		long ReadFromBuffer(BufferFile *Buffer);
 		void WriteToFile(BufferFile *File);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
@@ -492,9 +486,6 @@ class BasisGroup {
 		BasisGroup(void);
 		BasisGroup(BasisGroup *Copy);
 		void InitData(void);
-		long GetSize(BufferFile *Buffer);
-		long WriteToBuffer(BufferFile *Buffer);
-		long ReadFromBuffer(BufferFile *Buffer);
 		long WriteToFile(BufferFile *File, MoleculeData * lData);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
@@ -546,9 +537,6 @@ class DataGroup {
 		DataGroup(DataGroup *Copy);
 		~DataGroup(void);
 		void InitData(void);
-		long GetSize(BufferFile *Buffer);
-		long WriteToBuffer(BufferFile *Buffer);
-		void ReadFromBuffer(BufferFile *Buffer, long length);
 		void WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs * Prefs, long BasisTest);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
@@ -568,18 +556,28 @@ typedef enum EFRAG_PositionTypes {
 	
 	NumEFragPositionTypes
 };
+
+/// EffectiveFragmentsGroup stores the options for the EFRAG group, but not the actual fragments
 class EffectiveFragmentsGroup {
 	private:
-		long MaxBasisFuncs;	//< MXBF - max number of basis functions in any of the EFP2 potentials
-		long MaxMOs;		//< MXMO - Max number of MOs in any EFP2's PROJECTION section
-		long NumBufferMOs;	//< NBUFFMO - First n orbs in the MO matrix belong to the QM/MM buffer - see $MOFRZ
-		char flags;			//< Set of bits to handle the 3 text fields
+		long MaxBasisFuncs;	///< MXBF - max number of basis functions in any of the EFP2 potentials
+		long MaxMOs;		///< MXMO - Max number of MOs in any EFP2's PROJECTION section
+		long NumBufferMOs;	///< NBUFFMO - First n orbs in the MO matrix belong to the QM/MM buffer - see $MOFRZ
+		char flags;			///< Set of bits to handle the 3 text fields
 	public:
+			/** Constructor. Sets normal default values.
+			 */
 		EffectiveFragmentsGroup(void) {flags=0; MaxBasisFuncs = MaxMOs = NumBufferMOs = -1;};
+			/** = operator to copy one instance to another.
+			 */
+		const EffectiveFragmentsGroup & operator=(const EffectiveFragmentsGroup & other) {flags=other.flags; MaxBasisFuncs=other.MaxBasisFuncs; MaxMOs=other.MaxMOs; NumBufferMOs=other.NumBufferMOs; return *this;};
 		bool UseCartesianCoordinates(void) const {return (flags & 1);};
 		void UseCartesianCoordinates(bool v) {flags = (flags & 0xFE) + (v ? 1 : 0);};
 		bool UseInternalCoordinates(void) const {return !(flags & 1);};
 		void UseInternalCoordinates(bool v) {flags = (flags & 0xFE) + (v ? 0 : 1);};
+			/** Set the coordinates type from the text string.
+			 * @param v The string containing a valid COORD= value (CART or INT).
+			 */
 		bool SetCoordinatesType(const char * v);
 		const char * GetGAMESSCoordText(void) const {return ConvertCoordToText(UseInternalCoordinates()?1:0);};
 		static const char * ConvertCoordToText(int v);
@@ -649,9 +647,6 @@ class GuessGroup {
 		GuessGroup(GuessGroup *Copy);
 	//	~GuessGroup(void);	//not needed until iorder and jorder are used
 		void InitData(void);
-		long GetSize(BufferFile *Buffer);
-		long WriteToBuffer(BufferFile *Buffer);
-		long ReadFromBuffer(BufferFile *Buffer);
 		void WriteToFile(BufferFile *File, InputData *IData, MoleculeData * orbdata);
 		void WriteVecGroup(BufferFile *File, MoleculeData * lData);
 		void WriteXML(XMLElement * parent) const;
@@ -692,9 +687,6 @@ class SCFGroup {
 		SCFGroup(SCFGroup *Copy);
 		void InitData(void);
 			//no destructor for now
-		long GetSize(BufferFile *Buffer);
-		long WriteToBuffer(BufferFile *Buffer);
-		long ReadFromBuffer(BufferFile *Buffer);
 		void WriteToFile(BufferFile *File, InputData *IData);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
@@ -730,9 +722,6 @@ class MP2Group {
 		bool GetMP2Prop(void) const {return MP2Prop;};
 		void SetMP2Prop(bool state) {MP2Prop = state;};
 
-		long GetSize(BufferFile *Buffer);
-		long WriteToBuffer(BufferFile *Buffer);
-		long ReadFromBuffer(BufferFile *Buffer);
 		void WriteToFile(BufferFile *File, InputData *IData);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
@@ -766,9 +755,6 @@ class HessianGroup {
 		inline bool GetVibAnalysis(void) const {return ((BitOptions & 16)?true:false);};
 		inline void SetVibAnalysis(bool NewVal) {if (BitOptions & 16) BitOptions -= 16; if (NewVal) BitOptions += 16;};
 
-		long GetSize(BufferFile *Buffer);
-		long WriteToBuffer(BufferFile *Buffer);
-		long ReadFromBuffer(BufferFile *Buffer);
 		void WriteToFile(BufferFile *File, InputData *IData);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
@@ -854,9 +840,6 @@ class DFTGroup {
 		static const char * GetDFTGridFuncText(DFTFunctionalsGrid d);
 		static const char * GetDFTGridFreeFuncText(DFTFunctionalsGridFree d);
 
-		long GetSize(BufferFile *Buffer);
-		long WriteToBuffer(BufferFile *Buffer);
-		long ReadFromBuffer(BufferFile *Buffer);
 		void WriteToFile(BufferFile *File, InputData *IData);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
@@ -927,9 +910,6 @@ class StatPtGroup {
 		inline bool AlwaysPrintOrbs(void) const {return ((BitOptions & 32) != 0);};
 		inline void SetAlwaysPrintOrbs(bool NewVal) {BitOptions = (BitOptions & 0xDF) + (NewVal ? 32 : 0);};
 
-		long GetSize(BufferFile *Buffer);
-		long WriteToBuffer(BufferFile *Buffer);
-		long ReadFromBuffer(BufferFile *Buffer);
 		void WriteToFile(BufferFile *File, InputData *IData);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
@@ -953,10 +933,7 @@ class InputData {
 		InputData(void);
 		InputData(InputData *Copy);
 		~InputData(void);
-		long GetSize(BufferFile *Buffer);	//returns total size of the Input group and all subgroups
-		long WriteToBuffer(BufferFile *Buffer);	//Pack Input data into the provided buffer
 		long WriteInputFile(MoleculeData * lData, MolDisplayWin * owner);	//Write out an input file for another program (GAMESS etc)
-		void ReadFromBuffer(BufferFile *Buffer, long length);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
 };

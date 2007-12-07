@@ -3259,6 +3259,8 @@ const char * CML_convert(MMP_InputOptionsNS t)
 			return "StatPtGroup";
 		case MMP_IODFTGroupElement:
 			return "DFTGroup";
+		case MMP_IOEFPGroupElement:
+			return "EFRAGGroup";
 		default:
             return "invalid";
     }
@@ -3533,6 +3535,26 @@ const char * CML_convert(MMP_IOStatPtGroupNS t)
 			return "RecalcHessianSteps";
 		case MMP_IOSPGAlwaysPrintOrbs:
 			return "AlwaysPrintOrbitals";
+		default:
+            return "invalid";
+    }
+}
+#pragma mark MMP_IOEFPGroupNS
+const char * CML_convert(MMP_IOEFPGroupNS t)
+{       
+    switch(t) {
+        case MMP_IOEFPCoordType:
+            return "CoordType";
+		case MMP_IOEFPPolMethod:
+			return "PolMethod";
+        case MMP_IOEFPPosition:
+            return "Position";
+		case MMP_IOEFPMaxBasisFuncs:
+			return "MaxBasisFuncs";
+		case MMP_IOEFPMaxMOs:
+			return "MaxMOs";
+		case MMP_IOEFPNumBufferMOs:
+			return "NumBufferMOs";
 		default:
             return "invalid";
     }

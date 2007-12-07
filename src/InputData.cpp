@@ -64,6 +64,7 @@ InputData::InputData(InputData *Copy) {
 	else Hessian = NULL;
 	DFT = NULL;
 	if (Copy->DFT) DFT = new DFTGroup(Copy->DFT);
+	EFP = Copy->EFP;
 }
 InputData::~InputData(void) {	//destructor
 	if (Control) delete Control;	//simply delete all groups present
@@ -76,92 +77,6 @@ InputData::~InputData(void) {	//destructor
 	if (Hessian) delete Hessian;
 	if (StatPt) delete StatPt;
 	if (DFT) delete DFT;
-}
-long InputData::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long size = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return size;
-}
-long InputData::WriteToBuffer(BufferFile *Buffer) {
-	long Pos, length=sizeof(InputData);
-
-	Pos = Buffer->Write((Ptr) &length, sizeof(long));
-	Pos += Buffer->Write((Ptr) this, length);
-
-	if (Control) {
-		length = 1;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = Control->GetSize(Buffer);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += Control->WriteToBuffer(Buffer);
-	}
-	if (System) {
-		length = 2;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = System->GetSize(Buffer);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += System->WriteToBuffer(Buffer);
-	}
-	if (Basis) {
-		length = 3;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = Basis->GetSize(Buffer);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += Basis->WriteToBuffer(Buffer);
-	}
-	if (Data) {
-		length = 4;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = Data->GetSize(Buffer);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += Data->WriteToBuffer(Buffer);
-	}
-	if (Guess) {
-		length = 5;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = Guess->GetSize(Buffer);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += Guess->WriteToBuffer(Buffer);
-	}
-	if (SCF) {
-		length = 6;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = SCF->GetSize(Buffer);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += SCF->WriteToBuffer(Buffer);
-	}
-	if (MP2) {
-		length = 7;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = MP2->GetSize(Buffer);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += MP2->WriteToBuffer(Buffer);
-	}
-	if (Hessian) {
-		length = 8;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = Hessian->GetSize(Buffer);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += Hessian->WriteToBuffer(Buffer);
-	}
-	if (StatPt) {
-		length = 9;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = StatPt->GetSize(Buffer);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += StatPt->WriteToBuffer(Buffer);
-	}
-	if (DFT) {
-		length = 10;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = DFT->GetSize(Buffer);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += DFT->WriteToBuffer(Buffer);
-	}
-		
-	return Pos;
 }
 void InputData::WriteXML(XMLElement * parent) const {
 	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_InputOptionsElement));
@@ -196,6 +111,7 @@ void InputData::WriteXML(XMLElement * parent) const {
 	if (DFT) {
 		DFT->WriteXML(Ele);
 	}
+	EFP.WriteXML(Ele);
 }
 void InputData::ReadXML(XMLElement * parent) {
 	XMLElementList * ipxml = parent->getChildren();
@@ -260,91 +176,6 @@ void InputData::ReadXML(XMLElement * parent) {
 			}
 		}
 		delete ipxml;
-	}
-}
-
-void InputData::ReadFromBuffer(BufferFile *Buffer, long length) {
-	long lPos, code, objectLength;
-
-	lPos = Buffer->Read((Ptr) &objectLength, sizeof(long));
-	lPos += Buffer->BufferSkip(objectLength);
-		
-	while (lPos<length) {
-		lPos += Buffer->Read((Ptr) &code, sizeof(long));
-		lPos += Buffer->Read((Ptr) &objectLength, sizeof(long));
-		long blockStart = Buffer->GetFilePos();
-		switch (code) {
-			case 1:	//control group
-				if (Control==NULL) Control = new ControlGroup;
-				if (Control) Control->ReadFromBuffer(Buffer, objectLength);
-				else throw MemoryError();
-			break;
-			case 2: //system
-				if (System == NULL) System = new SystemGroup;
-				if (System) {
-					code = System->ReadFromBuffer(Buffer);
-//					if (code != objectLength) throw DataError();
-				} else throw MemoryError();
-			break;
-			case 3:
-				if (Basis == NULL) Basis = new BasisGroup;
-				if (Basis) {
-					code = Basis->ReadFromBuffer(Buffer);
-//					if (code != objectLength) throw DataError();
-				} else throw MemoryError();
-			break;
-			case 4:
-				if (Data == NULL) Data = new DataGroup;
-				if (Data) Data->ReadFromBuffer(Buffer, objectLength);
-				else throw MemoryError();
-			break;
-			case 5:
-				if (Guess == NULL) Guess = new GuessGroup;
-				if (Guess) {
-					code = Guess->ReadFromBuffer(Buffer);
-	//				if (code != objectLength) throw DataError();
-				} else throw MemoryError();
-			break;
-			case 6:
-				if (SCF == NULL) SCF = new SCFGroup;
-				if (SCF) {
-					code = SCF->ReadFromBuffer(Buffer);
-//					if (code != objectLength) throw DataError();
-				} else throw MemoryError();
-			break;
-			case 7:
-				if (MP2 == NULL) MP2 = new MP2Group;
-				if (MP2) {
-					code = MP2->ReadFromBuffer(Buffer);
-//					if (code != objectLength) throw DataError();
-				} else throw MemoryError();
-			break;
-			case 8:
-				if (Hessian == NULL) Hessian = new HessianGroup;
-				if (Hessian) {
-					code = Hessian->ReadFromBuffer(Buffer);
-//					if (code != objectLength) throw DataError();
-				} else throw MemoryError();
-			break;
-			case 9:
-				if (StatPt == NULL) StatPt = new StatPtGroup;
-				if (StatPt) {
-					code = StatPt->ReadFromBuffer(Buffer);
-//					if (code != objectLength) throw DataError();
-				} else throw MemoryError();
-			break;
-			case 10:
-				if (DFT == NULL) DFT = new DFTGroup;
-				if (DFT) {
-					code = DFT->ReadFromBuffer(Buffer);
-//					if (code != objectLength) throw DataError();
-				} else throw MemoryError();
-			break;
-			default:
-				Buffer->BufferSkip(objectLength);	//unknown group just skip it
-		}
-		Buffer->SetFilePos(blockStart+objectLength);
-		lPos += objectLength;
 	}
 }
 
@@ -771,93 +602,6 @@ bool ControlGroup::SetNormP(bool State) {
 	if (Options & (1<<7)) Options -= (1<<7);
 	if (State) Options += (1<<7);
 	return GetNormP();
-}
-long ControlGroup::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long size = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return size;
-}
-long ControlGroup::WriteToBuffer(BufferFile *Buffer) {
-	long length = 28;
-
-	long Pos = Buffer->Write((Ptr) &length, sizeof(long));
-	Pos += Buffer->Write((Ptr) ExeType, sizeof (char *));
-	Pos += Buffer->Write((Ptr) &SCFType, sizeof(short));
-	Pos += Buffer->Write((Ptr) &MPLevelCIType, sizeof(short));
-	Pos += Buffer->Write((Ptr) &RunType, sizeof(short));
-	Pos += Buffer->Write((Ptr) &MaxIt, sizeof(short));
-	Pos += Buffer->Write((Ptr) &Charge, sizeof(short));
-	Pos += Buffer->Write((Ptr) &Multiplicity, sizeof(short));
-	Pos += Buffer->Write((Ptr) &Local, sizeof(short));
-	Pos += Buffer->Write((Ptr) &Friend, sizeof(short));
-	Pos += Buffer->Write((Ptr) &NPrint, sizeof(short));
-	Pos += Buffer->Write((Ptr) &ITol, sizeof(short));
-	Pos += Buffer->Write((Ptr) &ICut, sizeof(short));
-	Pos += Buffer->Write((Ptr) &Options, sizeof(char));
-	length = 0;
-	Pos += Buffer->Write((Ptr) &length, sizeof(char));	//padding byte for compatibility
-
-	if (ExeType) {
-		length = 1;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = 1 + strlen(ExeType);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += Buffer->Write((Ptr) ExeType, length);
-	}
-	if (CCType != CC_None) {
-		length = 2;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = sizeof(short);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += Buffer->Write((Ptr) &CCType, length);
-	}
-	length = 99;
-	Pos += Buffer->Write((Ptr) &length, sizeof(long));
-	return Pos;
-}
-long ControlGroup::ReadFromBuffer(BufferFile *Buffer, long length) {
-	long mylength, pos, code;
-
-	pos = Buffer->Read((Ptr) &mylength, sizeof(long));
-	if (mylength == 28) {
-		pos += Buffer->Read((Ptr) &ExeType, sizeof(char *));
-		pos += Buffer->Read((Ptr) &SCFType, sizeof(short));
-		pos += Buffer->Read((Ptr) &MPLevelCIType, sizeof(short));
-		pos += Buffer->Read((Ptr) &RunType, sizeof(short));
-		pos += Buffer->Read((Ptr) &MaxIt, sizeof(short));
-		pos += Buffer->Read((Ptr) &Charge, sizeof(short));
-		pos += Buffer->Read((Ptr) &Multiplicity, sizeof(short));
-		pos += Buffer->Read((Ptr) &Local, sizeof(short));
-		pos += Buffer->Read((Ptr) &Friend, sizeof(short));
-		pos += Buffer->Read((Ptr) &NPrint, sizeof(short));
-		pos += Buffer->Read((Ptr) &ITol, sizeof(short));
-		pos += Buffer->Read((Ptr) &ICut, sizeof(short));
-		pos += Buffer->Read((Ptr) &Options, sizeof(char));
-		pos += Buffer->Read((Ptr) &mylength, sizeof(char));//padding byte
-	} else {
-		return pos;
-	}
-	ExeType = NULL;
-	while (pos < length) {
-		//otherwise look for the exetype
-		pos += Buffer->Read((Ptr) &code, sizeof(long));
-		switch (code) {
-			case 1:
-				pos += Buffer->Read((Ptr) &mylength, sizeof(long));
-				ExeType = new char[mylength];
-				if (ExeType)
-					pos += Buffer->Read(ExeType, mylength);
-				else throw MemoryError();
-				break;
-			case 2:
-				pos += Buffer->Read((Ptr) &mylength, sizeof(long));
-				pos += Buffer->Read((Ptr) &CCType, sizeof(short));
-				break;
-		}
-	}
-	return pos;
 }
 void ControlGroup::ReadXML(XMLElement * parent) {
 	XMLElementList * children = parent->getChildren();
@@ -1461,20 +1205,6 @@ void SystemGroup::InitData(void) {
 	MemDDIUnits = megaWordsUnit;
 	Flags = 0;
 }
-long SystemGroup::GetSize(BufferFile *Buffer) {
-	bool cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long size = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return size;
-}
-long SystemGroup::WriteToBuffer(BufferFile *Buffer) {
-	long Pos, length = sizeof(SystemGroup);
-
-	Pos = Buffer->Write((Ptr) &length, sizeof(long));
-	Pos += Buffer->Write((Ptr) this, length);
-	return Pos;
-}
 void SystemGroup::WriteXML(XMLElement * parent) const {
 	char line[kMaxLineLength];
 	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOSystemGroupElement));
@@ -1579,25 +1309,6 @@ void SystemGroup::ReadXML(XMLElement * parent) {
 		}
 		delete children;
 	}
-}
-long SystemGroup::ReadFromBuffer(BufferFile *Buffer) {
-	long mylength, size;
-
-	size = Buffer->Read((Ptr) &mylength, sizeof(long));
-//	if (mylength != sizeof(SystemGroup)) return size;
-	if (mylength != 12) return size;
-//	size += Buffer->Read((Ptr) this, mylength);
-	size += Buffer->Read((Ptr) &TimeLimit, sizeof(long));
-	size += Buffer->Read((Ptr) &mylength, sizeof(long));
-	Memory = mylength;
-	size += Buffer->Read(&KDiag, sizeof(char));
-	char temp;
-	size += Buffer->Read(&temp, sizeof(char));
-	SetTimeUnits((TimeUnit) temp);
-	size += Buffer->Read(&temp, sizeof(char));
-	SetMemUnits((MemoryUnit) temp);
-	size += Buffer->Read(&Flags, sizeof(char));
-	return size;
 }
 void SystemGroup::WriteToFile(BufferFile *File) {
 	long	test;
@@ -1943,28 +1654,6 @@ short BasisGroup::SetECPPotential(short NewType) {
 	ECPPotential = NewType;
 	return ECPPotential;
 }
-long BasisGroup::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long size = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return size;
-}
-long BasisGroup::WriteToBuffer(BufferFile *Buffer) {
-	long Pos, length = sizeof(BasisGroup);
-
-	Pos = Buffer->Write((Ptr) &length, sizeof(long));
-	Pos += Buffer->Write((Ptr) this, length);
-	return Pos;
-}
-long BasisGroup::ReadFromBuffer(BufferFile *Buffer) {
-	long mylength, size;
-
-	size = Buffer->Read((Ptr) &mylength, sizeof(long));
-	if (mylength != sizeof(BasisGroup)) return size;
-	size += Buffer->Read((Ptr) this, mylength);
-	return size;
-}
 void BasisGroup::WriteXML(XMLElement * parent) const {
 	char line[kMaxLineLength];
 	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOBasisGroupElement));
@@ -2293,45 +1982,6 @@ short DataGroup::SetNumZVar(short NewNum) {
 	NumZVar = NewNum;
 	return NumZVar;
 }
-long DataGroup::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long size = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return size;
-}
-long DataGroup::WriteToBuffer(BufferFile *Buffer) {
-	long Pos, length = sizeof(DataGroup);
-
-	Pos = Buffer->Write((Ptr) &length, sizeof(long));
-	Pos += Buffer->Write((Ptr) this, length);
-
-	if (Title) {
-		length = 1;
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		length = 1 + strlen(Title);
-		Pos += Buffer->Write((Ptr) &length, sizeof(long));
-		Pos += Buffer->Write((Ptr) Title, length);
-	}
-	return Pos;
-}
-void DataGroup::ReadFromBuffer(BufferFile *Buffer, long length) {
-	long mylength, pos, code;
-
-	pos = Buffer->Read((Ptr) &mylength, sizeof(long));
-	if (mylength != sizeof(DataGroup)) return;
-	pos += Buffer->Read((Ptr) this, mylength);
-	if (pos < length) {
-		pos += Buffer->Read((Ptr) &code,sizeof(long));
-		if (code == 1) {	//Title card
-			pos += Buffer->Read((Ptr) &mylength, sizeof(long));
-			Title = new char[mylength];
-			if (Title) {
-				pos += Buffer->Read(Title, mylength);
-			} else throw MemoryError();
-		}
-	}
-}
 void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs * Prefs, long BasisTest) {
 	char	Out[133];
 
@@ -2551,47 +2201,6 @@ void GuessGroup::InitData(void) {
 	GuessType = 0;
 	Options = 0;
 }
-long GuessGroup::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long size = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return size;
-}
-long GuessGroup::WriteToBuffer(BufferFile *Buffer) {
-	long total, code, length = sizeof(GuessGroup);
-
-	code = 1;
-	total = Buffer->Write((Ptr) &code, sizeof(long));
-	length = 2*sizeof(float) + sizeof(long) + 2*sizeof(short) + sizeof(char);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) &MOTolZ, sizeof(float));
-	total += Buffer->Write((Ptr) &MOTolEquil, sizeof(float));
-	total += Buffer->Write((Ptr) &NumOrbs, sizeof(long));
-	total += Buffer->Write((Ptr) &VecSource, sizeof(short));
-	total += Buffer->Write((Ptr) &GuessType, sizeof(short));
-	total += Buffer->Write((Ptr) &Options, sizeof(char));
-
-		//copy iorder and jorder too
-
-	return total;
-}
-long GuessGroup::ReadFromBuffer(BufferFile *Buffer) {
-	long mylength, size;
-
-	size = Buffer->Read((Ptr) &mylength, sizeof(long));
-	if (mylength != 1) return size;
-	size += Buffer->Read((Ptr) &mylength, sizeof(long));
-	if (mylength != (2*sizeof(float) + sizeof(long) + 2*sizeof(short) + sizeof(char))) return size;
-	
-	size += Buffer->Read((Ptr) &MOTolZ, sizeof(float));
-	size += Buffer->Read((Ptr) &MOTolEquil, sizeof(float));
-	size += Buffer->Read((Ptr) &NumOrbs, sizeof(long));
-	size += Buffer->Read((Ptr) &VecSource, sizeof(short));
-	size += Buffer->Read((Ptr) &GuessType, sizeof(short));
-	size += Buffer->Read((Ptr) &Options, sizeof(char));
-	return size;
-}
 void GuessGroup::WriteToFile(BufferFile *File, InputData *IData, MoleculeData * MainData) {
 	long	test=false;
 	char	Out[133];
@@ -2788,28 +2397,6 @@ short SCFGroup::SetConvergance(short NewConv) {
 	if (NewConv > 0) ConvCriteria = NewConv;
 	return ConvCriteria;
 }
-long SCFGroup::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long size = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return size;
-}
-long SCFGroup::WriteToBuffer(BufferFile *Buffer) {
-	long	pos, length = sizeof(SCFGroup);
-
-	pos = Buffer->Write((Ptr) &length, sizeof(long));
-	pos += Buffer->Write((Ptr) this, length);
-	return pos;
-}
-long SCFGroup::ReadFromBuffer(BufferFile *Buffer) {
-	long mylength, size;
-
-	size = Buffer->Read((Ptr) &mylength, sizeof(long));
-	if (mylength != sizeof(SCFGroup)) return size;
-	size += Buffer->Read((Ptr) this, mylength);
-	return size;
-}
 void SCFGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	long	test=false;
 	char	Out[133];
@@ -2942,28 +2529,6 @@ bool MP2Group::SetLMOMP2(bool State) {
 	if (State) LMOMP2 = true;
 	else LMOMP2 = false;
 	return LMOMP2;
-}
-long MP2Group::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long size = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return size;
-}
-long MP2Group::WriteToBuffer(BufferFile *Buffer) {
-	long	pos, length=sizeof(MP2Group);
-
-	pos = Buffer->Write((Ptr) &length, sizeof(long));
-	pos += Buffer->Write((Ptr) this, length);
-	return pos;
-}
-long MP2Group::ReadFromBuffer(BufferFile *Buffer) {
-	long mylength, size;
-
-	size = Buffer->Read((Ptr) &mylength, sizeof(long));
-	if (mylength != sizeof(MP2Group)) return size;
-	size += Buffer->Read((Ptr) this, mylength);
-	return size;
 }
 void MP2Group::WriteToFile(BufferFile *File, InputData *IData) {
 	long	test=false;
@@ -3114,28 +2679,6 @@ void HessianGroup::InitData(void) {
 	FrequencyScaleFactor = 1.0;
 	BitOptions = 17;	//bit 1 + bit 5
 }
-long HessianGroup::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long size = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return size;
-}
-long HessianGroup::ReadFromBuffer(BufferFile *Buffer) {
-	long mylength, size;
-
-	size = Buffer->Read((Ptr) &mylength, sizeof(long));
-	if (mylength != sizeof(HessianGroup)) return size;
-	size += Buffer->Read((Ptr) this, mylength);
-	return size;
-}
-long HessianGroup::WriteToBuffer(BufferFile *Buffer) {
-	long	pos, length=sizeof(HessianGroup);
-
-	pos = Buffer->Write((Ptr) &length, sizeof(long));
-	pos += Buffer->Write((Ptr) this, length);
-	return pos;
-}
 void HessianGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	Boolean	method=false;
 	char	Out[133];
@@ -3268,47 +2811,6 @@ void DFTGroup::InitData(void) {
 	BitFlags = 0;
 	SetAuxFunctions(true);
 	SetMethodGrid(true);
-}
-long DFTGroup::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long size = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return size;
-}
-long DFTGroup::WriteToBuffer(BufferFile *Buffer) {
-	long	pos, length=2*sizeof(float)+7*sizeof(short)+sizeof(char);
-
-	pos = Buffer->Write((Ptr) &length, sizeof(long));
-	pos += Buffer->Write((Ptr) &GridSwitch, sizeof(float));
-	pos += Buffer->Write((Ptr) &Threshold, sizeof(float));
-	pos += Buffer->Write((Ptr) &Functional, sizeof(short));
-	pos += Buffer->Write((Ptr) &NumRadialGrids, sizeof(short));
-	pos += Buffer->Write((Ptr) &NumThetaGrids, sizeof(short));
-	pos += Buffer->Write((Ptr) &NumPhiGrids, sizeof(short));
-	pos += Buffer->Write((Ptr) &NumRadialGridsInit, sizeof(short));
-	pos += Buffer->Write((Ptr) &NumThetaGridsInit, sizeof(short));
-	pos += Buffer->Write((Ptr) &NumPhiGridsInit, sizeof(short));
-	pos += Buffer->Write((Ptr) &BitFlags, sizeof(char));
-	return pos;
-}
-long DFTGroup::ReadFromBuffer(BufferFile *Buffer) {
-	long mylength, size, length = 2*sizeof(float)+7*sizeof(short)+sizeof(char);
-
-	size = Buffer->Read((Ptr) &mylength, sizeof(long));
-	if (mylength != length) return size;
-	size += Buffer->Read((Ptr) this, mylength);
-	size += Buffer->Read((Ptr) &GridSwitch, sizeof(float));
-	size += Buffer->Read((Ptr) &Threshold, sizeof(float));
-	size += Buffer->Read((Ptr) &Functional, sizeof(short));
-	size += Buffer->Read((Ptr) &NumRadialGrids, sizeof(short));
-	size += Buffer->Read((Ptr) &NumThetaGrids, sizeof(short));
-	size += Buffer->Read((Ptr) &NumPhiGrids, sizeof(short));
-	size += Buffer->Read((Ptr) &NumRadialGridsInit, sizeof(short));
-	size += Buffer->Read((Ptr) &NumThetaGridsInit, sizeof(short));
-	size += Buffer->Read((Ptr) &NumPhiGridsInit, sizeof(short));
-	size += Buffer->Read((Ptr) &BitFlags, sizeof(char));
-	return size;
 }
 void DFTGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	char	Out[kMaxLineLength];
@@ -3620,6 +3122,44 @@ bool EffectiveFragmentsGroup::SetPositionType(const char * tag) {
 	}
 	return false;
 }
+void EffectiveFragmentsGroup::WriteXML(XMLElement * parent) const {
+	//This group is only needed if there are non-default values
+	if (UseInternalCoordinates() || !PolMethodIsDefault() || !PositionIsDefault() ||
+		(MaxMOs >= 0) || (NumBufferMOs >= 0) || (MaxBasisFuncs>=0)) {
+
+		char line[kMaxLineLength];
+		XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOEFPGroupElement));
+		if (UseInternalCoordinates())
+			Ele->addAttribute(CML_convert(MMP_IOEFPCoordType), GetGAMESSCoordText());
+		if (!PolMethodIsDefault())
+			Ele->addAttribute(CML_convert(MMP_IOEFPPolMethod), ConvertPolMethodToText(PolMethod()));
+		if (!PositionIsDefault())
+			Ele->addAttribute(CML_convert(MMP_IOEFPPosition), ConvertPositionMethodToText(PositionMethod()));
+		if (MaxMOs >= 0)
+			Ele->addAttribute(CML_convert(MMP_IOEFPMaxMOs), MaxMOs);
+		if (MaxBasisFuncs >= 0)
+			Ele->addAttribute(CML_convert(MMP_IOEFPMaxBasisFuncs), MaxBasisFuncs);
+		if (NumBufferMOs >= 0)
+			Ele->addAttribute(CML_convert(MMP_IOEFPNumBufferMOs), NumBufferMOs);
+	}
+}
+void EffectiveFragmentsGroup::ReadXML(XMLElement * parent) {
+	const char * u = parent->getAttributeValue(CML_convert(MMP_IOEFPCoordType));
+	if (u) {
+		SetCoordinatesType(u);
+	}
+	u = parent->getAttributeValue(CML_convert(MMP_IOEFPPolMethod));
+	if (u) {
+		SetPolMethod(u);
+	}
+	u = parent->getAttributeValue(CML_convert(MMP_IOEFPPosition));
+	if (u) {
+		SetPositionType(u);
+	}
+	parent->getAttributeValue(CML_convert(MMP_IOEFPMaxMOs), MaxMOs);
+	parent->getAttributeValue(CML_convert(MMP_IOEFPMaxBasisFuncs), MaxBasisFuncs);
+	parent->getAttributeValue(CML_convert(MMP_IOEFPNumBufferMOs), NumBufferMOs);
+}
 
 #pragma mark StatPtGroup
 void StatPtGroup::InitData(void) {
@@ -3634,28 +3174,6 @@ void StatPtGroup::InitData(void) {
 	MaxSteps = 20;
 	nRecalcHess = 0;
 	SetRadiusUpdate(true);
-}
-long StatPtGroup::GetSize(BufferFile *Buffer) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long size = WriteToBuffer(Buffer);
-	Buffer->SetOutput(cState);
-	return size;
-}
-long StatPtGroup::WriteToBuffer(BufferFile *Buffer) {
-	long	pos, length=sizeof(StatPtGroup);
-
-	pos = Buffer->Write((Ptr) &length, sizeof(long));
-	pos += Buffer->Write((Ptr) this, length);
-	return pos;
-}
-long StatPtGroup::ReadFromBuffer(BufferFile *Buffer) {
-	long mylength, size;
-
-	size = Buffer->Read((Ptr) &mylength, sizeof(long));
-	if (mylength != sizeof(StatPtGroup)) return size;
-	size += Buffer->Read((Ptr) this, mylength);
-	return size;
 }
 const char * StatPtGroup::GetMethodText(OptMethod type) {
 	switch (type) {
