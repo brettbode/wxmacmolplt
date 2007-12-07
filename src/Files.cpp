@@ -858,9 +858,29 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			MainData->InputOptions->EFP.SetNumBufferMOs(tag);
 		//Now tackle the individual fragment definitions
 		//These should consist of 4 line blocks of Fragname=xxx followed by three atom lines
-		Buffer->GetLine(Line);
-		while (ReadStringKeyword(Line, "FRAGNAME", token)) {
-			if (!strcasecmp(token, "H2ORHF")||!strcasecmp(token, "H2ODFT") {	//builtin EFP1 style is limited to H2O with known labels
+		//For now I am only going to deal with cartesian coordinates
+		if (MainData->InputOptions->EFP.UseCartesianCoordinates()) {
+			Buffer->GetLine(Line);
+			while (ReadStringKeyword(Line, "FRAGNAME", token)) {
+				if (!strcasecmp(token, "H2ORHF")||!strcasecmp(token, "H2ODFT")) {	//builtin EFP1 style is limited to H2O with known labels
+					MainData->FragmentNames.push_back(std::string(token));
+					long fragNum = MainData->FragmentNames.size();
+					CPoint3D	pos;
+					int		AtomType;
+					for (int i=0; i<3; i++) {
+						AtomType = -1;
+						Buffer->GetLine(Line);
+						//lines have format "label x, y, z"
+						sscanf(Line, "%s %f %f %f", token, &pos.x, &pos.y, &pos.z);
+						if (!strcasecmp(token, "O1")) AtomType = 8;
+						else if (!strcasecmp(token, "H2")||!strcasecmp(token, "H3")) AtomType = 1;
+						if (AtomType > 0) {
+							mpAtom * atm = lFrame->AddAtom(AtomType, pos);
+							atm->SetFragmentNumber(fragNum);
+						}
+					}
+				}
+				Buffer->GetLine(Line);
 			}
 		}
 	}
