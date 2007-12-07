@@ -273,6 +273,7 @@ class MolDisplayWin : public wxFrame {
 		void OnSaveUpdate(wxUpdateUIEvent& event);
 
 		void OnSaveStructureUpdate(wxUpdateUIEvent& event);
+		void DeleteSelected();
 
 		DECLARE_EVENT_TABLE()
 

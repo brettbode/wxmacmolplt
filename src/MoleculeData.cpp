@@ -376,7 +376,7 @@ void MoleculeData::UnitConversion(bool AtoB) {
 //Rotate the molecule by 180 degrees about either the horizontal or vertical axis
 //Pass in 0 to flip about the horizontal axis, 1 for vertical
 void MoleculeData::FlipRotation(short theItem) {
-	Point			p={0,0}, q={10,10}, sphereCenter={10,10};
+	Point			p(0,0), q(10,10), sphereCenter(10,10);
 	long			sphereRadius=10;
 	Matrix4D		rotationMatrix, tempcopyMatrix;
 

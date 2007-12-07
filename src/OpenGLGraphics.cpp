@@ -664,8 +664,7 @@ void MolDisplayWin::DrawMoleculeGL(void)
 }
 #endif
 
-void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball)
-{
+void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball) {
 #ifndef __wxBuild__
 	aglSetCurrentContext (OpenGLData->aglContext);
 #endif
@@ -673,96 +672,84 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball)
 	if (OpenGLData->transpTriList) { //update the transparent surface sorting
 		SortTransparentTriangles();
 	}
+
 	DrawGL();	//actual drawing
 
-	{
-		// Now add stuff specific to rotations
-		// glDisable(GL_DEPTH_TEST);	//These are not strictly neccessary, but probably increase speed
-		// glShadeModel(GL_FLAT);
-		// glDisable(GL_LIGHTING);
+	// Now add stuff specific to rotations
+	// glDisable(GL_DEPTH_TEST);	//These are not strictly neccessary, but probably increase speed
+	// glShadeModel(GL_FLAT);
+	// glDisable(GL_LIGHTING);
 
-		GLint matrixMode;
-		glGetIntegerv (GL_MATRIX_MODE, &matrixMode);
-		glMatrixMode (GL_PROJECTION);
-		glPushMatrix();
-		glLoadIdentity ();
-		glMatrixMode (GL_MODELVIEW);
-		glPushMatrix();
-		glLoadIdentity ();
+	GLint matrixMode;
+	glGetIntegerv (GL_MATRIX_MODE, &matrixMode);
+	glMatrixMode (GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity ();
+	glMatrixMode (GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity ();
 #ifdef __wxBuild__
-		wxRect DisplayRect = glCanvas->GetRect();
-		long hsize = DisplayRect.GetWidth();
-		long vsize = DisplayRect.GetHeight();
+	wxRect DisplayRect = glCanvas->GetRect();
+	long hsize = DisplayRect.GetWidth();
+	long vsize = DisplayRect.GetHeight();
 #else
-		long hsize = DisplayRect.right - DisplayRect.left;
-		long vsize = DisplayRect.bottom - DisplayRect.top;
+	long hsize = DisplayRect.right - DisplayRect.left;
+	long vsize = DisplayRect.bottom - DisplayRect.top;
 #endif
-		glScalef (2.0 / hsize, -2.0 /  vsize, 1.0);
-		glTranslatef (-hsize / 2.0, -vsize / 2.0, 0.0);
+	glScalef (2.0 / hsize, -2.0 /  vsize, 1.0);
+	glTranslatef (-hsize / 2.0, -vsize / 2.0, 0.0);
 
-		RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
-		long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
+	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
+	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
 
-		//choose black or white based on the background color
-		if (backMagnitude > 70000)  //"light" background choose black
-			glColor3f (0.0, 0.0, 0.0);
-		else
-			glColor3f (1.0, 1.0, 1.0);
+	//choose black or white based on the background color
+	if (backMagnitude > 70000)  //"light" background choose black
+		glColor3f (0.0, 0.0, 0.0);
+	else
+		glColor3f (1.0, 1.0, 1.0);
 
-		if (ShowAngles) {
-			char AngleString[50];
-			float psi, phi, theta;
-			MatrixToEulerAngles(MainData->TotalRotation, &psi, &phi, &theta);
-			sprintf((char *)AngleString, "%.2f, %.2f, %.2f, Scale:%.2f",
-					psi, phi, theta, MainData->WindowSize);
+	if (ShowAngles) {
+		char AngleString[50];
+		float psi, phi, theta;
+		MatrixToEulerAngles(MainData->TotalRotation, &psi, &phi, &theta);
+		sprintf((char *)AngleString, "%.2f, %.2f, %.2f, Scale:%.2f",
+				psi, phi, theta, MainData->WindowSize);
 
-			DrawStaticLabel(AngleString, 10, -20);
-		}
-#ifndef __wxBuild__
-				if (ShowAngles) {
-					glRasterPos3d (10, 12, 0); 
-					char AngleString[50];
-					float psi, phi, theta;
-					MatrixToEulerAngles(MainData->TotalRotation, &psi, &phi, &theta);
-					sprintf((char *)AngleString, "%.2f, %.2f, %.2f, Scale:%.2f",
-							psi, phi, theta, MainData->WindowSize);
-					DrawCStringGL (AngleString, OpenGLData->fontList);
-					// glRasterPos3d (10, (DisplayRect.bottom - DisplayRect.top) - 3, 0); 
-					// DrawCStringGL ((char*) glGetString (GL_RENDER), OpenGLData->fontList);
-				}
-#endif
-				//Draw the trackball outline
-				if (ShowTrackball) {
-					Point			sphereCenter;
-					long			sphereRadius; 
-					sphereCenter.h = hsize/2; 
-					sphereCenter.v = vsize/2;
-					if (sphereCenter.h >= sphereCenter.v)
-						sphereRadius   = (long)((float) (sphereCenter.h)*0.9);
-					else
-						sphereRadius   = (long)((float) (sphereCenter.v)*0.9);
-					long NumDivisions = (long) (20.0*(1.0+ sphereRadius/200.0));
-					float divarc = (2*kPi)/NumDivisions;
-
-					glLineWidth(1);
-					glBegin(GL_LINE_LOOP);
-					glVertex3d(sphereCenter.h-sphereRadius, sphereCenter.v, 0.0);
-					for (int i=0; i<NumDivisions; i++) {
-						float x = sphereCenter.h - (sphereRadius*cos(i*divarc));
-						float y = sphereCenter.v + (sphereRadius*sin(i*divarc));
-						glVertex3d(x, y, 0.0);
-					}
-					glEnd();
-				}
-			glPopMatrix(); // GL_MODELVIEW
-			glMatrixMode (GL_PROJECTION);
-			glPopMatrix();
-		glMatrixMode (matrixMode);
+		DrawStaticLabel(AngleString, 10, -20);
 	}
+
+	//Draw the trackball outline
+	if (ShowTrackball) {
+		Point			sphereCenter;
+		long			sphereRadius; 
+		sphereCenter.h = hsize/2; 
+		sphereCenter.v = vsize/2;
+		if (sphereCenter.h >= sphereCenter.v)
+			sphereRadius   = (long)((float) (sphereCenter.h)*0.9);
+		else
+			sphereRadius   = (long)((float) (sphereCenter.v)*0.9);
+		long NumDivisions = (long) (20.0*(1.0+ sphereRadius/200.0));
+		float divarc = (2*kPi)/NumDivisions;
+
+		glLineWidth(1);
+		glBegin(GL_LINE_LOOP);
+		glVertex3d(sphereCenter.h-sphereRadius, sphereCenter.v, 0.0);
+		for (int i=0; i<NumDivisions; i++) {
+			float x = sphereCenter.h - (sphereRadius*cos(i*divarc));
+			float y = sphereCenter.v + (sphereRadius*sin(i*divarc));
+			glVertex3d(x, y, 0.0);
+		}
+		glEnd();
+	}
+	glPopMatrix(); // GL_MODELVIEW
+	glMatrixMode (GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(matrixMode);
 	
 #ifndef __wxBuild__
 	aglSwapBuffers(OpenGLData->aglContext);	// finally swap buffers to display our work
 #endif
+
 }
 
 void MolDisplayWin::DrawGL(void) {

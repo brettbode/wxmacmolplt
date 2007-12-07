@@ -191,7 +191,13 @@ struct RGBColor {
 	unsigned short 					green;						/*magnitude of green component*/
 	unsigned short 					blue;						/*magnitude of blue component*/
 };
-struct Point { short h; short v; };
+class Point {
+	public:
+		Point() : h(0), v(0) {}
+		Point(short h, short v) : h(h), v(v) {}
+		short h;
+		short v;
+};
 #endif
 
 #ifdef WIN32

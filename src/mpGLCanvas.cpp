@@ -1087,7 +1087,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 			if (build_palette->InPeriodicMode()) {
 				MolWin->SetStatusText(_("Add new atom here."));
 			} else {
-				MolWin->SetStatusText(_("Add new structure here."));
+				MolWin->SetStatusText(_("Add new prototype here."));
 			}
 		} else if (selected_type == MMP_ATOM) {
 			wxString info, id;
@@ -1236,7 +1236,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 					if (structure) {
 						if (structure->link_atom == -1) {
-							MolWin->SetStatusText(wxT("Structure has no connecting bonding site."));
+							MolWin->SetStatusText(wxT("Prototype has no connecting bonding site."));
 						} else {
 							lFrame->resetAllSelectState();
 							MolWin->SetHighliteMode(true);
@@ -1277,7 +1277,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 			}
 
 			// If the user clicked on nothing, we try to add an atom given
-			// the selected element on the periodic table palette.
+			// the selected element on the builder palette.
 			else if (selected < 0 && !was_just_rotating) {
 
 				CPoint3D newPnt;
@@ -1357,7 +1357,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					}
 
 				}
-				lFrame->SetBonds(Prefs, true, false);
+				lFrame->SetBonds(Prefs, true, true);
 				MolWin->UpdateGLModel();
 			} else {
 				SelectObj(selected_type, selected, deSelectAll);
@@ -1476,6 +1476,8 @@ void MpGLCanvas::eventMouseWheel(wxMouseEvent& event) {
 	SetCurrent();
 	glfSetCurrentBMFFont(bitmap_fontd);
 
+	mMainData->WindowSize *= (event.GetWheelRotation() * 0.01f) /
+							 event.GetWheelDelta() + 1.0f;		
 	// The display window will calculate the appropriate action for mouse 
 	// wheel movement.
 	MolWin->Rotate(event);
@@ -1598,7 +1600,11 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				(*atom)->Position += centroid;
 			}
 
-		} else {
+		}
+		
+		// If Control/Command is not down, then the user is translating either
+		// in the screen plane, or in depth.
+		else {
 			GLdouble tmpX, tmpY, tmpZ;
 			findWinCoord(lAtoms[selected].Position.x,
 				lAtoms[selected].Position.y,
@@ -1618,15 +1624,15 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				was_zooming = true;
 			}
 
-			// If no shift, just transform.
+			// If no shift, just translate.
 			else {
 				if (was_zooming == true) {
 					GLdouble tmpWinX, tmpWinY;
 
 					findWinCoord(lAtoms[selected].Position.x,
-						lAtoms[selected].Position.y,
-						lAtoms[selected].Position.z,
-						tmpWinX, tmpWinY, atomDepth);
+								 lAtoms[selected].Position.y,
+								 lAtoms[selected].Position.z,
+								 tmpWinX, tmpWinY, atomDepth);
 		   
 					winDiffX = curr_mouse.x - (int) tmpWinX;
 					winDiffY = curr_mouse.y - (int) tmpWinY;
@@ -1642,6 +1648,8 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				MolWin->SelectionChanged(true);
 			}
 
+			// Screen plane translation can be restricted by an annotation
+			// constraint.
 			int constrain_anno_id = mMainData->GetConstrainAnnotation();
 			if (!event.ShiftDown() && !event.MiddleIsDown() &&
 				constrain_anno_id != -1 &&
@@ -1649,6 +1657,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				ConstrainPosition(constrain_anno_id, newX, newY, newZ);
 			}
 
+			// Or it can follow the mouse freely.
 			else {
 				GLdouble offset_x, offset_y, offset_z;
 
@@ -2594,7 +2603,7 @@ void MpGLCanvas::PasteAtMouse(wxCommandEvent& event) {
 		lFrame->SetAtomPosition(i, pos + offset);
 	}
 	
-	lFrame->SetBonds(Prefs, false, false);
+	lFrame->SetBonds(Prefs, true, true);
 	MolWin->BondsChanged();
 
 }
