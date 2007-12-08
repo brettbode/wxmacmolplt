@@ -3643,8 +3643,8 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 				
 				// Rotate.
 				else {
-					VirtualSphereQD3D(Point(mouse_start.x, mouse_start.y), Point(q.x, q.y),
-									  Point(sphereCenter.x, sphereCenter.y), sphereRadius,
+					VirtualSphereQD3D(mouse_start, q,
+									  sphereCenter, sphereRadius,
 									  rotationMatrix, MainData->TotalRotation);
 
 					CPoint3D InitialTrans, FinalTrans;

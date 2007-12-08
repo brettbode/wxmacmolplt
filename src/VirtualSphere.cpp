@@ -14,15 +14,12 @@
   еееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееее*/
 #include "Globals.h"
 #include "Geometries.h"	//Needed for a couple of structure and type definition
-#ifndef __wxBuild__
-#include <Quickdraw.h>
-#endif
 #include "VirtualSphere.h"
 #include "Math3D.h"
 
 /* Local routine */
-static void PointOnUnitSphere (Point	p,
-							   Point	cueCenter,
+static void PointOnUnitSphere (const wxPoint &	p,
+							   const wxPoint &	cueCenter,
 							   long		cueRadius,
 							   CPoint3D	*v);
 void Rotate3DPt(Matrix4D rotationMatrix, CPoint3D incoord, CPoint3D *outcoord);
@@ -34,11 +31,11 @@ void SetRotation4DMatrix (Matrix4D ModelRotation, Matrix4D rotationMatrix, const
  Determine the axis and angle of rotation from the last 2 locations of the mouse
  relative to the Virtual Sphere cue circle.  
 -------------------------------------------------------------------------------------------------*/
-void VirtualSphere (Point	p,	
-						   Point	q,
-						   Point	cueCenter,
-						   long		cueRadius,
-						   Matrix4D rotationMatrix)
+void VirtualSphere (const wxPoint &	p,	
+					const wxPoint &	q,
+					const wxPoint &	cueCenter,
+					long		cueRadius,
+					Matrix4D rotationMatrix)
 {	CPoint3D		op, oq;
 
 	/* Project mouse points to 3-D points on the +z hemisphere of a unit
@@ -51,12 +48,12 @@ void VirtualSphere (Point	p,
 	 * op to oq. */
 	SetRotationMatrix (rotationMatrix, &op, &oq);
 }
-void VirtualSphereQD3D 	(Point	p,	
-						  		 Point	q,
-						  		 Point	cueCenter,
-						  		 long	cueRadius,
-						  		 Matrix4D rotationMatrix,
-						  		 Matrix4D ModelRotation)
+void VirtualSphereQD3D (const wxPoint &	p,	
+						const wxPoint &	q,
+						const wxPoint &	cueCenter,
+						long	cueRadius,
+						Matrix4D rotationMatrix,
+						Matrix4D ModelRotation)
 {	CPoint3D		op, oq;
 
 	/* Project mouse points to 3-D points on the +z hemisphere of a unit
@@ -137,8 +134,8 @@ void SetRotation4DMatrix (Matrix4D ModelRotation, Matrix4D rotationMatrix, const
  Orthographic projection is used, though technically the field of view of the camera
  should be taken into account.  However, the discrepancy is neglegible.
 -------------------------------------------------------------------------------------------------*/
-static void PointOnUnitSphere (Point	p,
-							   Point	cueCenter,
+static void PointOnUnitSphere (const wxPoint &	p,
+							   const wxPoint &	cueCenter,
 							   long		cueRadius,
 							   CPoint3D	*v)
 {	float	length;
@@ -147,9 +144,9 @@ static void PointOnUnitSphere (Point	p,
 	/* Turn the mouse points into vectors relative to the center of the circle
 	 * and normalize them.  Note we need to flip the y value since the 3D coordinate
 	 * has positive y going up. */
-	v->x = (float)  (p.h - cueCenter.h) / (float) cueRadius;
+	v->x = (float)  (p.x - cueCenter.x) / (float) cueRadius;
 //	v->y = (float)  (p.v - cueCenter.v) / (float) cueRadius;
-	v->y = (float)  (cueCenter.v - p.v) / (float) cueRadius;
+	v->y = (float)  (cueCenter.y - p.y) / (float) cueRadius;
 
 	lengthSquared = v->x*v->x + v->y*v->y;
 	

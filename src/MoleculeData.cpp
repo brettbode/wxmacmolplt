@@ -376,16 +376,16 @@ void MoleculeData::UnitConversion(bool AtoB) {
 //Rotate the molecule by 180 degrees about either the horizontal or vertical axis
 //Pass in 0 to flip about the horizontal axis, 1 for vertical
 void MoleculeData::FlipRotation(short theItem) {
-	Point			p(0,0), q(10,10), sphereCenter(10,10);
+	wxPoint			p(0,0), q(10,10), sphereCenter(10,10);
 	long			sphereRadius=10;
 	Matrix4D		rotationMatrix, tempcopyMatrix;
 
 //180 degree rotation is desired, but if the two vectors are colinear then the
 //rotation will not have a well defined axis so use two 90 degree rotations instead
 	if (theItem == 0) {	//flipHitem
-		p.v = 10;
+		p.y = 10;
 	} else {	//theItem == 1 (flipVitem)
-		p.h = 10;
+		p.x = 10;
 	}
 	VirtualSphereQD3D (p, q, sphereCenter, sphereRadius, rotationMatrix, TotalRotation);
 

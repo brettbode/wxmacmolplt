@@ -1552,12 +1552,12 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			glGetIntegerv(GL_VIEWPORT, viewport);
 
 			// The virtual sphere current and previous mouse locations.
-			Point prev, curr;
-			Point cent;
-			prev.h = prev_pt.x;
-			prev.v = prev_pt.y;
-			curr.h = curr_pt.x;
-			curr.v = curr_pt.y;
+			wxPoint prev, curr;
+			wxPoint cent;
+			prev.x = prev_pt.x;
+			prev.y = prev_pt.y;
+			curr.x = curr_pt.x;
+			curr.y = curr_pt.y;
 
 			// Calculate a point at maximal distance in along the x-axis in
 			// eye space.
@@ -1578,8 +1578,8 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 					   &(proj_max[0]), &(proj_max[1]), &(proj_max[2]));
 
 			// The centroid's projection is the center of the virtual sphere.
-			cent.h = (unsigned short) proj_pt[0];
-			cent.v = height - (unsigned short) proj_pt[1];
+			cent.x = (unsigned short) proj_pt[0];
+			cent.y = height - (unsigned short) proj_pt[1];
 
 			// The distance between the two projected points is the radius.
 			proj_pt[0] = proj_pt[0] - proj_max[0];

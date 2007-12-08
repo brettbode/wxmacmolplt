@@ -23,16 +23,16 @@
 #ifndef	__VIRTUALSPHERE__
 #define __VIRTUALSPHERE__
 
-void VirtualSphere (Point	p,	
-						   Point	q,
-						   Point	cueCenter,
-						   long		cueRadius,
-						   Matrix4D rotationMatrix);
+void VirtualSphere (const wxPoint &	p,	
+					const wxPoint &	q,
+					const wxPoint &	cueCenter,
+					long		cueRadius,
+					Matrix4D rotationMatrix);
 
-void VirtualSphereQD3D 	(Point	p,	
-						  		 Point	q,
-						  		 Point	cueCenter,
-						  		 long	cueRadius,
-						  		 Matrix4D rotationMatrix,
-						  		 Matrix4D ModelRotation);
+void VirtualSphereQD3D (const wxPoint &	p,	
+						const wxPoint &	q,
+						const wxPoint &	cueCenter,
+						long	cueRadius,
+						Matrix4D rotationMatrix,
+						Matrix4D ModelRotation);
 #endif /*__VIRTUALSPHERE__*/
