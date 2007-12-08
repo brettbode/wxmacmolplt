@@ -23,6 +23,8 @@
 #ifndef	__VIRTUALSPHERE__
 #define __VIRTUALSPHERE__
 
+#include "wx/wx.h"
+
 void VirtualSphere (const wxPoint &	p,	
 					const wxPoint &	q,
 					const wxPoint &	cueCenter,

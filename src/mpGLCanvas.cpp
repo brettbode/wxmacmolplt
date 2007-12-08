@@ -2451,24 +2451,24 @@ void MpGLCanvas::annoPopupMenu(int x, int y) {
 	if (interactiveMode &&
 		mMainData->Annotations[selected]->getType() != MP_ANNOTATION_MARKER) {
 		item = menu.AppendCheckItem(GL_Popup_Lock_To_Annotation,
-				                    wxT("Constrain atoms"));
+				                    wxT("Constrain Annotation"));
 		if (selected == mMainData->GetConstrainAnnotation()) {
 			item->Check(true);
 		}
 
 		switch (mMainData->Annotations[selected]->getType()) {
 			case MP_ANNOTATION_LENGTH:
-				menu.Append(GL_Popup_Set_Anno_Param, wxT("Set length"));
+				menu.Append(GL_Popup_Set_Anno_Param, wxT("Set Length"));
 				break;
 			case MP_ANNOTATION_ANGLE:
-				menu.Append(GL_Popup_Set_Anno_Param, wxT("Set angle"));
+				menu.Append(GL_Popup_Set_Anno_Param, wxT("Set Angle"));
 				break;
 			case MP_ANNOTATION_DIHEDRAL:
-				menu.Append(GL_Popup_Set_Anno_Param, wxT("Set angle"));
+				menu.Append(GL_Popup_Set_Anno_Param, wxT("Set Angle"));
 				break;
 		}
 	}
-	menu.Append(GL_Popup_Delete_Length, wxT("Delete annotation"));
+	menu.Append(GL_Popup_Delete_Length, wxT("Delete Annotation"));
 	PopupMenu(&menu, x, y);
 
 }
@@ -2500,7 +2500,7 @@ void MpGLCanvas::SetAnnotationParameter(wxCommandEvent& event) {
 
 	default_value.Printf(wxT("%f"), anno->getParam(*lFrame));
 	dlg = new wxTextEntryDialog(this, prompt, wxT("Edit Annotation"),
-			default_value);
+								default_value);
 
 	// Only if a valid number was entered and OK was clicked do we change the
 	// annotation parameter.

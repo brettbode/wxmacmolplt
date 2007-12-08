@@ -720,23 +720,23 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball) {
 
 	//Draw the trackball outline
 	if (ShowTrackball) {
-		Point			sphereCenter;
-		long			sphereRadius; 
-		sphereCenter.h = hsize/2; 
-		sphereCenter.v = vsize/2;
-		if (sphereCenter.h >= sphereCenter.v)
-			sphereRadius   = (long)((float) (sphereCenter.h)*0.9);
+		wxPoint sphereCenter;
+		long sphereRadius; 
+		sphereCenter.x = hsize / 2; 
+		sphereCenter.y = vsize / 2;
+		if (sphereCenter.x >= sphereCenter.y)
+			sphereRadius   = (long) (((float) sphereCenter.x) * 0.9);
 		else
-			sphereRadius   = (long)((float) (sphereCenter.v)*0.9);
-		long NumDivisions = (long) (20.0*(1.0+ sphereRadius/200.0));
-		float divarc = (2*kPi)/NumDivisions;
+			sphereRadius   = (long) (((float) sphereCenter.y) * 0.9);
+		long NumDivisions = (long) (20.0 * (1.0 + sphereRadius / 200.0));
+		float divarc = (2 * kPi) / NumDivisions;
 
 		glLineWidth(1);
 		glBegin(GL_LINE_LOOP);
-		glVertex3d(sphereCenter.h-sphereRadius, sphereCenter.v, 0.0);
+		glVertex3d(sphereCenter.x - sphereRadius, sphereCenter.y, 0.0);
 		for (int i=0; i<NumDivisions; i++) {
-			float x = sphereCenter.h - (sphereRadius*cos(i*divarc));
-			float y = sphereCenter.v + (sphereRadius*sin(i*divarc));
+			float x = sphereCenter.x - (sphereRadius*cos(i*divarc));
+			float y = sphereCenter.y + (sphereRadius*sin(i*divarc));
 			glVertex3d(x, y, 0.0);
 		}
 		glEnd();
@@ -766,7 +766,7 @@ void MolDisplayWin::DrawGL(void) {
 
 	gluDeleteQuadric(quad);
 
-	float anno_color[3];
+	float anno_color[4];
 	RGBColor *BackgroundColor = Prefs->GetBackgroundColorLoc();
 	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
 	
@@ -776,6 +776,7 @@ void MolDisplayWin::DrawGL(void) {
 	} else {
 		anno_color[0] = anno_color[1] = anno_color[2] = 1.0f;
 	}
+	anno_color[3] = 1.0f;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear out the buffer
 
@@ -815,19 +816,20 @@ void MolDisplayWin::DrawGL(void) {
 	if (MainData->GetAnnotationCount() > 0) {
 		glLoadName(MMP_ANNOTATION);
 		glPushName(0);
-		glDisable(GL_LIGHTING);
 		std::vector<Annotation *>::const_iterator anno;
+		glDisable(GL_BLEND);
+		glDisable(GL_LIGHTING);
 		int anno_id = 0;
 		for (anno = MainData->Annotations.begin();
 			 anno != MainData->Annotations.end(); anno++) {
 			glLoadName(anno_id + 1);
-			glColor3fv(anno_color);
+			glColor4fv(anno_color);
 			(*anno)->draw(this);
 			anno_id++;
 		}
-		glDisable(GL_BLEND);
+		/* glDisable(GL_BLEND); */
 		glPopName();
-		glDisable(GL_LIGHTING);
+		glEnable(GL_LIGHTING);
 	}
 	
 	// Add any surfaces
@@ -1096,8 +1098,9 @@ void AnnotationAngle::draw(const MolDisplayWin * win) const {
 }
 
 void AnnotationDihedral::draw(const MolDisplayWin * win) const {
-	MoleculeData * maindata = win->GetData();
-	Frame * cFrame = maindata->GetCurrentFramePtr();
+
+	MoleculeData *maindata = win->GetData();
+	Frame *cFrame = maindata->GetCurrentFramePtr();
 
 	//validate the atom references for this frame
 	if ((atoms[0] < 0)||(atoms[0] >= cFrame->GetNumAtoms())) return;
@@ -1118,9 +1121,10 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	Matrix4D plane2xy;
 	float angle;
 	GLuint stipple_tex;
+	GLfloat color[4];
+
+	glGetFloatv(GL_CURRENT_COLOR, color);
 	
-	glColor3f(0.0f, 0.0f, 0.0f);
-		
 	cFrame->GetAtomPosition(atoms[0], atom1_pos);
 	cFrame->GetAtomPosition(atoms[1], atom2_pos);
 	cFrame->GetAtomPosition(atoms[2], atom3_pos);
@@ -1187,7 +1191,7 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 		glTranslatef(atom3_pos.x, atom3_pos.y, atom3_pos.z);
 		glMultMatrixf((GLfloat *) plane2xy);
 
-		glColor4f(0.3f, 0.3f, 0.3f, 0.2f);
+		glColor4f(color[0] - 0.3f, color[1] - 0.3f, color[2] - 0.3f, 0.2f);
 		glBegin(GL_TRIANGLE_FAN);
 		glVertex3f(0.0f, 0.0f, 0.0f);
 		for (angle = 0.0f; angle <= 3.1416f; angle += 0.01f) {
@@ -1196,7 +1200,7 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 		glVertex3f(0.0f, 0.0f, 0.0f);
 		glEnd();
 
-		glColor4f(0.6f, 0.06f, 0.06f, 0.2f);
+		glColor4f(color[0] - 0.6f, color[1] - 0.06f, color[2] - 0.06f, 0.2f);
 		glLineWidth(2.0f);
 		glBegin(GL_LINES);
 			glVertex3f(-1.0f, 0.0f, 0.0f);
@@ -1210,7 +1214,7 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
 
-	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+	glColor4f(color[0], color[1], color[2], 1.0f);
 	DrawAngleAnnotation(&pt1, &atom3_pos, &pt3, win->GetPrefs(),
 						win->GetLengthTexId(), &normal1);
 	
@@ -1252,7 +1256,6 @@ void AnnotationMarker::draw(const MolDisplayWin * win) const {
 	invert1[0] = invert1[1] = invert1[2] = 0.0f;
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, m);
-	glDisable(GL_LIGHTING);
 	glLineWidth(3.0f);
 
 	invert2[0] = 0.0f;
@@ -1317,7 +1320,6 @@ void AnnotationMarker::draw(const MolDisplayWin * win) const {
 				ca2 * m[8] + sa2 * m[9]);
 	glEnd();
 	glLineWidth(1.0f);
-	glEnable(GL_LIGHTING);
 	glPopMatrix();
 }
 

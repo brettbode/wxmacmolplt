@@ -1,5 +1,6 @@
 #include "MyTypes.h"
 #include "Frame.h"
+#include <iostream>
 
 AnnotationLength::AnnotationLength(void) : Annotation() {
 	atoms[0] = -1;
@@ -177,9 +178,14 @@ float AnnotationAngle::getParam(const Frame& frame) const {
 	Normalize3D(&vec1);
 	Normalize3D(&vec2);
 
-	angle = acos(DotProduct3D(&vec1, &vec2)) * 180.0f / kPi;
+	float dot = DotProduct3D(&vec1, &vec2);
+	if (fabs(dot) < 0.999999f) {
+		angle = acos(dot);
+	} else {
+		angle = dot > 0.0f ? 0.0f : kPi;
+	}
 
-	return angle;
+	return angle * 180.0f / kPi;
 
 }
 
@@ -210,11 +216,21 @@ void AnnotationAngle::setParam(Frame& frame, float value) {
 	// So, we don't even really consider the vector from the third atom to the
 	// angle's vertex.
 	Normalize3D(&vec1);
+	Normalize3D(&vec2);
 
-	// The axis of rotation is the normal of the plane formed by the three
-	// atoms.
-	CrossProduct3D(&vec1, &vec2, &normal);
-	Normalize3D(&normal);
+	// If the atoms aren't collinear, the axis of rotation is the normal of the
+	// plane formed by the three atoms.
+	if (fabs(DotProduct3D(&vec1, &vec2)) < 0.999999f) {
+		CrossProduct3D(&vec1, &vec2, &normal);
+		Normalize3D(&normal);
+	}
+	
+	// Otherwise the atoms are collinear, and there are an infinite number of
+	// planes whose normal we could use.  The rotation is ambiguous, so we pick
+	// an arbitrary normal.
+	else {
+		OrthoVector(vec1, normal);
+	}
 
 	CPoint3D new_vec;
 	float angle_diff = value - getParam(frame);
@@ -356,7 +372,6 @@ void AnnotationDihedral::setParam(Frame& frame, float value) {
 	CPoint3D rotated_vec;
 	CPoint3D normal1;
 	CPoint3D normal2;
-	CPoint3D cross;
 	Matrix4D rotate;
 
 	frame.GetAtomPosition(atoms[0], atom1_pos);
@@ -383,10 +398,12 @@ void AnnotationDihedral::setParam(Frame& frame, float value) {
 	CrossProduct3D(&axis, &vec2, &normal2);
 	Normalize3D(&normal2);
 
-	CrossProduct3D(&normal1, &normal2, &cross);
-	Normalize3D(&cross);
+	if (fabs(DotProduct3D(&normal1, &normal2)) < 0.999999f) {
+		CrossProduct3D(&normal1, &normal2, &axis);
+		Normalize3D(&axis);
+	}
 
-	RotateAroundAxis(rotate, cross, getParam(frame) - value);
+	RotateAroundAxis(rotate, axis, getParam(frame) - value);
 
 	// Rotate3DPt(rotate, vec2, &rotated_vec); 
 
