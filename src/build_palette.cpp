@@ -283,11 +283,11 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 
 	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
 	wxString user_protos = gStdPaths.GetUserConfigDir();
-#if __UNIX__
+#if defined(__WXMAC__) || defined(__WXMSW__)
+	user_protos += wxT("/macmolplt_prototypes.cml");
+#else
 	// The standard unix path is the user's home dir. Thus the file should be "hidden".
 	user_protos += wxT("/.macmolplt_prototypes.cml");
-#else
-	user_protos += wxT("/macmolplt_prototypes.cml");
 #endif	
 
 	struc_sizer = new wxGridBagSizer();

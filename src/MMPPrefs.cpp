@@ -500,13 +500,11 @@ bool WinPrefs::ReadUserPrefs(void) {
 #ifdef __wxBuild__
 	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
 	wxString pathname = gStdPaths.GetUserConfigDir();
-#ifdef __WXMAC__
+#if defined(__WXMAC__) || defined(__WXMSW__)
 	pathname += wxT("/MacMolPlt.Prefs.xml");
-#elif __UNIX__
+#else
 	//The standarad unix path is the user's home dir. Thus the file should be "hidden".
 	pathname += wxT("/.MacMolPlt.Prefs.xml");
-#else
-	pathname += wxT("/MacMolPlt.Prefs.xml");
 #endif	
 	FILE * preffile = fopen(pathname.mb_str(wxConvUTF8), "r");
 	if (preffile) {
