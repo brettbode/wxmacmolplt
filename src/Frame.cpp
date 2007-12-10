@@ -620,8 +620,23 @@ long Frame::GetNumElectrons(void) const {
 	return result;
 };
 
-void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds, bool selectedOnly)
-{	long		iatm, jatm, maxbonds;
+/**
+ * Reevaluates the atom's bonds in this frame.  If KeepOldBonds is true and
+ * selectedOnly is true, then all bonds between selected atoms are retained and
+ * so are all bonds between unselected atoms; the only bonds that change are
+ * those between an unselected atom and a selected one.  If KeepOldBonds is
+ * true and selectedOnly is false, all incoming bonds are retained and new ones
+ * can be added anywhere.  If KeepOldBonds is false, all incoming bonds are 
+ * deleted.  In this case, selectedOnly being true will add new bonds only if
+ * they involve at least one selected atom, or if true, they may be added
+ * anywhere.
+ * @param Prefs Preferences used to determining bonding sensitivity.
+ * @param KeepOldBonds Flag indicating which bonds to leave alone.
+ * @param selectedOnly Flag indicate which atoms' bonds to consider.
+*/
+void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
+
+	long		iatm, jatm, maxbonds;
 	CPoint3D	offset;
 	float		distance, AutoDist=-1.0;
 	bool		newBond=true;
@@ -642,10 +657,12 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds, bool selectedOnly)
 		//Here we copy the old bond array over preserving the existing bonds
 		NumBonds = 0;
 		for (long ibond=0; ibond<NumOldBonds; ibond++) {
+			// In selectedOnly mode we only copy bonds that connect atoms
+			// in the same selection state.  In this way, we reevaluate bonds
+			// between the interface between selected and unselected.
 			if (selectedOnly) {
-				//In selectedOnly mode we do not copy bonds with selected atoms
-				if (!Atoms[OldBonds[ibond].Atom1].GetSelectState()
-					&& !Atoms[OldBonds[ibond].Atom2].GetSelectState()) {
+				if (Atoms[OldBonds[ibond].Atom1].GetSelectState() ==
+					Atoms[OldBonds[ibond].Atom2].GetSelectState()) {
 					Bonds[NumBonds] = OldBonds[ibond];
 					NumBonds++;
 				}
@@ -807,6 +824,7 @@ void Frame::SetBonds(WinPrefs * Prefs, bool KeepOldBonds, bool selectedOnly)
 		}
 	}
 } /* SetBonds */
+
 long Frame::BondExists(long a1, long a2) const {
 	long result = -1;
 
