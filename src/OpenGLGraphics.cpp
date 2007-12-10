@@ -1893,10 +1893,11 @@ void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 	while (pos < length) {
 		glPushMatrix();
 		glScalef(BondSize, BondSize, BondSize);
+		Prefs.ChangeColorBondColor(kHydrogenBond);
 		glCallList(sphere_list);
 		/* gluSphere(quadric, BondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere */
-		if (highlighting_on && bond.GetSelectState()) {
-			glColor3f(0.0f,0.0f,0.0f);
+		if (highlighting_on && !bond.GetSelectState()) {
+			glColor3f(0.0f, 0.0f, 0.0f);
 			glEnable(GL_POLYGON_STIPPLE);
 			glPolygonStipple(stippleMask);
 
@@ -1907,15 +1908,15 @@ void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 			/* gluSphere(quadric, BondSize*1.01, (long)(Quality), (long)(0.5*Quality)); */
 			glDisable(GL_POLYGON_STIPPLE);
 			
-			glColor4f(0.5,0.5,0.5,0.7f);
-			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-			glEnable(GL_BLEND);
-			glPushMatrix();
-			glScalef(1.02f, 1.02f, 1.02f);
-			glCallList(sphere_list);
-			glPopMatrix();
+			/* glColor4f(0.5,0.5,0.5,0.7f); */
+			/* glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); */
+			/* glEnable(GL_BLEND); */
+			/* glPushMatrix(); */
+			/* glScalef(1.02f, 1.02f, 1.02f); */
+			/* glCallList(sphere_list); */
+			/* glPopMatrix(); */
 			/* gluSphere(quadric, BondSize*1.02, (long)(Quality), (long)(0.5*Quality)); */
-			glDisable(GL_BLEND);
+			/* glDisable(GL_BLEND); */
 
 		}
 		glPopMatrix();
@@ -4437,7 +4438,8 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 	
 	BondOrder logical_order = bond.Order;
 	if (logical_order == kHydrogenBond) {
-		DrawHydrogenBond(bond, atom1, atom2, Prefs, quadric, sphere_list, true);
+		DrawHydrogenBond(bond, atom1, atom2, Prefs, quadric, sphere_list,
+						 highlighting_on);
 		return;
 	}
 
@@ -4525,6 +4527,7 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 			while (pos < length) {
 				glPushMatrix(); // scaled bond sphere location
 				glScalef(BondSize, BondSize, BondSize);
+				Prefs.ChangeColorBondColor(kHydrogenBond);
 				glCallList(sphere_list);
 				if (highlighting_on && !bond.GetSelectState()) {
 					glColor3f(0.0f,0.0f,0.0f);
