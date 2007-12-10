@@ -455,9 +455,9 @@ void BuilderDlg::OnLPChoice(wxCommandEvent& event) {
 /* ------------------------------------------------------------------------- */
 
 void BuilderDlg::OnStructureChoice(wxCommandEvent& event) {
-
-	if (event.GetSelection() != wxNOT_FOUND) {
-		canvas->SetStructure(structures[event.GetSelection()]);
+	int id = event.GetSelection();
+	if ((id != wxNOT_FOUND)&&(id>=0)&&(id<structures.size())) {
+		canvas->SetStructure(structures[id]);
 	}
 
 }
