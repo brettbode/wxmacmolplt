@@ -2132,59 +2132,65 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 	if (isAtom) {
 		insertAnnotationMenuItems(menu);
 
-		// If the periodic table is shown and an atom is selected, offer an
-		// option to change the clicked-on atom to the selected type.
-		if (build_palette && build_palette->GetSelectedElement() != 0 &&
-			build_palette->GetSelectedElement() != lFrame->Atoms[selected].GetType()) {
+		if (!lFrame->Atoms[selected].IsEffectiveFragment()) {
+			// If the periodic table is shown and an atom is selected, offer an
+			// option to change the clicked-on atom to the selected type.
+			if (build_palette && build_palette->GetSelectedElement() != 0 &&
+				build_palette->GetSelectedElement() != lFrame->Atoms[selected].GetType()) {
 
-			wxString label;
-			wxString atom_name;
-			Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1,
-				atom_name);
-			label = wxT("Change ") + atom_name + wxT(" to ");
-			Prefs->GetAtomLabel(build_palette->GetSelectedElement() - 1, atom_name);
-			label.Append(atom_name);
-			menu.Append(GL_Popup_Change_Atom, label);
-		}
+				wxString label;
+				wxString atom_name;
+				Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1,
+					atom_name);
+				label = wxT("Change ") + atom_name + wxT(" to ");
+				Prefs->GetAtomLabel(build_palette->GetSelectedElement() - 1, atom_name);
+				label.Append(atom_name);
+				menu.Append(GL_Popup_Change_Atom, label);
+			}
 
-		short cNum = lFrame->Atoms[selected].GetCoordinationNumber();
-		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Zero, wxT("0"));
-		if (cNum == 0) item->Check(true);
-		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_One, wxT("1"));
-		if (cNum == 1) item->Check(true);
-		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Two, wxT("2"));
-		if (cNum == 2) item->Check(true);
-		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Three, wxT("3"));
-		if (cNum == 3) item->Check(true);
-		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Four, wxT("4"));
-		if (cNum == 4) item->Check(true);
-		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Five, wxT("5"));
-		if (cNum == 5) item->Check(true);
-		item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Six, wxT("6"));
-		if (cNum == 6) item->Check(true);
-		menu.Append(GL_Popup_Change_Coord_Num, _("Change coordination #"), submenu);
+			short cNum = lFrame->Atoms[selected].GetCoordinationNumber();
+			item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Zero, wxT("0"));
+			if (cNum == 0) item->Check(true);
+			item = submenu->AppendRadioItem(GL_Popup_To_Coordination_One, wxT("1"));
+			if (cNum == 1) item->Check(true);
+			item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Two, wxT("2"));
+			if (cNum == 2) item->Check(true);
+			item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Three, wxT("3"));
+			if (cNum == 3) item->Check(true);
+			item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Four, wxT("4"));
+			if (cNum == 4) item->Check(true);
+			item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Five, wxT("5"));
+			if (cNum == 5) item->Check(true);
+			item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Six, wxT("6"));
+			if (cNum == 6) item->Check(true);
+			menu.Append(GL_Popup_Change_Coord_Num, _("Change coordination #"), submenu);
 
-		short LPNum = lFrame->Atoms[selected].GetLonePairCount();
-		submenu = new wxMenu();
-		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Zero, wxT("0"));
-		if (LPNum == 0) item->Check(true);
-		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_One, wxT("1"));
-		if (LPNum == 1) item->Check(true);
-		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Two, wxT("2"));
-		if (LPNum == 2) item->Check(true);
-		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Three, wxT("3"));
-		if (LPNum == 3) item->Check(true);
-		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Four, wxT("4"));
-		if (LPNum == 4) item->Check(true);
-		item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Five, wxT("5"));
-		if (LPNum == 5) item->Check(true);
-		menu.Append(GL_Popup_Change_LPCount, _("Change lone pair count"), submenu);
+			short LPNum = lFrame->Atoms[selected].GetLonePairCount();
+			submenu = new wxMenu();
+			item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Zero, wxT("0"));
+			if (LPNum == 0) item->Check(true);
+			item = submenu->AppendRadioItem(GL_Popup_To_LPCount_One, wxT("1"));
+			if (LPNum == 1) item->Check(true);
+			item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Two, wxT("2"));
+			if (LPNum == 2) item->Check(true);
+			item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Three, wxT("3"));
+			if (LPNum == 3) item->Check(true);
+			item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Four, wxT("4"));
+			if (LPNum == 4) item->Check(true);
+			item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Five, wxT("5"));
+			if (LPNum == 5) item->Check(true);
+			menu.Append(GL_Popup_Change_LPCount, _("Change lone pair count"), submenu);
 
-		// A plane is defined by exactly 3 atoms.  With any more than that, we 
-		// can have noncoplanar atoms.  Only then do we allow the user to fit
-		// the atoms to a plane.
-		if (lFrame->GetNumAtomsSelected() >= 4) {
-			menu.Append(GL_Popup_Fit_To_Plane, wxT("Fit atoms to plane"));
+			// A plane is defined by exactly 3 atoms.  With any more than that, we 
+			// can have noncoplanar atoms.  Only then do we allow the user to fit
+			// the atoms to a plane.
+			if (lFrame->GetNumAtomsSelected() >= 4) {
+				menu.Append(GL_Popup_Fit_To_Plane, wxT("Fit atoms to plane"));
+			}
+		} else {
+			//The selected atom is part of an effective fragment and thus should not be 
+			//modified directly.
+			menu.Append(GL_Popup_Change_EFP_To_AllElec, wxT("Convert EFP to ab initio atoms"));
 		}
 
 		if (lFrame->GetNumAtomsSelected() == 3) {
@@ -2299,6 +2305,14 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 		nItem.Append(aLabel);
 		item = menu.Append(wxID_ANY, nItem);
 		item->Enable(false);
+		
+		if (lFrame->Atoms[selected].IsEffectiveFragment()) {
+			wxString flabel(mMainData->FragmentNames[lFrame->Atoms[selected].GetFragmentNumber()-1].c_str(), wxConvUTF8);
+			aLabel.Printf(wxT("EFP "), (selected+1));
+			aLabel.Append(flabel);
+			item = menu.Append(wxID_ANY, aLabel);
+			item->Enable(false);
+		}
 
 		for (anno = mMainData->Annotations.begin(), anno_id = 0;
 			 anno != mMainData->Annotations.end() && !already_exists;
@@ -2956,6 +2970,44 @@ void MpGLCanvas::ConnectSelectedToSite(int src_atom, int src_site,
 	}
 }
 
+void MpGLCanvas::ConvertEFPToAllElec(wxCommandEvent& event) {
+	Frame *lFrame = mMainData->cFrame;
+	//Convert all atoms in the selected effective fragment to all electron atoms.
+	if (lFrame->Atoms[selected].IsEffectiveFragment()) {
+		int fragId = lFrame->Atoms[selected].GetFragmentNumber();
+		int firstatm=-1;
+		for (int iatom=0; iatom<lFrame->GetNumAtoms(); iatom++) {
+			if (lFrame->Atoms[iatom].IsEffectiveFragment()) {
+				if (lFrame->Atoms[iatom].GetFragmentNumber() == fragId) {
+					if (firstatm < 0) firstatm = iatom;
+					lFrame->Atoms[iatom].IsEffectiveFragment(false);
+				} else if (lFrame->Atoms[iatom].GetFragmentNumber() > fragId)
+					lFrame->Atoms[iatom].SetFragmentNumber(lFrame->Atoms[iatom].GetFragmentNumber()-1);
+			}
+		}
+		//indexing is now up to date, pop the fragname out of the list
+		std::vector<std::string>::iterator iter = mMainData->FragmentNames.begin();
+		for (int i=1; i<fragId; i++) ++iter;
+		mMainData->FragmentNames.erase(iter);
+		//data is update, but need to make sure this does leave mixed all-electron and fragment blocks
+		if (firstatm > 0 && lFrame->Atoms[firstatm-1].IsEffectiveFragment()) {
+			int firstfrag = -1;
+			for (int i=0; i<lFrame->GetNumAtoms(); i++) 
+				if (lFrame->Atoms[i].IsEffectiveFragment()) {
+					firstfrag = i;
+					break;
+				}
+			for (int i=firstfrag; i<lFrame->GetNumAtoms(); i++) {
+				if (!lFrame->Atoms[i].IsEffectiveFragment()) {
+					mMainData->ReorderAtomList(i, firstfrag);
+					firstfrag++;
+				}
+			}
+		}
+		MolWin->AtomsChanged(true, true);
+	}
+}
+
 void MpGLCanvas::OnIdleEvent(wxIdleEvent& event) {
 	draw();
 	event.RequestMore();
@@ -3029,5 +3081,6 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MENU(GL_Popup_To_LPCount_Five, MpGLCanvas::ChangeLPCount)
 	EVT_MENU(GL_Popup_Paste_At, MpGLCanvas::PasteAtMouse)
 	EVT_MENU(GL_Popup_Save_Prototype, MpGLCanvas::SavePrototype)
+	EVT_MENU(GL_Popup_Change_EFP_To_AllElec, MpGLCanvas::ConvertEFPToAllElec)
 END_EVENT_TABLE()
 

@@ -65,6 +65,7 @@
 #define GL_Popup_Paste_At 30048
 #define GL_Popup_Add_Plane_Normal 30049
 #define GL_Popup_Save_Prototype 30050
+#define GL_Popup_Change_EFP_To_AllElec 30051
 
 class BuilderDlg;
 
@@ -159,6 +160,10 @@ class MpGLCanvas : public wxGLCanvas {
 								   int dst_atom, int dst_site);
 		void OnIdleEvent(wxIdleEvent& event);
 		void SavePrototype(wxCommandEvent& event);
+		/**
+		 Convert the selected effective fragment into all-electron atoms.
+		 */
+		void ConvertEFPToAllElec(wxCommandEvent& event);
 
 	public:
 		/**
