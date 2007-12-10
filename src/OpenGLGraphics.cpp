@@ -4516,7 +4516,6 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 		glPushMatrix(); // bond pipe
 		glMultMatrixf((const GLfloat *) &rotMat);
 
-#if 0
 		if (bond.Order == kAromaticBond && ipipe == 1) {
 			// plot the 2nd part of an aromatic bond as a series of spheres similar to a hydrogen bond
 			Prefs.ChangeColorBondColor(kHydrogenBond);
@@ -4524,39 +4523,35 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 			float pos = 0.75*BondSize;
 			glTranslatef(0.0, 0.0, pos);
 			while (pos < length) {
-				glPushMatrix();
+				glPushMatrix(); // scaled bond sphere location
 				glScalef(BondSize, BondSize, BondSize);
 				glCallList(sphere_list);
-				/* gluSphere(quadric, BondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere */
 				if (highlighting_on && !bond.GetSelectState()) {
 					glColor3f(0.0f,0.0f,0.0f);
 					glEnable(GL_POLYGON_STIPPLE);
 					glPolygonStipple(stippleMask);
-					glPushMatrix(); // stippled bond pipe
+					glPushMatrix(); // stipple-scaled bond sphere location
 					glScalef(1.01f, 1.01f, 1.01f);
 					glCallList(sphere_list);
-					glPopMatrix(); // stippled bond pipe
-					/* gluSphere(quadric, BondSize * 1.01, (long)(Quality), (long)(0.5*Quality)); */
+					glPopMatrix(); // stipple-scaled bond sphere location
 					glDisable(GL_POLYGON_STIPPLE);
 					
-					glColor4f(0.5,0.5,0.5,0.7f);
-					glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-					glEnable(GL_BLEND);
-					glPushMatrix(); // transparent bond pipe
-					glScalef(1.02f, 1.02f, 1.02f);
-					glCallList(sphere_list);
-					glPopMatrix(); // transparent bond pipe
-					/* gluSphere(quadric, BondSize*1.02, (long)(Quality), (long)(0.5*Quality)); */
-					glDisable(GL_BLEND);
+					/* glColor4f(0.5,0.5,0.5,0.7f); */
+					/* glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); */
+					/* glEnable(GL_BLEND); */
+					/* glPushMatrix(); // transparent bond pipe */
+					/* glScalef(1.02f, 1.02f, 1.02f); */
+					/* glCallList(sphere_list); */
+					/* glPopMatrix(); // transparent bond pipe */
+					/* glDisable(GL_BLEND); */
 				}
-				glPopMatrix(); // bond pipe
+				glPopMatrix(); // scaled bond sphere location
 				glTranslatef(0.0, 0.0, 2.5*BondSize);
 				pos += 2.5*BondSize;
 			}
-			glPopMatrix(); // base atom
+			glPopMatrix(); // bond pipe
 			continue;
 		}
-#endif
 		
 		// Now, if a bond is selected but not this one, we need to draw an
 		// encapsulating cylinder to mask it out.
