@@ -162,6 +162,7 @@ enum MMP_EventID {
 	MMP_TOOL_ARROW,
 	MMP_TOOL_LASSO,
 	MMP_TOOL_HAND,
+	MMP_SELECT_ALL,
 	MMP_SELECT_NONE,
 	MMP_SHOWBONDSITES,
 	MMP_SAVESTRUCTURE,
@@ -201,9 +202,10 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
 	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
 	EVT_UPDATE_UI(wxID_CLEAR,       MolDisplayWin::OnDeleteUpdate)
-	EVT_MENU (wxID_SELECTALL,       MolDisplayWin::menuEditSelect_all)
+	EVT_MENU (MMP_SELECT_ALL,       MolDisplayWin::menuEditSelect_all)
 	EVT_MENU (MMP_SELECT_NONE,		MolDisplayWin::menuEditSelectNone)
-	EVT_UPDATE_UI(MMP_SELECT_NONE,	MolDisplayWin::OnSelectionUpdate)
+	EVT_UPDATE_UI(MMP_SELECT_NONE,	MolDisplayWin::OnSelectNoneUpdate)
+	EVT_UPDATE_UI(MMP_SELECT_ALL,	MolDisplayWin::OnSelectAllUpdate)
 
 	EVT_MENU (MMP_SHOW_FULLSCREEN,  MolDisplayWin::menuViewShowFullScreen)
 	EVT_UPDATE_UI(MMP_SHOW_FULLSCREEN, MolDisplayWin::OnShowNormalScreen)
@@ -634,7 +636,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuEdit->Append(wxID_PASTE, wxT("&Paste\tCtrl+V"));
 	menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
 	menuEdit->AppendSeparator();
-	menuEdit->Append(wxID_SELECTALL, wxT("&Select All\tCtrl+A"));
+	menuEdit->Append(MMP_SELECT_ALL, wxT("&Select All\tCtrl+A"));
 	menuEdit->Append(MMP_SELECT_NONE, wxT("Select &None\tShift+Ctrl+A"));
 	menuEdit->AppendSeparator();
 	menuEdit->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"), wxT("Edit the default preferences for new windows"));
@@ -911,9 +913,14 @@ void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event ) {
 * wxEVT_UPDATE_UI event handler for Edit menu items
  */
 
-void MolDisplayWin::OnSelectionUpdate(wxUpdateUIEvent& event) {
-	menuEdit->Enable(wxID_CLEAR, mHighliteState && InEditMode());
+void MolDisplayWin::OnSelectNoneUpdate(wxUpdateUIEvent& event) {
+	/* menuEdit->Enable(wxID_CLEAR, mHighliteState && InEditMode()); */
 	event.Enable(MainData->cFrame->GetNumAtomsSelected() > 0);
+}
+
+void MolDisplayWin::OnSelectAllUpdate(wxUpdateUIEvent& event) {
+	/* menuEdit->Enable(wxID_CLEAR, mHighliteState && InEditMode()); */
+	event.Enable(MainData->cFrame->GetNumAtoms() > 0);
 }
 
 /**
@@ -2205,6 +2212,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 		struc->nbonds = new_bonds.size();
 		struc->bonds = new Bond[struc->nbonds];
 		memcpy(struc->bonds, &(new_bonds[0]), sizeof(Bond) * struc->nbonds);
+		delete[] new_ids;
 
 		// for (si = 0; si < natoms_selected; si++) { 
 			// std::cout << "structure_atoms[si]: " << structure_atoms[si] << std::endl; 
@@ -2225,7 +2233,6 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 			build_palette->AddUserStructure(struc);
 		} else {
 			delete struc;
-			delete new_ids;
 		}
 	}
 

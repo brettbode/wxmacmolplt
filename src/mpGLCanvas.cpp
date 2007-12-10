@@ -933,6 +933,9 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 	mpAtom *lAtoms = mMainData->cFrame->Atoms;
 
 	SetCurrent();
+
+	// We give the canvas keyboard focus since the builder dialog steals it.
+	this->SetFocus();
 	
 	long time_between = mouse_activate_timer.Time();
 	if (time_between < 10) {

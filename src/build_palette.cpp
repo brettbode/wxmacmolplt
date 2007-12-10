@@ -455,10 +455,19 @@ void BuilderDlg::OnLPChoice(wxCommandEvent& event) {
 /* ------------------------------------------------------------------------- */
 
 void BuilderDlg::OnStructureChoice(wxCommandEvent& event) {
-	int id = event.GetSelection();
-	if ((id != wxNOT_FOUND)&&(id>=0)&&(id<structures.size())) {
-		canvas->SetStructure(structures[id]);
-	}
+
+	/* int id = event.GetSelection(); */
+	/* if (InPeriodicMode()) { */
+		/* wxKeyEvent key_event(id); */
+		/* KeyHandler(key_event); */
+		/* std::cout << "skipping event" << std::endl; */
+		/* event.Skip(); */
+	/* } else { */
+		int id = event.GetSelection();
+		if (id != wxNOT_FOUND && id >= 0 && id < structures.size()) {
+			canvas->SetStructure(structures[id]);
+		}
+	/* } */
 
 }
 
@@ -926,6 +935,8 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 			}
 			canvas->Render();
 		}
+	} else {
+		elements[prev_id >= 0 ? prev_id : 0].button->SetFocus();
 	}
 
 }
