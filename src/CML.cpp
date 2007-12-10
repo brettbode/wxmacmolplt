@@ -248,7 +248,7 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_FragmentNameList));
 			for (int i=0; i<FragmentNames.size(); i++) {
-				XMLElement * FN = Ele->addChildElement("FRAGNAME", FragmentNames[i].c_str());
+				XMLElement * FN = Ele->addChildElement(kFRAGNAMEXML, FragmentNames[i].c_str());
 			}
 		}
 		//InputOptions
@@ -925,6 +925,10 @@ void Structure::WriteXML(XMLElement *parent) const {
 
 	snprintf(line, kMaxLineLength, "%ls", name.c_str());
 	struc_el->addAttribute(CML_convert(nameAttr), line);
+	
+	if (FragName.size() > 0) {
+		struc_el->addAttribute(kFRAGNAMEXML, FragName.c_str());
+	}
 
 	XMLElement *atoms_el = struc_el->addChildElement("atoms");
 	atoms_el->addAttribute(CML_convert(sizeAttr), natoms);
@@ -2670,6 +2674,11 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 	attr = struc_el->getAttributeValue(CML_convert(nameAttr));
 	if (!attr) return false;
 	name = wxString(attr, wxConvUTF8);
+
+	attr = struc_el->getAttributeValue(kFRAGNAMEXML);
+	if (attr != NULL) {
+		FragName = std::string(attr);
+	}
 
 	// Then we get an atoms element which contains some number of
 	// atom elements.

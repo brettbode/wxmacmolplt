@@ -260,6 +260,9 @@
 		8B33B9600BF8EDA20056C79E /* listaction.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9430BF8EDA20056C79E /* listaction.c */; };
 		8B33B9620BF8EDA20056C79E /* swf4compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9450BF8EDA20056C79E /* swf4compiler.tab.c */; };
 		8B33B9630BF8EDA20056C79E /* swf5compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9470BF8EDA20056C79E /* swf5compiler.tab.c */; };
+		8B3759AA0D0D8797008B8193 /* solvents.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B3759A90D0D8797008B8193 /* solvents.cml */; };
+		8B3759AB0D0D8797008B8193 /* solvents.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B3759A90D0D8797008B8193 /* solvents.cml */; };
+		8B3759AC0D0D8797008B8193 /* solvents.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B3759A90D0D8797008B8193 /* solvents.cml */; };
 		8B396E710C70AA8C009690AF /* build_palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B396E6F0C70AA8C009690AF /* build_palette.cpp */; };
 		8B396E720C70AA8C009690AF /* build_palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B396E6F0C70AA8C009690AF /* build_palette.cpp */; };
 		8B396E730C70AA8C009690AF /* build_palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B396E6F0C70AA8C009690AF /* build_palette.cpp */; };
@@ -329,6 +332,9 @@
 		8B45D25E0A700DB60005269A /* arial1.glf in Resources */ = {isa = PBXBuildFile; fileRef = 8B45D25D0A700DB60005269A /* arial1.glf */; };
 		8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
 		8B4FB3D40A3093470014F6B5 /* surfaceswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */; };
+		8B5BB9450CBC07EE00D802A9 /* system_structures.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B5BB9440CBC07EE00D802A9 /* system_structures.cml */; };
+		8B5BB9460CBC07EE00D802A9 /* system_structures.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B5BB9440CBC07EE00D802A9 /* system_structures.cml */; };
+		8B5BB9470CBC07EE00D802A9 /* system_structures.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B5BB9440CBC07EE00D802A9 /* system_structures.cml */; };
 		8B5D0D6C0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */; };
 		8B5D0D6D0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */; };
 		8B5D0D6E0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */; };
@@ -664,6 +670,7 @@
 		8B33B9460BF8EDA20056C79E /* swf4compiler.tab.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = swf4compiler.tab.h; path = actioncompiler/swf4compiler.tab.h; sourceTree = "<group>"; };
 		8B33B9470BF8EDA20056C79E /* swf5compiler.tab.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = swf5compiler.tab.c; path = actioncompiler/swf5compiler.tab.c; sourceTree = "<group>"; };
 		8B33B9480BF8EDA20056C79E /* swf5compiler.tab.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = swf5compiler.tab.h; path = actioncompiler/swf5compiler.tab.h; sourceTree = "<group>"; };
+		8B3759A90D0D8797008B8193 /* solvents.cml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = solvents.cml; path = resources/solvents.cml; sourceTree = "<group>"; };
 		8B396E6F0C70AA8C009690AF /* build_palette.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = build_palette.cpp; path = src/build_palette.cpp; sourceTree = "<group>"; };
 		8B396E700C70AA8C009690AF /* build_palette.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = build_palette.h; path = src/build_palette.h; sourceTree = "<group>"; };
 		8B396EAA0C764DB7009690AF /* BsVeraSans.fdb */ = {isa = PBXFileReference; lastKnownFileType = file; name = BsVeraSans.fdb; path = resources/fonts/BsVeraSans.fdb; sourceTree = "<group>"; };
@@ -675,6 +682,7 @@
 		8B4BB4410A0A7C9D00FE9CC6 /* appendframesoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = appendframesoptions.h; path = src/appendframesoptions.h; sourceTree = "<group>"; };
 		8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceswindow.cpp; path = src/surfaceswindow.cpp; sourceTree = "<group>"; };
 		8B4FB3D20A3093470014F6B5 /* surfaceswindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceswindow.h; path = src/surfaceswindow.h; sourceTree = "<group>"; };
+		8B5BB9440CBC07EE00D802A9 /* system_structures.cml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = system_structures.cml; path = resources/system_structures.cml; sourceTree = "<group>"; };
 		8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = symmetrypointgroupdlg.cpp; path = src/symmetrypointgroupdlg.cpp; sourceTree = "<group>"; };
 		8B5D0D6B0BC7ECA100CE2A4B /* symmetrypointgroupdlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = symmetrypointgroupdlg.h; path = src/symmetrypointgroupdlg.h; sourceTree = "<group>"; };
 		8B600B720B8F35C400084AF2 /* qtexport.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = qtexport.cpp; path = src/qtexport.cpp; sourceTree = "<group>"; };
@@ -845,6 +853,8 @@
 			children = (
 				8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */,
 				8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */,
+				8B5BB9440CBC07EE00D802A9 /* system_structures.cml */,
+				8B3759A90D0D8797008B8193 /* solvents.cml */,
 				8B45D25D0A700DB60005269A /* arial1.glf */,
 				8B6716370C44015B0067A3C9 /* arial1.bmf */,
 				8B396EAA0C764DB7009690AF /* BsVeraSans.fdb */,
@@ -1176,10 +1186,12 @@
 		1652D9FF09D0AE7200B7783F /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 1652DA0009D0AE7200B7783F /* Build configuration list for PBXProject "wxMacMolPlt" */;
+			compatibilityVersion = "Xcode 2.4";
 			hasScannedForEncodings = 0;
 			mainGroup = 1652D9FD09D0AE7200B7783F;
 			productRefGroup = 1652DA0C09D0AE8F00B7783F /* Products */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				1652DA0A09D0AE8F00B7783F /* wxMacMolPlt */,
 				8B8816AD0A751FED00EC8791 /* wxMacMolPlt-ppc */,
@@ -1204,6 +1216,8 @@
 				8B33B8AF0BF8ED280056C79E /* Makefile.in in Resources */,
 				8B6716380C44015B0067A3C9 /* arial1.bmf in Resources */,
 				8B396EAB0C764DB7009690AF /* BsVeraSans.fdb in Resources */,
+				8B5BB9450CBC07EE00D802A9 /* system_structures.cml in Resources */,
+				8B3759AA0D0D8797008B8193 /* solvents.cml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1222,6 +1236,8 @@
 				8B33B9110BF8ED280056C79E /* Makefile.in in Resources */,
 				8B6716390C44015B0067A3C9 /* arial1.bmf in Resources */,
 				8B396EAC0C764DB7009690AF /* BsVeraSans.fdb in Resources */,
+				8B5BB9460CBC07EE00D802A9 /* system_structures.cml in Resources */,
+				8B3759AB0D0D8797008B8193 /* solvents.cml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1240,6 +1256,8 @@
 				8B33B8E00BF8ED280056C79E /* Makefile.in in Resources */,
 				8B67163A0C44015B0067A3C9 /* arial1.bmf in Resources */,
 				8B396EAD0C764DB7009690AF /* BsVeraSans.fdb in Resources */,
+				8B5BB9470CBC07EE00D802A9 /* system_structures.cml in Resources */,
+				8B3759AC0D0D8797008B8193 /* solvents.cml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1676,12 +1694,15 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = "";
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -1729,7 +1750,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
-				SDKROOT = "$(inherited)";
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
@@ -1741,10 +1762,13 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
@@ -1792,6 +1816,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
+				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
@@ -1808,10 +1833,12 @@
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = "";
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION_i386 = 4.0;
 				GCC_VERSION_ppc = 3.3;
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
@@ -1871,10 +1898,12 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION_i386 = 4.0;
 				GCC_VERSION_ppc = 3.3;
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;

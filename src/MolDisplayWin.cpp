@@ -2179,6 +2179,8 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 	int ai, bi;
 	int *new_ids;
 	int natoms_selected = frame->GetNumAtomsSelected();
+	bool abinitioAtoms=false, EFPAtoms=false;
+	int fragId = -1;
 
 	if (natoms_selected) {
 		struc = new Structure;	
@@ -2192,9 +2194,28 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 				struc->atoms[si] = atoms[ai];
 				new_ids[ai] = si;
 				si++;
+				//A prototype can be any number of all electron atoms or one effective fragment.
+				if (atoms[ai].IsEffectiveFragment()) {
+					EFPAtoms = true;
+					if (fragId < 0) {
+						fragId = atoms[ai].GetFragmentNumber();
+						struc->FragName = MainData->FragmentNames[fragId-1];
+					} else if (fragId != atoms[ai].GetFragmentNumber()) {
+						MessageAlert("A prototype can consist of only a single effective fragment.");
+						delete struc;
+						delete [] new_ids;
+						return;
+					}
+				} else abinitioAtoms = true;
 			} else {
 				new_ids[ai] = -1;
 			}
+		}
+		if (abinitioAtoms && EFPAtoms) {
+			MessageAlert("Prototypes can not mix all-electron and effective fragment atoms.");
+			delete struc;
+			delete [] new_ids;
+			return;
 		}
 
 		Bond new_bond;

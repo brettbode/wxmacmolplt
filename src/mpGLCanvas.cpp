@@ -1342,8 +1342,14 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 						lFrame->resetAllSelectState();
 						MolWin->SetHighliteMode(true);
+						int fragId=-1;
+						if (structure->FragName.size() > 0) {
+							fragId = mMainData->FragmentNames.size() + 1;
+							mMainData->FragmentNames.push_back(structure->FragName);
+						}
 						for (int i = 0; i < structure->natoms; i++) {
 							new_atom = mpAtom(structure->atoms[i]);
+							if (fragId > 0) new_atom.SetFragmentNumber(fragId);
 							mMainData->NewAtom(new_atom);
 							lFrame->GetAtomPosition(lFrame->NumAtoms - 1, pos);
 							lFrame->SetAtomPosition(lFrame->NumAtoms - 1, pos + offset);

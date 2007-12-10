@@ -650,10 +650,12 @@ void BuilderDlg::AddStructure(Structure *structure) {
 
 	int i;
 
-	for (i = structure->natoms - 1; i >= 0; i--) {
-		if (structure->atoms[i].Type == 1) {
-			structure->SetPruneAtom(i);
-			break;
+	if (structure->FragName.size() <= 0) {
+		for (i = structure->natoms - 1; i >= 0; i--) {
+			if (structure->atoms[i].Type == 1) {
+				structure->SetPruneAtom(i);
+				break;
+			}
 		}
 	}
 

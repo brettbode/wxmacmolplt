@@ -465,6 +465,7 @@ enum MMP_WindowDataNS {
 };
 
 #define kStructureXML "Structure"
+#define kFRAGNAMEXML	"FRAGNAME"
 
 #define kAnnotationXML "Annotation"
 #define kAnnAtom1XML "Atom-1"

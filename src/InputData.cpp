@@ -2019,16 +2019,18 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 	} else {
 		if (Coord <= UniqueCoordType) MainData->GenerateSymmetryUniqueAtoms();
 		for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
-			if ((Coord > UniqueCoordType)||(cFrame->Atoms[iatom].IsSymmetryUnique())) {
-				Str255 AtomLabel;
-				Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
-				AtomLabel[AtomLabel[0]+1] = 0;
-				sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
-					(char *) &(AtomLabel[1]), (float) (cFrame->Atoms[iatom].GetType()), 
-					cFrame->Atoms[iatom].Position.x, cFrame->Atoms[iatom].Position.y,
-					cFrame->Atoms[iatom].Position.z);
-				File->WriteLine(Out, true);
-				if (BasisTest) lBasis->WriteBasis(File, iatom);
+			if (!cFrame->Atoms[iatom].IsEffectiveFragment()) {
+				if ((Coord > UniqueCoordType)||(cFrame->Atoms[iatom].IsSymmetryUnique())) {
+					Str255 AtomLabel;
+					Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
+					AtomLabel[AtomLabel[0]+1] = 0;
+					sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
+						(char *) &(AtomLabel[1]), (float) (cFrame->Atoms[iatom].GetType()), 
+						cFrame->Atoms[iatom].Position.x, cFrame->Atoms[iatom].Position.y,
+						cFrame->Atoms[iatom].Position.z);
+					File->WriteLine(Out, true);
+					if (BasisTest) lBasis->WriteBasis(File, iatom);
+				}
 			}
 		}
 	}
@@ -2051,7 +2053,7 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 					File->WriteLine("FRAGNAME=", false);
 					File->WriteLine(MainData->GetFragmentName(iatom-1), true);
 					atomsWritten=0;
-					HydrogenIndex=1;
+					HydrogenIndex=2;
 				}
 				if (atomsWritten < 3) {	//the EFRAG group only punchs the first three atoms
 					//special case the atom labels for now. Eventually I think this should
@@ -2061,11 +2063,13 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 					else {
 						sprintf(Out, "H%d ", HydrogenIndex);
 						File->WriteLine(Out, false);
+						HydrogenIndex++;
 					}
 					sprintf(Out, "%10.5f  %10.5f  %10.5f",
 							cFrame->Atoms[iatom].Position.x, cFrame->Atoms[iatom].Position.y,
 							cFrame->Atoms[iatom].Position.z);
 					File->WriteLine(Out, true);
+					atomsWritten++;
 				}
 			}
 		}

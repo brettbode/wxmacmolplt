@@ -1,5 +1,4 @@
 #include "preview_canvas.h"
-
 #include "Math3D.h"
 #include "Globals.h"
 #include "VirtualSphere.h"
@@ -452,7 +451,7 @@ void PreviewCanvas::OnLeftMouseUp(wxMouseEvent& event) {
 
 	if (!event.ShiftDown() && !was_dragging) {
 		int selected = Pick();
-		if (selected >= 0 && struc->atoms[selected].Type == 1) {
+		if (selected >= 0 && struc->atoms[selected].Type == 1 && struc->FragName.size() <=0) {
 			struc->SetPruneAtom(selected);
 		}
 	}

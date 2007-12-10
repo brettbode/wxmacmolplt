@@ -2787,11 +2787,11 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 	
 	//First read in the fragment names which are separate from the coordinates
 	while (Buffer->LocateKeyWord("COORDINATES FOR FRAGMENT", 24)) {
-		if (Buffer->LocateKeyWord("NAMED", 5, 80)) {
+		if (Buffer->LocateKeyWord("NAMED", 5, Buffer->GetFilePos()+80)) {
 			Buffer->GetLine(Line);
-			sscanf(Line, "%s", Label);
+			sscanf(&(Line[5]), "%s", Label);
 			FragmentNames.push_back(std::string(Label));
-		}
+		} else Buffer->SkipnLines(1);
 	}
 
 	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS", 32)) {
@@ -2854,7 +2854,7 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 						MaxSize = MAX(MaxSize, fabs(Pos.z));
 						NumFragmentAtoms ++;
 					}
-				}
+				} else workingFragment = false;
 			}
 		}
 	}

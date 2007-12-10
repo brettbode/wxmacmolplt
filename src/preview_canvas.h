@@ -37,7 +37,6 @@ class PreviewCanvas : public wxGLCanvas {
 		void DrawAtoms();
 		int Pick();
 		
-		wxGLContext *context;
 		wxPoint curr_mouse;
 		wxPoint prev_mouse;
 		Matrix4D global_rotation;

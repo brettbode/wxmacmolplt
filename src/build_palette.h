@@ -45,6 +45,7 @@ class Structure {
 		int natoms;
 		Bond *bonds;
 		int nbonds;
+		std::string FragName;
 		wxString name;
 		int atom_to_prune;
 		int link_atom;
