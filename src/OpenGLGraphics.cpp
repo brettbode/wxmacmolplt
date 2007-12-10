@@ -4513,9 +4513,10 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 		rotMat[3][1] = v1.y;
 		rotMat[3][2] = v1.z;
 
-		glPushMatrix();
+		glPushMatrix(); // bond pipe
 		glMultMatrixf((const GLfloat *) &rotMat);
 
+#if 0
 		if (bond.Order == kAromaticBond && ipipe == 1) {
 			// plot the 2nd part of an aromatic bond as a series of spheres similar to a hydrogen bond
 			Prefs.ChangeColorBondColor(kHydrogenBond);
@@ -4531,41 +4532,35 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 					glColor3f(0.0f,0.0f,0.0f);
 					glEnable(GL_POLYGON_STIPPLE);
 					glPolygonStipple(stippleMask);
-					glPushMatrix();
+					glPushMatrix(); // stippled bond pipe
 					glScalef(1.01f, 1.01f, 1.01f);
 					glCallList(sphere_list);
-					glPopMatrix();
+					glPopMatrix(); // stippled bond pipe
 					/* gluSphere(quadric, BondSize * 1.01, (long)(Quality), (long)(0.5*Quality)); */
 					glDisable(GL_POLYGON_STIPPLE);
 					
 					glColor4f(0.5,0.5,0.5,0.7f);
 					glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 					glEnable(GL_BLEND);
-					glPushMatrix();
+					glPushMatrix(); // transparent bond pipe
 					glScalef(1.02f, 1.02f, 1.02f);
 					glCallList(sphere_list);
-					glPopMatrix();
+					glPopMatrix(); // transparent bond pipe
 					/* gluSphere(quadric, BondSize*1.02, (long)(Quality), (long)(0.5*Quality)); */
 					glDisable(GL_BLEND);
 				}
-				glPopMatrix();
+				glPopMatrix(); // bond pipe
 				glTranslatef(0.0, 0.0, 2.5*BondSize);
 				pos += 2.5*BondSize;
 			}
-			glPopMatrix();
+			glPopMatrix(); // base atom
 			continue;
 		}
+#endif
 		
 		// Now, if a bond is selected but not this one, we need to draw an
 		// encapsulating cylinder to mask it out.
 		if (highlighting_on && !bond.GetSelectState()) {
-			glPopMatrix();
-			glPushMatrix();
-
-			rotMat[3][0] = v1.x;
-			rotMat[3][1] = v1.y;
-			rotMat[3][2] = v1.z;
-			glMultMatrixf((const GLfloat *) &rotMat);
 
 			// Display stippled cylinder and spheres slightly larger than bond
 			// cylinder and spheres.
@@ -4574,54 +4569,47 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 			glPolygonStipple(stippleMask);
 			gluCylinder(quadric, tmpBondSize * 1.01f, tmpBondSize * 1.01f,
 						length, (long) Quality, (long) (0.5f * Quality));
-			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres
-				glPushMatrix();
-				glScalef(tmpBondSize * 1.01f, tmpBondSize * 1.01f,
-						 tmpBondSize * 1.01f);
-				glCallList(sphere_list);
-				glPopMatrix();
-				/* gluSphere(quadric, tmpBondSize * 1.01f, (long) Quality, */
-						  /* (long) (0.5f * Quality)); */
-				glPushMatrix();
-				glTranslatef(0.0f, 0.0f, length);
-				/* glTranslatef(0.0f, 0.0f, 1.0f); */
-				glPushMatrix();
-				glScalef(tmpBondSize * 1.01f, tmpBondSize * 1.01f,
-						 tmpBondSize * 1.01f);
-				glCallList(sphere_list);
-				glPopMatrix();
-				/* gluSphere(quadric, tmpBondSize * 1.01f, (long) Quality, */
-						  /* (long) (0.5f * Quality)); */
-				glPopMatrix();
-			}
-			glDisable(GL_POLYGON_STIPPLE);
 
+			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres
+				glPushMatrix(); // scaled end0 of bond pipe
+				glScalef(tmpBondSize * 1.01f, tmpBondSize * 1.01f,
+						 tmpBondSize * 1.01f);
+				glCallList(sphere_list);
+				glPopMatrix(); // scaled end0 of bond pipe
+
+				glPushMatrix(); // end1 of bond pipe
+				glTranslatef(0.0f, 0.0f, length);
+				glPushMatrix(); // scaled end1 of bond pipe
+				glScalef(tmpBondSize * 1.01f, tmpBondSize * 1.01f,
+						 tmpBondSize * 1.01f);
+				glCallList(sphere_list);
+				glPopMatrix(); // scaled end1 of bond pipe
+				glPopMatrix(); // end1 of bond pipe
+			}
+
+#if 0
 			// Display semi-transparent and non-stippled cylinder and spheres
 			// slightly larger than the bond and stippled cylinder and spheres.
-			//glColor4f(0.5f, 0.5f, 0.5f, 0.7f);
-			//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-			//glEnable(GL_BLEND);
-			//gluCylinder(quadric, tmpBondSize * 1.02f, tmpBondSize * 1.02f,
-			//length, (long) Quality, (long) (0.5 * Quality));
-
 			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres
-				glPushMatrix();
+				Prefs.ChangeColorAtomColor(atom1.GetType());
+				glPushMatrix(); // scaled end0 of bond pipe
 				glScalef(tmpBondSize * 1.02f, tmpBondSize * 1.02f,
 						 tmpBondSize * 1.02f);
 				glCallList(sphere_list);
-				glPopMatrix();
-				/* gluSphere(quadric, tmpBondSize * 1.02f, (long) Quality, */
-							 /* (long) (0.5 * Quality)); */
+				glPopMatrix(); // scaled end0 of bond pipe
+
+				Prefs.ChangeColorAtomColor(atom2.GetType());
+				glPushMatrix(); // end1 of bond pipe
 				glTranslatef(0.0f, 0.0f, length);
-				glPushMatrix();
+				glPushMatrix(); // scaled end1 of bond pipe
 				glScalef(tmpBondSize * 1.02f, tmpBondSize * 1.02f,
 						 tmpBondSize * 1.02f);
 				glCallList(sphere_list);
-				glPopMatrix();
-				/* gluSphere(quadric, tmpBondSize * 1.02f, (long) Quality, */
-						  /* (long) (0.5 * Quality)); */
+				glPopMatrix(); // scaled end1 of bond pipe
+				glPopMatrix(); // end1 of bond pipe
 			}
-			//glDisable(GL_BLEND);
+#endif
+			glDisable(GL_POLYGON_STIPPLE);
 
 		}
 
@@ -4647,7 +4635,6 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 				glScalef(tmpBondSize, tmpBondSize, tmpBondSize);
 				glCallList(sphere_list);
 				glPopMatrix();
-				/* gluSphere(quadric, tmpBondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere */
 			}
 
 			Prefs.ChangeColorAtomColor(atom2.GetType());
@@ -4665,23 +4652,11 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 				rotMat[3][1] = v2.y;
 				rotMat[3][2] = v2.z;
 				glMultMatrixf((const GLfloat *) &rotMat);
-				// glTranslatef(0.0, baseBondOffset+ipipe*3.5*tmpBondSize, 0.0);
 				glPushMatrix();
 				glScalef(tmpBondSize, tmpBondSize, tmpBondSize);
 				glCallList(sphere_list);
 				glPopMatrix();
-				/* gluSphere(quadric, tmpBondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere */
 			}
-			// glPopMatrix(); 
-			// if (Prefs.DrawWireFrame()) { //Add end caps if no spheres 
-				// glPopMatrix(); 
-				// glPushMatrix(); 
-				// rotMat[3][0] = v2.x; 
-				// rotMat[3][1] = v2.y; 
-				// rotMat[3][2] = v2.z; 
-				// glMultMatrixf((const GLfloat *) &rotMat); 
-				// gluDisk(quadric, 0.0, BondSize, (long)(Quality), 2); 
-			// } 
 		}
 		
 		// We only need to draw one cylinder the whole length of a bond since
