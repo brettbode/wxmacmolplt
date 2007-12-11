@@ -64,6 +64,10 @@ extern Boolean	gOpenGLAvailable;
 
 //#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
 
+void DrawPipeCylinder(float length, GLUquadric *quadric, unsigned int ncaps,
+					  GLuint sphere_list, float radius, long quality);
+void DrawPipeSpheres(const WinPrefs& Prefs, float length, float scale_factor,
+					 bool is_masked, GLuint sphere_list);
 void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, float m[16],
 						const CPoint3D& x_world, float offset, GLuint length_anno_tex_id, const WinPrefs * Prefs, bool draw_label = true);
 void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
@@ -4432,16 +4436,11 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 	CPoint3D v1, v2, offset, NormalOffset, NormEnd;
 	CPoint3D NormStart(0, 0, 1);
 	Matrix4D rotMat;
-	float Quality = Prefs.GetQD3DAtomQuality();
+	long Quality = (long) Prefs.GetQD3DAtomQuality();
 	float AtomScale = Prefs.GetAtomScale();
 	GLdouble BondSize = Prefs.GetQD3DBondWidth() * 0.5;
 	
 	BondOrder logical_order = bond.Order;
-	if (logical_order == kHydrogenBond) {
-		DrawHydrogenBond(bond, atom1, atom2, Prefs, quadric, sphere_list,
-						 highlighting_on);
-		return;
-	}
 
 	if (logical_order == kAromaticBond) logical_order = kDoubleBond;
 	if (!Prefs.ColorBondHalves()) logical_order = kSingleBond;	//only generate multiple pipes when colored by atom color
@@ -4451,47 +4450,55 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 	GLdouble baseBondOffset = -1.75 * tmpBondSize * (MAX(logical_order, 1) - 1);
 
 	if (atom1.GetInvisibility() || atom2.GetInvisibility()) return;
-
-	//if both atoms are selected, the bond is automatically
 	
-	GLdouble scr_coords1[3]; // Screen coordinates of atom1
-	GLdouble scr_coords2[3]; // Screen coordinates of atom2
-	CPoint3D scr_vec;        // Screen space vector between atoms
-	GLdouble perp_obj[3];    // Object coords on vector perp. to scr_vec
+	// If this is bond that's going to need multiple pipes, we want each
+	// pipe to be shifted in screen space so that all pipes are visible
+	// all the time.
 	CPoint3D offset_vec;     // Direction to shift bond cylinders
+	if (logical_order > 1) {
+		GLdouble scr_coords1[3]; // Screen coordinates of atom1
+		GLdouble scr_coords2[3]; // Screen coordinates of atom2
+		CPoint3D scr_vec;        // Screen space vector between atoms
+		GLdouble perp_obj[3];    // Object coords on vector perp. to scr_vec
 
-	// Find screen coordinates of one atom.
-	gluProject(atom1.Position.x, atom1.Position.y, atom1.Position.z,
-			   modelview, proj, viewport,
-			   &(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2]));
+		// Find screen coordinates of one atom.
+		gluProject(atom1.Position.x, atom1.Position.y, atom1.Position.z,
+				   modelview, proj, viewport,
+				   &(scr_coords1[0]), &(scr_coords1[1]), &(scr_coords1[2]));
 
-	// Find screen coordinates of other atom.
-	gluProject(atom2.Position.x, atom2.Position.y, atom2.Position.z,
-			   modelview, proj, viewport,
-			   &(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2]));
+		// Find screen coordinates of other atom.
+		gluProject(atom2.Position.x, atom2.Position.y, atom2.Position.z,
+				   modelview, proj, viewport,
+				   &(scr_coords2[0]), &(scr_coords2[1]), &(scr_coords2[2]));
 
-	// Find vector perpendicular to vector between two screen points and
-	// normalize it so we can scalar multiply it later.  We flip and 
-	// negate the slope of the line between the two screen coordinates to
-	// get the slop of the perpendicular line.
-	scr_vec.x = scr_coords2[1] - scr_coords1[1];
-	scr_vec.y = scr_coords1[0] - scr_coords2[0];
-	scr_vec.z = 0;
-	scr_vec *= 1 / scr_vec.Magnitude();
+		// Find vector perpendicular to vector between two screen points and
+		// normalize it so we can scalar multiply it later.  We flip and 
+		// negate the slope of the line between the two screen coordinates to
+		// get the slop of the perpendicular line.
+		scr_vec.x = scr_coords2[1] - scr_coords1[1];
+		scr_vec.y = scr_coords1[0] - scr_coords2[0];
+		scr_vec.z = 0;
+		scr_vec *= 1 / scr_vec.Magnitude();
 
-	// Now find a point on the perpendicular vector with atom1's depth
-	// and get its object coordinates.
-	gluUnProject(scr_coords1[0] + scr_vec.x * 10,
-				 scr_coords1[1] + scr_vec.y * 10,
-				 scr_coords1[2],
-				 modelview, proj, viewport,
-				 &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
+		// Now find a point on the perpendicular vector with atom1's depth
+		// and get its object coordinates.
+		gluUnProject(scr_coords1[0] + scr_vec.x * 10,
+					 scr_coords1[1] + scr_vec.y * 10,
+					 scr_coords1[2],
+					 modelview, proj, viewport,
+					 &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
 
-	// Finally, we see what direction all bond cylinders must be offset
-	// so that they will always stay in view.
-	offset_vec = CPoint3D(perp_obj[0], perp_obj[1], perp_obj[2]) -
-				 atom1.Position;
-	offset_vec *= 1 / offset_vec.Magnitude();
+		// Finally, we see what direction all bond cylinders must be offset
+		// so that they will always stay in view.
+		offset_vec = CPoint3D(perp_obj[0], perp_obj[1], perp_obj[2]) -
+					 atom1.Position;
+		offset_vec *= 1 / offset_vec.Magnitude();
+	}
+	
+	// If there's only one pipe, we need no offset.
+	else {
+		offset_vec = CPoint3D(0.0f, 0.0f, 0.0f);
+	}
 	
 	// For each "sub-bond" between these two atoms...
 	for (int ipipe = 0; ipipe < MAX(logical_order, 1); ++ipipe) {
@@ -4503,7 +4510,7 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 
 		offset = v2 - v1;
 		float length = offset.Magnitude();
-		if (length>0.00001) {
+		if (length > 0.00001) {
 			NormalOffset = offset * (1.0f / length);
 		} else {
 			NormalOffset = CPoint3D(0, 0, 0);
@@ -4518,40 +4525,13 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 		glPushMatrix(); // bond pipe
 		glMultMatrixf((const GLfloat *) &rotMat);
 
-		if (bond.Order == kAromaticBond && ipipe == 1) {
-			// plot the 2nd part of an aromatic bond as a series of spheres similar to a hydrogen bond
-			Prefs.ChangeColorBondColor(kHydrogenBond);
-			//Plot as a series of spheres
-			float pos = 0.75*BondSize;
-			glTranslatef(0.0, 0.0, pos);
-			while (pos < length) {
-				glPushMatrix(); // scaled bond sphere location
-				glScalef(BondSize, BondSize, BondSize);
-				Prefs.ChangeColorBondColor(kHydrogenBond);
-				glCallList(sphere_list);
-				if (highlighting_on && !bond.GetSelectState()) {
-					glColor3f(0.0f,0.0f,0.0f);
-					glEnable(GL_POLYGON_STIPPLE);
-					glPolygonStipple(stippleMask);
-					glPushMatrix(); // stipple-scaled bond sphere location
-					glScalef(1.01f, 1.01f, 1.01f);
-					glCallList(sphere_list);
-					glPopMatrix(); // stipple-scaled bond sphere location
-					glDisable(GL_POLYGON_STIPPLE);
-					
-					/* glColor4f(0.5,0.5,0.5,0.7f); */
-					/* glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); */
-					/* glEnable(GL_BLEND); */
-					/* glPushMatrix(); // transparent bond pipe */
-					/* glScalef(1.02f, 1.02f, 1.02f); */
-					/* glCallList(sphere_list); */
-					/* glPopMatrix(); // transparent bond pipe */
-					/* glDisable(GL_BLEND); */
-				}
-				glPopMatrix(); // scaled bond sphere location
-				glTranslatef(0.0, 0.0, 2.5*BondSize);
-				pos += 2.5*BondSize;
-			}
+		// Both hydrogen bonds and one part of the aromatic bond and drawn
+		// as a line of spheres.
+		if (bond.Order == kHydrogenBond ||
+			(bond.Order == kAromaticBond && ipipe == 1)) {
+			DrawPipeSpheres(Prefs, length, BondSize,
+							highlighting_on && !bond.GetSelectState(),
+							sphere_list);
 			glPopMatrix(); // bond pipe
 			continue;
 		}
@@ -4560,53 +4540,13 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 		// encapsulating cylinder to mask it out.
 		if (highlighting_on && !bond.GetSelectState()) {
 
-			// Display stippled cylinder and spheres slightly larger than bond
-			// cylinder and spheres.
-			glColor3f(0.0f, 0.0f, 0.0f);
 			glEnable(GL_POLYGON_STIPPLE);
 			glPolygonStipple(stippleMask);
-			gluCylinder(quadric, tmpBondSize * 1.01f, tmpBondSize * 1.01f,
-						length, (long) Quality, (long) (0.5f * Quality));
+			
+			glColor3f(0.0f, 0.0f, 0.0f);
+			DrawPipeCylinder(length, quadric, Prefs.DrawWireFrame() ? 3 : 0,
+							 sphere_list, tmpBondSize * 1.01f, Quality);
 
-			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres
-				glPushMatrix(); // scaled end0 of bond pipe
-				glScalef(tmpBondSize * 1.01f, tmpBondSize * 1.01f,
-						 tmpBondSize * 1.01f);
-				glCallList(sphere_list);
-				glPopMatrix(); // scaled end0 of bond pipe
-
-				glPushMatrix(); // end1 of bond pipe
-				glTranslatef(0.0f, 0.0f, length);
-				glPushMatrix(); // scaled end1 of bond pipe
-				glScalef(tmpBondSize * 1.01f, tmpBondSize * 1.01f,
-						 tmpBondSize * 1.01f);
-				glCallList(sphere_list);
-				glPopMatrix(); // scaled end1 of bond pipe
-				glPopMatrix(); // end1 of bond pipe
-			}
-
-#if 0
-			// Display semi-transparent and non-stippled cylinder and spheres
-			// slightly larger than the bond and stippled cylinder and spheres.
-			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres
-				Prefs.ChangeColorAtomColor(atom1.GetType());
-				glPushMatrix(); // scaled end0 of bond pipe
-				glScalef(tmpBondSize * 1.02f, tmpBondSize * 1.02f,
-						 tmpBondSize * 1.02f);
-				glCallList(sphere_list);
-				glPopMatrix(); // scaled end0 of bond pipe
-
-				Prefs.ChangeColorAtomColor(atom2.GetType());
-				glPushMatrix(); // end1 of bond pipe
-				glTranslatef(0.0f, 0.0f, length);
-				glPushMatrix(); // scaled end1 of bond pipe
-				glScalef(tmpBondSize * 1.02f, tmpBondSize * 1.02f,
-						 tmpBondSize * 1.02f);
-				glCallList(sphere_list);
-				glPopMatrix(); // scaled end1 of bond pipe
-				glPopMatrix(); // end1 of bond pipe
-			}
-#endif
 			glDisable(GL_POLYGON_STIPPLE);
 
 		}
@@ -4614,71 +4554,133 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 		// We may need to draw two cylinders if the user wants the bonds
 		// colored according to their element.
 		if (Prefs.ColorBondHalves()) {
-			//center the color change at the middle of the visible part of the bond
+			// Center the color change at the middle of the visible part of the
+			// bond.
 			float radius1 = AtomScale*Prefs.GetAtomSize(atom1.GetType() - 1);
 			float radius2 = AtomScale*Prefs.GetAtomSize(atom2.GetType() - 1);
 			float percent1 = radius1/length;
 			float percent2 = radius2/length;
-			float centerPercent = 0.5 + 0.5*(percent1-percent2);
+			float centerPercent = 0.5 + 0.5 * (percent1 - percent2);
 			
-			CPoint3D v3; //first half bond from atom 1
-			v3.x = centerPercent*(v2.x - v1.x)+v1.x;
-			v3.y = centerPercent*(v2.y - v1.y)+v1.y;
-			v3.z = centerPercent*(v2.z - v1.z)+v1.z;
-
+			// Draw first half.
 			Prefs.ChangeColorAtomColor(atom1.GetType());
-			gluCylinder(quadric, tmpBondSize, tmpBondSize, length*centerPercent, (long)(Quality), (long)(0.5*Quality));
-			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres
-				glPushMatrix();
-				glScalef(tmpBondSize, tmpBondSize, tmpBondSize);
-				glCallList(sphere_list);
-				glPopMatrix();
-			}
+			DrawPipeCylinder(length * centerPercent, quadric,
+							 Prefs.DrawWireFrame() ? 1 : 0, sphere_list,
+							 tmpBondSize, Quality);
 
+			// Draw second half starting at the weighted halfway point.
+			glPushMatrix(); // halfway point
+			glTranslatef(0.0f, 0.0f, length * centerPercent);
 			Prefs.ChangeColorAtomColor(atom2.GetType());
-			glPopMatrix();
-			glPushMatrix();
-			rotMat[3][0] = v3.x;
-			rotMat[3][1] = v3.y;
-			rotMat[3][2] = v3.z;
-			glMultMatrixf((const GLfloat *) &rotMat);
-			gluCylinder(quadric, tmpBondSize, tmpBondSize, length*(1-centerPercent), (long)(Quality), (long)(0.5*Quality));
-			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres
-				glPopMatrix();
-				glPushMatrix();
-				rotMat[3][0] = v2.x;
-				rotMat[3][1] = v2.y;
-				rotMat[3][2] = v2.z;
-				glMultMatrixf((const GLfloat *) &rotMat);
-				glPushMatrix();
-				glScalef(tmpBondSize, tmpBondSize, tmpBondSize);
-				glCallList(sphere_list);
-				glPopMatrix();
-			}
+			DrawPipeCylinder(length * (1.0f - centerPercent), quadric,
+							 Prefs.DrawWireFrame() ? 2 : 0,
+							 sphere_list, tmpBondSize, Quality);
+			glPopMatrix(); // halfway point
+
 		}
 		
 		// We only need to draw one cylinder the whole length of a bond since
 		// the user's not interested in coloring each half differently.
 		else {
 			Prefs.ChangeColorBondColor(bond.Order);
-			for (int i = 0; i < MAX(logical_order, 1); ++i) {
-				gluCylinder(quadric, tmpBondSize, tmpBondSize, length,
-							(long) Quality, (long) (0.5f * Quality));
-			}
-
-			if (Prefs.DrawWireFrame()) { //Add end caps if no spheres
-				gluDisk(quadric, 0.0, tmpBondSize, (long) Quality, 2);
-				glPopMatrix();
-				glPushMatrix();
-				rotMat[3][0] = v2.x;
-				rotMat[3][1] = v2.y;
-				rotMat[3][2] = v2.z;
-				glMultMatrixf((const GLfloat *) &rotMat);
-				gluDisk(quadric, 0.0, tmpBondSize, (long) Quality, 2);
-			}
+			DrawPipeCylinder(length, quadric, Prefs.DrawWireFrame() ? 3 : 0,
+							 sphere_list, tmpBondSize, Quality);
 		}
 
-		glPopMatrix();
+		glPopMatrix(); // bond pipe
+	}
+
+}
+
+/* ------------------------------------------------------------------------- */
+/**
+ * This function draws a series of spheres from the origin along the negative
+ * z-axis for length units.  The spheres are optionally drawn with a hatching
+ * mask.
+ * \param Prefs Prefences used to determine sphere color.
+ * \param length Distance along z-axis along which to draw spheres.
+ * \param scale_factor Size of spheres relative to current transform.
+ * \param is_masked Flag indicating whether to draw stippled overlay to mask
+ *                  spheres.
+ * \param sphere_list Preassembled display list that draws a sphere.
+ */
+
+void DrawPipeSpheres(const WinPrefs& Prefs, float length, float scale_factor,
+					 bool is_masked, GLuint sphere_list) {
+
+	glPushMatrix(); // offset from origin
+
+	// Plot as a series of spheres, starting slightly offset from the origin.
+	float pos = 0.75f * scale_factor;
+	glTranslatef(0.0, 0.0, pos);
+	while (pos < length) {
+		glPushMatrix(); // scaled sphere location
+		glScalef(scale_factor, scale_factor, scale_factor);
+
+		Prefs.ChangeColorBondColor(kHydrogenBond);
+		glCallList(sphere_list);
+
+		if (is_masked) {
+			glEnable(GL_POLYGON_STIPPLE);
+			glPolygonStipple(stippleMask);
+			glPushMatrix(); // stipple-scaled sphere location
+			glScalef(1.01f, 1.01f, 1.01f);
+			glColor3f(0.0f, 0.0f, 0.0f);
+			glCallList(sphere_list);
+			glPopMatrix(); // stipple-scaled sphere location
+			glDisable(GL_POLYGON_STIPPLE);
+		}
+
+		glPopMatrix(); // scaled sphere location
+
+		glTranslatef(0.0f, 0.0f, 2.5f * scale_factor);
+		pos += 2.5f * scale_factor;
+	}
+
+	glPopMatrix(); // offset from origin
+
+}
+
+/* ------------------------------------------------------------------------- */
+/**
+ * Draws a cylinder from the current transformation's origin along negative z
+ * axis for length units.  Assumes modeling transformation is in place, and
+ * OpenGL commands are ready to be issued.  Useful for drawing bond pipes that
+ * are optionally capped.
+ * \param length Extent of the cylinder along the z-axis.
+ * \param quadric Preallocated GLU quadric object.
+ * \param ncaps Number of end caps to draw.  Should be 1 to draw endcap only at
+ *              origin, 2 only at the opposite end, and 3 to draw both.
+ * \param sphere_list Preassembled display list id for drawing endcaps, which
+ * 					  should be valid if ncaps != 0.
+ * \param radius Radius of cylinder.
+ * \param quality Measure of "facetedness" of cylinder's geometric
+ * 				  representation.
+ */
+
+void DrawPipeCylinder(float length, GLUquadric *quadric, unsigned int ncaps,
+					  GLuint sphere_list, float radius, long quality) {
+
+	gluCylinder(quadric, radius, radius, length, quality,
+				(long) (0.5f * quality));
+
+	// Draw sphere at end0 if requested.
+	if (ncaps & 1) {
+		glPushMatrix(); // scaled end0
+		glScalef(radius, radius, radius);
+		glCallList(sphere_list);
+		glPopMatrix(); // scaled end0
+	}
+
+	// Draw sphere at end1 if requested.
+	if (ncaps & 2) {
+		glPushMatrix(); // end1
+		glTranslatef(0.0f, 0.0f, length);
+		glPushMatrix(); // scaled end1
+		glScalef(radius, radius, radius);
+		glCallList(sphere_list);
+		glPopMatrix(); // scaled end1
+		glPopMatrix(); // end1
 	}
 
 }
