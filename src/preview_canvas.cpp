@@ -174,30 +174,50 @@ void PreviewCanvas::Render() {
 
 		DrawAtoms();
 
+		// Should this structure be dropped in at a bonding site, we'll need
+		// a bonding site on the structure itself to connect to.  To do this,
+		// an atom may have been chosen as the prune atom.  We drop a big, red,
+		// screen-aligned X over the prune atom.
 		if (struc->atom_to_prune >= 0) {
 			mpAtom *atom = &struc->atoms[struc->atom_to_prune];
 			float radius;
 
-			glBindTexture(GL_TEXTURE_2D, mask_texture_id);
-			glEnable(GL_TEXTURE_2D);
-			glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,
-						  GL_SEPARATE_SPECULAR_COLOR);
+			glPushMatrix(); // structure centroid
 
-			glPushMatrix();
 			glTranslatef(atom->Position.x, atom->Position.y, atom->Position.z);
-			gPreferences->ChangeColorAtomColor(atom->Type);
 			radius = gPreferences->GetAtomScale() *
 					 gPreferences->GetAtomSize(atom->Type - 1);
 
-			glPushMatrix();
-			glScalef(radius, radius, radius);
-			glCallList(sphere_list);
-			glPopMatrix();
-			glPopMatrix();
+			// To make the X always face the viewer, we need to figure out what
+			// the x-, y-, and z-axes in eye space are in object space (where we
+			// are drawing).
+			float m[16];
+			glGetFloatv(GL_MODELVIEW_MATRIX, m);
+			CPoint3D x(m[0], m[4], m[8]);
+			CPoint3D y(m[1], m[5], m[9]);
+			CPoint3D z(m[2], m[6], m[10]);
+			x *= radius * 1.1f;
+			y *= radius * 1.1f;
+			z *= radius * -1.1f;
 
-			glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,
-						  GL_SINGLE_COLOR);
-			glDisable(GL_TEXTURE_2D);
+			// Display a big red X.  We draw the lines along the eye-space
+			// axes, using their object-space coordinates.  The x- and y-axes
+			// combine to form the corners of square; we draw along the
+			// square's diagonals.  We also move closer to the viewer along the
+			// z-axis.
+			glDisable(GL_LIGHTING);
+			glLineWidth(3.0f);
+			glColor3f(1.0f, 0.0f, 0.0f);
+			glBegin(GL_LINES);
+			glVertex3f(-x.x - y.x - z.x, -x.y - y.y - z.y, -x.z - y.z - z.z);
+			glVertex3f( x.x + y.x - z.x,  x.y + y.y - z.y,  x.z + y.z - z.z);
+			glVertex3f(-x.x + y.x - z.x, -x.y + y.y - z.y, -x.z + y.z - z.z);
+			glVertex3f( x.x - y.x - z.x,  x.y - y.y - z.y,  x.z - y.z - z.z);
+			glEnd();
+			glLineWidth(1.0f);
+			glEnable(GL_LIGHTING);
+
+			glPopMatrix(); // structure centroid
 		}
 
 		// We need these for calculating the offsets for double- and triple-
