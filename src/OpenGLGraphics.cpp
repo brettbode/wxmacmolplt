@@ -3,11 +3,7 @@
  *      see the LICENSE file in the top level directory
  */
 
-/*�������������������������������������������
-  �   routines to implement OpenGL graphics	�
-  �	  Brett Bode							�
-  �������������������������������������������
-
+/*
 	Added RotateMoleculeGL routine and code to generate the angle strings and trackball - BMB July 2001
 	Corrected Create3DGLPICT for resolutions other than 72 dpi - BMB Feb 2002
 */
