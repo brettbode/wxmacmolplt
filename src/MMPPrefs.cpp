@@ -317,6 +317,7 @@ WinPrefs::WinPrefs(void) {
 	SymbolLabels = NumberLabels = false;
 	CenterOnPage = true;
 	ShowSymOps = false;
+	show_toolbar = true;
 }
 
 WinPrefs::~WinPrefs(void) {
@@ -615,6 +616,9 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 			{
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AnimateTime), longVal))
 					SetAnimateTime(longVal);
+				if (child->getAttributeValue(MMPPref_convert(MMP_ShowToolbar), boolVal)) {
+					show_toolbar = boolVal;
+				}
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DAtomQuality), longVal))
 					SetQD3DAtomQuality(longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_BondWidth), floatVal))
@@ -1010,6 +1014,7 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	std::ostringstream outbuf;
 	XMLElement * molElement = root->addChildElement(MMPPref_convert(MMPPref_MolDisplayPrefs));
 
+	molElement->addBoolAttribute(MMPPref_convert(MMP_ShowToolbar), show_toolbar);
 	outbuf << GetAnimateTime();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_AnimateTime), outbuf.str().c_str());
 	outbuf.str("");
@@ -1440,6 +1445,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "BondOrder";
         case MMPMolDisplay_AnimateTime:
             return "AnimationDelay";
+        case MMP_ShowToolbar:
+            return "ShowToolbar";
 		case MMPMolDisplay_3DAtomQuality:
             return "Atom3DQuality";
         case MMPMolDisplay_BondWidth:

@@ -199,6 +199,7 @@ class WinPrefs {
 		GraphOptions	PlotOptions;
 		SurfaceOptions	SurfaceOpts;
 		FrequencyWindowOptions	FreqWinOpts;
+		bool show_toolbar;
 
 	public:
 		WinPrefs(void);
@@ -339,6 +340,9 @@ class WinPrefs {
 		inline void SetAtomColor(long AtomNum) {RGBForeColor(&(AtomColors[AtomNum]));};
 #endif
 		inline void SetAtomColor(long AtomNum, const RGBColor & color) {AtomColors[AtomNum] = color; };
+		inline bool ToolbarShown() const { return show_toolbar; }
+		/* inline bool ToggleToolbar() { show_toolbar = !show_toolbar; } */
+		inline void SetToolbarShown(bool enable) { show_toolbar = enable; }
 
 		//void SetAtomPattern(long AtomNum);
 		void SetAtomPattern(long AtomType, short pat) {

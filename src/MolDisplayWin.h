@@ -250,7 +250,7 @@ class MolDisplayWin : public wxFrame {
 							  long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
 
 		bool mHighliteState;
-		bool interactiveMode;
+		/* bool interactiveMode; */
 		bool stale_click;
 		wxToolBar *toolbar;
 		bool mAltModifyingToolBar;
@@ -271,6 +271,8 @@ class MolDisplayWin : public wxFrame {
 		void OnRotateTimer(wxTimerEvent& event);
 		void OnShowNormalScreen(wxUpdateUIEvent& event);
 		void OnSaveUpdate(wxUpdateUIEvent& event);
+		void ShowToolbar(bool enable = true);
+		void OnShowToolbarUpdate(wxUpdateUIEvent& event);
 
 		void OnSaveStructureUpdate(wxUpdateUIEvent& event);
 		void DeleteSelected();
@@ -426,11 +428,11 @@ class MolDisplayWin : public wxFrame {
 		 */
 		void menuBuilderShowBondSites(wxCommandEvent &event);
 		/**
-		 * Toggles the molecule builder. When active a toolbar is added to the main display
-		 * window.
+		 * Toggles the toolbar. When active a toolbar is added to the main
+		 * display window.
 		 * @param event The command event (not used).
 		 */
-		void menuBuilderInteractive_mode(wxCommandEvent &event);
+		void menuBuilderShowToolbar(wxCommandEvent &event);
 		/**
 		 * Toggles the build tools palette.
 		 * @param event The command event (not used).

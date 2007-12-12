@@ -135,7 +135,7 @@ enum MMP_EventID {
 	MMP_OFFSETMODE,
 	MMP_WINDOWPARAMETERS,
 	MMP_ZMATRIXCALC,
-	MMP_INTERACTIVE,
+	MMP_SHOW_TOOLBAR,
 	MMP_CURPOINTGROUP,
 	MMP_POINTGROUPORDER,
 	MMP_PGC1,
@@ -283,7 +283,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_CONVERTTOBOHR,		MolDisplayWin::menuMoleculeConvertToBohr)
 	EVT_MENU (MMP_CONVERTTOANGSTROMS,	MolDisplayWin::menuMoleculeConvertToAngstroms)
 	EVT_MENU (MMP_INVERTNORMALMODE,		MolDisplayWin::menuMoleculeInvertNormalMode)
-	EVT_MENU (MMP_INTERACTIVE,			MolDisplayWin::menuBuilderInteractive_mode)
+	EVT_MENU (MMP_SHOW_TOOLBAR,			MolDisplayWin::menuBuilderShowToolbar)
+	EVT_UPDATE_UI(MMP_SHOW_TOOLBAR,		MolDisplayWin::OnShowToolbarUpdate)
 	EVT_MENU (MMP_SHOWBUILDTOOLS,		MolDisplayWin::menuBuilderShowBuildTools)
 	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuBuilderAddHydrogens)
 	EVT_MENU (MMP_DELETEHYDROGENS,		MolDisplayWin::menuBuilderDeleteHydrogens)
@@ -410,7 +411,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
 	show_fullscreen = false;
 	mHighliteState = false;
-	interactiveMode = false;
+	/* interactiveMode = false; */
 	window_just_focused = false;
 	mAltModifyingToolBar = false;
 
@@ -466,13 +467,18 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 16, 8, 0, GL_ALPHA,
 				 GL_UNSIGNED_BYTE, texture);
-	//If this is a new/empty window default to edit mode (title should be "Untitled")
-	if (!title.Cmp(wxT("Untitled"))) {
-		wxCommandEvent foo;
-		menuBuilderInteractive_mode(foo);	//active the builder by default on new/empty windows
-		menuBuild->Check(MMP_INTERACTIVE, true);
-		foo.SetId(MMP_TOOL_HAND);
-		OnToggleTool(foo);
+
+	if (Prefs->ToolbarShown()) {
+		ShowToolbar();
+		menuBuild->Check(MMP_SHOW_TOOLBAR, Prefs->ToolbarShown());
+
+		// If this is a new/empty window default to edit mode (title should be
+		// "Untitled")
+		if (!title.Cmp(wxT("Untitled"))) {
+			wxCommandEvent foo;
+			foo.SetId(MMP_TOOL_HAND);
+			OnToggleTool(foo);
+		}
 	}
 }
 
@@ -698,7 +704,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
 
 #ifdef ENABLE_INTERACTIVE_MODE
-	menuBuild->AppendCheckItem(MMP_INTERACTIVE, _("Enable Molecule &Builder\tCtrl+I"), _("Interactive graphical molecular editor"));
+	menuBuild->AppendCheckItem(MMP_SHOW_TOOLBAR, _("Show Toolbar\tCtrl+I"), _("Show tools for viewing and editing atoms"));
 #endif
 	menuBuild->AppendCheckItem(MMP_SHOWBUILDTOOLS, _("Show Build &Tools\tCtrl+T"), _("Display build tools palette"));
 #ifdef ENABLE_INTERACTIVE_MODE
@@ -864,6 +870,10 @@ void MolDisplayWin::AdjustMenus(void) {
 
 void MolDisplayWin::OnSaveUpdate(wxUpdateUIEvent& event) {
 	event.Enable(Dirty);
+}
+
+void MolDisplayWin::OnShowToolbarUpdate(wxUpdateUIEvent& event) {
+	event.Check(Prefs->ToolbarShown());
 }
 
 void MolDisplayWin::OnUndoUpdate( wxUpdateUIEvent& event ) {
@@ -2117,11 +2127,24 @@ void MolDisplayWin::menuEditSelectNone(wxCommandEvent &event) {
 
 }
 
-void MolDisplayWin::menuBuilderInteractive_mode(wxCommandEvent &event)
-{
-	interactiveMode = 1 - interactiveMode;
+void MolDisplayWin::menuBuilderShowToolbar(wxCommandEvent &event) {
 
-	if (interactiveMode) {
+	ShowToolbar(event.IsChecked());
+
+}
+
+void MolDisplayWin::ShowToolbar(bool enable) {
+
+	bool needs_change;
+
+	Prefs->SetToolbarShown(enable);
+
+	needs_change = Prefs->ToolbarShown() == (toolbar == NULL);
+	if (!needs_change) {
+		return;
+	}
+
+	if (Prefs->ToolbarShown()) {
 		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT);
 
 #include "xpms/view.xpm"
@@ -2264,6 +2287,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 		} else {
 			delete struc;
 		}
+		delete[] new_ids;
 	}
 
 }
@@ -2859,7 +2883,7 @@ void MolDisplayWin::DeleteSelected() {
 void MolDisplayWin::KeyUpHandler(wxKeyEvent & event) {
 	//the only keyup event we care about at the moment is alt up when in edit/select mode
 	int key = event.GetKeyCode();
-	if (key == WXK_ALT && interactiveMode) {
+	if (key == WXK_ALT && Prefs->ToolbarShown()) {
 		if (mAltModifyingToolBar) {
 			toolbar->ToggleTool(MMP_TOOL_HAND, true);
 			glCanvas->SetCursor(wxCursor(wxCURSOR_HAND));
@@ -3393,6 +3417,10 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 	if (append) {
 		if ((type != CMLFile) || (test < 10)) ResetModel(true);
 	}
+
+	ShowToolbar(Prefs->ToolbarShown());
+	menuBuild->Check(MMP_SHOW_TOOLBAR, Prefs->ToolbarShown());
+
 	return test;
 }
 long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWindows) {
@@ -4039,7 +4067,7 @@ void FrameSnapShot::Restore(void) {
 }
 
 void MolDisplayWin::CreateFrameSnapShot(void) {
-	if (interactiveMode) {
+	if (Prefs->ToolbarShown()) {
 		FrameSnapShot * f = new FrameSnapShot(MainData->cFrame);
 		mUndoBuffer.AddSnapshot(f);
 	}

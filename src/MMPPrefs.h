@@ -112,6 +112,7 @@ enum MMPMolDisplayElments {
 	MMPMolDisplay_ShowAtomNumbers,
 	MMPMolDisplay_ShowSymmetryOps,
 	MMPMolDisplay_ShowAtomPatterns,
+	MMP_ShowToolbar,
 	
 	NumberMMPMolDisplayElements
 };
