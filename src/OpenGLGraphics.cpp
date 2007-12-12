@@ -1542,6 +1542,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		for (long iatom=0; iatom<NumAtoms; iatom++) {
 
 			if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
+			if (Prefs->ShowEFPWireFrame()&&lAtoms[iatom].IsEffectiveFragment()) continue;
 			long curAtomType = lAtoms[iatom].GetType() - 1;
 
 			float radius;
@@ -4565,7 +4566,9 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 			// Draw first half.
 			Prefs.ChangeColorAtomColor(atom1.GetType());
 			DrawPipeCylinder(length * centerPercent, quadric,
-							 Prefs.DrawWireFrame() ? 1 : 0, sphere_list,
+							 (Prefs.DrawWireFrame()||(Prefs.ShowEFPWireFrame() &&
+													  atom1.IsEffectiveFragment())) ? 1 : 0, 
+							 sphere_list,
 							 tmpBondSize, Quality);
 
 			// Draw second half starting at the weighted halfway point.
@@ -4573,7 +4576,8 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 			glTranslatef(0.0f, 0.0f, length * centerPercent);
 			Prefs.ChangeColorAtomColor(atom2.GetType());
 			DrawPipeCylinder(length * (1.0f - centerPercent), quadric,
-							 Prefs.DrawWireFrame() ? 2 : 0,
+							 (Prefs.DrawWireFrame() || (Prefs.ShowEFPWireFrame() &&
+														atom2.IsEffectiveFragment())) ? 2 : 0,
 							 sphere_list, tmpBondSize, Quality);
 			glPopMatrix(); // halfway point
 
@@ -4583,7 +4587,9 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 		// the user's not interested in coloring each half differently.
 		else {
 			Prefs.ChangeColorBondColor(bond.Order);
-			DrawPipeCylinder(length, quadric, Prefs.DrawWireFrame() ? 3 : 0,
+			DrawPipeCylinder(length, quadric, (Prefs.DrawWireFrame() || (Prefs.ShowEFPWireFrame() &&
+																		 (atom1.IsEffectiveFragment() ||
+																		  atom2.IsEffectiveFragment()))) ? 3 : 0,
 							 sphere_list, tmpBondSize, Quality);
 		}
 

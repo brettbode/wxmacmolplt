@@ -1,0 +1,881 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<cml xmlns="http://www.xml-cml.org/schema/cml2/core">
+<metadataList>
+<metadata name="Structures">
+<Structure name="Alanine">
+<atoms size="13">
+<atom id="a0" elementType="C" x3="3.113300" y3="2.779600" z3="1.817000" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="2.003600" y3="2.020600" z3="1.101300" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="1.964000" y3="0.586800" z3="1.621500" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a3" elementType="N" x3="0.733800" y3="2.766900" z3="1.277700" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a4" elementType="O" x3="4.188800" y3="3.070800" z3="1.050600" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a5" elementType="O" x3="3.171000" y3="3.140300" z3="2.978100" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a6" elementType="H" x3="2.205300" y3="2.008600" z3="0.000000" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="1.756100" y3="0.540500" z3="2.699600" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="1.188500" y3="0.000000" z3="1.110600" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="2.921600" y3="0.078000" z3="1.450700" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="H" x3="4.834100" y3="3.550200" z3="1.560800" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a11" elementType="H" x3="0.000000" y3="2.269400" z3="0.819500" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a12" elementType="H" x3="0.516500" y3="2.858400" z3="2.248200" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="12">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a5" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a7" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b8" atomRefs2="a2 a9" order="S"></bond>
+<bond id="b9" atomRefs2="a3 a11" order="S"></bond>
+<bond id="b10" atomRefs2="a3 a12" order="S"></bond>
+<bond id="b11" atomRefs2="a4 a10" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Arginine">
+<atoms size="26">
+<atom id="a0" elementType="N" x3="-2.322069" y3="-2.601858" z3="-2.867814" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a1" elementType="C" x3="-3.473442" y3="-2.194649" z3="-2.097891" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="-3.395152" y3="-0.742294" z3="-1.647216" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a3" elementType="O" x3="-2.412534" y3="-0.074109" z3="-1.661857" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a4" elementType="C" x3="-3.659773" y3="-3.101447" z3="-0.869630" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a5" elementType="C" x3="-3.925975" y3="-4.560357" z3="-1.241398" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a6" elementType="O" x3="-4.564618" y3="-0.280551" z3="-1.211312" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a7" elementType="H" x3="-4.355617" y3="-2.282368" z3="-2.723502" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="-4.479279" y3="-2.716801" z3="-0.270318" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="-2.763171" y3="-3.037334" z3="-0.254961" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="H" x3="-4.444182" y3="0.621241" z3="-0.928989" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a11" elementType="C" x3="-4.127948" y3="-5.433794" z3="-0.002207" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a12" elementType="N" x3="-4.416645" y3="-6.832018" z3="-0.293988" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a13" elementType="C" x3="-3.470152" y3="-7.684007" z3="-0.840913" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a14" elementType="N" x3="-2.189789" y3="-7.489156" z3="-0.347967" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a15" elementType="N" x3="-3.678166" y3="-8.587118" z3="-1.697713" coordinationNumber="2" lonePairCount="1"></atom>
+<atom id="a16" elementType="H" x3="-3.103123" y3="-4.946216" z3="-1.829041" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a17" elementType="H" x3="-4.817070" y3="-4.617008" z3="-1.864766" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="-4.959314" y3="-5.061694" z3="0.587469" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a19" elementType="H" x3="-3.253541" y3="-5.380030" z3="0.632063" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a20" elementType="H" x3="-5.318269" y3="-6.967041" z3="-0.698416" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a21" elementType="H" x3="-1.576257" y3="-8.207152" z3="-0.671218" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a22" elementType="H" x3="-2.142882" y3="-7.377193" z3="0.643131" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a23" elementType="H" x3="-4.613651" y3="-8.558548" z3="-2.058118" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a24" elementType="H" x3="-2.266706" y3="-2.085084" z3="-3.724062" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a25" elementType="H" x3="-1.481090" y3="-2.397643" z3="-2.361733" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="25">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a24" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a25" order="S"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a4" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a7" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a3" order="D"></bond>
+<bond id="b7" atomRefs2="a2 a6" order="S"></bond>
+<bond id="b8" atomRefs2="a4 a5" order="S"></bond>
+<bond id="b9" atomRefs2="a4 a8" order="S"></bond>
+<bond id="b10" atomRefs2="a4 a9" order="S"></bond>
+<bond id="b11" atomRefs2="a5 a11" order="S"></bond>
+<bond id="b12" atomRefs2="a5 a16" order="S"></bond>
+<bond id="b13" atomRefs2="a5 a17" order="S"></bond>
+<bond id="b14" atomRefs2="a6 a10" order="S"></bond>
+<bond id="b15" atomRefs2="a11 a12" order="S"></bond>
+<bond id="b16" atomRefs2="a11 a18" order="S"></bond>
+<bond id="b17" atomRefs2="a11 a19" order="S"></bond>
+<bond id="b18" atomRefs2="a12 a13" order="S"></bond>
+<bond id="b19" atomRefs2="a12 a20" order="S"></bond>
+<bond id="b20" atomRefs2="a13 a14" order="S"></bond>
+<bond id="b21" atomRefs2="a13 a15" order="D"></bond>
+<bond id="b22" atomRefs2="a14 a21" order="S"></bond>
+<bond id="b23" atomRefs2="a14 a22" order="S"></bond>
+<bond id="b24" atomRefs2="a15 a23" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Asparagine">
+<atoms size="17">
+<atom id="a0" elementType="N" x3="1.962032" y3="-0.351741" z3="-0.414563" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a1" elementType="C" x3="0.560032" y3="-0.279741" z3="-0.808563" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="0.048032" y3="1.130259" z3="-0.557563" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a3" elementType="O" x3="0.749032" y3="2.105259" z3="-0.400563" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a4" elementType="C" x3="-0.251968" y3="-1.345741" z3="-0.060563" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a5" elementType="C" x3="0.187032" y3="-2.749742" z3="-0.478563" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a6" elementType="O" x3="0.903032" y3="-2.963742" z3="-1.449563" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a7" elementType="N" x3="-0.320968" y3="-3.761741" z3="0.285437" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a8" elementType="O" x3="-1.305969" y3="1.208259" z3="-0.588563" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a9" elementType="H" x3="0.399032" y3="-0.455741" z3="-1.888563" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="H" x3="-1.321969" y3="-1.237741" z3="-0.273563" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a11" elementType="H" x3="-0.109968" y3="-1.216741" z3="1.018437" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a12" elementType="H" x3="-0.787968" y3="-3.585742" z3="1.162437" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a13" elementType="H" x3="-0.004968" y3="-4.702742" z3="0.093437" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a14" elementType="H" x3="-1.520969" y3="2.153259" z3="-0.473563" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a15" elementType="H" x3="2.398032" y3="-1.111741" z3="-0.931563" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a16" elementType="H" x3="2.426032" y3="0.519259" z3="-0.661563" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="16">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a15" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a16" order="S"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a4" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a9" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a3" order="D"></bond>
+<bond id="b7" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b8" atomRefs2="a4 a5" order="S"></bond>
+<bond id="b9" atomRefs2="a4 a10" order="S"></bond>
+<bond id="b10" atomRefs2="a4 a11" order="S"></bond>
+<bond id="b11" atomRefs2="a5 a6" order="D"></bond>
+<bond id="b12" atomRefs2="a5 a7" order="S"></bond>
+<bond id="b13" atomRefs2="a7 a12" order="S"></bond>
+<bond id="b14" atomRefs2="a7 a13" order="S"></bond>
+<bond id="b15" atomRefs2="a8 a14" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Aspartic Acid">
+<atoms size="16">
+<atom id="a0" elementType="C" x3="0.439918" y3="-0.216429" z3="-0.244958" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-0.772326" y3="-0.998979" z3="-0.731483" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="-0.876723" y3="-2.307920" z3="0.063680" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a3" elementType="N" x3="-1.964329" y3="-0.187390" z3="-0.789747" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a4" elementType="O" x3="0.307634" y3="1.094311" z3="-0.293229" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a5" elementType="O" x3="1.444209" y3="-0.750286" z3="0.108454" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a6" elementType="H" x3="-0.518866" y3="-1.273191" z3="-1.752487" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-1.684112" y3="-2.918216" z3="-0.330170" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="0.031896" y3="-2.888956" z3="-0.028552" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="1.121218" y3="1.477291" z3="0.020885" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="C" x3="-1.136546" y3="-2.087183" z3="1.531013" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a11" elementType="O" x3="-1.223797" y3="-3.228685" z3="2.199699" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a12" elementType="O" x3="-1.260351" y3="-1.026535" z3="2.057207" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a13" elementType="H" x3="-1.374058" y3="-3.028428" z3="3.118948" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a14" elementType="H" x3="-2.728471" y3="-0.703840" z3="-1.177767" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a15" elementType="H" x3="-2.226218" y3="0.139113" z3="0.118868" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="15">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a5" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a7" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b8" atomRefs2="a2 a10" order="S"></bond>
+<bond id="b9" atomRefs2="a3 a14" order="S"></bond>
+<bond id="b10" atomRefs2="a3 a15" order="S"></bond>
+<bond id="b11" atomRefs2="a4 a9" order="S"></bond>
+<bond id="b12" atomRefs2="a10 a11" order="S"></bond>
+<bond id="b13" atomRefs2="a10 a12" order="D"></bond>
+<bond id="b14" atomRefs2="a11 a13" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Cysteine">
+<atoms size="14">
+<atom id="a0" elementType="C" x3="-0.445442" y3="0.041526" z3="-0.045439" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-1.596501" y3="-0.672757" z3="-0.728927" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="-1.592496" y3="-2.126426" z3="-0.208562" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a3" elementType="N" x3="-2.799477" y3="0.085527" z3="-0.489155" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a4" elementType="O" x3="0.700064" y3="-0.097645" z3="-0.699700" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a5" elementType="O" x3="-0.533431" y3="0.618588" z3="0.988178" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a6" elementType="H" x3="-1.394398" y3="-0.684782" z3="-1.792885" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-1.862284" y3="-2.130749" z3="0.839541" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="-0.607486" y3="-2.560140" z3="-0.319354" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="1.386117" y3="0.336859" z3="-0.201230" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="S" x3="-2.794984" y3="-3.129155" z3="-1.150025" coordinationNumber="2" lonePairCount="0"></atom>
+<atom id="a11" elementType="H" x3="-2.883775" y3="-4.143246" z3="-0.301034" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a12" elementType="H" x3="-3.607594" y3="-0.397953" z3="-0.826949" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a13" elementType="H" x3="-2.916413" y3="0.265043" z3="0.488862" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="13">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a5" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a7" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b8" atomRefs2="a2 a10" order="S"></bond>
+<bond id="b9" atomRefs2="a3 a12" order="S"></bond>
+<bond id="b10" atomRefs2="a3 a13" order="S"></bond>
+<bond id="b11" atomRefs2="a4 a9" order="S"></bond>
+<bond id="b12" atomRefs2="a10 a11" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Glutamic Acid">
+<atoms size="19">
+<atom id="a0" elementType="C" x3="-0.377895" y3="0.004424" z3="-0.105894" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-1.574538" y3="-0.661242" z3="-0.755157" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="-1.816930" y3="-1.998642" z3="-0.023915" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a3" elementType="N" x3="-2.664585" y3="0.289885" z3="-0.744928" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a4" elementType="O" x3="0.775249" y3="-0.431611" z3="-0.599621" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a5" elementType="O" x3="-0.441886" y3="0.789587" z3="0.782373" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a6" elementType="H" x3="-1.312583" y3="-0.869751" z3="-1.786162" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-2.071745" y3="-1.798517" z3="1.011915" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="-0.899118" y3="-2.575794" z3="-0.015440" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="1.483740" y3="-0.016589" z3="-0.116424" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="C" x3="-2.917535" y3="-2.830402" z3="-0.674635" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a11" elementType="C" x3="-3.116223" y3="-4.164705" z3="-0.000784" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a12" elementType="O" x3="-2.491962" y3="-4.581256" z3="0.918779" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a13" elementType="O" x3="-4.102153" y3="-4.855580" z3="-0.567640" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a14" elementType="H" x3="-2.697735" y3="-3.027134" z3="-1.720775" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a15" elementType="H" x3="-3.875887" y3="-2.321440" z3="-0.658451" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a16" elementType="H" x3="-4.184688" y3="-5.687323" z3="-0.110889" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a17" elementType="H" x3="-3.509760" y3="-0.102896" z3="-1.106065" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="-2.832595" y3="0.633096" z3="0.180344" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="18">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a5" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a7" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b8" atomRefs2="a2 a10" order="S"></bond>
+<bond id="b9" atomRefs2="a3 a17" order="S"></bond>
+<bond id="b10" atomRefs2="a3 a18" order="S"></bond>
+<bond id="b11" atomRefs2="a4 a9" order="S"></bond>
+<bond id="b12" atomRefs2="a10 a11" order="S"></bond>
+<bond id="b13" atomRefs2="a10 a14" order="S"></bond>
+<bond id="b14" atomRefs2="a10 a15" order="S"></bond>
+<bond id="b15" atomRefs2="a11 a12" order="D"></bond>
+<bond id="b16" atomRefs2="a11 a13" order="S"></bond>
+<bond id="b17" atomRefs2="a13 a16" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Glutamine">
+<atoms size="20">
+<atom id="a0" elementType="C" x3="0.468522" y3="-0.189076" z3="-0.272332" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-0.696878" y3="-0.968926" z3="-0.857110" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="-0.829933" y3="-2.313449" z3="-0.103657" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a3" elementType="N" x3="-1.876845" y3="-0.142378" z3="-0.966965" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a4" elementType="O" x3="0.110748" y3="0.781081" z3="0.557317" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a5" elementType="O" x3="1.608189" y3="-0.450978" z3="-0.491466" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a6" elementType="H" x3="-0.372441" y3="-1.216805" z3="-1.860382" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-1.531939" y3="-2.936207" z3="-0.651428" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="0.131844" y3="-2.812091" z3="-0.156194" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="0.902139" y3="1.203104" z3="0.878085" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="C" x3="-1.257954" y3="-2.235283" z3="1.379222" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a11" elementType="C" x3="-2.758687" y3="-2.102333" z3="1.569371" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a12" elementType="O" x3="-3.313989" y3="-1.041026" z3="1.653983" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a13" elementType="N" x3="-3.445527" y3="-3.270396" z3="1.594566" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a14" elementType="H" x3="-0.798043" y3="-1.390301" z3="1.874454" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a15" elementType="H" x3="-0.913575" y3="-3.132925" z3="1.883380" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a16" elementType="H" x3="-4.423818" y3="-3.230093" z3="1.775271" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a17" elementType="H" x3="-2.991347" y3="-4.148895" z3="1.682738" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="-2.594282" y3="-0.626331" z3="-1.470623" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a19" elementType="H" x3="-2.252371" y3="0.097879" z3="-0.070301" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="19">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a5" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a7" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b8" atomRefs2="a2 a10" order="S"></bond>
+<bond id="b9" atomRefs2="a3 a18" order="S"></bond>
+<bond id="b10" atomRefs2="a3 a19" order="S"></bond>
+<bond id="b11" atomRefs2="a4 a9" order="S"></bond>
+<bond id="b12" atomRefs2="a10 a11" order="S"></bond>
+<bond id="b13" atomRefs2="a10 a14" order="S"></bond>
+<bond id="b14" atomRefs2="a10 a15" order="S"></bond>
+<bond id="b15" atomRefs2="a11 a12" order="D"></bond>
+<bond id="b16" atomRefs2="a11 a13" order="S"></bond>
+<bond id="b17" atomRefs2="a13 a16" order="S"></bond>
+<bond id="b18" atomRefs2="a13 a17" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Glycine">
+<atoms size="10">
+<atom id="a0" elementType="C" x3="0.455392" y3="-0.203309" z3="-0.419661" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-0.789454" y3="-1.027774" z3="-0.644012" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="N" x3="-1.913820" y3="-0.191483" z3="-1.014020" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a3" elementType="O" x3="0.214005" y3="0.885995" z3="0.305698" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a4" elementType="O" x3="1.543613" y3="-0.494702" z3="-0.791992" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a5" elementType="H" x3="-0.569558" y3="-1.716879" z3="-1.446100" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a6" elementType="H" x3="1.034180" y3="1.356821" z3="0.418383" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-0.941897" y3="-1.614268" z3="0.264841" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="-2.711012" y3="-0.755947" z3="-1.231219" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="-2.166347" y3="0.422727" z3="-0.265529" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="9">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a3" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a4" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a5" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a7" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a9" order="S"></bond>
+<bond id="b8" atomRefs2="a3 a6" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Histidine">
+<atoms size="20">
+<atom id="a0" elementType="C" x3="-0.079634" y3="0.012365" z3="0.077201" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-0.723146" y3="-1.060698" z3="-0.785802" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="N" x3="-1.716473" y3="-0.503753" z3="-1.686445" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a3" elementType="O" x3="-0.766816" y3="1.150147" z3="0.120541" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a4" elementType="O" x3="0.903930" y3="-0.155945" z3="0.720174" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a5" elementType="H" x3="-0.314080" y3="1.737508" z3="0.718389" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a6" elementType="H" x3="-1.161961" y3="-1.746201" z3="-0.055959" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="C" x3="0.341033" y3="-1.852473" z3="-1.550673" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a8" elementType="C" x3="1.158756" y3="-1.071748" z3="-2.541038" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a9" elementType="C" x3="0.899262" y3="0.085245" z3="-3.193753" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a10" elementType="N" x3="2.394358" y3="-1.549585" z3="-2.913062" coordinationNumber="2" lonePairCount="1"></atom>
+<atom id="a11" elementType="N" x3="2.004834" y3="0.320269" z3="-3.975083" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a12" elementType="C" x3="2.859636" y3="-0.697451" z3="-3.759683" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a13" elementType="H" x3="-0.156329" y3="-2.678323" z3="-2.056027" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a14" elementType="H" x3="1.020979" y3="-2.295323" z3="-0.835566" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a15" elementType="H" x3="2.149261" y3="1.096905" z3="-4.576803" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a16" elementType="H" x3="0.051718" y3="0.732266" z3="-3.182090" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a17" elementType="H" x3="3.810074" y3="-0.761368" z3="-4.249180" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="-2.165742" y3="-1.240879" z3="-2.193932" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a19" elementType="H" x3="-2.421629" y3="0.000833" z3="-1.187119" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="20">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a3" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a4" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a7" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a18" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a19" order="S"></bond>
+<bond id="b8" atomRefs2="a3 a5" order="S"></bond>
+<bond id="b9" atomRefs2="a7 a8" order="S"></bond>
+<bond id="b10" atomRefs2="a7 a13" order="S"></bond>
+<bond id="b11" atomRefs2="a7 a14" order="S"></bond>
+<bond id="b12" atomRefs2="a8 a9" order="D"></bond>
+<bond id="b13" atomRefs2="a8 a10" order="S"></bond>
+<bond id="b14" atomRefs2="a9 a11" order="S"></bond>
+<bond id="b15" atomRefs2="a9 a16" order="S"></bond>
+<bond id="b16" atomRefs2="a10 a12" order="D"></bond>
+<bond id="b17" atomRefs2="a11 a12" order="S"></bond>
+<bond id="b18" atomRefs2="a11 a15" order="S"></bond>
+<bond id="b19" atomRefs2="a12 a17" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Isoleucine">
+<atoms size="22">
+<atom id="a0" elementType="C" x3="0.452060" y3="-0.525086" z3="-0.001718" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-0.776372" y3="-0.697162" z3="-0.880482" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="N" x3="-1.450206" y3="0.581036" z3="-1.040087" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a3" elementType="O" x3="0.238705" y3="0.321716" z3="1.003905" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a4" elementType="O" x3="1.476981" y3="-1.113808" z3="-0.117150" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a5" elementType="H" x3="1.029022" y3="0.353991" z3="1.534371" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a6" elementType="H" x3="-1.383975" y3="-1.418843" z3="-0.323842" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="C" x3="-0.422732" y3="-1.341520" z3="-2.233129" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="0.183229" y3="-2.210466" z3="-1.998459" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="C" x3="0.409239" y3="-0.407084" z3="-3.127958" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a10" elementType="C" x3="1.036024" y3="-1.108015" z3="-4.334951" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a11" elementType="C" x3="-1.694886" y3="-1.836098" z3="-2.935364" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a12" elementType="H" x3="1.206535" y3="0.029434" z3="-2.537065" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a13" elementType="H" x3="-0.209572" y3="0.418628" z3="-3.462873" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a14" elementType="H" x3="1.659243" y3="-1.941623" z3="-4.023783" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a15" elementType="H" x3="1.664051" y3="-0.417506" z3="-4.889258" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a16" elementType="H" x3="0.289545" y3="-1.488667" z3="-5.024620" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a17" elementType="H" x3="-2.294998" y3="-2.455743" z3="-2.274414" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="-1.452169" y3="-2.436407" z3="-3.804024" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a19" elementType="H" x3="-2.314715" y3="-1.011947" z3="-3.278692" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a20" elementType="H" x3="-2.321124" y3="0.457034" z3="-1.516376" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a21" elementType="H" x3="-1.648845" y3="0.995035" z3="-0.151561" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="21">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a3" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a4" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a7" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a20" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a21" order="S"></bond>
+<bond id="b8" atomRefs2="a3 a5" order="S"></bond>
+<bond id="b9" atomRefs2="a7 a8" order="S"></bond>
+<bond id="b10" atomRefs2="a7 a9" order="S"></bond>
+<bond id="b11" atomRefs2="a7 a11" order="S"></bond>
+<bond id="b12" atomRefs2="a9 a10" order="S"></bond>
+<bond id="b13" atomRefs2="a9 a12" order="S"></bond>
+<bond id="b14" atomRefs2="a9 a13" order="S"></bond>
+<bond id="b15" atomRefs2="a10 a14" order="S"></bond>
+<bond id="b16" atomRefs2="a10 a15" order="S"></bond>
+<bond id="b17" atomRefs2="a10 a16" order="S"></bond>
+<bond id="b18" atomRefs2="a11 a17" order="S"></bond>
+<bond id="b19" atomRefs2="a11 a18" order="S"></bond>
+<bond id="b20" atomRefs2="a11 a19" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Leucine">
+<atoms size="22">
+<atom id="a0" elementType="C" x3="-0.818077" y3="0.363163" z3="-0.066855" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-1.521318" y3="-0.748610" z3="-0.815637" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="-1.265445" y3="-2.106580" z3="-0.113461" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a3" elementType="N" x3="-2.898765" y3="-0.358061" z3="-1.033506" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a4" elementType="O" x3="0.501511" y3="0.311229" z3="-0.214429" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a5" elementType="O" x3="-1.351870" y3="1.178471" z3="0.613536" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a6" elementType="H" x3="-1.036781" y3="-0.818085" z3="-1.783794" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-1.884379" y3="-2.845864" z3="-0.619334" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="-0.236452" y3="-2.382058" z3="-0.324339" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="0.886365" y3="1.011730" z3="0.303627" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="C" x3="-1.482530" y3="-2.221286" z3="1.406859" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a11" elementType="C" x3="-2.926427" y3="-1.975415" z3="1.857600" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a12" elementType="C" x3="-1.014377" y3="-3.604631" z3="1.874059" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a13" elementType="H" x3="-0.851900" y3="-1.482825" z3="1.898143" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a14" elementType="H" x3="-3.028296" y3="-2.177979" z3="2.919289" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a15" elementType="H" x3="-3.618234" y3="-2.629103" z3="1.331611" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a16" elementType="H" x3="-3.235960" y3="-0.951391" z3="1.695208" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a17" elementType="H" x3="-1.101071" y3="-3.700029" z3="2.951879" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="0.022488" y3="-3.784933" z3="1.607385" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a19" elementType="H" x3="-1.614563" y3="-4.391476" z3="1.423920" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a20" elementType="H" x3="-3.477162" y3="-1.150225" z3="-1.227287" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a21" elementType="H" x3="-3.271775" y3="0.129068" z3="-0.245402" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="21">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a5" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a7" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b8" atomRefs2="a2 a10" order="S"></bond>
+<bond id="b9" atomRefs2="a3 a20" order="S"></bond>
+<bond id="b10" atomRefs2="a3 a21" order="S"></bond>
+<bond id="b11" atomRefs2="a4 a9" order="S"></bond>
+<bond id="b12" atomRefs2="a10 a11" order="S"></bond>
+<bond id="b13" atomRefs2="a10 a12" order="S"></bond>
+<bond id="b14" atomRefs2="a10 a13" order="S"></bond>
+<bond id="b15" atomRefs2="a11 a14" order="S"></bond>
+<bond id="b16" atomRefs2="a11 a15" order="S"></bond>
+<bond id="b17" atomRefs2="a11 a16" order="S"></bond>
+<bond id="b18" atomRefs2="a12 a17" order="S"></bond>
+<bond id="b19" atomRefs2="a12 a18" order="S"></bond>
+<bond id="b20" atomRefs2="a12 a19" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Lysine">
+<atoms size="24">
+<atom id="a0" elementType="C" x3="-0.794782" y3="0.273739" z3="-0.102720" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-1.466227" y3="-0.810543" z3="-0.917935" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="-1.347673" y3="-2.167676" z3="-0.179652" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a3" elementType="N" x3="-2.795836" y3="-0.358811" z3="-1.270829" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a4" elementType="O" x3="0.530136" y3="0.201255" z3="-0.161689" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a5" elementType="O" x3="-1.361012" y3="1.080443" z3="0.562217" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a6" elementType="H" x3="-0.893307" y3="-0.911376" z3="-1.833008" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-1.923665" y3="-2.891925" z3="-0.751775" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="-0.310821" y3="-2.482825" z3="-0.251744" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="0.891519" y3="0.883177" z3="0.396605" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="C" x3="-1.760824" y3="-2.238174" z3="1.298609" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a11" elementType="C" x3="-3.248577" y3="-2.036641" z3="1.603859" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a12" elementType="H" x3="-1.171535" y3="-1.527412" z3="1.871786" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a13" elementType="H" x3="-3.840717" y3="-2.676837" z3="0.951172" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a14" elementType="H" x3="-3.541679" y3="-1.013877" z3="1.388202" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a15" elementType="C" x3="-3.620699" y3="-2.352464" z3="3.058293" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a16" elementType="N" x3="-3.017876" y3="-1.511563" z3="4.079483" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a17" elementType="H" x3="-1.469395" y3="-3.223464" z3="1.658174" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="-3.361844" y3="-3.382931" z3="3.284814" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a19" elementType="H" x3="-4.697999" y3="-2.277435" z3="3.167154" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a20" elementType="H" x3="-3.208380" y3="-0.543032" z3="3.904851" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a21" elementType="H" x3="-2.022787" y3="-1.617162" z3="4.100734" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a22" elementType="H" x3="-3.373232" y3="-1.120083" z3="-1.566157" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a23" elementType="H" x3="-3.240270" y3="0.104867" z3="-0.505734" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="23">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a5" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a7" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b8" atomRefs2="a2 a10" order="S"></bond>
+<bond id="b9" atomRefs2="a3 a22" order="S"></bond>
+<bond id="b10" atomRefs2="a3 a23" order="S"></bond>
+<bond id="b11" atomRefs2="a4 a9" order="S"></bond>
+<bond id="b12" atomRefs2="a10 a11" order="S"></bond>
+<bond id="b13" atomRefs2="a10 a12" order="S"></bond>
+<bond id="b14" atomRefs2="a10 a17" order="S"></bond>
+<bond id="b15" atomRefs2="a11 a13" order="S"></bond>
+<bond id="b16" atomRefs2="a11 a14" order="S"></bond>
+<bond id="b17" atomRefs2="a11 a15" order="S"></bond>
+<bond id="b18" atomRefs2="a15 a16" order="S"></bond>
+<bond id="b19" atomRefs2="a15 a18" order="S"></bond>
+<bond id="b20" atomRefs2="a15 a19" order="S"></bond>
+<bond id="b21" atomRefs2="a16 a20" order="S"></bond>
+<bond id="b22" atomRefs2="a16 a21" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Methionine">
+<atoms size="20">
+<atom id="a0" elementType="C" x3="-0.521490" y3="0.231402" z3="-0.051691" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-1.525669" y3="-0.662233" z3="-0.751814" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="-1.480889" y3="-2.074947" z3="-0.120706" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a3" elementType="N" x3="-2.800169" y3="0.018140" z3="-0.774646" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a4" elementType="O" x3="0.720668" y3="0.024593" z3="-0.479201" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a5" elementType="O" x3="-0.776355" y3="0.999618" z3="0.817720" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a6" elementType="H" x3="-1.184518" y3="-0.773430" z3="-1.774448" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-2.119593" y3="-2.725508" z3="-0.710909" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="-0.470120" y3="-2.455740" z3="-0.235397" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="1.304822" y3="0.586642" z3="0.021169" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="C" x3="-1.862556" y3="-2.192490" z3="1.361912" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a11" elementType="H" x3="-1.414578" y3="-1.396811" z3="1.944596" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a12" elementType="H" x3="-1.480478" y3="-3.133003" z3="1.740981" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a13" elementType="S" x3="-3.664051" y3="-2.187778" z3="1.633458" coordinationNumber="2" lonePairCount="0"></atom>
+<atom id="a14" elementType="C" x3="-3.707008" y3="-2.544358" z3="3.405226" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a15" elementType="H" x3="-3.207814" y3="-1.768461" z3="3.971590" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a16" elementType="H" x3="-3.251081" y3="-3.502541" z3="3.621442" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a17" elementType="H" x3="-4.746730" y3="-2.578266" z3="3.703410" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="-3.517512" y3="-0.575895" z3="-1.141376" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a19" elementType="H" x3="-3.076049" y3="0.302546" z3="0.143944" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="19">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a5" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a7" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b8" atomRefs2="a2 a10" order="S"></bond>
+<bond id="b9" atomRefs2="a3 a18" order="S"></bond>
+<bond id="b10" atomRefs2="a3 a19" order="S"></bond>
+<bond id="b11" atomRefs2="a4 a9" order="S"></bond>
+<bond id="b12" atomRefs2="a10 a11" order="S"></bond>
+<bond id="b13" atomRefs2="a10 a12" order="S"></bond>
+<bond id="b14" atomRefs2="a10 a13" order="S"></bond>
+<bond id="b15" atomRefs2="a13 a14" order="S"></bond>
+<bond id="b16" atomRefs2="a14 a15" order="S"></bond>
+<bond id="b17" atomRefs2="a14 a16" order="S"></bond>
+<bond id="b18" atomRefs2="a14 a17" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Phenylalanine">
+<atoms size="23">
+<atom id="a0" elementType="C" x3="-0.479391" y3="0.271665" z3="-0.159323" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-1.536892" y3="-0.630547" z3="-0.763053" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="C" x3="-1.475557" y3="-2.045590" z3="-0.126131" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a3" elementType="N" x3="-2.809124" y3="0.047304" z3="-0.692597" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a4" elementType="O" x3="0.751381" y3="-0.112047" z3="-0.497945" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a5" elementType="O" x3="-0.682546" y3="1.197672" z3="0.552387" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a6" elementType="H" x3="-1.272925" y3="-0.752089" z3="-1.808508" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-2.193281" y3="-2.660606" z3="-0.661086" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="-0.497435" y3="-2.469847" z3="-0.323439" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="1.369255" y3="0.480132" z3="-0.080038" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="C" x3="-0.745387" y3="-1.991923" z3="2.291329" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a11" elementType="C" x3="-1.011426" y3="-2.027003" z3="3.649929" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a12" elementType="C" x3="-2.312744" y3="-2.174994" z3="4.100886" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a13" elementType="C" x3="-3.343194" y3="-2.291763" z3="3.183031" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a14" elementType="C" x3="-3.072127" y3="-2.256437" z3="1.824832" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a15" elementType="C" x3="-1.771347" y3="-2.099444" z3="1.357930" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a16" elementType="H" x3="0.270765" y3="-1.884776" z3="1.953264" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a17" elementType="H" x3="-0.203162" y3="-1.942298" z3="4.354264" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="-2.520545" y3="-2.204550" z3="5.155446" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a19" elementType="H" x3="-4.356277" y3="-2.415381" z3="3.522378" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a20" elementType="H" x3="-3.881055" y3="-2.362246" z3="1.122777" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a21" elementType="H" x3="-3.556034" y3="-0.557727" z3="-0.970421" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a22" elementType="H" x3="-2.991763" y3="0.377444" z3="0.234216" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="23">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a5" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a7" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a8" order="S"></bond>
+<bond id="b8" atomRefs2="a2 a15" order="S"></bond>
+<bond id="b9" atomRefs2="a3 a21" order="S"></bond>
+<bond id="b10" atomRefs2="a3 a22" order="S"></bond>
+<bond id="b11" atomRefs2="a4 a9" order="S"></bond>
+<bond id="b12" atomRefs2="a10 a11" order="S"></bond>
+<bond id="b13" atomRefs2="a10 a15" order="S"></bond>
+<bond id="b14" atomRefs2="a10 a16" order="S"></bond>
+<bond id="b15" atomRefs2="a11 a12" order="S"></bond>
+<bond id="b16" atomRefs2="a11 a17" order="S"></bond>
+<bond id="b17" atomRefs2="a12 a13" order="S"></bond>
+<bond id="b18" atomRefs2="a12 a18" order="S"></bond>
+<bond id="b19" atomRefs2="a13 a14" order="S"></bond>
+<bond id="b20" atomRefs2="a13 a19" order="S"></bond>
+<bond id="b21" atomRefs2="a14 a15" order="S"></bond>
+<bond id="b22" atomRefs2="a14 a20" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Proline">
+<atoms size="17">
+<atom id="a0" elementType="C" x3="-0.661976" y3="-0.025399" z3="-0.158690" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-1.729845" y3="-0.482153" z3="-1.131054" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="N" x3="-3.047926" y3="0.022624" z3="-0.797138" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a3" elementType="O" x3="0.549876" y3="-0.431492" z3="-0.526338" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a4" elementType="O" x3="-0.847092" y3="0.626584" z3="0.818253" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a5" elementType="H" x3="-1.422736" y3="-0.124024" z3="-2.108780" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a6" elementType="H" x3="1.179097" y3="-0.115932" z3="0.115223" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="C" x3="-3.819849" y3="-1.049286" z3="-0.185079" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a8" elementType="C" x3="-3.374649" y3="-2.265106" z3="-0.989404" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a9" elementType="C" x3="-1.865647" y3="-2.030598" z3="-1.135034" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a10" elementType="H" x3="-4.880969" y3="-0.847511" z3="-0.270678" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a11" elementType="H" x3="-3.587276" y3="-1.188964" z3="0.871947" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a12" elementType="H" x3="-3.856520" y3="-2.254860" z3="-1.961060" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a13" elementType="H" x3="-3.605554" y3="-3.206632" z3="-0.504911" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a14" elementType="H" x3="-1.445690" y3="-2.468605" z3="-2.030762" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a15" elementType="H" x3="-1.338405" y3="-2.461785" z3="-0.290704" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a16" elementType="H" x3="-2.995479" y3="0.839198" z3="-0.222732" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="17">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a3" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a4" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a5" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a9" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a16" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a7" order="S"></bond>
+<bond id="b8" atomRefs2="a3 a6" order="S"></bond>
+<bond id="b9" atomRefs2="a7 a8" order="S"></bond>
+<bond id="b10" atomRefs2="a7 a10" order="S"></bond>
+<bond id="b11" atomRefs2="a7 a11" order="S"></bond>
+<bond id="b12" atomRefs2="a8 a9" order="S"></bond>
+<bond id="b13" atomRefs2="a8 a12" order="S"></bond>
+<bond id="b14" atomRefs2="a8 a13" order="S"></bond>
+<bond id="b15" atomRefs2="a9 a14" order="S"></bond>
+<bond id="b16" atomRefs2="a9 a15" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Serine">
+<atoms size="14">
+<atom id="a0" elementType="C" x3="0.429402" y3="-0.045391" z3="-0.278673" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="C" x3="-0.854398" y3="-0.823579" z3="-0.513515" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a2" elementType="N" x3="-1.953237" y3="0.096712" z3="-0.265582" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a3" elementType="O" x3="0.795456" y3="0.680057" z3="-1.319890" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a4" elementType="O" x3="1.055241" y3="-0.065671" z3="0.738036" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a5" elementType="H" x3="-0.872100" y3="-1.105020" z3="-1.559856" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a6" elementType="H" x3="1.571905" y3="1.178652" z3="-1.082659" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="C" x3="-0.889577" y3="-2.081544" z3="0.357759" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a8" elementType="O" x3="-1.000708" y3="-1.774282" z3="1.715476" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a9" elementType="H" x3="-0.015807" y3="-2.699427" z3="0.162307" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="H" x3="-1.767537" y3="-2.660102" z3="0.097349" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a11" elementType="H" x3="-0.205201" y3="-1.328116" z3="1.981818" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a12" elementType="H" x3="-2.778661" y3="-0.202186" z3="-0.746115" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a13" elementType="H" x3="-2.160199" y3="0.108567" z3="0.715056" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="13">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a3" order="S"></bond>
+<bond id="b2" atomRefs2="a0 a4" order="D"></bond>
+<bond id="b3" atomRefs2="a1 a2" order="S"></bond>
+<bond id="b4" atomRefs2="a1 a5" order="S"></bond>
+<bond id="b5" atomRefs2="a1 a7" order="S"></bond>
+<bond id="b6" atomRefs2="a2 a12" order="S"></bond>
+<bond id="b7" atomRefs2="a2 a13" order="S"></bond>
+<bond id="b8" atomRefs2="a3 a6" order="S"></bond>
+<bond id="b9" atomRefs2="a7 a8" order="S"></bond>
+<bond id="b10" atomRefs2="a7 a9" order="S"></bond>
+<bond id="b11" atomRefs2="a7 a10" order="S"></bond>
+<bond id="b12" atomRefs2="a8 a11" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Threonine">
+<atoms size="17">
+<atom id="a0" elementType="C" x3="-0.373954" y3="0.013107" z3="0.029254" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="O" x3="-0.447879" y3="1.128858" z3="-0.688504" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a2" elementType="O" x3="0.523426" y3="-0.188170" z3="0.787974" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a3" elementType="H" x3="0.310279" y3="1.669643" z3="-0.486911" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a4" elementType="C" x3="-1.535517" y3="-0.930881" z3="-0.262665" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a5" elementType="N" x3="-1.552793" y3="-1.359317" z3="-1.647277" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a6" elementType="C" x3="-1.487510" y3="-2.141117" z3="0.678688" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a7" elementType="O" x3="-0.329754" y3="-2.898876" z3="0.434267" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a8" elementType="C" x3="-2.687135" y3="-3.056487" z3="0.507101" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="-2.443964" y3="-0.367389" z3="-0.072119" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="H" x3="-1.470801" y3="-1.766476" z3="1.698648" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a11" elementType="H" x3="0.415816" y3="-2.413309" z3="0.764872" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a12" elementType="H" x3="-2.615134" y3="-3.877953" z3="1.210372" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a13" elementType="H" x3="-2.721223" y3="-3.457807" z3="-0.496507" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a14" elementType="H" x3="-3.611907" y3="-2.520084" z3="0.695547" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a15" elementType="H" x3="-0.779374" y3="-1.967471" z3="-1.833888" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a16" elementType="H" x3="-1.520128" y3="-0.583711" z3="-2.278030" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="16">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a2" order="D"></bond>
+<bond id="b2" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b3" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b4" atomRefs2="a4 a5" order="S"></bond>
+<bond id="b5" atomRefs2="a4 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a4 a9" order="S"></bond>
+<bond id="b7" atomRefs2="a5 a15" order="S"></bond>
+<bond id="b8" atomRefs2="a5 a16" order="S"></bond>
+<bond id="b9" atomRefs2="a6 a7" order="S"></bond>
+<bond id="b10" atomRefs2="a6 a8" order="S"></bond>
+<bond id="b11" atomRefs2="a6 a10" order="S"></bond>
+<bond id="b12" atomRefs2="a7 a11" order="S"></bond>
+<bond id="b13" atomRefs2="a8 a12" order="S"></bond>
+<bond id="b14" atomRefs2="a8 a13" order="S"></bond>
+<bond id="b15" atomRefs2="a8 a14" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Tryptophan">
+<atoms size="27">
+<atom id="a0" elementType="C" x3="-0.613751" y3="0.224065" z3="0.061059" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="O" x3="0.020456" y3="0.664584" z3="-1.026401" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a2" elementType="O" x3="-0.421613" y3="0.698177" z3="1.133132" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a3" elementType="H" x3="0.591307" y3="1.378309" z3="-0.756522" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a4" elementType="C" x3="-1.623006" y3="-0.891575" z3="-0.206155" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a5" elementType="N" x3="-1.808483" y3="-1.292216" z3="-1.580212" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a6" elementType="C" x3="-1.344837" y3="-2.102278" z3="0.696798" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a7" elementType="C" x3="-0.085055" y3="-2.884817" z3="0.421385" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="-2.560711" y3="-0.468010" z3="0.140525" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="-2.195973" y3="-2.765224" z3="0.586070" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="C" x3="1.021878" y3="-2.542258" z3="-0.274403" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a11" elementType="C" x3="0.171145" y3="-4.213614" z3="0.939040" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a12" elementType="C" x3="1.447238" y3="-4.590019" z3="0.506245" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a13" elementType="N" x3="1.951188" y3="-3.554844" z3="-0.231756" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a14" elementType="C" x3="2.006372" y3="-5.825903" z3="0.829210" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a15" elementType="C" x3="-0.569981" y3="-5.101253" z3="1.726264" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a16" elementType="C" x3="-0.026195" y3="-6.321864" z3="2.050006" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a17" elementType="C" x3="1.255328" y3="-6.679611" z3="1.602073" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="-1.338866" y3="-1.759977" z3="1.726098" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a19" elementType="H" x3="1.245913" y3="-1.643933" z3="-0.811446" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a20" elementType="H" x3="2.832859" y3="-3.540616" z3="-0.686397" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a21" elementType="H" x3="2.988748" y3="-6.101754" z3="0.488330" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a22" elementType="H" x3="-1.552055" y3="-4.835860" z3="2.075725" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a23" elementType="H" x3="-0.584574" y3="-7.014301" z3="2.654014" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a24" elementType="H" x3="1.656709" y3="-7.640737" z3="1.870168" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a25" elementType="H" x3="-1.022940" y3="-1.804837" z3="-1.925954" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a26" elementType="H" x3="-1.947410" y3="-0.503815" z3="-2.180035" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="28">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a2" order="D"></bond>
+<bond id="b2" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b3" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b4" atomRefs2="a4 a5" order="S"></bond>
+<bond id="b5" atomRefs2="a4 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a4 a8" order="S"></bond>
+<bond id="b7" atomRefs2="a5 a25" order="S"></bond>
+<bond id="b8" atomRefs2="a5 a26" order="S"></bond>
+<bond id="b9" atomRefs2="a6 a7" order="S"></bond>
+<bond id="b10" atomRefs2="a6 a9" order="S"></bond>
+<bond id="b11" atomRefs2="a6 a18" order="S"></bond>
+<bond id="b12" atomRefs2="a7 a10" order="D"></bond>
+<bond id="b13" atomRefs2="a7 a11" order="S"></bond>
+<bond id="b14" atomRefs2="a10 a13" order="S"></bond>
+<bond id="b15" atomRefs2="a10 a19" order="S"></bond>
+<bond id="b16" atomRefs2="a11 a12" order="A"></bond>
+<bond id="b17" atomRefs2="a11 a15" order="A"></bond>
+<bond id="b18" atomRefs2="a12 a13" order="S"></bond>
+<bond id="b19" atomRefs2="a12 a14" order="A"></bond>
+<bond id="b20" atomRefs2="a13 a20" order="S"></bond>
+<bond id="b21" atomRefs2="a14 a17" order="A"></bond>
+<bond id="b22" atomRefs2="a14 a21" order="S"></bond>
+<bond id="b23" atomRefs2="a15 a16" order="A"></bond>
+<bond id="b24" atomRefs2="a15 a22" order="S"></bond>
+<bond id="b25" atomRefs2="a16 a17" order="A"></bond>
+<bond id="b26" atomRefs2="a16 a23" order="S"></bond>
+<bond id="b27" atomRefs2="a17 a24" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Tyrosine">
+<atoms size="24">
+<atom id="a0" elementType="C" x3="-0.678151" y3="-0.317054" z3="0.206523" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="O" x3="0.433410" y3="-0.738289" z3="-0.387225" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a2" elementType="O" x3="-0.657720" y3="0.488449" z3="1.082418" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a3" elementType="H" x3="1.169359" y3="-0.291767" z3="0.020976" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a4" elementType="C" x3="-1.955734" y3="-0.918872" z3="-0.375678" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a5" elementType="N" x3="-1.774441" y3="-2.003113" z3="-1.312987" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a6" elementType="C" x3="-2.927044" y3="-1.313486" z3="0.752938" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a7" elementType="H" x3="-2.417182" y3="-0.094918" z3="-0.913562" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a8" elementType="H" x3="-3.872253" y3="-1.550035" z3="0.279428" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a9" elementType="H" x3="-3.084159" y3="-0.447699" z3="1.382968" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a10" elementType="C" x3="-1.637628" y3="-4.667600" z3="3.145577" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a11" elementType="C" x3="-1.312376" y3="-3.376780" z3="3.525496" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a12" elementType="C" x3="-1.730967" y3="-2.302334" z3="2.755083" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a13" elementType="C" x3="-2.473283" y3="-2.488725" z3="1.596518" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a14" elementType="C" x3="-2.793813" y3="-3.797771" z3="1.238407" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a15" elementType="C" x3="-2.383996" y3="-4.878169" z3="1.994855" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a16" elementType="O" x3="-1.260267" y3="-5.754827" z3="3.856292" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a17" elementType="H" x3="-0.770461" y3="-5.497601" z3="4.624811" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="-0.740333" y3="-3.204385" z3="4.421969" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a19" elementType="H" x3="-1.473743" y3="-1.305904" z3="3.066522" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a20" elementType="H" x3="-3.377456" y3="-3.972929" z3="0.351815" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a21" elementType="H" x3="-2.638637" y3="-5.883554" z3="1.714730" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a22" elementType="H" x3="-1.298244" y3="-2.771577" z3="-0.882201" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a23" elementType="H" x3="-1.214972" y3="-1.714943" z3="-2.091311" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="24">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a2" order="D"></bond>
+<bond id="b2" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b3" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b4" atomRefs2="a4 a5" order="S"></bond>
+<bond id="b5" atomRefs2="a4 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a4 a7" order="S"></bond>
+<bond id="b7" atomRefs2="a5 a22" order="S"></bond>
+<bond id="b8" atomRefs2="a5 a23" order="S"></bond>
+<bond id="b9" atomRefs2="a6 a8" order="S"></bond>
+<bond id="b10" atomRefs2="a6 a9" order="S"></bond>
+<bond id="b11" atomRefs2="a6 a13" order="S"></bond>
+<bond id="b12" atomRefs2="a10 a11" order="A"></bond>
+<bond id="b13" atomRefs2="a10 a15" order="A"></bond>
+<bond id="b14" atomRefs2="a10 a16" order="S"></bond>
+<bond id="b15" atomRefs2="a11 a12" order="A"></bond>
+<bond id="b16" atomRefs2="a11 a18" order="S"></bond>
+<bond id="b17" atomRefs2="a12 a13" order="A"></bond>
+<bond id="b18" atomRefs2="a12 a19" order="S"></bond>
+<bond id="b19" atomRefs2="a13 a14" order="A"></bond>
+<bond id="b20" atomRefs2="a14 a15" order="A"></bond>
+<bond id="b21" atomRefs2="a14 a20" order="S"></bond>
+<bond id="b22" atomRefs2="a15 a21" order="S"></bond>
+<bond id="b23" atomRefs2="a16 a17" order="S"></bond>
+</bonds>
+</Structure>
+<Structure name="Valine">
+<atoms size="19">
+<atom id="a0" elementType="C" x3="-0.397131" y3="-0.005182" z3="-0.209015" coordinationNumber="3" lonePairCount="0"></atom>
+<atom id="a1" elementType="O" x3="-0.847022" y3="1.118799" z3="0.338729" coordinationNumber="2" lonePairCount="2"></atom>
+<atom id="a2" elementType="O" x3="0.750467" y3="-0.165737" z3="-0.479518" coordinationNumber="1" lonePairCount="2"></atom>
+<atom id="a3" elementType="H" x3="-0.105850" y3="1.701720" z3="0.476622" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a4" elementType="C" x3="-1.486260" y3="-1.041732" z3="-0.450009" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a5" elementType="N" x3="-1.319934" y3="-1.683971" z3="-1.740193" coordinationNumber="3" lonePairCount="1"></atom>
+<atom id="a6" elementType="H" x3="-2.441676" y3="-0.530748" z3="-0.439813" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a7" elementType="C" x3="-1.476602" y3="-2.102727" z3="0.674539" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a8" elementType="C" x3="-2.655478" y3="-3.064339" z3="0.505547" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a9" elementType="C" x3="-1.487387" y3="-1.482701" z3="2.076664" coordinationNumber="4" lonePairCount="0"></atom>
+<atom id="a10" elementType="H" x3="-0.552836" y3="-2.666665" z3="0.561814" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a11" elementType="H" x3="-2.600792" y3="-3.859471" z3="1.242860" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a12" elementType="H" x3="-2.662971" y3="-3.508571" z3="-0.480044" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a13" elementType="H" x3="-3.599472" y3="-2.544611" z3="0.651239" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a14" elementType="H" x3="-0.599477" y3="-0.892176" z3="2.275666" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a15" elementType="H" x3="-1.528911" y3="-2.265158" z3="2.827114" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a16" elementType="H" x3="-2.352547" y3="-0.841090" z3="2.217288" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a17" elementType="H" x3="-0.375157" y3="-2.004838" z3="-1.838540" coordinationNumber="1" lonePairCount="0"></atom>
+<atom id="a18" elementType="H" x3="-1.487543" y3="-1.037470" z3="-2.486940" coordinationNumber="1" lonePairCount="0"></atom>
+</atoms>
+<bonds size="18">
+<bond id="b0" atomRefs2="a0 a1" order="S"></bond>
+<bond id="b1" atomRefs2="a0 a2" order="D"></bond>
+<bond id="b2" atomRefs2="a0 a4" order="S"></bond>
+<bond id="b3" atomRefs2="a1 a3" order="S"></bond>
+<bond id="b4" atomRefs2="a4 a5" order="S"></bond>
+<bond id="b5" atomRefs2="a4 a6" order="S"></bond>
+<bond id="b6" atomRefs2="a4 a7" order="S"></bond>
+<bond id="b7" atomRefs2="a5 a17" order="S"></bond>
+<bond id="b8" atomRefs2="a5 a18" order="S"></bond>
+<bond id="b9" atomRefs2="a7 a8" order="S"></bond>
+<bond id="b10" atomRefs2="a7 a9" order="S"></bond>
+<bond id="b11" atomRefs2="a7 a10" order="S"></bond>
+<bond id="b12" atomRefs2="a8 a11" order="S"></bond>
+<bond id="b13" atomRefs2="a8 a12" order="S"></bond>
+<bond id="b14" atomRefs2="a8 a13" order="S"></bond>
+<bond id="b15" atomRefs2="a9 a14" order="S"></bond>
+<bond id="b16" atomRefs2="a9 a15" order="S"></bond>
+<bond id="b17" atomRefs2="a9 a16" order="S"></bond>
+</bonds>
+</Structure>
+</metadata>
+</metadataList>
+</cml>

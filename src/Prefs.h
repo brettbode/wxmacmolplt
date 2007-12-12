@@ -184,6 +184,7 @@ class WinPrefs {
 				//bit 9: Look for H bonds, bit 10: determine bond order
 				//bit 11: Default for 3D mode, bit 12: native EOL chars
 				//bit 13: Create custom file icon, bit 14: Show 2D atom patterns
+				//bit 15: Show EFP atoms in wireframe mode
 
 		float			AtomMasses[kMaxAtomTypes], AutoBondScale, BondWidth, AtomScale,
 						GLFOV, VectorScale, QD3DFillBrightness, QD3DPointBrightness,
@@ -281,6 +282,15 @@ class WinPrefs {
 		//Set to overlay a 2D pattern on the atoms in ball and stick mode
 		inline bool Show2DPattern(void) const {return ((BitOptions & (1<<13))?true:false); };
 		inline void Show2DPattern(bool newVal) {BitOptions = (BitOptions & 0xFFFFDFFF) + (newVal?(1<<13):0);};
+		/**
+		 Display EFP atoms in wireframe mode
+		 */
+		inline bool ShowEFPWireFrame(void) const {return ((BitOptions & (1<<14))?true:false); };
+		/**
+		 Set the EFP atoms display mode.
+		 @param newValue If true this will overide the general wireframe mode setting for EFP atoms.
+		 */
+		inline void ShowEFPWireFrame(bool newVal) {BitOptions = (BitOptions & 0xFFFFBFFF) + (newVal?(1<<14):0);};
 		inline Boolean ChangeFileType(void) const {return (SetCreator); };
 		inline void ChangeFileType(Boolean newVal) {SetCreator = (newVal != 0);};
 		inline short GetStereoOffset(void) const {return StereoOffset;};

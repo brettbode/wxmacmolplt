@@ -81,6 +81,7 @@ enum MMP_EventID {
 	MMP_DISPLAYMODESUBMENU,
 	MMP_WIREFRAMEMODE,
 	MMP_BALLANDSTICKMODE,
+	MMP_EFP_WIREFRAME,
 	MMP_ADDMARKANNOTATION,
 	MMP_ADDLENGTHANNOTATION,
 	MMP_ADDANGLEANNOTATION,
@@ -233,6 +234,8 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_UPDATE_UI(MMP_DELETEALLANNOTATIONS, MolDisplayWin::OnDeleteAnnotationsUpdate )
 	EVT_MENU (MMP_WIREFRAMEMODE,	MolDisplayWin::menuViewWireFrameStyle)
 	EVT_MENU (MMP_BALLANDSTICKMODE,	MolDisplayWin::menuViewBallAndStickStyle)
+	EVT_MENU (MMP_EFP_WIREFRAME,	MolDisplayWin::menuViewEFP_Wireframe)
+	EVT_UPDATE_UI(MMP_EFP_WIREFRAME,	MolDisplayWin::OnEFPWireFrameUpdate )
 	EVT_MENU (MMP_SHOWPATTERN,		MolDisplayWin::menuViewShow2DPattern)
 	EVT_UPDATE_UI(MMP_SHOWPATTERN,	MolDisplayWin::OnShowPatternUpdate )
 	EVT_MENU (MMP_ANIMATEFRAMES,    MolDisplayWin::menuViewAnimateFrames)
@@ -662,6 +665,8 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewStyle->AppendRadioItem(MMP_WIREFRAMEMODE, _("Wire Frame"), _("Display as bonds only"));
 	menuViewStyle->AppendRadioItem(MMP_BALLANDSTICKMODE, _("Ball and Stick"), _("Tradiational display mode, sphere size can be adjusted in the preferences"));
 	menuViewStyle->AppendSeparator();
+	menuViewStyle->AppendCheckItem(MMP_EFP_WIREFRAME, _("Show Effective Fragments as Wire Frame"), _("Overide the display mode for EFP solvent molecules"));
+	menuViewStyle->AppendSeparator();
 	menuViewStyle->AppendCheckItem(MMP_SHOWPATTERN, _("Show Atom Patterns"), _("Overlay a 2D pattern on the atom spheres (Ball and Stick mode only)"));
 	
 	menuViewAnnotations = new wxMenu;
@@ -963,6 +968,10 @@ void MolDisplayWin::OnDeleteAnnotationsUpdate( wxUpdateUIEvent& event ) {
 void MolDisplayWin::OnShowPatternUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(!Prefs->DrawWireFrame());
 	event.Check(Prefs->Show2DPattern());
+}
+void MolDisplayWin::OnEFPWireFrameUpdate( wxUpdateUIEvent& event ) {
+	event.Enable(MainData->FragmentNames.size()>0);
+	event.Check(Prefs->ShowEFPWireFrame());
 }
 void MolDisplayWin::OnShowPointGroupUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(false);
@@ -2437,6 +2446,13 @@ void MolDisplayWin::menuViewBallAndStickStyle(wxCommandEvent &event)
 {
 	Prefs->DrawBallnStick(true);
 	Prefs->DrawWireFrame(false);
+	UpdateModelDisplay();
+	Dirty = true;
+}
+
+void MolDisplayWin::menuViewEFP_Wireframe(wxCommandEvent &event)
+{
+	Prefs->ShowEFPWireFrame(1-Prefs->ShowEFPWireFrame());
 	UpdateModelDisplay();
 	Dirty = true;
 }

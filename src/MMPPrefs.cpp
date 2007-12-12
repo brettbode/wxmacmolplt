@@ -671,6 +671,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					ColorBondHalves(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_WireframeMode), boolVal))
 					DrawWireFrame(boolVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_EFPWireframeMode), boolVal))
+					ShowEFPWireFrame(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_OutlineBonds), boolVal))
 					OutLineBonds(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_UseCylinders), boolVal))
@@ -1067,6 +1069,7 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_Stereo), (UseStereo()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ColorHalfBonds), (ColorBondHalves()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_WireframeMode), (DrawWireFrame()?trueXML:falseXML));
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_EFPWireframeMode), (ShowEFPWireFrame()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_OutlineBonds), (OutLineBonds()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_UseCylinders), (CylindersForLines()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_Use3DByDefault), (Default3DOn()?trueXML:falseXML));
@@ -1477,6 +1480,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "ColorBondHalves";
         case MMPMolDisplay_WireframeMode:
             return "WireframeMode";
+        case MMPMolDisplay_EFPWireframeMode:
+            return "EFPWireFrameMode";
         case MMPMolDisplay_OutlineBonds:
             return "OutlineBonds";
         case MMPMolDisplay_UseCylinders:

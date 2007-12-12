@@ -3365,7 +3365,6 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 #else
 		FileSave = 33; //DRC bit 6 plus bit 1 for saving
 #endif
-		MainData->DrawMode += 8;
 	}
 	long FilePos = Buffer->GetFilePos();
 	QPpresent = Buffer->LocateKeyWord("Q          P", 12);

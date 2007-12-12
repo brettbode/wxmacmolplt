@@ -103,6 +103,7 @@ enum MMPMolDisplayElments {
 	MMPMolDisplay_Stereo,
 	MMPMolDisplay_ColorHalfBonds,
 	MMPMolDisplay_WireframeMode,
+	MMPMolDisplay_EFPWireframeMode,
 	MMPMolDisplay_OutlineBonds,
 	MMPMolDisplay_UseCylinders,
 	MMPMolDisplay_Use3DByDefault,

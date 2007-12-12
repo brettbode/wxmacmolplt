@@ -376,6 +376,8 @@ class MolDisplayWin : public wxFrame {
 		void OnShowPatternUpdate(wxUpdateUIEvent &event);
 		void menuViewWireFrameStyle(wxCommandEvent &event);
 		void menuViewBallAndStickStyle(wxCommandEvent &event);
+		void menuViewEFP_Wireframe(wxCommandEvent &event);
+		void OnEFPWireFrameUpdate(wxUpdateUIEvent &event);
 		void menuViewShrink_10(wxCommandEvent &event);
 		void menuViewEnlarge_10(wxCommandEvent &event);
 		void menuViewCenter(wxCommandEvent &event);

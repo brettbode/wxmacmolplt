@@ -303,13 +303,13 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	struc_groups = new wxChoice(panel, kPeriodicStrucGroups);
 	struc_groups->Append(_T("Organics"),
 						 new StrucGroupClientData(sys_prefs_path +
-							 				  _T("/system_structures.cml")));
+							 				  _T("/organics.cml")));
 	struc_groups->Append(_T("Solvents"),
 						 new StrucGroupClientData(sys_prefs_path +
 							 				  _T("/solvents.cml")));
-	struc_groups->Append(_T("Peptides"),
-						 new StrucGroupClientData(sys_prefs_path +
-							 				  _T("/peptides.cml")));
+//	struc_groups->Append(_T("Peptides"),
+//						 new StrucGroupClientData(sys_prefs_path +
+//							 				  _T("/peptides.cml")));
 	struc_groups->Append(_T("Amino Acids"),
 						 new StrucGroupClientData(sys_prefs_path +
 							 				  _T("/amino_acids.cml")));
