@@ -2865,7 +2865,9 @@ void MolDisplayWin::DeleteSelected() {
 			// Delete each atom that's selected.
 			for (long i=MainData->cFrame->NumAtoms-1; i>=0; i--) {
 				if (MainData->cFrame->Atoms[i].GetSelectState()) {
-					MainData->DeleteAtom(i, false);
+					long j = MainData->DeleteAtom(i, false);
+						//restart the scan if more than 1 atom is removed.
+					if ((j==0)&&(i!=0)) i = MainData->cFrame->GetNumAtoms()-1;
 				}
 			}
 
@@ -4028,6 +4030,7 @@ void UndoData::RedoOperation(void) {
 }
 
 FrameSnapShot::FrameSnapShot(MoleculeData * target) {
+	IntCoords = NULL;
 	targetData = target;
 	mTarget = target->cFrame;
 	NumAtoms = mTarget->GetNumAtoms();

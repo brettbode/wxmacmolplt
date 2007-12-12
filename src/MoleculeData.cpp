@@ -1597,7 +1597,10 @@ bool MoleculeData::ModeVisible(void) const {
 long MoleculeData::GetNumBonds(void) const {
 	return cFrame->GetNumBonds();
 }
-void MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
+long MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
+	long offset = AtomNum;
+	int fragId = -1;
+	if (cFrame->Atoms[AtomNum].IsEffectiveFragment()) fragId = cFrame->Atoms[AtomNum].GetFragmentNumber();
 	if (allFrames) {
 		Frame * lFrame = Frames;
 		while (lFrame) {
@@ -1622,7 +1625,25 @@ void MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
 		}
 	}
 	
+	if (fragId > 0) { //recurse to delete the other atoms in the same fragment
+		for (long i=0; i<cFrame->NumAtoms; i++) {
+			if (cFrame->Atoms[i].IsEffectiveFragment() &&
+				cFrame->Atoms[i].GetFragmentNumber() == fragId) {
+				//turn off fragment bit to prevent multilevel recursion
+				cFrame->Atoms[i].IsEffectiveFragment(false);
+				DeleteAtom(i, allFrames);
+				--i;
+			}
+		}
+		//remove the fragment name from the name list
+		std::vector<std::string>::iterator iter = FragmentNames.begin();
+		for (int i=1; i<fragId; i++) ++iter;
+		FragmentNames.erase(iter);
+		offset = 0;	//Have the caller rescan the whole list to be safe.
+	}
+
 	ResetRotation();
+	return offset;
 }
 void MoleculeData::ReorderAtomList(long index1, long targetindex) {
 	//Sanity check the move

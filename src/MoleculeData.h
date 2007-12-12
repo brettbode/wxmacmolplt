@@ -151,10 +151,13 @@ class MoleculeData {
 		inline Internals * GetInternalCoordinates(void) const {return IntCoords;};
 		/**
 			Delete an atom.
+			The return value is the index of the next atom in the list. This routine may remove
+			more than one atom. For example in the case of effective fragments the entire fragment
+			must be removed.
 			\param AtomNum The index of the atom to delete.
 			\param allFrames If true the atom with the same index will be removed from all frames.
 		 */
-		void DeleteAtom(long AtomNum, bool allFrames=false);
+		long DeleteAtom(long AtomNum, bool allFrames=false);
 		/**
 			Reorders the atom list.
 			\param index1 The initial index of the atom

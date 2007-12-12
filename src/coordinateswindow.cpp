@@ -542,11 +542,12 @@ void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 	long natoms = lFrame->GetNumAtoms();
 	for (int i=(natoms-1); i>=0; i--) {
 		if (lFrame->GetAtomSelection(i)) {
-			MainData->DeleteAtom(i);
-			coordGrid->DeleteRows(i, 1, true);
+			int j = MainData->DeleteAtom(i);
+			//restart the scan if more than 1 atom is removed.
+			if ((j==0)&&(i!=0)) i = natoms-1;
 		}
 	}
-	coordGrid->ClearSelection();
+	FrameChanged();
 	UpdateControls();
 	Parent->ResetModel(false);
 }

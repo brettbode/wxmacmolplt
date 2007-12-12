@@ -1138,7 +1138,25 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 
 			// We create a snapsot only when the drag has just started and
 			// when molecular state will be changed.
-			if (ndrag_events == 1) MolWin->CreateFrameSnapShot();
+			if (ndrag_events == 1) {
+				MolWin->CreateFrameSnapShot();
+			}
+			if (ndrag_events < 3) {
+				//also check that only whole EFPs are selected
+				Frame *lFrame = mMainData->cFrame;
+				long NumAtoms = lFrame->NumAtoms;
+				mpAtom *lAtoms = lFrame->Atoms;
+				for (long i=0; i<NumAtoms; i++) {
+					if (lAtoms[i].IsEffectiveFragment() && lAtoms[i].GetSelectState()) {
+						long fragId = lAtoms[i].GetFragmentNumber();
+						for (long j=0; j<NumAtoms; j++) {
+							if (lAtoms[j].IsEffectiveFragment() &&
+								lAtoms[j].GetFragmentNumber()==fragId)
+								lAtoms[j].SetSelectState(true);
+						}
+					}
+				}
+			}
 
 			HandleEditing(event, curr_mouse, prev_mouse);
 			draw();
@@ -1210,6 +1228,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 			// skeleton, add the atom in the direction of the bonding site.
 			else if (selected_site >= 0) {
 				MolWin->CreateFrameSnapShot();
+				long OrigAtomCount = lFrame->GetNumAtoms();
 
 				if (build_palette->InPeriodicMode()) {
 					CPoint3D vector, origin;
@@ -1279,7 +1298,18 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						}
 					}
 				}
-
+				//Sort fragments to the end of the list
+				if ((OrigAtomCount > 0)&&(!lFrame->Atoms[OrigAtomCount].IsEffectiveFragment())&&
+					lFrame->Atoms[OrigAtomCount-1].IsEffectiveFragment()) {
+					long initialFragAtom = 0;
+					while (!lFrame->Atoms[initialFragAtom].IsEffectiveFragment() &&
+						   initialFragAtom < OrigAtomCount) initialFragAtom++;
+					for (long i=OrigAtomCount; i<lFrame->GetNumAtoms(); i++) {
+						mMainData->ReorderAtomList(i, initialFragAtom);
+						initialFragAtom++;
+					}
+				}
+				
 			}
 
 			// If the user clicked on nothing, we try to add an atom given
@@ -1299,6 +1329,8 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				newPnt = CPoint3D(newX, newY, newZ);
 
 				MolWin->CreateFrameSnapShot();
+				
+				long OrigAtomCount = lFrame->GetNumAtoms();
 
 				if (build_palette->InPeriodicMode()) {
 					type = build_palette->GetSelectedElement();
@@ -1368,6 +1400,17 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						MolWin->SelectionChanged(true);
 					}
 
+				}
+				//Sort fragments to the end of the list
+				if ((OrigAtomCount > 0)&&(!lFrame->Atoms[OrigAtomCount].IsEffectiveFragment())&&
+					lFrame->Atoms[OrigAtomCount-1].IsEffectiveFragment()) {
+					long initialFragAtom = 0;
+					while (!lFrame->Atoms[initialFragAtom].IsEffectiveFragment() &&
+						   initialFragAtom < OrigAtomCount) initialFragAtom++;
+					for (long i=OrigAtomCount; i<lFrame->GetNumAtoms(); i++) {
+						mMainData->ReorderAtomList(i, initialFragAtom);
+						initialFragAtom++;
+					}
 				}
 				lFrame->SetBonds(Prefs, true, true);
 				MolWin->UpdateGLModel();
@@ -1658,6 +1701,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			if (!lFrame->GetAtomSelection(selected)) {
 				SelectObj(selected_type, selected, true);
 				MolWin->SelectionChanged(true);
+				return;
 			}
 
 			// Screen plane translation can be restricted by an annotation
@@ -2860,7 +2904,7 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 		if (lFrame->GetAtomSelection(selected)) {
 			for (int i = 0; i < lFrame->NumAtoms; i++) {
 				if (lFrame->GetAtomSelection(i)) {
-					mMainData->DeleteAtom(i);
+					 i = mMainData->DeleteAtom(i);
 					// Deleting an atom will shift its successor to current
 					// position, so we must adjust i.
 					i--;
