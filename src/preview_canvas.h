@@ -51,8 +51,6 @@ class PreviewCanvas : public wxGLCanvas {
 		bool gl_initialized;
 		int selected;
 		bool was_dragging;
-		static const GLubyte mask[16 * 16];
-		GLuint mask_texture_id;
 
 	DECLARE_EVENT_TABLE()
 };
