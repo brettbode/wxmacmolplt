@@ -4027,21 +4027,27 @@ void UndoData::RedoOperation(void) {
 	}
 }
 
-FrameSnapShot::FrameSnapShot(Frame * target) {
-	mTarget = target;
-	NumAtoms = target->GetNumAtoms();
-	NumBonds = target->GetNumBonds();
+FrameSnapShot::FrameSnapShot(MoleculeData * target) {
+	targetData = target;
+	mTarget = target->cFrame;
+	NumAtoms = mTarget->GetNumAtoms();
+	NumBonds = mTarget->GetNumBonds();
 	Atoms = new mpAtom[NumAtoms];
 	Bonds = new Bond[NumBonds];
 	for (int i=0; i<NumAtoms; i++)
-		Atoms[i] = target->Atoms[i];
+		Atoms[i] = mTarget->Atoms[i];
 	for (int i=0; i<NumBonds; i++)
-		Bonds[i] = target->Bonds[i];
+		Bonds[i] = mTarget->Bonds[i];
+	FragmentNames = target->FragmentNames;
+	if (target->IntCoords) {
+		IntCoords = new Internals(target->IntCoords);
+	}
 }
 
 FrameSnapShot::~FrameSnapShot(void) {
 	if (Atoms) delete [] Atoms;
 	if (Bonds) delete [] Bonds;
+	if (IntCoords) delete IntCoords;
 }
 
 void FrameSnapShot::Restore(void) {
@@ -4063,12 +4069,19 @@ void FrameSnapShot::Restore(void) {
 		for (int i=0; i<NumBonds; i++)
 			mTarget->Bonds[i] = Bonds[i];
 		mTarget->NumBonds = NumBonds;
+		
+		targetData->FragmentNames = FragmentNames;
+		
+		if (IntCoords) {	//restore the internal coordinate definitions
+			if (targetData->IntCoords) delete targetData->IntCoords;
+			targetData->IntCoords = new Internals(IntCoords);
+		}
 	}
 }
 
 void MolDisplayWin::CreateFrameSnapShot(void) {
 	if (Prefs->ToolbarShown()) {
-		FrameSnapShot * f = new FrameSnapShot(MainData->cFrame);
+		FrameSnapShot * f = new FrameSnapShot(MainData);
 		mUndoBuffer.AddSnapshot(f);
 	}
 }

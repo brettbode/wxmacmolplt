@@ -2974,6 +2974,7 @@ void MpGLCanvas::ConvertEFPToAllElec(wxCommandEvent& event) {
 	Frame *lFrame = mMainData->cFrame;
 	//Convert all atoms in the selected effective fragment to all electron atoms.
 	if (lFrame->Atoms[selected].IsEffectiveFragment()) {
+		MolWin->CreateFrameSnapShot();
 		int fragId = lFrame->Atoms[selected].GetFragmentNumber();
 		int firstatm=-1;
 		for (int iatom=0; iatom<lFrame->GetNumAtoms(); iatom++) {

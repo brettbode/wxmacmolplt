@@ -21,6 +21,12 @@ Internals::Internals(void) {
 	MOPacStyle = NULL;
 	GeneralStyle = NULL;
 }
+Internals::Internals(Internals * copy) {
+	MOPacStyle = NULL;
+	GeneralStyle = NULL;
+	if (copy->MOPacStyle)
+		MOPacStyle = new MOPacInternals(copy->MOPacStyle);
+}
 Internals::~Internals(void) {
 	if (MOPacStyle) delete MOPacStyle;
 	if (GeneralStyle) delete GeneralStyle;
@@ -37,6 +43,19 @@ MOPacInternals::MOPacInternals(long Num) {
 	if (!ConnectionAtoms || !Values || !Type) throw MemoryError();
 	Allocation = Num;
 	Count = 0;
+}
+MOPacInternals::MOPacInternals(MOPacInternals * copy) {
+	ConnectionAtoms = new long[copy->Count];
+	Values = new float[copy->Count];
+	Type = new char[copy->Count];
+	if (!ConnectionAtoms || !Values || !Type) throw MemoryError();
+	Allocation = copy->Count;
+	Count = copy->Count;
+	for (long i=0; i<Count; i++) {
+		ConnectionAtoms[i] = copy->ConnectionAtoms[i];
+		Values[i] = copy->Values[i];
+		Type[i] = copy->Type[i];
+	}
 }
 MOPacInternals::~MOPacInternals(void) {
 	if (ConnectionAtoms) delete [] ConnectionAtoms;

@@ -86,7 +86,7 @@ class FrameSnapShot : public UndoSnapShot {
 public:
 	/** Create a snapshot from the provided frame pointer.
 	*/
-	FrameSnapShot(Frame * target);
+	FrameSnapShot(MoleculeData * target);
 	virtual ~FrameSnapShot(void);
 	/** Restore the saved data. Note the frame point is stored here
 		so you can't restore if the original frame memory has been
@@ -94,11 +94,14 @@ public:
 	*/
 	virtual void Restore(void);
 private:
+	MoleculeData * targetData;	///< The target data structure
 	Frame *		mTarget;	///< The target Frame.
 	mpAtom *	Atoms;		///< Saved atom list
 	Bond *		Bonds;		///< Saved bond list
 	long		NumAtoms;	///< atom count
 	long		NumBonds;	///< bond count
+	std::vector<std::string> FragmentNames;	//< Effective Fragment name for each fragment (FRAGNAME)
+	Internals * IntCoords;	///< Set of internal coordinate definitions
 };
 
 /** Container class for undo/redo data. This class manages the list of

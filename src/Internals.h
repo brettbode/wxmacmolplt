@@ -49,6 +49,10 @@ class MOPacInternals {
 		 */
 		MOPacInternals(long count);
 		/**
+		 Copy constructor
+		 */
+		MOPacInternals(MOPacInternals * copy);
+		/**
 		 * Constructor with initial data from CML.
 		 * @param Parent The XML parent element containing the internal coordinate data.
 		 */
@@ -188,6 +192,10 @@ class Internals {
 		GeneralInternals *	GeneralStyle;
 	public:
 		Internals(void);
+		/**
+		 Copy constructor
+		 */
+		Internals(Internals * copy);
 		~Internals(void);
 		inline MOPacInternals * GetMOPacStyle(void) {return MOPacStyle;};
 		void ReadXML(XMLElement * parent);

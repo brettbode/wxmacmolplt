@@ -28,6 +28,7 @@ class MoleculeData {
 		friend class Surf2DBase;
 		friend class Surf3DBase;
 		friend class MpGLCanvas;
+		friend class FrameSnapShot;
 	private:
 		std::vector<Annotation *> Annotations;	//Set of annotations
 		int constrain_anno_id;
