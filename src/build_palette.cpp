@@ -821,7 +821,7 @@ bool BuilderDlg::LoadStructuresFromFile(const wxString& filename) {
 	// don't do anything.  (There used to be an error message here, but
 	// there's a strong chance that the file might not exist, which is
 	// a perfectly legal thing.)
-	load_file = fopen(filename.mb_str(wxConvUTF8), "r");
+	load_file = fopen(filename.mb_str(wxConvUTF8), "rb");
 	if (load_file == NULL) {
 		return false;
 	}
