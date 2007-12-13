@@ -111,7 +111,6 @@ class MpGLCanvas : public wxGLCanvas {
 		
 		int mSelectState;
 		int oldSelect;
-		bool interactiveMode;
 		GLdouble atomDepth;
 		GLint winDiffX, winDiffY;
 		bool was_zooming;
@@ -154,6 +153,7 @@ class MpGLCanvas : public wxGLCanvas {
 		bool window_just_focused; // Flag indicating window getting focus
 		wxStopWatch mouse_activate_timer;
 		bool ignore_next_up;
+		bool is_lassoing;
 
 		void AddPlaneNormal(wxCommandEvent& event);
 		void ConnectSelectedToSite(int src_atom, int src_site,
@@ -316,7 +316,6 @@ class MpGLCanvas : public wxGLCanvas {
 			
 		void testPicking(int x, int y);
 		void SelectObj(int selected_type, int select_id, bool mode);
-		void toggleInteractiveMode();
 		void findReal3DCoord(GLdouble x, GLdouble y, GLdouble z, GLdouble& realX, GLdouble& realY, GLdouble& realZ);
 		void findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, GLdouble& winY, GLdouble& winZ);
 		/* MpGLCanvas *GetParent(void) { return parent; } */

@@ -2182,9 +2182,6 @@ void MolDisplayWin::ShowToolbar(bool enable) {
 		mUndoBuffer.Clear();
 	}
 
-	if (glCanvas)
-		glCanvas->toggleInteractiveMode();
-
 	wxSizeEvent size_event;
 	glCanvas->AddPendingEvent(size_event);
 
@@ -2889,7 +2886,6 @@ void MolDisplayWin::KeyUpHandler(wxKeyEvent & event) {
 		if (mAltModifyingToolBar) {
 			toolbar->ToggleTool(MMP_TOOL_HAND, true);
 			glCanvas->SetCursor(wxCursor(wxCURSOR_HAND));
-			LassoEnd();
 			UpdateModelDisplay();
 			
 			mAltModifyingToolBar = false;

@@ -55,10 +55,10 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin *parent, wxWindowID id,
 	mMainData = parent->GetData();
 
 	mSelectState = -1;
-	interactiveMode = false;
 	oldSelect = -1;
 	select_stack_top = 0;
 	ignore_next_up = false;
+	is_lassoing = false;
 	
 	selected = -1;
 	selected_type = MMP_NULL;
@@ -951,30 +951,28 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 
 	testPicking(curr_mouse.x, curr_mouse.y);
 
-	if (interactiveMode) {
-		// If the mouse left the window while the user was already
-		// lassoing, stale_click will be true and this code will get
-		// executed, and the lassoing already in progress will be lost.
-		// So, we force that a new lasso is started only when the mouse
-		// button has just gone down.
-		if (MolWin->InSelectionMode()) {
-			MolWin->LassoStart(curr_mouse.x, height - curr_mouse.y);
-			select_stack_top = 5;
-		} else if (selected_type == MMP_ATOM) {
-			GLdouble tmpWinX, tmpWinY;
+	// User's lassoing.
+	if (MolWin->InSelectionMode()) {
+		is_lassoing = true;
+		MolWin->LassoStart(curr_mouse.x, height - curr_mouse.y);
+		select_stack_top = 5;
+	}
+	
+	// User's editing and clicked on an atom.
+	else if (MolWin->InEditMode() && selected_type == MMP_ATOM) {
+		GLdouble tmpWinX, tmpWinY;
 
-			findWinCoord(lAtoms[selected].Position.x,
-				lAtoms[selected].Position.y,
-				lAtoms[selected].Position.z,
-				tmpWinX, tmpWinY, atomDepth);
-   
-			winDiffX = curr_mouse.x - (int) tmpWinX;
-			winDiffY = curr_mouse.y - (int) tmpWinY;
+		findWinCoord(lAtoms[selected].Position.x,
+			lAtoms[selected].Position.y,
+			lAtoms[selected].Position.z,
+			tmpWinX, tmpWinY, atomDepth);
 
-			first_site_clicked = selected_site;
-			first_atom_clicked = selected;
-		}
-	} 
+		winDiffX = curr_mouse.x - (int) tmpWinX;
+		winDiffY = curr_mouse.y - (int) tmpWinY;
+
+		first_site_clicked = selected_site;
+		first_atom_clicked = selected;
+	}
 
 	if (MolWin->IsRotating()) {
 		was_just_rotating = true;
@@ -1120,7 +1118,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	glfSetCurrentBMFFont(bitmap_fontd);
 
 	// Lassoing should only be done with the left mouse button.
-	if (MolWin->InSelectionMode() && event.LeftIsDown()) {
+	if (is_lassoing && event.LeftIsDown()) {
 		HandleLassoing(event, wxPoint(curr_mouse.x, height - curr_mouse.y));
 		draw();
 	}
@@ -1189,8 +1187,9 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		deSelectAll = false;
 	}
 
-	// If the lasso tool is being used, we want to end close off it's region.
-	if (MolWin->InSelectionMode()) {
+	// If the lasso tool is being used, we want to close off its region.
+	if (is_lassoing) {
+		is_lassoing = false;
 		MolWin->LassoEnd();
 		if (ndrag_events <= 0) {
 			SelectObj(selected_type, selected, deSelectAll);
@@ -2515,7 +2514,7 @@ void MpGLCanvas::annoPopupMenu(int x, int y) {
 	wxMenu menu;
 	wxMenuItem *item;
 
-	if (interactiveMode &&
+	if (MolWin->InEditMode() &&
 		mMainData->Annotations[selected]->getType() != MP_ANNOTATION_MARKER) {
 		item = menu.AppendCheckItem(GL_Popup_Lock_To_Annotation,
 				                    wxT("Constrain Annotation"));
@@ -2948,12 +2947,6 @@ void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
 	MolWin->UpdateModelDisplay();
 	MolWin->AtomsChanged(true, false);
 	MolWin->AdjustMenus();
-}
-
-void MpGLCanvas::toggleInteractiveMode(void) {
-
-	interactiveMode = 1 - interactiveMode;
-
 }
 
 /**
