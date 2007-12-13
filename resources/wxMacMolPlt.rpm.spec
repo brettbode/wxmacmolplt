@@ -5,7 +5,7 @@
 %define debug_package %{nil}
 %define __check_files %{nil}
 Name: wxmacmolplt
-Version: 7.0
+Version: 7.1
 Release: 1
 Summary: MacMolPlt molecular visualization package
 Group: undefined
@@ -32,6 +32,9 @@ wxMacMolPlt is a molecular visualization tool for use with GAMESS
 %{sysconfdir}/wxmacmolplt/MacMolPlt.Prefs.xml
 %{sysconfdir}/wxmacmolplt/arial1.glf
 %{sysconfdir}/wxmacmolplt/arial1.bmf
+%{sysconfdir}/wxmacmolplt/organics.cml
+%{sysconfdir}/wxmacmolplt/solvents.cml
+%{sysconfdir}/wxmacmolplt/amino_acids.cml
 %doc %{sysconfdir}/doc/wxmacmolplt/LICENSE
 #FC gz
 %doc %{sysconfdir}/man/man1/wxmacmolplt.1.gz
