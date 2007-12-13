@@ -464,7 +464,8 @@ void BuilderDlg::OnStructureChoice(wxCommandEvent& event) {
 		/* event.Skip(); */
 	/* } else { */
 		int id = event.GetSelection();
-		if (id != wxNOT_FOUND && id >= 0 && id < structures.size()) {
+		/* if (id != wxNOT_FOUND && id >= 0 && id < structures.size()) { */
+		if (id != wxNOT_FOUND) {
 			canvas->SetStructure(structures[id]);
 		}
 	/* } */
@@ -937,7 +938,16 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 			}
 			canvas->Render();
 		}
+#ifdef __WXMAC__
+		mStructureChoice->Enable();
+#endif
+
 	} else {
+#ifdef __WXMAC__
+		// This control wants to take over event handling once it gets 
+		// focus.  So, we turn him off when he's not visible.
+		mStructureChoice->Disable();
+#endif
 		elements[prev_id >= 0 ? prev_id : 0].button->SetFocus();
 	}
 
