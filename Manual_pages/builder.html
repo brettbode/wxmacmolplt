@@ -14,6 +14,7 @@
 		<p><a href="#Adding_Bonds">Adding Bonds</a></p>
 		<p><a href="#Modifying_subgroups">Modifying subgroups</a></p>
 		<p><a href="#prototypes">Molecular Prototypes</a></p>
+		<p><a href="#EFPs">Effective Fragments</a></p>
 		<p><a href="#misc">Final thoughts</a></p>
 		<hr>
 		<h3><a name="Getting_Started"></a>Getting Started</h3>
@@ -43,9 +44,24 @@
       <p>To bond a prototype to an existing atom, first note that one of the hydrogen atoms in the prototype is marked in the Prototypes preview. This hydrogen will be pruned in order to free a bonding site for the prototype. You can alter which atom is pruned by clicking on a different hydrogen atom. Now, return to the molecular display and click on the appropriate bonding site of the existing, base atom. The prototype will be transformed and dropped into place with the marked hydrogen removed.</p>
       <p>To add a user-defined prototype, build the structure in the molecular display as desired.  Then, select all atoms in the structure and choose "Prototype Selection" in the "Builder" menu. Enter a name for the prototype. It will now be available in the User-defined prototypes.</p>
 		<hr>
+<h3><a name="EFPs"></a>Effective Fragments</h3>
+Effective Fragments are a unique feature of GAMESS that allow treating solvation
+with explicit, but non-ab initio, solvent molecules. MacMolPlt should correctly
+read GAMESS output files with EFP atoms in them and will correctly punch out
+the $EFRAG group to GAMESS input files for the builtin EFP1 H2O solvents. In 
+addition the solvents group in the prototypes list includes the two builtin
+EFP1 water fragments so that you can directly add fragments in the builder.
+<P>
+Right-clicking on a fragment atom will present an option to convert the EFP
+fragment into an all-electron system. EFP fragments do have limititations. 
+Their internal geometry is fixed so the builder should prevent you from 
+changing the internal geometry (eg. if you delete or drag one atom in a 
+fragment you will automatically select and move the whole fragment).
+<hr>
 		<h3><a name="misc"></a>Final Thoughts</h3>
 		<p>Occasionally a mouse click is not handled correctly and an atom is added by mistake. If that happens just undo it.</p>
-		<p>A natural extension to the builder will be a palette with functional subgroups, solvents, etc. This is a planned addition for the future as is a mode to build using symmetry.</p>
+		<p>The list of prebuilt molecules is fairly limited. If you would like to see your favorite structure in the list for a furture release please send me the coordinates.</p>
+		<p>The prebuilt prototypes have been taken from several sources and should not be considered as definitively correct.
 	</body>
 
 </html>
