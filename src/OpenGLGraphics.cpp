@@ -50,6 +50,7 @@
 #include <string.h>
 
 #include <iostream>
+#include <algorithm>
 
 #ifndef __wxBuild__
 extern Boolean	gOpenGLAvailable;
