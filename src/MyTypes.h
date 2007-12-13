@@ -599,6 +599,7 @@ class Surface {
 		long Read(BufferFile * Buffer, long length);
 		virtual void Export(BufferFile * Buffer);
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer) {
+			return 0;
 		}
 	//	void ExportToFile(void);
 		virtual void RotateSurface(Matrix4D RotationMatrix);
