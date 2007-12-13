@@ -36,6 +36,7 @@
    <UL>
 				<LI><A HREF="#image">BMP, PNG or JPEG image</A>
 				<li><a href="#movies">Flash or QuickTime movies</a>
+				<li><a href="#povray">POV-Ray scene descriptions</a>
 				<LI>tab-delimited energies
 
 			</UL>
@@ -324,6 +325,11 @@ image. This can be used to generate hi-res images suitable for printing.
 			<hr width="70%">
 			<a name="movies"></a>Movies</h4>
 		<p>The current molecular display, with an optional energy plot, can be exported to a movie suitable for use on a web site, in a presentation, etc. Currently two formats are supported. On MacOS X only you can export to a QuickTime movie (by default in mpeg4 format). On all platforms you may also choose to use the Shockwave Flash format. In both cases the resulting movie will look best at the same size as the display window that created it.</p>
+		<h4>
+			<hr width="70%">
+			<a name="povray"></a>POV-Ray</h4>
+		<p>The current molecular display can be exported to POV-Ray's scene description language (SDL) for high quality raytracing.  Only atoms, bonds, and surfaces are exported at this time.  The camera transformation and surface geometry used for the current frame are retained in the SDL file.  (Atoms and bonds are rendered parametrically using sphere and cylinder primitives, but surfaces are modeled as polygonal meshes.)  The lighting parameters for the atoms, bonds, and surfaces can be adjusted using the SDL macros AtomBondFinish and SurfaceFinish at the top of the exported file.
+      </p>
 		<h4>
 			<hr width="70%">
 			<a name="CML"></a>Chemical Markup Language (CML)</h4>
