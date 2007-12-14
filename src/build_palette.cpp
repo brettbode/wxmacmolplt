@@ -81,8 +81,6 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	tabs = new wxNotebook(this, kPeriodicNotebookID, wxPoint(-1, -1),
 						  wxSize(-1, -1));
 
-	wxPanel *solvents_panel = new wxPanel(tabs);
-
 	periodic_panel = GetPeriodicPanel();
 	structures_panel = GetStructuresPanel();
 
@@ -456,19 +454,10 @@ void BuilderDlg::OnLPChoice(wxCommandEvent& event) {
 
 void BuilderDlg::OnStructureChoice(wxCommandEvent& event) {
 
-	/* int id = event.GetSelection(); */
-	/* if (InPeriodicMode()) { */
-		/* wxKeyEvent key_event(id); */
-		/* KeyHandler(key_event); */
-		/* std::cout << "skipping event" << std::endl; */
-		/* event.Skip(); */
-	/* } else { */
-		int id = event.GetSelection();
-		/* if (id != wxNOT_FOUND && id >= 0 && id < structures.size()) { */
-		if (id != wxNOT_FOUND) {
-			canvas->SetStructure(structures[id]);
-		}
-	/* } */
+	int id = event.GetSelection();
+	if (id != wxNOT_FOUND) {
+		canvas->SetStructure(structures[id]);
+	}
 
 }
 
@@ -485,7 +474,7 @@ void BuilderDlg::KeyHandler(wxKeyEvent& event) {
 				//if less than three seconds try to interpert as the 2nd letter of a two letter element symbol
 				id = SetAtomType(keyBuffer);
 			}
-			if (id < 0) {	//interpert as the first letter of an element symbol
+			if (id < 0) {	//interpret as the first letter of an element symbol
 				keyBuffer[0] = key;
 				keyBuffer[1] = '\0';
 				id = SetAtomType(keyBuffer);
