@@ -4028,6 +4028,7 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 	/* float x_angle, y_angle, z_angle; */
 	/* MatrixToEulerAngles(MainData->TotalRotation, &x_angle, &y_angle, */
 						/* &z_angle); */
+	Buffer->PutText("#include \"transforms.inc\"\n\n");
 
 	tmpStr.Printf(wxT("camera {\n"
 					  "\tlocation <0, 0, 0>\n"
@@ -4158,7 +4159,56 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 	tmpStr.Printf(wxT("\n\ttranslate <0, 0, %f>\n"),
 				  -MainData->WindowSize);
 	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-	Buffer->PutText("}\n");
+	Buffer->PutText("}\n\n");
+
+	if (Prefs->ShowAtomicSymbolLabels()) {
+		CPoint3D text_pos;
+		wxString atomic_symbol;
+		unsigned int i;
+
+		for (i = 0; i < kMaxAtomTypes; i++) {
+			Prefs->GetAtomLabel(i, atomic_symbol);
+			tmpStr.Printf(wxT("#declare Atom_%03d = "
+							  "   text {"
+							  "      ttf \"timrom.ttf\", \"") +
+									 atomic_symbol + wxT("\", 0.01, 0"
+							  "   }\n\n"), i);
+			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		}
+
+		Buffer->PutText("union {\n");
+		float radius;
+		for (long iatom = 0; iatom < NumAtoms; iatom++) {
+			if (lAtoms[iatom].GetInvisibility()) continue;
+
+			Rotate3DPt(MainData->TotalRotation, lAtoms[iatom].Position, &text_pos);
+			curAtomType = lAtoms[iatom].GetType() - 1;
+			radius = AtomScale*Prefs->GetAtomSize(curAtomType);
+			Prefs->GetAtomLabel(i, atomic_symbol);
+
+			AtomColor = Prefs->GetAtomColorLoc(curAtomType);
+			red = AtomColor->red / 65536.0;
+			green = AtomColor->green / 65536.0;
+			blue = AtomColor->blue / 65536.0;
+
+			tmpStr.Printf(wxT("object {\n"
+							  "   Atom_%03d\n"
+							  "   Center_Trans(Atom_%03d, x + y)\n"
+							  "   scale <0.25, 0.25, 1.0>\n"
+							  "   translate <%f, %f, %f>\n"
+							  "   no_shadow\n"
+							  "   pigment { color rgb <%f, %f, %f> }\n"
+							  "}\n\n"), curAtomType, curAtomType,
+						  text_pos.x, text_pos.y, text_pos.z + radius,
+						  1.0f - red, 1.0f - green, 1.0f - blue);
+			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		}
+		Buffer->PutText("\n\tscale <-1, 1, 1>\n");
+		tmpStr.Printf(wxT("\n\ttranslate <0, 0, %f>\n"),
+					  -MainData->WindowSize);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("}\n");
+	}
 
 }
 
