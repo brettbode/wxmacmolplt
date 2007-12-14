@@ -1,8 +1,21 @@
+wxmacmolplt (7.1.0-1) unstable; urgency=low
+
+  * New major upstream release.
+
+ -- Brett Bode <brett@scl.ameslab.gov>  Thu, 13 Dec 2007 14:50:29 -0600
+
+wxmacmolplt (7.0.0-2) unstable; urgency=low
+
+  * Fix a build dependancy problem to get flash export working.
+
+ -- Brett Bode <brett@scl.ameslab.gov>  Fri, 17 Aug 2007 12:32:33 -0500
+
 wxmacmolplt (7.0.0-1) unstable; urgency=low
 
   * New major upstream release
+  * -
 
- -- Brett Bode <brett@scl.ameslab.gov>  Tue, 14 Aug 2007 15:51:33 -0500
+ -- Brett Bode <brett@scl.ameslab.gov>  Fri, 17 Aug 2007 12:31:57 -0500
 
 wxmacmolplt (6.5-1) unstable; urgency=low
 
