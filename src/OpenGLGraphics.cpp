@@ -1532,6 +1532,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		bg_invert[0] = bg_invert[1] = bg_invert[2] = 1.0f;
 	}
 
+	bool draw_subdued;
 	glEnable(GL_RESCALE_NORMAL);
 	if (!Prefs->DrawWireFrame()) {
 		glLoadName(MMP_ATOM);
@@ -1542,81 +1543,67 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			if (Prefs->ShowEFPWireFrame()&&lAtoms[iatom].IsEffectiveFragment()) continue;
 			long curAtomType = lAtoms[iatom].GetType() - 1;
 
-			float radius;
-			// if (!Prefs->DrawWireFrame()) { 
-			radius = AtomScale*Prefs->GetAtomSize(curAtomType);
-			// } else { 
-				// radius = BondSize; 
-			// } 
-			
+			float radius = AtomScale * Prefs->GetAtomSize(curAtomType);
 			if (radius < 0.01) continue;	//skip really small spheres
 
-			//	RGBColor * AtomColor = Prefs->GetAtomColorLoc(curAtomType);
-			//		float red, green, blue;
-			//	red = AtomColor->red/65536.0;
-			//	green = AtomColor->green/65536.0;
-			//	blue = AtomColor->blue/65536.0;
-
-			glPushMatrix();
+			glPushMatrix(); // molecule origin
 			glTranslatef(lAtoms[iatom].Position.x, 
-				     lAtoms[iatom].Position.y,
-				     lAtoms[iatom].Position.z);
+						 lAtoms[iatom].Position.y,
+						 lAtoms[iatom].Position.z);
 
-			//	glColor3f(red, green, blue);
+			if (edit_symmetrically && !lAtoms[iatom].IsSymmetryUnique()) {
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+				glLoadName(0);
+				glColor3fv(bg_invert);
+				glEnable(GL_POLYGON_STIPPLE);
+				glPolygonStipple(stippleMask);
+				gluSphere(core_obj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
+				glDisable(GL_POLYGON_STIPPLE);
+				glPopMatrix(); // molecule origin
+				continue;
+			}
 
-			glLoadName(iatom+1);
+			glLoadName(iatom + 1);
+			draw_subdued = mHighliteState && !lAtoms[iatom].GetSelectState();
 			  
-			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+			if (draw_subdued) {
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
 			} else {
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
 			}
 
 			if (Prefs->Show2DPattern()) {
-			  short patternindex = Prefs->GetAtomPattern(lAtoms[iatom].GetType()-1);
-			  //The 0th pattern is assumed to be solid so no need to draw
-			  if ((patternindex>0)&&(patternindex<numPatterns)) {
-			    //glEnable(GL_DEPTH_TEST);
-			    //glEnable(GL_STENCIL_TEST);
-			    //glStencilFunc(GL_ALWAYS, 1, 1);
-			    //glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-			    //glDepthFunc(GL_LESS);
-
-			    glColor3f(0.0f,0.0f,0.0f);
-			    glEnable(GL_POLYGON_STIPPLE);
-			    glPolygonStipple(atomMaskPatterns[patternindex]);
-			    gluSphere(core_obj, radius, (long)(1.5*Quality), (long)(Quality));//Create and draw the sphere
-			    glDisable(GL_POLYGON_STIPPLE);
-
-			    //glStencilFunc(GL_EQUAL, 1, 1);
-			    //glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-			    //glDepthFunc(GL_ALWAYS);
-			  }
+				short patternindex = Prefs->GetAtomPattern(lAtoms[iatom].GetType()-1);
+				//The 0th pattern is assumed to be solid so no need to draw
+				if ((patternindex>0)&&(patternindex<numPatterns)) {
+					glColor3f(0.0f, 0.0f, 0.0f);
+					glEnable(GL_POLYGON_STIPPLE);
+					glPolygonStipple(atomMaskPatterns[patternindex]);
+					gluSphere(core_obj, radius, (long)(1.5*Quality), (long)(Quality));//Create and draw the sphere
+					glDisable(GL_POLYGON_STIPPLE);
+				}
 			}
 
-			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
-			  glColor3f(0.0f,0.0f,0.0f);
-			  glEnable(GL_POLYGON_STIPPLE);
-			  glPolygonStipple(stippleMask);
-			  gluSphere(core_obj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
-			  glDisable(GL_POLYGON_STIPPLE);
-
-			  //glColor4f(0.5,0.5,0.5,0.7f);
-			  //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-			  //glEnable(GL_BLEND);
-			  //gluSphere(core_obj, radius*1.02, (long)(1.5*Quality), (long)(Quality));
-			  //glDisable(GL_BLEND);
+			if (draw_subdued) {
+				glColor3f(0.0f,0.0f,0.0f);
+				glEnable(GL_POLYGON_STIPPLE);
+				glPolygonStipple(stippleMask);
+				gluSphere(core_obj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
+				glDisable(GL_POLYGON_STIPPLE);
 			}
 
 			Prefs->ChangeColorAtomColor(curAtomType+1);
 	  
-			if (mHighliteState && !lAtoms[iatom].GetSelectState()) {
+			if (draw_subdued) {
 				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
 				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
 				glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
@@ -1628,16 +1615,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
 			}
 
-			glPushMatrix();
+			glPushMatrix(); // atom center
 			glScalef(radius, radius, radius);
 			glCallList(OpenGLData->sphere_list);
-			glPopMatrix();
-			/* gluSphere(core_obj, radius, (long)(1.5*Quality), (long)(Quality));	//Create and draw the sphere */
-
-			//if (Prefs->Show2DPattern()) {
-			//  glDisable(GL_STENCIL_TEST);
-			//  glDisable(GL_DEPTH_TEST);
-			//}
+			glPopMatrix(); // atom center
 
 			if (InEditMode() && show_bond_sites) {
 				glPushMatrix();
@@ -1645,7 +1626,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glPopMatrix();
 			}
 
-			glPopMatrix();
+			glPopMatrix(); // molecular origin
 		}
 		glPopName();
 	}
@@ -3033,8 +3014,8 @@ void DashedQuadFromLine(const CPoint3D& pt1,
 		// text.
 		glPushMatrix();
 		glTranslatef((pt1.x + pt2.x) / 2.0f,
-						(pt1.y + pt2.y) / 2.0f,
-						(pt1.z + pt2.z) / 2.0f);
+					 (pt1.y + pt2.y) / 2.0f,
+					 (pt1.z + pt2.z) / 2.0f);
 		glMultMatrixf(m);
 
 		// Move out for the kind of bond that exists between the atoms.

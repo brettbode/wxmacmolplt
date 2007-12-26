@@ -660,6 +660,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	EndOfGroup = false;
 	if (Buffer->FindGroup("MP2")) {
 		if (!MainData->InputOptions->Guess) MainData->InputOptions->MP2 = new MP2Group;
+		std::cout << "MainData->InputOptions->MP2: " << MainData->InputOptions->MP2 << std::endl;
 		do {
 			float tempf;
 			Buffer->GetLine(Line);

@@ -224,6 +224,7 @@ class MolDisplayWin : public wxFrame {
 		bool			OperationInProgress;
 		bool			timerRunning;
 		bool			show_fullscreen;
+		bool			edit_symmetrically;
 		
 		Progress		*ProgressInd;    ///< Progress indicator window for long operations
 		OpenGLRec		*OpenGLData;     ///< Extra OpenGL data
@@ -430,6 +431,7 @@ class MolDisplayWin : public wxFrame {
 		 * @param event The command event (not used).
 		 */
 		void menuBuilderShowBondSites(wxCommandEvent &event);
+		void menuBuilderSymmetryEdit(wxCommandEvent &event);
 		/**
 		 * Toggles the toolbar. When active a toolbar is added to the main
 		 * display window.
@@ -452,6 +454,7 @@ class MolDisplayWin : public wxFrame {
 		 * @param event The UpdateUI event.
 		 */
 		void OnShowBondSitesUpdate(wxUpdateUIEvent& event);
+		void OnShowSymmetryEdit(wxUpdateUIEvent& event);
 		void UpdateAtomsOptions(wxUpdateUIEvent& event);
 		
 		//Commands to open (or raise) the various data subviews.
@@ -629,6 +632,7 @@ class MolDisplayWin : public wxFrame {
 		bool InSelectionMode(void);
 		bool InViewMode(void);
 		bool InEditMode(void);
+		bool InSymmetryEditMode(void);
 		void DrawBondingSites(long iatom, float radius, GLUquadricObj *qobj, int site_id=0, CPoint3D * vector=NULL);
 		void SetStatusText(const wxString& label);
 		/**

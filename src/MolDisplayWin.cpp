@@ -166,6 +166,7 @@ enum MMP_EventID {
 	MMP_SELECT_ALL,
 	MMP_SELECT_NONE,
 	MMP_SHOWBONDSITES,
+	MMP_SYMMETRY_EDIT,
 	MMP_SAVESTRUCTURE,
 	MMP_SHOW_FULLSCREEN,
 	
@@ -289,10 +290,12 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuBuilderAddHydrogens)
 	EVT_MENU (MMP_DELETEHYDROGENS,		MolDisplayWin::menuBuilderDeleteHydrogens)
 	EVT_MENU (MMP_SHOWBONDSITES,		MolDisplayWin::menuBuilderShowBondSites)
+	EVT_MENU (MMP_SYMMETRY_EDIT,		MolDisplayWin::menuBuilderSymmetryEdit)
 	EVT_MENU (MMP_SAVESTRUCTURE,		MolDisplayWin::menuBuilderSaveStructure)
 	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate)
 	EVT_UPDATE_UI(MMP_SAVESTRUCTURE,	MolDisplayWin::OnSaveStructureUpdate)
 	EVT_UPDATE_UI(MMP_SHOWBONDSITES,	MolDisplayWin::OnShowBondSitesUpdate)
+	EVT_UPDATE_UI(MMP_SYMMETRY_EDIT,	MolDisplayWin::OnShowSymmetryEdit)
 	EVT_UPDATE_UI_RANGE(MMP_NEWFRAME, MMP_ANNOTATIONSSUBMENU,
 						MolDisplayWin::UpdateAtomsOptions)
 	EVT_UPDATE_UI(wxID_COPY,			MolDisplayWin::UpdateAtomsOptions)
@@ -411,9 +414,9 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
 	show_fullscreen = false;
 	mHighliteState = false;
-	/* interactiveMode = false; */
 	window_just_focused = false;
 	mAltModifyingToolBar = false;
+	edit_symmetrically = false;
 
 	toolbar = NULL;
 	lasso_has_area = false;
@@ -712,6 +715,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuBuild->Append(MMP_ADDHYDROGENS, wxT("Add &Hydrogens"), _T("Complete moleclues by adding hydrogens to incomplete bonds"));
 	menuBuild->Append(MMP_DELETEHYDROGENS, wxT("&Delete Hydrogens"), _T("Remove terminal hydrogens (Does not apply to effective fragments or SIMOMM atoms)"));
 	menuBuild->AppendCheckItem(MMP_SHOWBONDSITES, wxT("&Show Bonding Sites"), _T("Click on a site to add an atom"));
+	menuBuild->AppendCheckItem(MMP_SYMMETRY_EDIT, wxT("Edit with Symmetry"), _T(""));
 	menuBuild->AppendSeparator();
 	menuBuild->Append(MMP_SAVESTRUCTURE, wxT("Prototype Selection"), _T("Save structure as a prototype in builder"));
 #endif
@@ -893,6 +897,11 @@ void MolDisplayWin::OnAddHydrogensUpdate( wxUpdateUIEvent& event ) {
 
 void MolDisplayWin::OnShowBondSitesUpdate(wxUpdateUIEvent& event) {
 	event.Check(show_bond_sites);
+	event.Enable(InEditMode());
+}
+
+void MolDisplayWin::OnShowSymmetryEdit(wxUpdateUIEvent& event) {
+	event.Check(edit_symmetrically);
 	event.Enable(InEditMode());
 }
 
@@ -1333,7 +1342,9 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
 #ifndef __WXMAC__
 	if (!Dirty && (MainData->NumFrames == 1) && (MainData->MaxAtoms == 0)) {
 		//First need to use an open file dialog
-		wxString filename = wxFileSelector(wxT("Choose a file to open"));
+		wxString filename = wxFileSelector(wxT("Choose a file to open"),
+										   wxT(""), wxT(""), wxT(""),
+										   wxT("*.*"), wxOPEN, this);
 		//If the user chooses a file, create a window and have it process it.
 		if (!filename.IsEmpty()) {
 			//Ok we have a problem. Abort open can't close the last window!
@@ -2755,6 +2766,10 @@ void MolDisplayWin::menuBuilderShowBondSites(wxCommandEvent &event) {
 	UpdateModelDisplay();
 }
 
+void MolDisplayWin::menuBuilderSymmetryEdit(wxCommandEvent &event) {
+	edit_symmetrically = !edit_symmetrically;
+}
+
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 	StopAnimations();
 	int key = event.GetKeyCode();
@@ -3955,6 +3970,10 @@ bool MolDisplayWin::InSelectionMode(void) {
 
 bool MolDisplayWin::InEditMode(void) {
 	return toolbar && toolbar->GetToolState(MMP_TOOL_HAND);
+}
+
+bool MolDisplayWin::InSymmetryEditMode(void) {
+	return edit_symmetrically;
 }
 
 void MolDisplayWin::LassoStart(const int x, const int y) {
