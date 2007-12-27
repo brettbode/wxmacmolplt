@@ -985,7 +985,7 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 	glfSetCurrentBMFFont(bitmap_fontd);
 	MolWin->Rotate(event);
 
-	CaptureMouse();
+	/* CaptureMouse(); */
 
 }
 
@@ -1044,7 +1044,7 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 		glfSetCurrentBMFFont(bitmap_fontd);
 		MolWin->Rotate(event);
 
-		CaptureMouse();
+		/* CaptureMouse(); */
 	}
 
 }
@@ -1063,7 +1063,7 @@ void MpGLCanvas::eventMouseMiddleWentDown(wxMouseEvent& event) {
 	glfSetCurrentBMFFont(bitmap_fontd);
 	MolWin->Rotate(event);
 
-	CaptureMouse();
+	/* CaptureMouse(); */
 
 }
 
@@ -1729,6 +1729,15 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				}
 			}
 
+			if (MolWin->InSymmetryEditMode()) {
+				for (int i = lFrame->GetNumAtoms() - 1; i >= 0; i--) {
+					if (!lAtoms[i].IsSymmetryUnique()) {
+						lFrame->DeleteAtom(i);
+					}
+				}
+				mMainData->GenerateSymmetryDependantAtoms();
+			}
+
 		}
 
 		lFrame->SetBonds(Prefs, true, true);
@@ -1830,7 +1839,6 @@ void MpGLCanvas::HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt) {
 	glGetDoublev(GL_PROJECTION_MATRIX, proj);
 
 	if (!MolWin->LassoHasArea()) {
-		// CaptureMouse(); 
 		MolWin->LassoStart(curr_pt.x, curr_pt.y);
 	}
 
@@ -1977,7 +1985,7 @@ void MpGLCanvas::testPicking(int x, int y) {
 	// the bond id.
 	int i, j;
 	for (i = 0, j = 0; i < hits; i++) {
-		if (buff[j + 1] < min_depth && buff[j + 3] != MMP_NULL) {
+		if (buff[j + 1] < min_depth && buff[j + 3] != MMP_NULL && buff[j + 4] != 0) {
 			min_depth = buff[j + 1];
 			selected_type = buff[j + 3];
 			if (buff[j] > 1) {
