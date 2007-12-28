@@ -93,7 +93,7 @@ public:
 	
 	virtual void draw(const MolDisplayWin * win) const = 0;
 	virtual bool containsAtom(const int atom_id) const {return false;};
-	virtual void adjustIds(const int atom_id) {};
+	virtual void adjustIds(const int atom_id, int offset = -1) {};
 	virtual void WriteXML(XMLElement *parent) const = 0;
 	virtual bool ReadXML(XMLElement *p) = 0;
 	virtual bool isEquivalent(const int natoms, const int *new_list) const {
@@ -114,7 +114,7 @@ public:
 	
 	void draw(const MolDisplayWin * win) const;
 	bool containsAtom(const int atom_id) const;
-	void adjustIds(const int atom_id);
+	void adjustIds(const int atom_id, int offset = -1);
 	bool isEquivalent(const int natoms, const int *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
@@ -133,7 +133,7 @@ public:
 	~AnnotationMarker(void) {};
 	void draw(const MolDisplayWin * win) const;
 	bool containsAtom(const int atom_id) const;
-	void adjustIds(const int atom_id);
+	void adjustIds(const int atom_id, int offset = -1);
 	bool isEquivalent(const int natoms, const int *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
@@ -153,7 +153,7 @@ public:
 	~AnnotationAngle(void) {};
 	void draw(const MolDisplayWin * win) const;
 	bool containsAtom(const int atom_id) const;
-	void adjustIds(const int atom_id);
+	void adjustIds(const int atom_id, int offset = -1);
 	bool isEquivalent(const int natoms, const int *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
@@ -173,7 +173,7 @@ public:
 	~AnnotationDihedral(void) {};
 	void draw(const MolDisplayWin * win) const;
 	bool containsAtom(const int atom_id) const;
-	void adjustIds(const int atom_id);
+	void adjustIds(const int atom_id, int offset = -1);
 	bool isEquivalent(const int natoms, const int *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);

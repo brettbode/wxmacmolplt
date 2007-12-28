@@ -1437,7 +1437,6 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 		// We don't allow two sites of the same atom to bond.
 		if (selected != first_atom_clicked) {
-			// selected_site >= 0 && selected_site != first_site_clicked) { 
 
 			bool okay_to_continue = true;
 
@@ -1474,6 +1473,17 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	// need to call rotate one more time to get rid of the rotation circle
 	// that appears.
 	else {
+		if (MolWin->InSymmetryEditMode()) {
+			mpAtom *lAtoms = lFrame->Atoms;
+			for (int i = lFrame->GetNumAtoms() - 1; i >= 0; i--) {
+				if (!lAtoms[i].IsSymmetryUnique()) {
+					lFrame->DeleteAtom(i);
+				}
+			}
+			mMainData->GenerateSymmetryDependantAtoms();
+			lFrame->SetBonds(Prefs, true, false);
+		}
+
 		MolWin->Rotate(event);
 	}
 
@@ -1728,16 +1738,6 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 					}
 				}
 			}
-
-			if (MolWin->InSymmetryEditMode()) {
-				for (int i = lFrame->GetNumAtoms() - 1; i >= 0; i--) {
-					if (!lAtoms[i].IsSymmetryUnique()) {
-						lFrame->DeleteAtom(i);
-					}
-				}
-				mMainData->GenerateSymmetryDependantAtoms();
-			}
-
 		}
 
 		lFrame->SetBonds(Prefs, true, true);

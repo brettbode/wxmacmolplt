@@ -16,9 +16,9 @@ bool AnnotationLength::containsAtom(const int atom_id) const {
 	return ((atoms[0] == atom_id)||(atoms[1] == atom_id));
 }
 
-void AnnotationLength::adjustIds(const int atom_id) {
-	if (atoms[0] > atom_id) atoms[0]--;
-	if (atoms[1] > atom_id) atoms[1]--;
+void AnnotationLength::adjustIds(const int atom_id, int offset) {
+	if (atoms[0] > atom_id) atoms[0] += offset;
+	if (atoms[1] > atom_id) atoms[1] += offset;
 }
 
 bool AnnotationLength::isEquivalent(const int natoms, const int *new_list) const {
@@ -95,8 +95,8 @@ bool AnnotationMarker::containsAtom(const int atom_id) const {
 	return atom == atom_id;
 }
 
-void AnnotationMarker::adjustIds(const int atom_id) {
-	if (atom > atom_id) atom--;
+void AnnotationMarker::adjustIds(const int atom_id, int offset) {
+	if (atom > atom_id) atom += offset;
 }
 
 bool AnnotationMarker::isEquivalent(const int natoms, const int *new_list) const {
@@ -136,10 +136,10 @@ bool AnnotationAngle::containsAtom(const int atom_id) const {
 	return ((atoms[0] == atom_id)||(atoms[1] == atom_id)||(atoms[2] == atom_id));
 }
 
-void AnnotationAngle::adjustIds(const int atom_id) {
-	if (atoms[0] > atom_id) atoms[0] --;
-	if (atoms[1] > atom_id) atoms[1] --;
-	if (atoms[2] > atom_id) atoms[2] --;
+void AnnotationAngle::adjustIds(const int atom_id, int offset) {
+	if (atoms[0] > atom_id) atoms[0] += offset;
+	if (atoms[1] > atom_id) atoms[1] += offset;
+	if (atoms[2] > atom_id) atoms[2] += offset;
 }
 
 bool AnnotationAngle::isEquivalent(const int natoms, const int *new_list) const {
@@ -281,11 +281,11 @@ bool AnnotationDihedral::containsAtom(const int atom_id) const {
 			atoms[3] == atom_id);
 }
 
-void AnnotationDihedral::adjustIds(const int atom_id) {
-	if (atoms[0] > atom_id) atoms[0] --;
-	if (atoms[1] > atom_id) atoms[1] --;
-	if (atoms[2] > atom_id) atoms[2] --;
-	if (atoms[3] > atom_id) atoms[3] --;
+void AnnotationDihedral::adjustIds(const int atom_id, int offset) {
+	if (atoms[0] > atom_id) atoms[0] += offset;
+	if (atoms[1] > atom_id) atoms[1] += offset;
+	if (atoms[2] > atom_id) atoms[2] += offset;
+	if (atoms[3] > atom_id) atoms[3] += offset;
 }
 
 bool AnnotationDihedral::isEquivalent(const int natoms, const int *new_list) const {

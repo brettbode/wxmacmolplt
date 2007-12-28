@@ -240,6 +240,25 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 			for (int i=NumAtoms; i>index; i--) {
 				Atoms[i] = Atoms[i-1];
 			}
+
+			// Adjust bonds that connect higher-numbered atoms.
+			for (int i = 0; i < NumBonds; ++i) {
+				if (Bonds[i].Atom1 >= index) Bonds[i].Atom1++;
+				if (Bonds[i].Atom2 >= index) Bonds[i].Atom2++;
+			}
+
+			// Adjust bonds that connect higher-numbered atoms.
+			for (int i = 0; i < NumBonds; ++i) {
+				if (Bonds[i].Atom1 >= index) Bonds[i].Atom1++;
+				if (Bonds[i].Atom2 >= index) Bonds[i].Atom2++;
+			}
+
+			// Adjust annotations that connect higher-numbered atoms.
+			/* std::vector<Annotation *>::iterator anno; */
+			/* anno = mMainData->Annotations.begin(); */
+			/* for (anno = mMainData->Annotations.begin(); anno != mMainData->Annotations.end(); ) { */
+				/* (*anno)->adjustIds(index - 1, 1); */
+			/* } */
 		}
 		Atoms[index].Type = AtomType;
 		Atoms[index].Position = AtomPosition;
@@ -257,7 +276,9 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 	DeleteOrbitals();
 	while (SurfaceList) DeleteSurface(0);
 	return result;
+
 }
+
 mpAtom * Frame::AddAtom(const mpAtom & atm, long index) {
 	
 	mpAtom * result = NULL;
@@ -528,8 +549,8 @@ void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any highe
 			//BlockMoveData(&(Atoms[AtomNum+1]), &(Atoms[AtomNum]), (NumAtoms-AtomNum)*sizeof(mpAtom));
 			memcpy(&(Atoms[AtomNum]), &(Atoms[AtomNum+1]), (NumAtoms-AtomNum - 1)*sizeof(mpAtom));
 		NumAtoms--;
+
 		//remove this atom from the bond list
-			
 		for (long ii=0; ii<NumBonds; ii++) {
 			if ((Bonds[ii].Atom1==AtomNum)||(Bonds[ii].Atom2==AtomNum)) {
 				DeleteBond(ii);
@@ -538,8 +559,9 @@ void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any highe
 				if (Bonds[ii].Atom1>AtomNum) Bonds[ii].Atom1 --;
 				if (Bonds[ii].Atom2>AtomNum) Bonds[ii].Atom2 --;
 			}
-		}	//Delete any orbitals and normal modes
+		}
 
+		// Delete any orbitals and normal modes
 		if (Vibs) {
 			delete Vibs;
 			Vibs = NULL;
