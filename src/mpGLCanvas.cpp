@@ -985,7 +985,9 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 	glfSetCurrentBMFFont(bitmap_fontd);
 	MolWin->Rotate(event);
 
-	/* CaptureMouse(); */
+#ifdef __WXMAC__
+	CaptureMouse();
+#endif
 
 }
 
@@ -1044,7 +1046,9 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 		glfSetCurrentBMFFont(bitmap_fontd);
 		MolWin->Rotate(event);
 
-		/* CaptureMouse(); */
+#ifdef __WXMAC__
+		CaptureMouse();
+#endif
 	}
 
 }
@@ -1063,7 +1067,9 @@ void MpGLCanvas::eventMouseMiddleWentDown(wxMouseEvent& event) {
 	glfSetCurrentBMFFont(bitmap_fontd);
 	MolWin->Rotate(event);
 
-	/* CaptureMouse(); */
+#ifdef __WXMAC__
+	CaptureMouse();
+#endif
 
 }
 
@@ -1476,6 +1482,9 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				if (!lAtoms[i].IsSymmetryUnique()) {
 					lFrame->DeleteAtom(i);
 				}
+			}
+			if (HasCapture()) {
+				ReleaseMouse();
 			}
 			mMainData->GenerateSymmetryDependantAtoms();
 			lFrame->SetBonds(Prefs, true, false);

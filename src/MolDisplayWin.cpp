@@ -2768,6 +2768,7 @@ void MolDisplayWin::menuBuilderShowBondSites(wxCommandEvent &event) {
 
 void MolDisplayWin::menuBuilderSymmetryEdit(wxCommandEvent &event) {
 	edit_symmetrically = !edit_symmetrically;
+	UpdateModelDisplay();
 }
 
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
