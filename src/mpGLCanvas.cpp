@@ -1469,10 +1469,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		draw();
 	}
 	
-	// Otherwise, the drag must have been to transform the whole scene.  We
-	// need to call rotate one more time to get rid of the rotation circle
-	// that appears.
-	else {
+	else if (did_edit) {
 		if (MolWin->InSymmetryEditMode()) {
 			mpAtom *lAtoms = lFrame->Atoms;
 			for (int i = lFrame->GetNumAtoms() - 1; i >= 0; i--) {
@@ -1482,8 +1479,14 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 			}
 			mMainData->GenerateSymmetryDependantAtoms();
 			lFrame->SetBonds(Prefs, true, false);
+			draw();
 		}
-
+	}
+	
+	// Otherwise, the drag must have been to transform the whole scene.  We
+	// need to call rotate one more time to get rid of the rotation circle
+	// that appears.
+	else {
 		MolWin->Rotate(event);
 	}
 
@@ -1496,6 +1499,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	
 	ignore_next_up = false;
 	leftDown = false;
+	did_edit = false;
 }
 
 void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
@@ -1738,6 +1742,8 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 					}
 				}
 			}
+
+			did_edit = true;
 		}
 
 		lFrame->SetBonds(Prefs, true, true);

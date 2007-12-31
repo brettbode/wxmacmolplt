@@ -116,6 +116,7 @@ class MpGLCanvas : public wxGLCanvas {
 		bool was_zooming;
 		bool was_just_rotating;
 		bool leftDown;
+		bool did_edit;
 
 		void initGL(void);
 		int bitmap_fontd;
