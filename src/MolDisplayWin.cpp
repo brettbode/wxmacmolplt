@@ -2647,15 +2647,12 @@ void MolDisplayWin::menuSetPointGroupOrder(wxCommandEvent &event) {
 	Dirty = true;
 }
 void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &event) {
-	bool pgFlags[kNumSymmetryPointGroups+2];
-	MainData->DeterminePointGroup(pgFlags, Prefs, 1.0E-4);
 	SymmetryPointGroupDlg * dlg = new SymmetryPointGroupDlg(this);
-	dlg->setup(pgFlags);
 	if (dlg->ShowModal() != wxID_CANCEL) {
 		//retrieve the selection and set the point group
 		GAMESSPointGroup temp;
 		int order;
-		if (dlg->GetSelectedPointGroup(pgFlags, temp, order)) {
+		if (dlg->GetSelectedPointGroup(temp, order)) {
 			if (! MainData->InputOptions) MainData->InputOptions = new InputData;
 			MainData->InputOptions->Data->SetPointGroup(temp);
 			MainData->InputOptions->Data->SetPointGroupOrder(order);

@@ -56,7 +56,10 @@ class wxListCtrl;
 #endif
 
 /*!
- * SymmetryPointGroupDlg class declaration
+ * SymmetryPointGroupDlg class declaration.
+ * This class presents the user with a dialog listing the possible symmetry point
+ * groups for the current set of coordinates. Upon dismissing the dialog the caller
+ * can retrieve the selected point group.
  */
 
 class SymmetryPointGroupDlg: public wxDialog
@@ -112,14 +115,22 @@ public:
 	/// Should we show tooltips?
 	static bool ShowToolTips();
 	
-	void setup(const bool * pgs);
-	bool GetSelectedPointGroup(const bool * pgs, GAMESSPointGroup & pg, int & pgOrder) const;
+	/** Call to retrieve the selected point group.
+	 @param pg The GAMESS point group
+	 @param pgOrder The order of the principle axis.
+	 */
+	bool GetSelectedPointGroup(GAMESSPointGroup & pg, int & pgOrder) const;
+private:
+	/// Call to update the list of acceptable point groups
+	void setup(void);
+
+	bool pgFlags[kNumSymmetryPointGroups+2];	///< List of flags indicating an acceptable PG
 
 ////@begin SymmetryPointGroupDlg member variables
 	wxStaticText* mHighestPGText;
 	wxStaticText* mAbelianPGText;
 	wxListCtrl* mPGListCntl;
-	MolDisplayWin * Parent;
+	MolDisplayWin * Parent;						///< Parent window
 public:
 	long selection;
 ////@end SymmetryPointGroupDlg member variables
