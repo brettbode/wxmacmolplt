@@ -49,6 +49,8 @@ BEGIN_EVENT_TABLE( SymmetryPointGroupDlg, wxDialog )
 ////@begin SymmetryPointGroupDlg event table entries
 	EVT_LIST_ITEM_SELECTED( ID_LISTCTRL1, SymmetryPointGroupDlg::OnListctrl1Selected )
 
+	EVT_SLIDER( ID_SLIDER1, SymmetryPointGroupDlg::OnSlider1Updated )
+
 	EVT_BUTTON( ID_SETBUTTON, SymmetryPointGroupDlg::OnSetbuttonClick )
 	EVT_UPDATE_UI( ID_SETBUTTON, SymmetryPointGroupDlg::OnSetbuttonUpdate )
 
@@ -113,7 +115,9 @@ void SymmetryPointGroupDlg::Init()
 	mHighestPGText = NULL;
 	mAbelianPGText = NULL;
 	mPGListCntl = NULL;
+	mSlider = NULL;
 ////@end SymmetryPointGroupDlg member initialisation
+	tolerance = 1.0E-5;
 }
 
 /*!
@@ -156,15 +160,24 @@ void SymmetryPointGroupDlg::CreateControls()
 	mPGListCntl = new wxListCtrl( itemDialog1, ID_LISTCTRL1, wxDefaultPosition, wxSize(100, 100), wxLC_REPORT|wxLC_NO_HEADER|wxLC_SINGLE_SEL );
 	itemBoxSizer9->Add(mPGListCntl, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	wxBoxSizer* itemBoxSizer12 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer2->Add(itemBoxSizer12, 0, wxALIGN_RIGHT|wxALL, 5);
+	wxBoxSizer* itemBoxSizer12 = new wxBoxSizer(wxVERTICAL);
+	itemBoxSizer2->Add(itemBoxSizer12, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	wxButton* itemButton13 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer12->Add(itemButton13, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("tolerance"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer12->Add(itemStaticText13, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	wxButton* itemButton14 = new wxButton( itemDialog1, ID_SETBUTTON, _("&Set Point Group"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemButton14->SetDefault();
-	itemBoxSizer12->Add(itemButton14, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mSlider = new wxSlider( itemDialog1, ID_SLIDER1, -5, -8, 2, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS );
+	itemBoxSizer12->Add(mSlider, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+	wxBoxSizer* itemBoxSizer15 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer15, 0, wxALIGN_RIGHT|wxALL, 5);
+
+	wxButton* itemButton16 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer15->Add(itemButton16, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxButton* itemButton17 = new wxButton( itemDialog1, ID_SETBUTTON, _("&Set Point Group"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemButton17->SetDefault();
+	itemBoxSizer15->Add(itemButton17, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 ////@end SymmetryPointGroupDlg content construction
 	setup();
@@ -210,13 +223,14 @@ void SymmetryPointGroupDlg::setup (void) {
 	
 	MoleculeData * MainData = Parent->GetData();
 	WinPrefs * Prefs = Parent->GetPrefs();
-	MainData->DeterminePointGroup(pgFlags, Prefs, 1.0E-4);
+	MainData->DeterminePointGroup(pgFlags, Prefs, tolerance);
 	
 	//order of the flags
 	//c1, cs, ci, c2h-c8h (3-9), c2v-c8v (10-16), c2-c8 (17-23), s2-s8 (24-26),
 	//D2d-d8d (27-33), d2h-d8h (34-40), d2-d8 (41-47), Td, Th, T, Oh, O
 	GAMESSPointGroup HighestPG=GAMESS_C1, HighestAPG=GAMESS_C1;
 	
+	mPGListCntl->ClearAll();	//start with a clean slate.
 	mPGListCntl->InsertColumn(0, wxT(""));
 	mPGListCntl->InsertItem(itemCount, wxT("C1"));
 	mPGListCntl->SetItemTextColour(0, blue);
@@ -969,3 +983,17 @@ void SymmetryPointGroupDlg::OnListctrl1Selected( wxListEvent& event )
 	}
 	event.Skip();
 }
+
+
+/*!
+ * wxEVT_COMMAND_SLIDER_UPDATED event handler for ID_SLIDER1
+ */
+
+void SymmetryPointGroupDlg::OnSlider1Updated( wxCommandEvent& event ) {
+	int val = mSlider->GetValue();
+	if (val < 0) tolerance = pow(10, val);
+	else tolerance = 0.1 * (val+2);
+	setup();
+	event.Skip();
+}
+

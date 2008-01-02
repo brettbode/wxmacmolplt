@@ -39,6 +39,7 @@ class wxListCtrl;
 ////@begin control identifiers
 #define ID_SYMMETRYPOINTGROUPDLG 10251
 #define ID_LISTCTRL1 10255
+#define ID_SLIDER1 10263
 #define ID_SETBUTTON 10254
 #define SYMBOL_SYMMETRYPOINTGROUPDLG_STYLE wxCAPTION|wxSYSTEM_MENU
 #define SYMBOL_SYMMETRYPOINTGROUPDLG_TITLE _("Symmetry Point Group")
@@ -89,6 +90,9 @@ public:
 	/// wxEVT_COMMAND_LIST_ITEM_SELECTED event handler for ID_LISTCTRL1
 	void OnListctrl1Selected( wxListEvent& event );
 
+	/// wxEVT_COMMAND_SLIDER_UPDATED event handler for ID_SLIDER1
+	void OnSlider1Updated( wxCommandEvent& event );
+
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_SETBUTTON
 	void OnSetbuttonClick( wxCommandEvent& event );
 
@@ -125,12 +129,14 @@ private:
 	void setup(void);
 
 	bool pgFlags[kNumSymmetryPointGroups+2];	///< List of flags indicating an acceptable PG
+	double tolerance;							///< How close due the coords have to be to be a match
 
 ////@begin SymmetryPointGroupDlg member variables
 	wxStaticText* mHighestPGText;
 	wxStaticText* mAbelianPGText;
 	wxListCtrl* mPGListCntl;
-	MolDisplayWin * Parent;						///< Parent window
+	wxSlider* mSlider;
+	MolDisplayWin * Parent;
 public:
 	long selection;
 ////@end SymmetryPointGroupDlg member variables
