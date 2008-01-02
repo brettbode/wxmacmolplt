@@ -1,5 +1,5 @@
 /*
- *  (c) 2004-2007 Iowa State University
+ *  (c) 2004-2008 Iowa State University
  *      see the LICENSE file in the top level directory
  */
 
@@ -104,9 +104,26 @@ class MoleculeData {
 		void InvertMode(void);
 		void UnitConversion(bool AngToBohr);
 		void FlipRotation(short theItem);
+		/**
+		 * Rotate/translate the reference coordinates into the principle orientation.
+		 * @param Prefs The current window preferences
+		 */
 		void RotateToPrincipleOrientation(WinPrefs * Prefs);
-		void DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs);
-		bool DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs) const;
+		/**
+		 * Determine the set of point groups satisfied by the current set of coordinates.
+		 * @param pgFlags One flag per point group indicating whether the coordinates satisfy the point group.
+		 * @param Prefs The current window preferences
+		 * @param tolerance how tight should the operator tolerances be
+		 */
+		void DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs, double tolerance);
+		/**
+		 * Compute the principle orientation of the current set of coordinates.
+		 * The return value indicates whether the current coordinates satisfy the current point group.
+		 * @param result The rotation/translation to convert the coordinates to the princ. orientation.
+		 * @param Prefs The current window preferences
+		 * @param precision The tolerance for slop in the coordinates (ex 1.0D-5)
+		 */
+		bool DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs, double precision) const;
 		void GenerateSymmetryDependantAtoms(void);
 		void GenerateSymmetryUniqueAtoms(void);
 		bool SetScreenPlane(CPoint3D *Points);

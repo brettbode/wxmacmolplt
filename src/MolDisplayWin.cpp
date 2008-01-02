@@ -2648,7 +2648,7 @@ void MolDisplayWin::menuSetPointGroupOrder(wxCommandEvent &event) {
 }
 void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &event) {
 	bool pgFlags[kNumSymmetryPointGroups+2];
-	MainData->DeterminePointGroup(pgFlags, Prefs);
+	MainData->DeterminePointGroup(pgFlags, Prefs, 1.0E-4);
 	SymmetryPointGroupDlg * dlg = new SymmetryPointGroupDlg(this);
 	dlg->setup(pgFlags);
 	if (dlg->ShowModal() != wxID_CANCEL) {

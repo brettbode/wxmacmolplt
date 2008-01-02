@@ -1035,12 +1035,12 @@ void MoleculeData::SetModelRotation(float Psi, float Phi, float Theta) {
 	SetModelCenter(&Center);
 }
 void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
-	if (!DeterminePrincipleOrientation(TotalRotation, Prefs)) {
-		MessageAlert("Unable to determine the proper symmetry adapted rotation. This"
+	if (!DeterminePrincipleOrientation(TotalRotation, Prefs, 1.0E-4)) {
+		MessageAlert("Unable to determine the proper symmetry adapated rotation. This"
 					 " may mean your selected point group is incorrect.");
 	}
 }
-void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs) {
+void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs, double precision) {
 	pgFlags[0] = true;
 	for (int i=0; i<kNumSymmetryPointGroups; i++) pgFlags[i] = false;
 	//order of the flags
@@ -1048,6 +1048,7 @@ void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs) {
 	//D2d-d8d (27-33), d2h-d8h (34-40), d2-d8 (41-47), Td, Th, T, Oh, O
 	int PrincAxisOrder = 1;
 	Matrix4D temp;
+//	double highPrecision=1.0E-4;
 	
 	GAMESSPointGroup savedpg = GAMESS_C1;
 	long savedpgOrder = 1;
@@ -1061,33 +1062,33 @@ void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs) {
 	for (int i=2; i<=8; i++) {
 		InputOptions->Data->SetPointGroup(GAMESS_CN);
 		InputOptions->Data->SetPointGroupOrder(i);
-		if (DeterminePrincipleOrientation(temp, Prefs)) {
+		if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 			pgFlags[17 - 2 + i] = true;
 			PrincAxisOrder = i;
 			InputOptions->Data->SetPointGroup(GAMESS_CNH);
-			if (DeterminePrincipleOrientation(temp, Prefs)) {
+			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 				pgFlags[3 - 2 + i] = true;
 			}
 			InputOptions->Data->SetPointGroup(GAMESS_CNV);
-			if (DeterminePrincipleOrientation(temp, Prefs)) {
+			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 				pgFlags[10 - 2 + i] = true;
 			}
 			InputOptions->Data->SetPointGroup(GAMESS_DN);
-			if (DeterminePrincipleOrientation(temp, Prefs)) {
+			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 				pgFlags[41 - 2 + i] = true;
 				InputOptions->Data->SetPointGroup(GAMESS_DND);
-				if (DeterminePrincipleOrientation(temp, Prefs)) {
+				if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 					pgFlags[27 - 2 + i] = true;
 				}
 				InputOptions->Data->SetPointGroup(GAMESS_DNH);
-				if (DeterminePrincipleOrientation(temp, Prefs)) {
+				if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 					pgFlags[34 - 2 + i] = true;
 				}
 			}
 			if (i < 5) {
 				InputOptions->Data->SetPointGroup(GAMESS_S2N);
 				InputOptions->Data->SetPointGroupOrder(i-1);
-				if (DeterminePrincipleOrientation(temp, Prefs)) {
+				if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 					pgFlags[24 - 2 + i] = true;
 				}
 			}
@@ -1095,41 +1096,41 @@ void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs) {
 	}
 	if (PrincAxisOrder > 1) {
 		InputOptions->Data->SetPointGroup(GAMESS_T);
-		if (DeterminePrincipleOrientation(temp, Prefs)) {
+		if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 			pgFlags[50] = true;
 			InputOptions->Data->SetPointGroup(GAMESS_O);
-			if (DeterminePrincipleOrientation(temp, Prefs)) {
+			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 				pgFlags[52] = true;
 				InputOptions->Data->SetPointGroup(GAMESS_OH);
-				if (DeterminePrincipleOrientation(temp, Prefs)) {
+				if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 					pgFlags[51] = true;
 				}
 			}
 			InputOptions->Data->SetPointGroup(GAMESS_TD);
-			if (DeterminePrincipleOrientation(temp, Prefs)) {
+			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 				pgFlags[48] = true;
 			}
 			InputOptions->Data->SetPointGroup(GAMESS_TH);
-			if (DeterminePrincipleOrientation(temp, Prefs)) {
+			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 				pgFlags[49] = true;
 			}
 		}
 	}
 	InputOptions->Data->SetPointGroup(GAMESS_CS);
-	if (DeterminePrincipleOrientation(temp, Prefs)) {
+	if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 		pgFlags[1] = true;
 	}
 	InputOptions->Data->SetPointGroup(GAMESS_CI);
-	if (DeterminePrincipleOrientation(temp, Prefs)) {
+	if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
 		pgFlags[2] = true;
 	}
 	//restore the entry point group
 	InputOptions->Data->SetPointGroup(savedpg);
 	InputOptions->Data->SetPointGroupOrder(savedpgOrder);
 }
-bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs) const {
-	// Setup the rotation matrix to present the molecule in the priciple
-	// orientation
+bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs,
+												 double precision) const {
+	//Setup the rotation matrix to present the molecule in the priciple orientation
 	
 	InitRotationMatrix(result);
 	//First compute and offset to the center of mass
@@ -1302,7 +1303,7 @@ bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Pre
 						Rotate3DPt(permuteMatrix, RotCoords[testatom], &testpt);
 						CPoint3D offset = result - testpt;
 							//test the difference in position. They should be quite close!
-						if (offset.Magnitude() < 1.0e-3) {
+						if (offset.Magnitude() < precision) {
 							match = true;
 							break;
 						}
