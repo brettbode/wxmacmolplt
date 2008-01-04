@@ -2659,6 +2659,7 @@ void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &event) {
 		GAMESSPointGroup temp;
 		int order;
 		if (dlg->GetSelectedPointGroup(temp, order)) {
+			CreateFrameSnapShot();
 			if (! MainData->InputOptions) MainData->InputOptions = new InputData;
 			MainData->InputOptions->Data->SetPointGroup(temp);
 			MainData->InputOptions->Data->SetPointGroupOrder(order);
