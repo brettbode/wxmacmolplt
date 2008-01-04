@@ -1048,7 +1048,6 @@ void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs, double 
 	//D2d-d8d (27-33), d2h-d8h (34-40), d2-d8 (41-47), Td, Th, T, Oh, O
 	int PrincAxisOrder = 1;
 	Matrix4D temp;
-//	double highPrecision=1.0E-4;
 	
 	GAMESSPointGroup savedpg = GAMESS_C1;
 	long savedpgOrder = 1;
@@ -1389,7 +1388,7 @@ void MoleculeData::GenerateSymmetryDependantAtoms(void) {
 		MessageAlert("Atoms closer than 0.2 Angstroms have been removed. Your coordinates may be incorrect for the chosen symmetry point group.");
 	}
 }
-void MoleculeData::GenerateSymmetryUniqueAtoms(void) {
+bool MoleculeData::GenerateSymmetryUniqueAtoms(double tolerance) {
 	//On input the coordinates should contain the full set of atoms in the
 	//correct orientation for the selected symmetry point group. The
 	//coordinates will not be changed, just "marked" as symmetry unique or not.
@@ -1422,7 +1421,7 @@ void MoleculeData::GenerateSymmetryUniqueAtoms(void) {
 				//or if there are any conflicts
 				CPoint3D offset = result - cFrame->Atoms[testatom].Position;
 				float dist = offset.Magnitude();
-				if (dist < 1.0e-3) {	//this cutoff might need tuning
+				if (dist < tolerance) {	//this cutoff might need tuning
 										//If we have a match the atoms had better be the same type
 					if (cFrame->Atoms[atm].GetType() != cFrame->Atoms[testatom].GetType())
 						conflicts = true;
@@ -1447,6 +1446,61 @@ void MoleculeData::GenerateSymmetryUniqueAtoms(void) {
 //	if (closeAtoms) {
 //		MessageAlert("Atoms closer than 0.2 Angstroms have been removed. Your coordinates may be incorrect for the chosen symmetry point group.");
 //	}
+	return (!conflicts);
+}
+void MoleculeData::SymmetrizeCoordinates(void) {
+	//The purpose of this routine is to remove the "slop" in the coordinates such that they 
+	//more tightly meet the selected point group.
+	GAMESSPointGroup pg = GAMESS_C1;
+	long pgOrder = 1;
+	if (InputOptions) {
+		pg = InputOptions->Data->GetPointGroup();
+		pgOrder = InputOptions->Data->GetPointGroupOrder();
+	}
+	if (pg == GAMESS_C1) return; //there is nothing to be done for C1
+	SymmetryOps symOps(pg, pgOrder);
+	//My strategy is to loop over the symmetry unique atoms, apply each operator. 
+	//If the resulting operation generates an atom "close" to the original atom add it
+	//to a vector sum. After all of the operators are applied divid the sum by the number of
+	//images. Next pass through the symmetry dependent atoms and adjust their position to
+	//match the newly generated coordinates
+	for (int atm=0; atm<cFrame->GetNumAtoms(); atm++) {
+		if (cFrame->Atoms[atm].IsSymmetryUnique()) {
+			CPoint3D sum;
+			int matchcount = 0;
+			for (int iOp=0; iOp<symOps.getOperationCount(); iOp++) {
+				CPoint3D result;
+				//Apply the operator to each atom
+				symOps.ApplyOperator(cFrame->Atoms[atm].Position, result, iOp);
+				CPoint3D offset = result - cFrame->Atoms[atm].Position;
+				float dist = offset.Magnitude();
+				if (dist < 0.3) {	//this cutoff might need tuning
+					sum += result;
+					matchcount++;
+				}
+			}
+			if (matchcount > 1) {
+				//update the symmetry unique coordinate
+				cFrame->Atoms[atm].Position = sum / (float) matchcount;
+				//and now update symmetry dependent atoms
+				for (int iOp=0; iOp<symOps.getOperationCount(); iOp++) {
+					CPoint3D result;
+					//Apply the operator to each atom
+					symOps.ApplyOperator(cFrame->Atoms[atm].Position, result, iOp);
+					for (int testatom=0; testatom<cFrame->GetNumAtoms(); testatom++) {
+						if (testatom == atm) continue;
+						//Now loop over the atoms to see if this generates a new atom
+						//or if there are any conflicts
+						CPoint3D offset = result - cFrame->Atoms[testatom].Position;
+						float dist = offset.Magnitude();
+						if (dist < 0.3) {	//this cutoff might need tuning
+							cFrame->Atoms[testatom].Position = result;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
 	Frame *	NewFrame, * NewFrame2;

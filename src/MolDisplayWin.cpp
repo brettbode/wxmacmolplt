@@ -2658,6 +2658,10 @@ void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &event) {
 			MainData->InputOptions->Data->SetPointGroupOrder(order);
 			MainData->RotateToPrincipleOrientation(Prefs);
 			MainData->StickCoordinates();
+			//update the list of symmetry unique atoms
+			MainData->GenerateSymmetryUniqueAtoms(dlg->GetTolerance());
+			MainData->SymmetrizeCoordinates();
+			MainData->StickCoordinates();
 			if (coordsWindow) coordsWindow->FrameChanged();
 			ResetView();
 			Dirty = true;

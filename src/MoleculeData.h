@@ -20,6 +20,11 @@ typedef class AtomTypeList AtomTypeList;
 typedef class WindowData WindowData;
 typedef class MolDisplayWin MolDisplayWin;
 
+/**
+ * The main data container for Molecule information.
+ * This class encapsulates all of the chemical information for a file including
+ * basis set, geometries, GAMESS options, etc.
+ */
 class MoleculeData {
 		friend class MolDisplayWin;
 		friend class CoordWin;
@@ -125,7 +130,20 @@ class MoleculeData {
 		 */
 		bool DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs, double precision) const;
 		void GenerateSymmetryDependantAtoms(void);
-		void GenerateSymmetryUniqueAtoms(void);
+		/**
+		 * Flag the symmetry unique atoms.
+		 * The coordinates are left unchanged, just the symmetry unique flag on the atoms
+		 * may be changed. A failure in the result would indicate a problem with the coordinates
+		 * or that the point group is not corrent.
+		 * @param tolerance The maximum distance between atoms that will be considered a match.
+		 */
+		bool GenerateSymmetryUniqueAtoms(double tolerance);
+		/**
+		 * Cleanup the coordinates to more tightly match the selected point group.
+		 * The routine assumes the symmetry unique atoms are already correctly marked.
+		 * This routine should not add or remove atoms, but will change the positions slightly.
+		 */
+		void SymmetrizeCoordinates(void);
 		bool SetScreenPlane(CPoint3D *Points);
 		void LinearLeastSquaresFit(Progress * lProgress);
 		void CreateLLM(long NumPts, WinPrefs * Prefs);
