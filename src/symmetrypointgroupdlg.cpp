@@ -161,13 +161,13 @@ void SymmetryPointGroupDlg::CreateControls()
 	itemBoxSizer9->Add(mPGListCntl, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer12 = new wxBoxSizer(wxVERTICAL);
-	itemBoxSizer2->Add(itemBoxSizer12, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer2->Add(itemBoxSizer12, 0, wxGROW|wxALL, 5);
 
 	wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("tolerance"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer12->Add(itemStaticText13, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	mSlider = new wxSlider( itemDialog1, ID_SLIDER1, -5, -8, 2, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS );
-	itemBoxSizer12->Add(mSlider, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer12->Add(mSlider, 0, wxGROW|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer15 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer2->Add(itemBoxSizer15, 0, wxALIGN_RIGHT|wxALL, 5);

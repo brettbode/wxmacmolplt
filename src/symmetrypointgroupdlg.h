@@ -124,6 +124,9 @@ public:
 	 @param pgOrder The order of the principle axis.
 	 */
 	bool GetSelectedPointGroup(GAMESSPointGroup & pg, int & pgOrder) const;
+	/// Call to retrieve the current tolerance value.
+	double GetTolerance(void) const {return tolerance;};
+	
 private:
 	/// Call to update the list of acceptable point groups
 	void setup(void);
