@@ -91,6 +91,13 @@ class CPoint3D {
 			result.z = z * factor;
 			return result;
 		}
+		CPoint3D operator/(float factor) const {
+			CPoint3D result;
+			result.x = x / factor;
+			result.y = y / factor;
+			result.z = z / factor;
+			return result;
+		}
 		CPoint3D operator-(const CPoint3D & pt) const {
 			CPoint3D result;
 			result.x = x - pt.x;
