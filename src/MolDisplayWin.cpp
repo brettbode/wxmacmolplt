@@ -167,6 +167,7 @@ enum MMP_EventID {
 	MMP_SELECT_NONE,
 	MMP_SHOWBONDSITES,
 	MMP_SYMMETRY_EDIT,
+	/* MMP_SYMMETRY_REGEN, */
 	MMP_SAVESTRUCTURE,
 	MMP_SHOW_FULLSCREEN,
 	
@@ -204,7 +205,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
 	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
 	EVT_UPDATE_UI(wxID_CLEAR,       MolDisplayWin::OnDeleteUpdate)
-	EVT_MENU (MMP_SELECT_ALL,       MolDisplayWin::menuEditSelect_all)
+	EVT_MENU (MMP_SELECT_ALL,       MolDisplayWin::menuEditSelectAll)
 	EVT_MENU (MMP_SELECT_NONE,		MolDisplayWin::menuEditSelectNone)
 	EVT_UPDATE_UI(MMP_SELECT_NONE,	MolDisplayWin::OnSelectNoneUpdate)
 	EVT_UPDATE_UI(MMP_SELECT_ALL,	MolDisplayWin::OnSelectAllUpdate)
@@ -291,6 +292,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_DELETEHYDROGENS,		MolDisplayWin::menuBuilderDeleteHydrogens)
 	EVT_MENU (MMP_SHOWBONDSITES,		MolDisplayWin::menuBuilderShowBondSites)
 	EVT_MENU (MMP_SYMMETRY_EDIT,		MolDisplayWin::menuBuilderSymmetryEdit)
+	/* EVT_MENU (MMP_SYMMETRY_REGEN,		MolDisplayWin::menuBuilderRegenSymmetry) */
 	EVT_MENU (MMP_SAVESTRUCTURE,		MolDisplayWin::menuBuilderSaveStructure)
 	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate)
 	EVT_UPDATE_UI(MMP_SAVESTRUCTURE,	MolDisplayWin::OnSaveStructureUpdate)
@@ -703,7 +705,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewRotate->Append(MMP_ROTATETOZAXIS, wxT("to &Z-axis"));
 	menuViewRotate->Append(MMP_ROTATE180HOR, wxT("180 degrees &Horizontal"));
 	menuViewRotate->Append(MMP_ROTATE180VER, wxT("180 degrees &Vertical"));
-	menuViewRotate->Append(MMP_ROTATEPRINC, wxT("to &Principle Orientation"));
+	menuViewRotate->Append(MMP_ROTATEPRINC, wxT("to &Principal Orientation"));
 	menuViewRotate->Append(MMP_ROTATEOTHER, wxT("&Other..."));
 
 #ifdef ENABLE_INTERACTIVE_MODE
@@ -716,6 +718,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuBuild->Append(MMP_DELETEHYDROGENS, wxT("&Delete Hydrogens"), _T("Remove terminal hydrogens (Does not apply to effective fragments or SIMOMM atoms)"));
 	menuBuild->AppendCheckItem(MMP_SHOWBONDSITES, wxT("&Show Bonding Sites"), _T("Click on a site to add an atom"));
 	menuBuild->AppendCheckItem(MMP_SYMMETRY_EDIT, wxT("Edit with Symmetry"), _T(""));
+	/* menuBuild->Append(MMP_SYMMETRY_REGEN, wxT("Regenerate Symmetry"), _T("")); */
 	menuBuild->AppendSeparator();
 	menuBuild->Append(MMP_SAVESTRUCTURE, wxT("Prototype Selection"), _T("Save structure as a prototype in builder"));
 #endif
@@ -753,10 +756,10 @@ void MolDisplayWin::createMenuBar(void) {
 	menuPGOrder->AppendRadioItem(MMP_PGORDER8, _("8"));
 	
 	menuSetPG->Append(wxID_ANY, _("&Point Group"), menuPointGroup, _("Select the Point Group"));
-	menuSetPG->Append(MMP_POINTGROUPORDER, _("&Order of Principle Axis"), menuPGOrder, _("Set the order of the principle rotation axis, if any"));
+	menuSetPG->Append(MMP_POINTGROUPORDER, _("&Order of Principal Axis"), menuPGOrder, _("Set the order of the principle rotation axis, if any"));
 	menuMolecule->Append(wxID_ANY, _("Set &Point Group"), menuSetPG, _("Manually set the point group"));
 	menuMolecule->Append(MMP_DETERMINEPG, _("Determine Point Group"), _("Compute the point group for the current coordinates"));
-	menuMolecule->Append(MMP_SYMADAPTCOORDS, _("Set &Coordinates to Principle Orientation"), _("Transform coordinates to the symmetry adapted principle orientation"));
+	menuMolecule->Append(MMP_SYMADAPTCOORDS, _("Set &Coordinates to Principal Orientation"), _("Transform coordinates to the symmetry adapted principle orientation"));
 	menuMolecule->AppendSeparator();
 	menuMolecule->Append(MMP_CONVERTTOBOHR, wxT("Convert to &Bohr"));
 	menuMolecule->Append(MMP_CONVERTTOANGSTROMS, wxT("Convert to &Angstroms"));
@@ -1821,8 +1824,10 @@ void MolDisplayWin::menuEditUndo(wxCommandEvent &event) {
 	}
 	ResetModel(false);
 	AtomsChanged(true, false);
-	AdjustMenus();
+
+	menuEdit->UpdateUI(); // force accelerators to reenable
 }
+
 void MolDisplayWin::menuEditRedo(wxCommandEvent &event) {
 	mUndoBuffer.RedoOperation();
 	mHighliteState = false;
@@ -1834,7 +1839,8 @@ void MolDisplayWin::menuEditRedo(wxCommandEvent &event) {
 	}
 	ResetModel(false);
 	AtomsChanged(true, false);
-	AdjustMenus();
+
+	menuEdit->UpdateUI(); // force accelerators to reenable
 }
 
 void MolDisplayWin::menuEditCut(wxCommandEvent &event) {
@@ -2116,7 +2122,7 @@ void MolDisplayWin::menuEditClear(wxCommandEvent &event) {
 	DeleteSelected();
 }
 
-void MolDisplayWin::menuEditSelect_all(wxCommandEvent &event) {
+void MolDisplayWin::menuEditSelectAll(wxCommandEvent &event) {
 
 	// Select each atom in the current frame and update.
 	SetHighliteMode(true);
@@ -2125,6 +2131,8 @@ void MolDisplayWin::menuEditSelect_all(wxCommandEvent &event) {
 	}
 	SelectionChanged(true);
 	UpdateModelDisplay();
+
+	menuEdit->UpdateUI(); // force accelerators to reenable
 
 }
 
@@ -2135,6 +2143,8 @@ void MolDisplayWin::menuEditSelectNone(wxCommandEvent &event) {
 	SetHighliteMode(false);
 	SelectionChanged(true);
 	UpdateModelDisplay();
+
+	menuEdit->UpdateUI(); // force accelerators to reenable
 
 }
 
@@ -2275,10 +2285,6 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 		memcpy(struc->bonds, &(new_bonds[0]), sizeof(Bond) * struc->nbonds);
 		delete[] new_ids;
 
-		// for (si = 0; si < natoms_selected; si++) { 
-			// std::cout << "structure_atoms[si]: " << structure_atoms[si] << std::endl; 
-		// } 
-		
 		wxTextEntryDialog *dlg =
 			new wxTextEntryDialog(this,
 					_("Please enter a name for this custom prototype:"),
@@ -2769,8 +2775,25 @@ void MolDisplayWin::menuBuilderShowBondSites(wxCommandEvent &event) {
 
 void MolDisplayWin::menuBuilderSymmetryEdit(wxCommandEvent &event) {
 	edit_symmetrically = !edit_symmetrically;
+
+	// When we start editing symmetrically, we deselect symmetry dependent 
+	// atoms so they don't bundled together with operations that blindly
+	// edit all selected atoms.
+	if (edit_symmetrically) {
+		Frame *lFrame = MainData->cFrame;
+		for (int i = 0; i < lFrame->NumAtoms; i++) {
+			if (!lFrame->Atoms[i].IsSymmetryUnique()) {
+				lFrame->SetAtomSelection(i, false);
+			}
+		}
+	}
+
 	UpdateModelDisplay();
 }
+
+/* void MolDisplayWin::menuBuilderRegenSymmetry(wxCommandEvent &event) { */
+	/* RegenerateSymmetryDependent(); */
+/* } */
 
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 	StopAnimations();
@@ -2836,13 +2859,14 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 				}
 				break;
 			default:
-				if (InEditMode()) {
+				if (InEditMode() &&
+					((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z'))) {
 					//Pass general chars to the periodic table to set the atom type
 					// TODO: A temporary hack to register outside event.
 					event.m_x = -50;
 					event.m_y = -50;
 					build_palette->KeyHandler(event);
-					return; //I don't think there is any reason to skip on this case?
+					/* return; //I don't think there is any reason to skip on this case? */
 				}
 				break;
 		}
@@ -3047,12 +3071,54 @@ void MolDisplayWin::CloseZMatrixCalc(void) {
 	winData.ZMatWindowVisible(false);
 }
 
+/**
+ * This function regenerates symmetry dependent atoms and should be called
+ * whenever anything to do with atoms is changed.  It deletes all non-symmetry
+ * unique atoms and uses the current point group to recreate them based on
+ * the remaining unique atoms.
+ */
+void MolDisplayWin::RegenerateSymmetryDependent() {
+
+	Frame *lFrame = MainData->GetCurrentFramePtr();
+	mpAtom *lAtoms = lFrame->Atoms;
+
+	for (int i = lFrame->GetNumAtoms() - 1; i >= 0; i--) {
+		if (!lAtoms[i].IsSymmetryUnique()) {
+			lFrame->DeleteAtom(i);
+		}
+	}
+
+	MainData->GenerateSymmetryDependantAtoms();
+
+	// We changed the atoms, so we better update the bonds.
+	lFrame->SetBonds(Prefs, true, false);
+	BondsChanged();
+
+}
+
+/**
+ * This function should be called whenever anything to do with atoms is
+ * changed.  It triggers symmetry dependent atoms to be regenerated, if
+ * necessary, updates related windows, and optionally redraws the frame.
+ * @param updateCoordsWin True to refresh the coordinates display.
+ * @param updateDisplay True to redraw the OpenGL canvas.
+ */
 void MolDisplayWin::AtomsChanged(bool updateCoordsWin, bool updateDisplay) {
+
+	if (InSymmetryEditMode() &&
+		!wxGetMouseState().LeftDown() &&
+		!wxGetMouseState().RightDown() &&
+		!wxGetMouseState().MiddleDown()) {
+		RegenerateSymmetryDependent();
+	}
+
 	if (updateCoordsWin && coordsWindow) coordsWindow->FrameChanged();
 	if (bondsWindow) bondsWindow->ResetList();
 	if (surfacesWindow) surfacesWindow->Reset();
 	if (updateDisplay) FrameChanged();
+
 }
+
 void MolDisplayWin::BondsChanged(void) {
 	if (bondsWindow) bondsWindow->ResetList();
 	FrameChanged();
@@ -4103,6 +4169,7 @@ void MolDisplayWin::CreateFrameSnapShot(void) {
 	if (Prefs->ToolbarShown()) {
 		FrameSnapShot * f = new FrameSnapShot(MainData);
 		mUndoBuffer.AddSnapshot(f);
+		menuEdit->UpdateUI();
 	}
 }
 
@@ -4129,4 +4196,3 @@ void MolDisplayWin::ToggleBuilderPalette(void) {
 		build_palette->Hide();
 	}
 } 
-

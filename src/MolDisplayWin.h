@@ -280,6 +280,7 @@ class MolDisplayWin : public wxFrame {
 
 		void OnSaveStructureUpdate(wxUpdateUIEvent& event);
 		void DeleteSelected();
+		void RegenerateSymmetryDependent();
 
 		DECLARE_EVENT_TABLE()
 
@@ -346,7 +347,7 @@ class MolDisplayWin : public wxFrame {
 		void OnPasteUpdate( wxUpdateUIEvent& event );
 		void PasteText(void);
 		void menuEditClear(wxCommandEvent &event);
-		void menuEditSelect_all(wxCommandEvent &event);
+		void menuEditSelectAll(wxCommandEvent &event);
 		void menuEditSelectNone(wxCommandEvent &event);
 		/// wxEVT_UPDATE_UI event handler for selection changes
 		void OnSelectAllUpdate(wxUpdateUIEvent& event);
@@ -432,6 +433,7 @@ class MolDisplayWin : public wxFrame {
 		 */
 		void menuBuilderShowBondSites(wxCommandEvent &event);
 		void menuBuilderSymmetryEdit(wxCommandEvent &event);
+		/* void menuBuilderRegenSymmetry(wxCommandEvent &event); */
 		/**
 		 * Toggles the toolbar. When active a toolbar is added to the main
 		 * display window.

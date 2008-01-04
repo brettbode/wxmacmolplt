@@ -295,8 +295,8 @@ void MoleculeData::StickCoordinates(void) {
 	InitRotationMatrix(TotalRotation);
 }
 
-void MoleculeData::NewAtom(const mpAtom& atom, long index) {
-	cFrame->AddAtom(atom, index);
+void MoleculeData::NewAtom(const mpAtom& atom, long index, const CPoint3D *pos) {
+	cFrame->AddAtom(atom, index, pos);
 	AtomAdded();
 }
 
@@ -1374,7 +1374,10 @@ void MoleculeData::GenerateSymmetryDependantAtoms(void) {
 					if (!match) {
 						//In order to match the order of atoms that GAMESS generates we need
 						//to insert the generated atom before the input one.
-						NewAtom(cFrame->Atoms[atm].GetType(), result, atm);
+						/* NewAtom(cFrame->Atoms[atm].GetType(), result, atm); */
+						NewAtom(cFrame->Atoms[atm], atm, &result);
+						cFrame->Atoms[atm].IsSymmetryUnique(false);
+						cFrame->SetAtomSelection(atm, false);
 						atm++;
 					}
 				}

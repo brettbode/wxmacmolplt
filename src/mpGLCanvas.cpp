@@ -1241,8 +1241,9 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					lFrame->GetAtomPosition(selected, origin);
 					mMainData->NewAtom(build_palette->GetSelectedElement(), origin + vector * 0.01 *
 									   (Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1)));
-					lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
-					lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
+					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
+					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
+					lFrame->Atoms[lFrame->GetNumAtoms() - 1].IsSymmetryUnique(MolWin->InSymmetryEditMode());
 					lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
 					MolWin->SetStatusText(wxT("Added new atom."));
 
@@ -1275,6 +1276,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 							for (int i = 0; i < structure->natoms; i++) {
 								new_atom = mpAtom(structure->atoms[i]);
 								mMainData->NewAtom(new_atom);
+								lFrame->Atoms[lFrame->GetNumAtoms() - 1].IsSymmetryUnique(MolWin->InSymmetryEditMode());
 								lFrame->SetAtomSelection(lFrame->NumAtoms - 1, true);
 							}
 
@@ -1340,8 +1342,9 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				if (build_palette->InPeriodicMode()) {
 					type = build_palette->GetSelectedElement();
 					mMainData->NewAtom(type, newPnt);
-					lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
-					lFrame->Atoms[lFrame->GetNumAtoms()-1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
+					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
+					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
+					lFrame->Atoms[lFrame->GetNumAtoms() - 1].IsSymmetryUnique(MolWin->InSymmetryEditMode());
 
 					// Let's select the new atom.
 					selected = lFrame->NumAtoms - 1;
@@ -1476,20 +1479,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	}
 	
 	else if (did_edit) {
-		if (MolWin->InSymmetryEditMode()) {
-			mpAtom *lAtoms = lFrame->Atoms;
-			for (int i = lFrame->GetNumAtoms() - 1; i >= 0; i--) {
-				if (!lAtoms[i].IsSymmetryUnique()) {
-					lFrame->DeleteAtom(i);
-				}
-			}
-			if (HasCapture()) {
-				ReleaseMouse();
-			}
-			mMainData->GenerateSymmetryDependantAtoms();
-			lFrame->SetBonds(Prefs, true, false);
-			draw();
-		}
+		MolWin->AtomsChanged(true, true);
 	}
 	
 	// Otherwise, the drag must have been to transform the whole scene.  We
@@ -2850,6 +2840,7 @@ void MpGLCanvas::AddPlaneNormal(wxCommandEvent& event) {
 	UnitCrossProduct3D(&vec1, &vec2, &normal);
 
 	mMainData->NewAtom(1, pos3 + normal);
+	lFrame->Atoms[lFrame->GetNumAtoms() - 1].IsSymmetryUnique(MolWin->InSymmetryEditMode());
 	lFrame->AddBond(select_stack[2], lFrame->NumAtoms - 1);
 	MolWin->AtomsChanged();
 
@@ -2904,6 +2895,7 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 		if (mMainData->CurrentFrame-1 != i) {
 			if (selected >= cFrame->NumAtoms) {
 				mMainData->NewAtom(lFrame->Atoms[selected].Type, lFrame->Atoms[selected].Position);
+				lFrame->Atoms[lFrame->GetNumAtoms() - 1].IsSymmetryUnique(MolWin->InSymmetryEditMode());
 			} else
 				cFrame->Atoms[selected] = lFrame->Atoms[selected];
 		}

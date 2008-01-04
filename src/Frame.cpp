@@ -225,7 +225,8 @@ void Frame::SetPreviousFrame(Frame * previous) { PreviousFrame = previous; }
 Frame * Frame::GetNextFrame(void) { return NextFrame; }
 Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
 
-mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index) {
+mpAtom *Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition,
+					   long index) {
 
 	/* AtomType is the atom's atomic number, starting with hydrogen at 1. */
 
@@ -239,12 +240,6 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 		} else {	//insert the atom into the middle of the list
 			for (int i=NumAtoms; i>index; i--) {
 				Atoms[i] = Atoms[i-1];
-			}
-
-			// Adjust bonds that connect higher-numbered atoms.
-			for (int i = 0; i < NumBonds; ++i) {
-				if (Bonds[i].Atom1 >= index) Bonds[i].Atom1++;
-				if (Bonds[i].Atom2 >= index) Bonds[i].Atom2++;
 			}
 
 			// Adjust bonds that connect higher-numbered atoms.
@@ -279,7 +274,7 @@ mpAtom * Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition, long index
 
 }
 
-mpAtom * Frame::AddAtom(const mpAtom & atm, long index) {
+mpAtom * Frame::AddAtom(const mpAtom& atm, long index, const CPoint3D *pos) {
 	
 	mpAtom * result = NULL;
 	
@@ -295,6 +290,9 @@ mpAtom * Frame::AddAtom(const mpAtom & atm, long index) {
 		}
 		Atoms[index] = atm;
 		result = &Atoms[index];
+		if (pos) {
+			SetAtomPosition(index, *pos);
+		}
 		NumAtoms++;
 	}
 	//Delete any orbitals and normal modes
@@ -551,13 +549,17 @@ void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any highe
 		NumAtoms--;
 
 		//remove this atom from the bond list
-		for (long ii=0; ii<NumBonds; ii++) {
-			if ((Bonds[ii].Atom1==AtomNum)||(Bonds[ii].Atom2==AtomNum)) {
+		/* for (long ii=0; ii<NumBonds; ii++) { */
+		for (long ii = NumBonds - 1; ii >= 0; ii--) {
+			if (Bonds[ii].Atom1 == AtomNum || Bonds[ii].Atom2 == AtomNum) {
 				DeleteBond(ii);
-				ii--;
 			} else {
-				if (Bonds[ii].Atom1>AtomNum) Bonds[ii].Atom1 --;
-				if (Bonds[ii].Atom2>AtomNum) Bonds[ii].Atom2 --;
+				if (Bonds[ii].Atom1 > AtomNum) {
+					Bonds[ii].Atom1--;
+				}
+				if (Bonds[ii].Atom2 > AtomNum) {
+					Bonds[ii].Atom2--;
+				}
 			}
 		}
 
