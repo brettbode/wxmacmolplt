@@ -28611,14 +28611,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -28812,6 +28804,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Implementation filename">""</string>
                     <string name="proxy-Header filename">""</string>
                     <string name="proxy-Member variable name">"Gen3DPanel"</string>
+                    <string name="proxy-Tab label">"Gen3D"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <string name="proxy-Help text">""</string>
                     <string name="proxy-Tooltip text">""</string>
                     <string name="proxy-Background colour">""</string>
@@ -28864,8 +28858,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
                     <bool name="proxy-AUI manager">0</bool>
-                    <string name="proxy-Tab label">"Gen3D"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -30752,6 +30744,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Implementation filename">""</string>
                     <string name="proxy-Header filename">""</string>
                     <string name="proxy-Member variable name">"Gen2DPanel"</string>
+                    <string name="proxy-Tab label">"Gen2D"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <string name="proxy-Help text">""</string>
                     <string name="proxy-Tooltip text">""</string>
                     <string name="proxy-Background colour">""</string>
@@ -30804,8 +30798,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
                     <bool name="proxy-AUI manager">0</bool>
-                    <string name="proxy-Tab label">"Gen2D"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -32319,6 +32311,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Implementation filename">""</string>
                     <string name="proxy-Header filename">""</string>
                     <string name="proxy-Member variable name">"TED2DPANEL"</string>
+                    <string name="proxy-Tab label">"2D TED"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <string name="proxy-Help text">""</string>
                     <string name="proxy-Tooltip text">""</string>
                     <string name="proxy-Background colour">""</string>
@@ -32371,8 +32365,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
                     <bool name="proxy-AUI manager">0</bool>
-                    <string name="proxy-Tab label">"2D TED"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -33743,6 +33735,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Implementation filename">""</string>
                     <string name="proxy-Header filename">""</string>
                     <string name="proxy-Member variable name">"TED3DPanel"</string>
+                    <string name="proxy-Tab label">"TED3D"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <string name="proxy-Help text">""</string>
                     <string name="proxy-Tooltip text">""</string>
                     <string name="proxy-Background colour">""</string>
@@ -33795,8 +33789,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
                     <bool name="proxy-AUI manager">0</bool>
-                    <string name="proxy-Tab label">"TED3D"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -36139,6 +36131,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Implementation filename">""</string>
                     <string name="proxy-Header filename">""</string>
                     <string name="proxy-Member variable name">"MEP2DPanel"</string>
+                    <string name="proxy-Tab label">"MEP 2D"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <string name="proxy-Help text">""</string>
                     <string name="proxy-Tooltip text">""</string>
                     <string name="proxy-Background colour">""</string>
@@ -36191,8 +36185,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
                     <bool name="proxy-AUI manager">0</bool>
-                    <string name="proxy-Tab label">"MEP 2D"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -37883,6 +37875,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Implementation filename">""</string>
                     <string name="proxy-Header filename">""</string>
                     <string name="proxy-Member variable name">"MEP3DPanel"</string>
+                    <string name="proxy-Tab label">"MEP3D"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <string name="proxy-Help text">""</string>
                     <string name="proxy-Tooltip text">""</string>
                     <string name="proxy-Background colour">""</string>
@@ -37935,8 +37929,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
                     <bool name="proxy-AUI manager">0</bool>
-                    <string name="proxy-Tab label">"MEP3D"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -39856,6 +39848,8 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Implementation filename">""</string>
                     <string name="proxy-Header filename">""</string>
                     <string name="proxy-Member variable name">""</string>
+                    <string name="proxy-Tab label">"3D orbital"</string>
+                    <string name="proxy-Tab icon">""</string>
                     <string name="proxy-Help text">""</string>
                     <string name="proxy-Tooltip text">""</string>
                     <string name="proxy-Background colour">""</string>
@@ -39908,8 +39902,6 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                     <string name="proxy-Custom ctor arguments">""</string>
                     <string name="proxy-Event sources">""</string>
                     <bool name="proxy-AUI manager">0</bool>
-                    <string name="proxy-Tab label">"3D orbital"</string>
-                    <string name="proxy-Tab icon">""</string>
                     <document>
                       <string name="title">"wxBoxSizer V"</string>
                       <string name="type">"dialog-control-document"</string>
@@ -41533,7 +41525,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                 <string name="proxy-Implementation filename">""</string>
                 <string name="proxy-Header filename">""</string>
                 <string name="proxy-Member variable name">""</string>
-                <string name="proxy-Label">"tolerance"</string>
+                <string name="proxy-Label">"Tolerance"</string>
                 <long name="proxy-Wrapping width">-1</long>
                 <string name="proxy-Help text">""</string>
                 <string name="proxy-Tooltip text">""</string>
@@ -41604,7 +41596,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                 <string name="proxy-Implementation filename">""</string>
                 <string name="proxy-Header filename">""</string>
                 <string name="proxy-Member variable name">"mSlider"</string>
-                <long name="proxy-Minimum value">-8</long>
+                <long name="proxy-Minimum value">-7</long>
                 <long name="proxy-Maximum value">2</long>
                 <long name="proxy-Initial value">-5</long>
                 <string name="proxy-Help text">""</string>
@@ -41624,7 +41616,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                 <string name="proxy-Data class manager window">""</string>
                 <bool name="proxy-wxSL_HORIZONTAL">1</bool>
                 <bool name="proxy-wxSL_VERTICAL">0</bool>
-                <bool name="proxy-wxSL_AUTOTICKS">1</bool>
+                <bool name="proxy-wxSL_AUTOTICKS">0</bool>
                 <bool name="proxy-wxSL_LABELS">0</bool>
                 <bool name="proxy-wxSL_LEFT">0</bool>
                 <bool name="proxy-wxSL_RIGHT">0</bool>
@@ -41659,6 +41651,172 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
               </document>
+              <document>
+                <string name="title">"wxBoxSizer H"</string>
+                <string name="type">"dialog-control-document"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"sizer"</string>
+                <long name="is-transient">0</long>
+                <long name="owns-file">1</long>
+                <long name="title-mode">0</long>
+                <long name="locked">0</long>
+                <string name="created">"4/1/2008"</string>
+                <string name="proxy-type">"wbBoxSizerProxy"</string>
+                <string name="proxy-Orientation">"Horizontal"</string>
+                <string name="proxy-Member variable name">""</string>
+                <string name="proxy-AlignH">"Expand"</string>
+                <string name="proxy-AlignV">"Centre"</string>
+                <long name="proxy-Stretch factor">1</long>
+                <long name="proxy-Border">5</long>
+                <bool name="proxy-wxLEFT">1</bool>
+                <bool name="proxy-wxRIGHT">1</bool>
+                <bool name="proxy-wxTOP">1</bool>
+                <bool name="proxy-wxBOTTOM">1</bool>
+                <bool name="proxy-wxSHAPED">0</bool>
+                <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+                <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <document>
+                  <string name="title">"wxStaticText: wxID_STATIC"</string>
+                  <string name="type">"dialog-control-document"</string>
+                  <string name="filename">""</string>
+                  <string name="icon-name">"statictext"</string>
+                  <long name="is-transient">0</long>
+                  <long name="owns-file">1</long>
+                  <long name="title-mode">0</long>
+                  <long name="locked">0</long>
+                  <string name="created">"4/1/2008"</string>
+                  <string name="proxy-type">"wbStaticTextProxy"</string>
+                  <string name="proxy-Id name">"wxID_STATIC"</string>
+                  <long name="proxy-Id value">5105</long>
+                  <string name="proxy-Name">""</string>
+                  <string name="proxy-Class">"wxStaticText"</string>
+                  <string name="proxy-Base class">"wxStaticText"</string>
+                  <bool name="proxy-External implementation">1</bool>
+                  <bool name="proxy-Separate files">0</bool>
+                  <string name="proxy-Implementation filename">""</string>
+                  <string name="proxy-Header filename">""</string>
+                  <string name="proxy-Member variable name">""</string>
+                  <string name="proxy-Label">"tight"</string>
+                  <long name="proxy-Wrapping width">-1</long>
+                  <string name="proxy-Help text">""</string>
+                  <string name="proxy-Tooltip text">""</string>
+                  <string name="proxy-Background colour">""</string>
+                  <string name="proxy-Foreground colour">""</string>
+                  <string name="proxy-Font">""</string>
+                  <bool name="proxy-Hidden">0</bool>
+                  <bool name="proxy-Enabled">1</bool>
+                  <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                  <string name="proxy-Data variable">""</string>
+                  <string name="proxy-Data validator">""</string>
+                  <string name="proxy-Data source">""</string>
+                  <string name="proxy-Data class name">""</string>
+                  <string name="proxy-Data class implementation filename">""</string>
+                  <string name="proxy-Data class header filename">""</string>
+                  <string name="proxy-Data class manager window">""</string>
+                  <bool name="proxy-wxALIGN_LEFT">1</bool>
+                  <bool name="proxy-wxALIGN_RIGHT">0</bool>
+                  <bool name="proxy-wxALIGN_CENTRE">0</bool>
+                  <bool name="proxy-wxST_NO_AUTORESIZE">0</bool>
+                  <bool name="proxy-wxNO_BORDER">0</bool>
+                  <bool name="proxy-wxSIMPLE_BORDER">0</bool>
+                  <bool name="proxy-wxDOUBLE_BORDER">0</bool>
+                  <bool name="proxy-wxSUNKEN_BORDER">0</bool>
+                  <bool name="proxy-wxRAISED_BORDER">0</bool>
+                  <bool name="proxy-wxSTATIC_BORDER">0</bool>
+                  <bool name="proxy-wxWANTS_CHARS">0</bool>
+                  <bool name="proxy-wxNO_FULL_REPAINT_ON_RESIZE">0</bool>
+                  <bool name="proxy-wxFULL_REPAINT_ON_RESIZE">0</bool>
+                  <string name="proxy-Custom styles">""</string>
+                  <long name="proxy-X">-1</long>
+                  <long name="proxy-Y">-1</long>
+                  <long name="proxy-Width">-1</long>
+                  <long name="proxy-Height">-1</long>
+                  <string name="proxy-AlignH">"Centre"</string>
+                  <string name="proxy-AlignV">"Centre"</string>
+                  <long name="proxy-Stretch factor">1</long>
+                  <long name="proxy-Border">5</long>
+                  <bool name="proxy-wxLEFT">1</bool>
+                  <bool name="proxy-wxRIGHT">1</bool>
+                  <bool name="proxy-wxTOP">1</bool>
+                  <bool name="proxy-wxBOTTOM">1</bool>
+                  <bool name="proxy-wxSHAPED">0</bool>
+                  <bool name="proxy-wxADJUST_MINSIZE">1</bool>
+                  <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+                  <string name="proxy-Custom arguments">""</string>
+                  <string name="proxy-Custom ctor arguments">""</string>
+                </document>
+                <document>
+                  <string name="title">"wxStaticText: wxID_STATIC"</string>
+                  <string name="type">"dialog-control-document"</string>
+                  <string name="filename">""</string>
+                  <string name="icon-name">"statictext"</string>
+                  <long name="is-transient">0</long>
+                  <long name="owns-file">1</long>
+                  <long name="title-mode">0</long>
+                  <long name="locked">0</long>
+                  <string name="created">"4/1/2008"</string>
+                  <string name="proxy-type">"wbStaticTextProxy"</string>
+                  <string name="proxy-Id name">"wxID_STATIC"</string>
+                  <long name="proxy-Id value">5105</long>
+                  <string name="proxy-Name">""</string>
+                  <string name="proxy-Class">"wxStaticText"</string>
+                  <string name="proxy-Base class">"wxStaticText"</string>
+                  <bool name="proxy-External implementation">1</bool>
+                  <bool name="proxy-Separate files">0</bool>
+                  <string name="proxy-Implementation filename">""</string>
+                  <string name="proxy-Header filename">""</string>
+                  <string name="proxy-Member variable name">""</string>
+                  <string name="proxy-Label">"loose"</string>
+                  <long name="proxy-Wrapping width">-1</long>
+                  <string name="proxy-Help text">""</string>
+                  <string name="proxy-Tooltip text">""</string>
+                  <string name="proxy-Background colour">""</string>
+                  <string name="proxy-Foreground colour">""</string>
+                  <string name="proxy-Font">""</string>
+                  <bool name="proxy-Hidden">0</bool>
+                  <bool name="proxy-Enabled">1</bool>
+                  <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                  <string name="proxy-Data variable">""</string>
+                  <string name="proxy-Data validator">""</string>
+                  <string name="proxy-Data source">""</string>
+                  <string name="proxy-Data class name">""</string>
+                  <string name="proxy-Data class implementation filename">""</string>
+                  <string name="proxy-Data class header filename">""</string>
+                  <string name="proxy-Data class manager window">""</string>
+                  <bool name="proxy-wxALIGN_LEFT">0</bool>
+                  <bool name="proxy-wxALIGN_RIGHT">1</bool>
+                  <bool name="proxy-wxALIGN_CENTRE">0</bool>
+                  <bool name="proxy-wxST_NO_AUTORESIZE">0</bool>
+                  <bool name="proxy-wxNO_BORDER">0</bool>
+                  <bool name="proxy-wxSIMPLE_BORDER">0</bool>
+                  <bool name="proxy-wxDOUBLE_BORDER">0</bool>
+                  <bool name="proxy-wxSUNKEN_BORDER">0</bool>
+                  <bool name="proxy-wxRAISED_BORDER">0</bool>
+                  <bool name="proxy-wxSTATIC_BORDER">0</bool>
+                  <bool name="proxy-wxWANTS_CHARS">0</bool>
+                  <bool name="proxy-wxNO_FULL_REPAINT_ON_RESIZE">0</bool>
+                  <bool name="proxy-wxFULL_REPAINT_ON_RESIZE">0</bool>
+                  <string name="proxy-Custom styles">""</string>
+                  <long name="proxy-X">-1</long>
+                  <long name="proxy-Y">-1</long>
+                  <long name="proxy-Width">-1</long>
+                  <long name="proxy-Height">-1</long>
+                  <string name="proxy-AlignH">"Right"</string>
+                  <string name="proxy-AlignV">"Centre"</string>
+                  <long name="proxy-Stretch factor">1</long>
+                  <long name="proxy-Border">5</long>
+                  <bool name="proxy-wxLEFT">1</bool>
+                  <bool name="proxy-wxRIGHT">1</bool>
+                  <bool name="proxy-wxTOP">1</bool>
+                  <bool name="proxy-wxBOTTOM">1</bool>
+                  <bool name="proxy-wxSHAPED">0</bool>
+                  <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+                  <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+                  <string name="proxy-Custom arguments">""</string>
+                  <string name="proxy-Custom ctor arguments">""</string>
+                </document>
+              </document>
             </document>
             <document>
               <string name="title">"wxBoxSizer H"</string>
@@ -41669,7 +41827,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
               <long name="owns-file">1</long>
               <long name="title-mode">0</long>
               <long name="locked">0</long>
-              <string name="created">"2/1/2008"</string>
+              <string name="created">"4/1/2008"</string>
               <string name="proxy-type">"wbBoxSizerProxy"</string>
               <string name="proxy-Orientation">"Horizontal"</string>
               <string name="proxy-Member variable name">""</string>
@@ -41694,7 +41852,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                 <long name="owns-file">1</long>
                 <long name="title-mode">0</long>
                 <long name="locked">0</long>
-                <string name="created">"2/1/2008"</string>
+                <string name="created">"4/1/2008"</string>
                 <string name="proxy-type">"wbButtonProxy"</string>
                 <string name="proxy-Id name">"wxID_CANCEL"</string>
                 <long name="proxy-Id value">5101</long>
@@ -41760,7 +41918,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                 <long name="owns-file">1</long>
                 <long name="title-mode">0</long>
                 <long name="locked">0</long>
-                <string name="created">"2/1/2008"</string>
+                <string name="created">"4/1/2008"</string>
                 <string name="proxy-type">"wbButtonProxy"</string>
                 <string name="event-handler-0">"wxEVT_COMMAND_BUTTON_CLICKED|OnSetbuttonClick|NONE||"</string>
                 <string name="event-handler-1">"wxEVT_UPDATE_UI|OnSetbuttonUpdate|NONE||"</string>

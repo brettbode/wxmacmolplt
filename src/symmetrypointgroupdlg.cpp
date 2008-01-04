@@ -163,21 +163,30 @@ void SymmetryPointGroupDlg::CreateControls()
 	wxBoxSizer* itemBoxSizer12 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer2->Add(itemBoxSizer12, 0, wxGROW|wxALL, 5);
 
-	wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("tolerance"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("Tolerance"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer12->Add(itemStaticText13, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mSlider = new wxSlider( itemDialog1, ID_SLIDER1, -5, -8, 2, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_AUTOTICKS );
+	mSlider = new wxSlider( itemDialog1, ID_SLIDER1, -5, -7, 2, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
 	itemBoxSizer12->Add(mSlider, 0, wxGROW|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer15 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer2->Add(itemBoxSizer15, 0, wxALIGN_RIGHT|wxALL, 5);
+	itemBoxSizer12->Add(itemBoxSizer15, 1, wxGROW|wxALL, 5);
 
-	wxButton* itemButton16 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer15->Add(itemButton16, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxStaticText* itemStaticText16 = new wxStaticText( itemDialog1, wxID_STATIC, _("tight"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
+	itemBoxSizer15->Add(itemStaticText16, 1, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
 
-	wxButton* itemButton17 = new wxButton( itemDialog1, ID_SETBUTTON, _("&Set Point Group"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemButton17->SetDefault();
-	itemBoxSizer15->Add(itemButton17, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxStaticText* itemStaticText17 = new wxStaticText( itemDialog1, wxID_STATIC, _("loose"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+	itemBoxSizer15->Add(itemStaticText17, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxBoxSizer* itemBoxSizer18 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer18, 0, wxALIGN_RIGHT|wxALL, 5);
+
+	wxButton* itemButton19 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer18->Add(itemButton19, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxButton* itemButton20 = new wxButton( itemDialog1, ID_SETBUTTON, _("&Set Point Group"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemButton20->SetDefault();
+	itemBoxSizer18->Add(itemButton20, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 ////@end SymmetryPointGroupDlg content construction
 	setup();
@@ -994,6 +1003,6 @@ void SymmetryPointGroupDlg::OnSlider1Updated( wxCommandEvent& event ) {
 	if (val < 0) tolerance = pow(10, val);
 	else tolerance = 0.1 * (val+2);
 	setup();
-	event.Skip();
+//	event.Skip();
 }
 
