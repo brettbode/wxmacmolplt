@@ -2017,7 +2017,7 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 		Internals * IntCoords = MainData->GetInternalCoordinates();
 		if (IntCoords) IntCoords->WriteMPCZMatCoordinatesToFile(File, MainData, Prefs);
 	} else {
-		if (Coord <= UniqueCoordType) MainData->GenerateSymmetryUniqueAtoms();
+		if (Coord <= UniqueCoordType) MainData->GenerateSymmetryUniqueAtoms(1.0E-3);
 		for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
 			if (!cFrame->Atoms[iatom].IsEffectiveFragment()) {
 				if ((Coord > UniqueCoordType)||(cFrame->Atoms[iatom].IsSymmetryUnique())) {
