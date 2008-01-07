@@ -60,8 +60,9 @@ class MoleculeData {
 												bit 4 for plotting KE rather than Total E
 												bit 5 for plotting PE */
 		char		DrawLabels;				// Flag for label drawing (both #'s and atomic labels) bit3 deactivates labeling H atoms
+		MolDisplayWin *MolWin;
 	public:
-		MoleculeData();
+		MoleculeData(MolDisplayWin *MolWin);
 		~MoleculeData(void);
 		long ReadInitialFragmentCoords(BufferFile * Buffer);
 		void ReadFragmentCoordinates(BufferFile * Buffer, long NumFragmentAtoms);

@@ -331,6 +331,13 @@ void MolDisplayWin::UpdateGLView(void)
 	}
 }
 #endif
+
+/**
+ * This function regenerates transparent geometries and any active display
+ * lists.  It should be called when the view changes (altering sort order
+ * of transparent surfaces), surfaces are updated, or the display list content
+ * has been altered.
+ */
 void MolDisplayWin::UpdateGLModel(void) {	//model has changed so force update
 	if (OpenGLData != NULL) {
 		OpenGLData->triangleCount = 0;

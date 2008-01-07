@@ -28,6 +28,7 @@
 #include <string.h>
 #include <new>
 #include <ctype.h>
+#include "MolDisplayWin.h"
 
 #ifdef WIN32
 #undef AddAtom
@@ -35,7 +36,8 @@
 
 extern WinPrefs *gPreferences;
 
-Frame::Frame(void) {
+Frame::Frame(MolDisplayWin *MolWin) {
+	this->MolWin = MolWin;
 	Energy = 0.0;
 	KE = 0.0;
 	MP2Energy = 0.0;
@@ -388,8 +390,10 @@ bool Frame::AddBond(long Atom1, long Atom2, const BondOrder & b) {
 	}
 	return result;
 }
+
 bool Frame::GetBondLength(long atom1, long atom2, float * length) {
-	bool Success = false;
+
+	bool result = false;
 
 	if ((atom1 >= 0)&&(atom2>=0)&&(atom1<NumAtoms)&&(atom2<NumAtoms)&&(atom1!=atom2)) {
 		CPoint3D offset;
@@ -397,13 +401,13 @@ bool Frame::GetBondLength(long atom1, long atom2, float * length) {
 		offset.y = Atoms[atom1].Position.y - Atoms[atom2].Position.y;
 		offset.z = Atoms[atom1].Position.z - Atoms[atom2].Position.z;
 		*length = offset.Magnitude();
-		Success = true;
+		result = true;
 	}
 
-	return Success;
+	return result;
 }
 bool Frame::GetBondAngle(long atom1, long atom2, long atom3, float * result) {
-	bool	Success = false;
+	bool res = false;
 
 	if ((atom1 >= 0)&&(atom2>=0)&&(atom3>=0)&&(atom1<NumAtoms)&&(atom2<NumAtoms)&&
 		(atom3<NumAtoms)&&(atom1!=atom2)&&(atom1!=atom3)&&(atom2!=atom3)) {
@@ -427,13 +431,13 @@ bool Frame::GetBondAngle(long atom1, long atom2, long atom3, float * result) {
 								(2*length1*length2)));
 			*result *= kRadToDegree;
 		} else *result = 0.0;
-		Success = true;
+		res = true;
 	}
-	return Success;
+	return res;
 }
 bool Frame::GetBondDihedral(long atom1, long bondAtom, long AngleAtom, long DihedralAtom,
 					 float * angle) {
-	bool	Success = false;
+	bool	result = false;
 	
 	if ((atom1 >= 0)&&(bondAtom>=0)&&(AngleAtom>=0)&&(DihedralAtom>=0)&&(atom1<NumAtoms)&&
 		(bondAtom<NumAtoms)&&(AngleAtom<NumAtoms)&&(DihedralAtom<NumAtoms)&&
@@ -484,11 +488,11 @@ bool Frame::GetBondDihedral(long atom1, long bondAtom, long AngleAtom, long Dihe
 				float Sense = DotProduct3D(&Normal2, &BondVector);
 				if (Sense < 0.0) *angle = -*angle;
 				*angle *= 180.0/Pi;
-				Success = true;
+				result = true;
 			}
 		}
 	}
-	return Success;
+	return result;
 }
 float Frame::GetBondLength(long ibond) {
 	CPoint3D offset;
@@ -613,6 +617,14 @@ bool Frame::SetAtomSelection(long atom_id, bool select_it) {
 	
 	// If the atom_id is out of bounds, return false.
 	if (atom_id < 0 || atom_id >= NumAtoms) {
+		return false;
+	}
+
+	// If this atom is wanting to be selected, but it's also a
+	// symmetry dependent atom and we're in symmetry edit mode,
+	// then we do not let it get selected.
+	if (select_it && MolWin->InSymmetryEditMode() &&
+		!Atoms[atom_id].IsSymmetryUnique()) {
 		return false;
 	}
 

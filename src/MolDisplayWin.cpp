@@ -393,7 +393,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 			:wxFrame((wxWindow *)NULL, wxID_ANY, title,
 					 position, size, style, name) {
 
-	MainData = new MoleculeData;
+	MainData = new MoleculeData(this);
 	Prefs = new WinPrefs;
 	*Prefs = *gPreferences;
 	Dirty = false;
@@ -1664,7 +1664,7 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
 /*  if ((app.WindowCount() <= 1) && canVeto) {  
 		//This is the last window! Clear it out, but leave it open
 		delete MainData;
-		MainData = new MoleculeData;
+		MainData = new MoleculeData(this);
 		delete Prefs;
 		Prefs = new WinPrefs;
 		*Prefs = *gPreferences;
@@ -1937,7 +1937,7 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 					BeginOperation();
 					try {
 						if ((MainData->NumFrames > 1)||InEditMode()) {
-							MoleculeData *	tdatap = new MoleculeData();
+							MoleculeData *	tdatap = new MoleculeData(this);
 							if (!tdatap) return;
 							BufferFile *Buffer = new BufferFile(CML, strlen(CML));
 							if (tdatap->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, false)) {
@@ -3125,7 +3125,7 @@ void MolDisplayWin::BondsChanged(void) {
 	FrameChanged();
 }
 
-//scan the new frame changing any mode bits for consistancy
+//scan the new frame changing any mode bits for consistency
 void MolDisplayWin::FrameChanged(void) {
 	//Check for and update any surfaces depending on the screen plane
 	Surface * temp = MainData->cFrame->SurfaceList;
@@ -3260,6 +3260,11 @@ void MolDisplayWin::UpdateFrameText(void) {
 	myStatus->SetStatusText(output);
 }
 
+/**
+ * This function redraws the scene, essentially.  Use this to do a barebones
+ * refresh.  If any data has changed, use a more specific function likes
+ * AtomsChanged or BondsChanged.
+ */
 void MolDisplayWin::UpdateModelDisplay(void) {
 	UpdateFrameText();
 	UpdateGLModel();
@@ -3336,7 +3341,7 @@ void MolDisplayWin::AbortOpen(const char * msg) {
 	if (app.WindowCount() <= 1) {   
 		//This is the last window! Clear it out, but leave it open
 		delete MainData;
-		MainData = new MoleculeData;
+		MainData = new MoleculeData(this);
 		delete Prefs;
 		Prefs = new WinPrefs;
 		*Prefs = *gPreferences;

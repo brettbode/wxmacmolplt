@@ -14,6 +14,7 @@
 #define __Frame__
 
 #include "MyTypes.h"
+/* #include "MolDisplayWin.h" */
 
 typedef class MoleculeData MoleculeData;
 typedef class WinPrefs WinPrefs;
@@ -78,9 +79,10 @@ class Frame {
 		Frame *		PreviousFrame;
 
 		int natoms_selected;
+		MolDisplayWin *MolWin;
 
 	public:
-		Frame(void);
+		Frame(MolDisplayWin *MolWin);
 		~Frame(void);
 
 		//Frame& operator= (const Frame& f);

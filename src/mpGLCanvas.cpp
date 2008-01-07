@@ -1479,6 +1479,12 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	}
 	
 	else if (did_edit) {
+		/* mMainData->RotateToPrincipleOrientation(Prefs); */
+		/* mMainData->StickCoordinates(); */
+		//update the list of symmetry unique atoms
+		/* mMainData->GenerateSymmetryUniqueAtoms(0.1f); */
+		mMainData->SymmetrizeCoordinates();
+		/* mMainData->StickCoordinates(); */
 		MolWin->AtomsChanged(true, true);
 	}
 	
@@ -2011,8 +2017,8 @@ void MpGLCanvas::testPicking(int x, int y) {
 
 }
 
-void MpGLCanvas::SelectObj(int selected_type, int select_id, bool unselect_all) 
-{
+void MpGLCanvas::SelectObj(int selected_type, int select_id, bool unselect_all) {
+
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
@@ -2303,46 +2309,42 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 	PopupMenu(&menu, x, y);
 
 }
-//make a popup menu editing the objets in the scene
 
+/**
+ * This function changes the atom that was clicked on to be an atom of the
+ * element type selected in the periodic table dialog.
+ * @param event The contextual menu event triggering the change.
+ */
 void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
+
 	MolWin->CreateFrameSnapShot();
 	mMainData->cFrame->SetAtomType(selected, build_palette->GetSelectedElement());
-	MolWin->UpdateModelDisplay();
 	MolWin->AtomsChanged(true,false);
+
 }
 
+/**
+ * This function changes the coordination number for the atom that was clicked
+ * on.
+ * @param event The contextual menu event triggering the change.
+ */
 void MpGLCanvas::ChangeCoordinationNumber(wxCommandEvent& event) {
-	
-	/* This function changes the coordination number for the clicked-on atom. */
 	
 	Frame *lFrame = mMainData->cFrame;
 	lFrame->Atoms[selected].SetCoordinationNumber(event.GetId() - GL_Popup_To_Coordination_Zero);
-	
-		/* Change both the atom that was clicked on and the oxidation number
-		* table, so any future atoms of this element have the same
-		* oxidation number. */
-//		Prefs->SetOxidationNumber(lFrame->GetAtomType(selected), ox_num);
-	
-	MolWin->UpdateModelDisplay();
-	MolWin->ContentChanged();
+	MolWin->AtomsChanged(true, true);
 	
 }
 
+/**
+ * This function changes the lone pair count for the atom that was clicked on.
+ * @param event The contextual menu event triggering the change.
+ */
 void MpGLCanvas::ChangeLPCount(wxCommandEvent& event) {
-	
-	/* This function changes the coordination number for the clicked-on atom. */
 	
 	Frame *lFrame = mMainData->cFrame;
 	lFrame->Atoms[selected].SetLonePairCount(event.GetId() - GL_Popup_To_LPCount_Zero);
-	
-	/* Change both the atom that was clicked on and the oxidation number
-		* table, so any future atoms of this element have the same
-		* oxidation number. */
-	//		Prefs->SetOxidationNumber(lFrame->GetAtomType(selected), ox_num);
-	
-	MolWin->UpdateModelDisplay();
-	MolWin->ContentChanged();
+	MolWin->AtomsChanged(true, true);
 	
 }
 

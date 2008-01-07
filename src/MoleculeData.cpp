@@ -29,10 +29,11 @@
 #undef AddAtom
 #endif
 
-MoleculeData::MoleculeData(void) {
+MoleculeData::MoleculeData(MolDisplayWin *MolWin) {
+	this->MolWin = MolWin;
 	RotCoords = NULL;
 	zBuffer = NULL;
-	cFrame = Frames = new Frame;
+	cFrame = Frames = new Frame(MolWin);
 	CurrentFrame=1;
 	NumFrames = 1;
 	IntCoords = NULL;
@@ -118,7 +119,7 @@ Frame * MoleculeData::LocateNewFrame(float XPosition)
 		}
 		if (lFrame->time < XPosition) lFrame = lFrame->NextFrame;
 		if ((lFrame->time-XPosition) < 1.0E-6) return NULL; /*duplicate point*/
-		lNewFrame = new Frame;
+		lNewFrame = new Frame(MolWin);
 		if (lNewFrame == NULL) throw MemoryError();
 		lNewFrame->PreviousFrame = lFrame->PreviousFrame;
 		lFrame->PreviousFrame = lNewFrame;
@@ -133,7 +134,7 @@ Frame * MoleculeData::LocateNewFrame(float XPosition)
 		}
 		if (lFrame->time > XPosition) lFrame = lFrame->PreviousFrame;
 		if ((XPosition-lFrame->time) < 1.0E-6) return NULL; /*duplicate point*/
-		lNewFrame = new Frame;
+		lNewFrame = new Frame(MolWin);
 		if (lNewFrame == NULL) throw MemoryError();
 		lNewFrame->NextFrame = lFrame->NextFrame;
 		lFrame->NextFrame = lNewFrame;
@@ -151,7 +152,7 @@ Frame * MoleculeData::LocateNewFrame(float XPosition)
 } /*LocateNewFrame*/
 
 Frame * MoleculeData::AddFrame(long NumAtoms, long NumBonds) {
-	Frame * temp = new Frame;
+	Frame * temp = new Frame(MolWin);
 	if (!temp) throw MemoryError();
 	if (cFrame->NextFrame) {
 		cFrame->NextFrame->PreviousFrame = temp;

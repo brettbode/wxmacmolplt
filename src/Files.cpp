@@ -232,7 +232,7 @@ long MoleculeData::UnPackData(BufferFile * Buffer) {
 	InputOptions = NULL;
 	NumFrames = 0;
 
-	Frame * lFrame = cFrame = Frames = new Frame;
+	Frame * lFrame = cFrame = Frames = new Frame(MolWin);
 	if (!lFrame) throw MemoryError();
 	Buffer->Read((Ptr) &code, sizeof(long));
 	if (code == 2) lFrame->ConvertFrameCode2(Buffer);
@@ -345,7 +345,7 @@ long MoleculeData::UnPackData(BufferFile * Buffer) {
 		}
 		Frame * lpFrame = lFrame;	lFrame = NULL;
 		if ((code == 2)||(code == 41)||(code == 54)) {
-			lFrame = new Frame;
+			lFrame = new Frame(MolWin);
 			if (!lFrame) throw MemoryError();
 			lpFrame->NextFrame = lFrame;
 			lFrame->PreviousFrame = lpFrame;
