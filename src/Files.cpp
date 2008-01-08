@@ -813,7 +813,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				//Generate symmetry dependant atoms
 				for (int i=0; i<lFrame->GetNumAtoms(); i++)
 					lFrame->Atoms[i].IsSymmetryUnique(true);
-				MainData->GenerateSymmetryDependantAtoms();
+				MainData->GenerateSymmetryDependentAtoms();
 			}
 		} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTCoordType) {
 			long bPos = Buffer->FindBlankLine();

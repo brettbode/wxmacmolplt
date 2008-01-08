@@ -1163,7 +1163,6 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 			}
 
 			HandleEditing(event, curr_mouse, prev_mouse);
-			draw();
 		}
 
 	}
@@ -1483,9 +1482,9 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		/* mMainData->StickCoordinates(); */
 		//update the list of symmetry unique atoms
 		/* mMainData->GenerateSymmetryUniqueAtoms(0.1f); */
-		mMainData->SymmetrizeCoordinates();
+		/* mMainData->SymmetrizeCoordinates(); */
 		/* mMainData->StickCoordinates(); */
-		MolWin->AtomsChanged(true, true);
+		/* MolWin->AtomsChanged(true, true); */
 	}
 	
 	// Otherwise, the drag must have been to transform the whole scene.  We
@@ -1748,12 +1747,13 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				}
 			}
 
-			did_edit = true;
 		}
 
+		lFrame->SetTargetAtom(selected);
 		lFrame->SetBonds(Prefs, true, true);
-		MolWin->UpdateGLModel();
-		MolWin->AtomsChanged(true, false);
+		did_edit = true;
+		MolWin->AtomsChanged(true, true);
+		selected = lFrame->GetTargetAtom();
 	}
 	
 	// If the user's dragging after selecting a bond, we want to
@@ -1826,7 +1826,11 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			}
 		}
 
-		MolWin->AtomsChanged(true, false);
+		lFrame->SetTargetAtom(selected);
+		lFrame->SetBonds(Prefs, true, true);
+		did_edit = true;
+		MolWin->AtomsChanged(true, true);
+		selected = lFrame->GetTargetAtom();
 	}
 	
 	else {
@@ -2168,7 +2172,7 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 	cov.SVD(&out, &gain, &in);
 
 	// Project the atoms onto the plane.  The plane's normal is the eigenvector
-	// with the smallest eigenvalue.  The other two vectors are more principle,
+	// with the smallest eigenvalue.  The other two vectors are more principal,
 	// lying in the plane.
 	CPoint3D normal = CPoint3D(out.data[2], out.data[5], out.data[8]);
 	for (atom = atoms.begin(); atom != atoms.end(); atom++) {

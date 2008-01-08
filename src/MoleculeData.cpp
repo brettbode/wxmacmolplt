@@ -1037,7 +1037,7 @@ void MoleculeData::SetModelRotation(float Psi, float Phi, float Theta) {
 }
 void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
 	if (!DeterminePrincipleOrientation(TotalRotation, Prefs, 1.0E-4)) {
-		MessageAlert("Unable to determine the proper symmetry adapated rotation. This"
+		MessageAlert("Unable to determine the proper symmetry adapted rotation. This"
 					 " may mean your selected point group is incorrect.");
 	}
 }
@@ -1333,7 +1333,7 @@ bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Pre
 	result[3][2] = rotatedCenterOfMass.z;
 	return success;
 }
-void MoleculeData::GenerateSymmetryDependantAtoms(void) {
+void MoleculeData::GenerateSymmetryDependentAtoms(void) {
 	// The input coordinates (in the current frame) must contain the symmetry
 	// unique atoms in the proper symmetry adapted reference frame. This
 	// routine will generate the symmetry dependent atoms.
@@ -1388,7 +1388,7 @@ void MoleculeData::GenerateSymmetryDependantAtoms(void) {
 	if (conflicts) {
 		MessageAlert("Found conflicts during generation of symmetry dependent coordinates. Your starting coordinates are probably incorrect for the chosen symmetry point group.");
 	}
-	if (closeAtoms) {
+	if (false && closeAtoms) {
 		MessageAlert("Atoms closer than 0.2 Angstroms have been removed. Your coordinates may be incorrect for the chosen symmetry point group.");
 	}
 }

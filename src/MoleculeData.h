@@ -130,7 +130,7 @@ class MoleculeData {
 		 * @param precision The tolerance for slop in the coordinates (ex 1.0D-5)
 		 */
 		bool DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs, double precision) const;
-		void GenerateSymmetryDependantAtoms(void);
+		void GenerateSymmetryDependentAtoms(void);
 		/**
 		 * Flag the symmetry unique atoms.
 		 * The coordinates are left unchanged, just the symmetry unique flag on the atoms

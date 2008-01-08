@@ -162,13 +162,13 @@ void MolDisplayWin::OpenGLInitWindow(void)
 		OpenGLData->fontList = 0;
 		GLint aglAttributes[] = {AGL_RGBA, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 16, AGL_NONE};
 		
-		OpenGLData->fmt = aglChoosePixelFormat (NULL, 0, aglAttributes); // get an appropriate pixel format
+		OpenGLData->fmt = aglChoosePixelFormat(NULL, 0, aglAttributes); // get an appropriate pixel format
 		GLenum err = aglGetError();
 
-		OpenGLData->aglContext = aglCreateContext (OpenGLData->fmt, NULL);			// Create an AGL context
+		OpenGLData->aglContext = aglCreateContext(OpenGLData->fmt, NULL);			// Create an AGL context
 		err = aglGetError();
 
-		if (!OpenGLData->aglContext || !aglSetDrawable (OpenGLData->aglContext, GetWindowPort (thisWindow)) ||
+		if (!OpenGLData->aglContext || !aglSetDrawable(OpenGLData->aglContext, GetWindowPort(thisWindow)) ||
 			(err != noErr))
 		{
 			OpenGLExitWindow();
@@ -176,7 +176,7 @@ void MolDisplayWin::OpenGLInitWindow(void)
 		}
 		else
 		{
-			aglSetCurrentContext (OpenGLData->aglContext);
+			aglSetCurrentContext(OpenGLData->aglContext);
 			//setup viewport to the appropriate area of the screen
 			//bufferRect seems to be x,y of lower left corner, then width and height
 			GLint bufferRect[4];
@@ -184,26 +184,26 @@ void MolDisplayWin::OpenGLInitWindow(void)
 			bufferRect [1] = InfoRect.bottom - InfoRect.top;
 			bufferRect [2] = DisplayRect.right - DisplayRect.left;
 			bufferRect [3] = DisplayRect.bottom - DisplayRect.top;
-			aglSetInteger (OpenGLData->aglContext, AGL_BUFFER_RECT, bufferRect);
-			aglEnable (OpenGLData->aglContext, AGL_BUFFER_RECT);
-			aglUpdateContext (OpenGLData->aglContext);
-			glViewport (0, 0, bufferRect [2], bufferRect [3]);
+			aglSetInteger(OpenGLData->aglContext, AGL_BUFFER_RECT, bufferRect);
+			aglEnable(OpenGLData->aglContext, AGL_BUFFER_RECT);
+			aglUpdateContext(OpenGLData->aglContext);
+			glViewport(0, 0, bufferRect [2], bufferRect [3]);
 
 			glEnable(GL_DEPTH_TEST);
 
 			//	glShadeModel(GL_FLAT);
 			glShadeModel(GL_SMOOTH);
 			glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-			glPolygonOffset (1.0, 1.0);
+			glPolygonOffset(1.0, 1.0);
 
 			GLfloat mat_specular[] = {0.8, 0.8, 0.8, 1.0};
 			GLfloat mat_shininess[] = {80.0};
 			GLfloat mat_diffuse[] = {0.2,0.2,0.2,0.8};
 			GLfloat mat_ambient[] = {0.1,0.1,0.1,0.8};
-			glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-			glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
-			glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
-			glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
 			//setup the static lighting properties
 			GLfloat ambient[4]  = {0.2,0.2,0.2,1.0};
 			GLfloat model_ambient[4]  = {0.1,0.1,0.1,0.1};
@@ -217,13 +217,13 @@ void MolDisplayWin::OpenGLInitWindow(void)
 	
 			UpdateGLView();
 	
-			glClear (GL_COLOR_BUFFER_BIT);
-			aglSwapBuffers (OpenGLData->aglContext);
+			glClear(GL_COLOR_BUFFER_BIT);
+			aglSwapBuffers(OpenGLData->aglContext);
 
 			//Setup a agl font so we can use it later
 			short fNum;
 			GetFNum("\pMonaco", &fNum);									// build font
-			OpenGLData->fontList = BuildFontGL (OpenGLData->aglContext, fNum, normal, 9);
+			OpenGLData->fontList = BuildFontGL(OpenGLData->aglContext, fNum, normal, 9);
 
 		}		
 		
@@ -235,11 +235,11 @@ void MolDisplayWin::OpenGLExitWindow(void)
 {
 	if (OpenGLData) {
 		if (OpenGLData->fontList) {
-			DeleteFontGL (OpenGLData->fontList);
+			DeleteFontGL(OpenGLData->fontList);
 			OpenGLData->fontList = 0;
 		}
 		if (OpenGLData->aglContext) {
-			glFinish ();
+			glFinish();
 			if (OpenGLData->MainListActive) {
 				glDeleteLists(OpenGLData->MainDisplayList, 1);
 				OpenGLData->MainListActive = false;
@@ -248,19 +248,19 @@ void MolDisplayWin::OpenGLExitWindow(void)
 				glDeleteLists(OpenGLData->SurfaceDisplayList, 1);
 				OpenGLData->SurfaceListActive = false;
 			}
-			aglSetCurrentContext (NULL);
+			aglSetCurrentContext(NULL);
 			GLenum err = aglGetError();
-			aglSetDrawable (OpenGLData->aglContext, NULL);
-			err = aglGetError ();
-			aglDestroyContext (OpenGLData->aglContext);
-			err = aglGetError ();
+			aglSetDrawable(OpenGLData->aglContext, NULL);
+			err = aglGetError();
+			aglDestroyContext(OpenGLData->aglContext);
+			err = aglGetError();
 			
 			OpenGLData->aglContext = NULL;
 			
 			if (OpenGLData->fmt)
 			{
-				aglDestroyPixelFormat (OpenGLData->fmt); // pixel format is no longer valid
-				err = aglGetError ();
+				aglDestroyPixelFormat(OpenGLData->fmt); // pixel format is no longer valid
+				err = aglGetError();
 			}
 			OpenGLData->fmt = 0;
 		}
@@ -279,17 +279,17 @@ void MolDisplayWin::UpdateGLView(void)
 		bufferRect [1] = InfoRect.bottom - InfoRect.top;
 		bufferRect [2] = DisplayRect.right - DisplayRect.left;
 		bufferRect [3] = DisplayRect.bottom - DisplayRect.top;
-		aglSetCurrentContext (OpenGLData->aglContext);
-		aglSetInteger (OpenGLData->aglContext, AGL_BUFFER_RECT, bufferRect);
-		aglUpdateContext (OpenGLData->aglContext);
-		glViewport (0, 0, bufferRect [2], bufferRect [3]);
+		aglSetCurrentContext(OpenGLData->aglContext);
+		aglSetInteger(OpenGLData->aglContext, AGL_BUFFER_RECT, bufferRect);
+		aglUpdateContext(OpenGLData->aglContext);
+		glViewport(0, 0, bufferRect [2], bufferRect [3]);
 		float hsize = DisplayRect.right - DisplayRect.left;
 		float vsize = DisplayRect.bottom - DisplayRect.top;
 		GLdouble aspect = hsize/vsize;
 		//	GLdouble ysize = 60.0;
 		//	if (aspect > 1.0) ysize /= aspect;
-		glMatrixMode (GL_PROJECTION);	//Setup the model space to screen space mapping
-		glLoadIdentity ();
+		glMatrixMode(GL_PROJECTION);	//Setup the model space to screen space mapping
+		glLoadIdentity();
 		//	gluPerspective(ysize, aspect, 0.1, 100.0);
 		GLdouble zNear = 0.1;
 		GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV());
@@ -302,8 +302,8 @@ void MolDisplayWin::UpdateGLView(void)
 			right = top * aspect;
 		}
 		glFrustum(-right, right, -top, top, zNear, 100.0);
-		glMatrixMode (GL_MODELVIEW);	//Prepare for model space by submitting the rotation/translation
-		glLoadIdentity ();
+		glMatrixMode(GL_MODELVIEW);	//Prepare for model space by submitting the rotation/translation
+		glLoadIdentity();
 
 		RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
 			float red, green, blue;
@@ -369,8 +369,8 @@ void MolDisplayWin::UpdateGLModel(void) {	//model has changed so force update
 void MolDisplayWin::WindowMoved(void)
 {
 	if (winData.is3DModeActive() && OpenGLData) {
-		aglSetCurrentContext (OpenGLData->aglContext);
-		aglUpdateContext (OpenGLData->aglContext);
+		aglSetCurrentContext(OpenGLData->aglContext);
+		aglUpdateContext(OpenGLData->aglContext);
 	}
 }
 
@@ -429,8 +429,8 @@ void MolDisplayWin::Create3DGLPICT(WindowPtr PrintWindow)
 				//in which case the back buffer should be up to date already
 			if (NumXPasses > 1 || NumYPasses > 1) {
 				//Setup the projection matrix to view the correct piece of the view for this pass
-				glMatrixMode (GL_PROJECTION);	//Setup the model space to screen space mapping
-				glLoadIdentity ();
+				glMatrixMode(GL_PROJECTION);	//Setup the model space to screen space mapping
+				glLoadIdentity();
 				GLdouble top, bottom, left, right;
 				left = GLLeft + ipass*hGLsize;
 				right = left + hGLsize;
@@ -492,7 +492,7 @@ void MolDisplayWin::Create3DGLPICT(WindowPtr PrintWindow)
 			(**myPixMap).pmExt = 0;
 			
 				//Now use copybits to push the pixels onto the printwindow
-			CopyBits ((BitMap *) (*myPixMap), GetPortBitMapForCopyBits(GetWindowPort(PrintWindow)),
+			CopyBits((BitMap *) (*myPixMap), GetPortBitMapForCopyBits(GetWindowPort(PrintWindow)),
 				  &WorkingPrintRect, &WorkingPrintRect, srcCopy, NULL);
 		  }
 	}
@@ -556,7 +556,7 @@ void MolDisplayWin::Print3DGL(const PMPrintSession mySession,
 	}
 
 	PixMapHandle myPixMap = NewPixMap();
-	aglSetCurrentContext (OpenGLData->aglContext);
+	aglSetCurrentContext(OpenGLData->aglContext);
 	glReadBuffer(GL_BACK);
 
 	GLdouble zNear = 0.1;
@@ -586,8 +586,8 @@ void MolDisplayWin::Print3DGL(const PMPrintSession mySession,
 			if ((ipass+1) == NumXPasses) passwidth = width - (ViewportScaledX - ScaledWidth);
 
 	//Setup the projection matrix to view the correct piece of the view for this pass
-			glMatrixMode (GL_PROJECTION);	//Setup the model space to screen space mapping
-			glLoadIdentity ();
+			glMatrixMode(GL_PROJECTION);	//Setup the model space to screen space mapping
+			glLoadIdentity();
 			GLdouble top, bottom, left, right;
 			left = GLLeft + ipass*hGLsize;
 			right = left + hGLsize;
@@ -637,7 +637,7 @@ void MolDisplayWin::Print3DGL(const PMPrintSession mySession,
 			(**myPixMap).pmExt = 0;
 			
 				//Now use copybits to push the pixels onto the printwindow
-			CopyBits ((BitMap *) (*myPixMap), GetPortBitMapForCopyBits(printerGPort),
+			CopyBits((BitMap *) (*myPixMap), GetPortBitMapForCopyBits(printerGPort),
 				&WorkingPrintRect, &WorkingPrintRect, srcCopy, NULL);
 		  
 		  }
@@ -664,7 +664,7 @@ void MolDisplayWin::Print3DGL(const PMPrintSession mySession,
 
 void MolDisplayWin::DrawMoleculeGL(void)
 {
-	aglSetCurrentContext (OpenGLData->aglContext);
+	aglSetCurrentContext(OpenGLData->aglContext);
 
 	DrawGL();	//actual drawing is abstracted into drawGL so printing can share the same function
 
@@ -674,7 +674,7 @@ void MolDisplayWin::DrawMoleculeGL(void)
 
 void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball) {
 #ifndef __wxBuild__
-	aglSetCurrentContext (OpenGLData->aglContext);
+	aglSetCurrentContext(OpenGLData->aglContext);
 #endif
 	
 	if (OpenGLData->transpTriList) { //update the transparent surface sorting
@@ -689,13 +689,13 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball) {
 	// glDisable(GL_LIGHTING);
 
 	GLint matrixMode;
-	glGetIntegerv (GL_MATRIX_MODE, &matrixMode);
-	glMatrixMode (GL_PROJECTION);
+	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
+	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
-	glLoadIdentity ();
-	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
-	glLoadIdentity ();
+	glLoadIdentity();
 #ifdef __wxBuild__
 	wxRect DisplayRect = glCanvas->GetRect();
 	long hsize = DisplayRect.GetWidth();
@@ -704,17 +704,17 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball) {
 	long hsize = DisplayRect.right - DisplayRect.left;
 	long vsize = DisplayRect.bottom - DisplayRect.top;
 #endif
-	glScalef (2.0 / hsize, -2.0 /  vsize, 1.0);
-	glTranslatef (-hsize / 2.0, -vsize / 2.0, 0.0);
+	glScalef(2.0 / hsize, -2.0 /  vsize, 1.0);
+	glTranslatef(-hsize / 2.0, -vsize / 2.0, 0.0);
 
 	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
 	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
 
 	//choose black or white based on the background color
 	if (backMagnitude > 70000)  //"light" background choose black
-		glColor3f (0.0, 0.0, 0.0);
+		glColor3f(0.0, 0.0, 0.0);
 	else
-		glColor3f (1.0, 1.0, 1.0);
+		glColor3f(1.0, 1.0, 1.0);
 
 	if (ShowAngles) {
 		char AngleString[50];
@@ -750,7 +750,7 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball) {
 		glEnd();
 	}
 	glPopMatrix(); // GL_MODELVIEW
-	glMatrixMode (GL_PROJECTION);
+	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
 	glMatrixMode(matrixMode);
 	
@@ -791,8 +791,8 @@ void MolDisplayWin::DrawGL(void) {
 	GLenum error = glGetError();	//clear the error code
 
 	// Setup the rotation matrix
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 	glTranslatef(0.0, 0.0, -(MainData->WindowSize));
 
 	if (Prefs->ShowAtomicSymbolLabels() || Prefs->ShowAtomNumberLabels()) {
@@ -1611,15 +1611,15 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			Prefs->ChangeColorAtomColor(curAtomType+1);
 	  
 			if (draw_subdued) {
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
 			} else {
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
-				glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
 			}
 
 			glPushMatrix(); // atom center
@@ -1870,7 +1870,7 @@ void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 	} else
 		NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
 	NormEnd = v2;
-	Normalize3D (&NormEnd);
+	Normalize3D(&NormEnd);
 	SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
 	rotMat[3][0] = atom1.Position.x;
 	rotMat[3][1] = atom1.Position.y;
@@ -3146,7 +3146,7 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	} else
 		NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
 	NormEnd = lineEnd;
-	Normalize3D (&NormEnd);
+	Normalize3D(&NormEnd);
 	SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
 	rotMat[3][0] = lineStart.x;
 	rotMat[3][1] = lineStart.y;
@@ -3201,6 +3201,7 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
 	glColor4f(0, .64, .85, 0.3);
    
 	glRectf(0, 0, s1Length, s2Length);

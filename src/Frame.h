@@ -80,6 +80,7 @@ class Frame {
 
 		int natoms_selected;
 		MolDisplayWin *MolWin;
+		int targeted_atom;
 
 	public:
 		Frame(MolDisplayWin *MolWin);
@@ -208,6 +209,10 @@ class Frame {
 #endif
 		bool SetAtomOxidationNumber(int atom_id, int ox_num);
 		int GetAtomOxidationNumber(int atom_id);
+
+		//
+		inline int GetTargetAtom() const { return targeted_atom; }
+		inline void SetTargetAtom(int id) { targeted_atom = id; }
 };
 
 #endif

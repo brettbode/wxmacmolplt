@@ -58,6 +58,7 @@ Frame::Frame(MolDisplayWin *MolWin) {
 	PreviousFrame = NULL;
  
 	natoms_selected = 0;
+	targeted_atom = -1;
 }
 
 long Frame::Write(BufferFile * Buffer) {
@@ -250,6 +251,10 @@ mpAtom *Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition,
 				if (Bonds[i].Atom2 >= index) Bonds[i].Atom2++;
 			}
 
+			if (targeted_atom >= index) {
+				targeted_atom++;
+			}
+
 			// Adjust annotations that connect higher-numbered atoms.
 			/* std::vector<Annotation *>::iterator anno; */
 			/* anno = mMainData->Annotations.begin(); */
@@ -289,11 +294,18 @@ mpAtom * Frame::AddAtom(const mpAtom& atm, long index, const CPoint3D *pos) {
 			for (int i=NumAtoms; i>index; i--) {
 				Atoms[i] = Atoms[i-1];
 			}
+
+			if (targeted_atom >= index) {
+				targeted_atom++;
+			}
 		}
 		Atoms[index] = atm;
 		result = &Atoms[index];
 		if (pos) {
 			SetAtomPosition(index, *pos);
+		}
+		if (atm.GetSelectState()) {
+			natoms_selected++;
 		}
 		NumAtoms++;
 	}
@@ -552,6 +564,12 @@ void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any highe
 			memcpy(&(Atoms[AtomNum]), &(Atoms[AtomNum+1]), (NumAtoms-AtomNum - 1)*sizeof(mpAtom));
 		NumAtoms--;
 
+		if (targeted_atom == AtomNum) {
+			targeted_atom = -1;
+		} else if (targeted_atom > AtomNum) {
+			targeted_atom--;
+		}
+
 		//remove this atom from the bond list
 		/* for (long ii=0; ii<NumBonds; ii++) { */
 		for (long ii = NumBonds - 1; ii >= 0; ii--) {
@@ -668,7 +686,7 @@ long Frame::GetNumElectrons(void) const {
  * anywhere.
  * @param Prefs Preferences used to determining bonding sensitivity.
  * @param KeepOldBonds Flag indicating which bonds to leave alone.
- * @param selectedOnly Flag indicate which atoms' bonds to consider.
+ * @param selectedOnly Flag indicating which atoms' bonds to consider.
 */
 void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 
