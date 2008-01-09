@@ -88,7 +88,9 @@ class BufferFile {
  		BufferFile(Ptr	TargetPtr, long PtrSize);
 #endif
  		~BufferFile(void);
+		/// Obtain the current file position
 		long GetFilePos(void);
+		///Set the file position
 		void SetFilePos(long NewPos);
 		inline long GetFileLength(void) {return ((ByteCount>GetFilePos())?ByteCount:GetFilePos());};
 		TextFileType GetFileType(const char * fileName);
@@ -97,19 +99,30 @@ class BufferFile {
  		long GetLine(char * Line);
 		long PutText(const char * Text);
 		void BackupnLines(long nBack);
+		/** Skip nSkip lines in the file. */
 		void SkipnLines(long nSkip);
 		/* inline bool LocateKeyWord(char Keyword[], long NumByte) {return LocateKeyWord(Keyword, NumByte, -1);}; */
-			//Search the file for the specified keyword until found, EOF, or the limit is reached
-			//Returns true or false, the file position upon exit will be the start of the keyword,
-			//or the starting position if the keyword is not found.
+		/** Search the file for the specified keyword until found, EOF, or the limit is reached.
+		 * Returns true or false, the file position upon exit will be the start of the keyword,
+		 * or the starting position if the keyword is not found.
+		 * @param Keyword The literal text string to search for
+		 * @param NumByte The length of the Keyword string
+		 * @param Limit (optional) The file position limit (in bytes) to limit the search. -1 will
+		 *							search to the end of the file.
+		 */
 		bool LocateKeyWord(const char Keyword[], long NumByte, long Limit = -1);
 		long FindBlankLine(void);
 		long GetNumLines(long size);
  		long BufferSkip(long NumBytes);
  		inline void SetColsPerLine(short newVal) {ColsPerLine = newVal;};
+		/// Obtain the current file position as a percentage of the file size.
  		inline float GetPercentRead(void) {return (float) 100.0*GetFilePos()/GetFileLength();};
  		long Write(const char * Source, long NumBytes);
 		long WriteLine(const char *text, bool newline);
+		/** SetOutput allows you to turn off actual writing and just count the bytes output
+		 * to obtain the accurate output size (in a brute force fashion).
+		 * @param State true for normal output, false to just count bytes.
+		 */
  		bool SetOutput(bool State);
  		bool GetOutput(void);
  		void AbnormalCleanup(void);
