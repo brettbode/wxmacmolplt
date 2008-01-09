@@ -474,8 +474,6 @@ const char * ConvertTypeOfOrbital(const TypeOfOrbital & t);
 bool ConvertTypeOfOrbital(const char * s, TypeOfOrbital & t);
 
 class OrbitalRec {
-	private:
-		void ReadCodes(BufferFile * Buffer, long NumBasisFunctions, long ByteCount);
 	public:
 		float *			Vectors;			//Eigenvectors (Alpha set in UHF, Natural Orbs in MCSCF)
 		float *			VectorsB;			//Eigenvectors (Beta set in UHF, Optimized MOs in MCSCF)
@@ -499,9 +497,6 @@ class OrbitalRec {
 		OrbitalRec(BufferFile *Buffer, long code, long length);
 		~OrbitalRec(void);
 		void ReSize(long nAlphaOrbs, long nBetaOrbs);
-		long GetSize(BufferFile *Buffer);
-		long WriteToBuffer(BufferFile *Buffer);
-		static OrbitalRec * Read(BufferFile *Buffer, long NumBasisFuncs, long ByteCount);
 		void WriteXML(XMLElement * parent) const;
 		bool ReadXML(XMLElement * parent);
 		const char * getLabel(void) const {return Label;};
@@ -589,14 +584,10 @@ class Surface {
 		inline long SetSurfaceID(void) {/*ID = TickCount(); return ID;*/
                                         static long ID = 0; return ++ID;};
 		virtual void RotateEvent(MoleculeData * MainData);
-		virtual long GetSize(BufferFile * Buffer);
-		virtual long Write(BufferFile * Buffer)=0;
 		virtual void WriteXML(XMLElement * parent) const;
 		virtual bool ReadXML(XMLElement * parent);
 		static Surface * ReadSurface(XMLElement * parent);
-		long GetSizeofSurface(BufferFile * Buffer);
 		long WriteSurface(BufferFile * Buffer);
-		long Read(BufferFile * Buffer, long length);
 		virtual void Export(BufferFile * Buffer);
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer) {
 			return 0;

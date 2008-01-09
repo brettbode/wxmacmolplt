@@ -50,9 +50,6 @@ class OrbSurfBase {
 		inline void UseSphericalHarmonics(bool newState) {Options = (Options & 0xFFFFFFBF) + (newState ? 64 : 0);};
 		inline bool GetOrbOccDisplay(void) const {return ((Options & 128) != 0);};
 		inline void SetOrbOccDisplay(bool newState) {Options = (Options & 0xFFFFFF7F) + (newState ? 128 : 0);};
-		long GetSizeofSurface(BufferFile * Buffer) const;
-		long Write(BufferFile * Buffer) const;
-		long Read(BufferFile * Buffer, long ObjectLength);
 		virtual void WriteXML(XMLElement * parent) const;
 		virtual void ReadXML(XMLElement * parent);
 };
@@ -365,16 +362,12 @@ class Surf3DBase : public Surface {
 		void SetupGridParameters(Frame * lFrame);
 		void Contour3DGrid(Progress * lProgress);
 		void AdjustSurfaceNormals(void);
-		long Write3D(BufferFile * Buffer, bool WriteGrid);
-		long Read3D(BufferFile * Buffer, long length);
-		long GetSizeofSurface(BufferFile * Buffer, bool WriteGrid);
 		void Write3DXML(XMLElement * parent, bool writeGrid) const;
 		void Read3DXML(XMLElement * parent);
 };
 class General2DSurface : public Surf2DBase {
 	public:
 		General2DSurface(WinPrefs * Prefs);
-		General2DSurface(BufferFile * Buffer, long length);
 		General2DSurface(XMLElement * x);
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
@@ -383,14 +376,12 @@ class General2DSurface : public Surf2DBase {
 		virtual SurfaceType GetSurfaceType(void) const {return kGeneral2DSurface;};
 		//pick and read a file containing the 2D grid
 		void ReadGrid(const bool Square, const bool UseMult, const double & MultValue);
-		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		virtual bool Needs2DPlane(void) const {bool result=false; if (Visible&&Grid) result=true; return result;};
 };
 class General3DSurface : public Surf3DBase {
 	public:
 		General3DSurface(WinPrefs * Prefs);
-		General3DSurface(BufferFile * Buffer, long length);
 		General3DSurface(XMLElement * x);
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kGeneral3DSurface;};
@@ -407,7 +398,6 @@ class General3DSurface : public Surf3DBase {
 		virtual long getTriangleCount(void) const;
 #endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
-		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		inline void GetMaxColor(RGBColor *temp) const {*temp=PosColor;};
 		inline void SetMaxColor(const RGBColor *newColor) {PosColor=*newColor;};
@@ -420,7 +410,6 @@ class TEDensity3DSurface : public Surf3DBase {
 		long		OrbSet;			//Target Orbital Set
 	public:
 		TEDensity3DSurface(WinPrefs * Prefs);
-		TEDensity3DSurface(BufferFile * Buffer, long length);
 		TEDensity3DSurface(XMLElement * x);
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity3D;};
@@ -438,7 +427,6 @@ class TEDensity3DSurface : public Surf3DBase {
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
 #endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
-		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * progress);
 		float CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisSet * Basis,
@@ -458,7 +446,6 @@ class TEDensity2DSurface : public Surf2DBase {
 		long OrbSet;	//Target Orbital Set
 	public:
 		TEDensity2DSurface(WinPrefs * Prefs);
-		TEDensity2DSurface(BufferFile * Buffer, long length);
 		TEDensity2DSurface(TEDensity2DSurface * target);
 		TEDensity2DSurface(XMLElement * x);
 #ifndef __wxBuild__
@@ -466,7 +453,6 @@ class TEDensity2DSurface : public Surf2DBase {
 #endif
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity2D;};
-		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * lProgress);
 		virtual void Update(MoleculeData * MainData);
@@ -476,14 +462,12 @@ class TEDensity2DSurface : public Surf2DBase {
 };
 class TEDensity1DSurface : public Surf1DBase {
 		TEDensity1DSurface(WinPrefs * Prefs);
-		TEDensity1DSurface(BufferFile * Buffer, long length);
 		TEDensity1DSurface(TEDensity1DSurface * target);
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
 #endif
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity1D;};
-		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * lProgress);
 		virtual void Update(MoleculeData * MainData);
@@ -494,7 +478,6 @@ class MEP2DSurface : public Surf2DBase {
 		long	OrbSet;		//Target orbital set
 	public:
 		MEP2DSurface(WinPrefs * Prefs);
-		MEP2DSurface(BufferFile * Buffer, long length);
 		MEP2DSurface(MEP2DSurface * target);
 		MEP2DSurface(XMLElement * x);
 		inline long getTargetOrbitalSet(void) const { return OrbSet;};
@@ -504,7 +487,6 @@ class MEP2DSurface : public Surf2DBase {
 #endif
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kMEP2D;};
-		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * lProgress);
 		virtual void Update(MoleculeData * MainData);
@@ -515,7 +497,6 @@ class MEP3DSurface : public Surf3DBase {
 		long	OrbSet;		//Target orbital set
 	public:
 		MEP3DSurface(WinPrefs * Prefs);
-		MEP3DSurface(BufferFile * Buffer, long length);
 		MEP3DSurface(XMLElement * x);
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
@@ -533,7 +514,6 @@ class MEP3DSurface : public Surf3DBase {
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
 #endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
-		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMEPGrid(MoleculeData * MainData, Progress * progress);
 		float CalculateGrid(long xStart, long xEnd, Frame * lFrame, BasisSet * Basis,
@@ -543,7 +523,6 @@ class MEP3DSurface : public Surf3DBase {
 class Orb3DSurface : public Surf3DBase, public OrbSurfBase {
 	public:
 		Orb3DSurface(WinPrefs * Prefs);
-		Orb3DSurface(BufferFile * Buffer, long length);
 		Orb3DSurface(Orb3DSurface * target);
 		Orb3DSurface(XMLElement * s);
 		virtual char * GetLabel(void);
@@ -559,7 +538,6 @@ class Orb3DSurface : public Surf3DBase, public OrbSurfBase {
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
 #endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
-		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * lProgress);
 		float CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisSet * Basis,
@@ -569,7 +547,6 @@ class Orb3DSurface : public Surf3DBase, public OrbSurfBase {
 class Orb2DSurface : public Surf2DBase, public OrbSurfBase {
 	public:
 		Orb2DSurface(WinPrefs * Prefs);
-		Orb2DSurface(BufferFile * Buffer, long length);
 		Orb2DSurface(Orb2DSurface * Original);
 		Orb2DSurface(XMLElement * x);
 #ifndef __wxBuild__
@@ -577,7 +554,6 @@ class Orb2DSurface : public Surf2DBase, public OrbSurfBase {
 #endif
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kOrb2DType;};
-		virtual long Write(BufferFile * Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * lProgress);
 		void UpdateData(Orb2DSurface * Original);

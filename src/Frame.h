@@ -96,7 +96,6 @@ class Frame {
 		void ConvertCode3(BufferFile * Buffer, long length);
 		void ConvertCode4(BufferFile * Buffer, long length);
 		void ConvertCode5(BufferFile * Buffer, long length);
-		void ReadSurfaceList(BufferFile * Buffer, long length);
 		void SetNextFrame(Frame *);
 		void SetPreviousFrame(Frame *);
 		Frame * GetNextFrame(void);
