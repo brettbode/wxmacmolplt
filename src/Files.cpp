@@ -1009,8 +1009,6 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 	return 1;
 }
 
-
-
 /**
   * Adds support for opening the MKL file extension. 
   * @param Buffer A BufferFileObject which the .MKL file is buffered into
@@ -1030,108 +1028,55 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	//look throughout the file for the $COORD or the last $$
 	//and count the number of lines between the two keywords 
 	//(each line is another atom in the molecule)
-	while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
-		Buffer->GetLine(Line);
-		if (0==FindKeyWord(Line, "$COORD", 5))
-			{
-				startOfCOORD = Buffer->GetFilePos();
-				//the first possible set of coordinates has been found
-				//count the lines (each line is an atom) until $end
-				//or if a $$ is found start over and look for $end, because
-				//the last $$ is the actual frame of the molecule
-				while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
-					Buffer->GetLine(Line);
-					//check for any other keywords inside $COORD keyword
-					if(0==FindKeyWord(Line, "$CHAR_MULT", 10) || 
-						0==FindKeyWord(Line, "$CHARGES", 8) || 
-						0==FindKeyWord(Line, "$BASIS", 6) || 
-						0==FindKeyWord(Line, "$COEFF_ALPHA", 12) || 
-						0==FindKeyWord(Line, "$COEFF_BETA", 11) || 
-						0==FindKeyWord(Line, "$OCC_ALPHA", 10) ||
-						0==FindKeyWord(Line, "$OCC_BETA", 9) || 
-						0==FindKeyWord(Line, "$FREQ", 5) || 
-						0==FindKeyWord(Line, "$DIPOLE", 7)
-					)
-					{
-						//there cannot be any other keywords inside $COORD keyword, file is corrupt
-						throw DataError(18);
-					}
-					else if (0==FindKeyWord(Line, "$$", 2)) 
-					{
-						//Begin parse out frame info 
-						if (nAtoms<=0) throw DataError(15);
-						//reset the Buffer to the start of the last atoms frame 
-						Buffer->SetFilePos(startOfCOORD);
-						//allocate memory for the atoms
-						if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
-						//parse for atom and coordinate information
-						for(long i=0; i<nAtoms; i++)
-						{
-							CPoint3D Pos;
-							long AtomType;
-							Buffer->GetLine(Line);
-							//parse line for atom type and x,y,z positions
-							sscanf (Line,"%lu %f %f %f",&AtomType,&Pos.x,&Pos.y,&Pos.z);
-							//add atom to the molecule
-							lFrame->AddAtom(AtomType, Pos);
-						}
-						//setup bonds, if needed
-						if (Prefs->GetAutoBond()){lFrame->SetBonds(Prefs, false);}  
-						//add frame
-						lFrame = MainData->AddFrame(nAtoms,0);
-						if (!lFrame) throw MemoryError();
-						//reset for next frame
-						nAtoms=0;
-						Buffer->GetLine(Line);
-						startOfCOORD = Buffer->GetFilePos();
-						//End parse out frame info 
-					}
-					else if (0==FindKeyWord(Line, "$END", 4)) 
-					{
-						//Begin parse out frame info 
-						//if there is no atoms in the molecule for this frame, the file is corrupted
-						if (nAtoms<=0) throw DataError(15);
-						//reset the Buffer to the start of the last atoms frame 
-						Buffer->SetFilePos(startOfCOORD);
-						//allocate memory for the atoms
-						if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
-						//parse for atom and coordinate information
-						for(long i=0; i<nAtoms; i++)
-						{
-							CPoint3D Pos;
-							long AtomType;
-							Buffer->GetLine(Line);
-							//parse line for atom type and x,y,z positions
-							sscanf (Line,"%lu %f %f %f",&AtomType,&Pos.x,&Pos.y,&Pos.z);
-							//add atom to the molecule
-							lFrame->AddAtom(AtomType, Pos);
-						}
-						//setup bonds, if needed
-						if (Prefs->GetAutoBond()){lFrame->SetBonds(Prefs, false);}  
-						//add frame
-						lFrame = MainData->AddFrame(nAtoms,0);
-						if (!lFrame) throw MemoryError();
-						//reset for next frame
-						nAtoms=0;
-						Buffer->GetLine(Line);
-						//End parse out frame info 
-						
-						break;  //break out of the loop, the end of all the coordinate sets has been reached
-					}
-					else 
-					{
-						nAtoms++;
-					} 
-				}
+	while (Buffer->GetFilePos() < Buffer->GetFileLength() && 
+		Buffer->LocateKeyWord("$COORD", 6)) {
+		Buffer->SkipnLines(1);
+		startOfCOORD = Buffer->GetFilePos();
+		long endOfCoord = -1;
+		if (Buffer->LocateKeyWord("$END", 4)) {
+			endOfCoord = Buffer->GetFilePos();
+			Buffer->SetFilePos(startOfCOORD);
+		} else endOfCoord = Buffer->GetFileSize();
+		while (Buffer->GetFilePos() < endOfCoord) {
+			long startOfFramePos = Buffer->GetFilePos();
+			long endOfFramePos = endOfCoord;
+			//individual geometries are separated by the "$$" line
+			if (Buffer->LocateKeyWord("$$", 2, endOfCoord)) {
+				endOfFramePos = Buffer->GetFilePos();
+				Buffer->SetFilePos(startOfFramePos);
 			}
+			nAtoms = Buffer->GetNumLines(endOfFramePos);
+			if (lFrame->GetNumAtoms()>0)
+				lFrame = MainData->AddFrame(nAtoms, 0);
+			for (long i=0; i<nAtoms; i++) {
+				CPoint3D Pos;
+				long AtomType;
+				if (Buffer->GetFilePos() >= endOfFramePos) {
+					nAtoms = i;
+					break;
+				}
+				Buffer->GetLine(Line);
+				//parse line for atom type and x,y,z positions
+				int ss = sscanf (Line,"%ld %f %f %f",&AtomType,&Pos.x,&Pos.y,&Pos.z);
+				if (ss == 0) {
+					nAtoms = i;
+					break;
+				}
+				if (ss != 4) {
+					MessageAlert("Error while reading coordinates.");
+					return 0;
+				}
+				//add atom to the molecule
+				lFrame->AddAtom(AtomType, Pos);
+			}
+			if (Buffer->GetFilePos() < endOfCoord) Buffer->SkipnLines(1);
+			//setup bonds, if needed
+			if (Prefs->GetAutoBond() && (nAtoms > 0))
+				lFrame->SetBonds(Prefs, false);
+		}
 	}
-	//This is wierd, but an extra frame is appended, so just delete the extra frame
-	MainData->DeleteFrame();
-	
 	return 1;
 }
-
-
 
 long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 	char	Line[kMaxLineLength];
