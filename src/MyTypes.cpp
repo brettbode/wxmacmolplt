@@ -96,7 +96,9 @@ bool AnnotationMarker::containsAtom(const int atom_id) const {
 }
 
 void AnnotationMarker::adjustIds(const int atom_id, int offset) {
-	if (atom > atom_id) atom += offset;
+	if (atom > atom_id) {
+		atom += offset;
+	}
 }
 
 bool AnnotationMarker::isEquivalent(const int natoms, const int *new_list) const {

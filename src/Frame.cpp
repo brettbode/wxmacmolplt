@@ -254,13 +254,6 @@ mpAtom *Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition,
 			if (targeted_atom >= index) {
 				targeted_atom++;
 			}
-
-			// Adjust annotations that connect higher-numbered atoms.
-			/* std::vector<Annotation *>::iterator anno; */
-			/* anno = mMainData->Annotations.begin(); */
-			/* for (anno = mMainData->Annotations.begin(); anno != mMainData->Annotations.end(); ) { */
-				/* (*anno)->adjustIds(index - 1, 1); */
-			/* } */
 		}
 		Atoms[index].Type = AtomType;
 		Atoms[index].Position = AtomPosition;
@@ -293,6 +286,12 @@ mpAtom * Frame::AddAtom(const mpAtom& atm, long index, const CPoint3D *pos) {
 		} else {	//insert the atom into the middle of the list
 			for (int i=NumAtoms; i>index; i--) {
 				Atoms[i] = Atoms[i-1];
+			}
+
+			// Adjust bonds that connect higher-numbered atoms.
+			for (int i = 0; i < NumBonds; ++i) {
+				if (Bonds[i].Atom1 >= index) Bonds[i].Atom1++;
+				if (Bonds[i].Atom2 >= index) Bonds[i].Atom2++;
 			}
 
 			if (targeted_atom >= index) {

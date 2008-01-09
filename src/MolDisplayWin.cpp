@@ -3085,7 +3085,7 @@ void MolDisplayWin::RegenerateSymmetryDependent() {
 
 	for (int i = lFrame->GetNumAtoms() - 1; i >= 0; i--) {
 		if (!lAtoms[i].IsSymmetryUnique()) {
-			lFrame->DeleteAtom(i);
+			MainData->DeleteAtom(i, false);
 		}
 	}
 

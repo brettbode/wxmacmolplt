@@ -1562,9 +1562,14 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
+	
+	if (selected_type != MMP_ATOM && selected_type != MMP_BOND) {
+		mSelectState = -1;
+		return;
+	}
 
 	// If an atom is clicked on...
-	if (selected_type == MMP_ATOM) {
+	else if (selected_type == MMP_ATOM) {
 
 		GLdouble newX, newY, newZ;
 
@@ -1748,12 +1753,6 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			}
 
 		}
-
-		lFrame->SetTargetAtom(selected);
-		lFrame->SetBonds(Prefs, true, true);
-		did_edit = true;
-		MolWin->AtomsChanged(true, true);
-		selected = lFrame->GetTargetAtom();
 	}
 	
 	// If the user's dragging after selecting a bond, we want to
@@ -1825,16 +1824,16 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 				lAtoms[i].Position += pivot_pt;
 			}
 		}
-
-		lFrame->SetTargetAtom(selected);
-		lFrame->SetBonds(Prefs, true, true);
-		did_edit = true;
-		MolWin->AtomsChanged(true, true);
-		selected = lFrame->GetTargetAtom();
 	}
-	
-	else {
-		mSelectState = -1;
+
+	lFrame->SetTargetAtom(selected);
+	lFrame->SetBonds(Prefs, true, true);
+	did_edit = true;
+	MolWin->AtomsChanged(true, true);
+	selected = lFrame->GetTargetAtom();
+
+	if (MolWin->InSymmetryEditMode()) {
+		select_stack_top = 5;
 	}
 
 }

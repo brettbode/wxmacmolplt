@@ -298,11 +298,29 @@ void MoleculeData::StickCoordinates(void) {
 
 void MoleculeData::NewAtom(const mpAtom& atom, long index, const CPoint3D *pos) {
 	cFrame->AddAtom(atom, index, pos);
+
+	// Adjust annotations that connect higher-numbered atoms.
+	if (index >= 0 && index < cFrame->NumAtoms - 1) {
+		std::vector<Annotation *>::iterator anno;
+		for (anno = Annotations.begin(); anno != Annotations.end(); ++anno) {
+			(*anno)->adjustIds(index - 1, 1);
+		}
+	}
+
 	AtomAdded();
 }
 
 void MoleculeData::NewAtom(long AtomType, const CPoint3D & AtomPosition, long index) {
 	cFrame->AddAtom(AtomType, AtomPosition, index);
+
+	// Adjust annotations that connect higher-numbered atoms.
+	if (index >= 0 && index < cFrame->NumAtoms - 1) {
+		std::vector<Annotation *>::iterator anno;
+		for (anno = Annotations.begin(); anno != Annotations.end(); ++anno) {
+			(*anno)->adjustIds(index - 1, 1);
+		}
+	}
+
 	AtomAdded();
 }
 
@@ -1682,7 +1700,7 @@ long MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
 			delete (*anno);
 			anno = Annotations.erase(anno);
 		} else {
-			(*anno)->adjustIds(AtomNum);
+			(*anno)->adjustIds(AtomNum, -1);
 			anno++;
 		}
 	}
