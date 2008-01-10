@@ -1075,6 +1075,59 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				lFrame->SetBonds(Prefs, false);
 		}
 	}
+	// now look for frequencies for the last frame
+	if ((lFrame->GetNumAtoms()>0)&&Buffer->LocateKeyWord("$FREQ", 5)) {
+		Buffer->SkipnLines(1);
+		// Create the VibRec
+		lFrame->Vibs = new VibRec(3*lFrame->NumAtoms, lFrame->NumAtoms);
+		long nModes=0;
+		char freq[kMaxLineLength];
+		bool error = false;	//Use the error flag to bail out once we hit an error
+		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
+			Buffer->GetLine(Line);
+			//Continue until we find the end of the group
+			if (FindKeyWord(Line, "$END", 4)<0) {
+				//The first line is the symmetry symbol, which we ignore
+				Buffer->GetLine(Line);	//next line is the frequencies
+				unsigned int lineModes=0;
+				int linebytes=strlen(Line);
+				int bytesconsumed, bytesRead=0;
+				while (bytesRead < linebytes) {
+					int scancount = sscanf(&(Line[bytesRead]), "%s%n", freq, &bytesconsumed);
+					if (scancount == 1) {
+						lFrame->Vibs->Frequencies.push_back(freq);
+						bytesRead += bytesconsumed;
+						lineModes++;
+					} else
+						break;
+				}
+				//Next come the vibrational offsets
+				for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
+					Buffer->GetLine(Line);
+					//each line will normally contain x, y, z for one atom for 3 modes
+					bytesRead = 0;
+					for (int imode=0; imode<lineModes; imode++) {
+						CPoint3D temp;
+						int scancount = sscanf(&(Line[bytesRead]), "%f %f %f%n",
+											   &(temp.x), &(temp.y), &(temp.z), &bytesconsumed);
+						if (scancount == 3) {
+							lFrame->Vibs->NormMode[iatm + lFrame->NumAtoms*(nModes+imode)] = temp;
+							bytesRead += bytesconsumed;
+						} else {
+							lineModes = imode;
+							error = true;
+							break;
+						}
+					}
+					if (error) break;
+				}
+				nModes += lineModes;
+			} else
+				break;
+		}
+		lFrame->Vibs->NumModes = nModes;
+		lFrame->Vibs->Resize(nModes);
+	}
 	return 1;
 }
 
@@ -1326,7 +1379,6 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 		VibRec * lVibs = MainData->cFrame->Vibs = new VibRec(nkinds, fileAtoms);
 		if (!lVibs) throw MemoryError();
 		catm = 0;
-		nkinds = 0;
 		ii=0;
 		try {
 					/* Now locate the first frequency (skipping the atomic masses) */
@@ -1339,7 +1391,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 			Buffer->SetFilePos(CurrentPos);
 
 			for (; ii < (3*(lFrame->NumAtoms)); ii++) {
-				/* Allow a small amount of background processing and allow user cancels */
+				/* Allow user cancels */
 				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 					{ throw UserCancel();}
 				Buffer->GetLine(LineText);
@@ -1347,15 +1399,11 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 				if (LineText[j] != '=') break;	/* no more frequencies so quit */
 				sscanf(&LineText[j+1], "%s", KeyWord);
 				LineLength = strlen(KeyWord);
-				lVibs->Frequencies[nkinds] = LineLength;
-				nkinds++;
 	/*Check to see if the first character is a '-' if so change it to an 'i' since it really is an
 	imaginary mode and because the menu manager will think it means create a divider in the menu instead
 	of a regular text item */
 				if (KeyWord[0] == '-') KeyWord[0] = 'i';
-				if (nkinds+LineLength > 20*3*(lFrame->NumAtoms)) break;
-				strncpy((char *) &(lVibs->Frequencies[nkinds]), KeyWord, LineLength);
-				nkinds += LineLength;
+				lVibs->Frequencies.push_back(std::string(token));
 
 				for (j=0; j < (lFrame->NumAtoms); j++) {
 					Buffer->GetLine(LineText);
