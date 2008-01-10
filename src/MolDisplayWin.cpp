@@ -2878,12 +2878,12 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 		
 		mAltModifyingToolBar = true;
 	} else if (event.AltDown()) {
-		switch (key) {
-			case 140:   //option - a
+		switch (key) {	//as long as we are called from a keydown handler these will upper case
+			case 'A':   //option - a
 				MainData->cFrame->toggleAbInitioVisibility();
 				ResetModel(false);
 				break;
-			case 167:   //option - s
+			case 'S':   //option - s
 				MainData->cFrame->toggleMMAtomVisibility();
 				ResetModel(false);
 				break;

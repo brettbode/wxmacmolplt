@@ -3095,7 +3095,7 @@ BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
 	EVT_MOUSE_CAPTURE_LOST(MpGLCanvas::eventMouseCaptureLost)
 #endif
 
-	EVT_CHAR(MpGLCanvas::KeyHandler)
+//	EVT_CHAR(MpGLCanvas::KeyHandler)	//I don't think we need both a keydown and char event handler?
 	EVT_KEY_DOWN(MpGLCanvas::KeyDownHandler)
 	EVT_KEY_UP(MpGLCanvas::KeyUpHandler)
 
