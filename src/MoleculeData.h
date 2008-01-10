@@ -130,7 +130,7 @@ class MoleculeData {
 		 * @param precision The tolerance for slop in the coordinates (ex 1.0D-5)
 		 */
 		bool DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs, double precision) const;
-		void GenerateSymmetryDependentAtoms(void);
+		void GenerateSymmetryDependentAtoms(bool do_warnings = true);
 		/**
 		 * Flag the symmetry unique atoms.
 		 * The coordinates are left unchanged, just the symmetry unique flag on the atoms
@@ -144,7 +144,7 @@ class MoleculeData {
 		 * The routine assumes the symmetry unique atoms are already correctly marked.
 		 * This routine should not add or remove atoms, but will change the positions slightly.
 		 */
-		void SymmetrizeCoordinates(void);
+		void SymmetrizeCoordinates(bool selected_only = false);
 		bool SetScreenPlane(CPoint3D *Points);
 		void LinearLeastSquaresFit(Progress * lProgress);
 		void CreateLLM(long NumPts, WinPrefs * Prefs);

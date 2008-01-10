@@ -3089,7 +3089,7 @@ void MolDisplayWin::RegenerateSymmetryDependent() {
 		}
 	}
 
-	MainData->GenerateSymmetryDependentAtoms();
+	MainData->GenerateSymmetryDependentAtoms(false);
 
 	// We changed the atoms, so we better update the bonds.
 	lFrame->SetBonds(Prefs, true, false);
@@ -3110,7 +3110,7 @@ void MolDisplayWin::AtomsChanged(bool updateCoordsWin, bool updateDisplay) {
 		/* !wxGetMouseState().RightDown() && */
 		/* !wxGetMouseState().MiddleDown()) { */
 		RegenerateSymmetryDependent();
-		MainData->SymmetrizeCoordinates();
+		MainData->SymmetrizeCoordinates(wxGetMouseState().LeftDown());
 	}
 
 	if (updateCoordsWin && coordsWindow) coordsWindow->FrameChanged();

@@ -510,11 +510,6 @@ void MpGLCanvas::draw(void) {
 		initGL();
 		UpdateGLView();
 	}
-		
-	/* static int ii = 0; */
-	/* glTranslatef((2 * ii - 1) / 50.0f, 0.0f, 0.0f); */
-	/* std::cout << "2 * ii - 1: " << 2 * ii - 1 << std::endl; */
-	/* ii = (ii + 1) % 2; */
 
 	glfSetCurrentBMFFont(bitmap_fontd);
 	//Only do the drawing if there is not an operation in progress
@@ -1999,6 +1994,7 @@ void MpGLCanvas::testPicking(int x, int y) {
 	// the bond id.
 	int i, j;
 	for (i = 0, j = 0; i < hits; i++) {
+		/* std::cout << "buff[j + 3]: " << buff[j + 3] << std::endl; */
 		if (buff[j + 1] < min_depth && buff[j + 3] != MMP_NULL && buff[j + 4] != 0) {
 			min_depth = buff[j + 1];
 			selected_type = buff[j + 3];
@@ -2011,6 +2007,7 @@ void MpGLCanvas::testPicking(int x, int y) {
 		}
 		j += buff[j] + 3;
 	}
+	/* std::cout << "selected_type: " << selected_type << std::endl; */
 
 #if 0
 	std::cout << "selected_type: " << selected_type << std::endl;

@@ -1672,7 +1672,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		DrawBond(lBonds[ibond], lAtoms[lBonds[ibond].Atom1],
 				 lAtoms[lBonds[ibond].Atom2], *Prefs, core_obj,
 				 modelview, proj, viewport, OpenGLData->sphere_list,
-				 mHighliteState);
+				 mHighliteState, InSymmetryEditMode());
 
 	}
 	glPopName();
@@ -4418,7 +4418,8 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 							 const mpAtom& atom2, const WinPrefs& Prefs,
 							 GLUquadric *quadric, GLdouble *modelview,
 							 GLdouble *proj, GLint *viewport,
-							 GLuint sphere_list, bool highlighting_on) {
+							 GLuint sphere_list, bool highlighting_on,
+							 bool cap_dependent) {
 
 	CPoint3D v1, v2, offset, NormalOffset, NormEnd;
 	CPoint3D NormStart(0, 0, 1);
@@ -4552,8 +4553,10 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 			// Draw first half.
 			Prefs.ChangeColorAtomColor(atom1.GetType());
 			DrawPipeCylinder(length * centerPercent, quadric,
-							 (Prefs.DrawWireFrame()||(Prefs.ShowEFPWireFrame() &&
-													  atom1.IsEffectiveFragment())) ? 1 : 0, 
+							 (Prefs.DrawWireFrame() ||
+							  (cap_dependent && !atom1.IsSymmetryUnique()) ||
+							  (Prefs.ShowEFPWireFrame() &&
+							   atom1.IsEffectiveFragment())) ? 1 : 0, 
 							 sphere_list,
 							 tmpBondSize, Quality);
 
@@ -4562,8 +4565,10 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 			glTranslatef(0.0f, 0.0f, length * centerPercent);
 			Prefs.ChangeColorAtomColor(atom2.GetType());
 			DrawPipeCylinder(length * (1.0f - centerPercent), quadric,
-							 (Prefs.DrawWireFrame() || (Prefs.ShowEFPWireFrame() &&
-														atom2.IsEffectiveFragment())) ? 2 : 0,
+							 (Prefs.DrawWireFrame() ||
+							  (cap_dependent && !atom2.IsSymmetryUnique()) ||
+							  (Prefs.ShowEFPWireFrame() &&
+							   atom2.IsEffectiveFragment())) ? 2 : 0,
 							 sphere_list, tmpBondSize, Quality);
 			glPopMatrix(); // halfway point
 
@@ -4573,9 +4578,14 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 		// the user's not interested in coloring each half differently.
 		else {
 			Prefs.ChangeColorBondColor(bond.Order);
-			DrawPipeCylinder(length, quadric, (Prefs.DrawWireFrame() || (Prefs.ShowEFPWireFrame() &&
-																		 (atom1.IsEffectiveFragment() ||
-																		  atom2.IsEffectiveFragment()))) ? 3 : 0,
+			DrawPipeCylinder(length, quadric,
+							 (Prefs.DrawWireFrame() ||
+							  (cap_dependent &&
+							   (!atom1.IsSymmetryUnique() ||
+							    !atom2.IsSymmetryUnique())) ||
+							  (Prefs.ShowEFPWireFrame() &&
+							   (atom1.IsEffectiveFragment() ||
+								atom2.IsEffectiveFragment()))) ? 3 : 0,
 							 sphere_list, tmpBondSize, Quality);
 		}
 

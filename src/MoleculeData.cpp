@@ -1351,7 +1351,7 @@ bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Pre
 	result[3][2] = rotatedCenterOfMass.z;
 	return success;
 }
-void MoleculeData::GenerateSymmetryDependentAtoms(void) {
+void MoleculeData::GenerateSymmetryDependentAtoms(bool do_warnings) {
 	// The input coordinates (in the current frame) must contain the symmetry
 	// unique atoms in the proper symmetry adapted reference frame. This
 	// routine will generate the symmetry dependent atoms.
@@ -1403,13 +1403,17 @@ void MoleculeData::GenerateSymmetryDependentAtoms(void) {
 			}
 		}
 	}
-	if (conflicts) {
-		MessageAlert("Found conflicts during generation of symmetry dependent coordinates. Your starting coordinates are probably incorrect for the chosen symmetry point group.");
-	}
-	if (false && closeAtoms) {
-		MessageAlert("Atoms closer than 0.2 Angstroms have been removed. Your coordinates may be incorrect for the chosen symmetry point group.");
+
+	if (do_warnings) {
+		if (conflicts) {
+			MessageAlert("Found conflicts during generation of symmetry dependent coordinates. Your starting coordinates are probably incorrect for the chosen symmetry point group.");
+		}
+		if (closeAtoms) {
+			MessageAlert("Atoms closer than 0.2 Angstroms have been removed. Your coordinates may be incorrect for the chosen symmetry point group.");
+		}
 	}
 }
+
 bool MoleculeData::GenerateSymmetryUniqueAtoms(double tolerance) {
 	//On input the coordinates should contain the full set of atoms in the
 	//correct orientation for the selected symmetry point group. The
@@ -1470,7 +1474,7 @@ bool MoleculeData::GenerateSymmetryUniqueAtoms(double tolerance) {
 //	}
 	return (!conflicts);
 }
-void MoleculeData::SymmetrizeCoordinates(void) {
+void MoleculeData::SymmetrizeCoordinates(bool selected_only) {
 	//The purpose of this routine is to remove the "slop" in the coordinates such that they 
 	//more tightly meet the selected point group.
 	GAMESSPointGroup pg = GAMESS_C1;
@@ -1487,7 +1491,8 @@ void MoleculeData::SymmetrizeCoordinates(void) {
 	//images. Next pass through the symmetry dependent atoms and adjust their position to
 	//match the newly generated coordinates
 	for (int atm=0; atm<cFrame->GetNumAtoms(); atm++) {
-		if (cFrame->Atoms[atm].IsSymmetryUnique()) {
+		if (cFrame->Atoms[atm].IsSymmetryUnique() &&
+			(!selected_only || cFrame->GetAtomSelection(atm))) {
 			CPoint3D sum;
 			int matchcount = 0;
 			for (int iOp=0; iOp<symOps.getOperationCount(); iOp++) {
@@ -1510,7 +1515,7 @@ void MoleculeData::SymmetrizeCoordinates(void) {
 					//Apply the operator to each atom
 					symOps.ApplyOperator(cFrame->Atoms[atm].Position, result, iOp);
 					for (int testatom=0; testatom<cFrame->GetNumAtoms(); testatom++) {
-						if (testatom == atm) continue;
+						if (testatom == atm || cFrame->GetAtomType(testatom) != cFrame->GetAtomType(atm)) continue;
 						//Now loop over the atoms to see if this generates a new atom
 						//or if there are any conflicts
 						CPoint3D offset = result - cFrame->Atoms[testatom].Position;
