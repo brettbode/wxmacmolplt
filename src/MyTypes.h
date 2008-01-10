@@ -383,32 +383,43 @@ typedef enum SurfaceType {
 } SurfaceType;
 const char * SurfaceTypeToText(const SurfaceType & s);
 bool TextToSurfaceType(const char * t, SurfaceType & s);
+/// Container for vibrational normal mode information.
 class VibRec {
 	private:
+		///private function to initalize the class data before first use
 		void init(void);
 	public:
-		std::vector<std::string>	Frequencies;	// array of strings
-		std::vector<CPoint3D>		NormMode;		// Array of normal modes
-		std::vector<float>			Intensities;	// Infrared intensity of each mode
-		std::vector<float>			ReducedMass;	// Reduced Mass for each mode
-		std::vector<float>			RamanIntensity;	// Raman spectrum
-		std::vector<float>			Depolarization;	// depolarization
-		long						NumModes;		// number of modes here
-		long						CurrentMode;	// Currently Drawn mode
+		std::vector<std::string>	Frequencies;	///< array of strings
+		std::vector<CPoint3D>		NormMode;		///< Array of normal modes
+		std::vector<float>			Intensities;	///< Infrared intensity of each mode
+		std::vector<float>			ReducedMass;	///< Reduced Mass for each mode
+		std::vector<float>			RamanIntensity;	///< Raman spectrum
+		std::vector<float>			Depolarization;	///< depolarization
+		long						NumModes;		///< number of modes here
+		long						CurrentMode;	///< Currently Drawn mode
 
+		/** Contructor and memory allocation.
+		 * This routine sets up the class and allocation and initializes the arrays.
+		 * @param NumVibs The number of normal modes expected (normally up to 3*NumAtoms)
+		 * @param NumAtoms The number of atoms in the geometry
+		 */
 		VibRec(const long & NumVibs, const long & NumAtoms);
+		/** default constructor.
+		 * You probably will need to call Setup to properly allocate the vectors
+		 */
 		VibRec(void);
 		~VibRec(void);
+		/** Allocate and initialize the class arrays.
+		 * This routine allocates and initializes the arrays. You only need to call this if
+		 * you use the default constructor.
+		 * @param NumVibs The number of normal modes expected (normally up to 3*NumAtoms)
+		 * @param NumAtoms The number of atoms in the geometry
+		 */
 		void Setup(const long & NumVibs, const long & NumAtoms);
+		/** Resize the arrays to the current number of modes.
+		 * @param NumAtoms This is needed to correctly dimension the normal mode array as NumModes*NumAtoms
+		 */
 		bool Resize(long NumAtoms);
-#ifndef __wxBuild__
-		static VibRec * ReadOldVibRec45(BufferFile * Buffer);
-		void ReadCode46(BufferFile * Buffer, long length);
-		void ReadCode47(BufferFile * Buffer, long NumAtoms, long length);
-		static VibRec * Read(BufferFile * Buffer, long NumAtoms);
-		long GetSize(BufferFile *Buffer, long NumAtoms);
-		long Write(BufferFile *Buffer, long NumAtoms);
-#endif
 		void WriteXML(XMLElement * parent, long NumAtoms) const;
 		void ReadXML(XMLElement * parent, const long & NumAtoms);
 		inline long GetNumModes(void) const {return NumModes;};

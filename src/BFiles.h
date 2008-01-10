@@ -36,6 +36,7 @@ typedef enum TextFileType {
 } TextFileType;
 
 /** case insensitive search for the keyword in the char string.
+ * The return value is the position of the first character of the keyword on success or -1 on failure.
  * @param buffer A null-terminated character string to search in.
  * @param keyword The string to search for.
  * @param numbyte The number of bytes in the keyword to match.
