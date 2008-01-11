@@ -3524,6 +3524,14 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
 		test = MainData->OpenCMLFile(Buffer, Prefs, &winData, ProgressInd, readPrefs);
 		if (test) {
 			SetSize(winData.GetMolWinRect());
+			if (Prefs->ToolbarShown()) {
+				ShowToolbar();
+				menuBuild->Check(MMP_SHOW_TOOLBAR, Prefs->ToolbarShown());
+				
+				wxCommandEvent foo;
+				foo.SetId(MMP_TOOL_HAND);
+				OnToggleTool(foo);
+			}
 			wxCommandEvent foo;	//just a placeholder so we can call the menu event functions
 			if (winData.BondsWindowVisible()) menuWindowBonds(foo);
 			if (winData.CoordsWindowVisible()) menuWindowCoordinates(foo);
