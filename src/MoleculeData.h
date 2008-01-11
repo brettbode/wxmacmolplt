@@ -209,7 +209,7 @@ class MoleculeData {
 		 Returns the FRAGNAME for the indicated effective fragment.
 		 \param index The atom index to test
 		 */
-		const char * GetFragmentName(long index) const;
+		const char * GetFragmentName(unsigned long index) const;
 		void GetRotationMatrix(Matrix4D copy);
 		int GetAnnotationCount(void) const {return Annotations.size();};
 		void DeleteAllAnnotations(void);

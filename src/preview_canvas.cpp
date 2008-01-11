@@ -303,7 +303,6 @@ void PreviewCanvas::SetStructure(Structure *structure) {
 
 void PreviewCanvas::OnLeftMouseDown(wxMouseEvent& event) {
 
-	const wxPoint& pt = event.GetPosition();
 	int width, height;
 	
 	GetClientSize(&width, &height);
@@ -324,7 +323,6 @@ int PreviewCanvas::Pick() {
 
 	GLuint buff[SELECT_BUFFER_SIZE];
 	GLint hits, view[4];
-	int id;
 	int selected = -1;
 
 	glSelectBuffer(SELECT_BUFFER_SIZE, buff);
@@ -404,7 +402,6 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 		return;
 	}
 
-	const wxPoint& pt = event.GetPosition();
 	int width, height;
 
 	GetClientSize(&width, &height);

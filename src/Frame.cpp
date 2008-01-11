@@ -61,23 +61,6 @@ Frame::Frame(MolDisplayWin *MolWin) {
 	targeted_atom = -1;
 }
 
-long Frame::Write(BufferFile * Buffer) {
-	long length, total=0;
-
-	length = 3*sizeof(double) + sizeof(float) +3*sizeof(long);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-
-	total += Buffer->Write((Ptr) &Energy, sizeof(double));
-	total += Buffer->Write((Ptr) &KE, sizeof(double));
-	total += Buffer->Write((Ptr) &MP2Energy, sizeof(double));
-	total += Buffer->Write((Ptr) &time, sizeof(float));
-	total += Buffer->Write((Ptr) &IRCPt, sizeof(long));
-	total += Buffer->Write((Ptr) &NumAtoms, sizeof(long));
-	total += Buffer->Write((Ptr) &NumBonds, sizeof(long));
-	
-	return total;
-}
-
 /*
 Frame& Frame::operator= (const Frame& f)
 {
@@ -102,90 +85,6 @@ Frame& Frame::operator= (const Frame& f)
 */
 //not needed currently
 
-void Frame::Read(BufferFile * Buffer, long length) {
-	if (length != (3*sizeof(double) + sizeof(float) +3*sizeof(long))) throw DataError();
-
-	Buffer->Read((Ptr) &Energy, sizeof(double));
-	Buffer->Read((Ptr) &KE, sizeof(double));
-	Buffer->Read((Ptr) &MP2Energy, sizeof(double));
-	Buffer->Read((Ptr) &time, sizeof(float));
-	Buffer->Read((Ptr) &IRCPt, sizeof(long));
-	Buffer->Read((Ptr) &NumAtoms, sizeof(long));
-	Buffer->Read((Ptr) &NumBonds, sizeof(long));
-	if (NumAtoms>0) {
-		Atoms = new mpAtom[NumAtoms];
-		if (!Atoms) throw MemoryError();
-		AtomAllocation = NumAtoms;
-	}
-	if (NumBonds>0) {
-		Bonds = new Bond[NumBonds];
-		if (!Bonds) throw MemoryError();
-		BondAllocation = NumBonds;
-	}
-}
-void Frame::Read41(BufferFile * Buffer, long length) {
-	if (length != 80) throw DataError();
-	Buffer->Read((Ptr) &Energy, sizeof(double));
-	Buffer->Read((Ptr) &KE, sizeof(double));
-	Buffer->Read((Ptr) &MP2Energy, sizeof(double));
-	Buffer->Read((Ptr) &time, sizeof(float));
-	Buffer->Read((Ptr) &IRCPt, sizeof(long));
-	Buffer->BufferSkip(8);
-	Buffer->Read((Ptr) &NumAtoms, sizeof(long));
-	Buffer->BufferSkip(4);
-	Buffer->Read((Ptr) &NumBonds, sizeof(long));
-	Buffer->BufferSkip(28);
-
-	if (NumAtoms>0) {
-		Atoms = new mpAtom[NumAtoms];
-		if (!Atoms) throw MemoryError();
-		AtomAllocation = NumAtoms;
-	}
-	if (NumBonds>0) {
-		Bonds = new Bond[NumBonds];
-		if (!Bonds) throw MemoryError();
-		BondAllocation = NumBonds;
-	}
-	if (SpecialAtoms) {
-		SpecialAtoms = new CPoint3D[NumAtoms];
-		if (!SpecialAtoms) throw MemoryError();
-	}
-}
-void Frame::ConvertCode3(BufferFile * Buffer, long length) {
-	if (length != NumAtoms*sizeof(long)) throw DataError();
-	long * temp = new long[NumAtoms];
-	if (temp) {
-		Buffer->Read((Ptr) temp, length);
-		for (long i=0; i<NumAtoms; i++) {
-			Atoms[i].Type = temp[i];
-		}
-		delete [] temp;
-	} else throw MemoryError();
-}
-void Frame::ConvertCode4(BufferFile * Buffer, long length) {
-	if (length != NumAtoms*sizeof(CPoint3D)) throw DataError();
-	CPoint3D * temp = new CPoint3D[NumAtoms];
-	if (temp) {
-		Buffer->Read((Ptr) temp, length);
-		for (long i=0; i<NumAtoms; i++)
-			Atoms[i].Position = temp[i];
-		delete [] temp;
-	} else throw MemoryError();
-}
-void Frame::ConvertCode5(BufferFile * Buffer, long length) {
-	if (length != NumBonds*2*sizeof(long)) throw DataError();
-	long * temp = new long[2*NumBonds];
-	if (temp) {
-		Buffer->Read((Ptr) temp, length);
-		for (long i=0; i<NumBonds; i++) {
-			Bonds[i].Atom1 = temp[2*i];
-			Bonds[i].Atom2 = temp[2*i+1];
-			Bonds[i].Order = kSingleBond;
-			Bonds[i].Highlite = 0;
-		}
-		delete [] temp;
-	} else throw MemoryError();
-}
 Frame::~Frame(void) {
 	if (Atoms) delete [] Atoms;
 	if (Bonds) delete [] Bonds;
@@ -1964,7 +1863,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 		//			}
 		//		}
 				LastPass = imode;
-				sprintf(LineText, "Read in %d normal modes", LastPass);
+				sprintf(LineText, "Read in %ld normal modes", LastPass);
 				ProgressInd->ChangeText(LineText);
 				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 					{throw UserCancel();}
@@ -2070,14 +1969,14 @@ void Frame::ParseMolDenFrequencies(BufferFile * Buffer, WinPrefs * Prefs) {
 void Frame::toggleMMAtomVisibility(void) {
 	for (int i=0; i<NumAtoms; i++) {
 		if (Atoms[i].IsSIMOMMAtom()) 
-			Atoms[i].SetInvisibility(1-Atoms[i].GetInvisibility());
+			Atoms[i].SetInvisibility(true-Atoms[i].GetInvisibility());
 	}
 }
 
 void Frame::toggleAbInitioVisibility(void) {
 	for (int i=0; i<NumAtoms; i++) {
 		if (! (Atoms[i].IsSIMOMMAtom())) 
-			Atoms[i].SetInvisibility(1-Atoms[i].GetInvisibility());
+			Atoms[i].SetInvisibility(true-Atoms[i].GetInvisibility());
 	}
 }
 
@@ -2096,7 +1995,6 @@ void Frame::resetAllSelectState() {
 int Frame::GetAtomNumBonds(int atom_id) const {
 
 	int num_bonds = 0;
-	int order;
 
 	for (int i = 0; i < NumBonds; i++) {
 		if (Bonds[i].Atom1 == atom_id || Bonds[i].Atom2 == atom_id) {

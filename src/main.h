@@ -56,7 +56,7 @@ class macMenuWinPlaceholder : public wxFrame {
 
 #endif
 
-typedef class setPreference;
+typedef class setPreference setPreference;
 /**
  * Subclasses wxApp to define an application's data and operations.
  */

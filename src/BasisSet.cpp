@@ -165,7 +165,7 @@ void BasisSet::WriteBasis(BufferFile * File, long AtomNum) const {
 						backconv = sqrt(FACG);
 					break;
 				}
-				sprintf(Line, "        %d %f %f", iprim+1, Shells[ishell].Exponent[iprim],
+				sprintf(Line, "        %ld %f %f", iprim+1, Shells[ishell].Exponent[iprim],
 					Shells[ishell].NormCoef[iprim]*backconv);
 				File->WriteLine(Line, false);
 				if (Shells[ishell].ShellType == LShell) {

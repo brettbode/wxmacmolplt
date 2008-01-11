@@ -1535,10 +1535,6 @@ void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
 	Frame * lFrame = cFrame;
 	Frame * lEndFrame = lFrame->NextFrame;
 	long NumAtoms = lFrame->NumAtoms;
-	long memNeeded = (NumPts+1)*(sizeof(Frame)+NumAtoms*sizeof(mpAtom))+5000;
-#ifndef __wxBuild__
-	if (MaxBlock() < memNeeded) return;	//roughly determine if sufficient memory is available
-#endif
 	
 	CPoint3D * offset = new CPoint3D[NumAtoms];
 	if (!offset) throw MemoryError();
@@ -1793,7 +1789,7 @@ void MoleculeData::DeleteAllAnnotations(void) {
 	}
 	Annotations.clear();
 }
-const char * MoleculeData::GetFragmentName(long index) const {
+const char * MoleculeData::GetFragmentName(unsigned long index) const {
 	if (index < FragmentNames.size())
 		return FragmentNames[index].c_str();
 	else

@@ -28,7 +28,7 @@
 /*!
  * Forward declarations
  */
-typedef class MolDisplayWin;
+typedef class MolDisplayWin MolDisplayWin;
 ////@begin forward declarations
 ////@end forward declarations
 

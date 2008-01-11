@@ -1598,7 +1598,6 @@ void InputBuilderWindow::SetupItems() {
 }
 
 void InputBuilderWindow::SetupBasisItems() {
-    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     short BasisValue = TmpInputRec->Basis->GetBasis();
     short NumGauss = TmpInputRec->Basis->GetNumGauss();
     int itemValue = 0;
@@ -1791,7 +1790,7 @@ void InputBuilderWindow::SetupControlItems() {
     // multText
     itemValue = TmpInputRec->Control->GetMultiplicity();
     if(itemValue <= 0) {
-        if(NumElectrons & 1) itemValue == 2;
+        if(NumElectrons & 1) itemValue = 2;
         else itemValue = 1;
     }
     multText->SetValue(wxString::Format(wxT("%d"), itemValue));
@@ -1801,7 +1800,6 @@ void InputBuilderWindow::SetupControlItems() {
 }
 
 void InputBuilderWindow::SetupDataItems() {
-    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     int itemValue;
 	
 	//Title
@@ -1855,7 +1853,6 @@ void InputBuilderWindow::SetupPointGroupOrder(void) {
 }
 
 void InputBuilderWindow::SetupSystemItems() {
-    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     
     // timeLimitText
     wxString time;
@@ -1897,8 +1894,6 @@ void InputBuilderWindow::SetupSystemItems() {
 }
 
 void InputBuilderWindow::SetupDFTItems() {
-    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
-
     if(TmpInputRec->DFT == NULL) {
         TmpInputRec->DFT = new DFTGroup;
     }
@@ -1942,7 +1937,7 @@ void InputBuilderWindow::SetupMOGuessItems() {
 		mMOSourceChoice->Append(wxString(_("By Hand Later")));
 		short tempVec = TmpInputRec->Guess->GetVecSource();
 		if (Orbs->size() > 0) {
-			if ((tempVec<=0)||(tempVec>Orbs->size() + 2)) tempVec = 2;
+			if ((tempVec<=0)||(tempVec > (Orbs->size() + 2))) tempVec = 2;
 			std::vector<OrbitalRec *>::const_iterator OrbSet = Orbs->begin();
 			while (OrbSet != Orbs->end()) {	//Build the popup menu
 				switch ((*OrbSet)->getOrbitalType()) {
@@ -2222,7 +2217,6 @@ void InputBuilderWindow::SetupStatPointItems() {
 }
 
 void InputBuilderWindow::SetupSummaryItems() {
-    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	
 	if (TmpInputRec->Data->GetTitle()) {
 		mTitleText->SetValue(wxString(TmpInputRec->Data->GetTitle(), wxConvUTF8));

@@ -450,7 +450,7 @@ XMLElement::XMLElement(const char * Buffer, int & bytesConsumed, int recursionDe
 				} else if (!strncmp("&#xD;", &(Buffer[cstart+c]), 5)) {
 					value[nc] = '\13';
 				} else {	//some other hash or an illegal char
-					value[nc];
+	//				value[nc];
 				}
 			}
 			nc++;
@@ -1058,7 +1058,7 @@ int XMLElement::getElementCount(const char * name) const {
 }
 
 void XMLElement::ParseNamespaceTags(std::vector<std::string> & tagNames, std::vector<int> & tagIds) {
-	int numLocalTags = 0;	//keep track of ids defined in this element as
+//	int numLocalTags = 0;	//keep track of ids defined in this element as
 							//they must be removed before exiting
 		//Search for namespace definition attributes first
 }

@@ -312,12 +312,6 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 	int edgePassWidth = 0;
 	int edgePassHeight = 0;
 
-	int passX = 0;
-	int passY = 0;
-
-	long hOffset = 0;
-	long vOffset = 0;
-
 	GLbyte *pixels;
 
 	if (!GetContext()) {
@@ -775,7 +769,6 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
 			CPoint3D vec_new;
 			float vec1_len;
 			float dist;
-			int origin_id;
 			CPoint3D origin_pos;
 			float mu;
 			CPoint3D vec3;
@@ -1840,7 +1833,6 @@ void MpGLCanvas::HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt) {
 	GLint viewport[4];
 	GLdouble win_x, win_y, win_z;
 	Frame *lFrame = mMainData->cFrame;
-	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
 
 	glGetIntegerv(GL_VIEWPORT, viewport);
@@ -1926,7 +1918,6 @@ void MpGLCanvas::findReal3DCoord(GLdouble x, GLdouble y, GLdouble z, GLdouble& r
 void MpGLCanvas::testPicking(int x, int y) {
 	GLuint buff[SELECT_BUFFER_SIZE];
 	GLint hits, view[4];
-	int id;
 
 	glSelectBuffer(SELECT_BUFFER_SIZE, buff);
 	glGetIntegerv(GL_VIEWPORT, view);
@@ -2021,7 +2012,6 @@ void MpGLCanvas::SelectObj(int selected_type, int select_id, bool unselect_all) 
 
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
-	mpAtom *lAtoms = lFrame->Atoms;
 	Bond *lBonds = lFrame->Bonds;
 
 	if (unselect_all) {
@@ -2186,7 +2176,6 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 	wxMenuItem *item;
 	wxMenu *submenu;
 	Frame *lFrame = mMainData->cFrame;
-	long NumAtoms = lFrame->NumAtoms;
 	int bond_order;
 	submenu = new wxMenu();
 	wxString length_label;
@@ -2525,7 +2514,6 @@ void MpGLCanvas::measurePopupMenu(int x, int y) {
 
 void MpGLCanvas::annoPopupMenu(int x, int y) {
 
-	Frame *lFrame = mMainData->cFrame;
 	wxMenu menu;
 	wxMenuItem *item;
 
@@ -2598,8 +2586,6 @@ void MpGLCanvas::SetAnnotationParameter(wxCommandEvent& event) {
 
 void MpGLCanvas::ConstrainToAnnotation(wxCommandEvent& event) {
 
-	Frame *lFrame = mMainData->cFrame;
-
 	if (mMainData->GetConstrainAnnotation() != selected) {
 		mMainData->ConstrainToAnnotation(selected);
 	} else {
@@ -2609,8 +2595,6 @@ void MpGLCanvas::ConstrainToAnnotation(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
-
-	Frame *lFrame = mMainData->cFrame;
 
 	Annotation * t = mMainData->Annotations[selected];
 	mMainData->Annotations.erase(mMainData->Annotations.begin() + selected);
@@ -2714,7 +2698,6 @@ void MpGLCanvas::bondPopupMenu(int x, int y) {
 	wxMenuItem *item;
 	wxMenu *submenu;
 	Frame *lFrame = mMainData->cFrame;
-	long NumAtoms = lFrame->NumAtoms;
 	int bond_order;
 	submenu = new wxMenu();
 	wxString length_label;
@@ -2889,7 +2872,6 @@ void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
 
 void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 	Frame *  lFrame = mMainData->cFrame;
-	long NumAtoms = lFrame->NumAtoms;
 
 	Frame * cFrame = mMainData->Frames;
 
@@ -2912,7 +2894,6 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 	MolWin->CreateFrameSnapShot();
 	Frame * lFrame = mMainData->cFrame;
-	long NumAtoms = lFrame->NumAtoms;
 
 	if (selected_type == MMP_ATOM) {
 
@@ -2948,7 +2929,6 @@ void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
 
 	MolWin->CreateFrameSnapShot();
 	Frame * lFrame = mMainData->Frames;
-	long NumAtoms = mMainData->cFrame->NumAtoms;
 
 	if (selected_type == MMP_ATOM)
 		mMainData->DeleteAtom(selected, true);

@@ -1986,8 +1986,6 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event ) {
 	bool updateGrid=UpdateTest;
 	bool updateContour=false;
   
-	wxWindow * focusWindow = wxWindow::FindFocus();
-
 	if (PlotOrb >= 0) {	//Don't update unless a valid orbital is chosen
 		if (TargetSet != mTarget->GetTargetSet()) updateGrid = true;
 		if (PlotOrb != mTarget->GetTargetOrb()) updateGrid=true;
@@ -2871,7 +2869,7 @@ void BaseSurfacePane::BuildOrbSetPopup(void) {
 	
 	if (Orbs->size() > 0) {
 		std::vector<OrbitalRec *>::const_iterator OrbSet = Orbs->begin();
-		long	OrbSetCount = 0;
+		unsigned long	OrbSetCount = 0;
 		while (OrbSet != Orbs->end()) {
 			if ((*OrbSet)->TotalDensityPossible()) {
 				switch ((*OrbSet)->getOrbitalType()) {
@@ -4551,7 +4549,6 @@ void Surface3DParamDlg::createControls()
 {
   wxString tmpStr;
   CPoint3D tempPt;
-  float tempFlt;
 
   mainSizer = new wxBoxSizer(wxVERTICAL);
 

@@ -34,13 +34,13 @@ Added OpenGL version of Draw3D to Surface 6/2001 BMB
 typedef class MoleculeData MoleculeData;
 typedef class WinPrefs WinPrefs;
 typedef class Progress Progress;
-typedef class GaussHermiteData GaussHermiteData;
+typedef struct GaussHermiteData GaussHermiteData;
 typedef class BasisSet BasisSet;
 typedef class Frame Frame;
 typedef class InputData InputData;
 typedef class Internals Internals;
 typedef class XMLElement XMLElement;
-typedef class MolDisplayWin;
+typedef class MolDisplayWin MolDisplayWin;
 
 /* class Frame; */
 
@@ -593,7 +593,7 @@ class Surface {
 		inline long GetSurfaceID(void) const {return ID;};
 		inline long SetSurfaceID(long NewID) {ID = NewID; return ID;};
 		inline long SetSurfaceID(void) {/*ID = TickCount(); return ID;*/
-                                        static long ID = 0; return ++ID;};
+                                        static long global_ID = 0; return ++global_ID;};
 		virtual void RotateEvent(MoleculeData * MainData);
 		virtual void WriteXML(XMLElement * parent) const;
 		virtual bool ReadXML(XMLElement * parent);

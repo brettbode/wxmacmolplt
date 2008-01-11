@@ -81,7 +81,7 @@ void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CP
 	Buffer->PutText(Label);
 	Buffer->PutText("\r");
 		//Write out the number of grid points in each direction
-	sprintf(Line, "%d %d %d   //nx ny nz\r", nx,ny,nz);
+	sprintf(Line, "%ld %ld %ld   //nx ny nz\r", nx,ny,nz);
 	Buffer->PutText(Line);	//true means add a line feed
 	sprintf(Line, "%g %g %g   //Origin of the 3D grid\r", Origin->x, Origin->y, Origin->z);
 	Buffer->PutText(Line);
@@ -113,7 +113,7 @@ void Surface::Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Or
 	Buffer->PutText(Label);
 	Buffer->PutText("\r");
 		//Write out the number of grid points in each direction
-	sprintf(Line, "%d    //# grid points\r", NumPoints);
+	sprintf(Line, "%ld    //# grid points\r", NumPoints);
 	Buffer->PutText(Line);	//true means add a line feed
 	sprintf(Line, "%g %g %g   //Origin of the 2D grid\r", Origin->x, Origin->y, Origin->z);
 	Buffer->PutText(Line);

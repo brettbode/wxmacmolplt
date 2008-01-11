@@ -53,10 +53,9 @@ long BuilderDlg::WriteCMLFile(BufferFile *Buffer) const {
 	xmlRoot->addAttribute("xmlns", "http://www.xml-cml.org/schema/cml2/core");
 
 	XMLElement *MetaDataListXML = xmlRoot->addChildElement(CML_convert(MetaDataListElement));
-	Structure *struc;
 	XMLElement *el = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 	el->addAttribute(CML_convert(nameAttr), CML_convert(MMP_Structures));
-	for (int i = 0; i < structures.size(); i++) {
+	for (unsigned int i = 0; i < structures.size(); i++) {
 		structures[i]->WriteXML(el);
 	}
 
@@ -247,7 +246,7 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 		if (FragmentNames.size() > 0) {
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_FragmentNameList));
-			for (int i=0; i<FragmentNames.size(); i++) {
+			for (unsigned int i=0; i<FragmentNames.size(); i++) {
 				XMLElement * FN = Ele->addChildElement(kFRAGNAMEXML, FragmentNames[i].c_str());
 			}
 		}
@@ -358,12 +357,12 @@ void BasisSet::WriteXML(XMLElement * parent) const {
 	t->addAttribute(CML_convert(MMP_BSMapLength), MapLength);
 	t->addAttribute(CML_convert(MMP_BSNumShells), NumShells);
 	t->addAttribute(CML_convert(MMP_BSNumFunctions), NumFuncs);
-	for (int i=0; i<Shells.size(); i++) {
+	for (unsigned int i=0; i<Shells.size(); i++) {
 		Shells[i].WriteXML(t);
 	}
 	if (BasisMap.size()) {
 		std::ostringstream buf;
-		for (int i=0; i<BasisMap.size(); i++) buf << BasisMap[i] << " ";
+		for (unsigned int i=0; i<BasisMap.size(); i++) buf << BasisMap[i] << " ";
 		XMLElement * map = t->addChildElement(CML_convert(ArrayElement),
 														buf.str().c_str());
 		map->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
@@ -372,7 +371,7 @@ void BasisSet::WriteXML(XMLElement * parent) const {
 	}
 	if (NuclearCharge.size()) {
 		std::ostringstream buf;
-		for (int i=0; i<NuclearCharge.size(); i++) buf << NuclearCharge[i] << " ";
+		for (unsigned int i=0; i<NuclearCharge.size(); i++) buf << NuclearCharge[i] << " ";
 		XMLElement * map = t->addChildElement(CML_convert(ArrayElement),
 											  buf.str().c_str());
 		map->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
@@ -386,7 +385,7 @@ void BasisShell::WriteXML(XMLElement * parent) const {
 	t->addAttribute(CML_convert(MMP_BSNumPrims), NumPrims);
 	if (Exponent.size()) {
 		std::ostringstream buf;
-		for (int i=0; i<Exponent.size(); i++) buf << Exponent[i] << " ";
+		for (unsigned int i=0; i<Exponent.size(); i++) buf << Exponent[i] << " ";
 		XMLElement * map = t->addChildElement(CML_convert(ArrayElement),
 											  buf.str().c_str());
 		map->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
@@ -395,7 +394,7 @@ void BasisShell::WriteXML(XMLElement * parent) const {
 	}
 	if (NormCoef.size()) {
 		std::ostringstream buf;
-		for (int i=0; i<NormCoef.size(); i++) buf << NormCoef[i] << " ";
+		for (unsigned int i=0; i<NormCoef.size(); i++) buf << NormCoef[i] << " ";
 		XMLElement * map = t->addChildElement(CML_convert(ArrayElement),
 											  buf.str().c_str());
 		map->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
@@ -404,7 +403,7 @@ void BasisShell::WriteXML(XMLElement * parent) const {
 	}
 	if (InputCoef.size()) {
 		std::ostringstream buf;
-		for (int i=0; i<InputCoef.size(); i++) buf << InputCoef[i] << " ";
+		for (unsigned int i=0; i<InputCoef.size(); i++) buf << InputCoef[i] << " ";
 		XMLElement * map = t->addChildElement(CML_convert(ArrayElement),
 											  buf.str().c_str());
 		map->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
@@ -453,7 +452,7 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 			XMLElement * bondEle = bondArrayEle->addChildElement(CML_convert(BondElement));
 			snprintf(line, kMaxLineLength, "b%d", j);
 			bondEle->addAttribute(CML_convert(IdAttr), line);
-			snprintf(line, kMaxLineLength, "a%d a%d", Bonds[j].Atom1, Bonds[j].Atom2);
+			snprintf(line, kMaxLineLength, "a%ld a%ld", Bonds[j].Atom1, Bonds[j].Atom2);
 			bondEle->addAttribute(CML_convert(atomRefs2Attr), line);
 			bondEle->addAttribute(CML_convert(orderAttr), CML_convert(Bonds[j].Order));
 		}
@@ -512,7 +511,7 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 				XMLElement * bondEle = bondArrayEle->addChildElement(CML_convert(BondElement));
 				snprintf(line, kMaxLineLength, "b%d", j);
 				bondEle->addAttribute(CML_convert(IdAttr), line);
-				snprintf(line, kMaxLineLength, "a%d a%d", Bonds[j].Atom1, Bonds[j].Atom2);
+				snprintf(line, kMaxLineLength, "a%ld a%ld", Bonds[j].Atom1, Bonds[j].Atom2);
 				bondEle->addAttribute(CML_convert(atomRefs2Attr), line);
 				bondEle->addAttribute(CML_convert(orderAttr), CML_convert(Bonds[j].Order));
 			}
@@ -642,9 +641,9 @@ void OrbitalRec::WriteXML(XMLElement * parent) const {
 													 fbuf.str().c_str());
 		vectors->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
 		vectors->addAttribute(CML_convert(titleAttr), CML_convert(MMP_OrbVectors));
-		snprintf(line, kMaxLineLength, "%d", NumAlphaOrbs);
+		snprintf(line, kMaxLineLength, "%ld", NumAlphaOrbs);
 		vectors->addAttribute(CML_convert(columnsAttr), line);
-		snprintf(line, kMaxLineLength, "%d", NumBasisFunctions);
+		snprintf(line, kMaxLineLength, "%ld", NumBasisFunctions);
 		vectors->addAttribute(CML_convert(rowsAttr), line);
 	}
 	if (VectorsB) {
@@ -658,9 +657,9 @@ void OrbitalRec::WriteXML(XMLElement * parent) const {
 														fbuf.str().c_str());
 		vectors->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
 		vectors->addAttribute(CML_convert(titleAttr), CML_convert(MMP_BetaOrbVectors));
-		snprintf(line, kMaxLineLength, "%d", NumBetaOrbs);
+		snprintf(line, kMaxLineLength, "%ld", NumBetaOrbs);
 		vectors->addAttribute(CML_convert(columnsAttr), line);
-		snprintf(line, kMaxLineLength, "%d", NumBasisFunctions);
+		snprintf(line, kMaxLineLength, "%ld", NumBasisFunctions);
 		vectors->addAttribute(CML_convert(rowsAttr), line);
 	}
 	if (Energy) {
@@ -672,7 +671,7 @@ void OrbitalRec::WriteXML(XMLElement * parent) const {
 														fbuf.str().c_str());
 		vectors->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
 		vectors->addAttribute(CML_convert(titleAttr), CML_convert(MMP_OrbEnergies));
-		snprintf(line, kMaxLineLength, "%d", NumAlphaOrbs);
+		snprintf(line, kMaxLineLength, "%ld", NumAlphaOrbs);
 		vectors->addAttribute(CML_convert(sizeAttr), line);
 	}
 	if (EnergyB) {
@@ -684,7 +683,7 @@ void OrbitalRec::WriteXML(XMLElement * parent) const {
 														fbuf.str().c_str());
 		vectors->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
 		vectors->addAttribute(CML_convert(titleAttr), CML_convert(MMP_BetaOrbEnergies));
-		snprintf(line, kMaxLineLength, "%d", NumBetaOrbs);
+		snprintf(line, kMaxLineLength, "%ld", NumBetaOrbs);
 		vectors->addAttribute(CML_convert(sizeAttr), line);
 	}
 	if (OrbOccupation) {
@@ -696,7 +695,7 @@ void OrbitalRec::WriteXML(XMLElement * parent) const {
 														fbuf.str().c_str());
 		vectors->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
 		vectors->addAttribute(CML_convert(titleAttr), CML_convert(MMP_OrbOccupations));
-		snprintf(line, kMaxLineLength, "%d", NumAlphaOrbs);
+		snprintf(line, kMaxLineLength, "%ld", NumAlphaOrbs);
 		vectors->addAttribute(CML_convert(sizeAttr), line);
 	}
 	if (OrbOccupationB) {
@@ -708,7 +707,7 @@ void OrbitalRec::WriteXML(XMLElement * parent) const {
 														fbuf.str().c_str());
 		vectors->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
 		vectors->addAttribute(CML_convert(titleAttr), CML_convert(MMP_BetaOrbOccupations));
-		snprintf(line, kMaxLineLength, "%d", NumBetaOrbs);
+		snprintf(line, kMaxLineLength, "%ld", NumBetaOrbs);
 		vectors->addAttribute(CML_convert(sizeAttr), line);
 	}
 	if (SymType) {
@@ -726,7 +725,7 @@ void OrbitalRec::WriteXML(XMLElement * parent) const {
 		XMLElement * vectors = orbElem->addChildElement(CML_convert(ArrayElement), sbuf.str().c_str());
 		vectors->addAttribute(CML_convert(dataTypeAttr), "xsd:string"); //required for the matrix XML element
 		vectors->addAttribute(CML_convert(titleAttr), CML_convert(MMP_OrbSyms));
-		snprintf(line, kMaxLineLength, "%d", NumAlphaOrbs);
+		snprintf(line, kMaxLineLength, "%ld", NumAlphaOrbs);
 		vectors->addAttribute(CML_convert(sizeAttr), line);
 	}
 	if (SymTypeB) {
@@ -744,7 +743,7 @@ void OrbitalRec::WriteXML(XMLElement * parent) const {
 		XMLElement * vectors = orbElem->addChildElement(CML_convert(ArrayElement), sbuf.str().c_str());
 		vectors->addAttribute(CML_convert(dataTypeAttr), "xsd:string"); //required for the matrix XML element
 		vectors->addAttribute(CML_convert(titleAttr), CML_convert(MMP_BetaOrbSyms));
-		snprintf(line, kMaxLineLength, "%d", NumBetaOrbs);
+		snprintf(line, kMaxLineLength, "%ld", NumBetaOrbs);
 		vectors->addAttribute(CML_convert(sizeAttr), line);
 	}
 }
@@ -761,7 +760,7 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 	Ele->addAttribute(CML_convert(titleAttr), CML_convert(MMP_CurrentMode));
 	//Build a space separated string of the vibrational frequencies
 	std::ostringstream fbuf;
-	for (int i=0; i<Frequencies.size(); i++) {
+	for (unsigned int i=0; i<Frequencies.size(); i++) {
 		if (i>0) fbuf << "|";
 		fbuf << Frequencies[i];
 	}
@@ -770,7 +769,7 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 	char line[kMaxLineLength];
 	freqXML->addAttribute(CML_convert(dataTypeAttr), "xsd:string");
 	freqXML->addAttribute(CML_convert(titleAttr), CML_convert(MMP_VibFrequencies));
-	snprintf(line, kMaxLineLength, "%d", NumModes);
+	snprintf(line, kMaxLineLength, "%ld", NumModes);
 	freqXML->addAttribute(CML_convert(sizeAttr), line);
 		//Add Normal Modes as a matrix
 	std::ostringstream freqbuf;
@@ -785,7 +784,7 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 	modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 	modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_VibNormalModes));
 	modes->addAttribute(CML_convert(columnsAttr), "3");
-	snprintf(line, kMaxLineLength, "%d", (NumModes*NumAtoms));
+	snprintf(line, kMaxLineLength, "%ld", (NumModes*NumAtoms));
 	modes->addAttribute(CML_convert(rowsAttr), line);
 	
 	if (!Intensities.empty()) {
@@ -799,7 +798,7 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 													 freqbuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_VibIntensity));
-		snprintf(line, kMaxLineLength, "%d", NumModes);
+		snprintf(line, kMaxLineLength, "%ld", NumModes);
 		modes->addAttribute(CML_convert(sizeAttr), line);
 	}
 	if (!ReducedMass.empty()) {
@@ -813,7 +812,7 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 													 freqbuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_ReducedMass));
-		snprintf(line, kMaxLineLength, "%d", NumModes);
+		snprintf(line, kMaxLineLength, "%ld", NumModes);
 		modes->addAttribute(CML_convert(sizeAttr), line);
 	}
 	if (!RamanIntensity.empty()) {
@@ -827,7 +826,7 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 													 freqbuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_RamanIntensity));
-		snprintf(line, kMaxLineLength, "%d", NumModes);
+		snprintf(line, kMaxLineLength, "%ld", NumModes);
 		modes->addAttribute(CML_convert(sizeAttr), line);
 	}
 	if (!Depolarization.empty()) {
@@ -841,7 +840,7 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 													 freqbuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_Depolarization));
-		snprintf(line, kMaxLineLength, "%d", NumModes);
+		snprintf(line, kMaxLineLength, "%ld", NumModes);
 		modes->addAttribute(CML_convert(sizeAttr), line);
 	}
 }
@@ -911,7 +910,7 @@ void GradientData::WriteXML(XMLElement * parent) {
 		grad->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		grad->addAttribute(CML_convert(titleAttr), CML_convert(MMP_CartesianGradient));
 		grad->addAttribute(CML_convert(columnsAttr), "3");
-		snprintf(line, kMaxLineLength, "%d", CartAllocation);
+		snprintf(line, kMaxLineLength, "%ld", CartAllocation);
 		grad->addAttribute(CML_convert(rowsAttr), line);
 	}
 }
@@ -969,7 +968,7 @@ void Structure::WriteXML(XMLElement *parent) const {
 		snprintf(line, kMaxLineLength, "b%d", i);
 		bond_el->addAttribute(CML_convert(IdAttr), line);
 
-		snprintf(line, kMaxLineLength, "a%d a%d", bonds[i].Atom1,
+		snprintf(line, kMaxLineLength, "a%ld a%ld", bonds[i].Atom1,
 				 bonds[i].Atom2);
 		bond_el->addAttribute(CML_convert(atomRefs2Attr), line);
 		bond_el->addAttribute(CML_convert(orderAttr),
@@ -1654,7 +1653,6 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::vector<char *> & idList) 
 }
 void Frame::ParseAtomAttributeArrayXML(XMLElement * arrayXML, const std::vector<char *> & idList) {
 	//The atom information can be in the form of Atom subelements or (gross) string attributes.
-	const char * etype = NULL, *xcoord = NULL, *ycoord = NULL, *zcoord=NULL, *idresult=NULL;
 	//Parse the subelements
 	XMLElementList * children = arrayXML->getChildren();
 	for (int i=0; i<children->length(); i++) {
@@ -1668,9 +1666,9 @@ void Frame::ParseAtomAttributeArrayXML(XMLElement * arrayXML, const std::vector<
 						const char * idresult = child->getAttributeValue(CML_convert(IdAttr));
 						if (!idresult) continue;
 						long atomId=-1;
-						for (i=0; i<idList.size(); i++) {
-							if (!strcmp(idresult, idList[i])) {
-								atomId = i;
+						for (unsigned int ii=0; ii<idList.size(); ii++) {
+							if (!strcmp(idresult, idList[ii])) {
+								atomId = ii;
 								break;
 							}
 						}
@@ -1871,7 +1869,8 @@ void Frame::ParseBondArrayXML(XMLElement * arrayXML, const std::vector<char *> &
 			int n2 = sscanf(&(atmref2[ar2pos]), "%s%n", atm2, &nchar);
 			ar2pos += nchar;
 			if ((n1!=1)||(n2!=1)) break;
-			long id1=-1, id2=-1, i;
+			long id1=-1, id2=-1;
+			unsigned long i;
 			for (i=0; i<idList.size(); i++) {
 				if (!strcmp(atm1, idList[i])) {
 					id1 = i;
@@ -1918,7 +1917,7 @@ bool Frame::ParseBondXML(XMLElement * bondXML, const std::vector<char *> & idLis
 				char * atm2 = new char [len+1];
 				sscanf(et, "%s %s", atm1, atm2);
 				if ((strlen(atm1) > 0)&&(strlen(atm2) > 0)) {
-					int i;
+					unsigned int i;
 					long id1=-1, id2=-1;
 					for (i=0; i<idList.size(); i++) {
 						if (!strcmp(atm1, idList[i])) {
@@ -1959,7 +1958,7 @@ bool Frame::ParseBondXML(XMLElement * bondXML, const std::vector<char *> & idLis
 						const char * value = child->getValue();
 						switch (att) {
 							case atomRefAttr:
-								for (int j=0; j<idList.size(); j++) {
+								for (unsigned int j=0; j<idList.size(); j++) {
 									if (!strcmp(value, idList[j])) {
 										if (nrefs==0) {
 											id1 = j;
@@ -2753,7 +2752,7 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 
 		attr = bond_el->getAttributeValue(CML_convert(atomRefs2Attr));
 		if (!attr) return false;
-		sscanf(attr, "a%d a%d", &bonds[i].Atom1, &bonds[i].Atom2);
+		sscanf(attr, "a%ld a%ld", &bonds[i].Atom1, &bonds[i].Atom2);
 
 		attr = bond_el->getAttributeValue(CML_convert(orderAttr));
 		if (!attr) return false;

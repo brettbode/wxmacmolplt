@@ -43,7 +43,7 @@ void ChooseDialog::OnChange(wxCommandEvent& event) {
 void ChooseDialog::Create(wxWindow *parent, wxWindowID id, wxString& message,
 						  int nitems, wxString *items) {
 
-	wxBoxSizer *main_sizer, *upper_sizer, *lower_sizer;
+	wxBoxSizer *upper_sizer, *lower_sizer;
 	wxButton *button_ok, *button_cancel;
 
 	wxDialog::Create(parent, id, wxT("select..."), wxDefaultPosition,

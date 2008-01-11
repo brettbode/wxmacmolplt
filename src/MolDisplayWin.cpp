@@ -2227,8 +2227,6 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 	mpAtom *atoms = frame->Atoms;
 	Bond *bonds = frame->Bonds;
 	Structure *struc;
-	mpAtom *structure_atoms;
-	Bond *structure_bonds;
 	int si = 0;
 	int ai, bi;
 	int *new_ids;
@@ -3208,8 +3206,6 @@ void MolDisplayWin::UpdateFrameText(void) {
 		EnergyOptions * lEOpts = Prefs->GetEnergyOptions();
 		GraphOptions * lPOpts = Prefs->GetGraphOptions();
 		float   UnitFactor = 1.0;
-		char    eText[kMaxLineLength] = "";
-		long    length=0;
 		if (lEOpts->GetDisplayUnits() == kKCalPerMole) UnitFactor = kHartreeTokCalPMol;
 		if (lEOpts->PlotMPEnergy())
 			Energy = (MainData->cFrame->MP2Energy-lEOpts->GetY1Zero())*UnitFactor;

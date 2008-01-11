@@ -194,7 +194,6 @@ void EnergyPlotDialog::RegenData(void) {
     vector< pair< int, double > > bondLenData;
     vector< pair< int, double > > bondAngleData;
     Frame *currFrame = NULL;
-    float temp;
     long atom1 = gOpts->Get1stAtom();
     long atom2 = gOpts->Get2ndAtom();
     long atom3 = gOpts->Get3rdAtom();

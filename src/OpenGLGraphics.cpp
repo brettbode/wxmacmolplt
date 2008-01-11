@@ -1128,7 +1128,6 @@ void AnnotationDihedral::draw(const MolDisplayWin * win) const {
 	CPoint3D binormal2;
 	Matrix4D plane2xy;
 	float angle;
-	GLuint stipple_tex;
 	GLfloat color[4];
 
 	glGetFloatv(GL_CURRENT_COLOR, color);
@@ -1401,7 +1400,6 @@ void MolDisplayWin::DrawLabel() {
 	wxString atomLabel;
 	long CurrentAtomType;
 	CPoint3D origPt, transPt;
-	long CurrentAtom;
 	if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) {
 		glLoadName(MMP_ATOM);
 		glPushName(0);
@@ -1525,7 +1523,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 	long NumBonds = lFrame->NumBonds;
 	float AtomScale = Prefs->GetAtomScale();
 	float Quality = Prefs->GetQD3DAtomQuality();
-	GLdouble BondSize = Prefs->GetQD3DBondWidth();
 	GLfloat bg_invert[3];
 
 	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
@@ -1837,7 +1834,6 @@ void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 
 	Prefs.ChangeColorBondColor(kHydrogenBond);
 	GLdouble BondSize = Prefs.GetQD3DBondWidth() * 0.5;
-	float Quality = Prefs.GetQD3DAtomQuality();
 	/* Frame *	lFrame=MainData->cFrame; */
 	/* long atom1 = lFrame->Bonds[bondNum].Atom1; */
 	/* long atom2 = lFrame->Bonds[bondNum].Atom2; */
@@ -1930,7 +1926,6 @@ void MolDisplayWin::AddAxisGL(void) {
 	glColor3f(anno_color[0], anno_color[1], anno_color[2]);
 	long Quality = (long)(Prefs->GetQD3DAtomQuality());
 	float VectorWidth = 0.02;
-	float LabelSize = Prefs->GetAnnotationLabelSize();
 
 	CPoint3D vector = CPoint3D(1.0f, 0.0f, 0.0f);
 	CPoint3D NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
@@ -2819,7 +2814,7 @@ long Surf3DBase::CreateWireFrameSurfaceWithLines(CPoint3D * Vertices, long * vLi
 									RGBColor * NColor, float MaxSurfaceValue, MoleculeData * )
 {
 	long				v1, v2, v3, result=0;
-	GLfloat				alpha=1.0, red, green, blue, xnorm, ynorm, znorm;
+	GLfloat				alpha=1.0, red, green, blue;
 	
 	red = (float) SurfaceColor->red/65536.0;
 	green = (float) SurfaceColor->green/65536.0;
@@ -3225,7 +3220,7 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 void DrawInversionPoint(void) {
 	GLUquadricObj * qobj = NULL;
 	qobj = gluNewQuadric();
-	float sphere_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
+//	float sphere_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
 	float sphere_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	float sphere_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 	
@@ -3635,14 +3630,13 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	Frame *	lFrame=MainData->cFrame;
 	mpAtom * lAtoms = lFrame->Atoms;
 	Bond * lBonds = lFrame->Bonds;
-	long NumAtoms = lFrame->NumAtoms;
 	long NumBonds = lFrame->NumBonds;
 	
 	short coordination = lAtoms[iatom].GetCoordinationNumber();
 	std::vector<Bond *> bonds;
 	int bonded_atoms[6];
 	CPoint3D vecs[6];
-	int i;
+	unsigned int i;
 
 	bonds.reserve(6);
 
@@ -3684,7 +3678,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	int lpCount = lAtoms[iatom].GetLonePairCount();
 	
 	CPoint3D origin = CPoint3D(0.0f, 0.0f, 0.0f);
-	float c, s, b, d;
+	float c, s, b;
 
 	Matrix4D rot;
 	InitRotationMatrix(rot);

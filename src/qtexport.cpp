@@ -322,7 +322,6 @@ void MolDisplayWin::WriteQTMovie(wxString & filepath) {
 			mCodec = kMPEG4VisualCodecType;
 	}
 
-	FSRef mFSRef;
 	OSStatus s;
 	OSErr myErr = myErr;
 	FSSpec targetSpec;

@@ -89,13 +89,6 @@ class Frame {
 		//Frame& operator= (const Frame& f);
 		//assignment operator overload -- not needed currently
 
-		void Read(BufferFile * Buffer, long length);
-		long Write(BufferFile * Buffer);
-		void Read41(BufferFile * Buffer, long length);
-		void ConvertFrameCode2(BufferFile * Buffer);
-		void ConvertCode3(BufferFile * Buffer, long length);
-		void ConvertCode4(BufferFile * Buffer, long length);
-		void ConvertCode5(BufferFile * Buffer, long length);
 		void SetNextFrame(Frame *);
 		void SetPreviousFrame(Frame *);
 		Frame * GetNextFrame(void);

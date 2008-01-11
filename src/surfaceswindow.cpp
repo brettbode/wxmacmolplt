@@ -284,7 +284,7 @@ void SurfacesWindow::addNewPane(int type) {
 }
 void SurfacesWindow::Reset(void) {
 	//rebuild the list of surfaces
-	int oldpage = book->GetSelection();
+//	int oldpage = book->GetSelection();
 	book->DeleteAllPages();
 	
 	BaseSurfacePane* tempPane = NULL;
@@ -563,7 +563,6 @@ void SurfacesWindow::OnSurftitleUpdated( wxCommandEvent& event )
 	//a TEXT_UPDATED event. To avoid treating these as actual edits I set the setValueCalled
 	//flag before calling SetValue and then clear it here instead of looking at the value.
 	if (!setValueCalled) {
-		int id = book->GetSelection();
 		wxString newLabel = surfTitleEdit->GetValue();
 		
 		BaseSurfacePane* tempPane = (BaseSurfacePane * ) book->GetCurrentPage();

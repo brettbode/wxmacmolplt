@@ -64,9 +64,9 @@ typedef class InputBuilderWindow InputBuilderWindow;
 typedef class ModeAnimation ModeAnimation;
 typedef class ZMatrixCalculator ZMatrixCalculator;
 typedef class setPreference setPreference;
-typedef struct qtData;
-typedef class MolStatusBar;
-typedef class UndoSnapShot;
+typedef struct qtData qtData;
+typedef class MolStatusBar MolStatusBar;
+typedef class UndoSnapShot UndoSnapShot;
 
 /**
 	Abstract class to hold snapshot data. All you can do with a snapshot is

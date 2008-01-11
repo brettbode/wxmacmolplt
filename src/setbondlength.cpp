@@ -174,7 +174,6 @@ void SetBondLength::CreateControls()
     itemBoxSizer15->Add(itemButton17, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 ////@end SetBondLength content construction
-	MoleculeData * MainData = Parent->GetData();
 	WinPrefs * Prefs = Parent->GetPrefs();
 	bool AutoBond = Prefs->GetAutoBond();
 	normalBondCheck->SetValue(AutoBond);

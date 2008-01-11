@@ -269,7 +269,6 @@ void MpApp::createMainFrame(const wxString &filename) {
 void MpApp::ApplyPrefsToAll(WinPrefs * prefs) {
 	std::list<MolDisplayWin *>::iterator win = MolWinList.begin();
 	while (win != MolWinList.end()) {
-		MolDisplayWin * temp = (*win);
 		(*win)->ChangePrefs(prefs);
 		win++;
 	}
@@ -278,7 +277,6 @@ void MpApp::ApplyPrefsToAll(WinPrefs * prefs) {
 void MpApp::AdjustAllMenus(void) {
 	std::list<MolDisplayWin *>::iterator win = MolWinList.begin();
 	while (win != MolWinList.end()) {
-		MolDisplayWin * temp = (*win);
 		(*win)->AdjustMenus();
 		win++;
 	}

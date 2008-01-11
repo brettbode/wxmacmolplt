@@ -201,7 +201,6 @@ void AnnotationAngle::setParam(Frame& frame, float value) {
 	CPoint3D vec1;
 	CPoint3D vec2;
 	CPoint3D normal;
-	float len;
 	Matrix4D rotate;
 
 	frame.GetAtomPosition(atoms[0], pt1);

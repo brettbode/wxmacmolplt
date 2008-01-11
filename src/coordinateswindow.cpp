@@ -446,42 +446,38 @@ void CoordinatesWindow::SizeCols(wxSize & s) {
 		
 }
 
-void CoordinatesWindow::UpdateSelection(bool mode)
-{
-  MoleculeData * MainData = Parent->GetData();
-  Frame * lFrame = MainData->GetCurrentFramePtr();
-  long natoms = lFrame->GetNumAtoms();
+void CoordinatesWindow::UpdateSelection(bool mode) {
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
 
-  needClearAll = mode;
+	needClearAll = mode;
 
-  std::vector<int> selected_ids;
-  int visibleRow = 0;
+	std::vector<int> selected_ids;
+	int visibleRow = 0;
 
-  for (long i=0; i<natoms; i++) 
-    if (lFrame->GetAtomSelection(i))
-      {
-	  selected_ids.push_back(i);
-	  visibleRow = i;
-      }
-//remember the selected atom before clearing selections
+	for (long i=0; i<natoms; i++) 
+	if (lFrame->GetAtomSelection(i)) {
+		selected_ids.push_back(i);
+		visibleRow = i;
+	}
+	//remember the selected atom before clearing selections
 
-  if (natoms != coordGrid->GetNumberRows())
-    {
-      FrameChanged();
-      visibleRow = natoms - 1;
-    }
+	if (natoms != coordGrid->GetNumberRows()) {
+		FrameChanged();
+		visibleRow = natoms - 1;
+	}
 
-  if (mode)
-    coordGrid->ClearSelection();
+	if (mode)
+		coordGrid->ClearSelection();
 
-  for ( int i = 0; i < selected_ids.size(); ++i)
-    coordGrid->SelectRow(selected_ids[i], true);
+	for (unsigned int i = 0; i < selected_ids.size(); ++i)
+		coordGrid->SelectRow(selected_ids[i], true);
 
-  Layout();
-  coordGrid->MakeCellVisible(visibleRow, 0);
-  
-  needClearAll = true;
+	Layout();
+	coordGrid->MakeCellVisible(visibleRow, 0);
 
+	needClearAll = true;
 }
 
 /*!
@@ -573,7 +569,6 @@ void CoordinatesWindow::OnStickbuttonClick( wxCommandEvent& event )
 {
 	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
-	Frame * lFrame = MainData->GetCurrentFramePtr();
 	MainData->StickCoordinates();
 	Parent->AtomsChanged();
 	FrameChanged();
@@ -627,7 +622,6 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 	int col = event.GetCol();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
-	long natoms = lFrame->GetNumAtoms();
 	wxString val = coordGrid->GetCellValue(row, col);
 	bool Changed = false;
 	if (col == 0) {	//Atomic label

@@ -1018,7 +1018,6 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	char Line[kMaxLineLength];
 	long	nAtoms;
-	short	scanerr;
 	
 	ProgressInd->ChangeText("Reading MKL file...");
 	Frame * lFrame = MainData->cFrame;
@@ -1106,7 +1105,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					Buffer->GetLine(Line);
 					//each line will normally contain x, y, z for one atom for 3 modes
 					bytesRead = 0;
-					for (int imode=0; imode<lineModes; imode++) {
+					for (unsigned int imode=0; imode<lineModes; imode++) {
 						CPoint3D temp;
 						int scancount = sscanf(&(Line[bytesRead]), "%f %f %f%n",
 											   &(temp.x), &(temp.y), &(temp.z), &bytesconsumed);
@@ -1219,7 +1218,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 			}
 		}
 	}
-	catch (DataError Error) {
+	catch (DataError /*Error*/) {
 		//attempt to save part of file
 		if (MainData->GetNumFrames() > 1) {
 			MainData->DeleteFrame();
@@ -1517,7 +1516,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 					MainData->SetCurrentFrame(iframe);
 					Buffer->GetLine(LineText);
 					float val;
-					while (sscanf(LineText, "%lf", &val) == 1) {
+					while (sscanf(LineText, "%f", &val) == 1) {
 						MainData->cFrame->SetRMSGradient(val);
 						iframe++;
 						if (iframe > MainData->GetNumFrames()) break;
@@ -1531,7 +1530,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 					MainData->SetCurrentFrame(iframe);
 					Buffer->GetLine(LineText);
 					float val;
-					while (sscanf(LineText, "%lf", &val) == 1) {
+					while (sscanf(LineText, "%f", &val) == 1) {
 						MainData->cFrame->SetMaximumGradient(val);
 						iframe++;
 						if (iframe > MainData->GetNumFrames()) break;
@@ -1599,7 +1598,6 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 		Buffer->GetLine(LineText);
 		while ((LineText[0] != '[')&&(Buffer->GetFilePos()<Buffer->GetFileSize())) {
 			unsigned char	token[kMaxLineLength];
-			long atomNum, junk;
 			CPoint3D pos;
 			//name x y z
 			int rdcount = sscanf(LineText, "%s %f %f %f", token, &(pos.x), &(pos.y), &(pos.z));
@@ -1709,6 +1707,7 @@ long MoleculeData::ParseTinkerCoordinates(BufferFile *Buffer) {
 		mpAtom * newAtom = lFrame->AddAtom(atomtype, position);
 		if (newAtom) newAtom->IsSIMOMMAtom(true);
 	}
+	return 1;
 }
 long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 		char		LineText[kMaxLineLength];
@@ -2359,8 +2358,6 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			return this->OpenGAMESSIRCLog(Buffer, flip, offset, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
 		}
 	}
-	long memlength = sizeof(Frame) + lFrame->NumAtoms*sizeof(mpAtom) +
-					lFrame->NumBonds*sizeof(Bond) + 5000;
 	KeyWordFound = true;
 //	if (SIMOMM) KeyWordFound = false;	//only grab a single geometry for SIMOMM
 	double	FrameEnergy, MP2FrameEnergy;
@@ -2373,13 +2370,6 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	while (KeyWordFound) {
 		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 			{ throw UserCancel();}
-//Test for available memory
-#ifndef __wxBuild__
-		if (MaxBlock() < memlength) {
-			MessageAlertByID(kerrstrings, 29);
-			break;
-		}
-#endif
 		KeyWordFound = false;
 			//Advance to the start of the next geometry step BEGINNING GEOMETRY SEARCH POINT
 			//If there isn't one then we are done with the geometries
@@ -3058,7 +3048,6 @@ void MoleculeData::ReadControlOptions(BufferFile * Buffer) {
 	}
 }
 void SystemGroup::ReadSystemOptions(BufferFile * Buffer) {
-	long	test;
 	char	LineText[kMaxLineLength], token[kMaxLineLength];
 	long StartPos = Buffer->GetFilePos();	//All keywords should be between these positions
 	long EndPos = Buffer->FindBlankLine();
@@ -3160,16 +3149,9 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 	}
 	NumAtoms = lFrame->NumAtoms;
 	KeyWordFound = Buffer->LocateKeyWord("POINT=", 6);
-	long memlength = sizeof(Frame)+NumAtoms*sizeof(mpAtom)+lFrame->NumBonds*sizeof(Bond)+5000;
 	while (KeyWordFound) {
 		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 			{ throw UserCancel();}
-#ifndef __wxBuild__
-		if (MaxBlock() < memlength) {
-			MessageAlertByID(kerrstrings, 29);
-			break;
-		}
-#endif
 		Buffer->GetLine(LineText);
 		LinePos = 6;
 		sscanf(&(LineText[LinePos]), "%ld", &point);
@@ -3223,16 +3205,9 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 		KeyWordFound = Buffer->LocateKeyWord(NextPointKeyword, 20);
 		if (KeyWordFound) LINEAR=true;
 	}
-	long memlength = sizeof(Frame)+NumAtoms*sizeof(mpAtom)+lFrame->NumBonds*sizeof(Bond)+5000;
 	while (KeyWordFound) {
 		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 			{ throw UserCancel();}
-#ifndef __wxBuild__
-		if (MaxBlock() < memlength) {
-			MessageAlertByID(kerrstrings, 29);
-			break;
-		}
-#endif
 		if (LINEAR) Buffer->BackupnLines(1);
 		Buffer->SkipnLines(1);
 		if (Buffer->LocateKeyWord("POINT", 5)) {
@@ -3412,7 +3387,6 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 	}
 
 	NumAtoms = lFrame->NumAtoms;
-	long memlength = sizeof(Frame)+NumAtoms*sizeof(mpAtom)+lFrame->NumBonds*sizeof(Bond)+5000;
 	long DRCnSkip = Prefs->GetDRCSkip();
 	while (KeyWordFound) {
 		Buffer->SkipnLines(1);
@@ -3420,12 +3394,6 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 			nskip = 0;
 			if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 				{ throw UserCancel();}
-#ifndef __wxBuild__
-			if (MaxBlock() < memlength) {
-				MessageAlertByID(kerrstrings, 29);
-				break;
-			}
-#endif
 			Buffer->GetLine(LineText);
 			sscanf(LineText, "%f", &tempfloat);
 			tempfloat *= flip;
@@ -3528,7 +3496,7 @@ void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
 	}
 		long		iatom;
 		Str255		AtomLabel;
-		char		text[kMaxLineLength], PointGroup[80];
+		char		text[kMaxLineLength];
 		bool		C1Sym=true;
 		GAMESSPointGroup	sym = GAMESS_C1;
 		
@@ -3739,7 +3707,6 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 	} else if (AllModes) {
 		if (!lFrame->Vibs) return;
 			mpAtom * lAtoms = lFrame->Atoms;
-			char Line[kMaxLineLength];
 		for (long i=0; i<lFrame->Vibs->GetNumModes(); i++) {
 			sprintf(text, "%ld", lFrame->NumAtoms);
 			Buffer->WriteLine(text, true);

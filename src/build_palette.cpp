@@ -290,9 +290,9 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 
 	struc_sizer = new wxGridBagSizer();
 
-	int lflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
-	int rflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
-	int cflags = wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL;
+//	int lflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
+//	int rflags = wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL;
+//	int cflags = wxALIGN_CENTER | wxALIGN_CENTER_VERTICAL;
 
 	struc_sizer->SetFlexibleDirection(wxBOTH);
 	struc_sizer->SetCols(2);
@@ -662,8 +662,6 @@ void BuilderDlg::AddStructure(Structure *structure) {
 
 void BuilderDlg::AddUserStructure(Structure *structure) {
 
-	Bond *bond;
-
 	// If we're not currently viewing either a custom structure file or
 	// the memory-stored structures, let's switch to the memory-stored
 	// structure group.
@@ -679,9 +677,9 @@ void BuilderDlg::AddUserStructure(Structure *structure) {
 
 	AddStructure(structure);
 
-	StrucGroupClientData *data = 
-		reinterpret_cast<StrucGroupClientData *>
-		(struc_groups->GetClientObject(struc_groups->GetSelection()));
+//	StrucGroupClientData *data = 
+//		reinterpret_cast<StrucGroupClientData *>
+//		(struc_groups->GetClientObject(struc_groups->GetSelection()));
 
 	// Select the just added structure.
 	mStructureChoice->SetSelection(mStructureChoice->GetCount() - 1);

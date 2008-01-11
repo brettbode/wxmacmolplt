@@ -223,12 +223,10 @@ void FrequenciesDialog::RegenData(void) {
 	
 	bool UseRaman = fprefs->ShowRamanIntensity();
     
-    MoleculeData  *mData = parent->GetData();
     VibRec *Vibs = parent->GetData()->cFrame->Vibs;
     
 	std::vector< double > xSetData;
 	std::vector< pair< int, double > > freqData;
-    float temp;
     int i = 0;
     
 	mFreqListBox->Clear();
@@ -342,7 +340,6 @@ void FrequenciesDialog::OnFreqlistboxSelected( wxCommandEvent& event )
 	int newSelection = mFreqListBox->GetSelection();
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     
-    MoleculeData  *mData = parent->GetData();
     VibRec *Vibs = parent->GetData()->cFrame->Vibs;
     
     if(Vibs != NULL) {

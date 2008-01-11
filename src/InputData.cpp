@@ -32,7 +32,6 @@
 #include "XML.hpp"
 #include "CML.h"
 
-#pragma segment IData
 	//InputData functions
 InputData::InputData(void) {
 	//Always create Control, System, Basis, and Data groups
@@ -179,7 +178,6 @@ void InputData::ReadXML(XMLElement * parent) {
 	}
 }
 
-#pragma segment Control
 	//ControlGroup functions
 ControlGroup::ControlGroup(void) {
 	ExeType = NULL;
@@ -887,7 +885,7 @@ void ControlGroup::WriteToFile(BufferFile *File, InputData *IData, long NumElect
 			tempSphere = true;
 	}
 	if (tempSphere) {
-		sprintf(Out, "ISPHER=1 ", IData->Data->GetCoordText());
+		sprintf(Out, "ISPHER=1 ");
 		File->WriteLine(Out, false);
 	}
 	if (IData->Data) {
@@ -2061,7 +2059,7 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 					if (cFrame->Atoms[iatom].GetType() == 8)
 						File->WriteLine("O1 ", false);
 					else {
-						sprintf(Out, "H%d ", HydrogenIndex);
+						sprintf(Out, "H%ld ", HydrogenIndex);
 						File->WriteLine(Out, false);
 						HydrogenIndex++;
 					}
@@ -2240,7 +2238,7 @@ void GuessGroup::WriteToFile(BufferFile *File, InputData *IData, MoleculeData * 
 				}
 			}
 		}
-		sprintf(Out, "NORB=%d ", nOrbs);
+		sprintf(Out, "NORB=%ld ", nOrbs);
 		File->WriteLine(Out, false);
 	}	//PrintMO
 	if (GetPrintMO()) {
@@ -2263,7 +2261,7 @@ void GuessGroup::WriteVecGroup(BufferFile *File, MoleculeData * lData) {
 		short tempVec = GetVecSource();
 		const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
 		if ((tempVec != 1)&&(Orbs->size() > 0)) {
-			if ((tempVec<=0)||(tempVec>Orbs->size() + 2)) tempVec = 2;
+			if ((tempVec<=0)||(tempVec > (Orbs->size() + 2))) tempVec = 2;
 			if (tempVec > 1) {
 				OrbitalRec * OrbSet = (*Orbs)[tempVec-2];
 				long nOrbs = GetNumOrbs();
@@ -2283,7 +2281,7 @@ void GuessGroup::WriteXML(XMLElement * parent) const {
 	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOGuessGroupElement));
 	if (GuessType) Ele->addChildElement(CML_convert(MMP_IOGGGuessType), ConvertGuessType(GuessType));
 	if (NumOrbs) {
-		snprintf(line, kMaxLineLength, "%d", NumOrbs);
+		snprintf(line, kMaxLineLength, "%ld", NumOrbs);
 		Ele->addChildElement(CML_convert(MMP_IOGGNumOrbs), line);
 	}
 	if (VecSource) {
@@ -2590,7 +2588,7 @@ void MP2Group::WriteXML(XMLElement * parent) const {
 	char line[kMaxLineLength];
 	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOMP2GroupElement));
 	if (NumCoreElectrons) {
-		snprintf(line, kMaxLineLength, "%d", NumCoreElectrons);
+		snprintf(line, kMaxLineLength, "%ld", NumCoreElectrons);
 		Ele->addChildElement(CML_convert(MMP_IOMGNumCoreElectrons), line);
 	}
 	if (CutOff > 0.0) {
@@ -2598,7 +2596,7 @@ void MP2Group::WriteXML(XMLElement * parent) const {
 		Ele->addChildElement(CML_convert(MMP_IOMGCutOff), line);
 	}
 	if (Memory) {
-		snprintf(line, kMaxLineLength, "%d", Memory);
+		snprintf(line, kMaxLineLength, "%ld", Memory);
 		Ele->addChildElement(CML_convert(MMP_IOMGMemory), line);
 	}
 	if (Method) {
@@ -3131,7 +3129,6 @@ void EffectiveFragmentsGroup::WriteXML(XMLElement * parent) const {
 	if (UseInternalCoordinates() || !PolMethodIsDefault() || !PositionIsDefault() ||
 		(MaxMOs >= 0) || (NumBufferMOs >= 0) || (MaxBasisFuncs>=0)) {
 
-		char line[kMaxLineLength];
 		XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOEFPGroupElement));
 		if (UseInternalCoordinates())
 			Ele->addAttribute(CML_convert(MMP_IOEFPCoordType), GetGAMESSCoordText());
@@ -3259,7 +3256,7 @@ void StatPtGroup::WriteToFile(BufferFile *File, InputData *IData) {
 		}
 	}
 	if ((runType == 6)&&(GetModeFollow() != 1)) {
-		sprintf(Out, "IFOLOW=%d ", GetModeFollow());
+		sprintf(Out, "IFOLOW=%ld ", GetModeFollow());
 		File->WriteLine(Out, false);
 	}
 	if (GetStatPoint()) {
@@ -3449,13 +3446,13 @@ void MOPacInternals::WriteZMATToFile(BufferFile * File) {
 	File->WriteLine(" $ZMAT IZMAT(1)=", false);
 	for (long i=3; i<Count; i+=3) {
 		if (i>9) File->WriteLine(", ", false);
-		sprintf(Out, "1,%d,%d, ", (i+3)/3, ConnectionAtoms[i]+1);
+		sprintf(Out, "1,%ld,%ld, ", (i+3)/3, ConnectionAtoms[i]+1);
 		File->WriteLine(Out, false);
 		if (i>3) {
-			sprintf(Out, "2,%d,%d,%d, ", (i+3)/3, ConnectionAtoms[i]+1, ConnectionAtoms[i+1]+1);
+			sprintf(Out, "2,%ld,%ld,%ld, ", (i+3)/3, ConnectionAtoms[i]+1, ConnectionAtoms[i+1]+1);
 			File->WriteLine(Out, false);
 			if (i>6) {
-				sprintf(Out, "3,%d,%d,%d,%d", (i+3)/3, ConnectionAtoms[i]+1,
+				sprintf(Out, "3,%ld,%ld,%ld,%ld", (i+3)/3, ConnectionAtoms[i]+1,
 					ConnectionAtoms[i+1]+1, ConnectionAtoms[i+2]+1);
 				File->WriteLine(Out, false);
 			}
@@ -3475,14 +3472,14 @@ void MOPacInternals::WriteCoordinatesToFile(BufferFile * File, MoleculeData * Ma
 		AtomLabel[AtomLabel[0]+1] = 0;
 		if (iatom==0) sprintf(Out, "%s", (char *) &(AtomLabel[1]));
 		else if (iatom == 1)
-			sprintf(Out, "%s  %d %10.5f", (char *) &(AtomLabel[1]),
+			sprintf(Out, "%s  %ld %10.5f", (char *) &(AtomLabel[1]),
 				ConnectionAtoms[3*iatom]+1, Values[3*iatom]);
 		else if (iatom == 2)
-			sprintf(Out, "%s   %d %10.5f  %d %8.4f",
+			sprintf(Out, "%s   %ld %10.5f  %ld %8.4f",
 				(char *) &(AtomLabel[1]), ConnectionAtoms[3*iatom]+1, Values[3*iatom], 
 				ConnectionAtoms[3*iatom+1]+1, Values[3*iatom+1]);
 		else
-			sprintf(Out, "%s   %d %10.5f  %d %8.4f  %d %8.4f",
+			sprintf(Out, "%s   %ld %10.5f  %ld %8.4f  %ld %8.4f",
 				(char *) &(AtomLabel[1]), ConnectionAtoms[3*iatom]+1, Values[3*iatom], 
 				ConnectionAtoms[3*iatom+1]+1, Values[3*iatom+1],
 				ConnectionAtoms[3*iatom+2]+1, Values[3*iatom+2]);
@@ -3505,11 +3502,11 @@ void MOPacInternals::WriteMPCZMatCoordinatesToFile(BufferFile * File, MoleculeDa
 			sprintf(Out, "%s   %10.5f", (char *) &(AtomLabel[1]),
 					Values[3*iatom]);
 		else if (iatom == 2)
-			sprintf(Out, "%s   %10.5f 0 %8.4f 0 %d %d",
+			sprintf(Out, "%s   %10.5f 0 %8.4f 0 %ld %ld",
 					(char *) &(AtomLabel[1]), Values[3*iatom], 
 					Values[3*iatom+1], ConnectionAtoms[3*iatom]+1, ConnectionAtoms[3*iatom+1]+1);
 		else
-			sprintf(Out, "%s   %10.5f 0 %8.4f 0 %8.4f 0 %d %d %d",
+			sprintf(Out, "%s   %10.5f 0 %8.4f 0 %8.4f 0 %ld %ld %ld",
 					(char *) &(AtomLabel[1]), Values[3*iatom], Values[3*iatom+1],
 					Values[3*iatom+2], ConnectionAtoms[3*iatom]+1,
 					ConnectionAtoms[3*iatom+1]+1, ConnectionAtoms[3*iatom+2]+1);
@@ -3544,7 +3541,7 @@ void OrbitalRec::WriteVecGroup(BufferFile * File, const long & NumBasisFuncs, co
 			iline = 1;	nVec = 0;
 			pOrb++;
 			if (pOrb>=100) pOrb -= 100;
-			sprintf(Line, "%2d%3d", pOrb, iline);
+			sprintf(Line, "%2ld%3ld", pOrb, iline);
 			File->WriteLine(Line, false);
 			for (long ivec=0; ivec<NumBasisFuncs; ivec++) {
 				sprintf(Line, "%15.8E", Vector[nn]);
@@ -3554,7 +3551,7 @@ void OrbitalRec::WriteVecGroup(BufferFile * File, const long & NumBasisFuncs, co
 				if ((nVec>=5)&&(ivec+1<NumBasisFuncs)) {//wrap line and start the next line
 					File->WriteLine("", true);
 					iline ++;
-					sprintf(Line, "%2d%3d", pOrb, iline);
+					sprintf(Line, "%2ld%3ld", pOrb, iline);
 					File->WriteLine(Line, false);
 					nVec = 0;
 				}

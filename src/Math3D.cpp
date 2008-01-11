@@ -276,7 +276,7 @@ void Normalize3D (CPoint3D *v)
 #include <iostream> 
 void SetRotationMatrix (Matrix4D rotationMatrix, const CPoint3D *op, const CPoint3D *oq) {
 
-	float		s, c, t;
+	float		s, c;
 	CPoint3D	a;
 	
 	CrossProduct3D(op, oq, &a);
@@ -321,6 +321,7 @@ void SetRotationMatrix (Matrix4D rotationMatrix, const CPoint3D *op, const CPoin
 		   // rotationMatrix[2][3], rotationMatrix[3][3]); 
 
 #if 0
+	float t;
 	if (s > 0) {
 		a.x /= s;
 		a.y /= s;

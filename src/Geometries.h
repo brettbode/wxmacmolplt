@@ -51,10 +51,10 @@ class CPoint3D {
 			x = y = z = 0.0f;
 		}
 
-		CPoint3D(float x, float y, float z) {
-			this->x = x;
-			this->y = y;
-			this->z = z;
+		CPoint3D(float xx, float yy, float zz) {
+			this->x = xx;
+			this->y = yy;
+			this->z = zz;
 		}
 
 		const CPoint3D& operator=(const CPoint3D& other) {

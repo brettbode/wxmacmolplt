@@ -40,7 +40,7 @@ class OrbSurfBase {
 		inline void SetTargetSet(long target) {TargetSet = target;};
 		inline bool UseAOs(void) const {return (Options & 1);};
 		inline void UseAOs(bool newval) {Options = (Options & 0xFFFFFFFE) + (newval ? 1 : 0);};
-		inline bool UseBetaSet(void) const {return (Options & 16);};
+		inline bool UseBetaSet(void) const {return ((Options & 16) != 0);};
 		inline void UseBetaSet(bool newval) {Options = (Options & 0xFFFFFFEF) + (newval ? 16 : 0);};
 		inline long GetOptions(void) const {return (Options & 0x1F);};
 		inline void SetOptions(long NewVal) {Options = (NewVal & 0x1F) + (Options & 0xFFFFFFE0);};
@@ -241,7 +241,7 @@ class Surf3DBase : public Surface {
 		inline void SolidSurface(bool state) {Mode = (Mode & 0xFFFFFFFC) + (state?1:2);};
 		inline bool WireFrameSurface(void) const {return ((Mode & 2)!=0);};
 		inline void WireFrameSurface(bool state) {Mode = (Mode & 0xFFFFFFFC) + (state?2:1);};
-		inline bool GetFixGrid(void) const {return (Mode & 16);};
+		inline bool GetFixGrid(void) const {return ((Mode & 16)!=0);};
 		inline void SetFixGrid(bool State) {Mode = (Mode & 0xFFFFFFEF) + (State?16:0);};
 		inline bool ColorByValue(void) const {return ((Mode & 8) != 0);};
 		inline void SetColorByValue(bool State) {Mode = (Mode & 0xFFFFFFF7) + (State?8:0);};

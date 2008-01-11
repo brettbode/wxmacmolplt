@@ -156,7 +156,7 @@ void MinimizeDifferences(mpAtom * FixedAtoms, mpAtom * targetAtoms, long NumAtom
 	//"clean up" the rotation matrix make the rotation part orthogonal and magnitude 1
 					OrthogonalizeRotationMatrix (FitMatrix);
 				}
-				RotAngle *= 0.1;
+				RotAngle *= 0.1f;
 			}
 		}
 	}
@@ -406,7 +406,6 @@ void VibRec::Setup(const long & NumVibs, const long & NumAtoms) {
 }
 bool VibRec::Resize(long NumAtoms) {	//reduce the allocation to the current # of modes
 	NormMode.resize(NumModes*NumAtoms);
-	CPoint3D * temp = new CPoint3D[NumModes*NumAtoms];
 	Frequencies.resize(NumModes);
 	Intensities.resize(NumModes);
 	return true;
@@ -708,9 +707,9 @@ void Surf2DBase::Write2DXML(XMLElement * parent, bool writeGrid) const {
 	sElem->addChildElement(CML_convert(MMP_SurfGridMax), line);
 	snprintf(line, kMaxLineLength, "%f", GridMin);
 	sElem->addChildElement(CML_convert(MMP_SurfGridMin), line);
-	snprintf(line, kMaxLineLength, "%d", NumGridPoints);
+	snprintf(line, kMaxLineLength, "%ld", NumGridPoints);
 	sElem->addChildElement(CML_convert(MMP_SurfNumGridPoints), line);
-	snprintf(line, kMaxLineLength, "%d", NumContours);
+	snprintf(line, kMaxLineLength, "%ld", NumContours);
 	sElem->addChildElement(CML_convert(MMP_SurfNumContours), line);
 	snprintf(line, kMaxLineLength, "%f", MaxContourValue);
 	sElem->addChildElement(CML_convert(MMP_SurfMaxContourValue), line);
@@ -889,13 +888,13 @@ void Surf3DBase::Write3DXML(XMLElement * parent, bool writeGrid) const {
 	snprintf(line, kMaxLineLength, "%f", ZGridInc);
 	sElem->addChildElement(CML_convert(MMP_SurfZInc), line);
 
-	snprintf(line, kMaxLineLength, "%d", NumXGridPoints);
+	snprintf(line, kMaxLineLength, "%ld", NumXGridPoints);
 	sElem->addChildElement(CML_convert(MMP_SurfNumXGridPoints), line);
-	snprintf(line, kMaxLineLength, "%d", NumYGridPoints);
+	snprintf(line, kMaxLineLength, "%ld", NumYGridPoints);
 	sElem->addChildElement(CML_convert(MMP_SurfNumYGridPoints), line);
-	snprintf(line, kMaxLineLength, "%d", NumZGridPoints);
+	snprintf(line, kMaxLineLength, "%ld", NumZGridPoints);
 	sElem->addChildElement(CML_convert(MMP_SurfNumZGridPoints), line);
-	snprintf(line, kMaxLineLength, "%d", NumGridPoints);
+	snprintf(line, kMaxLineLength, "%ld", NumGridPoints);
 	sElem->addChildElement(CML_convert(MMP_SurfNumGridPoints), line);
 
 	XMLElement * color = sElem->addChildElement(CML_convert(MMP_SurfPosColor));
@@ -951,11 +950,11 @@ void Surf3DBase::Write3DXML(XMLElement * parent, bool writeGrid) const {
 		sElem->addChildElement(CML_convert(MMP_SurfGrid), buf.str().c_str());
 	}
 	if (ContourHndl) {
-		snprintf(line, kMaxLineLength, "%d", NumVertices);
+		snprintf(line, kMaxLineLength, "%ld", NumVertices);
 		sElem->addChildElement(CML_convert(MMP_SurfNumVertices), line);
-		snprintf(line, kMaxLineLength, "%d", NumPosContourTriangles);
+		snprintf(line, kMaxLineLength, "%ld", NumPosContourTriangles);
 		sElem->addChildElement(CML_convert(MMP_SurfNumPosTris), line);
-		snprintf(line, kMaxLineLength, "%d", NumNegContourTriangles);
+		snprintf(line, kMaxLineLength, "%ld", NumNegContourTriangles);
 		sElem->addChildElement(CML_convert(MMP_SurfNumNegTris), line);
 		std::ostringstream buf, vbuf;
 		long length = 3*(NumPosContourTriangles + NumNegContourTriangles);
@@ -1489,7 +1488,7 @@ char * Orb2DSurface::GetLabel(void) {
 		else if (Options&4) sprintf(&(Label[nchar]), " LMO #%n", &nchar2);
 		nchar += nchar2;
 		if (PlotOrb >= 0) {
-			sprintf(&(Label[nchar]), " %d%n", PlotOrb+1, &nchar2);
+			sprintf(&(Label[nchar]), " %ld%n", PlotOrb+1, &nchar2);
 			nchar += nchar2;
 		}
 		if (Visible) sprintf(&(Label[nchar]), " Visible");
@@ -1548,7 +1547,7 @@ char * Orb3DSurface::GetLabel(void) {
 		else if (Options&4) sprintf(&(Label[nchar]), " LMO #%n", &nchar2);
 		nchar += nchar2;
 		if (PlotOrb >= 0) {
-			sprintf(&(Label[nchar]), " %d%n", PlotOrb+1, &nchar2);
+			sprintf(&(Label[nchar]), " %ld%n", PlotOrb+1, &nchar2);
 			nchar += nchar2;
 		}
 		if (Visible) sprintf(&(Label[nchar]), " Visible");
@@ -1580,7 +1579,7 @@ char * General2DSurface::GetLabel(void) {
 	return Surface::GetLabel();
 }
 TEDensity3DSurface::TEDensity3DSurface(WinPrefs * Prefs) : Surf3DBase(Prefs) {
-	MaxMEPValue = 0.1;
+	MaxMEPValue = 0.1f;
 	OrbSet = -1;
 	SetContourBothPosNeg(false);
 }
