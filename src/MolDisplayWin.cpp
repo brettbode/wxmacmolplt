@@ -1349,6 +1349,11 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
 										   wxT("*.*"), wxOPEN, this);
 		//If the user chooses a file, create a window and have it process it.
 		if (!filename.IsEmpty()) {
+			//An empty window defaults to edit mode with the toolbar active
+			//but once we open a file we should default to non-edit mode and hide the toolbar
+			if (Prefs->ToolbarShown()) {
+				ShowToolbar(false);
+			}
 			//Ok we have a problem. Abort open can't close the last window!
 			long r = OpenFile(filename);
 			if (r>0) {
