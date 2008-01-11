@@ -1000,7 +1000,7 @@ void SymmetryPointGroupDlg::OnListctrl1Selected( wxListEvent& event )
 
 void SymmetryPointGroupDlg::OnSlider1Updated( wxCommandEvent& event ) {
 	int val = mSlider->GetValue();
-	if (val < 0) tolerance = pow(10, val);
+	if (val < 0) tolerance = pow(10.0, val);
 	else tolerance = 0.1 * (val+2);
 	setup();
 //	event.Skip();
