@@ -473,17 +473,16 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 16, 8, 0, GL_ALPHA,
 				 GL_UNSIGNED_BYTE, texture);
 
-	if (Prefs->ToolbarShown()) {
+	// If this is a new/empty window default to edit mode (title should be
+	// "Untitled")
+	if (!title.Cmp(wxT("Untitled"))) {
+		Prefs->SetToolbarShown(true);
 		ShowToolbar();
 		menuBuild->Check(MMP_SHOW_TOOLBAR, Prefs->ToolbarShown());
 
-		// If this is a new/empty window default to edit mode (title should be
-		// "Untitled")
-		if (!title.Cmp(wxT("Untitled"))) {
-			wxCommandEvent foo;
-			foo.SetId(MMP_TOOL_HAND);
-			OnToggleTool(foo);
-		}
+		wxCommandEvent foo;
+		foo.SetId(MMP_TOOL_HAND);
+		OnToggleTool(foo);
 	}
 }
 

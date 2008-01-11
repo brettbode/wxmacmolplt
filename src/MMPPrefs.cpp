@@ -317,7 +317,7 @@ WinPrefs::WinPrefs(void) {
 	SymbolLabels = NumberLabels = false;
 	CenterOnPage = true;
 	ShowSymOps = false;
-	show_toolbar = true;
+	show_toolbar = false;
 }
 
 WinPrefs::~WinPrefs(void) {
