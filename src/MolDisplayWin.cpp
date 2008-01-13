@@ -2914,10 +2914,9 @@ void MolDisplayWin::DeleteSelected() {
 
 			// Nothing's highlighted anymore, so turn some features off.
 			mHighliteState = false;
-			UpdateModelDisplay();
-			AtomsChanged(true, false);
-			AdjustMenus();
-
+			AtomsChanged(true, true);
+			/* AdjustMenus(); */
+			menuEdit->UpdateUI();
 		}
 	}
 

@@ -1555,7 +1555,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 						 lAtoms[iatom].Position.y,
 						 lAtoms[iatom].Position.z);
 
-			if (edit_symmetrically && !lAtoms[iatom].IsSymmetryUnique()) {
+			if (InSymmetryEditMode() && !lAtoms[iatom].IsSymmetryUnique()) {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
 				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
@@ -1652,7 +1652,13 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 	glPushName(0);
 	for (long ibond = 0; ibond < NumBonds; ibond++) {
 
-		glLoadName(ibond + 1);	//bond names start after the last atom
+		if (!InSymmetryEditMode() ||
+			(lAtoms[lBonds[ibond].Atom1].IsSymmetryUnique() &&
+			 lAtoms[lBonds[ibond].Atom2].IsSymmetryUnique())) {
+			glLoadName(ibond + 1);
+		} else {
+			glLoadName(0);
+		}
 
 		if (mHighliteState && !lBonds[ibond].GetSelectState()) {
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
@@ -4481,7 +4487,7 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 	else {
 		offset_vec = CPoint3D(0.0f, 0.0f, 0.0f);
 	}
-	
+
 	// For each "sub-bond" between these two atoms...
 	for (int ipipe = 0; ipipe < MAX(logical_order, 1); ++ipipe) {
 
