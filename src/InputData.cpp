@@ -981,7 +981,7 @@ const char * MemoryUnitToText(const MemoryUnit & mu) {
 bool TextToMemoryUnit(const char * t, MemoryUnit & mu) {
 	if (!t || !*t) return false;
 	for (int i = (int) wordsUnit; i != (int) NumberMemoryUnits; ++i) {
-		if (strcmp(t, MemoryUnitToText((MemoryUnit) i)) == 0) {
+		if (strcasecmp(t, MemoryUnitToText((MemoryUnit) i)) == 0) {
 			mu = (MemoryUnit) i;
 			return true;
 		}
@@ -1010,7 +1010,7 @@ const char * TimeUnitToText(const TimeUnit & tu) {
 bool TextToTimeUnit(const char * t, TimeUnit & tu) {
 	if (!t || !*t) return false;
 	for (int i = (int) secondUnit; i != (int) NumberTimeUnits; ++i) {
-		if (strcmp(t, TimeUnitToText((TimeUnit) i)) == 0) {
+		if (strcasecmp(t, TimeUnitToText((TimeUnit) i)) == 0) {
 			tu = (TimeUnit) i;
 			return true;
 		}
@@ -1867,7 +1867,7 @@ short DataGroup::SetPointGroup(char *GroupText) {
 		if (!GroupText[i]) break;
 		if ((GroupText[i]>96)&&(GroupText[i]<123)) GroupText[i] = GroupText[i] - 32;
 	}
-	if (GroupText[0] == 'S') {
+	if (std::toupper(GroupText[0]) == 'S') {
 		PGroupOrder = GroupText[2] - 48;
 		GroupText[2]='N';
 	} else {
@@ -1882,7 +1882,7 @@ short DataGroup::SetPointGroup(char *GroupText) {
 	}
 
 	for (int i=1; i<NumberGAMESSPointGroups; i++) {
-		if (strcmp(GroupText, GetGAMESSPointGroupText((GAMESSPointGroup) i))==0) {
+		if (strcasecmp(GroupText, GetGAMESSPointGroupText((GAMESSPointGroup) i))==0) {
 			NewPGroup = (GAMESSPointGroup) i;
 			break;
 		}
@@ -1951,7 +1951,7 @@ const char * DataGroup::GetCoordTypeText(CoordinateType t) {
 CoordinateType DataGroup::SetCoordType(const char * CoordText) {
 	CoordinateType NewCoord = invalidCoordinateType;
 	for (int i=1; i<NumberCoordinateTypes; i++) {
-		if (strcmp(CoordText, GetCoordTypeText((CoordinateType) i))==0) {
+		if (strcasecmp(CoordText, GetCoordTypeText((CoordinateType) i))==0) {
 			NewCoord = (CoordinateType) i;
 			break;
 		}
@@ -2516,8 +2516,8 @@ const char * MP2Group::GetAOIntMethodText(void) const {
 }
 void MP2Group::SetAOIntMethod(const char * t) {
 	if (!t) return;
-	if (!strcmp(t, "DUP")) AOInts = 1;
-	else if (!strcmp(t, "DIST")) AOInts = 2;
+	if (!strcasecmp(t, "DUP")) AOInts = 1;
+	else if (!strcasecmp(t, "DIST")) AOInts = 2;
 }
 char MP2Group::SetAOIntMethod(char NewMethod) {
 	if ((NewMethod == 1)||(NewMethod == 2)) AOInts = NewMethod;
