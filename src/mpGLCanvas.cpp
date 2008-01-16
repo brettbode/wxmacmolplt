@@ -2355,7 +2355,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 		
 		if (lFrame->Atoms[selected].IsEffectiveFragment()) {
 			wxString flabel(mMainData->FragmentNames[lFrame->Atoms[selected].GetFragmentNumber()-1].c_str(), wxConvUTF8);
-			aLabel.Printf(wxT("EFP "), (selected+1));
+			aLabel.Printf(wxT("EFP %d"), lFrame->Atoms[selected].GetFragmentNumber(), (selected+1));
 			aLabel.Append(flabel);
 			item = menu.Append(wxID_ANY, aLabel);
 			item->Enable(false);

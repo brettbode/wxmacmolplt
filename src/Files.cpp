@@ -774,69 +774,73 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		Buffer->GetLine(Line);	//1st line is a title line
 		MainData->InputOptions->Data->SetTitle(Line, strlen(Line));
 		Buffer->GetLine(Line);	//2nd line contains the point group
-		scanerr = sscanf(Line, "%s %ld", token, &nAtoms);
-		MainData->InputOptions->Data->SetPointGroup(token);
-		if (scanerr == 2)	//if a number was read in set the order
-			MainData->InputOptions->Data->SetPointGroupOrder(nAtoms);
-			//If !C1 then skip the blank line well I guess rarely it isn't blank...
-		if (-1 == FindKeyWord(token, "C1", 2)) Buffer->SkipnLines(1);
-		StartPos = Buffer->GetFilePos();
-		if (!Buffer->LocateKeyWord("$END", 4)) throw DataError();
-		EndPos = Buffer->GetFilePos() - 1;
-		Buffer->SetFilePos(StartPos);
-		nAtoms = Buffer->GetNumLines(EndPos - StartPos);
-		if (MainData->InputOptions->Data->GetCoordType() <= CartesianCoordType) {
-			if (nAtoms > 0) {
-				if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
-			} else {
-				throw DataError(14);
-			}
-			while (Buffer->GetFilePos() < EndPos) {
-					CPoint3D	pos;
-					float		AtomType;
-				Buffer->GetLine(Line);
-				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
-				{ throw UserCancel();}
-				pos.x = pos.y = pos.z = 0.0;
-				sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
-				lFrame->AddAtom((long) AtomType, pos);
-				StartPos = Buffer->FindBlankLine();
-				if ((StartPos <= EndPos)&&(StartPos>-1)) {	//basis set is inlined in $DATA
-					Buffer->SetFilePos(StartPos);	//just skip over it
-					Buffer->SkipnLines(1);
+		if (FindKeyWord(Line, "$END", 4) < 0) {	//End of this group
+			scanerr = sscanf(Line, "%s %ld", token, &nAtoms);
+			MainData->InputOptions->Data->SetPointGroup(token);
+			if (scanerr == 2)	//if a number was read in set the order
+				MainData->InputOptions->Data->SetPointGroupOrder(nAtoms);
+				//If !C1 then skip the blank line well I guess rarely it isn't blank...
+			if (-1 == FindKeyWord(token, "C1", 2)) Buffer->SkipnLines(1);
+			StartPos = Buffer->GetFilePos();
+			if (!Buffer->LocateKeyWord("$END", 4)) throw DataError();
+			EndPos = Buffer->GetFilePos() - 1;
+			Buffer->SetFilePos(StartPos);
+			nAtoms = Buffer->GetNumLines(EndPos - StartPos);
+			if (MainData->InputOptions->Data->GetCoordType() <= CartesianCoordType) {
+				if (nAtoms > 0) {
+					if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
+				} else {
+					throw DataError(14);
 				}
+				while (Buffer->GetFilePos() < EndPos) {
+						CPoint3D	pos;
+						float		AtomType;
+					Buffer->GetLine(Line);
+					if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+					{ throw UserCancel();}
+					pos.x = pos.y = pos.z = 0.0;
+					sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
+					std::cout << "data token: " << token << std::endl;
+					lFrame->AddAtom((long) AtomType, pos);
+					StartPos = Buffer->FindBlankLine();
+					if ((StartPos <= EndPos)&&(StartPos>-1)) {	//basis set is inlined in $DATA
+						Buffer->SetFilePos(StartPos);	//just skip over it
+						Buffer->SkipnLines(1);
+					}
+				}
+				if (((MainData->InputOptions->Data->GetCoordType() == UniqueCoordType)||
+					 (MainData->InputOptions->Data->GetCoordType() == 0))&&
+					(MainData->InputOptions->Data->GetPointGroup()>GAMESS_C1)&&
+					(lFrame->GetNumAtoms() > 0)) {
+					//Generate symmetry dependant atoms
+					for (int i=0; i<lFrame->GetNumAtoms(); i++)
+						lFrame->Atoms[i].IsSymmetryUnique(true);
+					MainData->GenerateSymmetryDependentAtoms();
+				}
+			} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTCoordType) {
+				long bPos = Buffer->FindBlankLine();
+				if ((bPos > 0)&&(bPos < EndPos)) {
+					nAtoms = Buffer->GetNumLines(bPos - StartPos);
+				}
+				if (nAtoms > 0) {
+					if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
+				} else {
+					throw DataError(14);
+				}
+				MainData->ParseZMatrix(Buffer, nAtoms, Prefs);
+			} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTMPCCoordType) {
+				if (nAtoms > 0) {
+					if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
+				} else {
+					throw DataError(14);
+				}
+				MainData->ParseMOPACZMatrix(Buffer, nAtoms, Prefs);
 			}
-			if (((MainData->InputOptions->Data->GetCoordType() == UniqueCoordType)||
-				 (MainData->InputOptions->Data->GetCoordType() == 0))&&
-				(MainData->InputOptions->Data->GetPointGroup()>GAMESS_C1)&&
-				(lFrame->GetNumAtoms() > 0)) {
-				//Generate symmetry dependant atoms
-				for (int i=0; i<lFrame->GetNumAtoms(); i++)
-					lFrame->Atoms[i].IsSymmetryUnique(true);
-				MainData->GenerateSymmetryDependentAtoms();
-			}
-		} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTCoordType) {
-			long bPos = Buffer->FindBlankLine();
-			if ((bPos > 0)&&(bPos < EndPos)) {
-				nAtoms = Buffer->GetNumLines(bPos - StartPos);
-			}
-			if (nAtoms > 0) {
-				if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
-			} else {
-				throw DataError(14);
-			}
-			MainData->ParseZMatrix(Buffer, nAtoms, Prefs);
-		} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTMPCCoordType) {
-			if (nAtoms > 0) {
-				if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
-			} else {
-				throw DataError(14);
-			}
-			MainData->ParseMOPACZMatrix(Buffer, nAtoms, Prefs);
+			if (Prefs->GetAutoBond())	//setup bonds, if needed
+				lFrame->SetBonds(Prefs, false);
 		}
-		if (Prefs->GetAutoBond())	//setup bonds, if needed
-			lFrame->SetBonds(Prefs, false);
 	}
+	Buffer->SetFilePos(0);	//restart search from beginning of file
 	if (Buffer->FindGroup("EFRAG")) {
 		Buffer->SkipnLines(1);
 		Buffer->GetLine(Line);	//1st line has all of the options
@@ -856,13 +860,19 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			MainData->InputOptions->EFP.SetMaxBasisFunctions(tag);
 		if (ReadLongKeyword(Line, "NBUFFMO", &tag))
 			MainData->InputOptions->EFP.SetNumBufferMOs(tag);
+
+		long former_pos;
+		long start_pos;
+		long end_pos;
+		int found_it;
+		float tmp_f;
 		//Now tackle the individual fragment definitions
 		//These should consist of 4 line blocks of Fragname=xxx followed by three atom lines
 		//For now I am only going to deal with cartesian coordinates
 		if (MainData->InputOptions->EFP.UseCartesianCoordinates()) {
 			Buffer->GetLine(Line);
 			while (ReadStringKeyword(Line, "FRAGNAME", token)) {
-				if (!strcasecmp(token, "H2ORHF")||!strcasecmp(token, "H2ODFT")) {	//builtin EFP1 style is limited to H2O with known labels
+				if (!strcasecmp(token, "H2ORHF") || !strcasecmp(token, "H2ODFT")) {	//builtin EFP1 style is limited to H2O with known labels
 					MainData->FragmentNames.push_back(std::string(token));
 					long fragNum = MainData->FragmentNames.size();
 					CPoint3D	pos;
@@ -880,6 +890,144 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 						}
 					}
 				}
+				Buffer->GetLine(Line);
+			}
+		} else {
+			mpAtom *atm;
+			CPoint3D dst_locs[3];
+			CPoint3D pos;
+			int fstart;
+			int match[3] = {0, 0, 0};
+			CPoint3D src_locs[3];
+			char labels[3][kMaxLineLength];
+			int AtomType;
+			long fragNum;
+			int i;
+			CPoint3D new_pos;
+			CPoint3D rot_pos;
+			CPoint3D curr_pos;
+			CPoint3D orig;
+			Matrix4D vec2vec;
+			CPoint3D src_vec;
+			CPoint3D dst_vec;
+			CPoint3D dst_vec2;
+			CPoint3D dst_norm;
+			CPoint3D mid_norm;
+			CPoint3D mid_vec1, mid_vec2;
+			float dot;
+			float scale;
+
+			Buffer->GetLine(Line);
+			while (ReadStringKeyword(Line, "FRAGNAME", token)) {
+				MainData->FragmentNames.push_back(std::string(token));
+				fragNum = MainData->FragmentNames.size();
+				for (i = 0; i < 3; i++) {
+					Buffer->GetLine(Line);
+					sscanf(Line, "%s %f %f %f", labels[i],
+						   &(dst_locs[i].x), &(dst_locs[i].y), &(dst_locs[i].z));
+					std::cout << "Line: " << Line << std::endl;
+					/* atm = lFrame->AddAtom(6, dst_locs[i]); */
+					/* atm->SetFragmentNumber(fragNum); */
+				}
+
+				former_pos = Buffer->GetFilePos();
+				found_it = Buffer->FindGroup(MainData->FragmentNames[fragNum - 1].c_str());
+				if (!found_it) {
+					std::cout << "didn't find group " << token << std::endl;
+					throw DataError(20);
+				}
+				start_pos = Buffer->GetFilePos();
+
+				Buffer->SkipnLines(3);   // skip group name, title, COORDINATES
+
+				fstart = lFrame->NumAtoms;
+				while (Buffer->GetLine(Line) && Line[0] == 'A') {
+					sscanf(Line, "%s %f %f %f %f %d", token, &pos.x, &pos.y, &pos.z, &tmp_f, &AtomType);
+
+					if (strcmp(token, labels[0]) == 0) {
+						match[0] = lFrame->NumAtoms;
+						src_locs[0] = pos;
+					} else if (strcmp(token, labels[1]) == 0) {
+						match[1] = lFrame->NumAtoms;
+						src_locs[1] = pos;
+					} else if (strcmp(token, labels[2]) == 0) {
+						match[2] = lFrame->NumAtoms;
+						src_locs[2] = pos;
+					}
+
+					std::cout << "Line: " << Line << std::endl;
+					if (AtomType > 0) {
+						atm = lFrame->AddAtom(AtomType, pos);
+						atm->SetFragmentNumber(fragNum);
+					}
+				}
+
+				// We first find a rotation that one will align a vector
+				// in the fragment template to the corresponding vector in
+				// the destination space.  While we're at it, we figure out
+				// the scale ratio between the destination space and the
+				// fragment space.
+				dst_vec = dst_locs[1] - dst_locs[0];
+				src_vec = src_locs[1] - src_locs[0];
+
+				scale = dst_vec.Magnitude() / src_vec.Magnitude();
+
+				Normalize3D(&dst_vec);
+				Normalize3D(&src_vec);
+
+				SetRotationMatrix(vec2vec, &src_vec, &dst_vec);
+
+				// The common vector now serves as an axis of rotation.  We
+				// need to rotate the fragment template plane so that it
+				// coincides with the destination plane.  The angle of rotation
+				// can be determined by the angle between the two planes'
+				// normals.
+			   	lFrame->GetAtomPosition(match[0], orig);
+				Rotate3DOffset(vec2vec, src_locs[1] - orig, &mid_vec1);
+				Rotate3DOffset(vec2vec, src_locs[2] - orig, &mid_vec2);
+				UnitCrossProduct3D(&mid_vec1, &mid_vec2, &mid_norm);
+
+				dst_vec2 = dst_locs[2] - dst_locs[0];
+				UnitCrossProduct3D(&dst_vec, &dst_vec2, &dst_norm);
+
+				Matrix4D tri2tri;
+				dot = DotProduct3D(&mid_norm, &dst_norm);
+
+				// Technically, the axis of rotation might be facing a
+				// different direction than we think it is.  To be consistent,
+				// we instead use the axis that is normal to both planes'
+				// normals.  It points in the same or opposite direction as
+				// dst_vec.
+				CPoint3D axis;
+				UnitCrossProduct3D(&mid_norm, &dst_norm, &axis);
+				RotateAroundAxis(tri2tri, axis, acos(dot) * 180.0f / kPi);
+
+				// We concatenate the two rotation matrices.
+				Matrix4D transform;
+				MultiplyMatrix(vec2vec, tri2tri, transform);
+
+				// Okay, for each atom we added for this fragment instance, we
+				// move it into destination space.  We translate to make the
+				// base fragment atom the origin, scale into destination space,
+				// and then rotate to align the fragment with the destination
+				// plane, and then translate by the base destination atom.
+				for (long i = fstart; i < lFrame->NumAtoms; i++) {
+					lFrame->GetAtomPosition(i, curr_pos);
+					new_pos = curr_pos - orig;
+					new_pos = new_pos * scale;
+					Rotate3DOffset(transform, new_pos, &rot_pos);
+				    new_pos = rot_pos + dst_locs[0];
+					lFrame->SetAtomPosition(i, new_pos);
+				}
+
+				found_it = Buffer->FindGroup("END");
+				if (!found_it) {
+					std::cout << "didn't find end of group " << token << std::endl;
+					throw DataError(20);
+				}
+				end_pos = Buffer->GetFilePos();
+				Buffer->SetFilePos(former_pos);
+
 				Buffer->GetLine(Line);
 			}
 		}

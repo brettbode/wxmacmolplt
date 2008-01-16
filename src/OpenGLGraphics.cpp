@@ -1513,8 +1513,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 	if (!core_obj) throw std::bad_alloc();
 
 	// gluQuadricDrawStyle(qobj, GLU_FILL); //or GLU_LINE
-	gluQuadricOrientation(core_obj, GLU_OUTSIDE);
-	gluQuadricNormals(core_obj, GLU_SMOOTH); //GLU_FLAT GLU_NONE
+	/* gluQuadricOrientation(core_obj, GLU_OUTSIDE); */
+	/* gluQuadricNormals(core_obj, GLU_SMOOTH); //GLU_FLAT GLU_NONE */
 
 	Frame *lFrame = MainData->cFrame;
 	mpAtom *lAtoms = lFrame->Atoms;
@@ -2888,27 +2888,24 @@ long Surf3DBase::CreateWireFrameSurfaceWithLines(CPoint3D * Vertices, long * vLi
 }
 
 //Utility function to create a line made up of a variable width cylinder. the GLUquadricObj must be preallocated
-void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd,
+void CreateCylinderFromLine(GLUquadricObj *qobj, const CPoint3D& lineStart, const CPoint3D& lineEnd,
 							float lineWidth, int nslices, int nstacks, bool cap) {
+
 	if (qobj == NULL) return;
-	CPoint3D	offset, NormalOffset, NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
-	Matrix4D	rotMat;
+
+	CPoint3D offset;
+	CPoint3D NormalOffset(0.0f, 0.0f, 0.0f);
+	CPoint3D NormStart(0.0f, 0.0f, 1.0f);
+	Matrix4D rotMat;
 	
-	offset.x =  lineEnd.x - lineStart.x;
-	offset.y =  lineEnd.y - lineStart.y;
-	offset.z =  lineEnd.z - lineStart.z;
+	offset = lineEnd - lineStart;
 	float length = offset.Magnitude();
 	if (length>0.00001) {
 		NormalOffset.x = offset.x/length;
 		NormalOffset.y = offset.y/length;
 		NormalOffset.z = offset.z/length;
-	} else
-		NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
-	// NormEnd isn't being used as far as I can tell, so I'm commenting these
-	// lines out.
-	// CPoint3D NormEnd;
-	// NormEnd = lineEnd; 
-	// Normalize3D (&NormEnd); 
+	}
+
 	SetRotationMatrix(rotMat, &NormStart, &NormalOffset);
 	rotMat[3][0] = lineStart.x;
 	rotMat[3][1] = lineStart.y;
@@ -3176,7 +3173,7 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	glPopAttrib();
 }
 
-//Draw a transluecent plane
+//Draw a translucent plane
 void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2) {
 
 	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
@@ -3195,6 +3192,10 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 	glTranslatef(origin.x, origin.y, origin.z);
 	glMultMatrixf((const GLfloat *) &rotationMatrix);
 
+	// Symmetry planes are viewed from either side, so if we should either
+	// light both sides or light neither.  Neither is simpler.
+	glDisable(GL_LIGHTING);
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_BLEND);
 	glDepthMask(GL_FALSE);
@@ -3204,12 +3205,9 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
 	glColor4f(0, .64, .85, 0.3);
-   
 	glRectf(0, 0, s1Length, s2Length);
-
 	glDisable(GL_BLEND);
 
-	glDisable(GL_LIGHTING);
 	glColor4f(0, .64, .85, 1);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glLineWidth(1);
@@ -3633,9 +3631,9 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	// site_vec is 0, drawing is done.  Otherwise, the normalized vector for
 	// the site_vec is returned.
 
-	Frame *	lFrame=MainData->cFrame;
-	mpAtom * lAtoms = lFrame->Atoms;
-	Bond * lBonds = lFrame->Bonds;
+	Frame *lFrame=MainData->cFrame;
+	mpAtom *lAtoms = lFrame->Atoms;
+	Bond *lBonds = lFrame->Bonds;
 	long NumBonds = lFrame->NumBonds;
 	
 	short coordination = lAtoms[iatom].GetCoordinationNumber();
@@ -3654,13 +3652,12 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	for (i = 0; i < NumBonds; i++) {
 		if (((iatom == lBonds[i].Atom1) || (iatom == lBonds[i].Atom2)) &&
 			(lBonds[i].Order > kHydrogenBond)) {
-
 			bonds.push_back(&lBonds[i]);
-
-			if (bonds.size() >= coordination) {
-				return;
-			}
 		}
+	}
+
+	if (bonds.size() >= coordination) {
+		return;
 	}
 
 	// Test to see if any bond sites are unused, if not return.
@@ -3705,7 +3702,8 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				if (site_id == 0) { \
 					glLoadName(vec_site); \
 					CreateCylinderFromLine(qobj, origin, \
-										   vec * 2.0f * radius, CYL_RADIUS, 10, 1, true); \
+										   vec * 2.0f * radius, \
+										   CYL_RADIUS, 10, 3, true); \
 				} else if (site_id == vec_site) { \
 					*vector = vec; \
 					return; \
@@ -3714,7 +3712,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	// If we get here, we know that there are some unbonded sites.
 	switch (coordination+lpCount) {
 
-		// Configuarion will be linear.
+		// Configuration will be linear.
 		case 1:
 			{
 				CPoint3D v(0.0f, 1.0f, 0.0f);
@@ -4668,20 +4666,18 @@ void DrawPipeCylinder(float length, GLUquadric *quadric, unsigned int ncaps,
 
 	// Draw sphere at end0 if requested.
 	if (ncaps & 1) {
-		glPushMatrix(); // scaled end0
+		glPushMatrix(); // end0
 		glScalef(radius, radius, radius);
 		glCallList(sphere_list);
-		glPopMatrix(); // scaled end0
+		glPopMatrix(); // end0
 	}
 
 	// Draw sphere at end1 if requested.
 	if (ncaps & 2) {
 		glPushMatrix(); // end1
 		glTranslatef(0.0f, 0.0f, length);
-		glPushMatrix(); // scaled end1
 		glScalef(radius, radius, radius);
 		glCallList(sphere_list);
-		glPopMatrix(); // scaled end1
 		glPopMatrix(); // end1
 	}
 

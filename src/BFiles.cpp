@@ -250,7 +250,7 @@ void BufferFile::SetFilePos(long NewPos) {
 }
 // GetFileType will attempt to determine the type of text file we are dealing
 // with (ex: GAMESS log, GAMESS IRC ...) return Unknown when matching fails
-// the arguement is really a pascal string
+// the argument is really a pascal string
 TextFileType BufferFile::GetFileType(const char * fileName) {
 	long EntryPos = GetFilePos(), FileSize=ByteCount;
 	TextFileType	Type=kUnknown;
@@ -315,6 +315,14 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 	SetFilePos(EntryPos);
 	return Type;
 }
+
+/**
+ * This function scans the buffered file for the group specified by 
+ * GroupName.  In the GAMESS file format, groups start with a line
+ * containing " $GroupName" and end with " $END".  If the group is found,
+ * the file pointer is set to point at the " $GroupName" line.  Otherwise,
+ * the file pointer remains unchanged.
+ */
 long BufferFile::FindGroup(const char * GroupName) {
 	long result = 0, InitialPos, LineStartPos;
 	char Line[kMaxLineLength];
@@ -325,13 +333,14 @@ long BufferFile::FindGroup(const char * GroupName) {
 		GetLine(Line);
 		if (Line[0]==' ' && Line[1] == '$') {	//possible group name
 			if (0 == FindKeyWord(&(Line[2]), GroupName, strlen(GroupName)))
-				result = true;
+				result = 1;
 		}
 	}
 	if (!result) SetFilePos(InitialPos);	//reset the initial pos if no group was found
 	else SetFilePos(LineStartPos);	//Push the line back into the buffer
 	return result;
 }
+
 void BufferFile::AdvanceBuffer(void) {
 	if (IOType == 1) {	//Write mode
 		long BytesToWrite = MIN(BufferSize, BufferPos);
@@ -518,9 +527,9 @@ long BufferFile::FindBlankLine(void) {
 	SetFilePos(Start);
 	return BlankLinePos;
 }
-//Search the file for the specified keyword until found, EOF, or the limit is reached
-//Returns true or false, the file position upon exit will be the start of the keyword,
-//or the starting position if the keyword is not found.
+//Search the file for the specified keyword until found, EOF, or the limit is
+//reached Returns true or false, the file position upon exit will be the start
+//of the keyword, or the starting position if the keyword is not found.
 bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, long Limit) {
 	long OldPosition = GetFilePos();
 	char	LineText[kMaxLineLength + 1];
