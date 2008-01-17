@@ -870,29 +870,6 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		//These should consist of 4 line blocks of Fragname=xxx followed by three atom lines
 		//For now I am only going to deal with cartesian coordinates
 		if (MainData->InputOptions->EFP.UseCartesianCoordinates()) {
-			Buffer->GetLine(Line);
-			while (ReadStringKeyword(Line, "FRAGNAME", token)) {
-				if (!strcasecmp(token, "H2ORHF") || !strcasecmp(token, "H2ODFT")) {	//builtin EFP1 style is limited to H2O with known labels
-					MainData->FragmentNames.push_back(std::string(token));
-					long fragNum = MainData->FragmentNames.size();
-					CPoint3D	pos;
-					int		AtomType;
-					for (int i=0; i<3; i++) {
-						AtomType = -1;
-						Buffer->GetLine(Line);
-						//lines have format "label x, y, z"
-						sscanf(Line, "%s %f %f %f", token, &pos.x, &pos.y, &pos.z);
-						if (!strcasecmp(token, "O1")) AtomType = 8;
-						else if (!strcasecmp(token, "H2")||!strcasecmp(token, "H3")) AtomType = 1;
-						if (AtomType > 0) {
-							mpAtom * atm = lFrame->AddAtom(AtomType, pos);
-							atm->SetFragmentNumber(fragNum);
-						}
-					}
-				}
-				Buffer->GetLine(Line);
-			}
-		} else {
 			mpAtom *atm;
 			CPoint3D dst_locs[3];
 			CPoint3D pos;
@@ -915,118 +892,138 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			CPoint3D mid_norm;
 			CPoint3D mid_vec1, mid_vec2;
 			float dot;
-			float scale;
 
 			Buffer->GetLine(Line);
 			while (ReadStringKeyword(Line, "FRAGNAME", token)) {
-				MainData->FragmentNames.push_back(std::string(token));
-				fragNum = MainData->FragmentNames.size();
-				for (i = 0; i < 3; i++) {
-					Buffer->GetLine(Line);
-					sscanf(Line, "%s %f %f %f", labels[i],
-						   &(dst_locs[i].x), &(dst_locs[i].y), &(dst_locs[i].z));
-					std::cout << "Line: " << Line << std::endl;
-					/* atm = lFrame->AddAtom(6, dst_locs[i]); */
-					/* atm->SetFragmentNumber(fragNum); */
-				}
-
-				former_pos = Buffer->GetFilePos();
-				found_it = Buffer->FindGroup(MainData->FragmentNames[fragNum - 1].c_str());
-				if (!found_it) {
-					std::cout << "didn't find group " << token << std::endl;
-					throw DataError(20);
-				}
-				start_pos = Buffer->GetFilePos();
-
-				Buffer->SkipnLines(3);   // skip group name, title, COORDINATES
-
-				fstart = lFrame->NumAtoms;
-				while (Buffer->GetLine(Line) && Line[0] == 'A') {
-					sscanf(Line, "%s %f %f %f %f %d", token, &pos.x, &pos.y, &pos.z, &tmp_f, &AtomType);
-
-					if (strcmp(token, labels[0]) == 0) {
-						match[0] = lFrame->NumAtoms;
-						src_locs[0] = pos;
-					} else if (strcmp(token, labels[1]) == 0) {
-						match[1] = lFrame->NumAtoms;
-						src_locs[1] = pos;
-					} else if (strcmp(token, labels[2]) == 0) {
-						match[2] = lFrame->NumAtoms;
-						src_locs[2] = pos;
-					}
-
-					std::cout << "Line: " << Line << std::endl;
-					if (AtomType > 0) {
-						atm = lFrame->AddAtom(AtomType, pos);
-						atm->SetFragmentNumber(fragNum);
+				if (!strcasecmp(token, "H2ORHF") || !strcasecmp(token, "H2ODFT")) {	//builtin EFP1 style is limited to H2O with known labels
+					MainData->FragmentNames.push_back(std::string(token));
+					long fragNum = MainData->FragmentNames.size();
+					CPoint3D	pos;
+					int		AtomType;
+					for (int i=0; i<3; i++) {
+						AtomType = -1;
+						Buffer->GetLine(Line);
+						//lines have format "label x, y, z"
+						sscanf(Line, "%s %f %f %f", token, &pos.x, &pos.y, &pos.z);
+						if (!strcasecmp(token, "O1")) AtomType = 8;
+						else if (!strcasecmp(token, "H2")||!strcasecmp(token, "H3")) AtomType = 1;
+						if (AtomType > 0) {
+							mpAtom * atm = lFrame->AddAtom(AtomType, pos);
+							atm->SetFragmentNumber(fragNum);
+						}
 					}
 				}
 
-				// We first find a rotation that one will align a vector
-				// in the fragment template to the corresponding vector in
-				// the destination space.  While we're at it, we figure out
-				// the scale ratio between the destination space and the
-				// fragment space.
-				dst_vec = dst_locs[1] - dst_locs[0];
-				src_vec = src_locs[1] - src_locs[0];
+				// Custom fragment type.
+				else {
+					MainData->FragmentNames.push_back(std::string(token));
+					fragNum = MainData->FragmentNames.size();
+					for (i = 0; i < 3; i++) {
+						Buffer->GetLine(Line);
+						sscanf(Line, "%s %f %f %f", labels[i],
+							   &(dst_locs[i].x), &(dst_locs[i].y), &(dst_locs[i].z));
+						std::cout << "Line: " << Line << std::endl;
+						/* atm = lFrame->AddAtom(6, dst_locs[i]); */
+						/* atm->SetFragmentNumber(fragNum); */
+					}
 
-				scale = dst_vec.Magnitude() / src_vec.Magnitude();
+					former_pos = Buffer->GetFilePos();
+					found_it = Buffer->FindGroup(MainData->FragmentNames[fragNum - 1].c_str());
+					if (!found_it) {
+						std::cout << "didn't find group " << token << std::endl;
+						throw DataError(20);
+					}
+					start_pos = Buffer->GetFilePos();
 
-				Normalize3D(&dst_vec);
-				Normalize3D(&src_vec);
+					Buffer->SkipnLines(3);   // skip group name, title, COORDINATES
 
-				SetRotationMatrix(vec2vec, &src_vec, &dst_vec);
+					fstart = lFrame->NumAtoms;
+					while (Buffer->GetLine(Line) && Line[0] == 'A') {
+						sscanf(Line, "%s %f %f %f %f %d", token, &pos.x, &pos.y, &pos.z, &tmp_f, &AtomType);
 
-				// The common vector now serves as an axis of rotation.  We
-				// need to rotate the fragment template plane so that it
-				// coincides with the destination plane.  The angle of rotation
-				// can be determined by the angle between the two planes'
-				// normals.
-			   	lFrame->GetAtomPosition(match[0], orig);
-				Rotate3DOffset(vec2vec, src_locs[1] - orig, &mid_vec1);
-				Rotate3DOffset(vec2vec, src_locs[2] - orig, &mid_vec2);
-				UnitCrossProduct3D(&mid_vec1, &mid_vec2, &mid_norm);
+						if (strcmp(token, labels[0]) == 0) {
+							match[0] = lFrame->NumAtoms;
+							src_locs[0] = pos;
+						} else if (strcmp(token, labels[1]) == 0) {
+							match[1] = lFrame->NumAtoms;
+							src_locs[1] = pos;
+						} else if (strcmp(token, labels[2]) == 0) {
+							match[2] = lFrame->NumAtoms;
+							src_locs[2] = pos;
+						}
 
-				dst_vec2 = dst_locs[2] - dst_locs[0];
-				UnitCrossProduct3D(&dst_vec, &dst_vec2, &dst_norm);
+						std::cout << "Line: " << Line << std::endl;
+						if (AtomType > 0) {
+							atm = lFrame->AddAtom(AtomType, pos);
+							atm->SetFragmentNumber(fragNum);
+						}
+					}
 
-				Matrix4D tri2tri;
-				dot = DotProduct3D(&mid_norm, &dst_norm);
+					// We first find a rotation that one will align a vector
+					// in the fragment template to the corresponding vector in
+					// the destination space.  While we're at it, we figure out
+					// the scale ratio between the destination space and the
+					// fragment space.
+					dst_vec = dst_locs[1] - dst_locs[0];
+					Normalize3D(&dst_vec);
 
-				// Technically, the axis of rotation might be facing a
-				// different direction than we think it is.  To be consistent,
-				// we instead use the axis that is normal to both planes'
-				// normals.  It points in the same or opposite direction as
-				// dst_vec.
-				CPoint3D axis;
-				UnitCrossProduct3D(&mid_norm, &dst_norm, &axis);
-				RotateAroundAxis(tri2tri, axis, acos(dot) * 180.0f / kPi);
+					src_vec = src_locs[1] - src_locs[0];
+					Normalize3D(&src_vec);
 
-				// We concatenate the two rotation matrices.
-				Matrix4D transform;
-				MultiplyMatrix(vec2vec, tri2tri, transform);
+					SetRotationMatrix(vec2vec, &src_vec, &dst_vec);
 
-				// Okay, for each atom we added for this fragment instance, we
-				// move it into destination space.  We translate to make the
-				// base fragment atom the origin, scale into destination space,
-				// and then rotate to align the fragment with the destination
-				// plane, and then translate by the base destination atom.
-				for (long i = fstart; i < lFrame->NumAtoms; i++) {
-					lFrame->GetAtomPosition(i, curr_pos);
-					new_pos = curr_pos - orig;
-					new_pos = new_pos * scale;
-					Rotate3DOffset(transform, new_pos, &rot_pos);
-				    new_pos = rot_pos + dst_locs[0];
-					lFrame->SetAtomPosition(i, new_pos);
+					// The common vector now serves as an axis of rotation.  We
+					// need to rotate the fragment template plane so that it
+					// coincides with the destination plane.  The angle of rotation
+					// can be determined by the angle between the two planes'
+					// normals.
+					lFrame->GetAtomPosition(match[0], orig);
+					Rotate3DOffset(vec2vec, src_locs[1] - orig, &mid_vec1);
+					Rotate3DOffset(vec2vec, src_locs[2] - orig, &mid_vec2);
+					UnitCrossProduct3D(&mid_vec1, &mid_vec2, &mid_norm);
+
+					dst_vec2 = dst_locs[2] - dst_locs[0];
+					UnitCrossProduct3D(&dst_vec, &dst_vec2, &dst_norm);
+
+					Matrix4D tri2tri;
+					dot = DotProduct3D(&mid_norm, &dst_norm);
+
+					// Technically, the axis of rotation (the aligned vector)
+					// might be facing a different direction than we think it
+					// is.  To be consistent, we instead use the axis that is
+					// normal to both planes' normals.  It points in the same
+					// or opposite direction as dst_vec.
+					CPoint3D axis;
+					UnitCrossProduct3D(&mid_norm, &dst_norm, &axis);
+					RotateAroundAxis(tri2tri, axis, acos(dot) * 180.0f / kPi);
+
+					// We concatenate the two rotation matrices.
+					Matrix4D transform;
+					MultiplyMatrix(vec2vec, tri2tri, transform);
+
+					// Okay, for each atom we added for this fragment instance,
+					// we move it into destination space.  We translate to make
+					// the base fragment atom the origin, scale into angstroms,
+					// and then rotate to align the fragment with the
+					// destination plane, and then translate by the base
+					// destination atom.
+					for (long i = fstart; i < lFrame->NumAtoms; i++) {
+						lFrame->GetAtomPosition(i, curr_pos);
+						new_pos = curr_pos - orig;
+						new_pos = new_pos * kBohr2AngConversion;
+						Rotate3DOffset(transform, new_pos, &rot_pos);
+						new_pos = rot_pos + dst_locs[0];
+						lFrame->SetAtomPosition(i, new_pos);
+					}
+
+					found_it = Buffer->FindGroup("END");
+					if (!found_it) {
+						std::cout << "didn't find end of group " << token << std::endl;
+						throw DataError(20);
+					}
+					end_pos = Buffer->GetFilePos();
+					Buffer->SetFilePos(former_pos);
 				}
-
-				found_it = Buffer->FindGroup("END");
-				if (!found_it) {
-					std::cout << "didn't find end of group " << token << std::endl;
-					throw DataError(20);
-				}
-				end_pos = Buffer->GetFilePos();
-				Buffer->SetFilePos(former_pos);
 
 				Buffer->GetLine(Line);
 			}

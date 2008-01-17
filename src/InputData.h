@@ -564,6 +564,7 @@ class EffectiveFragmentsGroup {
 		long MaxMOs;		///< MXMO - Max number of MOs in any EFP2's PROJECTION section
 		long NumBufferMOs;	///< NBUFFMO - First n orbs in the MO matrix belong to the QM/MM buffer - see $MOFRZ
 		char flags;			///< Set of bits to handle the 3 text fields
+							// bit 1 is 0 for Cartesian coordinates, 1 for internal coordinates
 	public:
 			/** Constructor. Sets normal default values.
 			 */
@@ -571,9 +572,9 @@ class EffectiveFragmentsGroup {
 			/** = operator to copy one instance to another.
 			 */
 		const EffectiveFragmentsGroup & operator=(const EffectiveFragmentsGroup & other) {flags=other.flags; MaxBasisFuncs=other.MaxBasisFuncs; MaxMOs=other.MaxMOs; NumBufferMOs=other.NumBufferMOs; return *this;};
-		bool UseCartesianCoordinates(void) const {return (flags & 1);};
+		bool UseCartesianCoordinates(void) const {return !(flags & 1);};
 		void UseCartesianCoordinates(bool v) {flags = (flags & 0xFE) + (v ? 1 : 0);};
-		bool UseInternalCoordinates(void) const {return !(flags & 1);};
+		bool UseInternalCoordinates(void) const {return (flags & 1);};
 		void UseInternalCoordinates(bool v) {flags = (flags & 0xFE) + (v ? 0 : 1);};
 			/** Set the coordinates type from the text string.
 			 * @param v The string containing a valid COORD= value (CART or INT).
