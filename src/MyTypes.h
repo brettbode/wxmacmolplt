@@ -248,7 +248,11 @@ class mpAtom {
 		inline bool GetInvisibility(void) const {return ((flags & 1)? true: false);};	//Bit 1 sets invisibility
 		bool SetInvisibility(bool State) {flags = (flags & 0xFE) + (State? 1:0);return GetInvisibility();};
 		inline bool GetSelectState(void) const {return ((flags&2)?true:false);};	//Bit 2 sets selected
+
+		// Please don't call SetSelectState directly.  Use the frame method SetAtomSelection, so that the number
+		// of selected atoms is properly accounted for.
 		bool SetSelectState(bool State) {flags = (flags & 0xFD) + (State?2:0); return GetSelectState();};
+
 		inline long GetType(void) const {return Type;};
 		inline bool SetType(short atmType) {if ((atmType>0)&&(atmType<107)) {Type = atmType; return true;} return false;};
 		inline bool IsEffectiveFragment(void) const {return ((flags & (1<<2))?true:false);};

@@ -1133,6 +1133,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 			if (ndrag_events == 1) {
 				MolWin->CreateFrameSnapShot();
 			}
+
 			if (ndrag_events < 3) {
 				//also check that only whole EFPs are selected
 				Frame *lFrame = mMainData->cFrame;
@@ -1143,8 +1144,8 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 						long fragId = lAtoms[i].GetFragmentNumber();
 						for (long j=0; j<NumAtoms; j++) {
 							if (lAtoms[j].IsEffectiveFragment() &&
-								lAtoms[j].GetFragmentNumber()==fragId)
-								lAtoms[j].SetSelectState(true);
+								lAtoms[j].GetFragmentNumber() == fragId)
+								lFrame->SetAtomSelection(j, true);
 						}
 					}
 				}
@@ -2355,7 +2356,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 		
 		if (lFrame->Atoms[selected].IsEffectiveFragment()) {
 			wxString flabel(mMainData->FragmentNames[lFrame->Atoms[selected].GetFragmentNumber()-1].c_str(), wxConvUTF8);
-			aLabel.Printf(wxT("EFP %d"), lFrame->Atoms[selected].GetFragmentNumber(), (selected+1));
+			aLabel.Printf(wxT("EFP (%d) "), lFrame->Atoms[selected].GetFragmentNumber(), (selected+1));
 			aLabel.Append(flabel);
 			item = menu.Append(wxID_ANY, aLabel);
 			item->Enable(false);

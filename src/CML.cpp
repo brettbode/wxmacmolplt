@@ -1676,7 +1676,6 @@ void Frame::ParseAtomAttributeArrayXML(XMLElement * arrayXML, const std::vector<
 							bool temp;
 							if (child->getAttributeValue(CML_convert(selectedAttr),temp))
 								SetAtomSelection(atomId, temp);
-								// Atoms[atomId].SetSelectState(temp); 
 							if (child->getAttributeValue(CML_convert(invisibleAttr),temp))
 								Atoms[atomId].SetInvisibility(temp);
 							if (child->getAttributeValue(CML_convert(symmetryUniqueAttr),temp))

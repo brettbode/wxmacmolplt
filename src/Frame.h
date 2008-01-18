@@ -152,9 +152,6 @@ class Frame {
 		inline bool GetBondSelectState(long BondNum) const {return ((BondNum<NumBonds)?Bonds[BondNum].GetSelectState():false);};
 		inline void SetBondSelectState(long BondNum, bool state)
 			{if (BondNum<NumBonds) Bonds[BondNum].SetSelectState(state);};
-		/* inline bool GetAtomSelectState(long AtomNum) const {return ((AtomNum<NumAtoms)?Atoms[AtomNum].GetSelectState():false);}; */
-		/* inline void SetAtomSelectState(long AtomNum, bool state) */
-			/* {if (AtomNum<NumAtoms) Atoms[AtomNum].SetSelectState(state);}; */
 		inline BondOrder GetBondOrder(long BondNum) const {return Bonds[BondNum].Order;};
 		long GetNumElectrons(void) const;
 		inline void SetBondOrder(long BondNum, BondOrder NewOrder) {Bonds[BondNum].Order = NewOrder;};
