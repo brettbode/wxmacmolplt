@@ -82,10 +82,17 @@ class EnergyOptions {
 		float GetY2Zero(void) const {return y2Zero;};
 		void SetY1Zero(float NewValue) {y1Zero = NewValue;};
 		void SetY2Zero(float NewValue) {y2Zero = NewValue;};
+		/// Get the number of digits to print as labels
 		short GetNumDigits(void) const {return nDigits;};
-		void SetNumDigits(short newValue) {nDigits = newValue;};
+		/// Set the number of digits to print as labels ( > 0)
+		void SetNumDigits(const short & newValue) {
+			if ((newValue>0)&&(newValue<20)) nDigits = newValue;};
+		/// Get the screen space indicator point size
 		long GetEPlotPointSize(void) const {return EPlotBallSize;};
-		long SetEPlotPointSize(long NewSize) {return EPlotBallSize = NewSize;};
+		///Set the screen space indicator size (1 to 20)
+		long SetEPlotPointSize(const long & NewSize) {
+			if ((NewSize >= 1)&&(NewSize <= 20)) EPlotBallSize = NewSize;
+			return EPlotBallSize;};
 #ifndef __wxBuild__
 		void SetTEColor(void) {RGBForeColor(&TEColor);};
 		void SetMPColor(void) {RGBForeColor(&MPColor);};
@@ -296,42 +303,88 @@ class WinPrefs {
 		inline void ChangeFileType(Boolean newVal) {SetCreator = (newVal != 0);};
 		inline short GetStereoOffset(void) const {return StereoOffset;};
 		inline void SetStereoOffset(short newval) {StereoOffset = newval;};
+		/// Obtain the hi-res model space line width
 		inline float GetQD3DLineWidth(void) const {return (CylindersForLines() ? QD3DLineWidth : 0.0);};
-		inline void SetQD3DLineWidth(float newVal) {if (newVal >= 0) QD3DLineWidth = newVal;};
+		/// Set the hi-red model space line width (0 to 0.2)
+		inline void SetQD3DLineWidth(float newVal) {if ((newVal >= 0)&&(newVal<=0.2)) QD3DLineWidth = newVal;};
 		inline EnergyOptions * GetEnergyOptions(void) {return &EnergyPlotOptions;};
 		inline GraphOptions * GetGraphOptions(void) {return &PlotOptions;};
 		inline SurfaceOptions * GetSurfaceOptions(void) {return &SurfaceOpts;};
-		inline float SetMaxBondLength(float NewLength) {return (MaxBondLength = NewLength);};
+		/// Set the maximum inter atomic distance to be considered a bond (>0)
+		inline float SetMaxBondLength(const float & NewLength) {
+			if (NewLength >= 0.0) MaxBondLength = NewLength;
+			return MaxBondLength;};
+		/// the maximum inter atomic distance to be deemed a bond
 		inline float GetMaxBondLength(void) const {return MaxBondLength;}
+		/// Obtain the model space bond width
 		inline float GetQD3DBondWidth(void) const {return BondWidth;};
-		inline float SetQD3DBondWidth(float NewValue) {return BondWidth=NewValue;};
+		/// Set the model space bond width (values 0.001 to 0.2)
+		inline float SetQD3DBondWidth(float NewValue) {
+			if ((NewValue>=0.001)&&(NewValue<=0.2)) BondWidth=NewValue;
+			return BondWidth;};
+		///Obtain the atom (ie sphere) quality for the 3D display
 		inline long GetQD3DAtomQuality(void) const {return QD3DAtomQuality;};
-		inline long SetQD3DAtomQuality(long NewValue) {return QD3DAtomQuality = NewValue;};
+		///Set the # of divisions for 3D spheres (ie the quality). values should be between 2 and 40
+		inline long SetQD3DAtomQuality(long NewValue) {
+			if ((NewValue >= 2)&&(NewValue <= 40)) QD3DAtomQuality = NewValue;
+			return QD3DAtomQuality;};
+		/// Obtain the fill light brightness
 		inline float GetQD3DFillBrightness(void) const {return QD3DFillBrightness;};
-		inline float SetQD3DFillBrightness(float NewValue) {return QD3DFillBrightness = NewValue;};
+		/// Set the fill light brightness (0 to 1)
+		inline float SetQD3DFillBrightness(float NewValue) {
+			if ((NewValue >= 0.0)&&(NewValue<=1.0)) QD3DFillBrightness = NewValue;
+			return QD3DFillBrightness;};
+		/// Obtain the point light brightness
 		inline float GetQD3DPointBrightness(void) const {return QD3DPointBrightness;};
-		inline float SetQD3DPointBrightness(float NewValue) {return QD3DPointBrightness = NewValue;};
+		/// Set the point light brightness (0 to 1)
+		inline float SetQD3DPointBrightness(float NewValue) {
+			if ((NewValue >= 0.0)&&(NewValue <= 1.0)) QD3DPointBrightness = NewValue;
+			return QD3DPointBrightness;};
+		/** Obtain the master atom size scale factor in model space.
+		 * This includes the conversion from picometers to angstroms for the individual atom sizes.
+		 */
 		inline float GetAtomScale(void) const {return AtomScale;};
-		inline float SetAtomScale(float NewValue) {return AtomScale=NewValue;};
+		/// Set the model space global atom (sphere) scale factor (0 - 0.025)
+		inline float SetAtomScale(float NewValue) {
+			if ((NewValue >= 0)&&(NewValue <= 0.025)) AtomScale=NewValue;
+			return AtomScale;};
 		//Note the GL FOV is really stored as FOV/2
 		inline float GetGLFOV(void) const {return GLFOV;};
 		inline float SetGLFOV(float NewValue) {return GLFOV=((NewValue>0)&&(NewValue<90)?NewValue:30);};
+		/// Obtain the inter frame time delay for frame animations
 		inline long GetAnimateTime(void) const {return AnimateTime;};
-		inline long SetAnimateTime(long NewValue) {return AnimateTime=NewValue;};
+		/// Set the interframe delay for frame animations (values should be between 0 and 120).
+		inline long SetAnimateTime(long NewValue) {
+			if ((NewValue>=0)&&(NewValue<120)) AnimateTime=NewValue;
+			return AnimateTime;};
+		/// Obtain the normal mode animation quality value
 		inline short GetAnimationSpeed(void) const {return AnimationSpeed;};
-		inline short SetAnimationSpeed(short NewValue) {return AnimationSpeed=NewValue;};
+		/// set the normal mode animation quality setting ( 1 to 16 )
+		inline short SetAnimationSpeed(short NewValue) {
+			if ((NewValue>=1)&&(NewValue<=16)) AnimationSpeed=NewValue;
+			return AnimationSpeed;};
 		inline Boolean GetAutoBond(void) const {return AutoBondFlag;};
 		inline Boolean SetAutoBond(Boolean state) {return AutoBondFlag = state;};
 		inline Boolean GetHHBondFlag(void) const {return HHBondFlag;};
 		inline Boolean SetHHBondFlag(Boolean state) {return HHBondFlag = state;};
+		/// obtain the tolerance factor (like a percentage) for determining bonding
 		inline float GetAutoBondScale(void) const {return AutoBondScale;};
-		inline float SetAutoBondScale(float NewValue) {return AutoBondScale = NewValue;};
+		/// set the bonding tolerance factor (0.005 to 0.015)
+		inline float SetAutoBondScale(const float & NewValue) {
+			if ((NewValue>= 0.005)&&(NewValue <= 0.015)) AutoBondScale = NewValue;
+			return AutoBondScale;};
+		/// Obtain the model space size for atom labels
 		inline float GetAtomLabelSize(void) const {return AtomLabelSize;};
-		inline void SetAtomLabelSize(const float & s) {if (s>0.0) AtomLabelSize = s;};
+		/// Set the model space size for atom labels ( 0.25 to 4.0)
+		inline void SetAtomLabelSize(const float & s) {if ((s>0.0)&&(s<= 4.0)) AtomLabelSize = s;};
+		/// Obtain the model space size for atom labels
 		inline float GetAnnotationLabelSize(void) const {return AnnotationLabelSize;};
-		inline void SetAnnotationLabelSize(const float & s) {if (s>0.0) AnnotationLabelSize = s;};
+		/// Set the model space size for annotation labels ( 0.25 to 4.0)
+		inline void SetAnnotationLabelSize(const float & s) {if ((s>0.0)&&(s<= 4.0)) AnnotationLabelSize = s;};
+		/// Indicates how many geometries to skip between ones kept (normally 0)
 		inline long GetDRCSkip(void) const {return DRCnFileSkip;};
-		inline long SetDRCSkip(long NewValue) {return DRCnFileSkip=NewValue;};
+		/// Set the # of geometries to skip between ones kept (normally 0)
+		inline long SetDRCSkip(long NewValue) {if (NewValue >=0) DRCnFileSkip=NewValue; return DRCnFileSkip;};
 		inline short GetLabelFontID(void) const {return LabelFontID;};
 		inline short SetLabelFontID(short NewID) {return LabelFontID=NewID;};
 		inline short GetLabelSize(void) const {return LabelSize;};
@@ -377,8 +430,12 @@ class WinPrefs {
 		inline void SetVectorColor(void) const {RGBForeColor(&VectorColor);};
 #endif
 		void SetVectorPattern(void);
+		/// Obtain the normal mode length scale factor
 		inline float GetVectorScale(void) const {return VectorScale;};
-		inline float SetVectorScale(float NewValue) {return VectorScale = NewValue;};
+		/// Set the normal mode length scale factor (0.1 to 2.5)
+		inline float SetVectorScale(float NewValue) {
+			if ((NewValue >= 0.1)&&(NewValue<= 2.5)) VectorScale = NewValue;
+			return VectorScale;};
 		inline unsigned char * GetAtomLabelLoc(void) {return &(AtomLabels[0][0]);};
 		void GetAtomLabel(long AtomNum, Str255 text);
 #ifdef __wxBuild__
