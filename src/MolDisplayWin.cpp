@@ -464,6 +464,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 		255,   0,   0,   0, 0, 0, 0, 0, 255,   0,   0,   0, 0, 0, 0, 0
 	};
 
+	glCanvas->SetCurrent();
 	glGenTextures(1, &(OpenGLData->length_anno_tex_id));
 	glBindTexture(GL_TEXTURE_2D, OpenGLData->length_anno_tex_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -815,7 +816,7 @@ void MolDisplayWin::ClearMenus(void) {
 
 void MolDisplayWin::AdjustMenus(void) {
 	ClearMenus();
-	menuFile->Enable(wxID_SAVE, Dirty);
+	/* menuFile->Enable(wxID_SAVE, Dirty); */
 	if (Prefs->ShowAtomicSymbolLabels() && Prefs->ShowAtomNumberLabels())
 		menuViewLabels->Check(MMP_BOTHATOMLABELS, true);
 	else if (Prefs->ShowAtomicSymbolLabels())
@@ -1425,7 +1426,7 @@ void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
 		if(buffer) {
 			UpdateWindowData();
 			MainData->WriteCMLFile(buffer, Prefs, &winData, true, true);
-			Dirty = false;
+			Dirtify(false);
 			delete buffer;
 		}
 #ifdef __WXMAC__
@@ -1456,7 +1457,7 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 			UpdateWindowData();
 			buffer = new BufferFile(currFile, true);
 			MainData->WriteCMLFile(buffer, Prefs, &winData, true, true);
-			Dirty = false;
+			Dirtify(false);
 		}
 		//catch (std::bad_alloc) {//Out of memory error
 			//if (!append)
@@ -1712,7 +1713,7 @@ void MolDisplayWin::menuFilePrintOptions(wxCommandEvent &event) {
 	PrintOptions * po = new PrintOptions(this);
 	po->ShowModal();
 	po->Destroy();
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
@@ -2231,79 +2232,103 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 	int ai, bi;
 	int *new_ids;
 	int natoms_selected = frame->GetNumAtomsSelected();
-	bool abinitioAtoms=false, EFPAtoms=false;
+	bool has_abinitio = false, has_efrag = false;
 	int fragId = -1;
 
-	if (natoms_selected) {
-		struc = new Structure;	
-		struc->natoms = natoms_selected;
-		struc->atoms = new mpAtom[struc->natoms];
-		new_ids = new int[frame->NumAtoms];
+	// Don't bother adding a prototype if nothing's selected.
+	if (!natoms_selected) {
+		return;
+	}
 
-		si = 0;
-		for (ai = 0; ai < frame->NumAtoms; ai++) {
-			if (frame->GetAtomSelection(ai)) {
-				struc->atoms[si] = atoms[ai];
-				new_ids[ai] = si;
-				si++;
-				//A prototype can be any number of all electron atoms or one effective fragment.
-				if (atoms[ai].IsEffectiveFragment()) {
-					EFPAtoms = true;
-					if (fragId < 0) {
-						fragId = atoms[ai].GetFragmentNumber();
-						struc->FragName = MainData->FragmentNames[fragId-1];
-					} else if (fragId != atoms[ai].GetFragmentNumber()) {
-						MessageAlert("A prototype can consist of only a single effective fragment.");
-						delete struc;
-						delete [] new_ids;
-						return;
-					}
-				} else abinitioAtoms = true;
+	// We make space for the new structure here.  The memory will be owned
+	// by the build palette.
+	struc = new Structure;	
+	struc->natoms = natoms_selected;
+	struc->atoms = new mpAtom[struc->natoms];
+
+	// The IDs of the selected atoms will be collapsed so that they're
+	// consecutive within the structure.  But to export bonds to the structure,
+	// we need a mapping from the current ID to the new ID.
+	new_ids = new int[frame->NumAtoms];
+
+	si = 0;
+	for (ai = 0; ai < frame->NumAtoms; ai++) {
+		if (frame->GetAtomSelection(ai)) {
+			struc->atoms[si] = atoms[ai];
+			new_ids[ai] = si;
+			si++;
+
+			// A prototype can be any number of all electron atoms or one
+			// effective fragment.
+			if (atoms[ai].IsEffectiveFragment()) {
+				has_efrag = true;
+				if (fragId < 0) {
+					fragId = atoms[ai].GetFragmentNumber();
+					struc->FragName = MainData->FragmentNames[fragId-1];
+				} else if (fragId != atoms[ai].GetFragmentNumber()) {
+					MessageAlert("A prototype can consist of only a single effective fragment.");
+					delete struc;
+					delete[] new_ids;
+					return;
+				}
 			} else {
-				new_ids[ai] = -1;
+				has_abinitio = true;
 			}
-		}
-		if (abinitioAtoms && EFPAtoms) {
-			MessageAlert("Prototypes can not mix all-electron and effective fragment atoms.");
-			delete struc;
-			delete [] new_ids;
-			return;
-		}
 
-		Bond new_bond;
-		std::vector<Bond> new_bonds;
-		for (bi = 0; bi < frame->NumBonds; bi++) {
-			if (frame->GetAtomSelection(bonds[bi].Atom1) &&
-				frame->GetAtomSelection(bonds[bi].Atom2)) {
-				new_bond = Bond(bonds[bi]);
-				new_bond.Atom1 = new_ids[new_bond.Atom1];
-				new_bond.Atom2 = new_ids[new_bond.Atom2];
-				new_bonds.push_back(new_bond);
-			}
-		}
-
-		struc->nbonds = new_bonds.size();
-		struc->bonds = new Bond[struc->nbonds];
-		memcpy(struc->bonds, &(new_bonds[0]), sizeof(Bond) * struc->nbonds);
-		delete[] new_ids;
-
-		wxTextEntryDialog *dlg =
-			new wxTextEntryDialog(this,
-					_("Please enter a name for this custom prototype:"),
-					_("Add Prototype"));
-		int result;
-		do {
-			result = dlg->ShowModal();
-		} while (result != wxID_CANCEL && dlg->GetValue().Len() <= 0);
-
-		struc->name = dlg->GetValue();
-
-		if (result == wxID_OK) {
-			build_palette->AddUserStructure(struc);
 		} else {
-			delete struc;
+			new_ids[ai] = -1;
 		}
+	}
+
+	if (has_abinitio && has_efrag) {
+		MessageAlert("Prototypes can not mix all-electron and effective fragment atoms.");
+		delete struc;
 		delete[] new_ids;
+		return;
+	}
+
+	// If this prototype is an effective fragment with a special definition,
+	// we have to save out its raw text.
+	if (struc->FragName.size()) {
+		std::map<std::string, EFrag>::iterator frag;
+		frag = MainData->efrags.find(struc->FragName);
+		if (frag != MainData->efrags.end()) {
+			struc->frag_def = std::string(frag->second.GetText());
+		}
+	}
+
+	Bond new_bond;
+	std::vector<Bond> new_bonds;
+	for (bi = 0; bi < frame->NumBonds; bi++) {
+		if (frame->GetAtomSelection(bonds[bi].Atom1) &&
+			frame->GetAtomSelection(bonds[bi].Atom2)) {
+			new_bond = Bond(bonds[bi]);
+			new_bond.Atom1 = new_ids[new_bond.Atom1];
+			new_bond.Atom2 = new_ids[new_bond.Atom2];
+			new_bonds.push_back(new_bond);
+		}
+	}
+
+	struc->nbonds = new_bonds.size();
+	struc->bonds = new Bond[struc->nbonds];
+	memcpy(struc->bonds, &(new_bonds[0]), sizeof(Bond) * struc->nbonds);
+	delete[] new_ids;
+
+	wxTextEntryDialog *dlg =
+		new wxTextEntryDialog(this,
+				_("Please enter a name for this custom prototype:"),
+				_("Add Prototype"));
+	int result;
+	do {
+		result = dlg->ShowModal();
+	} while (result != wxID_CANCEL && dlg->GetValue().Len() <= 0);
+
+	struc->name = dlg->GetValue();
+
+	if (result == wxID_OK) {
+		build_palette->AddUserStructure(struc);
+	} else {
+		delete struc;
 	}
 
 }
@@ -2321,7 +2346,7 @@ void MolDisplayWin::menuViewShowFullScreen(wxCommandEvent &event) {
 void MolDisplayWin::menuViewShowNormalMode(wxCommandEvent &event) {
 	MainData->SetDrawMode(1-MainData->GetDrawMode());
 	ResetModel(false);
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuViewPrevNormalMode(wxCommandEvent &event) {
@@ -2346,7 +2371,7 @@ void MolDisplayWin::menuViewOffsetAlongMode(wxCommandEvent &event) {
 void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
 	MainData->CenterModelWindow();
 	ResetModel(false);
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::OnModeAnimation(wxTimerEvent & event) {
 	if (ModeAnimationData) {
@@ -2410,12 +2435,12 @@ void MolDisplayWin::menuViewAnimateMode(wxCommandEvent &event) {
 void MolDisplayWin::menuViewShowAxis(wxCommandEvent &event) {
 	MainData->SetShowAxis(1-MainData->ShowAxis());
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewShowSymmetryOperators(wxCommandEvent &event) {
 	Prefs->ShowSymmetryOperators(1-Prefs->ShowSymmetryOperators());
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuViewHideAtomLabels(wxCommandEvent &event)
@@ -2423,7 +2448,7 @@ void MolDisplayWin::menuViewHideAtomLabels(wxCommandEvent &event)
 	Prefs->ShowAtomicSymbolLabels(false);
 	Prefs->ShowAtomNumberLabels(false);
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuViewShowAtomLabel(wxCommandEvent &event)
@@ -2431,7 +2456,7 @@ void MolDisplayWin::menuViewShowAtomLabel(wxCommandEvent &event)
 	Prefs->ShowAtomicSymbolLabels(true);
 	Prefs->ShowAtomNumberLabels(false);
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuViewShowAtomNumber(wxCommandEvent &event)
@@ -2439,14 +2464,14 @@ void MolDisplayWin::menuViewShowAtomNumber(wxCommandEvent &event)
 	Prefs->ShowAtomicSymbolLabels(false);
 	Prefs->ShowAtomNumberLabels(true);
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewShowBothAtomLabels(wxCommandEvent &event)
 {
 	Prefs->ShowAtomicSymbolLabels(true);
 	Prefs->ShowAtomNumberLabels(true);
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewAddMarkAnnotation(wxCommandEvent &event) {
 	for (int i=0; i<MainData->cFrame->GetNumAtoms(); i++) {
@@ -2456,7 +2481,7 @@ void MolDisplayWin::menuViewAddMarkAnnotation(wxCommandEvent &event) {
 		}
 	}
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewAddAnnotation(wxCommandEvent &event) {
 	wxCommandEvent foo;
@@ -2466,13 +2491,13 @@ void MolDisplayWin::menuViewAddAnnotation(wxCommandEvent &event) {
 void MolDisplayWin::menuViewDeleteAllAnnotations(wxCommandEvent &event) {
 	MainData->DeleteAllAnnotations();
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuViewShow2DPattern(wxCommandEvent &event) {
 	Prefs->Show2DPattern(1-Prefs->Show2DPattern());
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuViewWireFrameStyle(wxCommandEvent &event)
@@ -2480,21 +2505,21 @@ void MolDisplayWin::menuViewWireFrameStyle(wxCommandEvent &event)
 	Prefs->DrawBallnStick(false);
 	Prefs->DrawWireFrame(true);
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewBallAndStickStyle(wxCommandEvent &event)
 {
 	Prefs->DrawBallnStick(true);
 	Prefs->DrawWireFrame(false);
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuViewEFP_Wireframe(wxCommandEvent &event)
 {
 	Prefs->ShowEFPWireFrame(1-Prefs->ShowEFPWireFrame());
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &event) {
@@ -2516,16 +2541,18 @@ void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &event) {
 void MolDisplayWin::menuViewShrink_10(wxCommandEvent &event) {
 	MainData->WindowSize *= 1.1;
 	ResetView();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewEnlarge_10(wxCommandEvent &event) {
 	MainData->WindowSize *= 0.9;
 	ResetView();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewSetWindowParameters(wxCommandEvent &event) {
 	windowparameters * temp = new windowparameters(this);
-	if (temp->ShowModal() != wxID_CANCEL) Dirty = true;
+	if (temp->ShowModal() != wxID_CANCEL) {
+		Dirtify();
+	}
 	temp->Destroy();
 }
 void MolDisplayWin::menuViewRotateTo_X_axis(wxCommandEvent &event) {
@@ -2536,7 +2563,7 @@ void MolDisplayWin::menuViewRotateTo_X_axis(wxCommandEvent &event) {
 		MainData->TotalRotation[1][2] = MainData->TotalRotation[2][1] = 0.0;
 	MainData->ResetRotation();
 	ResetView();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewRotateTo_Y_axis(wxCommandEvent &event) {
 	MainData->TotalRotation[0][0] = MainData->TotalRotation[1][2] = 1.0;
@@ -2546,30 +2573,30 @@ void MolDisplayWin::menuViewRotateTo_Y_axis(wxCommandEvent &event) {
 		MainData->TotalRotation[1][0] = MainData->TotalRotation[2][0] = 0.0;
 	MainData->ResetRotation();
 	ResetView();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewRotateTo_Z_axis(wxCommandEvent &event) {
 	InitRotationMatrix(MainData->TotalRotation);
 	MainData->ResetRotation();
 	ResetView();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewRotate180_horizontal(wxCommandEvent &event) {
 	MainData->FlipRotation(0);
 	MainData->ResetRotation();
 	ResetView();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewRotate180_vertical(wxCommandEvent &event) {
 	MainData->FlipRotation(1);
 	MainData->ResetRotation();
 	ResetView();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewRotatePrinciple_orientation(wxCommandEvent &event) {
 	MainData->RotateToPrincipleOrientation(Prefs);
 	ResetView();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuViewRotateOther(wxCommandEvent &event) {
 	SetScreenPlane * temp = new SetScreenPlane(this);
@@ -2581,7 +2608,7 @@ void MolDisplayWin::menuMoleculeSetBondLength(wxCommandEvent &event) {
 	SetBondLength * dlg = new SetBondLength(this);
 	dlg->ShowModal();
 	dlg->Destroy();
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuPreferences(wxCommandEvent &event) 
@@ -2624,7 +2651,7 @@ void MolDisplayWin::menuMoleculeSetFrameEnergy(wxCommandEvent &event) {
 	if(energyPlotWindow != NULL) {
 		energyPlotWindow->RegenData();
 	}
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuMoleculeCreateLLMPath(wxCommandEvent &event) {
@@ -2632,27 +2659,27 @@ void MolDisplayWin::menuMoleculeCreateLLMPath(wxCommandEvent &event) {
 	LLMDialog * llm = new LLMDialog(this);
 	llm->ShowModal();
 	llm->Destroy();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuMoleculeMinimizeFrameMovements(wxCommandEvent &event) {
 	BeginOperation();
 	MainData->LinearLeastSquaresFit(ProgressInd);
 	FinishOperation();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuSetPointGroup(wxCommandEvent &event) {
 	GAMESSPointGroup pg = (GAMESSPointGroup)(event.GetId() - MMP_PGC1 + GAMESS_C1);
 	if (! MainData->InputOptions) MainData->InputOptions = new InputData;
 	MainData->InputOptions->Data->SetPointGroup(pg);
 	ResetView();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuSetPointGroupOrder(wxCommandEvent &event) {
 	int order = event.GetId() - MMP_PGORDER2 + 2;
 	if (! MainData->InputOptions) MainData->InputOptions = new InputData;
 	MainData->InputOptions->Data->SetPointGroupOrder(order);
 	ResetView();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &event) {
 	SymmetryPointGroupDlg * dlg = new SymmetryPointGroupDlg(this);
@@ -2673,7 +2700,7 @@ void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &event) {
 			MainData->StickCoordinates();
 			if (coordsWindow) coordsWindow->FrameChanged();
 			ResetView();
-			Dirty = true;
+			Dirtify();
 		}
 	}
 	dlg->Destroy();
@@ -2683,22 +2710,22 @@ void MolDisplayWin::menuMoleculeSymCoords(wxCommandEvent &event) {
 	MainData->StickCoordinates();
 	if (coordsWindow) coordsWindow->FrameChanged();
 	ResetView();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuMoleculeConvertToBohr(wxCommandEvent &event) {
 	MainData->UnitConversion(0);
 	ResetAllWindows();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuMoleculeConvertToAngstroms(wxCommandEvent &event) {
 	MainData->UnitConversion(1);
 	ResetAllWindows();
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &event) {
 	MainData->InvertMode();
 	ResetModel(false);
-	Dirty = true;
+	Dirtify();
 }
 
 void MolDisplayWin::menuBuilderAddHydrogens(wxCommandEvent &event) {
@@ -2732,7 +2759,7 @@ void MolDisplayWin::menuBuilderAddHydrogens(wxCommandEvent &event) {
 	if (snapshotCreated) {
 		ResetModel(false);
 		AtomsChanged(true, false);
-		Dirty = true;
+		Dirtify();
 	}
 }
 void MolDisplayWin::menuBuilderDeleteHydrogens(wxCommandEvent &event) {
@@ -2767,7 +2794,7 @@ void MolDisplayWin::menuBuilderDeleteHydrogens(wxCommandEvent &event) {
 	if (snapshotCreated) {
 		ResetModel(false);
 		AtomsChanged(true, false);
-		Dirty = true;
+		Dirtify();
 	}
 }
 
@@ -2813,7 +2840,7 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 							menuView->Check(MMP_SHOWMODE, true);
 						}
 						ResetModel(false);
-						Dirty = true;
+						Dirtify();
 					}
 				}
 				break;
@@ -2826,7 +2853,7 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 							menuView->Check(MMP_SHOWMODE, true);
 						}
 						ResetModel(false);
-						Dirty = true;
+						Dirtify();
 					}
 				}
 				break;
@@ -3135,7 +3162,7 @@ void MolDisplayWin::FrameChanged(void) {
 		temp = temp->GetNextSurface();
 	}
 	UpdateModelDisplay();
-	Dirty = true;
+	Dirtify();
 	AdjustMenus();
 }
 void MolDisplayWin::ChangeFrames(long NewFrame) {
@@ -3180,7 +3207,7 @@ void MolDisplayWin::ModeChanged(void) {
 		menuView->Check(MMP_SHOWMODE, true);
 	}
 	ResetModel(false);
-	Dirty = true;
+	Dirtify();
 }
 void MolDisplayWin::ChangeModes(long NewMode) {
 	if(NewMode >= 0 && NewMode < MainData->cFrame->Vibs->GetNumModes()) {
@@ -3305,7 +3332,7 @@ void MolDisplayWin::ResetModel(bool Center) {
 	myStatus->SetScrollBar(MainData->CurrentFrame-1, MainData->NumFrames);
 	UpdateFrameText();
 	glCanvas->draw();
-	Dirty = true;
+	Dirtify();
 	AdjustMenus();
 }
 void MolDisplayWin::ResetAllWindows(void) {
@@ -3344,7 +3371,7 @@ void MolDisplayWin::AbortOpen(const char * msg) {
 		delete Prefs;
 		Prefs = new WinPrefs;
 		*Prefs = *gPreferences;
-		Dirty = false;
+		Dirtify();
 		SetTitle(wxT("Untitled"));
 		SetName(wxT("Untitled"));
 	} else
@@ -3880,7 +3907,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 		RotateMoleculeGL(Prefs->GetShowAngles() && !rotate_timer.IsRunning(),
 						 !rotate_timer.IsRunning());
 		glCanvas->SwapBuffers();
-		ContentChanged(); // Dirty should probably be set for the other case too
+		Dirtify();
 	}
 	
 	// Otherwise we do a plain drawing of the atoms.
@@ -3901,11 +3928,11 @@ void MolDisplayWin::ChangePrefs(WinPrefs * newPrefs) {
 }
 
 void MolDisplayWin::SelectionChanged(bool mode) {
-  if (coordsWindow)
-	coordsWindow->UpdateSelection(mode);
-  if (bondsWindow)
-	bondsWindow->UpdateSelection(mode);
-  ContentChanged();
+	if (coordsWindow)
+		coordsWindow->UpdateSelection(mode);
+	if (bondsWindow)
+		bondsWindow->UpdateSelection(mode);
+	Dirtify();
 }
 
 //The following is the amount of space to leave for the window sizing box used by
@@ -4184,6 +4211,13 @@ void MolDisplayWin::CreateFrameSnapShot(void) {
 		mUndoBuffer.AddSnapshot(f);
 		menuEdit->UpdateUI();
 	}
+}
+
+void MolDisplayWin::Dirtify(bool is_dirty) {
+
+	Dirty = is_dirty;
+	menuFile->UpdateUI(); // force accelerators to adjust
+
 }
 
 void MolDisplayWin::ToggleBuilderPalette(void) {

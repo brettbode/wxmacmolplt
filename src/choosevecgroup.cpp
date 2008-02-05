@@ -104,7 +104,7 @@ void ChooseVECgroup::CreateControls()
 
     wxStaticText* itemStaticText3 = new wxStaticText( itemDialog1, wxID_STATIC, _("The following $VEC groups were located in the selected file. Please select the target $VEC group to import."), wxDefaultPosition, wxDefaultSize, 0 );
     itemStaticText3->Wrap(400);
-    itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     list = new wxGrid( itemDialog1, ID_GRID, wxDefaultPosition, wxSize(516, 300), wxSUNKEN_BORDER|wxVSCROLL );
     if (ShowToolTips())

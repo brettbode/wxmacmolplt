@@ -6,6 +6,7 @@
 
 #include "build_palette.h"
 #include "main.h"
+#include "GlobalExceptions.h"
 
 extern bool show_build_palette;
 extern WinPrefs *gPreferences;
@@ -298,6 +299,7 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	struc_sizer->SetCols(2);
 	struc_sizer->SetRows(3);
 
+#define NUM_STRUC_GROUPS 4
 	struc_groups = new wxChoice(panel, kPeriodicStrucGroups);
 	struc_groups->Append(_T("Organics"),
 						 new StrucGroupClientData(sys_prefs_path +
@@ -305,9 +307,6 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	struc_groups->Append(_T("Solvents"),
 						 new StrucGroupClientData(sys_prefs_path +
 							 				  _T("/solvents.cml")));
-//	struc_groups->Append(_T("Peptides"),
-//						 new StrucGroupClientData(sys_prefs_path +
-//							 				  _T("/peptides.cml")));
 	struc_groups->Append(_T("Amino Acids"),
 						 new StrucGroupClientData(sys_prefs_path +
 							 				  _T("/amino_acids.cml")));
@@ -656,30 +655,27 @@ void BuilderDlg::AddStructure(Structure *structure) {
 
 /* ------------------------------------------------------------------------- */
 /**
- * This function adds a structure to either the currently selected user
- * structures file or the memory-stored User-defined structures.
+ * This function adds a structure to the user-defined structure group.
+ * @param structure The predefined structure which should be dynamically
+ *                  allocated. The memory will be owned by the build palette.
  */
 
 void BuilderDlg::AddUserStructure(Structure *structure) {
 
-	// If we're not currently viewing either a custom structure file or
-	// the memory-stored structures, let's switch to the memory-stored
-	// structure group.
-	if (struc_groups->GetSelection() <= 3) {
-		struc_groups->SetSelection(4);
+	// Switch to the user structure group if necessary.
+	if (struc_groups->GetSelection() < NUM_STRUC_GROUPS - 1) {
+		struc_groups->SetSelection(NUM_STRUC_GROUPS - 1);
 		wxCommandEvent event;
 		ChangeStructureGroup(event);
 	}
 
-	if (struc_groups->GetSelection() == 4) {
-		user_strucs.push_back(structure);
-	}
+	// Add to the fixed user_strucs list and to the currently viewed
+	// structures list.  Write the structures out to their file.
+	user_strucs.push_back(structure);
 
 	AddStructure(structure);
 
-//	StrucGroupClientData *data = 
-//		reinterpret_cast<StrucGroupClientData *>
-//		(struc_groups->GetClientObject(struc_groups->GetSelection()));
+	SaveStructures();
 
 	// Select the just added structure.
 	mStructureChoice->SetSelection(mStructureChoice->GetCount() - 1);
@@ -687,8 +683,6 @@ void BuilderDlg::AddUserStructure(Structure *structure) {
 	if (canvas) {
 		canvas->SetStructure(structures[structures.size() - 1]);
 	}
-
-	SaveStructures();
 
 }
 
@@ -719,8 +713,7 @@ std::ostream& operator<<(std::ostream& stream, const Structure& s) {
 	int i;
 	
 	std::cout << "------------------------" << std::endl;
-	// std::cout << "name: " << s.name.c_str() << std::endl; 
-	printf("%ls\n", s.name.c_str());
+	std::cout << s.name.ToAscii() << std::endl;
 	std::cout << "natoms: " << s.natoms << std::endl;
 	for (i = 0; i < s.natoms; i++) {
 		std::cout << "s.atoms[" << i << "]: " << s.atoms[i] << std::endl;
@@ -813,10 +806,21 @@ bool BuilderDlg::LoadStructuresFromFile(const wxString& filename) {
 		return false;
 	}
 
-	buffer = new BufferFile(load_file, false);
-	int result = ReadCMLFile(buffer);
+	try {
+		buffer = new BufferFile(load_file, false);
+	} catch (std::bad_alloc) {
+		MessageAlert("Insufficient memory to read in the file.");
+	} catch (MemoryError) {
+		MessageAlert("Insufficient memory to read in the file.");
+	} catch (DataError) {
+		MessageAlert("Invalid data encountered while reading the file.");
+	} catch (FileError) {
+		MessageAlert("File System error, read aborted.");
+	}
 
+	int result = 0;
 	if (buffer) {
+		result = ReadCMLFile(buffer);
 		delete buffer;
 	}
 

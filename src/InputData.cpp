@@ -2002,7 +2002,7 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 	if (Title == NULL) File->WriteLine("Title goes here", true);
 	else File->WriteLine(Title, true);
 		//Point Group
-	if ((PointGroup>GAMESS_CI)&&(PointGroup<GAMESS_TD)) {
+	if (((int) PointGroup > GAMESS_CI) && ((int) PointGroup < GAMESS_TD)) {
 		sprintf(Out, "%s %d", GetPointGroupText(), PGroupOrder);
 	} else sprintf(Out, "%s", GetPointGroupText());
 	File->WriteLine(Out, true);

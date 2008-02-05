@@ -1003,7 +1003,7 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 			MolWin->SelectionChanged(deSelectAll);
 			MolWin->UpdateGLModel();
 			draw();
-			MolWin->ContentChanged();
+			MolWin->Dirtify();
 		}
 
 		if (MolWin->InEditMode()) {
@@ -1018,7 +1018,7 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 			interactPopupMenu(curr_mouse.x, curr_mouse.y, 0);
 			MolWin->SelectionChanged(deSelectAll);
 			MolWin->UpdateGLModel();
-			MolWin->ContentChanged();
+			MolWin->Dirtify();
 		} else {
 			bondPopupMenu(curr_mouse.x, curr_mouse.y);
 		}
@@ -1188,7 +1188,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 		if (ndrag_events <= 0) {
 			SelectObj(selected_type, selected, deSelectAll);
 		}
-		MolWin->ContentChanged();
+		MolWin->Dirtify();
 		draw();
 	}
 
@@ -1244,7 +1244,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					MolWin->AtomsChanged(true, false);
 					MolWin->UpdateGLModel();
 					MolWin->AdjustMenus();
-					MolWin->ContentChanged();
+					MolWin->Dirtify();
 				} else {
 
 					mpAtom new_atom;
@@ -1371,10 +1371,19 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						lFrame->resetAllSelectState();
 						MolWin->SetHighliteMode(true);
 						int fragId=-1;
+
 						if (structure->FragName.size() > 0) {
 							fragId = mMainData->FragmentNames.size() + 1;
 							mMainData->FragmentNames.push_back(structure->FragName);
+							if (structure->frag_def.size()) {
+								std::map<std::string, EFrag>::iterator frag;
+								frag = mMainData->efrags.find(structure->FragName);
+								if (frag == mMainData->efrags.end()) {
+									mMainData->efrags.insert(std::pair<std::string, EFrag>(structure->FragName, structure->frag_def));
+								}
+							}
 						}
+
 						for (int i = 0; i < structure->natoms; i++) {
 							new_atom = mpAtom(structure->atoms[i]);
 							if (fragId > 0) new_atom.SetFragmentNumber(fragId);
@@ -2167,7 +2176,7 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 	}
 
 	MolWin->UpdateModelDisplay();
-	MolWin->ContentChanged();
+	MolWin->Dirtify();
 	
 }
 
@@ -2618,7 +2627,7 @@ void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
 	}
 
 	MolWin->UpdateModelDisplay();
-	MolWin->ContentChanged();
+	MolWin->Dirtify();
 }
 
 void MpGLCanvas::SavePrototype(wxCommandEvent& event) {
@@ -2867,7 +2876,7 @@ void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
 	}
 
 	MolWin->UpdateModelDisplay();
-	MolWin->ContentChanged();
+	MolWin->Dirtify();
 
 }
 
@@ -2889,7 +2898,7 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 	}
 
 	MolWin->UpdateModelDisplay();
-	MolWin->ContentChanged();
+	MolWin->Dirtify();
 }
 
 void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {

@@ -124,7 +124,7 @@ class BufferFile {
  		BufferFile(Handle	TargetHandle, long HandleSize);
 #else
 		/// Contructor used to operate on a preallocated character buffer
- 		BufferFile(Ptr	TargetPtr, long PtrSize);
+ 		BufferFile(Ptr TargetPtr, long PtrSize);
 #endif
  		~BufferFile(void);
 		/// Obtain the current file position

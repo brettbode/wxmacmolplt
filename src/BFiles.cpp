@@ -23,6 +23,13 @@
 
 extern WinPrefs *	gPreferences;
 
+/**
+ * This function checks buffer to see if it contains the keyword.  If so,
+ * a value > 0 is returned.  Otherwise, -1 is returned.
+ * @param buffer The buffer to scan through.
+ * @param keyin The keyword to search for.
+ * @param numbyte The number of characters in the keyword.
+ */
 long FindKeyWord(const char *buffer, const char keyin[], long numbyte) {
 	long	check;
 	
@@ -203,7 +210,9 @@ BufferFile::BufferFile(Ptr Data, long DataSize)
 	ByteCount = DataSize;
 	BlockCount = 1;
 	BlockLengths = new long[10];
-	if (!BlockLengths) throw MemoryError();
+	if (!BlockLengths) {
+		throw MemoryError();
+	}
 	BlockLengths[0]=ByteCount;
 	BlockArrayAllocation = 10;
 }
@@ -395,6 +404,14 @@ long BufferFile::Read(Ptr Target, long NumBytes) {
 	}
 	return BytesRead;
 }
+
+/**
+ * This function reads a single line from the buffer. It reads up until
+ * the newline, copying all characters into Line.  The newline is not
+ * copied into Line and the file pointer is set one character past it.
+ * @param Line A preallocated buffer into which the line from the file is copied.
+ * @return The number of characters copied.
+ */
 long BufferFile::GetLine(char * Line)
 {	long	LineChars=0;
 	if (BufferPos>=BufferSize) AdvanceBuffer();	//Just in case...

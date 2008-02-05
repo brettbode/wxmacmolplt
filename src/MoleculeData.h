@@ -35,6 +35,7 @@ class MoleculeData {
 		friend class MpGLCanvas;
 		friend class FrameSnapShot;
 	private:
+		std::map<std::string, EFrag> efrags;
 		std::vector<Annotation *> Annotations;	//Set of annotations
 		int constrain_anno_id;
 		CPoint3D	*RotCoords;				// The currently displayed, rotated coordinates

@@ -246,7 +246,7 @@ void CoordinatesWindow::CreateControls()
 	itemBoxSizer23->Add(itemButton27, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxStaticText* itemStaticText28 = new wxStaticText( itemPanel21, wxID_STATIC, _("Coord. Type:"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer23->Add(itemStaticText28, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemBoxSizer23->Add(itemStaticText28, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxArrayString coordTypeChoiceStrings;
 	coordTypeChoiceStrings.Add(_("Cartesian"));

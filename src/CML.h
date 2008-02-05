@@ -109,6 +109,7 @@ enum MMP_MetadataNamespace {
 	MMP_InternalCoordinates,
 	MMP_BasisSet,
 	MMP_FragmentNameList,
+	MMP_FragmentDefinitions,
 	MMP_InputOptions,
 	MMP_Annotations,
 	MMP_Structures,
@@ -465,7 +466,8 @@ enum MMP_WindowDataNS {
 };
 
 #define kStructureXML "Structure"
-#define kFRAGNAMEXML	"FRAGNAME"
+#define kFRAGNAMEXML "FRAGNAME"
+#define kFragmentDefXML "Fragment"
 
 #define kAnnotationXML "Annotation"
 #define kAnnAtom1XML "Atom-1"

@@ -800,7 +800,6 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					{ throw UserCancel();}
 					pos.x = pos.y = pos.z = 0.0;
 					sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
-					std::cout << "data token: " << token << std::endl;
 					lFrame->AddAtom((long) AtomType, pos);
 					StartPos = Buffer->FindBlankLine();
 					if ((StartPos <= EndPos)&&(StartPos>-1)) {	//basis set is inlined in $DATA
@@ -876,7 +875,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			int fstart;
 			int match[3] = {0, 0, 0};
 			CPoint3D src_locs[3];
-			char labels[3][kMaxLineLength];
+			std::string labels[3];
 			int AtomType;
 			long fragNum;
 			int i;
@@ -916,47 +915,77 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 
 				// Custom fragment type.
 				else {
+
+					// Read the three atoms that setup the fragment.
 					MainData->FragmentNames.push_back(std::string(token));
 					fragNum = MainData->FragmentNames.size();
+					char label[kMaxLineLength];
 					for (i = 0; i < 3; i++) {
 						Buffer->GetLine(Line);
-						sscanf(Line, "%s %f %f %f", labels[i],
-							   &(dst_locs[i].x), &(dst_locs[i].y), &(dst_locs[i].z));
-						std::cout << "Line: " << Line << std::endl;
-						/* atm = lFrame->AddAtom(6, dst_locs[i]); */
+						sscanf(Line, "%s %f %f %f", label,
+							   &(dst_locs[i].x), &(dst_locs[i].y),
+							   &(dst_locs[i].z));
+						labels[i] = label;
+						/* std::cout << "Line: " << Line << std::endl; */
+						/* atm = lFrame->AddAtom(3, dst_locs[i]); */
 						/* atm->SetFragmentNumber(fragNum); */
 					}
 
-					former_pos = Buffer->GetFilePos();
-					found_it = Buffer->FindGroup(MainData->FragmentNames[fragNum - 1].c_str());
-					if (!found_it) {
-						std::cout << "didn't find group " << token << std::endl;
-						throw DataError(20);
-					}
-					start_pos = Buffer->GetFilePos();
+					// See if the fragment template has been loaded in already.
+					// If so, go ahead and parse it.
+					std::map<std::string, EFrag>::iterator frag;
+					frag = MainData->efrags.find(token);
+					if (frag == MainData->efrags.end()) {
+						// save current position
+						former_pos = Buffer->GetFilePos();
 
-					Buffer->SkipnLines(3);   // skip group name, title, COORDINATES
+						// look for fragment definition
+						found_it = Buffer->FindGroup(token);
+						if (!found_it) {
+							std::cout << "didn't find group " << token << std::endl;
+							throw DataError(20);
+						}
+						start_pos = Buffer->GetFilePos();
+
+						// get definition text
+						std::string running_text;
+						Buffer->GetLine(Line);
+						while (FindKeyWord(Line, "$END", 4) < 0) {
+							running_text += Line;
+							running_text += "\n";
+							Buffer->GetLine(Line);
+						}
+
+						// restore file position
+						Buffer->SetFilePos(former_pos);
+
+						// get text
+						MainData->efrags.insert(std::pair<std::string, EFrag>(token, EFrag(running_text)));
+						frag = MainData->efrags.find(token);
+					}
 
 					fstart = lFrame->NumAtoms;
-					while (Buffer->GetLine(Line) && Line[0] == 'A') {
-						sscanf(Line, "%s %f %f %f %f %d", token, &pos.x, &pos.y, &pos.z, &tmp_f, &AtomType);
+					const std::vector<EFragAtom>& labeled_atoms = frag->second.GetAtoms();
+					std::vector<EFragAtom>::const_iterator efrag_atom;
 
-						if (strcmp(token, labels[0]) == 0) {
+					for (efrag_atom = labeled_atoms.begin();
+						 efrag_atom != labeled_atoms.end();
+						 ++efrag_atom) {
+
+						if (efrag_atom->GetLabel().compare(labels[0]) == 0) {
 							match[0] = lFrame->NumAtoms;
-							src_locs[0] = pos;
-						} else if (strcmp(token, labels[1]) == 0) {
+							src_locs[0] = efrag_atom->GetCoords();
+						} else if (efrag_atom->GetLabel().compare(labels[1]) == 0) {
 							match[1] = lFrame->NumAtoms;
-							src_locs[1] = pos;
-						} else if (strcmp(token, labels[2]) == 0) {
+							src_locs[1] = efrag_atom->GetCoords();
+						} else if (efrag_atom->GetLabel().compare(labels[2]) == 0) {
 							match[2] = lFrame->NumAtoms;
-							src_locs[2] = pos;
+							src_locs[2] = efrag_atom->GetCoords();
 						}
 
-						std::cout << "Line: " << Line << std::endl;
-						if (AtomType > 0) {
-							atm = lFrame->AddAtom(AtomType, pos);
-							atm->SetFragmentNumber(fragNum);
-						}
+						atm = lFrame->AddAtom(efrag_atom->GetAtomicNumber(),
+											  efrag_atom->GetCoords());
+						atm->SetFragmentNumber(fragNum);
 					}
 
 					// We first find a rotation that one will align a vector
@@ -990,8 +1019,8 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 
 					// Technically, the axis of rotation (the aligned vector)
 					// might be facing a different direction than we think it
-					// is.  To be consistent, we instead use the axis that is
-					// normal to both planes' normals.  It points in the same
+					// is. To be consistent, we instead use the axis that is
+					// normal to both planes' normals. It points in the same
 					// or opposite direction as dst_vec.
 					CPoint3D axis;
 					UnitCrossProduct3D(&mid_norm, &dst_norm, &axis);
@@ -1002,32 +1031,25 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					MultiplyMatrix(vec2vec, tri2tri, transform);
 
 					// Okay, for each atom we added for this fragment instance,
-					// we move it into destination space.  We translate to make
-					// the base fragment atom the origin, scale into angstroms,
-					// and then rotate to align the fragment with the
-					// destination plane, and then translate by the base
-					// destination atom.
+					// we move all fragment atoms into destination space. We
+					// translate to make the base fragment atom the origin and
+					// then rotate to align the fragment with the destination
+					// plane, and then translate by the base destination atom.
 					for (long i = fstart; i < lFrame->NumAtoms; i++) {
 						lFrame->GetAtomPosition(i, curr_pos);
 						new_pos = curr_pos - orig;
-						new_pos = new_pos * kBohr2AngConversion;
 						Rotate3DOffset(transform, new_pos, &rot_pos);
 						new_pos = rot_pos + dst_locs[0];
 						lFrame->SetAtomPosition(i, new_pos);
 					}
-
-					found_it = Buffer->FindGroup("END");
-					if (!found_it) {
-						std::cout << "didn't find end of group " << token << std::endl;
-						throw DataError(20);
-					}
-					end_pos = Buffer->GetFilePos();
-					Buffer->SetFilePos(former_pos);
 				}
 
 				Buffer->GetLine(Line);
 			}
 		}
+
+		lFrame->SetBonds(Prefs, true, false);
+
 	}
 	return 1;
 }

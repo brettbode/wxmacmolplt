@@ -134,7 +134,7 @@ void BondsDlg::CreateControls()
 
 	bondText = new wxStaticText( itemDialog1, wxID_STATIC, _("Bond Type:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	bondText->Enable(false);
-	itemBoxSizer3->Add(bondText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemBoxSizer3->Add(bondText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxArrayString BondOrderCtlStrings;
 	BondOrderCtlStrings.Add(_("Hydrogen Bond"));

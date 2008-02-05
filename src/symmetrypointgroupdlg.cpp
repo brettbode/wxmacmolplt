@@ -136,26 +136,26 @@ void SymmetryPointGroupDlg::CreateControls()
 	itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxStaticText* itemStaticText4 = new wxStaticText( itemDialog1, wxID_STATIC, _("The highest point group of the molecule is:"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer3->Add(itemStaticText4, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemBoxSizer3->Add(itemStaticText4, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	mHighestPGText = new wxStaticText( itemDialog1, wxID_STATIC, _("C1"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer3->Add(mHighestPGText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemBoxSizer3->Add(mHighestPGText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer2->Add(itemBoxSizer6, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxStaticText* itemStaticText7 = new wxStaticText( itemDialog1, wxID_STATIC, _("The highest abelian point group is:"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer6->Add(itemStaticText7, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemBoxSizer6->Add(itemStaticText7, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	mAbelianPGText = new wxStaticText( itemDialog1, wxID_STATIC, _("C1"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer6->Add(mAbelianPGText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemBoxSizer6->Add(mAbelianPGText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer9 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer2->Add(itemBoxSizer9, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxStaticText* itemStaticText10 = new wxStaticText( itemDialog1, wxID_STATIC, _("This is the list of possible point groups for this geometry:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemStaticText10->Wrap(100);
-	itemBoxSizer9->Add(itemStaticText10, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemBoxSizer9->Add(itemStaticText10, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	mPGListCntl = new wxListCtrl( itemDialog1, ID_LISTCTRL1, wxDefaultPosition, wxSize(100, 100), wxLC_REPORT|wxLC_NO_HEADER|wxLC_SINGLE_SEL );
 	itemBoxSizer9->Add(mPGListCntl, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -173,7 +173,7 @@ void SymmetryPointGroupDlg::CreateControls()
 	itemBoxSizer12->Add(itemBoxSizer15, 1, wxGROW|wxALL, 5);
 
 	wxStaticText* itemStaticText16 = new wxStaticText( itemDialog1, wxID_STATIC, _("tight"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
-	itemBoxSizer15->Add(itemStaticText16, 1, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemBoxSizer15->Add(itemStaticText16, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxStaticText* itemStaticText17 = new wxStaticText( itemDialog1, wxID_STATIC, _("loose"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
 	itemBoxSizer15->Add(itemStaticText17, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);

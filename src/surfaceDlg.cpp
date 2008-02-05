@@ -2300,7 +2300,7 @@ void General3DSurfPane::CreateControls()
     wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer5, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText6 = new wxStaticText( Gen3DPanel, wxID_STATIC, _("Choose 3D grid file:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer5->Add(itemStaticText6, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer5->Add(itemStaticText6, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxButton* itemButton7 = new wxButton( Gen3DPanel, ID_GENFILEBUTTON, _("Choose File..."), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer5->Add(itemButton7, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2328,7 +2328,7 @@ void General3DSurfPane::CreateControls()
     wxBoxSizer* itemBoxSizer13 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer12->Add(itemBoxSizer13, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
     wxStaticText* itemStaticText14 = new wxStaticText( Gen3DPanel, wxID_STATIC, _("Contour Value:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer13->Add(itemStaticText14, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer13->Add(itemStaticText14, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
 	mContourValueEdit = new wxTextCtrl( Gen3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer13->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -2341,17 +2341,17 @@ void General3DSurfPane::CreateControls()
 	wxBoxSizer* itemBoxSizer18 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer16->Add(itemBoxSizer18, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5);
     mGridMinText = new wxStaticText( Gen3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
-    itemBoxSizer18->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer18->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mGridMaxText = new wxStaticText( Gen3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-    itemBoxSizer18->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer18->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer21, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
     wxBoxSizer* itemBoxSizer22 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer21->Add(itemBoxSizer22, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
     wxStaticText* itemStaticText23 = new wxStaticText( Gen3DPanel, wxID_STATIC, _("Positive Color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer22->Add(itemStaticText23, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer22->Add(itemStaticText23, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
 	mTarget->GetTranspColor(&TranspColor);
 	mTarget->GetPosColor(&PosColor);
@@ -2363,7 +2363,7 @@ void General3DSurfPane::CreateControls()
     wxBoxSizer* itemBoxSizer25 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer21->Add(itemBoxSizer25, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
     wxStaticText* itemStaticText26 = new wxStaticText( Gen3DPanel, wxID_STATIC, _("Negative Color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer25->Add(itemStaticText26, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer25->Add(itemStaticText26, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mOrbColor2 = new colorArea( Gen3DPanel, ID_3D_COLOR_NEGATIVE, &NegColor );
     itemBoxSizer25->Add(mOrbColor2, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -2371,7 +2371,7 @@ void General3DSurfPane::CreateControls()
     wxBoxSizer* itemBoxSizer28 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer21->Add(itemBoxSizer28, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
     wxStaticText* itemStaticText29 = new wxStaticText( Gen3DPanel, wxID_STATIC, _("Transparency Color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer28->Add(itemStaticText29, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer28->Add(itemStaticText29, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mTransColor = new colorArea( Gen3DPanel, ID_TRANSPARENCY_COLOR, &TranspColor );
     itemBoxSizer28->Add(mTransColor, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -2603,7 +2603,7 @@ void General2DSurfPane::CreateControls() {
 	wxBoxSizer* itemBoxSizer41 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer41, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText42 = new wxStaticText( Gen2DPanel, wxID_STATIC, _("Choose 2D grid file:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer41->Add(itemStaticText42, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer41->Add(itemStaticText42, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxButton* itemButton43 = new wxButton( Gen2DPanel, ID_GENFILEBUTTON, _("Choose File..."), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer41->Add(itemButton43, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2628,7 +2628,7 @@ void General2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer48 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer48, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText49 = new wxStaticText( Gen2DPanel, wxID_STATIC, _("Max # of contours:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer48->Add(itemStaticText49, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer48->Add(itemStaticText49, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mNumContourText = new wxTextCtrl( Gen2DPanel, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer48->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2636,7 +2636,7 @@ void General2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer51 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer51, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText52 = new wxStaticText( Gen2DPanel, wxID_STATIC, _("Max contour value:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer51->Add(itemStaticText52, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer51->Add(itemStaticText52, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mContourValText = new wxTextCtrl( Gen2DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer51->Add(mContourValText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2646,7 +2646,7 @@ void General2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer55 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer54->Add(itemBoxSizer55, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
     wxStaticText* itemStaticText56 = new wxStaticText( Gen2DPanel, wxID_STATIC, _("Positive Color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer55->Add(itemStaticText56, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer55->Add(itemStaticText56, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mOrbColor1 = new colorArea( Gen2DPanel, ID_2D_COLOR_POSITIVE, &PosColor );
     itemBoxSizer55->Add(mOrbColor1, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -2654,7 +2654,7 @@ void General2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer58 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer54->Add(itemBoxSizer58, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
     wxStaticText* itemStaticText59 = new wxStaticText( Gen2DPanel, wxID_STATIC, _("Negative Color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer58->Add(itemStaticText59, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer58->Add(itemStaticText59, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mOrbColor2 = new colorArea( Gen2DPanel, ID_2D_COLOR_NEGATIVE, &NegColor );
     itemBoxSizer58->Add(mOrbColor2, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -2937,7 +2937,7 @@ void TEDensity2DSurfPane::CreateControls() {
 	wxBoxSizer* itemBoxSizer68 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer68, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText69 = new wxStaticText( TED2DPANEL, wxID_STATIC, _("Select Orbital Set:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer68->Add(itemStaticText69, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer68->Add(itemStaticText69, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxString* mOrbSetChoiceStrings = NULL;
     mOrbSetChoice = new wxChoice( TED2DPANEL, ID_ORB_CHOICE, wxDefaultPosition, wxDefaultSize, 0, mOrbSetChoiceStrings, 0 );
@@ -2948,7 +2948,7 @@ void TEDensity2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer71 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer71, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText72 = new wxStaticText( TED2DPANEL, wxID_STATIC, _("Number of grid points:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer71->Add(itemStaticText72, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer71->Add(itemStaticText72, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mNumGridPntSld = new wxSlider( TED2DPANEL, ID_GRID_POINT_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_LABELS );
     itemBoxSizer71->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2956,7 +2956,7 @@ void TEDensity2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer74 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer74, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText75 = new wxStaticText( TED2DPANEL, wxID_STATIC, _("Max. # of contours:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer74->Add(itemStaticText75, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer74->Add(itemStaticText75, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mNumContourText = new wxTextCtrl( TED2DPANEL, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer74->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2964,7 +2964,7 @@ void TEDensity2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer77 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer77, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText78 = new wxStaticText( TED2DPANEL, wxID_STATIC, _("Max. contour value:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer77->Add(itemStaticText78, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer77->Add(itemStaticText78, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mContourValText = new wxTextCtrl( TED2DPANEL, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer77->Add(mContourValText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2982,7 +2982,7 @@ void TEDensity2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer81 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer81, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText82 = new wxStaticText( TED2DPANEL, wxID_STATIC, _("Contour color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer81->Add(itemStaticText82, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer81->Add(itemStaticText82, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mOrbColor1 = new colorArea( TED2DPANEL, ID_2D_COLOR_POSITIVE, &PosColor );
     itemBoxSizer81->Add(mOrbColor1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -3477,7 +3477,7 @@ void TEDensity3DSurfPane::CreateControls() {
 	wxBoxSizer* itemBoxSizer93 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer93, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText94 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Select Orbital Set:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer93->Add(itemStaticText94, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer93->Add(itemStaticText94, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxString* mOrbSetChoiceStrings = NULL;
     mOrbSetChoice = new wxChoice( TED3DPanel, ID_ORB_CHOICE, wxDefaultPosition, wxDefaultSize, 0, mOrbSetChoiceStrings, 0 );
@@ -3488,7 +3488,7 @@ void TEDensity3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer96 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer96, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
     wxStaticText* itemStaticText97 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Number of grid points:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer96->Add(itemStaticText97, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer96->Add(itemStaticText97, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mNumGridPntSld = new wxSlider( TED3DPanel, ID_GRID_POINT_SLIDER, 0, 10, 150, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_LABELS );
     itemBoxSizer96->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -3496,7 +3496,7 @@ void TEDensity3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer99 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer99, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
     wxStaticText* itemStaticText100 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Grid Size:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer99->Add(itemStaticText100, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer99->Add(itemStaticText100, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mGridSizeSld = new wxSlider( TED3DPanel, ID_GRID_SIZE_SLIDER, 0, 0, 300, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL );
     itemBoxSizer99->Add(mGridSizeSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -3506,7 +3506,7 @@ void TEDensity3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer103 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer102->Add(itemBoxSizer103, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
     wxStaticText* itemStaticText104 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Contour Value:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer103->Add(itemStaticText104, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer103->Add(itemStaticText104, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mContourValueEdit = new wxTextCtrl( TED3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer103->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -3519,10 +3519,10 @@ void TEDensity3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer108 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer106->Add(itemBoxSizer108, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5);
     mGridMinText = new wxStaticText( TED3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
-    itemBoxSizer108->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer108->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mGridMaxText = new wxStaticText( TED3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-    itemBoxSizer108->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer108->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxBoxSizer* itemBoxSizer111 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer111, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
@@ -3547,7 +3547,7 @@ void TEDensity3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer115 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer111->Add(itemBoxSizer115, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
     wxStaticText* itemStaticText116 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Max. value to map"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer115->Add(itemStaticText116, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer115->Add(itemStaticText116, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mMaxMapEdit = new wxTextCtrl( TED3DPanel, ID_TED3D_MAX_MAP_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer115->Add(mMaxMapEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -3559,7 +3559,7 @@ void TEDensity3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer120 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer119->Add(itemBoxSizer120, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
     wxStaticText* itemStaticText121 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Surface Color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer120->Add(itemStaticText121, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer120->Add(itemStaticText121, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mOrbColor1 = new colorArea( TED3DPanel, ID_3D_COLOR_POSITIVE, &PosColor );
     itemBoxSizer120->Add(mOrbColor1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -3570,7 +3570,7 @@ void TEDensity3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer124 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer119->Add(itemBoxSizer124, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
     wxStaticText* itemStaticText125 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Transparency color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer124->Add(itemStaticText125, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer124->Add(itemStaticText125, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mTransColor = new colorArea( TED3DPanel, ID_TRANSPARENCY_COLOR, &TranspColor );
     itemBoxSizer124->Add(mTransColor, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -3673,7 +3673,7 @@ void MEP2DSurfPane::CreateControls() {
 	wxBoxSizer* itemBoxSizer137 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer137, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText138 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Select Orbital Set:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer137->Add(itemStaticText138, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer137->Add(itemStaticText138, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxString* mOrbSetChoiceStrings = NULL;
     mOrbSetChoice = new wxChoice( MEP2DPanel, ID_ORB_CHOICE, wxDefaultPosition, wxDefaultSize, 0, mOrbSetChoiceStrings, 0 );
@@ -3684,7 +3684,7 @@ void MEP2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer140 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer140, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText141 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Number of grid points:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer140->Add(itemStaticText141, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer140->Add(itemStaticText141, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mNumGridPntSld = new wxSlider( MEP2DPanel, ID_GRID_POINT_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_LABELS );
     itemBoxSizer140->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -3692,7 +3692,7 @@ void MEP2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer143 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer143, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText144 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Max. # of contours:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer143->Add(itemStaticText144, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer143->Add(itemStaticText144, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mNumContourText = new wxTextCtrl( MEP2DPanel, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer143->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -3700,7 +3700,7 @@ void MEP2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer146 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer146, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText147 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Max. contour value:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer146->Add(itemStaticText147, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer146->Add(itemStaticText147, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mContourValText = new wxTextCtrl( MEP2DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer146->Add(mContourValText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -3732,7 +3732,7 @@ void MEP2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer153 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer152->Add(itemBoxSizer153, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
     wxStaticText* itemStaticText154 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Positive Color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer153->Add(itemStaticText154, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer153->Add(itemStaticText154, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mOrbColor1 = new colorArea( MEP2DPanel, ID_2D_COLOR_POSITIVE, &PosColor );
     itemBoxSizer153->Add(mOrbColor1, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -3740,7 +3740,7 @@ void MEP2DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer156 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer152->Add(itemBoxSizer156, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
     wxStaticText* itemStaticText157 = new wxStaticText( MEP2DPanel, wxID_STATIC, _("Negative Color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer156->Add(itemStaticText157, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer156->Add(itemStaticText157, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mOrbColor2 = new colorArea( MEP2DPanel, ID_2D_COLOR_NEGATIVE, &NegColor);
     itemBoxSizer156->Add(mOrbColor2, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -4160,7 +4160,7 @@ void MEP3DSurfPane::CreateControls() {
 	wxBoxSizer* itemBoxSizer168 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer168, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
     wxStaticText* itemStaticText169 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Select Orbital Set:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer168->Add(itemStaticText169, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer168->Add(itemStaticText169, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxString* mOrbSetChoiceStrings = NULL;
     mOrbSetChoice = new wxChoice( MEP3DPanel, ID_ORB_CHOICE, wxDefaultPosition, wxDefaultSize, 0, mOrbSetChoiceStrings, 0 );
@@ -4171,7 +4171,7 @@ void MEP3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer171 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer171, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
     wxStaticText* itemStaticText172 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Number of grid points:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer171->Add(itemStaticText172, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer171->Add(itemStaticText172, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mNumGridPntSld = new wxSlider( MEP3DPanel, ID_GRID_POINT_SLIDER, 0, 10, 150, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_LABELS );
     itemBoxSizer171->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -4179,7 +4179,7 @@ void MEP3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer174 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer174, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
     wxStaticText* itemStaticText175 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Grid Size:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer174->Add(itemStaticText175, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer174->Add(itemStaticText175, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mGridSizeSld = new wxSlider( MEP3DPanel, ID_GRID_SIZE_SLIDER, 0, 0, 300, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL );
     itemBoxSizer174->Add(mGridSizeSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -4189,7 +4189,7 @@ void MEP3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer178 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer177->Add(itemBoxSizer178, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3);
     wxStaticText* itemStaticText179 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Contour Value:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer178->Add(itemStaticText179, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer178->Add(itemStaticText179, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     mContourValueEdit = new wxTextCtrl( MEP3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer178->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -4202,10 +4202,10 @@ void MEP3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer183 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer181->Add(itemBoxSizer183, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5);
     mGridMinText = new wxStaticText( MEP3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
-    itemBoxSizer183->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer183->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mGridMaxText = new wxStaticText( MEP3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-    itemBoxSizer183->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer183->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxBoxSizer* itemBoxSizer186 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer186, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
@@ -4214,7 +4214,7 @@ void MEP3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer188 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer187->Add(itemBoxSizer188, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
     wxStaticText* itemStaticText189 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Surface Color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer188->Add(itemStaticText189, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer188->Add(itemStaticText189, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mOrbColor1 = new colorArea( MEP3DPanel, ID_3D_COLOR_POSITIVE, &PosColor );
     itemBoxSizer188->Add(mOrbColor1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -4225,7 +4225,7 @@ void MEP3DSurfPane::CreateControls() {
     wxBoxSizer* itemBoxSizer192 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer187->Add(itemBoxSizer192, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
     wxStaticText* itemStaticText193 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Transparency color:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer192->Add(itemStaticText193, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer192->Add(itemStaticText193, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     mTransColor = new colorArea( MEP3DPanel, ID_TRANSPARENCY_COLOR, &TranspColor );
     itemBoxSizer192->Add(mTransColor, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);

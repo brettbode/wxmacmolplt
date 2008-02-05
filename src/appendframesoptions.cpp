@@ -107,7 +107,7 @@ void AppendFramesOptions::CreateControls()
     itemDialog1->SetSizer(itemBoxSizer2);
 
     wxStaticText* itemStaticText3 = new wxStaticText( itemDialog1, wxID_STATIC, _("Options to apply to the geometry points\nto be read in from the selected file."), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     negativeCheck = new wxCheckBox( itemDialog1, ID_NEGATIVECHECKBOX, _("Make these points negative"), wxDefaultPosition, wxDefaultSize, 0 );
     negativeCheck->SetValue(false);
@@ -119,7 +119,7 @@ void AppendFramesOptions::CreateControls()
     itemBoxSizer2->Add(itemBoxSizer5, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     wxStaticText* itemStaticText6 = new wxStaticText( itemDialog1, wxID_STATIC, _("IRC or time coordinate offset:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer5->Add(itemStaticText6, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer5->Add(itemStaticText6, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     offsetEdit = new wxTextCtrl( itemDialog1, ID_OFFSETTEXTCTL, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
@@ -130,7 +130,7 @@ void AppendFramesOptions::CreateControls()
     itemBoxSizer2->Add(itemBoxSizer8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     wxStaticText* itemStaticText9 = new wxStaticText( itemDialog1, wxID_STATIC, _("# of points to skip between\npoints read in:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-    itemBoxSizer8->Add(itemStaticText9, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer8->Add(itemStaticText9, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     skipEdit = new wxTextCtrl( itemDialog1, ID_SKIPTEXTCTL, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())

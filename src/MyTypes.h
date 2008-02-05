@@ -26,6 +26,7 @@ Added OpenGL version of Draw3D to Surface 6/2001 BMB
 #endif
 #include <vector>
 #include <string>
+#include <map>
 #include "Math3D.h"
 /* General Use Types independant of my data structures */
 #define kMaxAtomTypes		130
@@ -328,6 +329,46 @@ class Bond {
 		bool GetSelectState(void) const {return (Highlite & 1);};
 		void SetSelectState(bool state) {if (Highlite & 1) Highlite--; if (state) Highlite++;}
 };
+
+class EFragAtom {
+	public:
+		EFragAtom(const std::string& label, const CPoint3D& coords,
+				  int atomic_num)
+			: label(label),
+			  coords(coords),
+			  atomic_num(atomic_num) {
+		}
+
+		const CPoint3D& GetCoords() const {
+			return coords;
+		}
+
+		int GetAtomicNumber() const {
+			return atomic_num;
+		}
+
+		const std::string& GetLabel() const {
+			return label;
+		}
+
+	private:
+		std::string label;
+		CPoint3D coords;
+		int atomic_num;
+};
+
+class EFrag {
+	public:
+		EFrag(const std::string& text);
+		void ParseText();
+		const std::vector<EFragAtom>& GetAtoms() const;
+		const std::string& GetText() const;
+
+	private:
+		std::vector<EFragAtom> labeled_atoms;
+		std::string raw_text;
+};
+
 enum EnergyUnit {
 	kDefault,
 	kKCalPerMole

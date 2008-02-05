@@ -554,5 +554,64 @@ std::ostream& operator<<(std::ostream& stream, const Bond& b) {
 
 }
 
-// --------------------------------------------------------------------------- 
+/* ------------------------------------------------------------------------- */
+
+EFrag::EFrag(const std::string& text)
+	: raw_text(text) {
+
+	ParseText();
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+void EFrag::ParseText() {
+
+	CPoint3D pos;
+	char label[kMaxLineLength];
+	char line[kMaxLineLength];
+	int atomic_number;
+	float tmp1;
+	float tmp2;
+
+	char *buf_input = new char[raw_text.length()];
+	memcpy(buf_input, raw_text.c_str(), sizeof(char) * raw_text.length());
+	BufferFile buf(buf_input, raw_text.length());
+
+	// Skip group name, title, and COORDINATES.
+	buf.SkipnLines(3);
+
+	// Now read lines that start with A.  Stop after the first one
+	// that doesn't start with A.
+	do {
+		buf.GetLine(line);
+		sscanf(line, "%s %f %f %f %f %f", label,
+			   &pos.x, &pos.y, &pos.z, &tmp1, &tmp2);
+		atomic_number = (int) tmp2;
+		if (atomic_number) {
+			// Input is in atomic units; move to angstroms.
+			pos *= kBohr2AngConversion;
+			labeled_atoms.push_back(EFragAtom(label, pos, atomic_number));
+		}
+	} while (atomic_number);
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+const std::vector<EFragAtom>& EFrag::GetAtoms() const {
+
+	return labeled_atoms;
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+const std::string& EFrag::GetText() const {
+
+	return raw_text;
+
+}
+
+/* ------------------------------------------------------------------------- */
 

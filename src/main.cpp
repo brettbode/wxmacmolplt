@@ -32,22 +32,30 @@ bool show_build_palette = false;
 
 int glf_initialized = 0;
 
-static const wxCmdLineEntryDesc g_cmdLineDesc[] = 
-{ 
-{ wxCMD_LINE_SWITCH, wxT("h"), wxT("help"),    wxT("displays help on "
-												   "the command line parameters") }, 
-{ wxCMD_LINE_SWITCH, wxT("v"), wxT("version"), wxT("print version") }, 
-//{ wxCMD_LINE_OPTION, wxT("d"), wxT("debug"), wxT("specify a debug 
-//												 level") }, 
-{ wxCMD_LINE_PARAM,  NULL, NULL, wxT("input file"), 
-	wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL }, 
-{ wxCMD_LINE_NONE } 
+#if wxCHECK_VERSION(2, 9, 0)
+static const wxCmdLineEntryDesc g_cmdLineDesc[] = { 
+	{ wxCMD_LINE_SWITCH, "h", "help",    "displays help on "
+										 "the command line parameters" }, 
+	{ wxCMD_LINE_SWITCH, "v", "version", "print version" }, 
+	{ wxCMD_LINE_PARAM,  NULL, NULL,     "input file", 
+		wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL }, 
+	{ wxCMD_LINE_NONE } 
 };
+#else
+static const wxCmdLineEntryDesc g_cmdLineDesc[] = { 
+	{ wxCMD_LINE_SWITCH, wxT("h"), wxT("help"),    wxT("displays help on "
+													   "the command line parameters") }, 
+	{ wxCMD_LINE_SWITCH, wxT("v"), wxT("version"), wxT("print version") }, 
+	{ wxCMD_LINE_PARAM,  NULL, NULL,               wxT("input file"), 
+		wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL }, 
+	{ wxCMD_LINE_NONE } 
+};
+#endif
 
 #include "xpms/sp.xpm"
 wxSplashScreen * splash = NULL;
-wxTimer splashTimer;
-#define splashT_ID 12399
+/* #define splashT_ID 12399 */
+#define splashT_ID 289102
 bool MpApp::OnInit() {
 	m_InstanceChecker = NULL;
 	gPrefDlg = NULL;
@@ -87,13 +95,17 @@ bool MpApp::OnInit() {
     }
 #endif
 #endif
-		//Throw up a simple splash screen
+
+	// Throw up a simple splash screen
 	wxBitmap sp_bitmap(sp_xpm);
-	splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_NO_TIMEOUT , 2000,
+	splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 2000,
 								NULL, -1, wxDefaultPosition, wxDefaultSize,
 								wxSIMPLE_BORDER|wxSTAY_ON_TOP);
-	splashTimer.SetOwner(this, splashT_ID);
-	splashTimer.Start(2000, wxTIMER_ONE_SHOT);
+
+	/* wxTimer *splashTimer = new wxTimer(this, splashT_ID); */
+	/* splashTimer.SetOwner(this, splashT_ID); */
+	/* splashTimer.Start(2000, wxTIMER_ONE_SHOT); */
+	/* splashTimer->Start(2000, wxTIMER_CONTINUOUS); */
 	
 	//Set the numerical locale to "C" throughout
 	setlocale(LC_NUMERIC, "C");
@@ -222,6 +234,7 @@ bool MpApp::OnInit() {
 }
 
 void MpApp::splashCleanup(wxTimerEvent & event) {
+	std::cout << "got timer event" << std::endl;
 	if (splash) {
 		splash->Destroy();
 		splash = NULL;
@@ -345,7 +358,7 @@ void MpApp::menuFileOpen(wxCommandEvent &event) {
 }
 #ifdef __WXMAC__
 void MpApp::MacOpenFile(const wxString & filename) {
-		//first get rid of the splash screen if its still around
+	//first get rid of the splash screen if its still around
 	if (splash) {
 		splash->Destroy();
 		splash = NULL;
@@ -373,13 +386,12 @@ void MessageAlert(const char * message) {
 }
 
 BEGIN_EVENT_TABLE(MpApp, wxApp)
-EVT_MENU (wxID_NEW,          MpApp::menuFileNew)
-EVT_MENU (wxID_OPEN,         MpApp::menuFileOpen)
-EVT_MENU (wxID_EXIT,         MpApp::menuFileQuit)
-EVT_MENU (wxID_PREFERENCES,  MpApp::menuPreferences)
-
-EVT_MENU (wxID_ABOUT,    MpApp::menuHelpAbout)
-EVT_TIMER(splashT_ID,	MpApp::splashCleanup)
+	EVT_MENU (wxID_NEW, MpApp::menuFileNew)
+	EVT_MENU (wxID_OPEN, MpApp::menuFileOpen)
+	EVT_MENU (wxID_EXIT, MpApp::menuFileQuit)
+	EVT_MENU (wxID_PREFERENCES, MpApp::menuPreferences)
+	EVT_MENU (wxID_ABOUT, MpApp::menuHelpAbout)
+	EVT_TIMER(splashT_ID, MpApp::splashCleanup)
 END_EVENT_TABLE()
 
 // Tell wxWidgets to start the program:

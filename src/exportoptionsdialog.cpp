@@ -147,25 +147,25 @@ void ExportOptionsDialog::CreateControls()
 	itemBoxSizer4->Add(itemBoxSizer6, 0, wxALIGN_RIGHT, 5);
 
 	txt0 = new wxStaticText( panelRes, wxID_STATIC, _("Width:"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer6->Add(txt0, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+	itemBoxSizer6->Add(txt0, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM, 5);
 
 	resWidthSpin = new wxSpinCtrl( panelRes, ID_RESWIDTHSPIN, _T("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 999999999, 300 );
 	itemBoxSizer6->Add(resWidthSpin, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
 
 	txt1 = new wxStaticText( panelRes, wxID_STATIC, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer6->Add(txt1, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+	itemBoxSizer6->Add(txt1, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
 
 	wxBoxSizer* itemBoxSizer10 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer4->Add(itemBoxSizer10, 0, wxALIGN_RIGHT, 5);
 
 	txt2 = new wxStaticText( panelRes, wxID_STATIC, _("Height:"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer10->Add(txt2, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+	itemBoxSizer10->Add(txt2, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxBOTTOM, 5);
 
 	resHeightSpin = new wxSpinCtrl( panelRes, ID_RESHEIGHTSPIN, _T("300"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 999999999, 300 );
 	itemBoxSizer10->Add(resHeightSpin, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
 
 	txt3 = new wxStaticText( panelRes, wxID_STATIC, _("pixels"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer10->Add(txt3, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM|wxADJUST_MINSIZE, 5);
+	itemBoxSizer10->Add(txt3, 0, wxALIGN_CENTER_VERTICAL|wxRIGHT|wxBOTTOM, 5);
 
 	resTBGCheck = new wxCheckBox( panelRes, ID_CHECKBOX3, _("Enable background transparency"), wxDefaultPosition, wxDefaultSize, 0 );
 	resTBGCheck->SetValue(false);

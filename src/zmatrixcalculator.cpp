@@ -122,7 +122,7 @@ void ZMatrixCalculator::CreateControls()
     itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     wxStaticText* itemStaticText4 = new wxStaticText( itemDialog1, wxID_STATIC, _("Primary Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer3->Add(itemStaticText4, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer3->Add(itemStaticText4, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     mAtom1Edit = new wxTextCtrl( itemDialog1, ID_ATOM1EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer3->Add(mAtom1Edit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -134,7 +134,7 @@ void ZMatrixCalculator::CreateControls()
     itemBoxSizer6->Add(itemBoxSizer7, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText8 = new wxStaticText( itemDialog1, wxID_STATIC, _("Second Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer7->Add(itemStaticText8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer7->Add(itemStaticText8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     mAtom2Edit = new wxTextCtrl( itemDialog1, ID_ATOM2EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer7->Add(mAtom2Edit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -143,7 +143,7 @@ void ZMatrixCalculator::CreateControls()
     itemBoxSizer6->Add(itemBoxSizer10, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText11 = new wxStaticText( itemDialog1, wxID_STATIC, _("Third Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer10->Add(itemStaticText11, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer10->Add(itemStaticText11, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     mAtom3Edit = new wxTextCtrl( itemDialog1, ID_ATOM3EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer10->Add(mAtom3Edit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -152,7 +152,7 @@ void ZMatrixCalculator::CreateControls()
     itemBoxSizer6->Add(itemBoxSizer13, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     wxStaticText* itemStaticText14 = new wxStaticText( itemDialog1, wxID_STATIC, _("Fourth Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer13->Add(itemStaticText14, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer13->Add(itemStaticText14, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     mAtom4Edit = new wxTextCtrl( itemDialog1, ID_ATOM4EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer13->Add(mAtom4Edit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -167,7 +167,7 @@ void ZMatrixCalculator::CreateControls()
     itemBoxSizer17->Add(itemBoxSizer18, 0, wxALIGN_RIGHT|wxALL, 5);
 
     wxStaticText* itemStaticText19 = new wxStaticText( itemDialog1, wxID_STATIC, _("Bond Length:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer18->Add(itemStaticText19, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer18->Add(itemStaticText19, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     mBondLength = new wxTextCtrl( itemDialog1, ID_BONDLENGTHEDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
     itemBoxSizer18->Add(mBondLength, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -176,7 +176,7 @@ void ZMatrixCalculator::CreateControls()
     itemBoxSizer17->Add(itemBoxSizer21, 0, wxALIGN_RIGHT|wxALL, 5);
 
     wxStaticText* itemStaticText22 = new wxStaticText( itemDialog1, wxID_STATIC, _("Bond Angle:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer21->Add(itemStaticText22, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer21->Add(itemStaticText22, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     mBondAngle = new wxTextCtrl( itemDialog1, ID_BONDANGLEEDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
     itemBoxSizer21->Add(mBondAngle, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -185,7 +185,7 @@ void ZMatrixCalculator::CreateControls()
     itemBoxSizer17->Add(itemBoxSizer24, 0, wxALIGN_RIGHT|wxALL, 5);
 
     wxStaticText* itemStaticText25 = new wxStaticText( itemDialog1, wxID_STATIC, _("Dihedral Angle:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer24->Add(itemStaticText25, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer24->Add(itemStaticText25, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     mDihedralAngle = new wxTextCtrl( itemDialog1, ID_DIHEDRALANGLEEDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
     itemBoxSizer24->Add(mDihedralAngle, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);

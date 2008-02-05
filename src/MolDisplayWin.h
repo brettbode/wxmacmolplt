@@ -416,6 +416,8 @@ class MolDisplayWin : public wxFrame {
 		void menuMoleculeConvertToAngstroms(wxCommandEvent &event);
 		void menuMoleculeInvertNormalMode(wxCommandEvent &event);
 
+		void Dirtify(bool is_dirty = true);
+
 		/**
 		 * Fills out the coordination of every atom with hydrogens.
 		 * @param event The command event (not used).
@@ -645,11 +647,6 @@ class MolDisplayWin : public wxFrame {
 		void ToggleBuilderPalette();
 		WinPrefs *GetPrefs(void) {return Prefs;}
 		bool JustFocused(void);
-
-		/** This function should be called whenever there's something new to
-			save in the CML file.
-			*/
-		inline void ContentChanged() {Dirty = true;}
 };
 
 class MolPrintOut : public wxPrintout {

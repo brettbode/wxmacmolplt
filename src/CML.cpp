@@ -55,8 +55,10 @@ long BuilderDlg::WriteCMLFile(BufferFile *Buffer) const {
 	XMLElement *MetaDataListXML = xmlRoot->addChildElement(CML_convert(MetaDataListElement));
 	XMLElement *el = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 	el->addAttribute(CML_convert(nameAttr), CML_convert(MMP_Structures));
-	for (unsigned int i = 0; i < structures.size(); i++) {
-		structures[i]->WriteXML(el);
+
+	std::vector<Structure *>::const_iterator struc;
+	for (struc = structures.begin(); struc != structures.end(); ++struc) {
+		(*struc)->WriteXML(el);
 	}
 
 	std::ostringstream CMLtext;
@@ -74,6 +76,10 @@ long BuilderDlg::ReadCMLFile(BufferFile *Buffer) {
 
 	short errors = 0;
 	long fsize = Buffer->GetFileSize();
+
+	if (!fsize) {
+		return 0;
+	}
 	char *xmlbuffer = new char[fsize + 1];
 
 	Buffer->SetFilePos(0);
@@ -250,6 +256,18 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 				XMLElement * FN = Ele->addChildElement(kFRAGNAMEXML, FragmentNames[i].c_str());
 			}
 		}
+
+		// List of effective fragment definitions.
+		if (FragmentNames.size() > 0) {
+			XMLElement *Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
+			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_FragmentDefinitions));
+			std::map<std::string, EFrag>::const_iterator efrag;
+			for (efrag = efrags.begin(); efrag != efrags.end(); ++efrag) {
+				XMLElement *FN = Ele->addChildElement(kFragmentDefXML, efrag->second.GetText().c_str());
+				FN->addAttribute(CML_convert(nameAttr), efrag->first.c_str());
+			}
+		}
+
 		//InputOptions
 		if (InputOptions) {
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
@@ -278,16 +296,6 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_WindowData));
 			wData->WriteXML(Ele);
 		}
-
-		/* if (build_palette->GetNumStructures()) { */
-			/* Structure *struc; */
-			/* XMLElement *el = MetaDataListXML->addChildElement(CML_convert(MetaDataElement)); */
-			/* el->addAttribute(CML_convert(nameAttr), CML_convert(MMP_Structures)); */
-			/* for (int i = 0; i < build_palette->GetNumUserStructures(); i++) { */
-				/* struc = build_palette->GetUserStructure(i); */
-				/* struc->WriteXML(el); */
-			/* } */
-		/* } */
 	}
 	if (allFrames) {
 		Frame * lFrame;
@@ -922,11 +930,16 @@ void Structure::WriteXML(XMLElement *parent) const {
 
 	XMLElement *struc_el = parent->addChildElement(kStructureXML);
 
-	snprintf(line, kMaxLineLength, "%ls", name.c_str());
-	struc_el->addAttribute(CML_convert(nameAttr), line);
+	struc_el->addAttribute(CML_convert(nameAttr),
+						   std::string(name.ToAscii()).c_str());
 	
 	if (FragName.size() > 0) {
 		struc_el->addAttribute(kFRAGNAMEXML, FragName.c_str());
+	}
+
+	XMLElement *frag_el;
+	if (frag_def.size()) {
+		frag_el = struc_el->addChildElement("FragmentDefinition", frag_def.c_str());
 	}
 
 	XMLElement *atoms_el = struc_el->addChildElement("atoms");
@@ -1183,29 +1196,29 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 															}
 														}
 															break;
-															case MMP_InputOptions:
+														case MMP_FragmentDefinitions:
+															{
+																XMLElement *frags = mdchild->getFirstChild();
+																const char *fragname;
+																while (frags != NULL) {
+																	const char *name = frags->getName();
+																	if (name) {
+																		if (!strcmp(name, "Fragment")) {
+																			fragname = frags->getAttributeValue(CML_convert(nameAttr));
+																			efrags.insert(std::pair<std::string, EFrag>(fragname, EFrag(frags->getValue())));
+																		}
+																	}
+																	frags = frags->getNextChild();
+																}
+															}
+															break;
+														case MMP_InputOptions:
 														{
 															if (InputOptions) delete InputOptions;
 															InputOptions = new InputData;
 															InputOptions->ReadXML(mdchild);
 														}
 															break;
-														/* case MMP_Structures: { */
-															/* XMLElement *struc_el = mdchild->getFirstChild(); */
-															/* Structure *struc; */
-															/* while (struc_el) { */
-																/* if (struc_el->isName(kStructureXML)) { */
-																	/* struc = new Structure; */
-																	/* if (struc->ReadXML(struc_el)) { */
-																		/* build_palette->AddStructure(struc); */
-																	/* } else { */
-																		/* delete struc; */
-																	/* } */
-																/* } */
-																/* struc_el = struc_el->getNextChild(); */
-															/* } */
-															/* break; */
-														/* } */
 														case MMP_Annotations:
 														{
 															XMLElement * AnnChild = mdchild->getFirstChild();
@@ -2662,9 +2675,8 @@ bool AnnotationDihedral::ReadXML(XMLElement * Annotation) {
 bool Structure::ReadXML(XMLElement *struc_el) {
 
 	const char *attr;
-	XMLElement *atoms_el;
+	XMLElement *el;
 	XMLElement *atom_el;
-	XMLElement *bonds_el;
 	XMLElement *bond_el;
 	int i;
 
@@ -2678,12 +2690,19 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 		FragName = std::string(attr);
 	}
 
+	el = struc_el->getFirstChild();
+	if (!el) return false;
+
+	// See if fragment definition exists.
+	if (strcmp(el->getName(), "FragmentDefinition") == 0) {
+		frag_def = el->getValue();
+		el = el->getNextChild();
+	}
+
 	// Then we get an atoms element which contains some number of
 	// atom elements.
-	atoms_el = struc_el->getFirstChild();
-	if (!atoms_el) return false;
 
-	attr = atoms_el->getAttributeValue(CML_convert(sizeAttr));
+	attr = el->getAttributeValue(CML_convert(sizeAttr));
 	if (!attr) return false;
 	sscanf(attr, "%d", &natoms);
 	if (!natoms) return true;
@@ -2691,7 +2710,8 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 	atoms = new mpAtom[natoms];
 
 	i = 0;
-	atom_el = atoms_el->getFirstChild();
+	atom_el = el->getFirstChild();
+
 	while (atom_el) {
 		if (i >= natoms) {
 			std::cerr << "Malformed structure!" << std::endl;
@@ -2730,10 +2750,10 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 
 	// Then we get a bonds element which contains some number of
 	// bond elements.
-	bonds_el = atoms_el->getNextChild();
-	if (!bonds_el) return false;
+	el = el->getNextChild();
+	if (!el) return false;
 
-	attr = bonds_el->getAttributeValue(CML_convert(sizeAttr));
+	attr = el->getAttributeValue(CML_convert(sizeAttr));
 	if (!attr) return false;
 	sscanf(attr, "%d", &nbonds);
 
@@ -2742,7 +2762,7 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 
 	bonds = new Bond[nbonds];
 	i = 0;
-	bond_el = bonds_el->getFirstChild();
+	bond_el = el->getFirstChild();
 	while (bond_el) {
 		if (i >= nbonds) {
 			std::cerr << "Malformed structure!" << std::endl;
@@ -2970,6 +2990,8 @@ const char * CML_convert(MMP_MetadataNamespace t)
 			return "BasisSet";
 		case MMP_FragmentNameList:
 			return "FRAGNAMEList";
+		case MMP_FragmentDefinitions:
+			return "FragmentDefinitions";
 		case MMP_InputOptions:
 			return "InputOptions";
 		case MMP_Annotations:

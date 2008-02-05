@@ -113,7 +113,7 @@ void SetBondLength::CreateControls()
     itemDialog1->SetSizer(itemBoxSizer2);
 
     wxStaticText* itemStaticText3 = new wxStaticText( itemDialog1, wxID_STATIC, _("Maximum inter-atomic distance to be\nconsidered a bond:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     maxValueEdit = new wxTextCtrl( itemDialog1, ID_MAXLENGTHEDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())
@@ -142,7 +142,7 @@ void SetBondLength::CreateControls()
     itemBoxSizer8->Add(itemBoxSizer9, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
     normalText = new wxStaticText( itemDialog1, wxID_STATIC, _("\"normal\" bonding tolerance:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer9->Add(normalText, 0, wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+    itemBoxSizer9->Add(normalText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     normalTolSlider = new wxSlider( itemDialog1, ID_NORMALSLIDER, 100, 50, 150, wxDefaultPosition, wxSize(110, -1), wxSL_HORIZONTAL );
     if (ShowToolTips())
