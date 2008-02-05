@@ -234,7 +234,6 @@ bool MpApp::OnInit() {
 }
 
 void MpApp::splashCleanup(wxTimerEvent & event) {
-	std::cout << "got timer event" << std::endl;
 	if (splash) {
 		splash->Destroy();
 		splash = NULL;
