@@ -1241,7 +1241,65 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				lFrame->SetBonds(Prefs, false);
 		}
 	}
-	// now look for frequencies for the last frame
+	
+	// now look for Basis
+	if ((lFrame->GetNumAtoms()>0)&&Buffer->LocateKeyWord("$BASIS", 6)) {
+		
+		// Totals counters
+		long numFunctions = 0;
+		long nShells = 0;
+		long linesInSection = 0;
+		// These three are just for each line read: nFunc, IType, and Sc(alefactor)
+		long nFunc;	
+		char IType[5];
+		float Sc;
+	
+		bool error = false; // use the error flag to bail out once we hit an error, not really used here							
+		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
+			Buffer->GetLine(Line);
+			linesInSection++;
+			//Continue until we find the end of the group
+			if (FindKeyWord(Line, "$END", 4)<0) {								
+				int lineBytes = strlen(Line);
+				int bytesConsumed, bytesRead=0;
+				while (bytesRead < lineBytes) {
+					// Count the number of lines defining one shell
+					int scanCount = sscanf(&(Line[bytesRead]), "%ld %[SPDFGLM] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
+					if (scanCount == 3) { 
+						bytesRead+=bytesConsumed;
+						nShells++;
+					} else
+						break;
+				}
+			} else
+				break;
+		}
+		//Create the BasisSet
+		MainData->Basis = new BasisSet(nAtoms, nShells);
+/*		
+		// Go to line after $BASIS 
+		Buffer->BackupnLines(linesInSection-1);
+		
+		int iShell = 0;
+		int iAtom = 0;
+		// need to iterate over Atoms (between $BASIS, [$$,] $END) as well as shells
+		while (iShell < nShells) {
+			Buffer->GetLine(Line);
+			int lineBytes = strlen(Line);
+			int bytesConsumed, bytesRead = 0;
+			while (bytesRead < LineBytes) {
+			    int scanCount = sscanf(&(Line[bytesRead]), "%ld %[SPDFGLM] %f%n", &nFunc, &ITYPE, &Sc, &bytesConsumed);
+				if(scanCount == 3) {
+					bytesRead+=bytesConsumed;
+					// Save function for this shell in this atom
+					//
+				}
+		}
+*/
+
+	} //BasisSet
+	
+	// now look for vibrational frequencies for the last frame
 	if ((lFrame->GetNumAtoms()>0)&&Buffer->LocateKeyWord("$FREQ", 5)) {
 		Buffer->SkipnLines(1);
 		// Create the VibRec
@@ -1252,17 +1310,17 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
 			Buffer->GetLine(Line);
 			//Continue until we find the end of the group
-			if (FindKeyWord(Line, "$END", 4)<0) {
+			if (FindKeyWord(Line, "$END", 4)<0) {								
 				//The first line is the symmetry symbol, which we ignore
 				Buffer->GetLine(Line);	//next line is the frequencies
 				unsigned int lineModes=0;
-				int linebytes=strlen(Line);
-				int bytesconsumed, bytesRead=0;
-				while (bytesRead < linebytes) {
-					int scancount = sscanf(&(Line[bytesRead]), "%s%n", freq, &bytesconsumed);
-					if (scancount == 1) {
+				int lineBytes=strlen(Line);
+				int bytesConsumed, bytesRead=0;
+				while (bytesRead < lineBytes) {
+					int scanCount = sscanf(&(Line[bytesRead]), "%s%n", freq, &bytesConsumed);
+					if (scanCount == 1) {
 						lFrame->Vibs->Frequencies.push_back(freq);
-						bytesRead += bytesconsumed;
+						bytesRead += bytesConsumed;
 						lineModes++;
 					} else
 						break;
@@ -1274,11 +1332,11 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					bytesRead = 0;
 					for (unsigned int imode=0; imode<lineModes; imode++) {
 						CPoint3D temp;
-						int scancount = sscanf(&(Line[bytesRead]), "%f %f %f%n",
-											   &(temp.x), &(temp.y), &(temp.z), &bytesconsumed);
-						if (scancount == 3) {
+						int scanCount = sscanf(&(Line[bytesRead]), "%f %f %f%n",
+											   &(temp.x), &(temp.y), &(temp.z), &bytesConsumed);
+						if (scanCount == 3) {
 							lFrame->Vibs->NormMode[iatm + lFrame->NumAtoms*(nModes+imode)] = temp;
-							bytesRead += bytesconsumed;
+							bytesRead += bytesConsumed;
 						} else {
 							lineModes = imode;
 							error = true;
@@ -1293,7 +1351,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		}
 		lFrame->Vibs->NumModes = nModes;
 		lFrame->Vibs->Resize(nModes);
-	}
+	} // Vibrational Frequencies
 	return 1;
 }
 
