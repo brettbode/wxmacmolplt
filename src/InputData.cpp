@@ -31,6 +31,7 @@
 #include <string.h>
 #include "XML.hpp"
 #include "CML.h"
+#include <cctype>
 
 	//InputData functions
 InputData::InputData(void) {
