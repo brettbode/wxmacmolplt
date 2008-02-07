@@ -774,7 +774,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		Buffer->GetLine(Line);	//1st line is a title line
 		MainData->InputOptions->Data->SetTitle(Line, strlen(Line));
 		Buffer->GetLine(Line);	//2nd line contains the point group
-		if (FindKeyWord(Line, "$END", 4) < 0) {	//End of this group
+		if (FindKeyWord(Line, "$END", 4) < 0) {	// Make sure we're not at $END
 			scanerr = sscanf(Line, "%s %ld", token, &nAtoms);
 			MainData->InputOptions->Data->SetPointGroup(token);
 			if (scanerr == 2)	//if a number was read in set the order
@@ -786,57 +786,55 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			EndPos = Buffer->GetFilePos() - 1;
 			Buffer->SetFilePos(StartPos);
 			nAtoms = Buffer->GetNumLines(EndPos - StartPos);
-			if (MainData->InputOptions->Data->GetCoordType() <= CartesianCoordType) {
-				if (nAtoms > 0) {
+			if (nAtoms > 0) {
+				if (MainData->InputOptions->Data->GetCoordType() <= CartesianCoordType) {
 					if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
-				} else {
-					throw DataError(14);
-				}
-				while (Buffer->GetFilePos() < EndPos) {
-						CPoint3D	pos;
-						float		AtomType;
-					Buffer->GetLine(Line);
-					if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
-					{ throw UserCancel();}
-					pos.x = pos.y = pos.z = 0.0;
-					sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
-					lFrame->AddAtom((long) AtomType, pos);
-					StartPos = Buffer->FindBlankLine();
-					if ((StartPos <= EndPos)&&(StartPos>-1)) {	//basis set is inlined in $DATA
-						Buffer->SetFilePos(StartPos);	//just skip over it
-						Buffer->SkipnLines(1);
+					while (Buffer->GetFilePos() < EndPos) {
+							CPoint3D	pos;
+							float		AtomType;
+						Buffer->GetLine(Line);
+						if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+						{ throw UserCancel();}
+						pos.x = pos.y = pos.z = 0.0;
+						sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
+						lFrame->AddAtom((long) AtomType, pos);
+						StartPos = Buffer->FindBlankLine();
+						if ((StartPos <= EndPos)&&(StartPos>-1)) {	//basis set is inlined in $DATA
+							Buffer->SetFilePos(StartPos);	//just skip over it
+							Buffer->SkipnLines(1);
+						}
 					}
+					if (((MainData->InputOptions->Data->GetCoordType() == UniqueCoordType)||
+						 (MainData->InputOptions->Data->GetCoordType() == 0))&&
+						(MainData->InputOptions->Data->GetPointGroup()>GAMESS_C1)&&
+						(lFrame->GetNumAtoms() > 0)) {
+						//Generate symmetry dependant atoms
+						for (int i=0; i<lFrame->GetNumAtoms(); i++)
+							lFrame->Atoms[i].IsSymmetryUnique(true);
+						MainData->GenerateSymmetryDependentAtoms();
+					}
+				} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTCoordType) {
+					long bPos = Buffer->FindBlankLine();
+					if ((bPos > 0)&&(bPos < EndPos)) {
+						nAtoms = Buffer->GetNumLines(bPos - StartPos);
+					}
+					if (nAtoms > 0) {
+						if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
+					} else {
+						throw DataError(14);
+					}
+					MainData->ParseZMatrix(Buffer, nAtoms, Prefs);
+				} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTMPCCoordType) {
+					if (nAtoms > 0) {
+						if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
+					} else {
+						throw DataError(14);
+					}
+					MainData->ParseMOPACZMatrix(Buffer, nAtoms, Prefs);
 				}
-				if (((MainData->InputOptions->Data->GetCoordType() == UniqueCoordType)||
-					 (MainData->InputOptions->Data->GetCoordType() == 0))&&
-					(MainData->InputOptions->Data->GetPointGroup()>GAMESS_C1)&&
-					(lFrame->GetNumAtoms() > 0)) {
-					//Generate symmetry dependant atoms
-					for (int i=0; i<lFrame->GetNumAtoms(); i++)
-						lFrame->Atoms[i].IsSymmetryUnique(true);
-					MainData->GenerateSymmetryDependentAtoms();
-				}
-			} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTCoordType) {
-				long bPos = Buffer->FindBlankLine();
-				if ((bPos > 0)&&(bPos < EndPos)) {
-					nAtoms = Buffer->GetNumLines(bPos - StartPos);
-				}
-				if (nAtoms > 0) {
-					if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
-				} else {
-					throw DataError(14);
-				}
-				MainData->ParseZMatrix(Buffer, nAtoms, Prefs);
-			} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTMPCCoordType) {
-				if (nAtoms > 0) {
-					if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
-				} else {
-					throw DataError(14);
-				}
-				MainData->ParseMOPACZMatrix(Buffer, nAtoms, Prefs);
+				if (Prefs->GetAutoBond())	//setup bonds, if needed
+					lFrame->SetBonds(Prefs, false);
 			}
-			if (Prefs->GetAutoBond())	//setup bonds, if needed
-				lFrame->SetBonds(Prefs, false);
 		}
 	}
 	Buffer->SetFilePos(0);	//restart search from beginning of file
@@ -955,6 +953,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 							running_text += "\n";
 							Buffer->GetLine(Line);
 						}
+						running_text += Line;
 
 						// restore file position
 						Buffer->SetFilePos(former_pos);

@@ -2042,26 +2042,44 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 		File->WriteLine(" $EFRAG ", true);
 		File->WriteLine("COORD=CART", true);
 
-		long fragmentIndex = 0, atomsWritten=0, HydrogenIndex;
+		long last_frag = 0;
+		long curr_frag;
+		long atomsWritten=0, HydrogenIndex;
+		const char *frag_name;
 		for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
 			if (cFrame->Atoms[iatom].IsEffectiveFragment()) {
-				if (cFrame->Atoms[iatom].GetFragmentNumber() != fragmentIndex) {
+				curr_frag = cFrame->Atoms[iatom].GetFragmentNumber();
+				frag_name = MainData->GetFragmentName(curr_frag - 1);
+				if (curr_frag != last_frag) {
 					//start of a new fragment, punch FRAGNAME
-					fragmentIndex = cFrame->Atoms[iatom].GetFragmentNumber();
+					last_frag = curr_frag;
 					File->WriteLine("FRAGNAME=", false);
-					File->WriteLine(MainData->GetFragmentName(iatom-1), true);
+					File->WriteLine(frag_name, true);
 					atomsWritten=0;
 					HydrogenIndex=2;
+				}
+				EFrag *frag = NULL;
+				if (strcmp(frag_name, "H2ORHF") != 0 &&
+					strcmp(frag_name, "H2ODHT") != 0) {
+					std::map<std::string, EFrag>::iterator frag_entry;
+					frag_entry = MainData->efrags.find(std::string(frag_name));
+					if (frag_entry != MainData->efrags.end()) {
+						frag = &(frag_entry->second);
+					}
 				}
 				if (atomsWritten < 3) {	//the EFRAG group only punchs the first three atoms
 					//special case the atom labels for now. Eventually I think this should
 					//be done via a FRAGNAME database. 
-					if (cFrame->Atoms[iatom].GetType() == 8)
-						File->WriteLine("O1 ", false);
-					else {
-						sprintf(Out, "H%ld ", HydrogenIndex);
-						File->WriteLine(Out, false);
-						HydrogenIndex++;
+					if (!frag) {
+						if (cFrame->Atoms[iatom].GetType() == 8)
+							File->WriteLine("O1 ", false);
+						else {
+							sprintf(Out, "H%ld ", HydrogenIndex);
+							File->WriteLine(Out, false);
+							HydrogenIndex++;
+						}
+					} else {
+						File->WriteLine(frag->GetAtoms()[atomsWritten].GetLabel().c_str(), false);
 					}
 					sprintf(Out, "%10.5f  %10.5f  %10.5f",
 							cFrame->Atoms[iatom].Position.x, cFrame->Atoms[iatom].Position.y,
@@ -2072,6 +2090,14 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 			}
 		}
 		File->WriteLine(" $END", true);
+
+		std::map<std::string, EFrag>::const_iterator frag;
+		for (frag = MainData->efrags.begin();
+			 frag != MainData->efrags.end();
+			 ++frag) {
+			const std::string& text = frag->second.GetText();
+			File->Write(text.c_str(), text.size());
+		}
 	}
 }
 void DataGroup::WriteXML(XMLElement * parent) const {

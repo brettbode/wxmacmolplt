@@ -53,9 +53,9 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] = {
 #endif
 
 #include "xpms/sp.xpm"
+/* wxTimer *splash_timer = NULL; */
 wxSplashScreen * splash = NULL;
 /* #define splashT_ID 12399 */
-#define splashT_ID 289102
 bool MpApp::OnInit() {
 	m_InstanceChecker = NULL;
 	gPrefDlg = NULL;
@@ -95,17 +95,6 @@ bool MpApp::OnInit() {
     }
 #endif
 #endif
-
-	// Throw up a simple splash screen
-	wxBitmap sp_bitmap(sp_xpm);
-	splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 2000,
-								NULL, -1, wxDefaultPosition, wxDefaultSize,
-								wxSIMPLE_BORDER|wxSTAY_ON_TOP);
-
-	/* wxTimer *splashTimer = new wxTimer(this, splashT_ID); */
-	/* splashTimer.SetOwner(this, splashT_ID); */
-	/* splashTimer.Start(2000, wxTIMER_ONE_SHOT); */
-	/* splashTimer->Start(2000, wxTIMER_CONTINUOUS); */
 	
 	//Set the numerical locale to "C" throughout
 	setlocale(LC_NUMERIC, "C");
@@ -150,6 +139,11 @@ bool MpApp::OnInit() {
 		return false; 
 	} 
 
+#if 0
+	splash_timer = new wxTimer(this, splashT_ID);
+	splash_timer->Start(2000, wxTIMER_ONE_SHOT);
+#endif
+
 	// Check for debug level 
 	//	long debugLevel = 0; 
 	//	if (cmdParser.Found(wxT(ÒdÓ), & debugLevel)) 
@@ -185,11 +179,13 @@ bool MpApp::OnInit() {
 	
 	// Check for a project filename 
 	if (cmdParser.GetParamCount() > 0) {
+#if 0
 		//explicitly destroy the splash screen to get it out of the way
 		if (splash) {
 			splash->Destroy();
 			splash = NULL;
 		}
+#endif
 		
 		cmdFilename = cmdParser.GetParam(0); 
 		// Under Windows when invoking via a document 
@@ -205,7 +201,13 @@ bool MpApp::OnInit() {
 			long r = temp->OpenFile(cmdFilename);
 			if (r>0) temp->Show(true);
 		}
-	} 
+	} else {
+		// Throw up a simple splash screen
+		wxBitmap sp_bitmap(sp_xpm);
+		splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 2000,
+									NULL, -1, wxDefaultPosition, wxDefaultSize,
+									wxSIMPLE_BORDER|wxSTAY_ON_TOP);
+	}
 
     // Initialize image handlers so we can save the PNG format and such.
     wxInitAllImageHandlers();
@@ -233,12 +235,15 @@ bool MpApp::OnInit() {
     return true;
 }
 
+#if 0
 void MpApp::splashCleanup(wxTimerEvent & event) {
 	if (splash) {
 		splash->Destroy();
 		splash = NULL;
 	}
+	delete splash_timer;
 }
+#endif
 
 int MpApp::OnExit() {
 	//If we are using the instance checker we must delete it here or we will leave a stale lock behind
@@ -357,11 +362,15 @@ void MpApp::menuFileOpen(wxCommandEvent &event) {
 }
 #ifdef __WXMAC__
 void MpApp::MacOpenFile(const wxString & filename) {
+
+#if 0
 	//first get rid of the splash screen if its still around
 	if (splash) {
 		splash->Destroy();
 		splash = NULL;
 	}
+	// asdfs
+#endif
 	
 	if (filename.length() > 0) {
         createMainFrame(filename);
@@ -373,10 +382,12 @@ void MessageAlert(const char * message) {
 	//For some reason on windoze when the splash screen gets destroyed while the alert is
 	//up it hides the alert without releasing control so make sure its gone here before
 	//the alert is created.
+#if 0
 	if (splash) {
 		splash->Destroy();
 		splash = NULL;
 	}
+#endif
 	//wxLogMessage throws up a simple dialog alert and gives the user the option
 //of viewing and saving the current complete log.
 	//We need to convert to a wxString first to allow for unicode environments
@@ -390,7 +401,7 @@ BEGIN_EVENT_TABLE(MpApp, wxApp)
 	EVT_MENU (wxID_EXIT, MpApp::menuFileQuit)
 	EVT_MENU (wxID_PREFERENCES, MpApp::menuPreferences)
 	EVT_MENU (wxID_ABOUT, MpApp::menuHelpAbout)
-	EVT_TIMER(splashT_ID, MpApp::splashCleanup)
+	/* EVT_TIMER(splashT_ID, MpApp::splashCleanup) */
 END_EVENT_TABLE()
 
 // Tell wxWidgets to start the program:

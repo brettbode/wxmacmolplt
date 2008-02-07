@@ -34,6 +34,7 @@ class MoleculeData {
 		friend class Surf3DBase;
 		friend class MpGLCanvas;
 		friend class FrameSnapShot;
+		friend class DataGroup;
 	private:
 		std::map<std::string, EFrag> efrags;
 		std::vector<Annotation *> Annotations;	//Set of annotations
