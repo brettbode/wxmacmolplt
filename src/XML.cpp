@@ -443,14 +443,18 @@ XMLElement::XMLElement(const char * Buffer, int & bytesConsumed, int recursionDe
 			} else {
 				if (!strncmp("&amp;", &(Buffer[cstart+c]), 5)) {
 					value[nc] = '&';
+					c += 4;
 				} else if (!strncmp("&lt;", &(Buffer[cstart+c]), 4)) {
 					value[nc] = '<';
+					c += 3;
 				} else if (!strncmp("&gt;", &(Buffer[cstart+c]), 4)) {
 					value[nc] = '>';
+					c += 3;
 				} else if (!strncmp("&#xD;", &(Buffer[cstart+c]), 5)) {
 					value[nc] = '\13';
+					c += 4;
 				} else {	//some other hash or an illegal char
-	//				value[nc];
+					value[nc] = '&';
 				}
 			}
 			nc++;
