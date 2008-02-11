@@ -1243,7 +1243,6 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	
 	// now look for Basis
 	if ((lFrame->GetNumAtoms()>0)&&Buffer->LocateKeyWord("$BASIS", 6)) {
-		
 		// Totals counters
 		long numFunctions = 0;
 		long nShells = 0;
@@ -1273,30 +1272,69 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			} else
 				break;
 		}
-		//Create the BasisSet
+		// create the BasisSet
 		MainData->Basis = new BasisSet(nAtoms, nShells);
-/*		
-		// Go to line after $BASIS 
+		// Go back to the first line after $BASIS 
 		Buffer->BackupnLines(linesInSection-1);
-		
 		int iShell = 0;
 		int iAtom = 0;
-		// need to iterate over Atoms (between $BASIS, [$$,] $END) as well as shells
-		while (iShell < nShells) {
+		// store shell info for each atom
+		while (iShell < nShells && iAtom < nAtoms) {
 			Buffer->GetLine(Line);
 			int lineBytes = strlen(Line);
 			int bytesConsumed, bytesRead = 0;
-			while (bytesRead < LineBytes) {
-			    int scanCount = sscanf(&(Line[bytesRead]), "%ld %[SPDFGLM] %f%n", &nFunc, &ITYPE, &Sc, &bytesConsumed);
-				if(scanCount == 3) {
-					bytesRead+=bytesConsumed;
-					// Save function for this shell in this atom
-					//
-				}
-		}
-*/
+		    
+			int scanCount = sscanf(Line, "%ld %[SPDFGLM] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
+			// perhaps use strtok here instead of sscanf and parse each line the same way?
+			if (scanCount == 3) {
+				// Store BasisShell info
+				MainData->Basis->Shells.push_back(BasisShell());	
+				if (strncmp(IType, "L", 8)==0 || strncmp(IType, "SP", 8)==0) 	// include lower case letters as well?
+					MainData->Basis->Shells[iShell].ShellType = LShell;
+				else if (strncmp(IType, "S", 8)==0)
+					MainData->Basis->Shells[iShell].ShellType = SShell;
+				else if (strncmp(IType, "P", 8)==0)
+					MainData->Basis->Shells[iShell].ShellType = PShell;
+				else if (strncmp(IType, "D", 8)==0)
+					MainData->Basis->Shells[iShell].ShellType = DShell;
+				else if (strncmp(IType, "F", 8)==0)
+					MainData->Basis->Shells[iShell].ShellType = FShell;
+				
+				// save first shell of this atom to BasisMap
+				MainData->Basis->BasisMap.push_back(iShell);
 
-	} //BasisSet
+				// deal with Nuclear Charge? (not sure about ECPs; should make sure lFrame is correct)
+				MainData->Basis->NuclearCharge.push_back(lFrame->GetAtomType(iAtom));
+				MainData->Basis->NumShells++; 
+				// this takes the number given on the shell-definition line as the number
+				// of functions defined by the following exp/coeff sets (not sure if this is correct)
+				MainData->Basis->NumFuncs+=nFunc;	
+				
+				// go into loop in which exp/coeffs will be read until next shell/atom
+						// (still feeling this part out - not confident / not even finished first draft coding)
+				Buffer-> GetLine(Line);
+				bytesRead=0;
+				float tmpFloat;
+				scanCount = sscanf(&(Line[bytesRead]), "%f%n", &tmpFloat, &bytesConsumed);
+			
+		
+				iShell++;
+			}
+			// Handle $$, $END (these signal the end of an atom)
+			char tmpStr[5];
+			scanCount = sscanf(Line, "%s%n", &tmpStr, &bytesConsumed);
+			if (scanCount == 1) {
+				if ((bytesConsumed == 2 && strncmp(tmpStr, "$$", 5) == 0) || 
+				    (bytesConsumed == 4 && strncmp(tmpStr, "$END", 5) == 0)) {
+					// add ending shell of this atom to BasisMap
+					MainData->Basis->BasisMap.push_back(iShell-1);
+					iAtom++;
+				}
+				// else throw some kind of error?
+			}
+
+		} // creating BasisSet
+	} // BasisSet done
 	
 	// now look for vibrational frequencies for the last frame
 	if ((lFrame->GetNumAtoms()>0)&&Buffer->LocateKeyWord("$FREQ", 5)) {
@@ -1350,7 +1388,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		}
 		lFrame->Vibs->NumModes = nModes;
 		lFrame->Vibs->Resize(nModes);
-	} // Vibrational Frequencies
+	} // Vibrational Frequencies done
 	return 1;
 }
 
