@@ -914,7 +914,8 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				// Custom fragment type.
 				else {
 
-					// Read the three atoms that setup the fragment.
+					// Read the three atoms that setup the fragment.  These
+					// should be in angstroms.
 					MainData->FragmentNames.push_back(std::string(token));
 					fragNum = MainData->FragmentNames.size();
 					char label[kMaxLineLength];
@@ -925,7 +926,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 							   &(dst_locs[i].z));
 						labels[i] = label;
 						/* std::cout << "Line: " << Line << std::endl; */
-						/* atm = lFrame->AddAtom(3, dst_locs[i]); */
+						/* atm = lFrame->AddAtom(1, dst_locs[i]); */
 						/* atm->SetFragmentNumber(fragNum); */
 					}
 
@@ -989,9 +990,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 
 					// We first find a rotation that one will align a vector
 					// in the fragment template to the corresponding vector in
-					// the destination space.  While we're at it, we figure out
-					// the scale ratio between the destination space and the
-					// fragment space.
+					// the destination space.
 					dst_vec = dst_locs[1] - dst_locs[0];
 					Normalize3D(&dst_vec);
 
