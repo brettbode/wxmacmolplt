@@ -422,7 +422,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 
 	toolbar = NULL;
 	lasso_has_area = false;
-
 	show_bond_sites = true;
 
 	status_timer.SetOwner(this, MMP_STATUS_TIMER);
@@ -452,27 +451,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	
 	Show(true);
 	AdjustMenus();
-				
-	unsigned char texture[16 * 8] = {
-		255,   0,   0,   0, 0, 0, 0, 0, 255,   0,   0,   0, 0, 0, 0, 0,
-		255, 255,   0,   0, 0, 0, 0, 0, 255, 255,   0,   0, 0, 0, 0, 0,
-		255, 255, 255,   0, 0, 0, 0, 0, 255, 255, 255,   0, 0, 0, 0, 0,
-		255, 255, 255, 255, 0, 0, 0, 0, 255, 255, 255, 255, 0, 0, 0, 0,
-		255, 255, 255, 255, 0, 0, 0, 0, 255, 255, 255, 255, 0, 0, 0, 0,
-		255, 255, 255,   0, 0, 0, 0, 0, 255, 255, 255,   0, 0, 0, 0, 0,
-		255, 255,   0,   0, 0, 0, 0, 0, 255, 255,   0,   0, 0, 0, 0, 0,
-		255,   0,   0,   0, 0, 0, 0, 0, 255,   0,   0,   0, 0, 0, 0, 0
-	};
-
-	glCanvas->SetCurrent();
-	glGenTextures(1, &(OpenGLData->length_anno_tex_id));
-	glBindTexture(GL_TEXTURE_2D, OpenGLData->length_anno_tex_id);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 16, 8, 0, GL_ALPHA,
-				 GL_UNSIGNED_BYTE, texture);
 
 	// If this is a new/empty window default to edit mode (title should be
 	// "Untitled")
@@ -1187,7 +1165,11 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 							   wxT(""),
 							   wxT(""),
 							   wildcards,
+#if wxCHECK_VERSION(2,9,0)
+							   wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+#else
 							   wxSAVE | wxOVERWRITE_PROMPT);
+#endif
 
 	if(fileDlg->ShowModal() == wxID_OK) {
 		filepath = fileDlg->GetPath();
@@ -1347,7 +1329,13 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
 		//First need to use an open file dialog
 		wxString filename = wxFileSelector(wxT("Choose a file to open"),
 										   wxT(""), wxT(""), wxT(""),
-										   wxT("*.*"), wxOPEN, this);
+										   wxT("*.*"),
+#if wxCHECK_VERSION(2,9,0)
+										   wxFD_OPEN,
+#else
+										   wxOPEN,
+#endif
+										   this);
 		//If the user chooses a file, create a window and have it process it.
 		if (!filename.IsEmpty()) {
 			//An empty window defaults to edit mode with the toolbar active
@@ -1370,7 +1358,13 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
 void MolDisplayWin::menuFileAddFramesFromFile(wxCommandEvent &event) {
 	//First prompt for the file.
 	wxString filename = wxFileSelector(_("Choose a file containing points to be appended to the currently open file."),
-									   _T(""), _T(""), _T(""), _T("*"), wxOPEN, this);
+									   _T(""), _T(""), _T(""), _T("*"),
+#if wxCHECK_VERSION(2,9,0)
+									   wxFD_OPEN,
+#else
+									   wxOPEN,
+#endif
+									   this);
 	
 	//If the user chooses a file, popup the extra options dialog before processing it
 	if (filename.length() > 0) {
@@ -1446,7 +1440,12 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 
 	filePath = wxFileSelector(wxT("Save As"), wxT(""), wxT(""), wxT(""),
 							  wxT("CML Files (*.cml)|*.cml"),
-							  wxSAVE | wxOVERWRITE_PROMPT, this);
+#if wxCHECK_VERSION(2,9,0)
+							  wxFD_SAVE | wxFD_OVERWRITE_PROMPT,
+#else
+							  wxSAVE | wxOVERWRITE_PROMPT,
+#endif
+							  this);
 
 	if(!filePath.IsEmpty()) {
 		if((currFile = fopen(filePath.mb_str(wxConvUTF8), "w")) == NULL) {
@@ -2218,8 +2217,11 @@ void MolDisplayWin::menuBuilderShowBuildTools(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::OnSaveStructureUpdate(wxUpdateUIEvent& event) {
-	event.Enable((MainData->cFrame->GetNumAtomsSelected() > 0) &&
-				 InEditMode());
+
+	// Only require some atoms to be selected in order to save a 
+	// prototype.
+	event.Enable(MainData->cFrame->GetNumAtomsSelected() > 0);
+
 }
 
 void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {

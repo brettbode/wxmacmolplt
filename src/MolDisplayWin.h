@@ -32,6 +32,7 @@
 	functions more like a struct. None of this data is saved to file.
 */
 class OpenGLRec {
+	friend class MpGLCanvas;
 	public:
 #ifndef __wxBuild__
 		AGLContext aglContext;
@@ -199,6 +200,7 @@ private:
  * application, and each main window owns its dialogs.
  */
 class MolDisplayWin : public wxFrame {
+	friend class MpGLCanvas;
 	private:
 		wxMenuBar	*menuBar;
 		wxMenu		*menuFile;

@@ -87,7 +87,7 @@ MpGLCanvas::~MpGLCanvas() {
 
 void MpGLCanvas::initGL(void) {
 
-	if(GetContext()) {
+	if (GetContext()) {
 		wxString vector_font, bitmap_font;
 		wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
 #if wxCHECK_VERSION(2, 8, 0)
@@ -144,6 +144,26 @@ void MpGLCanvas::initGL(void) {
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
 		glEnable(GL_LIGHT0);
 
+		unsigned char texture[16 * 8] = {
+			255,   0,   0,   0, 0, 0, 0, 0, 255,   0,   0,   0, 0, 0, 0, 0,
+			255, 255,   0,   0, 0, 0, 0, 0, 255, 255,   0,   0, 0, 0, 0, 0,
+			255, 255, 255,   0, 0, 0, 0, 0, 255, 255, 255,   0, 0, 0, 0, 0,
+			255, 255, 255, 255, 0, 0, 0, 0, 255, 255, 255, 255, 0, 0, 0, 0,
+			255, 255, 255, 255, 0, 0, 0, 0, 255, 255, 255, 255, 0, 0, 0, 0,
+			255, 255, 255,   0, 0, 0, 0, 0, 255, 255, 255,   0, 0, 0, 0, 0,
+			255, 255,   0,   0, 0, 0, 0, 0, 255, 255,   0,   0, 0, 0, 0, 0,
+			255,   0,   0,   0, 0, 0, 0, 0, 255,   0,   0,   0, 0, 0, 0, 0
+		};
+
+		glGenTextures(1, &(MolWin->OpenGLData->length_anno_tex_id));
+		glBindTexture(GL_TEXTURE_2D, MolWin->OpenGLData->length_anno_tex_id);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 16, 8, 0, GL_ALPHA,
+					 GL_UNSIGNED_BYTE, texture);
+
 		initialized = true;
 	}
 }
@@ -153,7 +173,7 @@ void MpGLCanvas::setPrefs(WinPrefs *newPrefs) {
 }
 
 wxImage MpGLCanvas::getImage(const int width, const int height) {
-	if(!GetContext()) {
+	if (!GetContext()) {
 		return wxImage();
 	}
 	SetCurrent();
@@ -410,46 +430,58 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 	UpdateGLView();
 }
 
+/**
+ * This function multiplies the current matrix by a projection matrix defined
+ * by the preferences.  The calling function should set OpenGL's matrix mode
+ * to GL_PROJECTION (and call glLoadIdentity) before calling this function.
+ * @param aspect_ratio The width-to-height ratio of the window.
+ */
+void MpGLCanvas::SetProjection(float aspect_ratio) {
+
+	GLdouble zNear = 0.1;
+	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV()*(kPi)/180.0);
+
+	// At the moment the prefs limit the GLFOV to > 0 so the glOrtho code will
+	// not get run. Before it can be activated need to figure out what to do
+	// with it in the hi-res image export routines.
+	GLdouble top, right;
+	if (aspect_ratio > 1.0) {
+		right = myGLperspective;
+		top = right / aspect_ratio;
+	} else {
+		top = myGLperspective;
+		right = top * aspect_ratio;
+	}
+
+	if (myGLperspective > 0.001)
+		glFrustum(-right, right, -top, top, zNear, 1000.0);
+	else {
+		if (aspect_ratio > 1.0) {
+			right = mMainData->WindowSize;
+			top = right / aspect_ratio;
+		} else {
+			top = mMainData->WindowSize;
+			right = top * aspect_ratio;
+		}
+		glOrtho(-right, right, -top, top, zNear, 1000.0);
+	}
+
+}
+
 void MpGLCanvas::UpdateGLView(void) {
-	// int width, height; 
-	if(GetContext()&&(Prefs!=NULL)&&MolWin->IsShown()) {
+
+	if (GetContext() && Prefs != NULL && MolWin->IsShown()) {
 		SetCurrent();
 		glfSetCurrentBMFFont(bitmap_fontd);
-		// GetClientSize(&width, &height); 
-		glViewport(0, 0, (GLint)width, (GLint)height);
-		GLdouble aspect = ((float)width)/height;
-		//  GLdouble ysize = 60.0;
-		//  if (aspect > 1.0) ysize /= aspect;
-		glMatrixMode (GL_PROJECTION);   //Setup the model space to screen space mapping
-		glLoadIdentity ();
-		GLdouble zNear = 0.1;
-		GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV()*(kPi)/180.0);
-		//At the moment the prefs limit the GLFOV to > 0 so the glOrtho code will not
-		//get run. Before it can be activated need to figure out what to do with it in the 
-		//hi-res image export routines.
-		//	  gluPerspective(ysize, aspect, 0.1, 100.0);
-		GLdouble top, right;
-		if (aspect > 1.0) {
-			right = myGLperspective;
-			top = right/aspect;
-		} else {
-			top = myGLperspective;
-			right = top * aspect;
-		}
-		if (myGLperspective > 0.001)
-			glFrustum(-right, right, -top, top, zNear, 1000.0);
-		else {
-			if (aspect > 1.0) {
-				right = mMainData->WindowSize;
-				top = right/aspect;
-			} else {
-				top = mMainData->WindowSize;
-				right = top * aspect;
-			}
-			glOrtho(-right, right, -top, top, zNear, 1000.0);
-		}
-		glMatrixMode (GL_MODELVIEW);	//Prepare for model space by submitting the rotation/translation
-		glLoadIdentity ();
+
+		glViewport(0, 0, (GLint) width, (GLint) height);
+
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		SetProjection(((float) width) / height);
+
+		glMatrixMode(GL_MODELVIEW);	//Prepare for model space by submitting the rotation/translation
+		glLoadIdentity();
 		
 		RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
 		float red, green, blue;
@@ -500,6 +532,23 @@ void MpGLCanvas::draw(void) {
 	}
 
 	SetCurrent();
+
+		if (MolWin->OpenGLData->sphere_list) {
+			glDeleteLists(MolWin->OpenGLData->sphere_list, 1);
+		}
+
+		GLUquadric *quad = gluNewQuadric();
+		gluQuadricOrientation(quad, GLU_OUTSIDE);
+		gluQuadricNormals(quad, GLU_SMOOTH);
+
+		MolWin->OpenGLData->sphere_list = glGenLists(1);
+		glNewList(MolWin->OpenGLData->sphere_list, GL_COMPILE);
+		gluSphere(quad, 1.0f, (long) (1.5f * Prefs->GetQD3DAtomQuality()),
+				  (long) (Prefs->GetQD3DAtomQuality()));
+		glEndList();
+
+		gluDeleteQuadric(quad);
+				
 	if (!initialized) {
 		initGL();
 		UpdateGLView();
@@ -1942,37 +1991,7 @@ void MpGLCanvas::testPicking(int x, int y) {
 	glLoadIdentity();
 
 	gluPickMatrix(x, view[3]-y, 1.0, 1.0, view);
-	//gluPerspective(60, 1.0, 0.0001, 1000.0);
-
-	GLdouble top, right;
-	// int width, height; 
-
-	// GetClientSize(&width, &height); 
-
-	GLdouble aspect = ((float)width)/height;
-
-	GLdouble zNear = 0.1;
-	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV()*(kPi)/180.0);
-	if (aspect > 1.0) {
-		right = myGLperspective;
-		top = right/aspect;
-	} else {
-		top = myGLperspective;
-		right = top * aspect;
-	}
-
-	if (myGLperspective > 0.001)
-		glFrustum(-right, right, -top, top, zNear, 1000.0);
-	else {
-		if (aspect > 1.0) {
-			right = mMainData->WindowSize;
-			top = right/aspect;
-		} else {
-			top = mMainData->WindowSize;
-			right = top * aspect;
-		}
-		glOrtho(-right, right, -top, top, zNear, 1000.0);
-	}
+	SetProjection(((float) width) / height);
 
 	glMatrixMode(GL_MODELVIEW);
 
@@ -2258,9 +2277,6 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 			item = menu.Append(GL_Popup_Add_Plane_Normal, wxT("Add plane normal"));
 		}
 
-		item = menu.Append(GL_Popup_Save_Prototype, wxT("Prototype selection"));
-		item->Enable(lFrame->GetNumAtomsSelected() > 0);
-
 		menu.AppendSeparator();
 
 	}
@@ -2511,6 +2527,10 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 				break;
 		}
 	}
+
+	item = menu.Append(GL_Popup_Save_Prototype, wxT("Prototype selection"));
+	/* item->Enable(lFrame->GetNumAtomsSelected() > 0); */
+
 }
 
 void MpGLCanvas::measurePopupMenu(int x, int y) {

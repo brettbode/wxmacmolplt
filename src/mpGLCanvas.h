@@ -156,6 +156,7 @@ class MpGLCanvas : public wxGLCanvas {
 		bool ignore_next_up;
 		bool is_lassoing;
 
+		void SetProjection(float aspect_ratio);
 		void AddPlaneNormal(wxCommandEvent& event);
 		void ConnectSelectedToSite(int src_atom, int src_site,
 								   int dst_atom, int dst_site);

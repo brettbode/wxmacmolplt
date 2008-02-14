@@ -28,7 +28,12 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
 	
     wxString filePath = wxFileSelector(wxT("Save As"), wxT(""), wxT(""), wxT(""),
                               wxT("GAMESS input files (*.inp)|*.inp"),
-                              wxSAVE | wxOVERWRITE_PROMPT, owner);
+#if wxCHECK_VERSION(2,9,0)
+                              wxFD_SAVE | wxFD_OVERWRITE_PROMPT,
+#else
+                              wxSAVE | wxOVERWRITE_PROMPT,
+#endif
+							  owner);
 	
     if(!filePath.IsEmpty()) {
         if((currFile = fopen(filePath.mb_str(wxConvUTF8), "wb")) == NULL) {

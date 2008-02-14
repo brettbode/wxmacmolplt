@@ -281,7 +281,12 @@ void BaseSurfacePane::OnExport( wxCommandEvent &event ) {
 
 	wxString filePath = wxFileSelector(wxT("Export As"), wxT(""), wxT(""),
 									   wxT(""), wxT("*.*"),
-									   wxSAVE | wxOVERWRITE_PROMPT, owner);
+#ifdef wxCHECK_VERSION(2,9,0)
+									   wxFD_SAVE | wxFD_OVERWRITE_PROMPT,
+#else
+									   wxSAVE | wxOVERWRITE_PROMPT,
+#endif
+									   owner);
 
 	if(!filePath.IsEmpty()) {
 		if((currFile = fopen(filePath.mb_str(wxConvUTF8), "wb")) == NULL) {

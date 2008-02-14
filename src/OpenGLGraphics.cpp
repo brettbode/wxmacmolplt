@@ -107,6 +107,7 @@ OpenGLRec::OpenGLRec(void) {
 	transpSortVertex = NULL;
 	transpIndex = NULL;
 	triangleCount = 0;
+	/* sphere_list = 0; */
 	
 	MainListActive = false;
 	SurfaceListActive = false;
@@ -762,18 +763,6 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball) {
 
 void MolDisplayWin::DrawGL(void) {
 
-	GLUquadric *quad = gluNewQuadric();
-	gluQuadricOrientation(quad, GLU_OUTSIDE);
-	gluQuadricNormals(quad, GLU_SMOOTH);
-
-	OpenGLData->sphere_list = glGenLists(1);
-	glNewList(OpenGLData->sphere_list, GL_COMPILE);
-	gluSphere(quad, 1.0f, (long) (1.5f * Prefs->GetQD3DAtomQuality()),
-			  (long) (Prefs->GetQD3DAtomQuality()));
-	glEndList();
-
-	gluDeleteQuadric(quad);
-
 	float anno_color[4];
 	RGBColor *BackgroundColor = Prefs->GetBackgroundColorLoc();
 	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
@@ -973,7 +962,6 @@ void MolDisplayWin::DrawGL(void) {
 	    DrawStaticLabel(modeString, -50, -20);
 	}
 
-	glDeleteLists(OpenGLData->sphere_list, 1);
 }
 
 void AnnotationLength::draw(const MolDisplayWin * win) const {
