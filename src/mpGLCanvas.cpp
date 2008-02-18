@@ -164,12 +164,44 @@ void MpGLCanvas::initGL(void) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 16, 8, 0, GL_ALPHA,
 					 GL_UNSIGNED_BYTE, texture);
 
+		DoPrefDependent();
+
 		initialized = true;
 	}
 }
 
 void MpGLCanvas::setPrefs(WinPrefs *newPrefs) {
 	Prefs = newPrefs;
+}
+
+/**
+ * This function (re)generates any structures that are dependent on certain
+ * preference settings. It should be called when preferences change. It 
+ * assumes that a valid OpenGL context exists, so it should not be called
+ * by a parent's constructor.
+ */
+void MpGLCanvas::DoPrefDependent() {
+
+	SetCurrent();
+
+	// All atoms are drawn using one display list that draws a sphere. 
+	// We delete any current list and create it anew.
+	if (MolWin->OpenGLData->sphere_list) {
+		glDeleteLists(MolWin->OpenGLData->sphere_list, 1);
+	}
+
+	GLUquadric *quad = gluNewQuadric();
+	gluQuadricOrientation(quad, GLU_OUTSIDE);
+	gluQuadricNormals(quad, GLU_SMOOTH);
+
+	MolWin->OpenGLData->sphere_list = glGenLists(1);
+	glNewList(MolWin->OpenGLData->sphere_list, GL_COMPILE);
+	gluSphere(quad, 1.0f, (long) (1.5f * Prefs->GetQD3DAtomQuality()),
+			  (long) (Prefs->GetQD3DAtomQuality()));
+	glEndList();
+
+	gluDeleteQuadric(quad);
+				
 }
 
 wxImage MpGLCanvas::getImage(const int width, const int height) {
@@ -533,22 +565,6 @@ void MpGLCanvas::draw(void) {
 
 	SetCurrent();
 
-		if (MolWin->OpenGLData->sphere_list) {
-			glDeleteLists(MolWin->OpenGLData->sphere_list, 1);
-		}
-
-		GLUquadric *quad = gluNewQuadric();
-		gluQuadricOrientation(quad, GLU_OUTSIDE);
-		gluQuadricNormals(quad, GLU_SMOOTH);
-
-		MolWin->OpenGLData->sphere_list = glGenLists(1);
-		glNewList(MolWin->OpenGLData->sphere_list, GL_COMPILE);
-		gluSphere(quad, 1.0f, (long) (1.5f * Prefs->GetQD3DAtomQuality()),
-				  (long) (Prefs->GetQD3DAtomQuality()));
-		glEndList();
-
-		gluDeleteQuadric(quad);
-				
 	if (!initialized) {
 		initGL();
 		UpdateGLView();

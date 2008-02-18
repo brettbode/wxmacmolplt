@@ -3923,10 +3923,15 @@ bool MolDisplayWin::IsRotating(void) {
 	return rotate_timer.IsRunning();
 }
 
-void MolDisplayWin::ChangePrefs(WinPrefs * newPrefs) {
-	SetWindowPreferences(newPrefs);
+void MolDisplayWin::SetWindowPreferences(WinPrefs *NewPrefs) {
+
+	if (Prefs) {
+		*Prefs = *NewPrefs;
+		glCanvas->DoPrefDependent();
+	}
+
 	ResetAllWindows();
-	//if (PrefsDlog) PrefsDlog->PrefsChanged();
+
 }
 
 void MolDisplayWin::SelectionChanged(bool mode) {

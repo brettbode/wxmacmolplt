@@ -286,7 +286,8 @@ void MpApp::createMainFrame(const wxString &filename) {
 void MpApp::ApplyPrefsToAll(WinPrefs * prefs) {
 	std::list<MolDisplayWin *>::iterator win = MolWinList.begin();
 	while (win != MolWinList.end()) {
-		(*win)->ChangePrefs(prefs);
+		MolDisplayWin * temp = (*win);
+		(*win)->SetWindowPreferences(prefs);
 		win++;
 	}
 }

@@ -576,8 +576,8 @@ class MolDisplayWin : public wxFrame {
 		void UpdateModelDisplay(void);
 		MoleculeData * GetData(void) const {return MainData;};
 		WinPrefs * GetPrefs(void) const {return Prefs;};
-		void SetWindowPreferences(WinPrefs * NewPrefs) {if (Prefs) *Prefs=*NewPrefs; }
-		void ChangePrefs(WinPrefs * newPrefs);
+		void SetWindowPreferences(WinPrefs * NewPrefs);
+		/* void ChangePrefs(WinPrefs * newPrefs); */
 		void ResetView(void);
 		void ResetModel(bool Center);
 		void ResetAllWindows(void);

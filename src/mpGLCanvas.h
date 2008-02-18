@@ -195,7 +195,7 @@ class MpGLCanvas : public wxGLCanvas {
 		~MpGLCanvas();
 
 		void setPrefs(WinPrefs *newPrefs);
-
+		void DoPrefDependent();
 		void FitToPlane(wxCommandEvent& event);
 
 		/**
