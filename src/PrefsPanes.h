@@ -29,16 +29,15 @@ class colorPatternArea;
 
 #define NUM_ATOM_LABELS 6
 
-class PrefsPane
-{
+class PrefsPane : public wxPanel {
 	public:
-			//Constructor should add the needed pane items and do one time inits
-  PrefsPane(MolDisplayWin* targetWindow, WinPrefs* targetPrefs, short PaneID, Boolean GlobalPrefs);
+		//Constructor should add the needed pane items and do one time inits
+		PrefsPane(MolDisplayWin* targetWindow, WinPrefs* targetPrefs, short PaneID, Boolean GlobalPrefs, wxBookCtrlBase *parent);
 
-  ~PrefsPane(); 
+		~PrefsPane(); 
 
-			//setupitems should do all inits that might/can be done more than once
-			//like setting control values
+		//setupitems should do all inits that might/can be done more than once
+		//like setting control values
 		virtual void SetupPaneItems(MolDisplayWin* targetWindow)=0;
 
 		virtual void saveToTempPrefs()=0;
@@ -48,12 +47,11 @@ class PrefsPane
 	private:
 		Boolean isGlobalPrefs;
 
-        protected:
+	protected:
 		WinPrefs* mTargetPrefs;
 };
 
-class AtomPrefsPane : public wxScrolledWindow, public PrefsPane
-{
+class AtomPrefsPane : public PrefsPane {
 	public:
 		AtomPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		~AtomPrefsPane();
@@ -61,6 +59,7 @@ class AtomPrefsPane : public wxScrolledWindow, public PrefsPane
 		virtual void saveToTempPrefs();
 
 	private:
+		wxScrolledWindow *scroll_win;
 		short	ActiveEdit;
 		wxString mLabels[NUM_ATOM_LABELS];
 		
@@ -74,9 +73,8 @@ class AtomPrefsPane : public wxScrolledWindow, public PrefsPane
 };
 
 
-class BondPrefsPane : public wxPanel, public PrefsPane {
+class BondPrefsPane : public PrefsPane {
 	public:
-
 		BondPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		~BondPrefsPane();
 		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
@@ -106,9 +104,7 @@ class BondPrefsPane : public wxPanel, public PrefsPane {
 		DECLARE_EVENT_TABLE()
 };
 
-
-class DisplayPrefsPane : public wxPanel, public PrefsPane
-{
+class DisplayPrefsPane : public PrefsPane {
 	public:
 		DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
@@ -133,8 +129,7 @@ class DisplayPrefsPane : public wxPanel, public PrefsPane
 };
 
 
-class EnergyPrefsPane : public wxPanel, public PrefsPane
-{
+class EnergyPrefsPane : public PrefsPane {
 	public:
 		EnergyPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		~EnergyPrefsPane();
@@ -179,8 +174,7 @@ class EnergyPrefsPane : public wxPanel, public PrefsPane
 };
 
 
-class FilePrefsPane : public wxPanel, public PrefsPane
-{
+class FilePrefsPane : public PrefsPane {
 	public:
 		FilePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
@@ -206,8 +200,7 @@ class FilePrefsPane : public wxPanel, public PrefsPane
 };
 
 
-class ScalingPrefsPane : public wxPanel, public PrefsPane
-{
+class ScalingPrefsPane : public PrefsPane {
 	public:
 		ScalingPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
@@ -224,8 +217,7 @@ class ScalingPrefsPane : public wxPanel, public PrefsPane
 };
 
 
-class StereoPrefsPane : public wxPanel, public PrefsPane
-{
+class StereoPrefsPane : public PrefsPane {
 	public:
 		StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
@@ -246,8 +238,7 @@ class StereoPrefsPane : public wxPanel, public PrefsPane
 };
 
 
-class SurfacePrefsPane : public wxPanel, public PrefsPane
-{
+class SurfacePrefsPane : public PrefsPane {
 	public:
 		SurfacePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		~SurfacePrefsPane();
@@ -279,8 +270,7 @@ class SurfacePrefsPane : public wxPanel, public PrefsPane
 };
 
 
-class QD3DPrefsPane : public wxPanel, public PrefsPane
-{
+class QD3DPrefsPane : public PrefsPane {
 	public:
 		QD3DPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs);
 		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
@@ -290,9 +280,9 @@ class QD3DPrefsPane : public wxPanel, public PrefsPane
 		void OnSliderUpdate( wxCommandEvent &event );
 
 	private:
-		wxBoxSizer* mMainSizer;
-		wxGridSizer* mUpperSizer;
-		wxBoxSizer* mLowerSizer;
+		wxFlexGridSizer *mMainSizer;
+		/* wxGridSizer* mUpperSizer; */
+		/* wxBoxSizer* mLowerSizer; */
 
 		wxCheckBox* mChk3D;
 		colorArea* mBackgrdColor;

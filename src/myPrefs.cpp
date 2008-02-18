@@ -151,8 +151,13 @@ BEGIN_EVENT_TABLE(QD3DPrefsPane, wxPanel)
   EVT_CHECKBOX (ID_ACTIVATE_3D_MODE, QD3DPrefsPane::OnCheckBox)
 END_EVENT_TABLE()
 
-PrefsPane::PrefsPane(MolDisplayWin* targetWindow, WinPrefs* targetPrefs, short PaneID, Boolean GlobalPrefs) 
-{ 
+PrefsPane::PrefsPane(MolDisplayWin* targetWindow, WinPrefs* targetPrefs,
+					 short PaneID, Boolean GlobalPrefs, wxBookCtrlBase *parent)
+	: wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize 
+#if !wxCHECK_VERSION(2,9,0)
+			  , wxSUNKEN_BORDER
+#endif
+			  ) { 
   isGlobalPrefs = GlobalPrefs;
 
   //mTargetPrefs = new WinPrefs;
@@ -164,29 +169,41 @@ PrefsPane::~PrefsPane()
   //delete mTargetPrefs; 
 }
 
-AtomPrefsPane::AtomPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean Global) 
-  : PrefsPane(targetWindow, targetPrefs, kAtomPrefsPane, Global) 
-{
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER|wxScrolledWindowStyle );
+AtomPrefsPane::AtomPrefsPane(MolDisplayWin* targetWindow,
+							 wxBookCtrlBase *parent, WinPrefs* targetPrefs,
+							 Boolean Global) 
+	: PrefsPane(targetWindow, targetPrefs, kAtomPrefsPane, Global, parent) {
 
-  mLabels[0] = wxString(wxT("Atom"));
-  mLabels[1] = wxString(wxT("#"));
-  mLabels[2] = wxString(wxT("size(pm)"));
-  mLabels[3] = wxString(wxT("mass"));
-  mLabels[4] = wxString(wxT("Color"));
-  mLabels[5] = wxString(wxT("Pattern"));
+	scroll_win = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition,
+									  wxDefaultSize, wxVSCROLL);
 
-  mMainSizer = new wxFlexGridSizer(kMaxAtomTypes, NUM_ATOM_LABELS, 3, 10);
+	mLabels[0] = wxString(wxT("Atom"));
+	mLabels[1] = wxString(wxT("#"));
+	mLabels[2] = wxString(wxT("size(pm)"));
+	mLabels[3] = wxString(wxT("mass"));
+	mLabels[4] = wxString(wxT("Color"));
+	mLabels[5] = wxString(wxT("Pattern"));
 
-  SetSizer(mMainSizer);
+	mMainSizer = new wxFlexGridSizer(kMaxAtomTypes, NUM_ATOM_LABELS, 3, 10);
 
-  SetScrollRate( 10, 10 );
-  SetVirtualSize( 500, 1000 );
-  FitInside();
+	wxFlexGridSizer *sizer = new wxFlexGridSizer(1, 1, 0, 0);
+	sizer->AddGrowableCol(0);
+	sizer->AddGrowableRow(0);
+	sizer->Add(scroll_win, wxSizerFlags().Expand());
+	SetSizerAndFit(sizer);
+
+ 	scroll_win->SetSizer(mMainSizer);
+	scroll_win->SetScrollRate(10, 10);
+	scroll_win->SetVirtualSize(500, 1000);
+	mMainSizer->Layout();
+	scroll_win->FitInside();
+
 }
 
-AtomPrefsPane::~AtomPrefsPane()
-{
+AtomPrefsPane::~AtomPrefsPane() {
+
+	// These should be deleted by wx.
+#if 0
   for ( int i = 0; i < kMaxAtomTypes; i++)
     {
       delete mEleNames[i];
@@ -195,60 +212,48 @@ AtomPrefsPane::~AtomPrefsPane()
       delete mColorArea[i];
       delete mPatternArea[i];
     }
+#endif
+
 }
 
-void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) 
-{
-  for ( int i = 0; i < NUM_ATOM_LABELS; i++)
-    mMainSizer->Add(new wxStaticText(
-                            this,
-                            wxID_ANY,
-                            mLabels[i],
-                            wxDefaultPosition,
-                            wxDefaultSize,
-                            wxALIGN_CENTER
-                           ),
-                       0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-  //first row
+void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 
-  for ( int i = 0; i < kMaxAtomTypes; i++)
-    {
-      wxString tmp;
+	for (int i = 0; i < NUM_ATOM_LABELS; i++) {
+		mMainSizer->Add(new wxStaticText(scroll_win, wxID_ANY, mLabels[i],
+										 wxDefaultPosition, wxDefaultSize,
+										 wxALIGN_CENTER),
+						0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	}
 
-      mTargetPrefs->GetAtomLabel(i, tmp);
-      mEleNames[i] = new wxTextCtrl( this, wxID_ANY, tmp, wxDefaultPosition, wxSize(30, 20));
-      mMainSizer->Add(mEleNames[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	for (int i = 0; i < kMaxAtomTypes; i++) {
+		wxString tmp;
+		mTargetPrefs->GetAtomLabel(i, tmp);
+		mEleNames[i] = new wxTextCtrl(scroll_win, wxID_ANY, tmp, wxDefaultPosition, wxSize(30, 20));
+		mMainSizer->Add(mEleNames[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+		tmp.Printf(wxT("%d"), i+1);
+		mMainSizer->Add(new wxStaticText(scroll_win, wxID_ANY, tmp,
+										 wxDefaultPosition, wxDefaultSize,
+										 wxALIGN_CENTER),
+						0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-      tmp.Printf(wxT("%d"), i+1);
-      mMainSizer->Add(new wxStaticText(
-                            this,
-                            wxID_ANY,
-                            tmp,
-                            wxDefaultPosition,
-                            wxDefaultSize,
-                            wxALIGN_CENTER
-                           ),
-                       0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+		tmp.Printf(wxT("%d"),mTargetPrefs->GetAtomSize(i));
+		mEleSizes[i] = new wxTextCtrl( scroll_win, wxID_ANY, tmp, wxDefaultPosition, wxSize(40, 20));
+		mMainSizer->Add(mEleSizes[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+		
+		tmp.Printf(wxT("%.2f"),mTargetPrefs->GetAtomMass(i));
+		mEleMasses[i] = new wxTextCtrl( scroll_win, wxID_ANY, tmp, wxDefaultPosition, wxSize(50, 20));
+		mMainSizer->Add(mEleMasses[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+		
+		mColorArea[i] = new colorArea(scroll_win, i, mTargetPrefs->GetAtomColorLoc(i));
+		mMainSizer->Add(mColorArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+		
+		mPatternArea[i] = new colorPatternArea(scroll_win, i, mTargetPrefs->GetAtomColorLoc(i), mTargetPrefs->GetAtomPattern(i));
+		
+		mMainSizer->Add(mPatternArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+		mColorArea[i]->setPeer(mPatternArea[i]);
+		mPatternArea[i]->setPeer(mColorArea[i]); //need to synchronize color if needed
+	}
 
-      tmp.Printf(wxT("%d"),mTargetPrefs->GetAtomSize(i));
-      mEleSizes[i] = new wxTextCtrl( this, wxID_ANY, tmp, wxDefaultPosition, wxSize(40, 20));
-      mMainSizer->Add(mEleSizes[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-
-      tmp.Printf(wxT("%.2f"),mTargetPrefs->GetAtomMass(i));
-      mEleMasses[i] = new wxTextCtrl( this, wxID_ANY, tmp, wxDefaultPosition, wxSize(50, 20));
-      mMainSizer->Add(mEleMasses[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-
-      mColorArea[i] = new colorArea(this, i, mTargetPrefs->GetAtomColorLoc(i));
-      mMainSizer->Add(mColorArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-
-      mPatternArea[i] = new colorPatternArea(this, i, mTargetPrefs->GetAtomColorLoc(i), mTargetPrefs->GetAtomPattern(i));
-
-      mMainSizer->Add(mPatternArea[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-      mColorArea[i]->setPeer(mPatternArea[i]);
-      mPatternArea[i]->setPeer(mColorArea[i]); //need to synchronize color if needed
-    }
-
-  mMainSizer->Layout();
 }
 
 void AtomPrefsPane::saveToTempPrefs()
@@ -271,9 +276,9 @@ void AtomPrefsPane::saveToTempPrefs()
 }
 
 BondPrefsPane::BondPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean Global)
-	: PrefsPane(targetWindow, targetPrefs, kBondPrefsPane, Global) {
+	: PrefsPane(targetWindow, targetPrefs, kBondPrefsPane, Global, parent) {
 
-	Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
+	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
 
 	mMainSizer = new wxBoxSizer(wxVERTICAL);
 	mUpperSizer = new wxBoxSizer(wxVERTICAL);
@@ -378,9 +383,9 @@ void BondPrefsPane::OnChoice( wxCommandEvent &event )
 
 
 DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean Global)
-	: PrefsPane(targetWindow, targetPrefs, kDisplayPrefsPane, Global) 
+	: PrefsPane(targetWindow, targetPrefs, kDisplayPrefsPane, Global, parent) 
 {
-	Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER);
+	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER); */
 
 	mMainSizer = new wxBoxSizer(wxVERTICAL);
 
@@ -498,9 +503,9 @@ void DisplayPrefsPane::OnAnnotationLabelSlider( wxCommandEvent &event)
 }
 
 EnergyPrefsPane::EnergyPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
-	: PrefsPane(targetWindow, targetPrefs, kEPrefsPane, GlobalPrefs) 
+	: PrefsPane(targetWindow, targetPrefs, kEPrefsPane, GlobalPrefs, parent) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
+  /* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
 
   mMainSizer = new wxBoxSizer(wxVERTICAL);
   mUpperSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -828,9 +833,9 @@ void EnergyPrefsPane::OnRadio( wxCommandEvent& event )
 }
 
 FilePrefsPane::FilePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
-	: PrefsPane(targetWindow, targetPrefs, kFilePrefsPane, GlobalPrefs) 
+	: PrefsPane(targetWindow, targetPrefs, kFilePrefsPane, GlobalPrefs, parent) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
+  /* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
 
   mMainSizer = new wxBoxSizer(wxVERTICAL);
   mUpperSizer = new wxBoxSizer(wxVERTICAL);
@@ -985,9 +990,9 @@ void FilePrefsPane::OnSliderUpdate( wxCommandEvent &WXUNUSED(event) )
 
 
 ScalingPrefsPane::ScalingPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
-	: PrefsPane(targetWindow, targetPrefs, kScalingPrefsPane, GlobalPrefs) 
+	: PrefsPane(targetWindow, targetPrefs, kScalingPrefsPane, GlobalPrefs, parent) 
 {
-	Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
+	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
 
 	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
 	mMainSizer = new wxFlexGridSizer(2,3);
@@ -1039,9 +1044,9 @@ void ScalingPrefsPane::OnSliderUpdate( wxCommandEvent &event )
 }
 
 StereoPrefsPane::StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
-	: PrefsPane(targetWindow, targetPrefs, kStereoPrefsPane, GlobalPrefs) 
+	: PrefsPane(targetWindow, targetPrefs, kStereoPrefsPane, GlobalPrefs, parent) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
+  /* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
 
   mMainSizer = new wxBoxSizer(wxVERTICAL);
   mMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -1083,9 +1088,9 @@ void StereoPrefsPane::OnCheckBox( wxCommandEvent& WXUNUSED(event))
 
 
 SurfacePrefsPane::SurfacePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
-	: PrefsPane(targetWindow, targetPrefs, kSurfacePrefsPane, GlobalPrefs) 
+	: PrefsPane(targetWindow, targetPrefs, kSurfacePrefsPane, GlobalPrefs, parent) 
 {
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
+  /* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
 
   mMainSizer = new wxBoxSizer(wxHORIZONTAL);
   mLeftSizer = new wxBoxSizer(wxVERTICAL);
@@ -1218,60 +1223,70 @@ void SurfacePrefsPane::OnCheckBox( wxCommandEvent& event)
 
 
 QD3DPrefsPane::QD3DPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
-	: PrefsPane(targetWindow, targetPrefs, kQD3DPrefsPane, GlobalPrefs) 
-{
-  Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER );
+	: PrefsPane(targetWindow, targetPrefs, kQD3DPrefsPane, GlobalPrefs, parent) {
 
-  mMainSizer = new wxBoxSizer(wxVERTICAL);
-  mUpperSizer = new wxGridSizer(2,6);
-  mLowerSizer = new wxBoxSizer(wxHORIZONTAL);
+  mMainSizer = new wxFlexGridSizer(7, 2, 6, 0);
+  mMainSizer->AddGrowableCol(0);
+  mMainSizer->AddGrowableCol(1);
 
   SetSizer(mMainSizer);
+
 }
 
-void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) 
-{
-  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Bond Size:")), 0, wxALIGN_CENTER | wxALL, 3);
-  mSld[0] = new wxSlider( this, ID_BOND_SIZE_SLIDER, 
-			    (int)(mTargetPrefs->GetQD3DBondWidth()*500+0.5), 1, 100,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
-  mUpperSizer->Add(mSld[0], 0, wxALIGN_CENTER | wxALL, 3);
+void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 
-  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Display Quality:")), 0, wxALIGN_CENTER | wxALL, 3);
-  mSld[1] = new wxSlider( this, ID_DISPLAY_QUALITY_SLIDER, 
-			    (int)(mTargetPrefs->GetQD3DAtomQuality()+0.5), 2, 40,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
-  mUpperSizer->Add(mSld[1], 0, wxALIGN_CENTER | wxALL, 3);
+	int rflags = wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL;
+	int lflags = wxALIGN_CENTER_VERTICAL | wxALIGN_LEFT | wxALL;
 
-  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Fill Light Brightness:")), 0, wxALIGN_CENTER | wxALL, 3);
-  mSld[2] = new wxSlider( this, ID_FILL_LIGHT_BRIGHTNESS_SLIDER, 
-		       (int)(mTargetPrefs->GetQD3DFillBrightness()*100+0.5), 0, 100,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
-  mUpperSizer->Add(mSld[2], 0, wxALIGN_CENTER | wxALL, 3);
+  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Bond Size:")), 0,
+		  		  rflags, 3);
+  mSld[0] = new wxSlider(this, ID_BOND_SIZE_SLIDER, 
+						 (int) (mTargetPrefs->GetQD3DBondWidth() * 500 + 0.5),
+						 1, 100, wxDefaultPosition,
+						 wxSize(155, wxDefaultCoord));
+  mMainSizer->Add(mSld[0], 0, lflags, 3);
 
-  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Point Light Brightness:")), 0, wxALIGN_CENTER | wxALL, 3);
-  mSld[3] = new wxSlider( this, ID_POINT_LIGHT_BRIGHTNESS_SLIDER, 
-		      (int)(mTargetPrefs->GetQD3DPointBrightness()*100+0.5), 0, 100,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
-  mUpperSizer->Add(mSld[3], 0, wxALIGN_CENTER | wxALL, 3);
+  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Display Quality:")),
+		  		  0, rflags, 3);
+  mSld[1] = new wxSlider(this, ID_DISPLAY_QUALITY_SLIDER, 
+						 (int) (mTargetPrefs->GetQD3DAtomQuality() + 0.5),
+						 2, 40, wxDefaultPosition,
+						 wxSize(155, wxDefaultCoord));
+  mMainSizer->Add(mSld[1], 0, lflags, 3);
 
-  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("High-Resolution Line Width:")), 0, wxALIGN_CENTER | wxALL, 3);
+  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Fill Light Brightness:")),
+		  		  0, rflags, 3);
+  mSld[2] = new wxSlider(this, ID_FILL_LIGHT_BRIGHTNESS_SLIDER, 
+						 (int) (mTargetPrefs->GetQD3DFillBrightness() * 100 + 0.5),
+						 0, 100, wxDefaultPosition,
+						 wxSize(155, wxDefaultCoord));
+  mMainSizer->Add(mSld[2], 0, lflags, 3);
+
+  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Point Light Brightness:")),
+		  		  0, rflags, 3);
+  mSld[3] = new wxSlider(this, ID_POINT_LIGHT_BRIGHTNESS_SLIDER, 
+						 (int) (mTargetPrefs->GetQD3DPointBrightness()*100+0.5),
+						 0, 100, wxDefaultPosition, wxSize(155, wxDefaultCoord));
+  mMainSizer->Add(mSld[3], 0, lflags, 3);
+
+  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("High-Resolution Line Width:")),
+		  		  0, rflags, 3);
   mTargetPrefs->CylindersForLines(true);
-  mSld[4] = new wxSlider( this, ID_LINE_WIDTH_SLIDER, 
-		      (int)(mTargetPrefs->GetQD3DLineWidth()*10000+0.5), 0, 200,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord));
+  mSld[4] = new wxSlider(this, ID_LINE_WIDTH_SLIDER, 
+						 (int) (mTargetPrefs->GetQD3DLineWidth()*10000+0.5),
+						 0, 200, wxDefaultPosition, wxSize(155, wxDefaultCoord));
   mTargetPrefs->CylindersForLines(false);
-  mUpperSizer->Add(mSld[4], 0, wxALIGN_CENTER | wxALL, 3);
+  mMainSizer->Add(mSld[4], 0, lflags, 3);
 
-  mSld[5] = new wxSlider( this, ID_DEPTH_CUEING_SLIDER, 
-						  (int)(mTargetPrefs->GetGLFOV()), 
-						  0, 45, wxDefaultPosition, 
-						  wxSize(155,wxDefaultCoord));
+  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("3D Perspective:")),
+		  		  0, rflags, 3);
+  mSld[5] = new wxSlider(this, ID_DEPTH_CUEING_SLIDER, 
+						 (int)(mTargetPrefs->GetGLFOV()), 
+						 0, 45, wxDefaultPosition, 
+						 wxSize(155, wxDefaultCoord));
+  mMainSizer->Add(mSld[5], 0, lflags, 3);
   
-  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("3D Perspective:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-  mUpperSizer->Add(mSld[5], 0, wxALIGN_CENTER | wxALL, 3);
-  
-  mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER | wxALL, 3 );
+  /* mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER | wxALL, 3 ); */
 
   /*
   if (PrefsAreGlobal())
@@ -1282,11 +1297,10 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow)
     }
   */ //There is no 2-D mode for now
 	
-  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, _T("Background color:")), 0, wxALIGN_CENTER | wxALL, 3);
+  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Background color:")),
+		  		  0, rflags, 3);
   mBackgrdColor = new colorArea(this, 0, mTargetPrefs->GetBackgroundColorLoc());
-  mLowerSizer->Add(mBackgrdColor, 0, wxALIGN_CENTER | wxALL, 3);
-
-  mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER | wxALL, 3);
+  mMainSizer->Add(mBackgrdColor, 0, lflags, 3);
 
 }
 

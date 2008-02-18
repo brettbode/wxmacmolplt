@@ -43,7 +43,7 @@ BEGIN_EVENT_TABLE( setPreference, wxDialog )
 	EVT_CLOSE( setPreference::OnCloseWindow )
 
   EVT_CHOICEBOOK_PAGE_CHANGED(ID_NOTEBOOK, setPreference::OnChoicebook)
-  EVT_CHOICEBOOK_PAGE_CHANGING(ID_NOTEBOOK, setPreference::OnChoicebook)
+  /* EVT_CHOICEBOOK_PAGE_CHANGING(ID_NOTEBOOK, setPreference::OnChoicebook) */
   //related to wxNoteBook
 
   EVT_BUTTON( myID_SETFONT, setPreference::OnSetFont )
@@ -416,7 +416,7 @@ void setPreference::RecreateBooks()
       CreateInitialPages(m_choiceBook);
     }
 
-  m_sizer->Insert(0, m_choiceBook, 5, wxALL, MARGIN);                    
+  m_sizer->Insert(0, m_choiceBook, 5, wxALL | wxEXPAND, MARGIN);                    
   m_sizer->Show(m_choiceBook);
   m_sizer->Layout();
 }
@@ -484,9 +484,8 @@ void setPreference::OnSetFont(wxCommandEvent& WXUNUSED(event))
 
 void setPreference::OnChoicebook(wxChoicebookEvent& event)
 {
-  int idx = event.GetOldSelection();
+	int idx = event.GetOldSelection();
   
-  saveCurrPrefs(idx);
-
-  currPanel = event.GetSelection();
+	saveCurrPrefs(idx);
+	currPanel = event.GetSelection();
 }
