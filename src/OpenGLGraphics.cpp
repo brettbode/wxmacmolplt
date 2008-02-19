@@ -8,58 +8,28 @@
 	Corrected Create3DGLPICT for resolutions other than 72 dpi - BMB Feb 2002
 */
 
+#include <new>
+#include <string.h>
+#include <iostream>
+#include <algorithm>
+
 #include "Globals.h"
-
-#ifndef __wxBuild__
-#include "MyWindowClasses.h"
-#endif
-
 #include "MoleculeData.h"
 #include "Frame.h"
 #include "SurfaceTypes.h"
 #include "Math3D.h"
 #include "InputData.h"
-
-#ifndef __wxBuild__
-#include "MolDisplay.h"
-#include "Offscreen.h"
-#else
 #include "MolDisplayWin.h"
 #include "mpGLCanvas.h"
 #include "mmp_gl.h"
 #include "glf.h"
-#endif
-
 #include "Prefs.h"
 #include "Progress.h"
-
-#ifndef __wxBuild__
-#if __GNUC__
-#include <AGL/agl.h>
-#include <AGL/glu.h>
-#else
-#include <agl.h>
-#include <glu.h>
-#endif
-#include "aglString.h"
-#endif
-
 #include "patterns.h"
 
-#include <new>
-#include <string.h>
-
-#include <iostream>
-#include <algorithm>
-
-#ifndef __wxBuild__
-extern Boolean	gOpenGLAvailable;
-#endif
-	//0.0577 corresponds to fov=60 with zNear=0.1
-//#define myGLperspective	0.050	//0.050 seems to match my 2D mode
-//#define myGLperspective	0.10	//0.050 seems to match my 2D mode
-
-//#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
+// ----------------------------------------------------------------------------
+// FUNCTION PROTOTYPES
+// ----------------------------------------------------------------------------
 
 void DrawPipeCylinder(float length, GLUquadric *quadric, unsigned int ncaps,
 					  GLuint sphere_list, float radius, long quality);
@@ -80,6 +50,10 @@ void DrawSceneString(const float scale_factor, const float shift_x,
 		             const float shift_y, const float shift_z,
 					 const wxString& label);
 void DrawString(const char *str);
+
+// ----------------------------------------------------------------------------
+// GLOBALS
+// ----------------------------------------------------------------------------
 
 const GLubyte stippleMask[128] =
 
@@ -102,6 +76,10 @@ GLfloat l_shininess[] = {80.0};
 GLfloat l_diffuse[] = {0.2,0.2,0.2,0.8};
 GLfloat l_ambient[] = {0.1,0.1,0.1,0.8};
 
+// ----------------------------------------------------------------------------
+// FUNCTION DEFINITIONS
+// ----------------------------------------------------------------------------
+
 OpenGLRec::OpenGLRec(void) {
 	transpTriList = NULL;
 	transpSortVertex = NULL;
@@ -113,6 +91,7 @@ OpenGLRec::OpenGLRec(void) {
 	SurfaceListActive = false;
 	haveTransparentSurfaces = false;
 }
+
 OpenGLRec::~OpenGLRec(void) {
 	if (transpTriList) {
 		delete [] transpTriList;
@@ -127,211 +106,16 @@ OpenGLRec::~OpenGLRec(void) {
 		transpIndex = NULL;
 	}
 }
-#ifdef __wxBuild__
+
 void MolDisplayWin::InitGLData(void) {
 	OpenGLData = new OpenGLRec;
 }
+
 void MolDisplayWin::DeleteGLData(void) {
     if (OpenGLData)
 		delete OpenGLData;
 	OpenGLData = NULL;
 }
-#endif
-
-#ifndef __wxBuild__
-void MolDisplayWin::SetOpenGLState(bool NewState)
-{
-	if (gOpenGLAvailable) {	//Make sure OpenGL is really available before activating
-		if (winData.is3DModeActive() != NewState) {
-			if (winData.is3DModeActive() && !NewState) {
-				OpenGLExitWindow();
-				ResetModel(false);
-			} else if (!winData.is3DModeActive() && NewState) {
-				OpenGLInitWindow();
-				myInValidWindowRect(thisWindow, &DisplayRect);
-			}
-		}
-	}
-}
-
-void MolDisplayWin::OpenGLInitWindow(void)
-{
-	if (gOpenGLAvailable) {
-		SetPortWindowPort(thisWindow);
-		EraseRect(&DisplayRect);
-		OpenGLData = new OpenGLRec;
-		OpenGLData->fontList = 0;
-		GLint aglAttributes[] = {AGL_RGBA, AGL_DOUBLEBUFFER, AGL_DEPTH_SIZE, 16, AGL_NONE};
-		
-		OpenGLData->fmt = aglChoosePixelFormat(NULL, 0, aglAttributes); // get an appropriate pixel format
-		GLenum err = aglGetError();
-
-		OpenGLData->aglContext = aglCreateContext(OpenGLData->fmt, NULL);			// Create an AGL context
-		err = aglGetError();
-
-		if (!OpenGLData->aglContext || !aglSetDrawable(OpenGLData->aglContext, GetWindowPort(thisWindow)) ||
-			(err != noErr))
-		{
-			OpenGLExitWindow();
-			return;			
-		}
-		else
-		{
-			aglSetCurrentContext(OpenGLData->aglContext);
-			//setup viewport to the appropriate area of the screen
-			//bufferRect seems to be x,y of lower left corner, then width and height
-			GLint bufferRect[4];
-			bufferRect [0] = 0; 
-			bufferRect [1] = InfoRect.bottom - InfoRect.top;
-			bufferRect [2] = DisplayRect.right - DisplayRect.left;
-			bufferRect [3] = DisplayRect.bottom - DisplayRect.top;
-			aglSetInteger(OpenGLData->aglContext, AGL_BUFFER_RECT, bufferRect);
-			aglEnable(OpenGLData->aglContext, AGL_BUFFER_RECT);
-			aglUpdateContext(OpenGLData->aglContext);
-			glViewport(0, 0, bufferRect [2], bufferRect [3]);
-
-			glEnable(GL_DEPTH_TEST);
-
-			//	glShadeModel(GL_FLAT);
-			glShadeModel(GL_SMOOTH);
-			glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-			glPolygonOffset(1.0, 1.0);
-
-			GLfloat mat_specular[] = {0.8, 0.8, 0.8, 1.0};
-			GLfloat mat_shininess[] = {80.0};
-			GLfloat mat_diffuse[] = {0.2,0.2,0.2,0.8};
-			GLfloat mat_ambient[] = {0.1,0.1,0.1,0.8};
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
-			//setup the static lighting properties
-			GLfloat ambient[4]  = {0.2,0.2,0.2,1.0};
-			GLfloat model_ambient[4]  = {0.1,0.1,0.1,0.1};
-			glEnable(GL_COLOR_MATERIAL);
-			glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
-			glLightfv(GL_LIGHT0,GL_AMBIENT,ambient);
-			glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_TRUE);
-			glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,GL_TRUE);
-			glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
-			glEnable(GL_LIGHT0);
-	
-			UpdateGLView();
-	
-			glClear(GL_COLOR_BUFFER_BIT);
-			aglSwapBuffers(OpenGLData->aglContext);
-
-			//Setup a agl font so we can use it later
-			short fNum;
-			GetFNum("\pMonaco", &fNum);									// build font
-			OpenGLData->fontList = BuildFontGL(OpenGLData->aglContext, fNum, normal, 9);
-
-		}		
-		
-		winData.is3DModeActive(true);
-	}
-}
-
-void MolDisplayWin::OpenGLExitWindow(void)
-{
-	if (OpenGLData) {
-		if (OpenGLData->fontList) {
-			DeleteFontGL(OpenGLData->fontList);
-			OpenGLData->fontList = 0;
-		}
-		if (OpenGLData->aglContext) {
-			glFinish();
-			if (OpenGLData->MainListActive) {
-				glDeleteLists(OpenGLData->MainDisplayList, 1);
-				OpenGLData->MainListActive = false;
-			}
-			if (OpenGLData->SurfaceListActive) {
-				glDeleteLists(OpenGLData->SurfaceDisplayList, 1);
-				OpenGLData->SurfaceListActive = false;
-			}
-			aglSetCurrentContext(NULL);
-			GLenum err = aglGetError();
-			aglSetDrawable(OpenGLData->aglContext, NULL);
-			err = aglGetError();
-			aglDestroyContext(OpenGLData->aglContext);
-			err = aglGetError();
-			
-			OpenGLData->aglContext = NULL;
-			
-			if (OpenGLData->fmt)
-			{
-				aglDestroyPixelFormat(OpenGLData->fmt); // pixel format is no longer valid
-				err = aglGetError();
-			}
-			OpenGLData->fmt = 0;
-		}
-		delete OpenGLData;
-		OpenGLData = NULL;
-	}
-	winData.is3DModeActive(false);
-}
-
-void MolDisplayWin::UpdateGLView(void)
-{
-
-	if (OpenGLData) {
-		GLint bufferRect[4];
-		bufferRect [0] = 0; 
-		bufferRect [1] = InfoRect.bottom - InfoRect.top;
-		bufferRect [2] = DisplayRect.right - DisplayRect.left;
-		bufferRect [3] = DisplayRect.bottom - DisplayRect.top;
-		aglSetCurrentContext(OpenGLData->aglContext);
-		aglSetInteger(OpenGLData->aglContext, AGL_BUFFER_RECT, bufferRect);
-		aglUpdateContext(OpenGLData->aglContext);
-		glViewport(0, 0, bufferRect [2], bufferRect [3]);
-		float hsize = DisplayRect.right - DisplayRect.left;
-		float vsize = DisplayRect.bottom - DisplayRect.top;
-		GLdouble aspect = hsize/vsize;
-		//	GLdouble ysize = 60.0;
-		//	if (aspect > 1.0) ysize /= aspect;
-		glMatrixMode(GL_PROJECTION);	//Setup the model space to screen space mapping
-		glLoadIdentity();
-		//	gluPerspective(ysize, aspect, 0.1, 100.0);
-		GLdouble zNear = 0.1;
-		GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV());
-		GLdouble top, right;
-		if (aspect > 1.0) {
-			right = myGLperspective;
-			top = right/aspect;
-		} else {
-			top = myGLperspective;
-			right = top * aspect;
-		}
-		glFrustum(-right, right, -top, top, zNear, 100.0);
-		glMatrixMode(GL_MODELVIEW);	//Prepare for model space by submitting the rotation/translation
-		glLoadIdentity();
-
-		RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
-			float red, green, blue;
-		red = (float) BackgroundColor->red/65536;
-		green = (float) BackgroundColor->green/65536;
-		blue = (float) BackgroundColor->blue/65536;	//Set the color to the Vector color
-		glClearColor(red, green, blue, 1.0f);		// Setup the background "clear" color
-	
-		float fillBrightness = Prefs->GetQD3DFillBrightness();
-		float PointBrightness = Prefs->GetQD3DPointBrightness();
-		GLfloat position[4] = {6.0,6.0,12.0,0.0};
-		GLfloat diffuse[4]  = {fillBrightness,fillBrightness,fillBrightness,0.0};
-		GLfloat specular[4] = {PointBrightness,PointBrightness,PointBrightness,0.0};
-		glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuse);
-		glLightfv(GL_LIGHT0,GL_SPECULAR,specular);
-		glLightfv(GL_LIGHT0,GL_POSITION,position);
-		GLfloat ambient[] = {0.0,0.0,0.0,0.0};
-		glLightfv(GL_LIGHT1,GL_AMBIENT,ambient);
-		glLightfv(GL_LIGHT1,GL_DIFFUSE,diffuse);
-		glLightfv(GL_LIGHT1,GL_SPECULAR,specular);
-		position[0] = -6.0;
-		glLightfv(GL_LIGHT1,GL_POSITION,position);
-		glEnable(GL_LIGHT1);
-
-	}
-}
-#endif
 
 /**
  * This function regenerates transparent geometries and any active display
@@ -365,324 +149,14 @@ void MolDisplayWin::UpdateGLModel(void) {	//model has changed so force update
 	}
 }
 
-#ifndef __wxBuild__
-//When using openGL we must update the draw context when a window is moved
-void MolDisplayWin::WindowMoved(void)
-{
-	if (winData.is3DModeActive() && OpenGLData) {
-		aglSetCurrentContext(OpenGLData->aglContext);
-		aglUpdateContext(OpenGLData->aglContext);
-	}
-}
-
-void MolDisplayWin::Create3DGLPICT(WindowPtr PrintWindow)
-{
-	//Our goal is to grab the pixels for the current front buffer and copy them to the printwindow (and thus
-	//the PICT).
-	int width = DisplayRect.right - DisplayRect.left;
-	int height = DisplayRect.bottom - DisplayRect.top;
-	Rect windowBounds;
-	GetWindowPortBounds(PrintWindow, &windowBounds);
-	int ScaledWidth = windowBounds.right - windowBounds.left;
-	int ScaledHeight = windowBounds.bottom - windowBounds.top;
-	int NumXPasses = ScaledWidth / width;
-	if ((NumXPasses * width) < ScaledWidth) NumXPasses++;
-	int NumYPasses = ScaledHeight / height;
-	if ((NumYPasses * height) < ScaledHeight) NumYPasses++;
-	int ViewportScaledX = NumXPasses * width;
-	int ViewportScaledY = NumYPasses * height;
-	unsigned char * array = new unsigned char[width*height*sizeof(GLbyte)*4];
-	unsigned char * arrayorder = new unsigned char[width*height*sizeof(GLbyte)*4];
-	GLvoid * pixels= (GLvoid *) array;
-	Rect WorkingPrintRect;
-		
-	glReadBuffer(GL_BACK);
-	PixMapHandle myPixMap = NewPixMap();
-	GLdouble zNear = 0.1;
-	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV());
-	GLdouble hGLsize, vGLsize, GLLeft, GLTop;
-	double aspect = ((double)width)/((double)height);
-	if (aspect > 1.0) {
-		hGLsize = 2.0*(myGLperspective) / NumXPasses;	//This corresponds to fov=60 with zNear=0.1
-		vGLsize = hGLsize/aspect;
-		GLLeft = -myGLperspective;
-		GLTop = -GLLeft/aspect;
-	} else {
-		vGLsize = 2.0*(myGLperspective) / NumXPasses;
-		hGLsize = vGLsize * aspect;
-		GLTop = myGLperspective;
-		GLLeft = -GLTop *aspect;
-	}
+void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
 	
-	if (NumXPasses > 1 || NumYPasses > 1) {
-		Prefs->CylindersForLines(true);
-		UpdateGLModel();
-	}
-	
-	for (int jpass=0; jpass<NumYPasses; jpass++) {
-		int passheight = height;
-		if ((jpass+1) == NumYPasses) passheight = height - (ViewportScaledY - ScaledHeight);
-		for (int ipass=0; ipass<NumXPasses; ipass++) {
-			int passwidth = width;
-			if ((ipass+1) == NumXPasses) passwidth = width - (ViewportScaledX - ScaledWidth);
+	/* if (OpenGLData->transpTriList) { //update the transparent surface sorting */
+		/* SortTransparentTriangles(); */
+	/* } */
 
-				//Draw into back buffer for each pass, unless there is only one pass total
-				//in which case the back buffer should be up to date already
-			if (NumXPasses > 1 || NumYPasses > 1) {
-				//Setup the projection matrix to view the correct piece of the view for this pass
-				glMatrixMode(GL_PROJECTION);	//Setup the model space to screen space mapping
-				glLoadIdentity();
-				GLdouble top, bottom, left, right;
-				left = GLLeft + ipass*hGLsize;
-				right = left + hGLsize;
-				top = GLTop - jpass*vGLsize;
-				bottom = top - vGLsize;
-				glFrustum(left, right, bottom, top, zNear, 100.0);
-
-				DrawGL();
-
-				glFinish();
-			}
-			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-
-				//reorder the pixels so colors are correct and top to bottom row order
-			for (long i=0; i<height; i++ ) {
-				long oldrowstart = (height - (i+1))*(width*4*sizeof(GLbyte));
-				long newrowstart = i*(width*4*sizeof(GLbyte));
-				for (long j=0; j<width; j++) {
-#ifdef __LITTLE_ENDIAN__
-					arrayorder[newrowstart + j*4] = array[oldrowstart + j*4 +3];
-					arrayorder[newrowstart + j*4 + 1] = array[oldrowstart + j*4 +2];
-					arrayorder[newrowstart + j*4 + 2] = array[oldrowstart + j*4 +1];
-					arrayorder[newrowstart + j*4 + 3] = array[oldrowstart + j*4 +0];
-#else
-					arrayorder[newrowstart + j*4] = array[oldrowstart + j*4 +3];
-					arrayorder[newrowstart + j*4 + 1] = array[oldrowstart + j*4 +0];
-					arrayorder[newrowstart + j*4 + 2] = array[oldrowstart + j*4 +1];
-					arrayorder[newrowstart + j*4 + 3] = array[oldrowstart + j*4 +2];
-#endif
-				}
-			}
-
-
-				//Coerce the pixel data to a bitmap structure
-
-			(**myPixMap).baseAddr = (char *)arrayorder;
-			(**myPixMap).rowBytes = passwidth*4*sizeof(GLbyte) | 0x8000;
-				//setup output rect
-			WorkingPrintRect.left = ipass*width;
-			WorkingPrintRect.right = WorkingPrintRect.left + passwidth;
-			WorkingPrintRect.top = jpass*height;
-			WorkingPrintRect.bottom = WorkingPrintRect.top + passheight;
-			(**myPixMap).bounds = WorkingPrintRect;
-			(**myPixMap).pmVersion = 0;
-			(**myPixMap).packType = 0;
-			(**myPixMap).packSize = 0;
-			(**myPixMap).hRes = (**myPixMap).vRes = 72 << 16;
-			(**myPixMap).pixelType = RGBDirect;
-			(**myPixMap).pixelSize = 32;
-			(**myPixMap).cmpCount = 3;
-			(**myPixMap).cmpSize = 8;
-#ifdef __LITTLE_ENDIAN__
-			(**myPixMap).pixelFormat = k32ABGRPixelFormat;
-#else
-		//Its not at all clear to me that the following makes any difference on ppc, but the above is 
-		//needed on Intel
-			(**myPixMap).pixelFormat = k32RGBAPixelFormat;
-#endif
-			(**myPixMap).pmExt = 0;
-			
-				//Now use copybits to push the pixels onto the printwindow
-			CopyBits((BitMap *) (*myPixMap), GetPortBitMapForCopyBits(GetWindowPort(PrintWindow)),
-				  &WorkingPrintRect, &WorkingPrintRect, srcCopy, NULL);
-		  }
-	}
-		  
-	delete [] array;
-	delete [] arrayorder;
-	DisposePixMap(myPixMap);
-	if (NumXPasses > 1 || NumYPasses > 1) {
-		Prefs->CylindersForLines(false);
-		UpdateGLModel();
-		UpdateGLView();
-		DrawMoleculeGL();
-	}
-}
-
-#ifdef PM_OLDAPI
-void MolDisplayWin::Print3DGL(PMPrintContext myPrintContext, const PMPageFormat myFormat,
-	long PrinterRes, Boolean Center, Boolean FramePrintOut)
-#else
-void MolDisplayWin::Print3DGL(const PMPrintSession mySession,
-	const PMPageFormat myFormat, long PrinterRes, bool Center, bool FramePrintOut)
-#endif
-{			//This routine is setup for Carbon only
-	ProgressInd->ChangeText("Rendering large image...");
-		//Calculate a factor to convert the 72dpi QD3D drawing to the printer res
-	float ScaleFactor = (float)PrinterRes/72.0;
-		PMRect	PageRect;
-	PMGetAdjustedPageRect(myFormat, &PageRect);
-#ifdef PM_OLDAPI
-		GrafPtr printerGPort;
-	PMGetGrafPtr(myPrintContext, &printerGPort);
-#else
-		GrafPtr printerGPort;
-	PMSessionGetGraphicsContext(mySession, NULL, (void **) &printerGPort);
-#endif
-	
-		int width = DisplayRect.right - DisplayRect.left;
-		int height = DisplayRect.bottom - DisplayRect.top;
-		int ScaledWidth = (int) (width * ScaleFactor);
-		int ScaledHeight = (int) (height * ScaleFactor);
-		int NumXPasses = ScaledWidth / width;
-		if ((NumXPasses * width) < ScaledWidth) NumXPasses++;
-		int NumYPasses = ScaledHeight / height;
-		if ((NumYPasses * height) < ScaledHeight) NumYPasses++;
-		int ViewportScaledX = NumXPasses * width;
-		int ViewportScaledY = NumYPasses * height;
-		unsigned char * array = new unsigned char[width*height*sizeof(GLbyte)*4];
-		unsigned char * arrayorder = new unsigned char[width*height*sizeof(GLbyte)*4];
-		GLvoid * pixels= (GLvoid *) array;
-		Rect	WorkingPrintRect;
-	long hOffset=0, vOffset=0;
-	if (Center) {	//Compute the offset to move the rect to center on the page
-		long PageCenterH = (long) (PageRect.right - PageRect.left);
-		long PageCenterV = (long) (PageRect.bottom - PageRect.top);
-		PageCenterH /= 2;
-		PageCenterV /= 2;
-		long DCenterH = ScaledWidth/2;
-		long DCenterV = ScaledHeight/2;
-		vOffset = PageCenterV - DCenterV;
-		hOffset = PageCenterH - DCenterH;
-	}
-
-	PixMapHandle myPixMap = NewPixMap();
-	aglSetCurrentContext(OpenGLData->aglContext);
-	glReadBuffer(GL_BACK);
-
-	GLdouble zNear = 0.1;
-	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV());
-	GLdouble hGLsize, vGLsize, GLLeft, GLTop;
-	double aspect = ((double)width)/((double)height);
-	if (aspect > 1.0) {
-		hGLsize = 2.0*(myGLperspective) / ScaleFactor;	//This corresponds to fov=60 with zNear=0.1
-		vGLsize = hGLsize/aspect;
-		GLLeft = -myGLperspective;
-		GLTop = -GLLeft/aspect;
-	} else {
-		vGLsize = 2.0*(myGLperspective) / ScaleFactor;
-		hGLsize = vGLsize * aspect;
-		GLTop = myGLperspective;
-		GLLeft = -GLTop *aspect;
-	}
-
-	Prefs->CylindersForLines(true);
-	UpdateGLModel();
-	
-	for (int jpass=0; jpass<NumYPasses; jpass++) {
-		int passheight = height;
-		if ((jpass+1) == NumYPasses) passheight = height - (ViewportScaledY - ScaledHeight);
-		for (int ipass=0; ipass<NumXPasses; ipass++) {
-			int passwidth = width;
-			if ((ipass+1) == NumXPasses) passwidth = width - (ViewportScaledX - ScaledWidth);
-
-	//Setup the projection matrix to view the correct piece of the view for this pass
-			glMatrixMode(GL_PROJECTION);	//Setup the model space to screen space mapping
-			glLoadIdentity();
-			GLdouble top, bottom, left, right;
-			left = GLLeft + ipass*hGLsize;
-			right = left + hGLsize;
-			top = GLTop - jpass*vGLsize;
-			bottom = top - vGLsize;
-			glFrustum(left, right, bottom, top, zNear, 100.0);
-
-			DrawGL();
-
-			glFinish();
-			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-				//reorder the pixels so colors are correct and top to bottom row order
-				//Note the last pass over x and y is only over the remaining pixels in the output
-				//image not the full image read from GL.
-			for (long i=0; i<passheight; i++ ) {
-					//Start at the bottom of the scaled image (width is the full GL width)
-				long oldrowstart = (height - (i+1))*(width*4*sizeof(GLbyte));
-					//New image is just passwidth wide.
-				long newrowstart = i*(passwidth*4*sizeof(GLbyte));
-				for (long j=0; j<passwidth; j++) {
-					arrayorder[newrowstart + j*4] = array[oldrowstart + j*4 +3];
-					arrayorder[newrowstart + j*4 + 1] = array[oldrowstart + j*4 +0];
-					arrayorder[newrowstart + j*4 + 2] = array[oldrowstart + j*4 +1];
-					arrayorder[newrowstart + j*4 + 3] = array[oldrowstart + j*4 +2];
-				}
-			}
-
-				//Coerce the pixel data to a bitmap structure
-
-			(**myPixMap).baseAddr = (char *)arrayorder;
-			(**myPixMap).rowBytes = passwidth*4*sizeof(GLbyte) | 0x8000;
-				//setup output rect
-			WorkingPrintRect.left = ipass*width + hOffset;
-			WorkingPrintRect.right = WorkingPrintRect.left + passwidth;
-			WorkingPrintRect.top = jpass*height + vOffset;
-			WorkingPrintRect.bottom = WorkingPrintRect.top + passheight;
-			(**myPixMap).bounds = WorkingPrintRect;
-			(**myPixMap).pmVersion = 0;
-			(**myPixMap).packType = 0;
-			(**myPixMap).packSize = 0;
-			(**myPixMap).hRes = (**myPixMap).vRes = 72 << 16;
-			(**myPixMap).pixelType = RGBDirect;
-			(**myPixMap).pixelSize = 32;
-			(**myPixMap).cmpCount = 3;
-			(**myPixMap).cmpSize = 8;
-			(**myPixMap).pixelFormat = k32RGBAPixelFormat;
-			(**myPixMap).pmExt = 0;
-			
-				//Now use copybits to push the pixels onto the printwindow
-			CopyBits((BitMap *) (*myPixMap), GetPortBitMapForCopyBits(printerGPort),
-				&WorkingPrintRect, &WorkingPrintRect, srcCopy, NULL);
-		  
-		  }
-	}
-	delete [] array;
-	delete [] arrayorder;
-	DisposePixMap(myPixMap);
-
-	if (FramePrintOut) {
-			RGBColor	BlackColor={0,0,0};
-		PenSize((short)ScaleFactor, (short)ScaleFactor);
-		RGBForeColor(&BlackColor);
-		Rect TotalRect;
-		TotalRect.left = hOffset;
-		TotalRect.right = TotalRect.left + ScaledWidth;
-		TotalRect.top = vOffset;
-		TotalRect.bottom = TotalRect.top + ScaledHeight;
-		FrameRect(&TotalRect);
-	}
-	Prefs->CylindersForLines(false);
-	UpdateGLModel();
-	SetCursorToArrow();
-}
-
-void MolDisplayWin::DrawMoleculeGL(void)
-{
-	aglSetCurrentContext(OpenGLData->aglContext);
-
-	DrawGL();	//actual drawing is abstracted into drawGL so printing can share the same function
-
-	aglSwapBuffers(OpenGLData->aglContext);	// finally swap buffers to display our work
-}
-#endif
-
-void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball) {
-#ifndef __wxBuild__
-	aglSetCurrentContext(OpenGLData->aglContext);
-#endif
-	
-	if (OpenGLData->transpTriList) { //update the transparent surface sorting
-		SortTransparentTriangles();
-	}
-
-	DrawGL();	//actual drawing
+	// Draw the scene normally.
+	/* DrawGL(); */
 
 	// Now add stuff specific to rotations
 	// glDisable(GL_DEPTH_TEST);	//These are not strictly neccessary, but probably increase speed
@@ -697,14 +171,9 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball) {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-#ifdef __wxBuild__
 	wxRect DisplayRect = glCanvas->GetRect();
 	long hsize = DisplayRect.GetWidth();
 	long vsize = DisplayRect.GetHeight();
-#else
-	long hsize = DisplayRect.right - DisplayRect.left;
-	long vsize = DisplayRect.bottom - DisplayRect.top;
-#endif
 	glScalef(2.0 / hsize, -2.0 /  vsize, 1.0);
 	glTranslatef(-hsize / 2.0, -vsize / 2.0, 0.0);
 
@@ -755,12 +224,12 @@ void MolDisplayWin::RotateMoleculeGL(bool ShowAngles, bool ShowTrackball) {
 	glPopMatrix();
 	glMatrixMode(matrixMode);
 	
-#ifndef __wxBuild__
-	aglSwapBuffers(OpenGLData->aglContext);	// finally swap buffers to display our work
-#endif
-
 }
 
+/**
+ * Draws molecular structures, surfaces, and annotations. Assumes context,
+ * projection, and viewport have been set. 
+ */
 void MolDisplayWin::DrawGL(void) {
 
 	float anno_color[4];
@@ -775,19 +244,24 @@ void MolDisplayWin::DrawGL(void) {
 	}
 	anno_color[3] = 1.0f;
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	//Clear out the buffer
+	// Only do the drawing if there is not an operation in progress otherwise
+	// the underlying data may not be complete.
+	if (OperInProgress()) {
+		return;
+	}
 
 	GLenum error = glGetError();	//clear the error code
 
 	// Setup the rotation matrix
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef(0.0, 0.0, -(MainData->WindowSize));
+	/* glMatrixMode(GL_MODELVIEW); */
+	/* glLoadIdentity(); */
+	/* glTranslatef(0.0, 0.0, -(MainData->WindowSize)); */
 
 	if (Prefs->ShowAtomicSymbolLabels() || Prefs->ShowAtomNumberLabels()) {
 		DrawLabel();
 	}
 
+	/* glPushMatrix(); // unrotated scene */
 	glMultMatrixf((const GLfloat *) &(MainData->TotalRotation));
 
 	glEnable(GL_LIGHTING);
@@ -912,6 +386,8 @@ void MolDisplayWin::DrawGL(void) {
 		glDisable(GL_BLEND);
 	}
 
+	/* glPopMatrix(); // unrotated scene */
+
 	if (lasso_has_area) {
 		int canvas_width, canvas_height;
 
@@ -957,9 +433,16 @@ void MolDisplayWin::DrawGL(void) {
 
 	glDisable(GL_LIGHTING);
 
+#if 0
 	if (InEditMode()) {
 	    const char modeString[] = "editing";
 	    DrawStaticLabel(modeString, -50, -20);
+	}
+#endif
+
+	if (do_rotate_annotation) {
+		ShowRotation(Prefs->GetShowAngles() && !rotate_timer.IsRunning(),
+					 !rotate_timer.IsRunning());
 	}
 
 }

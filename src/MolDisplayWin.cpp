@@ -419,6 +419,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	window_just_focused = false;
 	mAltModifyingToolBar = false;
 	edit_symmetrically = false;
+	do_rotate_annotation = false;
 
 	toolbar = NULL;
 	lasso_has_area = false;
@@ -441,8 +442,20 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	int width, height;
 	GetClientSize(&width, &height);
 	
-	glCanvas = new MpGLCanvas(this, 11002, wxPoint(0,0), wxSize(height,width));
-	glCanvas->setPrefs(Prefs);
+	int attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16,
+					 0, 0};
+	bool do_stereo = false;
+#if wxCHECK_VERSION(2,9,0)
+	attribs[4] = WX_GL_STEREO;
+	if (wxGLCanvas::IsDisplaySupported(attribs)) {
+		/* do_stereo = true; */
+	} else {
+		attribs[4] = 0;
+	}
+#endif
+	glCanvas = new MpGLCanvas(this, 11002, wxPoint(0,0), wxSize(height,width),
+							  attribs, do_stereo);
+	glCanvas->SetPrefs(Prefs);
 	
 	SizeChanged();
 	glCanvas->SetFocus();
@@ -471,7 +484,7 @@ MolDisplayWin::~MolDisplayWin() {
 	//when this window is destroyed.
 	if (printData) delete printData;
 	if (pageSetupData) delete pageSetupData;
-	glCanvas->setPrefs(NULL);
+	glCanvas->SetPrefs(NULL);
 	if (ModeAnimationData) {
 		delete ModeAnimationData;
 		ModeAnimationData = NULL;
@@ -3290,13 +3303,13 @@ void MolDisplayWin::UpdateFrameText(void) {
 
 /**
  * This function redraws the scene, essentially.  Use this to do a barebones
- * refresh.  If any data has changed, use a more specific function likes
+ * refresh.  If any data has changed, use a more specific function like
  * AtomsChanged or BondsChanged.
  */
 void MolDisplayWin::UpdateModelDisplay(void) {
 	UpdateFrameText();
 	UpdateGLModel();
-	glCanvas->draw();
+	glCanvas->Draw();
 }
 
 void MolDisplayWin::ResetView(void) {
@@ -3314,8 +3327,8 @@ void MolDisplayWin::ResetView(void) {
 			break;
 		}
 	}
-	glCanvas->UpdateGLView();
-	glCanvas->draw();
+	/* glCanvas->UpdateGLView(); */
+	glCanvas->Draw();
 }
 void MolDisplayWin::ResetModel(bool Center) {
 	if (Center) {
@@ -3333,12 +3346,12 @@ void MolDisplayWin::ResetModel(bool Center) {
 	// Reset the frame scroll bar
 	myStatus->SetScrollBar(MainData->CurrentFrame-1, MainData->NumFrames);
 	UpdateFrameText();
-	glCanvas->draw();
+	glCanvas->Draw();
 	Dirtify();
 	AdjustMenus();
 }
 void MolDisplayWin::ResetAllWindows(void) {
-	glCanvas->UpdateGLView();
+	/* glCanvas->UpdateGLView(); */
 	ResetModel(false);
 	
 	//force updates for all the child windows
@@ -3582,8 +3595,8 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
 		}
 	}
 	if (readPrefs && test >= 10) {
-		//Update the view since a CMLfile reads in user preferences
-		glCanvas->UpdateGLView();
+		//Update the canvas since a CMLfile reads in user preferences
+		glCanvas->DoPrefDependent();
 	}
 /*  if (test == 0) AbortOpen(0);
 	else {
@@ -3833,7 +3846,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 					if (dy == 0) return;
 					if (dy > 99) dy = 99;
 					MainData->WindowSize *= 1.0 + 0.01*dy;
-					glCanvas->UpdateGLView();
+					/* glCanvas->UpdateGLView(); */
 				}
 				
 				// Rotate.
@@ -3906,15 +3919,21 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	// For autorotation, a left mouse click is faked, but we don't want to
 	// annotate then.
 	if (event.LeftIsDown() && event.Dragging()) {
-		RotateMoleculeGL(Prefs->GetShowAngles() && !rotate_timer.IsRunning(),
-						 !rotate_timer.IsRunning());
-		glCanvas->SwapBuffers();
+		/* RotateMoleculeGL(Prefs->GetShowAngles() && !rotate_timer.IsRunning(), */
+						 /* !rotate_timer.IsRunning()); */
+		/* glCanvas->SwapBuffers(); */
+		if (OpenGLData->transpTriList) { //update the transparent surface sorting
+			SortTransparentTriangles();
+		}
+		do_rotate_annotation = true;
+		glCanvas->Draw();
+		do_rotate_annotation = false;
 		Dirtify();
 	}
 	
 	// Otherwise we do a plain drawing of the atoms.
 	else {
-		glCanvas->draw();
+		glCanvas->Draw();
 	}
 
 }

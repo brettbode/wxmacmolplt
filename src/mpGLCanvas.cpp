@@ -7,7 +7,6 @@
  * mpGLCanvas.cpp
  ***************************************/
 
-
 #include "Globals.h"
 #include "mpGLCanvas.h"
 #include <wx/image.h>
@@ -32,20 +31,22 @@
 #include "VirtualSphere.h"
 #include "ChooseDialog.h"
 
+/* ------------------------------------------------------------------------- */
+
 extern int glf_initialized;
 extern bool show_build_palette;
 extern BuilderDlg *build_palette;
 
-int defAttribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
+/* ------------------------------------------------------------------------- */
 
 MpGLCanvas::MpGLCanvas(MolDisplayWin *parent, wxWindowID id,
 					   const wxPoint& position, const wxSize& size,
-					   long style, const wxString& name)
-			  :wxGLCanvas((wxWindow *)parent, id, position, size,
-						  style|wxFULL_REPAINT_ON_RESIZE, name, defAttribs) {
-	//There is an additional parameter to wxGLCanvas that is an int array
-	//of GL options we might need. Might need to use WX_GL_RGBA and
-	//WX_GL_DOUBLEBUFFER?
+					   int *attribs, bool do_stereo, long style,
+					   const wxString& name)
+	: wxGLCanvas((wxWindow *) parent, id, position, size,
+				 style | wxFULL_REPAINT_ON_RESIZE, name, attribs),
+	  do_stereo(do_stereo) {
+
 	Prefs = NULL;
 	MolWin = parent;
 	initialized = false;
@@ -68,14 +69,13 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin *parent, wxWindowID id,
 	ndrag_events = 0;
 	bitmap_fontd = -1;
 
-	//Hmm is this the right spot to initialize our GL settings?
-	//initGL();
 }
 
+/**
+ * Deconstructs the canvas and all associated resources.
+ */	
 MpGLCanvas::~MpGLCanvas() {
 
-	// This function frees any resources created by the canvas.
-	
 	// Since each canvas has its own bitmap font textures, we free those
 	// resources.  Since GLF tries to free some OpenGL resources, we need to
 	// bring the canvas' context back up -- otherwise another canvas' textures
@@ -85,6 +85,11 @@ MpGLCanvas::~MpGLCanvas() {
 
 }
 
+/**
+ * Initializes OpenGL state for the canvas. The OpenGL context isn't quite 
+ * ready in the canvas' constructor, so we have to make this a separate
+ * function and call it after the canvas has been shown.
+ */
 void MpGLCanvas::initGL(void) {
 
 	if (GetContext()) {
@@ -115,7 +120,7 @@ void MpGLCanvas::initGL(void) {
 			bitmap_fontd = glfGetCurrentBMFFont();
 		}
 
-		// Initialize the OpenGL context here.
+		// Initialize the OpenGL state here.
 		glEnable(GL_DEPTH_TEST);
 		
 		//  glShadeModel(GL_FLAT);
@@ -128,22 +133,24 @@ void MpGLCanvas::initGL(void) {
 		GLfloat mat_diffuse[] = {0.2,0.2,0.2,0.8};
 		GLfloat mat_ambient[] = {0.1,0.1,0.1,0.8};
 
-		glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-		glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
-		glMaterialfv (GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
-		glMaterialfv (GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
 
 		//setup the static lighting properties
-		GLfloat ambient[4]  = {0.2,0.2,0.2,1.0};
-		GLfloat model_ambient[4]  = {0.1,0.1,0.1,0.1};
+		/* GLfloat ambient[4] = {0.2,0.2,0.2,1.0}; */
+		GLfloat model_ambient[4] = {0.1f, 0.1f, 0.1f, 0.1f};
 		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 		glEnable(GL_COLOR_MATERIAL);
-		glLightfv(GL_LIGHT0,GL_AMBIENT,ambient);
+		/* glLightfv(GL_LIGHT0, GL_AMBIENT, ambient); */
 		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_TRUE);
 		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,GL_TRUE);
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
-		glEnable(GL_LIGHT0);
+		/* glEnable(GL_LIGHT0); */
 
+		// We make a texture of arrowheads for the annotations. The arrowheads
+		// will point in the direction the annotations can be moved.
 		unsigned char texture[16 * 8] = {
 			255,   0,   0,   0, 0, 0, 0, 0, 255,   0,   0,   0, 0, 0, 0, 0,
 			255, 255,   0,   0, 0, 0, 0, 0, 255, 255,   0,   0, 0, 0, 0, 0,
@@ -166,11 +173,16 @@ void MpGLCanvas::initGL(void) {
 
 		DoPrefDependent();
 
+		// Don't initialize more than once, so set a flag.
 		initialized = true;
 	}
 }
 
-void MpGLCanvas::setPrefs(WinPrefs *newPrefs) {
+/**
+ * Associate preferences with this canvas.
+ * @param newPrefs Pointer to existing preferences instance.
+ */
+void MpGLCanvas::SetPrefs(WinPrefs *newPrefs) {
 	Prefs = newPrefs;
 }
 
@@ -201,6 +213,38 @@ void MpGLCanvas::DoPrefDependent() {
 	glEndList();
 
 	gluDeleteQuadric(quad);
+		
+	// Set the background color to the user's preference.
+	RGBColor *BackgroundColor = Prefs->GetBackgroundColorLoc();
+	float red, green, blue;
+	red = (float) BackgroundColor->red / 65536;
+	green = (float) BackgroundColor->green / 65536;
+	blue = (float) BackgroundColor->blue / 65536;
+	glClearColor(red, green, blue, 1.0f);
+	
+	// Setup two lights on either side of the camera.
+	float fillBrightness = Prefs->GetQD3DFillBrightness();
+	float PointBrightness = Prefs->GetQD3DPointBrightness();
+	GLfloat position[4] = {6.0f, 6.0f, 12.0f, 0.0};
+	GLfloat diffuse[4]  = {fillBrightness, fillBrightness,
+						   fillBrightness, 0.0f};
+	GLfloat specular[4] = {PointBrightness, PointBrightness,
+						   PointBrightness, 0.0f};
+	GLfloat ambient[4] = {0.2f, 0.2f, 0.2f, 1.0};
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, position);
+	glEnable(GL_LIGHT0);
+
+	position[0] = -6.0;
+	ambient[0] = ambient[1] = ambient[2] = 0.0f;
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, specular);
+	glLightfv(GL_LIGHT1, GL_POSITION, position);
+	glEnable(GL_LIGHT1);
 				
 }
 
@@ -225,7 +269,7 @@ wxImage MpGLCanvas::getImage(const int width, const int height) {
 	pixels = (unsigned char *) malloc(3 * cwidth * cheight * sizeof(GLbyte));
 	memset(pixels, 0, 3*cwidth*cheight*sizeof(GLbyte));
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
-	//draw into the back buffer
+	//Draw into the back buffer
 	MolWin->DrawGL();
 	glFinish();
 	glReadBuffer( GL_BACK );
@@ -342,11 +386,9 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 		dc->DrawRectangle(hOffset, vOffset, ScaledWidth, ScaledHeight);
 	}
 	 MolWin->UpdateGLModel();
-	 UpdateGLView();
 }
 
 void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
-	//wxPen dcPen(wxT("BLACK"));
 
 	wxCoord dcWidth  = 0;
 	wxCoord dcHeight = 0;
@@ -459,7 +501,6 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 	delete [] pixels;
 	
 	MolWin->UpdateGLModel();
-	UpdateGLView();
 }
 
 /**
@@ -500,64 +541,31 @@ void MpGLCanvas::SetProjection(float aspect_ratio) {
 
 }
 
-void MpGLCanvas::UpdateGLView(void) {
-
-	if (GetContext() && Prefs != NULL && MolWin->IsShown()) {
-		SetCurrent();
-		glfSetCurrentBMFFont(bitmap_fontd);
-
-		glViewport(0, 0, (GLint) width, (GLint) height);
-
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		SetProjection(((float) width) / height);
-
-		glMatrixMode(GL_MODELVIEW);	//Prepare for model space by submitting the rotation/translation
-		glLoadIdentity();
-		
-		RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
-		float red, green, blue;
-		red = (float) BackgroundColor->red/65536;
-		green = (float) BackgroundColor->green/65536;
-		blue = (float) BackgroundColor->blue/65536; //Set the color to the Vector color
-		glClearColor(red, green, blue, 1.0f);	   // Setup the background "clear" color
-		
-		float fillBrightness = Prefs->GetQD3DFillBrightness();
-		float PointBrightness = Prefs->GetQD3DPointBrightness();
-		GLfloat position[4] = {6.0,6.0,12.0,0.0};
-		GLfloat diffuse[4]  = {fillBrightness,fillBrightness,fillBrightness,0.0};
-		GLfloat specular[4] = {PointBrightness,PointBrightness,PointBrightness,0.0};
-		glLightfv(GL_LIGHT0,GL_DIFFUSE,diffuse);
-		glLightfv(GL_LIGHT0,GL_SPECULAR,specular);
-		glLightfv(GL_LIGHT0,GL_POSITION,position);
-		GLfloat ambient[] = {0.0,0.0,0.0,0.0};
-		glLightfv(GL_LIGHT1,GL_AMBIENT,ambient);
-		glLightfv(GL_LIGHT1,GL_DIFFUSE,diffuse);
-		glLightfv(GL_LIGHT1,GL_SPECULAR,specular);
-		position[0] = -6.0;
-		glLightfv(GL_LIGHT1,GL_POSITION,position);
-		glEnable(GL_LIGHT1);
-	}
-}
-
 void MpGLCanvas::eventSize(wxSizeEvent &event) {
 
 	wxGLCanvas::OnSize(event);
 	GetClientSize(&width, &height);
-	UpdateGLView();
 	Update();
 	Refresh();
 
 }
 
+/**
+ * Handles paint events for the OpenGL canvas. Called by event handler after
+ * various events that invalidate the window.
+ * @param event The wx paint event.
+ */
 void MpGLCanvas::eventPaint(wxPaintEvent &event) {
 
-	wxPaintDC paintDC(this);
-	draw();
+	wxPaintDC paintDC(this); // wx requires this. I hope it goes away soon.
+	Draw();
 
 }
 
-void MpGLCanvas::draw(void) {
+/**
+ * Draws the molecules and all related structures.
+ */
+void MpGLCanvas::Draw() {
 
 	if (!GetContext() || !MolWin->IsShown() || Prefs == NULL) {
 		return;
@@ -567,16 +575,79 @@ void MpGLCanvas::draw(void) {
 
 	if (!initialized) {
 		initGL();
-		UpdateGLView();
 	}
 
+	// Each canvas has its own font instance and hence display lists, so
+	// we activate this canvas' lists.
 	glfSetCurrentBMFFont(bitmap_fontd);
-	//Only do the drawing if there is not an operation in progress
-	//otherwise the underlying data may not be complete.
-	if (!MolWin->OperInProgress()) {
+
+	// Setup OpenGL matrices.  The projection is defined according to the
+	// preferences, and we remain in eye space for now.
+	glViewport(0, 0, (GLint) width, (GLint) height);
+	glDrawBuffer(GL_BACK);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	if (!do_stereo) {
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		SetProjection(((float) width) / height);
+
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(0.0f, 0.0f, -mMainData->WindowSize);
+
+		// MolWin's got the goods, so hand off the rest of the work.
 		MolWin->DrawGL();
 	} else {
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear out the buffer
+		float focal_length = 0.1f * mMainData->WindowSize;
+		float radians = Prefs->GetGLFOV() * 1.0f / 2.0f * kPi / 180.0f;
+		float wd2 = mMainData->WindowSize * tan(radians);
+		float ndfl = mMainData->WindowSize / focal_length;
+		float left, right, bottom, top;
+		float near_z = 0.1f;
+		float far_z = 1000.0f;
+		
+		CPoint3D dir(0.0f, 0.0f, -1.0f);
+		CPoint3D up(0.0f, 1.0f, 0.0f);
+		CPoint3D r;
+		CrossProduct3D(&dir, &up, &r);
+		Normalize3D(&r);
+		r *= 0.5f;
+		
+		float eye_separation = focal_length / 2.0f;
+		
+		// Left.
+		glDrawBuffer(GL_BACK_LEFT);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		
+		left = -((float) width) / height * wd2 + 0.5f * eye_separation * ndfl;
+		right = ((float) width) / height * wd2 + 0.5f * eye_separation * ndfl;
+		top = wd2;
+		bottom = -wd2;
+		
+		glFrustum(left, right, bottom, top, near_z, far_z);
+		
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(r.x, r.y, -(2.0f * mMainData->WindowSize - r.z));
+		MolWin->DrawGL();
+
+		// Right.
+		glDrawBuffer(GL_BACK_RIGHT);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		
+		left = -((float) width) / height * wd2 - 0.5f * eye_separation * ndfl;
+		right = ((float) width) / height * wd2 - 0.5f * eye_separation * ndfl;
+		top = wd2;
+		bottom = -wd2;
+		
+		glFrustum(left, right, bottom, top, near_z, far_z);
+		
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(-r.x, -r.y, -(2.0f * mMainData->WindowSize + r.z));
 	}
 	
 	SwapBuffers();
@@ -1067,7 +1138,7 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 			SelectObj(selected_type, selected, deSelectAll);
 			MolWin->SelectionChanged(deSelectAll);
 			MolWin->UpdateGLModel();
-			draw();
+			Draw();
 			MolWin->Dirtify();
 		}
 
@@ -1179,7 +1250,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	// Lassoing should only be done with the left mouse button.
 	if (is_lassoing && event.LeftIsDown()) {
 		HandleLassoing(event, wxPoint(curr_mouse.x, height - curr_mouse.y));
-		draw();
+		Draw();
 	}
 
 	// User must be wanting to translate or rotate atoms.  This isn't the
@@ -1254,7 +1325,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 			SelectObj(selected_type, selected, deSelectAll);
 		}
 		MolWin->Dirtify();
-		draw();
+		Draw();
 	}
 
 	// Otherwise, if this mouse operation can be considered a stationary click
@@ -1495,7 +1566,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 			MolWin->SelectionChanged(deSelectAll);
 		}
 
-		draw();
+		Draw();
 
 	}
 	
@@ -1537,7 +1608,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 			}
 		}
 		first_site_clicked = -1;
-		draw();
+		Draw();
 	}
 	
 	else if (did_edit) {
@@ -1728,9 +1799,9 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			// atoms.
 			Matrix4D rot_matrix;
 			Matrix4D rot;
-			glGetFloatv(GL_MODELVIEW_MATRIX, (float *) rot);
 
-			VirtualSphereQD3D(prev, curr, cent, radius, rot_matrix, rot);
+			VirtualSphereQD3D(prev, curr, cent, radius, rot_matrix,
+							  mMainData->TotalRotation);
 
 			CPoint3D new_pt;
 			for (atom = atoms.begin(); atom != atoms.end(); atom++) {
@@ -2010,6 +2081,8 @@ void MpGLCanvas::testPicking(int x, int y) {
 	SetProjection(((float) width) / height);
 
 	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(0.0f, 0.0f, -mMainData->WindowSize);
 
 	MolWin->DrawGL();
 
@@ -3090,7 +3163,7 @@ void MpGLCanvas::ConvertEFPToAllElec(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::OnIdleEvent(wxIdleEvent& event) {
-	draw();
+	Draw();
 	event.RequestMore();
 }
 

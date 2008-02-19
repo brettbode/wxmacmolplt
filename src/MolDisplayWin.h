@@ -227,6 +227,7 @@ class MolDisplayWin : public wxFrame {
 		bool			timerRunning;
 		bool			show_fullscreen;
 		bool			edit_symmetrically;
+		bool			do_rotate_annotation;
 		
 		Progress		*ProgressInd;    ///< Progress indicator window for long operations
 		OpenGLRec		*OpenGLData;     ///< Extra OpenGL data
@@ -602,7 +603,7 @@ class MolDisplayWin : public wxFrame {
 		void AddSymmetryOperators(void);
 		void UpdateGLModel(void);
 		void Rotate(wxMouseEvent&);
-		void RotateMoleculeGL(bool ShowAngles, bool ShowTrackball);
+		void ShowRotation(bool ShowAngles, bool ShowTrackball);
 		static void DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 									 const mpAtom& atom2,
 									 const WinPrefs& Prefs,

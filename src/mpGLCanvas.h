@@ -155,6 +155,7 @@ class MpGLCanvas : public wxGLCanvas {
 		wxStopWatch mouse_activate_timer;
 		bool ignore_next_up;
 		bool is_lassoing;
+		bool do_stereo;
 
 		void SetProjection(float aspect_ratio);
 		void AddPlaneNormal(wxCommandEvent& event);
@@ -177,12 +178,14 @@ class MpGLCanvas : public wxGLCanvas {
 		* @param style The style of the new widget.	See wxWindow class docs.
 		* @param name The name of the new widget.
 		*/
-		MpGLCanvas(MolDisplayWin  *parent,
-						wxWindowID		  id		  = wxID_ANY,
-						const wxPoint  &position = wxDefaultPosition,
-						const wxSize	 &size	  = wxDefaultSize,
-						long				  style	  = wxNO_BORDER,
-						const wxString &name	  = wxT("DemoGLCanvas"));
+		MpGLCanvas(MolDisplayWin *parent,
+				   wxWindowID id = wxID_ANY,
+				   const wxPoint &position = wxDefaultPosition,
+				   const wxSize	&size = wxDefaultSize,
+				   int *attributes = NULL,
+				   bool do_stereo = false,
+				   long	style = wxNO_BORDER,
+				   const wxString &name = wxT("DemoGLCanvas"));
 
 		/**
 		* Sets the internal pointer to the window's preferences.  If the
@@ -194,16 +197,11 @@ class MpGLCanvas : public wxGLCanvas {
 		*/
 		~MpGLCanvas();
 
-		void setPrefs(WinPrefs *newPrefs);
+		void SetPrefs(WinPrefs *newPrefs);
 		void DoPrefDependent();
 		void FitToPlane(wxCommandEvent& event);
 
-		/**
-		* Updates GL parameters for changes in the window shape or
-		* for changes in the lighting and background color.
-		*/
-		void UpdateGLView(void);
-		void draw(void);
+		void Draw(void);
 
 		MolDisplayWin *GetParent(void) { return MolWin; }
 		  

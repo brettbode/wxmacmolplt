@@ -281,7 +281,7 @@ void BaseSurfacePane::OnExport( wxCommandEvent &event ) {
 
 	wxString filePath = wxFileSelector(wxT("Export As"), wxT(""), wxT(""),
 									   wxT(""), wxT("*.*"),
-#ifdef wxCHECK_VERSION(2,9,0)
+#if wxCHECK_VERSION(2,9,0)
 									   wxFD_SAVE | wxFD_OVERWRITE_PROMPT,
 #else
 									   wxSAVE | wxOVERWRITE_PROMPT,
