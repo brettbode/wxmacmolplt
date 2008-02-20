@@ -446,11 +446,13 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 					 0, 0};
 	bool do_stereo = false;
 #if wxCHECK_VERSION(2,9,0)
-	attribs[4] = WX_GL_STEREO;
-	if (wxGLCanvas::IsDisplaySupported(attribs)) {
-		/* do_stereo = true; */
-	} else {
-		attribs[4] = 0;
+	if (Prefs->UseStereo()) {
+		attribs[4] = WX_GL_STEREO;
+		if (wxGLCanvas::IsDisplaySupported(attribs)) {
+			do_stereo = true;
+		} else {
+			attribs[4] = 0;
+		}
 	}
 #endif
 	glCanvas = new MpGLCanvas(this, 11002, wxPoint(0,0), wxSize(height,width),

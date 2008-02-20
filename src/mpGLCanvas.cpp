@@ -138,16 +138,13 @@ void MpGLCanvas::initGL(void) {
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
 
-		//setup the static lighting properties
-		/* GLfloat ambient[4] = {0.2,0.2,0.2,1.0}; */
+		// Setup the static lighting properties.
 		GLfloat model_ambient[4] = {0.1f, 0.1f, 0.1f, 0.1f};
 		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 		glEnable(GL_COLOR_MATERIAL);
-		/* glLightfv(GL_LIGHT0, GL_AMBIENT, ambient); */
-		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,GL_TRUE);
-		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,GL_TRUE);
+		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
-		/* glEnable(GL_LIGHT0); */
 
 		// We make a texture of arrowheads for the annotations. The arrowheads
 		// will point in the direction the annotations can be moved.
@@ -232,6 +229,11 @@ void MpGLCanvas::DoPrefDependent() {
 						   PointBrightness, 0.0f};
 	GLfloat ambient[4] = {0.2f, 0.2f, 0.2f, 1.0};
 
+	// Make sure we're in eye space so that the lights always
+	// illuminate the visible scene.
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
@@ -270,10 +272,13 @@ wxImage MpGLCanvas::getImage(const int width, const int height) {
 	memset(pixels, 0, 3*cwidth*cheight*sizeof(GLbyte));
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
 	//Draw into the back buffer
-	MolWin->DrawGL();
+	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
+	/* glMatrixMode(GL_MODELVIEW); */
+	/* glLoadIdentity(); */
+	Draw();
 	glFinish();
-	glReadBuffer( GL_BACK );
-	glReadPixels( 0, 0, cwidth, cheight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	glReadBuffer(GL_FRONT);
+	glReadPixels(0, 0, cwidth, cheight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
 	// create a wxImage from the data, and mirror it vertically
 	return wxImage(cwidth,cheight,pixels).Mirror(false);
@@ -357,11 +362,14 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 			bottom = top - vGLsize;
 			glFrustum(left, right, bottom, top, zNear, 1000.0);
 			
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
 			MolWin->DrawGL();
 			
 			glFinish();
 			memset(pixels, 0, 3*width*height*sizeof(GLbyte));
-			glPixelStorei( GL_PACK_ALIGNMENT, 1 );
+			glPixelStorei(GL_PACK_ALIGNMENT, 1);
 			glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
 			wxCoord x = ipass*width + hOffset;
@@ -476,6 +484,9 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 			bottom = top - vGLsize;
 			glFrustum(left, right, bottom, top, zNear, 1000.0);
 			
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
 			MolWin->DrawGL();
 			
 			glFinish();
@@ -512,21 +523,21 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 void MpGLCanvas::SetProjection(float aspect_ratio) {
 
 	GLdouble zNear = 0.1;
-	GLdouble myGLperspective = zNear*tan(Prefs->GetGLFOV()*(kPi)/180.0);
+	GLdouble half_width = zNear * tan(Prefs->GetGLFOV() * kPi / 180.0);
 
 	// At the moment the prefs limit the GLFOV to > 0 so the glOrtho code will
 	// not get run. Before it can be activated need to figure out what to do
 	// with it in the hi-res image export routines.
 	GLdouble top, right;
 	if (aspect_ratio > 1.0) {
-		right = myGLperspective;
+		right = half_width;
 		top = right / aspect_ratio;
 	} else {
-		top = myGLperspective;
+		top = half_width;
 		right = top * aspect_ratio;
 	}
 
-	if (myGLperspective > 0.001)
+	if (half_width > 0.001)
 		glFrustum(-right, right, -top, top, zNear, 1000.0);
 	else {
 		if (aspect_ratio > 1.0) {
@@ -594,43 +605,47 @@ void MpGLCanvas::Draw() {
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glTranslatef(0.0f, 0.0f, -mMainData->WindowSize);
 
 		// MolWin's got the goods, so hand off the rest of the work.
 		MolWin->DrawGL();
 	} else {
-		float focal_length = 0.1f * mMainData->WindowSize;
-		float radians = Prefs->GetGLFOV() * 1.0f / 2.0f * kPi / 180.0f;
-		float wd2 = mMainData->WindowSize * tan(radians);
-		float ndfl = mMainData->WindowSize / focal_length;
-		float left, right, bottom, top;
 		float near_z = 0.1f;
 		float far_z = 1000.0f;
+		float focal_length = 1.0f * mMainData->WindowSize;
+		float radians = Prefs->GetGLFOV() * kPi / 180.0f;
+		float half_width = near_z * tan(radians);
+		float ndfl = 0.1f / focal_length;
+		float left, right, bottom, top;
+		float eye_separation = focal_length / 30.0f;
+
+		/* std::cout << "mMainData->WindowSize: " << mMainData->WindowSize << std::endl; */
+		/* std::cout << "half_width: " << half_width << std::endl; */
+		/* std::cout << "Prefs->GetGLFOV(): " << Prefs->GetGLFOV() << std::endl; */
+		/* std::cout << "eye_separation: " << eye_separation << std::endl; */
 		
 		CPoint3D dir(0.0f, 0.0f, -1.0f);
 		CPoint3D up(0.0f, 1.0f, 0.0f);
 		CPoint3D r;
 		CrossProduct3D(&dir, &up, &r);
 		Normalize3D(&r);
-		r *= 0.5f;
-		
-		float eye_separation = focal_length / 2.0f;
+		r *= eye_separation * 0.5f;
 		
 		// Left.
 		glDrawBuffer(GL_BACK_LEFT);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		
-		left = -((float) width) / height * wd2 + 0.5f * eye_separation * ndfl;
-		right = ((float) width) / height * wd2 + 0.5f * eye_separation * ndfl;
-		top = wd2;
-		bottom = -wd2;
+		float aspect_ratio = ((float) width) / height;
+		left = -aspect_ratio * half_width + 0.5f * eye_separation * ndfl;
+		right = aspect_ratio * half_width + 0.5f * eye_separation * ndfl;
+		top = half_width;
+		bottom = -half_width;
 		
 		glFrustum(left, right, bottom, top, near_z, far_z);
 		
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glTranslatef(r.x, r.y, -(2.0f * mMainData->WindowSize - r.z));
+		glTranslatef(r.x, r.y, r.z);
 		MolWin->DrawGL();
 
 		// Right.
@@ -638,16 +653,17 @@ void MpGLCanvas::Draw() {
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		
-		left = -((float) width) / height * wd2 - 0.5f * eye_separation * ndfl;
-		right = ((float) width) / height * wd2 - 0.5f * eye_separation * ndfl;
-		top = wd2;
-		bottom = -wd2;
+		left = -aspect_ratio * half_width - 0.5f * eye_separation * ndfl;
+		right = aspect_ratio * half_width - 0.5f * eye_separation * ndfl;
+		top = half_width;
+		bottom = -half_width;
 		
 		glFrustum(left, right, bottom, top, near_z, far_z);
 		
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glTranslatef(-r.x, -r.y, -(2.0f * mMainData->WindowSize + r.z));
+		glTranslatef(-r.x, -r.y, -r.z);
+		MolWin->DrawGL();
 	}
 	
 	SwapBuffers();
@@ -2082,7 +2098,6 @@ void MpGLCanvas::testPicking(int x, int y) {
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	glTranslatef(0.0f, 0.0f, -mMainData->WindowSize);
 
 	MolWin->DrawGL();
 

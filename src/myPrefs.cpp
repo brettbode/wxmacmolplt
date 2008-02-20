@@ -1044,9 +1044,7 @@ void ScalingPrefsPane::OnSliderUpdate( wxCommandEvent &event )
 }
 
 StereoPrefsPane::StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
-	: PrefsPane(targetWindow, targetPrefs, kStereoPrefsPane, GlobalPrefs, parent) 
-{
-  /* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
+	: PrefsPane(targetWindow, targetPrefs, kStereoPrefsPane, GlobalPrefs, parent) {
 
   mMainSizer = new wxBoxSizer(wxVERTICAL);
   mMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -1054,8 +1052,8 @@ StereoPrefsPane::StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *pa
   SetSizer(mMainSizer);
 }
 
-void StereoPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) 
-{
+void StereoPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+
   mChkActive = new wxCheckBox(this, ID_STEREO_ACTIVE, _T("Stereo Active"), wxDefaultPosition);
   mChkActive->SetValue(mTargetPrefs->UseStereo());
   mMainSizer->Add(mChkActive, 0, wxALIGN_LEFT | wxALL, 10);

@@ -252,10 +252,9 @@ void MolDisplayWin::DrawGL(void) {
 
 	GLenum error = glGetError();	//clear the error code
 
-	// Setup the rotation matrix
-	/* glMatrixMode(GL_MODELVIEW); */
-	/* glLoadIdentity(); */
-	/* glTranslatef(0.0, 0.0, -(MainData->WindowSize)); */
+	// Setup the rotation matrix. We do not set to identity since stereo may
+	// have tacked some transformations on.
+	glTranslatef(0.0f, 0.0f, -MainData->WindowSize);
 
 	if (Prefs->ShowAtomicSymbolLabels() || Prefs->ShowAtomNumberLabels()) {
 		DrawLabel();

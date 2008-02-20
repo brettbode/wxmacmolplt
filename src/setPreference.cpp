@@ -223,16 +223,15 @@ void setPreference::OnCloseWindow( wxCloseEvent& event )
 * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
  */
 
-void setPreference::OnCancel( wxCommandEvent& event )
-{
+void setPreference::OnCancel( wxCommandEvent& event ) {
 	Close();
 }
 /*!
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
  */
 
-void setPreference::OnOK( wxCommandEvent& event )
-{
+void setPreference::OnOK( wxCommandEvent& event ) {
+
 	saveCurrPrefs(currPanel);
 
 	if (mIsGlobal) {
@@ -246,29 +245,29 @@ void setPreference::OnOK( wxCommandEvent& event )
 	Close();
 }
 
-void setPreference::facDefaults( wxCommandEvent& WXUNUSED(event) )
-{
+void setPreference::facDefaults( wxCommandEvent& WXUNUSED(event) ) {
 
-  switch (currPanel)
-    {
-    case 0: mPrefs->ReadAtomDefaults(); break;
-    case 1: mPrefs->ReadBondDefaults(); break;
-    case 2: mPrefs->ReadDisplayDefaults(); break;
-    case 3: mPrefs->ReadEnergyDefaults(); break;
-    case 4: mPrefs->ReadFileDefaults(); break;
-    case 5: mPrefs->ReadScalingDefaults(); break;
-//    case 6: mPrefs->ReadStereoDefaults(); break;
-    case 6: mPrefs->ReadSurfaceDefaults(); break;
-    case 7: mPrefs->ReadQD3DDefaults(); break;
-    }
+	switch (currPanel) {
+		case 0: mPrefs->ReadAtomDefaults(); break;
+		case 1: mPrefs->ReadBondDefaults(); break;
+		case 2: mPrefs->ReadDisplayDefaults(); break;
+		case 3: mPrefs->ReadEnergyDefaults(); break;
+		case 4: mPrefs->ReadFileDefaults(); break;
+		case 5: mPrefs->ReadScalingDefaults(); break;
+		case 6: mPrefs->ReadStereoDefaults(); break;
+		case 7: mPrefs->ReadSurfaceDefaults(); break;
+		case 8: mPrefs->ReadQD3DDefaults(); break;
+	}
 
-  updatePanels(currPanel);
+	updatePanels(currPanel);
+
 }
 
-void setPreference::userDefaults( wxCommandEvent& WXUNUSED(event) )
-{ 
-  copyCurrPrefs(currPanel, gPreferences);
-  updatePanels(currPanel);
+void setPreference::userDefaults( wxCommandEvent& WXUNUSED(event) ) { 
+
+	copyCurrPrefs(currPanel, gPreferences);
+	updatePanels(currPanel);
+
 }
 
 void setPreference::OnApply( wxCommandEvent& WXUNUSED(event) ) {
@@ -297,91 +296,89 @@ void setPreference::OnRevert( wxCommandEvent& WXUNUSED(event) )
   updatePanels(currPanel);
 }
 
-void setPreference::saveCurrPrefs(int panelID)
-{
-  switch (panelID)
-    {
-    case 0: atomPanel->saveToTempPrefs(); break;
-    case 1: bondPanel->saveToTempPrefs(); break;
-    case 2: displayPanel->saveToTempPrefs(); break;
-    case 3: energyPanel->saveToTempPrefs(); break;
-    case 4: filePanel->saveToTempPrefs(); break;
-    case 5: scalPanel->saveToTempPrefs(); break;
-  //  case 6: stereoPanel->saveToTempPrefs(); break;
-    case 6: surfPanel->saveToTempPrefs(); break;
-    case 7: qd3dPanel->saveToTempPrefs(); break;
-    }
-}
+void setPreference::saveCurrPrefs(int panelID) {
 
-void setPreference::copyCurrPrefs(int panelID, WinPrefs* newPrefs)
-{
-  switch (panelID)
-    {
-    case 0: mPrefs->CopyAtomPrefs(newPrefs); break;
-    case 1: mPrefs->CopyBondPrefs(newPrefs); break;
-    case 2: mPrefs->CopyDisplayPrefs(newPrefs); break;
-    case 3: mPrefs->CopyEnergyPrefs(newPrefs); break;
-    case 4: mPrefs->CopyFilePrefs(newPrefs); break;
-    case 5: mPrefs->CopyScalingPrefs(newPrefs); break;
- //   case 6: mPrefs->CopyStereoPrefs(newPrefs); break;
-    case 6: mPrefs->CopySurfacePrefs(newPrefs); break;
-    case 7: mPrefs->CopyQD3DPrefs(newPrefs); break;
-    }
+	switch (panelID) {
+		case 0: atomPanel->saveToTempPrefs(); break;
+		case 1: bondPanel->saveToTempPrefs(); break;
+		case 2: displayPanel->saveToTempPrefs(); break;
+		case 3: energyPanel->saveToTempPrefs(); break;
+		case 4: filePanel->saveToTempPrefs(); break;
+		case 5: scalPanel->saveToTempPrefs(); break;
+		case 6: stereoPanel->saveToTempPrefs(); break;
+		case 7: surfPanel->saveToTempPrefs(); break;
+		case 8: qd3dPanel->saveToTempPrefs(); break;
+	}
 
 }
 
-void setPreference::updatePanels(int panelID)
-{
-  m_choiceBook->DeletePage(panelID);
+void setPreference::copyCurrPrefs(int panelID, WinPrefs* newPrefs) {
 
-  switch (panelID)
-    {
-    case 0:
-      atomPanel = new AtomPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
-      atomPanel->SetupPaneItems(mParent);
-      m_choiceBook->InsertPage(panelID,  atomPanel, wxT("Elements"), true );
-      break;
-    case 1: 
-      bondPanel = new BondPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
-      bondPanel->SetupPaneItems(mParent);
-      m_choiceBook->InsertPage( panelID, bondPanel, wxT("Bonds/Vectors"), true );
-      break;
-    case 2: 
-      displayPanel = new DisplayPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
-      displayPanel->SetupPaneItems(mParent);
-      m_choiceBook->InsertPage( panelID, displayPanel, wxT("Display Options"), true ); 
-      break;
-    case 3: 
-      energyPanel = new EnergyPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
-      energyPanel->SetupPaneItems(mParent);
-      m_choiceBook->InsertPage( panelID, energyPanel, wxT("Energy Options"), true ); 
-      break;
-    case 4: 
-      filePanel = new FilePrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
-      filePanel->SetupPaneItems(mParent);
-      m_choiceBook->InsertPage( panelID, filePanel, wxT("File"), true ); 
-      break;
-    case 5:  
-      scalPanel = new ScalingPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
-      scalPanel->SetupPaneItems(mParent);
-      m_choiceBook->InsertPage( panelID, scalPanel, wxT("Scaling/Speed"), true );
-      break;
-//    case 6: 
-//      stereoPanel = new StereoPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
-//      stereoPanel->SetupPaneItems(mParent);
-//      m_choiceBook->InsertPage( panelID, stereoPanel, wxT("Stereo Options"), true ); 
-//      break;
-    case 6: 
-      surfPanel = new SurfacePrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
-      surfPanel->SetupPaneItems(mParent);
-      m_choiceBook->InsertPage( panelID, surfPanel, wxT("Surface Options"), true ); 
-      break;
-    case 7: 
-      qd3dPanel = new QD3DPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
-      qd3dPanel->SetupPaneItems(mParent);
-      m_choiceBook->InsertPage( panelID, qd3dPanel, wxT("3D Options"), true ); 
-      break;
-    }
+	switch (panelID) {
+		case 0: mPrefs->CopyAtomPrefs(newPrefs); break;
+		case 1: mPrefs->CopyBondPrefs(newPrefs); break;
+		case 2: mPrefs->CopyDisplayPrefs(newPrefs); break;
+		case 3: mPrefs->CopyEnergyPrefs(newPrefs); break;
+		case 4: mPrefs->CopyFilePrefs(newPrefs); break;
+		case 5: mPrefs->CopyScalingPrefs(newPrefs); break;
+		case 6: mPrefs->CopyStereoPrefs(newPrefs); break;
+		case 7: mPrefs->CopySurfacePrefs(newPrefs); break;
+		case 8: mPrefs->CopyQD3DPrefs(newPrefs); break;
+	}
+
+}
+
+void setPreference::updatePanels(int panelID) {
+
+	m_choiceBook->DeletePage(panelID);
+
+	switch (panelID) {
+		case 0:
+			atomPanel = new AtomPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
+			atomPanel->SetupPaneItems(mParent);
+			m_choiceBook->InsertPage(panelID,  atomPanel, wxT("Elements"), true );
+			break;
+		case 1: 
+			bondPanel = new BondPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
+			bondPanel->SetupPaneItems(mParent);
+			m_choiceBook->InsertPage( panelID, bondPanel, wxT("Bonds/Vectors"), true );
+			break;
+		case 2: 
+			displayPanel = new DisplayPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
+			displayPanel->SetupPaneItems(mParent);
+			m_choiceBook->InsertPage( panelID, displayPanel, wxT("Display Options"), true ); 
+			break;
+		case 3: 
+			energyPanel = new EnergyPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
+			energyPanel->SetupPaneItems(mParent);
+			m_choiceBook->InsertPage( panelID, energyPanel, wxT("Energy Options"), true ); 
+			break;
+		case 4: 
+			filePanel = new FilePrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
+			filePanel->SetupPaneItems(mParent);
+			m_choiceBook->InsertPage( panelID, filePanel, wxT("File"), true ); 
+			break;
+		case 5:  
+			scalPanel = new ScalingPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
+			scalPanel->SetupPaneItems(mParent);
+			m_choiceBook->InsertPage( panelID, scalPanel, wxT("Scaling/Speed"), true );
+			break;
+		case 6: 
+			stereoPanel = new StereoPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
+			stereoPanel->SetupPaneItems(mParent);
+			m_choiceBook->InsertPage( panelID, stereoPanel, wxT("Stereo Options"), true ); 
+			break;
+		case 7: 
+			surfPanel = new SurfacePrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
+			surfPanel->SetupPaneItems(mParent);
+			m_choiceBook->InsertPage( panelID, surfPanel, wxT("Surface Options"), true ); 
+			break;
+		case 8: 
+			qd3dPanel = new QD3DPrefsPane(mParent, m_choiceBook, mPrefs, mIsGlobal);
+			qd3dPanel->SetupPaneItems(mParent);
+			m_choiceBook->InsertPage( panelID, qd3dPanel, wxT("3D Options"), true ); 
+			break;
+	}
 }
 
 void setPreference::RecreateBooks()
@@ -422,13 +419,14 @@ void setPreference::RecreateBooks()
 }
     
 
-wxBookCtrlBase *setPreference::GetCurrentBook()
-{
+wxBookCtrlBase *setPreference::GetCurrentBook() {
+
   return m_choiceBook;
+
 }
 
-void setPreference::CreateInitialPages(wxBookCtrlBase *parent)
-{
+void setPreference::CreateInitialPages(wxBookCtrlBase *parent) {
+
     // Create and add some panels to the notebook
     atomPanel = new AtomPrefsPane(mParent, parent, mPrefs, mIsGlobal);
     atomPanel->SetupPaneItems(mParent);
@@ -454,9 +452,9 @@ void setPreference::CreateInitialPages(wxBookCtrlBase *parent)
     scalPanel->SetupPaneItems(mParent);
     parent->AddPage( scalPanel, wxT("Scaling/Speed"), false );
 
-//    stereoPanel = new StereoPrefsPane(mParent, parent, mPrefs, mIsGlobal);
-//    stereoPanel->SetupPaneItems(mParent);
-//    parent->AddPage( stereoPanel, wxT("Stereo Options"), false );
+	stereoPanel = new StereoPrefsPane(mParent, parent, mPrefs, mIsGlobal);
+	stereoPanel->SetupPaneItems(mParent);
+	parent->AddPage( stereoPanel, wxT("Stereo Options"), false );
 
     surfPanel = new SurfacePrefsPane(mParent, parent, mPrefs, mIsGlobal);
     surfPanel->SetupPaneItems(mParent);
@@ -470,20 +468,17 @@ void setPreference::CreateInitialPages(wxBookCtrlBase *parent)
     currPanel = 0;
 }
 
-void setPreference::OnSetFont(wxCommandEvent& WXUNUSED(event))
-{
-  wxFontData data;
-  wxFontDialog dialog(this, data);
+void setPreference::OnSetFont(wxCommandEvent& WXUNUSED(event)) {
+	wxFontData data;
+	wxFontDialog dialog(this, data);
 
-    if ( dialog.ShowModal() == wxID_OK )
-    {
-      wxFontData retData = dialog.GetFontData();
-      wxFont myFont = retData.GetChosenFont();
-    }
+	if ( dialog.ShowModal() == wxID_OK ) {
+		wxFontData retData = dialog.GetFontData();
+		wxFont myFont = retData.GetChosenFont();
+	}
 }
 
-void setPreference::OnChoicebook(wxChoicebookEvent& event)
-{
+void setPreference::OnChoicebook(wxChoicebookEvent& event) {
 	int idx = event.GetOldSelection();
   
 	saveCurrPrefs(idx);
