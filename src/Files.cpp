@@ -1182,8 +1182,9 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 */
 long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	char Line[kMaxLineLength];
-	long	nAtoms;
-	
+	long nAtoms;
+	int scanCount, bytesRead, bytesConsumed;
+
 	ProgressInd->ChangeText("Reading MKL file...");
 	Frame * lFrame = MainData->cFrame;
 	//First scan the file to determine the number of atoms
@@ -1246,21 +1247,21 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		long numFunctions = 0;
 		long nShells = 0;
 		long linesInSection = 0;
-		// These three are just for each line read: nFunc, IType, and Sc(alefactor)
+		//  Temp vars 
 		long nFunc;	
 		char IType[5];
 		float Sc;
-	
+		
+		// Count Shells in Basis Section
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())) {
 			Buffer->GetLine(Line);
 			linesInSection++;
 			//Continue until we find the end of the group
 			if (FindKeyWord(Line, "$END", 4)<0) {								
 				int lineBytes = strlen(Line);
-				int bytesConsumed, bytesRead = 0;
+				bytesRead = 0;
 				while (bytesRead < lineBytes) {
-					// Count the number of lines defining one shell each
-					int scanCount = sscanf(&(Line[bytesRead]), "%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
+					scanCount = sscanf(&(Line[bytesRead]), "%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
 					if (scanCount == 3) { 
 						bytesRead+=bytesConsumed;
 						nShells++;
@@ -1274,100 +1275,126 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		MainData->Basis = new BasisSet(nAtoms, nShells);
 		// go back to the first line after $BASIS so we can start populating BasisSet
 		Buffer->BackupnLines(linesInSection-1);
+
 		int iShell = 0;
 		int iAtom = 0;
-		// store shell info for each atom
+		int shellsPeriAtom = 0;
+		// Reiterate through section and fill in BasisSet information
 		bool error  = false;
 		while (iShell < nShells && iAtom < nAtoms && !error) {
 			Buffer->GetLine(Line);
-			int bytesConsumed, bytesRead = 0;
-			int scanCount = sscanf(&(Line[bytesRead]), "%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
+			scanCount = sscanf(Line, "%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
 			if (scanCount == 3) {
-				// Store BasisShell info
-				bytesRead+=bytesConsumed;
+			printf("Line Read: nfunc: %ld\tIType: %s\tSc: %f\n", nFunc, IType, Sc);				//DEBUG CODE
+				//Create this BasisShell
 				MainData->Basis->Shells.push_back(BasisShell());	
-				// capture SP case so the rest of the comparisons can be done in a switch
-				if (toupper(IType[0]) == 'S' && toupper(IType[1]) == 'P') {		
+				if (toupper(IType[0]) == 'S' && toupper(IType[1]) == 'P') {
 					IType[0] = 'L';
 					IType[1] = '\0';
 				}
-				switch (IType[0]) {
+				switch (toupper(IType[0])) {
 					case 'L':
-					case 'l':
 						MainData->Basis->Shells[iShell].ShellType = LShell;
 						break;
 					case 'S':
-					case 's':
 						MainData->Basis->Shells[iShell].ShellType = SShell;
 						break;
 					case 'P':
-					case 'p':
 						MainData->Basis->Shells[iShell].ShellType = PShell;
 						break;
 					case 'D':
-					case 'd':
 						MainData->Basis->Shells[iShell].ShellType = DShell;
 						break;
 					case 'F':
-					case 'f':
 						MainData->Basis->Shells[iShell].ShellType = FShell;
 						break;
+					default:
+						// Need to generate an error
+						break;
 				}
+				printf("Basis->Shells[%ld].ShellType is %d\n", 
+						iShell, MainData->Basis->Shells[iShell].ShellType);		//DEBUG CODE
 				// save first shell of this atom to BasisMap
-				MainData->Basis->BasisMap.push_back(iShell);
-				// assign with Nuclear Charge (not sure if this is correct, or about ECPs; should make sure lFrame is correct)
-				// maybe need to insure lframe points to correct frame?
-				MainData->Basis->NuclearCharge.push_back(lFrame->GetAtomType(iAtom));
+				if (shellsPeriAtom==0) {
+					// save first shell of this atom to BasisMap
+					MainData->Basis->BasisMap[2*iAtom]=iShell;
+					printf("Basis->BasisMap[%d] is now %d\n", 2*iAtom, iShell); //DEBUG CODE
+				}
 				MainData->Basis->NumShells++; 
+				printf("Basis->NumShells is now %ld\n", MainData->Basis->NumShells);	//DEBUG CODE
 				MainData->Basis->NumFuncs+=nFunc;
+				printf("Basis->NumFuncs is now %ld\n", MainData->Basis->NumFuncs);		//DEBUG CODE
 				// currently not doing anything with Sc / Scalefactor
-				
-				// read in functions for this shell
-				bytesRead=0;
+				// read in functions for this shell (eat all lines until next shell-defining line)
+				char tmpStr[5];
 				float tmpFloat[3];
 				bool stopReadingShell = false;
 				while ( !stopReadingShell ) {
-					Buffer-> GetLine(Line);
-					scanCount = sscanf(&Line[bytesRead], "%f %f %f%n",
-								&(tmpFloat[0]), &(tmpFloat[1]), &(tmpFloat[2]), &bytesConsumed);
-					bytesRead += bytesConsumed;
+					Buffer->GetLine(Line);
+					if (3==sscanf(Line, "%ld %[lLsSpPdDfF] %f", &nFunc, &IType, &Sc)) {
+						Buffer->BackupnLines(1);
+						break;
+					}
+					scanCount = sscanf(Line, "%f %f %f", &(tmpFloat[0]),&(tmpFloat[1]),&(tmpFloat[2]));
+					if (scanCount==2 || scanCount==3)							//DEBUG CODE
+							printf("floats read (%d): %f\t%f\t%f\n", 
+								scanCount, tmpFloat[0], tmpFloat[1], tmpFloat[2]);	//DEBUG CODE
 					// non-SP (L) case: one exponent, one coef per line
-					if (scanCount == 2 && MainData->Basis->Shells[iShell].ShellType != LShell) {
+					if (scanCount==2 && MainData->Basis->Shells[iShell].ShellType!=LShell) {
 						MainData->Basis->Shells[iShell].Exponent.push_back(tmpFloat[0]);
 						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[1]);
 						MainData->Basis->Shells[iShell].NumPrims++;
+						printf("pushing %f as exp, %f as coef\n", 
+								tmpFloat[0], tmpFloat[1]);//DEBUG CODE
+						printf("Basis->Shells[%ld].NumPrims is now: %d\n", 
+								iShell, MainData->Basis->Shells[iShell].NumPrims);//DEBUG CODE
 					}
 					// SP (L) case: one exp, two coeff's per line
-					else if (scanCount == 3 && MainData->Basis->Shells[iShell].ShellType == LShell) {
-						MainData->Basis->Shells[iShell].Exponent.push_back(tmpFloat[0]);	// We push_back this one twice since
-						MainData->Basis->Shells[iShell].Exponent.push_back(tmpFloat[0]);    // two coef's share this exponent
+					else if (scanCount==3 && MainData->Basis->Shells[iShell].ShellType==LShell) {
+						MainData->Basis->Shells[iShell].Exponent.push_back(tmpFloat[0]);
 						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[1]);
 						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[2]);
-						MainData->Basis->Shells[iShell].NumPrims+=2;
+						MainData->Basis->Shells[iShell].NumPrims++;
+						printf("pushing %f as exp, %f as coef, %f as coef\n", 
+								tmpFloat[0], tmpFloat[1], tmpFloat[2]);	//DEBUG CODE
+						printf("Basis->Shells[%ld].NumPrims is now: %d\n", 
+								iShell, MainData->Basis->Shells[iShell].NumPrims);//DEBUG CODE
+					} 
+					else if (1==sscanf(Line, "%s%n", &tmpStr, &bytesConsumed)) {
+						printf("Caught string %s (expecting $$ or $END)\n", tmpStr);			//DEBUG CODE
+						if ((bytesConsumed == 2 && strncmp(tmpStr, "$$", 3)==0) ||
+							(bytesConsumed == 4 && strncmp(tmpStr, "$END", 5)==0)) {
+								// maybe need to insure lframe points to correct frame?
+								MainData->Basis->NuclearCharge[iAtom] = (long)(lFrame->GetAtomType(iAtom));
+								printf("pushing %ld as atom %ld's Nuc Charge\n", 
+										(long)(lFrame->GetAtomType(iAtom)),iAtom);	//DEBUGCODE 
+								// add ending shell of this atom to BasisMap
+								MainData->Basis->BasisMap[2*iAtom+1]=iShell;
+								printf("pushing %d as end of atom %d onto BasisMap\n",iShell,iAtom);//DEBUG CODE
+								iAtom++;
+								printf("iAtom is now: %ld\n", iAtom);								//DEBUG CODE
+								shellsPeriAtom = -1;	// reset for next atom;
+								stopReadingShell = true;
+								break;
+						}
+						// else throw an error?
 					} else 
 						stopReadingShell = true;
+						// set error?
 				}
 				iShell++;
-			}
-			else {
+				shellsPeriAtom++;
+				printf("iShell is now: %ld\n\n", iShell);					//DEBUG CODE
+			} else {
 				error = true;
 				break;
 			}
-			// handle $$, $END (these signal the end of an atom)
-			char tmpStr[5];
-			scanCount = sscanf(Line, "%s%n", &tmpStr, &bytesConsumed);
-			if (scanCount == 1) {
-				if ((bytesConsumed == 2 && strncmp(tmpStr, "$$", 5) == 0) || 
-				    (bytesConsumed == 4 && strncmp(tmpStr, "$END", 5) == 0)) {
-					// add ending shell of this atom to BasisMap
-					MainData->Basis->BasisMap.push_back(iShell-1);
-					iAtom++;
-				}
-				// else throw some kind of error?
-			}
 		} // creating BasisSet
-		if (error)
-			delete MainData->Basis;
+		if (error) {
+			printf("We've got an error!\n");					//DEBUG CODE
+			delete MainData->Basis;							// This would cause a SEGFAULT on close
+			MainData->Basis = new BasisSet(nAtoms, 0);		// Proposed fix to segfault
+		}
 	} // BasisSet done
 	
 	// now look for vibrational frequencies for the last frame
