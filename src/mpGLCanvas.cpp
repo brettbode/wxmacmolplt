@@ -269,15 +269,21 @@ wxImage MpGLCanvas::getImage(const int width, const int height) {
 	// malloc is required by wxImage,
 	// which takes responsibility for the memory
 	pixels = (unsigned char *) malloc(3 * cwidth * cheight * sizeof(GLbyte));
-	memset(pixels, 0, 3*cwidth*cheight*sizeof(GLbyte));
-	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
-	//Draw into the back buffer
-	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
-	/* glMatrixMode(GL_MODELVIEW); */
-	/* glLoadIdentity(); */
-	Draw();
+	memset(pixels, 0, 3 * cwidth * cheight * sizeof(GLbyte));
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+	// Draw into the back buffer.
+	glDrawBuffer(GL_BACK);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	SetProjection(((float) cwidth) / cheight);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	MolWin->DrawGL();
 	glFinish();
-	glReadBuffer(GL_FRONT);
+
+	glReadBuffer(GL_BACK);
 	glReadPixels(0, 0, cwidth, cheight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
 	// create a wxImage from the data, and mirror it vertically
@@ -353,8 +359,8 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 			if ((ipass+1) == NumXPasses) passwidth = width - (ViewportScaledX - ScaledWidth);
 			
 			//Setup the projection matrix to view the correct piece of the view for this pass
-			glMatrixMode (GL_PROJECTION);   //Setup the model space to screen space mapping
-			glLoadIdentity ();
+			glMatrixMode(GL_PROJECTION);   //Setup the model space to screen space mapping
+			glLoadIdentity();
 			GLdouble top, bottom, left, right;
 			left = GLLeft + ipass*hGLsize;
 			right = left + hGLsize;
@@ -366,8 +372,8 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
 			MolWin->DrawGL();
-			
 			glFinish();
+
 			memset(pixels, 0, 3*width*height*sizeof(GLbyte));
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
 			glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
@@ -574,7 +580,13 @@ void MpGLCanvas::eventPaint(wxPaintEvent &event) {
 }
 
 /**
- * Draws the molecules and all related structures.
+ * Draws the molecules and all related structures. This is the function that
+ * should be called for normal scene drawing. It sets user-specified matrices
+ * and draws to fill the canvas dimensions. If you need to do anything that
+ * deviates from the standard viewport and matrices, you should call
+ * MolDisplayWin::DrawGL() directly after customizing the OpenGL state for
+ * your needs. If an operation is in progress, the screen is cleared and 
+ * no other drawing is done.
  */
 void MpGLCanvas::Draw() {
 
@@ -598,6 +610,12 @@ void MpGLCanvas::Draw() {
 	glDrawBuffer(GL_BACK);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	// Only do the drawing if there is not an operation in progress otherwise
+	// the underlying data may not be complete.
+	if (MolWin->OperInProgress()) {
+		return;
+	}
+
 	if (!do_stereo) {
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -617,11 +635,6 @@ void MpGLCanvas::Draw() {
 		float ndfl = 0.1f / focal_length;
 		float left, right, bottom, top;
 		float eye_separation = focal_length / 30.0f;
-
-		/* std::cout << "mMainData->WindowSize: " << mMainData->WindowSize << std::endl; */
-		/* std::cout << "half_width: " << half_width << std::endl; */
-		/* std::cout << "Prefs->GetGLFOV(): " << Prefs->GetGLFOV() << std::endl; */
-		/* std::cout << "eye_separation: " << eye_separation << std::endl; */
 		
 		CPoint3D dir(0.0f, 0.0f, -1.0f);
 		CPoint3D up(0.0f, 1.0f, 0.0f);

@@ -2928,10 +2928,12 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 			case 'A':   //option - a
 				MainData->cFrame->toggleAbInitioVisibility();
 				ResetModel(false);
+				Dirtify();
 				break;
 			case 'S':   //option - s
 				MainData->cFrame->toggleMMAtomVisibility();
 				ResetModel(false);
+				Dirtify();
 				break;
 		}
 	}
@@ -3163,6 +3165,8 @@ void MolDisplayWin::AtomsChanged(bool updateCoordsWin, bool updateDisplay) {
 	if (surfacesWindow) surfacesWindow->Reset();
 	if (updateDisplay) FrameChanged();
 
+	Dirtify();
+
 }
 
 void MolDisplayWin::BondsChanged(void) {
@@ -3332,6 +3336,7 @@ void MolDisplayWin::ResetView(void) {
 	/* glCanvas->UpdateGLView(); */
 	glCanvas->Draw();
 }
+
 void MolDisplayWin::ResetModel(bool Center) {
 	if (Center) {
 		MainData->CenterModelWindow();
@@ -3349,11 +3354,15 @@ void MolDisplayWin::ResetModel(bool Center) {
 	myStatus->SetScrollBar(MainData->CurrentFrame-1, MainData->NumFrames);
 	UpdateFrameText();
 	glCanvas->Draw();
-	Dirtify();
+
+	// This is commented out because this function's called on file open,
+	// when the scene is definitely not dirty.
+	/* Dirtify(); */
+
 	AdjustMenus();
 }
+
 void MolDisplayWin::ResetAllWindows(void) {
-	/* glCanvas->UpdateGLView(); */
 	ResetModel(false);
 	
 	//force updates for all the child windows
@@ -4269,5 +4278,6 @@ void MolDisplayWin::ToggleBuilderPalette(void) {
 		((MpApp &) wxGetApp()).AdjustAllMenus();
 	} else {
 		build_palette->Hide();
+	Dirtify();;
 	}
 } 

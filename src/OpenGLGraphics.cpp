@@ -244,12 +244,6 @@ void MolDisplayWin::DrawGL(void) {
 	}
 	anno_color[3] = 1.0f;
 
-	// Only do the drawing if there is not an operation in progress otherwise
-	// the underlying data may not be complete.
-	if (OperInProgress()) {
-		return;
-	}
-
 	GLenum error = glGetError();	//clear the error code
 
 	// Setup the rotation matrix. We do not set to identity since stereo may
