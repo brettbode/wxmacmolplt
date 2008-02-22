@@ -43,6 +43,7 @@ wxmacmolplt_SOURCES =                                  \
     MyTypes.cpp                MyTypes.h               \
     OpenGLGraphics.cpp         mmp_gl.h                \
     orbitals.cpp                                       \
+    qtexport.cpp               qtexport.h              \
     build_palette.h            build_palette.cpp       \
     patterns.h                 Prefs.h                 \
                                PrefsPanes.h            \

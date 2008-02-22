@@ -267,7 +267,7 @@ int QTExport::GetKeyFrameRate(void) const {
 #include "MoleculeData.h"
 #include "MolDisplayWin.h"
 #include <wx/mac/carbon/private.h>
-#include <Movies.h>
+#include <QuickTime/Movies.h>
 
 typedef struct qtData {
 	Media theMedia;
