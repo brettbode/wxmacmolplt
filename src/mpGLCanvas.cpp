@@ -251,15 +251,17 @@ void MpGLCanvas::DoPrefDependent() {
 }
 
 wxImage MpGLCanvas::getImage(const int width, const int height) {
+
 	if (!GetContext()) {
 		return wxImage();
 	}
+
 	SetCurrent();
 	glfSetCurrentBMFFont(bitmap_fontd);
 	// TODO:  respect width/height
 	// TODO:  avoid grabbing the menu
 	GLint view[4];
-	GLint cwidth,cheight;
+	GLint cwidth, cheight;
 	unsigned char *pixels;
 
 	glGetIntegerv(GL_VIEWPORT, view);
@@ -287,18 +289,17 @@ wxImage MpGLCanvas::getImage(const int width, const int height) {
 	glReadPixels(0, 0, cwidth, cheight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
 	// create a wxImage from the data, and mirror it vertically
-	return wxImage(cwidth,cheight,pixels).Mirror(false);
+	return wxImage(cwidth, cheight, pixels).Mirror(false);
 }
-//0.0577 corresponds to fov=60 with zNear=0.1
-//#define myGLperspective 0.050	//0.050 seems to match my 2D mode
 
 void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor, 
-												Progress * progress, bool Center,
-												bool frame) {
+									Progress * progress, bool Center,
+									bool frame) {
 	
 	if (!GetContext()) {
 		return;
 	}
+
 	SetCurrent();
 	glfSetCurrentBMFFont(bitmap_fontd);
 
@@ -368,12 +369,14 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 			bottom = top - vGLsize;
 			glFrustum(left, right, bottom, top, zNear, 1000.0);
 			
+			glDrawBuffer(GL_BACK);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
 			MolWin->DrawGL();
 			glFinish();
 
+			glReadBuffer(GL_BACK);
 			memset(pixels, 0, 3*width*height*sizeof(GLbyte));
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
 			glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
@@ -529,6 +532,8 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 void MpGLCanvas::SetProjection(float aspect_ratio) {
 
 	GLdouble zNear = 0.1;
+
+	// half_width is half the width of the near clipping plane.
 	GLdouble half_width = zNear * tan(Prefs->GetGLFOV() * kPi / 180.0);
 
 	// At the moment the prefs limit the GLFOV to > 0 so the glOrtho code will
