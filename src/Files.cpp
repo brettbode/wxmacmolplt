@@ -1287,6 +1287,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		
 		while (iShell < nShells && iAtom < nAtoms && !error) {
 			Buffer->GetLine(Line);
+			// We should only need IType from this line
 			scanCount = sscanf(Line, "%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
 			if (scanCount == 3) {
 			printf("Line Read: nfunc: %ld\tIType: %s\tSc: %f\n", nFunc, IType, Sc);		//DEBUG CODE
@@ -1323,11 +1324,14 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					// save first shell of this atom to BasisMap
 					MainData->Basis->BasisMap[2*iAtom]=iShell;
 					printf("Basis->BasisMap[%d] is now %d\n", 2*iAtom, iShell); //DEBUG CODE
+					// maybe need to insure lframe points to correct frame?
+					MainData->Basis->NuclearCharge[iAtom] = (long)(lFrame->GetAtomType(iAtom));
+					printf("Basis->NuclearCharge[%d] = %d\n", 
+							iAtom, MainData->Basis->NuclearCharge[iAtom]); //DEBUG CODE
 				}
 				MainData->Basis->NumShells++; 
 				printf("Basis->NumShells is now %ld\n", MainData->Basis->NumShells);	//DEBUG CODE
-				MainData->Basis->NumFuncs+=nFunc;
-				printf("Basis->NumFuncs is now %ld\n", MainData->Basis->NumFuncs);		//DEBUG CODE
+//				printf("Basis->NumFuncs is now %ld\n", MainData->Basis->NumFuncs);		//DEBUG CODE
 				// currently not doing anything with Sc / Scalefactor
 				// read in functions for this shell (eat all lines until next shell-defining line)
 				char tmpStr[5];
@@ -1345,36 +1349,38 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 //								scanCount, tmpFloat[0], tmpFloat[1], tmpFloat[2]);	//DEBUG CODE
 					// non-SP (L) case: one exponent, one coef per line
 					if (scanCount==2 && MainData->Basis->Shells[iShell].ShellType!=LShell) {
+						MainData->Basis->NumFuncs++;
+						MainData->Basis->Shells[iShell].NumPrims++;
 						MainData->Basis->Shells[iShell].Exponent.push_back(tmpFloat[0]);
 						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[1]);
-						MainData->Basis->Shells[iShell].NumPrims++;
 						printf("pushing %f as exp, %f as coef\n", 
 								tmpFloat[0], tmpFloat[1]);//DEBUG CODE
+						printf("Basis->NumFuncs is now %ld\n", MainData->Basis->NumFuncs); //DEBUG CODE
 						printf("Basis->Shells[%ld].NumPrims is now %d\n", 
 								iShell, MainData->Basis->Shells[iShell].NumPrims);//DEBUG CODE
+
 					}
 					// SP (L) case: one exp, two coeff's per line
 					else if (scanCount==3 && MainData->Basis->Shells[iShell].ShellType==LShell) {
+						MainData->Basis->NumFuncs++;
+						MainData->Basis->Shells[iShell].NumPrims++;
 						MainData->Basis->Shells[iShell].Exponent.push_back(tmpFloat[0]);
 						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[1]);
 						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[2]);
-						MainData->Basis->Shells[iShell].NumPrims++;
 						printf("pushing %f as exp, %f as coef, %f as coef\n", 
 								tmpFloat[0], tmpFloat[1], tmpFloat[2]);	//DEBUG CODE
+						printf("Basis->NumFuncs is now %ld\n", MainData->Basis->NumFuncs); //DEBUG CODE
 						printf("Basis->Shells[%ld].NumPrims is now %d\n", 
 								iShell, MainData->Basis->Shells[iShell].NumPrims);//DEBUG CODE
 					} 
 					else if (1==sscanf(Line, "%s%n", &tmpStr, &bytesConsumed)) {
-						printf("Caught string %s (expecting $$ or $END)\n", tmpStr);			//DEBUG CODE
+						printf("Caught string %s (expecting $$ or $END)\n", tmpStr);	//DEBUG CODE
 						if ((bytesConsumed == 2 && strncmp(tmpStr, "$$", 3)==0) ||
 							(bytesConsumed == 4 && strncmp(tmpStr, "$END", 5)==0)) {
-								// maybe need to insure lframe points to correct frame?
-								MainData->Basis->NuclearCharge[iAtom] = (long)(lFrame->GetAtomType(iAtom));
-								printf("pushing %ld as atom %ld's Nuc Charge\n", 
-										(long)(lFrame->GetAtomType(iAtom)),iAtom);	//DEBUGCODE 
 								// add ending shell of this atom to BasisMap
 								MainData->Basis->BasisMap[2*iAtom+1]=iShell;
-								printf("Basis->BasisMap[ushing %d as end of atom %d onto BasisMap\n",iShell,iAtom);//DEBUG CODE
+								printf("Basis->BasisMap[ushing %d as end of atom %d onto BasisMap\n",
+										iShell,iAtom);//DEBUG CODE
 								iAtom++;
 								printf("\nAtom# (iAtom): %ld\n", iAtom);				//DEBUG CODE
 								shellsPeriAtom = -1;	// reset for next atom;
@@ -3815,7 +3821,6 @@ void MolDisplayWin::WritePICT(BufferFile * Buffer) {
 }
 #endif
 void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
-
 	Frame * lFrame = MainData->Frames;
 	long NumFrames = MainData->NumFrames;
 	if (!AllFrames) {
