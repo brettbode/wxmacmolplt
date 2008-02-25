@@ -41,6 +41,7 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
             return 0;
         }
         try {
+			lData->PruneUnusedFragments();
             buffer = new BufferFile(currFile, true);
 			long BasisTest=0;
 			buffer->WriteLine("!   File created by MacMolPlt "wxMacMolPlt_VERSION, true);

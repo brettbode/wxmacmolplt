@@ -707,14 +707,14 @@ void AnnotationMarker::draw(const MolDisplayWin * win) const {
 	WinPrefs * Prefs = win->GetPrefs();
 
 	// Validate the atom reference for this frame.
-	if (atom < 0 || atom >= cFrame->GetNumAtoms()) return;
+	if (atoms[0] < 0 || atoms[0] >= cFrame->GetNumAtoms()) return;
 
 	float AtomScale = Prefs->GetAtomScale();
-	long curAtomType = cFrame->GetAtomType(atom) - 1;
+	long curAtomType = cFrame->GetAtomType(atoms[0]) - 1;
 
 	radius = AtomScale * Prefs->GetAtomSize(curAtomType);
 
-	cFrame->GetAtomPosition(atom, atom_pos);
+	cFrame->GetAtomPosition(atoms[0], atom_pos);
 
 	glPushMatrix();
 	glTranslatef(atom_pos.x, atom_pos.y, atom_pos.z);

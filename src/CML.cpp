@@ -157,6 +157,9 @@ long BuilderDlg::ReadCMLFile(BufferFile *Buffer) {
 
 long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData *wData, 
 								bool allFrames, bool AllData) {
+
+	PruneUnusedFragments();
+
 	XMLSetup();
 		//The CML root is optional in the spec, but I will include here so that
 		//I can wrapper multiple Molecule elements to represent different frames
@@ -992,7 +995,7 @@ void Structure::WriteXML(XMLElement *parent) const {
 void AnnotationMarker::WriteXML(XMLElement * parent) const {
 	XMLElement * Elem = parent->addChildElement(kAnnotationXML);
 	Elem->addAttribute(CML_convert(titleAttr), CML_convert(MMP_AnnotationMarker));
-	Elem->addAttribute(kAnnAtom1XML, atom);
+	Elem->addAttribute(kAnnAtom1XML, atoms[0]);
 }
 
 void AnnotationLength::WriteXML(XMLElement * parent) const {
@@ -2644,7 +2647,7 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 	return result;
 }
 bool AnnotationMarker::ReadXML(XMLElement * Annotation) {
-	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atom);
+	bool result = Annotation->getAttributeValue(kAnnAtom1XML, atoms[0]);
 
 	return result;
 }

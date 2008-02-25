@@ -36,7 +36,6 @@ class MoleculeData {
 		friend class FrameSnapShot;
 		friend class DataGroup;
 	private:
-		std::map<std::string, EFrag> efrags;
 		std::vector<Annotation *> Annotations;	//Set of annotations
 		int constrain_anno_id;
 		CPoint3D	*RotCoords;				// The currently displayed, rotated coordinates
@@ -45,7 +44,16 @@ class MoleculeData {
 		Frame *		Frames;					// pointer to the first frame
 		Internals *	IntCoords;
 		BasisSet *	Basis;
+
+		// efrags is a hash from fragment name to a structure containing
+		// fragment text and parsed coordinates.  There's only one entry for
+		// each different fragment type.  FragmentNames is used to map fragment
+		// instances to their fragment type.  There's one entry per instance of
+		// each fragment type.  Use an atom's fragment number to index into
+		// FragmentNames, and use the string there to index into efrags.
+		std::map<std::string, EFrag> efrags;
 		std::vector<std::string> FragmentNames;	//< Effective Fragment name for each fragment (FRAGNAME)
+
 		char *		Description;			// Simple one line label
 		long		CurrentFrame;			// Number of the current frame
 		long		NumFrames;				// Current number of Frames
@@ -209,9 +217,10 @@ class MoleculeData {
 		bool ValidAtom(long AtomNum);
 		/**
 		 Returns the FRAGNAME for the indicated effective fragment.
-		 \param index The atom index to test
+		 \param index The index of the fragment.
 		 */
 		const char * GetFragmentName(unsigned long index) const;
+		void PruneUnusedFragments();
 		void GetRotationMatrix(Matrix4D copy);
 		int GetAnnotationCount(void) const {return Annotations.size();};
 		void DeleteAllAnnotations(void);

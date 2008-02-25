@@ -200,6 +200,7 @@ class MpGLCanvas : public wxGLCanvas {
 		void SetPrefs(WinPrefs *newPrefs);
 		void DoPrefDependent();
 		void FitToPlane(wxCommandEvent& event);
+		void SelectWholeFragments();
 
 		void Draw(void);
 

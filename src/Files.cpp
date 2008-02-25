@@ -3811,6 +3811,7 @@ void MolDisplayWin::WritePICT(BufferFile * Buffer) {
 }
 #endif
 void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
+
 	Frame * lFrame = MainData->Frames;
 	long NumFrames = MainData->NumFrames;
 	if (!AllFrames) {

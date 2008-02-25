@@ -1789,9 +1789,34 @@ void MoleculeData::DeleteAllAnnotations(void) {
 	}
 	Annotations.clear();
 }
+
 const char * MoleculeData::GetFragmentName(unsigned long index) const {
 	if (index < FragmentNames.size())
 		return FragmentNames[index].c_str();
 	else
 		return "H2ORHF";
+}
+
+void MoleculeData::PruneUnusedFragments() {
+
+	bool found_instance;
+	std::map<std::string, EFrag>::iterator frag;
+	std::vector<std::string>::const_iterator fragname;
+
+	for (frag = efrags.begin(); frag != efrags.end(); /* BLANK */) {
+		found_instance = false;
+		for (fragname = FragmentNames.begin();
+			 !found_instance && fragname != FragmentNames.end();
+			 ++fragname) {
+			if (frag->first.compare(*fragname) == 0) {
+				found_instance = true;
+			}
+		}
+		if (!found_instance) {
+			efrags.erase(frag++);
+		} else {
+			++frag;
+		}
+	}
+
 }

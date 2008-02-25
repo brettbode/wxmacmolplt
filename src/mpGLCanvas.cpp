@@ -1305,20 +1305,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 			}
 
 			if (ndrag_events < 3) {
-				//also check that only whole EFPs are selected
-				Frame *lFrame = mMainData->cFrame;
-				long NumAtoms = lFrame->NumAtoms;
-				mpAtom *lAtoms = lFrame->Atoms;
-				for (long i=0; i<NumAtoms; i++) {
-					if (lAtoms[i].IsEffectiveFragment() && lAtoms[i].GetSelectState()) {
-						long fragId = lAtoms[i].GetFragmentNumber();
-						for (long j=0; j<NumAtoms; j++) {
-							if (lAtoms[j].IsEffectiveFragment() &&
-								lAtoms[j].GetFragmentNumber() == fragId)
-								lFrame->SetAtomSelection(j, true);
-						}
-					}
-				}
+				SelectWholeFragments();
 			}
 
 			HandleEditing(event, curr_mouse, prev_mouse);
@@ -1329,6 +1316,31 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	// Otherwise the user must be transforming the whole scene.
 	else {
 		MolWin->Rotate(event);
+	}
+
+}
+
+/**
+ * Selects the remaining unselected atoms belonging to fragments that have at
+ * least one atom already selected.  This function should be called before
+ * performing any operations on whole fragments, like deletion, movement, and
+ * so on.
+ */
+void MpGLCanvas::SelectWholeFragments() {
+
+	//also check that only whole EFPs are selected
+	Frame *lFrame = mMainData->cFrame;
+	long NumAtoms = lFrame->NumAtoms;
+	mpAtom *lAtoms = lFrame->Atoms;
+	for (long i=0; i<NumAtoms; i++) {
+		if (lAtoms[i].IsEffectiveFragment() && lAtoms[i].GetSelectState()) {
+			long fragId = lAtoms[i].GetFragmentNumber();
+			for (long j=0; j<NumAtoms; j++) {
+				if (lAtoms[j].IsEffectiveFragment() &&
+					lAtoms[j].GetFragmentNumber() == fragId)
+					lFrame->SetAtomSelection(j, true);
+			}
+		}
 	}
 
 }
@@ -2668,9 +2680,11 @@ void MpGLCanvas::annoPopupMenu(int x, int y) {
 
 	wxMenu menu;
 	wxMenuItem *item;
+	mpAtom *lAtoms = mMainData->cFrame->Atoms;
 
 	if (MolWin->InEditMode() &&
-		mMainData->Annotations[selected]->getType() != MP_ANNOTATION_MARKER) {
+		mMainData->Annotations[selected]->getType() != MP_ANNOTATION_MARKER &&
+		!mMainData->Annotations[selected]->containsFragment(lAtoms)) {
 		item = menu.AppendCheckItem(GL_Popup_Lock_To_Annotation,
 				                    wxT("Constrain Annotation"));
 		if (selected == mMainData->GetConstrainAnnotation()) {
@@ -2774,6 +2788,7 @@ void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
 
 void MpGLCanvas::SavePrototype(wxCommandEvent& event) {
 
+	SelectWholeFragments();
 	MolWin->menuBuilderSaveStructure(event);
 
 }

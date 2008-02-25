@@ -32,6 +32,7 @@ Added OpenGL version of Draw3D to Surface 6/2001 BMB
 #define kMaxAtomTypes		130
 #define kMaxBondTypes		4
 
+#if 0
 typedef class MoleculeData MoleculeData;
 typedef class WinPrefs WinPrefs;
 typedef class Progress Progress;
@@ -42,6 +43,18 @@ typedef class InputData InputData;
 typedef class Internals Internals;
 typedef class XMLElement XMLElement;
 typedef class MolDisplayWin MolDisplayWin;
+#endif
+class MoleculeData;
+class WinPrefs;
+class Progress;
+struct GaussHermiteData;
+class BasisSet;
+class Frame;
+class InputData;
+class Internals;
+class XMLElement;
+class MolDisplayWin;
+class mpAtom;
 
 /* class Frame; */
 
@@ -89,101 +102,85 @@ enum AnnotationType {
 
 class Annotation {
 public:
-	Annotation(void) {};
-	virtual ~Annotation(void) {};
+	Annotation(unsigned int natoms = 0, long atom1_id = -1, long atom2_id = -1,
+			   long atom3_id = -1, long atom4_id = -1);
+	virtual ~Annotation() {};
 	
-	virtual void draw(const MolDisplayWin * win) const = 0;
-	virtual bool containsAtom(const int atom_id) const {return false;};
-	virtual void adjustIds(const int atom_id, int offset = -1) {};
-	virtual void WriteXML(XMLElement *parent) const = 0;
-	virtual bool ReadXML(XMLElement *p) = 0;
+	virtual bool containsAtom(const int atom_id) const;
+	virtual bool containsFragment(const mpAtom *atom_list) const;
+	virtual void adjustIds(const int atom_id, int offset = -1);
 	virtual bool isEquivalent(const int natoms, const int *new_list) const {
 		return false;
 	}
-	virtual int getAtom(const int index) const = 0;
-	virtual int getType(void) const {return MP_ANNOTATION;}
+	virtual int getAtom(const int index) const;
+	virtual int getType() const;
+
+	// Define these in subclasses.
+	virtual void WriteXML(XMLElement *parent) const = 0;
+	virtual bool ReadXML(XMLElement *p) = 0;
+	virtual void draw(const MolDisplayWin * win) const = 0;
 	virtual float getParam(const Frame& frame) const = 0;
 	virtual void setParam(Frame& frame, float value) = 0;
-private:
+
+protected:
+	long atoms[4];
+	unsigned int natoms;
+	int type;
 };
 
 class AnnotationLength : public Annotation {
 public:
-	AnnotationLength(void);
-	AnnotationLength(const long atom1_id, const long atom2_id);
-	~AnnotationLength(void) {};
+	AnnotationLength(const long atom1_id = -1, const long atom2_id = -1);
+	~AnnotationLength() {};
 	
 	void draw(const MolDisplayWin * win) const;
-	bool containsAtom(const int atom_id) const;
-	void adjustIds(const int atom_id, int offset = -1);
 	bool isEquivalent(const int natoms, const int *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
-	int getAtom(const int index) const;
-	int getType(void) const;
 	float getParam(const Frame& frame) const;
 	void setParam(Frame& frame, float value);
 private:
-	long atoms[2];
 };
 
 class AnnotationMarker : public Annotation {
 public:
-	AnnotationMarker(void);
-	AnnotationMarker(const long atom_id);
-	~AnnotationMarker(void) {};
+	AnnotationMarker(const long atom_id = -1);
+	~AnnotationMarker() {};
 	void draw(const MolDisplayWin * win) const;
-	bool containsAtom(const int atom_id) const;
-	void adjustIds(const int atom_id, int offset = -1);
 	bool isEquivalent(const int natoms, const int *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
-	int getAtom(const int index) const;
-	int getType(void) const;
 	float getParam(const Frame& frame) const;
 	void setParam(Frame& frame, float value);
 private:
-	long atom;
 };
 
 class AnnotationAngle : public Annotation {
 public:
-	AnnotationAngle(void);
-	AnnotationAngle(const long atom1_id, const long atom2_id,
-		const long atom3_id);
-	~AnnotationAngle(void) {};
+	AnnotationAngle(const long atom1_id = -1, const long atom2_id = -1,
+					const long atom3_id = -1);
+	~AnnotationAngle() {};
 	void draw(const MolDisplayWin * win) const;
-	bool containsAtom(const int atom_id) const;
-	void adjustIds(const int atom_id, int offset = -1);
 	bool isEquivalent(const int natoms, const int *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
-	int getAtom(const int index) const;
-	int getType(void) const;
 	float getParam(const Frame& frame) const;
 	void setParam(Frame& frame, float value);
 private:
-	long atoms[3];
 };
 
 class AnnotationDihedral : public Annotation {
 public:
-	AnnotationDihedral(void);
-	AnnotationDihedral(const long atom1_id, const long atom2_id, 
-		const long atom3_id, const long atom4_id);
+	AnnotationDihedral(const long atom1_id = -1, const long atom2_id = -1, 
+					   const long atom3_id = -1, const long atom4_id = -1);
 	~AnnotationDihedral(void) {};
 	void draw(const MolDisplayWin * win) const;
-	bool containsAtom(const int atom_id) const;
-	void adjustIds(const int atom_id, int offset = -1);
 	bool isEquivalent(const int natoms, const int *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
-	int getAtom(const int index) const;
-	int getType(void) const;
 	float getParam(const Frame& frame) const;
 	void setParam(Frame& frame, float value);
 private:
-	long atoms[4];
 };
 
 enum OrbitalGeometry {

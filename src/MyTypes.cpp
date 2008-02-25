@@ -2,24 +2,98 @@
 #include "Frame.h"
 #include <iostream>
 
-AnnotationLength::AnnotationLength(void) : Annotation() {
-	atoms[0] = -1;
-	atoms[1] = -1;
-};
+/* ------------------------------------------------------------------------- */
 
-AnnotationLength::AnnotationLength(const long atom1_id, const long atom2_id) : Annotation() {
+Annotation::Annotation(const unsigned int natoms,
+					   const long atom1_id, const long atom2_id,
+					   const long atom3_id, const long atom4_id)
+	: natoms(natoms) {
+
 	atoms[0] = atom1_id;
 	atoms[1] = atom2_id;
+	atoms[2] = atom3_id;
+	atoms[3] = atom4_id;
+
+	switch (natoms) {
+		case 1:
+			type = MP_ANNOTATION_MARKER;
+			break;
+		case 2:
+			type = MP_ANNOTATION_LENGTH;
+			break;
+		case 3:
+			type = MP_ANNOTATION_ANGLE;
+			break;
+		case 4:
+			type = MP_ANNOTATION_DIHEDRAL;
+			break;
+		default:
+			type = MP_ANNOTATION;
+	}
+
 }
 
-bool AnnotationLength::containsAtom(const int atom_id) const {
-	return ((atoms[0] == atom_id)||(atoms[1] == atom_id));
+/* ------------------------------------------------------------------------- */
+
+bool Annotation::containsAtom(const int atom_id) const {
+
+	unsigned int i;
+	for (i = 0; i < natoms; i++) {
+		if (atoms[i] == atom_id) {
+			return true;
+		}
+	}
+	return false;
+
 }
 
-void AnnotationLength::adjustIds(const int atom_id, int offset) {
-	if (atoms[0] > atom_id) atoms[0] += offset;
-	if (atoms[1] > atom_id) atoms[1] += offset;
+/* ------------------------------------------------------------------------- */
+
+void Annotation::adjustIds(const int atom_id, int offset) {
+
+	unsigned int i;
+	for (i = 0; i < natoms; i++) {
+		if (atoms[i] > atom_id) atoms[i] += offset;
+	}
+
 }
+
+/* ------------------------------------------------------------------------- */
+
+int Annotation::getAtom(const int index) const {
+
+	if (index < 0 || index >= natoms) return -1;
+	return atoms[index];
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+int Annotation::getType() const {
+	return type;
+}
+
+/* ------------------------------------------------------------------------- */
+
+bool Annotation::containsFragment(const mpAtom *atom_list) const {
+
+	unsigned int i;
+	for (i = 0; i < natoms; i++) {
+		if (atom_list[atoms[i]].IsEffectiveFragment()) {
+			return true;
+		}
+	}
+	return false;
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+AnnotationLength::AnnotationLength(const long atom1_id, const long atom2_id)
+	: Annotation(2, atom1_id, atom2_id) {
+}
+
+/* ------------------------------------------------------------------------- */
 
 bool AnnotationLength::isEquivalent(const int natoms, const int *new_list) const {
 	return natoms == 2 &&
@@ -27,14 +101,7 @@ bool AnnotationLength::isEquivalent(const int natoms, const int *new_list) const
 			(new_list[1] == atoms[0] && new_list[0] == atoms[1]));
 }
 
-int AnnotationLength::getAtom(const int index) const {
-	if (index < 0 || index > 1) return -1;
-	return atoms[index];
-}
-
-int AnnotationLength::getType(void) const {
-	return MP_ANNOTATION_LENGTH;
-}
+/* ------------------------------------------------------------------------- */
 
 float AnnotationLength::getParam(const Frame& frame) const {
 
@@ -48,6 +115,8 @@ float AnnotationLength::getParam(const Frame& frame) const {
 
 	return (pt2 - pt1).Magnitude();
 }
+
+/* ------------------------------------------------------------------------- */
 
 void AnnotationLength::setParam(Frame& frame, float value) {
 
@@ -83,66 +152,37 @@ void AnnotationLength::setParam(Frame& frame, float value) {
 
 }
 
-AnnotationMarker::AnnotationMarker(void) : Annotation() {
-	atom = -1;
-};
+/* ------------------------------------------------------------------------- */
 
-AnnotationMarker::AnnotationMarker(const long atom_id) : Annotation() {
-	atom = atom_id;
+AnnotationMarker::AnnotationMarker(const long atom_id)
+	: Annotation(1, atom_id) {
 }
 
-bool AnnotationMarker::containsAtom(const int atom_id) const {
-	return atom == atom_id;
-}
-
-void AnnotationMarker::adjustIds(const int atom_id, int offset) {
-	if (atom > atom_id) {
-		atom += offset;
-	}
-}
+/* ------------------------------------------------------------------------- */
 
 bool AnnotationMarker::isEquivalent(const int natoms, const int *new_list) const {
-	return natoms == 1 && new_list[0] == atom;
+	return natoms == 1 && new_list[0] == atoms[0];
 }
 
-int AnnotationMarker::getAtom(const int index) const {
-	if (index != 0) return -1;
-	return atom;
-}
-
-int AnnotationMarker::getType(void) const {
-	return MP_ANNOTATION_MARKER;
-}
+/* ------------------------------------------------------------------------- */
 
 float AnnotationMarker::getParam(const Frame& frame) const {
 	return 0.0f;
 }
 
+/* ------------------------------------------------------------------------- */
+
 void AnnotationMarker::setParam(Frame& frame, float value) {
 }
 
-AnnotationAngle::AnnotationAngle(void) : Annotation() {
-	atoms[0] = -1;
-	atoms[1] = -1;
-	atoms[2] = -1;
-}
+/* ------------------------------------------------------------------------- */
 
 AnnotationAngle::AnnotationAngle(const long atom1_id, const long atom2_id,
-	const long atom3_id) : Annotation() { 
-	atoms[0] = atom1_id;
-	atoms[1] = atom2_id;
-	atoms[2] = atom3_id;
-}
-	
-bool AnnotationAngle::containsAtom(const int atom_id) const {
-	return ((atoms[0] == atom_id)||(atoms[1] == atom_id)||(atoms[2] == atom_id));
+								 const long atom3_id)
+	: Annotation(3, atom1_id, atom2_id, atom3_id) { 
 }
 
-void AnnotationAngle::adjustIds(const int atom_id, int offset) {
-	if (atoms[0] > atom_id) atoms[0] += offset;
-	if (atoms[1] > atom_id) atoms[1] += offset;
-	if (atoms[2] > atom_id) atoms[2] += offset;
-}
+/* --------------------------------------------------------------------- */
 
 bool AnnotationAngle::isEquivalent(const int natoms, const int *new_list) const {
 	return natoms == 3 && new_list[1] == atoms[1] &&
@@ -150,14 +190,7 @@ bool AnnotationAngle::isEquivalent(const int natoms, const int *new_list) const 
 			(new_list[2] == atoms[0] && new_list[0] == atoms[2]));
 }
 
-int AnnotationAngle::getAtom(const int index) const {
-	if (index < 0 || index > 2) return -1;
-	return atoms[index];
-}
-
-int AnnotationAngle::getType(void) const {
-	return MP_ANNOTATION_ANGLE;
-}
+/* ------------------------------------------------------------------------- */
 
 float AnnotationAngle::getParam(const Frame& frame) const {
 
@@ -190,6 +223,8 @@ float AnnotationAngle::getParam(const Frame& frame) const {
 	return angle * 180.0f / kPi;
 
 }
+
+/* ------------------------------------------------------------------------- */
 
 void AnnotationAngle::setParam(Frame& frame, float value) {
 
@@ -260,34 +295,16 @@ void AnnotationAngle::setParam(Frame& frame, float value) {
 
 }
 
-AnnotationDihedral::AnnotationDihedral(void) : Annotation() {
-	atoms[0] = -1;
-	atoms[1] = -1;
-	atoms[2] = -1;
-	atoms[3] = -1;
+/* ------------------------------------------------------------------------- */
+
+AnnotationDihedral::AnnotationDihedral(const long atom1_id,
+									   const long atom2_id,
+									   const long atom3_id,
+									   const long atom4_id)
+	: Annotation(4, atom1_id, atom2_id, atom3_id, atom4_id) { 
 }
 
-AnnotationDihedral::AnnotationDihedral(const long atom1_id, const long atom2_id, 
-	const long atom3_id, const long atom4_id) : Annotation() { 
-	atoms[0] = atom1_id;
-	atoms[1] = atom2_id;
-	atoms[2] = atom3_id;
-	atoms[3] = atom4_id;
-}
-
-bool AnnotationDihedral::containsAtom(const int atom_id) const {
-	return (atoms[0] == atom_id ||
-			atoms[1] == atom_id || 
-			atoms[2] == atom_id ||
-			atoms[3] == atom_id);
-}
-
-void AnnotationDihedral::adjustIds(const int atom_id, int offset) {
-	if (atoms[0] > atom_id) atoms[0] += offset;
-	if (atoms[1] > atom_id) atoms[1] += offset;
-	if (atoms[2] > atom_id) atoms[2] += offset;
-	if (atoms[3] > atom_id) atoms[3] += offset;
-}
+/* ------------------------------------------------------------------------- */
 
 bool AnnotationDihedral::isEquivalent(const int natoms, const int *new_list) const {
 	return natoms == 4 &&
@@ -297,14 +314,7 @@ bool AnnotationDihedral::isEquivalent(const int natoms, const int *new_list) con
 			 (new_list[3] == atoms[0] && new_list[0] == atoms[3]));
 }
 
-int AnnotationDihedral::getAtom(const int index) const {
-	if (index < 0 || index > 3) return -1;
-	return atoms[index];
-}
-
-int AnnotationDihedral::getType(void) const {
-	return MP_ANNOTATION_DIHEDRAL;
-}
+/* ------------------------------------------------------------------------- */
 
 float AnnotationDihedral::getParam(const Frame& frame) const {
 
@@ -355,6 +365,8 @@ float AnnotationDihedral::getParam(const Frame& frame) const {
 	return acos(dot) * 180.0f / kPi;
 
 }
+
+/* ------------------------------------------------------------------------- */
 
 void AnnotationDihedral::setParam(Frame& frame, float value) {
 
