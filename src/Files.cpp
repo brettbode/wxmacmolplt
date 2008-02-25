@@ -1261,7 +1261,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				int lineBytes = strlen(Line);
 				bytesRead = 0;
 				while (bytesRead < lineBytes) {
-					scanCount = sscanf(&(Line[bytesRead]), "%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
+					scanCount = sscanf(&(Line[bytesRead]), 
+								"%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
 					if (scanCount == 3) { 
 						bytesRead+=bytesConsumed;
 						nShells++;
@@ -1281,11 +1282,14 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		int shellsPeriAtom = 0;
 		// Reiterate through section and fill in BasisSet information
 		bool error  = false;
+		
+		printf("\nAtom# (iAtom): %ld\n", iAtom);				//DEBUG CODE
+		
 		while (iShell < nShells && iAtom < nAtoms && !error) {
 			Buffer->GetLine(Line);
 			scanCount = sscanf(Line, "%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
 			if (scanCount == 3) {
-			printf("Line Read: nfunc: %ld\tIType: %s\tSc: %f\n", nFunc, IType, Sc);				//DEBUG CODE
+			printf("Line Read: nfunc: %ld\tIType: %s\tSc: %f\n", nFunc, IType, Sc);		//DEBUG CODE
 				//Create this BasisShell
 				MainData->Basis->Shells.push_back(BasisShell());	
 				if (toupper(IType[0]) == 'S' && toupper(IType[1]) == 'P') {
@@ -1336,9 +1340,9 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						break;
 					}
 					scanCount = sscanf(Line, "%f %f %f", &(tmpFloat[0]),&(tmpFloat[1]),&(tmpFloat[2]));
-					if (scanCount==2 || scanCount==3)							//DEBUG CODE
-							printf("floats read (%d): %f\t%f\t%f\n", 
-								scanCount, tmpFloat[0], tmpFloat[1], tmpFloat[2]);	//DEBUG CODE
+//					if (scanCount==2 || scanCount==3)							//DEBUG CODE
+//							printf("floats read (%d): %f\t%f\t%f\n", 
+//								scanCount, tmpFloat[0], tmpFloat[1], tmpFloat[2]);	//DEBUG CODE
 					// non-SP (L) case: one exponent, one coef per line
 					if (scanCount==2 && MainData->Basis->Shells[iShell].ShellType!=LShell) {
 						MainData->Basis->Shells[iShell].Exponent.push_back(tmpFloat[0]);
@@ -1346,7 +1350,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						MainData->Basis->Shells[iShell].NumPrims++;
 						printf("pushing %f as exp, %f as coef\n", 
 								tmpFloat[0], tmpFloat[1]);//DEBUG CODE
-						printf("Basis->Shells[%ld].NumPrims is now: %d\n", 
+						printf("Basis->Shells[%ld].NumPrims is now %d\n", 
 								iShell, MainData->Basis->Shells[iShell].NumPrims);//DEBUG CODE
 					}
 					// SP (L) case: one exp, two coeff's per line
@@ -1357,7 +1361,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						MainData->Basis->Shells[iShell].NumPrims++;
 						printf("pushing %f as exp, %f as coef, %f as coef\n", 
 								tmpFloat[0], tmpFloat[1], tmpFloat[2]);	//DEBUG CODE
-						printf("Basis->Shells[%ld].NumPrims is now: %d\n", 
+						printf("Basis->Shells[%ld].NumPrims is now %d\n", 
 								iShell, MainData->Basis->Shells[iShell].NumPrims);//DEBUG CODE
 					} 
 					else if (1==sscanf(Line, "%s%n", &tmpStr, &bytesConsumed)) {
@@ -1370,9 +1374,9 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 										(long)(lFrame->GetAtomType(iAtom)),iAtom);	//DEBUGCODE 
 								// add ending shell of this atom to BasisMap
 								MainData->Basis->BasisMap[2*iAtom+1]=iShell;
-								printf("pushing %d as end of atom %d onto BasisMap\n",iShell,iAtom);//DEBUG CODE
+								printf("Basis->BasisMap[ushing %d as end of atom %d onto BasisMap\n",iShell,iAtom);//DEBUG CODE
 								iAtom++;
-								printf("iAtom is now: %ld\n", iAtom);								//DEBUG CODE
+								printf("\nAtom# (iAtom): %ld\n", iAtom);				//DEBUG CODE
 								shellsPeriAtom = -1;	// reset for next atom;
 								stopReadingShell = true;
 								break;
@@ -1384,7 +1388,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				}
 				iShell++;
 				shellsPeriAtom++;
-				printf("iShell is now: %ld\n\n", iShell);					//DEBUG CODE
+				printf("iShell is now %ld\n\n", iShell);					//DEBUG CODE
 			} else {
 				error = true;
 				break;
