@@ -26,5 +26,6 @@ EXTRA_DIST = wxMacMolPlt.kdevelop LICENSE  \
     wxMacMolPlt.xcodeproj/project.pbxproj \
     debian/changelog debian/compat debian/control debian/copyright \
     debian/dirs debian/docs debian/menu debian/rules \
+    resources/wxmacmolplt.png resources/wxmacmolplt.desktop \
     resources/fonts/COPYRIGHT.BITSTREAM
 

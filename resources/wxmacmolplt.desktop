@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=0.9.4
+Encoding=UTF-8
+Name=wxMacMolPlt
+GenericName=Molecular modelling program
+Comment=Visualizes models of molecules
+Exec=wxmacmolplt
+Icon=wxmacmolplt
+Terminal=false
+Type=Application
+Categories=Science;Chemistry;GTK;

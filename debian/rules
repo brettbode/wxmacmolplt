@@ -65,6 +65,8 @@ install: build
 	dh_installdirs
 
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/wxmacmolplt
+	install -D -m644 resources/wxmacmolplt.desktop $(CURDIR)/debian/wxmacmolplt/usr/share/applications/wxmacmolplt.desktop
+	install -D -m664 resources/wxmacmolplt.png $(CURDIR)/debian/wxmacmolplt/usr/share/pixmaps/wxmacmolplt.png
 
 
 binary-indep: build install
@@ -76,7 +78,7 @@ binary-arch: build install
 	dh_installdocs
 	dh_installexamples
 #	dh_install
-#	dh_installmenu
+	dh_installmenu
 #	dh_installdebconf	
 #	dh_installlogrotate
 #	dh_installemacsen
