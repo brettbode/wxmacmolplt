@@ -82,7 +82,8 @@ long ReadBooleanKeyword(const char * Line, const char * Keyword, bool * Value) {
 		Pos = sscanf(&(Line[Pos]), "%s", token);
 		if (Pos == 1) {
 			*Value = false;
-			if ((token[0] == 't')||(token[1] == 't')) *Value = true;
+			if (! strcasecmp(token, ".t.") ||
+				! strcasecmp(token, ".true.")) *Value = true;
 		}
 	}
 	return (Pos == 1);
