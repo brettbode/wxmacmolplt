@@ -645,6 +645,18 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				MainData->InputOptions->SCF->SetDirectSCF(BoolTest);
 			if (ReadBooleanKeyword(Line, "FDIFF", &BoolTest))
 				MainData->InputOptions->SCF->SetFockDiff(BoolTest);
+			if (ReadBooleanKeyword(Line, "EXTRAP", &BoolTest))
+				MainData->InputOptions->SCF->SetExtrapolation(BoolTest);
+			if (ReadBooleanKeyword(Line, "DAMP", &BoolTest))
+				MainData->InputOptions->SCF->SetDamp(BoolTest);
+			if (ReadBooleanKeyword(Line, "SHIFT", &BoolTest))
+				MainData->InputOptions->SCF->SetShift(BoolTest);
+			if (ReadBooleanKeyword(Line, "RSTRCT", &BoolTest))
+				MainData->InputOptions->SCF->SetRestriction(BoolTest);
+			if (ReadBooleanKeyword(Line, "DIIS", &BoolTest))
+				MainData->InputOptions->SCF->SetDIIS(BoolTest);
+			if (ReadBooleanKeyword(Line, "DEM", &BoolTest))
+				MainData->InputOptions->SCF->SetDEM(BoolTest);
 			if (ReadLongKeyword(Line, "NCONV", &nAtoms))
 				MainData->InputOptions->SCF->SetConvergance(nAtoms);
 			if (ReadBooleanKeyword(Line, "UHFNOS", &BoolTest))

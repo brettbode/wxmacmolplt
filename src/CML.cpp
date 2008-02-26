@@ -3459,6 +3459,20 @@ const char * CML_convert(MMP_IOSCFGroupNS t)
             return "UHFNaturalOrbitals";
 		case MMP_IOSGConvCriteria:
 			return "ConverganceCriteria";
+		case MMP_IOSGExtrap:
+			return "Extrap";
+		case MMP_IOSGDamp:
+			return "Damp";
+		case MMP_IOSGShift:
+			return "Shift";
+		case MMP_IOSGRestriction:
+			return "Restrict";
+		case MMP_IOSGDIIS:
+			return "DIIS";
+		case MMP_IOSGSOSCF:
+			return "SOSCF";
+		case MMP_IOSGDEM:
+			return "DEM";
 		default:
             return "invalid";
     }

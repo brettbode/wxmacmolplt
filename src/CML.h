@@ -371,6 +371,13 @@ enum MMP_IOSCFGroupNS {
 	MMP_IOSGFockDiff,
 	MMP_IOSGUHFNauralOrbitals,
 	MMP_IOSGConvCriteria,
+	MMP_IOSGExtrap,
+	MMP_IOSGDamp,
+	MMP_IOSGShift,
+	MMP_IOSGRestriction,
+	MMP_IOSGDIIS,
+	MMP_IOSGSOSCF,
+	MMP_IOSGDEM,
 	
 	NumberMMPIOSCFGroupItems
 };

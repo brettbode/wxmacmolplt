@@ -2452,7 +2452,15 @@ void SCFGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	if (ConvCriteria > 0) {
 		sprintf(Out, "NCONV=%d ", ConvCriteria);
 		File->WriteLine(Out, false);
-	}	//UHF Natural Orbitals
+	}
+	if (GetDIIS()) File->WriteLine("DIIS=.T.", false);
+	if (GetSOSCF()) File->WriteLine("SOSCF=.T.", false);
+	if (GetExtrapolation()) File->WriteLine("EXTRAP=.T.", false);
+	if (GetDamp()) File->WriteLine("DAMP=.T.", false);
+	if (GetShift()) File->WriteLine("SHIFT=.T.", false);
+	if (GetRestriction()) File->WriteLine("RSTRCT=.T.", false);
+	if (GetDEM()) File->WriteLine("DEM=.T.", false);
+		//UHF Natural Orbitals
 	if (GetUHFNO()) {
 		sprintf(Out, "UHFNOS=.TRUE. ");
 		File->WriteLine(Out, false);
@@ -2470,6 +2478,13 @@ void SCFGroup::WriteXML(XMLElement * parent) const {
 	if (GetDirectSCF()) Ele->addChildElement(CML_convert(MMP_IOSGDirectSCF), trueXML);
 	if (GetFockDiff()) Ele->addChildElement(CML_convert(MMP_IOSGFockDiff), trueXML);
 	if (GetUHFNO()) Ele->addChildElement(CML_convert(MMP_IOSGUHFNauralOrbitals), trueXML);
+	if (GetExtrapolation()) Ele->addChildElement(CML_convert(MMP_IOSGExtrap), trueXML);
+	if (GetDamp()) Ele->addChildElement(CML_convert(MMP_IOSGDamp), trueXML);
+	if (GetShift()) Ele->addChildElement(CML_convert(MMP_IOSGShift), trueXML);
+	if (GetRestriction()) Ele->addChildElement(CML_convert(MMP_IOSGRestriction), trueXML);
+	if (GetDIIS()) Ele->addChildElement(CML_convert(MMP_IOSGDIIS), trueXML);
+	if (GetSOSCF()) Ele->addChildElement(CML_convert(MMP_IOSGSOSCF), trueXML);
+	if (GetDEM()) Ele->addChildElement(CML_convert(MMP_IOSGDEM), trueXML);
 }
 void SCFGroup::ReadXML(XMLElement * parent) {
 	XMLElementList * children = parent->getChildren();
@@ -2499,6 +2514,34 @@ void SCFGroup::ReadXML(XMLElement * parent) {
 					case MMP_IOSGUHFNauralOrbitals:
 						if (child->getBoolValue(tb))
 							SetUHFNO(tb);
+						break;
+					case MMP_IOSGExtrap:
+						if (child->getBoolValue(tb))
+							SetExtrapolation(tb);
+						break;
+					case MMP_IOSGDamp:
+						if (child->getBoolValue(tb))
+							SetDamp(tb);
+						break;
+					case MMP_IOSGShift:
+						if (child->getBoolValue(tb))
+							SetShift(tb);
+						break;
+					case MMP_IOSGRestriction:
+						if (child->getBoolValue(tb))
+							SetRestriction(tb);
+						break;
+					case MMP_IOSGDIIS:
+						if (child->getBoolValue(tb))
+							SetDIIS(tb);
+						break;
+					case MMP_IOSGSOSCF:
+						if (child->getBoolValue(tb))
+							SetSOSCF(tb);
+						break;
+					case MMP_IOSGDEM:
+						if (child->getBoolValue(tb))
+							SetDEM(tb);
 						break;
 				}
 			}
