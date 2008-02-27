@@ -1900,7 +1900,7 @@ short DataGroup::SetPointGroupOrder(short NewOrder) {
 	return PGroupOrder;
 }
 short DataGroup::SetTitle(const char *NewTitle, long length) {
-	if (Title) delete Title;
+	if (Title) delete[] Title;
 	Title = NULL;
 
 	if (length == -1) length = strlen(NewTitle);

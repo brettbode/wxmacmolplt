@@ -607,6 +607,8 @@ void EFrag::ParseText() {
 		}
 	} while (atomic_number);
 
+	delete[] buf_input;
+
 }
 
 /* ------------------------------------------------------------------------- */

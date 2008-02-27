@@ -60,6 +60,7 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin *parent, wxWindowID id,
 	select_stack_top = 0;
 	ignore_next_up = false;
 	is_lassoing = false;
+	did_edit = false;
 	
 	selected = -1;
 	selected_type = MMP_NULL;
@@ -143,7 +144,7 @@ void MpGLCanvas::initGL(void) {
 		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 		glEnable(GL_COLOR_MATERIAL);
 		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+		/* glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); */
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
 
 		// We make a texture of arrowheads for the annotations. The arrowheads
@@ -1332,6 +1333,8 @@ void MpGLCanvas::SelectWholeFragments() {
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
+	select_stack_top = 5;
+
 	for (long i=0; i<NumAtoms; i++) {
 		if (lAtoms[i].IsEffectiveFragment() && lAtoms[i].GetSelectState()) {
 			long fragId = lAtoms[i].GetFragmentNumber();
@@ -2337,10 +2340,9 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 
 	wxMenu menu;
 	wxMenuItem *item;
-	wxMenu *submenu;
+	wxMenu *submenu = NULL;
 	Frame *lFrame = mMainData->cFrame;
 	int bond_order;
-	submenu = new wxMenu();
 	wxString length_label;
 
 	if (isAtom) {
@@ -2362,6 +2364,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 				menu.Append(GL_Popup_Change_Atom, label);
 			}
 
+			submenu = new wxMenu;
 			short cNum = lFrame->Atoms[selected].GetCoordinationNumber();
 			item = submenu->AppendRadioItem(GL_Popup_To_Coordination_Zero, wxT("0"));
 			if (cNum == 0) item->Check(true);
@@ -2380,7 +2383,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 			menu.Append(GL_Popup_Change_Coord_Num, _("Change coordination #"), submenu);
 
 			short LPNum = lFrame->Atoms[selected].GetLonePairCount();
-			submenu = new wxMenu();
+			submenu = new wxMenu;
 			item = submenu->AppendRadioItem(GL_Popup_To_LPCount_Zero, wxT("0"));
 			if (LPNum == 0) item->Check(true);
 			item = submenu->AppendRadioItem(GL_Popup_To_LPCount_One, wxT("1"));
@@ -2407,7 +2410,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 			menu.Append(GL_Popup_Change_EFP_To_AllElec, wxT("Convert EFP to ab initio atoms"));
 		}
 
-		if (lFrame->GetNumAtomsSelected() == 3) {
+		if (select_stack_top == 3) {
 			item = menu.Append(GL_Popup_Add_Plane_Normal, wxT("Add plane normal"));
 		}
 
@@ -2418,6 +2421,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 	// If a bond is clicked on, we show some bond specific items, like
 	// the length of the bond and the order.
 	else  {
+		submenu = new wxMenu;
 		length_label.Printf(wxT("Bond length: %f"),
 			lFrame->GetBondLength(selected));
 		item = menu.Append(wxID_ANY, length_label);

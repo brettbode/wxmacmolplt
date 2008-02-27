@@ -18,7 +18,7 @@ class wxUglyChoice : public wxPanel {
 
     wxTextCtrl         *m_txt;
     wxBitmapButton     *m_btn;
-    wxMenu             *m_menu;
+    wxMenu             m_menu;
 
 
     DECLARE_DYNAMIC_CLASS(wxUglyChoice)

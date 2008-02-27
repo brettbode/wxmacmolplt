@@ -85,7 +85,7 @@ OpenGLRec::OpenGLRec(void) {
 	transpSortVertex = NULL;
 	transpIndex = NULL;
 	triangleCount = 0;
-	/* sphere_list = 0; */
+	sphere_list = 0;
 	
 	MainListActive = false;
 	SurfaceListActive = false;

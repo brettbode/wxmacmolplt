@@ -40,8 +40,6 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
             wxEVT_COMMAND_BUTTON_CLICKED,
             wxCommandEventHandler(wxUglyChoice::onButtonClick));
 
-    m_menu = new wxMenu();
-
     item.clear();
     selection = -1;
 
@@ -94,8 +92,6 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
             wxEVT_COMMAND_BUTTON_CLICKED,
             wxCommandEventHandler(wxUglyChoice::onButtonClick));
 	
-    m_menu = new wxMenu();
-	
     item.clear();
     selection = -1;
 	
@@ -116,6 +112,7 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
 }
 
 wxUglyChoice::~wxUglyChoice() {
+
 }
 
 int wxUglyChoice::Append(const wxString &item) {
@@ -123,9 +120,9 @@ int wxUglyChoice::Append(const wxString &item) {
 
     if(!item.IsEmpty()) {
 #if 0 //wxHAS_RADIO_MENU_ITEMS
-        mi = m_menu->AppendRadioItem(wxID_ANY, item);
+        mi = m_menu.AppendRadioItem(wxID_ANY, item);
 #else
-        mi = m_menu->Append(wxID_ANY, item);
+        mi = m_menu.Append(wxID_ANY, item);
 #endif
         this->item.push_back(mi->GetId());
 
@@ -134,7 +131,7 @@ int wxUglyChoice::Append(const wxString &item) {
                 wxCommandEventHandler(wxUglyChoice::onMenuSelect));
     }
     else {
-        m_menu->AppendSeparator();
+        m_menu.AppendSeparator();
     }
             
     // TODO:  Return valid value
@@ -146,9 +143,9 @@ int wxUglyChoice::Insert(const wxString &item, int pos) {
 
     if(!item.IsEmpty()) {
 #if 0 //wxHAS_RADIO_MENU_ITEMS
-        mi = m_menu->InsertRadioItem(pos, wxID_ANY, item);
+        mi = m_menu.InsertRadioItem(pos, wxID_ANY, item);
 #else
-        mi = m_menu->Insert(pos, wxID_ANY, item);
+        mi = m_menu.Insert(pos, wxID_ANY, item);
 #endif
         this->item.insert(this->item.begin() + pos, mi->GetId());
 
@@ -157,7 +154,7 @@ int wxUglyChoice::Insert(const wxString &item, int pos) {
                 wxCommandEventHandler(wxUglyChoice::onMenuSelect));
     }
     else {
-        m_menu->InsertSeparator(pos);
+        m_menu.InsertSeparator(pos);
     }
             
     // TODO:  Return valid value
@@ -165,7 +162,7 @@ int wxUglyChoice::Insert(const wxString &item, int pos) {
 }
 
 void wxUglyChoice::Delete(int n) {
-    m_menu->Destroy(item[n]);
+    m_menu.Destroy(item[n]);
     Disconnect(item[n],
                wxEVT_COMMAND_MENU_SELECTED,
                wxCommandEventHandler(wxUglyChoice::onMenuSelect));
@@ -176,7 +173,7 @@ void wxUglyChoice::Clear() {
     vector< int >::iterator i;
 
     for(i = item.begin(); i != item.end(); ++i) {
-        m_menu->Destroy(*i);
+        m_menu.Destroy(*i);
         Disconnect(*i,
                    wxEVT_COMMAND_MENU_SELECTED,
                    wxCommandEventHandler(wxUglyChoice::onMenuSelect));
@@ -198,19 +195,19 @@ void wxUglyChoice::SetToolTip(const wxString& tip) {
 }
 
 void wxUglyChoice::SetEnabled(int n, bool enabled) {
-    m_menu->Enable(item[n], enabled);
+    m_menu.Enable(item[n], enabled);
 }
 
 bool wxUglyChoice::GetEnabled(int n) const {
-    return m_menu->IsEnabled(item[n]);
+    return m_menu.IsEnabled(item[n]);
 }
 
 bool wxUglyChoice::SetSelection(int n) {
 	if ((n<0)||(n>item.size())) return false;
     selection = n;
-    m_txt->SetValue(m_menu->GetLabel(item[selection]));
+    m_txt->SetValue(m_menu.GetLabel(item[selection]));
 #if 0 //wxHAS_RADIO_MENU_ITEMS
-    m_menu->Check(item[selection], true);
+    m_menu.Check(item[selection], true);
 #endif
 
     return true;
@@ -218,7 +215,7 @@ bool wxUglyChoice::SetSelection(int n) {
 
 bool wxUglyChoice::SetStringSelection(const wxString &string) {
     int id = 0;
-    if((id = m_menu->FindItem(string)) == wxNOT_FOUND) {
+    if((id = m_menu.FindItem(string)) == wxNOT_FOUND) {
         return false;
     }
     for(int i = 0; i < item.size(); ++i) {
@@ -233,15 +230,15 @@ int wxUglyChoice::GetSelection() const {
 }
 
 wxString wxUglyChoice::GetString(int n) const {
-    return m_menu->GetLabel(item[n]);
+    return m_menu.GetLabel(item[n]);
 }
 
 wxString wxUglyChoice::GetStringSelection() const {
-    return m_menu->GetLabel(item[selection]);
+    return m_menu.GetLabel(item[selection]);
 }
 
 void wxUglyChoice::onButtonClick(wxCommandEvent &event) {
-    PopupMenu(m_menu);
+    PopupMenu(&m_menu);
 }
 
 void wxUglyChoice::onMenuSelect(wxCommandEvent &event) {
