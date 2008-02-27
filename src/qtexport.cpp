@@ -269,6 +269,15 @@ int QTExport::GetKeyFrameRate(void) const {
 #include <wx/mac/carbon/private.h>
 #include <QuickTime/Movies.h>
 
+#if wxCHECK_VERSION(2, 9, 0)
+//This is a gross hack to get access to the picHandle in the wxBitmapRefData class
+//that is no longer provided in the wx headers
+class wxBitmapRefData {
+public:
+	PicHandle     GetPictHandle();
+};
+#endif
+
 typedef struct qtData {
 	Media theMedia;
 	ImageDescriptionHandle imageDesc;

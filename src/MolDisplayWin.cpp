@@ -1520,6 +1520,15 @@ OSErr	SaveCustomIcon( const wxString & filename, IconFamilyHandle icnsH );
 //	and finally saving the custom icon to disk.
 //  I am utilizing a private interface to internal data for the wxBitmap class so
 //  be warned that this could break in the future!
+
+#if wxCHECK_VERSION(2, 9, 0)
+//This is a gross hack to get access to the picHandle in the wxBitmapRefData class
+//that is no longer provided in the wx headers
+class wxBitmapRefData {
+public:
+	PicHandle     GetPictHandle();
+};
+#endif
 bool MolDisplayWin::CreateCustomFileIcon( const wxString & filePath ) {
 	bool result = false;
 	
