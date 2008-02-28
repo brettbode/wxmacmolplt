@@ -3532,7 +3532,7 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 	long NumAtoms = lFrame->NumAtoms;
 	long NumExpectedAtoms = NumAtoms;
 	if (MainData->InputOptions->Control->GetSCFType()==GAMESS_UHF) NumBetaUHFOrbs = NumOccBeta;	//Only seperate Beta spin orbs for UHF wavefunctions
-	char * NextPointKeyword = new char[30];
+	char NextPointKeyword[30];
 	strcpy(NextPointKeyword, "* NEXT POINT ON IRC FOUND *");
 	bool KeyWordFound = Buffer->LocateKeyWord(NextPointKeyword, 27);
 	if (!KeyWordFound) {	//search for the alternative keyword needed for pace=linear IRC's

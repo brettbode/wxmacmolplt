@@ -106,8 +106,8 @@ Frame::~Frame(void) {
 	if (NextFrame) {
 		if (PreviousFrame) {
 			PreviousFrame->SetNextFrame(NextFrame);
-			NextFrame->SetPreviousFrame(PreviousFrame);
 		}
+		NextFrame->SetPreviousFrame(PreviousFrame);
 	} else if (PreviousFrame) {
 		PreviousFrame->SetNextFrame(NULL);
 	}
@@ -122,9 +122,13 @@ void Frame::DeleteOrbitals(void) {
 		Orbs.clear();
 	}
 }
+
 void Frame::SetNextFrame(Frame * next) { NextFrame = next; }
+
 void Frame::SetPreviousFrame(Frame * previous) { PreviousFrame = previous; }
+
 Frame * Frame::GetNextFrame(void) { return NextFrame; }
+
 Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
 
 mpAtom *Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition,

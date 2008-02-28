@@ -239,7 +239,7 @@ class mpAtom {
 			return *this;
 		}
 
-		inline short GetCoordinationNumber(void) const {return coordinationNumber;};
+		inline short GetCoordinationNumber() const {return coordinationNumber;};
 		inline short SetCoordinationNumber(short new_num) {return (coordinationNumber = new_num);};
 		inline short SetLonePairCount(short new_num) {return (LPCount = new_num);};
 		inline short GetLonePairCount(void) const {return LPCount;};

@@ -16,7 +16,8 @@ PreviewCanvas::PreviewCanvas(
 	int *attributes, const wxPoint& position, const wxSize& size,
 	long style, const wxString& name)
 	: wxGLCanvas(parent, id, position, size, style, name, attributes),
-	  centroid(0, 0, 0) {
+	  centroid(0, 0, 0),
+	  quadric(NULL) {
 
 	InitRotationMatrix(global_rotation);
 	struc = NULL;
@@ -32,8 +33,10 @@ PreviewCanvas::PreviewCanvas(
 
 PreviewCanvas::~PreviewCanvas() {
 
-	gluDeleteQuadric(quadric);
-	quadric = NULL;
+	if (quadric) {
+		gluDeleteQuadric(quadric);
+		quadric = NULL;
+	}
 
 }
 

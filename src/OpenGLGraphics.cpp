@@ -1394,6 +1394,11 @@ void MolDisplayWin::AddAxisGL(void) {
 		anno_color[0] = anno_color[1] = anno_color[2] = 1.0f;
 	}
 	glColor3f(anno_color[0], anno_color[1], anno_color[2]);
+	float plane_emissive[] = { 0.0, 0.0, 0.0, 1.0 };
+	float plane_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
 	long Quality = (long)(Prefs->GetQD3DAtomQuality());
 	float VectorWidth = 0.02;
 
@@ -2467,9 +2472,9 @@ void DashedQuadFromLine(const CPoint3D& pt1,
 		glVertex3f(new_pt1a.x, new_pt1a.y, new_pt1a.z);
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex3f(new_pt1b.x, new_pt1b.y, new_pt1b.z);
-		glTexCoord2f(len / 0.1f, 0.0f);
+		glTexCoord2f(len / (5.0f * width), 0.0f);
 		glVertex3f(new_pt2b.x, new_pt2b.y, new_pt2b.z);
-		glTexCoord2f(len / 0.1f, 1.0f);
+		glTexCoord2f(len / (5.0f * width), 1.0f);
 		glVertex3f(new_pt2a.x, new_pt2a.y, new_pt2a.z);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
@@ -2879,16 +2884,15 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 	y_eye[1] = m[5];
 	y_eye[2] = m[9];
 
+	GLdouble BondSize = Prefs->GetQD3DBondWidth();
+	CPoint3D origin(0.0f, 0.0f, 0.0f);
+
 	// How long should each dash be, and how often do we want them?
-	chord_len = 0.1f;
-	delta = acos((2 * min_len * min_len - chord_len * chord_len) /
-				 (2 * min_len * min_len));
+	chord_len = BondSize * 0.25f * 10.0f;
+	delta = angle / (min_len * angle / chord_len);
 
 	float ca = cos(angle);
 	float sa = sin(angle);
-
-	GLdouble BondSize = Prefs->GetQD3DBondWidth();
-	CPoint3D origin(0.0f, 0.0f, 0.0f);
 
 	// First we draw the dashes along each side.
 	DashedQuadFromLine(origin, CPoint3D(min_len, 0.0f, 0.0f),
@@ -3100,6 +3104,8 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	Bond *lBonds = lFrame->Bonds;
 	long NumBonds = lFrame->NumBonds;
 	
+	std::cout << "iatom: " << iatom << std::endl;
+	std::cout << "lFrame->NumAtoms: " << lFrame->NumAtoms << std::endl;
 	short coordination = lAtoms[iatom].GetCoordinationNumber();
 	std::vector<Bond *> bonds;
 	int bonded_atoms[6];
