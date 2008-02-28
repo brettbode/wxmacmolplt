@@ -1277,22 +1277,18 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		// shells counted, so we can create the BasisSet
 		MainData->Basis = new BasisSet(nAtoms, nShells);
 		Buffer->BackupnLines(linesInSection-1);
-		printf("We've got %ld atoms and %ld shells to deal with.\n", nAtoms, nShells); // DEBUG CODE
 		int iShell = 0, iAtom = 0, shellsPeriAtom = 0;
 		bool error = false;
 		// reiterate through Basis section to get and save BasisSet data
 		while (iShell < nShells && iAtom < nAtoms && !error) {
-			printf("\niAtom is: %ld\niShell is now %ld\n", iAtom, iShell);		//DEBUG CODE
 			Buffer->GetLine(Line);
 			// we will only use IType Line read
 			scanCount = sscanf(Line, "%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
 			if (3==scanCount) {
-				printf("Line Read: nfunc: %ld\tIType: %s\tSc: %f\n", nFunc, IType, Sc);		//DEBUG CODE
 				// create this BasisShell
 				MainData->Basis->Shells.push_back(BasisShell());	
 				// increment the shell count in the BasisSet
 				MainData->Basis->NumShells++; 
-				printf("Basis->NumShells is now %ld\n", MainData->Basis->NumShells);	//DEBUG CODE
 				// cast "SP" to L for simplicity
 				if ('S'==toupper(IType[0]) && 'P'==toupper(IType[1])) {
 					IType[0] = 'L';
@@ -1315,16 +1311,11 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						MainData->Basis->Shells[iShell].ShellType = FShell;
 						break;
 				}
-				printf("Basis->Shells[%ld].ShellType is %d\n", 
-						iShell, MainData->Basis->Shells[iShell].ShellType);	//DEBUG CODE
 				// add first shell of this atom to BasisMap and save NuclearCharge
 				if (0==shellsPeriAtom) {
 					MainData->Basis->BasisMap[2*iAtom]=iShell;
-					printf("Basis->BasisMap[%d] is %d\n", 2*iAtom, iShell); //DEBUG CODE
 					// maybe need to ensure lframe points to correct frame?
 					MainData->Basis->NuclearCharge[iAtom] = (long)(lFrame->GetAtomType(iAtom));
-					printf("Basis->NuclearCharge[%d] = %d\n", 
-							iAtom, MainData->Basis->NuclearCharge[iAtom]); //DEBUG CODE
 				}
 				// (currently not doing anything with nFunc or Sc read in)
 				// read in functions for this shell
@@ -1342,34 +1333,22 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					if (2==scanCount && LShell!=MainData->Basis->Shells[iShell].ShellType) {
 						MainData->Basis->NumFuncs++;
 						MainData->Basis->Shells[iShell].NumPrims++;
-						printf("Basis->NumFuncs is now %ld\n", MainData->Basis->NumFuncs); //DEBUG CODE
-						printf("Basis->Shells[%ld].NumPrims is now %d\n", 
-								iShell, MainData->Basis->Shells[iShell].NumPrims); //DEBUG CODE
 						MainData->Basis->Shells[iShell].Exponent.push_back(tmpFloat[0]);
 						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[1]);
-						printf("pushing %f as exp, %f as coef\n", 
-								tmpFloat[0], tmpFloat[1]);//DEBUG CODE
 					}
 					// SP (L) case: one exp, two coeff's per line
 					else if (3==scanCount && LShell==MainData->Basis->Shells[iShell].ShellType) {
 						MainData->Basis->NumFuncs++;
 						MainData->Basis->Shells[iShell].NumPrims++;
-						printf("Basis->NumFuncs is now %ld\n", MainData->Basis->NumFuncs); //DEBUG CODE
-						printf("Basis->Shells[%ld].NumPrims is now %d\n", 
-								iShell, MainData->Basis->Shells[iShell].NumPrims); //DEBUG CODE
 						MainData->Basis->Shells[iShell].Exponent.push_back(tmpFloat[0]);
 						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[1]);
 						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[2]);
-						printf("pushing %f as exp, %f as coef, %f as coef\n", 
-								tmpFloat[0], tmpFloat[1], tmpFloat[2]);	//DEBUG CODE
 					} 
 					else if (1==sscanf(Line, "%s%n", &tmpStr, &bytesConsumed)) {
-						printf("Caught string %s (expecting $$ or $END)\n", tmpStr);	//DEBUG CODE
 						if ((2==bytesConsumed && 0==strncmp(tmpStr, "$$", 3)) ||
 							(4==bytesConsumed && 0==strncmp(tmpStr, "$END", 5))) {
 							// add ending shell of this atom to BasisMap
 							MainData->Basis->BasisMap[2*iAtom+1]=iShell;
-							printf("Basis->BasisMap[%d] is %d\n",2*iAtom+1, iShell);//DEBUG CODE
 							// we'll move on to next atom (or be done with Basis)
 							iAtom++;
 							shellsPeriAtom = -1;	// reset for next atom;
@@ -1390,12 +1369,47 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			}
 		} // creating BasisSet
 		if (error) {
-			printf("We've got an error!\n");					//DEBUG CODE
-			delete MainData->Basis;							// This would cause a SEGFAULT on close
-			MainData->Basis = new BasisSet(nAtoms, 0);		// Proposed fix to segfault
+			delete MainData->Basis;						// This would cause a SEGFAULT on close
+			MainData->Basis = new BasisSet(nAtoms, 0);	// Proposed fix to segfault
 		}
 	} // BasisSet done
-	
+
+	// TEST BASISSET (this block until the end is DEBUG CODE
+	int iAtom = 0, iShell = 0;
+	printf("BasisSet info:\n");
+	printf("MapLength: %ld\n", MainData->Basis->MapLength);
+	printf("NumShells: %ld\n", MainData->Basis->NumShells);
+	printf("NumFuncs: %ld\n", MainData->Basis->NumFuncs);
+	while (iAtom < nAtoms) {
+		printf("Atom#: %ld\n", iAtom);
+		printf("\tNuclearCharge: %ld\n", MainData->Basis->NuclearCharge[iAtom]);
+		printf("\tMapEntries: %ld, %ld\n", 
+				MainData->Basis->BasisMap[2*iAtom], MainData->Basis->BasisMap[2*iAtom+1]);
+		while (iShell<=MainData->Basis->BasisMap[2*iAtom+1]) {
+			printf("\t\tShell#: %ld\n", iShell);
+			printf("\t\tShellType: %d\n", MainData->Basis->Shells[iShell].ShellType);
+			printf("\t\tNumPrims: %d\n", MainData->Basis->Shells[iShell].GetNumPrimitives());
+			int iPrim = 0;
+			while(iPrim < MainData->Basis->Shells[iShell].GetNumPrimitives()) {
+				if (-1==MainData->Basis->Shells[iShell].ShellType) {
+					printf("\t\t\tExp %f\tCoef %f\tCoef %f\n", 
+						MainData->Basis->Shells[iShell].Exponent[iPrim], 
+						MainData->Basis->Shells[iShell].InputCoef[2*iPrim],
+						MainData->Basis->Shells[iShell].InputCoef[2*iPrim+1]);
+				}
+				else {
+					printf("\t\t\tExp %f\tCoef %f\n", 
+						MainData->Basis->Shells[iShell].Exponent[iPrim], 
+						MainData->Basis->Shells[iShell].InputCoef[iPrim]);
+				}
+				iPrim++;
+			}
+			iShell++;
+		}
+		iAtom++;
+	}
+	// END BASISSET TEST
+
 	// now look for Alpha Coefficients (optional)
 	
 	// now look for Beta Coefficints (optional)
