@@ -1246,7 +1246,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	// now look for Basis
 	if ((lFrame->GetNumAtoms()>0)&&Buffer->LocateKeyWord("$BASIS", 6)) {
 		// totals counters
-		long numFunctions = 0,  nShells = 0, linesInSection = 0;
+		long nShells = 0, linesInSection = 0;
 		// temp vars for line-at-a-time read 
 		long nFunc;	
 		char IType[5];
@@ -1317,6 +1317,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					// maybe need to ensure lframe points to correct frame?
 					MainData->Basis->NuclearCharge[iAtom] = (long)(lFrame->GetAtomType(iAtom));
 				}
+				MainData->Basis->NumFuncs += MainData->Basis->Shells[iShell].GetNumFuncs(false);;
 				// (currently not doing anything with nFunc or Sc read in)
 				// read in functions for this shell
 				char tmpStr[5];
@@ -1331,18 +1332,16 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					scanCount = sscanf(Line, "%f %f %f", &(tmpFloat[0]),&(tmpFloat[1]),&(tmpFloat[2]));
 					// non-SP (L) case: one exponent, one coef per line
 					if (2==scanCount && LShell!=MainData->Basis->Shells[iShell].ShellType) {
-						MainData->Basis->NumFuncs++;
 						MainData->Basis->Shells[iShell].NumPrims++;
 						MainData->Basis->Shells[iShell].Exponent.push_back(tmpFloat[0]);
-						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[1]);
+						MainData->Basis->Shells[iShell].NormCoef.push_back(tmpFloat[1]);
 					}
 					// SP (L) case: one exp, two coeff's per line
 					else if (3==scanCount && LShell==MainData->Basis->Shells[iShell].ShellType) {
-						MainData->Basis->NumFuncs++;
 						MainData->Basis->Shells[iShell].NumPrims++;
 						MainData->Basis->Shells[iShell].Exponent.push_back(tmpFloat[0]);
-						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[1]);
-						MainData->Basis->Shells[iShell].InputCoef.push_back(tmpFloat[2]);
+						MainData->Basis->Shells[iShell].NormCoef.push_back(tmpFloat[1]);
+						MainData->Basis->Shells[iShell].NormCoef.push_back(tmpFloat[2]);
 					} 
 					else if (1==sscanf(Line, "%s%n", &tmpStr, &bytesConsumed)) {
 						if ((2==bytesConsumed && 0==strncmp(tmpStr, "$$", 3)) ||
@@ -1373,42 +1372,6 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			MainData->Basis = new BasisSet(nAtoms, 0);	// Proposed fix to segfault
 		}
 	} // BasisSet done
-
-	// TEST BASISSET (this block until the end is DEBUG CODE
-	int iAtom = 0, iShell = 0;
-	printf("BasisSet info:\n");
-	printf("MapLength: %ld\n", MainData->Basis->MapLength);
-	printf("NumShells: %ld\n", MainData->Basis->NumShells);
-	printf("NumFuncs: %ld\n", MainData->Basis->NumFuncs);
-	while (iAtom < nAtoms) {
-		printf("Atom#: %ld\n", iAtom);
-		printf("\tNuclearCharge: %ld\n", MainData->Basis->NuclearCharge[iAtom]);
-		printf("\tMapEntries: %ld, %ld\n", 
-				MainData->Basis->BasisMap[2*iAtom], MainData->Basis->BasisMap[2*iAtom+1]);
-		while (iShell<=MainData->Basis->BasisMap[2*iAtom+1]) {
-			printf("\t\tShell#: %ld\n", iShell);
-			printf("\t\tShellType: %d\n", MainData->Basis->Shells[iShell].ShellType);
-			printf("\t\tNumPrims: %d\n", MainData->Basis->Shells[iShell].GetNumPrimitives());
-			int iPrim = 0;
-			while(iPrim < MainData->Basis->Shells[iShell].GetNumPrimitives()) {
-				if (-1==MainData->Basis->Shells[iShell].ShellType) {
-					printf("\t\t\tExp %f\tCoef %f\tCoef %f\n", 
-						MainData->Basis->Shells[iShell].Exponent[iPrim], 
-						MainData->Basis->Shells[iShell].InputCoef[2*iPrim],
-						MainData->Basis->Shells[iShell].InputCoef[2*iPrim+1]);
-				}
-				else {
-					printf("\t\t\tExp %f\tCoef %f\n", 
-						MainData->Basis->Shells[iShell].Exponent[iPrim], 
-						MainData->Basis->Shells[iShell].InputCoef[iPrim]);
-				}
-				iPrim++;
-			}
-			iShell++;
-		}
-		iAtom++;
-	}
-	// END BASISSET TEST
 
 	// now look for Alpha Coefficients (optional)
 	
