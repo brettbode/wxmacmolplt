@@ -144,7 +144,7 @@ void MpGLCanvas::initGL(void) {
 		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 		glEnable(GL_COLOR_MATERIAL);
 		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-		/* glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE); */
+		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
 
 		// We make a texture of arrowheads for the annotations. The arrowheads

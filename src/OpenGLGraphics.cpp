@@ -1393,12 +1393,15 @@ void MolDisplayWin::AddAxisGL(void) {
 	} else {
 		anno_color[0] = anno_color[1] = anno_color[2] = 1.0f;
 	}
+	glEnable(GL_COLOR_MATERIAL);
 	glColor3f(anno_color[0], anno_color[1], anno_color[2]);
+
 	float plane_emissive[] = { 0.0, 0.0, 0.0, 1.0 };
 	float plane_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
+
 	long Quality = (long)(Prefs->GetQD3DAtomQuality());
 	float VectorWidth = 0.02;
 
@@ -3104,8 +3107,6 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	Bond *lBonds = lFrame->Bonds;
 	long NumBonds = lFrame->NumBonds;
 	
-	std::cout << "iatom: " << iatom << std::endl;
-	std::cout << "lFrame->NumAtoms: " << lFrame->NumAtoms << std::endl;
 	short coordination = lAtoms[iatom].GetCoordinationNumber();
 	std::vector<Bond *> bonds;
 	int bonded_atoms[6];
