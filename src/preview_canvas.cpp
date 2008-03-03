@@ -45,6 +45,7 @@ PreviewCanvas::~PreviewCanvas() {
 void PreviewCanvas::InitGL() {
 
 	SetCurrent();
+	gl_initialized = true;
 	
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();

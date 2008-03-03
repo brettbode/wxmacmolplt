@@ -423,6 +423,7 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 			}
 			
 			delete [] DataPtrs;
+			delete[] myThreads;
 		} else
 #endif
 		{

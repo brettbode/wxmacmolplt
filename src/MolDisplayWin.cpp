@@ -3964,7 +3964,7 @@ bool MolDisplayWin::IsRotating(void) {
 
 void MolDisplayWin::SetWindowPreferences(WinPrefs *NewPrefs) {
 
-	if (Prefs) {
+	if (Prefs && Prefs != NewPrefs) {
 		*Prefs = *NewPrefs;
 		glCanvas->DoPrefDependent();
 	}

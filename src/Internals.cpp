@@ -16,6 +16,7 @@
 #include "MoleculeData.h"
 #include "Frame.h"
 #include "Math3D.h"
+#include <iostream>
 
 Internals::Internals(void) {
 	MOPacStyle = NULL;
@@ -125,9 +126,9 @@ void MOPacInternals::GuessInit(MoleculeData * MainData, long theAtom, bool keepO
 		//I ran into an issue in an Oh struture where the three defining atoms are linear.
 		//Needless to say this doesn't result in a good definition so test for that here.
 		//Get the angle between the three defining atoms, if its 0 or 180 they are linear.
-		float angle;
-		lFrame->GetBondAngle(BondedAtom, AngleAtom, DihedralAtom, &angle);
-		if ((fabs(angle)>179.9)||(fabs(angle)<0.1)) {
+		float angle = 0.0f;
+		bool valid = lFrame->GetBondAngle(BondedAtom, AngleAtom, DihedralAtom, &angle);
+		if (valid && ((fabs(angle)>179.9)||(fabs(angle)<0.1))) {
 			float newLength = 1.0E10;
 			//find the closest atom that isn't linear with the other two
 			for (i=1; i<iatom; i++) {
