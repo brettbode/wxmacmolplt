@@ -3966,9 +3966,9 @@ void MolDisplayWin::SetWindowPreferences(WinPrefs *NewPrefs) {
 
 	if (Prefs && Prefs != NewPrefs) {
 		*Prefs = *NewPrefs;
-		glCanvas->DoPrefDependent();
 	}
 
+	glCanvas->DoPrefDependent();
 	ResetAllWindows();
 
 }

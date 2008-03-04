@@ -1056,7 +1056,12 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 					glColor3f(0.0f, 0.0f, 0.0f);
 					glEnable(GL_POLYGON_STIPPLE);
 					glPolygonStipple(atomMaskPatterns[patternindex]);
-					gluSphere(core_obj, radius, (long)(1.5*Quality), (long)(Quality));//Create and draw the sphere
+					glPushMatrix(); // atom center
+					/* glScalef(radius * 1.01f, radius * 1.01f, radius * 1.01f); */
+					glScalef(radius, radius, radius);
+					glCallList(OpenGLData->sphere_list);
+					glPopMatrix(); // atom center
+					/* gluSphere(core_obj, radius, (long)(1.5*Quality), (long)(Quality));//Create and draw the sphere */
 					glDisable(GL_POLYGON_STIPPLE);
 				}
 			}
@@ -1065,7 +1070,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glColor3f(0.0f,0.0f,0.0f);
 				glEnable(GL_POLYGON_STIPPLE);
 				glPolygonStipple(stippleMask);
-				gluSphere(core_obj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
+				glPushMatrix(); // atom center
+				glScalef(radius * 1.01f, radius * 1.01f, radius * 1.01f);
+				glCallList(OpenGLData->sphere_list);
+				glPopMatrix(); // atom center
 				glDisable(GL_POLYGON_STIPPLE);
 			}
 
