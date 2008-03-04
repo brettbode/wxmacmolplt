@@ -135,10 +135,10 @@ void CoordinateOffset::CreateControls()
     wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer2->Add(itemBoxSizer4, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    slider = new wxSlider( itemDialog1, ID_SLIDER, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+    slider = new wxSlider( itemDialog1, ID_SLIDER, 0, -100, 100, wxDefaultPosition, wxSize(100, 20), wxSL_HORIZONTAL );
     if (ShowToolTips())
         slider->SetToolTip(_("Adjust the slider to adjust the magnitude of the offset"));
-    itemBoxSizer4->Add(slider, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    itemBoxSizer4->Add(slider, 1, wxALIGN_CENTER_VERTICAL|wxALL | wxEXPAND, 5);
 
     editField = new wxTextCtrl( itemDialog1, ID_TEXTCTRL1, wxT(""), wxDefaultPosition, wxDefaultSize, 0 );
     if (ShowToolTips())

@@ -2739,11 +2739,13 @@ void MolDisplayWin::menuMoleculeSymCoords(wxCommandEvent &event) {
 	Dirtify();
 }
 void MolDisplayWin::menuMoleculeConvertToBohr(wxCommandEvent &event) {
+	CreateFrameSnapShot();
 	MainData->UnitConversion(0);
 	ResetAllWindows();
 	Dirtify();
 }
 void MolDisplayWin::menuMoleculeConvertToAngstroms(wxCommandEvent &event) {
+	CreateFrameSnapShot();
 	MainData->UnitConversion(1);
 	ResetAllWindows();
 	Dirtify();

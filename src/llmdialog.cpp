@@ -49,7 +49,7 @@ IMPLEMENT_DYNAMIC_CLASS( LLMDialog, wxDialog )
 BEGIN_EVENT_TABLE( LLMDialog, wxDialog )
 
 ////@begin LLMDialog event table entries
-    EVT_TEXT( ID_TEXTCTRL, LLMDialog::OnTextctrlUpdated )
+    /* EVT_TEXT( ID_TEXTCTRL, LLMDialog::OnTextctrlUpdated ) */
 
     EVT_BUTTON( wxID_OK, LLMDialog::OnOkClick )
 
@@ -114,7 +114,8 @@ void LLMDialog::CreateControls()
     wxStaticText* itemStaticText4 = new wxStaticText( itemDialog1, wxID_STATIC, _("Click the Create button to insert the\nnumber of frames given below along\nthe LLM path connecting the current\ngeometry with the next geometry."), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer2->Add(itemStaticText4, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    numPointsEdit = new wxTextCtrl( itemDialog1, ID_TEXTCTRL, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+    numPointsEdit = new wxTextCtrl( itemDialog1, ID_TEXTCTRL, _T(""), wxDefaultPosition, wxDefaultSize, 0,
+								   wxTextValidator(wxFILTER_NUMERIC, &valid_string));
     if (ShowToolTips())
         numPointsEdit->SetToolTip(_("Enter an integer for the number of intermediate geometries to create"));
     itemBoxSizer2->Add(numPointsEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -179,16 +180,17 @@ wxIcon LLMDialog::GetIconResource( const wxString& name )
  * wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TEXTCTRL
  */
 
+#if 0
 void LLMDialog::OnTextctrlUpdated( wxCommandEvent& event )
 {
 	wxString textVal = numPointsEdit->GetValue();
 	long numPoints = 0;
-	if (! textVal.ToLong(&numPoints)) {
-		textVal.Printf(wxT("%ld"), numPoints);
-		numPointsEdit->SetValue(textVal);
-	}
+	textVal.ToLong(&numPoints);
+	textVal.Printf(wxT("%ld"), numPoints);
+	numPointsEdit->ChangeValue(textVal);
     event.Skip();
 }
+#endif
 
 
 

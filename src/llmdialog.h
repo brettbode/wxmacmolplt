@@ -102,6 +102,7 @@ public:
     wxTextCtrl* numPointsEdit;
     wxCheckBox* internalCheck;
     MolDisplayWin * Parent;
+	wxString valid_string;
 ////@end LLMDialog member variables
 };
 
