@@ -112,6 +112,7 @@ public:
     wxTextCtrl* editField;
     MolDisplayWin * Parent;
     std::vector<CPoint3D> origCoords;
+	wxString valid_string;
 ////@end CoordinateOffset member variables
 };
 

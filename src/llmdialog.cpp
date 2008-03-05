@@ -114,8 +114,11 @@ void LLMDialog::CreateControls()
     wxStaticText* itemStaticText4 = new wxStaticText( itemDialog1, wxID_STATIC, _("Click the Create button to insert the\nnumber of frames given below along\nthe LLM path connecting the current\ngeometry with the next geometry."), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer2->Add(itemStaticText4, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    numPointsEdit = new wxTextCtrl( itemDialog1, ID_TEXTCTRL, _T(""), wxDefaultPosition, wxDefaultSize, 0,
-								   wxTextValidator(wxFILTER_NUMERIC, &valid_string));
+	wxTextValidator validator(wxFILTER_INCLUDE_CHAR_LIST, &valid_string);
+	wxString digits[10] = { _T("0"), _T("1"), _T("2"), _T("3"), _T("4"), _T("5"), _T("6"), _T("7"), _T("8"), _T("9") };
+	validator.SetIncludes(wxArrayString((size_t) 10, digits));
+    numPointsEdit = new wxTextCtrl(itemDialog1, ID_TEXTCTRL, _T(""), wxDefaultPosition, wxDefaultSize, 0,
+								   validator);
     if (ShowToolTips())
         numPointsEdit->SetToolTip(_("Enter an integer for the number of intermediate geometries to create"));
     itemBoxSizer2->Add(numPointsEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
