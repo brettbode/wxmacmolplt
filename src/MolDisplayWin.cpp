@@ -287,6 +287,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_INVERTNORMALMODE,		MolDisplayWin::menuMoleculeInvertNormalMode)
 	EVT_MENU (MMP_SHOW_TOOLBAR,			MolDisplayWin::menuBuilderShowToolbar)
 	EVT_UPDATE_UI(MMP_SHOW_TOOLBAR,		MolDisplayWin::OnShowToolbarUpdate)
+	EVT_UPDATE_UI(MMP_SHOWBUILDTOOLS,	MolDisplayWin::OnShowBuildToolsUpdate)
 	EVT_MENU (MMP_SHOWBUILDTOOLS,		MolDisplayWin::menuBuilderShowBuildTools)
 	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuBuilderAddHydrogens)
 	EVT_MENU (MMP_DELETEHYDROGENS,		MolDisplayWin::menuBuilderDeleteHydrogens)
@@ -824,7 +825,7 @@ void MolDisplayWin::AdjustMenus(void) {
 	else
 		menuViewStyle->Check(MMP_BALLANDSTICKMODE, true);
 
-	menuBuild->Check(MMP_SHOWBUILDTOOLS, show_build_palette);
+	/* menuBuild->Check(MMP_SHOWBUILDTOOLS, show_build_palette); */
 	
 	/* This should be handled by an UpdateUI event handler now. */
 	/* if (MainData->cFrame->NumAtoms == 0) { */
@@ -874,6 +875,10 @@ void MolDisplayWin::OnSaveUpdate(wxUpdateUIEvent& event) {
 
 void MolDisplayWin::OnShowToolbarUpdate(wxUpdateUIEvent& event) {
 	event.Check(Prefs->ToolbarShown());
+}
+
+void MolDisplayWin::OnShowBuildToolsUpdate(wxUpdateUIEvent& event) {
+	event.Check(show_build_palette);
 }
 
 void MolDisplayWin::OnUndoUpdate( wxUpdateUIEvent& event ) {

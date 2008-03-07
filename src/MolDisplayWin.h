@@ -280,6 +280,7 @@ class MolDisplayWin : public wxFrame {
 		void OnSaveUpdate(wxUpdateUIEvent& event);
 		void ShowToolbar(bool enable = true);
 		void OnShowToolbarUpdate(wxUpdateUIEvent& event);
+		void OnShowBuildToolsUpdate(wxUpdateUIEvent& event);
 
 		void OnSaveStructureUpdate(wxUpdateUIEvent& event);
 		void DeleteSelected();

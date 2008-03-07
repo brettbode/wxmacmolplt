@@ -38,7 +38,8 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] = {
 										 "the command line parameters" }, 
 	{ wxCMD_LINE_SWITCH, "v", "version", "print version" }, 
 	{ wxCMD_LINE_PARAM,  NULL, NULL,     "input file", 
-		wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL }, 
+		wxCMD_LINE_VAL_STRING,
+		wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE }, 
 	{ wxCMD_LINE_NONE } 
 };
 #else
@@ -187,19 +188,21 @@ bool MpApp::OnInit() {
 		}
 #endif
 		
-		cmdFilename = cmdParser.GetParam(0); 
-		// Under Windows when invoking via a document 
-		// in Explorer, we are passed the short form. 
-		// So normalize and make the long form. 
-		wxFileName fName(cmdFilename); 
-		fName.Normalize(wxPATH_NORM_LONG|wxPATH_NORM_DOTS| 
-						wxPATH_NORM_TILDE|wxPATH_NORM_ABSOLUTE); 
-		cmdFilename = fName.GetFullPath(); 
-		if (cmdFilename.length() > 0) {
-			MolDisplayWin * temp = new MolDisplayWin(cmdFilename);
-			MolWinList.push_back(temp);
-			long r = temp->OpenFile(cmdFilename);
-			if (r>0) temp->Show(true);
+		for (int i = 0; i < cmdParser.GetParamCount(); ++i) {
+			cmdFilename = cmdParser.GetParam(i); 
+			// Under Windows when invoking via a document 
+			// in Explorer, we are passed the short form. 
+			// So normalize and make the long form. 
+			wxFileName fName(cmdFilename); 
+			fName.Normalize(wxPATH_NORM_LONG|wxPATH_NORM_DOTS| 
+							wxPATH_NORM_TILDE|wxPATH_NORM_ABSOLUTE); 
+			cmdFilename = fName.GetFullPath(); 
+			if (cmdFilename.length() > 0) {
+				MolDisplayWin * temp = new MolDisplayWin(cmdFilename);
+				MolWinList.push_back(temp);
+				long r = temp->OpenFile(cmdFilename);
+				if (r>0) temp->Show(true);
+			}
 		}
 	} else {
 		// Throw up a simple splash screen

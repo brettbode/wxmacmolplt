@@ -4294,35 +4294,36 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 	float AtomScale = Prefs->GetAtomScale();
 	long curAtomType;
 	RGBColor * AtomColor;
-	wxString tmpStr;
 	float red, green, blue;
+	char tmpStr[500];
 
-	/* float x_angle, y_angle, z_angle; */
-	/* MatrixToEulerAngles(MainData->TotalRotation, &x_angle, &y_angle, */
-						/* &z_angle); */
 	Buffer->PutText("#include \"transforms.inc\"\n\n");
 
-	tmpStr.Printf(wxT("camera {\n"
-					  "\tlocation <0, 0, 0>\n"
-					  "\tsky <0, 1, 0>\n"
-					  "\tlook_at <0, 0, -1>\n"
-					  "}\n\n"));//, MainData->WindowSize);
-	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	sprintf(tmpStr,
+			"camera {\n"
+			"\tlocation <0, 0, 0>\n"
+			"\tsky <0, 1, 0>\n"
+			"\tlook_at <0, 0, -1>\n"
+			"}\n\n");
+	Buffer->PutText(tmpStr);
 
-	tmpStr.Printf(wxT("light_source {\n"
-					  "\t<6, 6, 12>, rgb <1, 1, 1>\n"
-					  "}\n\n"));
-	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	sprintf(tmpStr,
+			"light_source {\n"
+			"\t<6, 6, 12>, rgb <1, 1, 1>\n"
+			"}\n\n");
+	Buffer->PutText(tmpStr);
 
-	tmpStr.Printf(wxT("light_source {\n"
-					  "\t<-6, 6, 12>, rgb <1, 1, 1>\n"
-					  "}\n\n"));
-	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	sprintf(tmpStr,
+			"light_source {\n"
+			"\t<-6, 6, 12>, rgb <1, 1, 1>\n"
+			"}\n\n");
+	Buffer->PutText(tmpStr);
 
-	tmpStr.Printf(wxT("background {\n"
-					  "\trgb <1, 1, 1>\n"
-					  "}\n\n"));
-	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	sprintf(tmpStr,
+			"background {\n"
+			"\trgb <1, 1, 1>\n"
+			"}\n\n");
+	Buffer->PutText(tmpStr);
 
 	Buffer->PutText("#declare AtomBondFinish = finish {specular 0.95 roughness 0.005}\n");
 	Buffer->PutText("#declare SurfaceFinish = finish {specular 0.95 roughness 0.001}\n\n");
@@ -4339,17 +4340,16 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 
 		float radius = AtomScale*Prefs->GetAtomSize(curAtomType);
 		Buffer->PutText("sphere {\n");
-		tmpStr.Printf(wxT("\t<%f, %f, %f>, %f\n"),
-					  lAtoms[iatom].Position.x,
-					  lAtoms[iatom].Position.y,
-					  lAtoms[iatom].Position.z, radius);
-		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-		tmpStr.Printf(wxT("\ttexture {\n"
-						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
-						  "\t\tfinish {AtomBondFinish}\n"
-						  "\t}\n"),
-					  red, green, blue);
-		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		sprintf(tmpStr, "\t<%f, %f, %f>, %f\n",
+				lAtoms[iatom].Position.x,
+				lAtoms[iatom].Position.y,
+				lAtoms[iatom].Position.z, radius);
+		Buffer->PutText(tmpStr);
+		sprintf(tmpStr, "\ttexture {\n"
+				"\t\tpigment {color rgb <%f, %f, %f>}\n"
+				"\t\tfinish {AtomBondFinish}\n"
+				"\t}\n", red, green, blue);
+		Buffer->PutText(tmpStr);
 		Buffer->PutText("}\n\n");
 	}
 
@@ -4376,16 +4376,17 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 		blue = AtomColor->blue / 65536.0;
 
 		Buffer->PutText("cylinder {\n");
-		tmpStr.Printf(wxT("\t<%f, %f, %f>, <%f, %f, %f>, %f\n"),
-					  atom1.Position.x, atom1.Position.y, atom1.Position.z,
-					  halfway.x, halfway.y, halfway.z, BondSize);
-		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-		tmpStr.Printf(wxT("\ttexture {\n"
-						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
-						  "\t\tfinish {AtomBondFinish}\n"
-						  "\t}\n"),
-					  red, green, blue);
-		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		sprintf(tmpStr, "\t<%f, %f, %f>, <%f, %f, %f>, %f\n",
+				atom1.Position.x, atom1.Position.y, atom1.Position.z,
+				halfway.x, halfway.y, halfway.z, BondSize);
+		Buffer->PutText(tmpStr);
+		sprintf(tmpStr,
+				"\ttexture {\n"
+				"\t\tpigment {color rgb <%f, %f, %f>}\n"
+				"\t\tfinish {AtomBondFinish}\n"
+				"\t}\n",
+				red, green, blue);
+		Buffer->PutText(tmpStr);
 		Buffer->PutText("}\n\n");
 
 		AtomColor = Prefs->GetAtomColorLoc(atom2.GetType() - 1);
@@ -4394,43 +4395,41 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 		blue = AtomColor->blue / 65536.0;
 
 		Buffer->PutText("cylinder {\n");
-		tmpStr.Printf(wxT("\t<%f, %f, %f>, <%f, %f, %f> %f\n"),
-					  atom2.Position.x, atom2.Position.y, atom2.Position.z,
-					  halfway.x, halfway.y, halfway.z, BondSize);
-		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
-		tmpStr.Printf(wxT("\ttexture {\n"
-						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
-						  "\t\tfinish {AtomBondFinish}\n"
-						  "\t}\n"),
-					  red, green, blue);
-		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		sprintf(tmpStr, "\t<%f, %f, %f>, <%f, %f, %f> %f\n",
+				atom2.Position.x, atom2.Position.y, atom2.Position.z,
+				halfway.x, halfway.y, halfway.z, BondSize);
+		Buffer->PutText(tmpStr);
+		sprintf(tmpStr, "\ttexture {\n"
+				"\t\tpigment {color rgb <%f, %f, %f>}\n"
+				"\t\tfinish {AtomBondFinish}\n"
+				"\t}\n", red, green, blue);
+		Buffer->PutText(tmpStr);
 		Buffer->PutText("}\n\n");
 	}
 
 	// Export any surfaces.
 	Surface *lSurface = lFrame->SurfaceList;
 	while (lSurface) {
-		tmpStr.Printf(_T("// "));
-		tmpStr.Append(wxString(lSurface->GetLabel(), wxConvUTF8));
-		tmpStr.Append(_T("\n"));
-		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		Buffer->PutText("// ");
+		Buffer->PutText(lSurface->GetLabel());
+		Buffer->PutText("\n");
 		lSurface->ExportPOV(MainData, Prefs, Buffer);
 		lSurface = lSurface->GetNextSurface();
 	}
 
 	// Now, transform scene to mimic current rotation and translation.
 	float *m = (float *) MainData->TotalRotation;
-	tmpStr.Printf(wxT("\n\tmatrix <%f, %f, %f,"
-			   		  "\n\t        %f, %f, %f,"
-					  "\n\t        %f, %f, %f,"
-					  "\n\t        %f, %f, %f>\n"),
-				  m[0], m[1], m[2], m[4], m[5], m[6],
-				  m[8], m[9], m[10], m[12], m[13], m[14]);
-	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	sprintf(tmpStr,
+			"\n\tmatrix <%f, %f, %f,"
+			"\n\t        %f, %f, %f,"
+			"\n\t        %f, %f, %f,"
+			"\n\t        %f, %f, %f>\n",
+			m[0], m[1], m[2], m[4], m[5], m[6],
+			m[8], m[9], m[10], m[12], m[13], m[14]);
+	Buffer->PutText(tmpStr);
 	Buffer->PutText("\n\tscale <-1, 1, 1>\n");
-	tmpStr.Printf(wxT("\n\ttranslate <0, 0, %f>\n"),
-				  -MainData->WindowSize);
-	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+	sprintf(tmpStr, "\n\ttranslate <0, 0, %f>\n", -MainData->WindowSize);
+	Buffer->PutText(tmpStr);
 	Buffer->PutText("}\n\n");
 
 	if (Prefs->ShowAtomicSymbolLabels()) {
@@ -4440,12 +4439,13 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 
 		for (i = 0; i < kMaxAtomTypes; i++) {
 			Prefs->GetAtomLabel(i, atomic_symbol);
-			tmpStr.Printf(wxT("#declare Atom_%03d = "
-							  "   text {"
-							  "      ttf \"timrom.ttf\", \"") +
-									 atomic_symbol + wxT("\", 0.01, 0"
-							  "   }\n\n"), i);
-			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+			sprintf(tmpStr,
+					"#declare Atom_%03d = "
+					"   text {"
+					"      ttf \"timrom.ttf\", \"%s\", 0.01, 0"
+					"   }\n\n",
+					i, (const char *) atomic_symbol.mb_str(wxConvUTF8));
+			Buffer->PutText(tmpStr);
 		}
 
 		Buffer->PutText("union {\n");
@@ -4453,32 +4453,32 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 		for (long iatom = 0; iatom < NumAtoms; iatom++) {
 			if (lAtoms[iatom].GetInvisibility()) continue;
 
-			Rotate3DPt(MainData->TotalRotation, lAtoms[iatom].Position, &text_pos);
+			Rotate3DPt(MainData->TotalRotation, lAtoms[iatom].Position,
+					   &text_pos);
 			curAtomType = lAtoms[iatom].GetType() - 1;
-			radius = AtomScale*Prefs->GetAtomSize(curAtomType);
-			Prefs->GetAtomLabel(i, atomic_symbol);
+			radius = AtomScale * Prefs->GetAtomSize(curAtomType);
 
 			AtomColor = Prefs->GetAtomColorLoc(curAtomType);
 			red = AtomColor->red / 65536.0;
 			green = AtomColor->green / 65536.0;
 			blue = AtomColor->blue / 65536.0;
 
-			tmpStr.Printf(wxT("object {\n"
-							  "   Atom_%03d\n"
-							  "   Center_Trans(Atom_%03d, x + y)\n"
-							  "   scale <0.25, 0.25, 1.0>\n"
-							  "   translate <%f, %f, %f>\n"
-							  "   no_shadow\n"
-							  "   pigment { color rgb <%f, %f, %f> }\n"
-							  "}\n\n"), curAtomType, curAtomType,
-						  text_pos.x, text_pos.y, text_pos.z + radius,
-						  1.0f - red, 1.0f - green, 1.0f - blue);
-			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+			sprintf(tmpStr,
+					"object {\n"
+					"   Atom_%03d\n"
+					"   Center_Trans(Atom_%03d, x + y)\n"
+					"   scale <0.25, 0.25, 1.0>\n"
+					"   translate <%f, %f, %f>\n"
+					"   no_shadow\n"
+					"   pigment { color rgb <%f, %f, %f> }\n"
+					"}\n\n", curAtomType, curAtomType,
+					text_pos.x, text_pos.y, text_pos.z + radius,
+					1.0f - red, 1.0f - green, 1.0f - blue);
+			Buffer->PutText(tmpStr);
 		}
 		Buffer->PutText("\n\tscale <-1, 1, 1>\n");
-		tmpStr.Printf(wxT("\n\ttranslate <0, 0, %f>\n"),
-					  -MainData->WindowSize);
-		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		sprintf(tmpStr, "\n\ttranslate <0, 0, %f>\n", -MainData->WindowSize);
+		Buffer->PutText(tmpStr);
 		Buffer->PutText("}\n");
 	}
 
