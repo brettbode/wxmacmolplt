@@ -134,8 +134,8 @@ bool MpApp::OnInit() {
 #endif 
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 
-		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006 " 
-					   "Version %s, %s"), wxMacMolPlt_VERSION, (const wxChar*) date);
+		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006 ")
+					   wxT("Version %s, %s"), wxMacMolPlt_VERSION, (const wxChar*) date);
 		wxLogMessage(msg); 
 		return false; 
 	} 

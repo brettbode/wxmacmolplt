@@ -556,13 +556,13 @@ long Surf2DBase::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 						if (HasPoint[1] || HasPoint[2]) {
 							if (HasPoint[1]) {
 								lineEnd = Contour[1];
-								tmpStr.Printf(wxT("cylinder {\n"
-												  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
-												  "   texture {\n"
-												  "      pigment {color rgb<%f, %f, %f>}\n"
-												  "      finish {SurfaceFinish}\n"
-												  "   }\n"
-												  "}\n"),
+								tmpStr.Printf(wxT("cylinder {\n")
+											  wxT("   <%f, %f, %f>, <%f, %f, %f>, %f\n")
+											  wxT("   texture {\n")
+											  wxT("      pigment {color rgb<%f, %f, %f>}\n")
+											  wxT("      finish {SurfaceFinish}\n")
+											  wxT("   }\n")
+											  wxT("}\n"),
 											  lineStart.x, lineStart.y, lineStart.z,
 											  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
 											  color[0], color[1], color[2]);
@@ -570,13 +570,13 @@ long Surf2DBase::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 							}
 							if (HasPoint[2]) {
 								lineEnd = Contour[2];
-								tmpStr.Printf(wxT("cylinder {\n"
-												  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
-												  "   texture {\n"
-												  "      pigment {color rgb<%f, %f, %f>}\n"
-												  "      finish {SurfaceFinish}\n"
-												  "   }\n"
-												  "}\n"),
+								tmpStr.Printf(wxT("cylinder {\n")
+											  wxT("   <%f, %f, %f>, <%f, %f, %f>, %f\n")
+											  wxT("   texture {\n")
+											  wxT("      pigment {color rgb<%f, %f, %f>}\n")
+											  wxT("      finish {SurfaceFinish}\n")
+											  wxT("   }\n")
+											  wxT("}\n"),
 											  lineStart.x, lineStart.y, lineStart.z,
 											  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
 											  color[0], color[1], color[2]);
@@ -584,13 +584,13 @@ long Surf2DBase::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 							}
 						} else if (HasPoint[3]) {
 							lineEnd = Contour[3];
-							tmpStr.Printf(wxT("cylinder {\n"
-											  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
-											  "   texture {\n"
-											  "      pigment {color rgb<%f, %f, %f>}\n"
-											  "      finish {SurfaceFinish}\n"
-											  "   }\n"
-											  "}\n"),
+							tmpStr.Printf(wxT("cylinder {\n")
+										  wxT("   <%f, %f, %f>, <%f, %f, %f>, %f\n")
+										  wxT("   texture {\n")
+										  wxT("      pigment {color rgb<%f, %f, %f>}\n")
+										  wxT("      finish {SurfaceFinish}\n")
+										  wxT("   }\n")
+										  wxT("}\n"),
 										  lineStart.x, lineStart.y, lineStart.z,
 										  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
 										  color[0], color[1], color[2]);
@@ -601,13 +601,13 @@ long Surf2DBase::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 						if (HasPoint[3]) {
 							lineStart = Contour[1];
 							lineEnd = Contour[3];
-							tmpStr.Printf(wxT("cylinder {\n"
-											  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
-											  "   texture {\n"
-											  "      pigment {color rgb<%f, %f, %f>}\n"
-											  "      finish {SurfaceFinish}\n"
-											  "   }\n"
-											  "}\n"),
+							tmpStr.Printf(wxT("cylinder {\n")
+										  wxT("   <%f, %f, %f>, <%f, %f, %f>, %f\n")
+										  wxT("   texture {\n")
+										  wxT("      pigment {color rgb<%f, %f, %f>}\n")
+										  wxT("      finish {SurfaceFinish}\n")
+										  wxT("   }\n")
+										  wxT("}\n"),
 										  lineStart.x, lineStart.y, lineStart.z,
 										  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
 										  color[0], color[1], color[2]);
@@ -615,13 +615,13 @@ long Surf2DBase::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 						} else if (HasPoint[2] && !HasPoint[0]) {
 							lineStart = Contour[1];
 							lineEnd = Contour[2];
-							tmpStr.Printf(wxT("cylinder {\n"
-											  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
-											  "   texture {\n"
-											  "      pigment {color rgb<%f, %f, %f>}\n"
-											  "      finish {SurfaceFinish}\n"
-											  "   }\n"
-											  "}\n"),
+							tmpStr.Printf(wxT("cylinder {\n")
+										  wxT("   <%f, %f, %f>, <%f, %f, %f>, %f\n")
+										  wxT("   texture {\n")
+										  wxT("      pigment {color rgb<%f, %f, %f>}\n")
+										  wxT("      finish {SurfaceFinish}\n")
+										  wxT("   }\n")
+										  wxT("}\n"),
 										  lineStart.x, lineStart.y, lineStart.z,
 										  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
 										  color[0], color[1], color[2]);
@@ -631,13 +631,13 @@ long Surf2DBase::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 					if (HasPoint[2]&&HasPoint[3]) {
 						lineStart = Contour[2];
 						lineEnd = Contour[3];
-						tmpStr.Printf(wxT("cylinder {\n"
-										  "   <%f, %f, %f>, <%f, %f, %f>, %f\n"
-										  "   texture {\n"
-										  "      pigment {color rgb<%f, %f, %f>}\n"
-										  "      finish {SurfaceFinish}\n"
-										  "   }\n"
-										  "}\n"),
+						tmpStr.Printf(wxT("cylinder {\n")
+									  wxT("   <%f, %f, %f>, <%f, %f, %f>, %f\n")
+									  wxT("   texture {\n")
+									  wxT("      pigment {color rgb<%f, %f, %f>}\n")
+									  wxT("      finish {SurfaceFinish}\n")
+									  wxT("   }\n")
+									  wxT("}\n"),
 									  lineStart.x, lineStart.y, lineStart.z,
 									  lineEnd.x, lineEnd.y, lineEnd.z, lineWidth,
 									  color[0], color[1], color[2]);
@@ -1636,9 +1636,9 @@ long Surf3DBase::ExportPOVSurface(CPoint3D *Vertices, CPoint3D *Normals,
 	tmpStr.Printf(wxT("\t\t3 * %d"), NumTriangles);
 	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 	for (long i = 0; i < NumTriangles; i++) {
-		tmpStr.Printf(wxT(",\n\t\ttexture {pigment {color rgbt <%f, %f, %f, %f>} finish{SurfaceFinish}},"
-						   "\n\t\ttexture {pigment {color rgbt <%f, %f, %f, %f>} finish{SurfaceFinish}},"
-						   "\n\t\ttexture {pigment {color rgbt <%f, %f, %f, %f>} finish{SurfaceFinish}}"),
+		tmpStr.Printf(wxT(",\n\t\ttexture {pigment {color rgbt <%f, %f, %f, %f>} finish{SurfaceFinish}},")
+					  wxT("\n\t\ttexture {pigment {color rgbt <%f, %f, %f, %f>} finish{SurfaceFinish}},")
+					  wxT("\n\t\ttexture {pigment {color rgbt <%f, %f, %f, %f>} finish{SurfaceFinish}}"),
 					  transpTri[i].r1, transpTri[i].g1, transpTri[i].b1, 1.0f - transpTri[i].a1,
 					  transpTri[i].r2, transpTri[i].g2, transpTri[i].b2, 1.0f - transpTri[i].a2,
 					  transpTri[i].r3, transpTri[i].g3, transpTri[i].b3, 1.0f - transpTri[i].a3);

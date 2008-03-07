@@ -1145,15 +1145,15 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 	wxMemoryDC memDC;
 	wxImage    exportImage;
 	wxBitmap  *bmp;
-	wxString   wildcards(wxT("Windows Bitmap (*.bmp)|*.bmp"
-							 "|Portable Network Graphics (*.png)|*.png"
-							 "|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg"
-							 "|GAMESS $DATA group (*.inp)|*.inp"
-							 "|MDL MolFile|*.mol"
-							 "|XMOL (*.xyz)|*.xyz"
-							 "|Tab delimited Energies (*.txt)|*.txt"
-							 "|VRML (*.wrl)|*.wrl"
-							 "|POV-Ray (*.pov)|*.pov"));
+	wxString   wildcards(wxT("Windows Bitmap (*.bmp)|*.bmp")
+						 wxT("|Portable Network Graphics (*.png)|*.png")
+						 wxT("|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg")
+						 wxT("|GAMESS $DATA group (*.inp)|*.inp")
+						 wxT("|MDL MolFile|*.mol")
+						 wxT("|XMOL (*.xyz)|*.xyz")
+						 wxT("|Tab delimited Energies (*.txt)|*.txt")
+						 wxT("|VRML (*.wrl)|*.wrl")
+						 wxT("|POV-Ray (*.pov)|*.pov"));
 	bool vibs = false;
 	int itemCount = 9;
 	if (MainData->cFrame->GetNumberNormalModes() > 0) {
