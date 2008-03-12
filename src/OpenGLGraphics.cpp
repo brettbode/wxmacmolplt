@@ -2559,7 +2559,7 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	{0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
-	GLubyte testimage = new GLubyte[imageWidth*imageWidth*repeat*4];
+	GLubyte * testimage = new GLubyte[imageWidth*imageWidth*repeat*4];
 	int padding = ((repeat - order)*16)/order;
 	int remainder = ((repeat - order)*16)-(padding*order);
 	int p = 0;
