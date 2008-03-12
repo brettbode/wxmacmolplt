@@ -71,8 +71,9 @@ GLfloat d_shininess[] = {1.0};
 GLfloat d_diffuse[] = {0.02,0.02,0.02,0.8};
 GLfloat d_ambient[] = {0.1,0.1,0.1,0.8};
 
+GLfloat l_emissive[] = {0.0, 0.0, 0.0, 1.0};
 GLfloat l_specular[] = {0.8, 0.8, 0.8, 1.0};
-GLfloat l_shininess[] = {80.0};
+GLfloat l_shininess = 80.0;
 GLfloat l_diffuse[] = {0.2,0.2,0.2,0.8};
 GLfloat l_ambient[] = {0.1,0.1,0.1,0.8};
 
@@ -313,20 +314,25 @@ void MolDisplayWin::DrawGL(void) {
 //			MessageAlert(errmsg);
 //		}
 //	} else {
-		OpenGLData->haveTransparentSurfaces = false;
+	OpenGLData->haveTransparentSurfaces = false;
 //		OpenGLData->SurfaceDisplayList = glGenLists(1);
 //		if (OpenGLData->SurfaceDisplayList != 0)
 //			glNewList(OpenGLData->SurfaceDisplayList, GL_COMPILE_AND_EXECUTE);
-		while (lSurface) {
-			if (lSurface->GetVisibility()) {
-				if (! lSurface->isTransparent()) {
-					lSurface->Draw3DGL(MainData, Prefs, NULL);
-				} else {
-					OpenGLData->haveTransparentSurfaces = true;
-				}
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, l_emissive);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
+
+	while (lSurface) {
+		if (lSurface->GetVisibility()) {
+			if (! lSurface->isTransparent()) {
+				lSurface->Draw3DGL(MainData, Prefs, NULL);
+			} else {
+				OpenGLData->haveTransparentSurfaces = true;
 			}
-			lSurface = lSurface->GetNextSurface();
 		}
+		lSurface = lSurface->GetNextSurface();
+	}
 //		if (OpenGLData->SurfaceDisplayList != 0) {
 //			glEndList();
 //			OpenGLData->SurfaceListActive = true;
@@ -1044,7 +1050,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
 			} else {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
 				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
 				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
 			}
@@ -1086,7 +1092,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
 			} else {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
 				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
 				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
 			}
@@ -1139,7 +1145,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
 		} else {
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
 		}
@@ -1153,9 +1159,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 	glPopName();
 	glDisable(GL_RESCALE_NORMAL);
 
-	if (mHighliteState)
-		glEnable(GL_POLYGON_STIPPLE);
-
 	glLoadName(0);  //only atoms and bonds are selectable
 	                 //so give a NULL name value to the rest of the geometries
 
@@ -1164,6 +1167,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 		long cmode = (lFrame->NumAtoms)*(lFrame->Vibs->CurrentMode);
 
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
 		Prefs->ChangeColorVectorColor();
 
 		CPoint3D NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
@@ -1216,6 +1221,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		}
 	}
 	gluDeleteQuadric(core_obj);	//finally delete the quadric object
+
+	/* if (mHighliteState) */
+		/* glEnable(GL_POLYGON_STIPPLE); */
 
 /*	//draw bonds as lines
 	glDisable(GL_LIGHTING);
@@ -1272,7 +1280,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		}
 	glEnd();*/
 
-	glDisable(GL_POLYGON_STIPPLE);  //make sure everything outside 
+	/* glDisable(GL_POLYGON_STIPPLE);  //make sure everything outside  */
 	                                //this function has no stipple effect
 }
 void WinPrefs::ChangeColorBondColor(long order) const {
@@ -1404,10 +1412,8 @@ void MolDisplayWin::AddAxisGL(void) {
 	glEnable(GL_COLOR_MATERIAL);
 	glColor3f(anno_color[0], anno_color[1], anno_color[2]);
 
-	float plane_emissive[] = { 0.0, 0.0, 0.0, 1.0 };
-	float plane_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, l_emissive);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
 
 	long Quality = (long)(Prefs->GetQD3DAtomQuality());
@@ -2553,7 +2559,7 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	{0,0,0,0,0,0,0,0,255,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
-	GLubyte testimage[imageWidth*imageWidth*repeat*4];
+	GLubyte testimage = new GLubyte[imageWidth*imageWidth*repeat*4];
 	int padding = ((repeat - order)*16)/order;
 	int remainder = ((repeat - order)*16)-(padding*order);
 	int p = 0;
@@ -2651,6 +2657,8 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	glDeleteTextures(1, &texname);
 
 	glPopAttrib();
+
+	delete[] testimage;
 }
 
 //Draw a translucent plane
