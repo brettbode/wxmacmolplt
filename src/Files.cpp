@@ -1184,10 +1184,12 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	char Line[kMaxLineLength];
 	long nAtoms;
 	int scanCount, lineBytes, bytesRead, bytesConsumed;
-
+	bool BasisDone = false, CoefAlphaDone = false, CoefBetaDone = false;
+	bool OccAlphaDone = false, OccBetaDone = false;
+	
 	ProgressInd->ChangeText("Reading MKL file...");
 	Frame * lFrame = MainData->cFrame;
-	//First scan the file to determine the number of atoms
+	// first scan the file to determine the number of atoms
 	nAtoms = 0;
 	long startOfCOORD = 0;
 	//look throughout the file for the $COORD or the last $$
@@ -1195,7 +1197,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	//(each line is another atom in the molecule)
 	while (Buffer->GetFilePos() < Buffer->GetFileLength() && 
 		Buffer->LocateKeyWord("$COORD", 6)) {
-		Buffer->SkipnLines(1);
+		Buffer->SkipnLines(1); // skip $COORD line
 		startOfCOORD = Buffer->GetFilePos();
 		long endOfCoord = -1;
 		if (Buffer->LocateKeyWord("$END", 4)) {
@@ -1239,12 +1241,11 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			if (Prefs->GetAutoBond() && (nAtoms > 0))
 				lFrame->SetBonds(Prefs, false);
 		}
-	}
-
-	// now look for Molecular Charge and Multiplicity
+	} // Coords done
 
 	// now look for Basis
-	if ((lFrame->GetNumAtoms()>0)&&Buffer->LocateKeyWord("$BASIS", 6)) {
+	if ((0<lFrame->GetNumAtoms())&&(Buffer->LocateKeyWord("$BASIS", 6))) {
+		bool error = false;
 		// totals counters
 		long nShells = 0, linesInSection = 0;
 		// temp vars for line-at-a-time read 
@@ -1266,19 +1267,20 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					if (scanCount == 3) { 
 						bytesRead+=bytesConsumed;
 						nShells++;
-					} 
-					else
+					} else
 						break;
 				}
 			} 
-			else
+			else 
 				break;
 		}
+
+		// Should have a case in above block in case no $END is found before EOF
+
 		// shells counted, so we can create the BasisSet
 		MainData->Basis = new BasisSet(nAtoms, nShells);
-		Buffer->BackupnLines(linesInSection-1);
+		Buffer->BackupnLines(linesInSection-1); // go to line right after $BASIS
 		int iShell = 0, iAtom = 0, shellsPeriAtom = 0;
-		bool error = false;
 		// reiterate through Basis section to get and save BasisSet data
 		while (iShell < nShells && iAtom < nAtoms && !error) {
 			Buffer->GetLine(Line);
@@ -1317,7 +1319,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					// maybe need to ensure lframe points to correct frame?
 					MainData->Basis->NuclearCharge[iAtom] = (long)(lFrame->GetAtomType(iAtom));
 				}
-				MainData->Basis->NumFuncs += MainData->Basis->Shells[iShell].GetNumFuncs(false);;
+				MainData->Basis->NumFuncs += MainData->Basis->Shells[iShell].GetNumFuncs(false);
 				// (currently not doing anything with nFunc or Sc read in)
 				// read in functions for this shell
 				char tmpStr[5];
@@ -1368,40 +1370,182 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			}
 		} // creating BasisSet
 		if (error) {
-			delete MainData->Basis;						// This would cause a SEGFAULT on close
-			MainData->Basis = new BasisSet(nAtoms, 0);	// Proposed fix to segfault
+			delete MainData->Basis;
+			MainData->Basis = NULL;
 		}
-	} // BasisSet done
+		BasisDone = true;
+	}
+	//else throw an error because there needs to be a BasisSet?
 
-	// now look for Alpha Coefficients (optional)
-	
-	// now look for Beta Coefficints (optional)
-	
-	// now look for Alpha Occupations (optional)
+	// now look for Alpha Coefficients (Orbitals)
+	if (BasisDone&&(Buffer->LocateKeyWord("$COEFF_ALPHA", 12))) {
+		Buffer->GetLine(Line); // skip $COEFF_ALPHA line
+		bool error = false;
+		char tmpStr[5];
 
-	// now look for Beta Occupations (optional)
-	
-	// now look for Mulliken Charges (independent keyword)
+		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
+		OrbitalRec *OrbSet = new OrbitalRec(nOrbs, nOrbs, nOrbs);
+		if (OrbSet != NULL) lFrame->Orbs.push_back(OrbSet);
 
-	// now look for vibrational frequencies for the last frame (independent keyword)
-	if ((lFrame->GetNumAtoms()>0)&&Buffer->LocateKeyWord("$FREQ", 5)) {
-		Buffer->SkipnLines(1);
-		// Create the VibRec
+		unsigned long iSymCount, symCount = 0, eigenCount = 0;
+	
+		// verify here that lFrame points to the last frame?
+		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
+			Buffer->GetLine(Line);
+			// continue until we find the end of the group
+			if (FindKeyWord(Line, "$END", 4)<0) {
+				lineBytes = strlen(Line);
+				bytesRead = 0;
+				iSymCount = 0;
+				
+				// now get the Alpha symmetry symbols
+				while (bytesRead < lineBytes) {
+					scanCount = sscanf(&Line[bytesRead], "%s%n", tmpStr, &bytesConsumed);
+					if (1==scanCount) {
+						tmpStr[4] = '\0'; // SymType is 5 chars wide and must be null-terminated
+						strncpy(&OrbSet->SymType[5*symCount], tmpStr, 4);
+						bytesRead+=bytesConsumed;
+						iSymCount++;
+						symCount++;
+					} else
+						break;
+				} // get sym line
+				
+				// next come the Alpha eigen's (Energy)
+				Buffer->GetLine(Line);
+				lineBytes = strlen(Line);
+				bytesRead = 0;
+				float tmpEigen;
+				while (bytesRead < lineBytes) {
+					scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpEigen, &bytesConsumed);
+					if (scanCount == 1) {
+						lFrame->Orbs[0]->Energy[eigenCount] = tmpEigen;
+						bytesRead += bytesConsumed;
+						eigenCount++;
+					} else
+						break;
+				} //get eigen line
+
+				// now get the Alpha coefficients
+				for (long iLine=0; iLine < nOrbs; iLine++) {
+					Buffer->GetLine(Line);
+					// each line will contain up to 5 orbitals
+					lineBytes = strlen(Line);
+					bytesRead = 0;
+					long iCoef = 0;
+					float tmpCoef;
+					
+					while (bytesRead < lineBytes && iCoef < symCount) {
+						scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpCoef, &bytesConsumed);
+						if (scanCount == 1) {
+							OrbSet->Vectors[(symCount-iSymCount)*nOrbs+iCoef*nOrbs+iLine] = tmpCoef;
+							bytesRead += bytesConsumed;
+							iCoef++;
+						} else
+							break;
+					}
+					if (error) break;
+				} // get coef block
+			}
+			else
+				break; // found $END of $COEFF_ALPHA
+		}
+		//do resize if numOccAlphaOrbs ends up being greater than nOrbs?
+		CoefAlphaDone = true;
+	} // Alpha Coefficients (Orbitals) done
+	// lFrame->Orbs[0]->resize(nAlphaOrbs, nBetaOrbs); // if bigger, or when we do beta
+	
+	// now look for Beta Coefficients (Orbitals - optional)
+	if (BasisDone&&(Buffer->LocateKeyWord("$COEFF_BETA", 11))) {
+		Buffer->GetLine(Line); // skip $COEFF_ALPHA line
+		bool error = false;
+		char tmpStr[5];
+
+		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
+		unsigned long iSymCount, symCount = 0, eigenCount = 0;
+	
+		// verify here that lFrame points to the last frame?
+		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
+			Buffer->GetLine(Line);
+			// continue until we find the end of the group
+			if (FindKeyWord(Line, "$END", 4)<0) {
+				lineBytes = strlen(Line);
+				bytesRead = 0;
+				iSymCount = 0;
+				
+				// now get the Beta symmetry symbols
+				while (bytesRead < lineBytes) {
+					scanCount = sscanf(&Line[bytesRead], "%s%n", tmpStr, &bytesConsumed);
+					if (1==scanCount) {
+						tmpStr[4] = '\0'; // SymType is 5 chars wide and must be null-terminated
+						strncpy(&lFrame->Orbs[0]->SymTypeB[5*symCount], tmpStr, 4);
+						bytesRead+=bytesConsumed;
+						iSymCount++;
+						symCount++;
+					} else
+						break;
+				} // get sym line
+				
+				// next come the Beta eigen's (Energy)
+				Buffer->GetLine(Line);
+				lineBytes = strlen(Line);
+				bytesRead = 0;
+				float tmpEigen;
+				while (bytesRead < lineBytes) {
+					scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpEigen, &bytesConsumed);
+					if (scanCount == 1) {
+						lFrame->Orbs[0]->EnergyB[eigenCount] = tmpEigen;
+						bytesRead += bytesConsumed;
+						eigenCount++;
+					} else
+						break;
+				} //get eigen line
+
+				// now get the Beta coefficients
+				for (long iLine=0; iLine < nOrbs; iLine++) {
+					Buffer->GetLine(Line);
+					// each line will contain up to 5 orbitals
+					lineBytes = strlen(Line);
+					bytesRead = 0;
+					long iCoef = 0;
+					float tmpCoef;
+					
+					while (bytesRead < lineBytes && iCoef < symCount) {
+						scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpCoef, &bytesConsumed);
+						if (scanCount == 1) {
+							lFrame->Orbs[0]->VectorsB[(symCount-iSymCount)*nOrbs+iCoef*nOrbs+iLine] = tmpCoef;
+							bytesRead += bytesConsumed;
+							iCoef++;
+						} else
+							break;
+					}
+					if (error) break;
+				} // get coef block
+			}
+			else
+				break; // found $END of $COEFF_BETA
+		}
+	} // Beta Coefficients (orbitals) done
+	
+	// now look for vibrational frequencies for the last frame (independent)
+	if ((0<lFrame->GetNumAtoms())&&(Buffer->LocateKeyWord("$FREQ", 5))) {
+		Buffer->SkipnLines(1);	// skip $FREQ line
+		// create the VibRec
 		lFrame->Vibs = new VibRec(3*lFrame->NumAtoms, lFrame->NumAtoms);
 		long nModes=0;
 		char freq[kMaxLineLength];
 		bool error = false;	//Use the error flag to bail out once we hit an error
-		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
+		while ((Buffer->GetFilePos())<(Buffer->GetFileSize())&&!error) {
 			Buffer->GetLine(Line);
-			//Continue until we find the end of the group
+			//continue until we find the end of the group
 			if (FindKeyWord(Line, "$END", 4)<0) {								
-				//The first line is the symmetry symbol, which we ignore
+				//the first line is the symmetry symbol, which we ignore
 				Buffer->GetLine(Line);	//next line is the frequencies
 				unsigned int lineModes=0;
-				lineBytes=strlen(Line);
-				int bytesConsumed, bytesRead=0;
+				lineBytes = strlen(Line);
+				bytesRead = 0;
 				while (bytesRead < lineBytes) {
-					int scanCount = sscanf(&(Line[bytesRead]), "%s%n", freq, &bytesConsumed);
+					scanCount = sscanf(&(Line[bytesRead]), "%s%n", freq, &bytesConsumed);
 					if (scanCount == 1) {
 						lFrame->Vibs->Frequencies.push_back(freq);
 						bytesRead += bytesConsumed;
@@ -1436,9 +1580,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		lFrame->Vibs->NumModes = nModes;
 		lFrame->Vibs->Resize(nModes);
 	} // Vibrational Frequencies done
-
-	// now look for Dipole Vector (optional)
-
+	// else throw an error?
 	return 1;
 }
 
@@ -4294,36 +4436,35 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 	float AtomScale = Prefs->GetAtomScale();
 	long curAtomType;
 	RGBColor * AtomColor;
+	wxString tmpStr;
 	float red, green, blue;
-	char tmpStr[500];
 
+	/* float x_angle, y_angle, z_angle; */
+	/* MatrixToEulerAngles(MainData->TotalRotation, &x_angle, &y_angle, */
+						/* &z_angle); */
 	Buffer->PutText("#include \"transforms.inc\"\n\n");
 
-	sprintf(tmpStr,
-			"camera {\n"
-			"\tlocation <0, 0, 0>\n"
-			"\tsky <0, 1, 0>\n"
-			"\tlook_at <0, 0, -1>\n"
-			"}\n\n");
-	Buffer->PutText(tmpStr);
+	tmpStr.Printf(wxT("camera {\n"
+					  "\tlocation <0, 0, 0>\n"
+					  "\tsky <0, 1, 0>\n"
+					  "\tlook_at <0, 0, -1>\n"
+					  "}\n\n"));//, MainData->WindowSize);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 
-	sprintf(tmpStr,
-			"light_source {\n"
-			"\t<6, 6, 12>, rgb <1, 1, 1>\n"
-			"}\n\n");
-	Buffer->PutText(tmpStr);
+	tmpStr.Printf(wxT("light_source {\n"
+					  "\t<6, 6, 12>, rgb <1, 1, 1>\n"
+					  "}\n\n"));
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 
-	sprintf(tmpStr,
-			"light_source {\n"
-			"\t<-6, 6, 12>, rgb <1, 1, 1>\n"
-			"}\n\n");
-	Buffer->PutText(tmpStr);
+	tmpStr.Printf(wxT("light_source {\n"
+					  "\t<-6, 6, 12>, rgb <1, 1, 1>\n"
+					  "}\n\n"));
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 
-	sprintf(tmpStr,
-			"background {\n"
-			"\trgb <1, 1, 1>\n"
-			"}\n\n");
-	Buffer->PutText(tmpStr);
+	tmpStr.Printf(wxT("background {\n"
+					  "\trgb <1, 1, 1>\n"
+					  "}\n\n"));
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 
 	Buffer->PutText("#declare AtomBondFinish = finish {specular 0.95 roughness 0.005}\n");
 	Buffer->PutText("#declare SurfaceFinish = finish {specular 0.95 roughness 0.001}\n\n");
@@ -4340,16 +4481,17 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 
 		float radius = AtomScale*Prefs->GetAtomSize(curAtomType);
 		Buffer->PutText("sphere {\n");
-		sprintf(tmpStr, "\t<%f, %f, %f>, %f\n",
-				lAtoms[iatom].Position.x,
-				lAtoms[iatom].Position.y,
-				lAtoms[iatom].Position.z, radius);
-		Buffer->PutText(tmpStr);
-		sprintf(tmpStr, "\ttexture {\n"
-				"\t\tpigment {color rgb <%f, %f, %f>}\n"
-				"\t\tfinish {AtomBondFinish}\n"
-				"\t}\n", red, green, blue);
-		Buffer->PutText(tmpStr);
+		tmpStr.Printf(wxT("\t<%f, %f, %f>, %f\n"),
+					  lAtoms[iatom].Position.x,
+					  lAtoms[iatom].Position.y,
+					  lAtoms[iatom].Position.z, radius);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		tmpStr.Printf(wxT("\ttexture {\n"
+						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
+						  "\t\tfinish {AtomBondFinish}\n"
+						  "\t}\n"),
+					  red, green, blue);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		Buffer->PutText("}\n\n");
 	}
 
@@ -4376,17 +4518,16 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 		blue = AtomColor->blue / 65536.0;
 
 		Buffer->PutText("cylinder {\n");
-		sprintf(tmpStr, "\t<%f, %f, %f>, <%f, %f, %f>, %f\n",
-				atom1.Position.x, atom1.Position.y, atom1.Position.z,
-				halfway.x, halfway.y, halfway.z, BondSize);
-		Buffer->PutText(tmpStr);
-		sprintf(tmpStr,
-				"\ttexture {\n"
-				"\t\tpigment {color rgb <%f, %f, %f>}\n"
-				"\t\tfinish {AtomBondFinish}\n"
-				"\t}\n",
-				red, green, blue);
-		Buffer->PutText(tmpStr);
+		tmpStr.Printf(wxT("\t<%f, %f, %f>, <%f, %f, %f>, %f\n"),
+					  atom1.Position.x, atom1.Position.y, atom1.Position.z,
+					  halfway.x, halfway.y, halfway.z, BondSize);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		tmpStr.Printf(wxT("\ttexture {\n"
+						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
+						  "\t\tfinish {AtomBondFinish}\n"
+						  "\t}\n"),
+					  red, green, blue);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		Buffer->PutText("}\n\n");
 
 		AtomColor = Prefs->GetAtomColorLoc(atom2.GetType() - 1);
@@ -4395,41 +4536,43 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 		blue = AtomColor->blue / 65536.0;
 
 		Buffer->PutText("cylinder {\n");
-		sprintf(tmpStr, "\t<%f, %f, %f>, <%f, %f, %f> %f\n",
-				atom2.Position.x, atom2.Position.y, atom2.Position.z,
-				halfway.x, halfway.y, halfway.z, BondSize);
-		Buffer->PutText(tmpStr);
-		sprintf(tmpStr, "\ttexture {\n"
-				"\t\tpigment {color rgb <%f, %f, %f>}\n"
-				"\t\tfinish {AtomBondFinish}\n"
-				"\t}\n", red, green, blue);
-		Buffer->PutText(tmpStr);
+		tmpStr.Printf(wxT("\t<%f, %f, %f>, <%f, %f, %f> %f\n"),
+					  atom2.Position.x, atom2.Position.y, atom2.Position.z,
+					  halfway.x, halfway.y, halfway.z, BondSize);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
+		tmpStr.Printf(wxT("\ttexture {\n"
+						  "\t\tpigment {color rgb <%f, %f, %f>}\n"
+						  "\t\tfinish {AtomBondFinish}\n"
+						  "\t}\n"),
+					  red, green, blue);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		Buffer->PutText("}\n\n");
 	}
 
 	// Export any surfaces.
 	Surface *lSurface = lFrame->SurfaceList;
 	while (lSurface) {
-		Buffer->PutText("// ");
-		Buffer->PutText(lSurface->GetLabel());
-		Buffer->PutText("\n");
+		tmpStr.Printf(_T("// "));
+		tmpStr.Append(wxString(lSurface->GetLabel(), wxConvUTF8));
+		tmpStr.Append(_T("\n"));
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		lSurface->ExportPOV(MainData, Prefs, Buffer);
 		lSurface = lSurface->GetNextSurface();
 	}
 
 	// Now, transform scene to mimic current rotation and translation.
 	float *m = (float *) MainData->TotalRotation;
-	sprintf(tmpStr,
-			"\n\tmatrix <%f, %f, %f,"
-			"\n\t        %f, %f, %f,"
-			"\n\t        %f, %f, %f,"
-			"\n\t        %f, %f, %f>\n",
-			m[0], m[1], m[2], m[4], m[5], m[6],
-			m[8], m[9], m[10], m[12], m[13], m[14]);
-	Buffer->PutText(tmpStr);
+	tmpStr.Printf(wxT("\n\tmatrix <%f, %f, %f,"
+			   		  "\n\t        %f, %f, %f,"
+					  "\n\t        %f, %f, %f,"
+					  "\n\t        %f, %f, %f>\n"),
+				  m[0], m[1], m[2], m[4], m[5], m[6],
+				  m[8], m[9], m[10], m[12], m[13], m[14]);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 	Buffer->PutText("\n\tscale <-1, 1, 1>\n");
-	sprintf(tmpStr, "\n\ttranslate <0, 0, %f>\n", -MainData->WindowSize);
-	Buffer->PutText(tmpStr);
+	tmpStr.Printf(wxT("\n\ttranslate <0, 0, %f>\n"),
+				  -MainData->WindowSize);
+	Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 	Buffer->PutText("}\n\n");
 
 	if (Prefs->ShowAtomicSymbolLabels()) {
@@ -4439,13 +4582,12 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 
 		for (i = 0; i < kMaxAtomTypes; i++) {
 			Prefs->GetAtomLabel(i, atomic_symbol);
-			sprintf(tmpStr,
-					"#declare Atom_%03d = "
-					"   text {"
-					"      ttf \"timrom.ttf\", \"%s\", 0.01, 0"
-					"   }\n\n",
-					i, (const char *) atomic_symbol.mb_str(wxConvUTF8));
-			Buffer->PutText(tmpStr);
+			tmpStr.Printf(wxT("#declare Atom_%03d = "
+							  "   text {"
+							  "      ttf \"timrom.ttf\", \"") +
+									 atomic_symbol + wxT("\", 0.01, 0"
+							  "   }\n\n"), i);
+			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		}
 
 		Buffer->PutText("union {\n");
@@ -4453,32 +4595,32 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 		for (long iatom = 0; iatom < NumAtoms; iatom++) {
 			if (lAtoms[iatom].GetInvisibility()) continue;
 
-			Rotate3DPt(MainData->TotalRotation, lAtoms[iatom].Position,
-					   &text_pos);
+			Rotate3DPt(MainData->TotalRotation, lAtoms[iatom].Position, &text_pos);
 			curAtomType = lAtoms[iatom].GetType() - 1;
-			radius = AtomScale * Prefs->GetAtomSize(curAtomType);
+			radius = AtomScale*Prefs->GetAtomSize(curAtomType);
+			Prefs->GetAtomLabel(i, atomic_symbol);
 
 			AtomColor = Prefs->GetAtomColorLoc(curAtomType);
 			red = AtomColor->red / 65536.0;
 			green = AtomColor->green / 65536.0;
 			blue = AtomColor->blue / 65536.0;
 
-			sprintf(tmpStr,
-					"object {\n"
-					"   Atom_%03d\n"
-					"   Center_Trans(Atom_%03d, x + y)\n"
-					"   scale <0.25, 0.25, 1.0>\n"
-					"   translate <%f, %f, %f>\n"
-					"   no_shadow\n"
-					"   pigment { color rgb <%f, %f, %f> }\n"
-					"}\n\n", curAtomType, curAtomType,
-					text_pos.x, text_pos.y, text_pos.z + radius,
-					1.0f - red, 1.0f - green, 1.0f - blue);
-			Buffer->PutText(tmpStr);
+			tmpStr.Printf(wxT("object {\n"
+							  "   Atom_%03d\n"
+							  "   Center_Trans(Atom_%03d, x + y)\n"
+							  "   scale <0.25, 0.25, 1.0>\n"
+							  "   translate <%f, %f, %f>\n"
+							  "   no_shadow\n"
+							  "   pigment { color rgb <%f, %f, %f> }\n"
+							  "}\n\n"), curAtomType, curAtomType,
+						  text_pos.x, text_pos.y, text_pos.z + radius,
+						  1.0f - red, 1.0f - green, 1.0f - blue);
+			Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		}
 		Buffer->PutText("\n\tscale <-1, 1, 1>\n");
-		sprintf(tmpStr, "\n\ttranslate <0, 0, %f>\n", -MainData->WindowSize);
-		Buffer->PutText(tmpStr);
+		tmpStr.Printf(wxT("\n\ttranslate <0, 0, %f>\n"),
+					  -MainData->WindowSize);
+		Buffer->PutText(tmpStr.mb_str(wxConvUTF8));
 		Buffer->PutText("}\n");
 	}
 
