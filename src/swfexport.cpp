@@ -108,7 +108,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 #endif
 #endif
 	fontPath += wxT("/BsVeraSans.fdb");
-	FILE *fontFile = fopen(fontPath.fn_str(), "rb");
+	FILE *fontFile = fopen(fontPath.mb_str(wxConvUTF8), "rb");
 	if(fontFile == NULL) {
 		delete movie;
 		/* TODO:  Display an error message */
@@ -198,7 +198,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 		frameNumText->setColor(0x00, 0x00, 0x00); /* TODO:  Get from wxMMP config */
 		frameNumText->moveTo(0,
 				height - ((24.0 / 1024.0) * font->getAscent() + 3));
-		frameNumText->addString(frameNumStr.fn_str());
+		frameNumText->addString(frameNumStr.mb_str(wxConvUTF8));
 		textDI = movie->add((SWFBlock *)frameNumText);
 
 		movie->nextFrame();
@@ -313,7 +313,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 
 	getCanvasSize(&width, &height);
 
-	fontFile = fopen(fontPath.fn_str(), "rb");
+	fontFile = fopen(fontPath.mb_str(wxConvUTF8), "rb");
 	if(fontFile == NULL) {
 		/* TODO:  Display an error message */
 		/* OR, just disable drawing text */
@@ -358,7 +358,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 		frameNumText->setColor(0x00, 0x00, 0x00); /* TODO:  Get from wxMMP config */
 		frameNumText->moveTo(0,
 				height - ((24.0 / 1024.0) * font->getAscent() + 3));
-		frameNumText->addString(frameNumStr.fn_str());
+		frameNumText->addString(frameNumStr.mb_str(wxConvUTF8));
 
 		di = movie->add((SWFBlock *)bm);
 		textDI = movie->add((SWFBlock *)frameNumText);
