@@ -975,7 +975,9 @@ void MolDisplayWin::DrawTransparentTriangles(void) {
 	}
 	glEnd();	//End of triangle creation
 }
-
+#ifdef __WXMSW__
+#define GL_RESCALE_NORMAL 0x803A
+#endif
 void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 	GLUquadric *core_obj;
@@ -3111,6 +3113,7 @@ void DrawString(const char *str) {
 }
 
 #define CYL_RADIUS 0.05f
+#include <algorithm>
 void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qobj, int site_id, CPoint3D * vector) {
 
 	// This function either draws remaining bonding sites for the specified

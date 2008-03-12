@@ -1,6 +1,6 @@
+#include "Globals.h"
 #include "preview_canvas.h"
 #include "Math3D.h"
-#include "Globals.h"
 #include "VirtualSphere.h"
 #include "Prefs.h"
 #include "MolDisplayWin.h"
@@ -8,6 +8,10 @@
 #include <iostream>
 
 extern WinPrefs *gPreferences;
+
+#ifdef __WXMSW__
+#define GL_RESCALE_NORMAL 0x803A
+#endif
 
 /* ------------------------------------------------------------------------- */
 
