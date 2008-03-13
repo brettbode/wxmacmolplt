@@ -1243,6 +1243,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		}
 	} // Coords done
 
+printf("coords done\n");//DEBUG CODE
+
 	// now look for Basis
 	if ((0<lFrame->GetNumAtoms())&&(Buffer->LocateKeyWord("$BASIS", 6))) {
 		bool error = false;
@@ -1274,11 +1276,12 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			else 
 				break;
 		}
-
 		// Should have a case in above block in case no $END is found before EOF
 
 		// shells counted, so we can create the BasisSet
 		MainData->Basis = new BasisSet(nAtoms, nShells);
+		if (MainData->Basis == NULL) error = true;
+
 		Buffer->BackupnLines(linesInSection-1); // go to line right after $BASIS
 		int iShell = 0, iAtom = 0, shellsPeriAtom = 0;
 		// reiterate through Basis section to get and save BasisSet data
@@ -1316,7 +1319,6 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				// add first shell of this atom to BasisMap and save NuclearCharge
 				if (0==shellsPeriAtom) {
 					MainData->Basis->BasisMap[2*iAtom]=iShell;
-					// maybe need to ensure lframe points to correct frame?
 					MainData->Basis->NuclearCharge[iAtom] = (long)(lFrame->GetAtomType(iAtom));
 				}
 				MainData->Basis->NumFuncs += MainData->Basis->Shells[iShell].GetNumFuncs(false);
@@ -1359,7 +1361,6 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						// else throw an error?
 					} else 
 						stopReadingShell = true;
-						// set error?
 				}
 				// move on to next shell in next iteration
 				iShell++;
@@ -1370,24 +1371,26 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			}
 		} // creating BasisSet
 		if (error) {
-			delete MainData->Basis;
+			if (MainData->Basis != NULL) delete MainData->Basis;
 			MainData->Basis = NULL;
+			MessageAlert("Error while reading. No basis set created.");
 		}
-		BasisDone = true;
+		else 
+			BasisDone = true;
 	}
-	//else throw an error because there needs to be a BasisSet?
 
-	// now look for Alpha Coefficients (Orbitals)
+	// now look for Alpha Coefficients (Orbitals; depends on BasisSet)
 	if (BasisDone&&(Buffer->LocateKeyWord("$COEFF_ALPHA", 12))) {
 		Buffer->GetLine(Line); // skip $COEFF_ALPHA line
 		bool error = false;
 		char tmpStr[5];
+		unsigned long iSymCount, symCount = 0, eigenCount = 0;
 
+		// We assume that the number of Basis Functions is the number
+		// coefficients.  Otherwise we'll throw an error;
 		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
 		OrbitalRec *OrbSet = new OrbitalRec(nOrbs, nOrbs, nOrbs);
 		if (OrbSet != NULL) lFrame->Orbs.push_back(OrbSet);
-
-		unsigned long iSymCount, symCount = 0, eigenCount = 0;
 	
 		// verify here that lFrame points to the last frame?
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
@@ -1409,7 +1412,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						symCount++;
 					} else
 						break;
-				} // get sym line
+				} // got sym line
 				
 				// next come the Alpha eigen's (Energy)
 				Buffer->GetLine(Line);
@@ -1424,7 +1427,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						eigenCount++;
 					} else
 						break;
-				} //get eigen line
+				} //got eigen line
 
 				// now get the Alpha coefficients
 				for (long iLine=0; iLine < nOrbs; iLine++) {
@@ -1444,22 +1447,29 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						} else
 							break;
 					}
+					if (iCoef < iSymCount) error = true;
 					if (error) break;
-				} // get coef block
+				} // got coefs block
+				if (error) break;
 			}
 			else
 				break; // found $END of $COEFF_ALPHA
 		}
-		//do resize if numOccAlphaOrbs ends up being greater than nOrbs?
-		CoefAlphaDone = true;
+		if (error) {
+			if (OrbSet != NULL) delete OrbSet;
+			lFrame->Orbs[0] = NULL;
+			MessageAlert("Error while reading. No basis set created.");
+		}
+		else
+			CoefAlphaDone = true;
 	} // Alpha Coefficients (Orbitals) done
-	// lFrame->Orbs[0]->resize(nAlphaOrbs, nBetaOrbs); // if bigger, or when we do beta
-	
-	// now look for Beta Coefficients (Orbitals - optional)
-	if (BasisDone&&(Buffer->LocateKeyWord("$COEFF_BETA", 11))) {
-		Buffer->GetLine(Line); // skip $COEFF_ALPHA line
+
+	// now look for Beta Coefficients (Orbitals; optional; depends on Alpha Coefficients)
+	if (CoefAlphaDone&&(Buffer->LocateKeyWord("$COEFF_BETA", 11))) {
+		Buffer->GetLine(Line); // skip $COEFF_BETA line
 		bool error = false;
 		char tmpStr[5];
+		printf("in beta\n");
 
 		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
 		unsigned long iSymCount, symCount = 0, eigenCount = 0;
@@ -1525,8 +1535,26 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			else
 				break; // found $END of $COEFF_BETA
 		}
+		CoefBetaDone = true;
 	} // Beta Coefficients (orbitals) done
+	else // no Beta Coeffs
+		lFrame->Orbs[0]->ReSize(MainData->Basis->GetNumBasisFuncs(false), 0);
+
+	// now look for Alpha Orbital Occupations (optional; depends on COEFF_ALPHA)
+	if (CoefAlphaDone&&(Buffer->LocateKeyWord("$OCC_ALPHA", 10))) { 
+		Buffer->SkipnLines(1); // skip $OCC_ALPHA line
+		
+		
+		OccAlphaDone = true;	
+	}
 	
+	// now look for Beta Orbital Occupations (optional; depends on COEFF_BETA)
+	if (CoefBetaDone&&OccAlphaDone&&(Buffer->LocateKeyWord("$OCC_BETA", 9))) { 
+		Buffer->SkipnLines(1); // skip $OCC_BETA line
+		
+		OccBetaDone = true;		
+	}
+
 	// now look for vibrational frequencies for the last frame (independent)
 	if ((0<lFrame->GetNumAtoms())&&(Buffer->LocateKeyWord("$FREQ", 5))) {
 		Buffer->SkipnLines(1);	// skip $FREQ line
