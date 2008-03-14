@@ -1243,8 +1243,6 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		}
 	} // Coords done
 
-printf("coords done\n");//DEBUG CODE
-
 	// now look for Basis
 	if ((0<lFrame->GetNumAtoms())&&(Buffer->LocateKeyWord("$BASIS", 6))) {
 		bool error = false;
@@ -1392,7 +1390,6 @@ printf("coords done\n");//DEBUG CODE
 		OrbitalRec *OrbSet = new OrbitalRec(nOrbs, nOrbs, nOrbs);
 		if (OrbSet != NULL) lFrame->Orbs.push_back(OrbSet);
 	
-		// verify here that lFrame points to the last frame?
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
 			Buffer->GetLine(Line);
 			// continue until we find the end of the group
@@ -1458,7 +1455,7 @@ printf("coords done\n");//DEBUG CODE
 		if (error) {
 			if (OrbSet != NULL) delete OrbSet;
 			lFrame->Orbs[0] = NULL;
-			MessageAlert("Error while reading. No basis set created.");
+			MessageAlert("Error while reading. No orbset set created.");
 		}
 		else
 			CoefAlphaDone = true;
@@ -1469,12 +1466,10 @@ printf("coords done\n");//DEBUG CODE
 		Buffer->GetLine(Line); // skip $COEFF_BETA line
 		bool error = false;
 		char tmpStr[5];
-		printf("in beta\n");
 
 		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
 		unsigned long iSymCount, symCount = 0, eigenCount = 0;
 	
-		// verify here that lFrame points to the last frame?
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
 			Buffer->GetLine(Line);
 			// continue until we find the end of the group
@@ -1529,13 +1524,21 @@ printf("coords done\n");//DEBUG CODE
 						} else
 							break;
 					}
+					if (iCoef < iSymCount) error = true;
 					if (error) break;
 				} // get coef block
+				if (error) break;
 			}
 			else
 				break; // found $END of $COEFF_BETA
 		}
-		CoefBetaDone = true;
+		if (error) {
+			if (lFrame->Orbs[0] != NULL) 
+				lFrame->Orbs[0]->ReSize(MainData->Basis->GetNumBasisFuncs(false), 0);
+			MessageAlert("Error while reading. No beta orbset added.");
+		}
+		else
+			CoefBetaDone = true;
 	} // Beta Coefficients (orbitals) done
 	else // no Beta Coeffs
 		lFrame->Orbs[0]->ReSize(MainData->Basis->GetNumBasisFuncs(false), 0);
@@ -1543,16 +1546,99 @@ printf("coords done\n");//DEBUG CODE
 	// now look for Alpha Orbital Occupations (optional; depends on COEFF_ALPHA)
 	if (CoefAlphaDone&&(Buffer->LocateKeyWord("$OCC_ALPHA", 10))) { 
 		Buffer->SkipnLines(1); // skip $OCC_ALPHA line
+		bool error = false;
+
+		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
+		lFrame->Orbs[0]->OrbOccupation = new float[nOrbs];
+		if (lFrame->Orbs[0]->OrbOccupation != NULL) {
+			long occCount = 0, lineOccs;
+			float tmpOcc;
 		
-		
-		OccAlphaDone = true;	
-	}
-	
+			while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
+				Buffer->GetLine(Line);
+				// continue until we find the end of the group
+				if (FindKeyWord(Line, "$END", 4)<0) {
+					lineBytes = strlen(Line);
+					bytesRead = 0;
+					lineOccs = 0; 
+					while (bytesRead < lineBytes && lineOccs < 5 && occCount < nOrbs) {
+						scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpOcc, &bytesConsumed);
+						if (scanCount == 1) {
+							bytesRead+=bytesConsumed;
+							lFrame->Orbs[0]->OrbOccupation[occCount] = tmpOcc;
+							lineOccs++;
+							occCount++;
+						} 
+						else
+							break;
+					}
+					if (error) break;
+				}
+				else
+					break;
+			}
+			if (occCount < nOrbs) 
+				error = true;
+			else 
+				lFrame->Orbs[0]->NumOccupiedAlphaOrbs = occCount;		
+		}
+		if (error) {
+			if (lFrame->Orbs[0]->OrbOccupation != NULL) 
+				delete lFrame->Orbs[0]->OrbOccupation;
+			lFrame->Orbs[0]->OrbOccupation = NULL;
+			MessageAlert("Error while reading. No Alpha Occupations added.");
+		}
+		else
+			OccAlphaDone = true;	
+	}// Occ_Alpha done
+
 	// now look for Beta Orbital Occupations (optional; depends on COEFF_BETA)
 	if (CoefBetaDone&&OccAlphaDone&&(Buffer->LocateKeyWord("$OCC_BETA", 9))) { 
 		Buffer->SkipnLines(1); // skip $OCC_BETA line
+		bool error = false;
+
+		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
+		lFrame->Orbs[0]->OrbOccupationB = new float[nOrbs];
+		if (lFrame->Orbs[0]->OrbOccupationB != NULL) {
+			long occCount = 0, lineOccs;
+			float tmpOcc;
 		
-		OccBetaDone = true;		
+			while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
+				Buffer->GetLine(Line);
+				// continue until we find the end of the group
+				if (FindKeyWord(Line, "$END", 4)<0) {
+					lineBytes = strlen(Line);
+					bytesRead = 0;
+					lineOccs = 0; 
+					while (bytesRead < lineBytes && lineOccs < 5 && occCount < nOrbs) {
+						scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpOcc, &bytesConsumed);
+						if (scanCount == 1) {
+							bytesRead+=bytesConsumed;
+							lFrame->Orbs[0]->OrbOccupationB[occCount] = tmpOcc;
+							lineOccs++;
+							occCount++;
+						} 
+						else
+							break;
+					}
+					if (error) break;
+				}
+				else
+					break;
+			}
+			if (occCount < nOrbs) 
+				error = true;
+			else 
+				lFrame->Orbs[0]->NumOccupiedBetaOrbs = occCount;		
+		}
+		if (error) {
+			if (lFrame->Orbs[0]->OrbOccupationB != NULL)
+				delete lFrame->Orbs[0]->OrbOccupationB;
+			lFrame->Orbs[0]->OrbOccupationB = NULL; 
+			MessageAlert("Error while reading. No Beta Occupations added.");
+		}
+		else
+			OccBetaDone = true;		
 	}
 
 	// now look for vibrational frequencies for the last frame (independent)
