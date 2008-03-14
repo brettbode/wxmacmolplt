@@ -2098,6 +2098,7 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 			 ++frag) {
 			const std::string& text = frag->second.GetText();
 			File->Write(text.c_str(), text.size());
+			File->WriteLine("", true);
 		}
 	}
 }
