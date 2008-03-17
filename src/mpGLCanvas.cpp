@@ -621,8 +621,8 @@ void MpGLCanvas::Draw() {
 	// Setup OpenGL matrices.  The projection is defined according to the
 	// preferences, and we remain in eye space for now.
 	glViewport(0, 0, (GLint) width, (GLint) height);
-	glDrawBuffer(GL_BACK);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	/*glDrawBuffer(GL_BACK); */
+	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
 
 	// Only do the drawing if there is not an operation in progress otherwise
 	// the underlying data may not be complete.
@@ -631,6 +631,7 @@ void MpGLCanvas::Draw() {
 	}
 
 	if (!do_stereo) {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		SetProjection(((float) width) / height);
@@ -659,6 +660,7 @@ void MpGLCanvas::Draw() {
 		
 		// Left.
 		glDrawBuffer(GL_BACK_LEFT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		
@@ -677,6 +679,7 @@ void MpGLCanvas::Draw() {
 
 		// Right.
 		glDrawBuffer(GL_BACK_RIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		

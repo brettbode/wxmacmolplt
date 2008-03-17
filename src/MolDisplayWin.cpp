@@ -447,6 +447,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 					 0, 0};
 	bool do_stereo = false;
 #if wxCHECK_VERSION(2,9,0)
+	std::cout << "Prefs->UseStereo(): " << (int) Prefs->UseStereo() << std::endl;
 	if (Prefs->UseStereo()) {
 		attribs[4] = WX_GL_STEREO;
 		if (wxGLCanvas::IsDisplaySupported(attribs)) {
@@ -3757,11 +3758,9 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 		lSurface = lSurface->GetNextSurface();
 	}
 
-	bool Stereo = Prefs->UseStereo();
 	wxRect DisplayRect = glCanvas->GetRect();
 	hsize = DisplayRect.GetWidth();
 	vsize = DisplayRect.GetHeight();
-	if (Stereo) hsize/=2;
 
 	/* Figure out where to place the Virtual Sphere cue. */
 	width = hsize;
@@ -3772,11 +3771,6 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	else
 		sphereRadius   = (long)((float) (sphereCenter.y)*0.9);
 	hoffset = sphereCenter.x;
-#if wxCHECK_VERSION(2, 8, 0)
-	if (Stereo && ! DisplayRect.Contains(mouse_start)) sphereCenter.x += hsize;
-#else
-	if (Stereo && ! DisplayRect.Inside(mouse_start)) sphereCenter.x += hsize;
-#endif
 	hsize = MAX(hsize, vsize);
 	sphereRect.SetHeight(sphereRadius);
 	sphereRect.SetWidth(sphereRadius);
