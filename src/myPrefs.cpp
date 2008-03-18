@@ -1046,10 +1046,13 @@ void ScalingPrefsPane::OnSliderUpdate( wxCommandEvent &event )
 StereoPrefsPane::StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, targetPrefs, kStereoPrefsPane, GlobalPrefs, parent) {
 
-  mMainSizer = new wxBoxSizer(wxVERTICAL);
-  mMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
+	mMainSizer = new wxBoxSizer(wxVERTICAL);
+	mMiddleSizer = new wxBoxSizer(wxHORIZONTAL);
 
-  SetSizer(mMainSizer);
+	SetSizer(mMainSizer);
+	if (!GlobalPrefs) {
+		Disable();
+	}
 }
 
 void StereoPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
@@ -1057,18 +1060,20 @@ void StereoPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
   mChkActive = new wxCheckBox(this, ID_STEREO_ACTIVE, _T("Stereo Active"), wxDefaultPosition);
   mChkActive->SetValue(mTargetPrefs->UseStereo());
   mMainSizer->Add(mChkActive, 0, wxALIGN_LEFT | wxALL, 10);
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Enter the number of degrees of offset between the stereo images.")), 0, wxALIGN_LEFT | wxALL, 10);
+  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Enabling or disabling stereo affects new windows only.")), 0, wxALIGN_LEFT | wxALL, 10);
+  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("The eye separation is determined by dividing the focal length\n")
+			                                       _T("by the eye separation factor. To minimize ghosting, either\n")
+												   _T("zoom out or increase the factor below.")), 0, wxALIGN_LEFT | wxALL, 10);
 
-  mMiddleSizer->Add(new wxStaticText(this, wxID_ANY, _T("Offset (degrees) ")), 0, wxALIGN_LEFT | wxALL, 10);
+  mMiddleSizer->Add(new wxStaticText(this, wxID_ANY, _T("Factor ")), 0, wxALIGN_LEFT | wxALL, 10);
 
   wxString tmp;
   tmp.Printf(wxT("%d"), mTargetPrefs->GetStereoOffset());
   mOffDegree = new wxTextCtrl( this, wxID_ANY, tmp);
-
   mMiddleSizer->Add(mOffDegree, 0, wxALIGN_LEFT | wxALL, 3);
 
   mMainSizer->Add(mMiddleSizer, 0, wxALIGN_LEFT | wxLEFT, 10);
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Hint: Enter a + number for cross-eyed viewing\n or a - number for straight on viewing.")), 0, wxALIGN_LEFT | wxLEFT, 10);
+  /* mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Hint: Enter a + number for cross-eyed viewing\n or a - number for straight on viewing.")), 0, wxALIGN_LEFT | wxLEFT, 10); */
 
 }
 

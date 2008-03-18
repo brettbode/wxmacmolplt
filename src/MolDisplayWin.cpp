@@ -447,7 +447,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 					 0, 0};
 	bool do_stereo = false;
 #if wxCHECK_VERSION(2,9,0)
-	std::cout << "Prefs->UseStereo(): " << (int) Prefs->UseStereo() << std::endl;
 	if (Prefs->UseStereo()) {
 		attribs[4] = WX_GL_STEREO;
 		if (wxGLCanvas::IsDisplaySupported(attribs)) {

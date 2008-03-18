@@ -649,7 +649,7 @@ void MpGLCanvas::Draw() {
 		float half_width = near_z * tan(radians);
 		float ndfl = 0.1f / focal_length;
 		float left, right, bottom, top;
-		float eye_separation = focal_length / 30.0f;
+		float eye_separation = focal_length / Prefs->GetStereoOffset();
 		
 		CPoint3D dir(0.0f, 0.0f, -1.0f);
 		CPoint3D up(0.0f, 1.0f, 0.0f);
