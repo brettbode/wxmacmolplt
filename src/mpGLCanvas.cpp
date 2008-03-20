@@ -647,7 +647,7 @@ void MpGLCanvas::Draw() {
 		float focal_length = 1.0f * mMainData->WindowSize;
 		float radians = Prefs->GetGLFOV() * kPi / 180.0f;
 		float half_width = near_z * tan(radians);
-		float ndfl = 0.1f / focal_length;
+		float ndfl = near_z / focal_length;
 		float left, right, bottom, top;
 		float eye_separation = focal_length / Prefs->GetStereoOffset();
 		

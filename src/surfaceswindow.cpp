@@ -285,15 +285,20 @@ void SurfacesWindow::addNewPane(int type) {
 void SurfacesWindow::Reset(void) {
 	//rebuild the list of surfaces
 //	int oldpage = book->GetSelection();
-	book->DeleteAllPages();
+	/* book->DeleteAllPages(); */
 	
-	BaseSurfacePane* tempPane = NULL;
-	MoleculeData * MainData = Parent->GetData();
-	Frame * lFrame = MainData->GetCurrentFramePtr();
+	size_t npages = book->GetPageCount();
+	for (size_t i = 0; i < npages; ++i) {
+		book->DeletePage(0);
+	}
+	
+	BaseSurfacePane *tempPane = NULL;
+	MoleculeData *MainData = Parent->GetData();
+	Frame *lFrame = MainData->GetCurrentFramePtr();
 	long NumSurfaces = lFrame->GetNumSurfaces();
-	if (NumSurfaces > 0 ) {
+	if (NumSurfaces > 0) {
 		for (int i=0; i<NumSurfaces; i++) {
-			Surface * lSurf = lFrame->GetSurface(i);
+			Surface *lSurf = lFrame->GetSurface(i);
 			if (lSurf) {
 				switch (lSurf->GetSurfaceType()) {
 					case kOrb3DType:
