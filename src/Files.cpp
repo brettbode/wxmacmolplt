@@ -1181,34 +1181,42 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
   * BufferFile operations.
 */
 long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
+	// buffer line for text to be scanned while parsing
 	char Line[kMaxLineLength];
-	long nAtoms;
+	// number of atomes in in the structure described by this file
+	long nAtoms = 0;
+	// Placeholders for traversing file sections in Buffer
+	long startOfSection = 0;
+	long endOfSection = -1;
+	// counters for line-by-line text input:
+	// # of tokens sucessfully read in a sscanf call, # bytes total in line, 
+	// current position in line, and the # of bytes read through one sscanf call
 	int scanCount, lineBytes, bytesRead, bytesConsumed;
+	// flags to indicate $KEYWORD section completion and order-of-dependency
+	// following.  Also used to enforce data parsing in-order (doesn't guarantee
+	// that the file's data was in-order, only that it is parsed in-order)
 	bool BasisDone = false, CoefAlphaDone = false, CoefBetaDone = false;
 	bool OccAlphaDone = false, OccBetaDone = false;
 	
 	ProgressInd->ChangeText("Reading MKL file...");
 	Frame * lFrame = MainData->cFrame;
 	// first scan the file to determine the number of atoms
-	nAtoms = 0;
-	long startOfCOORD = 0;
 	//look throughout the file for the $COORD or the last $$
 	//and count the number of lines between the two keywords 
 	//(each line is another atom in the molecule)
-	while (Buffer->GetFilePos() < Buffer->GetFileLength() && 
-		Buffer->LocateKeyWord("$COORD", 6)) {
+	while (Buffer->GetFilePos() < Buffer->GetFileLength() 
+			&& Buffer->LocateKeyWord("$COORD", 6)) {
 		Buffer->SkipnLines(1); // skip $COORD line
-		startOfCOORD = Buffer->GetFilePos();
-		long endOfCoord = -1;
+		startOfSection = Buffer->GetFilePos();
 		if (Buffer->LocateKeyWord("$END", 4)) {
-			endOfCoord = Buffer->GetFilePos();
-			Buffer->SetFilePos(startOfCOORD);
-		} else endOfCoord = Buffer->GetFileSize();
-		while (Buffer->GetFilePos() < endOfCoord) {
+			endOfSection = Buffer->GetFilePos();
+			Buffer->SetFilePos(startOfSection);
+		} else endOfSection = Buffer->GetFileSize();
+		while (Buffer->GetFilePos() < endOfSection) {
 			long startOfFramePos = Buffer->GetFilePos();
-			long endOfFramePos = endOfCoord;
+			long endOfFramePos = endOfSection;
 			//individual geometries are separated by the "$$" line
-			if (Buffer->LocateKeyWord("$$", 2, endOfCoord)) {
+			if (Buffer->LocateKeyWord("$$", 2, endOfSection)) {
 				endOfFramePos = Buffer->GetFilePos();
 				Buffer->SetFilePos(startOfFramePos);
 			}
@@ -1236,14 +1244,14 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				//add atom to the molecule
 				lFrame->AddAtom(AtomType, Pos);
 			}
-			if (Buffer->GetFilePos() < endOfCoord) Buffer->SkipnLines(1);
+			if (Buffer->GetFilePos() < endOfSection) Buffer->SkipnLines(1);
 			//setup bonds, if needed
 			if (Prefs->GetAutoBond() && (nAtoms > 0))
 				lFrame->SetBonds(Prefs, false);
 		}
 	} // Coords done
 
-	// now look for Basis
+	// now look for Basis data
 	if ((0<lFrame->GetNumAtoms())&&(Buffer->LocateKeyWord("$BASIS", 6))) {
 		bool error = false;
 		// totals counters
@@ -1253,7 +1261,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		char IType[5];
 		float Sc;
 		
-		// count total number of shells in Basis section
+		// count total number of shells in Basis section by counting
+		// the number of lines formatted according to the sscanf below
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())) {
 			Buffer->GetLine(Line);
 			linesInSection++;
@@ -1274,29 +1283,32 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			else 
 				break;
 		}
-		// Should have a case in above block in case no $END is found before EOF
+		// Should have a case in above block in case no $END is found before EOF,
+		// similar to how the $COORD section parser above works
 
-		// shells counted, so we can create the BasisSet
+		// Now that shells are counted, we can create the BasisSet and parse data
 		MainData->Basis = new BasisSet(nAtoms, nShells);
 		if (MainData->Basis == NULL) error = true;
-
-		Buffer->BackupnLines(linesInSection-1); // go to line right after $BASIS
-		int iShell = 0, iAtom = 0, shellsPeriAtom = 0;
+		
+		// go back to the line right after $BASIS so we can parse the data
+		Buffer->BackupnLines(linesInSection-1); 
+		long iShell = 0, iAtom = 0, shellsPeriAtom = 0;
 		// reiterate through Basis section to get and save BasisSet data
 		while (iShell < nShells && iAtom < nAtoms && !error) {
 			Buffer->GetLine(Line);
-			// we will only use IType Line read
+			// we only use IType read; nFunc is redundant; Sc(ale Factor)  we don't use
 			scanCount = sscanf(Line, "%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
 			if (3==scanCount) {
-				// create this BasisShell
+				// create this BasisShell in the BasisSet
 				MainData->Basis->Shells.push_back(BasisShell());	
-				// increment the shell count in the BasisSet
+				// increment the shell count in the BasisSet (how many shells we've parsed)
 				MainData->Basis->NumShells++; 
 				// cast "SP" to L for simplicity
 				if ('S'==toupper(IType[0]) && 'P'==toupper(IType[1])) {
 					IType[0] = 'L';
 					IType[1] = '\0';
 				}
+				// save the type of this BasisShell
 				switch (toupper(IType[0])) {
 					case 'L':
 						MainData->Basis->Shells[iShell].ShellType = LShell;
@@ -1320,8 +1332,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					MainData->Basis->NuclearCharge[iAtom] = (long)(lFrame->GetAtomType(iAtom));
 				}
 				MainData->Basis->NumFuncs += MainData->Basis->Shells[iShell].GetNumFuncs(false);
-				// (currently not doing anything with nFunc or Sc read in)
-				// read in functions for this shell
+				// read in functions for this shell (kinda dumb - grab rows of floats if
+				// the line isn't formatted like the line we grab IType from)
 				char tmpStr[5];
 				float tmpFloat[3];
 				bool stopReadingShell = false;
@@ -1345,6 +1357,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						MainData->Basis->Shells[iShell].NormCoef.push_back(tmpFloat[1]);
 						MainData->Basis->Shells[iShell].NormCoef.push_back(tmpFloat[2]);
 					} 
+					// We've found the end of this Atom's Basis Set, end of the $BASIS section
+					// or else we've hit an error
 					else if (1==sscanf(Line, "%s%n", &tmpStr, &bytesConsumed)) {
 						if ((2==bytesConsumed && 0==strncmp(tmpStr, "$$", 3)) ||
 							(4==bytesConsumed && 0==strncmp(tmpStr, "$END", 5))) {
@@ -1639,7 +1653,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		}
 		else
 			OccBetaDone = true;		
-	}
+	}// Occ_Beta Done
 
 	// now look for vibrational frequencies for the last frame (independent)
 	if ((0<lFrame->GetNumAtoms())&&(Buffer->LocateKeyWord("$FREQ", 5))) {
