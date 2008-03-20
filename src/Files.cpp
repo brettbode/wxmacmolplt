@@ -1255,7 +1255,10 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	if ((0<lFrame->GetNumAtoms())&&(Buffer->LocateKeyWord("$BASIS", 6))) {
 		bool error = false;
 		// totals counters
-		long nShells = 0, linesInSection = 0;
+		unsigned long nShells = 0, linesInSection = 0;
+		// other counters; may be set to -1 as a reset to offset an increment
+		// thus placing back at 0 for a subsequent iteration
+		long iShell = 0, iAtom = 0, shellsPeriAtom = 0;
 		// temp vars for line-at-a-time read 
 		long nFunc;	
 		char IType[5];
@@ -1292,7 +1295,6 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		
 		// go back to the line right after $BASIS so we can parse the data
 		Buffer->BackupnLines(linesInSection-1); 
-		long iShell = 0, iAtom = 0, shellsPeriAtom = 0;
 		// reiterate through Basis section to get and save BasisSet data
 		while (iShell < nShells && iAtom < nAtoms && !error) {
 			Buffer->GetLine(Line);
@@ -1333,7 +1335,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				}
 				MainData->Basis->NumFuncs += MainData->Basis->Shells[iShell].GetNumFuncs(false);
 				// read in functions for this shell (kinda dumb - grab rows of floats if
-				// the line isn't formatted like the line we grab IType from)
+				// the line isn't formatted like the lines we grab ITypes from)
 				char tmpStr[5];
 				float tmpFloat[3];
 				bool stopReadingShell = false;
@@ -1370,7 +1372,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 							stopReadingShell = true;
 							break;
 						}
-						// else throw an error?
+						// else throw an error? simply "else error = true;" causes incorrect behavior, though
 					} else 
 						stopReadingShell = true;
 				}
@@ -1383,6 +1385,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			}
 		} // creating BasisSet
 		if (error) {
+			// Free what we have and set it NULL so dependent functions won't crash
 			if (MainData->Basis != NULL) delete MainData->Basis;
 			MainData->Basis = NULL;
 			MessageAlert("Error while reading. No basis set created.");
@@ -1396,14 +1399,17 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		Buffer->GetLine(Line); // skip $COEFF_ALPHA line
 		bool error = false;
 		char tmpStr[5];
+		// counters for within iterations and overall in this section
 		unsigned long iSymCount, symCount = 0, eigenCount = 0;
 
-		// We assume that the number of Basis Functions is the number
-		// coefficients.  Otherwise we'll throw an error;
+		// we assume that the number of Basis Functions is the number
+		// coefficients.  Otherwise we should throw an error
 		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
+		// create the OrbitalRec and save it if successful
 		OrbitalRec *OrbSet = new OrbitalRec(nOrbs, nOrbs, nOrbs);
 		if (OrbSet != NULL) lFrame->Orbs.push_back(OrbSet);
-	
+
+		// read the section until we hit the end.  should be modified to halt on EOF
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
 			Buffer->GetLine(Line);
 			// continue until we find the end of the group
@@ -1412,7 +1418,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				bytesRead = 0;
 				iSymCount = 0;
 				
-				// now get the Alpha symmetry symbols
+				// get the Alpha symmetry symbols a line at a time (should be 5 per line, 
+				// except possibly the last block may have fewer per line)
 				while (bytesRead < lineBytes) {
 					scanCount = sscanf(&Line[bytesRead], "%s%n", tmpStr, &bytesConsumed);
 					if (1==scanCount) {
@@ -1425,11 +1432,13 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						break;
 				} // got sym line
 				
-				// next come the Alpha eigen's (Energy)
+				// next come Alpha eigens (Energy; first row of data after syms)
 				Buffer->GetLine(Line);
 				lineBytes = strlen(Line);
 				bytesRead = 0;
 				float tmpEigen;
+				// get a line of the values at a time (should be 5 per line, except possibly 
+				// the last block may have fewer per line)
 				while (bytesRead < lineBytes) {
 					scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpEigen, &bytesConsumed);
 					if (scanCount == 1) {
@@ -1443,12 +1452,12 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				// now get the Alpha coefficients
 				for (long iLine=0; iLine < nOrbs; iLine++) {
 					Buffer->GetLine(Line);
-					// each line will contain up to 5 orbitals
+					// each line should contain up to 5 orbitals
 					lineBytes = strlen(Line);
 					bytesRead = 0;
 					long iCoef = 0;
 					float tmpCoef;
-					
+					// get coefficients line at a time, "symCount" times
 					while (bytesRead < lineBytes && iCoef < symCount) {
 						scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpCoef, &bytesConsumed);
 						if (scanCount == 1) {
@@ -1467,6 +1476,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				break; // found $END of $COEFF_ALPHA
 		}
 		if (error) {
+			// free what we have and set NULL so dependent functions won't crash
 			if (OrbSet != NULL) delete OrbSet;
 			lFrame->Orbs[0] = NULL;
 			MessageAlert("Error while reading. No orbset set created.");
@@ -1480,9 +1490,11 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		Buffer->GetLine(Line); // skip $COEFF_BETA line
 		bool error = false;
 		char tmpStr[5];
-
-		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
+		// counters for within iterations and overall in this section
 		unsigned long iSymCount, symCount = 0, eigenCount = 0;
+		// we assume that the number of Basis Functions is the number
+		// coefficients.  Otherwise wei should throw an error
+		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
 	
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
 			Buffer->GetLine(Line);
@@ -1492,7 +1504,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				bytesRead = 0;
 				iSymCount = 0;
 				
-				// now get the Beta symmetry symbols
+				// get the Beta symmetry symbols a line at a time (should be 5 per line, 
+				// except possibly the last block may have fewer per line)
 				while (bytesRead < lineBytes) {
 					scanCount = sscanf(&Line[bytesRead], "%s%n", tmpStr, &bytesConsumed);
 					if (1==scanCount) {
@@ -1505,11 +1518,13 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						break;
 				} // get sym line
 				
-				// next come the Beta eigen's (Energy)
+				// next come Beta eigens (Energy; first row of data after syms)
 				Buffer->GetLine(Line);
 				lineBytes = strlen(Line);
 				bytesRead = 0;
 				float tmpEigen;
+				// get a line of the values at a time (should be 5 per line, except possibly 
+				// the last block may have fewer per line)
 				while (bytesRead < lineBytes) {
 					scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpEigen, &bytesConsumed);
 					if (scanCount == 1) {
@@ -1528,7 +1543,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					bytesRead = 0;
 					long iCoef = 0;
 					float tmpCoef;
-					
+					// get coefficients line at a time, "symCount" times
 					while (bytesRead < lineBytes && iCoef < symCount) {
 						scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpCoef, &bytesConsumed);
 						if (scanCount == 1) {
@@ -1547,6 +1562,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				break; // found $END of $COEFF_BETA
 		}
 		if (error) {
+			// If we got to this point, Alpha was done correctly, so we don't delete the
+			// OrbitalRec -just resize it to exclude Beta (check for NULL to be safe)
 			if (lFrame->Orbs[0] != NULL) 
 				lFrame->Orbs[0]->ReSize(MainData->Basis->GetNumBasisFuncs(false), 0);
 			MessageAlert("Error while reading. No beta orbset added.");
@@ -1561,13 +1578,15 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	if (CoefAlphaDone&&(Buffer->LocateKeyWord("$OCC_ALPHA", 10))) { 
 		Buffer->SkipnLines(1); // skip $OCC_ALPHA line
 		bool error = false;
-
+		// the number of orbital occupations should be the number of basis functions
 		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
 		lFrame->Orbs[0]->OrbOccupation = new float[nOrbs];
+		// if the array was allocated fine, we can continue
 		if (lFrame->Orbs[0]->OrbOccupation != NULL) {
+			// counters and a temporary slot for data read one item at a time
 			long occCount = 0, lineOccs;
 			float tmpOcc;
-		
+			// read the occupation numbers end $END; should have a case for EOF read
 			while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
 				Buffer->GetLine(Line);
 				// continue until we find the end of the group
@@ -1575,6 +1594,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					lineBytes = strlen(Line);
 					bytesRead = 0;
 					lineOccs = 0; 
+					//read line at a time, up to 5, and within number of orb's defined above
 					while (bytesRead < lineBytes && lineOccs < 5 && occCount < nOrbs) {
 						scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpOcc, &bytesConsumed);
 						if (scanCount == 1) {
@@ -1591,12 +1611,15 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				else
 					break;
 			}
+			// insufficient data
 			if (occCount < nOrbs) 
 				error = true;
+			// else set the number occupied to what we read.
 			else 
 				lFrame->Orbs[0]->NumOccupiedAlphaOrbs = occCount;		
 		}
 		if (error) {
+			// free what we have and set NULL so dependent functions won't crash
 			if (lFrame->Orbs[0]->OrbOccupation != NULL) 
 				delete lFrame->Orbs[0]->OrbOccupation;
 			lFrame->Orbs[0]->OrbOccupation = NULL;
@@ -1614,6 +1637,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
 		lFrame->Orbs[0]->OrbOccupationB = new float[nOrbs];
 		if (lFrame->Orbs[0]->OrbOccupationB != NULL) {
+			// counters and a temporary slot for data read one item at a time
 			long occCount = 0, lineOccs;
 			float tmpOcc;
 		
@@ -1624,6 +1648,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					lineBytes = strlen(Line);
 					bytesRead = 0;
 					lineOccs = 0; 
+					//read line at a time, up to 5, and within number of orb's defined above
 					while (bytesRead < lineBytes && lineOccs < 5 && occCount < nOrbs) {
 						scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpOcc, &bytesConsumed);
 						if (scanCount == 1) {
@@ -1640,12 +1665,15 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				else
 					break;
 			}
+			// insufficient data
 			if (occCount < nOrbs) 
 				error = true;
+			// else set the number occupied to what we read.
 			else 
 				lFrame->Orbs[0]->NumOccupiedBetaOrbs = occCount;		
 		}
 		if (error) {
+			// free what we have and set NULL so dependent functions won't crash
 			if (lFrame->Orbs[0]->OrbOccupationB != NULL)
 				delete lFrame->Orbs[0]->OrbOccupationB;
 			lFrame->Orbs[0]->OrbOccupationB = NULL; 
@@ -1667,11 +1695,13 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			Buffer->GetLine(Line);
 			//continue until we find the end of the group
 			if (FindKeyWord(Line, "$END", 4)<0) {								
-				//the first line is the symmetry symbol, which we ignore
+				//the first line is the symmetry symbolis which we ignore
+				// (we should've gotten those from the Alpha/Beta Coefficients)
 				Buffer->GetLine(Line);	//next line is the frequencies
 				unsigned int lineModes=0;
 				lineBytes = strlen(Line);
 				bytesRead = 0;
+				// read Frequencies as strings one at a time in one line
 				while (bytesRead < lineBytes) {
 					scanCount = sscanf(&(Line[bytesRead]), "%s%n", freq, &bytesConsumed);
 					if (scanCount == 1) {
