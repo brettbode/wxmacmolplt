@@ -98,7 +98,7 @@ void WinPrefs::ReadBondDefaults(void) {
 void WinPrefs::CopyBondPrefs(WinPrefs * Orig) {
 	memcpy(BondColors, Orig->GetBondColorLoc(0), 4*sizeof(RGBColor));
 	memcpy(BondPatterns, Orig->GetBondPatternLoc(0), 4*sizeof(short));
-	memcpy(&VectorColor, Orig->GetVectorColorLoc(), sizeof(short));
+	memcpy(&VectorColor, Orig->GetVectorColorLoc(), sizeof(RGBColor));
 	memcpy(&VectorPattern, Orig->GetVectorPatternLoc(), sizeof(short));
 	RotateMode = Orig->GetRotateMode();
 	VectorScale = Orig->GetVectorScale();

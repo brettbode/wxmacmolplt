@@ -810,19 +810,19 @@ void Surf2DBase::Read2DXML(XMLElement * parent) {
 					break;
 				case MMP_SurfPosColor:
 					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), tf))
-						PosColor.red = (short)(tf*65535.0);
+						PosColor.red = (unsigned short)(tf*65535.0);
 					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), tf))
-						PosColor.green = (short)(tf*65535.0);
+						PosColor.green = (unsigned short)(tf*65535.0);
 						if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), tf))
-							PosColor.blue = (short)(tf*65535.0);
+							PosColor.blue = (unsigned short)(tf*65535.0);
 							break;
 				case MMP_SurfNegColor:
 					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), tf))
-						NegColor.red = (short)(tf*65535.0);
+						NegColor.red = (unsigned short)(tf*65535.0);
 					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), tf))
-						NegColor.green = (short)(tf*65535.0);
+						NegColor.green = (unsigned short)(tf*65535.0);
 						if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), tf))
-							NegColor.blue = (short)(tf*65535.0);
+							NegColor.blue = (unsigned short)(tf*65535.0);
 							break;
 				case MMP_SurfShowZeroContour:
 					if (child->getBoolValue(tb))
@@ -1066,27 +1066,30 @@ void Surf3DBase::Read3DXML(XMLElement * parent) {
 					break;
 				case MMP_SurfPosColor:
 					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), tf))
-						PosColor.red = (short)(tf*65535.0);
+						PosColor.red = (unsigned short)(tf*65535.0);
 					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), tf))
-						PosColor.green = (short)(tf*65535.0);
+						PosColor.green = (unsigned short)(tf*65535.0);
 					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), tf))
-						PosColor.blue = (short)(tf*65535.0);
+						PosColor.blue = (unsigned short)(tf*65535.0);
 					break;
 				case MMP_SurfNegColor:
 					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), tf))
-						NegColor.red = (short)(tf*65535.0);
+						NegColor.red = (unsigned short)(tf*65535.0);
 					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), tf))
-						NegColor.green = (short)(tf*65535.0);
+						NegColor.green = (unsigned short)(tf*65535.0);
 					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), tf))
-						NegColor.blue = (short)(tf*65535.0);
+						NegColor.blue = (unsigned short)(tf*65535.0);
 					break;
 				case MMP_SurfTransColor:
-					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), tf))
-						TranspColor.red = (short)(tf*65535.0);
-					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), tf))
-						TranspColor.green = (short)(tf*65535.0);
-					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), tf))
-						TranspColor.blue = (short)(tf*65535.0);
+					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), tf)) {
+						TranspColor.red = (unsigned short)(tf*65535.0);
+					}
+					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), tf)) {
+						TranspColor.green = (unsigned short)(tf*65535.0);
+					}
+					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), tf)) {
+						TranspColor.blue = (unsigned short)(tf*65535.0);
+					}
 					break;
 				case MMP_SurfContourValue:
 					if (child->getDoubleValue(td))

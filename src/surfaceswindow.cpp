@@ -285,12 +285,15 @@ void SurfacesWindow::addNewPane(int type) {
 void SurfacesWindow::Reset(void) {
 	//rebuild the list of surfaces
 //	int oldpage = book->GetSelection();
-	/* book->DeleteAllPages(); */
-	
+
+#if wxCHECK_VERSION(2,9,0)
+	book->DeleteAllPages();
+#else
 	size_t npages = book->GetPageCount();
 	for (size_t i = 0; i < npages; ++i) {
 		book->DeletePage(0);
 	}
+#endif
 	
 	BaseSurfacePane *tempPane = NULL;
 	MoleculeData *MainData = Parent->GetData();
