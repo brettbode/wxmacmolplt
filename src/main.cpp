@@ -20,6 +20,7 @@
 #include <wx/stdpaths.h>
 #include <locale.h>
 #include <sstream>
+#include <iostream>
 
 #include "glf.h"
 #include "build_palette.h"
