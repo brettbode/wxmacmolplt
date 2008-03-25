@@ -1058,10 +1058,12 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 							XMLElement * child = children->item(i);
 							CML_Element elName;
 							CML_convert(child->getName(), elName);
-							if (ProgressInd) ProgressInd->ChangeText("Reading CML elements...");
-							if (!ProgressInd->UpdateProgress((100*i)/children->length())) { 
-								delete xDoc;
-								throw UserCancel();
+							if (ProgressInd) {
+								ProgressInd->ChangeText("Reading CML elements...");
+								if (!ProgressInd->UpdateProgress((100*i)/children->length())) { 
+									delete xDoc;
+									throw UserCancel();
+								}
 							}
 							switch (elName) {
 								case MoleculeElement:

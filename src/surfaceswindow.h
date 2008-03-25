@@ -84,14 +84,7 @@ public:
 
 ////@begin SurfacesWindow event handler declarations
 
-	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_SURFTITLE
-	void OnSurftitleUpdated( wxCommandEvent& event );
-
-	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_VISIBLECHECK
-	void OnVisiblecheckClick( wxCommandEvent& event );
-
-	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_ALLFRAMECHECK
-	void OnAllframecheckClick( wxCommandEvent& event );
+	void OnChangeTitle(wxCommandEvent& event);
 
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
 	void OnAddClick( wxCommandEvent& event );
@@ -129,9 +122,6 @@ public:
 	void SurfaceUpdated(void);
 	
 ////@begin SurfacesWindow member variables
-	wxTextCtrl* surfTitleEdit;
-	wxCheckBox* visibleCheck;
-	wxCheckBox* allFrameCheck;
 	wxChoicebook* book;
 	wxButton* mDeleteButton;
 private:

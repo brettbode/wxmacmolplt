@@ -635,7 +635,7 @@ class Surface {
 		inline long GetSurfaceID(void) const {return ID;};
 		inline long SetSurfaceID(long NewID) {ID = NewID; return ID;};
 		inline long SetSurfaceID(void) {/*ID = TickCount(); return ID;*/
-                                        static long global_ID = 0; return ++global_ID;};
+                                        static long global_ID = 0; ID = ++global_ID; return ID;};
 		virtual void RotateEvent(MoleculeData * MainData);
 		virtual void WriteXML(XMLElement * parent) const;
 		virtual bool ReadXML(XMLElement * parent);

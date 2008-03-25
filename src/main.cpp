@@ -409,7 +409,7 @@ BEGIN_EVENT_TABLE(MpApp, wxApp)
 END_EVENT_TABLE()
 
 // Tell wxWidgets to start the program:
-IMPLEMENT_APP(MpApp)
+IMPLEMENT_APP_NO_MAIN(MpApp)
 
 #ifdef __WXMAC__
 macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,
@@ -458,3 +458,53 @@ void macMenuWinPlaceholder::createMenuBar(void) {
 }
 #endif
 
+int main(int argc, char **argv) {
+
+	if (argc >= 2 && strcmp(argv[1], "-b") == 0) {
+		wxInitialize();
+		wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
+#ifdef __LINUX__
+		//It has become apparent that wx is not determining the install prefix
+		//correctly on linux. So set it here as a workaround
+		// Ok I don't know how else to get the wxStandardPaths class?
+		wxStandardPaths * paths = (wxStandardPaths * ) &gStdPaths;
+		if (strcmp(INSTALL_PREFIX, "NONE"))
+			paths->SetInstallPrefix(wxString(INSTALL_PREFIX, wxConvUTF8));
+		else
+			paths->SetInstallPrefix(wxString("/usr/local", wxConvUTF8));
+#endif
+		std::cout << "INSTALL_PREFIX: " << INSTALL_PREFIX << std::endl;
+
+		gPreferences = new WinPrefs;
+		gPrefDefaults = new WinPrefs;
+
+		// Now read in the users preferences file from the system:preferences folder if present
+		gPrefDefaults->ReadDefaultPrefs();
+		*gPreferences = *gPrefDefaults;
+		//attempt to read new xml pref file
+		gPreferences->ReadUserPrefs();
+
+		MoleculeData *moldata = new MoleculeData(NULL);
+		std::cout << "opening: " << argv[3] << std::endl;
+		FILE *f = fopen(argv[3], "rb");
+		BufferFile *bfile = new BufferFile(f, false);
+		WinPrefs *prefs = new WinPrefs;
+		moldata->OpenCMLFile(bfile, prefs, NULL, NULL, true);
+		delete bfile;
+		fclose(f);
+
+		std::cout << "writing to: " << argv[2] << std::endl;
+		f = fopen(argv[2], "w");
+		bfile = new BufferFile(f, true);
+		moldata->ExportPOV(bfile, prefs);
+		delete bfile;
+		fclose(f);
+
+		delete moldata;
+		wxUninitialize();
+
+	} else {
+		wxEntry(argc, argv);
+	}
+
+}

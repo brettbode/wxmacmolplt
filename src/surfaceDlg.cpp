@@ -57,29 +57,35 @@ IMPLEMENT_CLASS( MEP3DSurfPane, wxPanel )
 IMPLEMENT_CLASS( Surface2DParamDlg, wxFrame )
 IMPLEMENT_CLASS( Surface3DParamDlg, wxFrame )
 
-BEGIN_EVENT_TABLE( Orbital2DSurfPane, wxPanel )
-  EVT_CHOICE  (ID_ORB_FORMAT_CHOICE,  Orbital2DSurfPane::OnOrbFormatChoice)
-  EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
-  EVT_CHOICE  (ID_ORB_CHOICE, Orbital2DSurfPane::OnOrbSetChoice)
-  EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
-  EVT_LISTBOX (ID_ATOM_LIST, Orbital2DSurfPane::OnAtomList)
-  EVT_LISTBOX (ID_ORB_COEF, Orbital2DSurfPane::OnCoefList)
-  EVT_CHECKBOX (ID_USE_PLANE_CHECKBOX, Surface2DPane::OnUsePlaneChk)
-  EVT_CHECKBOX (ID_SHOW_ZERO_CHECKBOX, Surface2DPane::OnShowZeroChk)
-  EVT_CHECKBOX (ID_DASH_CHECKBOX, Surface2DPane::OnDashChk)
-  EVT_CHECKBOX (ID_REVERSE_PHASE_CHECKBOX, Orbital2DSurfPane::OnReversePhase)
-  EVT_BUTTON (ID_SURFACE_UPDATE_BUT, Orbital2DSurfPane::OnUpdate)
-  EVT_BUTTON (ID_SET_PARAM_BUT, Surface2DPane::OnSetParam)
-  EVT_BUTTON (ID_SET_PLANE_BUT, Surface2DPane::OnSetPlane)
-  EVT_COMMAND_ENTER(ID_2D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
-  EVT_COMMAND_ENTER(ID_2D_COLOR_NEGATIVE, Surface2DPane::OnNegColorChange)
+BEGIN_EVENT_TABLE(BaseSurfacePane, wxPanel)
+	EVT_CHECKBOX(ID_ALLFRAMECHECK, BaseSurfacePane::OnCheckAllFrames)
+	EVT_TEXT(ID_SURFTITLE, BaseSurfacePane::OnChangeTitle)
+	EVT_CHECKBOX(ID_VISIBLECHECK, BaseSurfacePane::OnCheckVisible)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE( Orbital2DSurfPane, BaseSurfacePane )
+	EVT_CHOICE  (ID_ORB_FORMAT_CHOICE,  Orbital2DSurfPane::OnOrbFormatChoice)
+	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
+	EVT_CHOICE  (ID_ORB_CHOICE, Orbital2DSurfPane::OnOrbSetChoice)
+	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
+	EVT_LISTBOX (ID_ATOM_LIST, Orbital2DSurfPane::OnAtomList)
+	EVT_LISTBOX (ID_ORB_COEF, Orbital2DSurfPane::OnCoefList)
+	EVT_CHECKBOX (ID_USE_PLANE_CHECKBOX, Surface2DPane::OnUsePlaneChk)
+	EVT_CHECKBOX (ID_SHOW_ZERO_CHECKBOX, Surface2DPane::OnShowZeroChk)
+	EVT_CHECKBOX (ID_DASH_CHECKBOX, Surface2DPane::OnDashChk)
+	EVT_CHECKBOX (ID_REVERSE_PHASE_CHECKBOX, Orbital2DSurfPane::OnReversePhase)
+	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, Orbital2DSurfPane::OnUpdate)
+	EVT_BUTTON (ID_SET_PARAM_BUT, Surface2DPane::OnSetParam)
+	EVT_BUTTON (ID_SET_PLANE_BUT, Surface2DPane::OnSetPlane)
+	EVT_COMMAND_ENTER(ID_2D_COLOR_POSITIVE, Surface2DPane::OnPosColorChange)
+	EVT_COMMAND_ENTER(ID_2D_COLOR_NEGATIVE, Surface2DPane::OnNegColorChange)
 	EVT_CHECKBOX (ID_DISPLAY_PLANE_CHECKBOX, Surface2DPane::OnDisplayPlaneChk)
 	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface2DPane::OnContourValueText)
 	EVT_TEXT (ID_NUM_CONTOUR_TEXT, Surface2DPane::OnNumContoursText)
 	EVT_CHECKBOX (ID_SPH_HARMONICS_CHECKBOX, Orbital2DSurfPane::OnSphHarmonicChk)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
+BEGIN_EVENT_TABLE( Orbital3DSurfPane, BaseSurfacePane )
 	EVT_CHOICE  (ID_ORB_FORMAT_CHOICE,  Orbital3DSurfPane::OnOrbFormatChoice)
 	EVT_CHOICE  (ID_ORB_CHOICE, Orbital3DSurfPane::OnOrbSetChoice)
 	EVT_LISTBOX (ID_ATOM_LIST, Orbital3DSurfPane::OnAtomList)
@@ -102,7 +108,7 @@ BEGIN_EVENT_TABLE( Orbital3DSurfPane, wxPanel )
 	EVT_IDLE(Surface3DPane::OnIdle)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE( General3DSurfPane, wxPanel )
+BEGIN_EVENT_TABLE( General3DSurfPane, BaseSurfacePane )
 	EVT_BUTTON (ID_GENFILEBUTTON, General3DSurfPane::OnFileButton)
 	EVT_CHECKBOX (ID_GENMULTCHECK, General3DSurfPane::OnMultCheck)
 	EVT_CHECKBOX (ID_GENSQUARECHECK, General3DSurfPane::OnSquareCheck)
@@ -120,7 +126,7 @@ BEGIN_EVENT_TABLE( General3DSurfPane, wxPanel )
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, General3DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE( General2DSurfPane, wxPanel )
+BEGIN_EVENT_TABLE( General2DSurfPane, BaseSurfacePane )
 	EVT_BUTTON (ID_GENFILEBUTTON, General2DSurfPane::OnFileButton)
 	EVT_CHECKBOX (ID_GENMULTCHECK, General2DSurfPane::OnMultCheck)
 	EVT_CHECKBOX (ID_GENSQUARECHECK, General2DSurfPane::OnSquareCheck)
@@ -136,7 +142,7 @@ BEGIN_EVENT_TABLE( General2DSurfPane, wxPanel )
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, General2DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE( TEDensity2DSurfPane, wxPanel )
+BEGIN_EVENT_TABLE( TEDensity2DSurfPane, BaseSurfacePane )
 	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
 	EVT_CHOICE  (ID_ORB_CHOICE, BaseSurfacePane::OnOrbSetChoice)
 	EVT_CHECKBOX (ID_USE_PLANE_CHECKBOX, Surface2DPane::OnUsePlaneChk)
@@ -150,7 +156,7 @@ BEGIN_EVENT_TABLE( TEDensity2DSurfPane, wxPanel )
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, TEDensity2DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE( TEDensity3DSurfPane, wxPanel )
+BEGIN_EVENT_TABLE( TEDensity3DSurfPane, BaseSurfacePane )
 	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
 	EVT_CHOICE  (ID_ORB_CHOICE, BaseSurfacePane::OnOrbSetChoice)
 	EVT_SLIDER (ID_CONTOUR_VALUE_SLIDER, Surface3DPane::OnContourValueSld)
@@ -171,7 +177,7 @@ BEGIN_EVENT_TABLE( TEDensity3DSurfPane, wxPanel )
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, TEDensity3DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE( MEP2DSurfPane, wxPanel )
+BEGIN_EVENT_TABLE( MEP2DSurfPane, BaseSurfacePane )
 	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
 	EVT_CHOICE  (ID_ORB_CHOICE, BaseSurfacePane::OnOrbSetChoice)
 	EVT_CHECKBOX (ID_USE_PLANE_CHECKBOX, Surface2DPane::OnUsePlaneChk)
@@ -188,7 +194,7 @@ BEGIN_EVENT_TABLE( MEP2DSurfPane, wxPanel )
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, MEP2DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE( MEP3DSurfPane, wxPanel )
+BEGIN_EVENT_TABLE( MEP3DSurfPane, BaseSurfacePane )
 	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
 	EVT_CHOICE  (ID_ORB_CHOICE, BaseSurfacePane::OnOrbSetChoice)
 	EVT_SLIDER (ID_CONTOUR_VALUE_SLIDER, Surface3DPane::OnContourValueSld)
@@ -226,10 +232,10 @@ BaseSurfacePane::BaseSurfacePane( wxWindow* parent, Surface* target, SurfacesWin
 {
 	mTarget = target;
 	owner = p;
-  //mData = data;
+	//mData = data;
 
 	Visible = target->GetVisibility();
-	AllFrames = (mTarget->GetSurfaceID() != 0);
+	AllFrames = (target->GetSurfaceID() != 0);
 	UpdateTest = false;
 
 	Create(parent, id, pos, size, style);
@@ -259,9 +265,67 @@ bool BaseSurfacePane::Create( wxWindow* parent, wxWindowID id, const wxPoint& po
  */
 
 void BaseSurfacePane::CreateControls() {
+
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 
+	wxBoxSizer *box_sizer = new wxBoxSizer(wxHORIZONTAL);
+
+	box_sizer->Add(new wxStaticText(this, wxID_ANY, _T("Name:")), 0, wxALIGN_CENTER_VERTICAL | wxLEFT | wxALIGN_RIGHT, 5);
+
+	wxString tmp_str(GetTargetSurface()->GetLabel(), wxConvUTF8);
+	surfTitleEdit = new wxTextCtrl(this, ID_SURFTITLE, tmp_str, wxDefaultPosition, wxSize(250, -1), 0 );
+	if (SurfacesWindow::ShowToolTips())
+		surfTitleEdit->SetToolTip(_("You may change the label to anything you like."));
+	box_sizer->Add(surfTitleEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	visibleCheck = new wxCheckBox(this, ID_VISIBLECHECK, _("Visible"), wxDefaultPosition, wxDefaultSize, 0 );
+	visibleCheck->SetValue(Visible);
+	if (SurfacesWindow::ShowToolTips())
+		visibleCheck->SetToolTip(_("Uncheck to hide the surface without deleting it."));
+	box_sizer->Add(visibleCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	allFrameCheck = new wxCheckBox(this, ID_ALLFRAMECHECK, _("All Frames"), wxDefaultPosition, wxDefaultSize, 0 );
+	allFrameCheck->SetValue(AllFrames);
+	if (SurfacesWindow::ShowToolTips())
+		allFrameCheck->SetToolTip(_("Check to apply this surface to all frames."));
+	box_sizer->Add(allFrameCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	mainSizer->Add(box_sizer, 0, wxALIGN_CENTER);
+
 	SetSizer(mainSizer);
+}
+
+void BaseSurfacePane::OnCheckAllFrames(wxCommandEvent& event) {
+
+	setAllFrames(event.GetSelection());
+
+}
+
+void BaseSurfacePane::OnCheckVisible(wxCommandEvent& event) {
+
+	SetVisibility(event.GetSelection());
+
+}
+
+void BaseSurfacePane::OnChangeTitle(wxCommandEvent& event) {
+
+	wxString newLabel(event.GetString());
+	wxString test(mTarget->GetLabel(), wxConvUTF8);
+	if (newLabel.IsEmpty()) {
+		mTarget->SetLabel(NULL);
+		newLabel = wxString(mTarget->GetLabel(), wxConvUTF8);
+	} else if (newLabel.Cmp(test) != 0) {
+		mTarget->SetLabel((const char *)newLabel.mb_str(wxConvUTF8));
+	}
+
+	event.Skip();
+	
+}
+
+const wxString BaseSurfacePane::GetTitle() const {
+
+	return surfTitleEdit->GetValue();
+
 }
 
 void BaseSurfacePane::PageIsNowActive(void) {
@@ -312,12 +376,14 @@ void BaseSurfacePane::OnExport( wxCommandEvent &event ) {
 void BaseSurfacePane::SetVisibility(bool state) {
 	Visible = state;
 
+	visibleCheck->SetValue((int) state);
 	setUpdateButton();
 }
 
 void BaseSurfacePane::setAllFrames(bool state) {
 	AllFrames = state;
 
+	allFrameCheck->SetValue((int) state);
 	setUpdateButton();
 }
 
@@ -1286,19 +1352,18 @@ void Orbital2DSurfPane::CreateControls()
   OnOrbSetChoice(foo);
 }
 
-void Orbital2DSurfPane::TargetToPane(void) 
-{
-  NumGridPoints = mTarget->GetNumGridPoints();
-  NumContours = mTarget->GetNumContours();
-  MaxContourValue = mTarget->GetMaxValue();
-  mTarget->GetPosColor(&PosColor);
-  mTarget->GetNegColor(&NegColor);
-  ShowZeroContour = mTarget->GetShowZeroContour();
-  UseScreenPlane = mTarget->GetRotate2DMap();
-  Visible = mTarget->GetVisibility();
-  DashLines = mTarget->GetDashLine();
-  DisplayPlane = mTarget->ShowPlottingPlane();
-  UpdateTest = false;
+void Orbital2DSurfPane::TargetToPane(void) {
+	NumGridPoints = mTarget->GetNumGridPoints();
+	NumContours = mTarget->GetNumContours();
+	MaxContourValue = mTarget->GetMaxValue();
+	mTarget->GetPosColor(&PosColor);
+	mTarget->GetNegColor(&NegColor);
+	ShowZeroContour = mTarget->GetShowZeroContour();
+	UseScreenPlane = mTarget->GetRotate2DMap();
+	Visible = mTarget->GetVisibility();
+	DashLines = mTarget->GetDashLine();
+	DisplayPlane = mTarget->ShowPlottingPlane();
+	UpdateTest = false;
 }
 
 bool Orbital2DSurfPane::UpdateNeeded(void) {
@@ -1816,14 +1881,14 @@ void Orbital3DSurfPane::CreateControls()
   rightBottomSizer->Add(mSubRightBot4Sizer);
   rightBottomSizer->Add(mSubRightBot5Sizer);
 
-  middleSizer->Add(leftMiddleSizer, 0, wxALL, 10);
+  middleSizer->Add(leftMiddleSizer, 0, wxALL | wxALIGN_CENTER, 10);
   middleSizer->Add(45,10);
-  middleSizer->Add(rightMiddleSizer, 0, wxALL, 10);
-  bottomSizer->Add(leftBottomSizer, 0, wxALL, 3);
-  bottomSizer->Add(rightBottomSizer, 0, wxALL, 3);
-  mainSizer->Add(upperSizer);
-  mainSizer->Add(middleSizer);
-  mainSizer->Add(bottomSizer);
+  middleSizer->Add(rightMiddleSizer, 0, wxALL | wxALIGN_CENTER, 10);
+  bottomSizer->Add(leftBottomSizer, 0, wxALL | wxALIGN_CENTER, 3);
+  bottomSizer->Add(rightBottomSizer, 0, wxALL | wxALIGN_CENTER, 3);
+  mainSizer->Add(upperSizer, wxALIGN_CENTER);
+  mainSizer->Add(middleSizer, wxALIGN_CENTER);
+  mainSizer->Add(bottomSizer, wxALIGN_CENTER);
   
   wxCommandEvent foo;
   OnOrbSetChoice(foo);

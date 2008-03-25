@@ -160,10 +160,17 @@ public:
 	virtual bool UpdateNeeded(void) = 0;	//< Should the update button be activated?
 
 	void SetVisibility(bool state);	//< Toggle the surface visibility.
+
+	void OnCheckAllFrames(wxCommandEvent& event);
+	void OnCheckVisible(wxCommandEvent& event);
+	void OnChangeTitle(wxCommandEvent& event);
+
 	void setAllFrames(bool state);	//< Should the surface be applied to all frames?
 
 	bool GetVisibility(void) const {return Visible;};	//< Is the surface visible?
 	bool GetAllFrames(void) const {return AllFrames;};	//< Is the surface applies to all frames?
+
+	const wxString GetTitle() const;
 
 	void SetUpdateTest(bool test);	//< Set flag to force an update (overrides the automatic tests).
 	void setUpdateButton();			//< Updates the state of the update button comparing the current and saved states.
@@ -203,6 +210,9 @@ protected:
 	bool SwitchFixGrid;
 	long TargetOrbSet;
 	wxChoice* mOrbSetChoice;
+	wxTextCtrl* surfTitleEdit;
+	wxCheckBox* visibleCheck;
+	wxCheckBox* allFrameCheck;
 
 	SurfacesWindow * owner;	//< Our parent window.
 
@@ -211,6 +221,7 @@ protected:
 
 	Surface* mTarget;	//< Pointer to the target surface.
 
+    DECLARE_EVENT_TABLE()
 };
 
 class OrbSurfacePane

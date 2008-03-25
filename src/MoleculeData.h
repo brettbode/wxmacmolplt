@@ -231,6 +231,7 @@ class MoleculeData {
 			return constrain_anno_id;
 		}
 		void RemoveAnnotationConstraint(void) { constrain_anno_id = -1; }
+		void ExportPOV(BufferFile *Buffer, WinPrefs *Prefs);
 };
 
 #endif

@@ -61,14 +61,9 @@ IMPLEMENT_CLASS( SurfacesWindow, wxFrame )
 BEGIN_EVENT_TABLE( SurfacesWindow, wxFrame )
 
 ////@begin SurfacesWindow event table entries
-	EVT_TEXT( ID_SURFTITLE, SurfacesWindow::OnSurftitleUpdated )
 
-	EVT_CHECKBOX( ID_VISIBLECHECK, SurfacesWindow::OnVisiblecheckClick )
-
-	EVT_CHECKBOX( ID_ALLFRAMECHECK, SurfacesWindow::OnAllframecheckClick )
-
+	EVT_TEXT(ID_SURFTITLE, SurfacesWindow::OnChangeTitle)
 	EVT_BUTTON( wxID_ADD, SurfacesWindow::OnAddClick )
-
 	EVT_BUTTON( wxID_DELETE, SurfacesWindow::OnDeleteClick )
 
 ////@end SurfacesWindow event table entries
@@ -134,13 +129,9 @@ SurfacesWindow::~SurfacesWindow()
 void SurfacesWindow::Init()
 {
 ////@begin SurfacesWindow member initialisation
-	surfTitleEdit = NULL;
-	visibleCheck = NULL;
-	allFrameCheck = NULL;
 	book = NULL;
 	mDeleteButton = NULL;
 ////@end SurfacesWindow member initialisation
-	setValueCalled = false;
 }
 
 
@@ -157,40 +148,25 @@ void SurfacesWindow::CreateControls()
 	itemFrame1->SetSizer(itemBoxSizer2);
 
 	wxPanel* itemPanel3 = new wxPanel( itemFrame1, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-	itemBoxSizer2->Add(itemPanel3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+	itemBoxSizer2->Add(itemPanel3, 1, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 0);
 
 	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
 	itemPanel3->SetSizer(itemBoxSizer4);
 
-	wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer4->Add(itemBoxSizer5, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
-
-	surfTitleEdit = new wxTextCtrl( itemPanel3, ID_SURFTITLE, _T(""), wxDefaultPosition, wxSize(250, -1), 0 );
-	if (SurfacesWindow::ShowToolTips())
-		surfTitleEdit->SetToolTip(_("You may change the label to anything you like."));
-	itemBoxSizer5->Add(surfTitleEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
-	visibleCheck = new wxCheckBox( itemPanel3, ID_VISIBLECHECK, _("Visible"), wxDefaultPosition, wxDefaultSize, 0 );
-	visibleCheck->SetValue(false);
-	if (SurfacesWindow::ShowToolTips())
-		visibleCheck->SetToolTip(_("Uncheck to hide the surface without deleting it."));
-	itemBoxSizer5->Add(visibleCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
-	allFrameCheck = new wxCheckBox( itemPanel3, ID_ALLFRAMECHECK, _("All Frames"), wxDefaultPosition, wxDefaultSize, 0 );
-	allFrameCheck->SetValue(false);
-	if (SurfacesWindow::ShowToolTips())
-		allFrameCheck->SetToolTip(_("Check to apply this surface to all frames."));
-	itemBoxSizer5->Add(allFrameCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
 	wxBoxSizer* itemBoxSizer9 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer4->Add(itemBoxSizer9, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer4->Add(itemBoxSizer9, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	book = new wxChoicebook( itemPanel3, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxNB_TOP|wxSUNKEN_BORDER );
+	book = new wxChoicebook( itemPanel3, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxNB_TOP
+#if !wxCHECK_VERSION(2,9,0)
+#warning "Doing sunken."
+|wxSUNKEN_BORDER
+#endif
+);
 
-	itemBoxSizer9->Add(book, 4, wxALIGN_CENTER_VERTICAL|wxALL, 2);
+	itemBoxSizer9->Add(book, 4, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 2);
 
 	wxBoxSizer* itemBoxSizer11 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer4->Add(itemBoxSizer11, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer4->Add(itemBoxSizer11, 1, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxButton* itemButton12 = new wxButton( itemPanel3, wxID_ADD, _("&Add..."), wxDefaultPosition, wxDefaultSize, 0 );
 	if (SurfacesWindow::ShowToolTips())
@@ -208,13 +184,33 @@ void SurfacesWindow::CreateControls()
 	long NumSurfaces = lFrame->GetNumSurfaces();
 	if (NumSurfaces == 0) {
 		int type = selectSurfaceType();
-		addNewPane(type);
+		if (type == -1) {
+			book->Disable();
+			book->AddPage(new wxPanel(book), _("No surfaces defined"), true);
+		} else {
+			addNewPane(type);
+		}
 	} else {
 		Reset();
 	}
 }
 
+void SurfacesWindow::OnChangeTitle(wxCommandEvent& event) {
+
+	BaseSurfacePane* tempPane = (BaseSurfacePane *) book->GetCurrentPage();
+	if (tempPane) {
+		book->SetPageText(book->GetSelection(), tempPane->GetTitle());
+	} 
+	
+}
+
 void SurfacesWindow::addNewPane(int type) {
+
+	if (!book->IsEnabled()) {
+		book->DeletePage(0);
+		book->Enable();
+	}
+
 	BaseSurfacePane* tempPane = NULL;
 	Surface* newSurface = NULL;
 	
@@ -260,20 +256,15 @@ void SurfacesWindow::addNewPane(int type) {
 			break;
 	}
 	
-	if ( tempPane && newSurface) {
+	if (tempPane && newSurface) {
 		Frame * lFrame = mData->GetCurrentFramePtr();
 		lFrame->AppendSurface(newSurface);
 		
 		tempPane->SetVisibility(true);
-		visibleCheck->SetValue(true);
-		
-		allFrameCheck->SetValue((newSurface->GetSurfaceID() != 0));	 
-	} else {
-		visibleCheck->Disable();
-		allFrameCheck->Disable();
+		tempPane->setAllFrames(newSurface->GetSurfaceID() != 0);
 	}
 	
-	if ( type != -1) {
+	if (type != -1) {
 		wxString temp(newSurface->GetLabel(), wxConvUTF8);
 		book->AddPage(tempPane, temp, true);
 	}
@@ -282,9 +273,15 @@ void SurfacesWindow::addNewPane(int type) {
 	
 	GetSizer()->SetSizeHints(this);
 }
+
 void SurfacesWindow::Reset(void) {
 	//rebuild the list of surfaces
 //	int oldpage = book->GetSelection();
+
+	if (!book->IsEnabled()) {
+		book->DeletePage(0);
+		book->Enable();
+	}
 
 #if wxCHECK_VERSION(2,9,0)
 	book->DeleteAllPages();
@@ -335,13 +332,8 @@ void SurfacesWindow::Reset(void) {
 			}
 		}
 	} else {
-		wxString temp(_("No surface chosen."));
-#if wxCHECK_VERSION(2, 8, 0)
-		surfTitleEdit->ChangeValue(temp);
-#else
-		setValueCalled = true;
-		surfTitleEdit->SetValue(temp);
-#endif
+		book->Disable();
+		book->AddPage(new wxPanel(book), _("No surfaces defined"), true);
 	}
 	book->Fit();
 	
@@ -362,17 +354,11 @@ void SurfacesWindow::OnDeleteClick( wxCommandEvent& event ) {
 
 	lFrame->DeleteSurface(targetSurf);
 	book->DeletePage(targetSurf);
-	Parent->UpdateModelDisplay();
-	if (book->GetPageCount() <= 0) {
-		visibleCheck->Disable();
-		allFrameCheck->Disable();
-#if wxCHECK_VERSION(2, 8, 0)
-		surfTitleEdit->ChangeValue(wxT(""));
-#else
-		setValueCalled = true;
-		surfTitleEdit->SetValue(wxT(""));
-#endif
+	if (!book->GetPageCount()) {
+		book->Disable();
+		book->AddPage(new wxPanel(book), _("No surfaces defined"), true);
 	}
+	Parent->UpdateModelDisplay();
 	book->Fit();
 	
 	GetSizer()->SetSizeHints(this);
@@ -419,58 +405,14 @@ wxIcon SurfacesWindow::GetIconResource( const wxString& name )
 /*!
  * wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED event handler for ID_SURFLISTBOOK
  */
-void SurfacesWindow::OnSurflistbookPageChanged( wxChoicebookEvent& event )
-{
-	wxString temp(_("No surface chosen."));
-	BaseSurfacePane* tempPane = (BaseSurfacePane * ) book->GetCurrentPage();
+void SurfacesWindow::OnSurflistbookPageChanged(wxChoicebookEvent& event) {
+
+	BaseSurfacePane* tempPane = dynamic_cast<BaseSurfacePane *>(book->GetCurrentPage());
 	if (tempPane) {
-	//	GetSizer()->Fit(this);
-	//	MainPanel->Fit();
 		Fit();
-		
-		Surface * tempSurf = tempPane->GetTargetSurface();
-		wxString t2(tempSurf->GetLabel(), wxConvUTF8);
-		temp = t2;
-		visibleCheck->SetValue(tempPane->GetVisibility());
-		
-		int surfType = tempSurf->GetSurfaceType();
-		if ( surfType == kGeneral2DSurface || surfType == kGeneral3DSurface)
-			allFrameCheck->Disable();
-		else {
-			allFrameCheck->Enable();
-			allFrameCheck->SetValue(tempPane->GetAllFrames());
-		}
 		tempPane->PageIsNowActive();	//make sure the update button is the default
 	}
-#if wxCHECK_VERSION(2, 8, 0)
-	surfTitleEdit->ChangeValue(temp);
-#else
-	setValueCalled = true;
-	surfTitleEdit->SetValue(temp);
-#endif
 }
-
-/*!
- * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_VISIBLECHECK
- */
-
-void SurfacesWindow::OnVisiblecheckClick( wxCommandEvent& event )
-{
-	BaseSurfacePane* tempPane = (BaseSurfacePane * ) book->GetCurrentPage();
-	tempPane->SetVisibility(event.GetSelection());
-}
-
-
-/*!
- * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_ALLFRAMECHECK
- */
-
-void SurfacesWindow::OnAllframecheckClick( wxCommandEvent& event )
-{
-	BaseSurfacePane* tempPane = (BaseSurfacePane * ) book->GetCurrentPage();
-	tempPane->setAllFrames(event.GetSelection());
-}
-
 
 /*!
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
@@ -481,10 +423,6 @@ void SurfacesWindow::OnAddClick( wxCommandEvent& event )
 	int surfTypeId = selectSurfaceType();
 	if (surfTypeId > 0) {
 		addNewPane(surfTypeId);
-		if (book->GetPageCount()> 0) {
-			visibleCheck->Enable();
-			//allFrameCheck->Enable();
-		}
 	}
 }
 
@@ -492,15 +430,7 @@ void SurfacesWindow::SurfaceUpdated(void) {
 	//Do we need to generate a frame changed event here???
 	BaseSurfacePane* tempPane = (BaseSurfacePane * ) book->GetCurrentPage();
 	if (tempPane) {
-		Surface * tempSurf = tempPane->GetTargetSurface();
-		wxString temp(tempSurf->GetLabel(), wxConvUTF8);
-#if wxCHECK_VERSION(2, 8, 0)
-		surfTitleEdit->ChangeValue(temp);
-#else
-		setValueCalled = true;
-		surfTitleEdit->SetValue(temp);
-#endif
-		book->SetPageText(book->GetSelection(), temp);
+		book->SetPageText(book->GetSelection(), tempPane->GetTitle());
 		//The previous line does not immediately update the list text???
 	} 
 	Parent->UpdateModelDisplay();
@@ -561,34 +491,3 @@ int SurfacesWindow::selectSurfaceType()
 	
 }
 
-/*!
- * wxEVT_COMMAND_TEXT_UPDATED event handler for ID_SURFTITLE
- */
-
-void SurfacesWindow::OnSurftitleUpdated( wxCommandEvent& event )
-{
-	//Prior to wx v2.7 you had to call SetValue to change a textCtrl which generates
-	//a TEXT_UPDATED event. To avoid treating these as actual edits I set the setValueCalled
-	//flag before calling SetValue and then clear it here instead of looking at the value.
-	if (!setValueCalled) {
-		wxString newLabel = surfTitleEdit->GetValue();
-		
-		BaseSurfacePane* tempPane = (BaseSurfacePane * ) book->GetCurrentPage();
-		if (tempPane) {
-			Surface * tempSurf = tempPane->GetTargetSurface();
-			if (tempSurf) {
-				wxString test(tempSurf->GetLabel(), wxConvUTF8);
-				if (newLabel.IsEmpty()) {
-					tempSurf->SetLabel(NULL);
-					newLabel = wxString(tempSurf->GetLabel(), wxConvUTF8);
-					book->SetPageText(book->GetSelection(), newLabel);
-				} else if (newLabel.Cmp(test) != 0) {
-					tempSurf->SetLabel((const char *)newLabel.mb_str(wxConvUTF8));
-					book->SetPageText(book->GetSelection(), newLabel);
-				}
-			}
-		}
-	} else
-		setValueCalled = false;
-	
-}

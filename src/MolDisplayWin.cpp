@@ -2565,20 +2565,23 @@ void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &event) {
 		else
 			ChangeFrames(MainData->CurrentFrame+1);
 		m_timer.SetOwner(this, MMP_ANIMATEFRAMESTIMER);
-		m_timer.Start(AnimateTime);
+		m_timer.Start(AnimateTime, wxTIMER_CONTINUOUS);
 		timerRunning = true;
 	}
 }
+
 void MolDisplayWin::menuViewShrink_10(wxCommandEvent &event) {
 	MainData->WindowSize *= 1.1;
 	ResetView();
 	Dirtify();
 }
+
 void MolDisplayWin::menuViewEnlarge_10(wxCommandEvent &event) {
 	MainData->WindowSize *= 0.9;
 	ResetView();
 	Dirtify();
 }
+
 void MolDisplayWin::menuViewSetWindowParameters(wxCommandEvent &event) {
 	windowparameters * temp = new windowparameters(this);
 	if (temp->ShowModal() != wxID_CANCEL) {
@@ -2859,11 +2862,11 @@ void MolDisplayWin::menuBuilderSymmetryEdit(wxCommandEvent &event) {
 /* } */
 
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
-	StopAnimations();
 	int key = event.GetKeyCode();
 	if (!event.HasModifiers()) {
 		switch (key) {
 			case '[':
+				StopAnimations();
 				if (MainData->cFrame->Vibs) {
 					if (MainData->cFrame->Vibs->CurrentMode>0) {
 						MainData->cFrame->Vibs->CurrentMode--;
@@ -2878,6 +2881,7 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 				}
 				break;
 			case ']':
+				StopAnimations();
 				if (MainData->cFrame->Vibs) {
 					if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1)) {
 						MainData->cFrame->Vibs->CurrentMode++;

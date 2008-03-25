@@ -377,6 +377,7 @@ void WinPrefs::ReadDefaultPrefs(void) {
 	pathname += wxT("Resources");
 #endif
 #endif
+	/* std::cout << "pathname: " << pathname << std::endl; */
 	pathname += wxT("/MacMolPlt.Prefs.xml");
 	
 	FILE * preffile = fopen(pathname.mb_str(wxConvUTF8), "r");
