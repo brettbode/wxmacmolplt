@@ -914,11 +914,11 @@ void Surf3DBase::Write3DXML(XMLElement * parent, bool writeGrid) const {
 	color->addAttribute(MMPPref_convert(MMPPref_ColorBlue), line);
 
 	color = sElem->addChildElement(CML_convert(MMP_SurfTransColor));
-	snprintf(line, kMaxLineLength, "%f", (TranspColor.red/65535.0));
+	snprintf(line, kMaxLineLength, "%f", (Transparency/100.0));
 	color->addAttribute(MMPPref_convert(MMPPref_ColorRed), line);
-	snprintf(line, kMaxLineLength, "%f", (TranspColor.green/65535.0));
+	snprintf(line, kMaxLineLength, "%f", (Transparency/100.0));
 	color->addAttribute(MMPPref_convert(MMPPref_ColorGreen), line);
-	snprintf(line, kMaxLineLength, "%f", (TranspColor.blue/65535.0));
+	snprintf(line, kMaxLineLength, "%f", (Transparency/100.0));
 	color->addAttribute(MMPPref_convert(MMPPref_ColorBlue), line);
 
 	snprintf(line, kMaxLineLength, "%f", ContourValue);
@@ -1082,13 +1082,7 @@ void Surf3DBase::Read3DXML(XMLElement * parent) {
 					break;
 				case MMP_SurfTransColor:
 					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), tf)) {
-						TranspColor.red = (unsigned short)(tf*65535.0);
-					}
-					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), tf)) {
-						TranspColor.green = (unsigned short)(tf*65535.0);
-					}
-					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), tf)) {
-						TranspColor.blue = (unsigned short)(tf*65535.0);
+						Transparency = (int) (tf * 100.0f);
 					}
 					break;
 				case MMP_SurfContourValue:
@@ -1435,7 +1429,7 @@ void MEP3DSurface::UpdateData(MEP3DSurface * target) {
 	GridSize = target->GetGridSize();
 	target->GetPosColor(&PosColor);
 	target->GetNegColor(&NegColor);
-	target->GetTranspColor(&TranspColor);
+	Transparency = target->GetTransparency();
 	OrbSet = target->getTargetOrbitalSet();
 }
 
@@ -1518,7 +1512,7 @@ Orb3DSurface::Orb3DSurface(Orb3DSurface * target) : Surf3DBase() {
 	GridSize = target->GetGridSize();
 	target->GetPosColor(&PosColor);
 	target->GetNegColor(&NegColor);
-	target->GetTranspColor(&TranspColor);
+	Transparency = target->GetTransparency();
 }
 void Orb3DSurface::UpdateData(Orb3DSurface * target) {
 	Visible = target->GetVisibility();
@@ -1534,7 +1528,7 @@ void Orb3DSurface::UpdateData(Orb3DSurface * target) {
 	GridSize = target->GetGridSize();
 	target->GetPosColor(&PosColor);
 	target->GetNegColor(&NegColor);
-	target->GetTranspColor(&TranspColor);
+	Transparency = target->GetTransparency();
 	if (Label) {delete [] Label; Label = NULL;}
 	if (!target->DefaultLabel())
 		Label = target->GetLabel();
@@ -1612,7 +1606,7 @@ void TEDensity3DSurface::UpdateData(TEDensity3DSurface * target) {
 	ContourValue = target->GetContourValue();
 	GridSize = target->GetGridSize();
 	target->GetPosColor(&PosColor);
-	target->GetTranspColor(&TranspColor);
+	Transparency = target->GetTransparency();
 	OrbSet = target->getTargetOrbSet();
 }
 

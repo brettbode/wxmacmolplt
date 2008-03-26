@@ -25,6 +25,7 @@
 #include "wx/wx.h"
 #endif
 
+#include <wx/spinctrl.h>
 #include <vector>
 
 ////@end includes
@@ -96,7 +97,7 @@ class SurfacesWindow;
 #define ID_SMOOTH_CHECKBOX 10082
 #define ID_FREE_MEM_BUT 10083
 #define ID_ATOM_LIST 10084
-#define ID_TRANSPARENCY_COLOR 10085
+#define ID_TRANSPARENCY 10085
 #define ID_REVERSE_PHASE_CHECKBOX 10086
 #define ID_ORB_FORMAT_CHOICE 10087
 #define ID_2D_COLOR_POSITIVE 10088
@@ -331,7 +332,7 @@ public:
   void OnFreeMem(wxCommandEvent& event );
   void OnPosColorChange(wxCommandEvent & event);
   void OnNegColorChange(wxCommandEvent & event);
-  void OnTranspColorChange(wxCommandEvent & event);
+  void OnTransparencyChange(wxSpinEvent & event);
   void OnIdle( wxIdleEvent& WXUNUSED(event) );
   void OnSetParam( wxCommandEvent &event );
   void OnGridSizeSld(wxCommandEvent &event );
@@ -349,7 +350,7 @@ protected:
   wxStaticText* mGridMaxText;
   colorArea* mOrbColor1;
   colorArea* mOrbColor2;
-  colorArea* mTransColor;
+  wxSpinCtrl *mTransparency;
   wxRadioBox* m3DRdoBox;
   wxCheckBox* mSmoothChkBox;
   wxButton* mFreeMemBut;
@@ -357,7 +358,7 @@ protected:
   float GridSize;
   RGBColor PosColor;
   RGBColor NegColor;
-  RGBColor TranspColor;
+  int Transparency;
   bool UseNormals;
   bool UseSolidSurface;
   float ContourValue;

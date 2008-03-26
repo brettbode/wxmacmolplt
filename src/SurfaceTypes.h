@@ -224,7 +224,7 @@ class Surf3DBase : public Surface {
 									//128 invert color mapping
 		RGBColor	PosColor;
 		RGBColor	NegColor;
-		RGBColor	TranspColor;		//Transparency color
+		int			Transparency;		//Transparency color
 		float		ContourValue;
 		float		GridSize;
 	public:
@@ -257,9 +257,9 @@ class Surf3DBase : public Surface {
 		inline void SetPosColor(RGBColor *newColor) {PosColor=*newColor;};
 		inline void GetNegColor(RGBColor *temp) const {*temp=NegColor;};
 		inline void SetNegColor(RGBColor *newColor) {NegColor=*newColor;};
-		inline void GetTranspColor(RGBColor *temp) const {*temp=TranspColor;};
-		inline void SetTranspColor(RGBColor *newColor) {TranspColor=*newColor;};
-		virtual bool isTransparent(void) const {return (SolidSurface()&&((TranspColor.red<64000)||(TranspColor.green<64000)||(TranspColor.blue<64000)));};
+		inline int GetTransparency() const {return Transparency;};
+		inline void SetTransparency(int newColor) {Transparency=newColor;};
+		virtual bool isTransparent(void) const {return (SolidSurface()&& Transparency > 0);};
 		inline float GetGridMax(void) const {return GridMax;};
 		inline float GetGridMin(void) const {return GridMin;};
 		inline long GetNumXGridPoints(void) const {return NumXGridPoints;};

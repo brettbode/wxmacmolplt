@@ -148,7 +148,7 @@ void SurfacesWindow::CreateControls()
 	itemFrame1->SetSizer(itemBoxSizer2);
 
 	wxPanel* itemPanel3 = new wxPanel( itemFrame1, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-	itemBoxSizer2->Add(itemPanel3, 1, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 0);
+	itemBoxSizer2->Add(itemPanel3, 0, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 0);
 
 	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
 	itemPanel3->SetSizer(itemBoxSizer4);
@@ -171,7 +171,7 @@ void SurfacesWindow::CreateControls()
 	wxButton* itemButton12 = new wxButton( itemPanel3, wxID_ADD, _("&Add..."), wxDefaultPosition, wxDefaultSize, 0 );
 	if (SurfacesWindow::ShowToolTips())
 		itemButton12->SetToolTip(_("Click to add a new surface."));
-	itemBoxSizer11->Add(itemButton12, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	itemBoxSizer11->Add(itemButton12, 0, wxALIGN_BOTTOM|wxALL, 5);
 
 	mDeleteButton = new wxButton( itemPanel3, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 	if (SurfacesWindow::ShowToolTips())

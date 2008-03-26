@@ -2188,8 +2188,7 @@ long Surf3DBase::CreateSolidSurface(CPoint3D * Vertices, CPoint3D * Normals, lon
 	green = MAX(green, 0.0);
 	long * VertexList = vList;
 	if (isTransparent()) {
-		alpha = (((float) TranspColor.red/65536.0) + ((float) TranspColor.green/65536.0) + 
-					((float) TranspColor.blue/65536.0))/3.0;
+		alpha = (100 - Transparency) / 100.0f;
 		if (!transpTri) return 0;	//transparncy requires a different draw method
 		result = NumTriangles;
 	}

@@ -679,7 +679,7 @@ Surf3DBase::Surf3DBase(WinPrefs * Prefs) {
 	lOpts->GetPosColor(&PosColor);
 	lOpts->GetNegColor(&NegColor);
 		//Init the transparency color to opaque
-	TranspColor.red = TranspColor.green = TranspColor.blue = 65535;
+	Transparency = 0;
 	ContourValue = 0.1;
 	GridSize = lOpts->GetGridSize();
 }
@@ -1516,9 +1516,7 @@ long Surf3DBase::ExportPOVSurface(CPoint3D *Vertices, CPoint3D *Normals,
 	transpTri = new myGLTriangle[NumTriangles];
 
 	if (isTransparent()) {
-		alpha = (((float) TranspColor.red / 65536.0) +
-				 ((float) TranspColor.green / 65536.0) + 
-				 ((float) TranspColor.blue / 65536.0)) / 3.0f;
+		alpha = (100 - Transparency) / 100.0f;
 		result = NumTriangles;
 	}
 

@@ -104,7 +104,7 @@ BEGIN_EVENT_TABLE( Orbital3DSurfPane, BaseSurfacePane )
 	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
-	EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
+	EVT_SPINCTRL(ID_TRANSPARENCY, Surface3DPane::OnTransparencyChange)
 	EVT_IDLE(Surface3DPane::OnIdle)
 END_EVENT_TABLE()
 
@@ -122,7 +122,7 @@ BEGIN_EVENT_TABLE( General3DSurfPane, BaseSurfacePane )
 	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
-	EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
+	EVT_SPINCTRL(ID_TRANSPARENCY, Surface3DPane::OnTransparencyChange)
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, General3DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
@@ -168,7 +168,7 @@ BEGIN_EVENT_TABLE( TEDensity3DSurfPane, BaseSurfacePane )
 	EVT_TEXT (ID_TED3D_MAX_MAP_EDIT, TEDensity3DSurfPane::OnMaxMEPValueText)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
-	EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
+	EVT_SPINCTRL(ID_TRANSPARENCY, Surface3DPane::OnTransparencyChange)
 	EVT_RADIOBOX (ID_3D_RADIOBOX, Surface3DPane::On3DRadioBox)
 	EVT_CHECKBOX (ID_SMOOTH_CHECKBOX, Surface3DPane::OnSmoothCheck)
 	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
@@ -202,7 +202,7 @@ BEGIN_EVENT_TABLE( MEP3DSurfPane, BaseSurfacePane )
 	EVT_SLIDER (ID_GRID_SIZE_SLIDER, Surface3DPane::OnGridSizeSld)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
-	EVT_COMMAND_ENTER(ID_TRANSPARENCY_COLOR, Surface3DPane::OnTranspColorChange)
+	EVT_SPINCTRL(ID_TRANSPARENCY, Surface3DPane::OnTransparencyChange)
 	EVT_RADIOBOX (ID_3D_RADIOBOX, Surface3DPane::On3DRadioBox)
 	EVT_CHECKBOX (ID_SMOOTH_CHECKBOX, Surface3DPane::OnSmoothCheck)
 	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
@@ -1024,7 +1024,7 @@ Surface3DPane::~Surface3DPane()
 {
   delete mOrbColor1;
   delete mOrbColor2;
-  delete mTransColor;
+  delete mTransparency;
 }
 
 void Surface3DPane::setContourValueSld()
@@ -1135,8 +1135,8 @@ void Surface3DPane::OnNegColorChange(wxCommandEvent & event) {
 	mOrbColor2->getColor(&NegColor);
 	setUpdateButton();
 }
-void Surface3DPane::OnTranspColorChange(wxCommandEvent & event) {
-	mTransColor->getColor(&TranspColor);
+void Surface3DPane::OnTransparencyChange(wxSpinEvent & event) {
+	Transparency = event.GetPosition();
 	setUpdateButton();
 }
 
@@ -1344,9 +1344,9 @@ void Orbital2DSurfPane::CreateControls()
   middleSizer->Add(rightMiddleSizer, 0, wxALL, 10);
   bottomSizer->Add(leftBottomSizer, 0, wxALL, 3);
   bottomSizer->Add(rightBottomSizer, 0, wxALL, 3);
-  mainSizer->Add(upperSizer);
-  mainSizer->Add(middleSizer);
-  mainSizer->Add(bottomSizer);
+  mainSizer->Add(upperSizer, 1, wxALIGN_CENTER_HORIZONTAL);
+  mainSizer->Add(middleSizer, 1, wxALIGN_CENTER_HORIZONTAL);
+  mainSizer->Add(bottomSizer, 1, wxALIGN_CENTER_HORIZONTAL);
   
   wxCommandEvent foo;
   OnOrbSetChoice(foo);
@@ -1627,7 +1627,7 @@ void Orbital3DSurfPane::TargetToPane(void) {
 	NumGridPoints = mTarget->GetNumGridPoints();
 	mTarget->GetPosColor(&PosColor);
 	mTarget->GetNegColor(&NegColor);
-	mTarget->GetTranspColor(&TranspColor);
+	Transparency = mTarget->GetTransparency();
 	GridSize = mTarget->GetGridSize();
 	ContourValue = mTarget->GetContourValue();
 	UseSolidSurface = mTarget->SolidSurface();
@@ -1654,7 +1654,9 @@ void Orbital3DSurfPane::refreshControls() {
 
 	mOrbColor1->setColor(&PosColor);
 	mOrbColor2->setColor(&NegColor);
-	mTransColor->setColor(&TranspColor);
+	wxString tmp_str;
+	tmp_str.Printf("%d", Transparency);
+	mTransparency->SetValue(tmp_str);
 }
 
 /*!
@@ -1723,20 +1725,20 @@ void Orbital3DSurfPane::CreateControls()
 	mContourValueEdit = new wxTextCtrl( this, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	
 	wxStaticText * label4 = new wxStaticText( this, wxID_ANY,
-						  _T("Transparency Color:"),
+						  _T("Transparency:"),
 						  wxDefaultPosition,
 						  wxDefaultSize);
 	
-	mTarget->GetTranspColor(&TranspColor);
+	Transparency = mTarget->GetTransparency();
 	mTarget->GetPosColor(&PosColor);
 	mTarget->GetNegColor(&NegColor);
 	
 	mOrbColor1 = new colorArea(this, ID_3D_COLOR_POSITIVE, &PosColor);
-	//  mOrbColor1->draw(&PosColor);
 	mOrbColor2 = new colorArea(this, ID_3D_COLOR_NEGATIVE, &NegColor);
-	//  mOrbColor2->draw(&NegColor);
-	mTransColor = new colorArea(this, ID_TRANSPARENCY_COLOR, &TranspColor);
-	//  mTransColor->draw(&TranspColor);
+    mTransparency = new wxSpinCtrl(this, ID_TRANSPARENCY, _T(""),
+								   wxDefaultPosition, wxDefaultSize,
+								   wxSP_ARROW_KEYS, 0, 100, 0);
+	mTransparency->SetValue(Transparency);
 	
 	wxString radiochoices[] = {_T("Solid"), _T("Wire Frame")};
 	m3DRdoBox = new wxRadioBox( this, ID_3D_RADIOBOX, _T(""), wxDefaultPosition, wxDefaultSize, WXSIZEOF(radiochoices), radiochoices, 1, wxRA_SPECIFY_ROWS );
@@ -1858,7 +1860,7 @@ void Orbital3DSurfPane::CreateControls()
 
   mSubRightBot2Sizer = new wxBoxSizer(wxHORIZONTAL);
   mSubRightBot2Sizer->Add(label4, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-  mSubRightBot2Sizer->Add(mTransColor, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+  mSubRightBot2Sizer->Add(mTransparency, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
   mSubRightBot3Sizer = new wxBoxSizer(wxHORIZONTAL);
   mSubRightBot3Sizer->Add(m3DRdoBox, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -1886,9 +1888,9 @@ void Orbital3DSurfPane::CreateControls()
   middleSizer->Add(rightMiddleSizer, 0, wxALL | wxALIGN_CENTER, 10);
   bottomSizer->Add(leftBottomSizer, 0, wxALL | wxALIGN_CENTER, 3);
   bottomSizer->Add(rightBottomSizer, 0, wxALL | wxALIGN_CENTER, 3);
-  mainSizer->Add(upperSizer, wxALIGN_CENTER);
-  mainSizer->Add(middleSizer, wxALIGN_CENTER);
-  mainSizer->Add(bottomSizer, wxALIGN_CENTER);
+  mainSizer->Add(upperSizer, 1, wxALIGN_CENTER);
+  mainSizer->Add(middleSizer, 1, wxALIGN_CENTER);
+  mainSizer->Add(bottomSizer, 1, wxALIGN_CENTER);
   
   wxCommandEvent foo;
   OnOrbSetChoice(foo);
@@ -1930,11 +1932,9 @@ bool Orbital3DSurfPane::UpdateNeeded(void) {
 			  ||(NegColor.blue!=testColor.blue)) 
 			  result=true;
 
-		  mTarget->GetTranspColor(&testColor);
-		  if ((TranspColor.red != testColor.red)
-			  ||(TranspColor.green!=testColor.green)
-			  ||(TranspColor.blue!=testColor.blue)) 
-			  result=true;
+			unsigned char test_transp = mTarget->GetTransparency();
+			if (test_transp != Transparency) 
+				result=true;
 		}
 	}
 	return result;
@@ -2085,7 +2085,7 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event ) {
 	mTarget->SetGridSize(GridSize);
 	mTarget->SetPosColor(&PosColor);
 	mTarget->SetNegColor(&NegColor);
-	mTarget->SetTranspColor(&TranspColor);
+	mTarget->SetTransparency(Transparency);
 	mTarget->SetPhaseChange(PhaseChange);
 	mTarget->UseSurfaceNormals(UseNormals);
 	mTarget->UseSphericalHarmonics(SphericalHarmonics);
@@ -2314,7 +2314,7 @@ void General3DSurfPane::TargetToPane(void)
 {
 	mTarget->GetPosColor(&PosColor);
 	mTarget->GetNegColor(&NegColor);
-	mTarget->GetTranspColor(&TranspColor);
+	Transparency = mTarget->GetTransparency();
 	ContourValue = mTarget->GetContourValue();
 	UseSolidSurface = mTarget->SolidSurface();
 	UseNormals = mTarget->UseSurfaceNormals();
@@ -2354,7 +2354,9 @@ void General3DSurfPane::refreshControls()
 	
 	mOrbColor1->setColor(&PosColor);
 	mOrbColor2->setColor(&NegColor);
-	mTransColor->setColor(&TranspColor);
+	wxString tmp_str;
+	tmp_str.Printf("%d", Transparency);
+	mTransparency->SetValue(tmp_str);
 
 	mGenContourPosNegCheck->SetValue(ContourPosNeg);
 }
@@ -2423,7 +2425,7 @@ void General3DSurfPane::CreateControls()
     wxStaticText* itemStaticText23 = new wxStaticText( Gen3DPanel, wxID_STATIC, _("Positive Color:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer22->Add(itemStaticText23, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
-	mTarget->GetTranspColor(&TranspColor);
+	Transparency = mTarget->GetTransparency();
 	mTarget->GetPosColor(&PosColor);
 	mTarget->GetNegColor(&NegColor);
 
@@ -2440,11 +2442,14 @@ void General3DSurfPane::CreateControls()
 	
     wxBoxSizer* itemBoxSizer28 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer21->Add(itemBoxSizer28, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
-    wxStaticText* itemStaticText29 = new wxStaticText( Gen3DPanel, wxID_STATIC, _("Transparency Color:"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText* itemStaticText29 = new wxStaticText( Gen3DPanel, wxID_STATIC, _("Transparency:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer28->Add(itemStaticText29, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
-    mTransColor = new colorArea( Gen3DPanel, ID_TRANSPARENCY_COLOR, &TranspColor );
-    itemBoxSizer28->Add(mTransColor, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+    mTransparency = new wxSpinCtrl(this, ID_TRANSPARENCY, _T(""),
+								   wxDefaultPosition, wxDefaultSize,
+								   wxSP_ARROW_KEYS, 0, 100, 0);
+	mTransparency->SetValue(Transparency);
+    itemBoxSizer28->Add(mTransparency, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
 	wxBoxSizer* itemBoxSizer31 = new wxBoxSizer(wxHORIZONTAL);
     mainSizer->Add(itemBoxSizer31, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
@@ -2518,9 +2523,9 @@ bool General3DSurfPane::UpdateNeeded(void)
 			mTarget->GetNegColor(&testColor);
 			if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)||
 				(NegColor.blue!=testColor.blue)) result=true;
-			mTarget->GetTranspColor(&testColor);
-			if ((TranspColor.red != testColor.red)||(TranspColor.green!=testColor.green)||
-				(TranspColor.blue!=testColor.blue)) result=true;
+			unsigned char test_transp = mTarget->GetTransparency();
+			if (test_transp != Transparency) 
+				result=true;
 		}
 	}
 	return result;
@@ -2538,7 +2543,7 @@ void General3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	mTarget->SetContourValue(ContourValue);
 	mTarget->SetPosColor(&PosColor);
 	mTarget->SetNegColor(&NegColor);
-	mTarget->SetTranspColor(&TranspColor);
+	mTarget->SetTransparency(Transparency);
 	mTarget->UseSurfaceNormals(UseNormals);
 	if (updateContour && mTarget->GridAvailable()) {
 		Progress * lProgress = new Progress();
@@ -3058,7 +3063,7 @@ void TEDensity2DSurfPane::CreateControls() {
     itemBoxSizer81->Add(mOrbColor1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxBoxSizer* itemBoxSizer84 = new wxBoxSizer(wxHORIZONTAL);
-    mainSizer->Add(itemBoxSizer84, 0, wxALIGN_RIGHT|wxALL, 5);
+    mainSizer->Add(itemBoxSizer84, 0, wxALIGN_CENTER|wxALL, 5);
     wxBoxSizer* itemBoxSizer85 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer84->Add(itemBoxSizer85, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
     mSetParamBut = new wxButton( TED2DPANEL, ID_SET_PARAM_BUT, _("Parameters..."), wxDefaultPosition, wxDefaultSize, 0 );
@@ -3246,7 +3251,7 @@ void TEDensity3DSurfPane::TargetToPane(void)
 {
 	mTarget->GetPosColor(&PosColor);
 	mTarget->GetNegColor(&NegColor);
-	mTarget->GetTranspColor(&TranspColor);
+	Transparency = mTarget->GetTransparency();
 	ContourValue = mTarget->GetContourValue();
 	UseSolidSurface = mTarget->SolidSurface();
 	UseNormals = mTarget->UseSurfaceNormals();
@@ -3270,7 +3275,9 @@ void TEDensity3DSurfPane::refreshControls()
 	
 	mOrbColor1->setColor(&PosColor);
 	mOrbColor2->setColor(&NegColor);
-	mTransColor->setColor(&TranspColor);
+	wxString tmp_str;
+	tmp_str.Printf("%d", Transparency);
+	mTransparency->SetValue(tmp_str);
 
 	mColorSurfCheck->SetValue(UseMEP);
 	mUseRGBColorCheck->SetValue(UseRGBSurfaceColor);
@@ -3353,9 +3360,9 @@ bool TEDensity3DSurfPane::UpdateNeeded(void)
 		mTarget->GetNegColor(&testColor);
 		if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)||
 			(NegColor.blue!=testColor.blue)) result=true;
-		mTarget->GetTranspColor(&testColor);
-		if ((TranspColor.red != testColor.red)||(TranspColor.green!=testColor.green)||
-			(TranspColor.blue!=testColor.blue)) result=true;
+		unsigned char test_transp = mTarget->GetTransparency();
+		if (test_transp != Transparency) 
+			result=true;
 	}
 	return result;
 }
@@ -3394,7 +3401,7 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	mTarget->SetGridSize(GridSize);
 	mTarget->SetPosColor(&PosColor);
 	mTarget->SetNegColor(&NegColor);
-	mTarget->SetTranspColor(&TranspColor);
+	mTarget->SetTransparency(Transparency);
 	mTarget->SetColorByValue(UseMEP);
 	mTarget->UseSurfaceNormals(UseNormals);
 	mTarget->UseRGBColoration(UseRGBSurfaceColor);
@@ -3639,11 +3646,14 @@ void TEDensity3DSurfPane::CreateControls() {
 	
     wxBoxSizer* itemBoxSizer124 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer119->Add(itemBoxSizer124, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
-    wxStaticText* itemStaticText125 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Transparency color:"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText* itemStaticText125 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Transparency:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer124->Add(itemStaticText125, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
-    mTransColor = new colorArea( TED3DPanel, ID_TRANSPARENCY_COLOR, &TranspColor );
-    itemBoxSizer124->Add(mTransColor, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mTransparency = new wxSpinCtrl(this, ID_TRANSPARENCY, _T(""),
+								   wxDefaultPosition, wxDefaultSize,
+								   wxSP_ARROW_KEYS, 0, 100, 0);
+	mTransparency->SetValue(Transparency);
+    itemBoxSizer124->Add(mTransparency, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxBoxSizer* itemBoxSizer127 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer119->Add(itemBoxSizer127, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
@@ -3816,7 +3826,7 @@ void MEP2DSurfPane::CreateControls() {
     itemBoxSizer156->Add(mOrbColor2, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	
     wxBoxSizer* itemBoxSizer159 = new wxBoxSizer(wxHORIZONTAL);
-    mainSizer->Add(itemBoxSizer159, 0, wxALIGN_RIGHT|wxALL, 5);
+    mainSizer->Add(itemBoxSizer159, 0, wxALIGN_CENTER|wxALL, 5);
     wxBoxSizer* itemBoxSizer160 = new wxBoxSizer(wxVERTICAL);
     itemBoxSizer159->Add(itemBoxSizer160, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
     mSetParamBut = new wxButton( MEP2DPanel, ID_SET_PARAM_BUT, _("Parameters..."), wxDefaultPosition, wxDefaultSize, 0 );
@@ -4017,7 +4027,7 @@ void MEP3DSurfPane::TargetToPane(void)
 {
 	mTarget->GetPosColor(&PosColor);
 	mTarget->GetNegColor(&NegColor);
-	mTarget->GetTranspColor(&TranspColor);
+	Transparency = mTarget->GetTransparency();
 	ContourValue = mTarget->GetContourValue();
 	UseSolidSurface = mTarget->SolidSurface();
 	UseNormals = mTarget->UseSurfaceNormals();
@@ -4037,7 +4047,9 @@ void MEP3DSurfPane::refreshControls()
 	
 	mOrbColor1->setColor(&PosColor);
 	mOrbColor2->setColor(&NegColor);
-	mTransColor->setColor(&TranspColor);
+	wxString tmp_str;
+	tmp_str.Printf("%d", Transparency);
+	mTransparency->SetValue(tmp_str);
 	
 	mNumGridPntSld->SetValue(NumGridPoints);
 	mGridSizeSld->SetValue((short)(100*GridSize));
@@ -4070,9 +4082,9 @@ bool MEP3DSurfPane::UpdateNeeded(void)
 		mTarget->GetNegColor(&testColor);
 		if ((NegColor.red != testColor.red)||(NegColor.green!=testColor.green)||
 			(NegColor.blue!=testColor.blue)) result=true;
-		mTarget->GetTranspColor(&testColor);
-		if ((TranspColor.red != testColor.red)||(TranspColor.green!=testColor.green)||
-			(TranspColor.blue!=testColor.blue)) result=true;
+		unsigned char test_transp = mTarget->GetTransparency();
+		if (test_transp != Transparency) 
+			result=true;
 	}
 	return result;
 }
@@ -4106,7 +4118,7 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	mTarget->SetGridSize(GridSize);
 	mTarget->SetPosColor(&PosColor);
 	mTarget->SetNegColor(&NegColor);
-	mTarget->SetTranspColor(&TranspColor);
+	mTarget->SetTransparency(Transparency);
 	mTarget->UseSurfaceNormals(UseNormals);
 	MoleculeData * data = owner->GetMoleculeData();
 	WinPrefs * Prefs = owner->GetPrefs();
@@ -4294,11 +4306,14 @@ void MEP3DSurfPane::CreateControls() {
 	
     wxBoxSizer* itemBoxSizer192 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer187->Add(itemBoxSizer192, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
-    wxStaticText* itemStaticText193 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Transparency color:"), wxDefaultPosition, wxDefaultSize, 0 );
+    wxStaticText* itemStaticText193 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Transparency:"), wxDefaultPosition, wxDefaultSize, 0 );
     itemBoxSizer192->Add(itemStaticText193, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
-    mTransColor = new colorArea( MEP3DPanel, ID_TRANSPARENCY_COLOR, &TranspColor );
-    itemBoxSizer192->Add(mTransColor, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+    mTransparency = new wxSpinCtrl(MEP3DPanel, ID_TRANSPARENCY, _T(""),
+								   wxDefaultPosition, wxDefaultSize,
+								   wxSP_ARROW_KEYS, 0, 100, 0);
+	mTransparency->SetValue(Transparency);
+    itemBoxSizer192->Add(mTransparency, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	
     wxBoxSizer* itemBoxSizer195 = new wxBoxSizer(wxHORIZONTAL);
     itemBoxSizer187->Add(itemBoxSizer195, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
