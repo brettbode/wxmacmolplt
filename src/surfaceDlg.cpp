@@ -322,7 +322,7 @@ void BaseSurfacePane::OnChangeTitle(wxCommandEvent& event) {
 	
 }
 
-const wxString BaseSurfacePane::GetTitle() const {
+const wxString BaseSurfacePane::GetSurfaceName() const {
 
 	return surfTitleEdit->GetValue();
 

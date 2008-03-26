@@ -171,7 +171,7 @@ public:
 	bool GetVisibility(void) const {return Visible;};	//< Is the surface visible?
 	bool GetAllFrames(void) const {return AllFrames;};	//< Is the surface applies to all frames?
 
-	const wxString GetTitle() const;
+	const wxString GetSurfaceName() const;
 
 	void SetUpdateTest(bool test);	//< Set flag to force an update (overrides the automatic tests).
 	void setUpdateButton();			//< Updates the state of the update button comparing the current and saved states.

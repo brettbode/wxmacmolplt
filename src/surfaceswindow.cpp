@@ -199,7 +199,7 @@ void SurfacesWindow::OnChangeTitle(wxCommandEvent& event) {
 
 	BaseSurfacePane* tempPane = (BaseSurfacePane *) book->GetCurrentPage();
 	if (tempPane) {
-		book->SetPageText(book->GetSelection(), tempPane->GetTitle());
+		book->SetPageText(book->GetSelection(), tempPane->GetSurfaceName());
 	} 
 	
 }
@@ -430,7 +430,7 @@ void SurfacesWindow::SurfaceUpdated(void) {
 	//Do we need to generate a frame changed event here???
 	BaseSurfacePane* tempPane = (BaseSurfacePane * ) book->GetCurrentPage();
 	if (tempPane) {
-		book->SetPageText(book->GetSelection(), tempPane->GetTitle());
+		book->SetPageText(book->GetSelection(), tempPane->GetSurfaceName());
 		//The previous line does not immediately update the list text???
 	} 
 	Parent->UpdateModelDisplay();
