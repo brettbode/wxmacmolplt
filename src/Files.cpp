@@ -42,6 +42,7 @@
 #else
 #include "MolDisplayWin.h"
 #endif
+#include <iostream>
 
 //#include "mat2quat.h"
 #include "InputData.h"
@@ -68,36 +69,15 @@ extern Boolean		gQ3DAvail, gOpenGLAvailable;
 bool ReadGVBOccupancy(BufferFile * Buffer, long NumPairOrbs, long MaxOrbs, float * Occupancy);
 
 void FileError::WriteError(void) {
-#ifdef __wxBuild__
-#ifndef WIN32
-#warning Need warning string replacement
-#endif
-#else
-	Str255	errmsg;
-
-	SetCursorToArrow();
-	if (Error == eofErr) {
-		GetIndString(errmsg, kerrstrings, 36);
-	} else {
-		GetIndString(errmsg, kerrstrings, 35);
-		sprintf((char *)&(errmsg[errmsg[0]+1]), " %d", Error);
+	if (Error == eofErr)
+		wxLogMessage(wxT("Unexpected End Of File. Please check to make sure the file is complete."));
+	else {
+		wxString err;
+		err.Printf(wxT("File System related error. Please report error number %d."), (int) Error);
+		wxLogMessage(err);
 	}
-	MessageAlert(errmsg);
-#endif
 }
 void DataError::WriteError(void) {
-#ifdef __wxBuild__
-#ifndef WIN32
-//#warning Need warning string replacement
-#endif
-#else
-	SetCursorToArrow();
-	if (ErrNum>0) {
-		Str255	errmsg;
-		GetIndString(errmsg, kDataErrMsgs, ErrNum);
-		MessageAlert(errmsg);
-	}
-#endif
 };
 
 #ifndef __wxBuild__
@@ -1076,7 +1056,10 @@ long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
 	partB[0] = Line[3]; partB[1] = Line[4]; partB[2]=Line[5]; partB[3]='\0';
 	scanerr = sscanf(partA, "%3ld", &nAtoms);
 	scanerr += sscanf(partB, "%3ld", &nBonds);
-	if (scanerr!=2 || nAtoms <= 0) throw DataError(16);
+	if (scanerr!=2 || nAtoms <= 0) {
+		wxLogMessage(wxT("Error parsing MDL MolFile."));
+		throw DataError();
+	}
 	MainData->SetupFrameMemory(nAtoms, nBonds);
 		long i;
 	for (i=0; i<nAtoms; i++) {
@@ -1752,7 +1735,10 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 		//1st line contains the number of atoms
 	Buffer->GetLine(Line);
 	scanerr = sscanf(Line, "%ld", &nAtoms);
-	if ((scanerr!=1)||(nAtoms<=0)) throw DataError(15);
+	if ((scanerr!=1)||(nAtoms<=0)) {
+		wxLogMessage(wxT("XYZ files must have an integer representing the number of atoms on the first line of the file."));
+		throw DataError();
+	}
 		//allocate memory for the atoms
 	if (lFrame->NumAtoms > 0) {	//If there are already atoms treat as an append
 		lFrame = MainData->AddFrame(nAtoms,0);
@@ -1776,13 +1762,18 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 					test = ParseCartLine(Line, &AtomType, &Pos, &Vector, -1);
 					
 					if (test==-1) {	//invalid atom type
-						throw DataError(17);
+						wxLogMessage(wxT("Error: An invalid Atom Type was encountered in the atom list."));
+						throw DataError();
 					} else if (test<0) {//other invalid data was encountered
-						throw DataError(18);
+						wxLogMessage(wxT("An error occured while reading the file. Open File Aborted!"));
+						throw DataError();
 					}
 					if (AtomType > 115) {
 						if (AtomType > 255) {
-							if (((AtomType - 255) < 1)||((AtomType - 255) > nAtoms)) throw DataError(19);
+							if (((AtomType - 255) < 1)||((AtomType - 255) > nAtoms)) {
+								wxLogMessage(wxT("Invalid atom number detected in special atom list."));
+								throw DataError();
+							}
 						}
 						if (!lFrame->AddSpecialAtom(Vector, i)) {
 							throw MemoryError();
@@ -1835,7 +1826,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 		if (MainData->GetNumFrames() > 1) {
 			MainData->DeleteFrame();
 		}
-		MessageAlert("Error while parsing file. Partial file may be valid.");
+		wxLogMessage(wxT("Error while parsing file. Partial file may be valid."));
 	}
 	return 1;
 }
@@ -1917,14 +1908,22 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 		test = ParseCartLine(LineText, &AtomType, &Pos, &Vector, Mode);
 		
 		if (test==-1) {	//invalid atom type
-			throw DataError(17);
+			wxLogMessage(wxT("Error: An invalid Atom Type was encountered in the atom list."));
+			throw DataError();
 		} else if (test<0) {
-			throw DataError(18);
+			wxLogMessage(wxT("An error occured while reading the file. Open File Aborted!"));
+			throw DataError();
 		}
 		if (AtomType > 115) {
-			if (Mode < 0) throw DataError(20);
+			if (Mode < 0) {
+				wxLogMessage(wxT("Error: Special Atom types may not be used with Normal Modes!"));
+				throw DataError();
+			}
 			if (AtomType > 255) {
-				if (((AtomType - 255) < 1)||((AtomType - 255) > fileAtoms)) throw DataError(19);
+				if (((AtomType - 255) < 1)||((AtomType - 255) > fileAtoms)) {
+					wxLogMessage(wxT("Invalid atom number detected in special atom list."));
+					throw DataError();
+				}
 			}
 			if (!lFrame->AddSpecialAtom(Vector, j)) throw MemoryError();
 		}
@@ -2021,7 +2020,8 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 					iscanerr = sscanf(LineText, "%f%f%f", &((lVibs->NormMode[catm]).x),
 						&((lVibs->NormMode[catm]).y), &((lVibs->NormMode[catm]).z));
 					if (iscanerr != 3) {			/*Uh Ohh looks like there was a problem reading the file*/
-						throw DataError(21);
+						wxLogMessage(wxT("Error reading the Normal Mode input. Open file aborted."));
+						throw DataError();
 					}
 					(lVibs->NormMode[catm]).x *= (Prefs->GetSqrtAtomMass((lFrame->Atoms[j].Type)-1));
 					(lVibs->NormMode[catm]).y *= (Prefs->GetSqrtAtomMass((lFrame->Atoms[j].Type)-1));
@@ -2304,7 +2304,8 @@ long MoleculeData::ParseTinkerCoordinates(BufferFile *Buffer) {
 	if (numlines > 0) {
 		if (!SetupFrameMemory(numlines, 0)) throw std::bad_alloc();
 	} else {
-		throw DataError(12);
+		wxLogMessage(wxT("Unable to locate Tinker coordinates in file."));
+		throw DataError();
 	}
 	for (long i=0; i<numlines; i++) {
 		long linenum;
@@ -2314,7 +2315,10 @@ long MoleculeData::ParseTinkerCoordinates(BufferFile *Buffer) {
 		Buffer->GetLine(LineText);
 		int scannum = sscanf(LineText, "%ld %s %f %f %f", &linenum, Label, &(position.x),
 							 &(position.y), &(position.z));
-		if (scannum != 5) throw DataError(13);
+		if (scannum != 5) {
+			wxLogMessage(wxT("Error encountered while parsing coordinates."));
+			throw DataError();
+		}
 		long atomtype = SetAtomType(Label);
 		mpAtom * newAtom = lFrame->AddAtom(atomtype, position);
 		if (newAtom) newAtom->IsSIMOMMAtom(true);
@@ -2342,7 +2346,8 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 	if (numlines > 0) {
 		if (!MainData->SetupFrameMemory(numlines, 0)) throw std::bad_alloc();
 	} else {
-		throw DataError(12);
+		wxLogMessage(wxT("Unable to locate Tinker coordinates in file."));
+		throw DataError();
 	}
 	for (long i=0; i<numlines; i++) {
 			long linenum;
@@ -2352,7 +2357,10 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 		Buffer->GetLine(LineText);
 		int scannum = sscanf(LineText, "%ld %s %f %f %f", &linenum, Label, &(position.x),
 				&(position.y), &(position.z));
-		if (scannum != 5) throw DataError(13);
+		if (scannum != 5) {
+			wxLogMessage(wxT("Error encountered while parsing coordinates."));
+			throw DataError();
+		}
 		long atomtype = SetAtomType(Label);
 		mpAtom * newAtom = lFrame->AddAtom(atomtype, position);
 		if (newAtom) newAtom->IsSIMOMMAtom(true);
@@ -2370,10 +2378,13 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 		if (numlines > 0) {
 			if (!MainData->SetupFrameMemory(numlines+lFrame->NumAtoms, 0)) throw MemoryError();
 		} else {
-			throw DataError(22);
+			wxLogMessage(wxT("Unable to locate coordinates in the file."));
+			throw DataError();
 		}
-		if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize)))
-			throw DataError(23);
+		if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize))) {
+			wxLogMessage(wxT("Unable to interpert coordinates."));
+			throw DataError();
+		}
 		lFrame->toggleAbInitioVisibility();
 	}
 	if (Prefs->GetAutoBond())
@@ -2567,10 +2578,12 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			if (numlines > 0) {
 				if (!MainData->SetupFrameMemory(numlines+lFrame->NumAtoms, 0)) throw MemoryError();
 			} else {
-				throw DataError(22);
+				wxLogMessage(wxT("Unable to locate coordinates in the file."));
+				throw DataError();
 			}
 			if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize)))
-				throw DataError(23);
+				wxLogMessage(wxT("Unable to interpert coordinates."));
+				throw DataError();
 		}
 		LinePos = Buffer->GetFilePos();		//next look for fragments
 		if (Buffer->LocateKeyWord("READING $EFRAG GROUP", 20, EnergyPos)) {	//ughh fragments!
@@ -2578,7 +2591,8 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			Buffer->SetFilePos(LinePos);
 		}
 		if (lFrame->NumAtoms <= 0) {	//initial coordinates not found! Abort!
-			throw DataError(22);
+			wxLogMessage(wxT("Unable to locate coordinates in the file."));
+			throw DataError();
 		}
 		if (Prefs->GetAutoBond())
 			lFrame->SetBonds(Prefs, false);
@@ -4643,34 +4657,48 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 		if (FirstFile) SetLabel(Line);
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%ld", &LinePos);
-		if ((scanerr != 1)||(LinePos<=0))
-			throw DataError(4);
+		if ((scanerr != 1)||(LinePos<=0)) {
+			wxLogMessage(wxT("The second line must contain the # of grid points."));
+			throw DataError();
+		}
 		if (FirstFile) NumGridPoints = LinePos;
 		else if (LinePos != NumGridPoints) throw DataError(7);
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%f%f%f", &(tempPt.x), &(tempPt.y), &(tempPt.z));
-		if (scanerr != 3) throw DataError(2);
+		if (scanerr != 3) {
+			wxLogMessage(wxT("Could not parse the x, y, and z values for the origin of the 3D grid."));
+			throw DataError();
+		}
 		if (FirstFile) Origin = tempPt;
 		else if ((fabs(tempPt.x) < fabs(100*(tempPt.x-Origin.x)))||
 				(fabs(tempPt.y) < fabs(100*(tempPt.y-Origin.y)))||
-				(fabs(tempPt.z) < fabs(100*(tempPt.z-Origin.z)))) 
+				 (fabs(tempPt.z) < fabs(100*(tempPt.z-Origin.z)))) {
+					wxLogMessage(wxT("The origin of the file grid does not match the current origin!"));
 					throw DataError(8);
+		}
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%f%f%f", &(tempPt.x), &(tempPt.y), &(tempPt.z));
-		if (scanerr != 3) throw DataError(5);
+		if (scanerr != 3) {
+			wxLogMessage(wxT("The fourth line must contain a 3D vector indicating the increment along the first side of the grid."));
+			throw DataError();
+		}
 		if (FirstFile) XInc = tempPt;
 		else if ((fabs(tempPt.x) < fabs(100*(tempPt.x-XInc.x)))||
 				(fabs(tempPt.y) < fabs(100*(tempPt.y-XInc.y)))||
-				(fabs(tempPt.z) < fabs(100*(tempPt.z-XInc.z)))) 
-					throw DataError(9);
+				 (fabs(tempPt.z) < fabs(100*(tempPt.z-XInc.z)))) {
+					wxLogMessage(wxT("The first increment vector does not match the current grid!"));
+					throw DataError();
+		}
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%f%f%f", &(tempPt.x), &(tempPt.y), &(tempPt.z));
 		if (scanerr != 3) throw DataError(6);
 		if (FirstFile) YInc = tempPt;
 		else if ((fabs(tempPt.x) < fabs(100*(tempPt.x-YInc.x)))||
 				(fabs(tempPt.y) < fabs(100*(tempPt.y-YInc.y)))||
-				(fabs(tempPt.z) < fabs(100*(tempPt.z-YInc.z)))) 
-					throw DataError(10);
+				 (fabs(tempPt.z) < fabs(100*(tempPt.z-YInc.z)))) {
+					wxLogMessage(wxT("The second increment vector does not match the current grid!"));
+					throw DataError();
+		}
 			//allocate memory for the grid
 		long TotalPoints = NumGridPoints*NumGridPoints;
 		if (FirstFile) {
@@ -4790,35 +4818,50 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%ld%ld%ld", &LineLength, &LinePos, &tempL);
-		if ((scanerr != 3)||(LineLength<=0)||(LinePos<=0)||(tempL<=0))
-			throw DataError(1);
+		if ((scanerr != 3)||(LineLength<=0)||(LinePos<=0)||(tempL<=0)) {
+			wxLogMessage(wxT("The second line must contain the # of x, y, and z grid points."));
+			throw DataError();
+		}
 		if (FirstFile) {
 			NumXGridPoints = LineLength;
 			NumYGridPoints = LinePos;
 			NumZGridPoints = tempL;
 		} else if ((NumXGridPoints!=LineLength)||(NumYGridPoints!=LinePos)||
-			(NumZGridPoints!=tempL)) throw DataError(7);
+				   (NumZGridPoints!=tempL)) {
+			wxLogMessage(wxT("The number of grid points does not match the existing grid!"));
+			throw DataError();
+		}
 
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%f%f%f", &(tempPt.x), &(tempPt.y), &(tempPt.z));
-		if (scanerr != 3) throw DataError(2);
+		if (scanerr != 3) {
+			wxLogMessage(wxT("Could not parse the x, y, and z values for the origin of the 3D grid."));
+			throw DataError();
+		}
 		if (FirstFile) Origin = tempPt;
 		else if ((fabs(tempPt.x) < fabs(100*(tempPt.x-Origin.x)))||
 				(fabs(tempPt.y) < fabs(100*(tempPt.y-Origin.y)))||
-				(fabs(tempPt.z) < fabs(100*(tempPt.z-Origin.z)))) 
-					throw DataError(8);
+				 (fabs(tempPt.z) < fabs(100*(tempPt.z-Origin.z)))) {
+					wxLogMessage(wxT("The origin of the file grid does not match the current origin!"));
+					throw DataError();
+		}
 
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%f%f%f", &(tempPt.x), &(tempPt.y), &(tempPt.z));
-		if (scanerr != 3) throw DataError(3);
+		if (scanerr != 3) {
+			wxLogMessage(wxT("Could not parse the x, y, and z increment values from the fourth line."));
+			throw DataError();
+		}
 		if (FirstFile) {
 			XGridInc = tempPt.x;
 			YGridInc = tempPt.y;
 			ZGridInc = tempPt.z;
 		} else if ((fabs(tempPt.x) < fabs(100*(tempPt.x-XGridInc)))||
 				(fabs(tempPt.y) < fabs(100*(tempPt.y-YGridInc)))||
-				(fabs(tempPt.z) < fabs(100*(tempPt.z-ZGridInc)))) 
-					throw DataError(11);
+				   (fabs(tempPt.z) < fabs(100*(tempPt.z-ZGridInc)))) {
+					wxLogMessage(wxT("The x, y, and z grid increments must match those of the existing grid."));
+					throw DataError();
+		}
 			//allocate memory for the grid (if needed)
 		long TotalPoints = NumXGridPoints*NumYGridPoints*NumZGridPoints;
 		if (FirstFile) AllocateGrid(TotalPoints);
