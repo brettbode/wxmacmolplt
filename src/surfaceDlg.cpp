@@ -1654,9 +1654,7 @@ void Orbital3DSurfPane::refreshControls() {
 
 	mOrbColor1->setColor(&PosColor);
 	mOrbColor2->setColor(&NegColor);
-	wxString tmp_str;
-	tmp_str.Printf("%d", Transparency);
-	mTransparency->SetValue(tmp_str);
+	mTransparency->SetValue(Transparency);
 }
 
 /*!
@@ -2354,9 +2352,7 @@ void General3DSurfPane::refreshControls()
 	
 	mOrbColor1->setColor(&PosColor);
 	mOrbColor2->setColor(&NegColor);
-	wxString tmp_str;
-	tmp_str.Printf("%d", Transparency);
-	mTransparency->SetValue(tmp_str);
+	mTransparency->SetValue(Transparency);
 
 	mGenContourPosNegCheck->SetValue(ContourPosNeg);
 }
@@ -3275,9 +3271,7 @@ void TEDensity3DSurfPane::refreshControls()
 	
 	mOrbColor1->setColor(&PosColor);
 	mOrbColor2->setColor(&NegColor);
-	wxString tmp_str;
-	tmp_str.Printf("%d", Transparency);
-	mTransparency->SetValue(tmp_str);
+	mTransparency->SetValue(Transparency);
 
 	mColorSurfCheck->SetValue(UseMEP);
 	mUseRGBColorCheck->SetValue(UseRGBSurfaceColor);
@@ -4047,9 +4041,7 @@ void MEP3DSurfPane::refreshControls()
 	
 	mOrbColor1->setColor(&PosColor);
 	mOrbColor2->setColor(&NegColor);
-	wxString tmp_str;
-	tmp_str.Printf("%d", Transparency);
-	mTransparency->SetValue(tmp_str);
+	mTransparency->SetValue(Transparency);
 	
 	mNumGridPntSld->SetValue(NumGridPoints);
 	mGridSizeSld->SetValue((short)(100*GridSize));
