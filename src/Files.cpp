@@ -61,428 +61,19 @@
 #define PI 3.14159265
 
 extern WinPrefs *	gPreferences;
-#ifndef __wxBuild__
-extern Boolean		gQ3DAvail, gOpenGLAvailable;
-#endif
 
 	//Local function definitions
 bool ReadGVBOccupancy(BufferFile * Buffer, long NumPairOrbs, long MaxOrbs, float * Occupancy);
 
 void FileError::WriteError(void) {
 	if (Error == eofErr)
-		wxLogMessage(wxT("Unexpected End Of File. Please check to make sure the file is complete."));
+		wxLogMessage(_("Unexpected End Of File. Please check to make sure the file is complete."));
 	else {
 		wxString err;
-		err.Printf(wxT("File System related error. Please report error number %d."), (int) Error);
+		err.Printf(_("File System related error. Please report error number %d."), (int) Error);
 		wxLogMessage(err);
 	}
 }
-void DataError::WriteError(void) {
-};
-
-#ifndef __wxBuild__
-void OpenMolPFile(FSSpec *myFile) {
-	OSErr				myerr;
-	Rect				tRect;
-	bool				NeedRect=true;
-
-	SpinCursor(0);
-		//First attempt to get the window Rect from the resource fork
-		//otherwise get it from the end of the data fork
-		//the resource fork is used in files written later than v3.0.1
-	short ResFileRef = FSpOpenResFile(myFile, fsRdPerm);
-	myerr = ResError();	//check for errors
-	if (myerr==noErr) {
-		myerr = myReadPreference(ResFileRef, ResFileRef, (ResType) 'RECT', 1, (Ptr) &tRect, sizeof(Rect));
-		if (myerr == noErr) NeedRect = false;	//Got the resource!
-	} else ResFileRef = 0;
-
-	MolDisplayWin * Window = NULL;
-	if (!NeedRect) Window = new MolDisplayWin(myFile->name, &tRect);
-	else Window = new MolDisplayWin(myFile->name, NULL);
-	if (Window == NULL) return;
-	Window->ShowWindow();
-	Window->SetFileSpec(myFile, 0);
-	SpinCursor(0);
-
-	Window->ReadMolPFile(ResFileRef);
-
-	if (ResFileRef) CloseResFile(ResFileRef);
-
-	SetCursorToArrow();					/* reset the cursor before returning */
-} /*OpenMolPFile*/
-void MolDisplayWin::ReadMolPFile(short ResFileRef) {
-	if (ResFileRef) {	//attempt to read in the files preferences
-		Prefs->ReadFilePrefs(ResFileRef);
-		if (gQ3DAvail || gOpenGLAvailable) {
-			//Attempt to read the QD3D state
-				Boolean t;
-			OSErr myerr = myReadPreference(ResFileRef, ResFileRef, (ResType) 'QD3P', 128, (Ptr) &t, sizeof(Boolean));
-			if ((myerr == noErr)&&(t)) winData.is3DModeActive(true);
-		}
-	}
-		short vreftemp;
-	OSErr myerr = FSpOpenDF(&fileFSSpec, fsRdPerm, &vreftemp);	/* Open the data fork */
-	if (myerr != noErr) {
-		AbortOpen(0);
-		return;		// abort if there is an error opening the file
-	}
-	fileRefNum = vreftemp;
-
-	BufferFile * lBuffer = NULL;
-	bool Success = false;
-	try {
-		lBuffer = new BufferFile(vreftemp, false);
-		SpinCursor(0);
-		if (!MainData->UnPackData(lBuffer)) { /*the unpack failed so close the window*/
-				Str255	tempStr;
-			Close();
-			GetIndString(tempStr, kerrstrings, 21);
-			MessageAlert(tempStr);
-			return;
-		}
-		SpinCursor(0);
-		Success = true;
-	}
-	catch (std::bad_alloc) {
-		Close();
-		MessageAlert("\pInsufficient memory to read in the file.");
-	}
-	catch (MemoryError) {
-		Close();
-		MessageAlert("\pInsufficient memory to read in the file.");
-	}
-	catch (DataError) {
-		Close();
-		MessageAlert("\pInvalid data encountered while reading the file.");
-	}
-	catch (FileError) {
-		Close();
-		MessageAlert("\pFile System error, read aborted.");
-	}
-	if (lBuffer) delete lBuffer;
-	if (Success) {
-		if (FileSave & 1) FileSave -= 1;
-		if (!(FileSave & 2)) FileSave += 2;
-			//Initialize QuickDraw3D if neccessary
-#ifdef QuickDraw3D
-		if (gQ3DAvail) {
-			if (QD3DActive) Q3DInitWindow();
-		}
-#endif
-#ifdef UseOpenGL
-		if (gOpenGLAvailable) {
-			if (winData.is3DModeActive()) OpenGLInitWindow();
-		}
-#endif
-		ResetModel(false);
-	}
-}
-
-long MoleculeData::UnPackData(BufferFile * Buffer) {
-	long		length=0, code;
-	char		Version;
-	
-	if (Frames) delete Frames;
-	cFrame = Frames = NULL;
-	Buffer->Read((Ptr) &length, sizeof(long));
-	if (length != 'BMBm') throw DataError();
-	Buffer->Read(&Version, 1);
-	if (Version < 2) throw DataError();
-	if (Version == 2) {
-		return UnPackOldData(Buffer);
-	}
-	if (Version > 5) throw DataError();
-	Buffer->Read((Ptr) &code, sizeof(long));
-	Buffer->Read((Ptr) &length, sizeof(long));
-	if (code == 1)	// The first item must be the Main Data struct
-		ConvertMainWinData1(Buffer, length);
-	else if (code == 14)
-		ConvertMainWinData14(Buffer, length);
-	else if (code == 40) {
-		if (length != sizeof(MoleculeData)) throw DataError(); //The size of the struct had better be right!
-		Buffer->Read((Ptr) this, length);
-	} else throw DataError();
-	cFrame = Frames = NULL;		//zero out all pointers that were just read in and thus are invalid
-	RotCoords = NULL;
-	zBuffer = NULL;
-	Description = NULL;
-	Basis = NULL;
-	IntCoords = NULL;
-	InputOptions = NULL;
-	NumFrames = 0;
-
-	Frame * lFrame = cFrame = Frames = new Frame(MolWin);
-	if (!lFrame) throw MemoryError();
-	Buffer->Read((Ptr) &code, sizeof(long));
-	if (code == 2) lFrame->ConvertFrameCode2(Buffer);
-	else if (code == 41) {
-		Buffer->Read((Ptr) &length, sizeof(long));
-		lFrame->Read41(Buffer, length);
-	} else if (code == 54) {
-		Buffer->Read((Ptr) &length, sizeof(long));
-		lFrame->Read(Buffer, length);
-	} else throw DataError();	// Next must come a Frame struct
-	NumFrames = 1;
-	MaxAtoms = MAX(MaxAtoms, lFrame->NumAtoms);
-	Buffer->Read((Ptr) &code, sizeof(long));
-	while (lFrame) {
-		while ((code>0)&&(code!=2)&&(code!=41)&&(code!=54)) { //process until the next frame or end of file is reached
-			Buffer->Read((Ptr) &length, sizeof(long));
-			Buffer->SetBlockLength(length);
-			switch (code) {
-				case 3:
-					lFrame->ConvertCode3(Buffer, length);
-				break;
-				case 4:
-					lFrame->ConvertCode4(Buffer, length);
-				break;
-				case 5:
-					lFrame->ConvertCode5(Buffer, length);
-				break;
-				case 42:
-					if (length != lFrame->NumAtoms*sizeof(Atom)) throw DataError();
-					Buffer->Read((Ptr) (lFrame->Atoms), length);
-				break;
-				case 43:
-					if (length != lFrame->NumBonds*sizeof(Bond)) throw DataError();
-					Buffer->Read((Ptr) (lFrame->Bonds), length);
-				break;
-				case 6:
-				case 44:
-					if (length == lFrame->NumAtoms*sizeof(CPoint3D)) {
-						if (! lFrame->SpecialAtoms) {
-							lFrame->SpecialAtoms = new CPoint3D[lFrame->NumAtoms];
-							if (!lFrame->SpecialAtoms) throw MemoryError();
-						}
-						Buffer->Read((Ptr) (lFrame->SpecialAtoms), length);
-					}
-				break;
-				case 7:
-				case 45:
-					lFrame->Vibs = VibRec::ReadOldVibRec45(Buffer);
-				break;
-				case 8:
-				case 46:
-					if (lFrame->Vibs) lFrame->Vibs->ReadCode46(Buffer, length);
-				break;
-				case 9:
-				case 47:
-					if (lFrame->Vibs) lFrame->Vibs->ReadCode47(Buffer, lFrame->NumAtoms, length);
-				break;
-				case 56:	//new style vibrec
-					lFrame->Vibs = VibRec::Read(Buffer, lFrame->NumAtoms);
-				break;
-				case 57:
-					if (Basis) {
-						OrbitalRec * OrbSet = OrbitalRec::Read(Buffer, Basis->GetNumBasisFuncs(false), length);
-						if (OrbSet != NULL) lFrame->Orbs.push_back(OrbSet);
-					}
-				break;
-				case 10:	//Read in old orbitals
-					ReadMORec10(Buffer, length);
-				break;
-				case 48:
-					if (Basis) {
-						ReadMORec48(Buffer, Basis->GetNumBasisFuncs(false), length);
-					}
-				break;
-				case 49:
-					lFrame->ReadSurfaceList(Buffer, length);
-				break;
-				case 12:
-					ReadRunInfoRec(Buffer, length);
-				break;
-				case 13:
-					ReadRunTitle(Buffer, length);
-				break;
-				case 50:
-					IntCoords = IntCoords->Read(Buffer);
-				break;
-				case 51:
-					if (!Basis)
-						Basis = Basis->Read(Buffer, 0, length);
-					else throw DataError();
-				break;
-				case 52:
-					Description = new char[length];
-					if (!Description) throw MemoryError();
-					Buffer->Read((Ptr) Description, length);
-				break;
-				case 15:	//Input Options
-				case 53:
-					if (InputOptions) delete InputOptions;
-					InputOptions = new InputData;
-					if (InputOptions) 
-						InputOptions->ReadFromBuffer(Buffer, length);
-				break;
-				case 55:
-					lFrame->Gradient = GradientData::Read(Buffer);
-				break;
-			}
-			Buffer->FinishBlock();
-			Buffer->Read((Ptr) &code, sizeof(long));
-		}
-		Frame * lpFrame = lFrame;	lFrame = NULL;
-		if ((code == 2)||(code == 41)||(code == 54)) {
-			lFrame = new Frame(MolWin);
-			if (!lFrame) throw MemoryError();
-			lpFrame->NextFrame = lFrame;
-			lFrame->PreviousFrame = lpFrame;
-			NumFrames ++;
-		}
-		if (code == 2) lFrame->ConvertFrameCode2(Buffer);
-		else if (code == 41) {
-			Buffer->Read((Ptr) &length, sizeof(long));
-			lFrame->Read41(Buffer, length);
-		} else if (code == 54) {
-			Buffer->Read((Ptr) &length, sizeof(long));
-			lFrame->Read(Buffer, length);
-		}
-		if ((code == 2)||(code == 41)||(code == 54)) {
-			MaxAtoms = MAX(MaxAtoms, lFrame->NumAtoms);
-			Buffer->Read((Ptr) &code, sizeof(long));
-				//copy over the next/previous ptr after the read operation
-			lFrame->PreviousFrame = lpFrame;
-			lFrame->NextFrame = NULL;			
-		}
-	}	// Done reading the buffer
-	length = CurrentFrame;
-	CurrentFrame = 1;
-	while (CurrentFrame < length) {
-		if (cFrame->NextFrame) cFrame = cFrame->NextFrame;
-		else break;
-		CurrentFrame ++;
-	}
-
-	RotCoords = new CPoint3D[MaxAtoms];
-	zBuffer = new long[MaxAtoms];
-	if (!(RotCoords)||!(zBuffer)) return 0;
-	if (Basis) {	//Check to see if the nuclear charge array needs to be generated
-		if (Basis->NuclearCharge[0] == -1) {
-			if (cFrame->NumAtoms == Basis->MapLength) {
-				for (long iatom=0; iatom<cFrame->NumAtoms; iatom++)
-					Basis->NuclearCharge[iatom] = cFrame->Atoms[iatom].GetNuclearCharge();
-			}
-		}
-	}
-
-	ResetRotation();
-	return 1;
-}
-
-void OpenTEXTFile(FSSpec *myFile, long flip, float offset, long nSkip) {
-	short				vreftemp;
-	OSErr				myerr;
-	long				test=0;
-
-	SpinCursor(0);
-	TextFont(systemFont);
-	myerr = FSpOpenDF(myFile, fsRdPerm, &vreftemp);	/* Open the data fork */
-	if (myerr != noErr) {
-		MessageAlertByID(kerrstrings, 1);
-		return;		// abort if there is an error opening the file
-	}
-	MolDisplayWin * Window = NULL;
-	BufferFile * Buffer=NULL;
-	try {
-		Window = new MolDisplayWin(myFile->name, NULL);
-
-		Window->ShowWindow();
-		Window->SetFileSpec(myFile, vreftemp);
-		Window->SetSkipPoints(nSkip);
-		SpinCursor(0);
-
-		Buffer = new BufferFile(vreftemp, false);
-		if (!Buffer) throw MemoryError();
-
-		SpinCursor(0);
-				// Attempt to identify the file type by looking for key words
-		TextFileType type = Buffer->GetFileType((char *) myFile->name);
-		
-		Window->BeginOperation();
-		switch (type) {
-			case kMolType:
-				test = Window->OpenMolPltFile(Buffer);
-			break;
-			case kGAMESSlogType:
-				test = Window->OpenGAMESSlog(Buffer, false, flip, offset);
-			break;
-			case kGAMESSIRCType:
-				test = Window->OpenGAMESSIRC(Buffer, false,flip,offset);
-			break;
-			case kGAMESSDRCType:
-				test = Window->OpenGAMESSDRC(Buffer, false, false,flip,offset);
-			break;
-			case kGAMESSInputType:
-				test = Window->OpenGAMESSInput(Buffer);
-			break;
-			case kXYZType:
-				test = Window->OpenXYZFile(Buffer);
-			break;
-			case kPDBType:
-				test = Window->OpenPDBFile(Buffer);
-			break;
-			case kMDLMolFile:
-				test = Window->OpenMDLMolFile(Buffer);
-			break;
-			case CMLFile:
-			{
-				test = Window->OpenCMLFile(Buffer);
-				if (test == 0) Window->AbortOpen(0);
-			}
-			break;
-			case MolDenFile:
-				test = Window->OpenMoldenFile(Buffer);
-				break;
-			//case MolekelFile:
-				//test = Window->OpenMolekelFile(Buffer);
-				//break;
-			default:	//Should only get here for unknown file types.
-				Window->AbortOpen(34);
-		}
-	}
-	catch (std::bad_alloc) {//Out of memory error
-		Window->AbortOpen(3);
-	}
-	catch (MemoryError) {
-		Window->AbortOpen(3);
-	}
-	catch (UserCancel) {
-		Window->AbortOpen(6);
-	}
-	catch (DataError Error) {//Error parsing the file data
-		if (!Error.ErrorSet())  Window->AbortOpen(21);
-		else {
-			Error.WriteError();
-			delete Window; Window = NULL;
-		}
-	}
-		//Some kind of File system related error
-	catch (FileError Error) { Error.WriteError(); Window->AbortOpen(-1);}
-	catch (...) { Window->AbortOpen(40);}
-	if (Buffer) delete Buffer;		//Done reading so free up the buffer
-	if (test) {//Note test is left 0 if any exception occurs(which causes Window to be deleted)
-		if (gPreferences->ChangeFileType()) {
-				// Looks like this is a good file so set the creator type for the neat icon
-				FInfo	myFInfo;
-			HGetFInfo(myFile->vRefNum, myFile->parID, myFile->name, &myFInfo);
-			if (myFInfo.fdCreator != (OSType) 'BMBm') {
-				myFInfo.fdCreator = (OSType) 'BMBm';
-				HSetFInfo(myFile->vRefNum, myFile->parID, myFile->name, &myFInfo);
-			}
-		}
-			//Text files are not used after opening so close it immediately
-		Window->CloseFile();	//Hmmm should this happen for CML files?
-		if (!Window->IsSavedFile()) Window->SetFileType(5);
-		Window->FinishOperation();	//Close the progress dialog, if opened
-		if (!Window->IsSavedFile() && gPreferences->Default3DOn()) Window->Activate3D();
-			//Tell the window its data has changed so that it will be redrawn correctly
-		if (!Window->IsSavedFile()) Window->ResetModel(true);
-	}
-	SetCursorToArrow();
-}	/*OpenTEXTFile*/
-#endif
 
 long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	char	Line[kMaxLineLength], token[kMaxLineLength];
@@ -801,14 +392,16 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					if (nAtoms > 0) {
 						if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
 					} else {
-						throw DataError(14);
+						wxLogMessage(_("No atoms found in your $DATA group!"));
+						throw DataError();
 					}
 					MainData->ParseZMatrix(Buffer, nAtoms, Prefs);
 				} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTMPCCoordType) {
 					if (nAtoms > 0) {
 						if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
 					} else {
-						throw DataError(14);
+						wxLogMessage(_("No atoms found in your $DATA group!"));
+						throw DataError();
 					}
 					MainData->ParseMOPACZMatrix(Buffer, nAtoms, Prefs);
 				}
@@ -922,7 +515,10 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 						found_it = Buffer->FindGroup(token);
 						if (!found_it) {
 							std::cout << "didn't find group " << token << std::endl;
-							throw DataError(20);
+							wxString msg;
+							msg.Printf(_("Unable to locate correct EFP2 fragment definition group named %s"), token);
+							wxLogMessage(msg);
+							throw DataError();
 						}
 						start_pos = Buffer->GetFilePos();
 
@@ -1057,7 +653,7 @@ long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
 	scanerr = sscanf(partA, "%3ld", &nAtoms);
 	scanerr += sscanf(partB, "%3ld", &nBonds);
 	if (scanerr!=2 || nAtoms <= 0) {
-		wxLogMessage(wxT("Error parsing MDL MolFile."));
+		wxLogMessage(_("Error parsing MDL MolFile."));
 		throw DataError();
 	}
 	MainData->SetupFrameMemory(nAtoms, nBonds);
@@ -1736,7 +1332,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 	Buffer->GetLine(Line);
 	scanerr = sscanf(Line, "%ld", &nAtoms);
 	if ((scanerr!=1)||(nAtoms<=0)) {
-		wxLogMessage(wxT("XYZ files must have an integer representing the number of atoms on the first line of the file."));
+		wxLogMessage(_("XYZ files must have an integer representing the number of atoms on the first line of the file."));
 		throw DataError();
 	}
 		//allocate memory for the atoms
@@ -1762,16 +1358,16 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 					test = ParseCartLine(Line, &AtomType, &Pos, &Vector, -1);
 					
 					if (test==-1) {	//invalid atom type
-						wxLogMessage(wxT("Error: An invalid Atom Type was encountered in the atom list."));
+						wxLogMessage(_("Error: An invalid Atom Type was encountered in the atom list."));
 						throw DataError();
 					} else if (test<0) {//other invalid data was encountered
-						wxLogMessage(wxT("An error occured while reading the file. Open File Aborted!"));
+						wxLogMessage(_("An error occured while reading the file. Open File Aborted!"));
 						throw DataError();
 					}
 					if (AtomType > 115) {
 						if (AtomType > 255) {
 							if (((AtomType - 255) < 1)||((AtomType - 255) > nAtoms)) {
-								wxLogMessage(wxT("Invalid atom number detected in special atom list."));
+								wxLogMessage(_("Invalid atom number detected in special atom list."));
 								throw DataError();
 							}
 						}
@@ -1826,7 +1422,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 		if (MainData->GetNumFrames() > 1) {
 			MainData->DeleteFrame();
 		}
-		wxLogMessage(wxT("Error while parsing file. Partial file may be valid."));
+		wxLogMessage(_("Error while parsing file. Partial file may be valid."));
 	}
 	return 1;
 }
@@ -1908,20 +1504,20 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 		test = ParseCartLine(LineText, &AtomType, &Pos, &Vector, Mode);
 		
 		if (test==-1) {	//invalid atom type
-			wxLogMessage(wxT("Error: An invalid Atom Type was encountered in the atom list."));
+			wxLogMessage(_("Error: An invalid Atom Type was encountered in the atom list."));
 			throw DataError();
 		} else if (test<0) {
-			wxLogMessage(wxT("An error occured while reading the file. Open File Aborted!"));
+			wxLogMessage(_("An error occured while reading the file. Open File Aborted!"));
 			throw DataError();
 		}
 		if (AtomType > 115) {
 			if (Mode < 0) {
-				wxLogMessage(wxT("Error: Special Atom types may not be used with Normal Modes!"));
+				wxLogMessage(_("Error: Special Atom types may not be used with Normal Modes!"));
 				throw DataError();
 			}
 			if (AtomType > 255) {
 				if (((AtomType - 255) < 1)||((AtomType - 255) > fileAtoms)) {
-					wxLogMessage(wxT("Invalid atom number detected in special atom list."));
+					wxLogMessage(_("Invalid atom number detected in special atom list."));
 					throw DataError();
 				}
 			}
@@ -2020,7 +1616,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 					iscanerr = sscanf(LineText, "%f%f%f", &((lVibs->NormMode[catm]).x),
 						&((lVibs->NormMode[catm]).y), &((lVibs->NormMode[catm]).z));
 					if (iscanerr != 3) {			/*Uh Ohh looks like there was a problem reading the file*/
-						wxLogMessage(wxT("Error reading the Normal Mode input. Open file aborted."));
+						wxLogMessage(_("Error reading the Normal Mode input. Open file aborted."));
 						throw DataError();
 					}
 					(lVibs->NormMode[catm]).x *= (Prefs->GetSqrtAtomMass((lFrame->Atoms[j].Type)-1));
@@ -2304,7 +1900,7 @@ long MoleculeData::ParseTinkerCoordinates(BufferFile *Buffer) {
 	if (numlines > 0) {
 		if (!SetupFrameMemory(numlines, 0)) throw std::bad_alloc();
 	} else {
-		wxLogMessage(wxT("Unable to locate Tinker coordinates in file."));
+		wxLogMessage(_("Unable to locate Tinker coordinates in file."));
 		throw DataError();
 	}
 	for (long i=0; i<numlines; i++) {
@@ -2316,7 +1912,7 @@ long MoleculeData::ParseTinkerCoordinates(BufferFile *Buffer) {
 		int scannum = sscanf(LineText, "%ld %s %f %f %f", &linenum, Label, &(position.x),
 							 &(position.y), &(position.z));
 		if (scannum != 5) {
-			wxLogMessage(wxT("Error encountered while parsing coordinates."));
+			wxLogMessage(_("Error encountered while parsing coordinates."));
 			throw DataError();
 		}
 		long atomtype = SetAtomType(Label);
@@ -2346,7 +1942,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 	if (numlines > 0) {
 		if (!MainData->SetupFrameMemory(numlines, 0)) throw std::bad_alloc();
 	} else {
-		wxLogMessage(wxT("Unable to locate Tinker coordinates in file."));
+		wxLogMessage(_("Unable to locate Tinker coordinates in file."));
 		throw DataError();
 	}
 	for (long i=0; i<numlines; i++) {
@@ -2358,7 +1954,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 		int scannum = sscanf(LineText, "%ld %s %f %f %f", &linenum, Label, &(position.x),
 				&(position.y), &(position.z));
 		if (scannum != 5) {
-			wxLogMessage(wxT("Error encountered while parsing coordinates."));
+			wxLogMessage(_("Error encountered while parsing coordinates."));
 			throw DataError();
 		}
 		long atomtype = SetAtomType(Label);
@@ -2378,11 +1974,11 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 		if (numlines > 0) {
 			if (!MainData->SetupFrameMemory(numlines+lFrame->NumAtoms, 0)) throw MemoryError();
 		} else {
-			wxLogMessage(wxT("Unable to locate coordinates in the file."));
+			wxLogMessage(_("Unable to locate coordinates in the file."));
 			throw DataError();
 		}
 		if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize))) {
-			wxLogMessage(wxT("Unable to interpert coordinates."));
+			wxLogMessage(_("Unable to interpert coordinates."));
 			throw DataError();
 		}
 		lFrame->toggleAbInitioVisibility();
@@ -2578,11 +2174,11 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			if (numlines > 0) {
 				if (!MainData->SetupFrameMemory(numlines+lFrame->NumAtoms, 0)) throw MemoryError();
 			} else {
-				wxLogMessage(wxT("Unable to locate coordinates in the file."));
+				wxLogMessage(_("Unable to locate coordinates in the file."));
 				throw DataError();
 			}
 			if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize)))
-				wxLogMessage(wxT("Unable to interpert coordinates."));
+				wxLogMessage(_("Unable to interpert coordinates."));
 				throw DataError();
 		}
 		LinePos = Buffer->GetFilePos();		//next look for fragments
@@ -2591,7 +2187,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			Buffer->SetFilePos(LinePos);
 		}
 		if (lFrame->NumAtoms <= 0) {	//initial coordinates not found! Abort!
-			wxLogMessage(wxT("Unable to locate coordinates in the file."));
+			wxLogMessage(_("Unable to locate coordinates in the file."));
 			throw DataError();
 		}
 		if (Prefs->GetAutoBond())
@@ -4060,59 +3656,6 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 	MainData->CurrentFrame = 1;
 	return 1;
 }	/*OpenGAMESSDRC*/
-#ifndef __wxBuild__
-void MolDisplayWin::CloseFile(void) {
-	if (fileRefNum) {
-		FSClose(fileRefNum);
-		fileRefNum = 0;		//Make sure this file isn't closed again
-		FlushVol(NULL, fileFSSpec.vRefNum);	//Flush all file information to disk
-	}
-}
-void MolDisplayWin::ImportVecGroup(FSSpec * target) {
-	if (MainData->Basis) {
-			short vreftemp;
-		OSErr myerr = FSpOpenDF(target, fsRdPerm, &vreftemp);	/* Open the data fork */
-		if (myerr != noErr) {
-			MessageAlert("\pError opening the requested file!");
-			return;		// abort if there is an error opening the file
-		}
-			ImportVecDlg * temp = NULL;
-		try {
-			temp = new ImportVecDlg(this, vreftemp);
-		}
-		catch (MemoryError) {
-			MessageAlert("\pOut of memory! Be careful!");
-		}
-		catch (DataError) {
-			MessageAlert("\pInvalid data encountered! Beware of bad data already read into frames.");
-		}
-		catch (FileError) {
-			MessageAlert("\pUnexpected End of File encountered!");
-		}
-		catch (...) {
-			if (temp) delete temp;
-			MessageAlert("\pSorry. Out of memory. Unable to complete the import.");
-			FSClose(vreftemp);
-		}
-	}
-}
-void MolDisplayWin::WritePICT(BufferFile * Buffer) {
-	PicHandle	tempPict = CreatePICT(360, false);
-	if (tempPict) {
-			//The first 512 bytes are reservered for App use, so just write out 512 zeros
-			char junk=0;
-		long dataSize = GetHandleSize((Handle) tempPict);
-		if (dataSize > 10) {
-			for (int i=0; i<512; i++) Buffer->Write(&junk, 1);
-			HLock((Handle) tempPict);
-			Buffer->Write((Ptr) *tempPict, dataSize);
-		} else {
-			MessageAlert("\pError creating PICT! Try increasing MacMolPlt's memory partition and retry.");
-		}
-		KillPicture(tempPict);
-	}
-}
-#endif
 void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
 	Frame * lFrame = MainData->Frames;
 	long NumFrames = MainData->NumFrames;
@@ -4606,7 +4149,6 @@ void MolDisplayWin::WritePOVFile(BufferFile *Buffer) {
 }
 
 void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const double & MultValue) {
-#ifdef __wxBuild__
     wxString filename = wxFileSelector(wxT("Choose a file containing the surface data."));
     //We are looking for $ VEC groups. Scan to see how many are there. If more than 1 the user will
     //have to choose.
@@ -4619,19 +4161,6 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
         }
 	} else
 		return;
-#else
-	//First prompt the user for the file
-	FSSpec				inFile;
-	short				fileRefNum=0;
-	OSErr				myerr;
-
-	if (!GetTextFileName(&inFile)) return;
-
-// Attempt to open the data fork of the selected file
-	myerr = FSpOpenDF(&inFile, fsRdPerm, &fileRefNum);
-	if (myerr != noErr) fileRefNum = 0;
-	if (!fileRefNum) return;	//no file found/chosen
-#endif
 	bool FirstFile = (Grid == NULL);
 	
 //Ok got a file, create a buffer for it and then attempt to read it in
@@ -4648,55 +4177,57 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 	CPoint3D	tempPt;
 	try {
 			char Line[kMaxLineLength];
-#ifdef __wxBuild__
 		Buffer = new BufferFile(myfile, false);
-#else
-		Buffer = new BufferFile(fileRefNum, false);
-#endif
 		Buffer->GetLine(Line);
 		if (FirstFile) SetLabel(Line);
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%ld", &LinePos);
 		if ((scanerr != 1)||(LinePos<=0)) {
-			wxLogMessage(wxT("The second line must contain the # of grid points."));
+			wxLogMessage(_("The second line must contain the # of grid points."));
 			throw DataError();
 		}
 		if (FirstFile) NumGridPoints = LinePos;
-		else if (LinePos != NumGridPoints) throw DataError(7);
+		else if (LinePos != NumGridPoints) {
+			wxLogMessage(_("The number of grid points does not match the existing grid!"));
+			throw DataError();
+		}
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%f%f%f", &(tempPt.x), &(tempPt.y), &(tempPt.z));
 		if (scanerr != 3) {
-			wxLogMessage(wxT("Could not parse the x, y, and z values for the origin of the 3D grid."));
+			wxLogMessage(_("Could not parse the x, y, and z values for the origin of the 3D grid."));
 			throw DataError();
 		}
 		if (FirstFile) Origin = tempPt;
 		else if ((fabs(tempPt.x) < fabs(100*(tempPt.x-Origin.x)))||
 				(fabs(tempPt.y) < fabs(100*(tempPt.y-Origin.y)))||
 				 (fabs(tempPt.z) < fabs(100*(tempPt.z-Origin.z)))) {
-					wxLogMessage(wxT("The origin of the file grid does not match the current origin!"));
-					throw DataError(8);
+					wxLogMessage(_("The origin of the file grid does not match the current origin!"));
+					throw DataError();
 		}
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%f%f%f", &(tempPt.x), &(tempPt.y), &(tempPt.z));
 		if (scanerr != 3) {
-			wxLogMessage(wxT("The fourth line must contain a 3D vector indicating the increment along the first side of the grid."));
+			wxLogMessage(_("The fourth line must contain a 3D vector indicating the increment along the first side of the grid."));
 			throw DataError();
 		}
 		if (FirstFile) XInc = tempPt;
 		else if ((fabs(tempPt.x) < fabs(100*(tempPt.x-XInc.x)))||
 				(fabs(tempPt.y) < fabs(100*(tempPt.y-XInc.y)))||
 				 (fabs(tempPt.z) < fabs(100*(tempPt.z-XInc.z)))) {
-					wxLogMessage(wxT("The first increment vector does not match the current grid!"));
+					wxLogMessage(_("The first increment vector does not match the current grid!"));
 					throw DataError();
 		}
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%f%f%f", &(tempPt.x), &(tempPt.y), &(tempPt.z));
-		if (scanerr != 3) throw DataError(6);
+		if (scanerr != 3) {
+			wxLogMessage(_("The fifth line must contain a 3D vector indicating the increment along the second grid direction."));
+			throw DataError();
+		}
 		if (FirstFile) YInc = tempPt;
 		else if ((fabs(tempPt.x) < fabs(100*(tempPt.x-YInc.x)))||
 				(fabs(tempPt.y) < fabs(100*(tempPt.y-YInc.y)))||
 				 (fabs(tempPt.z) < fabs(100*(tempPt.z-YInc.z)))) {
-					wxLogMessage(wxT("The second increment vector does not match the current grid!"));
+					wxLogMessage(_("The second increment vector does not match the current grid!"));
 					throw DataError();
 		}
 			//allocate memory for the grid
@@ -4749,7 +4280,7 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 
 		success = true;
 	}
-	catch (DataError Error) { Error.WriteError();}
+	catch (DataError /*Error*/) {}
 	catch (FileError Error) { Error.WriteError();}
 	catch (...) {
 		success = false;
@@ -4759,15 +4290,10 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 		FreeGrid();
 	}
 	if (Buffer) delete Buffer;
-#ifdef __wxBuild__
 	fclose(myfile);
-#else
-	FSClose(fileRefNum);
-#endif
 }
 void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const double & MultValue) {
 	//First prompt the user for the file
-#ifdef __wxBuild__
     wxString filename = wxFileSelector(wxT("Choose a file containing the surface data."));
 	FILE * myfile = NULL;
     if (!filename.empty()) {
@@ -4778,18 +4304,6 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
         }
 	} else
 		return;
-#else
-	FSSpec				inFile;
-	short				fileRefNum=0;
-	OSErr				myerr;
-
-	if (!GetTextFileName(&inFile)) return;
-	
-	// Attempt to open the data fork of the selected file
-	myerr = FSpOpenDF(&inFile, fsRdPerm, &fileRefNum);
-	if (myerr != noErr) fileRefNum = 0;
-	if (!fileRefNum) return;	//no file found/chosen
-#endif	
 
 	bool FirstFile = (Grid == NULL);
 
@@ -4808,18 +4322,14 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 	short	scanerr;
 	try {
 			char Line[kMaxLineLength];
-#ifdef __wxBuild__
 		Buffer = new BufferFile(myfile, false);
-#else
-		Buffer = new BufferFile(fileRefNum, false);
-#endif
 		Buffer->GetLine(Line);
 		if (FirstFile) SetLabel(Line);	//grab the label only if this is the first data file
 
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%ld%ld%ld", &LineLength, &LinePos, &tempL);
 		if ((scanerr != 3)||(LineLength<=0)||(LinePos<=0)||(tempL<=0)) {
-			wxLogMessage(wxT("The second line must contain the # of x, y, and z grid points."));
+			wxLogMessage(_("The second line must contain the # of x, y, and z grid points."));
 			throw DataError();
 		}
 		if (FirstFile) {
@@ -4828,28 +4338,28 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 			NumZGridPoints = tempL;
 		} else if ((NumXGridPoints!=LineLength)||(NumYGridPoints!=LinePos)||
 				   (NumZGridPoints!=tempL)) {
-			wxLogMessage(wxT("The number of grid points does not match the existing grid!"));
+			wxLogMessage(_("The number of grid points does not match the existing grid!"));
 			throw DataError();
 		}
 
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%f%f%f", &(tempPt.x), &(tempPt.y), &(tempPt.z));
 		if (scanerr != 3) {
-			wxLogMessage(wxT("Could not parse the x, y, and z values for the origin of the 3D grid."));
+			wxLogMessage(_("Could not parse the x, y, and z values for the origin of the 3D grid."));
 			throw DataError();
 		}
 		if (FirstFile) Origin = tempPt;
 		else if ((fabs(tempPt.x) < fabs(100*(tempPt.x-Origin.x)))||
 				(fabs(tempPt.y) < fabs(100*(tempPt.y-Origin.y)))||
 				 (fabs(tempPt.z) < fabs(100*(tempPt.z-Origin.z)))) {
-					wxLogMessage(wxT("The origin of the file grid does not match the current origin!"));
+					wxLogMessage(_("The origin of the file grid does not match the current origin!"));
 					throw DataError();
 		}
 
 		Buffer->GetLine(Line);
 		scanerr = sscanf(Line, "%f%f%f", &(tempPt.x), &(tempPt.y), &(tempPt.z));
 		if (scanerr != 3) {
-			wxLogMessage(wxT("Could not parse the x, y, and z increment values from the fourth line."));
+			wxLogMessage(_("Could not parse the x, y, and z increment values from the fourth line."));
 			throw DataError();
 		}
 		if (FirstFile) {
@@ -4859,7 +4369,7 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 		} else if ((fabs(tempPt.x) < fabs(100*(tempPt.x-XGridInc)))||
 				(fabs(tempPt.y) < fabs(100*(tempPt.y-YGridInc)))||
 				   (fabs(tempPt.z) < fabs(100*(tempPt.z-ZGridInc)))) {
-					wxLogMessage(wxT("The x, y, and z grid increments must match those of the existing grid."));
+					wxLogMessage(_("The x, y, and z grid increments must match those of the existing grid."));
 					throw DataError();
 		}
 			//allocate memory for the grid (if needed)
@@ -4910,7 +4420,7 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 
 		success = true;
 	}
-	catch (DataError Error) { Error.WriteError();}
+	catch (DataError /*Error*/) {}
 	catch (FileError Error) { Error.WriteError();}
 	catch (...) {
 		success = false;
@@ -4920,11 +4430,7 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 		if (Grid) FreeGrid();
 	}
 	if (Buffer) delete Buffer;
-#ifdef __wxBuild__
 	fclose(myfile);
-#else
-	FSClose(fileRefNum);
-#endif
 }
 long LocateKeyWord(const char *Buffer, const char * KeyWord, long length, long bytecount)
 {	long	test=0, pos=-1;

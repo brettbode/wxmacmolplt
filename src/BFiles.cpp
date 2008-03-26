@@ -158,7 +158,10 @@ BufferFile::BufferFile(FILE * TargetFileRef, bool Write)
 		ByteCount = ftell(FilePtr);
 		fseek(FilePtr, 0, SEEK_SET);
 #endif
-		if (ByteCount <= 0) throw DataError(24);
+		if (ByteCount <= 0) {
+			wxLogMessage(_("The requested file is empty."));
+			throw DataError();
+		}
 //Allocate the Buffer
 		BufferSize = MIN(kBufferSize, ByteCount);
 		BlockLengths[0] = ByteCount;

@@ -33,12 +33,7 @@ class MemoryError {
 };
 class DataError {
 	public:
-		long ErrNum;
-		bool ErrorSet(void) {return ((ErrNum>0)?true:false);}
-		void SetError(long num) {ErrNum = num;}
-		DataError(void) {ErrNum = -1;};
-		DataError(long num) {ErrNum = num;};
-		void WriteError(void);
+		DataError(void) {};
 };
 class FileError {
 	public:
