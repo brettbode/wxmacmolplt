@@ -2177,9 +2177,10 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				wxLogMessage(_("Unable to locate coordinates in the file."));
 				throw DataError();
 			}
-			if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize)))
+			if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize))) {
 				wxLogMessage(_("Unable to interpert coordinates."));
 				throw DataError();
+			}
 		}
 		LinePos = Buffer->GetFilePos();		//next look for fragments
 		if (Buffer->LocateKeyWord("READING $EFRAG GROUP", 20, EnergyPos)) {	//ughh fragments!
