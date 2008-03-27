@@ -1210,16 +1210,19 @@ void Frame::ReadMolDenOrbitals(BufferFile * Buffer, long NumFuncs) {
 				}
 				int p;
 				if ((p=FindKeyWord(Line, "ENE=", 4))>=0) {
+					ConvertExponentStyle(Line);
 					sscanf(&(Line[p+4]),"%f", &energy);
 				} else if (FindKeyWord(Line, "SPIN=", 5)>=0) {
 					if (FindKeyWord(Line, "BETA", 4)>=0) alphaSpin = false;
 				} else if ((p=FindKeyWord(Line, "OCCUP=", 6))>=0) {
+					ConvertExponentStyle(Line);
 					sscanf(&(Line[p+6]),"%f", &occ);
 				} else if ((p=FindKeyWord(Line, "SYM=", 4))>=0) {
 					sscanf(&(Line[p+4]),"%4s", symLabel);
 				} else {
 					int test;
 					float junk;
+					ConvertExponentStyle(Line);
 					if (sscanf(Line, "%d %f", &test, &junk) == 2 ) {//start of the vector
 						Buffer->BackupnLines(1);
 						header = false;
@@ -1252,6 +1255,7 @@ void Frame::ReadMolDenOrbitals(BufferFile * Buffer, long NumFuncs) {
 			
 			for (int i=0; i<NumFuncs; i++) {	//loop over the vector itself
 				Buffer->GetLine(Line);
+				ConvertExponentStyle(Line);
 				int iline;
 				float vec;
 				if (sscanf(Line, "%d %f", &iline, &vec) == 2) {

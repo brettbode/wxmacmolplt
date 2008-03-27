@@ -736,6 +736,7 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms, con
 	return Basis;
 }	/*ParseGAMESSBasisSet*/
 
+#include <iostream>
 bool BasisSet::ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms) {
 	bool result = true;
 	char	LineText[kMaxLineLength];
@@ -808,6 +809,7 @@ bool BasisSet::ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms) {
 				for (long iprim=0; iprim<numPrims; iprim++) {
 					float	fexp, fcoef, fcoefp;
 					Buffer->GetLine(LineText);
+					ConvertExponentStyle(LineText);
 					if (ShellType >= 0) {
 						if (sscanf(LineText, "%f %f", &fexp, &fcoef) != 2) return false;
 					} else {

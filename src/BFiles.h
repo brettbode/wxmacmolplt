@@ -78,6 +78,11 @@ long ReadBooleanKeyword(const char * Line, const char * Keyword, bool * Value);
 long LocateForValue(const char * Line, const char * KeyWord);
 ///Search the provided, null-terminated, string for any non-white space characters.
 bool IsBlank(const char * Line);
+/** Convert old fortran style exponents using d or D into c style e or E.
+ * The routine simply replaces all 'd' or 'D's with 'e'.
+ * @param Line A null-terminated string that will be modified in place.
+ */
+void ConvertExponentStyle(char * Line);
 
 /** BufferFile is a class to abstract out file handling calls.
 	It was originally written to get around file buffering issues on MacOS 9 and earlier,

@@ -109,6 +109,18 @@ long LocateForValue(const char * Line, const char * KeyWord) {
 	}
 	return Pos;
 }
+/** Convert old fortran style exponents using D or Q into c style e or E.
+ * The routine simply replaces all 'd's, 'D's, 'q's and 'Q's with 'e'.
+ * @param Line A null-terminated string that will be modified in place.
+ */
+void ConvertExponentStyle(char * Line) {
+	int i=0;
+	while ((Line[i] != '\0')&&(i<kMaxLineLength)) {
+		if ((std::tolower(Line[i]) == 'd')||(std::tolower(Line[i]) == 'q'))
+			Line[i] = 'e';
+		i++;
+	}
+}
 
 #ifdef UseMacIO
 BufferFile::BufferFile(short TargetFileRef, bool Write)
