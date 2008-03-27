@@ -508,6 +508,12 @@ class MolDisplayWin : public wxFrame {
 		 */
 		long OpenMKLFile(BufferFile * Buffer);
 		long ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos);
+		/**
+		 Output the coordinates in gamess input format ($DATA and $EFRAG group).
+		 If AllFrames then a series of $DATA groups will be output for the user to divide as needed.
+		 \param Buffer A buffer to write the text to.
+		 \param AllFrames Should the data for all frames be included or just the current frame?
+		 */
 		void ExportGAMESS(BufferFile * Buffer, bool AllFrames);
 		/**
 		 Output the plotted energies for the system to a tab de-limited text file. 
@@ -533,7 +539,15 @@ class MolDisplayWin : public wxFrame {
 		 \param Buffer A buffer to write the text to.
 		 */
 		void WriteMDLMolFile(BufferFile * Buffer);
+		/**
+		 Export the current model to a Virtual Reality Markup Language file. 
+		 \param Buffer A buffer to write the output to.
+		 */
 		void WriteVRMLFile(BufferFile * Buffer);
+		/**
+		 Export the current model to a POV-ray input file. 
+		 \param Buffer A buffer to write the output to.
+		 */
 		void WritePOVFile(BufferFile *Buffer);
 #ifdef __MAC_USE_QUICKTIME__
 		//quicktime movie export

@@ -3657,51 +3657,48 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 	MainData->CurrentFrame = 1;
 	return 1;
 }	/*OpenGAMESSDRC*/
+/**
+ Output the coordinates in gamess input format ($DATA and $EFRAG group).
+ If AllFrames then a series of $DATA groups will be output for the user to divide as needed.
+ \param Buffer A buffer to write the text to.
+ \param AllFrames Should the data for all frames be included or just the current frame?
+ */
 void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
-	Frame * lFrame = MainData->Frames;
-	long NumFrames = MainData->NumFrames;
+	//Utilize the data group class to do all the real work
+	InputData * lInputOptions = MainData->GetInputData();
+	long basisTest = 1;
+	if (lInputOptions->Basis) {
+		if (lInputOptions->Basis->GetBasis() != 0) basisTest = 0;
+	}
 	if (!AllFrames) {
-		lFrame = MainData->cFrame;
-		NumFrames = 1;
-	}
-		long		iatom;
-		Str255		AtomLabel;
-		char		text[kMaxLineLength];
-		bool		C1Sym=true;
-		GAMESSPointGroup	sym = GAMESS_C1;
-		
-	if (MainData->InputOptions) {
-		sym = MainData->InputOptions->Data->GetPointGroup();
-		C1Sym = (sym == GAMESS_C1);
-	}
-	for (long i=0; i<NumFrames; i++) {
-		sprintf(text, " $DATA\rComments go here: Frame # %ld\n", i);
-		Buffer->PutText(text);
-		if (C1Sym) {
-			Buffer->PutText("C1\n");
-		} else {	//Add a blank line unless the Point Group is C1
-			if ((sym>=GAMESS_CNH)&&(sym<=GAMESS_DN)) {
-				sprintf(text, "%s %d\n\n", MainData->InputOptions->Data->GetPointGroupText(), 
-						MainData->InputOptions->Data->GetPointGroupOrder());
-			} else {
-				sprintf(text, "%s\n\n", MainData->InputOptions->Data->GetPointGroupText());
-			}
-			Buffer->PutText(text);
-		}
-		for (iatom=0; iatom<lFrame->NumAtoms; iatom++) {
-			Prefs->GetAtomLabel(lFrame->Atoms[iatom].GetType()-1, AtomLabel);
-			AtomLabel[AtomLabel[0]+1] = 0;
-			sprintf(text, "%s   %5.1f  %10.5f  %10.5f  %10.5f\n",
-				(char *) &(AtomLabel[1]), (float) (lFrame->Atoms[iatom].Type), 
-				lFrame->Atoms[iatom].Position.x, lFrame->Atoms[iatom].Position.y,
-				lFrame->Atoms[iatom].Position.z);
-			Buffer->PutText(text);
-		}
-		sprintf(text, " $END\n");
-		Buffer->PutText(text);
+		lInputOptions->Data->WriteToFile(Buffer, MainData, Prefs, basisTest);
+	} else {
+		long savedFrame	= MainData->GetCurrentFrame();
+		MainData->CurrentFrame = 1;
+		MainData->cFrame = MainData->Frames;
+		for (int iframe=0; iframe<MainData->GetNumFrames(); iframe++) {
+			char		text[kMaxLineLength];
+			sprintf(text, "! Frame # %ld", iframe+1);
+			Buffer->WriteLine(text, true);
 
-		lFrame = lFrame->NextFrame;
-		if (!lFrame) break;
+			MainData->SetCurrentFrame(iframe);
+
+			lInputOptions->Data->WriteToFile(Buffer, MainData, Prefs, basisTest);
+		}
+		
+		MainData->SetCurrentFrame(savedFrame);
+
+		if ((lInputOptions->Data->GetCoordType() == ZMTCoordType)||
+			(lInputOptions->Data->GetCoordType() == ZMTMPCCoordType)) {
+			//If we are using internals update their values after restoring the frame
+			Internals * IntCoords = MainData->GetInternalCoordinates();
+			MOPacInternals * mInts = NULL;
+			if (internals)
+				mInts = internals->GetMOPacStyle();
+			if (mInts) {
+				mInts->CartesiansToInternals(MainData);
+			}
+		}
 	}
 }
 void MolDisplayWin::WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames) {
