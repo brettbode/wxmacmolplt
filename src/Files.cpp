@@ -3693,8 +3693,8 @@ void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
 			//If we are using internals update their values after restoring the frame
 			Internals * IntCoords = MainData->GetInternalCoordinates();
 			MOPacInternals * mInts = NULL;
-			if (internals)
-				mInts = internals->GetMOPacStyle();
+			if (IntCoords)
+				mInts = IntCoords->GetMOPacStyle();
 			if (mInts) {
 				mInts->CartesiansToInternals(MainData);
 			}
