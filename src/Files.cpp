@@ -834,7 +834,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	if ((0<lFrame->GetNumAtoms())&&(Buffer->LocateKeyWord("$BASIS", 6))) {
 		bool error = false;
 		// totals counters
-		unsigned long nShells = 0, linesInSection = 0;
+		unsigned long nShells = 0, linesInBasis = 0;
 		// other counters; may be set to -1 as a reset to offset an increment
 		// thus placing back at 0 for a subsequent iteration
 		long iShell = 0, iAtom = 0, shellsPeriAtom = 0;
@@ -847,38 +847,39 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		// the number of lines formatted according to the sscanf below
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())) {
 			Buffer->GetLine(Line);
-			linesInSection++;
-			// continue until we find the end of the group
-			if (FindKeyWord(Line, "$END", 4)<0) {								
+			linesInBasis++;
+			// continue until we find the end of the group / start of next
+			if (FindKeyWord(Line, "$END", 4)<0 && FindKeyWord(Line, "$COEFF", 6)<0 
+				&& FindKeyWord(Line, "$OCC", 4)<0) {
 				lineBytes = strlen(Line);
 				bytesRead = 0;
 				while (bytesRead < lineBytes) {
-					scanCount = sscanf(&(Line[bytesRead]), 
-								"%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
+					scanCount = sscanf(&(Line[bytesRead]), 	"%ld %[lLsSpPdDfF] %f%n", 
+								&nFunc, &IType, &Sc, &bytesConsumed);
 					if (scanCount == 3) { 
 						bytesRead+=bytesConsumed;
 						nShells++;
 					} else
 						break;
 				}
-			} 
-			else 
+			}
+			else // end of group has been determined
 				break;
 		}
-		// Should have a case in above block in case no $END is found before EOF,
-		// similar to how the $COORD section parser above works
 
 		// Now that shells are counted, we can create the BasisSet and parse data
 		MainData->Basis = new BasisSet(nAtoms, nShells);
 		if (MainData->Basis == NULL) error = true;
 		
 		// go back to the line right after $BASIS so we can parse the data
-		Buffer->BackupnLines(linesInSection-1); 
+		Buffer->BackupnLines(linesInBasis-1); 
 		// reiterate through Basis section to get and save BasisSet data
 		while (iShell < nShells && iAtom < nAtoms && !error) {
 			Buffer->GetLine(Line);
+			
 			// we only use IType read; nFunc is redundant; Sc(ale Factor)  we don't use
-			scanCount = sscanf(Line, "%ld %[lLsSpPdDfF] %f%n", &nFunc, &IType, &Sc, &bytesConsumed);
+			scanCount = sscanf(Line, "%ld %[lLsSpPdDfF] %f%n", 
+								&nFunc, &IType, &Sc, &bytesConsumed);
 			if (3==scanCount) {
 				// create this BasisShell in the BasisSet
 				MainData->Basis->Shells.push_back(BasisShell());	
@@ -941,8 +942,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					// We've found the end of this Atom's Basis Set, end of the $BASIS section
 					// or else we've hit an error
 					else if (1==sscanf(Line, "%s%n", &tmpStr, &bytesConsumed)) {
-						if ((2==bytesConsumed && 0==strncmp(tmpStr, "$$", 3)) ||
-							(4==bytesConsumed && 0==strncmp(tmpStr, "$END", 5))) {
+						if (2==bytesConsumed && 0==strncmp(tmpStr, "$$", 3)) { 
 							// add ending shell of this atom to BasisMap
 							MainData->Basis->BasisMap[2*iAtom+1]=iShell;
 							// we'll move on to next atom (or be done with Basis)
@@ -951,19 +951,38 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 							stopReadingShell = true;
 							break;
 						}
-						// else throw an error? simply "else error = true;" causes incorrect behavior, though
+						else if (4==bytesConsumed && 0==strncmp(tmpStr, "$END", 5)) {
+							// same as above, but need to break out of basis parsing
+							MainData->Basis->BasisMap[2*iAtom+1]=iShell;
+							iAtom++;
+							stopReadingShell = true;
+							BasisDone;
+							break;
+						}
+						// else throw an error? "else error = true;" causes incorrect behavior, though
+						else if (0==strncmp(Line,"\0", kMaxLineLength))
+							break;
+						else {
+							error = true;
+						}
 					} else 
 						stopReadingShell = true;
 				}
 				// move on to next shell in next iteration
 				iShell++;
 				shellsPeriAtom++;
-			} else {
+			} 
+			else if (FindKeyWord(Line, "$END", 4) >-1) {
+				BasisDone = true;
+				break;
+			}
+			else {
 				error = true;
 				break;
 			}
+
 		} // creating BasisSet
-		if (error) {
+		if (error && !BasisDone) {
 			// Free what we have and set it NULL so dependent functions won't crash
 			if (MainData->Basis != NULL) delete MainData->Basis;
 			MainData->Basis = NULL;
@@ -972,7 +991,6 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		else 
 			BasisDone = true;
 	}
-
 	// now look for Alpha Coefficients (Orbitals; depends on BasisSet)
 	if (BasisDone&&(Buffer->LocateKeyWord("$COEFF_ALPHA", 12))) {
 		Buffer->GetLine(Line); // skip $COEFF_ALPHA line
@@ -1052,13 +1070,14 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				if (error) break;
 			}
 			else
+				// if not found $END??
 				break; // found $END of $COEFF_ALPHA
 		}
 		if (error) {
 			// free what we have and set NULL so dependent functions won't crash
 			if (OrbSet != NULL) delete OrbSet;
 			lFrame->Orbs[0] = NULL;
-			MessageAlert("Error while reading. No orbset set created.");
+			MessageAlert("Error while reading. No orbital set created.");
 		}
 		else
 			CoefAlphaDone = true;
@@ -1138,6 +1157,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				if (error) break;
 			}
 			else
+				// if not found $END??
 				break; // found $END of $COEFF_BETA
 		}
 		if (error) {
@@ -1145,12 +1165,12 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			// OrbitalRec -just resize it to exclude Beta (check for NULL to be safe)
 			if (lFrame->Orbs[0] != NULL) 
 				lFrame->Orbs[0]->ReSize(MainData->Basis->GetNumBasisFuncs(false), 0);
-			MessageAlert("Error while reading. No beta orbset added.");
+			MessageAlert("Error while reading. No beta orbital set added.");
 		}
 		else
 			CoefBetaDone = true;
 	} // Beta Coefficients (orbitals) done
-	else // no Beta Coeffs
+	else if (BasisDone && CoefAlphaDone) // no Beta Coeffs
 		lFrame->Orbs[0]->ReSize(MainData->Basis->GetNumBasisFuncs(false), 0);
 
 	// now look for Alpha Orbital Occupations (optional; depends on COEFF_ALPHA)
@@ -1267,57 +1287,62 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		Buffer->SkipnLines(1);	// skip $FREQ line
 		// create the VibRec
 		lFrame->Vibs = new VibRec(3*lFrame->NumAtoms, lFrame->NumAtoms);
-		long nModes=0;
-		char freq[kMaxLineLength];
-		bool error = false;	//Use the error flag to bail out once we hit an error
-		while ((Buffer->GetFilePos())<(Buffer->GetFileSize())&&!error) {
-			Buffer->GetLine(Line);
-			//continue until we find the end of the group
-			if (FindKeyWord(Line, "$END", 4)<0) {								
-				//the first line is the symmetry symbolis which we ignore
-				// (we should've gotten those from the Alpha/Beta Coefficients)
-				Buffer->GetLine(Line);	//next line is the frequencies
-				unsigned int lineModes=0;
-				lineBytes = strlen(Line);
-				bytesRead = 0;
-				// read Frequencies as strings one at a time in one line
-				while (bytesRead < lineBytes) {
-					scanCount = sscanf(&(Line[bytesRead]), "%s%n", freq, &bytesConsumed);
-					if (scanCount == 1) {
-						lFrame->Vibs->Frequencies.push_back(freq);
-						bytesRead += bytesConsumed;
-						lineModes++;
-					} else
-						break;
-				}
-				//Next come the vibrational offsets
-				for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
-					Buffer->GetLine(Line);
-					//each line will normally contain x, y, z for one atom for 3 modes
+		//continue only if we're successful
+		if (lFrame->Vibs != NULL) {
+			long nModes=0;
+			char freq[kMaxLineLength];
+			bool error = false;	//Use the error flag to bail out once we hit an error
+			while ((Buffer->GetFilePos())<(Buffer->GetFileSize())&&!error) {
+				Buffer->GetLine(Line);
+				//continue until we find the end of the group
+				if (FindKeyWord(Line, "$END", 4)<0) {								
+					//the first line is the symmetry symbolis which we ignore
+					// (we should've gotten those from the Alpha/Beta Coefficients)
+					Buffer->GetLine(Line);	//next line is the frequencies
+					long lineModes=0;
+					lineBytes = strlen(Line);
 					bytesRead = 0;
-					for (unsigned int imode=0; imode<lineModes; imode++) {
-						CPoint3D temp;
-						int scanCount = sscanf(&(Line[bytesRead]), "%f %f %f%n",
-											   &(temp.x), &(temp.y), &(temp.z), &bytesConsumed);
-						if (scanCount == 3) {
-							lFrame->Vibs->NormMode[iatm + lFrame->NumAtoms*(nModes+imode)] = temp;
+					// read Frequencies as strings one at a time in one line
+					while (bytesRead < lineBytes) {
+						scanCount = sscanf(&(Line[bytesRead]), "%s%n", freq, &bytesConsumed);
+						if (scanCount == 1) {
+							lFrame->Vibs->Frequencies.push_back(freq);
 							bytesRead += bytesConsumed;
-						} else {
-							lineModes = imode;
-							error = true;
+							lineModes++;
+						} else
 							break;
-						}
 					}
-					if (error) break;
-				}
-				nModes += lineModes;
-			} else
-				break;
+					//Next come the vibrational offsets
+					for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
+						Buffer->GetLine(Line);
+						//each line will normally contain x, y, z for one atom for 3 modes
+						bytesRead = 0;
+						for (long imode=0; imode<lineModes; imode++) {
+							CPoint3D temp;
+							int scanCount = sscanf(&(Line[bytesRead]), "%f %f %f%n",
+												   &(temp.x), &(temp.y), &(temp.z), &bytesConsumed);
+							if (scanCount == 3) {
+								lFrame->Vibs->NormMode[iatm + lFrame->NumAtoms*(nModes+imode)] = temp;
+								bytesRead += bytesConsumed;
+							} else {
+								lineModes = imode;
+								error = true;
+								break;
+							}
+						}
+						if (error) break;
+					}
+					nModes += lineModes;
+				} else
+					break;
+			}// end while in file and not errori
+			lFrame->Vibs->NumModes = nModes;
+			lFrame->Vibs->Resize(nModes);
 		}
-		lFrame->Vibs->NumModes = nModes;
-		lFrame->Vibs->Resize(nModes);
-	} // Vibrational Frequencies done
-	// else throw an error?
+	} // vibrational frequencies done
+	// Don't need an else, case, since lFrame->Vibs would be NULL, anyway
+	// We don't handle the $DIPOLE section in MKL files
+	// OpenMKLFile can return because we are done parsing the file
 	return 1;
 }
 
