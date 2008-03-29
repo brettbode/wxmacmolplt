@@ -1010,7 +1010,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
 			Buffer->GetLine(Line);
 			// continue until we find the end of the group
-			if (FindKeyWord(Line, "$END", 4)<0) {
+			if (FindKeyWord(Line, "$", 1)<0 && 0!=strncmp(Line, "\0", kMaxLineLength)) {
 				lineBytes = strlen(Line);
 				bytesRead = 0;
 				iSymCount = 0;
@@ -1070,7 +1070,6 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				if (error) break;
 			}
 			else
-				// if not found $END??
 				break; // found $END of $COEFF_ALPHA
 		}
 		if (error) {
@@ -1097,7 +1096,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
 			Buffer->GetLine(Line);
 			// continue until we find the end of the group
-			if (FindKeyWord(Line, "$END", 4)<0) {
+			if (FindKeyWord(Line, "$", 1)<0 && 0!=strncmp(Line, "\0", kMaxLineLength)) {
 				lineBytes = strlen(Line);
 				bytesRead = 0;
 				iSymCount = 0;
@@ -1189,7 +1188,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
 				Buffer->GetLine(Line);
 				// continue until we find the end of the group
-				if (FindKeyWord(Line, "$END", 4)<0) {
+				if (FindKeyWord(Line, "$", 1)<0 && 0!=strncmp(Line, "\0", kMaxLineLength)) { 
 					lineBytes = strlen(Line);
 					bytesRead = 0;
 					lineOccs = 0; 
@@ -1243,7 +1242,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			while ((Buffer->GetFilePos()<Buffer->GetFileSize())&&!error) {
 				Buffer->GetLine(Line);
 				// continue until we find the end of the group
-				if (FindKeyWord(Line, "$END", 4)<0) {
+				if (FindKeyWord(Line, "$", 1)<0 && 0!=strncmp(Line, "\0", kMaxLineLength)) { 
 					lineBytes = strlen(Line);
 					bytesRead = 0;
 					lineOccs = 0; 
@@ -1295,7 +1294,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			while ((Buffer->GetFilePos())<(Buffer->GetFileSize())&&!error) {
 				Buffer->GetLine(Line);
 				//continue until we find the end of the group
-				if (FindKeyWord(Line, "$END", 4)<0) {								
+				if (FindKeyWord(Line, "$", 1)<0 && 0!=strncmp(Line, "\0", kMaxLineLength)) { 
 					//the first line is the symmetry symbolis which we ignore
 					// (we should've gotten those from the Alpha/Beta Coefficients)
 					Buffer->GetLine(Line);	//next line is the frequencies
