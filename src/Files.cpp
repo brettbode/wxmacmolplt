@@ -433,9 +433,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 
 		long former_pos;
 		long start_pos;
-		long end_pos;
 		int found_it;
-		float tmp_f;
 		//Now tackle the individual fragment definitions
 		//These should consist of 4 line blocks of Fragname=xxx followed by three atom lines
 		//For now I am only going to deal with cartesian coordinates
@@ -447,7 +445,6 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			int match[3] = {0, 0, 0};
 			CPoint3D src_locs[3];
 			std::string labels[3];
-			int AtomType;
 			long fragNum;
 			int i;
 			CPoint3D new_pos;
@@ -956,7 +953,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 							MainData->Basis->BasisMap[2*iAtom+1]=iShell;
 							iAtom++;
 							stopReadingShell = true;
-							BasisDone;
+					//statement has no effect		BasisDone;
 							break;
 						}
 						// else throw an error? "else error = true;" causes incorrect behavior, though
