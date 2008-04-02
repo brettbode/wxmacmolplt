@@ -63,6 +63,20 @@ MOPacInternals::~MOPacInternals(void) {
 	if (Values) delete [] Values;
 	if (Type) delete [] Type;
 }
+void Internals::WriteCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) {
+	if (!MOPacStyle) {
+		CreateMOPacInternals(3*MainData->GetMaximumAtomCount());
+		if (MOPacStyle) MOPacStyle->GuessInit(MainData);
+	}
+	if (MOPacStyle) MOPacStyle->WriteCoordinatesToFile(File, MainData, Prefs);
+}
+void Internals::WriteMPCZMatCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) {
+	if (!MOPacStyle) {
+		CreateMOPacInternals(3*MainData->GetMaximumAtomCount());
+		if (MOPacStyle) MOPacStyle->GuessInit(MainData);
+	}
+	if (MOPacStyle) MOPacStyle->WriteMPCZMatCoordinatesToFile(File, MainData, Prefs);
+}
 //Guess the connection atom set, then setup the values
 void MOPacInternals::GuessInit(MoleculeData * MainData, long theAtom, bool keepOld) {
 	Frame * lFrame = MainData->GetCurrentFramePtr();

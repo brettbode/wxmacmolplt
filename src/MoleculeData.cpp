@@ -691,6 +691,8 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 		IntCoords->CreateMOPacInternals(3*nAtoms);
 		mInts = IntCoords->GetMOPacStyle();
 	}
+	float unitConversion = 1.0;
+	if (InputOptions && InputOptions->Data->GetUnits()) unitConversion = kBohr2AngConversion;
 	int iline=0;
 	long StartPos = Buffer->GetFilePos();
 	Buffer->LocateKeyWord("$END", 4);
@@ -796,7 +798,7 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 			con2--;
 			con3--;
 			if (con1 >= iline) break;
-			mInts->AddInternalCoordinate(iline, con1, 0, bondLength);
+			mInts->AddInternalCoordinate(iline, con1, 0, bondLength*unitConversion);
 			if (iline > 1) {
 				if (con2 >= iline) break;
 				mInts->AddInternalCoordinate(iline, con2, 1, bondAngle);
@@ -981,6 +983,8 @@ void MoleculeData::ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, W
 		IntCoords->CreateMOPacInternals(3*nAtoms);
 		mInts = IntCoords->GetMOPacStyle();
 	}
+	float unitConversion = 1.0;
+	if (InputOptions && InputOptions->Data->GetUnits()) unitConversion = kBohr2AngConversion;
 	int iline=0;
 	long EndPos = Buffer->GetFileSize();
 	while ((Buffer->GetFilePos() < EndPos)&&(iline<nAtoms)) {
@@ -1016,7 +1020,7 @@ void MoleculeData::ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, W
 			con2--;
 			con3--;
 			if (con1 >= iline) break;
-			mInts->AddInternalCoordinate(iline, con1, 0, bondLength);
+			mInts->AddInternalCoordinate(iline, con1, 0, bondLength*unitConversion);
 			if (iline > 1) {
 				mInts->AddInternalCoordinate(iline, con2, 1, bondAngle);
 				if (iline > 2)

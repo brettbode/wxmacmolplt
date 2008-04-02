@@ -1971,6 +1971,17 @@ bool DataGroup::SetUnits(bool NewType) {
 	if (NewType) Options += 1;
 	return GetUnits();
 }
+int DataGroup::SetUnits(const char * u) {
+	int rval = -1;
+	if (!strcasecmp(u, "ANGS")) {
+		SetUnits(false);
+		rval = 0;
+	} else if (!strcasecmp(u, "BOHR")) {
+		SetUnits(true);
+		rval = 1;
+	}
+	return rval;
+}
 bool DataGroup::SetUseSym(bool State) {
 	if (Options & (1<<1)) Options -= (1<<1);
 	if (State) Options += (1<<1);
@@ -1987,7 +1998,8 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 	Frame * cFrame = MainData->GetCurrentFramePtr();
 	BasisSet * lBasis = MainData->GetBasisSet();
 	BasisTest = BasisTest && lBasis;	//Make sure there really is a basis set defined
-//	if (BasisTest) File->WriteLine(" $CONTRL NORMP=1 $END", true);
+	float unitConversion = 1.0;
+	if (MainData->InputOptions->Data->GetUnits()) unitConversion = kAng2BohrConversion;
 		//Punch the group label
 	//Check the number of ab initio atoms. If zero and we have effective fragments force
 	//Coord = fragonly
@@ -2011,9 +2023,17 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 		//coordinates
 	if (Coord == ZMTCoordType) {	//"normal" style z-matrix
 		Internals * IntCoords = MainData->GetInternalCoordinates();
+		if (!IntCoords) {
+			MainData->InitializeInternals();
+			IntCoords = MainData->GetInternalCoordinates();
+		}
 		if (IntCoords) IntCoords->WriteCoordinatesToFile(File, MainData, Prefs);
 	} else if (Coord == ZMTMPCCoordType) {
 		Internals * IntCoords = MainData->GetInternalCoordinates();
+		if (!IntCoords) {
+			MainData->InitializeInternals();
+			IntCoords = MainData->GetInternalCoordinates();
+		}
 		if (IntCoords) IntCoords->WriteMPCZMatCoordinatesToFile(File, MainData, Prefs);
 	} else {
 		if (Coord <= UniqueCoordType) MainData->GenerateSymmetryUniqueAtoms(1.0E-3);
@@ -2025,8 +2045,9 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 					AtomLabel[AtomLabel[0]+1] = 0;
 					sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
 						(char *) &(AtomLabel[1]), (float) (cFrame->Atoms[iatom].GetType()), 
-						cFrame->Atoms[iatom].Position.x, cFrame->Atoms[iatom].Position.y,
-						cFrame->Atoms[iatom].Position.z);
+						cFrame->Atoms[iatom].Position.x*unitConversion,
+						cFrame->Atoms[iatom].Position.y*unitConversion,
+						cFrame->Atoms[iatom].Position.z*unitConversion);
 					File->WriteLine(Out, true);
 					if (BasisTest) lBasis->WriteBasis(File, iatom);
 				}
@@ -3534,6 +3555,9 @@ void MOPacInternals::WriteZMATToFile(BufferFile * File) {
 void MOPacInternals::WriteCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) {
 	UpdateAtoms(MainData);	//First make sure the connectivity and values are up to date
 	CartesiansToInternals(MainData);
+	float unitConversion = 1.0;
+	InputData * lOptions = MainData->GetInputData();
+	if (lOptions && lOptions->Data->GetUnits()) unitConversion = kAng2BohrConversion;
 		char	Out[133];
 		Str255	AtomLabel;
 		Frame *	cFrame = MainData->GetCurrentFramePtr();
@@ -3544,14 +3568,14 @@ void MOPacInternals::WriteCoordinatesToFile(BufferFile * File, MoleculeData * Ma
 		if (iatom==0) sprintf(Out, "%s", (char *) &(AtomLabel[1]));
 		else if (iatom == 1)
 			sprintf(Out, "%s  %ld %10.5f", (char *) &(AtomLabel[1]),
-				ConnectionAtoms[3*iatom]+1, Values[3*iatom]);
+				ConnectionAtoms[3*iatom]+1, Values[3*iatom]*unitConversion);
 		else if (iatom == 2)
 			sprintf(Out, "%s   %ld %10.5f  %ld %8.4f",
-				(char *) &(AtomLabel[1]), ConnectionAtoms[3*iatom]+1, Values[3*iatom], 
+				(char *) &(AtomLabel[1]), ConnectionAtoms[3*iatom]+1, Values[3*iatom]*unitConversion, 
 				ConnectionAtoms[3*iatom+1]+1, Values[3*iatom+1]);
 		else
 			sprintf(Out, "%s   %ld %10.5f  %ld %8.4f  %ld %8.4f",
-				(char *) &(AtomLabel[1]), ConnectionAtoms[3*iatom]+1, Values[3*iatom], 
+				(char *) &(AtomLabel[1]), ConnectionAtoms[3*iatom]+1, Values[3*iatom]*unitConversion, 
 				ConnectionAtoms[3*iatom+1]+1, Values[3*iatom+1],
 				ConnectionAtoms[3*iatom+2]+1, Values[3*iatom+2]);
 		File->WriteLine(Out, true);
@@ -3561,6 +3585,9 @@ void MOPacInternals::WriteCoordinatesToFile(BufferFile * File, MoleculeData * Ma
 void MOPacInternals::WriteMPCZMatCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) {
 	UpdateAtoms(MainData);	//First make sure the connectivity and values are up to date
 	CartesiansToInternals(MainData);
+	float unitConversion = 1.0;
+	InputData * lOptions = MainData->GetInputData();
+	if (lOptions && lOptions->Data->GetUnits()) unitConversion = kAng2BohrConversion;
 	char	Out[133];
 	Str255	AtomLabel;
 	Frame *	cFrame = MainData->GetCurrentFramePtr();
@@ -3571,14 +3598,14 @@ void MOPacInternals::WriteMPCZMatCoordinatesToFile(BufferFile * File, MoleculeDa
 		if (iatom==0) sprintf(Out, "%s", (char *) &(AtomLabel[1]));
 		else if (iatom == 1)
 			sprintf(Out, "%s   %10.5f", (char *) &(AtomLabel[1]),
-					Values[3*iatom]);
+					Values[3*iatom]*unitConversion);
 		else if (iatom == 2)
 			sprintf(Out, "%s   %10.5f 0 %8.4f 0 %ld %ld",
-					(char *) &(AtomLabel[1]), Values[3*iatom], 
+					(char *) &(AtomLabel[1]), Values[3*iatom]*unitConversion, 
 					Values[3*iatom+1], ConnectionAtoms[3*iatom]+1, ConnectionAtoms[3*iatom+1]+1);
 		else
 			sprintf(Out, "%s   %10.5f 0 %8.4f 0 %8.4f 0 %ld %ld %ld",
-					(char *) &(AtomLabel[1]), Values[3*iatom], Values[3*iatom+1],
+					(char *) &(AtomLabel[1]), Values[3*iatom]*unitConversion, Values[3*iatom+1],
 					Values[3*iatom+2], ConnectionAtoms[3*iatom]+1,
 					ConnectionAtoms[3*iatom+1]+1, ConnectionAtoms[3*iatom+2]+1);
 		File->WriteLine(Out, true);

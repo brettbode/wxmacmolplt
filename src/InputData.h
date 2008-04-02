@@ -527,7 +527,15 @@ class DataGroup {
 		CoordinateType SetCoordType(const char *CoordText);
 		CoordinateType SetCoordType(CoordinateType NewType);
 		bool GetUnits(void) const {return ((Options&1)?true:false);};
-		bool SetUnits(bool NewType);
+		/** Set the units for the coordinates (true for bohr, false for angstrom).
+		 * @param unitFlag Flag to indicate units
+		 */
+		bool SetUnits(bool unitFlag);
+		/** Set the units for the coordinates (bohr or angs (angstroms)).
+		 * The return value is 0 for angstroms, 1 for bohr, -1 indicates invalid text.
+		 * @param unitText A null-terminated string to parse.
+		 */
+		int SetUnits(const char * unitText);
 		bool SetUseSym(bool State);
 		bool GetUseSym(void) const {return ((Options&2)?true:false);};
 		short GetNumZVar(void) const {return NumZVar;};

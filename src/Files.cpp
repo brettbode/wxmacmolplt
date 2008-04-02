@@ -99,6 +99,8 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				MainData->InputOptions->Control->SetCIType(token);
 			if (ReadStringKeyword(Line, "COORD", token))
 				MainData->InputOptions->Data->SetCoordType(token);
+			if (ReadStringKeyword(Line, "UNITS", token))
+				MainData->InputOptions->Data->SetUnits(token);
 			if (ReadLongKeyword(Line, "ICHARG", &nAtoms))
 				MainData->InputOptions->Control->SetCharge(nAtoms);
 			if (ReadStringKeyword(Line, "LOCAL", token))
@@ -354,6 +356,8 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			if (-1 == FindKeyWord(token, "C1", 2)) Buffer->SkipnLines(1);
 			StartPos = Buffer->GetFilePos();
 			if (!Buffer->LocateKeyWord("$END", 4)) throw DataError();
+			float unitConversion = 1.0;
+			if (MainData->InputOptions->Data->GetUnits()) unitConversion = kBohr2AngConversion;
 			EndPos = Buffer->GetFilePos() - 1;
 			Buffer->SetFilePos(StartPos);
 			nAtoms = Buffer->GetNumLines(EndPos - StartPos);
@@ -368,6 +372,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 						{ throw UserCancel();}
 						pos.x = pos.y = pos.z = 0.0;
 						sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
+						pos *= unitConversion;
 						lFrame->AddAtom((long) AtomType, pos);
 						StartPos = Buffer->FindBlankLine();
 						if ((StartPos <= EndPos)&&(StartPos>-1)) {	//basis set is inlined in $DATA
