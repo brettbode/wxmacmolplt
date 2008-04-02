@@ -247,7 +247,7 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 	Frame *	lFrame = lData->GetCurrentFramePtr();
 	BasisSet * Basis = lData->GetBasisSet();
 	AODensity * TotalAODensity = lFrame->GetAODensity(Basis, OrbSet);
-	if (!TotalAODensity) throw MemoryError();;
+	if (!TotalAODensity) throw MemoryError();
 
 	SetupGridParameters(lFrame);	//Define the 3D volume
 

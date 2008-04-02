@@ -3937,7 +3937,7 @@ void MEP2DSurfPane::OnUpdate(wxCommandEvent &event) {
 				Surface * temp = lFrame->GetSurfaceWithID(SurfaceID);
 				MEP2DSurface * lSurf = NULL;
 				if (temp)
-					if (temp->GetSurfaceType() == kOrb2DType)
+					if (temp->GetSurfaceType() == kMEP2D)
 						lSurf = (MEP2DSurface *) temp;
 				if (lSurf) {
 					lSurf->UpdateData(mTarget);
@@ -4154,7 +4154,7 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 				Surface * temp = lFrame->GetSurfaceWithID(SurfaceID);
 				//Confirm that the surface is the correct type
 				if (temp)
-					if (temp->GetSurfaceType() == kTotalDensity3D)
+					if (temp->GetSurfaceType() == kMEP3D)
 						lSurf = (MEP3DSurface *) temp;
 				if (lSurf) lSurf->UpdateData(mTarget);
 			} else lSurf = mTarget;
@@ -4163,7 +4163,12 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 					lProgress->ChangeText("Calculating 3D Grid...");
 					lProgress->SetBaseValue(100*i/NumFrames);
 					lProgress->SetScaleFactor((float) 0.9/NumFrames);
-					if (updateGrid) lSurf->CalculateMEPGrid(data, lProgress);
+					if (updateGrid) {
+						try {
+							lSurf->CalculateMEPGrid(data, lProgress);
+						} catch (...) {
+						}
+					}
 					lProgress->ChangeText("Contouring grid...");
 					lProgress->SetBaseValue((long)(100*i/NumFrames + 90.0/NumFrames));
 					lProgress->SetScaleFactor((float) 0.1/NumFrames);

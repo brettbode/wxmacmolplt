@@ -515,8 +515,8 @@ MolDisplayWin::~MolDisplayWin() {
 	// if this is the last MolDisplayWin that's open, we close the periodic
 	// dialog in order for the whole application to close.
 #ifndef __WXMAC__
-	MpApp& app = wxGetApp();
-	if (app.WindowCount() == 0) {
+	MpApp *app = (MpApp *) wxTheApp;
+	if (app->WindowCount() == 0) {
 		if (build_palette) {
 			build_palette->Destroy();
 		}
@@ -4288,7 +4288,7 @@ void MolDisplayWin::ToggleBuilderPalette(void) {
 				// window_rect.y + 22); 
 			// build_palette->Show(); 
 		// } 
-		((MpApp &) wxGetApp()).AdjustAllMenus();
+		wxGetApp().AdjustAllMenus();
 	} else {
 		build_palette->Hide();
 	Dirtify();;

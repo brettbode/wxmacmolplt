@@ -55,9 +55,12 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] = {
 #endif
 
 #include "xpms/sp.xpm"
-/* wxTimer *splash_timer = NULL; */
 wxSplashScreen * splash = NULL;
-/* #define splashT_ID 12399 */
+
+MpApp& wxGetApp() {
+	return *wx_static_cast(MpApp*, wxApp::GetInstance());
+}
+
 bool MpApp::OnInit() {
 	m_InstanceChecker = NULL;
 	gPrefDlg = NULL;
@@ -140,11 +143,6 @@ bool MpApp::OnInit() {
 		wxLogMessage(msg); 
 		return false; 
 	} 
-
-#if 0
-	splash_timer = new wxTimer(this, splashT_ID);
-	splash_timer->Start(2000, wxTIMER_ONE_SHOT);
-#endif
 
 	// Check for debug level 
 	//	long debugLevel = 0; 
@@ -238,16 +236,6 @@ bool MpApp::OnInit() {
 
     return true;
 }
-
-#if 0
-void MpApp::splashCleanup(wxTimerEvent & event) {
-	if (splash) {
-		splash->Destroy();
-		splash = NULL;
-	}
-	delete splash_timer;
-}
-#endif
 
 int MpApp::OnExit() {
 	//If we are using the instance checker we must delete it here or we will leave a stale lock behind
@@ -410,7 +398,7 @@ BEGIN_EVENT_TABLE(MpApp, wxApp)
 END_EVENT_TABLE()
 
 // Tell wxWidgets to start the program:
-IMPLEMENT_APP_NO_MAIN(MpApp)
+/* IMPLEMENT_APP_NO_MAIN(MpApp) */
 
 #ifdef __WXMAC__
 macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,
@@ -461,51 +449,109 @@ void macMenuWinPlaceholder::createMenuBar(void) {
 
 int main(int argc, char **argv) {
 
-	if (argc >= 2 && strcmp(argv[1], "-b") == 0) {
-		wxInitialize();
-		wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
-#ifdef __LINUX__
-		//It has become apparent that wx is not determining the install prefix
-		//correctly on linux. So set it here as a workaround
-		// Ok I don't know how else to get the wxStandardPaths class?
-		wxStandardPaths * paths = (wxStandardPaths * ) &gStdPaths;
-		if (strcmp(INSTALL_PREFIX, "NONE"))
-			paths->SetInstallPrefix(wxString(INSTALL_PREFIX, wxConvUTF8));
-		else
-			paths->SetInstallPrefix(wxString("/usr/local", wxConvUTF8));
-#endif
-		std::cout << "INSTALL_PREFIX: " << INSTALL_PREFIX << std::endl;
-
-		gPreferences = new WinPrefs;
-		gPrefDefaults = new WinPrefs;
-
-		// Now read in the users preferences file from the system:preferences folder if present
-		gPrefDefaults->ReadDefaultPrefs();
-		*gPreferences = *gPrefDefaults;
-		//attempt to read new xml pref file
-		gPreferences->ReadUserPrefs();
-
-		MoleculeData *moldata = new MoleculeData(NULL);
-		std::cout << "opening: " << argv[3] << std::endl;
-		FILE *f = fopen(argv[3], "rb");
-		BufferFile *bfile = new BufferFile(f, false);
-		WinPrefs *prefs = new WinPrefs;
-		moldata->OpenCMLFile(bfile, prefs, NULL, NULL, true);
-		delete bfile;
-		fclose(f);
-
-		std::cout << "writing to: " << argv[2] << std::endl;
-		f = fopen(argv[2], "w");
-		bfile = new BufferFile(f, true);
-		moldata->ExportPOV(bfile, prefs);
-		delete bfile;
-		fclose(f);
-
-		delete moldata;
-		wxUninitialize();
-
+	if (argc >= 2 &&
+		(strcmp(argv[1], "-b") == 0 ||
+		 strcmp(argv[1], "-v") == 0 ||
+		 strcmp(argv[1], "-h") == 0)) {
+		MpAppNoGUI *guiless_app = new MpAppNoGUI;
 	} else {
-		wxEntry(argc, argv);
+		MpApp *gui_app = new MpApp;
 	}
+	wxEntry(argc, argv);
 
 }
+
+bool MpAppNoGUI::OnInit() {
+
+#if wxCHECK_VERSION(2, 9, 0)
+	static const wxCmdLineEntryDesc cmd_line_desc[] = { 
+		{ wxCMD_LINE_SWITCH, "h", "help",
+							 "displays help on the command line parameters" }, 
+		{ wxCMD_LINE_SWITCH, "v", "version", "print version" }, 
+		{ wxCMD_LINE_OPTION, "b", "batch", "export POV-Ray scene",
+							 wxCMD_LINE_VAL_STRING }, 
+		{ wxCMD_LINE_PARAM, NULL, NULL, "input file",
+			wxCMD_LINE_VAL_STRING, wxCMD_LINE_OPTION_MANDATORY }, 
+		{ wxCMD_LINE_NONE } 
+	};
+#else
+	static const wxCmdLineEntryDesc cmd_line_desc[] = { 
+		{ wxCMD_LINE_SWITCH, wxT("h"), wxT("help"), 
+							 wxT("displays help on the command line parameters") }, 
+		{ wxCMD_LINE_SWITCH, wxT("v"), wxT("version"), wxT("print version") }, 
+		{ wxCMD_LINE_OPTION, wxT("b"), wxT("batch"), wxT("export POV-Ray scene") }, 
+		{ wxCMD_LINE_PARAM, NULL, NULL, wxT("input file"), 
+			wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL }, 
+		{ wxCMD_LINE_NONE } 
+	};
+#endif
+
+    // Parse command line 
+	wxString cmdFilename; 
+	wxCmdLineParser cmdParser(cmd_line_desc, argc, argv); 
+	int res; 
+
+	wxLogNull log; 
+	// Pass false to suppress auto Usage() message 
+	res = cmdParser.Parse(false); 
+
+	// Check if the user asked for command-line help 
+	if (res == -1 || res > 0 || cmdParser.Found(wxT("h"))) 
+	{ 
+		cmdParser.Usage(); 
+		return false; 
+	} 
+
+	// Check if the user asked for the version 
+	if (cmdParser.Found(wxT("v"))) { 
+#ifndef __WXMSW__ 
+		wxLog::SetActiveTarget(new wxLogStderr);
+#endif 
+		wxString msg; 
+		wxString date(wxString::FromAscii(__DATE__)); 
+		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006 ")
+					   wxT("Version %s, %s"), wxMacMolPlt_VERSION, (const wxChar*) date);
+		wxLogMessage(msg); 
+		return false; 
+	} 
+
+	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
+
+#ifdef __LINUX__
+	//It has become apparent that wx is not determining the install prefix
+	//correctly on linux. So set it here as a workaround
+	// Ok I don't know how else to get the wxStandardPaths class?
+	wxStandardPaths * paths = (wxStandardPaths * ) &gStdPaths;
+	if (strcmp(INSTALL_PREFIX, "NONE"))
+		paths->SetInstallPrefix(wxString(INSTALL_PREFIX, wxConvUTF8));
+	else
+		paths->SetInstallPrefix(wxString("/usr/local", wxConvUTF8));
+#endif
+
+	gPreferences = new WinPrefs;
+	gPrefDefaults = new WinPrefs;
+
+	gPrefDefaults->ReadDefaultPrefs();
+	*gPreferences = *gPrefDefaults;
+	gPreferences->ReadUserPrefs();
+
+	MoleculeData *moldata = new MoleculeData(NULL);
+	FILE *f = fopen(argv[3], "rb");
+	BufferFile *bfile = new BufferFile(f, false);
+	moldata->OpenCMLFile(bfile, gPreferences, NULL, NULL, true);
+	delete bfile;
+	fclose(f);
+
+	f = fopen(argv[2], "w");
+	bfile = new BufferFile(f, true);
+	moldata->ExportPOV(bfile, gPreferences);
+	delete bfile;
+	fclose(f);
+
+	delete gPreferences;
+	delete gPrefDefaults;
+	delete moldata;
+	return false;
+
+}
+
