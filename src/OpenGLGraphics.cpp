@@ -246,6 +246,9 @@ void MolDisplayWin::DrawGL(void) {
 	anno_color[3] = 1.0f;
 
 	GLenum error = glGetError();	//clear the error code
+	if (error != GL_NO_ERROR) {
+		std::cerr << "opengl error: " << error << std::endl;
+	}
 
 	// Setup the rotation matrix. We do not set to identity since stereo may
 	// have tacked some transformations on.
@@ -299,7 +302,7 @@ void MolDisplayWin::DrawGL(void) {
 	
 	// Add any surfaces
 	Surface * lSurface = MainData->cFrame->SurfaceList;
-	error = glGetError();
+	// error = glGetError(); 
 	//draw all the normal opaque surfaces
 	//Ok the following works fine on all my systems, but for some reason it fails to work
 	//on for a few other folks. I sort of think this is really an OpenGL bug, but the difference
@@ -818,10 +821,8 @@ void MolDisplayWin::DrawStaticLabel(const char *label, GLfloat x, GLfloat y) {
 	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
 
 	glMatrixMode(GL_PROJECTION);
-
 	glPushMatrix();
 	glLoadIdentity();
-
 	gluOrtho2D(0, canvasWidth, 0, canvasHeight);
 
 	glMatrixMode(GL_MODELVIEW);
@@ -852,7 +853,6 @@ void MolDisplayWin::DrawStaticLabel(const char *label, GLfloat x, GLfloat y) {
 	glPopMatrix(); // GL_MODELVIEW
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
 	glPopMatrix();
 
 	glMatrixMode(matrixMode);
@@ -1669,12 +1669,12 @@ void Surf2DBase::Contour2DGrid3DGL(MoleculeData * , WinPrefs * Prefs)
 	}
 	long n;
 	Boolean Dash = GetDashLine();
-	GLenum error = glGetError();
+	// GLenum error = glGetError(); 
 	if (UseLines) {
 		glDisable(GL_LIGHTING);
 		glLineWidth(1);
 		glBegin(GL_LINES);
-		error = glGetError();	//maybe clear off odd errors...
+		// error = glGetError();	//maybe clear off odd errors... 
 	}
 	glColor3f(0.65, 0.65, 0.65);	//Setup for the gray zero contour color
 	
@@ -1838,7 +1838,7 @@ void Surf2DBase::Contour2DGrid3DGL(MoleculeData * , WinPrefs * Prefs)
 	}
 	if (UseLines) {
 		glEnd();
-		error = glGetError();	//This is here to clear off odd errors.
+		// error = glGetError();	//This is here to clear off odd errors. 
 		glEnable(GL_LIGHTING);
 	} else {
 		if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
@@ -2994,11 +2994,6 @@ void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 
 	m[12] = m[13] = m[14] = 0.0f;
 	m[15] = 1.0f;
-	/* std::cout << "m[#](# in 0,16): " */
-			  /* << m[0] << ", " << m[1] << ", " << m[2] << ", " << m[3] << ", " << std::endl */
-			  /* << m[4] << ", " << m[5] << ", " << m[6] << ", " << m[7] << ", " << std::endl */
-			  /* << m[8] << ", " << m[9] << ", " << m[10] << ", " << m[11] << ", " << std::endl */
-			  /* << m[12] << ", " << m[13] << ", " << m[14] << ", " << m[15] << std::endl; */
 
 	char angle_label[40];
 	sprintf(angle_label, "%.2f", angle * 180.f / kPi);
@@ -3926,9 +3921,9 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 
 	if (atom1.GetInvisibility() || atom2.GetInvisibility()) return;
 	
-	// If this is bond that's going to need multiple pipes, we want each
-	// pipe to be shifted in screen space so that all pipes are visible
-	// all the time.
+	// If this is a bond that's going to need multiple pipes, we want each pipe
+	// to be shifted in screen space so that all pipes are visible all the
+	// time.
 	CPoint3D offset_vec;     // Direction to shift bond cylinders
 	if (logical_order > 1) {
 		GLdouble scr_coords1[3]; // Screen coordinates of atom1
@@ -3953,12 +3948,12 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 		scr_vec.x = scr_coords2[1] - scr_coords1[1];
 		scr_vec.y = scr_coords1[0] - scr_coords2[0];
 		scr_vec.z = 0;
-		scr_vec *= 1 / scr_vec.Magnitude();
+		scr_vec *= 1.0f / scr_vec.Magnitude();
 
 		// Now find a point on the perpendicular vector with atom1's depth
 		// and get its object coordinates.
-		gluUnProject(scr_coords1[0] + scr_vec.x * 10,
-					 scr_coords1[1] + scr_vec.y * 10,
+		gluUnProject(scr_coords1[0] + scr_vec.x * 10.0f,
+					 scr_coords1[1] + scr_vec.y * 10.0f,
 					 scr_coords1[2],
 					 modelview, proj, viewport,
 					 &(perp_obj[0]), &(perp_obj[1]), &(perp_obj[2]));
@@ -3967,7 +3962,7 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
 		// so that they will always stay in view.
 		offset_vec = CPoint3D(perp_obj[0], perp_obj[1], perp_obj[2]) -
 					 atom1.Position;
-		offset_vec *= 1 / offset_vec.Magnitude();
+		offset_vec *= 1.0f / offset_vec.Magnitude();
 	}
 	
 	// If there's only one pipe, we need no offset.

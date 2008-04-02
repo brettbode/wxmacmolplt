@@ -481,7 +481,7 @@ bool MpAppNoGUI::OnInit() {
 		{ wxCMD_LINE_SWITCH, wxT("v"), wxT("version"), wxT("print version") }, 
 		{ wxCMD_LINE_OPTION, wxT("b"), wxT("batch"), wxT("export POV-Ray scene") }, 
 		{ wxCMD_LINE_PARAM, NULL, NULL, wxT("input file"), 
-			wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL }, 
+			wxCMD_LINE_VAL_STRING, wxCMD_LINE_OPTION_MANDATORY }, 
 		{ wxCMD_LINE_NONE } 
 	};
 #endif
@@ -535,14 +535,21 @@ bool MpAppNoGUI::OnInit() {
 	*gPreferences = *gPrefDefaults;
 	gPreferences->ReadUserPrefs();
 
+	// std::cout << "(int) rc: " << (int) rc << std::endl; 
+	// std::cout << "pov_file: " << pov_file << std::endl; 
+
 	MoleculeData *moldata = new MoleculeData(NULL);
-	FILE *f = fopen(argv[3], "rb");
+	FILE *f = fopen(cmdParser.GetParam(0).ToAscii(), "rb");
 	BufferFile *bfile = new BufferFile(f, false);
 	moldata->OpenCMLFile(bfile, gPreferences, NULL, NULL, true);
 	delete bfile;
 	fclose(f);
 
-	f = fopen(argv[2], "w");
+	wxString pov_file;
+	bool rc = cmdParser.Found(_T("b"), &pov_file);
+	std::cout << "rc: " << rc << std::endl;
+	std::cout << "pov_file.ToAscii(): " << pov_file.ToAscii() << std::endl;
+	f = fopen(pov_file.ToAscii(), "w");
 	bfile = new BufferFile(f, true);
 	moldata->ExportPOV(bfile, gPreferences);
 	delete bfile;
@@ -555,3 +562,6 @@ bool MpAppNoGUI::OnInit() {
 
 }
 
+int MpAppNoGUI::OnRun() {
+
+}

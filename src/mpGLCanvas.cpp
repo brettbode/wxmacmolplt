@@ -557,9 +557,11 @@ void MpGLCanvas::SetProjection(float aspect_ratio) {
 		right = top * aspect_ratio;
 	}
 
-	if (half_width > 0.001)
+	if (half_width > 0.001) {
 		glFrustum(-right, right, -top, top, zNear, 1000.0);
-	else {
+		GLdouble woop[16];
+		glGetDoublev(GL_PROJECTION_MATRIX, woop);
+	} else {
 		if (aspect_ratio > 1.0) {
 			right = mMainData->WindowSize;
 			top = right / aspect_ratio;
@@ -2133,10 +2135,8 @@ void MpGLCanvas::testPicking(int x, int y) {
 	glPushName(0);
 
 	glMatrixMode(GL_PROJECTION);
-
 	glPushMatrix();
 	glLoadIdentity();
-
 	gluPickMatrix(x, view[3]-y, 1.0, 1.0, view);
 	SetProjection(((float) width) / height);
 
@@ -2147,6 +2147,7 @@ void MpGLCanvas::testPicking(int x, int y) {
 
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
  
 	hits = glRenderMode(GL_RENDER);
 

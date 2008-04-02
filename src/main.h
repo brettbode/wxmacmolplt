@@ -135,6 +135,7 @@ class MpApp : public wxApp {
 class MpAppNoGUI : public wxAppConsole {
 	public:
 		bool OnInit();
+		int OnRun();
 };
 
 DECLARE_APP(MpApp)
