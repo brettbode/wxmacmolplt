@@ -102,10 +102,10 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
 	wxFrame::Create( parent, id, caption, pos, size, style );
 
 	CreateControls();
-	if (GetSizer())
-	{
-		GetSizer()->SetSizeHints(this);
-	}
+	// if (GetSizer()) 
+	// { 
+		// GetSizer()->SetSizeHints(this); 
+	// } 
 	Centre();
 ////@end SurfacesWindow creation
 	return true;
@@ -160,7 +160,7 @@ void SurfacesWindow::CreateControls()
 #endif
 );
 
-	itemBoxSizer4->Add(book, 1, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 2);
+	itemBoxSizer4->Add(book, 2, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 2);
 
 	wxBoxSizer* itemBoxSizer11 = new wxBoxSizer(wxHORIZONTAL);
 
@@ -266,9 +266,7 @@ void SurfacesWindow::addNewPane(int type) {
 		book->AddPage(tempPane, temp, true);
 	}
 	
-	book->Fit();
-	
-	GetSizer()->SetSizeHints(this);
+	// GetSizer()->SetSizeHints(this); 
 }
 
 void SurfacesWindow::Reset(void) {
@@ -332,9 +330,9 @@ void SurfacesWindow::Reset(void) {
 		book->Disable();
 		book->AddPage(new wxPanel(book), _("No surfaces defined"), true);
 	}
-	book->Fit();
-	
-	GetSizer()->SetSizeHints(this);
+
+	Fit();
+	// GetSizer()->SetSizeHints(this); 
 }
 
 /*!
@@ -356,9 +354,8 @@ void SurfacesWindow::OnDeleteClick( wxCommandEvent& event ) {
 		book->AddPage(new wxPanel(book), _("No surfaces defined"), true);
 	}
 	Parent->UpdateModelDisplay();
-	book->Fit();
 	
-	GetSizer()->SetSizeHints(this);
+	// GetSizer()->SetSizeHints(this); 
 	Fit();
 }
 
@@ -406,9 +403,10 @@ void SurfacesWindow::OnSurflistbookPageChanged(wxChoicebookEvent& event) {
 
 	BaseSurfacePane* tempPane = dynamic_cast<BaseSurfacePane *>(book->GetCurrentPage());
 	if (tempPane) {
-		Fit();
 		tempPane->PageIsNowActive();	//make sure the update button is the default
 	}
+	Fit();
+
 }
 
 /*!

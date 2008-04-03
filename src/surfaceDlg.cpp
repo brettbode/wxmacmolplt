@@ -1344,9 +1344,9 @@ void Orbital2DSurfPane::CreateControls()
   middleSizer->Add(rightMiddleSizer, 0, wxALL, 10);
   bottomSizer->Add(leftBottomSizer, 0, wxALL, 3);
   bottomSizer->Add(rightBottomSizer, 0, wxALL, 3);
-  mainSizer->Add(upperSizer, 1, wxALIGN_CENTER_HORIZONTAL);
-  mainSizer->Add(middleSizer, 1, wxALIGN_CENTER_HORIZONTAL);
-  mainSizer->Add(bottomSizer, 1, wxALIGN_CENTER_HORIZONTAL);
+  mainSizer->Add(upperSizer, 0, wxALIGN_CENTER_HORIZONTAL);
+  mainSizer->Add(middleSizer, 0, wxALIGN_CENTER_HORIZONTAL);
+  mainSizer->Add(bottomSizer, 0, wxALIGN_CENTER_HORIZONTAL);
   
   wxCommandEvent foo;
   OnOrbSetChoice(foo);
@@ -1886,9 +1886,9 @@ void Orbital3DSurfPane::CreateControls()
   middleSizer->Add(rightMiddleSizer, 0, wxALL | wxALIGN_CENTER, 10);
   bottomSizer->Add(leftBottomSizer, 0, wxALL | wxALIGN_CENTER, 3);
   bottomSizer->Add(rightBottomSizer, 0, wxALL | wxALIGN_CENTER, 3);
-  mainSizer->Add(upperSizer, 1, wxALIGN_CENTER);
-  mainSizer->Add(middleSizer, 1, wxALIGN_CENTER);
-  mainSizer->Add(bottomSizer, 1, wxALIGN_CENTER);
+  mainSizer->Add(upperSizer, 0, wxALIGN_CENTER);
+  mainSizer->Add(middleSizer, 0, wxALIGN_CENTER);
+  mainSizer->Add(bottomSizer, 0, wxALIGN_CENTER);
   
   wxCommandEvent foo;
   OnOrbSetChoice(foo);
