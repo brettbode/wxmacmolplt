@@ -1346,6 +1346,27 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	// OpenMKLFile can return because we are done parsing the file
 	return 1;
 }
+/**
+  * Adds support for opening the MOPAC MOP and mop file extensions. 
+  * @param Buffer A BufferFileObject that the .MOP or .mop file is buffered into
+  * to make parsing the file easier.  See the BufferFile object for valid
+  * BufferFile operations.
+*/
+long MolDisplayWin::OpenMOPFile(BufferFile * Buffer) {
+	printf("file read\n");
+	return 0;
+}
+/**
+  * Adds support for opening the MOPAC ARC and arc archive file extensions. 
+  * @param Buffer A BufferFileObject that the .ARC or .arc file is buffered into
+  * to make parsing the file easier.  See the BufferFile object for valid
+  * BufferFile operations.
+*/
+long MolDisplayWin::OpenARCFile(BufferFile * Buffer) {
+	printf("file read\n");
+	return 0;
+}
+
 
 long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 	char	Line[kMaxLineLength];
