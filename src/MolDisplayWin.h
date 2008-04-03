@@ -503,7 +503,7 @@ class MolDisplayWin : public wxFrame {
 		long OpenMolPltFile(BufferFile *Buffer);
 		long OpenMoldenFile(BufferFile * Buffer);
 		/**
-		 Open an MKL format filee. 
+		 Open an MKL format file. 
 		 \param Buffer The buffer connected to the MKL file.
 		 */
 		long OpenMKLFile(BufferFile * Buffer);
