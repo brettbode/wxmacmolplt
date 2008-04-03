@@ -1353,7 +1353,6 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
   * BufferFile operations.
 */
 long MolDisplayWin::OpenMOPFile(BufferFile * Buffer) {
-	printf("file read\n");
 	return 0;
 }
 /**
@@ -1363,7 +1362,6 @@ long MolDisplayWin::OpenMOPFile(BufferFile * Buffer) {
   * BufferFile operations.
 */
 long MolDisplayWin::OpenARCFile(BufferFile * Buffer) {
-	printf("file read\n");
 	return 0;
 }
 
