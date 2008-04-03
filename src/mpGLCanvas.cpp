@@ -43,9 +43,19 @@ MpGLCanvas::MpGLCanvas(MolDisplayWin *parent, wxWindowID id,
 					   const wxPoint& position, const wxSize& size,
 					   int *attribs, bool do_stereo, long style,
 					   const wxString& name)
-	: wxGLCanvas((wxWindow *) parent, id, position, size,
-				 style | wxFULL_REPAINT_ON_RESIZE, name, attribs),
+	:
+#if wxCHECK_VERSION(2,9,0)
+	 wxGLCanvas((wxWindow *) parent, id, attribs, position, size,
+				style | wxFULL_REPAINT_ON_RESIZE, name),
+#else
+	 wxGLCanvas((wxWindow *) parent, id, position, size,
+				style | wxFULL_REPAINT_ON_RESIZE, name, attribs),
+#endif
 	  do_stereo(do_stereo) {
+
+#if wxCHECK_VERSION(2,9,0)
+	context = new wxGLContext(this);
+#endif
 
 	Prefs = NULL;
 	MolWin = parent;
@@ -93,95 +103,94 @@ MpGLCanvas::~MpGLCanvas() {
  */
 void MpGLCanvas::initGL(void) {
 
-	if (GetContext()) {
-		wxString vector_font, bitmap_font;
-		wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
+	wxString vector_font, bitmap_font;
+	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
 #if wxCHECK_VERSION(2, 8, 0)
-		wxString pathname = gStdPaths.GetResourcesDir();
+	wxString pathname = gStdPaths.GetResourcesDir();
 #else
-		wxString pathname = gStdPaths.GetDataDir();
+	wxString pathname = gStdPaths.GetDataDir();
 #ifdef __WXMAC__
-		//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
-		//but xcode is putting them in Resources.
-		pathname.Remove(pathname.Length() - 13);
-		pathname += wxT("Resources");
+	//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
+	//but xcode is putting them in Resources.
+	pathname.Remove(pathname.Length() - 13);
+	pathname += wxT("Resources");
 #endif
 #endif
-		vector_font = pathname + wxT("/arial1.glf");
-		bitmap_font = pathname + wxT("/arial1.bmf");
+	vector_font = pathname + wxT("/arial1.glf");
+	bitmap_font = pathname + wxT("/arial1.bmf");
 
-		if (glfLoadBMFFont(bitmap_font.mb_str(wxConvUTF8)) < 0) {
-			std::ostringstream buf;
-			buf << "Warning: font file not found! This probably means wxmacmolplt is not "
-				   "properly installed. Looking for " << bitmap_font.mb_str(wxConvUTF8);
-			MessageAlert(buf.str().c_str());
-			glfClose();
-			glf_initialized = 0;
-		} else {
-			bitmap_fontd = glfGetCurrentBMFFont();
-		}
-
-		// Initialize the OpenGL state here.
-		glEnable(GL_DEPTH_TEST);
-		
-		//  glShadeModel(GL_FLAT);
-		glShadeModel(GL_SMOOTH);
-		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-		glPolygonOffset (1.0, 1.0);
-		
-		GLfloat mat_specular[] = {0.8, 0.8, 0.8, 1.0};
-		GLfloat mat_shininess[] = {80.0};
-		GLfloat mat_diffuse[] = {0.2,0.2,0.2,0.8};
-		GLfloat mat_ambient[] = {0.1,0.1,0.1,0.8};
-
-		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
-
-		// Setup the static lighting properties.
-		GLfloat model_ambient[4] = {0.1f, 0.1f, 0.1f, 0.1f};
-		glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-		glEnable(GL_COLOR_MATERIAL);
-		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
-		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
-
-		// We make a texture of arrowheads for the annotations. The arrowheads
-		// will point in the direction the annotations can be moved.
-		unsigned char texture[16 * 16] = {
-			255,   0,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255, 255,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255, 255, 255,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255, 255, 255, 255,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255, 255, 255, 255, 255,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255, 255, 255, 255, 255,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255, 255, 255, 255,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255, 255, 255,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255, 255,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255, 255,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255, 255,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-			255,   0,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
-		};
-
-		glGenTextures(1, &(MolWin->OpenGLData->length_anno_tex_id));
-		glBindTexture(GL_TEXTURE_2D, MolWin->OpenGLData->length_anno_tex_id);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 16, 16, 0, GL_ALPHA,
-					 GL_UNSIGNED_BYTE, texture);
-
-		DoPrefDependent();
-
-		// Don't initialize more than once, so set a flag.
-		initialized = true;
+	if (glfLoadBMFFont(bitmap_font.mb_str(wxConvUTF8)) < 0) {
+		std::ostringstream buf;
+		buf << "Warning: font file not found! This probably means wxmacmolplt is not "
+			   "properly installed. Looking for " << bitmap_font.mb_str(wxConvUTF8);
+		MessageAlert(buf.str().c_str());
+		glfClose();
+		glf_initialized = 0;
+	} else {
+		bitmap_fontd = glfGetCurrentBMFFont();
 	}
+
+	// Initialize the OpenGL state here.
+	glEnable(GL_DEPTH_TEST);
+	
+	//  glShadeModel(GL_FLAT);
+	glShadeModel(GL_SMOOTH);
+	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+	glPolygonOffset (1.0, 1.0);
+	
+	GLfloat mat_specular[] = {0.8, 0.8, 0.8, 1.0};
+	GLfloat mat_shininess[] = {80.0};
+	GLfloat mat_diffuse[] = {0.2,0.2,0.2,0.8};
+	GLfloat mat_ambient[] = {0.1,0.1,0.1,0.8};
+
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+
+	// Setup the static lighting properties.
+	GLfloat model_ambient[4] = {0.1f, 0.1f, 0.1f, 0.1f};
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glEnable(GL_COLOR_MATERIAL);
+	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, model_ambient);
+
+	// We make a texture of arrowheads for the annotations. The arrowheads
+	// will point in the direction the annotations can be moved.
+	unsigned char texture[16 * 16] = {
+		255,   0,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255, 255,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255, 255, 255,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255, 255, 255, 255,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255, 255, 255, 255, 255,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255, 255, 255, 255, 255,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255, 255, 255, 255,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255, 255, 255,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255, 255,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255, 255,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255, 255,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+		255,   0,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
+	};
+
+	glGenTextures(1, &(MolWin->OpenGLData->length_anno_tex_id));
+	glBindTexture(GL_TEXTURE_2D, MolWin->OpenGLData->length_anno_tex_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 16, 16, 0, GL_ALPHA,
+				 GL_UNSIGNED_BYTE, texture);
+
+	DoPrefDependent();
+
+	// Don't initialize more than once, so set a flag.
+	initialized = true;
+
 }
 
 /**
@@ -200,7 +209,11 @@ void MpGLCanvas::SetPrefs(WinPrefs *newPrefs) {
  */
 void MpGLCanvas::DoPrefDependent() {
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 
 	// All atoms are drawn using one display list that draws a sphere. 
 	// We delete any current list and create it anew.
@@ -261,11 +274,11 @@ void MpGLCanvas::DoPrefDependent() {
 
 wxImage MpGLCanvas::getImage(const int width, const int height) {
 
-	if (!GetContext()) {
-		return wxImage();
-	}
-
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 	glfSetCurrentBMFFont(bitmap_fontd);
 	// TODO:  respect width/height
 	// TODO:  avoid grabbing the menu
@@ -305,11 +318,11 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 									Progress * progress, bool Center,
 									bool frame) {
 	
-	if (!GetContext()) {
-		return;
-	}
-
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 	glfSetCurrentBMFFont(bitmap_fontd);
 
 	GLint view[4];
@@ -434,10 +447,11 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 
 	GLbyte *pixels;
 
-	if (!GetContext()) {
-		return;
-	}
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 	glfSetCurrentBMFFont(bitmap_fontd);
 
 	glGetIntegerv(GL_VIEWPORT, glViewport);
@@ -576,7 +590,9 @@ void MpGLCanvas::SetProjection(float aspect_ratio) {
 
 void MpGLCanvas::eventSize(wxSizeEvent &event) {
 
+#if !wxCHECK_VERSION(2,9,0)
 	wxGLCanvas::OnSize(event);
+#endif
 	GetClientSize(&width, &height);
 	Update();
 	Refresh();
@@ -606,11 +622,21 @@ void MpGLCanvas::eventPaint(wxPaintEvent &event) {
  */
 void MpGLCanvas::Draw() {
 
-	if (!GetContext() || !MolWin->IsShown() || Prefs == NULL) {
+/* #if wxCHECK_VERSION(2,9,0) */
+	if (!IsShownOnScreen()) {
+		return;
+	}
+/* #endif */
+
+	if (!MolWin->IsShown() || Prefs == NULL) {
 		return;
 	}
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 
 	if (!initialized) {
 		initGL();
@@ -1104,7 +1130,11 @@ void MpGLCanvas::eventMouseLeftWentDown(wxMouseEvent& event) {
 
 	mpAtom *lAtoms = mMainData->cFrame->Atoms;
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 
 	// We give the canvas keyboard focus since the builder dialog steals it.
 	this->SetFocus();
@@ -1168,7 +1198,11 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 	bool deSelectAll = true;
 	Frame *lFrame = mMainData->cFrame;
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 
 	ndrag_events = 0;
 
@@ -1227,7 +1261,11 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 
 void MpGLCanvas::eventMouseMiddleWentDown(wxMouseEvent& event) {
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 
 	curr_mouse = event.GetPosition();
 	prev_mouse = curr_mouse;
@@ -1252,7 +1290,11 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	
 	Frame *lFrame = mMainData->cFrame;
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
@@ -1370,7 +1412,11 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	curr_mouse = event.GetPosition();
 	prev_mouse = curr_mouse;
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 	glfSetCurrentBMFFont(bitmap_fontd);
 
 	// If either the command or shift keys are held, we want to add to the
@@ -1704,7 +1750,11 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
@@ -1726,7 +1776,11 @@ void MpGLCanvas::eventMouseRightWentUp(wxMouseEvent& event) {
 
 void MpGLCanvas::eventMouseMiddleWentUp(wxMouseEvent& event) {
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 	glfSetCurrentBMFFont(bitmap_fontd);
 
 	if (HasCapture()) {
@@ -1741,7 +1795,11 @@ void MpGLCanvas::eventMouseMiddleWentUp(wxMouseEvent& event) {
 
 void MpGLCanvas::eventMouseWheel(wxMouseEvent& event) {
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
 	glfSetCurrentBMFFont(bitmap_fontd);
 
 	mMainData->WindowSize *= (event.GetWheelRotation() * 0.01f) /

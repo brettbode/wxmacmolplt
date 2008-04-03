@@ -19,9 +19,18 @@ PreviewCanvas::PreviewCanvas(
 	wxWindow *parent, wxWindowID id,
 	int *attributes, const wxPoint& position, const wxSize& size,
 	long style, const wxString& name)
-	: wxGLCanvas(parent, id, position, size, style, name, attributes),
+	:
+#if wxCHECK_VERSION(2,9,0)
+	  wxGLCanvas(parent, id, attributes, position, size, style, name),
+#else
+	  wxGLCanvas(parent, id, position, size, style, name, attributes),
+#endif
 	  centroid(0, 0, 0),
 	  quadric(NULL) {
+
+#if wxCHECK_VERSION(2,9,0)
+	context = new wxGLContext(this);
+#endif
 
 	InitRotationMatrix(global_rotation);
 	struc = NULL;
@@ -48,7 +57,12 @@ PreviewCanvas::~PreviewCanvas() {
 
 void PreviewCanvas::InitGL() {
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	SetCurrent();
+#endif
+
 	gl_initialized = true;
 	
 	glMatrixMode(GL_MODELVIEW);
@@ -99,7 +113,7 @@ void PreviewCanvas::OnPaint(wxPaintEvent& event) {
    
 void PreviewCanvas::OnSize(wxSizeEvent& event) {
 	
-	wxGLCanvas::OnSize(event);
+	/* wxGLCanvas::OnSize(event); */
 
 	Refresh();
 	Update();
@@ -116,11 +130,15 @@ void PreviewCanvas::OnSize(wxSizeEvent& event) {
 
 void PreviewCanvas::Render() {
 
+#if wxCHECK_VERSION(2,9,0)
+	SetCurrent(*context);
+#else
 	if (!GetContext()) {
 		return;
 	}
 
 	SetCurrent();
+#endif
 
 	if (!gl_initialized) {
 		InitGL();

@@ -76,31 +76,9 @@ typedef class MolDisplayWin MolDisplayWin;
  */
 class MpGLCanvas : public wxGLCanvas {
 	private:
-
-		/*
-		class AtomTypeDialog : public wxDialog {
-			public:
-				AtomTypeDialog() {}
-				AtomTypeDialog( MpGLCanvas * parent, wxWindowID id = NEW_ATOM_TYPE_DIALOG, const wxString& caption = NEW_ATOM_TYPE_TITLE);
-				~AtomTypeDialog() {}
-
-				void OnChoice( wxCommandEvent &event );
-				int getID() { return typeID; }
-
-			private:
-				void Create(MpGLCanvas * parent, wxWindowID id, const wxString& caption);
-
-				wxBoxSizer *mainSizer, *upperSizer, *lowerSizer;
-				wxButton *mButtOK, *mButtCancel;
-				wxChoice* mTypeChoice;
-
-				int typeID;
-				MpGLCanvas *parent;
-
-			DECLARE_EVENT_TABLE()
-		};
-		*/
-		  
+#if wxCHECK_VERSION(2,9,0)
+		wxGLContext *context;
+#endif
 		MolDisplayWin * MolWin;
 		WinPrefs * Prefs;
 		bool initialized;

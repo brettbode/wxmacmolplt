@@ -51,6 +51,9 @@ class PreviewCanvas : public wxGLCanvas {
 		bool gl_initialized;
 		int selected;
 		bool was_dragging;
+#if wxCHECK_VERSION(2,9,0)
+		wxGLContext *context;
+#endif
 
 	DECLARE_EVENT_TABLE()
 };

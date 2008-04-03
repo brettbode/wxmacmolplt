@@ -102,9 +102,10 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
 	wxFrame::Create( parent, id, caption, pos, size, style );
 
 	CreateControls();
-	if (GetSizer()) {
-		// GetSizer()->SetSizeHints(this); 
-	}
+	/* if (GetSizer())  */
+	/* {  */
+		/* GetSizer()->SetSizeHints(this);  */
+	/* }  */
 	Centre();
 ////@end SurfacesWindow creation
 	return true;
@@ -334,7 +335,6 @@ void SurfacesWindow::Reset(void) {
 
 	Fit();
 	SetMinSize(GetBestSize());
-	// GetSizer()->SetSizeHints(this); 
 }
 
 /*!

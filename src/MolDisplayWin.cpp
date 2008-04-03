@@ -3373,6 +3373,7 @@ void MolDisplayWin::ResetModel(bool Center) {
 	// Reset the frame scroll bar
 	myStatus->SetScrollBar(MainData->CurrentFrame-1, MainData->NumFrames);
 	UpdateFrameText();
+
 	glCanvas->Draw();
 
 	// This is commented out because this function's called on file open,
@@ -3758,7 +3759,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	Surface *lSurface;
 	bool UpdateSurface = false;
 
-	glCanvas->SetCurrent();
+	/* glCanvas->SetCurrent(); */
 	
 	// Some surfaces need to be adjusted for the new screen plane.
 	lSurface = MainData->cFrame->SurfaceList;
