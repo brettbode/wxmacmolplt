@@ -102,10 +102,9 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
 	wxFrame::Create( parent, id, caption, pos, size, style );
 
 	CreateControls();
-	// if (GetSizer()) 
-	// { 
+	if (GetSizer()) {
 		// GetSizer()->SetSizeHints(this); 
-	// } 
+	}
 	Centre();
 ////@end SurfacesWindow creation
 	return true;
@@ -147,33 +146,33 @@ void SurfacesWindow::CreateControls()
 	wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
 	itemFrame1->SetSizer(itemBoxSizer2);
 
-	wxPanel* itemPanel3 = new wxPanel( itemFrame1, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-	itemBoxSizer2->Add(itemPanel3, 1, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 0);
+	// wxPanel* itemPanel3 = new wxPanel( itemFrame1, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL ); 
+	// itemBoxSizer2->Add(itemPanel3, 1, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 0); 
 
-	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
-	itemPanel3->SetSizer(itemBoxSizer4);
+	// wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL); 
+	// itemPanel3->SetSizer(itemBoxSizer4); 
 
-	book = new wxChoicebook( itemPanel3, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxNB_TOP
+	book = new wxChoicebook( this, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxNB_TOP
 #if !wxCHECK_VERSION(2,9,0)
 #warning "Doing sunken."
 |wxSUNKEN_BORDER
 #endif
 );
 
-	itemBoxSizer4->Add(book, 2, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 2);
+	itemBoxSizer2->Add(book, 2, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 2);
 
 	wxBoxSizer* itemBoxSizer11 = new wxBoxSizer(wxHORIZONTAL);
 
-	wxButton* itemButton12 = new wxButton( itemPanel3, wxID_ADD, _("&Add..."), wxDefaultPosition, wxDefaultSize, 0 );
+	wxButton* itemButton12 = new wxButton( this, wxID_ADD, _("&Add..."), wxDefaultPosition, wxDefaultSize, 0 );
 	if (SurfacesWindow::ShowToolTips())
 		itemButton12->SetToolTip(_("Click to add a new surface."));
 	itemBoxSizer11->Add(itemButton12, 0, wxALIGN_BOTTOM|wxALL, 5);
 
-	mDeleteButton = new wxButton( itemPanel3, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
+	mDeleteButton = new wxButton( this, wxID_DELETE, _("&Delete"), wxDefaultPosition, wxDefaultSize, 0 );
 	if (SurfacesWindow::ShowToolTips())
 		mDeleteButton->SetToolTip(_("Delete the selected surface"));
 	itemBoxSizer11->Add(mDeleteButton, 0, wxALIGN_BOTTOM|wxALL, 5);
-	itemBoxSizer4->Add(itemBoxSizer11, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer2->Add(itemBoxSizer11, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 ////@end SurfacesWindow content construction
 
@@ -266,6 +265,8 @@ void SurfacesWindow::addNewPane(int type) {
 		book->AddPage(tempPane, temp, true);
 	}
 	
+	Fit();
+	SetMinSize(GetBestSize());
 	// GetSizer()->SetSizeHints(this); 
 }
 
@@ -332,6 +333,7 @@ void SurfacesWindow::Reset(void) {
 	}
 
 	Fit();
+	SetMinSize(GetBestSize());
 	// GetSizer()->SetSizeHints(this); 
 }
 
@@ -355,8 +357,9 @@ void SurfacesWindow::OnDeleteClick( wxCommandEvent& event ) {
 	}
 	Parent->UpdateModelDisplay();
 	
-	// GetSizer()->SetSizeHints(this); 
 	Fit();
+	SetMinSize(GetBestSize());
+	// GetSizer()->SetSizeHints(this); 
 }
 
 
@@ -405,7 +408,9 @@ void SurfacesWindow::OnSurflistbookPageChanged(wxChoicebookEvent& event) {
 	if (tempPane) {
 		tempPane->PageIsNowActive();	//make sure the update button is the default
 	}
-	Fit();
+
+	// Fit(); 
+	// SetMinSize(GetBestSize()); 
 
 }
 
