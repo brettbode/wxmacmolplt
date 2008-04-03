@@ -148,13 +148,10 @@ void SurfacesWindow::CreateControls()
 	itemFrame1->SetSizer(itemBoxSizer2);
 
 	wxPanel* itemPanel3 = new wxPanel( itemFrame1, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-	itemBoxSizer2->Add(itemPanel3, 0, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 0);
+	itemBoxSizer2->Add(itemPanel3, 1, wxALIGN_CENTER_HORIZONTAL | wxALL | wxEXPAND, 0);
 
 	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
 	itemPanel3->SetSizer(itemBoxSizer4);
-
-	wxBoxSizer* itemBoxSizer9 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer4->Add(itemBoxSizer9, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	book = new wxChoicebook( itemPanel3, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxNB_TOP
 #if !wxCHECK_VERSION(2,9,0)
@@ -163,10 +160,9 @@ void SurfacesWindow::CreateControls()
 #endif
 );
 
-	itemBoxSizer9->Add(book, 4, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 2);
+	itemBoxSizer4->Add(book, 1, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 2);
 
 	wxBoxSizer* itemBoxSizer11 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer4->Add(itemBoxSizer11, 1, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxButton* itemButton12 = new wxButton( itemPanel3, wxID_ADD, _("&Add..."), wxDefaultPosition, wxDefaultSize, 0 );
 	if (SurfacesWindow::ShowToolTips())
@@ -177,6 +173,7 @@ void SurfacesWindow::CreateControls()
 	if (SurfacesWindow::ShowToolTips())
 		mDeleteButton->SetToolTip(_("Delete the selected surface"));
 	itemBoxSizer11->Add(mDeleteButton, 0, wxALIGN_BOTTOM|wxALL, 5);
+	itemBoxSizer4->Add(itemBoxSizer11, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 ////@end SurfacesWindow content construction
 
