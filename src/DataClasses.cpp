@@ -3,6 +3,7 @@
  *      see the LICENSE file in the top level directory
  */
 
+#include <iostream>
 #include "Globals.h"
 #include "Progress.h"
 #include "MyTypes.h"

@@ -2117,8 +2117,6 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event ) {
 	}
 
 	Progress * lProgress = new Progress();
-//  if (!lProgress) 
-  //  cout<<"Cannot allocate the pregress bar!"<<endl;
 
 	if (AllFrames) {	//compute the contour for each frame, no grid is kept
 		long SurfaceID = mTarget->GetSurfaceID();
@@ -2136,26 +2134,32 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event ) {
 				//Confirm that the surface is the correct type
 
 				if (temp)
-					if (temp->GetSurfaceType() == kOrb3DType)
+					if (temp->GetSurfaceType() == kOrb3DType) {
 						lSurf = (Orb3DSurface *) temp;
+					}
 
 				if (lSurf) lSurf->UpdateData(mTarget);
 			} else lSurf = mTarget;
 
 			if (lSurf) {
 				if (Visible) {
+					lSurf->SetTargetSet(mTarget->GetTargetSet());
 					lProgress->ChangeText("Calculating 3D Grid...");
 					lProgress->SetBaseValue(100*i/NumFrames);
 					lProgress->SetScaleFactor((float) 0.9/NumFrames);
-					if (updateGrid) mTarget->CalculateMOGrid(mData, lProgress);
+					if (updateGrid) {
+						lSurf->CalculateMOGrid(mData, lProgress);
+					}
 					lProgress->ChangeText("Contouring grid...");
 					lProgress->SetBaseValue((long)(100*i/NumFrames + 90.0/NumFrames));
 					lProgress->SetScaleFactor((float) 0.1/NumFrames);
-					if (updateContour) mTarget->Contour3DGrid(lProgress);
+					if (updateContour) {
+						lSurf->Contour3DGrid(lProgress);
+					}
 					lSurf->FreeGrid();
 				} else {
-					if (updateGrid) mTarget->FreeGrid();
-					if (updateContour) mTarget->FreeContour();
+					if (updateGrid) lSurf->FreeGrid();
+					if (updateContour) lSurf->FreeContour();
 				}
 			}
 		}
@@ -3916,8 +3920,11 @@ void MEP2DSurfPane::OnUpdate(wxCommandEvent &event) {
 			SurfaceID = mTarget->SetSurfaceID();
 			while (lFrame) {
 				if (lFrame != mData->GetCurrentFramePtr()) {
-					MEP2DSurface * NewSurface = new MEP2DSurface(mTarget);
-					lFrame->AppendSurface(NewSurface);
+					try {
+						MEP2DSurface * NewSurface = new MEP2DSurface(mTarget);
+						lFrame->AppendSurface(NewSurface);
+					} catch (...) {
+					}
 				}
 				lFrame = lFrame->GetNextFrame();
 			}
@@ -4184,11 +4191,15 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 		if (Visible) {
 			lProgress->ChangeText("Calculating 3D Grid...");
 			lProgress->SetScaleFactor(0.95);
-			if (updateGrid) mTarget->CalculateMEPGrid(data, lProgress);
-			lProgress->ChangeText("Contouring grid...");
-			lProgress->SetBaseValue(95);
-			lProgress->SetScaleFactor(0.05);
-			if (updateContour) mTarget->Contour3DGrid(lProgress);
+			try {
+				if (updateGrid) mTarget->CalculateMEPGrid(data, lProgress);
+				lProgress->ChangeText("Contouring grid...");
+				lProgress->SetBaseValue(95);
+				lProgress->SetScaleFactor(0.05);
+				if (updateContour) mTarget->Contour3DGrid(lProgress);
+			} catch (...) {
+				MessageAlert("MEP Calculation failed.");
+			}
 		} else {
 			mTarget->FreeGrid();
 			if (updateContour) mTarget->FreeContour();
