@@ -483,7 +483,12 @@ long BufferFile::PutText(const char * Text)	//This requires a NULL terminated st
 void BufferFile::BackupnLines(long nBack) {
 	for (long nBacked=0; nBacked<=nBack; nBacked++) {
 		if ((BufferStart+BufferPos)<=0) break;	//Beginning of file reached
-		if (BufferPos == 0) { BufferStart = MAX(0, (BufferStart-BufferSize)); AdvanceBuffer();}
+		if (BufferPos == 0) {
+			long cPos = GetFilePos();
+			BufferStart = MAX(0, (BufferStart-BufferSize-1)); 
+			AdvanceBuffer();
+			BufferPos = cPos-BufferStart;	//Set pos to end of buffer
+		}
 #ifdef UseHandles
 		while (((*Buffer)[BufferPos] != 13)&&((*Buffer)[BufferPos] != 10)) {
 #else
@@ -492,9 +497,10 @@ void BufferFile::BackupnLines(long nBack) {
 			BufferPos --;
 			if ((BufferStart+BufferPos)==0) break;	//Beginning of file reached
 			if (BufferPos == 0) {	//Back up one buffer block
-				BufferStart = MAX(0, (BufferStart-BufferSize));
+				long cPos = GetFilePos();
+				BufferStart = MAX(0, (BufferStart-BufferSize-1));
 				AdvanceBuffer();
-				BufferPos = BufferSize;	//Set pos to end of buffer
+				BufferPos = cPos-BufferStart;	//Set pos to end of buffer
 			}
 		}
 		if ((Buffer[BufferPos]==10)&&(Buffer[BufferPos-1]==13)) BufferPos--;
