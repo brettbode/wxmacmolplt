@@ -2403,7 +2403,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		//Could read GUESS options here...
 		//Look for the initial guess orbitals in case the user requested them
 		if (MainData->GetNumBasisFunctions() > 0) {
-			if (Buffer->LocateKeyWord("INITIAL GUESS ORBITALS", 22, EnergyPos)) {
+			if (Buffer->LocateKeyWord("      INITIAL GUESS ORBITALS", 28, EnergyPos)) {
 				lFrame->ParseGAMESSGuessVectors(Buffer, MainData->GetNumBasisFunctions(),
 												(TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType(),
 												ProgressInd);

@@ -805,11 +805,12 @@ void Frame::ParseGAMESSGuessVectors(BufferFile * Buffer, long NumFuncs, TypeOfWa
 	//finally the MCSCF guess appears to have all zero occupation #'s.
 	float * Occupancies=NULL;
 	char	Line[kMaxLineLength+1];
+	int NumOrbs = NumFuncs;
+	//occupancies are printed out when using HCORE or Huekel guess types
 	if (Buffer->LocateKeyWord("ASSIGNED OCCUPANCIES", 20)) {
 		Buffer->SkipnLines(2);
 		Occupancies = new float[NumFuncs];
 		for (int i=0; i<NumFuncs; i++) Occupancies[i] = 0.0;
-		int NumOrbs = NumFuncs;
 		int iorb = 0;
 		while (iorb < NumOrbs) {
 			int imaxorb = MIN(10, NumOrbs-iorb);	//Max of 10 orbitals per line
@@ -832,17 +833,20 @@ void Frame::ParseGAMESSGuessVectors(BufferFile * Buffer, long NumFuncs, TypeOfWa
 			if (imaxorb <= 0) break;
 		}
 		NumOrbs = iorb;
-		Buffer->BackupnLines(1);
-		Buffer->SetFilePos(Buffer->FindBlankLine());
-		Buffer->SkipnLines(1);
-		if (NumOrbs > 0) {
-			OrbitalRec * orbs = ParseGAMESSEigenVectors(Buffer, NumFuncs, NumOrbs,
-									/*long NumBetaOrbs*/ 0, NumOrbs, 0,
-									t, lProgress);
-			if (orbs) {
-				orbs->SetOccupancy(Occupancies, NumFuncs);
-				orbs->setOrbitalType(GuessOrbital);
-			}
+	}
+	Buffer->BackupnLines(1);
+	Buffer->SetFilePos(Buffer->FindBlankLine());
+	Buffer->SkipnLines(1);
+	if (NumOrbs > 0) {
+		OrbitalRec * orbs = ParseGAMESSEigenVectors(Buffer, NumFuncs, NumOrbs,
+								/*long NumBetaOrbs*/ 0, NumOrbs, 0,
+								t, lProgress);
+		if (orbs) {
+			if (Occupancies) orbs->SetOccupancy(Occupancies, NumFuncs);
+			orbs->setOrbitalType(GuessOrbital);
+		} else if (Occupancies) {
+			delete [] Occupancies;
+			Occupancies = NULL;
 		}
 	}
 }
