@@ -515,9 +515,9 @@ bool MpAppNoGUI::OnInit() {
 		return false; 
 	} 
 
+#ifdef __LINUX__
 	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
 
-#ifdef __LINUX__
 	//It has become apparent that wx is not determining the install prefix
 	//correctly on linux. So set it here as a workaround
 	// Ok I don't know how else to get the wxStandardPaths class?
