@@ -221,6 +221,7 @@ bool MpApp::OnInit() {
 #else
 	if (MolWinList.size()<=0){
 		MolDisplayWin * temp = new MolDisplayWin(wxT("Untitled"));
+		temp->Show();
 		MolWinList.push_back(temp);
 	}
 	SetExitOnFrameDelete(true);
