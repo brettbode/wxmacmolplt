@@ -1538,6 +1538,8 @@ void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
 	
 	Frame * lFrame = cFrame;
 	Frame * lEndFrame = lFrame->NextFrame;
+	//saniety check
+	if ((lFrame == NULL)||(lEndFrame == NULL)||(NumPts<1)) return;
 	long NumAtoms = lFrame->NumAtoms;
 	
 	CPoint3D * offset = new CPoint3D[NumAtoms];
@@ -1575,6 +1577,9 @@ void MoleculeData::CreateInternalLLM(long NumPts, WinPrefs * Prefs) {
 	
 	Frame * lFrame = cFrame;
 	Frame * lEndFrame = lFrame->NextFrame;
+	//saniety check
+	if ((lFrame == NULL)||(lEndFrame == NULL)||(NumPts<1)) return;
+
 	long NumAtoms = lFrame->NumAtoms;
 	long SavedFrameNum = CurrentFrame;
 
