@@ -179,14 +179,6 @@ bool MpApp::OnInit() {
 	
 	// Check for a project filename 
 	if (cmdParser.GetParamCount() > 0) {
-#if 0
-		//explicitly destroy the splash screen to get it out of the way
-		if (splash) {
-			splash->Destroy();
-			splash = NULL;
-		}
-#endif
-		
 		for (int i = 0; i < cmdParser.GetParamCount(); ++i) {
 			cmdFilename = cmdParser.GetParam(i); 
 			// Under Windows when invoking via a document 
@@ -195,12 +187,12 @@ bool MpApp::OnInit() {
 			wxFileName fName(cmdFilename); 
 			fName.Normalize(wxPATH_NORM_LONG|wxPATH_NORM_DOTS| 
 							wxPATH_NORM_TILDE|wxPATH_NORM_ABSOLUTE); 
-			cmdFilename = fName.GetFullPath(); 
+			cmdFilename = fName.GetFullPath();
 			if (cmdFilename.length() > 0) {
 				MolDisplayWin * temp = new MolDisplayWin(cmdFilename);
 				MolWinList.push_back(temp);
 				long r = temp->OpenFile(cmdFilename);
-				if (r>0) temp->Show(true);
+				if (r>0) temp->Show();
 			}
 		}
 	} else {
@@ -356,15 +348,6 @@ void MpApp::menuFileOpen(wxCommandEvent &event) {
 #ifdef __WXMAC__
 void MpApp::MacOpenFile(const wxString & filename) {
 
-#if 0
-	//first get rid of the splash screen if its still around
-	if (splash) {
-		splash->Destroy();
-		splash = NULL;
-	}
-	// asdfs
-#endif
-	
 	if (filename.length() > 0) {
         createMainFrame(filename);
 	}
@@ -398,7 +381,7 @@ BEGIN_EVENT_TABLE(MpApp, wxApp)
 END_EVENT_TABLE()
 
 // Tell wxWidgets to start the program:
-/* IMPLEMENT_APP_NO_MAIN(MpApp) */
+/* IMPLEMENT_APP(MpApp) */
 
 #ifdef __WXMAC__
 macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,

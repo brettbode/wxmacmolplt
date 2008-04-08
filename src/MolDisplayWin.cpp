@@ -391,8 +391,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 						 const wxSize   &size,
 						 long            style,
 						 const wxString &name)
-			:wxFrame((wxWindow *)NULL, wxID_ANY, title,
-					 position, size, style, name) {
+	: wxFrame(NULL, wxID_ANY, title, position, size, style, name) {
 
 	MainData = new MoleculeData(this);
 	Prefs = new WinPrefs;
@@ -456,7 +455,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 		}
 	}
 #endif
-	glCanvas = new MpGLCanvas(this, 11002, wxPoint(0,0), wxSize(height,width),
+	glCanvas = new MpGLCanvas(this, wxID_ANY, wxPoint(0,0), wxSize(height,width),
 							  attribs, do_stereo);
 	glCanvas->SetPrefs(Prefs);
 	
@@ -465,7 +464,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	createMenuBar();
 	SetMenuBar(menuBar);
 	
-	Show(true);
+	/* Show(true); */
 	AdjustMenus();
 
 	// If this is a new/empty window default to edit mode (title should be
