@@ -1761,7 +1761,7 @@ void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
 												&printDialogData);
 	if (!preview->Ok()) {//failure to create the print preview
 		delete preview;
-		// TODO:  throw up an error dialog
+		wxLogMessage(_("Unable to create the print preview dialog. Aborted!"));
 		return;
 	}
 	wxPreviewFrame * frame = new wxPreviewFrame(preview, this, _T("wxMacMolPlt print preview"),
@@ -2953,6 +2953,11 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 		switch (key) {	//as long as we are called from a keydown handler these will upper case
 			case 'A':   //option - a
 				MainData->cFrame->toggleAbInitioVisibility();
+				ResetModel(false);
+				Dirtify();
+				break;
+			case 'E':   //option - e
+				MainData->cFrame->toggleEFPVisibility();
 				ResetModel(false);
 				Dirtify();
 				break;

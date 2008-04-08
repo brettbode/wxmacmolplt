@@ -1992,6 +1992,13 @@ void Frame::toggleAbInitioVisibility(void) {
 	}
 }
 
+void Frame::toggleEFPVisibility(void) {
+	for (int i=0; i<NumAtoms; i++) {
+		if (Atoms[i].IsEffectiveFragment()) 
+			Atoms[i].SetInvisibility(true-Atoms[i].GetInvisibility());
+	}
+}
+
 void Frame::resetAllSelectState() {
 	
 	// Typically, atom selection should be done through SetAtomSelection, but

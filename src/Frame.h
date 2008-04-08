@@ -145,6 +145,7 @@ class Frame {
 		long GetNumMMAtoms(void);
 		void toggleMMAtomVisibility(void);
 		void toggleAbInitioVisibility(void);
+		void toggleEFPVisibility(void);
 		bool GetBondLength(long atom1, long atom2, float * length);
 		bool GetBondAngle(long atom1, long BondAtom, long AngleAtom, float * angle);
 		bool GetBondDihedral(long atom1, long BondAtom, long AngleAtom, long DihedralAtom,
