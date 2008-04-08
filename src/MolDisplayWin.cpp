@@ -255,6 +255,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 
 	EVT_MENU (MMP_SETBONDLENGTH,      MolDisplayWin::menuMoleculeSetBondLength)
 	EVT_MENU (MMP_ENERGYEDIT,         MolDisplayWin::menuMoleculeSetFrameEnergy)
+	EVT_UPDATE_UI(MMP_CREATELLMPATH,  MolDisplayWin::OnMoleculeCreateLLMPathUpdate )
 	EVT_MENU (MMP_CREATELLMPATH,      MolDisplayWin::menuMoleculeCreateLLMPath)
 	EVT_MENU (MMP_MINFRAMEMOVEMENTS,  MolDisplayWin::menuMoleculeMinimizeFrameMovements)
 	EVT_UPDATE_UI(MMP_CURPOINTGROUP,	MolDisplayWin::OnShowPointGroupUpdate )
@@ -800,7 +801,6 @@ void MolDisplayWin::ClearMenus(void) {
 
 	menuMolecule->Enable(MMP_SETBONDLENGTH, false);
 	menuMolecule->Enable(MMP_ENERGYEDIT, false);
-	menuMolecule->Enable(MMP_CREATELLMPATH, false);
 	menuMolecule->Enable(MMP_MINFRAMEMOVEMENTS, false);
 	menuMolecule->Enable(MMP_DETERMINEPG, false);
 	menuMolecule->Enable(MMP_SYMADAPTCOORDS, false);
@@ -843,17 +843,6 @@ void MolDisplayWin::AdjustMenus(void) {
 	if (MainData->NumFrames > 1 ) {
 		menuFile->Enable(MMP_DELETEFRAME, true);
 		menuView->Enable(MMP_ANIMATEFRAMES, true);
-		if (MainData->CurrentFrame < MainData->NumFrames) {
-			Frame * lFrame = MainData->GetCurrentFramePtr();
-			Frame * lnFrame = lFrame->GetNextFrame();
-			if (lFrame->NumAtoms == lnFrame->NumAtoms) {
-				for (long i=0; i<lFrame->NumAtoms; i++) {
-					bool good = true;
-					if (lFrame->Atoms[i].Type != lnFrame->Atoms[i].Type) good = false;
-					if (good) menuMolecule->Enable(MMP_CREATELLMPATH, true);
-				}
-			}
-		}
 		menuMolecule->Enable(MMP_MINFRAMEMOVEMENTS, true);
 	}
 	if (MainData->cFrame->Vibs) {
@@ -1025,7 +1014,25 @@ void MolDisplayWin::OnShowPointGroupUpdate( wxUpdateUIEvent& event ) {
 	menuPointGroup->Check((MMP_PGC1+pg-GAMESS_C1), true);
 	event.SetText(pgString);
 }
-
+void MolDisplayWin::OnMoleculeCreateLLMPathUpdate( wxUpdateUIEvent& event ) {
+	event.Enable(false);
+	if (MainData->NumFrames > 1 ) {
+		if (MainData->CurrentFrame < MainData->NumFrames) {
+			Frame * lFrame = MainData->GetCurrentFramePtr();
+			Frame * lnFrame = lFrame->GetNextFrame();
+			if (lFrame->NumAtoms == lnFrame->NumAtoms) {
+				bool good = true;
+				for (long i=0; i<lFrame->NumAtoms; i++) {
+					if (lFrame->Atoms[i].Type != lnFrame->Atoms[i].Type) {
+						good = false;
+						break;
+					}
+				}
+				event.Enable(good);
+			}
+		}
+	}
+}
 /* Event handler functions */
 
 /* File menu */

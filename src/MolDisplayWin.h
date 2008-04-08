@@ -409,6 +409,14 @@ class MolDisplayWin : public wxFrame {
 
 		void menuMoleculeSetBondLength(wxCommandEvent &event);
 		void menuMoleculeSetFrameEnergy(wxCommandEvent &event);
+		/**
+		 * Updates the Create LLM menu item.
+		 */
+		void OnMoleculeCreateLLMPathUpdate(wxUpdateUIEvent &event);
+		/**
+		 * Put up the Create LLM dialog. This should only be called when there is at
+		 * least one frame after the current frame.
+		 */
 		void menuMoleculeCreateLLMPath(wxCommandEvent &event);
 		void menuMoleculeMinimizeFrameMovements(wxCommandEvent &event);
 		void OnShowPointGroupUpdate(wxUpdateUIEvent &event);
