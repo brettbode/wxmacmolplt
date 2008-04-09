@@ -268,6 +268,7 @@ void SurfacesWindow::addNewPane(int type) {
 	
 	Fit();
 	SetMinSize(GetBestSize());
+	SetSize(GetMinSize());
 	// GetSizer()->SetSizeHints(this); 
 }
 
@@ -359,6 +360,7 @@ void SurfacesWindow::OnDeleteClick( wxCommandEvent& event ) {
 	
 	Fit();
 	SetMinSize(GetBestSize());
+	SetSize(GetMinSize());
 	// GetSizer()->SetSizeHints(this); 
 }
 
