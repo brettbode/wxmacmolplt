@@ -143,8 +143,14 @@ class Frame {
 		inline Bond * GetBondLoc(long ibond) {return &(Bonds[ibond]);};
 		float GetBondLength(long ibond);
 		long GetNumMMAtoms(void);
+		/** Toggle the visibility of MM atoms (ie in SiMOMM runs).
+		 */
 		void toggleMMAtomVisibility(void);
+		/** Toggle the visibility of ab initio atoms.
+		 */
 		void toggleAbInitioVisibility(void);
+		/** Toggle the visibility of effective fragments.
+		 */
 		void toggleEFPVisibility(void);
 		bool GetBondLength(long atom1, long atom2, float * length);
 		bool GetBondAngle(long atom1, long BondAtom, long AngleAtom, float * angle);
@@ -159,6 +165,12 @@ class Frame {
 		void ParseGAMESSGuessVectors(BufferFile * Buffer, long NumFuncs, TypeOfWavefunction t, Progress * lProgress);
 		void ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs, Progress * lProgress);
 		void ParseGAMESSCIVectors(BufferFile * Buffer, long NumFuncs, Progress * lProgress);
+		/** Parse the GAMESS UHF natural orbitals and occupation numbers.
+		 * @param Buffer the input buffer.
+		 * @param NumFuncs the number of basis functions.
+		 * @param lProgress the progress indicator.
+		 */
+		void ParseUHFNOs(BufferFile * Buffer, long NumFuncs, Progress * lProgress);
 		void ParseGVBGIOrbitals(BufferFile * Buffer, const long & NumFuncs, Progress * lProgress);
 		OrbitalRec * ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs,
 			long NumBetaOrbs, const long & NumOccAlpha, const long & NumOccBeta, const TypeOfWavefunction & method, Progress * lProgress);

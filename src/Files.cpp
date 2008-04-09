@@ -2539,6 +2539,11 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 							Buffer->SkipnLines(4);
 							lFrame->ParseGVBGIOrbitals(Buffer, MainData->GetNumBasisFunctions(), ProgressInd);
 						}
+					} else if (MainData->InputOptions->Control->GetSCFType() == GAMESS_UHF) {
+						if (Buffer->LocateKeyWord("UHF NATURAL ORBITALS AND OCCUPATION NUMBERS",
+												  43, NextFinalPos)) {
+							lFrame->ParseUHFNOs(Buffer, MainData->GetNumBasisFunctions(), ProgressInd);
+						}
 					}
 					if (MainData->InputOptions->Control->GetMPLevel()) {
 						if (Buffer->LocateKeyWord("MP2 NATURAL ORBITAL OCCUPATION NUMBERS",
@@ -2910,8 +2915,14 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 							} else Buffer->SetFilePos(SavedPos);
 						}
 					}
-// It doesn't appear that GVB orbitals are read in after the first set???
+					// It doesn't appear that GVB orbitals are read in after the first set???
 					// It appears that GAMESS only prints the GI orbitals on the first iteration
+					if (MainData->InputOptions->Control->GetSCFType() == GAMESS_UHF) {
+						if (Buffer->LocateKeyWord("UHF NATURAL ORBITALS AND OCCUPATION NUMBERS",
+												  43, NextFinalPos)) {
+							lFrame->ParseUHFNOs(Buffer, MainData->GetNumBasisFunctions(), ProgressInd);
+						}
+					}
 					if (MainData->InputOptions->Control->GetMPLevel()) {
 						if (Buffer->LocateKeyWord("MP2 NATURAL ORBITAL OCCUPATION NUMBERS",
 							38, NextFinalPos) && ReadMP2Orbitals) {
