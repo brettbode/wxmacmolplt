@@ -413,15 +413,14 @@ OrbSurfacePane::OrbSurfacePane( OrbSurfBase* target, SurfacesWindow* o) {
 	SphericalHarmonics = target->UseSphericalHarmonics();
 	PhaseChange = target->GetPhaseChange();
 
-	if ((TargetSet<0)||(!(OrbOptions&1))) {	//default to something sensible
+	if ((TargetSet<0)&&(!(OrbOptions&1))) {	//default to something sensible
 		MoleculeData * mData = myowner->GetMoleculeData();
 		Frame * lFrame = mData->GetCurrentFramePtr();
 		const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
 
 		if (Orbs->size() > 0) {
 			TargetSet = 0;	//just default to the first set...
-		} 
-		else
+		} else
 			OrbOptions = 1;	//No MO's so default to AO's
 	}
 
@@ -550,6 +549,7 @@ int OrbSurfacePane::getOrbSetForOrbPane(vector<wxString>& choice) {
 			OrbSet++;
 		}
 	}
+	if (OrbOptions&1) item = 1;	//AOs
 
 	return item;
 }
@@ -561,7 +561,8 @@ void OrbSurfacePane::makeMOList(vector<wxString>& choice) {
 
 	wxString tmpStr;
 
-	if (lFrame && (Orbs->size() > 0)) {
+		//validate Frame and orbitals and skip if AOs are chosen
+	if (lFrame && (Orbs->size() > 0) && !(OrbOptions&1)) {
 		OrbitalRec * lMOs = NULL;
 
 		if ((TargetSet < Orbs->size())&&(TargetSet >= 0)) 
@@ -610,7 +611,7 @@ void OrbSurfacePane::makeMOList(vector<wxString>& choice) {
 					}
 					//TextSize(12);	//reset the point size
 				}
-				int nchar = tmpStr.Length();
+	//			int nchar = tmpStr.Length();
 
 				tmpStr.Append('\t');
 				/* for ( int ichar = 0; ichar < 12 - nchar; ichar++) */
@@ -1281,8 +1282,12 @@ void Orbital2DSurfPane::CreateControls() {
 	mainSizer->Add(middleSizer, 0, wxALIGN_CENTER_HORIZONTAL);
 	mainSizer->Add(bottomSizer, 0, wxALIGN_CENTER_HORIZONTAL);
 
-	wxCommandEvent foo;
-	OnOrbSetChoice(foo);
+	if (PlotOrb >= 0) {
+		if (OrbOptions&1)	//AOs
+			mOrbCoef->SetSelection(PlotOrb);
+		else //MOs
+			mAtomList->SetSelection(PlotOrb);
+	}
 }
 
 void Orbital2DSurfPane::TargetToPane(void) {
@@ -1805,11 +1810,12 @@ void Orbital3DSurfPane::CreateControls() {
 	mainSizer->Add(middleSizer, 0, wxALIGN_CENTER);
 	mainSizer->Add(bottomSizer, 0, wxALIGN_CENTER);
 
-	int tmp = PlotOrb;
-	wxCommandEvent foo;
-	OnOrbSetChoice(foo);
-	mAtomList->SetSelection(tmp);
-	OnAtomList(foo);
+	if (PlotOrb >= 0) {
+		if (OrbOptions&1)	//AOs
+			mOrbCoef->SetSelection(PlotOrb);
+		else //MOs
+			mAtomList->SetSelection(PlotOrb);
+	}
 }
 
 bool Orbital3DSurfPane::UpdateNeeded(void) {
