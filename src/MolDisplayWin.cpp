@@ -3585,6 +3585,7 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 
 	return test;
 }
+
 long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWindows) {
 	bool localprogress=false;
 	if (!ProgressInd) {

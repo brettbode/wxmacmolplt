@@ -622,11 +622,15 @@ void MpGLCanvas::eventPaint(wxPaintEvent &event) {
  */
 void MpGLCanvas::Draw() {
 
-/* #if wxCHECK_VERSION(2,9,0) */
+#if wxCHECK_VERSION(2,9,0)
 	if (!IsShownOnScreen()) {
 		return;
 	}
-/* #endif */
+#else
+	if (!GetCurrent()) {
+		return;
+	}
+#endif
 
 	if (!MolWin->IsShown() || Prefs == NULL) {
 		return;
