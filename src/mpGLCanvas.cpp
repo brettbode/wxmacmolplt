@@ -627,7 +627,7 @@ void MpGLCanvas::Draw() {
 		return;
 	}
 #else
-	if (!GetCurrent()) {
+	if (!GetContext()) {
 		return;
 	}
 #endif
