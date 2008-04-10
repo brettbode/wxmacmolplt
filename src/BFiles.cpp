@@ -116,7 +116,7 @@ long LocateForValue(const char * Line, const char * KeyWord) {
 void ConvertExponentStyle(char * Line) {
 	int i=0;
 	while ((Line[i] != '\0')&&(i<kMaxLineLength)) {
-		if ((std::tolower(Line[i]) == 'd')||(std::tolower(Line[i]) == 'q'))
+		if ((tolower(Line[i]) == 'd')||(tolower(Line[i]) == 'q'))
 			Line[i] = 'e';
 		i++;
 	}
