@@ -2387,6 +2387,7 @@ void MolDisplayWin::menuViewShowNormalMode(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuViewPrevNormalMode(wxCommandEvent &event) {
+	std::cout << "there" << std::endl;
 	if (MainData->cFrame->Vibs) {
 		if (MainData->cFrame->Vibs->CurrentMode>0) {
 			ChangeModes(MainData->cFrame->Vibs->CurrentMode - 1);
@@ -2394,6 +2395,7 @@ void MolDisplayWin::menuViewPrevNormalMode(wxCommandEvent &event) {
 	}
 }
 void MolDisplayWin::menuViewNextNormalMode(wxCommandEvent &event) {
+	std::cout << "here" << std::endl;
 	if (MainData->cFrame->Vibs) {
 		if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1)) {
 			ChangeModes(MainData->cFrame->Vibs->CurrentMode + 1);
@@ -2872,32 +2874,15 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 	if (!event.HasModifiers()) {
 		switch (key) {
 			case '[':
-				StopAnimations();
-				if (MainData->cFrame->Vibs) {
-					if (MainData->cFrame->Vibs->CurrentMode>0) {
-						MainData->cFrame->Vibs->CurrentMode--;
-						//activate normal mode display if not active
-						if (!MainData->GetDrawMode()) {
-							MainData->SetDrawMode(true);
-							menuView->Check(MMP_SHOWMODE, true);
-						}
-						ResetModel(false);
-						Dirtify();
-					}
+				if (MainData->cFrame->Vibs &&
+					MainData->cFrame->Vibs->CurrentMode > 0) {
+					ChangeModes(MainData->cFrame->Vibs->CurrentMode - 1);
 				}
 				break;
 			case ']':
-				StopAnimations();
-				if (MainData->cFrame->Vibs) {
-					if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1)) {
-						MainData->cFrame->Vibs->CurrentMode++;
-						if (!MainData->GetDrawMode()) {
-							MainData->SetDrawMode(true);
-							menuView->Check(MMP_SHOWMODE, true);
-						}
-						ResetModel(false);
-						Dirtify();
-					}
+				if (MainData->cFrame->Vibs &&
+					MainData->cFrame->Vibs->CurrentMode < MainData->cFrame->Vibs->NumModes - 1) {
+					ChangeModes(MainData->cFrame->Vibs->CurrentMode + 1);
 				}
 				break;
 			case WXK_BACK:

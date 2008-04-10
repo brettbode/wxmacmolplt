@@ -636,23 +636,6 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DLineWidth), floatVal))
 					SetQD3DLineWidth(floatVal);
 				val = child->getAttributeValue(MMPPref_convert(MMPMolDisplay_LabelFontID));
-#ifdef __wxBuild__
-#ifndef WIN32
-#warning Need to handle the font pref
-#endif
-#else
-				LabelFontID = systemFont;
-				if (val) {
-					long l = strlen(val);
-					Str255 FontName, TestFontName;
-					strncpy((char *)&(FontName[1]), val, l);
-					FontName[0] = l;
-					LabelFontID = FMGetFontFamilyFromName(FontName);
-					FMGetFontFamilyName(LabelFontID, TestFontName);
-					if (!(EqualString(FontName, TestFontName, false, false)))
-						LabelFontID = systemFont;
-				}
-#endif
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_LabelSize), longVal))
 					SetLabelSize(longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AtomLabelSize), floatVal))
@@ -1040,22 +1023,6 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	outbuf.str("");
 	outbuf << QD3DLineWidth;
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_3DLineWidth), outbuf.str().c_str());
-#ifdef __wxBuild__
-#ifndef WIN32
-#warning Need to handle the font pref
-#endif
-#else
-	Str255 FontName;
-#ifdef CarbonBuild
-	FMGetFontFamilyName(GetLabelFontID(), FontName);
-#else
-	GetFontName(GetLabelFontID(), FontName);	/* Store the font name -- not the ID */
-#endif
-	if (FontName[0] > 0) {
-		FontName[FontName[0]+1] = '\0';
-		molElement->addAttribute(MMPPref_convert(MMPMolDisplay_LabelFontID), (char *)&(FontName[1]));
-	}
-#endif
 	outbuf.str("");
 	outbuf << GetLabelSize();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_LabelSize), outbuf.str().c_str());
