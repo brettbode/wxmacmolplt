@@ -432,8 +432,15 @@ void macMenuWinPlaceholder::createMenuBar(void) {
 }
 #endif
 
-int main(int argc, char **argv) {
-
+#ifdef __WXMSW__
+extern "C" int WINAPI WinMain(HINSTANCE hInstance,
+							  HINSTANCE hPrevInstance,
+							  wxCmdLineArgType lpCmdLine,
+							  int nCmdShow)
+#else
+int main(int argc, char **argv)
+#endif 
+{
 	if (argc >= 2 &&
 		(strcmp(argv[1], "-b") == 0 ||
 		 strcmp(argv[1], "-v") == 0 ||
@@ -442,7 +449,12 @@ int main(int argc, char **argv) {
 	} else {
 		MpApp *gui_app = new MpApp;
 	}
-	wxEntry(argc, argv);
+
+#ifdef __WXMSW__
+	return wxEntry(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
+#else
+	return wxEntry(argc, argv);
+#endif
 
 }
 
