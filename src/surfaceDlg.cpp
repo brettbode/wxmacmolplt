@@ -590,7 +590,7 @@ void OrbSurfacePane::makeMOList(vector<wxString>& choice) {
 			char* oneSymLabel;
 
 			for (int theCell = 0; theCell < NumMOs; theCell++) {
-				tmpStr.Printf(wxT("%d\t"), theCell+1); 
+				tmpStr.Printf(wxT("%d  "), theCell+1); 
 
 				if (SymLabel) {	//Add the symetry of the orb, if known
 
@@ -611,11 +611,10 @@ void OrbSurfacePane::makeMOList(vector<wxString>& choice) {
 					}
 					//TextSize(12);	//reset the point size
 				}
-	//			int nchar = tmpStr.Length();
 
-				tmpStr.Append('\t');
-				/* for ( int ichar = 0; ichar < 12 - nchar; ichar++) */
-				/* tmpStr.Append(' '); */
+				int nchar = tmpStr.Length();
+				for (int ichar = 0; ichar < 12 - nchar; ichar++)
+					tmpStr.Append(' ');
 
 				wxString temp;
 				if (OrbColumnEnergyOrOccupation) {	//orb occupation selected
@@ -626,22 +625,22 @@ void OrbSurfacePane::makeMOList(vector<wxString>& choice) {
 						//attempt to set the occupation based on the wavefunction type
 						if (lMOs->getOrbitalWavefunctionType() == RHF) {
 							if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
-								temp.Printf(wxT("2"));
+								temp.Printf(wxT("2  "));
 							else 
-								temp.Printf(wxT("0"));
+								temp.Printf(wxT("0  "));
 						} else if (lMOs->getOrbitalWavefunctionType() == ROHF) {
-							temp.Printf(wxT("0"));
+							temp.Printf(wxT("0  "));
 							if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
-								temp.Printf(wxT("2"));
+								temp.Printf(wxT("2  "));
 							else if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
-								temp.Printf(wxT("1"));
+								temp.Printf(wxT("1  "));
 						} else if (lMOs->getOrbitalWavefunctionType() == UHF) {
-							temp.Printf(wxT("0"));
+							temp.Printf(wxT("0  "));
 							if (Alpha) {
 								if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
-									temp.Printf(wxT("1"));
+									temp.Printf(wxT("1  "));
 							} else if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
-								temp.Printf(wxT("1"));
+								temp.Printf(wxT("1  "));
 						} else {	//MCSCF or CI occupations can't be guessed
 							temp.Printf(wxT("?? "));
 						}
@@ -688,10 +687,9 @@ void OrbSurfacePane::makeAOList(vector<wxString>& choice) {
 							sprintf(label, "%ld", iatom+1);
 							aChoice.Printf(wxT("%ld"), iatom+1);
 
-							aChoice.Append('\t');
-							/* nchar = aChoice.Length(); */
-							/* for ( int i = 0; i < 4 - nchar; i++) */
-							/* aChoice.Append(' '); */
+							nchar = aChoice.Length();
+							for (int i = 0; i < 4 - nchar; i++)
+								aChoice.Append(' ');
 
 							WinPrefs * mPrefs = myowner->GetPrefs();
 							if (mPrefs) {
@@ -700,18 +698,15 @@ void OrbSurfacePane::makeAOList(vector<wxString>& choice) {
 								tmpStr.Trim();
 								aChoice.Append(tmpStr);
 							}
-						} else {
-							aChoice.Append('\t');
 						}
 
-						/* nchar = aChoice.Length(); */
+						nchar = aChoice.Length();
 
-						/* for ( int i = 0; i < 11 - nchar; i++) */
-						/* aChoice.Append(' '); */
-						aChoice.Append('\t');
+						for (int i = 0; i < 11 - nchar; i++)
+							aChoice.Append(' ');
 
-						/* if (nchar == 0) */
-						/* aChoice.Append(' '); //compensate one space */
+						if (nchar == 0)
+							aChoice.Append(' '); //compensate one space
 
 						jfunc = theCell-ifunc;
 						BasisPtr->Shells[ishell].GetLabel(label, jfunc, SphericalHarmonics);
@@ -722,30 +717,13 @@ void OrbSurfacePane::makeAOList(vector<wxString>& choice) {
 							//aChoice.Append(' ');
 							wxString ltemp(label, wxConvUTF8);
 							aChoice.Append(ltemp);
-
-#if 0
-							for (long ichar=1; ichar<=nchar; ichar++) {
-								char isExponent = ((label[ichar]>='0')&&
-										(label[ichar]<='9')&&
-										(label[ichar-1]>='r')&&
-										(label[ichar-1]<='z'));
-								if (isExponent) {
-									//adjust vertical position
-								}
-
-								//DrawText(label, ichar, 1);
-							}
-#endif
 						}
 
-						aChoice.Append('\t');
-#if 0
-						for ( int i = 0; i < 6-nchar; i++)
+						for (int i = 0; i < 6-nchar; i++)
 							aChoice.Append(' ');
 
 						if (nchar <= 2)
 							aChoice.Append(' '); //compensate one space
-#endif
 
 						ifunc = theCell+1;
 						ishell=maxshell;
@@ -770,7 +748,7 @@ void OrbSurfacePane::makeAOList(vector<wxString>& choice) {
 							if (OrbOptions & 16) {
 								if (PlotOrb<MOs->NumBetaOrbs)
 									aVector = &(MOs->VectorsB[NumBasisFuncs*PlotOrb]);
-							} 
+							}
 							else {
 								if (PlotOrb<MOs->NumAlphaOrbs)
 									aVector = &(MOs->Vectors[NumBasisFuncs*PlotOrb]);
