@@ -879,7 +879,6 @@ void AODensity::SetupMemory(long NumBasisFunctions) {
 }
 AODensity * OrbitalRec::GetAODensity(BasisSet * lBasis, long NumAtoms) {
 	if (!TotalAODensity) {
-//		if (!EigenVectors) throw DataError();
 		long NumBasisFunctions = lBasis->GetNumBasisFuncs(false);
 		TotalAODensity = new AODensity;
 		if (TotalAODensity) {
@@ -996,22 +995,28 @@ void OrbitalRec::GetAODensityMatrix(float * AODensityArray, long NumOccAlpha, lo
 
 	if (!AODensityArray) throw MemoryError();	//Memory must be allocated by the caller
 	float	*OccupancyA=NULL, *OccupancyB=NULL;
-	if (BaseWavefunction == RHF) {
-		OccupancyA = new float[NumOccAlpha];
-		if (OccupancyA) for (i=0; i<NumOccAlpha; i++) OccupancyA[i]=2.0;
-	} else if (BaseWavefunction == ROHF) {
-		OccupancyA = new float[NumOccAlpha];
-		if (OccupancyA) for (i=0; i<NumOccAlpha; i++) {
-			if (i<NumOccBeta) OccupancyA[i]=2.0;
-			else OccupancyA[i]=1.0;
+	bool OccMemIsLocal = false;
+	OccupancyA = OrbOccupation;
+	OccupancyB = OrbOccupationB;
+	if (!OrbOccupation) {
+		if (BaseWavefunction == RHF) {
+			OccupancyA = new float[NumOccAlpha];
+			if (OccupancyA) for (i=0; i<NumOccAlpha; i++) OccupancyA[i]=2.0;
+			OccMemIsLocal = true;
+		} else if (BaseWavefunction == ROHF) {
+			OccupancyA = new float[NumOccAlpha];
+			if (OccupancyA) for (i=0; i<NumOccAlpha; i++) {
+				if (i<NumOccBeta) OccupancyA[i]=2.0;
+				else OccupancyA[i]=1.0;
+			}
+			OccMemIsLocal = true;
+		} else if ((BaseWavefunction == UHF)&&(OrbitalType != NaturalOrbital)) {
+			OccupancyA = new float[NumOccAlpha];
+			if (OccupancyA) for (i=0; i<NumOccAlpha; i++) OccupancyA[i]=1.0;
+			OccupancyB = new float[NumOccBeta];
+			if (OccupancyB) for (i=0; i<NumOccBeta; i++) OccupancyB[i]=1.0;
+			OccMemIsLocal = true;
 		}
-	} else if ((BaseWavefunction == UHF)&&(OrbitalType != NaturalOrbital)) {
-		OccupancyA = new float[NumOccAlpha];
-		if (OccupancyA) for (i=0; i<NumOccAlpha; i++) OccupancyA[i]=1.0;
-		OccupancyB = new float[NumOccBeta];
-		if (OccupancyB) for (i=0; i<NumOccBeta; i++) OccupancyB[i]=1.0;
-	} else if ((BaseWavefunction == MCSCF)||(BaseWavefunction == RHFMP2)||(BaseWavefunction == UHF)) {
-		OccupancyA = OrbOccupation;
 	}
 	if (!OccupancyA) throw MemoryError();
 		//clear the AO density array
@@ -1032,7 +1037,7 @@ void OrbitalRec::GetAODensityMatrix(float * AODensityArray, long NumOccAlpha, lo
 			}
 		}
 	}
-	if ((BaseWavefunction == UHF)&&(OrbitalType != NaturalOrbital)) {
+	if (((BaseWavefunction == UHF)&&(OrbitalType != NaturalOrbital))||OccupancyB) {
 		if (!OccupancyB) throw MemoryError();
 		for (m=0; m<NumOccBeta; m++) {
 			n=0;
@@ -1044,9 +1049,9 @@ void OrbitalRec::GetAODensityMatrix(float * AODensityArray, long NumOccAlpha, lo
 			}
 		}
 	}
-	if ((BaseWavefunction != MCSCF)&&(BaseWavefunction != RHFMP2)&&
-		!((BaseWavefunction == UHF)&&(OrbitalType == NaturalOrbital)))
+		//delete memory if it was allocated above
+	if (OccMemIsLocal)
 		delete[] OccupancyA;
-	if (OccupancyB) delete[] OccupancyB;
+	if (OccMemIsLocal && OccupancyB) delete[] OccupancyB;
 }
 

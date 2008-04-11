@@ -1234,6 +1234,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		Buffer->SkipnLines(1); // skip $OCC_BETA line
 		bool error = false;
 
+		lFrame->Orbs[0]->setOrbitalWavefunctionType(UHF);
 		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
 		lFrame->Orbs[0]->OrbOccupationB = new float[nOrbs];
 		if (lFrame->Orbs[0]->OrbOccupationB != NULL) {
