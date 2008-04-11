@@ -382,9 +382,6 @@ BEGIN_EVENT_TABLE(MpApp, wxApp)
 	/* EVT_TIMER(splashT_ID, MpApp::splashCleanup) */
 END_EVENT_TABLE()
 
-// Tell wxWidgets to start the program:
-/* IMPLEMENT_APP(MpApp) */
-
 #ifdef __WXMAC__
 macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,
                          const wxPoint  &position,
@@ -432,15 +429,12 @@ void macMenuWinPlaceholder::createMenuBar(void) {
 }
 #endif
 
+// Tell wxWidgets to start the program:
 #ifdef __WXMSW__
-extern "C" int WINAPI WinMain(HINSTANCE hInstance,
-							  HINSTANCE hPrevInstance,
-							  wxCmdLineArgType lpCmdLine,
-							  int nCmdShow)
+IMPLEMENT_APP(MpApp)
 #else
-int main(int argc, char **argv)
-#endif 
-{
+int main(int argc, char **argv) {
+
 	if (argc >= 2 &&
 		(strcmp(argv[1], "-b") == 0 ||
 		 strcmp(argv[1], "-v") == 0 ||
@@ -450,11 +444,7 @@ int main(int argc, char **argv)
 		MpApp *gui_app = new MpApp;
 	}
 
-#ifdef __WXMSW__
-	return wxEntry(hInstance, hPrevInstance, lpCmdLine, nCmdShow);
-#else
 	return wxEntry(argc, argv);
-#endif
 
 }
 
@@ -562,3 +552,4 @@ bool MpAppNoGUI::OnInit() {
 int MpAppNoGUI::OnRun() {
 
 }
+#endif

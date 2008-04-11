@@ -132,14 +132,15 @@ class MpApp : public wxApp {
 #endif
 };
 
+#ifndef __WXMSW__
 class MpAppNoGUI : public wxAppConsole {
 	public:
 		bool OnInit();
 		int OnRun();
 };
+#endif
 
 DECLARE_APP(MpApp)
-/* DECLARE_APP(MpAppNoGUI) */
 
 #endif /* #ifndef MAIN_H */
 
