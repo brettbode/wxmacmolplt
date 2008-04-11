@@ -57,9 +57,11 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] = {
 #include "xpms/sp.xpm"
 wxSplashScreen * splash = NULL;
 
+#ifndef __WXMSWX__
 MpApp& wxGetApp() {
 	return *wx_static_cast(MpApp*, wxApp::GetInstance());
 }
+#endif
 
 bool MpApp::OnInit() {
 	m_InstanceChecker = NULL;
