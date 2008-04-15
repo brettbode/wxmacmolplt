@@ -13,6 +13,22 @@ current release before reporting it.</P>
 <P>
 <HR WIDTH="80%">
 </P><BR>
+<P>Version 7.2:</P>
+<UL>
+	<LI>Added a tolerance option in the Determine Point Group dialog. This
+		dialog will now also cleanup (or symmetrize) the coordinates.
+	<LI>New option to enforce symmetry as in the molecule builder.
+	<LI>New option to use quad-buffered OpenGL for stereo display (if your
+		hardware supports it, and requires wxWidgets 2.9 or later).
+	<LI>Full support added for EFP2 style effective fragments. You can now
+		use GAMESS input files to read in the full EFP2 information and
+		then add the fragment to your prototype library. Subsequently
+		generated input files will have the full EFP2 information.
+	<LI>Added a parser for MKL file format.
+	<LI>Added parsing for UHF natural orbitals.
+	<LI>Improved initial guess orbital parsing.
+	<LI>Many bug fixes.
+</UL>
 <P>Version 7.1:</P>
 <UL>
 	<LI>Added <a href="builder.html#prototypes">prototypes</a> section to the build pallat. This includes a 

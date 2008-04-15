@@ -21,7 +21,7 @@
 
 //This needs to get put into the build system...
 #define __wxBuild__
-#define wxMacMolPlt_VERSION "7.1"
+#define wxMacMolPlt_VERSION "7.2"
 
 //activate the following line to use the interactive editor
 // please add CXXFLAGS=-DENABLE_INTERACTIVE_MODE to your configure step rather

@@ -21,6 +21,8 @@
 				<string>mol</string>
 				<string>cml</string>
 				<string>CML</string>
+				<string>mkl</string>
+				<string>MKL</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>text-doc.icns</string>
@@ -34,22 +36,6 @@
 			</array>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
-				<string>mlp</string>
-			</array>
-			<key>CFBundleTypeIconFile</key>
-			<string>bindoc.icns</string>
-			<key>CFBundleTypeName</key>
-			<string>MacMolPlt Binary Document</string>
-			<key>CFBundleTypeOSTypes</key>
-			<array>
-				<string>MolP</string>
-			</array>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
 		</dict>
 		<dict>
 			<key>CFBundleTypeExtensions</key>
@@ -107,17 +93,17 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleLongVersionString</key>
-	<string>v 7.1</string>
+	<string>v 7.2</string>
 	<key>CFBundleName</key>
 	<string>wxMacMolPlt</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>7.1</string>
+	<string>7.2</string>
 	<key>CFBundleSignature</key>
 	<string>BMBm</string>
 	<key>CFBundleVersion</key>
-	<string>7.1</string>
+	<string>7.2</string>
 	<key>LSPrefersCarbon</key>
 	<string></string>
 </dict>
