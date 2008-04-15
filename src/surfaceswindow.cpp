@@ -155,7 +155,9 @@ void SurfacesWindow::CreateControls()
 
 	book = new wxChoicebook( this, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxNB_TOP
 #if !wxCHECK_VERSION(2,9,0)
+#ifndef WIN32
 #warning "Doing sunken."
+#endif
 |wxSUNKEN_BORDER
 #endif
 );
