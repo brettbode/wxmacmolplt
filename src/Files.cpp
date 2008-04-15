@@ -879,13 +879,13 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		while (iShell < nShells && iAtom < nAtoms && !error) {
 			Buffer->GetLine(Line);
 			
-			// we only use IType read; nFunc is redundant; Sc(ale Factor)  we don't use
+			// we only use IType read; nFunc is redundant; Sc(ale Factor) we don't use
 			scanCount = sscanf(Line, "%ld %[lLsSpPdDfF] %f%n", 
 								&nFunc, &IType, &Sc, &bytesConsumed);
 			if (3==scanCount) {
 				// create this BasisShell in the BasisSet
 				MainData->Basis->Shells.push_back(BasisShell());	
-				// increment the shell count in the BasisSet (how many shells we've parsed)
+				// increment the shell count in the BasisSet (how many shells parsed)
 				MainData->Basis->NumShells++; 
 				// cast "SP" to L for simplicity
 				if ('S'==toupper(IType[0]) && 'P'==toupper(IType[1])) {
@@ -916,7 +916,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					MainData->Basis->NuclearCharge[iAtom] = (long)(lFrame->GetAtomType(iAtom));
 				}
 				MainData->Basis->NumFuncs += MainData->Basis->Shells[iShell].GetNumFuncs(false);
-				// read in functions for this shell (kinda dumb - grab rows of floats if
+				// read in functions for this shell (kinda dumb: grab rows of floats if
 				// the line isn't formatted like the lines we grab ITypes from)
 				char tmpStr[5];
 				float tmpFloat[3];
@@ -958,10 +958,12 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 							MainData->Basis->BasisMap[2*iAtom+1]=iShell;
 							iAtom++;
 							stopReadingShell = true;
-					//statement has no effect		BasisDone;
+							// BasisDone = true;
+							// possibly needed when trying to make parser more intelligent when the 
+							// file isn't formatted perfectly; eg, there is a blank line after $END
 							break;
 						}
-						// else throw an error? "else error = true;" causes incorrect behavior, though
+						// else throw an error? but "else error = true;" causes incorrect behavior
 						else if (0==strncmp(Line,"\0", kMaxLineLength))
 							break;
 						else {
