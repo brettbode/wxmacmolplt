@@ -26,6 +26,7 @@
 #endif
 
 #include <wx/spinctrl.h>
+#include <wx/htmllbox.h>
 #include <vector>
 
 ////@end includes
@@ -144,6 +145,54 @@ class SurfacesWindow;
  * as title, visibility, update button, etc.
  */
 
+class FormattedListBox : public wxHtmlListBox {
+	public:
+		FormattedListBox()
+			: wxHtmlListBox() {
+		}
+
+		FormattedListBox(wxWindow *parent, int id, int style = 0)
+			: wxHtmlListBox(parent, id, wxDefaultPosition, wxDefaultSize,
+							style) {
+			
+#if 0
+			SetMargins(5, 5);
+			SetBackgroundColour(*wxBLUE);
+			SetSelectionBackground(*wxRED);
+#endif
+		}
+
+		void Append(const wxString& item) {
+			items.push_back(item);
+			SetItemCount(items.size());
+			RefreshAll();
+		}
+
+		wxString OnGetItem(size_t n) const {
+			/* std::cout << "items[n]: " << items[n] << std::endl; */
+			return items[n];
+		}
+
+		void Clear() {
+			wxHtmlListBox::Clear();
+			items.clear();
+			SetItemCount(0);
+			RefreshAll();
+		}
+
+		void OnResize(wxSizeEvent& event) {
+			Refresh(false);
+			event.Skip();
+		}
+
+	private:
+		std::vector<wxString> items;
+
+	DECLARE_DYNAMIC_CLASS(FormattedListBox)
+	DECLARE_NO_COPY_CLASS(FormattedListBox)
+	DECLARE_EVENT_TABLE()
+};
+
 class BaseSurfacePane : public wxPanel
 {
 	DECLARE_CLASS(BaseSurfacePane)
@@ -225,34 +274,35 @@ protected:
     DECLARE_EVENT_TABLE()
 };
 
-class OrbSurfacePane
-{
- public:
-  OrbSurfacePane() {}
-  OrbSurfacePane( OrbSurfBase* target, SurfacesWindow* owner);
-  ~OrbSurfacePane();
+class OrbSurfacePane {
+	public:
+		OrbSurfacePane() {}
+		OrbSurfacePane( OrbSurfBase* target, SurfacesWindow* owner);
+		~OrbSurfacePane();
 
- protected:
-  bool UpdateEvent(); 
+	protected:
+		bool UpdateEvent(); 
 
-  //put code that is common for orbital panels
-  void makeMOList(std::vector<wxString>& choice);
-  void makeAOList(std::vector<wxString>& choice);
-  int getOrbSetForOrbPane(std::vector<wxString>& choice);
-  int orbSetChangeEvt(int item, SurfacesWindow * owner);
-  void setFlagOnOrbFormatChange(int itemtype);
+		//put code that is common for orbital panels
+		void makeMOList();
+		void makeAOList();
+		int getOrbSetForOrbPane(std::vector<wxString>& choice);
+		int orbSetChangeEvt(int item, SurfacesWindow * owner);
+		void setFlagOnOrbFormatChange(int itemtype);
 
-  long TargetSet;
-  long OrbOptions; //from mac version
-  long OrbColumnEnergyOrOccupation;
-  long SphericalHarmonics;
-  long PlotOrb;
-  bool PhaseChange;
-  bool coefIsEnabled;
+		long TargetSet;
+		long OrbOptions; //from mac version
+		long OrbColumnEnergyOrOccupation;
+		long SphericalHarmonics;
+		long PlotOrb;
+		bool PhaseChange;
+		bool coefIsEnabled;
+		FormattedListBox *mMOList;
+		FormattedListBox *mOrbCoef;
 
-private:
-  OrbSurfBase* mTarget;
-  SurfacesWindow * myowner;
+	private:
+		OrbSurfBase* mTarget;
+		SurfacesWindow * myowner;
 
 };
 
@@ -385,7 +435,7 @@ class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
     virtual void refreshControls();
 
     void OnOrbSetChoice( wxCommandEvent &event );
-    void OnAtomList( wxCommandEvent &event );
+    void OnMOList( wxCommandEvent &event );
     void OnOrbFormatChoice( wxCommandEvent &event );
     void OnReversePhase(wxCommandEvent &event );
     void OnSphHarmonicChk(wxCommandEvent &event );
@@ -412,8 +462,6 @@ class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
     wxBoxSizer* mSubRightBot2Sizer;
     wxGridSizer* mSubRightBot3Sizer;
 
-    wxListBox* mAtomList;
-    wxListBox* mOrbCoef;
     wxChoice* mOrbFormatChoice;
     wxCheckBox* mSphHarmonicsChk;
     wxCheckBox* mRevPhaseChk;
@@ -440,7 +488,7 @@ public:
     void CreateControls();
 
     void OnOrbFormatChoice( wxCommandEvent &event );
-    void OnAtomList( wxCommandEvent &event );
+    void OnMOList( wxCommandEvent &event );
     void OnOrbSetChoice( wxCommandEvent &event );
     void OnSphHarmonicChk(wxCommandEvent &event );
     void OnReversePhase(wxCommandEvent &event );
@@ -483,8 +531,6 @@ public:
     wxBoxSizer* mSubRightBot4Sizer;
     wxGridSizer* mSubRightBot5Sizer;
 
-    wxListBox* mAtomList;
-    wxListBox* mOrbCoef;
     wxChoice* mOrbFormatChoice;
     wxCheckBox* mSphHarmonicsChk;
     wxCheckBox* mRevPhaseChk;  
