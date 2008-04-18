@@ -780,7 +780,7 @@ void OrbSurfacePane::makeAOList() {
 			}
 
 			if (PlotOrb>=0) { //Is an MO selected?
-				aChoice.Append("<td width=\"40\%\" align=\"right\">");
+				aChoice.Append(wxT("<td width=\"40\%\" align=\"right\">"));
 				if (!(OrbOptions&1)) { //If not displaying AO's
 					const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
 					if (Orbs->size() > 0) {
@@ -809,9 +809,9 @@ void OrbSurfacePane::makeAOList() {
 						}
 					}
 				}
-				aChoice.Append("&nbsp;</td>");
+				aChoice.Append(wxT("&nbsp;</td>"));
 			}
-			aChoice.Append("</tr></table>");
+			aChoice.Append(wxT("</tr></table>"));
 			mOrbCoef->Append(aChoice);
 			/* choice.push_back(aChoice); */
 		}
