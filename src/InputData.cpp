@@ -3369,6 +3369,8 @@ void StatPtGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	if (AlwaysPrintOrbs()) {
 		File->WriteLine("NPRT=1 ", false);
 	}
+	if (GetHessEndFlag())
+		File->WriteLine("HESSEND=.t. ", false);
 
 	File->WriteLine("$END", true);
 }
@@ -3397,7 +3399,8 @@ void StatPtGroup::WriteXML(XMLElement * parent) const {
 	Ele->addChildElement(CML_convert(MMP_IOSPGMaxSteps), line);
 	snprintf(line, kMaxLineLength, "%d", nRecalcHess);
 	Ele->addChildElement(CML_convert(MMP_IOSPGnRecalcHess), line);
-	if (GetStatPoint()) Ele->addChildElement(CML_convert(MMP_IOSPGAlwaysPrintOrbs), trueXML);
+	if (AlwaysPrintOrbs()) Ele->addChildElement(CML_convert(MMP_IOSPGAlwaysPrintOrbs), trueXML);
+	if (GetHessEndFlag()) Ele->addChildElement(CML_convert(MMP_IOSPGHessEnd), trueXML);
 }
 void StatPtGroup::ReadXML(XMLElement * parent) {
 	XMLElementList * children = parent->getChildren();
@@ -3499,6 +3502,10 @@ void StatPtGroup::ReadXML(XMLElement * parent) {
 					case MMP_IOSPGAlwaysPrintOrbs:
 						if (child->getBoolValue(tb))
 							SetAlwaysPrintOrbs(tb);
+						break;
+					case MMP_IOSPGHessEnd:
+						if (child->getBoolValue(tb))
+							SetHessFlag(tb);
 						break;
 				}
 			}

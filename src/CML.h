@@ -441,6 +441,7 @@ enum MMP_IOStatPtGroupNS {
 	MMP_IOSPGMaxSteps,
 	MMP_IOSPGnRecalcHess,
 	MMP_IOSPGAlwaysPrintOrbs,
+	MMP_IOSPGHessEnd,
 	
 	NumberMMPIOStatPtGroupItems
 };

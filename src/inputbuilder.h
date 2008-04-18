@@ -141,6 +141,7 @@ class wxSpinCtrl;
 #define ID_HESS_RECALC_EDIT 10163
 #define ID_STATPT_MODE_EDIT 10240
 #define ID_PRINTORBS_CHECK 10156
+#define ID_HESSEND_CHECK 10264
 #define ID_SUMMARYPANEL 10229
 #define ID_SUMMARY_TITLE 10231
 #define ID_SUMMARY_BASISSET 10232
@@ -458,6 +459,9 @@ public:
 
 	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PRINTORBS_CHECK
 	void OnPrintorbsCheckClick( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_HESSEND_CHECK
+	void OnHessendCheckClick( wxCommandEvent& event );
 
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
 	void OnDefaultsbuttonClick( wxCommandEvent& event );

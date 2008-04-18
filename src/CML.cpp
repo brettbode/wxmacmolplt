@@ -3583,6 +3583,8 @@ const char * CML_convert(MMP_IOStatPtGroupNS t)
 			return "RecalcHessianSteps";
 		case MMP_IOSPGAlwaysPrintOrbs:
 			return "AlwaysPrintOrbitals";
+		case MMP_IOSPGHessEnd:
+			return "HessianAtEnd";
 		default:
             return "invalid";
     }

@@ -885,6 +885,10 @@ enum HessUpdateMethod {
 	
 	NumberStatPtHessUpdateMethods
 };
+/**
+ * Stationary Point related options. Container for options related to searching for a
+ * minima or transition state (OPTIMIZE or SADPOINT).
+ */
 class StatPtGroup {
 	private:
 		float		OptConvergance;
@@ -893,7 +897,12 @@ class StatPtGroup {
 		float		MinTrustRadius;
 		float		StatJumpSize;
 		long		ModeFollow;
-		long		BitOptions;	//1: radius update; 2: Stat. Pt.; 3-5 Hess method; 6: print orbs every iter.
+		/**
+		 * bitfield for a group of true/false flags. The bits include:
+		 * 1: radius update; 2: Stat. Pt.; 3-5 Hess method; 6: print orbs every iter.
+		 * 7: Hessian at stationary point
+		 */
+		long		BitOptions;
 		short		method;
 		short		MaxSteps;
 		short		nRecalcHess;
@@ -932,9 +941,31 @@ class StatPtGroup {
 		static const char * GetHessUpdateMethodText(HessUpdateMethod d);
 		inline bool AlwaysPrintOrbs(void) const {return ((BitOptions & 32) != 0);};
 		inline void SetAlwaysPrintOrbs(bool NewVal) {BitOptions = (BitOptions & 0xDF) + (NewVal ? 32 : 0);};
-
+		/**
+		 * Indicates whether a hessian will be computed on the final optimized structure.
+		 */
+		inline bool GetHessEndFlag(void) const {return ((BitOptions & 64) != 0);};
+		/**
+		 * Set the value of the flag to compute a hessian on the optimized structure.
+		 * @param newValue bool value indicating whether to compute or not.
+		 */
+		inline void SetHessFlag(bool newValue) {BitOptions = (BitOptions & 0xBF) + (newValue ? 64 : 0);};
+	
+		/**
+		 * Output the group options in GAMESS input format.
+		 * @param File The output buffer.
+		 * @param IData Pointer to the main input data class.
+		 */
 		void WriteToFile(BufferFile *File, InputData *IData);
+		/**
+		 Output the group to CML suitable for reading by the ReadXML routine.
+		 @param parent the parent XML tag to append this group to
+		 */
 		void WriteXML(XMLElement * parent) const;
+		/**
+		 Load this groups non-default settings from CML.
+		 @param parent the parent XML tag to append this group from
+		 */
 		void ReadXML(XMLElement * parent);
 };
 class MolDisplayWin;
