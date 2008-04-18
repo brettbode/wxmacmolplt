@@ -597,7 +597,7 @@ void OrbSurfacePane::makeMOList() {
 			char* oneSymLabel;
 
 			for (int theCell = 0; theCell < NumMOs; theCell++) {
-				tmpStr.Printf(wxT("<table width=\"100\%\"><tr><td width=\"20\%\" align=\"right\">%d</td>"), theCell+1); 
+				tmpStr.Printf(wxT("<table width=\"100\%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20\%\" align=\"right\">%d</td>"), theCell+1); 
 
 				tmpStr.Append(wxT("<td width=\"40\%\">"));
 				if (SymLabel) {	//Add the symetry of the orb, if known
@@ -631,7 +631,7 @@ void OrbSurfacePane::makeMOList() {
 						}
 					}
 				}
-				tmpStr.Append(wxT("</td>"));
+				tmpStr.Append(wxT("&nbsp;</td>"));
 
 				wxString temp;
 				tmpStr.Append(wxT("<td width=\"40\%\" align=\"right\">"));
@@ -668,7 +668,7 @@ void OrbSurfacePane::makeMOList() {
 				}
 
 				tmpStr.Append(temp);
-				tmpStr.Append(wxT("</td></tr></table>"));
+				tmpStr.Append(wxT("&nbsp;</td></tr></table>"));
 				mMOList->Append(tmpStr);
 			}
 		}
@@ -715,13 +715,13 @@ void OrbSurfacePane::makeAOList() {
 
 						char label[63];
 						wxString tmpStr;
-						aChoice.Printf(wxT("<table width=\"100\%\"><tr>")); 
+						aChoice.Printf(wxT("<table width=\"100\%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr>")); 
 						int nchar = 0;
 						//punch out the atom # and symbol if this is the 1st function for this atom
 
 						if ((ishell==minshell)&&(theCell==ifunc)) {
 							sprintf(label, "%ld", iatom+1);
-							tmpStr.Printf(wxT("<td width=\"%d\%\">%ld</td>"), percents[0], iatom + 1);
+							tmpStr.Printf(wxT("<td width=\"%d\%\">%ld&nbsp;</td>"), percents[0], iatom + 1);
 							aChoice.Append(tmpStr);
 
 							tmpStr.Printf(_T("<td width=\"%d\%\">"), percents[1]);
@@ -809,7 +809,7 @@ void OrbSurfacePane::makeAOList() {
 						}
 					}
 				}
-				aChoice.Append("</td>");
+				aChoice.Append("&nbsp;</td>");
 			}
 			aChoice.Append("</tr></table>");
 			mOrbCoef->Append(aChoice);

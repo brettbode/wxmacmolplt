@@ -155,8 +155,8 @@ class FormattedListBox : public wxHtmlListBox {
 			: wxHtmlListBox(parent, id, wxDefaultPosition, wxDefaultSize,
 							style) {
 			
+			SetMargins(0, 0);
 #if 0
-			SetMargins(5, 5);
 			SetBackgroundColour(*wxBLUE);
 			SetSelectionBackground(*wxRED);
 #endif
