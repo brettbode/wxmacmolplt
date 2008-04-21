@@ -260,6 +260,7 @@ void MpApp::createMainFrame(const wxString &filename) {
     if(filename.IsEmpty()) {
 	    temp = new MolDisplayWin(wxT("Untitled"));
 	    MolWinList.push_back(temp);
+		temp->Show();
     } else {
 		temp = new MolDisplayWin(filename);
 		MolWinList.push_back(temp);
