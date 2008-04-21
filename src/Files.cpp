@@ -1001,7 +1001,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		bool error = false;
 		char tmpStr[5];
 		// counters for within iterations and overall in this section
-		unsigned long iSymCount, symCount = 0, eigenCount = 0;
+		unsigned long iSymCount, symCount = 0, eigenvecCount = 0;
 
 		// we assume that the number of Basis Functions is the number
 		// coefficients.  Otherwise we should throw an error
@@ -1033,22 +1033,22 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						break;
 				} // got sym line
 				
-				// next come Alpha eigens (Energy; first row of data after syms)
+				// next come Alpha eigenvectors (Energy; first row of data after syms)
 				Buffer->GetLine(Line);
 				lineBytes = strlen(Line);
 				bytesRead = 0;
-				float tmpEigen;
+				float tmpEigenvec;
 				// get a line of the values at a time (should be 5 per line, except possibly 
 				// the last block may have fewer per line)
 				while (bytesRead < lineBytes) {
-					scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpEigen, &bytesConsumed);
+					scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpEigenvec, &bytesConsumed);
 					if (scanCount == 1) {
-						lFrame->Orbs[0]->Energy[eigenCount] = tmpEigen;
+						lFrame->Orbs[0]->Energy[eigenvecCount] = tmpEigenvec;
 						bytesRead += bytesConsumed;
-						eigenCount++;
+						eigenvecCount++;
 					} else
 						break;
-				} //got eigen line
+				} //got eigenvector line
 
 				// now get the Alpha coefficients
 				for (long iLine=0; iLine < nOrbs; iLine++) {
@@ -1092,7 +1092,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		bool error = false;
 		char tmpStr[5];
 		// counters for within iterations and overall in this section
-		unsigned long iSymCount, symCount = 0, eigenCount = 0;
+		unsigned long iSymCount, symCount = 0, eigenvecCount = 0;
 		// we assume that the number of Basis Functions is the number
 		// coefficients.  Otherwise wei should throw an error
 		long nOrbs = MainData->Basis->GetNumBasisFuncs(false);
@@ -1119,22 +1119,22 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						break;
 				} // get sym line
 				
-				// next come Beta eigens (Energy; first row of data after syms)
+				// next come Beta eigenvectors (Energy; first row of data after syms)
 				Buffer->GetLine(Line);
 				lineBytes = strlen(Line);
 				bytesRead = 0;
-				float tmpEigen;
+				float tmpEigenvec;
 				// get a line of the values at a time (should be 5 per line, except possibly 
 				// the last block may have fewer per line)
 				while (bytesRead < lineBytes) {
-					scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpEigen, &bytesConsumed);
+					scanCount = sscanf(&Line[bytesRead], "%f%n", &tmpEigenvec, &bytesConsumed);
 					if (scanCount == 1) {
-						lFrame->Orbs[0]->EnergyB[eigenCount] = tmpEigen;
+						lFrame->Orbs[0]->EnergyB[eigenvecCount] = tmpEigenvec;
 						bytesRead += bytesConsumed;
-						eigenCount++;
+						eigenvecCount++;
 					} else
 						break;
-				} //get eigen line
+				} //get eigenvector line
 
 				// now get the Beta coefficients
 				for (long iLine=0; iLine < nOrbs; iLine++) {
