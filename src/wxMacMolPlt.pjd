@@ -16,12 +16,12 @@
     <bool name="make_unicode_strings">1</bool>
     <bool name="extract_strings">0</bool>
     <string name="user_name">"Brett Bode"</string>
-    <string name="copyright_string">"(c) 2007 Iowa State University"</string>
+    <string name="copyright_string">"(c) 2008 Iowa State University"</string>
     <string name="resource_prefix">""</string>
     <bool name="use_two_step_construction">0</bool>
     <bool name="use_enums">0</bool>
     <string name="current_platform">"&lt;All platforms&gt;"</string>
-    <string name="target_wx_version">"&lt;Any&gt;"</string>
+    <string name="target_wx_version">"2.6.4"</string>
     <string name="cpp_header_comment">"/////////////////////////////////////////////////////////////////////////////
 // Name:        %HEADER-FILENAME%
 // Purpose:     
@@ -135,7 +135,7 @@
         <long name="locked">0</long>
         <string name="template-name">""</string>
         <bool name="dirty">1</bool>
-        <long name="makefile-last-written">0</long>
+        <long name="makefile-last-written">-8519680</long>
         <string name="Compiler name">""</string>
         <string name="Build mode">"Debug"</string>
         <string name="Unicode mode">"ANSI"</string>
@@ -23916,6 +23916,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         <long name="locked">0</long>
                         <string name="created">"18/4/2008"</string>
                         <string name="proxy-type">"wbCheckBoxProxy"</string>
+                        <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnHessendCheckClick|NONE||InputBuilderWindow"</string>
                         <string name="proxy-Id name">"ID_HESSEND_CHECK"</string>
                         <long name="proxy-Id value">10264</long>
                         <string name="proxy-Name">""</string>
@@ -23955,7 +23956,7 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
                         <long name="proxy-Y">-1</long>
                         <long name="proxy-Width">-1</long>
                         <long name="proxy-Height">-1</long>
-                        <string name="proxy-AlignH">"Left"</string>
+                        <string name="proxy-AlignH">"Expand"</string>
                         <string name="proxy-AlignV">"Centre"</string>
                         <long name="proxy-Stretch factor">0</long>
                         <long name="proxy-Border">3</long>

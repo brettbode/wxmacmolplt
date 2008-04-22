@@ -248,13 +248,6 @@ InputBuilderWindow::InputBuilderWindow( wxWindow* parent, wxWindowID id, const w
 }
 
 InputBuilderWindow::~InputBuilderWindow() {
-    //temp
-    //tabMOGuess->Destroy();
-    //tabHessOpts->Destroy();
-    //tabMiscPrefs->Destroy();
-    //tabSCFOpts->Destroy();
-    //tabStatPoint->Destroy();
-    
     delete TmpInputRec;
 }
 
@@ -1418,7 +1411,7 @@ void InputBuilderWindow::CreateControls()
 	itemCheckBox199->SetValue(false);
 	if (InputBuilderWindow::ShowToolTips())
 		itemCheckBox199->SetToolTip(_("Check to automatically compute a hessian for the optimized structure (HSSEND)"));
-	itemBoxSizer165->Add(itemCheckBox199, 0, wxALIGN_LEFT|wxALL, 3);
+	itemBoxSizer165->Add(itemCheckBox199, 0, wxGROW|wxALL, 3);
 
 	listBook->AddPage(itemPanel164, _("Stat. Point"));
 
@@ -1524,24 +1517,9 @@ void InputBuilderWindow::CreateControls()
 
     for(int i = NUM_PANES - 1; i >= 0; i--) {
         tab[i] = listBook->GetPage(i);
-        listBook->RemovePage(i);
-        visibleTab[i] = false;
+        visibleTab[i] = true;
     }
     
-    //wxListView * t = listBook->GetListView();
-	//t->SetWindowStyle(wxLC_REPORT|wxLC_SINGLE_SEL|wxLC_NO_HEADER);
-	//t->SetWindowStyle(wxLC_LIST|wxLC_SINGLE_SEL);
-
-    setPaneVisible(BASIS_PANE,   true);
-    setPaneVisible(CONTROL_PANE, true);
-    setPaneVisible(DATA_PANE,    true);
-	setPaneVisible(MOGUESS_PANE, true);
-    setPaneVisible(SYSTEM_PANE,  true);
-    if(TmpInputRec->Control->UseDFT()) setPaneVisible(DFT_PANE, true);
-	if(TmpInputRec->Control->GetSCFType() <= 4) setPaneVisible(SCFOPTS_PANE, true);
-    setPaneVisible(MISCPREFS_PANE, true);
-    setPaneVisible(SUMMARY_PANE, true);
-
     listBook->SetSelection(1);
 }
 
@@ -1609,6 +1587,7 @@ void InputBuilderWindow::SetupItems() {
 	setPaneVisible(HESSOPTS_PANE, (TmpInputRec->Control->GetRunType() == 3)||(
 				((TmpInputRec->Control->GetRunType() == 3)||(TmpInputRec->Control->GetRunType() == 6))&&
 					(TmpInputRec->StatPt->GetHessMethod() == 3)));
+	Fit();
 }
 
 void InputBuilderWindow::SetupBasisItems() {
