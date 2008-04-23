@@ -18,6 +18,7 @@ wxmacmolplt_SOURCES =                                  \
     energyplotdialog.cpp       energyplotdialog.h      \
     exportoptionsdialog.cpp    exportoptionsdialog.h   \
     Files.cpp                                          \
+    FloatSlider.cpp            FloatSlider.h           \
     Frame.cpp                  Frame.h                 \
     frameenergy.cpp            frameenergy.h           \
     frequenciesdialog.cpp      frequenciesdialog.h     \

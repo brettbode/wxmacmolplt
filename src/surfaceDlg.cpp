@@ -103,7 +103,7 @@ BEGIN_EVENT_TABLE( Orbital3DSurfPane, BaseSurfacePane )
 	EVT_SLIDER (ID_GRID_SIZE_SLIDER, Orbital3DSurfPane::OnGridSizeSld)
 	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
 	EVT_BUTTON (ID_SURFACE_UPDATE_BUT, Orbital3DSurfPane::OnUpdate)
-	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
+	/* EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter) */
 	EVT_BUTTON (ID_SET_PARAM_BUT, Surface3DPane::OnSetParam)
 	EVT_BUTTON (ID_FREE_MEM_BUT, Surface3DPane::OnFreeMem)
 	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
@@ -121,7 +121,7 @@ BEGIN_EVENT_TABLE( General3DSurfPane, BaseSurfacePane )
 	EVT_RADIOBOX (ID_3D_RADIOBOX, Surface3DPane::On3DRadioBox)
 	EVT_CHECKBOX (ID_SMOOTH_CHECKBOX, Surface3DPane::OnSmoothCheck)
 	EVT_SLIDER (ID_CONTOUR_VALUE_SLIDER, General3DSurfPane::OnContourValueSld)
-	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
+	/* EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter) */
 	EVT_TEXT (ID_GENMULTEDIT, General3DSurfPane::OnMultValueEdit)
 	EVT_BUTTON (ID_FREE_MEM_BUT, Surface3DPane::OnFreeMem)
 	EVT_BUTTON (ID_SURFACE_EXPORT_BUT, BaseSurfacePane::OnExport)
@@ -165,7 +165,7 @@ BEGIN_EVENT_TABLE( TEDensity3DSurfPane, BaseSurfacePane )
 	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
 	EVT_CHOICE  (ID_ORB_CHOICE, BaseSurfacePane::OnOrbSetChoice)
 	EVT_SLIDER (ID_CONTOUR_VALUE_SLIDER, Surface3DPane::OnContourValueSld)
-	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
+	/* EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter) */
 	EVT_SLIDER (ID_GRID_SIZE_SLIDER, Surface3DPane::OnGridSizeSld)
 	EVT_CHECKBOX (ID_TED3D_COLOR_SURF_CHECK, TEDensity3DSurfPane::OnUseMEPCheck)
 	EVT_CHECKBOX (ID_USERGB_COLOR_CHECK, TEDensity3DSurfPane::OnRGBColorCheck)
@@ -203,7 +203,7 @@ BEGIN_EVENT_TABLE( MEP3DSurfPane, BaseSurfacePane )
 	EVT_SLIDER (ID_GRID_POINT_SLIDER, BaseSurfacePane::OnGridPointSld)
 	EVT_CHOICE  (ID_ORB_CHOICE, BaseSurfacePane::OnOrbSetChoice)
 	EVT_SLIDER (ID_CONTOUR_VALUE_SLIDER, Surface3DPane::OnContourValueSld)
-	EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
+	/* EVT_TEXT (ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter) */
 	EVT_SLIDER (ID_GRID_SIZE_SLIDER, Surface3DPane::OnGridSizeSld)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_POSITIVE, Surface3DPane::OnPosColorChange)
 	EVT_COMMAND_ENTER(ID_3D_COLOR_NEGATIVE, Surface3DPane::OnNegColorChange)
@@ -1005,9 +1005,7 @@ Surface3DPane::~Surface3DPane() {
 }
 
 void Surface3DPane::setContourValueSld() {
-	float GridMax = mTarget->GetGridMax();
-	mContourValSld->SetValue((short)(100*(ContourValue/((fabs(GridMax)>=0.001)?GridMax:0.25))));
-
+	mContourValSld->SetValue(ContourValue);
 }
 
 void Surface3DPane::On3DRadioBox (wxCommandEvent& event ) {
@@ -1028,43 +1026,51 @@ void Surface3DPane::OnSmoothCheck (wxCommandEvent& event ) {
 }
 
 void Surface3DPane::changeContourValue() {
-	double newVal;
+	float newVal;
 
 	if (mTarget->GetGridMax() > 0.000001 ){
-		wxString tmpStr = mContourValueEdit->GetValue();
-		if (tmpStr.ToDouble(&newVal)) {
-			if (newVal < 0.0) newVal *= -1.0;
-			if (newVal > mTarget->GetGridMax()) 
-				newVal = mTarget->GetGridMax();
+		/* wxString tmpStr = mContourValueEdit->GetValue(); */
+		/* if (tmpStr.ToDouble(&newVal)) { */
+		newVal = mContourValSld->GetValue();
+		if (newVal < 0.0) newVal *= -1.0;
+		if (newVal > mTarget->GetGridMax()) 
+			newVal = mTarget->GetGridMax();
 
-			ContourValue = newVal;
-			setContourValueSld();
-			setUpdateButton();
-		}
+		ContourValue = newVal;
+		/* setContourValueSld(); */
+		setUpdateButton();
+		/* } */
 	}
 }
 
-void Surface3DPane::OnContourValueEnter(wxCommandEvent& event ) {
-	changeContourValue();
-}
-void Surface3DPane::SetContourValueText(void) {
-	wxString tmpStr;
-	tmpStr.Printf(wxT("%.4f"), ContourValue);
-	mContourValueEdit->SetValue(tmpStr);
-}
+/* void Surface3DPane::OnContourValueEnter(wxCommandEvent& event ) { */
+	/* changeContourValue(); */
+/* } */
+
+/* void Surface3DPane::SetContourValueText(void) { */
+	/* wxString tmpStr; */
+	/* tmpStr.Printf(wxT("%.4f"), ContourValue); */
+	/* mContourValueEdit->SetValue(tmpStr); */
+	/* mContourValSld->SetValue(ContourValue); */
+/* } */
+
 void Surface3DPane::SetContourMaxValueText(void) {
-	wxString tmpStr;
-	tmpStr.Printf(wxT("%.4f"), mTarget->GetGridMax());
-	mGridMaxText->SetLabel(tmpStr);
+	/* wxString tmpStr; */
+	/* tmpStr.Printf(wxT("%.4f"), mTarget->GetGridMax()); */
+	/* mGridMaxText->SetLabel(tmpStr); */
+	mContourValSld->SetMax(mTarget->GetGridMax());
 }
+
 void Surface3DPane::OnContourValueSld(wxCommandEvent &event ) {
 	float GridMax = mTarget->GetGridMax();
-	ContourValue = 0.01 * mContourValSld->GetValue() * ((fabs(GridMax)>=0.001)?GridMax:0.25);
+	/* ContourValue = 0.01 * mContourValSld->GetValue() * ((fabs(GridMax)>=0.001)?GridMax:0.25); */
+	ContourValue = mContourValSld->GetValue();
 
-	SetContourValueText();
+	/* SetContourValueText(); */
 
 	setUpdateButton();
 }
+
 void Surface3DPane::OnGridSizeSld(wxCommandEvent &event ) {
 	GridSize = 0.01 * mGridSizeSld->GetValue();
 	setUpdateButton();
@@ -1577,7 +1583,8 @@ void Orbital3DSurfPane::refreshControls() {
 
 	mNumGridPntSld->SetValue(NumGridPoints);
 	mGridSizeSld->SetValue((short)(100*GridSize));
-	mContourValSld->SetValue((short)(100*(ContourValue/((fabs(GridMax)>=0.001)?GridMax:0.25))));
+	/* mContourValSld->SetValue((100*(ContourValue/((fabs(GridMax)>=0.001)?GridMax:0.25)))); */
+	mContourValSld->SetValue(ContourValue);
 	m3DRdoBox->SetSelection(1-UseSolidSurface);
 	mSmoothChkBox->SetValue(UseNormals);
 	mSphHarmonicsChk->SetValue(SphericalHarmonics);
@@ -1649,12 +1656,16 @@ void Orbital3DSurfPane::CreateControls() {
 			(short) (100*mTarget->GetGridSize()), 0, 300,
 			wxDefaultPosition, wxSize(155,wxDefaultCoord),
 			wxSL_AUTOTICKS | wxSL_LABELS);
-	mContourValSld = new wxSlider( this, ID_CONTOUR_VALUE_SLIDER, 
-			(short)(100*(mTarget->GetContourValue()/((fabs(GridMax)>=0.001)?GridMax:0.25))), 
-			0, 100, wxDefaultPosition, 
-			wxSize(155,wxDefaultCoord));
+	/* mContourValSld = new wxSlider( this, ID_CONTOUR_VALUE_SLIDER,  */
+			/* (short)(100*(mTarget->GetContourValue()/((fabs(GridMax)>=0.001)?GridMax:0.25))),  */
+			/* 0, 100, wxDefaultPosition,  */
+			/* wxSize(155,wxDefaultCoord)); */
+	mContourValSld = new FloatSlider(this, ID_CONTOUR_VALUE_SLIDER,
+									 mTarget->GetContourValue() /
+									 	((fabs(GridMax)>=0.001)?GridMax:0.25),
+									 0.0f, 100.0f);
 
-	mContourValueEdit = new wxTextCtrl( this, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+	/* mContourValueEdit = new wxTextCtrl( this, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER); */
 
 	wxStaticText * label4 = new wxStaticText( this, wxID_ANY,
 			_T("Transparency:"),
@@ -1763,24 +1774,24 @@ void Orbital3DSurfPane::CreateControls() {
 	leftBottomSizer->Add(mSubLeftBot1Sizer, 1, wxEXPAND | wxALL, 5);
 	leftBottomSizer->Add(mSubLeftBot2Sizer, 1, wxEXPAND | wxALL, 5);
 
-	mSubRightBot0Sizer = new wxBoxSizer(wxHORIZONTAL);
-	mSubRightBot0Sizer->Add(mContourValueEdit);
+	/* mSubRightBot0Sizer = new wxBoxSizer(wxHORIZONTAL); */
+	/* mSubRightBot0Sizer->Add(mContourValueEdit); */
 
-	wxString tmpStr;
-	tmpStr.Printf(wxT("%.4f"), ContourValue);
-	mContourValueEdit->SetValue(tmpStr);
+	/* wxString tmpStr; */
+	/* tmpStr.Printf(wxT("%.4f"), ContourValue); */
+	/* mContourValueEdit->SetValue(tmpStr); */
 
-	mSubRightBot0Sizer->Add(30,30);
+	/* mSubRightBot0Sizer->Add(30,30); */
 
-	mGridMinText = new wxStaticText(this, wxID_ANY, _T("0"), wxDefaultPosition, wxDefaultSize);
-	mSubRightBot0Sizer->Add(mGridMinText, 0, wxALIGN_TOP | wxALL, 3);
-	mSubRightBot0Sizer->Add(100,30);
+	/* mGridMinText = new wxStaticText(this, wxID_ANY, _T("0"), wxDefaultPosition, wxDefaultSize); */
+	/* mSubRightBot0Sizer->Add(mGridMinText, 0, wxALIGN_TOP | wxALL, 3); */
+	/* mSubRightBot0Sizer->Add(100,30); */
 
-	tmpStr.Printf(wxT("%.4f"), GridMax);
-	mGridMaxText = new wxStaticText(this, wxID_ANY, tmpStr, 
-			wxDefaultPosition, wxDefaultSize);
-	mSubRightBot0Sizer->Add(mGridMaxText, 
-			0, wxALIGN_TOP | wxALL, 3);
+	/* tmpStr.Printf(wxT("%.4f"), GridMax); */
+	/* mGridMaxText = new wxStaticText(this, wxID_ANY, tmpStr,  */
+			/* wxDefaultPosition, wxDefaultSize); */
+	/* mSubRightBot0Sizer->Add(mGridMaxText,  */
+			/* 0, wxALIGN_TOP | wxALL, 3); */
 
 	mSubRightBot1Sizer = new wxBoxSizer(wxHORIZONTAL);
 	mSubRightBot1Sizer->Add(new wxStaticText(this, wxID_ANY,
@@ -1808,7 +1819,7 @@ void Orbital3DSurfPane::CreateControls() {
 	mSubRightBot5Sizer->Add(mUpdateBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	mUpdateBut->SetDefault();
 
-	rightBottomSizer->Add(mSubRightBot0Sizer);
+	/* rightBottomSizer->Add(mSubRightBot0Sizer); */
 	rightBottomSizer->Add(20, 20);
 	rightBottomSizer->Add(mSubRightBot1Sizer);
 	rightBottomSizer->Add(mSubRightBot2Sizer);
@@ -1837,11 +1848,14 @@ bool Orbital3DSurfPane::UpdateNeeded(void) {
 	bool result = false;
 
 	double newVal;
-	wxString tmpStr = mContourValueEdit->GetValue();
-	if (!tmpStr.ToDouble(&newVal)) {
-		tmpStr.Printf(wxT("%.4f"), ContourValue);
-		mContourValueEdit->SetValue(tmpStr);
-	} else ContourValue = newVal;
+	/* wxString tmpStr = mContourValueEdit->GetValue(); */
+	/* if (!tmpStr.ToDouble(&newVal)) { */
+		/* tmpStr.Printf(wxT("%.4f"), ContourValue); */
+		/* mContourValueEdit->SetValue(tmpStr); */
+	/* } else { */
+		/* ContourValue = newVal; */
+	/* } */
+	ContourValue = mContourValSld->GetValue();
 
 	if (PlotOrb >= 0) {	//Don't update unless a valid orbital is chosen
 		if (PlotOrb != mTarget->GetTargetOrb()) result=true;
@@ -1953,12 +1967,13 @@ void Orbital3DSurfPane::OnReversePhase(wxCommandEvent &event ) {
 
 void Orbital3DSurfPane::OnContourValueSld(wxCommandEvent &event ) {
 	float GridMax = mTarget->GetGridMax();
-	ContourValue = 0.01 * mContourValSld->GetValue() * ((fabs(GridMax)>=0.001)?GridMax:0.25);
+	/* ContourValue = 0.01 * mContourValSld->GetValue() * ((fabs(GridMax)>=0.001)?GridMax:0.25); */
+	ContourValue = mContourValSld->GetValue();
 	//mTarget->SetContourValue(ContourValue);
 
-	wxString tmpStr;
-	tmpStr.Printf(wxT("%.4f"), ContourValue);
-	mContourValueEdit->SetValue(tmpStr);
+	/* wxString tmpStr; */
+	/* tmpStr.Printf(wxT("%.4f"), ContourValue); */
+	/* mContourValueEdit->SetValue(tmpStr); */
 
 	setUpdateButton();
 }
@@ -2107,9 +2122,10 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event ) {
 
 	float GridMax = mTarget->GetGridMax();
 
-	wxString tmpStr;
-	tmpStr.Printf(wxT("%.4f"), GridMax);
-	mGridMaxText->SetLabel(tmpStr);
+	/* wxString tmpStr; */
+	/* tmpStr.Printf(wxT("%.4f"), GridMax); */
+	/* mGridMaxText->SetLabel(tmpStr); */
+	mContourValSld->SetMax(GridMax);
 
 	setContourValueSld();
 
@@ -2238,16 +2254,20 @@ void General3DSurfPane::refreshControls() {
 	float GridMin = mTarget->GetGridMin();
 	if (ContourPosNeg) GridMin = 0.0;
 	float Range = GridMax - GridMin;
-	if (fabs(Range)< ContourValue) Range = ContourValue;
+	if (fabs(Range) < ContourValue) Range = ContourValue;
 
-	mContourValSld->SetValue((short) (100*((ContourValue - GridMin)/Range)));
+	/* std::cout << "100*((ContourValue - GridMin)/Range)): " << 100*((ContourValue - GridMin)/Range) << std::endl; */
+	/* mContourValSld->SetValue((short) (100*((ContourValue - GridMin)/Range))); */
+	mContourValSld->SetValue(ContourValue);
 	wxString tmpStr;
-	tmpStr.Printf(wxT("%.4f"), ContourValue);
-	mContourValueEdit->SetValue(tmpStr);
-	tmpStr.Printf(wxT("%.4f"), GridMax);
-	mGridMaxText->SetLabel(tmpStr);
-	tmpStr.Printf(wxT("%.4f"), GridMin);
-	mGridMinText->SetLabel(tmpStr);
+	/* tmpStr.Printf(wxT("%.4f"), ContourValue); */
+	/* mContourValueEdit->SetValue(tmpStr); */
+	/* tmpStr.Printf(wxT("%.4f"), GridMax); */
+	/* mGridMaxText->SetLabel(tmpStr); */
+	mContourValSld->SetMax(GridMax);
+	/* tmpStr.Printf(wxT("%.4f"), GridMin); */
+	/* mGridMinText->SetLabel(tmpStr); */
+	mContourValSld->SetMin(GridMin);
 
 	tmpStr.Printf(wxT("%.4f"), MultValue);
 	mGenMultValue->SetValue(tmpStr);
@@ -2309,21 +2329,22 @@ void General3DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText14 = new wxStaticText( Gen3DPanel, wxID_STATIC, _("Contour Value:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer13->Add(itemStaticText14, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mContourValueEdit = new wxTextCtrl( Gen3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer13->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	/* mContourValueEdit = new wxTextCtrl( Gen3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 ); */
+	/* itemBoxSizer13->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5); */
 
 	wxBoxSizer* itemBoxSizer16 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer12->Add(itemBoxSizer16, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-	mContourValSld = new wxSlider( Gen3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL );
+	/* mContourValSld = new wxSlider( Gen3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL ); */
+	mContourValSld = new FloatSlider(Gen3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f);
 	itemBoxSizer16->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
 
-	wxBoxSizer* itemBoxSizer18 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer16->Add(itemBoxSizer18, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5);
-	mGridMinText = new wxStaticText( Gen3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
-	itemBoxSizer18->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	/* wxBoxSizer* itemBoxSizer18 = new wxBoxSizer(wxHORIZONTAL); */
+	/* itemBoxSizer16->Add(itemBoxSizer18, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5); */
+	/* mGridMinText = new wxStaticText( Gen3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT ); */
+	/* itemBoxSizer18->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
 
-	mGridMaxText = new wxStaticText( Gen3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-	itemBoxSizer18->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	/* mGridMaxText = new wxStaticText( Gen3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT ); */
+	/* itemBoxSizer18->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
 
 	wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer21, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
@@ -2462,12 +2483,13 @@ void General3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	float GridMin = mTarget->GetGridMin();
 	if (ContourPosNeg) GridMin = 0.0;
 	float Range = GridMax - GridMin;
-	if (fabs(Range)< ContourValue) Range = ContourValue;
+	if (fabs(Range) < ContourValue) Range = ContourValue;
 
-	mContourValSld->SetValue((short) (100*((ContourValue-GridMin)/Range)));
-	wxString tmpStr;
-	tmpStr.Printf(wxT("%.4f"), ContourValue);
-	mContourValueEdit->SetValue(tmpStr);
+	mContourValSld->SetValue(ContourValue);
+	/* mContourValSld->SetValue((100*((ContourValue-GridMin)/Range))); */
+	/* wxString tmpStr; */
+	/* tmpStr.Printf(wxT("%.4f"), ContourValue); */
+	/* mContourValueEdit->SetValue(tmpStr); */
 
 	UpdateTest = false;
 	setUpdateButton();
@@ -2493,11 +2515,12 @@ void General3DSurfPane::OnContourValueSld(wxCommandEvent &event ) {
 	float Range = GridMax - GridMin;
 	if (fabs(Range)< ContourValue) Range = ContourValue;
 
-	ContourValue = GridMin + (0.01 * mContourValSld->GetValue() * Range);
+	/* ContourValue = GridMin + (0.01 * mContourValSld->GetValue() * Range); */
+	ContourValue = mContourValSld->GetValue();
 
-	wxString tmpStr;
-	tmpStr.Printf(wxT("%.4f"), ContourValue);
-	mContourValueEdit->SetValue(tmpStr);
+	/* wxString tmpStr; */
+	/* tmpStr.Printf(wxT("%.4f"), ContourValue); */
+	/* mContourValueEdit->SetValue(tmpStr); */
 
 	setUpdateButton();
 }
@@ -3126,6 +3149,7 @@ TEDensity3DSurfPane::TEDensity3DSurfPane( wxWindow* parent, TEDensity3DSurface* 
 TEDensity3DSurfPane::~TEDensity3DSurfPane() {
 
 }
+
 void TEDensity3DSurfPane::TargetToPane(void) {
 	mTarget->GetPosColor(&PosColor);
 	mTarget->GetNegColor(&NegColor);
@@ -3144,11 +3168,12 @@ void TEDensity3DSurfPane::TargetToPane(void) {
 	MaxMEPValue = mTarget->GetMaxSurfaceValue();
 	UpdateTest = false;
 }
+
 void TEDensity3DSurfPane::refreshControls() {
 	mOrbSetChoice->SetSelection(TargetOrbSet);
-	SetContourValueText();
-	setContourValueSld();
+	/* SetContourValueText(); */
 	SetContourMaxValueText();
+	setContourValueSld();
 
 	mOrbColor1->setColor(&PosColor);
 	mOrbColor2->setColor(&NegColor);
@@ -3238,7 +3263,7 @@ bool TEDensity3DSurfPane::UpdateNeeded(void) {
 }
 void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	SetMaxMEPValueText();
-	SetContourValueText();
+	/* SetContourValueText(); */
 
 	//only update the grid if needed
 	bool updateGrid=UpdateTest, updateContour=false, updateMEP=false;
@@ -3406,8 +3431,8 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	SetupContourSlider();
 	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DExportButton, target->ExportPossible());
 	*/
-	setContourValueSld();
 	SetContourMaxValueText();
+	setContourValueSld();
 	UpdateTest = false;
 	setUpdateButton();
 
@@ -3455,21 +3480,22 @@ void TEDensity3DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText104 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Contour Value:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer103->Add(itemStaticText104, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mContourValueEdit = new wxTextCtrl( TED3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer103->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	/* mContourValueEdit = new wxTextCtrl( TED3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 ); */
+	/* itemBoxSizer103->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5); */
 
 	wxBoxSizer* itemBoxSizer106 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer102->Add(itemBoxSizer106, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3);
-	mContourValSld = new wxSlider( TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL );
+	/* mContourValSld = new wxSlider( TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL ); */
+	mContourValSld = new FloatSlider(TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f);
 	itemBoxSizer106->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
 
-	wxBoxSizer* itemBoxSizer108 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer106->Add(itemBoxSizer108, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5);
-	mGridMinText = new wxStaticText( TED3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
-	itemBoxSizer108->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	/* wxBoxSizer* itemBoxSizer108 = new wxBoxSizer(wxHORIZONTAL); */
+	/* itemBoxSizer106->Add(itemBoxSizer108, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5); */
+	/* mGridMinText = new wxStaticText( TED3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT ); */
+	/* itemBoxSizer108->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
 
-	mGridMaxText = new wxStaticText( TED3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-	itemBoxSizer108->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	/* mGridMaxText = new wxStaticText( TED3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT ); */
+	/* itemBoxSizer108->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
 
 	wxBoxSizer* itemBoxSizer111 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer111, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
@@ -3901,9 +3927,9 @@ void MEP3DSurfPane::TargetToPane(void) {
 }
 void MEP3DSurfPane::refreshControls() {
 	mOrbSetChoice->SetSelection(TargetOrbSet);
-	SetContourValueText();
-	setContourValueSld();
+	/* SetContourValueText(); */
 	SetContourMaxValueText();
+	setContourValueSld();
 
 	mOrbColor1->setColor(&PosColor);
 	mOrbColor2->setColor(&NegColor);
@@ -3946,7 +3972,7 @@ bool MEP3DSurfPane::UpdateNeeded(void) {
 	return result;
 }
 void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
-	SetContourValueText();
+	/* SetContourValueText(); */
 
 	//only update the grid if needed
 	bool updateGrid=UpdateTest, updateContour=false;
@@ -4089,8 +4115,8 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	SetupContourSlider();
 	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DExportButton, target->ExportPossible());
 	*/
-	setContourValueSld();
 	SetContourMaxValueText();
+	setContourValueSld();
 	UpdateTest = false;
 	setUpdateButton();
 
@@ -4139,21 +4165,22 @@ void MEP3DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText179 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Contour Value:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer178->Add(itemStaticText179, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mContourValueEdit = new wxTextCtrl( MEP3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer178->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	/* mContourValueEdit = new wxTextCtrl( MEP3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 ); */
+	/* itemBoxSizer178->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5); */
 
 	wxBoxSizer* itemBoxSizer181 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer177->Add(itemBoxSizer181, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3);
-	mContourValSld = new wxSlider( MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL );
+	/* mContourValSld = new wxSlider( MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL ); */
+	mContourValSld = new FloatSlider(MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f);
 	itemBoxSizer181->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
 
-	wxBoxSizer* itemBoxSizer183 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer181->Add(itemBoxSizer183, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5);
-	mGridMinText = new wxStaticText( MEP3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT );
-	itemBoxSizer183->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	/* wxBoxSizer* itemBoxSizer183 = new wxBoxSizer(wxHORIZONTAL); */
+	/* itemBoxSizer181->Add(itemBoxSizer183, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5); */
+	/* mGridMinText = new wxStaticText( MEP3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT ); */
+	/* itemBoxSizer183->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
 
-	mGridMaxText = new wxStaticText( MEP3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
-	itemBoxSizer183->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	/* mGridMaxText = new wxStaticText( MEP3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT ); */
+	/* itemBoxSizer183->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
 
 	wxBoxSizer* itemBoxSizer186 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer186, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);

@@ -29,6 +29,7 @@
 #include <wx/htmllbox.h>
 #include <vector>
 
+#include "FloatSlider.h"
 ////@end includes
 
 /*!
@@ -378,7 +379,7 @@ public:
 
   void On3DRadioBox (wxCommandEvent& event );
   void OnSmoothCheck (wxCommandEvent& event );
-  void OnContourValueEnter(wxCommandEvent& event );
+  /* void OnContourValueEnter(wxCommandEvent& event ); */
   void OnFreeMem(wxCommandEvent& event );
   void OnPosColorChange(wxCommandEvent & event);
   void OnNegColorChange(wxCommandEvent & event);
@@ -394,8 +395,9 @@ public:
 
 protected:
   wxSlider* mGridSizeSld;
-  wxSlider* mContourValSld;
-  wxTextCtrl* mContourValueEdit;
+  /* wxSlider* mContourValSld; */
+  FloatSlider* mContourValSld;
+  /* wxTextCtrl* mContourValueEdit; */
   wxStaticText* mGridMinText;
   wxStaticText* mGridMaxText;
   colorArea* mOrbColor1;
