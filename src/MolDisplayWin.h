@@ -511,18 +511,18 @@ class MolDisplayWin : public wxFrame {
 		long OpenMolPltFile(BufferFile *Buffer);
 		long OpenMoldenFile(BufferFile * Buffer);
 		/**
-		 Open an MKL format file. 
+		 Open a Molekel or ".MKL" format file. 
 		 \param Buffer The buffer connected to the MKL file.
 		 */
 		long OpenMKLFile(BufferFile * Buffer);
 		long ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos);
 		/**
-		 Open a MOPAC MOP file.
+		 Open a MOPAC MOP output or ".MOP" file.
 		 \param Buffer The buffer connected to the MOP file.
 		 */
 		long OpenMOPFile(BufferFile * Buffer);
 		/**
-		 Open a MOPAC ARC or archive file.
+		 Open a MOPAC archive or ".ARC" file.
 		 \param Buffer The buffer connected to the ARC file.
 		 */
 		long OpenARCFile(BufferFile * Buffer);

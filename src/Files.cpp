@@ -764,7 +764,7 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	// buffer line for text to be scanned while parsing
 	char Line[kMaxLineLength];
-	// number of atomes in in the structure described by this file
+	// number of atomes in the structure described by this file
 	long nAtoms = 0;
 	// Placeholders for traversing file sections in Buffer
 	long startOfSection = 0;
@@ -1356,6 +1356,18 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
   * BufferFile operations.
 */
 long MolDisplayWin::OpenMOPFile(BufferFile * Buffer) {
+	// buffer line for text to be scanned while parsing
+	char Line[kMaxLineLength];
+	// number of atomes in the structure described by this file
+	long nAtoms = 0;
+	// counters for line-by-line text input:
+	// # of tokens sucessfully read in a sscanf call, # bytes total in line, 
+	// current position in line, and the # of bytes read through one sscanf call
+	int scanCount, lineBytes, bytesRead, bytesConsumed;
+	
+	ProgressInd->ChangeText("Reading MKL file...");
+	Frame * lFrame = MainData->cFrame;
+	
 	return 0;
 }
 /**
