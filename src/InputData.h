@@ -84,6 +84,7 @@
 #define kDFTGridFuncPopup		2
 #define kDFTGridFreeFuncPopup	4
 
+/** enum for the set of GAMESS run types. */
 enum TypeOfRun {
 	InvalidRunType=0,
 	Energy=1,
@@ -98,6 +99,7 @@ enum TypeOfRun {
 	GradExtrRun,
 	DRCRun,
 	SurfaceRun,
+	G3MP2,
 	PropRun,
 	MorokumaRun,
 	TransitnRun,
@@ -218,6 +220,10 @@ class ControlGroup {
 		CIRunType SetCIType(const char * CIText);
 		TypeOfRun SetRunType(const TypeOfRun & NewRunType);
 		TypeOfRun SetRunType(const char *RunText);
+		/** Routine to convert the TypeOfRun enum into a char string containing
+		 the standard GAMESS Run type.
+		 @param r The TypeOfRun identifier
+		 */
 		static const char * GetGAMESSRunText(const TypeOfRun & r);
 		inline TypeOfRun GetRunType(void) const {return RunType;};
 		short GetExeType(void);

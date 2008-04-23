@@ -14121,7 +14121,7 @@ mass-weighted cartesian space as shown."</string>
                             <string name="proxy-Implementation filename">""</string>
                             <string name="proxy-Header filename">""</string>
                             <string name="proxy-Member variable name">"runChoice"</string>
-                            <string name="proxy-Strings">"Energy|Gradient|Hessian|Optimization|Trudge|Saddle Point|Min. Energy Crossing|IRC|Molecular Dynamics|Gradient Extremal|DRC|Energy Surface|Properties|Morokuma|Radiative Transition mom.|Spin Orbit|Finite Electric Field|TDHF|extended TDHF|Global Optimization|VSCF|FMO Optimization|Raman Intensities|NMR|Make EFP|Free state FMO"</string>
+                            <string name="proxy-Strings">"Energy|Gradient|Hessian|Optimization|Trudge|Saddle Point|Min. Energy Crossing|IRC|Molecular Dynamics|Gradient Extremal|DRC|Energy Surface|G3MP2|Properties|Morokuma|Radiative Transition mom.|Spin Orbit|Finite Electric Field|TDHF|extended TDHF|Global Optimization|VSCF|FMO Optimization|Raman Intensities|NMR|Make EFP|Free state FMO"</string>
                             <string name="proxy-Initial value">"Energy"</string>
                             <string name="proxy-Help text">""</string>
                             <string name="proxy-Tooltip text">""</string>

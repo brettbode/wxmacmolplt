@@ -48,7 +48,7 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
 			if (Control) Control->WriteToFile(buffer, this, lData->GetNumElectrons());
 			if (DFT) DFT->WriteToFile(buffer, this);
 			if (System) System->WriteToFile(buffer);
-			if (Basis) BasisTest = Basis->WriteToFile(buffer, lData);
+			if (Basis && (Control->GetRunType() != G3MP2)) BasisTest = Basis->WriteToFile(buffer, lData);
 			if (Guess) Guess->WriteToFile(buffer, this, lData);
 			if (SCF) SCF->WriteToFile(buffer, this);
 			if (MP2) MP2->WriteToFile(buffer, this);

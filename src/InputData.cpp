@@ -266,6 +266,7 @@ short ControlGroup::GetMPLevel(void) const {	//return the appropriate MP value b
 		(RunType!=SadPointRun)&&(RunType!=IRCRun)&&(RunType!=GradExtrRun)&&(RunType!=DRCRun)) result=(MPLevelCIType & 0x0F);
 	if (MPLevelCIType & 0xF0) result = -1;	//deactivate MP2 when CI is requested
 	if (GetCCType() != CC_None) result = -1;
+	if (GetRunType() == G3MP2) result = -1;
 	return result;
 }
 CIRunType ControlGroup::SetCIType(CIRunType NewVal) {
@@ -331,6 +332,8 @@ const char * ControlGroup::GetGAMESSRunText(const TypeOfRun & r) {
 			return "DRC";
 		case SurfaceRun:
 			return "SURFACE";
+		case G3MP2:
+			return "G3MP2";
 		case PropRun:
 			return "PROP";
 		case MorokumaRun:
@@ -2779,8 +2782,9 @@ void HessianGroup::WriteToFile(BufferFile *File, InputData *IData) {
 
 		//first determine wether or not the hessian group needs to be punched
 		//punch for hessians and optimize/sadpoint runs using Hess=Calc
-	if (IData->Control->GetRunType() == 3) method = true;
-	else if ((IData->Control->GetRunType() == 4)||(IData->Control->GetRunType() == 6)) {
+	if ((IData->Control->GetRunType() == HessianRun)||
+		(IData->Control->GetRunType() == G3MP2)) method = true;
+	else if ((IData->Control->GetRunType() == OptimizeRun)||(IData->Control->GetRunType() == SadPointRun)) {
 		if (IData->StatPt) {
 			if (IData->StatPt->GetHessMethod() == 3) method = true;
 		}
@@ -2789,7 +2793,7 @@ void HessianGroup::WriteToFile(BufferFile *File, InputData *IData) {
 
 	bool AnalyticPoss = (((IData->Control->GetSCFType() == 1)||(IData->Control->GetSCFType() == 3)||
 						  (IData->Control->GetSCFType() == 4)||(IData->Control->GetSCFType() == 0))&&
-						 (IData->Control->GetMPLevel() == 0));
+						 (IData->Control->GetMPLevel() <= 0));
 	method = GetAnalyticMethod() && AnalyticPoss;
 		//Punch the group label
 	File->WriteLine(" $FORCE ", false);
@@ -3317,7 +3321,8 @@ void StatPtGroup::WriteToFile(BufferFile *File, InputData *IData) {
 
 	short runType = IData->Control->GetRunType();
 		//first determine wether or not the statpt group needs to be punched
-	if ((runType != 4)&&(runType != 6)) return;	//only punch for optimize and sadpoint runs
+	if ((runType != OptimizeRun)&&(runType != SadPointRun)&&
+		(runType != G3MP2)) return;	//only punch for optimize and sadpoint runs
 
 		//Punch the group label
 	File->WriteLine(" $STATPT ", false);

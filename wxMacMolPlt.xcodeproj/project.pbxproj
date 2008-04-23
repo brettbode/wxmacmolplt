@@ -561,6 +561,10 @@
 		8B9B48620D0F3E8700CE0EDF /* solvents.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B932BC60D0A45F900DACA21 /* solvents.cml */; };
 		8B9B48630D0F3E8800CE0EDF /* solvents.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B932BC60D0A45F900DACA21 /* solvents.cml */; };
 		8B9B48640D0F3E8800CE0EDF /* solvents.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B932BC60D0A45F900DACA21 /* solvents.cml */; };
+		8BA56CA10DBFC97D00B8F40C /* FloatSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */; };
+		8BA56CA20DBFC97D00B8F40C /* FloatSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */; };
+		8BA56CA30DBFC97D00B8F40C /* FloatSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */; };
+		8BA56CA40DBFC97D00B8F40C /* FloatSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */; };
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
 		8BDC58C20CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */; };
@@ -851,6 +855,8 @@
 		8B932BC60D0A45F900DACA21 /* solvents.cml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = solvents.cml; path = resources/solvents.cml; sourceTree = "<group>"; };
 		8B9B48520D0F37BD00CE0EDF /* amino_acids.cml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = amino_acids.cml; path = resources/amino_acids.cml; sourceTree = "<group>"; };
 		8B9B485A0D0F3CF000CE0EDF /* organics.cml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = organics.cml; path = resources/organics.cml; sourceTree = "<group>"; };
+		8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FloatSlider.cpp; path = src/FloatSlider.cpp; sourceTree = "<group>"; };
+		8BA56CA00DBFC97D00B8F40C /* FloatSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FloatSlider.h; path = src/FloatSlider.h; sourceTree = "<group>"; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
 		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
 		8BD5BA820A41E01800FF9CAE /* inputbuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = inputbuilder.cpp; path = src/inputbuilder.cpp; sourceTree = "<group>"; };
@@ -1251,6 +1257,8 @@
 				8BDC58C10CB2A965000BE0A6 /* changeatomorderdialog.h */,
 				8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */,
 				8B6C7BFE0A24E9E800B7358F /* wxMolGraph.h */,
+				8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */,
+				8BA56CA00DBFC97D00B8F40C /* FloatSlider.h */,
 				8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */,
 				8B6075B00A1A34B1008CC9FD /* printoptions.h */,
 				1652DA5009D0B12600B7783F /* Progress.cpp */,
@@ -1594,6 +1602,7 @@
 				8B396E710C70AA8C009690AF /* build_palette.cpp in Sources */,
 				8B24B31E0CA0731B00E92838 /* preview_canvas.cpp in Sources */,
 				8BDC58C20CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */,
+				8BA56CA40DBFC97D00B8F40C /* FloatSlider.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1730,6 +1739,7 @@
 				8B162E860D75C12600975533 /* build_palette.cpp in Sources */,
 				8B162E870D75C12600975533 /* preview_canvas.cpp in Sources */,
 				8B162E880D75C12600975533 /* changeatomorderdialog.cpp in Sources */,
+				8BA56CA10DBFC97D00B8F40C /* FloatSlider.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1866,6 +1876,7 @@
 				8B396E720C70AA8C009690AF /* build_palette.cpp in Sources */,
 				8B24B31F0CA0731B00E92838 /* preview_canvas.cpp in Sources */,
 				8BDC58C30CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */,
+				8BA56CA20DBFC97D00B8F40C /* FloatSlider.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2002,6 +2013,7 @@
 				8B396E730C70AA8C009690AF /* build_palette.cpp in Sources */,
 				8B24B3200CA0731B00E92838 /* preview_canvas.cpp in Sources */,
 				8BDC58C40CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */,
+				8BA56CA30DBFC97D00B8F40C /* FloatSlider.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2204,7 +2216,7 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
-				INFOPLIST_FILE = "/Users/brett/software/wxMacMolPlt/resources/Info copy.plist";
+				INFOPLIST_FILE = /Users/brett/software/wxMacMolPlt/resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
@@ -2238,6 +2250,7 @@
 					"-lwxtiffd-2.9",
 					"-lwxjpegd-2.9",
 					"-lwxpngd-2.9",
+					"-lwx_macud_html-2.9",
 					"-lz",
 					"-lpthread",
 					"-liconv",

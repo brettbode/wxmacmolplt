@@ -595,6 +595,7 @@ void InputBuilderWindow::CreateControls()
 	runChoiceStrings.Add(_("Gradient Extremal"));
 	runChoiceStrings.Add(_("DRC"));
 	runChoiceStrings.Add(_("Energy Surface"));
+	runChoiceStrings.Add(_("G3MP2"));
 	runChoiceStrings.Add(_("Properties"));
 	runChoiceStrings.Add(_("Morokuma"));
 	runChoiceStrings.Add(_("Radiative Transition mom."));
@@ -1582,11 +1583,15 @@ void InputBuilderWindow::SetupItems() {
     SetupStatPointItems();
     SetupSummaryItems();
 
-	setPaneVisible(STATPOINT_PANE, ((TmpInputRec->Control->GetRunType() == 4)||(TmpInputRec->Control->GetRunType() == 6)));
-	setPaneVisible(MP2OPTS_PANE, (TmpInputRec->Control->GetMPLevel() == 2));
-	setPaneVisible(HESSOPTS_PANE, (TmpInputRec->Control->GetRunType() == 3)||(
-				((TmpInputRec->Control->GetRunType() == 3)||(TmpInputRec->Control->GetRunType() == 6))&&
-					(TmpInputRec->StatPt->GetHessMethod() == 3)));
+	setPaneVisible(BASIS_PANE, (TmpInputRec->Control->GetRunType() != G3MP2));
+	setPaneVisible(STATPOINT_PANE, ((TmpInputRec->Control->GetRunType() == OptimizeRun)||
+									(TmpInputRec->Control->GetRunType() == SadPointRun)||
+									(TmpInputRec->Control->GetRunType() == G3MP2)));
+	setPaneVisible(MP2OPTS_PANE, (TmpInputRec->Control->GetMPLevel() == 2)||
+								(TmpInputRec->Control->GetRunType()==G3MP2));
+	setPaneVisible(HESSOPTS_PANE, (TmpInputRec->Control->GetRunType() == HessianRun)||
+				   (TmpInputRec->Control->GetRunType() == G3MP2)||
+				((TmpInputRec->Control->GetRunType() == SadPointRun)&&(TmpInputRec->StatPt->GetHessMethod() == 3)));
 	Fit();
 }
 
@@ -1699,97 +1704,98 @@ void InputBuilderWindow::SetupControlItems() {
     
     int itemValue = 0;
     
-    itemValue = TmpInputRec->Control->GetRunType();
-    if(itemValue == 0) itemValue = 1;
-    runChoice->SetSelection(itemValue - 1);
-    
-    if(scft == 0) {
-        if(NumElectrons & 1) {
-            scft = 3;
-        }
-        else {
-            scft = 1;
-        }
-    }
-    scfChoice->SetSelection(scft - 1);
+	TypeOfRun runType = TmpInputRec->Control->GetRunType();
+    if(runType == InvalidRunType) runType = Energy;
+    runChoice->SetSelection(runType - 1);
+
+	if (runType == G3MP2) {
+		scfChoice->SetSelection(0);	//G3MP2 only supports RHF
+		scfChoice->Enable(false);
+	} else {
+		scfChoice->Enable(true);
+		if(scft == 0) {
+			if(NumElectrons & 1) {
+				scft = 3;
+			} else {
+				scft = 1;
+			}
+		}
+		scfChoice->SetSelection(scft - 1);
+	}
 
     // mp2Check
-    if(ci || cc || dft || (mp2 < 0)) {
-        mp2Check->SetValue(false);
-        mp2Check->Enable(false);
-    }
-    else {
-        mp2Check->Enable(true);
-        if(mp2 < 0) mp2 = 0;
-        if(mp2 == 2) mp2 = 1;
-        mp2Check->SetValue(mp2);
-    }
+	if(ci || cc || dft || (mp2 < 0)) {
+		mp2Check->SetValue(false);
+		mp2Check->Enable(false);
+	} else {
+		mp2Check->Enable(true);
+		if(mp2 < 0) mp2 = 0;
+		if(mp2 == 2) mp2 = 1;
+		mp2Check->SetValue(mp2);
+	}
     
     // dftCheck
-    if(ci || cc || (mp2 > 0) || (scft > 3)) {
-        dftCheck->SetValue(false);
-        dftCheck->Enable(false);
-    }
-    else {
-        dftCheck->Enable(true);
-        dftCheck->SetValue(dft);
-        if(dft) setPaneVisible(DFT_PANE, true);
-        else setPaneVisible(DFT_PANE, false);
-    }
+	if(ci || cc || (mp2 > 0) || (scft > 3) || (runType == G3MP2)) {
+		dftCheck->SetValue(false);
+		dftCheck->Enable(false);
+		setPaneVisible(DFT_PANE, false);
+	} else {
+		dftCheck->Enable(true);
+		dftCheck->SetValue(dft);
+		if(dft) setPaneVisible(DFT_PANE, true);
+		else setPaneVisible(DFT_PANE, false);
+	}
     
     // ciChoice
-    if((mp2 > 0) || dft || cc || scft == 2) {
-        ciChoice->SetSelection(0);
-        ciChoice->Enable(false);
-        ciLabel->Enable(false);
-    }
-    else {
-        ciChoice->Enable(true);
-        ciLabel->Enable(true);
-        ciChoice->SetSelection(ci);
-    }
+	if((mp2 > 0) || dft || cc || scft == 2 || (runType == G3MP2)) {
+		ciChoice->SetSelection(0);
+		ciChoice->Enable(false);
+		ciLabel->Enable(false);
+	} else {
+		ciChoice->Enable(true);
+		ciLabel->Enable(true);
+		ciChoice->SetSelection(ci);
+	}
     
     // ccChoice
-    if((mp2 > 0) || dft || ci || scft > 1) {
-        ccChoice->SetSelection(0);
-        ccChoice->Enable(false);
-        ccLabel->Enable(false);
-    }
-    else {
-        ccChoice->Enable(true);
-        ccLabel->Enable(true);
-        ccChoice->SetSelection(cc);
-    }
+	if((mp2 > 0) || dft || ci || scft > 1 || (runType == G3MP2)) {
+		ccChoice->SetSelection(0);
+		ccChoice->Enable(false);
+		ccLabel->Enable(false);
+	} else {
+		ccChoice->Enable(true);
+		ccLabel->Enable(true);
+		ccChoice->SetSelection(cc);
+	}
     
     // scfIterText
     itemValue = TmpInputRec->Control->GetMaxIt();
     if(itemValue <= 0) itemValue = 30;
     scfIterText->SetValue(wxString::Format(wxT("%d"), itemValue));
     
-    // exeChoice
-    exeChoice->SetSelection(TmpInputRec->Control->GetExeType());
-    if(TmpInputRec->Control->GetFriend() != Friend_None) {
-		//The friend keyword choices force a check run type
-        exeChoice->Enable(false);
+	// exeChoice
+	exeChoice->SetSelection(TmpInputRec->Control->GetExeType());
+	if(TmpInputRec->Control->GetFriend() != Friend_None) {
+	//The friend keyword choices force a check run type
+		exeChoice->Enable(false);
 		exeChoice->SetSelection(1);
-    }
-    else {
-        exeChoice->Enable(true);
-    }
+	} else {
+		exeChoice->Enable(true);
+	}
     
     // mchargeText
-    mchargeText->SetValue(wxString::Format(wxT("%hd"), TmpInputRec->Control->GetCharge()));
+	mchargeText->SetValue(wxString::Format(wxT("%hd"), TmpInputRec->Control->GetCharge()));
     
     // multText
-    itemValue = TmpInputRec->Control->GetMultiplicity();
-    if(itemValue <= 0) {
-        if(NumElectrons & 1) itemValue = 2;
-        else itemValue = 1;
-    }
-    multText->SetValue(wxString::Format(wxT("%d"), itemValue));
+	itemValue = TmpInputRec->Control->GetMultiplicity();
+	if(itemValue <= 0) {
+		if(NumElectrons & 1) itemValue = 2;
+		else itemValue = 1;
+	}
+	multText->SetValue(wxString::Format(wxT("%d"), itemValue));
     
     // localChoice
-    localChoice->SetSelection(TmpInputRec->Control->GetLocal());
+	localChoice->SetSelection(TmpInputRec->Control->GetLocal());
 }
 
 void InputBuilderWindow::SetupDataItems() {
@@ -2009,7 +2015,7 @@ void InputBuilderWindow::SetupHessOptsItems() {
 
 	bool AnalyticPoss = (((TmpInputRec->Control->GetSCFType() == 1)||(TmpInputRec->Control->GetSCFType() == 3)||
 							 (TmpInputRec->Control->GetSCFType() == 4)||(TmpInputRec->Control->GetSCFType() == 0))&&
-							(TmpInputRec->Control->GetMPLevel() == 0));
+							(TmpInputRec->Control->GetMPLevel() <= 0));
 	
 	bool AnalyticSelected = TmpInputRec->Hessian->GetAnalyticMethod() && AnalyticPoss;
 	mHessMethodRadio->Enable(AnalyticPoss);
@@ -2181,7 +2187,7 @@ void InputBuilderWindow::SetupStatPointItems() {
 	//Init Hess
 	short HessType = TmpInputRec->StatPt->GetHessMethod();
 	if (!HessType) {
-		if (RunType == 4) HessType = 1;
+		if ((RunType == OptimizeRun)||(RunType == G3MP2)) HessType = 1;
 		else HessType = 2;
 	}
 	mInitHessRadio->SetSelection(HessType-1);
