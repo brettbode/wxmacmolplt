@@ -130,7 +130,11 @@ void FloatSlider::SetValue(float val) {
 
    wxString text;
    text.Printf(wxT("%.3f"), val);
+#if wxCHECK_VERSION(2,9,0)
    val_box->ChangeValue(text);
+#else
+   val_box->SetValue(text);
+#endif
 
    SyncSlider();
 
@@ -183,7 +187,11 @@ void FloatSlider::SyncText() {
    wxString text;
    text.Printf(wxT("%.3f"),
                ((float) slider->GetValue()) / NTICS * (max - min) + min);
+#if wxCHECK_VERSION(2,9,0)
    val_box->ChangeValue(text);
+#else
+   val_box->SetValue(text);
+#endif
 
 }
 
