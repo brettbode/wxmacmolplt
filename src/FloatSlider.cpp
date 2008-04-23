@@ -36,14 +36,14 @@ FloatSlider::FloatSlider(wxWindow *parent,
 
    wxString label;
 
-   label.Printf("%.3f", min);
+   label.Printf(wxT("%.3f"), min);
    min_label = new wxStaticText(this, wxID_ANY, label);
 
-   label.Printf("%.3f", val);
+   label.Printf(wxT("%.3f"), val);
    val_box = new wxTextCtrl(this, ID_VAL_BOX, label, wxDefaultPosition,
                             wxDefaultSize, wxTE_PROCESS_ENTER);
 
-   label.Printf("%.3f", max);
+   label.Printf(wxT("%.3f"), max);
    max_label = new wxStaticText(this, wxID_ANY, label);
 
    hsizer->Add(min_label, wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL)
@@ -129,7 +129,7 @@ void FloatSlider::SetValue(float val) {
    /* assert(val >= min && val <= max); */
 
    wxString text;
-   text.Printf("%.3f", val);
+   text.Printf(wxT("%.3f"), val);
    val_box->ChangeValue(text);
 
    SyncSlider();
@@ -181,7 +181,7 @@ void FloatSlider::SyncSlider() {
 void FloatSlider::SyncText() {
 
    wxString text;
-   text.Printf("%.3f",
+   text.Printf(wxT("%.3f"),
                ((float) slider->GetValue()) / NTICS * (max - min) + min);
    val_box->ChangeValue(text);
 
@@ -193,7 +193,7 @@ void FloatSlider::SetMin(float min) {
 
 	this->min = min;
 	wxString str;
-	str.Printf("%.3f", min);
+	str.Printf(wxT("%.3f"), min);
 	min_label->SetLabel(str);
 
 }
@@ -204,7 +204,7 @@ void FloatSlider::SetMax(float max) {
 
 	this->max = max;
 	wxString str;
-	str.Printf("%.3f", max);
+	str.Printf(wxT("%.3f"), max);
 	max_label->SetLabel(str);
 
 }
