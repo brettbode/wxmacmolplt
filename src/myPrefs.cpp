@@ -1057,30 +1057,41 @@ StereoPrefsPane::StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *pa
 
 void StereoPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 
-  mChkActive = new wxCheckBox(this, ID_STEREO_ACTIVE, _T("Stereo Active"), wxDefaultPosition);
-  mChkActive->SetValue(mTargetPrefs->UseStereo());
-  mMainSizer->Add(mChkActive, 0, wxALIGN_LEFT | wxALL, 10);
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Enabling or disabling stereo affects new windows only.")), 0, wxALIGN_LEFT | wxALL, 10);
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("The eye separation is determined by dividing the focal length\n")
-			                                       _T("by the eye separation factor. To minimize ghosting, either\n")
-												   _T("zoom out or increase the factor below.")), 0, wxALIGN_LEFT | wxALL, 10);
+#if wxCHECK_VERSION(2,9,0)
+	int attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16,
+					 WX_GL_STEREO, 0};
+	if (!wxGLCanvas::IsDisplaySupported(attribs)) {
+		Disable();
+		mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("No stereo pixel format available.")), 0, wxALIGN_LEFT | wxALL, 10);
+	}
+#else
+	Disable();
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("wxWidgets 2.9 needed for stereo support.")), 0, wxALIGN_LEFT | wxALL, 10);
+#endif
 
-  mMiddleSizer->Add(new wxStaticText(this, wxID_ANY, _T("Factor ")), 0, wxALIGN_LEFT | wxALL, 10);
+	mChkActive = new wxCheckBox(this, ID_STEREO_ACTIVE, _T("Stereo Active"), wxDefaultPosition);
+	mChkActive->SetValue(mTargetPrefs->UseStereo());
+	mMainSizer->Add(mChkActive, 0, wxALIGN_LEFT | wxALL, 10);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Enabling or disabling stereo affects new windows only.")), 0, wxALIGN_LEFT | wxALL, 10);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("The eye separation is determined by dividing the focal length\n")
+				_T("by the eye separation factor. To minimize ghosting, either\n")
+				_T("zoom out or increase the factor below.")), 0, wxALIGN_LEFT | wxALL, 10);
 
-  wxString tmp;
-  tmp.Printf(wxT("%d"), mTargetPrefs->GetStereoOffset());
-  mOffDegree = new wxTextCtrl( this, wxID_ANY, tmp);
-  mMiddleSizer->Add(mOffDegree, 0, wxALIGN_LEFT | wxALL, 3);
+	mMiddleSizer->Add(new wxStaticText(this, wxID_ANY, _T("Factor ")), 0, wxALIGN_LEFT | wxALL, 10);
 
-  mMainSizer->Add(mMiddleSizer, 0, wxALIGN_LEFT | wxLEFT, 10);
-  /* mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Hint: Enter a + number for cross-eyed viewing\n or a - number for straight on viewing.")), 0, wxALIGN_LEFT | wxLEFT, 10); */
+	wxString tmp;
+	tmp.Printf(wxT("%d"), mTargetPrefs->GetStereoOffset());
+	mOffDegree = new wxTextCtrl( this, wxID_ANY, tmp);
+	mMiddleSizer->Add(mOffDegree, 0, wxALIGN_LEFT | wxALL, 3);
+
+	mMainSizer->Add(mMiddleSizer, 0, wxALIGN_LEFT | wxLEFT, 10);
 
 }
 
 void StereoPrefsPane::saveToTempPrefs()
 {
   long v;
-  (mOffDegree->GetValue()).ToLong(&v);
+  mOffDegree->GetValue().ToLong(&v);
   mTargetPrefs->SetStereoOffset(v);
 }
 

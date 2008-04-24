@@ -1506,6 +1506,8 @@ void Orbital2DSurfPane::OnOrbSetChoice( wxCommandEvent &event ) {
 }
 
 void Orbital2DSurfPane::OnCoefList( wxCommandEvent &event ) {
+
+	OrbSurfacePane::OnAtomicOrbitalChoice(event);
 	if (coefIsEnabled) {
 		if (OrbOptions&1)
 			PlotOrb = mOrbCoef->GetSelection();
@@ -1934,12 +1936,15 @@ void Orbital3DSurfPane::OnOrbSetChoice( wxCommandEvent &event ) {
 }
 
 void Orbital3DSurfPane::OnCoefList( wxCommandEvent &event ) {
+
+	OrbSurfacePane::OnAtomicOrbitalChoice(event);
 	if (coefIsEnabled) {
 		if (OrbOptions&1)
 			PlotOrb = mOrbCoef->GetSelection();
 
 		setUpdateButton();
 	}
+
 }
 
 void Orbital3DSurfPane::OnMOList( wxCommandEvent &event ) {
@@ -4706,4 +4711,12 @@ void Surface3DParamDlg::OnPasteAll(wxCommandEvent &event ) {
 	gridIncText1->SetValue(pConfig->Read(_T("XInc")));
 	gridIncText2->SetValue(pConfig->Read(_T("YInc")));
 	gridIncText3->SetValue(pConfig->Read(_T("ZInc")));
+}
+
+void OrbSurfacePane::OnAtomicOrbitalChoice(wxCommandEvent& event) {
+
+	if (!coefIsEnabled) {
+		mOrbCoef->SetSelection(wxNOT_FOUND);
+	}
+
 }

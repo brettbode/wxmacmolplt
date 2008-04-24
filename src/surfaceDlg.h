@@ -278,7 +278,7 @@ protected:
 class OrbSurfacePane {
 	public:
 		OrbSurfacePane() {}
-		OrbSurfacePane( OrbSurfBase* target, SurfacesWindow* owner);
+		OrbSurfacePane(OrbSurfBase* target, SurfacesWindow* owner);
 		~OrbSurfacePane();
 
 	protected:
@@ -290,6 +290,8 @@ class OrbSurfacePane {
 		int getOrbSetForOrbPane(std::vector<wxString>& choice);
 		int orbSetChangeEvt(int item, SurfacesWindow * owner);
 		void setFlagOnOrbFormatChange(int itemtype);
+
+		void OnAtomicOrbitalChoice(wxCommandEvent& event);
 
 		long TargetSet;
 		long OrbOptions; //from mac version
@@ -304,7 +306,6 @@ class OrbSurfacePane {
 	private:
 		OrbSurfBase* mTarget;
 		SurfacesWindow * myowner;
-
 };
 
 /*!
@@ -423,8 +424,7 @@ protected:
   //DECLARE_EVENT_TABLE()
 }; 
 
-class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane
-{    
+class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane {    
   DECLARE_CLASS( Orbital2DSurfPane )
 
  public:
