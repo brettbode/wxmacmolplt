@@ -69,7 +69,19 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_370C3773CA004C5483CCD36CBAA743F9"
+        "OwnerKey" = "8:_C3DB4E5127064661BF895D3B319240FF"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3DC39FA8E8A240609EB4C4B898CCA1D8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3E0531F129D34A3DB803126D0133EDF3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -82,6 +94,12 @@
         "Entry"
         {
         "MsmKey" = "8:_46EB442D8BFA49519AE9EBF4A0F0B6C3"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4C594EA7B2A04A7E9F4C4590D3ADCF98"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -177,12 +195,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_B3853FC079DF43E0A94F387CD879610F"
-        "OwnerKey" = "8:_BA2B93F57E844E54BBEA35F27BBC61BD"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_B482828130E3458F82CC28729622DFF2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -195,13 +207,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_BA2B93F57E844E54BBEA35F27BBC61BD"
+        "MsmKey" = "8:_BC66D3E960BE9134DC5A3DCD592C994E"
         "OwnerKey" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_BC66D3E960BE9134DC5A3DCD592C994E"
+        "MsmKey" = "8:_C3DB4E5127064661BF895D3B319240FF"
         "OwnerKey" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -214,6 +226,12 @@
         "Entry"
         {
         "MsmKey" = "8:_CB4D45B5CA334CB9A47A873405C6DFA1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CC05CDDDA7DF43888B321FF364445A0A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -238,6 +256,12 @@
         "Entry"
         {
         "MsmKey" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E5A7046019644D7EA74AC466D9E01DF4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -428,7 +452,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:TRUE"
+            "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -552,6 +576,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3E0531F129D34A3DB803126D0133EDF3"
+            {
+            "SourcePath" = "8:..\\resources\\amino_acids.cml"
+            "TargetName" = "8:amino_acids.cml"
+            "Tag" = "8:"
+            "Folder" = "8:_9EB3D9B8000942A3B75EA9188914B18B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_41E72B4E86844CCA8B48DEFA3137373B"
             {
             "SourcePath" = "8:..\\Manual_pages\\water.jpg"
@@ -578,6 +622,26 @@
             "TargetName" = "8:2D_TED_Dialog.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4C594EA7B2A04A7E9F4C4590D3ADCF98"
+            {
+            "SourcePath" = "8:..\\resources\\fonts\\BsVeraSans.fdb"
+            "TargetName" = "8:BsVeraSans.fdb"
+            "Tag" = "8:"
+            "Folder" = "8:_9EB3D9B8000942A3B75EA9188914B18B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -948,7 +1012,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:TRUE"
+            "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -968,7 +1032,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:TRUE"
+            "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -978,6 +1042,26 @@
             "TargetName" = "8:Version_History.html"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CC05CDDDA7DF43888B321FF364445A0A"
+            {
+            "SourcePath" = "8:..\\resources\\solvents.cml"
+            "TargetName" = "8:solvents.cml"
+            "Tag" = "8:"
+            "Folder" = "8:_9EB3D9B8000942A3B75EA9188914B18B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1038,6 +1122,26 @@
             "TargetName" = "8:MEP_3D_Dialog.gif"
             "Tag" = "8:"
             "Folder" = "8:_54156D4F8605464A80C7A574252C23E1"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E5A7046019644D7EA74AC466D9E01DF4"
+            {
+            "SourcePath" = "8:..\\resources\\organics.cml"
+            "TargetName" = "8:organics.cml"
+            "Tag" = "8:"
+            "Folder" = "8:_9EB3D9B8000942A3B75EA9188914B18B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1347,14 +1451,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:wxMacMolPlt"
-        "ProductCode" = "8:{8C91CFCF-52E2-4E0F-8699-2B54FFAE9685}"
-        "PackageCode" = "8:{13CF9C93-1919-4ACE-805F-ACDE80D4743A}"
+        "ProductCode" = "8:{B03E76D6-3CA5-44BA-A67E-2045E957E90E}"
+        "PackageCode" = "8:{783D3E91-67EE-497D-A656-E7AE9BBECF26}"
         "UpgradeCode" = "8:{72B5F228-F1BD-4ED0-82D5-347629C06CC4}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:7.0"
+        "ProductVersion" = "8:7.2.1"
         "Manufacturer" = "8:ISU"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1877,7 +1981,7 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_B3853FC079DF43E0A94F387CD879610F"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_370C3773CA004C5483CCD36CBAA743F9"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
@@ -1891,7 +1995,7 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_BA2B93F57E844E54BBEA35F27BBC61BD"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C3DB4E5127064661BF895D3B319240FF"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
