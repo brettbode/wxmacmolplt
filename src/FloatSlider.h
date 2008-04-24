@@ -11,31 +11,40 @@
  */
 
 class FloatSlider : public wxPanel {
-   public:
-      FloatSlider(wxWindow *parent = NULL, int id = wxID_ANY,
-                  float val = 0.0f, float min = 0.0f, float max = 1.0f);
-      float GetValue() const;
-      void SetValue(float val);
-      void SetMin(float min);
-      void SetMax(float max);
-      float GetMax() const;
-      float GetMin() const;
-      void SyncSlider();
-      void SyncText();
-      
-   private:
-      void OnSliderChange(wxCommandEvent& event);
-      void OnTextChange(wxCommandEvent& event);
+	public:
+		enum {
+			POW = 0x1
+		};
 
-      wxSlider *slider;
-      wxStaticText *min_label;
-      wxTextCtrl *val_box;
-      wxStaticText *max_label;
+		FloatSlider(wxWindow *parent = NULL,
+					int id = wxID_ANY,
+					float val = 0.0f,
+					float min = 0.0f,
+					float max = 1.0f,
+					int style = 0);
+		float GetValue() const;
+		void SetValue(float val);
+		void SetMin(float min);
+		void SetMax(float max);
+		float GetMax() const;
+		float GetMin() const;
+		void SyncSlider();
+		void SyncText();
 
-      float min;
-      float max;
+	private:
+		void OnSliderChange(wxCommandEvent& event);
+		void OnTextChange(wxCommandEvent& event);
 
-   DECLARE_EVENT_TABLE()
+		wxSlider *slider;
+		wxStaticText *min_label;
+		wxTextCtrl *val_box;
+		wxStaticText *max_label;
+
+		float min;
+		float max;
+		bool is_pow;
+
+		DECLARE_EVENT_TABLE()
 };
 
 /* ------------------------------------------------------------------------- */

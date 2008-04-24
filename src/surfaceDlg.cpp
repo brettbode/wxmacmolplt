@@ -597,9 +597,9 @@ void OrbSurfacePane::makeMOList() {
 			char* oneSymLabel;
 
 			for (int theCell = 0; theCell < NumMOs; theCell++) {
-				tmpStr.Printf(wxT("<table width=\"100\%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20\%\" align=\"right\">%d&nbsp;</td>"), theCell+1); 
+				tmpStr.Printf(wxT("<table width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), theCell+1); 
 
-				tmpStr.Append(wxT("<td width=\"40\%\">"));
+				tmpStr.Append(wxT("<td width=\"40%%\">"));
 				if (SymLabel) {	//Add the symetry of the orb, if known
 
 					oneSymLabel = &(SymLabel[theCell*5]);	
@@ -634,7 +634,7 @@ void OrbSurfacePane::makeMOList() {
 				tmpStr.Append(wxT("&nbsp;</td>"));
 
 				wxString temp;
-				tmpStr.Append(wxT("<td width=\"40\%\" align=\"right\">"));
+				tmpStr.Append(wxT("<td width=\"40%%\" align=\"right\">"));
 				if (OrbColumnEnergyOrOccupation) {	//orb occupation selected
 
 					if (OccNum)
@@ -715,16 +715,16 @@ void OrbSurfacePane::makeAOList() {
 
 						char label[63];
 						wxString tmpStr;
-						aChoice.Printf(wxT("<table width=\"100\%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr>")); 
+						aChoice.Printf(wxT("<table width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr>")); 
 						int nchar = 0;
 						//punch out the atom # and symbol if this is the 1st function for this atom
 
 						if ((ishell==minshell)&&(theCell==ifunc)) {
 							sprintf(label, "%ld", iatom+1);
-							tmpStr.Printf(wxT("<td width=\"%d\%\">%ld&nbsp;</td>"), percents[0], iatom + 1);
+							tmpStr.Printf(wxT("<td width=\"%d%%\">%ld&nbsp;</td>"), percents[0], iatom + 1);
 							aChoice.Append(tmpStr);
 
-							tmpStr.Printf(_T("<td width=\"%d\%\">"), percents[1]);
+							tmpStr.Printf(_T("<td width=\"%d%%\">"), percents[1]);
 							aChoice.Append(tmpStr);
 							WinPrefs * mPrefs = myowner->GetPrefs();
 							if (mPrefs) {
@@ -735,7 +735,7 @@ void OrbSurfacePane::makeAOList() {
 							}
 							aChoice.Append(_T("</td>"));
 						} else {
-							tmpStr.Printf(_T("<td width=\"%d\%\">&nbsp;</td><td width=\"%d\%\">&nbsp;</td>"),
+							tmpStr.Printf(_T("<td width=\"%d%%\">&nbsp;</td><td width=\"%d%%\">&nbsp;</td>"),
 										  percents[0], percents[1]);
 							aChoice.Append(tmpStr);
 						}
@@ -744,7 +744,7 @@ void OrbSurfacePane::makeAOList() {
 						BasisPtr->Shells[ishell].GetLabel(label, jfunc, SphericalHarmonics);
 						nchar = strlen(label);
 
-						tmpStr.Printf(_T("<td width=\"%d\%\">"), percents[2]);
+						tmpStr.Printf(_T("<td width=\"%d%%\">"), percents[2]);
 						aChoice.Append(tmpStr);
 
 						wxString ltemp(label, wxConvUTF8);
@@ -780,7 +780,7 @@ void OrbSurfacePane::makeAOList() {
 			}
 
 			if (PlotOrb>=0) { //Is an MO selected?
-				aChoice.Append(wxT("<td width=\"40\%\" align=\"right\">"));
+				aChoice.Append(wxT("<td width=\"40%%\" align=\"right\">"));
 				if (!(OrbOptions&1)) { //If not displaying AO's
 					const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
 					if (Orbs->size() > 0) {
@@ -1228,6 +1228,7 @@ void Orbital2DSurfPane::CreateControls() {
 
 	mSphHarmonicsChk->SetValue(SphericalHarmonics);
 	upperLeftMiddleSizer->Add(mSphHarmonicsChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	mSphHarmonicsChk->Enable(coefIsEnabled);
 
 	lowerLeftMiddleSizer->Add(label1, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	lowerLeftMiddleSizer->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -1542,7 +1543,7 @@ void Orbital2DSurfPane::OnSphHarmonicChk(wxCommandEvent &event ) {
 	SphericalHarmonics = mSphHarmonicsChk->GetValue();
 	mMOList->Clear();
 	PlotOrb = -1;
-	coefIsEnabled = true;
+	/* coefIsEnabled = true; */
 
 	makeAOList();
 }
@@ -1665,7 +1666,7 @@ void Orbital3DSurfPane::CreateControls() {
 	mContourValSld = new FloatSlider(this, ID_CONTOUR_VALUE_SLIDER,
 									 mTarget->GetContourValue() /
 									 	((fabs(GridMax)>=0.001)?GridMax:0.25),
-									 0.0f, 100.0f);
+									 0.0f, 100.0f, FloatSlider::POW);
 
 	/* mContourValueEdit = new wxTextCtrl( this, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER); */
 
@@ -1721,6 +1722,7 @@ void Orbital3DSurfPane::CreateControls() {
 	upperSizer->Add(mRevPhaseChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
 	mSphHarmonicsChk = new wxCheckBox( this, ID_SPH_HARMONICS_CHECKBOX, _T("Spherical Harmonics"), wxDefaultPosition, wxDefaultSize );
+	mSphHarmonicsChk->Enable(coefIsEnabled);
 
 	wxString choices1[] = {_T("Energy"), _T("Occupation #")};
 	mOrbFormatChoice = new wxChoice( this, ID_ORB_FORMAT_CHOICE, wxDefaultPosition, wxSize(120,wxDefaultCoord), 2, choices1 );
@@ -1959,7 +1961,7 @@ void Orbital3DSurfPane::OnSphHarmonicChk(wxCommandEvent &event ) {
 	SphericalHarmonics = mSphHarmonicsChk->GetValue();
 	mMOList->Clear();
 	PlotOrb = -1;
-	coefIsEnabled = true;
+	/* coefIsEnabled = true; */
 
 	makeAOList();
 }
@@ -2340,7 +2342,7 @@ void General3DSurfPane::CreateControls() {
 	wxBoxSizer* itemBoxSizer16 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer12->Add(itemBoxSizer16, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	/* mContourValSld = new wxSlider( Gen3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL ); */
-	mContourValSld = new FloatSlider(Gen3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f);
+	mContourValSld = new FloatSlider(Gen3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f, FloatSlider::POW);
 	itemBoxSizer16->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
 
 	/* wxBoxSizer* itemBoxSizer18 = new wxBoxSizer(wxHORIZONTAL); */
@@ -3491,7 +3493,7 @@ void TEDensity3DSurfPane::CreateControls() {
 	wxBoxSizer* itemBoxSizer106 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer102->Add(itemBoxSizer106, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3);
 	/* mContourValSld = new wxSlider( TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL ); */
-	mContourValSld = new FloatSlider(TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f);
+	mContourValSld = new FloatSlider(TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f, FloatSlider::POW);
 	itemBoxSizer106->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
 
 	/* wxBoxSizer* itemBoxSizer108 = new wxBoxSizer(wxHORIZONTAL); */
@@ -4176,7 +4178,7 @@ void MEP3DSurfPane::CreateControls() {
 	wxBoxSizer* itemBoxSizer181 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer177->Add(itemBoxSizer181, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3);
 	/* mContourValSld = new wxSlider( MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL ); */
-	mContourValSld = new FloatSlider(MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f);
+	mContourValSld = new FloatSlider(MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f, FloatSlider::POW);
 	itemBoxSizer181->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
 
 	/* wxBoxSizer* itemBoxSizer183 = new wxBoxSizer(wxHORIZONTAL); */

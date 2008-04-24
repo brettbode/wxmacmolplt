@@ -18,13 +18,15 @@ enum {
  */
 
 FloatSlider::FloatSlider(wxWindow *parent,
-                         int id,
-                         float val,
-                         float min,
-                         float max)
-   : wxPanel(parent, id),
-     min(min),
-     max(max) {
+						 int id,
+						 float val,
+						 float min,
+						 float max,
+						 int style)
+	: wxPanel(parent, id),
+	  min(min),
+	  max(max),
+	  is_pow(style & FloatSlider::POW) {
 
    assert(val >= min && val <= max);
 
@@ -172,7 +174,16 @@ float FloatSlider::GetMin() const {
 
 void FloatSlider::SyncSlider() {
 
-   slider->SetValue((int) ((GetValue() - min) / (max - min) * NTICS));
+	int new_val;
+
+	if (is_pow) {
+		/* new_val = ((float) slider->GetValue() * slider->GetValue()) / (NTICS * NTICS) * (max - min) + min; */
+		new_val = (int) sqrtf((GetValue() - min) / (max - min) * (NTICS * NTICS));
+	} else {
+		new_val = (int) ((GetValue() - min) / (max - min) * NTICS);
+	}
+
+	slider->SetValue(new_val);
 
 }
 
@@ -184,18 +195,29 @@ void FloatSlider::SyncSlider() {
 
 void FloatSlider::SyncText() {
 
-   wxString text;
-   text.Printf(wxT("%.3f"),
-               ((float) slider->GetValue()) / NTICS * (max - min) + min);
+	wxString text;
+	float new_val;
+
+	if (is_pow) {
+		new_val = ((float) slider->GetValue() * slider->GetValue()) / (NTICS * NTICS) * (max - min) + min;
+	} else {
+		new_val = ((float) slider->GetValue()) / NTICS * (max - min) + min;
+	}
+
+	text.Printf(wxT("%.3f"), new_val);
 #if wxCHECK_VERSION(2,9,0)
-   val_box->ChangeValue(text);
+	val_box->ChangeValue(text);
 #else
-   val_box->SetValue(text);
+	val_box->SetValue(text);
 #endif
 
 }
 
 /* ------------------------------------------------------------------------- */
+/**
+ * Assign slider's minimum value.
+ * @param New minimum.
+ */
 
 void FloatSlider::SetMin(float min) {
 
@@ -207,6 +229,10 @@ void FloatSlider::SetMin(float min) {
 }
 
 /* ------------------------------------------------------------------------- */
+/**
+ * Assign slider's maximum value.
+ * @param New maximum.
+ */
 
 void FloatSlider::SetMax(float max) {
 
