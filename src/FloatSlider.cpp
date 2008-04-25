@@ -22,8 +22,9 @@ FloatSlider::FloatSlider(wxWindow *parent,
 						 float val,
 						 float min,
 						 float max,
-						 int style)
-	: wxPanel(parent, id),
+						 int style,
+						 const wxSize& size)
+	: wxPanel(parent, id, wxDefaultPosition, size),
 	  min(min),
 	  max(max),
 	  is_pow(style & FloatSlider::POW) {
@@ -33,7 +34,8 @@ FloatSlider::FloatSlider(wxWindow *parent,
    wxBoxSizer *vsizer = new wxBoxSizer(wxVERTICAL);
    wxGridSizer *hsizer = new wxGridSizer(1, 3, 0, 0);
 
-   slider = new wxSlider(this, ID_SLIDER, 0, 0, NTICS);
+   slider = new wxSlider(this, ID_SLIDER, 0, 0, NTICS, wxDefaultPosition, wxSize(100, wxDefaultCoord));
+   slider->SetMinSize(slider->GetSize());
    vsizer->Add(slider, wxSizerFlags().Expand());
 
    wxString label;
@@ -43,7 +45,7 @@ FloatSlider::FloatSlider(wxWindow *parent,
 
    label.Printf(wxT("%.3f"), val);
    val_box = new wxTextCtrl(this, ID_VAL_BOX, label, wxDefaultPosition,
-                            wxDefaultSize, wxTE_PROCESS_ENTER);
+                            wxSize(50, wxDefaultCoord), wxTE_PROCESS_ENTER);
 
    label.Printf(wxT("%.3f"), max);
    max_label = new wxStaticText(this, wxID_ANY, label);
@@ -56,6 +58,8 @@ FloatSlider::FloatSlider(wxWindow *parent,
 
    vsizer->Add(hsizer, wxSizerFlags().Expand());
 
+   SetMinSize(size);
+   /* SetSizer(vsizer); */
    SetSizerAndFit(vsizer);
 
    // Only the text control contains the current value since the slider tracks

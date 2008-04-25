@@ -21,7 +21,8 @@ class FloatSlider : public wxPanel {
 					float val = 0.0f,
 					float min = 0.0f,
 					float max = 1.0f,
-					int style = 0);
+					int style = 0,
+					const wxSize& size = wxDefaultSize);
 		float GetValue() const;
 		void SetValue(float val);
 		void SetMin(float min);

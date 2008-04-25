@@ -41,6 +41,8 @@
 using namespace std;
 #include <iostream>
 
+#define CONTOUR_WIDTH 200
+
 IMPLEMENT_CLASS( BaseSurfacePane, wxPanel )
 IMPLEMENT_CLASS( Surface2DPane, wxPanel )
 IMPLEMENT_CLASS( Surface3DPane, wxPanel )
@@ -1666,7 +1668,7 @@ void Orbital3DSurfPane::CreateControls() {
 	mContourValSld = new FloatSlider(this, ID_CONTOUR_VALUE_SLIDER,
 									 mTarget->GetContourValue() /
 									 	((fabs(GridMax)>=0.001)?GridMax:0.25),
-									 0.0f, 100.0f, FloatSlider::POW);
+									 0.0f, 100.0f, FloatSlider::POW, wxSize(CONTOUR_WIDTH, wxDefaultCoord));
 
 	/* mContourValueEdit = new wxTextCtrl( this, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER); */
 
@@ -1755,7 +1757,7 @@ void Orbital3DSurfPane::CreateControls() {
 	rightMiddleSizer->Add(label2, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
 	rightMiddleSizer->Add(mGridSizeSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
 	rightMiddleSizer->Add(label3, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
-	rightMiddleSizer->Add(mContourValSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
+	rightMiddleSizer->Add(mContourValSld, 0, wxFIXED_MINSIZE | wxALIGN_CENTER_VERTICAL | wxALL, 10);
 
 	mSubLeftBot1Sizer = new wxBoxSizer(wxVERTICAL);
 	mSubLeftBot2Sizer = new wxBoxSizer(wxVERTICAL);
@@ -2339,11 +2341,12 @@ void General3DSurfPane::CreateControls() {
 	/* mContourValueEdit = new wxTextCtrl( Gen3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 ); */
 	/* itemBoxSizer13->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5); */
 
-	wxBoxSizer* itemBoxSizer16 = new wxBoxSizer(wxVERTICAL);
-	itemBoxSizer12->Add(itemBoxSizer16, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	/* wxBoxSizer* itemBoxSizer16 = new wxBoxSizer(wxVERTICAL); */
+	/* itemBoxSizer12->Add(itemBoxSizer16, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
 	/* mContourValSld = new wxSlider( Gen3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL ); */
-	mContourValSld = new FloatSlider(Gen3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f, FloatSlider::POW);
-	itemBoxSizer16->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+	mContourValSld = new FloatSlider(Gen3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f, FloatSlider::POW, wxSize(CONTOUR_WIDTH, wxDefaultCoord));
+	itemBoxSizer12->Add(mContourValSld, 0, wxFIXED_MINSIZE | wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	/* itemBoxSizer16->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1); */
 
 	/* wxBoxSizer* itemBoxSizer18 = new wxBoxSizer(wxHORIZONTAL); */
 	/* itemBoxSizer16->Add(itemBoxSizer18, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5); */
@@ -3490,11 +3493,12 @@ void TEDensity3DSurfPane::CreateControls() {
 	/* mContourValueEdit = new wxTextCtrl( TED3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 ); */
 	/* itemBoxSizer103->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5); */
 
-	wxBoxSizer* itemBoxSizer106 = new wxBoxSizer(wxVERTICAL);
-	itemBoxSizer102->Add(itemBoxSizer106, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3);
+	/* wxBoxSizer* itemBoxSizer106 = new wxBoxSizer(wxVERTICAL); */
+	/* itemBoxSizer102->Add(itemBoxSizer106, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3); */
 	/* mContourValSld = new wxSlider( TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL ); */
-	mContourValSld = new FloatSlider(TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f, FloatSlider::POW);
-	itemBoxSizer106->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+	mContourValSld = new FloatSlider(TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f, FloatSlider::POW, wxSize(CONTOUR_WIDTH, wxDefaultCoord));
+	itemBoxSizer102->Add(mContourValSld, 0, wxFIXED_MINSIZE | wxALIGN_CENTER_VERTICAL|wxALL, 3);
+	/* itemBoxSizer106->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1); */
 
 	/* wxBoxSizer* itemBoxSizer108 = new wxBoxSizer(wxHORIZONTAL); */
 	/* itemBoxSizer106->Add(itemBoxSizer108, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5); */
@@ -4175,11 +4179,12 @@ void MEP3DSurfPane::CreateControls() {
 	/* mContourValueEdit = new wxTextCtrl( MEP3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 ); */
 	/* itemBoxSizer178->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5); */
 
-	wxBoxSizer* itemBoxSizer181 = new wxBoxSizer(wxVERTICAL);
-	itemBoxSizer177->Add(itemBoxSizer181, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3);
+	/* wxBoxSizer* itemBoxSizer181 = new wxBoxSizer(wxVERTICAL); */
+	/* itemBoxSizer177->Add(itemBoxSizer181, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3); */
 	/* mContourValSld = new wxSlider( MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL ); */
-	mContourValSld = new FloatSlider(MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f, FloatSlider::POW);
-	itemBoxSizer181->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+	mContourValSld = new FloatSlider(MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f, FloatSlider::POW, wxSize(CONTOUR_WIDTH, wxDefaultCoord));
+	itemBoxSizer177->Add(mContourValSld, 0, wxFIXED_MINSIZE | wxALIGN_CENTER_VERTICAL|wxALL, 3);
+	/* itemBoxSizer181->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1); */
 
 	/* wxBoxSizer* itemBoxSizer183 = new wxBoxSizer(wxHORIZONTAL); */
 	/* itemBoxSizer181->Add(itemBoxSizer183, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5); */
