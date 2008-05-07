@@ -249,6 +249,15 @@ BaseSurfacePane::BaseSurfacePane( wxWindow* parent, Surface* target, SurfacesWin
 
 BaseSurfacePane::~BaseSurfacePane() {
 
+	// The default button apparently needs to be manually unset.  Otherwise
+	// calling wxButton::SetDefault later will try to operate on the previous
+	// default and now deleted button.
+    wxTopLevelWindow * const
+        tlw = wxDynamicCast(wxGetTopLevelParent(this), wxTopLevelWindow);
+
+	if (tlw) {
+		tlw->SetDefaultItem(NULL);
+	}
 }
 
 bool BaseSurfacePane::Create( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) {
@@ -1843,10 +1852,15 @@ void Orbital3DSurfPane::CreateControls() {
 	mainSizer->Add(bottomSizer, 1, wxEXPAND | wxALIGN_CENTER);
 
 	if (PlotOrb >= 0) {
-		if (OrbOptions&1)	//AOs
-			mOrbCoef->SetSelection(PlotOrb);
-		else //MOs
-			mMOList->SetSelection(PlotOrb);
+		if (OrbOptions&1) {//AOs
+			if (mOrbCoef->GetItemCount()) {
+				mOrbCoef->SetSelection(PlotOrb);
+			}
+		} else { //MOs
+			if (mMOList->GetItemCount()) {
+				mMOList->SetSelection(PlotOrb);
+			}
+		}
 	}
 }
 
