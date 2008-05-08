@@ -1410,6 +1410,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 		while (!Done) {
 			Done = true;
 			if (RdPoint) {
+				VibRec * lVibs = NULL;
 				for (i=0; i<nAtoms; i++) {
 						long AtomType, test;
 						CPoint3D Pos, Vector;
@@ -1436,13 +1437,13 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 						}
 					} else if (test == 7) {	//mass weight the normal mode
 						if (i==0) {
-							lFrame->Vibs = new VibRec(1, nAtoms);
-							if (!lFrame->Vibs) throw MemoryError();
+							lVibs = new VibRec(1, nAtoms);
+							if (!lVibs) throw MemoryError();
 						}
-						if (lFrame->Vibs) {
-							lFrame->Vibs->NormMode[i].x = Vector.x*Prefs->GetSqrtAtomMass(AtomType-1);
-							lFrame->Vibs->NormMode[i].y = Vector.y*Prefs->GetSqrtAtomMass(AtomType-1);
-							lFrame->Vibs->NormMode[i].z = Vector.z*Prefs->GetSqrtAtomMass(AtomType-1);
+						if (lVibs) {
+							lVibs->NormMode[i].x = Vector.x*Prefs->GetSqrtAtomMass(AtomType-1);
+							lVibs->NormMode[i].y = Vector.y*Prefs->GetSqrtAtomMass(AtomType-1);
+							lVibs->NormMode[i].z = Vector.z*Prefs->GetSqrtAtomMass(AtomType-1);
 						}
 					}
 					lFrame->AddAtom(AtomType, Pos);
@@ -1450,6 +1451,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 					MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.y));
 					MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.z));
 				}
+				if (lVibs) lFrame->Vibs = lVibs;
 				if (Prefs->GetAutoBond())	//setup bonds, if needed
 					lFrame->SetBonds(Prefs, false);
 			}
