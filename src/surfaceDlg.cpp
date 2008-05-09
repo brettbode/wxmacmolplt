@@ -1572,6 +1572,7 @@ Orbital3DSurfPane::Orbital3DSurfPane( wxWindow* parent, Orb3DSurface* target,
 
 	TargetToPane();
 	CreateControls();
+	refreshControls();
 }
 
 Orbital3DSurfPane::~Orbital3DSurfPane() {
@@ -1599,6 +1600,7 @@ void Orbital3DSurfPane::refreshControls() {
 	mGridSizeSld->SetValue((short)(100*GridSize));
 	/* mContourValSld->SetValue((100*(ContourValue/((fabs(GridMax)>=0.001)?GridMax:0.25)))); */
 	mContourValSld->SetValue(ContourValue);
+	mContourValSld->SetMax(GridMax);
 	m3DRdoBox->SetSelection(1-UseSolidSurface);
 	mSmoothChkBox->SetValue(UseNormals);
 	mSphHarmonicsChk->SetValue(SphericalHarmonics);
@@ -2281,6 +2283,7 @@ void General3DSurfPane::refreshControls() {
 
 	/* std::cout << "100*((ContourValue - GridMin)/Range)): " << 100*((ContourValue - GridMin)/Range) << std::endl; */
 	/* mContourValSld->SetValue((short) (100*((ContourValue - GridMin)/Range))); */
+	
 	mContourValSld->SetValue(ContourValue);
 	wxString tmpStr;
 	/* tmpStr.Printf(wxT("%.4f"), ContourValue); */

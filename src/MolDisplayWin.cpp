@@ -479,6 +479,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 		foo.SetId(MMP_TOOL_HAND);
 		OnToggleTool(foo);
 	}
+
+	Show();
 }
 
 MolDisplayWin::~MolDisplayWin() {

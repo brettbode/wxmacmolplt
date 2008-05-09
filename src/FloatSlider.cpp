@@ -34,7 +34,7 @@ FloatSlider::FloatSlider(wxWindow *parent,
    wxBoxSizer *vsizer = new wxBoxSizer(wxVERTICAL);
    wxGridSizer *hsizer = new wxGridSizer(1, 3, 0, 0);
 
-   slider = new wxSlider(this, ID_SLIDER, 0, 0, NTICS, wxDefaultPosition, wxSize(100, wxDefaultCoord));
+   slider = new wxSlider(this, ID_SLIDER, 0, 0, NTICS, wxDefaultPosition, wxSize(120, wxDefaultCoord));
    slider->SetMinSize(slider->GetSize());
    vsizer->Add(slider, wxSizerFlags().Expand());
 
@@ -44,8 +44,8 @@ FloatSlider::FloatSlider(wxWindow *parent,
    min_label = new wxStaticText(this, wxID_ANY, label);
 
    label.Printf(wxT("%.3f"), val);
-   val_box = new wxTextCtrl(this, ID_VAL_BOX, label, wxDefaultPosition,
-                            wxSize(50, wxDefaultCoord), wxTE_PROCESS_ENTER);
+   val_box = new wxTextCtrl(this, ID_VAL_BOX, label, wxDefaultPosition, //wxDefaultSize,
+                            wxSize(70, wxDefaultCoord), wxTE_PROCESS_ENTER);
 
    label.Printf(wxT("%.3f"), max);
    max_label = new wxStaticText(this, wxID_ANY, label);
