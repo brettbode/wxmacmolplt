@@ -153,11 +153,7 @@ END_EVENT_TABLE()
 
 PrefsPane::PrefsPane(MolDisplayWin* targetWindow, WinPrefs* targetPrefs,
 					 short PaneID, Boolean GlobalPrefs, wxBookCtrlBase *parent)
-	: wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize 
-#if !wxCHECK_VERSION(2,9,0)
-			  , wxSUNKEN_BORDER
-#endif
-			  ) { 
+	: wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER) { 
   isGlobalPrefs = GlobalPrefs;
 
   //mTargetPrefs = new WinPrefs;

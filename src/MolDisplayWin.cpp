@@ -202,7 +202,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (wxID_COPY,            MolDisplayWin::menuEditCopy)
 	EVT_MENU (MMP_COPYCOORDS,       MolDisplayWin::menuEditCopyCoordinates)
 	EVT_MENU (wxID_PASTE,           MolDisplayWin::menuEditPaste)
-	EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate )
+	EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate)
 	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
 	EVT_UPDATE_UI(wxID_CLEAR,       MolDisplayWin::OnDeleteUpdate)
 	EVT_MENU (MMP_SELECT_ALL,       MolDisplayWin::menuEditSelectAll)
@@ -911,7 +911,13 @@ void MolDisplayWin::UpdateAtomsOptions(wxUpdateUIEvent& event) {
 * wxEVT_UPDATE_UI event handler for wxID_PASTE
  */
 
-void MolDisplayWin::OnPasteUpdate( wxUpdateUIEvent& event ) {
+void MolDisplayWin::OnPasteUpdate(wxUpdateUIEvent& event) {
+
+	// This function gets triggered on a paste event (actually, a call to
+	// CreateFrameSnapShot, which triggers UI updates).  The clipboard is
+	// already open there, and it's a mistake to open it twice.
+	if (wxTheClipboard->IsOpened()) return;
+
 	event.Enable(false);
 	//paste is allowed for empty frames or while in edit mode
 	if ((MainData->cFrame->NumAtoms == 0)||InEditMode()) {
@@ -2389,7 +2395,6 @@ void MolDisplayWin::menuViewShowNormalMode(wxCommandEvent &event) {
 }
 
 void MolDisplayWin::menuViewPrevNormalMode(wxCommandEvent &event) {
-	std::cout << "there" << std::endl;
 	if (MainData->cFrame->Vibs) {
 		if (MainData->cFrame->Vibs->CurrentMode>0) {
 			ChangeModes(MainData->cFrame->Vibs->CurrentMode - 1);
@@ -2397,7 +2402,6 @@ void MolDisplayWin::menuViewPrevNormalMode(wxCommandEvent &event) {
 	}
 }
 void MolDisplayWin::menuViewNextNormalMode(wxCommandEvent &event) {
-	std::cout << "here" << std::endl;
 	if (MainData->cFrame->Vibs) {
 		if (MainData->cFrame->Vibs->CurrentMode<(MainData->cFrame->Vibs->NumModes-1)) {
 			ChangeModes(MainData->cFrame->Vibs->CurrentMode + 1);

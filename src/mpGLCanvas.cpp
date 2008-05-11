@@ -352,8 +352,9 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 		hOffset = PageCenterH - DCenterH;
 	}
 	
-	unsigned char *pixels = (unsigned char *) malloc(3 * width * height * 
-									sizeof(GLbyte));
+	/* unsigned char *pixels = (unsigned char *) malloc(3 * width * height *  */
+									/* sizeof(GLbyte)); */
+	unsigned char *pixels = new unsigned char[3 * width * height];
 	glReadBuffer(GL_BACK);
 	 
 	GLdouble zNear = 0.1;
@@ -415,10 +416,15 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 			 
 		}
 	}
-	delete [] pixels;
+	delete[] pixels;
+	/* free(pixels); */
 	 
 	if (frame) {
 		wxPen lpen = dc->GetPen();
+		if (lpen == wxNullPen) {
+			std::cout << "lpen was NULL" << std::endl;
+			lpen = wxPen(*wxBLACK_PEN);
+		}
 		lpen.SetWidth((int)ScaleFactor);
 		dc->SetBrush(*wxTRANSPARENT_BRUSH);
 		dc->SetPen(lpen);
