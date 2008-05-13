@@ -1,3 +1,9 @@
+wxmacmolplt (7.2.1-1) unstable; urgency=low
+
+  * New bug fix upstream release.
+
+ -- root <root@debian.iprt.iastate.edu>  Tue, 13 May 2008 06:41:01 -0500
+
 wxmacmolplt (7.2.0-1) unstable; urgency=low
 
   * New major upstream release.
