@@ -1765,8 +1765,8 @@ void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
 	wxPrintDialogData printDialogData(*printData);
 	wxString title(_T("MacMolPlt printout"));
 	wxPrintPreview * preview = new wxPrintPreview(new MolPrintOut(this, title),
-												new MolPrintOut(this, title),
-												&printDialogData);
+												  new MolPrintOut(this, title),
+												  &printDialogData);
 	if (!preview->Ok()) {//failure to create the print preview
 		delete preview;
 		wxLogMessage(_("Unable to create the print preview dialog. Aborted!"));
@@ -1826,15 +1826,18 @@ bool MolPrintOut::OnPrintPage(int page) {
 	if (page != 1) return false;
 	wxDC * dc = GetDC();
     if (dc) {
-        // Draw page numbers at top left corner of printable area, sized so that
-        // screen size of text matches paper size.
-        MapScreenSizeToDevice();
+
+#ifdef __WXMAC__
+		// Preview has a different scale, which I don't quite get.
+		if (!IsPreview()) {
+			MapScreenSizeToDevice();
+		}
 		dc->SetBrush(*wxLIGHT_GREY_BRUSH);
+#endif
 
 		wxSize dcp = dc->GetPPI();
 		int sh, sw;
 		GetPPIScreen(&sw, &sh);
-   //     float scale = (float)w/ (float)sw;
 		float scale = (float)dcp.GetWidth()/ (float)sw;
 		Parent->PrintGL(dc, scale);
 		return true;
