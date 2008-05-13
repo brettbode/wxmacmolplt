@@ -317,7 +317,7 @@ wxImage MpGLCanvas::getImage(const int width, const int height) {
 void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor, 
 									Progress * progress, bool Center,
 									bool frame) {
-	
+
 #if wxCHECK_VERSION(2,9,0)
 	SetCurrent(*context);
 #else
@@ -374,7 +374,7 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 	}
 	
 	MolWin->UpdateGLModel();
-	
+
 	for (int jpass=0; jpass<NumYPasses; jpass++) {
 		int passheight = height;
 		if ((jpass+1) == NumYPasses) passheight = height - (ViewportScaledY - ScaledHeight);
@@ -411,7 +411,7 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 			//it into the right orientation, then converts it to a bitmap
 			//to draw into the device context. We retain ownership of the pixels
 			//and thus have to delete them below.
-			dc->DrawBitmap(wxBitmap(wxImage(width,height,pixels, true).Mirror(false)),
+			dc->DrawBitmap(wxBitmap(wxImage(width, height, pixels, true).Mirror(false)),
 							x, y, false);
 			 
 		}

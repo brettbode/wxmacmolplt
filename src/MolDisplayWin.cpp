@@ -1796,32 +1796,42 @@ void MolDisplayWin::menuFilePrint(wxCommandEvent &event) {
 		//save off the print data from a successful job
 		(*printData) = printer.GetPrintDialogData().GetPrintData();
 	}
+	glCanvas->Draw();
+
 }
+
 MolPrintOut::MolPrintOut(MolDisplayWin * parent, wxString & title) :
 	wxPrintout(title) {
 	Parent = parent;
 }
+
 void MolPrintOut::GetPageInfo(int *minPage, int *maxPage, int *selPageFrom, int *selPageTo) {
 	*minPage = 1;
 	*maxPage = 1;
 	*selPageFrom = 1;
 	*selPageTo = 1;
 }
+
 bool MolPrintOut::HasPage(int pageNum) {
 	return (pageNum == 1);
 }
+
 bool MolPrintOut::OnBeginDocument(int startPage, int endPage) {
 	if (!wxPrintout::OnBeginDocument(startPage, endPage))
 		return false;
 	return true;
 }
+
 bool MolPrintOut::OnPrintPage(int page) {
 	if (page != 1) return false;
 	wxDC * dc = GetDC();
-	if (dc) {
-		int h, w;
+    if (dc) {
+        // Draw page numbers at top left corner of printable area, sized so that
+        // screen size of text matches paper size.
+        MapScreenSizeToDevice();
+		dc->SetBrush(*wxLIGHT_GREY_BRUSH);
+
 		wxSize dcp = dc->GetPPI();
-		GetPPIPrinter(&w, &h);
 		int sh, sw;
 		GetPPIScreen(&sw, &sh);
    //     float scale = (float)w/ (float)sw;
@@ -1831,6 +1841,7 @@ bool MolPrintOut::OnPrintPage(int page) {
 	}
 	return false;
 }
+
 void MolDisplayWin::PrintGL(wxDC * dc, const float & sFactor) {
 	float scaleFactor = sFactor;
 	BeginOperation();
