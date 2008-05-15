@@ -1073,7 +1073,7 @@ void Surface3DPane::SetContourMaxValueText(void) {
 }
 
 void Surface3DPane::OnContourValueSld(wxCommandEvent &event ) {
-	float GridMax = mTarget->GetGridMax();
+	//float GridMax = mTarget->GetGridMax();
 	/* ContourValue = 0.01 * mContourValSld->GetValue() * ((fabs(GridMax)>=0.001)?GridMax:0.25); */
 	ContourValue = mContourValSld->GetValue();
 
@@ -1869,7 +1869,7 @@ void Orbital3DSurfPane::CreateControls() {
 bool Orbital3DSurfPane::UpdateNeeded(void) {
 	bool result = false;
 
-	double newVal;
+	//double newVal;
 	/* wxString tmpStr = mContourValueEdit->GetValue(); */
 	/* if (!tmpStr.ToDouble(&newVal)) { */
 		/* tmpStr.Printf(wxT("%.4f"), ContourValue); */
@@ -1991,7 +1991,7 @@ void Orbital3DSurfPane::OnReversePhase(wxCommandEvent &event ) {
 }
 
 void Orbital3DSurfPane::OnContourValueSld(wxCommandEvent &event ) {
-	float GridMax = mTarget->GetGridMax();
+	//float GridMax = mTarget->GetGridMax();
 	/* ContourValue = 0.01 * mContourValSld->GetValue() * ((fabs(GridMax)>=0.001)?GridMax:0.25); */
 	ContourValue = mContourValSld->GetValue();
 	//mTarget->SetContourValue(ContourValue);

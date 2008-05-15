@@ -223,6 +223,7 @@ bool wxUglyChoice::SetStringSelection(const wxString &string) {
             return SetSelection(i);
         }
     }
+	return false;
 }
 
 int wxUglyChoice::GetSelection() const {

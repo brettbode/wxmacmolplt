@@ -440,8 +440,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	
 	myStatus = new MolStatusBar(this);
 	SetStatusBar(myStatus);
-	int width, height;
-	GetClientSize(&width, &height);
 	
 	int attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16,
 					 0, 0};
@@ -456,14 +454,14 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 		}
 	}
 #endif
-	glCanvas = new MpGLCanvas(this, wxID_ANY, wxPoint(0,0), wxSize(height,width),
+	glCanvas = new MpGLCanvas(this, wxID_ANY, wxPoint(0,0), wxDefaultSize,
 							  attribs, do_stereo);
 	glCanvas->SetPrefs(Prefs);
 	
-	SizeChanged();
-	glCanvas->SetFocus();
 	createMenuBar();
 	SetMenuBar(menuBar);
+	/* SizeChanged(); */
+	glCanvas->SetFocus();
 	
 	/* Show(true); */
 	AdjustMenus();
@@ -479,6 +477,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 		foo.SetId(MMP_TOOL_HAND);
 		OnToggleTool(foo);
 	}
+
+	SetClientSize(wxSize(400, 400));
 
 	Show();
 }
@@ -534,18 +534,18 @@ void MolDisplayWin::getCanvasSize(long *width, long *height) {
 }
 
 void MolDisplayWin::eventSize(wxSizeEvent &event) {
-	SizeChanged();
+	/* SizeChanged(); */
 	event.Skip();
 }
 
-void MolDisplayWin::SizeChanged(void) {
+/* void MolDisplayWin::SizeChanged(void) { */
 	//resize/reposition the controls and the display canvas
-	int width, height;
-	GetClientSize(&width, &height);
+	/* int width, height; */
+	/* GetClientSize(&width, &height); */
 
 	//The status bar class effects the client size so no need to subtract it off here
-	glCanvas->SetSize(wxSize(width, height));
-}
+	/* glCanvas->SetSize(wxSize(width, height)); */
+/* } */
 
 void MolDisplayWin::OnMenuOpen(wxMenuEvent & event) {
 	StopAnimations();

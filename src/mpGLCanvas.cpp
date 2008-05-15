@@ -1928,7 +1928,6 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			// Now we assemble the rotation matrix and rotate all the selected
 			// atoms.
 			Matrix4D rot_matrix;
-			Matrix4D rot;
 
 			VirtualSphereQD3D(prev, curr, cent, radius, rot_matrix,
 							  mMainData->TotalRotation);

@@ -299,7 +299,7 @@ class MolDisplayWin : public wxFrame {
 		 */
 		MolDisplayWin(const wxString &title,
 					const wxPoint  &position = wxDefaultPosition,
-					const wxSize   &size     = wxSize(400,420),
+					const wxSize   &size     = wxDefaultSize,
 					long            style    = wxDEFAULT_FRAME_STYLE,
 					const wxString &name     = wxT("MpMainFrame"));
 
@@ -657,7 +657,7 @@ class MolDisplayWin : public wxFrame {
 
 		bool IsRotating(void);
 		void eventSize(wxSizeEvent &event);
-		void SizeChanged(void);
+		/* void SizeChanged(void); */
 		void OnFrameAnimationTimer(wxTimerEvent & event);
 		//Called during normal mode animations
 		void OnModeAnimation(wxTimerEvent & event);

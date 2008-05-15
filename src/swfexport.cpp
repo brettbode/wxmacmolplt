@@ -245,7 +245,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	wxString title;
 	wxMessageDialog *sizeDlg = NULL;
 	bool savedrawmode=false;
-	long i;
+	//long i;
 	SWFMovie *movie = NULL;
 	SWFInput *in = NULL;
 	SWFBitmap *bm = NULL;

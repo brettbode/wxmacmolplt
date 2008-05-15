@@ -908,6 +908,8 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 	if (event.GetOldSelection() == 1 && canvas) {
 		delete canvas;
 		canvas = NULL;
+		/* canvas_panel_sizer->Detach(canvas); */
+		/* canvas->Destroy(); */
 	}
 
 	if (event.GetSelection() == 1) {
