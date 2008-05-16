@@ -422,7 +422,6 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 	if (frame) {
 		wxPen lpen = dc->GetPen();
 		if (lpen == wxNullPen) {
-			std::cout << "lpen was NULL" << std::endl;
 			lpen = wxPen(*wxBLACK_PEN);
 		}
 		lpen.SetWidth((int)ScaleFactor);
@@ -1534,12 +1533,19 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 							lFrame->DeleteAtom(prev_natoms +
 											   structure->atom_to_prune);
 
-							ConnectSelectedToSite(prev_natoms + structure->link_atom,
+							// If the link-to atom was past the just deleted atom to prune, we
+							// need to adjust the link-to atom id by -1.
+							int offset = 0;
+							if (structure->link_atom > structure->atom_to_prune) {
+								offset = -1;
+							}
+
+							ConnectSelectedToSite(prev_natoms + structure->link_atom + offset,
 												  structure->link_site - 1,
 												  selected, selected_site);
 
 							lFrame->AddBond(selected,
-											prev_natoms + structure->link_atom,
+											prev_natoms + structure->link_atom + offset,
 											kSingleBond);
 
 							MolWin->AtomsChanged(true, false);
