@@ -1,10 +1,10 @@
+#ifndef _WX_UGLY_CHOICE_H_
+#define _WX_UGLY_CHOICE_H_
+
 #include "wx/wx.h"
 #include <vector>
 
 using namespace std;
-
-#ifndef _WX_UGLY_CHOICE_H_
-#define _WX_UGLY_CHOICE_H_
 
 /**
  * A custom widget for use in place of wxChoice.  Unlike wxChoice, wxUglyChoice

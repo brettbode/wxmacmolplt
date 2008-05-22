@@ -3098,10 +3098,6 @@ void MolDisplayWin::menuWindowInput_builder(wxCommandEvent &event) {
 	}
 	else {
 		inputBuilderWindow = new InputBuilderWindow(this);
-			//Since this window is not resizeable leave the width and height alone
-		wxRect temp = winData.GetInputBWinRect();
-		temp.width = temp.height = -1;
-		inputBuilderWindow->SetSize(temp);
 		inputBuilderWindow->Show();
 	}
 	winData.InputBWindowVisible(true);

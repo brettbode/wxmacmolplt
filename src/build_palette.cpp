@@ -19,6 +19,8 @@ extern BuilderDlg *build_palette;
 #define kPeriodicStrucChoice        13804
 #define kPeriodicRenameStructure    13805
 #define kPeriodicStrucGroups        13806
+#define kPeriodicCanvasPanel        13807
+#define kPeriodicCanvas             13808
 
 IMPLEMENT_DYNAMIC_CLASS(BuilderDlg, wxMiniFrame)
 
@@ -326,7 +328,7 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	// it.  But hiding the structure panel causes some page change events
 	// in the notebook that we want to avoid.  So, we create an intermediate
 	// panel and add the canvas to that.
-	canvas_panel = new wxPanel(panel, wxID_ANY);
+	canvas_panel = new wxPanel(panel, kPeriodicCanvasPanel);
 	canvas_panel_sizer = new wxFlexGridSizer(1, 1, 0, 0);
 	canvas_panel_sizer->AddGrowableCol(0);
 	canvas_panel_sizer->AddGrowableRow(0);
@@ -457,6 +459,7 @@ void BuilderDlg::OnStructureChoice(wxCommandEvent& event) {
 	if (id != wxNOT_FOUND) {
 		canvas->SetStructure(structures[id]);
 	}
+	canvas->SetFocus();
 
 }
 
@@ -920,7 +923,7 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 		 * since the selection is lost. */
 		canvas_panel->Hide();
 		int attrs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
-		canvas = new PreviewCanvas(canvas_panel, wxID_ANY, attrs);
+		canvas = new PreviewCanvas(canvas_panel, kPeriodicCanvas, attrs);
 		canvas_panel_sizer->Add(canvas, wxSizerFlags().Expand());
 		canvas_panel_sizer->Layout();
 		canvas_panel->Show();
@@ -930,6 +933,10 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 				canvas->SetStructure(structures[mStructureChoice->GetSelection()]);
 			}
 			canvas->Render();
+			canvas->Connect(wxEVT_CHAR,
+							wxKeyEventHandler(BuilderDlg::KeyHandler),
+							NULL, this);
+			canvas->SetFocus();
 		}
 #ifdef __WXMAC__
 		mStructureChoice->Enable();

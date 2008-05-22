@@ -34,6 +34,7 @@ class PreviewCanvas : public wxGLCanvas {
 		void OnMiddleMouseUp(wxMouseEvent& event);
 		void OnMouseEnterWindow(wxMouseEvent& event);
 		void OnMouseDrag(wxMouseEvent& event);
+		void OnKey(wxKeyEvent& event);
 		void DrawAtoms();
 		int Pick();
 		

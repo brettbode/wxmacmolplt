@@ -15,10 +15,13 @@ extern WinPrefs *gPreferences;
 
 /* ------------------------------------------------------------------------- */
 
-PreviewCanvas::PreviewCanvas(
-	wxWindow *parent, wxWindowID id,
-	int *attributes, const wxPoint& position, const wxSize& size,
-	long style, const wxString& name)
+PreviewCanvas::PreviewCanvas(wxWindow *parent,
+							 wxWindowID id,
+							 int *attributes,
+							 const wxPoint& position,
+							 const wxSize& size,
+							 long style,
+							 const wxString& name)
 	:
 #if wxCHECK_VERSION(2,9,0)
 	  wxGLCanvas(parent, id, attributes, position, size, style, name),
@@ -514,9 +517,19 @@ void PreviewCanvas::OnIdle(wxIdleEvent& event) {
 
 /* ------------------------------------------------------------------------- */
 
+void PreviewCanvas::OnKey(wxKeyEvent& event) {
+
+	/* std::cout << "event.GetKeyCode(): " << event.GetKeyCode() << std::endl; */
+	event.Skip();
+
+}	
+
+/* ------------------------------------------------------------------------- */
+
 BEGIN_EVENT_TABLE(PreviewCanvas, wxGLCanvas)
 	EVT_PAINT(PreviewCanvas::OnPaint)
 	EVT_SIZE(PreviewCanvas::OnSize)
+	/* EVT_CHAR(PreviewCanvas::OnKey) */
 	EVT_LEFT_DOWN(PreviewCanvas::OnLeftMouseDown)
 	EVT_MIDDLE_DOWN(PreviewCanvas::OnMiddleMouseDown)
 	EVT_LEFT_UP(PreviewCanvas::OnLeftMouseUp)

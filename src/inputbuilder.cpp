@@ -52,185 +52,95 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 
 ////@begin InputBuilderWindow event table entries
 	EVT_CLOSE( InputBuilderWindow::OnCloseWindow )
-
 	EVT_LISTBOOK_PAGE_CHANGED( ID_IBNOTEBOOK, InputBuilderWindow::OnIblistbookPageChanged )
-
 	EVT_CHOICE( ID_BASIS_CHOICE, InputBuilderWindow::OnBasisChoiceSelected )
-
 	EVT_CHOICE( ID_ECPT_CHOICE, InputBuilderWindow::OnEcptChoiceSelected )
-
 	EVT_CHOICE( ID_NUMD_CHOICE, InputBuilderWindow::OnNumdChoiceSelected )
-
 	EVT_CHOICE( ID_NUMF_CHOICE, InputBuilderWindow::OnNumfChoiceSelected )
-
 	EVT_CHOICE( ID_NUMP_CHOICE, InputBuilderWindow::OnNumpChoiceSelected )
-
 	EVT_CHOICE( ID_POLAR_CHOICE, InputBuilderWindow::OnPolarChoiceSelected )
-
 	EVT_CHECKBOX( ID_DIFFL_CHECKBOX, InputBuilderWindow::OnDifflCheckboxClick )
-
 	EVT_CHECKBOX( ID_DIFFS_CHECKBOX, InputBuilderWindow::OnDiffsCheckboxClick )
-
 	EVT_CHECKBOX( ID_SPHERE_CHECK, InputBuilderWindow::OnSphereCheckClick )
-
 	EVT_CHOICE( ID_RUN_CHOICE, InputBuilderWindow::OnRunChoiceSelected )
-
 	EVT_CHOICE( ID_SCF_CHOICE, InputBuilderWindow::OnScfChoiceSelected )
-
 	EVT_CHOICE( ID_LOCAL_CHOICE, InputBuilderWindow::OnLocalChoiceSelected )
-
 	EVT_TEXT( ID_MCHARGE_TEXTCTRL, InputBuilderWindow::OnMchargeTextctrlUpdated )
-
 	EVT_TEXT( ID_MULT_TEXTCTRL, InputBuilderWindow::OnMultTextctrlUpdated )
-
 	EVT_CHOICE( ID_EXE_CHOICE, InputBuilderWindow::OnExeChoiceSelected )
-
 	EVT_TEXT( ID_MAXIT_TEXTCTRL, InputBuilderWindow::OnMaxitTextctrlUpdated )
-
 	EVT_CHECKBOX( ID_MP2_CHECKBOX, InputBuilderWindow::OnMp2CheckboxClick )
-
 	EVT_CHECKBOX( ID_DFT_CHECKBOX, InputBuilderWindow::OnDftCheckboxClick )
-
 	EVT_CHOICE( ID_CI_CHOICE, InputBuilderWindow::OnCiChoiceSelected )
-
 	EVT_CHOICE( ID_CC_CHOICE, InputBuilderWindow::OnCcChoiceSelected )
-
 	EVT_TEXT( ID_TITLE_TEXTCTRL, InputBuilderWindow::OnTitleTextctrlUpdated )
-
 	EVT_CHOICE( ID_COORD_CHOICE, InputBuilderWindow::OnCoordChoiceSelected )
-
 	EVT_CHOICE( ID_UNIT_CHOICE, InputBuilderWindow::OnUnitChoiceSelected )
-
 	EVT_TEXT( ID_ZMAT_VARS_TEXT, InputBuilderWindow::OnZmatVarsTextUpdated )
-
 	EVT_CHOICE( ID_POINTGROUP_CHOICE, InputBuilderWindow::OnPointgroupChoiceSelected )
-
 	EVT_CHOICE( ID_ORDER_CHOICE, InputBuilderWindow::OnOrderChoiceSelected )
-
 	EVT_CHECKBOX( ID_SYMMETRY_CHECKBOX, InputBuilderWindow::OnSymmetryCheckboxClick )
-
 	EVT_TEXT( ID_TIMELIMIT_TEXT, InputBuilderWindow::OnTimelimitTextUpdated )
-
 	EVT_CHOICE( ID_TIMELIMITUNITS_CHOICE, InputBuilderWindow::OnTimelimitunitsChoiceSelected )
-
 	EVT_TEXT( ID_MEMORY_TEXT, InputBuilderWindow::OnMemoryTextUpdated )
-
 	EVT_CHOICE( ID_MEMORYUNITS_CHOICE, InputBuilderWindow::OnMemoryunitsChoiceSelected )
-
 	EVT_TEXT( ID_MEMDDI_EDIT, InputBuilderWindow::OnMemddiEditUpdated )
-
 	EVT_CHOICE( ID_MEMDDICHOICE, InputBuilderWindow::OnMemddichoiceSelected )
-
 	EVT_CHOICE( ID_DIAGONALIZATION_CHOICE, InputBuilderWindow::OnDiagonalizationChoiceSelected )
-
 	EVT_CHECKBOX( ID_CORE_CHECKBOX, InputBuilderWindow::OnCoreCheckboxClick )
-
 	EVT_RADIOBOX( ID_PLBALANCE_RADIOBOX, InputBuilderWindow::OnPlbalanceRadioboxSelected )
-
 	EVT_CHECKBOX( ID_EXTERNDATAREP_CHECKBOX, InputBuilderWindow::OnExterndatarepCheckboxClick )
-
 	EVT_CHECKBOX( ID_PARALL_CHECK, InputBuilderWindow::OnParallCheckClick )
-
 	EVT_CHOICE( ID_DFTMETHOD_CHOICE, InputBuilderWindow::OnDftmethodChoiceSelected )
-
 	EVT_CHOICE( ID_GRID_FUNCTIONAL_CHOICE, InputBuilderWindow::OnGridFunctionalChoiceSelected )
-
 	EVT_CHOICE( ID_GRIDFREE_FUNCTIONAL_CHOICE, InputBuilderWindow::OnGridfreeFunctionalChoiceSelected )
-
 	EVT_CHOICE( ID_INITGUESS_CHOICE, InputBuilderWindow::OnInitguessChoiceSelected )
-
 	EVT_CHOICE( ID_MOGUESS_VECSOURCE_CHOICE, InputBuilderWindow::OnMoguessVecsourceChoiceSelected )
-
 	EVT_TEXT( ID_MOGUESS_VECORBCOUNT_TEXT, InputBuilderWindow::OnMoguessVecorbcountTextUpdated )
-
 	EVT_CHECKBOX( ID_PRINTINITGUESS_CHECKBOX, InputBuilderWindow::OnPrintinitguessCheckboxClick )
-
 	EVT_CHECKBOX( ID_ROTORBITALS_CHECKBOX, InputBuilderWindow::OnRotorbitalsCheckboxClick )
-
 	EVT_RADIOBOX( ID_HESSMETHOD_RADIO, InputBuilderWindow::OnHessmethodRadioSelected )
-
 	EVT_TEXT( ID_FORCEDISPLACE_EDIT, InputBuilderWindow::OnForcedisplaceEditUpdated )
-
 	EVT_CHECKBOX( ID_HESSDOUBLEDIFFCHECK, InputBuilderWindow::OnHessdoublediffcheckClick )
-
 	EVT_CHECKBOX( ID_HESSPURIFYCHECK, InputBuilderWindow::OnHesspurifycheckClick )
-
 	EVT_CHECKBOX( ID_HESSPRTINTFC_CHECK, InputBuilderWindow::OnHessprtintfcCheckClick )
-
 	EVT_CHECKBOX( ID_HESSVIBANL_CHECK, InputBuilderWindow::OnHessvibanlCheckClick )
-
 	EVT_TEXT( ID_HESSFREQSCALE_EDIT, InputBuilderWindow::OnHessfreqscaleEditUpdated )
-
 	EVT_CHECKBOX( ID_MOLPLT_CHECK, InputBuilderWindow::OnMolpltCheckClick )
-
 	EVT_CHECKBOX( ID_PLTORB_CHECK, InputBuilderWindow::OnPltorbCheckClick )
-
 	EVT_CHECKBOX( ID_AIMPAC_CHECK, InputBuilderWindow::OnAimpacCheckClick )
-
 	EVT_CHECKBOX( ID_RPAC_CHECK, InputBuilderWindow::OnRpacCheckClick )
-
 	EVT_RADIOBOX( ID_MISC_PROG_RADIO, InputBuilderWindow::OnMiscProgRadioSelected )
-
 	EVT_TEXT( ID_MP2_CORE_EDIT, InputBuilderWindow::OnMp2CoreEditUpdated )
-
 	EVT_TEXT( ID_MP2MEM_EDIT, InputBuilderWindow::OnMp2memEditUpdated )
-
 	EVT_TEXT( ID_MP2INTCUTOFF_EDIT, InputBuilderWindow::OnMp2intcutoffEditUpdated )
-
 	EVT_CHECKBOX( ID_LMOMP2_CHECK, InputBuilderWindow::OnLmomp2CheckClick )
-
 	EVT_CHECKBOX( ID_MP2PROP_CHECK, InputBuilderWindow::OnMp2propCheckClick )
-
 	EVT_RADIOBOX( ID_MP2TRANS_RADIO, InputBuilderWindow::OnMp2transRadioSelected )
-
 	EVT_RADIOBOX( ID_MP2AOSTORAGE_RADIO, InputBuilderWindow::OnMp2aostorageRadioSelected )
-
 	EVT_CHECKBOX( ID_DIRECTSCF_CHECK, InputBuilderWindow::OnDirectscfCheckClick )
-
 	EVT_CHECKBOX( ID_FDIFF_CHECK, InputBuilderWindow::OnFdiffCheckClick )
-
 	EVT_CHECKBOX( ID_UHF_NO_CHECK, InputBuilderWindow::OnUhfNoCheckClick )
-
 	EVT_SPINCTRL( ID_SCF_CONV_SPIN, InputBuilderWindow::OnScfConvSpinUpdated )
-
 	EVT_TEXT( ID_MAXSTEPCOUNT_EDIT, InputBuilderWindow::OnMaxstepcountEditUpdated )
-
 	EVT_TEXT( ID_GRADCONVCRITERIA_EDIT, InputBuilderWindow::OnGradconvcriteriaEditUpdated )
-
 	EVT_CHOICE( ID_OPTMETHOD_CHOICE, InputBuilderWindow::OnOptmethodChoiceSelected )
-
 	EVT_TEXT( ID_INITSTEPSIZE_EDIT, InputBuilderWindow::OnInitstepsizeEditUpdated )
-
 	EVT_TEXT( ID_MINSTEPSIZE_EDIT, InputBuilderWindow::OnMinstepsizeEditUpdated )
-
 	EVT_TEXT( ID_MAXSTEPSIZE_CHECK, InputBuilderWindow::OnMaxstepsizeEditUpdated )
-
 	EVT_CHECKBOX( ID_UPDATESTEPSIZE_CHECK, InputBuilderWindow::OnUpdatestepsizeCheckClick )
-
 	EVT_CHECKBOX( ID_STATPT_CHECK, InputBuilderWindow::OnStatptCheckClick )
-
 	EVT_TEXT( ID_STATPT_JUMP_EDIT, InputBuilderWindow::OnStatptJumpEditUpdated )
-
 	EVT_RADIOBOX( ID_INIT_HESS_RADIO, InputBuilderWindow::OnInitHessRadioSelected )
-
 	EVT_TEXT( ID_HESS_RECALC_EDIT, InputBuilderWindow::OnHessRecalcEditUpdated )
-
 	EVT_TEXT( ID_STATPT_MODE_EDIT, InputBuilderWindow::OnStatptModeEditUpdated )
-
 	EVT_CHECKBOX( ID_PRINTORBS_CHECK, InputBuilderWindow::OnPrintorbsCheckClick )
-
 	EVT_CHECKBOX( ID_HESSEND_CHECK, InputBuilderWindow::OnHessendCheckClick )
-
 	EVT_BUTTON( ID_DEFAULTSBUTTON, InputBuilderWindow::OnDefaultsbuttonClick )
-
 	EVT_BUTTON( ID_REVERTBUTTON, InputBuilderWindow::OnRevertbuttonClick )
-
 	EVT_BUTTON( ID_WRITEFILEBUTTON, InputBuilderWindow::OnWritefilebuttonClick )
-
 	EVT_BUTTON( wxID_CANCEL, InputBuilderWindow::OnCancelClick )
-
 	EVT_BUTTON( wxID_OK, InputBuilderWindow::OnOkClick )
-
 ////@end InputBuilderWindow event table entries
 END_EVENT_TABLE()
 
