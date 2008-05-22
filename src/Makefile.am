@@ -30,6 +30,7 @@ wxmacmolplt_SOURCES =                                  \
     Gradient.cpp               Gradient.h              \
     inputbuilder.cpp           inputbuilder.h          \
     InputData.cpp              InputData.h             \
+    InputWizard.cpp            InputWizard.h           \
     Internals.cpp              Internals.h             \
     llmdialog.cpp              llmdialog.h             \
     main.cpp                   main.h                  \

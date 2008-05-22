@@ -27,6 +27,7 @@
 #include "Prefs.h"
 #include "Progress.h"
 #include <deque>
+#include "InputWizard.h"
 
 /** This class holds all the window specific OpenGL data. It currently
 	functions more like a struct. None of this data is saved to file.
@@ -243,7 +244,8 @@ class MolDisplayWin : public wxFrame {
 		EnergyPlotDialog	*energyPlotWindow;
 		FrequenciesDialog	*frequenciesWindow;
 		SurfacesWindow		*surfacesWindow;
-		InputBuilderWindow  *inputBuilderWindow;
+		InputBuilderWindow	*inputBuilderWindow;
+		/* InputWizard			*input_wizard; */
 		setPreference		*prefsDlg;
 		ZMatrixCalculator	*zMatCalcDlg;
 		
@@ -480,6 +482,7 @@ class MolDisplayWin : public wxFrame {
 		void menuWindowEnergy_plot(wxCommandEvent &event);
 		void menuWindowFrequencies(wxCommandEvent &event);
 		void menuWindowInput_builder(wxCommandEvent &event);
+		void menuWindowInputWizard(wxCommandEvent &event);
 		void menuWindowSurfaces(wxCommandEvent &event);
 		void menuWindowZMatrixCalc(wxCommandEvent &event);
 		void KeyHandler(wxKeyEvent &event);
