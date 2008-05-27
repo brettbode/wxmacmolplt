@@ -227,8 +227,34 @@ void MpGLCanvas::DoPrefDependent() {
 
 	MolWin->OpenGLData->sphere_list = glGenLists(1);
 	glNewList(MolWin->OpenGLData->sphere_list, GL_COMPILE);
+
+#if 1
+	float *verts;
+	int *faces;
+	int nverts;
+	int nfaces;
+	float *normals;
+
+	GenerateOctahedron((int) ((Prefs->GetQD3DAtomQuality() + 7) / 5), &verts,
+					   nverts, &faces, nfaces, &normals);
+	glVertexPointer(3, GL_FLOAT, 0, verts);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, verts);
+	glNormalPointer(GL_FLOAT, 0, normals);
+	glDrawElements(GL_TRIANGLES, nfaces * 3, GL_UNSIGNED_INT, faces);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	delete[] verts;
+	delete[] faces;
+	delete[] normals;
+#else
 	gluSphere(quad, 1.0f, (long) (1.5f * Prefs->GetQD3DAtomQuality()),
 			  (long) (Prefs->GetQD3DAtomQuality()));
+#endif
+
 	glEndList();
 
 	gluDeleteQuadric(quad);
@@ -3311,7 +3337,7 @@ void MpGLCanvas::eventMouseCaptureLost(wxMouseCaptureLostEvent& event) {
 #endif
 
 BEGIN_EVENT_TABLE(MpGLCanvas, wxGLCanvas)
-	/* EVT_IDLE(MpGLCanvas::OnIdleEvent)  */
+	/* EVT_IDLE(MpGLCanvas::OnIdleEvent) */
 	EVT_SIZE(MpGLCanvas::eventSize)
 	EVT_PAINT(MpGLCanvas::eventPaint)
 	EVT_ERASE_BACKGROUND(MpGLCanvas::eventErase)

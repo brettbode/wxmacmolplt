@@ -118,4 +118,11 @@ class CPoint3D {
 typedef float Matrix3D[3][3]; 
 typedef float Matrix4D[4][4];
 
+void GenerateOctahedron(int nlevels,
+						float **verts,
+						int& nverts,
+						int **faces,
+						int& nfaces,
+						float **normals);
+
 #endif

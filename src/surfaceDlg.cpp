@@ -249,6 +249,9 @@ BaseSurfacePane::BaseSurfacePane( wxWindow* parent, Surface* target, SurfacesWin
 
 BaseSurfacePane::~BaseSurfacePane() {
 
+#if 0
+	// This should be fixed by wxWidgets r53773.
+
 	// The default button apparently needs to be manually unset.  Otherwise
 	// calling wxButton::SetDefault later will try to operate on the previous
 	// default and now deleted button.
@@ -258,6 +261,8 @@ BaseSurfacePane::~BaseSurfacePane() {
 	if (tlw) {
 		tlw->SetDefaultItem(NULL);
 	}
+#endif
+
 }
 
 bool BaseSurfacePane::Create( wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style ) {
