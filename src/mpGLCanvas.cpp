@@ -234,9 +234,20 @@ void MpGLCanvas::DoPrefDependent() {
 	int nverts;
 	int nfaces;
 	float *normals;
+	int nlevels;
 
-	GenerateOctahedron((int) ((Prefs->GetQD3DAtomQuality() + 7) / 5), &verts,
-					   nverts, &faces, nfaces, &normals);
+	// We do some funny mapping from display quality (2 - 40) to number of
+	// subdivisions.  2 maps to 0 levels, while all other values are mapped
+	// such that 13 -> 3 levels and 40 -> 7 levels.  Levels >7 recurse too
+	// much.
+	if (Prefs->GetQD3DAtomQuality() == 2) {
+		nlevels = 0;
+	} else {
+		nlevels = (int) ((Prefs->GetQD3DAtomQuality() - 13.0f) *
+						 (4.0f / 27.0f) + 3.0f);
+	}
+
+	GenerateOctahedron(nlevels, &verts, nverts, &faces, nfaces, &normals);
 	glVertexPointer(3, GL_FLOAT, 0, verts);
 
 	glEnableClientState(GL_VERTEX_ARRAY);
