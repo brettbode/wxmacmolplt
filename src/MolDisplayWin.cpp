@@ -1835,7 +1835,7 @@ bool MolPrintOut::OnPrintPage(int page) {
 		if (!IsPreview()) {
 			MapScreenSizeToDevice();
 		}
-		dc->SetBrush(*wxLIGHT_GREY_BRUSH);
+		/* dc->SetBrush(*wxLIGHT_GREY_BRUSH); */
 #endif
 
 		wxSize dcp = dc->GetPPI();
