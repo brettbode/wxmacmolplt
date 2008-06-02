@@ -138,6 +138,7 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 	EVT_CHECKBOX( ID_HESSEND_CHECK, InputBuilderWindow::OnHessendCheckClick )
 	EVT_BUTTON( ID_DEFAULTSBUTTON, InputBuilderWindow::OnDefaultsbuttonClick )
 	EVT_BUTTON( ID_REVERTBUTTON, InputBuilderWindow::OnRevertbuttonClick )
+	EVT_BUTTON( ID_ADVANCEDBUTTON, InputBuilderWindow::OnAdvancedButtonClicked )
 	EVT_BUTTON( ID_WRITEFILEBUTTON, InputBuilderWindow::OnWritefilebuttonClick )
 	EVT_BUTTON( wxID_CANCEL, InputBuilderWindow::OnCancelClick )
 	EVT_BUTTON( wxID_OK, InputBuilderWindow::OnOkClick )
@@ -1397,6 +1398,9 @@ void InputBuilderWindow::CreateControls()
 	revertBtn = new wxButton( itemPanel3, ID_REVERTBUTTON, _("Revert"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer220->Add(revertBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
+    advanced_button = new wxButton(itemPanel3, ID_ADVANCEDBUTTON, _("Basic"), wxDefaultPosition, wxDefaultSize, 0);
+	itemBoxSizer220->Add(advanced_button, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+
 	writeBtn = new wxButton( itemPanel3, ID_WRITEFILEBUTTON, _("Write File"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer220->Add(writeBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
@@ -1478,6 +1482,41 @@ void InputBuilderWindow::OnCloseWindow( wxCloseEvent& event )
     parent->CloseInputBuilderWindow();
 }
 
+bool InputBuilderWindow::ShowBasis() const {
+
+	return TmpInputRec->Control->GetRunType() != G3MP2;
+
+}
+
+bool InputBuilderWindow::ShowStatPoint() const {
+
+	return TmpInputRec->Control->GetRunType() == OptimizeRun ||
+		   TmpInputRec->Control->GetRunType() == SadPointRun ||
+		   TmpInputRec->Control->GetRunType() == G3MP2;
+
+}
+
+bool InputBuilderWindow::ShowMP2Opts() const {
+
+	return TmpInputRec->Control->GetMPLevel() == 2 ||
+		   TmpInputRec->Control->GetRunType() == G3MP2;
+
+}
+
+bool InputBuilderWindow::ShowHessOpts() const {
+
+	return TmpInputRec->Control->GetRunType() == HessianRun ||
+		   TmpInputRec->Control->GetRunType() == G3MP2 ||
+		   (TmpInputRec->Control->GetRunType() == SadPointRun &&
+		    TmpInputRec->StatPt->GetHessMethod() == 3);
+
+}
+
+bool InputBuilderWindow::ShowSCFOpts() const {
+
+	return TmpInputRec->Control->GetSCFType() <= 4;
+
+}
 
 void InputBuilderWindow::SetupItems() {
     SetupBasisItems();
@@ -1493,15 +1532,11 @@ void InputBuilderWindow::SetupItems() {
     SetupStatPointItems();
     SetupSummaryItems();
 
-	setPaneVisible(BASIS_PANE, (TmpInputRec->Control->GetRunType() != G3MP2));
-	setPaneVisible(STATPOINT_PANE, ((TmpInputRec->Control->GetRunType() == OptimizeRun)||
-									(TmpInputRec->Control->GetRunType() == SadPointRun)||
-									(TmpInputRec->Control->GetRunType() == G3MP2)));
-	setPaneVisible(MP2OPTS_PANE, (TmpInputRec->Control->GetMPLevel() == 2)||
-								(TmpInputRec->Control->GetRunType()==G3MP2));
-	setPaneVisible(HESSOPTS_PANE, (TmpInputRec->Control->GetRunType() == HessianRun)||
-				   (TmpInputRec->Control->GetRunType() == G3MP2)||
-				((TmpInputRec->Control->GetRunType() == SadPointRun)&&(TmpInputRec->StatPt->GetHessMethod() == 3)));
+	setPaneVisible(BASIS_PANE, ShowBasis());
+	setPaneVisible(STATPOINT_PANE, ShowStatPoint());
+	setPaneVisible(MP2OPTS_PANE, ShowMP2Opts());
+	setPaneVisible(HESSOPTS_PANE, ShowHessOpts());
+
 	Fit();
 }
 
@@ -2328,7 +2363,7 @@ void InputBuilderWindow::OnRunChoiceSelected( wxCommandEvent& event )
 void InputBuilderWindow::OnScfChoiceSelected( wxCommandEvent& event )
 {
     TmpInputRec->Control->SetSCFType((GAMESS_SCFType)(scfChoice->GetSelection() + 1));
-	setPaneVisible(SCFOPTS_PANE, (TmpInputRec->Control->GetSCFType() <= 4));
+	setPaneVisible(SCFOPTS_PANE, ShowSCFOpts());
     SetupItems();
 }
 
@@ -2557,6 +2592,41 @@ void InputBuilderWindow::OnRevertbuttonClick( wxCommandEvent& event )
     SetupItems();
 }
 
+/*!
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ADVANCEDBUTTON
+ */
+
+void InputBuilderWindow::OnAdvancedButtonClicked( wxCommandEvent& event )
+{
+
+	// User wants to go to advanced mode.
+	if (advanced_button->GetLabel() == wxT("Advanced")) {
+		advanced_button->SetLabel(wxT("Basic"));
+		setPaneVisible(BASIS_PANE, ShowBasis());
+		setPaneVisible(CONTROL_PANE, true);
+		setPaneVisible(DATA_PANE, true);
+		setPaneVisible(SYSTEM_PANE, true);
+		setPaneVisible(DFT_PANE, true);
+		setPaneVisible(MOGUESS_PANE, true);
+		setPaneVisible(HESSOPTS_PANE, ShowHessOpts());
+		setPaneVisible(MISCPREFS_PANE, true);
+		setPaneVisible(MP2OPTS_PANE, ShowMP2Opts());
+		setPaneVisible(SCFOPTS_PANE, ShowSCFOpts());
+		setPaneVisible(STATPOINT_PANE, ShowStatPoint());
+		setPaneVisible(SUMMARY_PANE, true);
+		// TODO: scf pane and dft pane
+		SetupControlItems();
+	}
+	
+	// User wants to go to basic mode.
+	else {
+		advanced_button->SetLabel(wxT("Advanced"));
+		for (int i = DATA_PANE; i <= SUMMARY_PANE; ++i) {
+			setPaneVisible(i, false);
+		}
+	}
+
+}
 
 /*!
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_WRITEFILEBUTTON

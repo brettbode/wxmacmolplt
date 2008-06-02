@@ -309,7 +309,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_ENERGYPLOTWINDOW,		MolDisplayWin::menuWindowEnergy_plot)
 	EVT_MENU (MMP_FREQUENCIESWINDOW,	MolDisplayWin::menuWindowFrequencies)
 	EVT_MENU (MMP_INPUTBUILDERWINDOW,	MolDisplayWin::menuWindowInput_builder)
-	EVT_MENU (MMP_INPUT_WIZARD,			MolDisplayWin::menuWindowInputWizard)
+	/* EVT_MENU (MMP_INPUT_WIZARD,			MolDisplayWin::menuWindowInputWizard) */
 	EVT_MENU (MMP_SURFACESWINDOW,		MolDisplayWin::menuWindowSurfaces)
 	EVT_MENU (ID_LOCAL_PREFERENCES,		MolDisplayWin::menuPreferences)
 	EVT_MENU (MMP_ZMATRIXCALC,			MolDisplayWin::menuWindowZMatrixCalc)
@@ -769,7 +769,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"), _("A plot of the energy for each geometry"));
 	menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"), _("Plot the vibrational frequencies"));
 	menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"), _T("Generate a GAMESS input file"));
-	menuWindow->Append(MMP_INPUT_WIZARD, wxT("&Input Builder Wizard"), _T("Easily generate a GAMESS input file"));
+	/* menuWindow->Append(MMP_INPUT_WIZARD, wxT("&Input Builder Wizard"), _T("Easily generate a GAMESS input file")); */
 	menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"), _T("Add/Edit/Remove various surface types"));
 	menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"));
 	menuWindow->Append(ID_LOCAL_PREFERENCES, wxT("Pr&eferences"), _T("Edit the preferences for this window"));

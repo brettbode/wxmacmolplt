@@ -518,58 +518,52 @@ void GenerateOctahedron(int nlevels,
 						int& nfaces,
 						float **normals) {
 
-   vidx_map_t vidx_map;
-   int nfaces_so_far = 0;
+	vidx_map_t vidx_map;
+	int nfaces_so_far = 0;
 
-   nverts = (2 << (2 * nlevels + 1)) + 2;
-   nfaces = 2 << (2 * nlevels + 2);
+	nverts = (2 << (2 * nlevels + 1)) + 2;
+	nfaces = 2 << (2 * nlevels + 2);
 
-   CPoint3D face_normals[nfaces];
+	CPoint3D face_normals[nfaces];
 
-   *verts = new float[nverts * 3];
-   *faces = new int[nfaces * 3];
-   *normals = new float[nverts * 3];
+	*verts = new float[nverts * 3];
+	*faces = new int[nfaces * 3];
+	*normals = new float[nverts * 3];
 
-   CPoint3D octaverts[6] = {
-      CPoint3D(0.0f, 1.0f, 0.0f),
-      CPoint3D(-1.0f, 0.0f, 0.0f),
-      CPoint3D(0.0f, 0.0f, -1.0f),
-      CPoint3D(0.0f, -1.0f, 0.0f),
-      CPoint3D(1.0f, 0.0f, 0.0f),
-      CPoint3D(0.0f, 0.0f, 1.0f)
-   };
+	CPoint3D octaverts[6] = {
+		CPoint3D(0.0f, 1.0f, 0.0f),
+		CPoint3D(-1.0f, 0.0f, 0.0f),
+		CPoint3D(0.0f, 0.0f, -1.0f),
+		CPoint3D(0.0f, -1.0f, 0.0f),
+		CPoint3D(1.0f, 0.0f, 0.0f),
+		CPoint3D(0.0f, 0.0f, 1.0f)
+	};
 
-   // The geometry will definitely contain the initial vertices.
-   IssueVertexOcta(*verts, vidx_map, octaverts[0]);
-   IssueVertexOcta(*verts, vidx_map, octaverts[1]);
-   IssueVertexOcta(*verts, vidx_map, octaverts[2]);
-   IssueVertexOcta(*verts, vidx_map, octaverts[3]);
-   IssueVertexOcta(*verts, vidx_map, octaverts[4]);
-   IssueVertexOcta(*verts, vidx_map, octaverts[5]);
+	// The geometry will definitely contain the initial vertices.
+	IssueVertexOcta(*verts, vidx_map, octaverts[0]);
+	IssueVertexOcta(*verts, vidx_map, octaverts[1]);
+	IssueVertexOcta(*verts, vidx_map, octaverts[2]);
+	IssueVertexOcta(*verts, vidx_map, octaverts[3]);
+	IssueVertexOcta(*verts, vidx_map, octaverts[4]);
+	IssueVertexOcta(*verts, vidx_map, octaverts[5]);
 
-   // Now issue the eight faces for subdividing.
-   IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
-                     octaverts[0], octaverts[1], octaverts[2]);
-   IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
-                     octaverts[1], octaverts[3], octaverts[2]);
-   IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
-                     octaverts[0], octaverts[2], octaverts[4]);
-   IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
-                     octaverts[2], octaverts[3], octaverts[4]);
-   IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
-                     octaverts[0], octaverts[4], octaverts[5]);
-   IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
-                     octaverts[4], octaverts[3], octaverts[5]);
-   IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
-                     octaverts[0], octaverts[5], octaverts[1]);
-   IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
-                     octaverts[5], octaverts[3], octaverts[1]);
-
-	/* for (fi = 0; fi < nfaces; fi++) { */
-		/* face_normals[fi * 3 + 0] = 0.0f; */
-		/* face_normals[fi * 3 + 1] = 0.0f; */
-		/* face_normals[fi * 3 + 2] = 0.0f; */
-	/* } */
+	// Now issue the eight faces for subdividing.
+	IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
+					  octaverts[0], octaverts[1], octaverts[2]);
+	IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
+					  octaverts[1], octaverts[3], octaverts[2]);
+	IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
+					  octaverts[0], octaverts[2], octaverts[4]);
+	IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
+					  octaverts[2], octaverts[3], octaverts[4]);
+	IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
+					  octaverts[0], octaverts[4], octaverts[5]);
+	IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
+					  octaverts[4], octaverts[3], octaverts[5]);
+	IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
+					  octaverts[0], octaverts[5], octaverts[1]);
+	IssueTriangleOcta(*verts, vidx_map, *faces, nlevels, nfaces_so_far,
+					  octaverts[5], octaverts[3], octaverts[1]);
 
 	CPoint3D vec0;
 	CPoint3D vec1;
@@ -621,81 +615,81 @@ void GenerateOctahedron(int nlevels,
 /* ------------------------------------------------------------------------- */
 
 void IssueVertexOcta(float *verts,
-                     vidx_map_t& vidx_map,
-                     const CPoint3D& v) {
+					 vidx_map_t& vidx_map,
+					 const CPoint3D& v) {
 
-   std::ostringstream outs;
+	std::ostringstream outs;
 
-   outs << std::fixed << v.x << "," << v.y << "," << v.z;
+	outs << std::fixed << v.x << "," << v.y << "," << v.z;
 
-   if (vidx_map.find(outs.str()) == vidx_map.end()) {
-	  verts[vidx_map.size() * 3 + 0] = v.x;
-	  verts[vidx_map.size() * 3 + 1] = v.y;
-	  verts[vidx_map.size() * 3 + 2] = v.z;
-      vidx_map.insert(std::pair<std::string, int>(outs.str(), vidx_map.size()));
-   }
+	if (vidx_map.find(outs.str()) == vidx_map.end()) {
+		verts[vidx_map.size() * 3 + 0] = v.x;
+		verts[vidx_map.size() * 3 + 1] = v.y;
+		verts[vidx_map.size() * 3 + 2] = v.z;
+		vidx_map.insert(std::pair<std::string, int>(outs.str(), vidx_map.size()));
+	}
 
 }
 
 /* ------------------------------------------------------------------------- */
 
 void IssueTriangleOcta(float *verts,
-                       vidx_map_t& vidx_map,
-                       int *faces,
-                       int level,
+					   vidx_map_t& vidx_map,
+					   int *faces,
+					   int level,
 					   int& nfaces_so_far,
-                       const CPoint3D& v0,
-                       const CPoint3D& v1,
-                       const CPoint3D& v2) {
+					   const CPoint3D& v0,
+					   const CPoint3D& v1,
+					   const CPoint3D& v2) {
 
-   // Base case.  We've reached the face level.
-   if (level == 0) {
-      std::ostringstream outs;
-      vidx_map_t::iterator it0, it1, it2;
+	// Base case.  We've reached the face level.
+	if (level == 0) {
+		std::ostringstream outs;
+		vidx_map_t::iterator it0, it1, it2;
 
-      outs << std::fixed << v0.x << "," << v0.y << "," << v0.z;
-      it0 = vidx_map.find(outs.str());
-      if (it0 == vidx_map.end()) {
-         std::cout << "Bad: outs.str(): " << outs.str() << std::endl;
-      }
-      outs.str("");
+		outs << std::fixed << v0.x << "," << v0.y << "," << v0.z;
+		it0 = vidx_map.find(outs.str());
+		if (it0 == vidx_map.end()) {
+			std::cout << "Bad: outs.str(): " << outs.str() << std::endl;
+		}
+		outs.str("");
 
-      outs << std::fixed << v1.x << "," << v1.y << "," << v1.z;
-      it1 = vidx_map.find(outs.str());
-      if (it1 == vidx_map.end()) {
-         std::cout << "Bad: outs.str(): " << outs.str() << std::endl;
-      }
-      outs.str("");
+		outs << std::fixed << v1.x << "," << v1.y << "," << v1.z;
+		it1 = vidx_map.find(outs.str());
+		if (it1 == vidx_map.end()) {
+			std::cout << "Bad: outs.str(): " << outs.str() << std::endl;
+		}
+		outs.str("");
 
-      outs << std::fixed << v2.x << "," << v2.y << "," << v2.z;
-      it2 = vidx_map.find(outs.str());
-      if (it2 == vidx_map.end()) {
-         std::cout << "Bad: outs.str(): " << outs.str() << std::endl;
-      }
-      outs.str("");
+		outs << std::fixed << v2.x << "," << v2.y << "," << v2.z;
+		it2 = vidx_map.find(outs.str());
+		if (it2 == vidx_map.end()) {
+			std::cout << "Bad: outs.str(): " << outs.str() << std::endl;
+		}
+		outs.str("");
 
-	  faces[nfaces_so_far * 3 + 0] = it1->second;
-	  faces[nfaces_so_far * 3 + 1] = it0->second;
-	  faces[nfaces_so_far * 3 + 2] = it2->second;
-	  ++nfaces_so_far;
-   }
-   
-   // Recursive case.  This face need to be decomposed into four subtriangles.
-   else {
-      CPoint3D v3 = (v0 + v1) * 0.5f;
-      CPoint3D v4 = (v1 + v2) * 0.5f;
-      CPoint3D v5 = (v2 + v0) * 0.5f;
-      Normalize3D(&v3);
-      Normalize3D(&v4);
-      Normalize3D(&v5);
-      IssueVertexOcta(verts, vidx_map, v3);
-      IssueVertexOcta(verts, vidx_map, v4);
-      IssueVertexOcta(verts, vidx_map, v5);
-      IssueTriangleOcta(verts, vidx_map, faces, level - 1, nfaces_so_far, v0, v3, v5);
-      IssueTriangleOcta(verts, vidx_map, faces, level - 1, nfaces_so_far, v3, v4, v5);
-      IssueTriangleOcta(verts, vidx_map, faces, level - 1, nfaces_so_far, v3, v1, v4);
-      IssueTriangleOcta(verts, vidx_map, faces, level - 1, nfaces_so_far, v5, v4, v2);
-   }
+		faces[nfaces_so_far * 3 + 0] = it1->second;
+		faces[nfaces_so_far * 3 + 1] = it0->second;
+		faces[nfaces_so_far * 3 + 2] = it2->second;
+		++nfaces_so_far;
+	}
+
+	// Recursive case.  This face need to be decomposed into four subtriangles.
+	else {
+		CPoint3D v3 = (v0 + v1) * 0.5f;
+		CPoint3D v4 = (v1 + v2) * 0.5f;
+		CPoint3D v5 = (v2 + v0) * 0.5f;
+		Normalize3D(&v3);
+		Normalize3D(&v4);
+		Normalize3D(&v5);
+		IssueVertexOcta(verts, vidx_map, v3);
+		IssueVertexOcta(verts, vidx_map, v4);
+		IssueVertexOcta(verts, vidx_map, v5);
+		IssueTriangleOcta(verts, vidx_map, faces, level - 1, nfaces_so_far, v0, v3, v5);
+		IssueTriangleOcta(verts, vidx_map, faces, level - 1, nfaces_so_far, v3, v4, v5);
+		IssueTriangleOcta(verts, vidx_map, faces, level - 1, nfaces_so_far, v3, v1, v4);
+		IssueTriangleOcta(verts, vidx_map, faces, level - 1, nfaces_so_far, v5, v4, v2);
+	}
 
 }
 

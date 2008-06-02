@@ -151,6 +151,7 @@ class wxSpinCtrl;
 #define ID_SUMMARY_ELEC 10236
 #define ID_DEFAULTSBUTTON 10228
 #define ID_REVERTBUTTON 10090
+#define ID_ADVANCEDBUTTON 10091
 #define ID_WRITEFILEBUTTON 10073
 #define SYMBOL_INPUTBUILDERWINDOW_STYLE wxCAPTION|wxSYSTEM_MENU|wxCLOSE_BOX|wxTAB_TRAVERSAL
 #define SYMBOL_INPUTBUILDERWINDOW_TITLE _("Input Builder")
@@ -205,6 +206,12 @@ public:
 
     /// Creates the controls and sizers
     void CreateControls();
+
+	bool ShowBasis() const;
+	bool ShowStatPoint() const;
+	bool ShowMP2Opts() const;
+	bool ShowHessOpts() const;
+	bool ShowSCFOpts() const;
 
 ////@begin InputBuilderWindow event handler declarations
 
@@ -469,6 +476,9 @@ public:
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_REVERTBUTTON
 	void OnRevertbuttonClick( wxCommandEvent& event );
 
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ADVANCEDBUTTON
+	void OnAdvancedButtonClicked( wxCommandEvent& event );
+
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_WRITEFILEBUTTON
 	void OnWritefilebuttonClick( wxCommandEvent& event );
 
@@ -606,6 +616,7 @@ public:
 	wxTextCtrl* mElectronCorr;
 	wxButton* defaultsBtn;
 	wxButton* revertBtn;
+	wxButton* advanced_button;
 	wxButton* writeBtn;
 ////@end InputBuilderWindow member variables
 
