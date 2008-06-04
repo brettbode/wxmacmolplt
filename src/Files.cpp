@@ -74,7 +74,12 @@ void FileError::WriteError(void) {
 		wxLogMessage(err);
 	}
 }
-
+/**
+  * Adds support for opening GAMESS Input (.INP) files. 
+  * @param Buffer A BufferFileObject that the .INP or .inp file is buffered
+  * into to make parsing the file easier.  See the BufferFile object for 
+  * valid BufferFile operations.
+*/
 long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	char	Line[kMaxLineLength], token[kMaxLineLength];
 	short	scanerr;
@@ -927,7 +932,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						Buffer->BackupnLines(1);
 						break;
 					}
-					scanCount = sscanf(Line, "%f %f %f", &(tmpFloat[0]),&(tmpFloat[1]),&(tmpFloat[2]));
+					scanCount = sscanf(Line, "%f %f %f", &tmpFloat[0], &tmpFloat[1], &tmpFloat[2]);
 					// non-SP (L) case: one exponent, one coef per line
 					if (2==scanCount && LShell!=MainData->Basis->Shells[iShell].ShellType) {
 						MainData->Basis->Shells[iShell].NumPrims++;
@@ -1308,7 +1313,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					bytesRead = 0;
 					// read Frequencies as strings one at a time in one line
 					while (bytesRead < lineBytes) {
-						scanCount = sscanf(&(Line[bytesRead]), "%s%n", freq, &bytesConsumed);
+						scanCount = sscanf(&Line[bytesRead], "%s%n", freq, &bytesConsumed);
 						if (scanCount == 1) {
 							lFrame->Vibs->Frequencies.push_back(freq);
 							bytesRead += bytesConsumed;
@@ -1323,8 +1328,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						bytesRead = 0;
 						for (long imode=0; imode<lineModes; imode++) {
 							CPoint3D temp;
-							int scanCount = sscanf(&(Line[bytesRead]), "%f %f %f%n",
-												   &(temp.x), &(temp.y), &(temp.z), &bytesConsumed);
+							int scanCount = sscanf(&Line[bytesRead], "%f %f %f%n",
+												   &temp.x, &temp.y, &temp.z, &bytesConsumed);
 							if (scanCount == 3) {
 								lFrame->Vibs->NormMode[iatm + lFrame->NumAtoms*(nModes+imode)] = temp;
 								bytesRead += bytesConsumed;
@@ -1339,37 +1344,166 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					nModes += lineModes;
 				} else
 					break;
-			}// end while in file and not errori
+			}// end while in file and not error
 			lFrame->Vibs->NumModes = nModes;
 			lFrame->Vibs->Resize(nModes);
 		}
 	} // vibrational frequencies done
 	// Don't need an else, case, since lFrame->Vibs would be NULL, anyway
 	// We don't handle the $DIPOLE section in MKL files
-	// OpenMKLFile can return because we are done parsing the file
+	// OpenMKLFile() can return "success" because we are done parsing the file
 	return 1;
 }
+
 /**
-  * Adds support for opening the MOPAC MOP and mop file extensions. 
-  * @param Buffer A BufferFileObject that the .MOP or .mop file is buffered into
-  * to make parsing the file easier.  See the BufferFile object for valid
-  * BufferFile operations.
+  * Adds support for opening the MOPAC zMatrix MOP and mop file types.
+  * @param Buffer A BufferFileObject that the .MOP or .mop file is buffered
+  * into to make parsing the file easier.  See the BufferFile object for 
+  * valid BufferFile operations.
 */
 long MolDisplayWin::OpenMOPFile(BufferFile * Buffer) {
 	// buffer line for text to be scanned while parsing
 	char Line[kMaxLineLength];
-	// number of atomes in the structure described by this file
-	long nAtoms = 0;
-	// counters for line-by-line text input:
-	// # of tokens sucessfully read in a sscanf call, # bytes total in line, 
-	// current position in line, and the # of bytes read through one sscanf call
-	int scanCount, lineBytes, bytesRead, bytesConsumed;
+	// placeholder for traversing file sections in Buffer
+	long startOfAtoms = 1;
+	// # of tokens sucessfully read in a sscanf call, # line of atoms read 
+	int  scanCount = 0, iLine = 0;
+	// vars for holding sscanf read, borrowing some from ParseMOPACZMatrix()
+	CPoint3D	pos = CPoint3D(0.0f, 0.0f, 0.0f);	//This is just a placeholder
+	char		token[8];	// This could probably safelybe 2-3 chars long
+	float		bondLength = -0.1, bondAngle = 0.0, bondDihedral = 0.0;
+	// sane defaults to avoid accessing unassigned variables
+	long		firstAtomType =-1, AtomType=-1, nAtoms = 0;
+	int			j1=-1, j2=-1, j3=-1, con1=-1, con2=-1, con3=-1;
+	bool		error = false, firstAtom = true;
+
+	ProgressInd->ChangeText("Reading MOP file...");
+	Frame *lFrame = MainData->cFrame;
+	//zero out initial token
+	memset((void *)token, 0, (size_t)(8*sizeof(char)));
+
+	printf("Loading\n");										// DEBUG CODE
 	
-	ProgressInd->ChangeText("Reading MKL file...");
-	Frame * lFrame = MainData->cFrame;
+	Buffer->SkipnLines(3);							// Skip descriptions-	
+	startOfAtoms = Buffer->GetFilePos();			// line before 1st atom
+	printf("startOfAtoms: %ld\n", startOfAtoms);				// DEBUG CODE
+
+	// Count the number of Atoms
+	while (Buffer->GetFilePos()	< Buffer->GetFileLength()) {
+		Buffer->GetLine(Line);
+		scanCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", &token, &bondLength, 
+					&j1, &bondAngle, &j2, &bondDihedral, &j3, &con1, &con2, &con3);
+		printf("literal %2d: %s\n", nAtoms, Line);				// DEBUG CODE
+		if (scanCount > 2 && nAtoms > 1 && bondLength < 0.00001) {
+			break;
+		}
+		if ( (scanCount > 6 && nAtoms > 2) || (scanCount > 4 && nAtoms == 2) || 
+			(scanCount > 2 && nAtoms == 1) || (scanCount > 0 && nAtoms == 0) ) 
+			nAtoms++;
+		else 
+			break;
+	}
+	printf("nAtoms is: %d\n", nAtoms);							// DEBUG CODE
+	Buffer->SetFilePos(startOfAtoms);	// now that atoms are counted, go back to where they start
 	
-	return 0;
+	// data in this file will be treated as a zMatrix 
+	// cartesian mop files exist, but usually have a different extension
+	if (!(MainData->IntCoords)) {
+		MainData->IntCoords = new Internals;
+		printf("new Internals\n");								// DEBUG CODE
+	}
+	MOPacInternals * mInts = MainData->IntCoords->GetMOPacStyle();
+	if (!mInts) {
+		MainData->IntCoords->CreateMOPacInternals(3*nAtoms);
+		mInts = MainData->IntCoords->GetMOPacStyle();
+	}
+	printf("got mInts\n");										// DEBUG CODE
+	float unitConversion = 1.0;
+	if (MainData->InputOptions && MainData->InputOptions->Data->GetUnits()) 
+		unitConversion = kBohr2AngConversion;
+	printf("got unitConversion\n");								// DEBUG CODE	
+
+	while (iLine < nAtoms) {
+
+		Buffer->GetLine(Line);
+		printf("literal: %s\n", Line);							// DEBUG CODE
+		printf("reading line %d\n", iLine);					// DEBUG CODE	
+		scanCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", &token, &bondLength, 
+					&j1, &bondAngle, &j2, &bondDihedral, &j3, &con1, &con2, &con3);
+		if (scanCount < 1) break;	//failed to parse anything?
+	
+		printf("line %d was: %s\n", iLine, Line);				// DEBUG CODE
+		printf("\tgot atom number %ld\n", iLine+1);				// DEBUG CODE
+		
+		AtomType = SetAtomType((unsigned char *) token);
+/*		if (firstAtom) {
+			firstAtomType = AtomType;
+		}
+		else {
+			// The last Atom listed maybe a dupe of the first.  This acts as a terminating 
+			// entry, but depending on where the MOP file came from, it may not have it.
+			if (AtomType == firstAtomType && bondLength < 0.00001) {
+				printf("\tdid not add atom number %d\n", iLine+1);			// DEBUG CODE
+				break;
+			}
+		}
+*/		firstAtom = false; // we only needed this flag in the above test.	
+		lFrame->AddAtom(AtomType, pos);
+		printf("\tadded atom number %ld\n", iLine+1);			// DEBUG CODE
+		if (iLine > 0) {
+			if (scanCount < 2) break;
+			if (iLine == 1) {	//the second atom will specify only the bond length
+				con1 = 1;
+			} else {
+				if (iLine == 2) {	//For the third atom the connectivity is optional
+					if ((scanCount >= 5)&&(scanCount <= 7)) {
+						con1 = 2;
+						con2 = 1;	//The default allows the connections to be assumed
+						if (scanCount >= 6) {
+							con1 = (int) bondDihedral;
+							con2 = j3;
+						}
+					} else break;	// the line is invalid
+				}
+			}
+			if (bondLength < 0.00001) break;
+			con1--;
+			con2--;
+			con3--;
+			if (con1 >= iLine) break;
+			mInts->AddInternalCoordinate(iLine, con1, 0, bondLength*unitConversion);
+			if (iLine > 1) {
+				mInts->AddInternalCoordinate(iLine, con2, 1, bondAngle);
+				if (iLine > 2)
+					mInts->AddInternalCoordinate(iLine, con3, 2, bondDihedral);
+			}
+		}
+		iLine++;
+		printf("iLine just became: %ld\n", iLine);				// DEBUG CODE
+	}
+	//if we punted after the AddAtom call delete off the atom without internal coordinate information
+	printf("Might remove last atom\n");							// DEBUG CODE
+	if (iLine > lFrame->NumAtoms) {
+		lFrame->DeleteAtom(iLine-1);
+		printf("Did remove last atom\n");						// DEBUG CODE
+	}	
+	printf("Will convert to cartesians\n");						// DEBUG CODE	
+	//Now convert the set of internals into cartesians
+	mInts->InternalsToCartesians(MainData, Prefs, 0);			// SOMETIMES CAUSES SEG FAULTS
+	printf("Did convert to cartesians\n");						// DEBUG CODE	
+	// End of yank from ParseMOPACZMatrix
+	
+	printf("Might do SetBonds\n");
+	if (Prefs->GetAutoBond()) {	//setup bonds, if needed		// SUSPECT
+		lFrame->SetBonds(Prefs, true);							// SUSPECT
+		printf("Did SetBonds\n");								// DEBUG CODE
+	}
+	if(error)						// error is placholder in case we make errors above
+		return 0;					// 0 is if error, but so far nothing generates this					
+	else
+		return 1;	// success
 }
+
 /**
   * Adds support for opening the MOPAC ARC and arc archive file extensions. 
   * @param Buffer A BufferFileObject that the .ARC or .arc file is buffered into

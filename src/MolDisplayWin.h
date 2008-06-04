@@ -510,15 +510,19 @@ class MolDisplayWin : public wxFrame {
 		long OpenXYZFile(BufferFile * Buffer);
 		long OpenPDBFile(BufferFile * Buffer);
 		long OpenMDLMolFile(BufferFile * Buffer);
+		/**
+		 Open a GAMESS input or ".INP" format file. 
+		 \param Buffer The buffer connected to the INP file.
+		 */
 		long OpenGAMESSInput(BufferFile * Buffer);
-		long OpenMolPltFile(BufferFile *Buffer);
+		long OpenMolPltFile(BufferFile * Buffer);
 		long OpenMoldenFile(BufferFile * Buffer);
 		/**
 		 Open a Molekel or ".MKL" format file. 
 		 \param Buffer The buffer connected to the MKL file.
 		 */
 		long OpenMKLFile(BufferFile * Buffer);
-		long ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos);
+		long ParseSIMMOMLogFile(BufferFile * Buffer, long EnergyPos);
 		/**
 		 Open a MOPAC MOP output or ".MOP" file.
 		 \param Buffer The buffer connected to the MOP file.
