@@ -189,9 +189,11 @@ void MpGLCanvas::initGL(void) {
 	DoPrefDependent();
 
 #ifdef GL_VERSION_2_0
-	MolWin->OpenGLData->shader_program = 
-		GetShaderProgramFromFiles("shaders/perpixel_dirlight_v.glsl",
-								  "shaders/perpixel_dirlight_f.glsl");
+	std::string vpath, fpath;
+	vpath = std::string(pathname.ToAscii()) + "/shaders/perpixel_dirlight_v.glsl";
+	fpath = std::string(pathname.ToAscii()) + "/shaders/perpixel_dirlight_f.glsl";
+	MolWin->OpenGLData->shader_program = 0;
+	MolWin->OpenGLData->shader_program = GetShaderProgramFromFiles(vpath, fpath);
 #endif
 
 	// Don't initialize more than once, so set a flag.
@@ -1351,7 +1353,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	prev_mouse = curr_mouse;
 	curr_mouse = event.GetPosition();
 
-	// We don't do anything if a button isn't held down.
+	// We only show text if a button isn't held down.
 	if (!event.Dragging()) {
 		testPicking(curr_mouse.x, curr_mouse.y);
 		if (MolWin->InEditMode() && selected_site >= 0) {
@@ -2279,7 +2281,6 @@ void MpGLCanvas::testPicking(int x, int y) {
 	// the bond id.
 	int i, j;
 	for (i = 0, j = 0; i < hits; i++) {
-		/* std::cout << "buff[j + 3]: " << buff[j + 3] << std::endl; */
 		if (buff[j + 1] < min_depth && buff[j + 3] != MMP_NULL && buff[j + 4] != 0) {
 			min_depth = buff[j + 1];
 			selected_type = buff[j + 3];
@@ -2292,7 +2293,6 @@ void MpGLCanvas::testPicking(int x, int y) {
 		}
 		j += buff[j] + 3;
 	}
-	/* std::cout << "selected_type: " << selected_type << std::endl; */
 
 #if 0
 	std::cout << "selected_type: " << selected_type << std::endl;

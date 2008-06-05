@@ -267,14 +267,17 @@ void MolDisplayWin::DrawGL(void) {
 
 	glEnable(GL_LIGHTING);
 
-	if (MainData->ShowAxis()) AddAxisGL();
-	
-	//Draw the main molecular geometry
 #ifdef GL_VERSION_2_0
-	if (Prefs->GetPerPixelLighting()) {
+	GLint mode;
+	glGetIntegerv(GL_RENDER_MODE, &mode);
+	if (Prefs->GetPerPixelLighting() && mode == GL_RENDER) {
 		glUseProgram(OpenGLData->shader_program);
 	}
 #endif
+
+	if (MainData->ShowAxis()) AddAxisGL();
+	
+	//Draw the main molecular geometry
 	if (MainData->cFrame->NumAtoms > 0) {
 		if (OpenGLData->MainListActive) {
 			glCallList(OpenGLData->MainDisplayList);
@@ -289,6 +292,7 @@ void MolDisplayWin::DrawGL(void) {
 			// OpenGLData->MainListActive = true; 
 		}
 	}
+
 #ifdef GL_VERSION_2_0
 	glUseProgram(0);
 #endif
@@ -313,9 +317,9 @@ void MolDisplayWin::DrawGL(void) {
 	}
 	
 #ifdef GL_VERSION_2_0
-	if (Prefs->GetPerPixelLighting()) {
-		glUseProgram(OpenGLData->shader_program);
-	}
+	/* if (Prefs->GetPerPixelLighting()) { */
+		/* glUseProgram(OpenGLData->shader_program); */
+	/* } */
 #endif
 	// Add any surfaces
 	Surface * lSurface = MainData->cFrame->SurfaceList;
@@ -405,7 +409,7 @@ void MolDisplayWin::DrawGL(void) {
 		glDisable(GL_BLEND);
 	}
 #ifdef GL_VERSION_2_0
-	glUseProgram(0);
+	/* glUseProgram(0); */
 #endif
 
 	/* glPopMatrix(); // unrotated scene */
