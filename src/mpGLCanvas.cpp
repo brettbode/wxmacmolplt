@@ -190,8 +190,8 @@ void MpGLCanvas::initGL(void) {
 
 #ifdef GL_VERSION_2_0
 	std::string vpath, fpath;
-	vpath = std::string(pathname.ToAscii()) + "/shaders/perpixel_dirlight_v.glsl";
-	fpath = std::string(pathname.ToAscii()) + "/shaders/perpixel_dirlight_f.glsl";
+	vpath = std::string(pathname.ToAscii()) + "/perpixel_dirlight_v.glsl";
+	fpath = std::string(pathname.ToAscii()) + "/perpixel_dirlight_f.glsl";
 	MolWin->OpenGLData->shader_program = 0;
 	MolWin->OpenGLData->shader_program = GetShaderProgramFromFiles(vpath, fpath);
 #endif

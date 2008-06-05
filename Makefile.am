@@ -3,8 +3,10 @@ dist_doc_DATA = LICENSE
 dist_man_MANS = resources/wxmacmolplt.1 
 dist_pkgdata_DATA = resources/MacMolPlt.Prefs.xml \
     resources/fonts/arial1.bmf resources/fonts/arial1.glf \
-	resources/fonts/BsVeraSans.fdb resources/organics.cml \
-	resources/solvents.cml resources/amino_acids.cml
+    resources/fonts/BsVeraSans.fdb resources/organics.cml \
+    resources/solvents.cml resources/amino_acids.cml \
+    resources/shaders/perpixel_dirlight_v.glsl \
+	 resources/shaders/perpixel_dirlight_f.glsl
 nobase_dist_pkgdata_DATA = MacMolPlt_Manual.html \
     Manual_pages/WalkThrough.html Manual_pages/2D_General_Dialog.gif \
     Manual_pages/2D_MEP.gif Manual_pages/2D_MEP_Dialog.gif \
