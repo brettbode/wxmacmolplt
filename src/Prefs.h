@@ -207,6 +207,7 @@ class WinPrefs {
 		SurfaceOptions	SurfaceOpts;
 		FrequencyWindowOptions	FreqWinOpts;
 		bool show_toolbar;
+		bool light_per_pixel;
 
 	public:
 		WinPrefs(void);
@@ -396,6 +397,8 @@ class WinPrefs {
 		inline bool ToolbarShown() const { return show_toolbar; }
 		/* inline bool ToggleToolbar() { show_toolbar = !show_toolbar; } */
 		inline void SetToolbarShown(bool enable) { show_toolbar = enable; }
+		inline bool GetPerPixelLighting() const { return light_per_pixel; }
+		inline void SetPerPixelLighting(bool enable) { light_per_pixel = enable; }
 
 		//void SetAtomPattern(long AtomNum);
 		void SetAtomPattern(long AtomType, short pat) {

@@ -188,6 +188,12 @@ void MpGLCanvas::initGL(void) {
 
 	DoPrefDependent();
 
+#ifdef GL_VERSION_2_0
+	MolWin->OpenGLData->shader_program = 
+		GetShaderProgramFromFiles("shaders/perpixel_dirlight_v.glsl",
+								  "shaders/perpixel_dirlight_f.glsl");
+#endif
+
 	// Don't initialize more than once, so set a flag.
 	initialized = true;
 

@@ -23,6 +23,7 @@
 	10/2007 - Added import support for Molkel (.MKL) files
 */
 
+#include "Files.h"
 #include "Globals.h"
 #include "GlobalExceptions.h"
 #include "Progress.h"
@@ -48,8 +49,10 @@
 #include "InputData.h"
 #include "Prefs.h"
 #include <string.h>
+#include <string>
 #include <stdio.h>
 #include <cctype>
+#include <fstream>
 #include <iostream>
 //using namespace std;
 #include <new>
@@ -5207,3 +5210,31 @@ long SetAtomType(const unsigned char *TestLabel) {
 	}
 	return result;
 } /* SetAtomType */
+
+/**
+ * This function opens the file specified by file_name and copies the contents
+ * to a string.
+ * @param file_name Name of file to read
+ * @param contents String to write contents to
+ * @return True */
+
+bool FileToString(const std::string& file_name,
+                  std::string& contents) {
+
+   std::ifstream f(file_name.c_str(), std::ios::in | std::ios::ate);
+   int size;
+
+   // Get file size.
+   size = (int) f.tellg();
+   f.seekg(0, std::ios::beg);
+
+   // Allocate buffer, read contents in.
+   char *cstr = new char[size];
+   f.read(cstr, size);
+   f.close();
+   contents = std::string(cstr, size);
+   delete[] cstr;
+
+   return true;
+
+}

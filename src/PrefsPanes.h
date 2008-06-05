@@ -286,6 +286,7 @@ class QD3DPrefsPane : public PrefsPane {
 
 		wxCheckBox* mChk3D;
 		colorArea* mBackgrdColor;
+		wxCheckBox *mPerPixelCheck;
 		wxSlider* mSld[6];
 
 		DECLARE_EVENT_TABLE()

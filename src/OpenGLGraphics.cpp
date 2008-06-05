@@ -26,6 +26,7 @@
 #include "Prefs.h"
 #include "Progress.h"
 #include "patterns.h"
+#include "Files.h"
 
 // ----------------------------------------------------------------------------
 // FUNCTION PROTOTYPES
@@ -87,6 +88,9 @@ OpenGLRec::OpenGLRec(void) {
 	transpIndex = NULL;
 	triangleCount = 0;
 	sphere_list = 0;
+#ifdef GL_VERSION_2_0
+	shader_program = 0;
+#endif
 	
 	MainListActive = false;
 	SurfaceListActive = false;
@@ -266,6 +270,11 @@ void MolDisplayWin::DrawGL(void) {
 	if (MainData->ShowAxis()) AddAxisGL();
 	
 	//Draw the main molecular geometry
+#ifdef GL_VERSION_2_0
+	if (Prefs->GetPerPixelLighting()) {
+		glUseProgram(OpenGLData->shader_program);
+	}
+#endif
 	if (MainData->cFrame->NumAtoms > 0) {
 		if (OpenGLData->MainListActive) {
 			glCallList(OpenGLData->MainDisplayList);
@@ -280,6 +289,9 @@ void MolDisplayWin::DrawGL(void) {
 			// OpenGLData->MainListActive = true; 
 		}
 	}
+#ifdef GL_VERSION_2_0
+	glUseProgram(0);
+#endif
 
 	if (MainData->GetAnnotationCount() > 0) {
 		glLoadName(MMP_ANNOTATION);
@@ -300,6 +312,11 @@ void MolDisplayWin::DrawGL(void) {
 		glEnable(GL_LIGHTING);
 	}
 	
+#ifdef GL_VERSION_2_0
+	if (Prefs->GetPerPixelLighting()) {
+		glUseProgram(OpenGLData->shader_program);
+	}
+#endif
 	// Add any surfaces
 	Surface * lSurface = MainData->cFrame->SurfaceList;
 	// error = glGetError(); 
@@ -387,6 +404,9 @@ void MolDisplayWin::DrawGL(void) {
 		DrawTransparentTriangles();
 		glDisable(GL_BLEND);
 	}
+#ifdef GL_VERSION_2_0
+	glUseProgram(0);
+#endif
 
 	/* glPopMatrix(); // unrotated scene */
 
@@ -4166,6 +4186,116 @@ void DrawPipeCylinder(float length, GLUquadric *quadric, unsigned int ncaps,
 	}
 
 }
+
+/* ------------------------------------------------------------------------- */
+
+#ifdef GL_VERSION_2_0
+GLuint GetShaderProgramFromFiles(const std::string& vert_filename,
+                                 const std::string& frag_filename) {
+
+   std::string vert_src;
+   std::string frag_src;
+
+   if (!vert_filename.empty()) {
+      FileToString(vert_filename, vert_src);
+   }
+
+   if (!frag_filename.empty()) {
+      FileToString(frag_filename, frag_src);
+   }
+
+   return GetShaderProgram(vert_src, frag_src);
+
+}
+
+/* ------------------------------------------------------------------------- */
+
+GLuint GetShaderProgram(const std::string& vert_src,
+                        const std::string& frag_src) {
+
+   GLuint shader_prog = 0;
+
+   GLint succeeded;
+   char *log;
+   GLint log_length;
+   GLint chars_written;
+
+   shader_prog = glCreateProgram();
+
+   if (vert_src.length()) {
+      GLuint vert_shader;
+      const char *v2 = &vert_src.c_str()[0];
+
+      // Vertex shader.
+      vert_shader = glCreateShader(GL_VERTEX_SHADER);
+      glShaderSource(vert_shader, 1, &v2, NULL);
+      glCompileShader(vert_shader);
+      glGetShaderiv(vert_shader, GL_COMPILE_STATUS, &succeeded);
+
+      glGetShaderiv(vert_shader, GL_INFO_LOG_LENGTH, &log_length);
+      if (log_length > 1) {
+		 log = new char[log_length];
+         glGetShaderInfoLog(vert_shader, log_length, &chars_written, log);
+         std::cout << "log: " << log << std::endl;
+         delete[] log;
+      }
+
+      if (succeeded != GL_TRUE) {
+         std::cout << "Vertex Program: " << vert_src << std::endl;
+         wxLogMessage(wxT("Something went wrong with the shader."));
+      }
+
+      glAttachShader(shader_prog, vert_shader);
+   }
+
+   // Fragment shader.
+   if (frag_src.length()) {
+      GLuint frag_shader;
+      const char *f2 = &frag_src.c_str()[0];
+      frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
+      glShaderSource(frag_shader, 1, &f2, NULL);
+
+      glCompileShader(frag_shader);
+      glGetShaderiv(frag_shader, GL_COMPILE_STATUS, &succeeded);
+
+      glGetShaderiv(frag_shader, GL_INFO_LOG_LENGTH, &log_length);
+      if (log_length > 1) {
+		 log = new char[log_length];
+         glGetShaderInfoLog(frag_shader, log_length, &chars_written, log);
+         std::cout << "log: " << log << std::endl;
+		 delete[] log;
+      }
+
+      if (succeeded != GL_TRUE) {
+         std::cout << "Fragment Program: " << frag_src << std::endl;
+         wxLogMessage(wxT("Something went wrong with the shader."));
+      }
+
+      glAttachShader(shader_prog, frag_shader);
+   }
+
+   glLinkProgram(shader_prog);
+   glGetProgramiv(shader_prog, GL_LINK_STATUS, &succeeded);
+   if (succeeded != GL_TRUE) {
+      char *log;
+      GLint log_length;
+      GLint chars_written;
+      glGetProgramiv(shader_prog, GL_INFO_LOG_LENGTH, &log_length);
+      if (log_length) {
+		 log = new char[log_length];
+         glGetProgramInfoLog(shader_prog, log_length, &chars_written, log);
+         std::cout << "log: " << log << std::endl;
+         delete[] log;
+         exit(1);
+      } else {
+         wxLogMessage(wxT("Something went wrong with the shader program."));
+      }
+   }
+
+   return shader_prog;
+
+}
+#endif
 
 /* ------------------------------------------------------------------------- */
 

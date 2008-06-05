@@ -1,6 +1,10 @@
 #ifndef MMP_GL_H
 #define MMP_GL_H
 
+#ifndef GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES
+#endif
+
 #ifdef __WXMAC__
 #include <OpenGL/glu.h>
 #include <OpenGL/gl.h>
@@ -9,12 +13,18 @@
 #include <GL/gl.h>
 #endif
 
+#include <string>
+
 #ifndef GL_RESCALE_NORMAL
 #define GL_RESCALE_NORMAL 0x803A
 #endif
 
-/* #ifndef GL_SEPARATE_SPECULAR_COLOR */
-/* #define GL_SEPARATE_SPECULAR_COLOR 0x81FA */
-/* #endif */
+#ifdef GL_VERSION_2_0
+GLuint GetShaderProgramFromFiles(const std::string& vert_filename,
+                                 const std::string& frag_filename);
+
+GLuint GetShaderProgram(const std::string& vert_src,
+                        const std::string& frag_src);
+#endif
 
 #endif

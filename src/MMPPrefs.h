@@ -98,6 +98,7 @@ enum MMPMolDisplayElments {
 	MMPMolDisplay_AnimationSpeed,
 	MMPMolDisplay_StereoOffset,
 	MMPMolDisplay_RotateMode,
+	MMPMolDisplay_PerPixelLighting,
 	MMPMolDisplay_AnimateMode,
 	MMPMolDisplay_ShowAngles,
 	MMPMolDisplay_Stereo,

@@ -73,96 +73,102 @@
 #define ID_DISPLAY_DEPTH_SLIDER	5038
 #define ID_ATOM_LABEL_SLIDER	5039
 #define ID_ANNOTATION_SLIDER	5040
+#define ID_PER_PIXEL_LIGHTING 5041
 
 #include "GlobalExceptions.h"
 #include "MyTypes.h"
 #include "Prefs.h"
 #include "PrefsPanes.h"
 #include "colorArea.h"
+#include "mmp_gl.h"
 #include <stdio.h>
 #include <string.h>
 #include <wx/colordlg.h>
 
 using namespace std;
 
-extern short		gAppResRef;
+extern short gAppResRef;
 
 BEGIN_EVENT_TABLE(BondPrefsPane, wxPanel)
-  EVT_CHOICE (ID_BOND_MODE_CHOICE, BondPrefsPane::OnChoice)
-  EVT_SLIDER (ID_NORMAL_MODE_SCALING_SLIDER, BondPrefsPane::OnSliderUpdate)
-  EVT_CHECKBOX (ID_SHOW_NORMAL_MODE_ANIMATION, BondPrefsPane::OnToggleAnim)
-  EVT_CHECKBOX (ID_SHOW_NORMAL_MODE_ROTATION, BondPrefsPane::OnToggleRotation)
+	EVT_CHOICE(ID_BOND_MODE_CHOICE, BondPrefsPane::OnChoice)
+	EVT_SLIDER(ID_NORMAL_MODE_SCALING_SLIDER, BondPrefsPane::OnSliderUpdate)
+	EVT_CHECKBOX(ID_SHOW_NORMAL_MODE_ANIMATION, BondPrefsPane::OnToggleAnim)
+	EVT_CHECKBOX(ID_SHOW_NORMAL_MODE_ROTATION, BondPrefsPane::OnToggleRotation)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(DisplayPrefsPane, wxPanel)
-	EVT_RADIOBOX (ID_DISPLAY_MODE_RADIOBOX, DisplayPrefsPane::OnRadio)
-	EVT_CHECKBOX (ID_COLOR_BONDS_BY_ATOM_COLOR, DisplayPrefsPane::OnCheckBox)
-	EVT_RADIOBOX (ID_ATOM_LABELS_RADIO, DisplayPrefsPane::OnLabelsRadio)
-	EVT_SLIDER (ID_ATOM_LABEL_SLIDER, DisplayPrefsPane::OnAtomLabelSlider)
-	EVT_SLIDER (ID_ANNOTATION_SLIDER, DisplayPrefsPane::OnAnnotationLabelSlider)
+	EVT_RADIOBOX(ID_DISPLAY_MODE_RADIOBOX, DisplayPrefsPane::OnRadio)
+	EVT_CHECKBOX(ID_COLOR_BONDS_BY_ATOM_COLOR, DisplayPrefsPane::OnCheckBox)
+	EVT_RADIOBOX(ID_ATOM_LABELS_RADIO, DisplayPrefsPane::OnLabelsRadio)
+	EVT_SLIDER(ID_ATOM_LABEL_SLIDER, DisplayPrefsPane::OnAtomLabelSlider)
+	EVT_SLIDER(ID_ANNOTATION_SLIDER, DisplayPrefsPane::OnAnnotationLabelSlider)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(EnergyPrefsPane, wxPanel)
-  EVT_SLIDER (ID_PLOT_BALL_SIZE_SLIDER, EnergyPrefsPane::OnSliderUpdate)
-  EVT_RADIOBOX (ID_UNIT_RADIOBOX, EnergyPrefsPane::OnRadio)
-  EVT_RADIOBOX (ID_MISC_RADIOBOX, EnergyPrefsPane::OnRadio)
-  EVT_CHECKBOX (ID_TOTAL_ENERGY, EnergyPrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_MP2_ENERGY, EnergyPrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_POTENTIAL_ENERGY, EnergyPrefsPane::OnCheckBox)
+	EVT_SLIDER(ID_PLOT_BALL_SIZE_SLIDER, EnergyPrefsPane::OnSliderUpdate)
+	EVT_RADIOBOX(ID_UNIT_RADIOBOX, EnergyPrefsPane::OnRadio)
+	EVT_RADIOBOX(ID_MISC_RADIOBOX, EnergyPrefsPane::OnRadio)
+	EVT_CHECKBOX(ID_TOTAL_ENERGY, EnergyPrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_MP2_ENERGY, EnergyPrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_POTENTIAL_ENERGY, EnergyPrefsPane::OnCheckBox)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(FilePrefsPane, wxPanel)
-  EVT_CHECKBOX (ID_AUTO_BOND_PASTE_OPEN, FilePrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_GUESS_BOND_ORDER, FilePrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_PREVENT_HH_BONDS, FilePrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_LOOK_HYDROGEN_BONDS, FilePrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_SHOW_ANGLES_WHILE_ROTATING, FilePrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_USE_MAC_EOL_CHAR, FilePrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_PROMPT_SAVE_FILE, FilePrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_CREATE_CUSTOM_FILE_ICON, FilePrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_CHANGE_FILE_CREATOR, FilePrefsPane::OnCheckBox)
-  EVT_SLIDER (ID_AUTO_BOND_TOLERANCE_SLIDER, FilePrefsPane::OnSliderUpdate)
+	EVT_CHECKBOX(ID_AUTO_BOND_PASTE_OPEN, FilePrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_GUESS_BOND_ORDER, FilePrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_PREVENT_HH_BONDS, FilePrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_LOOK_HYDROGEN_BONDS, FilePrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_SHOW_ANGLES_WHILE_ROTATING, FilePrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_USE_MAC_EOL_CHAR, FilePrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_PROMPT_SAVE_FILE, FilePrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_CREATE_CUSTOM_FILE_ICON, FilePrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_CHANGE_FILE_CREATOR, FilePrefsPane::OnCheckBox)
+	EVT_SLIDER(ID_AUTO_BOND_TOLERANCE_SLIDER, FilePrefsPane::OnSliderUpdate)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(ScalingPrefsPane, wxPanel)
-  EVT_SLIDER (ID_ATOM_SIZE_SLIDER, ScalingPrefsPane::OnSliderUpdate)
-  EVT_SLIDER (ID_ANIM_QUALITY_SLIDER, ScalingPrefsPane::OnSliderUpdate)
-  EVT_SLIDER (ID_FRAME_DELAY_SLIDER, ScalingPrefsPane::OnSliderUpdate)
+	EVT_SLIDER(ID_ATOM_SIZE_SLIDER, ScalingPrefsPane::OnSliderUpdate)
+	EVT_SLIDER(ID_ANIM_QUALITY_SLIDER, ScalingPrefsPane::OnSliderUpdate)
+	EVT_SLIDER(ID_FRAME_DELAY_SLIDER, ScalingPrefsPane::OnSliderUpdate)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(StereoPrefsPane, wxPanel)
-  EVT_CHECKBOX (ID_STEREO_ACTIVE, StereoPrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_STEREO_ACTIVE, StereoPrefsPane::OnCheckBox)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(SurfacePrefsPane, wxPanel)
-  EVT_SLIDER (ID_NUM_GRID_POINT_SLIDER, SurfacePrefsPane::OnSliderUpdate)
-  EVT_SLIDER (ID_3D_GRID_SIZE_SLIDER, SurfacePrefsPane::OnSliderUpdate)
-  EVT_CHECKBOX (ID_SHOW_ZERO_VALUE_CONTOUR, SurfacePrefsPane::OnCheckBox)
-  EVT_CHECKBOX (ID_SHOW_ATOM_POSITION, SurfacePrefsPane::OnCheckBox)
+	EVT_SLIDER(ID_NUM_GRID_POINT_SLIDER, SurfacePrefsPane::OnSliderUpdate)
+	EVT_SLIDER(ID_3D_GRID_SIZE_SLIDER, SurfacePrefsPane::OnSliderUpdate)
+	EVT_CHECKBOX(ID_SHOW_ZERO_VALUE_CONTOUR, SurfacePrefsPane::OnCheckBox)
+	EVT_CHECKBOX(ID_SHOW_ATOM_POSITION, SurfacePrefsPane::OnCheckBox)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(QD3DPrefsPane, wxPanel)
-  EVT_SLIDER (ID_BOND_SIZE_SLIDER, QD3DPrefsPane::OnSliderUpdate)
-  EVT_SLIDER (ID_DISPLAY_QUALITY_SLIDER, QD3DPrefsPane::OnSliderUpdate)
-  EVT_SLIDER (ID_FILL_LIGHT_BRIGHTNESS_SLIDER, QD3DPrefsPane::OnSliderUpdate)
-  EVT_SLIDER (ID_POINT_LIGHT_BRIGHTNESS_SLIDER, QD3DPrefsPane::OnSliderUpdate)
-  EVT_SLIDER (ID_LINE_WIDTH_SLIDER, QD3DPrefsPane::OnSliderUpdate)
-  EVT_SLIDER (ID_DEPTH_CUEING_SLIDER, QD3DPrefsPane::OnSliderUpdate)
-  EVT_CHECKBOX (ID_ACTIVATE_3D_MODE, QD3DPrefsPane::OnCheckBox)
+	EVT_SLIDER(ID_BOND_SIZE_SLIDER, QD3DPrefsPane::OnSliderUpdate)
+	EVT_SLIDER(ID_DISPLAY_QUALITY_SLIDER, QD3DPrefsPane::OnSliderUpdate)
+	EVT_SLIDER(ID_FILL_LIGHT_BRIGHTNESS_SLIDER, QD3DPrefsPane::OnSliderUpdate)
+	EVT_SLIDER(ID_POINT_LIGHT_BRIGHTNESS_SLIDER, QD3DPrefsPane::OnSliderUpdate)
+	EVT_SLIDER(ID_LINE_WIDTH_SLIDER, QD3DPrefsPane::OnSliderUpdate)
+	EVT_SLIDER(ID_DEPTH_CUEING_SLIDER, QD3DPrefsPane::OnSliderUpdate)
+	EVT_CHECKBOX(ID_PER_PIXEL_LIGHTING, QD3DPrefsPane::OnCheckBox)
+	/* EVT_CHECKBOX(ID_ACTIVATE_3D_MODE, QD3DPrefsPane::OnCheckBox) */
 END_EVENT_TABLE()
 
-PrefsPane::PrefsPane(MolDisplayWin* targetWindow, WinPrefs* targetPrefs,
-					 short PaneID, Boolean GlobalPrefs, wxBookCtrlBase *parent)
+PrefsPane::PrefsPane(MolDisplayWin* targetWindow,
+					 WinPrefs* targetPrefs,
+					 short PaneID,
+					 Boolean GlobalPrefs,
+					 wxBookCtrlBase *parent)
 	: wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER) { 
-  isGlobalPrefs = GlobalPrefs;
 
-  //mTargetPrefs = new WinPrefs;
-  mTargetPrefs = targetPrefs;
+	isGlobalPrefs = GlobalPrefs;
+
+	//mTargetPrefs = new WinPrefs;
+	mTargetPrefs = targetPrefs;
 }
 
-PrefsPane::~PrefsPane() 
-{ 
-  //delete mTargetPrefs; 
+PrefsPane::~PrefsPane() { 
+	//delete mTargetPrefs; 
 }
 
 AtomPrefsPane::AtomPrefsPane(MolDisplayWin* targetWindow,
@@ -200,8 +206,7 @@ AtomPrefsPane::~AtomPrefsPane() {
 
 	// These should be deleted by wx.
 #if 0
-  for ( int i = 0; i < kMaxAtomTypes; i++)
-    {
+  for (int i = 0; i < kMaxAtomTypes; i++) {
       delete mEleNames[i];
       delete mEleSizes[i];
       delete mEleMasses[i];
@@ -233,11 +238,11 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 						0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
 		tmp.Printf(wxT("%d"),mTargetPrefs->GetAtomSize(i));
-		mEleSizes[i] = new wxTextCtrl( scroll_win, wxID_ANY, tmp, wxDefaultPosition, wxSize(40, 20));
+		mEleSizes[i] = new wxTextCtrl(scroll_win, wxID_ANY, tmp, wxDefaultPosition, wxSize(40, 20));
 		mMainSizer->Add(mEleSizes[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 		
 		tmp.Printf(wxT("%.2f"),mTargetPrefs->GetAtomMass(i));
-		mEleMasses[i] = new wxTextCtrl( scroll_win, wxID_ANY, tmp, wxDefaultPosition, wxSize(50, 20));
+		mEleMasses[i] = new wxTextCtrl(scroll_win, wxID_ANY, tmp, wxDefaultPosition, wxSize(50, 20));
 		mMainSizer->Add(mEleMasses[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 		
 		mColorArea[i] = new colorArea(scroll_win, i, mTargetPrefs->GetAtomColorLoc(i));
@@ -252,29 +257,30 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 
 }
 
-void AtomPrefsPane::saveToTempPrefs()
-{
-  long size;
-  double mass;
+void AtomPrefsPane::saveToTempPrefs() {
+	long size;
+	double mass;
 
-  wxString tmp;
+	wxString tmp;
 
-  for ( int i = 0; i < kMaxAtomTypes; i++)
-    {
-      mTargetPrefs->SetAtomLabel(i, mEleNames[i]->GetValue());
-      (mEleSizes[i]->GetValue()).ToLong(&size);
-      mTargetPrefs->SetAtomSize(i, size);
-      (mEleMasses[i]->GetValue()).ToDouble(&mass);
-      mTargetPrefs->SetAtomMass(i, mass);
-	  mColorArea[i]->getColor(mTargetPrefs->GetAtomColorLoc(i));
-	  mTargetPrefs->SetAtomPattern(i, mPatternArea[i]->getPattern());
-    }
+	for (int i = 0; i < kMaxAtomTypes; i++) {
+		mTargetPrefs->SetAtomLabel(i, mEleNames[i]->GetValue());
+		(mEleSizes[i]->GetValue()).ToLong(&size);
+		mTargetPrefs->SetAtomSize(i, size);
+		(mEleMasses[i]->GetValue()).ToDouble(&mass);
+		mTargetPrefs->SetAtomMass(i, mass);
+		mColorArea[i]->getColor(mTargetPrefs->GetAtomColorLoc(i));
+		mTargetPrefs->SetAtomPattern(i, mPatternArea[i]->getPattern());
+	}
 }
 
-BondPrefsPane::BondPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean Global)
+BondPrefsPane::BondPrefsPane(MolDisplayWin* targetWindow,
+							 wxBookCtrlBase *parent,
+							 WinPrefs* targetPrefs,
+							 Boolean Global)
 	: PrefsPane(targetWindow, targetPrefs, kBondPrefsPane, Global, parent) {
 
-	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
+	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER); */
 
 	mMainSizer = new wxBoxSizer(wxVERTICAL);
 	mUpperSizer = new wxBoxSizer(wxVERTICAL);
@@ -297,7 +303,7 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 	mChkRotation = new wxCheckBox(this, ID_SHOW_NORMAL_MODE_ROTATION, _T("Show Normal Mode During Rotation"), wxDefaultPosition);
 	mChkRotation->SetValue(mTargetPrefs->GetRotateMode());
 
-	mSldScale = new wxSlider( this, ID_NORMAL_MODE_SCALING_SLIDER, 
+	mSldScale = new wxSlider(this, ID_NORMAL_MODE_SCALING_SLIDER, 
 				(int)(mTargetPrefs->GetVectorScale()*10 - 1), 0, 25,
 							 wxDefaultPosition, wxSize(155,wxDefaultCoord));
 
@@ -336,63 +342,60 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 	mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER | wxALL, 3);
 }
 
-void BondPrefsPane::saveToTempPrefs()
-{
+void BondPrefsPane::saveToTempPrefs() {
 	mColorArea->getColor(mTargetPrefs->GetBondColorLoc(mChoiceId));
 	mNormColorArea->getColor(mTargetPrefs->GetVectorColorLoc());
 }
 
-void BondPrefsPane::OnSliderUpdate( wxCommandEvent &WXUNUSED(event) )
-{
-  mTargetPrefs->SetVectorScale((float)(0.1*(mSldScale->GetValue()+1)));
+void BondPrefsPane::OnSliderUpdate(wxCommandEvent &WXUNUSED(event)) {
+	mTargetPrefs->SetVectorScale((float)(0.1*(mSldScale->GetValue()+1)));
 }
 
-void BondPrefsPane::OnToggleAnim(wxCommandEvent& WXUNUSED(event))
-{
-  mTargetPrefs->SetAnimateMode(mChkAnim->GetValue());
+void BondPrefsPane::OnToggleAnim(wxCommandEvent& WXUNUSED(event)) {
+	mTargetPrefs->SetAnimateMode(mChkAnim->GetValue());
 }
 
-void BondPrefsPane::OnToggleRotation(wxCommandEvent& WXUNUSED(event))
-{
-  mTargetPrefs->SetRotateMode(mChkRotation->GetValue());
+void BondPrefsPane::OnToggleRotation(wxCommandEvent& WXUNUSED(event)) {
+	mTargetPrefs->SetRotateMode(mChkRotation->GetValue());
 }
 
-void BondPrefsPane::OnChoice( wxCommandEvent &event )
-{
+void BondPrefsPane::OnChoice(wxCommandEvent &event) {
   //int localId = -1;
 
 	mColorArea->getColor(mTargetPrefs->GetBondColorLoc(mChoiceId));
 
 	wxString localStr = event.GetString();
 
-	if ( localStr.Cmp(_T("Hydrogen Bonds")) == 0)
+	if (localStr.Cmp(_T("Hydrogen Bonds")) == 0)
 		mChoiceId = 0;
-	else if ( localStr.Cmp(_T("Single Bonds")) == 0)
+	else if (localStr.Cmp(_T("Single Bonds")) == 0)
 		mChoiceId = 1;
-	else if ( localStr.Cmp(_T("Double Bonds")) == 0)
+	else if (localStr.Cmp(_T("Double Bonds")) == 0)
 		mChoiceId = 2;
-	else if ( localStr.Cmp(_T("Triple Bonds")) == 0)
+	else if (localStr.Cmp(_T("Triple Bonds")) == 0)
 		mChoiceId = 3;
 
 	mColorArea->setColor(mTargetPrefs->GetBondColorLoc(mChoiceId));
 }
 
 
-DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean Global)
-	: PrefsPane(targetWindow, targetPrefs, kDisplayPrefsPane, Global, parent) 
-{
+DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow,
+								   wxBookCtrlBase *parent,
+								   WinPrefs* targetPrefs,
+								   Boolean Global)
+	: PrefsPane(targetWindow, targetPrefs, kDisplayPrefsPane, Global, parent) {
 	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER); */
 
 	mMainSizer = new wxBoxSizer(wxVERTICAL);
 
 	wxString choices[] = {_T("Ball and Stick"), _T("WireFrame (Bonds only)")};
 
-	mRdoBox = new wxRadioBox( this, ID_DISPLAY_MODE_RADIOBOX, _T("Display Mode"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 0, wxRA_SPECIFY_ROWS );
+	mRdoBox = new wxRadioBox(this, ID_DISPLAY_MODE_RADIOBOX, _T("Display Mode"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 0, wxRA_SPECIFY_ROWS);
 	mChkColor = new wxCheckBox(this, ID_COLOR_BONDS_BY_ATOM_COLOR, _T("Color bonds by atom color"), wxDefaultPosition, wxDefaultSize, 0);
 
 	wxString atomLabels[] = {_T("None"), _T("Atomic Symbols"), _T("Atom Numbers"), _T("Both Symbols and Numbers")};
 
-	mAtomLabels = new wxRadioBox( this, ID_ATOM_LABELS_RADIO, _T("Atom Labels"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(atomLabels), atomLabels, 0, wxRA_SPECIFY_ROWS );
+	mAtomLabels = new wxRadioBox(this, ID_ATOM_LABELS_RADIO, _T("Atom Labels"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(atomLabels), atomLabels, 0, wxRA_SPECIFY_ROWS);
 
 	mMainSizer->Add(mRdoBox, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 	mMainSizer->Add(mChkColor, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
@@ -400,14 +403,14 @@ DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *
 
 	wxGridSizer * lgridSizer = new wxGridSizer(2,2);
 	lgridSizer->Add(new wxStaticText(this, wxID_ANY, _("Size of atom labels:")), 0, wxALIGN_RIGHT | wxALL, 3);
-	mAtomLabelSizeSlider = new wxSlider( this, ID_ATOM_LABEL_SLIDER, 
+	mAtomLabelSizeSlider = new wxSlider(this, ID_ATOM_LABEL_SLIDER, 
 							(int)(mTargetPrefs->GetAtomLabelSize()*100), 25, 400,
 							wxDefaultPosition, wxSize(155,wxDefaultCoord));
 	mAtomLabelSizeSlider->SetToolTip(_("Changes the size of the atomic labels. Move left for smaller labels, right for larger ones."));
 	lgridSizer->Add(mAtomLabelSizeSlider, 0, wxALIGN_CENTER | wxALL, 3);
 
 	lgridSizer->Add(new wxStaticText(this, wxID_ANY, _("Size of annotation text:")), 0, wxALIGN_RIGHT | wxALL, 3);
-	mAnnotationLabelSizeSlider = new wxSlider( this, ID_ANNOTATION_SLIDER, 
+	mAnnotationLabelSizeSlider = new wxSlider(this, ID_ANNOTATION_SLIDER, 
 										 (int)(mTargetPrefs->GetAnnotationLabelSize()*100), 25, 400,
 										 wxDefaultPosition, wxSize(155,wxDefaultCoord));
 	mAnnotationLabelSizeSlider->SetToolTip(_("Changes the size of the annotation text. Move left for smaller labels, right for larger ones."));
@@ -419,9 +422,9 @@ DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *
 
 #include <iostream>
 void DisplayPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
-	if ( mTargetPrefs->DrawBallnStick() && !mTargetPrefs->DrawWireFrame())
+	if (mTargetPrefs->DrawBallnStick() && !mTargetPrefs->DrawWireFrame())
 		mRdoBox->SetSelection(0);
-	else if ( !mTargetPrefs->DrawBallnStick() && mTargetPrefs->DrawWireFrame())
+	else if (!mTargetPrefs->DrawBallnStick() && mTargetPrefs->DrawWireFrame())
 		mRdoBox->SetSelection(1);
 	else
 		cout<<"Something wrong! Check preference setting!"<<endl;
@@ -442,28 +445,24 @@ void DisplayPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 	mAnnotationLabelSizeSlider->SetValue((int)(mTargetPrefs->GetAnnotationLabelSize()*100));
 }
 
-void DisplayPrefsPane::saveToTempPrefs()
-{
+void DisplayPrefsPane::saveToTempPrefs() {
 
 }
 
-void DisplayPrefsPane::OnRadio( wxCommandEvent &event )
-{
-  wxString tmpStr = event.GetString();
+void DisplayPrefsPane::OnRadio(wxCommandEvent &event) {
+	wxString tmpStr = event.GetString();
 
-  if (tmpStr.Cmp(_T("Ball and Stick")) == 0)
-    {
-      mTargetPrefs->DrawBallnStick(true);
-      mTargetPrefs->DrawWireFrame(false);
-    }
-  else if (tmpStr.Cmp(_T("WireFrame (Bonds only)")) == 0)
-    {
-      mTargetPrefs->DrawWireFrame(true);
-      mTargetPrefs->DrawBallnStick(false);
-    }
+	if (tmpStr.Cmp(_T("Ball and Stick")) == 0) {
+		mTargetPrefs->DrawBallnStick(true);
+		mTargetPrefs->DrawWireFrame(false);
+	}
+	else if (tmpStr.Cmp(_T("WireFrame (Bonds only)")) == 0) {
+		mTargetPrefs->DrawWireFrame(true);
+		mTargetPrefs->DrawBallnStick(false);
+	}
 }
 
-void DisplayPrefsPane::OnLabelsRadio( wxCommandEvent &event ) {
+void DisplayPrefsPane::OnLabelsRadio(wxCommandEvent &event) {
 	switch (event.GetSelection()) {
 		case 0:
 			mTargetPrefs->ShowAtomicSymbolLabels(false);
@@ -484,511 +483,479 @@ void DisplayPrefsPane::OnLabelsRadio( wxCommandEvent &event ) {
 	}
 }
 
-void DisplayPrefsPane::OnCheckBox( wxCommandEvent &event)
-{
-  if (event.GetId() == ID_COLOR_BONDS_BY_ATOM_COLOR)
-    mTargetPrefs->ColorBondHalves(mChkColor->GetValue());
+void DisplayPrefsPane::OnCheckBox(wxCommandEvent &event) {
+	if (event.GetId() == ID_COLOR_BONDS_BY_ATOM_COLOR)
+		mTargetPrefs->ColorBondHalves(mChkColor->GetValue());
 }
-void DisplayPrefsPane::OnAtomLabelSlider( wxCommandEvent &event)
-{
+void DisplayPrefsPane::OnAtomLabelSlider(wxCommandEvent &event) {
 	mTargetPrefs->SetAtomLabelSize((float)(mAtomLabelSizeSlider->GetValue())/100.0);
 }
-void DisplayPrefsPane::OnAnnotationLabelSlider( wxCommandEvent &event)
-{
+void DisplayPrefsPane::OnAnnotationLabelSlider(wxCommandEvent &event) {
 	mTargetPrefs->SetAnnotationLabelSize((float)(mAnnotationLabelSizeSlider->GetValue())/100.0);
 }
 
-EnergyPrefsPane::EnergyPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
-	: PrefsPane(targetWindow, targetPrefs, kEPrefsPane, GlobalPrefs, parent) 
-{
-  /* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
+EnergyPrefsPane::EnergyPrefsPane(MolDisplayWin* targetWindow,
+								 wxBookCtrlBase *parent,
+								 WinPrefs* targetPrefs,
+								 Boolean GlobalPrefs)
+	: PrefsPane(targetWindow, targetPrefs, kEPrefsPane, GlobalPrefs, parent) {
+	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER); */
 
-  mMainSizer = new wxBoxSizer(wxVERTICAL);
-  mUpperSizer = new wxBoxSizer(wxHORIZONTAL);
+	mMainSizer = new wxBoxSizer(wxVERTICAL);
+	mUpperSizer = new wxBoxSizer(wxHORIZONTAL);
 
-  if (PrefsAreGlobal())
-    mLowerSizer = new wxGridSizer(4,2);
-  else
-    mLowerSizer = new wxGridSizer(6,2);
+	if (PrefsAreGlobal())
+		mLowerSizer = new wxGridSizer(4,2);
+	else
+		mLowerSizer = new wxGridSizer(6,2);
 
-  if (!PrefsAreGlobal())
-    {
-      mBottomSizer = new wxBoxSizer(wxHORIZONTAL);
-      mLeftBottomSizer = new wxBoxSizer(wxVERTICAL);
-    }
-
-  mRightBottomSizer = NULL;
-  mRight1BottomSizer = NULL;
-  mRight2BottomSizer = NULL;
-  mAtomText[0] = NULL;
-  mAtomText[1] = NULL;
-  mAtomText[2] = NULL;
-  mY1pt = NULL;
-  mY2pt = NULL;
-
-  SetSizer(mMainSizer);
-
-}
-
-EnergyPrefsPane::~EnergyPrefsPane()
-{
-  delete mEColor;
-  delete mMPColor;
-  delete mPEColor;
-  delete mOtherColor;
-
-  if (mY1pt) delete mY1pt;
-  if (mY2pt) delete mY2pt;
-}
-
-void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) 
-{
-  EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
-  GraphOptions * lPOpts = mTargetPrefs->GetGraphOptions();
-  //Setup the slider for the E plot point size
-
-  mSldBallSize = new wxSlider( this, ID_PLOT_BALL_SIZE_SLIDER, 
-			    (int)(lEOpts->GetEPlotPointSize()), 1, 20,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
-
-  wxString tmp;
-  tmp.Printf(wxT("%d"), lEOpts->GetNumDigits());
-  mNumDigitsArea = new wxTextCtrl( this, wxID_ANY, tmp, wxDefaultPosition, wxDefaultSize);
-
-  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("E. Plot Ball Size:"))), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-  mUpperSizer->Add(mSldBallSize, 0, wxALIGN_LEFT | wxALL, 3);
-  mUpperSizer->Add(30, 30);
-  mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("# digits"))), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-  mUpperSizer->Add(mNumDigitsArea, 0, wxALIGN_CENTER | wxALL, 3);
-
-  mEColor = new colorArea(this, 0, lEOpts->GetTEColor());
-  mMPColor = new colorArea(this, 1, lEOpts->GetMPColor());
-  mPEColor = new colorArea(this, 2, lEOpts->GetPEColor());
-  mOtherColor = new colorArea(this, 3, lEOpts->GetKEColor());
-
-  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("E Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
-  mLowerSizer->Add(mEColor, 0, wxALIGN_LEFT | wxALL, 3);
-  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("MP Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
-  mLowerSizer->Add(mMPColor, 0, wxALIGN_LEFT | wxALL, 3);
-
-  if (!PrefsAreGlobal())
-    {
-      mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Y1 zero pt "))), 0, wxALIGN_RIGHT | wxALL, 3);
-      tmp.Printf(wxT("%.4f"),lEOpts->GetY1Zero());
-      mY1pt = new wxTextCtrl(this, wxID_ANY, tmp);
-      mLowerSizer->Add(mY1pt, 0, wxALIGN_RIGHT | wxALL, 3);
-    }
-
-  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("PE Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
-  mLowerSizer->Add(mPEColor, 0, wxALIGN_LEFT | wxALL, 3);
-  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Other Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
-  mLowerSizer->Add(mOtherColor, 0, wxALIGN_LEFT | wxALL, 3);
-
-  if (!PrefsAreGlobal())
-    {
-      mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Y2 zero pt "))), 0, wxALIGN_RIGHT | wxALL, 3);
-      tmp.Printf(wxT("%.4f"),lEOpts->GetY2Zero());
-      mY2pt = new wxTextCtrl(this, wxID_ANY, tmp);
-      mLowerSizer->Add(mY2pt, 0, wxALIGN_RIGHT | wxALL, 3);
-    }
-
-  if (!PrefsAreGlobal())
-    {
-      mTotalEny = new wxCheckBox(this, ID_TOTAL_ENERGY, _T("Total Energy"));
-      mTotalEny->SetValue(lEOpts->PlotEnergy());
-      mMP2Eny = new wxCheckBox(this, ID_MP2_ENERGY, _T("MP2 Energy"));
-      mMP2Eny->SetValue(lEOpts->PlotMPEnergy());
-      mPotEny = new wxCheckBox(this, ID_POTENTIAL_ENERGY, _T("Potential Energy"));
-      mPotEny->SetValue(lEOpts->PlotPEnergy());
-
-      mLeftBottomSizer->Add(mTotalEny, 0, wxALIGN_LEFT | wxALL, 3);
-      mLeftBottomSizer->Add(mMP2Eny, 0, wxALIGN_LEFT | wxALL, 3);
-      mLeftBottomSizer->Add(mPotEny, 0, wxALIGN_LEFT | wxALL, 3);
-
-      EnergyUnit lunit = lEOpts->GetDisplayUnits();
-
-      wxString choices[] = {_T("Default"), _T("kcal/mol")};
-  
-      mRdoUnit = new wxRadioBox( this, ID_UNIT_RADIOBOX, _T("Unit"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 1, wxRA_SPECIFY_COLS );
-
-      if (lunit == kDefault)
-	mRdoUnit->SetSelection(0);
-      else if (lunit == kKCalPerMole)
-	mRdoUnit->SetSelection(1);
-
-      wxString choices2[] = {_T("None"), _T("Kinetic Energy"), _T("RMS Grad"), _T("Max. Grad"), _T("Bond Length"), _T("Bond Angle") };
-  
-      mRdoMisc = new wxRadioBox( this, ID_MISC_RADIOBOX, _T(""), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices2), choices2, 1, wxRA_SPECIFY_COLS );
-
-      if (lEOpts->PlotOther())
-	mRdoMisc->SetSelection(0);
-      if (lEOpts->PlotKEnergy())
-	mRdoMisc->SetSelection(1);
-      if (lPOpts->PlotRMSGradient())
-	mRdoMisc->SetSelection(2);
-      if (lPOpts->PlotMaxGradient())
-	mRdoMisc->SetSelection(3);
-      if (lPOpts->PlotBondLength())
-	mRdoMisc->SetSelection(4);
-      if (lPOpts->PlotBondAngle())
-	mRdoMisc->SetSelection(5);
-
-      mLeftBottomSizer->Add(mRdoUnit, 0, wxALIGN_CENTER | wxALL, 3);
-      mBottomSizer->Add(mLeftBottomSizer, 0, wxALL, 10);
-      mBottomSizer->Add(mRdoMisc, 0, wxALIGN_CENTER | wxALL, 10);
-
-      setHiddenCtrls();
-
-      mRightBottomSizer->Hide(mRight1BottomSizer);
-      mRightBottomSizer->Hide(mRight2BottomSizer); 
-      //initially hide them
-
-      if (lPOpts->PlotBondAngle())
-	{
-	  mRightBottomSizer->Show(mRight1BottomSizer, true, true);
-	  mRightBottomSizer->Show(mRight2BottomSizer, true, true);
-	  mRightBottomSizer->Layout();
+	if (!PrefsAreGlobal()) {
+		mBottomSizer = new wxBoxSizer(wxHORIZONTAL);
+		mLeftBottomSizer = new wxBoxSizer(wxVERTICAL);
 	}
 
-      if (lPOpts->PlotBondLength())
-	{
-	  mRightBottomSizer->Show(mRight1BottomSizer, true, true);
-	  mRightBottomSizer->Layout();
+	mRightBottomSizer = NULL;
+	mRight1BottomSizer = NULL;
+	mRight2BottomSizer = NULL;
+	mAtomText[0] = NULL;
+	mAtomText[1] = NULL;
+	mAtomText[2] = NULL;
+	mY1pt = NULL;
+	mY2pt = NULL;
+
+	SetSizer(mMainSizer);
+
+}
+
+EnergyPrefsPane::~EnergyPrefsPane() {
+	delete mEColor;
+	delete mMPColor;
+	delete mPEColor;
+	delete mOtherColor;
+
+	if (mY1pt) delete mY1pt;
+	if (mY2pt) delete mY2pt;
+}
+
+void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+	EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
+	GraphOptions * lPOpts = mTargetPrefs->GetGraphOptions();
+	//Setup the slider for the E plot point size
+
+	mSldBallSize = new wxSlider(this, ID_PLOT_BALL_SIZE_SLIDER, 
+			(int)(lEOpts->GetEPlotPointSize()), 1, 20,
+			wxDefaultPosition, wxSize(155,wxDefaultCoord),
+			wxSL_AUTOTICKS | wxSL_LABELS);
+
+	wxString tmp;
+	tmp.Printf(wxT("%d"), lEOpts->GetNumDigits());
+	mNumDigitsArea = new wxTextCtrl(this, wxID_ANY, tmp, wxDefaultPosition, wxDefaultSize);
+
+	mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("E. Plot Ball Size:"))), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mUpperSizer->Add(mSldBallSize, 0, wxALIGN_LEFT | wxALL, 3);
+	mUpperSizer->Add(30, 30);
+	mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("# digits"))), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mUpperSizer->Add(mNumDigitsArea, 0, wxALIGN_CENTER | wxALL, 3);
+
+	mEColor = new colorArea(this, 0, lEOpts->GetTEColor());
+	mMPColor = new colorArea(this, 1, lEOpts->GetMPColor());
+	mPEColor = new colorArea(this, 2, lEOpts->GetPEColor());
+	mOtherColor = new colorArea(this, 3, lEOpts->GetKEColor());
+
+	mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("E Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
+	mLowerSizer->Add(mEColor, 0, wxALIGN_LEFT | wxALL, 3);
+	mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("MP Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
+	mLowerSizer->Add(mMPColor, 0, wxALIGN_LEFT | wxALL, 3);
+
+	if (!PrefsAreGlobal()) {
+		mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Y1 zero pt "))), 0, wxALIGN_RIGHT | wxALL, 3);
+		tmp.Printf(wxT("%.4f"),lEOpts->GetY1Zero());
+		mY1pt = new wxTextCtrl(this, wxID_ANY, tmp);
+		mLowerSizer->Add(mY1pt, 0, wxALIGN_RIGHT | wxALL, 3);
 	}
 
-    }
+	mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("PE Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
+	mLowerSizer->Add(mPEColor, 0, wxALIGN_LEFT | wxALL, 3);
+	mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Other Color"))), 0, wxALIGN_RIGHT | wxALL, 3);
+	mLowerSizer->Add(mOtherColor, 0, wxALIGN_LEFT | wxALL, 3);
 
-  mMainSizer->Add(mUpperSizer);
-  mMainSizer->Add(mLowerSizer);
-
-  if (!PrefsAreGlobal())
-    mMainSizer->Add(mBottomSizer, 0, wxALL, 10);
-
-}
-
-void EnergyPrefsPane::setHiddenCtrls()
-{
-  GraphOptions * lPOpts = mTargetPrefs->GetGraphOptions();
-
-  if (!mRightBottomSizer)
-    mRightBottomSizer = new wxBoxSizer(wxVERTICAL);
-
-  if (!mRight1BottomSizer)
-    mRight1BottomSizer = new wxGridSizer(2,3);
-
-  if (!mRight2BottomSizer)
-    mRight2BottomSizer = new wxGridSizer(2,1);
-
-  wxString tmp;
-  if (!mAtomText[0])
-    {
-      tmp.Printf(wxT("%d"), lPOpts->Get1stAtom()+1);
-      mAtomText[0] = new wxTextCtrl(this, wxID_ANY, tmp);
-    }
-  if (!mAtomText[1])
-    {
-      tmp.Printf(wxT("%d"), lPOpts->Get2ndAtom()+1);
-      mAtomText[1] = new wxTextCtrl(this, wxID_ANY, tmp);
-    }
-
-  mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 1:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
-  mRight1BottomSizer->Add(mAtomText[0], wxALIGN_CENTER | wxALL, 3);
-  mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 2:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
-  mRight1BottomSizer->Add(mAtomText[1], wxALIGN_CENTER | wxALL, 3);
-
-  if (!mAtomText[2])
-    {
-      tmp.Printf(wxT("%d"), lPOpts->Get3rdAtom()+1);
-      mAtomText[2] = new wxTextCtrl(this, wxID_ANY, tmp);
-    }
-  mRight2BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 3:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
-  mRight2BottomSizer->Add(mAtomText[2], wxALIGN_CENTER | wxALL, 3);
-	  
-  mRightBottomSizer->Add(mRight1BottomSizer);
-  mRightBottomSizer->Add(mRight2BottomSizer);
-  mBottomSizer->Add(mRightBottomSizer);
-}
-
-void EnergyPrefsPane::saveToTempPrefs()
-{
-  EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
-  GraphOptions * lPOpts = mTargetPrefs->GetGraphOptions();
-
-  long localLong;
-  double localDouble;
-
-  (mNumDigitsArea->GetValue()).ToLong(&localLong);
-  lEOpts->SetNumDigits(localLong);
-
-  mEColor->getColor(lEOpts->GetTEColor());
-  mMPColor->getColor(lEOpts->GetMPColor());
-  mOtherColor->getColor(lEOpts->GetKEColor());
-  mPEColor->getColor(lEOpts->GetPEColor());
-
-  if (!PrefsAreGlobal())
-    {
-      (mY1pt->GetValue()).ToDouble(&localDouble);
-      lEOpts->SetY1Zero(localDouble);
-      (mY2pt->GetValue()).ToDouble(&localDouble);
-      lEOpts->SetY2Zero(localDouble);
-
-      if (lPOpts->PlotBondLength() || lPOpts->PlotBondAngle())
-	{
-	  (mAtomText[0]->GetValue()).ToLong(&localLong);
-	  lPOpts->Set1stAtom(localLong-1);
-	  (mAtomText[1]->GetValue()).ToLong(&localLong);
-	  lPOpts->Set2ndAtom(localLong-1);
-
-	  if (lPOpts->PlotBondAngle())
-	    {
-	      (mAtomText[2]->GetValue()).ToLong(&localLong);
-	      lPOpts->Set3rdAtom(localLong-1);
-	    }
+	if (!PrefsAreGlobal()) {
+		mLowerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Y2 zero pt "))), 0, wxALIGN_RIGHT | wxALL, 3);
+		tmp.Printf(wxT("%.4f"),lEOpts->GetY2Zero());
+		mY2pt = new wxTextCtrl(this, wxID_ANY, tmp);
+		mLowerSizer->Add(mY2pt, 0, wxALIGN_RIGHT | wxALL, 3);
 	}
-    }
+
+	if (!PrefsAreGlobal()) {
+		mTotalEny = new wxCheckBox(this, ID_TOTAL_ENERGY, _T("Total Energy"));
+		mTotalEny->SetValue(lEOpts->PlotEnergy());
+		mMP2Eny = new wxCheckBox(this, ID_MP2_ENERGY, _T("MP2 Energy"));
+		mMP2Eny->SetValue(lEOpts->PlotMPEnergy());
+		mPotEny = new wxCheckBox(this, ID_POTENTIAL_ENERGY, _T("Potential Energy"));
+		mPotEny->SetValue(lEOpts->PlotPEnergy());
+
+		mLeftBottomSizer->Add(mTotalEny, 0, wxALIGN_LEFT | wxALL, 3);
+		mLeftBottomSizer->Add(mMP2Eny, 0, wxALIGN_LEFT | wxALL, 3);
+		mLeftBottomSizer->Add(mPotEny, 0, wxALIGN_LEFT | wxALL, 3);
+
+		EnergyUnit lunit = lEOpts->GetDisplayUnits();
+
+		wxString choices[] = {_T("Default"), _T("kcal/mol")};
+
+		mRdoUnit = new wxRadioBox(this, ID_UNIT_RADIOBOX, _T("Unit"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 1, wxRA_SPECIFY_COLS);
+
+		if (lunit == kDefault)
+			mRdoUnit->SetSelection(0);
+		else if (lunit == kKCalPerMole)
+			mRdoUnit->SetSelection(1);
+
+		wxString choices2[] = {_T("None"), _T("Kinetic Energy"), _T("RMS Grad"), _T("Max. Grad"), _T("Bond Length"), _T("Bond Angle") };
+
+		mRdoMisc = new wxRadioBox(this, ID_MISC_RADIOBOX, _T(""), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices2), choices2, 1, wxRA_SPECIFY_COLS);
+
+		if (lEOpts->PlotOther())
+			mRdoMisc->SetSelection(0);
+		if (lEOpts->PlotKEnergy())
+			mRdoMisc->SetSelection(1);
+		if (lPOpts->PlotRMSGradient())
+			mRdoMisc->SetSelection(2);
+		if (lPOpts->PlotMaxGradient())
+			mRdoMisc->SetSelection(3);
+		if (lPOpts->PlotBondLength())
+			mRdoMisc->SetSelection(4);
+		if (lPOpts->PlotBondAngle())
+			mRdoMisc->SetSelection(5);
+
+		mLeftBottomSizer->Add(mRdoUnit, 0, wxALIGN_CENTER | wxALL, 3);
+		mBottomSizer->Add(mLeftBottomSizer, 0, wxALL, 10);
+		mBottomSizer->Add(mRdoMisc, 0, wxALIGN_CENTER | wxALL, 10);
+
+		setHiddenCtrls();
+
+		mRightBottomSizer->Hide(mRight1BottomSizer);
+		mRightBottomSizer->Hide(mRight2BottomSizer); 
+		//initially hide them
+
+		if (lPOpts->PlotBondAngle()) {
+			mRightBottomSizer->Show(mRight1BottomSizer, true, true);
+			mRightBottomSizer->Show(mRight2BottomSizer, true, true);
+			mRightBottomSizer->Layout();
+		}
+
+		if (lPOpts->PlotBondLength()) {
+			mRightBottomSizer->Show(mRight1BottomSizer, true, true);
+			mRightBottomSizer->Layout();
+		}
+
+	}
+
+	mMainSizer->Add(mUpperSizer);
+	mMainSizer->Add(mLowerSizer);
+
+	if (!PrefsAreGlobal())
+		mMainSizer->Add(mBottomSizer, 0, wxALL, 10);
+
 }
 
-void EnergyPrefsPane::OnSliderUpdate( wxCommandEvent &WXUNUSED(event) )
-{
-  EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
-  lEOpts->SetEPlotPointSize(mSldBallSize->GetValue());
+void EnergyPrefsPane::setHiddenCtrls() {
+	GraphOptions * lPOpts = mTargetPrefs->GetGraphOptions();
+
+	if (!mRightBottomSizer)
+		mRightBottomSizer = new wxBoxSizer(wxVERTICAL);
+
+	if (!mRight1BottomSizer)
+		mRight1BottomSizer = new wxGridSizer(2,3);
+
+	if (!mRight2BottomSizer)
+		mRight2BottomSizer = new wxGridSizer(2,1);
+
+	wxString tmp;
+	if (!mAtomText[0]) {
+		tmp.Printf(wxT("%d"), lPOpts->Get1stAtom()+1);
+		mAtomText[0] = new wxTextCtrl(this, wxID_ANY, tmp);
+	}
+	if (!mAtomText[1]) {
+		tmp.Printf(wxT("%d"), lPOpts->Get2ndAtom()+1);
+		mAtomText[1] = new wxTextCtrl(this, wxID_ANY, tmp);
+	}
+
+	mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 1:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
+	mRight1BottomSizer->Add(mAtomText[0], wxALIGN_CENTER | wxALL, 3);
+	mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 2:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
+	mRight1BottomSizer->Add(mAtomText[1], wxALIGN_CENTER | wxALL, 3);
+
+	if (!mAtomText[2]) {
+		tmp.Printf(wxT("%d"), lPOpts->Get3rdAtom()+1);
+		mAtomText[2] = new wxTextCtrl(this, wxID_ANY, tmp);
+	}
+	mRight2BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 3:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
+	mRight2BottomSizer->Add(mAtomText[2], wxALIGN_CENTER | wxALL, 3);
+
+	mRightBottomSizer->Add(mRight1BottomSizer);
+	mRightBottomSizer->Add(mRight2BottomSizer);
+	mBottomSizer->Add(mRightBottomSizer);
 }
 
-void EnergyPrefsPane::OnCheckBox( wxCommandEvent& event)
-{
-  int id = event.GetId();
+void EnergyPrefsPane::saveToTempPrefs() {
+	EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
+	GraphOptions * lPOpts = mTargetPrefs->GetGraphOptions();
 
-  EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
+	long localLong;
+	double localDouble;
 
-  if ( id == ID_TOTAL_ENERGY )
-    lEOpts->SetPlotEnergy(mTotalEny->GetValue());
-  if ( id == ID_MP2_ENERGY )
-    lEOpts->SetPlotMPEnergy(mMP2Eny->GetValue());
-  if ( id == ID_POTENTIAL_ENERGY )
-    lEOpts->SetPlotPEnergy(mPotEny->GetValue());
+	(mNumDigitsArea->GetValue()).ToLong(&localLong);
+	lEOpts->SetNumDigits(localLong);
+
+	mEColor->getColor(lEOpts->GetTEColor());
+	mMPColor->getColor(lEOpts->GetMPColor());
+	mOtherColor->getColor(lEOpts->GetKEColor());
+	mPEColor->getColor(lEOpts->GetPEColor());
+
+	if (!PrefsAreGlobal()) {
+		(mY1pt->GetValue()).ToDouble(&localDouble);
+		lEOpts->SetY1Zero(localDouble);
+		(mY2pt->GetValue()).ToDouble(&localDouble);
+		lEOpts->SetY2Zero(localDouble);
+
+		if (lPOpts->PlotBondLength() || lPOpts->PlotBondAngle()) {
+			(mAtomText[0]->GetValue()).ToLong(&localLong);
+			lPOpts->Set1stAtom(localLong-1);
+			(mAtomText[1]->GetValue()).ToLong(&localLong);
+			lPOpts->Set2ndAtom(localLong-1);
+
+			if (lPOpts->PlotBondAngle()) {
+				(mAtomText[2]->GetValue()).ToLong(&localLong);
+				lPOpts->Set3rdAtom(localLong-1);
+			}
+		}
+	}
 }
 
-void EnergyPrefsPane::OnRadio( wxCommandEvent& event )
-{
-  //int id = event.GetId();
+void EnergyPrefsPane::OnSliderUpdate(wxCommandEvent &WXUNUSED(event)) {
+	EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
+	lEOpts->SetEPlotPointSize(mSldBallSize->GetValue());
+}
 
-  wxString tmpStr = event.GetString();
+void EnergyPrefsPane::OnCheckBox(wxCommandEvent& event) {
+	int id = event.GetId();
 
-  mRightBottomSizer->Hide(mRight1BottomSizer);
-  mRightBottomSizer->Hide(mRight2BottomSizer);
+	EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
 
-	if ( tmpStr.Cmp(_T("Bond Length")) == 0 || tmpStr.Cmp(_T("Bond Angle")) == 0) {
+	if (id == ID_TOTAL_ENERGY)
+		lEOpts->SetPlotEnergy(mTotalEny->GetValue());
+	if (id == ID_MP2_ENERGY)
+		lEOpts->SetPlotMPEnergy(mMP2Eny->GetValue());
+	if (id == ID_POTENTIAL_ENERGY)
+		lEOpts->SetPlotPEnergy(mPotEny->GetValue());
+}
+
+void EnergyPrefsPane::OnRadio(wxCommandEvent& event) {
+	//int id = event.GetId();
+
+	wxString tmpStr = event.GetString();
+
+	mRightBottomSizer->Hide(mRight1BottomSizer);
+	mRightBottomSizer->Hide(mRight2BottomSizer);
+
+	if (tmpStr.Cmp(_T("Bond Length")) == 0 || tmpStr.Cmp(_T("Bond Angle")) == 0) {
 		mRightBottomSizer->Show(mRight1BottomSizer, true, true);
 
-		if (tmpStr.Cmp(_T("Bond Angle")) == 0 )
+		if (tmpStr.Cmp(_T("Bond Angle")) == 0)
 			mRightBottomSizer->Show(mRight2BottomSizer, true, true);
 
- 		mMainSizer->Layout();
+		mMainSizer->Layout();
 	}
 
-  EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
-  GraphOptions * lPOpts = mTargetPrefs->GetGraphOptions();
+	EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
+	GraphOptions * lPOpts = mTargetPrefs->GetGraphOptions();
 
-  if (event.GetId() == ID_UNIT_RADIOBOX)
-    {
-      EnergyUnit lunit;
+	if (event.GetId() == ID_UNIT_RADIOBOX) {
+		EnergyUnit lunit;
 
-      if (tmpStr.Cmp(_T("Default")) == 0)
-	lunit = kDefault;
-      else if (tmpStr.Cmp(_T("kcal/mol")) == 0)
-	lunit = kKCalPerMole;
+		if (tmpStr.Cmp(_T("Default")) == 0)
+			lunit = kDefault;
+		else if (tmpStr.Cmp(_T("kcal/mol")) == 0)
+			lunit = kKCalPerMole;
 
-      lEOpts->SetDisplayUnits(lunit);
-    }
+		lEOpts->SetDisplayUnits(lunit);
+	}
 
-  if (event.GetId() == ID_MISC_RADIOBOX)
-    {
-      lEOpts->SetPlotOther(false);
-      lEOpts->SetPlotKEnergy(false);
-      lPOpts->SetPlotRMSGradient(false);
-      lPOpts->SetPlotMaxGradient(false);
-      lPOpts->SetPlotBondLength(false);
-      lPOpts->SetPlotBondAngle(false);
-      //set everything to false first
+	if (event.GetId() == ID_MISC_RADIOBOX) {
+		lEOpts->SetPlotOther(false);
+		lEOpts->SetPlotKEnergy(false);
+		lPOpts->SetPlotRMSGradient(false);
+		lPOpts->SetPlotMaxGradient(false);
+		lPOpts->SetPlotBondLength(false);
+		lPOpts->SetPlotBondAngle(false);
+		//set everything to false first
 
-      if (tmpStr.Cmp(_T("None")) == 0)
-	lEOpts->SetPlotOther(true);
-      else if (tmpStr.Cmp(_T("Kinetic Energy")) == 0)
-	lEOpts->SetPlotKEnergy(true);
-      else if (tmpStr.Cmp(_T("RMS Grad")) == 0)
-	lPOpts->SetPlotRMSGradient(true);
-      else if (tmpStr.Cmp(_T("Max. Grad")) == 0)
-	lPOpts->SetPlotMaxGradient(true);
-      else if (tmpStr.Cmp(_T("Bond Length")) == 0)
-	lPOpts->SetPlotBondLength(true);
-      else if (tmpStr.Cmp(_T("Bond Angle")) == 0)
-	lPOpts->SetPlotBondAngle(true);
-    }
-  
+		if (tmpStr.Cmp(_T("None")) == 0)
+			lEOpts->SetPlotOther(true);
+		else if (tmpStr.Cmp(_T("Kinetic Energy")) == 0)
+			lEOpts->SetPlotKEnergy(true);
+		else if (tmpStr.Cmp(_T("RMS Grad")) == 0)
+			lPOpts->SetPlotRMSGradient(true);
+		else if (tmpStr.Cmp(_T("Max. Grad")) == 0)
+			lPOpts->SetPlotMaxGradient(true);
+		else if (tmpStr.Cmp(_T("Bond Length")) == 0)
+			lPOpts->SetPlotBondLength(true);
+		else if (tmpStr.Cmp(_T("Bond Angle")) == 0)
+			lPOpts->SetPlotBondAngle(true);
+	}
+
 }
 
 FilePrefsPane::FilePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
-	: PrefsPane(targetWindow, targetPrefs, kFilePrefsPane, GlobalPrefs, parent) 
-{
-  /* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
+	: PrefsPane(targetWindow, targetPrefs, kFilePrefsPane, GlobalPrefs, parent) {
+	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER); */
 
-  mMainSizer = new wxBoxSizer(wxVERTICAL);
-  mUpperSizer = new wxBoxSizer(wxVERTICAL);
-  mSecondSizer = new wxFlexGridSizer(2,3);
-  mMiddleSizer = new wxFlexGridSizer(2,3);
-  mLowerSizer = new wxBoxSizer(wxHORIZONTAL);
-  mBottomSizer = new wxBoxSizer(wxHORIZONTAL);
+	mMainSizer = new wxBoxSizer(wxVERTICAL);
+	mUpperSizer = new wxBoxSizer(wxVERTICAL);
+	mSecondSizer = new wxFlexGridSizer(2,3);
+	mMiddleSizer = new wxFlexGridSizer(2,3);
+	mLowerSizer = new wxBoxSizer(wxHORIZONTAL);
+	mBottomSizer = new wxBoxSizer(wxHORIZONTAL);
 
-  SetSizer(mMainSizer);
+	SetSizer(mMainSizer);
 }
 
-void FilePrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) 
-{
-  mChkBox[0] = new wxCheckBox(this, ID_AUTO_BOND_PASTE_OPEN, _T("Auto-Bond on Paste and File Open"));
-  mChkBox[0]->SetValue(mTargetPrefs->GetAutoBond());
+void FilePrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+	mChkBox[0] = new wxCheckBox(this, ID_AUTO_BOND_PASTE_OPEN, _T("Auto-Bond on Paste and File Open"));
+	mChkBox[0]->SetValue(mTargetPrefs->GetAutoBond());
 
-  mChkBox[1] = new wxCheckBox(this, ID_GUESS_BOND_ORDER, _T("Guess bond order"));
-  mChkBox[1]->SetValue(mTargetPrefs->DetermineBondOrder());
+	mChkBox[1] = new wxCheckBox(this, ID_GUESS_BOND_ORDER, _T("Guess bond order"));
+	mChkBox[1]->SetValue(mTargetPrefs->DetermineBondOrder());
 
-  mChkBox[2] = new wxCheckBox(this, ID_PREVENT_HH_BONDS, _T("Prevent H-H bonds in Auto-Bond"));
-  mChkBox[2]->SetValue(mTargetPrefs->GetHHBondFlag());
+	mChkBox[2] = new wxCheckBox(this, ID_PREVENT_HH_BONDS, _T("Prevent H-H bonds in Auto-Bond"));
+	mChkBox[2]->SetValue(mTargetPrefs->GetHHBondFlag());
 
-  mChkBox[3] = new wxCheckBox(this, ID_LOOK_HYDROGEN_BONDS, _T("Look for hydrogen bonds"));
-  mChkBox[3]->SetValue(mTargetPrefs->AllowHydrogenBonds());
-	
-  mChkBox[4] = new wxCheckBox(this, ID_SHOW_ANGLES_WHILE_ROTATING, _T("Show angles while rotating"));
-  mChkBox[4]->SetValue(mTargetPrefs->GetShowAngles());
+	mChkBox[3] = new wxCheckBox(this, ID_LOOK_HYDROGEN_BONDS, _T("Look for hydrogen bonds"));
+	mChkBox[3]->SetValue(mTargetPrefs->AllowHydrogenBonds());
 
-#ifdef __WXMAC__
-if (PrefsAreGlobal())
-    {
-      mChkBox[5] = new wxCheckBox(this, ID_USE_MAC_EOL_CHAR, _T("Use Mac EOL chars"));
-      mChkBox[5]->SetValue(mTargetPrefs->NativeEOLChar());
-    }
-#endif
-
-  mChkBox[6] = new wxCheckBox(this, ID_PROMPT_SAVE_FILE, _T("Prompt to save file"));
-  mChkBox[6]->SetValue(mTargetPrefs->GetPrompt4Save());
-
-
-  mChkBox[7] = new wxCheckBox(this, ID_CREATE_CUSTOM_FILE_ICON, _T("create custom file icon"));
-  mChkBox[7]->SetValue(mTargetPrefs->CreateCustomIcon());
+	mChkBox[4] = new wxCheckBox(this, ID_SHOW_ANGLES_WHILE_ROTATING, _T("Show angles while rotating"));
+	mChkBox[4]->SetValue(mTargetPrefs->GetShowAngles());
 
 #ifdef __WXMAC__
-  if (PrefsAreGlobal())
-    {
-      mChkBox[8] = new wxCheckBox(this, ID_CHANGE_FILE_CREATOR, _T("Change file creator type to wxMacMolPlt"));
-      mChkBox[8]->SetValue(mTargetPrefs->ChangeFileType());
-    }
-#endif
-
-  mUpperSizer->Add(mChkBox[0], 0, wxALIGN_LEFT | wxALL, 3);
-
-  mSecondSizer->Add(30, 0);
-  mSecondSizer->Add(mChkBox[1], 0, wxALIGN_LEFT | wxALL, 3);
-  mSecondSizer->Add(30, 0);
-  mSecondSizer->Add(mChkBox[2], 0, wxALIGN_LEFT | wxALL, 3);
-  mSecondSizer->Add(30, 0);
-  mSecondSizer->Add(mChkBox[3], 0, wxALIGN_LEFT | wxALL, 3);
-
-  mMiddleSizer->Add(mChkBox[4], 0, wxALIGN_LEFT | wxALL, 3);
-
-#ifdef __WXMAC__
-  if (PrefsAreGlobal())
-    mMiddleSizer->Add(mChkBox[5], 0, wxALIGN_LEFT | wxALL, 3);
-#endif
-
-  mMiddleSizer->Add(mChkBox[6], 0, wxALIGN_LEFT | wxALL, 3);
-  mMiddleSizer->Add(mChkBox[7], 0, wxALIGN_LEFT | wxALL, 3);
-
-#ifdef __WXMAC__
-  if (PrefsAreGlobal())
-    mMiddleSizer->Add(mChkBox[8], 0, wxALIGN_LEFT | wxALL, 3);
-#endif
-
-  mSldTol = new wxSlider( this, ID_AUTO_BOND_TOLERANCE_SLIDER, 
-			  (int)(mTargetPrefs->GetAutoBondScale()*10000+0.5), 
-			  50, 150, wxDefaultPosition, 
-			  wxSize(155,wxDefaultCoord));
-
-  mLowerSizer->Add(new wxStaticText(this, wxID_ANY, _T("Auto-Bond Tolerance:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-  mLowerSizer->Add(mSldTol, 0, wxALIGN_LEFT | wxALL, 3);
-
-  wxString tmp;
-  tmp.Printf(wxT("%d"), mTargetPrefs->GetDRCSkip());
-  mPointSkip = new wxTextCtrl(this, wxID_ANY, tmp);
-
-  mBottomSizer->Add(new wxStaticText(this, wxID_ANY, _T("When reading a DRC file how many\n points should be skipped between\n points read in? (0 reads every point)")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-  mBottomSizer->Add(mPointSkip, 0, wxALIGN_CENTER | wxALL, 3);
-
-  mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
-  mMainSizer->Add(mSecondSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
-  mMainSizer->Add(mMiddleSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
-  mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
-  mMainSizer->Add(mBottomSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
-
-}
-
-void FilePrefsPane::saveToTempPrefs()
-{
-  long v;
-  (mPointSkip->GetValue()).ToLong(&v);
-  mTargetPrefs->SetDRCSkip(v);
-}
-
-void FilePrefsPane::OnCheckBox( wxCommandEvent &event)
-{
-  if (event.GetId() == ID_AUTO_BOND_PASTE_OPEN)
-    {
-      Boolean mainStatus = mChkBox[0]->GetValue();
-      mTargetPrefs->SetAutoBond(mainStatus);
-
-      if (!mainStatus)
-	{
-	  mChkBox[1]->Disable();
-	  mChkBox[2]->Disable();
-	  mChkBox[3]->Disable();
+	if (PrefsAreGlobal()) {
+		mChkBox[5] = new wxCheckBox(this, ID_USE_MAC_EOL_CHAR, _T("Use Mac EOL chars"));
+		mChkBox[5]->SetValue(mTargetPrefs->NativeEOLChar());
 	}
-      else
-	{
-	  mChkBox[1]->Enable();
-	  mChkBox[2]->Enable();
-	  mChkBox[3]->Enable();
-	}
-    }
-  else if (event.GetId() == ID_GUESS_BOND_ORDER)
-    mTargetPrefs->DetermineBondOrder(mChkBox[1]->GetValue());
-  else if (event.GetId() == ID_PREVENT_HH_BONDS)
-    mTargetPrefs->SetHHBondFlag(mChkBox[2]->GetValue());
-  else if (event.GetId() == ID_LOOK_HYDROGEN_BONDS)
-    mTargetPrefs->AllowHydrogenBonds(mChkBox[3]->GetValue());
-  else if (event.GetId() == ID_SHOW_ANGLES_WHILE_ROTATING)
-    mTargetPrefs->SetShowAngles(mChkBox[4]->GetValue());
-#ifdef __WXMAC__
-  else if (event.GetId() == ID_USE_MAC_EOL_CHAR && PrefsAreGlobal())
-    mTargetPrefs->NativeEOLChar(mChkBox[5]->GetValue());
 #endif
-  else if (event.GetId() == ID_PROMPT_SAVE_FILE)
-    mTargetPrefs->SetPrompt4Save(mChkBox[6]->GetValue());
-  else if (event.GetId() == ID_CREATE_CUSTOM_FILE_ICON)
-    mTargetPrefs->CreateCustomIcon(mChkBox[7]->GetValue());
+
+	mChkBox[6] = new wxCheckBox(this, ID_PROMPT_SAVE_FILE, _T("Prompt to save file"));
+	mChkBox[6]->SetValue(mTargetPrefs->GetPrompt4Save());
+
+
+	mChkBox[7] = new wxCheckBox(this, ID_CREATE_CUSTOM_FILE_ICON, _T("create custom file icon"));
+	mChkBox[7]->SetValue(mTargetPrefs->CreateCustomIcon());
+
 #ifdef __WXMAC__
-  else if (event.GetId() == ID_CHANGE_FILE_CREATOR)
-    mTargetPrefs->ChangeFileType(mChkBox[8]->GetValue());
+	if (PrefsAreGlobal()) {
+		mChkBox[8] = new wxCheckBox(this, ID_CHANGE_FILE_CREATOR, _T("Change file creator type to wxMacMolPlt"));
+		mChkBox[8]->SetValue(mTargetPrefs->ChangeFileType());
+	}
+#endif
+
+	mUpperSizer->Add(mChkBox[0], 0, wxALIGN_LEFT | wxALL, 3);
+
+	mSecondSizer->Add(30, 0);
+	mSecondSizer->Add(mChkBox[1], 0, wxALIGN_LEFT | wxALL, 3);
+	mSecondSizer->Add(30, 0);
+	mSecondSizer->Add(mChkBox[2], 0, wxALIGN_LEFT | wxALL, 3);
+	mSecondSizer->Add(30, 0);
+	mSecondSizer->Add(mChkBox[3], 0, wxALIGN_LEFT | wxALL, 3);
+
+	mMiddleSizer->Add(mChkBox[4], 0, wxALIGN_LEFT | wxALL, 3);
+
+#ifdef __WXMAC__
+	if (PrefsAreGlobal())
+		mMiddleSizer->Add(mChkBox[5], 0, wxALIGN_LEFT | wxALL, 3);
+#endif
+
+	mMiddleSizer->Add(mChkBox[6], 0, wxALIGN_LEFT | wxALL, 3);
+	mMiddleSizer->Add(mChkBox[7], 0, wxALIGN_LEFT | wxALL, 3);
+
+#ifdef __WXMAC__
+	if (PrefsAreGlobal())
+		mMiddleSizer->Add(mChkBox[8], 0, wxALIGN_LEFT | wxALL, 3);
+#endif
+
+	mSldTol = new wxSlider(this, ID_AUTO_BOND_TOLERANCE_SLIDER, 
+			(int)(mTargetPrefs->GetAutoBondScale()*10000+0.5), 
+			50, 150, wxDefaultPosition, 
+			wxSize(155,wxDefaultCoord));
+
+	mLowerSizer->Add(new wxStaticText(this, wxID_ANY, _T("Auto-Bond Tolerance:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mLowerSizer->Add(mSldTol, 0, wxALIGN_LEFT | wxALL, 3);
+
+	wxString tmp;
+	tmp.Printf(wxT("%d"), mTargetPrefs->GetDRCSkip());
+	mPointSkip = new wxTextCtrl(this, wxID_ANY, tmp);
+
+	mBottomSizer->Add(new wxStaticText(this, wxID_ANY, _T("When reading a DRC file how many\n points should be skipped between\n points read in? (0 reads every point)")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mBottomSizer->Add(mPointSkip, 0, wxALIGN_CENTER | wxALL, 3);
+
+	mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+	mMainSizer->Add(mSecondSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+	mMainSizer->Add(mMiddleSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+	mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+	mMainSizer->Add(mBottomSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
+
+}
+
+void FilePrefsPane::saveToTempPrefs() {
+	long v;
+	(mPointSkip->GetValue()).ToLong(&v);
+	mTargetPrefs->SetDRCSkip(v);
+}
+
+void FilePrefsPane::OnCheckBox(wxCommandEvent &event) {
+	if (event.GetId() == ID_AUTO_BOND_PASTE_OPEN) {
+		Boolean mainStatus = mChkBox[0]->GetValue();
+		mTargetPrefs->SetAutoBond(mainStatus);
+
+		if (!mainStatus) {
+			mChkBox[1]->Disable();
+			mChkBox[2]->Disable();
+			mChkBox[3]->Disable();
+		}
+		else
+		{
+			mChkBox[1]->Enable();
+			mChkBox[2]->Enable();
+			mChkBox[3]->Enable();
+		}
+	}
+	else if (event.GetId() == ID_GUESS_BOND_ORDER)
+		mTargetPrefs->DetermineBondOrder(mChkBox[1]->GetValue());
+	else if (event.GetId() == ID_PREVENT_HH_BONDS)
+		mTargetPrefs->SetHHBondFlag(mChkBox[2]->GetValue());
+	else if (event.GetId() == ID_LOOK_HYDROGEN_BONDS)
+		mTargetPrefs->AllowHydrogenBonds(mChkBox[3]->GetValue());
+	else if (event.GetId() == ID_SHOW_ANGLES_WHILE_ROTATING)
+		mTargetPrefs->SetShowAngles(mChkBox[4]->GetValue());
+#ifdef __WXMAC__
+	else if (event.GetId() == ID_USE_MAC_EOL_CHAR && PrefsAreGlobal())
+		mTargetPrefs->NativeEOLChar(mChkBox[5]->GetValue());
+#endif
+	else if (event.GetId() == ID_PROMPT_SAVE_FILE)
+		mTargetPrefs->SetPrompt4Save(mChkBox[6]->GetValue());
+	else if (event.GetId() == ID_CREATE_CUSTOM_FILE_ICON)
+		mTargetPrefs->CreateCustomIcon(mChkBox[7]->GetValue());
+#ifdef __WXMAC__
+	else if (event.GetId() == ID_CHANGE_FILE_CREATOR)
+		mTargetPrefs->ChangeFileType(mChkBox[8]->GetValue());
 #endif
 }
 
-void FilePrefsPane::OnSliderUpdate( wxCommandEvent &WXUNUSED(event) )
-{
+void FilePrefsPane::OnSliderUpdate(wxCommandEvent &WXUNUSED(event)) {
   mTargetPrefs->SetAutoBondScale((float)(mSldTol->GetValue())/10000);
 }
 
 
 ScalingPrefsPane::ScalingPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
-	: PrefsPane(targetWindow, targetPrefs, kScalingPrefsPane, GlobalPrefs, parent) 
-{
-	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
+	: PrefsPane(targetWindow, targetPrefs, kScalingPrefsPane, GlobalPrefs, parent) {
+	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER); */
 
 	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
 	mMainSizer = new wxFlexGridSizer(2,3);
@@ -997,46 +964,43 @@ ScalingPrefsPane::ScalingPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *
 	SetSizer(itemBoxSizer4);
 }
 
-void ScalingPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) 
-{
-  mSld[0] = new wxSlider( this, ID_ATOM_SIZE_SLIDER, 
-			  (int)(mTargetPrefs->GetAtomScale()*10000+0.5), 
-			  0, 250, wxDefaultPosition, 
-			  wxSize(155,wxDefaultCoord));
+void ScalingPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+	mSld[0] = new wxSlider(this, ID_ATOM_SIZE_SLIDER, 
+			(int)(mTargetPrefs->GetAtomScale()*10000+0.5), 
+			0, 250, wxDefaultPosition, 
+			wxSize(155,wxDefaultCoord));
 
-  mSld[1] = new wxSlider( this, ID_ANIM_QUALITY_SLIDER, 
-			  (int)(mTargetPrefs->GetAnimationSpeed()-1), 
-			  0, 15, wxDefaultPosition, 
-			  wxSize(155,wxDefaultCoord));
+	mSld[1] = new wxSlider(this, ID_ANIM_QUALITY_SLIDER, 
+			(int)(mTargetPrefs->GetAnimationSpeed()-1), 
+			0, 15, wxDefaultPosition, 
+			wxSize(155,wxDefaultCoord));
 
-  mSld[2] = new wxSlider( this, ID_FRAME_DELAY_SLIDER, 
-			  (int)(mTargetPrefs->GetAnimateTime()), 
-			  0, 120, wxDefaultPosition, 
-			  wxSize(155,wxDefaultCoord));
+	mSld[2] = new wxSlider(this, ID_FRAME_DELAY_SLIDER, 
+			(int)(mTargetPrefs->GetAnimateTime()), 
+			0, 120, wxDefaultPosition, 
+			wxSize(155,wxDefaultCoord));
 
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Atom Size:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-  mMainSizer->Add(mSld[0], 0, wxALIGN_LEFT | wxALL, 3);
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Mode Animation Quality:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-  mMainSizer->Add(mSld[1], 0, wxALIGN_LEFT | wxALL, 3);
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Frame Delay:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-  mMainSizer->Add(mSld[2], 0, wxALIGN_LEFT | wxALL, 3);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Atom Size:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mMainSizer->Add(mSld[0], 0, wxALIGN_LEFT | wxALL, 3);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Mode Animation Quality:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mMainSizer->Add(mSld[1], 0, wxALIGN_LEFT | wxALL, 3);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Frame Delay:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mMainSizer->Add(mSld[2], 0, wxALIGN_LEFT | wxALL, 3);
 }
 
-void ScalingPrefsPane::saveToTempPrefs()
-{
+void ScalingPrefsPane::saveToTempPrefs() {
 
 }
 
-void ScalingPrefsPane::OnSliderUpdate( wxCommandEvent &event )
-{
-  int id = event.GetId();
+void ScalingPrefsPane::OnSliderUpdate(wxCommandEvent &event) {
+	int id = event.GetId();
 
-  if (id == ID_ATOM_SIZE_SLIDER)
-    mTargetPrefs->SetAtomScale((float)(mSld[0]->GetValue())/10000);
-  if (id == ID_ANIM_QUALITY_SLIDER)
-    mTargetPrefs->SetAnimationSpeed(mSld[1]->GetValue()+1);
-  if (id == ID_FRAME_DELAY_SLIDER)
-    mTargetPrefs->SetAnimateTime(mSld[2]->GetValue());
+	if (id == ID_ATOM_SIZE_SLIDER)
+		mTargetPrefs->SetAtomScale((float)(mSld[0]->GetValue())/10000);
+	if (id == ID_ANIM_QUALITY_SLIDER)
+		mTargetPrefs->SetAnimationSpeed(mSld[1]->GetValue()+1);
+	if (id == ID_FRAME_DELAY_SLIDER)
+		mTargetPrefs->SetAnimateTime(mSld[2]->GetValue());
 }
 
 StereoPrefsPane::StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
@@ -1077,121 +1041,115 @@ void StereoPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 
 	wxString tmp;
 	tmp.Printf(wxT("%d"), mTargetPrefs->GetStereoOffset());
-	mOffDegree = new wxTextCtrl( this, wxID_ANY, tmp);
+	mOffDegree = new wxTextCtrl(this, wxID_ANY, tmp);
 	mMiddleSizer->Add(mOffDegree, 0, wxALIGN_LEFT | wxALL, 3);
 
 	mMainSizer->Add(mMiddleSizer, 0, wxALIGN_LEFT | wxLEFT, 10);
 
 }
 
-void StereoPrefsPane::saveToTempPrefs()
-{
-  long v;
-  mOffDegree->GetValue().ToLong(&v);
-  mTargetPrefs->SetStereoOffset(v);
+void StereoPrefsPane::saveToTempPrefs() {
+	long v;
+	mOffDegree->GetValue().ToLong(&v);
+	mTargetPrefs->SetStereoOffset(v);
 }
 
-void StereoPrefsPane::OnCheckBox( wxCommandEvent& WXUNUSED(event))
-{
-  mTargetPrefs->UseStereo(mChkActive->GetValue());
+void StereoPrefsPane::OnCheckBox(wxCommandEvent& WXUNUSED(event)) {
+	mTargetPrefs->UseStereo(mChkActive->GetValue());
 }
 
 
 SurfacePrefsPane::SurfacePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
-	: PrefsPane(targetWindow, targetPrefs, kSurfacePrefsPane, GlobalPrefs, parent) 
-{
-  /* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER ); */
+	: PrefsPane(targetWindow, targetPrefs, kSurfacePrefsPane, GlobalPrefs, parent) {
+  /* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER); */
 
-  mMainSizer = new wxBoxSizer(wxHORIZONTAL);
-  mLeftSizer = new wxBoxSizer(wxVERTICAL);
-  mRightSizer = new wxBoxSizer(wxVERTICAL);
-  mLeftMidSizer = new wxGridSizer(2,2);
-  mRightUpperSizer = new wxBoxSizer(wxHORIZONTAL);
-  mRightMidSizer = new wxFlexGridSizer(2,2);
+	mMainSizer = new wxBoxSizer(wxHORIZONTAL);
+	mLeftSizer = new wxBoxSizer(wxVERTICAL);
+	mRightSizer = new wxBoxSizer(wxVERTICAL);
+	mLeftMidSizer = new wxGridSizer(2,2);
+	mRightUpperSizer = new wxBoxSizer(wxHORIZONTAL);
+	mRightMidSizer = new wxFlexGridSizer(2,2);
 
-  SetSizer(mMainSizer);
+	SetSizer(mMainSizer);
 }
 
-SurfacePrefsPane::~SurfacePrefsPane()
-{
-  delete mSurfColor[0];
-  delete mSurfColor[1];
+SurfacePrefsPane::~SurfacePrefsPane() {
+	delete mSurfColor[0];
+	delete mSurfColor[1];
 }
 
-void SurfacePrefsPane::SetupPaneItems( MolDisplayWin* targetWindow) 
-{
-  SurfaceOptions * lSOpts = mTargetPrefs->GetSurfaceOptions();
+void SurfacePrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+	SurfaceOptions * lSOpts = mTargetPrefs->GetSurfaceOptions();
 
-  mLeftSizer->Add(new wxStaticText(this, wxID_ANY, _T("Surface Colors:")), 0, wxALIGN_CENTER | wxALL, 3);
+	mLeftSizer->Add(new wxStaticText(this, wxID_ANY, _T("Surface Colors:")), 0, wxALIGN_CENTER | wxALL, 3);
 
-  mLeftMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("+")), 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_BOTTOM | wxALL, 1);
-  mLeftMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("-")), 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_BOTTOM | wxALL, 1);
+	mLeftMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("+")), 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_BOTTOM | wxALL, 1);
+	mLeftMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("-")), 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_BOTTOM | wxALL, 1);
 
-  RGBColor tmpColor;
+	RGBColor tmpColor;
 
-  lSOpts->GetPosColor(&tmpColor);
-  mSurfColor[0] = new colorArea(this, 0, &tmpColor);
-//  mSurfColor[0]->draw(tmpColor);
-  lSOpts->GetNegColor(&tmpColor);
-  mSurfColor[1] = new colorArea(this, 1, &tmpColor);
-//  mSurfColor[1]->draw(tmpColor);
+	lSOpts->GetPosColor(&tmpColor);
+	mSurfColor[0] = new colorArea(this, 0, &tmpColor);
+	//  mSurfColor[0]->draw(tmpColor);
+	lSOpts->GetNegColor(&tmpColor);
+	mSurfColor[1] = new colorArea(this, 1, &tmpColor);
+	//  mSurfColor[1]->draw(tmpColor);
 
-  mLeftMidSizer->Add(mSurfColor[0], 0, wxALIGN_TOP | wxALL, 1);
-  mLeftMidSizer->Add(mSurfColor[1], 0, wxALIGN_TOP | wxALL, 1);
+	mLeftMidSizer->Add(mSurfColor[0], 0, wxALIGN_TOP | wxALL, 1);
+	mLeftMidSizer->Add(mSurfColor[1], 0, wxALIGN_TOP | wxALL, 1);
 
-  mLeftSizer->Add(mLeftMidSizer, 0, wxALIGN_CENTER | wxALL, 3);
-  mLeftSizer->Add(10,10);
+	mLeftSizer->Add(mLeftMidSizer, 0, wxALIGN_CENTER | wxALL, 3);
+	mLeftSizer->Add(10,10);
 
-  mLeftSizer->Add(new wxStaticText(this, wxID_ANY, _T("Def. # of Grid Points")), 0, wxALIGN_LEFT | wxALL, 3);
+	mLeftSizer->Add(new wxStaticText(this, wxID_ANY, _T("Def. # of Grid Points")), 0, wxALIGN_LEFT | wxALL, 3);
 
-  mSldGridPoint = new wxSlider( this, ID_NUM_GRID_POINT_SLIDER, 
-			    lSOpts->GetNumGridPoints(), 10, 150,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
+	mSldGridPoint = new wxSlider(this, ID_NUM_GRID_POINT_SLIDER, 
+			lSOpts->GetNumGridPoints(), 10, 150,
+			wxDefaultPosition, wxSize(155,wxDefaultCoord),
+			wxSL_AUTOTICKS | wxSL_LABELS);
 
-  mLeftSizer->Add(mSldGridPoint, 0, wxALIGN_CENTER | wxALL, 3);
+	mLeftSizer->Add(mSldGridPoint, 0, wxALIGN_CENTER | wxALL, 3);
 
-  mRightSizer->Add(new wxStaticText(this, wxID_ANY, _T("Specific to 3D surfaces:")), 0, wxALIGN_LEFT | wxALL, 3);
+	mRightSizer->Add(new wxStaticText(this, wxID_ANY, _T("Specific to 3D surfaces:")), 0, wxALIGN_LEFT | wxALL, 3);
 
-  mRightUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Grid Size:")), 0, wxALIGN_CENTER | wxALL, 3);
+	mRightUpperSizer->Add(new wxStaticText(this, wxID_ANY, _T("Grid Size:")), 0, wxALIGN_CENTER | wxALL, 3);
 
-  mSldGridSize = new wxSlider( this, ID_3D_GRID_SIZE_SLIDER, 
-			    (int)(100*(lSOpts->GetGridSize())+0.5), 0, 300,
-                             wxDefaultPosition, wxSize(155,wxDefaultCoord),
-                             wxSL_AUTOTICKS | wxSL_LABELS);
-  mRightUpperSizer->Add(mSldGridSize, 0, wxALIGN_CENTER | wxALL, 3);
-  mRightSizer->Add(mRightUpperSizer);
+	mSldGridSize = new wxSlider(this, ID_3D_GRID_SIZE_SLIDER, 
+			(int)(100*(lSOpts->GetGridSize())+0.5), 0, 300,
+			wxDefaultPosition, wxSize(155,wxDefaultCoord),
+			wxSL_AUTOTICKS | wxSL_LABELS);
+	mRightUpperSizer->Add(mSldGridSize, 0, wxALIGN_CENTER | wxALL, 3);
+	mRightSizer->Add(mRightUpperSizer);
 
-  mRightSizer->Add(new wxStaticText(this, wxID_ANY, _T("Specific to 2D maps:")), 0, wxALIGN_LEFT | wxALL, 3);
+	mRightSizer->Add(new wxStaticText(this, wxID_ANY, _T("Specific to 2D maps:")), 0, wxALIGN_LEFT | wxALL, 3);
 
-  mRightMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("# of Contours:")), 0, wxALIGN_CENTER | wxALL, 3);
-  
-  wxString tmp;
-  tmp.Printf(wxT("%d"), lSOpts->GetNumContours());
-  mNumContour = new wxTextCtrl(this, wxID_ANY, tmp);
-  mRightMidSizer->Add(mNumContour, 0, wxALIGN_CENTER | wxALL, 3);
+	mRightMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("# of Contours:")), 0, wxALIGN_CENTER | wxALL, 3);
 
- mRightMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("Max contour value")), 0, wxALIGN_CENTER | wxALL, 3);
+	wxString tmp;
+	tmp.Printf(wxT("%d"), lSOpts->GetNumContours());
+	mNumContour = new wxTextCtrl(this, wxID_ANY, tmp);
+	mRightMidSizer->Add(mNumContour, 0, wxALIGN_CENTER | wxALL, 3);
 
-  tmp.Printf(wxT("%.3f"), lSOpts->GetMaxContour());
-  mMaxContourValue = new wxTextCtrl(this, wxID_ANY, tmp);
-  mRightMidSizer->Add(mMaxContourValue, 0, wxALIGN_CENTER | wxALL, 3);			       
-  mRightSizer->Add(mRightMidSizer);
+	mRightMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("Max contour value")), 0, wxALIGN_CENTER | wxALL, 3);
 
-  mZeroContour = new wxCheckBox(this, ID_SHOW_ZERO_VALUE_CONTOUR, _T("Show Zero-value contour"));
-  mZeroContour->SetValue(lSOpts->GetShowZeroContour());
-  mAtomPosition = new wxCheckBox(this, ID_SHOW_ATOM_POSITION, _T("Show atom positions"));
-  mAtomPosition->SetValue(lSOpts->Get2DHashMarks());
+	tmp.Printf(wxT("%.3f"), lSOpts->GetMaxContour());
+	mMaxContourValue = new wxTextCtrl(this, wxID_ANY, tmp);
+	mRightMidSizer->Add(mMaxContourValue, 0, wxALIGN_CENTER | wxALL, 3);			       
+	mRightSizer->Add(mRightMidSizer);
 
-  mRightSizer->Add(mZeroContour,  0, wxALIGN_LEFT | wxALL, 3);
-  mRightSizer->Add(mAtomPosition,  0, wxALIGN_LEFT | wxALL, 3);
+	mZeroContour = new wxCheckBox(this, ID_SHOW_ZERO_VALUE_CONTOUR, _T("Show Zero-value contour"));
+	mZeroContour->SetValue(lSOpts->GetShowZeroContour());
+	mAtomPosition = new wxCheckBox(this, ID_SHOW_ATOM_POSITION, _T("Show atom positions"));
+	mAtomPosition->SetValue(lSOpts->Get2DHashMarks());
 
-  mMainSizer->Add(mLeftSizer, wxALIGN_CENTER | wxALL, 10);
-  mMainSizer->Add(mRightSizer, wxALIGN_CENTER | wxALL, 10);
+	mRightSizer->Add(mZeroContour,  0, wxALIGN_LEFT | wxALL, 3);
+	mRightSizer->Add(mAtomPosition,  0, wxALIGN_LEFT | wxALL, 3);
+
+	mMainSizer->Add(mLeftSizer, wxALIGN_CENTER | wxALL, 10);
+	mMainSizer->Add(mRightSizer, wxALIGN_CENTER | wxALL, 10);
 }
 
-void SurfacePrefsPane::saveToTempPrefs()
-{
+void SurfacePrefsPane::saveToTempPrefs() {
 	SurfaceOptions * lSOpts = mTargetPrefs->GetSurfaceOptions();
 
 	long lv;
@@ -1209,37 +1167,35 @@ void SurfacePrefsPane::saveToTempPrefs()
 	lSOpts->SetNegColor(tmpColor);
 }
 
-void SurfacePrefsPane::OnSliderUpdate( wxCommandEvent& event)
-{
-  SurfaceOptions * lSOpts = mTargetPrefs->GetSurfaceOptions();
-  int id = event.GetId();
+void SurfacePrefsPane::OnSliderUpdate(wxCommandEvent& event) {
+	SurfaceOptions * lSOpts = mTargetPrefs->GetSurfaceOptions();
+	int id = event.GetId();
 
-  if ( id == ID_NUM_GRID_POINT_SLIDER )
-    lSOpts->SetNumGridPoints(mSldGridPoint->GetValue());
-  if ( id == ID_3D_GRID_SIZE_SLIDER )
-    lSOpts->SetGridSize((float)(mSldGridSize->GetValue()/100));
+	if (id == ID_NUM_GRID_POINT_SLIDER)
+		lSOpts->SetNumGridPoints(mSldGridPoint->GetValue());
+	if (id == ID_3D_GRID_SIZE_SLIDER)
+		lSOpts->SetGridSize((float)(mSldGridSize->GetValue()/100));
 }
 
-void SurfacePrefsPane::OnCheckBox( wxCommandEvent& event)
-{
-  SurfaceOptions * lSOpts = mTargetPrefs->GetSurfaceOptions();
-  int id = event.GetId();
+void SurfacePrefsPane::OnCheckBox(wxCommandEvent& event) {
+	SurfaceOptions * lSOpts = mTargetPrefs->GetSurfaceOptions();
+	int id = event.GetId();
 
-  if ( id == ID_SHOW_ZERO_VALUE_CONTOUR )
-    lSOpts->SetShowZeroContour(mZeroContour->GetValue());
-  if ( id == ID_SHOW_ATOM_POSITION )
-    lSOpts->Set2DHashMarks(mAtomPosition->GetValue());
+	if (id == ID_SHOW_ZERO_VALUE_CONTOUR)
+		lSOpts->SetShowZeroContour(mZeroContour->GetValue());
+	if (id == ID_SHOW_ATOM_POSITION)
+		lSOpts->Set2DHashMarks(mAtomPosition->GetValue());
 }
 
 
 QD3DPrefsPane::QD3DPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, targetPrefs, kQD3DPrefsPane, GlobalPrefs, parent) {
 
-  mMainSizer = new wxFlexGridSizer(7, 2, 6, 0);
-  mMainSizer->AddGrowableCol(0);
-  mMainSizer->AddGrowableCol(1);
+	mMainSizer = new wxFlexGridSizer(7, 2, 6, 0);
+	mMainSizer->AddGrowableCol(0);
+	mMainSizer->AddGrowableCol(1);
 
-  SetSizer(mMainSizer);
+	SetSizer(mMainSizer);
 
 }
 
@@ -1248,96 +1204,105 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 	int rflags = wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL;
 	int lflags = wxALIGN_CENTER_VERTICAL | wxALIGN_LEFT | wxALL;
 
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Bond Size:")), 0,
-		  		  rflags, 3);
-  mSld[0] = new wxSlider(this, ID_BOND_SIZE_SLIDER, 
-						 (int) (mTargetPrefs->GetQD3DBondWidth() * 500 + 0.5),
-						 1, 100, wxDefaultPosition,
-						 wxSize(155, wxDefaultCoord));
-  mMainSizer->Add(mSld[0], 0, lflags, 3);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Bond Size:")), 0,
+			rflags, 3);
+	mSld[0] = new wxSlider(this, ID_BOND_SIZE_SLIDER, 
+			(int) (mTargetPrefs->GetQD3DBondWidth() * 500 + 0.5),
+			1, 100, wxDefaultPosition,
+			wxSize(155, wxDefaultCoord));
+	mMainSizer->Add(mSld[0], 0, lflags, 3);
 
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Display Quality:")),
-		  		  0, rflags, 3);
-  mSld[1] = new wxSlider(this, ID_DISPLAY_QUALITY_SLIDER, 
-						 (int) (mTargetPrefs->GetQD3DAtomQuality() + 0.5),
-						 2, 40, wxDefaultPosition,
-						 wxSize(155, wxDefaultCoord));
-  mMainSizer->Add(mSld[1], 0, lflags, 3);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Display Quality:")),
+			0, rflags, 3);
+	mSld[1] = new wxSlider(this, ID_DISPLAY_QUALITY_SLIDER, 
+			(int) (mTargetPrefs->GetQD3DAtomQuality() + 0.5),
+			2, 40, wxDefaultPosition,
+			wxSize(155, wxDefaultCoord));
+	mMainSizer->Add(mSld[1], 0, lflags, 3);
 
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Fill Light Brightness:")),
-		  		  0, rflags, 3);
-  mSld[2] = new wxSlider(this, ID_FILL_LIGHT_BRIGHTNESS_SLIDER, 
-						 (int) (mTargetPrefs->GetQD3DFillBrightness() * 100 + 0.5),
-						 0, 100, wxDefaultPosition,
-						 wxSize(155, wxDefaultCoord));
-  mMainSizer->Add(mSld[2], 0, lflags, 3);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Fill Light Brightness:")),
+			0, rflags, 3);
+	mSld[2] = new wxSlider(this, ID_FILL_LIGHT_BRIGHTNESS_SLIDER, 
+			(int) (mTargetPrefs->GetQD3DFillBrightness() * 100 + 0.5),
+			0, 100, wxDefaultPosition,
+			wxSize(155, wxDefaultCoord));
+	mMainSizer->Add(mSld[2], 0, lflags, 3);
 
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Point Light Brightness:")),
-		  		  0, rflags, 3);
-  mSld[3] = new wxSlider(this, ID_POINT_LIGHT_BRIGHTNESS_SLIDER, 
-						 (int) (mTargetPrefs->GetQD3DPointBrightness()*100+0.5),
-						 0, 100, wxDefaultPosition, wxSize(155, wxDefaultCoord));
-  mMainSizer->Add(mSld[3], 0, lflags, 3);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Point Light Brightness:")),
+			0, rflags, 3);
+	mSld[3] = new wxSlider(this, ID_POINT_LIGHT_BRIGHTNESS_SLIDER, 
+			(int) (mTargetPrefs->GetQD3DPointBrightness()*100+0.5),
+			0, 100, wxDefaultPosition, wxSize(155, wxDefaultCoord));
+	mMainSizer->Add(mSld[3], 0, lflags, 3);
 
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("High-Resolution Line Width:")),
-		  		  0, rflags, 3);
-  mTargetPrefs->CylindersForLines(true);
-  mSld[4] = new wxSlider(this, ID_LINE_WIDTH_SLIDER, 
-						 (int) (mTargetPrefs->GetQD3DLineWidth()*10000+0.5),
-						 0, 200, wxDefaultPosition, wxSize(155, wxDefaultCoord));
-  mTargetPrefs->CylindersForLines(false);
-  mMainSizer->Add(mSld[4], 0, lflags, 3);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("High-Resolution Line Width:")),
+			0, rflags, 3);
+	mTargetPrefs->CylindersForLines(true);
+	mSld[4] = new wxSlider(this, ID_LINE_WIDTH_SLIDER, 
+			(int) (mTargetPrefs->GetQD3DLineWidth()*10000+0.5),
+			0, 200, wxDefaultPosition, wxSize(155, wxDefaultCoord));
+	mTargetPrefs->CylindersForLines(false);
+	mMainSizer->Add(mSld[4], 0, lflags, 3);
 
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("3D Perspective:")),
-		  		  0, rflags, 3);
-  mSld[5] = new wxSlider(this, ID_DEPTH_CUEING_SLIDER, 
-						 (int)(mTargetPrefs->GetGLFOV()), 
-						 0, 45, wxDefaultPosition, 
-						 wxSize(155, wxDefaultCoord));
-  mMainSizer->Add(mSld[5], 0, lflags, 3);
-  
-  /* mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER | wxALL, 3 ); */
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("3D Perspective:")),
+			0, rflags, 3);
+	mSld[5] = new wxSlider(this, ID_DEPTH_CUEING_SLIDER, 
+			(int)(mTargetPrefs->GetGLFOV()), 
+			0, 45, wxDefaultPosition, 
+			wxSize(155, wxDefaultCoord));
+	mMainSizer->Add(mSld[5], 0, lflags, 3);
 
-  /*
-  if (PrefsAreGlobal())
-    {
-      mChk3D = new wxCheckBox( this, ID_ACTIVATE_3D_MODE, _T("Activate 3D mode by default"));
-      mChk3D->SetValue(mTargetPrefs->Default3DOn());
-      mMainSizer->Add(mChk3D, 0, wxALIGN_CENTER | wxALL, 3);
-    }
-  */ //There is no 2-D mode for now
-	
-  mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Background color:")),
-		  		  0, rflags, 3);
-  mBackgrdColor = new colorArea(this, 0, mTargetPrefs->GetBackgroundColorLoc());
-  mMainSizer->Add(mBackgrdColor, 0, lflags, 3);
+	/* mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER | wxALL, 3); */
+
+	/*
+	   if (PrefsAreGlobal()) {
+	   mChk3D = new wxCheckBox(this, ID_ACTIVATE_3D_MODE, _T("Activate 3D mode by default"));
+	   mChk3D->SetValue(mTargetPrefs->Default3DOn());
+	   mMainSizer->Add(mChk3D, 0, wxALIGN_CENTER | wxALL, 3);
+	   }
+	   */ //There is no 2-D mode for now
+
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Background color:")),
+			0, rflags, 3);
+	mBackgrdColor = new colorArea(this, 0, mTargetPrefs->GetBackgroundColorLoc());
+	mMainSizer->Add(mBackgrdColor, 0, lflags, 3);
+
+#if GL_VERSION_2_0
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Per-pixel lighting:")),
+					0, rflags, 3);
+	mPerPixelCheck = new wxCheckBox(this, ID_PER_PIXEL_LIGHTING, wxT(""));
+	mPerPixelCheck->SetValue(mTargetPrefs->GetPerPixelLighting());
+	mMainSizer->Add(mPerPixelCheck, 0, lflags, 3);
+#endif
 
 }
 
-void QD3DPrefsPane::saveToTempPrefs()
-{
+void QD3DPrefsPane::saveToTempPrefs() {
 	mBackgrdColor->getColor(mTargetPrefs->GetBackgroundColorLoc());
 }
 
-void QD3DPrefsPane::OnCheckBox( wxCommandEvent& WXUNUSED(event))
-{
-  mTargetPrefs->Default3DOn(mChk3D->GetValue());
+void QD3DPrefsPane::OnCheckBox(wxCommandEvent& event) {
+	int id = event.GetId();
+
+	if (id == ID_PER_PIXEL_LIGHTING)
+		mTargetPrefs->SetPerPixelLighting(mPerPixelCheck->GetValue());
+
+	/* mTargetPrefs->Default3DOn(mChk3D->GetValue()); */
 }
 
-void QD3DPrefsPane::OnSliderUpdate( wxCommandEvent &event )
-{
-  int id = event.GetId();
+void QD3DPrefsPane::OnSliderUpdate(wxCommandEvent &event) {
+	int id = event.GetId();
 
-  if (id == ID_BOND_SIZE_SLIDER)
-    mTargetPrefs->SetQD3DBondWidth((float)(mSld[0]->GetValue())/500);
-  if (id == ID_DISPLAY_QUALITY_SLIDER)
-    mTargetPrefs->SetQD3DAtomQuality(mSld[1]->GetValue());
-  if (id == ID_FILL_LIGHT_BRIGHTNESS_SLIDER)
-    mTargetPrefs->SetQD3DFillBrightness((float)(mSld[2]->GetValue())/100);
-  if (id == ID_POINT_LIGHT_BRIGHTNESS_SLIDER)
-    mTargetPrefs->SetQD3DPointBrightness((float)(mSld[3]->GetValue())/100);
-  if (id == ID_LINE_WIDTH_SLIDER)
-    mTargetPrefs->SetQD3DLineWidth((float)(mSld[4]->GetValue())/10000);
-  if (id == ID_DEPTH_CUEING_SLIDER)
-	  mTargetPrefs->SetGLFOV((float)(mSld[5]->GetValue()));
+	if (id == ID_BOND_SIZE_SLIDER)
+		mTargetPrefs->SetQD3DBondWidth((float)(mSld[0]->GetValue())/500);
+	if (id == ID_DISPLAY_QUALITY_SLIDER)
+		mTargetPrefs->SetQD3DAtomQuality(mSld[1]->GetValue());
+	if (id == ID_FILL_LIGHT_BRIGHTNESS_SLIDER)
+		mTargetPrefs->SetQD3DFillBrightness((float)(mSld[2]->GetValue())/100);
+	if (id == ID_POINT_LIGHT_BRIGHTNESS_SLIDER)
+		mTargetPrefs->SetQD3DPointBrightness((float)(mSld[3]->GetValue())/100);
+	if (id == ID_LINE_WIDTH_SLIDER)
+		mTargetPrefs->SetQD3DLineWidth((float)(mSld[4]->GetValue())/10000);
+	if (id == ID_DEPTH_CUEING_SLIDER)
+		mTargetPrefs->SetGLFOV((float)(mSld[5]->GetValue()));
 }

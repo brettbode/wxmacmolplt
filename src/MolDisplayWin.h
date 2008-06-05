@@ -53,6 +53,9 @@ class OpenGLRec {
 		bool			haveTransparentSurfaces;	///< Flag if there are transparent surfaces
 		GLuint			length_anno_tex_id;			///< texture id for length annotations
 		GLuint			sphere_list;
+#ifdef GL_VERSION_2_0
+		GLuint			shader_program;
+#endif
 		
 		OpenGLRec(void);
 		~OpenGLRec(void);
