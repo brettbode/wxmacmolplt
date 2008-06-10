@@ -57,15 +57,14 @@ void DrawString(const char *str);
 // ----------------------------------------------------------------------------
 
 const GLubyte stippleMask[128] =
-
   {0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00};
+   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00};
 
 GLfloat d_specular[] = {0.1, 0.1, 0.1, 1.0};
 GLfloat d_shininess[] = {1.0};
@@ -124,11 +123,11 @@ void MolDisplayWin::DeleteGLData(void) {
 
 /**
  * This function regenerates transparent geometries and any active display
- * lists.  It should be called when the view changes (altering sort order
+ * lists.  It should be called when the view changes (which alters sort order
  * of transparent surfaces), surfaces are updated, or the display list content
  * has been altered.
  */
-void MolDisplayWin::UpdateGLModel(void) {	//model has changed so force update
+void MolDisplayWin::UpdateGLModel(void) {
 	if (OpenGLData != NULL) {
 		OpenGLData->triangleCount = 0;
 		if (OpenGLData->transpTriList) {
@@ -156,18 +155,6 @@ void MolDisplayWin::UpdateGLModel(void) {	//model has changed so force update
 
 void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
 	
-	/* if (OpenGLData->transpTriList) { //update the transparent surface sorting */
-		/* SortTransparentTriangles(); */
-	/* } */
-
-	// Draw the scene normally.
-	/* DrawGL(); */
-
-	// Now add stuff specific to rotations
-	// glDisable(GL_DEPTH_TEST);	//These are not strictly neccessary, but probably increase speed
-	// glShadeModel(GL_FLAT);
-	// glDisable(GL_LIGHTING);
-
 	GLint matrixMode;
 	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
 	glMatrixMode(GL_PROJECTION);
@@ -4198,106 +4185,110 @@ void DrawPipeCylinder(float length, GLUquadric *quadric, unsigned int ncaps,
 GLuint GetShaderProgramFromFiles(const std::string& vert_filename,
                                  const std::string& frag_filename) {
 
-   std::string vert_src;
-   std::string frag_src;
+	std::string vert_src;
+	std::string frag_src;
 
-   if (!vert_filename.empty()) {
-      FileToString(vert_filename, vert_src);
-   }
+	if (!vert_filename.empty()) {
+		if (!FileToString(vert_filename, vert_src)) {
+			return 0;
+		}
+	}
 
-   if (!frag_filename.empty()) {
-      FileToString(frag_filename, frag_src);
-   }
+	if (!frag_filename.empty()) {
+		if (!FileToString(frag_filename, frag_src)) {
+			return 0;
+		}
+	}
 
-   return GetShaderProgram(vert_src, frag_src);
+	return GetShaderProgram(vert_src, frag_src);
 
 }
 
 /* ------------------------------------------------------------------------- */
 
 GLuint GetShaderProgram(const std::string& vert_src,
-                        const std::string& frag_src) {
+						const std::string& frag_src) {
 
-   GLuint shader_prog = 0;
+	GLuint shader_prog = 0;
 
-   GLint succeeded;
-   char *log;
-   GLint log_length;
-   GLint chars_written;
+	GLint succeeded;
+	char *log;
+	GLint log_length;
+	GLint chars_written;
 
-   shader_prog = glCreateProgram();
+	shader_prog = glCreateProgram();
 
-   if (vert_src.length()) {
-      GLuint vert_shader;
-      const char *v2 = &vert_src.c_str()[0];
+	if (vert_src.length()) {
+		GLuint vert_shader;
+		const char *v2 = &vert_src.c_str()[0];
 
-      // Vertex shader.
-      vert_shader = glCreateShader(GL_VERTEX_SHADER);
-      glShaderSource(vert_shader, 1, &v2, NULL);
-      glCompileShader(vert_shader);
-      glGetShaderiv(vert_shader, GL_COMPILE_STATUS, &succeeded);
+		// Vertex shader.
+		vert_shader = glCreateShader(GL_VERTEX_SHADER);
+		glShaderSource(vert_shader, 1, &v2, NULL);
+		glCompileShader(vert_shader);
+		glGetShaderiv(vert_shader, GL_COMPILE_STATUS, &succeeded);
 
-      glGetShaderiv(vert_shader, GL_INFO_LOG_LENGTH, &log_length);
-      if (log_length > 1) {
-		 log = new char[log_length];
-         glGetShaderInfoLog(vert_shader, log_length, &chars_written, log);
-         std::cout << "log: " << log << std::endl;
-         delete[] log;
-      }
+		glGetShaderiv(vert_shader, GL_INFO_LOG_LENGTH, &log_length);
+		if (log_length > 1) {
+			log = new char[log_length];
+			glGetShaderInfoLog(vert_shader, log_length, &chars_written, log);
+			std::cout << "log: " << log << std::endl;
+			delete[] log;
+		}
 
-      if (succeeded != GL_TRUE) {
-         std::cout << "Vertex Program: " << vert_src << std::endl;
-         wxLogMessage(wxT("Something went wrong with the shader."));
-      }
+		if (succeeded != GL_TRUE) {
+			std::cout << "Vertex Program: " << vert_src << std::endl;
+			wxLogMessage(wxT("Something went wrong with the shader."));
+		}
 
-      glAttachShader(shader_prog, vert_shader);
-   }
+		glAttachShader(shader_prog, vert_shader);
+	}
 
-   // Fragment shader.
-   if (frag_src.length()) {
-      GLuint frag_shader;
-      const char *f2 = &frag_src.c_str()[0];
-      frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
-      glShaderSource(frag_shader, 1, &f2, NULL);
+	// Fragment shader.
+	if (frag_src.length()) {
+		GLuint frag_shader;
+		const char *f2 = &frag_src.c_str()[0];
+		frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(frag_shader, 1, &f2, NULL);
 
-      glCompileShader(frag_shader);
-      glGetShaderiv(frag_shader, GL_COMPILE_STATUS, &succeeded);
+		glCompileShader(frag_shader);
+		glGetShaderiv(frag_shader, GL_COMPILE_STATUS, &succeeded);
 
-      glGetShaderiv(frag_shader, GL_INFO_LOG_LENGTH, &log_length);
-      if (log_length > 1) {
-		 log = new char[log_length];
-         glGetShaderInfoLog(frag_shader, log_length, &chars_written, log);
-         std::cout << "log: " << log << std::endl;
-		 delete[] log;
-      }
+		glGetShaderiv(frag_shader, GL_INFO_LOG_LENGTH, &log_length);
+		if (log_length > 1) {
+			log = new char[log_length];
+			glGetShaderInfoLog(frag_shader, log_length, &chars_written, log);
+			std::cout << "log: " << log << std::endl;
+			delete[] log;
+		}
 
-      if (succeeded != GL_TRUE) {
-         std::cout << "Fragment Program: " << frag_src << std::endl;
-         wxLogMessage(wxT("Something went wrong with the shader."));
-      }
+		if (succeeded != GL_TRUE) {
+			std::cout << "Fragment Program: " << frag_src << std::endl;
+			wxLogMessage(wxT("Something went wrong with the shader."));
+		}
 
-      glAttachShader(shader_prog, frag_shader);
-   }
+		glAttachShader(shader_prog, frag_shader);
+	}
 
-   glLinkProgram(shader_prog);
-   glGetProgramiv(shader_prog, GL_LINK_STATUS, &succeeded);
-   if (succeeded != GL_TRUE) {
-      char *log;
-      GLint log_length;
-      GLint chars_written;
-      glGetProgramiv(shader_prog, GL_INFO_LOG_LENGTH, &log_length);
-      if (log_length) {
-		 log = new char[log_length];
-         glGetProgramInfoLog(shader_prog, log_length, &chars_written, log);
-         std::cout << "log: " << log << std::endl;
-         delete[] log;
-         exit(1);
-      } else {
-         wxLogMessage(wxT("Something went wrong with the shader program."));
-      }
-   }
+	glLinkProgram(shader_prog);
+	glGetProgramiv(shader_prog, GL_LINK_STATUS, &succeeded);
+	if (succeeded != GL_TRUE) {
+		char *log;
+		GLint log_length;
+		GLint chars_written;
+		glGetProgramiv(shader_prog, GL_INFO_LOG_LENGTH, &log_length);
+		if (log_length) {
+			log = new char[log_length];
+			glGetProgramInfoLog(shader_prog, log_length, &chars_written, log);
+			std::cout << "log: " << log << std::endl;
+			delete[] log;
+			exit(1);
+		} else {
+			wxLogMessage(wxT("Something went wrong with the shader program."));
+		}
+	}
 
-   return shader_prog;
+	return shader_prog;
 
 }
 #endif

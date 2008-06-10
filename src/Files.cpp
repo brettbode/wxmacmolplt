@@ -5219,22 +5219,26 @@ long SetAtomType(const unsigned char *TestLabel) {
  * @return True */
 
 bool FileToString(const std::string& file_name,
-                  std::string& contents) {
+				  std::string& contents) {
 
-   std::ifstream f(file_name.c_str(), std::ios::in | std::ios::ate);
-   int size;
+	std::ifstream f(file_name.c_str(), std::ios::in | std::ios::ate);
+	if (!f.is_open()) {
+		return false;
+	}
 
-   // Get file size.
-   size = (int) f.tellg();
-   f.seekg(0, std::ios::beg);
+	int size;
 
-   // Allocate buffer, read contents in.
-   char *cstr = new char[size];
-   f.read(cstr, size);
-   f.close();
-   contents = std::string(cstr, size);
-   delete[] cstr;
+	// Get file size.
+	size = (int) f.tellg();
+	f.seekg(0, std::ios::beg);
 
-   return true;
+	// Allocate buffer, read contents in.
+	char *cstr = new char[size];
+	f.read(cstr, size);
+	f.close();
+	contents = std::string(cstr, size);
+	delete[] cstr;
+
+	return true;
 
 }
