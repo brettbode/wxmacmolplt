@@ -1267,7 +1267,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 						exportImage.SetMaskColour(red, green, blue);
 					}
 				}
-				exportImage.SaveFile(filepath, type);
+				exportImage.SaveFile(filepath, (wxBitmapType) type);
 				memDC.SelectObject(wxNullBitmap); // bmp has now been
 												  // destroyed.
 			}

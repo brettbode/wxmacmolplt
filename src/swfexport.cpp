@@ -161,7 +161,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 
 		wxImage frame = glCanvas->getImage(0, 0);
 		wxMemoryOutputStream *memOutStream = new wxMemoryOutputStream();
-		frame.SaveFile(*(wxOutputStream *)memOutStream, (int)wxBITMAP_TYPE_JPEG);
+		frame.SaveFile(*(wxOutputStream *)memOutStream, wxBITMAP_TYPE_JPEG);
 		long datLen = memOutStream->GetSize();
 		char unsigned *jpegData = new unsigned char [datLen];
 		memOutStream->CopyTo(jpegData, datLen);
@@ -178,7 +178,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 				memOutStream = new wxMemoryOutputStream();
 				frame = epBitmap->ConvertToImage();
 				frame.SaveFile(*(wxOutputStream *)memOutStream,
-						(int)wxBITMAP_TYPE_JPEG);
+						wxBITMAP_TYPE_JPEG);
 				datLen = memOutStream->GetSize();
 				char unsigned *epJpegData = new unsigned char [datLen];
 				memOutStream->CopyTo(epJpegData, datLen);
@@ -343,7 +343,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 
 		wxImage mImage = glCanvas->getImage(0, 0);
 		wxMemoryOutputStream *memOutStream = new wxMemoryOutputStream();
-		mImage.SaveFile(*(wxOutputStream *)memOutStream, (int)wxBITMAP_TYPE_JPEG);
+		mImage.SaveFile(*(wxOutputStream *)memOutStream, wxBITMAP_TYPE_JPEG);
 		long datLen = memOutStream->GetSize();
 		char unsigned *jpegData = new unsigned char [datLen];
 		memOutStream->CopyTo(jpegData, datLen);
