@@ -1054,8 +1054,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			if (InSymmetryEditMode() && !lAtoms[iatom].IsSymmetryUnique()) {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+				/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse); */
+				/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient); */
 				glLoadName(0);
 				glColor3fv(bg_invert);
 				glEnable(GL_POLYGON_STIPPLE);
@@ -1072,13 +1072,13 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			if (draw_subdued) {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+				/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse); */
+				/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient); */
 			} else {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
+				/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse); */
+				/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient); */
 			}
 
 			if (Prefs->Show2DPattern()) {
@@ -1114,13 +1114,13 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			if (draw_subdued) {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+				/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse); */
+				/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient); */
 			} else {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
+				/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse); */
+				/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient); */
 			}
 
 			glPushMatrix(); // atom center
@@ -1167,13 +1167,13 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		if (mHighliteState && !lBonds[ibond].GetSelectState()) {
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient);
+			/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse); */
+			/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient); */
 		} else {
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient);
+			/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse); */
+			/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient); */
 		}
 
 		DrawBond(lBonds[ibond], lAtoms[lBonds[ibond].Atom1],
@@ -2627,11 +2627,12 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth*repeat, imageWidth, 0, GL_RGBA,
 				 GL_UNSIGNED_BYTE, testimage);
 	
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse);
+	/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse); */
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
 	glColor4f(0, .64, .85, 0.7);
+	/* glColor4fv(plane_diffuse); */
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -2713,7 +2714,7 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 	glEnable(GL_BLEND);
 	glDepthMask(GL_FALSE);
 
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse);
+	/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse); */
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
@@ -2744,7 +2745,7 @@ void DrawInversionPoint(void) {
 	glPushAttrib(GL_LIGHTING_BIT);
 
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 128.0);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, sphere_diffuse);
+	/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, sphere_diffuse); */
 //	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, sphere_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, sphere_specular);
 	glColor4f(.7, .7, .7, 1.0);
@@ -2756,7 +2757,7 @@ void DrawInversionPoint(void) {
 	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
 	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
 	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse);
+	/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse); */
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
 	glColor4f(0, .64, .85, 0.7);
