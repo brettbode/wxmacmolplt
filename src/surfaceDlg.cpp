@@ -1674,7 +1674,7 @@ void Orbital3DSurfPane::CreateControls() {
 			wxDefaultSize);
 
 	mGridSizeSld = new wxSlider( this, ID_GRID_SIZE_SLIDER, 
-			(short) (100*mTarget->GetGridSize()), 0, 300,
+			(short) (100*mTarget->GetGridSize()), 1, 300,
 			wxDefaultPosition, wxSize(155,wxDefaultCoord),
 			wxSL_AUTOTICKS | wxSL_LABELS);
 	/* mContourValSld = new wxSlider( this, ID_CONTOUR_VALUE_SLIDER,  */
@@ -3502,7 +3502,7 @@ void TEDensity3DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText100 = new wxStaticText( TED3DPanel, wxID_STATIC, _("Grid Size:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer99->Add(itemStaticText100, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mGridSizeSld = new wxSlider( TED3DPanel, ID_GRID_SIZE_SLIDER, 0, 0, 300, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL );
+	mGridSizeSld = new wxSlider( TED3DPanel, ID_GRID_SIZE_SLIDER, 0, 1, 300, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL );
 	itemBoxSizer99->Add(mGridSizeSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer102 = new wxBoxSizer(wxHORIZONTAL);
@@ -4188,7 +4188,7 @@ void MEP3DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText175 = new wxStaticText( MEP3DPanel, wxID_STATIC, _("Grid Size:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer174->Add(itemStaticText175, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mGridSizeSld = new wxSlider( MEP3DPanel, ID_GRID_SIZE_SLIDER, 0, 0, 300, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL );
+	mGridSizeSld = new wxSlider( MEP3DPanel, ID_GRID_SIZE_SLIDER, 0, 1, 300, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL );
 	itemBoxSizer174->Add(mGridSizeSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer177 = new wxBoxSizer(wxHORIZONTAL);
