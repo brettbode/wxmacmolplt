@@ -6,8 +6,6 @@ dnl AC_CONFIG_HEADER
 dnl AC_REVISION
 AM_MAINTAINER_MODE
 
-CPPFLAGS="${CPPFLAGS} -DGL_GLEXT_PROTOTYPES"
-
 #
 # There isn't a reliable way to know we should use the Apple OpenGL framework
 # without a configure option.  A Mac OS X user may have installed an

@@ -24,6 +24,8 @@ wxmacmolplt_SOURCES =                                  \
     frequenciesdialog.cpp      frequenciesdialog.h     \
     GaussHermite.cpp           GaussHermite.h          \
     Geometries.cpp             Geometries.h            \
+    glew.cpp                   glew.h                  \
+	 glxew.h                    wglew.h                 \
     glf.cpp                    glf.h                   \
                                GlobalExceptions.h      \
                                Globals.h               \

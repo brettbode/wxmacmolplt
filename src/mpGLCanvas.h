@@ -14,7 +14,7 @@
 #define MPGLCANVAS_H 1
 
 #include "wx/wx.h"
-#include "wx/glcanvas.h"
+#include "mmp_gl.h"
 #include "wx/popupwin.h"
 #include "wx/generic/dragimgg.h"
 #define wxDragImage wxGenericDragImage

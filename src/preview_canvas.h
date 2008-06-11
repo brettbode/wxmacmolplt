@@ -2,7 +2,7 @@
 #define PREVIEW_CANVAS_H
 
 #include "wx/wx.h"
-#include "wx/glcanvas.h"
+#include "mmp_gl.h"
 #include "Geometries.h"
 #include "build_palette.h"
 #include "MyTypes.h"

@@ -103,6 +103,8 @@ MpGLCanvas::~MpGLCanvas() {
  */
 void MpGLCanvas::initGL(void) {
 
+	glewInit();
+
 	wxString vector_font, bitmap_font;
 	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
 #if wxCHECK_VERSION(2, 8, 0)
@@ -188,13 +190,13 @@ void MpGLCanvas::initGL(void) {
 
 	DoPrefDependent();
 
-#ifdef GL_VERSION_2_0
-	std::string vpath, fpath;
-	vpath = std::string(pathname.ToAscii()) + "/perpixel_dirlight_v.glsl";
-	fpath = std::string(pathname.ToAscii()) + "/perpixel_dirlight_f.glsl";
-	MolWin->OpenGLData->shader_program = 0;
-	MolWin->OpenGLData->shader_program = GetShaderProgramFromFiles(vpath, fpath);
-#endif
+	if (GLEW_VERSION_2_0) {
+		std::string vpath, fpath;
+		vpath = std::string(pathname.ToAscii()) + "/perpixel_dirlight_v.glsl";
+		fpath = std::string(pathname.ToAscii()) + "/perpixel_dirlight_f.glsl";
+		MolWin->OpenGLData->shader_program =
+			GetShaderProgramFromFiles(vpath, fpath);
+	}
 
 	// Don't initialize more than once, so set a flag.
 	initialized = true;

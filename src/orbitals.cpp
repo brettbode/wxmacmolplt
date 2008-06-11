@@ -37,9 +37,9 @@ extern long			gNumProcessors;
 #endif
 #include <iostream>
 
-float CalculateMOAmplitude(float XValue, float YValue, float ZValue, mpAtom *Atoms,
+float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *Atoms,
 		BasisSet *Basis, float *MOVector, long NumAtoms, bool UseSphericalHarmonics);
-void CalculateAOAmplitudeVector(float XValue, float YValue, float ZValue, mpAtom *Atoms,
+void CalculateAOAmplitudeVector(float X_value, float Y_value, float Z_value, mpAtom *Atoms,
 		BasisSet *Basis, float *AOVector, long NumAtoms);
 
 const char * ConvertTypeOfWavefunction(const TypeOfWavefunction & t) {
@@ -1046,7 +1046,7 @@ long MORec::Read(BufferFile *Buffer, long NumBasisFuncs, long ByteCount) {
 }
 */
 //Computes the MO Amplitude at the specified x,y,z
-float CalculateMOAmplitude(float XValue, float YValue, float ZValue, mpAtom *Atoms,
+float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *Atoms,
 		BasisSet *Basis, float *MOVector, long NumAtoms, bool UseSphericalHarmonics) {
 	long ivec = 0, NumPrims;
 	float	x, y, z, x2, y2, z2, r=0, r2, VectorSum, expcr2, Amplitude=0.0;
@@ -1060,9 +1060,9 @@ float CalculateMOAmplitude(float XValue, float YValue, float ZValue, mpAtom *Ato
 					//loop over the atoms/shells
 	for (long iatom=0; iatom<NumAtoms; iatom++) {
 		if (iatom > Basis->MapLength) continue;
-		x = XValue - Atoms[iatom].Position.x*kAng2BohrConversion;
-		y = YValue - Atoms[iatom].Position.y*kAng2BohrConversion;
-		z = ZValue - Atoms[iatom].Position.z*kAng2BohrConversion;
+		x = X_value - Atoms[iatom].Position.x*kAng2BohrConversion;
+		y = Y_value - Atoms[iatom].Position.y*kAng2BohrConversion;
+		z = Z_value - Atoms[iatom].Position.z*kAng2BohrConversion;
 		x2 = x*x;
 		y2 = y*y;
 		z2 = z*z;
@@ -1170,7 +1170,7 @@ float CalculateMOAmplitude(float XValue, float YValue, float ZValue, mpAtom *Ato
 	return Amplitude;
 }
 //Computes the AO Amplitude vector at the specified x,y,z
-void CalculateAOAmplitudeVector(float XValue, float YValue, float ZValue, mpAtom *Atoms,
+void CalculateAOAmplitudeVector(float X_value, float Y_value, float Z_value, mpAtom *Atoms,
 		BasisSet *Basis, float *AOVector, long NumAtoms) {
 	long ivec = 0, NumPrims;
 	float	x, y, z, x2, y2, z2, r2, expcr2;
@@ -1184,9 +1184,9 @@ void CalculateAOAmplitudeVector(float XValue, float YValue, float ZValue, mpAtom
 					//loop over the atoms/shells
 	for (long iatom=0; iatom<NumAtoms; iatom++) {
 		if (iatom > Basis->MapLength) continue;
-		x = XValue - Atoms[iatom].Position.x*kAng2BohrConversion;
-		y = YValue - Atoms[iatom].Position.y*kAng2BohrConversion;
-		z = ZValue - Atoms[iatom].Position.z*kAng2BohrConversion;
+		x = X_value - Atoms[iatom].Position.x*kAng2BohrConversion;
+		y = Y_value - Atoms[iatom].Position.y*kAng2BohrConversion;
+		z = Z_value - Atoms[iatom].Position.z*kAng2BohrConversion;
 		x2 = x*x;
 		y2 = y*y;
 		z2 = z*z;

@@ -87,9 +87,7 @@ OpenGLRec::OpenGLRec(void) {
 	transpIndex = NULL;
 	triangleCount = 0;
 	sphere_list = 0;
-#ifdef GL_VERSION_2_0
 	shader_program = 0;
-#endif
 	
 	MainListActive = false;
 	SurfaceListActive = false;
@@ -254,13 +252,13 @@ void MolDisplayWin::DrawGL(void) {
 
 	glEnable(GL_LIGHTING);
 
-#ifdef GL_VERSION_2_0
-	GLint mode;
-	glGetIntegerv(GL_RENDER_MODE, &mode);
-	if (Prefs->GetPerPixelLighting() && mode == GL_RENDER) {
-		glUseProgram(OpenGLData->shader_program);
+	if (GLEW_VERSION_2_0) {
+		GLint mode;
+		glGetIntegerv(GL_RENDER_MODE, &mode);
+		if (Prefs->GetPerPixelLighting() && mode == GL_RENDER) {
+			glUseProgram(OpenGLData->shader_program);
+		}
 	}
-#endif
 
 	if (MainData->ShowAxis()) AddAxisGL();
 	
@@ -280,9 +278,9 @@ void MolDisplayWin::DrawGL(void) {
 		}
 	}
 
-#ifdef GL_VERSION_2_0
-	glUseProgram(0);
-#endif
+	if (GLEW_VERSION_2_0) {
+		glUseProgram(0);
+	}
 
 	if (MainData->GetAnnotationCount() > 0) {
 		glLoadName(MMP_ANNOTATION);
@@ -303,11 +301,10 @@ void MolDisplayWin::DrawGL(void) {
 		glEnable(GL_LIGHTING);
 	}
 	
-#ifdef GL_VERSION_2_0
-	/* if (Prefs->GetPerPixelLighting()) { */
-		/* glUseProgram(OpenGLData->shader_program); */
-	/* } */
-#endif
+	if (GLEW_VERSION_2_0 && Prefs->GetPerPixelLighting()) {
+		glUseProgram(OpenGLData->shader_program);
+	}
+
 	// Add any surfaces
 	Surface * lSurface = MainData->cFrame->SurfaceList;
 	// error = glGetError(); 
@@ -395,9 +392,10 @@ void MolDisplayWin::DrawGL(void) {
 		DrawTransparentTriangles();
 		glDisable(GL_BLEND);
 	}
-#ifdef GL_VERSION_2_0
-	/* glUseProgram(0); */
-#endif
+
+	if (GLEW_VERSION_2_0) {
+		glUseProgram(0);
+	}
 
 	/* glPopMatrix(); // unrotated scene */
 
@@ -4181,7 +4179,6 @@ void DrawPipeCylinder(float length, GLUquadric *quadric, unsigned int ncaps,
 
 /* ------------------------------------------------------------------------- */
 
-#ifdef GL_VERSION_2_0
 GLuint GetShaderProgramFromFiles(const std::string& vert_filename,
                                  const std::string& frag_filename) {
 
@@ -4291,7 +4288,6 @@ GLuint GetShaderProgram(const std::string& vert_src,
 	return shader_prog;
 
 }
-#endif
 
 /* ------------------------------------------------------------------------- */
 

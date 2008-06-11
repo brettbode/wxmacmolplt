@@ -639,7 +639,7 @@ void TEDensity3DSurface::CalculateSurfaceValuesGrid(MoleculeData * lData, Progre
 }
 
 //Calculates the MEP value at the specified x,y,z coordinate
-float Frame::CalculateMEP(float XValue, float YValue, float ZValue,
+float Frame::CalculateMEP(float X_value, float Y_value, float Z_value,
 		BasisSet *Basis, AODensity * TotalAODensity, GaussHermiteData * GHData,
 		float * ElectronicMEP, float * NuclearMEP) {
 	double	ElectronicPotential=0.0, NuclearPotential=0.0;	//results of the MEP calculation
@@ -777,7 +777,7 @@ float Frame::CalculateMEP(float XValue, float YValue, float ZValue,
 								}
 							}
 
-							RysRoots.x = AiAj *((Ax-XValue)*(Ax-XValue) + (Ay-YValue)*(Ay-YValue) + (Az-ZValue)*(Az-ZValue));
+							RysRoots.x = AiAj *((Ax-X_value)*(Ax-X_value) + (Ay-Y_value)*(Ay-Y_value) + (Az-Z_value)*(Az-Z_value));
 							if (RysRoots.nRoots <= 3) Root123(&RysRoots);
 							else if (RysRoots.nRoots == 4) Root4(&RysRoots);
 							else if (RysRoots.nRoots == 5) Root5(&RysRoots);
@@ -790,9 +790,9 @@ float Frame::CalculateMEP(float XValue, float YValue, float ZValue,
 								double tt = 1.0/(AiAj+UU);
 
 								GHInt.T = sqrt(tt);
-								GHInt.x0 = (AAx + UU*XValue)*tt;
-								GHInt.y0 = (AAy + UU*YValue)*tt;
-								GHInt.z0 = (AAz + UU*ZValue)*tt;
+								GHInt.x0 = (AAx + UU*X_value)*tt;
+								GHInt.y0 = (AAy + UU*Y_value)*tt;
+								GHInt.z0 = (AAz + UU*Z_value)*tt;
 
 								in = mm;
 								for (iang=0; iang<=Lishell; iang++) {
@@ -844,9 +844,9 @@ float Frame::CalculateMEP(float XValue, float YValue, float ZValue,
 				}
 			}
 		}	//now for the nuclear contribution
-		xi -= XValue;
-		yi -= YValue;
-		zi -= ZValue;
+		xi -= X_value;
+		yi -= Y_value;
+		zi -= Z_value;
 		r2 = sqrt(xi*xi + yi*yi + zi*zi);
 		if (r2 > 0.001) NuclearPotential += NuclearCharge[iatom] / r2;
 	}

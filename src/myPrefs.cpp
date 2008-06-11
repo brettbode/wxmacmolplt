@@ -1267,13 +1267,13 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 	mBackgrdColor = new colorArea(this, 0, mTargetPrefs->GetBackgroundColorLoc());
 	mMainSizer->Add(mBackgrdColor, 0, lflags, 3);
 
-#if GL_VERSION_2_0
-	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Per-pixel lighting:")),
-					0, rflags, 3);
-	mPerPixelCheck = new wxCheckBox(this, ID_PER_PIXEL_LIGHTING, wxT(""));
-	mPerPixelCheck->SetValue(mTargetPrefs->GetPerPixelLighting());
-	mMainSizer->Add(mPerPixelCheck, 0, lflags, 3);
-#endif
+	if (GLEW_VERSION_2_0) {
+		mMainSizer->Add(new wxStaticText(this, wxID_ANY,
+					    _T("Per-pixel lighting:")), 0, rflags, 3);
+		mPerPixelCheck = new wxCheckBox(this, ID_PER_PIXEL_LIGHTING, wxT(""));
+		mPerPixelCheck->SetValue(mTargetPrefs->GetPerPixelLighting());
+		mMainSizer->Add(mPerPixelCheck, 0, lflags, 3);
+	}
 
 }
 

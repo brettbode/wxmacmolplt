@@ -19,6 +19,8 @@
 #pragma hdrstop
 #endif
 
+#include "mmp_gl.h"
+
 #ifndef WX_PRECOMP
 #include "wx/wx.h"
 #endif

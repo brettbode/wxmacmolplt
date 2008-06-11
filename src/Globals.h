@@ -182,10 +182,9 @@ Boolean FrontApp(void);
 #endif	//End of Mac definitions!
 
 #ifdef __wxBuild__
+#include "mmp_gl.h"
 //When building on a Mac the following types will get picked up from system headers
-#ifdef __WXMAC__
-#include <wx/glcanvas.h>
-#else
+#ifndef __WXMAC__
 struct RGBColor {
 	unsigned short 					red;						/*magnitude of red component*/
 	unsigned short 					green;						/*magnitude of green component*/
