@@ -33,8 +33,8 @@ typedef enum TextFileType {
 	CMLFile,
 	MolDenFile,
 	MolekelFile,
-	MOPACmopFile,
-	MOPACarcFile
+	MOPACarcFile,
+	MOPACmopFile
 } TextFileType;
 
 /** case insensitive search for the keyword in the char string.

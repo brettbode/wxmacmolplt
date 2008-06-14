@@ -1360,12 +1360,15 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 }
 
 /**
-  * Adds support for opening the MOPAC zMatrix MOP and mop file types.
-  * @param Buffer A BufferFileObject that the .MOP or .mop file is buffered
+  * Adds support for opening the MoPac zMatrix MOP and mop file types, and
+  * MoPac archive output ARC and arc files.
+  * @param Buffer A BufferFileObject that the .MOP or .mop file is buffereid.
+  * @param fileType A char indicating whether the file is a MOP or ARC file.
   * into to make parsing the file easier.  See the BufferFile object for 
-  * valid BufferFile operations.
+  * valid BufferFile operations. Parsing code adapted from 
+  * MoleculeData::ParseMOPACZMatrix.
 */
-long MolDisplayWin::OpenMOPFile(BufferFile * Buffer) {
+long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, char fileType) {
 	// buffer line for text to be scanned while parsing
 	char		Line[kMaxLineLength];
 	// placeholder for traversing file sections in Buffer
@@ -1374,37 +1377,52 @@ long MolDisplayWin::OpenMOPFile(BufferFile * Buffer) {
 	int			scanCount = 0, iLine = 0;
 	// vars for holding sscanf read, borrowing some from ParseMOPACZMatrix()
 	CPoint3D	pos = CPoint3D(0.0f, 0.0f, 0.0f);	// just a placeholder
-	char		token[4];	// This could probably safely be 2-3 chars long
+	char		symbol[4];	// This could probably safely be 2-3 chars long
 	float		bondLength = -0.1, bondAngle = 0.0, bondDihedral = 0.0;
 	// sane defaults to avoid accessing unassigned variables
 	long		firstAtomType = -1, AtomType = -1, nAtoms = 0;
 	int			j1 = -1, j2 = -1, j3 = -1, con1, con2, con3;
 	bool		error = false;
 
-	ProgressInd->ChangeText("Reading MOP file...");
+	ProgressInd->ChangeText("Reading MOPAC file...");
 	Frame *lFrame = MainData->cFrame;
-	//zero out initial token
-	memset((void *)token, 0, (size_t)(4*sizeof(char)));
+	//zero out initial symbol
+	memset((void *)symbol, 0, (size_t)(4*sizeof(char)));
 	
-	Buffer->SkipnLines(3);						// Skip descriptions-	
-	startOfAtoms = Buffer->GetFilePos();		// line before 1st atom
+	// file is of type ARC
+	if (fileType == 'a'){
+		// Get to the right part of the file
+		Buffer->LocateKeyWord("DATE:", 5);
+		Buffer->SkipnLines(1);
+		Buffer->LocateKeyWord("DATE:", 5);
+		Buffer->SkipnLines(1);
+	}
+	// file is of type MOP
+	else if (fileType == 'm') {
+		// skip descriptions, MoPac parms and goto start of atoms
+		Buffer->SkipnLines(3);	
+		startOfAtoms = Buffer->GetFilePos();
+	}
+	else
+		return 0;	// quit 'cause we don't know what kind of file we were passed
 
 	// Count the number of Atoms
 	while (Buffer->GetFilePos()	< Buffer->GetFileLength()) {
 		Buffer->GetLine(Line);
-		scanCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", &token, &bondLength, 
+		scanCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", &symbol, &bondLength, 
 					&j1, &bondAngle, &j2, &bondDihedral, &j3, &con1, &con2, &con3);
 		// The last atom in the list may be a duplicate of the
 		// first atom in the list and needs to be ignored
 		if (scanCount > 2 && nAtoms > 1 && bondLength < 0.00001) break;
-		// otherwise, it is probably a new atom
+		// otherwise, it is [probably] a new atom
 		if ( (scanCount > 9 && nAtoms > 2) || (scanCount > 8 && nAtoms == 2) || 
 			(scanCount > 6 && nAtoms == 1) || (scanCount > 4 && nAtoms == 0) ) 
 			nAtoms++;
 		else 
 			break;
 	}
-	Buffer->SetFilePos(startOfAtoms);	// atoms are counted; go back to atoms' start
+	// atoms are now counted; go back to atoms' start for actual parsing
+	Buffer->SetFilePos(startOfAtoms);
 	
 	// data in this file will be treated as a zMatrix 
 	// cartesian mop files exist, but usually have a different extension
@@ -1425,14 +1443,14 @@ long MolDisplayWin::OpenMOPFile(BufferFile * Buffer) {
 		con2 = -1;
 		con3 = -1;
 		Buffer->GetLine(Line);
-		scanCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", &token, &bondLength, 
+		scanCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", &symbol, &bondLength, 
 					&j1, &bondAngle, &j2, &bondDihedral, &j3, &con1, &con2, &con3);
 		if (scanCount < 1) { 
 			error = true;
 			break;	//failed to get anything
 		}
-		
-		AtomType = SetAtomType((unsigned char *)token);
+		// Get type of atom by atomic symbol and add it to fram (dummy position 0,0,0)
+		AtomType = SetAtomType((unsigned char *)symbol);
 		lFrame->AddAtom(AtomType, pos);
 		if (iLine > 0) {
 			if (scanCount < 2) {
@@ -1463,6 +1481,7 @@ long MolDisplayWin::OpenMOPFile(BufferFile * Buffer) {
 			con3--;
 			if (con1 >= iLine) 
 				break;
+			// store connections and coordinates
 			mInts->AddInternalCoordinate(iLine, con1, 0, bondLength*unitConversion);
 			if (iLine > 1) {
 				mInts->AddInternalCoordinate(iLine, con2, 1, bondAngle);
@@ -1479,144 +1498,12 @@ long MolDisplayWin::OpenMOPFile(BufferFile * Buffer) {
 	if (iLine > lFrame->NumAtoms) 
 		lFrame->DeleteAtom(iLine-1);
 	// now convert the set of internals into cartesians
-	// caused some segfaults in testing, but probably due to bad files.
+	// this caused some segfaults in testing, but probably due to bad files
 	mInts->InternalsToCartesians(MainData, Prefs, 0);
-													
-	if (Prefs->GetAutoBond()) 	//setup bonds, if needed
+	// Setup bonds, if needed													
+	if (Prefs->GetAutoBond())
 		lFrame->SetBonds(Prefs, true);
-	return 1;	// OpenMOPFile success
-}
-
-/**
-  * Adds support for opening the MOPAC ARC and arc archive file extensions. 
-  * @param Buffer A BufferFileObject that the .ARC or .arc file is buffered into
-  * to make parsing the file easier.  See the BufferFile object for valid
-  * BufferFile operations.
-*/
-long MolDisplayWin::OpenARCFile(BufferFile * Buffer) {
-	// buffer line for text to be scanned while parsing
-	char		Line[kMaxLineLength];
-	// placeholder for traversing file sections in Buffer
-	long		startOfAtoms = 1;
-	// # of tokens sucessfully read in a sscanf call, # line of atoms read 
-	int			scanCount = 0, iLine = 0;
-	// vars for holding sscanf read, borrowing some from ParseMOPACZMatrix()
-	CPoint3D	pos = CPoint3D(0.0f, 0.0f, 0.0f);	// just a placeholder
-	char		token[4];	// This could probably safely be 2-3 chars long
-	float		bondLength = -0.1, bondAngle = 0.0, bondDihedral = 0.0;
-	// sane defaults to avoid accessing unassigned variables
-	long		firstAtomType = -1, AtomType = -1, nAtoms = 0;
-	int			j1 = -1, j2 = -1, j3 = -1, con1, con2, con3;
-	bool		error = false;
-
-	ProgressInd->ChangeText("Reading ARC file...");
-	Frame *lFrame = MainData->cFrame;
-	//zero out initial token
-	memset((void *)token, 0, (size_t)(4*sizeof(char)));
-	
-	// Get to the right part of the file
-	Buffer->LocateKeyWord("DATE:", 5);
-	Buffer->SkipnLines(1);
-	Buffer->LocateKeyWord("DATE:", 5);
-	Buffer->SkipnLines(1);
-	
-	// Count the number of Atoms
-	startOfAtoms = Buffer->GetFilePos();		// line before 1st atom
-	while (Buffer->GetFilePos()	< Buffer->GetFileLength()) {
-		Buffer->GetLine(Line);
-		scanCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", &token, &bondLength, 
-					&j1, &bondAngle, &j2, &bondDihedral, &j3, &con1, &con2, &con3);
-		// The last atom in the list may be a duplicate of the
-		// first atom in the list and needs to be ignored
-		if (scanCount > 2 && nAtoms > 1 && bondLength < 0.00001) break;
-		// otherwise, it is probably a new atom
-		if ( (scanCount > 9 && nAtoms > 2) || (scanCount > 8 && nAtoms == 2) || 
-			(scanCount > 6 && nAtoms == 1) || (scanCount > 4 && nAtoms == 0) ) 
-			nAtoms++;
-		else 
-			break;
-	}
-	Buffer->SetFilePos(startOfAtoms);	// atoms are counted; go back to atoms' start
-	
-	// data in this file will be treated as a zMatrix 
-	// cartesian mop files exist, but usually have a different extension
-	if (!(MainData->IntCoords)) 
-		MainData->IntCoords = new Internals;
-	MOPacInternals * mInts = MainData->IntCoords->GetMOPacStyle();
-	if (!mInts) {
-		MainData->IntCoords->CreateMOPacInternals(3*nAtoms);
-		mInts = MainData->IntCoords->GetMOPacStyle();
-	}
-	float unitConversion = 1.0;
-	if (MainData->InputOptions && MainData->InputOptions->Data->GetUnits()) 
-		unitConversion = kBohr2AngConversion;
-
-	// Get and add atoms (parsing) loop
-	while (iLine < nAtoms) {
-		con1 = -1;	// Default Values
-		con2 = -1;
-		con3 = -1;
-		Buffer->GetLine(Line);
-		scanCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", &token, &bondLength, 
-					&j1, &bondAngle, &j2, &bondDihedral, &j3, &con1, &con2, &con3);
-		if (scanCount < 1) { 
-			error = true;
-			break;	//failed to get anything
-		}
-		
-		AtomType = SetAtomType((unsigned char *)token);
-		lFrame->AddAtom(AtomType, pos);
-		if (iLine > 0) {
-			if (scanCount < 2) {
-				error = true;
-				break;
-			}
-			if (iLine == 1)	//the second atom will specify only the bond length
-				con1 = 1;
-			// 3rd Line and beyond (iLine == 2 and up)
-			else {
-				if (iLine == 2) {	//For the third atom the connectivity is optional
-					if ((scanCount >= 5)&&(scanCount <= 7)) {
-						con1 = 2;
-						con2 = 1;	//The default allows the connections to be assumed
-						if (scanCount >= 6) {
-							con1 = (int) bondDihedral;
-							con2 = j3;
-						}
-					} 
-					else if (scanCount < 5) break;	// in this case the line is invalid
-				}
-			}
-			if (bondLength < 0.00001) 
-				break; // bad value or dupe of first atom
-			// reduce values by 1 because our indexing starts at 0 not 1
-			con1--;
-			con2--;
-			con3--;
-			if (con1 >= iLine) 
-				break;
-			mInts->AddInternalCoordinate(iLine, con1, 0, bondLength*unitConversion);
-			if (iLine > 1) {
-				mInts->AddInternalCoordinate(iLine, con2, 1, bondAngle);
-				if (iLine > 2)
-					mInts->AddInternalCoordinate(iLine, con3, 2, bondDihedral);
-			}
-		}
-		iLine++;
-	} // end parsing loop
-	if (error) 
-		return 0; // failure due to an error: quit!
-	// if we punted after the AddAtom call delete off the 
-	// atom without internal coordinate information
-	if (iLine > lFrame->NumAtoms) 
-		lFrame->DeleteAtom(iLine-1);
-	// now convert the set of internals into cartesians
-	// caused some segfaults in testing, but probably due to bad files.
-	mInts->InternalsToCartesians(MainData, Prefs, 0);
-													
-	if (Prefs->GetAutoBond()) 	//setup bonds, if needed
-		lFrame->SetBonds(Prefs, true);
-	return 1;	// OpenARCFile success
+	return 1;	// OpenMOPACFile success
 }
 
 long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {

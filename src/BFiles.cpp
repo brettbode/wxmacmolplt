@@ -291,8 +291,8 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 			else if (-1<FindKeyWord(temp, ".INP", 4)) Type = kGAMESSInputType;
 			else if (-1<FindKeyWord(temp, ".CML", 4)) Type = CMLFile;
 			else if (-1<FindKeyWord(temp, ".MKL", 4)) Type = MolekelFile;
-			else if (-1<FindKeyWord(temp, ".MOP", 4)) Type = MOPACmopFile;
 			else if (-1<FindKeyWord(temp, ".ARC", 4)) Type = MOPACarcFile;
+			else if (-1<FindKeyWord(temp, ".MOP", 4)) Type = MOPACmopFile;
 		}
 	}
 	

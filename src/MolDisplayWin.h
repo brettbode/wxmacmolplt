@@ -525,15 +525,11 @@ class MolDisplayWin : public wxFrame {
 		long OpenMKLFile(BufferFile * Buffer);
 		long ParseSIMMOMLogFile(BufferFile * Buffer, long EnergyPos);
 		/**
-		 Open a MOPAC MOP output or ".MOP" file.
+		 Open a MOPAC ".MOP" or archive ".ARC" file.
 		 \param Buffer The buffer connected to the MOP file.
+		 \param fileType char designating which file extension is used
 		 */
-		long OpenMOPFile(BufferFile * Buffer);
-		/**
-		 Open a MOPAC archive or ".ARC" file.
-		 \param Buffer The buffer connected to the ARC file.
-		 */
-		long OpenARCFile(BufferFile * Buffer);
+		long OpenMOPACFile(BufferFile * Buffer, char fileType);
 		/**
 		 Output the coordinates in gamess input format ($DATA and $EFRAG group).
 		 If AllFrames then a series of $DATA groups will be output for the user to divide as needed.

@@ -3519,11 +3519,11 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 			case MolekelFile:
 				test = OpenMKLFile(Buffer);
 				break;
-			case MOPACmopFile:
-				test = OpenMOPFile(Buffer);
-				break;
 			case MOPACarcFile:
-				test = OpenARCFile(Buffer);
+				test = OpenMOPACFile(Buffer, 'a');
+				break;
+			case MOPACmopFile:
+				test = OpenMOPACFile(Buffer, 'm');
 				break;
 			default:    //Should only get here for unknown file types.
 			{
