@@ -49,7 +49,8 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] = {
 													   "the command line parameters") }, 
 	{ wxCMD_LINE_SWITCH, wxT("v"), wxT("version"), wxT("print version") }, 
 	{ wxCMD_LINE_PARAM,  NULL, NULL,               wxT("input file"), 
-		wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL }, 
+		wxCMD_LINE_VAL_STRING,
+		wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE }, 
 	{ wxCMD_LINE_NONE } 
 };
 #endif
