@@ -1398,14 +1398,13 @@ long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, char fileType) {
 		Buffer->SkipnLines(1);
 	}
 	// file is of type MOP
-	else if (fileType == 'm') {
+	else if (fileType == 'm') 
 		// skip descriptions, MoPac parms and goto start of atoms
 		Buffer->SkipnLines(3);	
-		startOfAtoms = Buffer->GetFilePos();
-	}
 	else
 		return 0;	// quit 'cause we don't know what kind of file we were passed
-
+	
+	startOfAtoms = Buffer->GetFilePos();
 	// Count the number of Atoms
 	while (Buffer->GetFilePos()	< Buffer->GetFileLength()) {
 		Buffer->GetLine(Line);
