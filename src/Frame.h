@@ -28,7 +28,7 @@ typedef class XMLElement XMLElement;
 typedef class OBMol OBMol;
 #endif
 
-#ifdef WIN32
+#if defined(WIN32)
 #undef AddAtom
 #endif
 

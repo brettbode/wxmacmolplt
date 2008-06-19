@@ -192,9 +192,9 @@ struct RGBColor {
 };
 #endif
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #define snprintf _snprintf
-	//VS apparently lacks these functions
+//VS apparently lacks these functions
 int strcasecmp(const char * a, const char * b);
 int strncasecmp(const char * a, const char * b, int l);
 #endif

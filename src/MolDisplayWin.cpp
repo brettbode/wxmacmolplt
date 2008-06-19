@@ -364,7 +364,7 @@ END_EVENT_TABLE()
 
 //Class to hold CML data on the clipboard
 //This is really intended for internal use for copying data from one file to another.
-class WXDLLEXPORT wxCMLDataObject : public wxDataObjectSimple {
+class wxCMLDataObject : public wxDataObjectSimple {
 public:
 	wxCMLDataObject(char * cmlText=NULL) : wxDataObjectSimple(_("CML")) {
 		CML = cmlText;};
@@ -431,7 +431,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	status_timer.SetOwner(this, MMP_STATUS_TIMER);
 	rotate_timer.SetOwner(this, MMP_ROTATE_TIMER);
 
-#ifdef __WXMSW__
+#ifdef _MSC_VER
 	//Visual studio is a total pile.
 	//The %n format specifier is disabled by default and
 	//putting this in the app init function didn't work.
@@ -2911,6 +2911,7 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 			case WXK_BACK:
 			case WXK_DELETE:
 				DeleteSelected();
+				glCanvas->Draw();
 				return;
 				break;
 			case WXK_LEFT:
@@ -3767,9 +3768,11 @@ void MolDisplayWin::UpdateWindowData(void) {
 }
 
 void MolDisplayWin::OnRotateTimer(wxTimerEvent& event) {
+
 	wxMouseEvent mouse_event = wxMouseEvent(wxEVT_MOTION);
 	mouse_event.m_leftDown = true;
 	Rotate(mouse_event);
+
 }
 
 void MolDisplayWin::Rotate(wxMouseEvent &event) {
@@ -3993,7 +3996,9 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 }
 
 bool MolDisplayWin::IsRotating(void) {
+
 	return rotate_timer.IsRunning();
+
 }
 
 void MolDisplayWin::SetWindowPreferences(WinPrefs *NewPrefs) {

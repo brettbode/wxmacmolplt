@@ -118,6 +118,7 @@ void MpGLCanvas::initGL(void) {
 	pathname += wxT("Resources");
 #endif
 #endif
+
 	vector_font = pathname + wxT("/arial1.glf");
 	bitmap_font = pathname + wxT("/arial1.bmf");
 
@@ -188,8 +189,6 @@ void MpGLCanvas::initGL(void) {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 16, 16, 0, GL_ALPHA,
 				 GL_UNSIGNED_BYTE, texture);
 
-	DoPrefDependent();
-
 	if (GLEW_VERSION_2_0) {
 		std::string vpath, fpath;
 		vpath = std::string(pathname.ToAscii()) + "/perpixel_dirlight_v.glsl";
@@ -197,6 +196,9 @@ void MpGLCanvas::initGL(void) {
 		MolWin->OpenGLData->shader_program =
 			GetShaderProgramFromFiles(vpath, fpath);
 	}
+
+	// Generate projection, quadric objects, shader uniforms, etc.
+	DoPrefDependent();
 
 	// Don't initialize more than once, so set a flag.
 	initialized = true;
@@ -316,6 +318,20 @@ void MpGLCanvas::DoPrefDependent() {
 	glLightfv(GL_LIGHT1, GL_SPECULAR, specular);
 	glLightfv(GL_LIGHT1, GL_POSITION, position);
 	glEnable(GL_LIGHT1);
+
+	if (GLEW_VERSION_2_0) {
+		glUseProgram(MolWin->OpenGLData->shader_program);
+		CPoint3D light_pos(position[0], position[1], position[2]);
+		Normalize3D(&light_pos);
+		GLint light_pos_loc =
+			glGetUniformLocation(MolWin->OpenGLData->shader_program, "light_dir");
+		if (light_pos_loc >= 0) {
+			glUniform3f(light_pos_loc, light_pos.x, light_pos.y, light_pos.z);
+		} else {
+			std::cerr << "Can't set shader uniforms." << std::endl;
+		}
+		glUseProgram(0);
+	}
 				
 }
 

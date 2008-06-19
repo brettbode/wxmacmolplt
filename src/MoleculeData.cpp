@@ -25,7 +25,7 @@
 #include <string.h>
 #include <new>
 #include <map>
-#ifdef WIN32
+#if defined(WIN32)
 #undef AddAtom
 #endif
 
@@ -353,7 +353,7 @@ void MoleculeData::AtomAdded(void) {
 
 	if (IntCoords) {
 		MOPacInternals * mInts = IntCoords->GetMOPacStyle();
-		if (mInts) mInts->AddAtom(this);
+		if (mInts) mInts->AppendAtom(this);
 	}
 	ResetRotation();
 }

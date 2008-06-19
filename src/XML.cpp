@@ -28,7 +28,7 @@
 #endif
 #endif
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #define strcasecmp strcmp
 #endif
 

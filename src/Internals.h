@@ -120,7 +120,7 @@ class MOPacInternals {
 		 * Add an atom to the list.
 		 * @param MainData The coordinate information.
 		 */
-		void AddAtom(MoleculeData * MainData);
+		void AppendAtom(MoleculeData * MainData);
 		/**
 		 * Delete an atom from the list.
 		 * @param MainData The coordinate information.

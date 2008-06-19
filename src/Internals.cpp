@@ -408,7 +408,8 @@ void MOPacInternals::InternalsToCartesians(MoleculeData * MainData, WinPrefs * P
 		}
 	}
 }
-void MOPacInternals::AddAtom(MoleculeData * MainData) {
+
+void MOPacInternals::AppendAtom(MoleculeData * MainData) {
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	if (3*lFrame->NumAtoms > Allocation) {
 		long * templ = new long[3*lFrame->NumAtoms+12];
@@ -459,7 +460,7 @@ void MOPacInternals::DeleteAtom(MoleculeData * MainData, long WhichAtom) {
 void MOPacInternals::UpdateAtoms(MoleculeData * MainData) {
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	while (lFrame->NumAtoms*3 > Count) {	//More atoms, just append atoms to the end of the list
-		AddAtom(MainData);
+		AppendAtom(MainData);
 	}
 	while (lFrame->NumAtoms*3 < Count) {
 		DeleteAtom(MainData, lFrame->NumAtoms+1);

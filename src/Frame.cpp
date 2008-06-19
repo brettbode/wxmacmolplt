@@ -30,7 +30,7 @@
 #include <ctype.h>
 #include "MolDisplayWin.h"
 
-#ifdef WIN32
+#if defined(WIN32)
 #undef AddAtom
 #endif
 

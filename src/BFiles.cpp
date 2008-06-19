@@ -728,7 +728,7 @@ void BufferFile::FinishBlock(void) {
 	}
 }
 
-#ifdef WIN32
+#ifdef _MSC_VER
 //functions Visual studio lacks...
 int strcasecmp(const char * a, const char * b) {
 	int pos = 0, result = -1;

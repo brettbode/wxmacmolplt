@@ -31,7 +31,7 @@
 #include "Math3D.h"
 #include "MolDisplayWin.h"
 #include "build_palette.h"
-#ifdef WIN32
+#if defined(WIN32)
 #undef AddAtom
 #endif
 

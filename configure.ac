@@ -6,19 +6,39 @@ dnl AC_CONFIG_HEADER
 dnl AC_REVISION
 AM_MAINTAINER_MODE
 
+AC_CANONICAL_HOST
+LIBGL=
+HOST=
+case "${host}" in
+   *msvc*)
+      HOST=MSW 
+      LIBGL="-lopengl32 -lglu32"
+      ;;
+   *darwin*)
+      HOST=OSX 
+      LIBGL="-framework OpenGL"
+      ;;
+   *)
+      HOST=LINUX
+      LIBGL="-lGL -lGLU"
+      ;;
+esac
+AM_CONDITIONAL(HOST_IS_MSW, [test "x$HOST" == xMSW])
+AC_SUBST([LIBGL])
+
 #
 # There isn't a reliable way to know we should use the Apple OpenGL framework
 # without a configure option.  A Mac OS X user may have installed an
 # alternative GL implementation (e.g., Mesa), which may or may not depend on X.
 #
-AC_ARG_WITH([apple-opengl-framework],
-            [AC_HELP_STRING([--with-apple-opengl-framework],
-                            [use Apple OpenGL framework (Mac OS X only; default=no)])],
-            [],
-            [with_apple_opengl_framework=no])
-LIBGL=
-AS_IF([test "x$with_apple_opengl_framework" != xno],
-      [AC_SUBST([LIBGL], ["-framework OpenGL"])])
+# AC_ARG_WITH([apple-opengl-framework], 
+            # [AC_HELP_STRING([--with-apple-opengl-framework], 
+                            # [use Apple OpenGL framework (Mac OS X only; default=no)])], 
+            # [], 
+            # [with_apple_opengl_framework=no]) 
+# LIBGL= 
+# AS_IF([test "x$with_apple_opengl_framework" != xno], 
+      # [AC_SUBST([LIBGL], ["-framework OpenGL"])]) 
 
 AC_ARG_WITH([quicktime],
             [AC_HELP_STRING([--with-quicktime],
@@ -130,6 +150,12 @@ AC_TRY_RUN([
 CXXFLAGS=$TEMP_CXXFLAGS
 LIBS=$TEMP_LIBS
 AC_LANG_RESTORE()
+
+case "${host}" in
+    *msvc*)
+        datarootdir="${bindir}"
+        ;;
+esac
 
 #Begin Mike Ekstrand's cleverness
 if test -z "${datarootdir}"; then

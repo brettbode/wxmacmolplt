@@ -170,6 +170,8 @@ typedef _W64 int ptrdiff_t;
 #define GLAPIENTRY APIENTRY
 #endif
 
+#define GLEW_STATIC
+
 /*
  * GLEW_STATIC needs to be set when using the static version.
  * GLEW_BUILD is set when building the DLL version.
