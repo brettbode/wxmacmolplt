@@ -524,7 +524,7 @@ void GenerateOctahedron(int nlevels,
 	nverts = (2 << (2 * nlevels + 1)) + 2;
 	nfaces = 2 << (2 * nlevels + 2);
 
-	CPoint3D face_normals[nfaces];
+	CPoint3D *face_normals = new CPoint3D[nfaces];
 
 	*verts = new float[nverts * 3];
 	*faces = new int[nfaces * 3];
@@ -591,7 +591,7 @@ void GenerateOctahedron(int nlevels,
 	}
 
 	int vi;
-	CPoint3D tmp_normals[nverts];
+	CPoint3D *tmp_normals = new CPoint3D[nverts];
 
 	for (vi = 0; vi < nverts; ++vi) {
 		tmp_normals[vi] = CPoint3D(0.0f, 0.0f, 0.0f);
@@ -603,12 +603,18 @@ void GenerateOctahedron(int nlevels,
 		}
 	}
 
+	delete[] face_normals;
+	face_normals = NULL;
+
 	for (vi = 0; vi < nverts; ++vi) {
 		Normalize3D(&tmp_normals[vi]);
 		(*normals)[vi * 3 + 0] = tmp_normals[vi].x;
 		(*normals)[vi * 3 + 1] = tmp_normals[vi].y;
 		(*normals)[vi * 3 + 2] = tmp_normals[vi].z;
 	}
+
+	delete[] tmp_normals;
+	tmp_normals = NULL;
 
 }
 
