@@ -394,7 +394,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 						(MainData->InputOptions->Data->GetPointGroup()>GAMESS_C1)&&
 						(lFrame->GetNumAtoms() > 0)) {
 						//Generate symmetry dependant atoms
-						for (int i=0; i<lFrame->GetNumAtoms(); i++)
+						for (int i=0; i<lFrame->GetNumAtoms(); ++i)
 							lFrame->Atoms[i].IsSymmetryUnique(true);
 						MainData->GenerateSymmetryDependentAtoms();
 					}
@@ -481,7 +481,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					long fragNum = MainData->FragmentNames.size();
 					CPoint3D	pos;
 					int		AtomType;
-					for (int i=0; i<3; i++) {
+					for (int i=0; i<3; ++i) {
 						AtomType = -1;
 						Buffer->GetLine(Line);
 						//lines have format "label x, y, z"
@@ -503,7 +503,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					MainData->FragmentNames.push_back(std::string(token));
 					fragNum = MainData->FragmentNames.size();
 					char label[kMaxLineLength];
-					for (i = 0; i < 3; i++) {
+					for (i = 0; i < 3; ++i) {
 						Buffer->GetLine(Line);
 						sscanf(Line, "%s %f %f %f", label,
 							   &(dst_locs[i].x), &(dst_locs[i].y),
@@ -620,7 +620,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					// translate to make the base fragment atom the origin and
 					// then rotate to align the fragment with the destination
 					// plane, and then translate by the base destination atom.
-					for (long i = fstart; i < lFrame->NumAtoms; i++) {
+					for (long i = fstart; i < lFrame->NumAtoms; ++i) {
 						lFrame->GetAtomPosition(i, curr_pos);
 						new_pos = curr_pos - orig;
 						Rotate3DOffset(transform, new_pos, &rot_pos);
@@ -669,18 +669,18 @@ long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
 	}
 	MainData->SetupFrameMemory(nAtoms, nBonds);
 		long i;
-	for (i=0; i<nAtoms; i++) {
+	for (i=0; i<nAtoms; ++i) {
 			CPoint3D tPt;
 			char	token[5];
 				//Atom line format:  "%10f%10f%10f %3s"
 		Buffer->GetLine(Line);
-		for (int i=0; i<10; i++) partA[i] = Line[i];
+		for (int i=0; i<10; ++i) partA[i] = Line[i];
 		partA[10] = '\0';
 		scanerr = sscanf(partA, "%10f", &tPt.x);
-		for (int i=0; i<10; i++) partB[i] = Line[i+10];
+		for (int i=0; i<10; ++i) partB[i] = Line[i+10];
 		partB[10] = '\0';
 		scanerr += sscanf(partB, "%10f", &tPt.y);
-		for (int i=0; i<10; i++) partC[i] = Line[i+20];
+		for (int i=0; i<10; ++i) partC[i] = Line[i+20];
 		partC[10] = '\0';
 		scanerr += sscanf(partC, "%10f", &tPt.z);
 		scanerr += sscanf(&(Line[31]), "%3s", token);
@@ -691,7 +691,7 @@ long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
 		} else break;
 	}
 	if (i==nAtoms && nBonds > 0) {	//Read in bonds if all atom were read successfully
-		for (i=0; i<nBonds; i++) {
+		for (i=0; i<nBonds; ++i) {
 			long type, a1, a2;
 			Buffer->GetLine(Line);	//Bonds format: "%3ld%3ld%3ld"
 			partA[0] = Line[0]; partA[1] = Line[1]; partA[2]=Line[2]; partA[3]='\0';
@@ -722,8 +722,8 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 	nAtoms = 0;
 	while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
 		Buffer->GetLine(Line);
-		if (0==FindKeyWord(Line, "ATOM", 4)) nAtoms++;
-		if (0==FindKeyWord(Line, "HETATM", 4)) nAtoms++;
+		if (0==FindKeyWord(Line, "ATOM", 4)) ++nAtoms;
+		if (0==FindKeyWord(Line, "HETATM", 4)) ++nAtoms;
 	}
 	Buffer->SetFilePos(0);
 	if (nAtoms>0) {
@@ -753,7 +753,7 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 						MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.x));
 						MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.y));
 						MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.z));
-						nAtoms++;
+						++nAtoms;
 					}
 				}
 			}
@@ -813,7 +813,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			nAtoms = Buffer->GetNumLines(endOfFramePos);
 			if (lFrame->GetNumAtoms()>0)
 				lFrame = MainData->AddFrame(nAtoms, 0);
-			for (long i=0; i<nAtoms; i++) {
+			for (long i=0; i<nAtoms; ++i) {
 				CPoint3D Pos;
 				long AtomType;
 				if (Buffer->GetFilePos() >= endOfFramePos) {
@@ -858,7 +858,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		// the number of lines formatted according to the sscanf below
 		while ((Buffer->GetFilePos()<Buffer->GetFileSize())) {
 			Buffer->GetLine(Line);
-			linesInBasis++;
+			++linesInBasis;
 			// continue until we find the end of the group / start of next
 			if (FindKeyWord(Line, "$END", 4)<0 && FindKeyWord(Line, "$COEFF", 6)<0 
 				&& FindKeyWord(Line, "$OCC", 4)<0) {
@@ -869,7 +869,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 								&nFunc, &IType, &Sc, &bytesConsumed);
 					if (scanCount == 3) { 
 						bytesRead+=bytesConsumed;
-						nShells++;
+						++nShells;
 					} else
 						break;
 				}
@@ -957,7 +957,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 							// add ending shell of this atom to BasisMap
 							MainData->Basis->BasisMap[2*iAtom+1]=iShell;
 							// we'll move on to next atom (or be done with Basis)
-							iAtom++;
+							++iAtom;
 							shellsPeriAtom = -1;	// reset for next atom;
 							stopReadingShell = true;
 							break;
@@ -965,7 +965,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						else if (4==bytesConsumed && 0==strncmp(tmpStr, "$END", 5)) {
 							// same as above, but need to break out of basis parsing
 							MainData->Basis->BasisMap[2*iAtom+1]=iShell;
-							iAtom++;
+							++iAtom;
 							stopReadingShell = true;
 							// BasisDone = true;
 							// possibly needed when trying to make parser more intelligent when the 
@@ -982,9 +982,9 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						stopReadingShell = true;
 				}
 				// move on to next shell in next iteration
-				iShell++;
-				shellsPeriAtom++;
-			} 
+				++iShell;
+				++shellsPeriAtom;
+			}
 			else if (FindKeyWord(Line, "$END", 4) >-1) {
 				BasisDone = true;
 				break;
@@ -1036,8 +1036,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						tmpStr[4] = '\0'; // SymType is 5 chars wide and must be null-terminated
 						strncpy(&OrbSet->SymType[5*symCount], tmpStr, 4);
 						bytesRead+=bytesConsumed;
-						iSymCount++;
-						symCount++;
+						++iSymCount;
+						++symCount;
 					} else
 						break;
 				} // got sym line
@@ -1054,13 +1054,13 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					if (scanCount == 1) {
 						lFrame->Orbs[0]->Energy[eigenvecCount] = tmpEigenvec;
 						bytesRead += bytesConsumed;
-						eigenvecCount++;
+						++eigenvecCount;
 					} else
 						break;
 				} //got eigenvector line
 
 				// now get the Alpha coefficients
-				for (long iLine=0; iLine < nOrbs; iLine++) {
+				for (long iLine=0; iLine < nOrbs; ++iLine) {
 					Buffer->GetLine(Line);
 					// each line should contain up to 5 orbitals
 					lineBytes = strlen(Line);
@@ -1073,7 +1073,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						if (scanCount == 1) {
 							OrbSet->Vectors[(symCount-iSymCount)*nOrbs+iCoef*nOrbs+iLine] = tmpCoef;
 							bytesRead += bytesConsumed;
-							iCoef++;
+							++iCoef;
 						} else
 							break;
 					}
@@ -1122,8 +1122,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						tmpStr[4] = '\0'; // SymType is 5 chars wide and must be null-terminated
 						strncpy(&lFrame->Orbs[0]->SymTypeB[5*symCount], tmpStr, 4);
 						bytesRead+=bytesConsumed;
-						iSymCount++;
-						symCount++;
+						++iSymCount;
+						++symCount;
 					} else
 						break;
 				} // get sym line
@@ -1140,13 +1140,13 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					if (scanCount == 1) {
 						lFrame->Orbs[0]->EnergyB[eigenvecCount] = tmpEigenvec;
 						bytesRead += bytesConsumed;
-						eigenvecCount++;
+						++eigenvecCount;
 					} else
 						break;
 				} //get eigenvector line
 
 				// now get the Beta coefficients
-				for (long iLine=0; iLine < nOrbs; iLine++) {
+				for (long iLine=0; iLine < nOrbs; ++iLine) {
 					Buffer->GetLine(Line);
 					// each line will contain up to 5 orbitals
 					lineBytes = strlen(Line);
@@ -1159,7 +1159,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						if (scanCount == 1) {
 							lFrame->Orbs[0]->VectorsB[(symCount-iSymCount)*nOrbs+iCoef*nOrbs+iLine] = tmpCoef;
 							bytesRead += bytesConsumed;
-							iCoef++;
+							++iCoef;
 						} else
 							break;
 					}
@@ -1211,8 +1211,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						if (scanCount == 1) {
 							bytesRead+=bytesConsumed;
 							lFrame->Orbs[0]->OrbOccupation[occCount] = tmpOcc;
-							lineOccs++;
-							occCount++;
+							++lineOccs;
+							++occCount;
 						} 
 						else
 							break;
@@ -1266,8 +1266,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						if (scanCount == 1) {
 							bytesRead+=bytesConsumed;
 							lFrame->Orbs[0]->OrbOccupationB[occCount] = tmpOcc;
-							lineOccs++;
-							occCount++;
+							++lineOccs;
+							++occCount;
 						} 
 						else
 							break;
@@ -1321,16 +1321,16 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 						if (scanCount == 1) {
 							lFrame->Vibs->Frequencies.push_back(freq);
 							bytesRead += bytesConsumed;
-							lineModes++;
+							++lineModes;
 						} else
 							break;
 					}
 					//Next come the vibrational offsets
-					for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
+					for (long iatm=0; iatm<lFrame->NumAtoms; ++iatm) {
 						Buffer->GetLine(Line);
 						//each line will normally contain x, y, z for one atom for 3 modes
 						bytesRead = 0;
-						for (long imode=0; imode<lineModes; imode++) {
+						for (long imode=0; imode<lineModes; ++imode) {
 							CPoint3D temp;
 							int scanCount = sscanf(&Line[bytesRead], "%f %f %f%n",
 												   &temp.x, &temp.y, &temp.z, &bytesConsumed);
@@ -1416,7 +1416,7 @@ long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, char fileType) {
 		// otherwise, it is [probably] a new atom
 		if ( (scanCount > 9 && nAtoms > 2) || (scanCount > 8 && nAtoms == 2) || 
 			(scanCount > 6 && nAtoms == 1) || (scanCount > 4 && nAtoms == 0) ) 
-			nAtoms++;
+			++nAtoms;
 		else 
 			break;
 	}
@@ -1488,7 +1488,7 @@ long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, char fileType) {
 					mInts->AddInternalCoordinate(iLine, con3, 2, bondDihedral);
 			}
 		}
-		iLine++;
+		++iLine;
 	} // end parsing loop
 	if (error) 
 		return 0; // failure due to an error: quit!
@@ -1535,7 +1535,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 			Done = true;
 			if (RdPoint) {
 				VibRec * lVibs = NULL;
-				for (i=0; i<nAtoms; i++) {
+				for (i=0; i<nAtoms; ++i) {
 						long AtomType, test;
 						CPoint3D Pos, Vector;
 
@@ -1594,7 +1594,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 						if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 							{ throw UserCancel();}
 					} else {
-						nSkip++;
+						++nSkip;
 						Buffer->SkipnLines(nAtoms+1);
 						RdPoint = false;
 					}
@@ -1680,7 +1680,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 	Buffer->SkipnLines(nkinds);
 
 // read in the coords and atomtypes
-	for (j=0; j<fileAtoms; j++) {			// loop over the number of atoms
+	for (j=0; j<fileAtoms; ++j) {			// loop over the number of atoms
 			long AtomType;
 			CPoint3D Pos, Vector;
 
@@ -1726,9 +1726,9 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 		if (LinePos >= 0) {
 			LinePos += 9;
 			LineLength = strlen(LineText);
-			for (j=0; j<(2*fileBonds); j++) {
+			for (j=0; j<(2*fileBonds); ++j) {
 				while (LineText[LinePos] && ((LineText[LinePos] < '0')||
-						(LineText[LinePos] > '9'))) LinePos++;
+						(LineText[LinePos] > '9'))) ++LinePos;
 				while (LinePos >= LineLength) {	//EOL reached try getting a new line
 					long CurrentPos = Buffer->GetFilePos();
 					Buffer->GetLine(LineText);
@@ -1740,7 +1740,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 					LinePos = 0;
 					LineLength = strlen(LineText);
 					while (LineText[LinePos] && ((LineText[LinePos] < '0')||
-							(LineText[LinePos] > '9'))) LinePos++;
+							(LineText[LinePos] > '9'))) ++LinePos;
 				}
 				if (LinePos < LineLength) {
 					iscanerr = sscanf(&LineText[LinePos], "%ld%n", &temp, &nchar);
@@ -1782,12 +1782,12 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 			}
 			Buffer->SetFilePos(CurrentPos);
 
-			for (; ii < (3*(lFrame->NumAtoms)); ii++) {
+			for (; ii < (3*(lFrame->NumAtoms)); ++ii) {
 				/* Allow user cancels */
 				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
 					{ throw UserCancel();}
 				Buffer->GetLine(LineText);
-				for (j=0; LineText[j] && (LineText[j] != '='); j++) ;
+				for (j=0; LineText[j] && (LineText[j] != '='); ++j) ;
 				if (LineText[j] != '=') break;	/* no more frequencies so quit */
 				sscanf(&LineText[j+1], "%s", KeyWord);
 				LineLength = strlen(KeyWord);
@@ -1797,7 +1797,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 				if (KeyWord[0] == '-') KeyWord[0] = 'i';
 				lVibs->Frequencies.push_back(std::string(token));
 
-				for (j=0; j < (lFrame->NumAtoms); j++) {
+				for (j=0; j < (lFrame->NumAtoms); ++j) {
 					Buffer->GetLine(LineText);
 					iscanerr = sscanf(LineText, "%f%f%f", &((lVibs->NormMode[catm]).x),
 						&((lVibs->NormMode[catm]).y), &((lVibs->NormMode[catm]).z));
@@ -1808,7 +1808,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 					(lVibs->NormMode[catm]).x *= (Prefs->GetSqrtAtomMass((lFrame->Atoms[j].Type)-1));
 					(lVibs->NormMode[catm]).y *= (Prefs->GetSqrtAtomMass((lFrame->Atoms[j].Type)-1));
 					(lVibs->NormMode[catm]).z *= (Prefs->GetSqrtAtomMass((lFrame->Atoms[j].Type)-1));
-					catm++;
+					++catm;
 				}
 			}
 		}
@@ -1853,7 +1853,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 					if (epos > 0) {
 						sscanf(&(LineText[epos+5]), "%lf", &(lFrame->Energy));
 					}
-					for (int iatm=0; iatm<atmCount; iatm++) {
+					for (int iatm=0; iatm<atmCount; ++iatm) {
 						unsigned char token[kMaxLineLength];
 						CPoint3D	pos;
 						Buffer->GetLine(LineText);
@@ -1898,7 +1898,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 					MainData->SetCurrentFrame(iframe);
 					Buffer->GetLine(LineText);
 					while (sscanf(LineText, "%lf", &MainData->cFrame->Energy) == 1) {
-						iframe++;
+						++iframe;
 						if (iframe > MainData->GetNumFrames()) break;
 						MainData->SetCurrentFrame(iframe);
 						Buffer->GetLine(LineText);
@@ -1912,7 +1912,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 					float val;
 					while (sscanf(LineText, "%f", &val) == 1) {
 						MainData->cFrame->SetRMSGradient(val);
-						iframe++;
+						++iframe;
 						if (iframe > MainData->GetNumFrames()) break;
 						MainData->SetCurrentFrame(iframe);
 						Buffer->GetLine(LineText);
@@ -1926,7 +1926,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 					float val;
 					while (sscanf(LineText, "%f", &val) == 1) {
 						MainData->cFrame->SetMaximumGradient(val);
-						iframe++;
+						++iframe;
 						if (iframe > MainData->GetNumFrames()) break;
 						MainData->SetCurrentFrame(iframe);
 						Buffer->GetLine(LineText);
@@ -2021,7 +2021,7 @@ long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
 	char	LineText[kMaxLineLength];
 	long *	zcore = new long[cFrame->NumAtoms];
 	if (!zcore) throw MemoryError();
-	for (atom=0; atom<cFrame->NumAtoms; atom ++) zcore[atom]=0;
+	for (atom=0; atom<cFrame->NumAtoms; ++atom) zcore[atom]=0;
 	
 	long StartPos = Buffer->GetFilePos();
 	if (!Buffer->LocateKeyWord("THE ECP RUN REMOVES", 19, -1)) {
@@ -2089,7 +2089,7 @@ long MoleculeData::ParseTinkerCoordinates(BufferFile *Buffer) {
 		wxLogMessage(_("Unable to locate Tinker coordinates in file."));
 		throw DataError();
 	}
-	for (long i=0; i<numlines; i++) {
+	for (long i=0; i<numlines; ++i) {
 		long linenum;
 		CPoint3D	position;
 		unsigned char	Label[kMaxLineLength];
@@ -2131,7 +2131,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 		wxLogMessage(_("Unable to locate Tinker coordinates in file."));
 		throw DataError();
 	}
-	for (long i=0; i<numlines; i++) {
+	for (long i=0; i<numlines; ++i) {
 			long linenum;
 			CPoint3D	position;
 			unsigned char	Label[kMaxLineLength];
@@ -2183,7 +2183,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 				if (Basis->NuclearCharge[0] == -1) {
 					if (MainData->cFrame->NumAtoms == Basis->MapLength) {
 						//for the purpose of the basis set, set the charge of mm atoms to 0
-						for (long iatom=0; iatom<MainData->cFrame->NumAtoms; iatom++) {
+						for (long iatom=0; iatom<MainData->cFrame->NumAtoms; ++iatom) {
 							if (! MainData->cFrame->Atoms[iatom].IsSIMOMMAtom() )
 								Basis->NuclearCharge[iatom] = MainData->cFrame->Atoms[iatom].GetNuclearCharge();
 							else
@@ -2393,7 +2393,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 					if (Basis->NuclearCharge[0] == -1) {
 						if (MainData->cFrame->NumAtoms == Basis->MapLength) {
 							//for the purpose of the basis set, set the charge of mm atoms to 0
-							for (long iatom=0; iatom<MainData->cFrame->NumAtoms; iatom++) {
+							for (long iatom=0; iatom<MainData->cFrame->NumAtoms; ++iatom) {
 								if (! MainData->cFrame->Atoms[iatom].IsSIMOMMAtom() )
 									Basis->NuclearCharge[iatom] = MainData->cFrame->Atoms[iatom].GetNuclearCharge();
 								else
@@ -2499,14 +2499,14 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			}
 			Occupancy = new float[MainData->GetNumBasisFunctions()];
 			if (!Occupancy) throw MemoryError();
-			for (test=0; test<MainData->GetNumBasisFunctions(); test++) Occupancy[test] = 0.0;
-			for (test=0; test<NumCoreOrbs; test++) Occupancy[test] = 2.0;
+			for (test=0; test<MainData->GetNumBasisFunctions(); ++test) Occupancy[test] = 0.0;
+			for (test=0; test<NumCoreOrbs; ++test) Occupancy[test] = 2.0;
 			if (NumOpenOrbs > 0) {	//Parse the occupancies of the open shells
 				if (Buffer->LocateKeyWord("F VECTOR (OCCUPANCIES)", 23)) {
 						long nSkip = 3;
 					if (NumCoreOrbs > 0) nSkip = 4;	//skip the one line for all doubly occupied core orbs
 					Buffer->SkipnLines(nSkip);
-					for (nSkip=0; nSkip<NumOpenOrbs; nSkip++) {
+					for (nSkip=0; nSkip<NumOpenOrbs; ++nSkip) {
 						Buffer->GetLine(LineText);
 						sscanf(LineText, "%ld %f", &test, &(Occupancy[NumCoreOrbs + nSkip]));
 						Occupancy[NumCoreOrbs + nSkip] *= 2;	//occupancies are listed as % of orbital filled
@@ -2734,7 +2734,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				MainData->ParseTinkerCoordinates(Buffer);
 				if (MainData->cFrame->NumAtoms > 0) {
 					//update the coordinates in the first frame
-					for (int iatom=0; iatom<MainData->cFrame->NumAtoms; iatom++) {
+					for (int iatom=0; iatom<MainData->cFrame->NumAtoms; ++iatom) {
 						if (MainData->cFrame->Atoms[iatom].IsSIMOMMAtom()) {
 							preserve->Atoms[iatom].Position.x = MainData->cFrame->Atoms[iatom].Position.x;
 							preserve->Atoms[iatom].Position.y = MainData->cFrame->Atoms[iatom].Position.y;
@@ -2868,7 +2868,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				lFrame = MainData->AddFrame(lpFrame->NumAtoms,0);
 
 				if (SIMOMM) {	//copy over the MM atoms so that they will be in the same order
-					for (int iatom=0; iatom<lpFrame->NumAtoms; iatom++) {
+					for (int iatom=0; iatom<lpFrame->NumAtoms; ++iatom) {
 						if (lpFrame->Atoms[iatom].IsSIMOMMAtom()) {
 							lFrame->AddAtom(lpFrame->Atoms[iatom].Type, 
 											lpFrame->Atoms[iatom].Position);
@@ -2948,7 +2948,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				MainData->ParseTinkerCoordinates(Buffer);
 				if (MainData->cFrame->NumAtoms > 0) {
 					//update the coordinates in the first frame
-					for (int iatom=0; iatom<MainData->cFrame->NumAtoms; iatom++) {
+					for (int iatom=0; iatom<MainData->cFrame->NumAtoms; ++iatom) {
 						if (MainData->cFrame->Atoms[iatom].IsSIMOMMAtom()) {
 							preserve->Atoms[iatom].Position.x = MainData->cFrame->Atoms[iatom].Position.x;
 							preserve->Atoms[iatom].Position.y = MainData->cFrame->Atoms[iatom].Position.y;
@@ -3170,7 +3170,7 @@ bool ReadGVBOccupancy(BufferFile * Buffer, long NumPairOrbs, long MaxOrbs, float
 		float	junkf, Occ1, Occ2;
 	if ((NumPairOrbs <= 0)||(!Occupancy)) return false;	//no GVB pairs or no memory
 	Buffer->SkipnLines(4);
-	for (long i=0; i<NumPairOrbs; i++) {
+	for (long i=0; i<NumPairOrbs; ++i) {
 		Buffer->GetLine(Line);
 		sscanf(Line, "%ld %ld %ld %f %f %f %f", &junk, &Orb1, &Orb2, &junkf, &junkf,
 			&Occ1, &Occ2);
@@ -3207,7 +3207,7 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 		Buffer->SkipnLines(3);
 		SetupFrameMemory(lFrame->NumAtoms + 10, 0);
 		bool workingFragment=false;
-		for (int i=0; i<NumMultipoles; i++) {
+		for (int i=0; i<NumMultipoles; ++i) {
 				CPoint3D	Pos;
 				float		eCharge, nCharge;
 			Buffer->GetLine(Line);
@@ -3244,7 +3244,7 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 						SetupFrameMemory(lFrame->NumAtoms + 10, 0);
 					if (AtomType > 0) {
 						if (!workingFragment) {
-							FragmentNumber ++;
+							++FragmentNumber;
 							workingFragment = true;
 						}
 						Pos.x *= kBohr2AngConversion;
@@ -3255,7 +3255,7 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 						MaxSize = MAX(MaxSize, fabs(Pos.x));
 						MaxSize = MAX(MaxSize, fabs(Pos.y));
 						MaxSize = MAX(MaxSize, fabs(Pos.z));
-						NumFragmentAtoms ++;
+						++NumFragmentAtoms;
 					}
 				} else workingFragment = false;
 			}
@@ -3273,7 +3273,7 @@ void MoleculeData::ReadFragmentCoordinates(BufferFile * Buffer, long NumFragment
 
 	while (iatom<NumFragmentAtoms) {
 		Buffer->GetLine(Line);
-		if (-1<LocateKeyWord(Line, "FRAGNAME=",9, strlen(Line))) {FragmentNumber++; continue;}
+		if (-1<LocateKeyWord(Line, "FRAGNAME=",9, strlen(Line))) {++FragmentNumber; continue;}
 		int iscan = sscanf(Line, "%s%f%f%f", Label, &Pos.x, &Pos.y, &Pos.z);
 		if (iscan == 4) {
 			long AtomType = -1;
@@ -3291,10 +3291,10 @@ void MoleculeData::ReadFragmentCoordinates(BufferFile * Buffer, long NumFragment
 			if ((std::toupper(Label[0]) == 'A')&&(AtomType < 0)) {
 				while ((referenceFragAtom < startFrame->GetNumAtoms())&&
 					   !startFrame->Atoms[referenceFragAtom].IsEffectiveFragment())
-					referenceFragAtom++;
+					++referenceFragAtom;
 				if (referenceFragAtom < startFrame->GetNumAtoms()) {
 					AtomType = startFrame->Atoms[referenceFragAtom].Type;
-					referenceFragAtom++;
+					++referenceFragAtom;
 				}
 			}
 			if (AtomType > 0) {
@@ -3303,7 +3303,7 @@ void MoleculeData::ReadFragmentCoordinates(BufferFile * Buffer, long NumFragment
 				MaxSize = MAX(MaxSize, fabs(Pos.x));
 				MaxSize = MAX(MaxSize, fabs(Pos.y));
 				MaxSize = MAX(MaxSize, fabs(Pos.z));
-				iatom ++;
+				++iatom;
 			}
 		}
 	}
@@ -3841,12 +3841,12 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 			if (Prefs->GetAutoBond())
 				lFrame->SetBonds(Prefs, false);
 		} else
-			nskip ++;
+			++nskip;
 		KeyWordFound = Buffer->LocateKeyWord(Etext, Elength);
 	}
 
 	lFrame = MainData->Frames;
-	for (long iframe=0; iframe<MainData->NumFrames; iframe++) {
+	for (long iframe=0; iframe<MainData->NumFrames; ++iframe) {
 		lFrame->IRCPt = iframe + 1;
 		lFrame = lFrame->NextFrame;
 	}
@@ -3873,7 +3873,7 @@ void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
 		long savedFrame	= MainData->GetCurrentFrame();
 		MainData->CurrentFrame = 1;
 		MainData->cFrame = MainData->Frames;
-		for (int iframe=0; iframe<MainData->GetNumFrames(); iframe++) {
+		for (int iframe=0; iframe<MainData->GetNumFrames(); ++iframe) {
 			char		text[kMaxLineLength];
 			sprintf(text, "! Frame # %ld", iframe+1);
 			Buffer->WriteLine(text, true);
@@ -3939,7 +3939,7 @@ void MolDisplayWin::WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames) {
 		lFrame = MainData->cFrame;
 		NumFrames = 1;
 	}
-	for (long i=0; i<NumFrames; i++) {
+	for (long i=0; i<NumFrames; ++i) {
 		sprintf(text, "%f", lFrame->time);
 		Buffer->PutText(text);
 		if (PlotTE) {
@@ -3999,7 +3999,7 @@ void MolDisplayWin::WriteFrequencies(BufferFile * Buffer) {
 	Buffer->PutText("Frequency\tIntensity");
 	if (haveRaman) Buffer->PutText("\tRaman Intensity");
 	Buffer->WriteLine("", true);
-	for (long i=0; i<lFrame->Vibs->GetNumModes(); i++) {
+	for (long i=0; i<lFrame->Vibs->GetNumModes(); ++i) {
 		sprintf(text, "%s", lFrame->Vibs->Frequencies[i].c_str());
 		Buffer->PutText(text);
 		if (haveInten) {
@@ -4035,16 +4035,16 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 		if (!ModeOffset || !tempAtoms) return;
 		float	VectorScale = Prefs->GetVectorScale();
 		float offsetFactor = 1.0/40.0;
-		for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
+		for (iatm=0; iatm<(lFrame->NumAtoms); ++iatm) {
 			tempAtoms[iatm] = lAtoms[iatm].Position;
 			ModeOffset[iatm] = lFrame->Vibs->NormMode[iatm+cmode];
 			ModeOffset[iatm] *= VectorScale;
 		}
-		for (i=0; i<20; i++) {
+		for (i=0; i<20; ++i) {
 			if ((i==5)||(i==15)) {
 				offsetFactor *= -1.0;
 			}
-			for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
+			for (iatm=0; iatm<(lFrame->NumAtoms); ++iatm) {
 				tempAtoms[iatm].x += offsetFactor*(ModeOffset[iatm].x);
 				tempAtoms[iatm].y += offsetFactor*(ModeOffset[iatm].y);
 				tempAtoms[iatm].z += offsetFactor*(ModeOffset[iatm].z);
@@ -4054,7 +4054,7 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 			sprintf(text, "Frequency %s Frame %ld", 
 					lFrame->Vibs->Frequencies[lFrame->Vibs->CurrentMode].c_str(), i+1);
 			Buffer->WriteLine(text, true);
-			for (long j=0; j<lFrame->NumAtoms; j++) {
+			for (long j=0; j<lFrame->NumAtoms; ++j) {
 					Str255	Label;
 				Prefs->GetAtomLabel(lAtoms[j].Type-1, Label);
 				Label[Label[0]+1]=0;
@@ -4071,13 +4071,13 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 	} else if (AllModes) {
 		if (!lFrame->Vibs) return;
 			mpAtom * lAtoms = lFrame->Atoms;
-		for (long i=0; i<lFrame->Vibs->GetNumModes(); i++) {
+		for (long i=0; i<lFrame->Vibs->GetNumModes(); ++i) {
 			sprintf(text, "%ld", lFrame->NumAtoms);
 			Buffer->WriteLine(text, true);
 			sprintf(text, "Frequency %s", 
 					lFrame->Vibs->Frequencies[i].c_str());
 			Buffer->WriteLine(text, true);
-			for (long j=0; j<lFrame->NumAtoms; j++) {
+			for (long j=0; j<lFrame->NumAtoms; ++j) {
 					Str255	Label;
 				Prefs->GetAtomLabel(lAtoms[j].Type-1, Label);
 				Label[Label[0]+1]=0;
@@ -4091,13 +4091,13 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 			}
 		}
 	} else {	
-		for (long i=0; i<NumFrames; i++) {
+		for (long i=0; i<NumFrames; ++i) {
 				mpAtom * lAtoms = lFrame->Atoms;
 			sprintf(text, "%ld", lFrame->NumAtoms);
 			Buffer->WriteLine(text, true);
 			sprintf(text, "Frame %ld", i+1);
 			Buffer->WriteLine(text, true);
-			for (long j=0; j<lFrame->NumAtoms; j++) {
+			for (long j=0; j<lFrame->NumAtoms; ++j) {
 					Str255	Label;
 				Prefs->GetAtomLabel(lAtoms[j].GetType()-1, Label);
 				Label[Label[0]+1]=0;
@@ -4145,7 +4145,7 @@ void MolDisplayWin::WriteMDLMolFile(BufferFile * Buffer) {
 	Buffer->WriteLine(Line, true);
 		mpAtom * lAtoms = lFrame->Atoms;
 		long i;
-	for (i=0; i<lFrame->GetNumAtoms(); i++) {
+	for (i=0; i<lFrame->GetNumAtoms(); ++i) {
 			Str255	Label;
 		Prefs->GetAtomLabel(lAtoms[i].GetType()-1, Label);
 		Label[Label[0]+1]=0;
@@ -4156,7 +4156,7 @@ void MolDisplayWin::WriteMDLMolFile(BufferFile * Buffer) {
 	}
 	if (lFrame->GetNumBonds() > 0) {
 		Bond * lBonds = lFrame->Bonds;
-		for (i=0; i<lFrame->GetNumBonds(); i++) {
+		for (i=0; i<lFrame->GetNumBonds(); ++i) {
 			int	type = lBonds[i].Order;
 			if (type>3 || type<=0) type = 1;
 			sprintf(Line, "%3ld%3ld%3d  0  0  0  0", lBonds[i].Atom1+1,
@@ -4184,7 +4184,7 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer) {
 	wxString tmpStr;
 	float red, green, blue;
 
-	for (long iatom=0; iatom<NumAtoms; iatom++) {
+	for (long iatom=0; iatom<NumAtoms; ++iatom) {
 		if (lAtoms[iatom].GetInvisibility()) continue;
 		
 		curAtomType = lAtoms[iatom].GetType() - 1;
@@ -4222,7 +4222,7 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer) {
 	double theta;
 	double axisX, axisY, axisZ;
 	
-	for (long ibond=0; ibond<NumBonds; ibond++) {
+	for (long ibond=0; ibond<NumBonds; ++ibond) {
 		CPoint3D v1, v2, offset;
 		long atom1 = lBonds[ibond].Atom1;
 		long atom2 = lBonds[ibond].Atom2;
@@ -4438,7 +4438,7 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 #else
 		lGrid = Grid;
 #endif
-		if (FirstFile) for (LinePos=0; LinePos<TotalPoints; LinePos++)
+		if (FirstFile) for (LinePos=0; LinePos<TotalPoints; ++LinePos)
 			lGrid[LinePos] = 0.0;
 		Buffer->GetLine(Line);
 		LinePos = 0;
@@ -4467,7 +4467,7 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 			GridMax = MAX(GridMax, lGrid[n]);
 			GridMin = MIN(GridMin, lGrid[n]);
 			LinePos += nchar;
-			n++;
+			++n;
 		}
 #ifdef UseHandles
 		HUnlock(Grid);
@@ -4578,7 +4578,7 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 #else
 		lGrid = Grid;
 #endif
-		if (FirstFile) for (LinePos=0; LinePos<TotalPoints; LinePos++)
+		if (FirstFile) for (LinePos=0; LinePos<TotalPoints; ++LinePos)
 			lGrid[LinePos] = 0.0;
 		Buffer->GetLine(Line);
 		LinePos = 0;
@@ -4607,7 +4607,7 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 			GridMax = MAX(GridMax, lGrid[n]);
 			GridMin = MIN(GridMin, lGrid[n]);
 			LinePos += nchar;
-			n++;
+			++n;
 		}
 #ifdef UseHandles
 		HUnlock(Grid);
@@ -4653,7 +4653,7 @@ long ParseGLogLine(BufferFile * Buffer, Frame * lFrame, long numExpected, long T
 	char	LineText[kMaxLineLength+1];
 	CPoint3D	Position;
 	
-	for (iatm=0; iatm<numExpected; iatm++) {
+	for (iatm=0; iatm<numExpected; ++iatm) {
 		Buffer->GetLine(LineText);
 		switch (Type) {
 			case 0:	//Standard Coordinates at the top of the log file
