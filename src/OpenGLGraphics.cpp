@@ -67,7 +67,7 @@ const GLubyte stippleMask[128] =
    0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00};
 
 GLfloat d_specular[] = {0.1, 0.1, 0.1, 1.0};
-GLfloat d_shininess[] = {1.0};
+GLfloat d_shininess = 1.0;
 GLfloat d_diffuse[] = {0.02,0.02,0.02,0.8};
 GLfloat d_ambient[] = {0.1,0.1,0.1,0.8};
 
@@ -984,6 +984,7 @@ void MolDisplayWin::DrawTransparentTriangles(void) {
 	}
 	glEnd();	//End of triangle creation
 }
+
 #ifdef __WXMSW__
 #define GL_RESCALE_NORMAL 0x803A
 #endif
@@ -1038,9 +1039,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 			if (InSymmetryEditMode() && !lAtoms[iatom].IsSymmetryUnique()) {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-				/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse); */
-				/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient); */
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
 				glLoadName(0);
 				glColor3fv(bg_invert);
 				glEnable(GL_POLYGON_STIPPLE);
@@ -1056,14 +1055,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			  
 			if (draw_subdued) {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-				/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse); */
-				/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient); */
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
 			} else {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
-				/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse); */
-				/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient); */
 			}
 
 			if (Prefs->Show2DPattern()) {
@@ -1074,11 +1069,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 					glEnable(GL_POLYGON_STIPPLE);
 					glPolygonStipple(atomMaskPatterns[patternindex]);
 					glPushMatrix(); // atom center
-					/* glScalef(radius * 1.01f, radius * 1.01f, radius * 1.01f); */
 					glScalef(radius, radius, radius);
 					glCallList(OpenGLData->sphere_list);
 					glPopMatrix(); // atom center
-					/* gluSphere(core_obj, radius, (long)(1.5*Quality), (long)(Quality));//Create and draw the sphere */
 					glDisable(GL_POLYGON_STIPPLE);
 				}
 			}
@@ -1098,14 +1091,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 	  
 			if (draw_subdued) {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
-				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-				/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse); */
-				/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient); */
+				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
 			} else {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
-				/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse); */
-				/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient); */
 			}
 
 			glPushMatrix(); // atom center
@@ -1151,14 +1140,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 		if (mHighliteState && !lBonds[ibond].GetSelectState()) {
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
-			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
-			/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, d_diffuse); */
-			/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, d_ambient); */
+			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
 		} else {
 			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 			glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);
-			/* glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, l_diffuse); */
-			/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, l_ambient); */
 		}
 
 		DrawBond(lBonds[ibond], lAtoms[lBonds[ibond].Atom1],
@@ -1171,7 +1156,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 	glDisable(GL_RESCALE_NORMAL);
 
 	glLoadName(0);  //only atoms and bonds are selectable
-	                 //so give a NULL name value to the rest of the geometries
+	                //so give a NULL name value to the rest of the geometries
 
 	if (MainData->GetDrawMode() && lFrame->Vibs) { //Add the current normal mode, if active
 		float VectorScale = Prefs->GetVectorScale();
@@ -1233,67 +1218,8 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 	}
 	gluDeleteQuadric(core_obj);	//finally delete the quadric object
 
-	/* if (mHighliteState) */
-		/* glEnable(GL_POLYGON_STIPPLE); */
-
-/*	//draw bonds as lines
-	glDisable(GL_LIGHTING);
-//	glEnable(GL_LINE_SMOOTH);
-	GLfloat BondSize = 100*Prefs->GetQD3DBondWidth() *
-							MainData->MaxSize / (0.5*MainData->WindowSize);
-	glLineWidth(BondSize);
-	glBegin(GL_LINES);
-		for (long ibond=0; ibond<NumBonds; ibond++) {
-				CPoint3D	v1, v2;
-			long atom1 = lBonds[ibond].Atom1;
-			long atom2 = lBonds[ibond].Atom2;
-			if (lAtoms[atom1].GetInvisibility() || lAtoms[atom2].GetInvisibility()) continue;
-
-			v1.x = lAtoms[atom1].Position.x;
-			v1.y = lAtoms[atom1].Position.y;
-			v1.z = lAtoms[atom1].Position.z;
-			v2.x = lAtoms[atom2].Position.x;
-			v2.y = lAtoms[atom2].Position.y;
-			v2.z = lAtoms[atom2].Position.z;
-
-			if (Prefs->ColorBondHalves()) {	//first half bond from atom 1
-		//			CPoint3D v3;
-		//		v3.x = 0.5*(v2.x - v1.x)+v1.x;
-		//		v3.y = 0.5*(v2.y - v1.y)+v1.y;
-		//		v3.z = 0.5*(v2.z - v1.z)+v1.z;
-
-				RGBColor * BondColor = Prefs->GetAtomColorLoc(lAtoms[atom1].GetType() - 1);
-					float red, green, blue;
-				red = BondColor->red/65536.0;
-				green = BondColor->green/65536.0;
-				blue = BondColor->blue/65536.0;
-				glColor3f(red, green, blue);
-				glVertex3d(v1.x, v1.y, v1.z);
-		//		glVertex3d(v3.x, v3.y, v3.z);
-
-				BondColor = Prefs->GetAtomColorLoc(lAtoms[atom2].GetType() - 1);
-				red = BondColor->red/65536.0;
-				green = BondColor->green/65536.0;
-				blue = BondColor->blue/65536.0;
-				glColor3f(red, green, blue);
-		//		glVertex3d(v3.x, v3.y, v3.z);
-				glVertex3d(v2.x, v2.y, v2.z);
-			} else {
-				RGBColor * BondColor = Prefs->GetBondColorLoc(lBonds[ibond].Order);
-					float red, green, blue;
-				red = BondColor->red/65536.0;
-				green = BondColor->green/65536.0;
-				blue = BondColor->blue/65536.0;
-				glColor3f(red, green, blue);
-				glVertex3d(v1.x, v1.y, v1.z);
-				glVertex3d(v2.x, v2.y, v2.z);
-			}
-		}
-	glEnd();*/
-
-	/* glDisable(GL_POLYGON_STIPPLE);  //make sure everything outside  */
-	                                //this function has no stipple effect
 }
+
 void WinPrefs::ChangeColorBondColor(long order) const {
 	float red, green, blue;
 	red = BondColors[order].red/65536.0;
@@ -1301,6 +1227,7 @@ void WinPrefs::ChangeColorBondColor(long order) const {
 	blue = BondColors[order].blue/65536.0;
 	glColor3f(red, green, blue);
 }
+
 void WinPrefs::ChangeColorAtomColor(long atomtype, float alpha) const {
 	float red, green, blue;
 	red = AtomColors[atomtype-1].red/65536.0;
@@ -1308,6 +1235,7 @@ void WinPrefs::ChangeColorAtomColor(long atomtype, float alpha) const {
 	blue = AtomColors[atomtype-1].blue/65536.0;
 	glColor4f(red, green, blue, alpha);
 }
+
 void WinPrefs::ChangeColorVectorColor(void) const {
 	float red, green, blue;
 	red = VectorColor.red/65536.0;
@@ -1331,26 +1259,8 @@ void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 
 	Prefs.ChangeColorBondColor(kHydrogenBond);
 	GLdouble BondSize = Prefs.GetQD3DBondWidth() * 0.5;
-	/* Frame *	lFrame=MainData->cFrame; */
-	/* long atom1 = lFrame->Bonds[bondNum].Atom1; */
-	/* long atom2 = lFrame->Bonds[bondNum].Atom2; */
-	/* v1.x = lFrame->Atoms[atom1].Position.x; */
-	/* v1.y = lFrame->Atoms[atom1].Position.y; */
-	/* v1.z = lFrame->Atoms[atom1].Position.z; */
-	/* v2.x = lFrame->Atoms[atom2].Position.x; */
-	/* v2.y = lFrame->Atoms[atom2].Position.y; */
-	/* v2.z = lFrame->Atoms[atom2].Position.z; */
-	/* offset.x = v2.x - v1.x; */
-	/* offset.y = v2.y - v1.y; */
-	/* offset.z = v2.z - v1.z; */
 	offset = atom2.Position - atom1.Position;
 	
-	//GL lines don't scale with distance so they aren't a good solution
-//	glLineWidth(10.0);
-//	glBegin(GL_LINES);
-//	glVertex3d(v1.x, v1.y, v1.z);
-//	glVertex3d(v2.x, v2.y, v2.z);
-//	glEnd();
 	//Plot as a series of spheres
 	CPoint3D	NormalOffset, NormEnd, NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
 	Matrix4D	rotMat;
@@ -2612,7 +2522,6 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth*repeat, imageWidth, 0, GL_RGBA,
 				 GL_UNSIGNED_BYTE, testimage);
 	
-	/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse); */
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
@@ -2699,7 +2608,6 @@ void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CP
 	glEnable(GL_BLEND);
 	glDepthMask(GL_FALSE);
 
-	/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse); */
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
@@ -2730,7 +2638,6 @@ void DrawInversionPoint(void) {
 	glPushAttrib(GL_LIGHTING_BIT);
 
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 128.0);
-	/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, sphere_diffuse); */
 //	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, sphere_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, sphere_specular);
 	glColor4f(.7, .7, .7, 1.0);
@@ -2742,7 +2649,6 @@ void DrawInversionPoint(void) {
 	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
 	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
 	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
-	/* glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, plane_diffuse); */
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);
 	glColor4f(0, .64, .85, 0.7);
