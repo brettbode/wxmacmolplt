@@ -333,7 +333,7 @@ void MolDisplayWin::DrawGL(void) {
 
 	while (lSurface) {
 		if (lSurface->GetVisibility()) {
-			if (! lSurface->isTransparent()) {
+			if (!lSurface->isTransparent()) {
 				lSurface->Draw3DGL(MainData, Prefs, NULL);
 			} else {
 				OpenGLData->haveTransparentSurfaces = true;
