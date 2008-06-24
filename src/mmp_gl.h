@@ -2,6 +2,7 @@
 #define MMP_GL_H
 
 #include "glew.h"
+#include <wx/wx.h>
 #include <wx/glcanvas.h>
 #include <string>
 
