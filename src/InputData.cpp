@@ -3375,7 +3375,7 @@ void StatPtGroup::WriteToFile(BufferFile *File, InputData *IData) {
 		File->WriteLine("NPRT=1 ", false);
 	}
 	if (GetHessEndFlag())
-		File->WriteLine("HESSEND=.t. ", false);
+		File->WriteLine("HSSEND=.t. ", false);
 
 	File->WriteLine("$END", true);
 }
