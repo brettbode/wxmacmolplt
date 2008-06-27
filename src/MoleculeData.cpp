@@ -628,30 +628,16 @@ CleanUpAndExit:		//Clean up the RotCoords Array...
 	cFrame = SavedFrame;
 	::CopyMatrix(SavedRotation, TotalRotation);
 	ResetRotation();
-#ifndef __wxBuild__
-#ifdef CarbonBuild
-	Cursor	arrow;	
-	SetCursor(GetQDGlobalsArrow(&arrow));
-#else
-	SetCursor(&qd.arrow);	//reset the cursor to the standard arrow
-#endif
-#endif
 	return;	//Correct return
 FrameIncorrect:		//Incorrect frame list for this routine: throw up an error and exit
-#ifdef __wxBuild__
 	MessageAlert("Sorry each frame must have the same number and order of atoms in order to fit an animation path.");
-#else
-	Str255	errmsg;
-	GetIndString(errmsg, kerrstrings, 33);
-	MessageAlert(errmsg);
-#endif
 }	/*LinearLeastSquaresFit*/
-bool MoleculeData::OrbSurfacePossible(void) {
+bool MoleculeData::OrbSurfacePossible(void) const {
 	bool result = false;
 	if (Basis) result = true;
 	return result;
 }
-bool MoleculeData::TotalDensityPossible(void) {
+bool MoleculeData::TotalDensityPossible(void) const {
 	bool result = false;
 	if (Basis) {
 		if (cFrame->Orbs.size() > 0) {//Currently TE density is based on eigenvectors only
@@ -667,6 +653,14 @@ bool MoleculeData::TotalDensityPossible(void) {
 	}
 	return result;
 }
+bool MoleculeData::MEPCalculationPossible(void) const {
+	bool result = false;
+	if (Basis) {
+		result = Basis->AreNuclearChargesValid();
+		if (result) result = TotalDensityPossible();
+	}
+	return result;
+}
 //Read in a general basis set from a GAMESS log file
 void MoleculeData::ParseGAMESSBasisSet(BufferFile * Buffer) {
 
@@ -679,6 +673,7 @@ void MoleculeData::ParseGAMESSBasisSet(BufferFile * Buffer) {
 			if (Basis->NuclearCharge[iatom] == 115)	//dummy atom/no charge
 				Basis->NuclearCharge[iatom] = 0;
 		}
+		Basis->NuclearChargesAreValid(true);
 	}
 }	/*ParseGAMESSBasisSet*/
 //Parse a gaussian style zmatrix as would be formated in GAMESS input

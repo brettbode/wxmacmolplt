@@ -380,7 +380,7 @@ void BasisSet::WriteXML(XMLElement * parent) const {
 		map->addAttribute(CML_convert(titleAttr), CML_convert(MMP_BSMap));
 		map->addAttribute(CML_convert(sizeAttr), BasisMap.size());
 	}
-	if (NuclearCharge.size()) {
+	if (NuclearCharge.size() && goodCharges) {
 		std::ostringstream buf;
 		for (unsigned int i=0; i<NuclearCharge.size(); i++) buf << NuclearCharge[i] << " ";
 		XMLElement * map = t->addChildElement(CML_convert(ArrayElement),
@@ -2127,6 +2127,7 @@ BasisSet * BasisSet::ReadXML(XMLElement * parent) {
 												target->NuclearCharge[i] = ic;
 												pos += nchar;
 											}
+											target->goodCharges = true;
 										}
 											break;
 									}

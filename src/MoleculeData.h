@@ -113,8 +113,21 @@ class MoleculeData {
 		inline BasisSet * GetBasisSet(void) const {return Basis;};
 		long GetNumBasisFunctions(void) const;
 		inline long GetNumFrames(void) {return NumFrames;};
-		bool OrbSurfacePossible(void);
-		bool TotalDensityPossible(void);
+		/**
+		 * Does the current data include enough information to plot an orbital?
+		 */
+		bool OrbSurfacePossible(void) const;
+		/**
+		 * Determine whether it is possible to compute a total electron density with the
+		 * current data. This requires having a set of orbitals with a known occupation.
+		 */
+		bool TotalDensityPossible(void) const;
+		/**
+		 * Determine whether it is possible to compute a molecular electrostatic potential with the
+		 * current data. This requires having a set of orbitals with a known occupation and knowing
+		 * the nuclear charge for each atom (potentially not known for ECP/MCPs).
+		 */
+		bool MEPCalculationPossible(void) const;
 		void ResetRotation(void);
 		void CenterModelWindow(void);
 		void InvertMode(void);

@@ -3246,19 +3246,28 @@ void TEDensity3DSurfPane::refreshControls() {
 	mOrbColor2->setColor(&NegColor);
 	mTransparency->SetValue(Transparency);
 
-	mColorSurfCheck->SetValue(UseMEP);
-	mUseRGBColorCheck->SetValue(UseRGBSurfaceColor);
-	if (UseMEP) {
-		mUseRGBColorCheck->Enable();
-		if (UseRGBSurfaceColor) mInvertRGBCheck->Enable();
-		else mInvertRGBCheck->Disable();
-		mMaxMapEdit->Enable();
+	MoleculeData * data = owner->GetMoleculeData();
+	if (data->MEPCalculationPossible()) {
+		mColorSurfCheck->SetValue(UseMEP);
+		mUseRGBColorCheck->SetValue(UseRGBSurfaceColor);
+		if (UseMEP) {
+			mUseRGBColorCheck->Enable();
+			if (UseRGBSurfaceColor) mInvertRGBCheck->Enable();
+			else mInvertRGBCheck->Disable();
+			mMaxMapEdit->Enable();
+		} else {
+			mUseRGBColorCheck->Disable();
+			mInvertRGBCheck->Disable();
+			mMaxMapEdit->Disable();
+		}
+		SetMaxMEPValueText();
 	} else {
+		UseMEP = false;
+		mColorSurfCheck->Disable();
 		mUseRGBColorCheck->Disable();
 		mInvertRGBCheck->Disable();
 		mMaxMapEdit->Disable();
 	}
-	SetMaxMEPValueText();
 	mNumGridPntSld->SetValue(NumGridPoints);
 	mGridSizeSld->SetValue((short)(100*GridSize));
 
@@ -3428,7 +3437,7 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 					lProgress->SetBaseValue((long)(100*i/NumFrames + 90.0*MEPScale/NumFrames));
 					lProgress->SetScaleFactor((float) 0.1*MEPScale/NumFrames);
 					if (updateContour) lSurf->Contour3DGrid(lProgress);
-					if (updateMEP) {
+					if (updateMEP && data->MEPCalculationPossible()) {
 						lProgress->ChangeText("Calculating MEP values...");
 						lProgress->SetBaseValue(100*i/NumFrames + 50/NumFrames);
 						lProgress->SetScaleFactor(0.5/NumFrames);
@@ -3458,7 +3467,7 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 				lProgress->SetScaleFactor(0.1*MEPScale);
 				mTarget->Contour3DGrid(lProgress);
 			}
-			if (updateMEP) {
+			if (updateMEP && data->MEPCalculationPossible()) {
 				lProgress->ChangeText("Calculating MEP values...");
 				lProgress->SetBaseValue(50);
 				lProgress->SetScaleFactor(0.5);
@@ -3479,25 +3488,6 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	else
 		mFreeMemBut->Disable();
 
-	/*	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DFreeMem, target->GridAvailable());
-	//Setup the contour value and grid max text items
-	short	itemtype;
-	Handle	itemhandle;
-	Rect	itemrect;
-	GetDialogItem(SurfaceDlg, kSurfBaseItems+kTE3DValue, &itemtype, &itemhandle, &itemrect);
-	float ContourValue = target->GetContourValue(), GridMax = target->GetGridMax();
-	Str255	itemText;
-	sprintf((char *) &(itemText[1]), "%.4f", ContourValue);
-	itemText[0] = strlen((char *) &(itemText[1]));
-	SetDialogItemText(itemhandle, itemText);
-	GetDialogItem(SurfaceDlg, kSurfBaseItems+kTE3DMaxValue, &itemtype, &itemhandle, &itemrect);
-	sprintf((char *) &(itemText[1]), "%.4f", GridMax);
-	itemText[0] = strlen((char *) &(itemText[1]));
-	SetDialogItemText(itemhandle, itemText);
-	UpdateTest = false;
-	SetupContourSlider();
-	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DExportButton, target->ExportPossible());
-	*/
 	SetContourMaxValueText();
 	setContourValueSld();
 	UpdateTest = false;

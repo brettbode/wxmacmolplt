@@ -55,7 +55,7 @@ void TEDensity3DSurface::Update(MoleculeData * MainData) {
 			lProgress->SetBaseValue((long)(90*MEPScale));
 			lProgress->SetScaleFactor(0.1*MEPScale);
 			Contour3DGrid(lProgress);
-			if (ColorByValue()) {
+			if (ColorByValue() && MainData->MEPCalculationPossible()) {
 				lProgress->ChangeText("Calculating MEP values...");
 				lProgress->SetBaseValue(50);
 				lProgress->SetScaleFactor(0.5);
@@ -69,19 +69,11 @@ void MEP2DSurface::Update(MoleculeData * MainData) {
 	if (Visible) {
 		if (GetRotate2DMap()) SetPlaneToScreenPlane(MainData);
 			Progress * lProgress = new Progress();
-#ifndef __wxBuild__
-			CGrafPtr	lSavedPort;
-			GDHandle	lSavedGDH;
-		GetGWorld (&lSavedPort, &lSavedGDH);
-#endif
 		if (lProgress) {
 			lProgress->ChangeText("Calculating 2D Grid...");
 			CalculateMOGrid(MainData, lProgress);
 			delete lProgress;
 		}
-#ifndef __wxBuild__
-		SetGWorld (lSavedPort, lSavedGDH);
-#endif
 	}
 }
 void MEP3DSurface::Update(MoleculeData * MainData) {

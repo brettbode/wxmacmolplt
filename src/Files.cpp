@@ -1003,6 +1003,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		}
 		else 
 			BasisDone = true;
+		MainData->Basis->NuclearChargesAreValid(true);
 	}
 	// now look for Alpha Coefficients (Orbitals; depends on BasisSet)
 	if (BasisDone&&(Buffer->LocateKeyWord("$COEFF_ALPHA", 12))) {
@@ -2024,13 +2025,13 @@ long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
 	for (atom=0; atom<cFrame->NumAtoms; ++atom) zcore[atom]=0;
 	
 	long StartPos = Buffer->GetFilePos();
-	if (!Buffer->LocateKeyWord("THE ECP RUN REMOVES", 19, -1)) {
+	if (!Buffer->LocateKeyWord("CP RUN REMOVES", 14, -1)) {
 		delete [] zcore;
 		return 0;
 	}
 	long EndPos = Buffer->GetFilePos();
 	Buffer->GetLine(LineText);	//read in the number of electrons removed
-	sscanf(&(LineText[20]),"%ld", &ElectronsRemoved);
+	sscanf(&(LineText[15]),"%ld", &ElectronsRemoved);
 
 		//Now read in the number of protons removed from each atom
 	Buffer->SetFilePos(StartPos);
@@ -2064,7 +2065,8 @@ long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
 	}
 	delete [] zcore;
 	if (ProtonsRemoved != ElectronsRemoved) {
-		MessageAlert("Parse Error while reading ECP Potential Data. Use with caution!");
+		Basis->NuclearChargesAreValid(false);
+//		MessageAlert("Parse Error while reading ECP Potential Data. Use with caution!");
 	}
 	return ElectronsRemoved;
 }
@@ -2263,10 +2265,10 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			sscanf(&(LineText[LinePos]),"%ld", &NumOccBeta);
 		}
 		LinePos = Buffer->GetFilePos();
-			//Check for ECP type run which reduces the number of occupied orbitals
-		if (Buffer->LocateKeyWord("THE ECP RUN REMOVES", 19, EnergyPos)) {
+			//Check for ECP/MCP type run which reduces the number of occupied orbitals
+		if (Buffer->LocateKeyWord("CP RUN REMOVES", 14, EnergyPos)) {
 			Buffer->GetLine(LineText);	//read in the number of electrons removed
-			sscanf(&(LineText[20]),"%ld", &test);
+			sscanf(&(LineText[15]),"%ld", &test);
 			test /= 2;
 			NumOccAlpha -= test;
 			if (NumOccAlpha < 0) NumOccAlpha = 0;	//Oops!
@@ -2450,7 +2452,8 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		}
 		LinePos = Buffer->GetFilePos();
 			//Check for ECP type run which reduces the number of occupied orbitals
-		if (Buffer->LocateKeyWord("ECP POTENTIALS", 14, EnergyPos)) {
+		if (Buffer->LocateKeyWord("ECP POTENTIALS", 14, EnergyPos)||
+			Buffer->LocateKeyWord("MODEL-POTENTIALS", 16, EnergyPos)) {
 			test = MainData->ParseECPotentials(Buffer);
 			test /= 2;
 			NumOccAlpha -= test;

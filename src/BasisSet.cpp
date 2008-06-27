@@ -26,6 +26,7 @@ BasisSet::BasisSet(long nAtoms, long nShells) {
 	Shells.reserve(nShells);
 	NumShells = NumFuncs = 0;
 	MapLength = nAtoms;
+	goodCharges = false;
 	BasisMap.reserve(2*nAtoms);
 	NuclearCharge.reserve(nAtoms);
 	for (long i=0; i<nAtoms; i++) {

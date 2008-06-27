@@ -60,6 +60,7 @@ class BasisSet {
 		long			NumFuncs;			//Total # of funcs, that is the total number of
 											//of shells x the # of functions per shell (ie 1 for
 											//s, 3 for p,...) MOVectors are NumFuncsxNumFuncs
+		bool			goodCharges;		///< Are the nuclear charges valid (normally true!)
 
 	//member functions
 		BasisSet(long nAtoms, long nShells);
@@ -73,6 +74,14 @@ class BasisSet {
 		void Normalize(bool InputNormed, bool NormOutput);
 		static BasisSet * ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms, const mpAtom * Atoms);
 		bool ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms);
+		/**
+		 * Is the nuclear charge array valid?
+		 */
+		bool AreNuclearChargesValid(void) const {return goodCharges;};
+		/**
+		 * Set the flag to indicate if the nuclearCharge array is valid.
+		 */
+		void NuclearChargesAreValid(bool v) {goodCharges = v;};
 };
 
 #endif /* __BasisSet__ */

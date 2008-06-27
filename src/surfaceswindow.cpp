@@ -435,26 +435,26 @@ void SurfacesWindow::SurfaceUpdated(void) {
 	Parent->UpdateModelDisplay();
 }
 
-int SurfacesWindow::selectSurfaceType()
-{
+int SurfacesWindow::selectSurfaceType() {
 	std::vector<wxString> allOptions;
 	int numOptions = 2;
-	
-	if (mData->OrbSurfacePossible())
-    {
+
+	if (mData->OrbSurfacePossible()) {
 		allOptions.push_back(_T("2D Orbital"));
 		allOptions.push_back(_T("3D Orbital"));
 		numOptions += 2;
-    }
-	
-	if (mData->TotalDensityPossible())
-    {
+	}
+
+	if (mData->TotalDensityPossible()) {
 		allOptions.push_back(_T("2D Total Electron Density"));
 		allOptions.push_back(_T("3D Total Electron Density"));
+		numOptions += 2;
+	}
+	if (mData->MEPCalculationPossible()) {
 		allOptions.push_back(_T("2D Molecular Electrostatic Potential"));
 		allOptions.push_back(_T("3D Molecular Electrostatic Potential"));
-		numOptions += 4;
-    }
+		numOptions += 2;
+	}
 	
 	allOptions.push_back(_T("General 2D from File"));
 	allOptions.push_back(_T("General 3D from File"));
