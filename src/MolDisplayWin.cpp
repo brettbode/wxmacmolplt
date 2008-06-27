@@ -3521,10 +3521,10 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 				test = OpenMKLFile(Buffer);
 				break;
 			case MOPACarcFile:
-				test = OpenMOPACFile(Buffer, 'a');
+				test = OpenMOPACFile(Buffer, type);
 				break;
 			case MOPACmopFile:
-				test = OpenMOPACFile(Buffer, 'm');
+				test = OpenMOPACFile(Buffer, type);
 				break;
 			default:    //Should only get here for unknown file types.
 			{

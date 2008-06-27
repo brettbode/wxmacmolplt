@@ -68,7 +68,7 @@ void Surface::Draw2D(MoleculeData * /*lData*/, long /*hoffset*/, long /*voffset*
 }
 void Surface::Update(MoleculeData * /*lData*/) {
 }
-void Surface::Export(BufferFile * Buffer) {
+void Surface::Export(BufferFile * Buffer, exportFileType eft) {
 	Buffer->Write("Export not supported for the chosen surface type", true);
 }
 void Surface::RotateSurface(Matrix4D /*RotationMatrix*/) {
@@ -105,6 +105,20 @@ void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CP
 	}
 	if (ival) 	Buffer->PutText("\r");
 }
+
+void Surface::Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
+	float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
+	
+	printf("EXPORT 3D CCP4!\n");	//DEBUG CODE
+
+}
+
+void Surface::Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
+	float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
+
+	printf("EXPORT 3D CNS!\n");		//DEBUG CODE
+}
+
 void Surface::Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Origin,
 	const CPoint3D *XInc, const CPoint3D *YInc, const char * Label, BufferFile * Buffer) const {
 		char Line[kMaxLineLength];
@@ -207,7 +221,7 @@ void Surf2DBase::RotateSurface(Matrix4D RotationMatrix) {
 	Rotate3DOffset(RotationMatrix, YInc, &temp);
 	YInc = temp;
 }
-void Surf2DBase::Export(BufferFile * Buffer) {
+void Surf2DBase::Export(BufferFile * Buffer, exportFileType eft) {
 	float * lGrid;
 	char * label = GetLabel();
 #ifdef UseHandles
@@ -702,7 +716,7 @@ Surf3DBase::~Surf3DBase(void) {
 	FreeContour();
 	FreeGrid();
 }
-void Surf3DBase::Export(BufferFile * Buffer) {
+void Surf3DBase::Export(BufferFile * Buffer, exportFileType eft) {
 	float * lGrid;
 #ifdef UseHandles
 	HLock(Grid);
@@ -711,8 +725,22 @@ void Surf3DBase::Export(BufferFile * Buffer) {
 	lGrid = Grid;
 #endif
 	char * label = GetLabel();
-	Surface::Export3D(lGrid, NumXGridPoints, NumYGridPoints, NumZGridPoints, &Origin,
-		XGridInc, YGridInc, ZGridInc, label, Buffer);
+	// our text file type
+	if (eft == 0) {
+		Surface::Export3D(lGrid, NumXGridPoints, NumYGridPoints, NumZGridPoints, &Origin,
+			XGridInc, YGridInc, ZGridInc, label, Buffer);
+	}
+	// ccp4 file
+	else if (eft == CCP4FILE) {
+		Surface::Export3DCCP4(lGrid, NumXGridPoints, NumYGridPoints, NumZGridPoints, &Origin,
+			XGridInc, YGridInc, ZGridInc, label, Buffer);
+	}
+	// cns file
+	else if (eft == CNSFILE) {
+		Surface::Export3DCNS(lGrid, NumXGridPoints, NumYGridPoints, NumZGridPoints, &Origin,
+			XGridInc, YGridInc, ZGridInc, label, Buffer);
+	}
+		
 	/* if (label) delete [] label; */
 #ifdef UseHandles
 	HUnlock(Grid);

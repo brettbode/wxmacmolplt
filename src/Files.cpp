@@ -1368,7 +1368,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
   * valid BufferFile operations. Parsing code adapted from 
   * MoleculeData::ParseMOPACZMatrix.
 */
-long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, char fileType) {
+long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, TextFileType fileType) {
 	// buffer line for text to be scanned while parsing
 	char		Line[kMaxLineLength];
 	// placeholder for traversing file sections in Buffer
@@ -1390,7 +1390,7 @@ long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, char fileType) {
 	memset((void *)symbol, 0, (size_t)(4*sizeof(char)));
 	
 	// file is of type ARC
-	if (fileType == 'a'){
+	if (fileType == MOPACarcFile) {
 		// Get to the right part of the file
 		Buffer->LocateKeyWord("DATE:", 5);
 		Buffer->SkipnLines(1);
@@ -1398,7 +1398,7 @@ long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, char fileType) {
 		Buffer->SkipnLines(1);
 	}
 	// file is of type MOP
-	else if (fileType == 'm') 
+	else if (fileType == MOPACmopFile) 
 		// skip descriptions, MoPac parms and goto start of atoms
 		Buffer->SkipnLines(3);	
 	else

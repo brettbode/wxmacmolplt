@@ -68,7 +68,8 @@ class Surf1DBase : public Surface {
 	public:
 		Surf1DBase(void);
 		Surf1DBase(WinPrefs *);
-		virtual ~Surf1DBase(void);
+		virtual ~Surf1DBase(void);	
+		inline short GetDimensions(void) const {return 1;};
 		inline void GetPosColor(RGBColor *temp) const {*temp=PosColor;};
 		inline void SetPosColor(const RGBColor *newColor) {PosColor=*newColor;};
 		inline void GetNegColor(RGBColor *temp) const {*temp=NegColor;};
@@ -77,7 +78,7 @@ class Surf1DBase : public Surface {
 		void SetNumGridPoints(long newNum);
 		inline bool GridAvailable(void) const {return (Grid!=NULL);};
 		virtual bool ExportPossible(void) const {return GridAvailable();};
-		virtual void Export(BufferFile * Buffer);
+		virtual void Export(BufferFile * Buffer, exportFileType eft);
 		inline void FreeGrid(void) {
 			if (Grid) {
 				delete [] Grid;
@@ -113,6 +114,7 @@ class Surf2DBase : public Surface {
 		Surf2DBase(WinPrefs * Prefs);
 		Surf2DBase(void);
 		virtual ~Surf2DBase(void);
+		inline short GetDimensions(void) const {return 2;};
 		inline bool GetShowZeroContour(void) const {return (SurfOptions&1);};
 		inline void SetShowZeroContour(bool state) {if (SurfOptions&1) SurfOptions--; if (state) SurfOptions++;};
 		inline bool GetRotate2DMap(void) const {return ((SurfOptions&2)!=0);};
@@ -147,7 +149,7 @@ class Surf2DBase : public Surface {
 		virtual void RotateSurface(Matrix4D RotationMatrix);
 		inline bool GridAvailable(void) const {return (Grid!=NULL);};
 		virtual bool ExportPossible(void) const {return GridAvailable();};
-		virtual void Export(BufferFile * Buffer);
+		virtual void Export(BufferFile * Buffer, exportFileType eft);
 		void Write2DXML(XMLElement * parent, bool writeGrid) const;
 		void Read2DXML(XMLElement * sxml);
 		inline void FreeGrid(void) {
@@ -232,6 +234,7 @@ class Surf3DBase : public Surface {
 		Surf3DBase(WinPrefs * Prefs);
 		Surf3DBase(void);
 		virtual ~Surf3DBase(void);
+		inline short GetDimensions(void) const {return 3;};
 		inline float GetContourValue(void) const {return ContourValue;};
 		inline float GetGridSize(void) const {return GridSize;};
 		inline void SetContourValue(float newValue) {if (newValue>0) ContourValue = newValue;};
@@ -338,7 +341,7 @@ class Surf3DBase : public Surface {
 		void AllocateNormals(long NumPoints);
 		inline bool ContourAvail(void) const {return (ContourHndl != NULL);};
 		virtual bool ExportPossible(void) const {return GridAvailable();};
-		virtual void Export(BufferFile * Buffer);
+		virtual void Export(BufferFile * Buffer, exportFileType eft);
 		virtual void RotateSurface(Matrix4D RotationMatrix);
 #ifdef UseOpenGL
 		void SetSurfaceColor(const float & surfaceValue, const RGBColor * pColor, const RGBColor * nColor, float & red, float & green, float & blue) const; //Pass the value/Max, does not need to between 1 and -1

@@ -529,7 +529,7 @@ class MolDisplayWin : public wxFrame {
 		 \param Buffer The buffer connected to the MOP file.
 		 \param fileType char designating which file extension is used
 		 */
-		long OpenMOPACFile(BufferFile * Buffer, char fileType);
+		long OpenMOPACFile(BufferFile * Buffer, TextFileType fileType);
 		/**
 		 Output the coordinates in gamess input format ($DATA and $EFRAG group).
 		 If AllFrames then a series of $DATA groups will be output for the user to divide as needed.

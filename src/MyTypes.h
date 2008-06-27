@@ -611,13 +611,27 @@ class Surface {
 		bool		Visible;
 		bool		has_default_label;
 
+		// exports to (our) text file type
 		void Export3D(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
+			float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const;
+		// exports to CCP4 file type
+		void Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
+			float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const;
+		// exports to CNS file type
+		void Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
 			float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const;
 		void Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Origin,
 			const CPoint3D *XInc, const CPoint3D *YInc, const char * Label, BufferFile * Buffer) const;
 	public:
+		enum exportFileType {
+			TXTFILE,
+			CCP4FILE,
+			CNSFILE		
+		};
+
 		Surface(void);
 		virtual ~Surface(void);
+		virtual short GetDimensions(void) const=0;
 		Surface * GetNextSurface(void) const {return NextSurface;};
 		void SetNextSurface(Surface * target) {NextSurface = target;}
 		virtual char *GetLabel(void);
@@ -641,7 +655,7 @@ class Surface {
 		virtual bool ReadXML(XMLElement * parent);
 		static Surface * ReadSurface(XMLElement * parent);
 		long WriteSurface(BufferFile * Buffer);
-		virtual void Export(BufferFile * Buffer);
+		virtual void Export(BufferFile * Buffer, exportFileType eft);
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer) {
 			return 0;
 		}

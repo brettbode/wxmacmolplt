@@ -360,25 +360,60 @@ void BaseSurfacePane::OnGridPointSld( wxCommandEvent &event ) {
 void BaseSurfacePane::OnExport( wxCommandEvent &event ) {
 	FILE *currFile = NULL;
 	BufferFile *buffer = NULL;
-
+	wxString dropFilter;
+	wxFileName fileName;
+	wxString filePath;
+/*	
+ 	// TODO need to fix extensions, especially .txt
 	wxString filePath = wxFileSelector(wxT("Export As"), wxT(""), wxT(""),
-			wxT(""), wxT("*.*"),
+			wxT(""), wxT("CCP4 file (*.ccp4)|*.ccp4|CNS file (*.CNS)|*.cns|text file (*.txt)|*.txt"),
 #if wxCHECK_VERSION(2,9,0)
 			wxFD_SAVE | wxFD_OVERWRITE_PROMPT,
 #else
 			wxSAVE | wxOVERWRITE_PROMPT,
 #endif
 			owner);
+*/
+	// get filename from filePath (TODO: txt is dummy; should be replaced)
+	if(mTarget->GetDimensions() == 3)
+		dropFilter = wxT("text file (*.txt)|*.txt|CCP4 file (*.CCP4)|*.ccp4|CNS file (*.CNS)|*.cns");
+	else
+		dropFilter = wxT("text file (*.txt)|*.txt");
+	
+	wxFileDialog wfd(owner, wxT("Export As"), wxT(""), wxT(""), dropFilter,
+#if wxCHECK_VERSION(2,9,0)
+			wxFD_SAVE | wxFD_OVERWRITE_PROMPT
+#else
+			wxSAVE | wxOVERWRITE_PROMPT
+#endif 
+	);
 
-	if(!filePath.IsEmpty()) {
+	if (wfd.ShowModal()==wxID_OK) {
+		filePath = wfd.GetPath();
+	}
+
+	// Generalize out
+	if (!filePath.IsEmpty()) {
 		if((currFile = fopen(filePath.mb_str(wxConvUTF8), "wb")) == NULL) {
 			MessageAlert("Unable to open the file for output.");
 			return;
 		}
 		try {
 			buffer = new BufferFile(currFile, true);
-
-			mTarget->Export(buffer);
+			switch (wfd.GetFilterIndex()) {
+				case 0:
+					// txt file
+					mTarget->Export(buffer, Surface::TXTFILE);
+				break;
+				case 1:
+					// ccp4 file
+					mTarget->Export(buffer, Surface::CCP4FILE);
+				break;
+				case 2:
+					// cns file
+					mTarget->Export(buffer, Surface::CNSFILE);
+				break;
+			}
 		}
 		catch (...) {
 			MessageAlert("Error attempting to write file.");
