@@ -621,6 +621,7 @@ public:
 ////@end InputBuilderWindow member variables
 
     InputData * TmpInputRec;
+	wxBoxSizer *button_sizer;
     
     wxWindow *tab[NUM_PANES];
     wxString  tabText[NUM_PANES];

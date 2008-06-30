@@ -1389,24 +1389,24 @@ void InputBuilderWindow::CreateControls()
 
 	itemBoxSizer4->Add(listBook, 1, wxGROW|wxALL, 2);
 
-	wxBoxSizer* itemBoxSizer220 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer4->Add(itemBoxSizer220, 0, wxGROW, 5);
+	button_sizer = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer4->Add(button_sizer, 0, wxGROW, 5);
 
 	defaultsBtn = new wxButton( itemPanel3, ID_DEFAULTSBUTTON, _("Use Defaults"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer220->Add(defaultsBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	button_sizer->Add(defaultsBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	revertBtn = new wxButton( itemPanel3, ID_REVERTBUTTON, _("Revert"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer220->Add(revertBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	button_sizer->Add(revertBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
     advanced_button = new wxButton(itemPanel3, ID_ADVANCEDBUTTON, _("Basic"), wxDefaultPosition, wxDefaultSize, 0);
-	itemBoxSizer220->Add(advanced_button, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+	button_sizer->Add(advanced_button, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
 
 	writeBtn = new wxButton( itemPanel3, ID_WRITEFILEBUTTON, _("Write File"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer220->Add(writeBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
+	button_sizer->Add(writeBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
 	wxStdDialogButtonSizer* itemStdDialogButtonSizer224 = new wxStdDialogButtonSizer;
 
-	itemBoxSizer220->Add(itemStdDialogButtonSizer224, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	button_sizer->Add(itemStdDialogButtonSizer224, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 	wxButton* itemButton225 = new wxButton( itemPanel3, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemStdDialogButtonSizer224->AddButton(itemButton225);
 
@@ -2620,11 +2620,15 @@ void InputBuilderWindow::OnAdvancedButtonClicked( wxCommandEvent& event )
 	
 	// User wants to go to basic mode.
 	else {
+		listBook->SetSelection(1);
 		advanced_button->SetLabel(wxT("Advanced"));
 		for (int i = DATA_PANE; i <= SUMMARY_PANE; ++i) {
 			setPaneVisible(i, false);
 		}
 	}
+
+	advanced_button->SetSize(advanced_button->GetBestSize());
+	button_sizer->Layout();
 
 }
 
