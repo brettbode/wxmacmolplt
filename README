@@ -1,4 +1,4 @@
-wxMolPlt is a wxWidgets rewrite of MacMolPlt by Brett Bode's research group at
+wxMacMolPlt is a wxWidgets rewrite of MacMolPlt by Brett Bode's research group at
 Iowa State University. The source code to this program is released under the 
 terms of the license file in this directory.
 
@@ -10,7 +10,7 @@ of wxWidgets with OpenGL support enabled. wxWidgets 2.6 and later should work.
 Prebuilt packages should also work. We have tested against the version 2.6.3
 prebuilt package within Debain and found it to work.
 
-For further build instructions refer the the INSTALL file in this directory.
+For further build instructions refer the INSTALL file in this directory.
 
 An html manual is included that includes a quick walkthrough of the program's
 capabilities.
