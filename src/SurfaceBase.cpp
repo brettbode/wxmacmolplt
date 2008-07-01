@@ -73,9 +73,11 @@ void Surface::Export(BufferFile * Buffer, exportFileType eft) {
 }
 void Surface::RotateSurface(Matrix4D /*RotationMatrix*/) {
 }
+// Exports surface data to our general text file type	
+// This can effectively only be called by Surf3DBase objects
 void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
-	float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
-		char Line[kMaxLineLength];
+		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
+	char Line[kMaxLineLength];
 	if (!Grid3D) return;
 		//punch out the provided surface label
 	Buffer->PutText(Label);
@@ -105,18 +107,20 @@ void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CP
 	}
 	if (ival) 	Buffer->PutText("\r");
 }
-
+// Exports surface data to CCP4 file type	
+// This can effectively only be called by Surf3DBase objects
 void Surface::Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
-	float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
-	
-	printf("EXPORT 3D CCP4!\n");	//DEBUG CODE
+		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
 
 }
 
+// Exports surface data to CNS file type	
+// This can effectively only be called by Surf3DBase objects
 void Surface::Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
-	float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
+		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
 
-	printf("EXPORT 3D CNS!\n");		//DEBUG CODE
+	char Line[kMaxLineLength];
+	if(!Grid3D) return;
 }
 
 void Surface::Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Origin,
