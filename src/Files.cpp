@@ -2025,6 +2025,7 @@ long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
 	for (atom=0; atom<cFrame->NumAtoms; ++atom) zcore[atom]=0;
 	
 	long StartPos = Buffer->GetFilePos();
+	//This works for both ECPs and MCPs
 	if (!Buffer->LocateKeyWord("CP RUN REMOVES", 14, -1)) {
 		delete [] zcore;
 		return 0;
@@ -2035,29 +2036,48 @@ long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
 
 		//Now read in the number of protons removed from each atom
 	Buffer->SetFilePos(StartPos);
-	while (Buffer->LocateKeyWord("PARAMETERS FOR", 14, EndPos)) {
-		Buffer->GetLine(LineText);
-		LinePos = FindKeyWord(LineText, "ON ATOM", 7)+7;
-		sscanf(&(LineText[LinePos]), "%ld", &atom);
-		atom--;
-		if (atom>=0 && atom<cFrame->NumAtoms) {
-			LinePos = FindKeyWord(LineText, "WITH ZCORE", 10)+10;
-			if (LinePos>=10) {
-				sscanf(&(LineText[LinePos]), "%ld", &(zcore[atom]));
-				if (zcore[atom]>0 && zcore[atom] <= cFrame->Atoms[atom].GetNuclearCharge()) {
-					Basis->NuclearCharge[atom] -= zcore[atom];
-					ProtonsRemoved += zcore[atom];
-				}
-			} else {
-				LinePos = FindKeyWord(LineText, "ARE THE SAME AS ATOM", 20)+20;
-				if (LinePos>=20) {
-					long OtherAtom;
-					sscanf(&(LineText[LinePos]), "%ld", &OtherAtom);
-					OtherAtom --;
-					if (OtherAtom>=0 && OtherAtom<atom) {
-						zcore[atom] = zcore[OtherAtom];
+	if (Buffer->LocateKeyWord("MODEL-POTENTIALS", 16, EndPos)) {
+		while (Buffer->LocateKeyWord("THE MCP PLACED ON ATOM", 22, EndPos)) {
+			Buffer->GetLine(LineText);
+			LinePos = FindKeyWord(LineText, "ON ATOM", 7)+7;
+			sscanf(&(LineText[LinePos]), "%ld", &atom);
+			atom--;
+			if (atom>=0 && atom<cFrame->NumAtoms) {
+				LinePos = FindKeyWord(LineText, "REMOVES ZCORE=", 14)+14;
+				if (LinePos>=14) {
+					sscanf(&(LineText[LinePos]), "%ld", &(zcore[atom]));
+					if (zcore[atom]>0 && zcore[atom] <= cFrame->Atoms[atom].GetNuclearCharge()) {
 						Basis->NuclearCharge[atom] -= zcore[atom];
 						ProtonsRemoved += zcore[atom];
+					}
+				}
+			}
+		}
+	} else {
+		while (Buffer->LocateKeyWord("PARAMETERS FOR", 14, EndPos)) {
+			Buffer->GetLine(LineText);
+			LinePos = FindKeyWord(LineText, "ON ATOM", 7)+7;
+			sscanf(&(LineText[LinePos]), "%ld", &atom);
+			atom--;
+			if (atom>=0 && atom<cFrame->NumAtoms) {
+				LinePos = FindKeyWord(LineText, "WITH ZCORE", 10)+10;
+				if (LinePos>=10) {
+					sscanf(&(LineText[LinePos]), "%ld", &(zcore[atom]));
+					if (zcore[atom]>0 && zcore[atom] <= cFrame->Atoms[atom].GetNuclearCharge()) {
+						Basis->NuclearCharge[atom] -= zcore[atom];
+						ProtonsRemoved += zcore[atom];
+					}
+				} else {
+					LinePos = FindKeyWord(LineText, "ARE THE SAME AS ATOM", 20)+20;
+					if (LinePos>=20) {
+						long OtherAtom;
+						sscanf(&(LineText[LinePos]), "%ld", &OtherAtom);
+						OtherAtom --;
+						if (OtherAtom>=0 && OtherAtom<atom) {
+							zcore[atom] = zcore[OtherAtom];
+							Basis->NuclearCharge[atom] -= zcore[atom];
+							ProtonsRemoved += zcore[atom];
+						}
 					}
 				}
 			}
