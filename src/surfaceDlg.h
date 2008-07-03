@@ -189,22 +189,22 @@ class FormattedListBox : public wxHtmlListBox {
 	private:
 		std::vector<wxString> items;
 
-	DECLARE_DYNAMIC_CLASS(FormattedListBox)
-	DECLARE_NO_COPY_CLASS(FormattedListBox)
+	/* DECLARE_DYNAMIC_CLASS(FormattedListBox) */
+	/* DECLARE_NO_COPY_CLASS(FormattedListBox) */
 	DECLARE_EVENT_TABLE()
 };
 
 class BaseSurfacePane : public wxPanel
 {
-	DECLARE_CLASS(BaseSurfacePane)
+	/* DECLARE_CLASS(BaseSurfacePane) */
 
 public:
 
 	BaseSurfacePane() {}
-	BaseSurfacePane( wxWindow* parent, Surface * target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+	BaseSurfacePane(wxWindow* parent, Surface * target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
 	~BaseSurfacePane();
 
-	bool Create( wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+	bool Create(wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
 
 	virtual void TargetToPane() = 0;	//< Call to update the display with new data in the target surface.
 	virtual void refreshControls() = 0;	//< Updates the control state, call when data changes.
@@ -232,19 +232,19 @@ public:
 	void PageIsNowActive(void);
 	Surface * GetTargetSurface(void) const {return mTarget;};	//< Return a pointer to the surface data.
 
-	void OnGridPointSld( wxCommandEvent &event );	//< Call back when the grid points slider is changed.
+	void OnGridPointSld(wxCommandEvent &event);	//< Call back when the grid points slider is changed.
 	/**
 	 * Call back for the Set Param button.
 	 * Displays the appropriate surface parameters dialog.
 	 */
-	void OnSetParam( wxCommandEvent &event );
+	void OnSetParam(wxCommandEvent &event);
 	/**
 		Call back for the Export button.
 		Prompts the user for a file name, then exports the surface to that file.
 	 */
-	void OnExport( wxCommandEvent &event );
+	void OnExport(wxCommandEvent &event);
 	void BuildOrbSetPopup(void);
-	void OnOrbSetChoice( wxCommandEvent &event );
+	void OnOrbSetChoice(wxCommandEvent &event);
 
 protected:
 	wxBoxSizer* mainSizer;	//< A primary BoxSizer for the page.
@@ -312,28 +312,27 @@ class OrbSurfacePane {
  * 2D class declaration
  */
 
-class Surface2DPane : public BaseSurfacePane
-{
-  DECLARE_CLASS(Surface2DPane)
+class Surface2DPane : public BaseSurfacePane {
+  /* DECLARE_CLASS(Surface2DPane) */
 
  public:
   Surface2DPane() {}
-  Surface2DPane( wxWindow* parent, Surf2DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style );
+  Surface2DPane(wxWindow* parent, Surf2DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
   ~Surface2DPane();
 
   void OnPosColorChange(wxCommandEvent & event);
   void OnNegColorChange(wxCommandEvent & event);
-  void OnShowZeroChk( wxCommandEvent &event );
-  void OnDashChk(wxCommandEvent& event );
-  void OnUsePlaneChk( wxCommandEvent &event );
-  void OnDisplayPlaneChk( wxCommandEvent &event );
-  void OnContourValueText( wxCommandEvent &event );
+  void OnShowZeroChk(wxCommandEvent &event);
+  void OnDashChk(wxCommandEvent& event);
+  void OnUsePlaneChk(wxCommandEvent &event);
+  void OnDisplayPlaneChk(wxCommandEvent &event);
+  void OnContourValueText(wxCommandEvent &event);
   void SetContourValueText(void);
-  void OnNumContoursText( wxCommandEvent &event );
+  void OnNumContoursText(wxCommandEvent &event);
   void SetNumContoursText(void);
-  void OnIdle( wxIdleEvent& WXUNUSED(event) );
-  void OnSetPlane( wxCommandEvent &event );
-  void OnSetParam( wxCommandEvent &event );
+  void OnIdle(wxIdleEvent& WXUNUSED(event));
+  void OnSetPlane(wxCommandEvent &event);
+  void OnSetParam(wxCommandEvent &event);
 
  protected:
 
@@ -364,34 +363,34 @@ class Surface2DPane : public BaseSurfacePane
 
   Surf2DBase* mTarget;
 
-  //DECLARE_EVENT_TABLE()
+  DECLARE_EVENT_TABLE()
 };
 
 
-class Surface3DPane : public BaseSurfacePane
-{
-  DECLARE_CLASS(Surface3DPane)
+class Surface3DPane : public BaseSurfacePane {
+  /* DECLARE_CLASS(Surface3DPane) */
 
 public:
   Surface3DPane() {}
 
-  Surface3DPane( wxWindow* parent, Surf3DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style );
+  Surface3DPane(wxWindow* parent, Surf3DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
   ~Surface3DPane();
 
-  void On3DRadioBox (wxCommandEvent& event );
-  void OnSmoothCheck (wxCommandEvent& event );
-  /* void OnContourValueEnter(wxCommandEvent& event ); */
-  void OnFreeMem(wxCommandEvent& event );
+  void On3DRadioBox(wxCommandEvent& event);
+  void OnSmoothCheck(wxCommandEvent& event);
+  void OnContourValueEnter(wxCommandEvent& event);
+  virtual void OnUpdate(wxCommandEvent& event) = 0;
+  void OnFreeMem(wxCommandEvent& event);
   void OnPosColorChange(wxCommandEvent & event);
   void OnNegColorChange(wxCommandEvent & event);
   void OnTransparencyChange(wxSpinEvent & event);
-  void OnIdle( wxIdleEvent& WXUNUSED(event) );
-  void OnSetParam( wxCommandEvent &event );
-  void OnGridSizeSld(wxCommandEvent &event );
+  void OnIdle(wxIdleEvent& WXUNUSED(event));
+  void OnSetParam(wxCommandEvent &event);
+  void OnGridSizeSld(wxCommandEvent &event);
 
   void setContourValueSld();
   void SetContourValueText(void);
-  void OnContourValueSld(wxCommandEvent &event );
+  void OnContourValueSld(wxCommandEvent &event);
   void SetContourMaxValueText(void);
 
 protected:
@@ -421,32 +420,32 @@ protected:
 
   Surf3DBase* mTarget;
 
-  //DECLARE_EVENT_TABLE()
+  DECLARE_EVENT_TABLE()
 }; 
 
 class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane {    
-  DECLARE_CLASS( Orbital2DSurfPane )
+  /* DECLARE_CLASS(Orbital2DSurfPane) */
 
  public:
     /// Constructors
     Orbital2DSurfPane() { }
-    Orbital2DSurfPane( wxWindow* parent, Orb2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL2D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL2D_POSITION, const wxSize& size = SYMBOL_ORBITAL2D_SIZE, long style = SYMBOL_ORBITAL2D_STYLE );
+    Orbital2DSurfPane(wxWindow* parent, Orb2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL2D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL2D_POSITION, const wxSize& size = SYMBOL_ORBITAL2D_SIZE, long style = SYMBOL_ORBITAL2D_STYLE);
     ~Orbital2DSurfPane();
 
     virtual void TargetToPane();
     virtual void refreshControls();
 
-    void OnOrbSetChoice( wxCommandEvent &event );
-    void OnMOList( wxCommandEvent &event );
-    void OnOrbFormatChoice( wxCommandEvent &event );
-    void OnReversePhase(wxCommandEvent &event );
-    void OnSphHarmonicChk(wxCommandEvent &event );
-    void OnCoefList( wxCommandEvent &event );
+    void OnOrbSetChoice(wxCommandEvent &event);
+    void OnMOList(wxCommandEvent &event);
+    void OnOrbFormatChoice(wxCommandEvent &event);
+    void OnReversePhase(wxCommandEvent &event);
+    void OnSphHarmonicChk(wxCommandEvent &event);
+    void OnCoefList(wxCommandEvent &event);
 
  private:
     virtual bool UpdateNeeded(void);
     void CreateControls();
-    void OnUpdate(wxCommandEvent &event );
+    void OnUpdate(wxCommandEvent &event);
 
     wxBoxSizer* upperSizer;
     wxBoxSizer* middleSizer;
@@ -475,12 +474,12 @@ class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane {
 
 class Orbital3DSurfPane : public Surface3DPane, public OrbSurfacePane
 {    
-  DECLARE_CLASS( Orbital3DSurfPane )
+  /* DECLARE_CLASS(Orbital3DSurfPane) */
 
 public:
     /// Constructors
     Orbital3DSurfPane() { }
-    Orbital3DSurfPane( wxWindow* parent, Orb3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    Orbital3DSurfPane(wxWindow* parent, Orb3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
     ~Orbital3DSurfPane();
 
     virtual void TargetToPane();
@@ -489,23 +488,23 @@ public:
     /// Creates the controls and sizers
     void CreateControls();
 
-    void OnOrbFormatChoice( wxCommandEvent &event );
-    void OnMOList( wxCommandEvent &event );
-    void OnOrbSetChoice( wxCommandEvent &event );
-    void OnSphHarmonicChk(wxCommandEvent &event );
-    void OnReversePhase(wxCommandEvent &event );
-    void OnContourValueSld(wxCommandEvent &event );
-    void OnGridSizeSld(wxCommandEvent &event );
-    void OnUpdate(wxCommandEvent &event );
-    void OnCoefList( wxCommandEvent &event );
+    void OnOrbFormatChoice(wxCommandEvent &event);
+    void OnMOList(wxCommandEvent &event);
+    void OnOrbSetChoice(wxCommandEvent &event);
+    void OnSphHarmonicChk(wxCommandEvent &event);
+    void OnReversePhase(wxCommandEvent &event);
+    void OnContourValueSld(wxCommandEvent &event);
+    void OnGridSizeSld(wxCommandEvent &event);
+    void OnUpdate(wxCommandEvent &event);
+    void OnCoefList(wxCommandEvent &event);
 
 ////@begin Orbital3D member function declarations
 
     /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+    wxBitmap GetBitmapResource(const wxString& name);
 
     /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+    wxIcon GetIconResource(const wxString& name);
 ////@end Orbital3D member function declarations
 
     /// Should we show tooltips?
@@ -544,12 +543,12 @@ public:
 
 class General3DSurfPane : public Surface3DPane
 {    
-	DECLARE_CLASS( General3DSurfPane )
+	/* DECLARE_CLASS(General3DSurfPane) */
 	
 public:
     /// Constructors
     General3DSurfPane() { }
-    General3DSurfPane( wxWindow* parent, General3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    General3DSurfPane(wxWindow* parent, General3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
     ~General3DSurfPane();
 	
     virtual void TargetToPane();
@@ -559,10 +558,10 @@ public:
     void CreateControls();
 
     /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+    wxBitmap GetBitmapResource(const wxString& name);
 	
     /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+    wxIcon GetIconResource(const wxString& name);
 	
     /// Should we show tooltips?
     static bool ShowToolTips();
@@ -579,11 +578,11 @@ private:
 	/// Prompts the user for the file and then attempts to read it in.
 	void OnFileButton(wxCommandEvent &event);
 	/// Call back function for when the Update button is pressed.
-	void OnUpdate(wxCommandEvent &event );
+	void OnUpdate(wxCommandEvent &event);
 	/// Call back function for changes in the counter value slider.
-    void OnContourValueSld(wxCommandEvent &event );
+    void OnContourValueSld(wxCommandEvent &event);
 	/// Call back function for when the text field is changed.
-	void OnMultValueEdit(wxCommandEvent& event );
+	void OnMultValueEdit(wxCommandEvent& event);
 	
     wxCheckBox* mMultCheck;
     wxTextCtrl* mGenMultValue;
@@ -602,12 +601,12 @@ private:
 
 class General2DSurfPane : public Surface2DPane
 {    
-	DECLARE_CLASS( General3DSurfPane )
+	/* DECLARE_CLASS(General3DSurfPane) */
 	
 public:
     /// Constructors
     General2DSurfPane() { }
-    General2DSurfPane( wxWindow* parent, General2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    General2DSurfPane(wxWindow* parent, General2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
     ~General2DSurfPane();
 	
     virtual void TargetToPane();
@@ -617,10 +616,10 @@ public:
     void CreateControls();
 	
     /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+    wxBitmap GetBitmapResource(const wxString& name);
 	
     /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+    wxIcon GetIconResource(const wxString& name);
 	
     /// Should we show tooltips?
     static bool ShowToolTips() {return true;};
@@ -631,8 +630,8 @@ private:
 	void OnMultCheck(wxCommandEvent &event);
 	void OnSquareCheck(wxCommandEvent &event);
 	void OnFileButton(wxCommandEvent &event);
-	void OnUpdate(wxCommandEvent &event );
-	void OnMultValueEnter(wxCommandEvent& event );
+	void OnUpdate(wxCommandEvent &event);
+	void OnMultValueEnter(wxCommandEvent& event);
 	void SetMultValue(void);
 	
     wxCheckBox* mMultCheck;
@@ -650,12 +649,12 @@ private:
 
 class TEDensity2DSurfPane : public Surface2DPane
 {    
-	DECLARE_CLASS( TEDensity2DSurfPane )
+	/* DECLARE_CLASS(TEDensity2DSurfPane) */
 	
 public:
     /// Constructors
     TEDensity2DSurfPane() { }
-    TEDensity2DSurfPane( wxWindow* parent, TEDensity2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_TED2D_IDNAME, const wxPoint& pos = SYMBOL_TED2D_POSITION, const wxSize& size = SYMBOL_TED2D_SIZE, long style = SYMBOL_TED2D_STYLE );
+    TEDensity2DSurfPane(wxWindow* parent, TEDensity2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_TED2D_IDNAME, const wxPoint& pos = SYMBOL_TED2D_POSITION, const wxSize& size = SYMBOL_TED2D_SIZE, long style = SYMBOL_TED2D_STYLE);
     ~TEDensity2DSurfPane();
 	
     virtual void TargetToPane();
@@ -665,10 +664,10 @@ public:
     void CreateControls();
 	
     /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+    wxBitmap GetBitmapResource(const wxString& name);
 	
     /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+    wxIcon GetIconResource(const wxString& name);
 	
     /// Should we show tooltips?
     static bool ShowToolTips() {return true;};
@@ -676,7 +675,7 @@ public:
 private:
 	virtual bool UpdateNeeded(void);
 
-	void OnUpdate(wxCommandEvent &event );
+	void OnUpdate(wxCommandEvent &event);
 
     TEDensity2DSurface*	mTarget;
 	
@@ -684,29 +683,29 @@ private:
 };
 class TEDensity3DSurfPane : public Surface3DPane
 {    
-	DECLARE_CLASS( TEDensity3DSurfPane )
+	/* DECLARE_CLASS(TEDensity3DSurfPane) */
 	
 public:
     /// Constructors
     TEDensity3DSurfPane() { }
-    TEDensity3DSurfPane( wxWindow* parent, TEDensity3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    TEDensity3DSurfPane(wxWindow* parent, TEDensity3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
     ~TEDensity3DSurfPane();
 	
     virtual void TargetToPane();
     virtual void refreshControls();
-	void OnUseMEPCheck(wxCommandEvent &event );
-	void OnRGBColorCheck(wxCommandEvent &event );
-	void OnInvertRGBCheck(wxCommandEvent &event );
-	void OnMaxMEPValueText(wxCommandEvent &event );
+	void OnUseMEPCheck(wxCommandEvent &event);
+	void OnRGBColorCheck(wxCommandEvent &event);
+	void OnInvertRGBCheck(wxCommandEvent &event);
+	void OnMaxMEPValueText(wxCommandEvent &event);
 	
     /// Creates the controls and sizers
     void CreateControls();
 	
     /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+    wxBitmap GetBitmapResource(const wxString& name);
 	
     /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+    wxIcon GetIconResource(const wxString& name);
 	
     /// Should we show tooltips?
     static bool ShowToolTips() {return true;};
@@ -714,7 +713,7 @@ public:
 private:
 		virtual bool UpdateNeeded(void);
 	
-	void OnUpdate(wxCommandEvent &event );
+	void OnUpdate(wxCommandEvent &event);
 	void SetMaxMEPValueText(void);
 	
 	wxCheckBox*	mColorSurfCheck;
@@ -734,12 +733,12 @@ private:
 };
 class MEP2DSurfPane : public Surface2DPane
 {    
-	DECLARE_CLASS( MEP2DSurfPane )
+	/* DECLARE_CLASS(MEP2DSurfPane) */
 	
 public:
     /// Constructors
     MEP2DSurfPane() { }
-    MEP2DSurfPane( wxWindow* parent, MEP2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    MEP2DSurfPane(wxWindow* parent, MEP2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
     ~MEP2DSurfPane();
 	
     virtual void TargetToPane();
@@ -749,10 +748,10 @@ public:
     void CreateControls();
 	
     /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+    wxBitmap GetBitmapResource(const wxString& name);
 	
     /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+    wxIcon GetIconResource(const wxString& name);
 	
     /// Should we show tooltips?
     static bool ShowToolTips() {return true;};
@@ -760,7 +759,7 @@ public:
 private:
 		virtual bool UpdateNeeded(void);
 	
-	void OnUpdate(wxCommandEvent &event );
+	void OnUpdate(wxCommandEvent &event);
 	
     MEP2DSurface*	mTarget;
 	
@@ -768,12 +767,12 @@ private:
 };
 class MEP3DSurfPane : public Surface3DPane
 {    
-	DECLARE_CLASS( MEP3DSurfPane )
+	/* DECLARE_CLASS(MEP3DSurfPane) */
 	
 public:
     /// Constructors
     MEP3DSurfPane() { }
-    MEP3DSurfPane( wxWindow* parent, MEP3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE );
+    MEP3DSurfPane(wxWindow* parent, MEP3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
     ~MEP3DSurfPane();
 	
     virtual void TargetToPane();
@@ -783,18 +782,18 @@ public:
     void CreateControls();
 	
     /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+    wxBitmap GetBitmapResource(const wxString& name);
 	
     /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+    wxIcon GetIconResource(const wxString& name);
 	
     /// Should we show tooltips?
     static bool ShowToolTips() {return true;};
 	
 private:
-		virtual bool UpdateNeeded(void);
+	virtual bool UpdateNeeded(void);
 	
-	void OnUpdate(wxCommandEvent &event );
+	void OnUpdate(wxCommandEvent &event);
 
     MEP3DSurface*	mTarget;
 	
@@ -803,22 +802,22 @@ private:
 
 class Surface2DParamDlg : public wxFrame 
 {
-  DECLARE_CLASS(Surface2DParamDlg);
+  /* DECLARE_CLASS(Surface2DParamDlg); */
 
  public:
-  Surface2DParamDlg(BaseSurfacePane * parent, Surf2DBase * targetSurface, wxWindowID id = ID_2D_PARAM_DIALOG, const wxString& caption = SYMBOL_2D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE );
+  Surface2DParamDlg(BaseSurfacePane * parent, Surf2DBase * targetSurface, wxWindowID id = ID_2D_PARAM_DIALOG, const wxString& caption = SYMBOL_2D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
 
   ~Surface2DParamDlg(void) {}
 
-  bool Create(wxWindowID id = ID_2D_PARAM_DIALOG, const wxString& caption = SYMBOL_2D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE );
+  bool Create(wxWindowID id = ID_2D_PARAM_DIALOG, const wxString& caption = SYMBOL_2D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
 
  private:
   void createControls();
 
-  void OnClose(wxCommandEvent &event );
-  void OnCancel(wxCommandEvent &event );
-  void OnCopyAll(wxCommandEvent &event );
-  void OnPasteAll(wxCommandEvent &event );
+  void OnClose(wxCommandEvent &event);
+  void OnCancel(wxCommandEvent &event);
+  void OnCopyAll(wxCommandEvent &event);
+  void OnPasteAll(wxCommandEvent &event);
 
   wxBoxSizer* mainSizer;
   wxBoxSizer *firstTierSizer, *secondTierSizer, *thirdTierSizer;
@@ -839,22 +838,22 @@ class Surface2DParamDlg : public wxFrame
 
 class Surface3DParamDlg : public wxFrame 
 {
-  DECLARE_CLASS(Surface3DParamDlg);
+  /* DECLARE_CLASS(Surface3DParamDlg); */
 
  public:
-  Surface3DParamDlg(BaseSurfacePane * parent, Surf3DBase * targetSurface, wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE );
+  Surface3DParamDlg(BaseSurfacePane * parent, Surf3DBase * targetSurface, wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
 
   ~Surface3DParamDlg(void){}
 
-  bool Create(wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE );
+  bool Create(wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
   
  private:
   void createControls();
 
-  void OnClose(wxCommandEvent &event );
-  void OnCancel(wxCommandEvent &event );
-  void OnCopyAll(wxCommandEvent &event );
-  void OnPasteAll(wxCommandEvent &event );
+  void OnClose(wxCommandEvent &event);
+  void OnCancel(wxCommandEvent &event);
+  void OnCopyAll(wxCommandEvent &event);
+  void OnPasteAll(wxCommandEvent &event);
 
   wxBoxSizer* mainSizer;
   wxBoxSizer *firstTierSizer, *secondTierSizer, *thirdTierSizer;

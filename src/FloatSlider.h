@@ -35,6 +35,7 @@ class FloatSlider : public wxPanel {
 	private:
 		void OnSliderChange(wxCommandEvent& event);
 		void OnTextChange(wxCommandEvent& event);
+		void OnTextEnter(wxCommandEvent& event);
 
 		wxSlider *slider;
 		wxStaticText *min_label;

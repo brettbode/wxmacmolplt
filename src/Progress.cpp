@@ -43,7 +43,8 @@ bool Progress::UpdateProgress(float Percent) {
 		}
 	} else if (RunTime<ctime) {
 		progDlg = new wxProgressDialog(wxT("progress"), tempLabel, 100, NULL, 
-									   wxPD_APP_MODAL | wxPD_CAN_ABORT);
+									   wxPD_APP_MODAL | wxPD_CAN_ABORT |
+									   wxPD_AUTO_HIDE);
 		result = progDlg->Update(PercentDone, tempLabel);
 		NextTime = ctime + SleepTime;
 	}

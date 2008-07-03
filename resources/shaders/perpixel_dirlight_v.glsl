@@ -8,9 +8,6 @@ void main() {
 
    // Transform the normal.
    normal = normalize(gl_NormalMatrix * gl_Normal);
-   if (dot(normal, vec3(0.0, 0.0, 1.0)) < 0.0) {
-      normal = -normal;
-   }
 
    // Modulate the light source colors by the material parameters.
    diffuse = gl_Color * gl_LightSource[0].diffuse;
