@@ -617,7 +617,7 @@ class Surface {
 		// exports to CCP4 file type
 		void Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
 			float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const;
-		// exports to CNS file type
+		// exports to CNS electron density map file type
 		void Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
 			float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const;
 		void Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Origin,

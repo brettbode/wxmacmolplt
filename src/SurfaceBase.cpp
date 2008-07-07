@@ -114,7 +114,7 @@ void Surface::Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, cons
 
 }
 
-// Exports surface data to CNS file type	
+// Exports surface data to CNS electron density map file type	
 // This can effectively only be called by Surf3DBase objects
 void Surface::Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
 		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {

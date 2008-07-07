@@ -309,20 +309,9 @@ void BaseSurfacePane::OnExport(wxCommandEvent &event) {
 	wxString dropFilter;
 	wxFileName fileName;
 	wxString filePath;
-/*	
- 	// TODO need to fix extensions, especially .txt
-	wxString filePath = wxFileSelector(wxT("Export As"), wxT(""), wxT(""),
-			wxT(""), wxT("CCP4 file (*.ccp4)|*.ccp4|CNS file (*.CNS)|*.cns|text file (*.txt)|*.txt"),
-#if wxCHECK_VERSION(2,9,0)
-			wxFD_SAVE | wxFD_OVERWRITE_PROMPT,
-#else
-			wxSAVE | wxOVERWRITE_PROMPT,
-#endif
-			owner);
-*/
 	// get filename from filePath (TODO: txt is dummy; should be replaced)
 	if(mTarget->GetDimensions() == 3)
-		dropFilter = wxT("text file (*.txt)|*.txt|CCP4 file (*.CCP4)|*.ccp4|CNS file (*.CNS)|*.cns");
+		dropFilter = wxT("text file (*.txt)|*.txt|CCP4 file (*.CCP4)|*.ccp4|CNS electron density map (*.CNS)|*.cns");
 	else
 		dropFilter = wxT("text file (*.txt)|*.txt");
 	
