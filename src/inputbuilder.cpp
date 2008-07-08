@@ -26,6 +26,7 @@
 #endif
 #include <wx/listctrl.h>
 #include <wx/listbook.h>
+#include <wx/filename.h>
 
 ////@begin includes
 ////@end includes
@@ -143,6 +144,7 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 	EVT_BUTTON( wxID_CANCEL, InputBuilderWindow::OnCancelClick )
 	EVT_BUTTON( wxID_OK, InputBuilderWindow::OnOkClick )
 ////@end InputBuilderWindow event table entries
+	EVT_BUTTON( ID_ENQUEUEBUTTON, InputBuilderWindow::OnEnqueueButtonClick )
 END_EVENT_TABLE()
 
 /*!
@@ -1404,6 +1406,9 @@ void InputBuilderWindow::CreateControls()
 	writeBtn = new wxButton( itemPanel3, ID_WRITEFILEBUTTON, _("Write File"), wxDefaultPosition, wxDefaultSize, 0 );
 	button_sizer->Add(writeBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
+	wxButton *enqueueBtn = new wxButton( itemPanel3, ID_ENQUEUEBUTTON, _("Send to GamessQ"), wxDefaultPosition, wxDefaultSize, 0 );
+	button_sizer->Add(enqueueBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
+
 	wxStdDialogButtonSizer* itemStdDialogButtonSizer224 = new wxStdDialogButtonSizer;
 
 	button_sizer->Add(itemStdDialogButtonSizer224, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2643,6 +2648,28 @@ void InputBuilderWindow::OnWritefilebuttonClick( wxCommandEvent& event )
     parent->GetData()->WriteInputFile(parent);
 }
 
+/*!
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ENQUEUEBUTTON
+ */
+
+void InputBuilderWindow::OnEnqueueButtonClick( wxCommandEvent& event )
+{
+	wxFileName file(wxFileName::CreateTempFileName(wxT("wxMacMolPltData_")));
+	file.SetExt(wxT("inp"));
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	TmpInputRec->WriteInputFile(file.GetFullPath(), parent->GetData(), parent);
+
+#ifdef __WXMAC__
+	pid_t pid = fork();
+	if (pid == 0) {
+		execlp("open", "open", "-a", "gamessq",
+				(const char *)file.GetFullPath().ToAscii(), NULL);
+		exit(1);
+	}
+#else /* __WXMAC__ */
+	wxExecute(wxT("gamessq ") + file.GetFullPath());
+#endif /* __WXMAC__ */
+}
 
 void InputBuilderWindow::setPaneVisible(int pane, bool visible) {
     int currPos = pane;

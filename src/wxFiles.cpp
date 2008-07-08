@@ -23,9 +23,6 @@ extern WinPrefs *	gPreferences;
 	//Prompt for a filename and then write out a valid input file for GAMESS
 long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
 
-    FILE *currFile = NULL;
-    BufferFile *buffer = NULL;
-	
     wxString filePath = wxFileSelector(wxT("Save As"), wxT(""), wxT(""), wxT(""),
                               wxT("GAMESS input files (*.inp)|*.inp"),
 #if wxCHECK_VERSION(2,9,0)
@@ -36,35 +33,43 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
 							  owner);
 	
     if(!filePath.IsEmpty()) {
-        if((currFile = fopen(filePath.mb_str(wxConvUTF8), "wb")) == NULL) {
-            MessageAlert("Unable to open the file for output.");
-            return 0;
-        }
-        try {
-			lData->PruneUnusedFragments();
-            buffer = new BufferFile(currFile, true);
-			long BasisTest=0;
-			buffer->WriteLine("!   File created by MacMolPlt "wxMacMolPlt_VERSION, true);
-			if (Control) Control->WriteToFile(buffer, this, lData->GetNumElectrons());
-			if (DFT) DFT->WriteToFile(buffer, this);
-			if (System) System->WriteToFile(buffer);
-			if (Basis && (Control->GetRunType() != G3MP2)) BasisTest = Basis->WriteToFile(buffer, lData);
-			if (Guess) Guess->WriteToFile(buffer, this, lData);
-			if (SCF) SCF->WriteToFile(buffer, this);
-			if (MP2) MP2->WriteToFile(buffer, this);
-			if (StatPt) StatPt->WriteToFile(buffer, this);
-			if (Hessian) Hessian->WriteToFile(buffer, this);
-			if (Data) Data->WriteToFile(buffer, lData, owner->GetPrefs(), BasisTest);
-			if (Guess) Guess->WriteVecGroup(buffer, lData);
-        }
-        catch (MemoryError) {
-            MessageAlert("Not enough memory to open the file for writing.");
-        }
-		if(buffer) {
-			delete buffer;
-		}
-		fclose(currFile);
+		return WriteInputFile(filePath, lData, owner);
+	}
+}
+
+long InputData::WriteInputFile(const wxString &filePath, MoleculeData * lData, MolDisplayWin * owner) {
+
+    FILE *currFile = NULL;
+    BufferFile *buffer = NULL;
+	
+    if((currFile = fopen(filePath.mb_str(wxConvUTF8), "wb")) == NULL) {
+        MessageAlert("Unable to open the file for output.");
+        return 0;
     }
+    try {
+		lData->PruneUnusedFragments();
+        buffer = new BufferFile(currFile, true);
+		long BasisTest=0;
+		buffer->WriteLine("!   File created by MacMolPlt "wxMacMolPlt_VERSION, true);
+		if (Control) Control->WriteToFile(buffer, this, lData->GetNumElectrons());
+		if (DFT) DFT->WriteToFile(buffer, this);
+		if (System) System->WriteToFile(buffer);
+		if (Basis && (Control->GetRunType() != G3MP2)) BasisTest = Basis->WriteToFile(buffer, lData);
+		if (Guess) Guess->WriteToFile(buffer, this, lData);
+		if (SCF) SCF->WriteToFile(buffer, this);
+		if (MP2) MP2->WriteToFile(buffer, this);
+		if (StatPt) StatPt->WriteToFile(buffer, this);
+		if (Hessian) Hessian->WriteToFile(buffer, this);
+		if (Data) Data->WriteToFile(buffer, lData, owner->GetPrefs(), BasisTest);
+		if (Guess) Guess->WriteVecGroup(buffer, lData);
+    }
+    catch (MemoryError) {
+        MessageAlert("Not enough memory to open the file for writing.");
+    }
+	if(buffer) {
+		delete buffer;
+	}
+	fclose(currFile);
 	return 1;
 }
 

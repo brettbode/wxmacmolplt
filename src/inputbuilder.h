@@ -159,6 +159,7 @@ class wxSpinCtrl;
 #define SYMBOL_INPUTBUILDERWINDOW_SIZE wxDefaultSize
 #define SYMBOL_INPUTBUILDERWINDOW_POSITION wxDefaultPosition
 ////@end control identifiers
+#define ID_ENQUEUEBUTTON 10273
 
 
 enum {
@@ -501,6 +502,9 @@ public:
 
     /// Should we show tooltips?
     static bool ShowToolTips();
+
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ENQUEUEBUTTON
+	void OnEnqueueButtonClick( wxCommandEvent& event );
     
     void SetupItems();
     void SetupBasisItems();

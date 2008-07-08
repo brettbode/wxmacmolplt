@@ -993,7 +993,11 @@ class InputData {
 		InputData(void);
 		InputData(InputData *Copy);
 		~InputData(void);
-		long WriteInputFile(MoleculeData * lData, MolDisplayWin * owner);	//Write out an input file for another program (GAMESS etc)
+		//! Write out an input file for another program (GAMESS etc)
+		long WriteInputFile(MoleculeData * lData, MolDisplayWin * owner);
+
+		//! Write out an input file for another program (GAMESS etc)
+		long WriteInputFile(const wxString &filePath, MoleculeData * lData, MolDisplayWin * owner);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);
 };
