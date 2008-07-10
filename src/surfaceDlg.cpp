@@ -3471,33 +3471,36 @@ void TEDensity3DSurfPane::CreateControls() {
 	/* mGridMaxText = new wxStaticText(TED3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT); */
 	/* itemBoxSizer108->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
 
-	wxBoxSizer* itemBoxSizer111 = new wxBoxSizer(wxHORIZONTAL);
-	mainSizer->Add(itemBoxSizer111, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+	wxStaticBoxSizer *mep_sizer = new wxStaticBoxSizer(wxHORIZONTAL, TED3DPanel, wxT("MEP"));
+
+	mainSizer->Add(mep_sizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
 	wxBoxSizer* itemBoxSizer112 = new wxBoxSizer(wxVERTICAL);
-	itemBoxSizer111->Add(itemBoxSizer112, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mep_sizer->Add(itemBoxSizer112, 0);
 	mColorSurfCheck = new wxCheckBox(TED3DPanel, ID_TED3D_COLOR_SURF_CHECK, _("Colorize using the surface MEP value"), wxDefaultPosition, wxDefaultSize, 0);
 	mColorSurfCheck->SetValue(false);
-	itemBoxSizer112->Add(mColorSurfCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer112->Add(mColorSurfCheck, 0);
 
 	mUseRGBColorCheck = new wxCheckBox(TED3DPanel, ID_USERGB_COLOR_CHECK, _("Use RGB surface coloration"), wxDefaultPosition, wxDefaultSize, 0);
 	if (ShowToolTips())
 		mUseRGBColorCheck->SetToolTip(_("Uses blue for attractive, green for neutral, and red of repulsive to a + charge"));
 	mUseRGBColorCheck->SetValue(false);
-	itemBoxSizer112->Add(mUseRGBColorCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer112->Add(mUseRGBColorCheck, 0);
 
 	mInvertRGBCheck = new wxCheckBox(TED3DPanel, ID_INVERT_RGB_CHECK, _("Invert color map"), wxDefaultPosition, wxDefaultSize, 0);
 	mInvertRGBCheck->SetValue(false);
 	if (ShowToolTips())
 		mInvertRGBCheck->SetToolTip(_("Flips the RGB mapping so that red is attractive, blue replusive to a + charge"));
-	itemBoxSizer112->Add(mInvertRGBCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer112->Add(mInvertRGBCheck, 0);
+
+	mep_sizer->AddSpacer(10);
 
 	wxBoxSizer* itemBoxSizer115 = new wxBoxSizer(wxVERTICAL);
-	itemBoxSizer111->Add(itemBoxSizer115, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mep_sizer->Add(itemBoxSizer115, 0, wxALIGN_CENTER_VERTICAL);
 	wxStaticText* itemStaticText116 = new wxStaticText(TED3DPanel, wxID_STATIC, _("Max. value to map"), wxDefaultPosition, wxDefaultSize, 0);
-	itemBoxSizer115->Add(itemStaticText116, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer115->Add(itemStaticText116, 0);
 
 	mMaxMapEdit = new wxTextCtrl(TED3DPanel, ID_TED3D_MAX_MAP_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
-	itemBoxSizer115->Add(mMaxMapEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer115->Add(mMaxMapEdit, 0, wxALIGN_CENTER_HORIZONTAL);
 
 	wxBoxSizer* itemBoxSizer118 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer118, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
