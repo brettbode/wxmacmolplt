@@ -3357,7 +3357,9 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 						lProgress->ChangeText("Calculating MEP values...");
 						lProgress->SetBaseValue(100*i/NumFrames + 50/NumFrames);
 						lProgress->SetScaleFactor(0.5/NumFrames);
+						owner->GetParent()->Freeze();
 						mTarget->CalculateSurfaceValues(data, lProgress);
+						owner->GetParent()->Thaw();
 					}
 					lSurf->FreeGrid();
 				} else {
@@ -3387,7 +3389,9 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 				lProgress->ChangeText("Calculating MEP values...");
 				lProgress->SetBaseValue(50);
 				lProgress->SetScaleFactor(0.5);
+				owner->GetParent()->Freeze();
 				mTarget->CalculateSurfaceValues(data, lProgress);
+				owner->GetParent()->Thaw();
 			}
 		} else {
 			//always free the grid for invisable surfaces since they can be big
