@@ -41,7 +41,12 @@ float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *
 		BasisSet *Basis, float *MOVector, long NumAtoms, bool UseSphericalHarmonics);
 void CalculateAOAmplitudeVector(float X_value, float Y_value, float Z_value, mpAtom *Atoms,
 		BasisSet *Basis, float *AOVector, long NumAtoms);
-
+/** Setup a pair of filtering arrays indicating whether there are non-zero MO Vector elements for
+ each shell and atom.
+ */
+void SetupMOScreens(const BasisSet * Basis, const float * MOVector, std::vector<bool> & AtomScreen,
+					std::vector<bool> & ShellScreen, long NumAtoms, bool UseSphericalHarmonics);
+	
 const char * ConvertTypeOfWavefunction(const TypeOfWavefunction & t) {
 	switch (t) {
 		case RHF:
@@ -970,81 +975,81 @@ MORec::~MORec(void) {
 	if (OrientedLocalOrbitals) delete OrientedLocalOrbitals;
 	if (TotalAODensity) delete TotalAODensity;
 }
-//		IO functions
-long MORec::GetSize(BufferFile *Buffer, long NumBasisFuncs) {
-	Boolean	cState = Buffer->GetOutput();
-	Buffer->SetOutput(false);
-	long length = WriteToBuffer(Buffer, NumBasisFuncs);
-	Buffer->SetOutput(cState);
-	return length;
-}
-long MORec::WriteToBuffer(BufferFile *Buffer, long NumBasisFuncs) {
-	long code, length, total=0;
-	
-	code = 6;
-	total += Buffer->Write((Ptr) &code, sizeof(long));
-	length = 2*sizeof(long);
-	total += Buffer->Write((Ptr) &length, sizeof(long));
-	total += Buffer->Write((Ptr) &NumOccupiedAlphaOrbs, sizeof(long));
-	total += Buffer->Write((Ptr) &NumOccupiedBetaOrbs, sizeof(long));
-	if (EigenVectors) {
-		code = 3;
-		total += Buffer->Write((Ptr) &code, sizeof(long));
-		length = EigenVectors->GetSize(Buffer, NumBasisFuncs);
-		total += Buffer->Write((Ptr) &length, sizeof(long));
-		total += EigenVectors->WriteToBuffer(Buffer, NumBasisFuncs);
-	}
-	if (LocalOrbitals) {
-		code = 4;
-		total += Buffer->Write((Ptr) &code, sizeof(long));
-		length = LocalOrbitals->GetSize(Buffer, NumBasisFuncs);
-		total += Buffer->Write((Ptr) &length, sizeof(long));
-		total += LocalOrbitals->WriteToBuffer(Buffer, NumBasisFuncs);
-	}
-	if (OrientedLocalOrbitals) {
-		code = 7;
-		total += Buffer->Write((Ptr) &code, sizeof(long));
-		length = OrientedLocalOrbitals->GetSize(Buffer, NumBasisFuncs);
-		total += Buffer->Write((Ptr) &length, sizeof(long));
-		total += OrientedLocalOrbitals->WriteToBuffer(Buffer, NumBasisFuncs);
-	}//Note the AODensity is not saved!
-	
-	return total;
-}
-long MORec::Read(BufferFile *Buffer, long NumBasisFuncs, long ByteCount) {
-	long code, length, total=0;
-
-	while (total<ByteCount) {
-		total += Buffer->Read((Ptr) &code, sizeof(long));
-		total += Buffer->Read((Ptr) &length, sizeof(long));
-		switch (code) {
-			case 3:	//EigenVectors
-				EigenVectors = EigenVectors->Read(Buffer, NumBasisFuncs, length);
-			break;
-			case 4:	//Localized Orbitals
-				LocalOrbitals = LocalOrbitals->Read(Buffer, NumBasisFuncs, length);
-			break;
-			case 5:
-				if (length != 4*sizeof(long)) throw DataError();
-				Buffer->BufferSkip(2*sizeof(long));
-				total += Buffer->Read((Ptr) &NumOccupiedAlphaOrbs, sizeof(long));
-				total += Buffer->Read((Ptr) &NumOccupiedBetaOrbs, sizeof(long));
-			break;
-			case 6:
-				total += Buffer->Read((Ptr) &NumOccupiedAlphaOrbs, sizeof(long));
-				total += Buffer->Read((Ptr) &NumOccupiedBetaOrbs, sizeof(long));
-			break;
-			case 7:
-				OrientedLocalOrbitals = OrientedLocalOrbitals->Read(Buffer, NumBasisFuncs, length);
-			break;
-			default:	//Getting here is an error
-				Buffer->BufferSkip(length);
-		}
-		total += length;
-	}
-	return total;
-}
 */
+#define kShellScreenThreshold (1.0e-5)
+/** Setup a pair of filtering arrays indicating whether there are non-zero MO Vector elements for
+each shell and atom.
+ */
+void SetupMOScreens(const BasisSet * Basis, const float * MOVector, std::vector<bool> & AtomScreen,
+					std::vector<bool> & ShellScreen, long NumAtoms, bool UseSphericalHarmonics) {
+	long ivec = 0, nshell=0;
+	float VectorSum;
+	const std::vector<BasisShell> & Shells=Basis->Shells;
+	for (long iatom=0; iatom<NumAtoms; iatom++) {
+		bool computeAtom = false;
+		for (long ishell=Basis->BasisMap[2*iatom]; ishell<=Basis->BasisMap[2*iatom+1]; ishell++) {
+			int	type = Shells[ishell].ShellType;
+			if (UseSphericalHarmonics) type += 10;
+			switch (type) {
+				case LShell:
+				case SHLShell:
+					//The p part of the L shell must be handled seperately since it has two
+					//normalization factors for the same shell
+					VectorSum =	MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+MOVector[ivec+3];
+					ivec += 4;
+					break;
+				case SShell:
+				case SHSShell:
+					VectorSum = MOVector[ivec];
+					ivec += 1;
+					break;
+				case PShell:
+				case SHPShell:
+					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2];
+					ivec += 3;
+					break;
+				case DShell:
+					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+
+						MOVector[ivec+3]+MOVector[ivec+4]+MOVector[ivec+5];
+					ivec += 6;
+					break;
+				case FShell:
+					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+MOVector[ivec+3]+
+								MOVector[ivec+4]+MOVector[ivec+5]+MOVector[ivec+6]+MOVector[ivec+7]+
+								MOVector[ivec+8]+MOVector[ivec+9];
+					ivec += 10;
+					break;
+				case GShell:
+					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+MOVector[ivec+3]+
+						MOVector[ivec+4]+MOVector[ivec+5]+MOVector[ivec+6]+MOVector[ivec+7]+
+						MOVector[ivec+8]+MOVector[ivec+9]+MOVector[ivec+10]+MOVector[ivec+11]+
+						MOVector[ivec+12]+MOVector[ivec+13]+MOVector[ivec+14];
+					ivec += 15;
+					break;
+				case SHDShell:	
+					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+
+								MOVector[ivec+3]+MOVector[ivec+4];
+					ivec += 5;
+					break;
+				case SHFShell:
+					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+
+								MOVector[ivec+3]+MOVector[ivec+4]+MOVector[ivec+5]+
+								MOVector[ivec+6];
+					ivec += 7;
+					break;
+				case SHGShell:
+					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+
+								MOVector[ivec+3]+MOVector[ivec+4]+MOVector[ivec+5]+
+								MOVector[ivec+6]+MOVector[ivec+7]+MOVector[ivec+8];
+					ivec += 9;
+					break;
+			}
+			ShellScreen[nshell] = (VectorSum > kShellScreenThreshold);
+			computeAtom = computeAtom || ShellScreen[nshell];
+			nshell++;
+		}
+	}
+}
 //Computes the MO Amplitude at the specified x,y,z
 float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *Atoms,
 		BasisSet *Basis, float *MOVector, long NumAtoms, bool UseSphericalHarmonics) {
