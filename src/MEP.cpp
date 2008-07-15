@@ -442,7 +442,7 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 }
 #ifdef __wxBuild__
 typedef struct TED3DSurfGridData {
-	TEDensity3DSurface *	Surf;
+	Surf3DBase *	Surf;
 	MoleculeData *			MolData;
 	AODensity *				TotalDensity;
 	long					xStart;
@@ -476,7 +476,7 @@ void * TEDMEP3DThread::Entry() {
 typedef TEDMEP3DThread * TEDMEP3DThreadPtr;
 
 #endif
-void TEDensity3DSurface::CalculateSurfaceValues(MoleculeData *lData, Progress * lProgress) {
+void Surf3DBase::CalculateSurfaceValues(MoleculeData *lData, Progress * lProgress) {
 	GaussHermiteData	GHData;
 
 	if (!ContourHndl) return;
@@ -591,7 +591,7 @@ void TEDensity3DSurface::CalculateSurfaceValues(MoleculeData *lData, Progress * 
 	HUnlock(ContourHndl);
 #endif
 }
-void TEDensity3DSurface::CalculateSurfaceValuesGrid(MoleculeData * lData, Progress * lProgress,
+void Surf3DBase::CalculateSurfaceValuesGrid(MoleculeData * lData, Progress * lProgress,
 													AODensity * TotalAODensity, long start, long end,
 													GaussHermiteData * GHData, float * lGrid,
 													CPoint3D * Contour, long * PercentDone, bool MPTask) {

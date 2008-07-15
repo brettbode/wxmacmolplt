@@ -1366,7 +1366,7 @@ MEP2DSurface::MEP2DSurface(MEP2DSurface * target) {
 	target->GetYIncrement(&YInc);
 	if (!target->DefaultLabel())
 		Label = target->GetLabel();
-	OrbSet = target->getTargetOrbitalSet();
+	OrbSet = target->getTargetOrbSet();
 	NextSurface = NULL;
 	GridAllocation = 0;
 	Grid = NULL;
@@ -1386,7 +1386,7 @@ void MEP2DSurface::UpdateData(MEP2DSurface * target) {
 	if (Label) {delete [] Label; Label = NULL;}
 	if (!target->DefaultLabel())
 		Label = target->GetLabel();
-	OrbSet = target->getTargetOrbitalSet();
+	OrbSet = target->getTargetOrbSet();
 }
 char * MEP2DSurface::GetLabel(void) {
 	if (DefaultLabel()) {
@@ -1431,7 +1431,7 @@ void MEP3DSurface::UpdateData(MEP3DSurface * target) {
 	target->GetPosColor(&PosColor);
 	target->GetNegColor(&NegColor);
 	Transparency = target->GetTransparency();
-	OrbSet = target->getTargetOrbitalSet();
+	OrbSet = target->getTargetOrbSet();
 }
 
 Orb2DSurface::Orb2DSurface(WinPrefs * Prefs) : Surf2DBase(Prefs) {

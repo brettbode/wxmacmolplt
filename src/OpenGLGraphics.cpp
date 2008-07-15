@@ -217,8 +217,8 @@ void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
 }
 
 /**
- * Draws molecular structures, surfaces, and annotations. Assumes context,
- * projection, and viewport have been set. 
+ * Draws molecular structures, surfaces, and annotations.
+ * @precondition Context, projection, and viewport have been set. 
  */
 void MolDisplayWin::DrawGL(void) {
 
@@ -1776,67 +1776,32 @@ long General3DSurface::getTriangleCount(void) const {
 long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs *, myGLTriangle * transpTri) {
 	long result=0;
 	if (Visible) {
-#ifdef UseHandles
-		if (ContourHndl && VertexHndl) {
-			HLock(ContourHndl);
-			HLock(VertexHndl);
-			if (SurfaceNormals) HLock(SurfaceNormals);
-			if (SolidSurface()) {
-				if (UseSurfaceNormals()&&SurfaceNormals) {
-					result = CreateSolidSurface((CPoint3D *) *ContourHndl, (CPoint3D *) *SurfaceNormals, (long *) *VertexHndl,
-						NumPosContourTriangles, &PosColor, NULL, NULL, 1.0, MainData, transpTri);
-					if ((Mode & 4)&&(NumNegContourTriangles > 0))
-						result += CreateSolidSurface((CPoint3D *) *ContourHndl,
-							(CPoint3D *) *SurfaceNormals, (long *) &(((long *) *VertexHndl)[3*NumPosContourTriangles]),
-							NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData, &(transpTri[result]));
-				} else {
-					result = CreateSolidSurface((CPoint3D *) *ContourHndl, NULL, (long *) *VertexHndl,
-						NumPosContourTriangles, &PosColor, NULL, NULL, 1.0, MainData, transpTri);
-					if ((Mode & 4)&&(NumNegContourTriangles > 0))
-						result += CreateSolidSurface((CPoint3D *) *ContourHndl,
-							NULL, (long *) &(((long *) *VertexHndl)[3*NumPosContourTriangles]),
-							NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData, &(transpTri[result]));
-				}
-			} else if (WireFrameSurface()) {
-				CreateWireSurface((CPoint3D *) *ContourHndl, NULL, (long *) *VertexHndl,
-					NumPosContourTriangles, &PosColor, NULL, NULL, 1.0, MainData);
-				if (ContourBothPosNeg()&&(NumNegContourTriangles > 0))
-					CreateWireSurface((CPoint3D *) *ContourHndl, NULL, 
-						(long *) &(((long *) *VertexHndl)[3*NumPosContourTriangles]),
-						NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData);
-			}
-			HUnlock(ContourHndl);
-			HUnlock(VertexHndl);
-			if (SurfaceNormals) HUnlock(SurfaceNormals);
-		}
-#else
 		if (ContourHndl && VertexList) {
 			if (SolidSurface()) {
 				if (UseSurfaceNormals()&&SurfaceNormals) {
 					result = CreateSolidSurface(ContourHndl, SurfaceNormals, VertexList,
-									NumPosContourTriangles, &PosColor, NULL, NULL, 1.0, MainData, transpTri);
+									NumPosContourTriangles, &PosColor, List, &NegColor, MaxMEPValue, MainData, transpTri);
 					if ((Mode & 4)&&(NumNegContourTriangles > 0))
 						result += CreateSolidSurface(ContourHndl,
 													 SurfaceNormals, &(VertexList[3*NumPosContourTriangles]),
-													 NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData, &(transpTri[result]));
+													 NumNegContourTriangles, &NegColor, List, &PosColor, MaxMEPValue, MainData, &(transpTri[result]));
 				} else {
 					result = CreateSolidSurface(ContourHndl, NULL, VertexList,
-												NumPosContourTriangles, &PosColor, NULL, NULL, 1.0, MainData, transpTri);
+												NumPosContourTriangles, &PosColor, List, &NegColor, MaxMEPValue, MainData, transpTri);
 					if ((Mode & 4)&&(NumNegContourTriangles > 0))
 						result += CreateSolidSurface(ContourHndl,
 													 NULL, &(VertexList[3*NumPosContourTriangles]),
-													 NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData, &(transpTri[result]));
+													 NumNegContourTriangles, &NegColor, List, &PosColor, MaxMEPValue, MainData, &(transpTri[result]));
 				}
 			} else if (WireFrameSurface()) {
 				CreateWireSurface(ContourHndl, NULL, VertexList,
-								  NumPosContourTriangles, &PosColor, NULL, NULL, 1.0, MainData);
+								  NumPosContourTriangles, &PosColor, List, &NegColor, MaxMEPValue, MainData);
 				if (ContourBothPosNeg()&&(NumNegContourTriangles > 0))
 					CreateWireSurface(ContourHndl, NULL, 
 									  &(VertexList[3*NumPosContourTriangles]),
-									  NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData);
+									  NumNegContourTriangles, &NegColor, List, &PosColor, MaxMEPValue, MainData);
 			}
 		}
-#endif
 	}
 	return result;
 }

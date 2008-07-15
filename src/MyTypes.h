@@ -610,6 +610,7 @@ class Surface {
 		char *		Label;
 		bool		Visible;
 		bool		has_default_label;
+		long		OrbSet;			//Target Orbital Set
 
 		// exports to (our) text file type
 		void Export3D(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
@@ -671,6 +672,8 @@ class Surface {
 		virtual long Draw3DGL(MoleculeData * lData,  WinPrefs * Prefs, myGLTriangle *)=0;
 		virtual long getTriangleCount(void) const {return 0;};
 #endif
+		inline long getTargetOrbSet(void) const {return OrbSet;};
+		inline void setTargetOrbSet(const long & target) {OrbSet = target;};
 };
 
 void ApplyRotation(Matrix4D RotMat, long Axis, float AngleDegrees);

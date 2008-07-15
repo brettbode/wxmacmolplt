@@ -124,9 +124,9 @@ class SurfacesWindow;
 #define ID_GENCONPOSNEGCHECK 10107
 #define ID_GENSURFGRIDMINTEXT 10108
 #define ID_GRID_MAX_TEXT 10109
-#define ID_TED3D_COLOR_SURF_CHECK 10110
+#define ID_3D_COLOR_SURF_CHECK 10110
 #define ID_USERGB_COLOR_CHECK 10111
-#define ID_TED3D_MAX_MAP_EDIT 10112
+#define ID_3D_MAX_MAP_EDIT 10112
 #define ID_DISPLAY_PLANE_CHECKBOX 10244
 #define ID_INVERT_RGB_CHECK 10245
 
@@ -368,59 +368,75 @@ class Surface2DPane : public BaseSurfacePane {
 
 
 class Surface3DPane : public BaseSurfacePane {
-  /* DECLARE_CLASS(Surface3DPane) */
+	/* DECLARE_CLASS(Surface3DPane) */
 
-public:
-  Surface3DPane() {}
+	public:
+		Surface3DPane() {}
 
-  Surface3DPane(wxWindow* parent, Surf3DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
-  ~Surface3DPane();
+		Surface3DPane(wxWindow* parent, Surf3DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
+		~Surface3DPane();
 
-  void On3DRadioBox(wxCommandEvent& event);
-  void OnSmoothCheck(wxCommandEvent& event);
-  void OnContourValueEnter(wxCommandEvent& event);
-  virtual void OnUpdate(wxCommandEvent& event) = 0;
-  void OnFreeMem(wxCommandEvent& event);
-  void OnPosColorChange(wxCommandEvent & event);
-  void OnNegColorChange(wxCommandEvent & event);
-  void OnTransparencyChange(wxSpinEvent & event);
-  void OnIdle(wxIdleEvent& WXUNUSED(event));
-  void OnSetParam(wxCommandEvent &event);
-  void OnGridSizeSld(wxCommandEvent &event);
+		void On3DRadioBox(wxCommandEvent& event);
+		void OnSmoothCheck(wxCommandEvent& event);
+		void OnContourValueEnter(wxCommandEvent& event);
+		virtual void OnUpdate(wxCommandEvent& event) = 0;
+		void OnFreeMem(wxCommandEvent& event);
+		void OnPosColorChange(wxCommandEvent & event);
+		void OnNegColorChange(wxCommandEvent & event);
+		void OnTransparencyChange(wxSpinEvent & event);
+		void OnIdle(wxIdleEvent& WXUNUSED(event));
+		void OnSetParam(wxCommandEvent &event);
+		void OnGridSizeSld(wxCommandEvent &event);
 
-  void setContourValueSld();
-  void SetContourValueText(void);
-  void OnContourValueSld(wxCommandEvent &event);
-  void SetContourMaxValueText(void);
+		void setContourValueSld();
+		void SetContourValueText(void);
+		void OnContourValueSld(wxCommandEvent &event);
+		void SetContourMaxValueText(void);
+		void refreshMEPControls();
 
-protected:
-  wxSlider* mGridSizeSld;
-  /* wxSlider* mContourValSld; */
-  FloatSlider* mContourValSld;
-  /* wxTextCtrl* mContourValueEdit; */
-  wxStaticText* mGridMinText;
-  wxStaticText* mGridMaxText;
-  colorArea* mOrbColor1;
-  colorArea* mOrbColor2;
-  wxSpinCtrl *mTransparency;
-  wxRadioBox* m3DRdoBox;
-  wxCheckBox* mSmoothChkBox;
-  wxButton* mFreeMemBut;
+		void OnUseMEPCheck(wxCommandEvent &event);
+		void OnRGBColorCheck(wxCommandEvent &event);
+		void OnInvertRGBCheck(wxCommandEvent &event);
+		void OnMaxMEPValueText(wxCommandEvent &event);
+		void SetMaxMEPValueText();
 
-  float GridSize;
-  RGBColor PosColor;
-  RGBColor NegColor;
-  int Transparency;
-  bool UseNormals;
-  bool UseSolidSurface;
-  float ContourValue;
+	protected:
+		wxSlider* mGridSizeSld;
+		/* wxSlider* mContourValSld; */
+		FloatSlider* mContourValSld;
+		/* wxTextCtrl* mContourValueEdit; */
+		wxStaticText* mGridMinText;
+		wxStaticText* mGridMaxText;
+		colorArea* mOrbColor1;
+		colorArea* mOrbColor2;
+		wxSpinCtrl *mTransparency;
+		wxRadioBox* m3DRdoBox;
+		wxCheckBox* mSmoothChkBox;
+		wxButton* mFreeMemBut;
 
- private:
-  void changeContourValue();
+		float GridSize;
+		RGBColor PosColor;
+		RGBColor NegColor;
+		int Transparency;
+		bool UseNormals;
+		bool UseSolidSurface;
+		float ContourValue;
 
-  Surf3DBase* mTarget;
+		wxCheckBox*	mColorSurfCheck;
+		wxCheckBox*	mUseRGBColorCheck;
+		wxCheckBox*	mInvertRGBCheck;
+		wxTextCtrl*	mMaxMapEdit;
+		bool UseMEP;
+		bool UseRGBSurfaceColor;
+		bool InvertRGBSurfaceColor;
+		float MaxMEPValue;
 
-  DECLARE_EVENT_TABLE()
+	private:
+		void changeContourValue();
+
+		Surf3DBase* mTarget;
+
+	DECLARE_EVENT_TABLE()
 }; 
 
 class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane {    
@@ -684,52 +700,36 @@ private:
 class TEDensity3DSurfPane : public Surface3DPane
 {    
 	/* DECLARE_CLASS(TEDensity3DSurfPane) */
-	
-public:
-    /// Constructors
-    TEDensity3DSurfPane() { }
-    TEDensity3DSurfPane(wxWindow* parent, TEDensity3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
-    ~TEDensity3DSurfPane();
-	
-    virtual void TargetToPane();
-    virtual void refreshControls();
-	void OnUseMEPCheck(wxCommandEvent &event);
-	void OnRGBColorCheck(wxCommandEvent &event);
-	void OnInvertRGBCheck(wxCommandEvent &event);
-	void OnMaxMEPValueText(wxCommandEvent &event);
-	
-    /// Creates the controls and sizers
-    void CreateControls();
-	
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource(const wxString& name);
-	
-    /// Retrieves icon resources
-    wxIcon GetIconResource(const wxString& name);
-	
-    /// Should we show tooltips?
-    static bool ShowToolTips() {return true;};
-	
-private:
+
+	public:
+		/// Constructors
+		TEDensity3DSurfPane() { }
+		TEDensity3DSurfPane(wxWindow* parent, TEDensity3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
+		~TEDensity3DSurfPane();
+
+		virtual void TargetToPane();
+		virtual void refreshControls();
+
+		/// Creates the controls and sizers
+		void CreateControls();
+
+		/// Retrieves bitmap resources
+		wxBitmap GetBitmapResource(const wxString& name);
+
+		/// Retrieves icon resources
+		wxIcon GetIconResource(const wxString& name);
+
+		/// Should we show tooltips?
+		static bool ShowToolTips() {return true;};
+
+	private:
 		virtual bool UpdateNeeded(void);
-	
-	void OnUpdate(wxCommandEvent &event);
-	void SetMaxMEPValueText(void);
-	
-	wxCheckBox*	mColorSurfCheck;
-	wxCheckBox*	mUseRGBColorCheck;
-	wxCheckBox*	mInvertRGBCheck;
-	wxTextCtrl*	mMaxMapEdit;
-	wxString mMaxMapValidator;
-	
-	bool	UseMEP;
-	bool	UseRGBSurfaceColor;
-	bool	InvertRGBSurfaceColor;
-	float	MaxMEPValue;
-	
-    TEDensity3DSurface*	mTarget;
-	
-    DECLARE_EVENT_TABLE()
+
+		void OnUpdate(wxCommandEvent &event);
+
+		TEDensity3DSurface*	mTarget;
+
+	DECLARE_EVENT_TABLE()
 };
 class MEP2DSurfPane : public Surface2DPane
 {    

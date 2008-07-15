@@ -230,10 +230,13 @@ class Surf3DBase : public Surface {
 		int			Transparency;		//Transparency color
 		float		ContourValue;
 		float		GridSize;
+		float		MaxMEPValue;	//Maximum surface value to map to a color
 	public:
 		Surf3DBase(WinPrefs * Prefs);
 		Surf3DBase(void);
 		virtual ~Surf3DBase(void);
+		inline void SetMaxSurfaceValue(float NewVal) {MaxMEPValue = NewVal;};
+		inline float GetMaxSurfaceValue(void) const {return MaxMEPValue;};
 		inline short GetDimensions(void) const {return 3;};
 		inline float GetContourValue(void) const {return ContourValue;};
 		inline float GetGridSize(void) const {return GridSize;};
@@ -368,6 +371,11 @@ class Surf3DBase : public Surface {
 		void AdjustSurfaceNormals(void);
 		void Write3DXML(XMLElement * parent, bool writeGrid) const;
 		void Read3DXML(XMLElement * parent);
+		void CalculateSurfaceValues(MoleculeData * MainData, Progress * progress);
+		void CalculateSurfaceValuesGrid(MoleculeData * MainData, Progress * progress,
+										AODensity * TotalDensity, long start, long end,
+										GaussHermiteData * GHData, float * grid,
+										CPoint3D * Contour, long * PercentDone, bool MPTask);
 };
 class General2DSurface : public Surf2DBase {
 	public:
@@ -410,16 +418,12 @@ class General3DSurface : public Surf3DBase {
 };
 class TEDensity3DSurface : public Surf3DBase {
 	private:
-		float		MaxMEPValue;	//Maximum surface value to map to a color
-		long		OrbSet;			//Target Orbital Set
 	public:
 		TEDensity3DSurface(WinPrefs * Prefs);
 		TEDensity3DSurface(XMLElement * x);
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity3D;};
 		void UpdateData(TEDensity3DSurface * target);
-		inline void SetMaxSurfaceValue(float NewVal) {MaxMEPValue = NewVal;};
-		inline float GetMaxSurfaceValue(void) const {return MaxMEPValue;};
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
 #endif
@@ -437,17 +441,9 @@ class TEDensity3DSurface : public Surf3DBase {
 			float * Vectors, float * VectorsB, float * OccupancyA, float * OccupancyB, float * AOVector,
 			long NumOccupiedAlphaOrbs, long NumOccupiedBetaOrbs, long NumAtoms, Progress * progress,
 			long * PercentDone, bool MPTask);
-		void CalculateSurfaceValues(MoleculeData * MainData, Progress * progress);
-		void CalculateSurfaceValuesGrid(MoleculeData * MainData, Progress * progress,
-										AODensity * TotalDensity, long start, long end,
-										GaussHermiteData * GHData, float * grid,
-										CPoint3D * Contour, long * PercentDone, bool MPTask);
-		inline long getTargetOrbSet(void) const {return OrbSet;};
-		inline void setTargetOrbSet(const long & target) {OrbSet = target;};
 };
 class TEDensity2DSurface : public Surf2DBase {
 	private:
-		long OrbSet;	//Target Orbital Set
 	public:
 		TEDensity2DSurface(WinPrefs * Prefs);
 		TEDensity2DSurface(TEDensity2DSurface * target);
@@ -461,8 +457,6 @@ class TEDensity2DSurface : public Surf2DBase {
 		void CalculateMOGrid(MoleculeData * MainData, Progress * lProgress);
 		virtual void Update(MoleculeData * MainData);
 		void UpdateData(TEDensity2DSurface * target);
-		inline long getTargetOrbSet(void) const {return OrbSet;};
-		inline void setTargetOrbSet(const long & target) {OrbSet = target;};
 };
 class TEDensity1DSurface : public Surf1DBase {
 		TEDensity1DSurface(WinPrefs * Prefs);
@@ -479,13 +473,10 @@ class TEDensity1DSurface : public Surf1DBase {
 };
 class MEP2DSurface : public Surf2DBase {
 	private:
-		long	OrbSet;		//Target orbital set
 	public:
 		MEP2DSurface(WinPrefs * Prefs);
 		MEP2DSurface(MEP2DSurface * target);
 		MEP2DSurface(XMLElement * x);
-		inline long getTargetOrbitalSet(void) const { return OrbSet;};
-		inline void setTargetOrbitalSet(const long & target) {OrbSet = target;};
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
 #endif
@@ -498,7 +489,6 @@ class MEP2DSurface : public Surf2DBase {
 };
 class MEP3DSurface : public Surf3DBase {
 	private:
-		long	OrbSet;		//Target orbital set
 	public:
 		MEP3DSurface(WinPrefs * Prefs);
 		MEP3DSurface(XMLElement * x);
@@ -508,8 +498,6 @@ class MEP3DSurface : public Surf3DBase {
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kMEP3D;};
 		void UpdateData(MEP3DSurface * target);
-		inline long getTargetOrbitalSet(void) const { return OrbSet;};
-		inline void setTargetOrbitalSet(const long & target) {OrbSet = target;};
 		virtual void Update(MoleculeData * MainData);
 #ifdef QuickDraw3D
 		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);

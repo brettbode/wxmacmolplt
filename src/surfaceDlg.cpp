@@ -88,6 +88,10 @@ BEGIN_EVENT_TABLE(Surface3DPane, BaseSurfacePane)
 	EVT_SLIDER(ID_GRID_SIZE_SLIDER, Surface3DPane::OnGridSizeSld)
 	EVT_SLIDER(ID_CONTOUR_VALUE_SLIDER, Surface3DPane::OnContourValueSld)
 	EVT_TEXT_ENTER(ID_CONTOUR_VALUE_EDIT, Surface3DPane::OnContourValueEnter)
+	EVT_CHECKBOX(ID_3D_COLOR_SURF_CHECK, Surface3DPane::OnUseMEPCheck)
+	EVT_CHECKBOX(ID_USERGB_COLOR_CHECK, Surface3DPane::OnRGBColorCheck)
+	EVT_CHECKBOX(ID_INVERT_RGB_CHECK, Surface3DPane::OnInvertRGBCheck)
+	EVT_TEXT(ID_3D_MAX_MAP_EDIT, Surface3DPane::OnMaxMEPValueText)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(Surface2DPane, BaseSurfacePane)
@@ -149,10 +153,6 @@ BEGIN_EVENT_TABLE(TEDensity2DSurfPane, Surface2DPane)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(TEDensity3DSurfPane, Surface3DPane)
-	EVT_CHECKBOX(ID_TED3D_COLOR_SURF_CHECK, TEDensity3DSurfPane::OnUseMEPCheck)
-	EVT_CHECKBOX(ID_USERGB_COLOR_CHECK, TEDensity3DSurfPane::OnRGBColorCheck)
-	EVT_CHECKBOX(ID_INVERT_RGB_CHECK, TEDensity3DSurfPane::OnInvertRGBCheck)
-	EVT_TEXT(ID_TED3D_MAX_MAP_EDIT, TEDensity3DSurfPane::OnMaxMEPValueText)
 	EVT_BUTTON(ID_SURFACE_UPDATE_BUT, TEDensity3DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
@@ -994,6 +994,33 @@ void Surface3DPane::setContourValueSld() {
 	mContourValSld->SetValue(ContourValue);
 }
 
+void Surface3DPane::refreshMEPControls() {
+
+	MoleculeData * data = owner->GetMoleculeData();
+	if (data->MEPCalculationPossible()) {
+		mColorSurfCheck->SetValue(UseMEP);
+		mUseRGBColorCheck->SetValue(UseRGBSurfaceColor);
+		if (UseMEP) {
+			mUseRGBColorCheck->Enable();
+			if (UseRGBSurfaceColor) mInvertRGBCheck->Enable();
+			else mInvertRGBCheck->Disable();
+			mMaxMapEdit->Enable();
+		} else {
+			mUseRGBColorCheck->Disable();
+			mInvertRGBCheck->Disable();
+			mMaxMapEdit->Disable();
+		}
+		SetMaxMEPValueText();
+	} else {
+		UseMEP = false;
+		mColorSurfCheck->Disable();
+		mUseRGBColorCheck->Disable();
+		mInvertRGBCheck->Disable();
+		mMaxMapEdit->Disable();
+	}
+
+}
+
 void Surface3DPane::On3DRadioBox(wxCommandEvent& event) {
 	UseSolidSurface = 1-m3DRdoBox->GetSelection();
 
@@ -1059,7 +1086,35 @@ void Surface3DPane::OnIdle(wxIdleEvent& WXUNUSED(event)) {
 	}
 
 }
+void Surface3DPane::OnUseMEPCheck(wxCommandEvent &event) {
+	UseMEP = mColorSurfCheck->GetValue();
+	refreshControls();
+	setUpdateButton();
+}
+void Surface3DPane::OnRGBColorCheck(wxCommandEvent &event) {
+	UseRGBSurfaceColor = mUseRGBColorCheck->GetValue();
+	refreshControls();
+	setUpdateButton();
+}
+void Surface3DPane::OnInvertRGBCheck(wxCommandEvent &event) {
+	InvertRGBSurfaceColor = mInvertRGBCheck->GetValue();
+	//	refreshControls();
+	setUpdateButton();
+}
+void Surface3DPane::OnMaxMEPValueText(wxCommandEvent& event) {
+	double newVal=0.0;
+	wxString temp = mMaxMapEdit->GetValue();
 
+	if (temp.ToDouble(&newVal)) {
+		MaxMEPValue = newVal;
+	}
+	setUpdateButton();
+}
+void Surface3DPane::SetMaxMEPValueText() {
+	wxString temp;
+	temp.Printf(wxT("%.4f"), MaxMEPValue);
+	mMaxMapEdit->SetValue(temp);
+}
 void Surface3DPane::OnFreeMem(wxCommandEvent& event) {
 	mTarget->FreeGrid();
 	mFreeMemBut->Disable();
@@ -2227,6 +2282,10 @@ void General3DSurfPane::TargetToPane(void) {
 	UseSolidSurface = mTarget->SolidSurface();
 	UseNormals = mTarget->UseSurfaceNormals();
 	ContourPosNeg = mTarget->ContourBothPosNeg();
+	UseMEP = mTarget->ColorByValue();
+	UseRGBSurfaceColor = mTarget->UseRGBColoration();
+	InvertRGBSurfaceColor = mTarget->InvertRGBColoration();
+	MaxMEPValue = mTarget->GetMaxSurfaceValue();
 	UpdateTest = false;
 }
 
@@ -2269,6 +2328,14 @@ void General3DSurfPane::refreshControls() {
 	mTransparency->SetValue(Transparency);
 
 	mGenContourPosNegCheck->SetValue(ContourPosNeg);
+	refreshMEPControls();
+
+	// We make dual contouring and MEP coloring mutually exclusive.
+	mColorSurfCheck->Enable(!ContourPosNeg);
+	mUseRGBColorCheck->Enable(mUseRGBColorCheck->IsEnabled() && !ContourPosNeg);
+	mInvertRGBCheck->Enable(mInvertRGBCheck->IsEnabled() && !ContourPosNeg);
+	mMaxMapEdit->Enable(mMaxMapEdit->IsEnabled() && !ContourPosNeg);
+	mGenContourPosNegCheck->Enable(!UseMEP);
 }
 
 /*!
@@ -2335,6 +2402,37 @@ void General3DSurfPane::CreateControls() {
 	itemBoxSizer21->Add(itemBoxSizer22, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
 	wxStaticText* itemStaticText23 = new wxStaticText(Gen3DPanel, wxID_STATIC, _("Positive Color:"), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer22->Add(itemStaticText23, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+	// Create MEP box.
+	wxStaticBoxSizer *mep_sizer = new wxStaticBoxSizer(wxHORIZONTAL, Gen3DPanel, wxT("MEP"));
+	mainSizer->Add(mep_sizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
+	wxBoxSizer* itemBoxSizer112 = new wxBoxSizer(wxVERTICAL);
+	mep_sizer->Add(itemBoxSizer112, 0);
+	mColorSurfCheck = new wxCheckBox(Gen3DPanel, ID_3D_COLOR_SURF_CHECK, _("Colorize using the surface MEP value"), wxDefaultPosition, wxDefaultSize, 0);
+	mColorSurfCheck->SetValue(false);
+	itemBoxSizer112->Add(mColorSurfCheck, 0);
+
+	mUseRGBColorCheck = new wxCheckBox(Gen3DPanel, ID_USERGB_COLOR_CHECK, _("Use RGB surface coloration"), wxDefaultPosition, wxDefaultSize, 0);
+	if (ShowToolTips())
+		mUseRGBColorCheck->SetToolTip(_("Uses blue for attractive, green for neutral, and red of repulsive to a + charge"));
+	mUseRGBColorCheck->SetValue(false);
+	itemBoxSizer112->Add(mUseRGBColorCheck, 0);
+
+	mInvertRGBCheck = new wxCheckBox(Gen3DPanel, ID_INVERT_RGB_CHECK, _("Invert color map"), wxDefaultPosition, wxDefaultSize, 0);
+	mInvertRGBCheck->SetValue(false);
+	if (ShowToolTips())
+		mInvertRGBCheck->SetToolTip(_("Flips the RGB mapping so that red is attractive, blue replusive to a + charge"));
+	itemBoxSizer112->Add(mInvertRGBCheck, 0);
+
+	mep_sizer->AddSpacer(10);
+
+	wxBoxSizer* itemBoxSizer115 = new wxBoxSizer(wxVERTICAL);
+	mep_sizer->Add(itemBoxSizer115, 0, wxALIGN_CENTER_VERTICAL);
+	wxStaticText* itemStaticText116 = new wxStaticText(Gen3DPanel, wxID_STATIC, _("Max. value to map"), wxDefaultPosition, wxDefaultSize, 0);
+	itemBoxSizer115->Add(itemStaticText116, 0);
+
+	mMaxMapEdit = new wxTextCtrl(Gen3DPanel, ID_3D_MAX_MAP_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
+	itemBoxSizer115->Add(mMaxMapEdit, 0, wxALIGN_CENTER_HORIZONTAL);
 
 	Transparency = mTarget->GetTransparency();
 	mTarget->GetPosColor(&PosColor);
@@ -2422,6 +2520,11 @@ bool General3DSurfPane::UpdateNeeded(void) {
 		if (Visible != mTarget->GetVisibility()) result = true;
 		if (ContourValue != mTarget->GetContourValue()) result = true;
 		if (UseSolidSurface != mTarget->SolidSurface()) result = true;
+		if (UseMEP != mTarget->ColorByValue()) result = true;
+		if (UseNormals != mTarget->UseSurfaceNormals()) result = true;
+		if (UseRGBSurfaceColor != mTarget->UseRGBColoration()) result = true;
+		if (InvertRGBSurfaceColor != mTarget->InvertRGBColoration()) result = true;
+		if (MaxMEPValue != mTarget->GetMaxSurfaceValue()) result = true;
 		//		if (UseColorByValue != mTarget->ColorByValue()) result = true;
 		if (ContourPosNeg != mTarget->ContourBothPosNeg()) result = true;
 		if (UseNormals != mTarget->UseSurfaceNormals()) result = true;
@@ -2441,26 +2544,50 @@ bool General3DSurfPane::UpdateNeeded(void) {
 	return result;
 }
 void General3DSurfPane::OnUpdate(wxCommandEvent &event) {
+	SetMaxMEPValueText();
+
+	bool updateMEP=false;
 	bool updateContour = UpdateTest || ! mTarget->ContourAvail();
 	if (Visible) {	//update the contour if contour value has changed
 		if (ContourValue != mTarget->GetContourValue()) updateContour = true;
 	}
 	mTarget->SetVisibility(Visible);
+	if (UseMEP && !mTarget->ColorByValue()) updateMEP = true;
+	if (updateMEP && !mTarget->ContourAvail()) updateContour = true;
 	mTarget->SolidSurface(UseSolidSurface);
 	if (ContourPosNeg != mTarget->ContourBothPosNeg()) updateContour = true;
 	mTarget->SetContourBothPosNeg(ContourPosNeg);
+	if (updateContour && UseMEP) updateMEP = true;
 	//	mTarget->SetColorByValue(UseColorByValue);
+	mTarget->SetColorByValue(UseMEP);
 	mTarget->SetContourValue(ContourValue);
+	mTarget->SetMaxSurfaceValue(MaxMEPValue);
+	mTarget->UseRGBColoration(UseRGBSurfaceColor);
+	mTarget->InvertRGBColoration(InvertRGBSurfaceColor);
 	mTarget->SetPosColor(&PosColor);
 	mTarget->SetNegColor(&NegColor);
 	mTarget->SetTransparency(Transparency);
 	mTarget->UseSurfaceNormals(UseNormals);
+
+	MoleculeData * data = owner->GetMoleculeData();
+	float MEPScale = 1.0;
+	if (updateMEP) MEPScale = 0.5;
+	Progress * lProgress = new Progress();
 	if (updateContour && mTarget->GridAvailable()) {
-		Progress * lProgress = new Progress();
 		lProgress->ChangeText("Contouring grid...");
+		lProgress->SetBaseValue((long)(90*MEPScale));
+		lProgress->SetScaleFactor(0.1*MEPScale);
 		mTarget->Contour3DGrid(lProgress);
-		delete lProgress;
 	}
+	if (updateMEP && data->MEPCalculationPossible()) {
+		lProgress->ChangeText("Calculating MEP values...");
+		lProgress->SetBaseValue(50);
+		lProgress->SetScaleFactor(0.5);
+		owner->GetParent()->Freeze();
+		mTarget->CalculateSurfaceValues(data, lProgress);
+		owner->GetParent()->Thaw();
+	}
+	delete lProgress;
 	//Setup the contour value and grid max text items
 	float GridMax = mTarget->GetGridMax();
 	float GridMin = mTarget->GetGridMin();
@@ -3162,28 +3289,7 @@ void TEDensity3DSurfPane::refreshControls() {
 	mOrbColor2->setColor(&NegColor);
 	mTransparency->SetValue(Transparency);
 
-	MoleculeData * data = owner->GetMoleculeData();
-	if (data->MEPCalculationPossible()) {
-		mColorSurfCheck->SetValue(UseMEP);
-		mUseRGBColorCheck->SetValue(UseRGBSurfaceColor);
-		if (UseMEP) {
-			mUseRGBColorCheck->Enable();
-			if (UseRGBSurfaceColor) mInvertRGBCheck->Enable();
-			else mInvertRGBCheck->Disable();
-			mMaxMapEdit->Enable();
-		} else {
-			mUseRGBColorCheck->Disable();
-			mInvertRGBCheck->Disable();
-			mMaxMapEdit->Disable();
-		}
-		SetMaxMEPValueText();
-	} else {
-		UseMEP = false;
-		mColorSurfCheck->Disable();
-		mUseRGBColorCheck->Disable();
-		mInvertRGBCheck->Disable();
-		mMaxMapEdit->Disable();
-	}
+	refreshMEPControls();
 	mNumGridPntSld->SetValue(NumGridPoints);
 	mGridSizeSld->SetValue((short)(100*GridSize));
 
@@ -3194,35 +3300,6 @@ void TEDensity3DSurfPane::refreshControls() {
 		mSmoothChkBox->Enable();
 	else
 		mSmoothChkBox->Disable();
-}
-void TEDensity3DSurfPane::OnUseMEPCheck(wxCommandEvent &event) {
-	UseMEP = mColorSurfCheck->GetValue();
-	refreshControls();
-	setUpdateButton();
-}
-void TEDensity3DSurfPane::OnRGBColorCheck(wxCommandEvent &event) {
-	UseRGBSurfaceColor = mUseRGBColorCheck->GetValue();
-	refreshControls();
-	setUpdateButton();
-}
-void TEDensity3DSurfPane::OnInvertRGBCheck(wxCommandEvent &event) {
-	InvertRGBSurfaceColor = mInvertRGBCheck->GetValue();
-	//	refreshControls();
-	setUpdateButton();
-}
-void TEDensity3DSurfPane::OnMaxMEPValueText(wxCommandEvent& event) {
-	double newVal=0.0;
-	wxString temp = mMaxMapEdit->GetValue();
-
-	if (temp.ToDouble(&newVal)) {
-		MaxMEPValue = newVal;
-	}
-	setUpdateButton();
-}
-void TEDensity3DSurfPane::SetMaxMEPValueText(void) {
-	wxString temp;
-	temp.Printf(wxT("%.4f"), MaxMEPValue);
-	mMaxMapEdit->SetValue(temp);
 }
 bool TEDensity3DSurfPane::UpdateNeeded(void) {
 	bool result = UpdateTest;
@@ -3476,11 +3553,10 @@ void TEDensity3DSurfPane::CreateControls() {
 	/* itemBoxSizer108->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
 
 	wxStaticBoxSizer *mep_sizer = new wxStaticBoxSizer(wxHORIZONTAL, TED3DPanel, wxT("MEP"));
-
 	mainSizer->Add(mep_sizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
 	wxBoxSizer* itemBoxSizer112 = new wxBoxSizer(wxVERTICAL);
 	mep_sizer->Add(itemBoxSizer112, 0);
-	mColorSurfCheck = new wxCheckBox(TED3DPanel, ID_TED3D_COLOR_SURF_CHECK, _("Colorize using the surface MEP value"), wxDefaultPosition, wxDefaultSize, 0);
+	mColorSurfCheck = new wxCheckBox(TED3DPanel, ID_3D_COLOR_SURF_CHECK, _("Colorize using the surface MEP value"), wxDefaultPosition, wxDefaultSize, 0);
 	mColorSurfCheck->SetValue(false);
 	itemBoxSizer112->Add(mColorSurfCheck, 0);
 
@@ -3503,7 +3579,7 @@ void TEDensity3DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText116 = new wxStaticText(TED3DPanel, wxID_STATIC, _("Max. value to map"), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer115->Add(itemStaticText116, 0);
 
-	mMaxMapEdit = new wxTextCtrl(TED3DPanel, ID_TED3D_MAX_MAP_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
+	mMaxMapEdit = new wxTextCtrl(TED3DPanel, ID_3D_MAX_MAP_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer115->Add(mMaxMapEdit, 0, wxALIGN_CENTER_HORIZONTAL);
 
 	wxBoxSizer* itemBoxSizer118 = new wxBoxSizer(wxHORIZONTAL);
@@ -3724,7 +3800,7 @@ void MEP2DSurfPane::CreateControls() {
 	itemBoxSizer163->Add(mUpdateBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 }
 void MEP2DSurfPane::TargetToPane(void) {
-	TargetOrbSet = mTarget->getTargetOrbitalSet();
+	TargetOrbSet = mTarget->getTargetOrbSet();
 	NumGridPoints = mTarget->GetNumGridPoints();
 	mTarget->GetPosColor(&PosColor);
 	mTarget->GetNegColor(&NegColor);
@@ -3749,7 +3825,7 @@ bool MEP2DSurfPane::UpdateNeeded(void) {
 	if (ShowZeroContour != mTarget->GetShowZeroContour()) result = true;
 	if (DisplayPlane != mTarget->ShowPlottingPlane()) result = true;
 	if (DashLines != mTarget->GetDashLine()) result = true;
-	if (TargetOrbSet != mTarget->getTargetOrbitalSet()) result = true;
+	if (TargetOrbSet != mTarget->getTargetOrbSet()) result = true;
 	if (!result) {
 		RGBColor	testColor;
 		mTarget->GetPosColor(&testColor);
@@ -3766,8 +3842,8 @@ void MEP2DSurfPane::OnUpdate(wxCommandEvent &event) {
 	SetContourValueText();
 
 	bool	updateGrid = UpdateTest;
-	if (TargetOrbSet != mTarget->getTargetOrbitalSet()) {
-		mTarget->setTargetOrbitalSet(TargetOrbSet);
+	if (TargetOrbSet != mTarget->getTargetOrbSet()) {
+		mTarget->setTargetOrbSet(TargetOrbSet);
 		updateGrid = true;
 	}
 	if (NumGridPoints != mTarget->GetNumGridPoints()) {
@@ -3900,7 +3976,7 @@ void MEP3DSurfPane::TargetToPane(void) {
 	UseSolidSurface = mTarget->SolidSurface();
 	UseNormals = mTarget->UseSurfaceNormals();
 	NumGridPoints = mTarget->GetNumGridPoints();
-	TargetOrbSet = mTarget->getTargetOrbitalSet();
+	TargetOrbSet = mTarget->getTargetOrbSet();
 	GridSize = mTarget->GetGridSize();
 	Visible = mTarget->GetVisibility();
 	AllFrames = (mTarget->GetSurfaceID() != 0);
@@ -3932,7 +4008,7 @@ bool MEP3DSurfPane::UpdateNeeded(void) {
 
 	if (Visible != mTarget->GetVisibility()) result = true;
 	if (AllFrames != (mTarget->GetSurfaceID() != 0)) result = true;
-	if (TargetOrbSet != mTarget->getTargetOrbitalSet()) result = true;
+	if (TargetOrbSet != mTarget->getTargetOrbSet()) result = true;
 	if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
 	if (ContourValue != mTarget->GetContourValue()) result = true;
 	if (GridSize != mTarget->GetGridSize()) result = true;
@@ -3957,7 +4033,7 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 
 	//only update the grid if needed
 	bool updateGrid=UpdateTest, updateContour=false;
-	if (TargetOrbSet != mTarget->getTargetOrbitalSet()) {
+	if (TargetOrbSet != mTarget->getTargetOrbSet()) {
 		updateGrid = true;
 		mTarget->SetFixGrid(false);
 	}
@@ -3976,7 +4052,7 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	if (updateGrid) updateContour = true;
 	mTarget->SetVisibility(Visible);
 	mTarget->SolidSurface(UseSolidSurface);
-	mTarget->setTargetOrbitalSet(TargetOrbSet);
+	mTarget->setTargetOrbSet(TargetOrbSet);
 	mTarget->SetNumGridPoints(NumGridPoints);
 	mTarget->SetContourValue(ContourValue);
 	mTarget->SetGridSize(GridSize);

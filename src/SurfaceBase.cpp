@@ -30,7 +30,8 @@ void NormalizeNormalArray(CPoint3D * ContourNorm, long &NumVertices);
 void ComputeTriangleNormals(CPoint3D * Contour, CPoint3D *ContourNorm, long * VertexList, long &NumTriangles);
 
 
-Surface::Surface(void) {
+Surface::Surface(void)
+	: OrbSet(-1) {
 	ID = 0;		//Set this to something unique
 	NextSurface = NULL;
 	Label = NULL;

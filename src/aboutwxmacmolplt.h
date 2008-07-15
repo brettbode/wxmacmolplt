@@ -64,19 +64,19 @@
 
 class AboutwxMacMolPlt: public wxDialog
 {    
-    DECLARE_DYNAMIC_CLASS( AboutwxMacMolPlt )
-    DECLARE_EVENT_TABLE()
+	DECLARE_DYNAMIC_CLASS( AboutwxMacMolPlt )
+	DECLARE_EVENT_TABLE()
 
-public:
-    /// Constructors
-    AboutwxMacMolPlt( );
-    AboutwxMacMolPlt( wxWindow* parent, wxWindowID id = SYMBOL_ABOUTWXMACMOLPLT_IDNAME, const wxString& caption = SYMBOL_ABOUTWXMACMOLPLT_TITLE, const wxPoint& pos = SYMBOL_ABOUTWXMACMOLPLT_POSITION, const wxSize& size = SYMBOL_ABOUTWXMACMOLPLT_SIZE, long style = SYMBOL_ABOUTWXMACMOLPLT_STYLE );
+	public:
+		/// Constructors
+		AboutwxMacMolPlt( );
+		AboutwxMacMolPlt( wxWindow* parent, wxWindowID id = SYMBOL_ABOUTWXMACMOLPLT_IDNAME, const wxString& caption = SYMBOL_ABOUTWXMACMOLPLT_TITLE, const wxPoint& pos = SYMBOL_ABOUTWXMACMOLPLT_POSITION, const wxSize& size = SYMBOL_ABOUTWXMACMOLPLT_SIZE, long style = SYMBOL_ABOUTWXMACMOLPLT_STYLE );
 
-    /// Creation
-    bool Create( wxWindow* parent, wxWindowID id = SYMBOL_ABOUTWXMACMOLPLT_IDNAME, const wxString& caption = SYMBOL_ABOUTWXMACMOLPLT_TITLE, const wxPoint& pos = SYMBOL_ABOUTWXMACMOLPLT_POSITION, const wxSize& size = SYMBOL_ABOUTWXMACMOLPLT_SIZE, long style = SYMBOL_ABOUTWXMACMOLPLT_STYLE );
+		/// Creation
+		bool Create( wxWindow* parent, wxWindowID id = SYMBOL_ABOUTWXMACMOLPLT_IDNAME, const wxString& caption = SYMBOL_ABOUTWXMACMOLPLT_TITLE, const wxPoint& pos = SYMBOL_ABOUTWXMACMOLPLT_POSITION, const wxSize& size = SYMBOL_ABOUTWXMACMOLPLT_SIZE, long style = SYMBOL_ABOUTWXMACMOLPLT_STYLE );
 
-    /// Creates the controls and sizers
-    void CreateControls();
+		/// Creates the controls and sizers
+		void CreateControls();
 
 ////@begin AboutwxMacMolPlt event handler declarations
 
@@ -84,20 +84,20 @@ public:
 
 ////@begin AboutwxMacMolPlt member function declarations
 
-	/// Retrieves bitmap resources
-	wxBitmap GetBitmapResource( const wxString& name );
+		/// Retrieves bitmap resources
+		wxBitmap GetBitmapResource( const wxString& name );
 
-	/// Retrieves icon resources
-	wxIcon GetIconResource( const wxString& name );
+		/// Retrieves icon resources
+		wxIcon GetIconResource( const wxString& name );
 ////@end AboutwxMacMolPlt member function declarations
 
-    /// Should we show tooltips?
-    static bool ShowToolTips();
+		/// Should we show tooltips?
+		static bool ShowToolTips();
 
 ////@begin AboutwxMacMolPlt member variables
-	wxStaticText* mVersionText;
+		wxStaticText* mVersionText;
 ////@end AboutwxMacMolPlt member variables
 };
 
 #endif
-    // _ABOUTWXMACMOLPLT_H_
+// _ABOUTWXMACMOLPLT_H_
