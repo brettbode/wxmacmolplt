@@ -6,7 +6,9 @@ shared = resources/MacMolPlt.Prefs.xml \
     resources/fonts/BsVeraSans.fdb resources/organics.cml \
     resources/solvents.cml resources/amino_acids.cml \
     resources/shaders/perpixel_dirlight_v.glsl \
-    resources/shaders/perpixel_dirlight_f.glsl
+    resources/shaders/perpixel_dirlight_f.glsl \
+    resources/shaders/shadows_v.glsl \
+    resources/shaders/shadows_f.glsl
 if HOST_IS_MSW
 bindata_DATA = $(shared)
 bindatadir = $(bindir)
