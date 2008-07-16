@@ -453,7 +453,7 @@ void Matrix2D::SVD(Matrix2D *out, Matrix2D *gain, Matrix2D *in) const {
       }
    }
 
-   free(rv1);
+   delete[] rv1;
 
    int i_max;
 
