@@ -318,7 +318,7 @@ WinPrefs::WinPrefs(void) {
 	CenterOnPage = true;
 	ShowSymOps = false;
 	show_toolbar = false;
-	light_per_pixel = false;
+	shader_mode = 0;
 }
 
 WinPrefs::~WinPrefs(void) {
@@ -649,8 +649,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					SetStereoOffset(longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_RotateMode), boolVal))
 					SetRotateMode(boolVal);
-				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_PerPixelLighting), boolVal))
-					SetPerPixelLighting(boolVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShaderMode), longVal))
+					SetShaderMode(longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AnimateMode), boolVal))
 					SetAnimateMode(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowAngles), boolVal))
@@ -1038,7 +1038,9 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	outbuf << GetStereoOffset();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_StereoOffset), outbuf.str().c_str());
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_RotateMode), (GetRotateMode()?trueXML:falseXML));
-	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_PerPixelLighting), (GetPerPixelLighting()?trueXML:falseXML));
+	outbuf.str("");
+	outbuf << GetShaderMode();
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShaderMode), outbuf.str().c_str());
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_AnimateMode), (GetAnimateMode()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowAngles), (GetShowAngles()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_Stereo), (UseStereo()?trueXML:falseXML));
@@ -1447,8 +1449,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "StereoOffset";
         case MMPMolDisplay_RotateMode:
             return "RotateMode";
-        case MMPMolDisplay_PerPixelLighting:
-            return "PerPixelLighting";
+        case MMPMolDisplay_ShaderMode:
+            return "ShaderMode";
         case MMPMolDisplay_AnimateMode:
             return "AnimateMode";
         case MMPMolDisplay_ShowAngles:

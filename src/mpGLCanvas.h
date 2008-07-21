@@ -67,6 +67,8 @@
 #define GL_Popup_Save_Prototype 30050
 #define GL_Popup_Change_EFP_To_AllElec 30051
 
+#define FBO_SIZE 512
+
 class BuilderDlg;
 
 typedef class MolDisplayWin MolDisplayWin;
@@ -176,13 +178,19 @@ class MpGLCanvas : public wxGLCanvas {
 		~MpGLCanvas();
 
 		void SetPrefs(WinPrefs *newPrefs);
-		void DoPrefDependent();
 		void FitToPlane(wxCommandEvent& event);
 		void SelectWholeFragments();
 
 		void Draw(void);
 
 		MolDisplayWin *GetParent(void) { return MolWin; }
+
+#if wxCHECK_VERSION(2,9,0)
+		// HUH: I don't know why this needs scope resolved, but it does.
+		void SetCurrent() { wxGLCanvas::SetCurrent(*context); }
+		// And defining the above seems to hide the following from wxGLCanvas.
+		void SetCurrent(wxGLContext& context) { wxGLCanvas::SetCurrent(context); }
+#endif
 		  
 		/**
 		* Creates an image of the canvas for purposes such as printing or

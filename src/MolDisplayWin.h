@@ -27,37 +27,8 @@
 #include "Prefs.h"
 #include "Progress.h"
 #include <deque>
-#include "InputWizard.h"
+#include "MyTypes.h"
 
-/** This class holds all the window specific OpenGL data. It currently
-	functions more like a struct. None of this data is saved to file.
-*/
-class OpenGLRec {
-	friend class MpGLCanvas;
-	public:
-#ifndef __wxBuild__
-		AGLContext aglContext;
-		AGLPixelFormat	fmt;
-		GLuint fontList;
-#endif
-		
-		myGLTriangle *  transpTriList;		///< The list of transparent triangles
-		float *			transpSortVertex;	///< The rotated screen Z coordinate to sort on.
-		long *			transpIndex;		///< The sorted triangle list
-		long			triangleCount;		///< The number of transparent triangles
-		
-		GLuint			MainDisplayList;	///< id for a main display list
-		GLuint			SurfaceDisplayList;
-		bool			MainListActive;
-		bool			SurfaceListActive;
-		bool			haveTransparentSurfaces;	///< Flag if there are transparent surfaces
-		GLuint			length_anno_tex_id;			///< texture id for length annotations
-		GLuint			sphere_list;
-		GLuint			shader_program;
-		
-		OpenGLRec(void);
-		~OpenGLRec(void);
-};
 typedef class BondsDlg BondsDlg;
 typedef class CoordinatesWindow CoordinatesWindow;
 typedef class EnergyPlotDialog EnergyPlotDialog;
@@ -77,8 +48,8 @@ typedef class UndoSnapShot UndoSnapShot;
 */
 class UndoSnapShot {
 public:
-	virtual ~UndoSnapShot(void) {};
-	virtual void Restore(void) {};
+	virtual ~UndoSnapShot() {}
+	virtual void Restore() {}
 };
 
 /**
@@ -90,12 +61,12 @@ public:
 	/** Create a snapshot from the provided frame pointer.
 	*/
 	FrameSnapShot(MoleculeData * target);
-	virtual ~FrameSnapShot(void);
+	virtual ~FrameSnapShot();
 	/** Restore the saved data. Note the frame point is stored here
 		so you can't restore if the original frame memory has been
 		destroyed.
 	*/
-	virtual void Restore(void);
+	virtual void Restore();
 private:
 	MoleculeData * targetData;	///< The target data structure
 	Frame *		mTarget;	///< The target Frame.
@@ -113,26 +84,26 @@ private:
 */
 class UndoData {
 public:
-	UndoData(void) : operationCount(0), position(0) {};
-	~UndoData(void) {Clear();};
+	UndoData() : operationCount(0), position(0) {}
+	~UndoData() {Clear();}
 	///How many snapshots are saved.
-	int GetOperationCount(void) const {return operationCount;};
+	int GetOperationCount() const {return operationCount;}
 	///Obtains the position in the snapshot list.
-	int GetPosition(void) const {return position;};
+	int GetPosition() const {return position;}
 	///Move the snapshot position manually (not normally needed).
-	void SetPosition(int p) {if ((p>=0)&&(p<operationCount)) position = p;};
+	void SetPosition(int p) {if ((p>=0)&&(p<operationCount)) position = p;}
 	///Is undo possible?
-	bool undoPossible(void) const {return ((operationCount > 0)&&(position > 0));};
+	bool undoPossible() const {return ((operationCount > 0)&&(position > 0));}
 	///Is redo possible?
-	bool redoPossible(void) const {return ((position+1) < operationCount);};
+	bool redoPossible() const {return ((position+1) < operationCount);}
 	///Remove all snapshots and free their memory.
-	void Clear(void);
+	void Clear();
 	///Add a snapshot to the stack.
 	void AddSnapshot(UndoSnapShot *);
 	///Undo to the previous snapshot.
-	void UndoOperation(void);
+	void UndoOperation();
 	///Redo to the next snapshot.
-	void RedoOperation(void);
+	void RedoOperation();
 private:
 	std::deque<UndoSnapShot *>	UndoList;
 	int	operationCount;
@@ -142,47 +113,47 @@ private:
 //Simple class to save window visibility and positioning data
 class WindowData {
 public:
-	WindowData(void);
+	WindowData();
 	static void Validate(wxRect & t);
 	
 	void WriteXML(XMLElement * parent) const;
 	void ReadXML(XMLElement * parent);
 	
-	bool BondsWindowVisible(void) const {return BondsVis;};
-	void BondsWindowVisible(bool v) {BondsVis = v;};
-	bool CoordsWindowVisible(void) const {return CoordsVis;};
-	void CoordsWindowVisible(bool v) {CoordsVis = v;};
-	bool EnergyWindowVisible(void) const {return EnergyVis;};
-	void EnergyWindowVisible(bool v) {EnergyVis = v;};
-	bool FreqWindowVisible(void) const {return FreqVis;};
-	void FreqWindowVisible(bool v) {FreqVis = v;};
-	bool SurfacesWindowVisible(void) const {return SurfacesVis;};
-	void SurfacesWindowVisible(bool v) {SurfacesVis = v;};
-	bool InputBWindowVisible(void) const {return InputBVis;};
-	void InputBWindowVisible(bool v) {InputBVis = v;};
-	bool PrefsWindowVisible(void) const {return PrefVis;};
-	void PrefsWindowVisible(bool v) {PrefVis = v;};
-	bool ZMatWindowVisible(void) const {return ZMatVis;};
-	void ZMatWindowVisible(bool v) {ZMatVis = v;};
+	bool BondsWindowVisible() const {return BondsVis;}
+	void BondsWindowVisible(bool v) {BondsVis = v;}
+	bool CoordsWindowVisible() const {return CoordsVis;}
+	void CoordsWindowVisible(bool v) {CoordsVis = v;}
+	bool EnergyWindowVisible() const {return EnergyVis;}
+	void EnergyWindowVisible(bool v) {EnergyVis = v;}
+	bool FreqWindowVisible() const {return FreqVis;}
+	void FreqWindowVisible(bool v) {FreqVis = v;}
+	bool SurfacesWindowVisible() const {return SurfacesVis;}
+	void SurfacesWindowVisible(bool v) {SurfacesVis = v;}
+	bool InputBWindowVisible() const {return InputBVis;}
+	void InputBWindowVisible(bool v) {InputBVis = v;}
+	bool PrefsWindowVisible() const {return PrefVis;}
+	void PrefsWindowVisible(bool v) {PrefVis = v;}
+	bool ZMatWindowVisible() const {return ZMatVis;}
+	void ZMatWindowVisible(bool v) {ZMatVis = v;}
 	
-	const wxRect & GetMolWinRect(void) const {return MolWinRect;};
-	void SetMolWinRect(const wxRect & v) {MolWinRect = v;};
-	const wxRect & GetBondsWinRect(void) const {return BondsWinRect;};
-	void SetBondsWinRect(const wxRect & v) {BondsWinRect = v;};
-	const wxRect & GetCoordsWinRect(void) const {return CoordsWinRect;};
-	void SetCoordsWinRect(const wxRect & v) {CoordsWinRect = v;};
-	const wxRect & GetEnergyWinRect(void) const {return EnergyWinRect;};
-	void SetEnergyWinRect(const wxRect & v) {EnergyWinRect = v;};
-	const wxRect & GetFrequencyWinRect(void) const {return FreqWinRect;};
-	void SetFrequencyWinRect(const wxRect & v) {FreqWinRect = v;};
-	const wxRect & GetSurfacesWinRect(void) const {return SurfacesWinRect;};
-	void SetSurfacesWinRect(const wxRect & v) {SurfacesWinRect = v;};
-	const wxRect & GetInputBWinRect(void) const {return InputBuilderRect;};
-	void SetInputBWinRect(const wxRect & v) {InputBuilderRect = v;};
-	const wxRect & GetPrefsWinRect(void) const {return PreferenceWinRect;};
-	void SetPrefsWinRect(const wxRect & v) {PreferenceWinRect = v;};
-	const wxRect & GetZMatWinRect(void) const {return ZMatRect;};
-	void SetZMatWinRect(const wxRect & v) {ZMatRect = v;};
+	const wxRect & GetMolWinRect() const {return MolWinRect;}
+	void SetMolWinRect(const wxRect & v) {MolWinRect = v;}
+	const wxRect & GetBondsWinRect() const {return BondsWinRect;}
+	void SetBondsWinRect(const wxRect & v) {BondsWinRect = v;}
+	const wxRect & GetCoordsWinRect() const {return CoordsWinRect;}
+	void SetCoordsWinRect(const wxRect & v) {CoordsWinRect = v;}
+	const wxRect & GetEnergyWinRect() const {return EnergyWinRect;}
+	void SetEnergyWinRect(const wxRect & v) {EnergyWinRect = v;}
+	const wxRect & GetFrequencyWinRect() const {return FreqWinRect;}
+	void SetFrequencyWinRect(const wxRect & v) {FreqWinRect = v;}
+	const wxRect & GetSurfacesWinRect() const {return SurfacesWinRect;}
+	void SetSurfacesWinRect(const wxRect & v) {SurfacesWinRect = v;}
+	const wxRect & GetInputBWinRect() const {return InputBuilderRect;}
+	void SetInputBWinRect(const wxRect & v) {InputBuilderRect = v;}
+	const wxRect & GetPrefsWinRect() const {return PreferenceWinRect;}
+	void SetPrefsWinRect(const wxRect & v) {PreferenceWinRect = v;}
+	const wxRect & GetZMatWinRect() const {return ZMatRect;}
+	void SetZMatWinRect(const wxRect & v) {ZMatRect = v;}
 private:
 	wxRect	MolWinRect;
 	wxRect	BondsWinRect;
@@ -232,7 +203,6 @@ class MolDisplayWin : public wxFrame {
 		bool			do_rotate_annotation;
 		
 		Progress		*ProgressInd;    ///< Progress indicator window for long operations
-		OpenGLRec		*OpenGLData;     ///< Extra OpenGL data
 		MpGLCanvas		*glCanvas;
 		MolStatusBar	*myStatus;
 		ModeAnimation	*ModeAnimationData;
@@ -246,7 +216,6 @@ class MolDisplayWin : public wxFrame {
 		FrequenciesDialog	*frequenciesWindow;
 		SurfacesWindow		*surfacesWindow;
 		InputBuilderWindow	*inputBuilderWindow;
-		/* InputWizard			*input_wizard; */
 		setPreference		*prefsDlg;
 		ZMatrixCalculator	*zMatCalcDlg;
 		
@@ -255,7 +224,7 @@ class MolDisplayWin : public wxFrame {
 		wxPageSetupDialogData *pageSetupData;
 		wxPrintData           *printData;
 
-		void createMenuBar(void);
+		void createMenuBar();
 		long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
 							  long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
 
@@ -276,6 +245,24 @@ class MolDisplayWin : public wxFrame {
 		bool show_bond_sites;
 		bool window_just_focused;
 
+		myGLTriangle *transpTriList;		///< The list of transparent triangles
+		float *transpSortVertex;	///< The rotated screen Z coordinate to sort on.
+		long *transpIndex;		///< The sorted triangle list
+		long triangleCount;		///< The number of transparent triangles
+		
+		GLuint MainDisplayList;	///< id for a main display list
+		GLuint SurfaceDisplayList;
+		bool MainListActive;
+		bool SurfaceListActive;
+		bool haveTransparentSurfaces;	///< Flag if there are transparent surfaces
+		GLuint length_anno_tex_id;			///< texture id for length annotations
+		GLuint sphere_list;
+		GLuint shader_program;
+		GLuint depth_fbo;
+		GLuint depth_tex_id;
+		GLfloat fg_color[3];
+		GLfloat light_pos[4];
+
 		void OnToggleTool(wxCommandEvent& event);
 		void OnStatusTimer(wxTimerEvent& event);
 		void OnRotateTimer(wxTimerEvent& event);
@@ -288,6 +275,7 @@ class MolDisplayWin : public wxFrame {
 		void OnSaveStructureUpdate(wxUpdateUIEvent& event);
 		void DeleteSelected();
 		void RegenerateSymmetryDependent();
+		void DoPrefDependent();
 
 		DECLARE_EVENT_TABLE()
 
@@ -320,8 +308,8 @@ class MolDisplayWin : public wxFrame {
 		void getCanvasSize(long *width, long *height);
 
 		//Call to update the menu bar itesm for the current data
-		void AdjustMenus(void);
-		void ClearMenus(void);
+		void AdjustMenus();
+		void ClearMenus();
 		// Below are the event handler functions for the menu.  The initial
 		// list was taken from the original MacMolPlt menus.
 
@@ -352,7 +340,7 @@ class MolDisplayWin : public wxFrame {
 		void menuEditPaste(wxCommandEvent &event);
 		/// wxEVT_UPDATE_UI event handler for wxID_PASTE
 		void OnPasteUpdate( wxUpdateUIEvent& event );
-		void PasteText(void);
+		void PasteText();
 		void menuEditClear(wxCommandEvent &event);
 		void menuEditSelectAll(wxCommandEvent &event);
 		void menuEditSelectNone(wxCommandEvent &event);
@@ -408,7 +396,7 @@ class MolDisplayWin : public wxFrame {
 		void menuBuilderSaveStructure(wxCommandEvent &event);
 
 		void menuPreferences(wxCommandEvent &event);
-		void ClosePrefsWindow(void);
+		void ClosePrefsWindow();
 
 		void menuMoleculeSetBondLength(wxCommandEvent &event);
 		void menuMoleculeSetFrameEnergy(wxCommandEvent &event);
@@ -483,7 +471,6 @@ class MolDisplayWin : public wxFrame {
 		void menuWindowEnergy_plot(wxCommandEvent &event);
 		void menuWindowFrequencies(wxCommandEvent &event);
 		void menuWindowInput_builder(wxCommandEvent &event);
-		void menuWindowInputWizard(wxCommandEvent &event);
 		void menuWindowSurfaces(wxCommandEvent &event);
 		void menuWindowZMatrixCalc(wxCommandEvent &event);
 		void KeyHandler(wxKeyEvent &event);
@@ -492,13 +479,13 @@ class MolDisplayWin : public wxFrame {
 		 * \param event The event to handle.
 		 */
 		void KeyUpHandler(wxKeyEvent &event);
-		void CloseBondsWindow(void);
-		void CloseCoordsWindow(void);
-		void CloseEnergy_plotWindow(void);
-		void CloseFrequenciesWindow(void);
-		void CloseSurfacesWindow(void);
-		void CloseInputBuilderWindow(void);
-		void CloseZMatrixCalc(void);
+		void CloseBondsWindow();
+		void CloseCoordsWindow();
+		void CloseEnergy_plotWindow();
+		void CloseFrequenciesWindow();
+		void CloseSurfacesWindow();
+		void CloseInputBuilderWindow();
+		void CloseZMatrixCalc();
 		void OnActivate(wxActivateEvent & event);
 		
 		//File handling routines
@@ -597,48 +584,46 @@ class MolDisplayWin : public wxFrame {
 		/**
 			Call when the bonds list is changed to update the bonds subwindow and the main display.
 		 */
-		void BondsChanged(void);
+		void BondsChanged();
 		/**
 			Call to update surfaces (as needed) and the main display window. Generally this
 			is called after the frame is changed or after a significant change to the frame data.
 		 */
-		void FrameChanged(void);
+		void FrameChanged();
 		void ChangeFrames(long NewFrame);
 		/**
 			Call to insert the selected atoms at the provided index.
 			\param index The position in the atom list to insert the 1st selected atom.
 		 */
 		void ChangeAtomOrder(long index);
-		void ModeChanged(void);
+		void ModeChanged();
 		void ChangeModes(long NewMode);
-		void UpdateModelDisplay(void);
-		MoleculeData * GetData(void) const {return MainData;};
-		WinPrefs * GetPrefs(void) const {return Prefs;};
+		void UpdateModelDisplay();
+		MoleculeData * GetData() const {return MainData;}
+		WinPrefs * GetPrefs() const {return Prefs;}
 		void SetWindowPreferences(WinPrefs * NewPrefs);
 		/* void ChangePrefs(WinPrefs * newPrefs); */
-		void ResetView(void);
+		void ResetView();
 		void ResetModel(bool Center);
-		void ResetAllWindows(void);
-		void UpdateFrameText(void);
-		void BeginOperation(void);
-		void FinishOperation(void);
-		bool OperInProgress(void) const {return OperationInProgress;};
+		void ResetAllWindows();
+		void UpdateFrameText();
+		void BeginOperation();
+		void FinishOperation();
+		bool OperInProgress() const {return OperationInProgress;}
 		/**
 		 * Updates the visibility and position information. This should
 		 * be called before saving the state of the file.
 		 */
-		void UpdateWindowData(void);
+		void UpdateWindowData();
 		
 		//OpenGL drawing routines
-		void InitGLData(void);
-		void DeleteGLData(void);
-		void DrawGL(void);
-		void SortTransparentTriangles(void);
-		void DrawTransparentTriangles(void);
-		void DrawMoleculeCoreGL(void);
-		void AddAxisGL(void);
-		void AddSymmetryOperators(void);
-		void UpdateGLModel(void);
+		void DrawGL(int do_shader = true);
+		void SortTransparentTriangles();
+		void DrawTransparentTriangles();
+		void DrawMoleculeCoreGL();
+		void AddAxisGL();
+		void AddSymmetryOperators();
+		void ReleaseLists();
 		void Rotate(wxMouseEvent&);
 		void ShowRotation(bool ShowAngles, bool ShowTrackball);
 		static void DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
@@ -655,38 +640,38 @@ class MolDisplayWin : public wxFrame {
 		void PrintGL(wxDC * dc, const float & scaleFactor);
 		void SetHighliteMode(bool state) { mHighliteState = state; }
 		void DrawStaticLabel(const char* label, GLfloat x, GLfloat y);
-		void DrawLabel(void);
+		void DrawLabel();
 		void SelectionChanged(bool mode);
-		GLuint GetLengthTexId(void) const {return OpenGLData->length_anno_tex_id;};
+		GLuint GetLengthTexId() const {return length_anno_tex_id;}
 
-		bool IsRotating(void);
+		bool IsRotating();
 		void eventSize(wxSizeEvent &event);
-		/* void SizeChanged(void); */
+		/* void SizeChanged(); */
 		void OnFrameAnimationTimer(wxTimerEvent & event);
 		//Called during normal mode animations
 		void OnModeAnimation(wxTimerEvent & event);
 		//Function to be called when window loses focus to stop animations
 		void OnMenuOpen(wxMenuEvent & event);
 		void OnKillFocus(wxFocusEvent & event);
-		void StopAnimations(void);
+		void StopAnimations();
 		void LassoStart(const int x, const int y);
 		void LassoGrown(const int x, const int y);
-		void LassoEnd(void);
+		void LassoEnd();
 		bool LassoContains(const int x, const int y);
-		bool LassoHasArea(void);
-		bool InSelectionMode(void);
-		bool InViewMode(void);
-		bool InEditMode(void);
-		bool InSymmetryEditMode(void);
+		bool LassoHasArea();
+		bool InSelectionMode();
+		bool InViewMode();
+		bool InEditMode();
+		bool InSymmetryEditMode();
 		void DrawBondingSites(long iatom, float radius, GLUquadricObj *qobj, int site_id=0, CPoint3D * vector=NULL);
 		void SetStatusText(const wxString& label);
 		/**
 			Call to push a snapshot of the current coordinates to the undo stack.
 		 */
-		void CreateFrameSnapShot(void);
+		void CreateFrameSnapShot();
 		void ToggleBuilderPalette();
-		WinPrefs *GetPrefs(void) {return Prefs;}
-		bool JustFocused(void);
+		WinPrefs *GetPrefs() {return Prefs;}
+		bool JustFocused();
 };
 
 class MolPrintOut : public wxPrintout {

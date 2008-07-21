@@ -73,7 +73,7 @@
 #define ID_DISPLAY_DEPTH_SLIDER	5038
 #define ID_ATOM_LABEL_SLIDER	5039
 #define ID_ANNOTATION_SLIDER	5040
-#define ID_PER_PIXEL_LIGHTING 5041
+#define ID_SHADER_CHOICE 5041
 
 #include "GlobalExceptions.h"
 #include "MyTypes.h"
@@ -150,7 +150,7 @@ BEGIN_EVENT_TABLE(QD3DPrefsPane, wxPanel)
 	EVT_SLIDER(ID_POINT_LIGHT_BRIGHTNESS_SLIDER, QD3DPrefsPane::OnSliderUpdate)
 	EVT_SLIDER(ID_LINE_WIDTH_SLIDER, QD3DPrefsPane::OnSliderUpdate)
 	EVT_SLIDER(ID_DEPTH_CUEING_SLIDER, QD3DPrefsPane::OnSliderUpdate)
-	EVT_CHECKBOX(ID_PER_PIXEL_LIGHTING, QD3DPrefsPane::OnCheckBox)
+	EVT_CHOICE(ID_SHADER_CHOICE, QD3DPrefsPane::OnShaderChoice)
 	/* EVT_CHECKBOX(ID_ACTIVATE_3D_MODE, QD3DPrefsPane::OnCheckBox) */
 END_EVENT_TABLE()
 
@@ -1269,10 +1269,17 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 
 	if (GLEW_VERSION_2_0) {
 		mMainSizer->Add(new wxStaticText(this, wxID_ANY,
-					    _T("Per-pixel lighting:")), 0, rflags, 3);
-		mPerPixelCheck = new wxCheckBox(this, ID_PER_PIXEL_LIGHTING, wxT(""));
-		mPerPixelCheck->SetValue(mTargetPrefs->GetPerPixelLighting());
-		mMainSizer->Add(mPerPixelCheck, 0, lflags, 3);
+					    _T("Shader Mode:")), 0, rflags, 3);
+		wxString choices[3] = {
+			wxT("No shaders"),
+			wxT("Smooth shading"),
+			wxT("Smooth shading and shadows")
+		};
+		mShaderChooser = new wxChoice(this, ID_SHADER_CHOICE,
+									  wxDefaultPosition, wxDefaultSize,
+									  3, choices);
+		mShaderChooser->SetSelection(mTargetPrefs->GetShaderMode());
+		mMainSizer->Add(mShaderChooser, 0, lflags, 3);
 	}
 
 }
@@ -1281,12 +1288,12 @@ void QD3DPrefsPane::saveToTempPrefs() {
 	mBackgrdColor->getColor(mTargetPrefs->GetBackgroundColorLoc());
 }
 
+void QD3DPrefsPane::OnShaderChoice(wxCommandEvent& event) {
+	mTargetPrefs->SetShaderMode(event.GetInt());
+}
+
 void QD3DPrefsPane::OnCheckBox(wxCommandEvent& event) {
 	int id = event.GetId();
-
-	if (id == ID_PER_PIXEL_LIGHTING)
-		mTargetPrefs->SetPerPixelLighting(mPerPixelCheck->GetValue());
-
 	/* mTargetPrefs->Default3DOn(mChk3D->GetValue()); */
 }
 

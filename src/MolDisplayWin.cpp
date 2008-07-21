@@ -39,6 +39,7 @@
 #include "zmatrixcalculator.h"
 #include "symmetrypointgroupdlg.h"
 #include "setPreference.h"
+#include "MyTypes.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
 #include <wx/image.h>
@@ -175,158 +176,6 @@ enum MMP_EventID {
 	Number_MMP_Ids
 };
 
-
-BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
-	EVT_MENU (MMP_NEWFRAME,         MolDisplayWin::menuFileAppendNewFrame)
-#ifndef __WXMAC__
-	EVT_MENU (wxID_OPEN,            MolDisplayWin::menuFileOpen)
-#endif
-	EVT_MENU (MMP_ADDFRAMES,        MolDisplayWin::menuFileAddFramesFromFile)
-	EVT_MENU (wxID_SAVE,            MolDisplayWin::menuFileSave)
-	EVT_UPDATE_UI(wxID_SAVE,		MolDisplayWin::OnSaveUpdate)
-	EVT_MENU (wxID_SAVEAS,          MolDisplayWin::menuFileSave_as)
-	EVT_MENU (wxID_CLOSE,           MolDisplayWin::menuFileClose)
-	EVT_CLOSE(                      MolDisplayWin::FileClose)
-	EVT_MENU (MMP_DELETEFRAME,      MolDisplayWin::menuFileDeleteFrame)
-	EVT_MENU (MMP_IMPORTMENU,       MolDisplayWin::menuFileImport)
-	EVT_MENU (MMP_EXPORT,           MolDisplayWin::menuFileExport)
-	EVT_MENU (wxID_PRINT_SETUP,     MolDisplayWin::menuFilePage_setup)
-	EVT_MENU (MMP_PRINTOPTIONS,     MolDisplayWin::menuFilePrintOptions)
-	EVT_MENU (wxID_PREVIEW,         MolDisplayWin::menuFilePrint_preview)
-	EVT_MENU (wxID_PRINT,           MolDisplayWin::menuFilePrint)
-
-	EVT_MENU (wxID_UNDO,            MolDisplayWin::menuEditUndo)
-	EVT_MENU (wxID_REDO,            MolDisplayWin::menuEditRedo)
-	EVT_UPDATE_UI(wxID_UNDO,		MolDisplayWin::OnUndoUpdate)
-	EVT_UPDATE_UI(wxID_REDO,		MolDisplayWin::OnRedoUpdate)
-	EVT_MENU (wxID_CUT,             MolDisplayWin::menuEditCut)
-	EVT_MENU (wxID_COPY,            MolDisplayWin::menuEditCopy)
-	EVT_MENU (MMP_COPYCOORDS,       MolDisplayWin::menuEditCopyCoordinates)
-	EVT_MENU (wxID_PASTE,           MolDisplayWin::menuEditPaste)
-	EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate)
-	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
-	EVT_UPDATE_UI(wxID_CLEAR,       MolDisplayWin::OnDeleteUpdate)
-	EVT_MENU (MMP_SELECT_ALL,       MolDisplayWin::menuEditSelectAll)
-	EVT_MENU (MMP_SELECT_NONE,		MolDisplayWin::menuEditSelectNone)
-	EVT_UPDATE_UI(MMP_SELECT_NONE,	MolDisplayWin::OnSelectNoneUpdate)
-	EVT_UPDATE_UI(MMP_SELECT_ALL,	MolDisplayWin::OnSelectAllUpdate)
-
-	EVT_MENU (MMP_SHOW_FULLSCREEN,  MolDisplayWin::menuViewShowFullScreen)
-	EVT_UPDATE_UI(MMP_SHOW_FULLSCREEN, MolDisplayWin::OnShowNormalScreen)
-	EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
-	EVT_MENU (MMP_ANIMATEMODE,      MolDisplayWin::menuViewAnimateMode)
-	EVT_MENU (MMP_OFFSETMODE,       MolDisplayWin::menuViewOffsetAlongMode)
-	EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
-	EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
-	EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
-	EVT_MENU (MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::menuViewShowSymmetryOperators)
-	EVT_UPDATE_UI(MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::OnShowSymOpsUpdate )
-	EVT_MENU (MMP_NO_ATOMLABEL,		MolDisplayWin::menuViewHideAtomLabels)
-	EVT_MENU (MMP_SHOWATOMLABELS,   MolDisplayWin::menuViewShowAtomLabel)
-	EVT_MENU (MMP_SHOWATOMNUMBER,   MolDisplayWin::menuViewShowAtomNumber)
-	EVT_MENU (MMP_BOTHATOMLABELS,   MolDisplayWin::menuViewShowBothAtomLabels)
-	EVT_MENU (MMP_ADDMARKANNOTATION,   MolDisplayWin::menuViewAddMarkAnnotation)
-	EVT_MENU (MMP_ADDLENGTHANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
-	EVT_MENU (MMP_ADDANGLEANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
-	EVT_MENU (MMP_ADDDIHEDRALANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
-	EVT_UPDATE_UI(MMP_ADDMARKANNOTATION, MolDisplayWin::OnAnnotationMarkUpdate )
-	EVT_UPDATE_UI(MMP_ADDLENGTHANNOTATION, MolDisplayWin::OnAnnotationLengthUpdate )
-	EVT_UPDATE_UI(MMP_ADDANGLEANNOTATION, MolDisplayWin::OnAnnotationAngleUpdate )
-	EVT_UPDATE_UI(MMP_ADDDIHEDRALANNOTATION, MolDisplayWin::OnAnnotationDihedralUpdate )
-	EVT_MENU (MMP_DELETEALLANNOTATIONS,   MolDisplayWin::menuViewDeleteAllAnnotations)
-	EVT_UPDATE_UI(MMP_DELETEALLANNOTATIONS, MolDisplayWin::OnDeleteAnnotationsUpdate )
-	EVT_MENU (MMP_WIREFRAMEMODE,	MolDisplayWin::menuViewWireFrameStyle)
-	EVT_MENU (MMP_BALLANDSTICKMODE,	MolDisplayWin::menuViewBallAndStickStyle)
-	EVT_MENU (MMP_EFP_WIREFRAME,	MolDisplayWin::menuViewEFP_Wireframe)
-	EVT_UPDATE_UI(MMP_EFP_WIREFRAME,	MolDisplayWin::OnEFPWireFrameUpdate )
-	EVT_MENU (MMP_SHOWPATTERN,		MolDisplayWin::menuViewShow2DPattern)
-	EVT_UPDATE_UI(MMP_SHOWPATTERN,	MolDisplayWin::OnShowPatternUpdate )
-	EVT_MENU (MMP_ANIMATEFRAMES,    MolDisplayWin::menuViewAnimateFrames)
-	EVT_MENU (MMP_SHRINK10,         MolDisplayWin::menuViewShrink_10)
-	EVT_MENU (MMP_ENLARGE10,        MolDisplayWin::menuViewEnlarge_10)
-	EVT_MENU (MMP_CENTER,           MolDisplayWin::menuViewCenter)
-	EVT_MENU (MMP_ROTATETOXAXIS,    MolDisplayWin::menuViewRotateTo_X_axis)
-	EVT_MENU (MMP_ROTATETOYAXIS,    MolDisplayWin::menuViewRotateTo_Y_axis)
-	EVT_MENU (MMP_ROTATETOZAXIS,    MolDisplayWin::menuViewRotateTo_Z_axis)
-	EVT_MENU (MMP_ROTATE180HOR,     MolDisplayWin::menuViewRotate180_horizontal)
-	EVT_MENU (MMP_ROTATE180VER,     MolDisplayWin::menuViewRotate180_vertical)
-	EVT_MENU (MMP_ROTATEPRINC,      MolDisplayWin::menuViewRotatePrinciple_orientation)
-	EVT_MENU (MMP_ROTATEOTHER,      MolDisplayWin::menuViewRotateOther)
-	EVT_MENU (MMP_WINDOWPARAMETERS,	MolDisplayWin::menuViewSetWindowParameters)
-
-	EVT_MENU (MMP_SETBONDLENGTH,      MolDisplayWin::menuMoleculeSetBondLength)
-	EVT_MENU (MMP_ENERGYEDIT,         MolDisplayWin::menuMoleculeSetFrameEnergy)
-	EVT_UPDATE_UI(MMP_CREATELLMPATH,  MolDisplayWin::OnMoleculeCreateLLMPathUpdate )
-	EVT_MENU (MMP_CREATELLMPATH,      MolDisplayWin::menuMoleculeCreateLLMPath)
-	EVT_MENU (MMP_MINFRAMEMOVEMENTS,  MolDisplayWin::menuMoleculeMinimizeFrameMovements)
-	EVT_UPDATE_UI(MMP_CURPOINTGROUP,	MolDisplayWin::OnShowPointGroupUpdate )
-	EVT_MENU (MMP_PGC1,					MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGCS,					MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGCI,					MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGCNH,				MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGCNV,				MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGCN,					MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGS2N,				MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGDND,				MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGDNH,				MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGDN,					MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGTD,					MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGTH,					MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGT,					MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGOH,					MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGO,					MolDisplayWin::menuSetPointGroup)
-	EVT_MENU (MMP_PGORDER2,				MolDisplayWin::menuSetPointGroupOrder)
-	EVT_MENU (MMP_PGORDER3,				MolDisplayWin::menuSetPointGroupOrder)
-	EVT_MENU (MMP_PGORDER4,				MolDisplayWin::menuSetPointGroupOrder)
-	EVT_MENU (MMP_PGORDER5,				MolDisplayWin::menuSetPointGroupOrder)
-	EVT_MENU (MMP_PGORDER6,				MolDisplayWin::menuSetPointGroupOrder)
-	EVT_MENU (MMP_PGORDER7,				MolDisplayWin::menuSetPointGroupOrder)
-	EVT_MENU (MMP_PGORDER8,				MolDisplayWin::menuSetPointGroupOrder)
-	EVT_MENU (MMP_DETERMINEPG,			MolDisplayWin::menuMoleculeDetermineSym)
-	EVT_MENU (MMP_SYMADAPTCOORDS,		MolDisplayWin::menuMoleculeSymCoords)
-	EVT_MENU (MMP_CONVERTTOBOHR,		MolDisplayWin::menuMoleculeConvertToBohr)
-	EVT_MENU (MMP_CONVERTTOANGSTROMS,	MolDisplayWin::menuMoleculeConvertToAngstroms)
-	EVT_MENU (MMP_INVERTNORMALMODE,		MolDisplayWin::menuMoleculeInvertNormalMode)
-	EVT_MENU (MMP_SHOW_TOOLBAR,			MolDisplayWin::menuBuilderShowToolbar)
-	EVT_UPDATE_UI(MMP_SHOW_TOOLBAR,		MolDisplayWin::OnShowToolbarUpdate)
-	EVT_UPDATE_UI(MMP_SHOWBUILDTOOLS,	MolDisplayWin::OnShowBuildToolsUpdate)
-	EVT_MENU (MMP_SHOWBUILDTOOLS,		MolDisplayWin::menuBuilderShowBuildTools)
-	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuBuilderAddHydrogens)
-	EVT_MENU (MMP_DELETEHYDROGENS,		MolDisplayWin::menuBuilderDeleteHydrogens)
-	EVT_MENU (MMP_SHOWBONDSITES,		MolDisplayWin::menuBuilderShowBondSites)
-	EVT_MENU (MMP_SYMMETRY_EDIT,		MolDisplayWin::menuBuilderSymmetryEdit)
-	/* EVT_MENU (MMP_SYMMETRY_REGEN,		MolDisplayWin::menuBuilderRegenSymmetry) */
-	EVT_MENU (MMP_SAVESTRUCTURE,		MolDisplayWin::menuBuilderSaveStructure)
-	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate)
-	EVT_UPDATE_UI(MMP_SAVESTRUCTURE,	MolDisplayWin::OnSaveStructureUpdate)
-	EVT_UPDATE_UI(MMP_SHOWBONDSITES,	MolDisplayWin::OnShowBondSitesUpdate)
-	EVT_UPDATE_UI(MMP_SYMMETRY_EDIT,	MolDisplayWin::OnShowSymmetryEdit)
-	EVT_UPDATE_UI_RANGE(MMP_NEWFRAME, MMP_ANNOTATIONSSUBMENU,
-						MolDisplayWin::UpdateAtomsOptions)
-	EVT_UPDATE_UI(wxID_COPY,			MolDisplayWin::UpdateAtomsOptions)
-	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
-	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)
-	EVT_MENU (MMP_ENERGYPLOTWINDOW,		MolDisplayWin::menuWindowEnergy_plot)
-	EVT_MENU (MMP_FREQUENCIESWINDOW,	MolDisplayWin::menuWindowFrequencies)
-	EVT_MENU (MMP_INPUTBUILDERWINDOW,	MolDisplayWin::menuWindowInput_builder)
-	/* EVT_MENU (MMP_INPUT_WIZARD,			MolDisplayWin::menuWindowInputWizard) */
-	EVT_MENU (MMP_SURFACESWINDOW,		MolDisplayWin::menuWindowSurfaces)
-	EVT_MENU (ID_LOCAL_PREFERENCES,		MolDisplayWin::menuPreferences)
-	EVT_MENU (MMP_ZMATRIXCALC,			MolDisplayWin::menuWindowZMatrixCalc)
-
-	EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
-	EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
-	EVT_TIMER(MMP_STATUS_TIMER, MolDisplayWin::OnStatusTimer)
-	EVT_TIMER(MMP_ROTATE_TIMER, MolDisplayWin::OnRotateTimer)
-	EVT_SIZE(MolDisplayWin::eventSize)
-	EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
-	EVT_KEY_UP (MolDisplayWin::KeyUpHandler)
-	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen)
-	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
-	EVT_ACTIVATE(MolDisplayWin::OnActivate)
-	EVT_TOOL_RANGE(MMP_TOOL_ARROW, MMP_TOOL_HAND, MolDisplayWin::OnToggleTool)
-END_EVENT_TABLE()
-
 //Local use class to hold data during the animation of normal modes
 class ModeAnimation {
 public:
@@ -402,7 +251,6 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	Dirty = false;
 	OperationInProgress = false;
 	ProgressInd = NULL;
-	OpenGLData = NULL;
 	ModeAnimationData = NULL;
 	bondsWindow = NULL;
 	coordsWindow = NULL;
@@ -438,7 +286,22 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	_set_printf_count_output(1);
 #endif
 
-	InitGLData();
+	transpTriList = NULL;
+	transpSortVertex = NULL;
+	transpIndex = NULL;
+	triangleCount = 0;
+	sphere_list = 0;
+	shader_program = 0;
+	depth_fbo = 0;
+	depth_tex_id = 0;
+	MainListActive = false;
+	SurfaceListActive = false;
+	haveTransparentSurfaces = false;
+
+	light_pos[0] = 6.0f;
+	light_pos[1] = 6.0f;
+	light_pos[2] = 12.0f;
+	light_pos[3] = 0.0f;
 	
 	myStatus = new MolStatusBar(this);
 	SetStatusBar(myStatus);
@@ -512,7 +375,12 @@ MolDisplayWin::~MolDisplayWin() {
 		Prefs = NULL;
 	}
 
-	DeleteGLData();
+	delete[] transpTriList;
+	transpTriList = NULL;
+	delete[] transpSortVertex;
+	transpSortVertex = NULL;
+	delete[] transpIndex;
+	transpIndex = NULL;
 
 	// Since the periodic table dialog no longer has a parent, the application
 	// will stay open if the dialog is open but no MolDisplayWins are.  So,
@@ -2896,6 +2764,10 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 	int key = event.GetKeyCode();
 	if (!event.HasModifiers()) {
 		switch (key) {
+			case 'b': case 'B':
+				std::cout << "edge" << std::endl;
+				glEdgeFlag(GL_TRUE);
+				break;
 			case '[':
 				if (MainData->cFrame->Vibs &&
 					MainData->cFrame->Vibs->CurrentMode > 0) {
@@ -3106,11 +2978,6 @@ void MolDisplayWin::menuWindowInput_builder(wxCommandEvent &event) {
 		inputBuilderWindow->Show();
 	}
 	winData.InputBWindowVisible(true);
-}
-
-void MolDisplayWin::menuWindowInputWizard(wxCommandEvent &event) {
-	InputWizard *input_wizard = new InputWizard(this);
-	input_wizard->RunWizard();
 }
 
 void MolDisplayWin::CloseInputBuilderWindow(void) {
@@ -3357,7 +3224,7 @@ void MolDisplayWin::UpdateFrameText(void) {
  */
 void MolDisplayWin::UpdateModelDisplay(void) {
 	UpdateFrameText();
-	UpdateGLModel();
+	ReleaseLists();
 	glCanvas->Draw();
 }
 
@@ -3392,7 +3259,7 @@ void MolDisplayWin::ResetModel(bool Center) {
 		lSurface->RotateEvent(MainData);
 		lSurface = lSurface->GetNextSurface();
 	}
-	UpdateGLModel();
+	ReleaseLists();
 	// Reset the frame scroll bar
 	myStatus->SetScrollBar(MainData->CurrentFrame-1, MainData->NumFrames);
 	UpdateFrameText();
@@ -3658,22 +3525,9 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
 	}
 	if (readPrefs && test >= 10) {
 		//Update the canvas since a CMLfile reads in user preferences
-		glCanvas->DoPrefDependent();
+		glCanvas->SetCurrent();
+		DoPrefDependent();
 	}
-/*  if (test == 0) AbortOpen(0);
-	else {
-		SetFileType(2);
-		Rect tGRect;
-		winData.GetMolWinRect(tGRect);
-		SetWindowRect(&tGRect);
-		CalculateWindowParameters();
-		if (winData.is3DModeActive()) {
-			winData.is3DModeActive(false);
-			Activate3D();
-		}
-		ResetModel(false);
-	}
-			*/
 	if (localprogress) FinishOperation();
 	return test;
 }
@@ -3903,7 +3757,6 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 					if (dy == 0) return;
 					if (dy > 99) dy = 99;
 					MainData->WindowSize *= 1.0 + 0.01*dy;
-					/* glCanvas->UpdateGLView(); */
 				}
 				
 				// Rotate.
@@ -3955,7 +3808,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 			}
 
 			/* Update the window */
-			if (UpdateSurface) UpdateGLModel();
+			if (UpdateSurface) ReleaseLists();
 
 			// Remember previous mouse point for next iteration.
 			mouse_start = q;
@@ -3979,7 +3832,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 		/* RotateMoleculeGL(Prefs->GetShowAngles() && !rotate_timer.IsRunning(), */
 						 /* !rotate_timer.IsRunning()); */
 		/* glCanvas->SwapBuffers(); */
-		if (OpenGLData->transpTriList) { //update the transparent surface sorting
+		if (transpTriList) { //update the transparent surface sorting
 			SortTransparentTriangles();
 		}
 		do_rotate_annotation = true;
@@ -4007,7 +3860,8 @@ void MolDisplayWin::SetWindowPreferences(WinPrefs *NewPrefs) {
 		*Prefs = *NewPrefs;
 	}
 
-	glCanvas->DoPrefDependent();
+	glCanvas->SetCurrent();
+	DoPrefDependent();
 	ResetAllWindows();
 
 }
@@ -4329,3 +4183,154 @@ void MolDisplayWin::ToggleBuilderPalette(void) {
 	Dirtify();;
 	}
 } 
+
+BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
+	EVT_MENU (MMP_NEWFRAME,         MolDisplayWin::menuFileAppendNewFrame)
+#ifndef __WXMAC__
+	EVT_MENU (wxID_OPEN,            MolDisplayWin::menuFileOpen)
+#endif
+	EVT_MENU (MMP_ADDFRAMES,        MolDisplayWin::menuFileAddFramesFromFile)
+	EVT_MENU (wxID_SAVE,            MolDisplayWin::menuFileSave)
+	EVT_UPDATE_UI(wxID_SAVE,		MolDisplayWin::OnSaveUpdate)
+	EVT_MENU (wxID_SAVEAS,          MolDisplayWin::menuFileSave_as)
+	EVT_MENU (wxID_CLOSE,           MolDisplayWin::menuFileClose)
+	EVT_CLOSE(                      MolDisplayWin::FileClose)
+	EVT_MENU (MMP_DELETEFRAME,      MolDisplayWin::menuFileDeleteFrame)
+	EVT_MENU (MMP_IMPORTMENU,       MolDisplayWin::menuFileImport)
+	EVT_MENU (MMP_EXPORT,           MolDisplayWin::menuFileExport)
+	EVT_MENU (wxID_PRINT_SETUP,     MolDisplayWin::menuFilePage_setup)
+	EVT_MENU (MMP_PRINTOPTIONS,     MolDisplayWin::menuFilePrintOptions)
+	EVT_MENU (wxID_PREVIEW,         MolDisplayWin::menuFilePrint_preview)
+	EVT_MENU (wxID_PRINT,           MolDisplayWin::menuFilePrint)
+
+	EVT_MENU (wxID_UNDO,            MolDisplayWin::menuEditUndo)
+	EVT_MENU (wxID_REDO,            MolDisplayWin::menuEditRedo)
+	EVT_UPDATE_UI(wxID_UNDO,		MolDisplayWin::OnUndoUpdate)
+	EVT_UPDATE_UI(wxID_REDO,		MolDisplayWin::OnRedoUpdate)
+	EVT_MENU (wxID_CUT,             MolDisplayWin::menuEditCut)
+	EVT_MENU (wxID_COPY,            MolDisplayWin::menuEditCopy)
+	EVT_MENU (MMP_COPYCOORDS,       MolDisplayWin::menuEditCopyCoordinates)
+	EVT_MENU (wxID_PASTE,           MolDisplayWin::menuEditPaste)
+	EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate)
+	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
+	EVT_UPDATE_UI(wxID_CLEAR,       MolDisplayWin::OnDeleteUpdate)
+	EVT_MENU (MMP_SELECT_ALL,       MolDisplayWin::menuEditSelectAll)
+	EVT_MENU (MMP_SELECT_NONE,		MolDisplayWin::menuEditSelectNone)
+	EVT_UPDATE_UI(MMP_SELECT_NONE,	MolDisplayWin::OnSelectNoneUpdate)
+	EVT_UPDATE_UI(MMP_SELECT_ALL,	MolDisplayWin::OnSelectAllUpdate)
+
+	EVT_MENU (MMP_SHOW_FULLSCREEN,  MolDisplayWin::menuViewShowFullScreen)
+	EVT_UPDATE_UI(MMP_SHOW_FULLSCREEN, MolDisplayWin::OnShowNormalScreen)
+	EVT_MENU (MMP_SHOWMODE,         MolDisplayWin::menuViewShowNormalMode)
+	EVT_MENU (MMP_ANIMATEMODE,      MolDisplayWin::menuViewAnimateMode)
+	EVT_MENU (MMP_OFFSETMODE,       MolDisplayWin::menuViewOffsetAlongMode)
+	EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
+	EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
+	EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
+	EVT_MENU (MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::menuViewShowSymmetryOperators)
+	EVT_UPDATE_UI(MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::OnShowSymOpsUpdate )
+	EVT_MENU (MMP_NO_ATOMLABEL,		MolDisplayWin::menuViewHideAtomLabels)
+	EVT_MENU (MMP_SHOWATOMLABELS,   MolDisplayWin::menuViewShowAtomLabel)
+	EVT_MENU (MMP_SHOWATOMNUMBER,   MolDisplayWin::menuViewShowAtomNumber)
+	EVT_MENU (MMP_BOTHATOMLABELS,   MolDisplayWin::menuViewShowBothAtomLabels)
+	EVT_MENU (MMP_ADDMARKANNOTATION,   MolDisplayWin::menuViewAddMarkAnnotation)
+	EVT_MENU (MMP_ADDLENGTHANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
+	EVT_MENU (MMP_ADDANGLEANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
+	EVT_MENU (MMP_ADDDIHEDRALANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
+	EVT_UPDATE_UI(MMP_ADDMARKANNOTATION, MolDisplayWin::OnAnnotationMarkUpdate )
+	EVT_UPDATE_UI(MMP_ADDLENGTHANNOTATION, MolDisplayWin::OnAnnotationLengthUpdate )
+	EVT_UPDATE_UI(MMP_ADDANGLEANNOTATION, MolDisplayWin::OnAnnotationAngleUpdate )
+	EVT_UPDATE_UI(MMP_ADDDIHEDRALANNOTATION, MolDisplayWin::OnAnnotationDihedralUpdate )
+	EVT_MENU (MMP_DELETEALLANNOTATIONS,   MolDisplayWin::menuViewDeleteAllAnnotations)
+	EVT_UPDATE_UI(MMP_DELETEALLANNOTATIONS, MolDisplayWin::OnDeleteAnnotationsUpdate )
+	EVT_MENU (MMP_WIREFRAMEMODE,	MolDisplayWin::menuViewWireFrameStyle)
+	EVT_MENU (MMP_BALLANDSTICKMODE,	MolDisplayWin::menuViewBallAndStickStyle)
+	EVT_MENU (MMP_EFP_WIREFRAME,	MolDisplayWin::menuViewEFP_Wireframe)
+	EVT_UPDATE_UI(MMP_EFP_WIREFRAME,	MolDisplayWin::OnEFPWireFrameUpdate )
+	EVT_MENU (MMP_SHOWPATTERN,		MolDisplayWin::menuViewShow2DPattern)
+	EVT_UPDATE_UI(MMP_SHOWPATTERN,	MolDisplayWin::OnShowPatternUpdate )
+	EVT_MENU (MMP_ANIMATEFRAMES,    MolDisplayWin::menuViewAnimateFrames)
+	EVT_MENU (MMP_SHRINK10,         MolDisplayWin::menuViewShrink_10)
+	EVT_MENU (MMP_ENLARGE10,        MolDisplayWin::menuViewEnlarge_10)
+	EVT_MENU (MMP_CENTER,           MolDisplayWin::menuViewCenter)
+	EVT_MENU (MMP_ROTATETOXAXIS,    MolDisplayWin::menuViewRotateTo_X_axis)
+	EVT_MENU (MMP_ROTATETOYAXIS,    MolDisplayWin::menuViewRotateTo_Y_axis)
+	EVT_MENU (MMP_ROTATETOZAXIS,    MolDisplayWin::menuViewRotateTo_Z_axis)
+	EVT_MENU (MMP_ROTATE180HOR,     MolDisplayWin::menuViewRotate180_horizontal)
+	EVT_MENU (MMP_ROTATE180VER,     MolDisplayWin::menuViewRotate180_vertical)
+	EVT_MENU (MMP_ROTATEPRINC,      MolDisplayWin::menuViewRotatePrinciple_orientation)
+	EVT_MENU (MMP_ROTATEOTHER,      MolDisplayWin::menuViewRotateOther)
+	EVT_MENU (MMP_WINDOWPARAMETERS,	MolDisplayWin::menuViewSetWindowParameters)
+
+	EVT_MENU (MMP_SETBONDLENGTH,      MolDisplayWin::menuMoleculeSetBondLength)
+	EVT_MENU (MMP_ENERGYEDIT,         MolDisplayWin::menuMoleculeSetFrameEnergy)
+	EVT_UPDATE_UI(MMP_CREATELLMPATH,  MolDisplayWin::OnMoleculeCreateLLMPathUpdate )
+	EVT_MENU (MMP_CREATELLMPATH,      MolDisplayWin::menuMoleculeCreateLLMPath)
+	EVT_MENU (MMP_MINFRAMEMOVEMENTS,  MolDisplayWin::menuMoleculeMinimizeFrameMovements)
+	EVT_UPDATE_UI(MMP_CURPOINTGROUP,	MolDisplayWin::OnShowPointGroupUpdate )
+	EVT_MENU (MMP_PGC1,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGCS,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGCI,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGCNH,				MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGCNV,				MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGCN,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGS2N,				MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGDND,				MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGDNH,				MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGDN,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGTD,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGTH,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGT,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGOH,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGO,					MolDisplayWin::menuSetPointGroup)
+	EVT_MENU (MMP_PGORDER2,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER3,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER4,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER5,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER6,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER7,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_PGORDER8,				MolDisplayWin::menuSetPointGroupOrder)
+	EVT_MENU (MMP_DETERMINEPG,			MolDisplayWin::menuMoleculeDetermineSym)
+	EVT_MENU (MMP_SYMADAPTCOORDS,		MolDisplayWin::menuMoleculeSymCoords)
+	EVT_MENU (MMP_CONVERTTOBOHR,		MolDisplayWin::menuMoleculeConvertToBohr)
+	EVT_MENU (MMP_CONVERTTOANGSTROMS,	MolDisplayWin::menuMoleculeConvertToAngstroms)
+	EVT_MENU (MMP_INVERTNORMALMODE,		MolDisplayWin::menuMoleculeInvertNormalMode)
+	EVT_MENU (MMP_SHOW_TOOLBAR,			MolDisplayWin::menuBuilderShowToolbar)
+	EVT_UPDATE_UI(MMP_SHOW_TOOLBAR,		MolDisplayWin::OnShowToolbarUpdate)
+	EVT_UPDATE_UI(MMP_SHOWBUILDTOOLS,	MolDisplayWin::OnShowBuildToolsUpdate)
+	EVT_MENU (MMP_SHOWBUILDTOOLS,		MolDisplayWin::menuBuilderShowBuildTools)
+	EVT_MENU (MMP_ADDHYDROGENS,			MolDisplayWin::menuBuilderAddHydrogens)
+	EVT_MENU (MMP_DELETEHYDROGENS,		MolDisplayWin::menuBuilderDeleteHydrogens)
+	EVT_MENU (MMP_SHOWBONDSITES,		MolDisplayWin::menuBuilderShowBondSites)
+	EVT_MENU (MMP_SYMMETRY_EDIT,		MolDisplayWin::menuBuilderSymmetryEdit)
+	/* EVT_MENU (MMP_SYMMETRY_REGEN,		MolDisplayWin::menuBuilderRegenSymmetry) */
+	EVT_MENU (MMP_SAVESTRUCTURE,		MolDisplayWin::menuBuilderSaveStructure)
+	EVT_UPDATE_UI(MMP_ADDHYDROGENS,		MolDisplayWin::OnAddHydrogensUpdate)
+	EVT_UPDATE_UI(MMP_SAVESTRUCTURE,	MolDisplayWin::OnSaveStructureUpdate)
+	EVT_UPDATE_UI(MMP_SHOWBONDSITES,	MolDisplayWin::OnShowBondSitesUpdate)
+	EVT_UPDATE_UI(MMP_SYMMETRY_EDIT,	MolDisplayWin::OnShowSymmetryEdit)
+	EVT_UPDATE_UI_RANGE(MMP_NEWFRAME, MMP_ANNOTATIONSSUBMENU,
+						MolDisplayWin::UpdateAtomsOptions)
+	EVT_UPDATE_UI(wxID_COPY,			MolDisplayWin::UpdateAtomsOptions)
+	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
+	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)
+	EVT_MENU (MMP_ENERGYPLOTWINDOW,		MolDisplayWin::menuWindowEnergy_plot)
+	EVT_MENU (MMP_FREQUENCIESWINDOW,	MolDisplayWin::menuWindowFrequencies)
+	EVT_MENU (MMP_INPUTBUILDERWINDOW,	MolDisplayWin::menuWindowInput_builder)
+	EVT_MENU (MMP_SURFACESWINDOW,		MolDisplayWin::menuWindowSurfaces)
+	EVT_MENU (ID_LOCAL_PREFERENCES,		MolDisplayWin::menuPreferences)
+	EVT_MENU (MMP_ZMATRIXCALC,			MolDisplayWin::menuWindowZMatrixCalc)
+
+	EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)
+	EVT_TIMER(MMP_ANIMATEMODETIMER, MolDisplayWin::OnModeAnimation)
+	EVT_TIMER(MMP_STATUS_TIMER, MolDisplayWin::OnStatusTimer)
+	EVT_TIMER(MMP_ROTATE_TIMER, MolDisplayWin::OnRotateTimer)
+	EVT_SIZE(MolDisplayWin::eventSize)
+	EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
+	EVT_KEY_UP (MolDisplayWin::KeyUpHandler)
+	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen)
+	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
+	EVT_ACTIVATE(MolDisplayWin::OnActivate)
+	EVT_TOOL_RANGE(MMP_TOOL_ARROW, MMP_TOOL_HAND, MolDisplayWin::OnToggleTool)
+END_EVENT_TABLE()
+

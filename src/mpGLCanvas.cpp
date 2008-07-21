@@ -13,9 +13,7 @@
 #include "MolDisplayWin.h"
 #include "glf.h"
 
-#ifdef __wxBuild__
 #include <wx/stdpaths.h>
-#endif
 #ifdef __WXMAC__
 #include <AGL/glu.h>
 #else
@@ -29,7 +27,6 @@
 #include "build_palette.h"
 #include "Math3D.h"
 #include "VirtualSphere.h"
-#include "ChooseDialog.h"
 
 /* ------------------------------------------------------------------------- */
 
@@ -97,9 +94,9 @@ MpGLCanvas::~MpGLCanvas() {
 }
 
 /**
- * Initializes OpenGL state for the canvas. The OpenGL context isn't quite 
- * ready in the canvas' constructor, so we have to make this a separate
- * function and call it after the canvas has been shown.
+ Initializes OpenGL state for the canvas. The OpenGL context isn't quite ready
+ in the canvas' constructor, so we have to make this a separate function and
+ call it after the canvas has been shown.
  */
 void MpGLCanvas::initGL(void) {
 
@@ -180,8 +177,8 @@ void MpGLCanvas::initGL(void) {
 		255,   0,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0,
 	};
 
-	glGenTextures(1, &(MolWin->OpenGLData->length_anno_tex_id));
-	glBindTexture(GL_TEXTURE_2D, MolWin->OpenGLData->length_anno_tex_id);
+	glGenTextures(1, &(MolWin->length_anno_tex_id));
+	glBindTexture(GL_TEXTURE_2D, MolWin->length_anno_tex_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -189,16 +186,8 @@ void MpGLCanvas::initGL(void) {
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 16, 16, 0, GL_ALPHA,
 				 GL_UNSIGNED_BYTE, texture);
 
-	if (GLEW_VERSION_2_0) {
-		std::string vpath, fpath;
-		vpath = std::string(pathname.ToAscii()) + "/perpixel_dirlight_v.glsl";
-		fpath = std::string(pathname.ToAscii()) + "/perpixel_dirlight_f.glsl";
-		MolWin->OpenGLData->shader_program =
-			GetShaderProgramFromFiles(vpath, fpath);
-	}
-
 	// Generate projection, quadric objects, shader uniforms, etc.
-	DoPrefDependent();
+	MolWin->DoPrefDependent();
 
 	// Don't initialize more than once, so set a flag.
 	initialized = true;
@@ -211,128 +200,6 @@ void MpGLCanvas::initGL(void) {
  */
 void MpGLCanvas::SetPrefs(WinPrefs *newPrefs) {
 	Prefs = newPrefs;
-}
-
-/**
- * This function (re)generates any structures that are dependent on certain
- * preference settings. It should be called when preferences change. It 
- * assumes that a valid OpenGL context exists, so it should not be called
- * by a parent's constructor.
- */
-void MpGLCanvas::DoPrefDependent() {
-
-#if wxCHECK_VERSION(2,9,0)
-	SetCurrent(*context);
-#else
-	SetCurrent();
-#endif
-
-	// All atoms are drawn using one display list that draws a sphere. 
-	// We delete any current list and create it anew.
-	if (MolWin->OpenGLData->sphere_list) {
-		glDeleteLists(MolWin->OpenGLData->sphere_list, 1);
-	}
-
-	GLUquadric *quad = gluNewQuadric();
-	gluQuadricOrientation(quad, GLU_OUTSIDE);
-	gluQuadricNormals(quad, GLU_SMOOTH);
-
-	MolWin->OpenGLData->sphere_list = glGenLists(1);
-	glNewList(MolWin->OpenGLData->sphere_list, GL_COMPILE);
-
-#if 1
-	float *verts;
-	int *faces;
-	int nverts;
-	int nfaces;
-	float *normals;
-	int nlevels;
-
-	// We do some funny mapping from display quality (2 - 40) to number of
-	// subdivisions.  2 maps to 0 levels, while all other values are mapped
-	// such that 13 -> 3 levels and 40 -> 7 levels.  Levels >7 recurse too
-	// much.
-	if (Prefs->GetQD3DAtomQuality() == 2) {
-		nlevels = 0;
-	} else {
-		nlevels = (int) ((Prefs->GetQD3DAtomQuality() - 13.0f) *
-						 (4.0f / 27.0f) + 3.0f);
-	}
-
-	GenerateOctahedron(nlevels, &verts, nverts, &faces, nfaces, &normals);
-	glVertexPointer(3, GL_FLOAT, 0, verts);
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_NORMAL_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, verts);
-	glNormalPointer(GL_FLOAT, 0, normals);
-	glDrawElements(GL_TRIANGLES, nfaces * 3, GL_UNSIGNED_INT, faces);
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-
-	delete[] verts;
-	delete[] faces;
-	delete[] normals;
-#else
-	gluSphere(quad, 1.0f, (long) (1.5f * Prefs->GetQD3DAtomQuality()),
-			  (long) (Prefs->GetQD3DAtomQuality()));
-#endif
-
-	glEndList();
-
-	gluDeleteQuadric(quad);
-		
-	// Set the background color to the user's preference.
-	RGBColor *BackgroundColor = Prefs->GetBackgroundColorLoc();
-	float red, green, blue;
-	red = (float) BackgroundColor->red / 65536;
-	green = (float) BackgroundColor->green / 65536;
-	blue = (float) BackgroundColor->blue / 65536;
-	glClearColor(red, green, blue, 1.0f);
-	
-	// Setup two lights on either side of the camera.
-	float fillBrightness = Prefs->GetQD3DFillBrightness();
-	float PointBrightness = Prefs->GetQD3DPointBrightness();
-	GLfloat position[4] = {6.0f, 6.0f, 12.0f, 0.0};
-	GLfloat diffuse[4]  = {fillBrightness, fillBrightness,
-						   fillBrightness, 0.0f};
-	GLfloat specular[4] = {PointBrightness, PointBrightness,
-						   PointBrightness, 0.0f};
-	GLfloat ambient[4] = {0.2f, 0.2f, 0.2f, 1.0};
-
-	// Make sure we're in eye space so that the lights always
-	// illuminate the visible scene.
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
-	glLightfv(GL_LIGHT0, GL_POSITION, position);
-	glEnable(GL_LIGHT0);
-
-	position[0] = -6.0;
-	ambient[0] = ambient[1] = ambient[2] = 0.0f;
-	glLightfv(GL_LIGHT1, GL_AMBIENT, ambient);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, specular);
-	glLightfv(GL_LIGHT1, GL_POSITION, position);
-	glEnable(GL_LIGHT1);
-
-	if (GLEW_VERSION_2_0) {
-		glUseProgram(MolWin->OpenGLData->shader_program);
-		CPoint3D light_pos(position[0], position[1], position[2]);
-		Normalize3D(&light_pos);
-		GLint light_pos_loc =
-			glGetUniformLocation(MolWin->OpenGLData->shader_program, "light_dir");
-		if (light_pos_loc >= 0) {
-			glUniform3f(light_pos_loc, light_pos.x, light_pos.y, light_pos.z);
-		} else {
-			std::cerr << "Can't set shader uniforms." << std::endl;
-		}
-		glUseProgram(0);
-	}
-				
 }
 
 wxImage MpGLCanvas::getImage(const int width, const int height) {
@@ -436,7 +303,7 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 		GLLeft = -GLTop *aspect;
 	}
 	
-	MolWin->UpdateGLModel();
+	MolWin->ReleaseLists();
 
 	for (int jpass=0; jpass<NumYPasses; jpass++) {
 		int passheight = height;
@@ -492,7 +359,7 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 		dc->SetPen(lpen);
 		dc->DrawRectangle(hOffset, vOffset, ScaledWidth, ScaledHeight);
 	}
-	 MolWin->UpdateGLModel();
+	 MolWin->ReleaseLists();
 }
 
 void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
@@ -557,7 +424,7 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 		GLLeft = -GLTop *aspect;
 	}
 	
-	MolWin->UpdateGLModel();
+	MolWin->ReleaseLists();
 	
 	for(int passY = 0; passY < numPassesY; passY++) {
 		if ((passY + 1) == numPassesY) {
@@ -611,7 +478,7 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 	}
 	delete [] pixels;
 	
-	MolWin->UpdateGLModel();
+	MolWin->ReleaseLists();
 }
 
 /**
@@ -641,8 +508,6 @@ void MpGLCanvas::SetProjection(float aspect_ratio) {
 
 	if (half_width > 0.001) {
 		glFrustum(-right, right, -top, top, zNear, 1000.0);
-		GLdouble woop[16];
-		glGetDoublev(GL_PROJECTION_MATRIX, woop);
 	} else {
 		if (aspect_ratio > 1.0) {
 			right = mMainData->WindowSize;
@@ -731,6 +596,62 @@ void MpGLCanvas::Draw() {
 	}
 
 	if (!do_stereo) {
+#if 1
+		if (Prefs->GetShaderMode() == 2) {
+			// Render to depth texture.
+			glBindTexture(GL_TEXTURE_2D, MolWin->depth_tex_id);
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, MolWin->depth_fbo);
+
+			glClear(GL_DEPTH_BUFFER_BIT);
+			glViewport(0, 0, FBO_SIZE, FBO_SIZE);
+
+			CPoint3D a(MolWin->light_pos[0], MolWin->light_pos[1], MolWin->light_pos[2]);
+			CPoint3D b(0.0f, 0.0f, -mMainData->WindowSize);
+			float dist = (b - a).Magnitude();
+
+			float theta = atan(mMainData->MaxSize * 1.5f / dist) * kRadToDegree;
+			float near = dist - 0.5f;
+			if (near < 0.0f) {
+				near = 0.1f;
+			}
+
+			glMatrixMode(GL_PROJECTION);
+			glLoadIdentity();
+			gluPerspective(theta, 1.0f, 1.0f, dist + 5.0f);
+
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+			gluLookAt(MolWin->light_pos[0],
+					  MolWin->light_pos[1],
+					  MolWin->light_pos[2],
+					  0.0, 0.0, -mMainData->WindowSize,
+					  0.0, 1.0, 0.0);
+
+			glPolygonOffset(4, 4);
+			glEnable(GL_POLYGON_OFFSET_FILL);
+			bool prev_rotate_mode = MolWin->do_rotate_annotation;
+			MolWin->do_rotate_annotation = false;
+			MolWin->DrawGL(false);
+			MolWin->do_rotate_annotation = prev_rotate_mode;
+			glDisable(GL_POLYGON_OFFSET_FILL);
+
+			// Back to normal now.
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+			glViewport(0, 0, (GLint) width, (GLint) height);
+
+			// Set up texture matrix so that it transforms vertex coordinates
+			// into indices for the depth texture.
+			glMatrixMode(GL_TEXTURE);
+			glLoadIdentity();
+			glTranslatef(0.5f, 0.5f, 0.5f);
+			glScalef(0.5f, 0.5f, 0.5f);
+			gluPerspective(theta, 1.0f, 1.0f, dist + 5.0f);
+			gluLookAt(MolWin->light_pos[0], MolWin->light_pos[1], MolWin->light_pos[2],
+					  0.0, 0.0, -mMainData->WindowSize,
+					  0.0, 1.0, 0.0);
+		}
+#endif
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -1291,7 +1212,7 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 		if (!lFrame->GetAtomSelection(selected)) {
 			SelectObj(selected_type, selected, deSelectAll);
 			MolWin->SelectionChanged(deSelectAll);
-			MolWin->UpdateGLModel();
+			MolWin->ReleaseLists();
 			Draw();
 			MolWin->Dirtify();
 		}
@@ -1307,7 +1228,7 @@ void MpGLCanvas::eventMouseRightWentDown(wxMouseEvent& event) {
 		if (MolWin->InEditMode()) {
 			interactPopupMenu(curr_mouse.x, curr_mouse.y, 0);
 			MolWin->SelectionChanged(deSelectAll);
-			MolWin->UpdateGLModel();
+			MolWin->ReleaseLists();
 			MolWin->Dirtify();
 		} else {
 			bondPopupMenu(curr_mouse.x, curr_mouse.y);
@@ -1558,7 +1479,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 					lFrame->SetBonds(Prefs, true, true);
 					MolWin->AtomsChanged(true, false);
-					MolWin->UpdateGLModel();
+					MolWin->ReleaseLists();
 					MolWin->AdjustMenus();
 					MolWin->Dirtify();
 				} else {
@@ -1741,7 +1662,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					}
 				}
 				lFrame->SetBonds(Prefs, true, true);
-				MolWin->UpdateGLModel();
+				MolWin->ReleaseLists();
 			} else {
 				SelectObj(selected_type, selected, deSelectAll);
 				MolWin->SelectionChanged(deSelectAll);

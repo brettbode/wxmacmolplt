@@ -806,7 +806,7 @@ void CoordinatesWindow::OnSelectCell( wxGridEvent& event ) {
 	}
 	UpdateControls();
 
-	Parent->UpdateGLModel();
+	Parent->ReleaseLists();
 	Parent->ResetView();
 
 	event.Skip();
@@ -832,7 +832,7 @@ void CoordinatesWindow::OnRangeSelect( wxGridRangeSelectEvent& event ) {
 
 	UpdateControls();
 
-	Parent->UpdateGLModel();
+	Parent->ReleaseLists();
 	Parent->ResetView();
 
 	event.Skip();

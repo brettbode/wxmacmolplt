@@ -276,6 +276,7 @@ class QD3DPrefsPane : public PrefsPane {
 		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
+		void OnShaderChoice(wxCommandEvent& event);
 		void OnCheckBox( wxCommandEvent& WXUNUSED(event));
 		void OnSliderUpdate( wxCommandEvent &event );
 
@@ -286,7 +287,7 @@ class QD3DPrefsPane : public PrefsPane {
 
 		wxCheckBox* mChk3D;
 		colorArea* mBackgrdColor;
-		wxCheckBox *mPerPixelCheck;
+		wxChoice *mShaderChooser;
 		wxSlider* mSld[6];
 
 		DECLARE_EVENT_TABLE()

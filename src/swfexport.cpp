@@ -156,7 +156,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 			temp = temp->GetNextSurface();
 		}
 		MainData->ResetRotation();
-		UpdateGLModel();
+		ReleaseLists();
 		DrawGL();
 
 		wxImage frame = glCanvas->getImage(0, 0);
@@ -306,7 +306,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 		ModeOffset[iatm] *= VectorScale;
 	}
 	MainData->ResetRotation();
-	UpdateGLModel();
+	ReleaseLists();
 	DrawGL();
 
 	if(AnimateTime < 1) AnimateTime = 1;
@@ -376,7 +376,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 		}
 
 		MainData->ResetRotation();
-		UpdateGLModel();
+		ReleaseLists();
 		DrawGL();
 	}
 
@@ -388,7 +388,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	MainData->ResetRotation();
 
 	MainData->SetDrawMode(savedrawmode);
-	UpdateGLModel();
+	ReleaseLists();
 	DrawGL();
 
 	msg = wxString::Format(wxT("Optimal viewing dimensions are %ld pixels wide by %ld pixels high."), width, height);

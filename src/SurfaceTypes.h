@@ -552,17 +552,4 @@ class Orb2DSurface : public Surf2DBase, public OrbSurfBase {
 		virtual void Update(MoleculeData * MainData);
 		virtual bool Needs2DPlane(void) const;
 };
-
-class myGLTriangle {
-public:
-	CPoint3D	v1;
-	CPoint3D	v2;
-	CPoint3D	v3;
-	CPoint3D	n1;
-	CPoint3D	n2;
-	CPoint3D	n3;
-	float		r1, g1, b1, a1; //RGBA color for v1
-	float		r2, g2, b2, a2; //RGBA color for v2
-	float		r3, g3, b3, a3; //RGBA color for v3
-};
 #endif

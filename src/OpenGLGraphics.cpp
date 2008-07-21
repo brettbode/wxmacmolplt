@@ -12,6 +12,7 @@
 #include <string.h>
 #include <iostream>
 #include <algorithm>
+#include <wx/stdpaths.h>
 
 #include "Globals.h"
 #include "MoleculeData.h"
@@ -36,16 +37,21 @@ void DrawPipeCylinder(float length, GLUquadric *quadric, unsigned int ncaps,
 					  GLuint sphere_list, float radius, long quality);
 void DrawPipeSpheres(const WinPrefs& Prefs, float length, float scale_factor,
 					 bool is_masked, GLuint sphere_list);
-void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width, float m[16],
-						const CPoint3D& x_world, float offset, GLuint length_anno_tex_id, const WinPrefs * Prefs, bool draw_label = true);
+void DashedQuadFromLine(const CPoint3D& pt1, const CPoint3D& pt2, float width,
+						float m[16], const CPoint3D& x_world, float offset,
+						GLuint length_anno_tex_id, const WinPrefs * Prefs,
+						bool draw_label = true);
 void DrawAngleAnnotation(const CPoint3D *pt1, const CPoint3D *pt2,
 						 const CPoint3D *pt3, const WinPrefs *Prefs,
 						 GLuint length_anno_tex_id, CPoint3D *ambig_axis = NULL);
-void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart, const CPoint3D & lineEnd,
-							float lineWidth, int nslices = 4, int nstacks = 1, bool cap = false);
-void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order);
+void CreateCylinderFromLine(GLUquadricObj * qobj, const CPoint3D & lineStart,
+							const CPoint3D & lineEnd, float lineWidth,
+							int nslices = 4, int nstacks = 1, bool cap = false);
+void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd,
+					  const int & order);
 void DrawInversionPoint(void);
-void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2);
+void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1,
+						  const CPoint3D & p2);
 void DrawArrow(const float & length, const float & width, const int & quality);
 void DrawSceneString(const float scale_factor, const float shift_x,
 		             const float shift_y, const float shift_z,
@@ -56,15 +62,24 @@ void DrawString(const char *str);
 // GLOBALS
 // ----------------------------------------------------------------------------
 
-const GLubyte stippleMask[128] =
-  {0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
-   0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00};
+const GLubyte stippleMask[128] = {
+	0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00,
+	0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+	0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00,
+	0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+	0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00,
+	0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+	0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00,
+	0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+	0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00,
+	0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+	0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00,
+	0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+	0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00,
+	0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00,
+	0xaa, 0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00,
+	0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00
+};
 
 GLfloat d_specular[] = {0.1, 0.1, 0.1, 1.0};
 GLfloat d_shininess = 1.0;
@@ -81,76 +96,36 @@ GLfloat l_ambient[] = {0.1,0.1,0.1,0.8};
 // FUNCTION DEFINITIONS
 // ----------------------------------------------------------------------------
 
-OpenGLRec::OpenGLRec(void) {
-	transpTriList = NULL;
-	transpSortVertex = NULL;
-	transpIndex = NULL;
+/**
+ * This function frees any transparent geometries and any active display
+ * lists.  It should be called when the view changes (which alters sort order
+ * of transparent surfaces), surfaces are updated, or the display list content
+ * has been altered.  It does not remake any lists.
+ */
+void MolDisplayWin::ReleaseLists() {
 	triangleCount = 0;
-	sphere_list = 0;
-	shader_program = 0;
-	
-	MainListActive = false;
-	SurfaceListActive = false;
-	haveTransparentSurfaces = false;
-}
 
-OpenGLRec::~OpenGLRec(void) {
-	if (transpTriList) {
-		delete [] transpTriList;
-		transpTriList = NULL;
-	}
-	if (transpSortVertex) {
-		delete [] transpSortVertex;
-		transpSortVertex = NULL;
-	}
-	if (transpIndex) {
-		delete [] transpIndex;
-		transpIndex = NULL;
-	}
-}
+	delete[] transpTriList;
+	transpTriList = NULL;
+	delete[] transpSortVertex;
+	transpSortVertex = NULL;
+	delete[] transpIndex;
+	transpIndex = NULL;
 
-void MolDisplayWin::InitGLData(void) {
-	OpenGLData = new OpenGLRec;
-}
-
-void MolDisplayWin::DeleteGLData(void) {
-    if (OpenGLData)
-		delete OpenGLData;
-	OpenGLData = NULL;
+	if (MainListActive) {
+		glDeleteLists(MainDisplayList, 1);
+		MainListActive = false;
+	}
+	if (SurfaceListActive) {
+		glDeleteLists(SurfaceDisplayList, 1);
+		SurfaceListActive = false;
+	}
 }
 
 /**
- * This function regenerates transparent geometries and any active display
- * lists.  It should be called when the view changes (which alters sort order
- * of transparent surfaces), surfaces are updated, or the display list content
- * has been altered.
+ Display a transformation annotation, optionally consisting of Euler
+ angles and an outline of the trackball's footprint.
  */
-void MolDisplayWin::UpdateGLModel(void) {
-	if (OpenGLData != NULL) {
-		OpenGLData->triangleCount = 0;
-		if (OpenGLData->transpTriList) {
-			delete [] OpenGLData->transpTriList;
-			OpenGLData->transpTriList = NULL;
-		}
-		if (OpenGLData->transpSortVertex) {
-			delete [] OpenGLData->transpSortVertex;
-			OpenGLData->transpSortVertex = NULL;
-		}
-		if (OpenGLData->transpIndex) {
-			delete [] OpenGLData->transpIndex;
-			OpenGLData->transpIndex = NULL;
-		}
-		if (OpenGLData->MainListActive) {
-			glDeleteLists(OpenGLData->MainDisplayList, 1);
-			OpenGLData->MainListActive = false;
-		}
-		if (OpenGLData->SurfaceListActive) {
-			glDeleteLists(OpenGLData->SurfaceDisplayList, 1);
-			OpenGLData->SurfaceListActive = false;
-		}
-	}
-}
-
 void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
 	
 	GLint matrixMode;
@@ -167,14 +142,7 @@ void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
 	glScalef(2.0 / hsize, -2.0 /  vsize, 1.0);
 	glTranslatef(-hsize / 2.0, -vsize / 2.0, 0.0);
 
-	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
-	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
-
-	//choose black or white based on the background color
-	if (backMagnitude > 70000)  //"light" background choose black
-		glColor3f(0.0, 0.0, 0.0);
-	else
-		glColor3f(1.0, 1.0, 1.0);
+	glColor3fv(fg_color);
 
 	if (ShowAngles) {
 		char AngleString[50];
@@ -220,19 +188,7 @@ void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
  * Draws molecular structures, surfaces, and annotations.
  * @precondition Context, projection, and viewport have been set. 
  */
-void MolDisplayWin::DrawGL(void) {
-
-	float anno_color[4];
-	RGBColor *BackgroundColor = Prefs->GetBackgroundColorLoc();
-	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
-	
-	// choose black or white based on the background color
-	if (backMagnitude > 70000) {  //"light" background choose black
-		anno_color[0] = anno_color[1] = anno_color[2] = 0.0f;
-	} else {
-		anno_color[0] = anno_color[1] = anno_color[2] = 1.0f;
-	}
-	anno_color[3] = 1.0f;
+void MolDisplayWin::DrawGL(int do_shader) {
 
 	GLenum error = glGetError();	//clear the error code
 	if (error != GL_NO_ERROR) {
@@ -244,19 +200,24 @@ void MolDisplayWin::DrawGL(void) {
 	glTranslatef(0.0f, 0.0f, -MainData->WindowSize);
 
 	if (Prefs->ShowAtomicSymbolLabels() || Prefs->ShowAtomNumberLabels()) {
+		glMatrixMode(GL_TEXTURE);
+		glPushMatrix();
+		glLoadIdentity();
 		DrawLabel();
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
 	}
 
 	/* glPushMatrix(); // unrotated scene */
 	glMultMatrixf((const GLfloat *) &(MainData->TotalRotation));
-
 	glEnable(GL_LIGHTING);
 
-	if (GLEW_VERSION_2_0) {
+	if (GLEW_VERSION_2_0 && do_shader) {
 		GLint mode;
 		glGetIntegerv(GL_RENDER_MODE, &mode);
-		if (Prefs->GetPerPixelLighting() && mode == GL_RENDER) {
-			glUseProgram(OpenGLData->shader_program);
+		if (Prefs->GetShaderMode() && mode == GL_RENDER) {
+			glBindTexture(GL_TEXTURE_2D, depth_tex_id);
+			glUseProgram(shader_program);
 		}
 	}
 
@@ -264,17 +225,17 @@ void MolDisplayWin::DrawGL(void) {
 	
 	//Draw the main molecular geometry
 	if (MainData->cFrame->NumAtoms > 0) {
-		if (OpenGLData->MainListActive) {
-			glCallList(OpenGLData->MainDisplayList);
+		if (MainListActive) {
+			glCallList(MainDisplayList);
 		} else { // build the main display list
 			// Suppress this temporarily because double- and triple-bond display
 			// requires a transformation depending on the current viewing 
 			// transformation.
-			// OpenGLData->MainDisplayList = glGenLists(1); 
-			// glNewList(OpenGLData->MainDisplayList, GL_COMPILE_AND_EXECUTE); 
+			// MainDisplayList = glGenLists(1); 
+			// glNewList(MainDisplayList, GL_COMPILE_AND_EXECUTE); 
 			DrawMoleculeCoreGL();
 			// glEndList(); 
-			// OpenGLData->MainListActive = true; 
+			// MainListActive = true; 
 		}
 	}
 
@@ -283,6 +244,10 @@ void MolDisplayWin::DrawGL(void) {
 	}
 
 	if (MainData->GetAnnotationCount() > 0) {
+		glMatrixMode(GL_TEXTURE);
+		glPushMatrix();
+		glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW);
 		glLoadName(MMP_ANNOTATION);
 		glPushName(0);
 		std::vector<Annotation *>::const_iterator anno;
@@ -292,40 +257,25 @@ void MolDisplayWin::DrawGL(void) {
 		for (anno = MainData->Annotations.begin();
 			 anno != MainData->Annotations.end(); anno++) {
 			glLoadName(anno_id + 1);
-			glColor4fv(anno_color);
+			glColor3fv(fg_color);
 			(*anno)->draw(this);
 			anno_id++;
 		}
-		/* glDisable(GL_BLEND); */
 		glPopName();
 		glEnable(GL_LIGHTING);
+		glMatrixMode(GL_TEXTURE);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
 	}
 	
-	if (GLEW_VERSION_2_0 && Prefs->GetPerPixelLighting()) {
-		glUseProgram(OpenGLData->shader_program);
+	if (GLEW_VERSION_2_0 && Prefs->GetShaderMode() && do_shader) {
+		glBindTexture(GL_TEXTURE_2D, depth_tex_id);
+		glUseProgram(shader_program);
 	}
 
 	// Add any surfaces
 	Surface * lSurface = MainData->cFrame->SurfaceList;
-	// error = glGetError(); 
-	//draw all the normal opaque surfaces
-	//Ok the following works fine on all my systems, but for some reason it fails to work
-	//on for a few other folks. I sort of think this is really an OpenGL bug, but the difference
-	//in performance is probably not enough to worry about...
-//	if (OpenGLData->SurfaceListActive) {
-//		glCallList(OpenGLData->SurfaceDisplayList);
-//		error = glGetError();
-//		if (error != GL_NO_ERROR) {
-//			Str255 errmsg;
-//			sprintf(&(errmsg[1]),"gl error during the glCallList(surfacelist) drawing %d\n", error);
-//			errmsg[0] = strlen(&(errmsg[1]));
-//			MessageAlert(errmsg);
-//		}
-//	} else {
-	OpenGLData->haveTransparentSurfaces = false;
-//		OpenGLData->SurfaceDisplayList = glGenLists(1);
-//		if (OpenGLData->SurfaceDisplayList != 0)
-//			glNewList(OpenGLData->SurfaceDisplayList, GL_COMPILE_AND_EXECUTE);
+	haveTransparentSurfaces = false;
 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, l_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
@@ -336,35 +286,19 @@ void MolDisplayWin::DrawGL(void) {
 			if (!lSurface->isTransparent()) {
 				lSurface->Draw3DGL(MainData, Prefs, NULL);
 			} else {
-				OpenGLData->haveTransparentSurfaces = true;
+				haveTransparentSurfaces = true;
 			}
 		}
 		lSurface = lSurface->GetNextSurface();
 	}
-//		if (OpenGLData->SurfaceDisplayList != 0) {
-//			glEndList();
-//			OpenGLData->SurfaceListActive = true;
-//		}
-//		error = glGetError();
-//		if (error != GL_NO_ERROR) {
-//			if (OpenGLData->SurfaceDisplayList != 0) {
-//				glDeleteLists(OpenGLData->SurfaceDisplayList, 1);
-//				OpenGLData->SurfaceDisplayList = 0;
-//				OpenGLData->SurfaceListActive = false;
-//			}
-//			Str255 errmsg;
-//			sprintf(&(errmsg[1]),"gl returned an error during the surfacelist creation %d\n", error);
-//			errmsg[0] = strlen(&(errmsg[1]));
-//			MessageAlert(errmsg);
-//		}
-//	}
+
 	if (Prefs->ShowSymmetryOperators()) AddSymmetryOperators();
 	//Transparent surfaces have to be depth sorted and drawn last.
-	if (OpenGLData->haveTransparentSurfaces) {
+	if (haveTransparentSurfaces) {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		Surface * lSurface = MainData->cFrame->SurfaceList;
-		if (! OpenGLData->transpTriList) {
+		if (! transpTriList) {
 			long totalTriCount = 0;
 			while (lSurface) {
 				if (lSurface->GetVisibility() && lSurface->isTransparent()) {
@@ -372,21 +306,21 @@ void MolDisplayWin::DrawGL(void) {
 				}
 				lSurface = lSurface->GetNextSurface();
 			}
-			OpenGLData->transpTriList = new myGLTriangle[totalTriCount];
-			OpenGLData->transpSortVertex = new float[totalTriCount];
-			OpenGLData->transpIndex = new long[totalTriCount];
-			OpenGLData->triangleCount = totalTriCount;
+			transpTriList = new myGLTriangle[totalTriCount];
+			transpSortVertex = new float[totalTriCount];
+			transpIndex = new long[totalTriCount];
+			triangleCount = totalTriCount;
 			
 			lSurface = MainData->cFrame->SurfaceList;
 			long triStartCount = 0;
 			while (lSurface) {
 				if (lSurface->GetVisibility() && lSurface->isTransparent()) {
 					triStartCount += lSurface->Draw3DGL(MainData, Prefs, 
-											&(OpenGLData->transpTriList[triStartCount]));
+											&(transpTriList[triStartCount]));
 				}
 				lSurface = lSurface->GetNextSurface();
 			}
-			for (int i=0; i<OpenGLData->triangleCount; i++) OpenGLData->transpIndex[i] = i;
+			for (int i=0; i<triangleCount; i++) transpIndex[i] = i;
 			SortTransparentTriangles();
 		}
 		DrawTransparentTriangles();
@@ -422,7 +356,7 @@ void MolDisplayWin::DrawGL(void) {
 		glDisable(GL_DEPTH_TEST);
 		glEnable(GL_LINE_STIPPLE);
 		glLineStipple(3, (GLushort) 43690);
-		glColor4f(anno_color[0], anno_color[1], anno_color[2], 0.9f);
+		glColor4f(fg_color[0], fg_color[1], fg_color[2], 0.9f);
 		glLineWidth(2.0f);
 		glBegin(GL_LINE_LOOP);
 			glVertex2f(lasso_start.x, lasso_start.y);
@@ -444,16 +378,16 @@ void MolDisplayWin::DrawGL(void) {
 
 	glDisable(GL_LIGHTING);
 
-#if 0
-	if (InEditMode()) {
-	    const char modeString[] = "editing";
-	    DrawStaticLabel(modeString, -50, -20);
-	}
-#endif
-
 	if (do_rotate_annotation) {
+		glMatrixMode(GL_TEXTURE);
+		glPushMatrix();
+		glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW);
 		ShowRotation(Prefs->GetShowAngles() && !rotate_timer.IsRunning(),
 					 !rotate_timer.IsRunning());
+		glMatrixMode(GL_TEXTURE);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
 	}
 
 }
@@ -816,15 +750,7 @@ void MolDisplayWin::DrawStaticLabel(const char *label, GLfloat x, GLfloat y) {
 	int canvasWidth, canvasHeight;
 	
 	glCanvas->GetSize(&canvasWidth, &canvasHeight);
-	
-	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
-	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
-	
-	if (backMagnitude > 70000) {
-		glColor3f(0.0, 0.0, 0.0);
-	} else {
-		glColor3f(1.0, 1.0, 1.0);
-	}
+	glColor3fv(fg_color);
 	
 	GLint matrixMode;
 	glGetIntegerv(GL_MATRIX_MODE, &matrixMode);
@@ -934,21 +860,21 @@ void MolDisplayWin::DrawLabel() {
 
 void MolDisplayWin::SortTransparentTriangles(void) {
 	CPoint3D tempV;
-	for (int i=0; i<OpenGLData->triangleCount; i++) {
-		Rotate3DPt(MainData->TotalRotation, OpenGLData->transpTriList[i].v1,
+	for (int i=0; i<triangleCount; i++) {
+		Rotate3DPt(MainData->TotalRotation, transpTriList[i].v1,
 			&(tempV));
-		OpenGLData->transpSortVertex[i] = tempV.z;	//We only need to save the z coordinate to sort
+		transpSortVertex[i] = tempV.z;	//We only need to save the z coordinate to sort
 	}
 	bool done = false;
-	long maxcount = OpenGLData->triangleCount-1;
+	long maxcount = triangleCount-1;
 	while (!done) {
 		done = true;
 		for (int i=0; i<maxcount; i++) {
-			long tempi = OpenGLData->transpIndex[i];
-			long tempj = OpenGLData->transpIndex[i+1];
-			if (OpenGLData->transpSortVertex[tempi] > OpenGLData->transpSortVertex[tempj]) {
-				OpenGLData->transpIndex[i] = tempj;
-				OpenGLData->transpIndex[i+1] = tempi;
+			long tempi = transpIndex[i];
+			long tempj = transpIndex[i+1];
+			if (transpSortVertex[tempi] > transpSortVertex[tempj]) {
+				transpIndex[i] = tempj;
+				transpIndex[i+1] = tempi;
 				done = false;
 			}
 		}
@@ -958,36 +884,33 @@ void MolDisplayWin::SortTransparentTriangles(void) {
 
 void MolDisplayWin::DrawTransparentTriangles(void) {
 	glBegin(GL_TRIANGLES);
-	for (long itri=0; itri<OpenGLData->triangleCount; itri++) {
-		long itriIndex = OpenGLData->transpIndex[itri];
+	for (long itri=0; itri<triangleCount; itri++) {
+		long itriIndex = transpIndex[itri];
 
-		glColor4f(OpenGLData->transpTriList[itriIndex].r1, OpenGLData->transpTriList[itriIndex].g1,
-				  OpenGLData->transpTriList[itriIndex].b1, OpenGLData->transpTriList[itriIndex].a1);
-		glNormal3f(OpenGLData->transpTriList[itriIndex].n1.x, 
-				   OpenGLData->transpTriList[itriIndex].n1.y, OpenGLData->transpTriList[itriIndex].n1.z);
-		glVertex3d(OpenGLData->transpTriList[itriIndex].v1.x, OpenGLData->transpTriList[itriIndex].v1.y,
-			OpenGLData->transpTriList[itriIndex].v1.z);
+		glColor4f(transpTriList[itriIndex].r1, transpTriList[itriIndex].g1,
+				  transpTriList[itriIndex].b1, transpTriList[itriIndex].a1);
+		glNormal3f(transpTriList[itriIndex].n1.x, 
+				   transpTriList[itriIndex].n1.y, transpTriList[itriIndex].n1.z);
+		glVertex3d(transpTriList[itriIndex].v1.x, transpTriList[itriIndex].v1.y,
+			transpTriList[itriIndex].v1.z);
 		
-		glColor4f(OpenGLData->transpTriList[itriIndex].r2, OpenGLData->transpTriList[itriIndex].g2,
-				  OpenGLData->transpTriList[itriIndex].b2, OpenGLData->transpTriList[itriIndex].a2);
-		glNormal3f(OpenGLData->transpTriList[itriIndex].n2.x, 
-				   OpenGLData->transpTriList[itriIndex].n2.y, OpenGLData->transpTriList[itriIndex].n2.z);
-		glVertex3d(OpenGLData->transpTriList[itriIndex].v2.x, OpenGLData->transpTriList[itriIndex].v2.y,
-				   OpenGLData->transpTriList[itriIndex].v2.z);
+		glColor4f(transpTriList[itriIndex].r2, transpTriList[itriIndex].g2,
+				  transpTriList[itriIndex].b2, transpTriList[itriIndex].a2);
+		glNormal3f(transpTriList[itriIndex].n2.x, 
+				   transpTriList[itriIndex].n2.y, transpTriList[itriIndex].n2.z);
+		glVertex3d(transpTriList[itriIndex].v2.x, transpTriList[itriIndex].v2.y,
+				   transpTriList[itriIndex].v2.z);
 
-		glColor4f(OpenGLData->transpTriList[itriIndex].r3, OpenGLData->transpTriList[itriIndex].g3,
-				  OpenGLData->transpTriList[itriIndex].b3, OpenGLData->transpTriList[itriIndex].a3);
-		glNormal3f(OpenGLData->transpTriList[itriIndex].n3.x, 
-				   OpenGLData->transpTriList[itriIndex].n3.y, OpenGLData->transpTriList[itriIndex].n3.z);
-		glVertex3d(OpenGLData->transpTriList[itriIndex].v3.x, OpenGLData->transpTriList[itriIndex].v3.y,
-				   OpenGLData->transpTriList[itriIndex].v3.z);
+		glColor4f(transpTriList[itriIndex].r3, transpTriList[itriIndex].g3,
+				  transpTriList[itriIndex].b3, transpTriList[itriIndex].a3);
+		glNormal3f(transpTriList[itriIndex].n3.x, 
+				   transpTriList[itriIndex].n3.y, transpTriList[itriIndex].n3.z);
+		glVertex3d(transpTriList[itriIndex].v3.x, transpTriList[itriIndex].v3.y,
+				   transpTriList[itriIndex].v3.z);
 	}
 	glEnd();	//End of triangle creation
 }
 
-#ifdef __WXMSW__
-#define GL_RESCALE_NORMAL 0x803A
-#endif
 void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 	GLUquadric *core_obj;
@@ -1005,18 +928,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 	long NumBonds = lFrame->NumBonds;
 	float AtomScale = Prefs->GetAtomScale();
 	float Quality = Prefs->GetQD3DAtomQuality();
-	GLfloat bg_invert[3];
-
-	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
-	long backMagnitude = BackgroundColor->red + BackgroundColor->green +
-		BackgroundColor->blue;
-
-	//choose black or white based on the background color
-	if (backMagnitude > 70000) { //"light" background choose black
-		bg_invert[0] = bg_invert[1] = bg_invert[2] = 0.0f;
-	} else {
-		bg_invert[0] = bg_invert[1] = bg_invert[2] = 1.0f;
-	}
 
 	bool draw_subdued;
 	glEnable(GL_RESCALE_NORMAL);
@@ -1041,7 +952,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, d_specular);
 				glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, d_shininess);
 				glLoadName(0);
-				glColor3fv(bg_invert);
+				glColor3fv(fg_color);
 				glEnable(GL_POLYGON_STIPPLE);
 				glPolygonStipple(stippleMask);
 				gluSphere(core_obj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
@@ -1070,7 +981,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 					glPolygonStipple(atomMaskPatterns[patternindex]);
 					glPushMatrix(); // atom center
 					glScalef(radius, radius, radius);
-					glCallList(OpenGLData->sphere_list);
+					glCallList(sphere_list);
 					glPopMatrix(); // atom center
 					glDisable(GL_POLYGON_STIPPLE);
 				}
@@ -1082,7 +993,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glPolygonStipple(stippleMask);
 				glPushMatrix(); // atom center
 				glScalef(radius * 1.01f, radius * 1.01f, radius * 1.01f);
-				glCallList(OpenGLData->sphere_list);
+				glCallList(sphere_list);
 				glPopMatrix(); // atom center
 				glDisable(GL_POLYGON_STIPPLE);
 			}
@@ -1099,7 +1010,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 			glPushMatrix(); // atom center
 			glScalef(radius, radius, radius);
-			glCallList(OpenGLData->sphere_list);
+			glCallList(sphere_list);
 			glPopMatrix(); // atom center
 
 			if (InEditMode() && show_bond_sites) {
@@ -1148,7 +1059,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 		DrawBond(lBonds[ibond], lAtoms[lBonds[ibond].Atom1],
 				 lAtoms[lBonds[ibond].Atom2], *Prefs, core_obj,
-				 modelview, proj, viewport, OpenGLData->sphere_list,
+				 modelview, proj, viewport, sphere_list,
 				 mHighliteState, InSymmetryEditMode());
 
 	}
@@ -1288,7 +1199,6 @@ void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 		glScalef(BondSize, BondSize, BondSize);
 		Prefs.ChangeColorBondColor(kHydrogenBond);
 		glCallList(sphere_list);
-		/* gluSphere(quadric, BondSize, (long)(Quality), (long)(0.5*Quality));	//Create and draw the sphere */
 		if (highlighting_on && !bond.GetSelectState()) {
 			glColor3f(0.0f, 0.0f, 0.0f);
 			glEnable(GL_POLYGON_STIPPLE);
@@ -1298,19 +1208,7 @@ void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 			glScalef(1.01f, 1.01f, 1.01f);
 			glCallList(sphere_list);
 			glPopMatrix();
-			/* gluSphere(quadric, BondSize*1.01, (long)(Quality), (long)(0.5*Quality)); */
 			glDisable(GL_POLYGON_STIPPLE);
-			
-			/* glColor4f(0.5,0.5,0.5,0.7f); */
-			/* glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); */
-			/* glEnable(GL_BLEND); */
-			/* glPushMatrix(); */
-			/* glScalef(1.02f, 1.02f, 1.02f); */
-			/* glCallList(sphere_list); */
-			/* glPopMatrix(); */
-			/* gluSphere(quadric, BondSize*1.02, (long)(Quality), (long)(0.5*Quality)); */
-			/* glDisable(GL_BLEND); */
-
 		}
 		glPopMatrix();
 		glTranslatef(0.0, 0.0, 2.5*BondSize);
@@ -1320,18 +1218,8 @@ void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 }
 
 void MolDisplayWin::AddAxisGL(void) {
-	RGBColor * BackgroundColor = Prefs->GetBackgroundColorLoc();
-	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
-	float anno_color[3];
-	
-	//choose black or white based on the background color
-	if (backMagnitude > 70000) {  //"light" background choose black
-		anno_color[0] = anno_color[1] = anno_color[2] = 0.0f;
-	} else {
-		anno_color[0] = anno_color[1] = anno_color[2] = 1.0f;
-	}
 	glEnable(GL_COLOR_MATERIAL);
-	glColor3f(anno_color[0], anno_color[1], anno_color[2]);
+	glColor3fv(fg_color);
 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, l_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
@@ -4161,4 +4049,192 @@ GLuint GetShaderProgram(const std::string& vert_src,
 }
 
 /* ------------------------------------------------------------------------- */
+
+/**
+ This function (re)generates any structures that are dependent on preference
+ settings. It should be called when preferences change. It assumes that a valid
+ OpenGL context exists and is current, so it should not be called by a parent's
+ constructor.
+ */
+void MolDisplayWin::DoPrefDependent() {
+
+	// All atoms are drawn using one display list that draws a sphere. 
+	// We delete any current list and create it anew.
+	if (sphere_list) {
+		glDeleteLists(sphere_list, 1);
+	}
+
+	GLUquadric *quad = gluNewQuadric();
+	gluQuadricOrientation(quad, GLU_OUTSIDE);
+	gluQuadricNormals(quad, GLU_SMOOTH);
+
+	sphere_list = glGenLists(1);
+	glNewList(sphere_list, GL_COMPILE);
+
+#if 1
+	float *verts;
+	int *faces;
+	int nverts;
+	int nfaces;
+	float *normals;
+	int nlevels;
+
+	// We do some funny mapping from display quality (2 - 40) to number of
+	// subdivisions.  2 maps to 0 levels, while all other values are mapped
+	// such that 13 -> 3 levels and 40 -> 7 levels.  Levels >7 recurse too
+	// much.
+	if (Prefs->GetQD3DAtomQuality() == 2) {
+		nlevels = 0;
+	} else {
+		nlevels = (int) ((Prefs->GetQD3DAtomQuality() - 13.0f) *
+						 (4.0f / 27.0f) + 3.0f);
+	}
+
+	GenerateOctahedron(nlevels, &verts, nverts, &faces, nfaces, &normals);
+	glVertexPointer(3, GL_FLOAT, 0, verts);
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, verts);
+	glNormalPointer(GL_FLOAT, 0, normals);
+	glDrawElements(GL_TRIANGLES, nfaces * 3, GL_UNSIGNED_INT, faces);
+	glDisableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	delete[] verts;
+	delete[] faces;
+	delete[] normals;
+#else
+	gluSphere(quad, 1.0f, (long) (1.5f * Prefs->GetQD3DAtomQuality()),
+			  (long) (Prefs->GetQD3DAtomQuality()));
+#endif
+
+	glEndList();
+
+	gluDeleteQuadric(quad);
+		
+	// Set the background color to the user's preference.
+	RGBColor *BackgroundColor = Prefs->GetBackgroundColorLoc();
+	float red, green, blue;
+	red = (float) BackgroundColor->red / 65536;
+	green = (float) BackgroundColor->green / 65536;
+	blue = (float) BackgroundColor->blue / 65536;
+	glClearColor(red, green, blue, 1.0f);
+
+	// The foreground color is white or black, whichever has better contrast given
+	// the background color.
+	long backMagnitude = BackgroundColor->red + BackgroundColor->green + BackgroundColor->blue;
+	if (backMagnitude > 70000)
+		fg_color[0] = fg_color[1] = fg_color[2] = 0.0f;
+	else
+		fg_color[0] = fg_color[1] = fg_color[2] = 1.0f;
+	
+	// Setup two lights on either side of the camera.
+	float fillBrightness = Prefs->GetQD3DFillBrightness();
+	float PointBrightness = Prefs->GetQD3DPointBrightness();
+	GLfloat diffuse[4]  = {fillBrightness, fillBrightness, fillBrightness, 0.0f};
+	GLfloat specular[4] = {PointBrightness, PointBrightness, PointBrightness, 0.0f};
+	GLfloat ambient[4] = {0.2f, 0.2f, 0.2f, 1.0};
+
+	// Make sure we're in eye space so that the lights always
+	// illuminate the visible scene.
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+	glEnable(GL_LIGHT0);
+
+	/* position[0] = -6.0; */
+	/* ambient[0] = ambient[1] = ambient[2] = 0.0f; */
+	/* glLightfv(GL_LIGHT1, GL_AMBIENT, ambient); */
+	/* glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse); */
+	/* glLightfv(GL_LIGHT1, GL_SPECULAR, specular); */
+	/* glLightfv(GL_LIGHT1, GL_POSITION, position); */
+	/* glEnable(GL_LIGHT1); */
+
+	if (GLEW_VERSION_2_0) {
+		if (depth_fbo) {
+			glDeleteFramebuffersEXT(1, &(depth_fbo));
+			depth_fbo = 0;
+		}
+
+		wxString vector_font, bitmap_font;
+		wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
+#if wxCHECK_VERSION(2, 8, 0)
+		wxString pathname = gStdPaths.GetResourcesDir();
+#else
+		wxString pathname = gStdPaths.GetDataDir();
+#ifdef __WXMAC__
+		//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
+		//but xcode is putting them in Resources.
+		pathname.Remove(pathname.Length() - 13);
+		pathname += wxT("Resources");
+#endif
+#endif
+
+		std::string vpath, fpath;
+		if (Prefs->GetShaderMode() == 1) {
+			vpath = std::string(pathname.ToAscii()) + "/perpixel_dirlight_v.glsl";
+			fpath = std::string(pathname.ToAscii()) + "/perpixel_dirlight_f.glsl";
+			shader_program = GetShaderProgramFromFiles(vpath, fpath);
+		} else if (Prefs->GetShaderMode() == 2) {
+			vpath = std::string(pathname.ToAscii()) + "/shadows_v.glsl";
+			fpath = std::string(pathname.ToAscii()) + "/shadows_f.glsl";
+			shader_program = GetShaderProgramFromFiles(vpath, fpath);
+
+			glGenTextures(1, &(depth_tex_id));
+			glBindTexture(GL_TEXTURE_2D, depth_tex_id);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, FBO_SIZE,
+						 FBO_SIZE, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+			glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+			glTexParameteri(GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+			glGenFramebuffersEXT(1, &depth_fbo);
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, depth_fbo);
+			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+									  GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D,
+									  depth_tex_id, 0);
+			glDrawBuffer(GL_NONE);
+			glReadBuffer(GL_NONE);
+
+			GLenum status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+			if (status != GL_FRAMEBUFFER_COMPLETE_EXT) {
+				std::cout << "Bad status: << " << (int) status << std::endl;
+			}
+
+			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		}
+
+		if (shader_program) {
+			glUseProgram(shader_program);
+
+			CPoint3D lightvec(light_pos[0], light_pos[1], light_pos[2]);
+			Normalize3D(&lightvec);
+			GLint light_pos_loc = glGetUniformLocation(shader_program, "light_dir");
+			if (light_pos_loc >= 0) {
+				glUniform3f(light_pos_loc, lightvec.x, lightvec.y, lightvec.z);
+			} else {
+				std::cerr << "Can't set shader uniforms." << std::endl;
+			}
+
+			GLint uniform_loc = glGetUniformLocation(shader_program, "depth_map");
+			if (uniform_loc >= 0) {
+				glUniform1i(uniform_loc, 0);
+			}
+
+			glUseProgram(0);
+		}
+	}
+				
+}
 
