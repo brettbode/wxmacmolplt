@@ -497,7 +497,7 @@ void MolDisplayWin::CreateFrameMovie(GWorldPtr lgWorld, Handle CompressedData,
 			temp = temp->GetNextSurface();
 		}
 		MainData->ResetRotation();
-		UpdateGLModel();
+		ReleaseLists();
 		DrawGL();
 
 		//	create a pict of the current molecule display
@@ -557,7 +557,7 @@ void MolDisplayWin::CreateFrameMovie(GWorldPtr lgWorld, Handle CompressedData,
 	}
 	MainData->SetCurrentFrame(SavedFrameNum);
 	MainData->ResetRotation();
-	UpdateGLModel();
+	ReleaseLists();
 	DrawGL();
 }
 void MolDisplayWin::CreateModeMovie(GWorldPtr lgWorld, Handle CompressedData,
@@ -589,7 +589,7 @@ void MolDisplayWin::CreateModeMovie(GWorldPtr lgWorld, Handle CompressedData,
 		ModeOffset[iatm] *= VectorScale;
 	}
 	MainData->ResetRotation();
-	UpdateGLModel();
+	ReleaseLists();
 	DrawGL();
 
 	OSErr	myErr;
@@ -649,7 +649,7 @@ void MolDisplayWin::CreateModeMovie(GWorldPtr lgWorld, Handle CompressedData,
 		}
 
 		MainData->ResetRotation();
-		UpdateGLModel();
+		ReleaseLists();
 		DrawGL();
 	}
 	for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
@@ -660,7 +660,7 @@ void MolDisplayWin::CreateModeMovie(GWorldPtr lgWorld, Handle CompressedData,
 	if (ModeOffset) delete [] ModeOffset;
 	if (SavedAtoms) delete [] SavedAtoms;
 	MainData->SetDrawMode(savedrawmode);
-	UpdateGLModel();
+	ReleaseLists();
 	DrawGL();
 }
 
