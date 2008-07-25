@@ -61,6 +61,7 @@ class MoleculeData {
 		float		MaxSize;				// The maximum side length of any frame
 		float		WindowSize;				// The Window size in the molecule coordinate space (ie Å or Bohrs) user adjustable to change the window scaling
 		Matrix4D	TotalRotation;			// Rotation matrix for displaying the molecule
+		CPoint3D    Centroid;
 		InputData *	InputOptions;			// Run information
 		char		DrawMode;				// Flag for normal mode display & MO display
 											/*	bit 1 for showing normal modes

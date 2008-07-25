@@ -190,27 +190,33 @@ void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
  */
 void MolDisplayWin::DrawGL(int do_shader) {
 
-	GLenum error = glGetError();	//clear the error code
-	if (error != GL_NO_ERROR) {
-		std::cerr << "opengl error: " << error << std::endl;
-	}
+	// Make (0, 0, WindowSize) the origin.  Moves geometry away from camera.
+	glTranslatef(0, 0, -MainData->WindowSize);
 
-	// Setup the rotation matrix. We do not set to identity since stereo may
-	// have tacked some transformations on.
-	glTranslatef(0.0f, 0.0f, -MainData->WindowSize);
-
-	if (Prefs->ShowAtomicSymbolLabels() || Prefs->ShowAtomNumberLabels()) {
+	if ((Prefs->ShowAtomicSymbolLabels() || Prefs->ShowAtomNumberLabels()) &&
+		(shader_program == 0 || do_shader)) {
 		glMatrixMode(GL_TEXTURE);
 		glPushMatrix();
 		glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW);
 		DrawLabel();
+		glMatrixMode(GL_TEXTURE);
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
 	}
 
-	/* glPushMatrix(); // unrotated scene */
-	glMultMatrixf((const GLfloat *) &(MainData->TotalRotation));
 	glEnable(GL_LIGHTING);
+
+	// Rotate about the origin (the molecule's centroid).
+	glMultMatrixf((const GLfloat *) &(MainData->TotalRotation));
+
+	// Make the molecule's centroid the origin.
+	glTranslatef(-MainData->Centroid.x, -MainData->Centroid.y,
+	             -MainData->Centroid.z);
+
+	// We're in a good space to draw the axis.  We've rotated, but we haven't
+	// moved around for the molecule yet.
+	if (MainData->ShowAxis()) AddAxisGL();
 
 	if (GLEW_VERSION_2_0 && do_shader) {
 		GLint mode;
@@ -220,8 +226,6 @@ void MolDisplayWin::DrawGL(int do_shader) {
 			glUseProgram(shader_program);
 		}
 	}
-
-	if (MainData->ShowAxis()) AddAxisGL();
 	
 	//Draw the main molecular geometry
 	if (MainData->cFrame->NumAtoms > 0) {
@@ -292,7 +296,24 @@ void MolDisplayWin::DrawGL(int do_shader) {
 		lSurface = lSurface->GetNextSurface();
 	}
 
-	if (Prefs->ShowSymmetryOperators()) AddSymmetryOperators();
+	if (Prefs->ShowSymmetryOperators()) {
+		if (GLEW_VERSION_2_0) {
+			glUseProgram(0);
+		}
+		glMatrixMode(GL_TEXTURE);
+		glPushMatrix();
+		glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW);
+		AddSymmetryOperators();
+		glMatrixMode(GL_TEXTURE);
+		glPopMatrix();
+		glMatrixMode(GL_MODELVIEW);
+		if (GLEW_VERSION_2_0 && Prefs->GetShaderMode() && do_shader) {
+			glBindTexture(GL_TEXTURE_2D, depth_tex_id);
+			glUseProgram(shader_program);
+		}
+	}
+
 	//Transparent surfaces have to be depth sorted and drawn last.
 	if (haveTransparentSurfaces) {
 		glEnable(GL_BLEND);
@@ -838,11 +859,11 @@ void MolDisplayWin::DrawLabel() {
 			green = AtomColor->green/65536.0;
 			blue = AtomColor->blue/65536.0;
 
-			origPt.x = lAtoms[iatom].Position.x;
-			origPt.y = lAtoms[iatom].Position.y;
-			origPt.z = lAtoms[iatom].Position.z;
-
-			Rotate3DPt(MainData->TotalRotation, origPt, &transPt );
+			// Find atom's position in world coordinates.  Move there for
+			// drawing label screen-aligned.
+			origPt = lAtoms[iatom].Position;
+			origPt -= MainData->Centroid;
+			Rotate3DPt(MainData->TotalRotation, origPt, &transPt);
 
 			glPushMatrix();
 			glTranslatef(transPt.x, transPt.y, transPt.z+(radius+0.01));
@@ -915,7 +936,6 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 	GLUquadric *core_obj;
 	core_obj = gluNewQuadric();
-	if (!core_obj) throw std::bad_alloc();
 
 	// gluQuadricDrawStyle(qobj, GLU_FILL); //or GLU_LINE
 	/* gluQuadricOrientation(core_obj, GLU_OUTSIDE); */
@@ -942,6 +962,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 			float radius = AtomScale * Prefs->GetAtomSize(curAtomType);
 			if (radius < 0.01) continue;	//skip really small spheres
+
+			/* glPushMatrix(); // atom center */
+			/* glCallList(sphere_list); */
+			/* glPopMatrix(); // atom center */
 
 			glPushMatrix(); // molecule origin
 			glTranslatef(lAtoms[iatom].Position.x, 
@@ -1230,15 +1254,13 @@ void MolDisplayWin::AddAxisGL(void) {
 
 	CPoint3D vector = CPoint3D(1.0f, 0.0f, 0.0f);
 	CPoint3D NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
-	glPushMatrix();
 	
 	// Z-axis
+	glPushMatrix();
 	glTranslatef(0.0, 0.0, -MainData->MaxSize);
 	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
-	glPushMatrix();
 	glTranslatef(0.0, 0.0, 2.0f * MainData->MaxSize);
 	DrawSceneString(0.3f, 0.0f, 0.0f, 0.0f, wxT("z"));
-	glPopMatrix();
 	glPopMatrix();
 
 	// X-axis
@@ -1247,11 +1269,9 @@ void MolDisplayWin::AddAxisGL(void) {
 	rotMat[3][0] = -MainData->MaxSize;
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
-	glPushMatrix();
+	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
 	glTranslatef(0.0, 0.0, 2.0f * MainData->MaxSize);
 	DrawSceneString(0.3f, 0.0f, 0.0f, 0.0f, wxT("x"));
-	glPopMatrix();
-	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
 	glPopMatrix();
 
 	// Y-axis
@@ -1262,10 +1282,8 @@ void MolDisplayWin::AddAxisGL(void) {
 	glPushMatrix();
 	glMultMatrixf((const GLfloat *) &rotMat);
 	DrawArrow(2*MainData->MaxSize, VectorWidth, Quality);
-	glPushMatrix();
 	glTranslatef(0.0, 0.0, 2.0f * MainData->MaxSize);
 	DrawSceneString(0.3f, 0.0f, 0.0f, 0.0f, wxT("y"));
-	glPopMatrix();
 	glPopMatrix();
 }
 

@@ -195,8 +195,8 @@ void MoleculeData::GetRotationMatrix(Matrix4D copy) {
 void MoleculeData::CenterModelWindow(void) {
 	float	XMin, XMax, YMin, YMax, ZMin, ZMax;
 //first set the Min and Max to big and small values
-	XMin=YMin=ZMin=1.0E10;
-	XMax=YMax=ZMax=-1.0E10;
+	XMin=YMin=ZMin=1.0e10;
+	XMax=YMax=ZMax=-1.0e10;
 
 //Start at the beginning of the frame list so that the center for the entire
 //frame list is generated.	
@@ -214,26 +214,15 @@ void MoleculeData::CenterModelWindow(void) {
 		lFrame = lFrame->GetNextFrame();
 	}
 //The center is now just half of the min plus the max
-	CPoint3D Center, NewCenter;
-	Center.x = (XMax+XMin)*0.5;
-	Center.y = (YMax+YMin)*0.5;
-	Center.z = (ZMax+ZMin)*0.5;
+	Centroid.x = (XMax+XMin)*0.5;
+	Centroid.y = (YMax+YMin)*0.5;
+	Centroid.z = (ZMax+ZMin)*0.5;
 //Recompute the maximum width of the molecule
 	MaxSize = MAX((XMax-XMin), (YMax-YMin));
 	MaxSize = MAX(MaxSize, (ZMax-ZMin));
 	
-	TotalRotation[3][0] =
-	TotalRotation[3][1] =
-	TotalRotation[3][2] = 0.0;
-
-	Rotate3DPt(TotalRotation, Center, &NewCenter);
-//Now offset the screen coordinate system in the opposite direction
-//as the center. This has the effect of lining up the screen coordinate
-//center with the molecular center.
-	TotalRotation[3][0] = -NewCenter.x;
-	TotalRotation[3][1] = -NewCenter.y;
-	TotalRotation[3][2] = -NewCenter.z;
 }	/*CenterModelWindow*/
+
 void MoleculeData::ResetRotation(void) {
 	if ((cFrame->NumAtoms > MaxAtoms)||(RotCoords==NULL)||(zBuffer==NULL)) {
 		if (RotCoords != NULL) {
@@ -288,11 +277,14 @@ void MoleculeData::StickCoordinates(void) {
 		}
 	}
 		long i;
-	for (i=0; i<cFrame->NumAtoms; i++)
-		Rotate3DPt(TotalRotation, cFrame->Atoms[i].Position, &(RotCoords[i]));
+	for (i=0; i<cFrame->NumAtoms; i++) {
+		Rotate3DPt(TotalRotation, cFrame->Atoms[i].Position - Centroid,
+				   &(RotCoords[i]));
+	}
 	for (i=0; i<cFrame->NumAtoms; i++) {
 		cFrame->Atoms[i].Position = RotCoords[i];
 	}
+	Centroid = CPoint3D(0.0f, 0.0f, 0.0f);
 	InitRotationMatrix(TotalRotation);
 }
 
@@ -408,35 +400,12 @@ void MoleculeData::FlipRotation(short theItem) {
 	}
 	VirtualSphereQD3D (p, q, sphereCenter, sphereRadius, rotationMatrix, TotalRotation);
 
-	CPoint3D	InitialTrans, FinalTrans;
-//First back rotate the translation to get the inital translation
-	FinalTrans.x = TotalRotation[3][0];
-	FinalTrans.y = TotalRotation[3][1];
-	FinalTrans.z = TotalRotation[3][2];
-	BackRotate3DOffset(TotalRotation, &FinalTrans, &InitialTrans);
-/*	InitialTrans.x = ((TotalRotation[3][0])*TotalRotation[0][0] +
-		( TotalRotation[3][1])*TotalRotation[0][1] +
-		( TotalRotation[3][2])*TotalRotation[0][2]);
-	InitialTrans.y = ((TotalRotation[3][0])*TotalRotation[1][0] +
-		( TotalRotation[3][1])*TotalRotation[1][1] +
-		( TotalRotation[3][2])*TotalRotation[1][2]);
-	InitialTrans.z = ((TotalRotation[3][0])*TotalRotation[2][0] +
-		( TotalRotation[3][1])*TotalRotation[2][1] +
-		( TotalRotation[3][2])*TotalRotation[2][2]);*/
-//Now zero out the translation part of the matrix
-	TotalRotation[3][0] = TotalRotation[3][1] =
-	TotalRotation[3][2] = 0.0;
 /* Concatenate the new rotation with the current rotation */
 //Mulitply twice since the rotate generated is 90 degrees and we want 180
 	MultiplyMatrix (rotationMatrix, TotalRotation, tempcopyMatrix);
 	CopyMatrix (tempcopyMatrix, TotalRotation);
 	MultiplyMatrix (rotationMatrix, TotalRotation, tempcopyMatrix);
 	CopyMatrix (tempcopyMatrix, TotalRotation);
-//Now rotate the translation to the new orientation
-	Rotate3DPt(TotalRotation, InitialTrans, &FinalTrans);
-	TotalRotation[3][0] = FinalTrans.x;
-	TotalRotation[3][1] = FinalTrans.y;
-	TotalRotation[3][2] = FinalTrans.z;
 }	/*FlipRotation*/
 // Sets the plane of the screen to that defined by the three points provided
 bool MoleculeData::SetScreenPlane(CPoint3D *Points) {
@@ -483,10 +452,8 @@ bool MoleculeData::SetScreenPlane(CPoint3D *Points) {
 	TotalRotation[2][3] = TotalRotation[3][0] = TotalRotation[3][1] = TotalRotation[3][2] = 0.0;
 	TotalRotation[3][3] = 1.0;
 		//Rotation the first Point and use for the translation
-	Rotate3DPt(TotalRotation, Points[0], &Vector1);
-	TotalRotation[3][0] = -Vector1.x;
-	TotalRotation[3][1] = -Vector1.y;
-	TotalRotation[3][2] = -Vector1.z;
+	/* Rotate3DPt(TotalRotation, Points[0], &Vector1); */
+	/* Centroid = Vector1 * -1.0f; */
 	
 	ResetRotation();
 	return true;
@@ -1030,18 +997,20 @@ void MoleculeData::ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, W
 	mInts->InternalsToCartesians(this, Prefs, 0);
 }
 void MoleculeData::GetModelCenter(CPoint3D * center) {
-		CPoint3D	temp;
-	temp.x = -TotalRotation[3][0];
-	temp.y = -TotalRotation[3][1];
-	temp.z = -TotalRotation[3][2];
-	BackRotate3DOffset(TotalRotation, &temp, center);
+		/* CPoint3D	temp; */
+	/* temp.x = -TotalRotation[3][0]; */
+	/* temp.y = -TotalRotation[3][1]; */
+	/* temp.z = -TotalRotation[3][2]; */
+	/* BackRotate3DOffset(TotalRotation, &temp, center); */
+	*center = Centroid;
 }
 void MoleculeData::SetModelCenter(CPoint3D * center) {
-		CPoint3D	temp;
-	Rotate3DOffset(TotalRotation, *center, &temp);
-	TotalRotation[3][0] = -temp.x;
-	TotalRotation[3][1] = -temp.y;
-	TotalRotation[3][2] = -temp.z;
+		/* CPoint3D	temp; */
+	/* Rotate3DOffset(TotalRotation, *center, &temp); */
+	/* TotalRotation[3][0] = -temp.x; */
+	/* TotalRotation[3][1] = -temp.y; */
+	/* TotalRotation[3][2] = -temp.z; */
+	Centroid = *center;
 }
 void MoleculeData::GetModelRotation(float * Psi, float * Phi, float * Theta) {
 	MatrixToEulerAngles(TotalRotation, Psi, Phi, Theta);

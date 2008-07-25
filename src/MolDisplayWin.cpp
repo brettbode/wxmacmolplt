@@ -307,7 +307,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	SetStatusBar(myStatus);
 	
 	int attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16,
-					 0, 0};
+	                 0, 0};
 	bool do_stereo = false;
 #if wxCHECK_VERSION(2,9,0)
 	if (Prefs->UseStereo()) {
@@ -320,7 +320,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	}
 #endif
 	glCanvas = new MpGLCanvas(this, wxID_ANY, wxPoint(0,0), wxDefaultSize,
-							  attribs, do_stereo);
+	                          attribs, do_stereo);
 	glCanvas->SetPrefs(Prefs);
 	
 	createMenuBar();
@@ -404,18 +404,8 @@ void MolDisplayWin::getCanvasSize(long *width, long *height) {
 }
 
 void MolDisplayWin::eventSize(wxSizeEvent &event) {
-	/* SizeChanged(); */
 	event.Skip();
 }
-
-/* void MolDisplayWin::SizeChanged(void) { */
-	//resize/reposition the controls and the display canvas
-	/* int width, height; */
-	/* GetClientSize(&width, &height); */
-
-	//The status bar class effects the client size so no need to subtract it off here
-	/* glCanvas->SetSize(wxSize(width, height)); */
-/* } */
 
 void MolDisplayWin::OnMenuOpen(wxMenuEvent & event) {
 	StopAnimations();
@@ -453,7 +443,7 @@ void MolDisplayWin::StopAnimations(void) {
 		ModeAnimationData->m_timer.Stop();
 		MainData->SetDrawMode(ModeAnimationData->SavedDrawMode);
 		for (int iatm=0; iatm<(MainData->cFrame->NumAtoms); iatm++) {
-			MainData->cFrame->Atoms[iatm].Position = ModeAnimationData->SavedCoordinates[iatm]; 
+			MainData->cFrame->Atoms[iatm].Position = ModeAnimationData->SavedCoordinates[iatm];
 		}
 		delete ModeAnimationData;
 		ModeAnimationData = NULL;
@@ -751,10 +741,9 @@ void MolDisplayWin::OnRedoUpdate( wxUpdateUIEvent& event ) {
 }
 
 void MolDisplayWin::OnAddHydrogensUpdate( wxUpdateUIEvent& event ) {
-	event.Enable((MainData->cFrame->GetNumAtoms() > 0) &&
-				 InEditMode());
+	event.Enable((MainData->cFrame->GetNumAtoms() > 0) && InEditMode());
 	menuBuild->Enable(MMP_DELETEHYDROGENS, (MainData->cFrame->GetNumAtoms() > 0) &&
-					  InEditMode());
+	                  InEditMode());
 }
 
 void MolDisplayWin::OnShowBondSitesUpdate(wxUpdateUIEvent& event) {
@@ -794,7 +783,7 @@ void MolDisplayWin::OnPasteUpdate(wxUpdateUIEvent& event) {
 	if ((MainData->cFrame->NumAtoms == 0)||InEditMode()) {
 		if (wxTheClipboard->Open()) {
 			if (wxTheClipboard->IsSupported(wxDF_TEXT) ||
-				wxTheClipboard->IsSupported(_("CML"))) {
+			    wxTheClipboard->IsSupported(_("CML"))) {
 				event.Enable(true);
 			}
 			wxTheClipboard->Close();
@@ -1066,7 +1055,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 	int        type  = 0;
 
 	fileDlg = new wxFileDialog(this,
-							   wxT("Export"),
+	                           wxT("Export"),
 							   wxT(""),
 							   wxT(""),
 							   wildcards,
@@ -1106,7 +1095,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 			exportOptionsDlg->setFileType(type);
 			if(exportOptionsDlg->ShowModal() == wxID_OK) {
 				bmp = new wxBitmap(exportOptionsDlg->getWidth(),
-								   exportOptionsDlg->getHeight());
+				                                               exportOptionsDlg->getHeight());
 				memDC.SelectObject(*bmp);
 				glCanvas->GenerateHiResImageForExport(&memDC);
 				exportImage = bmp->ConvertToImage();
@@ -2019,7 +2008,7 @@ void MolDisplayWin::PasteText(void) {
 				if (TextBuffer) delete TextBuffer;
 			}
 			delete [] tbuf;
-		   
+  
 			if (iline == 0) {   /*No atoms were found so clear the memory I just allocated*/
 				wxTheClipboard->Close();
 				return;
@@ -2172,7 +2161,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 
 	// We make space for the new structure here.  The memory will be owned
 	// by the build palette.
-	struc = new Structure;	
+	struc = new Structure;
 	struc->natoms = natoms_selected;
 	struc->atoms = new mpAtom[struc->natoms];
 
@@ -2231,7 +2220,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 	std::vector<Bond> new_bonds;
 	for (bi = 0; bi < frame->NumBonds; bi++) {
 		if (frame->GetAtomSelection(bonds[bi].Atom1) &&
-			frame->GetAtomSelection(bonds[bi].Atom2)) {
+		    frame->GetAtomSelection(bonds[bi].Atom2)) {
 			new_bond = Bond(bonds[bi]);
 			new_bond.Atom1 = new_ids[new_bond.Atom1];
 			new_bond.Atom2 = new_ids[new_bond.Atom2];
@@ -2245,7 +2234,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 	delete[] new_ids;
 
 	wxTextEntryDialog *dlg =
-		new wxTextEntryDialog(this,
+	   new wxTextEntryDialog(this,
 				_("Please enter a name for this custom prototype:"),
 				_("Add Prototype"));
 	int result;
@@ -2305,8 +2294,8 @@ void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
 }
 void MolDisplayWin::OnModeAnimation(wxTimerEvent & event) {
 	if (ModeAnimationData) {
-		if ((ModeAnimationData->iPoint==ModeAnimationData->NumPoints)||
-			(ModeAnimationData->iPoint==-ModeAnimationData->NumPoints)) {
+		if (ModeAnimationData->iPoint == ModeAnimationData->NumPoints ||
+		    ModeAnimationData->iPoint == -ModeAnimationData->NumPoints) {
 			ModeAnimationData->inc *= -1;
 			ModeAnimationData->offsetFactor *= -1.0;
 		}
@@ -2326,7 +2315,7 @@ void MolDisplayWin::menuViewAnimateMode(wxCommandEvent &event) {
 		ModeAnimationData->m_timer.Stop();
 		MainData->SetDrawMode(ModeAnimationData->SavedDrawMode);
 		for (int iatm=0; iatm<(MainData->cFrame->NumAtoms); iatm++) {
-			MainData->cFrame->Atoms[iatm].Position = ModeAnimationData->SavedCoordinates[iatm]; 
+			MainData->cFrame->Atoms[iatm].Position = ModeAnimationData->SavedCoordinates[iatm];
 		}
 		delete ModeAnimationData;
 		ModeAnimationData = NULL;
@@ -2492,8 +2481,8 @@ void MolDisplayWin::menuViewRotateTo_X_axis(wxCommandEvent &event) {
 	MainData->TotalRotation[0][2] = MainData->TotalRotation[1][1] = 1.0;
 	MainData->TotalRotation[2][0] = -1.0;
 	MainData->TotalRotation[0][0] = MainData->TotalRotation[2][2] =
-		MainData->TotalRotation[1][0] = MainData->TotalRotation[0][1] =
-		MainData->TotalRotation[1][2] = MainData->TotalRotation[2][1] = 0.0;
+	   MainData->TotalRotation[1][0] = MainData->TotalRotation[0][1] =
+	   MainData->TotalRotation[1][2] = MainData->TotalRotation[2][1] = 0.0;
 	MainData->ResetRotation();
 	ResetView();
 	Dirtify();
@@ -2502,8 +2491,8 @@ void MolDisplayWin::menuViewRotateTo_Y_axis(wxCommandEvent &event) {
 	MainData->TotalRotation[0][0] = MainData->TotalRotation[1][2] = 1.0;
 	MainData->TotalRotation[2][1] = -1.0;
 	MainData->TotalRotation[1][1] = MainData->TotalRotation[2][2] =
-		MainData->TotalRotation[0][1] = MainData->TotalRotation[0][2] =
-		MainData->TotalRotation[1][0] = MainData->TotalRotation[2][0] = 0.0;
+	   MainData->TotalRotation[0][1] = MainData->TotalRotation[0][2] =
+	   MainData->TotalRotation[1][0] = MainData->TotalRotation[2][0] = 0.0;
 	MainData->ResetRotation();
 	ResetView();
 	Dirtify();
@@ -2672,8 +2661,9 @@ void MolDisplayWin::menuBuilderAddHydrogens(wxCommandEvent &event) {
 		short coordination = lFrame->Atoms[iatom].GetCoordinationNumber();
 		int bondCount = 0;
 		for (long i=0; i<lFrame->NumBonds; i++) {
-			if (((iatom == lFrame->Bonds[i].Atom1)||(iatom == lFrame->Bonds[i].Atom2))&&
-				(lFrame->Bonds[i].Order > kHydrogenBond)) {
+			if ((iatom == lFrame->Bonds[i].Atom1 ||
+			     iatom == lFrame->Bonds[i].Atom2) &&
+			     lFrame->Bonds[i].Order > kHydrogenBond) {
 				bondCount++;
 			}
 		}
@@ -2686,7 +2676,7 @@ void MolDisplayWin::menuBuilderAddHydrogens(wxCommandEvent &event) {
 			DrawBondingSites(iatom, 0, NULL, k+1, &vector);
 			lFrame->GetAtomPosition(iatom, origin);
 			MainData->NewAtom(1, origin + vector * 0.01 *
-							  (Prefs->GetAtomSize(lFrame->GetAtomType(iatom)-1) + Prefs->GetAtomSize(0)));
+			                  (Prefs->GetAtomSize(lFrame->GetAtomType(iatom)-1) + Prefs->GetAtomSize(0)));
 			lFrame->Atoms[lFrame->GetNumAtoms()-1].SetCoordinationNumber(1);
 			lFrame->AddBond(iatom,lFrame->GetNumAtoms()-1,kSingleBond);
 		}
@@ -2710,8 +2700,9 @@ void MolDisplayWin::menuBuilderDeleteHydrogens(wxCommandEvent &event) {
 			if (lFrame->Atoms[iatom].IsEffectiveFragment() || lFrame->Atoms[iatom].IsSIMOMMAtom()) continue;
 			bool hasBonds=false;
 			for (long i=0; i<lFrame->NumBonds; i++) {
-				if (((iatom == lFrame->Bonds[i].Atom1)||(iatom == lFrame->Bonds[i].Atom2))&&
-					(lFrame->Bonds[i].Order > kHydrogenBond)) {
+				if ((iatom == lFrame->Bonds[i].Atom1 ||
+				     iatom == lFrame->Bonds[i].Atom2) &&
+				    lFrame->Bonds[i].Order > kHydrogenBond) {
 					hasBonds = true;
 					break;
 				}
@@ -2756,27 +2747,28 @@ void MolDisplayWin::menuBuilderSymmetryEdit(wxCommandEvent &event) {
 	UpdateModelDisplay();
 }
 
-/* void MolDisplayWin::menuBuilderRegenSymmetry(wxCommandEvent &event) { */
-	/* RegenerateSymmetryDependent(); */
-/* } */
+#if 0
+void MolDisplayWin::menuBuilderRegenSymmetry(wxCommandEvent &event) {
+	RegenerateSymmetryDependent();
+}
+#endif
 
 void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 	int key = event.GetKeyCode();
 	if (!event.HasModifiers()) {
 		switch (key) {
 			case 'b': case 'B':
-				std::cout << "edge" << std::endl;
 				glEdgeFlag(GL_TRUE);
 				break;
 			case '[':
 				if (MainData->cFrame->Vibs &&
-					MainData->cFrame->Vibs->CurrentMode > 0) {
+				    MainData->cFrame->Vibs->CurrentMode > 0) {
 					ChangeModes(MainData->cFrame->Vibs->CurrentMode - 1);
 				}
 				break;
 			case ']':
 				if (MainData->cFrame->Vibs &&
-					MainData->cFrame->Vibs->CurrentMode < MainData->cFrame->Vibs->NumModes - 1) {
+				    MainData->cFrame->Vibs->CurrentMode < MainData->cFrame->Vibs->NumModes - 1) {
 					ChangeModes(MainData->cFrame->Vibs->CurrentMode + 1);
 				}
 				break;
@@ -2814,7 +2806,7 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 				break;
 			default:
 				if (InEditMode() &&
-					((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z'))) {
+				    ((key >= 'a' && key <= 'z') || (key >= 'A' && key <= 'Z'))) {
 					//Pass general chars to the periodic table to set the atom type
 					// TODO: A temporary hack to register outside event.
 					event.m_x = -50;
@@ -3062,10 +3054,7 @@ void MolDisplayWin::RegenerateSymmetryDependent() {
  */
 void MolDisplayWin::AtomsChanged(bool updateCoordsWin, bool updateDisplay) {
 
-	if (InSymmetryEditMode()) { // &&
-		/* !wxGetMouseState().LeftDown() && */
-		/* !wxGetMouseState().RightDown() && */
-		/* !wxGetMouseState().MiddleDown()) { */
+	if (InSymmetryEditMode()) {
 		RegenerateSymmetryDependent();
 		MainData->SymmetrizeCoordinates(wxGetMouseState().LeftDown());
 	}
@@ -3301,7 +3290,7 @@ void MolDisplayWin::AbortOpen(const char * msg) {
 	//reinitialize the window data and leave open
 #ifndef __WXMAC__
 	MpApp & app = wxGetApp();
-	if (app.WindowCount() <= 1) {   
+	if (app.WindowCount() <= 1) {
 		//This is the last window! Clear it out, but leave it open
 		delete MainData;
 		MainData = new MoleculeData(this);
@@ -3432,7 +3421,7 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 	//Some kind of File system related error
 	catch (FileError Error) { Error.WriteError();
 		if (!append) AbortOpen(NULL);}
-	catch (...) { 
+	catch (...) {
 		if (!append)
 			AbortOpen("Unknown error reading the selected file. File open aborted.");
 	}
@@ -3450,7 +3439,7 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 		  if (s == noErr) {
 			  FSCatalogInfoBitmap fields = kFSCatInfoFinderInfo;
 			  FSCatalogInfo info;
-			  
+  
 			  FSGetCatalogInfo(&mFSRef, fields, &info, NULL, NULL, NULL);
 			  FileInfo * mfinfo = (FileInfo *) (&(info.finderInfo));
 			  if (mfinfo->fileCreator != (OSType) 'BMBm') {
@@ -3568,9 +3557,10 @@ void WindowData::Validate(wxRect & testRect) {
 #endif
 		}
 		//Test the sample rect to see if it lies (at least partially) on this display
-		if ((testRect.x >= displayRect.x)&&(testRect.y >= displayRect.y)&&
-			(testRect.x < (displayRect.x+displayRect.width))&&
-			(testRect.y < (displayRect.y+displayRect.height))) {
+		if (testRect.x >= displayRect.x &&
+		    testRect.y >= displayRect.y &&
+		    testRect.x < (displayRect.x + displayRect.width) &&
+		    testRect.y < (displayRect.y + displayRect.height)) {
 			//ok rect tests within this window
 			//now test the size to make sure the window can be placed fully on this screen
 			if (testRect.width < 1) testRect.width = -1;
@@ -3626,7 +3616,6 @@ void MolDisplayWin::OnRotateTimer(wxTimerEvent& event) {
 	wxMouseEvent mouse_event = wxMouseEvent(wxEVT_MOTION);
 	mouse_event.m_leftDown = true;
 	Rotate(mouse_event);
-
 }
 
 void MolDisplayWin::Rotate(wxMouseEvent &event) {
@@ -3654,7 +3643,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 
 	/* Figure out where to place the Virtual Sphere cue. */
 	width = hsize;
-	sphereCenter.x = hsize/2; 
+	sphereCenter.x = hsize/2;
 	sphereCenter.y = vsize/2;
 	if (sphereCenter.x >= sphereCenter.y)
 		sphereRadius   = (long)((float) (sphereCenter.x)*0.9);
@@ -3729,22 +3718,34 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 			// The right mouse button or Command-{Left,Middle} produces a 
 			// translation along screen spaces axes.
 			if (event.CmdDown() || event.RightIsDown()) {
-				CPoint3D offset;
 
 				// If shift is also held down, we depth-translate along the
 				// viewing direction.
 				if (event.ShiftDown()) {
-					offset.z = dy / (hsize / MainData->WindowSize);
-					MainData->TotalRotation[3][2] += offset.z;
+					float factor = 1.2f * MainData->WindowSize / hsize;
+					CPoint3D eye_z_in_obj(MainData->TotalRotation[0][2],
+							              MainData->TotalRotation[1][2],
+										  MainData->TotalRotation[2][2]);
+
+					eye_z_in_obj *= -inertia.y * factor;
+					MainData->Centroid -= eye_z_in_obj;
 				}
 				
 				// Otherwise we move in proportion to the window size along
 				// the screen's x- and y-axes.
 				else {
-					offset.x = dx/(hsize/MainData->WindowSize);
-					offset.y = dy/(hsize/MainData->WindowSize);
-					MainData->TotalRotation[3][0] += offset.x;
-					MainData->TotalRotation[3][1] -= offset.y;
+					float factor = 1.2f * MainData->WindowSize / hsize;
+					CPoint3D eye_x_in_obj(MainData->TotalRotation[0][0],
+							              MainData->TotalRotation[1][0],
+										  MainData->TotalRotation[2][0]);
+					CPoint3D eye_y_in_obj(MainData->TotalRotation[0][1],
+							              MainData->TotalRotation[1][1],
+										  MainData->TotalRotation[2][1]);
+
+					eye_x_in_obj *= inertia.x * factor;
+					eye_y_in_obj *= -inertia.y * factor;
+					MainData->Centroid -= eye_x_in_obj;
+					MainData->Centroid -= eye_y_in_obj;
 				}
 			}
 			
@@ -3762,35 +3763,12 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 				// Rotate.
 				else {
 					VirtualSphereQD3D(mouse_start, q,
-									  sphereCenter, sphereRadius,
-									  rotationMatrix, MainData->TotalRotation);
-
-					CPoint3D InitialTrans, FinalTrans;
-
-					// First back rotate the translation to get the inital translation
-					InitialTrans.x = ((MainData->TotalRotation[3][0])*MainData->TotalRotation[0][0] +
-									  (MainData->TotalRotation[3][1])*MainData->TotalRotation[0][1] +
-									  (MainData->TotalRotation[3][2])*MainData->TotalRotation[0][2]);
-					InitialTrans.y = ((MainData->TotalRotation[3][0])*MainData->TotalRotation[1][0] +
-									  (MainData->TotalRotation[3][1])*MainData->TotalRotation[1][1] +
-									  (MainData->TotalRotation[3][2])*MainData->TotalRotation[1][2]);
-					InitialTrans.z = ((MainData->TotalRotation[3][0])*MainData->TotalRotation[2][0] +
-									  (MainData->TotalRotation[3][1])*MainData->TotalRotation[2][1] +
-									  (MainData->TotalRotation[3][2])*MainData->TotalRotation[2][2]);
-
-					// Now zero out the translation part of the matrix
-					MainData->TotalRotation[3][0] = MainData->TotalRotation[3][1] =
-					MainData->TotalRotation[3][2] = 0.0;
+					                  sphereCenter, sphereRadius,
+					                  rotationMatrix, MainData->TotalRotation);
 
 					// Concatenate the new rotation with the current rotation
 					MultiplyMatrix(rotationMatrix, MainData->TotalRotation, tempcopyMatrix);
 					CopyMatrix(tempcopyMatrix, MainData->TotalRotation);
-
-					// Now rotate the translation to the new orientation
-					Rotate3DPt(MainData->TotalRotation, InitialTrans, &FinalTrans);
-					MainData->TotalRotation[3][0] = FinalTrans.x;
-					MainData->TotalRotation[3][1] = FinalTrans.y;
-					MainData->TotalRotation[3][2] = FinalTrans.z;
 
 					// Clean up the rotation matrix make the rotation part orthogonal and magnitude 1
 					OrthogonalizeRotationMatrix (MainData->TotalRotation);
@@ -3821,7 +3799,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	else if (event.LeftUp()) {
 		if (abs(inertia.x) > 3 || abs(inertia.y) > 3) {
 			rotate_timer.Start(33, false);
-		} 
+		}
 	}
 
 	// If the scene is actively being rotated, we call a function that sorts
@@ -3829,9 +3807,6 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	// For autorotation, a left mouse click is faked, but we don't want to
 	// annotate then.
 	if (event.LeftIsDown() && event.Dragging()) {
-		/* RotateMoleculeGL(Prefs->GetShowAngles() && !rotate_timer.IsRunning(), */
-						 /* !rotate_timer.IsRunning()); */
-		/* glCanvas->SwapBuffers(); */
 		if (transpTriList) { //update the transparent surface sorting
 			SortTransparentTriangles();
 		}
@@ -4049,9 +4024,9 @@ bool MolDisplayWin::LassoHasArea(void) {
 
 bool MolDisplayWin::LassoContains(const int x, const int y) {
 	return ((x >= lasso_start.x && x <= lasso_end.x) ||
-			(x <= lasso_start.x && x >= lasso_end.x)) &&
+	        (x <= lasso_start.x && x >= lasso_end.x)) &&
 	       ((y >= lasso_start.y && y <= lasso_end.y) ||
-			(y <= lasso_start.y && y >= lasso_end.y));
+	        (y <= lasso_start.y && y >= lasso_end.y));
 }
 
 void UndoData::AddSnapshot(UndoSnapShot * s) {
@@ -4310,7 +4285,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_UPDATE_UI(MMP_SHOWBONDSITES,	MolDisplayWin::OnShowBondSitesUpdate)
 	EVT_UPDATE_UI(MMP_SYMMETRY_EDIT,	MolDisplayWin::OnShowSymmetryEdit)
 	EVT_UPDATE_UI_RANGE(MMP_NEWFRAME, MMP_ANNOTATIONSSUBMENU,
-						MolDisplayWin::UpdateAtomsOptions)
+	                    MolDisplayWin::UpdateAtomsOptions)
 	EVT_UPDATE_UI(wxID_COPY,			MolDisplayWin::UpdateAtomsOptions)
 	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
 	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)

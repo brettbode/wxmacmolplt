@@ -122,7 +122,7 @@ void MpGLCanvas::initGL(void) {
 	if (glfLoadBMFFont(bitmap_font.mb_str(wxConvUTF8)) < 0) {
 		std::ostringstream buf;
 		buf << "Warning: font file not found! This probably means wxmacmolplt is not "
-			   "properly installed. Looking for " << bitmap_font.mb_str(wxConvUTF8);
+		       "properly installed. Looking for " << bitmap_font.mb_str(wxConvUTF8);
 		MessageAlert(buf.str().c_str());
 		glfClose();
 		glf_initialized = 0;
@@ -1098,7 +1098,7 @@ void MpGLCanvas::eventMouseLeftDoubleClick(wxMouseEvent& event) {
 
 	// If we're in edit mode, we display the periodic table dialog.
 	if (MolWin->InEditMode() && selected_type == MMP_NULL &&
-		!show_build_palette) {
+	    !show_build_palette) {
 		MolWin->ToggleBuilderPalette();
 	}
 
@@ -1300,7 +1300,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 				MolWin->SetStatusText(_("Bond an atom here."));
 			}
 		} else if (MolWin->InEditMode() && selected < 0 && 
-				   build_palette && build_palette->GetSelectedElement()) {
+		           build_palette && build_palette->GetSelectedElement()) {
 			if (build_palette->InPeriodicMode()) {
 				MolWin->SetStatusText(_("Add new atom here."));
 			} else {
@@ -1340,7 +1340,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	// case if something that's not a bond or atom is clicked on, like a
 	// bonding site or an annotation or the background.
 	else if (MolWin->InEditMode() &&
-			 (selected_type == MMP_BOND || selected_type == MMP_ATOM)) {
+	         (selected_type == MMP_BOND || selected_type == MMP_ATOM)) {
 
 		// If a bond site is clicked on, it may be part of drag operation to
 		// join two sites.  We aren't editing in such a case, nor do we want
@@ -1388,7 +1388,7 @@ void MpGLCanvas::SelectWholeFragments() {
 			long fragId = lAtoms[i].GetFragmentNumber();
 			for (long j=0; j<NumAtoms; j++) {
 				if (lAtoms[j].IsEffectiveFragment() &&
-					lAtoms[j].GetFragmentNumber() == fragId)
+				    lAtoms[j].GetFragmentNumber() == fragId)
 					lFrame->SetAtomSelection(j, true);
 			}
 		}
@@ -1465,7 +1465,8 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					MolWin->DrawBondingSites(selected, 0, NULL, selected_site+1, &vector);
 					lFrame->GetAtomPosition(selected, origin);
 					mMainData->NewAtom(build_palette->GetSelectedElement(), origin + vector * 0.01 *
-									   (Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) + Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1)));
+					                   (Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) +
+					                   Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1)));
 					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
 					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
 					lFrame->Atoms[lFrame->GetNumAtoms() - 1].IsSymmetryUnique(MolWin->InSymmetryEditMode());
@@ -1514,8 +1515,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 														 bond->Order);
 							}
 
-							lFrame->DeleteAtom(prev_natoms +
-											   structure->atom_to_prune);
+							lFrame->DeleteAtom(prev_natoms + structure->atom_to_prune);
 
 							// If the link-to atom was past the just deleted atom to prune, we
 							// need to adjust the link-to atom id by -1.
@@ -1538,11 +1538,12 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					}
 				}
 				//Sort fragments to the end of the list
-				if ((OrigAtomCount > 0)&&(!lFrame->Atoms[OrigAtomCount].IsEffectiveFragment())&&
-					lFrame->Atoms[OrigAtomCount-1].IsEffectiveFragment()) {
+				if (OrigAtomCount > 0 &&
+				    !lFrame->Atoms[OrigAtomCount].IsEffectiveFragment() &&
+				    lFrame->Atoms[OrigAtomCount-1].IsEffectiveFragment()) {
 					long initialFragAtom = 0;
 					while (!lFrame->Atoms[initialFragAtom].IsEffectiveFragment() &&
-						   initialFragAtom < OrigAtomCount) initialFragAtom++;
+					       initialFragAtom < OrigAtomCount) initialFragAtom++;
 					for (long i=OrigAtomCount; i<lFrame->GetNumAtoms(); i++) {
 						mMainData->ReorderAtomList(i, initialFragAtom);
 						initialFragAtom++;
@@ -1651,11 +1652,12 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 				}
 				//Sort fragments to the end of the list
-				if ((OrigAtomCount > 0)&&(!lFrame->Atoms[OrigAtomCount].IsEffectiveFragment())&&
-					lFrame->Atoms[OrigAtomCount-1].IsEffectiveFragment()) {
+				if (OrigAtomCount > 0 &&
+				    !lFrame->Atoms[OrigAtomCount].IsEffectiveFragment() &&
+				    lFrame->Atoms[OrigAtomCount-1].IsEffectiveFragment()) {
 					long initialFragAtom = 0;
 					while (!lFrame->Atoms[initialFragAtom].IsEffectiveFragment() &&
-						   initialFragAtom < OrigAtomCount) initialFragAtom++;
+					       initialFragAtom < OrigAtomCount) initialFragAtom++;
 					for (long i=OrigAtomCount; i<lFrame->GetNumAtoms(); i++) {
 						mMainData->ReorderAtomList(i, initialFragAtom);
 						initialFragAtom++;
@@ -1681,7 +1683,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 	// If a drag occurred between two bonding sites, we pair them up with
 	// a bond.
 	else if (MolWin->InEditMode() && first_site_clicked >= 0 &&
-			 selected_site >= 0) {
+	         selected_site >= 0) {
 
 		testPicking(curr_mouse.x, curr_mouse.y);
 
@@ -1835,7 +1837,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			// selected, we return immediately since rotating around itself
 			// would be silly.
 			if (!lFrame->GetAtomSelection(selected) ||
-				lFrame->GetNumAtomsSelected() <= 1) {
+			    lFrame->GetNumAtomsSelected() <= 1) {
 				return;
 			}
 
@@ -1913,7 +1915,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			proj_pt[0] = proj_pt[0] - proj_max[0];
 			proj_pt[1] = proj_pt[1] - proj_max[1];
 			radius = (int) sqrt(proj_pt[0] * proj_pt[0] +
-								proj_pt[1] * proj_pt[1]);
+			                    proj_pt[1] * proj_pt[1]);
 
 			// Now we assemble the rotation matrix and rotate all the selected
 			// atoms.
@@ -1963,7 +1965,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 								 lAtoms[selected].Position.y,
 								 lAtoms[selected].Position.z,
 								 tmpWinX, tmpWinY, atomDepth);
-		   
+  
 					winDiffX = curr_mouse.x - (int) tmpWinX;
 					winDiffY = curr_mouse.y - (int) tmpWinY;
 					was_zooming = false;
@@ -1982,9 +1984,10 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 			// Screen plane translation can be restricted by an annotation
 			// constraint.
 			int constrain_anno_id = mMainData->GetConstrainAnnotation();
-			if (!event.ShiftDown() && !event.MiddleIsDown() &&
-				constrain_anno_id != -1 &&
-				mMainData->Annotations[constrain_anno_id]->containsAtom(selected)) {
+			if (!event.ShiftDown() &&
+			    !event.MiddleIsDown() &&
+			    constrain_anno_id != -1 &&
+			    mMainData->Annotations[constrain_anno_id]->containsAtom(selected)) {
 				ConstrainPosition(constrain_anno_id, newX, newY, newZ);
 			}
 
@@ -2028,7 +2031,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 		Matrix4D rot_mat;
 		float dy;              // No. pixels of mouse change in y-dir
 		float angle_offset;    // Corresponding amount of rotation
-	   
+  
 		// Calculate the amount of rotation according to the amount
 		// of mouse change along the y-axis of the viewport.
 		dy = curr_pt.y - prev_pt.y;
@@ -2298,7 +2301,7 @@ void MpGLCanvas::SelectObj(int selected_type, int select_id, bool unselect_all) 
 				long atom2 = lBonds[i].Atom2;
 
 				if (lFrame->GetAtomSelection(atom1) &&
-					lFrame->GetAtomSelection(atom2))
+				    lFrame->GetAtomSelection(atom2))
 					lBonds[i].SetSelectState(atom_is_selected);
 			}
 		}
@@ -2419,7 +2422,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 			// If the periodic table is shown and an atom is selected, offer an
 			// option to change the clicked-on atom to the selected type.
 			if (build_palette && build_palette->GetSelectedElement() != 0 &&
-				build_palette->GetSelectedElement() != lFrame->Atoms[selected].GetType()) {
+			    build_palette->GetSelectedElement() != lFrame->Atoms[selected].GetType()) {
 
 				wxString label;
 				wxString atom_name;
@@ -2754,8 +2757,8 @@ void MpGLCanvas::annoPopupMenu(int x, int y) {
 	mpAtom *lAtoms = mMainData->cFrame->Atoms;
 
 	if (MolWin->InEditMode() &&
-		mMainData->Annotations[selected]->getType() != MP_ANNOTATION_MARKER &&
-		!mMainData->Annotations[selected]->containsFragment(lAtoms)) {
+	    mMainData->Annotations[selected]->getType() != MP_ANNOTATION_MARKER &&
+	    !mMainData->Annotations[selected]->containsFragment(lAtoms)) {
 		item = menu.AppendCheckItem(GL_Popup_Lock_To_Annotation,
 				                    wxT("Constrain Annotation"));
 		if (selected == mMainData->GetConstrainAnnotation()) {
@@ -3001,13 +3004,15 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 		if (lFrame->GetAtomNumBonds(bond->Atom2) == 1) {
 			CPoint3D offset = lFrame->Atoms[bond->Atom2].Position - lFrame->Atoms[bond->Atom1].Position;
 			Normalize3D(&offset);
-			lFrame->Atoms[bond->Atom2].Position = lFrame->Atoms[bond->Atom1].Position + offset * scale *
-				(Prefs->GetAtomSize(lFrame->Atoms[bond->Atom1].Type-1) + Prefs->GetAtomSize(lFrame->Atoms[bond->Atom2].Type-1));
+			lFrame->Atoms[bond->Atom2].Position =
+			   lFrame->Atoms[bond->Atom1].Position + offset * scale *
+               (Prefs->GetAtomSize(lFrame->Atoms[bond->Atom1].Type-1) + Prefs->GetAtomSize(lFrame->Atoms[bond->Atom2].Type-1));
 		} else if (lFrame->GetAtomNumBonds(bond->Atom1) == 1) {
 			CPoint3D offset = lFrame->Atoms[bond->Atom1].Position - lFrame->Atoms[bond->Atom2].Position;
 			Normalize3D(&offset);
-			lFrame->Atoms[bond->Atom1].Position = lFrame->Atoms[bond->Atom2].Position + offset * scale *
-				(Prefs->GetAtomSize(lFrame->Atoms[bond->Atom1].Type-1) + Prefs->GetAtomSize(lFrame->Atoms[bond->Atom2].Type-1));
+			lFrame->Atoms[bond->Atom1].Position =
+			   lFrame->Atoms[bond->Atom2].Position + offset * scale *
+			   (Prefs->GetAtomSize(lFrame->Atoms[bond->Atom1].Type-1) + Prefs->GetAtomSize(lFrame->Atoms[bond->Atom2].Type-1));
 		}
 		MolWin->BondsChanged();
 	} else if (select_stack_top == 2) { //new bond
@@ -3222,9 +3227,9 @@ void MpGLCanvas::ConnectSelectedToSite(int src_atom, int src_site,
 	// We translate each selected atom by the distance between
 	// the bond offset and the dragged-to atom.
 	offset = origin - atom_pos +
-		dst_vec * 0.01 *
-		(Prefs->GetAtomSize(lFrame->GetAtomType(src_atom) - 1) +
-		 Prefs->GetAtomSize(lFrame->GetAtomType(dst_atom) - 1));
+	   dst_vec * 0.01 *
+	   (Prefs->GetAtomSize(lFrame->GetAtomType(src_atom) - 1) +
+	    Prefs->GetAtomSize(lFrame->GetAtomType(dst_atom) - 1));
 
 	// We rotate the selected the atoms using the dragged-to atom
 	// as the origin.  The rotation is done first, and then the
@@ -3265,7 +3270,7 @@ void MpGLCanvas::ConvertEFPToAllElec(wxCommandEvent& event) {
 		//data is update, but need to make sure this does leave mixed all-electron and fragment blocks
 		if (firstatm > 0 && lFrame->Atoms[firstatm-1].IsEffectiveFragment()) {
 			int firstfrag = -1;
-			for (int i=0; i<lFrame->GetNumAtoms(); i++) 
+			for (int i=0; i<lFrame->GetNumAtoms(); i++)
 				if (lFrame->Atoms[i].IsEffectiveFragment()) {
 					firstfrag = i;
 					break;

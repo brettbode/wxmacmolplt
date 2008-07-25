@@ -229,7 +229,6 @@ class MolDisplayWin : public wxFrame {
 							  long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
 
 		bool mHighliteState;
-		/* bool interactiveMode; */
 		bool stale_click;
 		wxToolBar *toolbar;
 		bool mAltModifyingToolBar;

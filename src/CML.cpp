@@ -174,10 +174,16 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 		{
 			//Add rotation matrix
 			std::ostringstream rotbuf;
+			Matrix4D tmp;
+			CopyMatrix(TotalRotation, tmp);
+			tmp[3][0] = Centroid.x;
+			tmp[3][1] = Centroid.y;
+			tmp[3][2] = Centroid.z;
 			for (int i=0; i<4; i++) {
 				for (int j=0; j<4; j++) {
-					if ((i>0)||(j>0)) rotbuf << " ";
-					rotbuf << TotalRotation[j][i]; 
+					if ((i>0)||(j>0))
+						rotbuf << " ";
+					rotbuf << tmp[j][i]; 
 				}
 			}
 			XMLElement * rotmat = xmlRoot->addChildElement(CML_convert(MatrixElement),
@@ -1094,6 +1100,12 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 														}
 													}
 												}
+												Centroid.x = TotalRotation[3][0];
+												Centroid.y = TotalRotation[3][1];
+												Centroid.z = TotalRotation[3][2];
+												TotalRotation[3][0] = 0.0f;
+												TotalRotation[3][1] = 0.0f;
+												TotalRotation[3][2] = 0.0f;
 												OrthogonalizeRotationMatrix(TotalRotation);
 											}
 										}

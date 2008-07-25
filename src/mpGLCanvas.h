@@ -137,7 +137,6 @@ class MpGLCanvas : public wxGLCanvas {
 		bool is_lassoing;
 		bool do_stereo;
 
-		void SetProjection(float aspect_ratio);
 		void AddPlaneNormal(wxCommandEvent& event);
 		void ConnectSelectedToSite(int src_atom, int src_site,
 								   int dst_atom, int dst_site);
@@ -182,6 +181,7 @@ class MpGLCanvas : public wxGLCanvas {
 		void SelectWholeFragments();
 
 		void Draw(void);
+		void SetProjection(float aspect_ratio);
 
 		MolDisplayWin *GetParent(void) { return MolWin; }
 
