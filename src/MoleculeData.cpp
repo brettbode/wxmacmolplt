@@ -220,6 +220,7 @@ void MoleculeData::CenterModelWindow(void) {
 //Recompute the maximum width of the molecule
 	MaxSize = MAX((XMax-XMin), (YMax-YMin));
 	MaxSize = MAX(MaxSize, (ZMax-ZMin));
+	MolCentroid = Centroid;
 	
 }	/*CenterModelWindow*/
 

@@ -598,6 +598,13 @@ void MpGLCanvas::Draw() {
 	if (!do_stereo) {
 #if 1
 		if (Prefs->GetShaderMode() == 2) {
+			CPoint3D world_focus;
+			Rotate3DPt(mMainData->TotalRotation,
+					   mMainData->MolCentroid - mMainData->Centroid,
+					   &world_focus);
+			world_focus.z -= mMainData->WindowSize;
+			float max_reach = 1.5f * sqrtf(3.0f * mMainData->MaxSize);
+
 			// Render to depth texture.
 			glBindTexture(GL_TEXTURE_2D, MolWin->depth_tex_id);
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, MolWin->depth_fbo);
@@ -606,25 +613,24 @@ void MpGLCanvas::Draw() {
 			glViewport(0, 0, FBO_SIZE, FBO_SIZE);
 
 			CPoint3D a(MolWin->light_pos[0], MolWin->light_pos[1], MolWin->light_pos[2]);
-			CPoint3D b(0.0f, 0.0f, -mMainData->WindowSize);
-			float dist = (b - a).Magnitude();
+			float dist = (world_focus - a).Magnitude();
 
-			float theta = atan(mMainData->MaxSize * 1.5f / dist) * kRadToDegree;
-			float near = dist - 0.5f;
+			float theta = 2.0f * atan(max_reach / dist) * kRadToDegree;
+			float near = dist - max_reach;
 			if (near < 0.0f) {
 				near = 0.1f;
 			}
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			gluPerspective(theta, 1.0f, 1.0f, dist + 5.0f);
+			gluPerspective(theta, 1.0f, near, dist + max_reach);
 
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
 			gluLookAt(MolWin->light_pos[0],
 					  MolWin->light_pos[1],
 					  MolWin->light_pos[2],
-					  0.0, 0.0, -mMainData->WindowSize,
+					  world_focus.x, world_focus.y, world_focus.z,
 					  0.0, 1.0, 0.0);
 
 			glPolygonOffset(4, 4);
@@ -645,9 +651,9 @@ void MpGLCanvas::Draw() {
 			glLoadIdentity();
 			glTranslatef(0.5f, 0.5f, 0.5f);
 			glScalef(0.5f, 0.5f, 0.5f);
-			gluPerspective(theta, 1.0f, 1.0f, dist + 5.0f);
+			gluPerspective(theta, 1.0f, near, dist + max_reach);
 			gluLookAt(MolWin->light_pos[0], MolWin->light_pos[1], MolWin->light_pos[2],
-					  0.0, 0.0, -mMainData->WindowSize,
+					  world_focus.x, world_focus.y, world_focus.z,
 					  0.0, 1.0, 0.0);
 		}
 #endif
