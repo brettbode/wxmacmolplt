@@ -658,6 +658,7 @@ void OrbSurfacePane::makeMOList() {
 				mMOList->Append(tmpStr);
 			}
 		}
+		mMOList->DoneAppending();
 	}
 }
 
@@ -801,6 +802,7 @@ void OrbSurfacePane::makeAOList() {
 			mOrbCoef->Append(aChoice);
 			/* choice.push_back(aChoice); */
 		}
+		mOrbCoef->DoneAppending();
 	}
 }
 

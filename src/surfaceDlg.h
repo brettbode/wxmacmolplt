@@ -165,12 +165,16 @@ class FormattedListBox : public wxHtmlListBox {
 
 		void Append(const wxString& item) {
 			items.push_back(item);
+			// This was causing too many refreshes for some reason.
+			// Call DoneAppending instead.
+			/* SetItemCount(items.size()); */
+		}
+
+		void DoneAppending() {
 			SetItemCount(items.size());
-			RefreshAll();
 		}
 
 		wxString OnGetItem(size_t n) const {
-			/* std::cout << "items[n]: " << items[n] << std::endl; */
 			return items[n];
 		}
 
