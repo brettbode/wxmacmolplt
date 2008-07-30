@@ -616,14 +616,14 @@ void MpGLCanvas::Draw() {
 			float dist = (world_focus - a).Magnitude();
 
 			float theta = 2.0f * atan(max_reach / dist) * kRadToDegree;
-			float near = dist - max_reach;
-			if (near < 0.0f) {
-				near = 0.1f;
+			float my_near = dist - max_reach;
+			if (my_near < 0.0f) {
+				my_near = 0.1f;
 			}
 
 			glMatrixMode(GL_PROJECTION);
 			glLoadIdentity();
-			gluPerspective(theta, 1.0f, near, dist + max_reach);
+			gluPerspective(theta, 1.0f, my_near, dist + max_reach);
 
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
@@ -651,7 +651,7 @@ void MpGLCanvas::Draw() {
 			glLoadIdentity();
 			glTranslatef(0.5f, 0.5f, 0.5f);
 			glScalef(0.5f, 0.5f, 0.5f);
-			gluPerspective(theta, 1.0f, near, dist + max_reach);
+			gluPerspective(theta, 1.0f, my_near, dist + max_reach);
 			gluLookAt(MolWin->light_pos[0], MolWin->light_pos[1], MolWin->light_pos[2],
 					  world_focus.x, world_focus.y, world_focus.z,
 					  0.0, 1.0, 0.0);
