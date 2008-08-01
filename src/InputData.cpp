@@ -3378,6 +3378,12 @@ void StatPtGroup::WriteToFile(BufferFile *File, InputData *IData) {
 		File->WriteLine("HSSEND=.t. ", false);
 
 	File->WriteLine("$END", true);
+	//When HESS=READ emit a warning so the user knows they must manually add the $HESS group
+	if ((GetHessMethod() == StatPt_HessUpdateMethod_Read)||
+		((GetHessMethod()==0)&&(runType == SadPointRun))) {
+		MessageAlert("You must manually add a $HESS group to the input file!");
+		File->WriteLine("! A $HESS group must be manually added to this file!", true);
+	}
 }
 void StatPtGroup::WriteXML(XMLElement * parent) const {
 	char line[kMaxLineLength];
