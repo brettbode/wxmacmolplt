@@ -83,6 +83,10 @@ enum MMP_EventID {
 	MMP_WIREFRAMEMODE,
 	MMP_BALLANDSTICKMODE,
 	MMP_EFP_WIREFRAME,
+	MMP_TOGGLEVISSUBMENU,
+	MMP_TOGGLEABINITIO,
+	MMP_TOGGLEMMATOMS,
+	MMP_TOGGLEEFPATOMS,
 	MMP_ADDMARKANNOTATION,
 	MMP_ADDLENGTHANNOTATION,
 	MMP_ADDANGLEANNOTATION,
@@ -535,6 +539,12 @@ void MolDisplayWin::createMenuBar(void) {
 	menuViewStyle->AppendCheckItem(MMP_EFP_WIREFRAME, _("Show Effective Fragments as Wire Frame"), _("Overide the display mode for EFP solvent molecules"));
 	menuViewStyle->AppendSeparator();
 	menuViewStyle->AppendCheckItem(MMP_SHOWPATTERN, _("Show Atom Patterns"), _("Overlay a 2D pattern on the atom spheres (Ball and Stick mode only)"));
+
+	wxMenu * menuViewToggleVis = new wxMenu;
+	menuView->Append(MMP_DISPLAYMODESUBMENU, _("&Toggle visibility of"), menuViewToggleVis);
+	menuViewToggleVis->Append(MMP_TOGGLEABINITIO, _("&ab initio atoms\tAlt-a"), _("Show/Hide ab initio atoms"));
+	menuViewToggleVis->Append(MMP_TOGGLEMMATOMS, _("&MM atoms\tAlt-s"), _("Show/Hide Molecular Mechanics atoms"));
+	menuViewToggleVis->Append(MMP_TOGGLEEFPATOMS, _("&Effective Fragment atoms\tAlt-e"), _("Show/Hide EFP atoms"));
 	
 	menuViewAnnotations = new wxMenu;
 	menuViewAnnotations->Append(MMP_ADDMARKANNOTATION, _("&Mark Selected"), _("Mark the selected atom(s), right-click to remove"));
@@ -2441,6 +2451,24 @@ void MolDisplayWin::menuViewEFP_Wireframe(wxCommandEvent &event)
 	Dirtify();
 }
 
+void MolDisplayWin::menuViewToggleAIAtomsVis(wxCommandEvent &event) {
+	MainData->cFrame->toggleAbInitioVisibility();
+	ResetModel(false);
+	Dirtify();
+}
+
+void MolDisplayWin::menuViewToggleMMAtomsVis(wxCommandEvent &event) {
+	MainData->cFrame->toggleMMAtomVisibility();
+	ResetModel(false);
+	Dirtify();
+}
+
+void MolDisplayWin::menuViewToggleEFPAtomsVis(wxCommandEvent &event) {
+	MainData->cFrame->toggleEFPVisibility();
+	ResetModel(false);
+	Dirtify();
+}
+
 void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &event) {
 	long AnimateTime = 10*Prefs->GetAnimateTime();
 	if (AnimateTime < 1) AnimateTime = 1;
@@ -4225,6 +4253,9 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_SHOWPATTERN,		MolDisplayWin::menuViewShow2DPattern)
 	EVT_UPDATE_UI(MMP_SHOWPATTERN,	MolDisplayWin::OnShowPatternUpdate )
 	EVT_MENU (MMP_ANIMATEFRAMES,    MolDisplayWin::menuViewAnimateFrames)
+	EVT_MENU (MMP_TOGGLEABINITIO,	MolDisplayWin::menuViewToggleAIAtomsVis)
+	EVT_MENU (MMP_TOGGLEMMATOMS,	MolDisplayWin::menuViewToggleMMAtomsVis)
+	EVT_MENU (MMP_TOGGLEEFPATOMS,	MolDisplayWin::menuViewToggleEFPAtomsVis)
 	EVT_MENU (MMP_SHRINK10,         MolDisplayWin::menuViewShrink_10)
 	EVT_MENU (MMP_ENLARGE10,        MolDisplayWin::menuViewEnlarge_10)
 	EVT_MENU (MMP_CENTER,           MolDisplayWin::menuViewCenter)

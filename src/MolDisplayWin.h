@@ -366,6 +366,12 @@ class MolDisplayWin : public wxFrame {
 		void menuViewShowBothAtomLabels(wxCommandEvent &event);
 		void menuViewAddAnnotation(wxCommandEvent &event);
 		void menuViewAddMarkAnnotation(wxCommandEvent &event);
+		///Menu item handler to toggle the visibility of ab inito atoms
+		void menuViewToggleAIAtomsVis(wxCommandEvent & event);
+		///Menu item handler to toggle the visibility of Molecular mechanics atoms
+		void menuViewToggleMMAtomsVis(wxCommandEvent & event);
+		///Menu item handler to toggle the visibility of effective fragment potential atoms
+		void menuViewToggleEFPAtomsVis(wxCommandEvent & event);
 		void OnAnnotationMarkUpdate(wxUpdateUIEvent &event);
 		void OnAnnotationLengthUpdate(wxUpdateUIEvent &event);
 		void OnAnnotationAngleUpdate(wxUpdateUIEvent &event);
