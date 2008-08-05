@@ -6,6 +6,23 @@
 	objectVersion = 42;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		8B2998A20E48F78300624A73 /* Dist directory */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 8B2998A50E48F7A100624A73 /* Build configuration list for PBXAggregateTarget "Dist directory" */;
+			buildPhases = (
+				8B2998A10E48F78300624A73 /* Copy Files (2) (2) (2) (2) (2) (2) (2) */,
+				8B2998CC0E48F9E800624A73 /* CopyFiles */,
+				8B2998F50E48FA7D00624A73 /* CopyFiles */,
+			);
+			dependencies = (
+				8B2998A70E48F7BA00624A73 /* PBXTargetDependency */,
+			);
+			name = "Dist directory";
+			productName = "Dist directory";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		1626378C0A07E46E0089452E /* llmdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1626378A0A07E46E0089452E /* llmdialog.cpp */; };
 		1652DA5C09D0B12600B7783F /* AtomTypeList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2709D0B12600B7783F /* AtomTypeList.cpp */; };
@@ -196,6 +213,39 @@
 		8B279D000A4B6F0D00994DD5 /* inputbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF70A4B6F0D00994DD5 /* inputbuilder.cpp */; };
 		8B279D010A4B6F0D00994DD5 /* surfaceDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */; };
 		8B279D030A4B6F0D00994DD5 /* wxUglyChoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CFD0A4B6F0D00994DD5 /* wxUglyChoice.cpp */; };
+		8B2998AB0E48F81900624A73 /* sample.irc in Copy Files (2) (2) (2) (2) (2) (2) (2) */ = {isa = PBXBuildFile; fileRef = 8B2998A90E48F81900624A73 /* sample.irc */; };
+		8B2998AC0E48F81900624A73 /* water.log in Copy Files (2) (2) (2) (2) (2) (2) (2) */ = {isa = PBXBuildFile; fileRef = 8B2998AA0E48F81900624A73 /* water.log */; };
+		8B2998C40E48F9D800624A73 /* wxMacMolPlt.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B3B8B210A770A280041EA88 /* wxMacMolPlt.app */; };
+		8B2998CF0E48FA3100624A73 /* MacMolPlt_Manual.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998CE0E48FA2300624A73 /* MacMolPlt_Manual.html */; };
+		8B2998F60E48FAAD00624A73 /* 2D_General_Dialog.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998D00E48FA6F00624A73 /* 2D_General_Dialog.gif */; };
+		8B2998F70E48FAAD00624A73 /* 2D_MEP.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998D10E48FA6F00624A73 /* 2D_MEP.gif */; };
+		8B2998F80E48FAAD00624A73 /* 2D_MEP_Dialog.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998D20E48FA6F00624A73 /* 2D_MEP_Dialog.gif */; };
+		8B2998F90E48FAAD00624A73 /* 2D_Orbital.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998D30E48FA6F00624A73 /* 2D_Orbital.gif */; };
+		8B2998FA0E48FAAD00624A73 /* 2D_Orbital_Dialog.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998D40E48FA6F00624A73 /* 2D_Orbital_Dialog.gif */; };
+		8B2998FB0E48FAAD00624A73 /* 2D_TED.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998D50E48FA6F00624A73 /* 2D_TED.gif */; };
+		8B2998FC0E48FAAD00624A73 /* 2D_TED_Dialog.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998D60E48FA6F00624A73 /* 2D_TED_Dialog.gif */; };
+		8B2998FD0E48FAAD00624A73 /* 3D_General_Dialog.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998D70E48FA6F00624A73 /* 3D_General_Dialog.gif */; };
+		8B2998FE0E48FAAD00624A73 /* 3D_Orbital.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998D80E48FA6F00624A73 /* 3D_Orbital.jpg */; };
+		8B2998FF0E48FAAD00624A73 /* 3D_Orbital_Dialog.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998D90E48FA6F00624A73 /* 3D_Orbital_Dialog.gif */; };
+		8B2999000E48FAAD00624A73 /* 3D_TED.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998DA0E48FA6F00624A73 /* 3D_TED.jpg */; };
+		8B2999010E48FAAD00624A73 /* 3D_TED_Dialog.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998DB0E48FA6F00624A73 /* 3D_TED_Dialog.gif */; };
+		8B2999020E48FAAD00624A73 /* bond_sites.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998DC0E48FA6F00624A73 /* bond_sites.jpg */; };
+		8B2999030E48FAAD00624A73 /* Bonds_Win.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998DD0E48FA6F00624A73 /* Bonds_Win.gif */; };
+		8B2999040E48FAAD00624A73 /* builder.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998DE0E48FA6F00624A73 /* builder.html */; };
+		8B2999050E48FAAD00624A73 /* Coords_Win.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998DF0E48FA6F00624A73 /* Coords_Win.gif */; };
+		8B2999060E48FAAD00624A73 /* Create_Surface.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998E00E48FA6F00624A73 /* Create_Surface.gif */; };
+		8B2999070E48FAAD00624A73 /* General_Description.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998E10E48FA6F00624A73 /* General_Description.html */; };
+		8B2999080E48FAAD00624A73 /* IB_Win.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998E20E48FA6F00624A73 /* IB_Win.gif */; };
+		8B2999090E48FAAD00624A73 /* LLM.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998E30E48FA6F00624A73 /* LLM.html */; };
+		8B29990A0E48FAAD00624A73 /* MacMolPlt_Files.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998E40E48FA6F00624A73 /* MacMolPlt_Files.html */; };
+		8B29990B0E48FAAD00624A73 /* MacMolPlt_Surfaces.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998E50E48FA6F00624A73 /* MacMolPlt_Surfaces.html */; };
+		8B29990C0E48FAAD00624A73 /* MacMolPlt_Windows.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998E60E48FA6F00624A73 /* MacMolPlt_Windows.html */; };
+		8B29990D0E48FAAD00624A73 /* MEP_3D.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998E70E48FA6F00624A73 /* MEP_3D.jpg */; };
+		8B29990E0E48FAAD00624A73 /* MEP_3D_Dialog.gif in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998E80E48FA6F00624A73 /* MEP_3D_Dialog.gif */; };
+		8B29990F0E48FAAD00624A73 /* sample-mol.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998E90E48FA6F00624A73 /* sample-mol.jpg */; };
+		8B2999100E48FAAD00624A73 /* Version_History.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998EA0E48FA6F00624A73 /* Version_History.html */; };
+		8B2999110E48FAAD00624A73 /* WalkThrough.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998EB0E48FA6F00624A73 /* WalkThrough.html */; };
+		8B2999120E48FAAD00624A73 /* water.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998EC0E48FA6F00624A73 /* water.jpg */; };
 		8B33B7B80BF8DBEB0056C79E /* swfexport-g.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */; };
 		8B33B7BA0BF8DBEB0056C79E /* swfexport-g.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */; };
 		8B33B7BC0BF8DBEB0056C79E /* swfexport-g.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */; };
@@ -616,6 +666,80 @@
 		};
 /* End PBXBuildRule section */
 
+/* Begin PBXContainerItemProxy section */
+		8B2998A60E48F7BA00624A73 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1652D9FF09D0AE7200B7783F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8B3B8ADF0A770A280041EA88 /* wxMacMolPlt Universal */;
+			remoteInfo = "wxMacMolPlt Universal";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8B2998A10E48F78300624A73 /* Copy Files (2) (2) (2) (2) (2) (2) (2) */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = MacMolPlt/samples;
+			dstSubfolderSpec = 16;
+			files = (
+				8B2998AB0E48F81900624A73 /* sample.irc in Copy Files (2) (2) (2) (2) (2) (2) (2) */,
+				8B2998AC0E48F81900624A73 /* water.log in Copy Files (2) (2) (2) (2) (2) (2) (2) */,
+			);
+			name = "Copy Files (2) (2) (2) (2) (2) (2) (2)";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8B2998CC0E48F9E800624A73 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = MacMolPlt;
+			dstSubfolderSpec = 16;
+			files = (
+				8B2998CF0E48FA3100624A73 /* MacMolPlt_Manual.html in CopyFiles */,
+				8B2998C40E48F9D800624A73 /* wxMacMolPlt.app in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8B2998F50E48FA7D00624A73 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = MacMolPlt/Manual_pages;
+			dstSubfolderSpec = 16;
+			files = (
+				8B2998F60E48FAAD00624A73 /* 2D_General_Dialog.gif in CopyFiles */,
+				8B2998F70E48FAAD00624A73 /* 2D_MEP.gif in CopyFiles */,
+				8B2998F80E48FAAD00624A73 /* 2D_MEP_Dialog.gif in CopyFiles */,
+				8B2998F90E48FAAD00624A73 /* 2D_Orbital.gif in CopyFiles */,
+				8B2998FA0E48FAAD00624A73 /* 2D_Orbital_Dialog.gif in CopyFiles */,
+				8B2998FB0E48FAAD00624A73 /* 2D_TED.gif in CopyFiles */,
+				8B2998FC0E48FAAD00624A73 /* 2D_TED_Dialog.gif in CopyFiles */,
+				8B2998FD0E48FAAD00624A73 /* 3D_General_Dialog.gif in CopyFiles */,
+				8B2998FE0E48FAAD00624A73 /* 3D_Orbital.jpg in CopyFiles */,
+				8B2998FF0E48FAAD00624A73 /* 3D_Orbital_Dialog.gif in CopyFiles */,
+				8B2999000E48FAAD00624A73 /* 3D_TED.jpg in CopyFiles */,
+				8B2999010E48FAAD00624A73 /* 3D_TED_Dialog.gif in CopyFiles */,
+				8B2999020E48FAAD00624A73 /* bond_sites.jpg in CopyFiles */,
+				8B2999030E48FAAD00624A73 /* Bonds_Win.gif in CopyFiles */,
+				8B2999040E48FAAD00624A73 /* builder.html in CopyFiles */,
+				8B2999050E48FAAD00624A73 /* Coords_Win.gif in CopyFiles */,
+				8B2999060E48FAAD00624A73 /* Create_Surface.gif in CopyFiles */,
+				8B2999070E48FAAD00624A73 /* General_Description.html in CopyFiles */,
+				8B2999080E48FAAD00624A73 /* IB_Win.gif in CopyFiles */,
+				8B2999090E48FAAD00624A73 /* LLM.html in CopyFiles */,
+				8B29990A0E48FAAD00624A73 /* MacMolPlt_Files.html in CopyFiles */,
+				8B29990B0E48FAAD00624A73 /* MacMolPlt_Surfaces.html in CopyFiles */,
+				8B29990C0E48FAAD00624A73 /* MacMolPlt_Windows.html in CopyFiles */,
+				8B29990D0E48FAAD00624A73 /* MEP_3D.jpg in CopyFiles */,
+				8B29990E0E48FAAD00624A73 /* MEP_3D_Dialog.gif in CopyFiles */,
+				8B29990F0E48FAAD00624A73 /* sample-mol.jpg in CopyFiles */,
+				8B2999100E48FAAD00624A73 /* Version_History.html in CopyFiles */,
+				8B2999110E48FAAD00624A73 /* WalkThrough.html in CopyFiles */,
+				8B2999120E48FAAD00624A73 /* water.jpg in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		1626378A0A07E46E0089452E /* llmdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = llmdialog.cpp; path = src/llmdialog.cpp; sourceTree = "<group>"; };
 		1626378B0A07E46E0089452E /* llmdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = llmdialog.h; path = src/llmdialog.h; sourceTree = "<group>"; };
@@ -701,6 +825,38 @@
 		8B279CFA0A4B6F0D00994DD5 /* surfaceDlg.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceDlg.h; path = src/surfaceDlg.h; sourceTree = "<group>"; };
 		8B279CFD0A4B6F0D00994DD5 /* wxUglyChoice.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = wxUglyChoice.cpp; path = src/wxUglyChoice.cpp; sourceTree = "<group>"; };
 		8B279CFE0A4B6F0D00994DD5 /* wxUglyChoice.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = wxUglyChoice.h; path = src/wxUglyChoice.h; sourceTree = "<group>"; };
+		8B2998A90E48F81900624A73 /* sample.irc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = sample.irc; path = samples/sample.irc; sourceTree = "<group>"; };
+		8B2998AA0E48F81900624A73 /* water.log */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = water.log; path = samples/water.log; sourceTree = "<group>"; };
+		8B2998CE0E48FA2300624A73 /* MacMolPlt_Manual.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = MacMolPlt_Manual.html; sourceTree = "<group>"; };
+		8B2998D00E48FA6F00624A73 /* 2D_General_Dialog.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2D_General_Dialog.gif; path = Manual_pages/2D_General_Dialog.gif; sourceTree = "<group>"; };
+		8B2998D10E48FA6F00624A73 /* 2D_MEP.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2D_MEP.gif; path = Manual_pages/2D_MEP.gif; sourceTree = "<group>"; };
+		8B2998D20E48FA6F00624A73 /* 2D_MEP_Dialog.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2D_MEP_Dialog.gif; path = Manual_pages/2D_MEP_Dialog.gif; sourceTree = "<group>"; };
+		8B2998D30E48FA6F00624A73 /* 2D_Orbital.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2D_Orbital.gif; path = Manual_pages/2D_Orbital.gif; sourceTree = "<group>"; };
+		8B2998D40E48FA6F00624A73 /* 2D_Orbital_Dialog.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2D_Orbital_Dialog.gif; path = Manual_pages/2D_Orbital_Dialog.gif; sourceTree = "<group>"; };
+		8B2998D50E48FA6F00624A73 /* 2D_TED.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2D_TED.gif; path = Manual_pages/2D_TED.gif; sourceTree = "<group>"; };
+		8B2998D60E48FA6F00624A73 /* 2D_TED_Dialog.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 2D_TED_Dialog.gif; path = Manual_pages/2D_TED_Dialog.gif; sourceTree = "<group>"; };
+		8B2998D70E48FA6F00624A73 /* 3D_General_Dialog.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 3D_General_Dialog.gif; path = Manual_pages/3D_General_Dialog.gif; sourceTree = "<group>"; };
+		8B2998D80E48FA6F00624A73 /* 3D_Orbital.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = 3D_Orbital.jpg; path = Manual_pages/3D_Orbital.jpg; sourceTree = "<group>"; };
+		8B2998D90E48FA6F00624A73 /* 3D_Orbital_Dialog.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 3D_Orbital_Dialog.gif; path = Manual_pages/3D_Orbital_Dialog.gif; sourceTree = "<group>"; };
+		8B2998DA0E48FA6F00624A73 /* 3D_TED.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = 3D_TED.jpg; path = Manual_pages/3D_TED.jpg; sourceTree = "<group>"; };
+		8B2998DB0E48FA6F00624A73 /* 3D_TED_Dialog.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = 3D_TED_Dialog.gif; path = Manual_pages/3D_TED_Dialog.gif; sourceTree = "<group>"; };
+		8B2998DC0E48FA6F00624A73 /* bond_sites.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = bond_sites.jpg; path = Manual_pages/bond_sites.jpg; sourceTree = "<group>"; };
+		8B2998DD0E48FA6F00624A73 /* Bonds_Win.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Bonds_Win.gif; path = Manual_pages/Bonds_Win.gif; sourceTree = "<group>"; };
+		8B2998DE0E48FA6F00624A73 /* builder.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = builder.html; path = Manual_pages/builder.html; sourceTree = "<group>"; };
+		8B2998DF0E48FA6F00624A73 /* Coords_Win.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Coords_Win.gif; path = Manual_pages/Coords_Win.gif; sourceTree = "<group>"; };
+		8B2998E00E48FA6F00624A73 /* Create_Surface.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Create_Surface.gif; path = Manual_pages/Create_Surface.gif; sourceTree = "<group>"; };
+		8B2998E10E48FA6F00624A73 /* General_Description.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = General_Description.html; path = Manual_pages/General_Description.html; sourceTree = "<group>"; };
+		8B2998E20E48FA6F00624A73 /* IB_Win.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = IB_Win.gif; path = Manual_pages/IB_Win.gif; sourceTree = "<group>"; };
+		8B2998E30E48FA6F00624A73 /* LLM.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = LLM.html; path = Manual_pages/LLM.html; sourceTree = "<group>"; };
+		8B2998E40E48FA6F00624A73 /* MacMolPlt_Files.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = MacMolPlt_Files.html; path = Manual_pages/MacMolPlt_Files.html; sourceTree = "<group>"; };
+		8B2998E50E48FA6F00624A73 /* MacMolPlt_Surfaces.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = MacMolPlt_Surfaces.html; path = Manual_pages/MacMolPlt_Surfaces.html; sourceTree = "<group>"; };
+		8B2998E60E48FA6F00624A73 /* MacMolPlt_Windows.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = MacMolPlt_Windows.html; path = Manual_pages/MacMolPlt_Windows.html; sourceTree = "<group>"; };
+		8B2998E70E48FA6F00624A73 /* MEP_3D.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = MEP_3D.jpg; path = Manual_pages/MEP_3D.jpg; sourceTree = "<group>"; };
+		8B2998E80E48FA6F00624A73 /* MEP_3D_Dialog.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = MEP_3D_Dialog.gif; path = Manual_pages/MEP_3D_Dialog.gif; sourceTree = "<group>"; };
+		8B2998E90E48FA6F00624A73 /* sample-mol.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "sample-mol.jpg"; path = "Manual_pages/sample-mol.jpg"; sourceTree = "<group>"; };
+		8B2998EA0E48FA6F00624A73 /* Version_History.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = Version_History.html; path = Manual_pages/Version_History.html; sourceTree = "<group>"; };
+		8B2998EB0E48FA6F00624A73 /* WalkThrough.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = WalkThrough.html; path = Manual_pages/WalkThrough.html; sourceTree = "<group>"; };
+		8B2998EC0E48FA6F00624A73 /* water.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = water.jpg; path = Manual_pages/water.jpg; sourceTree = "<group>"; };
 		8B33B7B40BF8DBEB0056C79E /* patterns.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = patterns.h; path = src/patterns.h; sourceTree = "<group>"; };
 		8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = "swfexport-g.cpp"; path = "src/swfexport-g.cpp"; sourceTree = "<group>"; };
 		8B33B7B60BF8DBEB0056C79E /* swfexport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = swfexport.h; path = src/swfexport.h; sourceTree = "<group>"; };
@@ -900,6 +1056,8 @@
 		8BF17D770A5328210059B71F /* windowparameters.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = windowparameters.h; path = src/windowparameters.h; sourceTree = "<group>"; };
 		8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = zmatrixcalculator.cpp; path = src/zmatrixcalculator.cpp; sourceTree = "<group>"; };
 		8BF17DA30A55D0910059B71F /* zmatrixcalculator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zmatrixcalculator.h; path = src/zmatrixcalculator.h; sourceTree = "<group>"; };
+		8BFE27070DEC9415000E69E0 /* InputWizard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InputWizard.cpp; path = src/InputWizard.cpp; sourceTree = "<group>"; };
+		8BFE27080DEC9415000E69E0 /* InputWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InputWizard.h; path = src/InputWizard.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -944,6 +1102,8 @@
 				1652DA2609D0B0E700B7783F /* source */,
 				8B33B7F30BF8EB4B0056C79E /* ming-src */,
 				1652DAC709D0B41400B7783F /* Resources */,
+				8B2998A80E48F7F300624A73 /* Samples */,
+				8B2998CD0E48FA0900624A73 /* Docs */,
 				1652DA0C09D0AE8F00B7783F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -1005,6 +1165,8 @@
 				1652DA3E09D0B12600B7783F /* Internals.h */,
 				8BD5BA820A41E01800FF9CAE /* inputbuilder.cpp */,
 				8BD5BA830A41E01800FF9CAE /* inputbuilder.h */,
+				8BFE27070DEC9415000E69E0 /* InputWizard.cpp */,
+				8BFE27080DEC9415000E69E0 /* InputWizard.h */,
 				1626378A0A07E46E0089452E /* llmdialog.cpp */,
 				1626378B0A07E46E0089452E /* llmdialog.h */,
 				1652DA3F09D0B12600B7783F /* main.cpp */,
@@ -1052,6 +1214,52 @@
 				8B5B66690E030FAB000EC27D /* perpixel_dirlight_v.glsl */,
 			);
 			name = Resources;
+			sourceTree = "<group>";
+		};
+		8B2998A80E48F7F300624A73 /* Samples */ = {
+			isa = PBXGroup;
+			children = (
+				8B2998A90E48F81900624A73 /* sample.irc */,
+				8B2998AA0E48F81900624A73 /* water.log */,
+			);
+			name = Samples;
+			sourceTree = "<group>";
+		};
+		8B2998CD0E48FA0900624A73 /* Docs */ = {
+			isa = PBXGroup;
+			children = (
+				8B2998D00E48FA6F00624A73 /* 2D_General_Dialog.gif */,
+				8B2998D10E48FA6F00624A73 /* 2D_MEP.gif */,
+				8B2998D20E48FA6F00624A73 /* 2D_MEP_Dialog.gif */,
+				8B2998D30E48FA6F00624A73 /* 2D_Orbital.gif */,
+				8B2998D40E48FA6F00624A73 /* 2D_Orbital_Dialog.gif */,
+				8B2998D50E48FA6F00624A73 /* 2D_TED.gif */,
+				8B2998D60E48FA6F00624A73 /* 2D_TED_Dialog.gif */,
+				8B2998D70E48FA6F00624A73 /* 3D_General_Dialog.gif */,
+				8B2998D80E48FA6F00624A73 /* 3D_Orbital.jpg */,
+				8B2998D90E48FA6F00624A73 /* 3D_Orbital_Dialog.gif */,
+				8B2998DA0E48FA6F00624A73 /* 3D_TED.jpg */,
+				8B2998DB0E48FA6F00624A73 /* 3D_TED_Dialog.gif */,
+				8B2998DC0E48FA6F00624A73 /* bond_sites.jpg */,
+				8B2998DD0E48FA6F00624A73 /* Bonds_Win.gif */,
+				8B2998DE0E48FA6F00624A73 /* builder.html */,
+				8B2998DF0E48FA6F00624A73 /* Coords_Win.gif */,
+				8B2998E00E48FA6F00624A73 /* Create_Surface.gif */,
+				8B2998E10E48FA6F00624A73 /* General_Description.html */,
+				8B2998E20E48FA6F00624A73 /* IB_Win.gif */,
+				8B2998E30E48FA6F00624A73 /* LLM.html */,
+				8B2998E40E48FA6F00624A73 /* MacMolPlt_Files.html */,
+				8B2998E50E48FA6F00624A73 /* MacMolPlt_Surfaces.html */,
+				8B2998E60E48FA6F00624A73 /* MacMolPlt_Windows.html */,
+				8B2998E70E48FA6F00624A73 /* MEP_3D.jpg */,
+				8B2998E80E48FA6F00624A73 /* MEP_3D_Dialog.gif */,
+				8B2998E90E48FA6F00624A73 /* sample-mol.jpg */,
+				8B2998EA0E48FA6F00624A73 /* Version_History.html */,
+				8B2998EB0E48FA6F00624A73 /* WalkThrough.html */,
+				8B2998EC0E48FA6F00624A73 /* water.jpg */,
+				8B2998CE0E48FA2300624A73 /* MacMolPlt_Manual.html */,
+			);
+			name = Docs;
 			sourceTree = "<group>";
 		};
 		8B33B7F30BF8EB4B0056C79E /* ming-src */ = {
@@ -1405,6 +1613,7 @@
 				8B8816AD0A751FED00EC8791 /* wxMacMolPlt-ppc */,
 				8B3B8ADF0A770A280041EA88 /* wxMacMolPlt Universal */,
 				8B162DF70D75C12600975533 /* wxMacMolPlt-2.9 */,
+				8B2998A20E48F78300624A73 /* Dist directory */,
 			);
 		};
 /* End PBXProject section */
@@ -2063,6 +2272,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		8B2998A70E48F7BA00624A73 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8B3B8ADF0A770A280041EA88 /* wxMacMolPlt Universal */;
+			targetProxy = 8B2998A60E48F7BA00624A73 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		1652DA0109D0AE7200B7783F /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2357,12 +2574,15 @@
 					Cocoa,
 					"-framework",
 					System,
-					"-lwx_macu-2.9",
+					"-lwx_base_carbonu-2.9",
+					"-lwx_macu_core-2.9",
+					"-lwx_macu_adv-2.9",
 					"-lwx_macu_gl-2.9",
 					"-lwxexpat-2.9",
 					"-lwxtiff-2.9",
 					"-lwxjpeg-2.9",
 					"-lwxpng-2.9",
+					"-lwx_macu_html-2.9",
 					"-lz",
 					"-lpthread",
 					"-liconv",
@@ -2373,10 +2593,32 @@
 					"-framework",
 					AGL,
 				);
+				OTHER_LDFLAGS_QUOTED_FOR_TARGET_1 = "`$(HOME)/software/wx/wx-2.9-univ/bin/wx-config --libs base,core,gl,adv,html`";
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				WRAPPER_EXTENSION = app;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
+		8B2998A30E48F78300624A73 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "Dist directory";
+			};
+			name = Debug;
+		};
+		8B2998A40E48F78300624A73 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "Dist directory";
 				ZERO_LINK = NO;
 			};
 			name = Release;
@@ -2663,6 +2905,15 @@
 			buildConfigurations = (
 				8B162E8C0D75C12600975533 /* Debug */,
 				8B162E8D0D75C12600975533 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		8B2998A50E48F7A100624A73 /* Build configuration list for PBXAggregateTarget "Dist directory" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B2998A30E48F78300624A73 /* Debug */,
+				8B2998A40E48F78300624A73 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
