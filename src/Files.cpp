@@ -769,6 +769,7 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
   * @param Buffer A BufferFileObject which the .MKL file is buffered into
   * to make parsing the file easier.  See the BufferFile object for valid
   * BufferFile operations.
+  * @return Returns 1 upon open success or 0 on error or failure to open
 */
 long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	// buffer line for text to be scanned while parsing
@@ -1368,6 +1369,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
   * into to make parsing the file easier.  See the BufferFile object for 
   * valid BufferFile operations. Parsing code adapted from 
   * MoleculeData::ParseMOPACZMatrix.
+  * \return Returns 1 upon open success or 0 on error or failure to open
 */
 long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, TextFileType fileType) {
 	// buffer line for text to be scanned while parsing
@@ -3880,8 +3882,8 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 /**
  Output the coordinates in gamess input format ($DATA and $EFRAG group).
  If AllFrames then a series of $DATA groups will be output for the user to divide as needed.
- \param Buffer A buffer to write the text to.
- \param AllFrames Should the data for all frames be included or just the current frame?
+ @param Buffer A buffer to write the text to.
+ @param AllFrames Should the data for all frames be included or just the current frame?
  */
 void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
 	//Utilize the data group class to do all the real work
@@ -5226,8 +5228,7 @@ long SetAtomType(const unsigned char *TestLabel) {
  * to a string.
  * @param file_name Name of file to read
  * @param contents String to write contents to
- * @return True */
-
+ * \return True */
 bool FileToString(const std::string& file_name,
 				  std::string& contents) {
 

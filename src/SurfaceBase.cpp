@@ -108,20 +108,62 @@ void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CP
 	}
 	if (ival) 	Buffer->PutText("\r");
 }
-// Exports surface data to CCP4 file type	
-// This can effectively only be called by Surf3DBase objects
+
+/**
+  * Exports surface data to CCP4 file type	
+  * This can effectively only be called by Surf3DBase objects
+  * @param Grid3D
+  * @param nx
+  * @param ny
+  * @param nz
+  * @param Origin
+  * @param XInc
+  * @param YInc
+  * @param ZInc
+  * @param Label
+  * @param Buffer A BufferFileObject which the .MKL file is buffered into
+  * to make parsing the file easier.  See the BufferFile object for valid
+  * BufferFile operations.
+*/
 void Surface::Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
 		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
 
 }
 
-// Exports surface data to CNS electron density map file type	
-// This can effectively only be called by Surf3DBase objects
+/**
+  * Exports surface data to CNS electron density map file type	
+  * This can effectively only be called by Surf3DBase objects
+  * @param Grid3D
+  * @param nx
+  * @param ny
+  * @param nz
+  * @param Origin
+  * @param XInc
+  * @param YInc
+  * @param ZInc
+  * @param Label
+  * @param Buffer A BufferFileObject which the .MKL file is buffered into
+  * to make parsing the file easier.  See the BufferFile object for valid
+  * BufferFile operations.
+*/
 void Surface::Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
 		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
-
+	if(!Grid3D) return;			// we'll only export if this is a 3D surface
+	
 	char Line[kMaxLineLength];
+	wxDateTime CurTime = wxDateTime::Now();
+	wxString UserName = wxGetUserId();
 	if(!Grid3D) return;
+	
+	Buffer->PutText("\n\t2 \n");		// !NTITLE
+	sprintf(Line, "REMARKS created by wxMacMolPlt\n");		// since this is just a 
+	Buffer->PutText(Line);									// REM line, let's brag
+	sprintf(Line, "REMARKS user: %s\tdate: %s\n", 
+		(const char *)UserName.ToAscii(),					// username that ran program
+		(const char *)CurTime.Format(wxT("%c")).ToAscii());	// standard time format	
+	Buffer->PutText(Line);
+
+	// print data here
 }
 
 void Surface::Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Origin,

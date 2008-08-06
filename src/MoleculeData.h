@@ -215,24 +215,24 @@ class MoleculeData {
 			The return value is the index of the next atom in the list. This routine may remove
 			more than one atom. For example in the case of effective fragments the entire fragment
 			must be removed.
-			\param AtomNum The index of the atom to delete.
-			\param allFrames If true the atom with the same index will be removed from all frames.
+			@param AtomNum The index of the atom to delete.
+			@param allFrames If true the atom with the same index will be removed from all frames.
 		 */
 		long DeleteAtom(long AtomNum, bool allFrames=false);
 		/**
 			Reorders the atom list.
-			\param index1 The initial index of the atom
-			\param index2 The final index of the atom
+			@param index1 The initial index of the atom
+			@param index2 The final index of the atom
 		 */
 		void ReorderAtomList(long index1, long index2);
 		/**
 			Is the provided atom index valid for the current frame?
-			\param AtomNum The atom index to test
+			@param AtomNum The atom index to test
 		 */
 		bool ValidAtom(long AtomNum);
 		/**
-		 Returns the FRAGNAME for the indicated effective fragment.
-		 \param index The index of the fragment.
+			Returns the FRAGNAME for the indicated effective fragment.
+			@param index The index of the fragment.
 		 */
 		const char * GetFragmentName(unsigned long index) const;
 		void PruneUnusedFragments();

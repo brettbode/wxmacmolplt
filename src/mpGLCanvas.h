@@ -253,7 +253,7 @@ class MpGLCanvas : public wxGLCanvas {
 		/**
 		* Handles erase events received by the widget.	This is a no-op that
 		* is in place to prevent flickering in Microsoft Windows.
-		* \param event The event to handle.
+		* @param event The event to handle.
 		*/
 		void eventErase(wxEraseEvent &event);
 
@@ -261,7 +261,7 @@ class MpGLCanvas : public wxGLCanvas {
 		* Handles mouse events received by the widget.	This is used to allow
 		* rotation of the view and perhaps eventually selection and
 		* modification of objects within the view.
-		* \param event The event to handle.
+		* @param event The event to handle.
 		*/
 		void eventMouse(wxMouseEvent &event);
 #if wxCHECK_VERSION(2, 8, 0)
@@ -270,27 +270,27 @@ class MpGLCanvas : public wxGLCanvas {
 		  
 		/**
 		* Handles Char events received by the widget. 
-		* \param event The event to handle.
+		* @param event The event to handle.
 		*/
 		void KeyHandler(wxKeyEvent & event);
 
 		/**
 		 * Handles KEYDOWN events received by the widget. 
-		 * \param event The event to handle.
+		 * @param event The event to handle.
 		 */
 		void KeyDownHandler(wxKeyEvent & event);
 		
 		/**
 		 * Handles KEYUP events received by the widget. 
-		 * \param event The event to handle.
+		 * @param event The event to handle.
 		 */
 		void KeyUpHandler(wxKeyEvent & event);
 		
 		/**
 		* Translates a mouse click into a selection of an atom or bond 
-		* \param x x coordinate of the click.
-		* \param y y coordinate of the click.
-		* \param mode if true clear off other selections.
+		* @param x x coordinate of the click.
+		* @param y y coordinate of the click.
+		* @param mode if true clear off other selections.
 		*/
 		void On_Apply_All(wxCommandEvent& event);
 		void On_Delete_Single_Frame(wxCommandEvent& event);

@@ -3868,12 +3868,12 @@ void MolDisplayWin::DrawBond(const Bond& bond, const mpAtom& atom1,
  * This function draws a series of spheres from the origin along the negative
  * z-axis for length units.  The spheres are optionally drawn with a hatching
  * mask.
- * \param Prefs Prefences used to determine sphere color.
- * \param length Distance along z-axis along which to draw spheres.
- * \param scale_factor Size of spheres relative to current transform.
- * \param is_masked Flag indicating whether to draw stippled overlay to mask
+ * @param Prefs Prefences used to determine sphere color.
+ * @param length Distance along z-axis along which to draw spheres.
+ * @param scale_factor Size of spheres relative to current transform.
+ * @param is_masked Flag indicating whether to draw stippled overlay to mask
  *                  spheres.
- * \param sphere_list Preassembled display list that draws a sphere.
+ * @param sphere_list Preassembled display list that draws a sphere.
  */
 
 void DrawPipeSpheres(const WinPrefs& Prefs, float length, float scale_factor,
@@ -3918,14 +3918,14 @@ void DrawPipeSpheres(const WinPrefs& Prefs, float length, float scale_factor,
  * axis for length units.  Assumes modeling transformation is in place, and
  * OpenGL commands are ready to be issued.  Useful for drawing bond pipes that
  * are optionally capped.
- * \param length Extent of the cylinder along the z-axis.
- * \param quadric Preallocated GLU quadric object.
- * \param ncaps Number of end caps to draw.  Should be 1 to draw endcap only at
+ * @param length Extent of the cylinder along the z-axis.
+ * @param quadric Preallocated GLU quadric object.
+ * @param ncaps Number of end caps to draw.  Should be 1 to draw endcap only at
  *              origin, 2 only at the opposite end, and 3 to draw both.
- * \param sphere_list Preassembled display list id for drawing endcaps, which
+ * @param sphere_list Preassembled display list id for drawing endcaps, which
  * 					  should be valid if ncaps != 0.
- * \param radius Radius of cylinder.
- * \param quality Measure of "facetedness" of cylinder's geometric
+ * @param radius Radius of cylinder.
+ * @param quality Measure of "facetedness" of cylinder's geometric
  * 				  representation.
  */
 

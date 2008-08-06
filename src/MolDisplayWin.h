@@ -352,7 +352,7 @@ class MolDisplayWin : public wxFrame {
 		void menuViewShowNormalMode(wxCommandEvent &event);
 		void menuViewPrevNormalMode(wxCommandEvent &event);
 		void menuViewNextNormalMode(wxCommandEvent &event);
-		  // void menuViewDisplay_frequencyDOSTUFF(wxCommandEvent &event);
+		// void menuViewDisplay_frequencyDOSTUFF(wxCommandEvent &event);
 		void menuViewOffsetAlongMode(wxCommandEvent &event);
 		void menuViewAnimateMode(wxCommandEvent &event);
 		void menuViewAnimateFrames(wxCommandEvent &event);
@@ -481,7 +481,7 @@ class MolDisplayWin : public wxFrame {
 		void KeyHandler(wxKeyEvent &event);
 		/**
 		 * Handles KEY_UP events received by the window. 
-		 * \param event The event to handle.
+		 * @param event The event to handle.
 		 */
 		void KeyUpHandler(wxKeyEvent &event);
 		void CloseBondsWindow();
@@ -505,62 +505,64 @@ class MolDisplayWin : public wxFrame {
 		long OpenMDLMolFile(BufferFile * Buffer);
 		/**
 		 Open a GAMESS input or ".INP" format file. 
-		 \param Buffer The buffer connected to the INP file.
+		 @param Buffer The buffer connected to the INP file.
 		 */
 		long OpenGAMESSInput(BufferFile * Buffer);
 		long OpenMolPltFile(BufferFile * Buffer);
 		long OpenMoldenFile(BufferFile * Buffer);
 		/**
 		 Open a Molekel or ".MKL" format file. 
-		 \param Buffer The buffer connected to the MKL file.
+		 @param Buffer The buffer connected to the MKL file.
+		 \return Returns 1 upon open success or 0 on error or failure to open
 		 */
 		long OpenMKLFile(BufferFile * Buffer);
 		long ParseSIMMOMLogFile(BufferFile * Buffer, long EnergyPos);
 		/**
 		 Open a MOPAC ".MOP" or archive ".ARC" file.
-		 \param Buffer The buffer connected to the MOP file.
-		 \param fileType char designating which file extension is used
-		 */
+		 @param Buffer The buffer connected to the MOP file.
+		 @param fileType char designating which file extension is used
+		 \return Returns 1 upon open success or 0 on error or failure to open
+		*/
 		long OpenMOPACFile(BufferFile * Buffer, TextFileType fileType);
 		/**
 		 Output the coordinates in gamess input format ($DATA and $EFRAG group).
 		 If AllFrames then a series of $DATA groups will be output for the user to divide as needed.
-		 \param Buffer A buffer to write the text to.
-		 \param AllFrames Should the data for all frames be included or just the current frame?
+		 @param Buffer A buffer to write the text to.
+		 @param AllFrames Should the data for all frames be included or just the current frame?
 		 */
 		void ExportGAMESS(BufferFile * Buffer, bool AllFrames);
 		/**
 		 Output the plotted energies for the system to a tab de-limited text file. 
-		 \param Buffer A buffer to write the text to.
-		 \param AllFrames Should the data for all frames be included or just the current frame?
+		 @param Buffer A buffer to write the text to.
+		 @param AllFrames Should the data for all frames be included or just the current frame?
 		 */
 		void WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames);
 		/**
 		 Output the frequencies for the current frame to a text file. 
-		 \param Buffer A buffer to write the text to.
+		 @param Buffer A buffer to write the text to.
 		 */
 		void WriteFrequencies(BufferFile * Buffer);
 		/**
 		 Export the current system to an XYZ format file. 
-		 \param Buffer A buffer to write the text to.
-		 \param AllFrames Should the data for all frames be included or just the current frame?
-		 \param AllModes Should the normal modes be output or just the current one?
-		 \param AnimateMode Flag to produce a sequence of geometries animating the current normal mode.
+		 @param Buffer A buffer to write the text to.
+		 @param AllFrames Should the data for all frames be included or just the current frame?
+		 @param AllModes Should the normal modes be output or just the current one?
+		 @param AnimateMode Flag to produce a sequence of geometries animating the current normal mode.
 		 */
 		void WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllModes, bool AnimateMode);
 		/**
 		 Export the current system to an MDL mol file. 
-		 \param Buffer A buffer to write the text to.
+		 @param Buffer A buffer to write the text to.
 		 */
 		void WriteMDLMolFile(BufferFile * Buffer);
 		/**
 		 Export the current model to a Virtual Reality Markup Language file. 
-		 \param Buffer A buffer to write the output to.
+		 @param Buffer A buffer to write the output to.
 		 */
 		void WriteVRMLFile(BufferFile * Buffer);
 		/**
 		 Export the current model to a POV-ray input file. 
-		 \param Buffer A buffer to write the output to.
+		 @param Buffer A buffer to write the output to.
 		 */
 		void WritePOVFile(BufferFile *Buffer);
 #ifdef __MAC_USE_QUICKTIME__
@@ -582,8 +584,8 @@ class MolDisplayWin : public wxFrame {
 		//General Utility routines
 		/**
 			Call when the atoms list is updated to cause all subwindows to update.
-			\param updateCoordsWin	Should the coordinates window be updated (if open)?
-			\param updateDisplay Should the main molecule display be updated?
+			@param updateCoordsWin	Should the coordinates window be updated (if open)?
+			@param updateDisplay Should the main molecule display be updated?
 		 */
 		void AtomsChanged(bool updateCoordsWin=false, bool updateDisplay=false);
 		/**
@@ -598,7 +600,7 @@ class MolDisplayWin : public wxFrame {
 		void ChangeFrames(long NewFrame);
 		/**
 			Call to insert the selected atoms at the provided index.
-			\param index The position in the atom list to insert the 1st selected atom.
+			@param index The position in the atom list to insert the 1st selected atom.
 		 */
 		void ChangeAtomOrder(long index);
 		void ModeChanged();
