@@ -74,22 +74,35 @@ void Surface::Export(BufferFile * Buffer, exportFileType eft) {
 }
 void Surface::RotateSurface(Matrix4D /*RotationMatrix*/) {
 }
-// Exports surface data to our general text file type	
-// This can effectively only be called by Surf3DBase objects
+/**
+  * Exports surface data to our text file type	
+  * This can effectively only be called by Surf3DBase objects
+  * @param Grid3D
+  * @param nx number of grid points on the X axis
+  * @param ny number of grid points on the Y axis
+  * @param nz number of grid points on the Z axis
+  * @param Origin origin of the 3D cartesian grid
+  * @param XInc increment in the X direction 
+  * @param YInc increment in the Y direction 
+  * @param ZInc increment in the Z direction 
+  * @param Label provided text label for this surface
+  * @param Buffer A BufferFileObject which the .MKL file is buffered into
+  * to make parsing the file easier.  See the BufferFile object for valid
+  * BufferFile operations.
+*/
 void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
 		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
 	char Line[kMaxLineLength];
 	if (!Grid3D) return;
 		//punch out the provided surface label
-	Buffer->PutText(Label);
-	Buffer->PutText("\r");
+	Buffer->WriteLine(Label, true);
 		//Write out the number of grid points in each direction
-	sprintf(Line, "%ld %ld %ld   //nx ny nz\r", nx,ny,nz);
-	Buffer->PutText(Line);	//true means add a line feed
-	sprintf(Line, "%g %g %g   //Origin of the 3D grid\r", Origin->x, Origin->y, Origin->z);
-	Buffer->PutText(Line);
-	sprintf(Line, "%g %g %g   //x increment, y inc, z inc/ grid(x(y(z)))\r", XInc, YInc, ZInc);
-	Buffer->PutText(Line);
+	sprintf(Line, "%ld %ld %ld   //nx ny nz", nx,ny,nz);
+	Buffer->WriteLine(Line, true);	// true means add a system-appropriate EOL
+	sprintf(Line, "%g %g %g   //Origin of the 3D grid", Origin->x, Origin->y, Origin->z);
+	Buffer->WriteLine(Line, true);
+	sprintf(Line, "%g %g %g   //x increment, y inc, z inc/ grid(x(y(z)))", XInc, YInc, ZInc);
+	Buffer->WriteLine(Line, true);
 		//now write out the grid
 		long	ix,iy,iz,igrid=0,ival=0;
 	for (ix=0; ix < nx; ix++) {
@@ -99,28 +112,28 @@ void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CP
 				Buffer->PutText(Line);
 				ival++;
 				if (ival>=5) {
-					Buffer->PutText("\r");
+					Buffer->WriteLine("", true);
 					ival=0;
 				}
 				igrid++;
 			}
 		}
 	}
-	if (ival) 	Buffer->PutText("\r");
+	if (ival) 	Buffer->WriteLine("", true);
 }
 
 /**
   * Exports surface data to CCP4 file type	
   * This can effectively only be called by Surf3DBase objects
   * @param Grid3D
-  * @param nx
-  * @param ny
-  * @param nz
-  * @param Origin
-  * @param XInc
-  * @param YInc
-  * @param ZInc
-  * @param Label
+  * @param nx number of grid points on the X axis
+  * @param ny number of grid points on the Y axis
+  * @param nz number of grid points on the Z axis
+  * @param Origin origin of the 3D cartesian grid
+  * @param XInc increment in the X direction 
+  * @param YInc increment in the Y direction 
+  * @param ZInc increment in the Z direction 
+  * @param Label provided text label for this surface
   * @param Buffer A BufferFileObject which the .MKL file is buffered into
   * to make parsing the file easier.  See the BufferFile object for valid
   * BufferFile operations.
@@ -134,14 +147,14 @@ void Surface::Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, cons
   * Exports surface data to CNS electron density map file type	
   * This can effectively only be called by Surf3DBase objects
   * @param Grid3D
-  * @param nx
-  * @param ny
-  * @param nz
-  * @param Origin
-  * @param XInc
-  * @param YInc
-  * @param ZInc
-  * @param Label
+  * @param nx number of grid points on the X axis
+  * @param ny number of grid points on the Y axis
+  * @param nz number of grid points on the Z axis
+  * @param Origin origin of the 3D cartesian grid
+  * @param XInc increment in the X direction 
+  * @param YInc increment in the Y direction 
+  * @param ZInc increment in the Z direction 
+  * @param Label provided text label for this surface
   * @param Buffer A BufferFileObject which the .MKL file is buffered into
   * to make parsing the file easier.  See the BufferFile object for valid
   * BufferFile operations.
@@ -155,13 +168,13 @@ void Surface::Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const
 	wxString UserName = wxGetUserId();
 	if(!Grid3D) return;
 	
-	Buffer->PutText("\n\t2 \n");		// !NTITLE
-	sprintf(Line, "REMARKS created by wxMacMolPlt\n");		// since this is just a 
-	Buffer->PutText(Line);									// REM line, let's brag
-	sprintf(Line, "REMARKS user: %s\tdate: %s\n", 
+	Buffer->WriteLine("\n\t2 ", true);		// !NTITLE
+	sprintf(Line, "REMARKS CNS electron density map created by wxMacMolPlt"); 
+	Buffer->WriteLine(Line, true);
+	sprintf(Line, "REMARKS user: %s\tdate: %s", 
 		(const char *)UserName.ToAscii(),					// username that ran program
 		(const char *)CurTime.Format(wxT("%c")).ToAscii());	// standard time format	
-	Buffer->PutText(Line);
+	Buffer->WriteLine(Line, true);
 
 	// print data here
 }

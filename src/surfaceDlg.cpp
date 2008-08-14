@@ -309,7 +309,7 @@ void BaseSurfacePane::OnExport(wxCommandEvent &event) {
 	wxString dropFilter;
 	wxFileName fileName;
 	wxString filePath;
-	// get filename from filePath (TODO: txt is dummy; should be replaced)
+	// get filename from filePath 
 	if(mTarget->GetDimensions() == 3)
 		dropFilter = wxT("text file (*.txt)|*.txt|CCP4 file (*.CCP4)|*.ccp4|CNS electron density map (*.CNS)|*.cns");
 	else
@@ -337,7 +337,7 @@ void BaseSurfacePane::OnExport(wxCommandEvent &event) {
 			buffer = new BufferFile(currFile, true);
 			switch (wfd.GetFilterIndex()) {
 				case 0:
-					// txt file
+					// our txt file
 					mTarget->Export(buffer, Surface::TXTFILE);
 				break;
 				case 1:

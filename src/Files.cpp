@@ -1369,7 +1369,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
   * into to make parsing the file easier.  See the BufferFile object for 
   * valid BufferFile operations. Parsing code adapted from 
   * MoleculeData::ParseMOPACZMatrix.
-  * \return Returns 1 upon open success or 0 on error or failure to open
+  * @return Returns 1 upon open success or 0 on error or failure to open
 */
 long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, TextFileType fileType) {
 	// buffer line for text to be scanned while parsing
@@ -5228,7 +5228,8 @@ long SetAtomType(const unsigned char *TestLabel) {
  * to a string.
  * @param file_name Name of file to read
  * @param contents String to write contents to
- * \return True */
+ * @\return True 
+*/
 bool FileToString(const std::string& file_name,
 				  std::string& contents) {
 
