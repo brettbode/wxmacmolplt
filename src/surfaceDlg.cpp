@@ -3204,13 +3204,13 @@ void TEDensity1DSurfPane::CreateControls() {
 
 	itemBoxSizer81 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer81, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
-	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, wxT("Clamp Value")));
+	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, _("Clamp Value")));
 	clamp_box = new wxTextCtrl(TED1DPANEL, ID_3D_MAX_MAP_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	itemBoxSizer81->Add(clamp_box, 0, wxALIGN_CENTER_HORIZONTAL);
 
 	itemBoxSizer81 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer81, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
-	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, wxT("Scale Factor")));
+	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, _("Scale Factor")));
 	scale_box = new wxTextCtrl(TED1DPANEL, ID_SCALE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	itemBoxSizer81->Add(scale_box, 0, wxALIGN_CENTER_HORIZONTAL);
 
@@ -3411,14 +3411,14 @@ void TEDensity1DSurfPane::refreshControls() {
 	/* mOrbColor1->setColor(&PosColor); */
 	mNumGridPntSld->SetValue(NumGridPoints);
 
-	clamp_box->SetValue(wxString::Format("%f", mTarget->GetMaxValue()));
-	scale_box->SetValue(wxString::Format("%f", mTarget->GetScale()));
-	endpt1_xbox->SetValue(wxString::Format("%f", mTarget->Start.x));
-	endpt1_ybox->SetValue(wxString::Format("%f", mTarget->Start.y));
-	endpt1_zbox->SetValue(wxString::Format("%f", mTarget->Start.z));
-	endpt2_xbox->SetValue(wxString::Format("%f", mTarget->End.x));
-	endpt2_ybox->SetValue(wxString::Format("%f", mTarget->End.y));
-	endpt2_zbox->SetValue(wxString::Format("%f", mTarget->End.z));
+	clamp_box->SetValue(wxString::Format(wxT("%f"), mTarget->GetMaxValue()));
+	scale_box->SetValue(wxString::Format(wxT("%f"), mTarget->GetScale()));
+	endpt1_xbox->SetValue(wxString::Format(wxT("%f"), mTarget->Start.x));
+	endpt1_ybox->SetValue(wxString::Format(wxT("%f"), mTarget->Start.y));
+	endpt1_zbox->SetValue(wxString::Format(wxT("%f"), mTarget->Start.z));
+	endpt2_xbox->SetValue(wxString::Format(wxT("%f"), mTarget->End.x));
+	endpt2_ybox->SetValue(wxString::Format(wxT("%f"), mTarget->End.y));
+	endpt2_zbox->SetValue(wxString::Format(wxT("%f"), mTarget->End.z));
 }
 /*!
  * Get bitmap resources
