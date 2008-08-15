@@ -39,6 +39,12 @@
       
       <LI><A HREF="#dendiff">Density difference</A>
    </UL>
+
+   <LI>1D:
+   
+   <UL>
+      <LI><A HREF="#1DTED">Total Electron Densities</A>
+   </UL>
 </UL>
 
 <P>
@@ -54,16 +60,33 @@ window and click the Add button in the lower right corner. All
 surfaces for a frame are listed in the menu near the top of
 the Surfaces window.</P>
 
-<P>The surfaces are divided into two main types: 2D contour maps, and
-3D isosurfaces. Common to all surfaces are the options to type in a
-label for the surface and an option to make the surface
-visible/invisible. The purpose for making a surface invisible is so
-that you can define the surface the way you want, and precalculate
-the grid and contour(s) and then work on a seperate surface. Then
-when you want to show off the surface to someone else simply make it
+<P>The surfaces are divided into three main types: 1D spectrum lines,
+2D contour maps, and 3D isosurfaces. Common to all surfaces are the options to
+type in a label for the surface and an option to make the surface
+visible/invisible. The purpose for making a surface invisible is so that you
+can define the surface the way you want, and precalculate the grid and
+contour(s) and then work on a seperate surface. Then when you want to show off
+the surface to someone else simply make it
 visible.</P>
 
-<P>There are several options common to all 2D surfaces such as the ability to set contour colors and choose the plotting plane. The plotting plane can be fixed to the plane of the screen, in which case it is changed as the molecule is rotated, or the plane can be simply constant. </P>
+<p>
+1D spectrum lines allow for the spectrum of surface values on a line between
+two locations to be visualized. The endpoints of the line can be relocated
+through both the Surfaces dialog and with the mouse after the surface is
+created. To move with the mouse, click on the endpoint and drag it left and
+right. Both endpoints can be moved at the same time by holding down the
+Control/Command key while dragging. The endpoints can be moved in and out of
+the scene by tapping (holding is not required) the Shift key. The surface
+values can be visualized in one of two ways: a) as an embedded 2-D graph with
+the x-axis spanning between the two endpoints and the y-axis representing
+value intensity, or b) as a colored key ranging from blue at the minimum
+surface value to red at the clamped maximum value.
+</p>
+
+<P>There are several options common to all 2D surfaces such as the ability to
+set contour colors and choose the plotting plane. The plotting plane can be
+fixed to the plane of the screen, in which case it is changed as the molecule
+is rotated, or the plane can be simply constant. </P>
 
 <P>3D isosurfaces also have a few common features such as colors,
 number of grid points, grid size, and the contour value. The grid
@@ -641,6 +664,25 @@ X-SAS-UseImageWidth X-SAS-UseImageHeight ALIGN=bottom></CENTER></P>
    change any other surface parameters. Once freed the grid must be
    recalculated before updating the contour.
 </UL>
+
+<H3>
+<HR>
+1D Total Electron Densities<A NAME="1DTED"></A>:</H3>
+
+<P>
+Creates a linear sampling of total electron density between two locations.
+</P>
+
+<P>
+The important controls are:
+<UL>
+<LI>Number of Grid Points: Controls the rate of regular sampling between the two endpoints.</LI>
+<LI>Clamp: Maximum allowed density value. All densities higher than this value will be clamped to this value.</LI>
+<LI>Scale: Factor by which to scale density values when mapping to physical offset from sampling line.</LI>
+<LI>Endpoint 1: Location at which to start sampling.</LI>
+<LI>Endpoint 2: Location at which to end sampling.</LI>
+</UL>
+</P>
 
 <H3>
 <HR>
