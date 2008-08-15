@@ -2505,50 +2505,88 @@ void MolDisplayWin::menuViewSetWindowParameters(wxCommandEvent &event) {
 	}
 	temp->Destroy();
 }
+
+void MolDisplayWin::menuViewRotateInPlace(const Matrix4D new_m) {
+
+	Matrix4D ri;
+	CPoint3D trans_centroid, rot_centroid, rot2_centroid;
+
+	trans_centroid = MainData->MolCentroid - MainData->Centroid;
+	Rotate3DPt(MainData->TotalRotation, trans_centroid, &rot_centroid);
+
+	CopyMatrix(new_m, MainData->TotalRotation);
+
+	InverseMatrix(MainData->TotalRotation, ri);
+	Rotate3DPt(ri, rot_centroid, &rot2_centroid);
+	MainData->Centroid = rot2_centroid - MainData->MolCentroid;
+	MainData->Centroid *= -1.0;
+	MainData->ResetRotation();
+	ResetView();
+	Dirtify();
+}
+
 void MolDisplayWin::menuViewRotateTo_X_axis(wxCommandEvent &event) {
-	MainData->TotalRotation[0][2] = MainData->TotalRotation[1][1] = 1.0;
-	MainData->TotalRotation[2][0] = -1.0;
-	MainData->TotalRotation[0][0] = MainData->TotalRotation[2][2] =
-	   MainData->TotalRotation[1][0] = MainData->TotalRotation[0][1] =
-	   MainData->TotalRotation[1][2] = MainData->TotalRotation[2][1] = 0.0;
-	MainData->ResetRotation();
-	ResetView();
-	Dirtify();
+
+	Matrix4D new_m;
+	InitRotationMatrix(new_m);
+	new_m[0][2] = new_m[1][1] = 1.0;
+	new_m[2][0] = -1.0;
+	new_m[0][0] = new_m[2][2] = new_m[1][0] = new_m[0][1] =
+	   new_m[1][2] = new_m[2][1] = 0.0;
+
+	menuViewRotateInPlace(new_m);
 }
+
 void MolDisplayWin::menuViewRotateTo_Y_axis(wxCommandEvent &event) {
-	MainData->TotalRotation[0][0] = MainData->TotalRotation[1][2] = 1.0;
-	MainData->TotalRotation[2][1] = -1.0;
-	MainData->TotalRotation[1][1] = MainData->TotalRotation[2][2] =
-	   MainData->TotalRotation[0][1] = MainData->TotalRotation[0][2] =
-	   MainData->TotalRotation[1][0] = MainData->TotalRotation[2][0] = 0.0;
-	MainData->ResetRotation();
-	ResetView();
-	Dirtify();
+
+	Matrix4D new_m;
+	InitRotationMatrix(new_m);
+	new_m[0][0] = new_m[1][2] = 1.0;
+	new_m[2][1] = -1.0;
+	new_m[1][1] = new_m[2][2] = new_m[0][1] = new_m[0][2] =
+	   new_m[1][0] = new_m[2][0] = 0.0;
+
+	menuViewRotateInPlace(new_m);
 }
+
 void MolDisplayWin::menuViewRotateTo_Z_axis(wxCommandEvent &event) {
-	InitRotationMatrix(MainData->TotalRotation);
-	MainData->ResetRotation();
-	ResetView();
-	Dirtify();
+
+	Matrix4D new_m;
+	InitRotationMatrix(new_m);
+
+	menuViewRotateInPlace(new_m);
 }
+
 void MolDisplayWin::menuViewRotate180_horizontal(wxCommandEvent &event) {
+
+	Matrix4D tmp;
+	Matrix4D new_m;
+	CopyMatrix(MainData->TotalRotation, tmp);
 	MainData->FlipRotation(0);
-	MainData->ResetRotation();
-	ResetView();
-	Dirtify();
+	CopyMatrix(MainData->TotalRotation, new_m);
+	CopyMatrix(tmp, MainData->TotalRotation);
+	menuViewRotateInPlace(new_m);
 }
+
 void MolDisplayWin::menuViewRotate180_vertical(wxCommandEvent &event) {
+
+	Matrix4D tmp;
+	Matrix4D new_m;
+	CopyMatrix(MainData->TotalRotation, tmp);
 	MainData->FlipRotation(1);
-	MainData->ResetRotation();
-	ResetView();
-	Dirtify();
+	CopyMatrix(MainData->TotalRotation, new_m);
+	CopyMatrix(tmp, MainData->TotalRotation);
+	menuViewRotateInPlace(new_m);
 }
+
 void MolDisplayWin::menuViewRotatePrinciple_orientation(wxCommandEvent &event) {
 	MainData->RotateToPrincipleOrientation(Prefs);
 	ResetView();
 	Dirtify();
 }
+
 void MolDisplayWin::menuViewRotateOther(wxCommandEvent &event) {
+	MainData->Centroid = MainData->MolCentroid;
 	SetScreenPlane * temp = new SetScreenPlane(this);
 	temp->Show();
 }

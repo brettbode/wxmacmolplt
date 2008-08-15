@@ -682,7 +682,7 @@ class Surface {
 		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs)=0;
 #endif
 #ifdef UseOpenGL
-		virtual long Draw3DGL(MoleculeData * lData,  WinPrefs * Prefs, myGLTriangle *)=0;
+		virtual long Draw3DGL(MoleculeData * lData,  WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0)=0;
 		virtual long getTriangleCount(void) const {return 0;};
 #endif
 		inline long getTargetOrbSet(void) const {return OrbSet;};

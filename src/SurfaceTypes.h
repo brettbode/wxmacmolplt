@@ -54,16 +54,20 @@ class OrbSurfBase {
 		virtual void WriteXML(XMLElement * parent) const;
 		virtual void ReadXML(XMLElement * parent);
 };
+
 class Surf1DBase : public Surface {
 	protected:
 		float *		Grid;
 		long		GridAllocation;
-		CPoint3D	Start;
-		CPoint3D	End;
 		long		NumGridPoints;
 		RGBColor	PosColor;
 		RGBColor	NegColor;
 		float		MaxContourValue;
+		float       Scale;
+		float		GridMax, GridMin;
+		
+		// bit field:
+		// 	  bit 0 -> both + and - contours
 		long		SurfOptions;
 	public:
 		Surf1DBase(void);
@@ -79,6 +83,16 @@ class Surf1DBase : public Surface {
 		inline bool GridAvailable(void) const {return (Grid!=NULL);};
 		virtual bool ExportPossible(void) const {return GridAvailable();};
 		virtual void Export(BufferFile * Buffer, exportFileType eft);
+		inline bool ContourBothPosNeg(void) const {return (SurfOptions & 1) != 0;};
+		inline void SetContourBothPosNeg(bool NewVal) { SurfOptions = (SurfOptions & ~(1 << 1)) | (((int) NewVal) << 1); }
+		inline float GetMaxValue(void) const { return MaxContourValue; }
+		inline void SetMaxValue(float newVal) {MaxContourValue=newVal;};
+		inline float GetScale(void) const { return Scale; }
+		inline void SetScale(float newVal) {Scale=newVal;};
+		void Write1DXML(XMLElement *parent, bool writeGrid) const;
+		void Read1DXML(XMLElement *sxml);
+		long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *,
+					  unsigned int shader_program = 0);
 		inline void FreeGrid(void) {
 			if (Grid) {
 				delete [] Grid;
@@ -90,7 +104,10 @@ class Surf1DBase : public Surface {
 			Grid = new float[NumPoints];
 			if (Grid) GridAllocation = NumPoints;
 		};
+		CPoint3D Start;
+		CPoint3D End;
 };
+
 class Surf2DBase : public Surface {
 	protected:
 #ifdef UseHandles
@@ -181,7 +198,7 @@ class Surf2DBase : public Surface {
 		void Contour2DGridQ3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
 #endif
 #ifdef UseOpenGL
-		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
+		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0);
 		void Contour2DGrid3DGL(MoleculeData * lData, WinPrefs * Prefs);
 #endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
@@ -377,6 +394,7 @@ class Surf3DBase : public Surface {
 										GaussHermiteData * GHData, float * grid,
 										CPoint3D * Contour, long * PercentDone, bool MPTask);
 };
+
 class General2DSurface : public Surf2DBase {
 	public:
 		General2DSurface(WinPrefs * Prefs);
@@ -391,6 +409,7 @@ class General2DSurface : public Surf2DBase {
 		virtual void WriteXML(XMLElement * parent) const;
 		virtual bool Needs2DPlane(void) const {bool result=false; if (Visible&&Grid) result=true; return result;};
 };
+
 class General3DSurface : public Surf3DBase {
 	public:
 		General3DSurface(WinPrefs * Prefs);
@@ -406,7 +425,7 @@ class General3DSurface : public Surf3DBase {
 		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
 #endif
 #ifdef UseOpenGL
-		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
+		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0);
 		virtual long getTriangleCount(void) const;
 #endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
@@ -432,7 +451,7 @@ class TEDensity3DSurface : public Surf3DBase {
 		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
 #endif
 #ifdef UseOpenGL
-		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
+		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0);
 #endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
@@ -458,19 +477,23 @@ class TEDensity2DSurface : public Surf2DBase {
 		virtual void Update(MoleculeData * MainData);
 		void UpdateData(TEDensity2DSurface * target);
 };
+
 class TEDensity1DSurface : public Surf1DBase {
+	public:
 		TEDensity1DSurface(WinPrefs * Prefs);
 		TEDensity1DSurface(TEDensity1DSurface * target);
+		TEDensity1DSurface(XMLElement * x);
 #ifndef __wxBuild__
 		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
 #endif
-		virtual char * GetLabel(void);
-		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity1D;};
-		virtual void WriteXML(XMLElement * parent) const;
-		void CalculateMOGrid(MoleculeData * MainData, Progress * lProgress);
-		virtual void Update(MoleculeData * MainData);
-		void UpdateData(TEDensity1DSurface * target);
+		virtual char *GetLabel(void);
+		virtual SurfaceType GetSurfaceType(void) const { return kTotalDensity1D; }
+		virtual void WriteXML(XMLElement *parent) const;
+		void CalculateMOGrid(MoleculeData *MainData, Progress *lProgress);
+		virtual void Update(MoleculeData *MainData);
+		void UpdateData(TEDensity1DSurface *target);
 };
+
 class MEP2DSurface : public Surf2DBase {
 	private:
 	public:
@@ -503,7 +526,7 @@ class MEP3DSurface : public Surf3DBase {
 		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
 #endif
 #ifdef UseOpenGL
-		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
+		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0);
 #endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
@@ -527,7 +550,7 @@ class Orb3DSurface : public Surf3DBase, public OrbSurfBase {
 		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
 #endif
 #ifdef UseOpenGL
-		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *);
+		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0);
 #endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual void WriteXML(XMLElement * parent) const;

@@ -3160,6 +3160,10 @@ const char * CML_convert(MMP_SurfaceNameSpace t)
             return "Normals";
         case MMP_SurfSurfaceValues:
             return "SurfaceValues";
+        case MMP_SurfEndpoint1:
+            return "Endpoint1";
+        case MMP_SurfEndpoint2:
+            return "Endpoint2";
 		default:
             return "invalid";
     }

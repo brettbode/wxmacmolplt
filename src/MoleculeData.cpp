@@ -189,6 +189,10 @@ void MoleculeData::GetRotationMatrix(Matrix4D copy) {
 	CopyMatrix(TotalRotation, copy);
 }
 
+const Matrix4D& MoleculeData::GetRotationMatrix() const {
+	return TotalRotation;
+}
+
 #include <iostream>
 //routine calculates the cartesian center of the molecule and offsets the 
 //coordinate system of the window to match the moleculer center.
@@ -400,6 +404,15 @@ void MoleculeData::FlipRotation(short theItem) {
 		p.x = 10;
 	}
 	VirtualSphereQD3D (p, q, sphereCenter, sphereRadius, rotationMatrix, TotalRotation);
+	float *m = (float *) rotationMatrix;
+	std::cout << "m[#](# in 0,16): " << std::endl
+		<< m[0] << ", " << m[1] << ", " << m[2] << ", " << m[3] << ", " <<
+										   std::endl
+		<< m[4] << ", " << m[5] << ", " << m[6] << ", " << m[7] << ", " <<
+										   std::endl
+		<< m[8] << ", " << m[9] << ", " << m[10] << ", " << m[11] << ", " <<
+										   std::endl
+		<< m[12] << ", " << m[13] << ", " << m[14] << ", " << m[15] << std::endl;
 
 /* Concatenate the new rotation with the current rotation */
 //Mulitply twice since the rotate generated is 90 degrees and we want 180
@@ -998,19 +1011,9 @@ void MoleculeData::ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, W
 	mInts->InternalsToCartesians(this, Prefs, 0);
 }
 void MoleculeData::GetModelCenter(CPoint3D * center) {
-		/* CPoint3D	temp; */
-	/* temp.x = -TotalRotation[3][0]; */
-	/* temp.y = -TotalRotation[3][1]; */
-	/* temp.z = -TotalRotation[3][2]; */
-	/* BackRotate3DOffset(TotalRotation, &temp, center); */
 	*center = Centroid;
 }
 void MoleculeData::SetModelCenter(CPoint3D * center) {
-		/* CPoint3D	temp; */
-	/* Rotate3DOffset(TotalRotation, *center, &temp); */
-	/* TotalRotation[3][0] = -temp.x; */
-	/* TotalRotation[3][1] = -temp.y; */
-	/* TotalRotation[3][2] = -temp.z; */
 	Centroid = *center;
 }
 void MoleculeData::GetModelRotation(float * Psi, float * Phi, float * Theta) {
@@ -1023,7 +1026,7 @@ void MoleculeData::SetModelRotation(float Psi, float Phi, float Theta) {
 	SetModelCenter(&Center);
 }
 void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
-	if (!DeterminePrincipleOrientation(TotalRotation, Prefs, 1.0E-4)) {
+	if (!DeterminePrincipleOrientation(TotalRotation, Centroid, Prefs, 1.0E-4)) {
 		MessageAlert("Unable to determine the proper symmetry adapted rotation. This"
 					 " may mean your selected point group is incorrect.");
 	}
@@ -1036,6 +1039,7 @@ void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs, double 
 	//D2d-d8d (27-33), d2h-d8h (34-40), d2-d8 (41-47), Td, Th, T, Oh, O
 	int PrincAxisOrder = 1;
 	Matrix4D temp;
+	CPoint3D ptmp;
 	
 	GAMESSPointGroup savedpg = GAMESS_C1;
 	long savedpgOrder = 1;
@@ -1049,33 +1053,33 @@ void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs, double 
 	for (int i=2; i<=8; i++) {
 		InputOptions->Data->SetPointGroup(GAMESS_CN);
 		InputOptions->Data->SetPointGroupOrder(i);
-		if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+		if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 			pgFlags[17 - 2 + i] = true;
 			PrincAxisOrder = i;
 			InputOptions->Data->SetPointGroup(GAMESS_CNH);
-			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+			if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 				pgFlags[3 - 2 + i] = true;
 			}
 			InputOptions->Data->SetPointGroup(GAMESS_CNV);
-			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+			if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 				pgFlags[10 - 2 + i] = true;
 			}
 			InputOptions->Data->SetPointGroup(GAMESS_DN);
-			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+			if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 				pgFlags[41 - 2 + i] = true;
 				InputOptions->Data->SetPointGroup(GAMESS_DND);
-				if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+				if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 					pgFlags[27 - 2 + i] = true;
 				}
 				InputOptions->Data->SetPointGroup(GAMESS_DNH);
-				if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+				if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 					pgFlags[34 - 2 + i] = true;
 				}
 			}
 			if (i < 5) {
 				InputOptions->Data->SetPointGroup(GAMESS_S2N);
 				InputOptions->Data->SetPointGroupOrder(i-1);
-				if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+				if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 					pgFlags[24 - 2 + i] = true;
 				}
 			}
@@ -1083,39 +1087,41 @@ void MoleculeData::DeterminePointGroup(bool * pgFlags, WinPrefs * Prefs, double 
 	}
 	if (PrincAxisOrder > 1) {
 		InputOptions->Data->SetPointGroup(GAMESS_T);
-		if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+		if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 			pgFlags[50] = true;
 			InputOptions->Data->SetPointGroup(GAMESS_O);
-			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+			if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 				pgFlags[52] = true;
 				InputOptions->Data->SetPointGroup(GAMESS_OH);
-				if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+				if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 					pgFlags[51] = true;
 				}
 			}
 			InputOptions->Data->SetPointGroup(GAMESS_TD);
-			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+			if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 				pgFlags[48] = true;
 			}
 			InputOptions->Data->SetPointGroup(GAMESS_TH);
-			if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+			if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 				pgFlags[49] = true;
 			}
 		}
 	}
 	InputOptions->Data->SetPointGroup(GAMESS_CS);
-	if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+	if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 		pgFlags[1] = true;
 	}
 	InputOptions->Data->SetPointGroup(GAMESS_CI);
-	if (DeterminePrincipleOrientation(temp, Prefs, precision)) {
+	if (DeterminePrincipleOrientation(temp, ptmp, Prefs, precision)) {
 		pgFlags[2] = true;
 	}
 	//restore the entry point group
 	InputOptions->Data->SetPointGroup(savedpg);
 	InputOptions->Data->SetPointGroupOrder(savedpgOrder);
 }
-bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs,
+bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result,
+												 CPoint3D& translation,
+												 WinPrefs * Prefs,
 												 double precision) const {
 	//Setup the rotation matrix to present the molecule in the priciple orientation
 	
@@ -1124,6 +1130,7 @@ bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Pre
 	CPoint3D centerOfMass;
 	CalculateCenterOfMass(cFrame->Atoms, cFrame->GetNumAtoms(),
 						  Prefs->GetAtomMassLoc(), &centerOfMass);
+	translation = centerOfMass;
 	centerOfMass *= -1.0;
 	CPoint3D rotatedCenterOfMass = centerOfMass;
 	
@@ -1315,9 +1322,6 @@ bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Pre
 			}
 		}
 	}
-	result[3][0] = rotatedCenterOfMass.x;
-	result[3][1] = rotatedCenterOfMass.y;
-	result[3][2] = rotatedCenterOfMass.z;
 	return success;
 }
 void MoleculeData::GenerateSymmetryDependentAtoms(bool do_warnings) {

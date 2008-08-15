@@ -94,6 +94,19 @@ BEGIN_EVENT_TABLE(Surface3DPane, BaseSurfacePane)
 	EVT_TEXT(ID_3D_MAX_MAP_EDIT, Surface3DPane::OnMaxMEPValueText)
 END_EVENT_TABLE()
 
+BEGIN_EVENT_TABLE(Surface1DPane, BaseSurfacePane)
+	EVT_COMMAND_ENTER(ID_2D_COLOR_POSITIVE, Surface1DPane::OnPosColorChange)
+	EVT_COMMAND_ENTER(ID_2D_COLOR_NEGATIVE, Surface1DPane::OnNegColorChange)
+	EVT_TEXT(ID_SCALE_EDIT, Surface1DPane::OnChangeScale)
+	EVT_TEXT(ID_3D_MAX_MAP_EDIT, Surface1DPane::OnChangeClamp)
+	EVT_TEXT/*_ENTER*/(ID_ENDPT1_XBOX, Surface1DPane::OnChangeEndpoint)
+	EVT_TEXT/*_ENTER*/(ID_ENDPT1_YBOX, Surface1DPane::OnChangeEndpoint)
+	EVT_TEXT/*_ENTER*/(ID_ENDPT1_ZBOX, Surface1DPane::OnChangeEndpoint)
+	EVT_TEXT/*_ENTER*/(ID_ENDPT2_XBOX, Surface1DPane::OnChangeEndpoint)
+	EVT_TEXT/*_ENTER*/(ID_ENDPT2_YBOX, Surface1DPane::OnChangeEndpoint)
+	EVT_TEXT/*_ENTER*/(ID_ENDPT2_ZBOX, Surface1DPane::OnChangeEndpoint)
+END_EVENT_TABLE()
+
 BEGIN_EVENT_TABLE(Surface2DPane, BaseSurfacePane)
 	EVT_CHECKBOX(ID_USE_PLANE_CHECKBOX, Surface2DPane::OnUsePlaneChk)
 	EVT_CHECKBOX(ID_SHOW_ZERO_CHECKBOX, Surface2DPane::OnShowZeroChk)
@@ -146,6 +159,10 @@ BEGIN_EVENT_TABLE(General2DSurfPane, Surface2DPane)
 	EVT_CHECKBOX(ID_GENSQUARECHECK, General2DSurfPane::OnSquareCheck)
 	EVT_TEXT(ID_GENMULTEDIT, General2DSurfPane::OnMultValueEnter)
 	EVT_BUTTON(ID_SURFACE_UPDATE_BUT, General2DSurfPane::OnUpdate)
+END_EVENT_TABLE()
+
+BEGIN_EVENT_TABLE(TEDensity1DSurfPane, Surface1DPane)
+	EVT_BUTTON(ID_SURFACE_UPDATE_BUT, TEDensity1DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(TEDensity2DSurfPane, Surface2DPane)
@@ -860,6 +877,112 @@ int OrbSurfacePane::orbSetChangeEvt(int item, SurfacesWindow * owner) {
 }
 
 /*
+ * General 1D surface dialog class
+ */
+
+Surface1DPane::Surface1DPane(wxWindow* parent, Surf1DBase* target, 
+		SurfacesWindow* Owner, wxWindowID id, 
+		const wxPoint& pos, const wxSize& size, 
+		long style) 
+	: BaseSurfacePane(parent, target, Owner, id, pos, size, style),
+	  endpt1_xbox(NULL),
+	  endpt1_ybox(NULL),
+	  endpt1_zbox(NULL),
+	  endpt2_xbox(NULL),
+	  endpt2_ybox(NULL),
+	  endpt2_zbox(NULL) {
+	mOrbColor1 = NULL;
+	mOrbColor2 = NULL;
+
+	mTarget = target;
+}
+
+Surface1DPane::~Surface1DPane() {
+	delete mOrbColor1;
+	if (mOrbColor2) delete mOrbColor2;
+}
+
+void Surface1DPane::OnPosColorChange(wxCommandEvent & event) {
+	mOrbColor1->getColor(&PosColor);
+	setUpdateButton();
+}
+
+void Surface1DPane::OnNegColorChange(wxCommandEvent & event) {
+	mOrbColor2->getColor(&NegColor);
+	setUpdateButton();
+}
+
+void Surface1DPane::OnChangeClamp(wxCommandEvent &event) {
+
+	double dval;
+
+	if (clamp_box->GetValue().ToDouble(&dval)) {
+		MaxContourValue = (float) dval;
+		setUpdateButton();
+	}
+
+}
+
+void Surface1DPane::OnChangeScale(wxCommandEvent &event) {
+
+	double dval;
+
+	if (scale_box->GetValue().ToDouble(&dval)) {
+		Scale = (float) dval;
+		setUpdateButton();
+	}
+
+}
+
+void Surface1DPane::OnChangeEndpoint(wxCommandEvent &event) {
+	bool ok;
+	bool any_ok;
+	double dval;
+	float fval;
+#define UPDATE_ENDPOINT(control, coord) \
+	if (control) { \
+		ok = control->GetValue().ToDouble(&dval); \
+		fval = (float) dval; \
+		if (ok) { \
+			coord = fval; \
+			any_ok = true; \
+		} \
+	}
+
+	UPDATE_ENDPOINT(endpt1_xbox, Start.x);
+	UPDATE_ENDPOINT(endpt1_ybox, Start.y);
+	UPDATE_ENDPOINT(endpt1_zbox, Start.z);
+	UPDATE_ENDPOINT(endpt2_xbox, End.x);
+	UPDATE_ENDPOINT(endpt2_ybox, End.y);
+	UPDATE_ENDPOINT(endpt2_zbox, End.z);
+
+#undef UPDATE_ENDPOINT
+
+	if (any_ok) {
+		setUpdateButton();
+	}
+}
+
+/* if the focus in the panel is changed between main panel and 
+   two wxTextCtrls, read the content of two wxTextCtrls. */
+
+void Surface1DPane::OnIdle(wxIdleEvent& WXUNUSED(event)) {
+	static wxWindow *s_windowFocus = (wxWindow *)NULL;
+	wxWindow *focus = wxWindow::FindFocus();
+
+	if (focus && (focus != s_windowFocus)) {
+		s_windowFocus = focus;
+		wxString className = s_windowFocus->GetClassInfo()->GetClassName();
+
+		if (className.Cmp(_T("wxTextCtrl")) == 0 
+				|| className.Cmp(_T("Orbital2DSurfPane")) == 0) {
+			double d;
+			setUpdateButton();
+		}
+	}
+}
+
+/*
  * General 2D surface dialog class
  */
 
@@ -940,6 +1063,7 @@ void Surface2DPane::OnSetParam(wxCommandEvent &event) {
 	Surface2DParamDlg* paramDlg = new Surface2DParamDlg(this, mTarget);
 	paramDlg->Show();
 }
+
 void Surface2DPane::OnContourValueText(wxCommandEvent& event) {
 	//Contour Value edit text has changed, convert the text
 	double newVal=0.0;
@@ -950,11 +1074,13 @@ void Surface2DPane::OnContourValueText(wxCommandEvent& event) {
 	}
 	setUpdateButton();
 }
+
 void Surface2DPane::SetContourValueText(void) {
 	wxString tmpStr;
 	tmpStr.Printf(wxT("%.4f"), MaxContourValue);
 	mContourValText->SetValue(tmpStr);
 }
+
 void Surface2DPane::OnNumContoursText(wxCommandEvent& event) {
 	//Num contours edit text has changed, convert the text
 	long newVal=-1;
@@ -966,6 +1092,7 @@ void Surface2DPane::OnNumContoursText(wxCommandEvent& event) {
 
 	setUpdateButton();
 }
+
 void Surface2DPane::SetNumContoursText(void) {
 	wxString tmpStr;
 	tmpStr.Printf(wxT("%ld"), NumContours);
@@ -3027,6 +3154,296 @@ void BaseSurfacePane::OnOrbSetChoice(wxCommandEvent &event) {
 	setUpdateButton();
 }	
 
+TEDensity1DSurfPane::TEDensity1DSurfPane(wxWindow* parent, TEDensity1DSurface* target, 
+		SurfacesWindow* o, wxWindowID id,
+		const wxPoint& pos, const wxSize& size, 
+		long style) 
+	: Surface1DPane(parent, target, o, id, pos, size, style) {
+	mTarget = target;
+
+	TargetToPane();
+	CreateControls();
+	BuildOrbSetPopup();
+	refreshControls();
+}
+
+TEDensity1DSurfPane::~TEDensity1DSurfPane() {
+
+}
+
+void TEDensity1DSurfPane::CreateControls() {
+	TEDensity1DSurfPane * TED1DPANEL = this;	//this is here just to match the code below from DialogBlocks
+
+	wxBoxSizer* itemBoxSizer68 = new wxBoxSizer(wxHORIZONTAL);
+	mainSizer->Add(itemBoxSizer68, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxStaticText* itemStaticText69 = new wxStaticText(TED1DPANEL, wxID_STATIC, _("Select Orbital Set:"), wxDefaultPosition, wxDefaultSize, 0);
+	itemBoxSizer68->Add(itemStaticText69, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxString* mOrbSetChoiceStrings = NULL;
+	mOrbSetChoice = new wxChoice(TED1DPANEL, ID_ORB_CHOICE, wxDefaultPosition, wxDefaultSize, 0, mOrbSetChoiceStrings, 0);
+	if (ShowToolTips())
+		mOrbSetChoice->SetToolTip(_("Choose the set of vectors to use for producing the TED surface."));
+	itemBoxSizer68->Add(mOrbSetChoice, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxBoxSizer* itemBoxSizer71 = new wxBoxSizer(wxHORIZONTAL);
+	mainSizer->Add(itemBoxSizer71, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxStaticText* itemStaticText72 = new wxStaticText(TED1DPANEL, wxID_STATIC, _("Number of grid points:"), wxDefaultPosition, wxDefaultSize, 0);
+	itemBoxSizer71->Add(itemStaticText72, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	mNumGridPntSld = new wxSlider(TED1DPANEL, ID_GRID_POINT_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_LABELS);
+	itemBoxSizer71->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxBoxSizer* itemBoxSizer81;
+	/* itemBoxSizer81 = new wxBoxSizer(wxHORIZONTAL); */
+	/* mainSizer->Add(itemBoxSizer81, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5); */
+	/* wxStaticText* itemStaticText82 = new wxStaticText(TED1DPANEL, wxID_STATIC, _("Contour color:"), wxDefaultPosition, wxDefaultSize, 0); */
+	/* itemBoxSizer81->Add(itemStaticText82, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
+
+	/* mOrbColor1 = new colorArea(TED1DPANEL, ID_2D_COLOR_POSITIVE, &PosColor); */
+	/* itemBoxSizer81->Add(mOrbColor1, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
+
+	itemBoxSizer81 = new wxBoxSizer(wxHORIZONTAL);
+	mainSizer->Add(itemBoxSizer81, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, "Clamp Value"));
+	clamp_box = new wxTextCtrl(TED1DPANEL, ID_3D_MAX_MAP_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+	itemBoxSizer81->Add(clamp_box, 0, wxALIGN_CENTER_HORIZONTAL);
+
+	itemBoxSizer81 = new wxBoxSizer(wxHORIZONTAL);
+	mainSizer->Add(itemBoxSizer81, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, "Scale Factor"));
+	scale_box = new wxTextCtrl(TED1DPANEL, ID_SCALE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+	itemBoxSizer81->Add(scale_box, 0, wxALIGN_CENTER_HORIZONTAL);
+
+	wxFlexGridSizer* flex_sizer = new wxFlexGridSizer(2, 4, 0, 0);
+	mainSizer->Add(flex_sizer, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
+	flex_sizer->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, _("Endpoint 1:")),
+					wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL));
+	endpt1_xbox = new wxTextCtrl(TED1DPANEL, ID_ENDPT1_XBOX, wxT(""),
+								 /* wxString::Format("%f", mTarget->Start.x), */
+								 wxDefaultPosition, wxDefaultSize,
+								 wxTE_PROCESS_ENTER,
+								 wxTextValidator(wxFILTER_NUMERIC,
+												 &endpt1_xstr));
+	flex_sizer->Add(endpt1_xbox);
+	endpt1_ybox = new wxTextCtrl(TED1DPANEL, ID_ENDPT1_YBOX, wxT(""),
+								 /* wxString::Format("%f", mTarget->Start.y), */
+								 wxDefaultPosition, wxDefaultSize,
+								 wxTE_PROCESS_ENTER,
+								 wxTextValidator(wxFILTER_NUMERIC,
+												 &endpt1_ystr));
+	flex_sizer->Add(endpt1_ybox);
+	endpt1_zbox = new wxTextCtrl(TED1DPANEL, ID_ENDPT1_ZBOX, wxT(""),
+								 /* wxString::Format("%f", mTarget->Start.z), */
+								 wxDefaultPosition, wxDefaultSize,
+								 wxTE_PROCESS_ENTER,
+								 wxTextValidator(wxFILTER_NUMERIC,
+												 &endpt1_zstr));
+	flex_sizer->Add(endpt1_zbox);
+	flex_sizer->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, _("Endpoint 2:")),
+					wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL));
+	endpt2_xbox = new wxTextCtrl(TED1DPANEL, ID_ENDPT2_XBOX, wxT(""),
+								 /* wxString::Format("%f", mTarget->End.x), */
+								 wxDefaultPosition, wxDefaultSize,
+								 wxTE_PROCESS_ENTER,
+								 wxTextValidator(wxFILTER_NUMERIC,
+												 &endpt2_xstr));
+	flex_sizer->Add(endpt2_xbox);
+	endpt2_ybox = new wxTextCtrl(TED1DPANEL, ID_ENDPT2_YBOX, wxT(""),
+								 /* wxString::Format("%f", mTarget->End.y), */
+								 wxDefaultPosition, wxDefaultSize,
+								 wxTE_PROCESS_ENTER,
+								 wxTextValidator(wxFILTER_NUMERIC,
+												 &endpt2_ystr));
+	flex_sizer->Add(endpt2_ybox);
+	endpt2_zbox = new wxTextCtrl(TED1DPANEL, ID_ENDPT2_ZBOX, wxT(""),
+								 /* wxString::Format("%f", mTarget->End.z), */
+								 wxDefaultPosition, wxDefaultSize,
+								 wxTE_PROCESS_ENTER,
+								 wxTextValidator(wxFILTER_NUMERIC,
+												 &endpt2_zstr));
+	flex_sizer->Add(endpt2_zbox);
+
+	wxBoxSizer* itemBoxSizer84 = new wxBoxSizer(wxHORIZONTAL);
+	mainSizer->Add(itemBoxSizer84, 0, wxALIGN_CENTER|wxALL, 5);
+	wxBoxSizer* itemBoxSizer85 = new wxBoxSizer(wxVERTICAL);
+	itemBoxSizer84->Add(itemBoxSizer85, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer88 = new wxBoxSizer(wxVERTICAL);
+	itemBoxSizer84->Add(itemBoxSizer88, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mExportBut = new wxButton(TED1DPANEL, ID_SURFACE_EXPORT_BUT, _("Export..."), wxDefaultPosition, wxDefaultSize, 0);
+
+	if (mTarget->ExportPossible())
+		mExportBut->Enable();
+	else
+		mExportBut->Disable();
+
+	itemBoxSizer88->Add(mExportBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
+	mUpdateBut = new wxButton(TED1DPANEL, ID_SURFACE_UPDATE_BUT, _("Update"), wxDefaultPosition, wxDefaultSize, 0);
+	mUpdateBut->SetDefault();
+	itemBoxSizer88->Add(mUpdateBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+}
+
+void TEDensity1DSurfPane::TargetToPane(void) {
+	TargetOrbSet = mTarget->getTargetOrbSet();
+	NumGridPoints = mTarget->GetNumGridPoints();
+	mTarget->GetPosColor(&PosColor);
+	MaxContourValue = mTarget->GetMaxValue();
+	Scale = mTarget->GetScale();
+	Visible = mTarget->GetVisibility();
+	AllFrames = (mTarget->GetSurfaceID() != 0);
+	Start = mTarget->Start;
+	End = mTarget->End;
+	UpdateTest = false;
+}
+
+bool TEDensity1DSurfPane::UpdateNeeded(void) {
+	bool result = UpdateTest;
+
+	if (Visible != mTarget->GetVisibility()) result = true;
+	if (NumGridPoints != mTarget->GetNumGridPoints()) result = true;
+	if (MaxContourValue != mTarget->GetMaxValue()) result = true;
+	if (Scale != mTarget->GetScale()) result = true;
+	if (TargetOrbSet != mTarget->getTargetOrbSet()) result = true;
+	if (!result) {
+		RGBColor	testColor;
+		mTarget->GetPosColor(&testColor);
+		if ((PosColor.red != testColor.red)||(PosColor.green!=testColor.green)||
+				(PosColor.blue!=testColor.blue)) result=true;
+	}
+
+#define CHECK_ENDPOINT(coordinate) \
+	if (coordinate != mTarget->coordinate) { \
+		result = true; \
+	}
+
+	CHECK_ENDPOINT(Start.x)
+	CHECK_ENDPOINT(Start.y)
+	CHECK_ENDPOINT(Start.z)
+	CHECK_ENDPOINT(End.x)
+	CHECK_ENDPOINT(End.y)
+	CHECK_ENDPOINT(End.z)
+
+#undef CHECK_ENDPOINT
+
+	return result;
+}
+
+void TEDensity1DSurfPane::OnUpdate(wxCommandEvent &event) {
+
+	bool updateGrid = UpdateTest;
+	if (TargetOrbSet != mTarget->getTargetOrbSet()) {
+		mTarget->setTargetOrbSet(TargetOrbSet);
+		updateGrid = true;
+	}
+	if (NumGridPoints != mTarget->GetNumGridPoints()) {
+		mTarget->SetNumGridPoints(NumGridPoints);
+		updateGrid = true;
+	}
+
+	mTarget->SetVisibility(Visible);
+	mTarget->SetPosColor(&PosColor);
+	mTarget->SetMaxValue(MaxContourValue);
+	mTarget->SetScale(Scale);
+
+#define CHECK_ENDPOINT(coordinate) \
+	if (coordinate != mTarget->coordinate) { \
+		mTarget->coordinate = coordinate; \
+		updateGrid = true; \
+	}
+
+	CHECK_ENDPOINT(Start.x)
+	CHECK_ENDPOINT(Start.y)
+	CHECK_ENDPOINT(Start.z)
+	CHECK_ENDPOINT(End.x)
+	CHECK_ENDPOINT(End.y)
+	CHECK_ENDPOINT(End.z)
+
+#undef CHECK_ENDPOINT
+
+	MoleculeData * mData = owner->GetMoleculeData();
+	if (AllFrames != (mTarget->GetSurfaceID() != 0)) {	//update all frames
+		long SurfaceID;
+		Frame *	lFrame = mData->GetFirstFrame();
+		if (AllFrames) {	//adding the surface to all frames
+			SurfaceID = mTarget->SetSurfaceID();
+			while (lFrame) {
+				if (lFrame != mData->GetCurrentFramePtr()) {
+					TEDensity1DSurface * NewSurface = new TEDensity1DSurface(mTarget);
+					lFrame->AppendSurface(NewSurface);
+				}
+				lFrame = lFrame->GetNextFrame();
+			}
+		} else {			//deleting the surface from other frames
+			SurfaceID = mTarget->GetSurfaceID();
+			mTarget->SetSurfaceID(0);	//Unmark this frames surface so it doesn't get deleted
+			while (lFrame) {
+				lFrame->DeleteSurfaceWithID(SurfaceID);
+				lFrame = lFrame->GetNextFrame();
+			}
+		}
+	} else if (AllFrames) {
+		long SurfaceID = mTarget->GetSurfaceID();
+		Frame * lFrame = mData->GetFirstFrame();
+		while (lFrame) {
+			if (lFrame != mData->GetCurrentFramePtr()) {
+				Surface * temp = lFrame->GetSurfaceWithID(SurfaceID);
+				TEDensity1DSurface * lSurf = NULL;
+				if (temp)
+					if (temp->GetSurfaceType() == kTotalDensity1D)
+						lSurf = (TEDensity1DSurface *) temp;
+				if (lSurf) {
+					lSurf->UpdateData(mTarget);
+					if (updateGrid) lSurf->FreeGrid();
+				}
+			}
+			lFrame = lFrame->GetNextFrame();
+		}
+	}	//if the grid needs updating, release the current grid to mark it for recalc.
+	if (updateGrid) mTarget->FreeGrid();
+	UpdateTest = false;
+	setUpdateButton();
+	mExportBut->Enable();
+	owner->SurfaceUpdated();
+}
+
+void TEDensity1DSurfPane::refreshControls() {
+	mOrbSetChoice->SetSelection(TargetOrbSet);
+	/* mOrbColor1->setColor(&PosColor); */
+	mNumGridPntSld->SetValue(NumGridPoints);
+
+	clamp_box->SetValue(wxString::Format("%f", mTarget->GetMaxValue()));
+	scale_box->SetValue(wxString::Format("%f", mTarget->GetScale()));
+	endpt1_xbox->SetValue(wxString::Format("%f", mTarget->Start.x));
+	endpt1_ybox->SetValue(wxString::Format("%f", mTarget->Start.y));
+	endpt1_zbox->SetValue(wxString::Format("%f", mTarget->Start.z));
+	endpt2_xbox->SetValue(wxString::Format("%f", mTarget->End.x));
+	endpt2_ybox->SetValue(wxString::Format("%f", mTarget->End.y));
+	endpt2_zbox->SetValue(wxString::Format("%f", mTarget->End.z));
+}
+/*!
+ * Get bitmap resources
+ */
+
+wxBitmap TEDensity1DSurfPane::GetBitmapResource(const wxString& name) {
+	// Bitmap retrieval
+	////@begin Orbital3D bitmap retrieval
+	wxUnusedVar(name);
+	return wxNullBitmap;
+	////@end Orbital3D bitmap retrieval
+}
+
+/*!
+ * Get icon resources
+ */
+
+wxIcon TEDensity1DSurfPane::GetIconResource(const wxString& name) {
+	// Icon retrieval
+	////@begin Orbital3D icon retrieval
+	wxUnusedVar(name);
+	return wxNullIcon;
+	////@end Orbital3D icon retrieval
+}
+
 void TEDensity2DSurfPane::CreateControls() {
 	TEDensity2DSurfPane * TED2DPANEL = this;	//this is here just to match the code below from DialogBlocks
 
@@ -3108,6 +3525,7 @@ void TEDensity2DSurfPane::CreateControls() {
 	mUpdateBut->SetDefault();
 	itemBoxSizer88->Add(mUpdateBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 }
+
 void TEDensity2DSurfPane::TargetToPane(void) {
 	TargetOrbSet = mTarget->getTargetOrbSet();
 	NumGridPoints = mTarget->GetNumGridPoints();
@@ -3120,6 +3538,7 @@ void TEDensity2DSurfPane::TargetToPane(void) {
 	AllFrames = (mTarget->GetSurfaceID() != 0);
 	UpdateTest = false;
 }
+
 bool TEDensity2DSurfPane::UpdateNeeded(void) {
 	bool result = UpdateTest;
 
@@ -3138,6 +3557,7 @@ bool TEDensity2DSurfPane::UpdateNeeded(void) {
 	}
 	return result;
 }
+
 void TEDensity2DSurfPane::OnUpdate(wxCommandEvent &event) {
 	SetNumContoursText();
 	SetContourValueText();

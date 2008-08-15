@@ -27,6 +27,7 @@
 #include "build_palette.h"
 #include "Math3D.h"
 #include "VirtualSphere.h"
+#include "SurfaceTypes.h"
 
 /* ------------------------------------------------------------------------- */
 
@@ -1367,6 +1368,10 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 		}
 
 	}
+
+	else if (selected_type == MMP_SURFACE) {
+		HandleEditing(event, curr_mouse, prev_mouse);
+	}
 	
 	// Otherwise the user must be transforming the whole scene.
 	else {
@@ -1410,6 +1415,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 	curr_mouse = event.GetPosition();
 	prev_mouse = curr_mouse;
+	was_zooming = false;
 
 #if wxCHECK_VERSION(2,9,0)
 	SetCurrent(*context);
@@ -1825,13 +1831,13 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
 	
-	if (selected_type != MMP_ATOM && selected_type != MMP_BOND) {
-		mSelectState = -1;
-		return;
-	}
+	/* if (selected_type != MMP_ATOM && selected_type != MMP_BOND) { */
+		/* mSelectState = -1; */
+		/* return; */
+	/* } */
 
 	// If an atom is clicked on...
-	else if (selected_type == MMP_ATOM) {
+	if (selected_type == MMP_ATOM) {
 
 		GLdouble newX, newY, newZ;
 
@@ -2088,6 +2094,77 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 		}
 	}
 
+	// If the user clicked on a 1-D surface, he can move the end points.
+	else if (selected_type == MMP_SURFACE) {
+
+		GLdouble newX, newY, newZ;
+		CPoint3D *end_point;
+		CPoint3D *other_end_point;
+
+		int i = 0;
+		Surface *lSurface = mMainData->cFrame->SurfaceList;
+		while (lSurface) {
+			if (i == selected) {
+				break;
+			}
+			++i;
+		}
+
+		Surf1DBase *surf1D = dynamic_cast<Surf1DBase *>(lSurface);
+
+		if (!surf1D || selected_site == -1) {
+			return;
+		}
+
+		if (selected_site == 0) {
+			end_point = &surf1D->Start;
+			other_end_point = &surf1D->End;
+		} else {
+			end_point = &surf1D->End;
+			other_end_point = &surf1D->Start;
+		}
+
+		GLdouble tmpX, tmpY, tmpZ;
+		findWinCoord(end_point->x, end_point->y, end_point->z,
+					 tmpX, tmpY, tmpZ);
+
+		// If shift is held when an atom is clicked on, we want to
+		// change the depths of either the clicked on or selected
+		// atoms.  Also do this for the middle mouse button.
+		if (event.ShiftDown() || event.MiddleIsDown() || was_zooming) {
+			float depth_offset;
+			float dy = curr_pt.y - prev_pt.y;
+			depth_offset = dy / (10.0f * height);
+			findReal3DCoord(tmpX, tmpY, tmpZ - depth_offset, newX, newY, newZ);
+			was_zooming = true;
+		}
+
+		// If no shift, just translate.
+		else {
+			findReal3DCoord(curr_pt.x, curr_pt.y, tmpZ, newX, newY, newZ);
+		}
+
+		CPoint3D new_coord((float) newX, (float) newY, (float) newZ);
+		CPoint3D offset;
+
+		offset = new_coord - *end_point;
+		*end_point += offset;
+		if (event.ControlDown() || selected_site == -1) {
+			*other_end_point += offset;
+		}
+		surf1D->FreeGrid();
+
+		MolWin->AtomsChanged(false, false);
+		
+		Draw();
+		return;
+	}
+
+	// Other
+	else {
+		return;
+	}
+
 	lFrame->SetTargetAtom(selected);
 	lFrame->SetBonds(Prefs, true, true);
 	did_edit = true;
@@ -2097,7 +2174,6 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	if (MolWin->InSymmetryEditMode()) {
 		select_stack_top = 5;
 	}
-
 }
 			
 void MpGLCanvas::HandleLassoing(wxMouseEvent& event, const wxPoint& curr_pt) {

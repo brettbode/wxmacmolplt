@@ -80,6 +80,12 @@ class SurfacesWindow;
 #define SYMBOL_TED2D_SIZE wxSize(400, 300)
 #define SYMBOL_TED2D_POSITION wxDefaultPosition
 
+#define SYMBOL_TED1D_STYLE wxSUNKEN_BORDER
+#define SYMBOL_TED1D_TITLE _("1D Total Electron Density")
+#define SYMBOL_TED1D_IDNAME ID_MYDIALOG4
+#define SYMBOL_TED1D_SIZE wxSize(400, 300)
+#define SYMBOL_TED1D_POSITION wxDefaultPosition
+
 #define SYMBOL_PARAM_SIZE wxSize(400, 300)
 #define SYMBOL_PARAM_POSITION wxDefaultPosition
 
@@ -127,8 +133,15 @@ class SurfacesWindow;
 #define ID_3D_COLOR_SURF_CHECK 10110
 #define ID_USERGB_COLOR_CHECK 10111
 #define ID_3D_MAX_MAP_EDIT 10112
+#define ID_SCALE_EDIT 10113
 #define ID_DISPLAY_PLANE_CHECKBOX 10244
 #define ID_INVERT_RGB_CHECK 10245
+#define ID_ENDPT1_XBOX 10246
+#define ID_ENDPT1_YBOX 10247
+#define ID_ENDPT1_ZBOX 10248
+#define ID_ENDPT2_XBOX 10246
+#define ID_ENDPT2_YBOX 10247
+#define ID_ENDPT2_ZBOX 10248
 
 ////@end control identifiers
 
@@ -310,6 +323,52 @@ class OrbSurfacePane {
 	private:
 		OrbSurfBase* mTarget;
 		SurfacesWindow * myowner;
+};
+
+class Surface1DPane : public BaseSurfacePane {
+
+	public:
+		Surface1DPane() {}
+		Surface1DPane(wxWindow* parent, Surf1DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
+		~Surface1DPane();
+
+		void OnPosColorChange(wxCommandEvent & event);
+		void OnNegColorChange(wxCommandEvent & event);
+		void OnChangeEndpoint(wxCommandEvent &event);
+		void OnIdle(wxIdleEvent& WXUNUSED(event));
+		void OnChangeClamp(wxCommandEvent &event);
+		void OnChangeScale(wxCommandEvent &event);
+
+	protected:
+
+		colorArea* mOrbColor1;
+		colorArea* mOrbColor2;
+		RGBColor PosColor;
+		RGBColor NegColor;
+		wxTextCtrl *endpt1_xbox;
+		wxTextCtrl *endpt1_ybox;
+		wxTextCtrl *endpt1_zbox;
+		wxTextCtrl *endpt2_xbox;
+		wxTextCtrl *endpt2_ybox;
+		wxTextCtrl *endpt2_zbox;
+		wxTextCtrl *clamp_box;
+		wxTextCtrl *scale_box;
+		wxString endpt1_xstr;
+		wxString endpt1_ystr;
+		wxString endpt1_zstr;
+		wxString endpt2_xstr;
+		wxString endpt2_ystr;
+		wxString endpt2_zstr;
+
+		CPoint3D Start, End;
+		float MaxContourValue;
+		float Scale;
+
+	private:
+
+		Surf1DBase* mTarget;
+
+	DECLARE_EVENT_TABLE()
 };
 
 /*!
@@ -663,6 +722,40 @@ private:
 	bool				useMultValue;
 	bool				squareValues;
 	float				MultValue;
+	
+    DECLARE_EVENT_TABLE()
+};
+
+class TEDensity1DSurfPane : public Surface1DPane
+{    
+	
+public:
+    /// Constructors
+    TEDensity1DSurfPane() { }
+    TEDensity1DSurfPane(wxWindow* parent, TEDensity1DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_TED1D_IDNAME, const wxPoint& pos = SYMBOL_TED1D_POSITION, const wxSize& size = SYMBOL_TED1D_SIZE, long style = SYMBOL_TED1D_STYLE);
+    ~TEDensity1DSurfPane();
+	
+    virtual void TargetToPane();
+    virtual void refreshControls();
+	
+    /// Creates the controls and sizers
+    void CreateControls();
+	
+    /// Retrieves bitmap resources
+    wxBitmap GetBitmapResource(const wxString& name);
+	
+    /// Retrieves icon resources
+    wxIcon GetIconResource(const wxString& name);
+	
+    /// Should we show tooltips?
+    static bool ShowToolTips() {return true;};
+	
+private:
+	virtual bool UpdateNeeded(void);
+
+	void OnUpdate(wxCommandEvent &event);
+
+    TEDensity1DSurface*	mTarget;
 	
     DECLARE_EVENT_TABLE()
 };

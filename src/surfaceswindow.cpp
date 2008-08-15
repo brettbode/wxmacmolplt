@@ -38,12 +38,13 @@
 
 #define ID_2D_ORBITAL_PANE 1
 #define ID_3D_ORBITAL_PANE 2
-#define ID_2D_TE_DENSITY_PANE 3
-#define ID_3D_TE_DENSITY_PANE 4
-#define ID_2D_ME_POTENTIAL_PANE 5
-#define ID_3D_ME_POTENTIAL_PANE 6
-#define ID_2D_FILE_PANE 7
-#define ID_3D_FILE_PANE 8
+#define ID_1D_TE_DENSITY_PANE 3
+#define ID_2D_TE_DENSITY_PANE 4
+#define ID_3D_TE_DENSITY_PANE 5
+#define ID_2D_ME_POTENTIAL_PANE 6
+#define ID_3D_ME_POTENTIAL_PANE 7
+#define ID_2D_FILE_PANE 8
+#define ID_3D_FILE_PANE 9
 
 ////@begin XPM images
 ////@end XPM images
@@ -218,6 +219,11 @@ void SurfacesWindow::addNewPane(int type) {
 			newSurface = new Orb3DSurface(mPrefs);
 			tempPane = new Orbital3DSurfPane(book, dynamic_cast<Orb3DSurface*>(newSurface), this);
 			break;
+
+		case ID_1D_TE_DENSITY_PANE:
+			newSurface = new TEDensity1DSurface(mPrefs);
+			tempPane = new TEDensity1DSurfPane(book, dynamic_cast<TEDensity1DSurface*>(newSurface), this);
+			break;
 			
 		case ID_2D_TE_DENSITY_PANE:
 			newSurface = new TEDensity2DSurface(mPrefs);
@@ -307,6 +313,9 @@ void SurfacesWindow::Reset(void) {
 						break;
 					case kTotalDensity2D:
 						tempPane = new TEDensity2DSurfPane(book, dynamic_cast<TEDensity2DSurface*>(lSurf), this);
+						break;
+					case kTotalDensity1D:
+						tempPane = new TEDensity1DSurfPane(book, dynamic_cast<TEDensity1DSurface*>(lSurf), this);
 						break;
 					case kMEP2D:
 						tempPane = new MEP2DSurfPane(book, dynamic_cast<MEP2DSurface*>(lSurf), this);
@@ -446,10 +455,12 @@ int SurfacesWindow::selectSurfaceType() {
 	}
 
 	if (mData->TotalDensityPossible()) {
+		allOptions.push_back(_T("1D Total Electron Density"));
 		allOptions.push_back(_T("2D Total Electron Density"));
 		allOptions.push_back(_T("3D Total Electron Density"));
-		numOptions += 2;
+		numOptions += 3;
 	}
+
 	if (mData->MEPCalculationPossible()) {
 		allOptions.push_back(_T("2D Molecular Electrostatic Potential"));
 		allOptions.push_back(_T("3D Molecular Electrostatic Potential"));
@@ -473,6 +484,8 @@ int SurfacesWindow::selectSurfaceType() {
 		return ID_2D_ORBITAL_PANE;
 	if (temp.Cmp(wxT("3D Orbital")) == 0)
 		return ID_3D_ORBITAL_PANE;
+	if (temp.Cmp(wxT("1D Total Electron Density")) == 0)
+		return ID_1D_TE_DENSITY_PANE;
 	if (temp.Cmp(wxT("2D Total Electron Density")) == 0)
 		return ID_2D_TE_DENSITY_PANE;
 	if (temp.Cmp(wxT("3D Total Electron Density")) == 0)

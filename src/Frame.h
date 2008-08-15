@@ -52,6 +52,7 @@ class Frame {
 		friend class Orb3DSurface;
 		friend class TEDensity3DSurface;
 		friend class TEDensity2DSurface;
+		friend class TEDensity1DSurface;
 		friend class MOPacInternals;
 		friend class DataGroup;
 		friend class ImportVecDlg;

@@ -169,7 +169,7 @@ typedef struct {		/* Struct to make matrix copying more efficient */
 	Matrix4D a;
 } MatrixAsStruct;
 
-void CopyMatrix (Matrix4D fromMatrix, Matrix4D toMatrix)
+void CopyMatrix (const Matrix4D fromMatrix, Matrix4D toMatrix)
 {
 	* (MatrixAsStruct *) toMatrix = * (MatrixAsStruct *) fromMatrix;
 }
@@ -306,68 +306,6 @@ void SetRotationMatrix (Matrix4D rotationMatrix, const CPoint3D *op, const CPoin
 	Normalize3D(&a);
 	float degrees = acos(c) * 180.0f / kPi;
 	RotateAroundAxis(rotationMatrix, a, degrees);
-	// printf("rotationMatrix[0][<0-15>]:\n" 
-		   // "%f %f %f %f\n" 
-		   // "%f %f %f %f\n" 
-		   // "%f %f %f %f\n" 
-		   // "%f %f %f %f\n", 
-		   // rotationMatrix[0][0], rotationMatrix[1][0], 
-		   // rotationMatrix[2][0], rotationMatrix[3][0], 
-		   // rotationMatrix[0][1], rotationMatrix[1][1], 
-		   // rotationMatrix[2][1], rotationMatrix[3][1], 
-		   // rotationMatrix[0][2], rotationMatrix[1][2], 
-		   // rotationMatrix[2][2], rotationMatrix[3][2], 
-		   // rotationMatrix[0][3], rotationMatrix[1][3], 
-		   // rotationMatrix[2][3], rotationMatrix[3][3]); 
-
-#if 0
-	float t;
-	if (s > 0) {
-		a.x /= s;
-		a.y /= s;
-		a.z /= s;
-		t = 1 - c;
-
-#define ax	(-(a.x))
-#define ay	(-(a.y))
-#define az	(-(a.z))
-#define ax2	(ax * ax)
-#define ay2	(ay * ay)
-#define az2	(az * az)
-		rotationMatrix[0][0] = t*ax2+c;
-		rotationMatrix[1][0] = t*ax*ay+s*az;
-		rotationMatrix[2][0] = t*ax*az-s*ay;
-
-		rotationMatrix[0][1] = t*ax*ay-s*az;
-		rotationMatrix[1][1] = t*ay2+c;
-		rotationMatrix[2][1] = t*ay*az+s*ax;
-
-		rotationMatrix[0][2] = t*ax*az+s*ay;
-		rotationMatrix[1][2] = t*ay*az-s*ax;
-		rotationMatrix[2][2] = t*az2+c;
-#undef ax
-#undef ay
-#undef az
-#undef ax2
-#undef ay2
-#undef az2
-		// OrthogonalizeRotationMatrix(rotationMatrix); 
-
-	} else {
-
-		InitRotationMatrix(rotationMatrix);
-		// if (c < 0.0f) { 
-			// rotationMatrix[0][0] *= -1; 
-			// rotationMatrix[1][1] *= -1; 
-			// rotationMatrix[2][2] *= -1; 
-		// } 
-	}
-
-	rotationMatrix[0][3] = rotationMatrix[1][3] = rotationMatrix[2][3] = 
-	rotationMatrix[3][0] = rotationMatrix[3][1] = rotationMatrix[3][2] = 0.0;
-	rotationMatrix[3][3] = 1.0;
-#endif
-
 }
 
 void RotateAroundAxis(Matrix4D m, const CPoint3D& axis, float degrees) {

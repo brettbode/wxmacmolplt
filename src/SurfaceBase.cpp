@@ -211,6 +211,41 @@ void Surface::Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Or
 	}
 	if (ival) Buffer->PutText("\r");
 }
+
+Surf1DBase::Surf1DBase(WinPrefs *Prefs) {
+	Grid = NULL;
+	GridAllocation = 0;
+	SurfaceOptions * lOpts = Prefs->GetSurfaceOptions();
+	NumGridPoints = lOpts->GetNumGridPoints();
+	MaxContourValue = lOpts->GetMaxContour();
+	SurfOptions = 0;
+	SetContourBothPosNeg(true);
+	lOpts->GetPosColor(&PosColor);
+	lOpts->GetNegColor(&NegColor);
+	Start = CPoint3D(0.0f, 0.0f, 0.0f);
+	End = CPoint3D(1.0f, 0.0f, 0.0f);
+	Scale = 1.0f;
+}
+
+Surf1DBase::Surf1DBase() {
+	Grid = NULL;
+	GridAllocation = 0;
+	SetContourBothPosNeg(true);
+	Start = CPoint3D(0.0f, 0.0f, 0.0f);
+	End = CPoint3D(1.0f, 0.0f, 0.0f);
+	Scale = 1.0f;
+	MaxContourValue = 100.0f;
+}
+
+Surf1DBase::~Surf1DBase() {
+	FreeGrid();
+}
+
+void Surf1DBase::SetNumGridPoints(long newNum) {
+	long OldNum = NumGridPoints;
+	if (newNum > 1) NumGridPoints = newNum;
+}
+
 /* member functions for the base 2D surface class */
 
 Surf2DBase::Surf2DBase(WinPrefs * Prefs) {
@@ -281,6 +316,23 @@ void Surf2DBase::RotateSurface(Matrix4D RotationMatrix) {
 	Rotate3DOffset(RotationMatrix, YInc, &temp);
 	YInc = temp;
 }
+
+void Surf1DBase::Export(BufferFile * Buffer, exportFileType eft) {
+	float * lGrid;
+	char * label = GetLabel();
+#ifdef UseHandles
+	HLock(Grid);
+	lGrid = (float *) *Grid;
+#else
+	lGrid = Grid;
+#endif
+	/* Surface::Export1D(lGrid, NumGridPoints, &Origin, &XInc, &YInc, label, Buffer); */
+	/* if (label) delete [] label; */
+#ifdef UseHandles
+	HUnlock(Grid);
+#endif
+}
+
 void Surf2DBase::Export(BufferFile * Buffer, exportFileType eft) {
 	float * lGrid;
 	char * label = GetLabel();
@@ -1952,8 +2004,8 @@ void SortContourPoints(long *Points, unsigned char index, long *VertexList, long
 						Normals[4].y = Grid3D[n+NumYGridPoints*NumZGridPoints] - Grid3D[n+(1+NumYGridPoints)*NumZGridPoints];
 						Normals[4].z = Grid3D[n+NumYGridPoints*NumZGridPoints] - Grid3D[n+NumYGridPoints*NumZGridPoints+1];
 						if (fabs(Grid3D[n+NumYGridPoints*NumZGridPoints]) > fabs(Grid3D[n])) Normals[4].x *= -1.0;
-						if (fabs(Grid3D[n+NumYGridPoints*NumZGridPoints]) > fabs(Grid3D[n+(1+NumYGridPoints)*NumZGridPoints])) Normals[4].y *= -1.0;
-						if (fabs(Grid3D[n+NumYGridPoints*NumZGridPoints]) > fabs(Grid3D[n+NumYGridPoints*NumZGridPoints+1])) Normals[4].z *= -1.0;
+						if (fabs(Grid3D[n+NumYGridPoints*NumZGridPoints]) > fabs(Grid3D[n+(1+NumYGridPoints)*NumZGridPoints])) Nont[0]*TestPoint[3])<0.0) {
+					bs(Grid3D[n+NumYGridPoints*NumZGridPoints]) > fabs(Grid3D[n+NumYGridPoints*NumZGridPoints+1])) Normals[4].z *= -1.0;
 						if (XGridValue < 0.0) Normals[4].x *= -1.0;
 						if (YGridValue < 0.0) Normals[4].y *= -1.0;
 						if (ZGridValue < 0.0) Normals[4].z *= -1.0;

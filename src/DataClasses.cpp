@@ -523,6 +523,7 @@ void General3DSurface::WriteXML(XMLElement * parent) const {
 	
 	Surf3DBase::Write3DXML(sElem, true);
 }
+
 General3DSurface::General3DSurface(XMLElement * sxml) {
 	XMLElement * child = sxml->getFirstChild();
 	while (child) {
@@ -537,6 +538,40 @@ General3DSurface::General3DSurface(XMLElement * sxml) {
 		child = child->getNextChild();
 	}
 }
+
+void TEDensity1DSurface::WriteXML(XMLElement * parent) const {
+	XMLElement * sElem = parent->addChildElement(CML_convert(MMP_SurfaceDescription));
+	sElem->addAttribute(CML_convert(dataTypeAttr), SurfaceTypeToText(kTotalDensity1D));
+	
+	Surf1DBase::Write1DXML(sElem, false);
+	if (OrbSet >= 0) {
+		std::ostringstream b;
+		b << OrbSet;
+		sElem->addChildElement(CML_convert(MMP_OrbSurfTargetSet), b.str().c_str());
+	}
+}
+
+TEDensity1DSurface::TEDensity1DSurface(XMLElement * sxml) {
+	XMLElement * child = sxml->getFirstChild();
+	while (child) {
+		MMP_SurfaceNameSpace type;
+		if (CML_convert(child->getName(), type)) {
+			switch (type) {
+				case MMP_1DSurface:
+					Surf1DBase::Read1DXML(child);
+					break;
+				case MMP_OrbSurfTargetSet:
+				{
+					long tl;
+					if (child->getLongValue(tl))
+						OrbSet = tl;
+				}
+			}
+		}
+		child = child->getNextChild();
+	}
+}
+
 void TEDensity2DSurface::WriteXML(XMLElement * parent) const {
 	XMLElement * sElem = parent->addChildElement(CML_convert(MMP_SurfaceDescription));
 	sElem->addAttribute(CML_convert(dataTypeAttr), SurfaceTypeToText(kTotalDensity2D));
@@ -548,6 +583,7 @@ void TEDensity2DSurface::WriteXML(XMLElement * parent) const {
 		sElem->addChildElement(CML_convert(MMP_OrbSurfTargetSet), b.str().c_str());
 	}
 }
+
 TEDensity2DSurface::TEDensity2DSurface(XMLElement * sxml) {
 	XMLElement * child = sxml->getFirstChild();
 	while (child) {
@@ -568,6 +604,7 @@ TEDensity2DSurface::TEDensity2DSurface(XMLElement * sxml) {
 		child = child->getNextChild();
 	}
 }
+
 void TEDensity3DSurface::WriteXML(XMLElement * parent) const {
 	XMLElement * sElem = parent->addChildElement(CML_convert(MMP_SurfaceDescription));
 	sElem->addAttribute(CML_convert(dataTypeAttr), SurfaceTypeToText(kTotalDensity3D));
@@ -674,6 +711,152 @@ MEP3DSurface::MEP3DSurface(XMLElement * sxml) {
 		child = child->getNextChild();
 	}
 }
+
+void Surf1DBase::Write1DXML(XMLElement *parent, bool writeGrid) const {
+	XMLElement * sElem = parent->addChildElement(CML_convert(MMP_1DSurface));
+	
+	Surface::WriteXML(sElem);
+	
+	char line[kMaxLineLength];
+
+	snprintf(line, kMaxLineLength, "%f", GridMax);
+	sElem->addChildElement(CML_convert(MMP_SurfGridMax), line);
+	snprintf(line, kMaxLineLength, "%f", GridMin);
+	sElem->addChildElement(CML_convert(MMP_SurfGridMin), line);
+	snprintf(line, kMaxLineLength, "%ld", NumGridPoints);
+	sElem->addChildElement(CML_convert(MMP_SurfNumGridPoints), line);
+	snprintf(line, kMaxLineLength, "%f", MaxContourValue);
+	sElem->addChildElement(CML_convert(MMP_SurfMaxContourValue), line);
+
+	XMLElement * color = sElem->addChildElement(CML_convert(MMP_SurfPosColor));
+	snprintf(line, kMaxLineLength, "%f", (PosColor.red/65535.0));
+	color->addAttribute(MMPPref_convert(MMPPref_ColorRed), line);
+	snprintf(line, kMaxLineLength, "%f", (PosColor.green/65535.0));
+	color->addAttribute(MMPPref_convert(MMPPref_ColorGreen), line);
+	snprintf(line, kMaxLineLength, "%f", (PosColor.blue/65535.0));
+	color->addAttribute(MMPPref_convert(MMPPref_ColorBlue), line);
+
+	color = sElem->addChildElement(CML_convert(MMP_SurfNegColor));
+	snprintf(line, kMaxLineLength, "%f", (NegColor.red/65535.0));
+	color->addAttribute(MMPPref_convert(MMPPref_ColorRed), line);
+	snprintf(line, kMaxLineLength, "%f", (NegColor.green/65535.0));
+	color->addAttribute(MMPPref_convert(MMPPref_ColorGreen), line);
+	snprintf(line, kMaxLineLength, "%f", (NegColor.blue/65535.0));
+	color->addAttribute(MMPPref_convert(MMPPref_ColorBlue), line);
+
+	sElem->addChildElement(CML_convert(MMP_SurfPosNegContours), (ContourBothPosNeg()?trueXML:falseXML));
+
+	XMLElement *endpoint = sElem->addChildElement(CML_convert(MMP_SurfEndpoint1));
+	snprintf(line, kMaxLineLength, "%f", Start.x);
+	endpoint->addAttribute(CML_convert(X3Attr), line);
+	snprintf(line, kMaxLineLength, "%f", Start.y);
+	endpoint->addAttribute(CML_convert(Y3Attr), line);
+	snprintf(line, kMaxLineLength, "%f", Start.z);
+	endpoint->addAttribute(CML_convert(Z3Attr), line);
+
+	endpoint = sElem->addChildElement(CML_convert(MMP_SurfEndpoint2));
+	snprintf(line, kMaxLineLength, "%f", End.x);
+	endpoint->addAttribute(CML_convert(X3Attr), line);
+	snprintf(line, kMaxLineLength, "%f", End.y);
+	endpoint->addAttribute(CML_convert(Y3Attr), line);
+	snprintf(line, kMaxLineLength, "%f", End.z);
+	endpoint->addAttribute(CML_convert(Z3Attr), line);
+	
+	if (writeGrid && Grid) {
+		std::ostringstream buf;
+		long len = NumGridPoints*NumGridPoints;
+#ifdef UseHandles
+		HLock(Grid);
+		for (int i=0; i<len; i++)
+			buf << ((float *)(*Grid))[i] << " ";
+		HUnlock(Grid);
+#else
+		for (int i=0; i<len; i++)
+			buf << Grid[i] << " ";
+#endif
+		sElem->addChildElement(CML_convert(MMP_SurfGrid), buf.str().c_str());
+	}
+}
+
+void Surf1DBase::Read1DXML(XMLElement *parent) {
+	XMLElement * child = parent->getFirstChild();
+	while (child) {
+		MMP_SurfaceNameSpace type;
+		if (CML_convert(child->getName(), type)) {
+			float tf;
+			double td;
+			long tl;
+			bool tb;
+			switch (type) {
+				case MMP_BaseSurface:
+					Surface::ReadXML(child);
+					break;
+				case MMP_SurfGridMax:
+					if (child->getDoubleValue(td))
+						GridMax = td;
+					break;
+				case MMP_SurfGridMin:
+					if (child->getDoubleValue(td))
+						GridMin = td;
+					break;
+				case MMP_SurfNumGridPoints:
+					if (child->getLongValue(tl))
+						NumGridPoints = tl;
+					break;
+				case MMP_SurfMaxContourValue:
+					if (child->getDoubleValue(td))
+						MaxContourValue = td;
+					break;
+				case MMP_SurfPosColor:
+					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), tf))
+						PosColor.red = (unsigned short)(tf*65535.0);
+					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), tf))
+						PosColor.green = (unsigned short)(tf*65535.0);
+						if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), tf))
+							PosColor.blue = (unsigned short)(tf*65535.0);
+							break;
+				case MMP_SurfNegColor:
+					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), tf))
+						NegColor.red = (unsigned short)(tf*65535.0);
+					if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), tf))
+						NegColor.green = (unsigned short)(tf*65535.0);
+						if (child->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), tf))
+							NegColor.blue = (unsigned short)(tf*65535.0);
+							break;
+				case MMP_SurfEndpoint1:
+					if (child->getAttributeValue(CML_convert(X3Attr), tf))
+						Start.x = tf;
+					if (child->getAttributeValue(CML_convert(Y3Attr), tf))
+						Start.y = tf;
+					if (child->getAttributeValue(CML_convert(Z3Attr), tf))
+						Start.z = tf;
+				case MMP_SurfEndpoint2:
+					if (child->getAttributeValue(CML_convert(X3Attr), tf))
+						End.x = tf;
+					if (child->getAttributeValue(CML_convert(Y3Attr), tf))
+						End.y = tf;
+					if (child->getAttributeValue(CML_convert(Z3Attr), tf))
+						End.z = tf;
+				case MMP_SurfGrid:
+					if (NumGridPoints > 0) {
+						long count = NumGridPoints*NumGridPoints;
+						AllocateGrid(count);
+#ifdef UseHandles
+						HLock(Grid);
+						long test = child->getFloatArray(count, (float *) (*Grid));
+						HUnlock(Grid);
+#else
+						long test = child->getFloatArray(count, Grid);
+#endif
+						if (test != count) FreeGrid();
+					}
+					break;
+			}
+		}
+		child = child->getNextChild();
+	}
+}
+
 void Surf2DBase::Write2DXML(XMLElement * parent, bool writeGrid) const {
 	XMLElement * sElem = parent->addChildElement(CML_convert(MMP_2DSurface));
 	
@@ -864,6 +1047,7 @@ void Surf2DBase::Read2DXML(XMLElement * parent) {
 		child = child->getNextChild();
 	}
 }
+
 void Surf3DBase::Write3DXML(XMLElement * parent, bool writeGrid) const {
 	XMLElement * sElem = parent->addChildElement(CML_convert(MMP_3DSurface));
 	
@@ -1322,6 +1506,9 @@ Surface * Surface::ReadSurface(XMLElement * parent) {
 					case kTotalDensity2D:
 						result = new TEDensity2DSurface(parent);
 						break;
+					case kTotalDensity1D:
+						result = new TEDensity1DSurface(parent);
+						break;
 					case kMEP2D:
 						result = new MEP2DSurface(parent);
 						break;
@@ -1576,6 +1763,7 @@ char * General2DSurface::GetLabel(void) {
 	}
 	return Surface::GetLabel();
 }
+
 TEDensity3DSurface::TEDensity3DSurface(WinPrefs * Prefs) : Surf3DBase(Prefs) {
 	MaxMEPValue = 0.1f;
 	OrbSet = -1;
@@ -1592,6 +1780,7 @@ char * TEDensity3DSurface::GetLabel(void) {
 	}
 	return Surface::GetLabel();
 }
+
 void TEDensity3DSurface::UpdateData(TEDensity3DSurface * target) {
 	ID = target->GetSurfaceID();
 	Visible = target->GetVisibility();
@@ -1629,6 +1818,7 @@ TEDensity2DSurface::TEDensity2DSurface(TEDensity2DSurface * target) {
 	Grid = NULL;
 	GridAllocation = 0;
 }
+
 TEDensity2DSurface::TEDensity2DSurface(WinPrefs * Prefs) : Surf2DBase(Prefs) {
 	SetContourBothPosNeg(false);
 	OrbSet = -1;
@@ -1644,6 +1834,7 @@ char * TEDensity2DSurface::GetLabel(void) {
 	}
 	return Surface::GetLabel();
 }
+
 void TEDensity2DSurface::Update(MoleculeData * MainData) {
 	if (Visible) {
 		Progress * lProgress = new Progress;
@@ -1655,6 +1846,7 @@ void TEDensity2DSurface::Update(MoleculeData * MainData) {
 		}
 	}
 }
+
 void TEDensity2DSurface::UpdateData(TEDensity2DSurface * target) {
 	Visible = target->GetVisibility();
 	NumGridPoints = target->GetNumGridPoints();
@@ -1669,6 +1861,68 @@ void TEDensity2DSurface::UpdateData(TEDensity2DSurface * target) {
 	if (Label) {delete[] Label; Label = NULL;}
 	if (!target->DefaultLabel())
 		Label = target->GetLabel();
+}
+
+TEDensity1DSurface::TEDensity1DSurface(WinPrefs * Prefs) :
+	Surf1DBase(Prefs) {
+	OrbSet = -1;
+	SetContourBothPosNeg(false);
+}
+
+char *TEDensity1DSurface::GetLabel() {
+	if (DefaultLabel()) {
+		if (Label) delete[] Label;
+		Label = new char[100];
+		int nchar;
+		sprintf(Label, "1D Total Electron Density%n", &nchar);
+		if (Visible) sprintf(&(Label[nchar]), " Visible");
+	}
+	return Surface::GetLabel();
+}
+
+void TEDensity1DSurface::Update(MoleculeData * MainData) {
+	if (Visible) {
+		Progress * lProgress = new Progress;
+		if (lProgress) {
+			lProgress->ChangeText("Calculating TED Grid...");
+			CalculateMOGrid(MainData, lProgress);
+			delete lProgress;
+		}
+	}
+}
+
+void TEDensity1DSurface::UpdateData(TEDensity1DSurface *target) {
+	Visible = target->GetVisibility();
+	NumGridPoints = target->GetNumGridPoints();
+	/* NumContours = target->GetNumContours(); */
+	MaxContourValue = target->GetMaxValue();
+	target->GetPosColor(&PosColor);
+	/* SurfOptions = target->GetSurfOptions(); */
+	/* target->GetOrigin(&Origin); */
+	/* target->GetXIncrement(&XInc); */
+	/* target->GetYIncrement(&YInc); */
+	target->setTargetOrbSet(OrbSet);
+	if (Label) {delete[] Label; Label = NULL;}
+	if (!target->DefaultLabel())
+		Label = target->GetLabel();
+}
+
+TEDensity1DSurface::TEDensity1DSurface(TEDensity1DSurface *target) {
+	ID = target->GetSurfaceID();
+	Visible = target->GetVisibility();
+	NumGridPoints = target->GetNumGridPoints();
+	MaxContourValue = target->GetMaxValue();
+	target->GetPosColor(&PosColor);
+	/* SurfOptions = target->GetSurfOptions(); */
+	/* target->GetOrigin(&Origin); */
+	/* target->GetXIncrement(&XInc); */
+	/* target->GetYIncrement(&YInc); */
+	OrbSet = target->getTargetOrbSet();
+	if (!target->DefaultLabel())
+		Label = target->GetLabel();
+	NextSurface = NULL;
+	Grid = NULL;
+	GridAllocation = 0;
 }
 
 //Calculate the sum of the squares of the change in position of each atom between

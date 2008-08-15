@@ -388,6 +388,7 @@ class MolDisplayWin : public wxFrame {
 		void menuViewShrink_10(wxCommandEvent &event);
 		void menuViewEnlarge_10(wxCommandEvent &event);
 		void menuViewCenter(wxCommandEvent &event);
+		void menuViewRotateInPlace(const Matrix4D new_m);
 		void menuViewRotateTo_X_axis(wxCommandEvent &event);
 		void menuViewRotateTo_Y_axis(wxCommandEvent &event);
 		void menuViewRotateTo_Z_axis(wxCommandEvent &event);
@@ -650,6 +651,7 @@ class MolDisplayWin : public wxFrame {
 		void DrawLabel();
 		void SelectionChanged(bool mode);
 		GLuint GetLengthTexId() const {return length_anno_tex_id;}
+		GLuint GetSphereList() const { return sphere_list; }
 
 		bool IsRotating();
 		void eventSize(wxSizeEvent &event);

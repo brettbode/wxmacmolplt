@@ -1609,6 +1609,175 @@ void TEDensity2DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 	HUnlock(Grid);
 #endif
 }
+
+void TEDensity1DSurface::CalculateMOGrid(MoleculeData *lData,
+										 Progress * lProgress) {
+
+	long NumPoints = NumGridPoints;
+
+	Frame *	lFrame = lData->GetCurrentFramePtr();
+	BasisSet * Basis = lData->GetBasisSet();
+	long NumBasisFuncs = Basis->GetNumBasisFuncs(false);
+	if (lFrame->Orbs.size() <= 0) return;	//safety check
+	if (OrbSet > lFrame->Orbs.size()) return;	//Invalid choice of an orbital set
+	if (OrbSet < 0) {	//pick a default set
+		long i=0;
+		std::vector<OrbitalRec *>::const_iterator Set = lFrame->Orbs.begin();
+		while (Set != lFrame->Orbs.end()) {
+			if ((*Set)->getNumOccupiedAlphaOrbitals() > 0) {
+				OrbSet = i;
+				break;
+			}
+		}
+		if (OrbSet < 0) return;
+	}
+
+	if (Grid && (GridAllocation != NumPoints)) {
+		FreeGrid();
+	}
+
+	if (!Grid) {
+		// Attempt to allocate memory for the 1D grid
+		AllocateGrid(NumPoints);
+	}
+
+	// If the memory allocation failed the MO calculation can not be done
+	if (Grid == NULL) return;
+
+	// If sufficient memory is available then setup pointers for fast local use
+	float * lGrid;
+	lGrid = Grid;
+
+	OrbitalRec	*MOs=NULL;
+	MOs = lFrame->Orbs[OrbSet];
+ 
+	if (MOs==NULL) {	//Invalid orbitals set choice, free memory and return
+		FreeGrid();
+		return;
+	}
+
+	float *OccupancyA = NULL,
+		  *OccupancyB = NULL,
+		  *Vectors = NULL,
+		  *VectorsB = NULL,
+		  *AOVector;
+
+	bool deleteTempOcc = false;
+	if (MOs->getOrbitalWavefunctionType() == RHF) {
+		OccupancyA = new float[MOs->NumOccupiedAlphaOrbs];
+		if (OccupancyA) for (long i=0; i<MOs->NumOccupiedAlphaOrbs; i++) OccupancyA[i]=2.0;
+		Vectors = MOs->Vectors;
+		deleteTempOcc = true;
+	} else if (MOs->getOrbitalWavefunctionType() == ROHF) {
+		OccupancyA = new float[MOs->NumOccupiedAlphaOrbs];
+		if (OccupancyA) for (long i=0; i<MOs->NumOccupiedAlphaOrbs; i++) {
+			if (i<MOs->NumOccupiedBetaOrbs) OccupancyA[i]=2.0;
+			else OccupancyA[i]=1.0;
+		}
+		Vectors = MOs->Vectors;
+		deleteTempOcc = true;
+	} else if ((MOs->getOrbitalWavefunctionType() == UHF)&&(MOs->getOrbitalType() != NaturalOrbital)) {
+			long i;
+		OccupancyA = new float[MOs->NumOccupiedAlphaOrbs];
+		if (OccupancyA) for (i=0; i<MOs->NumOccupiedAlphaOrbs; i++) OccupancyA[i]=1.0;
+		OccupancyB = new float[MOs->NumOccupiedBetaOrbs];
+		if (OccupancyB) for (i=0; i<MOs->NumOccupiedBetaOrbs; i++) OccupancyB[i]=1.0;
+		Vectors = MOs->Vectors;
+		VectorsB = MOs->VectorsB;
+		deleteTempOcc = true;
+//	} else if ((MOs->getOrbitalWavefunctionType() == MCSCF)||(MOs->getOrbitalWavefunctionType() == RHFMP2)||
+//			   ((MOs->getOrbitalWavefunctionType() == UHF)&&(MOs->getOrbitalType() == NaturalOrbital))) {
+	} else {
+		OccupancyA = MOs->OrbOccupation;
+		Vectors = MOs->Vectors;
+	}
+
+	if ((Vectors == NULL)||(OccupancyA == NULL)) {
+		if (deleteTempOcc) {
+			if (OccupancyA) delete [] OccupancyA;
+			if (OccupancyB) delete [] OccupancyB;
+		}
+		FreeGrid();
+		return;
+	}
+
+	AOVector = new float[NumBasisFuncs];
+	if (AOVector == NULL) throw DataError();
+
+	//Store the Grid mins and incs at the beginning of the grid
+	GridMax = -1.0e20;
+	GridMin = 1.0e20;
+
+	//loop over the plotting grid in the x, y, and z directions
+	long n = 0;
+	float XGridValue;
+	float YGridValue;
+	float ZGridValue;
+	CPoint3D lXInc = End - Start;
+	lXInc *= 1.0f / NumGridPoints;
+	long	MONum;
+	CPoint3D Origin = Start * kAng2BohrConversion;
+
+	lXInc *= kAng2BohrConversion;
+
+	for (long iXPt = 0; iXPt < NumGridPoints; iXPt++) {
+		if (!lProgress->UpdateProgress(iXPt/NumGridPoints)) {	//User canceled so clean things up and abort
+			if (deleteTempOcc) {
+				if (OccupancyA) delete [] OccupancyA;
+				if (OccupancyB) delete [] OccupancyB;
+			}
+			if (AOVector) delete [] AOVector;
+			FreeGrid();
+			return;
+		}
+
+		XGridValue = Origin.x + iXPt * lXInc.x;
+		YGridValue = Origin.y + iXPt * lXInc.y;
+		ZGridValue = Origin.z + iXPt * lXInc.z;
+
+		//First calculate the ampiltude of each AO at the current grid point
+		CalculateAOAmplitudeVector(XGridValue, YGridValue, ZGridValue,
+			lFrame->Atoms, Basis, AOVector, lFrame->NumAtoms);
+		
+		float *MOVector, Density, Sum;
+		Sum = 0.0;
+
+		if (MOs->NumOccupiedAlphaOrbs) {
+			for (MONum=0; MONum<MOs->NumOccupiedAlphaOrbs; MONum++) {
+				MOVector = &(Vectors[NumBasisFuncs*MONum]);
+				Density = 0.0;
+				for (long ivec=0; ivec<NumBasisFuncs; ivec++)
+					Density += MOVector[ivec]*AOVector[ivec];
+				Sum += Density*Density*OccupancyA[MONum];
+			}
+		}
+
+		if (OccupancyB) {
+			for (MONum=0; MONum<MOs->NumOccupiedBetaOrbs; MONum++) {
+				MOVector = &(VectorsB[NumBasisFuncs*MONum]);
+				for (long ivec=0; ivec<NumBasisFuncs; ivec++)
+					Density += MOVector[ivec]*AOVector[ivec];
+				Sum += Density*Density*OccupancyB[MONum];
+			}
+		}
+
+		lGrid[n] = Sum;
+		GridMax = MAX(GridMax, lGrid[n]);
+		GridMin = MIN(GridMin, lGrid[n]);
+		n++;
+		XGridValue += lXInc.x;
+		YGridValue += lXInc.y;
+		ZGridValue += lXInc.z;
+	}
+
+	//Unlock the grid handle and return
+	if (deleteTempOcc) {
+		if (OccupancyA) delete [] OccupancyA;
+		if (OccupancyB) delete [] OccupancyB;
+	}
+	if (AOVector) delete [] AOVector;
+}
+
 #ifdef powerc
 typedef struct Orb3DGridData {
 	Orb3DSurface *	Surf;

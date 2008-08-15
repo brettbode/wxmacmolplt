@@ -28,7 +28,7 @@ void SortzBuffer(const CPoint3D coord[], long zBuffer[], long natoms);
 void BackRotate3DOffset(const Matrix4D rotMatrix, const CPoint3D * in, CPoint3D * out);
 void MatrixToEulerAngles(Matrix4D rotMatrix, float * phi, float * psi, float * theta);
 void EulerAnglesToMatrix(Matrix4D rotMatrix, float phi, float psi, float theta);
-void CopyMatrix (Matrix4D fromMatrix, Matrix4D toMatrix);
+void CopyMatrix (const Matrix4D fromMatrix, Matrix4D toMatrix);
 void CrossProduct3D (const CPoint3D *a, const CPoint3D *b, CPoint3D *aCrossB);
 float DotProduct3D (const CPoint3D *a, const CPoint3D *b);
 float DeterminantMatrix(const Matrix4D A);

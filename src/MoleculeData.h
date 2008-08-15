@@ -72,8 +72,8 @@ class MoleculeData {
 												bit 4 for plotting KE rather than Total E
 												bit 5 for plotting PE */
 		char		DrawLabels;				// Flag for label drawing (both #'s and atomic labels) bit3 deactivates labeling H atoms
-		MolDisplayWin *MolWin;
 	public:
+		MolDisplayWin *MolWin;
 		MoleculeData(MolDisplayWin *MolWin);
 		~MoleculeData(void);
 		long ReadInitialFragmentCoords(BufferFile * Buffer);
@@ -154,7 +154,7 @@ class MoleculeData {
 		 * @param Prefs The current window preferences
 		 * @param precision The tolerance for slop in the coordinates (ex 1.0D-5)
 		 */
-		bool DeterminePrincipleOrientation(Matrix4D result, WinPrefs * Prefs, double precision) const;
+		bool DeterminePrincipleOrientation(Matrix4D result, CPoint3D& translation, WinPrefs * Prefs, double precision) const;
 		void GenerateSymmetryDependentAtoms(bool do_warnings = true);
 		/**
 		 * Flag the symmetry unique atoms.
@@ -237,6 +237,7 @@ class MoleculeData {
 		const char * GetFragmentName(unsigned long index) const;
 		void PruneUnusedFragments();
 		void GetRotationMatrix(Matrix4D copy);
+		const Matrix4D& GetRotationMatrix() const;
 		int GetAnnotationCount(void) const {return Annotations.size();};
 		void DeleteAllAnnotations(void);
 		void ConstrainToAnnotation(int anno_id) {

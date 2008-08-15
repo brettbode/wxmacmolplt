@@ -188,6 +188,8 @@ enum MMP_SurfaceNameSpace {
 	MMP_SurfVerticesList,
 	MMP_SurfNormals,
 	MMP_SurfSurfaceValues,
+	MMP_SurfEndpoint1,
+	MMP_SurfEndpoint2,
 	
 	NumberMMPSurfaceItems
 };

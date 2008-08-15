@@ -285,7 +285,12 @@ void MolDisplayWin::DrawGL(int do_shader) {
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
 
+	glLoadName(MMP_SURFACE);
+	glPushName(0);
+	int surf_id = 0;
 	while (lSurface) {
+		++surf_id;
+		glLoadName(surf_id);
 		if (lSurface->GetVisibility()) {
 			if (!lSurface->isTransparent()) {
 				lSurface->Draw3DGL(MainData, Prefs, NULL);
@@ -295,6 +300,7 @@ void MolDisplayWin::DrawGL(int do_shader) {
 		}
 		lSurface = lSurface->GetNextSurface();
 	}
+	glPopName();
 
 	if (Prefs->ShowSymmetryOperators()) {
 		if (GLEW_VERSION_2_0) {
@@ -1444,8 +1450,140 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 			*/
 	}
 }
-long Surf2DBase::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle *)
-{
+
+long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs *Prefs, myGLTriangle *, unsigned int shader_program) {
+
+	if (Visible) {
+		// Update the grid if needed, then display
+		if (!Grid) Update(MainData);
+	}
+
+	glPushName(1);
+
+	glPushMatrix();
+	glTranslatef(Start.x, Start.y, Start.z);
+	glScalef(0.05f, 0.05f, 0.05f);
+	glCallList(MainData->MolWin->GetSphereList());
+	glPopMatrix();
+
+	glLoadName(2);
+	glPushMatrix();
+	glTranslatef(End.x, End.y, End.z);
+	glScalef(0.05f, 0.05f, 0.05f);
+	glCallList(MainData->MolWin->GetSphereList());
+	glPopMatrix();
+
+	CPoint3D vec = End - Start;
+	CPoint3D perp;
+	OrthoVector(vec, perp);
+	vec *= 1.0f / (NumGridPoints - 1);
+	CPoint3D curr_pt = Start;
+	CPoint3D next_pt;
+
+	// Find a vector perpendicular to both view direction and the vector from
+	// Start to End projected onto the screen plane.  The graph will be pushed
+	// away along this perpendicular vector so that it can always be seen, no
+	// matter the rotation.
+	const Matrix4D& rot = MainData->GetRotationMatrix();
+	CPoint3D normal(rot[0][2], rot[1][2], rot[2][2]);
+	CPoint3D projected_start = Start;
+	CPoint3D projected_end = End;
+	ProjectToPlane(normal, Start, projected_start);
+	ProjectToPlane(normal, Start, projected_end);
+	CPoint3D projected_vec = projected_end - projected_start;
+	CrossProduct3D(&projected_vec, &normal, &perp);
+	Normalize3D(&perp);
+
+	glLoadName(0);
+	float range_factor;
+	if (GridMax > MaxContourValue) {
+		range_factor = 1.0f / (MaxContourValue - GridMin);
+	} else {
+ 		range_factor = 1.0f / (GridMax - GridMin);
+	}
+
+	float red;
+	float curr_val, next_val;
+	curr_val = Grid[0] > MaxContourValue ? MaxContourValue : Grid[0];
+
+#if 1
+	GLUquadricObj *quadric = gluNewQuadric();
+	CreateCylinderFromLine(quadric, Start, End, 0.02f, 5, 5, false);
+
+	for (int i = 0; i < NumGridPoints - 1; ++i) {
+		next_val = Grid[i + 1] > MaxContourValue ? MaxContourValue : Grid[i + 1];
+		next_pt = curr_pt + vec;
+		red = (curr_val - GridMin) * range_factor; 
+		glColor3f(red, 0.0f, 1.0f - red);
+		CreateCylinderFromLine(quadric, curr_pt + perp * (curr_val * Scale),
+							   next_pt + perp * (next_val * Scale),
+							   0.05f, 5, 5, true);
+		curr_val = next_val;
+		curr_pt = next_pt;
+	}
+
+	glColor3f(1.0f, 1.0f, 1.0f);
+	if (fabs(Grid[0]) > 1e-6f) {
+		glPushMatrix();
+		glTranslatef(next_pt.x, next_pt.y, next_pt.z);
+		glScalef(0.05f, 0.05f, 0.05f);
+		glCallList(MainData->MolWin->GetSphereList());
+		glPopMatrix();
+
+		curr_val = Scale * (Grid[0] > MaxContourValue ? MaxContourValue : Grid[0]);
+		CreateCylinderFromLine(quadric, Start, Start + perp * curr_val,
+							   0.02f, 5, 5, true);
+	}
+
+	if (fabs(Grid[NumGridPoints - 1]) > 1e-6f) {
+		curr_val = Scale * (Grid[NumGridPoints - 1] > MaxContourValue ? MaxContourValue : Grid[NumGridPoints - 1]);
+		CreateCylinderFromLine(quadric, End, End + perp * curr_val,
+							   0.02f, 5, 5, true);
+	}
+
+	gluDeleteQuadric(quadric);
+#else
+	if (GLEW_VERSION_2_0 && Prefs->GetShaderMode()) {
+		glUseProgram(0);
+	}
+
+	glDisable(GL_LIGHTING);
+	glBegin(GL_QUADS);
+	for (int i = 0; i < NumGridPoints - 1; ++i) {
+		next_val = Grid[i + 1] > MaxContourValue ? MaxContourValue : Grid[i + 1];
+		next_pt = curr_pt + vec;
+		red = (curr_val - GridMin) * range_factor; 
+		glColor3f(red, 0.0f, 1.0f - red);
+		glVertex3f(curr_pt.x - perp.x * 0.045f,
+				   curr_pt.y - perp.y * 0.045f,
+				   curr_pt.z - perp.z * 0.045f);
+		glVertex3f(curr_pt.x + perp.x * 0.045f,
+				   curr_pt.y + perp.y * 0.045f,
+				   curr_pt.z + perp.z * 0.045f);
+		red = (Grid[i + 1] - GridMin) * range_factor; 
+		glColor3f(red, 0.0f, 1.0f - red);
+		glVertex3f(next_pt.x + perp.x * 0.045f,
+				   next_pt.y + perp.y * 0.045f,
+				   next_pt.z + perp.z * 0.045f);
+		glVertex3f(next_pt.x - perp.x * 0.045f,
+				   next_pt.y - perp.y * 0.045f,
+				   next_pt.z - perp.z * 0.045f);
+		curr_pt = next_pt;
+		curr_val = next_val;
+	}
+	glEnd();
+	glEnable(GL_LIGHTING);
+
+	if (GLEW_VERSION_2_0 && Prefs->GetShaderMode()) {
+		glUseProgram(shader_program);
+	}
+#endif
+
+	glPopName();
+
+}
+
+long Surf2DBase::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program) {
 	if (Visible) {
 			//Update the grid if needed, then contour and display
 		if (!Grid) Update(MainData);
@@ -1679,7 +1817,7 @@ long General3DSurface::getTriangleCount(void) const {
 	return result;
 }
 
-long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs *, myGLTriangle * transpTri) {
+long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs *, myGLTriangle * transpTri, unsigned int shader_program) {
 	long result=0;
 	if (Visible) {
 		if (ContourHndl && VertexList) {
@@ -1711,7 +1849,7 @@ long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs *, myGLTriangl
 	}
 	return result;
 }
-long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri) {
+long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri, unsigned int shader_program) {
 	long result = 0;
 	if (Visible) {
 #ifdef UseHandles
@@ -1761,7 +1899,7 @@ long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTria
 	}
 	return result;
 }
-long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri) {
+long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri, unsigned int shader_program) {
 	long result=0;
 	if (Visible && (PlotOrb>=0)) {
 #ifdef UseHandles
@@ -1830,7 +1968,7 @@ long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle *
 	}
 	return result;
 }
-long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri) {
+long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri, unsigned int shader_program) {
 	long result=0;
 	if (Visible) {
 #ifdef UseHandles
@@ -1986,6 +2124,7 @@ long Surf3DBase::CreateSolidSurface(CPoint3D * Vertices, CPoint3D * Normals, lon
 	if (!SurfaceValue) {	//If we are not using surface coloring setup the color once for all the triangles
 		glColor4f(red, green, blue, alpha);
 	}
+
 
 	if (!transpTri)
 		glBegin(GL_TRIANGLES);
@@ -2193,7 +2332,8 @@ void CreateCylinderFromLine(GLUquadricObj *qobj, const CPoint3D& lineStart, cons
 	gluCylinder(qobj, lineWidth, lineWidth, length, nslices, nstacks);
 	if (cap) {
 		glTranslatef(0.0, 0.0, length);
-		gluDisk(qobj, 0.0, lineWidth, nslices, 2);
+		gluSphere(qobj, lineWidth, nslices, nstacks);
+		/* gluDisk(qobj, 0.0, lineWidth, nslices, 2); */
 	}
 	glPopMatrix();
 }

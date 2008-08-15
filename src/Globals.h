@@ -227,7 +227,8 @@ typedef enum {
 	MMP_NULL,
 	MMP_ATOM,
 	MMP_BOND,
-	MMP_ANNOTATION
+	MMP_ANNOTATION,
+	MMP_SURFACE
 } MMP_object_t;
 
 #endif
