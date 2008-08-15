@@ -287,6 +287,7 @@ void MolDisplayWin::DrawGL(int do_shader) {
 
 	glLoadName(MMP_SURFACE);
 	glPushName(0);
+	glEnable(GL_RESCALE_NORMAL);
 	int surf_id = 0;
 	while (lSurface) {
 		++surf_id;
@@ -301,6 +302,7 @@ void MolDisplayWin::DrawGL(int do_shader) {
 		lSurface = lSurface->GetNextSurface();
 	}
 	glPopName();
+	glDisable(GL_RESCALE_NORMAL);
 
 	if (Prefs->ShowSymmetryOperators()) {
 		if (GLEW_VERSION_2_0) {
