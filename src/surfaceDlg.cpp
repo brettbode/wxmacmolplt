@@ -3204,13 +3204,13 @@ void TEDensity1DSurfPane::CreateControls() {
 
 	itemBoxSizer81 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer81, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
-	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, "Clamp Value"));
+	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, wxT("Clamp Value")));
 	clamp_box = new wxTextCtrl(TED1DPANEL, ID_3D_MAX_MAP_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	itemBoxSizer81->Add(clamp_box, 0, wxALIGN_CENTER_HORIZONTAL);
 
 	itemBoxSizer81 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer81, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
-	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, "Scale Factor"));
+	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, wxT("Scale Factor")));
 	scale_box = new wxTextCtrl(TED1DPANEL, ID_SCALE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 	itemBoxSizer81->Add(scale_box, 0, wxALIGN_CENTER_HORIZONTAL);
 
