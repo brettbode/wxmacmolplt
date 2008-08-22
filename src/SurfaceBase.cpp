@@ -176,7 +176,7 @@ void Surface::Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const
 		(const char *)CurTime.Format(wxT("%c")).ToAscii());	// standard time format	
 	Buffer->WriteLine(Line, true);
 
-	// print data here
+	// TODO print out formatted data here
 }
 
 void Surface::Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Origin,
