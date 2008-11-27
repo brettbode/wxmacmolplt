@@ -1582,7 +1582,7 @@ long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs *Prefs, myGLTriangle 
 #endif
 
 	glPopName();
-
+	return 0;
 }
 
 long Surf2DBase::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program) {
