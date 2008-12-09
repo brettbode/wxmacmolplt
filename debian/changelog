@@ -1,3 +1,9 @@
+wxmacmolplt (7.3) unstable; urgency=low
+
+  * New upstream version.
+
+ -- root <brett@scl.ameslag.gov>  Mon,  8 Dec 2008 20:57:30 -0600
+
 wxmacmolplt (7.2.1-1) unstable; urgency=low
 
   * New bug fix upstream release.
