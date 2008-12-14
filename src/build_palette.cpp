@@ -940,8 +940,9 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 		}
 #ifdef __WXMAC__
 		mStructureChoice->Enable();
+		Hide();	//This is a gross hack to get the gl canvas to display properly??
+		Show();
 #endif
-
 	} else {
 #ifdef __WXMAC__
 		// This control wants to take over event handling once it gets 
