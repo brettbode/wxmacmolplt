@@ -289,6 +289,7 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 			if (-1<FindKeyWord(temp, ".XYZ", 4)) Type = kXYZType;
 			else if (-1<FindKeyWord(temp, ".PDB", 4)) Type = kPDBType;
 			else if (-1<FindKeyWord(temp, ".INP", 4)) Type = kGAMESSInputType;
+			else if (-1<FindKeyWord(temp, ".TRJ", 4)) Type = kGAMESSTRJType;
 			else if (-1<FindKeyWord(temp, ".CML", 4)) Type = CMLFile;
 			else if (-1<FindKeyWord(temp, ".MKL", 4)) Type = MolekelFile;
 			else if (-1<FindKeyWord(temp, ".ARC", 4)) Type = MOPACarcFile;
@@ -301,6 +302,12 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 	while ((ByteCount <= FileSize)&&(Type == kUnknown)) {
 		if (LocateKeyWord("GAMESS VERSION", 14, -1))
 			Type = kGAMESSlogType;
+		else if (LocateKeyWord("===== IRC DATA PACKET", 21, -1))
+			Type = kGAMESSTRJType;
+		else if (LocateKeyWord("===== DRC DATA PACKET", 21, -1))
+			Type = kGAMESSTRJType;
+		else if (LocateKeyWord("===== MD DATA PACKET", 20, -1))
+			Type = kGAMESSTRJType;
 		else if (LocateKeyWord("IRC INFORMATION PACKET", 22, -1))
 			Type = kGAMESSIRCType;
 		else if (LocateKeyWord("VELOCITY (BOHR/FS)", 18, -1))

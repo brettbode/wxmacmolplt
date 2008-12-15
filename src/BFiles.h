@@ -26,6 +26,7 @@ typedef enum TextFileType {
 	kGAMESSlogType,
 	kGAMESSIRCType,
 	kGAMESSDRCType,
+	kGAMESSTRJType,
 	kGAMESSInputType,
 	kXYZType,
 	kPDBType,
