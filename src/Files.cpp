@@ -3547,6 +3547,109 @@ void SystemGroup::ReadSystemOptions(BufferFile * Buffer) {
 		sscanf(&(LineText[6]), "%d", &temp);
 		SetDiag(temp);
 	}
+}
+long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, float offset)
+{
+	TypeOfRun		runType=InvalidRunType;
+	char			LineText[kMaxLineLength+1];
+	bool			FirstFrame = true;
+	
+	ProgressInd->ChangeText("Reading GAMESS trajectory file...");
+	Frame * lFrame = MainData->cFrame;
+	
+	//Determine the specific run type
+	if (Buffer->LocateKeyWord("===== IRC DATA PACKET", 21, -1)) {
+		runType	= IRCRun;
+	} else if (Buffer->LocateKeyWord("===== DRC DATA PACKET", 21, -1)) {
+		runType = DRCRun;
+	} else if (Buffer->LocateKeyWord("===== MD DATA PACKET", 20, -1)) {
+		runType = MolDynamics;
+	}
+	if (!Append) { //set the runtype
+		if (!MainData->InputOptions) MainData->InputOptions = new InputData;
+		if (runType) MainData->InputOptions->Control->SetRunType(runType);
+	}
+	Buffer->SetFilePos(0);
+	//search for the beginning of the information packet
+	
+	while (Buffer->LocateKeyWord("DATA PACKET", 11, -1)) {
+		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+		{ throw UserCancel();}
+		//if this is an irc we could pull the point out of the header line
+		if (runType == IRCRun) {
+			Buffer->GetLine(LineText);
+			long point=0;
+			long pos = FindKeyWord(LineText, "FOR STEP", 8);
+			if (pos >= 0) {
+				sscanf(&(LineText[pos+8]), "%ld", &point);
+			}
+			lFrame->IRCPt = point * flip;
+		} else
+			Buffer->SkipnLines(1);
+		//search for the end of the packet?
+		//first line give atom counts, nat=       3 nfrg=       1 nqmmm=       0
+		Buffer->GetLine(LineText);
+		long NumAIAtoms=0, Numfragments=0, NumMDAtoms=0;
+		ReadLongKeyword(LineText, "NAT", &NumAIAtoms);
+		ReadLongKeyword(LineText, "NFRG", &Numfragments);
+		ReadLongKeyword(LineText, "NQMMM", &NumMDAtoms);
+		//second line is the x-axis and total energy, either ttotal or stotal
+		//STOTAL=   1.49848 sqrt(amu)*bohr   tot. E=      -91.6219797490 Hartree
+		Buffer->GetLine(LineText);
+		float xvalue;
+		double totE;
+		if (runType == IRCRun)
+			ReadFloatKeyword(LineText, "STOTAL", &xvalue);
+		else	//MD and DRC spell it TTOTAL
+			ReadFloatKeyword(LineText, "TTOTAL", &xvalue);
+		ReadDoubleKeyword(LineText, "TOT. E", totE);
+
+		xvalue *= flip;
+		xvalue += offset;
+		Frame * lFrame = NULL;
+		if (!Append && FirstFrame) {	
+			lFrame = MainData->Frames;
+			lFrame->time = xvalue;
+			FirstFrame = false;
+		} else
+			lFrame = MainData->LocateNewFrame(xvalue);
+		if (lFrame) {
+			lFrame->Energy = totE;
+			// DRCs have an extra line with the kinetic and potential energies
+			//POT. E=        -9.1287351998 kin. E=          .0016326701 Hartree
+			if (runType == DRCRun) {
+				//DRCs conserve energy so Tot E == Pot. E + kinetic E.
+				//Thus only need to store two of them.
+				Buffer->GetLine(LineText);
+				double kinE;
+				if (ReadDoubleKeyword(LineText, "KIN. E", kinE))
+					lFrame->KE = kinE;
+			}
+			// MD runs have two extra lines for energies
+			//POT. E=        -47726.960743 kcal/mol
+			//kin. E=             7.015829  trans KE=   5.422237  rot KE=   1.593592 kcal/mol
+			//Todo: For MD runs energy is not necessarily conserved so all energies could be stored
+			//Don't have the infrastructure for that at the moment.
+
+			//setup the frame for the antipated atom count
+			if (!MainData->SetupFrameMemory(NumAIAtoms+Numfragments+NumMDAtoms, 0)) throw MemoryError();
+			
+			if ((NumAIAtoms > 0)&&Buffer->LocateKeyWord("----- QM PARTICLE COORDINATES", 29)) {
+				Buffer->SkipnLines(1);
+				ParseGLogLine(Buffer, lFrame, NumAIAtoms, 10, &(MainData->MaxSize));
+			}
+			if ((Numfragments > 0)&&Buffer->LocateKeyWord("----- EFP PARTICLE COORDINATES", 30)) {
+				Buffer->SkipnLines(1);
+			}
+			if ((NumMDAtoms > 0)&&Buffer->LocateKeyWord("----- MM PARTICLE COORDINATES", 29)) {
+				Buffer->SkipnLines(1);
+			}
+
+			if (Prefs->GetAutoBond())
+				lFrame->SetBonds(Prefs, false);
+			}
+	}
+	return 1;
 }	
 long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, float offset)
 {	long			LinePos, NumAtoms, point;

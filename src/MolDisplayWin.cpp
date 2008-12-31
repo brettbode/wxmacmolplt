@@ -3412,6 +3412,9 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 			case kGAMESSDRCType:
 				test = OpenGAMESSDRC(Buffer, false, append,flipval,offset);
 				break;
+			case kGAMESSTRJType:
+				test = OpenGAMESSTRJ(Buffer, append,flipval,offset);
+				break;
 			case kGAMESSInputType:
 				if (!append)
 					test = OpenGAMESSInput(Buffer);

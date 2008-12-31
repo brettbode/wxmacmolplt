@@ -498,9 +498,35 @@ class MolDisplayWin : public wxFrame {
 		long OpenFile(wxString fileName, float offset=0.0, bool flip=false, bool append=false);
 		long OpenCMLFile(BufferFile * Buffer, bool readPrefs=true, bool readWindows=true);
 		long OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, float offset);
+		/**
+		 Open a GAMESS IRC file (pre 2009). 
+		 @param Buffer The buffer connected to the DRC file.
+		 @param Append true if this file is to be appended to existing points.
+		 @param flip is a multiplier for the x-coordinate (such as -1).
+		 @param offset is added to the x-coordinate.
+		 \return Returns 1 upon open success or 0 on error or failure to open
+		 */
 		long OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, float offset);
+		/**
+		 Open a GAMESS DRC (aka DRP) file (pre 2009). 
+		 @param Buffer The buffer connected to the DRC file.
+		 @param LogFile true if this is a DRC GAMESS log file, false if the .irc file.
+		 @param Append true if this file is to be appended to existing points.
+		 @param flip is a multiplier for the x-coordinate (such as -1).
+		 @param offset is added to the x-coordinate.
+		 \return Returns 1 upon open success or 0 on error or failure to open
+		 */
 		long OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append,
-						   long flip, float offset);
+							long flip, float offset);
+		/**
+		 Open a GAMESS trajectory file. 
+		 @param Buffer The buffer connected to the TRJ file.
+		 @param Append true if this file is to be appended to existing points.
+		 @param flip is a multiplier for the x-coordinate (such as -1).
+		 @param offset is added to the x-coordinate.
+		 \return Returns 1 upon open success or 0 on error or failure to open
+		 */
+		long OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, float offset);
 		long OpenXYZFile(BufferFile * Buffer);
 		long OpenPDBFile(BufferFile * Buffer);
 		long OpenMDLMolFile(BufferFile * Buffer);
