@@ -75,6 +75,13 @@ long ReadFloatKeyword(const char * Line, const char * Keyword, float * Value) {
 	}
 	return (Pos == 1);
 }
+long ReadDoubleKeyword(const char * Line, const char * Keyword, double & Value) {
+	long Pos = LocateForValue(Line, Keyword);
+	if (Pos > -1) {
+		Pos = sscanf(&(Line[Pos]), "%lf", &Value);
+	}
+	return (Pos == 1);
+}
 long ReadBooleanKeyword(const char * Line, const char * Keyword, bool * Value) {
 	long Pos = LocateForValue(Line, Keyword);
 	if (Pos > -1) {

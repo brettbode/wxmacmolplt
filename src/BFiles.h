@@ -66,6 +66,13 @@ long ReadLongKeyword(const char * Line, const char * Keyword, long * Value);
  * @param Value The float value to set.
  */
 long ReadFloatKeyword(const char * Line, const char * Keyword, float * Value);
+/** Search the null-terminated string for "Keyword = double value".
+ * The return value is 1 for success 0 for failure.
+ * @param Line A null-terminated string to search in.
+ * @param KeyWord A null-terminated string to search for in the line followed by an '='.
+ * @param Value The double value to set.
+ */
+long ReadDoubleKeyword(const char * Line, const char * Keyword, double & Value);
 /** Search the null-terminated string for "Keyword = true/false/t/f".
  * The return value is 1 for success 0 for failure.
  * @param Line A null-terminated string to search in.
