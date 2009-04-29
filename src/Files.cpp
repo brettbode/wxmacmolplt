@@ -713,7 +713,7 @@ long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
 }
 long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 	char Line[kMaxLineLength];
-	long	nAtoms;
+	long	nAtoms, nModels;
 	short	scanerr;
 
 	ProgressInd->ChangeText("Reading PDB file...");
@@ -722,6 +722,7 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 	nAtoms = 0;
 	while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
 		Buffer->GetLine(Line);
+		if (0==FindKeyWord(Line, "MODEL", 5)) ++nModels;
 		if (0==FindKeyWord(Line, "ATOM", 4)) ++nAtoms;
 		if (0==FindKeyWord(Line, "HETATM", 4)) ++nAtoms;
 	}
@@ -735,17 +736,54 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 		nAtoms = 0;
 			//Scan for Atom or hetAtm lines
 			//Format is: a6,i5,2x,a4,a3,2x,i4,4x,3F8.3,2f6.2
+			//1 -  6        Record name   "ATOM  "
+			//7 - 11        Integer       serial       Atom  serial number.
+			//13 - 16        Atom          name         Atom name.
+			//17             Character     altLoc       Alternate location indicator.
+			//18 - 20        Residue name  resName      Residue name.
+			//22             Character     chainID      Chain identifier.
+			//23 - 26        Integer       resSeq       Residue sequence number.
+			//27             AChar         iCode        Code for insertion of residues.
+			//31 - 38        Real(8.3)     x            Orthogonal coordinates for X in Angstroms.
+			//39 - 46        Real(8.3)     y            Orthogonal coordinates for Y in Angstroms.
+			//47 - 54        Real(8.3)     z            Orthogonal coordinates for Z in Angstroms.
+			//55 - 60        Real(6.2)     occupancy    Occupancy.
+			//61 - 66        Real(6.2)     tempFactor   Temperature  factor.
+			//77 - 78        LString(2)    element      Element symbol, right-justified.
+			//79 - 80        LString(2)    charge       Charge  on the atom.
 			//This routine only parses simple pdb files. It probably gets many files atom types wrong
 			//and it always reads in all atoms including duplicates
 		while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
 			Buffer->GetLine(Line);
+			int LineLength = strlen(Line);
+				//Only read in the first model in a file
+			if (0==FindKeyWord(Line, "ENDMDL", 6)) break;
 			long atomTest = FindKeyWord(Line, "ATOM", 4);
 			long HetTest = FindKeyWord(Line, "HETATM", 4);
 			if ((0==atomTest)||(0==HetTest)) {
-				LinePos = 13;
-				if (atomTest==0) Line[14] = ' ';
-				else if (Line[12] != ' ') LinePos = 12;
-				AtomType = SetAtomType((unsigned char *) &(Line[LinePos]));
+				AtomType = -1;
+				if (LineLength >= 78) {	//Use the element symbol if present
+					unsigned char label[4];
+					bool test=false;
+					if (isalpha(Line[76])) {
+						label[0] = Line[76];
+						label[1] = Line[77];
+						label[2] = '\0';
+						test = true;
+					} else if (isalpha(Line[77])) {
+						label[0] = Line[77];
+						label[1] = '\0';
+						test = true;
+					}
+					if (test)
+						AtomType = SetAtomType(label);
+				}
+				if (AtomType <= 0)	{//If no symbol attempt to use the "name"
+					LinePos = 13;
+					if (atomTest==0) Line[14] = ' ';
+					else if (Line[12] != ' ') LinePos = 12;
+					AtomType = SetAtomType((unsigned char *) &(Line[LinePos]));
+				}
 				if (AtomType > 0) {
 					scanerr = sscanf(&(Line[30]), "%8e%8e%8e", &(Pos.x), &(Pos.y), &(Pos.z));
 					if (scanerr == 3) {
@@ -760,6 +798,9 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 		}
 		if (Prefs->GetAutoBond())	//setup bonds, if needed
 			lFrame->SetBonds(Prefs, false);
+		if (nModels > 1) {
+			wxLogMessage(_("This PDB file contains multiple models. Only the first model has been read in."));
+		}
 	}
 	return 1;
 }
