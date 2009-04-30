@@ -757,7 +757,20 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 			Buffer->GetLine(Line);
 			int LineLength = strlen(Line);
 				//Only read in the first model in a file
-			if (0==FindKeyWord(Line, "ENDMDL", 6)) break;
+			if (0==FindKeyWord(Line, "ENDMDL", 6)) {
+				bool modelFound=false;
+				while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
+					Buffer->GetLine(Line);
+					if (0==FindKeyWord(Line, "MODEL", 5)) {
+						modelFound = true;
+						break;
+					}
+				}
+				if (!modelFound) break;
+				if (Prefs->GetAutoBond())	//setup bonds, if needed
+					lFrame->SetBonds(Prefs, false);
+				lFrame = MainData->AddFrame(lFrame->GetNumAtoms(), lFrame->GetNumBonds());
+			}
 			long atomTest = FindKeyWord(Line, "ATOM", 4);
 			long HetTest = FindKeyWord(Line, "HETATM", 4);
 			if ((0==atomTest)||(0==HetTest)) {
@@ -798,9 +811,6 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 		}
 		if (Prefs->GetAutoBond())	//setup bonds, if needed
 			lFrame->SetBonds(Prefs, false);
-		if (nModels > 1) {
-			wxLogMessage(_("This PDB file contains multiple models. Only the first model has been read in."));
-		}
 	}
 	return 1;
 }

@@ -267,7 +267,7 @@ X-SAS-UseImageWidth X-SAS-UseImageHeight ALIGN=bottom></CENTER></P>
 <HR WIDTH="70%">
 <A NAME="pdb"></A>Protein Data Bank .pdb files</H4>
 
-<P>MacMolPlt now has a very simple minded ability to read in PDB
+<P>MacMolPlt has a very simple minded ability to read in PDB
 files. What this means is that MacMolPlt will read in most (all?) PDB
 files and will read in all (including duplicates and HETATM's) atoms
 as generic atoms (ie. C, N, O instead of C<SUB><FONT
@@ -275,7 +275,8 @@ FACE="Symbol">a</FONT></SUB>, C<SUB><FONT
 FACE="Symbol">b</FONT></SUB>, etc...). No connection or other special
 information will be read, just the basic atom types and positions. If
 you don't want to see duplicate atoms or HETATM's then you will have
-delete them by hand before reading the file...</P>
+delete them by hand before reading the file... If the file contains
+multiple models they will be separated into different frames.</P>
 
 <H4>
 <HR WIDTH="70%">
