@@ -1369,7 +1369,7 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 
 	}
 
-	else if (selected_type == MMP_SURFACE) {
+	else if (selected_type == MMP_1DSURFACE) {
 		HandleEditing(event, curr_mouse, prev_mouse);
 	}
 	
@@ -2095,22 +2095,13 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	}
 
 	// If the user clicked on a 1-D surface, he can move the end points.
-	else if (selected_type == MMP_SURFACE) {
+	else if (selected_type == MMP_1DSURFACE) {
 
 		GLdouble newX, newY, newZ;
 		CPoint3D *end_point;
 		CPoint3D *other_end_point;
 
-		int i = 0;
-		Surface *lSurface = mMainData->cFrame->SurfaceList;
-		while (lSurface) {
-			if (i == selected) {
-				break;
-			}
-			++i;
-		}
-
-		Surf1DBase *surf1D = dynamic_cast<Surf1DBase *>(lSurface);
+		Surf1DBase *surf1D = dynamic_cast<Surf1DBase *>(mMainData->cFrame->GetSurfaceWithID(selected));
 
 		if (!surf1D || selected_site == -1) {
 			return;
@@ -3369,8 +3360,8 @@ void MpGLCanvas::ConvertEFPToAllElec(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::OnIdleEvent(wxIdleEvent& event) {
-	Draw();
-	event.RequestMore();
+//	draw();
+//	event.RequestMore();
 }
 
 #if wxCHECK_VERSION(2, 8, 0)

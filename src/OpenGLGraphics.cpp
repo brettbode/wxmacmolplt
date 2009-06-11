@@ -285,13 +285,10 @@ void MolDisplayWin::DrawGL(int do_shader) {
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
 
-	glLoadName(MMP_SURFACE);
-	glPushName(0);
 	glEnable(GL_RESCALE_NORMAL);
 	int surf_id = 0;
 	while (lSurface) {
 		++surf_id;
-		glLoadName(surf_id);
 		if (lSurface->GetVisibility()) {
 			if (!lSurface->isTransparent()) {
 				lSurface->Draw3DGL(MainData, Prefs, NULL);
@@ -301,7 +298,6 @@ void MolDisplayWin::DrawGL(int do_shader) {
 		}
 		lSurface = lSurface->GetNextSurface();
 	}
-	glPopName();
 	glDisable(GL_RESCALE_NORMAL);
 
 	if (Prefs->ShowSymmetryOperators()) {
@@ -1460,6 +1456,9 @@ long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs *Prefs, myGLTriangle 
 		if (!Grid) Update(MainData);
 	}
 
+	glLoadName(MMP_1DSURFACE);
+	glPushName(GetSurfaceID()+1);
+
 	glPushName(1);
 
 	glPushMatrix();
@@ -1581,6 +1580,7 @@ long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs *Prefs, myGLTriangle 
 	}
 #endif
 
+	glPopName();
 	glPopName();
 	return 0;
 }

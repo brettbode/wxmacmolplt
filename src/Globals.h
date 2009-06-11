@@ -21,7 +21,7 @@
 
 //This needs to get put into the build system...
 #define __wxBuild__
-#define wxMacMolPlt_VERSION "7.3"
+#define wxMacMolPlt_VERSION "7.3.1d1"
 
 //activate the following line to use the interactive editor
 // please add CXXFLAGS=-DENABLE_INTERACTIVE_MODE to your configure step rather
@@ -228,7 +228,7 @@ typedef enum {
 	MMP_ATOM,
 	MMP_BOND,
 	MMP_ANNOTATION,
-	MMP_SURFACE
+	MMP_1DSURFACE
 } MMP_object_t;
 
 #endif
