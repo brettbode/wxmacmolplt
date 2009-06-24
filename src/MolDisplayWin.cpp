@@ -1153,7 +1153,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 		else {
 			FILE *currFile = NULL;
 
-			if((currFile = fopen(filepath.mb_str(wxConvUTF8), "w")) != NULL) {
+			if((currFile = fopen(filepath.mb_str(wxConvUTF8), "wb")) != NULL) {
 				BufferFile *buffer = NULL;
 				try {
 					buffer = new BufferFile(currFile, true);
@@ -1288,7 +1288,7 @@ void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
 		FILE *currFile = NULL;
 		BufferFile *buffer = NULL;
 
-		if((currFile = fopen(currFilePath.mb_str(wxConvUTF8), "w")) == NULL) {
+		if((currFile = fopen(currFilePath.mb_str(wxConvUTF8), "wb")) == NULL) {
 			MessageAlert("Unable to access the file.");
 			return;
 		}
@@ -1352,7 +1352,7 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 							  this);
 
 	if(!filePath.IsEmpty()) {
-		if((currFile = fopen(filePath.mb_str(wxConvUTF8), "w")) == NULL) {
+		if((currFile = fopen(filePath.mb_str(wxConvUTF8), "wb")) == NULL) {
 			MessageAlert("Unable to access the file.");
 			return;
 		}

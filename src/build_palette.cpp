@@ -746,7 +746,7 @@ void BuilderDlg::SaveStructures() {
 	data = reinterpret_cast<StrucGroupClientData *>
 		   (struc_groups->GetClientObject(struc_groups->GetSelection()));
 
-	save_file = fopen(data->filename.mb_str(wxConvUTF8), "w");
+	save_file = fopen(data->filename.mb_str(wxConvUTF8), "wb");
 	if (save_file == NULL) {
 		MessageAlert("Unable to access the file.");
 		return;

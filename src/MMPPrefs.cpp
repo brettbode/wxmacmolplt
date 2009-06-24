@@ -380,7 +380,7 @@ void WinPrefs::ReadDefaultPrefs(void) {
 #endif
 	pathname += wxT("/MacMolPlt.Prefs.xml");
 	
-	FILE * preffile = fopen(pathname.mb_str(wxConvUTF8), "r");
+	FILE * preffile = fopen(pathname.mb_str(wxConvUTF8), "rb");
 	if (preffile) {
 		fseek(preffile, 0, SEEK_END);
 		long ByteCount = ftell(preffile);
@@ -508,7 +508,7 @@ bool WinPrefs::ReadUserPrefs(void) {
 	//The standarad unix path is the user's home dir. Thus the file should be "hidden".
 	pathname += wxT("/.MacMolPlt.Prefs.xml");
 #endif	
-	FILE * preffile = fopen(pathname.mb_str(wxConvUTF8), "r");
+	FILE * preffile = fopen(pathname.mb_str(wxConvUTF8), "rb");
 	if (preffile) {
 		fseek(preffile, 0, SEEK_END);
 		long ByteCount = ftell(preffile);
