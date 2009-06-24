@@ -237,7 +237,7 @@ SWFAction newSWFAction_fromFile(const char *filename)
 {
 	SWFAction action = createEmptyAction();
 	action->inputType = INPUT_FILE;
-	action->input.file = fopen(filename, "r");
+	action->input.file = fopen(filename, "rb");
 	if(action->input.file == NULL)
 	{
 		destroySWFAction(action);

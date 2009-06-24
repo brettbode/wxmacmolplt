@@ -500,7 +500,7 @@ bool MpAppNoGUI::OnInit() {
 #endif 
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 
-		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006 ")
+		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2008 ")
 					   wxT("Version %s, %s"), wxMacMolPlt_VERSION, (const wxChar*) date);
 		wxLogMessage(msg); 
 		return false; 
@@ -540,7 +540,7 @@ bool MpAppNoGUI::OnInit() {
 	bool rc = cmdParser.Found(_T("b"), &pov_file);
 	std::cout << "rc: " << rc << std::endl;
 	std::cout << "pov_file.ToAscii(): " << pov_file.ToAscii() << std::endl;
-	f = fopen(pov_file.ToAscii(), "w");
+	f = fopen(pov_file.ToAscii(), "wb");
 	bfile = new BufferFile(f, true);
 	moldata->ExportPOV(bfile, gPreferences);
 	delete bfile;
