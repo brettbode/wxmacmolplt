@@ -2794,6 +2794,9 @@ void HessianGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	bool AnalyticPoss = (((IData->Control->GetSCFType() == 1)||(IData->Control->GetSCFType() == 3)||
 						  (IData->Control->GetSCFType() == 4)||(IData->Control->GetSCFType() == 0))&&
 						 (IData->Control->GetMPLevel() <= 0));
+	//Analytic hessians are not available for semi-emperical basis sets
+	if ((IData->Basis->GetBasis() == GAMESS_BS_MNDO)||(IData->Basis->GetBasis() == GAMESS_BS_AM1)||
+		(IData->Basis->GetBasis() == GAMESS_BS_PM3)) AnalyticPoss = false;
 	method = GetAnalyticMethod() && AnalyticPoss;
 		//Punch the group label
 	File->WriteLine(" $FORCE ", false);

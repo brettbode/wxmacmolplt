@@ -1400,8 +1400,8 @@ void InputBuilderWindow::CreateControls()
 	revertBtn = new wxButton( itemPanel3, ID_REVERTBUTTON, _("Revert"), wxDefaultPosition, wxDefaultSize, 0 );
 	button_sizer->Add(revertBtn, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    advanced_button = new wxButton(itemPanel3, ID_ADVANCEDBUTTON, _("Basic"), wxDefaultPosition, wxDefaultSize, 0);
-	button_sizer->Add(advanced_button, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+  //  advanced_button = new wxButton(itemPanel3, ID_ADVANCEDBUTTON, _("Basic"), wxDefaultPosition, wxDefaultSize, 0);
+//	button_sizer->Add(advanced_button, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
 
 	writeBtn = new wxButton( itemPanel3, ID_WRITEFILEBUTTON, _("Write File"), wxDefaultPosition, wxDefaultSize, 0 );
 	button_sizer->Add(writeBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
@@ -1966,6 +1966,9 @@ void InputBuilderWindow::SetupHessOptsItems() {
 	bool AnalyticPoss = (((TmpInputRec->Control->GetSCFType() == 1)||(TmpInputRec->Control->GetSCFType() == 3)||
 							 (TmpInputRec->Control->GetSCFType() == 4)||(TmpInputRec->Control->GetSCFType() == 0))&&
 							(TmpInputRec->Control->GetMPLevel() <= 0));
+	//Analytic hessians are not available for semi-emperical basis sets
+	if ((TmpInputRec->Basis->GetBasis() == GAMESS_BS_MNDO)||(TmpInputRec->Basis->GetBasis() == GAMESS_BS_AM1)||
+		(TmpInputRec->Basis->GetBasis() == GAMESS_BS_PM3)) AnalyticPoss = false;
 	
 	bool AnalyticSelected = TmpInputRec->Hessian->GetAnalyticMethod() && AnalyticPoss;
 	mHessMethodRadio->Enable(AnalyticPoss);
