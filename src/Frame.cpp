@@ -1476,9 +1476,93 @@ void Frame::ParseUHFNOs(BufferFile * Buffer, long NumFuncs, Progress * lProgress
 			OrbSet=NULL;
 		}
 	}
-	OrbSet->NumAlphaOrbs = NumNOrbs;
-	OrbSet->NumOccupiedAlphaOrbs = NumNOrbs;
-	if (OrbSet) Orbs.push_back(OrbSet);
+	if (OrbSet) {
+		OrbSet->NumAlphaOrbs = NumNOrbs;
+		OrbSet->NumOccupiedAlphaOrbs = NumNOrbs;
+		Orbs.push_back(OrbSet);
+	}
+}
+//Parse TD-DFT Natural Orbitals
+//
+void Frame::ParseTDDFTNOs(BufferFile * Buffer, long NumFuncs, Progress * lProgress) {
+	long	iorb, jorb, imaxorb=0, NumNOrbs=0, TestOrb,
+	ScanErr, LinePos;
+	int		nChar;
+	float	*Vectors, *OccNums;
+	char	Line[kMaxLineLength+1];
+	OrbitalRec * OrbSet = NULL;
+	
+	try {
+		Buffer->SetFilePos(Buffer->FindBlankLine());
+		Buffer->SkipnLines(1);
+		
+		OrbSet = new OrbitalRec(NumFuncs, 0, NumFuncs);
+		OrbSet->setOrbitalWavefunctionType(TDDFT);
+		OrbSet->setOrbitalType(NaturalOrbital);
+		
+		Vectors = OrbSet->Vectors;
+		if (OrbSet->Energy) {
+			delete [] OrbSet->Energy;
+			OrbSet->Energy = NULL;
+		}
+		if (OrbSet->SymType) {
+			delete [] OrbSet->SymType;
+			OrbSet->SymType = NULL;
+		}
+		OccNums = OrbSet->OrbOccupation = new float [NumFuncs];
+		if (!OccNums) throw MemoryError();
+		
+		iorb=0;
+		NumNOrbs = NumFuncs;
+		while (iorb<NumNOrbs) {
+			// Allow a little backgrounding and user cancels
+			if (!lProgress->UpdateProgress(Buffer->GetPercentRead())) {
+				delete OrbSet;
+				return;
+			}
+			imaxorb = MIN(10, NumNOrbs-iorb);	//Max of 10 orbitals per line
+			Buffer->GetLine(Line);
+			LinePos = 0;
+			for (jorb=0; jorb<imaxorb; jorb++) {
+				ScanErr = sscanf(&(Line[LinePos]), "%ld%n", &TestOrb, &nChar);
+				if (ScanErr && (TestOrb==jorb+iorb+1)) LinePos += nChar;
+				else {
+					imaxorb = jorb;
+					if (jorb==0) {	//No more orbitals found
+						imaxorb = 0;
+						NumNOrbs = iorb;
+					}
+					break;
+				}
+			}
+			if (imaxorb <= 0) break;
+			//first read in the orbital occupation number of each orbital
+			Buffer->GetLine(Line);	//blank
+			Buffer->GetLine(Line);
+			LinePos = 0;
+			for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital occupations
+				ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(OccNums[iorb+jorb]),&nChar);
+				if (ScanErr<=0) throw DataError();	//Looks like the MO's are not complete
+				LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
+			}
+			Buffer->GetLine(Line);
+			//read in the vector block
+			ReadGAMESSlogVectors(Buffer, &(Vectors[iorb*NumFuncs]), NumFuncs, imaxorb);
+			iorb += imaxorb;
+			Buffer->SkipnLines(1);	//Skip blank line between blocks
+		}
+	}
+	catch (...) {
+		if (OrbSet) {
+			delete OrbSet;
+			OrbSet=NULL;
+		}
+	}
+	if (OrbSet) {
+		OrbSet->NumAlphaOrbs = NumNOrbs;
+		OrbSet->NumOccupiedAlphaOrbs = NumNOrbs;
+		Orbs.push_back(OrbSet);
+	}
 }
 //Parse a set of Localized MOs from a GAMESS log file. Note that
 //there is no symmetry or orbital energy information available.

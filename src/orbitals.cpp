@@ -63,6 +63,8 @@ const char * ConvertTypeOfWavefunction(const TypeOfWavefunction & t) {
 			return "CI";
 		case RHFMP2:
 			return "RMP2";
+		case TDDFT:
+			return "TDDFT";
 		default:
 			return "Unknown";
 	}

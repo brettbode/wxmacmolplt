@@ -172,6 +172,12 @@ class Frame {
 		 * @param lProgress the progress indicator.
 		 */
 		void ParseUHFNOs(BufferFile * Buffer, long NumFuncs, Progress * lProgress);
+		/** Parse the GAMESS TD-DFT natural orbitals and occupation numbers.
+		 * @param Buffer the input buffer.
+		 * @param NumFuncs the number of basis functions.
+		 * @param lProgress the progress indicator.
+		 */
+		void ParseTDDFTNOs(BufferFile * Buffer, long NumFuncs, Progress * lProgress);
 		void ParseGVBGIOrbitals(BufferFile * Buffer, const long & NumFuncs, Progress * lProgress);
 		OrbitalRec * ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs,
 			long NumBetaOrbs, const long & NumOccAlpha, const long & NumOccBeta, const TypeOfWavefunction & method, Progress * lProgress);

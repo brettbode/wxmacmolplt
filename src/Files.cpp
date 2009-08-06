@@ -2762,6 +2762,14 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 							lFrame->ParseUHFNOs(Buffer, MainData->GetNumBasisFunctions(), ProgressInd);
 						}
 					}
+					//			if (MainData->InputOptions->Control->GetSCFType() == GAMESS_TDDFT) {
+					//I don't have the right control keywords yet. Possibilities are TDDFT=EXCITE in 
+					//$CONTRL or TDPRP=.t. in $TDDFT
+					if (Buffer->LocateKeyWord("TDDFT NATURAL ORBITALS",
+											  23, NextFinalPos)) {
+						lFrame->ParseTDDFTNOs(Buffer, MainData->GetNumBasisFunctions(), ProgressInd);
+					}
+					//			}
 					if (MainData->InputOptions->Control->GetMPLevel()) {
 						if (Buffer->LocateKeyWord("MP2 NATURAL ORBITAL OCCUPATION NUMBERS",
 							38, NextFinalPos) && ReadMP2Orbitals) {
@@ -3140,6 +3148,14 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 							lFrame->ParseUHFNOs(Buffer, MainData->GetNumBasisFunctions(), ProgressInd);
 						}
 					}
+		//			if (MainData->InputOptions->Control->GetSCFType() == GAMESS_TDDFT) {
+					//I don't have the right control keywords yet. Possibilities are TDDFT=EXCITE in 
+					//$CONTRL or TDPRP=.t. in $TDDFT
+						if (Buffer->LocateKeyWord("TDDFT NATURAL ORBITALS",
+												  23, NextFinalPos)) {
+							lFrame->ParseTDDFTNOs(Buffer, MainData->GetNumBasisFunctions(), ProgressInd);
+						}
+		//			}
 					if (MainData->InputOptions->Control->GetMPLevel()) {
 						if (Buffer->LocateKeyWord("MP2 NATURAL ORBITAL OCCUPATION NUMBERS",
 							38, NextFinalPos) && ReadMP2Orbitals) {

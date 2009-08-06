@@ -1913,6 +1913,9 @@ void InputBuilderWindow::SetupMOGuessItems() {
 							case RHFMP2:
 								mMOSourceChoice->Append(wxString(_("RMP2 Natural Orbitals")));
 								break;
+							case TDDFT:
+								mMOSourceChoice->Append(wxString(_("TD-DFT Natural Orbitals")));
+								break;
 							default:
 								mMOSourceChoice->Append(wxString(_("Natural Orbitals")));
 								break;
