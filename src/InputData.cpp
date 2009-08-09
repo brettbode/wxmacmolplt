@@ -2780,23 +2780,11 @@ void HessianGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	Boolean	method=false;
 	char	Out[133];
 
-		//first determine wether or not the hessian group needs to be punched
-		//punch for hessians and optimize/sadpoint runs using Hess=Calc
-	if ((IData->Control->GetRunType() == HessianRun)||
-		(IData->Control->GetRunType() == G3MP2)) method = true;
-	else if ((IData->Control->GetRunType() == OptimizeRun)||(IData->Control->GetRunType() == SadPointRun)) {
-		if (IData->StatPt) {
-			if (IData->StatPt->GetHessMethod() == 3) method = true;
-		}
-	}
-	if (!method) return;
+		//Only output a force group if it's relevant to the overall run options
+	if (! IsHessianGroupNeeded(IData)) return;
 
-	bool AnalyticPoss = (((IData->Control->GetSCFType() == 1)||(IData->Control->GetSCFType() == 3)||
-						  (IData->Control->GetSCFType() == 4)||(IData->Control->GetSCFType() == 0))&&
-						 (IData->Control->GetMPLevel() <= 0));
-	//Analytic hessians are not available for semi-emperical basis sets
-	if ((IData->Basis->GetBasis() == GAMESS_BS_MNDO)||(IData->Basis->GetBasis() == GAMESS_BS_AM1)||
-		(IData->Basis->GetBasis() == GAMESS_BS_PM3)) AnalyticPoss = false;
+	bool AnalyticPoss = IsAnalyticHessianPossible(IData);
+
 	method = GetAnalyticMethod() && AnalyticPoss;
 		//Punch the group label
 	File->WriteLine(" $FORCE ", false);
@@ -2897,6 +2885,31 @@ void HessianGroup::ReadXML(XMLElement * parent) {
 		}
 		delete children;
 	}
+}
+bool HessianGroup::IsAnalyticHessianPossible(const InputData * IData) {
+	//Check based on the SCF type
+	bool result = (((IData->Control->GetSCFType() == 1)||(IData->Control->GetSCFType() == 3)||
+					(IData->Control->GetSCFType() == 4)||(IData->Control->GetSCFType() == 0))&&
+				   (IData->Control->GetMPLevel() <= 0));
+	//Analytic hessians are not available for semi-emperical basis sets
+	if ((IData->Basis->GetBasis() == GAMESS_BS_MNDO)||(IData->Basis->GetBasis() == GAMESS_BS_AM1)||
+		(IData->Basis->GetBasis() == GAMESS_BS_PM3)) return false;
+	
+	return result;
+}
+bool HessianGroup::IsHessianGroupNeeded(const InputData * IData) {
+	bool result = false;
+	//Hessians are computed with runtyp of hessian, optimize or sadpoint
+	//optimize/sadpoint runs using Hess=Calc or hssend=.t.
+	if ((IData->Control->GetRunType() == HessianRun)||
+		(IData->Control->GetRunType() == G3MP2)) result = true;
+	else if ((IData->Control->GetRunType() == OptimizeRun)||(IData->Control->GetRunType() == SadPointRun)) {
+		if (IData->StatPt) {
+			if (IData->StatPt->GetHessMethod() == 3) result = true;
+			if (IData->StatPt->GetHessEndFlag()) result = true;
+		}
+	}
+	return result;
 }
 #pragma mark DFTGroup
 void DFTGroup::InitData(void) {

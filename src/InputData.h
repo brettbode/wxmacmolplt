@@ -784,6 +784,19 @@ class HessianGroup {
 		inline bool GetVibAnalysis(void) const {return ((BitOptions & 16)?true:false);};
 		inline void SetVibAnalysis(bool NewVal) {if (BitOptions & 16) BitOptions -= 16; if (NewVal) BitOptions += 16;};
 
+		/**
+		 * Analyze the provided set of input parameters to determine if the run will involve the
+		 * computation of a hessian, thus making this group needed.
+		 * @param IData Pointer to the set of input data to analyze.
+		 */
+		static bool IsHessianGroupNeeded(const InputData * IData);
+		/**
+		 * Analyze the provided set of input parameters to determine if GAMESS can compute
+		 * the 2nd derivative of the energy analytically.
+		 * @param IData Pointer to the set of input data to analyze.
+		 */
+		static bool IsAnalyticHessianPossible(const InputData * IData);
+	
 		void WriteToFile(BufferFile *File, InputData *IData);
 		void WriteXML(XMLElement * parent) const;
 		void ReadXML(XMLElement * parent);

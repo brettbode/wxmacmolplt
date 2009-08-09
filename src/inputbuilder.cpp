@@ -1510,11 +1510,7 @@ bool InputBuilderWindow::ShowMP2Opts() const {
 
 bool InputBuilderWindow::ShowHessOpts() const {
 
-	return TmpInputRec->Control->GetRunType() == HessianRun ||
-		   TmpInputRec->Control->GetRunType() == G3MP2 ||
-		   (TmpInputRec->Control->GetRunType() == SadPointRun &&
-		    TmpInputRec->StatPt->GetHessMethod() == 3);
-
+	return HessianGroup::IsHessianGroupNeeded(TmpInputRec);
 }
 
 bool InputBuilderWindow::ShowSCFOpts() const {
@@ -1966,12 +1962,7 @@ void InputBuilderWindow::SetupMOGuessItems() {
 void InputBuilderWindow::SetupHessOptsItems() {
 	if (!TmpInputRec->Hessian) TmpInputRec->Hessian = new HessianGroup;
 
-	bool AnalyticPoss = (((TmpInputRec->Control->GetSCFType() == 1)||(TmpInputRec->Control->GetSCFType() == 3)||
-							 (TmpInputRec->Control->GetSCFType() == 4)||(TmpInputRec->Control->GetSCFType() == 0))&&
-							(TmpInputRec->Control->GetMPLevel() <= 0));
-	//Analytic hessians are not available for semi-emperical basis sets
-	if ((TmpInputRec->Basis->GetBasis() == GAMESS_BS_MNDO)||(TmpInputRec->Basis->GetBasis() == GAMESS_BS_AM1)||
-		(TmpInputRec->Basis->GetBasis() == GAMESS_BS_PM3)) AnalyticPoss = false;
+	bool AnalyticPoss = TmpInputRec->Hessian->IsAnalyticHessianPossible(TmpInputRec);
 	
 	bool AnalyticSelected = TmpInputRec->Hessian->GetAnalyticMethod() && AnalyticPoss;
 	mHessMethodRadio->Enable(AnalyticPoss);
@@ -2625,7 +2616,6 @@ void InputBuilderWindow::OnAdvancedButtonClicked( wxCommandEvent& event )
 		setPaneVisible(SCFOPTS_PANE, ShowSCFOpts());
 		setPaneVisible(STATPOINT_PANE, ShowStatPoint());
 		setPaneVisible(SUMMARY_PANE, true);
-		// TODO: scf pane and dft pane
 		SetupControlItems();
 	}
 	
@@ -3175,6 +3165,7 @@ void InputBuilderWindow::OnInitHessRadioSelected( wxCommandEvent& event )
 		TmpInputRec->StatPt->SetHessMethod(val);
 	}
 	SetupStatPointItems();
+    SetupItems();
 	event.Skip();
 }
 
@@ -3657,6 +3648,7 @@ void InputBuilderWindow::OnSphereCheckClick( wxCommandEvent& event )
 void InputBuilderWindow::OnHessendCheckClick( wxCommandEvent& event )
 {
 	TmpInputRec->StatPt->SetHessFlag(event.IsChecked());
+    SetupItems();
 	event.Skip();
 }
 
