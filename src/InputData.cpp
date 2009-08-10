@@ -65,6 +65,7 @@ InputData::InputData(InputData *Copy) {
 	DFT = NULL;
 	if (Copy->DFT) DFT = new DFTGroup(Copy->DFT);
 	EFP = Copy->EFP;
+	FMO = Copy->FMO;
 }
 InputData::~InputData(void) {	//destructor
 	if (Control) delete Control;	//simply delete all groups present
@@ -2023,36 +2024,38 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 	} else sprintf(Out, "%s", GetPointGroupText());
 	File->WriteLine(Out, true);
 	if ((PointGroup!=0)&&(PointGroup!=1)) File->WriteLine("", true);
-		//coordinates
-	if (Coord == ZMTCoordType) {	//"normal" style z-matrix
-		Internals * IntCoords = MainData->GetInternalCoordinates();
-		if (!IntCoords) {
-			MainData->InitializeInternals();
-			IntCoords = MainData->GetInternalCoordinates();
-		}
-		if (IntCoords) IntCoords->WriteCoordinatesToFile(File, MainData, Prefs);
-	} else if (Coord == ZMTMPCCoordType) {
-		Internals * IntCoords = MainData->GetInternalCoordinates();
-		if (!IntCoords) {
-			MainData->InitializeInternals();
-			IntCoords = MainData->GetInternalCoordinates();
-		}
-		if (IntCoords) IntCoords->WriteMPCZMatCoordinatesToFile(File, MainData, Prefs);
-	} else {
-		if (Coord <= UniqueCoordType) MainData->GenerateSymmetryUniqueAtoms(1.0E-3);
-		for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
-			if (!cFrame->Atoms[iatom].IsEffectiveFragment()) {
-				if ((Coord > UniqueCoordType)||(cFrame->Atoms[iatom].IsSymmetryUnique())) {
-					Str255 AtomLabel;
-					Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
-					AtomLabel[AtomLabel[0]+1] = 0;
-					sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
-						(char *) &(AtomLabel[1]), (float) (cFrame->Atoms[iatom].GetType()), 
-						cFrame->Atoms[iatom].Position.x*unitConversion,
-						cFrame->Atoms[iatom].Position.y*unitConversion,
-						cFrame->Atoms[iatom].Position.z*unitConversion);
-					File->WriteLine(Out, true);
-					if (BasisTest) lBasis->WriteBasis(File, iatom);
+	if (! MainData->InputOptions->FMO.IsFMOActive()) {
+			//coordinates
+		if (Coord == ZMTCoordType) {	//"normal" style z-matrix
+			Internals * IntCoords = MainData->GetInternalCoordinates();
+			if (!IntCoords) {
+				MainData->InitializeInternals();
+				IntCoords = MainData->GetInternalCoordinates();
+			}
+			if (IntCoords) IntCoords->WriteCoordinatesToFile(File, MainData, Prefs);
+		} else if (Coord == ZMTMPCCoordType) {
+			Internals * IntCoords = MainData->GetInternalCoordinates();
+			if (!IntCoords) {
+				MainData->InitializeInternals();
+				IntCoords = MainData->GetInternalCoordinates();
+			}
+			if (IntCoords) IntCoords->WriteMPCZMatCoordinatesToFile(File, MainData, Prefs);
+		} else {
+			if (Coord <= UniqueCoordType) MainData->GenerateSymmetryUniqueAtoms(1.0E-3);
+			for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
+				if (!cFrame->Atoms[iatom].IsEffectiveFragment()) {
+					if ((Coord > UniqueCoordType)||(cFrame->Atoms[iatom].IsSymmetryUnique())) {
+						Str255 AtomLabel;
+						Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
+						AtomLabel[AtomLabel[0]+1] = 0;
+						sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
+							(char *) &(AtomLabel[1]), (float) (cFrame->Atoms[iatom].GetType()), 
+							cFrame->Atoms[iatom].Position.x*unitConversion,
+							cFrame->Atoms[iatom].Position.y*unitConversion,
+							cFrame->Atoms[iatom].Position.z*unitConversion);
+						File->WriteLine(Out, true);
+						if (BasisTest) lBasis->WriteBasis(File, iatom);
+					}
 				}
 			}
 		}
@@ -2124,6 +2127,24 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 			File->Write(text.c_str(), text.size());
 			File->WriteLine("", true);
 		}
+	}
+	if (MainData->InputOptions->FMO.IsFMOActive()) {
+		//FMO runs place all the coordinates in the FMOXYZ group
+		File->WriteLine(" $FMOXYZ ", true);
+		for (int iatom=0; iatom<cFrame->NumAtoms; iatom++) {
+			if (!cFrame->Atoms[iatom].IsEffectiveFragment()) {
+				Str255 AtomLabel;
+				Prefs->GetAtomLabel(cFrame->Atoms[iatom].GetType()-1, AtomLabel);
+				AtomLabel[AtomLabel[0]+1] = 0;
+				sprintf(Out, "%s   %5.1f  %10.5f  %10.5f  %10.5f",
+						(char *) &(AtomLabel[1]), (float) (cFrame->Atoms[iatom].GetType()), 
+						cFrame->Atoms[iatom].Position.x*unitConversion,
+						cFrame->Atoms[iatom].Position.y*unitConversion,
+						cFrame->Atoms[iatom].Position.z*unitConversion);
+				File->WriteLine(Out, true);
+			}
+		}
+		File->WriteLine(" $END", true);
 	}
 }
 void DataGroup::WriteXML(XMLElement * parent) const {
@@ -3272,6 +3293,22 @@ void EffectiveFragmentsGroup::ReadXML(XMLElement * parent) {
 	parent->getAttributeValue(CML_convert(MMP_IOEFPMaxMOs), MaxMOs);
 	parent->getAttributeValue(CML_convert(MMP_IOEFPMaxBasisFuncs), MaxBasisFuncs);
 	parent->getAttributeValue(CML_convert(MMP_IOEFPNumBufferMOs), NumBufferMOs);
+}
+
+#pragma mark FMOGroup
+void FMOGroup::WriteToFile(BufferFile *File, InputData *IData) {
+	char	Out[kMaxLineLength];
+	
+	if (!IData->FMO.IsFMOActive()) return;
+	
+	//Punch the group label
+	File->WriteLine("!!!! Warning: FMO input is incomplete - you must complete by hand.", true);
+	File->WriteLine(" $FMO ", false);
+
+	sprintf(Out, "NFRAG=%ld ", GetNumberFragments());
+	File->WriteLine(Out, false);
+	
+	File->WriteLine("$END", true);
 }
 
 #pragma mark StatPtGroup

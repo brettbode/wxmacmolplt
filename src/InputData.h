@@ -987,6 +987,44 @@ class StatPtGroup {
 		 */
 		void ReadXML(XMLElement * parent);
 };
+
+/**
+ * Fragment Molecular Orbital primary option group.
+ * There are a few basic options, but many of the options are arrays based either on the 
+ * number of fragments or the number of atoms. Not sure whether to store them here or not??
+ */
+class FMOGroup {
+private:
+	long	NumberFragments;	///< the number of fragments in which to divide up the system
+	bool	Active;				///< Flag to turn FMO off or on
+public:
+	FMOGroup(void) {Active=false; NumberFragments=1;};
+	const FMOGroup & operator=(const FMOGroup & other) {Active=other.Active; NumberFragments=other.NumberFragments; return *this;};
+	
+	inline bool IsFMOActive(void) const {return Active;};
+	void FMOActive(bool newState) {Active = newState;};
+	inline long GetNumberFragments(void) const {return NumberFragments;};
+	void SetNumberFragments(long & num) {NumberFragments = num;};
+	
+	/**
+	 * Output the group options in GAMESS input format.
+	 * @param File The output buffer.
+	 * @param IData Pointer to the main input data class.
+	 */
+	void WriteToFile(BufferFile *File, InputData *IData);
+	/**
+	 Output the group to CML suitable for reading by the ReadXML routine.
+	 @param parent the parent XML tag to append this group to
+	 */
+//	void WriteXML(XMLElement * parent) const;
+	/**
+	 Load this groups non-default settings from CML.
+	 @param parent the parent XML tag to append this group from
+	 */
+//	void ReadXML(XMLElement * parent);
+	
+};
+
 class MolDisplayWin;
 
 class InputData {
@@ -1002,6 +1040,7 @@ class InputData {
 		StatPtGroup		*StatPt;
 		DFTGroup		*DFT;
 		EffectiveFragmentsGroup	EFP;
+		FMOGroup		FMO;
 			//member functions
 		InputData(void);
 		InputData(InputData *Copy);

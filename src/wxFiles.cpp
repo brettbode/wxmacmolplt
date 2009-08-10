@@ -35,6 +35,7 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
     if(!filePath.IsEmpty()) {
 		return WriteInputFile(filePath, lData, owner);
 	}
+	return -1;
 }
 
 long InputData::WriteInputFile(const wxString &filePath, MoleculeData * lData, MolDisplayWin * owner) {
@@ -60,6 +61,7 @@ long InputData::WriteInputFile(const wxString &filePath, MoleculeData * lData, M
 		if (MP2) MP2->WriteToFile(buffer, this);
 		if (StatPt) StatPt->WriteToFile(buffer, this);
 		if (Hessian) Hessian->WriteToFile(buffer, this);
+		FMO.WriteToFile(buffer, this);
 		if (Data) Data->WriteToFile(buffer, lData, owner->GetPrefs(), BasisTest);
 		if (Guess) Guess->WriteVecGroup(buffer, lData);
     }

@@ -350,6 +350,21 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		} while (!EndOfGroup);
 	}
 	Buffer->SetFilePos(0);	//restart search from beginning of file
+	EndOfGroup = false;
+	if (Buffer->FindGroup("FMO")) {
+		MainData->InputOptions->FMO.FMOActive(true);
+		do {
+			Buffer->GetLine(Line);
+			if (ReadLongKeyword(Line, "NFRAG", &nAtoms))
+				MainData->InputOptions->FMO.SetNumberFragments(nAtoms);
+			
+			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
+				//scan for multiple occurances of this group
+				if (!Buffer->FindGroup("FMO")) EndOfGroup = true;
+			}
+		} while (!EndOfGroup);
+	}
+	Buffer->SetFilePos(0);	//restart search from beginning of file
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	if (Buffer->FindGroup("DATA")) {
 		Buffer->SkipnLines(1);
@@ -370,6 +385,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			EndPos = Buffer->GetFilePos() - 1;
 			Buffer->SetFilePos(StartPos);
 			nAtoms = Buffer->GetNumLines(EndPos - StartPos);
+			if (MainData->InputOptions->FMO.IsFMOActive()) nAtoms=0;	//FMO coordinates are in $FMOXYZ
 			if (nAtoms > 0) {
 				if (MainData->InputOptions->Data->GetCoordType() <= CartesianCoordType) {
 					if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
@@ -422,6 +438,33 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				if (Prefs->GetAutoBond())	//setup bonds, if needed
 					lFrame->SetBonds(Prefs, false);
 			}
+		}
+	}
+	Buffer->SetFilePos(0);	//restart search from beginning of file
+	if (MainData->InputOptions->FMO.IsFMOActive() && Buffer->FindGroup("FMOXYZ")) {
+		Buffer->SkipnLines(1);
+		StartPos = Buffer->GetFilePos();
+		if (!Buffer->LocateKeyWord("$END", 4)) throw DataError();
+		float unitConversion = 1.0;
+		if (MainData->InputOptions->Data->GetUnits()) unitConversion = kBohr2AngConversion;
+		EndPos = Buffer->GetFilePos() - 1;
+		Buffer->SetFilePos(StartPos);
+		nAtoms = Buffer->GetNumLines(EndPos - StartPos);
+		if (nAtoms > 0) {
+			if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
+			while (Buffer->GetFilePos() < EndPos) {
+				CPoint3D	pos;
+				float		AtomType;
+				Buffer->GetLine(Line);
+				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+				{ throw UserCancel();}
+				pos.x = pos.y = pos.z = 0.0;
+				sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
+				pos *= unitConversion;
+				lFrame->AddAtom((long) AtomType, pos);
+			}
+			if (Prefs->GetAutoBond())	//setup bonds, if needed
+				lFrame->SetBonds(Prefs, false);
 		}
 	}
 	Buffer->SetFilePos(0);	//restart search from beginning of file
@@ -638,6 +681,11 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	}
 	return 1;
 }
+/**
+ * Parses the MDL Mol Format (just atoms). 
+ * @param Buffer A BufferFileObject which the MDL mol file is buffered into
+ * @return Returns 1 upon open success or 0 on error or failure to open
+ */
 long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
 	char Line[kMaxLineLength], partA[16], partB[16], partC[16];
 	long	nAtoms, nBonds;
@@ -711,6 +759,11 @@ long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
 	
 	return 1;
 }
+/**
+ * Parses the Protein Databank Format (just atoms). 
+ * @param Buffer A BufferFileObject which the PDB file is buffered into
+ * @return Returns 1 upon open success or 0 on error or failure to open
+ */
 long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 	char Line[kMaxLineLength];
 	long	nAtoms, nModels;
