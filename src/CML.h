@@ -276,6 +276,7 @@ enum MMP_InputOptionsNS {
 	MMP_IOStatPtGroupElement,
 	MMP_IODFTGroupElement,
 	MMP_IOEFPGroupElement,
+	MMP_IOFMOGroupElement,
 	
 	NumberMMPInputOptions
 };
@@ -458,6 +459,13 @@ enum MMP_IOEFPGroupNS {
 	
 	NumberMMPIOEFPGroupItems
 };
+enum MMP_IOFMOGroupNS {
+	MMP_IOFMOGroupInvalid=0,
+	MMP_IOFMOActiveFlag,
+	MMP_IOFMONumFragments,
+	
+	NumberMMPIOFMOGroupItems
+};
 
 #define VISIBLE_XML	"visible"
 enum MMP_WindowDataNS {
@@ -518,6 +526,7 @@ const char * CML_convert(MMP_IOHessGroupNS b);
 const char * CML_convert(MMP_IODFTGroupNS b);
 const char * CML_convert(MMP_IOStatPtGroupNS b);
 const char * CML_convert(MMP_IOEFPGroupNS b);
+const char * CML_convert(MMP_IOFMOGroupNS b);
 const char * CML_convert(MMP_WindowDataNS b);
 const char * CML_convert(MMP_BasisSetNS b);
 const char * CML_convert(MMP_AnnotationTypesNS b);
@@ -546,6 +555,7 @@ bool CML_convert(const char * s, MMP_IOHessGroupNS & b);
 bool CML_convert(const char * s, MMP_IODFTGroupNS & b);
 bool CML_convert(const char * s, MMP_IOStatPtGroupNS & b);
 bool CML_convert(const char * s, MMP_IOEFPGroupNS & b);
+bool CML_convert(const char * s, MMP_IOFMOGroupNS & b);
 bool CML_convert(const char * s, MMP_WindowDataNS & b);
 bool CML_convert(const char * s, MMP_BasisSetNS & b);
 bool CML_convert(const char * s, MMP_AnnotationTypesNS & b);

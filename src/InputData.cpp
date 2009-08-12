@@ -113,6 +113,7 @@ void InputData::WriteXML(XMLElement * parent) const {
 		DFT->WriteXML(Ele);
 	}
 	EFP.WriteXML(Ele);
+	FMO.WriteXML(Ele);
 }
 void InputData::ReadXML(XMLElement * parent) {
 	XMLElementList * ipxml = parent->getChildren();
@@ -167,6 +168,12 @@ void InputData::ReadXML(XMLElement * parent) {
 									case MMP_IODFTGroupElement:
 										if (DFT == NULL) DFT = new DFTGroup;
 										if (DFT) DFT->ReadXML(child);
+										break;
+									case MMP_IOEFPGroupElement:
+										EFP.ReadXML(child);
+										break;
+									case MMP_IOFMOGroupElement:
+										FMO.ReadXML(child);
 										break;
 								}
 							}
@@ -3309,6 +3316,41 @@ void FMOGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	File->WriteLine(Out, false);
 	
 	File->WriteLine("$END", true);
+}
+void FMOGroup::WriteXML(XMLElement * parent) const {
+	//This group is only needed if there are non-default values
+	if (IsFMOActive() || (GetNumberFragments()>1)) {
+		
+		XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOFMOGroupElement));
+		Ele->addBoolAttribute(CML_convert(MMP_IOFMOActiveFlag), IsFMOActive());
+		char line[kMaxLineLength];
+		snprintf(line, kMaxLineLength, "%ld", GetNumberFragments());
+		Ele->addChildElement(CML_convert(MMP_IOFMONumFragments), line);
+	}
+}
+void FMOGroup::ReadXML(XMLElement * parent) {
+	bool tb;
+	if (parent->getAttributeValue(CML_convert(MMP_IOFMOActiveFlag), tb)) FMOActive(tb);
+	XMLElementList * children = parent->getChildren();
+	if (children) {
+		for (int i=0; i<children->length(); i++) {
+			XMLElement * child = children->item(i);
+			MMP_IOFMOGroupNS item;
+			if (child && CML_convert(child->getName(), item)) {
+				switch (item) {
+					case MMP_IOFMONumFragments:
+					{
+						long temp;
+						if (child->getLongValue(temp)) {
+							SetNumberFragments(temp);
+						}
+					}
+						break;
+				}
+			}
+		}
+		delete children;
+	}
 }
 
 #pragma mark StatPtGroup

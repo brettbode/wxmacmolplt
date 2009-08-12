@@ -3312,6 +3312,8 @@ const char * CML_convert(MMP_InputOptionsNS t)
 			return "DFTGroup";
 		case MMP_IOEFPGroupElement:
 			return "EFRAGGroup";
+		case MMP_IOFMOGroupElement:
+			return "FMOGroup";
 		default:
             return "invalid";
     }
@@ -3626,6 +3628,18 @@ const char * CML_convert(MMP_IOEFPGroupNS t)
             return "invalid";
     }
 }
+#pragma mark MMP_IOFMOGroupNS
+const char * CML_convert(MMP_IOFMOGroupNS t)
+{       
+    switch(t) {
+        case MMP_IOFMOActiveFlag:
+            return "FMOActive";
+		case MMP_IOFMONumFragments:
+			return "NumberFMOFragments";
+		default:
+            return "invalid";
+    }
+}
 #pragma mark MMP_WindowDataNS
 const char * CML_convert(MMP_WindowDataNS t)
 {       
@@ -3798,6 +3812,14 @@ bool CML_convert(const char * s, MMP_IOHessGroupNS & t)
 bool CML_convert(const char * s, MMP_IODFTGroupNS & t)
 {
     MATCH(s, t, 0, NumberMMPIODFTGroupItems, MMP_IODFTGroupNS)
+}
+bool CML_convert(const char * s, MMP_IOEFPGroupNS & t)
+{
+    MATCH(s, t, 0, NumberMMPIOEFPGroupItems, MMP_IOEFPGroupNS)
+}
+bool CML_convert(const char * s, MMP_IOFMOGroupNS & t)
+{
+    MATCH(s, t, 0, NumberMMPIOFMOGroupItems, MMP_IOFMOGroupNS)
 }
 bool CML_convert(const char * s, MMP_WindowDataNS & t)
 {

@@ -1016,12 +1016,12 @@ public:
 	 Output the group to CML suitable for reading by the ReadXML routine.
 	 @param parent the parent XML tag to append this group to
 	 */
-//	void WriteXML(XMLElement * parent) const;
+	void WriteXML(XMLElement * parent) const;
 	/**
 	 Load this groups non-default settings from CML.
 	 @param parent the parent XML tag to append this group from
 	 */
-//	void ReadXML(XMLElement * parent);
+	void ReadXML(XMLElement * parent);
 	
 };
 
