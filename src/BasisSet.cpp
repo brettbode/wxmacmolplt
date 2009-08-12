@@ -740,6 +740,7 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms, con
 #include <iostream>
 bool BasisSet::ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms) {
 	bool result = true;
+//	bool use5D=false, use7F=false, use10G=false;
 	char	LineText[kMaxLineLength];
 	long	shellCount = 0;
 	
@@ -759,19 +760,19 @@ bool BasisSet::ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms) {
 				if (strlen(token) == 1) {
 					switch (toupper(token[0])) {
 						case 'S':
-							ShellType = 0;
+							ShellType = SShell;
 							break;
 						case 'P':
-							ShellType = 1;
+							ShellType = PShell;
 							break;
 						case 'D':
-							ShellType = 2;
+							ShellType = DShell;
 							break;
 						case 'F':
-							ShellType = 3;
+							ShellType = FShell;
 							break;
 						case 'G':
-							ShellType = 4;
+							ShellType = GShell;
 							break;
 						default:
 							return false; //invalid type
