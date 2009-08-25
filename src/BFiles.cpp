@@ -186,23 +186,12 @@ BufferFile::BufferFile(FILE * TargetFileRef, bool Write)
 		BlockLengths[0] = ByteCount;
 	}
 	if (BufferSize <= 0) throw MemoryError("Invalid buffer size!");
-#ifdef UseHandles
-		OSErr		myerr;
-	Buffer = TempNewHandle(BufferSize, &myerr);
-	if (!Buffer)
-		Buffer = NewHandle(BufferSize);
-#else
-	Buffer = (Ptr) new char[BufferSize];
-#endif
+	Buffer = new char[BufferSize];
 	if (!Buffer) throw MemoryError("Unable to allocate file buffer");
 //Got the Buffer so read in the first block
 	AdvanceBuffer();
 }
-#ifdef UseHandles
-BufferFile::BufferFile(Handle Data, long DataSize)
-#else
-BufferFile::BufferFile(Ptr Data, long DataSize)
-#endif
+BufferFile::BufferFile(char * Data, long DataSize)
 {
 	BufferStart = BufferPos = 0;
 	BufferSize = DataSize;		//Obviously Data should be >= to DataSize or there will be trouble!
@@ -242,11 +231,7 @@ BufferFile::BufferFile(Ptr Data, long DataSize)
 BufferFile::~BufferFile(void) {
 	if (IOType == 1) AdvanceBuffer();
 	if (Buffer && (IOType != -1)) {	//Dispose the file buffer (if I allocated it)
-#ifdef UseHandles
-		DisposeHandle(Buffer);
-#else
 		delete [] Buffer;
-#endif
 	}
 	if (BlockLengths) delete [] BlockLengths;
 }
@@ -426,11 +411,7 @@ long BufferFile::Read(Ptr Target, long NumBytes) {
 	while (BytesRead<NumBytes) {
 		if (BufferPos>=BufferSize) AdvanceBuffer();
 		BlockSize = MIN((NumBytes-BytesRead), (BufferSize-BufferPos));
-#ifdef UseHandles
-		BlockMoveData(&((*Buffer)[BufferPos]), &(Target[BytesRead]), BlockSize);
-#else
 		memcpy(&(Target[BytesRead]), &(Buffer[BufferPos]), BlockSize);
-#endif
 		BytesRead += BlockSize;
 		BufferPos += BlockSize;
 	}
@@ -449,23 +430,14 @@ long BufferFile::GetLine(char * Line)
 	if (BufferPos>=BufferSize) AdvanceBuffer();	//Just in case...
 	if ((BufferStart+BufferPos)>=ByteCount) throw FileError(eofErr);	//End of file reached
 			//advance until a line feed or return is found
-#ifdef UseHandles
-	while (((*Buffer)[BufferPos] != 13)&&((*Buffer)[BufferPos] != 10)) {
-		Line[LineChars] = (*Buffer)[BufferPos];
-#else
 	while ((Buffer[BufferPos] != 13)&&(Buffer[BufferPos] != 10)) {
 		Line[LineChars] = Buffer[BufferPos];
-#endif
 		LineChars++;
 		BufferPos ++;
 		if ((BufferStart+BufferPos)>=ByteCount) break;	//End of file reached, assume EOL
 		if (LineChars>=(kMaxLineLength-2)) break;	//Make sure we don't overrun the Line buffer
 		if (BufferPos>=BufferSize) AdvanceBuffer();
 	}
-#ifdef UseHandles
-	if (((BufferPos+BufferStart+1)<ByteCount)&&
-		(((*Buffer)[BufferPos] == 13)||((*Buffer)[BufferPos] == 10))) BufferPos++;
-#else
 	if ((BufferPos+BufferStart)<ByteCount) {
 		if (BufferPos >= BufferSize) AdvanceBuffer();
 		if ((Buffer[BufferPos] == 13)||(Buffer[BufferPos] == 10)) {
@@ -476,7 +448,6 @@ long BufferFile::GetLine(char * Line)
 			}
 		}
 	}
-#endif
 	Line[LineChars] = 0;	//Make it a proper NULL terminated string
 	return LineChars;	//Return the number of characters read (not including the NULL)
 }
@@ -484,11 +455,7 @@ long BufferFile::PutText(const char * Text)	//This requires a NULL terminated st
 {	long	TextChars=0;				//not copied
 	while (Text[TextChars]) {
 		if (BufferPos>=BufferSize) AdvanceBuffer();	// Flush out the buffer
-#ifdef UseHandles
-		(*Buffer)[BufferPos] = Text[TextChars];
-#else
 		Buffer[BufferPos] = Text[TextChars];
-#endif
 		TextChars++;
 		BufferPos ++;
 	}
@@ -503,11 +470,7 @@ void BufferFile::BackupnLines(long nBack) {
 			AdvanceBuffer();
 			BufferPos = cPos-BufferStart;	//Set pos to end of buffer
 		}
-#ifdef UseHandles
-		while (((*Buffer)[BufferPos] != 13)&&((*Buffer)[BufferPos] != 10)) {
-#else
 		while ((Buffer[BufferPos] != 13)&&(Buffer[BufferPos] != 10)) {
-#endif
 			BufferPos --;
 			if ((BufferStart+BufferPos)==0) break;	//Beginning of file reached
 			if (BufferPos == 0) {	//Back up one buffer block
@@ -527,11 +490,7 @@ void BufferFile::SkipnLines(long nSkip) {
 	for (long nSkipped=0; nSkipped<nSkip; nSkipped++) {	//advance until a line feed or return is found
 		if ((BufferStart+BufferPos)>=ByteCount) throw FileError(eofErr);	//End of file reached
 		if (BufferPos>=BufferSize) AdvanceBuffer();	//Just in case...
-#ifdef UseHandles
-		while (((*Buffer)[BufferPos] != 13)&&((*Buffer)[BufferPos] != 10)) {
-#else
 		while ((Buffer[BufferPos] != 13)&&(Buffer[BufferPos] != 10)) {
-#endif
 			BufferPos ++;
 			if ((BufferStart+BufferPos)>=ByteCount) break;	//End of file reached, assume EOL
 			if (BufferPos>=BufferSize) AdvanceBuffer();
@@ -563,13 +522,8 @@ long BufferFile::FindBlankLine(void) {
 		if (BufferStart + BufferPos >= ByteCount)	// No blank lines found
 			break;
 		if (BufferPos>=BufferSize) AdvanceBuffer();	//Just in case...
-#ifdef UseHandles
-		for (; ((*Buffer)[BufferPos] != 13)&&((*Buffer)[BufferPos] != 10); ) {
-			if ((*Buffer)[BufferPos] > 32) done = false;	//Is it a printable char?
-#else
 		for (; (Buffer[BufferPos] != 13)&&(Buffer[BufferPos] != 10); ) {
 			if (Buffer[BufferPos] > 32) done = false;	//Is it a printable char?
-#endif
 			BufferPos++;
 			if ((BufferStart+BufferPos)>=ByteCount) break;	//End of file reached, assume EOL
 			if (BufferPos>=BufferSize) AdvanceBuffer();
@@ -618,21 +572,13 @@ long BufferFile::GetNumLines(long size) {
 	long NumLines=1;
 	while ((BufferStart+BufferPos) < EndPos) {
 		if (BufferPos>=BufferSize) AdvanceBuffer();
-#ifdef UseHandles
-		if (((*Buffer)[BufferPos] == 13)||((*Buffer)[BufferPos]==10)) NumLines++;
-#else
 		if ((Buffer[BufferPos] == 13)||(Buffer[BufferPos]==10)) NumLines++;
 		if ((Buffer[BufferPos]==13)&&(Buffer[BufferPos+1]==10)) BufferPos++;
-#endif
 		
 		BufferPos++;
 	}
 	BufferPos--;
-#ifdef UseHandles
-	if (((*Buffer)[BufferPos] == 13)||((*Buffer)[BufferPos]==10)) NumLines--;
-#else
 	if ((Buffer[BufferPos] == 13)||(Buffer[BufferPos]==10)) NumLines--;
-#endif
 	SetFilePos(StartPos);
 	return NumLines;
 } /*GetNumLines*/
@@ -654,11 +600,7 @@ long BufferFile::Write(const char * Source, long NumBytes) {
 		while (BytesWritten<NumBytes) {
 			if (BufferPos>=BufferSize) AdvanceBuffer();
 			BlockSize = MIN((NumBytes-BytesWritten), (BufferSize-BufferPos));
-#ifdef UseHandles
-			BlockMoveData(&(Source[BytesWritten]), &((*Buffer)[BufferPos]), BlockSize);
-#else
 			memcpy(&(Buffer[BufferPos]), &(Source[BytesWritten]), BlockSize);
-#endif
 			BytesWritten += BlockSize;
 			BufferPos += BlockSize;
 		}
@@ -673,30 +615,18 @@ long BufferFile::WriteLine(const char *text, bool NewLine) {
 		}
 		if (((nchar+LinePos)>ColsPerLine)&&(nchar<ColsPerLine)) {
 				//Wrap line and indent the next line, but don't wrap a single huge line
-#ifdef UseHandles
-			sprintf(&((*Buffer)[BufferPos]), "%c    ", EOLchar);
-#else
 			sprintf(&(Buffer[BufferPos]), "%c    ", EOLchar);
-#endif
 			BufferPos+=5;
 			LinePos=4;
 		}
 		for (long i=0; i<nchar; i++) {
-#ifdef UseHandles
-			(*Buffer)[BufferPos+i] = text[i];
-#else
 			Buffer[BufferPos+i] = text[i];
-#endif
 		}
 		BufferPos += nchar;
 		LinePos += nchar;
 		if (NewLine) {	//User requested a newline (no blanks for the next line)
 						//Tack on an EOL char as set when the Buffer was initialized.
-#ifdef UseHandles
-			(*Buffer)[BufferPos] = EOLchar;
-#else
 			Buffer[BufferPos] = EOLchar;
-#endif
 			BufferPos ++;
 			LinePos = 0;
 		}
@@ -718,11 +648,7 @@ void BufferFile::SetBlockLength(long length) {
 	if (BlockCount >= BlockArrayAllocation) {
 		long * temp = new long[BlockArrayAllocation+10];
 		if (!temp) throw MemoryError();
-#ifdef UseHandles
-		BlockMoveData((Ptr) BlockLengths, (Ptr) temp, BlockArrayAllocation*sizeof(long));
-#else
 		memcpy((Ptr) temp, (Ptr) BlockLengths, BlockArrayAllocation*sizeof(long));
-#endif
 		delete [] BlockLengths;
 		BlockLengths = temp;
 		BlockArrayAllocation += 10;
@@ -740,6 +666,43 @@ void BufferFile::FinishBlock(void) {
 			BlockLengths[i] = BlockLengths[i+1];
 		BlockCount--;
 	}
+}
+bool BufferFile::ReadLongValue(long & target, long Limit) {
+	bool result = false;
+	char work[kMaxLineLength];
+	if (GetFilePos() >= GetFileLength()) return false;	//already at the EOF
+	if (Limit < 0) Limit = GetFileLength();
+	
+	long SaveStart = GetFilePos();
+	//Advance over the whitespace (non-printable chars, space and commas
+	do {
+		if ((1 != Read(work, 1))||(GetFilePos() >= Limit)) {
+			SetFilePos(SaveStart);
+			return false;
+		}
+	} while ((work[0]<=' ')&&(work[0]!=','));
+	
+	//work[0] now has the first char
+	int count=0;
+	while (((work[count]>='0')&&(work[count]<='9'))||(work[count]=='-')) {
+		++count;
+		if ((1 != Read(&(work[count]), 1))||(GetFilePos() >= Limit)||
+			(count>(kMaxLineLength-2)))
+			break;
+	}
+		//backup over the non #.
+	if (GetFilePos() < Limit) SetFilePos(GetFilePos()-1);
+	if (count > 0) {
+		work[count] = '\0';
+		char * test;
+		target = strtol(work, &test, 0);
+		if ((test!=work)&&(test[0]=='\0')) {
+			result = true;
+		}
+	}
+	if (!result) SetFilePos(SaveStart);
+	
+	return result;
 }
 
 #ifdef _MSC_VER

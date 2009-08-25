@@ -101,11 +101,7 @@ void ConvertExponentStyle(char * Line);
 */
 class BufferFile {
 	private:
-#ifdef UseHandles
-		Handle		Buffer;
-#else
-		Ptr			Buffer;
-#endif
+		char *		Buffer;
 		long		BufferStart;
 		long		ByteCount;
 						//Blocks allow the user to restrict reads to a given
@@ -135,12 +131,8 @@ class BufferFile {
 		///Contructor used to operate on a pre-opened file.
  		BufferFile(FILE * TargetFileRef, bool Write);
 #endif
-#ifdef UseHandles
- 		BufferFile(Handle	TargetHandle, long HandleSize);
-#else
 		/// Contructor used to operate on a preallocated character buffer
- 		BufferFile(Ptr TargetPtr, long PtrSize);
-#endif
+ 		BufferFile(char * TargetPtr, long PtrSize);
  		~BufferFile(void);
 		/// Obtain the current file position
 		long GetFilePos(void);
@@ -232,6 +224,14 @@ class BufferFile {
 		inline long GetFileSize(void) const {return ByteCount;};
 		///How many bytes are left in the current search block.
  		long BytesLeftInBlock(void) {return (BlockLengths[0]-GetFilePos());};
+		/** Read the next long value skipping any whitespace.
+		 *  Returns true if successful.
+		 *  The buffer pos is moved to the next byte after the long on success, unchanged otherwise.
+		 * @param target will contain the parsed long value
+		 * @param Limit (optional) The file position limit (in bytes) to limit the search. The default
+		 *				will search to the end of the file.
+		 */
+		bool ReadLongValue(long & target, long Limit=-1);
  };
  
 #endif
