@@ -997,6 +997,7 @@ class FMOGroup {
 private:
 	long	NumberFragments;	///< the number of fragments in which to divide up the system
 	bool	Active;				///< Flag to turn FMO off or on
+	bool	OutputStyle;		///< Flag indicating how the INDAT array will be written
 public:
 	FMOGroup(void) {Active=false; NumberFragments=1;};
 	const FMOGroup & operator=(const FMOGroup & other) {Active=other.Active; NumberFragments=other.NumberFragments; return *this;};
@@ -1005,13 +1006,16 @@ public:
 	void FMOActive(bool newState) {Active = newState;};
 	inline long GetNumberFragments(void) const {return NumberFragments;};
 	void SetNumberFragments(long & num) {NumberFragments = num;};
+		/** If true output INDAT as the atom list for each fragment, else atom ordered list */
+	inline bool UseFragmentINDAT(void) const {return OutputStyle;};
+	void UseFragmentINDAT(bool choice) {OutputStyle = choice;};	///< Pass true for INDAT ordered by fragment
 	
 	/**
 	 * Output the group options in GAMESS input format.
 	 * @param File The output buffer.
-	 * @param IData Pointer to the main input data class.
+	 * @param MainData Pointer to the main data class.
 	 */
-	void WriteToFile(BufferFile *File, InputData *IData);
+	void WriteToFile(BufferFile *File, MoleculeData * MainData);
 	/**
 	 Output the group to CML suitable for reading by the ReadXML routine.
 	 @param parent the parent XML tag to append this group to

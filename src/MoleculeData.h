@@ -36,42 +36,47 @@ class MoleculeData {
 		friend class FrameSnapShot;
 		friend class DataGroup;
 	private:
-		std::vector<Annotation *> Annotations;	//Set of annotations
+		std::vector<Annotation *> Annotations;	///< Set of annotations
 		int constrain_anno_id;
-		CPoint3D	*RotCoords;				// The currently displayed, rotated coordinates
-		long		*zBuffer;				// the sorting order for RotCoords
-		Frame *		cFrame;					// pointer to the currently drawn frame
-		Frame *		Frames;					// pointer to the first frame
-		Internals *	IntCoords;
-		BasisSet *	Basis;
+		CPoint3D	*RotCoords;				///< The currently displayed, rotated coordinates in 2D mode
+		long		*zBuffer;				///< the sorting order for RotCoords in 2D mode
+		Frame *		cFrame;					///< pointer to the currently drawn frame
+		Frame *		Frames;					///< pointer to the first frame
+		Internals *	IntCoords;				///< The set of internal coordinate definitions
+		BasisSet *	Basis;					///< The full basis set used in a computation
 
-		// efrags is a hash from fragment name to a structure containing
-		// fragment text and parsed coordinates.  There's only one entry for
-		// each different fragment type.  FragmentNames is used to map fragment
-		// instances to their fragment type.  There's one entry per instance of
-		// each fragment type.  Use an atom's fragment number to index into
-		// FragmentNames, and use the string there to index into efrags.
+		/** efrags is a hash from fragment name to a structure containing
+		 * fragment text and parsed coordinates.  There's only one entry for
+		 * each different fragment type.  FragmentNames is used to map fragment
+		 * instances to their fragment type.  There's one entry per instance of
+		 * each fragment type.  Use an atom's fragment number to index into
+		 * FragmentNames, and use the string there to index into efrags.
+		 */
 		std::map<std::string, EFrag> efrags;
-		std::vector<std::string> FragmentNames;	//< Effective Fragment name for each fragment (FRAGNAME)
+		std::vector<std::string> FragmentNames;	///< Effective Fragment name for each fragment (FRAGNAME)
+		std::vector<long> FMOFragmentIds;	///< Vector containing the FMO fragment mapping for each atom
 
-		char *		Description;			// Simple one line label
-		long		CurrentFrame;			// Number of the current frame
-		long		NumFrames;				// Current number of Frames
-		long		MaxAtoms;				// The maximum number of atoms in any frame
-		float		MaxSize;				// The maximum side length of any frame
-		float		WindowSize;				// The Window size in the molecule coordinate space (ie  or Bohrs) user adjustable to change the window scaling
-		Matrix4D	TotalRotation;			// Rotation matrix for displaying the molecule
+		char *		Description;			///< Simple one line label
+		long		CurrentFrame;			///< Number of the current frame
+		long		NumFrames;				///< Current number of Frames
+		long		MaxAtoms;				///< The maximum number of atoms in any frame
+		float		MaxSize;				///< The maximum side length of any frame
+		float		WindowSize;				///< The Window size in the molecule coordinate space (ie  or Bohrs) user adjustable to change the window scaling
+		Matrix4D	TotalRotation;			///< Rotation matrix for displaying the molecule
 		CPoint3D    Centroid;
 		CPoint3D    MolCentroid;
-		InputData *	InputOptions;			// Run information
-		char		DrawMode;				// Flag for normal mode display & MO display
-											/*	bit 1 for showing normal modes
-												bit 2 for showing special atoms
-												4 & 5 are obsolete, 6 indicates 2D plane display
-												bit 7 for showing the axis's
-												bit 4 for plotting KE rather than Total E
-												bit 5 for plotting PE */
-		char		DrawLabels;				// Flag for label drawing (both #'s and atomic labels) bit3 deactivates labeling H atoms
+		InputData *	InputOptions;			///< GAMESS run configuration information
+		
+		/** Flag for normal mode display & MO display
+		 *	bit 1 for showing normal modes
+		 *	bit 2 for showing special atoms
+		 *	4 & 5 are obsolete, 6 indicates 2D plane display
+		 *	bit 7 for showing the axis's
+		 *	bit 4 for plotting KE rather than Total E
+		 *	bit 5 for plotting PE
+		 */
+		char		DrawMode;
+		char		DrawLabels;				///< Flag for label drawing (both #'s and atomic labels) bit3 deactivates labeling H atoms
 	public:
 		MolDisplayWin *MolWin;
 		MoleculeData(MolDisplayWin *MolWin);
@@ -112,6 +117,18 @@ class MoleculeData {
 		inline Frame * GetFirstFrame(void) {return Frames;};
 		void ParseGAMESSBasisSet(BufferFile * Buffer);
 		long ParseECPotentials(BufferFile * Buffer);
+		/**
+		 * Parse the INDAT array of fragment ids for FMO.
+		 @param Buffer the file buffer stream
+		 @param NumAtoms target atom number
+		 @param EndOfGroup the file position to use as a limit for the parsing
+		 */
+		bool ParseFMOIds(BufferFile * Buffer, const long & NumAtoms, const long & EndOfGroup);
+		/**
+		 * Write the INDAT array of fragment ids for FMO out to the buffer in the input file format.
+		 @param Buffer the file buffer stream
+		 */
+		void WriteINDAT(BufferFile * Buffer);
 		inline BasisSet * GetBasisSet(void) const {return Basis;};
 		long GetNumBasisFunctions(void) const;
 		inline long GetNumFrames(void) {return NumFrames;};

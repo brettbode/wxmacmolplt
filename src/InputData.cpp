@@ -2066,6 +2066,29 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 				}
 			}
 		}
+	} else {
+		//For FMO runs instead of the coordinates emit one line per atom type
+		//First determine the list of unique atom types
+		std::vector<int>	atomTypes;
+		for (long i=0; i<cFrame->NumAtoms; i++) {
+			bool unique=true;
+			int atomT = cFrame->Atoms[i].GetType();
+			for (int j=0; j<atomTypes.size(); j++) {
+				if (atomTypes[j] == atomT) {
+					unique = false;
+					break;
+				}
+			}
+			if (unique) atomTypes.push_back(atomT);
+		}
+		for (int i=0; i<atomTypes.size(); i++) {
+			Str255 AtomLabel;
+			Prefs->GetAtomLabel(atomTypes[i]-1, AtomLabel);
+			AtomLabel[AtomLabel[0]+1] = 0;
+			// the position is unnescessary, these are here to generate the basis set only.
+			sprintf(Out, "%s   %d", (char *) &(AtomLabel[1]), atomTypes[i]);
+			File->WriteLine(Out, true);
+		}
 	}
 	
 	File->WriteLine(" $END", true);
@@ -3303,10 +3326,10 @@ void EffectiveFragmentsGroup::ReadXML(XMLElement * parent) {
 }
 
 #pragma mark FMOGroup
-void FMOGroup::WriteToFile(BufferFile *File, InputData *IData) {
+void FMOGroup::WriteToFile(BufferFile *File, MoleculeData * MainData) {
 	char	Out[kMaxLineLength];
 	
-	if (!IData->FMO.IsFMOActive()) return;
+	if (!IsFMOActive()) return;
 	
 	//Punch the group label
 	File->WriteLine("!!!! Warning: FMO input is incomplete - you must complete by hand.", true);
@@ -3315,7 +3338,46 @@ void FMOGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	sprintf(Out, "NFRAG=%ld ", GetNumberFragments());
 	File->WriteLine(Out, false);
 	
-	File->WriteLine("$END", true);
+	//INDAT array
+	MainData->WriteINDAT(File);
+	
+	File->WriteLine(" $END", true);
+}
+void MoleculeData::WriteINDAT(BufferFile * Buffer) {
+	if (FMOFragmentIds.size() > 0) {
+		char	Out[kMaxLineLength];
+		Buffer->WriteLine("INDAT(1)=", false);
+		if (InputOptions->FMO.UseFragmentINDAT()) { //group by fragment
+			for (long ifrag=1; ifrag<=InputOptions->FMO.GetNumberFragments(); ifrag++) {
+				Buffer->WriteLine(" 0,",true);
+				Buffer->WriteLine("        ", false);
+				for (long iatom=0; iatom<FMOFragmentIds.size(); iatom++) {
+					if (FMOFragmentIds[iatom] == ifrag) {
+						sprintf(Out, " %ld,", iatom+1);
+						Buffer->WriteLine(Out, false);
+						//Now see how many atoms in a row are assigned to the same fragment
+						long jatom=0;
+						for (; (jatom+iatom)<FMOFragmentIds.size(); jatom++) {
+							if (FMOFragmentIds[iatom+jatom+1] != ifrag) break;
+						}
+						if (jatom>1) {
+							sprintf(Out, " -%ld,", iatom+jatom+1);
+							Buffer->WriteLine(Out, false);
+							iatom+=jatom;
+						}
+					}
+				}
+			}
+			Buffer->WriteLine(" 0",true);
+		} else {	//ordered by atom number
+			for (long iatom=0; iatom<(FMOFragmentIds.size() - 1); iatom++) {
+				sprintf(Out, " %ld,", FMOFragmentIds[iatom]);
+				Buffer->WriteLine(Out, false);
+			}
+			sprintf(Out, " %ld", FMOFragmentIds[FMOFragmentIds.size()]);
+			Buffer->WriteLine(Out, true);
+		}
+	}
 }
 void FMOGroup::WriteXML(XMLElement * parent) const {
 	//This group is only needed if there are non-default values

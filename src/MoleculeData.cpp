@@ -657,6 +657,98 @@ void MoleculeData::ParseGAMESSBasisSet(BufferFile * Buffer) {
 		Basis->NuclearChargesAreValid(true);
 	}
 }	/*ParseGAMESSBasisSet*/
+bool MoleculeData::ParseFMOIds(BufferFile * Buffer, const long & AtomCount, const long & EndOfGroup) {
+	if (Buffer->LocateKeyWord("INDAT", 5, EndOfGroup)) {
+		Buffer->LocateKeyWord("=", 1, EndOfGroup);
+		Buffer->BufferSkip(1);
+		
+		//Prep the fragment mapping array so we can detect 
+		if (FMOFragmentIds.size() > 0) {
+			//hmmm this array is already setup? must be an error?? Consider this as non-fatal
+			wxLogMessage(_("Starting to parse INDAT array, but already have existing data!"));
+		}
+		FMOFragmentIds.reserve(AtomCount);
+		for (long i=0; i<AtomCount; i++) FMOFragmentIds.push_back(0);
+
+		// read in the ids here
+		//This array comes in two forms, but either way it specifes how atoms are divided into fragments
+		long tempL;
+		if (!Buffer->ReadLongValue(tempL, EndOfGroup)) {
+			wxLogMessage(_("Error: Unable to locate the first integer for the INDAT array. Skipping Fragment Ids."));
+			return false;
+		}
+
+		if (tempL == 0) { //Style b, atoms grouped by fragment
+			InputOptions->FMO.UseFragmentINDAT(true);
+			for (long ifragment=0; ifragment<InputOptions->FMO.GetNumberFragments(); ifragment++) {
+				long lastatom=0;
+				do {
+					if (!Buffer->ReadLongValue(tempL, EndOfGroup)) {
+						wxString msg;
+						msg.Printf(_("Error: Unable to parse atom Id for fragment %d. Skipping the remainder of the array."),
+								   ifragment+1);
+						wxLogMessage(msg);
+						return false;
+					}
+					if ((tempL > 0)&&(tempL<=AtomCount)) {
+						FMOFragmentIds[tempL-1] = ifragment+1;
+						lastatom = tempL;
+					} else if (tempL<0) {
+						if (lastatom==0) {
+							wxString msg;
+							msg.Printf(_("Error: Encountered %d not preceeded by a valid atom id. Skipping rest of INDAT."),
+									   tempL);
+							wxLogMessage(msg);
+							return false;
+						}
+						tempL *= -1;
+						if ((tempL <= (lastatom))||(tempL > AtomCount)) {
+							wxString msg;
+							msg.Printf(_("Error: Encountered %d preceeded by %d. Skipping invalid data."),
+									   -1*tempL, lastatom);
+							wxLogMessage(msg);
+						} else {
+							for (long jatom=lastatom; jatom < tempL; jatom++) {
+								FMOFragmentIds[jatom] = ifragment+1;
+							}
+						}
+					}
+				} while (tempL > 0);
+			}
+		} else {	//Style a, array of fragment ids, one per atom
+			//read in each id, test it, and store it
+			InputOptions->FMO.UseFragmentINDAT(false);
+			
+			for (long iatm=0; iatm<AtomCount; iatm++) {
+				if (iatm>0) {	//skip the 1st pass since we already have it from above
+					if (!Buffer->ReadLongValue(tempL, EndOfGroup)) {
+						wxString msg;
+						msg.Printf(_("Error: Unable to parse fragment Id for atom %d. Skipping the remainder of the array."),
+								   iatm+1);
+						wxLogMessage(msg);
+						return false;
+					}
+				}
+				if ((tempL < 1)||(tempL > InputOptions->FMO.GetNumberFragments())) {
+					wxString msg;
+					msg.Printf(_("Warning: Invalid fragment id assigned to atom %d, value %d."), iatm+1, tempL);
+					wxLogMessage(msg);
+				} else
+					FMOFragmentIds[iatm] = tempL;
+			}
+		}
+		
+		// Now check the array to see if all atoms were assigned to a fragment
+		for (int i=0; i<FMOFragmentIds.size(); i++) {
+			if (FMOFragmentIds[i] < 1) {
+				wxString msg;
+				msg.Printf(_("Warning: Atom %d is not assigned to a fragment."), i);
+				wxLogMessage(msg);
+			}
+		}
+	}
+	return true;
+}
 //Parse a gaussian style zmatrix as would be formated in GAMESS input
 void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPrefs * Prefs) {
 	if (!IntCoords) {

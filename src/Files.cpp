@@ -357,6 +357,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			Buffer->GetLine(Line);
 			if (ReadLongKeyword(Line, "NFRAG", &nAtoms))
 				MainData->InputOptions->FMO.SetNumberFragments(nAtoms);
+			//The rest of the items in this group depend on the # of atoms so parse them after the coordinates
 			
 			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
 				//scan for multiple occurances of this group
@@ -678,6 +679,26 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 
 		lFrame->SetBonds(Prefs, true, false);
 
+	}
+	if (MainData->InputOptions->FMO.IsFMOActive()) {
+		Buffer->SetFilePos(0);	//restart search from beginning of file
+		if (Buffer->FindGroup("FMO")) {
+			long startFMO = Buffer->GetFilePos();
+			long EndOfGroup;
+			if (Buffer->LocateKeyWord("$END", 4)) {
+				EndOfGroup = Buffer->GetFilePos();
+			} else {
+				EndOfGroup = -1;
+				wxLogMessage(_("The FMO group does not have proper termination."));
+			}
+			Buffer->SetFilePos(startFMO);
+			//Parse the items that depend on the # of atoms
+			//The rest of the items in this group depend on the # of atoms so parse them after the coordinates
+			
+			if (Buffer->LocateKeyWord("INDAT", 5, EndOfGroup)) {
+				MainData->ParseFMOIds(Buffer, lFrame->GetNumAtoms(), EndOfGroup);
+			}
+		}
 	}
 	return 1;
 }
