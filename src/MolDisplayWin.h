@@ -528,7 +528,17 @@ class MolDisplayWin : public wxFrame {
 		 */
 		long OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, float offset);
 		long OpenXYZFile(BufferFile * Buffer);
+		/**
+		 * Parses the Protein Databank Format (just atoms). 
+		 * @param Buffer A BufferFileObject which the PDB file is buffered into
+		 * @return Returns 1 upon open success or 0 on error or failure to open
+		 */
 		long OpenPDBFile(BufferFile * Buffer);
+		/**
+		 * Parses the MDL Mol Format (just atoms). 
+		 * @param Buffer A BufferFileObject which the MDL mol file is buffered into
+		 * @return Returns 1 upon open success or 0 on error or failure to open
+		 */
 		long OpenMDLMolFile(BufferFile * Buffer);
 		/**
 		 Open a GAMESS input or ".INP" format file. 

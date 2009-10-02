@@ -365,6 +365,8 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			}
 		} while (!EndOfGroup);
 	}
+	float unitConversion = 1.0;
+	if (MainData->InputOptions->Data->GetUnits()) unitConversion = kBohr2AngConversion;
 	Buffer->SetFilePos(0);	//restart search from beginning of file
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	if (Buffer->FindGroup("DATA")) {
@@ -381,8 +383,6 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			if (-1 == FindKeyWord(token, "C1", 2)) Buffer->SkipnLines(1);
 			StartPos = Buffer->GetFilePos();
 			if (!Buffer->LocateKeyWord("$END", 4)) throw DataError();
-			float unitConversion = 1.0;
-			if (MainData->InputOptions->Data->GetUnits()) unitConversion = kBohr2AngConversion;
 			EndPos = Buffer->GetFilePos() - 1;
 			Buffer->SetFilePos(StartPos);
 			nAtoms = Buffer->GetNumLines(EndPos - StartPos);
@@ -446,8 +446,6 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		Buffer->SkipnLines(1);
 		StartPos = Buffer->GetFilePos();
 		if (!Buffer->LocateKeyWord("$END", 4)) throw DataError();
-		float unitConversion = 1.0;
-		if (MainData->InputOptions->Data->GetUnits()) unitConversion = kBohr2AngConversion;
 		EndPos = Buffer->GetFilePos() - 1;
 		Buffer->SetFilePos(StartPos);
 		nAtoms = Buffer->GetNumLines(EndPos - StartPos);
@@ -530,6 +528,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 						Buffer->GetLine(Line);
 						//lines have format "label x, y, z"
 						sscanf(Line, "%s %f %f %f", token, &pos.x, &pos.y, &pos.z);
+						pos *= unitConversion;
 						if (!strcasecmp(token, "O1")) AtomType = 8;
 						else if (!strcasecmp(token, "H2")||!strcasecmp(token, "H3")) AtomType = 1;
 						if (AtomType > 0) {
@@ -552,6 +551,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 						sscanf(Line, "%s %f %f %f", label,
 							   &(dst_locs[i].x), &(dst_locs[i].y),
 							   &(dst_locs[i].z));
+						dst_locs[i] *= unitConversion;
 						labels[i] = label;
 						/* std::cout << "Line: " << Line << std::endl; */
 						/* atm = lFrame->AddAtom(1, dst_locs[i]); */

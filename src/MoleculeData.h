@@ -125,6 +125,16 @@ class MoleculeData {
 		 */
 		bool ParseFMOIds(BufferFile * Buffer, const long & NumAtoms, const long & EndOfGroup);
 		/**
+		 * Write the FMO array to XML
+		 * @param parent
+		 */
+		void WriteFMOIdsToXML(XMLElement * parent);
+		/**
+		 * Read the FMO Id array from XML
+		 * @param XML element
+		 */
+		void ReadFMOIdsFromXML(XMLElement * item);
+		/**
 		 * Write the INDAT array of fragment ids for FMO out to the buffer in the input file format.
 		 @param Buffer the file buffer stream
 		 */

@@ -281,7 +281,7 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 		if (InputOptions) {
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_InputOptions));
-			InputOptions->WriteXML(Ele);
+			InputOptions->WriteXML(Ele, this);
 		}
 		if (Annotations.size() > 0) {
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
@@ -1233,7 +1233,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 														{
 															if (InputOptions) delete InputOptions;
 															InputOptions = new InputData;
-															InputOptions->ReadXML(mdchild);
+															InputOptions->ReadXML(mdchild, this);
 														}
 															break;
 														case MMP_Annotations:
@@ -3390,6 +3390,10 @@ const char * CML_convert(MMP_IOSystemGroupNS t)
 			return "LoadBalance";
 		case MMP_IOSGXDR:
 			return "XDR";
+		case MMP_IOSGMemDDI:
+			return "DDIMemory";
+		case MMP_IOSGParallel:
+			return "Parallel";
 		default:
             return "invalid";
     }
@@ -3636,6 +3640,32 @@ const char * CML_convert(MMP_IOFMOGroupNS t)
             return "FMOActive";
 		case MMP_IOFMONumFragments:
 			return "NumberFMOFragments";
+		case MMP_IOFMONBODY:
+			return "NBody";
+		case MMP_IOFMOOutputStyleFlag:
+			return "INDATStyle";
+		case MMP_IOFMOFramentArray:
+			return "FragmentIdArray";
+		case MMP_IOFMOFragmentNames:
+			return "FragmentNames";
+		case MMP_IOFMOFragmentCharges:
+			return "FragmentCharges";
+		case MMP_IOFMOFragmentMultArray:
+			return "FragmentMultiplicities";
+		case MMP_IOFMOFragmentSCFArray:
+			return "FragmentSCF";
+		case MMP_IOFMOLayerCount:
+			return "LayerCount";
+		case MMP_IOFMOMPArray:
+			return "LayerMPn";
+		case MMP_IOFMODFTArray:
+			return "LayerDFT";
+		case MMP_IOFMOSCFArray:
+			return "LayerSCF";
+		case MMP_IOFMOCCArray:
+			return "LayerCC";
+		case MMP_IOFMOTDArray:
+			return "LayerTDDFT";
 		default:
             return "invalid";
     }
@@ -3812,6 +3842,10 @@ bool CML_convert(const char * s, MMP_IOHessGroupNS & t)
 bool CML_convert(const char * s, MMP_IODFTGroupNS & t)
 {
     MATCH(s, t, 0, NumberMMPIODFTGroupItems, MMP_IODFTGroupNS)
+}
+bool CML_convert(const char * s, MMP_IOStatPtGroupNS & t)
+{
+    MATCH(s, t, 0, NumberMMPIOStatPtGroupItems, MMP_IOStatPtGroupNS)
 }
 bool CML_convert(const char * s, MMP_IOEFPGroupNS & t)
 {

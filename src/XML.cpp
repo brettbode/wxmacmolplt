@@ -672,6 +672,12 @@ XMLElement * XMLElement::addChildElement(const char * elementName,
 	appendChild(*result);
 	return result;
 }
+XMLElement * XMLElement::addBoolChildElement(const char * name, bool value) {
+	XMLElement * result=NULL;
+	if (value) result = addChildElement(name, trueXML);
+	else result = addChildElement(name, falseXML);
+	return result;
+}
 XMLElement * XMLElement::addChildElementToFront(const char * elementName, const char * elementValue)
 {
 	XMLElement * result = NULL;

@@ -463,6 +463,19 @@ enum MMP_IOFMOGroupNS {
 	MMP_IOFMOGroupInvalid=0,
 	MMP_IOFMOActiveFlag,
 	MMP_IOFMONumFragments,
+	MMP_IOFMONBODY,
+	MMP_IOFMOOutputStyleFlag,
+	MMP_IOFMOFramentArray,
+	MMP_IOFMOFragmentNames,
+	MMP_IOFMOFragmentCharges,
+	MMP_IOFMOFragmentMultArray,
+	MMP_IOFMOFragmentSCFArray,
+	MMP_IOFMOLayerCount,
+	MMP_IOFMOMPArray,
+	MMP_IOFMODFTArray,
+	MMP_IOFMOSCFArray,
+	MMP_IOFMOCCArray,
+	MMP_IOFMOTDArray,
 	
 	NumberMMPIOFMOGroupItems
 };

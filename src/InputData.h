@@ -991,7 +991,7 @@ class StatPtGroup {
 /**
  * Fragment Molecular Orbital primary option group.
  * There are a few basic options, but many of the options are arrays based either on the 
- * number of fragments or the number of atoms. Not sure whether to store them here or not??
+ * number of fragments or the number of atoms.
  */
 class FMOGroup {
 private:
@@ -1017,15 +1017,17 @@ public:
 	 */
 	void WriteToFile(BufferFile *File, MoleculeData * MainData);
 	/**
-	 Output the group to CML suitable for reading by the ReadXML routine.
-	 @param parent the parent XML tag to append this group to
+	 * Output the group to CML suitable for reading by the ReadXML routine.
+	 * @param parent the parent XML tag to append this group to
+	 * @param MainData Pointer to the main data class.
 	 */
-	void WriteXML(XMLElement * parent) const;
+	void WriteXML(XMLElement * parent, MoleculeData * MainData) const;
 	/**
-	 Load this groups non-default settings from CML.
-	 @param parent the parent XML tag to append this group from
+	 * Load this groups non-default settings from CML.
+	 * @param parent the parent XML tag to append this group from
+	 * @param MainData Pointer to the main data class.
 	 */
-	void ReadXML(XMLElement * parent);
+	void ReadXML(XMLElement * parent, MoleculeData * MainData);
 	
 };
 
@@ -1054,8 +1056,8 @@ class InputData {
 
 		//! Write out an input file for another program (GAMESS etc)
 		long WriteInputFile(const wxString &filePath, MoleculeData * lData, MolDisplayWin * owner);
-		void WriteXML(XMLElement * parent) const;
-		void ReadXML(XMLElement * parent);
+		void WriteXML(XMLElement * parent, MoleculeData * p) const;
+		void ReadXML(XMLElement * parent, MoleculeData * p);
 };
 
 #endif

@@ -32,6 +32,7 @@
 #include "XML.hpp"
 #include "CML.h"
 #include <cctype>
+#include <sstream>
 
 	//InputData functions
 InputData::InputData(void) {
@@ -79,7 +80,7 @@ InputData::~InputData(void) {	//destructor
 	if (StatPt) delete StatPt;
 	if (DFT) delete DFT;
 }
-void InputData::WriteXML(XMLElement * parent) const {
+void InputData::WriteXML(XMLElement * parent, MoleculeData * p) const {
 	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_InputOptionsElement));
 	
 	if (Control) {
@@ -113,9 +114,9 @@ void InputData::WriteXML(XMLElement * parent) const {
 		DFT->WriteXML(Ele);
 	}
 	EFP.WriteXML(Ele);
-	FMO.WriteXML(Ele);
+	FMO.WriteXML(Ele, p);
 }
-void InputData::ReadXML(XMLElement * parent) {
+void InputData::ReadXML(XMLElement * parent, MoleculeData * p) {
 	XMLElementList * ipxml = parent->getChildren();
 	if (ipxml) {
 		if (ipxml->length() > 0) {
@@ -173,7 +174,7 @@ void InputData::ReadXML(XMLElement * parent) {
 										EFP.ReadXML(child);
 										break;
 									case MMP_IOFMOGroupElement:
-										FMO.ReadXML(child);
+										FMO.ReadXML(child, p);
 										break;
 								}
 							}
@@ -1247,7 +1248,7 @@ void SystemGroup::ReadXML(XMLElement * parent) {
 	if (children) {
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
-			MMP_IOControlGroupNS item;
+			MMP_IOSystemGroupNS item;
 			if (child && CML_convert(child->getName(), item)) {
 				bool tb;
 				switch (item) {
@@ -1701,7 +1702,7 @@ void BasisGroup::ReadXML(XMLElement * parent) {
 	if (children) {
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
-			MMP_IOControlGroupNS item;
+			MMP_IOBasisGroupNS item;
 			if (child && CML_convert(child->getName(), item)) {
 				bool tb;
 				switch (item) {
@@ -2202,7 +2203,7 @@ void DataGroup::ReadXML(XMLElement * parent) {
 	if (children) {
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
-			MMP_IOControlGroupNS item;
+			MMP_IODataGroupNS item;
 			if (child && CML_convert(child->getName(), item)) {
 				bool tb;
 				switch (item) {
@@ -2408,7 +2409,7 @@ void GuessGroup::ReadXML(XMLElement * parent) {
 	if (children) {
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
-			MMP_IOControlGroupNS item;
+			MMP_IOGuessGroupNS item;
 			if (child && CML_convert(child->getName(), item)) {
 				bool tb;
 				switch (item) {
@@ -2551,8 +2552,8 @@ void SCFGroup::WriteXML(XMLElement * parent) const {
 		snprintf(line, kMaxLineLength, "%d", GetConvergance());
 		Ele->addChildElement(CML_convert(MMP_IOSGConvCriteria), line);
 	}
-	if (GetDirectSCF()) Ele->addChildElement(CML_convert(MMP_IOSGDirectSCF), trueXML);
-	if (GetFockDiff()) Ele->addChildElement(CML_convert(MMP_IOSGFockDiff), trueXML);
+	Ele->addBoolChildElement(CML_convert(MMP_IOSGDirectSCF), GetDirectSCF());
+	Ele->addBoolChildElement(CML_convert(MMP_IOSGFockDiff), GetFockDiff());
 	if (GetUHFNO()) Ele->addChildElement(CML_convert(MMP_IOSGUHFNauralOrbitals), trueXML);
 	if (GetExtrapolation()) Ele->addChildElement(CML_convert(MMP_IOSGExtrap), trueXML);
 	if (GetDamp()) Ele->addChildElement(CML_convert(MMP_IOSGDamp), trueXML);
@@ -2567,7 +2568,7 @@ void SCFGroup::ReadXML(XMLElement * parent) {
 	if (children) {
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
-			MMP_IOControlGroupNS item;
+			MMP_IOSCFGroupNS item;
 			if (child && CML_convert(child->getName(), item)) {
 				bool tb;
 				switch (item) {
@@ -2758,7 +2759,7 @@ void MP2Group::ReadXML(XMLElement * parent) {
 	if (children) {
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
-			MMP_IOControlGroupNS item;
+			MMP_IOMP2GroupNS item;
 			if (child && CML_convert(child->getName(), item)) {
 				switch (item) {
 					case MMP_IOMGNumCoreElectrons:
@@ -2890,7 +2891,7 @@ void HessianGroup::ReadXML(XMLElement * parent) {
 	if (children) {
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
-			MMP_IOControlGroupNS item;
+			MMP_IOHessGroupNS item;
 			if (child && CML_convert(child->getName(), item)) {
 				bool tb;
 				switch (item) {
@@ -3135,7 +3136,7 @@ void DFTGroup::ReadXML(XMLElement * parent) {
 	if (children) {
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
-			MMP_IOControlGroupNS item;
+			MMP_IODFTGroupNS item;
 			if (child && CML_convert(child->getName(), item)) {
 				bool tb;
 				switch (item) {
@@ -3379,25 +3380,32 @@ void MoleculeData::WriteINDAT(BufferFile * Buffer) {
 		}
 	}
 }
-void FMOGroup::WriteXML(XMLElement * parent) const {
+void FMOGroup::WriteXML(XMLElement * parent, MoleculeData * MainData) const {
 	//This group is only needed if there are non-default values
 	if (IsFMOActive() || (GetNumberFragments()>1)) {
 		
 		XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IOFMOGroupElement));
 		Ele->addBoolAttribute(CML_convert(MMP_IOFMOActiveFlag), IsFMOActive());
+		Ele->addBoolAttribute(CML_convert(MMP_IOFMOOutputStyleFlag), UseFragmentINDAT());
 		char line[kMaxLineLength];
 		snprintf(line, kMaxLineLength, "%ld", GetNumberFragments());
 		Ele->addChildElement(CML_convert(MMP_IOFMONumFragments), line);
+	//	snprintf(line, kMaxLineLength, "%ld", Newfunction());
+	//	Ele->addChildElement(CML_convert(MMP_IOFMONBODY), line);
+		
+		MainData->WriteFMOIdsToXML(Ele);
 	}
 }
-void FMOGroup::ReadXML(XMLElement * parent) {
+void FMOGroup::ReadXML(XMLElement * parent, MoleculeData * MainData) {
 	bool tb;
 	if (parent->getAttributeValue(CML_convert(MMP_IOFMOActiveFlag), tb)) FMOActive(tb);
+	if (parent->getAttributeValue(CML_convert(MMP_IOFMOOutputStyleFlag), tb)) UseFragmentINDAT(tb);
 	XMLElementList * children = parent->getChildren();
 	if (children) {
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
 			MMP_IOFMOGroupNS item;
+			CML_Element cmlitem;
 			if (child && CML_convert(child->getName(), item)) {
 				switch (item) {
 					case MMP_IOFMONumFragments:
@@ -3409,9 +3417,42 @@ void FMOGroup::ReadXML(XMLElement * parent) {
 					}
 						break;
 				}
+			} else if (child && CML_convert(child->getName(), cmlitem)) {
+				MainData->ReadFMOIdsFromXML(child);
 			}
 		}
 		delete children;
+	}
+}
+void MoleculeData::WriteFMOIdsToXML(XMLElement * parent) {
+	if (FMOFragmentIds.size() > 0) {
+		std::ostringstream buf;
+		for (unsigned int i=0; i<FMOFragmentIds.size(); i++) buf << FMOFragmentIds[i] << " ";
+		XMLElement * map = parent->addChildElement(CML_convert(ArrayElement),
+												   buf.str().c_str());
+		map->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal"); //required for the matrix XML element
+		map->addAttribute(CML_convert(titleAttr), CML_convert(MMP_IOFMOFramentArray));
+		map->addAttribute(CML_convert(sizeAttr), FMOFragmentIds.size());
+	}
+}
+void MoleculeData::ReadFMOIdsFromXML(XMLElement * item) {
+	const char * attr = item->getAttributeValue(CML_convert(titleAttr));
+	MMP_IOFMOGroupNS title;
+	if (CML_convert(attr, title)) {
+		if (title == MMP_IOFMOFramentArray) {
+			long size;
+			if (item->getAttributeValue(CML_convert(sizeAttr), size)) {
+				FMOFragmentIds.reserve(size);
+				int nchar, pos=0;
+				const char * val = item->getValue();
+				for (int i=0; i<size; i++) {
+					long is;
+					if (sscanf(&(val[pos]), "%ld%n", &is, &nchar) != 1) throw DataError();
+					FMOFragmentIds.push_back(is);
+					pos += nchar;
+				}
+			}
+		}
 	}
 }
 
@@ -3575,7 +3616,7 @@ void StatPtGroup::ReadXML(XMLElement * parent) {
 	if (children) {
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
-			MMP_IOControlGroupNS item;
+			MMP_IOStatPtGroupNS item;
 			if (child && CML_convert(child->getName(), item)) {
 				bool tb;
 				switch (item) {

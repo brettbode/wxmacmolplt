@@ -180,6 +180,12 @@ class XMLElement {
 		void setNextChild(XMLElement & n) {nextChild = &n;};
 		XMLElement * addChildElement(const char * name, const char * value=NULL);
 		XMLElement * addChildElementToFront(const char * name, const char * value=NULL);
+		/**
+		 * Add a child element from a bool value
+		 * @param name The name of the new element
+		 * @param value The bool value to write as the text content of the element
+		 */
+		XMLElement * addBoolChildElement(const char * name, bool value);
 		int getElementCount(const char * elementName) const;
 		void ParseNamespaceTags(std::vector<std::string> & tagNames, std::vector<int> & tagIds);
 		void StripNamespaceTags(void);
