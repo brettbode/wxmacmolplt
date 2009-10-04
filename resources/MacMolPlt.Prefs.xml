@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <MacMolPltPreferences>
-<MoleculeDisplayPreferences AnimationDelay="20" Atom3DQuality="13" BondWidth="0.068" AtomScale="0.005" DepthCue="0.15" VectorScale="0.5" FillBrightness3D="0.4" PointBrightness3D="0.8" LineWidth3D="0.004" LabelFontId="Chicago" LabelSize="10" AnimationSpeed="7" StereoOffset="3" RotateMode="true" AnimateMode="false" ShowAngles="true" StereoActive="false" ColorBondHalves="true" WireframeMode="false" OutlineBonds="false" UseCylinders="false" Use3DByDefault="false">
+<MoleculeDisplayPreferences AnimationDelay="20" Atom3DQuality="13" BondWidth="0.068" AtomScale="0.005" DepthCue="0.15" VectorScale="0.5" FillBrightness3D="0.6" PointBrightness3D="0.8" LineWidth3D="0.004" LabelFontId="Chicago" LabelSize="10" AnimationSpeed="7" StereoOffset="3" RotateMode="true" AnimateMode="false" ShowAngles="true" StereoActive="false" ColorBondHalves="true" WireframeMode="false" OutlineBonds="false" UseCylinders="false" Use3DByDefault="false">
 <BackgroundColor red="1" green="1" blue="1"></BackgroundColor>
 <VectorColor red="1" green="0" blue="0" pattern="0"></VectorColor>
 <BondColor BondOrder="1" red="0.260868" green="0.260868" blue="0.260868" pattern="0"></BondColor>
