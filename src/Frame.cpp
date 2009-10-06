@@ -1183,9 +1183,14 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 		}
 	}
 	if (OrbSet != NULL) {
-		OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
-		OrbSet->setOrbitalWavefunctionType(method);
-		Orbs.push_back(OrbSet);
+		if ((OrbSet->getNumAlphaOrbitals() + OrbSet->getNumBetaOrbitals())<=0) {
+			delete OrbSet;
+			OrbSet = NULL;
+		} else {
+			OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
+			OrbSet->setOrbitalWavefunctionType(method);
+			Orbs.push_back(OrbSet);
+		}
 	}
 	return OrbSet;
 }
@@ -1479,7 +1484,12 @@ void Frame::ParseUHFNOs(BufferFile * Buffer, long NumFuncs, Progress * lProgress
 	if (OrbSet) {
 		OrbSet->NumAlphaOrbs = NumNOrbs;
 		OrbSet->NumOccupiedAlphaOrbs = NumNOrbs;
-		Orbs.push_back(OrbSet);
+		if ((OrbSet->getNumAlphaOrbitals() + OrbSet->getNumBetaOrbitals())<=0) {
+			delete OrbSet;
+			OrbSet = NULL;
+		} else {
+			Orbs.push_back(OrbSet);
+		}
 	}
 }
 //Parse TD-DFT Natural Orbitals
@@ -1561,7 +1571,12 @@ void Frame::ParseTDDFTNOs(BufferFile * Buffer, long NumFuncs, Progress * lProgre
 	if (OrbSet) {
 		OrbSet->NumAlphaOrbs = NumNOrbs;
 		OrbSet->NumOccupiedAlphaOrbs = NumNOrbs;
-		Orbs.push_back(OrbSet);
+		if ((OrbSet->getNumAlphaOrbitals() + OrbSet->getNumBetaOrbitals())<=0) {
+			delete OrbSet;
+			OrbSet = NULL;
+		} else {
+			Orbs.push_back(OrbSet);
+		}
 	}
 }
 //Parse a set of Localized MOs from a GAMESS log file. Note that
