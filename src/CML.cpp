@@ -19,6 +19,7 @@
 #include "BasisSet.h"
 #include "GlobalExceptions.h"
 
+#include <string>
 #include <sstream>
 #include <string.h>
 #include <iomanip>
@@ -1032,7 +1033,7 @@ void AnnotationDihedral::WriteXML(XMLElement * parent) const {
 
 /* Parse a CML1 or CML2 file */
 long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData,
-							   Progress * ProgressInd, bool readPrefs) {
+							   Progress * ProgressInd, bool readPrefs, bool UseAutoBond) {
 	short errors = 0;
 	long result = 0;
 	long targetFrameNum = 1;
@@ -1078,7 +1079,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 									}
 									firstFrame = false;
 									lFrame->ReadCMLMolecule(child);
-									if (Prefs->GetAutoBond() && (result < 10))	//setup bonds, if needed
+									if (UseAutoBond && (result < 10))	//setup bonds, if needed
 										lFrame->SetBonds(Prefs, true);
 									break;
 								case MatrixElement:
@@ -1315,7 +1316,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 					break;
 					case MoleculeElement:
 						lFrame->ReadCMLMolecule(root);
-						if (Prefs->GetAutoBond() && (result < 10))	//setup bonds, if needed
+						if (UseAutoBond && (result<10))	//setup bonds, if needed
 							lFrame->SetBonds(Prefs, true);
 						if (result <= 0) result = 1;
 					break;
@@ -1419,7 +1420,7 @@ void WindowData::ReadXML(XMLElement * parent) {
 bool Frame::ReadCMLMolecule(XMLElement * mol) {
 	//parse the contents of a Molecule element, each molecule is a different frame
 	
-	std::vector<char *> idList;	//vector of atom ids
+	std::map<std::string, long> idList; //map of ids to atom index
 	XMLElementList * children = mol->getChildren();
 	for (long i=0; i < children->length(); i++) {
 		XMLElement * child = children->item(i);
@@ -1533,17 +1534,10 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
 		}
 	}
 	delete children;
-	//release the memory occupied by the id array
-    std::vector<char *>::const_iterator id = idList.begin();
-    while (id != idList.end()) {
-        char * t = *id;
-        if (t != NULL) delete [] t;
-        id ++;
-    }
 	
 	return true;
 }
-void Frame::ParseAtomArray(XMLElement * arrayXML, std::vector<char *> & idList) {
+void Frame::ParseAtomArray(XMLElement * arrayXML, std::map<std::string, long> & idList) {
 	//The atom information can be in the form of Atom subelements or (gross) string attributes.
 	const char * etype = NULL, *xcoord = NULL, *ycoord = NULL, *zcoord=NULL, *idresult=NULL;
 	//Parse the subelements
@@ -1662,13 +1656,12 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::vector<char *> & idList) 
 					sscanf(zcstr, "%f", &(atomPos.z));
 					AddAtom(atomType, atomPos);
 					if (n5 == 1) {
-						char * t = new char[strlen(idstr)+1];
-						strcpy(t, idstr);
-						idList.push_back(t);
+						idList[idstr] = idList.size();
 					} else {
-						char * t = new char[1];
-						t[0] = '\0';
-						idList.push_back(t);
+						//This can't be matched in the future, but we have to add something to keep the numbering right
+						std::ostringstream t;
+						t << idList.size();
+						idList[t.str()] = idList.size();
 					}
 				}
 			}
@@ -1681,7 +1674,7 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::vector<char *> & idList) 
 		}
 	}
 }
-void Frame::ParseAtomAttributeArrayXML(XMLElement * arrayXML, const std::vector<char *> & idList) {
+void Frame::ParseAtomAttributeArrayXML(XMLElement * arrayXML, const std::map<std::string, long> & idList) {
 	//The atom information can be in the form of Atom subelements or (gross) string attributes.
 	//Parse the subelements
 	XMLElementList * children = arrayXML->getChildren();
@@ -1696,11 +1689,9 @@ void Frame::ParseAtomAttributeArrayXML(XMLElement * arrayXML, const std::vector<
 						const char * idresult = child->getAttributeValue(CML_convert(IdAttr));
 						if (!idresult) continue;
 						long atomId=-1;
-						for (unsigned int ii=0; ii<idList.size(); ii++) {
-							if (!strcmp(idresult, idList[ii])) {
-								atomId = ii;
-								break;
-							}
+						const std::map<std::string, long>::const_iterator it = idList.find(idresult);
+						if (it != idList.end()) {
+							atomId = it->second;
 						}
 						if ((atomId>=0)&&(atomId<NumAtoms)) {
 							bool temp;
@@ -1732,7 +1723,7 @@ void Frame::ParseAtomAttributeArrayXML(XMLElement * arrayXML, const std::vector<
 	delete children;
 }
 
-bool Frame::ParseAtomXML(XMLElement * atomXML, std::vector<char *> & idList) {
+bool Frame::ParseAtomXML(XMLElement * atomXML, std::map<std::string, long> & idList) {
 	long atomType=0;
 	CPoint3D atomPos;
 	bool	good=false;
@@ -1814,19 +1805,17 @@ bool Frame::ParseAtomXML(XMLElement * atomXML, std::vector<char *> & idList) {
 	}
 	if (good) {	//grab the atom id, if present
 		const char * idresult = atomXML->getAttributeValue("id");
-		char * t;
 		if (idresult != NULL) {
-			t = new char[strlen(idresult)+1];
-			strcpy(t, idresult);
+			idList[idresult] = idList.size();
 		} else {
-			t = new char[1];
-			t[0]= '\0';
+			std::ostringstream t;
+			t << idList.size();
+			idList[t.str()] = idList.size();
 		}
-		idList.push_back(t);
 	}
 	return good;
 }
-void Frame::ParseBondArrayXML(XMLElement * arrayXML, const std::vector<char *> & idList) {
+void Frame::ParseBondArrayXML(XMLElement * arrayXML, const std::map<std::string, long> & idList) {
 	const char * ordrref=NULL, *atmref1=NULL, *atmref2=NULL;
 	int nrefs=0;
 	//Look for Bond subelements
@@ -1899,18 +1888,13 @@ void Frame::ParseBondArrayXML(XMLElement * arrayXML, const std::vector<char *> &
 			ar2pos += nchar;
 			if ((n1!=1)||(n2!=1)) break;
 			long id1=-1, id2=-1;
-			unsigned long i;
-			for (i=0; i<idList.size(); i++) {
-				if (!strcmp(atm1, idList[i])) {
-					id1 = i;
-					break;
-				}
+			std::map<std::string, long>::const_iterator it = idList.find(atm1);
+			if (it != idList.end()) {
+				id1 = it->second;
 			}
-			for (i=0; i<idList.size(); i++) {
-				if (!strcmp(atm2, idList[i])) {
-					id2 = i;
-					break;
-				}
+			it = idList.find(atm2);
+			if (it != idList.end()) {
+				id2 = it->second;
 			}
 			int n3;
 			BondOrder b = kSingleBond;
@@ -1931,7 +1915,7 @@ void Frame::ParseBondArrayXML(XMLElement * arrayXML, const std::vector<char *> &
 	}
 }
 
-bool Frame::ParseBondXML(XMLElement * bondXML, const std::vector<char *> & idList) {
+bool Frame::ParseBondXML(XMLElement * bondXML, const std::map<std::string, long> & idList) {
 	//<bond id="a1" atomRefs2="a1 a2" order="S"/>
 	
 	const char * et = bondXML->getAttributeValue(CML_convert(atomRefs2Attr));
@@ -1946,19 +1930,14 @@ bool Frame::ParseBondXML(XMLElement * bondXML, const std::vector<char *> & idLis
 				char * atm2 = new char [len+1];
 				sscanf(et, "%s %s", atm1, atm2);
 				if ((strlen(atm1) > 0)&&(strlen(atm2) > 0)) {
-					unsigned int i;
 					long id1=-1, id2=-1;
-					for (i=0; i<idList.size(); i++) {
-						if (!strcmp(atm1, idList[i])) {
-							id1 = i;
-							break;
-						}
+					std::map<std::string, long>::const_iterator it = idList.find(atm1);
+					if (it != idList.end()) {
+						id1 = it->second;
 					}
-					for (i=0; i<idList.size(); i++) {
-						if (!strcmp(atm2, idList[i])) {
-							id2 = i;
-							break;
-						}
+					it = idList.find(atm2);
+					if (it != idList.end()) {
+						id2 = it->second;
 					}
 					if (BondExists(id1, id2) < 0) {	//avoid duplicate bonds
 						AddBond(id1, id2, b); 
@@ -1986,8 +1965,20 @@ bool Frame::ParseBondXML(XMLElement * bondXML, const std::vector<char *> & idLis
 					if (CML_convert(attvalue, att)) {
 						const char * value = child->getValue();
 						switch (att) {
-							case atomRefAttr:
-								for (unsigned int j=0; j<idList.size(); j++) {
+							case atomRefAttr: {
+								std::map<std::string, long>::const_iterator it = idList.find(value);
+								if (it != idList.end()) {
+									id1 = it->second;
+									if (nrefs==0) {
+										id1 = it->second;
+										nrefs++;
+									} else if (nrefs==1) {
+										id2 = it->second;
+										nrefs++;
+									}
+								}
+							}
+								/* for (unsigned int j=0; j<idList.size(); j++) {
 									if (!strcmp(value, idList[j])) {
 										if (nrefs==0) {
 											id1 = j;
@@ -1999,6 +1990,7 @@ bool Frame::ParseBondXML(XMLElement * bondXML, const std::vector<char *> & idLis
 										break;
 									}
 								}
+								 */
 								break;
 							case orderAttr:
 								CML_convert(value, b);
