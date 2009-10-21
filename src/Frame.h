@@ -33,6 +33,7 @@ typedef class OBMol OBMol;
 #endif
 
 #include <vector>
+#include <map>
 
 typedef class Frame Frame;
 class Frame {
@@ -62,6 +63,7 @@ class Frame {
 		double		Energy;
 		double		KE;
 		double		MP2Energy;
+		std::vector<EnergyValue> Energies;
 		float		time;
 		long		IRCPt;
 		mpAtom *	Atoms;
@@ -200,11 +202,11 @@ class Frame {
 		void ParseMolDenFrequencies(BufferFile * Buffer, WinPrefs *);
 		void DeleteOrbitals(void);
 		bool ReadCMLMolecule(XMLElement * molElement);
-		bool ParseAtomXML(XMLElement * atomXML, std::vector<char *> & idList);
-		void ParseAtomArray(XMLElement * arrayXML, std::vector<char *> & idList);
-		bool ParseBondXML(XMLElement * bondXML, const std::vector<char *> & idList);
-		void ParseBondArrayXML(XMLElement * arrayXML, const std::vector<char *> & idList);
-		void ParseAtomAttributeArrayXML(XMLElement * atomXML, const std::vector<char *> & idList);
+		bool ParseAtomXML(XMLElement * atomXML, std::map<std::string, long> & idList);
+		void ParseAtomArray(XMLElement * arrayXML, std::map<std::string, long> & idList);
+		bool ParseBondXML(XMLElement * bondXML, const std::map<std::string, long> & idList);
+		void ParseBondArrayXML(XMLElement * arrayXML, const std::map<std::string, long> & idList);
+		void ParseAtomAttributeArrayXML(XMLElement * atomXML, const std::map<std::string, long> & idList);
 		long WriteCMLFrame(XMLElement * parent, bool AllData);
 
 		void resetAllSelectState();

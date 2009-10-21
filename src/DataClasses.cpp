@@ -786,7 +786,6 @@ void Surf1DBase::Read1DXML(XMLElement *parent) {
 			float tf;
 			double td;
 			long tl;
-			bool tb;
 			switch (type) {
 				case MMP_BaseSurface:
 					Surface::ReadXML(child);

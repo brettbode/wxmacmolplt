@@ -32,7 +32,6 @@
 MoleculeData::MoleculeData(MolDisplayWin *MolWin) {
 	this->MolWin = MolWin;
 	RotCoords = NULL;
-	zBuffer = NULL;
 	cFrame = Frames = new Frame(MolWin);
 	CurrentFrame=1;
 	NumFrames = 1;
@@ -56,7 +55,6 @@ MoleculeData::~MoleculeData(void) {
 		Frames = cFrame;
 	}
 	if (RotCoords) delete [] RotCoords;
-	if (zBuffer) delete [] zBuffer;
 	if (Description) delete [] Description;
 	if (IntCoords) delete IntCoords;
 	if (Basis) delete Basis;
@@ -88,16 +86,12 @@ bool MoleculeData::SetupFrameMemory(long NumAtoms, long NumBonds) {
 	cFrame->BondAllocation = NumBonds;
 	if (NumAtoms > MaxAtoms) {	//Need to extend the size of the zbuffer arrays
 		if (RotCoords) delete [] RotCoords;
-		if (zBuffer) delete [] zBuffer;
 		try {
 			RotCoords = new CPoint3D[NumAtoms];
-			zBuffer = new long[NumAtoms];
 		}
 		catch (std::bad_alloc) {
 			if (RotCoords) delete [] RotCoords;
-			if (zBuffer) delete [] zBuffer;	//Attempt to restore the zBuffer
 			RotCoords = new CPoint3D[MaxAtoms];
-			zBuffer = new long[MaxAtoms];
 			return false;
 		}
 		MaxAtoms = NumAtoms;
@@ -229,25 +223,19 @@ void MoleculeData::CenterModelWindow(void) {
 }	/*CenterModelWindow*/
 
 void MoleculeData::ResetRotation(void) {
-	if ((cFrame->NumAtoms > MaxAtoms)||(RotCoords==NULL)||(zBuffer==NULL)) {
+	if ((cFrame->NumAtoms > MaxAtoms)||(RotCoords==NULL)) {
 		if (RotCoords != NULL) {
 			delete [] RotCoords;
 			RotCoords = NULL;
 		}
 		RotCoords = new CPoint3D[cFrame->NumAtoms];
-		if (zBuffer != NULL) {
-			delete [] zBuffer;
-			zBuffer = NULL;
-		}
-		zBuffer = new long[cFrame->NumAtoms];
 		MaxAtoms = cFrame->NumAtoms;
 	}
 	for (long i=0; i<cFrame->NumAtoms; i++) {
 		Rotate3DPt(TotalRotation, (cFrame->Atoms[i].Position), &(RotCoords[i]));
-		zBuffer[i] = i;
 	}
 		//Now sort the Z Buffer
-	SortzBuffer(RotCoords, zBuffer, cFrame->NumAtoms);
+//	SortzBuffer(RotCoords, zBuffer, cFrame->NumAtoms);
 }
 void MoleculeData::InitializeInternals(void) {
 	if (!IntCoords) IntCoords = new Internals;
@@ -293,7 +281,7 @@ void MoleculeData::StickCoordinates(void) {
 	InitRotationMatrix(TotalRotation);
 }
 
-void MoleculeData::NewAtom(const mpAtom& atom, long index, const CPoint3D *pos) {
+void MoleculeData::NewAtom(const mpAtom& atom, bool updateGlobal, long index, const CPoint3D *pos) {
 	cFrame->AddAtom(atom, index, pos);
 
 	// Adjust annotations that connect higher-numbered atoms.
@@ -304,10 +292,14 @@ void MoleculeData::NewAtom(const mpAtom& atom, long index, const CPoint3D *pos) 
 		}
 	}
 
-	AtomAdded();
+	if (IntCoords) {
+		MOPacInternals * mInts = IntCoords->GetMOPacStyle();
+		if (mInts) mInts->AppendAtom(this);
+	}
+	if (updateGlobal) AtomAdded();
 }
 
-void MoleculeData::NewAtom(long AtomType, const CPoint3D & AtomPosition, long index) {
+void MoleculeData::NewAtom(long AtomType, const CPoint3D & AtomPosition, bool updateGlobal, long index) {
 	cFrame->AddAtom(AtomType, AtomPosition, index);
 
 	// Adjust annotations that connect higher-numbered atoms.
@@ -318,16 +310,18 @@ void MoleculeData::NewAtom(long AtomType, const CPoint3D & AtomPosition, long in
 		}
 	}
 
-	AtomAdded();
+	if (IntCoords) {
+		MOPacInternals * mInts = IntCoords->GetMOPacStyle();
+		if (mInts) mInts->AppendAtom(this);
+	}
+	if (updateGlobal) AtomAdded();
 }
 
 void MoleculeData::AtomAdded(void) {
 	if (cFrame->AtomAllocation>MaxAtoms) {
 		if (RotCoords) delete [] RotCoords;
-		if (zBuffer) delete [] zBuffer;
 		RotCoords = new CPoint3D[cFrame->AtomAllocation];
-		zBuffer = new long[cFrame->AtomAllocation];
-		if (!RotCoords || !zBuffer) throw MemoryError();
+		if (!RotCoords) throw MemoryError();
 		MaxAtoms = cFrame->AtomAllocation;
 	}
 	float	XMin, XMax, YMin, YMax, ZMin, ZMax;
@@ -348,10 +342,6 @@ void MoleculeData::AtomAdded(void) {
 	MaxSize = MAX(MaxSize, (YMax-YMin));
 	MaxSize = MAX(MaxSize, (ZMax-ZMin));
 
-	if (IntCoords) {
-		MOPacInternals * mInts = IntCoords->GetMOPacStyle();
-		if (mInts) mInts->AppendAtom(this);
-	}
 	ResetRotation();
 }
 void MoleculeData::SetDescription(char * NewLabel) {
@@ -1459,7 +1449,7 @@ void MoleculeData::GenerateSymmetryDependentAtoms(bool do_warnings) {
 						//In order to match the order of atoms that GAMESS generates we need
 						//to insert the generated atom before the input one.
 						/* NewAtom(cFrame->Atoms[atm].GetType(), result, atm); */
-						NewAtom(cFrame->Atoms[atm], atm, &result);
+						NewAtom(cFrame->Atoms[atm], true, atm, &result);
 						cFrame->Atoms[atm].IsSymmetryUnique(false);
 						cFrame->SetAtomSelection(atm, false);
 						atm++;

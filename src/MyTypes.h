@@ -77,19 +77,40 @@ enum TypeOfPointGroup {
 	NumberPointGroups
 };
 
-enum TypeofEnergy {
-	PlainEnergy=0,	//general untyped energy
-	HFEnergy,		//RHF, ROHF, UHF
+enum TypeOfEnergy {
+	PlainEnergy=0,	///< general untyped energy
+	RHFEnergy,
+	UHFEnergy,
+	ROHFEnergy,
 	DFTEnergy,
-	PT2Energy,		//2nd order perturbation theory energy
-	PT4Energy,		//4th order perturbation theory energy
+	PT2Energy,		///< 2nd order perturbation theory energy
+	PT4Energy,		///< 4th order perturbation theory energy
+	GVBEnergy,
 	MCSCFEnergy,
 	MRMP2Energy,
 	CCSDEnergy,
-	CCSDPTPEnergy,	//CCSD(T)
+	CCSDPTPEnergy,	///< CCSD(T)
 	CIEnergy,
+	G3MP2Energy,
+	KineticEnergy,
 	
 	NumberEnergyTypes
+};
+
+enum EnergyUnit {
+	kDefault,
+	kKCalPerMole
+};
+
+class EnergyValue {
+public:
+	double	value;
+	TypeOfEnergy	type;
+	
+	EnergyValue(void) {value = 0.0, type=PlainEnergy;};
+	EnergyValue(double v, TypeOfEnergy t) {value=v; type=t;};
+	double GetEnergy(void) const {return value;};
+	TypeOfEnergy GetType(void) const {return type;};
 };
 
 enum AnnotationType {
@@ -366,11 +387,6 @@ class EFrag {
 		std::string raw_text;
 };
 
-enum EnergyUnit {
-	kDefault,
-	kKCalPerMole
-};
-
 #define kNumSymmetryPointGroups 53
 enum GAMESSPointGroup {
 	invalidPGroup=0,
@@ -576,29 +592,6 @@ class OrbitalRec {
 		bool TotalDensityPossible(void) const;
 };
 
-/*class MORec {
-	public:
-		OrbitalRec *	EigenVectors;	//Canonical Orbitals
-		OrbitalRec *	LocalOrbitals;	//Localized orbitals
-		OrbitalRec *	OrientedLocalOrbitals;	//Oriented Localized Orbitals
-//		AODensity *		TotalAODensity;	//AO Density corresponding to these orbitals
-//		long			NumOccupiedAlphaOrbs;	//# occupied orbs, normally just the
-//		long			NumOccupiedBetaOrbs;	//# of e's except for ECP runs
-
-		MORec(void);
-		~MORec(void);
-		long GetSize(BufferFile *Buffer, long NumBasisFuncs);
-		long WriteToBuffer(BufferFile *Buffer, long NumBasisFuncs);
-		long Read(BufferFile *Buffer, long NumBasisFuncs, long ByteCount);
-		inline void SetOccupancy(float * Occ, long nVec) {if (EigenVectors) EigenVectors->SetOccupancy(Occ, nVec);};
-		inline void RotateOrbitals(Matrix4D rotationMatrix, BasisSet * basis, long NumAtoms) {
-				if (TotalAODensity) delete TotalAODensity;	//The AO density matrix must be recalculated
-				if (EigenVectors) EigenVectors->RotateVectors(rotationMatrix, basis, NumAtoms);
-				if (LocalOrbitals) LocalOrbitals->RotateVectors(rotationMatrix, basis, NumAtoms);
-				if (OrientedLocalOrbitals) OrientedLocalOrbitals->RotateVectors(rotationMatrix, basis, NumAtoms);
-			};
-		AODensity * GetAODensity(BasisSet * lBasis, long NumAtoms);
-};*/
 typedef class SurfacePane SurfacePane;
 typedef class SurfacesWin SurfacesWin;
 typedef class Surface Surface;

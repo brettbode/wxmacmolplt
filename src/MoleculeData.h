@@ -39,7 +39,6 @@ class MoleculeData {
 		std::vector<Annotation *> Annotations;	///< Set of annotations
 		int constrain_anno_id;
 		CPoint3D	*RotCoords;				///< The currently displayed, rotated coordinates in 2D mode
-		long		*zBuffer;				///< the sorting order for RotCoords in 2D mode
 		Frame *		cFrame;					///< pointer to the currently drawn frame
 		Frame *		Frames;					///< pointer to the first frame
 		Internals *	IntCoords;				///< The set of internal coordinate definitions
@@ -100,7 +99,16 @@ class MoleculeData {
 		void ReadControlOptions(BufferFile * Buffer);
 		long ParseTinkerCoordinates(BufferFile * Buffer);
 		long WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData, bool allFrames, bool AllData);
-		long OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData, Progress * p, bool readPrefs);
+		/**
+		 * Parse CML text in the provided buffer
+		 * @param Buffer The buffer containing the CML text
+		 * @param Prefs The window preferences
+		 * @param wData The extra window data (sizes, etc)
+		 * @param p A progress indicator in case the operation takes too much time
+		 * @param readPrefs Should window preferences be read from the CML text (if present)
+		 * @param UseAutoBond Should the SetBonds routine be called on each frame
+		 */
+		long OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData * wData, Progress * p, bool readPrefs, bool UseAutoBond=true);
 		inline float GetMoleculeSize(void) {return WindowSize;};
 		inline void SetMoleculeSize(float newVal) {if (newVal > 0.0) WindowSize = newVal;};
 		void GetModelCenter(CPoint3D * center);
@@ -222,8 +230,22 @@ class MoleculeData {
 		void WriteInputFile(MolDisplayWin * owner);
 		InputData * GetInputData(void);
 		InputData * SetInputData(InputData * NewData);
-		void NewAtom(long AtomType, const CPoint3D & Position, long index=-1);
-		void NewAtom(const mpAtom& atom, long index=-1, const CPoint3D *pos = NULL);
+		/**
+		 * Add a new atom with type AtomType and located at Position
+		 * @param AtomType The type of the new atom
+		 * @param Position x,y,z coordinates for the new atom
+		 * @param updateGlobal Update the global arrays and structures (needed at some point)
+		 * @param index Insert the atom in the atom list at the specified index (-1 for the end)
+		 */
+		void NewAtom(long AtomType, const CPoint3D & Position, bool updateGlobal=true, long index=-1);
+		/**
+		 * Add a new atom as a copy of atom
+		 * @param atom The atom to copy
+		 * @param updateGlobal Update the global arrays and structures (needed at some point)
+		 * @param index Insert the atom in the atom list at the specified index (-1 for the end)
+		 * @param Optionally set the position of the new atom to pos.
+		 */
+		void NewAtom(const mpAtom& atom, bool updateGlobal=true, long index=-1, const CPoint3D *pos = NULL);
 		/**
 		 * Updates internal data structures to make sure they are consistent with the current atom count.
 		 */

@@ -916,6 +916,9 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 	}
 
 	if (event.GetSelection() == 1) {
+#ifdef __WXMAC__
+		mStructureChoice->Enable();
+#endif
 		/* GTK has a problem with gtk_widget_set_colormap being called within
 		 * wx.  GTK wants it called before the widget is made, but wx calls 
 		 * it afterward.  So, we work around that by hiding the parent and
@@ -938,6 +941,8 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 							NULL, this);
 			canvas->SetFocus();
 		}
+
+//		Refresh(true, NULL);
 #ifdef __WXMAC__
 		mStructureChoice->Enable();
 		Hide();	//This is a gross hack to get the gl canvas to display properly??

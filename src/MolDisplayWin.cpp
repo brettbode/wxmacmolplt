@@ -1871,7 +1871,7 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 							MoleculeData *	tdatap = new MoleculeData(this);
 							if (!tdatap) return;
 							BufferFile *Buffer = new BufferFile(CML, strlen(CML));
-							if (tdatap->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, false)) {
+							if (tdatap->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, false, false)) {
 								if (InEditMode()) {
 									CreateFrameSnapShot();
 									//In builder mode copy the selected atoms over
@@ -1885,7 +1885,7 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 									long initialAtomCount = MainData->cFrame->NumAtoms;
 									for (long i=0; i<tdatap->cFrame->NumAtoms; i++) {
 										if (CopyAllAtoms || tdatap->cFrame->Atoms[i].GetSelectState()) {
-											MainData->NewAtom(tdatap->cFrame->Atoms[i]);
+											MainData->NewAtom(tdatap->cFrame->Atoms[i], false);
 										}
 									}
 									for (long i=0; i<initialAtomCount; i++) {
@@ -1894,6 +1894,7 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 									for (long i=initialAtomCount; i<MainData->cFrame->NumAtoms; i++) {
 										MainData->cFrame->SetAtomSelection(i, true);
 									}
+									MainData->AtomAdded();//update global structures after all atoms are added
 									if (Prefs->GetAutoBond())
 										MainData->cFrame->SetBonds(Prefs, false);
 									mHighliteState = true;
@@ -1911,11 +1912,8 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 									if (tdatap->MaxAtoms > MainData->MaxAtoms) {
 										MainData->MaxAtoms = tdatap->MaxAtoms;
 										if (MainData->RotCoords) delete [] MainData->RotCoords;
-										if (MainData->zBuffer) delete [] MainData->zBuffer;
 										MainData->RotCoords = tdatap->RotCoords;
-										MainData->zBuffer = tdatap->zBuffer;
 										tdatap->RotCoords = NULL;
-										tdatap->zBuffer = NULL;
 									}
 									if (tdatap->Basis && !MainData->Basis) {
 										MainData->Basis = tdatap->Basis;
@@ -1928,7 +1926,7 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 							delete tdatap;
 						} else {
 							BufferFile *Buffer = new BufferFile(CML, strlen(CML));
-							if (MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, true)) {
+							if (MainData->OpenCMLFile(Buffer, Prefs, NULL, ProgressInd, true, true)) {
 							//if (MainData->OpenCMLFile(Buffer, Prefs, &tempData, true)) {
 				//				FileSave = 1;
 							}
@@ -2007,9 +2005,10 @@ void MolDisplayWin::PasteText(void) {
 							if (!MainData->cFrame->AddSpecialAtom(offset, iline)) break;
 						}
 						
-						MainData->NewAtom(Type, Position);
+						MainData->NewAtom(Type, Position, false);
 					}
 				}
+				MainData->AtomAdded();
 				//Done with the text handle so unlock it
 				delete TextBuffer;
 			}

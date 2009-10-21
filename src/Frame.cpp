@@ -138,7 +138,7 @@ mpAtom *Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition,
 
 	mpAtom * result = NULL;
 
-	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(10);
+	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(MAX(NumAtoms,10));
 
 	if (NumAtoms<AtomAllocation) {
 		if ((index<=-1)||(index>=NumAtoms)) {//Add to the end of the list
@@ -181,7 +181,7 @@ mpAtom * Frame::AddAtom(const mpAtom& atm, long index, const CPoint3D *pos) {
 	
 	mpAtom * result = NULL;
 	
-	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(10);
+	if (NumAtoms>=AtomAllocation) IncreaseAtomAllocation(MAX(NumAtoms,10));
 	
 	if (NumAtoms<AtomAllocation) {
 		if ((index<=-1)||(index>=NumAtoms)) {//Add to the end of the list
@@ -292,10 +292,16 @@ bool Frame::AddBond(long Atom1, long Atom2, const BondOrder & b) {
 	bool result = false;
 		//Validate the pair of atom references
 	if ((Atom1>=0)&&(Atom2>=0)&&(Atom1!=Atom2)&&(Atom1<NumAtoms)&&(Atom2<NumAtoms)) {
-		if (NumBonds == BondAllocation) IncreaseBondAllocation(10);
+		if (NumBonds == BondAllocation) IncreaseBondAllocation(MAX(10, NumBonds/10));
 		if (NumBonds<BondAllocation) {
-			Bonds[NumBonds].Atom1 = Atom1;
-			Bonds[NumBonds].Atom2 = Atom2;
+				//To improve scanning speed always place the higher atom # first
+			if (Atom1 > Atom2) {
+				Bonds[NumBonds].Atom1 = Atom1;
+				Bonds[NumBonds].Atom2 = Atom2;
+			} else {
+				Bonds[NumBonds].Atom1 = Atom2;
+				Bonds[NumBonds].Atom2 = Atom1;
+			}
 			Bonds[NumBonds].Order = b;
 			Bonds[NumBonds].Highlite = 0;
 			NumBonds++;
@@ -633,13 +639,15 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 	bool HHBondFlag = Prefs->GetHHBondFlag();
 	bool GuessBondOrder = Prefs->DetermineBondOrder();
 	float MaxBondLength = Prefs->GetMaxBondLength();
+	MaxBondLength *= MaxBondLength;
 	BondOrder lOrder;
 	long iType, jType;
 	for (iatm=0; iatm<NumAtoms; iatm++) {
 		iType = Atoms[iatm].GetType();
 		if (iType > 115) continue;
+		bool iSelectState = !Atoms[iatm].GetSelectState();
 		for (jatm=iatm+1; jatm<NumAtoms; jatm++) {
-			if (selectedOnly && !Atoms[iatm].GetSelectState() && !Atoms[jatm].GetSelectState())
+			if (selectedOnly && iSelectState && !Atoms[jatm].GetSelectState())
 				continue;
 			jType = Atoms[jatm].GetType();
 			if (HHBondFlag)	/*if both atoms are H's don't allow bonds if HHBondFlag is set*/
@@ -648,7 +656,9 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 			offset.x = Atoms[iatm].Position.x - Atoms[jatm].Position.x;
 			offset.y = Atoms[iatm].Position.y - Atoms[jatm].Position.y;
 			offset.z = Atoms[iatm].Position.z - Atoms[jatm].Position.z;
-			distance = offset.Magnitude();
+			distance = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
+			//We'll compare the squares of the distances to avoid the sqrt
+	//		distance = offset.Magnitude();
 			newBond = false;
 			if (distance <= MaxBondLength) {
 				newBond = true;
@@ -657,15 +667,16 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 			if (AutoBond && !newBond) {
 				AutoDist = AutoScale*((float) (Prefs->GetAtomSize(iType-1) + 
 					Prefs->GetAtomSize(jType-1)));
+				AutoDist *= AutoDist;
 				if (distance <= AutoDist) {
 					newBond = true;
 					lOrder = kSingleBond;
 				}
 				if (newBond && GuessBondOrder) {//See if this might qualify as a multiple bond
 					if ((iType != 1) && (jType != 1)) {
-						if (distance <= (.725 * AutoDist))
+						if (distance <= (.725 * .725 * AutoDist))
 							lOrder = kTripleBond;
-						else if (distance <= (0.80 * AutoDist))
+						else if (distance <= (0.80 * 0.80 * AutoDist))
 							lOrder = kDoubleBond;
 					}
 				}
@@ -690,11 +701,20 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 		}
 	}
 	if (AutoBond && Prefs->AllowHydrogenBonds()) {
+		//Searching the bond list for existing bonds is killing this algorithm when there are large numbers
+		//of atoms. Try creating a vector of the existing bonds to iatm and jatm early then search that short
+		//list later.
+		std::vector<long> bondsToI, bondsToJ;
 		for (iatm=0; iatm<NumAtoms; iatm++) {
 			iType = Atoms[iatm].GetType();
 			//only consider H bonds with N, O, F, P, S, Cl, Se, and Br
 			if (iType != 1) continue;	//Loop over hydrogens
 			if (selectedOnly && !Atoms[iatm].GetSelectState()) continue;
+			float iSize = AutoScale * ((float) (Prefs->GetAtomSize(iType-1)));
+			bondsToI.clear();
+			for (long i=0; i<NumBonds; i++) {
+				if ((Bonds[i].Atom1 == iatm)||(Bonds[i].Atom2 == iatm)) bondsToI.push_back(i);
+			}
 			for (jatm=0; jatm<NumAtoms; jatm++) {
 				if (selectedOnly && !Atoms[jatm].GetSelectState()) continue;
 				jType = Atoms[jatm].GetType();
@@ -702,23 +722,43 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 					  (jType==34)||(jType==35))) continue;
 				
 				//At this point iatm is a Hydrogen and jatm is a N, O, F, P, S, Cl, Se, or Br
-				if (BondExists(iatm, jatm) < 0) {	//can't be an existing bond
+				std::vector<long>::const_iterator it_i;
+				bool ijbond=false;
+				for (it_i = bondsToI.begin(); it_i < bondsToI.end(); it_i++) {
+					if (*it_i == jatm) {
+						ijbond = true;
+						break;
+					}
+				}
+				if (!ijbond) {	//can't be an existing bond
 					newBond = false;
 					offset.x = Atoms[iatm].Position.x - Atoms[jatm].Position.x;
 					offset.y = Atoms[iatm].Position.y - Atoms[jatm].Position.y;
 					offset.z = Atoms[iatm].Position.z - Atoms[jatm].Position.z;
-					distance = offset.Magnitude();
-					AutoDist = AutoScale*((float) (Prefs->GetAtomSize(iType-1) + 
-						Prefs->GetAtomSize(jType-1)));
-					float testDistance = 1.6*AutoDist;
+					distance = offset.x*offset.x + offset.y*offset.y + offset.z*offset.z;
+			//		distance = offset.Magnitude();
+	//				AutoDist = AutoScale*((float) (Prefs->GetAtomSize(iType-1) + 
+	//											   Prefs->GetAtomSize(jType-1)));
+					AutoDist = iSize + AutoScale*((float) (Prefs->GetAtomSize(jType-1)));
+					float testDistance = 1.6*1.6*AutoDist*AutoDist;
 					if (distance <= testDistance) newBond = true;
 					
 					if (newBond) {
+						bondsToJ.clear();
+						for (long i=0; i<NumBonds; i++) {
+							if ((Bonds[i].Atom1 == jatm)||(Bonds[i].Atom2 == jatm)) bondsToJ.push_back(i);
+						}
 						//scan the bond list, prevent h-bonds between any pair of
 						//atoms which are bonded to the same atom
 						for (long i=0; i<NumAtoms; i++) {
-							long ib = BondExists(i, iatm);
-							long jb = BondExists(i,jatm);
+							long ib = -1;
+							std::vector<long>::const_iterator it_i;
+							for (it_i = bondsToI.begin(); it_i < bondsToI.end(); it_i++) {
+								if (*it_i == i) {
+									ib = *it_i;
+									break;
+								}
+							}
 							//Don't filter on preexisting hydrogen bonds
 							if (ib >= 0)
 								if (Bonds[ib].Order == kHydrogenBond) {
@@ -733,7 +773,7 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 										float angle2;
 										GetBondAngle(i, jatm, iatm, &angle2);
 										if (angle2 > 95.0) {
-											if (distance > testDistance) {
+											if (distance > (testDistance*testDistance)) {
 												newBond = false;
 												break;
 											} else {	//delete the other bond
@@ -743,6 +783,13 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 									}
 									ib = -1;
 								}
+							long jb = -1;
+							for (it_i = bondsToJ.begin(); it_i < bondsToJ.end(); it_i++) {
+								if (*it_i == i) {
+									jb = *it_i;
+									break;
+								}
+							}
 							if (jb >= 0)
 								if (Bonds[jb].Order == kHydrogenBond) jb = -1;
 							if ((ib>=0) && (jb>=0)) {
@@ -762,6 +809,7 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 								BondAllocation = OldBondAllocation;
 								return;
 							}
+							bondsToI.push_back(NumBonds);
 						}
 					}
 				}
@@ -783,12 +831,25 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 
 long Frame::BondExists(long a1, long a2) const {
 	long result = -1;
+	long higherAtom;
+	long lowerAtom;
+	if (a1 > a2) {
+		higherAtom = a1;
+		lowerAtom = a2;
+	} else {
+		higherAtom = a2;
+		lowerAtom = a1;
+	}
 
+		//We assume that the atom pair is always listed with the higher atom in the Atom1 spot
 	for (long i=0; i<NumBonds; i++) {
-		if ((Bonds[i].Atom1 == a1 && Bonds[i].Atom2 == a2) ||
-			(Bonds[i].Atom1 == a2 && Bonds[i].Atom2 == a1)) {
+		if (Bonds[i].Atom1 == higherAtom) {
+			if (Bonds[i].Atom2 == lowerAtom) {
+//		if ((Bonds[i].Atom1 == a1 && Bonds[i].Atom2 == a2) ||
+//			(Bonds[i].Atom1 == a2 && Bonds[i].Atom2 == a1)) {
 				result = i;
 				break;
+			}
 		}
 	}
 	return result;
