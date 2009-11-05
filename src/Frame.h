@@ -61,8 +61,6 @@ class Frame {
 		friend class FrameSnapShot;
 	private:
 		double		Energy;
-		double		KE;
-		double		MP2Energy;
 		std::vector<EnergyValue> Energies;
 		float		time;
 		long		IRCPt;
@@ -103,13 +101,15 @@ class Frame {
 		void DeleteSurfaceWithID(long SurfaceID);
 		void AppendSurface(Surface * NewSurface);
 		long GetNumSurfaces(void);
+		double GetEnergy(TypeOfEnergy t) const;
 		inline double GetEnergy(void) const {return Energy;};
-		inline double GetKineticEnergy(void) const {return KE;};
-		inline double GetMP2Energy(void) const {return MP2Energy;};
+		void SetEnergy(const double & val, TypeOfEnergy t);
+		double GetKineticEnergy(void) const;
+		double GetMP2Energy(void) const;
+		void SetMP2Energy(const double & val) {SetEnergy(val, PT2Energy);};
 		inline float GetTime(void) const {return time;};
 		inline void SetEnergy(const double & val) {Energy = val;};
-		inline void SetKineticEnergy(const double & val) {KE = val;};
-		inline void SetMP2Energy(const double & val) {MP2Energy = val;};
+		void SetKineticEnergy(const double & val) {SetEnergy(val, KineticEnergy);};
 		inline void SetTime(const float & val) {time = val;};
 		void ChangeBond(long TheBond, short WhichPart, long TheAtom);
 		long GetBondAtom(long WhichBond, short ThePart);

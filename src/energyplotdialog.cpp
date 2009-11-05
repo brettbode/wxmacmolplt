@@ -206,9 +206,9 @@ void EnergyPlotDialog::RegenData(void) {
     for(currFrame = mData->Frames, i = 0; currFrame != NULL; currFrame = currFrame->NextFrame, i++) {
         xSetData.push_back((double)(currFrame->time));
         totalEnergyData.push_back(make_pair(i, currFrame->Energy));
-        potentialEnergyData.push_back(make_pair(i, currFrame->Energy - currFrame->KE));
-        mp2EnergyData.push_back(make_pair(i, currFrame->MP2Energy));
-        kineticEnergyData.push_back(make_pair(i, currFrame->KE));
+        potentialEnergyData.push_back(make_pair(i, currFrame->Energy - currFrame->GetKineticEnergy()));
+        mp2EnergyData.push_back(make_pair(i, currFrame->GetMP2Energy()));
+        kineticEnergyData.push_back(make_pair(i, currFrame->GetKineticEnergy()));
         if(currFrame->Gradient != NULL) rmsGradData.push_back(make_pair(i, (double)(currFrame->Gradient->GetRMS())));
         if(currFrame->Gradient != NULL) maxGradData.push_back(make_pair(i, (double)(currFrame->Gradient->GetMaximum())));
 		float length;

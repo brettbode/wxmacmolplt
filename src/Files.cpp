@@ -2731,8 +2731,10 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				if (MainData->InputOptions->Control->GetMPLevel()) {	//MP2 run so look for MP2 energy
 					StartPos = Buffer->GetFilePos();
 					if (Buffer->LocateKeyWord("E(MP2)=", 7)) {
+						double mpE;
 						Buffer->GetLine(LineText);
-						sscanf(&(LineText[8]), "%lf", &(lFrame->MP2Energy));
+						sscanf(&(LineText[8]), "%lf", &(mpE));
+						lFrame->Energies.push_back(EnergyValue(mpE, PT2Energy));
 					}
 					Buffer->SetFilePos(StartPos);
 				}
@@ -3016,7 +3018,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				Buffer->SetFilePos(EnergyPos);
 			}
 		// The output for optimizations was changed in 1/1998 to print all coordinates
-		// at the top of am optimization step, but the older style is also still possible
+		// at the top of an optimization step, but the older style is also still possible
 		//Look for ab initio atoms first
 			Buffer->SetFilePos(StartPos);	//reset pos to last frame to begin search
 //			if (Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31) || 
@@ -3087,7 +3089,8 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			}	//Make sure we actually found the coordinates
 			if (lFrame->GetNumAtoms()==0) {Buffer->SetFilePos(StartPos); break;}
 			lFrame->Energy = FrameEnergy;
-			lFrame->MP2Energy = MP2FrameEnergy;
+			if (MainData->InputOptions->Control->GetMPLevel()==2)
+				lFrame->Energies.push_back(EnergyValue(MP2FrameEnergy, PT2Energy));
 			lFrame->IRCPt = lpFrame->IRCPt + flip;
 			lFrame->time = lpFrame->time + flip + offset;
 			
@@ -3764,7 +3767,7 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 				Buffer->GetLine(LineText);
 				double kinE;
 				if (ReadDoubleKeyword(LineText, "KIN. E", kinE))
-					lFrame->KE = kinE;
+					lFrame->SetEnergy(kinE, KineticEnergy);
 			}
 			// MD runs have two extra lines for energies
 			//POT. E=        -47726.960743 kcal/mol
@@ -4010,7 +4013,7 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 	long			NumAtoms, Elength, nskip=0, LinePos, EStartPos;
 	char			Etext[40], LineText[kMaxLineLength+1];
 	float			tempfloat;
-	double			PE;
+	double			PE, KE;
 
 	ProgressInd->ChangeText("Reading GAMESS DRC file...");
 	Frame * lFrame = MainData->cFrame;
@@ -4051,8 +4054,9 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 		lFrame->time *= flip;
 		lFrame->time += offset;
 		LinePos = EStartPos;
-		sscanf(&(LineText[LinePos]), "%lf %lf %lf", &(lFrame->KE), &PE,
+		sscanf(&(LineText[LinePos]), "%lf %lf %lf", &KE, &PE,
 			&(lFrame->Energy));//Don't worry about the PE since E-KE=PE
+		lFrame->SetEnergy(KE, KineticEnergy);
 
 		if (!Buffer->LocateKeyWord("VELOCITY", 8)) return 0;
 		Buffer->SkipnLines(1);
@@ -4093,8 +4097,9 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 				continue;
 			}
 			LinePos = EStartPos;
-			sscanf(&(LineText[LinePos]), "%lf %lf %lf", &(lFrame->KE), &PE,
+			sscanf(&(LineText[LinePos]), "%lf %lf %lf", &KE, &PE,
 				&(lFrame->Energy));//Don't worry about the PE since E-KE=PE
+			lFrame->SetEnergy(KE, KineticEnergy);
 
 			sprintf(LineText, "Reading DRC time = %f", tempfloat);
 			ProgressInd->ChangeText(LineText);
@@ -4216,15 +4221,15 @@ void MolDisplayWin::WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames) {
 			Buffer->PutText(text);
 		}
 		if (PlotMPE) {
-			sprintf(text, "\t%f", (lFrame->MP2Energy-lEOpts->GetY1Zero())*UnitFactor);
+			sprintf(text, "\t%f", (lFrame->GetMP2Energy()-lEOpts->GetY1Zero())*UnitFactor);
 			Buffer->PutText(text);
 		}
 		if (PlotKE) {
-			sprintf(text, "\t%f", (lFrame->KE-lEOpts->GetY2Zero())*UnitFactor);
+			sprintf(text, "\t%f", (lFrame->GetKineticEnergy()-lEOpts->GetY2Zero())*UnitFactor);
 			Buffer->PutText(text);
 		}
 		if (PlotPE) {
-			sprintf(text, "\t%f", (lFrame->Energy - lFrame->KE - lEOpts->GetY1Zero())*UnitFactor);
+			sprintf(text, "\t%f", (lFrame->Energy - lFrame->GetKineticEnergy() - lEOpts->GetY1Zero())*UnitFactor);
 			Buffer->PutText(text);
 		}
 		if (lPOpts->PlotRMSGradient()) {

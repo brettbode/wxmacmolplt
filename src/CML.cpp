@@ -478,7 +478,7 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 	if (AllData) { //Add in the extra stuff that CML doesn't appear to support yet
 					//These are non-standard XML extensions to CML
 		XMLElement * listElement = NULL;
-		if ((Orbs.size() > 0)||(Energy != 0.0)||(KE != 0.0)||(MP2Energy != 0.0)||
+		if ((Orbs.size() > 0)||(Energy != 0.0)||(Energies.size() > 0) ||
 			(time != 0.0)||(IRCPt != 0)||Gradient||Vibs||SurfaceList||NonCMLBonds||
 			 AtomAttributes) {
 			listElement = molElement->addChildElement(CML_convert(ListElement));
@@ -545,23 +545,28 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 														  rbuf.str().c_str());
 			Ele->addAttribute(CML_convert(titleAttr), CML_convert(MMP_Energy));
 		}
-		if (KE != 0.0) {
+		std::vector<EnergyValue>::const_iterator it = Energies.begin();
+		while (it != Energies.end()) {
 			std::ostringstream rbuf;
+			rbuf.clear();
 			rbuf.setf(std::ios::scientific, std::ios::floatfield);
 			rbuf.precision(9);
-			rbuf << KE;
+			rbuf << (*it).value;
 			XMLElement * Ele = listElement->addChildElement(CML_convert(ScalarElement),
-														   rbuf.str().c_str());
-			Ele->addAttribute(CML_convert(titleAttr), CML_convert(MMP_KineticEnergy));
-		}
-		if (MP2Energy != 0.0) {
-			std::ostringstream rbuf;
-			rbuf.setf(std::ios::scientific, std::ios::floatfield);
-			rbuf.precision(9);
-			rbuf << MP2Energy;
-			XMLElement * Ele = listElement->addChildElement(CML_convert(ScalarElement),
-														   rbuf.str().c_str());
-			Ele->addAttribute(CML_convert(titleAttr), CML_convert(MMP_MP2Energy));
+															rbuf.str().c_str());
+			MMP_NameSpace tp;
+			switch ((*it).type) {
+				case PT2Energy:
+					tp = MMP_MP2Energy;
+					break;
+				case KineticEnergy:
+					tp = MMP_KineticEnergy;
+					break;
+				default:
+					tp = MMP_Energy;
+			}
+			Ele->addAttribute(CML_convert(titleAttr), CML_convert(tp));
+			++it;
 		}
 		if (time != 0.0) {
 			std::ostringstream rbuf;
@@ -1465,14 +1470,14 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
 												{
 													double temp;
 													if (listChild->getDoubleValue(temp))
-														KE = temp;
+														SetEnergy(temp, KineticEnergy);
 												}
 													break;
 												case MMP_MP2Energy:
 												{
 													double temp;
 													if (listChild->getDoubleValue(temp))
-														MP2Energy = temp;
+														SetMP2Energy(temp);
 												}
 													break;
 												case MMP_Time:

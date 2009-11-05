@@ -39,8 +39,6 @@ extern WinPrefs *gPreferences;
 Frame::Frame(MolDisplayWin *MolWin) {
 	this->MolWin = MolWin;
 	Energy = 0.0;
-	KE = 0.0;
-	MP2Energy = 0.0;
 	time = 0.0;
 	IRCPt = 0;
 	Atoms = NULL;
@@ -828,6 +826,40 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 		}
 	}
 } /* SetBonds */
+
+double Frame::GetMP2Energy(void) const {
+	return GetEnergy(PT2Energy);
+}
+double Frame::GetKineticEnergy(void) const {
+	return GetEnergy(KineticEnergy);
+}
+double Frame::GetEnergy(TypeOfEnergy t) const {
+	double result = 0.0;
+	std::vector<EnergyValue>::const_iterator it = Energies.begin();
+	while (it < Energies.end()) {
+		if ((*it).type == t) {
+			result = (*it).value;
+			break;
+		}
+		++it;
+	}
+	
+	return result;
+}
+void Frame::SetEnergy(const double & val, TypeOfEnergy t) {
+	bool found = false;
+	
+	std::vector<EnergyValue>::iterator it = Energies.begin();
+	while (it < Energies.end()) {
+		if ((*it).type == t) {
+			(*it).value = val;
+			found = true;
+			break;
+		}
+		++it;
+	}
+	if (!found) Energies.push_back(EnergyValue(val, t));
+}
 
 long Frame::BondExists(long a1, long a2) const {
 	long result = -1;
@@ -1856,7 +1888,7 @@ void Frame::ReadMP2Vectors(BufferFile * Buffer, BufferFile * DatBuffer, long Num
 		while (!found && DatBuffer->LocateKeyWord("MP2 NATURAL ORBITALS, E(MP2)=", 29,-1)) {
 			DatBuffer->GetLine(Line);
 			sscanf(&(Line[30]), "%lf", &testEnergy);
-			if (fabs(testEnergy - MP2Energy) < 1.0e-8) found = true;
+			if (fabs(testEnergy - GetMP2Energy()) < 1.0e-8) found = true;
 		}
 		if (found) {	//Found the correct MP2 vectors
 			OrbitalRec * OrbSet=NULL;
