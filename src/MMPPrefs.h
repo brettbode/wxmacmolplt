@@ -114,6 +114,7 @@ enum MMPMolDisplayElments {
 	MMPMolDisplay_ShowSymmetryOps,
 	MMPMolDisplay_ShowAtomPatterns,
 	MMP_ShowToolbar,
+	MMP_AutoRotateEnabled,
 	
 	NumberMMPMolDisplayElements
 };

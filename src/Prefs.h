@@ -201,7 +201,8 @@ class WinPrefs {
 		unsigned char	AtomLabels[kMaxAtomTypes][3];
 		char *			RendererName;
 		Boolean			RotateMode, AnimateMode, AutoBondFlag, HHBondFlag, SetCreator;
-		bool			FitToPage, CenterOnPage, FrameOnPage, SymbolLabels, NumberLabels, ShowSymOps;
+		bool			FitToPage, CenterOnPage, FrameOnPage, SymbolLabels, NumberLabels, ShowSymOps,
+						AllowAutoRotation;	///< Flag to enable/disable autorotation
 		EnergyOptions	EnergyPlotOptions;
 		GraphOptions	PlotOptions;
 		SurfaceOptions	SurfaceOpts;
@@ -282,6 +283,10 @@ class WinPrefs {
 		inline void ShowAtomNumberLabels(bool v) {NumberLabels = v;};
 		inline bool ShowSymmetryOperators(void) const {return ShowSymOps;};
 		inline void ShowSymmetryOperators(bool v) {ShowSymOps = v;};
+		/// Flag to determine wether to allow the auto rotate feature
+		inline bool AutoRotationEnabled(void) const {return AllowAutoRotation;};
+		/// Set function to allow auto rotation
+		inline void EnableAutoRotation(bool v) {AllowAutoRotation = v;};
 		//Note the meaning of the Native EOL bit is reversed
 		inline bool NativeEOLChar(void) const {return ((BitOptions & (1<<11))?false:true); };
 		inline void NativeEOLChar(bool newVal) {BitOptions = (BitOptions & 0xFFFFF7FF) + (newVal?0:(1<<11));};

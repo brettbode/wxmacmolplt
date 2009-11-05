@@ -3219,7 +3219,7 @@ void MolDisplayWin::UpdateFrameText(void) {
 		float   UnitFactor = 1.0;
 		if (lEOpts->GetDisplayUnits() == kKCalPerMole) UnitFactor = kHartreeTokCalPMol;
 		if (lEOpts->PlotMPEnergy())
-			Energy = (MainData->cFrame->MP2Energy-lEOpts->GetY1Zero())*UnitFactor;
+			Energy = (MainData->cFrame->GetMP2Energy()-lEOpts->GetY1Zero())*UnitFactor;
 		else if (lEOpts->PlotEnergy())
 			Energy = (MainData->cFrame->GetEnergy()-lEOpts->GetY1Zero())*UnitFactor;
 		else if (lEOpts->PlotKEnergy())
@@ -3684,6 +3684,9 @@ void MolDisplayWin::OnRotateTimer(wxTimerEvent& event) {
 	wxMouseEvent mouse_event = wxMouseEvent(wxEVT_MOTION);
 	mouse_event.m_leftDown = true;
 	Rotate(mouse_event);
+	if (!Prefs->AutoRotationEnabled()) {
+		rotate_timer.Stop();
+	}
 }
 
 void MolDisplayWin::Rotate(wxMouseEvent &event) {
@@ -3864,7 +3867,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	
 	// If the user releases the Left button while still moving, we cause the
 	// atoms to autorotate.
-	else if (event.LeftUp()) {
+	else if (event.LeftUp() && Prefs->AutoRotationEnabled()) {
 		if (abs(inertia.x) > 3 || abs(inertia.y) > 3) {
 			rotate_timer.Start(33, false);
 		}

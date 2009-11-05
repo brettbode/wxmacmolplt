@@ -195,6 +195,8 @@ void WinPrefs::CopyQD3DPrefs(WinPrefs * Orig) {
 	UseQD3DHardware(Orig->UseQD3DHardware());
 	GLFOV = Orig->GetGLFOV();
 	BackColor = Orig->BackColor;
+	shader_mode = Orig->GetShaderMode();
+	AllowAutoRotation = Orig->AutoRotationEnabled();
 }
 
 #ifdef __wxBuild__
@@ -319,6 +321,7 @@ WinPrefs::WinPrefs(void) {
 	ShowSymOps = false;
 	show_toolbar = false;
 	shader_mode = 0;
+	AllowAutoRotation = true;
 }
 
 WinPrefs::~WinPrefs(void) {
@@ -619,6 +622,9 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					SetAnimateTime(longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMP_ShowToolbar), boolVal)) {
 					show_toolbar = boolVal;
+				}
+				if (child->getAttributeValue(MMPPref_convert(MMP_AutoRotateEnabled), boolVal)) {
+					AllowAutoRotation = boolVal;
 				}
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DAtomQuality), longVal))
 					SetQD3DAtomQuality(longVal);
@@ -1000,6 +1006,7 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	XMLElement * molElement = root->addChildElement(MMPPref_convert(MMPPref_MolDisplayPrefs));
 
 	molElement->addBoolAttribute(MMPPref_convert(MMP_ShowToolbar), show_toolbar);
+	molElement->addBoolAttribute(MMPPref_convert(MMP_AutoRotateEnabled), AllowAutoRotation);
 	outbuf << GetAnimateTime();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_AnimateTime), outbuf.str().c_str());
 	outbuf.str("");
@@ -1479,6 +1486,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "ShowSymmetryOperators";
         case MMPMolDisplay_ShowAtomPatterns:
             return "ShowAtomPatterns";
+        case MMP_AutoRotateEnabled:
+            return "AutoRotationAllowed";
 		default:
             return "invalid";
     }

@@ -277,18 +277,15 @@ class QD3DPrefsPane : public PrefsPane {
 		virtual void saveToTempPrefs();
 
 		void OnShaderChoice(wxCommandEvent& event);
-		void OnCheckBox( wxCommandEvent& WXUNUSED(event));
 		void OnSliderUpdate( wxCommandEvent &event );
 
 	private:
 		wxFlexGridSizer *mMainSizer;
-		/* wxGridSizer* mUpperSizer; */
-		/* wxBoxSizer* mLowerSizer; */
 
-		wxCheckBox* mChk3D;
 		colorArea* mBackgrdColor;
 		wxChoice *mShaderChooser;
 		wxSlider* mSld[6];
+		wxCheckBox* mAutoRotateCheck;
 
 		DECLARE_EVENT_TABLE()
 };

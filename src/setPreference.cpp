@@ -80,19 +80,16 @@ setPreference::~setPreference( )
 
 setPreference::setPreference( MolDisplayWin* parent, bool isGlobal, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
-  mIsGlobal = isGlobal;
+	mIsGlobal = isGlobal;
 
-  mParent = parent;
-  //mPrefs = new WinPrefs;
+	mParent = parent;
 
-  if (isGlobal)
-    //*mPrefs = *gPreferences;
-    mPrefs = gPreferences;
-  else
-    //*mPrefs = *(parent->GetPrefs());
-    mPrefs = parent->GetPrefs();
+	if (isGlobal)
+		mPrefs = gPreferences;
+	else
+		mPrefs = parent->GetPrefs();
 
-  create(parent, id, caption, pos, size, style);
+	create(parent, id, caption, pos, size, style);
 }
 
 /*!

@@ -64,7 +64,7 @@
 #define ID_FILL_LIGHT_BRIGHTNESS_SLIDER 5029
 #define ID_POINT_LIGHT_BRIGHTNESS_SLIDER 5030
 #define ID_LINE_WIDTH_SLIDER 5031
-#define ID_ACTIVATE_3D_MODE 5032
+#define ID_3D_AUTO_ROTATE_CHECK 5032
 #define ID_TOTAL_ENERGY 5033
 #define ID_MP2_ENERGY 5034
 #define ID_POTENTIAL_ENERGY 5035
@@ -151,7 +151,6 @@ BEGIN_EVENT_TABLE(QD3DPrefsPane, wxPanel)
 	EVT_SLIDER(ID_LINE_WIDTH_SLIDER, QD3DPrefsPane::OnSliderUpdate)
 	EVT_SLIDER(ID_DEPTH_CUEING_SLIDER, QD3DPrefsPane::OnSliderUpdate)
 	EVT_CHOICE(ID_SHADER_CHOICE, QD3DPrefsPane::OnShaderChoice)
-	/* EVT_CHECKBOX(ID_ACTIVATE_3D_MODE, QD3DPrefsPane::OnCheckBox) */
 END_EVENT_TABLE()
 
 PrefsPane::PrefsPane(MolDisplayWin* targetWindow,
@@ -163,12 +162,10 @@ PrefsPane::PrefsPane(MolDisplayWin* targetWindow,
 
 	isGlobalPrefs = GlobalPrefs;
 
-	//mTargetPrefs = new WinPrefs;
 	mTargetPrefs = targetPrefs;
 }
 
 PrefsPane::~PrefsPane() { 
-	//delete mTargetPrefs; 
 }
 
 AtomPrefsPane::AtomPrefsPane(MolDisplayWin* targetWindow,
@@ -1204,7 +1201,7 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 	int rflags = wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL;
 	int lflags = wxALIGN_CENTER_VERTICAL | wxALIGN_LEFT | wxALL;
 
-	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Bond Size:")), 0,
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _("Bond Size:")), 0,
 			rflags, 3);
 	mSld[0] = new wxSlider(this, ID_BOND_SIZE_SLIDER, 
 			(int) (mTargetPrefs->GetQD3DBondWidth() * 500 + 0.5),
@@ -1212,7 +1209,7 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 			wxSize(155, wxDefaultCoord));
 	mMainSizer->Add(mSld[0], 0, lflags, 3);
 
-	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Display Quality:")),
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _("Display Quality:")),
 			0, rflags, 3);
 	mSld[1] = new wxSlider(this, ID_DISPLAY_QUALITY_SLIDER, 
 			(int) (mTargetPrefs->GetQD3DAtomQuality() + 0.5),
@@ -1220,7 +1217,7 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 			wxSize(155, wxDefaultCoord));
 	mMainSizer->Add(mSld[1], 0, lflags, 3);
 
-	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Fill Light Brightness:")),
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _("Fill Light Brightness:")),
 			0, rflags, 3);
 	mSld[2] = new wxSlider(this, ID_FILL_LIGHT_BRIGHTNESS_SLIDER, 
 			(int) (mTargetPrefs->GetQD3DFillBrightness() * 100 + 0.5),
@@ -1228,14 +1225,14 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 			wxSize(155, wxDefaultCoord));
 	mMainSizer->Add(mSld[2], 0, lflags, 3);
 
-	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Point Light Brightness:")),
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _("Point Light Brightness:")),
 			0, rflags, 3);
 	mSld[3] = new wxSlider(this, ID_POINT_LIGHT_BRIGHTNESS_SLIDER, 
 			(int) (mTargetPrefs->GetQD3DPointBrightness()*100+0.5),
 			0, 100, wxDefaultPosition, wxSize(155, wxDefaultCoord));
 	mMainSizer->Add(mSld[3], 0, lflags, 3);
 
-	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("High-Resolution Line Width:")),
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _("High-Resolution Line Width:")),
 			0, rflags, 3);
 	mTargetPrefs->CylindersForLines(true);
 	mSld[4] = new wxSlider(this, ID_LINE_WIDTH_SLIDER, 
@@ -1244,7 +1241,7 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 	mTargetPrefs->CylindersForLines(false);
 	mMainSizer->Add(mSld[4], 0, lflags, 3);
 
-	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("3D Perspective:")),
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _("3D Perspective:")),
 			0, rflags, 3);
 	mSld[5] = new wxSlider(this, ID_DEPTH_CUEING_SLIDER, 
 			(int)(mTargetPrefs->GetGLFOV()), 
@@ -1252,28 +1249,18 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 			wxSize(155, wxDefaultCoord));
 	mMainSizer->Add(mSld[5], 0, lflags, 3);
 
-	/* mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER | wxALL, 3); */
-
-	/*
-	   if (PrefsAreGlobal()) {
-	   mChk3D = new wxCheckBox(this, ID_ACTIVATE_3D_MODE, _T("Activate 3D mode by default"));
-	   mChk3D->SetValue(mTargetPrefs->Default3DOn());
-	   mMainSizer->Add(mChk3D, 0, wxALIGN_CENTER | wxALL, 3);
-	   }
-	   */ //There is no 2-D mode for now
-
-	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Background color:")),
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _("Background color:")),
 			0, rflags, 3);
 	mBackgrdColor = new colorArea(this, 0, mTargetPrefs->GetBackgroundColorLoc());
 	mMainSizer->Add(mBackgrdColor, 0, lflags, 3);
 
 	if (GLEW_VERSION_2_0) {
 		mMainSizer->Add(new wxStaticText(this, wxID_ANY,
-					    _T("Shader Mode:")), 0, rflags, 3);
+					    _("Shader Mode:")), 0, rflags, 3);
 		wxString choices[3] = {
-			wxT("No shaders"),
-			wxT("Smooth shading"),
-			wxT("Smooth shading and shadows")
+			_("No shaders"),
+			_("Smooth shading"),
+			_("Smooth shading and shadows")
 		};
 		mShaderChooser = new wxChoice(this, ID_SHADER_CHOICE,
 									  wxDefaultPosition, wxDefaultSize,
@@ -1281,20 +1268,19 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 		mShaderChooser->SetSelection(mTargetPrefs->GetShaderMode());
 		mMainSizer->Add(mShaderChooser, 0, lflags, 3);
 	}
-
+	mAutoRotateCheck = new wxCheckBox(this, ID_3D_AUTO_ROTATE_CHECK, _("Enable Auto Rotation"));
+	mAutoRotateCheck->SetValue(mTargetPrefs->AutoRotationEnabled());
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, wxT("")), 0, rflags, 3);
+	mMainSizer->Add(mAutoRotateCheck, 0, lflags, 3);
 }
 
 void QD3DPrefsPane::saveToTempPrefs() {
 	mBackgrdColor->getColor(mTargetPrefs->GetBackgroundColorLoc());
+	mTargetPrefs->EnableAutoRotation(mAutoRotateCheck->GetValue());
 }
 
 void QD3DPrefsPane::OnShaderChoice(wxCommandEvent& event) {
 	mTargetPrefs->SetShaderMode(event.GetInt());
-}
-
-void QD3DPrefsPane::OnCheckBox(wxCommandEvent& event) {
-	int id = event.GetId();
-	/* mTargetPrefs->Default3DOn(mChk3D->GetValue()); */
 }
 
 void QD3DPrefsPane::OnSliderUpdate(wxCommandEvent &event) {
