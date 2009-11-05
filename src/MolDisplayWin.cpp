@@ -1402,7 +1402,6 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 #ifdef __WXMAC__
 OSErr	SendFinderAppleEvent( AliasHandle aliasH, AEEventID appleEventID );
 OSErr	SaveCustomIcon( const wxString & filename, IconFamilyHandle icnsH );
-#include <wx/mac/carbon/private.h>
 //	This routine will set the custom icon in the file with
 //  an image based on the current molecule display.
 //	It does this by creating a PicHandle, then creating an icon from the Picture,
@@ -1411,12 +1410,15 @@ OSErr	SaveCustomIcon( const wxString & filename, IconFamilyHandle icnsH );
 //  be warned that this could break in the future!
 
 #if wxCHECK_VERSION(2, 9, 0)
+#include <wx/osx/private.h>
 //This is a gross hack to get access to the picHandle in the wxBitmapRefData class
 //that is no longer provided in the wx headers
 class wxBitmapRefData {
 public:
 	PicHandle     GetPictHandle();
 };
+#else
+#include <wx/mac/carbon/private.h>
 #endif
 bool MolDisplayWin::CreateCustomFileIcon( const wxString & filePath ) {
 	bool result = false;
@@ -2133,9 +2135,7 @@ void MolDisplayWin::ShowToolbar(bool enable) {
 		mUndoBuffer.Clear();
 	}
 
-	wxSizeEvent size_event;
-	glCanvas->AddPendingEvent(size_event);
-
+	glCanvas->SizeChanged();
 }
 
 void MolDisplayWin::menuBuilderShowBuildTools(wxCommandEvent &event) {
@@ -3223,9 +3223,9 @@ void MolDisplayWin::UpdateFrameText(void) {
 		else if (lEOpts->PlotEnergy())
 			Energy = (MainData->cFrame->GetEnergy()-lEOpts->GetY1Zero())*UnitFactor;
 		else if (lEOpts->PlotKEnergy())
-			Energy = (MainData->cFrame->KE-lEOpts->GetY2Zero())*UnitFactor;
+			Energy = (MainData->cFrame->GetKineticEnergy()-lEOpts->GetY2Zero())*UnitFactor;
 		else if (lEOpts->PlotPEnergy())
-			Energy = (MainData->cFrame->Energy - MainData->cFrame->KE-lEOpts->GetY1Zero())*UnitFactor;
+			Energy = (MainData->cFrame->Energy - MainData->cFrame->GetKineticEnergy()-lEOpts->GetY1Zero())*UnitFactor;
 		if (Energy != 0.0) {
 			output.Printf(wxT("E=%.*f"), lEOpts->GetNumDigits(), Energy);
 		}

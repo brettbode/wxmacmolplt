@@ -295,6 +295,8 @@ class MpGLCanvas : public wxGLCanvas {
 		void On_Apply_All(wxCommandEvent& event);
 		void On_Delete_Single_Frame(wxCommandEvent& event);
 		void On_Delete_All_Frames(wxCommandEvent& event);
+		/// Simple routine to cause a resize event, needed to access the private AddPendingEvent function
+		void SizeChanged(void) {wxSizeEvent size_event; AddPendingEvent(size_event);};
 		void ChangeBonding(wxCommandEvent& event);
 		void AddAnnotation(wxCommandEvent& event);
 		void DeleteAnnotation(wxCommandEvent& event);

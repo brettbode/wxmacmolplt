@@ -23,6 +23,7 @@
 ////@begin includes
 #include "wx/frame.h"
 #include "wx/notebook.h"
+#include <wx/choicebk.h>
 ////@end includes
 
 /*!
@@ -32,7 +33,6 @@
 ////@begin forward declarations
 class wxChoicebook;
 ////@end forward declarations
-class wxChoicebookEvent;
 
 /*!
  * Control identifiers

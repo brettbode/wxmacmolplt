@@ -27,7 +27,6 @@
 
 ////@begin includes
 ////@end includes
-#include <wx/choicebk.h>
 
 #include "MolDisplayWin.h"
 #include "Frame.h"
