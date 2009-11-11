@@ -56,7 +56,6 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] = {
 #endif
 
 #include "xpms/sp.xpm"
-wxSplashScreen * splash = NULL;
 
 #ifndef __WXMSW__
 MpApp& wxGetApp() {
@@ -67,6 +66,7 @@ MpApp& wxGetApp() {
 bool MpApp::OnInit() {
 	m_InstanceChecker = NULL;
 	gPrefDlg = NULL;
+	wxSplashScreen * splash = NULL;
 
 	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
 #ifdef __LINUX__
@@ -141,7 +141,7 @@ bool MpApp::OnInit() {
 #endif 
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 
-		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006 ")
+		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006-2009 ")
 					   wxT("Version %s, %s"), wxMacMolPlt_VERSION, (const wxChar*) date);
 		wxLogMessage(msg); 
 		return false; 
@@ -200,8 +200,18 @@ bool MpApp::OnInit() {
 		}
 	} else {
 		// Throw up a simple splash screen
+		// In theory the wx Splashscreen can be a fire and forget window that will simply destroy
+		// itself after a timeout. However, at least on the Mac you have to make sure that you don't
+		// try to throw up any other modal dialogs while it's active. It's easy enough to detect the
+		// presence of the window, but I can't seem to find a way to block and allow it to close on
+		// it's own. The most straight forward workaround appears to be to explicitly track it in this
+		// routine and destroy it before exiting this routine.
+		
+		// Avoid throwing up the splash screen when opening a file since that can generate other
+		// modal dialogs.
+		
 		wxBitmap sp_bitmap(sp_xpm);
-		splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 2000,
+		splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_NO_TIMEOUT, 0,
 									NULL, -1, wxDefaultPosition, wxDefaultSize,
 									wxSIMPLE_BORDER|wxSTAY_ON_TOP);
 	}
@@ -230,6 +240,11 @@ bool MpApp::OnInit() {
 	}
 	SetExitOnFrameDelete(true);
 #endif
+	
+	if (splash) {
+		sleep(1);
+		delete splash;
+	}
 
     return true;
 }
@@ -361,17 +376,8 @@ void MpApp::MacOpenFile(const wxString & filename) {
 #endif
 
 void MessageAlert(const char * message) {
-	//For some reason on windoze when the splash screen gets destroyed while the alert is
-	//up it hides the alert without releasing control so make sure its gone here before
-	//the alert is created.
-#if 0
-	if (splash) {
-		splash->Destroy();
-		splash = NULL;
-	}
-#endif
 	//wxLogMessage throws up a simple dialog alert and gives the user the option
-//of viewing and saving the current complete log.
+	//of viewing and saving the current complete log.
 	//We need to convert to a wxString first to allow for unicode environments
 	wxString str(message, wxConvUTF8);
 	wxLogMessage(str);
@@ -383,7 +389,6 @@ BEGIN_EVENT_TABLE(MpApp, wxApp)
 	EVT_MENU (wxID_EXIT, MpApp::menuFileQuit)
 	EVT_MENU (wxID_PREFERENCES, MpApp::menuPreferences)
 	EVT_MENU (wxID_ABOUT, MpApp::menuHelpAbout)
-	/* EVT_TIMER(splashT_ID, MpApp::splashCleanup) */
 END_EVENT_TABLE()
 
 #ifdef __WXMAC__
@@ -500,7 +505,7 @@ bool MpAppNoGUI::OnInit() {
 #endif 
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 
-		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2008 ")
+		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2008-2009 ")
 					   wxT("Version %s, %s"), wxMacMolPlt_VERSION, (const wxChar*) date);
 		wxLogMessage(msg); 
 		return false; 
