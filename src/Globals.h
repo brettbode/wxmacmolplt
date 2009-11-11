@@ -1,5 +1,5 @@
 /*
- *  (c) 2004 Iowa State University
+ *  (c) 2004-2009 Iowa State University
  *      see the LICENSE file in the top level directory
  */
 
@@ -21,7 +21,7 @@
 
 //This needs to get put into the build system...
 #define __wxBuild__
-#define wxMacMolPlt_VERSION "7.3.1d2"
+#define wxMacMolPlt_VERSION "7.4"
 
 //activate the following line to use the interactive editor
 // please add CXXFLAGS=-DENABLE_INTERACTIVE_MODE to your configure step rather
@@ -63,7 +63,6 @@
 #ifdef MacintoshBuild
 
 #define UseMacIO		//Use FS routines instead of StdC calls
-#define UseHandles		//Use Mac Handles instead of plain Ptrs
 
 #ifdef powerc	//only enable QuickDraw3D related routines on PPC's
 #define UseNavServices

@@ -671,7 +671,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 1652D9FF09D0AE7200B7783F /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B3B8ADF0A770A280041EA88 /* wxMacMolPlt Universal */;
+			remoteGlobalIDString = 8B3B8ADF0A770A280041EA88;
 			remoteInfo = "wxMacMolPlt Universal";
 		};
 /* End PBXContainerItemProxy section */
@@ -796,7 +796,7 @@
 		1652DA5A09D0B12600B7783F /* XML.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XML.cpp; path = src/XML.cpp; sourceTree = "<group>"; };
 		1652DA5B09D0B12600B7783F /* XML.hpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.h; name = XML.hpp; path = src/XML.hpp; sourceTree = "<group>"; };
 		1652DAC809D0B43700B7783F /* bindoc.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = bindoc.icns; path = resources/bindoc.icns; sourceTree = "<group>"; };
-		1652DAC909D0B43700B7783F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = Info.plist; path = resources/Info.plist; sourceTree = "<group>"; };
+		1652DAC909D0B43700B7783F /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = Info.plist; path = resources/Info.plist; sourceTree = "<group>"; };
 		1652DACA09D0B43700B7783F /* MacMolPlt.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = MacMolPlt.icns; path = resources/MacMolPlt.icns; sourceTree = "<group>"; };
 		1652DACB09D0B43700B7783F /* prefs.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = prefs.icns; path = resources/prefs.icns; sourceTree = "<group>"; };
 		1652DACC09D0B43700B7783F /* text-doc.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = "text-doc.icns"; path = "resources/text-doc.icns"; sourceTree = "<group>"; };
@@ -2301,8 +2301,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
+				GCC_CW_ASM_SYNTAX = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = "";
@@ -2310,6 +2311,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = 4.0;
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -2452,7 +2454,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_MODEL_TUNING = "";
@@ -2460,6 +2462,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = 4.0;
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -2482,8 +2485,8 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I$(HOME)/software/wx/wx-debug/lib/wx/include/mac-unicode-debug-static-2.9",
-					"-I$(HOME)/software/wx/wx-debug/include/wx-2.9",
+					"-I$(HOME)/software/wx/wx-2.9.0-debug/lib/wx/include/osx_carbon-unicode-debug-static-2.9",
+					"-I$(HOME)/software/wx/wx-2.9.0-debug/include/wx-2.9",
 					"-D__WXDEBUG__",
 					"-D__WXMAC__",
 					"-D_FILE_OFFSET_BITS=64",
@@ -2493,7 +2496,7 @@
 					"-DHAVE_LIBMING",
 				);
 				OTHER_LDFLAGS = (
-					"-L$(HOME)/software/wx/wx-debug/lib/",
+					"-L$(HOME)/software/wx/wx-2.9.0-debug/lib/",
 					"-framework",
 					QuickTime,
 					"-framework",
@@ -2504,15 +2507,15 @@
 					Cocoa,
 					"-framework",
 					System,
-					"-lwx_base_carbonud-2.9",
-					"-lwx_macud_core-2.9",
-					"-lwx_macud_adv-2.9",
-					"-lwx_macud_gl-2.9",
+					"-lwx_baseud-2.9",
+					"-lwx_osx_carbonud_core-2.9",
+					"-lwx_osx_carbonud_adv-2.9",
+					"-lwx_osx_carbonud_gl-2.9",
 					"-lwxexpatd-2.9",
 					"-lwxtiffd-2.9",
 					"-lwxjpegd-2.9",
 					"-lwxpngd-2.9",
-					"-lwx_macud_html-2.9",
+					"-lwx_osx_carbonud_html-2.9",
 					"-lz",
 					"-lpthread",
 					"-liconv",
@@ -2527,7 +2530,6 @@
 				PRODUCT_NAME = wxMacMolPlt;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Debug;
 		};
@@ -2640,6 +2642,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = 4.0;
 				GCC_VERSION_i386 = 4.0;
 				GCC_VERSION_ppc = 3.3;
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
@@ -2692,10 +2695,7 @@
 		8B3B8B200A770A280041EA88 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					i386,
-					ppc,
-				);
+				ARCHS = i386;
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -2705,6 +2705,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = 4.0;
 				GCC_VERSION_i386 = 4.0;
 				GCC_VERSION_ppc = 3.3;
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
