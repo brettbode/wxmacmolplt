@@ -46,8 +46,16 @@ extern BuilderDlg *build_palette;
 
 // --------------------------------------------------------------------------- 
 
-long BuilderDlg::WriteCMLFile(BufferFile *Buffer) const {
+long StructureGroup::WriteCMLFile(void) const {
 
+	FILE * save_file = fopen(filename.mb_str(wxConvUTF8), "wb");
+	if (save_file == NULL) {
+		MessageAlert("Unable to access the file.");
+		return 0;
+	}
+	
+	BufferFile * Buffer = new BufferFile(save_file, true);
+	
 	XMLSetup();
 	XMLDocument *xDoc = new XMLDocument(CML_convert(CMLElement), true, "CML uri");
 	XMLElement *xmlRoot = xDoc->getDocumentRoot();
@@ -67,14 +75,40 @@ long BuilderDlg::WriteCMLFile(BufferFile *Buffer) const {
 	delete xDoc;
 	XMLShutdown();
 	Buffer->Write(CMLtext.str().c_str(), CMLtext.str().length()); 
-	return CMLtext.str().length();
 
+	if (Buffer) {
+		delete Buffer;
+	}
+	fclose(save_file);
+	return CMLtext.str().length();
 }
 
 // --------------------------------------------------------------------------- 
 
-long BuilderDlg::ReadCMLFile(BufferFile *Buffer) {
+long StructureGroup::ReadCMLFile(void) {
 
+	// Open file of new structures.  If the file couldn't be opened, we
+	// don't do anything.  (There used to be an error message here, but
+	// there's a strong chance that the file might not exist, which is
+	// a perfectly legal thing.)
+	FILE * load_file = fopen(filename.mb_str(wxConvUTF8), "rb");
+	if (load_file == NULL) {
+		return false;
+	}
+	
+	BufferFile *Buffer = NULL;
+	try {
+		Buffer = new BufferFile(load_file, false);
+	} catch (std::bad_alloc) {
+		MessageAlert("Insufficient memory to read in the file.");
+	} catch (MemoryError) {
+		MessageAlert("Insufficient memory to read in the file.");
+	} catch (DataError) {
+		MessageAlert("Invalid data encountered while reading the file.");
+	} catch (FileError) {
+		MessageAlert("File System error, read aborted.");
+	}
+	
 	short errors = 0;
 	long fsize = Buffer->GetFileSize();
 
@@ -123,7 +157,7 @@ long BuilderDlg::ReadCMLFile(BufferFile *Buffer) {
 							if (struc_el->isName(kStructureXML)) {
 								struc = new Structure;
 								if (struc->ReadXML(struc_el)) {
-									AddStructure(struc);
+									structures.push_back(struc);
 								} else {
 									delete struc;
 								}
@@ -149,6 +183,8 @@ long BuilderDlg::ReadCMLFile(BufferFile *Buffer) {
 	}
 
 	XMLShutdown();
+	delete Buffer;
+	fclose(load_file);
 
 	return errors;
 
@@ -2698,6 +2734,7 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 	// First we get structure's name.
 	attr = struc_el->getAttributeValue(CML_convert(nameAttr));
 	if (!attr) return false;
+
 	name = wxString(attr, wxConvUTF8);
 
 	attr = struc_el->getAttributeValue(kFRAGNAMEXML);

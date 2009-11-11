@@ -62,6 +62,18 @@ class Structure {
 	private:
 };
 
+class StructureGroup {
+	public:
+		std::vector<Structure *> structures;
+		wxString filename;
+		bool is_custom;
+	
+	StructureGroup(const wxString & fn, bool custom);
+	~StructureGroup(void);
+	long WriteCMLFile() const;
+	long ReadCMLFile(void);
+};
+
 /* ------------------------------------------------------------------------- */
 /* CLASSES                                                                   */
 /* ------------------------------------------------------------------------- */
@@ -85,10 +97,13 @@ class BuilderDlg: public wxMiniFrame {
 		void KeyHandler(wxKeyEvent &event);
 		bool InStructuresMode(void) const;
 		bool InPeriodicMode(void) const;
-		void AddStructure(Structure *structure);
 		void AddUserStructure(Structure *structure);
+		///Return the user structure with the specified fragName
+		Structure * FindFragment(const std::string fragName) const;
 
 	private:
+		/// Adds the provided structure to the currently active prototype group (takes ownership of the structure)
+		void AddStructure(Structure *structure);
 		void ElementSelected(wxCommandEvent& event);
 		void OnCoordinationChoice(wxCommandEvent& event);
 		void OnLPChoice(wxCommandEvent& event);
@@ -97,17 +112,13 @@ class BuilderDlg: public wxMiniFrame {
 		wxPanel *GetPeriodicPanel(void);
 		wxPanel *GetStructuresPanel(void);
 		void SaveStructures();
-		long WriteCMLFile(BufferFile *Buffer) const;
-		long ReadCMLFile(BufferFile *Buffer);
-		bool LoadStructuresFromFile(const wxString& filename);
 		void UpdateRenameStructures(wxUpdateUIEvent& event);
 		void UpdateDeleteStructures(wxUpdateUIEvent& event);
 		void DeleteStructure(wxCommandEvent& event);
 		void RenameStructure(wxCommandEvent& event);
 		void OnStructureChoice(wxCommandEvent& event);
-		void TabChanged(wxNotebookEvent& event);
-		void ChangeStructureGroup(wxCommandEvent& event);
-		void DeleteAllStructures();
+		void TabChanged(wxNotebookEvent& event);	///< Called when switching between the element and prototype selection
+		void ChangeStructureGroup(wxCommandEvent& event);	///< Called when the prototype group is changed
 
 		short coordinationNumber[kNumTableElements];
 		short LonePairCount[kNumTableElements];
@@ -125,9 +136,9 @@ class BuilderDlg: public wxMiniFrame {
 		wxPanel *canvas_panel;
 		wxFlexGridSizer *canvas_panel_sizer;
 		wxListBox *mStructureChoice;
-		std::vector<Structure *> structures;
-		std::vector<Structure *> user_strucs;
-		PreviewCanvas *canvas;
+		int targetList;	///< Which of the structure groups is selected?
+		std::vector<StructureGroup *> StructureGroups;	///< One group per molecule grouping in the builder
+		PreviewCanvas *canvas;	///< Display area used for the prototypes
 		wxString sys_prefs_path;
 
 		wxStaticText *element_label;

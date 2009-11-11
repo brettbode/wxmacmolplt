@@ -2260,6 +2260,21 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 	}
 
 }
+std::map<std::string, EFrag>::const_iterator MolDisplayWin::FindFragmentDef(std::string fragName) {
+	std::map<std::string, EFrag>::const_iterator result;
+	//first search in the existing list of fragments
+	result = MainData->efrags.find(fragName);
+	if (result == MainData->efrags.end()) {
+		//It's not in the existing list. Search in the builder library
+		Structure *struc = build_palette->FindFragment(fragName);
+		if (struc) {
+			//found it. Add it to the current list of fragment definitions
+			MainData->efrags.insert(std::pair<std::string, EFrag>(struc->FragName, struc->frag_def));
+			result = MainData->efrags.find(fragName);
+		}
+	}
+	return result;
+}
 
 void MolDisplayWin::OnShowNormalScreen(wxUpdateUIEvent& event) {
 	event.Check(show_fullscreen);

@@ -42,19 +42,17 @@ END_EVENT_TABLE()
 
 /* ------------------------------------------------------------------------- */
 
-class StrucGroupClientData : public wxClientData {
+StructureGroup::StructureGroup(const wxString & fn, bool custom) {
+	filename = fn;
+	is_custom = custom;
+}
 
-	public:
-		StrucGroupClientData()
-			: wxClientData(), filename(), is_custom(false) {}
-
-		StrucGroupClientData(const wxString& filename, bool is_custom = false)
-			: wxClientData(), filename(filename), is_custom(is_custom) {}
-
-		wxString filename;
-		bool is_custom;
-
-};
+StructureGroup::~StructureGroup(void) {
+	std::vector<Structure *>::iterator struc;
+	for (struc = structures.begin(); struc != structures.end(); struc++) {
+		delete *struc;
+	}
+}
 
 // --------------------------------------------------------------------------- 
 // FUNCTIONS
@@ -303,17 +301,22 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 
 #define NUM_STRUC_GROUPS 4
 	struc_groups = new wxChoice(panel, kPeriodicStrucGroups);
-	struc_groups->Append(_T("Organics"),
-						 new StrucGroupClientData(sys_prefs_path +
-							 				  _T("/organics.cml")));
-	struc_groups->Append(_T("Solvents"),
-						 new StrucGroupClientData(sys_prefs_path +
-							 				  _T("/solvents.cml")));
-	struc_groups->Append(_T("Amino Acids"),
-						 new StrucGroupClientData(sys_prefs_path +
-							 				  _T("/amino_acids.cml")));
-	struc_groups->Append(_T("User-defined"),
-						 new StrucGroupClientData(user_protos, true));
+	struc_groups->Append(_T("Organics"));
+	StructureGroup * stg = new StructureGroup(sys_prefs_path + _T("/organics.cml"), false);
+	StructureGroups.push_back(stg);
+	stg->ReadCMLFile();
+	struc_groups->Append(_T("Solvents"));
+	stg = new StructureGroup(sys_prefs_path + _T("/solvents.cml"), false);
+	StructureGroups.push_back(stg);
+	stg->ReadCMLFile();
+	struc_groups->Append(_T("Amino Acids"));
+	stg = new StructureGroup(sys_prefs_path + _T("/amino_acids.cml"), false);
+	StructureGroups.push_back(stg);
+	stg->ReadCMLFile();
+	struc_groups->Append(_T("User-defined"));
+	stg = new StructureGroup(user_protos, true);
+	StructureGroups.push_back(stg);
+	stg->ReadCMLFile();
 
 	struc_sizer->Add(struc_groups, wxGBPosition(0, 0), wxGBSpan(1, 1),
 					 wxEXPAND);
@@ -375,10 +378,11 @@ BuilderDlg::~BuilderDlg() {
 	}
 
 	delete[] elements;
-
-	std::vector<Structure *>::iterator struc;
-	for (struc = structures.begin(); struc != structures.end(); struc++) {
-		delete *struc;
+	
+	std::vector<StructureGroup *>::const_iterator it = StructureGroups.begin();
+	while (it != StructureGroups.end()) {
+		delete (*it);
+		++it;
 	}
 
 }
@@ -457,7 +461,7 @@ void BuilderDlg::OnStructureChoice(wxCommandEvent& event) {
 
 	int id = event.GetSelection();
 	if (id != wxNOT_FOUND) {
-		canvas->SetStructure(structures[id]);
+		canvas->SetStructure(StructureGroups[targetList]->structures[id]);
 	}
 	canvas->SetFocus();
 
@@ -513,13 +517,14 @@ int BuilderDlg::GetSelectedElement(void) const {
 /* ------------------------------------------------------------------------- */
 
 Structure *BuilderDlg::GetSelectedStructure(void) const {
+	Structure * result = NULL;
 
 	if (mStructureChoice->GetSelection() == wxNOT_FOUND) {
 		return NULL;
 	} else {
-		return structures[mStructureChoice->GetSelection()];
+		result = StructureGroups[targetList]->structures[mStructureChoice->GetSelection()];
 	}
-
+	return result;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -651,7 +656,8 @@ void BuilderDlg::AddStructure(Structure *structure) {
 		}
 	}
 
-	structures.push_back(structure);
+	StructureGroups[targetList]->structures.push_back(structure);
+
 	mStructureChoice->Append(structure->name);
 
 }
@@ -672,10 +678,6 @@ void BuilderDlg::AddUserStructure(Structure *structure) {
 		ChangeStructureGroup(event);
 	}
 
-	// Add to the fixed user_strucs list and to the currently viewed
-	// structures list.  Write the structures out to their file.
-	user_strucs.push_back(structure);
-
 	AddStructure(structure);
 
 	SaveStructures();
@@ -684,7 +686,8 @@ void BuilderDlg::AddUserStructure(Structure *structure) {
 	mStructureChoice->SetSelection(mStructureChoice->GetCount() - 1);
 
 	if (canvas) {
-		canvas->SetStructure(structures[structures.size() - 1]);
+		canvas->SetStructure(StructureGroups[targetList]->structures[
+							StructureGroups[targetList]->structures.size() - 1]);
 	}
 
 }
@@ -692,21 +695,37 @@ void BuilderDlg::AddUserStructure(Structure *structure) {
 /* ------------------------------------------------------------------------- */
 
 int BuilderDlg::GetNumStructures() const {
-	
-	return structures.size();
-
+	return StructureGroups[targetList]->structures.size();
 }
 
 /* ------------------------------------------------------------------------- */
 
 Structure *BuilderDlg::GetStructure(int i) const {
-
-	if (i < 0 || i >= structures.size()) {
-		return NULL;
+	Structure * result = NULL;
+	
+	if ((i>=0) && (i<StructureGroups[targetList]->structures.size())) {
+		result = StructureGroups[targetList]->structures[i];
 	}
+	return result;
+}
 
-	return structures[i];
+Structure * BuilderDlg::FindFragment(const std::string fragName) const {
+	Structure * result = NULL;
 
+	std::vector<StructureGroup *>::const_iterator itgroup = StructureGroups.begin();
+	while (itgroup != StructureGroups.end()) {
+		std::vector<Structure *>::const_iterator it = (*itgroup)->structures.begin();
+		while (it != (*itgroup)->structures.end()) {
+			if ((*it)->FragName == fragName) {
+				result = (*it);
+				break;
+			}
+			++it;
+		}
+		++itgroup;
+	}
+	
+	return result;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -738,101 +757,12 @@ std::ostream& operator<<(std::ostream& stream, const Structure& s) {
  */
 
 void BuilderDlg::SaveStructures() {
-
-	FILE *save_file = NULL;
-	BufferFile *buffer = NULL;
-	StrucGroupClientData *data;
-
-	data = reinterpret_cast<StrucGroupClientData *>
-		   (struc_groups->GetClientObject(struc_groups->GetSelection()));
-
-	save_file = fopen(data->filename.mb_str(wxConvUTF8), "wb");
-	if (save_file == NULL) {
-		MessageAlert("Unable to access the file.");
-		return;
+	
+	int target = struc_groups->GetSelection();
+	if ((target>=0)&&(target<StructureGroups.size())) {
+		StructureGroups[target]->WriteCMLFile();
 	}
-
-	buffer = new BufferFile(save_file, true);
-	WriteCMLFile(buffer);
-
-	if (buffer) {
-		delete buffer;
-	}
-	fclose(save_file);
-
 }
-
-/* ------------------------------------------------------------------------- */
-/**
- * This function removes all the current structures in the structures list.
- */
-
-void BuilderDlg::DeleteAllStructures() {
-
-	int i;
-
-	if (canvas) {
-		canvas->SetStructure(NULL);
-	}
-
-	// The vector contains pointers to structures, so we delete the
-	// pointed-to memory first.
-	for (i = structures.size() - 1; i >= 0; i--) {
-		delete structures[i];
-	}
-
-	// And then we delete the rest.
-	structures.clear();
-	mStructureChoice->Clear();
-	mStructureChoice->SetSelection(wxNOT_FOUND);
-
-}
-
-/* ------------------------------------------------------------------------- */
-/**
- * This function loads structures from the file indicated by the specified
- * pathname.
- * @param filename The pathname to the structures file.
- */
-
-bool BuilderDlg::LoadStructuresFromFile(const wxString& filename) {
-
-	FILE *load_file = NULL;
-	BufferFile *buffer = NULL;
-
-	// Open file of new structures.  If the file couldn't be opened, we
-	// don't do anything.  (There used to be an error message here, but
-	// there's a strong chance that the file might not exist, which is
-	// a perfectly legal thing.)
-	load_file = fopen(filename.mb_str(wxConvUTF8), "rb");
-	if (load_file == NULL) {
-		return false;
-	}
-
-	try {
-		buffer = new BufferFile(load_file, false);
-	} catch (std::bad_alloc) {
-		MessageAlert("Insufficient memory to read in the file.");
-	} catch (MemoryError) {
-		MessageAlert("Insufficient memory to read in the file.");
-	} catch (DataError) {
-		MessageAlert("Invalid data encountered while reading the file.");
-	} catch (FileError) {
-		MessageAlert("File System error, read aborted.");
-	}
-
-	int result = 0;
-	if (buffer) {
-		result = ReadCMLFile(buffer);
-		delete buffer;
-	}
-
-	fclose(load_file);
-
-	return result == 0;
-
-}
-
 
 /* ------------------------------------------------------------------------- */
 /**
@@ -846,8 +776,8 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 
 	int id = mStructureChoice->GetSelection();
 
-	delete structures[id];
-	structures.erase(structures.begin() + id);
+	delete StructureGroups[targetList]->structures[id];
+	StructureGroups[targetList]->structures.erase(StructureGroups[targetList]->structures.begin() + id);
 	mStructureChoice->Delete(id);
 	if (mStructureChoice->GetCount() == 0) {
 		mStructureChoice->SetSelection(wxNOT_FOUND);
@@ -855,13 +785,9 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 	} else {
 		id = (id == 0) ? 0 : id - 1;
 		mStructureChoice->SetSelection(id);
-		canvas->SetStructure(structures[id]);
+		canvas->SetStructure(StructureGroups[targetList]->structures[id]);
 	}
-
-	StrucGroupClientData *data;
-	data = reinterpret_cast<StrucGroupClientData *>
-		   (struc_groups->GetClientObject(struc_groups->GetSelection()));
-
+	
 	SaveStructures();
 
 }
@@ -884,12 +810,9 @@ void BuilderDlg::RenameStructure(wxCommandEvent& event) {
 	// We have to change the structure list, the dropdown menu, and set the
 	// group's dirty flag.
 	if (!new_name.IsEmpty()) {
-		structures[id]->name = new_name;
-		mStructureChoice->SetString(id, structures[id]->name);
+		StructureGroups[targetList]->structures[id]->name = new_name;
+		mStructureChoice->SetString(id, StructureGroups[targetList]->structures[id]->name);
 
-		StrucGroupClientData *data;
-		data = reinterpret_cast<StrucGroupClientData *>
-			   (struc_groups->GetClientObject(struc_groups->GetSelection()));
 	}
 
 	SaveStructures();
@@ -933,7 +856,7 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 
 		if (event.GetSelection() == 1) {
 			if (mStructureChoice->GetSelection() != wxNOT_FOUND) {
-				canvas->SetStructure(structures[mStructureChoice->GetSelection()]);
+				canvas->SetStructure(StructureGroups[targetList]->structures[mStructureChoice->GetSelection()]);
 			}
 			canvas->Render();
 			canvas->Connect(wxEVT_CHAR,
@@ -1010,10 +933,7 @@ void Structure::SetPruneAtom(int atom_id) {
 
 void BuilderDlg::UpdateDeleteStructures(wxUpdateUIEvent& event) {
 
-	StrucGroupClientData *data =
-		reinterpret_cast<StrucGroupClientData *>
-		(struc_groups->GetClientObject(struc_groups->GetSelection()));
-	event.Enable(data->is_custom &&
+	event.Enable(StructureGroups[targetList]->is_custom &&
 				 mStructureChoice->GetSelection() != wxNOT_FOUND);
 
 }
@@ -1027,10 +947,7 @@ void BuilderDlg::UpdateDeleteStructures(wxUpdateUIEvent& event) {
 
 void BuilderDlg::UpdateRenameStructures(wxUpdateUIEvent& event) {
 
-	StrucGroupClientData *data =
-		reinterpret_cast<StrucGroupClientData *>
-		(struc_groups->GetClientObject(struc_groups->GetSelection()));
-	event.Enable(data->is_custom &&
+	event.Enable(StructureGroups[targetList]->is_custom &&
 				 mStructureChoice->GetSelection() != wxNOT_FOUND);
 
 }
@@ -1046,22 +963,29 @@ void BuilderDlg::UpdateRenameStructures(wxUpdateUIEvent& event) {
 
 void BuilderDlg::ChangeStructureGroup(wxCommandEvent& event) {
 
-	StrucGroupClientData *data;
-
-	DeleteAllStructures();
-
-	// Load structures from the file using the path associated with the
-	// menu item.
-	data = reinterpret_cast<StrucGroupClientData *>
-		   (struc_groups->GetClientObject(struc_groups->GetSelection()));
-	LoadStructuresFromFile(data->filename);
+	if (canvas) {
+		canvas->SetStructure(NULL);
+	}
+	
+	// And then we delete the rest.
+	mStructureChoice->Clear();
+	mStructureChoice->SetSelection(wxNOT_FOUND);
+	
+	targetList = struc_groups->GetSelection();
+	
+	//fill the list with the names of each structure
+	std::vector<Structure *>::const_iterator it = StructureGroups[targetList]->structures.begin();
+	while (it != StructureGroups[targetList]->structures.end()) {
+		mStructureChoice->Append((*it)->name);
+		++it;
+	}
 
 	// If there are some structures that were loaded in, select the first one
 	// in the list.
 	if (mStructureChoice->GetCount()) {
 		mStructureChoice->SetSelection(0);
 		if (canvas) {
-			canvas->SetStructure(structures[0]);
+			canvas->SetStructure(StructureGroups[targetList]->structures[0]);
 		}
 	} else if (canvas) {
 		canvas->SetStructure(NULL);

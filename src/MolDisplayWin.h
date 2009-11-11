@@ -275,6 +275,7 @@ class MolDisplayWin : public wxFrame {
 		void DeleteSelected();
 		void RegenerateSymmetryDependent();
 		void DoPrefDependent();
+		std::map<std::string, EFrag>::const_iterator FindFragmentDef(std::string fragName);
 
 		DECLARE_EVENT_TABLE()
 
