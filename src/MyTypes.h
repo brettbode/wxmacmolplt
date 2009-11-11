@@ -93,6 +93,9 @@ enum TypeOfEnergy {
 	CIEnergy,
 	G3MP2Energy,
 	KineticEnergy,
+	TranslationalKE,
+	RotationalKE,
+	PotentialEnergy,
 	
 	NumberEnergyTypes
 };
