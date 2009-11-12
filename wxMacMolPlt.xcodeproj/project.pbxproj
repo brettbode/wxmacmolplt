@@ -2452,6 +2452,7 @@
 		8B162E8C0D75C12600975533 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -2555,8 +2556,8 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I$(HOME)/software/wx/wx-2.9-univ/lib/wx/include/mac-unicode-release-static-2.9",
-					"-I$(HOME)/software/wx/wx-debug/include/wx-2.9",
+					"-I$(HOME)/software/wx/wx-2.9.0-univ/lib/wx/include/osx_carbon-unicode-release-static-2.9",
+					"-I$(HOME)/software/wx/wx-2.9.0-univ/include/wx-2.9",
 					"-D__WXMAC__",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
@@ -2565,7 +2566,7 @@
 					"-DHAVE_LIBMING",
 				);
 				OTHER_LDFLAGS = (
-					"-L$(HOME)/software/wx/wx-2.9-univ/lib/",
+					"-L$(HOME)/software/wx/wx-2.9.0-univ/lib/",
 					"-framework",
 					QuickTime,
 					"-framework",
@@ -2576,15 +2577,15 @@
 					Cocoa,
 					"-framework",
 					System,
-					"-lwx_base_carbonu-2.9",
-					"-lwx_macu_core-2.9",
-					"-lwx_macu_adv-2.9",
-					"-lwx_macu_gl-2.9",
+					"-lwx_baseu-2.9",
+					"-lwx_osx_carbonu_core-2.9",
+					"-lwx_osx_carbonu_adv-2.9",
+					"-lwx_osx_carbonu_gl-2.9",
 					"-lwxexpat-2.9",
 					"-lwxtiff-2.9",
 					"-lwxjpeg-2.9",
 					"-lwxpng-2.9",
-					"-lwx_macu_html-2.9",
+					"-lwx_osx_carbonu_html-2.9",
 					"-lz",
 					"-lpthread",
 					"-liconv",
@@ -2595,10 +2596,11 @@
 					"-framework",
 					AGL,
 				);
-				OTHER_LDFLAGS_QUOTED_FOR_TARGET_1 = "`$(HOME)/software/wx/wx-2.9-univ/bin/wx-config --libs base,core,gl,adv,html`";
+				OTHER_LDFLAGS_QUOTED_FOR_TARGET_1 = "`$(HOME)/software/wx/wx-2.9.0-univ/bin/wx-config --libs base,core,gl,adv,html`";
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				STRIP_INSTALLED_PRODUCT = NO;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};

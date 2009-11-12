@@ -2,13 +2,14 @@ Currently wxMacMolPlt includes build files and has been tested on Mac OS X,
 Linux and Windows. Since most people building from source will be running
 Linux this file focuses on the build instructions for Linux. To build from
 source on any OS you must have a C++ compiler such as g++ and an install
-of wxWidgets with OpenGL support enabled. wxWidgets 2.6 through 2.8.x 
+of wxWidgets with OpenGL support enabled. wxWidgets 2.6 through 2.9.x 
 should work.
 Prebuilt packages should also work. We have tested against the version 2.6.3
 prebuilt package within Debian and found it to work. If you are building on
 Fedora Core 5 or 6 first install the wxGTK-2.6.3, wxGTK-gl-2.6.3 and
 wxGTK-devel-2.6.3 rpms. With those three rpms installed you should have no
-trouble building or running wxMacMolPlt.
+trouble building or running wxMacMolPlt. Newer distros generally include a
+2.8 based wx and are preferred.
 
 If your distribution does not offer a prebuilt wxWidgets package you will need
 to grab the latest source copy from www.wxwidgets.org and install it. You 
