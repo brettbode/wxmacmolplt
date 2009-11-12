@@ -242,7 +242,7 @@ bool MpApp::OnInit() {
 #endif
 	
 	if (splash) {
-		sleep(1);
+		wxSleep(1);
 		delete splash;
 	}
 
