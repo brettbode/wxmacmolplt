@@ -17,9 +17,11 @@
 ==============================================================================
 */
 
-#if defined(WIN32)
-#include <windows.h>
-#endif
+//Not sure why this was needed. It seems to work fine without it on wx 2.8 and 2.9
+//Including it causes issues with wx 2.9.0
+//#if defined(WIN32)
+//#include <windows.h>
+//#endif
 
 #include <stdio.h>
 #include <stdlib.h>
