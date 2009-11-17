@@ -1584,6 +1584,7 @@ void TEDensity2DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 			if (OccupancyB) {
 				for (MONum=0; MONum<MOs->NumOccupiedBetaOrbs; MONum++) {
 					MOVector = &(VectorsB[NumBasisFuncs*MONum]);
+					Density = 0.0;
 					for (long ivec=0; ivec<NumBasisFuncs; ivec++)
 						Density += MOVector[ivec]*AOVector[ivec];
 					Sum += Density*Density*OccupancyB[MONum];
