@@ -783,7 +783,7 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 			if (readCount!=2) break;
 			std::pair<std::string, double> myVal(token, value);
 			std::pair<std::map<std::string, double>::iterator, bool> p = valueMap.insert(myVal);
-			if (! myVal.second) {	//We have hit a duplicate value
+			if (! p.second) {	//We have hit a duplicate value
 				MessageAlert("Duplicate keys detected in the value list");
 			}
 		}
