@@ -297,6 +297,11 @@ class MoleculeData {
 		}
 		void RemoveAnnotationConstraint(void) { constrain_anno_id = -1; }
 		void ExportPOV(BufferFile *Buffer, WinPrefs *Prefs);
+		/**
+		 Create an FMO fragment list
+		 @param NumMolecules The number of non-bonded molecules to group together in the same FMO fragment
+		 */
+		void CreateFMOFragmentation(const int & NumMolecules);
 };
 
 #endif

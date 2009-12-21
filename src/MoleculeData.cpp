@@ -1881,6 +1881,105 @@ void MoleculeData::PruneUnusedFragments() {
 
 }
 
+void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
+	//Create an FMO fragment list by breaking up the system into non-bonded pieces (H-bonds are ignored)
+	
+	//Start by initializing the vector with invalid fragment numbers
+	FMOFragmentIds.clear();
+	FMOFragmentIds.reserve(cFrame->GetNumAtoms());
+	for (long i=0; i<cFrame->GetNumAtoms(); i++) {
+		FMOFragmentIds.push_back(-1);
+	}
+	
+	long NextId = 1;
+	long atomNum = 0;
+	while (atomNum < cFrame->GetNumAtoms()) {
+		if (FMOFragmentIds[atomNum] < 1) {
+			FMOFragmentIds[atomNum] = NextId;
+			//starting a new fragment
+			//a recursive function would be simpler to write and should normally be fine, but if somebody runs this
+			//on a system with a large molecule that could be rather abusive on the stack
+			//Scan through the bonds list and check both ends of the bond for the active fragment Id. If one
+			//atom is tagged then the other needs to be. The process is done when a further pass through the list 
+			//does not produce any more tags. This seems a bit brute force and is horrible on memory accesses, but
+			//it is probably fast enough for the very limited number of times it be executed.
+			bool done=false;
+			while (!done) {
+				done = true;
+				for (long ib=0; ib<cFrame->GetNumBonds(); ++ib) {
+					if (FMOFragmentIds[cFrame->Bonds[ib].Atom1] == NextId) {
+						if (FMOFragmentIds[cFrame->Bonds[ib].Atom2] != NextId) {
+							FMOFragmentIds[cFrame->Bonds[ib].Atom2] = NextId;
+							done = false;
+						}
+					} else if (FMOFragmentIds[cFrame->Bonds[ib].Atom2] == NextId) {
+						if (FMOFragmentIds[cFrame->Bonds[ib].Atom1] != NextId) {
+							FMOFragmentIds[cFrame->Bonds[ib].Atom1] = NextId;
+							done = false;
+						}
+					}
+				}
+			}
+			++NextId;
+		}
+		++atomNum;
+	}
+	//Ok we should now have the non-bonded pieces separated. If the user wants more than one non-bonded piece in
+	//each fragment coalesce them now.
+	if (NumMolecules > 1) {
+		--NextId;	//this leaves NextId containing the starting number of fragments
+		//I think it is probably best to combine fragments that are closest to each other.
+		//It's probably best to consider the center of each fragment for the distance computation.
+		std::vector<CPoint3D> fragCenters;
+		fragCenters.reserve(NextId);
+		for (long ifrag=1; ifrag<=NextId; ++ifrag) {
+			fragCenters.push_back(CPoint3D(0,0,0));
+			long atmcount;
+			for (long iatom=0; iatom<cFrame->GetNumAtoms(); ++iatom) {
+				if (FMOFragmentIds[iatom] == ifrag) {
+					fragCenters[ifrag] += cFrame->Atoms[iatom].Position;
+					atmcount++;
+				}
+			}
+			fragCenters[ifrag].x /= (float) atmcount;
+			fragCenters[ifrag].y /= (float) atmcount;
+			fragCenters[ifrag].z /= (float) atmcount;
+		}
+		
+		for (long ifrag=1; ifrag<=NextId; ifrag++) {
+			for (int i=0; i<NumMolecules; i++) {
+				if (ifrag == NextId) break;	//we've ran out of fragments, the last one will have to be short
+				CPoint3D offset;
+				offset.x = fragCenters[ifrag].x-fragCenters[ifrag+1].x;
+				offset.y = fragCenters[ifrag].y-fragCenters[ifrag+1].y;
+				offset.z = fragCenters[ifrag].z-fragCenters[ifrag+1].z;
+				float distance = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
+				
+				long targetId = ifrag+1;
+				for (long jfrag=ifrag+2; jfrag<=NextId; jfrag++) {
+					offset.x = fragCenters[ifrag].x-fragCenters[jfrag].x;
+					offset.y = fragCenters[ifrag].y-fragCenters[jfrag].y;
+					offset.z = fragCenters[ifrag].z-fragCenters[jfrag].z;
+					float testDistance = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
+					if (testDistance < distance) {
+						distance = testDistance;
+						targetId = jfrag;
+					}
+				}
+				//Since we are removing a fragment we need to pull down the Ids higher up
+				//one thing I'm not doing is recomputing the fragment center so the next addition will 
+				//reference the original fragment only
+				for (long atomi=0; atomi<cFrame->GetNumAtoms(); ++atomi) {
+					if (FMOFragmentIds[atomi] == targetId) FMOFragmentIds[atomi] = ifrag;
+					if (FMOFragmentIds[atomi] > targetId) FMOFragmentIds[atomi]--;
+				}
+				fragCenters.erase(fragCenters.begin() + targetId-1);
+				NextId--;
+			}
+		}
+	}
+}
+
 void MoleculeData::ExportPOV(BufferFile *Buffer, WinPrefs *Prefs) {
 
 	Frame *lFrame = GetCurrentFramePtr();
