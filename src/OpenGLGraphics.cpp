@@ -189,6 +189,9 @@ void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
  * @precondition Context, projection, and viewport have been set. 
  */
 void MolDisplayWin::DrawGL(int do_shader) {
+	if (GLUpdateInProgress) return;	//a previous call in the stack is already updating this window. Do not repeat.
+	
+	GLUpdateInProgress = true;	//set the flag to prevent calls from updating at the same time.
 
 	// Make (0, 0, WindowSize) the origin.  Moves geometry away from camera.
 	glTranslatef(0, 0, -MainData->WindowSize);
@@ -414,7 +417,7 @@ void MolDisplayWin::DrawGL(int do_shader) {
 		glPopMatrix();
 		glMatrixMode(GL_MODELVIEW);
 	}
-
+	GLUpdateInProgress = false;	//reset the flag to allow updates.
 }
 
 void AnnotationLength::draw(const MolDisplayWin * win) const {
@@ -952,6 +955,14 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 	long NumBonds = lFrame->NumBonds;
 	float AtomScale = Prefs->GetAtomScale();
 	float Quality = Prefs->GetQD3DAtomQuality();
+	// For really large systems the size of the individual atoms and bonds gets small so there doesn't
+	// seem to be a need for the quality to remain high. This is an attempt to silently degrade the display quality
+	// to improve performance.
+	// Could disable the reduction when printing if this ends up causing a noticable issue
+	int QualReduce = MainData->WindowSize;
+	QualReduce /= 15;	//truncate the division
+	Quality -= QualReduce;
+	Quality = MAX(Quality, 2);	//Don't go below 2
 
 	bool draw_subdued;
 	glEnable(GL_RESCALE_NORMAL);
