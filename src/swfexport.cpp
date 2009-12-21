@@ -1,3 +1,4 @@
+
 #include "wx/wxprec.h"
 
 #ifdef __BORLANDC__
@@ -12,10 +13,6 @@
 
 #include "Globals.h"
 #include "swfexport.h"
-
-#ifdef HAVE_LIBMING
-#include <mingpp.h>
-#endif
 
 void SWFExport::SetMovieChoice(int v) {
 	mMovieType->SetSelection(v);
@@ -53,32 +50,34 @@ bool SWFExport::AddEnergyPlot(void) const {
 #include "energyplotdialog.h"
 #include "Progress.h"
 
+#include <mingpp.h>
+
 void MolDisplayWin::WriteFlashMovie(wxString & filepath) {
 	SWFExport * SWFOptions = new SWFExport(this);
-
+	
 	if(SWFOptions->ShowModal() != wxID_OK) {
 		SWFOptions->Destroy();
 		return;
 	}
-
+	
 	int movieType = SWFOptions->GetMovieChoice();
 	bool includeEP = SWFOptions->AddEnergyPlot();
-
+	
 	BeginOperation();
 	ProgressInd->ChangeText("Creating movie...");
-
+	
 	if(movieType == 0) {
 		CreateFrameMovie(filepath, includeEP);
 	}
 	else {
 		CreateModeMovie(filepath);
 	}
-
+	
 	FinishOperation();
 }
 
 void MolDisplayWin::CreateFrameMovie(wxString &filePath,
-		const bool includeEP) {
+									 const bool includeEP) {
 	wxMessageDialog *sizeDlg = NULL;
 	wxString title;
 	wxString msg;
@@ -118,11 +117,11 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 	SWFFont *font = new SWFFont(fontFile);
 	SWFText *frameNumText = NULL;
 	wxString frameNumStr;
-
+	
 	if(AnimateTime < 1) AnimateTime = 1;
-
+	
 	getCanvasSize(&width, &height);
-
+	
 	if(includeEP) {
 		width += height;
 		if(!energyPlotWindow) {
@@ -136,20 +135,20 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 		energyPlotWindow->Show(true);
 		energyPlotWindow->Update();
 	}
-
+	
 	movie->setBackground(0xFF, 0xFF, 0xFF);
 	movie->setRate(1000.0/(double)AnimateTime);
 	movie->setDimension(width, height);
-
+	
 	ProgressInd->SetScaleFactor(100.0 / (float)(MainData->NumFrames));
-
+	
 	for(i = 1; i <= MainData->NumFrames; ++i) {
 		if(!ProgressInd->UpdateProgress((float)i)) {
 			goto CLEANUP;
 		}
-
+		
 		MainData->SetCurrentFrame(i);
-
+		
 		Surface *temp = MainData->cFrame->SurfaceList;
 		while(temp) {
 			temp->RotateEvent(MainData);
@@ -158,7 +157,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 		MainData->ResetRotation();
 		ReleaseLists();
 		DrawGL();
-
+		
 		wxImage frame = glCanvas->getImage(0, 0);
 		wxMemoryOutputStream *memOutStream = new wxMemoryOutputStream();
 		frame.SaveFile(*(wxOutputStream *)memOutStream, wxBITMAP_TYPE_JPEG);
@@ -169,7 +168,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 		in = new SWFInput(jpegData, datLen);
 		bm = new SWFBitmap(in);
 		di = movie->add((SWFBlock *)bm);
-
+		
 		if(includeEP) {
 			energyPlotWindow->FrameChanged();
 			wxBitmap *epBitmap = NULL;
@@ -178,7 +177,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 				memOutStream = new wxMemoryOutputStream();
 				frame = epBitmap->ConvertToImage();
 				frame.SaveFile(*(wxOutputStream *)memOutStream,
-						wxBITMAP_TYPE_JPEG);
+							   wxBITMAP_TYPE_JPEG);
 				datLen = memOutStream->GetSize();
 				char unsigned *epJpegData = new unsigned char [datLen];
 				memOutStream->CopyTo(epJpegData, datLen);
@@ -190,44 +189,41 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 			}
 			delete epBitmap;
 		}
-
+		
 		frameNumStr = wxString::Format(wxT("%d/%d"), i, MainData->NumFrames);
 		frameNumText = new SWFText();
 		frameNumText->setFont(font);
 		frameNumText->setHeight(24);
 		frameNumText->setColor(0x00, 0x00, 0x00); /* TODO:  Get from wxMMP config */
 		frameNumText->moveTo(0,
-				height - ((24.0 / 1024.0) * font->getAscent() + 3));
+							 height - ((24.0 / 1024.0) * font->getAscent() + 3));
 		frameNumText->addString(frameNumStr.mb_str(wxConvUTF8));
 		textDI = movie->add((SWFBlock *)frameNumText);
-
+		
 		movie->nextFrame();
 		movie->remove(di);
 		movie->remove(textDI);
-		delete di;
-		delete textDI;
 		if(includeEP) {
 			movie->remove(di2);
-			delete di2;
 		}
 	}
-
+	
 	movie->save(filePath.mb_str(wxConvUTF8), 0);
 	MainData->SetCurrentFrame(SavedFrameNum);
-
+	
 	/* TODO:  Make sure EpWin is hidden */
-
+	
 	msg = wxString::Format(wxT("Optimal viewing dimensions are %ld pixels wide by %ld pixels high."), width, height);
 	title = wxString(wxT("Flash Video Info"));
 	sizeDlg = new wxMessageDialog(this, msg, title, wxOK);
 	sizeDlg->ShowModal();
 	delete sizeDlg;
-
+	
 CLEANUP:
 	delete movie;
 	delete font;
 	fclose(fontFile);
-
+	
 	if(includeEP) {
 		if(killEPlotWin) {
 			delete energyPlotWindow;
@@ -275,14 +271,14 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	SWFFont *font = NULL;
 	SWFText *frameNumText = NULL;
 	wxString frameNumStr;
-
+	
 	if(!MainData->cFrame->Vibs) return; // TODO: Should spit out a message.
 	Frame * lFrame = MainData->cFrame;
 	if (MainData->GetDrawMode()) {
 		savedrawmode=true;
 		if(!Prefs->GetAnimateMode()) MainData->SetDrawMode(false);
 	}
-
+	
 	long cmode = (lFrame->NumAtoms) * (lFrame->Vibs->CurrentMode);
 	long AnimationSpeed = Prefs->GetAnimationSpeed();
 	float offsetFactor = 1.0/(4.5*AnimationSpeed);
@@ -308,11 +304,11 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	MainData->ResetRotation();
 	ReleaseLists();
 	DrawGL();
-
+	
 	if(AnimateTime < 1) AnimateTime = 1;
-
+	
 	getCanvasSize(&width, &height);
-
+	
 	fontFile = fopen(fontPath.mb_str(wxConvUTF8), "rb");
 	if(fontFile == NULL) {
 		/* TODO:  Display an error message */
@@ -320,17 +316,17 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 		return;
 	}
 	font = new SWFFont(fontFile);
-
+	
 	movie = new SWFMovie();
 	movie->setBackground(0xFF, 0xFF, 0xFF);
 	movie->setRate(1000.0/(double)AnimateTime);
 	movie->setDimension(width, height);
-
+	
 	long npoint = 0;
 	long inc = 1;
-
+	
 	ProgressInd->SetScaleFactor(100.0 / (float)(4 * AnimationSpeed));
-
+	
 	for(long i = 0; i < (4 * AnimationSpeed); i++) {
 		if(!ProgressInd->UpdateProgress((float)i)) {
 			goto CLEANUP;
@@ -340,7 +336,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 			offsetFactor *= -1.0;
 		}
 		npoint += inc;
-
+		
 		wxImage mImage = glCanvas->getImage(0, 0);
 		wxMemoryOutputStream *memOutStream = new wxMemoryOutputStream();
 		mImage.SaveFile(*(wxOutputStream *)memOutStream, wxBITMAP_TYPE_JPEG);
@@ -350,53 +346,51 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 		delete memOutStream;
 		in = new SWFInput(jpegData, datLen);
 		bm = new SWFBitmap(in);
-
+		
 		frameNumStr = wxString::Format(wxT("%d/%d"), i+1, (4 * AnimationSpeed));
 		frameNumText = new SWFText();
 		frameNumText->setFont(font);
 		frameNumText->setHeight(24);
 		frameNumText->setColor(0x00, 0x00, 0x00); /* TODO:  Get from wxMMP config */
 		frameNumText->moveTo(0,
-				height - ((24.0 / 1024.0) * font->getAscent() + 3));
+							 height - ((24.0 / 1024.0) * font->getAscent() + 3));
 		frameNumText->addString(frameNumStr.mb_str(wxConvUTF8));
-
+		
 		di = movie->add((SWFBlock *)bm);
 		textDI = movie->add((SWFBlock *)frameNumText);
-
+		
 		movie->nextFrame();
 		movie->remove(di);
 		movie->remove(textDI);
-		delete di;
-		delete textDI;
-
+		
 		for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
 			lAtoms[iatm].Position.x += offsetFactor * (ModeOffset[iatm].x);
 			lAtoms[iatm].Position.y += offsetFactor * (ModeOffset[iatm].y);
 			lAtoms[iatm].Position.z += offsetFactor * (ModeOffset[iatm].z);
 		}
-
+		
 		MainData->ResetRotation();
 		ReleaseLists();
 		DrawGL();
 	}
-
+	
 	movie->save(filePath.mb_str(wxConvUTF8), 0);
-
+	
 	for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
 		lAtoms[iatm].Position = SavedAtoms[iatm];
 	}
 	MainData->ResetRotation();
-
+	
 	MainData->SetDrawMode(savedrawmode);
 	ReleaseLists();
 	DrawGL();
-
+	
 	msg = wxString::Format(wxT("Optimal viewing dimensions are %ld pixels wide by %ld pixels high."), width, height);
 	title = wxString(wxT("Flash Video Info"));
 	sizeDlg = new wxMessageDialog(this, msg, title, wxOK);
 	sizeDlg->ShowModal();
 	delete sizeDlg;
-
+	
 CLEANUP:
 	delete movie;
 	delete font;
@@ -405,4 +399,3 @@ CLEANUP:
 	if (SavedAtoms) delete [] SavedAtoms;
 }
 #endif
-
