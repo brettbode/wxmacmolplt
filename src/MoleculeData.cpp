@@ -1910,11 +1910,13 @@ void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
 					if (FMOFragmentIds[cFrame->Bonds[ib].Atom1] == NextId) {
 						if (FMOFragmentIds[cFrame->Bonds[ib].Atom2] != NextId) {
 							FMOFragmentIds[cFrame->Bonds[ib].Atom2] = NextId;
+							std::cout << "atom2 = " << cFrame->Bonds[ib].Atom2 << std::endl;
 							done = false;
 						}
 					} else if (FMOFragmentIds[cFrame->Bonds[ib].Atom2] == NextId) {
 						if (FMOFragmentIds[cFrame->Bonds[ib].Atom1] != NextId) {
 							FMOFragmentIds[cFrame->Bonds[ib].Atom1] = NextId;
+							std::cout << "atom1 = " << cFrame->Bonds[ib].Atom1 << std::endl;
 							done = false;
 						}
 					}
@@ -1924,6 +1926,7 @@ void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
 		}
 		++atomNum;
 	}
+	InputOptions->FMO.SetNumberFragments(NextId-1);
 	//Ok we should now have the non-bonded pieces separated. If the user wants more than one non-bonded piece in
 	//each fragment coalesce them now.
 	if (NumMolecules > 1) {
@@ -1932,12 +1935,14 @@ void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
 		//It's probably best to consider the center of each fragment for the distance computation.
 		std::vector<CPoint3D> fragCenters;
 		fragCenters.reserve(NextId);
-		for (long ifrag=1; ifrag<=NextId; ++ifrag) {
+		for (long ifrag=0; ifrag<NextId; ++ifrag) {
 			fragCenters.push_back(CPoint3D(0,0,0));
 			long atmcount;
 			for (long iatom=0; iatom<cFrame->GetNumAtoms(); ++iatom) {
-				if (FMOFragmentIds[iatom] == ifrag) {
-					fragCenters[ifrag] += cFrame->Atoms[iatom].Position;
+				if (FMOFragmentIds[iatom] == (ifrag+1)) {
+					fragCenters[ifrag].x += cFrame->Atoms[iatom].Position.x;
+					fragCenters[ifrag].y += cFrame->Atoms[iatom].Position.y;
+					fragCenters[ifrag].z += cFrame->Atoms[iatom].Position.z;
 					atmcount++;
 				}
 			}
@@ -1946,9 +1951,9 @@ void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
 			fragCenters[ifrag].z /= (float) atmcount;
 		}
 		
-		for (long ifrag=1; ifrag<=NextId; ifrag++) {
-			for (int i=0; i<NumMolecules; i++) {
-				if (ifrag == NextId) break;	//we've ran out of fragments, the last one will have to be short
+		for (long ifrag=0; ifrag<NextId; ifrag++) {
+			for (int i=1; i<NumMolecules; i++) {
+				if ((ifrag+1) == NextId) break;	//we've ran out of fragments, the last one will have to be short
 				CPoint3D offset;
 				offset.x = fragCenters[ifrag].x-fragCenters[ifrag+1].x;
 				offset.y = fragCenters[ifrag].y-fragCenters[ifrag+1].y;
@@ -1956,7 +1961,7 @@ void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
 				float distance = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
 				
 				long targetId = ifrag+1;
-				for (long jfrag=ifrag+2; jfrag<=NextId; jfrag++) {
+				for (long jfrag=ifrag+2; jfrag<NextId; jfrag++) {
 					offset.x = fragCenters[ifrag].x-fragCenters[jfrag].x;
 					offset.y = fragCenters[ifrag].y-fragCenters[jfrag].y;
 					offset.z = fragCenters[ifrag].z-fragCenters[jfrag].z;
@@ -1970,13 +1975,14 @@ void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
 				//one thing I'm not doing is recomputing the fragment center so the next addition will 
 				//reference the original fragment only
 				for (long atomi=0; atomi<cFrame->GetNumAtoms(); ++atomi) {
-					if (FMOFragmentIds[atomi] == targetId) FMOFragmentIds[atomi] = ifrag;
-					if (FMOFragmentIds[atomi] > targetId) FMOFragmentIds[atomi]--;
+					if (FMOFragmentIds[atomi] == (targetId+1)) FMOFragmentIds[atomi] = (ifrag+1);
+					if (FMOFragmentIds[atomi] > (targetId+1)) FMOFragmentIds[atomi]--;
 				}
-				fragCenters.erase(fragCenters.begin() + targetId-1);
+				fragCenters.erase(fragCenters.begin() + targetId);
 				NextId--;
 			}
 		}
+		InputOptions->FMO.SetNumberFragments(NextId);
 	}
 }
 
