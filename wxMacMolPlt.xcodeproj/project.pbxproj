@@ -522,6 +522,10 @@
 		8B3B8B1C0A770A280041EA88 /* glf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B899C0A6EAD7E0041EA88 /* glf.cpp */; };
 		8B45D25E0A700DB60005269A /* arial1.glf in Resources */ = {isa = PBXBuildFile; fileRef = 8B45D25D0A700DB60005269A /* arial1.glf */; };
 		8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
+		8B4D10C910E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */; };
+		8B4D10CA10E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */; };
+		8B4D10CB10E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */; };
+		8B4D10CC10E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */; };
 		8B4FB3D40A3093470014F6B5 /* surfaceswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */; };
 		8B5B666A0E030FAB000EC27D /* perpixel_dirlight_f.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66680E030FAB000EC27D /* perpixel_dirlight_f.glsl */; };
 		8B5B666B0E030FAB000EC27D /* perpixel_dirlight_v.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66690E030FAB000EC27D /* perpixel_dirlight_v.glsl */; };
@@ -1003,6 +1007,8 @@
 		8B45D25D0A700DB60005269A /* arial1.glf */ = {isa = PBXFileReference; lastKnownFileType = file; name = arial1.glf; path = resources/fonts/arial1.glf; sourceTree = "<group>"; };
 		8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = appendframesoptions.cpp; path = src/appendframesoptions.cpp; sourceTree = "<group>"; };
 		8B4BB4410A0A7C9D00FE9CC6 /* appendframesoptions.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = appendframesoptions.h; path = src/appendframesoptions.h; sourceTree = "<group>"; };
+		8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fmofragmentationdialog.cpp; path = src/fmofragmentationdialog.cpp; sourceTree = "<group>"; };
+		8B4D10C810E287DD0087E8DA /* fmofragmentationdialog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fmofragmentationdialog.h; path = src/fmofragmentationdialog.h; sourceTree = "<group>"; };
 		8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = surfaceswindow.cpp; path = src/surfaceswindow.cpp; sourceTree = "<group>"; };
 		8B4FB3D20A3093470014F6B5 /* surfaceswindow.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = surfaceswindow.h; path = src/surfaceswindow.h; sourceTree = "<group>"; };
 		8B5B66680E030FAB000EC27D /* perpixel_dirlight_f.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = perpixel_dirlight_f.glsl; path = resources/shaders/perpixel_dirlight_f.glsl; sourceTree = "<group>"; };
@@ -1037,8 +1043,6 @@
 		8BA56CA00DBFC97D00B8F40C /* FloatSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FloatSlider.h; path = src/FloatSlider.h; sourceTree = "<group>"; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
 		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
-		8BD5BA820A41E01800FF9CAE /* inputbuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = inputbuilder.cpp; path = src/inputbuilder.cpp; sourceTree = "<group>"; };
-		8BD5BA830A41E01800FF9CAE /* inputbuilder.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = inputbuilder.h; path = src/inputbuilder.h; sourceTree = "<group>"; };
 		8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = changeatomorderdialog.cpp; path = src/changeatomorderdialog.cpp; sourceTree = "<group>"; };
 		8BDC58C10CB2A965000BE0A6 /* changeatomorderdialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = changeatomorderdialog.h; path = src/changeatomorderdialog.h; sourceTree = "<group>"; };
 		8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = coordinateoffset.cpp; path = src/coordinateoffset.cpp; sourceTree = "<group>"; };
@@ -1056,8 +1060,6 @@
 		8BF17D770A5328210059B71F /* windowparameters.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = windowparameters.h; path = src/windowparameters.h; sourceTree = "<group>"; };
 		8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = zmatrixcalculator.cpp; path = src/zmatrixcalculator.cpp; sourceTree = "<group>"; };
 		8BF17DA30A55D0910059B71F /* zmatrixcalculator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = zmatrixcalculator.h; path = src/zmatrixcalculator.h; sourceTree = "<group>"; };
-		8BFE27070DEC9415000E69E0 /* InputWizard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InputWizard.cpp; path = src/InputWizard.cpp; sourceTree = "<group>"; };
-		8BFE27080DEC9415000E69E0 /* InputWizard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InputWizard.h; path = src/InputWizard.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1163,10 +1165,6 @@
 				1652DA3C09D0B12600B7783F /* InputData.h */,
 				1652DA3D09D0B12600B7783F /* Internals.cpp */,
 				1652DA3E09D0B12600B7783F /* Internals.h */,
-				8BD5BA820A41E01800FF9CAE /* inputbuilder.cpp */,
-				8BD5BA830A41E01800FF9CAE /* inputbuilder.h */,
-				8BFE27070DEC9415000E69E0 /* InputWizard.cpp */,
-				8BFE27080DEC9415000E69E0 /* InputWizard.h */,
 				1626378A0A07E46E0089452E /* llmdialog.cpp */,
 				1626378B0A07E46E0089452E /* llmdialog.h */,
 				1652DA3F09D0B12600B7783F /* main.cpp */,
@@ -1495,6 +1493,8 @@
 				8B6C7BFE0A24E9E800B7358F /* wxMolGraph.h */,
 				8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */,
 				8BA56CA00DBFC97D00B8F40C /* FloatSlider.h */,
+				8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */,
+				8B4D10C810E287DD0087E8DA /* fmofragmentationdialog.h */,
 				8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */,
 				8B6075B00A1A34B1008CC9FD /* printoptions.h */,
 				1652DA5009D0B12600B7783F /* Progress.cpp */,
@@ -1850,6 +1850,7 @@
 				8BA56CA40DBFC97D00B8F40C /* FloatSlider.cpp in Sources */,
 				8B5B66760E030FD2000EC27D /* glew.cpp in Sources */,
 				8B5B66850E031067000EC27D /* InputWizard.cpp in Sources */,
+				8B4D10C910E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1989,6 +1990,7 @@
 				8BA56CA10DBFC97D00B8F40C /* FloatSlider.cpp in Sources */,
 				8B5B66790E030FD2000EC27D /* glew.cpp in Sources */,
 				8B5B66880E031067000EC27D /* InputWizard.cpp in Sources */,
+				8B4D10CC10E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2128,6 +2130,7 @@
 				8BA56CA20DBFC97D00B8F40C /* FloatSlider.cpp in Sources */,
 				8B5B66770E030FD2000EC27D /* glew.cpp in Sources */,
 				8B5B66860E031067000EC27D /* InputWizard.cpp in Sources */,
+				8B4D10CA10E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2267,6 +2270,7 @@
 				8BA56CA30DBFC97D00B8F40C /* FloatSlider.cpp in Sources */,
 				8B5B66780E030FD2000EC27D /* glew.cpp in Sources */,
 				8B5B66870E031067000EC27D /* InputWizard.cpp in Sources */,
+				8B4D10CB10E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2550,6 +2554,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = 4.0;
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
 				INFOPLIST_FILE = /Users/brett/software/wxMacMolPlt/resources/Info.plist;

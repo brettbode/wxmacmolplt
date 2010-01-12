@@ -94,6 +94,11 @@ class wxSpinCtrl;
 #define ID_DFTMETHOD_CHOICE 10183
 #define ID_GRID_FUNCTIONAL_CHOICE 10184
 #define ID_GRIDFREE_FUNCTIONAL_CHOICE 10184
+#define ID_FMOPANE 10265
+#define ID_FMOACTIVECHECK 10267
+#define ID_FMOFRAGCOUNT 10266
+#define ID_FMOFRAGLIST 10268
+#define ID_FMOFRAGBUTTON 10269
 #define ID_IBMOGUESSPANEL 10095
 #define ID_INITGUESS_CHOICE 10132
 #define ID_MOGUESS_VECSOURCE_CHOICE 10124
@@ -151,8 +156,8 @@ class wxSpinCtrl;
 #define ID_SUMMARY_ELEC 10236
 #define ID_DEFAULTSBUTTON 10228
 #define ID_REVERTBUTTON 10090
-#define ID_ADVANCEDBUTTON 10091
 #define ID_WRITEFILEBUTTON 10073
+#define ID_ADVANCEDBUTTON 10270
 #define SYMBOL_INPUTBUILDERWINDOW_STYLE wxCAPTION|wxSYSTEM_MENU|wxCLOSE_BOX|wxTAB_TRAVERSAL
 #define SYMBOL_INPUTBUILDERWINDOW_TITLE _("Input Builder")
 #define SYMBOL_INPUTBUILDERWINDOW_IDNAME ID_INPUTBUILDERWINDOW
@@ -168,6 +173,7 @@ enum {
     DATA_PANE,
     SYSTEM_PANE,
     DFT_PANE,
+	FMO_Pane,
     MOGUESS_PANE,
     HESSOPTS_PANE,
     MISCPREFS_PANE,
@@ -345,6 +351,12 @@ public:
 	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_GRIDFREE_FUNCTIONAL_CHOICE
 	void OnGridfreeFunctionalChoiceSelected( wxCommandEvent& event );
 
+	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_FMOACTIVECHECK
+	void OnFMOActiveCheckClick( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_FMOFRAGBUTTON
+	void OnFMOFragButtonClick( wxCommandEvent& event );
+
 	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_INITGUESS_CHOICE
 	void OnInitguessChoiceSelected( wxCommandEvent& event );
 
@@ -477,11 +489,11 @@ public:
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_REVERTBUTTON
 	void OnRevertbuttonClick( wxCommandEvent& event );
 
-	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ADVANCEDBUTTON
-	void OnAdvancedButtonClicked( wxCommandEvent& event );
-
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_WRITEFILEBUTTON
 	void OnWritefilebuttonClick( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ADVANCEDBUTTON
+	void OnAdvancedButtonClicked( wxCommandEvent& event );
 
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
 	void OnCancelClick( wxCommandEvent& event );
@@ -512,6 +524,7 @@ public:
     void SetupDataItems();
     void SetupSystemItems();
     void SetupDFTItems();
+	void SetupFMOItems();
     void SetupMOGuessItems();
     void SetupHessOptsItems();
     void SetupMiscPrefsItems();
@@ -571,6 +584,10 @@ public:
 	wxBoxSizer* funcSizer;
 	wxUglyChoice* dftGridFuncChoice;
 	wxUglyChoice* dftGridFreeFuncChoice;
+	wxCheckBox* mFMOCheck;
+	wxTextCtrl* mNumFragsEdit;
+	wxListBox* mFMOList;
+	wxButton* mFMOGenFragsButton;
 	wxUglyChoice* initGuessChoice;
 	wxUglyChoice* mMOSourceChoice;
 	wxTextCtrl* mVecOrbCountText;
@@ -620,8 +637,8 @@ public:
 	wxTextCtrl* mElectronCorr;
 	wxButton* defaultsBtn;
 	wxButton* revertBtn;
-	wxButton* advanced_button;
 	wxButton* writeBtn;
+	wxButton* advanced_button;
 ////@end InputBuilderWindow member variables
 
     InputData * TmpInputRec;
