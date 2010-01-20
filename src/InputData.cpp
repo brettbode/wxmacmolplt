@@ -3375,7 +3375,7 @@ void MoleculeData::WriteINDAT(BufferFile * Buffer) {
 				sprintf(Out, " %ld,", FMOFragmentIds[iatom]);
 				Buffer->WriteLine(Out, false);
 			}
-			sprintf(Out, " %ld", FMOFragmentIds[FMOFragmentIds.size()]);
+			sprintf(Out, " %ld", FMOFragmentIds[FMOFragmentIds.size()-1]);
 			Buffer->WriteLine(Out, true);
 		}
 	}

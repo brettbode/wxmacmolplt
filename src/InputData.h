@@ -999,13 +999,14 @@ private:
 	bool	Active;				///< Flag to turn FMO off or on
 	bool	OutputStyle;		///< Flag indicating how the INDAT array will be written
 public:
-	FMOGroup(void) {Active=false; NumberFragments=1;};
+	FMOGroup(void) {InitData();};
 	const FMOGroup & operator=(const FMOGroup & other) {Active=other.Active; NumberFragments=other.NumberFragments; return *this;};
+	void InitData(void) {Active=false; NumberFragments=1; OutputStyle=false;};
 	
 	inline bool IsFMOActive(void) const {return Active;};
 	void FMOActive(bool newState) {Active = newState;};
 	inline long GetNumberFragments(void) const {return NumberFragments;};
-	void SetNumberFragments(long & num) {NumberFragments = num;};
+	void SetNumberFragments(const long & num) {NumberFragments = num;};
 		/** If true output INDAT as the atom list for each fragment, else atom ordered list */
 	inline bool UseFragmentINDAT(void) const {return OutputStyle;};
 	void UseFragmentINDAT(bool choice) {OutputStyle = choice;};	///< Pass true for INDAT ordered by fragment

@@ -341,6 +341,9 @@ void MoleculeData::AtomAdded(void) {
 	MaxSize = MAX(MaxSize, (XMax-XMin));
 	MaxSize = MAX(MaxSize, (YMax-YMin));
 	MaxSize = MAX(MaxSize, (ZMax-ZMin));
+	
+	while (FMOFragmentIds.size() < cFrame->GetNumAtoms())
+		FMOFragmentIds.push_back(1);	//initialize the fragment id for the new atoms
 
 	ResetRotation();
 }
@@ -1782,6 +1785,7 @@ long MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
 		FragmentNames.erase(iter);
 		offset = 0;	//Have the caller rescan the whole list to be safe.
 	}
+	if (FMOFragmentIds.size() > AtomNum) FMOFragmentIds.erase(FMOFragmentIds.begin() + AtomNum);
 
 	ResetRotation();
 	return offset;
@@ -1881,21 +1885,22 @@ void MoleculeData::PruneUnusedFragments() {
 
 }
 
-void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
+long MoleculeData::CreateFMOFragmentation(const int & NumMolecules, std::vector<long> & newFragmentation) {
 	//Create an FMO fragment list by breaking up the system into non-bonded pieces (H-bonds are ignored)
 	
+	long result = 0;
 	//Start by initializing the vector with invalid fragment numbers
-	FMOFragmentIds.clear();
-	FMOFragmentIds.reserve(cFrame->GetNumAtoms());
+	newFragmentation.clear();
+	newFragmentation.reserve(cFrame->GetNumAtoms());
 	for (long i=0; i<cFrame->GetNumAtoms(); i++) {
-		FMOFragmentIds.push_back(-1);
+		newFragmentation.push_back(-1);
 	}
 	
 	long NextId = 1;
 	long atomNum = 0;
 	while (atomNum < cFrame->GetNumAtoms()) {
-		if (FMOFragmentIds[atomNum] < 1) {
-			FMOFragmentIds[atomNum] = NextId;
+		if (newFragmentation[atomNum] < 1) {
+			newFragmentation[atomNum] = NextId;
 			//starting a new fragment
 			//a recursive function would be simpler to write and should normally be fine, but if somebody runs this
 			//on a system with a large molecule that could be rather abusive on the stack
@@ -1907,16 +1912,14 @@ void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
 			while (!done) {
 				done = true;
 				for (long ib=0; ib<cFrame->GetNumBonds(); ++ib) {
-					if (FMOFragmentIds[cFrame->Bonds[ib].Atom1] == NextId) {
-						if (FMOFragmentIds[cFrame->Bonds[ib].Atom2] != NextId) {
-							FMOFragmentIds[cFrame->Bonds[ib].Atom2] = NextId;
-							std::cout << "atom2 = " << cFrame->Bonds[ib].Atom2 << std::endl;
+					if (newFragmentation[cFrame->Bonds[ib].Atom1] == NextId) {
+						if (newFragmentation[cFrame->Bonds[ib].Atom2] != NextId) {
+							newFragmentation[cFrame->Bonds[ib].Atom2] = NextId;
 							done = false;
 						}
-					} else if (FMOFragmentIds[cFrame->Bonds[ib].Atom2] == NextId) {
-						if (FMOFragmentIds[cFrame->Bonds[ib].Atom1] != NextId) {
-							FMOFragmentIds[cFrame->Bonds[ib].Atom1] = NextId;
-							std::cout << "atom1 = " << cFrame->Bonds[ib].Atom1 << std::endl;
+					} else if (newFragmentation[cFrame->Bonds[ib].Atom2] == NextId) {
+						if (newFragmentation[cFrame->Bonds[ib].Atom1] != NextId) {
+							newFragmentation[cFrame->Bonds[ib].Atom1] = NextId;
 							done = false;
 						}
 					}
@@ -1926,7 +1929,7 @@ void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
 		}
 		++atomNum;
 	}
-	InputOptions->FMO.SetNumberFragments(NextId-1);
+	result = NextId - 1;
 	//Ok we should now have the non-bonded pieces separated. If the user wants more than one non-bonded piece in
 	//each fragment coalesce them now.
 	if (NumMolecules > 1) {
@@ -1939,7 +1942,7 @@ void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
 			fragCenters.push_back(CPoint3D(0,0,0));
 			long atmcount;
 			for (long iatom=0; iatom<cFrame->GetNumAtoms(); ++iatom) {
-				if (FMOFragmentIds[iatom] == (ifrag+1)) {
+				if (newFragmentation[iatom] == (ifrag+1)) {
 					fragCenters[ifrag].x += cFrame->Atoms[iatom].Position.x;
 					fragCenters[ifrag].y += cFrame->Atoms[iatom].Position.y;
 					fragCenters[ifrag].z += cFrame->Atoms[iatom].Position.z;
@@ -1975,15 +1978,31 @@ void MoleculeData::CreateFMOFragmentation(const int & NumMolecules) {
 				//one thing I'm not doing is recomputing the fragment center so the next addition will 
 				//reference the original fragment only
 				for (long atomi=0; atomi<cFrame->GetNumAtoms(); ++atomi) {
-					if (FMOFragmentIds[atomi] == (targetId+1)) FMOFragmentIds[atomi] = (ifrag+1);
-					if (FMOFragmentIds[atomi] > (targetId+1)) FMOFragmentIds[atomi]--;
+					if (newFragmentation[atomi] == (targetId+1)) newFragmentation[atomi] = (ifrag+1);
+					if (newFragmentation[atomi] > (targetId+1)) newFragmentation[atomi]--;
 				}
 				fragCenters.erase(fragCenters.begin() + targetId);
 				NextId--;
 			}
 		}
-		InputOptions->FMO.SetNumberFragments(NextId);
+		result = NextId;
 	}
+	return result;
+}
+long MoleculeData::GetFMOFragmentId(const long & AtomId) const {
+	if ((AtomId >= 0) && (AtomId < FMOFragmentIds.size())) {
+		return FMOFragmentIds[AtomId];
+	}
+	return -1;
+}
+void MoleculeData::SetFMOFragmentId(const long & AtomId, const long & FragId) {
+	if ((AtomId<0)||(AtomId>=cFrame->GetNumAtoms())) return;	//invalid atom
+	if ((FragId<1)||(FragId > InputOptions->FMO.GetNumberFragments())) return; //invalid fragment id
+	//Is the fragment id array setup?
+	while (FMOFragmentIds.size() < cFrame->GetNumAtoms()) {
+		FMOFragmentIds.push_back(1);	//simply initialize atoms to fragment 1
+	}
+	FMOFragmentIds[AtomId] = FragId;
 }
 
 void MoleculeData::ExportPOV(BufferFile *Buffer, WinPrefs *Prefs) {

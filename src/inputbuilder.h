@@ -23,6 +23,7 @@
 ////@begin includes
 #include "wx/frame.h"
 #include "wx/listbook.h"
+#include "wx/grid.h"
 #include "wx/spinctrl.h"
 ////@end includes
 
@@ -37,6 +38,7 @@
 class wxListbook;
 class wxUglyChoice;
 class wxBoxSizer;
+class wxGrid;
 class wxSpinCtrl;
 ////@end forward declarations
 
@@ -97,7 +99,7 @@ class wxSpinCtrl;
 #define ID_FMOPANE 10265
 #define ID_FMOACTIVECHECK 10267
 #define ID_FMOFRAGCOUNT 10266
-#define ID_FMOFRAGLIST 10268
+#define ID_FMOLIST 10268
 #define ID_FMOFRAGBUTTON 10269
 #define ID_IBMOGUESSPANEL 10095
 #define ID_INITGUESS_CHOICE 10132
@@ -213,6 +215,9 @@ public:
 
     /// Creates the controls and sizers
     void CreateControls();
+	
+	/// Saves the temporary data back to the main data structure
+	void SaveData(void) const;
 
 	bool ShowBasis() const;
 	bool ShowStatPoint() const;
@@ -353,6 +358,12 @@ public:
 
 	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_FMOACTIVECHECK
 	void OnFMOActiveCheckClick( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_FMOFRAGCOUNT
+	void OnFMOFragCountTextUpdated( wxCommandEvent& event );
+
+	/// wxEVT_GRID_CELL_CHANGE event handler for ID_FMOLIST
+	void OnFMOFragIdCellChange( wxGridEvent& event );
 
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_FMOFRAGBUTTON
 	void OnFMOFragButtonClick( wxCommandEvent& event );
@@ -534,7 +545,8 @@ public:
     void SetupSummaryItems();
 	
 	void SetupPointGroupOrder(void);
-
+	///Call when the frame or atoms in it have changed in case the input builder needs to update
+	void FrameChanged(void);
 ////@begin InputBuilderWindow member variables
 	wxListbook* listBook;
 	wxUglyChoice* basisChoice;
@@ -586,7 +598,7 @@ public:
 	wxUglyChoice* dftGridFreeFuncChoice;
 	wxCheckBox* mFMOCheck;
 	wxTextCtrl* mNumFragsEdit;
-	wxListBox* mFMOList;
+	wxGrid* mFMOFragList;
 	wxButton* mFMOGenFragsButton;
 	wxUglyChoice* initGuessChoice;
 	wxUglyChoice* mMOSourceChoice;
@@ -643,6 +655,8 @@ public:
 
     InputData * TmpInputRec;
 	wxBoxSizer *button_sizer;
+	//local data for FMO
+	std::vector<long> FMOFragmentIds;	///< Vector containing the FMO fragment mapping for each atom
     
     wxWindow *tab[NUM_PANES];
     wxString  tabText[NUM_PANES];

@@ -300,8 +300,21 @@ class MoleculeData {
 		/**
 		 Create an FMO fragment list
 		 @param NumMolecules The number of non-bonded molecules to group together in the same FMO fragment
+		 @param newFragmentation The resulting fragmentation vector
 		 */
-		void CreateFMOFragmentation(const int & NumMolecules);
+		long CreateFMOFragmentation(const int & NumMolecules, std::vector<long> & newFragmentation);
+		/**
+		 Returns the FMO fragment number for the selected atom
+		 @param AtomId the index of the desired atom
+		 */
+		long GetFMOFragmentId(const long & AtomId) const;
+		/**
+		 Set the FragmentId for atom index AtomId. This routine will initialize the fragment id
+		 array if it is empty.
+		 @param AtomId index of the atom to target
+		 @param FragId the new fragment id for the targeted atom
+		 */
+		void SetFMOFragmentId(const long & AtomId, const long & FragmentId);
 };
 
 #endif
