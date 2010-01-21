@@ -1614,12 +1614,7 @@ void Surf2DBase::Contour2DGrid3DGL(MoleculeData * , WinPrefs * Prefs)
 	Boolean		HasPoint[4];
 
 	long NumPoints = NumGridPoints;
-#ifdef UseHandles
-	HLock(Grid);
-	float * lGrid = (float *) *Grid;
-#else
 	float * lGrid = Grid;
-#endif
 	
 	CPoint3D	XGridMin, XGridInc, YGridInc;
 	XGridMin = Origin;
@@ -1819,9 +1814,6 @@ void Surf2DBase::Contour2DGrid3DGL(MoleculeData * , WinPrefs * Prefs)
 	} else {
 		if (qobj) gluDeleteQuadric(qobj);	//finally delete the quadric object
 	}
-#ifdef UseHandles
-	HUnlock(Grid);
-#endif
 }
 
 long General3DSurface::getTriangleCount(void) const {
@@ -1865,49 +1857,22 @@ long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs *, myGLTriangl
 long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri, unsigned int shader_program) {
 	long result = 0;
 	if (Visible) {
-#ifdef UseHandles
-		if (ContourHndl && VertexHndl) {
-			HLock(ContourHndl);
-			HLock(VertexHndl);
-			if (SurfaceNormals) HLock(SurfaceNormals);
-			if (List) HLock(List);
+		if (ContourHndl && VertexList) {
 			if (SolidSurface()) {
 				if ((UseSurfaceNormals())&&SurfaceNormals) {
-					result = CreateSolidSurface((CPoint3D *) *ContourHndl, (CPoint3D *) *SurfaceNormals, (long *) *VertexHndl,
-						NumPosContourTriangles,
-						&PosColor, (List ?(float *) *List:NULL), &NegColor, MaxMEPValue, MainData, transpTri);
+					result = CreateSolidSurface(ContourHndl, SurfaceNormals, VertexList,
+												NumPosContourTriangles,
+												&PosColor, List, &NegColor, MaxMEPValue, MainData, transpTri);
 				} else {
-					result = CreateSolidSurface((CPoint3D *) *ContourHndl, NULL, (long *) *VertexHndl,
-						NumPosContourTriangles,
-						&PosColor, (List ?(float *) *List:NULL), &NegColor, MaxMEPValue, MainData, transpTri);
+					result = CreateSolidSurface(ContourHndl, NULL, VertexList,
+												NumPosContourTriangles,
+												&PosColor, List, &NegColor, MaxMEPValue, MainData, transpTri);
 				}
 			} else if (WireFrameSurface()) {
-				CreateWireSurface((CPoint3D *) *ContourHndl, NULL, (long *) *VertexHndl,
-					NumPosContourTriangles,
-					&PosColor,(List ?(float *) *List:NULL), &NegColor, MaxMEPValue, MainData);
+				CreateWireSurface(ContourHndl, NULL, VertexList,
+								  NumPosContourTriangles,
+								  &PosColor, List, &NegColor, MaxMEPValue, MainData);
 			}
-			HUnlock(ContourHndl);
-			HUnlock(VertexHndl);
-			if (List) HUnlock(List);
-			if (SurfaceNormals) HUnlock(SurfaceNormals);
-#else
-			if (ContourHndl && VertexList) {
-				if (SolidSurface()) {
-					if ((UseSurfaceNormals())&&SurfaceNormals) {
-						result = CreateSolidSurface(ContourHndl, SurfaceNormals, VertexList,
-													NumPosContourTriangles,
-													&PosColor, List, &NegColor, MaxMEPValue, MainData, transpTri);
-					} else {
-						result = CreateSolidSurface(ContourHndl, NULL, VertexList,
-													NumPosContourTriangles,
-													&PosColor, List, &NegColor, MaxMEPValue, MainData, transpTri);
-					}
-				} else if (WireFrameSurface()) {
-					CreateWireSurface(ContourHndl, NULL, VertexList,
-									  NumPosContourTriangles,
-									  &PosColor, List, &NegColor, MaxMEPValue, MainData);
-				}
-#endif
 		}
 	}
 	return result;
@@ -1915,41 +1880,6 @@ long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTria
 long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri, unsigned int shader_program) {
 	long result=0;
 	if (Visible && (PlotOrb>=0)) {
-#ifdef UseHandles
-		if (ContourHndl && VertexHndl) {
-			HLock(ContourHndl);
-			HLock(VertexHndl);
-			if (SurfaceNormals) HLock(SurfaceNormals);
-			if (SolidSurface()) {
-				if ((UseSurfaceNormals())&&SurfaceNormals) {
-					result = CreateSolidSurface((CPoint3D *) *ContourHndl,
-												(CPoint3D *) *SurfaceNormals, (long *) *VertexHndl, NumPosContourTriangles,
-												&PosColor, NULL, NULL, 1.0, MainData, transpTri);
-					result += CreateSolidSurface((CPoint3D *) *ContourHndl,
-												 (CPoint3D *) *SurfaceNormals,
-												 (long *) &(((long *) *VertexHndl)[3*NumPosContourTriangles]),
-												 NumNegContourTriangles, &NegColor,
-												 NULL, NULL, 1.0, MainData, &(transpTri[result]));
-				} else {
-					result = CreateSolidSurface((CPoint3D *) *ContourHndl, NULL, (long *) *VertexHndl,
-												NumPosContourTriangles,
-												&PosColor, NULL, NULL, 1.0, MainData, transpTri);
-					result += CreateSolidSurface((CPoint3D *) *ContourHndl,
-												 NULL, (long *) &(((long *) *VertexHndl)[3*NumPosContourTriangles]),
-												 NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData, &(transpTri[result]));
-				}
-			} else if (WireFrameSurface()) {
-				CreateWireSurface((CPoint3D *) *ContourHndl, NULL, (long *) *VertexHndl, NumPosContourTriangles,
-								  &PosColor, NULL, NULL, 1.0, MainData);
-				CreateWireSurface((CPoint3D *) *ContourHndl, NULL, 
-								  (long *) &(((long *) *VertexHndl)[3*NumPosContourTriangles]),
-								  NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData);
-			}
-			HUnlock(ContourHndl);
-			HUnlock(VertexHndl);
-			if (SurfaceNormals) HUnlock(SurfaceNormals);
-		}
-#else
 		if (ContourHndl && VertexList) {
 			if (SolidSurface()) {
 				if ((UseSurfaceNormals())&&SurfaceNormals) {
@@ -1977,45 +1907,12 @@ long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle *
 								  NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData);
 			}
 		}
-#endif
 	}
 	return result;
 }
 long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri, unsigned int shader_program) {
 	long result=0;
 	if (Visible) {
-#ifdef UseHandles
-		if (ContourHndl && VertexHndl) {
-			HLock(ContourHndl);
-			HLock(VertexHndl);
-			if (SurfaceNormals) HLock(SurfaceNormals);
-			if (SolidSurface()) {
-				if ((UseSurfaceNormals())&&SurfaceNormals) {
-					result = CreateSolidSurface((CPoint3D *) *ContourHndl, (CPoint3D *) *SurfaceNormals,
-						(long *) *VertexHndl, NumPosContourTriangles,
-						&PosColor, NULL, NULL, 1.0, MainData, transpTri);
-					result += CreateSolidSurface((CPoint3D *) *ContourHndl, (CPoint3D *) *SurfaceNormals,
-						(long *) &(((long *) *VertexHndl)[3*NumPosContourTriangles]), 
-						NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData, &(transpTri[result]));
-				} else {
-					result = CreateSolidSurface((CPoint3D *) *ContourHndl, NULL, (long *) *VertexHndl, NumPosContourTriangles,
-						&PosColor, NULL, NULL, 1.0, MainData, transpTri);
-					result += CreateSolidSurface((CPoint3D *) *ContourHndl,
-						NULL, (long *) &(((long *) *VertexHndl)[3*NumPosContourTriangles]),
-						NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData, &(transpTri[result]));
-				}
-			} else if (WireFrameSurface()) {
-				CreateWireSurface((CPoint3D *) *ContourHndl, NULL, (long *) *VertexHndl, NumPosContourTriangles,
-					&PosColor, NULL, NULL, 1.0, MainData);
-				CreateWireSurface((CPoint3D *) *ContourHndl, NULL, 
-					&(((long *) *VertexHndl)[3*NumPosContourTriangles]),
-					NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData);
-			}
-			HUnlock(ContourHndl);
-			HUnlock(VertexHndl);
-			if (SurfaceNormals) HUnlock(SurfaceNormals);
-		}
-#else
 		if (ContourHndl && VertexList) {
 			if (SolidSurface()) {
 				if ((UseSurfaceNormals())&&SurfaceNormals) {
@@ -2040,7 +1937,6 @@ long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle *
 								  NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData);
 			}
 		}
-#endif
 	}
 	return result;
 }
