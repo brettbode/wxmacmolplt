@@ -275,6 +275,7 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	mAltModifyingToolBar = false;
 	edit_symmetrically = false;
 	do_rotate_annotation = false;
+	GLUpdateInProgress = false;
 
 	toolbar = NULL;
 	lasso_has_area = false;
@@ -1076,6 +1077,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 #endif
 
 	if(fileDlg->ShowModal() == wxID_OK) {
+		Prefs->CylindersForLines(true);
 		filepath = fileDlg->GetPath();
 		index    = fileDlg->GetFilterIndex();
 		if (index <= 2) {
@@ -1220,6 +1222,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 				MessageAlert("Unable to open the file for output.");
 			}
 		}
+		Prefs->CylindersForLines(false);
 	}
 
 	fileDlg->Destroy();

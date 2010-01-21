@@ -201,6 +201,7 @@ class MolDisplayWin : public wxFrame {
 		bool			show_fullscreen;
 		bool			edit_symmetrically;
 		bool			do_rotate_annotation;
+		bool			GLUpdateInProgress;		///< flag to prevent multiple simultaneous GL updates
 		
 		Progress		*ProgressInd;    ///< Progress indicator window for long operations
 		MpGLCanvas		*glCanvas;
