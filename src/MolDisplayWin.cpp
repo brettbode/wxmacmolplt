@@ -2042,7 +2042,7 @@ void MolDisplayWin::PasteText(void) {
 			//Now reset the display to take into account the new atoms
 			if (initialAtomCount == 0) {
 				MainData->CenterModelWindow();
-				MainData->WindowSize = 2.0*MainData->MaxSize;
+				if (MainData->MaxSize > 0.1) MainData->WindowSize = 2.0*MainData->MaxSize;
 				MainData->ResetRotation();
 			} else {
 				mHighliteState = true;
