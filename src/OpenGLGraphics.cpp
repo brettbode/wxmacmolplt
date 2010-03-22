@@ -1822,7 +1822,7 @@ long General3DSurface::getTriangleCount(void) const {
 	return result;
 }
 
-long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs *, myGLTriangle * transpTri, unsigned int shader_program) {
+long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
 	long result=0;
 	if (Visible) {
 		if (ContourHndl && VertexList) {
@@ -1844,17 +1844,17 @@ long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs *, myGLTriangl
 				}
 			} else if (WireFrameSurface()) {
 				CreateWireSurface(ContourHndl, NULL, VertexList,
-								  NumPosContourTriangles, &PosColor, List, &NegColor, MaxMEPValue, MainData);
+								  NumPosContourTriangles, &PosColor, List, &NegColor, MaxMEPValue, MainData, Prefs);
 				if (ContourBothPosNeg()&&(NumNegContourTriangles > 0))
 					CreateWireSurface(ContourHndl, NULL, 
 									  &(VertexList[3*NumPosContourTriangles]),
-									  NumNegContourTriangles, &NegColor, List, &PosColor, MaxMEPValue, MainData);
+									  NumNegContourTriangles, &NegColor, List, &PosColor, MaxMEPValue, MainData, Prefs);
 			}
 		}
 	}
 	return result;
 }
-long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri, unsigned int shader_program) {
+long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
 	long result = 0;
 	if (Visible) {
 		if (ContourHndl && VertexList) {
@@ -1871,13 +1871,13 @@ long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTria
 			} else if (WireFrameSurface()) {
 				CreateWireSurface(ContourHndl, NULL, VertexList,
 								  NumPosContourTriangles,
-								  &PosColor, List, &NegColor, MaxMEPValue, MainData);
+								  &PosColor, List, &NegColor, MaxMEPValue, MainData, Prefs);
 			}
 		}
 	}
 	return result;
 }
-long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri, unsigned int shader_program) {
+long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
 	long result=0;
 	if (Visible && (PlotOrb>=0)) {
 		if (ContourHndl && VertexList) {
@@ -1901,16 +1901,16 @@ long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle *
 				}
 			} else if (WireFrameSurface()) {
 				CreateWireSurface(ContourHndl, NULL, VertexList, NumPosContourTriangles,
-								  &PosColor, NULL, NULL, 1.0, MainData);
+								  &PosColor, NULL, NULL, 1.0, MainData, Prefs);
 				CreateWireSurface(ContourHndl, NULL, 
 								  &(VertexList[3*NumPosContourTriangles]),
-								  NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData);
+								  NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData, Prefs);
 			}
 		}
 	}
 	return result;
 }
-long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle * transpTri, unsigned int shader_program) {
+long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
 	long result=0;
 	if (Visible) {
 		if (ContourHndl && VertexList) {
@@ -1931,10 +1931,10 @@ long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle *
 				}
 			} else if (WireFrameSurface()) {
 				CreateWireSurface(ContourHndl, NULL, VertexList, NumPosContourTriangles,
-								  &PosColor, NULL, NULL, 1.0, MainData);
+								  &PosColor, NULL, NULL, 1.0, MainData, Prefs);
 				CreateWireSurface(ContourHndl, NULL, 
 								  &(VertexList[3*NumPosContourTriangles]),
-								  NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData);
+								  NumNegContourTriangles, &NegColor, NULL, NULL, 1.0, MainData, Prefs);
 			}
 		}
 	}
@@ -1943,11 +1943,11 @@ long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * , myGLTriangle *
 
 void Surf3DBase::CreateWireSurface(CPoint3D * Vertices, CPoint3D * Normals, long * VertexList,
 		long NumTriangles, RGBColor * SurfaceColor, float * SurfaceValue,
-		RGBColor * NColor, float MaxSurfaceValue, MoleculeData * MainData)
+		RGBColor * NColor, float MaxSurfaceValue, MoleculeData * MainData, const WinPrefs * Prefs)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glDisable(GL_LIGHTING);
-	glLineWidth(1);
+	glLineWidth(Prefs->GetLineWidth());
 	CreateSolidSurface(Vertices, Normals, VertexList,
 		NumTriangles, SurfaceColor, SurfaceValue, NColor, MaxSurfaceValue, MainData, NULL);
 	glEnable(GL_LIGHTING);

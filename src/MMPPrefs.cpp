@@ -322,6 +322,7 @@ WinPrefs::WinPrefs(void) {
 	show_toolbar = false;
 	shader_mode = 0;
 	AllowAutoRotation = true;
+	lineWidth = 1;
 }
 
 WinPrefs::~WinPrefs(void) {

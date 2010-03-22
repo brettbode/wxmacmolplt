@@ -99,9 +99,14 @@ public:
 
 ////@end ExportOptionsDialog event handler declarations
 
+	/// returns the desired width of the image
     int getWidth() const { return width; }
+	/// returns the desired height of the image
     int getHeight() const { return height; }
+	/// returns true if the target image should have a transparent background
     bool getTransparency() const { return transparency; }
+	/// returns the ratio between the desired image and the screen size
+	int getImageRatio() const;
     
     void setFileType(int ft);
 

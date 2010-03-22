@@ -1109,7 +1109,9 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 				bmp = new wxBitmap(exportOptionsDlg->getWidth(),
 				                                               exportOptionsDlg->getHeight());
 				memDC.SelectObject(*bmp);
+				Prefs->SetLineWidth(exportOptionsDlg->getImageRatio());
 				glCanvas->GenerateHiResImageForExport(&memDC);
+				Prefs->SetLineWidth(1);
 				exportImage = bmp->ConvertToImage();
 				if(exportOptionsDlg->getTransparency()) {
 					// This gets really hairy, since there isn't a good way to
@@ -1738,8 +1740,12 @@ void MolDisplayWin::PrintGL(wxDC * dc, const float & sFactor) {
 			scaleFactor = ((float) pageHeight)/((float) screenHeight);
 		}
 	}
+	int scale = scaleFactor;
+	if (scale < 1) scale = 1;
+	Prefs->SetLineWidth(scale);
 	glCanvas->GenerateHiResImage(dc, scaleFactor, ProgressInd, Prefs->GetCenterOnPage(),
 								 Prefs->GetFramePage());
+	Prefs->SetLineWidth(1);
 	Prefs->CylindersForLines(false);
 	FinishOperation();
 }

@@ -371,7 +371,7 @@ class Surf3DBase : public Surface {
 		
 		void CreateWireSurface(CPoint3D * Vertices, CPoint3D * Normals, long * VertexList,
 							   long NumTriangles, RGBColor * SurfaceColor, float * SurfaceValue,
-							   RGBColor * NegColor, float MaxSurfaceValue, MoleculeData *);
+							   RGBColor * NegColor, float MaxSurfaceValue, MoleculeData *, const WinPrefs *);
 		long CreateWireFrameSurfaceWithLines(CPoint3D * Vertices, long * vList,
 								long NumTriangles, RGBColor * SurfaceColor, float * SurfaceValue,
 								RGBColor * NColor, float MaxSurfaceValue, MoleculeData * );

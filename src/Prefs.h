@@ -209,6 +209,7 @@ class WinPrefs {
 		FrequencyWindowOptions	FreqWinOpts;
 		bool show_toolbar;
 		int shader_mode;
+		int lineWidth;
 
 	public:
 		WinPrefs(void);
@@ -465,6 +466,8 @@ class WinPrefs {
 		inline long GetBitOpt() { return  BitOptions; } //for debugging
 		unsigned char GetOxidationNumber(int atomic_number);
 		void SetOxidationNumber(int atomic_number, int ox_num);
+		int GetLineWidth(void) const {return lineWidth;};
+		void SetLineWidth(int newVal) {lineWidth = newVal;};
 };
 
 // New preferences classes below here..

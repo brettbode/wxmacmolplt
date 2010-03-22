@@ -319,3 +319,15 @@ void ExportOptionsDialog::OnCheckbox3Click( wxCommandEvent& event )
     transparency = resTBGCheck->GetValue();
 }
 
+/*!
+ * Compute and return the ratio in size between the target output image and the screen image
+ */
+
+int ExportOptionsDialog::getImageRatio() const
+{
+    int result;
+	result = width/screenWidth;
+	if (result*screenWidth < width) result++;
+	if (result < 1) result = 1;
+	return result;
+}
