@@ -2022,6 +2022,26 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					} else NumVibs = icol;
 				}
 				imode += NumVibs;
+				//RAMAN type of runs now allow a symmetry
+				if (Buffer->LocateKeyWord("SYMMETRY:", 9, Buffer->GetFilePos()+132)) {
+					Buffer->GetLine(LineText);
+					LinePos = 10;
+					if ((imode == NumVibs)&&(lVibs->Symmetry.empty())) {
+						lVibs->Symmetry.reserve(NumModes);
+					}
+					long LineLength = strlen(LineText);
+					long tVib = NumVibs;
+					for (unsigned long icol=0; icol<NumVibs; icol++) {
+						if (LinePos<LineLength) {
+							sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
+							LinePos += nchar;
+							long test = strlen(token);
+							if ((nchar>0)&&(test>0)) {
+								lVibs->Symmetry.push_back(std::string(token));
+							} else NumVibs = icol;
+						} else NumVibs = icol;
+					}
+				}
 				if (Buffer->LocateKeyWord("REDUCED MASS:", 13, Buffer->GetFilePos()+132)) {
 					Buffer->GetLine(LineText);
 					LinePos = 14;

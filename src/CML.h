@@ -88,6 +88,7 @@ enum MMP_VibRecNameSpace {
 	MMP_VibFrequencies,
 	MMP_NormalModesCount,
 	MMP_VibNormalModes,
+	MMP_Symmetry,
 	MMP_ReducedMass,
 	MMP_RamanIntensity,
 	MMP_Depolarization,

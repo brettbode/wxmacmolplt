@@ -846,6 +846,20 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 	snprintf(line, kMaxLineLength, "%ld", (NumModes*NumAtoms));
 	modes->addAttribute(CML_convert(rowsAttr), line);
 	
+	if (!Symmetry.empty()) {
+		std::ostringstream freqbuf;
+		char line[kMaxLineLength];
+		for (int i=0; i<NumModes; i++) {
+			if (i>0) freqbuf << " ";
+			freqbuf << Symmetry[i];
+		}
+		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
+													  freqbuf.str().c_str());
+		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
+		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_Symmetry));
+		snprintf(line, kMaxLineLength, "%ld", NumModes);
+		modes->addAttribute(CML_convert(sizeAttr), line);
+	}
 	if (!Intensities.empty()) {
 		std::ostringstream freqbuf;
 		char line[kMaxLineLength];
@@ -2384,6 +2398,35 @@ void VibRec::ReadXML(XMLElement * vibs, const long & NumAtoms) {
 													std::ostringstream buf;
 													for (int j=0; j<len; j++) {
 														if (v[j] != '|') {
+															buf << v[j];
+														} else {
+															Frequencies.push_back(buf.str());
+															mode ++;
+															buf.str("");
+														}
+													}
+													if (!buf.str().empty()) {
+														Frequencies.push_back(buf.str());
+														mode ++;
+													}
+												}
+											}
+										}
+											break;
+										case MMP_Symmetry:
+										{
+											long temp;
+											if (child->getAttributeValue(CML_convert(sizeAttr), temp)) {
+												//failing the next test indicates a corrupt record.
+												if (temp !=NumModes) continue;
+												const char * v = child->getValue();
+												if (Symmetry.empty() && v) {
+													long len = strlen(v);
+													Symmetry.reserve(NumModes);
+													int mode=0;
+													std::ostringstream buf;
+													for (int j=0; j<len; j++) {
+														if (v[j] != ' ') {
 															buf << v[j];
 														} else {
 															Frequencies.push_back(buf.str());

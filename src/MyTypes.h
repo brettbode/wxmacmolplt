@@ -452,6 +452,7 @@ class VibRec {
 	public:
 		std::vector<std::string>	Frequencies;	///< array of strings
 		std::vector<CPoint3D>		NormMode;		///< Array of normal modes
+		std::vector<std::string>	Symmetry;		///< array of strings for the symmetry of each mode
 		std::vector<float>			Intensities;	///< Infrared intensity of each mode
 		std::vector<float>			ReducedMass;	///< Reduced Mass for each mode
 		std::vector<float>			RamanIntensity;	///< Raman spectrum
