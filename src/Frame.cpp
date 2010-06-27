@@ -2030,7 +2030,6 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 						lVibs->Symmetry.reserve(NumModes);
 					}
 					long LineLength = strlen(LineText);
-					long tVib = NumVibs;
 					for (unsigned long icol=0; icol<NumVibs; icol++) {
 						if (LinePos<LineLength) {
 							sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
@@ -2085,7 +2084,9 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 						} else tVib = icol;
 					}
 				}
-				if (Buffer->LocateKeyWord("RAMAN INTENSITY:", 16, Buffer->GetFilePos()+132)) {
+				//In the 2010 version Mike is changing Raman intensity to Raman Activity
+				if ((Buffer->LocateKeyWord("RAMAN INTENSITY:", 16, Buffer->GetFilePos()+132))||
+					(Buffer->LocateKeyWord("RAMAN ACTIVITY:", 15, Buffer->GetFilePos()+132))) {
 					Buffer->GetLine(LineText);
 					LinePos = 17;
 					if ((imode == NumVibs)&&(lVibs->RamanIntensity.empty())) {
