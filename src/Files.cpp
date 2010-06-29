@@ -2709,8 +2709,9 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			//Confirm that the first energy is before the start of the IRC
 			if (Buffer->LocateKeyWord("JUMPING OFF SADDLE POINT ALONG THE IMAGINARY NORMAL MODE", 55)) {
 				long test = Buffer->GetFilePos();
-				if (EnergyPos > test)
+				if (EnergyPos > test) {
 					return OpenGAMESSIRCLog(Buffer, flip, offset, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
+				}
 			}
 		} else if (MainData->InputOptions->Control->GetRunType() == VSCFRun) {
 			//Read in normal modes, if present
@@ -2929,6 +2930,11 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		}
 	// Switch to IRC routine if neccessary
 		if (MainData->InputOptions->Control->GetRunType() == IRCRun) {
+			//If this is an MP2 run need to copy the MP2 energy to the total energy as the IRC
+			//parsing routine only finds the single total energy
+			if (MainData->InputOptions->Control->GetMPLevel()) {
+				lFrame->SetEnergy(lFrame->GetEnergy(PT2Energy));
+			}
 			return this->OpenGAMESSIRCLog(Buffer, flip, offset, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
 		}
 	}
