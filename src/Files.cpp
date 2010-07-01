@@ -3201,8 +3201,20 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 							}
 						} else {
 							test = Buffer->LocateKeyWord("EIGENVECTORS", 12, NextFinalPos);
-							if (!test)
+							if (!test) {
 								test = Buffer->LocateKeyWord("MOLECULAR ORBITALS", 18, NextFinalPos);
+								//for a while GAMESS printed out MOLECULAR ORBITALS with the LZ analysis
+								//so add a test to avoid that output
+								if (test) {
+									Buffer->BackupnLines(0);
+									Buffer->GetLine(LineText);
+									LinePos = FindKeyWord(LineText, "LZ VALUE ANALYSIS", 16);
+									if (LinePos > -1) {
+										Buffer->SkipnLines(2);
+										test = Buffer->LocateKeyWord("MOLECULAR ORBITALS", 18, NextFinalPos);
+									}
+								}
+							}
 						}
 						if (test) {
 								//skip over the line to the start of the orbital blocks
