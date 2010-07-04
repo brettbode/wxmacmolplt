@@ -3844,8 +3844,10 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 								Buffer->GetLine(LineText);
 								//lines have format "label x, y, z"
 								sscanf(LineText, "%s %f %f %f", token, &pos.x, &pos.y, &pos.z);
-								if (!strcasecmp(token, "O1")) AtomType = 8;
-								else if (!strcasecmp(token, "H2")||!strcasecmp(token, "H3")) AtomType = 1;
+								int c = 0;
+								if ((token[0] == 'Z')||(token[0] == 'z')) c = 1;
+								if (!strcasecmp(&(token[c]), "O1")) AtomType = 8;
+								else if (!strcasecmp(&(token[c]), "H2")||!strcasecmp(&(token[c]), "H3")) AtomType = 1;
 								if (AtomType > 0) {
 									mpAtom * atm = lFrame->AddAtom(AtomType, pos);
 									atm->SetFragmentNumber(fragNum);
