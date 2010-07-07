@@ -2722,7 +2722,8 @@ void InputBuilderWindow::OnDefaultsbuttonClick( wxCommandEvent& event )
 void InputBuilderWindow::OnRevertbuttonClick( wxCommandEvent& event )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
-    InputData *OldData = ((MolDisplayWin *)parent)->GetData()->GetInputData();
+	MoleculeData * MainData = ((MolDisplayWin *)parent)->GetData();
+	InputData *OldData = ((MolDisplayWin *)parent)->GetData()->GetInputData();
     
     switch(getCurrentPane()) {
         case BASIS_PANE:
@@ -2749,7 +2750,6 @@ void InputBuilderWindow::OnRevertbuttonClick( wxCommandEvent& event )
 		case FMO_Pane:
 			TmpInputRec->FMO = OldData->FMO;
 			FMOFragmentIds.clear();
-			MoleculeData * MainData = ((MolDisplayWin *)parent)->GetData();
 			if (MainData->GetFMOFragmentId(0)>0) {	//copy them over if setup
 				Frame * cFrame = MainData->GetCurrentFramePtr();
 				FMOFragmentIds.reserve(cFrame->GetNumAtoms());
