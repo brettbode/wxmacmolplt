@@ -22,6 +22,7 @@ wxmacmolplt_SOURCES =                                  \
     Frame.cpp                  Frame.h                 \
     frameenergy.cpp            frameenergy.h           \
     frequenciesdialog.cpp      frequenciesdialog.h     \
+    fmofragmentationdialog.cpp fmofragmentationdialog.h \
     GaussHermite.cpp           GaussHermite.h          \
     Geometries.cpp             Geometries.h            \
     glew.cpp                   glew.h                  \

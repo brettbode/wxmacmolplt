@@ -1,3 +1,9 @@
+wxmacmolplt (7.4.1-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- root <root@debian.iprt.iastate.edu>  Tue, 13 Jul 2010 21:44:54 -0500
+
 wxmacmolplt (7.4-1) unstable; urgency=low
 
   * New upstream version
