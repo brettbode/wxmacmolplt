@@ -126,7 +126,13 @@ completeSWFFontCharacter(SWFBlock block)
 		size += 2 * inst->nGlyphs;	// width table
 		for(i = 0 ; i < inst->nGlyphs ; i++)
 		{
-			nbits = SWFRect_numBits(font->bounds + inst->codeTable[i]);
+			struct SWFRect_s rect;
+			rect.minX = font->bounds->minX + inst->codeTable[i];
+			rect.minY = font->bounds->minY + inst->codeTable[i];
+			rect.maxX = font->bounds->maxX + inst->codeTable[i];
+			rect.maxY = font->bounds->maxY + inst->codeTable[i];
+			nbits = SWFRect_numBits(&rect);
+	//		nbits = SWFRect_numBits(font->bounds + inst->codeTable[i]);
 			size += (nbits+7) >> 3;
 		}
 	}
