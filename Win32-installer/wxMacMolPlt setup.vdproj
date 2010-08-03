@@ -33,6 +33,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1DB0F8B5FA6A45CD9CFE0FF20D8A7416"
+        "OwnerKey" = "8:_C21B4A714CE0410591105E63F408D258"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_1E5C34997E4C551D13C2D7FE04D57A16"
         "OwnerKey" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
         "MsmSig" = "8:_UNDEFINED"
@@ -65,12 +71,6 @@
         {
         "MsmKey" = "8:_36032819402641F497581EF89756094E"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_370C3773CA004C5483CCD36CBAA743F9"
-        "OwnerKey" = "8:_C3DB4E5127064661BF895D3B319240FF"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -213,7 +213,7 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C3DB4E5127064661BF895D3B319240FF"
+        "MsmKey" = "8:_C21B4A714CE0410591105E63F408D258"
         "OwnerKey" = "8:_DDE40DE35F3A4B93B842D1995C85DA5C"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -452,7 +452,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -1012,7 +1012,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -1032,7 +1032,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
@@ -1451,14 +1451,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:wxMacMolPlt"
-        "ProductCode" = "8:{B03E76D6-3CA5-44BA-A67E-2045E957E90E}"
-        "PackageCode" = "8:{783D3E91-67EE-497D-A656-E7AE9BBECF26}"
+        "ProductCode" = "8:{EE9233A0-F76B-4BE3-AB8A-68414CBC7603}"
+        "PackageCode" = "8:{60CC32AE-5F43-4FA8-878A-3EB0E63D5570}"
         "UpgradeCode" = "8:{72B5F228-F1BD-4ED0-82D5-347629C06CC4}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:7.2.1"
+        "ProductVersion" = "8:7.4.1"
         "Manufacturer" = "8:ISU"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1981,7 +1981,7 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_370C3773CA004C5483CCD36CBAA743F9"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_1DB0F8B5FA6A45CD9CFE0FF20D8A7416"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
@@ -1995,7 +1995,7 @@
             "Feature" = "8:"
             "IsolateTo" = "8:"
             }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C3DB4E5127064661BF895D3B319240FF"
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C21B4A714CE0410591105E63F408D258"
             {
             "UseDynamicProperties" = "11:TRUE"
             "IsDependency" = "11:TRUE"
