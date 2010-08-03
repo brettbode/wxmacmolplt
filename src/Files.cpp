@@ -1923,7 +1923,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 	imaginary mode and because the menu manager will think it means create a divider in the menu instead
 	of a regular text item */
 				if (KeyWord[0] == '-') KeyWord[0] = 'i';
-				lVibs->Frequencies.push_back(std::string(token));
+				lVibs->Frequencies.push_back(std::string(KeyWord));
 
 				for (j=0; j < (lFrame->NumAtoms); ++j) {
 					Buffer->GetLine(LineText);
