@@ -160,7 +160,10 @@ void glfClose()
 {
 	int i;
 	
-	free(conData);
+	if (conData) {
+		free(conData);
+		conData = NULL;
+	}
 
 	for (i=0; i<MAX_FONTS; i++) glfUnloadFontD(i);
 	for (i=0; i<MAX_FONTS; i++) glfUnloadBMFFontD(i);
