@@ -90,7 +90,6 @@ class patternSelectDlg : public wxDialog {
     ~patternSelectDlg();
 
     void OnOK( wxCommandEvent& WXUNUSED(event) );
-    void OnSize(wxSizeEvent & event);
 
     void setSltId(int id);
     int getSltId() { return mSltId; }
@@ -99,12 +98,11 @@ class patternSelectDlg : public wxDialog {
   private:
     void Create(colorPatternArea * parent, wxWindowID id, const wxString& caption);
 
-    wxBoxSizer *mainSizer, *lowerSizer, *upperSizer, *upperLeftSizer, *upperRightSizer;
+    wxBoxSizer *mainSizer, *lowerSizer, *upperSizer, *upperLeftSizer;
     wxGridSizer* innerSizer;
     wxButton *mButtOK, *mButtCancel;
-    colorPatternArea* patSlt[numPatterns];
+    colorPatternArea* patSlt[kNumPatterns];
     colorPatternArea  *oldPat, *newPat;
-    wxScrolledWindow* sltArea;
     int mSltId;
     int mSltPatId;
     colorPatternArea * mParent;
