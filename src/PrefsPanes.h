@@ -185,11 +185,6 @@ class FilePrefsPane : public PrefsPane {
 
 	private:
 		wxBoxSizer* mMainSizer;
-		wxBoxSizer* mUpperSizer;
-		wxFlexGridSizer* mSecondSizer;
-		wxFlexGridSizer* mMiddleSizer;
-		wxBoxSizer* mLowerSizer;
-		wxBoxSizer* mBottomSizer;
 
 		wxCheckBox* mChkBox[9];
 		wxSlider* mSldTol;

@@ -183,7 +183,7 @@ AtomPrefsPane::AtomPrefsPane(MolDisplayWin* targetWindow,
 	mLabels[4] = wxString(wxT("Color"));
 	mLabels[5] = wxString(wxT("Pattern"));
 
-	mMainSizer = new wxFlexGridSizer(kMaxAtomTypes, NUM_ATOM_LABELS, 3, 10);
+	mMainSizer = new wxFlexGridSizer(kMaxAtomTypes+1, NUM_ATOM_LABELS, 3, 10);
 
 	wxFlexGridSizer *sizer = new wxFlexGridSizer(1, 1, 0, 0);
 	sizer->AddGrowableCol(0);
@@ -398,7 +398,7 @@ DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow,
 	mMainSizer->Add(mChkColor, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);
 	mMainSizer->Add(mAtomLabels, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-	wxGridSizer * lgridSizer = new wxGridSizer(2,2);
+	wxGridSizer * lgridSizer = new wxGridSizer(2,2, 0,0);
 	lgridSizer->Add(new wxStaticText(this, wxID_ANY, _("Size of atom labels:")), 0, wxALIGN_RIGHT | wxALL, 3);
 	mAtomLabelSizeSlider = new wxSlider(this, ID_ATOM_LABEL_SLIDER, 
 							(int)(mTargetPrefs->GetAtomLabelSize()*100), 25, 400,
@@ -502,9 +502,9 @@ EnergyPrefsPane::EnergyPrefsPane(MolDisplayWin* targetWindow,
 	mUpperSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	if (PrefsAreGlobal())
-		mLowerSizer = new wxGridSizer(4,2);
+		mLowerSizer = new wxGridSizer(4,2, 0,0);
 	else
-		mLowerSizer = new wxGridSizer(6,2);
+		mLowerSizer = new wxGridSizer(6,2, 0,0);
 
 	if (!PrefsAreGlobal()) {
 		mBottomSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -661,10 +661,10 @@ void EnergyPrefsPane::setHiddenCtrls() {
 		mRightBottomSizer = new wxBoxSizer(wxVERTICAL);
 
 	if (!mRight1BottomSizer)
-		mRight1BottomSizer = new wxGridSizer(2,3);
+		mRight1BottomSizer = new wxGridSizer(2,3, 0,0);
 
 	if (!mRight2BottomSizer)
-		mRight2BottomSizer = new wxGridSizer(2,1);
+		mRight2BottomSizer = new wxGridSizer(2,1, 0,0);
 
 	wxString tmp;
 	if (!mAtomText[0]) {
@@ -807,74 +807,57 @@ FilePrefsPane::FilePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent
 	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER); */
 
 	mMainSizer = new wxBoxSizer(wxVERTICAL);
-	mUpperSizer = new wxBoxSizer(wxVERTICAL);
-	mSecondSizer = new wxFlexGridSizer(2,3);
-	mMiddleSizer = new wxFlexGridSizer(2,3);
-	mLowerSizer = new wxBoxSizer(wxHORIZONTAL);
-	mBottomSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	SetSizer(mMainSizer);
 }
 
 void FilePrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+	wxBoxSizer* UpperSizer = new wxBoxSizer(wxVERTICAL);
+	mMainSizer->Add(UpperSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
 	mChkBox[0] = new wxCheckBox(this, ID_AUTO_BOND_PASTE_OPEN, _T("Auto-Bond on Paste and File Open"));
 	mChkBox[0]->SetValue(mTargetPrefs->GetAutoBond());
-
+	UpperSizer->Add(mChkBox[0], 0, wxALIGN_LEFT|wxALL, 5);
+	
 	mChkBox[1] = new wxCheckBox(this, ID_GUESS_BOND_ORDER, _T("Guess bond order"));
 	mChkBox[1]->SetValue(mTargetPrefs->DetermineBondOrder());
+	UpperSizer->Add(mChkBox[1], 0, wxALIGN_LEFT|wxALL, 5);
 
 	mChkBox[2] = new wxCheckBox(this, ID_PREVENT_HH_BONDS, _T("Prevent H-H bonds in Auto-Bond"));
 	mChkBox[2]->SetValue(mTargetPrefs->GetHHBondFlag());
+	UpperSizer->Add(mChkBox[2], 0, wxALIGN_LEFT|wxALL, 5);
 
 	mChkBox[3] = new wxCheckBox(this, ID_LOOK_HYDROGEN_BONDS, _T("Look for hydrogen bonds"));
 	mChkBox[3]->SetValue(mTargetPrefs->AllowHydrogenBonds());
+	UpperSizer->Add(mChkBox[3], 0, wxALIGN_LEFT|wxALL, 5);
 
 	mChkBox[4] = new wxCheckBox(this, ID_SHOW_ANGLES_WHILE_ROTATING, _T("Show angles while rotating"));
 	mChkBox[4]->SetValue(mTargetPrefs->GetShowAngles());
+	UpperSizer->Add(mChkBox[4], 0, wxALIGN_LEFT|wxALL, 5);
 
 #ifdef __WXMAC__
 	if (PrefsAreGlobal()) {
 		mChkBox[5] = new wxCheckBox(this, ID_USE_MAC_EOL_CHAR, _T("Use Mac EOL chars"));
 		mChkBox[5]->SetValue(mTargetPrefs->NativeEOLChar());
+		UpperSizer->Add(mChkBox[5], 0, wxALIGN_LEFT|wxALL, 5);
 	}
 #endif
 
 	mChkBox[6] = new wxCheckBox(this, ID_PROMPT_SAVE_FILE, _T("Prompt to save file"));
 	mChkBox[6]->SetValue(mTargetPrefs->GetPrompt4Save());
+	UpperSizer->Add(mChkBox[6], 0, wxALIGN_LEFT|wxALL, 5);
 
 
 	mChkBox[7] = new wxCheckBox(this, ID_CREATE_CUSTOM_FILE_ICON, _T("create custom file icon"));
 	mChkBox[7]->SetValue(mTargetPrefs->CreateCustomIcon());
+	UpperSizer->Add(mChkBox[7], 0, wxALIGN_LEFT|wxALL, 5);
 
 #ifdef __WXMAC__
 	if (PrefsAreGlobal()) {
 		mChkBox[8] = new wxCheckBox(this, ID_CHANGE_FILE_CREATOR, _T("Change file creator type to wxMacMolPlt"));
 		mChkBox[8]->SetValue(mTargetPrefs->ChangeFileType());
+		UpperSizer->Add(mChkBox[8], 0, wxALIGN_LEFT|wxALL, 5);
 	}
-#endif
-
-	mUpperSizer->Add(mChkBox[0], 0, wxALIGN_LEFT | wxALL, 3);
-
-	mSecondSizer->Add(30, 0);
-	mSecondSizer->Add(mChkBox[1], 0, wxALIGN_LEFT | wxALL, 3);
-	mSecondSizer->Add(30, 0);
-	mSecondSizer->Add(mChkBox[2], 0, wxALIGN_LEFT | wxALL, 3);
-	mSecondSizer->Add(30, 0);
-	mSecondSizer->Add(mChkBox[3], 0, wxALIGN_LEFT | wxALL, 3);
-
-	mMiddleSizer->Add(mChkBox[4], 0, wxALIGN_LEFT | wxALL, 3);
-
-#ifdef __WXMAC__
-	if (PrefsAreGlobal())
-		mMiddleSizer->Add(mChkBox[5], 0, wxALIGN_LEFT | wxALL, 3);
-#endif
-
-	mMiddleSizer->Add(mChkBox[6], 0, wxALIGN_LEFT | wxALL, 3);
-	mMiddleSizer->Add(mChkBox[7], 0, wxALIGN_LEFT | wxALL, 3);
-
-#ifdef __WXMAC__
-	if (PrefsAreGlobal())
-		mMiddleSizer->Add(mChkBox[8], 0, wxALIGN_LEFT | wxALL, 3);
 #endif
 
 	mSldTol = new wxSlider(this, ID_AUTO_BOND_TOLERANCE_SLIDER, 
@@ -882,22 +865,19 @@ void FilePrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 			50, 150, wxDefaultPosition, 
 			wxSize(155,wxDefaultCoord));
 
-	mLowerSizer->Add(new wxStaticText(this, wxID_ANY, _T("Auto-Bond Tolerance:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-	mLowerSizer->Add(mSldTol, 0, wxALIGN_LEFT | wxALL, 3);
+	wxBoxSizer* LowerSizer = new wxBoxSizer(wxHORIZONTAL);
+	mMainSizer->Add(LowerSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 2);
+	LowerSizer->Add(new wxStaticText(this, wxID_ANY, _T("Auto-Bond Tolerance:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	LowerSizer->Add(mSldTol, 0, wxALIGN_LEFT | wxALL, 3);
 
+	wxBoxSizer* BottomSizer = new wxBoxSizer(wxHORIZONTAL);
+	mMainSizer->Add(BottomSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 2);
 	wxString tmp;
 	tmp.Printf(wxT("%d"), mTargetPrefs->GetDRCSkip());
 	mPointSkip = new wxTextCtrl(this, wxID_ANY, tmp);
 
-	mBottomSizer->Add(new wxStaticText(this, wxID_ANY, _T("When reading a DRC file how many\n points should be skipped between\n points read in? (0 reads every point)")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
-	mBottomSizer->Add(mPointSkip, 0, wxALIGN_CENTER | wxALL, 3);
-
-	mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
-	mMainSizer->Add(mSecondSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
-	mMainSizer->Add(mMiddleSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
-	mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
-	mMainSizer->Add(mBottomSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
-
+	BottomSizer->Add(new wxStaticText(this, wxID_ANY, _T("When reading a DRC file how many\n points should be skipped between\n points read in? (0 reads every point)")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	BottomSizer->Add(mPointSkip, 0, wxALIGN_CENTER | wxALL, 3);
 }
 
 void FilePrefsPane::saveToTempPrefs() {
@@ -952,13 +932,12 @@ void FilePrefsPane::OnSliderUpdate(wxCommandEvent &WXUNUSED(event)) {
 
 ScalingPrefsPane::ScalingPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, targetPrefs, kScalingPrefsPane, GlobalPrefs, parent) {
-	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER); */
 
 	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
-	mMainSizer = new wxFlexGridSizer(2,3);
-    itemBoxSizer4->Add(mMainSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
-
 	SetSizer(itemBoxSizer4);
+	mMainSizer = new wxFlexGridSizer(3, 2, 0,0);
+	itemBoxSizer4->Add(mMainSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+
 }
 
 void ScalingPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
@@ -977,11 +956,11 @@ void ScalingPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 			0, 120, wxDefaultPosition, 
 			wxSize(155,wxDefaultCoord));
 
-	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Atom Size:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Atom Size:")), 0, wxALIGN_RIGHT | wxALL, 3);
 	mMainSizer->Add(mSld[0], 0, wxALIGN_LEFT | wxALL, 3);
-	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Mode Animation Quality:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Mode Animation Quality:")), 0, wxALIGN_RIGHT | wxALL, 3);
 	mMainSizer->Add(mSld[1], 0, wxALIGN_LEFT | wxALL, 3);
-	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Frame Delay:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _T("Frame Delay:")), 0, wxALIGN_RIGHT | wxALL, 3);
 	mMainSizer->Add(mSld[2], 0, wxALIGN_LEFT | wxALL, 3);
 }
 
@@ -1063,9 +1042,9 @@ SurfacePrefsPane::SurfacePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *
 	mMainSizer = new wxBoxSizer(wxHORIZONTAL);
 	mLeftSizer = new wxBoxSizer(wxVERTICAL);
 	mRightSizer = new wxBoxSizer(wxVERTICAL);
-	mLeftMidSizer = new wxGridSizer(2,2);
+	mLeftMidSizer = new wxGridSizer(2,2, 0,0);
 	mRightUpperSizer = new wxBoxSizer(wxHORIZONTAL);
-	mRightMidSizer = new wxFlexGridSizer(2,2);
+	mRightMidSizer = new wxFlexGridSizer(2,2, 0,0);
 
 	SetSizer(mMainSizer);
 }
@@ -1188,7 +1167,7 @@ void SurfacePrefsPane::OnCheckBox(wxCommandEvent& event) {
 QD3DPrefsPane::QD3DPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, targetPrefs, kQD3DPrefsPane, GlobalPrefs, parent) {
 
-	mMainSizer = new wxFlexGridSizer(7, 2, 6, 0);
+	mMainSizer = new wxFlexGridSizer(9, 2, 6, 0);
 	mMainSizer->AddGrowableCol(0);
 	mMainSizer->AddGrowableCol(1);
 

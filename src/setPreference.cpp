@@ -68,14 +68,6 @@ setPreference::setPreference( )
 setPreference::~setPreference( )
 {
   //delete mPrefs;
-
-  /*if (m_imageList)
-    {
-        delete m_imageList;
-        m_imageList = (wxImageList *) NULL;
-    }
-  */
-
 }
 
 setPreference::setPreference( MolDisplayWin* parent, bool isGlobal, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
@@ -99,61 +91,47 @@ setPreference::setPreference( MolDisplayWin* parent, bool isGlobal, wxWindowID i
 bool setPreference::create( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
     wxDialog::Create( parent, id, caption, pos, size, style );
+	
+	wxBoxSizer * lSizer = new wxBoxSizer(wxVERTICAL);
+	SetSizer(lSizer);
 
-    m_sizer = new wxBoxSizer(wxVERTICAL);
     m_choiceBook   = (wxChoicebook *)   NULL;
     m_panel      = (wxPanel *)      NULL;
 
-    /*wxSize imageSize(32, 32);
+ //   m_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxSize(50,50),
+   //     wxTAB_TRAVERSAL | wxCLIP_CHILDREN | wxNO_BORDER | wxNO_FULL_REPAINT_ON_RESIZE);
+    m_panel = new wxPanel(this);
+	lSizer->Add(m_panel, wxALIGN_CENTER_HORIZONTAL | wxEXPAND | wxALL, 0);
+    m_sizer = new wxBoxSizer(wxVERTICAL);
+    m_panel->SetSizer(m_sizer);
 
-    m_imageList
-        = new wxImageList( imageSize.GetWidth(), imageSize.GetHeight() );
-
-    m_imageList->Add
-        (
-            wxArtProvider::GetIcon(wxART_INFORMATION, wxART_OTHER, imageSize)
-        );
-
-    m_imageList->Add
-        (
-            wxArtProvider::GetIcon(wxART_QUESTION, wxART_OTHER, imageSize)
-        );
-
-    m_imageList->Add
-        (
-            wxArtProvider::GetIcon(wxART_WARNING, wxART_OTHER, imageSize)
-        );
-
-    m_imageList->Add
-        (
-            wxArtProvider::GetIcon(wxART_ERROR, wxART_OTHER, imageSize)
-        );
-    */
-
-    m_panel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-        wxTAB_TRAVERSAL | wxCLIP_CHILDREN | wxNO_BORDER | wxNO_FULL_REPAINT_ON_RESIZE);
-
-    RecreateBooks();
-
-    m_bottomSizer = new wxBoxSizer(wxHORIZONTAL);
+ 	RecreateBooks();
+	
+	m_bottomSizer = new wxBoxSizer(wxHORIZONTAL);
     m_midSizer = new wxBoxSizer(wxHORIZONTAL);
     m_midLeftSizer = new wxBoxSizer(wxHORIZONTAL);
     m_midRightSizer = new wxBoxSizer(wxHORIZONTAL);
+
+    m_midSizer->Add(m_midLeftSizer, wxALL, 5);
+    m_midSizer->Add(m_midRightSizer, wxALL, 5);
+	
+    m_sizer->Add(m_midSizer, wxSizerFlags().Center());
+    m_sizer->Add(m_bottomSizer, wxSizerFlags().Center());
 
     m_buttFont = new wxButton(m_panel, myID_SETFONT, wxT("Set Font"));
     m_buttOK = new wxButton(m_panel, wxID_OK, wxT("OK") );
     m_buttCancel = new wxButton(m_panel, wxID_CANCEL, wxT("Cancel"));
 
-    if (mIsGlobal)
-      m_buttApply = new wxButton(m_panel, ID_APPLY, wxT("Apply to All"));
-    else
-      m_buttApply = new wxButton(m_panel, ID_APPLY, wxT("Apply"));
+	if (mIsGlobal)
+		m_buttApply = new wxButton(m_panel, ID_APPLY, wxT("Apply to All"));
+	else
+		m_buttApply = new wxButton(m_panel, ID_APPLY, wxT("Apply"));
 
     m_buttFacDef = new wxButton(m_panel, ID_FACTORY_DEFAULT, wxT("Factory Default"));
     m_buttRevert = new wxButton(m_panel, ID_REVERT, wxT("Revert"));
 
-    if (!mIsGlobal)
-      m_buttUserDef = new wxButton(m_panel, ID_USER_DEFAULT, wxT("User Defaults"));
+	if (!mIsGlobal)
+		m_buttUserDef = new wxButton(m_panel, ID_USER_DEFAULT, wxT("User Defaults"));
 
     m_bottomSizer->Add(m_buttFont, wxSizerFlags().Border(wxALL, 7));
     m_bottomSizer->Add(80, 30);
@@ -169,39 +147,20 @@ bool setPreference::create( MolDisplayWin* parent, wxWindowID id, const wxString
     m_midRightSizer->Add(138, 30);
     m_midRightSizer->Add(m_buttRevert, wxSizerFlags().Border(wxALL, 7));
 
-    m_midSizer->Add(m_midLeftSizer, wxALL, 5);
-    m_midSizer->Add(m_midRightSizer, wxALL, 5);
+//    m_sizer->Fit(this);
+//    m_sizer->SetSizeHints(this);
 
-    m_sizer->Add(m_midSizer, wxSizerFlags().Center());
-    m_sizer->Add(m_bottomSizer, wxSizerFlags().Center());
-
-    m_panel->SetSizer(m_sizer);
-    m_sizer->Fit(this);
-    m_sizer->SetSizeHints(this);
-
-    m_sizer->Layout();
+ //   m_sizer->Layout();
+	m_panel->Layout();
+    lSizer->Fit(this);
+	lSizer->SetSizeHints(this);
+    lSizer->Layout();
 
     Centre(wxBOTH);
 
     return true;
 }
 
-/*
-int setPreference::GetIconIndex(wxBookCtrlBase* bookCtrl)
-{
-    if (bookCtrl && bookCtrl->GetImageList())
-    {
-       int nImages = bookCtrl->GetImageList()->GetImageCount();
-
-       if (nImages > 0)
-       {
-           return bookCtrl->GetPageCount() % nImages;
-       }
-    }
-
-    return -1;
-}
-*/
 
 /*!
 * wxEVT_CLOSE_WINDOW event handler for ID_DIALOG
@@ -378,21 +337,18 @@ void setPreference::updatePanels(int panelID) {
 	}
 }
 
-void setPreference::RecreateBooks()
-{ 
-  wxChoicebook *oldBook = m_choiceBook;
+void setPreference::RecreateBooks() { 
+	wxChoicebook *oldBook = m_choiceBook;
 
-  m_choiceBook = new wxChoicebook(m_panel, ID_NOTEBOOK, wxDefaultPosition, wxSize(10,10), wxCHB_DEFAULT);
+	m_choiceBook = new wxChoicebook(m_panel, ID_NOTEBOOK, wxDefaultPosition, wxSize(10,10), wxCHB_DEFAULT);
 
-  //m_choiceBook->SetImageList(m_imageList);
+	m_sizer->Add(m_choiceBook, 5, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 4);                    
 
-  if (oldBook)
-    {
+	if (oldBook) {
       int sel = oldBook->GetSelection();
       int count = oldBook->GetPageCount();
 
-      for (int n = 0; n < count; n++)
-	{
+      for (int n = 0; n < count; n++) {
 	  wxString str = oldBook->GetPageText(n);
 	  wxWindow *page = new wxPanel(m_choiceBook);
 	  m_choiceBook->AddPage(page, str, false );
@@ -410,9 +366,9 @@ void setPreference::RecreateBooks()
       CreateInitialPages(m_choiceBook);
     }
 
-  m_sizer->Insert(0, m_choiceBook, 5, wxALL | wxEXPAND, MARGIN);                    
-  m_sizer->Show(m_choiceBook);
-  m_sizer->Layout();
+//  m_sizer->Insert(0, m_choiceBook, 5, wxALL | wxEXPAND, 4);                    
+//  m_sizer->Show(m_choiceBook);
+//  m_sizer->Layout();
 }
     
 

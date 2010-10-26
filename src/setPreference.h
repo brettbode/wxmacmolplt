@@ -18,11 +18,7 @@
 ////@begin includes
 #include "wx/sizer.h"
 #include "wx/gbsizer.h"
-//#include "wx/listbook.h"
-//#include "wx/notebook.h"
 #include "wx/choicebk.h"
-//#include "wx/imaglist.h"
-//#include "wx/artprov.h"
 ////@end includes
 
 /*!
@@ -52,7 +48,6 @@ class QD3DPrefsPane;
 #define SYMBOL_SETPREFERENCE_IDNAME ID_MY_PRE_DIALOG
 #define SYMBOL_SETPREFERENCE_SIZE wxSize(400, 300)
 #define SYMBOL_SETPREFERENCE_POSITION wxDefaultPosition
-#define MARGIN 4
 
 #define ID_NOTEBOOK 20001
 #define myID_SETFONT 30000
