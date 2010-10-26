@@ -1014,7 +1014,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			if (Prefs->Show2DPattern()) {
 				short patternindex = Prefs->GetAtomPattern(lAtoms[iatom].GetType()-1);
 				//The 0th pattern is assumed to be solid so no need to draw
-				if ((patternindex>0)&&(patternindex<numPatterns)) {
+				if ((patternindex>0)&&(patternindex<kNumPatterns)) {
 					glColor3f(0.0f, 0.0f, 0.0f);
 					glEnable(GL_POLYGON_STIPPLE);
 					glPolygonStipple(atomMaskPatterns[patternindex]);
