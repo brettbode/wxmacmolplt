@@ -53,7 +53,13 @@ PreviewCanvas::~PreviewCanvas() {
 		gluDeleteQuadric(quadric);
 		quadric = NULL;
 	}
-
+#if wxCHECK_VERSION(2,9,0)
+	if (context) {
+		delete context;
+		context = NULL;
+	}
+#endif
+	
 }
 
 /* ------------------------------------------------------------------------- */
