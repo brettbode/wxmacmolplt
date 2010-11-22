@@ -1,4 +1,4 @@
-AC_INIT(wxmacmolplt, 7.4.1, brett@scl.ameslab.gov)
+AC_INIT(wxmacmolplt, 7.4.2, brett@scl.ameslab.gov)
 AC_CONFIG_SRCDIR(src/main.cpp)
 AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE([1.9 foreign])
@@ -59,6 +59,19 @@ AS_IF([test "x$with_ming" != xno],
     [AC_SUBST([LIBMING], ["-lming"]) AC_DEFINE([HAVE_LIBMING])],
     [if test "x$with_ming" != xyes; then
         AC_MSG_FAILURE([--with-ming was given, but test for ming failed])
+    fi], -lpng)])
+
+AC_ARG_WITH(glew,
+[[  --system-glew           Use the system provided glew library instead of 
+                          the built-in version; (default=yes if present)]],
+[],
+[system_glew=yes])
+LIBMING=
+AS_IF([test "x$system_glew" != xno],
+[AC_CHECK_LIB([glew], [glewInit],
+    [AC_SUBST([LIBGLEW], ["-lglew"]) AC_DEFINE([SYSTEM_GLEW])],
+    [if test "x$system_glew" != xyes; then
+        AC_MSG_FAILURE([--system-glew was given, but test for glew failed])
     fi], -lpng)])
 
 WXCONFIG=wx-config

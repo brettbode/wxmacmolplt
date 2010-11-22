@@ -1,7 +1,11 @@
 #ifndef MMP_GL_H
 #define MMP_GL_H
 
+#ifdef SYSTEM_GLEW
+#include <GL/glew.h>
+#else
 #include "glew.h"
+#endif
 #include <wx/wx.h>
 #include <wx/glcanvas.h>
 #include <string>
