@@ -1392,10 +1392,10 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 				p1.z = origin.z;
 				DrawRotationAxis(origin, p1, 2);
 			}
-				//There are order count of planes bisecting the 2 fold axis
+				//There are order count of planes bisecting the C2 axis
 			for (int i=0; i<order; i++) {
-				origin.x = - sin(kPi * i/order) * MainData->MaxSize;
-				origin.y = - cos(kPi * i/order) * MainData->MaxSize;
+				origin.x = - cos(kPi * i/order + kPi/(2*order)) * MainData->MaxSize;
+				origin.y = - sin(kPi * i/order + kPi/(2*order)) * MainData->MaxSize;
 				origin.z = -MainData->MaxSize;
 				p1.x = - origin.x;
 				p1.y = - origin.y;
