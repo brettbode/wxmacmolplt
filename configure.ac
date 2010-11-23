@@ -62,17 +62,18 @@ AS_IF([test "x$with_ming" != xno],
     fi], -lpng)])
 
 AC_ARG_WITH(glew,
-[[  --system-glew           Use the system provided glew library instead of 
+[[  --with-glew             Use the system provided glew library instead of 
                           the built-in version; (default=yes if present)]],
 [],
-[system_glew=yes])
-LIBMING=
-AS_IF([test "x$system_glew" != xno],
-[AC_CHECK_LIB([glew], [glewInit],
-    [AC_SUBST([LIBGLEW], ["-lglew"]) AC_DEFINE([SYSTEM_GLEW])],
-    [if test "x$system_glew" != xyes; then
-        AC_MSG_FAILURE([--system-glew was given, but test for glew failed])
-    fi], -lpng)])
+[with_glew=yes])
+LIBGLEW=
+AS_IF([test "x$with_glew" != xno],
+[AC_CHECK_LIB([GLEW], [glewInit],
+    [AC_SUBST([LIBGLEW], ["-lGLEW"]) AC_DEFINE([SYSTEM_GLEW])],
+    [if test "x$with_glew" != xyes; then
+        AC_MSG_FAILURE([--with-glew was given, but test for glew failed])
+    fi])])
+AM_CONDITIONAL([SYSTEM_GLEW], [test "x$with_glew" = xyes])
 
 WXCONFIG=wx-config
 AC_ARG_WITH(wx-config,

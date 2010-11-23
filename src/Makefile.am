@@ -25,8 +25,6 @@ wxmacmolplt_SOURCES =                                  \
     fmofragmentationdialog.cpp fmofragmentationdialog.h \
     GaussHermite.cpp           GaussHermite.h          \
     Geometries.cpp             Geometries.h            \
-    glew.cpp                   glew.h                  \
-	 glxew.h                    wglew.h                 \
     glf.cpp                    glf.h                   \
                                GlobalExceptions.h      \
                                Globals.h               \
@@ -74,9 +72,15 @@ wxmacmolplt_SOURCES =                                  \
     wxUglyChoice.cpp           wxUglyChoice.h          \
     XML.cpp                    XML.hpp                 \
     zmatrixcalculator.cpp      zmatrixcalculator.h
+##The following allows the built in glew files to always
+##be included in the distribution, but are compiled and
+##linked in only if there is not a system provided glew.
+if !SYSTEM_GLEW
+wxmacmolplt_SOURCES += glew.cpp glew.h glxew.h wglew.h
+endif
 
 AM_CXXFLAGS = $(WX_CXXFLAGS)
-wxmacmolplt_LDADD = $(WX_LIBS) $(LIBMING) $(LIBGL)
+wxmacmolplt_LDADD = $(WX_LIBS) $(LIBMING) $(LIBGL) $(LIBGLEW)
 wxmacmolplt_LDFLAGS = $(WX_CXXFLAGS)
 EXTRA_DIST = wxMacMolPlt.pjd xpms/sp.xpm xpms/arrow.xpm \
 	xpms/hand.xpm xpms/rect_lasso.xpm xpms/view.xpm
