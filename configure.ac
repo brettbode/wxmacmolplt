@@ -57,19 +57,15 @@ LIBMING=
 AS_IF([test "x$with_ming" != xno],
 [AC_CHECK_LIB([ming], [Ming_init],
     [AC_SUBST([LIBMING], ["-lming"]) AC_DEFINE([HAVE_LIBMING])],
-    [if test "x$with_ming" != xyes; then
+    [if test "x$with_ming" = xyes; then
         AC_MSG_FAILURE([--with-ming was given, but test for ming failed])
     fi], -lpng)])
 
-## Ok the next one defaults to no because I do not know how to make
-## the conditional following it to work correctly in the case where
-## the GLEW library is autodetected. It needs to deactivate the built in
-## glew code in the src/Makefile.am.
 AC_ARG_WITH(glew,
 [[  --with-glew             Use the system provided glew library instead of 
                           the built-in version; (default=yes if present)]],
 [],
-[with_glew=no])
+[with_glew=check])
 
 LIBGLEW=
 
@@ -80,7 +76,7 @@ AS_IF([test "x$with_glew" != xno],
         AC_MSG_FAILURE([--with-glew was given, but test for glew failed])
     fi])])
 
-AM_CONDITIONAL([SYSTEM_GLEW], [test "x$with_glew" = xyes])
+AM_CONDITIONAL([SYSTEM_GLEW], [test $LIBGLEW = "-lGLEW"])
 
 WXCONFIG=wx-config
 AC_ARG_WITH(wx-config,
