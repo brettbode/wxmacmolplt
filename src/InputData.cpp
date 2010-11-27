@@ -46,7 +46,6 @@ InputData::InputData(void) {
 	SCF = NULL;
 	MP2 = NULL;
 	Hessian = NULL;
-	DFT = NULL;
 }
 InputData::InputData(InputData *Copy) {
 	//Always create Control, System, Basis, and Data groups
@@ -63,8 +62,7 @@ InputData::InputData(InputData *Copy) {
 	else MP2 = NULL;
 	if (Copy->Hessian) Hessian = new HessianGroup(Copy->Hessian);
 	else Hessian = NULL;
-	DFT = NULL;
-	if (Copy->DFT) DFT = new DFTGroup(Copy->DFT);
+	DFT = Copy->DFT;
 	EFP = Copy->EFP;
 	FMO = Copy->FMO;
 }
@@ -78,7 +76,6 @@ InputData::~InputData(void) {	//destructor
 	if (MP2) delete MP2;
 	if (Hessian) delete Hessian;
 	if (StatPt) delete StatPt;
-	if (DFT) delete DFT;
 }
 void InputData::WriteXML(XMLElement * parent, MoleculeData * p) const {
 	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_InputOptionsElement));
@@ -110,9 +107,7 @@ void InputData::WriteXML(XMLElement * parent, MoleculeData * p) const {
 	if (StatPt) {
 		StatPt->WriteXML(Ele);
 	}
-	if (DFT) {
-		DFT->WriteXML(Ele);
-	}
+	DFT.WriteXML(Ele);
 	EFP.WriteXML(Ele);
 	FMO.WriteXML(Ele, p);
 }
@@ -167,8 +162,7 @@ void InputData::ReadXML(XMLElement * parent, MoleculeData * p) {
 										if (StatPt) StatPt->ReadXML(child);
 										break;
 									case MMP_IODFTGroupElement:
-										if (DFT == NULL) DFT = new DFTGroup;
-										if (DFT) DFT->ReadXML(child);
+										DFT.ReadXML(child);
 										break;
 									case MMP_IOEFPGroupElement:
 										EFP.ReadXML(child);
@@ -860,11 +854,9 @@ void ControlGroup::WriteToFile(BufferFile *File, InputData *IData, long NumElect
 		File->WriteLine(Out, false);
 	}
 
-	if (IData->DFT) {
-		if (UseDFT()) {
-			sprintf(Out, "DFTTYP=%s ", IData->DFT->GetFunctionalText());
-			File->WriteLine(Out, false);
-		}
+	if (UseDFT()) {
+		sprintf(Out, "DFTTYP=%s ", IData->DFT.GetFunctionalText());
+		File->WriteLine(Out, false);
 	}
 	
 	if (MaxIt) {	//Punch Maxit if non-default value
@@ -2968,12 +2960,13 @@ void DFTGroup::InitData(void) {
 	GridSwitch = 3.0e-4;
 	Threshold = 1.0e-4;
 	Functional = 0;
-	NumRadialGrids = 96;
+/*	NumRadialGrids = 96;
 	NumThetaGrids = 12;
 	NumPhiGrids = 24;
 	NumRadialGridsInit = 24;
 	NumThetaGridsInit = 8;
 	NumPhiGridsInit = 16;
+ */
 	BitFlags = 0;
 	SetAuxFunctions(true);
 	SetMethodGrid(true);
@@ -3002,83 +2995,185 @@ const char * DFTGroup::GetDFTGridFuncText(DFTFunctionalsGrid type) {
 			return "SLATER";
 		case DFT_Grid_Becke:
 			return "BECKE";
-		case DFT_Grid_VWN:
-			return "VWN";
-		case DFT_Grid_LYP:
-			return "LYP";
-		case DFT_Grid_SVWN:
-			return "SVWN";
-		case DFT_Grid_BVWN:
-			return "BVWN";
-		case DFT_Grid_BLYP:
-			return "BLYP";
-		case DFT_Grid_B3LYP:
-			return "B3LYP";
 		case DFT_Grid_GILL:
 			return "GILL";
-		case DFT_Grid_PBE:
-			return "PBE";
+		case DFT_Grid_OPTX:
+			return "OPTX";
+		case DFT_Grid_PW91X:
+			return "PW91X";
+		case DFT_Grid_PBEX:
+			return "PBEX";
+		case DFT_Grid_VWN:
+			return "VWN";
+		case DFT_Grid_VWN1:
+			return "VWN1";
+		case DFT_Grid_PZ81:
+			return "PZ81";
+		case DFT_Grid_P86:
+			return "P86";
+		case DFT_Grid_LYP:
+			return "LYP";
+		case DFT_Grid_PW91C:
+			return "PW91C";
+		case DFT_Grid_PBEC:
+			return "PBEC";
 		case DFT_Grid_OP:
 			return "OP";
-		case DFT_Grid_SLYP:
-			return "SLYP";
-		case DFT_Grid_SOP:
-			return "SOP";
+		case DFT_Grid_SVWN:
+			return "SVWN";
+		case DFT_Grid_BLYP:
+			return "BLYP";
 		case DFT_Grid_BOP:
 			return "BOP";
+		case DFT_Grid_BP86:
+			return "BP86";
 		case DFT_Grid_GVWN:
 			return "GVWN";
-		case DFT_Grid_GLYP:
-			return "GLYP";
-		case DFT_Grid_GOP:
-			return "GOP";
+		case DFT_Grid_GPW91:
+			return "GPW91";
 		case DFT_Grid_PBEVWN:
 			return "PBEVWN";
-		case DFT_Grid_PBELYP:
-			return "PBELYP";
 		case DFT_Grid_PBEOP:
 			return "PBEOP";
+		case DFT_Grid_OLYP:
+			return "OLYP";
+		case DFT_Grid_PW91:
+			return "PW91";
+		case DFT_Grid_PBE:
+			return "PBE";
+		case DFT_Grid_revPBE:
+			return "REVPBE";
+		case DFT_Grid_RPBE:
+			return "RPBE";
+		case DFT_Grid_PBEsol:
+			return "PBESOL";
+		case DFT_Grid_EDF1:
+			return "EDF1";
+		case DFT_Grid_HCTH93:
+			return "HCTH93";
+		case DFT_Grid_HCTH120:
+			return "HCTH120";
+		case DFT_Grid_HCTH147:
+			return "HCTH147";
+		case DFT_Grid_HCTH407:
+			return "HCTH407";
+		case DFT_Grid_SOGGA:
+			return "SOGGA";
+		case DFT_Grid_MOHLYP:
+			return "MOHLYP";
+		case DFT_Grid_B97_D:
+			return "B97-D";
 		case DFT_Grid_BHHLYP:
 			return "BHHLYP";
+		case DFT_Grid_B3PW91:
+			return "B3PW91";
+		case DFT_Grid_B3LYP:
+			return "B3LYP";
+		case DFT_Grid_B3LYP1:
+			return "B3LYP1";
+		case DFT_Grid_B97:
+			return "B97";
+		case DFT_Grid_B97_1:
+			return "B97-1";
+		case DFT_Grid_B97_2:
+			return "B97-2";
+		case DFT_Grid_B97_3:
+			return "B97-3";
+		case DFT_Grid_B97_K:
+			return "B97-K";
+		case DFT_Grid_B98:
+			return "B98";
+		case DFT_Grid_PBE0:
+			return "PBE0";
+		case DFT_Grid_X3LYP:
+			return "X3LYP";
+		case DFT_Grid_CAMB3LYP:
+			return "CAMB3LYP";
+		case DFT_Grid_wB97:
+			return "WB97";
+		case DFT_Grid_wB97X:
+			return "WB97X";
+		case DFT_Grid_wB97X_D:
+			return "WB97X-D";
+		case DFT_Grid_B2PLYP:
+			return "B2PLYP";
+		case DFT_Grid_xB97X_2:
+			return "XB97X-2";
+		case DFT_Grid_xB97X_2L:
+			return "XB97X-2L";
+		case DFT_Grid_VS98:
+			return "VS98";
+		case DFT_Grid_PKZB:
+			return "PKZB";
+		case DFT_Grid_tHCTH:
+			return "tHCTH";
+		case DFT_Grid_tHCTHhyb:
+			return "tHCTHhyb";
+		case DFT_Grid_BMK:
+			return "BMK";
+		case DFT_Grid_TPSS:
+			return "TPSS";
+		case DFT_Grid_TPSSh:
+			return "TPSSh";
+		case DFT_Grid_TPSSm:
+			return "TPSSm";
+		case DFT_Grid_revTPSS:
+			return "REVTPSS";
+		case DFT_Grid_M05:
+			return "M05";
+		case DFT_Grid_M05_2X:
+			return "M05-2X";
+		case DFT_Grid_M06:
+			return "M06";
+		case DFT_Grid_M06_L:
+			return "M06-L";
+		case DFT_Grid_M06_2X:
+			return "M06-2X";
+		case DFT_Grid_M06_HF:
+			return "M06-HF";
+		case DFT_Grid_M08_HX:
+			return "M08-HX";
+		case DFT_Grid_M08_SO:
+			return "M08-SO";
 	}
 	return "invalid";
 }
 const char * DFTGroup::GetDFTGridFreeFuncText(DFTFunctionalsGridFree type) {
 	switch (type) {
+		case DFT_GridFree_XALPHA:
+			return "XALPHA";
 		case DFT_GridFree_Slater:
 			return "SLATER";
 		case DFT_GridFree_Becke:
 			return "BECKE";
-		case DFT_GridFree_VWN:
-			return "VWN";
-		case DFT_GridFree_LYP:
-			return "LYP";
-		case DFT_GridFree_SVWN:
-			return "SVWN";
-		case DFT_GridFree_BVWN:
-			return "BVWN";
-		case DFT_GridFree_BLYP:
-			return "BLYP";
-		case DFT_GridFree_B3LYP:
-			return "B3LYP";
-		case DFT_GridFree_XALPHA:
-			return "XALPHA";
 		case DFT_GridFree_Depristo:
 			return "DEPRISTO";
 		case DFT_GridFree_CAMA:
 			return "CAMA";
 		case DFT_GridFree_HALF:
 			return "HALF";
+		case DFT_GridFree_VWN:
+			return "VWN";
 		case DFT_GridFree_PWLOC:
 			return "PWLOC";
+		case DFT_GridFree_LYP:
+			return "LYP";
+		case DFT_GridFree_BVWN:
+			return "BVWN";
+		case DFT_GridFree_BLYP:
+			return "BLYP";
 		case DFT_GridFree_BPWLOC:
 			return "BPWLOC";
+		case DFT_GridFree_B3LYP:
+			return "B3LYP";
 		case DFT_GridFree_CAMB:
 			return "CAMB";
 		case DFT_GridFree_XVWN:
 			return "XVWN";
 		case DFT_GridFree_XPWLOC:
 			return "XPWLOC";
+		case DFT_GridFree_SVWN:
+			return "SVWN";
 		case DFT_GridFree_SPWLOC:
 			return "SPWLOC";
 		case DFT_GridFree_WIGNER:
@@ -3101,21 +3196,43 @@ const char * DFTGroup::GetFunctionalText(void) const {
 	}
 	return NULL;
 }
+short DFTGroup::SetFunctional(const char * DFT_Type) {
+	if (MethodGrid()) {
+		for (int i=0; i<NumberGRIDDFTFuncs; i++) {
+			if (!strcasecmp(DFT_Type, GetDFTGridFuncText((DFTFunctionalsGrid) i))) {
+				SetFunctional((DFTFunctionalsGrid) i);
+				break;
+			}
+		}
+	} else {
+		for (int i=0; i<NumberDFTGridFreeFuncs; i++) {
+			if (!strcasecmp(DFT_Type, GetDFTGridFreeFuncText((DFTFunctionalsGridFree) i))) {
+				SetFunctional((DFTFunctionalsGridFree) i);
+				break;
+			}
+		}
+	}
+	return GetFunctional();
+}
 short DFTGroup::SetFunctional(short newvalue) {
-		//Probably need some checks here??
-	Functional = newvalue;
+	if (MethodGrid()) {
+		if ((newvalue > 0)&&(newvalue < NumberGRIDDFTFuncs))
+			Functional = newvalue;
+	} else
+		if ((newvalue > 0)&&(newvalue < NumberDFTGridFreeFuncs))
+			Functional = newvalue;
 	return Functional;
 }
 void DFTGroup::WriteXML(XMLElement * parent) const {
 	char line[kMaxLineLength];
 	XMLElement * Ele = parent->addChildElement(CML_convert(MMP_IODFTGroupElement));
+	Ele->addBoolAttribute(CML_convert(MMP_IODFTGridMethod), MethodGrid());
 	snprintf(line, kMaxLineLength, "%f", GridSwitch);
 	Ele->addChildElement(CML_convert(MMP_IODFTGGridSwitch), line);
 	snprintf(line, kMaxLineLength, "%f", Threshold);
 	Ele->addChildElement(CML_convert(MMP_IODFTThreshold), line);
-	snprintf(line, kMaxLineLength, "%d", Functional);
-	Ele->addChildElement(CML_convert(MMP_IODFTFunctional), line);
-	snprintf(line, kMaxLineLength, "%d", NumRadialGrids);
+	Ele->addChildElement(CML_convert(MMP_IODFTFunctional), GetFunctionalText());
+/*	snprintf(line, kMaxLineLength, "%d", NumRadialGrids);
 	Ele->addChildElement(CML_convert(MMP_IODFTNumRadialGrids), line);
 	snprintf(line, kMaxLineLength, "%d", NumThetaGrids);
 	Ele->addChildElement(CML_convert(MMP_IODFTNumThetaGrids), line);
@@ -3127,12 +3244,15 @@ void DFTGroup::WriteXML(XMLElement * parent) const {
 	Ele->addChildElement(CML_convert(MMP_IODFTNumThetaGridsInit), line);
 	snprintf(line, kMaxLineLength, "%d", NumPhiGridsInit);
 	Ele->addChildElement(CML_convert(MMP_IODFTNumPhiGridsInit), line);
-	if (MethodGrid()) Ele->addChildElement(CML_convert(MMP_IODFTGridMethod), trueXML);
+ */
 	if (GetAuxFunctions()) Ele->addChildElement(CML_convert(MMP_IODFTGetAuxFunctions), trueXML);
 	if (GetThree()) Ele->addChildElement(CML_convert(MMP_IODFTThree), trueXML);
 }
 void DFTGroup::ReadXML(XMLElement * parent) {
-	XMLElementList * children = parent->getChildren();
+	bool boolResult;
+	if (parent->getAttributeValue(CML_convert(MMP_IODFTGridMethod), boolResult))
+		SetMethodGrid(boolResult);
+	XMLElementList * children = parent->getChildren(); 
 	if (children) {
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
@@ -3158,13 +3278,12 @@ void DFTGroup::ReadXML(XMLElement * parent) {
 						break;
 					case MMP_IODFTFunctional:
 					{
-						long temp;
-						if (child->getLongValue(temp)) {
-							Functional = temp;
-						}
+						const char * v = child->getValue();
+						if (v)
+							SetFunctional(v);
 					}
 						break;
-					case MMP_IODFTNumRadialGrids:
+/*					case MMP_IODFTNumRadialGrids:
 					{
 						long temp;
 						if (child->getLongValue(temp)) {
@@ -3212,10 +3331,7 @@ void DFTGroup::ReadXML(XMLElement * parent) {
 						}
 					}
 						break;
-					case MMP_IODFTGridMethod:
-						if (child->getBoolValue(tb))
-							SetMethodGrid(tb);
-						break;
+ */
 					case MMP_IODFTGetAuxFunctions:
 						if (child->getBoolValue(tb))
 							SetAuxFunctions(tb);

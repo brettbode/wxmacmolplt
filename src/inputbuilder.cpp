@@ -995,47 +995,98 @@ void InputBuilderWindow::CreateControls()
 	wxArrayString dftGridFuncChoiceStrings;
 	dftGridFuncChoiceStrings.Add(_("Slater exchange"));
 	dftGridFuncChoiceStrings.Add(_("Becke 1988 exchange"));
-	dftGridFuncChoiceStrings.Add(_("VWN: Vosko-Wilk-Nusair (VWN5) correlation"));
-	dftGridFuncChoiceStrings.Add(_("LYP: Lee-Yang-Parr correlation"));
-	dftGridFuncChoiceStrings.Add(_("SVWN: Slater exhange + VWN correlation"));
-	dftGridFuncChoiceStrings.Add(_("BVWN: BECKE exchange + VWN5 correlation"));
-	dftGridFuncChoiceStrings.Add(_("BLYP: BECKE exchange + LYP correlation"));
-	dftGridFuncChoiceStrings.Add(_("B3LYP"));
 	dftGridFuncChoiceStrings.Add(_("Gill 1996 exchange"));
-	dftGridFuncChoiceStrings.Add(_("Perdew-Burke-Ernzerhof (PBE) exchange"));
-	dftGridFuncChoiceStrings.Add(_("OP: One-parameter Progressive correlation"));
-	dftGridFuncChoiceStrings.Add(_("SLYP: SLATER + Lee-Yang-Parr (LYP) correlation"));
-	dftGridFuncChoiceStrings.Add(_("SOP: SLATER + OP correlation"));
+	dftGridFuncChoiceStrings.Add(_("OPTX: Handy-Cohen exchange"));
+	dftGridFuncChoiceStrings.Add(_("PW91X: Perdew-Want 1991 exchange"));
+	dftGridFuncChoiceStrings.Add(_("PBEX: Perdew-Burke-Ernzerhof exchange"));
+	dftGridFuncChoiceStrings.Add(_("VWN: Vosko-Wilk-Nusair (VWN5) correlation"));
+	dftGridFuncChoiceStrings.Add(_("VWN1: VWN correlation formula 1"));
+	dftGridFuncChoiceStrings.Add(_("PZ81: Perdew-Wang 1981 correlation"));
+	dftGridFuncChoiceStrings.Add(_("P86: Perdew 1986 correlation"));
+	dftGridFuncChoiceStrings.Add(_("LYP: Lee-Yang-Parr correlation"));
+	dftGridFuncChoiceStrings.Add(_("PW91C: Perdew-Wang 1991 correlation"));
+	dftGridFuncChoiceStrings.Add(_("PBEC: Perdew-Burke-Ernzerhof correlation"));
+	dftGridFuncChoiceStrings.Add(_("OP: one parameter progressive correlation"));
+	dftGridFuncChoiceStrings.Add(_("SVWN: Slater exhange + VWN correlation"));
+	dftGridFuncChoiceStrings.Add(_("BLYP: BECKE exchange + LYP correlation"));
 	dftGridFuncChoiceStrings.Add(_("BOP: BECKE exchange + OP correlation"));
-	dftGridFuncChoiceStrings.Add(_("BVWN: GILL exchange + VWN5 correlation"));
-	dftGridFuncChoiceStrings.Add(_("GLYP: GILL exchange + LYP correlation"));
-	dftGridFuncChoiceStrings.Add(_("GOP: GILL exchange + OP correlation"));
-	dftGridFuncChoiceStrings.Add(_("PBEVWN: PBE exchange + VWN6 correlation"));
-	dftGridFuncChoiceStrings.Add(_("PBELYP: PBE exchange +LYP correlation"));
+	dftGridFuncChoiceStrings.Add(_("BP86: Becke exchange + P86 correlation"));
+	dftGridFuncChoiceStrings.Add(_("GVWN: Gill exchange + VWN5 correlation"));
+	dftGridFuncChoiceStrings.Add(_("GPW91: Gill exchange + PW91 correlation"));
+	dftGridFuncChoiceStrings.Add(_("PBEVWN: PBE exchange + VWN5 correlation"));
 	dftGridFuncChoiceStrings.Add(_("PBEOP: PBE exchange + OP correlation"));
-	dftGridFuncChoiceStrings.Add(_("BHHLYP: HF and BECKE exchange + LYP correlation"));
+	dftGridFuncChoiceStrings.Add(_("OLYP: OPTX exchange + LYP correlation"));
+	dftGridFuncChoiceStrings.Add(_("PW91: PW91 exhange and correlation"));
+	dftGridFuncChoiceStrings.Add(_("PBE: exchange and correlation"));
+	dftGridFuncChoiceStrings.Add(_("revPBE: PBE revised by Zhang-Yang"));
+	dftGridFuncChoiceStrings.Add(_("RPBE: PBE revised by Hammer-Hansen-Norshov"));
+	dftGridFuncChoiceStrings.Add(_("PBEsol: PBE revised by Perdew et al for solids"));
+	dftGridFuncChoiceStrings.Add(_("EDF1: empirical density functional #1"));
+	dftGridFuncChoiceStrings.Add(_("HCTH93: Hamprecht-Cohen-Tozer-Handy 1998 fit to 93 systems"));
+	dftGridFuncChoiceStrings.Add(_("HCTH120: later fit to 120 systems"));
+	dftGridFuncChoiceStrings.Add(_("HCTH147: later fit to 147 systems"));
+	dftGridFuncChoiceStrings.Add(_("HCTH407: later fit to 407 systems"));
+	dftGridFuncChoiceStrings.Add(_("SOGGA: PBE revised by Zhang-Truhlar for solids"));
+	dftGridFuncChoiceStrings.Add(_("MOHLYP: metal optimized OPTX, half LYP"));
+	dftGridFuncChoiceStrings.Add(_("B97-D: Grimme's mod. B97"));
+	dftGridFuncChoiceStrings.Add(_("BHHLYP: HF and Becke exchange + LYP correlation"));
+	dftGridFuncChoiceStrings.Add(_("B3PW91: Becke's 3 parameter exchange + PW91 correlation"));
+	dftGridFuncChoiceStrings.Add(_("B3LYP: Becke+Slater+HF exchange and LYP+VWN5 correlation"));
+	dftGridFuncChoiceStrings.Add(_("B3LYP1: use of VWN1 in B3LYP"));
+	dftGridFuncChoiceStrings.Add(_("B97: Becke's 1997 hybrid functional"));
+	dftGridFuncChoiceStrings.Add(_("B97-1: Hamprect-Cohen-Tozer-Handy reparam. of B97"));
+	dftGridFuncChoiceStrings.Add(_("B97-2: Wilson-Bradley-Tozer 2001 mod to B97"));
+	dftGridFuncChoiceStrings.Add(_("B97-3: Keal-Tozer 2005 mod to B97"));
+	dftGridFuncChoiceStrings.Add(_("B97-K: Boese-Martin 2004 mod for kinetics"));
+	dftGridFuncChoiceStrings.Add(_("B98: Schmider-Becke 1998 mod to B97"));
+	dftGridFuncChoiceStrings.Add(_("PBE0: hybrid made from PBE"));
+	dftGridFuncChoiceStrings.Add(_("X3LYP: HF+Slater+Becke88+PW91 exchange and LYP+VWN1 correlation"));
+	dftGridFuncChoiceStrings.Add(_("CAMB3LYP: coulomb attenuated B3LYP"));
+	dftGridFuncChoiceStrings.Add(_("wB97: omega separated form of B97"));
+	dftGridFuncChoiceStrings.Add(_("wB97X: wB97 with short-range HF exchange"));
+	dftGridFuncChoiceStrings.Add(_("wB97X-D: dispersion corrected wB97X"));
+	dftGridFuncChoiceStrings.Add(_("B2PLYP: mixes BLYP, HF exchange and MP2"));
+	dftGridFuncChoiceStrings.Add(_("xB97X-2"));
+	dftGridFuncChoiceStrings.Add(_("wB97X-2L"));
+	dftGridFuncChoiceStrings.Add(_("VS98: Voorhis-Scuseria 1998"));
+	dftGridFuncChoiceStrings.Add(_("PKZB: Perdew-Kurth-Zupan-Blaha 1999"));
+	dftGridFuncChoiceStrings.Add(_("tHCTH: Boese-Handy 2002 metaGGA"));
+	dftGridFuncChoiceStrings.Add(_("tHCTHhyb: tHCTH hybrid with 15% HF exchange"));
+	dftGridFuncChoiceStrings.Add(_("BMK: Boese-Martin 2004 param. for kinetics"));
+	dftGridFuncChoiceStrings.Add(_("TPSS: Tao-Perdew-Staroverov-Scuseria 2003"));
+	dftGridFuncChoiceStrings.Add(_("TPSSh: TPSS with 10% HF exchange"));
+	dftGridFuncChoiceStrings.Add(_("TPSSm: TPSS with mod. parameter, 2007"));
+	dftGridFuncChoiceStrings.Add(_("revTPSS: TPSS rev. 2009"));
+	dftGridFuncChoiceStrings.Add(_("M05: Minnesota exchange-corr. 2005"));
+	dftGridFuncChoiceStrings.Add(_("M05-2X: M05 with mod. HF exchange"));
+	dftGridFuncChoiceStrings.Add(_("M06: Minnesota 2006"));
+	dftGridFuncChoiceStrings.Add(_("M06-L: M06 with 0% HF exchange"));
+	dftGridFuncChoiceStrings.Add(_("M06-2X: M06 with doubled HF exchange"));
+	dftGridFuncChoiceStrings.Add(_("M06-HF: M06 with 100% HF exchange"));
+	dftGridFuncChoiceStrings.Add(_("M08-HX: M08 with high HF exchange"));
+	dftGridFuncChoiceStrings.Add(_("M08-SO: M08 form different parameters"));
 	dftGridFuncChoice = new wxUglyChoice( itemPanel98, ID_GRID_FUNCTIONAL_CHOICE, wxDefaultPosition, wxDefaultSize, dftGridFuncChoiceStrings, 0 );
 	dftGridFuncChoice->SetStringSelection(_("Slater exchange"));
 	funcSizer->Add(dftGridFuncChoice, 0, wxALIGN_LEFT|wxALL, 5);
 
 	wxArrayString dftGridFreeFuncChoiceStrings;
+	dftGridFreeFuncChoiceStrings.Add(_("X-Alpha exchange"));
 	dftGridFreeFuncChoiceStrings.Add(_("Slater exchange"));
 	dftGridFreeFuncChoiceStrings.Add(_("Becke's 1988 exchange"));
-	dftGridFreeFuncChoiceStrings.Add(_("VWN: Vosko/Wilke/Nusair corr"));
-	dftGridFreeFuncChoiceStrings.Add(_("LYP: Lee/Yang/Parr corr\nSVWN: Slater exchange + VWN corr"));
-	dftGridFreeFuncChoiceStrings.Add(_("BVWN: Becke exchange + VWN corr"));
-	dftGridFreeFuncChoiceStrings.Add(_("BLYP: Becke exchange + LYP corr"));
-	dftGridFreeFuncChoiceStrings.Add(_("B3LYP: hybridized HF/Becke/LYP using VWN"));
-	dftGridFreeFuncChoiceStrings.Add(_("X-Alpha exchange"));
 	dftGridFreeFuncChoiceStrings.Add(_("Depristo/Kress exchange"));
 	dftGridFreeFuncChoiceStrings.Add(_("CAMA: Handy et al's mods to Becke exchange"));
 	dftGridFreeFuncChoiceStrings.Add(_("HALF: 50-50 mix of Becke and HF exchange"));
+	dftGridFreeFuncChoiceStrings.Add(_("VWN: Vosko/Wilke/Nusair corr"));
 	dftGridFreeFuncChoiceStrings.Add(_("PWLOC: Perdew/Wang local corr"));
-	dftGridFreeFuncChoiceStrings.Add(_("BPWLOC: Becke exchange "));
-	dftGridFreeFuncChoiceStrings.Add(_(" Perdew/Wang corr"));
+	dftGridFreeFuncChoiceStrings.Add(_("LYP: Lee/Yang/Parr corr\nSVWN: Slater exchange + VWN corr"));
+	dftGridFreeFuncChoiceStrings.Add(_("BVWN: Becke exchange + VWN corr"));
+	dftGridFreeFuncChoiceStrings.Add(_("BLYP: Becke exchange + LYP corr"));
+	dftGridFreeFuncChoiceStrings.Add(_("BPWLOC: Becke exchange +  Perdew/Wang corr"));
+	dftGridFreeFuncChoiceStrings.Add(_("B3LYP: hybridized HF/Becke/LYP using VWN"));
 	dftGridFreeFuncChoiceStrings.Add(_("CAMB: CAMA exchange + Cambridge corr"));
 	dftGridFreeFuncChoiceStrings.Add(_("XVWN: Xalpha exchange + VWN corr"));
 	dftGridFreeFuncChoiceStrings.Add(_("XPWLOC: Xalpha exchange + Perdew/Wang corr"));
+	dftGridFreeFuncChoiceStrings.Add(_("SVWN: Slater exchange + VWN5 corr"));
 	dftGridFreeFuncChoiceStrings.Add(_("SPWLOC: Slater exchange + PWLOC corr"));
 	dftGridFreeFuncChoiceStrings.Add(_("WIGNER: Wigner exchange + corr"));
 	dftGridFreeFuncChoiceStrings.Add(_("WS: Wigner scaled exchange + corr"));
@@ -1982,25 +2033,20 @@ void InputBuilderWindow::SetupSystemItems() {
 }
 
 void InputBuilderWindow::SetupDFTItems() {
-    if(TmpInputRec->DFT == NULL) {
-        TmpInputRec->DFT = new DFTGroup;
-    }
-    
-    // dftMethodChoice
-    bool grid = TmpInputRec->DFT->MethodGrid();
+	// dftMethodChoice
+    bool grid = TmpInputRec->DFT.MethodGrid();
     dftMethodChoice->SetSelection(grid ? 0 : 1);
     
     // dftGridFuncChoice and dftGridFreeFuncChoice
     if(grid) {
         dftGridFreeFuncChoice->Show(false);
         dftGridFuncChoice->Show(true);
-        dftGridFuncChoice->SetSelection(TmpInputRec->DFT->GetFunctional() - 1);
+        dftGridFuncChoice->SetSelection(TmpInputRec->DFT.GetFunctional() - 1);
         funcSizer->Layout();
-    }
-    else {
+    } else {
         dftGridFuncChoice->Show(false);
         dftGridFreeFuncChoice->Show(true);
-        dftGridFreeFuncChoice->SetSelection(TmpInputRec->DFT->GetFunctional() - 1);
+        dftGridFreeFuncChoice->SetSelection(TmpInputRec->DFT.GetFunctional() - 1);
         funcSizer->Layout();
     }
 }
@@ -2682,7 +2728,7 @@ void InputBuilderWindow::OnDefaultsbuttonClick( wxCommandEvent& event )
             TmpInputRec->System->InitData();
             break;
         case DFT_PANE:
-            TmpInputRec->DFT->InitData();
+            TmpInputRec->DFT.InitData();
             break;
 		case FMO_Pane:
 			TmpInputRec->FMO.InitData();
@@ -2740,12 +2786,7 @@ void InputBuilderWindow::OnRevertbuttonClick( wxCommandEvent& event )
             *(TmpInputRec->System) = *(OldData->System);
             break;
         case DFT_PANE:
-            if(OldData->DFT) {
-                *(TmpInputRec->DFT) = *(OldData->DFT);
-            }
-            else {
-                TmpInputRec->DFT->InitData();
-            }
+			TmpInputRec->DFT = OldData->DFT;
             break;
 		case FMO_Pane:
 			TmpInputRec->FMO = OldData->FMO;
@@ -3700,7 +3741,7 @@ void InputBuilderWindow::OnMp2aostorageRadioSelected( wxCommandEvent& event )
 
 void InputBuilderWindow::OnDftmethodChoiceSelected( wxCommandEvent& event )
 {
-    TmpInputRec->DFT->SetMethodGrid(!(dftMethodChoice->GetSelection()));
+    TmpInputRec->DFT.SetMethodGrid(!(dftMethodChoice->GetSelection()));
     SetupItems();
 }
 
@@ -3711,7 +3752,7 @@ void InputBuilderWindow::OnDftmethodChoiceSelected( wxCommandEvent& event )
 
 void InputBuilderWindow::OnGridFunctionalChoiceSelected( wxCommandEvent& event )
 {
-    TmpInputRec->DFT->SetFunctional(dftGridFuncChoice->GetSelection() + 1);
+    TmpInputRec->DFT.SetFunctional(dftGridFuncChoice->GetSelection() + 1);
 }
 
 
@@ -3721,7 +3762,7 @@ void InputBuilderWindow::OnGridFunctionalChoiceSelected( wxCommandEvent& event )
 
 void InputBuilderWindow::OnGridfreeFunctionalChoiceSelected( wxCommandEvent& event )
 {
-    TmpInputRec->DFT->SetFunctional(dftGridFreeFuncChoice->GetSelection() + 1);
+    TmpInputRec->DFT.SetFunctional(dftGridFreeFuncChoice->GetSelection() + 1);
 }
 
 /*!
@@ -3911,8 +3952,8 @@ void InputBuilderWindow::OnFMOFragIdCellChange( wxGridEvent& event )
 {
 	int row = event.GetRow();
 
-	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
-	MoleculeData * MainData = parent->GetData();
+//	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+//	MoleculeData * MainData = parent->GetData();
 
 	wxString val = mFMOFragList->GetCellValue(row, 0);
 	long newval;

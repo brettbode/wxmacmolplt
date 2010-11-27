@@ -53,7 +53,7 @@ long InputData::WriteInputFile(const wxString &filePath, MoleculeData * lData, M
 		long BasisTest=0;
 		buffer->WriteLine("!   File created by MacMolPlt "wxMacMolPlt_VERSION, true);
 		if (Control) Control->WriteToFile(buffer, this, lData->GetNumElectrons());
-		if (DFT) DFT->WriteToFile(buffer, this);
+		DFT.WriteToFile(buffer, this);
 		if (System) System->WriteToFile(buffer);
 		if (Basis && (Control->GetRunType() != G3MP2)) BasisTest = Basis->WriteToFile(buffer, lData);
 		if (Guess) Guess->WriteToFile(buffer, this, lData);

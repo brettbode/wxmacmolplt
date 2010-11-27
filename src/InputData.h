@@ -805,47 +805,98 @@ enum DFTFunctionalsGrid {
 	invalidDFTGrid=0,
 	DFT_Grid_Slater,
 	DFT_Grid_Becke,
-	DFT_Grid_VWN,
-	DFT_Grid_LYP,
-	DFT_Grid_SVWN,
-	DFT_Grid_BVWN,
-	DFT_Grid_BLYP,
-	DFT_Grid_B3LYP,
 	DFT_Grid_GILL,
-	DFT_Grid_PBE,
+	DFT_Grid_OPTX,
+	DFT_Grid_PW91X,
+	DFT_Grid_PBEX,
+	DFT_Grid_VWN,
+	DFT_Grid_VWN1,
+	DFT_Grid_PZ81,
+	DFT_Grid_P86,
+	DFT_Grid_LYP,
+	DFT_Grid_PW91C,
+	DFT_Grid_PBEC,
 	DFT_Grid_OP,
-	DFT_Grid_SLYP,
-	DFT_Grid_SOP,
+	DFT_Grid_SVWN,
+	DFT_Grid_BLYP,
 	DFT_Grid_BOP,
+	DFT_Grid_BP86,
 	DFT_Grid_GVWN,
-	DFT_Grid_GLYP,
-	DFT_Grid_GOP,
+	DFT_Grid_GPW91,
 	DFT_Grid_PBEVWN,
-	DFT_Grid_PBELYP,
 	DFT_Grid_PBEOP,
+	DFT_Grid_OLYP,
+	DFT_Grid_PW91,
+	DFT_Grid_PBE,
+	DFT_Grid_revPBE,
+	DFT_Grid_RPBE,
+	DFT_Grid_PBEsol,
+	DFT_Grid_EDF1,
+	DFT_Grid_HCTH93,
+	DFT_Grid_HCTH120,
+	DFT_Grid_HCTH147,
+	DFT_Grid_HCTH407,
+	DFT_Grid_SOGGA,
+	DFT_Grid_MOHLYP,
+	DFT_Grid_B97_D,
 	DFT_Grid_BHHLYP,
+	DFT_Grid_B3PW91,
+	DFT_Grid_B3LYP,
+	DFT_Grid_B3LYP1,
+	DFT_Grid_B97,
+	DFT_Grid_B97_1,
+	DFT_Grid_B97_2,
+	DFT_Grid_B97_3,
+	DFT_Grid_B97_K,
+	DFT_Grid_B98,
+	DFT_Grid_PBE0,
+	DFT_Grid_X3LYP,
+	DFT_Grid_CAMB3LYP,
+	DFT_Grid_wB97,
+	DFT_Grid_wB97X,
+	DFT_Grid_wB97X_D,
+	DFT_Grid_B2PLYP,
+	DFT_Grid_xB97X_2,
+	DFT_Grid_xB97X_2L,
+	DFT_Grid_VS98,
+	DFT_Grid_PKZB,
+	DFT_Grid_tHCTH,
+	DFT_Grid_tHCTHhyb,
+	DFT_Grid_BMK,
+	DFT_Grid_TPSS,
+	DFT_Grid_TPSSh,
+	DFT_Grid_TPSSm,
+	DFT_Grid_revTPSS,
+	DFT_Grid_M05,
+	DFT_Grid_M05_2X,
+	DFT_Grid_M06,
+	DFT_Grid_M06_L,
+	DFT_Grid_M06_2X,
+	DFT_Grid_M06_HF,
+	DFT_Grid_M08_HX,
+	DFT_Grid_M08_SO,
 	
 	NumberGRIDDFTFuncs
 };
 enum DFTFunctionalsGridFree {
 	invalidDFTGridFreeType=0,
+	DFT_GridFree_XALPHA,
 	DFT_GridFree_Slater,
 	DFT_GridFree_Becke,
-	DFT_GridFree_VWN,
-	DFT_GridFree_LYP,
-	DFT_GridFree_SVWN,
-	DFT_GridFree_BVWN,
-	DFT_GridFree_BLYP,
-	DFT_GridFree_B3LYP,
-	DFT_GridFree_XALPHA,
 	DFT_GridFree_Depristo,
 	DFT_GridFree_CAMA,
 	DFT_GridFree_HALF,
+	DFT_GridFree_VWN,
 	DFT_GridFree_PWLOC,
+	DFT_GridFree_LYP,
+	DFT_GridFree_BVWN,
+	DFT_GridFree_BLYP,
 	DFT_GridFree_BPWLOC,
+	DFT_GridFree_B3LYP,
 	DFT_GridFree_CAMB,
 	DFT_GridFree_XVWN,
 	DFT_GridFree_XPWLOC,
+	DFT_GridFree_SVWN,
 	DFT_GridFree_SPWLOC,
 	DFT_GridFree_WIGNER,
 	DFT_GridFree_WS,
@@ -858,16 +909,23 @@ class DFTGroup {
 		float	GridSwitch;
 		float	Threshold;
 		short	Functional;
-		short	NumRadialGrids;
-		short	NumThetaGrids;
-		short	NumPhiGrids;
-		short	NumRadialGridsInit;
-		short	NumThetaGridsInit;
-		short	NumPhiGridsInit;
+//		short	NumRadialGrids;
+//		short	NumThetaGrids;
+//		short	NumPhiGrids;
+//		short	NumRadialGridsInit;
+//		short	NumThetaGridsInit;
+//		short	NumPhiGridsInit;
 		char	BitFlags;
 	public:
 		DFTGroup(void) {InitData();};
 		DFTGroup(DFTGroup *Copy) {*this = *Copy;};
+		const DFTGroup & operator=(const DFTGroup & other) {
+			BitFlags=other.BitFlags; 
+			GridSwitch=other.GridSwitch; Threshold=other.Threshold; Functional=other.Functional; 
+//			NumRadialGrids=other.NumRadialGrids; NumThetaGrids=other.NumThetaGrids;
+//			NumPhiGrids=other.NumPhiGrids; NumRadialGridsInit=other.NumRadialGridsInit; 
+//			NumThetaGridsInit=other.NumThetaGridsInit; NumPhiGridsInit=other.NumPhiGridsInit; 
+			return *this;};
 		void InitData(void);
 		
 		bool MethodGrid(void) const {return ((BitFlags & 1) != 0);};
@@ -879,6 +937,11 @@ class DFTGroup {
 		inline short GetFunctional(void) const {return Functional;};
 		const char * GetFunctionalText(void) const;
 		short SetFunctional(short newvalue);
+		/**
+		 * Set the functional based on a text string containing a valid GAMESS DFTTYP.
+		 * @param GAMESS_DFT_Type char * with a valid GAMESS DFTTYP string.
+		 */
+		short SetFunctional(const char * GAMESS_DFT_Type);
 		static const char * GetDFTGridFuncText(DFTFunctionalsGrid d);
 		static const char * GetDFTGridFreeFuncText(DFTFunctionalsGridFree d);
 
@@ -1045,7 +1108,7 @@ class InputData {
 		MP2Group		*MP2;
 		HessianGroup	*Hessian;
 		StatPtGroup		*StatPt;
-		DFTGroup		*DFT;
+		DFTGroup		DFT;
 		EffectiveFragmentsGroup	EFP;
 		FMOGroup		FMO;
 			//member functions

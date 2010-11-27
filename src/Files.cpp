@@ -85,7 +85,7 @@ void FileError::WriteError(void) {
   * valid BufferFile operations.
 */
 long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
-	char	Line[kMaxLineLength], token[kMaxLineLength];
+	char	Line[kMaxLineLength], token[kMaxLineLength], DFTTYP[kMaxLineLength]="";
 	short	scanerr;
 	long	nAtoms, EndOfGroup, StartPos, EndPos;
 	bool	BasisFound=false, BoolTest;
@@ -122,6 +122,9 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				MainData->InputOptions->Basis->SetECPPotential(token);
 			if (ReadStringKeyword(Line, "PP", token))
 				MainData->InputOptions->Basis->SetECPPotential(token);
+			//look for the DFTTYP keyword, but we must allow for reading the DFT group
+			//later before setting the functional since it depends on the method
+			ReadStringKeyword(Line, "DFTTYP", DFTTYP);
 			if (ReadLongKeyword(Line, "ISPHER", &nAtoms)) {
 				if (nAtoms == 1)
 					MainData->InputOptions->Control->UseSphericalHarmonics(true);
@@ -336,11 +339,10 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	Buffer->SetFilePos(0);	//restart search from beginning of file
 	EndOfGroup = false;
 	if (Buffer->FindGroup("DFT")) {
-		if (!MainData->InputOptions->DFT) MainData->InputOptions->DFT = new DFTGroup;
 		do {
 			Buffer->GetLine(Line);
 			if (ReadStringKeyword(Line, "METHOD", token))
-				MainData->InputOptions->DFT->SetMethodGrid(
+				MainData->InputOptions->DFT.SetMethodGrid(
 					   strncasecmp(token, "GRIDFREE", 8) != 0);
 			
 			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
@@ -349,6 +351,15 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			}
 		} while (!EndOfGroup);
 	}
+	//Now can save the functional that is read from the contrl group
+	if (strlen(DFTTYP) > 0) {
+		MainData->InputOptions->DFT.SetFunctional(DFTTYP);
+		if (MainData->InputOptions->DFT.GetFunctional() > 0)
+			MainData->InputOptions->Control->UseDFT(true);
+		else
+			wxLogMessage(_("Unknown DFTTYP detected, ignored."));
+	}
+	
 	Buffer->SetFilePos(0);	//restart search from beginning of file
 	EndOfGroup = false;
 	if (Buffer->FindGroup("FMO")) {
@@ -2608,6 +2619,31 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			if (NumOccBeta) NumOccBeta -= test;
 			if (NumOccBeta<0) NumOccBeta = 0;
 			Buffer->SetFilePos(LinePos);
+		}
+		//DFT options
+		if (Buffer->LocateKeyWord("GRID-BASED DFT", 14, EnergyPos)) {
+			Buffer->SkipnLines(2);
+			Buffer->GetLine(LineText);
+			char DFTTYP[kMaxLineLength];
+			if (ReadStringKeyword(LineText, "DFTTYP", DFTTYP)) {
+				MainData->InputOptions->DFT.SetFunctional(DFTTYP);
+				if (MainData->InputOptions->DFT.GetFunctional() > 0)
+					MainData->InputOptions->Control->UseDFT(true);
+				else
+					wxLogMessage(_("Unknown DFTTYP detected, ignored."));
+			}
+		} else if (Buffer->LocateKeyWord("GRID-FREE DFT", 13, EnergyPos)) {
+			Buffer->SkipnLines(2);
+			Buffer->GetLine(LineText);
+			char DFTTYP[kMaxLineLength];
+			MainData->InputOptions->DFT.SetMethodGrid(false);
+			if (ReadStringKeyword(LineText, "DFTTYP", DFTTYP)) {
+				MainData->InputOptions->DFT.SetFunctional(DFTTYP);
+				if (MainData->InputOptions->DFT.GetFunctional() > 0)
+					MainData->InputOptions->Control->UseDFT(true);
+				else
+					wxLogMessage(_("Unknown DFTTYP detected, ignored."));
+			}
 		}
 			//Now read other Control options
 		if (!Buffer->LocateKeyWord("CONTRL OPTIONS", 14, EnergyPos)) {
