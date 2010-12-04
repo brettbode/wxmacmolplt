@@ -57,7 +57,7 @@ LIBMING=
 AS_IF([test "x$with_ming" != xno],
 [AC_CHECK_LIB([ming], [Ming_init],
     [AC_SUBST([LIBMING], ["-lming"]) AC_DEFINE([HAVE_LIBMING])],
-    [if test "x$with_ming" = xyes; then
+    [if test "x$with_ming" != xyes; then
         AC_MSG_FAILURE([--with-ming was given, but test for ming failed])
     fi], -lpng)])
 
