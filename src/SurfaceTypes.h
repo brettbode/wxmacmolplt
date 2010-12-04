@@ -82,6 +82,11 @@ class Surf1DBase : public Surface {
 		void SetNumGridPoints(long newNum);
 		inline bool GridAvailable(void) const {return (Grid!=NULL);};
 		virtual bool ExportPossible(void) const {return GridAvailable();};
+		/**
+		 * Exports surface data to our text file type	
+		 * @param Buffer A BufferFileObject
+		 * @param eft File type selector (currently unused)
+		 */
 		virtual void Export(BufferFile * Buffer, exportFileType eft);
 		inline bool ContourBothPosNeg(void) const {return (SurfOptions & 1) != 0;};
 		inline void SetContourBothPosNeg(bool NewVal) { SurfOptions = (SurfOptions & ~(1 << 1)) | (((int) NewVal) << 1); }

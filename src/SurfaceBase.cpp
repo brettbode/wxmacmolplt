@@ -317,20 +317,30 @@ void Surf2DBase::RotateSurface(Matrix4D RotationMatrix) {
 	YInc = temp;
 }
 
-void Surf1DBase::Export(BufferFile * Buffer, exportFileType eft) {
-	float * lGrid;
-	char * label = GetLabel();
-#ifdef UseHandles
-	HLock(Grid);
-	lGrid = (float *) *Grid;
-#else
-	lGrid = Grid;
-#endif
-	/* Surface::Export1D(lGrid, NumGridPoints, &Origin, &XInc, &YInc, label, Buffer); */
-	/* if (label) delete [] label; */
-#ifdef UseHandles
-	HUnlock(Grid);
-#endif
+void Surf1DBase::Export(BufferFile * Buffer, exportFileType /*eft*/) {
+	char Line[kMaxLineLength];
+	if (!Grid) return;
+	//punch out the provided surface label
+	Buffer->WriteLine(Label, true);
+	//Write out the number of grid points
+	sprintf(Line, "%ld   //# points", NumGridPoints);
+	Buffer->WriteLine(Line, true);	// true means add a system-appropriate EOL
+	sprintf(Line, "%g %g %g   //Origin of the Line", Start.x, Start.y, Start.z);
+	Buffer->WriteLine(Line, true);
+	sprintf(Line, "%g %g %g   //End of the Line", End.x, End.y, End.z);
+	Buffer->WriteLine(Line, true);
+	//now write out the grid
+	long	ix, ival=0;
+	for (ix=0; ix < NumGridPoints; ix++) {
+		sprintf(Line, "%g ", Grid[ix]);
+		Buffer->PutText(Line);
+		ival++;
+		if (ival>=5) {	//5 values per line
+			Buffer->WriteLine("", true);
+			ival=0;
+		}
+	}
+	if (ival) 	Buffer->WriteLine("", true);
 }
 
 void Surf2DBase::Export(BufferFile * Buffer, exportFileType eft) {
