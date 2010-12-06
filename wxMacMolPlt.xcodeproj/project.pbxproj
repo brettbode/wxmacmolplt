@@ -2490,9 +2490,11 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I$(HOME)/software/wx/wx-2.9.0-debug/lib/wx/include/osx_carbon-unicode-debug-static-2.9",
-					"-I$(HOME)/software/wx/wx-2.9.0-debug/include/wx-2.9",
+					"-I$(HOME)/software/wx/wx-2.9.1-debug/lib/wx/include/osx_carbon-unicode-static-2.9",
+					"-I$(HOME)/software/wx/wx-2.9.1-debug/include/wx-2.9",
 					"-D__WXDEBUG__",
+					"-D__WXOSX__",
+					"-D__WXOSX_CARBON__",
 					"-D__WXMAC__",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
@@ -2501,7 +2503,7 @@
 					"-DHAVE_LIBMING",
 				);
 				OTHER_LDFLAGS = (
-					"-L$(HOME)/software/wx/wx-2.9.0-debug/lib/",
+					"-L$(HOME)/software/wx/wx-2.9.1-debug/lib/",
 					"-framework",
 					QuickTime,
 					"-framework",
@@ -2561,8 +2563,10 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I$(HOME)/software/wx/wx-2.9.0-univ/lib/wx/include/osx_carbon-unicode-release-static-2.9",
-					"-I$(HOME)/software/wx/wx-2.9.0-univ/include/wx-2.9",
+					"-I$(HOME)/software/wx/wx-2.9.1-univ/lib/wx/include/osx_carbon-unicode-static-2.9",
+					"-I$(HOME)/software/wx/wx-2.9.1-univ/include/wx-2.9",
+					"-D__WXOSX__",
+					"-D__WXOSX_CARBON__",
 					"-D__WXMAC__",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
@@ -2571,7 +2575,7 @@
 					"-DHAVE_LIBMING",
 				);
 				OTHER_LDFLAGS = (
-					"-L$(HOME)/software/wx/wx-2.9.0-univ/lib/",
+					"-L$(HOME)/software/wx/wx-2.9.1-univ/lib/",
 					"-framework",
 					QuickTime,
 					"-framework",
@@ -2702,7 +2706,8 @@
 		8B3B8B200A770A280041EA88 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = i386;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
