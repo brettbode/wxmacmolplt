@@ -87,8 +87,9 @@ void FileError::WriteError(void) {
 long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	char	Line[kMaxLineLength], token[kMaxLineLength], DFTTYP[kMaxLineLength]="";
 	short	scanerr;
-	long	nAtoms, EndOfGroup, StartPos, EndPos;
-	bool	BasisFound=false, BoolTest;
+	long	nAtoms;
+	wxFileOffset StartPos, EndPos;
+	bool	BasisFound=false, BoolTest, EndOfGroup;
 
 	ProgressInd->ChangeText("Reading GAMESS input file...");
 
@@ -376,7 +377,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			}
 		} while (!EndOfGroup);
 	}
-	float unitConversion = 1.0;
+	float unitConversion = 1.0f;
 	if (MainData->InputOptions->Data->GetUnits()) unitConversion = kBohr2AngConversion;
 	Buffer->SetFilePos(0);	//restart search from beginning of file
 	Frame * lFrame = MainData->GetCurrentFramePtr();
@@ -405,9 +406,9 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 							CPoint3D	pos;
 							float		AtomType;
 						Buffer->GetLine(Line);
-						if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+						if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 						{ throw UserCancel();}
-						pos.x = pos.y = pos.z = 0.0;
+						pos.x = pos.y = pos.z = 0.0f;
 						sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
 						pos *= unitConversion;
 						lFrame->AddAtom((long) AtomType, pos);
@@ -427,7 +428,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 						MainData->GenerateSymmetryDependentAtoms();
 					}
 				} else if (MainData->InputOptions->Data->GetCoordType() <= ZMTCoordType) {
-					long bPos = Buffer->FindBlankLine();
+					wxFileOffset bPos = Buffer->FindBlankLine();
 					if ((bPos > 0)&&(bPos < EndPos)) {
 						nAtoms = Buffer->GetNumLines(bPos - StartPos);
 					}
@@ -466,9 +467,9 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				CPoint3D	pos;
 				float		AtomType;
 				Buffer->GetLine(Line);
-				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+				if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 				{ throw UserCancel();}
-				pos.x = pos.y = pos.z = 0.0;
+				pos.x = pos.y = pos.z = 0.0f;
 				sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
 				pos *= unitConversion;
 				lFrame->AddAtom((long) AtomType, pos);
@@ -498,9 +499,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		if (ReadLongKeyword(Line, "NBUFFMO", &tag))
 			MainData->InputOptions->EFP.SetNumBufferMOs(tag);
 
-		long former_pos;
-		long start_pos;
-		int found_it;
+		wxFileOffset former_pos, start_pos, found_it;
 		//Now tackle the individual fragment definitions
 		//These should consist of 4 line blocks of Fragname=xxx followed by three atom lines
 		//For now I am only going to deal with cartesian coordinates
@@ -664,7 +663,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					// or opposite direction as dst_vec.
 					CPoint3D axis;
 					UnitCrossProduct3D(&mid_norm, &dst_norm, &axis);
-					RotateAroundAxis(tri2tri, axis, acos(dot) * 180.0f / kPi);
+					RotateAroundAxis(tri2tri, axis, acos(dot) * 180.0 / kPi);
 
 					// We concatenate the two rotation matrices.
 					Matrix4D transform;
@@ -694,8 +693,8 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	if (MainData->InputOptions->FMO.IsFMOActive()) {
 		Buffer->SetFilePos(0);	//restart search from beginning of file
 		if (Buffer->FindGroup("FMO")) {
-			long startFMO = Buffer->GetFilePos();
-			long EndOfGroup;
+			wxFileOffset startFMO = Buffer->GetFilePos();
+			wxFileOffset EndOfGroup;
 			if (Buffer->LocateKeyWord("$END", 4)) {
 				EndOfGroup = Buffer->GetFilePos();
 			} else {
@@ -913,8 +912,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	// number of atomes in the structure described by this file
 	long nAtoms = 0;
 	// Placeholders for traversing file sections in Buffer
-	long startOfSection = 0;
-	long endOfSection = -1;
+	wxFileOffset startOfSection = 0;
+	wxFileOffset endOfSection = -1;
 	// counters for line-by-line text input:
 	// # of tokens sucessfully read in a sscanf call, # bytes total in line, 
 	// current position in line, and the # of bytes read through one sscanf call
@@ -940,14 +939,14 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			Buffer->SetFilePos(startOfSection);
 		} else endOfSection = Buffer->GetFileSize();
 		while (Buffer->GetFilePos() < endOfSection) {
-			long startOfFramePos = Buffer->GetFilePos();
-			long endOfFramePos = endOfSection;
+			wxFileOffset startOfFramePos = Buffer->GetFilePos();
+			wxFileOffset endOfFramePos = endOfSection;
 			//individual geometries are separated by the "$$" line
 			if (Buffer->LocateKeyWord("$$", 2, endOfSection)) {
 				endOfFramePos = Buffer->GetFilePos();
 				Buffer->SetFilePos(startOfFramePos);
 			}
-			nAtoms = Buffer->GetNumLines(endOfFramePos);
+			nAtoms = (long) Buffer->GetNumLines(endOfFramePos);
 			if (lFrame->GetNumAtoms()>0)
 				lFrame = MainData->AddFrame(nAtoms, 0);
 			for (long i=0; i<nAtoms; ++i) {
@@ -1511,15 +1510,15 @@ long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, TextFileType fileType) {
 	// buffer line for text to be scanned while parsing
 	char		Line[kMaxLineLength];
 	// placeholder for traversing file sections in Buffer
-	long		startOfAtoms = 1;
+	wxFileOffset	startOfAtoms = 1;
 	// # of tokens sucessfully read in a sscanf call, # line of atoms read 
 	int			scanCount = 0, iLine = 0;
 	// vars for holding sscanf read, borrowing some from ParseMOPACZMatrix()
 	CPoint3D	pos = CPoint3D(0.0f, 0.0f, 0.0f);	// just a placeholder
 	char		symbol[4];	// This could probably safely be 2-3 chars long
-	float		bondLength = -0.1, bondAngle = 0.0, bondDihedral = 0.0;
+	float		bondLength = -0.1f, bondAngle = 0.0f, bondDihedral = 0.0f;
 	// sane defaults to avoid accessing unassigned variables
-	long		firstAtomType = -1, AtomType = -1, nAtoms = 0;
+	long		AtomType = -1, nAtoms = 0;
 	int			j1 = -1, j2 = -1, j3 = -1, con1, con2, con3;
 	bool		error = false;
 
@@ -1571,7 +1570,7 @@ long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, TextFileType fileType) {
 		MainData->IntCoords->CreateMOPacInternals(3*nAtoms);
 		mInts = MainData->IntCoords->GetMOPacStyle();
 	}
-	float unitConversion = 1.0;
+	float unitConversion = 1.0f;
 	if (MainData->InputOptions && MainData->InputOptions->Data->GetUnits()) 
 		unitConversion = kBohr2AngConversion;
 
@@ -1718,8 +1717,8 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 				if (Prefs->GetAutoBond())	//setup bonds, if needed
 					lFrame->SetBonds(Prefs, false);
 			}
-			long cPos = Buffer->GetFilePos();
-			long fileLength = Buffer->GetFileLength();
+			wxFileOffset cPos = Buffer->GetFilePos();
+			wxFileOffset fileLength = Buffer->GetFileLength();
 			if (cPos < fileLength) {	//If we haven't reached the end of the file
 				Buffer->GetLine(Line);	//check to see if another frame is available
 				scanerr = sscanf(Line, "%ld", &nAtoms);
@@ -1730,7 +1729,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 						lFrame = MainData->AddFrame(nAtoms,0);
 						if (!lFrame) throw MemoryError();
 						Buffer->GetLine(Line);
-						if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+						if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 							{ throw UserCancel();}
 					} else {
 						++nSkip;
@@ -1757,7 +1756,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 						fileBonds=0;
 	int					nchar;
 	long				test=0, Mode=0;
-	float				BondLength=0.0;
+	float				BondLength=0.0f;
 	char				LineText[kMaxLineLength+1], KeyWord[kMaxLineLength+1], token[5];
 
 	ProgressInd->ChangeText("Reading MolPlt format file...");
@@ -1823,7 +1822,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 			long AtomType;
 			CPoint3D Pos, Vector;
 
-		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 		{ throw UserCancel();}
 		Buffer->GetLine(LineText);
 		test = ParseCartLine(LineText, &AtomType, &Pos, &Vector, Mode);
@@ -1869,7 +1868,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 				while (LineText[LinePos] && ((LineText[LinePos] < '0')||
 						(LineText[LinePos] > '9'))) ++LinePos;
 				while (LinePos >= LineLength) {	//EOL reached try getting a new line
-					long CurrentPos = Buffer->GetFilePos();
+					wxFileOffset CurrentPos = Buffer->GetFilePos();
 					Buffer->GetLine(LineText);
 					if ((-1<FindKeyWord(LineText, "ATOMIC", 6))||
 						(-1<FindKeyWord(LineText, "MODE", 4))) {
@@ -1913,7 +1912,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 		ii=0;
 		try {
 					/* Now locate the first frequency (skipping the atomic masses) */
-			long CurrentPos = Buffer->GetFilePos();
+			wxFileOffset CurrentPos = Buffer->GetFilePos();
 			Buffer->GetLine(LineText);
 			while (-1>=FindKeyWord(LineText, "MODE", 4)) {
 				CurrentPos = Buffer->GetFilePos();
@@ -1923,7 +1922,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 
 			for (; ii < (3*(lFrame->NumAtoms)); ++ii) {
 				/* Allow user cancels */
-				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+				if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 					{ throw UserCancel();}
 				Buffer->GetLine(LineText);
 				for (j=0; LineText[j] && (LineText[j] != '='); ++j) ;
@@ -2079,7 +2078,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 	Buffer->SetFilePos(0);
 	// Now look for the ATOMS keyword to use as coordinates for any MOs 
 	if (Buffer->LocateKeyWord("[ATOMS]", 7, -1)) {
-		float unitConv = 1.0;	//default to angstroms
+		float unitConv = 1.0f;	//default to angstroms
 		Buffer->GetLine(LineText);
 		if (FindKeyWord(LineText, "AU", 2) > 0) unitConv = kBohr2AngConversion;
 		if (lFrame->NumAtoms > 0) lFrame = MainData->AddFrame(lFrame->NumAtoms, 0);
@@ -2162,13 +2161,13 @@ long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
 	if (!zcore) throw MemoryError();
 	for (atom=0; atom<cFrame->NumAtoms; ++atom) zcore[atom]=0;
 	
-	long StartPos = Buffer->GetFilePos();
+	wxFileOffset StartPos = Buffer->GetFilePos();
 	//This works for both ECPs and MCPs
 	if (!Buffer->LocateKeyWord("CP RUN REMOVES", 14, -1)) {
 		delete [] zcore;
 		return 0;
 	}
-	long EndPos = Buffer->GetFilePos();
+	wxFileOffset EndPos = Buffer->GetFilePos();
 	Buffer->GetLine(LineText);	//read in the number of electrons removed
 	sscanf(&(LineText[15]),"%ld", &ElectronsRemoved);
 
@@ -2238,9 +2237,9 @@ long MoleculeData::ParseTinkerCoordinates(BufferFile *Buffer) {
 	//Grab the tinker coordinate output
 	
 	Buffer->SkipnLines(3);
-	long StartPos = Buffer->GetFilePos();
+	wxFileOffset StartPos = Buffer->GetFilePos();
 	if (!(Buffer->LocateKeyWord("-----------", 11, -1))) throw DataError();
-	long test = Buffer->GetFilePos() - StartPos;
+	wxFileOffset test = Buffer->GetFilePos() - StartPos;
 	Buffer->SetFilePos(StartPos);
 	long numlines = Buffer->GetNumLines(test) - 1;
 	if (numlines > 0) {
@@ -2276,13 +2275,13 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 	}	
 		//Grab the tinker coordinate output from the top of the file
 	ProgressInd->ChangeText("Reading Tinker Coordinates");
-	if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+	if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 		{throw UserCancel();}
 
 	Buffer->SkipnLines(3);
-	long StartPos = Buffer->GetFilePos();
+	wxFileOffset StartPos = Buffer->GetFilePos();
 	if (!(Buffer->LocateKeyWord("-----------", 11, -1))) throw DataError();
-	long test = Buffer->GetFilePos() - StartPos;
+	wxFileOffset test = Buffer->GetFilePos() - StartPos;
 	Buffer->SetFilePos(StartPos);
 	long numlines = Buffer->GetNumLines(test) - 1;
 	if (numlines > 0) {
@@ -2310,7 +2309,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 		//Now add the full ab initio atoms
 	if (Buffer->LocateKeyWord("COORDINATES (BOHR)", 16, -1)) {	//first normal (ab initio) atoms
 		ProgressInd->ChangeText("Reading Coordinates");
-		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 			{ AbortOpen("File open canceled by user"); return 0;}
 
 		Buffer->SkipnLines(2);
@@ -2334,7 +2333,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 	//attempt to read in the atomic basis set
 	if (Buffer->LocateKeyWord("ATOMIC BASIS SET", 16)) {
 		ProgressInd->ChangeText("Reading atomic basis set");
-		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 		{ throw UserCancel();}
 		try {
 			MainData->ParseGAMESSBasisSet(Buffer);
@@ -2385,9 +2384,10 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, float offset) {
 	Frame *			lpFrame;
 	long			test=0, numlines=0, OccupiedOrbCount=0, NumFragmentAtoms=0,
-					NumOccAlpha=0, NumOccBeta=0, NumBetaUHFOrbs=0, LinePos, StartPos,
-					NumCoreOrbs, NumOpenOrbs, NumGVBPairOrbs, EnergyPos,
-					ReadMP2Orbitals=1, NextFinalPos, SavedPos;
+					NumOccAlpha=0, NumOccBeta=0, NumBetaUHFOrbs=0, LinePos,
+					NumCoreOrbs, NumOpenOrbs, NumGVBPairOrbs,
+					ReadMP2Orbitals=1;
+	wxFileOffset	EnergyPos, NextFinalPos, SavedPos, StartPos;
 	float			*Occupancy = NULL;
 	bool			KeyWordFound, SIMOMM=false;
 	char			LineText[kMaxLineLength], token[kMaxLineLength];
@@ -2401,7 +2401,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		//First Skip over all of the input card lines
 	while (Buffer->LocateKeyWord("INPUT CARD>", 11))
 		Buffer->SkipnLines(1);
-	long HeaderEndPos = Buffer->GetFilePos();
+	wxFileOffset HeaderEndPos = Buffer->GetFilePos();
 	Buffer->LocateKeyWord("RUN TITLE", 9);	//find and skip over run title since
 	Buffer->SkipnLines(3);					//it can contain any arbitrary text
 	if (Buffer->LocateKeyWord("FINAL", 5)) {//locate initial energy since all options are before it
@@ -2422,7 +2422,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			LinePos = FindKeyWord(LineText, "=", 1) + 1;
 			sscanf(&(LineText[LinePos]),"%ld", &NumOccBeta);
 		}
-		LinePos = Buffer->GetFilePos();
+		SavedPos = Buffer->GetFilePos();
 			//Check for ECP/MCP type run which reduces the number of occupied orbitals
 		if (Buffer->LocateKeyWord("CP RUN REMOVES", 14, EnergyPos)) {
 			Buffer->GetLine(LineText);	//read in the number of electrons removed
@@ -2432,10 +2432,9 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			if (NumOccAlpha < 0) NumOccAlpha = 0;	//Oops!
 			if (NumOccBeta) NumOccBeta -= test;
 			if (NumOccBeta<0) NumOccBeta = 0;
-			Buffer->SetFilePos(LinePos);
+			Buffer->SetFilePos(SavedPos);
 		}
 		if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {	//Calculate the # of occupied MOs by parsing the DRT info
-		//	long filePos = Buffer->GetFilePos();
 			if (Buffer->LocateKeyWord("GUGA DISTINCT ROW TABLE", 23, EnergyPos)) {
 					long nfzc=0, ndoc=0, nmcc=0, naos=0, nbos=0, nalp=0, nval=0;
 				if (Buffer->LocateKeyWord("NFZC=",5, EnergyPos)) {
@@ -2471,7 +2470,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		KeyWordFound = Buffer->LocateKeyWord("BASIS OPTIONS", 13, EnergyPos);
 		if (KeyWordFound) {	//Read in the basis set information (for user reference)
 			ProgressInd->ChangeText("Reading Basis information");
-			if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+			if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 				{ throw UserCancel();}
 			MainData->ReadBasisOptions(Buffer);
 		}
@@ -2502,7 +2501,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 //			return (ParseSIMMOMLogFile(Buffer, EnergyPos));
 			SIMOMM=true;
 			ProgressInd->ChangeText("Reading Tinker Coordinates");
-			if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+			if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 			{throw UserCancel();}
 			MainData->ParseTinkerCoordinates(Buffer);
 			//The ab initio atoms will be added below
@@ -2510,7 +2509,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	//locate the input set of coordinates (present in every file)
 		if (Buffer->LocateKeyWord("COORDINATES (BOHR)", 16, EnergyPos)) {	//first normal (ab initio) atoms
 			ProgressInd->ChangeText("Reading Coordinates");
-			if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+			if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 				{ AbortOpen("File open canceled by user"); return 0;}
 
 			Buffer->SkipnLines(2);
@@ -2528,10 +2527,10 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				throw DataError();
 			}
 		}
-		LinePos = Buffer->GetFilePos();		//next look for fragments
+		StartPos = Buffer->GetFilePos();		//next look for fragments
 		if (Buffer->LocateKeyWord("READING $EFRAG GROUP", 20, EnergyPos)) {	//ughh fragments!
 			NumFragmentAtoms = MainData->ReadInitialFragmentCoords(Buffer);
-			Buffer->SetFilePos(LinePos);
+			Buffer->SetFilePos(StartPos);
 		}
 		if (lFrame->NumAtoms <= 0) {	//initial coordinates not found! Abort!
 			wxLogMessage(_("Unable to locate coordinates in the file."));
@@ -2544,7 +2543,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	//if it is not located and read in correctly MO vectors will also be skipped
 		if (Buffer->LocateKeyWord("ATOMIC BASIS SET", 16, EnergyPos)) {
 			ProgressInd->ChangeText("Reading atomic basis set");
-			if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+			if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 				{ throw UserCancel();}
 			try {
 				MainData->ParseGAMESSBasisSet(Buffer);
@@ -2608,7 +2607,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			LinePos = FindKeyWord(LineText, "=", 1) + 1;
 			sscanf(&(LineText[LinePos]),"%ld", &NumOccBeta);
 		}
-		LinePos = Buffer->GetFilePos();
+		SavedPos = Buffer->GetFilePos();
 			//Check for ECP type run which reduces the number of occupied orbitals
 		if (Buffer->LocateKeyWord("ECP POTENTIALS", 14, EnergyPos)||
 			Buffer->LocateKeyWord("MODEL-POTENTIALS", 16, EnergyPos)) {
@@ -2618,7 +2617,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			if (NumOccAlpha < 0) NumOccAlpha = 0;	//Oops!
 			if (NumOccBeta) NumOccBeta -= test;
 			if (NumOccBeta<0) NumOccBeta = 0;
-			Buffer->SetFilePos(LinePos);
+			Buffer->SetFilePos(SavedPos);
 		}
 		//DFT options
 		if (Buffer->LocateKeyWord("GRID-BASED DFT", 14, EnergyPos)) {
@@ -2685,8 +2684,8 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			}
 			Occupancy = new float[MainData->GetNumBasisFunctions()];
 			if (!Occupancy) throw MemoryError();
-			for (test=0; test<MainData->GetNumBasisFunctions(); ++test) Occupancy[test] = 0.0;
-			for (test=0; test<NumCoreOrbs; ++test) Occupancy[test] = 2.0;
+			for (test=0; test<MainData->GetNumBasisFunctions(); ++test) Occupancy[test] = 0.0f;
+			for (test=0; test<NumCoreOrbs; ++test) Occupancy[test] = 2.0f;
 			if (NumOpenOrbs > 0) {	//Parse the occupancies of the open shells
 				if (Buffer->LocateKeyWord("F VECTOR (OCCUPANCIES)", 23)) {
 						long nSkip = 3;
@@ -2700,7 +2699,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				}
 			}
 		} else if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {	//Calculate the # of occupied MOs by parsing the DRT info
-			long filePos = Buffer->GetFilePos();
+			wxFileOffset filePos = Buffer->GetFilePos();
 			if (Buffer->LocateKeyWord("GUGA DISTINCT ROW TABLE", 23, EnergyPos)) {
 					long nfzc=0, ndoc=0, nmcc=0, naos=0, nbos=0, nalp=0, nval=0;
 				if (Buffer->LocateKeyWord("NFZC=",5)) {
@@ -2744,7 +2743,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		} else if (MainData->InputOptions->Control->GetRunType() == IRCRun) {
 			//Confirm that the first energy is before the start of the IRC
 			if (Buffer->LocateKeyWord("JUMPING OFF SADDLE POINT ALONG THE IMAGINARY NORMAL MODE", 55)) {
-				long test = Buffer->GetFilePos();
+				wxFileOffset test = Buffer->GetFilePos();
 				if (EnergyPos > test) {
 					return OpenGAMESSIRCLog(Buffer, flip, offset, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
 				}
@@ -2851,7 +2850,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 								Buffer->SetFilePos(Buffer->FindBlankLine());
 								Buffer->SkipnLines(1);
 								ProgressInd->ChangeText("Reading eigenvectors");
-								if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+								if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 									{ AbortOpen("File open canceled by user"); return 0;}
 								OrbitalRec * OrbSet = lFrame->ParseGAMESSEigenVectors(Buffer, MainData->GetNumBasisFunctions(),
 									MainData->GetNumBasisFunctions(), NumBetaUHFOrbs, NumOccAlpha, NumOccBeta,
@@ -2984,7 +2983,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		strcpy(GeoSearchToken, "1NSERCH");
 	}
 	while (KeyWordFound) {
-		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 			{ throw UserCancel();}
 		KeyWordFound = false;
 			//Advance to the start of the next geometry step BEGINNING GEOMETRY SEARCH POINT
@@ -3006,7 +3005,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 						sscanf(&(LineText[LinePos+k+1]), "%lf", &FrameEnergy);
 				}
 				if (MainData->InputOptions->Control->GetMPLevel()==2) {	//MP2 run so look for MP2 energy
-					long temp = Buffer->GetFilePos();
+					wxFileOffset temp = Buffer->GetFilePos();
 					if (Buffer->LocateKeyWord("E(MP2)=", 7)) {
 						Buffer->GetLine(LineText);
 						sscanf(&(LineText[8]), "%lf", &MP2FrameEnergy);
@@ -3042,7 +3041,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				//Let the user know we are still making progress
 			sprintf(LineText, "Reading Coordinates: frame %ld", MainData->NumFrames);
 			ProgressInd->ChangeText(LineText);
-			if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+			if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 				{ throw UserCancel();}
 			EnergyPos = Buffer->GetFilePos();
 
@@ -3094,7 +3093,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 						} else if (Buffer->LocateKeyWord(" NSERCH", 7, NextFinalPos)) {
 							//Otherwise look for the coordinates at the end of the
 							//geometry step (pre 1998 style)
-							long npos = Buffer->GetFilePos();
+							wxFileOffset npos = Buffer->GetFilePos();
 							Buffer->SkipnLines(9);
 							test = ParseGLogLine(Buffer, lFrame, lpFrame->NumAtoms-NumFragmentAtoms, 1, &(MainData->MaxSize));
 							if (test==-1) {	//Something was wrong with this set of coordinates
@@ -3106,7 +3105,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 						}
 					}
 					if (NumFragmentAtoms > 0) {
-						long tempPos = Buffer->GetFilePos();
+						wxFileOffset tempPos = Buffer->GetFilePos();
 						Buffer->SetFilePos(StartPos);
 						if (Buffer->LocateKeyWord(GeoSearchToken, strlen(GeoSearchToken))) {
 				//		if (Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31) || 
@@ -3218,7 +3217,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 						if (MainData->InputOptions->Control->GetCIType() == 4) {
 							//CIS output includes the EIGENVECTORS token
 							//I think the regular EIGENVECTORS would be before the CIS line???
-							long bp = Buffer->GetFilePos();
+							wxFileOffset bp = Buffer->GetFilePos();
 							test = Buffer->LocateKeyWord("EIGENVECTORS", 12, NextFinalPos);
 							Buffer->BackupnLines(1);
 							if (Buffer->LocateKeyWord("CIS EIGENVALUES", 14, 80+Buffer->GetFilePos())) {
@@ -3259,7 +3258,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 								Buffer->SetFilePos(Buffer->FindBlankLine());
 								Buffer->SkipnLines(1);
 								ProgressInd->ChangeText("Reading eigenvectors");
-								if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+								if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 									{throw UserCancel();}
 								OrbitalRec * OrbSet = lFrame->ParseGAMESSEigenVectors(Buffer, MainData->GetNumBasisFunctions(),
 									MainData->GetNumBasisFunctions(), NumBetaUHFOrbs, NumOccAlpha, NumOccBeta,
@@ -3334,7 +3333,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			if (KeyWordFound) {
 				Buffer->SkipnLines(2);
 				ProgressInd->ChangeText("Reading localized orbitals");
-				if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+				if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 					{ throw UserCancel();}
 				OrbitalRec * OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
 					NumBetaUHFOrbs, ProgressInd, false);
@@ -3349,7 +3348,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				if (KeyWordFound) {
 					Buffer->SkipnLines(2);
 					ProgressInd->ChangeText("Reading oriented localized orbitals");
-					if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+					if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 						{ throw UserCancel();}
 					OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
 						NumBetaUHFOrbs, ProgressInd, true);
@@ -3582,8 +3581,8 @@ void MoleculeData::ReadBasisOptions(BufferFile * Buffer) {
 void MoleculeData::ReadControlOptions(BufferFile * Buffer) {
 		long	test;
 		char	LineText[kMaxLineLength], token[kMaxLineLength];
-	long StartPos = Buffer->GetFilePos();	//All keywords should be between these positions
-	long EndPos = Buffer->FindBlankLine();
+	wxFileOffset StartPos = Buffer->GetFilePos();	//All keywords should be between these positions
+	wxFileOffset EndPos = Buffer->FindBlankLine();
 	if (!Buffer->LocateKeyWord("SCFTYP", 6, EndPos)) throw DataError();
 	Buffer->GetLine(LineText);
 	sscanf(&(LineText[7]), "%s", token);
@@ -3692,8 +3691,8 @@ void MoleculeData::ReadControlOptions(BufferFile * Buffer) {
 }
 void SystemGroup::ReadSystemOptions(BufferFile * Buffer) {
 	char	LineText[kMaxLineLength], token[kMaxLineLength];
-	long StartPos = Buffer->GetFilePos();	//All keywords should be between these positions
-	long EndPos = Buffer->FindBlankLine();
+	wxFileOffset StartPos = Buffer->GetFilePos();	//All keywords should be between these positions
+	wxFileOffset EndPos = Buffer->FindBlankLine();
 
 	if (Buffer->LocateKeyWord("MEMORY=", 7, EndPos)) {
 		Buffer->GetLine(LineText);
@@ -3771,7 +3770,7 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 	//search for the beginning of the information packet
 	
 	while (Buffer->LocateKeyWord("DATA PACKET", 11, -1)) {
-		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 		{ throw UserCancel();}
 		//if this is an irc we could pull the point out of the header line
 		if (runType == IRCRun) {
@@ -4051,11 +4050,11 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 		sscanf(&(LineText[LinePos]), "%lf", &(lFrame->Energy));
 		Buffer->SkipnLines(1);	//skip "Coordinates (bohr)... label line
 
-		LinePos = Buffer->GetFilePos();
+		wxFileOffset start = Buffer->GetFilePos();
 		if (!Buffer->LocateKeyWord("MASS-WEIGHTED GRADIENT", 22)) throw DataError();
-		NumAtoms = Buffer->GetFilePos();
-		Buffer->SetFilePos(LinePos);
-		NumAtoms = Buffer->GetNumLines(NumAtoms-LinePos);
+		wxFileOffset endpos = Buffer->GetFilePos();
+		Buffer->SetFilePos(start);
+		NumAtoms = Buffer->GetNumLines(endpos-start);
 		
 		if (!MainData->SetupFrameMemory(NumAtoms, 0)) throw MemoryError();
 
@@ -4067,7 +4066,7 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 	NumAtoms = lFrame->NumAtoms;
 	KeyWordFound = Buffer->LocateKeyWord("POINT=", 6);
 	while (KeyWordFound) {
-		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 			{ throw UserCancel();}
 		Buffer->GetLine(LineText);
 		LinePos = 6;
@@ -4123,7 +4122,7 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 		if (KeyWordFound) LINEAR=true;
 	}
 	while (KeyWordFound) {
-		if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 			{ throw UserCancel();}
 		if (LINEAR) Buffer->BackupnLines(1);
 		Buffer->SkipnLines(1);
@@ -4173,9 +4172,9 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 			if (Prefs->GetAutoBond())
 				lFrame->SetBonds(Prefs, false);
 		}
-		long SavedPos = Buffer->GetFilePos();
+		wxFileOffset SavedPos = Buffer->GetFilePos();
 		KeyWordFound = Buffer->LocateKeyWord(NextPointKeyword, 20);
-		long NextPointPos = -1;
+		wxFileOffset NextPointPos = -1;
 		if (KeyWordFound) NextPointPos = Buffer->GetFilePos();
 		if (lFrame) {
 				//Attempt to read in orbitals for this geometry
@@ -4190,7 +4189,7 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 							Buffer->SetFilePos(Buffer->FindBlankLine());
 							Buffer->SkipnLines(1);
 							ProgressInd->ChangeText("Reading eigenvectors");
-							if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 								{ throw UserCancel();}
 							lFrame->ParseGAMESSEigenVectors(Buffer, MainData->GetNumBasisFunctions(),
 								MainData->GetNumBasisFunctions(), NumBetaUHFOrbs, NumOccAlpha, NumOccBeta,
@@ -4251,7 +4250,7 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 		FileSave = 33; //DRC bit 6 plus bit 1 for saving
 #endif
 	}
-	long FilePos = Buffer->GetFilePos();
+	wxFileOffset FilePos = Buffer->GetFilePos();
 	QPpresent = Buffer->LocateKeyWord("Q          P", 12);
 	if (!QPpresent) newQPformat = Buffer->LocateKeyWord("Q              P", 16);
 	Buffer->SetFilePos(FilePos);
@@ -4289,9 +4288,9 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 			Buffer->SkipnLines(1);
 		FilePos = Buffer->GetFilePos();
 		Buffer->LocateKeyWord("--------", 8);
-		NumAtoms = Buffer->GetFilePos();
+		wxFileOffset endPos = Buffer->GetFilePos();
 		Buffer->SetFilePos(FilePos);
-		NumAtoms = Buffer->GetNumLines(NumAtoms-FilePos)-1;
+		NumAtoms = Buffer->GetNumLines(endPos-FilePos)-1;
 		if (NumAtoms <= 0) throw DataError();
 
 		if (!MainData->SetupFrameMemory(NumAtoms, 0)) throw MemoryError();
@@ -4310,7 +4309,7 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 		Buffer->SkipnLines(1);
 		if (nskip >= DRCnSkip) {
 			nskip = 0;
-			if (!ProgressInd->UpdateProgress((100*Buffer->GetFilePos())/Buffer->GetFileLength()))
+			if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 				{ throw UserCancel();}
 			Buffer->GetLine(LineText);
 			sscanf(LineText, "%f", &tempfloat);
@@ -4431,7 +4430,7 @@ void MolDisplayWin::WriteTabbedEnergies(BufferFile * Buffer, bool AllFrames) {
 	Buffer->WriteLine("", true);
 
 	Frame * lFrame = MainData->Frames;
-	float	UnitFactor = 1.0;
+	float	UnitFactor = 1.0f;
 	if (lEOpts->GetDisplayUnits() == kKCalPerMole) UnitFactor = kHartreeTokCalPMol;
 	long NumFrames = MainData->NumFrames;
 	if (!AllFrames) {
@@ -4541,7 +4540,7 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 		}
 		for (i=0; i<20; ++i) {
 			if ((i==5)||(i==15)) {
-				offsetFactor *= -1.0;
+				offsetFactor *= -1.0f;
 			}
 			for (iatm=0; iatm<(lFrame->NumAtoms); ++iatm) {
 				tempAtoms[iatm].x += offsetFactor*(ModeOffset[iatm].x);
@@ -4758,7 +4757,7 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer) {
 			NormalOffset.y = offset.y/length;
 			NormalOffset.z = offset.z/length;
 		} else {
-			NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0;
+			NormalOffset.x=NormalOffset.y=NormalOffset.z=0.0f;
 		}
 
 		SetRotationMatrix(rotMat, &NormStart, &NormalOffset);

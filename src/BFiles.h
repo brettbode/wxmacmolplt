@@ -15,6 +15,7 @@
 #define __BFILE__
 #include <stdio.h>
 #include "Globals.h"
+#include <wx/ffile.h>
 
 #define	kBufferSize		262144		///<default file buffer size (for BufferFile internal buffer)
 #define kMaxLineLength	180			///<arbitrary Max line length (should handle 132 col lines), used throughout the program
@@ -101,22 +102,18 @@ void ConvertExponentStyle(char * Line);
 */
 class BufferFile {
 	private:
-		char *		Buffer;
-		long		BufferStart;
-		long		ByteCount;
+		char *		Buffer;		///< Working buffer for the file
+		wxFileOffset	BufferStart;	///<File position of the start of the Buffer
+		wxFileOffset	ByteCount;	///<File length
 						//Blocks allow the user to restrict reads to a given
 						//size below that of the total file length
 		long		BlockCount;
-		long *		BlockLengths;
+		wxFileOffset *	BlockLengths;
 		long		BlockArrayAllocation;
-		long		BufferPos;
-		long		BufferSize;		//Size (in bytes) of IO buffer
+		long		BufferPos;		/// Current offset within the working buffer
+		long		BufferSize;		/// Size (in bytes) of IO buffer
 		long		LinePos;
-#ifdef UseMacIO
-		short		FileRefNum;
-#else
-		FILE *		FilePtr;
-#endif
+		wxFFile	*	myFile;
  		short		ColsPerLine;
  		short		IOType;
  		char		EOLchar;
@@ -125,27 +122,23 @@ class BufferFile {
  		void AdvanceBuffer(void);
  	public:
  			//Build a read buffer on the specified (already open!) file
-#ifdef UseMacIO
- 		BufferFile(short TargetFileRef, bool Write);
-#else
 		///Contructor used to operate on a pre-opened file.
  		BufferFile(FILE * TargetFileRef, bool Write);
-#endif
 		/// Contructor used to operate on a preallocated character buffer
  		BufferFile(char * TargetPtr, long PtrSize);
  		~BufferFile(void);
 		/// Obtain the current file position
-		long GetFilePos(void);
+		inline wxFileOffset GetFilePos(void) const {return BufferStart+BufferPos;};
 		///Set the file position
-		void SetFilePos(long NewPos);
+		void SetFilePos(wxFileOffset NewPos);
 		///returns the current file length (valid for read and write opporations)
-		inline long GetFileLength(void) {return ((ByteCount>GetFilePos())?ByteCount:GetFilePos());};
+		inline wxFileOffset GetFileLength(void) const {return ((ByteCount>GetFilePos())?ByteCount:GetFilePos());};
 		/** Attempt to discern the file type (format) based on the filename and the contents.
 		 * @param fileName The name of the file, used to examine the file extension
 		 */
 		TextFileType GetFileType(const char * fileName);
 		///Find the specified GAMESS group name " $GroupName ...". 
-		long FindGroup(const char * GroupName);
+		wxFileOffset FindGroup(const char * GroupName);
 		/** Read NumBytes bytes from the file into the target string.
 		 * Note attempting to read past the end of the file will cause an exception to be thrown.
 		 * @param Target The pre-allocated buffer to read into which must be at least NumBytes+1 bytes long.
@@ -180,22 +173,22 @@ class BufferFile {
 		 * @param Limit (optional) The file position limit (in bytes) to limit the search. -1 will
 		 *							search to the end of the file.
 		 */
-		bool LocateKeyWord(const char Keyword[], long NumByte, long Limit = -1);
+		bool LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset Limit = -1);
 		/** Obtain the position of the next blank line.
 		 * The return value is the position. The file position is unchanged upon exit.
 		 */
-		long FindBlankLine(void);
+		wxFileOffset FindBlankLine(void);
 		/** Count the number of lines in the next size bytes.
 		 * return value is the line count. The file position is unchanged upon exit.
 		 * @param size Bytecount to search through
 		 */
 		long GetNumLines(long size);
 		///Move the file position forward NumBytes.
- 		long BufferSkip(long NumBytes);
+ 		wxFileOffset BufferSkip(wxFileOffset NumBytes);
 		///Set the column count for line wrapping in the WriteLine routine
  		inline void SetColsPerLine(short newVal) {ColsPerLine = newVal;};
 		/// Obtain the current file position as a percentage of the file size.
- 		inline float GetPercentRead(void) {return (float) 100.0*GetFilePos()/GetFileLength();};
+ 		inline float GetPercentRead(void) {return (float) (100.0*GetFilePos()/GetFileLength());};
 		/// Simply write Numbytes from Source to the file.
  		long Write(const char * Source, long NumBytes);
 		/** Output the specified text, wrapping the lines intelligently if needed.
@@ -221,9 +214,9 @@ class BufferFile {
 		///Pop the current block length restriction off the list.
  		void FinishBlock(void);
 		///obtain the file size
-		inline long GetFileSize(void) const {return ByteCount;};
+		inline wxFileOffset GetFileSize(void) const {return ByteCount;};
 		///How many bytes are left in the current search block.
- 		long BytesLeftInBlock(void) {return (BlockLengths[0]-GetFilePos());};
+ 		wxFileOffset BytesLeftInBlock(void) {return (BlockLengths[0]-GetFilePos());};
 		/** Read the next long value skipping any whitespace.
 		 *  Returns true if successful.
 		 *  The buffer pos is moved to the next byte after the long on success, unchanged otherwise.
@@ -231,7 +224,15 @@ class BufferFile {
 		 * @param Limit (optional) The file position limit (in bytes) to limit the search. The default
 		 *				will search to the end of the file.
 		 */
-		bool ReadLongValue(long & target, long Limit=-1);
- };
+		bool ReadLongValue(long & target, wxFileOffset Limit=-1);
+		/** Return the percentage done represented by the current file position relative to the file size
+		 */
+		float PercentRead(void) const {
+			float result = 0.0f;
+			if (ByteCount>0)
+				result = (float) ((100*GetFilePos())/GetFileLength());
+			return result;
+		};
+};
  
 #endif

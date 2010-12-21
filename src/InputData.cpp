@@ -1027,10 +1027,10 @@ TimeUnit SystemGroup::SetTimeUnits(TimeUnit NewUnits) {
 	return TimeUnits;
 }
 float SystemGroup::GetConvertedTime(void) const {
-	float result, factor=1.0;
+	float result, factor=1.0f;
 
 	if (TimeLimit) result = TimeLimit;
-	else result = 525600.0;
+	else result = 525600.0f;
 
 	switch (TimeUnits) {
 		case milleniaUnit:
@@ -1046,7 +1046,7 @@ float SystemGroup::GetConvertedTime(void) const {
 		case minuteUnit:
 		break;
 		case secondUnit:
-			factor = 60.0;
+			factor = 60.0f;
 		break;
 	}
 	result *= factor;
@@ -1366,8 +1366,8 @@ BasisGroup::BasisGroup(BasisGroup *Copy) {
 	}
 }
 void BasisGroup::InitData(void) {
-	Split2[0]=Split2[1]=0.0;
-	Split3[0]=Split3[1]=Split3[2]=0.0;
+	Split2[0]=Split2[1]=0.0f;
+	Split3[0]=Split3[1]=Split3[2]=0.0f;
 	Basis=NumGauss=NumHeavyFuncs=NumPFuncs=ECPPotential=0;
 	Polar = GAMESS_BS_No_Polarization;
 	Flags = 0;
@@ -2002,7 +2002,7 @@ void DataGroup::WriteToFile(BufferFile *File, MoleculeData * MainData, WinPrefs 
 	Frame * cFrame = MainData->GetCurrentFramePtr();
 	BasisSet * lBasis = MainData->GetBasisSet();
 	BasisTest = BasisTest && lBasis;	//Make sure there really is a basis set defined
-	float unitConversion = 1.0;
+	float unitConversion = 1.0f;
 	if (MainData->InputOptions->Data->GetUnits()) unitConversion = kAng2BohrConversion;
 		//Punch the group label
 	//Check the number of ab initio atoms. If zero and we have effective fragments force
@@ -2292,7 +2292,7 @@ GuessGroup::GuessGroup(GuessGroup *Copy) {	//copy constructor
 	}
 }
 void GuessGroup::InitData(void) {
-	MOTolZ = MOTolEquil = 0.0;
+	MOTolZ = MOTolEquil = 0.0f;
 	IOrder = JOrder = NULL;
 	NumOrbs = 0;
 	VecSource = 0;
@@ -2816,8 +2816,8 @@ void MP2Group::ReadXML(XMLElement * parent) {
 }
 #pragma mark HessianGroup
 void HessianGroup::InitData(void) {
-	DisplacementSize = 0.01;
-	FrequencyScaleFactor = 1.0;
+	DisplacementSize = 0.01f;
+	FrequencyScaleFactor = 1.0f;
 	BitOptions = 17;	//bit 1 + bit 5
 }
 void HessianGroup::WriteToFile(BufferFile *File, InputData *IData) {
@@ -3574,11 +3574,11 @@ void MoleculeData::ReadFMOIdsFromXML(XMLElement * item) {
 
 #pragma mark StatPtGroup
 void StatPtGroup::InitData(void) {
-	OptConvergance = 0.0001;
-	InitTrustRadius = 0.0;
-	MaxTrustRadius = 0.0;
-	MinTrustRadius = 0.05;
-	StatJumpSize = 0.01;
+	OptConvergance = 0.0001f;
+	InitTrustRadius = 0.0f;
+	MaxTrustRadius = 0.0f;
+	MinTrustRadius = 0.05f;
+	StatJumpSize = 0.01f;
 	ModeFollow = 1;
 	BitOptions = 0;
 	method = 3;
@@ -3887,7 +3887,7 @@ void MOPacInternals::WriteZMATToFile(BufferFile * File) {
 void MOPacInternals::WriteCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) {
 	UpdateAtoms(MainData);	//First make sure the connectivity and values are up to date
 	CartesiansToInternals(MainData);
-	float unitConversion = 1.0;
+	float unitConversion = 1.0f;
 	InputData * lOptions = MainData->GetInputData();
 	if (lOptions && lOptions->Data->GetUnits()) unitConversion = kAng2BohrConversion;
 		char	Out[133];
@@ -3917,7 +3917,7 @@ void MOPacInternals::WriteCoordinatesToFile(BufferFile * File, MoleculeData * Ma
 void MOPacInternals::WriteMPCZMatCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs) {
 	UpdateAtoms(MainData);	//First make sure the connectivity and values are up to date
 	CartesiansToInternals(MainData);
-	float unitConversion = 1.0;
+	float unitConversion = 1.0f;
 	InputData * lOptions = MainData->GetInputData();
 	if (lOptions && lOptions->Data->GetUnits()) unitConversion = kAng2BohrConversion;
 	char	Out[133];

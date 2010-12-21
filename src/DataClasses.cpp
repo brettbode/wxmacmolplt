@@ -35,17 +35,17 @@ void ApplyRotation(Matrix4D RotMat, long Axis, float AngleDegrees) {
 	InitialTrans.y = RotMat[3][1];
 	InitialTrans.z = RotMat[3][2];
 //Now zero out the translation part of the matrix
-	RotMat[3][0] = RotMat[3][1] = RotMat[3][2] = 0.0;
+	RotMat[3][0] = RotMat[3][1] = RotMat[3][2] = 0.0f;
 //Now calculate the rotation
 	float AngleRads = AngleDegrees * kPi/180.0;
 	float cosAngle = cos(AngleRads);
 	float sinAngle = sin(AngleRads);
 	Matrix4D	TempRot, TempCopyMat;
 	for (long ii=0; ii<4; ii++) {
-		TempRot[ii][ii] = 1.0;
+		TempRot[ii][ii] = 1.0f;
 		for (long jj=0; jj<ii; jj++) {
-			TempRot[ii][jj] = 0.0;
-			TempRot[jj][ii] = 0.0;
+			TempRot[ii][jj] = 0.0f;
+			TempRot[jj][ii] = 0.0f;
 		}
 	}
 	switch (Axis) {
@@ -76,8 +76,8 @@ void ApplyRotation(Matrix4D RotMat, long Axis, float AngleDegrees) {
 	RotMat[3][2] = InitialTrans.z;
 }	/*Apply Rotation*/
 void CalculateCenterOfMass(mpAtom * AtomList, long NumAtoms, float * AtomMasses, CPoint3D * Center) {
-	float TotalMass=0.0;
-	Center->x = Center->y = Center->z = 0.0;
+	float TotalMass=0.0f;
+	Center->x = Center->y = Center->z = 0.0f;
 	for (long i=0; i<NumAtoms; i++) {
 		float mass = AtomMasses[AtomList[i].GetType() - 1];
 		mass *= mass;	//Masses are stored as the square root
@@ -275,11 +275,11 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 	if (pg == GAMESS_CS) {
 		//X-Y plane
 		InitRotationMatrix(work);
-		work[2][2] = -1.0;
+		work[2][2] = -1.0f;
 		AddMatrix(work);
 	} else if (pg == GAMESS_CI) {
 		InitRotationMatrix(work);
-		work[0][0] = work[1][1] = work[2][2] = -1.0;
+		work[0][0] = work[1][1] = work[2][2] = -1.0f;
 		AddMatrix(work);
 	} else if (pg == GAMESS_S2N) {
 		//The X-Y plane is the plane for the improper rotation
@@ -301,13 +301,13 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 	} else { //T and O related groups
 		//Here we are taking care of the common subgroup T
 		InitRotationMatrix(work);
-		work[1][1] = work[2][2] = -1.0;
+		work[1][1] = work[2][2] = -1.0f;
 		AddMatrix(work);
-		work[1][1] = 1.0;
-		work[0][0] = work[2][2] = -1.0;
+		work[1][1] = 1.0f;
+		work[0][0] = work[2][2] = -1.0f;
 		AddMatrix(work);
-		work[0][0] = work[1][1] = -1.0;
-		work[2][2] = 1.0;
+		work[0][0] = work[1][1] = -1.0f;
+		work[2][2] = 1.0f;
 		AddMatrix(work);
 		for (int i=0; i<8; i++) {
 			operations.push_back(operations[9*i+6]);
@@ -398,7 +398,7 @@ void VibRec::Setup(const long & NumVibs, const long & NumAtoms) {
 		//init the intensities all to 1
 		for (long i=0; i<NumVibs; i++) Intensities.push_back(1.0);
 		CPoint3D temp;
-		temp.x = temp.y = temp.z = 0.0;
+		temp.x = temp.y = temp.z = 0.0f;
 		for (long i=0; i<(NumAtoms*NumVibs); i++) {
 			NormMode.push_back(temp);
 		}
@@ -412,22 +412,22 @@ bool VibRec::Resize(long NumAtoms) {	//reduce the allocation to the current # of
 	return true;
 }
 float VibRec::GetIntensity(long Mode) const {
-	float result = 1.0;	//default to 1.0
+	float result = 1.0f;	//default to 1.0
 	if ((Mode>=0)&&(Mode<Intensities.size())) result = Intensities[Mode];
 	return result;
 }
 float VibRec::GetRamanIntensity(long Mode) const {
-	float result = 0.0;
+	float result = 0.0f;
 	if ((Mode>=0)&&(Mode<RamanIntensity.size())) result = RamanIntensity[Mode];
 	return result;
 }
 float VibRec::GetFrequency(long Mode) const {
-	float result = 0.0;
+	float result = 0.0f;
 	if ((Mode >= 0) && (Mode < Frequencies.size())) {
 		sscanf(Frequencies[Mode].c_str(), "%f", &result);
 		if (((Frequencies[Mode])[Frequencies[Mode].length()-1] == 'i') ||
 			((Frequencies[Mode])[Frequencies[Mode].length()-1] == 'I'))
-			result *= -1.0;
+			result *= -1.0f;
 	}
 	return result;
 }
@@ -1927,7 +1927,7 @@ TEDensity1DSurface::TEDensity1DSurface(TEDensity1DSurface *target) {
 //Calculate the sum of the squares of the change in position of each atom between
 //CoordSetA and CoordSetB
 float CalculateSquaresValue(long NumOptAtoms, mpAtom CoordSetA[], CPoint3D CoordSet[]) {
-	float result=0.0, x, y, z;
+	float result=0.0f, x, y, z;
 	for (long iatom=0; iatom<NumOptAtoms; iatom++) {
 		x = (CoordSetA[iatom].Position.x - CoordSet[iatom].x);
 		y = (CoordSetA[iatom].Position.y - CoordSet[iatom].y);

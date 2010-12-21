@@ -112,7 +112,7 @@ class CPoint3D {
 			result.z = z + pt.z;
 			return result;
 		}
-		inline float Magnitude(void) {return sqrt(x*x+y*y+z*z);};
+		inline float Magnitude(void) {return (float) sqrt(x*x+y*y+z*z);};
 };
 
 typedef float Matrix3D[3][3]; 

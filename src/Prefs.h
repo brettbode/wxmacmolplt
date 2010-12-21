@@ -311,7 +311,7 @@ class WinPrefs {
 		inline short GetStereoOffset(void) const {return StereoOffset;};
 		inline void SetStereoOffset(short newval) {StereoOffset = newval;};
 		/// Obtain the hi-res model space line width
-		inline float GetQD3DLineWidth(void) const {return (CylindersForLines() ? QD3DLineWidth : 0.0);};
+		inline float GetQD3DLineWidth(void) const {return (CylindersForLines() ? QD3DLineWidth : 0.0F);};
 		/// Set the hi-red model space line width (0 to 0.2)
 		inline void SetQD3DLineWidth(float newVal) {if ((newVal >= 0)&&(newVal<=0.2)) QD3DLineWidth = newVal;};
 		inline EnergyOptions * GetEnergyOptions(void) {return &EnergyPlotOptions;};

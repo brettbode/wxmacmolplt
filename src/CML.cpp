@@ -1096,7 +1096,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 	Frame * lFrame = cFrame;
 	bool firstFrame = true;
 	
-	long fsize = Buffer->GetFileSize();
+	wxFileOffset fsize = Buffer->GetFileSize();
 	char * xmlbuffer = new char[fsize+1];
 	Buffer->SetFilePos(0);
 	Buffer->Read(xmlbuffer, fsize);

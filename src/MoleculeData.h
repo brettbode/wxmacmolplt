@@ -131,7 +131,7 @@ class MoleculeData {
 		 @param NumAtoms target atom number
 		 @param EndOfGroup the file position to use as a limit for the parsing
 		 */
-		bool ParseFMOIds(BufferFile * Buffer, const long & NumAtoms, const long & EndOfGroup);
+		bool ParseFMOIds(BufferFile * Buffer, const long & NumAtoms, const wxFileOffset & EndOfGroup);
 		/**
 		 * Write the FMO array to XML
 		 * @param parent

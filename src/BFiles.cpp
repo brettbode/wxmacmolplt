@@ -129,15 +129,10 @@ void ConvertExponentStyle(char * Line) {
 	}
 }
 
-#ifdef UseMacIO
-BufferFile::BufferFile(short TargetFileRef, bool Write)
-#else
-BufferFile::BufferFile(FILE * TargetFileRef, bool Write)
-#endif
-{
+BufferFile::BufferFile(FILE * TargetFileRef, bool Write) {
 //Initialize the class data
 	Buffer = NULL;
-	BlockLengths = new long[10];
+	BlockLengths = new wxFileOffset[10];
 	if (!BlockLengths) throw MemoryError();
 	BlockArrayAllocation = 10;
 	BlockLengths[0] = 0;
@@ -160,29 +155,19 @@ BufferFile::BufferFile(FILE * TargetFileRef, bool Write)
 	}
 	
 //check out the file
-#ifdef UseMacIO
-	FileRefNum = TargetFileRef;
-#else
-	FilePtr = TargetFileRef;
-#endif
+	myFile = new wxFFile(TargetFileRef);
 	if (Write) {
 		IOType = 1;
 		BufferSize = kBufferSize;
 	} else {
 		IOType = 0;
-#ifdef UseMacIO
-		GetEOF(FileRefNum, &ByteCount);				/* Find out how many bytes are in the file */
-#else
-		fseek(FilePtr, 0, SEEK_END);
-		ByteCount = ftell(FilePtr);
-		fseek(FilePtr, 0, SEEK_SET);
-#endif
+		ByteCount = myFile->Length();
 		if (ByteCount <= 0) {
 			wxLogMessage(_("The requested file is empty."));
 			throw DataError();
 		}
 //Allocate the Buffer
-		BufferSize = MIN(kBufferSize, ByteCount);
+		BufferSize = (long) MIN(kBufferSize, ByteCount);
 		BlockLengths[0] = ByteCount;
 	}
 	if (BufferSize <= 0) throw MemoryError("Invalid buffer size!");
@@ -195,11 +180,7 @@ BufferFile::BufferFile(char * Data, long DataSize)
 {
 	BufferStart = BufferPos = 0;
 	BufferSize = DataSize;		//Obviously Data should be >= to DataSize or there will be trouble!
-#ifdef UseMacIO
-	FileRefNum = 0;
-#else
-	FilePtr = NULL;
-#endif
+	myFile = NULL;
 	IOType = -1;	//No file associated with this buffer
 					//and the buffer should not be freed when this object is destroyed
 	DoIt = true;
@@ -221,7 +202,7 @@ BufferFile::BufferFile(char * Data, long DataSize)
 	Buffer = Data;
 	ByteCount = DataSize;
 	BlockCount = 1;
-	BlockLengths = new long[10];
+	BlockLengths = new wxFileOffset[10];
 	if (!BlockLengths) {
 		throw MemoryError();
 	}
@@ -236,29 +217,18 @@ BufferFile::~BufferFile(void) {
 	if (BlockLengths) delete [] BlockLengths;
 }
 void BufferFile::CloseFile(void) {
-#ifdef UseMacIO
-		short		tempRefNum = FileRefNum;
-#else
-		FILE *		tempPtr = FilePtr;
-#endif
+	myFile->Close();
 	delete this;
-
-#ifdef UseMacIO
-	FSClose(tempRefNum);
-#else
-	fclose(tempPtr);
-#endif
 }
 	//Error cleanup routine. Call only to discard buffers.
 void BufferFile::AbnormalCleanup(void) {
 	IOType = 0;
 	BufferPos = 0;
 }
-long BufferFile::GetFilePos(void) {return BufferStart+BufferPos;}
-void BufferFile::SetFilePos(long NewPos) {
+void BufferFile::SetFilePos(wxFileOffset NewPos) {
 	if ((NewPos<0)||(NewPos>ByteCount)) throw FileError(eofErr);
 	if ((NewPos>=BufferStart)&&(NewPos<(BufferStart+BufferSize)))
-		BufferPos = NewPos - BufferStart;
+		BufferPos = (size_t) (NewPos - BufferStart);
 	else {
 		BufferPos = 0;
 		BufferStart = NewPos;	//Set the beginning of the buffer to the New pos
@@ -269,7 +239,7 @@ void BufferFile::SetFilePos(long NewPos) {
 // with (ex: GAMESS log, GAMESS IRC ...) return Unknown when matching fails
 // the argument is really a pascal string
 TextFileType BufferFile::GetFileType(const char * fileName) {
-	long EntryPos = GetFilePos(), FileSize=ByteCount;
+	wxFileOffset EntryPos = GetFilePos(), FileSize=ByteCount;
 	TextFileType	Type=kUnknown;
 
 	ByteCount = BufferSize;
@@ -304,6 +274,8 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 			Type = kGAMESSIRCType;
 		else if (LocateKeyWord("VELOCITY (BOHR/FS)", 18, -1))
 			Type = kGAMESSDRCType;
+		else if (LocateKeyWord("GAMESS (US) VERSION", 19, -1))
+			Type = kGAMESSlogType;
 		else if ((GetFilePos() < kMaxLineLength) && LocateKeyWord("NATOMS", 6, kMaxLineLength))
 			Type = kMolType;
 		else if (LocateKeyWord("COMPND", 6, -1))
@@ -349,8 +321,8 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
  * the file pointer is set to point at the " $GroupName" line.  Otherwise,
  * the file pointer remains unchanged.
  */
-long BufferFile::FindGroup(const char * GroupName) {
-	long result = 0, InitialPos, LineStartPos;
+wxFileOffset BufferFile::FindGroup(const char * GroupName) {
+	wxFileOffset result = 0, InitialPos, LineStartPos;
 	char Line[kMaxLineLength];
 
 	InitialPos = GetFilePos();
@@ -371,34 +343,20 @@ void BufferFile::AdvanceBuffer(void) {
 	if (IOType == 1) {	//Write mode
 		long BytesToWrite = MIN(BufferSize, BufferPos);
 		if (BytesToWrite > 0) {
-#ifdef UseMacIO
-			if (!FileRefNum) throw FileError(0);
-			SetFPos(FileRefNum, fsFromStart, BufferStart);
-			OSErr myerr = FSWrite(FileRefNum, &BytesToWrite, *Buffer);
-			if (myerr != noErr) throw FileError(myerr);
-#else
-			if (!FilePtr) throw FileError(0);
-			fseek(FilePtr, BufferStart, SEEK_SET);
-			long written = fwrite(Buffer, 1, BytesToWrite, FilePtr);
+			if (!myFile) throw FileError(0);
+			myFile->Seek(BufferStart);
+			long written = myFile->Write(Buffer, BytesToWrite);
 			if (written != BytesToWrite) throw FileError();
-#endif
 			ByteCount = BufferStart += BufferPos;
 			BufferPos = 0;
 		}
 	} else {	//Read mode
-		long BytesToRead = MIN(BufferSize, (ByteCount-(BufferStart+BufferPos)));
+		long BytesToRead = (long) MIN(BufferSize, (ByteCount-(BufferStart+BufferPos)));
 		if (BytesToRead > 0) {
-#ifdef UseMacIO
-			if (!FileRefNum) throw FileError(0);
-			SetFPos(FileRefNum, fsFromStart, (BufferStart+BufferPos));
-			OSErr myerr = FSRead(FileRefNum, &BytesToRead, *Buffer);
-			if (myerr != noErr) throw FileError(myerr);
-#else
-			if (!FilePtr) throw FileError(0);
-			fseek(FilePtr, (BufferStart+BufferPos), SEEK_SET);
-			long read = fread(Buffer, 1, BytesToRead, FilePtr);
+			if (!myFile) throw FileError(0);
+			myFile->Seek(BufferStart+BufferPos);
+			long read = myFile->Read(Buffer, BytesToRead);
 			if (read != BytesToRead) throw FileError();
-#endif
 			BufferStart += BufferPos;
 			BufferPos = 0;
 		}
@@ -465,19 +423,19 @@ void BufferFile::BackupnLines(long nBack) {
 	for (long nBacked=0; nBacked<=nBack; nBacked++) {
 		if ((BufferStart+BufferPos)<=0) break;	//Beginning of file reached
 		if (BufferPos == 0) {
-			long cPos = GetFilePos();
+			wxFileOffset cPos = GetFilePos();
 			BufferStart = MAX(0, (BufferStart-BufferSize-1)); 
 			AdvanceBuffer();
-			BufferPos = cPos-BufferStart;	//Set pos to end of buffer
+			BufferPos = (long) (cPos-BufferStart);	//Set pos to end of buffer
 		}
 		while ((Buffer[BufferPos] != 13)&&(Buffer[BufferPos] != 10)) {
 			BufferPos --;
 			if ((BufferStart+BufferPos)==0) break;	//Beginning of file reached
 			if (BufferPos == 0) {	//Back up one buffer block
-				long cPos = GetFilePos();
+				wxFileOffset cPos = GetFilePos();
 				BufferStart = MAX(0, (BufferStart-BufferSize-1));
 				AdvanceBuffer();
-				BufferPos = cPos-BufferStart;	//Set pos to end of buffer
+				BufferPos = (long) (cPos-BufferStart);	//Set pos to end of buffer
 			}
 		}
 		if ((Buffer[BufferPos]==10)&&(Buffer[BufferPos-1]==13)) BufferPos--;
@@ -511,9 +469,9 @@ bool IsBlank(const char * Line) {
 	
 	return result;
 }
-long BufferFile::FindBlankLine(void) {
-	long Start = BufferStart + BufferPos, LineStart;
-	long BlankLinePos=-1;
+wxFileOffset BufferFile::FindBlankLine(void) {
+	wxFileOffset Start = BufferStart + BufferPos, LineStart;
+	wxFileOffset BlankLinePos=-1;
 	bool	done=false;
 	
 	while (!done) {
@@ -539,8 +497,8 @@ long BufferFile::FindBlankLine(void) {
 //Search the file for the specified keyword until found, EOF, or the limit is
 //reached Returns true or false, the file position upon exit will be the start
 //of the keyword, or the starting position if the keyword is not found.
-bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, long Limit) {
-	long OldPosition = GetFilePos();
+bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset Limit) {
+	wxFileOffset OldPosition = GetFilePos();
 	char	LineText[kMaxLineLength + 1];
 	bool	KeyWordFound=false;
 	
@@ -551,7 +509,7 @@ bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, long Limit) {
 			SetFilePos(OldPosition);				//finding the keyword
 			break;
 		}
-		long lineStartPos = GetFilePos();
+		wxFileOffset lineStartPos = GetFilePos();
 		GetLine(LineText);
 		long Start = FindKeyWord(LineText, Keyword, NumByte);
 		if (Start > -1) {	//Found it!
@@ -563,8 +521,8 @@ bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, long Limit) {
 	return KeyWordFound;
 }
 long BufferFile::GetNumLines(long size) {
-	long	StartPos = BufferStart + BufferPos;
-	long	EndPos=size + StartPos;
+	wxFileOffset	StartPos = BufferStart + BufferPos;
+	wxFileOffset	EndPos=size + StartPos;
 	if (EndPos>ByteCount) EndPos = ByteCount;	//really an error, but I will be leanient here
 	if (size == -1) EndPos = ByteCount;		//-1 causes entire file to be scanned
 	if (EndPos<=StartPos) return 0;			//No characters, so no lines...
@@ -582,10 +540,10 @@ long BufferFile::GetNumLines(long size) {
 	SetFilePos(StartPos);
 	return NumLines;
 } /*GetNumLines*/
-long BufferFile::BufferSkip(long NumBytes) {
+wxFileOffset BufferFile::BufferSkip(wxFileOffset NumBytes) {
 	if ((NumBytes+BufferStart+BufferPos)>ByteCount) throw FileError(eofErr);
 	if ((NumBytes+BufferStart+BufferPos)>BlockLengths[0]) throw DataError();
-	if (((NumBytes+BufferPos)<BufferSize)||(IOType==-1)) BufferPos += NumBytes;
+	if (((NumBytes+BufferPos)<BufferSize)||(IOType==-1)) BufferPos += (long) NumBytes;
 	else {
 		BufferStart += BufferPos + NumBytes;
 		BufferPos = 0;
@@ -642,13 +600,13 @@ bool BufferFile::GetOutput(void) { return DoIt; }
 //assumed to be the length from the current position to the
 //end of the block.
 void BufferFile::SetBlockLength(long length) {
-	long BlockEndPosition = length + GetFilePos();
+	wxFileOffset BlockEndPosition = length + GetFilePos();
 		//The new end position cannot be longer than the current end point
 	if (BlockEndPosition > BlockLengths[0]) throw DataError();
 	if (BlockCount >= BlockArrayAllocation) {
-		long * temp = new long[BlockArrayAllocation+10];
+		wxFileOffset * temp = new wxFileOffset[BlockArrayAllocation+10];
 		if (!temp) throw MemoryError();
-		memcpy((Ptr) temp, (Ptr) BlockLengths, BlockArrayAllocation*sizeof(long));
+		memcpy((Ptr) temp, (Ptr) BlockLengths, BlockArrayAllocation*sizeof(wxFileOffset));
 		delete [] BlockLengths;
 		BlockLengths = temp;
 		BlockArrayAllocation += 10;
@@ -667,13 +625,13 @@ void BufferFile::FinishBlock(void) {
 		BlockCount--;
 	}
 }
-bool BufferFile::ReadLongValue(long & target, long Limit) {
+bool BufferFile::ReadLongValue(long & target, wxFileOffset Limit) {
 	bool result = false;
 	char work[kMaxLineLength];
 	if (GetFilePos() >= GetFileLength()) return false;	//already at the EOF
 	if (Limit < 0) Limit = GetFileLength();
 	
-	long SaveStart = GetFilePos();
+	wxFileOffset SaveStart = GetFilePos();
 	//Advance over the whitespace (non-printable chars, space and commas
 	do {
 		if ((1 != Read(work, 1))||(GetFilePos() >= Limit)) {

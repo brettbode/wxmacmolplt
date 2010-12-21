@@ -16,8 +16,8 @@
 #include "BFiles.h"
 
 GradientData::GradientData(void) {
-	RMS = -1.0;	//init to an impossible value for the rms
-	Maximum = 0.0;
+	RMS = -1.0f;	//init to an impossible value for the rms
+	Maximum = 0.0f;
 	CartesianGradient = NULL;
 	CartAllocation = 0;
 }
@@ -77,13 +77,13 @@ long GradientData::Write(BufferFile * Buffer) {
 #endif
 //Buffer should be positioned at the nserch line
 bool GradientData::ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms,
-		long SearchLength, bool Style) {
+		wxFileOffset SearchLength, bool Style) {
 	bool result = false;
 	char	Line[kMaxLineLength], token[kMaxLineLength];
 	float	nucCharge;
 	long	scanerr, iline, test;
 
-	long	StartPosition = Buffer->GetFilePos();
+	wxFileOffset	StartPosition = Buffer->GetFilePos();
 	//read in the complete cartesian gradient
 	CartesianGradient = new CPoint3D[NumAtoms];
 	CartAllocation = NumAtoms;

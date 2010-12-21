@@ -191,7 +191,7 @@ class Frame {
 		float CalculateMEP(float x, float y, float z, BasisSet * Basis,
 			AODensity * TotalAODensity, GaussHermiteData * GHData, float * ElectronicMEP, float * NuclearMEP);
 		AODensity * GetAODensity(BasisSet * basis, const long & targetOrbSet);
-		void ReadGradient(BufferFile * Buffer, long SearchLength);
+		void ReadGradient(BufferFile * Buffer, wxFileOffset SearchLength);
 		float GetRMSGradient(void) const;
 		float GetMaxGradient(void) const;
 		void SetRMSGradient(float val);

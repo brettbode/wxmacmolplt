@@ -235,8 +235,8 @@ bool Frame::IncreaseAtomAllocation(long NumAdditional) {
 	} else return false;
 	return true;
 }
-void Frame::ReadGradient(BufferFile * Buffer, long SearchLength) {
-	long SavedPos = Buffer->GetFilePos(), npos;
+void Frame::ReadGradient(BufferFile * Buffer, wxFileOffset SearchLength) {
+	wxFileOffset SavedPos = Buffer->GetFilePos(), npos;
 	bool	Style=true;
 
 	if (Buffer->LocateKeyWord(" NSERCH", 7, SearchLength)) {	//Search for gradient data at the end 
@@ -258,7 +258,7 @@ void Frame::ReadGradient(BufferFile * Buffer, long SearchLength) {
 	Buffer->SetFilePos(SavedPos);	//reset position so other code isn't broken
 }
 float Frame::GetRMSGradient(void) const {
-	float result=-1.0;
+	float result=-1.0f;
 	if (Gradient) {
 		result = Gradient->GetRMS();
 	}

@@ -27,7 +27,7 @@ class GradientData {
 		float GetMaximum(void) const {return Maximum;};
 		void SetRMS(float v) {RMS = v;};
 		void SetMaximum(float v) {Maximum = v;};
-		bool ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms, long SearchLength,
+		bool ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms, wxFileOffset SearchLength,
 			bool Style);
 #ifndef __wxBuild__
 		long GetSize(BufferFile * Buffer);

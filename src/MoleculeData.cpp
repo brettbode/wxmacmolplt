@@ -650,7 +650,7 @@ void MoleculeData::ParseGAMESSBasisSet(BufferFile * Buffer) {
 		Basis->NuclearChargesAreValid(true);
 	}
 }	/*ParseGAMESSBasisSet*/
-bool MoleculeData::ParseFMOIds(BufferFile * Buffer, const long & AtomCount, const long & EndOfGroup) {
+bool MoleculeData::ParseFMOIds(BufferFile * Buffer, const long & AtomCount, const wxFileOffset & EndOfGroup) {
 	if (Buffer->LocateKeyWord("INDAT", 5, EndOfGroup)) {
 		Buffer->LocateKeyWord("=", 1, EndOfGroup);
 		Buffer->BufferSkip(1);
