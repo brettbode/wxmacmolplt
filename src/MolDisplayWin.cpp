@@ -1265,24 +1265,28 @@ void MolDisplayWin::menuFileOpen(wxCommandEvent &event) {
 		event.Skip();
 }
 void MolDisplayWin::menuFileAddFramesFromFile(wxCommandEvent &event) {
-	//First prompt for the file.
-	wxString filename = wxFileSelector(_("Choose a file containing points to be appended to the currently open file."),
-									   _T(""), _T(""), _T(""), _T("*"),
+	/* Add the data from one or more files to the existing file. */
+	wxFileDialog fileDlg(this,
+						_T("Choose a file(s) containing points to be appended to the currently open file."),
+						wxT(""), wxT(""), _T("*.*"),
 #if wxCHECK_VERSION(2,9,0)
-									   wxFD_OPEN,
+							   wxFD_OPEN | wxFD_MULTIPLE);
 #else
-									   wxOPEN,
+								wxOPEN | wxMULTIPLE);
 #endif
-									   this);
 	
-	//If the user chooses a file, popup the extra options dialog before processing it
-	if (filename.length() > 0) {
+	if(fileDlg.ShowModal() == wxID_OK) {
+		wxArrayString paths;
+		fileDlg.GetPaths(paths);
 		AppendFramesOptions * optDlg = new AppendFramesOptions(this);
 		optDlg->SetSkip(Prefs->GetDRCSkip());
 		optDlg->SetupItems();
 		if (optDlg->ShowModal() == wxID_OK) {
 			Prefs->SetDRCSkip(optDlg->GetSkip());
-			OpenFile(filename, optDlg->GetOffset(), optDlg->GetFlip(), true);
+			//Loop over the filenames in the path list.
+			for (size_t i=0; i<paths.GetCount(); i++) {
+				OpenFile(paths.Item(i), optDlg->GetOffset(), optDlg->GetFlip(), true);
+			}
 		}
 		optDlg->Destroy();
 	}
