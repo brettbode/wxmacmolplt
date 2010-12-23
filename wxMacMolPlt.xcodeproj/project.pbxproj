@@ -2913,8 +2913,8 @@
 				INSTALL_PATH = "$(HOME)/Applications";
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I$(HOME)/software/wx/wx-2.9.1-univ/lib/wx/include/osx_carbon-unicode-static-2.9",
-					"-I$(HOME)/software/wx/wx-2.9.1-univ/include/wx-2.9",
+					"-I$(HOME)/software/wx/wx-2.9-univ/lib/wx/include/osx_carbon-unicode-static-2.9",
+					"-I$(HOME)/software/wx/wx-2.9-univ/include/wx-2.9",
 					"-D__WXOSX__",
 					"-D__WXOSX_CARBON__",
 					"-D__WXMAC__",
@@ -2925,7 +2925,7 @@
 					"-DHAVE_LIBMING",
 				);
 				OTHER_LDFLAGS = (
-					"-L$(HOME)/software/wx/wx-2.9.1-univ/lib/",
+					"-L$(HOME)/software/wx/wx-2.9-univ/lib/",
 					"-framework",
 					QuickTime,
 					"-framework",
