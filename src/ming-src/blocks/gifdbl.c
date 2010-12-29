@@ -1,20 +1,36 @@
 /* $Id$ */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
 
 #include "ming_config.h"
 #include "libming.h"
+#include "error.h"
 
-#if USE_GIF
-#include <gif_lib.h>
-#include <zlib.h>
+#if !(USE_GIF) // {
+
+SWFDBLBitmapData newSWFDBLBitmapData_fromGifInput(SWFInput input)
+{
+	SWF_error("newSWFDBLBitmapData_fromGifInput can't be used (no gif compiled into this build of Ming).\n");
+	return NULL;
+}
+
+SWFDBLBitmapData newSWFDBLBitmapData_fromGifFile(const char * fileName)
+{
+	SWF_error("newSWFDBLBitmapData_fromGifFile can't be used (no gif compiled into this build of Ming).\n");
+	return NULL;
+}
+
+#else // def USE_GIF }{
 
 #include "bitmap.h"
 #include "dbl.h"
 #include "input.h"
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <gif_lib.h>
+#include <zlib.h>
 
 
 /*void error(char *msg)
@@ -191,16 +207,9 @@ readGif(GifFileType *file, dblData result)
 
 	result->data = malloc(outsize = (int)floor(size*1.01+12));
 
-#ifdef HAVE_LIBZ
 	/* zlib-compress the gif data */
 	compress2(result->data, &outsize, data, size, 9);
 	result->length = outsize;
-#endif
-#ifndef HAVE_LIBZ
-	/* No zlib, so just copy the data to the result location */
-	memcpy(result->data, data, size);
-	result->length = size;
-#endif
 
 	free(data);
 	return 1;
@@ -245,4 +254,5 @@ SWFDBLBitmapData newSWFDBLBitmapData_fromGifInput(SWFInput input)
 	// ret->input = NULL;
 	return ret;
 }
-#endif
+
+#endif // def USE_GIF }

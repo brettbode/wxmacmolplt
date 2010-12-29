@@ -148,13 +148,16 @@ SWFSprite_addBlock(SWFSprite sprite, SWFBlock block)
 	if ( block->type == SWF_SHOWFRAME ||
 			 block->type == SWF_PLACEOBJECT ||
 			 block->type == SWF_PLACEOBJECT2 ||
+			 block->type == SWF_PLACEOBJECT3 || 		
 			 block->type == SWF_REMOVEOBJECT ||
 			 block->type == SWF_REMOVEOBJECT2 ||
 			 block->type == SWF_DOACTION ||
 			 block->type == SWF_STARTSOUND ||
 			 block->type == SWF_FRAMELABEL ||
 			 block->type == SWF_SOUNDSTREAMHEAD ||
+			 block->type == SWF_SOUNDSTREAMHEAD2 ||
 			 block->type == SWF_SOUNDSTREAMBLOCK ||
+			 block->type == SWF_VIDEOFRAME ||
 			 block->type == SWF_END )
 	{
 		sprite->blocks =
@@ -163,7 +166,7 @@ SWFSprite_addBlock(SWFSprite sprite, SWFBlock block)
 		sprite->blocks[sprite->nBlocks++] = block;
 	}
 	else
-		; /* XXX - warn */
+		SWF_warn("SWFSprite: invalid block %i\n", block->type);
 }
 
 

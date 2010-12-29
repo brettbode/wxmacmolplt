@@ -21,8 +21,6 @@
 
 #include "ming_config.h"
 
-#include "ming.h"
-
 #include "movie.h"
 #include "shape_util.h"
 #include "blocklist.h"
@@ -32,7 +30,9 @@
  * If we move math.h include *after* block.h
  * compiler issues errors (?!)
  */
+#ifndef __C2MAN__
 #include <math.h>
+#endif
 
 #include "blocks/block.h"
 #include "blocks/method.h"
@@ -51,16 +51,20 @@
 #include "blocks/metadata.h"
 #include "blocks/scriptlimits.h"
 #include "blocks/tabindex.h"
+#include "blocks/sprite.h"
+#include "blocks/symbolclass.h"
+#include "blocks/scenedata.h"
+
 #include "libming.h"
 
-#ifndef WIN32
-#ifdef HAVE_ZLIB_H
+#if USE_ZLIB
 # include <zlib.h>
 #endif
-#endif
 
+#ifndef __C2MAN__
 #include <stdlib.h>
 #include <string.h>
+#endif
 
 struct SWFMovie_s
 {
@@ -95,9 +99,7 @@ struct SWFMovie_s
 	SWFFontCharacter* fonts;
 
 	/* background color */
-	byte r;
-	byte g;
-	byte b;
+	SWFBlock backgroundBlock;
 	
 	/* Fileattributes (necessary for version >= 8 */
 	SWFFileAttributes fattrs;
@@ -106,7 +108,13 @@ struct SWFMovie_s
 	SWFMetadata metadata;
 
 	/* Script limits */
-	SWFScriptLimits limits;	
+	SWFScriptLimits limits;
+
+	/* (exported) Symbol table (SWF >= 9) */
+	SWFSymbolClass symbolClass;
+
+	/* scene and frame definitions (SWF >= 9) */
+	SWFSceneData sceneData;	
 #if TRACK_ALLOCS
 	/* memory node for garbage collection */
 	mem_node *gcnode;
@@ -151,11 +159,12 @@ destroySWFMovie(SWFMovie movie /* Movie to be destroyed */)
 	if(movie->fattrs)
 		destroySWFFileAttributes(movie->fattrs);
 
-	if(movie->metadata)
-		destroySWFMetadata(movie->metadata);
-
 	if(movie->limits)
 		destroySWFScriptLimits(movie->limits);
+
+	if(movie->backgroundBlock)
+		destroySWFBlock(movie->backgroundBlock);
+
 #if TRACK_ALLOCS
 	ming_gc_remove_node(movie->gcnode);
 #endif
@@ -176,6 +185,10 @@ newSWFMovieWithVersion(int version /* Flash version */)
 
 	movie = (SWFMovie) malloc(sizeof(struct SWFMovie_s));
 
+	/* If malloc failed, return NULL to signify this */
+	if (movie == NULL)
+		return NULL;
+
 	movie->version = version;
 	movie->blockList = newSWFBlockList();
 	movie->displayList = newSWFDisplayList();
@@ -194,9 +207,7 @@ newSWFMovieWithVersion(int version /* Flash version */)
 	movie->nFonts = 0;
 	movie->fonts = NULL;
 
-	movie->r = 0xff;
-	movie->g = 0xff;
-	movie->b = 0xff;
+	movie->backgroundBlock = NULL;
 
 	if(version >= 8)	
 		movie->fattrs = newSWFFileAttributes();
@@ -204,6 +215,8 @@ newSWFMovieWithVersion(int version /* Flash version */)
 		movie->fattrs = NULL;
 	movie->metadata = NULL;
 	movie->limits = NULL;
+	movie->symbolClass = NULL;
+	movie->sceneData = NULL;
 #if TRACK_ALLOCS
 	movie->gcnode = ming_gc_add_node(movie, (dtorfunctype) destroySWFMovie);
 #endif
@@ -230,6 +243,16 @@ SWFMovie_setRate(SWFMovie movie /* movie to adjust */,
 	float rate	/* new frame rate */)
 {
 	movie->rate = rate;
+}
+
+/*
+ * get the frame rate of a movie
+ * This function gets the frame rate for the movie.
+ */
+float
+SWFMovie_getRate(SWFMovie movie /* movie to adjust */)
+{
+	return movie->rate;
 }
 
 /*
@@ -273,11 +296,10 @@ SWFMovie_setBackground(SWFMovie movie /* movie whose background is being set */,
 	byte g /* green value of background color */,
 	byte b /* blue value og background color */)
 {
-	movie->r = r;
-	movie->g = g;
-	movie->b = b;
+	if(movie->backgroundBlock)
+		destroySWFBlock(movie->backgroundBlock);
+	movie->backgroundBlock = (SWFBlock)newSWFSetBackgroundBlock(r, g, b);
 }
-
 
 /*
  * enable edit protections for a movie
@@ -287,11 +309,15 @@ SWFMovie_setBackground(SWFMovie movie /* movie whose background is being set */,
  */
 void
 SWFMovie_protect(SWFMovie movie /* movie to protect */,
-		char *password /* mds5 encoded password */)
+		const char *password /* mds5 encoded password */)
 {
 	SWFMovie_addBlock(movie, newSWFProtect(password));
 }
 
+/* 
+ * Adds a font to a movie.
+ * retursn a SWFFontCharacter object
+ */
 SWFFontCharacter
 SWFMovie_addFont(SWFMovie movie, SWFFont font)
 {
@@ -356,6 +382,15 @@ SWFMovie_addBlock(SWFMovie movie, SWFBlock block)
 }
 
 
+/* 
+ * Assigns a name to a SWFBlock object.
+ * Creates an exportlibrary with named symbols to be imported by other 
+ * SWF movies.
+ * Call SWFMovie_writeExports() when you're done with the exports
+ * to actually write the tag. If you don't the tag will be added
+ * at the END of the SWF.
+ * see also SWFMovie_importCharacter, SWFMovie_importFont
+ */
 void
 SWFMovie_addExport(SWFMovie movie, SWFBlock block, const char *name)
 {
@@ -364,9 +399,11 @@ SWFMovie_addExport(SWFMovie movie, SWFBlock block, const char *name)
 		case SWF_DEFINESHAPE:
 		case SWF_DEFINESHAPE2:
 		case SWF_DEFINESHAPE3:
+		case SWF_DEFINESHAPE4:
 			/*SWF_warn("Exporting a shape character is not ensured to work");*/
 		case SWF_DEFINESPRITE:
 		case SWF_DEFINEFONT2:
+		case SWF_DEFINESOUND:
 			movie->exports = (struct SWFExport_s*)realloc(movie->exports,
 					(movie->nExports+1) * sizeof(struct SWFExport_s));
 			movie->exports[movie->nExports].block = block;
@@ -418,7 +455,13 @@ SWFMovie_addCharacterDependencies(SWFMovie movie, SWFCharacter character)
 	}
 }
 
-
+/*
+ * Write the EXPORTASSET tag with informations gathered by calls to
+ * SWFMovie_addExport.
+ *
+ * Call this function to control insertion of the EXPORTASSET tag, which
+ * is otherwise written at the END of the SWF.
+ */
 void
 SWFMovie_writeExports(SWFMovie movie)
 {
@@ -438,6 +481,19 @@ SWFMovie_writeExports(SWFMovie movie)
 			SWFMovie_addCharacterDependencies(movie, (SWFCharacter)b);
 			completeSWFBlock(b);
 			SWFMovie_addBlock(movie, b);
+			/* Workaround for movieclip exports:
+			 * initAction and scalingGrid are only written when 
+			 * placing the movieclip. These extra blocks should
+			 * not get lost if a MC is eported only 
+			 */
+			if(SWFBlock_getType(b) == SWF_DEFINESPRITE)
+			{
+				SWFSprite sprite = (SWFSprite)b;
+				if(sprite->grid)
+					SWFMovie_addBlock(movie, (SWFBlock)sprite->grid);
+				if(sprite->initAction)
+					SWFMovie_addBlock(movie, (SWFBlock)sprite->initAction);
+			}
 		}
 	}
 
@@ -448,15 +504,65 @@ SWFMovie_writeExports(SWFMovie movie)
 	destroySWFExports(movie);
 }
 
+/* 
+ * This function replaces a displayable character with a new one.
+ * Do not use this function. Use SWFMovie_replace instead!
+ * returns 0 on success 
+ */
+int
+SWFMovie_replace_internal(SWFMovie movie, SWFDisplayItem item, SWFMovieBlockType ublock)
+{
+	SWFBlock block = ublock.block;
+	if(block == NULL || item == NULL)
+		return -1;
+
+	if ( SWFBlock_getType(block) == SWF_DEFINEBITS ||
+			 SWFBlock_getType(block) == SWF_DEFINEBITSJPEG2 ||
+			 SWFBlock_getType(block) == SWF_DEFINEBITSJPEG3 ||
+			 SWFBlock_getType(block) == SWF_DEFINELOSSLESS ||
+			 SWFBlock_getType(block) == SWF_DEFINELOSSLESS2 )
+	{
+		block = (SWFBlock)newSWFShapeFromBitmap((SWFBitmap)block, SWFFILL_TILED_BITMAP);
+	}
+
+	/* if it's a text object, we need to translate fonts into font characters */
+
+	if ( SWFBlock_getType(block) == SWF_DEFINETEXT ||
+			 SWFBlock_getType(block) == SWF_DEFINETEXT2 )
+	{
+		SWFMovie_resolveTextFonts(movie, (SWFText)block);
+	}
+
+	if ( SWFBlock_getType(block) == SWF_DEFINEEDITTEXT)
+	{
+		SWFMovie_resolveTextfieldFont(movie, (SWFTextField)block);
+	}
+	
+	if ( SWFBlock_isCharacter(block) )
+	{
+		SWFCharacter_setFinished((SWFCharacter)block);
+		SWFMovie_addCharacterDependencies(movie, (SWFCharacter)block);
+
+		SWFDisplayItem_replace(item, (SWFCharacter)block);
+		return 0;
+	}
+
+	SWF_warn("SWFMovie_replace: only characters can be replaced\n");
+	return -1;
+}
+
 
 /*
- * add a block to a movie.
- * This function adds a block or character to a movie. 
+ * Adds a block to a movie.
+ * This function adds a block or character to a movie.
+ * Do not use this function. Use SWFMovie_add instead
+ * returns a SWFDisplayItem 
  */
 SWFDisplayItem
-SWFMovie_add(SWFMovie movie /* movie to which the block will be added */,
-		SWFBlock block /* block to add to the movie */)
+SWFMovie_add_internal(SWFMovie movie /* movie to which the block will be added */,
+                      SWFMovieBlockType ublock /* block to add to the movie */)
 {
+	SWFBlock block = ublock.block;
 	if ( block == NULL )
 		return NULL;
 
@@ -484,6 +590,15 @@ SWFMovie_add(SWFMovie movie /* movie to which the block will be added */,
 	{
 		SWFMovie_resolveTextfieldFont(movie, (SWFTextField)block);
 	}
+
+	// not nice but has to be done!
+	if ( SWFBlock_getType(block) == SWF_INITACTION)
+	{
+		SWFInitAction init = (SWFInitAction)block;
+		SWFMovieClip mc = SWFInitAction_getMovieClip(init);
+		if(mc != NULL)
+			SWFMovie_addBlock(movie, (SWFBlock)mc);
+	} 
 	
 	if ( SWFBlock_isCharacter(block) )
 	{
@@ -491,7 +606,8 @@ SWFMovie_add(SWFMovie movie /* movie to which the block will be added */,
 		SWFCharacter_setFinished((SWFCharacter)block);
 		SWFMovie_addCharacterDependencies(movie, (SWFCharacter)block);
 
-		return SWFDisplayList_add(movie->displayList, (SWFCharacter)block);
+		return SWFDisplayList_add(movie->displayList, 
+			movie->blockList, (SWFCharacter)block);
 	}
 	else
 		SWFMovie_addBlock(movie, block);
@@ -499,13 +615,22 @@ SWFMovie_add(SWFMovie movie /* movie to which the block will be added */,
 	return NULL;
 }
 
-
+/* 
+ * Removes a SWFDisplayItem from the movie stage.
+ * A SWFDisplayItem stays on stage until it gets removed. This function 
+ * removes the item. The item is displayed until the current frame.
+ */
 void
 SWFMovie_remove(SWFMovie movie , SWFDisplayItem item)
 {
 	SWFDisplayItem_removeFromList(item, movie->blockList);
 }
 
+/* 
+ * Includes streaming sound to a movie. Sound is skiped by skip seconds.
+ * The skip parameter describes the time in seconds (float) to be skiped.
+ * See also SWFMovie_setSoundStream, newSWFSoundStream
+ */
 void
 SWFMovie_setSoundStreamAt(SWFMovie movie, SWFSoundStream stream, float skip)
 {
@@ -518,13 +643,23 @@ SWFMovie_setSoundStreamAt(SWFMovie movie, SWFSoundStream stream, float skip)
 	}
 }
 
+/* 
+ * Includes streaming sound to a movie. 
+ * Streaming (embedded) sound is played in sync with movie frames. 
+ * See also SWFMovie_setSoundStreamAt, newSWFSoundStream
+ */
 void
 SWFMovie_setSoundStream(SWFMovie movie, SWFSoundStream stream)
 {
 	SWFMovie_setSoundStreamAt(movie, stream, 0);
 }
 
-
+/*
+ * Starts playing event-sound (SWFSound)
+ *
+ * returns a SWFSoundInstance object.
+ * see also SWFSoundInstance, SWFSound, SWFMovie_stopSound
+ */
 SWFSoundInstance
 SWFMovie_startSound(SWFMovie movie, SWFSound sound)
 {
@@ -538,7 +673,11 @@ SWFMovie_startSound(SWFMovie movie, SWFSound sound)
 	return inst;
 }
 
-
+/*
+ * Stops playing event sound (SWFSound)
+ *
+ * see also SWFSoundInstance, SWFSound, SWFMovie_startSound
+ */
 void
 SWFMovie_stopSound(SWFMovie movie, SWFSound sound)
 {
@@ -551,7 +690,11 @@ SWFMovie_stopSound(SWFMovie movie, SWFSound sound)
 	SWFMovie_addBlock(movie, (SWFBlock)inst);
 }
 
-
+/*
+ * Add a new frame to the current movie.
+ * This function adds a new frame to the current movie. All items added, removed
+ * manipulated effect this frame and probably following frames.
+ */
 void
 SWFMovie_nextFrame(SWFMovie movie)
 {
@@ -561,7 +704,7 @@ SWFMovie_nextFrame(SWFMovie movie)
 
 /*
  * Add a label Frame
- * This function adds a labelFrame to the movie.
+ * This function adds a labelFrame to the movie's current frame.
  */
 void
 SWFMovie_labelFrame(SWFMovie movie /* Movie to which the label is added */,
@@ -589,9 +732,8 @@ SWFMovie_toOutput(SWFMovie movie, int level)
 	int status;
 #endif
 	SWFOutput header, tempbuffer=0, buffer, swfbuffer;
-	SWFBlock backgroundBlock;
-	unsigned long compresslength;
 	SWFBlock lastBlock;
+	unsigned long compresslength;
 
 	if ( movie->nExports > 0 )
 		SWFMovie_writeExports(movie);
@@ -612,6 +754,12 @@ SWFMovie_toOutput(SWFMovie movie, int level)
 	while ( movie->nFrames < movie->totalFrames )
 		SWFMovie_nextFrame(movie);
 
+	if(movie->symbolClass)
+		SWFMovie_addBlock(movie, (SWFBlock)movie->symbolClass);
+
+	if(movie->sceneData)
+		SWFMovie_addBlock(movie, (SWFBlock)movie->sceneData);
+
 	SWFMovie_addBlock(movie, newSWFEndBlock());
 
 	// add five for the setbackground block..
@@ -626,13 +774,13 @@ SWFMovie_toOutput(SWFMovie movie, int level)
 	SWFOutput_writeUInt16(header, (int)floor(movie->rate*256));
 	SWFOutput_writeUInt16(header, movie->nFrames);
 
-	backgroundBlock = (SWFBlock)newSWFSetBackgroundBlock(movie->r, movie->g, movie->b);
-        writeSWFBlockToMethod(backgroundBlock, SWFOutputMethod, header);
-	destroySWFBlock(backgroundBlock);
-
 	/* SWF >= 8: first block _must_ be SWF_FILEATTRIBUTES */ 
 	if(movie->fattrs)
 		writeSWFBlockToMethod((SWFBlock)movie->fattrs, SWFOutputMethod, header);
+
+	if(movie->backgroundBlock)
+		writeSWFBlockToMethod(movie->backgroundBlock, SWFOutputMethod, header);
+	
 	if(movie->limits)
 		writeSWFBlockToMethod((SWFBlock)movie->limits, SWFOutputMethod, header);	
 	SWFOutput_byteAlign(header);
@@ -695,6 +843,10 @@ SWFMovie_toOutput(SWFMovie movie, int level)
 	return swfbuffer;
 }
 
+/*
+ * Oputput a movie with SWFByteOutputMethod
+ * returns the number of bytes written.
+ */
 int
 SWFMovie_output(SWFMovie movie, SWFByteOutputMethod method, void *data)
 {
@@ -714,6 +866,10 @@ SWFMovie_output(SWFMovie movie, SWFByteOutputMethod method, void *data)
 	return swflength;
 }
 
+/*
+ * Save movie to file 
+ * returns the number of bytes written. -1 on error.
+ */
 int
 SWFMovie_save(SWFMovie movie, const char *filename)
 {
@@ -730,6 +886,10 @@ SWFMovie_save(SWFMovie movie, const char *filename)
 	return count;
 }
 
+/*
+ * Output movie to FILE stream 
+ * returns the number of bytes written
+ */
 int
 SWFMovie_output_to_stream(SWFMovie movie, FILE *fp)
 {
@@ -771,8 +931,17 @@ SWFMovie_addImport(SWFMovie movie, const char *filename, const char *name, int i
 	return movie->imports[n];
 }
 
+/* 
+ * Import a character to the movie
+ * Imports characters from an other movie. filename (URL) points to a SWF 
+ * file with exported characters. 
+ *
+ * returns a SWFCharacter object
+ */
 SWFCharacter
-SWFMovie_importCharacter(SWFMovie movie, const char *filename, const char *name)
+SWFMovie_importCharacter(SWFMovie movie, 
+                         const char *filename /* URL to movie */, 
+                         const char *name /* idetifier of character */)
 {
 	SWFCharacter res;
 	SWFImportBlock importer;
@@ -790,6 +959,11 @@ SWFMovie_importCharacter(SWFMovie movie, const char *filename, const char *name)
 	return res;
 }
 
+/* 
+ * Import a font from an other SWFFile
+ * see also SWFMovie_importCharacter
+ * returns a SWFFontCharacter object
+ */
 SWFFontCharacter
 SWFMovie_importFont(SWFMovie movie, const char *filename, const char *name)
 {
@@ -806,8 +980,15 @@ SWFMovie_importFont(SWFMovie movie, const char *filename, const char *name)
 
 
 /* 
- * sets SWF network permission
- * if flag is set to 0, a localy loaded movie will be able to access the network
+ * sets SWF network / fileaccess policy
+ * if the flag is set to 0 a localy loaded movie will be unable to access the network 
+ * but is allowed to access local files
+ *
+ * if the flag ist set to 1 a localy loaded movie will be unable to access local files
+ * but is allowed to access the network
+ *
+ * see also http://www.adobe.com/devnet/flash/articles/fplayer8_security.html 
+ * 
  * For SWF >= 8: default is 0
  */
 void 
@@ -827,7 +1008,7 @@ SWFMovie_setNetworkAccess(SWFMovie movie, int flag)
  * http://www.adobe.com/products/xmp
  */
 void
-SWFMovie_addMetadata(SWFMovie movie, char *xml)
+SWFMovie_addMetadata(SWFMovie movie, const char *xml)
 {
 	if(!movie->fattrs)
 		movie->fattrs = newSWFFileAttributes();
@@ -866,6 +1047,36 @@ SWFMovie_setTabIndex(SWFMovie movie,
 {
 	SWFTabIndex ti = newSWFTabIndex(depth, index);
 	SWFMovie_addBlock(movie, (SWFBlock) ti);
+}
+
+/* 
+ * assigns a symbolic name for a SWFCharacter
+ * Such classes are available for usage in other SWF files
+ * and can be referenced from inside the current movie.
+ *
+ * To assign a symbol to the root movie use NULL as character
+ * value.
+ */
+void 
+SWFMovie_assignSymbol(SWFMovie m, 
+                      SWFCharacter character /* target */,
+                      const char *name /* symbol */)
+{
+	if(m->symbolClass == NULL)
+		m->symbolClass = newSWFSymbolClass();
+	SWFSymbolClass_addSymbol(m->symbolClass, character, name);
+}
+
+/*
+ * define scenes for the movies' main timeline
+ */
+void
+SWFMovie_defineScene(SWFMovie m, unsigned int offset /* frame offset */, 
+                  const char *name /* name of the scene */)
+{
+	if(m->sceneData == NULL)
+		m->sceneData = newSWFSceneData();
+	SWFSceneData_addScene(m->sceneData, offset, name);
 }
 /*
  * Local variables:

@@ -29,7 +29,6 @@
 #include "libming.h"
 #include "compile.h"
 #include "actiontypes.h"
-//#include "blocks/error.h"
 #include "error.h"
 
 /* Define this to have some debugging output when outputting DEFINEFUNCTION2 */
@@ -41,31 +40,6 @@ int swfVersion = 0;
 static int nConstants = {0}, maxConstants = {0}, sizeConstants = {0};
 static char **constants = NULL;
 
-/* XXX - temp hack until we check at compile time */
-
-enum
-{
-	SWF_BIG_ENDIAN,
-	SWF_LITTLE_ENDIAN
-};
-
-static int byteorder;
-
-void checkByteOrder()
-{
-	unsigned int x;
-	unsigned char *p;
-
-	x = 0x01020304;
-	p = (unsigned char *)&x;
-
-	if(*p == 1)
-		byteorder = SWF_BIG_ENDIAN;
-	else
-		byteorder = SWF_LITTLE_ENDIAN;
-}
-
-
 char *stringConcat(char *a, char *b)
 {
 	if ( a != NULL )
@@ -73,6 +47,8 @@ char *stringConcat(char *a, char *b)
 		if ( b != NULL )
 		{
 			a = (char*)realloc(a, strlen(a)+strlen(b)+1);
+			if(a == NULL)
+				return NULL;
 			strcat(a, b);
 			free(b);
 		}
@@ -162,91 +138,11 @@ int bufferWriteConstants(Buffer out)
 	return len+3;
 }
 
-void bufferWriteDefineFunction2(Buffer out, char *func_name, Buffer args, Buffer code, int flags, int num_regs)
-{
-	Buffer c;
-	char buf[1024];
-	int num_args = 0, i;
-	char *p = (char *) args->buffer;
-	
-	strcpy(buf, "");
-		
-	// REGISTERPARAM records
-	c = newBuffer();
-	// TODO: rewrite this function, all these calls to strncat
-	//       seem overkill to me
-	for(i = 0; i < bufferLength(args); i++)
-	{
-		if(p[i] == '\0')
-		{
-			bufferWriteU8(c, 0);
-			bufferWriteHardString(c, buf, strlen(buf)+1);	
-			strcpy(buf, "");
-			num_args++;
-		}
-		else
-		{
-			strncat(buf, &p[i], 1);
-		}
-	}
-
-	bufferWriteOp(out, SWFACTION_DEFINEFUNCTION2);
-
-	if(func_name == NULL)
-	{
-		size_t taglen =
-			+ 1			/* function name (empty) */
-			+ 2			/* arg count (short) */
-			+ 1			/* reg count (byte) */
-			+ 2			/* flags */
-			+ bufferLength(c)	/* swf_params */
-			+ 2 			/* body size */
-			;
-
-#ifdef MING_DEBUG_FUNCTION2
-		printf("adding anonymouse SWF_DEFINEFUNCTION2 nargs=%d flags=%d"
-				" arglen=%d codelen=%d taglen=%d\n",
-				num_args, flags, bufferLength(args),
-				bufferLength(code), taglen);
-#endif
-		bufferWriteS16(out, taglen);
-
-		bufferWriteU8(out, 0); /* empty function name */
-	}
-	else
-	{
-		size_t taglen = 0
-			+ strlen(func_name)+1	/* function name */
-			+ 2			/* arg count (short) */
-			+ 1			/* reg count (byte) */
-			+ 2			/* flags */
-			+ bufferLength(c)	/* swf_params */
-			+ 2 			/* body size */
-			;
-
-#ifdef MING_DEBUG_FUNCTION2
-		printf("adding named SWF_DEFINEFUNCTION2 name=%s nargs=%d flags=%d"
-				" regparamlen=%d arglen=%d codelen=%d taglen=%d\n",
-				func_name, num_args, flags,
-				bufferLength(c),
-				bufferLength(args),
-				bufferLength(code), taglen);
-#endif
-		bufferWriteS16(out, taglen);
-		bufferWriteHardString(out, func_name, strlen(func_name)+1);	 
-	}
-	bufferWriteS16(out, num_args); /* number of params */
- 	bufferWriteU8(out, num_regs); /* register count */
- 	bufferWriteS16(out, flags);    /* flags */
- 	//bufferWriteS16(out, 0);    /* flags */
- 	bufferConcat(out, c);
-	bufferWriteS16(out, bufferLength(code)); /* code size */
-	bufferConcat(out, code);
-}
-
 Buffer newBuffer()
 {
 	Buffer out = (Buffer)malloc(BUFFER_SIZE);
+	if(out == NULL)
+		return NULL;
 	memset(out, 0, BUFFER_SIZE);
 
 	out->buffer = (byte*)malloc(BUFFER_INCREMENT);
@@ -254,6 +150,7 @@ Buffer newBuffer()
 	*(out->pos) = 0;
 	out->buffersize = out->free = BUFFER_INCREMENT;
 	out->pushloc = NULL;
+	out->hasObject = 0;
 
 	return out;
 }
@@ -360,6 +257,21 @@ int bufferWriteDataAndPush(Buffer a, Buffer b)
 	return length;
 }
 
+int bufferConcatSimple(Buffer a, Buffer b)
+{
+	int len = 0;
+
+	if(!a)
+		return 0;
+
+	if(b)
+	{	len = bufferWriteBuffer(a, b);
+		destroyBuffer(b);
+	}
+
+	return len;
+}
+
 int bufferConcat(Buffer a, Buffer b)
 {
 	int len = 0;
@@ -413,7 +325,7 @@ int bufferWriteS16(Buffer out, int data)
 	return 2;
 }
 
-int bufferWriteHardString(Buffer out, char *string, int length)
+int bufferWriteHardString(Buffer out, const char *string, int length)
 {
 	int i;
 
@@ -423,7 +335,7 @@ int bufferWriteHardString(Buffer out, char *string, int length)
 	return length;
 }
 
-int bufferWriteConstantString(Buffer out, char *string, int length)
+int bufferWriteConstantString(Buffer out, const char *string, int length)
 {
 	int n;
 
@@ -452,7 +364,24 @@ int bufferWriteConstantString(Buffer out, char *string, int length)
 	}
 }
 
-int bufferWriteString(Buffer out, char *string, int length)
+/* allow pushing STRINGs for SWF>=5 */
+int bufferWritePushString(Buffer out, char *string, int length)
+{
+	int l, len = 0;
+	if(out->pushloc == NULL || swfVersion < 5)
+	{
+		len = 3;
+		bufferWritePushOp(out);
+		bufferWriteS16(out, length+1);
+	}
+	
+	bufferWriteU8(out, PUSH_STRING);
+	l = bufferWriteHardString(out, string, length);
+	bufferPatchPushLength(out, l + 1);	
+	return len + l + 1;
+}
+
+int bufferWriteString(Buffer out, const char *string, int length)
 {
 	if(swfVersion < 5)
 	{
@@ -496,21 +425,48 @@ int bufferWriteInt(Buffer out, int i)
 
 	bufferWriteU8(out, PUSH_INT);
 
-	if(byteorder == SWF_LITTLE_ENDIAN)
+#if SWF_LITTLE_ENDIAN
+	bufferWriteU8(out, p[0]);
+	bufferWriteU8(out, p[1]);
+	bufferWriteU8(out, p[2]);
+	bufferWriteU8(out, p[3]);
+#else 
+	bufferWriteU8(out, p[3]);
+	bufferWriteU8(out, p[2]);
+	bufferWriteU8(out, p[1]);
+	bufferWriteU8(out, p[0]);
+#endif
+
+	return len + 5;
+}
+
+int bufferWriteFloat(Buffer out, float f)
+{
+	int len = 0;
+	unsigned char *p = (unsigned char *)&f;
+
+	if(out->pushloc == NULL || swfVersion < 5)
 	{
-		bufferWriteU8(out, p[0]);
-		bufferWriteU8(out, p[1]);
-		bufferWriteU8(out, p[2]);
-		bufferWriteU8(out, p[3]);
+		len = 3;
+		bufferWritePushOp(out);
+		bufferWriteS16(out, 5);
 	}
 	else
-	{
-		bufferWriteU8(out, p[3]);
-		bufferWriteU8(out, p[2]);
-		bufferWriteU8(out, p[1]);
-		bufferWriteU8(out, p[0]);
-	}
+		bufferPatchPushLength(out, 5);
 
+	bufferWriteU8(out, PUSH_FLOAT);
+
+#if SWF_LITTLE_ENDIAN
+	bufferWriteU8(out, p[0]);
+	bufferWriteU8(out, p[1]);
+	bufferWriteU8(out, p[2]);
+	bufferWriteU8(out, p[3]);	
+#else
+	bufferWriteU8(out, p[3]);
+	bufferWriteU8(out, p[2]);
+	bufferWriteU8(out, p[1]);
+	bufferWriteU8(out, p[0]);
+#endif
 	return len + 5;
 }
 
@@ -530,28 +486,25 @@ int bufferWriteDouble(Buffer out, double d)
 
 	bufferWriteU8(out, PUSH_DOUBLE);
 
-	if(byteorder == SWF_LITTLE_ENDIAN)
-	{
-		bufferWriteU8(out, p[4]);
-		bufferWriteU8(out, p[5]);
-		bufferWriteU8(out, p[6]);
-		bufferWriteU8(out, p[7]);
-		bufferWriteU8(out, p[0]);
-		bufferWriteU8(out, p[1]);
-		bufferWriteU8(out, p[2]);
-		bufferWriteU8(out, p[3]);
-	}
-	else
-	{
-		bufferWriteU8(out, p[3]);
-		bufferWriteU8(out, p[2]);
-		bufferWriteU8(out, p[1]);
-		bufferWriteU8(out, p[0]);
-		bufferWriteU8(out, p[7]);
-		bufferWriteU8(out, p[6]);
-		bufferWriteU8(out, p[5]);
-		bufferWriteU8(out, p[4]);
-	}
+#if SWF_LITTLE_ENDIAN
+	bufferWriteU8(out, p[4]);
+	bufferWriteU8(out, p[5]);
+	bufferWriteU8(out, p[6]);
+	bufferWriteU8(out, p[7]);
+	bufferWriteU8(out, p[0]);
+	bufferWriteU8(out, p[1]);
+	bufferWriteU8(out, p[2]);
+	bufferWriteU8(out, p[3]);
+#else
+	bufferWriteU8(out, p[3]);
+	bufferWriteU8(out, p[2]);
+	bufferWriteU8(out, p[1]);
+	bufferWriteU8(out, p[0]);
+	bufferWriteU8(out, p[7]);
+	bufferWriteU8(out, p[6]);
+	bufferWriteU8(out, p[5]);
+	bufferWriteU8(out, p[4]);
+#endif
 
 	return len + 9;
 }
@@ -654,13 +607,18 @@ void lower(char *s)
 static enum ctx *ctx_stack = {0};
 static int ctx_count = {0}, ctx_len = {0};
 void addctx(enum ctx val)
-{	if(ctx_count >= ctx_len)
+{	
+	if(ctx_count >= ctx_len)
 		ctx_stack = (enum ctx*) realloc(ctx_stack, (ctx_len += 10) * sizeof(enum ctx));
 	ctx_stack[ctx_count++] = val;
 }
 void delctx(enum ctx val)
-{	if(ctx_count <= 0 || ctx_stack[--ctx_count] != val)
-		SWF_error("consistency check in delctx");
+{	
+	if(ctx_count <= 0)  
+		SWF_error("consistency check in delctx: stack empty!\n");
+	else if (ctx_stack[--ctx_count] != val)
+		SWF_error("consistency check in delctx: val %i != %i\n", ctx_stack[ctx_count], val);
+
 }
 
 int chkctx(enum ctx val)
@@ -682,14 +640,18 @@ int chkctx(enum ctx val)
 			for(n = ctx_count ; --n >= 0 ; )
 				switch(ctx_stack[n])
 				{	case CTX_SWITCH:
+						return CTX_SWITCH;
 					case CTX_LOOP:
-						return 0;
+						return CTX_LOOP;
 					case CTX_FOR_IN:
-						return 1;
+						return CTX_FOR_IN;
 					case CTX_FUNCTION:
 						return -1;
+					case CTX_BREAK:
+						return CTX_BREAK;
 					default: ; /* computers are stupid */
 				}
+			return -1;
 		case CTX_CONTINUE:
 			for(n = ctx_count ; --n >= 0 ; )
 				switch(ctx_stack[n])
@@ -700,9 +662,8 @@ int chkctx(enum ctx val)
 						return -1;
 					default: ; /* computers are stupid */
 				}
-		default: ; /* computers are stupid */
+		default: return -1;; /* computers are stupid */
 	}
-	return 0;
 }
 
 /* replace MAGIC_CONTINUE_NUMBER and MAGIC_BREAK_NUMBER with jumps to
@@ -710,7 +671,7 @@ int chkctx(enum ctx val)
 /* jump offset is relative to end of jump instruction */
 /* I can't believe this actually worked */
 
-void bufferResolveJumps(Buffer out)
+void bufferResolveJumpsFull(Buffer out, byte *break_ptr, byte *continue_ptr)
 {
 	byte *p = out->buffer;
 	int l, target;
@@ -726,14 +687,14 @@ void bufferResolveJumps(Buffer out)
 	if(*p == MAGIC_CONTINUE_NUMBER_LO &&
 		 *(p+1) == MAGIC_CONTINUE_NUMBER_HI)
 	{
-		target = out->buffer - (p+2);
+		target = continue_ptr - (p+2);
 		*p = target & 0xff;
 		*(p+1) = (target>>8) & 0xff;
 	}
 	else if(*p == MAGIC_BREAK_NUMBER_LO &&
 		*(p+1) == MAGIC_BREAK_NUMBER_HI)
 	{
-		target = out->pos - (p+2);
+		target = break_ptr - (p+2);
 		*p = target & 0xff;
 		*(p+1) = (target>>8) & 0xff;
 	}
@@ -800,90 +761,412 @@ void bufferResolveSwitch(Buffer buffer, struct switchcases *slp)
 	}
 }
 	
-int lookupSetProperty(char *string)
+int lookupProperty(char *string)
 {
 	lower(string);
 
-	if(strcmp(string,"x")==0)		return 0x0000;
-	if(strcmp(string,"y")==0)		return 0x3f80;
-	if(strcmp(string,"xscale")==0)	return 0x4000;
-	if(strcmp(string,"yscale")==0)	return 0x4040;
-	if(strcmp(string,"alpha")==0)		return 0x40c0;
-	if(strcmp(string,"visible")==0)	return 0x40e0;
-	if(strcmp(string,"rotation")==0)	return 0x4120;
-	if(strcmp(string,"name")==0)		return 0x4140;
-	if(strcmp(string,"quality")==0)	return 0x4180;
-	if(strcmp(string,"focusrect")==0)	return 0x4188;
-	if(strcmp(string,"soundbuftime")==0)	return 0x4190;
+	if(strcmp(string, "_x") == 0)		return PROPERTY_X;
+	if(strcmp(string, "_y") == 0)		return PROPERTY_Y;
+	if(strcmp(string, "_xscale") == 0)	return PROPERTY_XSCALE;
+	if(strcmp(string, "_yscale") == 0)	return PROPERTY_YSCALE;
+	if(strcmp(string, "_currentframe") == 0) return PROPERTY_CURRENTFRAME;
+	if(strcmp(string, "_totalframes") == 0)	return PROPERTY_TOTALFRAMES;
+	if(strcmp(string, "_alpha") == 0)	return PROPERTY_ALPHA;
+	if(strcmp(string, "_visible") == 0)	return PROPERTY_VISIBLE;
+	if(strcmp(string, "_width") == 0)	return PROPERTY_WIDTH;
+	if(strcmp(string, "_height") == 0)	return PROPERTY_HEIGHT;
+	if(strcmp(string, "_rotation") == 0)	return PROPERTY_ROTATION;
+	if(strcmp(string, "_target") == 0)	return PROPERTY_TARGET;
+	if(strcmp(string, "_framesloaded") == 0)	return PROPERTY_FRAMESLOADED;
+	if(strcmp(string, "_name") == 0)		return PROPERTY_NAME;
+	if(strcmp(string, "_droptarget") == 0)	return PROPERTY_DROPTARGET;
+	if(strcmp(string, "_url") == 0)		return PROPERTY_URL;
+	if(strcmp(string, "_highquality") == 0)	return PROPERTY_HIGHQUALITY;
+	if(strcmp(string, "_focusrect") == 0)	return PROPERTY_FOCUSRECT;
+	if(strcmp(string, "_soundbuftime") == 0)	return PROPERTY_SOUNDBUFTIME;
+	if(strcmp(string, "_quality")==0)	return PROPERTY_QUALITY;
+	if(strcmp(string, "_xmouse") == 0)	return PROPERTY_XMOUSE;
+	if(strcmp(string, "_ymouse") == 0)	return PROPERTY_YMOUSE;
 
 	SWF_error("No such property: %s\n", string);
 	return -1;
 }
 
-int bufferWriteSetProperty(Buffer out, char *string)
+int bufferWriteProperty(Buffer out, char *string)
 {
-	int property = lookupSetProperty(string);
-
-	bufferWriteU8(out, SWFACTION_PUSH);
-	bufferWriteS16(out, 5);
-	bufferWriteU8(out, PUSH_PROPERTY);
-	bufferWriteS16(out, 0);
-	bufferWriteS16(out, property);
-
-	return 8;
+	int property = lookupProperty(string);
+	return bufferWriteFloat(out, property);
 }
 
+// XXX: ???
 int bufferWriteWTHITProperty(Buffer out)
 {
 	bufferWriteU8(out, SWFACTION_PUSH);
 	bufferWriteS16(out, 5);
-	bufferWriteU8(out, PUSH_PROPERTY);
+	bufferWriteU8(out, PUSH_FLOAT);
 	bufferWriteS16(out, 0);
 	bufferWriteS16(out, 0x4680);
 
 	return 8;
 }
 
-const char *lookupGetProperty(char *string)
+/**
+ * @param func_name
+ * 	Function name, NULL for anonymous functions.
+ *
+ * @param num_regs
+ * 	Number of registers.
+ *
+ * @param flags
+ * 	See SWFDefineFunction2Flags enum.
+ */
+static int bufferWriteDefineFunction2(Buffer out, char *func_name, 
+		Buffer args, Buffer code, int flags, int num_regs)
 {
-	lower(string);
+	Buffer c;
+	char buf[1024];
+	int num_args = 0, i;
+	char *p = (char *) args->buffer;
+	size_t taglen;	
+	strcpy(buf, "");
+		
+	// REGISTERPARAM records
+	c = newBuffer();
+	// TODO: rewrite this function, all these calls to strncat
+	//       seem overkill to me
+	for(i = 0; i < bufferLength(args); i++)
+	{
+		if(p[i] == '\0')
+		{
+			bufferWriteU8(c, 0);
+			bufferWriteHardString(c, buf, strlen(buf)+1);	
+			strcpy(buf, "");
+			num_args++;
+		}
+		else
+		{
+			strncat(buf, &p[i], 1);
+		}
+	}
 
-	if(strcmp(string,"x")==0)		return "0";
-	if(strcmp(string,"y")==0)		return "1";
-	if(strcmp(string,"xscale")==0)	return "2";
-	if(strcmp(string,"yscale")==0)	return "3";
-	if(strcmp(string,"currentframe")==0)	return "4";
-	if(strcmp(string,"totalframes")==0)	return "5";
-	if(strcmp(string,"alpha")==0)		return "6";
-	if(strcmp(string,"visible")==0)	return "7";
-	if(strcmp(string,"width")==0)		return "8";
-	if(strcmp(string,"height")==0)	return "9";
-	if(strcmp(string,"rotation")==0)	return "10";
-	if(strcmp(string,"target")==0)	return "11";
-	if(strcmp(string,"framesloaded")==0)	return "12";
-	if(strcmp(string,"name")==0)		return "13";
-	if(strcmp(string,"droptarget")==0)	return "14";
-	if(strcmp(string,"url")==0)		return "15";
-	if(strcmp(string,"quality")==0)	return "16";
-	if(strcmp(string,"focusrect")==0)	return "17";
-	if(strcmp(string,"soundbuftime")==0)	return "18";
+	bufferWriteOp(out, SWFACTION_DEFINEFUNCTION2);
 
-	SWF_error("No such property: %s\n", string);
-	return "";
+	if(func_name == NULL)
+	{
+		taglen =
+			+ 1			/* function name (empty) */
+			+ 2			/* arg count (short) */
+			+ 1			/* reg count (byte) */
+			+ 2			/* flags */
+			+ bufferLength(c)	/* swf_params */
+			+ 2 			/* body size */
+			;
+
+#ifdef MING_DEBUG_FUNCTION2
+		printf("adding anonymouse SWF_DEFINEFUNCTION2 nargs=%d flags=%d"
+				" arglen=%d codelen=%d taglen=%d\n",
+				num_args, flags, bufferLength(args),
+				bufferLength(code), taglen);
+#endif
+		bufferWriteS16(out, taglen);
+
+		bufferWriteU8(out, 0); /* empty function name */
+	}
+	else
+	{
+		taglen = 0
+			+ strlen(func_name)+1	/* function name */
+			+ 2			/* arg count (short) */
+			+ 1			/* reg count (byte) */
+			+ 2			/* flags */
+			+ bufferLength(c)	/* swf_params */
+			+ 2 			/* body size */
+			;
+
+#ifdef MING_DEBUG_FUNCTION2
+		printf("adding named SWF_DEFINEFUNCTION2 name=%s nargs=%d flags=%d"
+				" regparamlen=%d arglen=%d codelen=%d taglen=%d\n",
+				func_name, num_args, flags,
+				bufferLength(c),
+				bufferLength(args),
+				bufferLength(code), taglen);
+#endif
+		bufferWriteS16(out, taglen);
+		bufferWriteHardString(out, func_name, strlen(func_name)+1);	 
+	}
+	bufferWriteS16(out, num_args); /* number of params */
+ 	bufferWriteU8(out, num_regs); /* register count */
+ 	bufferWriteS16(out, flags);    /* flags */
+ 	//bufferWriteS16(out, 0);    /* flags */
+ 	bufferConcat(out, c);
+	bufferWriteS16(out, bufferLength(code)); /* code size */
+	bufferConcat(out, code);
+	return taglen;
 }
 
-int bufferWriteGetProperty(Buffer out, char *string)
+void destroyASFunction(ASFunction func)
 {
-	const char *property = lookupGetProperty(string);
+	free(func->name);
+	free(func);
+}
 
-	bufferWriteU8(out, SWFACTION_PUSH);
-	bufferWriteS16(out, strlen(property)+2);
-	bufferWriteU8(out, PUSH_STRING);
+int bufferWriteFunction(Buffer out, ASFunction function, int version)
+{
+	int tagLen; 
+	
+	if(version == 2)
+	{
+		tagLen = bufferWriteDefineFunction2(out, function->name, 
+			function->params.buffer, function->code, function->flags, 0);
+	}
+	else
+	{
+		tagLen = 5; 
+		tagLen += bufferLength(function->params.buffer);
+		if(function->name != NULL)
+			tagLen += strlen(function->name); 
+	
+		bufferWriteOp(out, SWFACTION_DEFINEFUNCTION);
+		bufferWriteS16(out, tagLen);
+		if(function->name == NULL) 
+			bufferWriteU8(out, 0); /* empty function name */
+		else
+			bufferWriteHardString(out, function->name, strlen(function->name) +1 );
+		bufferWriteS16(out, function->params.count);
+		bufferConcat(out, function->params.buffer);
+		bufferWriteS16(out, bufferLength(function->code));
+		bufferConcat(out, function->code);
+	}
+	destroyASFunction(function);
+	return tagLen;
+}
 
-	return 4 + bufferWriteData(out, (byte*) property, strlen(property)+1);
+ASFunction newASFunction()
+{
+	ASFunction func;
+	func = (ASFunction) malloc(sizeof(struct function_s));
+	func->flags = 0;
+	func->code = NULL;
+	func->params.count = 0;
+	func->params.buffer = NULL;
+	func->name = NULL;
+	return func;
+}
+
+void destroyASClass(ASClass clazz)
+{
+	ASClassMember member;
+	if(clazz->name)
+		free(clazz->name);
+	
+	member = clazz->members;
+	while(member)
+	{	
+		ASClassMember _this = member;
+		member = member->next;
+		free(_this);
+	}
+	free(clazz);
+}
+
+ASFunction ASClass_getConstructor(ASClass clazz)
+{
+	ASClassMember member;
+	member = clazz->members;
+	while(member)
+	{
+		ASFunction func;
+		ASClassMember _this = member;
+		member = member->next;
+
+		if(_this->type != METHOD)
+			continue;
+		func = _this->element.function;
+		if(!func || !func->name)
+			continue;
+		if(strcmp(func->name, clazz->name) != 0)
+			continue;
+		
+		_this->element.function = NULL;
+		return func;
+	}
+	return newASFunction(); // default empty constructor
+}
+
+static int bufferWriteClassConstructor(Buffer out, ASClass clazz)
+{
+	int len = 0;
+	ASFunction func;
+
+	/* class constructor */
+	len += bufferWriteString(out, "_global", strlen("_global") + 1);
+	len += bufferWriteOp(out, SWFACTION_GETVARIABLE);
+	len += bufferWriteString(out, clazz->name, strlen(clazz->name) + 1);
+	func = ASClass_getConstructor(clazz);
+	if(func->name)
+	{
+		free(func->name);
+		func->name = NULL;
+	}
+	len += bufferWriteFunction(out, func, 1);
+	len += bufferWriteSetRegister(out, 1);
+	len += bufferWriteOp(out, SWFACTION_SETMEMBER);
+	
+	len += bufferWriteRegister(out, 1);
+	len += bufferWriteString(out, "prototype", strlen("prototype") + 1);
+	len += bufferWriteOp(out, SWFACTION_GETMEMBER);
+	len += bufferWriteSetRegister(out, 2);
+	
+	len += bufferWriteOp(out, SWFACTION_POP);
+
+	return len;
+}
+
+static int bufferWriteClassMethods(Buffer out, ASClass clazz)
+{
+	ASClassMember member = clazz->members;
+	int len = 0;
+	while(member)
+	{
+		ASFunction func;
+		ASClassMember _this = member;
+		member = member->next;
+		if(_this->type != METHOD)
+			continue;
+		func = _this->element.function;
+		if(!func || !func->name)
+			continue;
+	
+		if(strcmp(func->name, clazz->name) != 0)
+		{
+			SWF_error("only one class constructor allowed\n");
+		}
+	
+		len += bufferWriteRegister(out, 2);
+		len += bufferWriteString(out, func->name, strlen(func->name) + 1);
+		free(func->name);
+		func->name = NULL;
+		len += bufferWriteFunction(out, func, 1);
+		len += bufferWriteOp(out, SWFACTION_SETMEMBER);
+		_this->element.function = NULL;
+	}
+	return len;
+}
+
+static int bufferWriteClassVariable(Buffer out, ASVariable var)
+{
+	int len = 0;
+	if(var->initCode != NULL)
+	{
+		len += bufferWriteRegister(out, 2);
+		len += bufferWriteString(out, var->name, strlen(var->name)+1);
+		len += bufferConcat(out, var->initCode);
+		len += bufferWriteOp(out, SWFACTION_SETMEMBER); 
+	}
+	free(var->name);
+	free(var); // aka destroyASVariable
+	return len;
+}
+
+static int bufferWriteClassMembers(Buffer out, ASClass clazz)
+{
+	ASClassMember member = clazz->members;
+	int len = 0;
+	while(member)
+	{
+		ASVariable var;
+		ASClassMember _this = member;
+		member = member->next;
+		if(_this->type != VARIABLE)
+			continue;
+		var = _this->element.var;
+		if(!var)
+			continue;
+		bufferWriteClassVariable(out, var);	
+		_this->element.var = NULL;
+	}
+	return len;
 }
 
 
+int bufferWriteClass(Buffer out, ASClass clazz)
+{
+	int len = 0;
+	len += bufferWriteClassConstructor(out, clazz);
+	len += bufferWriteClassMembers(out, clazz);	
+	len += bufferWriteClassMethods(out, clazz);
+	/* set class properties */
+	len += bufferWriteInt(out, 1);
+	len += bufferWriteNull(out);
+	len += bufferWriteString(out, "_global", strlen("_global") + 1);
+	len += bufferWriteOp(out, SWFACTION_GETVARIABLE);
+
+	len += bufferWriteString(out, clazz->name, strlen(clazz->name) + 1);
+	len += bufferWriteOp(out, SWFACTION_GETMEMBER);
+
+	len += bufferWriteString(out, "prototype", strlen("prototype") + 1);
+	len += bufferWriteOp(out, SWFACTION_GETMEMBER);
+		
+	len += bufferWriteInt(out, 3);
+	len += bufferWriteString(out, "ASSetPropFlags", strlen("ASSetPropFlags") + 1);
+	len += bufferWriteOp(out, SWFACTION_CALLFUNCTION);
+	len += bufferWriteOp(out, SWFACTION_POP);
+
+	destroyASClass(clazz);
+	return len;
+}
+
+void ASClassMember_append(ASClassMember m0, ASClassMember end)
+{
+	ASClassMember mb = m0;
+	while(mb->next)
+		mb = mb->next;
+	mb->next = end;
+}
+
+ASClass newASClass(char *name, ASClassMember members)
+{
+	ASClass clazz;
+	clazz = (ASClass) malloc(sizeof(struct class_s));
+	clazz->name = name;
+	clazz->members = members;
+	return clazz;	
+}
+
+ASClassMember newASClassMember_function(ASFunction func)
+{
+	ASClassMember member = (ASClassMember) malloc(sizeof(struct class_member_s));
+	member->element.function = func;
+	member->type = METHOD;
+	member->next = NULL; 
+	return member;
+}
+
+ASClassMember newASClassMember_variable(ASVariable var)
+{
+	ASClassMember member = (ASClassMember) malloc(sizeof(struct class_member_s));
+	member->element.var = var;
+	member->type = VARIABLE;
+	member->next = NULL; 
+	return member;
+}
+
+
+ASClassMember newASClassMember_buffer(Buffer buf)
+{
+	ASClassMember member = (ASClassMember) malloc(sizeof(struct class_member_s));
+	member->element.buffer = buf;
+	member->type = BUFF;
+	member->next = NULL; 
+	return member;
+}
+ASVariable newASVariable(char *name, Buffer buf)
+{
+	ASVariable var = (ASVariable) malloc(sizeof(struct variable_s));
+	var->name = name;
+	var->initCode = buf;
+	return var;
+}
 /*
  * Local variables:
  * tab-width: 2

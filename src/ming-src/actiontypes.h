@@ -132,10 +132,11 @@ typedef enum
 /* v7 actions */
   SWFACTION_DEFINEFUNCTION2         = 0x8E,
   SWFACTION_EXTENDS                 = 0x69,
-  SWFACTION_CASTOP                  = 0x2B,
-  SWFACTION_IMPLEMENTSOP            = 0x2C,
   SWFACTION_TRY                     = 0x8F,
   SWFACTION_THROW                   = 0x2A,
+  SWFACTION_CASTOP                  = 0x2B,
+  SWFACTION_IMPLEMENTSOP            = 0x2C,
+  SWFACTION_FSCOMMAND2              = 0x2D
 
 } Action;
 
@@ -159,13 +160,13 @@ typedef enum
   PROPERTY_NAME           = 0x0d,
   PROPERTY_DROPTARGET     = 0x0e,
   PROPERTY_URL            = 0x0f,
-  PROPERTY_XMOUSE         = 0x10,
-  PROPERTY_YMOUSE         = 0x11,
-  PROPERTY_HIGHQUALITY    = 0x12,
-  PROPERTY_FOCUSRECT      = 0x13,
-  PROPERTY_SOUNDBUFTIME   = 0x14,
-  PROPERTY_QUALITY        = 0x15,
-  PROPERTY_WTHIT          = 0x16
+  PROPERTY_HIGHQUALITY    = 0x10,
+  PROPERTY_FOCUSRECT      = 0x11,
+  PROPERTY_SOUNDBUFTIME   = 0x12,
+  PROPERTY_QUALITY        = 0x13,
+  PROPERTY_XMOUSE         = 0x14,
+  PROPERTY_YMOUSE         = 0x15,
+  PROPERTY_WTHIT          = 0x16	// not documented ???
 } Property;
 
 #define SWF_SETPROPERTY_X               0x0000

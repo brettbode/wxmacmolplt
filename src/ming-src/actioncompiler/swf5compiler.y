@@ -11,10 +11,17 @@
 #include "actiontypes.h"
 #include "assembler.h"
 
+#define YYERROR_VERBOSE 1
 #define YYPARSE_PARAM buffer
 //#define DEBUG 1
 
+#ifdef _MSC_VER 
+#define strcasecmp stricmp 
+#endif
+
+
 Buffer bf, bc;
+static int classContext = 0;
 
 %}
 
@@ -27,44 +34,48 @@ Buffer bf, bc;
   int intVal;
   int len;
   double doubleVal;
-
-  struct
-  {
-    Buffer buffer;
-    int count;
-  } exprlist;
-  struct switchcase   switchcase;
-  struct switchcases switchcases;
+  ASFunction 		function;
+  ASClass		clazz;
+  ASClassMember		classMember;
+  struct exprlist_s 	exprlist;
+  struct switchcase	switchcase;
+  struct switchcases	switchcases;
   struct
   {
 	Buffer obj, ident, memexpr;
   } lval;
 }
 
+/* 
+ * we expect 53 shift/reduce conflicts
+ * see also: http://www.gnu.org/software/bison/manual/html_mono/bison.html#Shift_002fReduce
+ */
+%expect 53
+
 /* tokens etc. */
 
 %token BREAK CONTINUE FUNCTION ELSE SWITCH CASE DEFAULT FOR IN IF WHILE
-%token DO VAR NEW DELETE TARGETPATH RETURN END WITH ASM EVAL
+%token DO VAR NEW DELETE DELETE2 TARGETPATH RETURN END WITH ASM EVAL
 
 %token RANDOM GETTIMER LENGTH CONCAT SUBSTR TRACE INT ORD CHR GETURL
 %token GETURL1 NEXTFRAME PREVFRAME PLAY STOP TOGGLEQUALITY STOPSOUNDS
 
-%token DUP SWAP POP PUSH SETREGISTER CALLFUNCTION CALLMETHOD
+%token DUP SWAP POP PUSH SETREGISTER CALLFUNCTION CALLMETHOD NEWOBJECT NEWMETHOD
 %token AND OR XOR MODULO ADD LESSTHAN EQUALS
-%token INC DEC TYPEOF INSTANCEOF ENUMERATE INITOBJECT INITARRAY GETMEMBER
-%token SETMEMBER SHIFTLEFT SHIFTRIGHT SHIFTRIGHT2 VAREQUALS OLDADD SUBTRACT
-%token MULTIPLY DIVIDE OLDEQUALS OLDLESSTHAN LOGICALAND LOGICALOR NOT
+%token INC DEC TYPEOF INSTANCEOF ENUMERATE ENUMERATE2 INITOBJECT INITARRAY
+%token GETMEMBER SETMEMBER SHIFTLEFT SHIFTRIGHT SHIFTRIGHT2 VAREQUALS OLDADD
+%token SUBTRACT MULTIPLY DIVIDE OLDEQUALS OLDLESSTHAN LOGICALAND LOGICALOR NOT
 %token STRINGEQ STRINGLENGTH SUBSTRING GETVARIABLE SETVARIABLE
 %token SETTARGETEXPRESSION  DUPLICATEMOVIECLIP REMOVEMOVIECLIP
 %token STRINGLESSTHAN MBLENGTH MBSUBSTRING MBORD MBCHR
-%token BRANCHALWAYS BRANCHIFTRUE GETURL2 POST GET 
+%token BRANCHALWAYS BRANCHIFTRUE GETURL2 POST GET CAST 
 %token LOADVARIABLES LOADMOVIE LOADVARIABLESNUM LOADMOVIENUM
 %token CALLFRAME STARTDRAG STOPDRAG GOTOANDSTOP GOTOANDPLAY SETTARGET 
-%token GETPROPERTY SETPROPERTY TONUMBER TOSTRING
+%token GETPROPERTY SETPROPERTY TONUMBER TOSTRING 
 
-%token TRY THROW CATCH FINALLY
+%token TRY THROW CATCH FINALLY THIS
 
-%token EXTENDS
+%token EXTENDS IMPLEMENTS FSCOMMAND2 CLASS PUBLIC PRIVATE
 
 %token NULLVAL
 %token UNDEFINED
@@ -73,6 +84,7 @@ Buffer bf, bc;
 %token <intVal> BOOLEAN
 %token <str> REGISTER
 
+%token BROKENSTRING
 /* these two are strdup'ed in compiler.flex, so free them up here */
 %token <str> STRING
 %token <str> IDENTIFIER
@@ -102,6 +114,10 @@ Buffer bf, bc;
 %token SHREQ ">>="
 %token SHR2EQ ">>>="
 
+%token _P_X _P_Y _P_XSCALE _P_YSCALE _P_CURRENTFRAME _P_TOTALFRAMES _P_ALPHA
+%token _P_VISIBLE _P_WIDTH _P_HEIGHT _P_ROTATION _P_TARGET _P_FRAMESLOADED 
+%token _P_NAME _P_DROPTARGET _P_URL _P_HIGHQUALITY _P_FOCUSRECT _P_SOUNDBUFTIME
+%token _P_QUALITY _P_XMOUSE _P_YMOUSE
 
 /* ascending order of ops ..? */
 
@@ -131,13 +147,15 @@ Buffer bf, bc;
 %type <action> try_catch_stmt throw_stmt
 %type <action> with_stmt
 %type <action> switch_stmt
-%type <action> anon_function_decl function_decl anycode
+%type <action> anycode
 %type <action> void_function_call function_call method_call
 %type <action> assign_stmt assign_stmts assign_stmts_opt
-%type <action> expr expr_or_obj objexpr expr_opt inpart obj_ref
+%type <action> expr expr_or_obj objexpr expr_opt inpart obj_ref obj_ref_for_delete_only
 %type <action> emptybraces level init_vars init_var primary lvalue_expr
-%type <lval> lvalue
-
+%type <action> delete_call primary_constant
+%type <classMember> class_stmts class_stmt class_vars class_var class_body 
+%type <lval> lvalue 
+%type <intVal> property
 %type <exprlist> expr_list objexpr_list formals_list
 
 %type <switchcase> switch_case
@@ -146,9 +164,12 @@ Buffer bf, bc;
 %type <op> assignop incdecop
 %type <getURLMethod> urlmethod
 
-%type <str> identifier
+%type <str> identifier function_identifier
 
+%type <function> function_decl
 %type <len> opcode opcode_list push_item with push_list
+
+%type <clazz> class_decl
 
 /*
 %type <intVal> integer
@@ -179,7 +200,15 @@ anycode
 	: stmt
 		{ bufferConcat(bc, $1); }
 	| function_decl
-		{ bufferConcat(bf, $1); }
+		{ 
+		  if(swfVersion > 6)
+			bufferWriteFunction(bf, $1, 2); 
+		  else
+			bufferWriteFunction(bf, $1, 1);
+		}
+
+	| class_decl
+		{ bufferWriteClass(bf, $1); }
 	;
 
 stmts
@@ -211,6 +240,78 @@ stmt
 	| throw_stmt
 	;
 
+
+class_stmts
+	: class_stmt
+	| class_stmts class_stmt
+	{ 	
+		$$ = $1;
+		ASClassMember_append($1, $2);			
+	}
+	;
+
+class_stmt
+	: access_attr function_decl 		{ $$ = newASClassMember_function($2); }
+	| access_attr VAR class_vars ';' 	{ $$ = $3; }
+	;
+
+class_init
+	: CLASS 
+	{
+		if(classContext)
+		{
+			swf5error("Nested classes are not allowed\n");
+			YYABORT;
+		}
+		classContext = 1;
+	}
+	; 
+
+class_body
+	: emptybraces {$$ = NULL; }
+	| '{' class_stmts '}' { $$ = $2; }
+	;	
+
+class_decl 
+	: class_init identifier class_body
+	{ 
+		$$ = newASClass($2, $3);
+		classContext = 0;
+	}
+	;
+
+access_attr
+	:	// empty
+	| PUBLIC
+	| PRIVATE
+	;
+
+type_attr
+	:
+	| ':' identifier
+
+class_vars
+	: class_var 
+
+	| class_vars ',' class_var 
+		{ $$ = $1;
+		  ASClassMember_append($1, $3); 
+		}
+	;
+
+class_var
+	: identifier type_attr '=' primary_constant
+		{ 
+		  ASVariable v = newASVariable($1, $4); 
+		  $$ = newASClassMember_variable(v);
+		}	  
+	| identifier type_attr
+		{ 
+			ASVariable v = newASVariable($1, NULL);
+			$$ = newASClassMember_variable(v);
+		}
+	;
+
 throw_stmt
 	: THROW expr_or_obj ';'		{ $$ = $2; bufferWriteOp($$, SWFACTION_THROW); }
 	;
@@ -218,47 +319,53 @@ throw_stmt
 try_catch_stmt
 	: TRY stmt					{ 	$$ = newBuffer();
 									bufferWriteOp($$, SWFACTION_TRY);
-									bufferWriteS16($$, bufferLength($2)+8);
-									bufferWriteU8($$, 0);
-									bufferWriteS16($$, bufferLength($2));
-									bufferWriteS16($$, 0);
-									bufferWriteS16($$, 0);
-									bufferWriteU8($$, 0); /* catch name here? - empty string */
-									bufferConcat($$, $2);
+									bufferWriteS16($$, 8);                /* TRY tag length */
+									bufferWriteU8($$, 0);                 /* flags */
+									bufferWriteS16($$, bufferLength($2)); /* try block length */
+									bufferWriteS16($$, 0);                /* catch block length */
+									bufferWriteS16($$, 0);                /* finally block length */
+									bufferWriteU8($$, 0);                 /* catch name - empty string */
+									bufferConcat($$, $2);                 /* append TRY body */
 								 }
 	| TRY stmt CATCH '(' identifier ')' stmt		{ $$ = newBuffer();
 									bufferWriteOp($$, SWFACTION_TRY);
-									bufferWriteS16($$, bufferLength($2)+strlen($5)+bufferLength($7)+8);
-									bufferWriteU8($$, 0);
-									bufferWriteS16($$, bufferLength($2));
-									bufferWriteS16($$, bufferLength($7));
-									bufferWriteS16($$, 0);
-									bufferWriteHardString($$, $5, strlen($5)+1);
-									bufferConcat($$, $2);
-									bufferConcat($$, $7);
+									bufferWriteS16($$, 8+strlen($5));       /* TRY tag length */
+									bufferWriteU8($$, 1);                   /* flags */
+									bufferWriteS16($$, bufferLength($2)+5); /* try block length + JUMP length */
+									bufferWriteS16($$, bufferLength($7));   /* catch block length */
+									bufferWriteS16($$, 0);                  /* finally block length */
+									bufferWriteHardString($$, $5, strlen($5)+1); /* catch name */
+									bufferConcat($$, $2);                   /* append TRY body */
+									bufferWriteOp($$, SWFACTION_JUMP);      /* jump after catch */
+									bufferWriteS16($$, 2);                  /* ... */
+									bufferWriteS16($$, bufferLength($7));   /* ... */
+									bufferConcat($$, $7);                   /* append CATCH body */
 								}
 	| TRY stmt FINALLY stmt		{	$$ = newBuffer();
 									bufferWriteOp($$, SWFACTION_TRY);
-									bufferWriteS16($$, bufferLength($2)+bufferLength($4)+8);
-									bufferWriteU8($$, 0);
-									bufferWriteS16($$, bufferLength($2));
-									bufferWriteS16($$, bufferLength($4));
-									bufferWriteS16($$, 0);
-									bufferWriteU8($$, 0); /* catch name here? - empty string */
-									bufferConcat($$, $2);
-									bufferConcat($$, $4);
+									bufferWriteS16($$, 8);                /* TRY tag length */
+									bufferWriteU8($$, 2);                 /* flags */
+									bufferWriteS16($$, bufferLength($2)); /* try block length */
+									bufferWriteS16($$, 0);                /* catch block length */
+									bufferWriteS16($$, bufferLength($4)); /* finally block length */
+									bufferWriteU8($$, 0);                 /* catch name - empty string */
+									bufferConcat($$, $2);                 /* append TRY body */
+									bufferConcat($$, $4);                 /* append FINALLY body */
 								 }
 	| TRY stmt CATCH '(' identifier ')' stmt FINALLY stmt	{ $$ = newBuffer();
 									bufferWriteOp($$, SWFACTION_TRY);
-									bufferWriteS16($$, bufferLength($2)+strlen($5)+bufferLength($7)+bufferLength($9)+8);
-									bufferWriteU8($$, 0);
-									bufferWriteS16($$, bufferLength($2));
+									bufferWriteS16($$, 8+strlen($5));        /* TRY tag length */
+									bufferWriteU8($$, 3);                    /* flags */
+									bufferWriteS16($$, bufferLength($2)+5);  /* try block length + JUMP length */
+									bufferWriteS16($$, bufferLength($7));    /* catch block length */
+									bufferWriteS16($$, bufferLength($9));    /* finally block length */
+									bufferWriteHardString($$, $5, strlen($5)+1); /* catch name */
+									bufferConcat($$, $2);                    /* append TRY body */
+									bufferWriteOp($$, SWFACTION_JUMP);       /* jump after catch */
+									bufferWriteS16($$, 2); 
 									bufferWriteS16($$, bufferLength($7));
-									bufferWriteS16($$, bufferLength($9));
-									bufferWriteHardString($$, $5, strlen($5)+1);
-									bufferConcat($$, $2);
-									bufferConcat($$, $7);
-									bufferConcat($$, $9);
+									bufferConcat($$, $7);                    /* append CATCH body */
+									bufferConcat($$, $9);                    /* append FINALLY body */
 								}
 	;
 
@@ -276,18 +383,24 @@ with_stmt
 return_stmt
 	: RETURN ';'
 		{ int tmp = chkctx(CTX_FUNCTION);
-		  if(tmp < 0)
+		  if(tmp < 0) 
+		  {
 			swf5error("return outside function");
+			YYABORT;
+		  }
 		  $$ = newBuffer();
 		  while(--tmp >= 0)
 			bufferWriteOp($$, SWFACTION_POP);
-		  bufferWriteNull($$);
+		  bufferWriteUndef($$);
 		  bufferWriteOp($$, SWFACTION_RETURN); }
 
 	| RETURN expr_or_obj ';'
 		{ int tmp = chkctx(CTX_FUNCTION);
 		  if(tmp < 0)
+		  {
 			swf5error("return outside function");
+			YYABORT;
+		  }
 		  $$ = newBuffer();
 		  while(--tmp >= 0)
 			bufferWriteOp($$, SWFACTION_POP);
@@ -306,11 +419,11 @@ if_stmt
 		  bufferWriteOp($$, SWFACTION_IF);
 		  bufferWriteS16($$, 2);
 		  bufferWriteS16($$, bufferLength($7)+5);
-		  bufferConcat($$, $7);
+		  bufferConcatSimple($$, $7);
 		  bufferWriteOp($$, SWFACTION_JUMP);
 		  bufferWriteS16($$, 2);
 		  bufferWriteS16($$, bufferLength($5));
-		  bufferConcat($$, $5); }
+		  bufferConcatSimple($$, $5); }
 
 	| IF '(' expr ')' stmt		%prec NOELSE
 		{ $$ = $3;
@@ -318,7 +431,7 @@ if_stmt
 		  bufferWriteOp($$, SWFACTION_IF);
 		  bufferWriteS16($$, 2);
 		  bufferWriteS16($$, bufferLength($5));
-		  bufferConcat($$, $5); }
+		  bufferConcatSimple($$, $5); }
 	;
 
 expr_opt
@@ -357,20 +470,29 @@ switch_cases
 	;
 
 switch_case
-	: CASE expr ':' stmts BREAK ';'
+	: CASE expr ':' stmts
 		{ $$.cond = $2;
 		  $$.action = $4;
-		  $$.isbreak = 1; }
-
-	| CASE expr ':' stmts
-		{ $$.cond = $2;
-		  $$.action = $4;
-		  $$.isbreak = 0; }
+		  if(chkctx(CTX_BREAK) == CTX_BREAK)
+		  {
+			delctx(CTX_BREAK);
+		  	$$.isbreak = 1;
+		  }
+		  else
+			$$.isbreak = 0; 
+		}
 
 	| DEFAULT ':' stmts
 		{ $$.cond = NULL;
 		  $$.action = $3;
-		  $$.isbreak = 0; }
+		  if(chkctx(CTX_BREAK) == CTX_BREAK)
+	          {
+			delctx(CTX_BREAK);
+		  	$$.isbreak = 1;
+		  }
+		  else
+			$$.isbreak = 0;
+		}
 	;
 
 
@@ -379,8 +501,6 @@ switch_case
 
 identifier
 	: IDENTIFIER
-	| NEW		{ $$ = strdup("new"); }
-	| DELETE	{ $$ = strdup("delete"); }
 	| TARGETPATH	{ $$ = strdup("targetPath"); }
 	| RANDOM	{ $$ = strdup("random"); }
 	| GETTIMER	{ $$ = strdup("getTimer"); }
@@ -416,7 +536,7 @@ identifier
 	| INC	{ $$ = strdup("inc"); }
 	| DEC	{ $$ = strdup("dec"); }
 	| TYPEOF	{ $$ = strdup("typeof"); }
-	| INSTANCEOF	{ $$ = strdup("instanceof"); }
+	| ENUMERATE2	{ $$ = strdup("enumerate2"); }
 	| ENUMERATE	{ $$ = strdup("enumerate"); }
 	| INITOBJECT	{ $$ = strdup("initobject"); }
 	| INITARRAY	{ $$ = strdup("initarray"); }
@@ -441,10 +561,10 @@ identifier
 	| GETVARIABLE	{ $$ = strdup("getvariable"); }
 	| SETVARIABLE	{ $$ = strdup("setvariable"); }
 	| SETTARGETEXPRESSION	{ $$ = strdup("settargetexpression"); }
-	| DUPLICATEMOVIECLIP	{ $$ = strdup("duplicatemovieclip"); }
-	| REMOVEMOVIECLIP	{ $$ = strdup("removemovieclip"); }
-	| STARTDRAG	{ $$ = strdup("startdrag"); }
-	| STOPDRAG	{ $$ = strdup("stopdrag"); }
+	| DUPLICATEMOVIECLIP	{ $$ = strdup("duplicateMovieClip"); }
+	| REMOVEMOVIECLIP	{ $$ = strdup("removeMovieClip"); }
+	| STARTDRAG	{ $$ = strdup("startDrag"); }
+	| STOPDRAG	{ $$ = strdup("stopDrag"); }
 	| STRINGLESSTHAN	{ $$ = strdup("stringlessthan"); }
 	| MBLENGTH	{ $$ = strdup("mblength"); }
 	| MBSUBSTRING	{ $$ = strdup("mbsubstring"); }
@@ -455,11 +575,43 @@ identifier
 	| GETURL2	{ $$ = strdup("getURL2"); }
 	| POST	{ $$ = strdup("post"); }
 	| GET	{ $$ = strdup("get"); }
-	| LOADVARIABLES	{ $$ = strdup("loadvariables"); }
-	| LOADMOVIE	{ $$ = strdup("loadmovie"); }
-	| EXTENDS	{ $$ = strdup("extends"); }
+	| LOADVARIABLES	{ $$ = strdup("loadVariables"); }
+	| LOADVARIABLESNUM { $$ = strdup("loadVariablesNum"); }
+	| LOADMOVIE	{ $$ = strdup("loadMovie"); }
+	| LOADMOVIENUM 	{ $$ = strdup("loadMovieNum"); }
 	| GOTOANDSTOP	{ $$ = strdup("gotoAndStop"); }
 	| GOTOANDPLAY	{ $$ = strdup("gotoAndPlay"); }
+	| SETTARGET 	{ $$ = strdup("setTarget"); }
+	| CALLFRAME	{ $$ = strdup("call"); }
+	| GETPROPERTY	{ $$ = strdup("getProperty"); }
+	| SETPROPERTY	{ $$ = strdup("setProperty"); }
+	| CAST		{ $$ = strdup("cast"); }
+	/* temp hack to keep things working */
+	| THIS		{ $$ = strdup("this"); }
+	
+	/* property names */ 
+	| _P_X			{ $$ = strdup("_x"); }
+	| _P_Y			{ $$ = strdup("_y"); }
+	| _P_XSCALE		{ $$ = strdup("_xscale"); }
+	| _P_YSCALE 		{ $$ = strdup("_yscale"); }
+	| _P_CURRENTFRAME	{ $$ = strdup("_currentframe"); }
+	| _P_TOTALFRAMES	{ $$ = strdup("_totalframes"); }
+	| _P_ALPHA		{ $$ = strdup("_alpha"); }
+	| _P_VISIBLE		{ $$ = strdup("_visible"); }
+	| _P_WIDTH 		{ $$ = strdup("_width"); }
+	| _P_HEIGHT		{ $$ = strdup("_height"); }
+	| _P_ROTATION		{ $$ = strdup("_rotation"); }
+	| _P_TARGET		{ $$ = strdup("_target"); }
+	| _P_FRAMESLOADED	{ $$ = strdup("_framesloaded"); }
+	| _P_NAME		{ $$ = strdup("_name"); }
+	| _P_DROPTARGET		{ $$ = strdup("_droptarget"); }
+	| _P_URL 		{ $$ = strdup("_url"); }
+	| _P_HIGHQUALITY	{ $$ = strdup("_highquality"); }
+	| _P_FOCUSRECT		{ $$ = strdup("_focusrect"); }
+	| _P_SOUNDBUFTIME	{ $$ = strdup("_soundbuftime"); }
+	| _P_QUALITY		{ $$ = strdup("_quality"); }
+	| _P_XMOUSE		{ $$ = strdup("_xmouse"); }
+	| _P_YMOUSE		{ $$ = strdup("_ymouse"); }
 	;
 
 formals_list
@@ -467,50 +619,32 @@ formals_list
 		{ $$.buffer = newBuffer();
 		  $$.count = 0; }
 
-	| identifier
+	| identifier type_attr
 		{ $$.buffer = newBuffer();
 		  bufferWriteHardString($$.buffer, $1, strlen($1)+1);
 		  $$.count = 1;
 		  free($1); }
 
-	| formals_list ',' identifier
+	| formals_list ',' identifier type_attr
 		{ $$ = $1;
 		  bufferWriteHardString($$.buffer, $3, strlen($3)+1);
 		  ++$$.count;
 		  free($3); }
 	;
 
-function_init
-	: FUNCTION
-		{ addctx(CTX_FUNCTION); }
+function_identifier
+	: 		{ addctx(CTX_FUNCTION); $$ = NULL; }
+	| identifier	{ addctx(CTX_FUNCTION); $$ = $1; }
 	;
 
 function_decl
-	: function_init identifier '(' formals_list ')' stmt
+	: FUNCTION function_identifier '(' formals_list ')' type_attr stmt
 	{
-		$$ = newBuffer();
-		if(swfVersion > 6)
-		{
-			// TODO: let user control which flags to use ?
-			// Don't preload any variable in registers, or we'll need to track all uses of 
-			// those variables in this function context turning them into register accesses
-			int flags = 0;
-			int num_regs = 0;
-			bufferWriteDefineFunction2($$, $2, $4.buffer, $6, flags, num_regs);
-		}
-		else
-		{
-			bufferWriteOp($$, SWFACTION_DEFINEFUNCTION);
-			bufferWriteS16($$, strlen($2) +
-				bufferLength($4.buffer) + 5);
-			bufferWriteHardString($$, $2, strlen($2)+1);
-			bufferWriteS16($$, $4.count);
-			bufferConcat($$, $4.buffer);
-			bufferWriteS16($$, bufferLength($6));
-			bufferConcat($$, $6);
-			delctx(CTX_FUNCTION);
-			free($2); // should be done for function2 as well ?
-		}
+		$$ = newASFunction();
+		$$->name = $2;
+		$$->params = $4;
+		$$->code = $7;	
+		delctx(CTX_FUNCTION);	
 	}
 	;
 
@@ -524,7 +658,7 @@ obj_ref
 		{ if($1.obj)
 		  {
 		    $$ = $1.obj;
-
+		    $$->hasObject = 1;
 		    if($1.ident)
 		      bufferConcat($$, $1.ident);
 		    else
@@ -539,6 +673,29 @@ obj_ref
 		}
 	| function_call
 	| method_call
+	;
+
+// this is a workaround for DELETE / DELETE2 OPs. (AS is broken!!!)
+obj_ref_for_delete_only
+	: lvalue
+		{ if($1.obj)
+		  {
+		    $$ = $1.obj;
+		    $$->hasObject = 1; 
+		    if($1.ident)
+		      bufferConcat($$, $1.ident);
+		    else
+		      bufferConcat($$, $1.memexpr);
+		  }
+		  else
+		  {
+		    $$ = $1.ident;
+		  }
+		}
+	| function_call
+	| void_function_call
+	| method_call
+	| '(' obj_ref_for_delete_only ')' { $$ = $2; }
 	;
 
 while_init
@@ -590,37 +747,41 @@ iter_stmt
 
 	| FOR '(' assign_stmts_opt ';' expr_opt ';' assign_stmts_opt ')' for_init stmt
 		{
+		  int continue_len;
 		  if($3)
 		    $$ = $3;
 		  else
 		    $$ = newBuffer();
 
-		  if($7)
-		  {
-                    bufferWriteOp($$, SWFACTION_JUMP);
-                    bufferWriteS16($$, 2);
-                    bufferWriteS16($$, bufferLength($7));
-		  }
-		  else
-		    $7 = newBuffer();
-
+		  continue_len = bufferLength ($7);
+		  if($10)
+		    bufferConcatSimple($10, $7);
+		  else if ($7)
+		    $10 = $7;
+		  else 
+		    $10 = newBuffer();
 		  if($5)
 		  {
-		    bufferConcat($7, $5);
-                    bufferWriteOp($7, SWFACTION_LOGICALNOT);
-                    bufferWriteOp($7, SWFACTION_IF);
-                    bufferWriteS16($7, 2);
-                    bufferWriteS16($7, bufferLength($10)+5);
+                    bufferWriteOp($5, SWFACTION_LOGICALNOT);
+                    bufferWriteOp($5, SWFACTION_IF);
+                    bufferWriteS16($5, 2);
+                    bufferWriteS16($5, bufferLength($10)+5);
+		    bufferConcat($5, $10);
                   }
+		  else
+		    $5 = $10;
 
-                  bufferConcat($7, $10);
-                  bufferWriteOp($7, SWFACTION_JUMP);
-                  bufferWriteS16($7, 2);
-                  bufferWriteS16($7, -(bufferLength($7)+2));
-                  bufferResolveJumps($7);
+                  bufferWriteOp($5, SWFACTION_JUMP);
+                  bufferWriteS16($5, 2);
+                  bufferWriteS16($5, -(bufferLength($5)+2));
+		  /* need to jump to last part of for stmt in continue case */
+		  if (continue_len)
+		    bufferResolveJumpsFull($5, $5->pos, $5->pos - continue_len - 5);
+		  else
+		    bufferResolveJumps($5);
 
-                  bufferConcat($$, $7);
-				  delctx(CTX_LOOP);
+                  bufferConcat($$, $5);
+		  delctx(CTX_LOOP);
                 }
 
 	| FOR '(' identifier inpart ')' for_in_init stmt
@@ -628,7 +789,10 @@ iter_stmt
 		  int tmp;
 
 		  $$ = $4;
-		  bufferWriteOp($$, SWFACTION_ENUMERATE);	
+		  if($4->hasObject)
+			bufferWriteOp($$, SWFACTION_ENUMERATE2);
+		  else
+			bufferWriteOp($$, SWFACTION_ENUMERATE);
 
 		  b2 = newBuffer();
 		  bufferWriteSetRegister(b2, 0);
@@ -648,12 +812,12 @@ iter_stmt
 		  bufferConcat(b3, $7);
 		  bufferWriteS16(b2, bufferLength(b3) + 5);
 		  tmp = bufferLength(b2) + bufferLength(b3) + 5;
-		  bufferConcat($$, b2);
 		  bufferWriteOp(b3, SWFACTION_JUMP);
 		  bufferWriteS16(b3, 2);
 		  bufferWriteS16(b3, -tmp);
-		  bufferResolveJumps(b3);
-		  bufferConcat($$, b3);
+		  bufferConcat(b2, b3);
+		  bufferResolveJumps(b2);
+		  bufferConcat($$, b2);
 		  delctx(CTX_FOR_IN);
 		  free($3); }
 
@@ -662,7 +826,10 @@ iter_stmt
 		  int tmp;
 
 		  $$ = $5;
-		  bufferWriteOp($$, SWFACTION_ENUMERATE);	
+		  if($5->hasObject)
+			bufferWriteOp($$, SWFACTION_ENUMERATE2);        
+		  else
+			bufferWriteOp($$, SWFACTION_ENUMERATE); 
 
 		  b2 = newBuffer();
 		  bufferWriteSetRegister(b2, 0);
@@ -681,12 +848,12 @@ iter_stmt
 		  bufferConcat(b3, $8);
 		  bufferWriteS16(b2, bufferLength(b3) + 5);
 		  tmp = bufferLength(b2) + bufferLength(b3) + 5;
-		  bufferConcat($$, b2);
 		  bufferWriteOp(b3, SWFACTION_JUMP);
 		  bufferWriteS16(b3, 2);
 		  bufferWriteS16(b3, -tmp);
-		  bufferResolveJumps(b3);
-		  bufferConcat($$, b3);
+		  bufferConcat(b2, b3);
+		  bufferResolveJumps(b2);
+		  bufferConcat($$, b2);
 		  delctx(CTX_FOR_IN);
 		  free($4); }
 	;
@@ -700,8 +867,12 @@ assign_stmts_opt
 // on the stack
 cont_stmt
 	: CONTINUE ';'
-		{ if(chkctx(CTX_CONTINUE) < 0)
+		{ 
+		  if(chkctx(CTX_CONTINUE) < 0)
+		  {
 			swf5error("continue outside loop");
+			YYABORT;
+		  }
 		  $$ = newBuffer();
 		  bufferWriteOp($$, SWFACTION_JUMP);
 		  bufferWriteS16($$, 2);
@@ -711,15 +882,27 @@ cont_stmt
 // break is possible if there is a CTX_LOOP, CTX_FOR_IN or CTX_SWITCH
 break_stmt
 	: BREAK ';'
-		{ int tmp = chkctx(CTX_BREAK);
-		  if(tmp < 0)
-			swf5error("break outside switch / loop");
+		{ int context = chkctx(CTX_BREAK);
 		  $$ = newBuffer();
-		  if(tmp)	/* break out of a for .. in */
-			bufferWriteOp($$, SWFACTION_POP);
-		  bufferWriteOp($$, SWFACTION_JUMP);
-		  bufferWriteS16($$, 2);
-		  bufferWriteS16($$, MAGIC_BREAK_NUMBER); }
+		  if(context == CTX_FOR_IN || context == CTX_LOOP)
+		  {
+		  	if(context == CTX_FOR_IN)	/* break out of a for .. in */
+				bufferWriteOp($$, SWFACTION_POP);
+		  	bufferWriteOp($$, SWFACTION_JUMP);
+		  	bufferWriteS16($$, 2);
+		  	bufferWriteS16($$, MAGIC_BREAK_NUMBER); 
+		  }
+		  else if(context == CTX_SWITCH)
+		  {
+			addctx(CTX_BREAK);	
+		  }
+		  else
+		  {
+			swf5error("break outside switch / loop");
+			YYABORT;
+		  }
+		}
+
 	;
 
 urlmethod
@@ -729,21 +912,16 @@ urlmethod
 
 	| ',' POST		{ $$ = GETURL_METHOD_POST; }
 
-	| ',' STRING		{ if(strcmp($2, "GET") == 0)
+	| ',' STRING		{ if(strcasecmp($2, "GET") == 0)
 				    $$ = GETURL_METHOD_GET;
-				  else if(strcmp($2, "POST") == 0)
-				    $$ = GETURL_METHOD_POST; }
+				  else if(strcasecmp($2, "POST") == 0)
+				    $$ = GETURL_METHOD_POST;
+				  else $$ = GETURL_METHOD_NOSEND;
+				}
 	;
 
 level
-	: INTEGER
-		{ char *lvlstring = (char*) malloc(12*sizeof(char));
-		  sprintf(lvlstring, "_level%d", $1);
-		  $$ = newBuffer();
-		  bufferWriteString($$, lvlstring, strlen(lvlstring)+1);
-		  free(lvlstring); }
-
-	| expr
+	: expr
 		{ $$ = newBuffer();
 		  bufferWriteString($$, "_level", 7);
 		  bufferConcat($$, $1);
@@ -751,50 +929,8 @@ level
 	;
 
 void_function_call
-	: identifier '(' expr_list ')'
-		{
-#ifdef DEBUG
-		  printf("void_function_call: IDENTIFIER '(' expr_list ')'\n");
-#endif
-		  $$ = $3.buffer;
-		  bufferWriteInt($$, $3.count);
-		  bufferWriteString($$, $1, strlen($1)+1);
-		  bufferWriteOp($$, SWFACTION_CALLFUNCTION);
-		  bufferWriteOp($$, SWFACTION_POP);
-		  free($1); }
 
-	| TARGETPATH '(' IDENTIFIER ')'
-		{ $$ = newBuffer();
-		  bufferWriteString($$, $3, strlen($3)+1);
-		  free($3);
-		  bufferWriteOp($$, SWFACTION_GETVARIABLE); 
-		  bufferWriteOp($$, SWFACTION_TARGETPATH); 
-		  bufferWriteOp($$, SWFACTION_POP); }
-
-	| DELETE IDENTIFIER
-		{ $$ = newBuffer();
-		  bufferWriteString($$, $2, strlen($2)+1);
-		  free($2);
-		  bufferWriteOp($$, SWFACTION_DELETE2);
-		  bufferWriteOp($$, SWFACTION_POP); }
-
-	| DELETE lvalue_expr '.' IDENTIFIER
-		{ $$ = $2;
-		  // bufferWriteOp($$, SWFACTION_GETVARIABLE);
-		  bufferWriteString($$, $4, strlen($4)+1);
-		  free($4);
-		  bufferWriteOp($$, SWFACTION_DELETE);
-		  bufferWriteOp($$, SWFACTION_POP); }
-
-	| DELETE lvalue_expr '[' expr ']'
-		{ $$ = $2;
-		  // bufferWriteOp($$, SWFACTION_GETVARIABLE);
-		  bufferConcat($$, $4);
-		  // bufferWriteOp($$, SWFACTION_GETVARIABLE);
-		  bufferWriteOp($$, SWFACTION_DELETE); 
-		  bufferWriteOp($$, SWFACTION_POP); }
-
-	| TRACE '(' expr_or_obj ')'
+	: TRACE '(' expr_or_obj ')'
 		{ $$ = $3;
 		  bufferWriteOp($$, SWFACTION_TRACE); }
 
@@ -977,7 +1113,13 @@ void_function_call
 		{ $$ = $3;
 		  bufferWriteOp($$, SWFACTION_SETTARGET2); }
 
-
+	| SETPROPERTY '(' expr ',' property ',' expr ')'
+		{
+			$$ = $3;
+			bufferWriteFloat($$, $5);
+			bufferConcat($$, $7);
+			bufferWriteOp($$, SWFACTION_SETPROPERTY);	
+		}
 	;
 
 
@@ -999,24 +1141,6 @@ function_call
 		  free($3);
 		  bufferWriteOp($$, SWFACTION_GETVARIABLE); 
 		  bufferWriteOp($$, SWFACTION_TARGETPATH); }
-
-
-	| DELETE IDENTIFIER
-		{ $$ = newBuffer();
-		  bufferWriteString($$, $2, strlen($2)+1);
-		  free($2);
-		  bufferWriteOp($$, SWFACTION_DELETE2);  }
-
-	| DELETE lvalue_expr '.' IDENTIFIER
-		{ $$ = $2;
-		  bufferWriteString($$, $4, strlen($4)+1);
-		  free($4);
-		  bufferWriteOp($$, SWFACTION_DELETE); }
-
-	| DELETE lvalue_expr '[' expr ']'
-		{ $$ = $2;
-		  bufferConcat($$, $4);
-		  bufferWriteOp($$, SWFACTION_DELETE);  }
 
 	| EVAL '(' expr ')'
 		{ $$ = $3;
@@ -1051,7 +1175,7 @@ function_call
 		  bufferConcat($$, $5);
 		  bufferWriteOp($$, SWFACTION_STRINGCONCAT); }
 
-	| SUBSTRING '(' expr ',' expr ',' expr ')'
+	| SUBSTR '(' expr ',' expr ',' expr ')'
 		{ $$ = $3;
 		  bufferConcat($$, $5);
 		  bufferConcat($$, $7);
@@ -1064,7 +1188,24 @@ function_call
 #endif
 		  $$ = $3;
 		  bufferWriteOp($$, SWFACTION_TYPEOF); }
+	
+	| GETPROPERTY '(' expr ',' property ')'
+		{ $$ = newBuffer();
+		  bufferConcat($$, $3);
+		  bufferWriteFloat($$, $5);
+		  bufferWriteOp($$, SWFACTION_GETPROPERTY);
+		}
+	;
 
+/* legacy and built-in functions */
+delete_call
+	: DELETE obj_ref_for_delete_only 
+		{ $$ = $2;
+		  if($2->hasObject)
+		    bufferWriteOp($$, SWFACTION_DELETE);
+		  else 
+		    bufferWriteOp($$, SWFACTION_DELETE2);
+		}
 	;
 
 
@@ -1084,33 +1225,6 @@ expr_list
 		  bufferConcat(tmp, $$.buffer);
 		  $$.buffer = tmp;
 		  ++$$.count;  }
-	;
-
-anon_function_decl
-	: function_init '(' formals_list ')' stmt
-	{
-		$$ = newBuffer();
-		if(swfVersion > 6)
-		{
-			// TODO: let user control which flags to use ?
-			// Don't preload any variable in registers, or we'll need to track all uses of 
-			// those variables in this function context turning them into register accesses
-			int flags = 0;
-			int num_regs = 0;
-			bufferWriteDefineFunction2($$, NULL, $3.buffer, $5, flags, num_regs);
-		}
-		else
-		{
-			bufferWriteOp($$, SWFACTION_DEFINEFUNCTION);
-			bufferWriteS16($$, bufferLength($3.buffer) + 5); /* what's 5 here ? */
-			bufferWriteU8($$, 0); /* empty function name */
-			bufferWriteS16($$, $3.count);
-			bufferConcat($$, $3.buffer);
-			bufferWriteS16($$, bufferLength($5));
-			bufferConcat($$, $5);
-			delctx(CTX_FUNCTION); // should be done for function2 as well ?
-		}
-	}
 	;
 
 method_call
@@ -1168,25 +1282,12 @@ incdecop
 	;
 
 
-/*
-integer
-	: '-' INTEGER %prec UMINUS	{ $$ = -$2; }
-	| INTEGER			{ $$ = $1; }
-	;
-
-double
-	: '-' DOUBLE %prec UMINUS	{ $$ = -$2; }
-	| DOUBLE			{ $$ = $1; }
-	;
-*/
-
 /* resolves an lvalue into a buffer */
 lvalue_expr
 	: lvalue
 		{ if($1.obj)
 		  {
 		    $$ = $1.obj;
-
 		    if($1.ident)
 		      bufferConcat($$, $1.ident);
 		    else
@@ -1230,6 +1331,8 @@ lvalue
 
 expr
 	: primary
+	
+	| primary_constant
 
 	| '-' expr %prec UMINUS
 		{ $$ = $2;
@@ -1245,15 +1348,24 @@ expr
 		{ $$ = $2;
 		  bufferWriteOp($2, SWFACTION_LOGICALNOT); }
 
-	| expr LOR expr
-		{ $$ = $1;
-		  bufferConcat($$, $3);
-		  bufferWriteOp($$, SWFACTION_LOGICALOR); }
-
 	| expr LAN expr
 		{ $$ = $1;
-		  bufferConcat($$, $3);
-		  bufferWriteOp($$, SWFACTION_LOGICALAND); }
+		  bufferWriteOp($$, SWFACTION_PUSHDUP);
+		  bufferWriteOp($$, SWFACTION_LOGICALNOT);
+		  bufferWriteOp($$, SWFACTION_IF);
+		  bufferWriteS16($$, 2);
+		  bufferWriteS16($$, bufferLength($3)+1);
+		  bufferWriteOp($$, SWFACTION_POP);
+		  bufferConcatSimple($$, $3); }
+
+	| expr LOR expr
+		{ $$ = $1;
+		  bufferWriteOp($$, SWFACTION_PUSHDUP);
+		  bufferWriteOp($$, SWFACTION_IF);
+		  bufferWriteS16($$, 2);
+		  bufferWriteS16($$, bufferLength($3)+1);
+		  bufferWriteOp($$, SWFACTION_POP);
+		  bufferConcatSimple($$, $3); }
 
 	| expr '*' expr
 		{ $$ = $1;
@@ -1350,11 +1462,11 @@ expr
 		{ bufferWriteOp($1, SWFACTION_IF);
 		  bufferWriteS16($1, 2);
 		  bufferWriteS16($1, bufferLength($5)+5);
-		  bufferConcat($1, $5);
+		  bufferConcatSimple($1, $5);
 		  bufferWriteOp($1, SWFACTION_JUMP);
 		  bufferWriteS16($1, 2);
 		  bufferWriteS16($1, bufferLength($3));
-		  bufferConcat($1, $3); }
+		  bufferConcatSimple($1, $3); }
 
 	| lvalue '=' expr_or_obj
 		{ if($1.obj) /* obj[memexpr] or obj.ident */
@@ -1393,7 +1505,7 @@ expr
 expr_or_obj
 	: expr
 
-	| NEW IDENTIFIER
+	| NEW identifier
 		{
 #ifdef DEBUG
 		  printf("NEW %s\n", $2);
@@ -1480,10 +1592,23 @@ expr_or_obj
 	;
 
 primary
-	: anon_function_decl
-
+	: function_decl
+		{
+			if($1->name != NULL)
+			{
+				swf5error("anonymous decl only. identifier not allowed");
+				YYABORT;
+			}
+			$$ = newBuffer();
+			if(swfVersion > 6)
+				bufferWriteFunction($$, $1, 2);
+			else
+				bufferWriteFunction($$, $1, 1);
+		}
 	| lvalue_expr
 
+	| delete_call
+			
 	| incdecop lvalue %prec "++"
 		{ if($2.obj)
 		  {
@@ -1577,38 +1702,7 @@ primary
 	| '(' expr ')'
 		{ $$ = $2; }
 
-	| '-' INTEGER %prec UMINUS
-		{ $$ = newBuffer();
-		  bufferWriteInt($$, -$2); }
-
-	| INTEGER
-		{ $$ = newBuffer();
-		  bufferWriteInt($$, $1); }
-
-	| '-' DOUBLE %prec UMINUS
-		{ $$ = newBuffer();
-		  bufferWriteDouble($$, -$2); }
-
-	| DOUBLE
-		{ $$ = newBuffer();
-		  bufferWriteDouble($$, $1); }
-
-	| BOOLEAN
-		{ $$ = newBuffer();
-		  bufferWriteBoolean($$, $1); }
-
-	| NULLVAL
-		{ $$ = newBuffer();
-		  bufferWriteNull($$); }
-
-	| UNDEFINED
-		{ $$ = newBuffer();
-		  bufferWriteUndef($$); }
-
-	| STRING
-		{ $$ = newBuffer();
-		  bufferWriteString($$, $1, strlen($1)+1);
-		  free($1); }
+	
 	| lvalue assignop expr
 		{ if($1.obj)
 		  {
@@ -1657,6 +1751,30 @@ primary
 		}
 	;
 
+primary_constant
+	: BOOLEAN
+		{ $$ = newBuffer();
+		  bufferWriteBoolean($$, $1); }
+	| NULLVAL
+		{ $$ = newBuffer();
+		  bufferWriteNull($$); }
+
+	| UNDEFINED
+		{ $$ = newBuffer();
+		  bufferWriteUndef($$); }
+
+	| STRING
+		{ $$ = newBuffer();
+		  bufferWriteString($$, $1, strlen($1)+1);
+		  free($1); }
+	| INTEGER
+		{ $$ = newBuffer();
+		  bufferWriteInt($$, $1); }
+	| DOUBLE
+		{ $$ = newBuffer();
+		  bufferWriteDouble($$, $1); }
+	;
+
 init_vars
 	: init_var
 
@@ -1666,14 +1784,14 @@ init_vars
 	;
 
 init_var
-	: identifier '=' expr_or_obj
+	: identifier type_attr '=' expr_or_obj
 		{ $$ = newBuffer();
 		  bufferWriteString($$, $1, strlen($1)+1);
 		  free($1);
-		  bufferConcat($$, $3);
+		  bufferConcat($$, $4);
 		  bufferWriteOp($$, SWFACTION_DEFINELOCAL); }
 
-	| identifier
+	| identifier type_attr
 		{ $$ = newBuffer();
 		  bufferWriteString($$, $1, strlen($1)+1);
 		  free($1);
@@ -1690,6 +1808,10 @@ assign_stmt
 		{ $$ = $2; }
 
 	| void_function_call
+
+	| delete_call
+		{ $$ = $1;
+		  bufferWriteOp($$, SWFACTION_POP); }
 
 	| function_call
 		{ $$ = $1;
@@ -1849,7 +1971,7 @@ opcode_list
 
 with
 	: WITH
-				{ $$ = bufferWriteOp(asmBuffer,
+				{ $<len>$ = bufferWriteOp(asmBuffer,
 						     SWFACTION_WITH); }
 	  opcode_list END	{ $$ = $<len>2 + $3;
 				  bufferPatchLength(asmBuffer, $3); }
@@ -1886,8 +2008,8 @@ push_list
 	;
 
 opcode
-	: PUSH 			{ $$ = bufferWritePushOp(asmBuffer);
-				  $$ += bufferWriteS16(asmBuffer, 0); }
+	: PUSH 			{ $<len>$ = bufferWritePushOp(asmBuffer);
+				  $<len>$ += bufferWriteS16(asmBuffer, 0); }
 	  push_list		{ $$ = $<len>2 + $3;
 				  bufferPatchLength(asmBuffer, $3); }
 
@@ -1906,6 +2028,10 @@ opcode
 						     SWFACTION_RETURN); }
 	| CALLMETHOD	{ $$ = bufferWriteOp(asmBuffer, 
 						     SWFACTION_CALLMETHOD); }
+	| NEWOBJECT		{ $$ = bufferWriteOp(asmBuffer, 
+						     SWFACTION_NEWOBJECT); }
+	| NEWMETHOD		{ $$ = bufferWriteOp(asmBuffer, 
+						     SWFACTION_NEWMETHOD); }
 	| AND			{ $$ = bufferWriteOp(asmBuffer, 
 						     SWFACTION_BITWISEAND); }
 	| OR			{ $$ = bufferWriteOp(asmBuffer, 
@@ -1930,8 +2056,12 @@ opcode
 						     SWFACTION_INSTANCEOF); }
 	| ENUMERATE		{ $$ = bufferWriteOp(asmBuffer, 
 						     SWFACTION_ENUMERATE); }
+	| ENUMERATE2		{ $$ = bufferWriteOp(asmBuffer, 
+						     SWFACTION_ENUMERATE2); }
 	| DELETE		{ $$ = bufferWriteOp(asmBuffer, 
 						     SWFACTION_DELETE); }
+	| DELETE2		{ $$ = bufferWriteOp(asmBuffer, 
+						     SWFACTION_DELETE2); }
 	| NEW			{ $$ = bufferWriteOp(asmBuffer, 
 						     SWFACTION_NEWOBJECT); }
 	| INITARRAY		{ $$ = bufferWriteOp(asmBuffer, 
@@ -1952,6 +2082,14 @@ opcode
 						     SWFACTION_DEFINELOCAL2); }
 	| EXTENDS		{ $$ = bufferWriteOp(asmBuffer, 
 						     SWFACTION_EXTENDS); }
+	| TARGETPATH		{ $$ = bufferWriteOp(asmBuffer, 
+						     SWFACTION_TARGETPATH); }
+	| IMPLEMENTS		{ $$ = bufferWriteOp(asmBuffer, 
+						     SWFACTION_IMPLEMENTSOP); }
+	| FSCOMMAND2		{ $$ = bufferWriteOp(asmBuffer, 
+						     SWFACTION_FSCOMMAND2); }
+	| CAST			{ $$ = bufferWriteOp(asmBuffer,
+						     SWFACTION_CASTOP);	}
 
 	/* f4 ops */
 	| OLDADD		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_ADD); }
@@ -2002,5 +2140,30 @@ opcode
 
 	;
 
+property
+	: STRING	 	{ $$ = lookupProperty($1); } // Ming extension !
+	| _P_X 			{ $$ = PROPERTY_X; }
+	| _P_Y 			{ $$ = PROPERTY_Y; }
+	| _P_XSCALE		{ $$ = PROPERTY_XSCALE; }
+	| _P_YSCALE		{ $$ = PROPERTY_YSCALE; }
+	| _P_CURRENTFRAME	{ $$ = PROPERTY_CURRENTFRAME; }
+	| _P_TOTALFRAMES	{ $$ = PROPERTY_TOTALFRAMES; }
+	| _P_ALPHA		{ $$ = PROPERTY_ALPHA; }
+	| _P_VISIBLE		{ $$ = PROPERTY_VISIBLE; }
+	| _P_WIDTH		{ $$ = PROPERTY_WIDTH; }
+	| _P_HEIGHT		{ $$ = PROPERTY_HEIGHT; }
+	| _P_ROTATION		{ $$ = PROPERTY_ROTATION; }
+	| _P_TARGET		{ $$ = PROPERTY_TARGET; }
+	| _P_FRAMESLOADED	{ $$ = PROPERTY_FRAMESLOADED; }
+	| _P_NAME		{ $$ = PROPERTY_NAME; }
+	| _P_DROPTARGET		{ $$ = PROPERTY_DROPTARGET; }
+	| _P_URL		{ $$ = PROPERTY_URL; }
+	| _P_HIGHQUALITY	{ $$ = PROPERTY_HIGHQUALITY; }
+	| _P_FOCUSRECT		{ $$ = PROPERTY_FOCUSRECT; }
+	| _P_SOUNDBUFTIME	{ $$ = PROPERTY_SOUNDBUFTIME; }	
+	| _P_QUALITY		{ $$ = PROPERTY_QUALITY; }
+	| _P_XMOUSE		{ $$ = PROPERTY_XMOUSE; }
+	| _P_YMOUSE		{ $$ = PROPERTY_YMOUSE; }
+	;
 %%
 

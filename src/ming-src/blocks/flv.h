@@ -25,6 +25,12 @@
 #ifndef _FLV_H_
 #define _FLV_H_
 
+#define AUDIO_CODEC_UNCOMPRESSED   0
+#define AUDIO_CODEC_ADPCM	0x01
+#define AUDIO_CODEC_MP3		0x02
+#define AUDIO_CODEC_NELLY_MONO	0x05
+#define AUDIO_CODEC_NELLY	0x06
+
 #define VIDEO_CODEC_H263 	0x02
 #define VIDEO_CODEC_SCREEN 	0x03
 #define VIDEO_CODEC_VP6		0x04
@@ -70,10 +76,10 @@ struct FLVTag_s
 {
 	struct FLVStream_s 	*stream;
 	int 			tagType;
-	unsigned long 		dataSize;
-	unsigned long 		timeStamp;
-	unsigned long 		offset;
-	unsigned long		data;
+	long 		dataSize;
+	long 		timeStamp;
+	long 		offset;
+	long		data;
 	union {
 		struct video_hdr video;
 		struct audio_hdr audio;
@@ -90,4 +96,5 @@ FLVStream *FLVStream_fromInput(SWFInput input);
 void destroyFLVStream(FLVStream *flv);
 SWFInput FLVTag_getPayloadInput(FLVTag *tag);
 int FLVStream_setStreamOffset(FLVStream *flv, unsigned int msecs);
+unsigned int FLVStream_getDuration(FLVStream *flv, int type);
 #endif

@@ -20,8 +20,18 @@
 #ifndef SWF_MINGPP_H_INCLUDED
 #define SWF_MINGPP_H_INCLUDED
 
+/* why would we need to include these ??
 #include <stdio.h>
-#include <string.h>
+*/
+#include <cstring> /* for strlen used in SWFBitmap costructor */
+#include <stdexcept>
+#include <iostream>
+#include <string>
+#include <list>
+
+#ifdef _MSC_VER
+#define strcasecmp stricmp 
+#endif
 
 /* mask the c type names so that we can replace them with classes.
    weird, but it works.  (on gcc, anyway..) */
@@ -32,6 +42,7 @@ extern "C"
   #define SWFMovie        c_SWFMovie
   #define SWFDisplayItem  c_SWFDisplayItem
   #define SWFFill         c_SWFFill
+  #define SWFFillStyle    c_SWFFillStyle
   #define SWFCharacter    c_SWFCharacter
   #define SWFBlock        c_SWFBlock
   #define SWFSprite       c_SWFSprite
@@ -41,6 +52,8 @@ extern "C"
   #define SWFMorph        c_SWFMorph
   #define SWFText         c_SWFText
   #define SWFFont         c_SWFFont
+  #define SWFBrowserFont  c_SWFBrowserFont
+  #define SWFFontCollection  c_SWFFontCollection
   #define SWFTextField    c_SWFTextField
   #define SWFAction       c_SWFAction
   #define SWFButton       c_SWFButton
@@ -52,18 +65,28 @@ extern "C"
   #define SWFBlur         c_SWFBlur
   #define SWFShadow       c_SWFShadow
   #define SWFFilterMatrix c_SWFFilterMatrix
-
-// begin minguts 2004/08/31 ((((
+  #define SWFInitAction   c_SWFInitAction
+  #define SWFButtonRecord c_SWFButtonRecord
   #define SWFFontCharacter c_SWFFontCharacter
   #define SWFPrebuiltClip c_SWFPrebuiltClip
-// )))) end minguts 2004/08/31
+  #define SWFSoundInstance c_SWFSoundInstance
+  #define SWFBinaryData	  c_SWFBinaryData
+  #define SWFMatrix	  c_SWFMatrix
+  #define SWFCXform	  c_SWFCXform
 
   #include <ming.h>
+
+/* 
+ * declaration from src/blocks/fdbfont.h. 
+ * internal function to maintain behavior of older ming-version
+ */
+SWFFont loadSWFFont_fromFdbFile(FILE *file);
 
   #undef SWFShape
   #undef SWFMovie
   #undef SWFDisplayItem
   #undef SWFFill
+  #undef SWFFillStyle
   #undef SWFCharacter
   #undef SWFBlock
   #undef SWFSprite
@@ -72,6 +95,8 @@ extern "C"
   #undef SWFGradient
   #undef SWFMorph
   #undef SWFFont
+  #undef SWFBrowserFont
+  #undef SWFFontCollection
   #undef SWFText
   #undef SWFTextField
   #undef SWFAction
@@ -79,21 +104,121 @@ extern "C"
   #undef SWFSoundStream
   #undef SWFInput
   #undef SWFSound
-// begin minguts 2004/08/31 ((((
   #undef SWFFontCharacter
   #undef SWFPrebuiltClip 
-// )))) end minguts 2004/08/31
   #undef SWFVideoStream
   #undef SWFFilter
   #undef SWFBlur
   #undef SWFShadow
   #undef SWFFilterMatrix
-}
+  #undef SWFInitAction
+  #undef SWFButtonRecord
+  #undef SWFSoundInstance
+  #undef SWFBinaryData
+  #undef SWFMatrix
+  #undef SWFCXform
+} // extern C
 
 #define SWF_DECLAREONLY(classname) \
 	private: \
 	classname(const classname&); \
 	const classname& operator=(const classname&)
+
+
+class SWFException : public std::exception
+{
+public:
+	SWFException(const char *m)
+	{ 
+		this->message = m;
+	}
+
+	virtual ~SWFException() throw () 
+	{ }
+		
+	virtual const char *what()
+	{
+		return this->message.c_str();
+	}	
+private:
+	std::string message;
+};
+
+/* SWFMatrix */
+class SWFMatrix
+{
+ friend class SWFDisplayItem;
+ public:
+  c_SWFMatrix matrix;
+
+  double getScaleX()
+  { return SWFMatrix_getScaleX(this->matrix); }
+
+  double getScaleY()
+  { return SWFMatrix_getScaleY(this->matrix); }
+
+  double getRotate0()
+  { return SWFMatrix_getRotate0(this->matrix); }
+ 
+  double getRotate1()
+  { return SWFMatrix_getRotate1(this->matrix); }
+
+  int getTranslateX()
+  { return SWFMatrix_getTranslateX(this->matrix); }
+
+  int getTranslateY()
+  { return SWFMatrix_getTranslateY(this->matrix); }
+
+ private:
+  SWFMatrix(c_SWFMatrix matrix)
+  {
+    if(matrix == NULL)
+      throw SWFException("SWFMatrix(c_SWFMatrix matrix)");
+    this->matrix = matrix;
+  }
+ SWF_DECLAREONLY(SWFMatrix);
+};
+
+class SWFCXform
+{
+ public:
+  c_SWFCXform cx;
+
+  SWFCXform(int rAdd, int gAdd, int bAdd, int aAdd, float rMult, float gMult, float bMult, float aMult)
+  {
+    this->cx =  newSWFCXform(rAdd, gAdd, bAdd, aAdd, rMult, gMult, bMult, aMult);
+    if(this->cx == NULL)
+      throw SWFException("SWFCXform(int rAdd, int gAdd,...)");
+  }
+
+  void setColorAdd(int rAdd, int gAdd, int bAdd, int aAdd)
+  { SWFCXform_setColorAdd(this->cx, rAdd, gAdd, bAdd, aAdd); }
+
+  void setColorMult(float rMult, float gMult, float bMult, float aMult)
+  { SWFCXform_setColorMult(this->cx, rMult, gMult, bMult, aMult); }
+
+  ~ SWFCXform()
+  { destroySWFCXform(cx); }
+
+  static SWFCXform *AddCXForm(int rAdd, int gAdd, int bAdd, int aAdd)
+  { return new SWFCXform(newSWFAddCXform(rAdd, gAdd, bAdd, aAdd));  }
+
+  static SWFCXform *MultCXForm(float rMult, float gMult, float bMult, float aMult)
+ { return new SWFCXform(newSWFMultCXform(rMult, gMult, bMult, aMult)); }
+
+  
+
+ private:
+  SWFCXform(c_SWFCXform cx)
+  {
+    if(cx == NULL)
+      throw SWFException("SWFCXform(c_SWFCXform cx)");
+
+    this->cx = cx;
+  }
+  SWF_DECLAREONLY(SWFCXform);
+
+};
 
 /*  SWFInput  */
 
@@ -103,10 +228,18 @@ class SWFInput
   c_SWFInput input;
 
   SWFInput(FILE *f)
-    { this->input = newSWFInput_file(f); }
+  { 
+    this->input = newSWFInput_file(f); 
+    if(this->input == NULL) 
+      throw SWFException("SWFInput(FILE *f)\n");
+  }
 
   SWFInput(unsigned char *buffer, int length)
-    { this->input = newSWFInput_buffer(buffer, length); }
+  { 
+    this->input = newSWFInput_buffer(buffer, length); 
+    if(this->input == NULL)
+      throw SWFException("SWFInput(unsigned char *buffer, int length)\n");
+  }
 
   SWFInput(unsigned char *buffer, int length, int alloced)
   {
@@ -114,6 +247,9 @@ class SWFInput
       this->input = newSWFInput_allocedBuffer(buffer, length);
     else
       this->input = newSWFInput_buffer(buffer, length);
+
+    if(this->input == NULL)
+      SWFException("SWFInput(unsigned char *buffer, int length, int alloced)\n");
   }
 
   virtual ~SWFInput() { destroySWFInput(this->input); }
@@ -128,45 +264,59 @@ class SWFInput
 class SWFBlock
 {
  public:
-  virtual c_SWFBlock getBlock()
-    { return NULL; }
+  virtual c_SWFBlock getBlock() = 0;
 };
 
 /*  SWFCharacter  */
 
 class SWFCharacter : public SWFBlock
 {
+ friend class SWFMovie;
+ friend class SWFDisplayItem;
  public:
   c_SWFCharacter character;
 
-// begin minguts 2004/08/31 (needed by new class SWFFontCharacter) ((((
-  SWFCharacter(c_SWFCharacter character)
-    { this->character = character; }
-// )))) end minguts 2004/08/31
-
-  float getWidth()
+    float getWidth()
     { return SWFCharacter_getWidth(this->character); }
 
   float getHeight()
     { return SWFCharacter_getHeight(this->character); }
 
-// begin minguts 2004/08/31 (removed NULL , needed by new class SWFFontCharacter) ((((
   virtual c_SWFBlock getBlock()
-    { return (c_SWFBlock)this->character; }
-// )))) end minguts 2004/08/31
+    { return (c_SWFBlock)character; }
 
-  SWFCharacter() {} //needed for base classing
+ protected:
+  SWFCharacter()
+  { character = NULL; }
+  
+  SWFCharacter(c_SWFCharacter c)
+  { character = c; }
+
+
   SWF_DECLAREONLY(SWFCharacter);
 };
-// begin minguts 2004/08/31: added two new classes: "SWFFontCharacter" and "SWFPrebuiltClip" ((((
 /*  SWFFontCharacter */
 class SWFFontCharacter : public SWFCharacter
 {
+ friend class SWFMovie;
  public:
   c_SWFFontCharacter fontcharacter;
+  
+  void addChars(const char *str)
+    { SWFFontCharacter_addChars(this->fontcharacter, str); }
 
+  void addUTF8Chars(const char *str)
+    { SWFFontCharacter_addUTF8Chars(this->fontcharacter, str); }
+
+  void addAllChars()
+    { SWFFontCharacter_addAllChars(this->fontcharacter); }
+
+ private:
   SWFFontCharacter(c_SWFFontCharacter fontcharacter)
-    { this->fontcharacter = fontcharacter; }
+  { 
+	this->fontcharacter = fontcharacter; 
+	this->character = (c_SWFCharacter)fontcharacter;
+  }
 
   virtual ~SWFFontCharacter()
     { }
@@ -174,17 +324,21 @@ class SWFFontCharacter : public SWFCharacter
   SWF_DECLAREONLY(SWFFontCharacter);
   SWFFontCharacter();
 };
-// 
+
 
 /*  SWFPrebuiltClip */
 
-class SWFPrebuiltClip : public SWFCharacter/* SWFBlock */
+class SWFPrebuiltClip : public SWFBlock
 {
  public:
   c_SWFPrebuiltClip prebuiltclip;
 
   SWFPrebuiltClip(c_SWFPrebuiltClip prebuiltclip)
-    { this->prebuiltclip = prebuiltclip; }
+  { 
+    if(prebuiltclip == NULL)
+      throw SWFException("new SWFPrebuiltClip: prebuiltclip == NULL)");
+    this->prebuiltclip = prebuiltclip; 
+  }
 
   virtual ~SWFPrebuiltClip()
     { }
@@ -199,7 +353,10 @@ class SWFPrebuiltClip : public SWFCharacter/* SWFBlock */
        strcmp(name + strlen(name) - 4, ".swf") == 0)
       this->prebuiltclip = newSWFPrebuiltClip_fromFile(name);
     else
-      this->prebuiltclip = 0 ; // needs to be fixed - but how ????
+      this->prebuiltclip = NULL;
+   
+    if(this->prebuiltclip == NULL)
+      throw SWFException("SWFPrebuiltClip(const char *name)");
   }
   SWF_DECLAREONLY(SWFPrebuiltClip);
   SWFPrebuiltClip();
@@ -215,7 +372,11 @@ class SWFAction : public SWFBlock
   c_SWFAction action;
 
   SWFAction(const char *script)
-    { this->action = compileSWFActionCode(script); }
+  { 
+    this->action = newSWFAction(script); 
+    if(this->action == NULL)
+      throw SWFException("SWFAction(const char *script)");
+  }
 
   // movies, buttons, etc. destroy the c_SWFAction..
   virtual ~SWFAction() {}
@@ -223,8 +384,44 @@ class SWFAction : public SWFBlock
   c_SWFBlock getBlock()
     { return (c_SWFBlock)this->action; }
 
+  int compile(int swfVersion, int *length)
+    { return SWFAction_compile(this->action, swfVersion, length); }
+
+  unsigned char *getByteCode(int *len)
+    { return SWFAction_getByteCode(this->action, len); }
+  
   SWF_DECLAREONLY(SWFAction);
   SWFAction();
+};
+
+/*  SWFInitAction  */
+
+class SWFInitAction : public SWFBlock
+{
+ public:
+  c_SWFInitAction init;
+
+  SWFInitAction(SWFAction *action)
+  { 
+    this->init = newSWFInitAction(action->action); 
+    if(this->init == NULL)
+      throw SWFException("SWFInitAction(SWFAction *action)");
+  }
+
+  SWFInitAction(SWFAction *action, int id)
+  { 
+    this->init = newSWFInitAction_withId(action->action, id); 
+    if(this->init == NULL)
+      throw SWFException("SWFInitAction(SWFAction *action, int id)");
+  }
+
+  virtual ~SWFInitAction() {}
+
+  c_SWFBlock getBlock()
+    { return (c_SWFBlock)this->init; }
+
+  SWF_DECLAREONLY(SWFInitAction);
+  SWFInitAction();
 };
 
 
@@ -236,13 +433,27 @@ class SWFGradient
   c_SWFGradient gradient;
 
   SWFGradient()
-    { this->gradient = newSWFGradient(); }
+  { 
+    this->gradient = newSWFGradient(); 
+    if(this->gradient == NULL)
+      throw SWFGradient();
+  }
 
   virtual ~SWFGradient()
     { destroySWFGradient(this->gradient); }
 
   void addEntry(float ratio, byte r, byte g, byte b, byte a=0xff)
     { SWFGradient_addEntry(this->gradient, ratio, r, g, b, a); }
+
+  void setSpreadMode(GradientSpreadMode mode)
+    { SWFGradient_setSpreadMode(this->gradient, mode); }
+
+  void setInterpolationMode(GradientInterpolationMode mode)
+    { SWFGradient_setInterpolationMode(this->gradient, mode); }
+
+  void setFocalPoint(float focalPoint)
+    { SWFGradient_setFocalPoint(this->gradient, focalPoint); }
+
   SWF_DECLAREONLY(SWFGradient);
 };
 
@@ -253,7 +464,11 @@ class SWFBlur
   c_SWFBlur blur;
   
   SWFBlur(float blurX, float blurY, int passes)
-    {  this->blur = newSWFBlur(blurX, blurY, passes); }
+  {  
+    this->blur = newSWFBlur(blurX, blurY, passes); 
+    if(this->blur == NULL)
+      throw SWFException("SWFBlur(float blurX, float blurY, int passes)");
+  }
 
   ~SWFBlur()
     { destroySWFBlur(blur); }
@@ -268,7 +483,11 @@ class SWFShadow
   c_SWFShadow shadow;
 
   SWFShadow(float angle, float distance, float strength)
-    { this->shadow = newSWFShadow(angle, distance, strength); }
+  { 
+    this->shadow = newSWFShadow(angle, distance, strength); 
+    if(this->shadow == NULL)
+      throw SWFException("SWFShadow(float angle, float distance, float strength)");
+  }
 
   ~SWFShadow()
     { destroySWFShadow(shadow); }
@@ -283,7 +502,11 @@ class SWFFilterMatrix
   c_SWFFilterMatrix matrix;
 
   SWFFilterMatrix(int cols, int rows, float *vals)
-    { this->matrix = newSWFFilterMatrix(cols, rows, vals); }
+  { 
+    this->matrix = newSWFFilterMatrix(cols, rows, vals); 
+    if(this->matrix == NULL)
+      throw SWFException("SWFFilterMatrix(int cols, int rows, float *vals)");
+  }
 
   ~SWFFilterMatrix()
     { destroySWFFilterMatrix(matrix); }
@@ -330,71 +553,73 @@ class SWFFilter
 
 private:
   SWFFilter(c_SWFFilter filter)
-    {  this->filter = filter; } 
+  {  
+    this->filter = filter;
+    if(this->filter == NULL)
+      throw SWFException("SWFFilter(c_SWFFilter filter)");
+  } 
   SWF_DECLAREONLY(SWFFilter);
   SWFFilter();
 };
+
 
 
 /*  SWFDisplayItem  */
 
 class SWFDisplayItem
 {
+ friend class SWFMovie;
+ friend class SWFMovieClip;
+ friend class SWFSprite;
  public:
   c_SWFDisplayItem item;
-
-  SWFDisplayItem(c_SWFDisplayItem item)
-    { this->item = item; }
-
-  virtual ~SWFDisplayItem()
-    { }
-
-  void rotate(float degrees)
+ 
+  void rotate(double degrees)
     { SWFDisplayItem_rotate(this->item, degrees); }
 
-  void rotateTo(float degrees)
+  void rotateTo(double degrees)
     { SWFDisplayItem_rotateTo(this->item, degrees); }
 
-  void getRotation(float *degrees)
+  void getRotation(double *degrees)
     { SWFDisplayItem_getRotation(this->item, degrees); }
 
-  void move(float x, float y)
+  void move(double x, double y)
     { SWFDisplayItem_move(this->item, x, y); }
 
-  void moveTo(float x, float y)
+  void moveTo(double x, double y)
     { SWFDisplayItem_moveTo(this->item, x, y); }
 
-  void getPosition(float *x, float *y)
+  void getPosition(double *x, double *y)
     { SWFDisplayItem_getPosition(this->item, x, y); }
 
-  void scale(float xScale, float yScale)
+  void scale(double xScale, double yScale)
     { SWFDisplayItem_scale(this->item, xScale, yScale); }
 
-  void scale(float scale)
+  void scale(double scale)
     { SWFDisplayItem_scale(this->item, scale, scale); }
 
-  void scaleTo(float xScale, float yScale)
+  void scaleTo(double xScale, double yScale)
     { SWFDisplayItem_scaleTo(this->item, xScale, yScale); }
 
-  void scaleTo(float scale)
+  void scaleTo(double scale)
     { SWFDisplayItem_scaleTo(this->item, scale, scale); }
 
-  void getScale(float *xScale, float *yScale)
+  void getScale(double *xScale, double *yScale)
     { SWFDisplayItem_getScale(this->item, xScale, yScale); }
 
-  void skewX(float skew)
+  void skewX(double skew)
     { SWFDisplayItem_skewX(this->item, skew); }
 
-  void skewXTo(float skew)
+  void skewXTo(double skew)
     { SWFDisplayItem_skewXTo(this->item, skew); }
 
-  void skewY(float skew)
+  void skewY(double skew)
     { SWFDisplayItem_skewY(this->item, skew); }
 
-  void skewYTo(float skew)
+  void skewYTo(double skew)
     { SWFDisplayItem_skewYTo(this->item, skew); }
 
-  void getSkew(float *xSkew, float *ySkew)
+  void getSkew(double *xSkew, double *ySkew)
     { SWFDisplayItem_getSkew(this->item, xSkew, ySkew); }
 
   int getDepth()
@@ -429,6 +654,36 @@ class SWFDisplayItem
 
   void setBlendMode(int mode)
     { SWFDisplayItem_setBlendMode(this->item, mode); }
+  
+  void setMatrix(double a, double b, double c, double d, double x, double y)
+    { SWFDisplayItem_setMatrix(this->item, a, b, c, d, x, y); }
+
+  SWFMatrix getMatrix()
+    { return SWFMatrix(SWFDisplayItem_getMatrix(this->item)); }
+
+  void setMaskLevel(int level)
+    { SWFDisplayItem_setMaskLevel(this->item, level); }
+
+  void endMask()
+    { SWFDisplayItem_endMask(this->item); }
+  
+  void flush()
+    { SWFDisplayItem_flush(this->item); }
+ 
+  SWFCharacter *getCharacter()
+    { return new SWFCharacter(SWFDisplayItem_getCharacter(this->item)); }
+
+  void setCXform(SWFCXform *cx)
+    { SWFDisplayItem_setCXform(this->item, cx->cx); } 
+  
+ private:
+  SWFDisplayItem(c_SWFDisplayItem item)
+  { 
+    this->item = item; 
+    if(this->item == NULL)
+      throw SWFException("SWFDisplayItem()");
+  }
+  ~SWFDisplayItem() { }
 
   SWF_DECLAREONLY(SWFDisplayItem);
   SWFDisplayItem();
@@ -443,13 +698,35 @@ class SWFSoundStream
   c_SWFSoundStream sound;
 
   SWFSoundStream(FILE *file)
-    { this->sound = newSWFSoundStream(file); }
+  { 
+    this->sound = newSWFSoundStream(file); 
+    if(this->sound == NULL)
+      throw SWFException("SWFSoundStream(FILE *file)");
+  }
 
   SWFSoundStream(SWFInput *input)
-    { this->sound = newSWFSoundStream_fromInput(input->input); }
+  { 
+    this->sound = newSWFSoundStream_fromInput(input->input); 
+    if(this->sound == NULL)
+      throw SWFException("SWFSoundStream(SWFInput *input)");
+  }
 
   SWFSoundStream(char *filename)
-    { this->sound = newSWFSoundStream(fopen(filename, "rb")); }
+  { 
+    this->sound = newSWFSoundStream(fopen(filename, "rb")); 
+    if(this->sound == NULL)
+      throw SWFException("SWFSoundStream(char *filename)");
+  }
+
+  unsigned int getDuration()
+  {
+    return SWFSoundStream_getDuration(this->sound);
+  }
+
+  void setInitialMp3Delay(int delaySeek)
+  {
+    SWFSoundStream_setInitialMp3Delay(this->sound, delaySeek);
+  }
 
   virtual ~SWFSoundStream()
     { destroySWFSoundStream(this->sound); }
@@ -460,45 +737,243 @@ class SWFSoundStream
 
 
 
-class SWFSound
+class SWFSound : public SWFBlock
 {
  public:
   c_SWFSound sound;
 
   SWFSound(FILE *file, int flags)
-    { this->sound = newSWFSound(file, flags); }
+  { 
+	filep = NULL;
+	this->sound = newSWFSound(file, flags);
+	if(this->sound == NULL)
+		throw SWFException("SWFSound(FILE *file, int flags)");
+  }
 
   SWFSound(SWFInput *input, int flags)
-    { this->sound = newSWFSound_fromInput(input->input, flags); }
+  {
+	this->sound = newSWFSound_fromInput(input->input, flags); 
+	filep = NULL;
+	if(this->sound == NULL)
+		throw SWFException("SWFSound(SWFInput *input, int flags)");
+  }
 
   SWFSound(char *filename, int flags)
-    { this->sound = newSWFSound(fopen(filename, "rb"), flags); }
+  { 
+	filep = fopen(filename, "rb");
+	this->sound = newSWFSound(filep, flags);
+	if(this->sound == NULL)
+	{
+		fclose(filep);
+		throw SWFException("SWFSound(char *filename, int flags)");
+	}
+  }
+  
+  SWFSound(SWFSoundStream *stream)
+  { 
+	this->sound = newSWFSound_fromSoundStream(stream->sound); 
+	filep = NULL;
+	if(this->sound == NULL)
+		throw SWFException("SWFSound(SWFSoundStream *stream)");
+  }
+
+  void delaySeek(int delaySeek)
+  {
+	SWFSound_setInitialMp3Delay(this->sound, delaySeek);
+  }
 
   virtual ~SWFSound()
-    { destroySWFSound(this->sound); }
+  {
+	if(filep)
+		fclose(filep); 
+	destroySWFSound(this->sound); 
+  }
+
+  c_SWFBlock getBlock()
+    { return (c_SWFBlock)this->sound; }
+ 
+ private:
+    FILE *filep;
+
   SWF_DECLAREONLY(SWFSound);
   SWFSound();
 };
 
+/*  SWFFont  */
+
+class SWFFont : public SWFBlock
+{
+ friend class SWFFontCollection;
+ public:
+  c_SWFFont font;
+
+  SWFFont(FILE *file) // deprecated 
+  {
+	std::cerr << "SWFFont(FILE *file) is deprecated and will be removed in future releases." << std::endl;
+	this->font = loadSWFFont_fromFdbFile(file);
+	if(this->font == NULL)
+		throw SWFException("SWFFont(FILE *file)");
+  }
+
+  SWFFont(char *path)
+  { 
+    this->font = newSWFFont_fromFile(path); 
+    if(this->font == NULL)
+      throw SWFException("SWFFont(char *path)");
+  }
+
+  virtual ~SWFFont()
+    { destroySWFFont(/*(c_SWFBlock)*/this->font); }
+
+  c_SWFBlock getBlock()
+    { return (c_SWFBlock)this->font; }
+
+  float getStringWidth(const char *string)
+    { return SWFFont_getStringWidth(this->font, string); }
+
+  float getWidth(const char *string)
+    { return SWFFont_getStringWidth(this->font, string); }
+
+  float getUTF8StringWidth(const char *string)
+    { return SWFFont_getUTF8StringWidth(this->font, string); }
+
+  float getAscent()
+    { return SWFFont_getAscent(this->font); }
+
+  float getDescent()
+    { return SWFFont_getDescent(this->font); }
+
+  float getLeading()
+    { return SWFFont_getLeading(this->font); }
+
+  const char *getName()
+    { return SWFFont_getName(this->font); }
+
+  int getGlyphCount()
+    { return SWFFont_getGlyphCount(this->font); }
+  
+  char *getShape(unsigned short c)
+    { return SWFFont_getShape(this->font, c); }
+
+  SWF_DECLAREONLY(SWFFont);
+
+ private:
+  SWFFont(c_SWFFont font)
+  { 
+    this->font = font;
+    if(this->font == NULL)
+      throw SWFException("SWFFont(c_SWFFont)");
+  }
+};
+
+/* SWFBrowserFont */
+class SWFBrowserFont : public SWFBlock
+{
+ public:
+  c_SWFBrowserFont bfont;
+  
+  SWFBrowserFont(char *name)
+  { 
+    this->bfont = newSWFBrowserFont(name); 
+    if(this->bfont == NULL)
+      throw SWFException("SWFBrowserFont(char *name)");
+  }
+
+  c_SWFBlock getBlock()
+    { return (c_SWFBlock)this->bfont; }
+
+  virtual ~SWFBrowserFont()
+    { destroySWFBrowserFont(this->bfont); }
+  
+  SWF_DECLAREONLY(SWFBrowserFont);
+};
+
+class SWFFontCollection
+{
+ public:
+  c_SWFFontCollection fc;
+
+  SWFFontCollection(const char *filename)
+  {
+    this->fc = newSWFFontCollection_fromFile(filename);
+    if(this->fc == NULL)
+      throw SWFException("SWFFontCollection(filename)");
+  }
+
+  ~ SWFFontCollection()
+    { destroySWFFontCollection(this->fc); }
+
+  SWFFont *getFont(int index)
+    { return new SWFFont(SWFFontCollection_getFont(this->fc, index)); }
+
+  int getFontCount()
+    { return SWFFontCollection_getFontCount(this->fc); }
+
+  SWF_DECLAREONLY(SWFFontCollection);
+};
+
+class SWFSoundInstance
+{
+ friend class SWFMovie;
+ friend class SWFMovieClip;
+
+ public:
+  c_SWFSoundInstance instance;
+ 
+  void setNoMultiple()
+  { SWFSoundInstance_setNoMultiple(this->instance); }
+
+  void setLoopInPoint(unsigned int point)
+  { SWFSoundInstance_setLoopInPoint(this->instance, point); }
+  
+  void setLoopOutPoint(unsigned int point)
+  {  SWFSoundInstance_setLoopOutPoint(this->instance, point); }
+
+  void setLoopCount(int count)
+  {  SWFSoundInstance_setLoopCount(this->instance, count); }
+
+  void addEnvelope(unsigned int mark44, short left, short right)
+  { SWFSoundInstance_addEnvelope(this->instance, mark44, left, right); }
+
+ private:
+  SWFSoundInstance(c_SWFSoundInstance inst)
+  {
+    if(inst == NULL)
+      throw SWFException("SWFSoundInstance(c_SWFSoundInstance inst)");
+
+    this->instance = inst;
+  }
+ SWF_DECLAREONLY(SWFSoundInstance);
+};
 
 /*  SWFMovie  */
-
 class SWFMovie
 {
  public:
   c_SWFMovie movie;
 
   SWFMovie()
-    { this->movie = newSWFMovie(); }
+  { 
+    this->movie = newSWFMovie();
+    if(this->movie == NULL)
+      throw SWFException("SWFMovie()");
+  }
 
   SWFMovie(int version)
-    { this->movie = newSWFMovieWithVersion(version); }
+  { 
+    this->movie = newSWFMovieWithVersion(version);
+    if(this->movie == NULL)
+      throw SWFException("SWFMovie(int version)");
+  }
 
   virtual ~SWFMovie()
     { destroySWFMovie(this->movie); }
 
   void setRate(float rate)
     { SWFMovie_setRate(this->movie, rate); }
+
+  float getRate()
+    { return SWFMovie_getRate(this->movie); }
 
   void setDimension(float x, float y)
     { SWFMovie_setDimension(this->movie, x, y); }
@@ -513,14 +988,38 @@ class SWFMovie
   void setBackground(byte r, byte g, byte b)
     { SWFMovie_setBackground(this->movie, r, g, b); }
 
-  void setSoundStream(SWFSoundStream *sound)
-    { SWFMovie_setSoundStream(this->movie, sound->sound); /* wogl */ }
+  void setSoundStream(SWFSoundStream *sound, float skip=0.0)
+  {
+    if(skip > 0)
+      SWFMovie_setSoundStreamAt(this->movie, sound->sound, skip);
+    else
+      SWFMovie_setSoundStream(this->movie, sound->sound); 
+  }
 
   SWFDisplayItem *add(SWFBlock *character)
-    { return new SWFDisplayItem(SWFMovie_add(this->movie, character->getBlock())); }
+  {
+    SWFMovieBlockType ublock;
+    ublock.block = character->getBlock();
+    c_SWFDisplayItem item = SWFMovie_add_internal(this->movie, ublock);
+    if(item == NULL)
+      return NULL;
+    SWFDisplayItem *_item_ = new SWFDisplayItem(item);
+    itemList.push_back(_item_);
+    return _item_; 
+  }
+
+  void addExport(SWFBlock *exp, char *name)
+    {  SWFMovie_addExport(this->movie, exp->getBlock(), name); }
 
   void remove(SWFDisplayItem *item)
     { SWFMovie_remove(this->movie, item->item); }
+
+  bool replace(SWFDisplayItem *item, SWFBlock *character)
+  { 
+    SWFMovieBlockType ublock;
+    ublock.block = character->getBlock();
+    return SWFMovie_replace_internal(this->movie, item->item, ublock); 
+  }
 
   void nextFrame()
     { SWFMovie_nextFrame(this->movie); }
@@ -535,6 +1034,7 @@ class SWFMovie
   {
     int oldlevel = Ming_setSWFCompression(level);
     int ret = SWFMovie_output_to_stream(this->movie, stdout);
+    cleanUp();
     Ming_setSWFCompression(oldlevel);
     return ret;
   }
@@ -544,30 +1044,29 @@ class SWFMovie
     int oldlevel = Ming_setSWFCompression(level);
     int result = SWFMovie_save(this->movie,filename);
     Ming_setSWFCompression(oldlevel);
+    cleanUp();
     return result;
   }
 
-  void startSound(SWFSound *sound)
-    { SWFMovie_startSound(this->movie, sound->sound); }
+  SWFSoundInstance *startSound(SWFSound *sound)
+    { return new SWFSoundInstance(SWFMovie_startSound(this->movie, sound->sound)); }
   void stopSound(SWFSound *sound)
     { SWFMovie_stopSound(this->movie, sound->sound); }
 
-// begin minguts 2004/08/31 ((((
-	SWFCharacter *importCharacter(const char *filename, const char *name)
-	{ return new SWFCharacter(SWFMovie_importCharacter(this->movie, filename, name));}
-	SWFFontCharacter *importFont(const char *filename, const char *name)
-	{ return new SWFFontCharacter(SWFMovie_importFont(this->movie, filename, name)); }
-// )))) end minguts 2004/08/31
+  SWFCharacter *importCharacter(const char *filename, const char *name)
+    { return new SWFCharacter(SWFMovie_importCharacter(this->movie, filename, name)); }
+
+  SWFFontCharacter *importFont(const char *filename, const char *name)
+  { return new SWFFontCharacter(SWFMovie_importFont(this->movie, filename, name)); }
+
+  SWFFontCharacter *addFont(SWFFont *font)
+  { return new SWFFontCharacter(SWFMovie_addFont(this->movie, font->font)); }
 
   void protect()
-	{
-		SWFMovie_protect(this->movie, NULL);
-	}
+  { SWFMovie_protect(this->movie, NULL);}
 
   void protect(char *password)
-	{
-		SWFMovie_protect(this->movie,password);
-	}
+  { SWFMovie_protect(this->movie,password); }
   
   void addMetadata(char *xml)
     { SWFMovie_addMetadata(this->movie, xml); }
@@ -581,21 +1080,146 @@ class SWFMovie
   void setTabIndex(int depth, int index)
     { SWFMovie_setTabIndex(this->movie, depth, index); }
 
+  void assignSymbol(SWFCharacter *character, char *name)
+    { SWFMovie_assignSymbol(this->movie, (c_SWFCharacter)character->getBlock(), name); }
+
+  void defineScene(unsigned int offset, const char *name)
+    { SWFMovie_defineScene(this->movie, offset, name); }
+
+  void writeExports()
+    { SWFMovie_writeExports(this->movie); }
+
   SWF_DECLAREONLY(SWFMovie);
+ private:
+
+  void cleanUp()
+  {
+    std::list<SWFDisplayItem *>::iterator iter = itemList.begin();
+    for(; iter != itemList.end(); iter++)
+      delete (*iter);
+  }
+  std::list<SWFDisplayItem *> itemList;
 };
 
 
-/*  SWFFill  */
 
+
+
+/*  SWFBitmap  */
+
+class SWFBitmap : public SWFCharacter
+{
+ public:
+  c_SWFBitmap bitmap;
+
+  c_SWFBlock getBlock()
+    { return (c_SWFBlock)this->bitmap; }
+  
+  SWFBitmap(const char *filename, const char *alpha=NULL)
+  {
+    if(strlen(filename) > 4)
+    {
+      if(strcasecmp(filename+strlen(filename)-4, ".dbl") == 0)
+	this->bitmap = (c_SWFBitmap) newSWFDBLBitmap(fopen(filename, "rb"));
+
+      else if(strcasecmp(filename+strlen(filename)-4, ".gif") == 0)
+	this->bitmap = (c_SWFBitmap) newSWFDBLBitmapData_fromGifFile(filename);
+
+      else if(strcasecmp(filename+strlen(filename)-4, ".png") == 0)
+ 		this->bitmap =   (c_SWFBitmap) newSWFDBLBitmapData_fromPngFile( filename );
+
+      else if(strcasecmp(filename+strlen(filename)-4, ".jpg") == 0 ||
+	(strlen(filename) > 5 && (strcasecmp(filename+strlen(filename)-5, ".jpeg") == 0)))
+      {
+	if(alpha != NULL)
+	  this->bitmap = (c_SWFBitmap) newSWFJpegWithAlpha(fopen(filename, "rb"),
+					     fopen(alpha, "rb"));
+	else
+	  this->bitmap = (c_SWFBitmap) newSWFJpegBitmap(fopen(filename, "rb"));
+      }
+
+      else
+	bitmap = NULL;
+    }
+    if ( ! this->bitmap ) 
+      throw SWFException("SWFBitmap(const char *filename, const char *alpha=NULL)");
+
+    this->character = (c_SWFCharacter)bitmap;
+  }
+  
+  SWFBitmap(unsigned char *raw, SWFRawImgFmt srcFmt, SWFBitmapFmt dstFmt, 
+            unsigned short width, unsigned short height)
+  {
+    this->bitmap = newSWFBitmap_fromRawImg(raw, srcFmt, dstFmt, width, height);
+    if ( ! this->bitmap ) 
+      throw SWFException("SWFBitmap(const char *filename, const char *alpha=NULL)");
+    this->character = (c_SWFCharacter)bitmap;
+  }
+  
+  SWFBitmap(SWFInput *input)
+  { 
+    this->bitmap = newSWFBitmap_fromInput(input->input);
+    if(this->bitmap == NULL)
+      throw SWFException("SWFBitmap(SWFInput *input)");
+    this->character = (c_SWFCharacter)bitmap;
+  }
+
+  virtual ~SWFBitmap()
+    { destroySWFBitmap(this->bitmap); }
+  
+  int getWidth()
+    { return SWFBitmap_getWidth(this->bitmap); }
+
+  int getHeight()
+    { return SWFBitmap_getHeight(this->bitmap); }
+
+  SWF_DECLAREONLY(SWFBitmap);
+  SWFBitmap();
+};
+
+class SWFFillStyle
+{
+ friend class SWFFill;
+ public:
+  c_SWFFillStyle fill;
+  
+  virtual ~SWFFillStyle() { }
+
+  static SWFFillStyle *SolidFillStyle(byte r, byte g, byte b, byte a=255)
+    { return new SWFFillStyle(newSWFSolidFillStyle(r, g, b, a)); }
+
+  static SWFFillStyle *GradientFillStyle(SWFGradient *gradient, byte flags)
+    { return new SWFFillStyle(newSWFGradientFillStyle(gradient->gradient, flags)); }
+
+  static SWFFillStyle *BitmapFillStyle(SWFBitmap *bitmap, byte flags)
+    { return new SWFFillStyle(newSWFBitmapFillStyle(bitmap ? bitmap->bitmap : 0, flags)); }
+
+ private:
+  SWFFillStyle(c_SWFFillStyle fill)
+  { 
+    this->fill = fill; 
+    if(this->fill == NULL)
+      throw SWFException("SWFFillStyle");
+  }
+  SWF_DECLAREONLY(SWFFillStyle);
+  SWFFillStyle();
+};   
+
+/*  SWFFill  */
 class SWFFill
 {
+ friend class SWFShape;
  public:
   c_SWFFill fill;
 
-  SWFFill(c_SWFFill fill)
-    { this->fill = fill; }
+  SWFFill(SWFFillStyle *fs)
+  {
+	this->fill = newSWFFill(fs->fill);
+	if(this->fill == NULL)
+		throw SWFException("SWFFill");
+  }
 
-  // shape destroys c_SWFFill object
+    // shape destroys c_SWFFill object
   virtual ~SWFFill() 
 	{ destroySWFFill(this->fill); }
 
@@ -646,137 +1270,47 @@ class SWFFill
 
   void moveTo(float x, float y)
     { SWFFill_move(this->fill, x, y); }
+
+  void setMatrix( float a, float b, float c, float d, float x, float y)
+    { SWFFill_setMatrix(this->fill, a, b, c, d, x, y); }
+
+  SWFFillStyle *getFillStyle()
+    { return new SWFFillStyle(SWFFill_getFillStyle(this->fill)); }
+
   SWF_DECLAREONLY(SWFFill);
-  SWFFill();
-};
+  SWFFill(); 
 
-
-
-
-/*  SWFBitmap  */
-
-class SWFBitmap : public SWFBlock
-{
- public:
-  c_SWFBitmap bitmap;
-
-// begin minguts (added because caused windows to crash) 2004/08/31 ((((
-  c_SWFBlock getBlock()
-    { return (c_SWFBlock)this->bitmap; }
-// )))) end minguts 2004/08/31
-
-  SWFBitmap(const char *filename, const char *alpha=NULL)
-  {
-    if(strlen(filename) > 4)
-    {
-      if(strcmp(filename+strlen(filename)-4, ".dbl") == 0)
-	this->bitmap = (c_SWFBitmap) newSWFDBLBitmap(fopen(filename, "rb"));
-
-#if USE_GIF
-      
-      else if(strcmp(filename+strlen(filename)-4, ".gif") == 0)
-	this->bitmap = (c_SWFBitmap) newSWFDBLBitmapData_fromGifFile(filename);
-
-#endif
-
-#if USE_PNG
-
-      else if(strcmp(filename+strlen(filename)-4, ".png") == 0)
- 		this->bitmap =   (c_SWFBitmap) newSWFDBLBitmapData_fromPngFile( filename );
-
-#endif
-
-      else if(strcmp(filename+strlen(filename)-4, ".jpg") == 0)
-      {
-	if(alpha != NULL)
-	  this->bitmap = (c_SWFBitmap) newSWFJpegWithAlpha(fopen(filename, "rb"),
-					     fopen(alpha, "rb"));
-	else
-	  this->bitmap = (c_SWFBitmap) newSWFJpegBitmap(fopen(filename, "rb"));
-      }
-
-      else
-	; // XXX - throw exception
-    }
+private:
+  SWFFill(c_SWFFill fill)
+  { 
+    this->fill = fill; 
+    if(this->fill == NULL)
+      throw SWFException("SWFFill");
   }
-
-  SWFBitmap(SWFInput *input)
-    { this->bitmap = newSWFBitmap_fromInput(input->input); }
-
-  virtual ~SWFBitmap()
-    { destroySWFBitmap(this->bitmap); }
-
-  int getWidth()
-    { return SWFBitmap_getWidth(this->bitmap); }
-
-  int getHeight()
-    { return SWFBitmap_getHeight(this->bitmap); }
-  SWF_DECLAREONLY(SWFBitmap);
-  SWFBitmap();
-};
-
-
-/*  SWFFont  */
-
-class SWFFont : public SWFBlock
-{
- public:
-  c_SWFFont font;
-
-  SWFFont()
-    { this->font = newSWFFont(); }
-
-  SWFFont(FILE *file)
-    { this->font = loadSWFFontFromFile(file); }
-
-  SWFFont(char *path)
-    { this->font = loadSWFFontFromFile(fopen(path, "rb")); }
-
-  SWFFont(const char *name)
-  {
-    if(strlen(name) > 4 &&
-       strcmp(name + strlen(name) - 4, ".fdb") == 0)
-      this->font = loadSWFFontFromFile(fopen(name, "rb"));
-    else
-      this->font = (c_SWFFont)newSWFBrowserFont(name); // minguts fix
-  }
-
-  virtual ~SWFFont()
-    { destroySWFFont(/*(c_SWFBlock)*/this->font); }
-
-  c_SWFBlock getBlock()
-    { return (c_SWFBlock)this->font; }
-
-  float getStringWidth(const unsigned char *string)
-    { return SWFFont_getStringWidth(this->font, string); }
-
-  float getWidth(const unsigned char *string)
-    { return SWFFont_getStringWidth(this->font, string); }
-
-  float getAscent()
-    { return SWFFont_getAscent(this->font); }
-
-  float getDescent()
-    { return SWFFont_getDescent(this->font); }
-
-  float getLeading()
-    { return SWFFont_getLeading(this->font); }
-  SWF_DECLAREONLY(SWFFont);
 };
 
 
 /*  SWFShape  */
-
 class SWFShape : public SWFCharacter
 {
  public:
   c_SWFShape shape;
 
   SWFShape()
-    { this->shape = newSWFShape(); }
+  { 
+    this->shape = newSWFShape();
+    if(this->shape == NULL)
+      throw SWFException("SWFShape()");
+
+    this->character = (c_SWFCharacter)shape;
+  }
 
   SWFShape(c_SWFShape shape)
-    { this->shape = shape; }
+  { 
+    this->shape = shape;
+    if(this->shape == NULL)
+      throw SWFException("SWFShape(c_SWFShape shape)");
+  }
 
   virtual ~SWFShape()
     { destroySWFShape(this->shape); }
@@ -784,29 +1318,32 @@ class SWFShape : public SWFCharacter
   c_SWFBlock getBlock()
     { return (c_SWFBlock)this->shape; }
 
-  void movePen(float x, float y)
+  void movePen(double x, double y)
     { SWFShape_movePen(this->shape, x, y); }
 
-  void movePenTo(float x, float y)
+  void movePenTo(double x, double y)
     { SWFShape_movePenTo(this->shape, x, y); }
 
-  void drawLine(float x, float y)
+  void drawLine(double x, double y)
     { SWFShape_drawLine(this->shape, x, y); }
 
-  void drawLineTo(float x, float y)
+  void drawLineTo(double x, double y)
     { SWFShape_drawLineTo(this->shape, x, y); }
 
-  void drawCurve(float cx, float cy, float ax, float ay)
+  void drawCurve(double cx, double cy, double ax, double ay)
     { SWFShape_drawCurve(this->shape, cx, cy, ax, ay); }
 
-  void drawCurveTo(float cx, float cy, float ax, float ay)
+  void drawCurveTo(double cx, double cy, double ax, double ay)
     { SWFShape_drawCurveTo(this->shape, cx, cy, ax, ay); }
 
-  void drawCubic(float ax, float ay, float bx, float by, float cx, float cy)
+  void drawCubic(double ax, double ay, double bx, double by, double cx, double cy)
     { SWFShape_drawCubic(this->shape, ax, ay, bx, by, cx, cy); }
 
-  void drawCubicTo(float ax, float ay, float bx, float by, float cx, float cy)
+  void drawCubicTo(double ax, double ay, double bx, double by, double cx, double cy)
     { SWFShape_drawCubicTo(this->shape, ax, ay, bx, by, cx, cy); }
+
+  void getPen(double *x, double *y)
+    { SWFShape_getPen(this->shape, x, y); }
 
   void end()
     { SWFShape_end(this->shape); }
@@ -814,11 +1351,17 @@ class SWFShape : public SWFCharacter
   SWFFill *addSolidFill(byte r, byte g, byte b, byte a=0xff)
     { return new SWFFill(SWFShape_addSolidFill(this->shape, r, g, b, a)); }
 
-  SWFFill *addGradientFill(SWFGradient *gradient, byte flags=0)
+  SWFFill *addGradientFill(SWFGradient *gradient, byte flags=0x10)
     { return new SWFFill(SWFShape_addGradientFill(this->shape, gradient->gradient, flags)); }
 
-  SWFFill *addBitmapFill(SWFBitmap *bitmap, byte flags=0)
-    { return new SWFFill(SWFShape_addBitmapFill(this->shape, bitmap->bitmap, flags)); }
+  SWFFill *addBitmapFill(SWFBitmap *bitmap, byte flags=0x40)
+    { return new SWFFill(SWFShape_addBitmapFill(this->shape, bitmap ? bitmap->bitmap : 0, flags)); }
+
+  void setLeftFillStyle(SWFFillStyle *fill)
+    { SWFShape_setLeftFillStyle(this->shape, fill->fill); }
+
+  void setRightFillStyle(SWFFillStyle *fill)
+    { SWFShape_setRightFillStyle(this->shape, fill->fill); }
 
   void setLeftFill(SWFFill *fill)
     { SWFShape_setLeftFill(this->shape, fill->fill); }
@@ -829,79 +1372,63 @@ class SWFShape : public SWFCharacter
   void setLine(unsigned short width, byte r, byte g, byte b, byte a=0xff)
     { SWFShape_setLine(this->shape, width, r, g, b, a); }
 
-// begin minguts 2004/08/31 ((((
   void drawCharacterBounds(SWFCharacter *character)
 	{ SWFShape_drawCharacterBounds(this->shape, character->character); }
+
   void setLineStyle(unsigned short width, byte r, byte g, byte b, byte a=0xff) // alias for setline
 	{ setLine(width, r, g, b, a); }
-// )))) end minguts 2004/08/31
 
-  void drawArc(float r, float startAngle, float endAngle)
+  void setLine2Filled(unsigned short width, SWFFillStyle *fill, int flags, float miterLimit)
+    {  SWFShape_setLine2Filled(this->shape, width, fill->fill, flags, miterLimit); }
+  
+  void setLine2(unsigned short width, byte r, byte g, byte b, byte a, int flags, float miterLimit)
+    {  SWFShape_setLine2(this->shape, width, r, g, b, a, flags, miterLimit); }
+
+  void drawArc(double r, double startAngle, double endAngle)
     { SWFShape_drawArc(this->shape, r, startAngle, endAngle); }
 
-  void drawCircle(float r)
+  void drawCircle(double r)
     { SWFShape_drawCircle(this->shape, r); }
 
   void drawGlyph(SWFFont *font, unsigned short c, int size=0)
     { SWFShape_drawSizedGlyph(this->shape, font->font, c, size); }
 
-  // deprecated?
+  void useVersion(int version)
+    { SWFShape_useVersion(this->shape, version); }
+
+  int getVersion()
+    { return SWFShape_getVersion(this->shape); }
+
+  void setRenderingHintingFlags(int flags)
+    { SWFShape_setRenderHintingFlags(this->shape, flags); }
+
+  void hideLine()
+    { SWFShape_hideLine(this->shape); }
+
   void drawFontGlyph(SWFFont *font, unsigned short c)
     { SWFShape_drawGlyph(this->shape, font->font, c); }
+
+  char *dumpOutline()
+  { return SWFShape_dumpOutline(this->shape); }
 
   SWF_DECLAREONLY(SWFShape);
 };
 
 
-/*  SWFSprite  */
-
-class SWFSprite : public SWFCharacter
-{
- public:
-  c_SWFMovieClip clip;
-
-  SWFSprite()
-    { this->clip = newSWFMovieClip(); }
-
-  virtual ~SWFSprite()
-    { destroySWFMovieClip(this->clip); }
-
-  c_SWFBlock getBlock()
-    { return (c_SWFBlock)this->clip; }
-
-  void setNumberOfFrames(int nFrames)
-    { SWFMovieClip_setNumberOfFrames(this->clip, nFrames); }
-
-  SWFDisplayItem *add(SWFBlock *character)
-    { return new SWFDisplayItem(SWFMovieClip_add(this->clip, character->getBlock())); }
-
-  void remove(SWFDisplayItem *item)
-    { SWFMovieClip_remove(this->clip, item->item); }
-
-  void nextFrame()
-    { SWFMovieClip_nextFrame(this->clip); }
-
-  void labelFrame(char *label)
-    { SWFMovieClip_labelFrame(this->clip, label); }
-
-  void setScalingGrid(int x, int y, int w, int h)
-    { SWFMovieClip_setScalingGrid(this->clip, x, y, w, h); }
-
-  void removeScalingGrid()
-    { SWFMovieClip_removeScalingGrid(this->clip); }
-
-  SWF_DECLAREONLY(SWFSprite);
-};
-
 /*  SWFMovieClip  */
-
 class SWFMovieClip : public SWFCharacter
 {
  public:
   c_SWFMovieClip clip;
 
   SWFMovieClip()
-    { this->clip = newSWFMovieClip(); }
+  { 
+    this->clip = newSWFMovieClip();
+    if(this->clip == NULL)
+      throw SWFException("SWFMovieClip()");
+
+    this->character = (c_SWFCharacter)clip;
+  }
 
   virtual ~SWFMovieClip()
     { destroySWFMovieClip(this->clip); }
@@ -913,7 +1440,13 @@ class SWFMovieClip : public SWFCharacter
     { SWFMovieClip_setNumberOfFrames(this->clip, nFrames); }
 
   SWFDisplayItem *add(SWFBlock *character)
-    { return new SWFDisplayItem(SWFMovieClip_add(this->clip, character->getBlock())); }
+  {
+    c_SWFDisplayItem item = SWFMovieClip_add(this->clip, character->getBlock());
+    if(item == NULL)
+      return NULL;
+    else
+      return new SWFDisplayItem(item); 
+  }
 
   void remove(SWFDisplayItem *item)
     { SWFMovieClip_remove(this->clip, item->item); }
@@ -923,7 +1456,33 @@ class SWFMovieClip : public SWFCharacter
 
   void labelFrame(char *label)
     { SWFMovieClip_labelFrame(this->clip, label); }
+
+  void addInitAction(SWFAction* a)
+    { SWFMovieClip_addInitAction(this->clip, a->action); }
+
+  void setScalingGrid(int x, int y, int w, int h)
+    { SWFMovieClip_setScalingGrid(this->clip, x, y, w, h); }
+
+  void removeScalingGrid()
+    { SWFMovieClip_removeScalingGrid(this->clip); }
+
+   SWFSoundInstance *startSound(SWFSound *sound)
+    { return new SWFSoundInstance(SWFMovieClip_startSound(this->clip, sound->sound)); }
+
+  void stopSound(SWFSound *sound)
+    { SWFMovieClip_stopSound(this->clip, sound->sound); }
+
+  void setSoundStream(SWFSoundStream *sound, float rate, float skip=0.0)
+  { SWFMovieClip_setSoundStreamAt(this->clip, sound->sound, rate, skip); }
+
   SWF_DECLAREONLY(SWFMovieClip);
+};
+
+/*  SWFSprite  */
+/* deprecated ! */
+class SWFSprite : public SWFMovieClip
+{
+  SWF_DECLAREONLY(SWFSprite);
 };
 
 
@@ -935,7 +1494,13 @@ class SWFMorph : public SWFCharacter
   c_SWFMorph morph;
 
   SWFMorph()
-    { this->morph = newSWFMorphShape(); }
+  { 
+    this->morph = newSWFMorphShape();
+    if(this->morph == NULL)
+      throw SWFException("SWFMorph()");
+
+    this->character = (c_SWFCharacter)morph;
+  }
 
   virtual ~SWFMorph()
     { destroySWFMorph(this->morph); }
@@ -959,8 +1524,16 @@ class SWFText : public SWFCharacter
  public:
   c_SWFText text;
 
-  SWFText()
-    { this->text = newSWFText2(); }
+  SWFText(int version = 1)
+  { 
+      if(version == 2)
+        this->text = newSWFText2();
+      else 
+        this->text = newSWFText();
+      if(this->text == NULL)
+        throw SWFException("SWFText()");
+      this->character = (c_SWFCharacter)text;
+  }
 
   virtual ~SWFText()
     { destroySWFText(this->text); }
@@ -968,8 +1541,8 @@ class SWFText : public SWFCharacter
   c_SWFBlock getBlock()
     { return (c_SWFBlock)this->text; }
 
-  void setFont(SWFBlock *font)
-    { SWFText_setFont(this->text, font->getBlock()); }
+  void setFont(SWFFont *font)
+    { SWFText_setFont(this->text, font->font); }
 
   void setHeight(float height)
     { SWFText_setHeight(this->text, height); }
@@ -987,17 +1560,32 @@ class SWFText : public SWFCharacter
   void addUTF8String(const char *string, int *advance=NULL)
     { SWFText_addUTF8String(this->text, string, advance); }
 
+  void addWideString(const unsigned short *string, int len, int *advance = NULL)
+    { SWFText_addWideString(this->text, string, len, advance); }
+
   void setSpacing(float spacing)
     { SWFText_setSpacing(this->text, spacing); }
 
-  float getStringWidth(const unsigned char *string)
+  float getStringWidth(const char *string)
     { return SWFText_getStringWidth(this->text, string); }
 
-  float getWidth(const unsigned char *string)
+  float getWidth(const char *string)
     { return SWFText_getStringWidth(this->text, string); }
 
-  float getUTF8Width(const unsigned char *string)
+  float getWideStringWidth(const unsigned short *string)
+    { return SWFText_getWideStringWidth(this->text, string); }
+
+  float getUTF8Width(const char *string)
     { return SWFText_getUTF8StringWidth(this->text, string); }
+
+  float getAscent()
+    { return SWFText_getAscent(this->text); }
+
+  float getDescent()
+    { return SWFText_getDescent(this->text); }
+  
+  float getLeading()
+    { return SWFText_getLeading(this->text); }
   SWF_DECLAREONLY(SWFText);
 };
 
@@ -1009,7 +1597,12 @@ class SWFTextField : public SWFCharacter
   c_SWFTextField textField;
 
   SWFTextField()
-    { this->textField = newSWFTextField(); }
+  { 
+    this->textField = newSWFTextField();
+    if(this->textField == NULL)
+      throw SWFException("SWFTextField()");
+    this->character = (c_SWFCharacter)textField;
+  }
 
   virtual ~SWFTextField()
     { destroySWFTextField(this->textField); }
@@ -1062,11 +1655,72 @@ class SWFTextField : public SWFCharacter
   void align(SWFTextFieldAlignment alignment)
     { SWFTextField_setAlignment(this->textField, alignment); }
 
+  void setFieldHeight(int height)
+    { SWFTextField_setFieldHeight(this->textField, height); }
+
   void setLength(int length)
     { SWFTextField_setLength(this->textField, length); }
+
+  void addChars(const char *string)
+    { SWFTextField_addChars(this->textField, string); }
+
   SWF_DECLAREONLY(SWFTextField);
 };
 
+class SWFButtonRecord
+{
+ friend class SWFButton;
+ public:
+  c_SWFButtonRecord record;
+
+  void addFilter(SWFFilter *f)
+    { SWFButtonRecord_addFilter(this->record, f->filter); }
+
+  void setDepth(int depth)
+    { SWFButtonRecord_setDepth(this->record, depth); }
+
+  void setBlendMode(int mode)
+    { SWFButtonRecord_setBlendMode(this->record, mode); }
+
+  void move(float x, float y)
+    { SWFButtonRecord_move(this->record, x, y); }
+
+  void moveTo(float x, float y)
+    { SWFButtonRecord_moveTo(this->record, x, y); }
+
+  void rotate(float deg)
+    { SWFButtonRecord_rotate(this->record, deg); }
+
+  void rotateTo(float deg)
+    { SWFButtonRecord_rotateTo(this->record, deg); }
+
+  void scale(float scaleX, float scaleY)
+    { SWFButtonRecord_scale(this->record, scaleX, scaleY); }
+
+  void scaleTo(float scaleX, float scaleY)
+    { SWFButtonRecord_scaleTo(this->record, scaleX, scaleY); }
+
+  void skewX(float skewX)
+    { SWFButtonRecord_skewX(this->record, skewX); }
+
+  void skewY(float skewY)
+    { SWFButtonRecord_skewY(this->record, skewY); }
+
+  void skewXTo(float skewX)
+    { SWFButtonRecord_skewXTo(this->record, skewX); }
+
+  void skewYTo(float skewY)
+    { SWFButtonRecord_skewYTo(this->record, skewY); }
+
+ private:
+  SWFButtonRecord(c_SWFButtonRecord record)
+  { 
+    this->record = record; 
+    if(this->record == NULL)
+      throw SWFException("ButtonRecord");
+  }
+  SWF_DECLAREONLY(SWFButtonRecord);	
+};
 
 /*  SWFButton  */
 
@@ -1076,7 +1730,12 @@ class SWFButton : public SWFCharacter
   c_SWFButton button;
 
   SWFButton()
-    { this->button = newSWFButton(); }
+  { 
+    this->button = newSWFButton();
+    if(this->button == NULL)
+      throw SWFException("SWFButton()");
+    this->character = (c_SWFCharacter)button;
+  }
 
   virtual ~SWFButton()
     { destroySWFButton(this->button); }
@@ -1084,8 +1743,8 @@ class SWFButton : public SWFCharacter
   c_SWFBlock getBlock()
     { return (c_SWFBlock)this->button; }
 
-  void addShape(SWFCharacter *character, byte flags)
-    { SWFButton_addShape(this->button, (c_SWFCharacter)character->getBlock(), flags); }
+  SWFButtonRecord* addShape(SWFCharacter *character, byte flags)
+    { return new SWFButtonRecord(SWFButton_addCharacter(this->button, (c_SWFCharacter)character->getBlock(), flags)); }
 
   void addAction(SWFAction *action, int flags)
     { SWFButton_addAction(this->button, action->action, flags); }
@@ -1102,9 +1761,33 @@ class SWFButton : public SWFCharacter
   void removeScalingGrid()
     { SWFButton_removeScalingGrid(this->button); }
 
+  SWFButtonRecord* addCharacter(SWFCharacter *character, byte flags)
+    { return new SWFButtonRecord(
+        SWFButton_addCharacter(this->button, (c_SWFCharacter)character->getBlock(), flags)); }
+
   SWF_DECLAREONLY(SWFButton);
 };
 
+/* SWFBinaryData */
+class SWFBinaryData : public SWFBlock
+{
+ public:
+  c_SWFBinaryData data;
+
+  SWFBinaryData(unsigned char *data, int length)
+  {
+    this->data = newSWFBinaryData(data, length);
+    if(this->data == NULL)
+      throw SWFException("SWFBinaryData(char *data, int length)");
+  }
+
+  virtual ~SWFBinaryData()
+    { destroySWFBinaryData(this->data); }
+
+  c_SWFBlock getBlock()
+    { return (c_SWFBlock)this->data; }
+  SWF_DECLAREONLY(SWFBinaryData);
+};
 
 /* SWFVideoStream */
 class SWFVideoStream : public SWFCharacter
@@ -1113,13 +1796,26 @@ class SWFVideoStream : public SWFCharacter
   c_SWFVideoStream stream;
 
   SWFVideoStream()
-    { this->stream = newSWFVideoStream(); }
+  { 
+    this->stream = newSWFVideoStream();
+    if(this->stream == NULL) 
+      throw SWFException("newSWFVideoStream()");
+    this->character = (c_SWFCharacter)stream;
+  }
 
   SWFVideoStream(const char *path)
-    { this->stream = newSWFVideoStream_fromFile(fopen(path, "rb")); }
+  { 
+    this->stream = newSWFVideoStream_fromFile(fopen(path, "rb")); 
+    if(this->stream == NULL)
+      throw SWFException("SWFVideoStream(const char *path)");
+  }
 
   SWFVideoStream(FILE *file)
-    { this->stream = newSWFVideoStream_fromFile(file); }
+  { 
+    this->stream = newSWFVideoStream_fromFile(file); 
+    if(this->stream == NULL)
+      throw SWFException(" SWFVideoStream(FILE *file)");
+  }
 
   virtual ~SWFVideoStream()
     { destroySWFVideoStream(this->stream); }
@@ -1129,6 +1825,18 @@ class SWFVideoStream : public SWFCharacter
 
   int getNumFrames()
     { return SWFVideoStream_getNumFrames(this->stream); }
+
+  int hasAudio()
+    { return SWFVideoStream_hasAudio(this->stream); }
+
+  int setFrameMode(int mode)
+    { return SWFVideoStream_setFrameMode(this->stream, mode); }
+
+  int nextFrame()
+    { return SWFVideoStream_nextFrame(this->stream); }
+
+  int seek(int frame, int whence)
+    { return SWFVideoStream_seek(this->stream, frame, whence); }
 
   c_SWFBlock getBlock()
     { return (c_SWFBlock)this->stream; }

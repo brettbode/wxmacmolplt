@@ -31,20 +31,23 @@
 
 #include "ming.h"
 #include "blocktypes.h"
-
-void SWFFill_setIdx(SWFFillStyle fill, int idx);
-int SWFFill_getIdx(SWFFillStyle fill);
+#include "rect.h"
 
 int SWFFillStyle_equals(SWFFillStyle fill1, SWFFillStyle fill2);
 
 void SWFOutput_writeFillStyles(SWFOutput out,
 			       SWFFillStyle *fills, int nFills,
-			       SWFBlocktype shapeType);
+			       SWFBlocktype shapeType, SWFRect bounds);
 
-void SWFOutput_writeFillStyle(SWFOutput out, SWFFillStyle file, SWFBlocktype type);
+void SWFOutput_writeFillStyle(SWFOutput out, SWFFillStyle file, SWFBlocktype type, SWFRect bounds);
 
 void SWFOutput_writeMorphFillStyles(SWFOutput out,
-				    SWFFillStyle *fills1, int nFills1,
-				    SWFFillStyle *fills2, int nFills2);
+				    SWFFillStyle *fills1, int nFills1, SWFRect bounds1,
+				    SWFFillStyle *fills2, int nFills2, SWFRect bounds2);
 
+void
+SWFOutput_writeMorphFillStyle(SWFOutput out, SWFFillStyle fill1, SWFRect bounds1,
+                              SWFFillStyle fill2, SWFRect bounds2);
+
+void SWFFillStyle_addDependency(SWFFillStyle fill, SWFCharacter c);
 #endif /* SWF_FILLSTYLE_H_INCLUDED */

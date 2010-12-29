@@ -29,17 +29,23 @@
 #include "soundinstance.h"
 #include "browserfont.h"
 #include "action.h"
+#include "filter.h"
+#include "../position.h"
 #include "libming.h"
 
-struct buttonRecord
+#define RECORD_HASFILTER	(1<<4)
+#define RECORD_HASBLEND		(1<<5)
+
+struct SWFButtonRecord_s
 {
 	byte flags;
 	unsigned short layer;
 	SWFCharacter character;
-	SWFMatrix matrix;
+	SWFPosition position;
 	SWFCXform cxform;
+	int blendMode;
+	SWFFilterList filterList;
 };
-typedef struct buttonRecord* ButtonRecord;
 
 struct actionRecord
 {
@@ -55,7 +61,7 @@ struct SWFButton_s
 	int menuflag;
 
 	int nRecords;
-	ButtonRecord *records;
+	SWFButtonRecord *records;
 
 	int nActions;
 	struct actionRecord *actions;
@@ -74,29 +80,30 @@ struct SWFButtonSound_s
 };
 
 
-static ButtonRecord newSWFButtonRecord(byte flags, SWFCharacter character,
+static SWFButtonRecord newSWFButtonRecord(byte flags, SWFCharacter character,
 									 unsigned short layer, SWFMatrix matrix)
 {
-	ButtonRecord record = (ButtonRecord) malloc(sizeof(struct buttonRecord));
+	SWFButtonRecord record = (SWFButtonRecord) malloc(sizeof(struct SWFButtonRecord_s));
 
 	record->flags = flags;
 	record->character = character;
 	record->layer = layer;
-	record->matrix = matrix;
-
+	record->position = newSWFPosition(matrix);
+	record->filterList = NULL;
+	record->blendMode = 0;
 	return record;
 }
 
 
 #define BUTTONRECORD_INCREMENT 8
 
-static void SWFButton_addRecord(SWFButton button, ButtonRecord record)
+static void SWFButton_addRecord(SWFButton button, SWFButtonRecord record)
 {
 	if ( button->nRecords % BUTTONRECORD_INCREMENT == 0 )
 	{
-		button->records = (ButtonRecord*) realloc(button->records,
+		button->records = (SWFButtonRecord*) realloc(button->records,
 						(button->nRecords + BUTTONRECORD_INCREMENT) *
-						sizeof(ButtonRecord));
+						sizeof(SWFButtonRecord));
 	}
 
 	button->records[button->nRecords++] = record;
@@ -124,16 +131,24 @@ void SWFButton_addAction(SWFButton button, SWFAction action, int flags)
 	++button->nActions;
 }
 
-
-/* XXX - temp hack */
+/* adds a shape character 
+ * Add a shape character to a button for given states
+ * possible states:
+ * SWFBUTTON_HIT  
+ * SWFBUTTON_DOWN  
+ * SWFBUTTON_OVER
+ * SWFBUTTON_UP
+ * states can be combined using the binary or operator    
+ * deprecated! use SWFButton_addCharacter instead
+ */
 void SWFButton_addShape(SWFButton button, SWFCharacter character, byte flags)
 {
 	SWFMatrix m;
-
+	SWF_warnOnce("SWFButton_addShape is deprecated\nUse SWFButton_addCharacter instead\n");
 	if ( SWFCharacter_isFinished((SWFCharacter)button) )
 		SWF_error("Can't alter a button after it's been added to another character");
 
-	m = newSWFMatrix(0, 0, 0, 0, 0, 0);
+	m = newSWFMatrix(1.0, 0, 0, 1.0, 0, 0);
 
 	SWFCharacter_getDependencies((SWFCharacter)character,
 									 &CHARACTER(button)->dependencies,
@@ -143,6 +158,157 @@ void SWFButton_addShape(SWFButton button, SWFCharacter character, byte flags)
 
 	SWFCharacter_setFinished(character);
 	SWFButton_addRecord(button, newSWFButtonRecord(flags, character, 0, m));
+}
+
+/* adds a character 
+ * Add a character to a button for given states
+ * possible states:
+ * SWFBUTTON_HIT
+ * SWFBUTTON_DOWN
+ * SWFBUTTON_OVER
+ * SWFBUTTON_UP
+ * states can be combined using the binary or operator
+ * returns a SWFButtonRecord object which can be further modified.
+ */
+SWFButtonRecord
+SWFButton_addCharacter(SWFButton button /* button object */, 
+                       SWFCharacter character /* character to be added */, 
+                       byte state /* state description */)
+{
+	SWFMatrix m;
+	SWFButtonRecord record;
+	SWFCharacter **depsPtr = &CHARACTER(button)->dependencies;
+	int *depCount = &CHARACTER(button)->nDependencies;
+	
+	if ( SWFCharacter_isFinished((SWFCharacter)button) )
+	{
+		SWF_warn("Can't alter a button after it's been added to another character");
+		return NULL;
+	}
+
+	SWFCharacter_getDependencies(character, depsPtr, depCount);
+	SWFCharacter_addDependency((SWFCharacter)button, character);
+	SWFCharacter_setFinished(character);
+	
+	m = newSWFMatrix(1.0, 0, 0, 1.0, 0, 0);
+	record = newSWFButtonRecord(state, character, 0, m);
+	SWFButton_addRecord(button, record);
+	return record;
+}
+
+void
+SWFButtonRecord_setDepth(SWFButtonRecord b, int depth)
+{
+	b->layer = depth;
+}
+
+/*
+ * sets blend mode
+ * Sets an alternative blend mode instead of default alpha blend. 
+ * possible modes are: 
+ * SWFBLEND_MODE_NORMAL 
+ * SWFBLEND_MODE_LAYER 
+ * SWFBLEND_MODE_MULT 
+ * SWFBLEND_MODE_SCREEN 
+ * SWFBLEND_MODE_DARKEN 
+ * SWFBLEND_MODE_ADD 
+ * SWFBLEND_MODE_SUB 
+ * SWFBLEND_MODE_DIFF 
+ * SWFBLEND_MODE_DIFF 
+ * SWFBLEND_MODE_INV 
+ * SWFBLDEN_MODE_ALPHA 
+ * SWFBLEND_MDOE_ERASE 
+ * SWFBLEND_MDOE_OVERLAY 
+ * SWFBLEND_MODE_HARDLIGHT 
+ */
+void
+SWFButtonRecord_setBlendMode(SWFButtonRecord record, int mode)
+{
+	record->blendMode = mode;
+	record->flags |= RECORD_HASBLEND;
+}
+
+/* 
+ * adds a surface filter
+ * Adds a bitmap filter to the display object.  
+ * See SWFFilter for possible filter objects. 
+ */
+void 
+SWFButtonRecord_addFilter(SWFButtonRecord record, SWFFilter filter)
+{
+	if(record->filterList == NULL)
+        {
+                record->filterList = newSWFFilterList();
+                record->flags |= RECORD_HASFILTER;
+        }
+        SWFFilterList_add(record->filterList, filter);
+}
+
+void 
+SWFButtonRecord_move(SWFButtonRecord record, double x, double y)
+{
+	SWFPosition_move(record->position, x, y);
+}
+
+void 
+SWFButtonRecord_moveTo(SWFButtonRecord record, double x, double y)
+{
+	SWFPosition_moveTo(record->position, x, y);
+}
+
+void 
+SWFButtonRecord_rotate(SWFButtonRecord record, double deg)
+{
+	SWFPosition_rotate(record->position, deg);
+}
+
+void 
+SWFButtonRecord_rotateTo(SWFButtonRecord record, double deg)
+{
+	SWFPosition_rotateTo(record->position, deg);
+}
+
+void 
+SWFButtonRecord_scale(SWFButtonRecord record, double scaleX, double scaleY)
+{
+	SWFPosition_scaleXY(record->position, scaleX, scaleY);
+}
+
+void 
+SWFButtonRecord_scaleTo(SWFButtonRecord record, double scaleX, double scaleY)
+{
+	SWFPosition_scaleXYTo(record->position, scaleX, scaleY);
+}
+
+void 
+SWFButtonRecord_skewX(SWFButtonRecord record, double skewX)
+{
+	SWFPosition_skewX(record->position, skewX);
+}
+
+void 
+SWFButtonRecord_skewXTo(SWFButtonRecord record, double skewX)
+{
+	SWFPosition_skewXTo(record->position, skewX);
+}
+
+void 
+SWFButtonRecord_skewY(SWFButtonRecord record, double skewY)
+{
+	SWFPosition_skewY(record->position, skewY);
+}
+
+void 
+SWFButtonRecord_skewYTo(SWFButtonRecord record, double skewY)
+{
+	SWFPosition_skewYTo(record->position, skewY);
+}
+
+void
+SWFButtonRecord_setMatrix(SWFButtonRecord record,
+                          double a, double b, double c, double d, double x, double y)
+{
+	SWFPosition_setMatrix(record->position, a, b, c, d, x, y);
 }
 
 void SWFButton_setMenu(SWFButton button, int flag)
@@ -157,11 +323,10 @@ void writeSWFButtonToMethod(SWFBlock block,
 	SWFOutput_writeToMethod(button->out, method, data);
 }
 
-
 int completeSWFButton(SWFBlock block)
 {
 	SWFButton button = (SWFButton)block;
-	ButtonRecord record;
+	SWFButtonRecord record;
 	SWFOutput out = newSWFOutput();
 	int i, length = 0, layer;
 	byte *offset;
@@ -181,8 +346,12 @@ int completeSWFButton(SWFBlock block)
 		layer = record->layer;
 		if(layer == 0 && block->swfVersion >= 5) layer = i+1;
 		SWFOutput_writeUInt16(out, layer);
-		SWFOutput_writeMatrix(out, record->matrix);
+		SWFOutput_writeMatrix(out, SWFPosition_getMatrix(record->position));
 		SWFOutput_writeUInt8(out, 0); /* blank CXForm */
+		if(record->flags & RECORD_HASFILTER)
+			SWFOutput_writeFilterList(out, record->filterList);
+		if(record->flags & RECORD_HASBLEND)
+			SWFOutput_writeUInt8(out, record->blendMode);
 	}
 
 	SWFOutput_writeUInt8(out, 0); /* end buttons */
@@ -197,7 +366,7 @@ int completeSWFButton(SWFBlock block)
 
 	for(i=0; i<button->nActions; ++i)
 	{
-		length = SWFAction_compile(button->actions[i].action, block->swfVersion);
+		SWFAction_compile(button->actions[i].action, block->swfVersion, &length);
 
 		if(i == button->nActions-1)
 			SWFOutput_writeUInt16(out, 0);
@@ -207,7 +376,7 @@ int completeSWFButton(SWFBlock block)
 		SWFOutput_writeUInt16(out, button->actions[i].flags);
 		SWFOutput_writeAction(out, button->actions[i].action);
 	}
-	
+		
 	button->out = out;
 	return SWFOutput_getLength(out);
 }
@@ -219,8 +388,11 @@ void destroySWFButton(SWFButton button)
 
 	for ( i=0; i<button->nRecords; ++i )
 	{
-		if ( button->records[i]->matrix != NULL )
-			destroySWFMatrix(button->records[i]->matrix);
+		if ( button->records[i]->position != NULL )
+			destroySWFPosition(button->records[i]->position);
+
+		if( button->records[i]->filterList != NULL)
+			destroySWFFilterList(button->records[i]->filterList);
 
 		free(button->records[i]);
 	}
@@ -436,6 +608,8 @@ SWFButton_removeScalingGrid(SWFButton b)
 		b->grid = NULL;
 	}
 }
+
+
 
 /*
  * Local variables:

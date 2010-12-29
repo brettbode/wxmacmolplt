@@ -31,8 +31,6 @@
 
 #include "ming.h"
 
-#define SWFSOUND_INITIAL_DELAY 1663
-
 #define SWF_SOUNDINFO_SYNCSTOPSOUND  (1<<5)
 #define SWF_SOUNDINFO_SYNCNOMULTIPLE (1<<4)
 #define SWF_SOUNDINFO_HASENVELOPE    (1<<3)
@@ -42,6 +40,19 @@
 
 SWFBlock newDefineSWFSoundBlock(SWFSound sound);
 
-void SWFSound_setData(SWFSound sound, byte flags, int numSamples, byte *data);
+static inline int SWFSound_getSampleRate(int flags)
+{
+	switch ( flags & SWF_SOUND_RATE)
+	{
+		case SWF_SOUND_44KHZ:
+			return 44100;
+		case SWF_SOUND_22KHZ:
+			return 22050;
+		case SWF_SOUND_11KHZ:
+			return 11025; 
+		default:
+			return 0;
+	}
+}
 
 #endif /* SWF_SOUND_H_INCLUDED */

@@ -38,14 +38,14 @@
 extern "C" {
 #endif
 
+#ifdef _MSC_VER
+#define inline __inline
+#endif
+
 #include <stdio.h>
 
-#define MING_VERSION        0.4.0.beta4
-#define MING_VERSION_TEXT  "0.4.0.beta4"
-
-/* do we enable gif / png functions? */
-#include "ming_config.h"
-
+#define MING_VERSION        0.4.3
+#define MING_VERSION_TEXT  "0.4.3"
 
 /***** Type definitions - avoid cyclic dependencies ****/
 
@@ -68,12 +68,14 @@ typedef struct SWFFont_s *SWFFont;
 typedef struct SWFText_s *SWFText;
 typedef struct SWFBrowserFont_s *SWFBrowserFont;
 typedef struct SWFFontCharacter_s *SWFFontCharacter;
+typedef struct SWFFontCollection_s *SWFFontCollection;
 typedef struct SWFTextField_s *SWFTextField;
 typedef struct SWFSoundStream_s *SWFSoundStream;
 typedef struct SWFSound_s *SWFSound;
 typedef struct SWFSoundInstance_s *SWFSoundInstance;
 typedef struct SWFCXform_s *SWFCXform;
 typedef struct SWFAction_s *SWFAction;
+typedef struct SWFInitAction_s *SWFInitAction;
 typedef struct SWFButton_s *SWFButton;
 typedef struct SWFSprite_s *SWFSprite;
 typedef struct SWFPosition_s *SWFPosition;
@@ -84,21 +86,58 @@ typedef struct SWFMovie_s *SWFMovie;
 typedef struct SWFVideoStream_s *SWFVideoStream;
 typedef struct SWFPrebuiltClip_s *SWFPrebuiltClip;
 typedef struct SWFFilter_s * SWFFilter;
+typedef struct SWFButtonRecord_s* SWFButtonRecord;
+typedef struct SWFSymbolClass_s* SWFSymbolClass;
+typedef struct SWFBinaryData_s* SWFBinaryData;
+typedef struct SWFSceneData_s* SWFSceneData;
+
+union SWFMovieBlockType_u {
+	SWFBlock 		block;
+	SWFCharacter 		character;
+	SWFDBLBitmap 		dblbmp;
+	SWFDBLBitmapData 	dblbmp_data;
+	SWFJpegBitmap 		jpegbmp;
+	SWFJpegWithAlpha        jpegbmp_alpha;
+	SWFShape 		shape;
+	SWFMorph		morph;
+	SWFText			text;
+	SWFTextField		textfield;
+	SWFSound		sound;
+	SWFSoundInstance	sound_instance;
+	SWFAction		action;
+	SWFButton		button;
+	SWFSprite		sprite;
+	SWFMovieClip		mc;
+	SWFVideoStream		stream;
+	SWFPrebuiltClip		prebuild;
+	SWFBinaryData		binary;
+	SWFInitAction		init;
+};
+
+typedef union SWFMovieBlockType_u SWFMovieBlockType;
+
+#if __GNUC__ > 3 ||  \
+	(__GNUC__ == 3 && (__GNUC_MINOR__ > 3 || \
+                 (__GNUC_MINOR__ == 3 && __GNUC_PATCHLEVEL__ > 0)))
+#define __to_movie_block(x) (union SWFMovieBlockType_u)x
+#else
+#define __to_movie_block(x) (union SWFMovieBlockType_u) { x }
+#endif
 
 /***** General Ming functions *****/
 
-int Ming_init();
-void Ming_cleanup();
-void Ming_collectGarbage();
+int Ming_init(void);
+void Ming_cleanup(void);
+void Ming_collectGarbage(void);
 void Ming_useConstants(int flag);
 
 /* sets the threshold error for drawing cubic beziers.  Lower is more
    accurate, hence larger file size. */
 void Ming_setCubicThreshold(int num);
 
-/* sets the overall scale, default is 1 */
+/* sets the overall scale, default is 20.0 */
 void Ming_setScale(float scale);
-float Ming_getScale();
+float Ming_getScale(void);
 
 /* set the version number to use */
 void Ming_useSWFVersion(int version);
@@ -125,7 +164,7 @@ SWFMsgFunc Ming_setWarnFunction(SWFMsgFunc);
 /*
  * Set the function that gets called when an error occurs within the library
  * This function sets function to be called when an error occurs within the
- * library. The default function prints the error mesage to stdout and exits.
+ * library. The default function prints the error message to stdout and exits.
  * Returns the previously-set error function.
  */
 SWFMsgFunc Ming_setErrorFunction(SWFMsgFunc);
@@ -133,7 +172,7 @@ SWFMsgFunc Ming_setErrorFunction(SWFMsgFunc);
 /* a generic output method.  specific instances dump output to file,
    send to stdout, etc. */
 typedef void (*SWFByteOutputMethod)(byte b, void *data);
-//void fileOutputMethod(byte b, void *data);
+void fileOutputMethod(byte b, void *data);
 
 
 /***** SWFBlock *****/
@@ -141,10 +180,10 @@ typedef void (*SWFByteOutputMethod)(byte b, void *data);
 
 /***** SWFMatrix *****/
 
-float SWFMatrix_getScaleX(SWFMatrix m);
-float SWFMatrix_getRotate0(SWFMatrix m);
-float SWFMatrix_getRotate1(SWFMatrix m);
-float SWFMatrix_getScaleY(SWFMatrix m);
+double SWFMatrix_getScaleX(SWFMatrix m);
+double SWFMatrix_getRotate0(SWFMatrix m);
+double SWFMatrix_getRotate1(SWFMatrix m);
+double SWFMatrix_getScaleY(SWFMatrix m);
 int SWFMatrix_getTranslateX(SWFMatrix m);
 int SWFMatrix_getTranslateY(SWFMatrix m);
 
@@ -154,9 +193,11 @@ int SWFMatrix_getTranslateY(SWFMatrix m);
 /* A generic input object.  Wraps files, buffers and streams; replaces
    standard file funcs */
 SWFInput newSWFInput_file(FILE *f);
+SWFInput newSWFInput_filename(const char *);
 SWFInput newSWFInput_stream(FILE *f);
 SWFInput newSWFInput_buffer(unsigned char *buffer, int length);
 SWFInput newSWFInput_allocedBuffer(unsigned char *buffer, int length);
+SWFInput newSWFInput_bufferCopy(unsigned char *buffer, int length);
 SWFInput newSWFInput_input(SWFInput in, unsigned int length);
 void destroySWFInput(SWFInput input);
 
@@ -178,9 +219,26 @@ float SWFCharacter_getHeight(SWFCharacter character);
 
 /***** SWFBitmap *****/
 
+typedef enum 
+{
+	SWF_DBL_COLORTABLE,
+	SWF_DBL_RGB15,
+	SWF_DBL_RGB24,
+	SWF_DBL_RGB32
+} SWFBitmapFmt;
+
+typedef enum {
+	SWF_RAWIMG_ARGB
+} SWFRawImgFmt;
+
+
 typedef SWFCharacter SWFBitmap;
 
 SWFBitmap newSWFBitmap_fromInput(SWFInput input);
+SWFBitmap newSWFBitmap_fromRawImg(unsigned char *raw, 
+                                  SWFRawImgFmt srcFmt, SWFBitmapFmt dstFmt,
+                                  unsigned short width, unsigned short height);
+
 void destroySWFBitmap(SWFBitmap bitmap);
 
 int SWFBitmap_getWidth(SWFBitmap b);
@@ -194,14 +252,11 @@ SWFDBLBitmap newSWFDBLBitmap(FILE *f);
 /* create a new DBL bitmap from the given input object */
 SWFDBLBitmap newSWFDBLBitmap_fromInput(SWFInput input);
 
-#if USE_GIF
 SWFDBLBitmapData newSWFDBLBitmapData_fromGifFile(const char *name);
 SWFDBLBitmapData newSWFDBLBitmapData_fromGifInput(SWFInput input);
-#endif
-#if USE_PNG
+
 SWFDBLBitmapData newSWFDBLBitmapData_fromPngFile(const char *name);
 SWFDBLBitmapData newSWFDBLBitmapData_fromPngInput(SWFInput input);
-#endif
 
 
 /***** SWFJpegBitmap extends SWFBitmap *****/
@@ -215,29 +270,49 @@ SWFJpegWithAlpha newSWFJpegWithAlpha_fromInput(SWFInput input, SWFInput alpha);
 
 /***** SWFGradient *****/
 
-SWFGradient newSWFGradient();
+typedef enum
+{
+        SWF_GRADIENT_PAD,
+        SWF_GRADIENT_REFLECT,
+        SWF_GRADIENT_REPEAT
+} GradientSpreadMode;
+
+typedef enum
+{
+        SWF_GRADIENT_NORMAL,
+        SWF_GRADIENT_LINEAR
+} GradientInterpolationMode;
+
+SWFGradient newSWFGradient(void);
 void destroySWFGradient(SWFGradient gradient);
 
 void SWFGradient_addEntry(SWFGradient gradient,
 			  float ratio, byte r, byte g, byte b, byte a);
 
+void SWFGradient_setSpreadMode(SWFGradient gradient, GradientSpreadMode mode);
+void SWFGradient_setInterpolationMode(SWFGradient gradient, GradientInterpolationMode mode);
+void SWFGradient_setFocalPoint(SWFGradient gradient, float focalPoint);
 
 /***** SWFFillStyle - a fill instance on a shape *****/
 
-#define SWFFILL_SOLID			0x00
-#define SWFFILL_GRADIENT		0x10
-#define SWFFILL_LINEAR_GRADIENT 	0x10
-#define SWFFILL_RADIAL_GRADIENT 	0x12
-#define SWFFILL_BITMAP			0x40
-#define SWFFILL_TILED_BITMAP		0x40
-#define SWFFILL_CLIPPED_BITMAP		0x41
+#define SWFFILL_SOLID				0x00
+#define SWFFILL_GRADIENT			0x10
+#define SWFFILL_LINEAR_GRADIENT 		0x10
+#define SWFFILL_RADIAL_GRADIENT 		0x12
+#define SWFFILL_FOCAL_GRADIENT			0x13
+#define SWFFILL_BITMAP				0x40
+#define SWFFILL_TILED_BITMAP			0x40
+#define SWFFILL_CLIPPED_BITMAP			0x41
+#define SWFFILL_NONSMOOTHED_TILED_BITMAP 	0x42
+#define SWFFILL_NONSMOOTHED_CLIPPED_BITMAP 	0x43
+
 
 SWFFillStyle newSWFSolidFillStyle(byte r, byte g, byte b, byte a);
 SWFFillStyle newSWFGradientFillStyle(SWFGradient gradient, byte radial);
 SWFFillStyle newSWFBitmapFillStyle(SWFCharacter bitmap, byte flags);
 
 SWFMatrix SWFFillStyle_getMatrix(SWFFillStyle fill);
-
+void destroySWFFillStyle(SWFFillStyle fill);
 
 /***** SWFLineStyle *****/
 
@@ -259,8 +334,8 @@ SWFLineStyle newSWFLineStyle(unsigned short width, byte r, byte g, byte b, byte 
 
 #define SWF_LINESTYLE_FLAG_NOCLOSE      (1<<2)
 
-#define SWF_LINESTYLE_FLAG_ENDCAP_ROUND (0<<0)
-#define SWF_LINESTYLE_FLAG_ENDCAP_NONE  (1<<0)
+#define SWF_LINESTYLE_FLAG_ENDCAP_ROUND  (0<<0)
+#define SWF_LINESTYLE_FLAG_ENDCAP_NONE   (1<<0)
 #define SWF_LINESTYLE_FLAG_ENDCAP_SQUARE (2<<0)
 
 SWFLineStyle newSWFLineStyle2(unsigned short width, byte r, byte g, byte b, byte a,
@@ -270,8 +345,15 @@ SWFLineStyle newSWFLineStyle2_filled(unsigned short width,
                                      float miterLimit);
 
 /***** SWFShape *****/
+#define SWF_SHAPE1 1
+#define SWF_SHAPE2 2
+#define SWF_SHAPE3 3
+#define SWF_SHAPE4 4
 
-SWFShape newSWFShape();
+#define SWF_SHAPE_USESCALINGSTROKES 	(1<<0)
+#define SWF_SHAPE_USENONSCALINGSTROKES	(1<<1)
+
+SWFShape newSWFShape(void);
 /*
  * returns a shape containing the bitmap in a filled rect
  * flag can be SWFFILL_CLIPPED_BITMAP or SWFFILL_TILED_BITMAP
@@ -280,33 +362,36 @@ SWFShape newSWFShapeFromBitmap(SWFBitmap bitmap, int flag);
 void destroySWFShape(SWFShape shape);
 
 void SWFShape_end(SWFShape shape);
+void SWFShape_useVersion(SWFShape shape, int version);
+int SWFShape_getVersion(SWFShape shape);
+void SWFShape_setRenderHintingFlags(SWFShape shape, int flags);
 
-void SWFShape_movePenTo(SWFShape shape, float x, float y);
-void SWFShape_movePen(SWFShape shape, float x, float y);
+void SWFShape_movePenTo(SWFShape shape, double x, double y);
+void SWFShape_movePen(SWFShape shape, double x, double y);
 
-float SWFShape_getPenX(SWFShape shape);
-float SWFShape_getPenY(SWFShape shape);
-void SWFShape_getPen(SWFShape shape, float* penX, float* penY);
+double SWFShape_getPenX(SWFShape shape);
+double SWFShape_getPenY(SWFShape shape);
+void SWFShape_getPen(SWFShape shape, double* penX, double* penY);
 
 /* x,y relative to shape origin */
-void SWFShape_drawLineTo(SWFShape shape, float x, float y);
-void SWFShape_drawLine(SWFShape shape, float dx, float dy);
+void SWFShape_drawLineTo(SWFShape shape, double x, double y);
+void SWFShape_drawLine(SWFShape shape, double dx, double dy);
 
-void SWFShape_drawCurveTo(SWFShape shape, float controlx, float controly,
-			  float anchorx, float anchory);
-void SWFShape_drawCurve(SWFShape shape, float controldx, float controldy,
-			float anchordx, float anchordy);
+void SWFShape_drawCurveTo(SWFShape shape, double controlx, double controly,
+			  double anchorx, double anchory);
+void SWFShape_drawCurve(SWFShape shape, double controldx, double controldy,
+			double anchordx, double anchordy);
 
 void SWFShape_setLineStyle(SWFShape shape, unsigned short width,
-			  byte r, byte g, byte b, byte a);
+			  byte r, byte g, byte b, byte a) __deprecated;
 
 void SWFShape_setLineStyle2(SWFShape shape, unsigned short width,
                             byte r, byte g, byte b, byte a, 
-                            int flags, float miterLimit);
+                            int flags, float miterLimit) __deprecated;
 
 void SWFShape_setLineStyle2filled(SWFShape shape, unsigned short width,
                                   SWFFillStyle fill,
-                                  int flags, float miterLimit);
+                                  int flags, float miterLimit) __deprecated;
 
 void SWFShape_hideLine(SWFShape shape);
 
@@ -320,10 +405,10 @@ SWFFillStyle SWFShape_addBitmapFillStyle(SWFShape shape,
 void SWFShape_setLeftFillStyle(SWFShape shape, SWFFillStyle fill);
 void SWFShape_setRightFillStyle(SWFShape shape, SWFFillStyle fill);
 
-
+char *SWFShape_dumpOutline(SWFShape s);
 /***** SWFMorph *****/
 
-SWFMorph newSWFMorphShape();
+SWFMorph newSWFMorphShape(void);
 void destroySWFMorph(SWFMorph morph);
 
 SWFShape SWFMorph_getShape1(SWFMorph morph);
@@ -332,13 +417,14 @@ SWFShape SWFMorph_getShape2(SWFMorph morph);
 
 /***** SWFFont *****/
 
-SWFFont newSWFFont();
+SWFFont newSWFFont_fromFile(const char *filename);
+
 /* pull font definition from fdb (font def block) file */
-SWFFont loadSWFFontFromFile(FILE *file);
+SWFFont loadSWFFontFromFile(FILE *file) __deprecated;
 void destroySWFFont(SWFFont font);
 
-float SWFFont_getStringWidth(SWFFont font, const unsigned char *string);
-float SWFFont_getUTF8StringWidth(SWFFont font, const unsigned char *string);
+float SWFFont_getStringWidth(SWFFont font, const char *string);
+float SWFFont_getUTF8StringWidth(SWFFont font, const char *string);
 
   /* deprecated? */
   float SWFFont_getWideStringWidth(SWFFont font, const unsigned short *string, int len);
@@ -347,16 +433,24 @@ float SWFFont_getUTF8StringWidth(SWFFont font, const unsigned char *string);
 float SWFFont_getAscent(SWFFont font);
 float SWFFont_getDescent(SWFFont font);
 float SWFFont_getLeading(SWFFont font);
-char *SWFFont_getShape(SWFFont font, unsigned short code);
+const char* SWFFont_getName(SWFFont font);
+int SWFFont_getGlyphCount(SWFFont font);
 
+SWFFontCollection newSWFFontCollection_fromFile(const char *filename);
+SWFFont *SWFFontCollection_getFonts(SWFFontCollection collection, int *count);
+int SWFFontCollection_getFontCount(SWFFontCollection collection);
+SWFFont SWFFontCollection_getFont(SWFFontCollection collection, int index);
+void destroySWFFontCollection(SWFFontCollection collection);
+
+char *SWFFont_getShape(SWFFont font, unsigned short c) __deprecated;
 
 /***** SWFText *****/
 
-SWFText newSWFText();
-SWFText newSWFText2();
+SWFText newSWFText(void);
+SWFText newSWFText2(void);
 void destroySWFText(SWFText text);
 
-void SWFText_setFont(SWFText text, void* font);
+void SWFText_setFont(SWFText text, SWFFont font);
 void SWFText_setHeight(SWFText text, float height);
 void SWFText_setColor(SWFText text, byte r, byte g, byte b, byte a);
 
@@ -369,8 +463,8 @@ void SWFText_addWideString(SWFText text, const unsigned short* string,
 
 void SWFText_setSpacing(SWFText text, float spacing);
 
-float SWFText_getStringWidth(SWFText text, const unsigned char* string);
-float SWFText_getUTF8StringWidth(SWFText text, const unsigned char* string);
+float SWFText_getStringWidth(SWFText text, const char* string);
+float SWFText_getUTF8StringWidth(SWFText text, const char* string);
 float SWFText_getWideStringWidth(SWFText text, const unsigned short* string);
 
   /* deprecated? */
@@ -392,32 +486,26 @@ void destroySWFBrowserFont(SWFBrowserFont browserFont);
 
 /***** SWFFontCharacter *****/
 
-SWFFontCharacter SWFMovie_addFont(SWFMovie movie, SWFFont font);
 void SWFFontCharacter_addChars(SWFFontCharacter font, const char *string);
 void SWFFontCharacter_addUTF8Chars(SWFFontCharacter font, const char *string);
-SWFFontCharacter SWFMovie_importFont(SWFMovie movie, const char *filename, const char *name);
-
+void SWFFontCharacter_addAllChars(SWFFontCharacter);
 
 /***** SWFTextField *****/
 
-#define SWFTEXTFIELD_ONMASK  0x2005 /* on bits */
-#define SWFTEXTFIELD_OFFMASK 0x3BFF /* off bits */
-/* Taken from textfield.h: #define SWFTEXTFIELD_OFFMASK 0x7BFF / off bits */
-
-#define SWFTEXTFIELD_HASFONT   (1<<0)   /* font and size given */
-#define SWFTEXTFIELD_HASLENGTH (1<<1)
-#define SWFTEXTFIELD_HASCOLOR  (1<<2)
-#define SWFTEXTFIELD_NOEDIT    (1<<3)
-#define SWFTEXTFIELD_PASSWORD  (1<<4)
-#define SWFTEXTFIELD_MULTILINE (1<<5)
-#define SWFTEXTFIELD_WORDWRAP  (1<<6)
-#define SWFTEXTFIELD_HASTEXT   (1<<7)   /* initial text present */
-#define SWFTEXTFIELD_USEFONT   (1<<8)
-#define SWFTEXTFIELD_HTML      (1<<9)
-#define SWFTEXTFIELD_DRAWBOX   (1<<11)
-#define SWFTEXTFIELD_NOSELECT  (1<<12)
-#define SWFTEXTFIELD_HASLAYOUT (1<<13)  /* align, margin, lspace, indent */
-#define SWFTEXTFIELD_AUTOSIZE  (1<<14)  /* SWF6 */
+#define SWFTEXTFIELD_HASFONT   (1<<0)   /* private */
+#define SWFTEXTFIELD_HASLENGTH (1<<1)   /* private */
+#define SWFTEXTFIELD_HASCOLOR  (1<<2)   /* private */ 
+#define SWFTEXTFIELD_NOEDIT    (1<<3)   /* disables editing */
+#define SWFTEXTFIELD_PASSWORD  (1<<4)   /* hides characters */
+#define SWFTEXTFIELD_MULTILINE (1<<5)   /* multiline and scrollable */
+#define SWFTEXTFIELD_WORDWRAP  (1<<6)   /* enable automatic line wrap */
+#define SWFTEXTFIELD_HASTEXT   (1<<7)   /* private */
+#define SWFTEXTFIELD_USEFONT   (1<<8)   /* private */
+#define SWFTEXTFIELD_HTML      (1<<9)   /* renders some HTML tags*/
+#define SWFTEXTFIELD_DRAWBOX   (1<<11)  /* draws a border */
+#define SWFTEXTFIELD_NOSELECT  (1<<12)  /* disabled selection */
+#define SWFTEXTFIELD_HASLAYOUT (1<<13)  /* private */
+#define SWFTEXTFIELD_AUTOSIZE  (1<<14)  /* resizes to textlen */
 
 typedef enum
 {
@@ -427,7 +515,7 @@ typedef enum
   SWFTEXTFIELD_ALIGN_JUSTIFY = 3
 } SWFTextFieldAlignment;
 
-SWFTextField newSWFTextField();
+SWFTextField newSWFTextField(void);
 void destroySWFTextField(SWFTextField textField);
 
 void SWFTextField_setFont(SWFTextField field, SWFBlock font);
@@ -463,8 +551,10 @@ SWFSoundStream newSWFSoundStream(FILE *file);
 /* added by David McNab <david@rebirthing.co.nz> */
 SWFSoundStream newSWFSoundStreamFromFileno(int fd);
 SWFSoundStream newSWFSoundStream_fromInput(SWFInput input);
-int SWFSoundStream_getFrames(SWFSoundStream sound);
+int SWFSoundStream_getFrames(SWFSoundStream sound) __deprecated;
 void destroySWFSoundStream(SWFSoundStream soundStream);
+unsigned int SWFSoundStream_getDuration(SWFSoundStream);
+void SWFSoundStream_setInitialMp3Delay(SWFSoundStream, int);
 
 
 /***** SWFSound *****/
@@ -473,6 +563,8 @@ SWFSound newSWFSound(FILE *file, byte flags);
 /* added by David McNab to facilitate Python access */
 SWFSound newSWFSoundFromFileno(int fd, byte flags);
 SWFSound newSWFSound_fromInput(SWFInput input, byte flags);
+SWFSound newSWFSound_fromSoundStream(SWFSoundStream stream);
+void SWFSound_setInitialMp3Delay(SWFSound sound, int delaySeek);
 void destroySWFSound(SWFSound sound);
 
 #define SWF_SOUND_COMPRESSION       0xf0
@@ -506,36 +598,34 @@ void SWFSoundInstance_setNoMultiple(SWFSoundInstance instance);
 void SWFSoundInstance_setLoopInPoint(SWFSoundInstance instance, unsigned int point);
 void SWFSoundInstance_setLoopOutPoint(SWFSoundInstance instance, unsigned int point);
 void SWFSoundInstance_setLoopCount(SWFSoundInstance instance, int count);
-void SWFSoundInstance_setNoMultiple(SWFSoundInstance instance);
-
+void SWFSoundInstance_addEnvelope(SWFSoundInstance inst, unsigned int mark44, short left, short right);
+void destroySWFSoundInstance(SWFSoundInstance inst);
 
 /***** SWFCXform - Color transform *****/
-
-/* create a new color transform with the given parameters */
 SWFCXform newSWFCXform(int rAdd, int gAdd, int bAdd, int aAdd,
 		       float rMult, float gMult, float bMult, float aMult);
-/* create a new color transform with the given additive parameters and
-   default multiplicative */
 SWFCXform newSWFAddCXform(int rAdd, int gAdd, int bAdd, int aAdd);
-/* create a new color transform with the given multiplicative parameters
-   and default additive */
 SWFCXform newSWFMultCXform(float rMult, float gMult, float bMult, float aMult);
 void destroySWFCXform(SWFCXform cXform);
-
-/* set the additive part of the color transform to the given parameters */
 void SWFCXform_setColorAdd(SWFCXform cXform,
 			   int rAdd, int gAdd, int bAdd, int aAdd);
-/* set the multiplicative part of the color transform to the given
-   parameters */
 void SWFCXform_setColorMult(SWFCXform cXform,
 			    float rMult, float gMult, float bMult, float aMult);
-
 
 /***** SWFAction *****/
 SWFAction newSWFAction(const char *script);
 SWFAction newSWFAction_fromFile(const char *filename);
+int SWFAction_compile(SWFAction action, int swfVersion, int *length);
 SWFAction compileSWFActionCode(const char *script) __deprecated;
 void destroySWFAction(SWFAction action);
+byte *SWFAction_getByteCode(SWFAction action, int *length);
+int SWFAction_setDebug(SWFAction action, int debug);
+
+SWFInitAction newSWFInitAction(SWFAction action);
+void destroySWFInitAction(SWFInitAction init);
+/* use with care */
+SWFInitAction newSWFInitAction_withId(SWFAction action, int id);
+
 
 
 /***** SWFButton *****/
@@ -575,17 +665,37 @@ void destroySWFAction(SWFAction action);
 #define SWFBUTTON_MOUSEOUT        SWFBUTTON_OVERUPTOIDLE
 #define SWFBUTTON_MOUSEOVER       SWFBUTTON_IDLETOOVERUP
 
-SWFButton newSWFButton();
+SWFButton newSWFButton(void);
 void destroySWFButton(SWFButton button);
 
-void SWFButton_addShape(SWFButton button, SWFCharacter character, byte flags);
+void SWFButton_addShape(SWFButton button, SWFCharacter character, byte flags) __deprecated;
+SWFButtonRecord SWFButton_addCharacter(SWFButton, SWFCharacter, byte flags);
 void SWFButton_addAction(SWFButton button, SWFAction action, int flags);
 SWFSoundInstance SWFButton_addSound(SWFButton button, SWFSound action, byte flags);
 void SWFButton_setMenu(SWFButton button, int flag);
 void SWFButton_setScalingGrid(SWFButton b, int x, int y, int w, int h);
 void SWFButton_removeScalingGrid(SWFButton b);
 
+void SWFButtonRecord_setDepth(SWFButtonRecord b, int depth);
+void SWFButtonRecord_addFilter(SWFButtonRecord b, SWFFilter f);
+void SWFButtonRecord_setBlendMode(SWFButtonRecord b, int mode);
+void SWFButtonRecord_move(SWFButtonRecord record, double x, double y);
+void SWFButtonRecord_moveTo(SWFButtonRecord record, double x, double y);
+void SWFButtonRecord_rotate(SWFButtonRecord record, double deg);
+void SWFButtonRecord_rotateTo(SWFButtonRecord record, double deg);
+void SWFButtonRecord_scale(SWFButtonRecord record, double scaleX, double scaleY);
+void SWFButtonRecord_scaleTo(SWFButtonRecord record, double scaleX, double scaleY);
+void SWFButtonRecord_skewX(SWFButtonRecord record, double skewX);
+void SWFButtonRecord_skewXTo(SWFButtonRecord record, double skewX);
+void SWFButtonRecord_skewY(SWFButtonRecord record, double skewY);
+void SWFButtonRecord_skewYTo(SWFButtonRecord record, double skewY);
+void SWFButtonRecord_setMatrix(SWFButtonRecord record, double a, double b, double c, double d, double x, double y);
+
+
 /****** SWFVideo ******/
+
+#define SWFVIDEOSTREAM_MODE_AUTO 	0
+#define SWFVIDEOSTREAM_MODE_MANUAL 	1
 
 void destroySWFVideoStream(SWFVideoStream stream);
 SWFVideoStream newSWFVideoStream_fromFile(FILE *f);
@@ -594,11 +704,13 @@ SWFVideoStream newSWFVideoStream(void);
 void SWFVideoStream_setDimension(SWFVideoStream stream, int width, int height);
 int SWFVideoStream_getNumFrames(SWFVideoStream stream);
 int SWFVideoStream_hasAudio(SWFVideoStream stream);
-
+int SWFVideoStream_setFrameMode(SWFVideoStream stream, int mode);
+int SWFVideoStream_nextFrame(SWFVideoStream stream);
+int SWFVideoStream_seek(SWFVideoStream stream, int frame, int whence);
 
 /***** SWFSprite *****/
 
-SWFSprite newSWFSprite();
+SWFSprite newSWFSprite(void);
 void destroySWFSprite(SWFSprite sprite);
 
 void SWFSprite_addBlock(SWFSprite sprite, SWFBlock block);
@@ -606,44 +718,47 @@ void SWFSprite_addBlock(SWFSprite sprite, SWFBlock block);
 
 /***** SWFPosition *****/
 
-struct _swfPosition
-{
-  int x;
-  int y;
-  float xScale;
-  float yScale;
-  float xSkew;
-  float ySkew;
-  float rot;
-  SWFMatrix matrix;
-};
-
-#define SWF_POSITION_SIZE sizeof(struct _swfPosition)
-
 SWFPosition newSWFPosition(SWFMatrix matrix);
 void destroySWFPosition(SWFPosition position);
 
-void SWFPosition_skewX(SWFPosition position, float x);
-void SWFPosition_skewXTo(SWFPosition position, float x);
-void SWFPosition_skewY(SWFPosition position, float y);
-void SWFPosition_skewYTo(SWFPosition position, float y);
+void SWFPosition_skewX(SWFPosition position, double x);
+void SWFPosition_skewXTo(SWFPosition position, double x);
+void SWFPosition_skewY(SWFPosition position, double y);
+void SWFPosition_skewYTo(SWFPosition position, double y);
 
-void SWFPosition_scaleX(SWFPosition position, float x);
-void SWFPosition_scaleXTo(SWFPosition position, float x);
-void SWFPosition_scaleY(SWFPosition position, float y);
-void SWFPosition_scaleYTo(SWFPosition position, float y);
-void SWFPosition_scaleXY(SWFPosition position, float x, float y);
-void SWFPosition_scaleXYTo(SWFPosition position, float x, float y);
+void SWFPosition_scaleX(SWFPosition position, double x);
+void SWFPosition_scaleXTo(SWFPosition position, double x);
+void SWFPosition_scaleY(SWFPosition position, double y);
+void SWFPosition_scaleYTo(SWFPosition position, double y);
+void SWFPosition_scaleXY(SWFPosition position, double x, double y);
+void SWFPosition_scaleXYTo(SWFPosition position, double x, double y);
 
 SWFMatrix SWFPosition_getMatrix(SWFPosition p);
-void SWFPosition_setMatrix(SWFPosition p, float a, float b, float c, float d,
-			   float x, float y);
+void SWFPosition_setMatrix(SWFPosition p, double a, double b, double c, double d,
+			   double x, double y);
 
-void SWFPosition_rotate(SWFPosition position, float degrees);
-void SWFPosition_rotateTo(SWFPosition position, float degrees);
+void SWFPosition_rotate(SWFPosition position, double degrees);
+void SWFPosition_rotateTo(SWFPosition position, double degrees);
 
-void SWFPosition_move(SWFPosition position, float x, float y);
-void SWFPosition_moveTo(SWFPosition position, float x, float y);
+void SWFPosition_move(SWFPosition position, double x, double y);
+void SWFPosition_moveTo(SWFPosition position, double x, double y);
+
+double SWFPosition_getRotation(SWFPosition position);
+double SWFPosition_getX(SWFPosition position);
+double SWFPosition_getY(SWFPosition position);
+
+void SWFPosition_getXY(SWFPosition position, double* outX, double* outY);
+
+double SWFPosition_getXScale(SWFPosition position);
+double SWFPosition_getYScale(SWFPosition position);
+
+void SWFPosition_getXYScale(SWFPosition position, double* outXScale, double* outYScale);
+
+double SWFPosition_getXSkew(SWFPosition position);
+double SWFPosition_getYSkew(SWFPosition position);
+
+void SWFPosition_getXYSkew(SWFPosition position, double* outXSkew, double* outYSkew);
+
 
 /***** SWFFilter ***********/
 
@@ -654,6 +769,18 @@ void SWFPosition_moveTo(SWFPosition position, float x, float y);
 
 #define FILTER_FLAG_CLAMP          (1<<1)
 #define FILTER_FLAG_PRESERVE_ALPHA (1<<0)
+
+typedef enum
+{
+	SWFFILTER_TYPE_DROPSHADOW,
+	SWFFILTER_TYPE_BLUR,
+	SWFFILTER_TYPE_GLOW,
+	SWFFILTER_TYPE_BEVEL,
+	SWFFILTER_TYPE_GRADIENTGLOW,
+	SWFFILTER_TYPE_CONVOLUTION,
+	SWFFILTER_TYPE_COLORMATRIX,
+	SWFFILTER_TYPE_GRADIENTBEVEL
+} SWFFilterFmt;
 
 typedef struct SWFColor {
         unsigned char    red;
@@ -700,38 +827,25 @@ SWFFilter newDropShadowFilter(SWFColor color, SWFBlur blur,
 SWFCharacter SWFDisplayItem_getCharacter(SWFDisplayItem item);
 void SWFDisplayItem_endMask(SWFDisplayItem item);
 
-/*
- * Methods for reading position data
- *  - added by David McNab <david@rebirthing.co.nz>
- */
+void SWFDisplayItem_move(SWFDisplayItem item, double x, double y);
+void SWFDisplayItem_moveTo(SWFDisplayItem item, double x, double y);
+void SWFDisplayItem_rotate(SWFDisplayItem item, double degrees);
+void SWFDisplayItem_rotateTo(SWFDisplayItem item, double degrees);
+void SWFDisplayItem_scale(SWFDisplayItem item, double xScale, double yScale);
+void SWFDisplayItem_scaleTo(SWFDisplayItem item, double xScale, double yScale);
+void SWFDisplayItem_skewX(SWFDisplayItem item, double x);
+void SWFDisplayItem_skewXTo(SWFDisplayItem item, double x);
+void SWFDisplayItem_skewY(SWFDisplayItem item, double y);
+void SWFDisplayItem_skewYTo(SWFDisplayItem item, double y);
 
-float SWFDisplayItem_get_x(SWFDisplayItem item);
-float SWFDisplayItem_get_y(SWFDisplayItem item);
-float SWFDisplayItem_get_xScale(SWFDisplayItem item);
-float SWFDisplayItem_get_yScale(SWFDisplayItem item);
-float SWFDisplayItem_get_xSkew(SWFDisplayItem item);
-float SWFDisplayItem_get_ySkew(SWFDisplayItem item);
-float SWFDisplayItem_get_rot(SWFDisplayItem item);
-
-void SWFDisplayItem_move(SWFDisplayItem item, float x, float y);
-void SWFDisplayItem_moveTo(SWFDisplayItem item, float x, float y);
-void SWFDisplayItem_rotate(SWFDisplayItem item, float degrees);
-void SWFDisplayItem_rotateTo(SWFDisplayItem item, float degrees);
-void SWFDisplayItem_scale(SWFDisplayItem item, float xScale, float yScale);
-void SWFDisplayItem_scaleTo(SWFDisplayItem item, float xScale, float yScale);
-void SWFDisplayItem_skewX(SWFDisplayItem item, float x);
-void SWFDisplayItem_skewXTo(SWFDisplayItem item, float x);
-void SWFDisplayItem_skewY(SWFDisplayItem item, float y);
-void SWFDisplayItem_skewYTo(SWFDisplayItem item, float y);
-
-void SWFDisplayItem_getPosition(SWFDisplayItem item, float * x, float * y);
-void SWFDisplayItem_getRotation(SWFDisplayItem item, float * degrees);
-void SWFDisplayItem_getScale(SWFDisplayItem item, float * xScale, float * yScale);
-void SWFDisplayItem_getSkew(SWFDisplayItem item, float * xSkew, float * ySkew);
+void SWFDisplayItem_getPosition(SWFDisplayItem item, double * x, double * y);
+void SWFDisplayItem_getRotation(SWFDisplayItem item, double * degrees);
+void SWFDisplayItem_getScale(SWFDisplayItem item, double * xScale, double * yScale);
+void SWFDisplayItem_getSkew(SWFDisplayItem item, double * xSkew, double * ySkew);
 
 SWFMatrix SWFDisplayItem_getMatrix(SWFDisplayItem item);
-void SWFDisplayItem_setMatrix(SWFDisplayItem i, float a, float b,
-			      float c, float d, float x, float y);
+void SWFDisplayItem_setMatrix(SWFDisplayItem i, double a, double b,
+			      double c, double d, double x, double y);
 
 int SWFDisplayItem_getDepth(SWFDisplayItem item);
 void SWFDisplayItem_setDepth(SWFDisplayItem item, int depth);
@@ -744,6 +858,8 @@ void SWFDisplayItem_setColorAdd(SWFDisplayItem item,
 				int r, int g, int b, int a);
 void SWFDisplayItem_setColorMult(SWFDisplayItem item,
 				 float r, float g, float b, float a);
+
+void SWFDisplayItem_flush(SWFDisplayItem item);
 
 #define SWFDisplayItem_addColor SWFDisplayItem_setColorAdd
 #define SWFDisplayItem_multColor SWFDisplayItem_setColorMult
@@ -778,16 +894,18 @@ enum {
 	SWFBLEND_MODE_LAYER,
 	SWFBLEND_MODE_MULT,
 	SWFBLEND_MODE_SCREEN,
+	SWFBLEND_MODE_LIGHTEN,
 	SWFBLEND_MODE_DARKEN,
+	SWFBLEND_MODE_DIFF,
 	SWFBLEND_MODE_ADD,
 	SWFBLEND_MODE_SUB,
-	SWFBLEND_MODE_DIFF,
 	SWFBLEND_MODE_INV,
 	SWFBLEND_MODE_ALPHA,
 	SWFBLEND_MODE_ERASE,
 	SWFBLEND_MODE_OVERLAY,
 	SWFBLEND_MODE_HARDLIGHT
- };
+};
+
 void SWFDisplayItem_setBlendMode(SWFDisplayItem item, int mode);
 void SWFDisplayItem_addFilter(SWFDisplayItem item, SWFFilter filter);
 /***** SWFFill *****/
@@ -796,6 +914,7 @@ void SWFDisplayItem_addFilter(SWFDisplayItem item, SWFFilter filter);
 
 SWFFill newSWFFill(SWFFillStyle fillstyle);
 void destroySWFFill(SWFFill fill);
+SWFFillStyle SWFFill_getFillStyle(SWFFill fill);
 
 void SWFFill_skewX(SWFFill fill, float x);
 void SWFFill_skewXTo(SWFFill fill, float x);
@@ -828,6 +947,14 @@ void SWFFill_setMatrix(SWFFill fill, float a, float b,
 void SWFShape_setLine(SWFShape shape, unsigned short width,
 		      byte r, byte g, byte b, byte a);
 
+void SWFShape_setLine2Filled(SWFShape shape, unsigned short width,
+                             SWFFillStyle fill,
+                             int flags, float miterLimit);
+
+void SWFShape_setLine2(SWFShape shape, unsigned short width, 
+                       byte r, byte g, byte b, byte a,
+                       int flags, float miterLimit);
+
 SWFFill SWFShape_addSolidFill(SWFShape shape, byte r, byte g, byte b, byte a);
 SWFFill SWFShape_addGradientFill(SWFShape shape, SWFGradient gradient, byte flags);
 SWFFill SWFShape_addBitmapFill(SWFShape shape, SWFBitmap bitmap, byte flags);
@@ -835,8 +962,8 @@ SWFFill SWFShape_addBitmapFill(SWFShape shape, SWFBitmap bitmap, byte flags);
 void SWFShape_setLeftFill(SWFShape shape, SWFFill fill);
 void SWFShape_setRightFill(SWFShape shape, SWFFill fill);
 
-void SWFShape_drawArc(SWFShape shape, float r, float startAngle, float endAngle);
-void SWFShape_drawCircle(SWFShape shape, float r);
+void SWFShape_drawArc(SWFShape shape, double r, double startAngle, double endAngle);
+void SWFShape_drawCircle(SWFShape shape, double r);
 
 /* draw character c from font font into shape shape at size size */
 void SWFShape_drawGlyph(SWFShape shape, SWFFont font, unsigned short c);
@@ -847,16 +974,16 @@ void SWFShape_drawSizedGlyph(SWFShape shape, SWFFont font, unsigned short c, int
 
 /* approximate a cubic bezier with quadratic segments */
 /* returns the number of segments used */
-int SWFShape_drawCubic(SWFShape shape, float bx, float by,
-		       float cx, float cy, float dx, float dy);
-int SWFShape_drawCubicTo(SWFShape shape, float bx, float by,
-			 float cx, float cy, float dx, float dy);
+int SWFShape_drawCubic(SWFShape shape, double bx, double by,
+		       double cx, double cy, double dx, double dy);
+int SWFShape_drawCubicTo(SWFShape shape, double bx, double by,
+			 double cx, double cy, double dx, double dy);
 void SWFShape_drawCharacterBounds(SWFShape shape, SWFCharacter character);
 
 
 /***** SWFMovieClip *****/
 
-SWFMovieClip newSWFMovieClip();
+SWFMovieClip newSWFMovieClip(void);
 void destroySWFMovieClip(SWFMovieClip movieClip);
 
 void SWFMovieClip_setNumberOfFrames(SWFMovieClip clip, int frames);
@@ -867,7 +994,7 @@ SWFDisplayItem SWFMovieClip_add(SWFMovieClip clip, SWFBlock block);
 void SWFMovieClip_remove(SWFMovieClip clip, SWFDisplayItem item);
 
 void SWFMovieClip_setSoundStream(SWFMovieClip clip, SWFSoundStream sound, float rate);
-void SWFMovie_setSoundStreamAt(SWFMovie movie, SWFSoundStream stream, float skip);
+void SWFMovieClip_setSoundStreamAt(SWFMovieClip clip, SWFSoundStream sound, float rate, float skip);
 SWFSoundInstance SWFMovieClip_startSound(SWFMovieClip clip, SWFSound sound);
 void SWFMovieClip_stopSound(SWFMovieClip clip, SWFSound sound);
 void SWFMovieClip_setScalingGrid(SWFMovieClip clip, int x, int y, int w, int h);
@@ -880,59 +1007,67 @@ void destroySWFPrebuiltClip(SWFPrebuiltClip clip);
 SWFPrebuiltClip newSWFPrebuiltClip_fromFile(const char *filename);
 SWFPrebuiltClip newSWFPrebuiltClip_fromInput(SWFInput input);
 
+/***** SWFBinaryData *****/
+
+SWFBinaryData newSWFBinaryData(unsigned char *blob, int length);
+void destroySWFBinaryData(SWFBinaryData data);
+
 /***** SWFMovie *****/
 
-/*
- * Write the EXPORTASSET tag with informations gathered by calls to
- * SWFMovie_addExport.
- *
- * Call this function to control insertion of the EXPORTASSET tag, which
- * is otherwise written at the END of the SWF.
- */
 void SWFMovie_writeExports(SWFMovie movie);
-
-SWFMovie newSWFMovie();
+SWFMovie newSWFMovie(void);
 SWFMovie newSWFMovieWithVersion(int version);
 void destroySWFMovie(SWFMovie movie);
-
 void SWFMovie_setRate(SWFMovie movie, float rate);
+float SWFMovie_getRate(SWFMovie movie);
 void SWFMovie_setDimension(SWFMovie movie, float x, float y);
 void SWFMovie_setNumberOfFrames(SWFMovie movie, int frames);
-
-/*
- * Export the given asset giving it the given linkage symbol.
- *
- * Call SWFMovie_writeExports() when you're done with the exports
- * to actually write the tag. If you don't the tag will be added
- * at the END of the SWF.
- */
 void SWFMovie_addExport(SWFMovie movie, SWFBlock block, const char *name);
-
+void SWFMovie_assignSymbol(SWFMovie m, SWFCharacter character, const char *name);
+void SWFMovie_defineScene(SWFMovie m, unsigned int offset, const char *name);
 void SWFMovie_setBackground(SWFMovie movie, byte r, byte g, byte b);
-
 void SWFMovie_setSoundStream(SWFMovie movie, SWFSoundStream sound);
+void SWFMovie_setSoundStreamAt(SWFMovie movie, SWFSoundStream stream, float skip);
 SWFSoundInstance SWFMovie_startSound(SWFMovie movie, SWFSound sound);
 void SWFMovie_stopSound(SWFMovie movie, SWFSound sound);
+SWFFontCharacter SWFMovie_addFont(SWFMovie movie, SWFFont font);
+SWFFontCharacter SWFMovie_importFont(SWFMovie movie, const char *filename, const char *name);
+SWFDisplayItem SWFMovie_add_internal(SWFMovie movie, SWFMovieBlockType ublock);
+#ifndef _MSC_VER
+#define SWFMovie_add(__movie, __block) \
+	SWFMovie_add_internal((__movie), __to_movie_block((__block)))
+#else
+static inline SWFDisplayItem SWFMovie_add(SWFMovie movie, SWFBlock block)
+{
+	SWFMovieBlockType ublock;
+	ublock.block = block;
+	return SWFMovie_add_internal(movie, ublock);
+}
+#endif
 
-SWFDisplayItem SWFMovie_add(SWFMovie movie, SWFBlock block);
+int SWFMovie_replace_internal(SWFMovie movie, SWFDisplayItem item, SWFMovieBlockType block);
+#ifndef _MSC_VER
+#define SWFMovie_replace(__movie, __item, __block) \
+	SWFMovie_replace_internal((__movie), (__item), __to_movie_block((__block)))
+#else
+static inline int SWFMovie_replace(SWFMovie movie, SWFDisplayItem item, SWFBlock block)
+{
+	SWFMovieBlockType ublock;
+	ublock.block = block;
+	return SWFMovie_replace_internal(movie, item, ublock);
+}
+#endif
+
 void SWFMovie_remove(SWFMovie movie, SWFDisplayItem item);
-
 void SWFMovie_nextFrame(SWFMovie movie);
 void SWFMovie_labelFrame(SWFMovie movie, const char *label);
 void SWFMovie_namedAnchor(SWFMovie movie, const char *label);
-
 int SWFMovie_output(SWFMovie movie, SWFByteOutputMethod method, void *data);
 int SWFMovie_save(SWFMovie movie, const char *filename);
 int SWFMovie_output_to_stream(SWFMovie movie, FILE *fp);
-
-/*
- * enable edit protections for a movie
- * This function adds a block that tells flash editors to not edit this movie.
- */
-void SWFMovie_protect(SWFMovie movie, char *password);
-
+void SWFMovie_protect(SWFMovie movie, const char *password);
 void SWFMovie_setNetworkAccess(SWFMovie movie, int flag);
-void SWFMovie_addMetadata(SWFMovie movie, char *xml);
+void SWFMovie_addMetadata(SWFMovie movie, const char *xml);
 void SWFMovie_setScriptLimits(SWFMovie movie, int maxRecursion, int timeout);
 void SWFMovie_setTabIndex(SWFMovie movie, int depth, int index);
 

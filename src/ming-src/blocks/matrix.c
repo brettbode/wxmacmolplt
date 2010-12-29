@@ -19,25 +19,16 @@
 
 /* $Id$ */
 
+#ifndef __C2MAN__
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
 #include <string.h>
+#endif
 
+#include "error.h"
 #include "libming.h"
 #include "matrix.h"
-
-
-struct SWFMatrix_s
-{
-	/* these are the lame names given in the swf spec.	not my fault. */
-	float scaleX;
-	float rotate0;
-	float rotate1;
-	float scaleY;
-	int translateX;
-	int translateY;
-};
 
 
 /* scale is in FB format- i.e., lower 16 bits are on the right of the
@@ -46,9 +37,13 @@ struct SWFMatrix_s
 #define FIXEDBITS 16
 
 SWFMatrix
-newSWFMatrix(float a, float b, float c, float d, int x, int y)
+newSWFMatrix(double a, double b, double c, double d, int x, int y)
 {
 	SWFMatrix m = (SWFMatrix)malloc(sizeof(struct SWFMatrix_s));
+
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == m)
+		return NULL;
 
 	m->scaleX = a;
 	m->rotate0 = b;
@@ -62,7 +57,7 @@ newSWFMatrix(float a, float b, float c, float d, int x, int y)
 
 
 void
-SWFMatrix_set(SWFMatrix m, float a, float b, float c, float d, int x, int y)
+SWFMatrix_set(SWFMatrix m, double a, double b, double c, double d, int x, int y)
 {
 	m->scaleX = a;
 	m->rotate0 = b;
@@ -73,28 +68,28 @@ SWFMatrix_set(SWFMatrix m, float a, float b, float c, float d, int x, int y)
 }
 
 
-float
+double
 SWFMatrix_getScaleX(SWFMatrix m)
 {
 	return m->scaleX;
 }
 
 
-float
+double
 SWFMatrix_getRotate0(SWFMatrix m)
 {
 	return m->rotate0;
 }
 
 
-float
+double
 SWFMatrix_getRotate1(SWFMatrix m)
 {
 	return m->rotate1;
 }
 
 
-float
+double
 SWFMatrix_getScaleY(SWFMatrix m)
 {
 	return m->scaleY;
@@ -137,6 +132,11 @@ SWFMatrix
 SWFMatrix_dup(SWFMatrix matrix)
 {
 	SWFMatrix m = (SWFMatrix)malloc(sizeof(struct SWFMatrix_s));
+
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == m)
+		return NULL;
+
 	memcpy(m, matrix, sizeof(struct SWFMatrix_s));
 	return m;
 }
@@ -184,8 +184,7 @@ SWFOutput_writeMatrix(SWFOutput out, SWFMatrix matrix)
 
 	SWFOutput_byteAlign(out);
 
-	if ( (matrix->scaleX == 0 && matrix->scaleY == 0) ||
-			 (matrix->scaleX == 1.0 && matrix->scaleY == 1.0) )
+	if (matrix->scaleX == 1.0 && matrix->scaleY == 1.0)
 	{
 		SWFOutput_writeBits(out, 0, 1);	 
 	}
@@ -196,6 +195,10 @@ SWFOutput_writeMatrix(SWFOutput out, SWFMatrix matrix)
 
 		SWFOutput_writeBits(out, 1, 1);
 		nBits = max(SWFOutput_numSBits(xScale), SWFOutput_numSBits(yScale));
+		if(nBits >= 32)
+			SWF_error("SWFMatrix_scale: number is to big. "
+				  " Requested %i bits\n", nBits);
+		
 		SWFOutput_writeBits(out, nBits, 5);
 		SWFOutput_writeSBits(out, xScale, nBits);
 		SWFOutput_writeSBits(out, yScale, nBits);
@@ -212,6 +215,10 @@ SWFOutput_writeMatrix(SWFOutput out, SWFMatrix matrix)
 
 		SWFOutput_writeBits(out, 1, 1);
 		nBits = max(SWFOutput_numSBits(rot0), SWFOutput_numSBits(rot1));
+		if(nBits >= 32)
+			SWF_error("SWFMatrix_rotate: number is to big. "
+				  " Requested %i bits\n", nBits);
+
 		SWFOutput_writeBits(out, nBits, 5);
 		SWFOutput_writeSBits(out, rot0, nBits);
 		SWFOutput_writeSBits(out, rot1, nBits);
@@ -221,6 +228,10 @@ SWFOutput_writeMatrix(SWFOutput out, SWFMatrix matrix)
 	{
 		nBits = max(SWFOutput_numSBits(matrix->translateX),
 		SWFOutput_numSBits(matrix->translateY));
+
+		if(nBits >= 32)
+			SWF_error("SWFMatrix_translate: number is to big. "
+				  " Requested %i bits\n", nBits);
 	}
 	else
 		nBits = 0;
@@ -253,9 +264,9 @@ SWFMatrix_apply(SWFMatrix m, double *x, double *y, int xlate)
 /* ma = ma*mb */
 void SWFMatrix_multiply(SWFMatrix ma, SWFMatrix mb)
 {
-	float a = ma->scaleX, b = ma->rotate0, c = ma->rotate1, d = ma->scaleY;
-	float e = mb->scaleX, f = mb->rotate0, g = mb->rotate1, h = mb->scaleY;
-	float tmp;
+	double a = ma->scaleX, b = ma->rotate0, c = ma->rotate1, d = ma->scaleY;
+	double e = mb->scaleX, f = mb->rotate0, g = mb->rotate1, h = mb->scaleY;
+	double tmp;
 
 	ma->scaleX = a*e+b*g;
 	ma->rotate0 = a*f+b*h;
@@ -272,8 +283,8 @@ void SWFMatrix_multiply(SWFMatrix ma, SWFMatrix mb)
 void
 SWFMatrix_leftMultiply(SWFMatrix ma, SWFMatrix mb)
 {
-	float a = ma->scaleX, b = ma->rotate0, c = ma->rotate1, d = ma->scaleY;
-	float e = mb->scaleX, f = mb->rotate0, g = mb->rotate1, h = mb->scaleY;
+	double a = ma->scaleX, b = ma->rotate0, c = ma->rotate1, d = ma->scaleY;
+	double e = mb->scaleX, f = mb->rotate0, g = mb->rotate1, h = mb->scaleY;
 
 	mb->scaleX = a*e+b*g;
 	mb->rotate0 = a*f+b*h;
@@ -283,17 +294,16 @@ SWFMatrix_leftMultiply(SWFMatrix ma, SWFMatrix mb)
 
 
 SWFMatrix
-newSWFRotateMatrix(float degrees)
+newSWFRotateMatrix(double degrees)
 {
-	float r = degrees * M_PI/180;
+	double r = degrees * M_PI/180;
 
-	return newSWFMatrix((float)cos(r), (float)sin(r),
-											(float)-sin(r), (float)cos(r), 0, 0);
+	return newSWFMatrix(cos(r), sin(r), -sin(r), cos(r), 0, 0);
 }
 
 
 void
-SWFMatrix_rotate(SWFMatrix matrix, float degrees)
+SWFMatrix_rotate(SWFMatrix matrix, double degrees)
 {
 	SWFMatrix rot = newSWFRotateMatrix(degrees);
 	SWFMatrix_leftMultiply(rot,matrix);
@@ -302,7 +312,7 @@ SWFMatrix_rotate(SWFMatrix matrix, float degrees)
 
 
 void
-SWFMatrix_scaleXY(SWFMatrix matrix, float xScale, float yScale)
+SWFMatrix_scaleXY(SWFMatrix matrix, double xScale, double yScale)
 {
 	matrix->scaleX = matrix->scaleX * xScale;
 	matrix->rotate0 = matrix->rotate0 * xScale;
@@ -312,7 +322,7 @@ SWFMatrix_scaleXY(SWFMatrix matrix, float xScale, float yScale)
 
 
 void
-SWFMatrix_scale(SWFMatrix matrix, float factor)
+SWFMatrix_scale(SWFMatrix matrix, double factor)
 {
 	matrix->scaleX = matrix->scaleX * factor;
 	matrix->scaleY = matrix->scaleY * factor;

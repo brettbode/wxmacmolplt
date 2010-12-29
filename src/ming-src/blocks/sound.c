@@ -24,29 +24,29 @@
 
 #include "outputblock.h"
 #include "sound.h"
+#include "soundstream.h"
 #include "character.h"
 #include "method.h"
 #include "input.h"
 #include "libming.h"
+#include "mp3.h"
 
 struct SWFSound_s
 {
 	struct SWFCharacter_s character;
 
 	byte flags;
-	byte isFinished;
-	int numSamples;
-	int delay;
-	int samplesPerFrame;
+	int seekSamples;
+	byte freeInput;
 
 	SWFInput input;
-	byte *data;
+	struct SWFSoundStream_s *soundStream;
 };
 
 
-int
-getMP3Size(SWFInput input);
-
+void
+writeSWFSoundWithSoundStreamToMethod(SWFSoundStream stream,
+	SWFByteOutputMethod method, void *data);
 
 static int
 soundDataSize(SWFSound sound)
@@ -97,12 +97,14 @@ soundDataSize(SWFSound sound)
 	else if ((sound->flags&SWF_SOUND_COMPRESSION) == SWF_SOUND_MP3_COMPRESSED)
 	{
 		int pos = SWFInput_tell(sound->input);
-		int samples = getMP3Size(sound->input);
+		int samples = -1;
+		getMP3Samples(sound->input, sound->flags, &samples);
 		SWFInput_seek(sound->input, pos, SEEK_SET);
 		return samples;
 	}
-	else /* ??? */
+	else 
 	{
+		SWF_warn("SWFSound: can't determine sampleCount\n");
 		return 0;
 	}
 }
@@ -122,7 +124,7 @@ writeSWFSoundToStream(SWFBlock block, SWFByteOutputMethod method, void *data)
 	methodWriteUInt32(soundDataSize(sound), method, data);
 
 	if ( (sound->flags & SWF_SOUND_COMPRESSION) == SWF_SOUND_MP3_COMPRESSED )
-		methodWriteUInt16(SWFSOUND_INITIAL_DELAY, method, data);	// XXX - delay?
+		methodWriteUInt16(sound->seekSamples, method, data);	
 
 	/* write samples */
 	for ( i=0; i<l; ++i )
@@ -143,26 +145,90 @@ completeDefineSWFSoundBlock(SWFBlock block)
 
 
 void
-destroySWFSound(SWFSound sound)
+writeSWFSoundWithSoundStreamToStream(SWFBlock block, SWFByteOutputMethod method, void *data)
 {
-	destroySWFCharacter((SWFCharacter) sound);
+	SWFSound sound = (SWFSound)block;
+
+	methodWriteUInt16(CHARACTERID(sound), method, data);
+	method(sound->flags, data);
+
+	writeSWFSoundWithSoundStreamToMethod(sound->soundStream, method, data);
 }
 
 
+int
+completeDefineSWFSoundWithSoundStreamBlock(SWFBlock block)
+{
+	SWFSound sound = (SWFSound)block;
+	int len = SWFSoundStream_getLength(sound->soundStream, 0) + 9;
+	SWFSoundStream_rewind(sound->soundStream);
+	return len;
+}
+
+/*
+ * Set number of samples to seek forward or delay (works with MP3 only)
+ *
+ * If this value is positive, the player seeks this
+ * number of samples into the sound block before the
+ * sound is played.
+ * If this value is negative the player plays this
+ * number of silent samples before playing the sound block
+ */
+void
+SWFSound_setInitialMp3Delay(SWFSound sound, int delaySeek)
+{
+	sound->seekSamples = delaySeek;
+}
+
+
+void
+destroySWFSound(SWFSound sound)
+{
+	if (sound->freeInput)
+		destroySWFInput(sound->input);
+	destroySWFCharacter((SWFCharacter) sound);
+}
+
+/*
+ * Creates a new EventSound object.
+ *
+ * The sound to be played is contained in a file and specified with flags.
+ *
+ * Flags must contain a sound format, sampling rate, size (in bits) and channels.
+ * If the file contains mp3 data it is not necessary to specify sampling rate, 
+ * sound size and channels.
+ *
+ * Possible sound formats are:
+ * - SWF_SOUND_NOT_COMPRESSED 
+ * - SWF_SOUND_ADPCM_COMPRESSED
+ * - SWF_SOUND_MP3_COMPRESSED
+ * - SWF_SOUND_NOT_COMPRESSED_LE
+ * - SWF_SOUND_NELLY_COMPRESSED
+ *
+ * Sampling rate must be one of the following values:
+ * - SWF_SOUND_5KHZ
+ * - SWF_SOUND_11KHZ
+ * - SWF_SOUND_22KHZ
+ * - SWF_SOUND_44KHZ
+ *
+ * Sound size is either SWF_SOUND_8BITS or SWF_SOUND_16BITS
+ * Channels are either SWF_SOUND_MONO or SWF_SOUND_STEREO
+ */
 SWFSound
 newSWFSound(FILE *f, byte flags)
 {
-	return newSWFSound_fromInput(newSWFInput_file(f), flags);
+	SWFSound s = newSWFSound_fromInput(newSWFInput_file(f), flags);
+	s->freeInput = TRUE;
+	return s;
 }
 
 /* added by David McNab <david@rebirthing.co.nz> */
 /* required so that python can pass in file descriptors instead of FILE* streams */
-
 SWFSound
 newSWFSoundFromFileno(int fd, byte flags)
 {
-  FILE *fp = fdopen(fd, "r");
-  return newSWFSound(fp, flags);
+	FILE *fp = fdopen(fd, "r");
+	return newSWFSound(fp, flags);
 }
 
 
@@ -184,19 +250,48 @@ newSWFSound_fromInput(SWFInput input, byte flags)
 
 	sound->input = input;
 	sound->flags = flags;
-
+	if((sound->flags&SWF_SOUND_COMPRESSION) == SWF_SOUND_MP3_COMPRESSED)
+	{
+		if(getMP3Flags(input, &sound->flags) < 0)
+		{
+			free(sound);
+			return NULL;
+		}
+	}
+	sound->soundStream = 0;
+	sound->seekSamples = SWFSOUND_INITIAL_DELAY;
+	sound->freeInput = FALSE;
 	return sound;
 }
 
-
-void
-SWFSound_setData(SWFSound sound, byte flags, int numSamples, byte *data)
+/*
+ * Creates an Event Sound object from a given SoundStream object
+ *
+ * see also newSWFSoundStream()
+ */
+SWFSound
+newSWFSound_fromSoundStream(SWFSoundStream stream)
 {
-	sound->flags = flags;
-	sound->numSamples = numSamples;
-	sound->data = data;
-}
+	SWFSound sound = (SWFSound)malloc(sizeof(struct SWFSound_s));
+	SWFBlock block = (SWFBlock)sound;
 
+	SWFCharacterInit((SWFCharacter)sound);
+
+	CHARACTERID(sound) = ++SWF_gNumCharacters;
+
+	block->type = SWF_DEFINESOUND;
+
+	block->writeBlock = writeSWFSoundWithSoundStreamToStream;
+	block->complete = completeDefineSWFSoundWithSoundStreamBlock;
+	block->dtor = (destroySWFBlockMethod) destroySWFSound;
+
+	sound->freeInput = FALSE;
+	sound->input = 0;
+	sound->flags = SWFSoundStream_getFlags(stream);
+	sound->soundStream = stream;
+
+	return sound;
+}
 
 /*
  * Local variables:

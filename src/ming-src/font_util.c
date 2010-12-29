@@ -1,9 +1,12 @@
+
+#ifndef __C2MAN__
 #include <string.h>
 #include <stdlib.h>
+#endif
+
 #include "font_util.h"
 #include "blocks/block.h"
 #include "libming.h"
-
 
 typedef struct
 {
@@ -32,7 +35,7 @@ Ming_getFont(const char* name)
 SWFFont
 Ming_loadFont(const char* path, const char* name)
 {
-  SWFFont font = loadSWFFontFromFile(fopen(path, "rb"));
+  SWFFont font = newSWFFont_fromFile(path);
 
   if ( font == NULL )
     return NULL;

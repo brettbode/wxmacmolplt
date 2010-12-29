@@ -19,8 +19,10 @@
 
 /* $Id$ */
 
+#ifndef __C2MAN__
 #include <stdlib.h>
 #include <string.h>
+#endif
 
 #include "placeobject.h"
 #include "method.h"
@@ -35,12 +37,6 @@
 #include "action.h"
 
 #include "libming.h"
-
-struct FilterList_s
-{
-	int numFilter;
-	SWFFilter *filter;
-};
 
 struct SWFPlaceObject2Block_s
 {
@@ -73,8 +69,12 @@ struct SWFPlaceObject2Block_s
 	char hasBlendFlag;
 	char hasFilterFlag;
 
-	struct FilterList_s *filterList; 
+	SWFFilterList filterList; 
 	int blendMode;
+
+#if TRACK_ALLOCS
+	mem_node *gcnode;
+#endif	
 }; 
 
 
@@ -94,7 +94,8 @@ static void writeActions(SWFPlaceObject2Block place)
 
 		for ( i=0; i<place->nActions; ++i )
 		{
-			int length = SWFAction_compile(place->actions[i], block->swfVersion);
+			int length;
+			SWFAction_compile(place->actions[i], block->swfVersion, &length);
 			if(block->swfVersion >= 6)
 				SWFOutput_writeUInt32(place->out, place->actionFlags[i]);
 			else
@@ -173,18 +174,10 @@ completeSWFPlaceObject2Block(SWFBlock block)
 		SWFOutput_writeUInt16(out, place->masklevel);
 
 	if( place->version == 3 && place->hasFilterFlag)
-	{
-		int i;
-		SWFOutput_writeUInt8(out, place->filterList->numFilter);		
-		for(i = 0; i < place->filterList->numFilter; i++)
-			SWFOutput_writeSWFFilter(out, place->filterList->filter[i]);
-	}
+		SWFOutput_writeFilterList(out, place->filterList);		
 
 	if( place->version == 3 && place->hasBlendFlag)
-	{
 		SWFOutput_writeUInt8(out, place->blendMode);
-	}
-
 
 	place->out = out;
 	writeActions(place);
@@ -205,10 +198,7 @@ destroySWFPlaceObject2Block(SWFPlaceObject2Block place)
 //	}
 
 	if( place->filterList != NULL )
-	{
-		free(place->filterList->filter);
-		free(place->filterList);
-	}
+		destroySWFFilterList(place->filterList);		
 
 	if ( place->name != NULL )
 		free(place->name);
@@ -222,11 +212,15 @@ destroySWFPlaceObject2Block(SWFPlaceObject2Block place)
 	if ( place->cXform != NULL )
 		destroySWFCXform(place->cXform);
 
+#if TRACK_ALLOCS
+	ming_gc_remove_node(place->gcnode);
+#endif
+
 	free(place);
 }
 
 
-static void
+static inline void
 setPlaceObjectVersion(SWFPlaceObject2Block block, int version)
 {
 	switch(version)
@@ -249,6 +243,10 @@ SWFPlaceObject2Block
 newSWFPlaceObject2Block(int depth)
 {
 	SWFPlaceObject2Block place = (SWFPlaceObject2Block)malloc(sizeof(struct SWFPlaceObject2Block_s));
+
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == place)
+		return NULL;
 
 	SWFBlockInit((SWFBlock)place);
 
@@ -279,6 +277,9 @@ newSWFPlaceObject2Block(int depth)
 	place->hasBlendFlag = 0;
 	place->hasFilterFlag = 0;
 	place->filterList = NULL;
+#if TRACK_ALLOCS
+	place->gcnode = ming_gc_add_node(place, (dtorfunctype) destroySWFPlaceObject2Block);
+#endif
 	return place;
 }
 
@@ -429,20 +430,13 @@ SWFPlaceObject2Block_setBlendMode(SWFPlaceObject2Block block, int mode)
 void 
 SWFPlaceObject2Block_addFilter(SWFPlaceObject2Block block, SWFFilter filter)
 {
-	int count;
 	if(block->filterList == NULL)
 	{
 		setPlaceObjectVersion(block, 3);
-		block->filterList = (struct FilterList_s *)
-			malloc(sizeof(struct FilterList_s));
-		block->filterList->numFilter = 0;
-		block->filterList->filter = 0;
+		block->filterList = newSWFFilterList();
 		block->hasFilterFlag = 1;
 	}
-	count = block->filterList->numFilter;
-	block->filterList->filter = realloc(block->filterList->filter, count + 1);
-	block->filterList->filter[count] = filter;
-	block->filterList->numFilter++;
+	SWFFilterList_add(block->filterList, filter);
 }
 
 /*

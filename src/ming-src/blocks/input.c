@@ -19,14 +19,16 @@
 
 /* $Id$ */
 
+#ifndef __C2MAN__
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
+#endif
 
 #ifndef WIN32
-	#include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include "libming.h"
@@ -50,8 +52,72 @@ struct SWFInput_s
 	/* memory node for garbage collection */
 	mem_node *gcnode;
 #endif
+	int buffer;
+	int bufbits;
 };
 
+void
+SWFInput_byteAlign(SWFInput input)
+{
+	if(input->bufbits > 0)
+	{
+		input->bufbits = 0;
+		input->buffer = 0;
+	}
+}
+
+int
+SWFInput_readBits(SWFInput input, int number)
+{
+	int ret = input->buffer;
+	if ( number == input->bufbits )
+	{
+		input->bufbits = 0;
+		input->buffer = 0;
+		return ret;
+	}
+
+	if ( number > input->bufbits )
+	{
+		number -= input->bufbits;
+
+		while( number > 8 )
+		{
+			ret <<= 8;
+			ret += SWFInput_getChar(input);
+			number -= 8;
+		}
+		
+		input->buffer = SWFInput_getChar(input);
+		
+		if ( number > 0 )
+		{
+			ret <<= number;
+			input->bufbits = 8-number;
+			ret += input->buffer >> (8-number);
+			input->buffer &= (1<<input->bufbits)-1;
+		}
+
+		return ret;
+	}
+
+	ret = input->buffer >> (input->bufbits-number);
+	input->bufbits -= number;
+	input->buffer &= (1<<input->bufbits)-1;
+//	printf("done: readBits(%i) numer < bufbits %i\n", number, ret);
+	return ret;
+}
+
+int 
+SWFInput_readSBits(SWFInput input, int number)
+{
+	int num = SWFInput_readBits(input, number);
+
+	if ( num & (1<<(number-1)) )
+		return num - (1<<number);
+	else
+		return num;
+}
 
 int
 SWFInput_getChar(SWFInput input)
@@ -250,13 +316,18 @@ newSWFInput_file(FILE *f)
 
 	input = (SWFInput) malloc(sizeof(struct SWFInput_s));
 
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == input)
+		return NULL;
+
 	input->getChar = SWFInput_file_getChar;
 	input->destroy = SWFInput_dtor;
 	input->eof = SWFInput_file_eof;
 	input->seek = SWFInput_file_seek;
 	input->read = SWFInput_file_read;
 	input->data = f;
-
+	input->bufbits = 0;
+	input->buffer = 0;
 	input->offset = 0;
 	input->length = buf.st_size;
 
@@ -264,6 +335,34 @@ newSWFInput_file(FILE *f)
 	input->gcnode = ming_gc_add_node(input, (dtorfunctype) destroySWFInput);
 #endif
 
+	return input;
+}
+
+static void SWFInput_dtor_close(SWFInput input)
+{
+	fclose((FILE *)input->data);
+	SWFInput_dtor(input);
+}
+
+
+SWFInput
+newSWFInput_filename(const char *filename)
+{
+	FILE *file;
+	SWFInput input;
+	
+	file = fopen(filename, "rb");
+	if(file == NULL)
+	{
+		SWF_warn("newSWFInput_filename: fopen failed\n");
+		return NULL;
+	}
+
+	input = newSWFInput_file(file);
+	if(input == NULL)
+		return NULL;
+
+	input->destroy = SWFInput_dtor_close;
 	return input;
 }
 
@@ -324,13 +423,18 @@ newSWFInput_buffer(unsigned char* buffer, int length)
 {
 	SWFInput input = (SWFInput) malloc(sizeof(struct SWFInput_s));
 
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == input)
+		return NULL;
+
 	input->getChar = SWFInput_buffer_getChar;
 	input->destroy = SWFInput_dtor;
 	input->eof = SWFInput_buffer_eof;
 	input->read = SWFInput_buffer_read;
 	input->seek = SWFInput_buffer_seek;
 	input->data = buffer;
-
+	input->buffer = 0;
+	input->bufbits = 0;
 	input->offset = 0;
 	input->length = length;
 
@@ -364,6 +468,26 @@ newSWFInput_allocedBuffer(unsigned char *buffer, int length)
 #endif
 	return input;
 }
+
+/* same as above but copy buffer and  needs to be freed */
+SWFInput
+newSWFInput_bufferCopy(unsigned char *buffer, int length)
+{
+	SWFInput input;
+	unsigned char *data = (unsigned char *)malloc(length);
+	if(data == NULL)
+		return NULL;
+
+	memcpy(data, buffer, length);
+	input = newSWFInput_buffer(data, length);
+	input->destroy = SWFInput_buffer_dtor;
+#if TRACK_ALLOCS
+	input->gcnode = ming_gc_add_node(input, (dtorfunctype) destroySWFInput);
+#endif
+	return input;
+}
+
+
 
 
 /* SWFInput_stream */
@@ -521,8 +645,20 @@ SWFInput
 newSWFInput_stream(FILE* f)
 {
 	SWFInput input = (SWFInput)malloc(sizeof(struct SWFInput_s));
+	struct SWFInputStreamData *data;
 
-	struct SWFInputStreamData *data = (struct SWFInputStreamData *)malloc(sizeof(struct SWFInputStreamData));
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == input)
+		return NULL;
+
+	data = (struct SWFInputStreamData *)malloc(sizeof(struct SWFInputStreamData));
+
+	/* If malloc failed, free memory allocated for input and return NULL to signify the failure */
+	if (NULL == data)
+	{
+		free(input);
+		return NULL;
+	}
 
 	input->getChar = SWFInput_stream_getChar;
 	input->destroy = SWFInput_stream_dtor;
@@ -532,6 +668,8 @@ newSWFInput_stream(FILE* f)
 
 	input->offset = 0;
 	input->length = 0;
+	input->buffer = 0;
+	input->bufbits = 0;
 
 	data->file = f;
 	data->buffer = NULL;
@@ -639,17 +777,30 @@ newSWFInput_input(SWFInput in, unsigned int length)
 	SWFInput input;
 	struct SWFInputPtr *data;
 
-	if(in == NULL)
+	if (in == NULL)
 		return NULL;
 
 	input = (SWFInput)malloc(sizeof(struct SWFInput_s));
+
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == input)
+		return NULL;
+
 	input->getChar = SWFInput_input_getChar;
 	input->destroy = SWFInput_input_dtor;
 	input->eof = SWFInput_input_eof;
 	input->read = SWFInput_input_read;
 	input->seek = SWFInput_input_seek;
-	
+
 	data = (struct SWFInputPtr *)malloc(sizeof(struct SWFInputPtr));
+
+	/* If malloc failed, free memory allocated for input and return NULL to signify the failure */
+	if (NULL == data)
+	{
+		free(input);
+		return NULL;
+	}
+
 	data->offset = SWFInput_tell(in);
 	data->input = in;
 
@@ -657,7 +808,8 @@ newSWFInput_input(SWFInput in, unsigned int length)
 	input->length = length;
 
 	input->data = (void *)data;
-
+	input->buffer = 0;
+	input->bufbits = 0;
 #if TRACK_ALLOCS
 	input->gcnode = ming_gc_add_node(input, (dtorfunctype) destroySWFInput);
 #endif

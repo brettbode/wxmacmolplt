@@ -6,7 +6,7 @@
 
 #include "compile.h"
 #include "actiontypes.h"
-#include "blocks/error.h"
+#include "error.h"
 #include "swf4compiler.tab.h" /* defines token types */
 
 static int swf4debug;
@@ -25,6 +25,8 @@ static void count();
 static void warning(char *msg);
 
 #define YY_INPUT(buf,result,max_size) result=lexBufferInput(buf, max_size)
+#define YY_NO_UNISTD_H
+#define YY_USE_PROTOS
 
 /* thanks to the prolific and brilliant Raff: */
 static int lexBufferInput(char *buf, int max_size)
@@ -74,7 +76,6 @@ static void unescape(char *buf)
 
 void swf4ParseInit(const char *script, int debug, int version)
 {
-  checkByteOrder();
   yyrestart(NULL);
 
   swf4debug = debug;
@@ -88,6 +89,8 @@ void swf4ParseInit(const char *script, int debug, int version)
 }
 
 %}
+%option never-interactive
+%s asm
 
 %{
  // forward declaration needed by the following function
@@ -143,19 +146,11 @@ callFrame	{ count();	return CALLFRAME;	}
 get[uU][rR][lL]		{ count();	return GETURL;	}
 get[uU][rR][lL]1	{ count();	return GETURL1;	}
 loadMovie	{ count();	return LOADMOVIE;	}
+loadMovieNum	{ count();	return LOADMOVIENUM;	}
 loadVariables	{ count();	return LOADVARIABLES;	}
 substr		{ count();	return SUBSTR;	}
 
 getProperty	{ count();	return GETPROPERTY;	}
-
-  /* getURL2 methods */
-post		{ count();	swf4lval.getURLMethod = GETURL_METHOD_POST;
-				return GETURL_METHOD;	}
-get		{ count();	swf4lval.getURLMethod = GETURL_METHOD_GET;
-				return GETURL_METHOD;	}
-nosend		{ count();	swf4lval.getURLMethod = GETURL_METHOD_NOSEND;
-				return GETURL_METHOD;	}
-
 
   /* v3 functions */
 nextFrame	{ count();	return NEXTFRAME;	}
@@ -174,6 +169,53 @@ tellTarget	{ count();	return TELLTARGET;	}
 
 
 this			{ count();      return THIS;	}
+
+asm			{ count();	BEGIN(asm); return ASM;		}
+
+  /* assembler v4 ops */
+<asm>{
+add			{ count();	return ASMADD; }
+substract		{ count();	return ASMSUBSTRACT; }
+divide			{ count();	return ASMDIVIDE; }
+multiply		{ count();	return ASMMULTIPLY; }
+equals			{ count();	return ASMEQUALS; }
+less			{ count();	return ASMLESS; }
+logicaland		{ count();	return ASMLOGICALAND; }
+logicalor		{ count();	return ASMLOGICALOR; }
+logicalnot		{ count();	return ASMLOGICALNOT; }
+stringand		{ count();	return ASMSTRINGAND; }
+stringequals		{ count();	return ASMSTRINGEQUALS; }
+stringextract		{ count();	return ASMSTRINGEXTRACT; }
+stringlength		{ count();	return ASMSTRINGLENGTH; }
+mbstringextract		{ count();	return ASMMBSTRINGEXTRACT; }
+mbstringlength		{ count();	return ASMMBSTRINGLENGTH; }
+stringless		{ count();	return ASMSTRINGLESS; }
+pop			{ count();	return ASMPOP; }
+push			{ count();	return ASMPUSH; }
+asciitochar		{ count();	return ASMASCIITOCHAR; }
+chartoascii		{ count();	return ASMCHARTOASCII; }
+tointeger		{ count();	return ASMTOINTEGER; }
+mbasciitochar		{ count();	return ASMMBASCIITOCHAR; }
+mbchartoascii		{ count();	return ASMMBCHARTOASCII; }
+call			{ count();	return ASMCALL;	}
+asmif			{ count();	return ASMIF; }
+jump			{ count();	return ASMJUMP; }
+getvariable		{ count();	return ASMGETVARIABLE; }
+setvariable		{ count();	return ASMSETVARIABLE; }
+geturl2			{ count();	return ASMGETURL2; }
+getproperty		{ count();	return ASMGETPROPERTY; }
+gotoframe2		{ count();	return ASMGOTOFRAME2; }
+removesprite		{ count();	return ASMREMOVESPRITE; }
+setproperty		{ count();	return ASMSETPROPERTY; }
+settarget2		{ count();	return ASMSETTARGET2; }
+startdrag		{ count();	return ASMSTARTDRAG; }
+waitforframe2		{ count();	return ASMWAITFORFRAME2; }
+clonesprite		{ count();	return ASMCLONESPRITE; }
+enddrag			{ count();	return ASMENDDRAG; }
+gettime			{ count();	return ASMGETTIME; }
+randomnumber		{ count();	return ASMRANDOMNUMBER; }
+asmtrace		{ count();	return ASMTRACE; }
+}
 
 {ID}			{ count();	swf4lval.str = strdup(yytext);
 					return IDENTIFIER;	}
@@ -194,13 +236,13 @@ this			{ count();      return THIS;	}
                                         unescape(swf4lval.str);
 					return STRING; 		}
 
-\"(\\.|[^\\"])*$	{ count();	swf4lval.str = strdup("");
+\"(\\.|[^\\"])*$	{ count();	swf4lval.str = NULL;
 					warning("Unterminated string!");
-					return STRING;		}
+					return BROKENSTRING;		}
 
-\'(\\.|[^\\'])*$	{ count();	swf4lval.str = strdup("");
+\'(\\.|[^\\'])*$	{ count();	swf4lval.str = NULL;
 					warning("Unterminated string!");
-					return STRING;		}
+					return BROKENSTRING;		}
 
 "/*"			{ count();	comment();		}
 "//"			{ count();	comment1();		}

@@ -44,8 +44,12 @@ struct SWFLineStyle_s
 };
 
 
+/* 
+ * sets simple linestyle 
+ * width is set in TWIPS
+ */
 SWFLineStyle newSWFLineStyle(unsigned short width,
-					 byte r, byte g, byte b, byte a)
+                             byte r, byte g, byte b, byte a)
 {
 	SWFLineStyle line = (SWFLineStyle)malloc(sizeof(struct SWFLineStyle_s));
 
@@ -166,8 +170,7 @@ SWFLineStyle newSWFLineStyle2_filled(unsigned short width, SWFFillStyle fill,
 	line->flags = SWF_LINESTYLE_FLAG_FILL | flags;
 	line->miterLimit = miterLimit;
 	line->fill = fill;
-
-	return 0;
+	return line;
 }
 
 byte SWFLineStyle_equals(SWFLineStyle line, unsigned short width,
@@ -208,18 +211,18 @@ unsigned short SWFLineStyle_getWidth(SWFLineStyle line)
 }
 
 
-static void writeLineStyle1(SWFOutput out, SWFLineStyle line, int shapeType)
+static inline void writeLineStyle1(SWFOutput out, SWFLineStyle line, int shapeType)
 {
 	SWFOutput_writeUInt16(out, line->width);
 	SWFOutput_writeUInt8(out, line->r);
 	SWFOutput_writeUInt8(out, line->g);
 	SWFOutput_writeUInt8(out, line->b);
 
-	if(shapeType == SWF_DEFINESHAPE3)
+	if(shapeType >= SWF_DEFINESHAPE3)
 		SWFOutput_writeUInt8(out, line->a);
 }
 
-static void writeLineStyle2(SWFOutput out, SWFLineStyle line, int shapeType)
+static inline void writeLineStyle2(SWFOutput out, SWFLineStyle line, SWFBlocktype shapeType, SWFRect bounds)
 {
 	SWFOutput_writeUInt16(out, line->width);
 	SWFOutput_writeUInt8(out, (line->flags >> 8));
@@ -227,7 +230,7 @@ static void writeLineStyle2(SWFOutput out, SWFLineStyle line, int shapeType)
 	if(line->flags & SWF_LINESTYLE_JOIN_MITER)
 		SWFOutput_writeFixed8(out, line->miterLimit);
 	if(line->flags & SWF_LINESTYLE_FLAG_FILL)
-		SWFOutput_writeFillStyle(out, line->fill, shapeType);
+		SWFOutput_writeFillStyle(out, line->fill, shapeType, bounds);
 	else
 	{
 		SWFOutput_writeUInt8(out, line->r);
@@ -239,7 +242,8 @@ static void writeLineStyle2(SWFOutput out, SWFLineStyle line, int shapeType)
 
 void SWFOutput_writeLineStyles(SWFOutput out,
                                SWFLineStyle *lines, int nLines,
-                               SWFBlocktype shapeType)
+                               SWFBlocktype shapeType,
+                               SWFRect bounds)
 {
 	SWFLineStyle line;
 	int i;
@@ -256,10 +260,59 @@ void SWFOutput_writeLineStyles(SWFOutput out,
 	{
 		line = lines[i];
 		if(shapeType == SWF_DEFINESHAPE4)
-			writeLineStyle2(out, line, shapeType);
+			writeLineStyle2(out, line, shapeType, bounds);
 		else
 			writeLineStyle1(out, line, shapeType);
-		++line;
+	}
+}
+
+
+void SWFOutput_writeMorphLineStyles2(SWFOutput out,
+		SWFLineStyle *lines1, int nLines1,
+		SWFLineStyle *lines2, int nLines2)
+{
+	SWFLineStyle line1, line2;
+	int i;
+
+	SWF_assert(nLines1 == nLines2);
+
+	if(nLines1<255)
+		SWFOutput_writeUInt8(out, nLines1);
+	else
+	{
+		SWFOutput_writeUInt8(out, 255);
+		SWFOutput_writeUInt16(out, nLines1);
+	}
+
+	for(i=0; i<nLines1; ++i)
+	{
+		line1 = lines1[i];
+		line2 = lines2[i];
+
+		SWFOutput_writeUInt16(out, line1->width);
+		SWFOutput_writeUInt16(out, line2->width);
+		
+		if(line1->flags != line2->flags)
+			SWF_warnOnce("Morph: shapes _must_ us equal line flags\n");
+		SWFOutput_writeUInt8(out, (line1->flags >> 8));
+		SWFOutput_writeUInt8(out, line1->flags);
+
+		if(line1->flags & SWF_LINESTYLE_JOIN_MITER)
+			SWFOutput_writeFixed8(out, line1->miterLimit);
+		if(line1->flags & SWF_LINESTYLE_FLAG_FILL)
+			SWFOutput_writeMorphFillStyle(out, line1->fill, NULL, line2->fill, NULL);
+		else
+		{	
+
+			SWFOutput_writeUInt8(out, line1->r);
+			SWFOutput_writeUInt8(out, line1->g);
+			SWFOutput_writeUInt8(out, line1->b);
+			SWFOutput_writeUInt8(out, line1->a);
+			SWFOutput_writeUInt8(out, line2->r);
+			SWFOutput_writeUInt8(out, line2->g);
+			SWFOutput_writeUInt8(out, line2->b);
+			SWFOutput_writeUInt8(out, line2->a);
+		}
 	}
 }
 
@@ -296,9 +349,6 @@ void SWFOutput_writeMorphLineStyles(SWFOutput out,
 		SWFOutput_writeUInt8(out, line2->g);
 		SWFOutput_writeUInt8(out, line2->b);
 		SWFOutput_writeUInt8(out, line2->a);
-
-		++line1;
-		++line2;
 	}
 }
 

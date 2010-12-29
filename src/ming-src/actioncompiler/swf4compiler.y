@@ -9,8 +9,10 @@
 #include <stdlib.h>
 #include "compile.h"
 #include "actiontypes.h"
+#include "assembler.h"
 
 #define YYPARSE_PARAM buffer
+#define YYERROR_VERBOSE 1
 
 %}
 
@@ -19,6 +21,7 @@
   char *str;
   SWFActionFunction function;
   SWFGetUrl2Method getURLMethod;
+  int len;
 }
 
 /* tokens etc. */
@@ -50,6 +53,7 @@
 %token GETURL
 %token GETURL1
 %token LOADMOVIE
+%token LOADMOVIENUM
 %token LOADVARIABLES
 %token POSTURL
 %token SUBSTR
@@ -68,16 +72,28 @@
 %token FRAMELOADED
 %token SETTARGET
 
+%token ASM
+
+/* v4 ASM */
+%token ASMADD ASMDIVIDE ASMMULTIPLY ASMEQUALS ASMLESS ASMLOGICALAND ASMLOGICALOR ASMLOGICALNOT 
+%token ASMSTRINGAND ASMSTRINGEQUALS ASMSTRINGEXTRACT ASMSTRINGLENGTH ASMMBSTRINGEXTRACT 
+%token ASMMBSTRINGLENGTH ASMPOP ASMPUSH ASMASCIITOCHAR ASMCHARTOASCII ASMTOINTEGER
+%token ASMCALL ASMIF ASMJUMP ASMGETVARIABLE ASMSETVARIABLE ASMGETURL2 ASMGETPROPERTY 
+%token ASMGOTOFRAME2 ASMREMOVESPRITE ASMSETPROPERTY ASMSETTARGET2 ASMSTARTDRAG
+%token ASMWAITFORFRAME2 ASMCLONESPRITE ASMENDDRAG ASMGETTIME ASMRANDOMNUMBER ASMTRACE
+%token ASMMBASCIITOCHAR ASMMBCHARTOASCII ASMSUBSTRACT ASMSTRINGLESS 
+
 /* high level functions */
 %token TELLTARGET
 
+%token BROKENSTRING
 /* these three are strdup'ed in compiler.flex, so free them here */
 %token <str> STRING
 %token <str> NUMBER
 %token <str> IDENTIFIER
 %token <str> PATH
 
-%token <getURLMethod> GETURL_METHOD
+%type <getURLMethod> urlmethod
 
 %token EQ "=="
 %token LE "<="
@@ -131,6 +147,9 @@
 %type <action> assign_stmts_opt
 %type <action> expr
 %type <action> program
+%type <action> level
+
+%type <len> opcode opcode_list push_item push_list
 
 /* make sure to free these, too! */
 %type <str>    sprite
@@ -387,6 +406,24 @@ break_stmt
 		  bufferWriteS16($$, MAGIC_BREAK_NUMBER); }
 	;
 
+
+urlmethod
+	: /* empty */		{ $$ = GETURL_METHOD_NOSEND; }
+	
+	| ',' STRING		{ if(strcmp($2, "GET") == 0)
+				    $$ = GETURL_METHOD_GET;
+				  else if(strcmp($2, "POST") == 0)
+				    $$ = GETURL_METHOD_POST; }
+	;
+
+level
+	: expr
+		{ $$ = newBuffer();
+		  bufferWriteString($$, "_level", 7);
+		  bufferConcat($$, $1);
+		  bufferWriteOp($$, SWFACTION_STRINGCONCAT); }
+	;
+
 void_function_call
 	: STOPDRAG '(' ')' /* no args */
 		{ $$ = newBuffer();
@@ -422,12 +459,12 @@ void_function_call
 		  bufferWriteS16($$, 1);
 		  bufferWriteU8($$, GETURL_METHOD_NOSEND); }
 
-	| GETURL '(' expr ',' expr ',' GETURL_METHOD ')'
+	| GETURL '(' expr ',' expr urlmethod ')'
 		{ $$ = $3;
 		  bufferConcat($$, $5);
 		  bufferWriteU8($$, SWFACTION_GETURL2);
 		  bufferWriteS16($$, 1);
-		  bufferWriteU8($$, $7); }
+		  bufferWriteU8($$, $6); }
 
 	| GETURL1 '(' STRING ',' STRING ')'
 		{ $$ = newBuffer();
@@ -438,33 +475,26 @@ void_function_call
 		  bufferWriteHardString($$, $5, strlen($5));
 		  bufferWriteU8($$, 0); }
 
-	| LOADMOVIE '(' expr ',' expr ')'
+	| LOADMOVIE '(' expr ',' expr urlmethod ')'
 		{ $$ = $3;
 		  bufferConcat($$, $5);
 		  bufferWriteU8($$, SWFACTION_GETURL2);
 		  bufferWriteS16($$, 1);
-		  bufferWriteU8($$, GETURL_METHOD_NOSEND | GETURL_LOADMOVIE); }
+		  bufferWriteU8($$, $6 | GETURL_LOADMOVIE); }
 
-	| LOADMOVIE '(' expr ',' expr ',' GETURL_METHOD ')'
+	| LOADMOVIENUM '(' expr ',' level urlmethod ')'
 		{ $$ = $3;
 		  bufferConcat($$, $5);
-		  bufferWriteU8($$, SWFACTION_GETURL2);
+		  bufferWriteOp($$, SWFACTION_GETURL2);
 		  bufferWriteS16($$, 1);
-		  bufferWriteU8($$, $7 | GETURL_LOADMOVIE); }
+		  bufferWriteU8($$, $6); }
 
-	| LOADVARIABLES '(' expr ',' expr ')'
+	| LOADVARIABLES '(' expr ',' expr urlmethod ')'
 		{ $$ = $3;
 		  bufferConcat($$, $5);
 		  bufferWriteU8($$, SWFACTION_GETURL2);
 		  bufferWriteS16($$, 1);
-		  bufferWriteU8($$, GETURL_METHOD_NOSEND | GETURL_LOADVARIABLES); }
-
-	| LOADVARIABLES '(' expr ',' expr ',' GETURL_METHOD ')'
-		{ $$ = $3;
-		  bufferConcat($$, $5);
-		  bufferWriteU8($$, SWFACTION_GETURL2);
-		  bufferWriteS16($$, 1);
-		  bufferWriteU8($$, $7 | GETURL_LOADVARIABLES); }
+		  bufferWriteU8($$, 0xc0 + $6); }
 
 	/* startDrag(target, lock, [left, right, top, bottom]) */
 	| STARTDRAG '(' expr ',' expr ')'
@@ -625,7 +655,7 @@ function_call
 	| GETPROPERTY '(' expr ',' STRING ')'
 		{ $$ = newBuffer();
 		  bufferConcat($$, $3);
-		  bufferWriteGetProperty($$, $5);
+		  bufferWriteProperty($$, $5);
 		  bufferWriteU8($$, SWFACTION_GETPROPERTY);
 		  free($5); }
 	;
@@ -691,7 +721,7 @@ rhs_expr
 	| sprite '.' IDENTIFIER
 		{ $$ = newBuffer();
 		  bufferWriteString($$, $1, strlen($1)+1);
-		  bufferWriteGetProperty($$, $3);
+		  bufferWriteProperty($$, $3);
 		  bufferWriteU8($$, SWFACTION_GETPROPERTY);
 		  free($3);
 		  free($1); }
@@ -699,11 +729,11 @@ rhs_expr
 	| "++" sprite '.' IDENTIFIER
 		{ $$ = newBuffer();
 		  bufferWriteString($$, $2, strlen($2)+1);
-		  bufferWriteGetProperty($$, $4);
+		  bufferWriteProperty($$, $4);
 		  bufferWriteString($$, $2, strlen($2)+1);
-		  bufferWriteSetProperty($$, $4);
+		  bufferWriteProperty($$, $4);
 		  bufferWriteString($$, $2, strlen($2)+1);
-		  bufferWriteGetProperty($$, $4);
+		  bufferWriteProperty($$, $4);
 		  bufferWriteString($$, "1", 2);
 		  bufferWriteU8($$, SWFACTION_ADD);
 		  bufferWriteU8($$, SWFACTION_SETPROPERTY);
@@ -724,11 +754,11 @@ rhs_expr
 	| "--" sprite '.' IDENTIFIER
 		{ $$ = newBuffer();
 		  bufferWriteString($$, $2, strlen($2)+1);
-		  bufferWriteGetProperty($$, $4);
+		  bufferWriteProperty($$, $4);
 		  bufferWriteString($$, $2, strlen($2)+1);
-		  bufferWriteSetProperty($$, $4);
+		  bufferWriteProperty($$, $4);
 		  bufferWriteString($$, $2, strlen($2)+1);
-		  bufferWriteGetProperty($$, $4);
+		  bufferWriteProperty($$, $4);
 		  bufferWriteString($$, "1", 2);
 		  bufferWriteU8($$, SWFACTION_ADD);
 		  bufferWriteU8($$, SWFACTION_SETPROPERTY);
@@ -894,6 +924,11 @@ lhs_expr
 assign_stmt
 	: pf_expr
 
+	| ASM '{'
+		{ asmBuffer = newBuffer(); }
+	  opcode_list '}'
+		{ $$ = asmBuffer; }
+
 	| void_function_call
 
 	| "++" lhs_expr
@@ -915,12 +950,12 @@ assign_stmt
 	| "++" sprite '.' IDENTIFIER
 		{ $$ = newBuffer();
 		  bufferWriteString($$, $2, strlen($2)+1);
-		  bufferWriteGetProperty($$, $4);
+		  bufferWriteProperty($$, $4);
 		  bufferWriteU8($$, SWFACTION_GETPROPERTY);
 		  bufferWriteString($$, "1", 2);
 		  bufferWriteU8($$, SWFACTION_ADD);
 		  bufferWriteString($$, $2, strlen($2)+1);
-		  bufferWriteSetProperty($$, $4);
+		  bufferWriteProperty($$, $4);
 		  bufferWriteU8($$, SWFACTION_SETPROPERTY);
 		  free($2);
 		  free($4); }
@@ -928,12 +963,12 @@ assign_stmt
 	| "--" sprite '.' IDENTIFIER
 		{ $$ = newBuffer();
 		  bufferWriteString($$, $2, strlen($2)+1);
-		  bufferWriteGetProperty($$, $4);
+		  bufferWriteProperty($$, $4);
 		  bufferWriteU8($$, SWFACTION_GETPROPERTY);
 		  bufferWriteString($$, "1", 2);
 		  bufferWriteU8($$, SWFACTION_SUBTRACT);
 		  bufferWriteString($$, $2, strlen($2)+1);
-		  bufferWriteSetProperty($$, $4);
+		  bufferWriteProperty($$, $4);
 		  bufferWriteU8($$, SWFACTION_SETPROPERTY);
 		  free($2);
 		  free($4); }
@@ -973,7 +1008,7 @@ assign_stmt
 	| sprite '.' IDENTIFIER '=' rhs_expr
                 { $$ = newBuffer();
 		  bufferWriteString($$, $1, strlen($1)+1);
-		  bufferWriteSetProperty($$, $3);
+		  bufferWriteProperty($$, $3);
 		  bufferConcat($$,$5);
 		  bufferWriteU8($$, SWFACTION_SETPROPERTY);
 		  free($1);
@@ -982,9 +1017,9 @@ assign_stmt
 	| sprite '.' IDENTIFIER "*=" rhs_expr
 		{ $$ = newBuffer();
 		  bufferWriteString($$, $1, strlen($1)+1);
-		  bufferWriteSetProperty($$, $3);
+		  bufferWriteProperty($$, $3);
 		  bufferWriteString($$, $1, strlen($1)+1);
-		  bufferWriteGetProperty($$, $3);
+		  bufferWriteProperty($$, $3);
 		  bufferWriteU8($$, SWFACTION_GETPROPERTY);
 		  bufferConcat($$, $5);
 		  bufferWriteU8($$, SWFACTION_MULTIPLY);
@@ -995,9 +1030,9 @@ assign_stmt
 	| sprite '.' IDENTIFIER "/=" rhs_expr
 		{ $$ = newBuffer();
 		  bufferWriteString($$, $1, strlen($1)+1);
-		  bufferWriteSetProperty($$, $3);
+		  bufferWriteProperty($$, $3);
 		  bufferWriteString($$, $1, strlen($1)+1);
-		  bufferWriteGetProperty($$, $3);
+		  bufferWriteProperty($$, $3);
 		  bufferWriteU8($$, SWFACTION_GETPROPERTY);
 		  bufferConcat($$, $5);
 		  bufferWriteU8($$, SWFACTION_DIVIDE);
@@ -1008,9 +1043,9 @@ assign_stmt
 	| sprite '.' IDENTIFIER "+=" rhs_expr
 		{ $$ = newBuffer();
 		  bufferWriteString($$, $1, strlen($1)+1);
-		  bufferWriteSetProperty($$, $3);
+		  bufferWriteProperty($$, $3);
 		  bufferWriteString($$, $1, strlen($1)+1);
-		  bufferWriteGetProperty($$, $3);
+		  bufferWriteProperty($$, $3);
 		  bufferWriteU8($$, SWFACTION_GETPROPERTY);
 		  bufferConcat($$, $5);
 		  bufferWriteU8($$, SWFACTION_ADD);
@@ -1021,9 +1056,9 @@ assign_stmt
 	| sprite '.' IDENTIFIER "-=" rhs_expr
 		{ $$ = newBuffer();
 		  bufferWriteString($$, $1, strlen($1)+1);
-		  bufferWriteSetProperty($$, $3);
+		  bufferWriteProperty($$, $3);
 		  bufferWriteString($$, $1, strlen($1)+1);
-		  bufferWriteGetProperty($$, $3);
+		  bufferWriteProperty($$, $3);
 		  bufferWriteU8($$, SWFACTION_GETPROPERTY);
 		  bufferConcat($$, $5);
 		  bufferWriteU8($$, SWFACTION_SUBTRACT);
@@ -1034,6 +1069,84 @@ assign_stmt
 
 expr
 	: rhs_expr
+	;
+
+push_item
+	: STRING		{ $$ = bufferWriteU8(asmBuffer, PUSH_STRING);
+				  $$ += bufferWriteHardString(asmBuffer, $1, strlen($1) + 1); } 
+
+push_list
+	: push_item			{ $$ = $1; }
+	| push_list ',' push_item	{ $$ = $1 + $3; }
+
+
+opcode_list
+	: opcode
+	| opcode_list opcode	{ $$ = $1 + $2; }
+	;
+
+opcode
+	: ASMPUSH 		{ $<len>$ = bufferWritePushOp(asmBuffer);
+				  $<len>$ += bufferWriteS16(asmBuffer, 0); }
+	  push_list		{ $$ = $<len>2 + $3;
+			
+				  bufferPatchLength(asmBuffer, $3); }
+
+	| ASMADD		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_ADD); }
+	| ASMSUBSTRACT		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_SUBTRACT); }
+	| ASMMULTIPLY		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_MULTIPLY); }
+	| ASMDIVIDE		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_DIVIDE); }
+	| ASMEQUALS		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_EQUAL); }
+	| ASMLESS		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_LESSTHAN); }
+	| ASMLOGICALAND		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_LOGICALAND); }
+	| ASMLOGICALOR		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_LOGICALOR); }
+	| ASMLOGICALNOT		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_LOGICALNOT); }
+	| ASMSTRINGAND		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_STRINGCONCAT); }
+	| ASMSTRINGEQUALS	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_STRINGEQ); }
+	| ASMSTRINGLENGTH	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_STRINGLENGTH); }
+	| ASMSTRINGEXTRACT	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_SUBSTRING); }
+	| ASMMBSTRINGEXTRACT	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_MBSUBSTRING); }
+	| ASMMBSTRINGLENGTH	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_MBLENGTH); }
+	| ASMSTRINGLESS		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_STRINGCOMPARE); }
+	| ASMPOP		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_POP); }
+	| ASMASCIITOCHAR	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_CHR); }
+	| ASMCHARTOASCII	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_ORD); }
+	| ASMTOINTEGER		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_INT); }
+	| ASMMBASCIITOCHAR	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_MBCHR); }
+	| ASMMBCHARTOASCII	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_MBORD); }
+	| ASMCALL		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_CALLFRAME); }
+	| ASMGETVARIABLE	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_GETVARIABLE); }
+	| ASMSETVARIABLE	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_SETVARIABLE); }
+	| ASMGETPROPERTY	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_GETPROPERTY); }
+	| ASMSETPROPERTY	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_SETPROPERTY); }
+	| ASMREMOVESPRITE	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_REMOVECLIP); }
+	| ASMSETTARGET2		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_SETTARGET2); }
+	| ASMSTARTDRAG		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_STARTDRAG); }
+	| ASMENDDRAG		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_ENDDRAG); }
+	| ASMCLONESPRITE	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_DUPLICATECLIP); }
+	| ASMGETTIME		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_GETTIME); }
+	| ASMRANDOMNUMBER	{ $$ = bufferWriteOp(asmBuffer, SWFACTION_RANDOMNUMBER); }
+	| ASMTRACE		{ $$ = bufferWriteOp(asmBuffer, SWFACTION_TRACE); }
+	
+	| ASMIF	NUMBER		{ $$ = ( 
+					bufferWriteOp(asmBuffer, SWFACTION_IF)
+					+ bufferWriteS16(asmBuffer, 2)
+					+ bufferWriteS16(asmBuffer, atoi($2))); }
+	| ASMJUMP NUMBER	{ $$ =  ( 
+					bufferWriteOp(asmBuffer, SWFACTION_JUMP)
+					+ bufferWriteS16(asmBuffer, 2)
+					+ bufferWriteS16(asmBuffer, atoi($2))); }
+	| ASMGETURL2 NUMBER	{ $$ =  (bufferWriteOp(asmBuffer, SWFACTION_GETURL2)
+					+ bufferWriteS16(asmBuffer, 1) 
+					+ bufferWriteU8(asmBuffer, atoi($2))); }
+	| ASMGOTOFRAME2	NUMBER	{ $$ =  (bufferWriteOp(asmBuffer, SWFACTION_GOTOFRAME2) 
+					+ bufferWriteS16(asmBuffer, 1)
+					+ bufferWriteU8(asmBuffer, atoi($2))); 
+					/* SceneBias missing */ }
+	| ASMWAITFORFRAME2 NUMBER { $$ = (bufferWriteOp(asmBuffer, SWFACTION_WAITFORFRAME2) 
+					+ bufferWriteS16(asmBuffer, 1)
+					+ bufferWriteU8(asmBuffer, atoi($2))); }
+
 	;
 
 %%

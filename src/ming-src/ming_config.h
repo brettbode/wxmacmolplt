@@ -1,14 +1,24 @@
 /* src/ming_config.h.  Generated from ming_config.h.in by configure.  */
 /* src/ming_config.h.in.  Generated from configure.in by autoheader.  */
 
+#ifndef __MING_CONFIG_H
+#define __MING_CONFIG_H
+
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
 
 /* Define to 1 if you have the `getopt' function. */
 #define HAVE_GETOPT 1
 
+/* Define to 1 if you have the <getopt.h> header file. */
+#define HAVE_GETOPT_H 1
+
 /* Define to 1 if you have the `getopt_long' function. */
 #define HAVE_GETOPT_LONG 1
+
+/* Define to 1 if you have the <gif_lib.h> header file. */
+/* #undef HAVE_GIF_LIB_H */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
@@ -38,17 +48,16 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#define HAVE_UNISTD_H 0
+#define HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the `vasprintf' function. */
 #define HAVE_VASPRINTF 1
 
 /* Define to 1 if you have the <zlib.h> header file. */
-#ifdef WIN32
-#define HAVE_ZLIB_H 0
-#else
 #define HAVE_ZLIB_H 1
-#endif
+
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
+/* #undef NO_MINUS_C_MINUS_O */
 
 /* Name of package */
 #define PACKAGE "ming"
@@ -60,13 +69,13 @@
 #define PACKAGE_NAME "ming"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "ming 0.4.0.beta4"
+#define PACKAGE_STRING "ming 0.4.3"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "ming"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.4.0.beta4"
+#define PACKAGE_VERSION "0.4.3"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -80,30 +89,19 @@
 #define USE_CXX 1
 
 /* Use freetype library */
-#define USE_FREETYPE 1
+#define USE_FREETYPE 0
 
 /* Use gif library */
 /* #undef USE_GIF */
 
 /* Use png library */
-#define USE_PNG 0
+/* #undef USE_PNG */
 
 /* Use zlib */
-#ifdef WIN32
-#define USE_ZLIB 0
-#else
-#define USE_ZLIB 0
-#endif
+#define USE_ZLIB 1
 
 /* Version number of package */
-#define VERSION "0.4.0.beta4"
+#define VERSION "0.4.3"
 
-/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
-   `char[]'. */
-#define YYTEXT_POINTER 1
+#endif
 
-#ifdef WIN32
-#ifndef __STRING
-#define __STRING(x) #x
-#endif
-#endif

@@ -36,22 +36,19 @@ typedef enum
 {
   SWF_UNUSEDBLOCK               = -1, /* tell ming to skip this */
 
-  SWF_CHARACTERSET		= 51,
   SWF_DEFINEBITS                =  6,
   SWF_DEFINEBITSJPEG2           = 21,
   SWF_DEFINEBITSJPEG3           = 35,
-  SWF_DEFINEBITSPTR		= 1023,
   SWF_DEFINEBUTTON              =  7,
   SWF_DEFINEBUTTON2             = 34,
   SWF_DEFINEBUTTONCXFORM        = 23,
   SWF_DEFINEBUTTONSOUND         = 17,
-  SWF_DEFINECOMMANDOBJ		= 50,
   SWF_DEFINEEDITTEXT		= 37,
   SWF_DEFINEFONT                = 10,
   SWF_DEFINEFONT2               = 48,
   SWF_DEFINEFONT3		= 75,  /* SWF_version  >= 8 */
   SWF_DEFINEFONTALIGNZONES	= 73,  /* SWF_version  >= 8 */
-  SWF_CMSTEXTSETTINGS		= 74,  /* SWF_version  >= 8 */
+  SWF_CSMTEXTSETTINGS		= 74,  /* SWF_version  >= 8 */
   SWF_DEFINEFONTINFO            = 13,
   SWF_DEFINEFONTINFO2		= 62,  /* SWF_version  >= 6 */
   SWF_DEFINELOSSLESS            = 20,
@@ -66,8 +63,6 @@ typedef enum
   SWF_DEFINESPRITE              = 39,
   SWF_DEFINETEXT                = 11,
   SWF_DEFINETEXT2               = 33,
-  SWF_DEFINETEXTFORMAT		= 42,
-  SWF_DEFINEVIDEO		= 38,
   SWF_DEFINESCALINGGRID		= 78,  /* SWF_version  >= 8 */
   SWF_DOACTION                  = 12,
   SWF_ENABLEDEBUGGER		= 58,  /* SWF_version  <  6 */ 
@@ -76,49 +71,67 @@ typedef enum
   SWF_SETTABINDEX		= 66,  /* SWF_version  >= 7 */
   SWF_END                       =  0,
   SWF_EXPORTASSETS              = 56,
-  SWF_FONTREF			= 52,
   SWF_FRAMELABEL                = 43,
-  SWF_FRAMETAG			= 47,
-  SWF_FREEALL			= 31,
-  SWF_FREECHARACTER		=  3,
-  SWF_GENCOMMAND		= 49,
   SWF_IMPORTASSETS              = 57,  /* SWF_version  < 8 only */
   SWF_IMPORTASSETS2		= 71,  /* SWF_version  >= 8 */
   SWF_JPEGTABLES                =  8,
-  SWF_NAMECHARACTER		= 40,
-  SWF_PATHSAREPOSTSCRIPT	= 25,
   SWF_PLACEOBJECT               =  4,
   SWF_PLACEOBJECT2              = 26,
   SWF_PLACEOBJECT3		= 70,  /* SWF_version >= 8 */
   SWF_PROTECT                   = 24,
   SWF_REMOVEOBJECT              =  5,
   SWF_REMOVEOBJECT2             = 28,
-  SWF_SERIALNUMBER		= 41,
   SWF_SETBACKGROUNDCOLOR        =  9,
   SWF_SHOWFRAME                 =  1,
   SWF_SOUNDSTREAMBLOCK          = 19,
   SWF_SOUNDSTREAMHEAD           = 18,
   SWF_SOUNDSTREAMHEAD2          = 45,
   SWF_STARTSOUND                = 15,
-  SWF_SYNCFRAME			= 29,
   SWF_INITACTION		= 59,
   SWF_DEFINEVIDEOSTREAM		= 60,
   SWF_VIDEOFRAME		= 61,
+  SWF_SERIALNUMBER		= 41,
+  SWF_DEBUGID			= 63,
 
   /* SWF8 tags */
   SWF_FILEATTRIBUTES            = 69,
   SWF_METADATA                  = 77,
 
+  /* SWF9 tags */
+  SWF_SYMBOLCLASS               = 76,
+  SWF_DOABC                     = 82,
+  SWF_DEFINEBINARYDATA		= 87,
+  SWF_DEFINESCENEANDFRAMEDATA   = 86,
+  SWF_STARTSOUND2		= 89,
+  SWF_DEFINEFONTNAME		= 88,
+
   /* Unconfirmed tags */
   SWF_REFLEX			= 777,
 
+  /*obsolete and/or undocumented tags */
+  SWF_DEFINECOMMANDOBJ		= 50,  
+  SWF_DEFINETEXTFORMAT		= 42,  
+  SWF_DEFINEVIDEO		= 38, 
+  SWF_FRAMETAG			= 47,  
+  SWF_FREEALL			= 31,  
+  SWF_FREECHARACTER		=  3,  
+  SWF_GENCOMMAND		= 49,  
+  SWF_FONTREF			= 52,  
+  SWF_NAMECHARACTER		= 40,  
+  SWF_PATHSAREPOSTSCRIPT	= 25,
+  SWF_SYNCFRAME			= 29,
+  SWF_CHARACTERSET		= 51,
+  SWF_DEFINEBITSPTR		= 1023,
+
 /* these are pseudo definitions that do not correspond to actual swf file tags */
+  SWF_MINGFONT = 252,
+  SWF_BROWSERFONT = 253,
   SWF_PREBUILTCLIP = 254,
   SWF_PREBUILT = 255
 } SWFBlocktype;
 
 
-static int SWFBlocktype_swfVersion(int type)
+static inline int SWFBlocktype_swfVersion(int type)
 {
 	switch(type)
 	{	
@@ -189,7 +202,7 @@ static int SWFBlocktype_swfVersion(int type)
 		case SWF_PLACEOBJECT3:
 		case SWF_IMPORTASSETS2:
 		case SWF_DEFINEFONTALIGNZONES:
-		case SWF_CMSTEXTSETTINGS:
+		case SWF_CSMTEXTSETTINGS:
 		case SWF_DEFINEFONT3:
 		case SWF_METADATA:
 		case SWF_DEFINESHAPE4:

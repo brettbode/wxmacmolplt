@@ -44,14 +44,19 @@ struct SWFVideoStream_s
 	
 	FLVStream *flv;
 	FLVTag *lastTag;
-		
-	unsigned int numFrames;	
+	int lastFrame;	
+
+	int numFrames;	
 	unsigned int frame;
 	int width;
 	int height;
 	unsigned short embedded;
 	unsigned char codecId;
 	unsigned char smoothingFlag;
+	int mode;
+	int addFrame;
+	int framesLoaded;
+	int firstFrame;
 };
 
 struct SWFVideoFrame_s
@@ -114,17 +119,27 @@ void writeSWFVideoFrameToMethod(SWFBlock block, SWFByteOutputMethod method, void
 SWFBlock
 SWFVideoStream_getVideoFrame(SWFVideoStream stream /* associated video stream */) {
 	SWFVideoFrame block;
-	
+	int frame;
+
 	if(!stream->embedded)
 		return NULL;
 	
 	if(stream->frame >= stream->numFrames)
 	{
-		SWF_warn("SWFVideoStream_getVideoFrame: no more frames\n");
+		SWF_warn("SWFVideoStream_getVideoFrame: frame %i, numFrames %i\n", 
+			stream->frame, stream->numFrames);
 		return NULL;
 	}
-	
+
+	if(stream->frame < stream->framesLoaded)
+		return NULL;
+
 	block = (SWFVideoFrame) malloc(sizeof(struct SWFVideoFrame_s));
+
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == block)
+		return NULL;
+
 	SWFBlockInit((SWFBlock)block);
 
 	BLOCK(block)->complete = completeSWFVideoFrame;
@@ -133,6 +148,16 @@ SWFVideoStream_getVideoFrame(SWFVideoStream stream /* associated video stream */
 	BLOCK(block)->type = SWF_VIDEOFRAME;
 
 	block->stream = stream;
+	if(stream->lastTag != NULL && stream->lastFrame < stream->frame)
+	{
+		frame = stream->lastFrame;
+	}
+	else
+	{
+		stream->lastTag = NULL;
+		frame = -1;
+	}
+
 	do {
 		if(FLVStream_nextTag(stream->flv, &block->tag, stream->lastTag))
 		{
@@ -140,11 +165,15 @@ SWFVideoStream_getVideoFrame(SWFVideoStream stream /* associated video stream */
 			return NULL;
 		}
 		stream->lastTag = &block->tag;
-	} while (block->tag.tagType != FLV_VIDEOTAG);
-
+		if(block->tag.tagType == FLV_VIDEOTAG)
+		{
+			frame++;
+		}
+	} while (frame != stream->frame);
+	
 	block->frameNum = stream->frame;	
-	stream->frame++;
-		
+	stream->lastFrame = stream->frame;	
+	stream->framesLoaded = stream->frame + 1;
 	return (SWFBlock)block;
 }
 
@@ -235,7 +264,6 @@ static int setH263StreamDimension(SWFVideoStream stream, FLVTag *tag)
 		default:
 			return setH263CustomDimension(stream, input, flags);
 	}
-	return -1;
 }				
 
 static int setScreenStreamDimension(SWFVideoStream stream, FLVTag *tag) 
@@ -396,45 +424,150 @@ static int setStreamProperties(SWFVideoStream stream)
 
 static int onPlace(SWFDisplayItem item, SWFBlockList blocklist)
 {
-	SWFVideoStream stream = (SWFVideoStream)SWFDisplayItem_getCharacter(item);                
+	SWFVideoStream stream = (SWFVideoStream)SWFDisplayItem_getCharacter(item); 
 	SWFBlock video = SWFVideoStream_getVideoFrame(stream);
 	if(video == NULL)
 		return 0;
-
         SWFBlockList_addBlock(blocklist, video);
+	stream->firstFrame = 0;
 	return 1;
 }
 
 static int onFrame(SWFDisplayItem item, SWFBlockList blocklist)
 {
-        int frame;
 	SWFPlaceObject2Block placeVideo;
 	SWFVideoStream stream;
-	SWFBlock video;
+	SWFBlock video = NULL;
 
 	/* if item is new -> onInit already inserted a frame */	
 	if(item->flags != 0)
 		return 0;
 
-	stream = (SWFVideoStream)SWFDisplayItem_getCharacter(item);                
-	video = SWFVideoStream_getVideoFrame(stream);
-	if(video != NULL)
+	stream = (SWFVideoStream)SWFDisplayItem_getCharacter(item);
+	if(stream->mode == SWFVIDEOSTREAM_MODE_MANUAL &&
+		stream->addFrame == 0)
+		return 0;
+	
+	if(stream->mode != SWFVIDEOSTREAM_MODE_MANUAL)
+		stream->frame++;
+
+	if(stream->frame >= stream->framesLoaded)
 	{
-		/* well it isn't really clear why we need the place-block here
-	 	 * its not metioned in the flash-specs 
-	 	 * but its not working without */
-		frame = SWFVideoStream_getFrameNumber((SWFVideoFrame)video);
-		placeVideo = newSWFPlaceObject2Block(item->depth);
-		SWFPlaceObject2Block_setRatio(placeVideo, frame);
-		SWFPlaceObject2Block_setMove(placeVideo);
-		SWFBlockList_addBlock(blocklist, (SWFBlock)placeVideo);               
-	 
-                SWFBlockList_addBlock(blocklist, video);
-		return 2;
+		video = SWFVideoStream_getVideoFrame(stream);
+		if(video == NULL)
+			return 0;
 	}
+	
+	placeVideo = newSWFPlaceObject2Block(item->depth);
+	SWFPlaceObject2Block_setRatio(placeVideo, stream->frame);
+	SWFPlaceObject2Block_setMove(placeVideo);
+	SWFBlockList_addBlock(blocklist, (SWFBlock)placeVideo);               
+	if(video != NULL)
+		SWFBlockList_addBlock(blocklist, video);
+	
+	stream->addFrame = 0;
+	return 2;
+}
+
+
+/**
+ * Seek within a video stream.
+ *
+ * This functions allows seeking in video stream. Semantics 
+ * like SWFInput_seek(); 
+ *
+ * Works only with SWFVIDEOSTREAM_MODE_MANUAL!
+ * @return old video position (frame)
+ */
+int SWFVideoStream_seek(SWFVideoStream stream, int frame, int whence)
+{
+	int old, pos;
+
+	if(stream == NULL || stream->embedded == 0)
+		return -1;
+
+	if(stream->mode != SWFVIDEOSTREAM_MODE_MANUAL)
+		return -1;
+
+	old = stream->frame;
+	switch(whence)
+	{
+	case SEEK_SET: 
+		if(frame < 0 || frame >= stream->numFrames)
+			return -1;
+		stream->frame = frame;
+		break;
+	case SEEK_END:
+		if(frame < 0 || frame >= stream->numFrames)	
+ 			return -1;
+		stream->frame = stream->numFrames - frame;
+		break;
+	case SEEK_CUR:
+		pos = stream->frame + frame;
+		if(pos < 0 || pos >= stream->numFrames)
+			return -1;
+		break;
+	default:
+		return -1;
+	}
+	stream->addFrame = 1;
+	return old;
+} 
+
+/**
+ * Display next video frame
+ *
+ * Works only with embedded video streams. 
+ *
+ * @return -1 if an error happend.
+ */
+int SWFVideoStream_nextFrame(SWFVideoStream stream)
+{
+	if(stream == NULL || !stream->embedded)
+		return -1;
+
+	if(stream->mode != SWFVIDEOSTREAM_MODE_MANUAL)
+		return -1;
+
+	if(stream->addFrame == 1 || stream->firstFrame == 1)
+		return 0;
+
+	stream->addFrame = 1;
+	stream->frame++;
 	return 0;
 }
 
+/**
+ * switch video stream frame mode
+ * If the mode == SWFVIDEOSTREAM_MODE_AUTO (default) every swfmovie 
+ * frame a video frame is added.
+ * In SWFVIDEOSTREAM_MODE_MANUAL mode, the user needs to call 
+ * SWFVideoStream_nextFrame() to change the video's frame. 
+ *
+ * Works only with embedded video streams.
+ *
+ * @return the previous mode or -1 if an invalid mode was passed.
+ */
+int SWFVideoStream_setFrameMode(SWFVideoStream stream, int mode)
+{
+	int oldmode;
+	if(stream == NULL || !stream->embedded)
+		return -1;
+	
+	oldmode = stream->mode;
+	switch(mode)
+	{
+	case SWFVIDEOSTREAM_MODE_AUTO:
+		stream->mode = mode;
+		return oldmode;
+	case SWFVIDEOSTREAM_MODE_MANUAL:
+		stream->mode = mode;
+		return oldmode;
+	default:
+		SWF_warn("SWFVideoStream_setFrameMode: mode %i is unknown", mode);
+		return -1;	
+	}
+}
 
 /* 
  * create a new SWFVideoSteam object
@@ -472,9 +605,13 @@ newSWFVideoStream_fromInput(SWFInput input) {
 		return NULL;
 	}
 	stream->lastTag = NULL;
+	stream->lastFrame = 0;
 	stream->frame = 0;
 	stream->embedded = 1;
-	
+	stream->mode = SWFVIDEOSTREAM_MODE_AUTO;
+	stream->addFrame = 0;
+	stream->framesLoaded = 0;
+	stream->firstFrame = 1;
 	stream->width = VIDEO_DEF_WIDTH;
 	stream->height = VIDEO_DEF_HEIGHT;
 	if (setStreamProperties(stream) < 0)

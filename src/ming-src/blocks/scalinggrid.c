@@ -25,7 +25,7 @@
 #include "rect.h"
 #include "scalinggrid.h"
 
-static int isValidGridChar(SWFCharacter c)
+static inline int isValidGridChar(SWFCharacter c)
 {
 	switch(BLOCK(c)->type)
 	{

@@ -31,7 +31,7 @@
 
 #include "ming.h"
 #include "output.h"
-
+#include "rect.h"
 
 #define SWF_SHAPE_NEWSTYLEFLAG	 (1<<4)
 #define SWF_SHAPE_LINESTYLEFLAG	 (1<<3)
@@ -80,4 +80,26 @@ SWFShape_getLines(SWFShape shape, SWFLineStyle** outLines, int* outNLines);
 void
 SWFShape_setMorphFlag(SWFShape shape);
 
+SWFRect SWFShape_getEdgeBounds(SWFShape shape);
+
+int SWFShape_getFlags(SWFShape shape);
+
+void
+SWFOutput_writeGlyphShape(SWFOutput out, SWFShape shape);
+
+SWFShape newSWFGlyphShape();
+
+void 
+SWFShape_setLineStyle2filled_internal(SWFShape shape, unsigned short width,
+                       SWFFillStyle fill,
+                       int flags, float miterLimit);
+
+void 
+SWFShape_setLineStyle2_internal(SWFShape shape, unsigned short width,
+                       byte r, byte g, byte b, byte a,
+                       int flags, float miterLimit);
+
+void
+SWFShape_setLineStyle_internal(SWFShape shape, unsigned short width,
+                      byte r, byte g, byte b, byte a);
 #endif /* SWF_SHAPE_H_INCLUDED */

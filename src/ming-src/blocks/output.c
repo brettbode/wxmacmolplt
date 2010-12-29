@@ -19,9 +19,11 @@
 
 /* $Id$ */
 
+#ifndef __C2MAN__
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#endif
 
 #include "output.h"
 #include "error.h"
@@ -45,8 +47,20 @@ newSWFOutput()
 {
 	SWFOutput out = (SWFOutput) malloc(sizeof(struct SWFOutput_s));
 
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == out)
+		return NULL;
+
 	out->next = NULL;
 	out->buffer = (byte*) malloc(OUTPUT_BUFFER_INCREMENT);
+
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == out->buffer)
+	{
+		free(out);
+		return NULL;
+	}
+
 	out->pos = out->buffer;
 	*(out->pos) = 0;
 	out->buffersize = out->free = OUTPUT_BUFFER_INCREMENT;
@@ -64,8 +78,20 @@ newSizedSWFOutput(int size)
 {
 	SWFOutput out = (SWFOutput)malloc(sizeof(struct SWFOutput_s));
 
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == out)
+		return NULL;
+
 	out->next = NULL;
 	out->buffer = (byte*) malloc(size+1);
+
+	/* If malloc failed, return NULL to signify this */
+	if (NULL == out->buffer)
+	{
+		free(out);
+		return NULL;
+	}
+
 	out->pos = out->buffer;
 	*(out->pos) = 0;
 	out->buffersize = out->free = size+1;
@@ -400,28 +426,49 @@ SWFOutput_writeFixed8(SWFOutput out, double val)
 	SWFOutput_writeUInt16(out, fixed);
 }
 
+
+
 void
 SWFOutput_writeFloat(SWFOutput out, float f)
 {
-	unsigned char buf[4];
-	float *pf = (float *)buf;
-	
-	*pf = f;
-
-	SWFOutput_writeUInt32(out, (unsigned int) *buf);
+	unsigned char *p = (unsigned char *)&f;
+#if SWF_LITTLE_ENDIAN
+	SWFOutput_writeUInt8(out, p[0]);
+	SWFOutput_writeUInt8(out, p[1]);
+	SWFOutput_writeUInt8(out, p[2]);
+	SWFOutput_writeUInt8(out, p[3]);
+#else
+	SWFOutput_writeUInt8(out, p[3]);
+	SWFOutput_writeUInt8(out, p[2]);
+	SWFOutput_writeUInt8(out, p[1]);
+	SWFOutput_writeUInt8(out, p[0]);
+#endif	
 }
 
 void
 SWFOutput_writeDouble(SWFOutput out, double d)
 {
-	unsigned int i;
-	unsigned char buf[8];
-	double *pd = (double *)buf;
+	unsigned char *p = (unsigned char *)&d;
 
-	*pd = d;
-
-	for(i = 7; i >= 0; i--)
-		SWFOutput_writeUInt8(out, buf[i]);
+#if SWF_LITTLE_ENDIAN
+	SWFOutput_writeUInt8(out, p[4]);
+	SWFOutput_writeUInt8(out, p[5]);
+	SWFOutput_writeUInt8(out, p[6]);
+	SWFOutput_writeUInt8(out, p[7]);
+	SWFOutput_writeUInt8(out, p[0]);
+	SWFOutput_writeUInt8(out, p[1]);
+	SWFOutput_writeUInt8(out, p[2]);
+	SWFOutput_writeUInt8(out, p[3]);
+#else
+	SWFOutput_writeUInt8(out, p[3]);
+	SWFOutput_writeUInt8(out, p[2]);
+	SWFOutput_writeUInt8(out, p[1]);
+	SWFOutput_writeUInt8(out, p[0]);
+	SWFOutput_writeUInt8(out, p[7]);
+	SWFOutput_writeUInt8(out, p[6]);
+	SWFOutput_writeUInt8(out, p[5]);
+	SWFOutput_writeUInt8(out, p[4]);
+#endif
 }
 
 #define FLOAT_SIGN_MASK 	0x80000000
@@ -468,6 +515,27 @@ SWFOutput_writeFloat16(SWFOutput out, float f)
 
 	i = sig << FLOAT16_SIGN_SHIFT | exp << FLOAT16_EXP_SHIFT | (mat & 0x7ff);
 	SWFOutput_writeUInt16(out, i);
+}
+
+#define ENC_HIGH_BIT 0x80
+#define ENC_BYTE_MASK 0x7f
+
+void 
+SWFOutput_writeEncUInt32(SWFOutput out, unsigned int i)
+{
+	if(i == 0) // special case 
+	{
+		SWFOutput_writeUInt8(out, 0);
+		return;
+	}
+	while(i > 0)
+	{
+		unsigned char temp = i & ENC_BYTE_MASK;
+		i = i >> 7;
+		if(i > 0)
+			temp |= ENC_HIGH_BIT;
+		SWFOutput_writeUInt8(out, temp);
+	}
 }
 
 /*

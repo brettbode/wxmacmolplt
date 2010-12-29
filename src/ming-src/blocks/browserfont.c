@@ -19,8 +19,11 @@
 
 /* $Id$ */
 
+#ifndef __C2MAN__
 #include <stdlib.h>
 #include <string.h>
+#endif
+
 #include "browserfont.h"
 #include "font.h"
 #include "character.h"
@@ -49,7 +52,6 @@ finishBrowserFont(SWFBrowserFont font)
 {
 	unsigned int i;
 	SWFOutput out;
-
 	SWF_assert(BLOCK(font)->swfVersion);
 
 	out = newSWFOutput();
@@ -84,7 +86,9 @@ completeSWFBrowserFont(SWFBlock block)
 	return SWFOutput_getLength(font->out);
 }
 
-
+/**
+ * destroys a SWFBrowserFont instance.
+ */
 void
 destroySWFBrowserFont(SWFBrowserFont font)
 {
@@ -93,7 +97,11 @@ destroySWFBrowserFont(SWFBrowserFont font)
 	free(font);
 }
 
-
+/**
+ * creates a browser font instance
+ * This Function allows the usage of built in fonts like "_sans".
+ * Takes the name of the font as an argument.
+ */
 SWFBrowserFont
 newSWFBrowserFont(const char *name)
 {
@@ -105,10 +113,7 @@ newSWFBrowserFont(const char *name)
 	BLOCK(font)->complete = completeSWFBrowserFont;
 	BLOCK(font)->dtor = (destroySWFBlockMethod) destroySWFBrowserFont;
 
-	/* XXX - hack here: we change type to defineFont2 on completion
-		 so that we can tell the difference in setFont: */
-
-	BLOCK(font)->type = SWF_DEFINEEDITTEXT;
+	BLOCK(font)->type = SWF_BROWSERFONT;
 	CHARACTERID(font) = ++SWF_gNumCharacters;
 	font->out = NULL;
 	font->name = strdup(name);

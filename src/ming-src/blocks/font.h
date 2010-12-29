@@ -36,12 +36,26 @@
 
 #define SWF_FONT_HASLAYOUT    (1<<7)
 #define SWF_FONT_SHIFTJIS     (1<<6)
-#define SWF_FONT_UNICODE      (1<<5)
+#define SWF_FONT_SMALLTEXT    (1<<5)
 #define SWF_FONT_ANSI         (1<<4)
 #define SWF_FONT_WIDEOFFSETS  (1<<3)
 #define SWF_FONT_WIDECODES    (1<<2)
 #define SWF_FONT_ISITALIC     (1<<1)
 #define SWF_FONT_ISBOLD       (1<<0)
+
+struct kernInfo
+{
+	byte code1;
+	byte code2;
+	short adjustment;
+};
+
+struct kernInfo16
+{
+	unsigned short code1;
+	unsigned short code2;
+	short adjustment;
+};
 
 struct SWFFont_s
 {
@@ -49,36 +63,33 @@ struct SWFFont_s
 	/* this lets us call destroySWFBlock(font) */
 	struct SWFBlock_s block;
 
-	byte *name;
+	// 0 for SWF < 7
+	byte langCode;
+
+	char *name;
 	byte flags;
 
 	int nGlyphs;
 
-	/* map from glyphs to char codes, loaded from fdb file */
+	/* map from glyphs to char codes */
 	unsigned short* glyphToCode; 
 
-	/* list of pointers to glyph shapes */
-	byte** glyphOffset;
-
-	/* shape table, mapped in from file */
-	byte* shapes;
+	/* shape table */
+	SWFShape* shapes;
 
 	/* glyph metrics */
 	short* advances;
-	struct SWFRect_s* bounds;
-
-	/* map from char codes to glyphs, constructed from glyphToCode map */
-	/* xxx - would be nice if this was in the fdb.. */
-	union
-	{
-		byte* charMap;
-		unsigned short** wideMap; /* array of 256 arrays of 256 shorts */
-	} codeToGlyph;
 
 	/* font metrics */
 	short ascent;
 	short descent;
 	short leading;
+	
+	union
+	{
+		byte* charMap;
+		unsigned short** wideMap; /* array of 256 arrays of 256 shorts */
+	} codeToGlyph;
 
 	/* font's kern table, if one is defined */
 	/* XXX - should be sorted for faster lookups */
@@ -89,10 +100,19 @@ struct SWFFont_s
 	} kernTable;
 };
 
+struct SWFFontCollection_s
+{
+	SWFFont *fontList;
+	int numFonts;
+};
 
-byte* SWFFont_findGlyph(SWFFont font, unsigned short c);
+SWFFont newSWFFont();
 
-const char* SWFFont_getName(SWFFont font);
+void SWFFontCollection_addFont(SWFFontCollection collection, SWFFont font);
+void destroySWFFontCollection(SWFFontCollection collection);
+SWFFontCollection newSWFFontCollection();
+
+SWFShape SWFFont_getGlyph(SWFFont font, unsigned short c);
 
 byte SWFFont_getFlags(SWFFont font);
 
@@ -139,7 +159,19 @@ int SWFFontCharacter_getNGlyphs(SWFFontCharacter font);
 
 void SWFFontCharacter_addTextToList(SWFFontCharacter font, SWFTextRecord text);
 
+/* swf codetable: glyph --> char */
 unsigned short SWFFontCharacter_getGlyphCode(SWFFontCharacter font, 
 					     unsigned short c);
+
+/* swf codetable: char --> glyph */
+int SWFFontCharacter_findGlyphCode(SWFFontCharacter font, unsigned short c);
+
+/* source font: glyph --> char */
+unsigned short SWFFont_getGlyphCode(SWFFont font, unsigned short c);
+
+/* source font: char --> glyph */
+int SWFFont_findGlyphCode(SWFFont font, unsigned short c);
+
+void SWFFont_buildReverseMapping(SWFFont font);
 
 #endif /* SWF_FONT_H_INCLUDED */

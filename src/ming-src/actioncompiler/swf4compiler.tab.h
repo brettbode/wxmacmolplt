@@ -64,46 +64,89 @@
      GETURL = 280,
      GETURL1 = 281,
      LOADMOVIE = 282,
-     LOADVARIABLES = 283,
-     POSTURL = 284,
-     SUBSTR = 285,
-     GETPROPERTY = 286,
-     NEXTFRAME = 287,
-     PREVFRAME = 288,
-     PLAY = 289,
-     STOP = 290,
-     TOGGLEQUALITY = 291,
-     STOPSOUNDS = 292,
-     GOTOFRAME = 293,
-     GOTOANDPLAY = 294,
-     FRAMELOADED = 295,
-     SETTARGET = 296,
-     TELLTARGET = 297,
-     STRING = 298,
-     NUMBER = 299,
-     IDENTIFIER = 300,
-     PATH = 301,
-     GETURL_METHOD = 302,
-     EQ = 303,
-     LE = 304,
-     GE = 305,
-     NE = 306,
-     LAN = 307,
-     LOR = 308,
-     INC = 309,
-     DEC = 310,
-     IEQ = 311,
-     DEQ = 312,
-     MEQ = 313,
-     SEQ = 314,
-     STREQ = 315,
-     STRNE = 316,
-     STRCMP = 317,
-     PARENT = 318,
-     END = 319,
-     UMINUS = 320,
-     POSTFIX = 321,
-     NEGATE = 322
+     LOADMOVIENUM = 283,
+     LOADVARIABLES = 284,
+     POSTURL = 285,
+     SUBSTR = 286,
+     GETPROPERTY = 287,
+     NEXTFRAME = 288,
+     PREVFRAME = 289,
+     PLAY = 290,
+     STOP = 291,
+     TOGGLEQUALITY = 292,
+     STOPSOUNDS = 293,
+     GOTOFRAME = 294,
+     GOTOANDPLAY = 295,
+     FRAMELOADED = 296,
+     SETTARGET = 297,
+     ASM = 298,
+     ASMADD = 299,
+     ASMDIVIDE = 300,
+     ASMMULTIPLY = 301,
+     ASMEQUALS = 302,
+     ASMLESS = 303,
+     ASMLOGICALAND = 304,
+     ASMLOGICALOR = 305,
+     ASMLOGICALNOT = 306,
+     ASMSTRINGAND = 307,
+     ASMSTRINGEQUALS = 308,
+     ASMSTRINGEXTRACT = 309,
+     ASMSTRINGLENGTH = 310,
+     ASMMBSTRINGEXTRACT = 311,
+     ASMMBSTRINGLENGTH = 312,
+     ASMPOP = 313,
+     ASMPUSH = 314,
+     ASMASCIITOCHAR = 315,
+     ASMCHARTOASCII = 316,
+     ASMTOINTEGER = 317,
+     ASMCALL = 318,
+     ASMIF = 319,
+     ASMJUMP = 320,
+     ASMGETVARIABLE = 321,
+     ASMSETVARIABLE = 322,
+     ASMGETURL2 = 323,
+     ASMGETPROPERTY = 324,
+     ASMGOTOFRAME2 = 325,
+     ASMREMOVESPRITE = 326,
+     ASMSETPROPERTY = 327,
+     ASMSETTARGET2 = 328,
+     ASMSTARTDRAG = 329,
+     ASMWAITFORFRAME2 = 330,
+     ASMCLONESPRITE = 331,
+     ASMENDDRAG = 332,
+     ASMGETTIME = 333,
+     ASMRANDOMNUMBER = 334,
+     ASMTRACE = 335,
+     ASMMBASCIITOCHAR = 336,
+     ASMMBCHARTOASCII = 337,
+     ASMSUBSTRACT = 338,
+     ASMSTRINGLESS = 339,
+     TELLTARGET = 340,
+     BROKENSTRING = 341,
+     STRING = 342,
+     NUMBER = 343,
+     IDENTIFIER = 344,
+     PATH = 345,
+     EQ = 346,
+     LE = 347,
+     GE = 348,
+     NE = 349,
+     LAN = 350,
+     LOR = 351,
+     INC = 352,
+     DEC = 353,
+     IEQ = 354,
+     DEQ = 355,
+     MEQ = 356,
+     SEQ = 357,
+     STREQ = 358,
+     STRNE = 359,
+     STRCMP = 360,
+     PARENT = 361,
+     END = 362,
+     UMINUS = 363,
+     POSTFIX = 364,
+     NEGATE = 365
    };
 #endif
 /* Tokens.  */
@@ -132,61 +175,105 @@
 #define GETURL 280
 #define GETURL1 281
 #define LOADMOVIE 282
-#define LOADVARIABLES 283
-#define POSTURL 284
-#define SUBSTR 285
-#define GETPROPERTY 286
-#define NEXTFRAME 287
-#define PREVFRAME 288
-#define PLAY 289
-#define STOP 290
-#define TOGGLEQUALITY 291
-#define STOPSOUNDS 292
-#define GOTOFRAME 293
-#define GOTOANDPLAY 294
-#define FRAMELOADED 295
-#define SETTARGET 296
-#define TELLTARGET 297
-#define STRING 298
-#define NUMBER 299
-#define IDENTIFIER 300
-#define PATH 301
-#define GETURL_METHOD 302
-#define EQ 303
-#define LE 304
-#define GE 305
-#define NE 306
-#define LAN 307
-#define LOR 308
-#define INC 309
-#define DEC 310
-#define IEQ 311
-#define DEQ 312
-#define MEQ 313
-#define SEQ 314
-#define STREQ 315
-#define STRNE 316
-#define STRCMP 317
-#define PARENT 318
-#define END 319
-#define UMINUS 320
-#define POSTFIX 321
-#define NEGATE 322
+#define LOADMOVIENUM 283
+#define LOADVARIABLES 284
+#define POSTURL 285
+#define SUBSTR 286
+#define GETPROPERTY 287
+#define NEXTFRAME 288
+#define PREVFRAME 289
+#define PLAY 290
+#define STOP 291
+#define TOGGLEQUALITY 292
+#define STOPSOUNDS 293
+#define GOTOFRAME 294
+#define GOTOANDPLAY 295
+#define FRAMELOADED 296
+#define SETTARGET 297
+#define ASM 298
+#define ASMADD 299
+#define ASMDIVIDE 300
+#define ASMMULTIPLY 301
+#define ASMEQUALS 302
+#define ASMLESS 303
+#define ASMLOGICALAND 304
+#define ASMLOGICALOR 305
+#define ASMLOGICALNOT 306
+#define ASMSTRINGAND 307
+#define ASMSTRINGEQUALS 308
+#define ASMSTRINGEXTRACT 309
+#define ASMSTRINGLENGTH 310
+#define ASMMBSTRINGEXTRACT 311
+#define ASMMBSTRINGLENGTH 312
+#define ASMPOP 313
+#define ASMPUSH 314
+#define ASMASCIITOCHAR 315
+#define ASMCHARTOASCII 316
+#define ASMTOINTEGER 317
+#define ASMCALL 318
+#define ASMIF 319
+#define ASMJUMP 320
+#define ASMGETVARIABLE 321
+#define ASMSETVARIABLE 322
+#define ASMGETURL2 323
+#define ASMGETPROPERTY 324
+#define ASMGOTOFRAME2 325
+#define ASMREMOVESPRITE 326
+#define ASMSETPROPERTY 327
+#define ASMSETTARGET2 328
+#define ASMSTARTDRAG 329
+#define ASMWAITFORFRAME2 330
+#define ASMCLONESPRITE 331
+#define ASMENDDRAG 332
+#define ASMGETTIME 333
+#define ASMRANDOMNUMBER 334
+#define ASMTRACE 335
+#define ASMMBASCIITOCHAR 336
+#define ASMMBCHARTOASCII 337
+#define ASMSUBSTRACT 338
+#define ASMSTRINGLESS 339
+#define TELLTARGET 340
+#define BROKENSTRING 341
+#define STRING 342
+#define NUMBER 343
+#define IDENTIFIER 344
+#define PATH 345
+#define EQ 346
+#define LE 347
+#define GE 348
+#define NE 349
+#define LAN 350
+#define LOR 351
+#define INC 352
+#define DEC 353
+#define IEQ 354
+#define DEQ 355
+#define MEQ 356
+#define SEQ 357
+#define STREQ 358
+#define STRNE 359
+#define STRCMP 360
+#define PARENT 361
+#define END 362
+#define UMINUS 363
+#define POSTFIX 364
+#define NEGATE 365
 
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 17 "./swf4compiler.y"
+#line 19 "./swf4compiler.y"
 {
   Buffer action;
   char *str;
   SWFActionFunction function;
   SWFGetUrl2Method getURLMethod;
+  int len;
 }
 /* Line 1489 of yacc.c.  */
-#line 190 "swf4compiler.tab.h"
+#line 277 "swf4compiler.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

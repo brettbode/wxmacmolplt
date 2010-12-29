@@ -27,7 +27,7 @@
 #include "error.h"
 #include "flv.h"
 
-static int readAudioHdr(FLVStream *flv, FLVTag *tag)
+static inline int readAudioHdr(FLVStream *flv, FLVTag *tag)
 {
 	int ichar;
 	ichar = SWFInput_getChar(flv->input);
@@ -40,7 +40,7 @@ static int readAudioHdr(FLVStream *flv, FLVTag *tag)
 	return 0;
 }
 
-static int readVideoHdr(FLVStream *flv, FLVTag *tag)
+static inline int readVideoHdr(FLVStream *flv, FLVTag *tag)
 {
 	int ichar;
 	ichar = SWFInput_getChar(flv->input);
@@ -52,7 +52,7 @@ static int readVideoHdr(FLVStream *flv, FLVTag *tag)
 	return 0;
 }
 
-unsigned long FLVStream_skipTagData(FLVStream *flv, FLVTag *tag)
+long FLVStream_skipTagData(FLVStream *flv, FLVTag *tag)
 {
 	if(flv == NULL || tag == NULL)
 		return -1;
@@ -184,6 +184,23 @@ int FLVStream_nextTagType(FLVStream *flv, FLVTag *tag, FLVTag *prev, int type)
 	}
 	return -1;
 
+}
+
+unsigned int FLVStream_getDuration(FLVStream *flv, int type)
+{
+	unsigned int duration = 0;
+	FLVTag tag, *p_tag = NULL;
+	
+	while(FLVStream_nextTag(flv, &tag, p_tag) == 0) 
+	{
+		if(tag.tagType == type)
+		{
+			/* optimistic approach */
+			duration = tag.timeStamp; 
+		}
+		p_tag = &tag;
+	}
+	return duration;
 }
 
 int FLVStream_getNumFrames(FLVStream *flv, int type)

@@ -27,7 +27,7 @@ int yylex();
 enum
 {
   PUSH_STRING = 0,
-  PUSH_PROPERTY = 1,
+  PUSH_FLOAT = 1,
   PUSH_NULL = 2,
   PUSH_UNDEF = 3,
   PUSH_REGISTER = 4,
@@ -106,9 +106,60 @@ struct _buffer
   int buffersize;
   int free;
   byte *pushloc;
+  int hasObject;  // simplify grammar (e.g. DELETE rule);
 };
 
 #define BUFFER_SIZE sizeof(struct _buffer)
+
+struct exprlist_s
+{
+	Buffer buffer;
+	int count;
+};
+
+struct function_s
+{
+	char *name;
+	struct exprlist_s params;
+	Buffer code;
+	int flags;
+};
+typedef struct function_s *ASFunction;
+
+struct variable_s	
+{	
+	char *name;
+	Buffer initCode;
+};
+typedef struct variable_s *ASVariable;
+
+typedef enum
+{
+	UNDEF,
+	METHOD,	
+	VARIABLE,
+	BUFF
+} ClassMemberType;
+
+struct class_member_s
+{
+	ClassMemberType type;
+	union
+	{
+		ASFunction function;
+		ASVariable var;
+		Buffer buffer;
+	} element;
+	struct class_member_s *next;
+};
+typedef struct class_member_s *ASClassMember;
+
+struct class_s
+{
+	char *name;
+	ASClassMember members;
+};
+typedef struct class_s *ASClass;
 
 struct switchcase
 {	Buffer cond, action;
@@ -145,6 +196,7 @@ SWFAction compileSWFActionCode(const char *script);
 Buffer newBuffer();
 void destroyBuffer(Buffer out);
 int bufferConcat(Buffer a, Buffer b);        /* destroys b. */
+int bufferConcatSimple(Buffer a, Buffer b);
 int bufferWriteBuffer(Buffer a, Buffer b);   /* doesn't. */
 
 /* utilities for writing */
@@ -164,39 +216,45 @@ int bufferWritePushOp(Buffer out);
 int bufferWriteU8(Buffer out, int data);
 int bufferWriteS16(Buffer out, int data);
 int bufferWriteData(Buffer out, const byte *buffer, int bytes);
-int bufferWriteHardString(Buffer out, char *string, int length);
-int bufferWriteConstantString(Buffer out, char *string, int length);
-int bufferWriteString(Buffer out, char *string, int length);
+int bufferWriteHardString(Buffer out, const char *string, int length);
+int bufferWriteConstantString(Buffer out, const char *string, int length);
+int bufferWriteString(Buffer out, const char *string, int length);
+int bufferWritePushString(Buffer out, char *string, int length);
 int bufferWriteInt(Buffer out, int i);
+int bufferWriteFloat(Buffer out, float f);
 int bufferWriteDouble(Buffer out, double d);
 int bufferWriteNull(Buffer out);
 int bufferWriteUndef(Buffer out);
 int bufferWriteBoolean(Buffer out, int val);
 int bufferWriteRegister(Buffer out, int num);
 int bufferWriteSetRegister(Buffer out, int num);
-int bufferWriteGetProperty(Buffer out, char *string);
-int bufferWriteSetProperty(Buffer out, char *string);
+int bufferWriteProperty(Buffer out, char *string);
 int bufferWriteWTHITProperty(Buffer out);
-
-/**
- * @param func_name
- * 	Function name, NULL for anonymous functions.
- *
- * @param num_regs
- * 	Number of registers.
- *
- * @param flags
- * 	See SWFDefineFunction2Flags enum.
- */
-void bufferWriteDefineFunction2(Buffer out, char *func_name,
-		Buffer args, Buffer code, int flags, int num_regs);
+int lookupProperty(char *string);
 
 /* concat b to a, destroy b */
 char *stringConcat(char *a, char *b);
 
 /* resolve magic number standins to relative offsets */
-void bufferResolveJumps(Buffer out);
+#define bufferResolveJumps(buf) bufferResolveJumpsFull(buf, \
+    buf->pos, buf->buffer)
+void bufferResolveJumpsFull(Buffer out, byte *break_ptr, byte *continue_ptr);
 void bufferResolveSwitch(Buffer buffer, struct switchcases *slp);
+
+void bufferPatchPushLength(Buffer buffer, int len);
+
+int bufferWriteFunction(Buffer out, ASFunction function, int version);
+int bufferWriteClass(Buffer out, ASClass clazz);
+
+ASFunction newASFunction();
+ASVariable newASVariable(char *, Buffer);
+ASClass newASClass(char *name, ASClassMember members);
+
+ASClassMember newASClassMember_function(ASFunction func);
+ASClassMember newASClassMember_function(ASFunction func);
+ASClassMember newASClassMember_buffer(Buffer buf);
+ASClassMember newASClassMember_variable(ASVariable var);
+void ASClassMember_append(ASClassMember m0, ASClassMember end);
 
 /* rather than setting globals... */
 void swf4ParseInit(const char *string, int debug, int version);

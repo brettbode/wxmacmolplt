@@ -25,9 +25,6 @@
 #include <stdio.h>
 
 #include "libming.h"
-//#include "blocks/output.h"
-//#include "blocks/action.h"
-//#include "blocks/error.h"
 #include "output.h"
 #include "action.h"
 #include "error.h"
@@ -37,8 +34,8 @@
 
 SWFAction compileSWFActionCode(const char *script)
 {
-//	SWF_warnOnce("Please do not use compileSWFActionCode() anymore\n"
-//		"Use newSWFAction(script) instead\n");
+	SWF_warnOnce("Please do not use compileSWFActionCode() anymore\n"
+	"Use newSWFAction(script) instead\n");
 	return newSWFAction(script);
 }
 

@@ -1,17 +1,34 @@
-#include <stdlib.h>
-#include <math.h>
 
-#include "ming_config.h"
 #include "libming.h"
+#include "ming_config.h"
+#include "error.h"
 
-#if USE_PNG
-#include <png.h>
-#include <zlib.h>
+#if !(USE_PNG) // {
+
+SWFDBLBitmapData newSWFDBLBitmapData_fromPngInput(SWFInput input)
+{
+	SWF_warn("newSWFDBLBitmapData_fromPngInput can't be used (no png compiled into this build of Ming).\n");
+	return NULL;
+}
+
+SWFDBLBitmapData newSWFDBLBitmapData_fromPngFile(const char * fileName)
+{
+	SWF_warn("newSWFDBLBitmapData_fromPngFile can't be used (no png compiled into this build of Ming).\n");
+	return NULL;
+}
+
+#else // def USE_PNG }{
 
 #include "bitmap.h"
 #include "dbl.h"
 #include "input.h"
 
+
+#ifndef __C2MAN__
+#include <zlib.h>
+#include <png.h>
+#include <stdlib.h>
+#include <math.h>
 
 struct pngdata
 {
@@ -279,16 +296,9 @@ static int readPNG(png_structp png_ptr, dblData result)
 
 	result->data = (unsigned char*) malloc(outsize = (int)floor(alignedsize*1.01+12));
 
-#ifdef HAVE_LIBZ
 	/* compress the RGB color table (if present) and image data one block */
 	compress2(result->data, (uLongf *) &outsize, data, alignedsize, 9);
 	result->length = outsize;
-#endif
-#ifndef HAVE_LIBZ
-	/* No zlib, so just copy the data to the result location */
-	memcpy(result->data, data, alignedsize);
-	result->length = alignedsize;
-#endif
 
 	free(data);
 	free(png.data);
@@ -335,4 +345,6 @@ SWFDBLBitmapData newSWFDBLBitmapData_fromPngInput(SWFInput input)
 	// ret->input = NULL;
 	return ret;
 }
-#endif
+
+#endif  // C2MAN
+#endif // def USE_PNG }

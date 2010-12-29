@@ -53,33 +53,14 @@ struct SWFDisplayItem_s
 	SWFPosition position;
 	SWFMatrix matrix;
 	struct SWFDisplayList_s *list;
+	
+	SWFBlockList blocklist;
 };
 
 
 /* display item */
 
-SWFCharacter SWFDisplayItem_getCharacter(SWFDisplayItem item);
-
-void SWFDisplayItem_endMask(SWFDisplayItem item);
-
-/*
- * Methods for reading position data
- *  - added by David McNab <david@rebirthing.co.nz>
- */
-
-float SWFDisplayItem_get_x(SWFDisplayItem item);
-float SWFDisplayItem_get_y(SWFDisplayItem item);
-float SWFDisplayItem_get_xScale(SWFDisplayItem item);
-float SWFDisplayItem_get_yScale(SWFDisplayItem item);
-float SWFDisplayItem_get_xSkew(SWFDisplayItem item);
-float SWFDisplayItem_get_ySkew(SWFDisplayItem item);
-float SWFDisplayItem_get_rot(SWFDisplayItem item);
-
-SWFMatrix SWFDisplayItem_getMatrix(SWFDisplayItem item);
-
 void SWFDisplayItem_removeFromList(SWFDisplayItem, SWFBlockList); 
-
-/* display list */
 
 void destroySWFDisplayList(SWFDisplayList displayList);
 
@@ -89,12 +70,16 @@ SWFDisplayList newSWFSpriteDisplayList();
 
 void SWFDisplayList_nextFrame(SWFDisplayList list);
 
-SWFDisplayItem SWFDisplayList_add(SWFDisplayList list, SWFCharacter shape);
+SWFDisplayItem SWFDisplayList_add(SWFDisplayList list, SWFBlockList blocklist, SWFCharacter shape);
 
 void SWFDisplayList_writeBlocks(SWFDisplayList list, SWFBlockList blocklist);
 
 void SWFDisplayList_setSoundStream(SWFDisplayList list, SWFSoundStream stream);
 
 void SWFDisplayList_rewindSoundStream(SWFDisplayList list);
+
+void
+SWFDisplayItem_replace(SWFDisplayItem item, SWFCharacter character);
+
 
 #endif /* SWF_DISPLAYLIST_H_INCLUDED */
