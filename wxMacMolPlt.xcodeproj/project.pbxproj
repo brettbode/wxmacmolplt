@@ -205,7 +205,6 @@
 		8B1DA4840A2E6A18009DFD94 /* myPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */; };
 		8B24B31E0CA0731B00E92838 /* preview_canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B24B31C0CA0731B00E92838 /* preview_canvas.cpp */; };
 		8B24B31F0CA0731B00E92838 /* preview_canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B24B31C0CA0731B00E92838 /* preview_canvas.cpp */; };
-		8B24B3200CA0731B00E92838 /* preview_canvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B24B31C0CA0731B00E92838 /* preview_canvas.cpp */; };
 		8B279CFF0A4B6F0D00994DD5 /* colorArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF50A4B6F0D00994DD5 /* colorArea.cpp */; };
 		8B279D000A4B6F0D00994DD5 /* inputbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF70A4B6F0D00994DD5 /* inputbuilder.cpp */; };
 		8B279D010A4B6F0D00994DD5 /* surfaceDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */; };
@@ -391,7 +390,6 @@
 		8B29D6B312B934BD0049477F /* fmofragmentationdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */; };
 		8B29D6B512B934BD0049477F /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */; };
 		8B33B7B80BF8DBEB0056C79E /* swfexport-g.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */; };
-		8B33B7BA0BF8DBEB0056C79E /* swfexport-g.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */; };
 		8B33B7BC0BF8DBEB0056C79E /* swfexport-g.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */; };
 		8B33B80E0BF8EC1F0056C79E /* displaylist.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7F60BF8EC1F0056C79E /* displaylist.c */; };
 		8B33B80F0BF8EC1F0056C79E /* fill.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7F80BF8EC1F0056C79E /* fill.c */; };
@@ -404,17 +402,6 @@
 		8B33B8160BF8EC1F0056C79E /* shape_cubic.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8080BF8EC1F0056C79E /* shape_cubic.c */; };
 		8B33B8170BF8EC1F0056C79E /* shape_util.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B80A0BF8EC1F0056C79E /* shape_util.c */; };
 		8B33B8180BF8EC1F0056C79E /* text_util.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B80C0BF8EC1F0056C79E /* text_util.c */; };
-		8B33B8190BF8EC1F0056C79E /* displaylist.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7F60BF8EC1F0056C79E /* displaylist.c */; };
-		8B33B81A0BF8EC1F0056C79E /* fill.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7F80BF8EC1F0056C79E /* fill.c */; };
-		8B33B81B0BF8EC1F0056C79E /* font_util.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7FA0BF8EC1F0056C79E /* font_util.c */; };
-		8B33B81C0BF8EC1F0056C79E /* gc.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7FC0BF8EC1F0056C79E /* gc.c */; };
-		8B33B81D0BF8EC1F0056C79E /* ming.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8000BF8EC1F0056C79E /* ming.c */; };
-		8B33B81E0BF8EC1F0056C79E /* movie.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8020BF8EC1F0056C79E /* movie.c */; };
-		8B33B81F0BF8EC1F0056C79E /* movieclip.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8040BF8EC1F0056C79E /* movieclip.c */; };
-		8B33B8200BF8EC1F0056C79E /* position.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8060BF8EC1F0056C79E /* position.c */; };
-		8B33B8210BF8EC1F0056C79E /* shape_cubic.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8080BF8EC1F0056C79E /* shape_cubic.c */; };
-		8B33B8220BF8EC1F0056C79E /* shape_util.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B80A0BF8EC1F0056C79E /* shape_util.c */; };
-		8B33B8230BF8EC1F0056C79E /* text_util.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B80C0BF8EC1F0056C79E /* text_util.c */; };
 		8B33B8240BF8EC1F0056C79E /* displaylist.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7F60BF8EC1F0056C79E /* displaylist.c */; };
 		8B33B8250BF8EC1F0056C79E /* fill.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7F80BF8EC1F0056C79E /* fill.c */; };
 		8B33B8260BF8EC1F0056C79E /* font_util.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B7FA0BF8EC1F0056C79E /* font_util.c */; };
@@ -427,7 +414,6 @@
 		8B33B82D0BF8EC1F0056C79E /* shape_util.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B80A0BF8EC1F0056C79E /* shape_util.c */; };
 		8B33B82E0BF8EC1F0056C79E /* text_util.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B80C0BF8EC1F0056C79E /* text_util.c */; };
 		8B33B8330BF8EC570056C79E /* blocklist.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8310BF8EC570056C79E /* blocklist.c */; };
-		8B33B8340BF8EC580056C79E /* blocklist.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8310BF8EC570056C79E /* blocklist.c */; };
 		8B33B8350BF8EC580056C79E /* blocklist.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8310BF8EC570056C79E /* blocklist.c */; };
 		8B33B8980BF8ED280056C79E /* action.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8380BF8ED270056C79E /* action.c */; };
 		8B33B8990BF8ED280056C79E /* bitmap.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B83A0BF8ED270056C79E /* bitmap.c */; };
@@ -475,52 +461,6 @@
 		8B33B8C60BF8ED280056C79E /* ttffont.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8920BF8ED280056C79E /* ttffont.c */; };
 		8B33B8C70BF8ED280056C79E /* utf8.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8940BF8ED280056C79E /* utf8.c */; };
 		8B33B8C80BF8ED280056C79E /* videostream.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8960BF8ED280056C79E /* videostream.c */; };
-		8B33B8C90BF8ED280056C79E /* action.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8380BF8ED270056C79E /* action.c */; };
-		8B33B8CA0BF8ED280056C79E /* bitmap.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B83A0BF8ED270056C79E /* bitmap.c */; };
-		8B33B8CB0BF8ED280056C79E /* block.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B83C0BF8ED270056C79E /* block.c */; };
-		8B33B8CC0BF8ED280056C79E /* browserfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B83F0BF8ED270056C79E /* browserfont.c */; };
-		8B33B8CD0BF8ED280056C79E /* button.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8410BF8ED270056C79E /* button.c */; };
-		8B33B8CE0BF8ED280056C79E /* character.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8430BF8ED270056C79E /* character.c */; };
-		8B33B8CF0BF8ED280056C79E /* cxform.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8450BF8ED270056C79E /* cxform.c */; };
-		8B33B8D00BF8ED280056C79E /* dbl.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8470BF8ED270056C79E /* dbl.c */; };
-		8B33B8D10BF8ED280056C79E /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8490BF8ED270056C79E /* error.c */; };
-		8B33B8D20BF8ED280056C79E /* fileattrs.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B84C0BF8ED270056C79E /* fileattrs.c */; };
-		8B33B8D30BF8ED280056C79E /* fillstyle.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B84E0BF8ED270056C79E /* fillstyle.c */; };
-		8B33B8D40BF8ED280056C79E /* filter.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8500BF8ED270056C79E /* filter.c */; };
-		8B33B8D50BF8ED280056C79E /* flv.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8520BF8ED270056C79E /* flv.c */; };
-		8B33B8D60BF8ED280056C79E /* font.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8540BF8ED270056C79E /* font.c */; };
-		8B33B8D70BF8ED280056C79E /* fontinfo.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8560BF8ED270056C79E /* fontinfo.c */; };
-		8B33B8D80BF8ED280056C79E /* fromswf.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8580BF8ED270056C79E /* fromswf.c */; };
-		8B33B8D90BF8ED280056C79E /* gifdbl.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B85A0BF8ED270056C79E /* gifdbl.c */; };
-		8B33B8DA0BF8ED280056C79E /* gradient.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B85B0BF8ED270056C79E /* gradient.c */; };
-		8B33B8DB0BF8ED280056C79E /* imports.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B85D0BF8ED270056C79E /* imports.c */; };
-		8B33B8DC0BF8ED280056C79E /* input.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B85F0BF8ED270056C79E /* input.c */; };
-		8B33B8DD0BF8ED280056C79E /* jpeg.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8610BF8ED270056C79E /* jpeg.c */; };
-		8B33B8DE0BF8ED280056C79E /* linestyle.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8640BF8ED270056C79E /* linestyle.c */; };
-		8B33B8E10BF8ED280056C79E /* matrix.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8680BF8ED270056C79E /* matrix.c */; };
-		8B33B8E20BF8ED280056C79E /* metadata.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B86A0BF8ED270056C79E /* metadata.c */; };
-		8B33B8E30BF8ED280056C79E /* method.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B86C0BF8ED270056C79E /* method.c */; };
-		8B33B8E40BF8ED280056C79E /* morph.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B86E0BF8ED270056C79E /* morph.c */; };
-		8B33B8E50BF8ED280056C79E /* mp3.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8700BF8ED270056C79E /* mp3.c */; };
-		8B33B8E60BF8ED280056C79E /* output.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8710BF8ED270056C79E /* output.c */; };
-		8B33B8E70BF8ED280056C79E /* outputblock.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8730BF8ED270056C79E /* outputblock.c */; };
-		8B33B8E80BF8ED280056C79E /* placeobject.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8750BF8ED270056C79E /* placeobject.c */; };
-		8B33B8E90BF8ED280056C79E /* pngdbl.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8770BF8ED270056C79E /* pngdbl.c */; };
-		8B33B8EA0BF8ED280056C79E /* protect.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8780BF8ED270056C79E /* protect.c */; };
-		8B33B8EC0BF8ED280056C79E /* rect.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B87B0BF8ED270056C79E /* rect.c */; };
-		8B33B8ED0BF8ED280056C79E /* scalinggrid.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B87D0BF8ED270056C79E /* scalinggrid.c */; };
-		8B33B8EE0BF8ED280056C79E /* scriptlimits.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B87F0BF8ED270056C79E /* scriptlimits.c */; };
-		8B33B8EF0BF8ED280056C79E /* shape.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8810BF8ED270056C79E /* shape.c */; };
-		8B33B8F00BF8ED280056C79E /* sound.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8830BF8ED270056C79E /* sound.c */; };
-		8B33B8F10BF8ED280056C79E /* soundinstance.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8850BF8ED270056C79E /* soundinstance.c */; };
-		8B33B8F20BF8ED280056C79E /* soundstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8870BF8ED270056C79E /* soundstream.c */; };
-		8B33B8F30BF8ED280056C79E /* sprite.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8890BF8ED270056C79E /* sprite.c */; };
-		8B33B8F40BF8ED280056C79E /* tabindex.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B88C0BF8ED280056C79E /* tabindex.c */; };
-		8B33B8F50BF8ED280056C79E /* text.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B88E0BF8ED280056C79E /* text.c */; };
-		8B33B8F60BF8ED280056C79E /* textfield.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8900BF8ED280056C79E /* textfield.c */; };
-		8B33B8F70BF8ED280056C79E /* ttffont.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8920BF8ED280056C79E /* ttffont.c */; };
-		8B33B8F80BF8ED280056C79E /* utf8.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8940BF8ED280056C79E /* utf8.c */; };
-		8B33B8F90BF8ED280056C79E /* videostream.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8960BF8ED280056C79E /* videostream.c */; };
 		8B33B8FA0BF8ED280056C79E /* action.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B8380BF8ED270056C79E /* action.c */; };
 		8B33B8FB0BF8ED280056C79E /* bitmap.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B83A0BF8ED270056C79E /* bitmap.c */; };
 		8B33B8FC0BF8ED280056C79E /* block.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B83C0BF8ED270056C79E /* block.c */; };
@@ -573,14 +513,6 @@
 		8B33B94D0BF8EDA20056C79E /* lex.swf5.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9420BF8EDA20056C79E /* lex.swf5.c */; };
 		8B33B94E0BF8EDA20056C79E /* listaction.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9430BF8EDA20056C79E /* listaction.c */; };
 		8B33B9510BF8EDA20056C79E /* swf5compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9470BF8EDA20056C79E /* swf5compiler.tab.c */; };
-		8B33B9520BF8EDA20056C79E /* assembler.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B93C0BF8EDA20056C79E /* assembler.c */; };
-		8B33B9530BF8EDA20056C79E /* compile.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B93E0BF8EDA20056C79E /* compile.c */; };
-		8B33B9540BF8EDA20056C79E /* compileaction.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9400BF8EDA20056C79E /* compileaction.c */; };
-		8B33B9550BF8EDA20056C79E /* lex.swf4.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9410BF8EDA20056C79E /* lex.swf4.c */; };
-		8B33B9560BF8EDA20056C79E /* lex.swf5.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9420BF8EDA20056C79E /* lex.swf5.c */; };
-		8B33B9570BF8EDA20056C79E /* listaction.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9430BF8EDA20056C79E /* listaction.c */; };
-		8B33B9590BF8EDA20056C79E /* swf4compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9450BF8EDA20056C79E /* swf4compiler.tab.c */; };
-		8B33B95A0BF8EDA20056C79E /* swf5compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9470BF8EDA20056C79E /* swf5compiler.tab.c */; };
 		8B33B95B0BF8EDA20056C79E /* assembler.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B93C0BF8EDA20056C79E /* assembler.c */; };
 		8B33B95C0BF8EDA20056C79E /* compile.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B93E0BF8EDA20056C79E /* compile.c */; };
 		8B33B95D0BF8EDA20056C79E /* compileaction.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9400BF8EDA20056C79E /* compileaction.c */; };
@@ -591,10 +523,8 @@
 		8B33B9630BF8EDA20056C79E /* swf5compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9470BF8EDA20056C79E /* swf5compiler.tab.c */; };
 		8B396E710C70AA8C009690AF /* build_palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B396E6F0C70AA8C009690AF /* build_palette.cpp */; };
 		8B396E720C70AA8C009690AF /* build_palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B396E6F0C70AA8C009690AF /* build_palette.cpp */; };
-		8B396E730C70AA8C009690AF /* build_palette.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B396E6F0C70AA8C009690AF /* build_palette.cpp */; };
 		8B396EAB0C764DB7009690AF /* BsVeraSans.fdb in Resources */ = {isa = PBXBuildFile; fileRef = 8B396EAA0C764DB7009690AF /* BsVeraSans.fdb */; };
 		8B396EAC0C764DB7009690AF /* BsVeraSans.fdb in Resources */ = {isa = PBXBuildFile; fileRef = 8B396EAA0C764DB7009690AF /* BsVeraSans.fdb */; };
-		8B396EAD0C764DB7009690AF /* BsVeraSans.fdb in Resources */ = {isa = PBXBuildFile; fileRef = 8B396EAA0C764DB7009690AF /* BsVeraSans.fdb */; };
 		8B3B899D0A6EAD7E0041EA88 /* glf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B899C0A6EAD7E0041EA88 /* glf.cpp */; };
 		8B3B8AE10A770A280041EA88 /* bindoc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC809D0B43700B7783F /* bindoc.icns */; };
 		8B3B8AE20A770A280041EA88 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC909D0B43700B7783F /* Info.plist */; };
@@ -659,116 +589,43 @@
 		8B4BB4420A0A7C9D00FE9CC6 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
 		8B4D10C910E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */; };
 		8B4D10CA10E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */; };
-		8B4D10CB10E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */; };
 		8B4D10CC10E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4D10C710E287DD0087E8DA /* fmofragmentationdialog.cpp */; };
 		8B4FB3D40A3093470014F6B5 /* surfaceswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */; };
 		8B5B666A0E030FAB000EC27D /* perpixel_dirlight_f.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66680E030FAB000EC27D /* perpixel_dirlight_f.glsl */; };
 		8B5B666B0E030FAB000EC27D /* perpixel_dirlight_v.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66690E030FAB000EC27D /* perpixel_dirlight_v.glsl */; };
 		8B5B666C0E030FAB000EC27D /* perpixel_dirlight_f.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66680E030FAB000EC27D /* perpixel_dirlight_f.glsl */; };
 		8B5B666D0E030FAB000EC27D /* perpixel_dirlight_v.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66690E030FAB000EC27D /* perpixel_dirlight_v.glsl */; };
-		8B5B666E0E030FAB000EC27D /* perpixel_dirlight_f.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66680E030FAB000EC27D /* perpixel_dirlight_f.glsl */; };
-		8B5B666F0E030FAB000EC27D /* perpixel_dirlight_v.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66690E030FAB000EC27D /* perpixel_dirlight_v.glsl */; };
 		8B5B66700E030FAB000EC27D /* perpixel_dirlight_f.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66680E030FAB000EC27D /* perpixel_dirlight_f.glsl */; };
 		8B5B66710E030FAB000EC27D /* perpixel_dirlight_v.glsl in Resources */ = {isa = PBXBuildFile; fileRef = 8B5B66690E030FAB000EC27D /* perpixel_dirlight_v.glsl */; };
 		8B5B66760E030FD2000EC27D /* glew.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5B66740E030FD2000EC27D /* glew.cpp */; };
 		8B5B66770E030FD2000EC27D /* glew.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5B66740E030FD2000EC27D /* glew.cpp */; };
-		8B5B66780E030FD2000EC27D /* glew.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5B66740E030FD2000EC27D /* glew.cpp */; };
 		8B5B66790E030FD2000EC27D /* glew.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5B66740E030FD2000EC27D /* glew.cpp */; };
 		8B5B66850E031067000EC27D /* InputWizard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5B66830E031067000EC27D /* InputWizard.cpp */; };
 		8B5B66860E031067000EC27D /* InputWizard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5B66830E031067000EC27D /* InputWizard.cpp */; };
-		8B5B66870E031067000EC27D /* InputWizard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5B66830E031067000EC27D /* InputWizard.cpp */; };
 		8B5B66880E031067000EC27D /* InputWizard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5B66830E031067000EC27D /* InputWizard.cpp */; };
 		8B5D0D6C0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */; };
 		8B5D0D6D0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */; };
-		8B5D0D6E0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B5D0D6A0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp */; };
 		8B600B740B8F35C400084AF2 /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
-		8B600B750B8F35C400084AF2 /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
 		8B600B760B8F35C400084AF2 /* qtexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B600B720B8F35C400084AF2 /* qtexport.cpp */; };
 		8B6075B10A1A34B1008CC9FD /* printoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */; };
 		8B6716380C44015B0067A3C9 /* arial1.bmf in Resources */ = {isa = PBXBuildFile; fileRef = 8B6716370C44015B0067A3C9 /* arial1.bmf */; };
 		8B6716390C44015B0067A3C9 /* arial1.bmf in Resources */ = {isa = PBXBuildFile; fileRef = 8B6716370C44015B0067A3C9 /* arial1.bmf */; };
-		8B67163A0C44015B0067A3C9 /* arial1.bmf in Resources */ = {isa = PBXBuildFile; fileRef = 8B6716370C44015B0067A3C9 /* arial1.bmf */; };
 		8B6716520C4BF1290067A3C9 /* MyTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6716510C4BF1290067A3C9 /* MyTypes.cpp */; };
 		8B6716530C4BF1290067A3C9 /* MyTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6716510C4BF1290067A3C9 /* MyTypes.cpp */; };
-		8B6716540C4BF1290067A3C9 /* MyTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6716510C4BF1290067A3C9 /* MyTypes.cpp */; };
 		8B6AF30B0A13EAC8004D2E5F /* exportoptionsdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */; };
 		8B6C7BFB0A24E9C100B7358F /* energyplotdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */; };
 		8B6C7BFF0A24E9E800B7358F /* wxMolGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */; };
 		8B7145C90A23983200435951 /* aboutwxmacmolplt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */; };
 		8B74487B0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7448790C1EF9E600A74512 /* ChooseDialog.cpp */; };
-		8B74487C0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7448790C1EF9E600A74512 /* ChooseDialog.cpp */; };
 		8B74487D0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7448790C1EF9E600A74512 /* ChooseDialog.cpp */; };
-		8B8816AF0A751FED00EC8791 /* bindoc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC809D0B43700B7783F /* bindoc.icns */; };
-		8B8816B00A751FED00EC8791 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC909D0B43700B7783F /* Info.plist */; };
-		8B8816B10A751FED00EC8791 /* MacMolPlt.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACA09D0B43700B7783F /* MacMolPlt.icns */; };
-		8B8816B20A751FED00EC8791 /* prefs.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACB09D0B43700B7783F /* prefs.icns */; };
-		8B8816B30A751FED00EC8791 /* text-doc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACC09D0B43700B7783F /* text-doc.icns */; };
-		8B8816B40A751FED00EC8791 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
-		8B8816B50A751FED00EC8791 /* arial1.glf in Resources */ = {isa = PBXBuildFile; fileRef = 8B45D25D0A700DB60005269A /* arial1.glf */; };
-		8B8816B70A751FED00EC8791 /* AtomTypeList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2709D0B12600B7783F /* AtomTypeList.cpp */; };
-		8B8816B80A751FED00EC8791 /* BasisSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2909D0B12600B7783F /* BasisSet.cpp */; };
-		8B8816B90A751FED00EC8791 /* BFiles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2B09D0B12600B7783F /* BFiles.cpp */; };
-		8B8816BA0A751FED00EC8791 /* CML.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA2E09D0B12600B7783F /* CML.cpp */; };
-		8B8816BB0A751FED00EC8791 /* DataClasses.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3009D0B12600B7783F /* DataClasses.cpp */; };
-		8B8816BC0A751FED00EC8791 /* Files.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3109D0B12600B7783F /* Files.cpp */; };
-		8B8816BD0A751FED00EC8791 /* Frame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3209D0B12600B7783F /* Frame.cpp */; };
-		8B8816BE0A751FED00EC8791 /* GaussHermite.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3409D0B12600B7783F /* GaussHermite.cpp */; };
-		8B8816BF0A751FED00EC8791 /* Gradient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3909D0B12600B7783F /* Gradient.cpp */; };
-		8B8816C00A751FED00EC8791 /* InputData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3B09D0B12600B7783F /* InputData.cpp */; };
-		8B8816C10A751FED00EC8791 /* Internals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3D09D0B12600B7783F /* Internals.cpp */; };
-		8B8816C20A751FED00EC8791 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA3F09D0B12600B7783F /* main.cpp */; };
-		8B8816C30A751FED00EC8791 /* Math3D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4109D0B12600B7783F /* Math3D.cpp */; };
-		8B8816C40A751FED00EC8791 /* MEP.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4309D0B12600B7783F /* MEP.cpp */; };
-		8B8816C50A751FED00EC8791 /* MMPPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4409D0B12600B7783F /* MMPPrefs.cpp */; };
-		8B8816C60A751FED00EC8791 /* MoleculeData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4609D0B12600B7783F /* MoleculeData.cpp */; };
-		8B8816C70A751FED00EC8791 /* mpGLCanvas.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4809D0B12600B7783F /* mpGLCanvas.cpp */; };
-		8B8816C80A751FED00EC8791 /* orbitals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA4E09D0B12600B7783F /* orbitals.cpp */; };
-		8B8816C90A751FED00EC8791 /* Progress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5009D0B12600B7783F /* Progress.cpp */; };
-		8B8816CA0A751FED00EC8791 /* RysPolynomial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5209D0B12600B7783F /* RysPolynomial.cpp */; };
-		8B8816CB0A751FED00EC8791 /* SurfaceBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5409D0B12600B7783F /* SurfaceBase.cpp */; };
-		8B8816CC0A751FED00EC8791 /* SurfWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5609D0B12600B7783F /* SurfWin.cpp */; };
-		8B8816CD0A751FED00EC8791 /* VirtualSphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5709D0B12600B7783F /* VirtualSphere.cpp */; };
-		8B8816CE0A751FED00EC8791 /* wxFiles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5909D0B12600B7783F /* wxFiles.cpp */; };
-		8B8816CF0A751FED00EC8791 /* XML.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1652DA5A09D0B12600B7783F /* XML.cpp */; };
-		8B8816D00A751FED00EC8791 /* MolDisplayWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 168626D909D33C6C00A77D97 /* MolDisplayWin.cpp */; };
-		8B8816D10A751FED00EC8791 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
-		8B8816D20A751FED00EC8791 /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
-		8B8816D30A751FED00EC8791 /* bondsdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16FB432E09F026A300E84C6B /* bondsdlg.cpp */; };
-		8B8816D40A751FED00EC8791 /* coordinateswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */; };
-		8B8816D50A751FED00EC8791 /* llmdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1626378A0A07E46E0089452E /* llmdialog.cpp */; };
-		8B8816D60A751FED00EC8791 /* setbondlength.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */; };
-		8B8816D70A751FED00EC8791 /* appendframesoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */; };
-		8B8816D80A751FED00EC8791 /* exportoptionsdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */; };
-		8B8816D90A751FED00EC8791 /* printoptions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6075AF0A1A34B1008CC9FD /* printoptions.cpp */; };
-		8B8816DA0A751FED00EC8791 /* aboutwxmacmolplt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B7145C70A23983200435951 /* aboutwxmacmolplt.cpp */; };
-		8B8816DB0A751FED00EC8791 /* energyplotdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BF90A24E9C100B7358F /* energyplotdialog.cpp */; };
-		8B8816DC0A751FED00EC8791 /* wxMolGraph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B6C7BFD0A24E9E800B7358F /* wxMolGraph.cpp */; };
-		8B8816DD0A751FED00EC8791 /* choosevecgroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */; };
-		8B8816DE0A751FED00EC8791 /* coordinateoffset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */; };
-		8B8816DF0A751FED00EC8791 /* frameenergy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA3EF0A2BE373009DFD94 /* frameenergy.cpp */; };
-		8B8816E00A751FED00EC8791 /* setPreference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4730A2E189B009DFD94 /* setPreference.cpp */; };
-		8B8816E10A751FED00EC8791 /* frequenciesdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA47F0A2E6A17009DFD94 /* frequenciesdialog.cpp */; };
-		8B8816E20A751FED00EC8791 /* myPrefs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B1DA4810A2E6A17009DFD94 /* myPrefs.cpp */; };
-		8B8816E30A751FED00EC8791 /* surfaceswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B4FB3D10A3093470014F6B5 /* surfaceswindow.cpp */; };
-		8B8816E40A751FED00EC8791 /* colorArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF50A4B6F0D00994DD5 /* colorArea.cpp */; };
-		8B8816E50A751FED00EC8791 /* inputbuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF70A4B6F0D00994DD5 /* inputbuilder.cpp */; };
-		8B8816E60A751FED00EC8791 /* surfaceDlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CF90A4B6F0D00994DD5 /* surfaceDlg.cpp */; };
-		8B8816E70A751FED00EC8791 /* wxUglyChoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B279CFD0A4B6F0D00994DD5 /* wxUglyChoice.cpp */; };
-		8B8816E80A751FED00EC8791 /* windowparameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17D760A5328210059B71F /* windowparameters.cpp */; };
-		8B8816E90A751FED00EC8791 /* zmatrixcalculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */; };
-		8B8816EA0A751FED00EC8791 /* glf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B899C0A6EAD7E0041EA88 /* glf.cpp */; };
 		8B9B48530D0F37BD00CE0EDF /* amino_acids.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B9B48520D0F37BD00CE0EDF /* amino_acids.cml */; };
-		8B9B48540D0F37BD00CE0EDF /* amino_acids.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B9B48520D0F37BD00CE0EDF /* amino_acids.cml */; };
 		8B9B48550D0F37BD00CE0EDF /* amino_acids.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B9B48520D0F37BD00CE0EDF /* amino_acids.cml */; };
 		8B9B485B0D0F3CF000CE0EDF /* organics.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B9B485A0D0F3CF000CE0EDF /* organics.cml */; };
-		8B9B485C0D0F3CF000CE0EDF /* organics.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B9B485A0D0F3CF000CE0EDF /* organics.cml */; };
 		8B9B485D0D0F3CF000CE0EDF /* organics.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B9B485A0D0F3CF000CE0EDF /* organics.cml */; };
 		8B9B48620D0F3E8700CE0EDF /* solvents.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B932BC60D0A45F900DACA21 /* solvents.cml */; };
-		8B9B48630D0F3E8800CE0EDF /* solvents.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B932BC60D0A45F900DACA21 /* solvents.cml */; };
 		8B9B48640D0F3E8800CE0EDF /* solvents.cml in Resources */ = {isa = PBXBuildFile; fileRef = 8B932BC60D0A45F900DACA21 /* solvents.cml */; };
 		8BA56CA10DBFC97D00B8F40C /* FloatSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */; };
 		8BA56CA20DBFC97D00B8F40C /* FloatSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */; };
-		8BA56CA30DBFC97D00B8F40C /* FloatSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */; };
 		8BA56CA40DBFC97D00B8F40C /* FloatSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */; };
 		8BBD949712C996A20063AAF3 /* binary.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949212C996A20063AAF3 /* binary.c */; };
 		8BBD949812C996A20063AAF3 /* scenedata.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949312C996A20063AAF3 /* scenedata.c */; };
@@ -776,9 +633,6 @@
 		8BBD949A12C996A20063AAF3 /* binary.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949212C996A20063AAF3 /* binary.c */; };
 		8BBD949B12C996A20063AAF3 /* scenedata.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949312C996A20063AAF3 /* scenedata.c */; };
 		8BBD949C12C996A20063AAF3 /* symbolclass.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949512C996A20063AAF3 /* symbolclass.c */; };
-		8BBD949D12C996A20063AAF3 /* binary.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949212C996A20063AAF3 /* binary.c */; };
-		8BBD949E12C996A20063AAF3 /* scenedata.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949312C996A20063AAF3 /* scenedata.c */; };
-		8BBD949F12C996A20063AAF3 /* symbolclass.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949512C996A20063AAF3 /* symbolclass.c */; };
 		8BBD94A012C996A20063AAF3 /* binary.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949212C996A20063AAF3 /* binary.c */; };
 		8BBD94A112C996A20063AAF3 /* scenedata.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949312C996A20063AAF3 /* scenedata.c */; };
 		8BBD94A212C996A20063AAF3 /* symbolclass.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949512C996A20063AAF3 /* symbolclass.c */; };
@@ -787,43 +641,27 @@
 		8BBD94A512C996A20063AAF3 /* symbolclass.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD949512C996A20063AAF3 /* symbolclass.c */; };
 		8BBD950012C99DC50063AAF3 /* fdbfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD94FE12C99DC50063AAF3 /* fdbfont.c */; };
 		8BBD950112C99DC50063AAF3 /* fdbfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD94FE12C99DC50063AAF3 /* fdbfont.c */; };
-		8BBD950212C99DC50063AAF3 /* fdbfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD94FE12C99DC50063AAF3 /* fdbfont.c */; };
 		8BBD950312C99DC50063AAF3 /* fdbfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD94FE12C99DC50063AAF3 /* fdbfont.c */; };
 		8BBD950412C99DC50063AAF3 /* fdbfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD94FE12C99DC50063AAF3 /* fdbfont.c */; };
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
 		8BDC58C20CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */; };
 		8BDC58C30CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */; };
-		8BDC58C40CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */; };
 		8BDC5DDD0A29F25F0060517F /* coordinateoffset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC5DDB0A29F25F0060517F /* coordinateoffset.cpp */; };
 		8BE7C29D0A273D9700DACA25 /* choosevecgroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BE7C29B0A273D9700DACA25 /* choosevecgroup.cpp */; };
 		8BEA48DC0BFA076D00C660A3 /* lex.swf4.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9410BF8EDA20056C79E /* lex.swf4.c */; };
 		8BEA48E00BFA078600C660A3 /* swf4compiler.tab.c in Sources */ = {isa = PBXBuildFile; fileRef = 8B33B9450BF8EDA20056C79E /* swf4compiler.tab.c */; };
 		8BEA48E90BFA0BE900C660A3 /* swfexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */; };
-		8BEA48EA0BFA0BE900C660A3 /* swfexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */; };
 		8BEA48EB0BFA0BE900C660A3 /* swfexport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */; };
 		8BEA48F10BFA0F7300C660A3 /* Geometries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48F00BFA0F7300C660A3 /* Geometries.cpp */; };
-		8BEA48F20BFA0F7300C660A3 /* Geometries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48F00BFA0F7300C660A3 /* Geometries.cpp */; };
 		8BEA48F30BFA0F7300C660A3 /* Geometries.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA48F00BFA0F7300C660A3 /* Geometries.cpp */; };
 		8BED377B09EDCC0E0003DF64 /* setscreenplane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BED377909EDCC0E0003DF64 /* setscreenplane.cpp */; };
 		8BEDFA000A09390700BF6F85 /* setbondlength.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BEDF9FE0A09390700BF6F85 /* setbondlength.cpp */; };
 		8BEE8B630B8BA40F00E9A7BB /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */; };
-		8BEE8B640B8BA40F00E9A7BB /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */; };
 		8BEE8B650B8BA40F00E9A7BB /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8BEE8B620B8BA40F00E9A7BB /* QuickTime.framework */; };
 		8BF17D780A5328210059B71F /* windowparameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17D760A5328210059B71F /* windowparameters.cpp */; };
 		8BF17DA40A55D0910059B71F /* zmatrixcalculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXBuildRule section */
-		8B8816F40A75209100EC8791 /* PBXBuildRule */ = {
-			isa = PBXBuildRule;
-			compilerSpec = com.apple.compilers.gcc.3_3;
-			fileType = sourcecode.c;
-			isEditable = 1;
-			outputFiles = (
-			);
-		};
-/* End PBXBuildRule section */
 
 /* Begin PBXContainerItemProxy section */
 		8B2998A60E48F7BA00624A73 /* PBXContainerItemProxy */ = {
@@ -1189,7 +1027,6 @@
 		8B7145C80A23983200435951 /* aboutwxmacmolplt.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = aboutwxmacmolplt.h; path = src/aboutwxmacmolplt.h; sourceTree = "<group>"; };
 		8B7448790C1EF9E600A74512 /* ChooseDialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ChooseDialog.cpp; path = src/ChooseDialog.cpp; sourceTree = "<group>"; };
 		8B74487A0C1EF9E600A74512 /* ChooseDialog.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ChooseDialog.h; path = src/ChooseDialog.h; sourceTree = "<group>"; };
-		8B8816EF0A751FED00EC8791 /* wxMacMolPlt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wxMacMolPlt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B932BC60D0A45F900DACA21 /* solvents.cml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = solvents.cml; path = resources/solvents.cml; sourceTree = "<group>"; };
 		8B9B48520D0F37BD00CE0EDF /* amino_acids.cml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = amino_acids.cml; path = resources/amino_acids.cml; sourceTree = "<group>"; };
 		8B9B485A0D0F3CF000CE0EDF /* organics.cml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = organics.cml; path = resources/organics.cml; sourceTree = "<group>"; };
@@ -1257,14 +1094,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		8B8816EB0A751FED00EC8791 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8BEE8B640B8BA40F00E9A7BB /* QuickTime.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1284,7 +1113,6 @@
 			isa = PBXGroup;
 			children = (
 				1652DA0B09D0AE8F00B7783F /* wxMacMolPlt.app */,
-				8B8816EF0A751FED00EC8791 /* wxMacMolPlt.app */,
 				8B3B8B210A770A280041EA88 /* wxMacMolPlt.app */,
 				8B162E8E0D75C12600975533 /* wxMacMolPlt.app */,
 				8B29D6B912B934BD0049477F /* wxMacMolPlt.app */,
@@ -1772,24 +1600,6 @@
 			productReference = 8B3B8B210A770A280041EA88 /* wxMacMolPlt.app */;
 			productType = "com.apple.product-type.application";
 		};
-		8B8816AD0A751FED00EC8791 /* wxMacMolPlt-ppc */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 8B8816EC0A751FED00EC8791 /* Build configuration list for PBXNativeTarget "wxMacMolPlt-ppc" */;
-			buildPhases = (
-				8B8816AE0A751FED00EC8791 /* Resources */,
-				8B8816B60A751FED00EC8791 /* Sources */,
-				8B8816EB0A751FED00EC8791 /* Frameworks */,
-			);
-			buildRules = (
-				8B8816F40A75209100EC8791 /* PBXBuildRule */,
-			);
-			dependencies = (
-			);
-			name = "wxMacMolPlt-ppc";
-			productName = wxMacMolPlt;
-			productReference = 8B8816EF0A751FED00EC8791 /* wxMacMolPlt.app */;
-			productType = "com.apple.product-type.application";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1810,7 +1620,6 @@
 			projectRoot = "";
 			targets = (
 				1652DA0A09D0AE8F00B7783F /* wxMacMolPlt */,
-				8B8816AD0A751FED00EC8791 /* wxMacMolPlt-ppc */,
 				8B3B8ADF0A770A280041EA88 /* wxMacMolPlt Universal */,
 				8B162DF70D75C12600975533 /* wxMacMolPlt-2.9 */,
 				8B2998A20E48F78300624A73 /* Dist directory */,
@@ -1901,27 +1710,6 @@
 				8B9B48640D0F3E8800CE0EDF /* solvents.cml in Resources */,
 				8B5B666C0E030FAB000EC27D /* perpixel_dirlight_f.glsl in Resources */,
 				8B5B666D0E030FAB000EC27D /* perpixel_dirlight_v.glsl in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8B8816AE0A751FED00EC8791 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8B8816AF0A751FED00EC8791 /* bindoc.icns in Resources */,
-				8B8816B00A751FED00EC8791 /* Info.plist in Resources */,
-				8B8816B10A751FED00EC8791 /* MacMolPlt.icns in Resources */,
-				8B8816B20A751FED00EC8791 /* prefs.icns in Resources */,
-				8B8816B30A751FED00EC8791 /* text-doc.icns in Resources */,
-				8B8816B40A751FED00EC8791 /* MacMolPlt.Prefs.xml in Resources */,
-				8B8816B50A751FED00EC8791 /* arial1.glf in Resources */,
-				8B67163A0C44015B0067A3C9 /* arial1.bmf in Resources */,
-				8B396EAD0C764DB7009690AF /* BsVeraSans.fdb in Resources */,
-				8B9B48540D0F37BD00CE0EDF /* amino_acids.cml in Resources */,
-				8B9B485C0D0F3CF000CE0EDF /* organics.cml in Resources */,
-				8B9B48630D0F3E8800CE0EDF /* solvents.cml in Resources */,
-				8B5B666E0E030FAB000EC27D /* perpixel_dirlight_f.glsl in Resources */,
-				8B5B666F0E030FAB000EC27D /* perpixel_dirlight_v.glsl in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2497,149 +2285,6 @@
 				8BBD949812C996A20063AAF3 /* scenedata.c in Sources */,
 				8BBD949912C996A20063AAF3 /* symbolclass.c in Sources */,
 				8BBD950012C99DC50063AAF3 /* fdbfont.c in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		8B8816B60A751FED00EC8791 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				8B8816B70A751FED00EC8791 /* AtomTypeList.cpp in Sources */,
-				8B8816B80A751FED00EC8791 /* BasisSet.cpp in Sources */,
-				8B8816B90A751FED00EC8791 /* BFiles.cpp in Sources */,
-				8B8816BA0A751FED00EC8791 /* CML.cpp in Sources */,
-				8B8816BB0A751FED00EC8791 /* DataClasses.cpp in Sources */,
-				8B8816BC0A751FED00EC8791 /* Files.cpp in Sources */,
-				8B8816BD0A751FED00EC8791 /* Frame.cpp in Sources */,
-				8B8816BE0A751FED00EC8791 /* GaussHermite.cpp in Sources */,
-				8B8816BF0A751FED00EC8791 /* Gradient.cpp in Sources */,
-				8B8816C00A751FED00EC8791 /* InputData.cpp in Sources */,
-				8B8816C10A751FED00EC8791 /* Internals.cpp in Sources */,
-				8B8816C20A751FED00EC8791 /* main.cpp in Sources */,
-				8B8816C30A751FED00EC8791 /* Math3D.cpp in Sources */,
-				8B8816C40A751FED00EC8791 /* MEP.cpp in Sources */,
-				8B8816C50A751FED00EC8791 /* MMPPrefs.cpp in Sources */,
-				8B8816C60A751FED00EC8791 /* MoleculeData.cpp in Sources */,
-				8B8816C70A751FED00EC8791 /* mpGLCanvas.cpp in Sources */,
-				8B8816C80A751FED00EC8791 /* orbitals.cpp in Sources */,
-				8B8816C90A751FED00EC8791 /* Progress.cpp in Sources */,
-				8B8816CA0A751FED00EC8791 /* RysPolynomial.cpp in Sources */,
-				8B8816CB0A751FED00EC8791 /* SurfaceBase.cpp in Sources */,
-				8B8816CC0A751FED00EC8791 /* SurfWin.cpp in Sources */,
-				8B8816CD0A751FED00EC8791 /* VirtualSphere.cpp in Sources */,
-				8B8816CE0A751FED00EC8791 /* wxFiles.cpp in Sources */,
-				8B8816CF0A751FED00EC8791 /* XML.cpp in Sources */,
-				8B8816D00A751FED00EC8791 /* MolDisplayWin.cpp in Sources */,
-				8B8816D10A751FED00EC8791 /* OpenGLGraphics.cpp in Sources */,
-				8B8816D20A751FED00EC8791 /* setscreenplane.cpp in Sources */,
-				8B8816D30A751FED00EC8791 /* bondsdlg.cpp in Sources */,
-				8B8816D40A751FED00EC8791 /* coordinateswindow.cpp in Sources */,
-				8B8816D50A751FED00EC8791 /* llmdialog.cpp in Sources */,
-				8B8816D60A751FED00EC8791 /* setbondlength.cpp in Sources */,
-				8B8816D70A751FED00EC8791 /* appendframesoptions.cpp in Sources */,
-				8B8816D80A751FED00EC8791 /* exportoptionsdialog.cpp in Sources */,
-				8B8816D90A751FED00EC8791 /* printoptions.cpp in Sources */,
-				8B8816DA0A751FED00EC8791 /* aboutwxmacmolplt.cpp in Sources */,
-				8B8816DB0A751FED00EC8791 /* energyplotdialog.cpp in Sources */,
-				8B8816DC0A751FED00EC8791 /* wxMolGraph.cpp in Sources */,
-				8B8816DD0A751FED00EC8791 /* choosevecgroup.cpp in Sources */,
-				8B8816DE0A751FED00EC8791 /* coordinateoffset.cpp in Sources */,
-				8B8816DF0A751FED00EC8791 /* frameenergy.cpp in Sources */,
-				8B8816E00A751FED00EC8791 /* setPreference.cpp in Sources */,
-				8B8816E10A751FED00EC8791 /* frequenciesdialog.cpp in Sources */,
-				8B8816E20A751FED00EC8791 /* myPrefs.cpp in Sources */,
-				8B8816E30A751FED00EC8791 /* surfaceswindow.cpp in Sources */,
-				8B8816E40A751FED00EC8791 /* colorArea.cpp in Sources */,
-				8B8816E50A751FED00EC8791 /* inputbuilder.cpp in Sources */,
-				8B8816E60A751FED00EC8791 /* surfaceDlg.cpp in Sources */,
-				8B8816E70A751FED00EC8791 /* wxUglyChoice.cpp in Sources */,
-				8B8816E80A751FED00EC8791 /* windowparameters.cpp in Sources */,
-				8B8816E90A751FED00EC8791 /* zmatrixcalculator.cpp in Sources */,
-				8B8816EA0A751FED00EC8791 /* glf.cpp in Sources */,
-				8B600B750B8F35C400084AF2 /* qtexport.cpp in Sources */,
-				8B5D0D6E0BC7ECA100CE2A4B /* symmetrypointgroupdlg.cpp in Sources */,
-				8B33B7BA0BF8DBEB0056C79E /* swfexport-g.cpp in Sources */,
-				8B33B8190BF8EC1F0056C79E /* displaylist.c in Sources */,
-				8B33B81A0BF8EC1F0056C79E /* fill.c in Sources */,
-				8B33B81B0BF8EC1F0056C79E /* font_util.c in Sources */,
-				8B33B81C0BF8EC1F0056C79E /* gc.c in Sources */,
-				8B33B81D0BF8EC1F0056C79E /* ming.c in Sources */,
-				8B33B81E0BF8EC1F0056C79E /* movie.c in Sources */,
-				8B33B81F0BF8EC1F0056C79E /* movieclip.c in Sources */,
-				8B33B8200BF8EC1F0056C79E /* position.c in Sources */,
-				8B33B8210BF8EC1F0056C79E /* shape_cubic.c in Sources */,
-				8B33B8220BF8EC1F0056C79E /* shape_util.c in Sources */,
-				8B33B8230BF8EC1F0056C79E /* text_util.c in Sources */,
-				8B33B8340BF8EC580056C79E /* blocklist.c in Sources */,
-				8B33B8C90BF8ED280056C79E /* action.c in Sources */,
-				8B33B8CA0BF8ED280056C79E /* bitmap.c in Sources */,
-				8B33B8CB0BF8ED280056C79E /* block.c in Sources */,
-				8B33B8CC0BF8ED280056C79E /* browserfont.c in Sources */,
-				8B33B8CD0BF8ED280056C79E /* button.c in Sources */,
-				8B33B8CE0BF8ED280056C79E /* character.c in Sources */,
-				8B33B8CF0BF8ED280056C79E /* cxform.c in Sources */,
-				8B33B8D00BF8ED280056C79E /* dbl.c in Sources */,
-				8B33B8D10BF8ED280056C79E /* error.c in Sources */,
-				8B33B8D20BF8ED280056C79E /* fileattrs.c in Sources */,
-				8B33B8D30BF8ED280056C79E /* fillstyle.c in Sources */,
-				8B33B8D40BF8ED280056C79E /* filter.c in Sources */,
-				8B33B8D50BF8ED280056C79E /* flv.c in Sources */,
-				8B33B8D60BF8ED280056C79E /* font.c in Sources */,
-				8B33B8D70BF8ED280056C79E /* fontinfo.c in Sources */,
-				8B33B8D80BF8ED280056C79E /* fromswf.c in Sources */,
-				8B33B8D90BF8ED280056C79E /* gifdbl.c in Sources */,
-				8B33B8DA0BF8ED280056C79E /* gradient.c in Sources */,
-				8B33B8DB0BF8ED280056C79E /* imports.c in Sources */,
-				8B33B8DC0BF8ED280056C79E /* input.c in Sources */,
-				8B33B8DD0BF8ED280056C79E /* jpeg.c in Sources */,
-				8B33B8DE0BF8ED280056C79E /* linestyle.c in Sources */,
-				8B33B8E10BF8ED280056C79E /* matrix.c in Sources */,
-				8B33B8E20BF8ED280056C79E /* metadata.c in Sources */,
-				8B33B8E30BF8ED280056C79E /* method.c in Sources */,
-				8B33B8E40BF8ED280056C79E /* morph.c in Sources */,
-				8B33B8E50BF8ED280056C79E /* mp3.c in Sources */,
-				8B33B8E60BF8ED280056C79E /* output.c in Sources */,
-				8B33B8E70BF8ED280056C79E /* outputblock.c in Sources */,
-				8B33B8E80BF8ED280056C79E /* placeobject.c in Sources */,
-				8B33B8E90BF8ED280056C79E /* pngdbl.c in Sources */,
-				8B33B8EA0BF8ED280056C79E /* protect.c in Sources */,
-				8B33B8EC0BF8ED280056C79E /* rect.c in Sources */,
-				8B33B8ED0BF8ED280056C79E /* scalinggrid.c in Sources */,
-				8B33B8EE0BF8ED280056C79E /* scriptlimits.c in Sources */,
-				8B33B8EF0BF8ED280056C79E /* shape.c in Sources */,
-				8B33B8F00BF8ED280056C79E /* sound.c in Sources */,
-				8B33B8F10BF8ED280056C79E /* soundinstance.c in Sources */,
-				8B33B8F20BF8ED280056C79E /* soundstream.c in Sources */,
-				8B33B8F30BF8ED280056C79E /* sprite.c in Sources */,
-				8B33B8F40BF8ED280056C79E /* tabindex.c in Sources */,
-				8B33B8F50BF8ED280056C79E /* text.c in Sources */,
-				8B33B8F60BF8ED280056C79E /* textfield.c in Sources */,
-				8B33B8F70BF8ED280056C79E /* ttffont.c in Sources */,
-				8B33B8F80BF8ED280056C79E /* utf8.c in Sources */,
-				8B33B8F90BF8ED280056C79E /* videostream.c in Sources */,
-				8B33B9520BF8EDA20056C79E /* assembler.c in Sources */,
-				8B33B9530BF8EDA20056C79E /* compile.c in Sources */,
-				8B33B9540BF8EDA20056C79E /* compileaction.c in Sources */,
-				8B33B9550BF8EDA20056C79E /* lex.swf4.c in Sources */,
-				8B33B9560BF8EDA20056C79E /* lex.swf5.c in Sources */,
-				8B33B9570BF8EDA20056C79E /* listaction.c in Sources */,
-				8B33B9590BF8EDA20056C79E /* swf4compiler.tab.c in Sources */,
-				8B33B95A0BF8EDA20056C79E /* swf5compiler.tab.c in Sources */,
-				8BEA48EA0BFA0BE900C660A3 /* swfexport.cpp in Sources */,
-				8BEA48F20BFA0F7300C660A3 /* Geometries.cpp in Sources */,
-				8B74487C0C1EF9E600A74512 /* ChooseDialog.cpp in Sources */,
-				8B6716540C4BF1290067A3C9 /* MyTypes.cpp in Sources */,
-				8B396E730C70AA8C009690AF /* build_palette.cpp in Sources */,
-				8B24B3200CA0731B00E92838 /* preview_canvas.cpp in Sources */,
-				8BDC58C40CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */,
-				8BA56CA30DBFC97D00B8F40C /* FloatSlider.cpp in Sources */,
-				8B5B66780E030FD2000EC27D /* glew.cpp in Sources */,
-				8B5B66870E031067000EC27D /* InputWizard.cpp in Sources */,
-				8B4D10CB10E287DD0087E8DA /* fmofragmentationdialog.cpp in Sources */,
-				8BBD949D12C996A20063AAF3 /* binary.c in Sources */,
-				8BBD949E12C996A20063AAF3 /* scenedata.c in Sources */,
-				8BBD949F12C996A20063AAF3 /* symbolclass.c in Sources */,
-				8BBD950212C99DC50063AAF3 /* fdbfont.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3296,131 +2941,6 @@
 			};
 			name = Release;
 		};
-		8B8816ED0A751FED00EC8791 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_MODEL_TUNING = "";
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
-				INFOPLIST_FILE = "/Users/brett/software/wxMacMolPlt/resources/Info copy.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				OBJROOT = "$(SYMROOT)";
-				OTHER_CPLUSPLUSFLAGS = (
-					"-I/Users/brett/software/wxWidgets-2.6.3/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
-					"-I/Users/brett/software/wxWidgets-2.6.3/include",
-					"-I/Users/brett/software/wxWidgets-2.6.3/contrib/include",
-					"-D__WXMAC__",
-					"-D_FILE_OFFSET_BITS=64",
-					"-D_LARGE_FILES",
-					"-DNO_GCC_PRAGMA",
-					"-DHAVE_LIBMING",
-				);
-				OTHER_LDFLAGS = (
-					"-L/Users/brett/software/wxWidgets-2.6.3/osx-build/lib",
-					"-framework",
-					QuickTime,
-					"-framework",
-					IOKit,
-					"-framework",
-					Carbon,
-					"-framework",
-					Cocoa,
-					"-framework",
-					System,
-					"-lwx_base_carbon-2.6",
-					"-lwx_mac_core-2.6",
-					"-lwx_mac_adv-2.6",
-					"-lwx_mac_gl-2.6",
-					"-lwxexpat-2.6",
-					"-lwxtiff-2.6",
-					"-lwxjpeg-2.6",
-					"-lwxpng-2.6",
-					"-lz",
-					"-lpthread",
-					"-liconv",
-					"-framework",
-					WebKit,
-					"-framework",
-					OpenGL,
-					"-framework",
-					AGL,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = wxMacMolPlt;
-				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
-			};
-			name = Debug;
-		};
-		8B8816EE0A751FED00EC8791 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
-				GCC_MODEL_TUNING = G4;
-				GCC_OPTIMIZATION_LEVEL = 1;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
-				GCC_VERSION_ppc = 3.3;
-				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
-				INFOPLIST_FILE = "/Users/brett/software/wxMacMolPlt/resources/Info copy.plist";
-				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = "";
-				OBJROOT = "$(SYMROOT)";
-				OTHER_CPLUSPLUSFLAGS = (
-					"-I/Users/brett/software/wxWidgets-2.6.3/osx-build/lib/wx/include/mac-ansi-release-static-2.6",
-					"-I/Users/brett/software/wxWidgets-2.6.3/include",
-					"-I/Users/brett/software/wxWidgets-2.6.3/contrib/include",
-					"-D__WXMAC__",
-					"-D_FILE_OFFSET_BITS=64",
-					"-D_LARGE_FILES",
-					"-DNO_GCC_PRAGMA",
-					"-DHAVE_LIBMING",
-				);
-				OTHER_LDFLAGS = (
-					"-L/Users/brett/software/wxWidgets-2.6.3/osx-build/lib",
-					"-framework",
-					QuickTime,
-					"-framework",
-					IOKit,
-					"-framework",
-					Carbon,
-					"-framework",
-					Cocoa,
-					"-framework",
-					System,
-					"-lwx_base_carbon-2.6",
-					"-lwx_mac_core-2.6",
-					"-lwx_mac_adv-2.6",
-					"-lwx_mac_gl-2.6",
-					"-lwxexpat-2.6",
-					"-lwxtiff-2.6",
-					"-lwxjpeg-2.6",
-					"-lwxpng-2.6",
-					"-lz",
-					"-lpthread",
-					"-liconv",
-					"-framework",
-					WebKit,
-					"-framework",
-					OpenGL,
-					"-framework",
-					AGL,
-				);
-				PREBINDING = NO;
-				PRODUCT_NAME = wxMacMolPlt;
-				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -3474,15 +2994,6 @@
 			buildConfigurations = (
 				8B3B8B1F0A770A280041EA88 /* Debug */,
 				8B3B8B200A770A280041EA88 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		8B8816EC0A751FED00EC8791 /* Build configuration list for PBXNativeTarget "wxMacMolPlt-ppc" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				8B8816ED0A751FED00EC8791 /* Debug */,
-				8B8816EE0A751FED00EC8791 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

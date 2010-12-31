@@ -98,7 +98,7 @@
 /* #undef USE_PNG */
 
 /* Use zlib */
-#define USE_ZLIB 1
+#define USE_ZLIB 0
 
 /* Version number of package */
 #define VERSION "0.4.3"
