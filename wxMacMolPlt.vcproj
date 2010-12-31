@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="wxMacMolPlt"
 	ProjectGUID="{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}"
 	RootNamespace="wxMacMolPlt"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -39,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\wxMacMolPlt\src\ming-src\actioncompiler&quot;;&quot;C:\wxMacMolPlt\src\ming-src\blocks&quot;;&quot;C:\wxMacMolPlt\src\ming-src&quot;;&quot;E:\wxWidgets-svn\lib\vc_lib\mswud&quot;;&quot;E:\wxWidgets-svn\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\wxMacMolPlt\src\ming-src\actioncompiler&quot;;&quot;C:\wxMacMolPlt\src\ming-src\blocks&quot;;&quot;C:\wxMacMolPlt\src\ming-src&quot;;&quot;C:\wxWidgets-2.9.1\lib\vc_lib\mswud&quot;;&quot;C:\wxWidgets-2.9.1\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0400;wxUSE_GUI=1;__WXDEBUG__;YY_NO_UNISTD_H;HAVE_LIBMING"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -62,10 +63,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxmsw29ud_adv.lib wxmsw29ud_gl.lib wxmsw29ud_core.lib wxmsw29ud_html.lib wxbase29ud.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;E:\wxWidgets-svn\lib\vc_lib&quot;"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;C:\wxWidgets-2.9.1\lib\vc_lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -85,9 +88,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -116,7 +116,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\wxMacMolPlt\src\ming-src\actioncompiler&quot;;&quot;C:\wxMacMolPlt\src\ming-src\blocks&quot;;&quot;C:\wxMacMolPlt\src\ming-src&quot;;&quot;E:\wxWidgets-2.8.7\lib\vc_lib\msw&quot;;&quot;E:\wxWidgets-2.8.7\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\wxMacMolPlt\src\ming-src\actioncompiler&quot;;&quot;C:\wxMacMolPlt\src\ming-src\blocks&quot;;&quot;C:\wxMacMolPlt\src\ming-src&quot;;&quot;C:\wxWidgets-2.9.1\lib\vc_lib\mswu&quot;;&quot;C:\wxWidgets-2.9.1\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x400;wxUSE_GUI=1;YY_NO_UNISTD_H;HAVE_LIBMING"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -135,13 +135,15 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wxmsw28_adv.lib wxmsw28_gl.lib wxmsw28_core.lib wxmsw28_html.lib wxbase28.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregex.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib"
+				AdditionalDependencies="wxmsw29u_adv.lib wxmsw29u_gl.lib wxmsw29u_core.lib wxmsw29u_html.lib wxbase29u.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;E:\wxWidgets-2.8.7\lib\vc_lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\wxWidgets-2.9.1\lib\vc_lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -161,9 +163,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -523,6 +522,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\ming-src\blocks\binary.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ming-src\blocks\bitmap.c"
 				>
 			</File>
@@ -599,6 +602,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\ming-src\compat.c"
+				>
+			</File>
+			<File
 				RelativePath=".\src\ming-src\actioncompiler\compile.c"
 				>
 			</File>
@@ -660,6 +667,14 @@
 			</File>
 			<File
 				RelativePath=".\src\ming-src\blocks\exports.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ming-src\blocks\fdbfont.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ming-src\blocks\fdbfont.h"
 				>
 			</File>
 			<File
@@ -1033,10 +1048,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\ming-src\blocks\read.c"
-				>
-			</File>
-			<File
 				RelativePath=".\src\ming-src\blocks\rect.c"
 				>
 			</File>
@@ -1054,6 +1065,14 @@
 			</File>
 			<File
 				RelativePath=".\src\ming-src\blocks\scalinggrid.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ming-src\blocks\scenedata.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ming-src\blocks\scenedata.h"
 				>
 			</File>
 			<File
@@ -1170,6 +1189,14 @@
 			</File>
 			<File
 				RelativePath=".\src\swfexport.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ming-src\blocks\symbolclass.c"
+				>
+			</File>
+			<File
+				RelativePath=".\src\ming-src\blocks\symbolclass.h"
 				>
 			</File>
 			<File

@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wxMacMolPlt", "wxMacMolPlt.vcproj", "{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "wxMacMolPlt", "Win32-installer\wxMacMolPlt setup.vdproj", "{1C734AF4-A2D3-4F19-B07A-6DD45672D086}"

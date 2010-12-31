@@ -790,13 +790,14 @@ SWFText_resolveCodes(SWFText text)
 		{
 			SWFRect glyphBounds;
 			int minX, maxX, minY, maxY;
+			int fontchar_glyphcode;
 
 			unsigned short font_glyphcode =
 				SWFFont_findGlyphCode(font, textRecord->string[i]);
 			glyphBounds = SWFFont_getGlyphBounds(font,font_glyphcode);
 			SWFRect_getBounds(glyphBounds, &minX, &maxX, &minY, &maxY);
 
-			int fontchar_glyphcode =
+			fontchar_glyphcode =
 				SWFFontCharacter_findGlyphCode(fontchar, textRecord->string[i]);
 			if (fontchar_glyphcode < 0) {
 				SWF_error("SWFText_resolveCodes: no suitable glyph available (in dumped font)");
