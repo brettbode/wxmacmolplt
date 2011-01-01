@@ -82,12 +82,7 @@ void MEP2DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	if ((Grid == NULL)||(TotalAODensity==NULL)) return;
 		//If sufficient memory is available then setup pointers for fast local use
 	float * lGrid;
-#ifdef UseHandles
-	HLock(Grid);
-	lGrid = (float *) *Grid;
-#else
 	lGrid = Grid;
-#endif
 		//Store the Grid mins and incs at the beginning of the grid
 	GridMax = -1.0e20;
 	GridMin = 1.0e20;
@@ -123,10 +118,6 @@ void MEP2DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	}
 //ProfilerSetStatus(0);
 //ProfilerDump("\pMEP profile");
-#ifdef UseHandles
-		//Unlock the grid handle and return
-	HUnlock(Grid);
-#endif
 }
 #ifdef powerc
 typedef struct MEP3DGridData {
@@ -192,11 +183,7 @@ float MEP3DSurface::CalculateGrid(long xStart, long xEnd, Frame * lFrame, BasisS
 	float XGridValue, YGridValue, ZGridValue;
 	long	iXPt, iYPt, iZPt;
 	long n=xStart*(NumYGridPoints*NumZGridPoints);
-#ifdef UseHandles
-	float * lGrid = (float *) *Grid;	//The Grid should already be locked down
-#else
 	float * lGrid = Grid;
-#endif
 
 	XGridValue = Origin.x + xStart * XGridInc;
 	for (iXPt=xStart; iXPt<xEnd; iXPt++) {
@@ -263,12 +250,7 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 	if (Grid == NULL) return;
 		//If sufficient memory is available then setup pointers for fast local use
 	float * lGrid;
-#ifdef UseHandles
-	HLock(Grid);
-	lGrid = (float *) *Grid;
-#else
 	lGrid = Grid;
-#endif
 		//Get the appropriate MO vector
 		//Store the Grid mins and incs at the beginning of the grid
 	GridMax = -1.0e20;
@@ -432,9 +414,6 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 			TotalAODensity, &GHData, lProgress, &junk, false);
 	}
 		//Unlock the grid handle and return
-#ifdef UseHandles
-	if (Grid) HUnlock(Grid);
-#endif
 	Origin *= kBohr2AngConversion;
 	XGridInc *= kBohr2AngConversion;
 	YGridInc *= kBohr2AngConversion;
@@ -498,15 +477,8 @@ void Surf3DBase::CalculateSurfaceValues(MoleculeData *lData, Progress * lProgres
 		//If sufficient memory is available then setup pointers for fast local use
 		float * lGrid;
 		CPoint3D * Contour;
-#ifdef UseHandles
-	HLock(List);
-	lGrid = (float *) *List;
-	HLock(ContourHndl);
-	Contour = (CPoint3D *) *ContourHndl;
-#else
 	lGrid = List;
 	Contour = ContourHndl;
-#endif
 	
 #ifdef __wxBuild__
 	if (wxThread::GetCPUCount() > 1) {
@@ -585,11 +557,6 @@ void Surf3DBase::CalculateSurfaceValues(MoleculeData *lData, Progress * lProgres
 		CalculateSurfaceValuesGrid(lData, lProgress, TotalAODensity, 0, NumVertices,
 							   &GHData, lGrid, Contour, &PercentDone, false);
 	}
-		//Unlock the grid handle and return
-#ifdef UseHandles
-	HUnlock(List);
-	HUnlock(ContourHndl);
-#endif
 }
 void Surf3DBase::CalculateSurfaceValuesGrid(MoleculeData * lData, Progress * lProgress,
 													AODensity * TotalAODensity, long start, long end,

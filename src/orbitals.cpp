@@ -1401,12 +1401,7 @@ void Orb2DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	if (Grid == NULL) return;
 		//If sufficient memory is available then setup pointers for fast local use
 	float * lGrid;
-#ifdef UseHandles
-	HLock(Grid);
-	lGrid = (float *) *Grid;
-#else
 	lGrid = Grid;
-#endif
 		//Store the Grid mins and incs at the beginning of the grid
 	GridMax = -1.0e20;
 	GridMin = 1.0e20;
@@ -1446,9 +1441,6 @@ void Orb2DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 		//Unlock the grid handle and return
 	if (Options & 1) delete [] MOVector;
 
-#ifdef UseHandles
-	HUnlock(Grid);
-#endif
 }
 //NOTE: This routine assumes that the atomic coordinates are in Angstroms and are thus
 //converted to Bohr when used.
@@ -1484,12 +1476,7 @@ void TEDensity2DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 	if (Grid == NULL) return;
 		//If sufficient memory is available then setup pointers for fast local use
 	float * lGrid;
-#ifdef UseHandles
-	HLock(Grid);
-	lGrid = (float *) *Grid;
-#else
 	lGrid = Grid;
-#endif
 
 	OrbitalRec	*MOs=NULL;
 	MOs = lFrame->Orbs[OrbSet];
@@ -1608,9 +1595,6 @@ void TEDensity2DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 	}
 	if (AOVector) delete [] AOVector;
 
-#ifdef UseHandles
-	HUnlock(Grid);
-#endif
 }
 
 void TEDensity1DSurface::CalculateMOGrid(MoleculeData *lData,
@@ -1939,12 +1923,7 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	if (Grid == NULL) return;
 		//If sufficient memory is available then setup pointers for fast local use
 	float * lGrid;
-#ifdef UseHandles
-	HLock(Grid);
-	lGrid = (float *) *Grid;
-#else
 	lGrid = Grid;
-#endif
 	GridMax = -1.0e20;	//init the Grid max to a value sure to be changed later
 #if defined(powerc) && defined(MacintoshBuild)
 	if (gMPAware && (gNumProcessors>1)) {
@@ -2101,9 +2080,6 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	}
 		//Unlock the grid handle and return
 	if (Options & 1) delete [] MOVector;
-#ifdef UseHandles
-	if (Grid) HUnlock(Grid);
-#endif
 		//Convert the grid values to Angstroms
 	Origin *= kBohr2AngConversion;
 	XGridInc *= kBohr2AngConversion;
@@ -2122,11 +2098,7 @@ float Orb3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisS
 	wxStopWatch timer;
 	long CheckTime = timer.Time();
 #endif
-#ifdef UseHandles
-	lGrid = (float *) *Grid;	//The Grid should already be locked down
-#else
 	lGrid = Grid;
-#endif
 	float PhaseChange = 1.0;
 	if (GetPhaseChange()) PhaseChange = -1.0;
 
@@ -2258,11 +2230,7 @@ float TEDensity3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, 
 	wxStopWatch timer;
 	long CheckTime = timer.Time();
 #endif
-#ifdef UseHandles
-	lGrid = (float *) *Grid;	//The Grid should already be locked down
-#else
 	lGrid = Grid;
-#endif
 
 	XGridValue = Origin.x + xStart * XGridInc;
 	for (iXPt=xStart; iXPt<xEnd; iXPt++) {
@@ -2365,12 +2333,7 @@ void TEDensity3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 	if (Grid == NULL) return;
 		//If sufficient memory is available then setup pointers for fast local use
 	float * lGrid;
-#ifdef UseHandles
-	HLock(Grid);
-	lGrid = (float *) *Grid;
-#else
 	lGrid = Grid;
-#endif
 		//Get the appropriate MO vector
 	BasisSet * Basis = lData->GetBasisSet();
 	long NumBasisFuncs = Basis->GetNumBasisFuncs(false);
@@ -2619,9 +2582,6 @@ void TEDensity3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgre
 		delete [] AOVector;
 	}
 		//Unlock the grid handle and return
-#ifdef UseHandles
-	if (Grid) HUnlock(Grid);
-#endif
 	if (deleteTempOcc) {
 		if (OccupancyA) delete [] OccupancyA;
 		if (OccupancyB) delete [] OccupancyB;

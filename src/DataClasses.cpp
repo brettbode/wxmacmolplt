@@ -765,15 +765,8 @@ void Surf1DBase::Write1DXML(XMLElement *parent, bool writeGrid) const {
 	if (writeGrid && Grid) {
 		std::ostringstream buf;
 		long len = NumGridPoints*NumGridPoints;
-#ifdef UseHandles
-		HLock(Grid);
-		for (int i=0; i<len; i++)
-			buf << ((float *)(*Grid))[i] << " ";
-		HUnlock(Grid);
-#else
 		for (int i=0; i<len; i++)
 			buf << Grid[i] << " ";
-#endif
 		sElem->addChildElement(CML_convert(MMP_SurfGrid), buf.str().c_str());
 	}
 }
@@ -840,13 +833,7 @@ void Surf1DBase::Read1DXML(XMLElement *parent) {
 					if (NumGridPoints > 0) {
 						long count = NumGridPoints*NumGridPoints;
 						AllocateGrid(count);
-#ifdef UseHandles
-						HLock(Grid);
-						long test = child->getFloatArray(count, (float *) (*Grid));
-						HUnlock(Grid);
-#else
 						long test = child->getFloatArray(count, Grid);
-#endif
 						if (test != count) FreeGrid();
 					}
 					break;
@@ -922,15 +909,8 @@ void Surf2DBase::Write2DXML(XMLElement * parent, bool writeGrid) const {
 	if (writeGrid && Grid) {
 		std::ostringstream buf;
 		long len = NumGridPoints*NumGridPoints;
-#ifdef UseHandles
-		HLock(Grid);
-		for (int i=0; i<len; i++)
-			buf << ((float *)(*Grid))[i] << " ";
-		HUnlock(Grid);
-#else
 		for (int i=0; i<len; i++)
 			buf << Grid[i] << " ";
-#endif
 		sElem->addChildElement(CML_convert(MMP_SurfGrid), buf.str().c_str());
 	}
 }
@@ -1031,13 +1011,7 @@ void Surf2DBase::Read2DXML(XMLElement * parent) {
 					if (NumGridPoints > 0) {
 						long count = NumGridPoints*NumGridPoints;
 						AllocateGrid(count);
-#ifdef UseHandles
-						HLock(Grid);
-						long test = child->getFloatArray(count, (float *) (*Grid));
-						HUnlock(Grid);
-#else
 						long test = child->getFloatArray(count, Grid);
-#endif
 						if (test != count) FreeGrid();
 					}
 					break;
@@ -1122,15 +1096,8 @@ void Surf3DBase::Write3DXML(XMLElement * parent, bool writeGrid) const {
 	if (writeGrid && Grid) {
 		std::ostringstream buf;
 		long len = NumGridPoints*NumGridPoints*NumGridPoints;
-#ifdef UseHandles
-		HLock(Grid);
-		for (int i=0; i<len; i++)
-			buf << ((float *)(*Grid))[i] << " ";
-		HUnlock(Grid);
-#else
 		for (int i=0; i<len; i++)
 			buf << Grid[i] << " ";
-#endif
 		sElem->addChildElement(CML_convert(MMP_SurfGrid), buf.str().c_str());
 	}
 	if (ContourHndl) {
@@ -1142,51 +1109,24 @@ void Surf3DBase::Write3DXML(XMLElement * parent, bool writeGrid) const {
 		sElem->addChildElement(CML_convert(MMP_SurfNumNegTris), line);
 		std::ostringstream buf, vbuf;
 		long length = 3*(NumPosContourTriangles + NumNegContourTriangles);
-#ifdef UseHandles
-		HLock(ContourHndl);
-		for (int i=0; i<NumVertices; i++)
-			buf << ((CPoint3D *)(*ContourHndl))[i].x << " " << ((CPoint3D *)(*ContourHndl))[i].y << " "
-				<< ((CPoint3D *)(*ContourHndl))[i].z << " ";
-		HUnlock(ContourHndl);
-		HLock(VertexHndl);
-		for (int j=0; j<length; j++)
-			vbuf << ((long *)(*VertexHndl))[j] << " ";
-		HUnlock(VertexHndl);
-#else
 		for (int i=0; i<NumVertices; i++)
 			buf << ContourHndl[i].x << " " << ContourHndl[i].y << " "
 				<< ContourHndl[i].z << " ";
 		for (int j=0; j<length; j++)
 			vbuf << VertexList[j] << " ";
-#endif
 		sElem->addChildElement(CML_convert(MMP_SurfVertices), buf.str().c_str());
 		sElem->addChildElement(CML_convert(MMP_SurfVerticesList), vbuf.str().c_str());
 		if (SurfaceNormals) {
 			std::ostringstream sbuf;
-#ifdef UseHandles
-			 HLock(SurfaceNormals);
-			 for (int i=0; i<NumVertices; i++)
-				 sbuf << ((CPoint3D *)(*SurfaceNormals))[i].x << " " << ((CPoint3D *)(*SurfaceNormals))[i].y << " "
-					 << ((CPoint3D *)(*SurfaceNormals))[i].z << " ";
-			 HUnlock(SurfaceNormals);
-#else
 			 for (int i=0; i<NumVertices; i++)
 				 sbuf << SurfaceNormals[i].x << " " << SurfaceNormals[i].y << " "
 					 << SurfaceNormals[i].z << " ";
-#endif
 			 sElem->addChildElement(CML_convert(MMP_SurfNormals), sbuf.str().c_str());
 		}
 		if (List) {
 			std::ostringstream lbuf;
-#ifdef UseHandles
-			HLock(List);
-			for (int i=0; i<NumVertices; i++)
-				lbuf << ((float *)(*List))[i] << " ";
-			HUnlock(List);
-#else
 			for (int i=0; i<NumVertices; i++)
 				lbuf << List[i] << " ";
-#endif
 			sElem->addChildElement(CML_convert(MMP_SurfSurfaceValues), lbuf.str().c_str());
 		}
 	}
@@ -1309,13 +1249,7 @@ void Surf3DBase::Read3DXML(XMLElement * parent) {
 					if (NumGridPoints > 0) {
 						long count = NumGridPoints*NumGridPoints*NumGridPoints;
 						AllocateGrid(count);
-#ifdef UseHandles
-						HLock(Grid);
-						long test = child->getFloatArray(count, (float *) (*Grid));
-						HUnlock(Grid);
-#else
 						long test = child->getFloatArray(count, Grid);
-#endif
 						if (test != count) FreeGrid();
 					}
 					break;
@@ -1334,52 +1268,28 @@ void Surf3DBase::Read3DXML(XMLElement * parent) {
 				case MMP_SurfVertices:
 					if (NumVertices > 0) {
 						AllocateContour(NumVertices, NumPosContourTriangles+NumNegContourTriangles);
-#ifdef UseHandles
-						HLock(ContourHndl);
-						long test = child->getFloatArray(3*NumVertices, (float *) (*ContourHndl));
-						HUnlock(ContourHndl);
-#else
 						long test = child->getFloatArray(3*NumVertices, (float *) ContourHndl);
-#endif
 						if (test != (3*NumVertices)) FreeContour();
 					}
 					break;
 				case MMP_SurfVerticesList:
 					if (VertexAllocation > 0) {
 						long length = 3*(NumPosContourTriangles + NumNegContourTriangles);
-#ifdef UseHandles
-						HLock(VertexHndl);
-						long test = child->getLongArray(length, (long *) (*VertexHndl));
-						HUnlock(VertexHndl);
-#else
 						long test = child->getLongArray(length, VertexList);
-#endif
 						if (test != length) FreeContour();
 					}
 					break;
 				case MMP_SurfNormals:
 					if (NumVertices > 0) {
 						AllocateNormals(NumVertices);
-#ifdef UseHandles
-						HLock(SurfaceNormals);
-						long test = child->getFloatArray(NumVertices*3, (float *) (*SurfaceNormals));
-						HUnlock(SurfaceNormals);
-#else
 						long test = child->getFloatArray(NumVertices*3, (float *) SurfaceNormals);
-#endif
 						if (test != 3*NumVertices) FreeNormals();
 					}
 					break;
 				case MMP_SurfSurfaceValues:
 					if (NumVertices > 0) {
 						AllocateList(NumVertices);
-#ifdef UseHandles
-						HLock(List);
-						long test = child->getFloatArray(NumVertices, (float *) (*List));
-						HUnlock(List);
-#else
 						long test = child->getFloatArray(NumVertices, List);
-#endif
 						if (test != NumVertices) FreeList();
 					}
 					break;

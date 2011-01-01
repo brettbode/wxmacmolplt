@@ -1,5 +1,5 @@
 /*
- *  (c) 2004-2009 Iowa State University
+ *  (c) 2004-2011 Iowa State University
  *      see the LICENSE file in the top level directory
  */
 
@@ -21,7 +21,7 @@
 
 //This needs to get put into the build system...
 #define __wxBuild__
-#define wxMacMolPlt_VERSION "7.4.2"
+#define wxMacMolPlt_VERSION "7.4.3a3"
 
 //activate the following line to use the interactive editor
 // please add CXXFLAGS=-DENABLE_INTERACTIVE_MODE to your configure step rather
@@ -31,154 +31,6 @@
 #endif
 //Activate to allow quicktime movie export on Mac
 //#define __MAC_USE_QUICKTIME__
-/*
-#define MacintoshBuild		//define to build for Mac PPC or 68K
-#if __GNUC__
-	//unix/os X build
-#include <Carbon/Carbon.h>
-#define Use_NIBs
-#ifndef powerc
-#define powerc
-#endif
-
-#define CarbonBuild
-#define UseNavServices
-//#ifdef PM_USE_SESSION_APIS
-//#undef PM_USE_SESSION_APIS
-//#endif
-//#define PM_USE_SESSION_APIS 0	//Turn off printing session APIs for now.
-#else
-#define PM_OLDAPI
-#endif
-*/
-
-#if TARGET_API_MAC_CARBON
-#define CarbonBuild		//define to build PPC carbon app
-#ifdef PM_USE_SESSION_APIS
-#undef PM_USE_SESSION_APIS
-#endif
-#define PM_USE_SESSION_APIS 0	//Turn off printing session APIs for now.
-#endif
-
-#ifdef MacintoshBuild
-
-#define UseMacIO		//Use FS routines instead of StdC calls
-
-#ifdef powerc	//only enable QuickDraw3D related routines on PPC's
-#define UseNavServices
-#ifndef CarbonBuild	/*Standard File package not supported on carbon*/
-#define QuickDraw3D
-#define QuickDraw3DHeaders
-#define UseStandardFilePackage
-#endif
-#endif
-
-#ifdef CarbonBuild	/*Carbon requires new menu routines only available in 8.5 and higher*/
-
-	//enable the following for a Quesa build
-//#define QuickDraw3D
-//#define Quesa
-//#define QuesaHeaders
-
-	//If we are not using QuickDraw3D use OpenGL (default on Carbon)
-#ifndef QuickDraw3D
-#define UseOpenGL
-#endif
-
-#define myDisableMenuItem( menu, item ) DisableMenuItem( menu, item )
-#define myEnableMenuItem( menu, item ) EnableMenuItem( menu, item )
-inline void SetCursorToArrow(void) {
-	Cursor	arrow;	
-	SetCursor(GetQDGlobalsArrow(&arrow));
-}
-inline void myValidWindowRect(WindowRef theWindow, const Rect * theRect) {
-	ValidWindowRect(theWindow, theRect);
-}
-inline void myInValidWindowRect(WindowRef theWindow, const Rect * theRect) {
-	InvalWindowRect(theWindow, theRect);
-}
-inline void SpinCursor(int ) {}
-#else /*non-Carbon function definitions*/
-#include <CursorCtl.h>  //Only needed for pre-carbon builds
-#define myDisableMenuItem( menu, item ) DisableItem( menu, item )
-#define myEnableMenuItem( menu, item ) EnableItem( menu, item )
-inline void SetCursorToArrow(void) {
-	SetCursor (&qd.arrow);
-}
-inline void myValidWindowRect(WindowPtr , const Rect * theRect) {
-	ValidRect(theRect);
-}
-inline void myInValidWindowRect(WindowPtr , const Rect * theRect) {
-	InvalRect(theRect);
-}
-#ifndef powerc
-inline DialogPtr GetDialogFromWindow(WindowPtr a) { return a;}
-inline void SetPortDialogPort(DialogPtr theDialog) {SetPort(theDialog);}
-#endif
-inline Pattern * GetQDGlobalsBlack(Pattern * black) {*black = qd.black; return black;}
-inline WindowPtr GetControlOwner(ControlRef thecontrol) {return ((**thecontrol).contrlOwner);}
-inline Rect * GetControlBounds(ControlRef theControl, Rect * bounds) {*bounds = (**theControl).contrlRect; return bounds;}
-inline PixMapHandle GetPortPixMap(CGrafPtr thePort) {return thePort->portPixMap;}
-#endif
-
-//#define DEBUG_IT	// Uncomment this flag to enable debug code
-#ifdef DEBUG_IT
-#define FailMessage(cond, s)								\
-	if (cond) {												\
-		DebugStr ((ConstStr255Param)"\p"#s);				\
-	}														
-#else
-#define FailMessage(cond, s)								\
-	((void)	0)
-#endif// DEBUG_IT
-
-#ifdef DEBUG_IT
-#define DebugMessage(s)			DebugStr ((ConstStr255Param)"\p"#s)
-#else
-#define DebugMessage(s)			((void)	0)
-#endif// DEBUG_IT
-#pragma options align=power		//This shouldn't be needed, but CW9 seemed to need it for 68K
-
-/* Define HiWrd and LoWrd macros for efficiency. */
-#define HiWrd(aLong)	(((aLong) >> 16) & 0xFFFF)
-#define LoWrd(aLong)	((aLong) & 0xFFFF)
-//#ifndef fabs
-//#define fabs(aaFloat)	(((aaFloat)>=0.0) ? (aaFloat) : -(aaFloat))
-//#endif
-#define MAX(x, y)		(((x)>(y)) ? (x) : (y))
-#define MIN(x, y)		(((x)>(y)) ? (y) : (x))
-#define fsign(x)		(((x)<0.0) ? -1.0 : 1.0)
-
-#define kMinDocDim			150			//Min size (height and width) of the main display
-#define kBarHeight			15			//Scroll bar height (or width)
-#define	rDitherPatterns		0			//Dither patterns rsrc #
-#define kIStringID			128
-#define kerrstrings			129			//Indexed strings for error messages
-#define kMenuStringsID		130			//indexed strings for menu items
-#define kConfirmStrings		131			//ind. strings for confirmation dialogs
-#define rMessageAlert		130
-#define kConfirmationAlert	131
-#define kUncaughtAlert		132
-#define kYesOrNoAlert		133
-#define kDataErrMsgs		134
-#define kSaveWarningAlert	134
-#define kGenLDEFID			200			//General use LDEF resource ID
-/* Structure used for dithering patterns */
-	typedef struct PatList {
-		short	patListSize;	/* Size */
-		Pattern	patList[1];		/* Pointer to varible size arrary */
-	} **PatListHandle;
-
-//Special global routines
-void MessageAlert (Str255 message);
-bool ConfirmationDialog(short ResID, short itemNum);
-void MessageAlertAndQuit (Str255 message);
-bool YesOrNoDialog(short ResID, short itemNum);
-void MessageAlertByID(const short ResID, const short itemNum);
-void ShowAboutMeDialog(void);
-Boolean FrontApp(void);
-
-#endif	//End of Mac definitions!
 
 #ifdef __wxBuild__
 #include "mmp_gl.h"
@@ -198,7 +50,6 @@ int strcasecmp(const char * a, const char * b);
 int strncasecmp(const char * a, const char * b, int l);
 #endif
 
-#define UseOpenGL
 typedef char * Ptr;
 typedef unsigned char Boolean;
 typedef unsigned char Str255 [256];

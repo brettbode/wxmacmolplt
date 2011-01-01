@@ -346,17 +346,9 @@ void Surf1DBase::Export(BufferFile * Buffer, exportFileType /*eft*/) {
 void Surf2DBase::Export(BufferFile * Buffer, exportFileType eft) {
 	float * lGrid;
 	char * label = GetLabel();
-#ifdef UseHandles
-	HLock(Grid);
-	lGrid = (float *) *Grid;
-#else
 	lGrid = Grid;
-#endif
 	Surface::Export2D(lGrid, NumGridPoints, &Origin, &XInc, &YInc, label, Buffer);
 	/* if (label) delete [] label; */
-#ifdef UseHandles
-	HUnlock(Grid);
-#endif
 }
 void Surf2DBase::Draw2D(MoleculeData * lData, long hoffset, long voffset, float scale) {
 	if (Visible) {
@@ -416,12 +408,7 @@ void Surf2DBase::Contour2DGrid(MoleculeData * lData, long hoffset, long voffset,
 
 	long NumPoints = NumGridPoints;
 	float * lGrid;
-#ifdef UseHandles
-	HLock(Grid);
-	lGrid = (float *) *Grid;
-#else
 	lGrid = Grid;
-#endif
 
 	CPoint3D	XGridMin, XGridInc, YGridInc, OutPt;
 	XGridMin = Origin;
@@ -584,9 +571,6 @@ void Surf2DBase::Contour2DGrid(MoleculeData * lData, long hoffset, long voffset,
 		}
 		ContourValue += ContourValueInc;
 	}
-#ifdef UseHandles
-	HUnlock(Grid);
-#endif
 	RGBForeColor(&savecolor);
 #endif	//end of wxBuild ifdef
 }
@@ -793,11 +777,7 @@ long Surf2DBase::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 /* member functions for the base 3D surface class */
 Surf3DBase::Surf3DBase(WinPrefs * Prefs) {
 	ContourHndl = NULL;
-#ifdef UseHandles
-	VertexHndl = NULL;
-#else
 	VertexList = NULL;
-#endif
 	List = NULL;
 	Grid = NULL;
 	SurfaceNormals = NULL;
@@ -824,11 +804,7 @@ Surf3DBase::Surf3DBase(void) : Surface() {
 	List = NULL;
 	Grid = NULL;
 	SurfaceNormals = NULL;
-#ifdef UseHandles
-	VertexHndl = NULL;
-#else
 	VertexList = NULL;
-#endif
 	GridAllocation = ContourAllocation = ListAllocation = SNormAllocation = VertexAllocation = 0;
 	NumVertices = NumPosContourTriangles = NumNegContourTriangles = 0;
 	GridMin = GridMax = 0;
@@ -840,12 +816,7 @@ Surf3DBase::~Surf3DBase(void) {
 }
 void Surf3DBase::Export(BufferFile * Buffer, exportFileType eft) {
 	float * lGrid;
-#ifdef UseHandles
-	HLock(Grid);
-	lGrid = (float *) *Grid;
-#else
 	lGrid = Grid;
-#endif
 	char * label = GetLabel();
 	// our text file type
 	if (eft == 0) {
@@ -864,9 +835,6 @@ void Surf3DBase::Export(BufferFile * Buffer, exportFileType eft) {
 	}
 		
 	/* if (label) delete [] label; */
-#ifdef UseHandles
-	HUnlock(Grid);
-#endif
 }
 //Call to define the 3D volume (meaning the origin, x,y,z increments and
 //the number of grid points along each axis
@@ -935,85 +903,31 @@ void Surf3DBase::SetupGridParameters(Frame * lFrame) {
 	}
 }
 void Surf3DBase::AllocateGrid(long NumPoints) {
-#ifdef UseHandles	//The main point of using handles here is to use temp memory out of the system heap
-	OSErr	myErr;
-	Grid = TempNewHandle(NumPoints*sizeof(float), &myErr);
-	if (Grid == NULL) {	//Try getting memory out of my heap
-		Grid = NewHandle(NumPoints*sizeof(float));
-	}
-#else
 	Grid = new float[NumPoints];
-#endif
 	if (Grid) GridAllocation = NumPoints;
 };
 bool Surf3DBase::AllocateContour(long NumPoints) {
-#ifdef UseHandles	//The main point of using handles here is to use temp memory out of the system heap
-	OSErr	myErr;
-	ContourHndl = TempNewHandle(NumPoints*sizeof(CPoint3D), &myErr);
-	if (ContourHndl == NULL) {	//Try getting memory out of my heap
-		ContourHndl = NewHandle(NumPoints*sizeof(CPoint3D));
-	}
-	VertexHndl = TempNewHandle(6*NumPoints*sizeof(long), &myErr);
-	if (VertexHndl == NULL) {	//Try getting memory out of my heap
-		VertexHndl = NewHandle(6*NumPoints*sizeof(long));
-	}
-	if (ContourHndl) ContourAllocation = NumPoints;
-	if (VertexHndl) VertexAllocation = 6*NumPoints;
-	return ((ContourHndl != NULL)&&(VertexHndl != NULL));
-#else
 	ContourHndl = new CPoint3D[NumPoints];
 	VertexList = new long[6*NumPoints];
 	if (ContourHndl) ContourAllocation = NumPoints;
 	if (VertexList) VertexAllocation = 6*NumPoints;
 	return ((ContourHndl != NULL)&&(VertexList != NULL));
-#endif
 };
 bool Surf3DBase::AllocateContour(long NumVertices, long NumTriangles) {
-#ifdef UseHandles	//The main point of using handles here is to use temp memory out of the system heap
-	OSErr	myErr;
-	ContourHndl = TempNewHandle(NumVertices*sizeof(CPoint3D), &myErr);
-	if (ContourHndl == NULL) {	//Try getting memory out of my heap
-		ContourHndl = NewHandle(NumVertices*sizeof(CPoint3D));
-	}
-	VertexHndl = TempNewHandle(3*NumTriangles*sizeof(long), &myErr);
-	if (VertexHndl == NULL) {	//Try getting memory out of my heap
-		VertexHndl = NewHandle(3*NumTriangles*sizeof(long));
-	}
-	if (ContourHndl) ContourAllocation = NumVertices;
-	if (VertexHndl) VertexAllocation = 3*NumTriangles;
-	return ((ContourHndl != NULL)&&(VertexHndl != NULL));
-#else
 	ContourHndl = new CPoint3D[NumVertices];
 	VertexList = new long[3*NumTriangles];
 	if (ContourHndl) ContourAllocation = NumVertices;
 	if (VertexList) VertexAllocation = 3*NumTriangles;
 	return ((ContourHndl != NULL)&&(VertexList != NULL));
-#endif
 };
 void Surf3DBase::AllocateList(long NumPoints) {
 	if (NumPoints <= 0 ) NumPoints = ContourAllocation;
-#ifdef UseHandles	//The main point of using handles here is to use temp memory out of the system heap
-	OSErr	myErr;
-	List = TempNewHandle(NumPoints*sizeof(float), &myErr);
-	if (List == NULL) {	//Try getting memory out of my heap
-		List = NewHandle(NumPoints*sizeof(float));
-	}
-#else
 	List = new float[NumPoints];
-#endif
 	if (List) ListAllocation = NumPoints;
 };
 void Surf3DBase::AllocateNormals(long NumPoints) {
 	if (NumPoints <= 0 ) NumPoints = ContourAllocation;
-#ifdef UseHandles	//The main point of using handles here is to use temp memory out of the system heap
-	OSErr	myErr;
-	SurfaceNormals = TempNewHandle(NumPoints*sizeof(CPoint3D), &myErr);
-	if (SurfaceNormals == NULL) {	//Try getting memory out of my heap
-		SurfaceNormals = NewHandle(NumPoints*sizeof(CPoint3D));
-	}
-#else
 	SurfaceNormals = new CPoint3D[NumPoints];
-#endif
 	if (SurfaceNormals) SNormAllocation = NumPoints;
 };
 //The grid and contour are not rotated, just cleared. Thus the
@@ -1066,22 +980,9 @@ void Surf3DBase::Contour3DGrid(Progress * lProgress) {
 		return;
 	}
 
-#ifdef UseHandles
-	HLock(ContourHndl);
-	Contour = (CPoint3D *) *ContourHndl;
-	HLock(VertexHndl);
-	long * VertexList = (long *) *VertexHndl;
-	if (ComputeNormals) {
-		HLock(SurfaceNormals);
-		ContourNorm = (CPoint3D *) *SurfaceNormals;
-	}
-	HLock(Grid);
-	Grid3D = (float *) *Grid;
-#else
 	Contour = ContourHndl;
 	if (ComputeNormals) ContourNorm = SurfaceNormals;
 	Grid3D = Grid;
-#endif
 
 	float TestPoint[8];
 	
@@ -1104,21 +1005,6 @@ void Surf3DBase::Contour3DGrid(Progress * lProgress) {
 						//this cube in the vertexarrays
 					if ((NumVertices+12)>=ContourAllocation) {
 						MaxContourPts = ContourAllocation + NumGridPoints*NumGridPoints;
-#ifdef UseHandles
-						HUnlock(ContourHndl);	//unlock to make it easier to move blocks of memory
-						SetHandleSize(ContourHndl, MaxContourPts*sizeof(CPoint3D));//Attempt to resize the handle
-						HLock(ContourHndl);
-						Contour = (CPoint3D *) *ContourHndl;
-						if (ComputeNormals) {
-							HUnlock(SurfaceNormals);	//unlock to make it easier to move blocks of memory
-							SetHandleSize(SurfaceNormals, MaxContourPts*sizeof(CPoint3D));//Attempt to resize the handle
-							HLock(SurfaceNormals);
-							ContourNorm = (CPoint3D *) *SurfaceNormals;
-							ContourAllocation = (GetHandleSize(SurfaceNormals)/sizeof(CPoint3D));
-							SNormAllocation = ContourAllocation;
-						} else
-							ContourAllocation = (GetHandleSize(ContourHndl)/sizeof(CPoint3D));
-#else
 						CPoint3D * tempC = new CPoint3D[MaxContourPts];
 						if (tempC) {
 							for (long i=0; i<NumVertices; i++)
@@ -1137,7 +1023,6 @@ void Surf3DBase::Contour3DGrid(Progress * lProgress) {
 								SNormAllocation = MaxContourPts;
 							} else ContourAllocation = SNormAllocation;	//increase failed so set the contour size back
 						}
-#endif
 						if ((NumVertices+12)>=ContourAllocation)
 							goto Exit;	//Allocation failed so bail
 					}
@@ -1312,13 +1197,6 @@ void Surf3DBase::Contour3DGrid(Progress * lProgress) {
 							//Check on memory and attempt to add if needed
 						if ((3*nContourTriangles+30)>=VertexAllocation) {
 							long NewNumVertexes = VertexAllocation + NumGridPoints*NumGridPoints;
-#ifdef UseHandles
-							HUnlock(VertexHndl);	//unlock to make it easier to move blocks of memory
-							SetHandleSize(VertexHndl, NewNumVertexes*sizeof(long));//Attempt to resize the handle
-							HLock(VertexHndl);
-							VertexList = (long *) *VertexHndl;
-							VertexAllocation = (GetHandleSize(VertexHndl)/sizeof(long));
-#else
 							long * tempV = new long[NewNumVertexes];
 							if (tempV) {
 								for (long i=0; i<(3*nContourTriangles); i++)
@@ -1327,7 +1205,6 @@ void Surf3DBase::Contour3DGrid(Progress * lProgress) {
 								VertexList = tempV;
 								VertexAllocation = NewNumVertexes;
 							}
-#endif
 							if ((3*nContourTriangles+30)>=VertexAllocation)
 								goto Exit;	//Allocation failed so bail
 						}
@@ -1361,16 +1238,6 @@ void Surf3DBase::Contour3DGrid(Progress * lProgress) {
 	}
 Exit:
 	if (ComputeNormals) NormalizeNormalArray(ContourNorm, NumVertices);
-#ifdef UseHandles
-	HUnlock(Grid);	
-	HUnlock(ContourHndl);
-	HUnlock(VertexHndl);
-	if (ComputeNormals) HUnlock(SurfaceNormals);
-		//Trim down any extra memory on the contour handles
-	SetHandleSize(ContourHndl, NumVertices*sizeof(CPoint3D));
-	SetHandleSize(VertexHndl, 3*nContourTriangles*sizeof(long));
-	if (ComputeNormals) SetHandleSize(SurfaceNormals, NumVertices*sizeof(CPoint3D));
-#endif
 	if (PreviousYZz) delete [] PreviousYZz;	//free local storage
 	if (CurrentYZz) delete [] CurrentYZz;
 	if (PreviousYZy) delete [] PreviousYZy;
@@ -1433,16 +1300,8 @@ void Surf3DBase::AdjustSurfaceNormals(void) {
 	CPoint3D	AveVec;
 	CPoint3D *	ContourNorm;
 	
-#ifdef UseHandles
-	if (!VertexHndl || !SurfaceNormals) return;
-	HLock(VertexHndl);
-	long * VertexList = (long *) *VertexHndl;
-	HLock(SurfaceNormals);
-	ContourNorm = (CPoint3D *) *SurfaceNormals;
-#else
 	if (!VertexList || !SurfaceNormals) return;
 	ContourNorm = SurfaceNormals;
-#endif
 
 //	for (unsigned int pass=0; pass < 2; pass++) {
 //		if (pass == 0) {
@@ -1500,10 +1359,6 @@ void Surf3DBase::AdjustSurfaceNormals(void) {
 			}
 		}
 //	}
-#ifdef UseHandles
-	HUnlock(VertexHndl);
-	HUnlock(SurfaceNormals);
-#endif
 }
 
 /* ------------------------------------------------------------------------- */
@@ -1945,17 +1800,6 @@ void SortContourPoints(long *Points, unsigned char index, long *VertexList, long
 							//Check on memory and attempt to add if needed
 						if ((nContourPoints+30)>=MaxContourPts) {
 							MaxContourPts += NumGridPoints*NumGridPoints;
-#ifdef UseHandles
-							HUnlock(ContourHndl);	//unlock to make it easier to move blocks of memory
-							SetHandleSize(ContourHndl, MaxContourPts*sizeof(CPoint3D));//Attempt to resize the handle
-							HLock(ContourHndl);
-							Contour = (CPoint3D *) *ContourHndl;
-							HUnlock(SurfaceNormals);	//unlock to make it easier to move blocks of memory
-							SetHandleSize(SurfaceNormals, MaxContourPts*sizeof(CPoint3D));//Attempt to resize the handle
-							HLock(SurfaceNormals);
-							ContourNorm = (CPoint3D *) *SurfaceNormals;
-							MaxContourPts = (GetHandleSize(SurfaceNormals)/sizeof(CPoint3D));
-#else
 							CPoint3D * tempC = new CPoint3D[MaxContourPts];
 							if (tempC) {
 								for (long i=0; i<nContourPoints; i++)
@@ -1965,7 +1809,6 @@ void SortContourPoints(long *Points, unsigned char index, long *VertexList, long
 								ContourAllocation = MaxContourPts;
 							} else MaxContourPts = ContourAllocation;
 							needs work here
-#endif
 							if ((nContourPoints+30)>=MaxContourPts)
 								goto Exit;	//Allocation failed so bail
 						}

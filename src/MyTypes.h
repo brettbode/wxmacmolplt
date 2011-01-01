@@ -14,16 +14,6 @@ Added OpenGL version of Draw3D to Surface 6/2001 BMB
 #ifndef __BFile__
 #include "BFiles.h"
 #endif
-#ifdef QuickDraw3DHeaders
-#ifndef QD3D_h
-#include <QD3D.h>
-#endif
-#endif
-#ifdef QuesaHeaders
-#ifndef QUESA_HDR
-#include <Quesa.h>
-#endif
-#endif
 #include <vector>
 #include <string>
 #include <map>
@@ -32,18 +22,6 @@ Added OpenGL version of Draw3D to Surface 6/2001 BMB
 #define kMaxAtomTypes		130
 #define kMaxBondTypes		4
 
-#if 0
-typedef class MoleculeData MoleculeData;
-typedef class WinPrefs WinPrefs;
-typedef class Progress Progress;
-typedef struct GaussHermiteData GaussHermiteData;
-typedef class BasisSet BasisSet;
-typedef class Frame Frame;
-typedef class InputData InputData;
-typedef class Internals Internals;
-typedef class XMLElement XMLElement;
-typedef class MolDisplayWin MolDisplayWin;
-#endif
 class MoleculeData;
 class WinPrefs;
 class Progress;
@@ -650,9 +628,6 @@ class Surface {
 		void SetLabel(const char * NewLabel);
 		inline bool DefaultLabel(void) {return has_default_label;};
 		virtual bool Needs2DPlane(void) const;
-#ifndef __wxBuild__
-		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window)=0;
-#endif
 		virtual void Update(MoleculeData * MainData);
 		virtual SurfaceType GetSurfaceType(void) const = 0;
 		virtual bool isTransparent(void) const {return false;};
@@ -676,13 +651,8 @@ class Surface {
 		virtual bool ExportPossible(void) const {return false;};
 		virtual bool NeedsUpdateDuringRotation(void) const {return false;};
 		virtual void Draw2D(MoleculeData * lData, long hoffset, long voffset, float scale);
-#ifdef QuickDraw3D
-		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs)=0;
-#endif
-#ifdef UseOpenGL
 		virtual long Draw3DGL(MoleculeData * lData,  WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0)=0;
 		virtual long getTriangleCount(void) const {return 0;};
-#endif
 		inline long getTargetOrbSet(void) const {return OrbSet;};
 		inline void setTargetOrbSet(const long & target) {OrbSet = target;};
 };

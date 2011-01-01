@@ -62,8 +62,6 @@
 #undef AddAtom
 #endif
 
-#define PI 3.14159265
-
 extern WinPrefs * gPreferences;
 
 	//Local function definitions
@@ -1772,9 +1770,6 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 		iscanerr = sscanf(&LineText[LinePos], "%1s%ld", token, &fileAtoms);
 		if (iscanerr != 2) return 0;
 	} else return 0;	// NATOMS keyword not found!
-#ifndef __wxBuild__
-	FileSave = 5;	//bit 2 marks .mol files
-#endif
 	LinePos = FindKeyWord(LineText, "NKINDS", 6);
 	if (LinePos >= 0) {
 		LinePos += 6;
@@ -4037,13 +4032,6 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 	long nSkip = 0;
 
 	if (!Append) {
-#ifdef __wxBuild__
-#ifndef WIN32
-#warning Need to set file type
-#endif
-#else
-		FileSave = 17; //IRC bit 5 plus bit 1 for saving
-#endif
 		if (!Buffer->LocateKeyWord("IRC INFORMATION PACKET", 22)) return 0;
 		if (!Buffer->LocateKeyWord("POINT=", 6)) return 0;
 		Buffer->GetLine(LineText);
@@ -4251,7 +4239,6 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append,
 			long flip, float offset) {
 
-//	Frame *			lpFrame=NULL;
 	bool			QPpresent, KeyWordFound, newQPformat=false;
 	long			NumAtoms, Elength, nskip=0, LinePos, EStartPos;
 	char			Etext[40], LineText[kMaxLineLength+1];
@@ -4261,13 +4248,6 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 	ProgressInd->ChangeText("Reading GAMESS DRC file...");
 	Frame * lFrame = MainData->cFrame;
 	if (!Append) {
-#ifdef __wxBuild__
-#ifndef WIN32
-#warning Need to setup file type
-#endif
-#else
-		FileSave = 33; //DRC bit 6 plus bit 1 for saving
-#endif
 	}
 	wxFileOffset FilePos = Buffer->GetFilePos();
 	QPpresent = Buffer->LocateKeyWord("Q          P", 12);
@@ -4949,12 +4929,7 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 		}
 		if (!Grid) throw MemoryError();
 		float * lGrid;
-#ifdef UseHandles
-		HLock(Grid);
-		lGrid = (float *) *Grid;
-#else
 		lGrid = Grid;
-#endif
 		if (FirstFile) for (LinePos=0; LinePos<TotalPoints; ++LinePos)
 			lGrid[LinePos] = 0.0;
 		Buffer->GetLine(Line);
@@ -4986,9 +4961,6 @@ void General2DSurface::ReadGrid(const bool Square, const bool UseMult, const dou
 			LinePos += nchar;
 			++n;
 		}
-#ifdef UseHandles
-		HUnlock(Grid);
-#endif
 
 		success = true;
 	}
@@ -5089,12 +5061,7 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 		if (FirstFile) AllocateGrid(TotalPoints);
 		if (!Grid) throw MemoryError();
 			float * lGrid;
-#ifdef UseHandles
-		HLock(Grid);
-		lGrid = (float *) *Grid;
-#else
 		lGrid = Grid;
-#endif
 		if (FirstFile) for (LinePos=0; LinePos<TotalPoints; ++LinePos)
 			lGrid[LinePos] = 0.0;
 		Buffer->GetLine(Line);
@@ -5126,9 +5093,6 @@ void General3DSurface::ReadGrid(const bool Square, const bool UseValue, const do
 			LinePos += nchar;
 			++n;
 		}
-#ifdef UseHandles
-		HUnlock(Grid);
-#endif
 
 		success = true;
 	}

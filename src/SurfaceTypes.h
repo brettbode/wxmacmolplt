@@ -16,13 +16,6 @@
 #ifndef __MyTypes__
 #include "MyTypes.h"
 #endif
-#ifdef powerc
-#ifndef QD3D_h
-#ifdef QuickDraw3D
-#include <QD3D.h>
-#endif
-#endif
-#endif
 #include <iostream>
 
 class OrbSurfBase {
@@ -115,11 +108,7 @@ class Surf1DBase : public Surface {
 
 class Surf2DBase : public Surface {
 	protected:
-#ifdef UseHandles
-		Handle		Grid;
-#else
 		float *		Grid;
-#endif
 		long		GridAllocation;
 		CPoint3D	Origin;
 		CPoint3D	XInc;
@@ -176,53 +165,27 @@ class Surf2DBase : public Surface {
 		void Read2DXML(XMLElement * sxml);
 		inline void FreeGrid(void) {
 			if (Grid) {
-#ifdef UseHandles
-				DisposeHandle(Grid);
-#else
 				delete [] Grid;
-#endif
 				Grid=NULL; GridAllocation = 0;
 			}
 		};
 		void AllocateGrid(long NumPoints) {
-#ifdef UseHandles	//The main point of using handles here is to use temp memory out of the system heap
-			OSErr	myErr;
-			Grid = TempNewHandle(NumPoints*sizeof(float), &myErr);
-			if (Grid == NULL) {	//Try getting memory out of my heap
-				Grid = NewHandle(NumPoints*sizeof(float));
-			}
-#else
 			Grid = new float[NumPoints];
-#endif
 			if (Grid) GridAllocation = NumPoints;
 		};
 		virtual void Draw2D(MoleculeData * lData, long hoffset, long voffset, float scale);
 		void Contour2DGrid(MoleculeData * lData, long hoffset, long voffset, float scale);
-#ifdef QuickDraw3D
-		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
-		void Contour2DGridQ3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
-#endif
-#ifdef UseOpenGL
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0);
 		void Contour2DGrid3DGL(MoleculeData * lData, WinPrefs * Prefs);
-#endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 };
 class Surf3DBase : public Surface {
 	protected:
-#ifdef UseHandles
-		Handle		ContourHndl;
-		Handle		VertexHndl;
-		Handle		List;
-		Handle		Grid;
-		Handle		SurfaceNormals;
-#else
 		CPoint3D *	ContourHndl;	//Actual vertex
 		long *		VertexList;	//Triangle vertex list
 		float *		List;
 		float *		Grid;
 		CPoint3D *	SurfaceNormals;
-#endif
 		long		GridAllocation;
 		long		ContourAllocation;
 		long		VertexAllocation;
@@ -308,32 +271,18 @@ class Surf3DBase : public Surface {
 		inline bool GridAvailable(void) const {return (Grid!=NULL);};
 		inline void FreeGrid(void) {
 			if (Grid) {
-#ifdef UseHandles
-				DisposeHandle(Grid);
-#else
 				delete [] Grid;
-#endif
 				Grid=NULL; GridAllocation = 0;
 			}
 		};
 		inline void FreeContour(void) {
 			if (ContourHndl) {
-#ifdef UseHandles
-				DisposeHandle(ContourHndl);
-#else
 				delete [] ContourHndl;
-#endif
 				ContourHndl=NULL; ContourAllocation = 0;
 			}
-#ifdef UseHandles
-			if (VertexHndl) {
-				DisposeHandle(VertexHndl);
-				VertexHndl=NULL;
-#else
 			if (VertexList) {
 				delete [] VertexList;
 				VertexList=NULL;
-#endif
 				VertexAllocation = 0;
 			}
 			if (List) FreeList();
@@ -341,21 +290,13 @@ class Surf3DBase : public Surface {
 		};
 		inline void FreeList(void) {
 			if (List) {
-#ifdef UseHandles
-				DisposeHandle(List);
-#else
 				delete [] List;
-#endif
 				List=NULL; ListAllocation = 0;
 			}
 		};
 		inline void FreeNormals(void) {
 			if (SurfaceNormals) {
-#ifdef UseHandles
-				DisposeHandle(SurfaceNormals);
-#else
 				delete [] SurfaceNormals;
-#endif
 				SurfaceNormals=NULL; SNormAllocation = 0;
 			}
 		};
@@ -368,7 +309,6 @@ class Surf3DBase : public Surface {
 		virtual bool ExportPossible(void) const {return GridAvailable();};
 		virtual void Export(BufferFile * Buffer, exportFileType eft);
 		virtual void RotateSurface(Matrix4D RotationMatrix);
-#ifdef UseOpenGL
 		void SetSurfaceColor(const float & surfaceValue, const RGBColor * pColor, const RGBColor * nColor, float & red, float & green, float & blue) const; //Pass the value/Max, does not need to between 1 and -1
 		long CreateSolidSurface(CPoint3D * Vertices, CPoint3D * Normals, long * VertexList,
 								long NumTriangles, RGBColor * SurfaceColor, float * SurfaceValue,
@@ -381,7 +321,6 @@ class Surf3DBase : public Surface {
 								long NumTriangles, RGBColor * SurfaceColor, float * SurfaceValue,
 								RGBColor * NColor, float MaxSurfaceValue, MoleculeData * );
 			virtual long getTriangleCount(void) const {return (NumPosContourTriangles+NumNegContourTriangles);};
-#endif
 		/* virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer) { */
 		/* } */
 		long ExportPOVSurface(CPoint3D *Vertices, CPoint3D *Normals, long *VertexList,
@@ -404,9 +343,6 @@ class General2DSurface : public Surf2DBase {
 	public:
 		General2DSurface(WinPrefs * Prefs);
 		General2DSurface(XMLElement * x);
-#ifndef __wxBuild__
-		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
-#endif
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kGeneral2DSurface;};
 		//pick and read a file containing the 2D grid
@@ -423,16 +359,8 @@ class General3DSurface : public Surf3DBase {
 		virtual SurfaceType GetSurfaceType(void) const {return kGeneral3DSurface;};
 			//pick and read a file containing the 3D grid
 		void ReadGrid(const bool Square, const bool UseValue, const double & MultValue);
-#ifndef __wxBuild__
-		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
-#endif
-#ifdef QuickDraw3D
-		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
-#endif
-#ifdef UseOpenGL
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0);
 		virtual long getTriangleCount(void) const;
-#endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		inline void GetMaxColor(RGBColor *temp) const {*temp=PosColor;};
@@ -448,16 +376,8 @@ class TEDensity3DSurface : public Surf3DBase {
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity3D;};
 		void UpdateData(TEDensity3DSurface * target);
-#ifndef __wxBuild__
-		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
-#endif
 		virtual void Update(MoleculeData * MainData);
-#ifdef QuickDraw3D
-		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
-#endif
-#ifdef UseOpenGL
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0);
-#endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * progress);
@@ -472,9 +392,6 @@ class TEDensity2DSurface : public Surf2DBase {
 		TEDensity2DSurface(WinPrefs * Prefs);
 		TEDensity2DSurface(TEDensity2DSurface * target);
 		TEDensity2DSurface(XMLElement * x);
-#ifndef __wxBuild__
-		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
-#endif
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kTotalDensity2D;};
 		virtual void WriteXML(XMLElement * parent) const;
@@ -488,9 +405,6 @@ class TEDensity1DSurface : public Surf1DBase {
 		TEDensity1DSurface(WinPrefs * Prefs);
 		TEDensity1DSurface(TEDensity1DSurface * target);
 		TEDensity1DSurface(XMLElement * x);
-#ifndef __wxBuild__
-		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
-#endif
 		virtual char *GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const { return kTotalDensity1D; }
 		virtual void WriteXML(XMLElement *parent) const;
@@ -505,9 +419,6 @@ class MEP2DSurface : public Surf2DBase {
 		MEP2DSurface(WinPrefs * Prefs);
 		MEP2DSurface(MEP2DSurface * target);
 		MEP2DSurface(XMLElement * x);
-#ifndef __wxBuild__
-		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
-#endif
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kMEP2D;};
 		virtual void WriteXML(XMLElement * parent) const;
@@ -520,19 +431,11 @@ class MEP3DSurface : public Surf3DBase {
 	public:
 		MEP3DSurface(WinPrefs * Prefs);
 		MEP3DSurface(XMLElement * x);
-#ifndef __wxBuild__
-		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
-#endif
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kMEP3D;};
 		void UpdateData(MEP3DSurface * target);
 		virtual void Update(MoleculeData * MainData);
-#ifdef QuickDraw3D
-		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
-#endif
-#ifdef UseOpenGL
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0);
-#endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMEPGrid(MoleculeData * MainData, Progress * progress);
@@ -547,16 +450,8 @@ class Orb3DSurface : public Surf3DBase, public OrbSurfBase {
 		Orb3DSurface(XMLElement * s);
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kOrb3DType;};
-#ifndef __wxBuild__
-		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
-#endif
 		virtual void Update(MoleculeData * MainData);
-#ifdef QuickDraw3D
-		virtual void Draw3D(MoleculeData * lData, TQ3GroupObject myGroup, WinPrefs * Prefs);
-#endif
-#ifdef UseOpenGL
 		virtual long Draw3DGL(MoleculeData * lData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program = 0);
-#endif
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * lProgress);
@@ -569,9 +464,6 @@ class Orb2DSurface : public Surf2DBase, public OrbSurfBase {
 		Orb2DSurface(WinPrefs * Prefs);
 		Orb2DSurface(Orb2DSurface * Original);
 		Orb2DSurface(XMLElement * x);
-#ifndef __wxBuild__
-		virtual SurfacePane * CreateSurfacePane(SurfacesWin * window);
-#endif
 		virtual char * GetLabel(void);
 		virtual SurfaceType GetSurfaceType(void) const {return kOrb2DType;};
 		virtual void WriteXML(XMLElement * parent) const;
