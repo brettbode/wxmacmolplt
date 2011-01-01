@@ -3750,6 +3750,8 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 	TypeOfRun		runType=InvalidRunType;
 	char			LineText[kMaxLineLength+1];
 	bool			FirstFrame = true;
+	long IRCnSkip = Prefs->GetDRCSkip();
+	long nSkip = 0;
 	
 	ProgressInd->ChangeText("Reading GAMESS trajectory file...");
 	Frame * lFrame = MainData->cFrame;
@@ -3786,236 +3788,240 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 		//search for the end of the packet?
 		//first line give atom counts, nat=       3 nfrg=       1 nqmmm=       0
 		Buffer->GetLine(LineText);
-		long NumAIAtoms=0, NumFragments=0, NumMDAtoms=0;
-		ReadLongKeyword(LineText, "NAT", &NumAIAtoms);
-		ReadLongKeyword(LineText, "NFRG", &NumFragments);
-		ReadLongKeyword(LineText, "NQMMM", &NumMDAtoms);
-		//second line is the x-axis and total energy, either ttotal or stotal
-		//STOTAL=   1.49848 sqrt(amu)*bohr   tot. E=      -91.6219797490 Hartree
-		Buffer->GetLine(LineText);
-		float xvalue;
-		double totE;
-		if (runType == IRCRun)
-			ReadFloatKeyword(LineText, "STOTAL", &xvalue);
-		else	//MD and DRC spell it TTOTAL
-			ReadFloatKeyword(LineText, "TTOTAL", &xvalue);
-		ReadDoubleKeyword(LineText, "TOT. E", totE);
+		if (nSkip >= IRCnSkip) {
+			nSkip = 0;
+			long NumAIAtoms=0, NumFragments=0, NumMDAtoms=0;
+			ReadLongKeyword(LineText, "NAT", &NumAIAtoms);
+			ReadLongKeyword(LineText, "NFRG", &NumFragments);
+			ReadLongKeyword(LineText, "NQMMM", &NumMDAtoms);
+			//second line is the x-axis and total energy, either ttotal or stotal
+			//STOTAL=   1.49848 sqrt(amu)*bohr   tot. E=      -91.6219797490 Hartree
+			Buffer->GetLine(LineText);
+			float xvalue;
+			double totE;
+			if (runType == IRCRun)
+				ReadFloatKeyword(LineText, "STOTAL", &xvalue);
+			else	//MD and DRC spell it TTOTAL
+				ReadFloatKeyword(LineText, "TTOTAL", &xvalue);
+			ReadDoubleKeyword(LineText, "TOT. E", totE);
 
-		xvalue *= flip;
-		xvalue += offset;
-		Frame * lFrame = NULL;
-		if (!Append && FirstFrame) {	
-			lFrame = MainData->Frames;
-			lFrame->time = xvalue;
-			FirstFrame = false;
-		} else
-			lFrame = MainData->LocateNewFrame(xvalue);
-		if (lFrame) {
-			lFrame->Energy = totE;
-			// DRCs have an extra line with the kinetic and potential energies
-			//POT. E=        -9.1287351998 kin. E=          .0016326701 Hartree
-			if (runType == DRCRun) {
-				//DRCs conserve energy so Tot E == Pot. E + kinetic E.
-				//Thus only need to store two of them.
-				Buffer->GetLine(LineText);
-				double kinE;
-				if (ReadDoubleKeyword(LineText, "KIN. E", kinE))
-					lFrame->SetEnergy(kinE, KineticEnergy);
-			} else if (runType == MolDynamics) {
-			// MD runs have two extra lines for energies
-			//POT. E=        -47726.960743 kcal/mol
-			//kin. E=             7.015829  trans KE=   5.422237  rot KE=   1.593592 kcal/mol
-			//Todo: For MD runs energy is not necessarily conserved so all energies could be stored
-			//Don't have the infrastructure for that at the moment.
-				Buffer->GetLine(LineText);
-				Buffer->GetLine(LineText);
-				double kinE;
-				if (ReadDoubleKeyword(LineText, "KIN. E", kinE))
-					lFrame->SetEnergy(kinE, KineticEnergy);
-			}
-
-			//setup the frame for the antipated atom count
-			if (!MainData->SetupFrameMemory(NumAIAtoms+NumFragments+NumMDAtoms, 0)) throw MemoryError();
-			
-			if ((NumAIAtoms > 0)&&Buffer->LocateKeyWord("----- QM PARTICLE COORDINATES", 29)) {
-				Buffer->SkipnLines(1);
-				ParseGLogLine(Buffer, lFrame, NumAIAtoms, 10, &(MainData->MaxSize));
-			}
-			if ((NumFragments > 0)&&Buffer->LocateKeyWord("----- EFP PARTICLE COORDINATES", 30)) {
-				Buffer->SkipnLines(1);
-				for (int ifrag=0; ifrag<NumFragments; ifrag++) {
-					mpAtom *atm;
-					CPoint3D dst_locs[3];
-					CPoint3D pos;
-					int fstart;
-					int match[3] = {0, 0, 0};
-					CPoint3D src_locs[3];
-					std::string labels[3];
-					long fragNum, fragmentsfound=0;
-					int i;
-					CPoint3D new_pos;
-					CPoint3D rot_pos;
-					CPoint3D curr_pos;
-					CPoint3D orig;
-					Matrix4D vec2vec;
-					CPoint3D src_vec;
-					CPoint3D dst_vec;
-					CPoint3D dst_vec2;
-					CPoint3D dst_norm;
-					CPoint3D mid_norm;
-					CPoint3D mid_vec1, mid_vec2;
-					float dot;
-					char	token[kMaxLineLength+1];
-
+			xvalue *= flip;
+			xvalue += offset;
+			Frame * lFrame = NULL;
+			if (!Append && FirstFrame) {	
+				lFrame = MainData->Frames;
+				lFrame->time = xvalue;
+				FirstFrame = false;
+			} else
+				lFrame = MainData->LocateNewFrame(xvalue);
+			if (lFrame) {
+				lFrame->Energy = totE;
+				// DRCs have an extra line with the kinetic and potential energies
+				//POT. E=        -9.1287351998 kin. E=          .0016326701 Hartree
+				if (runType == DRCRun) {
+					//DRCs conserve energy so Tot E == Pot. E + kinetic E.
+					//Thus only need to store two of them.
 					Buffer->GetLine(LineText);
-					while (ReadStringKeyword(LineText, "FRAGNAME", token)) {
-						if (!strcasecmp(token, "H2ORHF") || !strcasecmp(token, "H2ODFT")) {	//builtin EFP1 style is limited to H2O with known labels
-							MainData->FragmentNames.push_back(std::string(token));
-							long fragNum = MainData->FragmentNames.size();
-							CPoint3D	pos;
-							int		AtomType;
-							for (int i=0; i<3; ++i) {
-								AtomType = -1;
-								Buffer->GetLine(LineText);
-								//lines have format "label x, y, z"
-								sscanf(LineText, "%s %f %f %f", token, &pos.x, &pos.y, &pos.z);
-								int c = 0;
-								if ((token[0] == 'Z')||(token[0] == 'z')) c = 1;
-								if (!strcasecmp(&(token[c]), "O1")) AtomType = 8;
-								else if (!strcasecmp(&(token[c]), "H2")||!strcasecmp(&(token[c]), "H3")) AtomType = 1;
-								if (AtomType > 0) {
-									mpAtom * atm = lFrame->AddAtom(AtomType, pos);
+					double kinE;
+					if (ReadDoubleKeyword(LineText, "KIN. E", kinE))
+						lFrame->SetEnergy(kinE, KineticEnergy);
+				} else if (runType == MolDynamics) {
+				// MD runs have two extra lines for energies
+				//POT. E=        -47726.960743 kcal/mol
+				//kin. E=             7.015829  trans KE=   5.422237  rot KE=   1.593592 kcal/mol
+				//Todo: For MD runs energy is not necessarily conserved so all energies could be stored
+				//Don't have the infrastructure for that at the moment.
+					Buffer->GetLine(LineText);
+					Buffer->GetLine(LineText);
+					double kinE;
+					if (ReadDoubleKeyword(LineText, "KIN. E", kinE))
+						lFrame->SetEnergy(kinE, KineticEnergy);
+				}
+
+				//setup the frame for the antipated atom count
+				if (!MainData->SetupFrameMemory(NumAIAtoms+NumFragments+NumMDAtoms, 0)) throw MemoryError();
+				
+				if ((NumAIAtoms > 0)&&Buffer->LocateKeyWord("----- QM PARTICLE COORDINATES", 29)) {
+					Buffer->SkipnLines(1);
+					ParseGLogLine(Buffer, lFrame, NumAIAtoms, 10, &(MainData->MaxSize));
+				}
+				if ((NumFragments > 0)&&Buffer->LocateKeyWord("----- EFP PARTICLE COORDINATES", 30)) {
+					Buffer->SkipnLines(1);
+					for (int ifrag=0; ifrag<NumFragments; ifrag++) {
+						mpAtom *atm;
+						CPoint3D dst_locs[3];
+						CPoint3D pos;
+						int fstart;
+						int match[3] = {0, 0, 0};
+						CPoint3D src_locs[3];
+						std::string labels[3];
+						long fragNum, fragmentsfound=0;
+						int i;
+						CPoint3D new_pos;
+						CPoint3D rot_pos;
+						CPoint3D curr_pos;
+						CPoint3D orig;
+						Matrix4D vec2vec;
+						CPoint3D src_vec;
+						CPoint3D dst_vec;
+						CPoint3D dst_vec2;
+						CPoint3D dst_norm;
+						CPoint3D mid_norm;
+						CPoint3D mid_vec1, mid_vec2;
+						float dot;
+						char	token[kMaxLineLength+1];
+
+						Buffer->GetLine(LineText);
+						while (ReadStringKeyword(LineText, "FRAGNAME", token)) {
+							if (!strcasecmp(token, "H2ORHF") || !strcasecmp(token, "H2ODFT")) {	//builtin EFP1 style is limited to H2O with known labels
+								MainData->FragmentNames.push_back(std::string(token));
+								long fragNum = MainData->FragmentNames.size();
+								CPoint3D	pos;
+								int		AtomType;
+								for (int i=0; i<3; ++i) {
+									AtomType = -1;
+									Buffer->GetLine(LineText);
+									//lines have format "label x, y, z"
+									sscanf(LineText, "%s %f %f %f", token, &pos.x, &pos.y, &pos.z);
+									int c = 0;
+									if ((token[0] == 'Z')||(token[0] == 'z')) c = 1;
+									if (!strcasecmp(&(token[c]), "O1")) AtomType = 8;
+									else if (!strcasecmp(&(token[c]), "H2")||!strcasecmp(&(token[c]), "H3")) AtomType = 1;
+									if (AtomType > 0) {
+										mpAtom * atm = lFrame->AddAtom(AtomType, pos);
+										atm->SetFragmentNumber(fragNum);
+									}
+								}
+							}
+							
+							// Custom fragment type.
+							else {
+								
+								// Read the three atoms that setup the fragment.  These
+								// should be in angstroms.
+								MainData->FragmentNames.push_back(std::string(token));
+								fragNum = MainData->FragmentNames.size();
+								char label[kMaxLineLength];
+								for (i = 0; i < 3; ++i) {
+									Buffer->GetLine(LineText);
+									sscanf(LineText, "%s %f %f %f", label,
+										   &(dst_locs[i].x), &(dst_locs[i].y),
+										   &(dst_locs[i].z));
+									labels[i] = label;
+									/* std::cout << "Line: " << Line << std::endl; */
+									/* atm = lFrame->AddAtom(1, dst_locs[i]); */
+									/* atm->SetFragmentNumber(fragNum); */
+								}
+								
+								//The fragment definition must be either already in the local list or in 
+								//the builder library. FindFragmentDef will find it either way.
+								std::map<std::string, EFrag>::const_iterator frag;
+								frag = FindFragmentDef(token);
+								if (frag == MainData->efrags.end()) {
+									wxString msg;
+									msg.Printf(_("Unable to locate correct EFP2 fragment definition group named %s"), token);
+									wxLogMessage(msg);
+									throw DataError();
+								}
+								
+								fstart = lFrame->NumAtoms;
+								const std::vector<EFragAtom>& labeled_atoms = frag->second.GetAtoms();
+								std::vector<EFragAtom>::const_iterator efrag_atom;
+								
+								for (efrag_atom = labeled_atoms.begin();
+									 efrag_atom != labeled_atoms.end();
+									 ++efrag_atom) {
+									
+									if (efrag_atom->GetLabel().compare(labels[0]) == 0) {
+										match[0] = lFrame->NumAtoms;
+										src_locs[0] = efrag_atom->GetCoords();
+									} else if (efrag_atom->GetLabel().compare(labels[1]) == 0) {
+										match[1] = lFrame->NumAtoms;
+										src_locs[1] = efrag_atom->GetCoords();
+									} else if (efrag_atom->GetLabel().compare(labels[2]) == 0) {
+										match[2] = lFrame->NumAtoms;
+										src_locs[2] = efrag_atom->GetCoords();
+									}
+									
+									atm = lFrame->AddAtom(efrag_atom->GetAtomicNumber(),
+														  efrag_atom->GetCoords());
 									atm->SetFragmentNumber(fragNum);
 								}
-							}
-						}
-						
-						// Custom fragment type.
-						else {
-							
-							// Read the three atoms that setup the fragment.  These
-							// should be in angstroms.
-							MainData->FragmentNames.push_back(std::string(token));
-							fragNum = MainData->FragmentNames.size();
-							char label[kMaxLineLength];
-							for (i = 0; i < 3; ++i) {
-								Buffer->GetLine(LineText);
-								sscanf(LineText, "%s %f %f %f", label,
-									   &(dst_locs[i].x), &(dst_locs[i].y),
-									   &(dst_locs[i].z));
-								labels[i] = label;
-								/* std::cout << "Line: " << Line << std::endl; */
-								/* atm = lFrame->AddAtom(1, dst_locs[i]); */
-								/* atm->SetFragmentNumber(fragNum); */
-							}
-							
-							//The fragment definition must be either already in the local list or in 
-							//the builder library. FindFragmentDef will find it either way.
-							std::map<std::string, EFrag>::const_iterator frag;
-							frag = FindFragmentDef(token);
-							if (frag == MainData->efrags.end()) {
-								wxString msg;
-								msg.Printf(_("Unable to locate correct EFP2 fragment definition group named %s"), token);
-								wxLogMessage(msg);
-								throw DataError();
-							}
-							
-							fstart = lFrame->NumAtoms;
-							const std::vector<EFragAtom>& labeled_atoms = frag->second.GetAtoms();
-							std::vector<EFragAtom>::const_iterator efrag_atom;
-							
-							for (efrag_atom = labeled_atoms.begin();
-								 efrag_atom != labeled_atoms.end();
-								 ++efrag_atom) {
 								
-								if (efrag_atom->GetLabel().compare(labels[0]) == 0) {
-									match[0] = lFrame->NumAtoms;
-									src_locs[0] = efrag_atom->GetCoords();
-								} else if (efrag_atom->GetLabel().compare(labels[1]) == 0) {
-									match[1] = lFrame->NumAtoms;
-									src_locs[1] = efrag_atom->GetCoords();
-								} else if (efrag_atom->GetLabel().compare(labels[2]) == 0) {
-									match[2] = lFrame->NumAtoms;
-									src_locs[2] = efrag_atom->GetCoords();
+								// We first find a rotation that one will align a vector
+								// in the fragment template to the corresponding vector in
+								// the destination space.
+								dst_vec = dst_locs[1] - dst_locs[0];
+								Normalize3D(&dst_vec);
+								
+								src_vec = src_locs[1] - src_locs[0];
+								Normalize3D(&src_vec);
+								
+								SetRotationMatrix(vec2vec, &src_vec, &dst_vec);
+								
+								// The common vector now serves as an axis of rotation.  We
+								// need to rotate the fragment template plane so that it
+								// coincides with the destination plane.  The angle of rotation
+								// can be determined by the angle between the two planes'
+								// normals.
+								lFrame->GetAtomPosition(match[0], orig);
+								Rotate3DOffset(vec2vec, src_locs[1] - orig, &mid_vec1);
+								Rotate3DOffset(vec2vec, src_locs[2] - orig, &mid_vec2);
+								UnitCrossProduct3D(&mid_vec1, &mid_vec2, &mid_norm);
+								
+								dst_vec2 = dst_locs[2] - dst_locs[0];
+								UnitCrossProduct3D(&dst_vec, &dst_vec2, &dst_norm);
+								
+								Matrix4D tri2tri;
+								dot = DotProduct3D(&mid_norm, &dst_norm);
+								
+								// Technically, the axis of rotation (the aligned vector)
+								// might be facing a different direction than we think it
+								// is. To be consistent, we instead use the axis that is
+								// normal to both planes' normals. It points in the same
+								// or opposite direction as dst_vec.
+								CPoint3D axis;
+								UnitCrossProduct3D(&mid_norm, &dst_norm, &axis);
+								RotateAroundAxis(tri2tri, axis, acos(dot) * 180.0f / kPi);
+								
+								// We concatenate the two rotation matrices.
+								Matrix4D transform;
+								MultiplyMatrix(vec2vec, tri2tri, transform);
+								
+								// Okay, for each atom we added for this fragment instance,
+								// we move all fragment atoms into destination space. We
+								// translate to make the base fragment atom the origin and
+								// then rotate to align the fragment with the destination
+								// plane, and then translate by the base destination atom.
+								for (long i = fstart; i < lFrame->NumAtoms; ++i) {
+									lFrame->GetAtomPosition(i, curr_pos);
+									new_pos = curr_pos - orig;
+									Rotate3DOffset(transform, new_pos, &rot_pos);
+									new_pos = rot_pos + dst_locs[0];
+									lFrame->SetAtomPosition(i, new_pos);
 								}
-								
-								atm = lFrame->AddAtom(efrag_atom->GetAtomicNumber(),
-													  efrag_atom->GetCoords());
-								atm->SetFragmentNumber(fragNum);
+	//							Buffer->SkipnLines(lFrame->NumAtoms - fstart);
 							}
-							
-							// We first find a rotation that one will align a vector
-							// in the fragment template to the corresponding vector in
-							// the destination space.
-							dst_vec = dst_locs[1] - dst_locs[0];
-							Normalize3D(&dst_vec);
-							
-							src_vec = src_locs[1] - src_locs[0];
-							Normalize3D(&src_vec);
-							
-							SetRotationMatrix(vec2vec, &src_vec, &dst_vec);
-							
-							// The common vector now serves as an axis of rotation.  We
-							// need to rotate the fragment template plane so that it
-							// coincides with the destination plane.  The angle of rotation
-							// can be determined by the angle between the two planes'
-							// normals.
-							lFrame->GetAtomPosition(match[0], orig);
-							Rotate3DOffset(vec2vec, src_locs[1] - orig, &mid_vec1);
-							Rotate3DOffset(vec2vec, src_locs[2] - orig, &mid_vec2);
-							UnitCrossProduct3D(&mid_vec1, &mid_vec2, &mid_norm);
-							
-							dst_vec2 = dst_locs[2] - dst_locs[0];
-							UnitCrossProduct3D(&dst_vec, &dst_vec2, &dst_norm);
-							
-							Matrix4D tri2tri;
-							dot = DotProduct3D(&mid_norm, &dst_norm);
-							
-							// Technically, the axis of rotation (the aligned vector)
-							// might be facing a different direction than we think it
-							// is. To be consistent, we instead use the axis that is
-							// normal to both planes' normals. It points in the same
-							// or opposite direction as dst_vec.
-							CPoint3D axis;
-							UnitCrossProduct3D(&mid_norm, &dst_norm, &axis);
-							RotateAroundAxis(tri2tri, axis, acos(dot) * 180.0f / kPi);
-							
-							// We concatenate the two rotation matrices.
-							Matrix4D transform;
-							MultiplyMatrix(vec2vec, tri2tri, transform);
-							
-							// Okay, for each atom we added for this fragment instance,
-							// we move all fragment atoms into destination space. We
-							// translate to make the base fragment atom the origin and
-							// then rotate to align the fragment with the destination
-							// plane, and then translate by the base destination atom.
-							for (long i = fstart; i < lFrame->NumAtoms; ++i) {
-								lFrame->GetAtomPosition(i, curr_pos);
-								new_pos = curr_pos - orig;
-								Rotate3DOffset(transform, new_pos, &rot_pos);
-								new_pos = rot_pos + dst_locs[0];
-								lFrame->SetAtomPosition(i, new_pos);
+							fragmentsfound++;
+							if (fragmentsfound < NumFragments) {
+								//gamess prints out all the coordinates, but we only read the first three
+								//need to skip the rest to the start of the next fragment
+								Buffer->LocateKeyWord("FRAGNAME", 8);
 							}
-//							Buffer->SkipnLines(lFrame->NumAtoms - fstart);
+							Buffer->GetLine(LineText);
 						}
-						fragmentsfound++;
-						if (fragmentsfound < NumFragments) {
-							//gamess prints out all the coordinates, but we only read the first three
-							//need to skip the rest to the start of the next fragment
-							Buffer->LocateKeyWord("FRAGNAME", 8);
-						}
-						Buffer->GetLine(LineText);
 					}
+					
 				}
-				
-			}
-			if ((NumMDAtoms > 0)&&Buffer->LocateKeyWord("----- MM PARTICLE COORDINATES", 29)) {
-				Buffer->SkipnLines(1);
-			}
+				if ((NumMDAtoms > 0)&&Buffer->LocateKeyWord("----- MM PARTICLE COORDINATES", 29)) {
+					Buffer->SkipnLines(1);
+				}
 
-			if (Prefs->GetAutoBond())
-				lFrame->SetBonds(Prefs, false);
+				if (Prefs->GetAutoBond())
+					lFrame->SetBonds(Prefs, false);
 			}
+		} else
+			++ nSkip;
 	}
 	return 1;
 }	
@@ -4027,6 +4033,8 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 
 	ProgressInd->ChangeText("Reading GAMESS IRC file...");
 	Frame * lFrame = MainData->cFrame;
+	long IRCnSkip = Prefs->GetDRCSkip();
+	long nSkip = 0;
 
 	if (!Append) {
 #ifdef __wxBuild__
@@ -4069,31 +4077,35 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 			{ throw UserCancel();}
 		Buffer->GetLine(LineText);
-		LinePos = 6;
-		sscanf(&(LineText[LinePos]), "%ld", &point);
-		point *= flip;
-		LinePos = FindKeyWord(LineText, "STOTAL=", 7) + 7;
-		sscanf(&(LineText[LinePos]), "%f", &Xpos);
-		Xpos *= flip;
-		Xpos += offset;
-		lFrame = MainData->LocateNewFrame(Xpos);
+		if (nSkip >= IRCnSkip) {
+			nSkip = 0;
+			LinePos = 6;
+			sscanf(&(LineText[LinePos]), "%ld", &point);
+			point *= flip;
+			LinePos = FindKeyWord(LineText, "STOTAL=", 7) + 7;
+			sscanf(&(LineText[LinePos]), "%f", &Xpos);
+			Xpos *= flip;
+			Xpos += offset;
+			lFrame = MainData->LocateNewFrame(Xpos);
 
-		if (lFrame) {
-			lFrame->IRCPt = point;
-			LinePos = FindKeyWord(LineText, "E=", 2) + 2;
-			sscanf(&(LineText[LinePos]), "%lf", &(lFrame->Energy));
-			Buffer->SkipnLines(1);	//skip "Coordinates (bohr)... label line
+			if (lFrame) {
+				lFrame->IRCPt = point;
+				LinePos = FindKeyWord(LineText, "E=", 2) + 2;
+				sscanf(&(LineText[LinePos]), "%lf", &(lFrame->Energy));
+				Buffer->SkipnLines(1);	//skip "Coordinates (bohr)... label line
 
-			sprintf(LineText, "Reading in IRC point %ld", point);
-			ProgressInd->ChangeText(LineText);
+				sprintf(LineText, "Reading in IRC point %ld", point);
+				ProgressInd->ChangeText(LineText);
 
-			if (!MainData->SetupFrameMemory(NumAtoms, 0)) throw MemoryError();
+				if (!MainData->SetupFrameMemory(NumAtoms, 0)) throw MemoryError();
 
-			if (ParseGLogLine(Buffer, lFrame, NumAtoms, 0, &(MainData->MaxSize)) <= 0) break;
+				if (ParseGLogLine(Buffer, lFrame, NumAtoms, 0, &(MainData->MaxSize)) <= 0) break;
 
-			if (Prefs->GetAutoBond())
-				lFrame->SetBonds(Prefs, false);
-		}
+				if (Prefs->GetAutoBond())
+					lFrame->SetBonds(Prefs, false);
+			}
+		} else
+			++nSkip;
 		KeyWordFound = Buffer->LocateKeyWord("POINT=", 6);
 	}
 	MainData->cFrame = MainData->Frames;
@@ -4109,6 +4121,8 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 
 	ProgressInd->ChangeText("Reading GAMESS IRC log file...");
 	Frame * lFrame = MainData->cFrame;
+	long IRCnSkip = Prefs->GetDRCSkip();
+	long nSkip = 0;
 
 	long NumAtoms = lFrame->NumAtoms;
 	long NumExpectedAtoms = NumAtoms;
@@ -4138,40 +4152,45 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 			int result = sscanf(&(LineText[LinePos]), "%f", &Xpos);
 			if (result != 1) break;
 		} else break;
-		point *= flip;
-		Xpos *= flip;
-		Xpos += offset;
-		lFrame = MainData->LocateNewFrame(Xpos);
-		if (lFrame) {
-			sprintf(LineText, "Reading in IRC point %ld", point);
-			ProgressInd->ChangeText(LineText);
+		lFrame = NULL;
+		if (nSkip >= IRCnSkip) {
+			nSkip = 0;
+			point *= flip;
+			Xpos *= flip;
+			Xpos += offset;
+			lFrame = MainData->LocateNewFrame(Xpos);
+			if (lFrame) {
+				sprintf(LineText, "Reading in IRC point %ld", point);
+				ProgressInd->ChangeText(LineText);
 
-			lFrame->IRCPt = point;
-			if (Buffer->LocateKeyWord("ENERGY            =", 19)) {
-				Buffer->GetLine(LineText);
-				LinePos = 20;
-				sscanf(&(LineText[LinePos]), "%lf", &(lFrame->Energy));
-			}
-
-			if (!Buffer->LocateKeyWord("COORDINATES OF ALL ATOMS", 24)) break;
-			Buffer->SkipnLines(3);
-
-			MainData->SetupFrameMemory(NumAtoms, 0);
-
-			ParseGLogLine(Buffer, lFrame, NumAtoms, 10, &(MainData->MaxSize));
-
-			if ((NumFragmentAtoms <= 0)&&(NumExpectedAtoms > MainData->cFrame->NumAtoms))
-				NumFragmentAtoms = NumExpectedAtoms - MainData->cFrame->NumAtoms;
-			if (NumFragmentAtoms > 0) {
-				Buffer->BackupnLines(2);
-				if (Buffer->LocateKeyWord("COORDINATES OF FRAGMENT MULTIPOLE CENTERS", 41)) {
-					Buffer->SkipnLines(3);
-					MainData->ReadFragmentCoordinates(Buffer, NumFragmentAtoms);
+				lFrame->IRCPt = point;
+				if (Buffer->LocateKeyWord("ENERGY            =", 19)) {
+					Buffer->GetLine(LineText);
+					LinePos = 20;
+					sscanf(&(LineText[LinePos]), "%lf", &(lFrame->Energy));
 				}
+
+				if (!Buffer->LocateKeyWord("COORDINATES OF ALL ATOMS", 24)) break;
+				Buffer->SkipnLines(3);
+
+				MainData->SetupFrameMemory(NumAtoms, 0);
+
+				ParseGLogLine(Buffer, lFrame, NumAtoms, 10, &(MainData->MaxSize));
+
+				if ((NumFragmentAtoms <= 0)&&(NumExpectedAtoms > MainData->cFrame->NumAtoms))
+					NumFragmentAtoms = NumExpectedAtoms - MainData->cFrame->NumAtoms;
+				if (NumFragmentAtoms > 0) {
+					Buffer->BackupnLines(2);
+					if (Buffer->LocateKeyWord("COORDINATES OF FRAGMENT MULTIPOLE CENTERS", 41)) {
+						Buffer->SkipnLines(3);
+						MainData->ReadFragmentCoordinates(Buffer, NumFragmentAtoms);
+					}
+				}
+				if (Prefs->GetAutoBond())
+					lFrame->SetBonds(Prefs, false);
 			}
-			if (Prefs->GetAutoBond())
-				lFrame->SetBonds(Prefs, false);
-		}
+		} else
+			++ nSkip;
 		wxFileOffset SavedPos = Buffer->GetFilePos();
 		KeyWordFound = Buffer->LocateKeyWord(NextPointKeyword, 20);
 		wxFileOffset NextPointPos = -1;
