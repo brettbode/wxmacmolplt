@@ -670,7 +670,6 @@ void MolDisplayWin::ClearMenus(void) {
 	menuView->Enable(MMP_PREVMODE, false);
 	menuView->Enable(MMP_NEXTMODE, false);
 	menuView->Enable(MMP_OFFSETMODE, false);
-	menuView->Enable(MMP_ANNOTATIONSSUBMENU, false);
 	menuView->Enable(MMP_ANIMATEFRAMES, false);
 
 	menuMolecule->Enable(MMP_SETBONDLENGTH, false);
@@ -4311,6 +4310,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_ADDLENGTHANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
 	EVT_MENU (MMP_ADDANGLEANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
 	EVT_MENU (MMP_ADDDIHEDRALANNOTATION,   MolDisplayWin::menuViewAddAnnotation)
+EVT_UPDATE_UI (MMP_ANNOTATIONSSUBMENU,   MolDisplayWin::OnAnnotationLengthUpdate)
 	EVT_UPDATE_UI(MMP_ADDMARKANNOTATION, MolDisplayWin::OnAnnotationMarkUpdate )
 	EVT_UPDATE_UI(MMP_ADDLENGTHANNOTATION, MolDisplayWin::OnAnnotationLengthUpdate )
 	EVT_UPDATE_UI(MMP_ADDANGLEANNOTATION, MolDisplayWin::OnAnnotationAngleUpdate )
