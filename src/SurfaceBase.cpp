@@ -903,8 +903,14 @@ void Surf3DBase::SetupGridParameters(Frame * lFrame) {
 	}
 }
 void Surf3DBase::AllocateGrid(long NumPoints) {
-	Grid = new float[NumPoints];
-	if (Grid) GridAllocation = NumPoints;
+	if (NumPoints > 0) {
+		Grid = new float[NumPoints];
+		if (Grid) GridAllocation = NumPoints;
+	} else {
+		if (Grid) delete Grid;
+		Grid = NULL;
+		GridAllocation = 0;
+	}
 };
 bool Surf3DBase::AllocateContour(long NumPoints) {
 	ContourHndl = new CPoint3D[NumPoints];

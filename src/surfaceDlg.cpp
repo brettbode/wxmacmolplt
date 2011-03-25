@@ -2269,13 +2269,21 @@ void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event) {
 		mData->SetCurrentFrame(CurrentFrame);
 	} else {	//simply update this surface
 		if (Visible) {
-			lProgress->ChangeText("Calculating 3D Grid...");
-			lProgress->SetScaleFactor(0.9);
-			if (updateGrid) mTarget->CalculateMOGrid(mData, lProgress);
-			lProgress->ChangeText("Contouring grid...");
-			lProgress->SetBaseValue(90);
-			lProgress->SetScaleFactor(0.1);
-			if (updateContour) mTarget->Contour3DGrid(lProgress);
+			try {
+				lProgress->ChangeText("Calculating 3D Grid...");
+				lProgress->SetScaleFactor(0.9);
+				if (updateGrid) mTarget->CalculateMOGrid(mData, lProgress);
+				lProgress->ChangeText("Contouring grid...");
+				lProgress->SetBaseValue(90);
+				lProgress->SetScaleFactor(0.1);
+				if (updateContour) mTarget->Contour3DGrid(lProgress);
+			}
+			catch (bad_alloc & ba) {
+				MessageAlert("Error: Unable to allocate enough memory to update surface.");
+			}
+			catch (...) {
+				MessageAlert("Error: unknown exception occured while attempting to update surface.");
+			}
 		} else {
 			if (updateGrid) mTarget->FreeGrid();
 			if (updateContour) mTarget->FreeContour();
@@ -3877,26 +3885,34 @@ void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	} else {	//simply update this surface
 		if (!UseMEP) mTarget->FreeList();
 		if (Visible) {
-			float MEPScale = 1.0;
-			if (updateMEP) MEPScale = 0.5;
-			if (updateGrid) {
-				lProgress->ChangeText("Calculating 3D Grid...");
-				lProgress->SetScaleFactor(0.9*MEPScale);
-				mTarget->CalculateMOGrid(data, lProgress);
+			try {
+				float MEPScale = 1.0;
+				if (updateMEP) MEPScale = 0.5;
+				if (updateGrid) {
+					lProgress->ChangeText("Calculating 3D Grid...");
+					lProgress->SetScaleFactor(0.9*MEPScale);
+					mTarget->CalculateMOGrid(data, lProgress);
+				}
+				if (updateContour) {
+					lProgress->ChangeText("Contouring grid...");
+					lProgress->SetBaseValue((long)(90*MEPScale));
+					lProgress->SetScaleFactor(0.1*MEPScale);
+					mTarget->Contour3DGrid(lProgress);
+				}
+				if (updateMEP && data->MEPCalculationPossible()) {
+					lProgress->ChangeText("Calculating MEP values...");
+					lProgress->SetBaseValue(50);
+					lProgress->SetScaleFactor(0.5);
+					owner->GetParent()->Freeze();
+					mTarget->CalculateSurfaceValues(data, lProgress);
+					owner->GetParent()->Thaw();
+				}
 			}
-			if (updateContour) {
-				lProgress->ChangeText("Contouring grid...");
-				lProgress->SetBaseValue((long)(90*MEPScale));
-				lProgress->SetScaleFactor(0.1*MEPScale);
-				mTarget->Contour3DGrid(lProgress);
+			catch (bad_alloc & ba) {
+				MessageAlert("Error: Unable to allocate enough memory to update surface.");
 			}
-			if (updateMEP && data->MEPCalculationPossible()) {
-				lProgress->ChangeText("Calculating MEP values...");
-				lProgress->SetBaseValue(50);
-				lProgress->SetScaleFactor(0.5);
-				owner->GetParent()->Freeze();
-				mTarget->CalculateSurfaceValues(data, lProgress);
-				owner->GetParent()->Thaw();
+			catch (...) {
+				MessageAlert("Error: unknown exception occured while attempting to update surface.");
 			}
 		} else {
 			//always free the grid for invisable surfaces since they can be big
@@ -5105,6 +5121,9 @@ void Surface3DParamDlg::OnClose(wxCommandEvent &event) {
 	CPoint3D tempPt;
 	double	tempFlt;
 
+	long origXGridpts = mTargetSurf->GetNumXGridPoints();
+	long origYGridpts = mTargetSurf->GetNumYGridPoints();
+	long origZGridpts = mTargetSurf->GetNumZGridPoints();
 	tmpStr = numGridPoint1->GetValue();
 	if (tmpStr.ToLong(&tempLong))
 		mTargetSurf->SetNumXGridPoints(tempLong);
@@ -5116,7 +5135,19 @@ void Surface3DParamDlg::OnClose(wxCommandEvent &event) {
 	tmpStr = numGridPoint3->GetValue();
 	if (tmpStr.ToLong(&tempLong))
 		mTargetSurf->SetNumZGridPoints(tempLong);
-
+ 
+	//Since the number of grid points is cubic it gets big fast. Test to make sure the
+	//user entered values that can be managed.
+	long testpts = mTargetSurf->GetNumXGridPoints()*mTargetSurf->GetNumYGridPoints()*
+				mTargetSurf->GetNumZGridPoints();
+	if (testpts < 0) {	//overflow
+		MessageAlert("Error: The specified number of grid points exceeds what is possible on this machine.");
+		mTargetSurf->SetNumXGridPoints(origXGridpts);
+		mTargetSurf->SetNumYGridPoints(origYGridpts);
+		mTargetSurf->SetNumZGridPoints(origZGridpts);
+	} else if (testpts > 200*200*200) {	//this is normally a "big" size
+		MessageAlert("Warning: the selected number of grid points maybe excessive!");
+	}
 	tempPt.x = tempPt.y = tempPt.z = 0.0;
 	tmpStr = originText1->GetValue();
 	if (tmpStr.ToDouble(&tempFlt))

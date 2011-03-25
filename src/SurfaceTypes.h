@@ -99,8 +99,14 @@ class Surf1DBase : public Surface {
 			GridAllocation = 0;
 		};
 		void AllocateGrid(long NumPoints) {
-			Grid = new float[NumPoints];
-			if (Grid) GridAllocation = NumPoints;
+			if (NumPoints > 0) {
+				Grid = new float[NumPoints];
+				if (Grid) GridAllocation = NumPoints;
+			} else {
+				if (Grid) delete Grid;
+				Grid = NULL;
+				GridAllocation = 0;
+			}
 		};
 		CPoint3D Start;
 		CPoint3D End;
@@ -170,8 +176,14 @@ class Surf2DBase : public Surface {
 			}
 		};
 		void AllocateGrid(long NumPoints) {
-			Grid = new float[NumPoints];
-			if (Grid) GridAllocation = NumPoints;
+			if (NumPoints > 0) {
+				Grid = new float[NumPoints];
+				if (Grid) GridAllocation = NumPoints;
+			} else {
+				if (Grid) delete Grid;
+				Grid = NULL;
+				GridAllocation = 0;
+			}
 		};
 		virtual void Draw2D(MoleculeData * lData, long hoffset, long voffset, float scale);
 		void Contour2DGrid(MoleculeData * lData, long hoffset, long voffset, float scale);
