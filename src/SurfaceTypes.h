@@ -267,11 +267,11 @@ class Surf3DBase : public Surface {
 		inline float GetGridMax(void) const {return GridMax;};
 		inline float GetGridMin(void) const {return GridMin;};
 		inline long GetNumXGridPoints(void) const {return NumXGridPoints;};
-		inline void SetNumXGridPoints(long NewNum) {NumXGridPoints = NewNum;};
+		inline void SetNumXGridPoints(long NewNum) {if (NewNum > 0) NumXGridPoints = NewNum;};
 		inline long GetNumYGridPoints(void) const {return NumYGridPoints;};
-		inline void SetNumYGridPoints(long NewNum) {NumYGridPoints = NewNum;};
+		inline void SetNumYGridPoints(long NewNum) {if (NewNum > 0) NumYGridPoints = NewNum;};
 		inline long GetNumZGridPoints(void) const {return NumZGridPoints;};
-		inline void SetNumZGridPoints(long NewNum) {NumZGridPoints = NewNum;};
+		inline void SetNumZGridPoints(long NewNum) {if (NewNum > 0) NumZGridPoints = NewNum;};
 		inline void GetOrigin(CPoint3D * a) const {*a = Origin;};
 		inline void SetOrigin(CPoint3D * a) {Origin = *a;};
 		inline float GetXGridInc(void) const {return XGridInc;};
