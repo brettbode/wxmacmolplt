@@ -16,6 +16,8 @@
 #include <stdio.h>
 #include "Globals.h"
 #include <wx/ffile.h>
+#include <vector>
+#include <string>
 
 #define	kBufferSize		262144		///<default file buffer size (for BufferFile internal buffer)
 #define kMaxLineLength	180			///<arbitrary Max line length (should handle 132 col lines), used throughout the program
@@ -164,7 +166,6 @@ class BufferFile {
 		void BackupnLines(long nBack);
 		/// Skip nSkip lines in the file.
 		void SkipnLines(long nSkip);
-		/* inline bool LocateKeyWord(char Keyword[], long NumByte) {return LocateKeyWord(Keyword, NumByte, -1);}; */
 		/** Search the file for the specified keyword until found, EOF, or the limit is reached.
 		 * Returns true or false, the file position upon exit will be the start of the keyword,
 		 * or the starting position if the keyword is not found.
@@ -174,6 +175,15 @@ class BufferFile {
 		 *							search to the end of the file.
 		 */
 		bool LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset Limit = -1);
+		/** Search the file for the keywords provided in the vector of strings.
+		 * returns the index of the string in the vector or -1 if none are found. The buffer is left
+		 * at the start of the found keyword or the starting position if none are found.
+		 * @param keywords A vector of strings each containing a single keyword to search for
+		 * @param NumKeywords (optional) The nubmer of keywords to seach for, -1 searchs for all in the vector
+		 * @param Limit (optional) The file position limit (in bytes) to limit the search. -1 will
+		 *							search to the end of the file.
+		 */
+		int LocateKeyWord(const std::vector<std::string> & keywords, int NumKeywords=-1, wxFileOffset Limit = -1);
 		/** Obtain the position of the next blank line.
 		 * The return value is the position. The file position is unchanged upon exit.
 		 */

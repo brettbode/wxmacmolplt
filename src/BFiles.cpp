@@ -520,6 +520,41 @@ bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset 
 	}
 	return KeyWordFound;
 }
+/** Search the file for the keywords provided in the vector of strings.
+ * returns the index of the string in the vector or -1 if none are found. The buffer is left
+ * at the start of the found keyword or the starting position if none are found.
+ */
+ int BufferFile::LocateKeyWord(const std::vector<std::string> & keywords, int NumKeywords, wxFileOffset Limit) {
+	int result=-1;
+	if (NumKeywords < 0) NumKeywords = keywords.size();
+	wxFileOffset OldPosition = GetFilePos();
+	char	LineText[kMaxLineLength + 1];
+	bool	KeyWordFound=false;
+	
+	if (Limit < 0) Limit = ByteCount;
+	if (Limit > ByteCount) Limit = ByteCount;
+	 while (!KeyWordFound) {
+		 if ((BufferStart+BufferPos+1) >= Limit) {	//We've hit the end of the file without
+			 SetFilePos(OldPosition);				//finding the keyword
+			 break;
+		 }
+		 wxFileOffset lineStartPos = GetFilePos();
+		 GetLine(LineText);
+		 for (int ik=0; ik < keywords.size(); ik++) {
+			 long NumByte = keywords[ik].size();
+			 long Start = FindKeyWord(LineText, keywords[ik].c_str(), NumByte);
+			 if (Start > -1) {	//Found it!
+				 KeyWordFound = true;
+				 OldPosition = lineStartPos + Start;
+				 SetFilePos(OldPosition);
+				 break;
+			 }
+		 }
+	 }
+	 
+	return result;
+}
+
 long BufferFile::GetNumLines(long size) {
 	wxFileOffset	StartPos = BufferStart + BufferPos;
 	wxFileOffset	EndPos=size + StartPos;
