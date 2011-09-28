@@ -774,6 +774,8 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 					Changed = false;
 				} else {	//a change of a bond length or angle actually moves the atoms
 					mInts->InternalsToCartesians(MainData, Prefs, row);
+					MainData->RotateToPrincipleOrientation(Prefs);
+					MainData->StickCoordinates();
 					MainData->ResetRotation();
 				}
 			}
