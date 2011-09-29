@@ -342,7 +342,23 @@ void MolDisplayWin::WriteQTMovie(wxString & filepath) {
 	FILE * temp = fopen(t, "wb");
 	fclose(temp);
 
+#ifdef __WXOSX_COCOA__
+	//This function is not found in the wxCocoa implementation, it is probably possible to work around it
+	//Otherwise the code appears to link and run currently. However, it is probably better to redue the
+	//code to use the Cocoa qtKit framework rather than the old Carbon QT library.
+	
+	//This path is not tested as the current Cocoa code does not properly support the extended save dialog.
+	//	void wxMacFilename2FSSpec( const wxString& path , FSSpec *spec )
+	{
+		OSStatus err = noErr;
+		FSRef fsRef;
+		wxMacPathToFSRef( filepath , &fsRef );
+		err = FSGetCatalogInfo(&fsRef, kFSCatInfoNone, NULL, NULL, &targetSpec, NULL);
+		verify_noerr( err );
+	}
+#else
 	wxMacFilename2FSSpec(filepath, &targetSpec);
+#endif
 	
 	Movie	theMovie = NULL;
 		
