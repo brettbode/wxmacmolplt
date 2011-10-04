@@ -11,8 +11,16 @@
 *.tar
 
 CVS
+# generated files
 ship
 build
+Docs
+config
+configure
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
 
 # OS generated files #
 ######################
