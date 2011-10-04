@@ -16,6 +16,8 @@ enum {
  * @param val Initial value of slider.
  * @param min Minimum value of slider.
  * @param max Maximum value of slider.
+ * @param style pass through styles.
+ * @param size intial panel size.
  */
 FloatSlider::FloatSlider(wxWindow *parent,
 						 int id,
@@ -241,7 +243,7 @@ void FloatSlider::SyncText() {
 
 /**
  * Assign slider's minimum value.
- * @param New minimum.
+ * @param min New minimum.
  */
 void FloatSlider::SetMin(float min) {
 
@@ -256,7 +258,7 @@ void FloatSlider::SetMin(float min) {
 
 /**
  * Assign slider's maximum value.
- * @param New maximum.
+ * @param max New maximum.
  */
 void FloatSlider::SetMax(float max) {
 

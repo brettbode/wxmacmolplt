@@ -70,12 +70,16 @@ class MOPacInternals {
 		 * Write a "Gaussian" style zmatrix (in a $DATA group) to file. This outputs a normal
 		 * GAMESS ZMatrix suitable for the $DATA group of a GAMESS input file.
 		 * @param File The output file buffer.
+		 * @param MainData Master data record.
+		 * @param Prefs Master window preferences.
 		 */
 		void WriteCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs);
 		/**
 		 * Write a "MOPac" style zmatrix (in a $DATA group) to file. This outputs a MOPac
 		 * style ZMatrix suitable for the $DATA group of a GAMESS input file.
 		 * @param File The output file buffer.
+		 * @param MainData Master data record.
+		 * @param Prefs Master window preferences.
 		 */
 		void WriteMPCZMatCoordinatesToFile(BufferFile * File, MoleculeData * MainData, WinPrefs * Prefs);
 		/**
@@ -112,7 +116,7 @@ class MOPacInternals {
 		 * the previous set to keep the display from jumping around.
 		 * @param MainData The coordinate information.
 		 * @param Prefs The window preferences.
-		 * @param ChangeAtom The atom whose internal coordinate was changed. Pass 0 to update
+		 * @param ChangedAtom The atom whose internal coordinate was changed. Pass 0 to update
 		 *		all.
 		 */
 		void InternalsToCartesians(MoleculeData * MainData, WinPrefs * Prefs, long ChangedAtom);

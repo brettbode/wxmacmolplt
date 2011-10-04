@@ -115,14 +115,9 @@ class MoleculeData {
 		void SetModelCenter(CPoint3D * center);
 		void GetModelRotation(float * Psi, float * Phi, float * Theta);
 		void SetModelRotation(float Psi, float Phi, float Theta);
-		void AdvanceFrame(void);
-		void SetCurrentFrame(long FrameNum);
 	//	inline Boolean GetFrameMode(void) {return (DrawMode & (1<<3));};
 		AtomTypeList * GetAtomTypes(void);
 		bool SurfaceExportPossible(void);
-		inline long GetCurrentFrame(void) {return CurrentFrame;};
-		inline Frame* GetCurrentFramePtr(void) {return cFrame;};
-		inline Frame * GetFirstFrame(void) {return Frames;};
 		void ParseGAMESSBasisSet(BufferFile * Buffer);
 		long ParseECPotentials(BufferFile * Buffer);
 		/**
@@ -139,7 +134,7 @@ class MoleculeData {
 		void WriteFMOIdsToXML(XMLElement * parent);
 		/**
 		 * Read the FMO Id array from XML
-		 * @param XML element
+		 * @param item XML element
 		 */
 		void ReadFMOIdsFromXML(XMLElement * item);
 		/**
@@ -186,6 +181,7 @@ class MoleculeData {
 		 * Compute the principle orientation of the current set of coordinates.
 		 * The return value indicates whether the current coordinates satisfy the current point group.
 		 * @param result The rotation/translation to convert the coordinates to the princ. orientation.
+		 * @param translation vector translating the molecule such that the center of mass is at the origin.
 		 * @param Prefs The current window preferences
 		 * @param precision The tolerance for slop in the coordinates (ex 1.0D-5)
 		 */
@@ -209,10 +205,45 @@ class MoleculeData {
 		void LinearLeastSquaresFit(Progress * lProgress);
 		void CreateLLM(long NumPts, WinPrefs * Prefs);
 		void CreateInternalLLM(long NumPts, WinPrefs * Prefs);
+// routines to get/set the current/active frame
+		/// Return the index of the active frame.
+		inline long GetCurrentFrame(void) {return CurrentFrame;};	
+		/// Return a pointer to the active frame.
+		inline Frame* GetCurrentFramePtr(void) {return cFrame;};
+		/// Return a pointer to the first frame in a series.
+		inline Frame * GetFirstFrame(void) {return Frames;};
+		/// Increment the frame to the next one
+		void AdvanceFrame(void);
+		/**
+		 * Change the active frame to the one indexed by FrameNum. If the index is invalid the call does nothing.
+		 * @param FrameNum the index of the desired Frame.
+		 */
+		void SetCurrentFrame(long FrameNum);
+// routines to add/delete a frame or increase the memory allocations
+		/** Add a new frame to the list after the current/active frame. Preallocate memory for the specified number of
+		 * atoms and bonds. A pointer to the new frame is returned and also becomes the active frame.
+		 * @param NumAtoms Desired length of the Atom array
+		 * @param NumBonds Desired length of the Bonds array
+		 */
 		Frame * AddFrame(long NumAtoms, long NumBonds);
-		void DeleteFrame(void);
-		bool SetupFrameMemory(long NumAtoms, long NumBonds);
+		/** Add a new frame to the series ordered based on the provided XPosition. If successful, a pointer to the
+		 * new frame is returned and the new frame becomes the active frame. The call will fail if there is an
+		 * existing frame with the same XPosition value in which case the returned value will be NULL and the
+		 * state unchanged.
+		 * @param XPosition A value ordering the new frame in the existing series.
+		 */
 		Frame * LocateNewFrame(float XPosition);
+		/** Delete the current/active frame. The next frame will become the active frame, if deleting the last
+		 * frame, the previous frame will become active. If there is only one frame nothing is changed.
+		 */
+		void DeleteFrame(void);
+		/** Change the memory allocation for the atoms and bonds. Any existing data is preservered so you can't
+		 * set the allocation smaller than what is currently in use. Returns false if memory allocation fails.
+		 * @param NumAtoms Desired length of the Atom array
+		 * @param NumBonds Desired length of the Bonds array
+		 */
+		bool SetupFrameMemory(long NumAtoms, long NumBonds);
+
 		inline bool DrawHLabels(void) const {return ((DrawLabels & 4) == 0);};
 		inline void SetHLabelMode(bool State) {DrawLabels = (DrawLabels & 0xFB) + (State ? 0: 4);};
 		bool ModeVisible(void) const;
@@ -243,7 +274,7 @@ class MoleculeData {
 		 * @param atom The atom to copy
 		 * @param updateGlobal Update the global arrays and structures (needed at some point)
 		 * @param index Insert the atom in the atom list at the specified index (-1 for the end)
-		 * @param Optionally set the position of the new atom to pos.
+		 * @param pos Optionally set the position of the new atom to pos.
 		 */
 		void NewAtom(const mpAtom& atom, bool updateGlobal=true, long index=-1, const CPoint3D *pos = NULL);
 		/**
@@ -312,7 +343,7 @@ class MoleculeData {
 		 Set the FragmentId for atom index AtomId. This routine will initialize the fragment id
 		 array if it is empty.
 		 @param AtomId index of the atom to target
-		 @param FragId the new fragment id for the targeted atom
+		 @param FragmentId the new fragment id for the targeted atom
 		 */
 		void SetFMOFragmentId(const long & AtomId, const long & FragmentId);
 };

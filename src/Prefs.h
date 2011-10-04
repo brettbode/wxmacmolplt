@@ -303,7 +303,7 @@ class WinPrefs {
 		inline bool ShowEFPWireFrame(void) const {return ((BitOptions & (1<<14))?true:false); };
 		/**
 		 Set the EFP atoms display mode.
-		 @param newValue If true this will overide the general wireframe mode setting for EFP atoms.
+		 @param newVal If true this will overide the general wireframe mode setting for EFP atoms.
 		 */
 		inline void ShowEFPWireFrame(bool newVal) {BitOptions = (BitOptions & 0xFFFFBFFF) + (newVal?(1<<14):0);};
 		inline Boolean ChangeFileType(void) const {return (SetCreator); };

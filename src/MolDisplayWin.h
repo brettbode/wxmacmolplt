@@ -225,10 +225,6 @@ class MolDisplayWin : public wxFrame {
 		wxPageSetupDialogData *pageSetupData;
 		wxPrintData           *printData;
 
-		void createMenuBar();
-		long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
-							  long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
-
 		bool mHighliteState;
 		bool stale_click;
 		wxToolBar *toolbar;
@@ -263,6 +259,32 @@ class MolDisplayWin : public wxFrame {
 		GLfloat fg_color[3];
 		GLfloat light_pos[4];
 
+			///Called by the constructor to setup the initial menubar
+		void createMenuBar();
+		/**
+		 * Called by the GAMESS log file code to specifically handle IRC type log files.
+		 * @param Buffer The file buffer to parse.
+		 * @param flip Indicator that the IRC distance should be multiplied by -1.
+		 * @param offset Amount to offset the transition state for the IRC.
+		 * @param NumOccAlpha number of alpha occupied orbitals.
+		 * @param NumOccBeta Number of beta occupied orbitals.
+		 * @param NumFragmentAtoms Number of EFP style atoms.
+		 */
+		long OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offset,
+						  long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms);
+		/**
+		 * Called by the GAMESS log file code to specifically handle GlobOp type log files.
+		 * @param Buffer The file buffer to parse.
+		 * @param NumOccAlpha number of alpha occupied orbitals.
+		 * @param NumOccBeta Number of beta occupied orbitals.
+		 * @param NumFragmentAtoms Number of EFP style atoms.
+		 */
+		long OpenGAMESSGlobOpLog(BufferFile * Buffer, long NumOccAlpha, long NumOccBeta,
+								 long NumFragmentAtoms);
+		/**
+		 * Callback for when the user clicks on a button in the toolbar. The function ensures
+		 * at exactly one button is always selected.
+		 */
 		void OnToggleTool(wxCommandEvent& event);
 		void OnStatusTimer(wxTimerEvent& event);
 		void OnRotateTimer(wxTimerEvent& event);

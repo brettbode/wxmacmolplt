@@ -186,7 +186,7 @@ void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
 
 /**
  * Draws molecular structures, surfaces, and annotations.
- * @precondition Context, projection, and viewport have been set. 
+ * @pre Context, projection, and viewport have been set. 
  */
 void MolDisplayWin::DrawGL(int do_shader) {
 	if (GLUpdateInProgress) return;	//a previous call in the stack is already updating this window. Do not repeat.

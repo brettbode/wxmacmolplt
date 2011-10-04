@@ -154,6 +154,8 @@ class MpGLCanvas : public wxGLCanvas {
 		* @param id The window identifier for the new widget.
 		* @param position The initial position of the new widget.
 		* @param size The initial size of the new widget.
+		* @param attributes wx window attributes
+		* @param do_stereo If true setup the context as a quad-buffer stereo window.
 		* @param style The style of the new widget.	See wxWindow class docs.
 		* @param name The name of the new widget.
 		*/
@@ -166,16 +168,16 @@ class MpGLCanvas : public wxGLCanvas {
 				   long	style = wxNO_BORDER,
 				   const wxString &name = wxT("DemoGLCanvas"));
 
-		/**
-		* Sets the internal pointer to the window's preferences.  If the
-		* data structure needs to be deleted externally, this function should
-		* first be called with the parameter value set to NULL.	This will
-		* prevent the MpGLCanvas object from trying to reference a deleted
-		* data structure.
-		* @param newPrefs A pointer to the window preferences that the canvas should use.
-		*/
 		~MpGLCanvas();
 
+		/**
+		 * Sets the internal pointer to the window's preferences.  If the
+		 * data structure needs to be deleted externally, this function should
+		 * first be called with the parameter value set to NULL.	This will
+		 * prevent the MpGLCanvas object from trying to reference a deleted
+		 * data structure.
+		 * @param newPrefs A pointer to the window preferences that the canvas should use.
+		 */
 		void SetPrefs(WinPrefs *newPrefs);
 		void FitToPlane(wxCommandEvent& event);
 		void SelectWholeFragments();
@@ -218,7 +220,7 @@ class MpGLCanvas : public wxGLCanvas {
 		* @param dc The device context to send the output to.
 		* @param scaleFactor The ratio to scale the image up from the screen size.
 		* @param progress  A progress dialog to use in case this takes a while.
-		* @param center  Center the output in the device context.
+		* @param Center  Center the output in the device context.
 		* @param frame  Add a black frame around the image.
 		*/
 		void GenerateHiResImage(wxDC * dc, const float & scaleFactor, Progress * progress,
@@ -286,12 +288,6 @@ class MpGLCanvas : public wxGLCanvas {
 		 */
 		void KeyUpHandler(wxKeyEvent & event);
 		
-		/**
-		* Translates a mouse click into a selection of an atom or bond 
-		* @param x x coordinate of the click.
-		* @param y y coordinate of the click.
-		* @param mode if true clear off other selections.
-		*/
 		void On_Apply_All(wxCommandEvent& event);
 		void On_Delete_Single_Frame(wxCommandEvent& event);
 		void On_Delete_All_Frames(wxCommandEvent& event);

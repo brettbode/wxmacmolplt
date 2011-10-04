@@ -51,35 +51,35 @@ long FindKeyWord(const char *buffer, const char keyword[], long numbyte);
 /** Search the null-terminated string for "Keyword = string".
  * The return value is 1 for success 0 for failure.
  * @param Line A null-terminated string to search in.
- * @param KeyWord A null-terminated string to search for in the line followed by an '='.
+ * @param Keyword A null-terminated string to search for in the line followed by an '='.
  * @param Value The resulting string, which must be preallocated by the caller.
  */
 long ReadStringKeyword(const char * Line, const char * Keyword, char * Value);
 /** Search the null-terminated string for "Keyword = long int value".
  * The return value is 1 for success 0 for failure.
  * @param Line A null-terminated string to search in.
- * @param KeyWord A null-terminated string to search for in the line followed by an '='.
+ * @param Keyword A null-terminated string to search for in the line followed by an '='.
  * @param Value The long value to set.
  */
 long ReadLongKeyword(const char * Line, const char * Keyword, long * Value);
 /** Search the null-terminated string for "Keyword = float value".
  * The return value is 1 for success 0 for failure.
  * @param Line A null-terminated string to search in.
- * @param KeyWord A null-terminated string to search for in the line followed by an '='.
+ * @param Keyword A null-terminated string to search for in the line followed by an '='.
  * @param Value The float value to set.
  */
 long ReadFloatKeyword(const char * Line, const char * Keyword, float * Value);
 /** Search the null-terminated string for "Keyword = double value".
  * The return value is 1 for success 0 for failure.
  * @param Line A null-terminated string to search in.
- * @param KeyWord A null-terminated string to search for in the line followed by an '='.
+ * @param Keyword A null-terminated string to search for in the line followed by an '='.
  * @param Value The double value to set.
  */
 long ReadDoubleKeyword(const char * Line, const char * Keyword, double & Value);
 /** Search the null-terminated string for "Keyword = true/false/t/f".
  * The return value is 1 for success 0 for failure.
  * @param Line A null-terminated string to search in.
- * @param KeyWord A null-terminated string to search for in the line followed by an '='.
+ * @param Keyword A null-terminated string to search for in the line followed by an '='.
  * @param Value The bool value to set.
  */
 long ReadBooleanKeyword(const char * Line, const char * Keyword, bool * Value);
@@ -135,6 +135,8 @@ class BufferFile {
 		void SetFilePos(wxFileOffset NewPos);
 		///returns the current file length (valid for read and write opporations)
 		inline wxFileOffset GetFileLength(void) const {return ((ByteCount>GetFilePos())?ByteCount:GetFilePos());};
+		///Returns a bool value indicating if the End-Of-File has been reached
+		inline bool Eof() const {return ((GetFilePos()) >= (GetFileLength()));};
 		/** Attempt to discern the file type (format) based on the filename and the contents.
 		 * @param fileName The name of the file, used to examine the file extension
 		 */
@@ -203,7 +205,7 @@ class BufferFile {
  		long Write(const char * Source, long NumBytes);
 		/** Output the specified text, wrapping the lines intelligently if needed.
 		 * @param text The text to output, this normally will not contain any EOL chars
-		 * @param newLine Flag to force an EOL char after this text.
+		 * @param newline Flag to force an EOL char after this text.
 		 */
 		long WriteLine(const char *text, bool newline);
 		/** SetOutput allows you to turn off actual writing and just count the bytes output
