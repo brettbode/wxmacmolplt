@@ -1,0 +1,4 @@
+# xcode files not needed by a fresh checkout
+*.mode1
+*.mode1v3
+*.pbxuser

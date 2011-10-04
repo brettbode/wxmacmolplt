@@ -1,0 +1,22 @@
+# Compiled source #
+###################
+.deps
+*.o
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.gz
+*.tar
+
+CVS
+ship
+build
+
+# OS generated files #
+######################
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
