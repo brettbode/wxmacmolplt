@@ -521,10 +521,10 @@ bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset 
 	return KeyWordFound;
 }
 /** Search the file for the keywords provided in the vector of strings.
- * returns the index of the string in the vector or -1 if none are found. The buffer is left
+ * returns the int of the string/int pair or -1 if none are found. The buffer is left
  * at the start of the found keyword or the starting position if none are found.
  */
- int BufferFile::LocateKeyWord(const std::vector<std::string> & keywords, int NumKeywords, wxFileOffset Limit) {
+int BufferFile::LocateKeyWord(const std::vector<std::pair<std::string, int> > & keywords, int NumKeywords, wxFileOffset Limit) {
 	int result=-1;
 	if (NumKeywords < 0) NumKeywords = keywords.size();
 	wxFileOffset OldPosition = GetFilePos();
@@ -541,13 +541,13 @@ bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset 
 		 wxFileOffset lineStartPos = GetFilePos();
 		 GetLine(LineText);
 		 for (int ik=0; ik < keywords.size(); ik++) {
-			 long NumByte = keywords[ik].size();
-			 long Start = FindKeyWord(LineText, keywords[ik].c_str(), NumByte);
+			 long NumByte = keywords[ik].first.size();
+			 long Start = FindKeyWord(LineText, keywords[ik].first.c_str(), NumByte);
 			 if (Start > -1) {	//Found it!
 				 KeyWordFound = true;
 				 OldPosition = lineStartPos + Start;
 				 SetFilePos(OldPosition);
-				 result = ik;
+				 result = keywords[ik].second;
 				 break;
 			 }
 		 }

@@ -4379,14 +4379,22 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 // geometries are accepted.
 	
 // Blah... The keywords for the GLOBOP group do not appear to be echoed in the log file
+	enum GlobOpTags {
+		GeomStart=0,
+		NonOptGeometry,
+		GeomEnd,
+		OptGeometry,
+		Orbitals,
+		FailedOpt
+	};
 
-	std::vector<std::string> keywords;
-	keywords.push_back(std::string("GEOMETRY NUMBER"));
-	keywords.push_back(std::string("NUCLEAR COORDINATES FOR Global Optimization POINT"));
-	keywords.push_back(std::string("ENERGY ACCEPTED AT POINT"));
-	keywords.push_back(std::string("EQUILIBRIUM GEOMETRY LOCATED"));
-	keywords.push_back(std::string("MOLECULAR ORBITALS"));
-	keywords.push_back(std::string("FAILURE TO LOCATE STATIONARY POINT"));
+	std::vector<std::pair <std::string, int> > keywords;
+	keywords.push_back(make_pair (std::string("GEOMETRY NUMBER"), (int) GeomStart));
+	keywords.push_back(make_pair (std::string("NUCLEAR COORDINATES FOR Global Optimization POINT"), (int) NonOptGeometry));
+	keywords.push_back(make_pair (std::string("ENERGY ACCEPTED AT POINT"), (int) GeomEnd));
+	keywords.push_back(make_pair(std::string("EQUILIBRIUM GEOMETRY LOCATED"), (int) OptGeometry));
+	keywords.push_back(make_pair(std::string("MOLECULAR ORBITALS"), (int) Orbitals));
+	keywords.push_back(make_pair(std::string("FAILURE TO LOCATE STATIONARY POINT"), (int) FailedOpt));
 	
 	int state = 1, kw;
 	while (! Buffer->Eof()) {
@@ -4394,7 +4402,7 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 		{ throw UserCancel();}
 		if (-1 < (kw = Buffer->LocateKeyWord(keywords))) {
 			switch (kw) {
-				case 0:	//start of a search point
+				case GeomStart:	//start of a search point
 					if (state == 0) {
 						state = 1;
 					} else {//found another start before finding the end of the previous geometry
@@ -4408,7 +4416,7 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 					lFrame->time = MainData->GetNumFrames() - 1;
 					Buffer->SkipnLines(1);
 					break;
-				case 1:	// set of coordinates, MCMIN=false, these coords seem to be in an odd format
+				case NonOptGeometry:	// set of coordinates, MCMIN=false, these coords seem to be in an odd format
 					if (state == 1) {
 						Buffer->SkipnLines(1);
 						
@@ -4458,7 +4466,7 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 							lFrame->SetBonds(Prefs, false);
 					}
 					break;
-				case 2: // End of the search, read the energy and store the frame.
+				case GeomEnd: // End of the search, read the energy and store the frame.
 					if (state == 0) {	// Found an end without a matching begining, skip
 						wxLogMessage(_("Unexpected end of search point! Skipping and attempting to continue"));
 						Buffer->SkipnLines(1);
@@ -4473,7 +4481,7 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 						state = 0;
 					}
 					break;
-				case 3:	// Final optimized coordinates, parse and overwrite previous set
+				case OptGeometry:	// Final optimized coordinates, parse and overwrite previous set
 					if (state == 1) {
 						if (!Buffer->LocateKeyWord("COORDINATES OF ALL ATOMS", 24)) break;
 						Buffer->SkipnLines(3);
@@ -4493,7 +4501,7 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 							lFrame->SetBonds(Prefs, false);
 					} else Buffer->SkipnLines(1);
 					break;
-				case 4: // Set of Orbitals
+				case Orbitals: // Set of Orbitals
 					//Attempt to read in orbitals for this geometry
 					if (state == 1) {
 						if (MainData->Basis) {
@@ -4521,7 +4529,7 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 						}
 					} else Buffer->SkipnLines(1);
 					break;
-				case 5:	//optimization failed. 
+				case FailedOpt:	//optimization failed. 
 					if (state == 1) {
 						sprintf(LineText, "Geometry optimization incomplete for frame %d", MainData->GetNumFrames()-1);
 						MessageAlert(LineText);

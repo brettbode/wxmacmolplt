@@ -178,14 +178,14 @@ class BufferFile {
 		 */
 		bool LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset Limit = -1);
 		/** Search the file for the keywords provided in the vector of strings.
-		 * returns the index of the string in the vector or -1 if none are found. The buffer is left
+		 * returns the int value of the string/int pair in the vector or -1 if none are found. The buffer is left
 		 * at the start of the found keyword or the starting position if none are found.
-		 * @param keywords A vector of strings each containing a single keyword to search for
+		 * @param keywords A vector of string/int pairs each containing a single keyword to search for
 		 * @param NumKeywords (optional) The nubmer of keywords to seach for, -1 searchs for all in the vector
 		 * @param Limit (optional) The file position limit (in bytes) to limit the search. -1 will
 		 *							search to the end of the file.
 		 */
-		int LocateKeyWord(const std::vector<std::string> & keywords, int NumKeywords=-1, wxFileOffset Limit = -1);
+		int LocateKeyWord(const std::vector< std::pair <std::string, int> > & keywords, int NumKeywords=-1, wxFileOffset Limit = -1);
 		/** Obtain the position of the next blank line.
 		 * The return value is the position. The file position is unchanged upon exit.
 		 */
