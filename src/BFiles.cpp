@@ -547,6 +547,7 @@ bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset 
 				 KeyWordFound = true;
 				 OldPosition = lineStartPos + Start;
 				 SetFilePos(OldPosition);
+				 result = ik;
 				 break;
 			 }
 		 }

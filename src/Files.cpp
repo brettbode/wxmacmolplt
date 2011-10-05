@@ -2459,6 +2459,8 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			return this->OpenGAMESSDRC(Buffer, true, Append, flip,offset);
 		else
 			while (lFrame->NextFrame) lFrame = lFrame->NextFrame;
+		if (MainData->InputOptions->Control->GetRunType() == GLOBOPRun)
+			return OpenGAMESSGlobOpLog(Buffer, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
 	} else {
 		MainData->InputOptions = new InputData;
 		if (!MainData->InputOptions) throw MemoryError();
@@ -2747,7 +2749,9 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			//Read in normal modes, if present
 			if (Buffer->LocateKeyWord("NORMAL COORDINATE ANALYSIS", 25, EnergyPos)) 
 				MainData->cFrame->ParseNormalModes(Buffer, ProgressInd, Prefs);
-		}
+		} else if (MainData->InputOptions->Control->GetRunType() == GLOBOPRun)
+			return OpenGAMESSGlobOpLog(Buffer, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
+
 		if (EnergyPos > 0) {
 			Buffer->SetFilePos(EnergyPos);
 			Buffer->GetLine(LineText);
@@ -4351,6 +4355,204 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 	MainData->CurrentFrame = 1;
 	return 1;
 }	/*OpenGAMESSDRC*/
+
+long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
+									 long NumOccAlpha, long NumOccBeta, long NumFragmentAtoms) {
+	long			NumBetaUHFOrbs=0;
+	char			LineText[kMaxLineLength+1];
+	
+	ProgressInd->ChangeText("Reading GAMESS GlobOp log file...");
+	Frame * lFrame = MainData->cFrame;
+	
+	long NumAtoms = lFrame->NumAtoms;
+	long NumExpectedAtoms = NumAtoms;
+		//Setup a new frame for the initial geometry.
+	lFrame = MainData->AddFrame(NumExpectedAtoms, lFrame->GetNumBonds());
+	if (MainData->InputOptions->Control->GetSCFType()==GAMESS_UHF) NumBetaUHFOrbs = NumOccBeta;	//Only seperate Beta spin orbs for UHF wavefunctions
+
+// There appear to be two type of files, MCMIN=T|F. If true each accepted geometry is optimized
+// and the code should only grab the optimized coordinates and energies. If false then there is just
+// a single set of coordinates and energy. 
+// If true look for "EQUILIBRIUM GEOMETRY LOCATED", grab the following coordinates and optionally, orbitals.
+// Both types end with an energy "ENERGY ACCEPTED AT POINT", probably best to use it.
+// It appears the globop frame is bracketed by "GEOMETRY NUMBER" and "ENERGY ACCEPTED", though not all 
+// geometries are accepted.
+	
+// Blah... The keywords for the GLOBOP group do not appear to be echoed in the log file
+
+	std::vector<std::string> keywords;
+	keywords.push_back(std::string("GEOMETRY NUMBER"));
+	keywords.push_back(std::string("NUCLEAR COORDINATES FOR Global Optimization POINT"));
+	keywords.push_back(std::string("ENERGY ACCEPTED AT POINT"));
+	keywords.push_back(std::string("EQUILIBRIUM GEOMETRY LOCATED"));
+	keywords.push_back(std::string("MOLECULAR ORBITALS"));
+	keywords.push_back(std::string("FAILURE TO LOCATE STATIONARY POINT"));
+	
+	int state = 1, kw;
+	while (! Buffer->Eof()) {
+		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+		{ throw UserCancel();}
+		if (-1 < (kw = Buffer->LocateKeyWord(keywords))) {
+			switch (kw) {
+				case 0:	//start of a search point
+					if (state == 0) {
+						state = 1;
+					} else {//found another start before finding the end of the previous geometry
+						//The most likely reason is that the previous geometry was not accepted.
+						//I could search for the rejection text, but this should do the trick.
+						MainData->DeleteFrame();
+						lFrame = MainData->GetCurrentFramePtr();
+					}
+					lFrame = MainData->AddFrame(NumExpectedAtoms, lFrame->GetNumBonds());
+					lFrame->IRCPt = MainData->GetNumFrames() - 1;
+					lFrame->time = MainData->GetNumFrames() - 1;
+					Buffer->SkipnLines(1);
+					break;
+				case 1:	// set of coordinates, MCMIN=false, these coords seem to be in an odd format
+					if (state == 1) {
+						Buffer->SkipnLines(1);
+						
+						//The output is in the form of index_# atomic name x y z
+					{
+						bool done=false;
+						int nextExpected=1;
+						while (!done) {
+							if (Buffer->GetLine(LineText) < 1) break;
+							int index;
+							CPoint3D position;
+							unsigned char Label[kMaxLineLength];
+							int items = sscanf(LineText, "%d %s %f%f%f", &index, Label, &(position.x),
+											   &(position.y), &(position.z));
+							if (items == 5) {
+								if (index != nextExpected) {
+									wxLogMessage(_("Error parsing coordinates, attempting to continue."));
+									break;
+								} else {
+									int atomtype = SetAtomType(Label);
+									if (atomtype > 0) {
+										lFrame->AddAtom(atomtype, position);
+									} else {
+										wxLogMessage(_("Error parsing coordinates, attempting to continue."));
+										break;
+									}
+								}
+								
+							} else {
+								Buffer->BackupnLines(1);	//reset position and end
+								break;
+							}
+							nextExpected ++;
+						}
+					}
+						
+						if ((NumFragmentAtoms <= 0)&&(NumExpectedAtoms > MainData->cFrame->NumAtoms))
+							NumFragmentAtoms = NumExpectedAtoms - MainData->cFrame->NumAtoms;
+						if (NumFragmentAtoms > 0) {
+							Buffer->BackupnLines(2);
+							if (Buffer->LocateKeyWord("COORDINATES OF FRAGMENT MULTIPOLE CENTERS", 41)) {
+								Buffer->SkipnLines(3);
+								MainData->ReadFragmentCoordinates(Buffer, NumFragmentAtoms);
+							}
+						}
+						if (Prefs->GetAutoBond())
+							lFrame->SetBonds(Prefs, false);
+					}
+					break;
+				case 2: // End of the search, read the energy and store the frame.
+					if (state == 0) {	// Found an end without a matching begining, skip
+						wxLogMessage(_("Unexpected end of search point! Skipping and attempting to continue"));
+						Buffer->SkipnLines(1);
+					} else {
+						Buffer->GetLine(LineText);
+						int geom;
+						int result = sscanf(&(LineText[25]), "%d IS %lf", &geom, &(lFrame->Energy));
+						if (result != 2)
+							wxLogMessage(_("Error parsing final energy for a geometry. Attempting to continue."));
+						sprintf(LineText, "Completed parsing geometry %d", geom);
+						ProgressInd->ChangeText(LineText);
+						state = 0;
+					}
+					break;
+				case 3:	// Final optimized coordinates, parse and overwrite previous set
+					if (state == 1) {
+						if (!Buffer->LocateKeyWord("COORDINATES OF ALL ATOMS", 24)) break;
+						Buffer->SkipnLines(3);
+
+						ParseGLogLine(Buffer, lFrame, NumAtoms, 10, &(MainData->MaxSize));
+						
+						if ((NumFragmentAtoms <= 0)&&(NumExpectedAtoms > MainData->cFrame->NumAtoms))
+							NumFragmentAtoms = NumExpectedAtoms - MainData->cFrame->NumAtoms;
+						if (NumFragmentAtoms > 0) {
+							Buffer->BackupnLines(2);
+							if (Buffer->LocateKeyWord("COORDINATES OF FRAGMENT MULTIPOLE CENTERS", 41)) {
+								Buffer->SkipnLines(3);
+								MainData->ReadFragmentCoordinates(Buffer, NumFragmentAtoms);
+							}
+						}
+						if (Prefs->GetAutoBond())
+							lFrame->SetBonds(Prefs, false);
+					} else Buffer->SkipnLines(1);
+					break;
+				case 4: // Set of Orbitals
+					//Attempt to read in orbitals for this geometry
+					if (state == 1) {
+						if (MainData->Basis) {
+							try {
+								//skip over the line to the start of the orbital blocks
+								//There is always a blank line before the orbs, but there may a '---' divider line after the key line just found
+								Buffer->SetFilePos(Buffer->FindBlankLine());
+								Buffer->SkipnLines(1);
+								ProgressInd->ChangeText("Reading eigenvectors");
+								if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+								{ throw UserCancel();}
+								lFrame->ParseGAMESSEigenVectors(Buffer, MainData->GetNumBasisFunctions(),
+																MainData->GetNumBasisFunctions(), NumBetaUHFOrbs, NumOccAlpha, NumOccBeta,
+																(TypeOfWavefunction)(MainData->InputOptions->Control->GetSCFType()), ProgressInd);
+							}
+							catch (std::bad_alloc) {
+								MessageAlert("Insufficient memory to read in eigenvectors.");
+							}
+							catch (MemoryError) {
+								MessageAlert("Insufficient memory to read in eigenvectors.");
+							}
+							catch (DataError) {
+								MessageAlert("Error reading eigenvectors, orbitals skipped.");
+							}
+						}
+					} else Buffer->SkipnLines(1);
+					break;
+				case 5:	//optimization failed. 
+					if (state == 1) {
+						sprintf(LineText, "Geometry optimization incomplete for frame %d", MainData->GetNumFrames()-1);
+						MessageAlert(LineText);
+						
+						if (Buffer->LocateKeyWord("COORDINATES OF ALL ATOMS ARE (ANGS)", 35)) {
+							Buffer->SkipnLines(3);
+							ParseGLogLine(Buffer, lFrame, NumAtoms, 10, &(MainData->MaxSize));
+							
+							if ((NumFragmentAtoms <= 0)&&(NumExpectedAtoms > MainData->cFrame->NumAtoms))
+								NumFragmentAtoms = NumExpectedAtoms - MainData->cFrame->NumAtoms;
+							if (NumFragmentAtoms > 0) {
+								Buffer->BackupnLines(2);
+								if (Buffer->LocateKeyWord("COORDINATES OF FRAGMENT MULTIPOLE CENTERS", 41)) {
+									Buffer->SkipnLines(3);
+									MainData->ReadFragmentCoordinates(Buffer, NumFragmentAtoms);
+								}
+							}
+							if (Prefs->GetAutoBond())
+								lFrame->SetBonds(Prefs, false);
+						}
+					} else Buffer->SkipnLines(1);
+					break;
+			}
+		} else break;
+	}
+	if (state == 1) MainData->DeleteFrame();	//started a frame without finding the end.
+	MainData->SetCurrentFrame(1);
+	MainData->DeleteFrame();	//Delete the initial frame that has only starting geometry
+	return 1;
+}	/*OpenGAMESSGlobOpLog*/
+
 /**
  Output the coordinates in gamess input format ($DATA and $EFRAG group).
  If AllFrames then a series of $DATA groups will be output for the user to divide as needed.
