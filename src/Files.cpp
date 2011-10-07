@@ -2403,7 +2403,10 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		EnergyPos = Buffer->GetFilePos();
 		Buffer->SetFilePos(HeaderEndPos);
 	}
-
+	std::vector<std::pair <std::string, int> > OptKeywords; //search tokens for optimizations
+	OptKeywords.push_back(make_pair (std::string("BEGINNING GEOMETRY SEARCH POINT"), 0));
+	OptKeywords.push_back(make_pair (std::string("1NSERCH"), 1));
+	
 	if (Append) {
 		if (!MainData->InputOptions) throw MemoryError();
 			//Determine the number of occupied alpha and beta orbitals
@@ -2942,6 +2945,11 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				lFrame = preserve;
 			}
 				//look for gradient data
+			if (Buffer->LocateKeyWord(OptKeywords) >= 0) {
+				KeyWordFound = true;
+				NextFinalPos = Buffer->GetFilePos();
+				Buffer->SetFilePos(EnergyPos);
+			}
 			lFrame->ReadGradient(Buffer, NextFinalPos);
 		} else if (NumFragmentAtoms > 0) {
 			if (Buffer->LocateKeyWord("TOT. INTER. ENERGY", 18, NextFinalPos)) {
@@ -2975,21 +2983,19 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	KeyWordFound = true;
 //	if (SIMOMM) KeyWordFound = false;	//only grab a single geometry for SIMOMM
 	double	FrameEnergy, MP2FrameEnergy;
-	bool NewStyleGeometryKeyWord=true;
-	char GeoSearchToken[] = "BEGINNING GEOMETRY SEARCH POINT";
-	if (!(Buffer->LocateKeyWord(GeoSearchToken, 31))) {
-		NewStyleGeometryKeyWord = false;
-		strcpy(GeoSearchToken, "1NSERCH");
-	}
+//	bool NewStyleGeometryKeyWord=true;
+//	char GeoSearchToken[] = "BEGINNING GEOMETRY SEARCH POINT";
+//	if (!(Buffer->LocateKeyWord(GeoSearchToken, 31))) {
+//		NewStyleGeometryKeyWord = false;
+//		strcpy(GeoSearchToken, "1NSERCH");
+//	}
 	while (KeyWordFound) {
 		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 			{ throw UserCancel();}
 		KeyWordFound = false;
 			//Advance to the start of the next geometry step BEGINNING GEOMETRY SEARCH POINT
 			//If there isn't one then we are done with the geometries
-		if (!(Buffer->LocateKeyWord(GeoSearchToken, strlen(GeoSearchToken)))) break;
-//		if (!(Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31) || 
-//			  Buffer->LocateKeyWord("1NSERCH", 7))) break;
+		if (Buffer->LocateKeyWord(OptKeywords) < 0) break;
 		StartPos = Buffer->GetFilePos();
 		if (Buffer->LocateKeyWord("FINAL", 5)) {	//Search for final and energy on the same line
 			Buffer->GetLine(LineText);				//since final also appears in LMO calcs.
@@ -3048,22 +3054,21 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			NextFinalPos = -1;
 			if (lFrame->NumAtoms - NumFragmentAtoms > 0) {
 		//		if (NewStyleGeometryKeyWord&&Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31)) {
-				if (Buffer->LocateKeyWord(GeoSearchToken, strlen(GeoSearchToken))) {
-					KeyWordFound = true;
-				} else {
-					NewStyleGeometryKeyWord = false;
-					KeyWordFound = Buffer->LocateKeyWord("FINAL", 5);
+				if (Buffer->LocateKeyWord(OptKeywords) >= 0) {
+		//			KeyWordFound = true;
+					NextFinalPos = Buffer->GetFilePos();
+					//this doesn't seem to be needed and it messes up the last point in a numerical opt.
+	//			} else {
+	//				KeyWordFound = Buffer->LocateKeyWord("FINAL", 5);
 				}
-				if (KeyWordFound) NextFinalPos = Buffer->GetFilePos();
+	//			if (KeyWordFound) NextFinalPos = Buffer->GetFilePos();
 				Buffer->SetFilePos(EnergyPos);
 			}
 		// The output for optimizations was changed in 1/1998 to print all coordinates
 		// at the top of an optimization step, but the older style is also still possible
 		//Look for ab initio atoms first
 			Buffer->SetFilePos(StartPos);	//reset pos to last frame to begin search
-//			if (Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31) || 
-//				 Buffer->LocateKeyWord("1NSERCH", 7)) {
-			if (Buffer->LocateKeyWord(GeoSearchToken, strlen(GeoSearchToken))) {
+			if (Buffer->LocateKeyWord(OptKeywords) >= 0) {
 				lpFrame = lFrame;
 				lFrame = MainData->AddFrame(lpFrame->NumAtoms,0);
 
@@ -3088,7 +3093,6 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 								MainData->DeleteFrame();
 								break;
 							}
-							lFrame->ReadGradient(Buffer, NextFinalPos);
 						} else if (Buffer->LocateKeyWord(" NSERCH", 7, NextFinalPos)) {
 							//Otherwise look for the coordinates at the end of the
 							//geometry step (pre 1998 style)
@@ -3100,23 +3104,20 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 								break;
 							}
 							Buffer->SetFilePos(npos);//reset position back to beginning of gradient data
-							lFrame->ReadGradient(Buffer, NextFinalPos);
 						}
 					}
 					if (NumFragmentAtoms > 0) {
 						wxFileOffset tempPos = Buffer->GetFilePos();
 						Buffer->SetFilePos(StartPos);
-						if (Buffer->LocateKeyWord(GeoSearchToken, strlen(GeoSearchToken))) {
-				//		if (Buffer->LocateKeyWord("BEGINNING GEOMETRY SEARCH POINT", 31) || 
-				//			Buffer->LocateKeyWord("1NSERCH", 7)) {
+						if (Buffer->LocateKeyWord(OptKeywords) >= 0) {
 							if (Buffer->LocateKeyWord("COORDINATES OF FRAGMENT MULTIPOLE CENTERS", 41, NextFinalPos)) {
 								Buffer->SkipnLines(3);
 								MainData->ReadFragmentCoordinates(Buffer, NumFragmentAtoms);
 							}
 							Buffer->SetFilePos(tempPos);
-							lFrame->ReadGradient(Buffer, NextFinalPos);
 						}
 					}
+					lFrame->ReadGradient(Buffer, NextFinalPos);
 				}
 				catch (...) {	//Error occured while parsing coordinates, delete this frame
 					MainData->DeleteFrame();
@@ -4366,8 +4367,11 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 	
 	long NumAtoms = lFrame->NumAtoms;
 	long NumExpectedAtoms = NumAtoms;
+	MainData->SetCurrentFrame(MainData->GetNumFrames());
 		//Setup a new frame for the initial geometry.
 	lFrame = MainData->AddFrame(NumExpectedAtoms, lFrame->GetNumBonds());
+	lFrame->IRCPt = MainData->GetCurrentFrame();
+	lFrame->time = MainData->GetCurrentFrame();
 	if (MainData->InputOptions->Control->GetSCFType()==GAMESS_UHF) NumBetaUHFOrbs = NumOccBeta;	//Only seperate Beta spin orbs for UHF wavefunctions
 
 // There appear to be two type of files, MCMIN=T|F. If true each accepted geometry is optimized
@@ -4378,7 +4382,9 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 // It appears the globop frame is bracketed by "GEOMETRY NUMBER" and "ENERGY ACCEPTED", though not all 
 // geometries are accepted.
 	
-// Blah... The keywords for the GLOBOP group do not appear to be echoed in the log file
+// Old GlobOp files lack the keywords, but current ones do have them under the heading of
+// ---- MONTE CARLO/SIMULATED ANNEALING OPTIONS -----
+	
 	enum GlobOpTags {
 		GeomStart=0,
 		NonOptGeometry,
@@ -4412,8 +4418,8 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 						lFrame = MainData->GetCurrentFramePtr();
 					}
 					lFrame = MainData->AddFrame(NumExpectedAtoms, lFrame->GetNumBonds());
-					lFrame->IRCPt = MainData->GetNumFrames() - 1;
-					lFrame->time = MainData->GetNumFrames() - 1;
+					lFrame->IRCPt = MainData->GetCurrentFrame();
+					lFrame->time = MainData->GetCurrentFrame();
 					Buffer->SkipnLines(1);
 					break;
 				case NonOptGeometry:	// set of coordinates, MCMIN=false, these coords seem to be in an odd format
