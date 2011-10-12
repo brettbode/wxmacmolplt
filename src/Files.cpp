@@ -3756,22 +3756,56 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 	ProgressInd->ChangeText("Reading GAMESS trajectory file...");
 	Frame * lFrame = MainData->cFrame;
 	
+	long NumAIAtoms=0, NumFragments=0, NumMDAtoms=0;
 	//Determine the specific run type
-	if (Buffer->LocateKeyWord("===== IRC DATA PACKET", 21, -1)) {
+	//the 1024 is arbitrary, but if it's not found in the first 1024 bytes it probably isn't there
+	if (Buffer->LocateKeyWord("===== IRC DATA PACKET", 21, 1024)) {
 		runType	= IRCRun;
-	} else if (Buffer->LocateKeyWord("===== DRC DATA PACKET", 21, -1)) {
+	} else if (Buffer->LocateKeyWord("===== DRC DATA PACKET", 21, 1024)) {
 		runType = DRCRun;
-	} else if (Buffer->LocateKeyWord("===== MD DATA PACKET", 20, -1)) {
+	} else if (Buffer->LocateKeyWord("===== MD DATA PACKET", 20, 1024)) {
 		runType = MolDynamics;
+	} else if (Buffer->LocateKeyWord("ACCEPTED AT GLOBAL SEARCH POINT", 20, 1024)) {
+		runType = GLOBOPRun;
+		wxFileOffset start = Buffer->GetFilePos();
+		wxFileOffset fragStart=0;
+		if (Buffer->LocateKeyWord("COORDINATES OF FRAGMENT MULTIPOLE CENTERS", 40)) {
+			fragStart = Buffer->GetFilePos();
+		}
+		wxFileOffset nextPoint = Buffer->GetFileLength();
+		if (Buffer->LocateKeyWord("ACCEPTED AT GLOBAL SEARCH POINT", 20)) {
+			nextPoint = Buffer->GetFilePos();
+		}
+		if (fragStart > 0) {	
+			Buffer->SetFilePos(fragStart);
+			while (Buffer->LocateKeyWord("FRAGNAME", 8, nextPoint)) {
+				NumFragments++;
+				Buffer->SkipnLines(1);
+			}
+		} else fragStart = nextPoint;
+		Buffer->SetFilePos(start);
+		NumAIAtoms = Buffer->GetNumLines(fragStart - start) - 5;//subtract off the header lines
 	}
 	if (!Append) { //set the runtype
 		if (!MainData->InputOptions) MainData->InputOptions = new InputData;
 		if (runType) MainData->InputOptions->Control->SetRunType(runType);
 	}
 	Buffer->SetFilePos(0);
+	std::vector<std::pair <std::string, int> > keywords;
+	keywords.push_back(make_pair (std::string("DATA PACKET"), 1));
+	keywords.push_back(make_pair (std::string("ACCEPTED AT GLOBAL SEARCH POINT"), 2));
+	
+	std::vector<std::pair <std::string, int> > AIkeywords;
+	AIkeywords.push_back(make_pair (std::string("----- QM PARTICLE COORDINATES"), 1));
+	AIkeywords.push_back(make_pair (std::string("COORDINATES OF ALL ATOMS ARE"), 2));
+
+	std::vector<std::pair <std::string, int> > FragmentAtomsKeywords;
+	FragmentAtomsKeywords.push_back(make_pair (std::string("----- EFP PARTICLE COORDINATES"), 1));
+	FragmentAtomsKeywords.push_back(make_pair (std::string("COORDINATES OF FRAGMENT MULTIPOLE CENTERS"), 2));
+
 	//search for the beginning of the information packet
 	
-	while (Buffer->LocateKeyWord("DATA PACKET", 11, -1)) {
+	while (Buffer->LocateKeyWord(keywords) > -1) {
 		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 		{ throw UserCancel();}
 		//if this is an irc we could pull the point out of the header line
@@ -3790,20 +3824,29 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 		Buffer->GetLine(LineText);
 		if (nSkip >= IRCnSkip) {
 			nSkip = 0;
-			long NumAIAtoms=0, NumFragments=0, NumMDAtoms=0;
-			ReadLongKeyword(LineText, "NAT", &NumAIAtoms);
-			ReadLongKeyword(LineText, "NFRG", &NumFragments);
-			ReadLongKeyword(LineText, "NQMMM", &NumMDAtoms);
-			//second line is the x-axis and total energy, either ttotal or stotal
-			//STOTAL=   1.49848 sqrt(amu)*bohr   tot. E=      -91.6219797490 Hartree
-			Buffer->GetLine(LineText);
-			float xvalue;
-			double totE;
-			if (runType == IRCRun)
-				ReadFloatKeyword(LineText, "STOTAL", &xvalue);
-			else	//MD and DRC spell it TTOTAL
-				ReadFloatKeyword(LineText, "TTOTAL", &xvalue);
-			ReadDoubleKeyword(LineText, "TOT. E", totE);
+			float xvalue=0.0;
+			double totE=0.0;
+			if (runType == GLOBOPRun) {
+				Buffer->BackupnLines(2);	//Need the first line for GlobOp files
+				Buffer->GetLine(LineText);
+				ReadDoubleKeyword(LineText, "ENERGY", totE);
+				int Pos = FindKeyWord(LineText, "POINT", 5);
+				if (Pos >= 0) {
+					sscanf(&(LineText[Pos+5]), "%f", &xvalue);
+				}
+			} else {
+				ReadLongKeyword(LineText, "NAT", &NumAIAtoms);
+				ReadLongKeyword(LineText, "NFRG", &NumFragments);
+				ReadLongKeyword(LineText, "NQMMM", &NumMDAtoms);
+				//second line is the x-axis and total energy, either ttotal or stotal
+				//STOTAL=   1.49848 sqrt(amu)*bohr   tot. E=      -91.6219797490 Hartree
+				Buffer->GetLine(LineText);
+				if (runType == IRCRun)
+					ReadFloatKeyword(LineText, "STOTAL", &xvalue);
+				else	//MD and DRC spell it TTOTAL
+					ReadFloatKeyword(LineText, "TTOTAL", &xvalue);
+				ReadDoubleKeyword(LineText, "TOT. E", totE);
+			}
 
 			xvalue *= flip;
 			xvalue += offset;
@@ -3841,13 +3884,27 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 				//setup the frame for the antipated atom count
 				if (!MainData->SetupFrameMemory(NumAIAtoms+NumFragments+NumMDAtoms, 0)) throw MemoryError();
 				
-				if ((NumAIAtoms > 0)&&Buffer->LocateKeyWord("----- QM PARTICLE COORDINATES", 29)) {
-					Buffer->SkipnLines(1);
-					ParseGLogLine(Buffer, lFrame, NumAIAtoms, 10, &(MainData->MaxSize));
+				if (NumAIAtoms > 0) {
+					switch (Buffer->LocateKeyWord(AIkeywords)) {
+						case 1:
+							Buffer->SkipnLines(1);
+							ParseGLogLine(Buffer, lFrame, NumAIAtoms, 10, &(MainData->MaxSize));
+							break;
+						case 2:
+							Buffer->SkipnLines(3); //just skip the header lines
+							ParseGLogLine(Buffer, lFrame, NumAIAtoms, 10, &(MainData->MaxSize));
+							break;
+						default:
+							wxLogMessage(_("Expected ab initio atoms, but unable to locate header."));
+					}
 				}
-				if ((NumFragments > 0)&&Buffer->LocateKeyWord("----- EFP PARTICLE COORDINATES", 30)) {
-					Buffer->SkipnLines(1);
-					for (int ifrag=0; ifrag<NumFragments; ifrag++) {
+				int fragkey;
+				if ((NumFragments > 0)&&(fragkey = Buffer->LocateKeyWord(FragmentAtomsKeywords))) {
+					if (fragkey == 1)
+						Buffer->SkipnLines(1);
+					else if (fragkey == 2)
+						Buffer->SkipnLines(3);
+					if (fragkey > 0) {
 						mpAtom *atm;
 						CPoint3D dst_locs[3];
 						CPoint3D pos;
@@ -4000,15 +4057,14 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 									new_pos = rot_pos + dst_locs[0];
 									lFrame->SetAtomPosition(i, new_pos);
 								}
-	//							Buffer->SkipnLines(lFrame->NumAtoms - fstart);
 							}
 							fragmentsfound++;
 							if (fragmentsfound < NumFragments) {
 								//gamess prints out all the coordinates, but we only read the first three
 								//need to skip the rest to the start of the next fragment
-								Buffer->LocateKeyWord("FRAGNAME", 8);
+								if (Buffer->LocateKeyWord("FRAGNAME", 8))
+									Buffer->GetLine(LineText);
 							}
-							Buffer->GetLine(LineText);
 						}
 					}
 					
