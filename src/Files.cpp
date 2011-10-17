@@ -2647,7 +2647,13 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			//Now read other Control options
 		if (!Buffer->LocateKeyWord("CONTRL OPTIONS", 14, EnergyPos)) {
 				// $CONTRL OPTIONS used to be JOB OPTIONS so check for it too
-			if (!Buffer->LocateKeyWord("JOB OPTIONS", 11, EnergyPos)) throw DataError();
+			if (!Buffer->LocateKeyWord("JOB OPTIONS", 11, EnergyPos)) {
+				//Unable to locate the job options, perhaps the run terminated abnormally?
+				if (Buffer->LocateKeyWord("EXECUTION OF GAMESS TERMINATED -ABNORMALLY- AT", 46))
+					wxLogMessage(_("GAMESS terminated abnormally. Please check the log file for details."));
+				wxLogMessage(_("Unable to locate run options."));
+				return 0;
+			}
 		}
 		MainData->ReadControlOptions(Buffer);
 			//System group is immediately after the control group
