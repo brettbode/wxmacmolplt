@@ -27,22 +27,27 @@ extern WinPrefs *	gPreferences;
  * This function checks buffer to see if it contains the keyword.  If so,
  * a value > 0 is returned.  Otherwise, -1 is returned.
  * @param buffer The buffer to scan through.
- * @param keyin The keyword to search for.
+ * @param keyin The keyword to search for. Must be uppercase.
  * @param numbyte The number of characters in the keyword.
  */
 long FindKeyWord(const char *buffer, const char keyin[], long numbyte) {
 	long	check;
-	
-	char * keyword = new char[numbyte+1];
-	strncpy(keyword, keyin, numbyte);
-	keyword[numbyte] = '\0';
-	for (check=0; check<numbyte; check++) 				/* Make sure the keyword is uppercase */
-		if ((keyword[check]>96) && (keyword[check]<123)) keyword[check] -= 32;
+
+#if __WXDEBUG__
+//	char * keyword = new char[numbyte+1];
+//	strncpy(keyword, keyin, numbyte);
+//	keyword[numbyte] = '\0';
+//	for (check=0; check<numbyte; check++) 				/* Make sure the keyword is uppercase */
+//		if ((keyword[check]>96) && (keyword[check]<123)) keyword[check] -= 32;
+	for (check=0; check<numbyte; check++)
+		if ((keyin[check]>96) && (keyin[check]<123))
+			wxLogMessage(_("Error: keyword search on lower case keyword"));
+#endif
 	long	pos=0;
 	long result = -1;
 	while (buffer[pos]) {
 		check = 0;
-		while (((buffer[pos+check] == keyword[check])||(buffer[pos+check]-32 == keyword[check]))&&
+		while (((buffer[pos+check] == keyin[check])||(buffer[pos+check]-32 == keyin[check]))&&
 			(check < numbyte)) check++;
 		if (check == numbyte) {
 			result = pos;
@@ -50,7 +55,7 @@ long FindKeyWord(const char *buffer, const char keyin[], long numbyte) {
 		}
 		pos++;
 	}
-	delete [] keyword;
+//	delete [] keyword;
 	return result;
 } /* FindKeyword */
 
@@ -435,7 +440,8 @@ void BufferFile::BackupnLines(long nBack) {
 				wxFileOffset cPos = GetFilePos();
 				BufferStart = MAX(0, (BufferStart-BufferSize-1));
 				AdvanceBuffer();
-				BufferPos = (long) (cPos-BufferStart);	//Set pos to end of buffer
+				BufferPos = (long) (cPos-BufferStart-1);	//Set pos to end of buffer
+				if (BufferPos<0) BufferPos = 0;	//Don't think this is possible, but just to be safe.
 			}
 		}
 		if ((Buffer[BufferPos]==10)&&(Buffer[BufferPos-1]==13)) BufferPos--;

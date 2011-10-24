@@ -2393,21 +2393,27 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 
 	EnergyPos = -1;
 	NextFinalPos = -1;
-		//First Skip over all of the input card lines
-	while (Buffer->LocateKeyWord("INPUT CARD>", 11))
+		//First Skip over all of the input card lines, the lines are near the beginning of the file and one after another
+	while (Buffer->LocateKeyWord("INPUT CARD>", 11, (Buffer->GetFilePos()+1000)))
 		Buffer->SkipnLines(1);
-	wxFileOffset HeaderEndPos = Buffer->GetFilePos();
-	Buffer->LocateKeyWord("RUN TITLE", 9);	//find and skip over run title since
-	Buffer->SkipnLines(3);					//it can contain any arbitrary text
-	if (Buffer->LocateKeyWord("FINAL", 5)) {//locate initial energy since all options are before it
-		EnergyPos = Buffer->GetFilePos();
-		Buffer->SetFilePos(HeaderEndPos);
-	}
+	wxFileOffset HeaderEndPos = Buffer->GetFilePos();	//We don't care about anything earlier than this pos.
+//	Buffer->LocateKeyWord("RUN TITLE", 9);	//find and skip over run title since
+//	Buffer->SkipnLines(3);					//it can contain any arbitrary text
+//	if (Buffer->LocateKeyWord("FINAL", 5)) {//locate initial energy since all options are before it
+//		EnergyPos = Buffer->GetFilePos();
+//		Buffer->SetFilePos(HeaderEndPos);
+//	}
 	std::vector<std::pair <std::string, int> > OptKeywords; //search tokens for optimizations
 	OptKeywords.push_back(make_pair (std::string("BEGINNING GEOMETRY SEARCH POINT"), 0));
 	OptKeywords.push_back(make_pair (std::string("1NSERCH"), 1));
 	
 	if (Append) {
+		Buffer->LocateKeyWord("RUN TITLE", 9);	//find and skip over run title since
+		Buffer->SkipnLines(3);					//it can contain any arbitrary text
+		if (Buffer->LocateKeyWord("FINAL", 5)) {//locate initial energy since all options are before it
+			EnergyPos = Buffer->GetFilePos();
+			Buffer->SetFilePos(HeaderEndPos);
+		}
 		if (!MainData->InputOptions) throw MemoryError();
 			//Determine the number of occupied alpha and beta orbitals
 		if (Buffer->LocateKeyWord("NUMBER OF OCCUPIED ORBITALS (ALPHA)", 35, EnergyPos)) {
@@ -2467,70 +2473,325 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	} else {
 		MainData->InputOptions = new InputData;
 		if (!MainData->InputOptions) throw MemoryError();
-		KeyWordFound = Buffer->LocateKeyWord("BASIS OPTIONS", 13, EnergyPos);
-		if (KeyWordFound) {	//Read in the basis set information (for user reference)
-			ProgressInd->ChangeText("Reading Basis information");
-			if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
-				{ throw UserCancel();}
-			MainData->ReadBasisOptions(Buffer);
-		}
-		if (Buffer->LocateKeyWord("RUN TITLE", 9, EnergyPos)) {	//Read the 1 line run label
-			Buffer->SkipnLines(2);
-			Buffer->GetLine(LineText);
-			MainData->InputOptions->Data->SetTitle(LineText, strlen(LineText));
-		}
-		if (Buffer->LocateKeyWord("POINT GROUP", 11, EnergyPos)) {	//Setup molecular point group
-			Buffer->GetLine(LineText);
-			LinePos = FindKeyWord(LineText, "MOLECULE IS", 11);
-			if (LinePos > -1) {
-				sscanf(&(LineText[LinePos+12]), "%s", token);
-				MainData->InputOptions->Data->SetPointGroup(token);
-			}
+		enum {
+			final=0,
+			headerEnd,
+			basisOptions,
+			runTitle,
+			pointGroup,
+			QMMM,
+			coords,
+			EFRAG,
+			basisSet,
+			molCharge,
+			multiplicity,
+			occAlphaOrbs,
+			occBetaOrbs,
+			ECPoptions,
+			gridDFT,
+			gridFreeDFT,
+			controlOptions,
+			systemOptions,
+			GVBOptions,
+			abnormalTerm
+		};
+		std::vector<std::pair <std::string, int> > HeaderKeywords;
+//		HeaderKeywords.push_back(make_pair (std::string("FINAL"), (int) final));
+		HeaderKeywords.push_back(make_pair (std::string("DONE SETTING UP THE RUN"), (int) headerEnd));
+		HeaderKeywords.push_back(make_pair (std::string("BASIS OPTIONS"), (int) basisOptions));
+		HeaderKeywords.push_back(make_pair (std::string("RUN TITLE"), (int) runTitle));
+		HeaderKeywords.push_back(make_pair (std::string("POINT GROUP"), (int) pointGroup));
+		HeaderKeywords.push_back(make_pair (std::string("QMMM PROCEDURE IS ON"), (int) QMMM));
+		HeaderKeywords.push_back(make_pair (std::string("COORDINATES (BOHR)"), (int) coords));
+		HeaderKeywords.push_back(make_pair (std::string("READING $EFRAG GROUP"), (int) EFRAG));
+		HeaderKeywords.push_back(make_pair (std::string("ATOMIC BASIS SET"), (int) basisSet));
+		HeaderKeywords.push_back(make_pair (std::string("CHARGE OF MOLECULE"), (int) molCharge));
+		HeaderKeywords.push_back(make_pair (std::string("MULTIPLICITY"), (int) multiplicity));
+		HeaderKeywords.push_back(make_pair (std::string("NUMBER OF OCCUPIED ORBITALS (ALPHA)"), (int) occAlphaOrbs));
+		HeaderKeywords.push_back(make_pair (std::string("NUMBER OF OCCUPIED ORBITALS (BETA )"), (int) occBetaOrbs));
+		HeaderKeywords.push_back(make_pair (std::string("ECP POTENTIALS"), (int) ECPoptions));
+		HeaderKeywords.push_back(make_pair (std::string("MODEL-POTENTIALS"), (int) ECPoptions));
+		HeaderKeywords.push_back(make_pair (std::string("GRID-BASED DFT"), (int) gridDFT));
+		HeaderKeywords.push_back(make_pair (std::string("MODEL-POTENTIALS"), (int) gridFreeDFT));
+		HeaderKeywords.push_back(make_pair (std::string("CONTRL OPTIONS"), (int) controlOptions));
+		HeaderKeywords.push_back(make_pair (std::string("JOB OPTIONS"), (int) controlOptions));
+		HeaderKeywords.push_back(make_pair (std::string("SYSTEM OPTIONS"), (int) systemOptions));
+		HeaderKeywords.push_back(make_pair (std::string("EXECUTION OF GAMESS TERMINATED -ABNORMALLY- AT"), (int) abnormalTerm));
 
-			Buffer->GetLine(LineText);
-			LinePos = FindKeyWord(LineText, "AXIS IS", 7);
-			if (LinePos > -1) {
-				sscanf(&(LineText[LinePos+8]),"%ld", &test);
-				MainData->InputOptions->Data->SetPointGroupOrder(test);
-			}
-		}
-		Buffer->SetFilePos(0);
-		if (Buffer->LocateKeyWord("QMMM PROCEDURE IS ON", 20, EnergyPos)) {
-			//If this is a simmom type run then switch to that routine since the format is
-			//significantly different
-//			return (ParseSIMMOMLogFile(Buffer, EnergyPos));
-			SIMOMM=true;
-			ProgressInd->ChangeText("Reading Tinker Coordinates");
+		bool headerDone=false;
+		bool controlOptionsFound = false;
+		while (! Buffer->Eof() && ! headerDone) {
 			if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
-			{throw UserCancel();}
-			MainData->ParseTinkerCoordinates(Buffer);
-			//The ab initio atoms will be added below
-		}
-	//locate the input set of coordinates (present in every file)
-		if (Buffer->LocateKeyWord("COORDINATES (BOHR)", 16, EnergyPos)) {	//first normal (ab initio) atoms
-			ProgressInd->ChangeText("Reading Coordinates");
-			if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
-				{ AbortOpen("File open canceled by user"); return 0;}
-
-			Buffer->SkipnLines(2);
-			StartPos = Buffer->GetFilePos();
-			test = Buffer->FindBlankLine() - StartPos;
-			numlines = Buffer->GetNumLines(test);
-			if (numlines > 0) {
-				if (!MainData->SetupFrameMemory(numlines+lFrame->NumAtoms, 0)) throw MemoryError();
-			} else {
-				wxLogMessage(_("Unable to locate coordinates in the file."));
-				throw DataError();
-			}
-			if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize))) {
-				wxLogMessage(_("Unable to interpert coordinates."));
-				throw DataError();
-			}
-		}
-		StartPos = Buffer->GetFilePos();		//next look for fragments
-		if (Buffer->LocateKeyWord("READING $EFRAG GROUP", 20, EnergyPos)) {	//ughh fragments!
-			NumFragmentAtoms = MainData->ReadInitialFragmentCoords(Buffer);
-			Buffer->SetFilePos(StartPos);
+			{ throw UserCancel();}
+			int kw;
+			if (-1 < (kw = Buffer->LocateKeyWord(HeaderKeywords))) {
+				switch (kw) {
+					case final:
+						headerDone = true;
+						EnergyPos = Buffer->GetFilePos();
+						break;
+					case headerEnd:
+						headerDone = true;
+						break;
+					case basisOptions:
+	//					KeyWordFound = Buffer->LocateKeyWord("BASIS OPTIONS", 13, EnergyPos);
+	//					if (KeyWordFound) {	//Read in the basis set information (for user reference)
+							ProgressInd->ChangeText("Reading Basis information");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							MainData->ReadBasisOptions(Buffer);
+	//					}
+						break;
+					case runTitle:
+		//				if (Buffer->LocateKeyWord("RUN TITLE", 9, EnergyPos)) {	//Read the 1 line run label
+							Buffer->SkipnLines(2);
+							Buffer->GetLine(LineText);
+							MainData->InputOptions->Data->SetTitle(LineText, strlen(LineText));
+		//				}
+						break;
+					case pointGroup:
+//						if (Buffer->LocateKeyWord("POINT GROUP", 11, EnergyPos)) {	//Setup molecular point group
+							Buffer->GetLine(LineText);
+							LinePos = FindKeyWord(LineText, "MOLECULE IS", 11);
+							if (LinePos > -1) {
+								sscanf(&(LineText[LinePos+12]), "%s", token);
+								MainData->InputOptions->Data->SetPointGroup(token);
+							}
+							
+							Buffer->GetLine(LineText);
+							LinePos = FindKeyWord(LineText, "AXIS IS", 7);
+							if (LinePos > -1) {
+								sscanf(&(LineText[LinePos+8]),"%ld", &test);
+								MainData->InputOptions->Data->SetPointGroupOrder(test);
+							}
+//						}
+						break;
+					case QMMM:
+//						Buffer->SetFilePos(HeaderEndPos);
+//						if (Buffer->LocateKeyWord("QMMM PROCEDURE IS ON", 20, EnergyPos)) {
+							//If this is a simmom type run then switch to that routine since the format is
+							//significantly different
+							//			return (ParseSIMMOMLogFile(Buffer, EnergyPos));
+							SIMOMM=true;
+							ProgressInd->ChangeText("Reading Tinker Coordinates");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{throw UserCancel();}
+							MainData->ParseTinkerCoordinates(Buffer);
+							//The ab initio atoms will be added below
+//						}
+						break;
+					case coords:
+						//locate the input set of coordinates (present in every file)
+	//					if (Buffer->LocateKeyWord("COORDINATES (BOHR)", 16, EnergyPos)) {	//first normal (ab initio) atoms
+							ProgressInd->ChangeText("Reading Coordinates");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ AbortOpen("File open canceled by user"); return 0;}
+							
+							Buffer->SkipnLines(2);
+							StartPos = Buffer->GetFilePos();
+							test = Buffer->FindBlankLine() - StartPos;
+							numlines = Buffer->GetNumLines(test);
+							if (numlines > 0) {
+								if (!MainData->SetupFrameMemory(numlines+lFrame->NumAtoms, 0)) throw MemoryError();
+							} else {
+								wxLogMessage(_("Unable to locate coordinates in the file."));
+								throw DataError();
+							}
+							if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize))) {
+								wxLogMessage(_("Unable to interpert coordinates."));
+								throw DataError();
+							}
+	//					}
+						break;
+					case EFRAG:
+//						StartPos = Buffer->GetFilePos();		//next look for fragments
+//						if (Buffer->LocateKeyWord("READING $EFRAG GROUP", 20, EnergyPos)) {	//ughh fragments!
+							NumFragmentAtoms = MainData->ReadInitialFragmentCoords(Buffer);
+//							Buffer->SetFilePos(StartPos);
+//						}
+						break;
+					case basisSet:
+						//Read in the atomic basis set (if present) and keep it in case we find MO vectors later
+						//if it is not located and read in correctly MO vectors will also be skipped
+	//					if (Buffer->LocateKeyWord("ATOMIC BASIS SET", 16, EnergyPos)) {
+					{
+							ProgressInd->ChangeText("Reading atomic basis set");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							try {
+								MainData->ParseGAMESSBasisSet(Buffer);
+								BasisSet * Basis = MainData->Basis;
+								if (Basis && SIMOMM) {	//generate the nuclear charge array
+									if (Basis->NuclearCharge[0] == -1) {
+										if (MainData->cFrame->NumAtoms == Basis->MapLength) {
+											//for the purpose of the basis set, set the charge of mm atoms to 0
+											for (long iatom=0; iatom<MainData->cFrame->NumAtoms; ++iatom) {
+												if (! MainData->cFrame->Atoms[iatom].IsSIMOMMAtom() )
+													Basis->NuclearCharge[iatom] = MainData->cFrame->Atoms[iatom].GetNuclearCharge();
+												else
+													Basis->NuclearCharge[iatom] = 0;
+											}
+										}
+									}
+								}
+							}
+							catch (MemoryError) {
+								if (MainData->Basis) delete MainData->Basis;
+								MainData->Basis = NULL;
+								MessageAlert("Insufficient Memory to read the Basis Set.");
+							}
+							catch (std::bad_alloc) {
+								if (MainData->Basis) delete MainData->Basis;
+								MainData->Basis = NULL;
+								MessageAlert("Insufficient Memory to read the Basis Set.");
+							}
+							catch (DataError) {
+								MessageAlert("An error occured while reading the basis set, basis set skipped.");
+								if (MainData->Basis) delete MainData->Basis;
+								MainData->Basis = NULL;
+							}
+						}
+						break;
+					case molCharge:
+						//Read in charge and multiplicity
+//						if (Buffer->LocateKeyWord("CHARGE OF MOLECULE", 18, EnergyPos)) {
+							Buffer->GetLine(LineText);
+							LinePos = FindKeyWord(LineText, "=", 1) + 1;
+							long charge;
+							sscanf(&(LineText[LinePos]),"%ld", &charge);
+							MainData->InputOptions->Control->SetCharge(charge);
+//						}
+						break;
+					case multiplicity:
+						//There are now two forms of this, "SPIN MULTIPLICITY" and "STATE MULTIPLICITY"
+						//however, either should appear soon after the CHARGE.
+//						if (Buffer->LocateKeyWord("MULTIPLICITY", 12, Buffer->GetFilePos()+100)) {
+							Buffer->GetLine(LineText);
+							LinePos = FindKeyWord(LineText, "=", 1) + 1;
+							long Multiplicity;
+							sscanf(&(LineText[LinePos]),"%ld", &Multiplicity);
+							MainData->InputOptions->Control->SetMultiplicity(Multiplicity);
+//						}
+						break;
+					case occAlphaOrbs:
+						//Determine the number of occupied alpha and beta orbitals
+//						if (Buffer->LocateKeyWord("NUMBER OF OCCUPIED ORBITALS (ALPHA)", 35, EnergyPos)) {
+							Buffer->GetLine(LineText);
+							LinePos = FindKeyWord(LineText, "=", 1) + 1;
+							sscanf(&(LineText[LinePos]),"%ld", &NumOccAlpha);
+//						}
+						break;
+					case occBetaOrbs:
+//						if (Buffer->LocateKeyWord("NUMBER OF OCCUPIED ORBITALS (BETA )", 35, EnergyPos)) {
+							Buffer->GetLine(LineText);
+							LinePos = FindKeyWord(LineText, "=", 1) + 1;
+							sscanf(&(LineText[LinePos]),"%ld", &NumOccBeta);
+//						}
+						break;
+					case ECPoptions:
+//						SavedPos = Buffer->GetFilePos();
+						//Check for ECP type run which reduces the number of occupied orbitals
+//						if (Buffer->LocateKeyWord("ECP POTENTIALS", 14, EnergyPos)||
+//							Buffer->LocateKeyWord("MODEL-POTENTIALS", 16, EnergyPos)) {
+							test = MainData->ParseECPotentials(Buffer);
+							test /= 2;
+							NumOccAlpha -= test;
+							if (NumOccAlpha < 0) NumOccAlpha = 0;	//Oops!
+							if (NumOccBeta) NumOccBeta -= test;
+							if (NumOccBeta<0) NumOccBeta = 0;
+							Buffer->SetFilePos(SavedPos);
+//						}
+						break;
+					case gridDFT:
+						//DFT options
+	//					if (Buffer->LocateKeyWord("GRID-BASED DFT", 14, EnergyPos)) 
+					{
+							Buffer->SkipnLines(2);
+							Buffer->GetLine(LineText);
+							char DFTTYP[kMaxLineLength];
+							if (ReadStringKeyword(LineText, "DFTTYP", DFTTYP)) {
+								MainData->InputOptions->DFT.SetFunctional(DFTTYP);
+								if (MainData->InputOptions->DFT.GetFunctional() > 0)
+									MainData->InputOptions->Control->UseDFT(true);
+								else
+									wxLogMessage(_("Unknown DFTTYP detected, ignored."));
+							}
+					}
+							break;
+					case gridFreeDFT:
+					//	 else if (Buffer->LocateKeyWord("GRID-FREE DFT", 13, EnergyPos)) 
+					{
+							Buffer->SkipnLines(2);
+							Buffer->GetLine(LineText);
+							char DFTTYP[kMaxLineLength];
+							MainData->InputOptions->DFT.SetMethodGrid(false);
+							if (ReadStringKeyword(LineText, "DFTTYP", DFTTYP)) {
+								MainData->InputOptions->DFT.SetFunctional(DFTTYP);
+								if (MainData->InputOptions->DFT.GetFunctional() > 0)
+									MainData->InputOptions->Control->UseDFT(true);
+								else
+									wxLogMessage(_("Unknown DFTTYP detected, ignored."));
+							}
+						}
+						break;
+					case controlOptions:
+						//Now read other Control options
+//						if (!Buffer->LocateKeyWord("CONTRL OPTIONS", 14, EnergyPos)) {
+//							// $CONTRL OPTIONS used to be JOB OPTIONS so check for it too
+//							if (!Buffer->LocateKeyWord("JOB OPTIONS", 11, EnergyPos)) {
+//								//Unable to locate the job options, perhaps the run terminated abnormally?
+//								if (Buffer->LocateKeyWord("EXECUTION OF GAMESS TERMINATED -ABNORMALLY- AT", 46))
+//									wxLogMessage(_("GAMESS terminated abnormally. Please check the log file for details."));
+//								wxLogMessage(_("Unable to locate run options."));
+//								return 0;
+//							}
+//						}
+						MainData->ReadControlOptions(Buffer);
+						controlOptionsFound = true;
+						if (MainData->InputOptions->Control->GetSCFType()==GAMESS_GVB)
+							HeaderKeywords.push_back(make_pair (std::string("ROHF-GVB INPUT PARAMETERS"), (int) GVBOptions));
+						break;
+					case systemOptions:
+						//System group is immediately after the control group
+			//			if (Buffer->LocateKeyWord("SYSTEM OPTIONS", 14, EnergyPos)) {
+							MainData->InputOptions->System->ReadSystemOptions(Buffer);
+			//			}
+						break;
+					case GVBOptions:
+//						if (MainData->InputOptions->Control->GetSCFType()==GAMESS_GVB) { // Parse the GVB input parameters
+//							if (Buffer->LocateKeyWord("ROHF-GVB INPUT PARAMETERS", 26, EnergyPos)) {
+								Buffer->SkipnLines(3);
+								Buffer->GetLine(LineText);
+								sscanf(LineText, " NORB   =%ld NCO    =%ld", &test, &NumCoreOrbs);
+								NumOccAlpha = test;
+								Buffer->GetLine(LineText);
+								sscanf(LineText, " NPAIR  =%ld NSETO  =%ld", &NumGVBPairOrbs, &NumOpenOrbs);
+//							}
+							Occupancy = new float[MainData->GetNumBasisFunctions()];
+							if (!Occupancy) throw MemoryError();
+							for (test=0; test<MainData->GetNumBasisFunctions(); ++test) Occupancy[test] = 0.0f;
+							for (test=0; test<NumCoreOrbs; ++test) Occupancy[test] = 2.0f;
+							if (NumOpenOrbs > 0) {	//Parse the occupancies of the open shells
+								if (Buffer->LocateKeyWord("F VECTOR (OCCUPANCIES)", 23)) {
+									long nSkip = 3;
+									if (NumCoreOrbs > 0) nSkip = 4;	//skip the one line for all doubly occupied core orbs
+									Buffer->SkipnLines(nSkip);
+									for (nSkip=0; nSkip<NumOpenOrbs; ++nSkip) {
+										Buffer->GetLine(LineText);
+										sscanf(LineText, "%ld %f", &test, &(Occupancy[NumCoreOrbs + nSkip]));
+										Occupancy[NumCoreOrbs + nSkip] *= 2;	//occupancies are listed as % of orbital filled
+									}
+								}
+							}
+	//					}
+						break;
+					case abnormalTerm:
+					//		if (Buffer->LocateKeyWord("EXECUTION OF GAMESS TERMINATED -ABNORMALLY- AT", 46))
+						wxLogMessage(_("GAMESS terminated abnormally. Please check the log file for details."));
+						return 0;
+						break;
+				}
+			} else break;
 		}
 		if (lFrame->NumAtoms <= 0) {	//initial coordinates not found! Abort!
 			wxLogMessage(_("Unable to locate coordinates in the file."));
@@ -2538,128 +2799,8 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		}
 		if (Prefs->GetAutoBond())
 			lFrame->SetBonds(Prefs, false);
-
-	//Read in the atomic basis set (if present) and keep it in case we find MO vectors later
-	//if it is not located and read in correctly MO vectors will also be skipped
-		if (Buffer->LocateKeyWord("ATOMIC BASIS SET", 16, EnergyPos)) {
-			ProgressInd->ChangeText("Reading atomic basis set");
-			if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
-				{ throw UserCancel();}
-			try {
-				MainData->ParseGAMESSBasisSet(Buffer);
-				BasisSet * Basis = MainData->Basis;
-				if (Basis && SIMOMM) {	//generate the nuclear charge array
-					if (Basis->NuclearCharge[0] == -1) {
-						if (MainData->cFrame->NumAtoms == Basis->MapLength) {
-							//for the purpose of the basis set, set the charge of mm atoms to 0
-							for (long iatom=0; iatom<MainData->cFrame->NumAtoms; ++iatom) {
-								if (! MainData->cFrame->Atoms[iatom].IsSIMOMMAtom() )
-									Basis->NuclearCharge[iatom] = MainData->cFrame->Atoms[iatom].GetNuclearCharge();
-								else
-									Basis->NuclearCharge[iatom] = 0;
-							}
-						}
-					}
-				}
-			}
-			catch (MemoryError) {
-				if (MainData->Basis) delete MainData->Basis;
-				MainData->Basis = NULL;
-				MessageAlert("Insufficient Memory to read the Basis Set.");
-			}
-			catch (std::bad_alloc) {
-				if (MainData->Basis) delete MainData->Basis;
-				MainData->Basis = NULL;
-				MessageAlert("Insufficient Memory to read the Basis Set.");
-			}
-			catch (DataError) {
-				MessageAlert("An error occured while reading the basis set, basis set skipped.");
-				if (MainData->Basis) delete MainData->Basis;
-				MainData->Basis = NULL;
-			}
-		}
-
-			//Read in charge and multiplicity
-		if (Buffer->LocateKeyWord("CHARGE OF MOLECULE", 18, EnergyPos)) {
-			Buffer->GetLine(LineText);
-			LinePos = FindKeyWord(LineText, "=", 1) + 1;
-			long charge;
-			sscanf(&(LineText[LinePos]),"%ld", &charge);
-			MainData->InputOptions->Control->SetCharge(charge);
-		}
-			//There are now two forms of this, "SPIN MULTIPLICITY" and "STATE MULTIPLICITY"
-			//however, either should appear soon after the CHARGE.
-		if (Buffer->LocateKeyWord("MULTIPLICITY", 12, Buffer->GetFilePos()+100)) {
-			Buffer->GetLine(LineText);
-			LinePos = FindKeyWord(LineText, "=", 1) + 1;
-			long Multiplicity;
-			sscanf(&(LineText[LinePos]),"%ld", &Multiplicity);
-			MainData->InputOptions->Control->SetMultiplicity(Multiplicity);
-		}
-			//Determine the number of occupied alpha and beta orbitals
-		if (Buffer->LocateKeyWord("NUMBER OF OCCUPIED ORBITALS (ALPHA)", 35, EnergyPos)) {
-			Buffer->GetLine(LineText);
-			LinePos = FindKeyWord(LineText, "=", 1) + 1;
-			sscanf(&(LineText[LinePos]),"%ld", &NumOccAlpha);
-		}
-		if (Buffer->LocateKeyWord("NUMBER OF OCCUPIED ORBITALS (BETA )", 35, EnergyPos)) {
-			Buffer->GetLine(LineText);
-			LinePos = FindKeyWord(LineText, "=", 1) + 1;
-			sscanf(&(LineText[LinePos]),"%ld", &NumOccBeta);
-		}
-		SavedPos = Buffer->GetFilePos();
-			//Check for ECP type run which reduces the number of occupied orbitals
-		if (Buffer->LocateKeyWord("ECP POTENTIALS", 14, EnergyPos)||
-			Buffer->LocateKeyWord("MODEL-POTENTIALS", 16, EnergyPos)) {
-			test = MainData->ParseECPotentials(Buffer);
-			test /= 2;
-			NumOccAlpha -= test;
-			if (NumOccAlpha < 0) NumOccAlpha = 0;	//Oops!
-			if (NumOccBeta) NumOccBeta -= test;
-			if (NumOccBeta<0) NumOccBeta = 0;
-			Buffer->SetFilePos(SavedPos);
-		}
-		//DFT options
-		if (Buffer->LocateKeyWord("GRID-BASED DFT", 14, EnergyPos)) {
-			Buffer->SkipnLines(2);
-			Buffer->GetLine(LineText);
-			char DFTTYP[kMaxLineLength];
-			if (ReadStringKeyword(LineText, "DFTTYP", DFTTYP)) {
-				MainData->InputOptions->DFT.SetFunctional(DFTTYP);
-				if (MainData->InputOptions->DFT.GetFunctional() > 0)
-					MainData->InputOptions->Control->UseDFT(true);
-				else
-					wxLogMessage(_("Unknown DFTTYP detected, ignored."));
-			}
-		} else if (Buffer->LocateKeyWord("GRID-FREE DFT", 13, EnergyPos)) {
-			Buffer->SkipnLines(2);
-			Buffer->GetLine(LineText);
-			char DFTTYP[kMaxLineLength];
-			MainData->InputOptions->DFT.SetMethodGrid(false);
-			if (ReadStringKeyword(LineText, "DFTTYP", DFTTYP)) {
-				MainData->InputOptions->DFT.SetFunctional(DFTTYP);
-				if (MainData->InputOptions->DFT.GetFunctional() > 0)
-					MainData->InputOptions->Control->UseDFT(true);
-				else
-					wxLogMessage(_("Unknown DFTTYP detected, ignored."));
-			}
-		}
-			//Now read other Control options
-		if (!Buffer->LocateKeyWord("CONTRL OPTIONS", 14, EnergyPos)) {
-				// $CONTRL OPTIONS used to be JOB OPTIONS so check for it too
-			if (!Buffer->LocateKeyWord("JOB OPTIONS", 11, EnergyPos)) {
-				//Unable to locate the job options, perhaps the run terminated abnormally?
-				if (Buffer->LocateKeyWord("EXECUTION OF GAMESS TERMINATED -ABNORMALLY- AT", 46))
-					wxLogMessage(_("GAMESS terminated abnormally. Please check the log file for details."));
-				wxLogMessage(_("Unable to locate run options."));
-				return 0;
-			}
-		}
-		MainData->ReadControlOptions(Buffer);
-			//System group is immediately after the control group
-		if (Buffer->LocateKeyWord("SYSTEM OPTIONS", 14, EnergyPos)) {
-			MainData->InputOptions->System->ReadSystemOptions(Buffer);
-		}
+		
+		if (!controlOptionsFound) wxLogMessage(_("Unable to locate run options. Attempting to continue"));
 		
 			//Now that the $control options are read in normalize the basis set (normf and normp are needed)
 		if (MainData->Basis) MainData->Basis->Normalize(MainData->InputOptions->Control->GetNormP(),
@@ -2679,32 +2820,16 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 		else if (MainData->InputOptions->Control->GetSCFType()!=GAMESS_ROHF)
 			NumOccBeta = 0;
 
-		if (MainData->InputOptions->Control->GetSCFType()==GAMESS_GVB) { // Parse the GVB input parameters
-			if (Buffer->LocateKeyWord("ROHF-GVB INPUT PARAMETERS", 26, EnergyPos)) {
-				Buffer->SkipnLines(3);
-				Buffer->GetLine(LineText);
-				sscanf(LineText, " NORB   =%ld NCO    =%ld", &test, &NumCoreOrbs);
-				NumOccAlpha = test;
-				Buffer->GetLine(LineText);
-				sscanf(LineText, " NPAIR  =%ld NSETO  =%ld", &NumGVBPairOrbs, &NumOpenOrbs);
-			}
-			Occupancy = new float[MainData->GetNumBasisFunctions()];
-			if (!Occupancy) throw MemoryError();
-			for (test=0; test<MainData->GetNumBasisFunctions(); ++test) Occupancy[test] = 0.0f;
-			for (test=0; test<NumCoreOrbs; ++test) Occupancy[test] = 2.0f;
-			if (NumOpenOrbs > 0) {	//Parse the occupancies of the open shells
-				if (Buffer->LocateKeyWord("F VECTOR (OCCUPANCIES)", 23)) {
-						long nSkip = 3;
-					if (NumCoreOrbs > 0) nSkip = 4;	//skip the one line for all doubly occupied core orbs
-					Buffer->SkipnLines(nSkip);
-					for (nSkip=0; nSkip<NumOpenOrbs; ++nSkip) {
-						Buffer->GetLine(LineText);
-						sscanf(LineText, "%ld %f", &test, &(Occupancy[NumCoreOrbs + nSkip]));
-						Occupancy[NumCoreOrbs + nSkip] *= 2;	//occupancies are listed as % of orbital filled
-					}
-				}
-			}
-		} else if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {	//Calculate the # of occupied MOs by parsing the DRT info
+		if (MainData->InputOptions->Control->GetRunType() == GLOBOPRun)
+			return OpenGAMESSGlobOpLog(Buffer, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
+
+		HeaderEndPos = Buffer->GetFilePos();
+		if (Buffer->LocateKeyWord("FINAL", 5)) {//locate initial energy
+			EnergyPos = Buffer->GetFilePos();
+			Buffer->SetFilePos(HeaderEndPos);
+		}
+
+		if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {	//Calculate the # of occupied MOs by parsing the DRT info
 			wxFileOffset filePos = Buffer->GetFilePos();
 			if (Buffer->LocateKeyWord("GUGA DISTINCT ROW TABLE", 23, EnergyPos)) {
 					long nfzc=0, ndoc=0, nmcc=0, naos=0, nbos=0, nalp=0, nval=0;
@@ -2758,9 +2883,8 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			//Read in normal modes, if present
 			if (Buffer->LocateKeyWord("NORMAL COORDINATE ANALYSIS", 25, EnergyPos)) 
 				MainData->cFrame->ParseNormalModes(Buffer, ProgressInd, Prefs);
-		} else if (MainData->InputOptions->Control->GetRunType() == GLOBOPRun)
-			return OpenGAMESSGlobOpLog(Buffer, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
-
+		}
+		
 		if (EnergyPos > 0) {
 			Buffer->SetFilePos(EnergyPos);
 			Buffer->GetLine(LineText);
@@ -3417,7 +3541,7 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 	iatom = lFrame->GetNumAtoms();
 	
 	//First read in the fragment names which are separate from the coordinates
-	while (Buffer->LocateKeyWord("COORDINATES FOR FRAGMENT", 24)) {
+	while (Buffer->LocateKeyWord("COORDINATES FOR FRAGMENT", 24, Buffer->GetFilePos()+200)) {
 		if (Buffer->LocateKeyWord("NAMED", 5, Buffer->GetFilePos()+80)) {
 			Buffer->GetLine(Line);
 			sscanf(&(Line[5]), "%s", Label);
@@ -3425,13 +3549,13 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 		} else Buffer->SkipnLines(1);
 	}
 
-	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS", 32)) {
+	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS", 32, Buffer->GetFilePos()+1000)) {
 		Buffer->GetLine(Line);
 		sscanf(&(Line[32]), " =%ld", &NumMultipoles);
 	}
 		//Mike finally fixed the spelling of coordinates
-	if ((NumMultipoles>0) && (Buffer->LocateKeyWord("MULTIPOLE COORDINATES", 20) ||
-			Buffer->LocateKeyWord("MULTIPOLE CORDINATES", 19))) {
+	if ((NumMultipoles>0) && (Buffer->LocateKeyWord("MULTIPOLE COORDINATES", 20, Buffer->GetFilePos()+1000) ||
+			Buffer->LocateKeyWord("MULTIPOLE CORDINATES", 19, Buffer->GetFilePos()+1000))) {
 		Buffer->SkipnLines(3);
 		SetupFrameMemory(lFrame->NumAtoms + 10, 0);
 		bool workingFragment=false;
@@ -3587,7 +3711,7 @@ void MoleculeData::ReadBasisOptions(BufferFile * Buffer) {
 void MoleculeData::ReadControlOptions(BufferFile * Buffer) {
 		long	test;
 		char	LineText[kMaxLineLength], token[kMaxLineLength];
-	wxFileOffset StartPos = Buffer->GetFilePos();	//All keywords should be between these positions
+	wxFileOffset StartPos = Buffer->GetFilePos()+5;	//All keywords should be between these positions
 	wxFileOffset EndPos = Buffer->FindBlankLine();
 	if (!Buffer->LocateKeyWord("SCFTYP", 6, EndPos)) throw DataError();
 	Buffer->GetLine(LineText);
@@ -4451,18 +4575,25 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 		GeomStart=0,
 		NonOptGeometry,
 		GeomEnd,
+		GeomEnd2,
 		OptGeometry,
 		Orbitals,
 		FailedOpt
 	};
 
 	std::vector<std::pair <std::string, int> > keywords;
-	keywords.push_back(make_pair (std::string("GEOMETRY NUMBER"), (int) GeomStart));
-	keywords.push_back(make_pair (std::string("NUCLEAR COORDINATES FOR Global Optimization POINT"), (int) NonOptGeometry));
+	keywords.push_back(make_pair (std::string("GEOMETRY NUMBER"), (int) GeomStart));//old style
+	keywords.push_back(make_pair (std::string("EVALUATE ENERGY AT NEW TRANSLATIONAL GEOMETRY"), (int) GeomStart));//new style
+	keywords.push_back(make_pair (std::string("BEGINNING GEOMETRY SEARCH POINT NSERCH="), (int) NonOptGeometry));//new style
+	keywords.push_back(make_pair (std::string("NUCLEAR COORDINATES FOR GLOBAL OPTIMIZATION POINT"), (int) NonOptGeometry));
 	keywords.push_back(make_pair (std::string("ENERGY ACCEPTED AT POINT"), (int) GeomEnd));
+	keywords.push_back(make_pair (std::string("ENERGY ACCEPTED AT GLOBAL SEARCH POINT"), (int) GeomEnd2));
 	keywords.push_back(make_pair(std::string("EQUILIBRIUM GEOMETRY LOCATED"), (int) OptGeometry));
 	keywords.push_back(make_pair(std::string("MOLECULAR ORBITALS"), (int) Orbitals));
 	keywords.push_back(make_pair(std::string("FAILURE TO LOCATE STATIONARY POINT"), (int) FailedOpt));
+	
+	// In the old style there was a clear beginning and end of a search. In the new style it's a bit murkier.
+	// The new style doesn't announce the end of an optimization until you are past the coordinates.
 	
 	int state = 1, kw;
 	while (! Buffer->Eof()) {
@@ -4486,40 +4617,47 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 					break;
 				case NonOptGeometry:	// set of coordinates, MCMIN=false, these coords seem to be in an odd format
 					if (state == 1) {
+						if (lFrame->NumAtoms > 0) {
+							MainData->DeleteFrame();
+							lFrame = MainData->GetCurrentFramePtr();
+							lFrame = MainData->AddFrame(NumExpectedAtoms, lFrame->GetNumBonds());
+							lFrame->IRCPt = MainData->GetCurrentFrame();
+							lFrame->time = MainData->GetCurrentFrame();
+						}
 						Buffer->SkipnLines(1);
 						
 						//The output is in the form of index_# atomic name x y z
-					{
-						bool done=false;
-						int nextExpected=1;
-						while (!done) {
-							if (Buffer->GetLine(LineText) < 1) break;
-							int index;
-							CPoint3D position;
-							unsigned char Label[kMaxLineLength];
-							int items = sscanf(LineText, "%d %s %f%f%f", &index, Label, &(position.x),
-											   &(position.y), &(position.z));
-							if (items == 5) {
-								if (index != nextExpected) {
-									wxLogMessage(_("Error parsing coordinates, attempting to continue."));
-									break;
-								} else {
-									int atomtype = SetAtomType(Label);
-									if (atomtype > 0) {
-										lFrame->AddAtom(atomtype, position);
-									} else {
+						if ((NumAtoms-NumFragmentAtoms)>0) {
+							bool done=false;
+							int nextExpected=1;
+							while (!done) {
+								if (Buffer->GetLine(LineText) < 1) break;
+								int index;
+								CPoint3D position;
+								unsigned char Label[kMaxLineLength];
+								int items = sscanf(LineText, "%d %s %f%f%f", &index, Label, &(position.x),
+												   &(position.y), &(position.z));
+								if (items == 5) {
+									if (index != nextExpected) {
 										wxLogMessage(_("Error parsing coordinates, attempting to continue."));
 										break;
+									} else {
+										int atomtype = SetAtomType(Label);
+										if (atomtype > 0) {
+											lFrame->AddAtom(atomtype, position);
+										} else {
+											wxLogMessage(_("Error parsing coordinates, attempting to continue."));
+											break;
+										}
 									}
+									
+								} else {
+									Buffer->BackupnLines(1);	//reset position and end
+									break;
 								}
-								
-							} else {
-								Buffer->BackupnLines(1);	//reset position and end
-								break;
+								nextExpected ++;
 							}
-							nextExpected ++;
 						}
-					}
 						
 						if ((NumFragmentAtoms <= 0)&&(NumExpectedAtoms > MainData->cFrame->NumAtoms))
 							NumFragmentAtoms = NumExpectedAtoms - MainData->cFrame->NumAtoms;
@@ -4532,16 +4670,22 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 						}
 						if (Prefs->GetAutoBond())
 							lFrame->SetBonds(Prefs, false);
+					} else {
+						wxLogMessage(_("Unexpected set of coordinates! Skipping and attempting to continue"));
+						Buffer->SkipnLines(1);
 					}
 					break;
 				case GeomEnd: // End of the search, read the energy and store the frame.
+				case GeomEnd2:
 					if (state == 0) {	// Found an end without a matching begining, skip
 						wxLogMessage(_("Unexpected end of search point! Skipping and attempting to continue"));
 						Buffer->SkipnLines(1);
 					} else {
 						Buffer->GetLine(LineText);
 						int geom;
-						int result = sscanf(&(LineText[25]), "%d IS %lf", &geom, &(lFrame->Energy));
+						int tokenLen = 25;
+						if (kw == GeomEnd2) tokenLen = 38;
+						int result = sscanf(&(LineText[tokenLen]), "%d IS %lf", &geom, &(lFrame->Energy));
 						if (result != 2)
 							wxLogMessage(_("Error parsing final energy for a geometry. Attempting to continue."));
 						sprintf(LineText, "Completed parsing geometry %d", geom);
