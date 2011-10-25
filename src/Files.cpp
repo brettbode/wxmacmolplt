@@ -2699,7 +2699,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 							if (NumOccAlpha < 0) NumOccAlpha = 0;	//Oops!
 							if (NumOccBeta) NumOccBeta -= test;
 							if (NumOccBeta<0) NumOccBeta = 0;
-							Buffer->SetFilePos(SavedPos);
+//							Buffer->SetFilePos(SavedPos);
 //						}
 						break;
 					case gridDFT:
@@ -3795,7 +3795,7 @@ void MoleculeData::ReadControlOptions(BufferFile * Buffer) {
 	}
 
 	bool foo = Buffer->LocateKeyWord("ECP", 3, EndPos);
-	if (!foo) test = Buffer->LocateKeyWord("PP  ", 4, EndPos);
+	if (!foo) foo = Buffer->LocateKeyWord("PP  ", 4, EndPos);
 	if (foo) {
 		Buffer->GetLine(LineText);
 		sscanf(&(LineText[7]),"%s", token);
