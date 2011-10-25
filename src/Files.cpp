@@ -3048,6 +3048,17 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 					MessageAlert("Error reading eigenvectors, orbitals skipped.");
 				}
 			}
+			//MRMP2 - Only energy is supported
+			if ((MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF)&&
+				(MainData->InputOptions->Control->GetMPLevel())) {	//MP2 run so look for MP2 energy
+				if (Buffer->LocateKeyWord("TOTAL MRPT2, E(MP2) 0TH + 1ST + 2ND ORDER ENERGY", 48)) {
+					double mpE;
+					Buffer->GetLine(LineText);
+					sscanf(&(LineText[51]), "%lf", &(mpE));
+					//This should be changed to MRMP2Energy, but that isn't recognized elsewhere currently
+					lFrame->Energies.push_back(EnergyValue(mpE, PT2Energy));
+				}
+			}
 			if (SIMOMM) {	//See if we have MM energies and new coords
 				//could also grab the MM energy here
 				if (Buffer->LocateKeyWord("QM+MM Energy (Hartree):", 23)) {
