@@ -42,6 +42,7 @@
 #include "MyTypes.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
+#include <wx/filename.h>
 #include <wx/image.h>
 #include <wx/printdlg.h>
 #include <wx/mstream.h>
@@ -1402,7 +1403,8 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 		if (Prefs->CreateCustomIcon()) CreateCustomFileIcon(filePath);
 #endif
 		currFilePath = filePath;
-		SetTitle(filePath);
+		wxFileName fn(filePath);
+		SetTitle(fn.GetFullName());
 		fclose(currFile);
 	}
 }

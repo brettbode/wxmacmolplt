@@ -278,7 +278,8 @@ void MpApp::createMainFrame(const wxString &filename) {
 	    MolWinList.push_back(temp);
 		temp->Show();
     } else {
-		temp = new MolDisplayWin(filename);
+		wxFileName fn(filename);
+		temp = new MolDisplayWin(fn.GetFullName());
 		MolWinList.push_back(temp);
 		long r = temp->OpenFile(filename);
 		if (r>0) temp->Show(true);
