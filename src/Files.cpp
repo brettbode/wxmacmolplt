@@ -2152,6 +2152,10 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 long MoleculeData::ParseECPotentials(BufferFile * Buffer) {
 	long	ElectronsRemoved = 0, ProtonsRemoved=0, LinePos, atom;
 	char	LineText[kMaxLineLength];
+	if (cFrame->NumAtoms <= 0) {
+		Buffer->SkipnLines(1);
+		return 0;
+	}
 	long *	zcore = new long[cFrame->NumAtoms];
 	if (!zcore) throw MemoryError();
 	for (atom=0; atom<cFrame->NumAtoms; ++atom) zcore[atom]=0;

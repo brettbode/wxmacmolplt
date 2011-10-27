@@ -571,6 +571,7 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms, con
 		sscanf(&(LineText[LinePos]),"%ld",&NumShells);
 	} else return NULL;
 	if (NumShells<=0) return NULL;	//invalid number of shells
+	if (NumAtoms <= 0) return NULL;
 	BasisSet * Basis = new BasisSet(NumAtoms, NumShells);
 	if (Basis == NULL) return NULL;//No memory!
 
