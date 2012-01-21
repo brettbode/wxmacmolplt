@@ -1456,6 +1456,37 @@ const char * BasisGroup::GAMESSBasisSetToText(GAMESS_BasisSet bs) {
 			return "APC3";
 		case GAMESS_BS_APC4:
 			return "APC4";
+		case GAMESS_BW_SPK_DZP:
+			return "SPK-DZP";
+		case GAMESS_BW_SPK_TZP:
+			return "SPK-TZP";
+		case GAMESS_BW_SPK_QZP:
+			return "SPK-QZP";
+		case GAMESS_BW_SPK_ADZP:
+			return "SPK-ADZP";
+		case GAMESS_BW_SPK_ATZP:
+			return "SPK-ATZP";
+		case GAMESS_BW_SPK_AQZP:
+			return "SPK-AQZP";
+		case GAMESS_BW_SPKRDZP:
+			return "SPKRDZP";
+		case GAMESS_BW_SPKRTZP:
+			return "SPKRTZP";
+		case GAMESS_BW_SPKRQZP:
+			return "SPKRQZP";
+		case GAMESS_BW_SPKRADZP:
+			return "SPKRADZP";
+		case GAMESS_BW_SPKRATZP:
+			return "SPKRATZP";
+		case GAMESS_BW_SPKRAQZP:
+			return "SPKRAQZP";
+		case GAMESS_BW_KTZV:
+			return "KTZV";
+		case GAMESS_BW_KTZVP:
+			return "KTZVP";
+		case GAMESS_BW_KTZVPP:
+			return "KTZVPP";
+			
 		case GAMESS_BS_SBKJC:
 			return "SBKJC";
 		case GAMESS_BS_HW:
@@ -1466,6 +1497,22 @@ const char * BasisGroup::GAMESSBasisSetToText(GAMESS_BasisSet bs) {
 			return "MCP-TZP";
 		case GAMESS_BS_MCP_QZP:
 			return "MCP-QZP";
+		case GAMESS_BS_MCP_ATZP:
+			return "MCP-ATZP";
+		case GAMESS_BS_MCP_AQZP:
+			return "MCP-AQZP";
+		case GAMESS_BS_MCPCDZP:
+			return "MCPCDZP";
+		case GAMESS_BS_MCPCTZP:
+			return "MCPCTZP";
+		case GAMESS_BS_MCPCQZP:
+			return "MCPCQZP";
+		case GAMESS_BS_MCPACDZP:
+			return "MCPACDZP";
+		case GAMESS_BS_MCPACTZP:
+			return "MCPACTZP";
+		case GAMESS_BS_MCPACQZP:
+			return "MCPACQZP";
 		case GAMESS_BS_IMCP_SR1:
 			return "IMCP-SR1";
 		case GAMESS_BS_IMCP_SR2:
@@ -1474,12 +1521,27 @@ const char * BasisGroup::GAMESSBasisSetToText(GAMESS_BasisSet bs) {
 			return "IMCP-NR1";
 		case GAMESS_BS_IMCP_NR2:
 			return "IMCP-NR2";
+		case GAMESS_BS_ZFK3_DK3:
+			return "ZFK3-DK3";
+		case GAMESS_BS_ZFK4_DK3:
+			return "ZFK4-DK3";
+		case GAMESS_BS_ZFK5_DK3:
+			return "ZFK5-DK3";
+		case GAMESS_BS_ZFK3LDK3:
+			return "ZFK3LDK3";
+		case GAMESS_BS_ZFK4LDK3:
+			return "ZFK4LDK3";
+		case GAMESS_BS_ZFK5LDK3:
+			return "ZFK5LDK3";			
+			
 		case GAMESS_BS_MNDO:
 			return "MNDO";
 		case GAMESS_BS_AM1:
 			return "AM1";
 		case GAMESS_BS_PM3:
 			return "PM3";
+		case GAMESS_BS_RM1:
+			return "RM1";
 	}
 	return "invalid";
 }
