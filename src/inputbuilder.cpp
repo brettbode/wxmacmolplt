@@ -455,7 +455,7 @@ void InputBuilderWindow::CreateControls()
 	basisChoiceStrings.Add(_("6-311G"));
 	basisChoiceStrings.Add(_("Double Zeta Valance"));
 	basisChoiceStrings.Add(_("Dunning/Hay DZ"));
-	basisChoiceStrings.Add(_("Binning/Curtiss DZ"));
+//	basisChoiceStrings.Add(_("Binning/Curtiss DZ"));	//rolled into DZ basis so no longer needed
 	basisChoiceStrings.Add(_("Triple Zeta Valence"));
 	basisChoiceStrings.Add(_("McLean/Chandler"));
 	basisChoiceStrings.Add(wxEmptyString);
@@ -3064,7 +3064,7 @@ int InputBuilderWindow::getPaneAtPosition(int pos) {
     return currPane;
 }
 
-#define kNumBasisMenuItems 60
+#define kNumBasisMenuItems 89
 void InputBuilderWindow::CheckBasisMenu(void) {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     AtomTypeList * list = parent->GetData()->GetAtomTypes();
@@ -3072,76 +3072,128 @@ void InputBuilderWindow::CheckBasisMenu(void) {
     bool states[kNumBasisMenuItems];
     
     if(list) {
-        for(i = 0; i < kNumBasisMenuItems; i++) states[i] = true;
+        for(i = 0; i < kNumBasisMenuItems; i++) states[i] = false;
         list->Sort();
         long MaxType = list->GetMaxAtomType();
-        if(MaxType > 86) {
-            for(i = 0; i < kNumBasisMenuItems; i++) states[i] = false;
-        } else if(MaxType > 54) {
-            for(i = 0; i < kNumBasisMenuItems; i++) states[i] = false;
-            states[0] = true;
-            states[48] = true;
-			for (int i=50; i<57; i++) states[i] = true;
-        } else if(MaxType > 18) {
-            states[8] = false;
-            states[12] = false;
-            states[14] = false;
-            states[17] = false;
-            states[57] = false;
-            states[58] = false;
-            states[59] = false;
-            if(list->TransitionMetalInList()) {
-                states[9] = false;
-                states[10] = false;
-                states[11] = false;
-                states[13] = false;
-                states[15] = false;
-            }
-            if(list->IsAtomInList(19) || list->IsAtomInList(20)) {
-                states[9] = false;
-                states[10] = false;
-                states[11] = false;
-                states[13] = false;
-                states[15] = false;
-            }
-            if(MaxType > 30) states[16] = false;
-			if (list->IsAtomInList(19) || (MaxType > 36) || list->TransitionMetalInList()) {
-				for (int i=18; i <= 37; i++) states[i] = false;
+		//Run through the rules for each basis set
+		if (MaxType <= 86) {	//H-Rn
+			states[0] = true;	//MINI
+			states[1] = true;	//MIDI
+		}
+		if (MaxType <= 54) { //H-Xe
+			for (i=2; i<7; i++) states[i] = true;	//STO-NG
+			states[7] = true;	//3-21G
+		}
+		if (MaxType <= 18) //H-Ar
+			states[8] = true;	//6-21G
+		if ((MaxType <= 17)&&(!list->IsAtomInList(11) && !list->IsAtomInList(12) &&
+							  ! list->IsAtomInList(13) && ! list->IsAtomInList(14))) {
+				//H-Ne, P-Cl
+			states[9] = true;	//4-31G
+		}
+		if ((MaxType <= 9)&&(!list->IsAtomInList(3) && !list->IsAtomInList(4) &&
+							  ! list->IsAtomInList(5))) {
+			//H-He, C-F
+			states[10] = true;	//5-31G
+		}
+		if (MaxType <= 36) //H-Kr
+			states[11] = true;	//6-31G
+		if (MaxType <= 10) //H-Ne
+			states[12] = true;	//6-311G
+		if ((MaxType <= 36)&&(!list->IsAtomInList(2) && !list->IsAtomInList(11) &&
+							  ! list->IsAtomInList(12) && ! list->TransitionMetalInList())) {
+			//H, Li, Be-Ne, Al-Cl, K-Ca, Ga-Kr
+			states[13] = true;	//DZV
+		}
+		if ((MaxType <= 17)&&(!list->IsAtomInList(2) && !list->IsAtomInList(11) &&
+							 ! list->IsAtomInList(12))) {
+			//H, Li, Be-Ne, Al-Cl
+			states[14] = true;	//DH
+		}
+		if ((MaxType <= 30)&&(!list->IsAtomInList(2))) {
+			//H, Li-Zn
+			states[15] = true;	//TZV
+		}
+		if (MaxType <= 18) {	//H-Ar
+			states[16] = true;	//MC
+		}
+		if ((MaxType <= 36)&&(!list->IsAtomInList(19))) {
+			//H-Ar, Ca, Ga-Kr, Sc-Zn for T,Q only
+			if (! list->TransitionMetalInList()) {
+				states[17] = true;	//cc-pVDZ
+				states[20] = true;	//cc-pV5Z
+				states[21] = true;	//cc-pV6Z
+
+				states[22] = true;	//aug-cc-pVDZ
+				states[25] = true;	//aug-cc-pV5Z
+				states[26] = true;	//aug-cc-pV6Z
+
+				states[27] = true;	//cc-pCVDZ
+				states[30] = true;	//cc-pCV5Z
+				states[31] = true;	//cc-pCV6Z
+
+				states[32] = true;	//aug-cc-pCVDZ
+				states[35] = true;	//aug-cc-pCV5Z
+				states[36] = true;	//aug-cc-pCV6Z
 			}
-        } else if(MaxType > 10) {
-            states[10] = false;
-            states[12] = false;
-            states[15] = false;
-            if(list->IsAtomInList(11) ||
-               list->IsAtomInList(12) ||
-               list->IsAtomInList(13) ||
-               list->IsAtomInList(14) ||
-               list->IsAtomInList(18)) states[9] = false;
-            if(list->IsAtomInList(11) ||
-               list->IsAtomInList(12) ||
-               list->IsAtomInList(18)) {
-                states[13] = false;
-                states[14] = false;
-            }
-		} else {
-            states[15] = false;
-            if(list->IsAtomInList(3) ||
-               list->IsAtomInList(4) ||
-               list->IsAtomInList(5) ||
-               list->IsAtomInList(10)) states[10] = false;
-        }
-        
-        if(list->IsAtomInList(2)) {
-            states[13] = false;
-            states[14] = false;
-            states[16] = false;
-        }
-		if (list->IsAtomInList(2) || list->IsAtomInList(3) || list->IsAtomInList(4) ||
-			list->IsAtomInList(5) || list->IsAtomInList(10) || list->IsAtomInList(11) ||
-			list->IsAtomInList(12) || list->IsAtomInList(13) || (MaxType > 17)) {
-			for (int i=38; i<48; i++) { //Jensen PC basis sets available for H, C,N,O,F, Si,P,S,Cl
-				states[i] = false;
-			}
+			states[18] = true;	//cc-pVTZ
+			states[19] = true;	//cc-pVQZ
+			states[23] = true;	//aug-cc-pVTZ
+			states[24] = true;	//aug-cc-pVQZ
+			states[28] = true;	//cc-pCVTZ
+			states[29] = true;	//cc-pCVQZ
+			states[33] = true;	//aug-cc-pCVTZ
+			states[34] = true;	//aug-cc-pCVQZ
+		}
+		if (MaxType <= 18) {	//H-Ar
+			for (i=37; i<(37+10); i++)
+				states[i] = true;	//Jensen PCn and APCn
+		}
+		if (MaxType <= 54) { //H-Xe
+			for (i=47; i<(47+12); i++) states[i] = true;	//SPK variations
+		}
+		//the manual isn't clear on what is support for KTZV basis, for now just make them available
+		states[59] = true;
+		states[60] = true;
+		states[61] = true;
+		if (MaxType <= 86) {	//H-Rn
+			states[62] = true;	//SBKJC
+		}
+		if (MaxType <= 54) {	//H-Xe
+			states[63] = true;	//HW
+		}
+		if (MaxType <= 88) {	//H-Ra with exceptions
+			states[64] = true;	//MCP family
+			states[65] = true;	//MCP family
+			states[66] = true;	//MCP family
+			states[67] = true;	//MCP family
+			states[68] = true;	//MCP family
+			states[69] = true;	//MCP family
+			states[70] = true;	//MCP family
+			states[71] = true;	//MCP family
+			states[72] = true;	//MCP family
+			states[73] = true;	//MCP family
+			states[74] = true;	//MCP family
+		}
+		if (MaxType <= 86) {	//H-Rn (ok lots of exceptions not included here)
+			states[75] = true;	//IMCP-SR series
+			states[76] = true;	//IMCP-SR series
+			states[77] = true;	//IMCP-SR series
+			states[78] = true;	//IMCP-SR series
+		}
+		if (MaxType <= 86 && ! list->TransitionMetalInList()) {	//H-Rn minus D-block elements
+			states[79] = true;	//ZFK series
+			states[80] = true;	//ZFK series
+			states[81] = true;	//ZFK series
+			states[82] = true;	//ZFK series
+			states[83] = true;	//ZFK series
+			states[84] = true;	//ZFK series
+		}
+		if (MaxType <= 18) {	//H-Ar (guess that could be confirmed)
+			states[85] = true;	//MNDO
+			states[86] = true;	//AM1
+			states[87] = true;	//PM3
+			states[88] = true;	//RM1
 		}
         
         delete list;

@@ -369,7 +369,6 @@ enum GAMESS_BasisSet {
 	GAMESS_BS_N311,
 	GAMESS_BS_DZV,
 	GAMESS_BS_DH,
-	GAMESS_BS_BC,
 	GAMESS_BS_TZV,
 	GAMESS_BS_MC,
 	
@@ -402,6 +401,7 @@ enum GAMESS_BasisSet {
 	GAMESS_BS_PM3,
 	GAMESS_BS_RM1,
 	
+	GAMESS_BS_BC,	//Old basis name - appears to be rolled into DZ basis today
 	NumGAMESSBasisSetsItem
 };
 enum GAMESS_BS_Polarization {
