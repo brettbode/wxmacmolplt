@@ -1141,6 +1141,7 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 	int		nChar;
 	float	*Vectors, *Energy;
 	char	*SymType, Line[kMaxLineLength+1];
+	bool	energyError=false;
 
 	maxfuncs = NumFuncs;	//Always true
 	OrbitalRec * OrbSet = NULL;
@@ -1178,12 +1179,26 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 			}
 			if (imaxorb > 0) {
 					//read in energy and the symmetry of each orbital (ie. A1 A2 B1É)
+				//First comes the orbital energy. Unfortunately for very large system the numbers
+				//can run together (no space in the output format) or exceed the field width (***'s)
+				//Since that will probably only happen for very high energy orbitals (that don't
+				//matter chemically) just use the last "good" value and echo a warning.
+				//This will flag the case with *'s , but not when the values run together.
 				Buffer->GetLine(Line);
 				if (strlen(Line) <= 0) Buffer->GetLine(Line);
 				LinePos = 0;
 				for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital energies
 					ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(Energy[iorb+jorb]),&nChar);
-					if (ScanErr <= 0) throw DataError();
+					if (ScanErr <= 0) {
+						wxLogWarning(_("Error parsing the energy for orbital %d. Using last energy and continuing."), iorb+jorb);
+						if ((iorb+jorb)>0) Energy[iorb+jorb] = Energy[iorb+jorb-1];
+						jorb++;
+						while (jorb <imaxorb) {
+							Energy[iorb+jorb] = Energy[iorb+jorb-1];
+							jorb++;
+						}
+						energyError = true;
+					}
 					LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
 				}
 				Buffer->GetLine(Line);
@@ -1240,16 +1255,27 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 					}
 				}
 				if (imaxorb > 0) {
-						//first read in and the symmetry of each orbital (ie. A1 A2 B1É)
+						//First comes the orbital energy. Unfortunately for very large system the numbers
+						//can run together (no space in the output format) or exceed the field width (***'s)
+						//Since that will probably only happen for very high energy orbitals (that don't
+						//matter chemically) just use the last "good" value and echo a warning.
 					Buffer->GetLine(Line);
 					if (strlen(Line) <= 0) Buffer->GetLine(Line);
 					LinePos = 0;
 					for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital energies
 						ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(Energy[iorb+jorb]),&nChar);
-						if (ScanErr<=0) throw DataError();	//Looks like the MO's are not complete
+						if (ScanErr <= 0) {
+							wxLogWarning(_("Error parsing the energy for orbital %d. Using last energy and continuing."), iorb+jorb);
+							if ((iorb+jorb)>0) Energy[iorb+jorb] = Energy[iorb+jorb-1];
+							jorb++;
+							while (jorb <imaxorb) {
+								Energy[iorb+jorb] = Energy[iorb+jorb-1];
+								jorb++;
+							}
+						}
 						LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
 					}
-					Buffer->GetLine(Line);
+					Buffer->GetLine(Line); // Read in the symmetry of each orbital (ie. A1 A2 B1É)
 					if ((strlen(Line) > 0)&&SymType) {
 						LinePos = 0;
 						for (jorb=0; jorb<imaxorb; jorb++) {	//Get the orbital symmetries
