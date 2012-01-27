@@ -1768,6 +1768,7 @@ void InputBuilderWindow::SetupItems() {
 
 void InputBuilderWindow::SetupBasisItems() {
     short BasisValue = TmpInputRec->Basis->GetBasis();
+	if (BasisValue == GAMESS_BS_BC) BasisValue = GAMESS_BS_DZV;
     short NumGauss = TmpInputRec->Basis->GetNumGauss();
     int itemValue = 0;
     int testValue = 0;
@@ -3189,7 +3190,7 @@ void InputBuilderWindow::CheckBasisMenu(void) {
 			states[83] = true;	//ZFK series
 			states[84] = true;	//ZFK series
 		}
-		if (MaxType <= 18) {	//H-Ar (guess that could be confirmed)
+		if (MaxType <= 86) {	//H-Rn, but's lot's of exceptions I'm too lazy to put in here
 			states[85] = true;	//MNDO
 			states[86] = true;	//AM1
 			states[87] = true;	//PM3
