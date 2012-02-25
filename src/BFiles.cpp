@@ -33,7 +33,7 @@ extern WinPrefs *	gPreferences;
 long FindKeyWord(const char *buffer, const char keyin[], long numbyte) {
 	long	check;
 
-#if __WXDEBUG__
+#if defined(__WXDEBUG__)
 //	char * keyword = new char[numbyte+1];
 //	strncpy(keyword, keyin, numbyte);
 //	keyword[numbyte] = '\0';

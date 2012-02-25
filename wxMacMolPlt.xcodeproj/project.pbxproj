@@ -855,7 +855,6 @@
 		8B2998EB0E48FA6F00624A73 /* WalkThrough.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = WalkThrough.html; path = Manual_pages/WalkThrough.html; sourceTree = "<group>"; };
 		8B2998EC0E48FA6F00624A73 /* water.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = water.jpg; path = Manual_pages/water.jpg; sourceTree = "<group>"; };
 		8B29D6B912B934BD0049477F /* wxMacMolPlt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wxMacMolPlt.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		8B29D6BB12B934BD0049477F /* Info copy 3.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Info copy 3.plist"; path = "resources/Info copy 3.plist"; sourceTree = "<group>"; };
 		8B33B7B40BF8DBEB0056C79E /* patterns.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = patterns.h; path = src/patterns.h; sourceTree = "<group>"; };
 		8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = "swfexport-g.cpp"; path = "src/swfexport-g.cpp"; sourceTree = "<group>"; };
 		8B33B7B60BF8DBEB0056C79E /* swfexport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = swfexport.h; path = src/swfexport.h; sourceTree = "<group>"; };
@@ -1209,7 +1208,6 @@
 				1652DACC09D0B43700B7783F /* text-doc.icns */,
 				8B5B66680E030FAB000EC27D /* perpixel_dirlight_f.glsl */,
 				8B5B66690E030FAB000EC27D /* perpixel_dirlight_v.glsl */,
-				8B29D6BB12B934BD0049477F /* Info copy 3.plist */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -2566,8 +2564,8 @@
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_MODEL_TUNING = "";
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -2620,7 +2618,6 @@
 					"-framework",
 					AGL,
 				);
-				OTHER_LDFLAGS_QUOTED_FOR_TARGET_1 = "`$(HOME)/software/wx/wx-2.9.0-univ/bin/wx-config --libs base,core,gl,adv,html`";
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
 				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;

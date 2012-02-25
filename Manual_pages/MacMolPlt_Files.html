@@ -85,7 +85,7 @@ orbitals, but GAMESS does not normally punch orbitals to the log file
 for points other that the first and last point of a file. If you wish
 to view orbitals for other points you can either Import the $Vec
 group from the .Dat file or set the NPRT=1 option in either the
-$STATPT gourp or the $IRC group to force GAMESS to punch orbitals for
+$STATPT group or the $IRC group to force GAMESS to punch orbitals for
 every point. This will not permit computing a total electron density
 for MCSCF wavefunctions since GAMESS does not print the MCSCF natural
 orbitals and occupation numbers except for the first and last points.
@@ -118,16 +118,18 @@ ordered according to the IRC distance or DRC time regardless of their
 position in the files. Any duplicate points (duplicate means equal
 IRC distance or DRC time) will be skipped. On IRC's you may wish to
 change the sign of the IRC points on one side of the Transition
-state. To make flipping the sign easier there is now an option to
-automatically flip the sign when a file is opened. To use this option
-simply check the box in the open file dialog. If you wish to piece
+state. If you wish to piece
 together multiple IRC's from multiple transition states you will need
 to offset the second and subsequent transition states from the first
-(defined as point 0). To offset the points simply type in the offset
-distance in the edit field of the Open dialog. To calculate the
+(defined as point 0). To calculate the
 offset distance add the maximum IRC distance for the forward IRC from
 the first TS to the maximum IRC distance for the IRC in the reverse
-direction from the second TS. These features should make it easy to
+direction from the second TS.
+To flip the sign or offset the values there is a 2nd dialog that pops up
+after the append file selection dialog. The Append File option will allow
+the selection of multiple files to append at once, but the settings for the
+offset and flip are applied uniformaly to all selected files.
+These features should make it easy to
 create a seamless IRC from one minimum to another.</P>
 
 <H4>
