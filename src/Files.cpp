@@ -2535,7 +2535,10 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 						EnergyPos = Buffer->GetFilePos();
 						break;
 					case headerEnd:
-						headerDone = true;
+						//Until recently this was printed out at the beginning of the header output - useless!
+						//To account for that only consider this done if we've found the coordinates
+						if (lFrame->NumAtoms > 0) headerDone = true;
+						Buffer->SkipnLines(1);
 						break;
 					case basisOptions:
 	//					KeyWordFound = Buffer->LocateKeyWord("BASIS OPTIONS", 13, EnergyPos);
