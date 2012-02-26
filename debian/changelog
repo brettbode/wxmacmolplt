@@ -1,3 +1,9 @@
+wxmacmolplt (7.4.3-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- brett <brett@scl.ameslab.gov>  Mon, 30 Jan 2012 19:18:08 -0600
+
 wxmacmolplt (7.4.2-1) unstable; urgency=low
 
   * New upstream version
