@@ -1806,9 +1806,12 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 	Buffer->GetLine(LineText);
 	MainData->SetDescription(LineText);
 
+	//Need to keep the single mode storage separated off as the AddAtom function will delete it
+	//from the Frame record otherwise.
+	VibRec * Mode1Vibs = NULL;
 	if (Mode == -1) {
-		MainData->cFrame->Vibs = new VibRec(1, fileAtoms);
-		if (!MainData->cFrame->Vibs) throw MemoryError();
+		Mode1Vibs = new VibRec(1, fileAtoms);
+		if (!Mode1Vibs) throw MemoryError();
 	}
 	Buffer->SkipnLines(nkinds);
 
@@ -1824,34 +1827,40 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 		
 		if (test==-1) {	//invalid atom type
 			wxLogMessage(_("Error: An invalid Atom Type was encountered in the atom list."));
+			if (Mode1Vibs) delete Mode1Vibs;
 			throw DataError();
 		} else if (test<0) {
 			wxLogMessage(_("An error occured while reading the file. Open File Aborted!"));
+			if (Mode1Vibs) delete Mode1Vibs;
 			throw DataError();
 		}
 		if (AtomType > 115) {
 			if (Mode < 0) {
 				wxLogMessage(_("Error: Special Atom types may not be used with Normal Modes!"));
+				if (Mode1Vibs) delete Mode1Vibs;
 				throw DataError();
 			}
 			if (AtomType > 255) {
 				if (((AtomType - 255) < 1)||((AtomType - 255) > fileAtoms)) {
 					wxLogMessage(_("Invalid atom number detected in special atom list."));
+					if (Mode1Vibs) delete Mode1Vibs;
 					throw DataError();
 				}
 			}
 			if (!lFrame->AddSpecialAtom(Vector, j)) throw MemoryError();
 		}
 		if (Mode == -1) {	//mass weight the normal mode
-			lFrame->Vibs->NormMode[j].x = Vector.x*Prefs->GetSqrtAtomMass(AtomType-1);
-			lFrame->Vibs->NormMode[j].y = Vector.y*Prefs->GetSqrtAtomMass(AtomType-1);
-			lFrame->Vibs->NormMode[j].z = Vector.z*Prefs->GetSqrtAtomMass(AtomType-1);
+			Mode1Vibs->NormMode[j].x = Vector.x*Prefs->GetSqrtAtomMass(AtomType-1);
+			Mode1Vibs->NormMode[j].y = Vector.y*Prefs->GetSqrtAtomMass(AtomType-1);
+			Mode1Vibs->NormMode[j].z = Vector.z*Prefs->GetSqrtAtomMass(AtomType-1);
 		}
 		lFrame->AddAtom(AtomType, Pos);
 		MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.x));
 		MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.y));
 		MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.z));
 	}
+	if (Mode1Vibs) lFrame->Vibs = Mode1Vibs;
+	
 	if (fileBonds > 0) {						/* read in the array of bonds */
 		long	ibond=-1, temp;
 		Buffer->GetLine(LineText);
@@ -2398,7 +2407,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	EnergyPos = -1;
 	NextFinalPos = -1;
 		//First Skip over all of the input card lines, the lines are near the beginning of the file and one after another
-	while (Buffer->LocateKeyWord("INPUT CARD>", 11, (Buffer->GetFilePos()+1000)))
+	while (Buffer->LocateKeyWord("INPUT CARD>", 11, (Buffer->GetFilePos()+50000)))
 		Buffer->SkipnLines(1);
 	wxFileOffset HeaderEndPos = Buffer->GetFilePos();	//We don't care about anything earlier than this pos.
 //	Buffer->LocateKeyWord("RUN TITLE", 9);	//find and skip over run title since
@@ -2529,6 +2538,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			{ throw UserCancel();}
 			int kw;
 			if (-1 < (kw = Buffer->LocateKeyWord(HeaderKeywords))) {
+				wxFileOffset keywordPosition = Buffer->GetFilePos();
 				switch (kw) {
 					case final:
 						headerDone = true;
@@ -2798,6 +2808,8 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 						return 0;
 						break;
 				}
+					//If still positioned at the keyword, must advance or there will be a loop.
+				if (keywordPosition == Buffer->GetFilePos()) Buffer->SkipnLines(1);
 			} else break;
 		}
 		if (lFrame->NumAtoms <= 0) {	//initial coordinates not found! Abort!
@@ -3559,7 +3571,9 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 	iatom = lFrame->GetNumAtoms();
 	
 	//First read in the fragment names which are separate from the coordinates
-	while (Buffer->LocateKeyWord("COORDINATES FOR FRAGMENT", 24, Buffer->GetFilePos()+200)) {
+	//I am not sure why I originally pulled it as "FOR", but GAMESS hasn't used it for some time.
+	//	"COORDINATES FOR FRAGMENT"
+	while (Buffer->LocateKeyWord("COORDINATES OF FRAGMENT", 23, Buffer->GetFilePos()+200)) {
 		if (Buffer->LocateKeyWord("NAMED", 5, Buffer->GetFilePos()+80)) {
 			Buffer->GetLine(Line);
 			sscanf(&(Line[5]), "%s", Label);
@@ -3567,13 +3581,13 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 		} else Buffer->SkipnLines(1);
 	}
 
-	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS", 32, Buffer->GetFilePos()+1000)) {
+	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS", 32, Buffer->GetFilePos()+4000)) {
 		Buffer->GetLine(Line);
 		sscanf(&(Line[32]), " =%ld", &NumMultipoles);
 	}
 		//Mike finally fixed the spelling of coordinates
-	if ((NumMultipoles>0) && (Buffer->LocateKeyWord("MULTIPOLE COORDINATES", 20, Buffer->GetFilePos()+1000) ||
-			Buffer->LocateKeyWord("MULTIPOLE CORDINATES", 19, Buffer->GetFilePos()+1000))) {
+	if ((NumMultipoles>0) && (Buffer->LocateKeyWord("MULTIPOLE COORDINATES", 20, Buffer->GetFilePos()+10000) ||
+			Buffer->LocateKeyWord("MULTIPOLE CORDINATES", 19, Buffer->GetFilePos()+10000))) {
 		Buffer->SkipnLines(3);
 		SetupFrameMemory(lFrame->NumAtoms + 10, 0);
 		bool workingFragment=false;
