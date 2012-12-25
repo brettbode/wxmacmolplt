@@ -1825,11 +1825,13 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 		Buffer->GetLine(LineText);
 		test = ParseCartLine(LineText, &AtomType, &Pos, &Vector, Mode);
 		
-		if (test==-1) {	//invalid atom type
+		if (AtomType==-1) {	//invalid atom type
+				//Choices would seem to be to punt and abort or change to some sort of valid type
 			wxLogMessage(_("Error: An invalid Atom Type was encountered in the atom list."));
 			if (Mode1Vibs) delete Mode1Vibs;
 			throw DataError();
-		} else if (test<0) {
+		} 
+		if (test<0) {
 			wxLogMessage(_("An error occured while reading the file. Open File Aborted!"));
 			if (Mode1Vibs) delete Mode1Vibs;
 			throw DataError();
@@ -5790,6 +5792,9 @@ long SetAtomType(const unsigned char *TestLabel) {
 				case 'f':			/* Californium */
 					result = 98;
 					break;
+				case 'n':			/* Copernicium */
+					result = 112;
+					break;
 				default:			/* Carbon */
 					result = 6;
 					break;
@@ -6045,7 +6050,7 @@ long SetAtomType(const unsigned char *TestLabel) {
 				case 'a':			/* Radium */
 					result = 88;
 					break;
-				case 'f':
+				case 'f':			/* Rutherfordium */
 					result = 104;
 					break;
 			}
@@ -6094,11 +6099,14 @@ long SetAtomType(const unsigned char *TestLabel) {
 				case 'y':/* Dysprosium */
 					result = 66;
 					break;
-				case 'b':
+				case 'b':	/* Dubnium */
 					result = 105;
 					break;
 				case 's':	//Darmstadtium
 					result = 110;
+					break;
+				default:	//Deuterium
+					result = 1;
 					break;
 			}
 			break;

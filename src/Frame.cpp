@@ -132,7 +132,8 @@ Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
 mpAtom *Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition,
 					   long index) {
 
-	/* AtomType is the atom's atomic number, starting with hydrogen at 1. */
+	/* AtomType is the atom's atomic number, starting with hydrogen at 1. It is used to index the
+	   atom types array elsewhere so must be validated. */
 
 	mpAtom * result = NULL;
 
@@ -156,7 +157,10 @@ mpAtom *Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition,
 				targeted_atom++;
 			}
 		}
-		Atoms[index].Type = AtomType;
+		if ((AtomType>0)&&(AtomType<=kMaxAtomTypes))
+			Atoms[index].Type = AtomType;
+		else
+			Atoms[index].Type = 114; //Convert invalid types to a max type to clearly indicate a problem
 		Atoms[index].Position = AtomPosition;
 		Atoms[index].flags = 0;
 		Atoms[index].SetDefaultCoordinationNumber();
