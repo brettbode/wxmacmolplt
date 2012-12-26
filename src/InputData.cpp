@@ -2994,9 +2994,11 @@ void HessianGroup::ReadXML(XMLElement * parent) {
 }
 bool HessianGroup::IsAnalyticHessianPossible(const InputData * IData) {
 	//Check based on the SCF type
+	//This is only part of the current rules. It probably covers the common cases though.
+	//ToDo: Match this test up more closely with the state of GAMESS.
 	bool result = (((IData->Control->GetSCFType() == 1)||(IData->Control->GetSCFType() == 3)||
 					(IData->Control->GetSCFType() == 4)||(IData->Control->GetSCFType() == 0))&&
-				   (IData->Control->GetMPLevel() <= 0));
+				   (IData->Control->GetMPLevel() <= 0)&&(!IData->Control->UseDFT()));
 	//Analytic hessians are not available for semi-emperical basis sets
 	if ((IData->Basis->GetBasis() == GAMESS_BS_MNDO)||(IData->Basis->GetBasis() == GAMESS_BS_AM1)||
 		(IData->Basis->GetBasis() == GAMESS_BS_PM3)) return false;
