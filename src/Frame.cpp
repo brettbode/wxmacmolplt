@@ -996,10 +996,8 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 			OrbSet->setOrbitalType(NaturalOrbital);
 			Vectors = OrbSet->Vectors;
 			Energy = OrbSet->Energy;
-			if (OrbSet->SymType) {	//symmetry labels are not printed for NO's
-				delete [] OrbSet->SymType;
-				OrbSet->SymType = NULL;
-			}
+			SymType = OrbSet->SymType;
+			bool SymmetriesFound = true;
 			OccNums = OrbSet->OrbOccupation = new float [NumNOrbs];
 			if (!OccNums) throw MemoryError();
 				//Clear the occupation numbers just in case a full set is not read in
@@ -1014,7 +1012,6 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 					delete OrbSet;
 					return;
 				}
-	//			imaxorb = MIN(10, NumNOrbs-iorb);	//Max of 10 orbitals per line
 				imaxorb = ((10) > (NumNOrbs-iorb)) ? (NumNOrbs-iorb) : (10);	//Max of 10 orbitals per line
 				Buffer->GetLine(Line);
 				LinePos = 0;
@@ -1031,9 +1028,10 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 					}
 				}
 				if (imaxorb <= 0) break;
-				Buffer->SkipnLines(1);	//Skip blank line
-					//first read in the orbital energy/occupation number of each orbital
 				Buffer->GetLine(Line);
+					//Older versions had a blank line, skip it if present
+				if (IsBlank(Line)) Buffer->GetLine(Line);	
+					//first read in the orbital energy/occupation number of each orbital
 				LinePos = 0;
 				for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital energies
 					ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(Energy[iorb+jorb]),&nChar);
@@ -1044,13 +1042,25 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 					} else if (OccNums) OccNums[iorb+jorb] = 2.0;
 					LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
 				}
-				Buffer->SkipnLines(1);	//skip blank line
-					//orbital symetries are not printed for Natural orbitals
+				//In old versions orbital symetries are not printed for Natural orbitals, but new versions have them
+				Buffer->GetLine(Line);
+				if (!IsBlank(Line)) {
+					LinePos = 0;
+					for (jorb=0; jorb<imaxorb; jorb++) {	//Get the orbital symmetries
+						ScanErr = sscanf(&(Line[LinePos]), "%4s%n", &(SymType[(iorb+jorb)*5]),&nChar);
+						if (ScanErr<=0) throw DataError();	//Looks like the MO's are not complete
+						LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
+					}
+				} else SymmetriesFound = false;
 					//read in the vector block
 				ReadGAMESSlogVectors(Buffer, &(Vectors[iorb*maxfuncs]), maxfuncs, imaxorb);
 				iorb += imaxorb;
 				Buffer->SkipnLines(1);	//Skip blank line between blocks
 			}
+			if (!SymmetriesFound && (OrbSet->SymType!=NULL)) {
+				delete [] OrbSet->SymType;
+				OrbSet->SymType = NULL;
+			}			
 			OrbSet->ReSize(NumNOrbs, 0);
 		}
 	}
