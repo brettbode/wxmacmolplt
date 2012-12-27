@@ -496,6 +496,7 @@ typedef enum TypeOfWavefunction {
 	CI,
 	RHFMP2,
 	TDDFT,
+	EOM_CC,
 	
 	NumberWavefunctionTypes
 } TypeOfWavefunction;

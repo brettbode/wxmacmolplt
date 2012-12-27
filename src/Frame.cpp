@@ -1520,6 +1520,105 @@ void Frame::ParseGAMESSCIVectors(BufferFile * Buffer, long NumFuncs, Progress * 
 		if (OrbSet) Orbs.push_back(OrbSet);
 	}
 }
+//Handle EOM-CC natural orbitals
+void Frame::ParseGAMESSEOM_CC_Vectors(BufferFile * Buffer, long NumFuncs, Progress * lProgress) {
+	long	iorb, jorb, imaxorb=0, NumNOrbs=0, TestOrb,
+	ScanErr, LinePos;
+	int		nChar;
+	float	*Vectors, *OccNums;
+	char	Line[kMaxLineLength+1], *SymType=NULL;
+	OrbitalRec * OrbSet = NULL;
+	
+	if (Buffer->LocateKeyWord("NATURAL ORBITALS", 16)) {
+		try {
+			Buffer->SetFilePos(Buffer->FindBlankLine());
+			Buffer->SkipnLines(1);
+			lProgress->ChangeText("Reading EOM-CC Natural Orbitals");
+
+			bool	Style = false;
+			long begPos = Buffer->GetFilePos();
+			//Determine the style of the orbital output
+			Buffer->SkipnLines(1);
+			Buffer->GetLine(Line);
+			int t = strlen(Line);
+			if (t > 5) Style=true;
+			Buffer->SetFilePos(begPos);
+			
+			OrbSet = new OrbitalRec(NumFuncs, 0, NumFuncs);
+			OrbSet->setOrbitalWavefunctionType(EOM_CC);
+			OrbSet->setOrbitalType(NaturalOrbital);
+			
+			Vectors = OrbSet->Vectors;
+			if (OrbSet->Energy) {
+				delete [] OrbSet->Energy;
+				OrbSet->Energy = NULL;
+			}
+			if (OrbSet->SymType == NULL) {
+				OrbSet->SymType = new char [NumFuncs*5];
+				if (!OrbSet->SymType) throw MemoryError();
+			}
+			SymType = OrbSet->SymType;
+			OccNums = OrbSet->OrbOccupation = new float [NumFuncs];
+			if (!OccNums) throw MemoryError();
+			
+			iorb=0;
+			NumNOrbs = NumFuncs;
+			while (iorb<NumNOrbs) {
+				// Allow a little backgrounding and user cancels
+				if (!lProgress->UpdateProgress(Buffer->GetPercentRead())) {
+					delete OrbSet;
+					return;
+				}
+				imaxorb = MIN(10, NumNOrbs-iorb);	//Max of 10 orbitals per line
+				Buffer->GetLine(Line);
+				LinePos = 0;
+				for (jorb=0; jorb<imaxorb; jorb++) {
+					ScanErr = sscanf(&(Line[LinePos]), "%ld%n", &TestOrb, &nChar);
+					if (ScanErr && (TestOrb==jorb+iorb+1)) LinePos += nChar;
+					else {
+						imaxorb = jorb;
+						if (jorb==0) {	//No more orbitals found
+							imaxorb = 0;
+							NumNOrbs = iorb;
+						}
+						break;
+					}
+				}
+				if (imaxorb <= 0) break;
+				//first read in the orbital occupation number of each orbital
+				Buffer->GetLine(Line);
+				LinePos = 0;
+				for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital occupations
+					ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(OccNums[iorb+jorb]),&nChar);
+					if (ScanErr<=0) throw DataError();	//Looks like the MO's are not complete
+					LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
+				}
+				Buffer->GetLine(Line);
+				if (strlen(Line) > 0) {
+					LinePos = 0;
+					for (jorb=0; jorb<imaxorb; jorb++) {	//Get the orbital symmetries
+						ScanErr = sscanf(&(Line[LinePos]), "%4s%n", &(SymType[(iorb+jorb)*5]),&nChar);
+						if (ScanErr<=0) throw DataError();	//Looks like the MO's are not complete
+						LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
+					}
+				}
+				//read in the vector block
+				ReadGAMESSlogVectors(Buffer, &(Vectors[iorb*NumFuncs]), NumFuncs, imaxorb);
+				iorb += imaxorb;
+				Buffer->SkipnLines(1);	//Skip blank line between blocks
+			}
+		}
+		catch (...) {
+			if (OrbSet) {
+				delete OrbSet;
+				OrbSet=NULL;
+			}
+		}
+		OrbSet->NumAlphaOrbs = NumNOrbs;
+		OrbSet->NumOccupiedAlphaOrbs = NumNOrbs;
+		if (OrbSet) Orbs.push_back(OrbSet);
+	}
+}
 //Parse UHF Natural Orbitals
 //
 void Frame::ParseUHFNOs(BufferFile * Buffer, long NumFuncs, Progress * lProgress) {

@@ -537,6 +537,9 @@ int OrbSurfacePane::getOrbSetForOrbPane(vector<wxString>& choice) {
 							case TDDFT:
 								choice.push_back(_T("TD-DFT Natural Orbitals"));
 								break;
+							case EOM_CC:
+								choice.push_back(_T("EOM-CC Natural Orbitals"));
+								break;
 							default:
 								choice.push_back(_T("Natural Orbitals"));
 						}
@@ -3133,6 +3136,9 @@ void BaseSurfacePane::BuildOrbSetPopup(void) {
 								break;
 							case TDDFT:
 								mOrbSetChoice->Append(wxString(_T("TD-DFT Natural Orbitals")));
+								break;
+							case EOM_CC:
+								mOrbSetChoice->Append(wxString(_T("EOM-CC Natural Orbitals")));
 								break;
 							default:
 								mOrbSetChoice->Append(wxString(_T("Natural Orbitals")));

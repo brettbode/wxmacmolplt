@@ -385,10 +385,26 @@ const char * ControlGroup::GetGAMESSCCType(const CCRunType & r) {
 			return "R-CC";
 		case CC_CRCC:
 			return "CR-CC";
+		case CC_CRCCL:
+			return "CR-CCL";
+		case CC_CCSDTQ:
+			return "CCSD(TQ)";
+		case CC_CRCCQ:
+			return "CR-CC(Q)";
 		case CC_EOMCCSD:
 			return "EOM-CCSD";
 		case CC_CREOM:
 			return "CR-EOM";
+		case CC_CREOML:
+			return "CR-EOML";
+		case CC_IP_EOM2:
+			return "IP-EOM2";
+		case CC_IP_EOM3A:
+			return "IP-EOM3A";
+		case CC_EA_EOM2:
+			return "EA-EOM2";
+		case CC_EA_EOM3A:
+			return "EA-EOM3A";
 		default:
 			return "unknown";
 	}

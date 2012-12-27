@@ -791,8 +791,16 @@ void InputBuilderWindow::CreateControls()
 	ccChoiceStrings.Add(_("CCSD(T)"));
 	ccChoiceStrings.Add(_("R-CC"));
 	ccChoiceStrings.Add(_("CR-CC"));
+	ccChoiceStrings.Add(_("CR-CCL"));
+	ccChoiceStrings.Add(_("CCSD(TQ)"));
+	ccChoiceStrings.Add(_("CR-CC(Q)"));
 	ccChoiceStrings.Add(_("EOM-CCSD"));
 	ccChoiceStrings.Add(_("CR-EOM"));
+	ccChoiceStrings.Add(_("CR-EOML"));
+	ccChoiceStrings.Add(_("IP-EOM2"));
+	ccChoiceStrings.Add(_("IP-EOM3A"));
+	ccChoiceStrings.Add(_("EA-EOM2"));
+	ccChoiceStrings.Add(_("EA-EOM3A"));
 	ccChoice = new wxUglyChoice( itemPanel27, ID_CC_CHOICE, wxDefaultPosition, wxDefaultSize, ccChoiceStrings, 0 );
 	ccChoice->SetStringSelection(_("None"));
 	itemFlexGridSizer54->Add(ccChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -1929,8 +1937,9 @@ void InputBuilderWindow::SetupControlItems() {
 		ciChoice->SetSelection(ci);
 	}
     
-    // ccChoice
-	if((mp2 > 0) || dft || ci || scft > 1 || (runType == G3MP2)) {
+    // ccChoice - coupled cluster is only availble for RHF and ROHF. There is a much more limited
+	//				set of options for ROHF, not sure how to handle that here.
+	if((mp2 > 0) || dft || ci || ((scft > GAMESS_RHF)&&(scft != GAMESS_ROHF)) || (runType == G3MP2)) {
 		ccChoice->SetSelection(0);
 		ccChoice->Enable(false);
 		ccLabel->Enable(false);
@@ -2173,6 +2182,9 @@ void InputBuilderWindow::SetupMOGuessItems() {
 								break;
 							case TDDFT:
 								mMOSourceChoice->Append(wxString(_("TD-DFT Natural Orbitals")));
+								break;
+							case EOM_CC:
+								mMOSourceChoice->Append(wxString(_("EOM-CC Natural Orbitals")));
 								break;
 							default:
 								mMOSourceChoice->Append(wxString(_("Natural Orbitals")));

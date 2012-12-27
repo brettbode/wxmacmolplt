@@ -1906,7 +1906,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 			return 1;
 		}
 	}
-	if (BondLength > 0.0) {
+	if ((BondLength > 0.0)||(Prefs->GetAutoBond())) {
 		Prefs->SetMaxBondLength(BondLength);
 		lFrame->SetBonds(Prefs, false);
 	}
@@ -3040,6 +3040,12 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 							38, NextFinalPos) && ReadMP2Orbitals) {
 							lFrame->ReadMP2Vectors(Buffer, DatBuffer, MainData->GetNumBasisFunctions(),
 								ProgressInd, &ReadMP2Orbitals);
+						}
+					}
+					if (MainData->InputOptions->Control->GetCCType()) {
+						if (Buffer->LocateKeyWord("EOM-CC NATURAL ORBITALS",
+												  23, NextFinalPos)) {
+							lFrame->ParseGAMESSEOM_CC_Vectors(Buffer, MainData->GetNumBasisFunctions(), ProgressInd);
 						}
 					}
 					if (MainData->InputOptions->Control->GetCIType()) {	//Look for CI Natural orbitals
