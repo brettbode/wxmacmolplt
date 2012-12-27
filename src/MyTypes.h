@@ -511,6 +511,7 @@ typedef enum TypeOfOrbital {
 	BoysLocalizedOrbital,
 	OrientedLocalizedOrbital,
 	GuessOrbital,
+	DiabaticMolecularOrbital,
 	
 	NumOrbitalTypes
 //	RHFOptimized=1,

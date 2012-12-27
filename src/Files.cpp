@@ -3488,6 +3488,13 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 //Look for localized orbitals which appear only at the end of a log file
 	if (MainData->Basis) {
 		try {
+				//MCSCF runs can potentially have diabatic orbitals at the end.
+			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {
+				if (Buffer->LocateKeyWord("CAS-SCF DIABATIC MOLECULAR ORBITALS", 34)) {
+					lFrame->ParseGAMESSMCSCFDiabaticVectors(Buffer, MainData->GetNumBasisFunctions(),
+												OccupiedOrbCount, ProgressInd);
+				}
+			}
 				//GAMESS now punchs out the Fock operator for ruedenburg type localization
 				//which I need to skip if it is present
 			if (Buffer->LocateKeyWord("FOCK OPERATOR FOR THE LOCALIZED ORBITALS",40))

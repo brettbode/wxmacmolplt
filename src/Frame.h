@@ -167,6 +167,12 @@ class Frame {
 		inline void SetBondOrder(long BondNum, BondOrder NewOrder) {Bonds[BondNum].Order = NewOrder;};
 		void ParseGAMESSGuessVectors(BufferFile * Buffer, long NumFuncs, TypeOfWavefunction t, Progress * lProgress);
 		void ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs, Progress * lProgress);
+		/** Parse the GAMESS CAS-SCF Diabatic Molecular Orbitals
+		 * @param Buffer the input buffer.
+		 * @param NumFuncs the number of basis functions.
+		 * @param lProgress the progress indicator.
+		 */
+		void ParseGAMESSMCSCFDiabaticVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs, Progress * lProgress);
 		void ParseGAMESSCIVectors(BufferFile * Buffer, long NumFuncs, Progress * lProgress);
 		/** Parse the GAMESS UHF natural orbitals and occupation numbers.
 		 * @param Buffer the input buffer.

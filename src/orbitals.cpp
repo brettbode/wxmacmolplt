@@ -65,6 +65,8 @@ const char * ConvertTypeOfWavefunction(const TypeOfWavefunction & t) {
 			return "RMP2";
 		case TDDFT:
 			return "TDDFT";
+		case EOM_CC:
+			return "EOM_CC";
 		default:
 			return "Unknown";
 	}
@@ -95,6 +97,8 @@ const char * ConvertTypeOfOrbital(const TypeOfOrbital & t) {
 			return "Oriented Localized";
 		case GuessOrbital:
 			return "Initial Guess";
+		case DiabaticMolecularOrbital:
+			return "CAS-SCF Diabatic";
 		default:
 			return "Unknown";
 	}

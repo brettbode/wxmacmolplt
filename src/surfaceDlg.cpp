@@ -554,6 +554,9 @@ int OrbSurfacePane::getOrbSetForOrbPane(vector<wxString>& choice) {
 					case GuessOrbital:
 						choice.push_back(_T("Initial Guess Orbitals"));
 						break;
+					case DiabaticMolecularOrbital:
+						choice.push_back(_T("CAS-SCF Diabatic Molecular Orbitals"));
+						break;
 					default:
 						choice.push_back(_T("Molecular Orbitals"));
 				}
@@ -3152,6 +3155,9 @@ void BaseSurfacePane::BuildOrbSetPopup(void) {
 						break;
 					case GuessOrbital:
 						mOrbSetChoice->Append(wxString(_T("Initial Guess Orbitals")));
+						break;
+					case DiabaticMolecularOrbital:
+						mOrbSetChoice->Append(wxString(_T("CAS-SCF Diabatic Molecular Orbitals")));
 						break;
 					default:
 						mOrbSetChoice->Append(wxString(_T("Molecular Orbitals")));

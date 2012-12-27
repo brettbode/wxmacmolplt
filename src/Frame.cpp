@@ -1143,6 +1143,104 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 		Orbs.push_back(OrbSet);
 	}
 }
+//There is a relatively rare runtype based on MCSCF that produces diabatic orbitals
+//Mike describes these as neither the final MOs or Naturals orbitals (though there are occupancies)
+void Frame::ParseGAMESSMCSCFDiabaticVectors(BufferFile * Buffer, long NumFuncs,
+									long NumOrbs, Progress * lProgress) {
+	long	iorb, imaxorb=0, NumNOrbs=0, TestOrb,
+	ScanErr, LinePos, jorb;
+	int		nChar;
+	float	*Vectors, *Energy, *OccNums;
+	char	*SymType, Line[kMaxLineLength+1];
+	
+	long maxfuncs = NumFuncs;	//Always true
+	OrbitalRec * OrbSet = NULL;
+	NumNOrbs = NumOrbs;
+	
+	try {
+		OrbSet = new OrbitalRec(NumNOrbs, 0, maxfuncs);
+		OrbSet->setOrbitalWavefunctionType(MCSCF);
+		OrbSet->setOrbitalType(DiabaticMolecularOrbital);
+		Vectors = OrbSet->Vectors;
+		Energy = OrbSet->Energy;
+		SymType = OrbSet->SymType;
+		bool SymmetriesFound = true;
+		OccNums = OrbSet->OrbOccupation = new float [NumNOrbs];
+		if (!OccNums) throw MemoryError();
+		//Clear the occupation numbers just in case a full set is not read in
+		for (iorb=0; iorb<NumNOrbs; iorb++) OccNums[iorb] = 0.0;
+		
+		Buffer->SetFilePos(Buffer->FindBlankLine());
+		Buffer->SkipnLines(1);
+		iorb=0;
+		while (iorb<NumNOrbs) {
+			// Allow a little backgrounding and user cancels
+			if (!lProgress->UpdateProgress(Buffer->GetPercentRead())) {
+				delete OrbSet;
+				return;
+			}
+			imaxorb = ((10) > (NumNOrbs-iorb)) ? (NumNOrbs-iorb) : (10);	//Max of 10 orbitals per line
+			Buffer->GetLine(Line);
+			LinePos = 0;
+			for (jorb=0; jorb<imaxorb; jorb++) {
+				ScanErr = sscanf(&(Line[LinePos]), "%ld%n", &TestOrb, &nChar);
+				if (ScanErr && (TestOrb==jorb+iorb+1)) LinePos += nChar;
+				else {
+					imaxorb = jorb;
+					if (jorb==0) {	//No more orbitals found
+						imaxorb = 0;
+						NumNOrbs = iorb;
+					}
+					break;
+				}
+			}
+			if (imaxorb <= 0) break;
+			Buffer->GetLine(Line);
+			//Older versions had a blank line, skip it if present
+			if (IsBlank(Line)) Buffer->GetLine(Line);	
+			//first read in the orbital energy/occupation number of each orbital
+			LinePos = 0;
+			for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital energies
+				ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(Energy[iorb+jorb]),&nChar);
+				if (ScanErr<=0) throw DataError();	//Looks like the MO's are not complete
+				if (Energy[iorb+jorb] >= 0.0) {	//Only core orbital energies are printed
+					if (OccNums) OccNums[iorb+jorb] = Energy[iorb+jorb];
+					Energy[iorb+jorb] = 0.0;
+				} else if (OccNums) OccNums[iorb+jorb] = 2.0;
+				LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
+			}
+			//In old versions orbital symetries are not printed for Natural orbitals, but new versions have them
+			Buffer->GetLine(Line);
+			if (!IsBlank(Line)) {
+				LinePos = 0;
+				for (jorb=0; jorb<imaxorb; jorb++) {	//Get the orbital symmetries
+					ScanErr = sscanf(&(Line[LinePos]), "%4s%n", &(SymType[(iorb+jorb)*5]),&nChar);
+					if (ScanErr<=0) throw DataError();	//Looks like the MO's are not complete
+					LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
+				}
+			} else SymmetriesFound = false;
+			//read in the vector block
+			ReadGAMESSlogVectors(Buffer, &(Vectors[iorb*maxfuncs]), maxfuncs, imaxorb);
+			iorb += imaxorb;
+			Buffer->SkipnLines(1);	//Skip blank line between blocks
+		}
+		if (!SymmetriesFound && (OrbSet->SymType!=NULL)) {
+			delete [] OrbSet->SymType;
+			OrbSet->SymType = NULL;
+		}			
+		OrbSet->ReSize(NumNOrbs, 0);
+	}
+	catch (...) {
+		if (OrbSet != NULL) {
+			delete OrbSet;
+			OrbSet = NULL;
+		}
+	}
+	if (OrbSet) {
+		OrbSet->SetOrbitalOccupancy(NumNOrbs, 0);	//We should know the occupation # for all natural orbs.
+		Orbs.push_back(OrbSet);
+	}
+}
 
 //Reads in a general set of eigenvectors from a GAMESS log file. The number of beta
 //orbitals is used only to indicate the need to read in both alpha and beta sets.
