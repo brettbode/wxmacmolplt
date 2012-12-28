@@ -2469,7 +2469,7 @@
 		8B162E8C0D75C12600975533 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -2501,6 +2501,7 @@
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
 				INFOPLIST_FILE = /Users/brett/software/wxMacMolPlt/resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.5;
 				OBJROOT = "$(SYMROOT)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-I$(HOME)/software/wx/wx-2.9-debug/lib/wx/include/osx_carbon-unicode-static-2.9/",
@@ -2531,7 +2532,6 @@
 					"-lwx_osx_carbonu_core-2.9",
 					"-lwx_osx_carbonu_adv-2.9",
 					"-lwx_osx_carbonu_gl-2.9",
-					"-lwxexpat-2.9",
 					"-lwxtiff-2.9",
 					"-lwxjpeg-2.9",
 					"-lwxpng-2.9",
@@ -2545,10 +2545,12 @@
 					OpenGL,
 					"-framework",
 					AGL,
+					"-framework",
+					AudioToolbox,
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
+				SDKROOT = macosx10.5;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;

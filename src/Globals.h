@@ -21,7 +21,7 @@
 
 //This needs to get put into the build system...
 #define __wxBuild__
-#define wxMacMolPlt_VERSION "7.4.4d2"
+#define wxMacMolPlt_VERSION "7.4.4d3"
 
 //activate the following line to use the interactive editor
 // please add CXXFLAGS=-DENABLE_INTERACTIVE_MODE to your configure step rather
@@ -35,6 +35,13 @@
 #ifdef __wxBuild__
 #include "mmp_gl.h"
 //When building on a Mac the following types will get picked up from system headers
+//prior to 2.9 WXOSX_CARBON wasn't defined, but is implied. It seems easier to define it than
+//complicate the checks elsewhere.
+#if !wxCHECK_VERSION(2, 9, 0)
+#ifdef __WXMAC__
+#define __WXOSX_CARBON__
+#endif
+#endif
 #ifndef __WXOSX_CARBON__
 struct RGBColor {
 	unsigned short 					red;						/*magnitude of red component*/
