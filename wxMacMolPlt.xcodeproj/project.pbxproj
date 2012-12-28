@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -59,7 +59,6 @@
 		16B345EF09F9505C005FD3B2 /* coordinateswindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16B345ED09F9505C005FD3B2 /* coordinateswindow.cpp */; };
 		16FB433009F026A300E84C6B /* bondsdlg.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 16FB432E09F026A300E84C6B /* bondsdlg.cpp */; };
 		8B162DF90D75C12600975533 /* bindoc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC809D0B43700B7783F /* bindoc.icns */; };
-		8B162DFA0D75C12600975533 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC909D0B43700B7783F /* Info.plist */; };
 		8B162DFB0D75C12600975533 /* MacMolPlt.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACA09D0B43700B7783F /* MacMolPlt.icns */; };
 		8B162DFC0D75C12600975533 /* prefs.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACB09D0B43700B7783F /* prefs.icns */; };
 		8B162DFD0D75C12600975533 /* text-doc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACC09D0B43700B7783F /* text-doc.icns */; };
@@ -243,7 +242,6 @@
 		8B2999110E48FAAD00624A73 /* WalkThrough.html in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998EB0E48FA6F00624A73 /* WalkThrough.html */; };
 		8B2999120E48FAAD00624A73 /* water.jpg in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8B2998EC0E48FA6F00624A73 /* water.jpg */; };
 		8B29D61E12B934BD0049477F /* bindoc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC809D0B43700B7783F /* bindoc.icns */; };
-		8B29D61F12B934BD0049477F /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC909D0B43700B7783F /* Info.plist */; };
 		8B29D62012B934BD0049477F /* MacMolPlt.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACA09D0B43700B7783F /* MacMolPlt.icns */; };
 		8B29D62112B934BD0049477F /* prefs.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACB09D0B43700B7783F /* prefs.icns */; };
 		8B29D62212B934BD0049477F /* text-doc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACC09D0B43700B7783F /* text-doc.icns */; };
@@ -1107,6 +1105,7 @@
 				1652DA0C09D0AE8F00B7783F /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 1;
 		};
 		1652DA0C09D0AE8F00B7783F /* Products */ = {
 			isa = PBXGroup;
@@ -1603,8 +1602,11 @@
 /* Begin PBXProject section */
 		1652D9FF09D0AE7200B7783F /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+			};
 			buildConfigurationList = 1652DA0009D0AE7200B7783F /* Build configuration list for PBXProject "wxMacMolPlt" */;
-			compatibilityVersion = "Xcode 2.4";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -1654,7 +1656,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B162DF90D75C12600975533 /* bindoc.icns in Resources */,
-				8B162DFA0D75C12600975533 /* Info.plist in Resources */,
 				8B162DFB0D75C12600975533 /* MacMolPlt.icns in Resources */,
 				8B162DFC0D75C12600975533 /* prefs.icns in Resources */,
 				8B162DFD0D75C12600975533 /* text-doc.icns in Resources */,
@@ -1675,7 +1676,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8B29D61E12B934BD0049477F /* bindoc.icns in Resources */,
-				8B29D61F12B934BD0049477F /* Info.plist in Resources */,
 				8B29D62012B934BD0049477F /* MacMolPlt.icns in Resources */,
 				8B29D62112B934BD0049477F /* prefs.icns in Resources */,
 				8B29D62212B934BD0049477F /* text-doc.icns in Resources */,
@@ -2303,7 +2303,7 @@
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 			};
 			name = Debug;
 		};
@@ -2394,7 +2394,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
@@ -2460,7 +2460,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
@@ -2548,7 +2548,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2620,7 +2620,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				STRIP_INSTALLED_PRODUCT = NO;
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
@@ -2651,23 +2651,21 @@
 		8B29D6B712B934BD0049477F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_MODEL_TUNING = "";
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_PREFIX_HEADER = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = NO;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
 				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = NO;
 				GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = NO;
 				GCC_WARN_MISSING_PARENTHESES = YES;
@@ -2683,7 +2681,9 @@
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = "";
 				OBJROOT = "$(SYMROOT)";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-I$(HOME)/software/wx/wx-2.9-cocoa-debug/lib/wx/include/osx_cocoa-unicode-static-2.9/",
 					"-I$(HOME)/software/wx/wx-2.9-cocoa-debug/include/wx-2.9",
@@ -2695,7 +2695,6 @@
 					"-D_LARGE_FILES",
 					"-DNO_GCC_PRAGMA",
 					"-DHAVE_LIBMING",
-					"-D__MAC_USE_QUICKTIME__",
 				);
 				OTHER_LDFLAGS = (
 					"-L$(HOME)/software/wx/wx-2.9-cocoa-debug/lib/",
@@ -2728,9 +2727,8 @@
 					"-framework",
 					AGL,
 				);
-				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2738,25 +2736,22 @@
 		8B29D6B812B934BD0049477F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					i386,
-					ppc,
-				);
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "$(SYSTEM_LIBRARY_DIR)/Frameworks/Carbon.framework/Headers/Carbon.h";
+				GCC_PREFIX_HEADER = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
-				GCC_VERSION = 4.0;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				OBJROOT = "$(SYMROOT)";
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-I$(HOME)/software/wx/wx-2.9.0-univ/lib/wx/include/osx_carbon-unicode-release-static-2.9",
 					"-I$(HOME)/software/wx/wx-2.9.0-univ/include/wx-2.9",
@@ -2798,13 +2793,10 @@
 					"-framework",
 					AGL,
 				);
-				OTHER_LDFLAGS_QUOTED_FOR_TARGET_1 = "`$(HOME)/software/wx/wx-2.9.0-univ/bin/wx-config --libs base,core,gl,adv,html`";
-				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "";
 				STRIP_INSTALLED_PRODUCT = NO;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -2869,7 +2861,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};
@@ -2935,7 +2927,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = wxMacMolPlt;
-				SDKROOT = /Developer/SDKs/MacOSX10.4u.sdk;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.4u.sdk";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
 			};

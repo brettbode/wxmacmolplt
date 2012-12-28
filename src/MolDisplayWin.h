@@ -16,8 +16,10 @@
 #include "wx/wx.h"
 #include <wx/print.h>
 
-#ifdef __WXMAC__
+#ifdef __WXOSX_CARBON__
 #include <AGL/glu.h>
+#elif __WXOSX_COCOA__
+#include <OpenGL/glu.h>
 #else
 #include <GL/glu.h>
 #endif

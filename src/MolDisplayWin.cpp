@@ -1336,7 +1336,7 @@ void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
 			Dirtify(false);
 			delete buffer;
 		}
-#ifdef __WXMAC__
+#ifdef __WXOSX_CARBON__
 		if (Prefs->CreateCustomIcon()) CreateCustomFileIcon(currFilePath);
 #endif
 		fclose(currFile);
@@ -1399,7 +1399,7 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 		if(buffer) {
 			delete buffer;
 		}
-#ifdef __WXMAC__
+#ifdef __WXOSX_CARBON__
 		if (Prefs->CreateCustomIcon()) CreateCustomFileIcon(filePath);
 #endif
 		currFilePath = filePath;
@@ -1409,7 +1409,7 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 	}
 }
 
-#ifdef __WXMAC__
+#ifdef __WXOSX_CARBON__
 OSErr	SendFinderAppleEvent( AliasHandle aliasH, AEEventID appleEventID );
 OSErr	SaveCustomIcon( const wxString & filename, IconFamilyHandle icnsH );
 //	This routine will set the custom icon in the file with
@@ -3527,7 +3527,7 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 	FinishOperation();				//Close the progress dialog, if opened
 
 	if (test && !append) {//Note test is left 0 if any exception occurs(which causes Window to be deleted)
-#ifdef __WXMAC__
+#ifdef __WXOSX_CARBON__
 	  if (gPreferences->ChangeFileType()) {
 		  // Looks like this is a good file so set the creator type for the neat icon
 		  FSRef mFSRef;
