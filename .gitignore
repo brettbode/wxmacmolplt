@@ -21,6 +21,25 @@ Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
+AUTHORS
+ChangeLog
+NEWS
+config.log
+config.status
+
+# generated files from dialog blocks not actually used
+src/displayprefs.cpp
+src/displayprefs.h
+src/pattern2.cpp
+src/pattern2.h
+src/patternlayout.cpp
+src/patternlayout.h
+src/preferenceslayout.cpp
+src/preferenceslayout.h
+src/surfacelayout.cpp
+src/surfacelayout.h
+src/surfaces.cpp
+src/surfaces.h
 
 # OS generated files #
 ######################
