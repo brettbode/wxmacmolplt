@@ -40,8 +40,9 @@ long FindKeyWord(const char *buffer, const char keyin[], long numbyte) {
 //	for (check=0; check<numbyte; check++) 				/* Make sure the keyword is uppercase */
 //		if ((keyword[check]>96) && (keyword[check]<123)) keyword[check] -= 32;
 	for (check=0; check<numbyte; check++)
-		if ((keyin[check]>96) && (keyin[check]<123))
+		if ((keyin[check]>96) && (keyin[check]<123)) {
 			wxLogMessage(_("Error: keyword search on lower case keyword"));
+		}
 #endif
 	long	pos=0;
 	long result = -1;
