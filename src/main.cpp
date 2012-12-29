@@ -55,8 +55,6 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] = {
 };
 #endif
 
-#include "xpms/sp.xpm"
-
 #ifndef __WXMSW__
 MpApp& wxGetApp() {
 	return *wx_static_cast(MpApp*, wxApp::GetInstance());
@@ -141,7 +139,7 @@ bool MpApp::OnInit() {
 #endif 
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 
-		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006-2009 ")
+		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006-2012 ")
 					   wxT("Version %s, %s"), wxMacMolPlt_VERSION, (const wxChar*) date);
 		wxLogMessage(msg); 
 		return false; 
@@ -180,6 +178,9 @@ bool MpApp::OnInit() {
 		glf_initialized = 0;
 	}
 	
+    // Initialize image handlers so we can save the PNG format and such.
+    wxInitAllImageHandlers();
+	
 	// Check for a project filename 
 	if (cmdParser.GetParamCount() > 0) {
 		for (int i = 0; i < cmdParser.GetParamCount(); ++i) {
@@ -210,14 +211,13 @@ bool MpApp::OnInit() {
 		// Avoid throwing up the splash screen when opening a file since that can generate other
 		// modal dialogs.
 		
-		wxBitmap sp_bitmap(sp_xpm);
-		splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_NO_TIMEOUT, 0,
-									NULL, -1, wxDefaultPosition, wxDefaultSize,
-									wxSIMPLE_BORDER|wxSTAY_ON_TOP);
+		wxBitmap sp_bitmap;
+		if (sp_bitmap.LoadFile(pathname + wxT("/splash.png"), wxBITMAP_TYPE_PNG)) {
+			splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 6000,
+										NULL, -1, wxDefaultPosition, wxDefaultSize,
+										wxBORDER_SIMPLE|wxSTAY_ON_TOP);
+		}
 	}
-
-    // Initialize image handlers so we can save the PNG format and such.
-    wxInitAllImageHandlers();
 	
     // I think the following is appropriate.
 	// On Macs the app continues to run without any windows open, but Linux and Windows exit
