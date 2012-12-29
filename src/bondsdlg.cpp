@@ -195,9 +195,9 @@ void BondsDlg::ResetList(void) {
 		wxString buf;
 		for (long i=0; i<nbonds; i++) {
 			Bond * b = lFrame->GetBondLoc(i);
-			buf.Printf(wxT("%d"), (b->Atom1 + 1));
+			buf.Printf(wxT("%ld"), (b->Atom1 + 1));
 			bondGrid->SetCellValue(i, 0, buf);
-			buf.Printf(wxT("%d"), (b->Atom2 + 1));
+			buf.Printf(wxT("%ld"), (b->Atom2 + 1));
 			bondGrid->SetCellValue(i, 1, buf);
 			buf.Printf(wxT("%f"), lFrame->GetBondLength(i));
 			bondGrid->SetCellValue(i, 2, buf);

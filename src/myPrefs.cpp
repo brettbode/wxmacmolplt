@@ -234,7 +234,7 @@ void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 										 wxALIGN_CENTER),
 						0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-		tmp.Printf(wxT("%d"),mTargetPrefs->GetAtomSize(i));
+		tmp.Printf(wxT("%ld"),mTargetPrefs->GetAtomSize(i));
 		mEleSizes[i] = new wxTextCtrl(scroll_win, wxID_ANY, tmp, wxDefaultPosition, wxSize(40, 20));
 		mMainSizer->Add(mEleSizes[i], 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 		
@@ -668,11 +668,11 @@ void EnergyPrefsPane::setHiddenCtrls() {
 
 	wxString tmp;
 	if (!mAtomText[0]) {
-		tmp.Printf(wxT("%d"), lPOpts->Get1stAtom()+1);
+		tmp.Printf(wxT("%ld"), lPOpts->Get1stAtom()+1);
 		mAtomText[0] = new wxTextCtrl(this, wxID_ANY, tmp);
 	}
 	if (!mAtomText[1]) {
-		tmp.Printf(wxT("%d"), lPOpts->Get2ndAtom()+1);
+		tmp.Printf(wxT("%ld"), lPOpts->Get2ndAtom()+1);
 		mAtomText[1] = new wxTextCtrl(this, wxID_ANY, tmp);
 	}
 
@@ -682,7 +682,7 @@ void EnergyPrefsPane::setHiddenCtrls() {
 	mRight1BottomSizer->Add(mAtomText[1], wxALIGN_CENTER | wxALL, 3);
 
 	if (!mAtomText[2]) {
-		tmp.Printf(wxT("%d"), lPOpts->Get3rdAtom()+1);
+		tmp.Printf(wxT("%ld"), lPOpts->Get3rdAtom()+1);
 		mAtomText[2] = new wxTextCtrl(this, wxID_ANY, tmp);
 	}
 	mRight2BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 3:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
@@ -873,7 +873,7 @@ void FilePrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 	wxBoxSizer* BottomSizer = new wxBoxSizer(wxHORIZONTAL);
 	mMainSizer->Add(BottomSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 2);
 	wxString tmp;
-	tmp.Printf(wxT("%d"), mTargetPrefs->GetDRCSkip());
+	tmp.Printf(wxT("%ld"), mTargetPrefs->GetDRCSkip());
 	mPointSkip = new wxTextCtrl(this, wxID_ANY, tmp);
 
 	BottomSizer->Add(new wxStaticText(this, wxID_ANY, _T("When reading a DRC file how many\n points should be skipped between\n points read in? (0 reads every point)")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
@@ -1102,7 +1102,7 @@ void SurfacePrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 	mRightMidSizer->Add(new wxStaticText(this, wxID_ANY, _T("# of Contours:")), 0, wxALIGN_CENTER | wxALL, 3);
 
 	wxString tmp;
-	tmp.Printf(wxT("%d"), lSOpts->GetNumContours());
+	tmp.Printf(wxT("%ld"), lSOpts->GetNumContours());
 	mNumContour = new wxTextCtrl(this, wxID_ANY, tmp);
 	mRightMidSizer->Add(mNumContour, 0, wxALIGN_CENTER | wxALL, 3);
 

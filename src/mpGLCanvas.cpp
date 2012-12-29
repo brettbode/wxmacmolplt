@@ -589,6 +589,7 @@ void MpGLCanvas::Draw() {
 	// Setup OpenGL matrices.  The projection is defined according to the
 	// preferences, and we remain in eye space for now.
 	glViewport(0, 0, (GLint) width, (GLint) height);
+
 	/*glDrawBuffer(GL_BACK); */
 	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
 

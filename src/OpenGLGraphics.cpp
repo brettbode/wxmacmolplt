@@ -4036,7 +4036,7 @@ GLuint GetShaderProgram(const std::string& vert_src,
 
 	GLint succeeded;
 	char *log;
-	GLint log_length;
+	GLint log_length=0;
 	GLint chars_written;
 
 	shader_prog = glCreateProgram();

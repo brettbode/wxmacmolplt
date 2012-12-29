@@ -3294,7 +3294,7 @@ void MolDisplayWin::UpdateFrameText(void) {
 		}
 	}
 	wxString ft;
-	ft.Printf(wxT(" Frame %d of %d"), MainData->GetCurrentFrame(), MainData->GetNumFrames());
+	ft.Printf(wxT(" Frame %ld of %ld"), MainData->GetCurrentFrame(), MainData->GetNumFrames());
 	output += ft;
 
 	myStatus->SetStatusText(output);

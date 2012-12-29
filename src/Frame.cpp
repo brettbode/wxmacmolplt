@@ -984,11 +984,6 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 	long maxfuncs = NumFuncs;	//Always true
 	OrbitalRec * OrbSet = NULL;
 	
-//	Orbs = new MORec;
-//	if (Orbs==NULL) throw MemoryError();
-//	Orbs->EigenVectors = new OrbitalRec(NumNOrbs, NumOptOrbs, maxfuncs);
-//	if (Orbs->EigenVectors==NULL) throw MemoryError();
-//	Orbs->EigenVectors->OrbType=MCSCF;
 	try {
 		if (NumNOrbs) {	//read in the Natural Orbitals
 			OrbSet = new OrbitalRec(NumNOrbs, 0, maxfuncs);
