@@ -286,6 +286,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\glew.h"
+				>
+			</File>
+			<File
 				RelativePath=".\src\glf.h"
 				>
 			</File>
@@ -794,10 +798,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\glew.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\glf.cpp"
 				>
 			</File>
@@ -1288,10 +1288,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\src\sp.xpm"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>
