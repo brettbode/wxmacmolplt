@@ -228,9 +228,6 @@ bool Frame::IncreaseAtomAllocation(long NumAdditional) {
 	mpAtom * temp = new mpAtom[AtomAllocation+NumAdditional];
 	if (temp) {
 		if (Atoms != NULL) {
-			// BlockMoveData is Mac only.
-			//BlockMoveData(Atoms, temp, NumAtoms*sizeof(mpAtom));
-
 			memcpy(temp, Atoms, NumAtoms*sizeof(mpAtom));
 			delete [] Atoms;
 		}
@@ -453,8 +450,6 @@ bool Frame::IncreaseBondAllocation(long NumAdditional) {
 	Bond * temp = new Bond[BondAllocation+NumAdditional];
 	if (temp) {
 		if (Bonds != NULL) {
-            // BlockMoveData is Mac only.
-			//BlockMoveData(Bonds, temp, NumBonds*sizeof(Bond));
             memcpy(temp, Bonds, NumBonds*sizeof(Bond));
 			delete [] Bonds;
 		}
@@ -469,8 +464,6 @@ void Frame::DeleteAtom(long AtomNum) {	//remove the atom and pull down any highe
 			natoms_selected--;
 		}
 		if ((AtomNum<(NumAtoms-1))&&(NumAtoms>1))
-			// BlockMoveData is Mac only
-			//BlockMoveData(&(Atoms[AtomNum+1]), &(Atoms[AtomNum]), (NumAtoms-AtomNum)*sizeof(mpAtom));
 			memcpy(&(Atoms[AtomNum]), &(Atoms[AtomNum+1]), (NumAtoms-AtomNum - 1)*sizeof(mpAtom));
 		NumAtoms--;
 

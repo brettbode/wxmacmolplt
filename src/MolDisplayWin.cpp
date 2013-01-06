@@ -652,6 +652,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuBar->Append(menuWindow, wxT("&Subwindow"));
 
 	menuHelp->Append(wxID_ABOUT, wxT("&About MacMolPlt..."), _T("Learn about MacMolPlt"));
+	menuHelp->Append(wxID_HELP, wxT("&MacMolPlt Manual..."), _T("Brief documentation"));
 	menuBar->Append(menuHelp, wxT("&Help"));
 }
 

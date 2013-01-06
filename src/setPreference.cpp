@@ -157,6 +157,10 @@ bool setPreference::create( MolDisplayWin* parent, wxWindowID id, const wxString
     lSizer->Layout();
 
     Centre(wxBOTH);
+	//This is a hack to get the window to default to a reasonable size on 2.9.x on OS X
+	//Without this the height of the window defaults to ridiculously small.
+	//This seems to fix the problem with the global prefs, but not the window specific prefs.
+	SetSize(size);
 
     return true;
 }
@@ -345,24 +349,22 @@ void setPreference::RecreateBooks() {
 	m_sizer->Add(m_choiceBook, 5, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 4);                    
 
 	if (oldBook) {
-      int sel = oldBook->GetSelection();
-      int count = oldBook->GetPageCount();
+		int sel = oldBook->GetSelection();
+		int count = oldBook->GetPageCount();
 
-      for (int n = 0; n < count; n++) {
-	  wxString str = oldBook->GetPageText(n);
-	  wxWindow *page = new wxPanel(m_choiceBook);
-	  m_choiceBook->AddPage(page, str, false );
-        }
+		for (int n = 0; n < count; n++) {
+			wxString str = oldBook->GetPageText(n);
+			wxWindow *page = new wxPanel(m_choiceBook);
+			m_choiceBook->AddPage(page, str, false );
+		}
 
-      m_sizer->Detach(oldBook);
-      delete oldBook;
+		m_sizer->Detach(oldBook);
+		delete oldBook;
 
-      if (sel != wxNOT_FOUND)
-	{
-	  m_choiceBook->SetSelection(sel);
-	}                                                                           }
-  else
-    {
+		if (sel != wxNOT_FOUND) {
+			m_choiceBook->SetSelection(sel);
+		}
+	} else {
       CreateInitialPages(m_choiceBook);
     }
 
@@ -385,13 +387,13 @@ void setPreference::CreateInitialPages(wxBookCtrlBase *parent) {
     atomPanel->SetupPaneItems(mParent);
     parent->AddPage( atomPanel, wxT("Elements"), false );
 
-    bondPanel = new BondPrefsPane(mParent, parent, mPrefs, mIsGlobal);
-    bondPanel->SetupPaneItems(mParent);
-    parent->AddPage( bondPanel, wxT("Bonds/Vectors"), false );
+	bondPanel = new BondPrefsPane(mParent, parent, mPrefs, mIsGlobal);
+	bondPanel->SetupPaneItems(mParent);
+	parent->AddPage( bondPanel, wxT("Bonds/Vectors"), false );
 
-    displayPanel = new DisplayPrefsPane(mParent, parent, mPrefs, mIsGlobal);
-    displayPanel->SetupPaneItems(mParent);
-    parent->AddPage( displayPanel, wxT("Display Options"), false );
+	displayPanel = new DisplayPrefsPane(mParent, parent, mPrefs, mIsGlobal);
+	displayPanel->SetupPaneItems(mParent);
+	parent->AddPage( displayPanel, wxT("Display Options"), false );
 
     energyPanel = new EnergyPrefsPane(mParent, parent, mPrefs, mIsGlobal);
     energyPanel->SetupPaneItems(mParent);

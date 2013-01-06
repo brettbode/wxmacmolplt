@@ -115,6 +115,10 @@ class MpApp : public wxApp {
 
         void menuFileQuit(wxCommandEvent &event);
 		void menuHelpAbout(wxCommandEvent &event);
+		/**
+		 * Display an html browswer pointed at the provided documentation
+		 */
+		void menuHelp(wxCommandEvent &event);
         void menuFileNew(wxCommandEvent &event);
         void menuFileOpen(wxCommandEvent &event);
 		void menuPreferences(wxCommandEvent &event);

@@ -346,6 +346,25 @@ void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {
 	po->ShowModal();
     po->Destroy();
 }
+
+void MpApp::menuHelp(wxCommandEvent & WXUNUSED(event)) {
+	//It seems possible to throw up a basic html viewer within the app, or just call out to the users
+	//default browser.
+	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
+#if wxCHECK_VERSION(2, 8, 0)
+	wxString pathname = gStdPaths.GetResourcesDir();
+	pathname.Remove(pathname.Length() - 34);
+	pathname += wxT("MacMolPlt_Manual.html");
+#else
+	wxString pathname = gStdPaths.GetDataDir();
+#ifdef __WXMAC__
+	//On the Mac this points inside the app bundle, but the docs are at the wxMacMolPlt.app level
+	pathname.Remove(pathname.Length() - 34);
+	pathname += wxT("MacMolPlt_Manual.html");
+#endif
+#endif
+	wxLaunchDefaultBrowser(pathname, 0);
+}
 void MpApp::menuPreferences(wxCommandEvent & WXUNUSED(event)) {
 	//Default application preferences
     if (gPrefDlg) { //need to bring it to the front...
@@ -390,6 +409,7 @@ BEGIN_EVENT_TABLE(MpApp, wxApp)
 	EVT_MENU (wxID_EXIT, MpApp::menuFileQuit)
 	EVT_MENU (wxID_PREFERENCES, MpApp::menuPreferences)
 	EVT_MENU (wxID_ABOUT, MpApp::menuHelpAbout)
+	EVT_MENU (wxID_HELP, MpApp::menuHelp)
 END_EVENT_TABLE()
 
 #ifdef __WXMAC__
