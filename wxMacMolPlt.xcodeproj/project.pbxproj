@@ -2750,7 +2750,7 @@
 				COPY_PHASE_STRIP = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_OPTIMIZATION_LEVEL = 2;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -2762,17 +2762,18 @@
 				OBJROOT = "$(SYMROOT)";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I$(HOME)/software/wx/wx-2.9.0-univ/lib/wx/include/osx_carbon-unicode-release-static-2.9",
-					"-I$(HOME)/software/wx/wx-2.9.0-univ/include/wx-2.9",
+					"-I$(HOME)/software/wx/wx-2.9-cocoa-release/lib/wx/include/osx_cocoa-unicode-static-2.9/",
+					"-I$(HOME)/software/wx/wx-2.9-cocoa-release/include/wx-2.9",
 					"-D__WXMAC__",
+					"-D__WXOSX__",
+					"-D__WXOSX_COCOA__",
 					"-D_FILE_OFFSET_BITS=64",
 					"-D_LARGE_FILES",
 					"-DNO_GCC_PRAGMA",
-					"-D__MAC_USE_QUICKTIME__",
 					"-DHAVE_LIBMING",
 				);
 				OTHER_LDFLAGS = (
-					"-L$(HOME)/software/wx/wx-2.9.0-univ/lib/",
+					"-L$(HOME)/software/wx/wx-2.9-cocoa-release/lib",
 					"-framework",
 					QuickTime,
 					"-framework",
@@ -2784,14 +2785,14 @@
 					"-framework",
 					System,
 					"-lwx_baseu-2.9",
-					"-lwx_osx_carbonu_core-2.9",
-					"-lwx_osx_carbonu_adv-2.9",
-					"-lwx_osx_carbonu_gl-2.9",
-					"-lwxexpat-2.9",
+					"-lwx_osx_cocoau_core-2.9",
+					"-lwx_osx_cocoau_adv-2.9",
+					"-lwx_osx_cocoau_gl-2.9",
+					"-lexpat",
 					"-lwxtiff-2.9",
 					"-lwxjpeg-2.9",
 					"-lwxpng-2.9",
-					"-lwx_osx_carbonu_html-2.9",
+					"-lwx_osx_cocoau_html-2.9",
 					"-lz",
 					"-lpthread",
 					"-liconv",
@@ -2803,7 +2804,7 @@
 					AGL,
 				);
 				PRODUCT_NAME = wxMacMolPlt;
-				SDKROOT = "";
+				SDKROOT = macosx10.7;
 				STRIP_INSTALLED_PRODUCT = NO;
 				WRAPPER_EXTENSION = app;
 			};

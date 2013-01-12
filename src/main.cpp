@@ -353,17 +353,20 @@ void MpApp::menuHelp(wxCommandEvent & WXUNUSED(event)) {
 	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
 #if wxCHECK_VERSION(2, 8, 0)
 	wxString pathname = gStdPaths.GetResourcesDir();
+#ifdef __WXMAC__
 	pathname.Remove(pathname.Length() - 34);
-	pathname += wxT("MacMolPlt_Manual.html");
+#endif
+	pathname += wxT("/MacMolPlt_Manual.html");
 #else
 	wxString pathname = gStdPaths.GetDataDir();
 #ifdef __WXMAC__
 	//On the Mac this points inside the app bundle, but the docs are at the wxMacMolPlt.app level
 	pathname.Remove(pathname.Length() - 34);
-	pathname += wxT("MacMolPlt_Manual.html");
+	pathname += wxT("/MacMolPlt_Manual.html");
 #endif
 #endif
-	wxLaunchDefaultBrowser(pathname, 0);
+	wxString url = wxT("file://") + pathname;
+	wxLaunchDefaultBrowser(url, 0);
 }
 void MpApp::menuPreferences(wxCommandEvent & WXUNUSED(event)) {
 	//Default application preferences

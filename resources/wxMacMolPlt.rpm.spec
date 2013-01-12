@@ -61,6 +61,7 @@ MacMolPlt is:
 #%{sysconfdir}/wxmacmolplt/organics.cml
 #%{sysconfdir}/wxmacmolplt/solvents.cml
 #%{sysconfdir}/wxmacmolplt/amino_acids.cml
+#%{sysconfdir}/wxmacmolplt/splash.png
 #%doc %{sysconfdir}/doc/wxmacmolplt/LICENSE
 #FC gz
 #%doc %{sysconfdir}/man/man1/wxmacmolplt.1.gz
