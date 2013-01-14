@@ -2160,8 +2160,8 @@ void MolDisplayWin::menuBuilderShowBuildTools(wxCommandEvent &event) {
 void MolDisplayWin::OnSaveStructureUpdate(wxUpdateUIEvent& event) {
 
 	// Only require some atoms to be selected in order to save a 
-	// prototype.
-	event.Enable(MainData->cFrame->GetNumAtomsSelected() > 0);
+	// prototype. A single atom as a prototype doesn't make sense.
+	event.Enable(MainData->cFrame->GetNumAtomsSelected() > 1);
 
 }
 
@@ -2253,8 +2253,10 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 	}
 
 	struc->nbonds = new_bonds.size();
-	struc->bonds = new Bond[struc->nbonds];
-	memcpy(struc->bonds, &(new_bonds[0]), sizeof(Bond) * struc->nbonds);
+	struc->bonds = new Bond[MAX(struc->nbonds,10)];
+	if (new_bonds.size() > 0) {
+		memcpy(struc->bonds, &(new_bonds[0]), sizeof(Bond) * struc->nbonds);
+	}
 	delete[] new_ids;
 
 	wxTextEntryDialog *dlg =
