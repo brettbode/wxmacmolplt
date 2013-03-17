@@ -2121,7 +2121,13 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 			} else
 				delete lbasis;
 		}
-		if (MainData->Basis) {	//look for orbitals if we have a basis set
+		bool sphericalHarmonics=false;
+		//Should look for [5D], [5D10F], [5D7F] to catch unsupported spherical harmonics
+		if (Buffer->LocateKeyWord("[5D]", 4, -1)||Buffer->LocateKeyWord("[5D7F]", 6, -1)) {
+			wxLogMessage(_("Spherical harmonic basis sets are not supported. Molecular orbitals will be skipped."));
+			sphericalHarmonics = true;
+		}
+		if (MainData->Basis && !sphericalHarmonics) {	//look for orbitals if we have a basis set
 			if (Buffer->LocateKeyWord("[MO]", 4, -1)) {
 				Buffer->SkipnLines(1);
 				lFrame->ReadMolDenOrbitals(Buffer, MainData->Basis->GetNumBasisFuncs(false));
@@ -3595,8 +3601,11 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 			FragmentNames.push_back(std::string(Label));
 		} else Buffer->SkipnLines(1);
 	}
+	while (Buffer->LocateKeyWord("READING POTENTIAL PARAMETERS FOR FRAGMENT", 40, Buffer->GetFilePos()+200)) {
+		Buffer->SkipnLines(1);
+	}
 
-	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS", 32, Buffer->GetFilePos()+4000)) {
+	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS", 32, Buffer->GetFilePos()+10000)) {
 		Buffer->GetLine(Line);
 		sscanf(&(Line[32]), " =%ld", &NumMultipoles);
 	}
