@@ -48,8 +48,21 @@ long FindKeyWord(const char *buffer, const char keyin[], long numbyte) {
 	long result = -1;
 	while (buffer[pos]) {
 		check = 0;
-		while (((buffer[pos+check] == keyin[check])||(buffer[pos+check]-32 == keyin[check]))&&
-			(check < numbyte)) check++;
+		bool good=true;
+		while ((check<numbyte) && good) {
+			good=false;
+			if ((buffer[pos+check]>='a')&&(buffer[pos+check]<='z')) {
+				if (buffer[pos+check]-32 == keyin[check]) {
+					good=true;
+					check++;
+				}
+			} else {
+				if (buffer[pos+check] == keyin[check]) {
+					good=true;
+					check++;
+				}
+			}
+		}
 		if (check == numbyte) {
 			result = pos;
 			break;
