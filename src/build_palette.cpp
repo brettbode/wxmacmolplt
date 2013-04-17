@@ -477,7 +477,7 @@ void BuilderDlg::KeyHandler(wxKeyEvent& event) {
 			int id = -1;
 			if (secondKeytimer.Time() < 400) {
 				keyBuffer[1] = key;
-				//if less than three seconds try to interpert as the 2nd letter of a two letter element symbol
+				//if less than three seconds try to interpret as the 2nd letter of a two letter element symbol
 				id = SetAtomType(keyBuffer);
 			}
 			if (id < 0) {	//interpret as the first letter of an element symbol

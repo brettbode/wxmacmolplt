@@ -2339,7 +2339,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 			throw DataError();
 		}
 		if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize))) {
-			wxLogMessage(_("Unable to interpert coordinates."));
+			wxLogMessage(_("Unable to interpret coordinates."));
 			throw DataError();
 		}
 		lFrame->toggleAbInitioVisibility();
@@ -2623,7 +2623,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 								throw DataError();
 							}
 							if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize))) {
-								wxLogMessage(_("Unable to interpert coordinates."));
+								wxLogMessage(_("Unable to interpret coordinates."));
 								throw DataError();
 							}
 	//					}

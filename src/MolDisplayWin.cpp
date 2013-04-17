@@ -2004,7 +2004,7 @@ void MolDisplayWin::PasteText(void) {
 					return;
 				}
 				
-				/*Now interpert each of the lines*/
+				/*Now interpret each of the lines*/
 				for (iline=0; iline < NumLines; iline++) {
 					char LineText[kMaxLineLength];
 					
