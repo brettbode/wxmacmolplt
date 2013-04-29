@@ -22,12 +22,16 @@ enum TypeOfShell {
 	DShell,
 	FShell,
 	GShell,
+	HShell,
+	IShell,
 	SHLShell=9,
 	SHSShell=10,
 	SHPShell,
 	SHDShell,
 	SHFShell,
-	SHGShell
+	SHGShell,
+	SHHShell,
+	SHIShell
 };
 
 class BasisShell {
