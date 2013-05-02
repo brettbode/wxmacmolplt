@@ -850,7 +850,7 @@ void MolDisplayWin::DrawLabel() {
 			if (Prefs->ShowAtomNumberLabels() ) {
 				wxString tmpStr;
 
-				tmpStr.Printf(wxT("%d"), iatom+1);
+				tmpStr.Printf(wxT("%ld"), iatom+1);
 				atomLabel.Append(tmpStr);
 			}
 
