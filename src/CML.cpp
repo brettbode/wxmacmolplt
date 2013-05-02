@@ -1711,12 +1711,12 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::map<std::string, long> & 
 					sscanf(zcstr, "%f", &(atomPos.z));
 					AddAtom(atomType, atomPos);
 					if (n5 == 1) {
-						idList[idstr] = idList.size();
+						idList[idstr] = GetNumAtoms() - 1;
 					} else {
 						//This can't be matched in the future, but we have to add something to keep the numbering right
 						std::ostringstream t;
 						t << idList.size();
-						idList[t.str()] = idList.size();
+						idList[t.str()] = GetNumAtoms() - 1;
 					}
 				}
 			}
@@ -1861,11 +1861,11 @@ bool Frame::ParseAtomXML(XMLElement * atomXML, std::map<std::string, long> & idL
 	if (good) {	//grab the atom id, if present
 		const char * idresult = atomXML->getAttributeValue("id");
 		if (idresult != NULL) {
-			idList[idresult] = idList.size();
+			idList[idresult] = GetNumAtoms() - 1;
 		} else {
 			std::ostringstream t;
 			t << idList.size();
-			idList[t.str()] = idList.size();
+			idList[t.str()] = GetNumAtoms() - 1;
 		}
 	}
 	return good;
