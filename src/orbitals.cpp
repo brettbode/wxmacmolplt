@@ -1070,6 +1070,7 @@ float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *
 	float sqrt7 = sqrt(7.0);
 	float sqrt9 = 3.0;
 	float sqrt11 = sqrt(11.0);
+	float sqrt13 = sqrt(13.0);
 					//loop over the atoms/shells
 	for (long iatom=0; iatom<NumAtoms; iatom++) {
 		if (iatom > Basis->MapLength) continue;
@@ -1202,6 +1203,36 @@ float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *
 								(sqrt5*sqrt7/2)*x*y*(x2-y2)*MOVector[ivec+8]);
 					ivec += 9;
 				break;
+				case SHHShell:
+					VectorSum = sqrt11*0.5*((sqrt9*sqrt7/(4.0*sqrt(2.0)))*(x*x2*x2+5.0*x*y2*y2-10.0*x*x2*y2)*MOVector[ivec]+
+								(sqrt5*sqrt7*sqrt9/4.0)*(x2*x2-6.0*x2*y2+y2*y2)*z*MOVector[ivec+1]+
+								(sqrt5*sqrt7/(4.0*sqrt(2.0)))*(x*x2-3.0*x*y2)*(9*z2-r2)*MOVector[ivec+2]+
+								(sqrt7*sqrt5*sqrt3/2.0)*(x2-y2)*(3*z*z2-z*r2)*MOVector[ivec+3]+
+								(sqrt5*sqrt3/4.0)*x*(21*z2*z2-14.0*z2*r2+r2*r2)*MOVector[ivec+4]+
+								((63*z*z2*z2-70*z*z2*r2+15*z*r2*r2)/4.0)*MOVector[ivec+5]+
+								(sqrt5*sqrt3/4.0)*y*(21*z2*z2-14.0*z2*r2+r2*r2)*MOVector[ivec+6]+
+								(sqrt7*sqrt5*sqrt3)*x*y*z*(3*z2-r2)*MOVector[ivec+7]+
+								(sqrt5*sqrt7/(4.0*sqrt(2.0)))*(3.0*x2*y-y*y2)*(9*z2-r2)*MOVector[ivec+8]+
+								(sqrt5*sqrt7*sqrt9/4.0)*(x2*y-y*y2)*x*z*MOVector[ivec+9]+
+								(sqrt9*sqrt7/(4.0*sqrt(2.0)))*(5*x2*x2*y-10.0*x2*y*y2+y*y2*y2)*MOVector[ivec+10]);
+					ivec += 11;
+					break;
+				case SHIShell:
+					VectorSum = sqrt13*0.25*((sqrt11*sqrt7*sqrt3/(4.0*sqrt(2.0)))*(x2*x2*x2-15.0*x2*x2*y2+15*x2*y2*y2-y2*y2*y2)*MOVector[ivec]+
+								(sqrt7*sqrt9*sqrt11/sqrt(8.0))*x*z*(x2*x2-10.0*x2*y2+5.0*y2*y2)*z*MOVector[ivec+1]+
+								(sqrt7*sqrt9/4.0)*(x2*x2-6.0*x2*y2+y2*y2)*(11*z2-r2)*MOVector[ivec+2]+
+								(sqrt7*sqrt5*sqrt3/sqrt(8.0))*z*(11*z2-3*r2)*(x*x2-3.0*x*y2)*MOVector[ivec+3]+
+								(sqrt7*sqrt5*sqrt3/sqrt(32.0))*(x2-y2)*(33*z2*z2-18.0*z2*r2+r2*r2)*MOVector[ivec+4]+
+								(sqrt7*sqrt3/2.0)*x*z*(33*z2*z2-30.0*z2*r2+5.0*r2*r2)*MOVector[ivec+5]+
+								((231*z2*z2*z2-315*z2*z2*r2+105*z2*r2*r2-5.0*r2*r2*r2)/4.0)*MOVector[ivec+6]+
+								(sqrt7*sqrt3/2.0)*y*z*(33*z2*z2-30.0*z2*r2+5.0*r2*r2)*MOVector[ivec+7]+
+								(sqrt7*sqrt5*sqrt3/sqrt(8.0))*x*y*(33*z2*z2-18.0*z2*r2+r2*r2)*MOVector[ivec+8]+
+								(sqrt7*sqrt5*sqrt3/sqrt(8.0))*z*(11*z2-3*r2)*(3*x2*y-y*y2)*MOVector[ivec+9]+
+								(sqrt7*sqrt9)*x*y*(x2-y2)*(11*z2-r2)*MOVector[ivec+10]+
+								(sqrt7*sqrt9*sqrt11/sqrt(8.0))*(y2*y2+5*x2*x2-10*x2*y2)*y*z*MOVector[ivec+11]+
+								(sqrt11*sqrt7*sqrt3/sqrt(8.0))*x*y*(3*x2*x2-10.0*x2*y2+3*y2*y2)*MOVector[ivec+12]);
+					ivec += 13;
+					break;
 			}
 				//Only calculate the exponential if the vector is large enough
 			if (fabs(VectorSum) > 1.0e-6) {

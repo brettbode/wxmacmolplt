@@ -752,8 +752,89 @@ void BasisShell::GetLabel(char * label, short FuncNum, bool UseSphericalHarmonic
 			}
 		break;
 		case SHHShell:
+			label[0]='H';
+			switch (FuncNum) {
+				case 0:
+					strcpy((char *) &(label[1]), "x5-10x3y2+5xy4");
+					break;
+				case 1:
+					strcpy((char *) &(label[1]), "z(x4+y4-6x2y2)");
+					break;
+				case 2:
+					strcpy((char *) &(label[1]), "(x3-3xy2)(9z2-r2)");
+					break;
+				case 3:
+					strcpy((char *) &(label[1]), "(x2-y2)(3z3-zr2)");
+					break;
+				case 4:
+					strcpy((char *) &(label[1]), "21xz4-14xz2r2+xr4");
+					break;
+				case 5:
+					strcpy((char *) &(label[1]), "63z5-70z3r2+15zr4");
+					break;
+				case 6:
+					strcpy((char *) &(label[1]), "21yz4-14yz2r2+yr4");
+					break;
+				case 7:
+					strcpy((char *) &(label[1]), "xyz(3z3-zr2)");
+					break;
+				case 8:
+					strcpy((char *) &(label[1]), "(3x2y-y3)(9z2-r2)");
+					break;
+				case 9:
+					strcpy((char *) &(label[1]), "z(x3y-xy3)");
+					break;
+				case 10:
+					strcpy((char *) &(label[1]), "5x4y-10x2y3+5y5");
+					break;
+			}
+		break;
 		case SHIShell:
-			wxLogMessage(_("Spherical harmonic H shells not implemented in BasisShell::GetLabel"));
+			label[0]='I';
+			switch (FuncNum) {
+				case 0:
+					strcpy((char *) &(label[1]), "x6-15x4y2+15x2y4-y6");
+					break;
+				case 1:
+					strcpy((char *) &(label[1]), "xz(x4+5y4-10x2y2)");
+					break;
+				case 2:
+					strcpy((char *) &(label[1]), "(x4+y4-6x2y2)(11z2-r2)");
+					break;
+				case 3:
+					strcpy((char *) &(label[1]), "(x3-3xy2)z(11z2-3r2)");
+					break;
+				case 4:
+					strcpy((char *) &(label[1]), "(x2-y2)(33z4-18z2r2+r4)");
+					break;
+				case 5:
+					strcpy((char *) &(label[1]), "xz(33z4-30z2r2+5r4");
+					break;
+				case 6:
+					strcpy((char *) &(label[1]), "231z6-315z4r2+105z2r4-5r6");
+					break;
+				case 7:
+					strcpy((char *) &(label[1]), "yz(33z4-30z2r2+5r4");
+					break;
+				case 8:
+					strcpy((char *) &(label[1]), "xy(33z4-18z2r2+r4)");
+					break;
+				case 9:
+					strcpy((char *) &(label[1]), "z(11z2-3r2)(3x2y-y3)");
+					break;
+				case 10:
+					strcpy((char *) &(label[1]), "xy(x2-y2)(11z2-r2)");
+					break;
+				case 11:
+					strcpy((char *) &(label[1]), "yz(y4+5x4-10x2y2)");
+					break;
+				case 12:
+					strcpy((char *) &(label[1]), "xy(3x4-10x2y2+3y4");
+					break;
+			}
+			break;
+		default:
+			wxLogMessage(_("Undefined shell type not implemented in BasisShell::GetLabel"));
 			break;
 	}
 }
@@ -961,7 +1042,7 @@ bool BasisSet::ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms) {
 		long atomNum=-1;
 		Buffer->GetLine(LineText);
 		sscanf(LineText, "%ld", &atomNum);
-		if (atomNum != (i+1)) return false;	//incorrect order?
+		if (atomNum != (i+1)) return false;	//incorrect order? Need to log a message...
 		Buffer->GetLine(LineText);
 		while (!IsBlank(LineText)) {
 			char	token[kMaxLineLength];
