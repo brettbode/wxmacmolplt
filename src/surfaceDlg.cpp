@@ -352,7 +352,10 @@ void BaseSurfacePane::OnExport(wxCommandEvent &event) {
 		}
 		try {
 			buffer = new BufferFile(currFile, true);
-			switch (wfd.GetFilterIndex()) {
+			int filterIndex = 0;
+				//Looks like under wx 2.9 cocoa if there is only one choice the index doesn't work.
+			if(mTarget->GetDimensions() == 3) filterIndex = wfd.GetFilterIndex();
+			switch (filterIndex) {
 				case 0:
 					// our txt file
 					mTarget->Export(buffer, Surface::TXTFILE);
