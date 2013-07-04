@@ -430,7 +430,7 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 			}
 			
 			delete [] DataPtrs;
-			delete[] myThreads;
+			delete [] myThreads;
 		} else
 #endif
 		{
@@ -727,7 +727,7 @@ float Frame::CalculateMEP(float X_value, float Y_value, float Z_value,
 						for (jprim=0; jprim<JPrimMax; jprim++) {
 							float Aj = Shells[jshell].Exponent[jprim];
 							
-							float AiAj = Ai + Aj;
+							double AiAj = Ai + Aj;
 							double OneDAiAj = 1.0/AiAj;
 							double Fi = Pi212 * OneDAiAj;
 
