@@ -24,6 +24,7 @@
 #include "preview_canvas.h"
 
 #define kNumTableElements	112
+#define kNUM_STRUC_GROUPS 4
 
 /* ------------------------------------------------------------------------- */
 /* TYPES                                                                     */
@@ -86,32 +87,20 @@ class BuilderDlg: public wxMiniFrame {
 			int ypos = 100);
 		~BuilderDlg();
 
-		void New(wxCommandEvent& WXUNUSED(event));
-		int GetSelectedElement(void) const;
-		Structure *GetSelectedStructure(void) const;
-		int GetNumStructures(void) const;
-		Structure *GetStructure(int i) const;
-		short GetSelectedCoordination(void) const;
-		short GetSelectedLonePairCount(void) const;
 		static void NumberToTableCoords(int atomic_number, int *row, int *col);
 		void KeyHandler(wxKeyEvent &event);
 		bool InStructuresMode(void) const;
 		bool InPeriodicMode(void) const;
 		void AddUserStructure(Structure *structure);
-		///Return the user structure with the specified fragName
-		Structure * FindFragment(const std::string fragName) const;
+		void ElementSelected(wxCommandEvent& event);
 
 	private:
-		/// Adds the provided structure to the currently active prototype group (takes ownership of the structure)
-		void AddStructure(Structure *structure);
-		void ElementSelected(wxCommandEvent& event);
 		void OnCoordinationChoice(wxCommandEvent& event);
 		void OnLPChoice(wxCommandEvent& event);
 		void MouseMoved(wxMouseEvent& event);
 		void OnClose(wxCloseEvent& event);
 		wxPanel *GetPeriodicPanel(void);
 		wxPanel *GetStructuresPanel(void);
-		void SaveStructures();
 		void UpdateRenameStructures(wxUpdateUIEvent& event);
 		void UpdateDeleteStructures(wxUpdateUIEvent& event);
 		void DeleteStructure(wxCommandEvent& event);
@@ -120,12 +109,8 @@ class BuilderDlg: public wxMiniFrame {
 		void TabChanged(wxNotebookEvent& event);	///< Called when switching between the element and prototype selection
 		void ChangeStructureGroup(wxCommandEvent& event);	///< Called when the prototype group is changed
 
-		short coordinationNumber[kNumTableElements];
-		short LonePairCount[kNumTableElements];
 		int nelements;
 		int prev_id;
-		unsigned char keyBuffer[3];
-		wxStopWatch	secondKeytimer;
 		wxStaticText *mTextArea;
 		wxChoice *mCoordinationChoice;
 		wxChoice *mLPChoice;
@@ -136,8 +121,6 @@ class BuilderDlg: public wxMiniFrame {
 		wxPanel *canvas_panel;
 		wxFlexGridSizer *canvas_panel_sizer;
 		wxListBox *mStructureChoice;
-		int targetList;	///< Which of the structure groups is selected?
-		std::vector<StructureGroup *> StructureGroups;	///< One group per molecule grouping in the builder
 		PreviewCanvas *canvas;	///< Display area used for the prototypes
 		wxString sys_prefs_path;
 
@@ -156,6 +139,80 @@ class BuilderDlg: public wxMiniFrame {
 	DECLARE_DYNAMIC_CLASS(BuilderDlg)
 	DECLARE_EVENT_TABLE()
 
+};
+
+class BuilderInterface {
+public:
+	BuilderInterface();
+	~BuilderInterface();
+	
+	/// Show or Hide the bulder tool palate on the screen
+	void ShowPalette(bool state);
+	/// Is the palette window shown?
+	bool IsPaletteVisible(void) const;
+	/// Call to close the palette window
+	void ClosePalette(void);
+	/// Return the atomic number of the currently selected element (or 0 if none selected)
+	int GetSelectedElement(void) const;
+	/// Obtain a pointer to the currently selected structure (NULL if none is selected)
+	Structure *GetSelectedStructure(void) const;
+	/// Obtain a pointer to the ith structure in the current group (NULL if i is invalid)
+	Structure *GetStructure(int i) const;
+	/// Return the coordination number for the selected element
+	short GetSelectedCoordination(void) const;
+	/// Return the long pair count for the selected element
+	short GetSelectedLonePairCount(void) const;
+	/// Keyhandler whether the palette is active or not
+	void KeyHandler(wxKeyEvent &event);
+	bool InStructuresMode(void) const {return (currentTab!=0);};
+	bool InPeriodicMode(void) const {return (currentTab==0);};
+	/// Call (by the palette window) when the active tab is changed
+	void TabChanged(int index);
+	/// Add the provided structure to the user structure group
+	void AddUserStructure(Structure *structure);
+	/// Delete the specified structure
+	void DeleteStructure(int index);
+	/// Rename the indicated structure
+	void RenameStructure(int index, wxString & new_name);
+	///Return the user structure with the specified fragName
+	Structure * FindFragment(const std::string fragName) const;
+	/// Select the desired element
+	void ElementSelected(int elementType);
+	/// Is the current structure group editable?
+	bool currentGroupIsCustom(void) const;
+	/// Change the target group to the new selection
+	void ChangeTargetGroup(int new_group);
+	/// Change the target structure to the new index
+	int ChangeTargetStructure(int index);
+	/// Obtain the index of the selected structure group
+	inline int getTargetGroup(void) const {return targetList;};
+	/// Obtain the selected structure index
+	inline int getSelectedStructureIndex(void) const {return selectedStructure;};
+	/// Build out the list of structure names
+	void BuildNameList(wxListBox * theList) const;
+	/// Set the coordination number for the selected element
+	void SetSelectedCoordinationNumber(int val);
+	/// Set the lone pair count for the selection element
+	void SetSelectedLPCount(int val);
+
+private:
+	/// Call to save the currently selected structure group to file
+	void SaveStructures();
+
+	short coordinationNumber[kNumTableElements];
+	short LonePairCount[kNumTableElements];
+	int nelements;
+	int selectedElement;
+	unsigned char keyBuffer[3];
+	wxStopWatch	secondKeytimer;
+	element_t *elements;
+	int targetList;	///< Which of the structure groups is selected?
+	int selectedStructure; ///< Index of the selected structure in the currently selected group
+	std::vector<StructureGroup *> StructureGroups;	///< One group per molecule grouping in the builder
+	wxString sys_prefs_path;
+	int currentTab;			///< Currently active panel (periodic table or structures)
+	
+	BuilderDlg * BuilderPalette;
 };
 
 #endif

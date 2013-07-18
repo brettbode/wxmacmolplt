@@ -55,8 +55,7 @@
 #endif
 
 extern WinPrefs * gPreferences;
-extern bool show_build_palette;
-extern BuilderDlg *build_palette;
+extern BuilderInterface * BuilderTool;
 
 using namespace std;
 
@@ -395,9 +394,7 @@ MolDisplayWin::~MolDisplayWin() {
 #ifndef __WXMAC__
 	MpApp *app = (MpApp *) wxTheApp;
 	if (app->WindowCount() == 0) {
-		if (build_palette) {
-			build_palette->Destroy();
-		}
+		BuilderTool->ClosePalette();
 	}
 #endif
 }
@@ -699,22 +696,6 @@ void MolDisplayWin::AdjustMenus(void) {
 	else
 		menuViewStyle->Check(MMP_BALLANDSTICKMODE, true);
 
-	/* menuBuild->Check(MMP_SHOWBUILDTOOLS, show_build_palette); */
-	
-	/* This should be handled by an UpdateUI event handler now. */
-	/* if (MainData->cFrame->NumAtoms == 0) { */
-	/* } else { */
-		/* menuFile->Enable(MMP_NEWFRAME, true); */
-		/* menuEdit->Enable(wxID_COPY, true); */
-		/* menuEdit->Enable(MMP_COPYCOORDS, true); */
-		/* menuMolecule->Enable(MMP_ENERGYEDIT, true); */
-		/* menuMolecule->Enable(MMP_SETBONDLENGTH, true); */
-		/* menuMolecule->Enable(MMP_DETERMINEPG, true); */
-		/* menuMolecule->Enable(MMP_SYMADAPTCOORDS, true); */
-		/* menuFile->Enable(MMP_EXPORT, true); */
-		/* menuView->Enable(MMP_ANNOTATIONSSUBMENU, true); */
-	/* } */
-
 	if (MainData->NumFrames > 1 ) {
 		menuFile->Enable(MMP_DELETEFRAME, true);
 		menuView->Enable(MMP_ANIMATEFRAMES, true);
@@ -741,7 +722,7 @@ void MolDisplayWin::OnShowToolbarUpdate(wxUpdateUIEvent& event) {
 }
 
 void MolDisplayWin::OnShowBuildToolsUpdate(wxUpdateUIEvent& event) {
-	event.Check(show_build_palette);
+	event.Check(BuilderTool->IsPaletteVisible());
 }
 
 void MolDisplayWin::OnUndoUpdate( wxUpdateUIEvent& event ) {
@@ -2271,7 +2252,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 	struc->name = dlg->GetValue();
 
 	if (result == wxID_OK) {
-		build_palette->AddUserStructure(struc);
+		BuilderTool->AddUserStructure(struc);
 	} else {
 		delete struc;
 	}
@@ -2283,7 +2264,7 @@ std::map<std::string, EFrag>::const_iterator MolDisplayWin::FindFragmentDef(std:
 	result = MainData->efrags.find(fragName);
 	if (result == MainData->efrags.end()) {
 		//It's not in the existing list. Search in the builder library
-		Structure *struc = build_palette->FindFragment(fragName);
+		Structure *struc = BuilderTool->FindFragment(fragName);
 		if (struc) {
 			//found it. Add it to the current list of fragment definitions
 			MainData->efrags.insert(std::pair<std::string, EFrag>(struc->FragName, struc->frag_def));
@@ -2908,7 +2889,7 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 					// TODO: A temporary hack to register outside event.
 					event.m_x = -50;
 					event.m_y = -50;
-					build_palette->KeyHandler(event);
+					BuilderTool->KeyHandler(event);
 					/* return; //I don't think there is any reason to skip on this case? */
 				}
 				break;
@@ -4238,26 +4219,15 @@ void MolDisplayWin::Dirtify(bool is_dirty) {
 }
 
 void MolDisplayWin::ToggleBuilderPalette(void) {
-	show_build_palette = !show_build_palette;
-
 	// Have to make a top-level window for the miniframe to show the right
 	// toolbar under OS X.
 	wxGetApp().SetTopWindow(this);
 
-	if (show_build_palette) {
-		// if (build_palette) { 
-			build_palette->Show();
-			build_palette->Raise();
-		// } else { 
-			// wxRect window_rect = GetRect(); 
-			// build_palette = new BuilderDlg( 
-				// wxT("Builder Tools"), window_rect.x + window_rect.width, 
-				// window_rect.y + 22); 
-			// build_palette->Show(); 
-		// } 
+	if (!BuilderTool->IsPaletteVisible()) {
+		BuilderTool->ShowPalette(true);
 		wxGetApp().AdjustAllMenus();
 	} else {
-		build_palette->Hide();
+		BuilderTool->ShowPalette(false);
 	Dirtify();;
 	}
 } 

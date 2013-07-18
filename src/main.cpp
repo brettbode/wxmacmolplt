@@ -28,8 +28,7 @@
 //The global preferences settings
 WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
 
-BuilderDlg *build_palette;
-bool show_build_palette = false;
+BuilderInterface * BuilderTool;
 
 int glf_initialized = 0;
 
@@ -114,7 +113,7 @@ bool MpApp::OnInit() {
 	//attempt to read new xml pref file
 	gPreferences->ReadUserPrefs();
 
-	build_palette = new BuilderDlg(wxT("Builder Tools"));
+	BuilderTool = new BuilderInterface;
 
     // Parse command line 
 	wxString cmdFilename; 
@@ -416,6 +415,9 @@ BEGIN_EVENT_TABLE(MpApp, wxApp)
 END_EVENT_TABLE()
 
 #ifdef __WXMAC__
+BEGIN_EVENT_TABLE(macMenuWinPlaceholder, wxFrame)
+	EVT_CLOSE(macMenuWinPlaceholder::OnClose)
+END_EVENT_TABLE()
 macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,
                          const wxPoint  &position,
                          const wxSize   &size,
@@ -429,6 +431,14 @@ macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,
 }
 
 macMenuWinPlaceholder::~macMenuWinPlaceholder() {
+}
+void macMenuWinPlaceholder::OnClose(wxCloseEvent& event) {
+	//The only way to get here is if something is running through the window list and closing
+	//one by one. Send a quit event.
+	MpApp & app = wxGetApp();
+	app.ClosingMenuPlaceHolder();
+	wxCommandEvent tempEvent;
+	app.menuFileQuit(tempEvent);
 }
 
 void macMenuWinPlaceholder::createMenuBar(void) {

@@ -36,8 +36,6 @@
 #undef AddAtom
 #endif
 
-extern BuilderDlg *build_palette;
-
 //notes on extending CML
 //anything can go inside the CML tag.
 //Molecule can be extended via scalar, array, matrix, list and metadata
