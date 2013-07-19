@@ -211,7 +211,7 @@ bool MpApp::OnInit() {
 		// modal dialogs.
 		
 		wxBitmap sp_bitmap;
-		if (sp_bitmap.LoadFile(pathname + wxT("/splash.png"), wxBITMAP_TYPE_PNG)) {
+		if (sp_bitmap.LoadFile(pathname + wxT("/splash.jpg"), wxBITMAP_TYPE_JPEG)) {
 			splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 6000,
 										NULL, -1, wxDefaultPosition, wxDefaultSize,
 										wxBORDER_SIMPLE|wxSTAY_ON_TOP);
