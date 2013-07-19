@@ -5,7 +5,7 @@
 #%define debug_package %{nil}
 #%define __check_files %{nil}
 Name: wxmacmolplt
-Version: 7.4.4
+Version: 7.5.0
 Release: 1%{?dist}
 Summary: A graphics program for plotting 3-D molecular structures and normal modes
 Group: Applications/Engineering
@@ -61,7 +61,7 @@ MacMolPlt is:
 #%{sysconfdir}/wxmacmolplt/organics.cml
 #%{sysconfdir}/wxmacmolplt/solvents.cml
 #%{sysconfdir}/wxmacmolplt/amino_acids.cml
-#%{sysconfdir}/wxmacmolplt/splash.png
+#%{sysconfdir}/wxmacmolplt/splash.jpg
 #%doc %{sysconfdir}/doc/wxmacmolplt/LICENSE
 #FC gz
 #%doc %{sysconfdir}/man/man1/wxmacmolplt.1.gz
