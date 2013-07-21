@@ -375,18 +375,18 @@ void Surf2DBase::SetPlaneToScreenPlane(MoleculeData * MainData) {
 	InverseMatrix(MainData->TotalRotation, RotInverse);
 
 	CPoint3D	TestPoint, NewPoint1, NewPoint2;
-	TestPoint.x = -0.5*MainData->WindowSize;
-	TestPoint.y=-0.5*MainData->WindowSize; TestPoint.z=0.0;
+	TestPoint.x = -0.55*MainData->WindowSize;
+	TestPoint.y=-0.55*MainData->WindowSize; TestPoint.z=0.0;
 	BackRotate3DPt(RotInverse, TestPoint, &NewPoint1);
-	TestPoint.x = 0.5*MainData->WindowSize;
-	TestPoint.y=-0.5*MainData->WindowSize;
+	TestPoint.x = 0.55*MainData->WindowSize;
+	TestPoint.y=-0.55*MainData->WindowSize;
 	BackRotate3DPt(RotInverse, TestPoint, &NewPoint2);
 //	Origin.x = NewPoint1.x*kAng2BohrConversion;
 //	Origin.y = NewPoint1.y*kAng2BohrConversion;
 //	Origin.z = NewPoint1.z*kAng2BohrConversion;
-	Origin.x = NewPoint1.x;
-	Origin.y = NewPoint1.y;
-	Origin.z = NewPoint1.z;
+	Origin.x = NewPoint1.x + MainData->Centroid.x;
+	Origin.y = NewPoint1.y + MainData->Centroid.y;
+	Origin.z = NewPoint1.z + MainData->Centroid.z;
 	long NumPoints = NumGridPoints-1;	//Subtract one such that the window will be spanned by NumPoints
 //	XInc.x = (NewPoint2.x-NewPoint1.x)*kAng2BohrConversion/NumPoints;
 //	XInc.y = (NewPoint2.y-NewPoint1.y)*kAng2BohrConversion/NumPoints;
@@ -394,8 +394,8 @@ void Surf2DBase::SetPlaneToScreenPlane(MoleculeData * MainData) {
 	XInc.x = (NewPoint2.x-NewPoint1.x)/NumPoints;
 	XInc.y = (NewPoint2.y-NewPoint1.y)/NumPoints;
 	XInc.z = (NewPoint2.z-NewPoint1.z)/NumPoints;
-	TestPoint.x = -0.5*MainData->WindowSize;
-	TestPoint.y=0.5*MainData->WindowSize;
+	TestPoint.x = -0.55*MainData->WindowSize;
+	TestPoint.y=0.55*MainData->WindowSize;
 	BackRotate3DPt(RotInverse, TestPoint, &NewPoint2);
 //	YInc.x = (NewPoint2.x-NewPoint1.x)*kAng2BohrConversion/NumPoints;
 //	YInc.y = (NewPoint2.y-NewPoint1.y)*kAng2BohrConversion/NumPoints;

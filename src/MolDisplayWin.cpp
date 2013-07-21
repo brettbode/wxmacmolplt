@@ -3859,19 +3859,6 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 				}
 			}
 			
-			// No matter what mouse button/key combination we have, we update
-			// any surfaces that depend on the screen plane.
-			if (UpdateSurface) {
-				lSurface = MainData->cFrame->SurfaceList;
-				while (lSurface) {
-					lSurface->RotateEvent(MainData);
-					lSurface = lSurface->GetNextSurface();
-				}
-			}
-
-			/* Update the window */
-			if (UpdateSurface) ReleaseLists();
-
 			// Remember previous mouse point for next iteration.
 			mouse_start = q;
 		}
@@ -3885,6 +3872,19 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 			rotate_timer.Start(33, false);
 		}
 	}
+	// No matter what mouse button/key combination we have, we update
+	// any surfaces that depend on the screen plane.
+	// This may update a little more than needed, but it needs to be here to handle the mouse wheel event
+	if (UpdateSurface) {
+		lSurface = MainData->cFrame->SurfaceList;
+		while (lSurface) {
+			lSurface->RotateEvent(MainData);
+			lSurface = lSurface->GetNextSurface();
+		}
+	}
+	
+	/* Update the window */
+	if (UpdateSurface) ReleaseLists();
 
 	// If the scene is actively being rotated, we call a function that sorts
 	// transparent triangles, draws the atoms and some rotation annotations.

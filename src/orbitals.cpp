@@ -920,6 +920,15 @@ void OrbitalRec::RotateVectors(Matrix4D rotationMatrix, BasisSet * Basis, long N
 							MOVector[ivec+14] /= (sqrt7*sqrt5);
 							ivec += 15;
 						break;
+							// TODO add H and I shells
+						case HShell:
+							wxLogMessage(wxT("Rotating H shells is not coded, skipping..."));
+							ivec += 21;
+							break;
+						case IShell:
+							wxLogMessage(wxT("Rotating I shells is not coded, skipping..."));
+							ivec+=28;
+							break;
 					}
 					if (OrigVec) delete [] OrigVec;
 					OrigVec = NULL;
@@ -969,19 +978,6 @@ bool OrbitalRec::TotalDensityPossible(void) const {
 			(OrbOccupation != NULL));	//Is this a good enough test?
 }
 
-/*
-MORec::MORec(void) {
-	EigenVectors = LocalOrbitals = OrientedLocalOrbitals = NULL;
-	TotalAODensity = NULL;
-	NumOccupiedAlphaOrbs = NumOccupiedBetaOrbs = 0;
-}
-MORec::~MORec(void) {
-	if (EigenVectors) delete EigenVectors;
-	if (LocalOrbitals) delete LocalOrbitals;
-	if (OrientedLocalOrbitals) delete OrientedLocalOrbitals;
-	if (TotalAODensity) delete TotalAODensity;
-}
-*/
 #define kShellScreenThreshold (1.0e-5)
 /** Setup a pair of filtering arrays indicating whether there are non-zero MO Vector elements for
 each shell and atom.
@@ -1232,15 +1228,12 @@ float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *
 				{
 					float x3 = x*x2;
 					float x4 = x2*x2;
-					float x5 = x2*x3;
 					float x6 = x3*x3;
 					float y3 = y*y2;
 					float y4 = y2*y2;
-					float y5 = y2*y3;
 					float y6 = y3*y3;
 					float z3 = z*z2;
 					float z4 = z2*z2;
-					float z5 = z2*z3;
 					float z6 = z3*z3;
 					VectorSum = sqrt13*0.25*((sqrt11*sqrt7*sqrt3/(4.0*sqrt(2.0)))*(x6-15.0*x4*y2+15*x2*y4-y6)*MOVector[ivec]+
 								(sqrt7*sqrt9*sqrt11/sqrt(8.0))*x*z*(x4-10.0*x2*y2+5.0*y4)*z*MOVector[ivec+1]+
@@ -1469,14 +1462,6 @@ void Orb2DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	BasisSet * Basis = lData->GetBasisSet();
 	long NumBasisFuncs = Basis->GetNumBasisFuncs(UseSphericalHarmonics());
 	OrbitalRec	*MOs=NULL;
-//	MORec * lOrbs = NULL;
-//	if (!(Options&1)) {
-//		lOrbs=lFrame->Orbs;
-//		if (lFrame->Orbs.size() <= 0) {
-//			FreeGrid();
-//			return;
-//		}
-//	}
 
 	if (Grid && (GridAllocation != NumPoints)) FreeGrid();
 	if ((PlotOrb < 0)||(PlotOrb > NumBasisFuncs)) {
@@ -1981,14 +1966,7 @@ typedef Orb3DThread * Orb3DThreadPtr;
 //converted to Bohr when used.
 void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	Frame *	lFrame = lData->GetCurrentFramePtr();
-//	MORec * lOrbs = NULL;
-//	if (!(Options&1)) {
-//		lOrbs=lFrame->Orbs;
-//		if (!lOrbs) {
-//			FreeGrid();
-//			return;
-//		}
-//	}
+
 	if (PlotOrb < 0) {
 		FreeGrid();
 		return;
