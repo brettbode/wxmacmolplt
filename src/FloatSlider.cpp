@@ -156,7 +156,7 @@ void FloatSlider::SetValue(float val) {
 	/* assert(val >= min && val <= max); */
 
 	wxString text;
-	text.Printf(wxT("%.3f"), val);
+	text.Printf(wxT("%.3g"), val);
 #if wxCHECK_VERSION(2,9,0)
 	val_box->ChangeValue(text);
 #else
@@ -230,7 +230,7 @@ void FloatSlider::SyncText() {
 		new_val = ((float) slider->GetValue()) / NTICS * (max - min) + min;
 	}
 
-	text.Printf(wxT("%.3f"), new_val);
+	text.Printf(wxT("%.3g"), new_val);
 #if wxCHECK_VERSION(2,9,0)
 	val_box->ChangeValue(text);
 #else
@@ -264,7 +264,7 @@ void FloatSlider::SetMax(float max) {
 
 	this->max = max;
 	wxString str;
-	str.Printf(wxT("%.3f"), max);
+	str.Printf(wxT("%.3g"), max);
 	max_label->SetLabel(str);
 
 }
