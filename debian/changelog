@@ -1,3 +1,9 @@
+wxmacmolplt (7.5-1) precise; urgency=low
+
+  * New upstream version
+
+ -- Brett Bode <brett@scl.ameslab.gov>  Mon, 22 Jul 2013 09:18:13 -0500
+
 wxmacmolplt (7.4.4-1) unstable; urgency=low
 
   * New upstream version
