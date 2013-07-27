@@ -988,7 +988,6 @@ void Surface1DPane::OnIdle(wxIdleEvent& WXUNUSED(event)) {
 
 		if (className.Cmp(_T("wxTextCtrl")) == 0 
 				|| className.Cmp(_T("Orbital2DSurfPane")) == 0) {
-			double d;
 			setUpdateButton();
 		}
 	}

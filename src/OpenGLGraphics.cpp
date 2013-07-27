@@ -2372,7 +2372,7 @@ void DashedQuadFromLine(const CPoint3D& pt1,
 void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, const int & order) {
 
 	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
-	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
+//	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
 	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
 
 	glPushAttrib(GL_LIGHTING_BIT);
@@ -2505,7 +2505,7 @@ void DrawRotationAxis(const CPoint3D & lineStart, const CPoint3D & lineEnd, cons
 void DrawTranslucentPlane(const CPoint3D & origin, const CPoint3D & p1, const CPoint3D & p2) {
 
 	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
-	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
+//	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
 	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
 	glPushAttrib(GL_LIGHTING_BIT);
 	Matrix4D rotationMatrix;
@@ -2552,7 +2552,7 @@ void DrawInversionPoint(void) {
 	GLUquadricObj * qobj = NULL;
 	qobj = gluNewQuadric();
 //	float sphere_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
-	float sphere_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
+//	float sphere_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
 	float sphere_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 	
 	glPushAttrib(GL_LIGHTING_BIT);
@@ -2567,7 +2567,7 @@ void DrawInversionPoint(void) {
 	
 	//Add several arrows to indicate the inversion...
 	float plane_emissive[] = { 0.0, 0.3, 0.7, 0.2 };
-	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
+//	float plane_diffuse[] = { 0.0, 0.3, 0.6, 0.3 };
 	float plane_specular[] = { 0.0, 0.3, 0.6, 1.0 };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, plane_emissive);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, plane_specular);

@@ -254,7 +254,6 @@ Surf1DBase::~Surf1DBase() {
 }
 
 void Surf1DBase::SetNumGridPoints(long newNum) {
-	long OldNum = NumGridPoints;
 	if (newNum > 1) NumGridPoints = newNum;
 }
 
