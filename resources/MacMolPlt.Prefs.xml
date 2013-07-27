@@ -411,4 +411,8 @@
 <PositiveContourColor red="1" green="0" blue="0"></PositiveContourColor>
 <NegativeContourColor red="0" green="0" blue="1"></NegativeContourColor>
 </SurfaceWindowOptions>
+<WindowDefaults>
+<MoleculeDisplayWindow x="10" y="30" width="453" height="464"></MoleculeDisplayWindow>
+<PreferencesWindow x="10" y="50" width="500" height="495" visible="false"></PreferencesWindow>
+</WindowDefaults>
 </MacMolPltPreferences>

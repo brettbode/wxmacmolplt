@@ -29,6 +29,7 @@ extern short		gAppResRef;
 
 extern WinPrefs *	gPreferences;
 extern WinPrefs *	gPrefDefaults;
+extern WindowData	gWindowDefault;
 
 using namespace std;
 
@@ -912,6 +913,9 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				delete molChildren;
 			}
 				break;
+			case MMPPref_WindowDefaults:
+				gWindowDefault.ReadXML(child);
+				break;
 		}
 	}
 	delete children;
@@ -1292,7 +1296,10 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	outbuf.str("");
 	outbuf << (temp.blue/65535.0);
 	color->addAttribute(MMPPref_convert(MMPPref_ColorBlue), outbuf.str().c_str());
-	
+
+	XMLElement * WinDataElement = root->addChildElement(MMPPref_convert(MMPPref_WindowDefaults));
+	gWindowDefault.WriteXML(WinDataElement);
+
 	return 1;
 }
 
@@ -1321,6 +1328,8 @@ const char * MMPPref_convert(MMPPref_Element t)
             return "FrequencyWindowPreferences";
 		case MMPPref_SurfaceWinPrefs:
             return "SurfaceWindowOptions";
+		case MMPPref_WindowDefaults:
+            return "WindowDefaults";
 		default:
             return "invalid";
     }

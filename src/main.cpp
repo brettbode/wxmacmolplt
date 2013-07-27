@@ -27,6 +27,7 @@
 
 //The global preferences settings
 WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
+WindowData	gWindowDefault;
 
 BuilderInterface * BuilderTool;
 
@@ -415,9 +416,6 @@ BEGIN_EVENT_TABLE(MpApp, wxApp)
 END_EVENT_TABLE()
 
 #ifdef __WXMAC__
-BEGIN_EVENT_TABLE(macMenuWinPlaceholder, wxFrame)
-	EVT_CLOSE(macMenuWinPlaceholder::OnClose)
-END_EVENT_TABLE()
 macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,
                          const wxPoint  &position,
                          const wxSize   &size,
@@ -431,14 +429,6 @@ macMenuWinPlaceholder::macMenuWinPlaceholder(const wxString &title,
 }
 
 macMenuWinPlaceholder::~macMenuWinPlaceholder() {
-}
-void macMenuWinPlaceholder::OnClose(wxCloseEvent& event) {
-	//The only way to get here is if something is running through the window list and closing
-	//one by one. Send a quit event.
-	MpApp & app = wxGetApp();
-	app.ClosingMenuPlaceHolder();
-	wxCommandEvent tempEvent;
-	app.menuFileQuit(tempEvent);
 }
 
 void macMenuWinPlaceholder::createMenuBar(void) {
@@ -482,9 +472,9 @@ int main(int argc, char **argv) {
 		(strcmp(argv[1], "-b") == 0 ||
 		 strcmp(argv[1], "-v") == 0 ||
 		 strcmp(argv[1], "-h") == 0)) {
-		MpAppNoGUI *guiless_app = new MpAppNoGUI;
+		/*MpAppNoGUI *guiless_app = */ new MpAppNoGUI;
 	} else {
-		MpApp *gui_app = new MpApp;
+		/*MpApp *gui_app = */ new MpApp;
 	}
 
 	return wxEntry(argc, argv);

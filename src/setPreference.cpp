@@ -160,7 +160,13 @@ bool setPreference::create( MolDisplayWin* parent, wxWindowID id, const wxString
 	//This is a hack to get the window to default to a reasonable size on 2.9.x on OS X
 	//Without this the height of the window defaults to ridiculously small.
 	//This seems to fix the problem with the global prefs, but not the window specific prefs.
-	SetSize(size);
+#if wxCHECK_VERSION(2,9,0)
+//	SetSize(size);
+	// I would rather use the incoming size, but the default of -1,-1 simply isn't getting a properly
+	// sized window. On the global prefs the width is about 2/3 of correct and the height is passable.
+	// Instead set the fixed size below.
+	SetSize(480,500);
+#endif
 
     return true;
 }

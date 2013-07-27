@@ -56,6 +56,7 @@
 
 extern WinPrefs * gPreferences;
 extern BuilderInterface * BuilderTool;
+extern WindowData	gWindowDefault;
 
 using namespace std;
 
@@ -265,6 +266,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	prefsDlg = NULL;
 	zMatCalcDlg = NULL;
 	
+	winData = gWindowDefault;
+		
 	pageSetupData = NULL;
 	printData = NULL;
 	myStatus = NULL;
@@ -348,7 +351,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 		OnToggleTool(foo);
 	}
 
-	SetClientSize(wxSize(400, 400));
+//	SetClientSize(wxSize(400, 400));
+	SetSize(winData.GetMolWinRect());
 
 	Show();
 }
@@ -3605,7 +3609,8 @@ WindowData::WindowData(void) {
 	//These are all used for windows where -1 indicates the default value that
 	//causes wx to compute appropriate values
 	BondsVis = CoordsVis = EnergyVis = FreqVis = SurfacesVis = InputBVis = PrefVis = ZMatVis = false;
-	MolWinRect.x = MolWinRect.y = MolWinRect.width = MolWinRect.height = -1;
+	MolWinRect.x = MolWinRect.y = -1;
+	MolWinRect.width = MolWinRect.height = 450;
 	BondsWinRect.x = BondsWinRect.y = BondsWinRect.width = BondsWinRect.height = -1;
 	CoordsWinRect.x = CoordsWinRect.y = CoordsWinRect.width = CoordsWinRect.height = -1;
 	EnergyWinRect.x = EnergyWinRect.y = EnergyWinRect.width = EnergyWinRect.height = -1;
@@ -3690,6 +3695,14 @@ void MolDisplayWin::UpdateWindowData(void) {
 		winData.ZMatWindowVisible(true);
 		winData.SetZMatWinRect(zMatCalcDlg->GetRect());
 	} else winData.ZMatWindowVisible(false);
+}
+void MolDisplayWin::SetDefaultWindowData(void) {
+	//first make sure the data is up to date
+	UpdateWindowData();
+	//copy it onto to the defaults
+	gWindowDefault = winData;
+	//Now save the user preferences (no way to save only the window data)
+	gPreferences->WriteUserPrefs();
 }
 
 void MolDisplayWin::OnRotateTimer(wxTimerEvent& event) {

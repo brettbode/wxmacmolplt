@@ -297,7 +297,7 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_FragmentNameList));
 			for (unsigned int i=0; i<FragmentNames.size(); i++) {
-				XMLElement * FN = Ele->addChildElement(kFRAGNAMEXML, FragmentNames[i].c_str());
+				/*XMLElement * FN = */ Ele->addChildElement(kFRAGNAMEXML, FragmentNames[i].c_str());
 			}
 		}
 

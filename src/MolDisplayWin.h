@@ -112,63 +112,6 @@ private:
 	int position;
 };
 
-//Simple class to save window visibility and positioning data
-class WindowData {
-public:
-	WindowData();
-	static void Validate(wxRect & t);
-	
-	void WriteXML(XMLElement * parent) const;
-	void ReadXML(XMLElement * parent);
-	
-	bool BondsWindowVisible() const {return BondsVis;}
-	void BondsWindowVisible(bool v) {BondsVis = v;}
-	bool CoordsWindowVisible() const {return CoordsVis;}
-	void CoordsWindowVisible(bool v) {CoordsVis = v;}
-	bool EnergyWindowVisible() const {return EnergyVis;}
-	void EnergyWindowVisible(bool v) {EnergyVis = v;}
-	bool FreqWindowVisible() const {return FreqVis;}
-	void FreqWindowVisible(bool v) {FreqVis = v;}
-	bool SurfacesWindowVisible() const {return SurfacesVis;}
-	void SurfacesWindowVisible(bool v) {SurfacesVis = v;}
-	bool InputBWindowVisible() const {return InputBVis;}
-	void InputBWindowVisible(bool v) {InputBVis = v;}
-	bool PrefsWindowVisible() const {return PrefVis;}
-	void PrefsWindowVisible(bool v) {PrefVis = v;}
-	bool ZMatWindowVisible() const {return ZMatVis;}
-	void ZMatWindowVisible(bool v) {ZMatVis = v;}
-	
-	const wxRect & GetMolWinRect() const {return MolWinRect;}
-	void SetMolWinRect(const wxRect & v) {MolWinRect = v;}
-	const wxRect & GetBondsWinRect() const {return BondsWinRect;}
-	void SetBondsWinRect(const wxRect & v) {BondsWinRect = v;}
-	const wxRect & GetCoordsWinRect() const {return CoordsWinRect;}
-	void SetCoordsWinRect(const wxRect & v) {CoordsWinRect = v;}
-	const wxRect & GetEnergyWinRect() const {return EnergyWinRect;}
-	void SetEnergyWinRect(const wxRect & v) {EnergyWinRect = v;}
-	const wxRect & GetFrequencyWinRect() const {return FreqWinRect;}
-	void SetFrequencyWinRect(const wxRect & v) {FreqWinRect = v;}
-	const wxRect & GetSurfacesWinRect() const {return SurfacesWinRect;}
-	void SetSurfacesWinRect(const wxRect & v) {SurfacesWinRect = v;}
-	const wxRect & GetInputBWinRect() const {return InputBuilderRect;}
-	void SetInputBWinRect(const wxRect & v) {InputBuilderRect = v;}
-	const wxRect & GetPrefsWinRect() const {return PreferenceWinRect;}
-	void SetPrefsWinRect(const wxRect & v) {PreferenceWinRect = v;}
-	const wxRect & GetZMatWinRect() const {return ZMatRect;}
-	void SetZMatWinRect(const wxRect & v) {ZMatRect = v;}
-private:
-	wxRect	MolWinRect;
-	wxRect	BondsWinRect;
-	wxRect	CoordsWinRect;
-	wxRect	EnergyWinRect;
-	wxRect	FreqWinRect;
-	wxRect	SurfacesWinRect;
-	wxRect	InputBuilderRect;
-	wxRect	PreferenceWinRect;
-	wxRect	ZMatRect;
-	bool	BondsVis, CoordsVis, EnergyVis, FreqVis, SurfacesVis, InputBVis, PrefVis, ZMatVis;
-};
-
 /**
  * Subclasses wxFrame to define the main application window.  This is a
  * document window.  There can be multiple instances of the window in the
@@ -685,7 +628,12 @@ class MolDisplayWin : public wxFrame {
 		 * be called before saving the state of the file.
 		 */
 		void UpdateWindowData();
-		
+		/**
+		 * Pulls the window data for this document, copies it to the default and
+		 * saves it in the user preferences.
+		 */
+		void SetDefaultWindowData();
+	
 		//OpenGL drawing routines
 		void DrawGL(int do_shader = true);
 		void SortTransparentTriangles();
