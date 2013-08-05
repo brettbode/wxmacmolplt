@@ -554,6 +554,21 @@ int OrbSurfacePane::getOrbSetForOrbPane(vector<wxString>& choice) {
 					case OrientedLocalizedOrbital:
 						choice.push_back(_T("Oriented Localized Orbitals"));
 						break;
+					case NonOrthogonalSVDLocalizedOrbital:
+						choice.push_back(_T("Nonorthogonal SVD Localized Orbitals"));
+						break;
+					case PPASVDLocalizedOrbital:
+						choice.push_back(_T("PPA SVD Localized Orbitals"));
+						break;
+					case SVDExternalLocalizedOrbital:
+						choice.push_back(_T("SVD External Localized Orbitals"));
+						break;
+					case SplitQAExternalLocalizedOrbital:
+						choice.push_back(_T("SplitQA Localized Orbitals"));
+						break;
+					case OrderedExternalLocalizedOrbital:
+						choice.push_back(_T("Ordered External Localized Orbitals"));
+						break;
 					case GuessOrbital:
 						choice.push_back(_T("Initial Guess Orbitals"));
 						break;
@@ -3154,6 +3169,21 @@ void BaseSurfacePane::BuildOrbSetPopup(void) {
 						break;
 					case OrientedLocalizedOrbital:
 						mOrbSetChoice->Append(wxString(_T("Oriented Localized Orbitals")));
+						break;
+					case NonOrthogonalSVDLocalizedOrbital:
+						mOrbSetChoice->Append(wxString(_T("Nonorthogonal SVD Localized Orbitals")));
+						break;
+					case PPASVDLocalizedOrbital:
+						mOrbSetChoice->Append(wxString(_T("PPA SVD Localized Orbitals")));
+						break;
+					case SVDExternalLocalizedOrbital:
+						mOrbSetChoice->Append(wxString(_T("SVD External Localized Orbitals")));
+						break;
+					case SplitQAExternalLocalizedOrbital:
+						mOrbSetChoice->Append(wxString(_T("SplitQA Localized Orbitals")));
+						break;
+					case OrderedExternalLocalizedOrbital:
+						mOrbSetChoice->Append(wxString(_T("Ordered External Localized Orbitals")));
 						break;
 					case GuessOrbital:
 						mOrbSetChoice->Append(wxString(_T("Initial Guess Orbitals")));

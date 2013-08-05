@@ -532,6 +532,8 @@ const char * ControlGroup::GAMESSLocalizationToText(GAMESS_Localization t) {
 			return "RUEDNBRG";
 		case GAMESS_POP_Localization:
 			return "POP";
+		case GAMESS_SVD_Localization:
+			return "SVD";
 	}
 	return "invalid";
 }

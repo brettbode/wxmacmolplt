@@ -99,6 +99,16 @@ const char * ConvertTypeOfOrbital(const TypeOfOrbital & t) {
 			return "Initial Guess";
 		case DiabaticMolecularOrbital:
 			return "CAS-SCF Diabatic";
+		case NonOrthogonalSVDLocalizedOrbital:
+			return "NonOrthogonal SVD";
+		case PPASVDLocalizedOrbital:
+			return "PPA SVD";
+		case SVDExternalLocalizedOrbital:
+			return "SVD External";
+		case SplitQAExternalLocalizedOrbital:
+			return "Split QA Localized";
+		case OrderedExternalLocalizedOrbital:
+			return "Ordered External Localized";
 		default:
 			return "Unknown";
 	}

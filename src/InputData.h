@@ -185,6 +185,7 @@ enum GAMESS_Localization {
 	GAMESS_BOYS_Localization,
 	GAMESS_RUEDNBRG_Localization,
 	GAMESS_POP_Localization,
+	GAMESS_SVD_Localization,
 	
 	NumGAMESSLocalizations
 };

@@ -3494,53 +3494,179 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 //Look for localized orbitals which appear only at the end of a log file
 	if (MainData->Basis) {
 		try {
-				//MCSCF runs can potentially have diabatic orbitals at the end.
-			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {
-				if (Buffer->LocateKeyWord("CAS-SCF DIABATIC MOLECULAR ORBITALS", 34)) {
-					lFrame->ParseGAMESSMCSCFDiabaticVectors(Buffer, MainData->GetNumBasisFunctions(),
-												OccupiedOrbCount, ProgressInd);
-				}
+			enum {
+				CASSCFDiabatic=0,
+				FockLocalized,
+				DensityMatrixLocalized,
+				OrientedLocOrbs,
+				NonorthogLocOrbs,
+				PPASVDOrbs,
+				LocalizedOrbitals,
+				SVDExternalOrbs,
+				SplitQALocOrbs,
+				OrderedExternalLocOrbs
+			};
+			std::vector<std::pair <std::string, int> > LocOrbKeywords;
+			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) 
+				LocOrbKeywords.push_back(make_pair (std::string("CAS-SCF DIABATIC MOLECULAR ORBITALS"), (int) CASSCFDiabatic));
+			LocOrbKeywords.push_back(make_pair (std::string("FOCK OPERATOR FOR THE LOCALIZED ORBITALS"), (int) FockLocalized));
+			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF)
+				LocOrbKeywords.push_back(make_pair (std::string("DENSITY MATRIX FOR THE LOCALIZED ORBITALS"), (int) DensityMatrixLocalized));
+			LocOrbKeywords.push_back(make_pair (std::string("ORIENTED LOCALIZED ORBITALS"), (int) OrientedLocOrbs));
+			LocOrbKeywords.push_back(make_pair (std::string("NONORTHOGONAL PPA SVD LOCALIZED ORBITALS"), (int) NonorthogLocOrbs));
+			LocOrbKeywords.push_back(make_pair (std::string("PPA SVD LOCALIZED ORBITALS"), (int) PPASVDOrbs));
+			LocOrbKeywords.push_back(make_pair (std::string("SVD EXTERNAL LOCALIZED ORBITALS"), (int) SVDExternalOrbs));
+			LocOrbKeywords.push_back(make_pair (std::string("SPLITQA LOCALIZED ORBITALS"), (int) SplitQALocOrbs));
+			LocOrbKeywords.push_back(make_pair (std::string("ORDERED EXTERNAL LOCALIZED ORBITALS"), (int) OrderedExternalLocOrbs));
+//Order is important, look for this last since it is a subset of some of the others
+			LocOrbKeywords.push_back(make_pair (std::string("LOCALIZED ORBITALS"), (int) LocalizedOrbitals));
+			
+			while (! Buffer->Eof()) {
+				int kw;
+				if (-1 < (kw = Buffer->LocateKeyWord(LocOrbKeywords))) {
+					wxFileOffset keywordPosition = Buffer->GetFilePos();
+					OrbitalRec * OrbSet;
+					switch (kw) {
+						case CASSCFDiabatic:
+							//MCSCF runs can potentially have diabatic orbitals at the end.
+							if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {
+								lFrame->ParseGAMESSMCSCFDiabaticVectors(Buffer, MainData->GetNumBasisFunctions(),
+																		OccupiedOrbCount, ProgressInd);
+							}
+							break;
+						case FockLocalized:
+							Buffer->SkipnLines(1);
+							break;
+						case OrientedLocOrbs:
+							Buffer->SkipnLines(2);
+							ProgressInd->ChangeText("Reading oriented localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							if (OrbSet != NULL) {
+								OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
+								if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
+									OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
+								}
+							}
+							break;
+						case NonorthogLocOrbs:
+							Buffer->SetFilePos(Buffer->FindBlankLine());
+							Buffer->SkipnLines(1);
+							ProgressInd->ChangeText("Reading Nonorthogonal PPA SVD localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							OrbSet->setOrbitalType(NonOrthogonalSVDLocalizedOrbital);
+							break;
+						case PPASVDOrbs:
+							Buffer->SetFilePos(Buffer->FindBlankLine());
+							Buffer->SkipnLines(1);
+							ProgressInd->ChangeText("Reading PPA SVD localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							OrbSet->setOrbitalType(PPASVDLocalizedOrbital);
+							break;
+						case LocalizedOrbitals:
+							Buffer->SkipnLines(2);
+							ProgressInd->ChangeText("Reading localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+																		  NumBetaUHFOrbs, ProgressInd, false);
+							if (OrbSet != NULL) {
+								OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
+								if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
+									OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
+								}
+							}
+							break;
+						case SVDExternalOrbs:
+							Buffer->SetFilePos(Buffer->FindBlankLine());
+							Buffer->SkipnLines(1);
+							ProgressInd->ChangeText("Reading SVD External localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							OrbSet->setOrbitalType(SVDExternalLocalizedOrbital);
+							break;
+						case SplitQALocOrbs:
+							Buffer->SetFilePos(Buffer->FindBlankLine());
+							Buffer->SkipnLines(1);
+							ProgressInd->ChangeText("Reading SplitQA localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							OrbSet->setOrbitalType(SplitQAExternalLocalizedOrbital);
+							break;
+						case OrderedExternalLocOrbs:
+							Buffer->SetFilePos(Buffer->FindBlankLine());
+							Buffer->SkipnLines(1);
+							ProgressInd->ChangeText("Reading Ordered External localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							OrbSet->setOrbitalType(OrderedExternalLocalizedOrbital);
+							break;
+					}
+					//If still positioned at the keyword, must advance or there will be a loop.
+					if (keywordPosition == Buffer->GetFilePos()) Buffer->SkipnLines(1);
+				} else break;
 			}
+				//MCSCF runs can potentially have diabatic orbitals at the end.
+//			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {
+//				if (Buffer->LocateKeyWord("CAS-SCF DIABATIC MOLECULAR ORBITALS", 34)) {
+//					lFrame->ParseGAMESSMCSCFDiabaticVectors(Buffer, MainData->GetNumBasisFunctions(),
+//												OccupiedOrbCount, ProgressInd);
+//				}
+//			}
 				//GAMESS now punchs out the Fock operator for ruedenburg type localization
 				//which I need to skip if it is present
-			if (Buffer->LocateKeyWord("FOCK OPERATOR FOR THE LOCALIZED ORBITALS",40))
-				Buffer->SkipnLines(1);
-			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {
+//			if (Buffer->LocateKeyWord("FOCK OPERATOR FOR THE LOCALIZED ORBITALS",40))
+//				Buffer->SkipnLines(1);
+//			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {
 					//skip over the density matrix (present in Ruedenburg MCSCF runs)
-				if (Buffer->LocateKeyWord("DENSITY MATRIX FOR THE LOCALIZED ORBITALS",41))
-					Buffer->SkipnLines(1);
-			}
-			KeyWordFound = Buffer->LocateKeyWord("LOCALIZED ORBITALS",18);
-			if (KeyWordFound) {
-				Buffer->SkipnLines(2);
-				ProgressInd->ChangeText("Reading localized orbitals");
-				if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
-					{ throw UserCancel();}
-				OrbitalRec * OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
-					NumBetaUHFOrbs, ProgressInd, false);
-				if (OrbSet != NULL) {
-					OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
-					if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
-						OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
-					}
-				}
-				// There may also be oriented localized orbitals
-				KeyWordFound = Buffer->LocateKeyWord("ORIENTED LOCALIZED ORBITALS",27);
-				if (KeyWordFound) {
-					Buffer->SkipnLines(2);
-					ProgressInd->ChangeText("Reading oriented localized orbitals");
-					if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
-						{ throw UserCancel();}
-					OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
-						NumBetaUHFOrbs, ProgressInd, true);
-					if (OrbSet != NULL) {
-						OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
-						if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
-							OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
-						}
-					}
-				}
-			}
+//				if (Buffer->LocateKeyWord("DENSITY MATRIX FOR THE LOCALIZED ORBITALS",41))
+//					Buffer->SkipnLines(1);
+//			}
+//			KeyWordFound = Buffer->LocateKeyWord("LOCALIZED ORBITALS",18);
+//			if (KeyWordFound) {
+//				Buffer->SkipnLines(2);
+//				ProgressInd->ChangeText("Reading localized orbitals");
+//				if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+//					{ throw UserCancel();}
+//				OrbitalRec * OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+//					NumBetaUHFOrbs, ProgressInd, false);
+//				if (OrbSet != NULL) {
+//					OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
+//					if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
+//						OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
+//					}
+//				}
+//				// There may also be oriented localized orbitals
+//				KeyWordFound = Buffer->LocateKeyWord("ORIENTED LOCALIZED ORBITALS",27);
+//				if (KeyWordFound) {
+//					Buffer->SkipnLines(2);
+//					ProgressInd->ChangeText("Reading oriented localized orbitals");
+//					if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+//						{ throw UserCancel();}
+//					OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+//						NumBetaUHFOrbs, ProgressInd, true);
+//					if (OrbSet != NULL) {
+//						OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
+//						if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
+//							OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
+//						}
+//					}
+//				}
+//			}
 		}
 		catch (std::bad_alloc) {
 			MessageAlert("Insufficient memory to read in the localized orbitals.");

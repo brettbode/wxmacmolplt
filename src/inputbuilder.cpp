@@ -694,6 +694,7 @@ void InputBuilderWindow::CreateControls()
 	localChoiceStrings.Add(_("Foster-Boys"));
 	localChoiceStrings.Add(_("Edmiston-Ruedenberg"));
 	localChoiceStrings.Add(_("Pipek-Mezey"));
+	localChoiceStrings.Add(_("SVD"));
 	localChoice = new wxUglyChoice( itemPanel27, ID_LOCAL_CHOICE, wxDefaultPosition, wxDefaultSize, localChoiceStrings, 0 );
 	localChoice->SetStringSelection(_("None"));
 	itemFlexGridSizer30->Add(localChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2196,6 +2197,21 @@ void InputBuilderWindow::SetupMOGuessItems() {
 						break;
 					case OrientedLocalizedOrbital:
 						mMOSourceChoice->Append(wxString(_("Oriented Localized Orbitals")));
+						break;
+					case NonOrthogonalSVDLocalizedOrbital:
+						mMOSourceChoice->Append(wxString(_T("Nonorthogonal SVD Localized Orbitals")));
+						break;
+					case PPASVDLocalizedOrbital:
+						mMOSourceChoice->Append(wxString(_T("PPA SVD Localized Orbitals")));
+						break;
+					case SVDExternalLocalizedOrbital:
+						mMOSourceChoice->Append(wxString(_T("SVD External Localized Orbitals")));
+						break;
+					case SplitQAExternalLocalizedOrbital:
+						mMOSourceChoice->Append(wxString(_T("SplitQA Localized Orbitals")));
+						break;
+					case OrderedExternalLocalizedOrbital:
+						mMOSourceChoice->Append(wxString(_T("Ordered External Localized Orbitals")));
 						break;
 					default:
 						mMOSourceChoice->Append(wxString(_("Molecular Orbitals")));

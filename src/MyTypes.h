@@ -512,6 +512,11 @@ typedef enum TypeOfOrbital {
 	OrientedLocalizedOrbital,
 	GuessOrbital,
 	DiabaticMolecularOrbital,
+	NonOrthogonalSVDLocalizedOrbital,
+	PPASVDLocalizedOrbital,
+	SVDExternalLocalizedOrbital,
+	SplitQAExternalLocalizedOrbital,
+	OrderedExternalLocalizedOrbital,
 	
 	NumOrbitalTypes
 //	RHFOptimized=1,
