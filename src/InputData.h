@@ -553,7 +553,7 @@ typedef enum EFRAG_PolMethods {
 	SCF_PolMethod,
 	
 	NumEFragPolMethods
-};
+} EFRAG_PolMethods;
 typedef enum EFRAG_PositionTypes {
 	invalidEFragPositionType=0,
 	Optimize_Position,
@@ -561,7 +561,7 @@ typedef enum EFRAG_PositionTypes {
 	EFOPT_Position,
 	
 	NumEFragPositionTypes
-};
+} EFRAG_PositionTypes;
 
 /// EffectiveFragmentsGroup stores the options for the EFRAG group, but not the actual fragments
 class EffectiveFragmentsGroup {
@@ -637,7 +637,7 @@ class GuessGroup {
 		inline short GetGuess(void) const {return GuessType;};
 		const char * GetGuessText(void) const;
 		short SetGuess(const char *GuessText);
-		inline short SetGuess(short NewGuess) {if ((NewGuess<0)&&(NewGuess>5)) return -1; GuessType = NewGuess; return GetGuess();};
+		inline short SetGuess(short NewGuess) {if ((NewGuess<0)||(NewGuess>=NumberGuessTypes)) return -1; GuessType = NewGuess; return GetGuess();};
 		inline short GetVecSource(void) const {return VecSource;};
 		inline void SetVecSource(short NewVal) {if (NewVal>0) VecSource = NewVal;};
 		inline long GetNumOrbs(void) const {return NumOrbs;};
