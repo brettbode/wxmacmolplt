@@ -3515,7 +3515,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			LocOrbKeywords.push_back(make_pair (std::string("ORIENTED LOCALIZED ORBITALS"), (int) OrientedLocOrbs));
 			LocOrbKeywords.push_back(make_pair (std::string("NONORTHOGONAL PPA SVD LOCALIZED ORBITALS"), (int) NonorthogLocOrbs));
 			LocOrbKeywords.push_back(make_pair (std::string("PPA SVD LOCALIZED ORBITALS"), (int) PPASVDOrbs));
-			LocOrbKeywords.push_back(make_pair (std::string("SVD EXTERNAL LOCALIZED ORBITALS"), (int) SVDExternalOrbs));
+//			LocOrbKeywords.push_back(make_pair (std::string("SVD EXTERNAL LOCALIZED ORBITALS"), (int) SVDExternalOrbs));
 			LocOrbKeywords.push_back(make_pair (std::string("SPLITQA LOCALIZED ORBITALS"), (int) SplitQALocOrbs));
 			LocOrbKeywords.push_back(make_pair (std::string("ORDERED EXTERNAL LOCALIZED ORBITALS"), (int) OrderedExternalLocOrbs));
 //Order is important, look for this last since it is a subset of some of the others
@@ -4147,16 +4147,22 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 					sscanf(&(LineText[Pos+5]), "%f", &xvalue);
 				}
 			} else {
-				ReadLongKeyword(LineText, "NAT", &NumAIAtoms);
-				ReadLongKeyword(LineText, "NFRG", &NumFragments);
-				ReadLongKeyword(LineText, "NQMMM", &NumMDAtoms);
+				if (!ReadLongKeyword(LineText, "NAT", &NumAIAtoms))
+					wxLogMessage(_("Unable to locate NAT (ab initio atom count)."));
+				if (!ReadLongKeyword(LineText, "NFRG", &NumFragments))
+					wxLogMessage(_("Unable to locate NFRG (fragment count)."));
+				if (!ReadLongKeyword(LineText, "NQMMM", &NumMDAtoms))
+					wxLogMessage(_("Unable to locate NQMM (MM atom count)."));
+
 				//second line is the x-axis and total energy, either ttotal or stotal
 				//STOTAL=   1.49848 sqrt(amu)*bohr   tot. E=      -91.6219797490 Hartree
 				Buffer->GetLine(LineText);
 				if (runType == IRCRun)
-					ReadFloatKeyword(LineText, "STOTAL", &xvalue);
+					if (!ReadFloatKeyword(LineText, "STOTAL", &xvalue))
+						wxLogMessage(_("Unable to locate STOTAL in IRC data packet. Unable to position this packet in the sequence."));
 				else	//MD and DRC spell it TTOTAL
-					ReadFloatKeyword(LineText, "TTOTAL", &xvalue);
+					if (!ReadFloatKeyword(LineText, "TTOTAL", &xvalue))
+						wxLogMessage(_("Unable to locate TOTAL in trajectory data packet. Unable to position this packet in the sequence."));
 				ReadDoubleKeyword(LineText, "TOT. E", totE);
 			}
 
@@ -4191,6 +4197,8 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 					double kinE;
 					if (ReadDoubleKeyword(LineText, "KIN. E", kinE))
 						lFrame->SetEnergy(kinE, KineticEnergy);
+					else
+						wxLogMessage(_("Unable to parse the kinetic energy while reading a molecular dynamics trajectory file. The file format may not be correct."));
 				}
 
 				//setup the frame for the antipated atom count
