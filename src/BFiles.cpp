@@ -301,7 +301,8 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 			Type = kPDBType;
 		else if (FindGroup("DATA")||FindGroup("CONTRL")) {
 			Type = kGAMESSInputType;
-		} else if (LocateKeyWord("<molecule>", 10, -1))
+			//technically molecule is lower case, but LocateKeyword requires upper case
+		} else if (LocateKeyWord("<MOLECULE>", 10, -1))
 			Type = CMLFile;
 		else if (GetFilePos() < kMaxLineLength) {
 			try {
