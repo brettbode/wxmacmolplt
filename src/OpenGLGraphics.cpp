@@ -3048,7 +3048,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				if (bonds.size() == 0) {
 					CPoint3D v(0.0f, 1.0f, 0.0f);
 					DO_SITE(v, 1);
-					if (lpCount < 1) DO_SITE(v * -1.0f, 2);
+					if (lpCount < 1) {DO_SITE(v * -1.0f, 2);}
 				}
 
 				else if (bonds.size() == 1) {
@@ -3228,7 +3228,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 						DO_SITE(equat3, 3);
 						if (lpCount < 2) {
 							DO_SITE(axial, 4);
-							if (lpCount < 1) DO_SITE(axial * -1.0f, 5);
+							if (lpCount < 1) {DO_SITE(axial * -1.0f, 5);}
 						}
 					}
 				}
@@ -3252,7 +3252,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					DO_SITE(equat2, 3);
 					if (lpCount < 2) {
 						DO_SITE(axial, 4);
-						if (lpCount < 1) DO_SITE(axial * -1.0f, 5);
+						if (lpCount < 1) {DO_SITE(axial * -1.0f, 5);}
 					}
 				}
 			}
@@ -3286,7 +3286,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					DO_SITE(equat2, 3);
 					if (lpCount < 2) {
 						DO_SITE(equat3, 4);
-						if (lpCount < 1) DO_SITE(cross2, 5);
+						if (lpCount < 1) {DO_SITE(cross2, 5);}
 					}
 				}
 
@@ -3303,7 +3303,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					DO_SITE(equat3, 3);
 					if (lpCount < 2) {
 						DO_SITE(axial, 4);
-						if (lpCount < 1) DO_SITE(axial * -1.0f, 5);
+						if (lpCount < 1) {DO_SITE(axial * -1.0f, 5);}
 					}
 				}
 			}
@@ -3347,7 +3347,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					// construction.
 
 					DO_SITE(equat2, 4);
-					if (lpCount < 1) DO_SITE(equat3, 5);
+					if (lpCount < 1) {DO_SITE(equat3, 5);}
 				}
 
 				else if (fabs(dot12) < 0.25f || fabs(dot13) < 0.25f ||
@@ -3399,7 +3399,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					Normalize3D(&equat3);
 
 					DO_SITE(equat3, 4);
-					if (lpCount < 1) DO_SITE(cross, 5);
+					if (lpCount < 1) {DO_SITE(cross, 5);}
 				}
 
 				else {
@@ -3409,7 +3409,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					Normalize3D(&cross);
 
 					DO_SITE(cross, 4);
-					if (lpCount < 1) DO_SITE(cross * -1.0f, 5);
+					if (lpCount < 1) {DO_SITE(cross * -1.0f, 5);}
 				}
 
 			}
@@ -3485,7 +3485,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 							DO_SITE(e2 * -1.0f, 4);
 							if (lpCount < 2) {
 								DO_SITE(e3, 5);
-								if (lpCount < 1) DO_SITE(e3 * -1.0f, 6);
+								if (lpCount < 1) {DO_SITE(e3 * -1.0f, 6);}
 							}
 						}
 					}
@@ -3506,7 +3506,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 						DO_SITE(ortho * -1.0f, 4);
 						if (lpCount < 2) {
 							DO_SITE(cross, 5);
-							if (lpCount < 1) DO_SITE(cross * -1.0f, 6);
+							if (lpCount < 1) {DO_SITE(cross * -1.0f, 6);}
 						}
 					}
 				}
@@ -3544,7 +3544,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 						DO_SITE(cross2, 4);
 						if (lpCount < 2) {
 							DO_SITE(cross, 5);
-							if (lpCount < 1) DO_SITE(cross * -1.0f, 6);
+							if (lpCount < 1) {DO_SITE(cross * -1.0f, 6);}
 						}
 					}
 				}
@@ -3568,7 +3568,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 						DO_SITE(ortho * -1.0f, 4);
 						if (lpCount < 2) {
 							DO_SITE(cross, 5);
-							if (lpCount < 1) DO_SITE(cross * -1.0f, 6);
+							if (lpCount < 1) {DO_SITE(cross * -1.0f, 6);}
 						}
 					}
 				}
@@ -3612,7 +3612,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					DO_SITE(vecs[0] * -1.0f, 4);
 					if (lpCount < 2) {
 						DO_SITE(cross1, 5);
-						if (lpCount < 1) DO_SITE(cross2, 6);
+						if (lpCount < 1) {DO_SITE(cross2, 6);}
 					}
 				}
 
@@ -3644,7 +3644,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					DO_SITE(ortho_vec * -1.0f, 4);
 					if (lpCount < 2) {
 						DO_SITE(cross, 5);
-						if (lpCount < 1) DO_SITE(cross * -1.0f, 6);
+						if (lpCount < 1) {DO_SITE(cross * -1.0f, 6);}
 					}
 				}
 
@@ -3679,7 +3679,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 
 				if (nuninverted == 2) {
 					DO_SITE(vecs[uninverted[0]] * -1.0f, 5);
-					if (lpCount == 0) DO_SITE(vecs[uninverted[1]] * -1.0f, 6);
+					if (lpCount == 0) {DO_SITE(vecs[uninverted[1]] * -1.0f, 6);}
 				}
 				
 				else {
@@ -3688,7 +3688,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					Normalize3D(&cross);
 
 					DO_SITE(cross, 5);
-					if (lpCount == 0) DO_SITE(cross * -1.0f, 6);
+					if (lpCount == 0) {DO_SITE(cross * -1.0f, 6);}
 				}
 
 			}

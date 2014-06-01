@@ -4157,12 +4157,15 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 				//second line is the x-axis and total energy, either ttotal or stotal
 				//STOTAL=   1.49848 sqrt(amu)*bohr   tot. E=      -91.6219797490 Hartree
 				Buffer->GetLine(LineText);
-				if (runType == IRCRun)
-					if (!ReadFloatKeyword(LineText, "STOTAL", &xvalue))
+				if (runType == IRCRun) {
+					if (!ReadFloatKeyword(LineText, "STOTAL", &xvalue)) {
 						wxLogMessage(_("Unable to locate STOTAL in IRC data packet. Unable to position this packet in the sequence."));
-				else	//MD and DRC spell it TTOTAL
-					if (!ReadFloatKeyword(LineText, "TTOTAL", &xvalue))
+					}
+				} else {	//MD and DRC spell it TTOTAL
+					if (!ReadFloatKeyword(LineText, "TTOTAL", &xvalue)) {
 						wxLogMessage(_("Unable to locate TOTAL in trajectory data packet. Unable to position this packet in the sequence."));
+					}
+				}
 				ReadDoubleKeyword(LineText, "TOT. E", totE);
 			}
 
@@ -6275,7 +6278,7 @@ long SetAtomType(const unsigned char *TestLabel) {
 		case '*':	/*special atom types for special vectors*/
 			switch (label[1]) {
 				case 'c':	/*Charge centroids with dipole vectors*/
-					if (label[2]=='B' || label[2]=='b')
+					if (TestLabel[2]=='B' || TestLabel[2]=='b')
 						result = 117;
 					else
 						result = 116;
