@@ -164,7 +164,7 @@ void AboutwxMacMolPlt::CreateControls()
 	itemBoxSizer2->Add(itemButton18, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 ////@end AboutwxMacMolPlt content construction
-    mVersionText->SetLabel(_("MacMolPlt v"wxMacMolPlt_VERSION"\nBy Brett Bode"));
+    mVersionText->SetLabel(_("MacMolPlt v" wxMacMolPlt_VERSION "\nBy Brett Bode"));
 }
 
 /*!
