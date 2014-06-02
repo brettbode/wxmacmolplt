@@ -57,7 +57,7 @@ long StructureGroup::WriteCMLFile(void) const {
 	XMLSetup();
 	XMLDocument *xDoc = new XMLDocument(CML_convert(CMLElement), true, "CML uri");
 	XMLElement *xmlRoot = xDoc->getDocumentRoot();
-	xmlRoot->addAttribute("xmlns", "http://www.xml-cml.org/schema/cml2/core");
+	xmlRoot->addAttribute("xmlns", "http://www.xml-cml.org/schema/schema24/schema.xsd");
 
 	XMLElement *MetaDataListXML = xmlRoot->addChildElement(CML_convert(MetaDataListElement));
 	XMLElement *el = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
