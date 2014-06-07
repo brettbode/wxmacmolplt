@@ -52,13 +52,9 @@ IMPLEMENT_DYNAMIC_CLASS( EnergyPlotDialog, wxFrame )
 
 BEGIN_EVENT_TABLE( EnergyPlotDialog, wxFrame )
 ////@begin EnergyPlotDialog event table entries
-    EVT_CLOSE( EnergyPlotDialog::OnCloseWindow )
-
-    EVT_MENU( wxID_COPY, EnergyPlotDialog::OnCopyClick )
-
-    EVT_AXIS_DCLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphAxisDClick)
-    EVT_GRAPH_CLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphGraphClick)
-
+	EVT_CLOSE( EnergyPlotDialog::OnCloseWindow )
+	EVT_MENU( wxID_CLOSE, EnergyPlotDialog::OnCloseEvent )
+	EVT_MENU( wxID_COPY, EnergyPlotDialog::OnCopyClick )
 ////@end EnergyPlotDialog event table entries
 	// Key down should work, but I do not get any key events, so instead tackling from the other
 	// approach using the Char_hook
@@ -86,18 +82,18 @@ EnergyPlotDialog::EnergyPlotDialog( wxWindow* parent, wxWindowID id, const wxStr
 bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin EnergyPlotDialog member initialisation
-    epGraph = NULL;
+	epGraph = NULL;
 ////@end EnergyPlotDialog member initialisation
 
 ////@begin EnergyPlotDialog creation
-    wxFrame::Create( parent, id, caption, pos, size, style );
+	wxFrame::Create( parent, id, caption, pos, size, style );
 
-    CreateControls();
-    if (GetSizer())
-    {
-        GetSizer()->SetSizeHints(this);
-    }
-    Centre();
+	CreateControls();
+	if (GetSizer())
+	{
+		GetSizer()->SetSizeHints(this);
+	}
+	Centre();
 ////@end EnergyPlotDialog creation
 
     // Add data to epGraph
@@ -113,28 +109,33 @@ bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& 
 void EnergyPlotDialog::CreateControls()
 {    
 ////@begin EnergyPlotDialog content construction
-    EnergyPlotDialog* itemFrame1 = this;
+	EnergyPlotDialog* itemFrame1 = this;
 
-    wxMenuBar* menuBar = new wxMenuBar;
-    wxMenu* itemMenu3 = new wxMenu;
-    itemMenu3->Append(wxID_COPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
-    menuBar->Append(itemMenu3, _("&Edit"));
-    itemFrame1->SetMenuBar(menuBar);
+	wxMenuBar* menuBar = new wxMenuBar;
+	wxMenu* itemMenu3 = new wxMenu;
+	itemMenu3->Append(wxID_CLOSE, _("&Close Window\tCtrl+W"), wxEmptyString, wxITEM_NORMAL);
+	itemMenu3->AppendSeparator();
+	itemMenu3->Append(wxID_EXIT, _("&Quit\tCtrl+Q"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(itemMenu3, _("&File"));
+	wxMenu* itemMenu7 = new wxMenu;
+	itemMenu7->Append(wxID_COPY, _("&Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(itemMenu7, _("&Edit"));
+	itemFrame1->SetMenuBar(menuBar);
 
-    wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxVERTICAL);
-    itemFrame1->SetSizer(itemBoxSizer5);
+	wxBoxSizer* itemBoxSizer9 = new wxBoxSizer(wxVERTICAL);
+	itemFrame1->SetSizer(itemBoxSizer9);
 
-    wxPanel* itemPanel6 = new wxPanel( itemFrame1, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-    itemBoxSizer5->Add(itemPanel6, 1, wxGROW, 0);
+	wxPanel* itemPanel10 = new wxPanel( itemFrame1, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	itemBoxSizer9->Add(itemPanel10, 1, wxGROW, 0);
 
-    wxBoxSizer* itemBoxSizer7 = new wxBoxSizer(wxVERTICAL);
-    itemPanel6->SetSizer(itemBoxSizer7);
+	wxBoxSizer* itemBoxSizer11 = new wxBoxSizer(wxVERTICAL);
+	itemPanel10->SetSizer(itemBoxSizer11);
 
-    epGraph = new wxMolGraph( itemPanel6, ID_EPGRAPH, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-    itemBoxSizer7->Add(epGraph, 1, wxGROW|wxALL, 5);
+	epGraph = new wxMolGraph( itemPanel10, ID_EPGRAPH, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
+	itemBoxSizer11->Add(epGraph, 1, wxGROW|wxALL, 5);
 
 ////@end EnergyPlotDialog content construction
-    itemMenu3->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
+    itemMenu7->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
     wxMenu * menuHelp = new wxMenu;
     menuHelp->Append(wxID_ABOUT, wxT("&About"));
     menuBar->Append(menuHelp, wxT("&Help"));
@@ -157,8 +158,8 @@ wxBitmap EnergyPlotDialog::GetBitmapResource( const wxString& name )
 {
     // Bitmap retrieval
 ////@begin EnergyPlotDialog bitmap retrieval
-    wxUnusedVar(name);
-    return wxNullBitmap;
+	wxUnusedVar(name);
+	return wxNullBitmap;
 ////@end EnergyPlotDialog bitmap retrieval
 }
 
@@ -170,8 +171,8 @@ wxIcon EnergyPlotDialog::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 ////@begin EnergyPlotDialog icon retrieval
-    wxUnusedVar(name);
-    return wxNullIcon;
+	wxUnusedVar(name);
+	return wxNullIcon;
 ////@end EnergyPlotDialog icon retrieval
 }
 
@@ -293,7 +294,7 @@ void EnergyPlotDialog::OnEpgraphAxisDClick( wxCommandEvent& event )
  * wxEVT_CLOSE_WINDOW event handler for ID_ENERGYPLOTDIALOG
  */
 
-void EnergyPlotDialog::OnCloseWindow( wxCloseEvent& event )
+void EnergyPlotDialog::OnCloseEvent( wxCommandEvent& event )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->CloseEnergy_plotWindow();
@@ -350,3 +351,17 @@ void EnergyPlotDialog::KeyHandler(wxKeyEvent & event) {
 		}
 	}	event.Skip();
 }
+
+
+/*!
+ * wxEVT_CLOSE_WINDOW event handler for ID_EPLOTDIALOG
+ */
+
+void EnergyPlotDialog::OnCloseWindow( wxCloseEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    parent->CloseEnergy_plotWindow();
+}
+
+
+
