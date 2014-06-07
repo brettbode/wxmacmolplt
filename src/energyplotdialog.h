@@ -39,7 +39,7 @@ class wxMolGraph;
 
 ////@begin control identifiers
 #define ID_EPLOTDIALOG 10065
-#define SYMBOL_ENERGYPLOTDIALOG_STYLE wxDEFAULT_FRAME_STYLE|wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
+#define SYMBOL_ENERGYPLOTDIALOG_STYLE wxDEFAULT_FRAME_STYLE|wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX|wxWANTS_CHARS
 #define SYMBOL_ENERGYPLOTDIALOG_TITLE _("Energy Plot")
 #define SYMBOL_ENERGYPLOTDIALOG_IDNAME ID_EPLOTDIALOG
 #define SYMBOL_ENERGYPLOTDIALOG_SIZE wxDefaultSize
@@ -91,6 +91,7 @@ public:
     void OnEpgraphGraphClick( wxCommandEvent& event );
 
 ////@end EnergyPlotDialog event handler declarations
+	void KeyHandler(wxKeyEvent &event);
 
 ////@begin EnergyPlotDialog member function declarations
 

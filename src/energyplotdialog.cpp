@@ -60,6 +60,10 @@ BEGIN_EVENT_TABLE( EnergyPlotDialog, wxFrame )
     EVT_GRAPH_CLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphGraphClick)
 
 ////@end EnergyPlotDialog event table entries
+	// Key down should work, but I do not get any key events, so instead tackling from the other
+	// approach using the Char_hook
+//	EVT_KEY_DOWN (EnergyPlotDialog::KeyHandler)
+	EVT_CHAR_HOOK (EnergyPlotDialog::KeyHandler)
 END_EVENT_TABLE()
 
 /*!
@@ -330,4 +334,19 @@ void EnergyPlotDialog::CopyToBitMap(wxBitmap ** target) {
     epGraph->draw(tempDC);
 
     tempDC.SelectObject(wxNullBitmap);
+}
+
+void EnergyPlotDialog::KeyHandler(wxKeyEvent & event) {
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	int key = event.GetKeyCode();
+	if (!event.HasModifiers()) {
+		switch (key) {
+			case WXK_LEFT:
+			case WXK_RIGHT:
+			case WXK_HOME:
+			case WXK_END:
+				parent->KeyHandler(event);
+				break;
+		}
+	}	event.Skip();
 }
