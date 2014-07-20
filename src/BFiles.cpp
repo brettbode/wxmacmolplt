@@ -359,6 +359,33 @@ wxFileOffset BufferFile::FindGroup(const char * GroupName) {
 	return result;
 }
 
+/** Search the file for the keywords FINAL and ENERGY on the same line until found, EOF,
+ * or the limit is reached. Useful for GAMESS log files.
+ * Returns true or false, the file position upon exit will be the start of "FINAL",
+ * or the starting position if the keyword is not found.
+ * @param Limit (optional) The file position limit (in bytes) to limit the search. -1 will
+ *							search to the end of the file.
+ */
+bool BufferFile::LocateFinalEnergy(wxFileOffset Limit) {
+	bool result = false;
+	char LineText[kMaxLineLength];
+	
+	wxFileOffset StartPos = GetFilePos();
+	
+	while (LocateKeyWord("FINAL", 5, Limit)) {
+		wxFileOffset FINALPos = GetFilePos();
+		GetLine(LineText);
+		int LinePos = FindKeyWord(LineText, "ENERGY", 6);
+		if (LinePos > -1) {	//Found energy on the same line
+			SetFilePos(FINALPos);
+			result = true;
+			break;
+		}
+	}
+	if (!result) SetFilePos(StartPos);
+	return result;
+}
+
 void BufferFile::AdvanceBuffer(void) {
 	if (IOType == 1) {	//Write mode
 		long BytesToWrite = MIN(BufferSize, BufferPos);

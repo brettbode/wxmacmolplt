@@ -2431,7 +2431,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	if (Append) {
 		Buffer->LocateKeyWord("RUN TITLE", 9);	//find and skip over run title since
 		Buffer->SkipnLines(3);					//it can contain any arbitrary text
-		if (Buffer->LocateKeyWord("FINAL", 5)) {//locate initial energy since all options are before it
+		if (Buffer->LocateFinalEnergy()) {//locate initial energy since all options are before it
 			EnergyPos = Buffer->GetFilePos();
 			Buffer->SetFilePos(HeaderEndPos);
 		}
@@ -2851,7 +2851,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			return OpenGAMESSGlobOpLog(Buffer, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
 
 		HeaderEndPos = Buffer->GetFilePos();
-		if (Buffer->LocateKeyWord("FINAL", 5)) {//locate initial energy
+		if (Buffer->LocateFinalEnergy()) {//locate initial energy
 			EnergyPos = Buffer->GetFilePos();
 			Buffer->SetFilePos(HeaderEndPos);
 		}
@@ -2937,7 +2937,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				//Attempt to read in orbitals for first geometry
 			SavedPos = Buffer->GetFilePos();
 			NextFinalPos = -1;
-			if (Buffer->LocateKeyWord("FINAL", 5)) NextFinalPos = Buffer->GetFilePos();
+			if (Buffer->LocateFinalEnergy()) NextFinalPos = Buffer->GetFilePos();
 			Buffer->SetFilePos(SavedPos);
 			if (MainData->Basis) {
 				try {
@@ -3171,7 +3171,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			//If there isn't one then we are done with the geometries
 		if (Buffer->LocateKeyWord(OptKeywords) < 0) break;
 		StartPos = Buffer->GetFilePos();
-		if (Buffer->LocateKeyWord("FINAL", 5)) {	//Search for final and energy on the same line
+		if (Buffer->LocateFinalEnergy()) {	//Search for final and energy on the same line
 			Buffer->GetLine(LineText);				//since final also appears in LMO calcs.
 			LinePos = FindKeyWord(LineText, "ENERGY", 6);
 			if (LinePos > -1) {
