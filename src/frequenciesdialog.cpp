@@ -313,9 +313,12 @@ void FrequenciesDialog::OnCustomGraphClick( wxCommandEvent& event )
 void FrequenciesDialog::OnPrevmodeClick( wxCommandEvent& event )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
-    if(parent->GetData()->cFrame->Vibs->CurrentMode > 0) {
-        parent->ChangeModes(parent->GetData()->cFrame->Vibs->CurrentMode - 1);
-    }
+    MoleculeData *MainData = parent->GetData();
+	if (MainData->cFrame->Vibs) {
+		if(MainData->cFrame->Vibs->CurrentMode > 0) {
+			parent->ChangeModes(MainData->cFrame->Vibs->CurrentMode - 1);
+		}
+	}
 }
 
 /*!
@@ -325,9 +328,12 @@ void FrequenciesDialog::OnPrevmodeClick( wxCommandEvent& event )
 void FrequenciesDialog::OnNextmodeClick( wxCommandEvent& event )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
-    if(parent->GetData()->cFrame->Vibs->CurrentMode < parent->GetData()->cFrame->Vibs->NumModes - 1) {
-        parent->ChangeModes(parent->GetData()->cFrame->Vibs->CurrentMode + 1);
-    }
+	MoleculeData *MainData = parent->GetData();
+	if (MainData->cFrame->Vibs) {
+		if(MainData->cFrame->Vibs->CurrentMode < MainData->cFrame->Vibs->NumModes - 1) {
+			parent->ChangeModes(MainData->cFrame->Vibs->CurrentMode + 1);
+		}
+	}
 }
 
 
