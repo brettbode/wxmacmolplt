@@ -89,6 +89,9 @@ public:
 	/// wxEVT_CLOSE_WINDOW event handler for ID_FREQDIALOG
 	void OnCloseWindow( wxCloseEvent& event );
 
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE
+	void OnCloseEvent( wxCommandEvent& event );
+
 	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_FREQCOPY
 	void OnFreqcopyClick( wxCommandEvent& event );
 

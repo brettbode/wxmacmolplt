@@ -50,25 +50,17 @@ IMPLEMENT_CLASS( FrequenciesDialog, wxFrame )
 BEGIN_EVENT_TABLE( FrequenciesDialog, wxFrame )
 ////@begin FrequenciesDialog event table entries
 	EVT_CLOSE( FrequenciesDialog::OnCloseWindow )
-
+	EVT_MENU( wxID_CLOSE, FrequenciesDialog::OnCloseEvent )
 	EVT_MENU( ID_FREQCOPY, FrequenciesDialog::OnFreqcopyClick )
-
 	EVT_MENU( ID_PREVMODE, FrequenciesDialog::OnPrevmodeClick )
 	EVT_UPDATE_UI( ID_PREVMODE, FrequenciesDialog::OnPrevmodeUpdate )
-
 	EVT_MENU( ID_NEXTMODE, FrequenciesDialog::OnNextmodeClick )
 	EVT_UPDATE_UI( ID_NEXTMODE, FrequenciesDialog::OnNextmodeUpdate )
-
 	EVT_MENU( ID_MENUIRINTEN, FrequenciesDialog::OnMenuirintenClick )
-
 	EVT_MENU( ID_MENURAMANINTEN, FrequenciesDialog::OnMenuramanintenClick )
-
 	EVT_MENU( ID_MENUZOOMIN, FrequenciesDialog::OnMenuzoominClick )
-
 	EVT_MENU( ID_MENUZOOMOUT, FrequenciesDialog::OnMenuzoomoutClick )
-
 	EVT_LISTBOX( ID_FREQLISTBOX, FrequenciesDialog::OnFreqlistboxSelected )
-
 ////@end FrequenciesDialog event table entries
 	EVT_GRAPH_CLICK(ID_CUSTOM, FrequenciesDialog::OnCustomGraphClick)
 END_EVENT_TABLE()
@@ -124,40 +116,45 @@ void FrequenciesDialog::CreateControls()
 
 	wxMenuBar* menuBar = new wxMenuBar;
 	wxMenu* itemMenu3 = new wxMenu;
-	itemMenu3->Append(ID_FREQCOPY, _("&Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
-	menuBar->Append(itemMenu3, _("&Edit"));
-	wxMenu* itemMenu5 = new wxMenu;
-	itemMenu5->Append(ID_PREVMODE, _("&Previous Normal Mode\tCtrl+["), wxEmptyString, wxITEM_NORMAL);
-	itemMenu5->Append(ID_NEXTMODE, _("Ne&xt Normal Mode\tCtrl+]"), wxEmptyString, wxITEM_NORMAL);
-	itemMenu5->AppendSeparator();
-	itemMenu5->Append(ID_MENUIRINTEN, _("Show &IR Intensity"), wxEmptyString, wxITEM_RADIO);
-	itemMenu5->Append(ID_MENURAMANINTEN, _("Show &Raman Intensity"), wxEmptyString, wxITEM_RADIO);
-	itemMenu5->AppendSeparator();
-	itemMenu5->Append(ID_MENUZOOMIN, _("Zoom In\tCtrl++"), wxEmptyString, wxITEM_NORMAL);
-	itemMenu5->Append(ID_MENUZOOMOUT, _("Zoom Out\tCtrl+-"), wxEmptyString, wxITEM_NORMAL);
-	menuBar->Append(itemMenu5, _("&View"));
+	itemMenu3->Append(wxID_CLOSE, _("&Close Window\tCtrl+W"), wxEmptyString, wxITEM_NORMAL);
+	itemMenu3->AppendSeparator();
+	itemMenu3->Append(wxID_EXIT, _("&Quit\tCtrl+Q"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(itemMenu3, _("&File"));
+	wxMenu* itemMenu7 = new wxMenu;
+	itemMenu7->Append(ID_FREQCOPY, _("&Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(itemMenu7, _("&Edit"));
+	wxMenu* itemMenu9 = new wxMenu;
+	itemMenu9->Append(ID_PREVMODE, _("&Previous Normal Mode\tCtrl+["), wxEmptyString, wxITEM_NORMAL);
+	itemMenu9->Append(ID_NEXTMODE, _("Ne&xt Normal Mode\tCtrl+]"), wxEmptyString, wxITEM_NORMAL);
+	itemMenu9->AppendSeparator();
+	itemMenu9->Append(ID_MENUIRINTEN, _("Show &IR Intensity"), wxEmptyString, wxITEM_RADIO);
+	itemMenu9->Append(ID_MENURAMANINTEN, _("Show &Raman Intensity"), wxEmptyString, wxITEM_RADIO);
+	itemMenu9->AppendSeparator();
+	itemMenu9->Append(ID_MENUZOOMIN, _("Zoom In\tCtrl++"), wxEmptyString, wxITEM_NORMAL);
+	itemMenu9->Append(ID_MENUZOOMOUT, _("Zoom Out\tCtrl+-"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(itemMenu9, _("&View"));
 	itemFrame1->SetMenuBar(menuBar);
 
-	wxBoxSizer* itemBoxSizer14 = new wxBoxSizer(wxVERTICAL);
-	itemFrame1->SetSizer(itemBoxSizer14);
+	wxBoxSizer* itemBoxSizer18 = new wxBoxSizer(wxVERTICAL);
+	itemFrame1->SetSizer(itemBoxSizer18);
 
-	wxPanel* itemPanel15 = new wxPanel( itemFrame1, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-	itemBoxSizer14->Add(itemPanel15, 1, wxGROW, 0);
+	wxPanel* itemPanel19 = new wxPanel( itemFrame1, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	itemBoxSizer18->Add(itemPanel19, 1, wxGROW, 0);
 
-	wxBoxSizer* itemBoxSizer16 = new wxBoxSizer(wxVERTICAL);
-	itemPanel15->SetSizer(itemBoxSizer16);
+	wxBoxSizer* itemBoxSizer20 = new wxBoxSizer(wxVERTICAL);
+	itemPanel19->SetSizer(itemBoxSizer20);
 
-	wxBoxSizer* itemBoxSizer17 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer16->Add(itemBoxSizer17, 1, wxGROW|wxALL, 5);
+	wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer20->Add(itemBoxSizer21, 1, wxGROW|wxALL, 5);
 
 	wxArrayString mFreqListBoxStrings;
-	mFreqListBox = new wxListBox( itemPanel15, ID_FREQLISTBOX, wxDefaultPosition, wxDefaultSize, mFreqListBoxStrings, wxLB_SINGLE );
+	mFreqListBox = new wxListBox( itemPanel19, ID_FREQLISTBOX, wxDefaultPosition, wxDefaultSize, mFreqListBoxStrings, wxLB_SINGLE );
 	if (FrequenciesDialog::ShowToolTips())
 		mFreqListBox->SetToolTip(_("Click the frequency to display the desired mode."));
-	itemBoxSizer17->Add(mFreqListBox, 0, wxGROW|wxALL, 5);
+	itemBoxSizer21->Add(mFreqListBox, 0, wxGROW|wxALL, 5);
 
-	fGraph = new wxMolGraph( itemPanel15, ID_CUSTOM, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-	itemBoxSizer17->Add(fGraph, 1, wxGROW|wxALL, 5);
+	fGraph = new wxMolGraph( itemPanel19, ID_CUSTOM, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
+	itemBoxSizer21->Add(fGraph, 1, wxGROW|wxALL, 5);
 
 ////@end FrequenciesDialog content construction
     itemMenu3->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
@@ -447,5 +444,16 @@ void FrequenciesDialog::OnNextmodeUpdate( wxUpdateUIEvent& event )
 	if (MainData->cFrame->Vibs) {
 		event.Enable((MainData->cFrame->Vibs->NumModes > 0)&&(MainData->cFrame->Vibs->GetCurrentMode() < MainData->cFrame->Vibs->GetNumModes()-1));
 	} else event.Enable(false);
+}
+
+
+/*!
+ * wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE
+ */
+
+void FrequenciesDialog::OnCloseEvent( wxCommandEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+    parent->CloseFrequenciesWindow();
 }
 
