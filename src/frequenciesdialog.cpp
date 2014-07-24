@@ -49,25 +49,25 @@ IMPLEMENT_CLASS( FrequenciesDialog, wxFrame )
 
 BEGIN_EVENT_TABLE( FrequenciesDialog, wxFrame )
 ////@begin FrequenciesDialog event table entries
-    EVT_CLOSE( FrequenciesDialog::OnCloseWindow )
+	EVT_CLOSE( FrequenciesDialog::OnCloseWindow )
 
-    EVT_MENU( ID_FREQCOPY, FrequenciesDialog::OnFreqcopyClick )
+	EVT_MENU( ID_FREQCOPY, FrequenciesDialog::OnFreqcopyClick )
 
-    EVT_MENU( ID_PREVMODE, FrequenciesDialog::OnPrevmodeClick )
+	EVT_MENU( ID_PREVMODE, FrequenciesDialog::OnPrevmodeClick )
+	EVT_UPDATE_UI( ID_PREVMODE, FrequenciesDialog::OnPrevmodeUpdate )
 
-    EVT_MENU( ID_NEXTMODE, FrequenciesDialog::OnNextmodeClick )
+	EVT_MENU( ID_NEXTMODE, FrequenciesDialog::OnNextmodeClick )
+	EVT_UPDATE_UI( ID_NEXTMODE, FrequenciesDialog::OnNextmodeUpdate )
 
-    EVT_MENU( ID_MENUIRINTEN, FrequenciesDialog::OnMenuirintenClick )
+	EVT_MENU( ID_MENUIRINTEN, FrequenciesDialog::OnMenuirintenClick )
 
-    EVT_MENU( ID_MENURAMANINTEN, FrequenciesDialog::OnMenuramanintenClick )
+	EVT_MENU( ID_MENURAMANINTEN, FrequenciesDialog::OnMenuramanintenClick )
 
-    EVT_MENU( ID_MENUZOOMIN, FrequenciesDialog::OnMenuzoominClick )
+	EVT_MENU( ID_MENUZOOMIN, FrequenciesDialog::OnMenuzoominClick )
 
-    EVT_MENU( ID_MENUZOOMOUT, FrequenciesDialog::OnMenuzoomoutClick )
+	EVT_MENU( ID_MENUZOOMOUT, FrequenciesDialog::OnMenuzoomoutClick )
 
-    EVT_LISTBOX( ID_FREQLISTBOX, FrequenciesDialog::OnFreqlistboxSelected )
-
-    EVT_GRAPH_CLICK(ID_CUSTOM, FrequenciesDialog::OnCustomGraphClick)
+	EVT_LISTBOX( ID_FREQLISTBOX, FrequenciesDialog::OnFreqlistboxSelected )
 
 ////@end FrequenciesDialog event table entries
 	EVT_GRAPH_CLICK(ID_CUSTOM, FrequenciesDialog::OnCustomGraphClick)
@@ -93,19 +93,19 @@ FrequenciesDialog::FrequenciesDialog( wxWindow* parent, wxWindowID id, const wxS
 bool FrequenciesDialog::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin FrequenciesDialog member initialisation
-    mFreqListBox = NULL;
-    fGraph = NULL;
+	mFreqListBox = NULL;
+	fGraph = NULL;
 ////@end FrequenciesDialog member initialisation
 
 ////@begin FrequenciesDialog creation
-    wxFrame::Create( parent, id, caption, pos, size, style );
+	wxFrame::Create( parent, id, caption, pos, size, style );
 
-    CreateControls();
-    if (GetSizer())
-    {
-        GetSizer()->SetSizeHints(this);
-    }
-    Centre();
+	CreateControls();
+	if (GetSizer())
+	{
+		GetSizer()->SetSizeHints(this);
+	}
+	Centre();
 ////@end FrequenciesDialog creation
 
     RegenData();
@@ -120,44 +120,44 @@ bool FrequenciesDialog::Create( wxWindow* parent, wxWindowID id, const wxString&
 void FrequenciesDialog::CreateControls()
 {    
 ////@begin FrequenciesDialog content construction
-    FrequenciesDialog* itemFrame1 = this;
+	FrequenciesDialog* itemFrame1 = this;
 
-    wxMenuBar* menuBar = new wxMenuBar;
-    wxMenu* itemMenu3 = new wxMenu;
-    itemMenu3->Append(ID_FREQCOPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
-    menuBar->Append(itemMenu3, _("&Edit"));
-    wxMenu* itemMenu5 = new wxMenu;
-    itemMenu5->Append(ID_PREVMODE, _("&Previous Normal Mode\tCtrl+["), _T(""), wxITEM_NORMAL);
-    itemMenu5->Append(ID_NEXTMODE, _("Ne&xt Normal Mode\tCtrl+]"), _T(""), wxITEM_NORMAL);
-    itemMenu5->AppendSeparator();
-    itemMenu5->Append(ID_MENUIRINTEN, _("Show &IR Intensity"), _T(""), wxITEM_RADIO);
-    itemMenu5->Append(ID_MENURAMANINTEN, _("Show &Raman Intensity"), _T(""), wxITEM_RADIO);
-    itemMenu5->AppendSeparator();
-    itemMenu5->Append(ID_MENUZOOMIN, _("Zoom In\tCtrl++"), _T(""), wxITEM_NORMAL);
-    itemMenu5->Append(ID_MENUZOOMOUT, _("Zoom Out\tCtrl+-"), _T(""), wxITEM_NORMAL);
-    menuBar->Append(itemMenu5, _("&View"));
-    itemFrame1->SetMenuBar(menuBar);
+	wxMenuBar* menuBar = new wxMenuBar;
+	wxMenu* itemMenu3 = new wxMenu;
+	itemMenu3->Append(ID_FREQCOPY, _("&Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(itemMenu3, _("&Edit"));
+	wxMenu* itemMenu5 = new wxMenu;
+	itemMenu5->Append(ID_PREVMODE, _("&Previous Normal Mode\tCtrl+["), wxEmptyString, wxITEM_NORMAL);
+	itemMenu5->Append(ID_NEXTMODE, _("Ne&xt Normal Mode\tCtrl+]"), wxEmptyString, wxITEM_NORMAL);
+	itemMenu5->AppendSeparator();
+	itemMenu5->Append(ID_MENUIRINTEN, _("Show &IR Intensity"), wxEmptyString, wxITEM_RADIO);
+	itemMenu5->Append(ID_MENURAMANINTEN, _("Show &Raman Intensity"), wxEmptyString, wxITEM_RADIO);
+	itemMenu5->AppendSeparator();
+	itemMenu5->Append(ID_MENUZOOMIN, _("Zoom In\tCtrl++"), wxEmptyString, wxITEM_NORMAL);
+	itemMenu5->Append(ID_MENUZOOMOUT, _("Zoom Out\tCtrl+-"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(itemMenu5, _("&View"));
+	itemFrame1->SetMenuBar(menuBar);
 
-    wxBoxSizer* itemBoxSizer14 = new wxBoxSizer(wxVERTICAL);
-    itemFrame1->SetSizer(itemBoxSizer14);
+	wxBoxSizer* itemBoxSizer14 = new wxBoxSizer(wxVERTICAL);
+	itemFrame1->SetSizer(itemBoxSizer14);
 
-    wxPanel* itemPanel15 = new wxPanel( itemFrame1, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-    itemBoxSizer14->Add(itemPanel15, 1, wxGROW, 0);
+	wxPanel* itemPanel15 = new wxPanel( itemFrame1, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	itemBoxSizer14->Add(itemPanel15, 1, wxGROW, 0);
 
-    wxBoxSizer* itemBoxSizer16 = new wxBoxSizer(wxVERTICAL);
-    itemPanel15->SetSizer(itemBoxSizer16);
+	wxBoxSizer* itemBoxSizer16 = new wxBoxSizer(wxVERTICAL);
+	itemPanel15->SetSizer(itemBoxSizer16);
 
-    wxBoxSizer* itemBoxSizer17 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer16->Add(itemBoxSizer17, 1, wxGROW|wxALL, 5);
+	wxBoxSizer* itemBoxSizer17 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer16->Add(itemBoxSizer17, 1, wxGROW|wxALL, 5);
 
-    wxString* mFreqListBoxStrings = NULL;
-    mFreqListBox = new wxListBox( itemPanel15, ID_FREQLISTBOX, wxDefaultPosition, wxDefaultSize, 0, mFreqListBoxStrings, wxLB_SINGLE );
-    if (ShowToolTips())
-        mFreqListBox->SetToolTip(_("Click the frequency to display the desired mode."));
-    itemBoxSizer17->Add(mFreqListBox, 0, wxGROW|wxALL, 5);
+	wxArrayString mFreqListBoxStrings;
+	mFreqListBox = new wxListBox( itemPanel15, ID_FREQLISTBOX, wxDefaultPosition, wxDefaultSize, mFreqListBoxStrings, wxLB_SINGLE );
+	if (FrequenciesDialog::ShowToolTips())
+		mFreqListBox->SetToolTip(_("Click the frequency to display the desired mode."));
+	itemBoxSizer17->Add(mFreqListBox, 0, wxGROW|wxALL, 5);
 
-    fGraph = new wxMolGraph( itemPanel15, ID_CUSTOM, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
-    itemBoxSizer17->Add(fGraph, 1, wxGROW|wxALL, 5);
+	fGraph = new wxMolGraph( itemPanel15, ID_CUSTOM, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER );
+	itemBoxSizer17->Add(fGraph, 1, wxGROW|wxALL, 5);
 
 ////@end FrequenciesDialog content construction
     itemMenu3->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
@@ -183,8 +183,8 @@ wxBitmap FrequenciesDialog::GetBitmapResource( const wxString& name )
 {
     // Bitmap retrieval
 ////@begin FrequenciesDialog bitmap retrieval
-    wxUnusedVar(name);
-    return wxNullBitmap;
+	wxUnusedVar(name);
+	return wxNullBitmap;
 ////@end FrequenciesDialog bitmap retrieval
 }
 
@@ -196,8 +196,8 @@ wxIcon FrequenciesDialog::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 ////@begin FrequenciesDialog icon retrieval
-    wxUnusedVar(name);
-    return wxNullIcon;
+	wxUnusedVar(name);
+	return wxNullIcon;
 ////@end FrequenciesDialog icon retrieval
 }
 /*!
@@ -420,3 +420,32 @@ void FrequenciesDialog::OnMenuzoomoutClick( wxCommandEvent& event )
 	
 	Refresh();
 }
+
+
+/*!
+ * wxEVT_UPDATE_UI event handler for ID_PREVMODE
+ */
+
+void FrequenciesDialog::OnPrevmodeUpdate( wxUpdateUIEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	MoleculeData *MainData = parent->GetData();
+	if (MainData->cFrame->Vibs) {
+		event.Enable((MainData->cFrame->Vibs->NumModes > 0)&&(MainData->cFrame->Vibs->GetCurrentMode() > 0));
+	} else event.Enable(false);
+}
+
+
+/*!
+ * wxEVT_UPDATE_UI event handler for ID_NEXTMODE
+ */
+
+void FrequenciesDialog::OnNextmodeUpdate( wxUpdateUIEvent& event )
+{
+    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	MoleculeData *MainData = parent->GetData();
+	if (MainData->cFrame->Vibs) {
+		event.Enable((MainData->cFrame->Vibs->NumModes > 0)&&(MainData->cFrame->Vibs->GetCurrentMode() < MainData->cFrame->Vibs->GetNumModes()-1));
+	} else event.Enable(false);
+}
+

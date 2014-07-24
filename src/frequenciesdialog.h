@@ -40,11 +40,6 @@ class wxMolGraph;
 
 ////@begin control identifiers
 #define ID_FREQDIALOG 10054
-#define SYMBOL_FREQUENCIESDIALOG_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
-#define SYMBOL_FREQUENCIESDIALOG_TITLE _("Frequencies")
-#define SYMBOL_FREQUENCIESDIALOG_IDNAME ID_FREQDIALOG
-#define SYMBOL_FREQUENCIESDIALOG_SIZE wxDefaultSize
-#define SYMBOL_FREQUENCIESDIALOG_POSITION wxDefaultPosition
 #define ID_FREQCOPY 10170
 #define ID_PREVMODE 10084
 #define ID_NEXTMODE 10085
@@ -55,6 +50,11 @@ class wxMolGraph;
 #define ID_PANEL4 10226
 #define ID_FREQLISTBOX 10143
 #define ID_CUSTOM 10066
+#define SYMBOL_FREQUENCIESDIALOG_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
+#define SYMBOL_FREQUENCIESDIALOG_TITLE _("Frequencies")
+#define SYMBOL_FREQUENCIESDIALOG_IDNAME ID_FREQDIALOG
+#define SYMBOL_FREQUENCIESDIALOG_SIZE wxDefaultSize
+#define SYMBOL_FREQUENCIESDIALOG_POSITION wxDefaultPosition
 ////@end control identifiers
 
 /*!
@@ -86,46 +86,51 @@ public:
 
 ////@begin FrequenciesDialog event handler declarations
 
-    /// wxEVT_CLOSE_WINDOW event handler for ID_FREQDIALOG
-    void OnCloseWindow( wxCloseEvent& event );
+	/// wxEVT_CLOSE_WINDOW event handler for ID_FREQDIALOG
+	void OnCloseWindow( wxCloseEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_FREQCOPY
-    void OnFreqcopyClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_FREQCOPY
+	void OnFreqcopyClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_PREVMODE
-    void OnPrevmodeClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_PREVMODE
+	void OnPrevmodeClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_NEXTMODE
-    void OnNextmodeClick( wxCommandEvent& event );
+	/// wxEVT_UPDATE_UI event handler for ID_PREVMODE
+	void OnPrevmodeUpdate( wxUpdateUIEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUIRINTEN
-    void OnMenuirintenClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_NEXTMODE
+	void OnNextmodeClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENURAMANINTEN
-    void OnMenuramanintenClick( wxCommandEvent& event );
+	/// wxEVT_UPDATE_UI event handler for ID_NEXTMODE
+	void OnNextmodeUpdate( wxUpdateUIEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUZOOMIN
-    void OnMenuzoominClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUIRINTEN
+	void OnMenuirintenClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUZOOMOUT
-    void OnMenuzoomoutClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENURAMANINTEN
+	void OnMenuramanintenClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_LISTBOX_SELECTED event handler for ID_FREQLISTBOX
-    void OnFreqlistboxSelected( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUZOOMIN
+	void OnMenuzoominClick( wxCommandEvent& event );
 
-    /// wxEVT_GRAPH_CLICK event handler for ID_CUSTOM
-    void OnCustomGraphClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENUZOOMOUT
+	void OnMenuzoomoutClick( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_LISTBOX_SELECTED event handler for ID_FREQLISTBOX
+	void OnFreqlistboxSelected( wxCommandEvent& event );
 
 ////@end FrequenciesDialog event handler declarations
 
+	/// wxEVT_GRAPH_CLICK event handler for ID_CUSTOM
+	void OnCustomGraphClick( wxCommandEvent& event );
 
 ////@begin FrequenciesDialog member function declarations
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource( const wxString& name );
 
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+	/// Retrieves icon resources
+	wxIcon GetIconResource( const wxString& name );
 ////@end FrequenciesDialog member function declarations
 
     void FrameChanged(void);
@@ -136,8 +141,8 @@ public:
     static bool ShowToolTips();
 
 ////@begin FrequenciesDialog member variables
-    wxListBox* mFreqListBox;
-    wxMolGraph* fGraph;
+	wxListBox* mFreqListBox;
+	wxMolGraph* fGraph;
 ////@end FrequenciesDialog member variables
 };
 
