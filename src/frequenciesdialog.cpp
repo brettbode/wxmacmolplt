@@ -85,6 +85,7 @@ FrequenciesDialog::FrequenciesDialog( wxWindow* parent, wxWindowID id, const wxS
 bool FrequenciesDialog::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin FrequenciesDialog member initialisation
+	editMenu = NULL;
 	mFreqListBox = NULL;
 	fGraph = NULL;
 ////@end FrequenciesDialog member initialisation
@@ -120,9 +121,9 @@ void FrequenciesDialog::CreateControls()
 	itemMenu3->AppendSeparator();
 	itemMenu3->Append(wxID_EXIT, _("&Quit\tCtrl+Q"), wxEmptyString, wxITEM_NORMAL);
 	menuBar->Append(itemMenu3, _("&File"));
-	wxMenu* itemMenu7 = new wxMenu;
-	itemMenu7->Append(ID_FREQCOPY, _("&Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
-	menuBar->Append(itemMenu7, _("&Edit"));
+	editMenu = new wxMenu;
+	editMenu->Append(ID_FREQCOPY, _("&Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(editMenu, _("&Edit"));
 	wxMenu* itemMenu9 = new wxMenu;
 	itemMenu9->Append(ID_PREVMODE, _("&Previous Normal Mode\tCtrl+["), wxEmptyString, wxITEM_NORMAL);
 	itemMenu9->Append(ID_NEXTMODE, _("Ne&xt Normal Mode\tCtrl+]"), wxEmptyString, wxITEM_NORMAL);
@@ -157,7 +158,7 @@ void FrequenciesDialog::CreateControls()
 	itemBoxSizer21->Add(fGraph, 1, wxGROW|wxALL, 5);
 
 ////@end FrequenciesDialog content construction
-    itemMenu3->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
+    editMenu->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
     wxMenu * menuHelp = new wxMenu;
     menuHelp->Append(wxID_ABOUT, wxT("&About"));
     menuBar->Append(menuHelp, wxT("&Help"));

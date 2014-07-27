@@ -31,6 +31,7 @@
  */
 
 ////@begin forward declarations
+class wxMenu;
 class wxMolGraph;
 ////@end forward declarations
 
@@ -144,6 +145,7 @@ public:
     static bool ShowToolTips();
 
 ////@begin FrequenciesDialog member variables
+	wxMenu* editMenu;
 	wxListBox* mFreqListBox;
 	wxMolGraph* fGraph;
 ////@end FrequenciesDialog member variables
