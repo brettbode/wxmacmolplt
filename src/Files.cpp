@@ -682,6 +682,12 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				}
 
 				Buffer->GetLine(Line);
+					//At some point GAMESS started printing out all fragment atoms instead of the first three,
+					//since the code above has already properly obtained the full fixed fragment geometry just
+					//skip the user provided set which could be incorrect.
+				while (((0>FindKeyWord(Line, "FRAGNAME", 8))&&(0>FindKeyWord(Line, "$END", 4)))) {
+					Buffer->GetLine(Line);
+				}
 			}
 		}
 
