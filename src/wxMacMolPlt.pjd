@@ -9126,7 +9126,7 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
           <string name="app-kind">"Standard"</string>
           <long name="use-xrc">0</long>
           <long name="working-mode">0</long>
-          <string name="event-handler-0">"wxEVT_CLOSE_WINDOW|OnCloseWindow"</string>
+          <string name="event-handler-0">"wxEVT_CLOSE_WINDOW|OnCloseWindow|||EnergyPlotDialog"</string>
           <string name="proxy-Id name">"ID_EPLOTDIALOG"</string>
           <long name="proxy-Id value">10065</long>
           <string name="proxy-Class">"EnergyPlotDialog"</string>
@@ -9202,6 +9202,76 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
             <string name="proxy-Id name">"ID_MENUBAR1"</string>
             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
             <document>
+              <string name="title">"File"</string>
+              <string name="type">"dialog-control-document"</string>
+              <string name="filename">""</string>
+              <string name="icon-name">"menu"</string>
+              <long name="is-transient">0</long>
+              <long name="owns-file">1</long>
+              <long name="title-mode">0</long>
+              <long name="locked">0</long>
+              <string name="proxy-type">"wbMenuProxy"</string>
+              <string name="proxy-Label">"&amp;File"</string>
+              <bool name="proxy-Enabled">1</bool>
+              <string name="proxy-Member variable name">""</string>
+              <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              <document>
+                <string name="title">"&amp;Close Window\tCtrl+W: wxID_CLOSE"</string>
+                <string name="type">"dialog-control-document"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="owns-file">1</long>
+                <long name="title-mode">0</long>
+                <long name="locked">0</long>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnCloseEvent|NONE||EnergyPlotDialog"</string>
+                <string name="proxy-Id name">"wxID_CLOSE"</string>
+                <long name="proxy-Id value">5001</long>
+                <string name="proxy-Label">"&amp;Close Window\tCtrl+W"</string>
+                <string name="proxy-Kind">"Normal"</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              </document>
+              <document>
+                <string name="title">"------------"</string>
+                <string name="type">"dialog-control-document"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="owns-file">1</long>
+                <long name="title-mode">0</long>
+                <long name="locked">0</long>
+                <string name="proxy-type">"wbMenuSeparatorProxy"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              </document>
+              <document>
+                <string name="title">"&amp;Quit\tCtrl+Q: wxID_EXIT"</string>
+                <string name="type">"dialog-control-document"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="owns-file">1</long>
+                <long name="title-mode">0</long>
+                <long name="locked">0</long>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="proxy-Id name">"wxID_EXIT"</string>
+                <long name="proxy-Id value">5006</long>
+                <string name="proxy-Label">"&amp;Quit\tCtrl+Q"</string>
+                <string name="proxy-Kind">"Normal"</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              </document>
+            </document>
+            <document>
               <string name="title">"Edit"</string>
               <string name="type">"dialog-control-document"</string>
               <string name="filename">""</string>
@@ -9254,14 +9324,6 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -9465,7 +9527,7 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
           <string name="app-kind">"Standard"</string>
           <long name="use-xrc">0</long>
           <long name="working-mode">0</long>
-          <string name="event-handler-0">"wxEVT_CLOSE_WINDOW|OnCloseWindow"</string>
+          <string name="event-handler-0">"wxEVT_CLOSE_WINDOW|OnCloseWindow|||FrequenciesDialog"</string>
           <string name="proxy-Id name">"ID_FREQDIALOG"</string>
           <long name="proxy-Id value">10054</long>
           <string name="proxy-Class">"FrequenciesDialog"</string>
@@ -9541,6 +9603,76 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
             <string name="proxy-Id name">"ID_MENUBAR2"</string>
             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
             <document>
+              <string name="title">"File"</string>
+              <string name="type">"dialog-control-document"</string>
+              <string name="filename">""</string>
+              <string name="icon-name">"menu"</string>
+              <long name="is-transient">0</long>
+              <long name="owns-file">1</long>
+              <long name="title-mode">0</long>
+              <long name="locked">0</long>
+              <string name="proxy-type">"wbMenuProxy"</string>
+              <string name="proxy-Label">"&amp;File"</string>
+              <bool name="proxy-Enabled">1</bool>
+              <string name="proxy-Member variable name">""</string>
+              <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              <document>
+                <string name="title">"&amp;Close Window\tCtrl+W: wxID_CLOSE"</string>
+                <string name="type">"dialog-control-document"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="owns-file">1</long>
+                <long name="title-mode">0</long>
+                <long name="locked">0</long>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnCloseEvent|NONE||FrequenciesDialog"</string>
+                <string name="proxy-Id name">"wxID_CLOSE"</string>
+                <long name="proxy-Id value">5001</long>
+                <string name="proxy-Label">"&amp;Close Window\tCtrl+W"</string>
+                <string name="proxy-Kind">"Normal"</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              </document>
+              <document>
+                <string name="title">"------------"</string>
+                <string name="type">"dialog-control-document"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="owns-file">1</long>
+                <long name="title-mode">0</long>
+                <long name="locked">0</long>
+                <string name="proxy-type">"wbMenuSeparatorProxy"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              </document>
+              <document>
+                <string name="title">"&amp;Quit\tCtrl+Q: wxID_EXIT"</string>
+                <string name="type">"dialog-control-document"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="owns-file">1</long>
+                <long name="title-mode">0</long>
+                <long name="locked">0</long>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="proxy-Id name">"wxID_EXIT"</string>
+                <long name="proxy-Id value">5006</long>
+                <string name="proxy-Label">"&amp;Quit\tCtrl+Q"</string>
+                <string name="proxy-Kind">"Normal"</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              </document>
+            </document>
+            <document>
               <string name="title">"Edit"</string>
               <string name="type">"dialog-control-document"</string>
               <string name="filename">""</string>
@@ -9549,11 +9681,10 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
               <long name="owns-file">1</long>
               <long name="title-mode">0</long>
               <long name="locked">0</long>
-              <string name="created">"5/6/2006"</string>
               <string name="proxy-type">"wbMenuProxy"</string>
               <string name="proxy-Label">"&amp;Edit"</string>
               <bool name="proxy-Enabled">1</bool>
-              <string name="proxy-Member variable name">""</string>
+              <string name="proxy-Member variable name">"editMenu"</string>
               <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
               <document>
                 <string name="title">"&amp;Copy\tCtrl+C: ID_FREQCOPY"</string>
@@ -9564,7 +9695,6 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
                 <long name="owns-file">1</long>
                 <long name="title-mode">0</long>
                 <long name="locked">0</long>
-                <string name="created">"5/6/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
                 <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnFreqcopyClick"</string>
                 <string name="proxy-Id name">"ID_FREQCOPY"</string>
@@ -9588,7 +9718,6 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
               <long name="owns-file">1</long>
               <long name="title-mode">0</long>
               <long name="locked">0</long>
-              <string name="created">"5/6/2006"</string>
               <string name="proxy-type">"wbMenuProxy"</string>
               <string name="proxy-Label">"&amp;View"</string>
               <bool name="proxy-Enabled">1</bool>
@@ -9603,9 +9732,9 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
                 <long name="owns-file">1</long>
                 <long name="title-mode">0</long>
                 <long name="locked">0</long>
-                <string name="created">"5/6/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
-                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnPrevmodeClick"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnPrevmodeClick|||FrequenciesDialog"</string>
+                <string name="event-handler-1">"wxEVT_UPDATE_UI|OnPrevmodeUpdate|NONE||"</string>
                 <string name="proxy-Id name">"ID_PREVMODE"</string>
                 <long name="proxy-Id value">10084</long>
                 <string name="proxy-Label">"&amp;Previous Normal Mode\tCtrl+["</string>
@@ -9626,9 +9755,9 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
                 <long name="owns-file">1</long>
                 <long name="title-mode">0</long>
                 <long name="locked">0</long>
-                <string name="created">"5/6/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
-                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnNextmodeClick"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnNextmodeClick|||FrequenciesDialog"</string>
+                <string name="event-handler-1">"wxEVT_UPDATE_UI|OnNextmodeUpdate|NONE||FrequenciesDialog"</string>
                 <string name="proxy-Id name">"ID_NEXTMODE"</string>
                 <long name="proxy-Id value">10085</long>
                 <string name="proxy-Label">"Ne&amp;xt Normal Mode\tCtrl+]"</string>
@@ -9649,7 +9778,6 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
                 <long name="owns-file">1</long>
                 <long name="title-mode">0</long>
                 <long name="locked">0</long>
-                <string name="created">"28/6/2006"</string>
                 <string name="proxy-type">"wbMenuSeparatorProxy"</string>
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
               </document>
@@ -9662,7 +9790,6 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
                 <long name="owns-file">1</long>
                 <long name="title-mode">0</long>
                 <long name="locked">0</long>
-                <string name="created">"28/6/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
                 <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuirintenClick"</string>
                 <string name="proxy-Id name">"ID_MENUIRINTEN"</string>
@@ -9685,7 +9812,6 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
                 <long name="owns-file">1</long>
                 <long name="title-mode">0</long>
                 <long name="locked">0</long>
-                <string name="created">"28/6/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
                 <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuramanintenClick"</string>
                 <string name="proxy-Id name">"ID_MENURAMANINTEN"</string>
@@ -9708,7 +9834,6 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
                 <long name="owns-file">1</long>
                 <long name="title-mode">0</long>
                 <long name="locked">0</long>
-                <string name="created">"28/6/2006"</string>
                 <string name="proxy-type">"wbMenuSeparatorProxy"</string>
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
               </document>
@@ -9721,7 +9846,6 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
                 <long name="owns-file">1</long>
                 <long name="title-mode">0</long>
                 <long name="locked">0</long>
-                <string name="created">"28/6/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
                 <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuzoominClick"</string>
                 <string name="proxy-Id name">"ID_MENUZOOMIN"</string>
@@ -9744,7 +9868,6 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
                 <long name="owns-file">1</long>
                 <long name="title-mode">0</long>
                 <long name="locked">0</long>
-                <string name="created">"28/6/2006"</string>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
                 <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuzoomoutClick"</string>
                 <string name="proxy-Id name">"ID_MENUZOOMOUT"</string>
@@ -9773,14 +9896,6 @@ Thanks to the Gordon Group at Iowa State University, Apple Computer and the Nati
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -26750,6 +26865,14 @@ SVWN: Slater exchange + VWN corr|BVWN: Becke exchange + VWN corr|BLYP: Becke exc
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Stretch factor">0</long>
+            <long name="proxy-Border">5</long>
+            <bool name="proxy-wxLEFT">1</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
+            <bool name="proxy-wxTOP">1</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
