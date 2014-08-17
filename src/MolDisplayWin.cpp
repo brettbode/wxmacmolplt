@@ -2100,25 +2100,50 @@ void MolDisplayWin::ShowToolbar(bool enable) {
 	if (Prefs->ToolbarShown()) {
 		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT);
 
+		//The original plain xpms
 #include "xpms/view.xpm"
 #include "xpms/rect_lasso.xpm"
 #include "xpms/hand.xpm"
 
-		// toolbar->SetMargins(5,5); 
+#if wxCHECK_VERSION(2, 8, 0)
+		wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
+		wxString pathname = gStdPaths.GetResourcesDir();
+#else
+		wxString pathname = gStdPaths.GetDataDir();
+#ifdef __WXMAC__
+		//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
+		//but xcode is putting them in Resources.
+		pathname.Remove(pathname.Length() - 13);
+		pathname += wxT("Resources");
+#endif
+#endif
+		// toolbar->SetMargins(5,5);
 		toolbar->SetToolBitmapSize(wxSize(16, 15));
 
 		wxBitmap enabled_bmp;
 		wxBitmap enabled_bmp2;
 
-		enabled_bmp = wxBitmap(view_xpm);
+//		enabled_bmp = wxBitmap(view_xpm);
+		enabled_bmp.LoadFile(pathname + wxT("/view.png"), wxBITMAP_TYPE_PNG);
+//		std::cout << "view w="<< enabled_bmp.GetWidth() << " h="<<enabled_bmp.GetHeight()<<std::endl;
+//		enabled_bmp.SetWidth(16);
+//		enabled_bmp.SetHeight(15);
 		toolbar->AddRadioTool(MMP_TOOL_ARROW, _("View"), enabled_bmp,
 			wxNullBitmap);
 
+//		std::cout << "lasso w="<< enabled_bmp.GetWidth() << " h="<<enabled_bmp.GetHeight()<<std::endl;
 		enabled_bmp = wxBitmap(rect_lasso_xpm);
+		enabled_bmp.SetWidth(16);
+		enabled_bmp.SetHeight(15);
 		toolbar->AddRadioTool(MMP_TOOL_LASSO, _("Select"), enabled_bmp,
 			wxNullBitmap);
 
 		enabled_bmp = wxBitmap(hand_xpm);
+//		enabled_bmp.LoadFile(pathname + wxT("/test.jpg"), wxBITMAP_TYPE_JPEG);
+//		std::cout << "hand w="<< enabled_bmp.GetWidth() << " h="<<enabled_bmp.GetHeight()<<std::endl;
+//		enabled_bmp.SetWidth(16);
+//		enabled_bmp.SetHeight(15);
+		
 		toolbar->AddRadioTool(MMP_TOOL_HAND, _("Edit"), enabled_bmp,
 			wxNullBitmap);
 
