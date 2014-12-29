@@ -3213,6 +3213,9 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 		case 5:
 			// Here axial and equitorial sites are different. LPs should go in
 			// axial sites first.
+			// Hmm... Unclear why the previous comment was made. LPs prefer to be as far from other
+			// items as possible so should be in equitorial positions since axial are 90 degrees from
+			// 3 sites while equitorial are 90 degrees from 2 sites and 120 degrees from 2 sites.
 
 			if (bonds.size() == 0) {
 				float c = sqrtf(3) / 2.0f;
@@ -3221,14 +3224,14 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				CPoint3D equat2(c, 0.0f, 0.5f);
 				CPoint3D equat3(-c, 0.0f, 0.5f);
 
-				DO_SITE(equat1, 1);
+				DO_SITE(axial, 4);
 				if (lpCount < 4) {
-					DO_SITE(equat2, 2);
+					DO_SITE(axial * -1.0f, 5);
 					if (lpCount < 3) {
-						DO_SITE(equat3, 3);
+						DO_SITE(equat1, 1);
 						if (lpCount < 2) {
-							DO_SITE(axial, 4);
-							if (lpCount < 1) {DO_SITE(axial * -1.0f, 5);}
+							DO_SITE(equat2, 2);
+							if (lpCount < 1) {DO_SITE(equat3, 3);}
 						}
 					}
 				}
@@ -3236,23 +3239,24 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 			
 			else if (bonds.size() == 1) {
 
-				CPoint3D axial;
 				CPoint3D equat1;
 				CPoint3D equat2;
+				CPoint3D equat3;
 				Matrix4D rotate_mat;
 
-				OrthoVector(vecs[0], axial);
-				RotateAroundAxis(rotate_mat, axial, 120.0f);
-				Rotate3DPt(rotate_mat, vecs[0], &equat1);
-				equat2 = (equat1 + vecs[0]) * -1.0f;
+				OrthoVector(vecs[0], equat1);
+				RotateAroundAxis(rotate_mat, vecs[0], 120.0f);
+				Rotate3DPt(rotate_mat, equat1, &equat2);
 				Normalize3D(&equat2);
+				equat3 = (equat1 + equat2) * -1.0f;
+				Normalize3D(&equat3);
 
-				DO_SITE(equat1, 2);
+				DO_SITE(vecs[0] * -1.0f, 5);
 				if (lpCount < 3) {
-					DO_SITE(equat2, 3);
+					DO_SITE(equat1, 1);
 					if (lpCount < 2) {
-						DO_SITE(axial, 4);
-						if (lpCount < 1) {DO_SITE(axial * -1.0f, 5);}
+						DO_SITE(equat2, 2);
+						if (lpCount < 1) {DO_SITE(equat3, 3);}
 					}
 				}
 			}
@@ -3262,48 +3266,44 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				float dot = DotProduct3D(&vecs[0], &vecs[1]);
 
 				// If the two vectors are close to orthogonal, we assume the
-				// primary bond is equatorial and the secondary axial.
+				// primary bond is axial and the secondary equitorial.
 				if (fabs(dot) < 0.25f) {
 					Matrix4D rotate_mat;
-					CPoint3D cross1;
-					CPoint3D cross2;
 					CPoint3D equat2;
 					CPoint3D equat3;
+					
+					if (lpCount < 3) {
+						DO_SITE(vecs[0] * -1.0f, 5);
+						if (lpCount < 2) {
+							RotateAroundAxis(rotate_mat, vecs[0], 120.0f);
+							Rotate3DPt(rotate_mat, vecs[1], &equat2);
+							Normalize3D(&equat2);
+							equat3 = (vecs[1] + equat2) * -1.0f;
+							Normalize3D(&equat3);
 
-					CrossProduct3D(&vecs[0], &vecs[1], &cross1);
-					CrossProduct3D(&vecs[0], &cross1, &cross2);
-					Normalize3D(&cross2);
-
-					if (DotProduct3D(&vecs[1], &cross2) > 0.0f) {
-						cross2 *= -1.0f;
+							DO_SITE(equat2, 2);
+							if (lpCount < 1) {DO_SITE(equat3, 3);}
+						}
 					}
-
-					RotateAroundAxis(rotate_mat, cross2, 120.0f);
-					Rotate3DPt(rotate_mat, vecs[0], &equat2);
-					equat3 = (vecs[0] + equat2) * -1.0f;
-					Normalize3D(&equat3);
-
-					DO_SITE(equat2, 3);
-					if (lpCount < 2) {
-						DO_SITE(equat3, 4);
-						if (lpCount < 1) {DO_SITE(cross2, 5);}
-					}
-				}
-
-				else {
-					CPoint3D axial;
-					CPoint3D equat3;
-
-					equat3 = (vecs[0] + vecs[1]) * -1.0f;
-					Normalize3D(&equat3);
-
-					CrossProduct3D(&vecs[0], &vecs[1], &axial);
-					Normalize3D(&axial);
-
-					DO_SITE(equat3, 3);
-					if (lpCount < 2) {
-						DO_SITE(axial, 4);
-						if (lpCount < 1) {DO_SITE(axial * -1.0f, 5);}
+				} else {
+					if (lpCount < 3) {
+						CPoint3D equat1;
+						CPoint3D equat2;
+						CPoint3D equat3;
+						Matrix4D rotate_mat;
+						
+						OrthoVector(vecs[0], equat1);
+						RotateAroundAxis(rotate_mat, vecs[0], 120.0f);
+						Rotate3DPt(rotate_mat, equat1, &equat2);
+						Normalize3D(&equat2);
+						equat3 = (equat1 + equat2) * -1.0f;
+						Normalize3D(&equat3);
+					
+						DO_SITE(equat1, 1);
+						if (lpCount < 2) {
+							DO_SITE(equat2, 2);
+							if (lpCount < 1) {DO_SITE(equat3, 3);}
+						}
 					}
 				}
 			}
@@ -3398,8 +3398,8 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					equat3 = (vecs[equat1_id] + vecs[equat2_id]) * -1.0f;
 					Normalize3D(&equat3);
 
-					DO_SITE(equat3, 4);
-					if (lpCount < 1) {DO_SITE(cross, 5);}
+					DO_SITE(cross, 5);
+					if (lpCount < 1) {DO_SITE(equat3, 4);}
 				}
 
 				else {
