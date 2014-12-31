@@ -517,6 +517,10 @@ typedef enum TypeOfOrbital {
 	SVDExternalLocalizedOrbital,
 	SplitQAExternalLocalizedOrbital,
 	OrderedExternalLocalizedOrbital,
+	VB2000VBOrbital,
+	VB2000InitialOrbital,
+	VB2000LocalizedMolecularOrbital,
+	VB2000MolecularOrbital,
 	
 	NumOrbitalTypes
 //	RHFOptimized=1,

@@ -44,6 +44,7 @@ class OrbSurfBase {
 		inline void UseSphericalHarmonics(bool newState) {Options = (Options & 0xFFFFFFBF) + (newState ? 64 : 0);};
 		inline bool GetOrbOccDisplay(void) const {return ((Options & 128) != 0);};
 		inline void SetOrbOccDisplay(bool newState) {Options = (Options & 0xFFFFFF7F) + (newState ? 128 : 0);};
+		void ReduceOrbitalVector(const mpAtom * const Atoms, std::vector<CPoint3D> & reducedAtomPos, std::vector<short> & shellsPerAtom, std::vector<float> & reducedVector, const float * const MOVector) const;
 		virtual void WriteXML(XMLElement * parent) const;
 		virtual void ReadXML(XMLElement * parent);
 };
@@ -467,8 +468,12 @@ class Orb3DSurface : public Surf3DBase, public OrbSurfBase {
 		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer);
 		virtual void WriteXML(XMLElement * parent) const;
 		void CalculateMOGrid(MoleculeData * MainData, Progress * lProgress);
-		float CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisSet * Basis,
-			float * MOVector, long NumAtoms, Progress * lProgress, long * PercentDone, bool MPTask);
+		float CalculateGrid(long xStart, long xEnd, const mpAtom * const Atoms, const BasisSet * const Basis,
+			const float * const MOVector, long NumAtoms, Progress * lProgress, long * PercentDone,
+							const std::vector<int> * const atomScreen, const std::vector<int> * const shellScreen, bool MPTask);
+	float CalculateGridStreamlined(long xStart, long xEnd, const std::vector<CPoint3D> & atomList, const BasisSet * const Basis,
+						const std::vector<float> & reducedVector, long NumAtoms, Progress * lProgress, long * PercentDone,
+								   const std::vector<int> * const atomScreen, const std::vector<int> * const shellScreen, 	std::vector<int> & shellTypes, std::vector<int> & shellIndex, const std::vector<short> & shellsPerAtom, bool MPTask);
 		void UpdateData(Orb3DSurface * Original);
 };
 class Orb2DSurface : public Surf2DBase, public OrbSurfBase {

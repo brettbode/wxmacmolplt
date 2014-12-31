@@ -73,6 +73,7 @@ class BasisSet {
 		static BasisSet * ReadXML(XMLElement * parent);
 		void WriteBasis(BufferFile * File, long AtomNum) const;
 		long GetNumBasisFuncs(bool UseSphericalHarmonics) const;
+		long GetNumShells(void) const {return NumShells;};
 		inline std::vector<long> GetNuclearChargeArray(void) const {return NuclearCharge;};
 		void GetShellIndexArray(long * IndexArray) const;
 		void Normalize(bool InputNormed, bool NormOutput);
