@@ -2531,7 +2531,6 @@
 					"-lwx_osx_carbonu_core-2.9",
 					"-lwx_osx_carbonu_adv-2.9",
 					"-lwx_osx_carbonu_gl-2.9",
-					"-lwxexpat-2.9",
 					"-lwxtiff-2.9",
 					"-lwxjpeg-2.9",
 					"-lwxpng-2.9",
