@@ -2157,65 +2157,7 @@ void InputBuilderWindow::SetupMOGuessItems() {
 			if ((tempVec<=0)||(tempVec > (Orbs->size() + 2))) tempVec = 2;
 			std::vector<OrbitalRec *>::const_iterator OrbSet = Orbs->begin();
 			while (OrbSet != Orbs->end()) {	//Build the popup menu
-				switch ((*OrbSet)->getOrbitalType()) {
-					case OptimizedOrbital:
-						if ((*OrbSet)->getOrbitalWavefunctionType() == MCSCF)
-							mMOSourceChoice->Append(wxString(_("MCSCF Optimized Orbitals")));
-						else
-							mMOSourceChoice->Append(wxString(_("Molecular EigenVectors")));
-						break;
-					case NaturalOrbital:
-						switch ((*OrbSet)->getOrbitalWavefunctionType()) {
-							case UHF:
-								mMOSourceChoice->Append(wxString(_("UHF Natural Orbitals")));
-								break;
-							case GVB:
-								mMOSourceChoice->Append(wxString(_("GVB GI Orbitals")));
-								break;
-							case MCSCF:
-								mMOSourceChoice->Append(wxString(_("MCSCF Natural Orbitals")));
-								break;
-							case CI:
-								mMOSourceChoice->Append(wxString(_("CI Natural Orbitals")));
-								break;
-							case RHFMP2:
-								mMOSourceChoice->Append(wxString(_("RMP2 Natural Orbitals")));
-								break;
-							case TDDFT:
-								mMOSourceChoice->Append(wxString(_("TD-DFT Natural Orbitals")));
-								break;
-							case EOM_CC:
-								mMOSourceChoice->Append(wxString(_("EOM-CC Natural Orbitals")));
-								break;
-							default:
-								mMOSourceChoice->Append(wxString(_("Natural Orbitals")));
-								break;
-						}
-						break;
-					case LocalizedOrbital:
-						mMOSourceChoice->Append(wxString(_("Localized Orbitals")));
-						break;
-					case OrientedLocalizedOrbital:
-						mMOSourceChoice->Append(wxString(_("Oriented Localized Orbitals")));
-						break;
-					case NonOrthogonalSVDLocalizedOrbital:
-						mMOSourceChoice->Append(wxString(_T("Nonorthogonal SVD Localized Orbitals")));
-						break;
-					case PPASVDLocalizedOrbital:
-						mMOSourceChoice->Append(wxString(_T("PPA SVD Localized Orbitals")));
-						break;
-					case SVDExternalLocalizedOrbital:
-						mMOSourceChoice->Append(wxString(_T("SVD External Localized Orbitals")));
-						break;
-					case SplitQAExternalLocalizedOrbital:
-						mMOSourceChoice->Append(wxString(_T("SplitQA Localized Orbitals")));
-						break;
-					case OrderedExternalLocalizedOrbital:
-						mMOSourceChoice->Append(wxString(_T("Ordered External Localized Orbitals")));
-						break;
-					default:
-						mMOSourceChoice->Append(wxString(_("Molecular Orbitals")));
-				}
+				mMOSourceChoice->Append(wxString((*OrbSet)->getOrbitalTypeText()));
 				OrbSet++;
 			}
 		} else {	//No orbs so the only choice is by hand later

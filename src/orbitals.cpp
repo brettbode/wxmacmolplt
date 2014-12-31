@@ -312,7 +312,74 @@ void OrbitalRec::ReSize(long nAlphaOrbs, long nBetaOrbs) {
 		NumBetaOrbs = nBetaOrbs;
 	}
 }
-
+const char * OrbitalRec::getOrbitalTypeText(void) const {
+	switch (getOrbitalType()) {
+		case OptimizedOrbital:
+			if (getOrbitalWavefunctionType() == MCSCF)
+				return "MCSCF Optimized Orbitals";
+			else
+				return "Molecular EigenVectors";
+			break;
+			
+		case NaturalOrbital:
+			switch (getOrbitalWavefunctionType()) {
+				case UHF:
+					return "UHF Natural Orbitals";
+					break;
+				case GVB:
+					return "GVB GI Orbitals";
+					break;
+				case MCSCF:
+					return "MCSCF Natural Orbitals";
+					break;
+				case CI:
+					return "CI Natural Orbitals";
+					break;
+				case RHFMP2:
+					return "RMP2 Natural Orbitals";
+					break;
+				case TDDFT:
+					return "TD-DFT Natural Orbitals";
+					break;
+				case EOM_CC:
+					return "EOM-CC Natural Orbitals";
+					break;
+				default:
+					return "Natural Orbitals";
+			}
+			break;
+			
+		case LocalizedOrbital:
+			return "Localized Orbitals";
+			break;
+		case OrientedLocalizedOrbital:
+			return "Oriented Localized Orbitals";
+			break;
+		case NonOrthogonalSVDLocalizedOrbital:
+			return "Nonorthogonal SVD Localized Orbitals";
+			break;
+		case PPASVDLocalizedOrbital:
+			return "PPA SVD Localized Orbitals";
+			break;
+		case SVDExternalLocalizedOrbital:
+			return "SVD External Localized Orbitals";
+			break;
+		case SplitQAExternalLocalizedOrbital:
+			return "SplitQA Localized Orbitals";
+			break;
+		case OrderedExternalLocalizedOrbital:
+			return "Ordered External Localized Orbitals";
+			break;
+		case GuessOrbital:
+			return "Initial Guess Orbitals";
+			break;
+		case DiabaticMolecularOrbital:
+			return "CAS-SCF Diabatic Molecular Orbitals";
+			break;
+//		default:
+	}
+	return wxString(_T("Molecular Orbitals"));
+}
 //		IO routines
 //Call with the file positioned to the $Vec line
 void OrbitalRec::ReadVecGroup(BufferFile * Buffer, const long & NumBasisFuncs, const TypeOfWavefunction & Type) {

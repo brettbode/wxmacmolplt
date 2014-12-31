@@ -512,72 +512,7 @@ int OrbSurfacePane::getOrbSetForOrbPane(vector<wxString>& choice) {
 					item = numitems+1;	//target beta set
 			} 
 			else {
-				switch ((*OrbSet)->getOrbitalType()) {
-					case OptimizedOrbital:
-						if ((*OrbSet)->getOrbitalWavefunctionType() == MCSCF)
-							choice.push_back(_T("MCSCF Optimized Orbitals"));
-						else
-							choice.push_back(_T("Molecular EigenVectors"));
-						break;
-
-					case NaturalOrbital:
-						switch ((*OrbSet)->getOrbitalWavefunctionType()) {
-							case UHF:
-								choice.push_back(_T("UHF Natural Orbitals"));
-								break;
-							case GVB:
-								choice.push_back(_T("GVB GI Orbitals"));
-								break;
-							case MCSCF:
-								choice.push_back(_T("MCSCF Natural Orbitals"));
-								break;
-							case CI:
-								choice.push_back(_T("CI Natural Orbitals"));
-								break;
-							case RHFMP2:
-								choice.push_back(_T("RMP2 Natural Orbitals"));
-								break;
-							case TDDFT:
-								choice.push_back(_T("TD-DFT Natural Orbitals"));
-								break;
-							case EOM_CC:
-								choice.push_back(_T("EOM-CC Natural Orbitals"));
-								break;
-							default:
-								choice.push_back(_T("Natural Orbitals"));
-						}
-						break;
-
-					case LocalizedOrbital:
-						choice.push_back(_T("Localized Orbitals"));
-						break;
-					case OrientedLocalizedOrbital:
-						choice.push_back(_T("Oriented Localized Orbitals"));
-						break;
-					case NonOrthogonalSVDLocalizedOrbital:
-						choice.push_back(_T("Nonorthogonal SVD Localized Orbitals"));
-						break;
-					case PPASVDLocalizedOrbital:
-						choice.push_back(_T("PPA SVD Localized Orbitals"));
-						break;
-					case SVDExternalLocalizedOrbital:
-						choice.push_back(_T("SVD External Localized Orbitals"));
-						break;
-					case SplitQAExternalLocalizedOrbital:
-						choice.push_back(_T("SplitQA Localized Orbitals"));
-						break;
-					case OrderedExternalLocalizedOrbital:
-						choice.push_back(_T("Ordered External Localized Orbitals"));
-						break;
-					case GuessOrbital:
-						choice.push_back(_T("Initial Guess Orbitals"));
-						break;
-					case DiabaticMolecularOrbital:
-						choice.push_back(_T("CAS-SCF Diabatic Molecular Orbitals"));
-						break;
-					default:
-						choice.push_back(_T("Molecular Orbitals"));
-				}
+				choice.push_back(wxString((*OrbSet)->getOrbitalTypeText()));
 			}
 			numitems++;
 			OrbSetCount++;
@@ -3130,70 +3065,7 @@ void BaseSurfacePane::BuildOrbSetPopup(void) {
 		unsigned long	OrbSetCount = 0;
 		while (OrbSet != Orbs->end()) {
 			if ((*OrbSet)->TotalDensityPossible()) {
-				switch ((*OrbSet)->getOrbitalType()) {
-					case OptimizedOrbital:
-						if ((*OrbSet)->getOrbitalWavefunctionType() == MCSCF)
-							mOrbSetChoice->Append(wxString(_T("MCSCF Optimized Orbitals")));
-						else
-							mOrbSetChoice->Append(wxString(_T("Molecular EigenVectors")));
-						break;
-					case NaturalOrbital:
-						switch ((*OrbSet)->getOrbitalWavefunctionType()) {
-							case UHF:
-								mOrbSetChoice->Append(wxString(_T("UHF Natural Orbitals")));
-								break;
-							case GVB:
-								mOrbSetChoice->Append(wxString(_T("GVB GI Orbitals")));
-								break;
-							case MCSCF:
-								mOrbSetChoice->Append(wxString(_T("MCSCF Natural Orbitals")));
-								break;
-							case CI:
-								mOrbSetChoice->Append(wxString(_T("CI Natural Orbitals")));
-								break;
-							case RHFMP2:
-								mOrbSetChoice->Append(wxString(_T("RMP2 Natural Orbitals")));
-								break;
-							case TDDFT:
-								mOrbSetChoice->Append(wxString(_T("TD-DFT Natural Orbitals")));
-								break;
-							case EOM_CC:
-								mOrbSetChoice->Append(wxString(_T("EOM-CC Natural Orbitals")));
-								break;
-							default:
-								mOrbSetChoice->Append(wxString(_T("Natural Orbitals")));
-						}
-						break;
-					case LocalizedOrbital:
-						mOrbSetChoice->Append(wxString(_T("Localized Orbitals")));
-						break;
-					case OrientedLocalizedOrbital:
-						mOrbSetChoice->Append(wxString(_T("Oriented Localized Orbitals")));
-						break;
-					case NonOrthogonalSVDLocalizedOrbital:
-						mOrbSetChoice->Append(wxString(_T("Nonorthogonal SVD Localized Orbitals")));
-						break;
-					case PPASVDLocalizedOrbital:
-						mOrbSetChoice->Append(wxString(_T("PPA SVD Localized Orbitals")));
-						break;
-					case SVDExternalLocalizedOrbital:
-						mOrbSetChoice->Append(wxString(_T("SVD External Localized Orbitals")));
-						break;
-					case SplitQAExternalLocalizedOrbital:
-						mOrbSetChoice->Append(wxString(_T("SplitQA Localized Orbitals")));
-						break;
-					case OrderedExternalLocalizedOrbital:
-						mOrbSetChoice->Append(wxString(_T("Ordered External Localized Orbitals")));
-						break;
-					case GuessOrbital:
-						mOrbSetChoice->Append(wxString(_T("Initial Guess Orbitals")));
-						break;
-					case DiabaticMolecularOrbital:
-						mOrbSetChoice->Append(wxString(_T("CAS-SCF Diabatic Molecular Orbitals")));
-						break;
-					default:
-						mOrbSetChoice->Append(wxString(_T("Molecular Orbitals")));
-				}
+				mOrbSetChoice->Append(wxString((*OrbSet)->getOrbitalTypeText()));
 			}
 			if (TargetOrbSet < 0) {
 				if (((*OrbSet)->getOrbitalType() != GuessOrbital) ||

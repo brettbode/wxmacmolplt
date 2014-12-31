@@ -563,6 +563,7 @@ class OrbitalRec {
 		void WriteXML(XMLElement * parent) const;
 		bool ReadXML(XMLElement * parent);
 		const char * getLabel(void) const {return Label;};
+		const char * getOrbitalTypeText(void) const;
 		void setLabel(const char * c);
 		void ReadVecGroup(BufferFile *Buffer, const long &NumBasisFuncs, const TypeOfWavefunction &Type);
 		void ReadUHFVECOccupancies(BufferFile &);
