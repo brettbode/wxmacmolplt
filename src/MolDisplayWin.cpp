@@ -2124,7 +2124,8 @@ void MolDisplayWin::ShowToolbar(bool enable) {
 		wxBitmap enabled_bmp2;
 
 //		enabled_bmp = wxBitmap(view_xpm);
-		enabled_bmp.LoadFile(pathname + wxT("/view.png"), wxBITMAP_TYPE_PNG);
+		if (! enabled_bmp.LoadFile(pathname + wxT("/view.png"), wxBITMAP_TYPE_PNG))
+			enabled_bmp = wxBitmap(view_xpm);
 //		std::cout << "view w="<< enabled_bmp.GetWidth() << " h="<<enabled_bmp.GetHeight()<<std::endl;
 //		enabled_bmp.SetWidth(16);
 //		enabled_bmp.SetHeight(15);
