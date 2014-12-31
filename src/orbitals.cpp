@@ -117,9 +117,9 @@ const char * ConvertTypeOfOrbital(const TypeOfOrbital & t) {
 		case VB2000InitialOrbital:
 			return "VB2000 Initial Orbital";
 		case VB2000LocalizedMolecularOrbital:
-			return "VB2000 Localized Molecular Orbital";
+			return "VB2000 LMOs";
 		case VB2000MolecularOrbital:
-			return "VB2000 Molecular Orbital";
+			return "VB2000 Molecular Orbitals";
 		default:
 			return "Unknown";
 	}
@@ -376,6 +376,14 @@ const char * OrbitalRec::getOrbitalTypeText(void) const {
 		case DiabaticMolecularOrbital:
 			return "CAS-SCF Diabatic Molecular Orbitals";
 			break;
+		case VB2000VBOrbital:
+			return "VB2000 Valence Bond Orbitals";
+		case VB2000InitialOrbital:
+			return "VB2000 Initial Orbitals";
+		case VB2000LocalizedMolecularOrbital:
+			return "VB2000 Localized Molecular Orbitals";
+		case VB2000MolecularOrbital:
+			return "VB2000 Molecular Orbitals";
 //		default:
 	}
 	return wxString(_T("Molecular Orbitals"));
