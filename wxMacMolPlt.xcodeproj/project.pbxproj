@@ -2711,8 +2711,8 @@
 				OBJROOT = "$(SYMROOT)";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I$(HOME)/software/wx/wx-2.9-cocoa-debug/lib/wx/include/osx_cocoa-unicode-static-3.0/",
-					"-I$(HOME)/software/wx/wx-2.9-cocoa-debug/include/wx-3.0",
+					"-I$(HOME)/software/wx/wx-3.0-cocoa-debug/lib/wx/include/osx_cocoa-unicode-static-3.0/",
+					"-I$(HOME)/software/wx/wx-3.0-cocoa-debug/include/wx-3.0",
 					"-D__WXDEBUG__",
 					"-D__WXOSX__",
 					"-D__WXOSX_COCOA__",
@@ -2777,11 +2777,12 @@
 				HEADER_SEARCH_PATHS = /Developer/Headers/FlatCarbon;
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OBJROOT = "$(SYMROOT)";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
-					"-I$(HOME)/software/wx/wx-2.9-cocoa-release/lib/wx/include/osx_cocoa-unicode-static-2.9/",
-					"-I$(HOME)/software/wx/wx-2.9-cocoa-release/include/wx-2.9",
+					"-I$(HOME)/software/wx/wx-3.0-cocoa-release/lib/wx/include/osx_cocoa-unicode-static-3.0/",
+					"-I$(HOME)/software/wx/wx-3.0-cocoa-release/include/wx-3.0",
 					"-D__WXMAC__",
 					"-D__WXOSX__",
 					"-D__WXOSX_COCOA__",
@@ -2791,7 +2792,7 @@
 					"-DHAVE_LIBMING",
 				);
 				OTHER_LDFLAGS = (
-					"-L$(HOME)/software/wx/wx-2.9-cocoa-release/lib",
+					"-L$(HOME)/software/wx/wx-3.0-cocoa-release/lib",
 					"-framework",
 					QuickTime,
 					"-framework",
@@ -2802,15 +2803,15 @@
 					Cocoa,
 					"-framework",
 					System,
-					"-lwx_baseu-2.9",
-					"-lwx_osx_cocoau_core-2.9",
-					"-lwx_osx_cocoau_adv-2.9",
-					"-lwx_osx_cocoau_gl-2.9",
+					"-lwx_baseu-3.0",
+					"-lwx_osx_cocoau_core-3.0",
+					"-lwx_osx_cocoau_adv-3.0",
+					"-lwx_osx_cocoau_gl-3.0",
 					"-lexpat",
-					"-lwxtiff-2.9",
-					"-lwxjpeg-2.9",
-					"-lwxpng-2.9",
-					"-lwx_osx_cocoau_html-2.9",
+					"-lwxtiff-3.0",
+					"-lwxjpeg-3.0",
+					"-lwxpng-3.0",
+					"-lwx_osx_cocoau_html-3.0",
 					"-lz",
 					"-lpthread",
 					"-liconv",
