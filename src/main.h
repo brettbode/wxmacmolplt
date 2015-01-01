@@ -33,7 +33,7 @@ class macMenuWinPlaceholder : public wxFrame {
 
         void createMenuBar(void);
 
-    public:
+	public:
         /* Constructor that provides some useful default values.
          * @param title The text that will be displayed in the new window's title bar.
          * @param position The initial position of the new window.
@@ -115,6 +115,10 @@ class MpApp : public wxApp {
 
         void menuFileQuit(wxCommandEvent &event);
 		void menuHelpAbout(wxCommandEvent &event);
+		/**
+		 * Display an html browswer pointed at the provided documentation
+		 */
+		void menuHelp(wxCommandEvent &event);
         void menuFileNew(wxCommandEvent &event);
         void menuFileOpen(wxCommandEvent &event);
 		void menuPreferences(wxCommandEvent &event);

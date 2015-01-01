@@ -337,20 +337,20 @@
 <Atom Number="109" Size="140" Mass="16.3095" Label="Mt">
 <Color red="0" green="0" blue="0" pattern="33"></Color>
 </Atom>
-<Atom Number="110" Size="140" Mass="0" Label="un">
+<Atom Number="110" Size="140" Mass="16.7631" Label="Ds">
 <Color red="0" green="0" blue="0" pattern="34"></Color>
 </Atom>
-<Atom Number="111" Size="140" Mass="0" Label="un">
+<Atom Number="111" Size="140" Mass="16.4924" Label="Rg">
 <Color red="0" green="0" blue="0" pattern="35"></Color>
 </Atom>
-<Atom Number="112" Size="145" Mass="0" Label="un">
+<Atom Number="112" Size="145" Mass="16.8819" Label="Cn">
 <Color red="0" green="0" blue="0" pattern="36"></Color>
 </Atom>
 <Atom Number="113" Size="150" Mass="0" Label="un">
 <Color red="0" green="0" blue="0" pattern="37"></Color>
 </Atom>
 <Atom Number="114" Size="147" Mass="0" Label="un">
-<Color red="0" green="0" blue="0" pattern="38"></Color>
+<Color red="0" green="0" blue="0" pattern="0"></Color>
 </Atom>
 <Atom Number="115" Size="30" Mass="0" Label="G">
 <Color red="0" green="0" blue="0" pattern="39"></Color>
@@ -411,4 +411,8 @@
 <PositiveContourColor red="1" green="0" blue="0"></PositiveContourColor>
 <NegativeContourColor red="0" green="0" blue="1"></NegativeContourColor>
 </SurfaceWindowOptions>
+<WindowDefaults>
+<MoleculeDisplayWindow x="10" y="30" width="453" height="464"></MoleculeDisplayWindow>
+<PreferencesWindow x="10" y="50" width="500" height="495" visible="false"></PreferencesWindow>
+</WindowDefaults>
 </MacMolPltPreferences>

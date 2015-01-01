@@ -51,7 +51,7 @@ long InputData::WriteInputFile(const wxString &filePath, MoleculeData * lData, M
 		lData->PruneUnusedFragments();
         buffer = new BufferFile(currFile, true);
 		long BasisTest=0;
-		buffer->WriteLine("!   File created by MacMolPlt "wxMacMolPlt_VERSION, true);
+		buffer->WriteLine("!   File created by MacMolPlt " wxMacMolPlt_VERSION, true);
 		if (Control) Control->WriteToFile(buffer, this, lData->GetNumElectrons());
 		DFT.WriteToFile(buffer, this);
 		if (System) System->WriteToFile(buffer);

@@ -7,10 +7,10 @@
 #include "build_palette.h"
 #include "main.h"
 #include "GlobalExceptions.h"
+#include "myFiles.h"
 
-extern bool show_build_palette;
 extern WinPrefs *gPreferences;
-extern BuilderDlg *build_palette;
+extern BuilderInterface * BuilderTool;
 
 #define kPeriodicCoordinationChoice 13800
 #define kPeriodicLPChoice			13801
@@ -33,6 +33,8 @@ BEGIN_EVENT_TABLE(BuilderDlg, wxMiniFrame)
 	EVT_BUTTON(kPeriodicDeleteStructure, BuilderDlg::DeleteStructure)
 	EVT_BUTTON(kPeriodicRenameStructure, BuilderDlg::RenameStructure)
 	EVT_CHAR(BuilderDlg::KeyHandler)
+	EVT_CHAR_HOOK(BuilderDlg::KeyHandler)
+	EVT_KEY_DOWN (BuilderDlg::KeyHandler)
 	EVT_CLOSE(BuilderDlg::OnClose)
 	EVT_UPDATE_UI(kPeriodicDeleteStructure, BuilderDlg::UpdateDeleteStructures)
 	EVT_UPDATE_UI(kPeriodicRenameStructure, BuilderDlg::UpdateRenameStructures)
@@ -58,11 +60,7 @@ StructureGroup::~StructureGroup(void) {
 // FUNCTIONS
 // --------------------------------------------------------------------------- 
 
-BuilderDlg::BuilderDlg(const wxString& title,
-					   int xpos, int ypos) :
-	wxMiniFrame(NULL, wxID_ANY, title, wxPoint(xpos, ypos),
-		wxSize(-1, -1), wxCLOSE_BOX | wxCAPTION) {
-
+BuilderInterface::BuilderInterface() {
 	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
 #if wxCHECK_VERSION(2, 8, 0)
 	sys_prefs_path = gStdPaths.GetResourcesDir();
@@ -75,6 +73,312 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	sys_prefs_path += wxT("Resources");
 #endif
 #endif
+
+	BuilderPalette = NULL;
+
+	short lcoordination[] = {	1,                                0,
+								1,2,                    3,4,3,2,1,0,
+								1,2,                    3,4,5,6,1,0,
+								1,2,3,2,5,3,2,3,2,2,2,2,3,4,3,4,1,0,
+								1,2,3,4,5,6,6,3,3,2,1,2,3,4,3,4,1,0,
+								1,2,
+									3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+									4,5,6,6,4,4,4,3,2,1,2,3,2,1,0,
+								1,2,
+									3,4,5,6,5,4,3,3,3,3,3,3,3,3,3,
+									4,0,6,0,3,4,3,3,3};
+	short lLPCount[] = {0,                                0,
+						0,0,                    0,0,1,2,3,4,
+						0,0,                    0,0,0,0,3,4,
+						0,0,0,1,0,2,3,3,3,2,2,2,0,0,1,0,3,4,
+						0,0,0,0,0,0,0,3,3,2,2,2,0,0,1,0,3,4,
+						0,0,
+							0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+							0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,
+						0,0,
+							0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+							0,0,0,0,0,0,0,0,0};
+
+	for (int i=0; i<kNumTableElements; i++) {
+		coordinationNumber[i] = lcoordination[i];
+		LonePairCount[i] = lLPCount[i];
+	}
+
+	nelements = kNumTableElements;
+	
+	// Default to C selected.
+	selectedElement = 5;
+	keyBuffer[0] = keyBuffer[1] = keyBuffer[2] = '\0';
+	targetList = 0;	//start with the first structure of the first group
+	selectedStructure = 0;
+	currentTab = 0;
+	
+	// Read in the structure groups
+	wxString user_protos = gStdPaths.GetUserConfigDir();
+#if defined(__WXMAC__) || defined(__WXMSW__)
+	user_protos += wxT("/macmolplt_prototypes.cml");
+#else
+	// The standard unix path is the user's home dir. Thus the file should be "hidden".
+	user_protos += wxT("/.macmolplt_prototypes.cml");
+#endif	
+	
+	StructureGroup * stg = new StructureGroup(sys_prefs_path + _T("/organics.cml"), false);
+	StructureGroups.push_back(stg);
+	stg->ReadCMLFile();
+	stg = new StructureGroup(sys_prefs_path + _T("/solvents.cml"), false);
+	StructureGroups.push_back(stg);
+	stg->ReadCMLFile();
+	stg = new StructureGroup(sys_prefs_path + _T("/amino_acids.cml"), false);
+	StructureGroups.push_back(stg);
+	stg->ReadCMLFile();
+	stg = new StructureGroup(user_protos, true);
+	StructureGroups.push_back(stg);
+	stg->ReadCMLFile();
+	
+}
+
+BuilderInterface::~BuilderInterface() {
+	if (BuilderPalette) {
+		BuilderPalette->Destroy();
+		BuilderPalette = NULL;
+	}
+	std::vector<StructureGroup *>::const_iterator it = StructureGroups.begin();
+	while (it != StructureGroups.end()) {
+		delete (*it);
+		++it;
+	}
+	
+}
+
+void BuilderInterface::ShowPalette(bool state) {
+	if (state) {
+		if (!BuilderPalette)
+			BuilderPalette = new BuilderDlg(wxT("Builder Tools"));
+		if (BuilderPalette) {
+			BuilderPalette->Show();
+			BuilderPalette->Raise();
+		}
+	} else {
+		if (BuilderPalette) {
+			BuilderPalette->Destroy();
+			BuilderPalette = NULL;
+		}
+	}
+}
+bool BuilderInterface::IsPaletteVisible(void) const {
+	bool result = false;
+
+	if (BuilderPalette) {
+		result = BuilderPalette->IsShown();
+	}
+	return result;
+}
+void BuilderInterface::ClosePalette(void) {
+	if (BuilderPalette) {
+		BuilderPalette->Destroy();
+		BuilderPalette = NULL;
+	}
+}
+/* ------------------------------------------------------------------------- */
+
+int BuilderInterface::GetSelectedElement(void) const {
+	
+	/* This function returns the atomic number of the currently selected atom,
+	 * or 0 if no atom is selected. */
+	
+	return selectedElement + 1;
+	
+}
+/* ------------------------------------------------------------------------- */
+
+Structure * BuilderInterface::GetSelectedStructure(void) const {
+	Structure * result = NULL;
+	
+	if (targetList < StructureGroups.size()) {
+		if (selectedStructure < StructureGroups[targetList]->structures.size())
+			result = StructureGroups[targetList]->structures[selectedStructure];
+//		result = StructureGroups[targetList]->structures[mStructureChoice->GetSelection()];
+	}
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+
+Structure * BuilderInterface::GetStructure(int i) const {
+	Structure * result = NULL;
+	
+	if ((i>=0) && (i<StructureGroups[targetList]->structures.size())) {
+		result = StructureGroups[targetList]->structures[i];
+	}
+	return result;
+}
+/* ------------------------------------------------------------------------- */
+
+short BuilderInterface::GetSelectedCoordination(void) const {
+	short result = 0;
+	if (selectedElement >= 0) result = coordinationNumber[selectedElement];
+	return result;
+}
+
+/* ------------------------------------------------------------------------- */
+
+short BuilderInterface::GetSelectedLonePairCount(void) const {
+	short result = 0;
+	if (selectedElement >= 0) result = LonePairCount[selectedElement];
+	return result;
+}
+void BuilderInterface::KeyHandler(wxKeyEvent& event) {
+	int key = event.GetKeyCode();
+	if (!event.HasModifiers()) {
+		if (isalpha(key)) {
+			int id = -1;
+			if (secondKeytimer.Time() < 400) {
+				keyBuffer[1] = key;
+				//if less than three seconds try to interpret as the 2nd letter of a two letter element symbol
+				id = SetAtomType(keyBuffer);
+			}
+			if (id < 0) {	//interpret as the first letter of an element symbol
+				keyBuffer[0] = key;
+				keyBuffer[1] = '\0';
+				id = SetAtomType(keyBuffer);
+				secondKeytimer.Start();	//start the timer for a 2nd keystroke
+			}
+			if (id > 0) {
+				wxCommandEvent foo(0, id-1);
+				/* TODO: fix this! */
+				if (event.GetX() == -50 && event.GetY() == -50) {
+					foo.SetInt(1);
+				}
+				selectedElement = id - 1;
+				if (BuilderPalette)
+					BuilderPalette->ElementSelected(foo);
+			}
+		} else if (key == 309) {
+		}
+	} else {
+		if (key == 23) {
+//			Close();
+		}
+	}
+}
+void BuilderInterface::TabChanged(int index) {
+	currentTab = index;
+}
+void BuilderInterface::AddUserStructure(Structure *structure) {
+	
+	int i;
+	
+	if (structure->FragName.size() <= 0) {
+		for (i = structure->natoms - 1; i >= 0; i--) {
+			if (structure->atoms[i].Type == 1) {
+				structure->SetPruneAtom(i);
+				break;
+			}
+		}
+	}
+	targetList = kNUM_STRUC_GROUPS - 1;
+	StructureGroups[targetList]->structures.push_back(structure);
+	selectedStructure = StructureGroups[targetList]->structures.size() - 1;
+	
+	SaveStructures();
+	
+	if (BuilderPalette)
+		BuilderPalette->AddUserStructure(structure);
+	//Perhaps should open the dialog if it isn't already open?
+}
+/* ------------------------------------------------------------------------- */
+
+void BuilderInterface::DeleteStructure(int index) {
+	if ((index>=0)&&(index<StructureGroups[targetList]->structures.size())) {
+		delete StructureGroups[targetList]->structures[index];
+		StructureGroups[targetList]->structures.erase(StructureGroups[targetList]->structures.begin() + index);
+		SaveStructures();
+	}
+}
+/* ------------------------------------------------------------------------- */
+
+void BuilderInterface::RenameStructure(int index, wxString & new_name) {
+	
+	// As long as the new name isn't the empty string, we make the change.
+	if (!new_name.IsEmpty()&&(index>=0)&&(index<StructureGroups[targetList]->structures.size())) {
+		StructureGroups[targetList]->structures[index]->name = new_name;		
+	}
+	
+	SaveStructures();
+	
+}
+
+/* ------------------------------------------------------------------------- */
+/**
+ * This function saves the currently selected structure group out to its
+ * file.
+ */
+
+void BuilderInterface::SaveStructures() {
+	if ((targetList>=0)&&(targetList<StructureGroups.size())) {
+		StructureGroups[targetList]->WriteCMLFile();
+	}
+}
+
+Structure * BuilderInterface::FindFragment(const std::string fragName) const {
+	Structure * result = NULL;
+	
+	std::vector<StructureGroup *>::const_iterator itgroup = StructureGroups.begin();
+	while (itgroup != StructureGroups.end()) {
+		std::vector<Structure *>::const_iterator it = (*itgroup)->structures.begin();
+		while (it != (*itgroup)->structures.end()) {
+			if ((*it)->FragName == fragName) {
+				result = (*it);
+				break;
+			}
+			++it;
+		}
+		++itgroup;
+	}
+	return result;
+}
+// --------------------------------------------------------------------------- 
+
+void BuilderInterface::ElementSelected(int elementType) {
+	if (elementType > 0 || elementType <= kNumTableElements) {
+		selectedElement = elementType;
+	}
+}
+bool BuilderInterface::currentGroupIsCustom(void) const {
+	bool result = false;
+	if ((targetList>=0)&&(targetList<StructureGroups.size()))
+		result = StructureGroups[targetList]->is_custom;
+	return result;
+}
+void BuilderInterface::ChangeTargetGroup(int new_group) {
+	if ((new_group>=0)&&(new_group<StructureGroups.size())) {
+		targetList = new_group;
+		selectedStructure = 0;
+	}
+}
+int BuilderInterface::ChangeTargetStructure(int index) {
+	if ((index>=0)&&(index<StructureGroups[targetList]->structures.size()))
+		selectedStructure = index;
+	return selectedStructure;
+}
+void BuilderInterface::BuildNameList(wxListBox * theList) const {
+	//fill the list with the names of each structure
+	std::vector<Structure *>::const_iterator it = StructureGroups[targetList]->structures.begin();
+	while (it != StructureGroups[targetList]->structures.end()) {
+		theList->Append((*it)->name);
+		++it;
+	}
+}
+void BuilderInterface::SetSelectedCoordinationNumber(int val) {
+	coordinationNumber[selectedElement] = val;
+}
+void BuilderInterface::SetSelectedLPCount(int val) {
+	LonePairCount[selectedElement] = val;
+}
+
+BuilderDlg::BuilderDlg(const wxString& title,
+					   int xpos, int ypos) :
+	wxMiniFrame(NULL, wxID_ANY, title, wxPoint(xpos, ypos),
+		wxSize(-1, -1), wxCLOSE_BOX | wxCAPTION) {
 
 	canvas = NULL;
 
@@ -91,7 +395,8 @@ BuilderDlg::BuilderDlg(const wxString& title,
 	box_sizer->Add(tabs);
 	SetSizerAndFit(box_sizer);
 
-	wxCommandEvent foo(0, 6-1);
+	prev_id = -1;
+	wxCommandEvent foo(0, BuilderTool->GetSelectedElement()-1);
 	ElementSelected(foo);
 
 	wxCommandEvent event;
@@ -111,28 +416,6 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 	int row;
 	int col;
 	int font_size;
-	short lcoordination[] = {1,                                0,
-							 1,2,                    3,4,3,2,1,0,
-							 1,2,                    3,4,5,6,1,0,
-							 1,2,3,2,5,3,2,3,2,2,2,2,3,4,3,4,1,0,
-							 1,2,3,4,5,6,6,3,3,2,1,2,3,4,3,4,1,0,
-							 1,2,
-								3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-								 4,5,6,6,4,4,4,3,2,1,2,3,2,1,0,
-							 1,2,
-								3,4,5,6,5,4,3,3,3,3,3,3,3,3,3,
-								 4,0,6,0,3,0,0,0,0};
-	short lLPCount[] = {0,                                0,
-						0,0,                    0,0,1,2,3,4,
-						0,0,                    0,0,0,0,3,4,
-						0,0,0,1,0,2,3,3,3,2,2,2,0,0,1,0,3,4,
-						0,0,0,0,0,0,0,3,3,2,2,2,0,0,1,0,3,4,
-						0,0,
-						   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-							  0,0,0,0,0,0,0,0,0,0,0,1,2,3,0,
-						0,0,
-						   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-							  0,0,0,0,0,0,0,0,0};
 
 	wxPanel *periodic_panel = new wxPanel(tabs, wxID_ANY);
 	periodic_panel->Connect(wxEVT_CHAR,
@@ -140,11 +423,6 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 							NULL, this);
 	wxGridBagSizer *sizer = new wxGridBagSizer();
 	
-	for (int i=0; i<kNumTableElements; i++) {
-		coordinationNumber[i] = lcoordination[i];
-		LonePairCount[i] = lLPCount[i];
-	}
-
 #ifdef __WXMAC__
 #define IMAGE_SIZE 20
 	font_size = 12;
@@ -156,8 +434,7 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 	nelements = kNumTableElements;
 
 	// No element has been selected yet.
-	prev_id = -1;
-	keyBuffer[0] = keyBuffer[1] = keyBuffer[2] = '\0';
+//	prev_id = -1;
 
 	elements = new element_t[nelements];
 	if (elements == NULL) {
@@ -280,15 +557,6 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 
 	wxPanel *panel = new wxPanel(tabs, wxID_ANY);
 
-	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
-	wxString user_protos = gStdPaths.GetUserConfigDir();
-#if defined(__WXMAC__) || defined(__WXMSW__)
-	user_protos += wxT("/macmolplt_prototypes.cml");
-#else
-	// The standard unix path is the user's home dir. Thus the file should be "hidden".
-	user_protos += wxT("/.macmolplt_prototypes.cml");
-#endif	
-
 	struc_sizer = new wxGridBagSizer();
 
 //	int lflags = wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL;
@@ -299,24 +567,11 @@ wxPanel *BuilderDlg::GetStructuresPanel(void) {
 	struc_sizer->SetCols(2);
 	struc_sizer->SetRows(3);
 
-#define NUM_STRUC_GROUPS 4
 	struc_groups = new wxChoice(panel, kPeriodicStrucGroups);
 	struc_groups->Append(_T("Organics"));
-	StructureGroup * stg = new StructureGroup(sys_prefs_path + _T("/organics.cml"), false);
-	StructureGroups.push_back(stg);
-	stg->ReadCMLFile();
 	struc_groups->Append(_T("Solvents"));
-	stg = new StructureGroup(sys_prefs_path + _T("/solvents.cml"), false);
-	StructureGroups.push_back(stg);
-	stg->ReadCMLFile();
 	struc_groups->Append(_T("Amino Acids"));
-	stg = new StructureGroup(sys_prefs_path + _T("/amino_acids.cml"), false);
-	StructureGroups.push_back(stg);
-	stg->ReadCMLFile();
 	struc_groups->Append(_T("User-defined"));
-	stg = new StructureGroup(user_protos, true);
-	StructureGroups.push_back(stg);
-	stg->ReadCMLFile();
 
 	struc_sizer->Add(struc_groups, wxGBPosition(0, 0), wxGBSpan(1, 1),
 					 wxEXPAND);
@@ -379,12 +634,6 @@ BuilderDlg::~BuilderDlg() {
 
 	delete[] elements;
 	
-	std::vector<StructureGroup *>::const_iterator it = StructureGroups.begin();
-	while (it != StructureGroups.end()) {
-		delete (*it);
-		++it;
-	}
-
 }
 
 // --------------------------------------------------------------------------- 
@@ -413,6 +662,7 @@ void BuilderDlg::ElementSelected(wxCommandEvent& event) {
 			elements[prev_id].button->SetBitmapLabel(*(elements[prev_id].off_bmp));
 		}
 		prev_id = id;
+		BuilderTool->ElementSelected(id);
 // #if defined(__WXGTK__) 
 		// On GTK, subsequent keypresses won't get handled to change
 		// selected elements because nothing in the frame has focus.  We
@@ -435,24 +685,25 @@ void BuilderDlg::ElementSelected(wxCommandEvent& event) {
 		gPreferences->GetAtomLabel(prev_id, symbol);
 		mTextArea->SetLabel(symbol);
 		
-		mCoordinationChoice->SetSelection(coordinationNumber[prev_id]);
-		mLPChoice->SetSelection(LonePairCount[prev_id]);
+		mCoordinationChoice->SetSelection(BuilderTool->GetSelectedCoordination());
+		mLPChoice->SetSelection(BuilderTool->GetSelectedLonePairCount());
 	}
 	
 	Refresh();
-
 }
 
 // --------------------------------------------------------------------------- 
 
 void BuilderDlg::OnCoordinationChoice(wxCommandEvent& event) {
-	coordinationNumber[prev_id] = event.GetSelection();
+	BuilderTool->SetSelectedCoordinationNumber(event.GetSelection());
+//	coordinationNumber[prev_id] = event.GetSelection();
 }
 
 // --------------------------------------------------------------------------- 
 
 void BuilderDlg::OnLPChoice(wxCommandEvent& event) {
-	LonePairCount[prev_id] = event.GetSelection();
+	BuilderTool->SetSelectedLPCount(event.GetSelection());
+//	LonePairCount[prev_id] = event.GetSelection();
 }
 
 /* ------------------------------------------------------------------------- */
@@ -461,7 +712,9 @@ void BuilderDlg::OnStructureChoice(wxCommandEvent& event) {
 
 	int id = event.GetSelection();
 	if (id != wxNOT_FOUND) {
-		canvas->SetStructure(StructureGroups[targetList]->structures[id]);
+		BuilderTool->ChangeTargetStructure(id);
+		canvas->SetStructure(BuilderTool->GetSelectedStructure());
+//		canvas->SetStructure(StructureGroups[targetList]->structures[id]);
 	}
 	canvas->SetFocus();
 
@@ -469,94 +722,14 @@ void BuilderDlg::OnStructureChoice(wxCommandEvent& event) {
 
 /* ------------------------------------------------------------------------- */
 
-#include "myFiles.h"
 void BuilderDlg::KeyHandler(wxKeyEvent& event) {
-	int key = event.GetKeyCode();
-	if (!event.HasModifiers()) {
-		if (isalpha(key)) {
-			int id = -1;
-			if (secondKeytimer.Time() < 400) {
-				keyBuffer[1] = key;
-				//if less than three seconds try to interpert as the 2nd letter of a two letter element symbol
-				id = SetAtomType(keyBuffer);
-			}
-			if (id < 0) {	//interpret as the first letter of an element symbol
-				keyBuffer[0] = key;
-				keyBuffer[1] = '\0';
-				id = SetAtomType(keyBuffer);
-				secondKeytimer.Start();	//start the timer for a 2nd keystroke
-			}
-			if (id > 0) {
-				wxCommandEvent foo(0, id-1);
-				/* TODO: fix this! */
-				if (event.GetX() == -50 && event.GetY() == -50) {
-					foo.SetInt(1);
-				}
-				ElementSelected(foo);
-			}
-		} else if (key == 309) {
-		}
-	} else {
-		if (key == 23) {
-			Close();
-		}
-	}
+	BuilderTool->KeyHandler(event);
 }	
 
 /* ------------------------------------------------------------------------- */
 
-int BuilderDlg::GetSelectedElement(void) const {
-
-	/* This function returns the atomic number of the currently selected atom,
-	 * or 0 if no atom is selected. */
-
-	return prev_id + 1;
-
-}
-
-/* ------------------------------------------------------------------------- */
-
-Structure *BuilderDlg::GetSelectedStructure(void) const {
-	Structure * result = NULL;
-
-	if (mStructureChoice->GetSelection() == wxNOT_FOUND) {
-		return NULL;
-	} else {
-		result = StructureGroups[targetList]->structures[mStructureChoice->GetSelection()];
-	}
-	return result;
-}
-
-/* ------------------------------------------------------------------------- */
-
-short BuilderDlg::GetSelectedCoordination(void) const {
-	short result = 0;
-	if (prev_id >= 0) result = coordinationNumber[prev_id];
-	return result;
-}
-
-/* ------------------------------------------------------------------------- */
-
-short BuilderDlg::GetSelectedLonePairCount(void) const {
-	short result = 0;
-	if (prev_id >= 0) result = LonePairCount[prev_id];
-	return result;
-}
-
-/* ------------------------------------------------------------------------- */
-
 void BuilderDlg::OnClose(wxCloseEvent& event) {
-
-	// If possible, we want to try to hide the periodic dialog rather than
-	// fully close it.
-	if (event.CanVeto()) {
-		show_build_palette = false;
-		((MpApp &) wxGetApp()).AdjustAllMenus();
-		Hide();
-		event.Veto();
-	} else {
-		Destroy();
-	}
+	BuilderTool->ClosePalette();
 }
 
 /* ------------------------------------------------------------------------- */
@@ -641,91 +814,24 @@ Structure::~Structure() {
 
 }
 
-/* ------------------------------------------------------------------------- */
-
-void BuilderDlg::AddStructure(Structure *structure) {
-
-	int i;
-
-	if (structure->FragName.size() <= 0) {
-		for (i = structure->natoms - 1; i >= 0; i--) {
-			if (structure->atoms[i].Type == 1) {
-				structure->SetPruneAtom(i);
-				break;
-			}
-		}
-	}
-
-	StructureGroups[targetList]->structures.push_back(structure);
-
-	mStructureChoice->Append(structure->name);
-
-}
-
-/* ------------------------------------------------------------------------- */
-/**
- * This function adds a structure to the user-defined structure group.
- * @param structure The predefined structure which should be dynamically
- *                  allocated. The memory will be owned by the build palette.
- */
-
 void BuilderDlg::AddUserStructure(Structure *structure) {
-
+	
 	// Switch to the user structure group if necessary.
-	if (struc_groups->GetSelection() < NUM_STRUC_GROUPS - 1) {
-		struc_groups->SetSelection(NUM_STRUC_GROUPS - 1);
+	if (struc_groups->GetSelection() < kNUM_STRUC_GROUPS - 1) {
+		struc_groups->SetSelection(kNUM_STRUC_GROUPS - 1);
 		wxCommandEvent event;
 		ChangeStructureGroup(event);
 	}
-
-	AddStructure(structure);
-
-	SaveStructures();
-
+	
+	mStructureChoice->Append(structure->name);
+	
 	// Select the just added structure.
 	mStructureChoice->SetSelection(mStructureChoice->GetCount() - 1);
-
+	
 	if (canvas) {
-		canvas->SetStructure(StructureGroups[targetList]->structures[
-							StructureGroups[targetList]->structures.size() - 1]);
-	}
-
-}
-
-/* ------------------------------------------------------------------------- */
-
-int BuilderDlg::GetNumStructures() const {
-	return StructureGroups[targetList]->structures.size();
-}
-
-/* ------------------------------------------------------------------------- */
-
-Structure *BuilderDlg::GetStructure(int i) const {
-	Structure * result = NULL;
-	
-	if ((i>=0) && (i<StructureGroups[targetList]->structures.size())) {
-		result = StructureGroups[targetList]->structures[i];
-	}
-	return result;
-}
-
-Structure * BuilderDlg::FindFragment(const std::string fragName) const {
-	Structure * result = NULL;
-
-	std::vector<StructureGroup *>::const_iterator itgroup = StructureGroups.begin();
-	while (itgroup != StructureGroups.end()) {
-		std::vector<Structure *>::const_iterator it = (*itgroup)->structures.begin();
-		while (it != (*itgroup)->structures.end()) {
-			if ((*it)->FragName == fragName) {
-				result = (*it);
-				break;
-			}
-			++it;
-		}
-		++itgroup;
+		canvas->SetStructure(BuilderTool->GetSelectedStructure());
 	}
 	
-	return result;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -752,20 +858,6 @@ std::ostream& operator<<(std::ostream& stream, const Structure& s) {
 
 /* ------------------------------------------------------------------------- */
 /**
- * This function saves the currently selected structure group out to its
- * file.
- */
-
-void BuilderDlg::SaveStructures() {
-	
-	int target = struc_groups->GetSelection();
-	if ((target>=0)&&(target<StructureGroups.size())) {
-		StructureGroups[target]->WriteCMLFile();
-	}
-}
-
-/* ------------------------------------------------------------------------- */
-/**
  * This function handles clicks on the Delete Structure button.  The current
  * non-system structure is deleted and the first structure in the list is
  * selected in its place.
@@ -776,8 +868,7 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 
 	int id = mStructureChoice->GetSelection();
 
-	delete StructureGroups[targetList]->structures[id];
-	StructureGroups[targetList]->structures.erase(StructureGroups[targetList]->structures.begin() + id);
+	BuilderTool->DeleteStructure(id);
 	mStructureChoice->Delete(id);
 	if (mStructureChoice->GetCount() == 0) {
 		mStructureChoice->SetSelection(wxNOT_FOUND);
@@ -785,11 +876,8 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
 	} else {
 		id = (id == 0) ? 0 : id - 1;
 		mStructureChoice->SetSelection(id);
-		canvas->SetStructure(StructureGroups[targetList]->structures[id]);
+		canvas->SetStructure(BuilderTool->GetStructure(id));
 	}
-	
-	SaveStructures();
-
 }
 
 /* ------------------------------------------------------------------------- */
@@ -810,13 +898,9 @@ void BuilderDlg::RenameStructure(wxCommandEvent& event) {
 	// We have to change the structure list, the dropdown menu, and set the
 	// group's dirty flag.
 	if (!new_name.IsEmpty()) {
-		StructureGroups[targetList]->structures[id]->name = new_name;
-		mStructureChoice->SetString(id, StructureGroups[targetList]->structures[id]->name);
-
+		BuilderTool->RenameStructure(id, new_name);
+		mStructureChoice->SetString(id, new_name);
 	}
-
-	SaveStructures();
-
 }
 
 /* ------------------------------------------------------------------------- */
@@ -856,7 +940,7 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 
 		if (event.GetSelection() == 1) {
 			if (mStructureChoice->GetSelection() != wxNOT_FOUND) {
-				canvas->SetStructure(StructureGroups[targetList]->structures[mStructureChoice->GetSelection()]);
+				canvas->SetStructure(BuilderTool->GetStructure(mStructureChoice->GetSelection()));
 			}
 			canvas->Render();
 			canvas->Connect(wxEVT_CHAR,
@@ -866,6 +950,7 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 		}
 
 //		Refresh(true, NULL);
+		BuilderTool->TabChanged(1);
 #ifdef __WXMAC__
 		mStructureChoice->Enable();
 		Hide();	//This is a gross hack to get the gl canvas to display properly??
@@ -877,7 +962,8 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
 		// focus.  So, we turn him off when he's not visible.
 		mStructureChoice->Disable();
 #endif
-		elements[prev_id >= 0 ? prev_id : 0].button->SetFocus();
+		BuilderTool->TabChanged(0);
+		elements[BuilderTool->GetSelectedElement() >= 0 ? BuilderTool->GetSelectedElement() : 0].button->SetFocus();
 	}
 
 }
@@ -933,7 +1019,7 @@ void Structure::SetPruneAtom(int atom_id) {
 
 void BuilderDlg::UpdateDeleteStructures(wxUpdateUIEvent& event) {
 
-	event.Enable(StructureGroups[targetList]->is_custom &&
+	event.Enable(BuilderTool->currentGroupIsCustom() &&
 				 mStructureChoice->GetSelection() != wxNOT_FOUND);
 
 }
@@ -947,7 +1033,7 @@ void BuilderDlg::UpdateDeleteStructures(wxUpdateUIEvent& event) {
 
 void BuilderDlg::UpdateRenameStructures(wxUpdateUIEvent& event) {
 
-	event.Enable(StructureGroups[targetList]->is_custom &&
+	event.Enable(BuilderTool->currentGroupIsCustom()  &&
 				 mStructureChoice->GetSelection() != wxNOT_FOUND);
 
 }
@@ -971,21 +1057,16 @@ void BuilderDlg::ChangeStructureGroup(wxCommandEvent& event) {
 	mStructureChoice->Clear();
 	mStructureChoice->SetSelection(wxNOT_FOUND);
 	
-	targetList = struc_groups->GetSelection();
+	BuilderTool->ChangeTargetGroup(struc_groups->GetSelection());
 	
-	//fill the list with the names of each structure
-	std::vector<Structure *>::const_iterator it = StructureGroups[targetList]->structures.begin();
-	while (it != StructureGroups[targetList]->structures.end()) {
-		mStructureChoice->Append((*it)->name);
-		++it;
-	}
+	BuilderTool->BuildNameList(mStructureChoice);
 
 	// If there are some structures that were loaded in, select the first one
 	// in the list.
 	if (mStructureChoice->GetCount()) {
 		mStructureChoice->SetSelection(0);
 		if (canvas) {
-			canvas->SetStructure(StructureGroups[targetList]->structures[0]);
+			canvas->SetStructure(BuilderTool->GetStructure(0));
 		}
 	} else if (canvas) {
 		canvas->SetStructure(NULL);

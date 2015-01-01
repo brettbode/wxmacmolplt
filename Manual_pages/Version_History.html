@@ -13,6 +13,36 @@ current release before reporting it.</P>
 <P>
 <HR WIDTH="80%">
 </P><BR>
+<P>Version 7.6:</P>
+<UL>
+	<LI>Energy plot window now accepts the same keystrokes as the main display window to change frames (left, right, home, end)
+	<LI>Fix a parsing issue with ROHF GAMESS log files
+	<LI>Account for an $EFRAG group change to allow all fragment atoms rather than only the first three.
+	<LI>Fixed a crash in the frequency window (when no normal modes are present)
+	<LI>Fixed the positioning of lone pairs in the builder when the coordination number plus the number of lone pairs is 5.
+</UL>
+<P>Version 7.5:</P>
+<UL>
+	<LI>Added support for H and I basis functions.
+	<LI>Fixed a crash under windows related to prototype selection with a single atom.
+	<LI>Fixed issue on OSX preventing quit from the dock icon from working.
+	<LI>Fixed a couple of cases where a 2D surface was not updated appropriately.
+	<LI>New splash screen - guess the orbital!
+</UL>
+<P>Version 7.4.4:</P>
+<UL>
+	<LI>Fixed a seg fault when reading a single mode in a molplt file.
+	<LI>Fixed a bug related to fragement parsing.
+	<LI>Fixed a problem when deuterium was encountered. There is still
+	    not proper support for isotopes, but MacMolPlt should behave 
+		normally if they are encountered.
+	<LI>Modified MCSCF natural orbital parser for a recent change to GAMESS.
+	<LI>Added recent GAMESS coupled-cluster methods.
+	<LI>Added a parser for EOM-CC natural orbitals.
+	<LI>Added a parser for CAS-SCF diabatic molecular orbitals.
+	<LI>Cleaned up some potential 64 bit issues.
+</UL>
+
 <P>Version 7.4.3:</P>
 <UL>
 	<LI>Annotations menu is now properly enabled.

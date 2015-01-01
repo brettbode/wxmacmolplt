@@ -694,6 +694,7 @@ void InputBuilderWindow::CreateControls()
 	localChoiceStrings.Add(_("Foster-Boys"));
 	localChoiceStrings.Add(_("Edmiston-Ruedenberg"));
 	localChoiceStrings.Add(_("Pipek-Mezey"));
+	localChoiceStrings.Add(_("SVD"));
 	localChoice = new wxUglyChoice( itemPanel27, ID_LOCAL_CHOICE, wxDefaultPosition, wxDefaultSize, localChoiceStrings, 0 );
 	localChoice->SetStringSelection(_("None"));
 	itemFlexGridSizer30->Add(localChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -791,8 +792,16 @@ void InputBuilderWindow::CreateControls()
 	ccChoiceStrings.Add(_("CCSD(T)"));
 	ccChoiceStrings.Add(_("R-CC"));
 	ccChoiceStrings.Add(_("CR-CC"));
+	ccChoiceStrings.Add(_("CR-CCL"));
+	ccChoiceStrings.Add(_("CCSD(TQ)"));
+	ccChoiceStrings.Add(_("CR-CC(Q)"));
 	ccChoiceStrings.Add(_("EOM-CCSD"));
 	ccChoiceStrings.Add(_("CR-EOM"));
+	ccChoiceStrings.Add(_("CR-EOML"));
+	ccChoiceStrings.Add(_("IP-EOM2"));
+	ccChoiceStrings.Add(_("IP-EOM3A"));
+	ccChoiceStrings.Add(_("EA-EOM2"));
+	ccChoiceStrings.Add(_("EA-EOM3A"));
 	ccChoice = new wxUglyChoice( itemPanel27, ID_CC_CHOICE, wxDefaultPosition, wxDefaultSize, ccChoiceStrings, 0 );
 	ccChoice->SetStringSelection(_("None"));
 	itemFlexGridSizer54->Add(ccChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -1929,8 +1938,9 @@ void InputBuilderWindow::SetupControlItems() {
 		ciChoice->SetSelection(ci);
 	}
     
-    // ccChoice
-	if((mp2 > 0) || dft || ci || scft > 1 || (runType == G3MP2)) {
+    // ccChoice - coupled cluster is only availble for RHF and ROHF. There is a much more limited
+	//				set of options for ROHF, not sure how to handle that here.
+	if((mp2 > 0) || dft || ci || ((scft > GAMESS_RHF)&&(scft != GAMESS_ROHF)) || (runType == G3MP2)) {
 		ccChoice->SetSelection(0);
 		ccChoice->Enable(false);
 		ccLabel->Enable(false);
@@ -2147,47 +2157,7 @@ void InputBuilderWindow::SetupMOGuessItems() {
 			if ((tempVec<=0)||(tempVec > (Orbs->size() + 2))) tempVec = 2;
 			std::vector<OrbitalRec *>::const_iterator OrbSet = Orbs->begin();
 			while (OrbSet != Orbs->end()) {	//Build the popup menu
-				switch ((*OrbSet)->getOrbitalType()) {
-					case OptimizedOrbital:
-						if ((*OrbSet)->getOrbitalWavefunctionType() == MCSCF)
-							mMOSourceChoice->Append(wxString(_("MCSCF Optimized Orbitals")));
-						else
-							mMOSourceChoice->Append(wxString(_("Molecular EigenVectors")));
-						break;
-					case NaturalOrbital:
-						switch ((*OrbSet)->getOrbitalWavefunctionType()) {
-							case UHF:
-								mMOSourceChoice->Append(wxString(_("UHF Natural Orbitals")));
-								break;
-							case GVB:
-								mMOSourceChoice->Append(wxString(_("GVB GI Orbitals")));
-								break;
-							case MCSCF:
-								mMOSourceChoice->Append(wxString(_("MCSCF Natural Orbitals")));
-								break;
-							case CI:
-								mMOSourceChoice->Append(wxString(_("CI Natural Orbitals")));
-								break;
-							case RHFMP2:
-								mMOSourceChoice->Append(wxString(_("RMP2 Natural Orbitals")));
-								break;
-							case TDDFT:
-								mMOSourceChoice->Append(wxString(_("TD-DFT Natural Orbitals")));
-								break;
-							default:
-								mMOSourceChoice->Append(wxString(_("Natural Orbitals")));
-								break;
-						}
-						break;
-					case LocalizedOrbital:
-						mMOSourceChoice->Append(wxString(_("Localized Orbitals")));
-						break;
-					case OrientedLocalizedOrbital:
-						mMOSourceChoice->Append(wxString(_("Oriented Localized Orbitals")));
-						break;
-					default:
-						mMOSourceChoice->Append(wxString(_("Molecular Orbitals")));
-				}
+				mMOSourceChoice->Append(wxString((*OrbSet)->getOrbitalTypeText()));
 				OrbSet++;
 			}
 		} else {	//No orbs so the only choice is by hand later

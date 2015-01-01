@@ -496,6 +496,7 @@ typedef enum TypeOfWavefunction {
 	CI,
 	RHFMP2,
 	TDDFT,
+	EOM_CC,
 	
 	NumberWavefunctionTypes
 } TypeOfWavefunction;
@@ -510,6 +511,16 @@ typedef enum TypeOfOrbital {
 	BoysLocalizedOrbital,
 	OrientedLocalizedOrbital,
 	GuessOrbital,
+	DiabaticMolecularOrbital,
+	NonOrthogonalSVDLocalizedOrbital,
+	PPASVDLocalizedOrbital,
+	SVDExternalLocalizedOrbital,
+	SplitQAExternalLocalizedOrbital,
+	OrderedExternalLocalizedOrbital,
+	VB2000VBOrbital,
+	VB2000InitialOrbital,
+	VB2000LocalizedMolecularOrbital,
+	VB2000MolecularOrbital,
 	
 	NumOrbitalTypes
 //	RHFOptimized=1,
@@ -552,6 +563,7 @@ class OrbitalRec {
 		void WriteXML(XMLElement * parent) const;
 		bool ReadXML(XMLElement * parent);
 		const char * getLabel(void) const {return Label;};
+		const char * getOrbitalTypeText(void) const;
 		void setLabel(const char * c);
 		void ReadVecGroup(BufferFile *Buffer, const long &NumBasisFuncs, const TypeOfWavefunction &Type);
 		void ReadUHFVECOccupancies(BufferFile &);
@@ -601,7 +613,22 @@ class Surface {
 		bool		has_default_label;
 		long		OrbSet;			//Target Orbital Set
 
-		//! Exports to (our) text file type
+		/**
+		 * Exports surface data to our text file type	
+		 * This can effectively only be called by Surf3DBase objects
+		 * @param Grid3D
+		 * @param nx number of grid points on the X axis
+		 * @param ny number of grid points on the Y axis
+		 * @param nz number of grid points on the Z axis
+		 * @param Origin origin of the 3D cartesian grid
+		 * @param XInc increment in the X direction 
+		 * @param YInc increment in the Y direction 
+		 * @param ZInc increment in the Z direction 
+		 * @param Label provided text label for this surface
+		 * @param Buffer A BufferFileObject which the .txt file is buffered into
+		 * to make parsing the file easier.  See the BufferFile object for valid
+		 * BufferFile operations.
+		 */
 		void Export3D(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
 			float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const;
 		//! Exports to CCP4 file type
@@ -610,8 +637,21 @@ class Surface {
 		//! Exports to CNS electron density map file type
 		void Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
 			float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const;
+		/**
+		 * Exports surface data to our text file type	
+		 * This can effectively only be called by Surf2DBase objects
+		 * @param 2D Grid of data
+		 * @param NumPoints number of grid points in both the x and y direction
+		 * @param Origin origin of the 3D cartesian grid
+		 * @param XInc increment vector in the X direction 
+		 * @param YInc increment vector in the Y direction 
+		 * @param Label provided text label for this surface
+		 * @param Buffer A BufferFileObject which the .txt file is buffered into
+		 * to make parsing the file easier.  See the BufferFile object for valid
+		 * BufferFile operations.
+		 */	
 		void Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Origin,
-			const CPoint3D *XInc, const CPoint3D *YInc, const char * Label, BufferFile * Buffer) const;
+				const CPoint3D *XInc, const CPoint3D *YInc, const char * Label, BufferFile * Buffer) const;
 	public:
 		enum exportFileType {
 			TXTFILE,

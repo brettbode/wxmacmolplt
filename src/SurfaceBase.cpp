@@ -86,7 +86,7 @@ void Surface::RotateSurface(Matrix4D /*RotationMatrix*/) {
   * @param YInc increment in the Y direction 
   * @param ZInc increment in the Z direction 
   * @param Label provided text label for this surface
-  * @param Buffer A BufferFileObject which the .MKL file is buffered into
+  * @param Buffer A BufferFileObject which the .txt file is buffered into
   * to make parsing the file easier.  See the BufferFile object for valid
   * BufferFile operations.
 */
@@ -134,7 +134,7 @@ void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CP
   * @param YInc increment in the Y direction 
   * @param ZInc increment in the Z direction 
   * @param Label provided text label for this surface
-  * @param Buffer A BufferFileObject which the .MKL file is buffered into
+  * @param Buffer A BufferFileObject which the CCP4 file is buffered into
   * to make parsing the file easier.  See the BufferFile object for valid
   * BufferFile operations.
 */
@@ -155,7 +155,7 @@ void Surface::Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, cons
   * @param YInc increment in the Y direction 
   * @param ZInc increment in the Z direction 
   * @param Label provided text label for this surface
-  * @param Buffer A BufferFileObject which the .MKL file is buffered into
+  * @param Buffer A BufferFileObject which the CNS file is buffered into
   * to make parsing the file easier.  See the BufferFile object for valid
   * BufferFile operations.
 */
@@ -179,22 +179,34 @@ void Surface::Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const
 	// TODO print out formatted data here
 }
 
+/**
+ * Exports surface data to our text file type	
+ * This can effectively only be called by Surf2DBase objects
+ * @param 2D Grid of data
+ * @param NumPoints number of grid points in both the x and y direction
+ * @param Origin origin of the 3D cartesian grid
+ * @param XInc increment vector in the X direction 
+ * @param YInc increment vector in the Y direction 
+ * @param Label provided text label for this surface
+ * @param Buffer A BufferFileObject which the .txt file is buffered into
+ * to make parsing the file easier.  See the BufferFile object for valid
+ * BufferFile operations.
+ */
 void Surface::Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Origin,
 	const CPoint3D *XInc, const CPoint3D *YInc, const char * Label, BufferFile * Buffer) const {
 		char Line[kMaxLineLength];
 	if (!Grid2D) return;
 		//punch out the provided surface label
-	Buffer->PutText(Label);
-	Buffer->PutText("\r");
+	Buffer->WriteLine(Label, true);
 		//Write out the number of grid points in each direction
-	sprintf(Line, "%ld    //# grid points\r", NumPoints);
-	Buffer->PutText(Line);	//true means add a line feed
-	sprintf(Line, "%g %g %g   //Origin of the 2D grid\r", Origin->x, Origin->y, Origin->z);
-	Buffer->PutText(Line);
-	sprintf(Line, "%g %g %g   //X inc vector\r", XInc->x, XInc->y, XInc->z);
-	Buffer->PutText(Line);
-	sprintf(Line, "%g %g %g   //Y inc vector\r", YInc->x, YInc->y, YInc->z);
-	Buffer->PutText(Line);
+	sprintf(Line, "%ld    //# grid points", NumPoints);
+	Buffer->WriteLine(Line, true);	//true means add a line feed
+	sprintf(Line, "%g %g %g   //Origin of the 2D grid", Origin->x, Origin->y, Origin->z);
+	Buffer->WriteLine(Line, true);
+	sprintf(Line, "%g %g %g   //X inc vector", XInc->x, XInc->y, XInc->z);
+	Buffer->WriteLine(Line, true);
+	sprintf(Line, "%g %g %g   //Y inc vector", YInc->x, YInc->y, YInc->z);
+	Buffer->WriteLine(Line, true);
 		//now write out the grid
 		long	ix,iy,igrid=0,ival=0;
 	for (ix=0; ix < NumPoints; ix++) {
@@ -203,13 +215,13 @@ void Surface::Export2D(const float * Grid2D, long NumPoints, const CPoint3D * Or
 			Buffer->PutText(Line);
 			ival++;
 			if (ival>=5) {
-				Buffer->PutText("\r");
+				Buffer->WriteLine("", true);
 				ival=0;
 			}
 			igrid++;
 		}
 	}
-	if (ival) Buffer->PutText("\r");
+	if (ival) Buffer->WriteLine("", true);
 }
 
 Surf1DBase::Surf1DBase(WinPrefs *Prefs) {
@@ -242,7 +254,6 @@ Surf1DBase::~Surf1DBase() {
 }
 
 void Surf1DBase::SetNumGridPoints(long newNum) {
-	long OldNum = NumGridPoints;
 	if (newNum > 1) NumGridPoints = newNum;
 }
 
@@ -363,18 +374,18 @@ void Surf2DBase::SetPlaneToScreenPlane(MoleculeData * MainData) {
 	InverseMatrix(MainData->TotalRotation, RotInverse);
 
 	CPoint3D	TestPoint, NewPoint1, NewPoint2;
-	TestPoint.x = -0.5*MainData->WindowSize;
-	TestPoint.y=-0.5*MainData->WindowSize; TestPoint.z=0.0;
+	TestPoint.x = -0.55*MainData->WindowSize;
+	TestPoint.y=-0.55*MainData->WindowSize; TestPoint.z=0.0;
 	BackRotate3DPt(RotInverse, TestPoint, &NewPoint1);
-	TestPoint.x = 0.5*MainData->WindowSize;
-	TestPoint.y=-0.5*MainData->WindowSize;
+	TestPoint.x = 0.55*MainData->WindowSize;
+	TestPoint.y=-0.55*MainData->WindowSize;
 	BackRotate3DPt(RotInverse, TestPoint, &NewPoint2);
 //	Origin.x = NewPoint1.x*kAng2BohrConversion;
 //	Origin.y = NewPoint1.y*kAng2BohrConversion;
 //	Origin.z = NewPoint1.z*kAng2BohrConversion;
-	Origin.x = NewPoint1.x;
-	Origin.y = NewPoint1.y;
-	Origin.z = NewPoint1.z;
+	Origin.x = NewPoint1.x + MainData->Centroid.x;
+	Origin.y = NewPoint1.y + MainData->Centroid.y;
+	Origin.z = NewPoint1.z + MainData->Centroid.z;
 	long NumPoints = NumGridPoints-1;	//Subtract one such that the window will be spanned by NumPoints
 //	XInc.x = (NewPoint2.x-NewPoint1.x)*kAng2BohrConversion/NumPoints;
 //	XInc.y = (NewPoint2.y-NewPoint1.y)*kAng2BohrConversion/NumPoints;
@@ -382,8 +393,8 @@ void Surf2DBase::SetPlaneToScreenPlane(MoleculeData * MainData) {
 	XInc.x = (NewPoint2.x-NewPoint1.x)/NumPoints;
 	XInc.y = (NewPoint2.y-NewPoint1.y)/NumPoints;
 	XInc.z = (NewPoint2.z-NewPoint1.z)/NumPoints;
-	TestPoint.x = -0.5*MainData->WindowSize;
-	TestPoint.y=0.5*MainData->WindowSize;
+	TestPoint.x = -0.55*MainData->WindowSize;
+	TestPoint.y=0.55*MainData->WindowSize;
 	BackRotate3DPt(RotInverse, TestPoint, &NewPoint2);
 //	YInc.x = (NewPoint2.x-NewPoint1.x)*kAng2BohrConversion/NumPoints;
 //	YInc.y = (NewPoint2.y-NewPoint1.y)*kAng2BohrConversion/NumPoints;

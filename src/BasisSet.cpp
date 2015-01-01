@@ -71,6 +71,8 @@ void BasisSet::Normalize(bool /*InputNormed*/, bool /*NormOutput*/) {
 	float DNorm = PNorm*2/sqrt(3.0);
 	float FNorm = DNorm*2/sqrt(5.0);
 	float GNorm = FNorm*2/sqrt(7.0);
+	float HNorm = GNorm*2/sqrt(9.0);
+	float INorm = HNorm*2/sqrt(11.0);
 	for (long ishell=0; ishell<NumShells; ishell++) {
 		float	fExp;
 		long	NumPrims;
@@ -87,23 +89,30 @@ void BasisSet::Normalize(bool /*InputNormed*/, bool /*NormOutput*/) {
 				//This factor is correct for functions of the form xx, xxx, etc but is off
 				//for the xy, xxy, etc functions which must be multiplied by sqrt3, sqrt5 etc later
 			switch (ShellType) {
-				case -1:	//L shells
+				case LShell:
 					NormCoef[iprim+NumPrims] = PNorm*ExpNorm*ExpNorm2*InputCoef[iprim+NumPrims];
-				case 0:		//S shell
+				case SShell:
 					NormCoef[iprim] = SNorm*ExpNorm*InputCoef[iprim];
 				break;
-				case 1:		//P shell
+				case PShell:
 					NormCoef[iprim] = PNorm*ExpNorm*ExpNorm2*InputCoef[iprim];
 				break;
-				case 2:		//D shell
+				case DShell:
 					NormCoef[iprim] = DNorm*fExp*ExpNorm*InputCoef[iprim];
 				break;
-				case 3:		//F shell
+				case FShell:
 					NormCoef[iprim] = FNorm*fExp*ExpNorm*ExpNorm2*InputCoef[iprim];
 				break;
-				case 4:		//G shell
+				case GShell:
 					NormCoef[iprim] = GNorm*fExp*fExp*ExpNorm*InputCoef[iprim];
 				break;
+					//These two need to be checked!!!!
+				case HShell:
+					NormCoef[iprim] = HNorm*fExp*fExp*ExpNorm*ExpNorm2*InputCoef[iprim];
+					break;
+				case IShell:
+					NormCoef[iprim] = INorm*fExp*fExp*fExp*ExpNorm*InputCoef[iprim];
+					break;
 			}
 		}
 	}
@@ -136,16 +145,24 @@ void BasisSet::WriteBasis(BufferFile * File, long AtomNum) const {
 				case GShell:
 					ShellLabel = 'G';
 				break;
+				case HShell:
+					ShellLabel = 'H';
+					break;
+				case IShell:
+					ShellLabel = 'I';
+					break;
 			}
 			sprintf(Line, "    %c %d", ShellLabel, Shells[ishell].NumPrims);
 			File->WriteLine(Line, true);
 			for (iprim=0; iprim<Shells[ishell].NumPrims; iprim++) {
 				float EE = Shells[ishell].Exponent[iprim] * Shells[ishell].Exponent[iprim];
 				float FACS = PI32/(EE*sqrt(EE));
-				float FACP = 0.5*FACS/EE;
-				float FACD = 0.75*FACS/(EE*EE);
-				float FACF = 1.875*FACS/(EE*EE*EE);
-				float FACG = 6.5625*FACS/(EE*EE*EE*EE);
+				float FACP =   0.5*FACS/EE;
+				float FACD =   0.75*FACS/(EE*EE);
+				float FACF =   1.875*FACS/(EE*EE*EE);
+				float FACG =   6.5625*FACS/(EE*EE*EE*EE);
+				float FACH =  29.53125*FACS/(EE*EE*EE*EE*EE);
+				float FACI = 162.421875*FACS/(EE*EE*EE*EE*EE*EE);
 				float backconv, backl;
 				switch (Shells[ishell].ShellType) {
 					case LShell:
@@ -165,6 +182,12 @@ void BasisSet::WriteBasis(BufferFile * File, long AtomNum) const {
 					case GShell:
 						backconv = sqrt(FACG);
 					break;
+					case HShell:
+						backconv = sqrt(FACH);
+						break;
+					case IShell:
+						backconv = sqrt(FACI);
+						break;
 				}
 				sprintf(Line, "        %ld %f %f", iprim+1, Shells[ishell].Exponent[iprim],
 					Shells[ishell].NormCoef[iprim]*backconv);
@@ -214,6 +237,12 @@ long BasisShell::GetNumFuncs(bool UseSphericalHarmonics) const {
 		case GShell:	//G shell
 			ret = 15;
 		break;
+		case HShell:
+			ret = 21;
+			break;
+		case IShell:
+			ret = 28;
+			break;
 		case SHDShell:	//Spherical harmonic D
 			ret = 5;
 		break;
@@ -223,6 +252,12 @@ long BasisShell::GetNumFuncs(bool UseSphericalHarmonics) const {
 		case SHGShell:	//Spherical harmonic G
 			ret = 9;
 		break;
+		case SHHShell:	//Spherical harmonic H
+			ret = 11;
+			break;
+		case SHIShell:	//Spherical harmonic I
+			ret = 13;
+			break;
 	}
 	return ret;
 }
@@ -254,12 +289,24 @@ long BasisShell::GetAngularStart(bool UseSphericalHarmonics) const {
 		case GShell:	//G shell
 			ret = 20;
 		break;
+		case HShell:
+			ret = 35;
+			break;
+		case IShell:
+			ret = 56;
+			break;
 		case SHFShell:
 			ret = 9;
 		break;
 		case SHGShell:
 			ret = 16;
 		break;
+		case SHHShell:
+			ret = 25;
+			break;
+		case SHIShell:
+			ret = 36;
+			break;
 	}
 	return ret;
 }
@@ -471,6 +518,161 @@ void BasisShell::GetLabel(char * label, short FuncNum, bool UseSphericalHarmonic
 			}
 			label[5]=0;
 		break;
+		case HShell:
+			switch (FuncNum) {
+				case 0:
+					strcpy(label, "Hx5");
+					break;
+				case 1:
+					strcpy(label, "Hy5");
+					break;
+				case 2:
+					strcpy(label, "Hz5");
+					break;
+				case 3:
+					strcpy(label, "Hx4y");
+					break;
+				case 4:
+					strcpy(label, "Hx4z");
+					break;
+				case 5:
+					strcpy(label, "Hxy4");
+					break;
+				case 6:
+					strcpy(label, "Hy4z");
+					break;
+				case 7:
+					strcpy(label, "Hxz4");
+					break;
+				case 8:
+					strcpy(label, "Hyz4");
+					break;
+				case 9:
+					strcpy(label, "Hx3y2");
+					break;
+				case 10:
+					strcpy(label, "Hx3z2");
+					break;
+				case 11:
+					strcpy(label, "Hx2y3");
+					break;
+				case 12:
+					strcpy(label, "Hy3z2");
+					break;
+				case 13:
+					strcpy(label, "Hx2z3");
+					break;
+				case 14:
+					strcpy(label, "Hy2z3");
+					break;
+				case 15:
+					strcpy(label, "Hx3yz");
+					break;
+				case 16:
+					strcpy(label, "Hxy3z");
+					break;
+				case 17:
+					strcpy(label, "Hxyz3");
+					break;
+				case 18:
+					strcpy(label, "Hx2y2z");
+					break;
+				case 19:
+					strcpy(label, "Hx2yz2");
+					break;
+				case 20:
+					strcpy(label, "Hxy2z2");
+					break;
+			}
+			break;
+		case IShell:
+			switch (FuncNum) {
+				case 0:
+					strcpy(label, "Ix6");
+					break;
+				case 1:
+					strcpy(label, "Iy6");
+					break;
+				case 2:
+					strcpy(label, "Iz6");
+					break;
+				case 3:
+					strcpy(label, "Ix5y");
+					break;
+				case 4:
+					strcpy(label, "Ix5z");
+					break;
+				case 5:
+					strcpy(label, "Ixy5");
+					break;
+				case 6:
+					strcpy(label, "Iy5z");
+					break;
+				case 7:
+					strcpy(label, "Ixz5");
+					break;
+				case 8:
+					strcpy(label, "Iyz5");
+					break;
+				case 9:
+					strcpy(label, "Ix4y2");
+					break;
+				case 10:
+					strcpy(label, "Ix4z2");
+					break;
+				case 11:
+					strcpy(label, "Ix2y4");
+					break;
+				case 12:
+					strcpy(label, "Iy4z2");
+					break;
+				case 13:
+					strcpy(label, "Ix2z4");
+					break;
+				case 14:
+					strcpy(label, "Iy2z4");
+					break;
+				case 15:
+					strcpy(label, "Ix4yz");
+					break;
+				case 16:
+					strcpy(label, "Ixy4z");
+					break;
+				case 17:
+					strcpy(label, "Ixyz4");
+					break;
+				case 18:
+					strcpy(label, "Ix3y3");
+					break;
+				case 19:
+					strcpy(label, "Ix3z3");
+					break;
+				case 20:
+					strcpy(label, "Iy3z3");
+					break;
+				case 21:
+					strcpy(label, "Ix3y2z");
+					break;
+				case 22:
+					strcpy(label, "Ix3yz2");
+					break;
+				case 23:
+					strcpy(label, "Ix2y3z");
+					break;
+				case 24:
+					strcpy(label, "Ixy3z2");
+					break;
+				case 25:
+					strcpy(label, "Ix2yz3");
+					break;
+				case 26:
+					strcpy(label, "Ixy2z3");
+					break;
+				case 27:
+					strcpy(label, "Ix2y2z2");
+					break;
+			}
+			break;
 		case SHDShell:
 			label[0]='D';
 			switch (FuncNum) {
@@ -549,6 +751,91 @@ void BasisShell::GetLabel(char * label, short FuncNum, bool UseSphericalHarmonic
 				break;
 			}
 		break;
+		case SHHShell:
+			label[0]='H';
+			switch (FuncNum) {
+				case 0:
+					strcpy((char *) &(label[1]), "x5-10x3y2+5xy4");
+					break;
+				case 1:
+					strcpy((char *) &(label[1]), "z(x4+y4-6x2y2)");
+					break;
+				case 2:
+					strcpy((char *) &(label[1]), "(x3-3xy2)(9z2-r2)");
+					break;
+				case 3:
+					strcpy((char *) &(label[1]), "(x2-y2)(3z3-zr2)");
+					break;
+				case 4:
+					strcpy((char *) &(label[1]), "21xz4-14xz2r2+xr4");
+					break;
+				case 5:
+					strcpy((char *) &(label[1]), "63z5-70z3r2+15zr4");
+					break;
+				case 6:
+					strcpy((char *) &(label[1]), "21yz4-14yz2r2+yr4");
+					break;
+				case 7:
+					strcpy((char *) &(label[1]), "xyz(3z3-zr2)");
+					break;
+				case 8:
+					strcpy((char *) &(label[1]), "(3x2y-y3)(9z2-r2)");
+					break;
+				case 9:
+					strcpy((char *) &(label[1]), "z(x3y-xy3)");
+					break;
+				case 10:
+					strcpy((char *) &(label[1]), "5x4y-10x2y3+5y5");
+					break;
+			}
+		break;
+		case SHIShell:
+			label[0]='I';
+			switch (FuncNum) {
+				case 0:
+					strcpy((char *) &(label[1]), "x6-15x4y2+15x2y4-y6");
+					break;
+				case 1:
+					strcpy((char *) &(label[1]), "xz(x4+5y4-10x2y2)");
+					break;
+				case 2:
+					strcpy((char *) &(label[1]), "(x4+y4-6x2y2)(11z2-r2)");
+					break;
+				case 3:
+					strcpy((char *) &(label[1]), "(x3-3xy2)z(11z2-3r2)");
+					break;
+				case 4:
+					strcpy((char *) &(label[1]), "(x2-y2)(33z4-18z2r2+r4)");
+					break;
+				case 5:
+					strcpy((char *) &(label[1]), "xz(33z4-30z2r2+5r4");
+					break;
+				case 6:
+					strcpy((char *) &(label[1]), "231z6-315z4r2+105z2r4-5r6");
+					break;
+				case 7:
+					strcpy((char *) &(label[1]), "yz(33z4-30z2r2+5r4");
+					break;
+				case 8:
+					strcpy((char *) &(label[1]), "xy(33z4-18z2r2+r4)");
+					break;
+				case 9:
+					strcpy((char *) &(label[1]), "z(11z2-3r2)(3x2y-y3)");
+					break;
+				case 10:
+					strcpy((char *) &(label[1]), "xy(x2-y2)(11z2-r2)");
+					break;
+				case 11:
+					strcpy((char *) &(label[1]), "yz(y4+5x4-10x2y2)");
+					break;
+				case 12:
+					strcpy((char *) &(label[1]), "xy(3x4-10x2y2+3y4");
+					break;
+			}
+			break;
+		default:
+			wxLogMessage(_("Undefined shell type not implemented in BasisShell::GetLabel"));
+			break;
 	}
 }
 //Read in a general basis set from a GAMESS log file
@@ -556,13 +843,14 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms, con
 	long NumShells=0, NextAtom=0, ShellStart=0,
 		fShellStart=0, BasisEndPos, nTotFuncs=0, LinePos, EndPos, iatom, items;
 	char	LineText[kMaxLineLength+1];
+	Buffer->GetLine(LineText);
 	
-	Buffer->LocateKeyWord("CONTRACTION COEFFICIENTS", 22);
+	Buffer->LocateKeyWord("CONTRACTION COEFFICIENT", 21);
 	Buffer->SkipnLines(2);
 	long StartPos = Buffer->GetFilePos();
 		//go to the end of the basis and get the total # of shells to dimension mem
 		//output was changed in June, 2000
-	bool ShellsFound = Buffer->LocateKeyWord("TOTAL NUMBER OF BASIS SET SHELLS", 33);
+	bool ShellsFound = Buffer->LocateKeyWord("TOTAL NUMBER OF BASIS SET SHELLS", 32);
 	if (!ShellsFound) ShellsFound = Buffer->LocateKeyWord("TOTAL NUMBER OF SHELLS", 22);
 	if (ShellsFound) {
 		BasisEndPos = Buffer->GetFilePos();
@@ -577,12 +865,6 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms, con
 
 	Buffer->SetFilePos(StartPos);
 	Buffer->SkipnLines(2);	//advance to the first primitive line
-//Set up the normalization constants: (2/pi)^3/4 * 2^n/n!!
-//	float SNorm = sqrt(sqrt(pow(2.0/kPi, 3)));
-//	float PNorm = SNorm*2;
-//	float DNorm = PNorm*2/sqrt(3.0);
-//	float FNorm = DNorm*2/sqrt(5.0);
-//	float GNorm = FNorm*2/sqrt(7.0);
 //Note the atom label is skipped since it is just a general text string and the
 //Basis set is always given in the same order as the coordinates
 	//The ishell loop could be a do-while structure, but this ensures
@@ -603,25 +885,34 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms, con
 		CoefsperPrim = 1;
 		switch (ShellText[0]) {
 			case 'S':
-				ShellType=0;
+				ShellType=SShell;
 			break;
 			case 'P':
-				ShellType=1;
+				ShellType=PShell;
 			break;
 			case 'D':
-				ShellType=2;
+				ShellType=DShell;
 			break;
 			case 'F':
-				ShellType=3;
+				ShellType=FShell;
 			break;
 			case 'G':
-				ShellType=4;
+				ShellType=GShell;
 			break;
+			case 'H':
+				ShellType=HShell;
+				break;
+			case 'I':
+				ShellType=IShell;
+				break;
 			case 'L':
-				ShellType=-1;
+				ShellType=LShell;
 				CoefsperPrim = 2;
 			break;
 			default:
+				wxString msg;
+				msg.Printf(_("Unknown shell type encountered, shell label = %s"), ShellText);
+				wxLogMessage(msg);
 				throw DataError();
 		}
 		Basis->Shells.push_back(foo);
@@ -751,7 +1042,7 @@ bool BasisSet::ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms) {
 		long atomNum=-1;
 		Buffer->GetLine(LineText);
 		sscanf(LineText, "%ld", &atomNum);
-		if (atomNum != (i+1)) return false;	//incorrect order?
+		if (atomNum != (i+1)) return false;	//incorrect order? Need to log a message...
 		Buffer->GetLine(LineText);
 		while (!IsBlank(LineText)) {
 			char	token[kMaxLineLength];
@@ -775,7 +1066,16 @@ bool BasisSet::ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms) {
 						case 'G':
 							ShellType = GShell;
 							break;
+						case 'H':
+							ShellType = HShell;
+							break;
+						case 'I':
+							ShellType = IShell;
+							break;
 						default:
+							wxString msg;
+							msg.Printf(_("Unknown shell type encountered, shell label = %s"), token);
+							wxLogMessage(msg);
 							return false; //invalid type
 					}
 				} else if (strlen(token) == 2) {

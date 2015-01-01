@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\wxMacMolPlt\src\ming-src\actioncompiler&quot;;&quot;C:\wxMacMolPlt\src\ming-src\blocks&quot;;&quot;C:\wxMacMolPlt\src\ming-src&quot;;&quot;C:\wxWidgets-2.9.1\lib\vc_lib\mswud&quot;;&quot;C:\wxWidgets-2.9.1\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\wxMacMolPlt\src\ming-src\actioncompiler&quot;;&quot;C:\wxMacMolPlt\src\ming-src\blocks&quot;;&quot;C:\wxMacMolPlt\src\ming-src&quot;;&quot;C:\wxWidgets-2.9.5\lib\vc_lib\mswud&quot;;&quot;C:\wxWidgets-2.9.5\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;WINVER=0x0400;wxUSE_GUI=1;__WXDEBUG__;YY_NO_UNISTD_H;HAVE_LIBMING"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -64,7 +64,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxmsw29ud_adv.lib wxmsw29ud_gl.lib wxmsw29ud_core.lib wxmsw29ud_html.lib wxbase29ud.lib wxtiffd.lib wxjpegd.lib wxpngd.lib wxzlibd.lib wxregexud.lib wxexpatd.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;C:\wxWidgets-2.9.1\lib\vc_lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\wxWidgets-2.9.5\lib\vc_lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -116,7 +116,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\wxMacMolPlt\src\ming-src\actioncompiler&quot;;&quot;C:\wxMacMolPlt\src\ming-src\blocks&quot;;&quot;C:\wxMacMolPlt\src\ming-src&quot;;&quot;C:\wxWidgets-2.9.1\lib\vc_lib\mswu&quot;;&quot;C:\wxWidgets-2.9.1\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\wxMacMolPlt\src\ming-src\actioncompiler&quot;;&quot;C:\wxMacMolPlt\src\ming-src\blocks&quot;;&quot;C:\wxMacMolPlt\src\ming-src&quot;;&quot;C:\wxWidgets-2.9.5\lib\vc_lib\mswu&quot;;&quot;C:\wxWidgets-2.9.5\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;WINVER=0x400;wxUSE_GUI=1;YY_NO_UNISTD_H;HAVE_LIBMING"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -137,7 +137,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="wxmsw29u_adv.lib wxmsw29u_gl.lib wxmsw29u_core.lib wxmsw29u_html.lib wxbase29u.lib wxtiff.lib wxjpeg.lib wxpng.lib wxzlib.lib wxregexu.lib wxexpat.lib winmm.lib comctl32.lib rpcrt4.lib wsock32.lib odbc32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;C:\wxWidgets-2.9.1\lib\vc_lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\wxWidgets-2.9.5\lib\vc_lib&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -283,6 +283,10 @@
 			</File>
 			<File
 				RelativePath=".\src\Geometries.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\glew.h"
 				>
 			</File>
 			<File
@@ -794,10 +798,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\glew.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\glf.cpp"
 				>
 			</File>
@@ -1288,10 +1288,6 @@
 				>
 			</File>
 		</Filter>
-		<File
-			RelativePath=".\src\sp.xpm"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

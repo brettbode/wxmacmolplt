@@ -40,15 +40,29 @@ long FindKeyWord(const char *buffer, const char keyin[], long numbyte) {
 //	for (check=0; check<numbyte; check++) 				/* Make sure the keyword is uppercase */
 //		if ((keyword[check]>96) && (keyword[check]<123)) keyword[check] -= 32;
 	for (check=0; check<numbyte; check++)
-		if ((keyin[check]>96) && (keyin[check]<123))
+		if ((keyin[check]>96) && (keyin[check]<123)) {
 			wxLogMessage(_("Error: keyword search on lower case keyword"));
+		}
 #endif
 	long	pos=0;
 	long result = -1;
 	while (buffer[pos]) {
 		check = 0;
-		while (((buffer[pos+check] == keyin[check])||(buffer[pos+check]-32 == keyin[check]))&&
-			(check < numbyte)) check++;
+		bool good=true;
+		while ((check<numbyte) && good) {
+			good=false;
+			if ((buffer[pos+check]>='a')&&(buffer[pos+check]<='z')) {
+				if (buffer[pos+check]-32 == keyin[check]) {
+					good=true;
+					check++;
+				}
+			} else {
+				if (buffer[pos+check] == keyin[check]) {
+					good=true;
+					check++;
+				}
+			}
+		}
 		if (check == numbyte) {
 			result = pos;
 			break;
@@ -287,7 +301,8 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 			Type = kPDBType;
 		else if (FindGroup("DATA")||FindGroup("CONTRL")) {
 			Type = kGAMESSInputType;
-		} else if (LocateKeyWord("<molecule>", 10, -1))
+			//technically molecule is lower case, but LocateKeyword requires upper case
+		} else if (LocateKeyWord("<MOLECULE>", 10, -1))
 			Type = CMLFile;
 		else if (GetFilePos() < kMaxLineLength) {
 			try {
@@ -341,6 +356,33 @@ wxFileOffset BufferFile::FindGroup(const char * GroupName) {
 	}
 	if (!result) SetFilePos(InitialPos);	//reset the initial pos if no group was found
 	else SetFilePos(LineStartPos);	//Push the line back into the buffer
+	return result;
+}
+
+/** Search the file for the keywords FINAL and ENERGY on the same line until found, EOF,
+ * or the limit is reached. Useful for GAMESS log files.
+ * Returns true or false, the file position upon exit will be the start of "FINAL",
+ * or the starting position if the keyword is not found.
+ * @param Limit (optional) The file position limit (in bytes) to limit the search. -1 will
+ *							search to the end of the file.
+ */
+bool BufferFile::LocateFinalEnergy(wxFileOffset Limit) {
+	bool result = false;
+	char LineText[kMaxLineLength];
+	
+	wxFileOffset StartPos = GetFilePos();
+	
+	while (LocateKeyWord("FINAL", 5, Limit)) {
+		wxFileOffset FINALPos = GetFilePos();
+		GetLine(LineText);
+		int LinePos = FindKeyWord(LineText, "ENERGY", 6);
+		if (LinePos > -1) {	//Found energy on the same line
+			SetFilePos(FINALPos);
+			result = true;
+			break;
+		}
+	}
+	if (!result) SetFilePos(StartPos);
 	return result;
 }
 

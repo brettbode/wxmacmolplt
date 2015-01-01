@@ -14,8 +14,10 @@
 #include "glf.h"
 
 #include <wx/stdpaths.h>
-#ifdef __WXMAC__
+#ifdef __WXOSX_CARBON__
 #include <AGL/glu.h>
+#elif __WXOSX_COCOA__
+#include <OpenGL/glu.h>
 #else
 #include <GL/glu.h>
 #endif
@@ -32,8 +34,7 @@
 /* ------------------------------------------------------------------------- */
 
 extern int glf_initialized;
-extern bool show_build_palette;
-extern BuilderDlg *build_palette;
+extern BuilderInterface * BuilderTool;
 
 /* ------------------------------------------------------------------------- */
 
@@ -587,6 +588,7 @@ void MpGLCanvas::Draw() {
 	// Setup OpenGL matrices.  The projection is defined according to the
 	// preferences, and we remain in eye space for now.
 	glViewport(0, 0, (GLint) width, (GLint) height);
+
 	/*glDrawBuffer(GL_BACK); */
 	/* glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); */
 
@@ -1105,7 +1107,7 @@ void MpGLCanvas::eventMouseLeftDoubleClick(wxMouseEvent& event) {
 
 	// If we're in edit mode, we display the periodic table dialog.
 	if (MolWin->InEditMode() && selected_type == MMP_NULL &&
-	    !show_build_palette) {
+	    !BuilderTool->IsPaletteVisible()) {
 		MolWin->ToggleBuilderPalette();
 	}
 
@@ -1303,12 +1305,12 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 	if (!event.Dragging()) {
 		testPicking(curr_mouse.x, curr_mouse.y);
 		if (MolWin->InEditMode() && selected_site >= 0) {
-			if (build_palette->InPeriodicMode()) {
+			if (BuilderTool->InPeriodicMode()) {
 				MolWin->SetStatusText(_("Bond an atom here."));
 			}
 		} else if (MolWin->InEditMode() && selected < 0 && 
-		           build_palette && build_palette->GetSelectedElement()) {
-			if (build_palette->InPeriodicMode()) {
+		           BuilderTool->GetSelectedElement()) {
+			if (BuilderTool->InPeriodicMode()) {
 				MolWin->SetStatusText(_("Add new atom here."));
 			} else {
 				MolWin->SetStatusText(_("Add new prototype here."));
@@ -1454,13 +1456,8 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 
 			// If no periodic table is shown or an atom is not selected, but
 			// the user seems to be trying to add an atom, give them a message.
-			if (build_palette == NULL) {
-				if (selected_site >= 0 || selected < 0) {
-					MolWin->SetStatusText(wxT("Open periodic table dialog to add an atom."));
-				}
-			}
 
-			else if (build_palette->GetSelectedElement() == 0) {
+			if (BuilderTool->GetSelectedElement() == 0) {
 				if (selected_site >= 0 || selected < 0) {
 					MolWin->SetStatusText(wxT("Select an atom in the periodic table."));
 				}
@@ -1472,15 +1469,15 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				MolWin->CreateFrameSnapShot();
 				long OrigAtomCount = lFrame->GetNumAtoms();
 
-				if (build_palette->InPeriodicMode()) {
+				if (BuilderTool->InPeriodicMode()) {
 					CPoint3D vector, origin;
 					MolWin->DrawBondingSites(selected, 0, NULL, selected_site+1, &vector);
 					lFrame->GetAtomPosition(selected, origin);
-					mMainData->NewAtom(build_palette->GetSelectedElement(), origin + vector * 0.01 *
+					mMainData->NewAtom(BuilderTool->GetSelectedElement(), origin + vector * 0.01 *
 					                   (Prefs->GetAtomSize(lFrame->GetAtomType(selected)-1) +
-					                   Prefs->GetAtomSize(build_palette->GetSelectedElement() - 1)));
-					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
-					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
+					                   Prefs->GetAtomSize(BuilderTool->GetSelectedElement() - 1)));
+					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetCoordinationNumber(BuilderTool->GetSelectedCoordination());
+					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetLonePairCount(BuilderTool->GetSelectedLonePairCount());
 					lFrame->Atoms[lFrame->GetNumAtoms() - 1].IsSymmetryUnique(MolWin->InSymmetryEditMode());
 					lFrame->AddBond(selected,lFrame->GetNumAtoms()-1,kSingleBond);
 					MolWin->SetStatusText(wxT("Added new atom."));
@@ -1501,7 +1498,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					int prev_natoms = lFrame->NumAtoms;
 					Structure *structure;
 
-					structure = build_palette->GetSelectedStructure();
+					structure = BuilderTool->GetSelectedStructure();
 
 					if (structure) {
 						if (structure->link_atom == -1) {
@@ -1584,11 +1581,11 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				
 				long OrigAtomCount = lFrame->GetNumAtoms();
 
-				if (build_palette->InPeriodicMode()) {
-					type = build_palette->GetSelectedElement();
+				if (BuilderTool->InPeriodicMode()) {
+					type = BuilderTool->GetSelectedElement();
 					mMainData->NewAtom(type, newPnt);
-					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetCoordinationNumber(build_palette->GetSelectedCoordination());
-					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetLonePairCount(build_palette->GetSelectedLonePairCount());
+					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetCoordinationNumber(BuilderTool->GetSelectedCoordination());
+					lFrame->Atoms[lFrame->GetNumAtoms() - 1].SetLonePairCount(BuilderTool->GetSelectedLonePairCount());
 					lFrame->Atoms[lFrame->GetNumAtoms() - 1].IsSymmetryUnique(MolWin->InSymmetryEditMode());
 
 					// Let's select the new atom.
@@ -1599,9 +1596,9 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					MolWin->AtomsChanged(true, false);
 					MolWin->SetStatusText(wxT("Added new atom."));
 					MolWin->SelectionChanged(true);
-				} else if (build_palette->InStructuresMode()) {
+				} else if (BuilderTool->InStructuresMode()) {
 					Structure *structure; 
-					structure = build_palette->GetSelectedStructure();
+					structure = BuilderTool->GetSelectedStructure();
 
 					if (structure) {
 						CPoint3D pos = structure->atoms[0].Position;
@@ -2494,15 +2491,15 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 		if (!lFrame->Atoms[selected].IsEffectiveFragment()) {
 			// If the periodic table is shown and an atom is selected, offer an
 			// option to change the clicked-on atom to the selected type.
-			if (build_palette && build_palette->GetSelectedElement() != 0 &&
-			    build_palette->GetSelectedElement() != lFrame->Atoms[selected].GetType()) {
+			if (BuilderTool->GetSelectedElement() != 0 &&
+			    BuilderTool->GetSelectedElement() != lFrame->Atoms[selected].GetType()) {
 
 				wxString label;
 				wxString atom_name;
 				Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1,
 					atom_name);
 				label = wxT("Change ") + atom_name + wxT(" to ");
-				Prefs->GetAtomLabel(build_palette->GetSelectedElement() - 1, atom_name);
+				Prefs->GetAtomLabel(BuilderTool->GetSelectedElement() - 1, atom_name);
 				label.Append(atom_name);
 				menu.Append(GL_Popup_Change_Atom, label);
 			}
@@ -2614,7 +2611,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
 void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
 
 	MolWin->CreateFrameSnapShot();
-	mMainData->cFrame->SetAtomType(selected, build_palette->GetSelectedElement());
+	mMainData->cFrame->SetAtomType(selected, BuilderTool->GetSelectedElement());
 	MolWin->AtomsChanged(true,false);
 
 }

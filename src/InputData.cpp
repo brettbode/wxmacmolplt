@@ -385,10 +385,26 @@ const char * ControlGroup::GetGAMESSCCType(const CCRunType & r) {
 			return "R-CC";
 		case CC_CRCC:
 			return "CR-CC";
+		case CC_CRCCL:
+			return "CR-CCL";
+		case CC_CCSDTQ:
+			return "CCSD(TQ)";
+		case CC_CRCCQ:
+			return "CR-CC(Q)";
 		case CC_EOMCCSD:
 			return "EOM-CCSD";
 		case CC_CREOM:
 			return "CR-EOM";
+		case CC_CREOML:
+			return "CR-EOML";
+		case CC_IP_EOM2:
+			return "IP-EOM2";
+		case CC_IP_EOM3A:
+			return "IP-EOM3A";
+		case CC_EA_EOM2:
+			return "EA-EOM2";
+		case CC_EA_EOM3A:
+			return "EA-EOM3A";
 		default:
 			return "unknown";
 	}
@@ -516,6 +532,8 @@ const char * ControlGroup::GAMESSLocalizationToText(GAMESS_Localization t) {
 			return "RUEDNBRG";
 		case GAMESS_POP_Localization:
 			return "POP";
+		case GAMESS_SVD_Localization:
+			return "SVD";
 	}
 	return "invalid";
 }
@@ -2994,9 +3012,11 @@ void HessianGroup::ReadXML(XMLElement * parent) {
 }
 bool HessianGroup::IsAnalyticHessianPossible(const InputData * IData) {
 	//Check based on the SCF type
+	//This is only part of the current rules. It probably covers the common cases though.
+	//ToDo: Match this test up more closely with the state of GAMESS.
 	bool result = (((IData->Control->GetSCFType() == 1)||(IData->Control->GetSCFType() == 3)||
 					(IData->Control->GetSCFType() == 4)||(IData->Control->GetSCFType() == 0))&&
-				   (IData->Control->GetMPLevel() <= 0));
+				   (IData->Control->GetMPLevel() <= 0)&&(!IData->Control->UseDFT()));
 	//Analytic hessians are not available for semi-emperical basis sets
 	if ((IData->Basis->GetBasis() == GAMESS_BS_MNDO)||(IData->Basis->GetBasis() == GAMESS_BS_AM1)||
 		(IData->Basis->GetBasis() == GAMESS_BS_PM3)) return false;

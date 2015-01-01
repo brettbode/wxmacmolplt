@@ -257,7 +257,12 @@ X-SAS-UseImageHeight ALIGN=bottom></CENTER></P>
 <HR>
 Molecular Electrostatic Potential Map (MEPMap)<A NAME="MEP2D"></A>:
 </H3>
-
+<P>The Molecular Electrostatic Potential provides a computation of the
+force a fictious infintesimal test charge would experience at each test
+point. The computation actually omits the test charge so the result has units
+of Hartree divided by charge. One could set the test charge to 1, but of course
+such a value would in reality dramatically alter the electron distribution.
+</P>
 <P>Creates a 2D contour map of the Molecular Electrostatic Potential
 of a molecule. This requires that the original file read in by
 MacMolPlt contain basis set information and the natural orbitals

@@ -352,7 +352,10 @@ void BaseSurfacePane::OnExport(wxCommandEvent &event) {
 		}
 		try {
 			buffer = new BufferFile(currFile, true);
-			switch (wfd.GetFilterIndex()) {
+			int filterIndex = 0;
+				//Looks like under wx 2.9 cocoa if there is only one choice the index doesn't work.
+			if(mTarget->GetDimensions() == 3) filterIndex = wfd.GetFilterIndex();
+			switch (filterIndex) {
 				case 0:
 					// our txt file
 					mTarget->Export(buffer, Surface::TXTFILE);
@@ -509,51 +512,7 @@ int OrbSurfacePane::getOrbSetForOrbPane(vector<wxString>& choice) {
 					item = numitems+1;	//target beta set
 			} 
 			else {
-				switch ((*OrbSet)->getOrbitalType()) {
-					case OptimizedOrbital:
-						if ((*OrbSet)->getOrbitalWavefunctionType() == MCSCF)
-							choice.push_back(_T("MCSCF Optimized Orbitals"));
-						else
-							choice.push_back(_T("Molecular EigenVectors"));
-						break;
-
-					case NaturalOrbital:
-						switch ((*OrbSet)->getOrbitalWavefunctionType()) {
-							case UHF:
-								choice.push_back(_T("UHF Natural Orbitals"));
-								break;
-							case GVB:
-								choice.push_back(_T("GVB GI Orbitals"));
-								break;
-							case MCSCF:
-								choice.push_back(_T("MCSCF Natural Orbitals"));
-								break;
-							case CI:
-								choice.push_back(_T("CI Natural Orbitals"));
-								break;
-							case RHFMP2:
-								choice.push_back(_T("RMP2 Natural Orbitals"));
-								break;
-							case TDDFT:
-								choice.push_back(_T("TD-DFT Natural Orbitals"));
-								break;
-							default:
-								choice.push_back(_T("Natural Orbitals"));
-						}
-						break;
-
-					case LocalizedOrbital:
-						choice.push_back(_T("Localized Orbitals"));
-						break;
-					case OrientedLocalizedOrbital:
-						choice.push_back(_T("Oriented Localized Orbitals"));
-						break;
-					case GuessOrbital:
-						choice.push_back(_T("Initial Guess Orbitals"));
-						break;
-					default:
-						choice.push_back(_T("Molecular Orbitals"));
-				}
+				choice.push_back(wxString((*OrbSet)->getOrbitalTypeText()));
 			}
 			numitems++;
 			OrbSetCount++;
@@ -979,7 +938,6 @@ void Surface1DPane::OnIdle(wxIdleEvent& WXUNUSED(event)) {
 
 		if (className.Cmp(_T("wxTextCtrl")) == 0 
 				|| className.Cmp(_T("Orbital2DSurfPane")) == 0) {
-			double d;
 			setUpdateButton();
 		}
 	}
@@ -3107,49 +3065,7 @@ void BaseSurfacePane::BuildOrbSetPopup(void) {
 		unsigned long	OrbSetCount = 0;
 		while (OrbSet != Orbs->end()) {
 			if ((*OrbSet)->TotalDensityPossible()) {
-				switch ((*OrbSet)->getOrbitalType()) {
-					case OptimizedOrbital:
-						if ((*OrbSet)->getOrbitalWavefunctionType() == MCSCF)
-							mOrbSetChoice->Append(wxString(_T("MCSCF Optimized Orbitals")));
-						else
-							mOrbSetChoice->Append(wxString(_T("Molecular EigenVectors")));
-						break;
-					case NaturalOrbital:
-						switch ((*OrbSet)->getOrbitalWavefunctionType()) {
-							case UHF:
-								mOrbSetChoice->Append(wxString(_T("UHF Natural Orbitals")));
-								break;
-							case GVB:
-								mOrbSetChoice->Append(wxString(_T("GVB GI Orbitals")));
-								break;
-							case MCSCF:
-								mOrbSetChoice->Append(wxString(_T("MCSCF Natural Orbitals")));
-								break;
-							case CI:
-								mOrbSetChoice->Append(wxString(_T("CI Natural Orbitals")));
-								break;
-							case RHFMP2:
-								mOrbSetChoice->Append(wxString(_T("RMP2 Natural Orbitals")));
-								break;
-							case TDDFT:
-								mOrbSetChoice->Append(wxString(_T("TD-DFT Natural Orbitals")));
-								break;
-							default:
-								mOrbSetChoice->Append(wxString(_T("Natural Orbitals")));
-						}
-						break;
-					case LocalizedOrbital:
-						mOrbSetChoice->Append(wxString(_T("Localized Orbitals")));
-						break;
-					case OrientedLocalizedOrbital:
-						mOrbSetChoice->Append(wxString(_T("Oriented Localized Orbitals")));
-						break;
-					case GuessOrbital:
-						mOrbSetChoice->Append(wxString(_T("Initial Guess Orbitals")));
-						break;
-					default:
-						mOrbSetChoice->Append(wxString(_T("Molecular Orbitals")));
-				}
+				mOrbSetChoice->Append(wxString((*OrbSet)->getOrbitalTypeText()));
 			}
 			if (TargetOrbSet < 0) {
 				if (((*OrbSet)->getOrbitalType() != GuessOrbital) ||

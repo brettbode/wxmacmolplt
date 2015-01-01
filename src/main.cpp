@@ -27,9 +27,9 @@
 
 //The global preferences settings
 WinPrefs *  gPreferences=NULL, * gPrefDefaults=NULL;
+WindowData	gWindowDefault;
 
-BuilderDlg *build_palette;
-bool show_build_palette = false;
+BuilderInterface * BuilderTool;
 
 int glf_initialized = 0;
 
@@ -54,8 +54,6 @@ static const wxCmdLineEntryDesc g_cmdLineDesc[] = {
 	{ wxCMD_LINE_NONE } 
 };
 #endif
-
-#include "xpms/sp.xpm"
 
 #ifndef __WXMSW__
 MpApp& wxGetApp() {
@@ -116,7 +114,7 @@ bool MpApp::OnInit() {
 	//attempt to read new xml pref file
 	gPreferences->ReadUserPrefs();
 
-	build_palette = new BuilderDlg(wxT("Builder Tools"));
+	BuilderTool = new BuilderInterface;
 
     // Parse command line 
 	wxString cmdFilename; 
@@ -141,7 +139,7 @@ bool MpApp::OnInit() {
 #endif 
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 
-		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006-2009 ")
+		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006-2012 ")
 					   wxT("Version %s, %s"), wxMacMolPlt_VERSION, (const wxChar*) date);
 		wxLogMessage(msg); 
 		return false; 
@@ -180,6 +178,9 @@ bool MpApp::OnInit() {
 		glf_initialized = 0;
 	}
 	
+    // Initialize image handlers so we can save the PNG format and such.
+    wxInitAllImageHandlers();
+	
 	// Check for a project filename 
 	if (cmdParser.GetParamCount() > 0) {
 		for (int i = 0; i < cmdParser.GetParamCount(); ++i) {
@@ -210,14 +211,13 @@ bool MpApp::OnInit() {
 		// Avoid throwing up the splash screen when opening a file since that can generate other
 		// modal dialogs.
 		
-		wxBitmap sp_bitmap(sp_xpm);
-		splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_NO_TIMEOUT, 0,
-									NULL, -1, wxDefaultPosition, wxDefaultSize,
-									wxSIMPLE_BORDER|wxSTAY_ON_TOP);
+		wxBitmap sp_bitmap;
+		if (sp_bitmap.LoadFile(pathname + wxT("/splash.jpg"), wxBITMAP_TYPE_JPEG)) {
+			splash = new wxSplashScreen(sp_bitmap, wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT, 6000,
+										NULL, -1, wxDefaultPosition, wxDefaultSize,
+										wxBORDER_SIMPLE|wxSTAY_ON_TOP);
+		}
 	}
-
-    // Initialize image handlers so we can save the PNG format and such.
-    wxInitAllImageHandlers();
 	
     // I think the following is appropriate.
 	// On Macs the app continues to run without any windows open, but Linux and Windows exit
@@ -346,6 +346,28 @@ void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {
 	po->ShowModal();
     po->Destroy();
 }
+
+void MpApp::menuHelp(wxCommandEvent & WXUNUSED(event)) {
+	//It seems possible to throw up a basic html viewer within the app, or just call out to the users
+	//default browser.
+	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
+#if wxCHECK_VERSION(2, 8, 0)
+	wxString pathname = gStdPaths.GetResourcesDir();
+#ifdef __WXMAC__
+	pathname.Remove(pathname.Length() - 34);
+#endif
+	pathname += wxT("/MacMolPlt_Manual.html");
+#else
+	wxString pathname = gStdPaths.GetDataDir();
+#ifdef __WXMAC__
+	//On the Mac this points inside the app bundle, but the docs are at the wxMacMolPlt.app level
+	pathname.Remove(pathname.Length() - 34);
+	pathname += wxT("/MacMolPlt_Manual.html");
+#endif
+#endif
+	wxString url = wxT("file://") + pathname;
+	wxLaunchDefaultBrowser(url, 0);
+}
 void MpApp::menuPreferences(wxCommandEvent & WXUNUSED(event)) {
 	//Default application preferences
     if (gPrefDlg) { //need to bring it to the front...
@@ -390,6 +412,7 @@ BEGIN_EVENT_TABLE(MpApp, wxApp)
 	EVT_MENU (wxID_EXIT, MpApp::menuFileQuit)
 	EVT_MENU (wxID_PREFERENCES, MpApp::menuPreferences)
 	EVT_MENU (wxID_ABOUT, MpApp::menuHelpAbout)
+	EVT_MENU (wxID_HELP, MpApp::menuHelp)
 END_EVENT_TABLE()
 
 #ifdef __WXMAC__
@@ -449,9 +472,9 @@ int main(int argc, char **argv) {
 		(strcmp(argv[1], "-b") == 0 ||
 		 strcmp(argv[1], "-v") == 0 ||
 		 strcmp(argv[1], "-h") == 0)) {
-		MpAppNoGUI *guiless_app = new MpAppNoGUI;
+		/*MpAppNoGUI *guiless_app = */ new MpAppNoGUI;
 	} else {
-		MpApp *gui_app = new MpApp;
+		/*MpApp *gui_app = */ new MpApp;
 	}
 
 	return wxEntry(argc, argv);
@@ -506,7 +529,7 @@ bool MpAppNoGUI::OnInit() {
 #endif 
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 
-		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2008-2009 ")
+		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2008-2012 ")
 					   wxT("Version %s, %s"), wxMacMolPlt_VERSION, (const wxChar*) date);
 		wxLogMessage(msg); 
 		return false; 

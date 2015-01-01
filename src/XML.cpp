@@ -809,15 +809,38 @@ bool XMLElement::getLongValue(long & i) const {
 	}
 	return result;
 }
+#define kMaxCopyBuffer	63
 long XMLElement::getFloatArray(const long & count, float * array) const {
 	long readsofar=0;
 	if ((array != NULL)&&(value!=NULL)) {
 		long pos=0;
 		int nchar;
+		char line[kMaxCopyBuffer+1];
+	// It appears that internally sscanf internally calls strlen. For very large arrays this results in
+	// scanning the text string many times over a progressively smaller range, but still takes significant time.
+	// Simply copying the next value in the space delimited string over to a buffer and parsing that buffer results
+	// a major improvement in performance.
 		for (; readsofar<count; readsofar++) {
-			int itemCount = sscanf(&(value[pos]), "%f%n",
+			nchar = 0;
+			int itemCount = 0;
+			while ((value[pos] == ' ')&&(value[pos]!='\0')) pos++;
+			while ((value[pos] != ' ')&&(value[pos]!='\0')&&(nchar<kMaxCopyBuffer)) {
+				line[nchar] = value[pos];
+				nchar++;
+				pos++;
+			}
+			line[nchar] = '\0';
+			if (nchar < kMaxCopyBuffer) {
+				itemCount = sscanf(line, "%f",
+								   &(array[readsofar]));
+			} else {
+		// The following should be equivelent but is slow for very large strings
+		// Switch to this code if the copy didn't fit in the buffer for some reason
+				pos -= nchar;
+				itemCount = sscanf(&(value[pos]), "%f%n",
 							   &(array[readsofar]), &nchar);
-			pos += nchar;
+				pos += nchar;
+			}
 			if (itemCount != 1) {	//Just break and return what we have read in so far
 				break;
 			}
@@ -831,10 +854,28 @@ long XMLElement::getFloatArray(const long & count, std::vector<float> & array) c
 		long pos=0;
 		int nchar;
 		float temp;
+		char line[kMaxCopyBuffer+1];
 		for (; readsofar<count; readsofar++) {
-			int itemCount = sscanf(&(value[pos]), "%f%n",
+			nchar = 0;
+			int itemCount = 0;
+			while ((value[pos] == ' ')&&(value[pos]!='\0')) pos++;
+			while ((value[pos] != ' ')&&(value[pos]!='\0')&&(nchar<kMaxCopyBuffer)) {
+				line[nchar] = value[pos];
+				nchar++;
+				pos++;
+			}
+			line[nchar] = '\0';
+			if (nchar < kMaxCopyBuffer) {
+				itemCount = sscanf(line, "%f",
+								   &(array[readsofar]));
+			} else {
+				// The following should be equivelent but is slow for very large strings
+				// Switch to this code if the copy didn't fit in the buffer for some reason
+				pos -= nchar;
+				itemCount = sscanf(&(value[pos]), "%f%n",
 								   &temp, &nchar);
-			pos += nchar;
+				pos += nchar;
+			}
 			if (itemCount != 1) {	//Just break and return what we have read in so far
 				break;
 			}
@@ -848,10 +889,27 @@ long XMLElement::getLongArray(const long & count, long * array) const {
 	if ((array != NULL)&&(value!=NULL)) {
 		long pos=0;
 		int nchar;
+		char line[kMaxCopyBuffer+1];
 		for (; readsofar<count; readsofar++) {
-			int itemCount = sscanf(&(value[pos]), "%ld%n",
+			nchar = 0;
+			int itemCount = 0;
+			while ((value[pos] == ' ')&&(value[pos]!='\0')) pos++;
+			while ((value[pos] != ' ')&&(value[pos]!='\0')&&(nchar<kMaxCopyBuffer)) {
+				line[nchar] = value[pos];
+				nchar++;
+				pos++;
+			}
+			line[nchar] = '\0';
+			if (nchar < kMaxCopyBuffer) {
+				itemCount = sscanf(line, "%ld", &(array[readsofar]));
+			} else {
+				// The following should be equivelent but is slow for very large strings
+				// Switch to this code if the copy didn't fit in the buffer for some reason
+				pos -= nchar;
+				itemCount = sscanf(&(value[pos]), "%ld%n",
 								   &(array[readsofar]), &nchar);
-			pos += nchar;
+				pos += nchar;
+			}
 			if (itemCount != 1) {	//Just break and return what we have read in so far
 				break;
 			}

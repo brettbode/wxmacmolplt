@@ -39,13 +39,13 @@ class wxMolGraph;
 
 ////@begin control identifiers
 #define ID_EPLOTDIALOG 10065
+#define ID_PANEL5 10227
+#define ID_EPGRAPH 10000
 #define SYMBOL_ENERGYPLOTDIALOG_STYLE wxDEFAULT_FRAME_STYLE|wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_ENERGYPLOTDIALOG_TITLE _("Energy Plot")
 #define SYMBOL_ENERGYPLOTDIALOG_IDNAME ID_EPLOTDIALOG
 #define SYMBOL_ENERGYPLOTDIALOG_SIZE wxDefaultSize
 #define SYMBOL_ENERGYPLOTDIALOG_POSITION wxDefaultPosition
-#define ID_PANEL5 10227
-#define ID_EPGRAPH 10000
 ////@end control identifiers
 
 /*!
@@ -78,27 +78,33 @@ public:
 
 ////@begin EnergyPlotDialog event handler declarations
 
-    /// wxEVT_CLOSE_WINDOW event handler for ID_EPLOTDIALOG
-    void OnCloseWindow( wxCloseEvent& event );
+	/// wxEVT_CLOSE_WINDOW event handler for ID_EPLOTDIALOG
+	void OnCloseWindow( wxCloseEvent& event );
 
-    /// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_COPY
-    void OnCopyClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_CLOSE
+	void OnCloseEvent( wxCommandEvent& event );
 
-    /// wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH
-    void OnEpgraphAxisDClick( wxCommandEvent& event );
-
-    /// wxEVT_GRAPH_CLICK event handler for ID_EPGRAPH
-    void OnEpgraphGraphClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_COPY
+	void OnCopyClick( wxCommandEvent& event );
 
 ////@end EnergyPlotDialog event handler declarations
 
+    /// wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH
+	void OnEpgraphAxisDClick( wxCommandEvent& event );
+	
+    /// wxEVT_GRAPH_CLICK event handler for ID_EPGRAPH
+	void OnEpgraphGraphClick( wxCommandEvent& event );
+	
+	/// Key event handler
+	void KeyHandler(wxKeyEvent &event);
+
 ////@begin EnergyPlotDialog member function declarations
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource( const wxString& name );
 
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+	/// Retrieves icon resources
+	wxIcon GetIconResource( const wxString& name );
 ////@end EnergyPlotDialog member function declarations
 
     void FrameChanged(void);
@@ -109,7 +115,7 @@ public:
     static bool ShowToolTips();
 
 ////@begin EnergyPlotDialog member variables
-    wxMolGraph* epGraph;
+	wxMolGraph* epGraph;
 ////@end EnergyPlotDialog member variables
 };
 

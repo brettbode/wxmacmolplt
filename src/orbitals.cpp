@@ -37,16 +37,19 @@ extern long			gNumProcessors;
 #endif
 #include <iostream>
 
-float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *Atoms,
-		BasisSet *Basis, float *MOVector, long NumAtoms, bool UseSphericalHarmonics);
+float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, const mpAtom * const Atoms,
+		const BasisSet * const Basis, const float * const MOVector, long NumAtoms, bool UseSphericalHarmonics);
+float CalculateMOAmplitude2(float X_value, float Y_value, float Z_value, const mpAtom * const Atoms,
+						   const BasisSet * const Basis, const float * const MOVector, long NumAtoms,
+							const std::vector<int> * atomScreen, const std::vector<int> * shellScreen, bool UseSphericalHarmonics);
 void CalculateAOAmplitudeVector(float X_value, float Y_value, float Z_value, mpAtom *Atoms,
 		BasisSet *Basis, float *AOVector, long NumAtoms);
 /** Setup a pair of filtering arrays indicating whether there are non-zero MO Vector elements for
  each shell and atom.
  */
-void SetupMOScreens(const BasisSet * Basis, const float * MOVector, std::vector<bool> & AtomScreen,
-					std::vector<bool> & ShellScreen, long NumAtoms, bool UseSphericalHarmonics);
-	
+void SetupMOScreens(const BasisSet * const Basis, const float * const MOVector, const mpAtom * const Atoms, std::vector<int> & AtomScreen,
+					std::vector<int> & ShellScreen, long NumAtoms, std::vector<CPoint3D> & reducedAtomPos,
+					std::vector<short> & shellsPerAtom, std::vector<float> & reducedVector, std::vector<int> & shellTypes, std::vector<int> &shellIndex, bool UseSphericalHarmonics);
 const char * ConvertTypeOfWavefunction(const TypeOfWavefunction & t) {
 	switch (t) {
 		case RHF:
@@ -65,6 +68,8 @@ const char * ConvertTypeOfWavefunction(const TypeOfWavefunction & t) {
 			return "RMP2";
 		case TDDFT:
 			return "TDDFT";
+		case EOM_CC:
+			return "EOM_CC";
 		default:
 			return "Unknown";
 	}
@@ -95,6 +100,26 @@ const char * ConvertTypeOfOrbital(const TypeOfOrbital & t) {
 			return "Oriented Localized";
 		case GuessOrbital:
 			return "Initial Guess";
+		case DiabaticMolecularOrbital:
+			return "CAS-SCF Diabatic";
+		case NonOrthogonalSVDLocalizedOrbital:
+			return "NonOrthogonal SVD";
+		case PPASVDLocalizedOrbital:
+			return "PPA SVD";
+		case SVDExternalLocalizedOrbital:
+			return "SVD External";
+		case SplitQAExternalLocalizedOrbital:
+			return "Split QA Localized";
+		case OrderedExternalLocalizedOrbital:
+			return "Ordered External Localized";
+		case VB2000VBOrbital:
+			return "VB2000 VB Orbital";
+		case VB2000InitialOrbital:
+			return "VB2000 Initial Orbital";
+		case VB2000LocalizedMolecularOrbital:
+			return "VB2000 LMOs";
+		case VB2000MolecularOrbital:
+			return "VB2000 Molecular Orbitals";
 		default:
 			return "Unknown";
 	}
@@ -202,6 +227,8 @@ OrbitalRec::OrbitalRec(BufferFile *Buffer, long code, long length) {
 				BaseWavefunction = MCSCF;
 				OrbitalType = NaturalOrbital;
 			break;
+			default:
+				BaseWavefunction = RHF;
 		}
 	}
 }
@@ -285,7 +312,82 @@ void OrbitalRec::ReSize(long nAlphaOrbs, long nBetaOrbs) {
 		NumBetaOrbs = nBetaOrbs;
 	}
 }
-
+const char * OrbitalRec::getOrbitalTypeText(void) const {
+	switch (getOrbitalType()) {
+		case OptimizedOrbital:
+			if (getOrbitalWavefunctionType() == MCSCF)
+				return "MCSCF Optimized Orbitals";
+			else
+				return "Molecular EigenVectors";
+			break;
+			
+		case NaturalOrbital:
+			switch (getOrbitalWavefunctionType()) {
+				case UHF:
+					return "UHF Natural Orbitals";
+					break;
+				case GVB:
+					return "GVB GI Orbitals";
+					break;
+				case MCSCF:
+					return "MCSCF Natural Orbitals";
+					break;
+				case CI:
+					return "CI Natural Orbitals";
+					break;
+				case RHFMP2:
+					return "RMP2 Natural Orbitals";
+					break;
+				case TDDFT:
+					return "TD-DFT Natural Orbitals";
+					break;
+				case EOM_CC:
+					return "EOM-CC Natural Orbitals";
+					break;
+				default:
+					return "Natural Orbitals";
+			}
+			break;
+			
+		case LocalizedOrbital:
+			return "Localized Orbitals";
+			break;
+		case OrientedLocalizedOrbital:
+			return "Oriented Localized Orbitals";
+			break;
+		case NonOrthogonalSVDLocalizedOrbital:
+			return "Nonorthogonal SVD Localized Orbitals";
+			break;
+		case PPASVDLocalizedOrbital:
+			return "PPA SVD Localized Orbitals";
+			break;
+		case SVDExternalLocalizedOrbital:
+			return "SVD External Localized Orbitals";
+			break;
+		case SplitQAExternalLocalizedOrbital:
+			return "SplitQA Localized Orbitals";
+			break;
+		case OrderedExternalLocalizedOrbital:
+			return "Ordered External Localized Orbitals";
+			break;
+		case GuessOrbital:
+			return "Initial Guess Orbitals";
+			break;
+		case DiabaticMolecularOrbital:
+			return "CAS-SCF Diabatic Molecular Orbitals";
+			break;
+		case VB2000VBOrbital:
+			return "VB2000 Valence Bond Orbitals";
+		case VB2000InitialOrbital:
+			return "VB2000 Initial Orbitals";
+		case VB2000LocalizedMolecularOrbital:
+			return "VB2000 Localized Molecular Orbitals";
+		case VB2000MolecularOrbital:
+			return "VB2000 Molecular Orbitals";
+//		default:
+	}
+	return wxString(_T("Molecular Orbitals"));
+}
 //		IO routines
 //Call with the file positioned to the $Vec line
 void OrbitalRec::ReadVecGroup(BufferFile * Buffer, const long & NumBasisFuncs, const TypeOfWavefunction & Type) {
@@ -916,6 +1018,15 @@ void OrbitalRec::RotateVectors(Matrix4D rotationMatrix, BasisSet * Basis, long N
 							MOVector[ivec+14] /= (sqrt7*sqrt5);
 							ivec += 15;
 						break;
+							// TODO add H and I shells
+						case HShell:
+							wxLogMessage(wxT("Rotating H shells is not coded, skipping..."));
+							ivec += 21;
+							break;
+						case IShell:
+							wxLogMessage(wxT("Rotating I shells is not coded, skipping..."));
+							ivec+=28;
+							break;
 					}
 					if (OrigVec) delete [] OrigVec;
 					OrigVec = NULL;
@@ -965,105 +1076,391 @@ bool OrbitalRec::TotalDensityPossible(void) const {
 			(OrbOccupation != NULL));	//Is this a good enough test?
 }
 
-/*
-MORec::MORec(void) {
-	EigenVectors = LocalOrbitals = OrientedLocalOrbitals = NULL;
-	TotalAODensity = NULL;
-	NumOccupiedAlphaOrbs = NumOccupiedBetaOrbs = 0;
-}
-MORec::~MORec(void) {
-	if (EigenVectors) delete EigenVectors;
-	if (LocalOrbitals) delete LocalOrbitals;
-	if (OrientedLocalOrbitals) delete OrientedLocalOrbitals;
-	if (TotalAODensity) delete TotalAODensity;
-}
-*/
-#define kShellScreenThreshold (1.0e-5)
-/** Setup a pair of filtering arrays indicating whether there are non-zero MO Vector elements for
-each shell and atom.
+//This cutoff is in the ballpark. moving it up or down a factor of ten doesn't effect the timing much
+#define kShellScreenThreshold (1.0e-6)
+// the exponetial cutoff is conservative, but seems to carry most of the savings
+#define kExpCutoff (-50.0)
+
+/** Setup a filtered arrays that remove unneeded atoms and shells and combine the coefficients with
+ the normalization constants to simplify the computation of the distance specific part.
  */
-void SetupMOScreens(const BasisSet * Basis, const float * MOVector, std::vector<bool> & AtomScreen,
-					std::vector<bool> & ShellScreen, long NumAtoms, bool UseSphericalHarmonics) {
+void SetupMOScreens(const BasisSet * const Basis, const float * const MOVector, const mpAtom * const Atoms, std::vector<int> & AtomScreen,
+					std::vector<int> & ShellScreen, long NumAtoms, std::vector<CPoint3D> & reducedAtomPos,
+					std::vector<short> & shellsPerAtom, std::vector<float> & reducedVector, std::vector<int> & shellTypes, std::vector<int> &shellIndex, bool UseSphericalHarmonics) {
 	long ivec = 0, nshell=0;
+	long shellCounter=0, atomCounter=0;
 	float VectorSum;
 	const std::vector<BasisShell> & Shells=Basis->Shells;
+	AtomScreen.reserve(NumAtoms);
 	for (long iatom=0; iatom<NumAtoms; iatom++) {
 		bool computeAtom = false;
+		int atomSkip=0;
 		for (long ishell=Basis->BasisMap[2*iatom]; ishell<=Basis->BasisMap[2*iatom+1]; ishell++) {
 			int	type = Shells[ishell].ShellType;
 			if (UseSphericalHarmonics) type += 10;
+			int numFunctions=0;
+			switch (type) {
+				case LShell:
+				case SHLShell:
+					numFunctions = 4;
+					break;
+				case SShell:
+				case SHSShell:
+					numFunctions = 1;
+					break;
+				case PShell:
+				case SHPShell:
+					numFunctions = 3;
+					break;
+				case DShell:
+					numFunctions = 6;
+					break;
+				case FShell:
+					numFunctions = 10;
+					break;
+				case GShell:
+					numFunctions = 15;
+					break;
+				case HShell:
+					numFunctions = 21;
+					break;
+				case IShell:
+					numFunctions = 28;
+					break;
+				case SHDShell:
+					numFunctions = 5;
+					break;
+				case SHFShell:
+					numFunctions = 7;
+					break;
+				case SHGShell:
+					numFunctions = 9;
+					break;
+				case SHHShell:
+					numFunctions = 11;
+					break;
+				case SHIShell:
+					numFunctions = 13;
+					break;
+			}
+			VectorSum = 0.0;
+			for (int ifunc=0; ifunc<numFunctions; ifunc++) {
+				VectorSum += MOVector[ivec];
+				ivec++;
+			}
+			ShellScreen.push_back((fabs(VectorSum) > kShellScreenThreshold) ? 0 : numFunctions);
+			if (ShellScreen[nshell]) shellCounter++;
+			computeAtom = computeAtom || (ShellScreen[nshell] == 0);
+			if (!computeAtom) atomSkip += numFunctions;
+			nshell++;
+		}
+		if (computeAtom)
+			AtomScreen.push_back(0);
+		else
+			AtomScreen.push_back(atomSkip);
+		if (!computeAtom) atomCounter++;
+	}
+	wxString foo;
+	foo << wxT(" Screens: saved ") << shellCounter << wxT(" out of ")  << nshell << wxT(" shells") <<
+	wxT(" and ") << atomCounter << wxT(" out of ") << NumAtoms << wxT(" atoms");
+	wxLogMessage(foo);
+	//Set up normalization constants for d,f,g functions
+	float sqrt3 = sqrt(3.0);
+	float onedsqrt3 = 1/sqrt3;
+	float sqrt5 = sqrt(5.0);
+	float sqrt7 = sqrt(7.0);
+	float sqrt9 = 3.0;
+	float sqrt11 = sqrt(11.0);
+	float sqrt13 = sqrt(13.0);
+	//Use the screening arrays to create reduced vectors of atoms/MOVector
+	//this may seem redundant but doing it once here pulls some logic out of the loop over grid points so saves a lot later.
+	nshell = 0;
+	for (int iatom=0; iatom<NumAtoms; iatom++) {
+		int shellpatom=0;
+		for (long ishell=Basis->BasisMap[2*iatom]; ishell<=Basis->BasisMap[2*iatom+1]; ishell++) {
+			//Now multiply by the appropriate x, y, z factors
+			int	type = Shells[ishell].ShellType;
+			if (UseSphericalHarmonics) type += 10;
+			if ((ShellScreen[nshell])==0) {
+				shellTypes.push_back(type);
+				shellIndex.push_back(ishell);
+				shellpatom++;
+			}
 			switch (type) {
 				case LShell:
 				case SHLShell:
 					//The p part of the L shell must be handled seperately since it has two
 					//normalization factors for the same shell
-					VectorSum =	MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+MOVector[ivec+3];
+					if ((ShellScreen[nshell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(MOVector[ivec+3]);
+					}
 					ivec += 4;
 					break;
 				case SShell:
 				case SHSShell:
-					VectorSum = MOVector[ivec];
+					if ((ShellScreen[nshell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+					}
 					ivec += 1;
 					break;
 				case PShell:
 				case SHPShell:
-					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2];
+					if ((ShellScreen[nshell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+					}
 					ivec += 3;
 					break;
 				case DShell:
-					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+
-						MOVector[ivec+3]+MOVector[ivec+4]+MOVector[ivec+5];
+					if ((ShellScreen[nshell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(sqrt3*MOVector[ivec+3]);
+						reducedVector.push_back(sqrt3*MOVector[ivec+4]);
+						reducedVector.push_back(sqrt3*MOVector[ivec+5]);
+					}
 					ivec += 6;
 					break;
 				case FShell:
-					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+MOVector[ivec+3]+
-								MOVector[ivec+4]+MOVector[ivec+5]+MOVector[ivec+6]+MOVector[ivec+7]+
-								MOVector[ivec+8]+MOVector[ivec+9];
+					if ((ShellScreen[nshell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+3]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+4]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+5]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+6]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+7]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+8]);
+						reducedVector.push_back(sqrt5*sqrt3*MOVector[ivec+9]);
+					}
 					ivec += 10;
 					break;
 				case GShell:
-					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+MOVector[ivec+3]+
-						MOVector[ivec+4]+MOVector[ivec+5]+MOVector[ivec+6]+MOVector[ivec+7]+
-						MOVector[ivec+8]+MOVector[ivec+9]+MOVector[ivec+10]+MOVector[ivec+11]+
-						MOVector[ivec+12]+MOVector[ivec+13]+MOVector[ivec+14];
+					if ((ShellScreen[nshell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+3]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+4]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+5]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+6]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+7]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+8]);
+						reducedVector.push_back(sqrt7*sqrt5*onedsqrt3*MOVector[ivec+9]);
+						reducedVector.push_back(sqrt7*sqrt5*onedsqrt3*MOVector[ivec+10]);
+						reducedVector.push_back(sqrt7*sqrt5*onedsqrt3*MOVector[ivec+11]);
+						reducedVector.push_back(sqrt7*sqrt5*MOVector[ivec+12]);
+						reducedVector.push_back(sqrt7*sqrt5*MOVector[ivec+13]);
+						reducedVector.push_back(sqrt7*sqrt5*MOVector[ivec+14]);
+					}
 					ivec += 15;
 					break;
-				case SHDShell:	
-					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+
-								MOVector[ivec+3]+MOVector[ivec+4];
+				case HShell:
+					if ((ShellScreen[nshell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+3]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+4]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+5]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+6]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+7]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+8]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+9]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+10]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+11]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+12]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+13]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+14]);
+						reducedVector.push_back(sqrt9*sqrt7*MOVector[ivec+15]);
+						reducedVector.push_back(sqrt9*sqrt7*MOVector[ivec+16]);
+						reducedVector.push_back(sqrt9*sqrt7*MOVector[ivec+17]);
+						reducedVector.push_back(sqrt9*sqrt7*sqrt5*onedsqrt3*MOVector[ivec+18]);
+						reducedVector.push_back(sqrt9*sqrt7*sqrt5*onedsqrt3*MOVector[ivec+19]);
+						reducedVector.push_back(sqrt9*sqrt7*sqrt5*onedsqrt3*MOVector[ivec+20]);
+					}
+					ivec += 21;
+					break;
+				case IShell:
+					if ((ShellScreen[nshell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+3]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+4]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+5]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+6]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+7]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+8]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+9]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+10]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+11]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+12]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+13]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+14]);
+						reducedVector.push_back(sqrt11*sqrt9*MOVector[ivec+15]);
+						reducedVector.push_back(sqrt11*sqrt9*MOVector[ivec+16]);
+						reducedVector.push_back(sqrt11*sqrt9*MOVector[ivec+17]);
+						reducedVector.push_back(sqrt11*(sqrt3*sqrt7/sqrt5)*MOVector[ivec+18]);
+						reducedVector.push_back(sqrt11*(sqrt3*sqrt7/sqrt5)*MOVector[ivec+19]);
+						reducedVector.push_back(sqrt11*(sqrt3*sqrt7/sqrt5)*MOVector[ivec+20]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+21]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+22]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+23]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+24]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+25]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+26]);
+						reducedVector.push_back(sqrt11*sqrt5*sqrt7*MOVector[ivec+27]);
+					}
+					ivec += 28;
+					break;
+				case SHDShell:	//normallized except for common 1/sqrt(4pi)
+					//					VectorSum = sqrt5*(sqrt3*(x*y*MOVector[ivec]+y*z*MOVector[ivec+1])+
+					//									   0.5*(3*z2-r2)*MOVector[ivec+2]+
+					//									   sqrt3*(x*z*MOVector[ivec+3]+0.5*(x2-y2)*MOVector[ivec+4]));
+					reducedVector.push_back(sqrt5*sqrt3*MOVector[ivec]);
+					reducedVector.push_back(sqrt5*sqrt3*MOVector[ivec+1]);
+					reducedVector.push_back(sqrt5*0.5*MOVector[ivec+2]);
+					reducedVector.push_back(sqrt5*sqrt3*MOVector[ivec+3]);
+					reducedVector.push_back(sqrt5*sqrt3*0.5*MOVector[ivec+4]);
 					ivec += 5;
 					break;
 				case SHFShell:
-					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+
-								MOVector[ivec+3]+MOVector[ivec+4]+MOVector[ivec+5]+
-								MOVector[ivec+6];
+					//					VectorSum = sqrt7*((sqrt5/sqrt(8.0))*(x*x2-3*x*y2)*MOVector[ivec]+
+					//									   (sqrt5*sqrt3*0.5)*(x2-y2)*z*MOVector[ivec+1]+
+					//									   (sqrt3/sqrt(8.0))*x*(5*z2-r2)*MOVector[ivec+2]+
+					//									   0.5*z*(5*z2-3*r2)*MOVector[ivec+3]+
+					//									   (sqrt3/sqrt(8.0))*y*(5*z2-r2)*MOVector[ivec+4]+
+					//									   (sqrt5*sqrt3)*x*y*z*MOVector[ivec+5]+
+					//									   (sqrt5/sqrt(8.0))*y*(3*x2-y2)*MOVector[ivec+6]);
+					reducedVector.push_back(sqrt7*(sqrt5/sqrt(8.0))*MOVector[ivec]);
+					reducedVector.push_back(sqrt7*(sqrt5*sqrt3*0.5)*MOVector[ivec+1]);
+					reducedVector.push_back(sqrt7*(sqrt3/sqrt(8.0))*MOVector[ivec+2]);
+					reducedVector.push_back(sqrt7*0.5*MOVector[ivec+3]);
+					reducedVector.push_back(sqrt7*(sqrt3/sqrt(8.0))*MOVector[ivec+4]);
+					reducedVector.push_back(sqrt7*(sqrt5*sqrt3)*MOVector[ivec+5]);
+					reducedVector.push_back(sqrt7*(sqrt5/sqrt(8.0))*MOVector[ivec+6]);
 					ivec += 7;
 					break;
 				case SHGShell:
-					VectorSum = MOVector[ivec]+MOVector[ivec+1]+MOVector[ivec+2]+
-								MOVector[ivec+3]+MOVector[ivec+4]+MOVector[ivec+5]+
-								MOVector[ivec+6]+MOVector[ivec+7]+MOVector[ivec+8];
+					//					VectorSum = 3*((sqrt5*sqrt7/8.0)*(x2*x2+y2*y2-6*x2*y2)*MOVector[ivec]+
+					//								   (sqrt5*sqrt7/sqrt(8.0))*(x2-3*y2)*x*z*MOVector[ivec+1]+
+					//								   (sqrt5/4)*(x2-y2)*(7*z2-r2)*MOVector[ivec+2]+
+					//								   (sqrt5/sqrt(8.0))*x*z*(7*z2-3*r2)*MOVector[ivec+3]+
+					//								   ((35*z2*z2-30*z2*r2+3*r2*r2)/8.0)*MOVector[ivec+4]+
+					//								   (sqrt5/sqrt(8.0))*y*z*(7*z2-3*r2)*MOVector[ivec+5]+
+					//								   (sqrt5/2)*x*y*(7*z2-r2)*MOVector[ivec+6]+
+					//								   (sqrt5*sqrt7/sqrt(8.0))*y*z*(3*x2-y2)*MOVector[ivec+7]+
+					//								   (sqrt5*sqrt7/2)*x*y*(x2-y2)*MOVector[ivec+8]);
+					reducedVector.push_back(3*(sqrt5*sqrt7/8.0)*MOVector[ivec]);
+					reducedVector.push_back(3*(sqrt5*sqrt7/sqrt(8.0))*MOVector[ivec+1]);
+					reducedVector.push_back(3*(sqrt5/4.0)*MOVector[ivec+2]);
+					reducedVector.push_back(3*(sqrt5/sqrt(8.0))*MOVector[ivec+3]);
+					reducedVector.push_back(3.0/8.0*MOVector[ivec+4]);
+					reducedVector.push_back(3*(sqrt5/sqrt(8.0))*MOVector[ivec+5]);
+					reducedVector.push_back(3*(sqrt5/2.0)*MOVector[ivec+6]);
+					reducedVector.push_back(3*(sqrt5*sqrt7/sqrt(8.0))*MOVector[ivec+7]);
+					reducedVector.push_back(3*(sqrt5*sqrt7/2.0)*MOVector[ivec+8]);
 					ivec += 9;
 					break;
+				case SHHShell:
+				{
+					//					VectorSum = sqrt11*0.5*((sqrt9*sqrt7/(4.0*sqrt(2.0)))*(x5+5.0*x*y4-10.0*x3*y2)*MOVector[ivec]+
+					//											(sqrt5*sqrt7*sqrt9/4.0)*(x4-6.0*x2*y2+y4)*z*MOVector[ivec+1]+
+					//											(sqrt5*sqrt7/(4.0*sqrt(2.0)))*(x3-3.0*x*y2)*(9*z2-r2)*MOVector[ivec+2]+
+					//											(sqrt7*sqrt5*sqrt3/2.0)*(x2-y2)*(3*z3-z*r2)*MOVector[ivec+3]+
+					//											(sqrt5*sqrt3/4.0)*x*(21*z4-14.0*z2*r2+r2*r2)*MOVector[ivec+4]+
+					//											((63*z5-70*z3*r2+15*z*r2*r2)/4.0)*MOVector[ivec+5]+
+					//											(sqrt5*sqrt3/4.0)*y*(21*z4-14.0*z2*r2+r2*r2)*MOVector[ivec+6]+
+					//											(sqrt7*sqrt5*sqrt3)*x*y*z*(3*z2-r2)*MOVector[ivec+7]+
+					//											(sqrt5*sqrt7/(4.0*sqrt(2.0)))*(3.0*x2*y-y3)*(9*z2-r2)*MOVector[ivec+8]+
+					//											(sqrt5*sqrt7*sqrt9/4.0)*(x2*y-y3)*x*z*MOVector[ivec+9]+
+					//											(sqrt9*sqrt7/(4.0*sqrt(2.0)))*(5*x4*y-10.0*x2*y3+y5)*MOVector[ivec+10]);
+					reducedVector.push_back(sqrt11*0.5*(sqrt9*sqrt7/(4.0*sqrt(2.0)))*MOVector[ivec]);
+					reducedVector.push_back(sqrt11*0.5*(sqrt5*sqrt7*sqrt9/4.0)*MOVector[ivec+1]);
+					reducedVector.push_back(sqrt11*0.5*(sqrt5*sqrt7/(4.0*sqrt(2.0)))*MOVector[ivec+2]);
+					reducedVector.push_back(sqrt11*0.5*(sqrt7*sqrt5*sqrt3/2.0)*MOVector[ivec+3]);
+					reducedVector.push_back(sqrt11*0.5*(sqrt5*sqrt3/4.0)*MOVector[ivec+4]);
+					reducedVector.push_back(sqrt11*0.5*0.25*MOVector[ivec+5]);
+					reducedVector.push_back(sqrt11*0.5*(sqrt5*sqrt3/4.0)*MOVector[ivec+6]);
+					reducedVector.push_back(sqrt11*0.5*(sqrt7*sqrt5*sqrt3)*MOVector[ivec+7]);
+					reducedVector.push_back(sqrt11*0.5*(sqrt5*sqrt7/(4.0*sqrt(2.0)))*MOVector[ivec+8]);
+					reducedVector.push_back(sqrt11*0.5*(sqrt5*sqrt7*sqrt9/4.0)*MOVector[ivec+9]);
+					reducedVector.push_back(sqrt11*0.5*(sqrt9*sqrt7/(4.0*sqrt(2.0)))*MOVector[ivec+10]);
+					ivec += 11;
+				}
+					break;
+				case SHIShell:
+				{
+					//					float x3 = x*x2;
+					//					float x4 = x2*x2;
+					//					float x6 = x3*x3;
+					//					float y3 = y*y2;
+					//					float y4 = y2*y2;
+					//					float y6 = y3*y3;
+					//					float z3 = z*z2;
+					//					float z4 = z2*z2;
+					//					float z6 = z3*z3;
+					//					VectorSum = sqrt13*0.25*((sqrt11*sqrt7*sqrt3/(4.0*sqrt(2.0)))*(x6-15.0*x4*y2+15*x2*y4-y6)*MOVector[ivec]+
+					//											 (sqrt7*sqrt9*sqrt11/sqrt(8.0))*x*z*(x4-10.0*x2*y2+5.0*y4)*z*MOVector[ivec+1]+
+					//											 (sqrt7*sqrt9/4.0)*(x4-6.0*x2*y2+y4)*(11*z2-r2)*MOVector[ivec+2]+
+					//											 (sqrt7*sqrt5*sqrt3/sqrt(8.0))*z*(11*z2-3*r2)*(x3-3.0*x*y2)*MOVector[ivec+3]+
+					//											 (sqrt7*sqrt5*sqrt3/sqrt(32.0))*(x2-y2)*(33*z4-18.0*z2*r2+r2*r2)*MOVector[ivec+4]+
+					//											 (sqrt7*sqrt3/2.0)*x*z*(33*z4-30.0*z2*r2+5.0*r2*r2)*MOVector[ivec+5]+
+					//											 ((231*z6-315*z4*r2+105*z2*r2*r2-5.0*r2*r2*r2)/4.0)*MOVector[ivec+6]+
+					//											 (sqrt7*sqrt3/2.0)*y*z*(33*z4-30.0*z2*r2+5.0*r2*r2)*MOVector[ivec+7]+
+					//											 (sqrt7*sqrt5*sqrt3/sqrt(8.0))*x*y*(33*z4-18.0*z2*r2+r2*r2)*MOVector[ivec+8]+
+					//											 (sqrt7*sqrt5*sqrt3/sqrt(8.0))*z*(11*z2-3*r2)*(3*x2*y-y3)*MOVector[ivec+9]+
+					//											 (sqrt7*sqrt9)*x*y*(x2-y2)*(11*z2-r2)*MOVector[ivec+10]+
+					//											 (sqrt7*sqrt9*sqrt11/sqrt(8.0))*(y4+5*x4-10*x2*y2)*y*z*MOVector[ivec+11]+
+					//											 (sqrt11*sqrt7*sqrt3/sqrt(8.0))*x*y*(3*x4-10.0*x2*y2+3*y4)*MOVector[ivec+12]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt11*sqrt7*sqrt3/(4.0*sqrt(2.0)))*MOVector[ivec]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt7*sqrt9*sqrt11/sqrt(8.0))*MOVector[ivec+1]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt7*sqrt9/4.0)*MOVector[ivec+2]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt7*sqrt5*sqrt3/sqrt(8.0))*MOVector[ivec+3]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt7*sqrt5*sqrt3/sqrt(32.0))*MOVector[ivec+4]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt7*sqrt3/2.0)*MOVector[ivec+5]);
+					reducedVector.push_back(sqrt13*0.25*0.25*MOVector[ivec+6]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt7*sqrt3/2.0)*MOVector[ivec+7]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt7*sqrt5*sqrt3/sqrt(8.0))*MOVector[ivec+8]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt7*sqrt5*sqrt3/sqrt(8.0))*MOVector[ivec+9]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt7*sqrt9)*MOVector[ivec+10]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt7*sqrt9*sqrt11/sqrt(8.0))*MOVector[ivec+11]);
+					reducedVector.push_back(sqrt13*0.25*(sqrt11*sqrt7*sqrt3/sqrt(8.0))*MOVector[ivec+12]);
+					ivec += 13;
+				}
+					break;
 			}
-			ShellScreen[nshell] = (VectorSum > kShellScreenThreshold);
-			computeAtom = computeAtom || ShellScreen[nshell];
 			nshell++;
+		}
+		if ((AtomScreen[iatom])==0) {
+			reducedAtomPos.push_back(Atoms[iatom].Position);
+			shellsPerAtom.push_back(shellpatom);
 		}
 	}
 }
 //Computes the MO Amplitude at the specified x,y,z
-float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *Atoms,
-		BasisSet *Basis, float *MOVector, long NumAtoms, bool UseSphericalHarmonics) {
+float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, const mpAtom * const Atoms,
+		const BasisSet * const Basis, const float * const MOVector, long NumAtoms, bool UseSphericalHarmonics) {
 	long ivec = 0, NumPrims;
-	float	x, y, z, x2, y2, z2, r=0, r2, VectorSum, expcr2, Amplitude=0.0;
-	std::vector<BasisShell> & Shells=Basis->Shells;
+	float	x, y, z, x2, y2, z2, r2, VectorSum, tempSum, expcr2, Amplitude=0.0;
+//	float	r=0;
+	const std::vector<BasisShell> & Shells=Basis->Shells;
 
 		//Set up normalization constants for d,f,g functions
 	float sqrt3 = sqrt(3.0);
 	float onedsqrt3 = 1/sqrt3;
 	float sqrt5 = sqrt(5.0);
 	float sqrt7 = sqrt(7.0);
+	float sqrt9 = 3.0;
+	float sqrt11 = sqrt(11.0);
+	float sqrt13 = sqrt(13.0);
 					//loop over the atoms/shells
 	for (long iatom=0; iatom<NumAtoms; iatom++) {
 		if (iatom > Basis->MapLength) continue;
@@ -1074,7 +1471,7 @@ float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *
 		y2 = y*y;
 		z2 = z*z;
 		r2 = x2+y2+z2;
-		if (UseSphericalHarmonics) r = sqrt(r2);
+	//	if (UseSphericalHarmonics) r = sqrt(r2);
 		for (long ishell=Basis->BasisMap[2*iatom]; ishell<=Basis->BasisMap[2*iatom+1]; ishell++) {
 				//Now multiply by the appropriate x, y, z factors
 			int	type = Shells[ishell].ShellType;
@@ -1104,13 +1501,21 @@ float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *
 				break;
 				case PShell:
 				case SHPShell:
-					VectorSum = x*MOVector[ivec]+y*MOVector[ivec+1]+z*MOVector[ivec+2];
+					VectorSum = x*MOVector[ivec];
+					VectorSum += y*MOVector[ivec+1];
+					VectorSum += z*MOVector[ivec+2];
 					ivec += 3;
 				break;
 				case DShell:
-					VectorSum = (x2*MOVector[ivec]+y2*MOVector[ivec+1]+z2*MOVector[ivec+2])+
-								sqrt3*(x*(y*MOVector[ivec+3]+z*MOVector[ivec+4])+
-								y*z*MOVector[ivec+5]);
+					VectorSum = x2*MOVector[ivec];
+					VectorSum += y2*MOVector[ivec+1];
+					VectorSum += z2*MOVector[ivec+2];
+					// unrolled sqrt3(xy vec[+3] + xz vec[+4] + yz vec[+5])
+					tempSum = x*y*MOVector[ivec+3];
+					tempSum += x*z*MOVector[ivec+4];
+					tempSum += y*z*MOVector[ivec+5];
+					tempSum *= sqrt3;
+					VectorSum += tempSum;
 					ivec += 6;
 				break;
 				case FShell:
@@ -1133,6 +1538,41 @@ float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *
 								x*y*z2*MOVector[ivec+14]));
 					ivec += 15;
 				break;
+				case HShell:
+					VectorSum = x*x2*x2*MOVector[ivec]+y*y2*y2*MOVector[ivec+1]+
+								z*z2*z2*MOVector[ivec+2]+
+								sqrt9*(x2*x2*y*MOVector[ivec+3]+x2*x2*z*MOVector[ivec+4]+
+								 x*y2*y2*MOVector[ivec+5]+y2*y2*z*MOVector[ivec+6]+
+								 x*z2*z2*MOVector[ivec+7]+y*z2*z2*MOVector[ivec+8]+
+								 sqrt7*(onedsqrt3*(x*x2*y2*MOVector[ivec+9]+
+										x*x2*z2*MOVector[ivec+10]+x2*y2*y*MOVector[ivec+11]+
+										y2*y*z2*MOVector[ivec+12]+x2*z*z2*MOVector[ivec+13]+
+										y2*z*z2*MOVector[ivec+14])+
+										x*x2*y*z*MOVector[ivec+15]+x*y*y2*z*MOVector[ivec+16]+
+										x*y*z*z2*MOVector[ivec+17]+
+								sqrt5*onedsqrt3*(x2*y2*z*MOVector[ivec+18]+x2*y*z2*MOVector[ivec+19]+
+												 x*y2*z2*MOVector[ivec+20])));
+					ivec += 21;
+					break;
+				case IShell:
+					VectorSum = x2*x2*x2*MOVector[ivec]+y2*y2*y2*MOVector[ivec+1]+
+								z2*z2*z2*MOVector[ivec+2]+
+								sqrt11*(x*x2*x2*y*MOVector[ivec+3]+x*x2*x2*z*MOVector[ivec+4]+
+										x*y*y2*y2*MOVector[ivec+5]+y*y2*y2*z*MOVector[ivec+6]+
+										x*z*z2*z2*MOVector[ivec+7]+y*z*z2*z2*MOVector[ivec+8]+
+									sqrt3*(x2*x2*y2*MOVector[ivec+9]+x2*x2*z2*MOVector[ivec+10]+
+										x2*y2*y2*MOVector[ivec+11]+y2*y2*z2*MOVector[ivec+12]+
+										x2*z2*z2*MOVector[ivec+13]+y2*z2*z2*MOVector[ivec+14])+
+									sqrt9*(x2*x2*y*z*MOVector[ivec+15]+x*y2*y2*z*MOVector[ivec+16]+
+										x*y*z2*z2*MOVector[ivec+17])+
+									(sqrt3*sqrt7/sqrt5)*(x*x2*y*y2*MOVector[ivec+18]+
+										x*x2*z*z2*MOVector[ivec+19]+y*y2*z*z2*MOVector[ivec+20])+
+									sqrt3*sqrt7*(x*x2*y2*z*MOVector[ivec+21]+x*x2*y*z2*MOVector[ivec+22]+
+										x2*y*y2*z*MOVector[ivec+23]+x*y*y2*z2*MOVector[ivec+24]+
+										x2*y*z*z2*MOVector[ivec+25]+x*y2*z*z2*MOVector[ivec+26])+
+									sqrt5*sqrt7*x2*y2*z2*MOVector[ivec+27]);
+					ivec += 28;
+					break;
 				case SHDShell:	//normallized except for common 1/sqrt(4pi)
 					VectorSum = sqrt5*(sqrt3*(x*y*MOVector[ivec]+y*z*MOVector[ivec+1])+
 								0.5*(3*z2-r2)*MOVector[ivec+2]+
@@ -1161,6 +1601,58 @@ float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *
 								(sqrt5*sqrt7/2)*x*y*(x2-y2)*MOVector[ivec+8]);
 					ivec += 9;
 				break;
+				case SHHShell:
+				{
+					float x3 = x*x2;
+					float x4 = x2*x2;
+					float x5 = x2*x3;
+					float y3 = y*y2;
+					float y4 = y2*y2;
+					float y5 = y2*y3;
+					float z3 = z*z2;
+					float z4 = z2*z2;
+					float z5 = z2*z3;
+					VectorSum = sqrt11*0.5*((sqrt9*sqrt7/(4.0*sqrt(2.0)))*(x5+5.0*x*y4-10.0*x3*y2)*MOVector[ivec]+
+								(sqrt5*sqrt7*sqrt9/4.0)*(x4-6.0*x2*y2+y4)*z*MOVector[ivec+1]+
+								(sqrt5*sqrt7/(4.0*sqrt(2.0)))*(x3-3.0*x*y2)*(9*z2-r2)*MOVector[ivec+2]+
+								(sqrt7*sqrt5*sqrt3/2.0)*(x2-y2)*(3*z3-z*r2)*MOVector[ivec+3]+
+								(sqrt5*sqrt3/4.0)*x*(21*z4-14.0*z2*r2+r2*r2)*MOVector[ivec+4]+
+								((63*z5-70*z3*r2+15*z*r2*r2)/4.0)*MOVector[ivec+5]+
+								(sqrt5*sqrt3/4.0)*y*(21*z4-14.0*z2*r2+r2*r2)*MOVector[ivec+6]+
+								(sqrt7*sqrt5*sqrt3)*x*y*z*(3*z2-r2)*MOVector[ivec+7]+
+								(sqrt5*sqrt7/(4.0*sqrt(2.0)))*(3.0*x2*y-y3)*(9*z2-r2)*MOVector[ivec+8]+
+								(sqrt5*sqrt7*sqrt9/4.0)*(x2*y-y3)*x*z*MOVector[ivec+9]+
+								(sqrt9*sqrt7/(4.0*sqrt(2.0)))*(5*x4*y-10.0*x2*y3+y5)*MOVector[ivec+10]);
+					ivec += 11;
+				}
+					break;
+				case SHIShell:
+				{
+					float x3 = x*x2;
+					float x4 = x2*x2;
+					float x6 = x3*x3;
+					float y3 = y*y2;
+					float y4 = y2*y2;
+					float y6 = y3*y3;
+					float z3 = z*z2;
+					float z4 = z2*z2;
+					float z6 = z3*z3;
+					VectorSum = sqrt13*0.25*((sqrt11*sqrt7*sqrt3/(4.0*sqrt(2.0)))*(x6-15.0*x4*y2+15*x2*y4-y6)*MOVector[ivec]+
+								(sqrt7*sqrt9*sqrt11/sqrt(8.0))*x*z*(x4-10.0*x2*y2+5.0*y4)*z*MOVector[ivec+1]+
+								(sqrt7*sqrt9/4.0)*(x4-6.0*x2*y2+y4)*(11*z2-r2)*MOVector[ivec+2]+
+								(sqrt7*sqrt5*sqrt3/sqrt(8.0))*z*(11*z2-3*r2)*(x3-3.0*x*y2)*MOVector[ivec+3]+
+								(sqrt7*sqrt5*sqrt3/sqrt(32.0))*(x2-y2)*(33*z4-18.0*z2*r2+r2*r2)*MOVector[ivec+4]+
+								(sqrt7*sqrt3/2.0)*x*z*(33*z4-30.0*z2*r2+5.0*r2*r2)*MOVector[ivec+5]+
+								((231*z6-315*z4*r2+105*z2*r2*r2-5.0*r2*r2*r2)/4.0)*MOVector[ivec+6]+
+								(sqrt7*sqrt3/2.0)*y*z*(33*z4-30.0*z2*r2+5.0*r2*r2)*MOVector[ivec+7]+
+								(sqrt7*sqrt5*sqrt3/sqrt(8.0))*x*y*(33*z4-18.0*z2*r2+r2*r2)*MOVector[ivec+8]+
+								(sqrt7*sqrt5*sqrt3/sqrt(8.0))*z*(11*z2-3*r2)*(3*x2*y-y3)*MOVector[ivec+9]+
+								(sqrt7*sqrt9)*x*y*(x2-y2)*(11*z2-r2)*MOVector[ivec+10]+
+								(sqrt7*sqrt9*sqrt11/sqrt(8.0))*(y4+5*x4-10*x2*y2)*y*z*MOVector[ivec+11]+
+								(sqrt11*sqrt7*sqrt3/sqrt(8.0))*x*y*(3*x4-10.0*x2*y2+3*y4)*MOVector[ivec+12]);
+					ivec += 13;
+				}
+					break;
 			}
 				//Only calculate the exponential if the vector is large enough
 			if (fabs(VectorSum) > 1.0e-6) {
@@ -1169,6 +1661,252 @@ float CalculateMOAmplitude(float X_value, float Y_value, float Z_value, mpAtom *
 				for (long iprim=0; iprim<Shells[ishell].NumPrims; iprim++) {
 					expcr2 += Shells[ishell].NormCoef[iprim]*
 							exp(-r2*Shells[ishell].Exponent[iprim]);
+				}
+				Amplitude += expcr2*VectorSum;
+			}
+		}
+	}
+	return Amplitude;
+}
+//Computes the MO Amplitude at the specified x,y,z
+float CalculateMOAmplitude2(float X_value, float Y_value, float Z_value, const mpAtom * const Atoms,
+						   const BasisSet * const Basis, const float * const MOVector, long NumAtoms, 
+							const std::vector<int> * atomScreen, const std::vector<int> * shellScreen, bool UseSphericalHarmonics) {
+	
+	//This shows some promisebut the results are not correct as skipped shells are not skipped in the MOVector properly
+	long ivec = 0, NumPrims;
+	float	x, y, z, x2, y2, z2, r=0, r2, VectorSum, tempSum, expcr2, Amplitude=0.0;
+	const std::vector<BasisShell> & Shells=Basis->Shells;
+	
+	//Set up normalization constants for d,f,g functions
+	float sqrt3 = sqrt(3.0);
+	float onedsqrt3 = 1/sqrt3;
+	float sqrt5 = sqrt(5.0);
+	float sqrt7 = sqrt(7.0);
+	float sqrt9 = 3.0;
+	float sqrt11 = sqrt(11.0);
+	float sqrt13 = sqrt(13.0);
+	int nShell=0;
+	//loop over the atoms/shells
+	for (long iatom=0; iatom<NumAtoms; iatom++) {
+		if ((*atomScreen)[iatom]) {
+			nShell += Basis->BasisMap[2*iatom+1] - Basis->BasisMap[2*iatom];
+			ivec+=(*atomScreen)[iatom];
+			continue;
+		}
+		if (iatom > Basis->MapLength) continue;
+		x = X_value - Atoms[iatom].Position.x*kAng2BohrConversion;
+		y = Y_value - Atoms[iatom].Position.y*kAng2BohrConversion;
+		z = Z_value - Atoms[iatom].Position.z*kAng2BohrConversion;
+		x2 = x*x;
+		y2 = y*y;
+		z2 = z*z;
+		r2 = x2+y2+z2;
+		if (UseSphericalHarmonics) r = sqrt(r2);
+		for (long ishell=Basis->BasisMap[2*iatom]; ishell<=Basis->BasisMap[2*iatom+1]; ishell++) {
+			nShell++;
+			if ((*shellScreen)[nShell-1]) {
+				ivec += (*shellScreen)[nShell-1];
+				continue;
+			}
+			//Now multiply by the appropriate x, y, z factors
+			int	type = Shells[ishell].ShellType;
+			if (UseSphericalHarmonics) type += 10;
+			switch (type) {
+				case LShell:
+				case SHLShell:
+					//The p part of the L shell must be handled seperately since it has two
+					//normalization factors for the same shell
+					VectorSum =	x*MOVector[ivec+1]+y*MOVector[ivec+2]+z*MOVector[ivec+3];
+					if (fabs(VectorSum) > kShellScreenThreshold) {
+						NumPrims = Shells[ishell].NumPrims;
+						expcr2 = 0.0;
+						for (long iprim=0; iprim<NumPrims; iprim++) {
+							float exptemp = -r2*Shells[ishell].Exponent[iprim];
+							if (exptemp > kExpCutoff) {
+								expcr2 += Shells[ishell].NormCoef[iprim+NumPrims]*
+								expf(exptemp);
+							}
+//							expcr2 += Shells[ishell].NormCoef[iprim+NumPrims]*
+//							expf(-r2*Shells[ishell].Exponent[iprim]);
+						}
+						Amplitude += expcr2*VectorSum;
+					}
+					VectorSum = MOVector[ivec];
+					ivec += 4;
+					break;
+				case SShell:
+				case SHSShell:
+					VectorSum = MOVector[ivec];
+					ivec += 1;
+					break;
+				case PShell:
+				case SHPShell:
+					VectorSum = x*MOVector[ivec];
+					VectorSum += y*MOVector[ivec+1];
+					VectorSum += z*MOVector[ivec+2];
+					ivec += 3;
+					break;
+				case DShell:
+					VectorSum = x2*MOVector[ivec];
+					VectorSum += y2*MOVector[ivec+1];
+					VectorSum += z2*MOVector[ivec+2];
+					// unrolled sqrt3(xy vec[+3] + xz vec[+4] + yz vec[+5])
+					tempSum = x*y*MOVector[ivec+3];
+					tempSum += x*z*MOVector[ivec+4];
+					tempSum += y*z*MOVector[ivec+5];
+					tempSum *= sqrt3;
+					VectorSum += tempSum;
+					ivec += 6;
+					break;
+				case FShell:
+					VectorSum = x*x2*MOVector[ivec]+y*y2*MOVector[ivec+1]+
+					z*z2*MOVector[ivec+2]+sqrt5*(x2*y*MOVector[ivec+3]+
+												 x2*z*MOVector[ivec+4]+x*y2*MOVector[ivec+5]+
+												 y2*z*MOVector[ivec+6]+x*z2*MOVector[ivec+7]+
+												 y*z2*MOVector[ivec+8]+sqrt3*x*y*z*MOVector[ivec+9]);
+					ivec += 10;
+					break;
+				case GShell:
+					VectorSum = x2*x2*MOVector[ivec]+y2*y2*MOVector[ivec+1]+
+					z2*z2*MOVector[ivec+2]+sqrt7*
+					(x*x2*y*MOVector[ivec+3]+x*x2*z*MOVector[ivec+4]+
+					 x*y*y2*MOVector[ivec+5]+y*y2*z*MOVector[ivec+6]+
+					 x*z*z2*MOVector[ivec+7]+y*z*z2*MOVector[ivec+8]+
+					 sqrt5*(onedsqrt3*(x2*y2*MOVector[ivec+9]+
+									   x2*z2*MOVector[ivec+10]+y2*z2*MOVector[ivec+11])+
+							x2*y*z*MOVector[ivec+12]+x*y2*z*MOVector[ivec+13]+
+							x*y*z2*MOVector[ivec+14]));
+					ivec += 15;
+					break;
+				case HShell:
+					VectorSum = x*x2*x2*MOVector[ivec]+y*y2*y2*MOVector[ivec+1]+
+					z*z2*z2*MOVector[ivec+2]+
+					sqrt9*(x2*x2*y*MOVector[ivec+3]+x2*x2*z*MOVector[ivec+4]+
+						   x*y2*y2*MOVector[ivec+5]+y2*y2*z*MOVector[ivec+6]+
+						   x*z2*z2*MOVector[ivec+7]+y*z2*z2*MOVector[ivec+8]+
+						   sqrt7*(onedsqrt3*(x*x2*y2*MOVector[ivec+9]+
+											 x*x2*z2*MOVector[ivec+10]+x2*y2*y*MOVector[ivec+11]+
+											 y2*y*z2*MOVector[ivec+12]+x2*z*z2*MOVector[ivec+13]+
+											 y2*z*z2*MOVector[ivec+14])+
+								  x*x2*y*z*MOVector[ivec+15]+x*y*y2*z*MOVector[ivec+16]+
+								  x*y*z*z2*MOVector[ivec+17]+
+								  sqrt5*onedsqrt3*(x2*y2*z*MOVector[ivec+18]+x2*y*z2*MOVector[ivec+19]+
+												   x*y2*z2*MOVector[ivec+20])));
+					ivec += 21;
+					break;
+				case IShell:
+					VectorSum = x2*x2*x2*MOVector[ivec]+y2*y2*y2*MOVector[ivec+1]+
+					z2*z2*z2*MOVector[ivec+2]+
+					sqrt11*(x*x2*x2*y*MOVector[ivec+3]+x*x2*x2*z*MOVector[ivec+4]+
+							x*y*y2*y2*MOVector[ivec+5]+y*y2*y2*z*MOVector[ivec+6]+
+							x*z*z2*z2*MOVector[ivec+7]+y*z*z2*z2*MOVector[ivec+8]+
+							sqrt3*(x2*x2*y2*MOVector[ivec+9]+x2*x2*z2*MOVector[ivec+10]+
+								   x2*y2*y2*MOVector[ivec+11]+y2*y2*z2*MOVector[ivec+12]+
+								   x2*z2*z2*MOVector[ivec+13]+y2*z2*z2*MOVector[ivec+14])+
+							sqrt9*(x2*x2*y*z*MOVector[ivec+15]+x*y2*y2*z*MOVector[ivec+16]+
+								   x*y*z2*z2*MOVector[ivec+17])+
+							(sqrt3*sqrt7/sqrt5)*(x*x2*y*y2*MOVector[ivec+18]+
+												 x*x2*z*z2*MOVector[ivec+19]+y*y2*z*z2*MOVector[ivec+20])+
+							sqrt3*sqrt7*(x*x2*y2*z*MOVector[ivec+21]+x*x2*y*z2*MOVector[ivec+22]+
+										 x2*y*y2*z*MOVector[ivec+23]+x*y*y2*z2*MOVector[ivec+24]+
+										 x2*y*z*z2*MOVector[ivec+25]+x*y2*z*z2*MOVector[ivec+26])+
+							sqrt5*sqrt7*x2*y2*z2*MOVector[ivec+27]);
+					ivec += 28;
+					break;
+				case SHDShell:	//normallized except for common 1/sqrt(4pi)
+					VectorSum = sqrt5*(sqrt3*(x*y*MOVector[ivec]+y*z*MOVector[ivec+1])+
+									   0.5*(3*z2-r2)*MOVector[ivec+2]+
+									   sqrt3*(x*z*MOVector[ivec+3]+0.5*(x2-y2)*MOVector[ivec+4]));
+					ivec += 5;
+					break;
+				case SHFShell:
+					VectorSum = sqrt7*((sqrt5/sqrt(8.0))*(x*x2-3*x*y2)*MOVector[ivec]+
+									   (sqrt5*sqrt3*0.5)*(x2-y2)*z*MOVector[ivec+1]+
+									   (sqrt3/sqrt(8.0))*x*(5*z2-r2)*MOVector[ivec+2]+
+									   0.5*z*(5*z2-3*r2)*MOVector[ivec+3]+
+									   (sqrt3/sqrt(8.0))*y*(5*z2-r2)*MOVector[ivec+4]+
+									   (sqrt5*sqrt3)*x*y*z*MOVector[ivec+5]+
+									   (sqrt5/sqrt(8.0))*y*(3*x2-y2)*MOVector[ivec+6]);
+					ivec += 7;
+					break;
+				case SHGShell:
+					VectorSum = 3*((sqrt5*sqrt7/8.0)*(x2*x2+y2*y2-6*x2*y2)*MOVector[ivec]+
+								   (sqrt5*sqrt7/sqrt(8.0))*(x2-3*y2)*x*z*MOVector[ivec+1]+
+								   (sqrt5/4)*(x2-y2)*(7*z2-r2)*MOVector[ivec+2]+
+								   (sqrt5/sqrt(8.0))*x*z*(7*z2-3*r2)*MOVector[ivec+3]+
+								   ((35*z2*z2-30*z2*r2+3*r2*r2)/8.0)*MOVector[ivec+4]+
+								   (sqrt5/sqrt(8.0))*y*z*(7*z2-3*r2)*MOVector[ivec+5]+
+								   (sqrt5/2)*x*y*(7*z2-r2)*MOVector[ivec+6]+
+								   (sqrt5*sqrt7/sqrt(8.0))*y*z*(3*x2-y2)*MOVector[ivec+7]+
+								   (sqrt5*sqrt7/2)*x*y*(x2-y2)*MOVector[ivec+8]);
+					ivec += 9;
+					break;
+				case SHHShell:
+				{
+					float x3 = x*x2;
+					float x4 = x2*x2;
+					float x5 = x2*x3;
+					float y3 = y*y2;
+					float y4 = y2*y2;
+					float y5 = y2*y3;
+					float z3 = z*z2;
+					float z4 = z2*z2;
+					float z5 = z2*z3;
+					VectorSum = sqrt11*0.5*((sqrt9*sqrt7/(4.0*sqrt(2.0)))*(x5+5.0*x*y4-10.0*x3*y2)*MOVector[ivec]+
+											(sqrt5*sqrt7*sqrt9/4.0)*(x4-6.0*x2*y2+y4)*z*MOVector[ivec+1]+
+											(sqrt5*sqrt7/(4.0*sqrt(2.0)))*(x3-3.0*x*y2)*(9*z2-r2)*MOVector[ivec+2]+
+											(sqrt7*sqrt5*sqrt3/2.0)*(x2-y2)*(3*z3-z*r2)*MOVector[ivec+3]+
+											(sqrt5*sqrt3/4.0)*x*(21*z4-14.0*z2*r2+r2*r2)*MOVector[ivec+4]+
+											((63*z5-70*z3*r2+15*z*r2*r2)/4.0)*MOVector[ivec+5]+
+											(sqrt5*sqrt3/4.0)*y*(21*z4-14.0*z2*r2+r2*r2)*MOVector[ivec+6]+
+											(sqrt7*sqrt5*sqrt3)*x*y*z*(3*z2-r2)*MOVector[ivec+7]+
+											(sqrt5*sqrt7/(4.0*sqrt(2.0)))*(3.0*x2*y-y3)*(9*z2-r2)*MOVector[ivec+8]+
+											(sqrt5*sqrt7*sqrt9/4.0)*(x2*y-y3)*x*z*MOVector[ivec+9]+
+											(sqrt9*sqrt7/(4.0*sqrt(2.0)))*(5*x4*y-10.0*x2*y3+y5)*MOVector[ivec+10]);
+					ivec += 11;
+				}
+					break;
+				case SHIShell:
+				{
+					float x3 = x*x2;
+					float x4 = x2*x2;
+					float x6 = x3*x3;
+					float y3 = y*y2;
+					float y4 = y2*y2;
+					float y6 = y3*y3;
+					float z3 = z*z2;
+					float z4 = z2*z2;
+					float z6 = z3*z3;
+					VectorSum = sqrt13*0.25*((sqrt11*sqrt7*sqrt3/(4.0*sqrt(2.0)))*(x6-15.0*x4*y2+15*x2*y4-y6)*MOVector[ivec]+
+											 (sqrt7*sqrt9*sqrt11/sqrt(8.0))*x*z*(x4-10.0*x2*y2+5.0*y4)*z*MOVector[ivec+1]+
+											 (sqrt7*sqrt9/4.0)*(x4-6.0*x2*y2+y4)*(11*z2-r2)*MOVector[ivec+2]+
+											 (sqrt7*sqrt5*sqrt3/sqrt(8.0))*z*(11*z2-3*r2)*(x3-3.0*x*y2)*MOVector[ivec+3]+
+											 (sqrt7*sqrt5*sqrt3/sqrt(32.0))*(x2-y2)*(33*z4-18.0*z2*r2+r2*r2)*MOVector[ivec+4]+
+											 (sqrt7*sqrt3/2.0)*x*z*(33*z4-30.0*z2*r2+5.0*r2*r2)*MOVector[ivec+5]+
+											 ((231*z6-315*z4*r2+105*z2*r2*r2-5.0*r2*r2*r2)/4.0)*MOVector[ivec+6]+
+											 (sqrt7*sqrt3/2.0)*y*z*(33*z4-30.0*z2*r2+5.0*r2*r2)*MOVector[ivec+7]+
+											 (sqrt7*sqrt5*sqrt3/sqrt(8.0))*x*y*(33*z4-18.0*z2*r2+r2*r2)*MOVector[ivec+8]+
+											 (sqrt7*sqrt5*sqrt3/sqrt(8.0))*z*(11*z2-3*r2)*(3*x2*y-y3)*MOVector[ivec+9]+
+											 (sqrt7*sqrt9)*x*y*(x2-y2)*(11*z2-r2)*MOVector[ivec+10]+
+											 (sqrt7*sqrt9*sqrt11/sqrt(8.0))*(y4+5*x4-10*x2*y2)*y*z*MOVector[ivec+11]+
+											 (sqrt11*sqrt7*sqrt3/sqrt(8.0))*x*y*(3*x4-10.0*x2*y2+3*y4)*MOVector[ivec+12]);
+					ivec += 13;
+				}
+					break;
+			}
+			//Only calculate the exponential if the vector is large enough
+			if (fabs(VectorSum) > kShellScreenThreshold) {
+				expcr2 = 0.0;
+				//Form contracted exponential
+				for (long iprim=0; iprim<Shells[ishell].NumPrims; iprim++) {
+					float exptemp = -r2*Shells[ishell].Exponent[iprim];
+					if (exptemp > kExpCutoff) {
+						expcr2 += Shells[ishell].NormCoef[iprim]*
+						expf(exptemp);
+					}
+//					expcr2 += Shells[ishell].NormCoef[iprim]*
+//					expf(-r2*Shells[ishell].Exponent[iprim]);
 				}
 				Amplitude += expcr2*VectorSum;
 			}
@@ -1188,6 +1926,8 @@ void CalculateAOAmplitudeVector(float X_value, float Y_value, float Z_value, mpA
 	float onedsqrt3 = 1/sqrt3;
 	float sqrt5 = sqrt(5.0);
 	float sqrt7 = sqrt(7.0);
+	float sqrt9 = 3.0;
+	float sqrt11 = sqrt(11.0);
 					//loop over the atoms/shells
 	for (long iatom=0; iatom<NumAtoms; iatom++) {
 		if (iatom > Basis->MapLength) continue;
@@ -1272,6 +2012,61 @@ void CalculateAOAmplitudeVector(float X_value, float Y_value, float Z_value, mpA
 					AOVector[ivec+14] = sqrt7*sqrt5*x*y*z2*expcr2;
 					ivec += 15;
 				break;
+				case HShell:
+					AOVector[ivec] = x*x2*x2*expcr2;
+					AOVector[ivec+1] = y*y2*y2*expcr2;
+					AOVector[ivec+2] = z*z2*z2*expcr2;
+					AOVector[ivec+3] = sqrt9*x2*x2*y*expcr2;
+					AOVector[ivec+4] = sqrt9*x2*x2*z*expcr2;
+					AOVector[ivec+5] = sqrt9*x*y2*y2*expcr2;
+					AOVector[ivec+6] = sqrt9*y2*y2*z*expcr2;
+					AOVector[ivec+7] = sqrt9*x*z2*z2*expcr2;
+					AOVector[ivec+8] = sqrt9*y*z2*z2*expcr2;
+					AOVector[ivec+9] = sqrt3*sqrt7*x*x2*y2*expcr2;
+					AOVector[ivec+10] = sqrt3*sqrt7*x*x2*z2*expcr2;
+					AOVector[ivec+11] = sqrt3*sqrt7*x2*y*y2*expcr2;
+					AOVector[ivec+12] = sqrt3*sqrt7*y*y2*z2*expcr2;
+					AOVector[ivec+13] = sqrt3*sqrt7*x2*z*z2*expcr2;
+					AOVector[ivec+14] = sqrt3*sqrt7*y2*z*z2*expcr2;
+					AOVector[ivec+15] = sqrt9*sqrt7*x*x2*y*z*expcr2;
+					AOVector[ivec+16] = sqrt9*sqrt7*x*y*y2*z*expcr2;
+					AOVector[ivec+17] = sqrt9*sqrt7*x*y*z*z2*expcr2;
+					AOVector[ivec+18] = sqrt7*sqrt5*sqrt3*x2*y2*z*expcr2;
+					AOVector[ivec+19] = sqrt7*sqrt5*sqrt3*x2*y*z2*expcr2;
+					AOVector[ivec+20] = sqrt7*sqrt5*sqrt3*x*y2*z2*expcr2;
+					ivec += 21;
+					break;
+				case IShell:
+					AOVector[ivec] = x2*x2*x2*expcr2;
+					AOVector[ivec+1] = y2*y2*y2*expcr2;
+					AOVector[ivec+2] = z2*z2*z2*expcr2;
+					AOVector[ivec+3] = sqrt11*x*x2*x2*y*expcr2;
+					AOVector[ivec+4] = sqrt11*x*x2*x2*z*expcr2;
+					AOVector[ivec+5] = sqrt11*x*y*y2*y2*expcr2;
+					AOVector[ivec+6] = sqrt11*y*y2*y2*z*expcr2;
+					AOVector[ivec+7] = sqrt11*x*z*z2*z2*expcr2;
+					AOVector[ivec+8] = sqrt11*y*z*z2*z2*expcr2;
+					AOVector[ivec+9] = sqrt3*sqrt11*x2*x2*y2*expcr2;
+					AOVector[ivec+10] = sqrt3*sqrt11*x2*x2*z2*expcr2;
+					AOVector[ivec+11] = sqrt3*sqrt11*x2*y2*y2*expcr2;
+					AOVector[ivec+12] = sqrt3*sqrt11*y2*y2*z2*expcr2;
+					AOVector[ivec+13] = sqrt3*sqrt11*x2*z2*z2*expcr2;
+					AOVector[ivec+14] = sqrt3*sqrt11*y2*z2*z2*expcr2;
+					AOVector[ivec+15] = sqrt9*sqrt11*x2*x2*y*z*expcr2;
+					AOVector[ivec+16] = sqrt9*sqrt11*x*y2*y2*z*expcr2;
+					AOVector[ivec+17] = sqrt9*sqrt11*x*y*z2*z2*expcr2;
+					AOVector[ivec+18] = (sqrt3*sqrt7*sqrt11/sqrt5)*x*x2*y*y2*expcr2;
+					AOVector[ivec+19] = (sqrt3*sqrt7*sqrt11/sqrt5)*x*x2*z*z2*expcr2;
+					AOVector[ivec+20] = (sqrt3*sqrt7*sqrt11/sqrt5)*y*y2*z*z2*expcr2;
+					AOVector[ivec+21] = sqrt11*sqrt7*sqrt3*x*x2*y2*z*expcr2;
+					AOVector[ivec+22] = sqrt11*sqrt7*sqrt3*x*x2*y*z2*expcr2;
+					AOVector[ivec+23] = sqrt11*sqrt7*sqrt3*x2*y*y2*z*expcr2;
+					AOVector[ivec+24] = sqrt11*sqrt7*sqrt3*x*y*y2*z2*expcr2;
+					AOVector[ivec+25] = sqrt11*sqrt7*sqrt3*x2*y*z*z2*expcr2;
+					AOVector[ivec+26] = sqrt11*sqrt7*sqrt3*x*y2*z*z2*expcr2;
+					AOVector[ivec+27] = sqrt11*sqrt7*sqrt5*x2*y2*z2*expcr2;
+					ivec += 28;
+					break;
 			}
 		}
 	}
@@ -1315,14 +2110,6 @@ void Orb2DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	BasisSet * Basis = lData->GetBasisSet();
 	long NumBasisFuncs = Basis->GetNumBasisFuncs(UseSphericalHarmonics());
 	OrbitalRec	*MOs=NULL;
-//	MORec * lOrbs = NULL;
-//	if (!(Options&1)) {
-//		lOrbs=lFrame->Orbs;
-//		if (lFrame->Orbs.size() <= 0) {
-//			FreeGrid();
-//			return;
-//		}
-//	}
 
 	if (Grid && (GridAllocation != NumPoints)) FreeGrid();
 	if ((PlotOrb < 0)||(PlotOrb > NumBasisFuncs)) {
@@ -1358,39 +2145,11 @@ void Orb2DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 			}
 		}
 	}
-//	} else if (Options & 4) {	//or use the Localized MO's
-//		MOs = lOrbs->LocalOrbitals;
-//	} else if (Options & 2) {	//Plot the eigenvectors
-//		MOs = lOrbs->EigenVectors;
-//	} else if (Options & 8) {	//Plot the oriented LMO's
-//		MOs = lOrbs->OrientedLocalOrbitals;
-//	}
 
 	if (MOs==NULL) {	//Invalid orbitals set choice, free memory and return
 		FreeGrid();
 		return;
 	}
-//	if (!(Options&1)) {
-//		if (Options & 16) {
-//			if (PlotOrb>=MOs->NumBetaOrbs) {
-//				FreeGrid();
-//				return;
-//			}
-//			MOVector = &(MOs->VectorsB[NumBasisFuncs*PlotOrb]);
-//		} else {
-//			if (PlotOrb>=MOs->NumAlphaOrbs) {
-//				FreeGrid();
-//				return;
-//			}
-//			MOVector = &(MOs->Vectors[NumBasisFuncs*PlotOrb]);
-//		}
-//	} else {	//AOs: fake an MOVector with one non-zero coef.
-//		MOVector = new float[NumBasisFuncs];
-//		if (MOVector) {
-//			for (long i=0; i<NumBasisFuncs; i++) MOVector[i] = 0.0;
-//			MOVector[PlotOrb] = 1.0;	//Others are init to zero above
-//		}
-//	}
 	if (MOVector == NULL) throw MemoryError();
 
 	if (!Grid) {
@@ -1790,12 +2549,14 @@ typedef struct Orb3DGridData {
 	Orb3DSurface *	Surf;
 	long	xStart;
 	long	xEnd;
-	mpAtom *	Atoms;
-	BasisSet *	Basis;
-	float	*	MOVector;
+	const mpAtom *	Atoms;
+	const BasisSet *	Basis;
+	const float	*	MOVector;
 	long		NumAtoms;
 	float		GridMax;
 	long		PercentDone;
+	const std::vector<int> * atomScreen;
+	const std::vector<int> * shellScreen;
 } Orb3DGridData;
 //derive a class from wxThread that we will use to create the child threads
 class Orb3DThread : public wxThread {
@@ -1814,6 +2575,7 @@ Orb3DThread::Orb3DThread(Orb3DGridData * data) : wxThread(wxTHREAD_JOINABLE) {
 void * Orb3DThread::Entry() {
 	myData->GridMax = myData->Surf->CalculateGrid(myData->xStart, myData->xEnd, myData->Atoms, myData->Basis,
 												  myData->MOVector, myData->NumAtoms, NULL, &(myData->PercentDone),
+												  myData->atomScreen, myData->shellScreen,
 												  true);
 	myData->PercentDone = 100;
 	return NULL;
@@ -1827,14 +2589,7 @@ typedef Orb3DThread * Orb3DThreadPtr;
 //converted to Bohr when used.
 void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	Frame *	lFrame = lData->GetCurrentFramePtr();
-//	MORec * lOrbs = NULL;
-//	if (!(Options&1)) {
-//		lOrbs=lFrame->Orbs;
-//		if (!lOrbs) {
-//			FreeGrid();
-//			return;
-//		}
-//	}
+
 	if (PlotOrb < 0) {
 		FreeGrid();
 		return;
@@ -1844,15 +2599,6 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	BasisSet * Basis = lData->GetBasisSet();
 	long NumBasisFuncs = Basis->GetNumBasisFuncs(UseSphericalHarmonics());
 	float		*MOVector=NULL;
-	//	if (Options&1) {	//use AOs
-//		MOs = (OrbitalRec *) 1;
-//	} else if (Options & 4) {	//or use the Localized MO's
-//		MOs = lOrbs->LocalOrbitals;
-//	} else if (Options & 2) {	//Plot the eigenvectors
-//		MOs = lOrbs->EigenVectors;
-//	} else if (Options & 8) {	//Plot the oriented LMO's
-//		MOs = lOrbs->OrientedLocalOrbitals;
-//	}
 	if (UseAOs()) {	//Use AOs
 		MOs = (OrbitalRec *) 1;
 		MOVector = new float[NumBasisFuncs];
@@ -1885,27 +2631,6 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 		FreeGrid();
 		return;
 	}
-//	if (!(Options&1)) {
-//		if (Options & 16) {
-//			if (PlotOrb>=MOs->NumBetaOrbs) {
-//				FreeGrid();
-//				return;
-//			}
-//			MOVector = &(MOs->VectorsB[NumBasisFuncs*PlotOrb]);
-//		} else {
-//			if (PlotOrb>=MOs->NumAlphaOrbs) {
-//				FreeGrid();
-//				return;
-//			}
-//			MOVector = &(MOs->Vectors[NumBasisFuncs*PlotOrb]);
-//		}
-//	} else {	//AOs: fake an MOVector with one non-zero coef.
-//		MOVector = new float[NumBasisFuncs];
-//		if (MOVector) {
-//			for (long i=0; i<NumBasisFuncs; i++) MOVector[i] = 0.0;
-//			MOVector[PlotOrb] = 1.0;	//Others are init to zero above
-//		}
-//	}
 	if (MOVector == NULL) throw MemoryError();
 	SetupGridParameters(lFrame);	//Define the 3D volume
 
@@ -1925,6 +2650,17 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	float * lGrid;
 	lGrid = Grid;
 	GridMax = -1.0e20;	//init the Grid max to a value sure to be changed later
+	
+	std::vector<int> AtomScreen;
+	std::vector<int> ShellScreen;
+	std::vector<CPoint3D> atomList;
+	std::vector<short> shellsPerAtom;
+	std::vector<float> reducedVector;
+	std::vector<int> shellTypes;
+	std::vector<int> shellIndex;
+	
+	SetupMOScreens(Basis, MOVector, lFrame->Atoms, AtomScreen, ShellScreen, lFrame->NumAtoms, atomList, shellsPerAtom, reducedVector, shellTypes, shellIndex, UseSphericalHarmonics());
+	
 #if defined(powerc) && defined(MacintoshBuild)
 	if (gMPAware && (gNumProcessors>1)) {
 		OSErr	status;
@@ -2000,7 +2736,8 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 		lProgress->ResetTimes();
 	} else 
 #endif
-#ifdef __wxBuild__
+//#ifdef __wxBuild__
+#if 0
 		if (wxThread::GetCPUCount() > 1) {
 			int myCPUCount = wxThread::GetCPUCount();
 			//Ok we have multiple CPUs so create a worker thread for each CPU and split up the grid calculation
@@ -2022,6 +2759,8 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 				DataPtrs[i].MOVector = MOVector;
 				DataPtrs[i].NumAtoms = lFrame->NumAtoms;
 				DataPtrs[i].PercentDone = 0;
+				DataPtrs[i].atomScreen = &AtomScreen;
+				DataPtrs[i].shellScreen = &ShellScreen;
 				
 				//Create the actual thread
 				myThreads[i] = new Orb3DThread(&(DataPtrs[i]));
@@ -2074,9 +2813,23 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 		} else
 #endif
 		{
+#ifdef __wxBuild__
+			wxStopWatch timer;
+			long CheckTime = timer.Time();
+			long selfTime = CheckTime;
+#endif
 			long junk;	//just a placeholder, not used for cooperative tasks
-		GridMax = CalculateGrid(0,NumXGridPoints,lFrame->Atoms, Basis, MOVector,
-			lFrame->NumAtoms, lProgress, &junk,false);
+			GridMax = CalculateGrid(0,NumXGridPoints,lFrame->Atoms, Basis, MOVector,
+									lFrame->NumAtoms, lProgress, &junk, &AtomScreen, &ShellScreen, false);
+			wxString foo2;
+			CheckTime =timer.Time();
+			foo2 << wxT(" CalculateGrid selftime is ") << CheckTime -selfTime << wxT(" GridMax = ") << GridMax;
+			wxLogMessage(foo2);
+			GridMax = CalculateGridStreamlined(0,NumXGridPoints, atomList, Basis, reducedVector,
+					lFrame->NumAtoms, lProgress, &junk, &AtomScreen, &ShellScreen, shellTypes, shellIndex, shellsPerAtom, false);
+			wxString foo;
+			foo << wxT(" CalculateGridStreamLined selftime is ") << timer.Time() -CheckTime << wxT(" GridMax = ") << GridMax;
+			wxLogMessage(foo);
 	}
 		//Unlock the grid handle and return
 	if (Options & 1) delete [] MOVector;
@@ -2086,8 +2839,9 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 	YGridInc *= kBohr2AngConversion;
 	ZGridInc *= kBohr2AngConversion;
 }
-float Orb3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisSet * Basis,
-		float * MOVector, long NumAtoms, Progress * lProgress, long * PercentDone, bool MPTask) {
+float Orb3DSurface::CalculateGrid(long xStart, long xEnd, const mpAtom * const Atoms, const BasisSet * const Basis,
+		const float * const MOVector, long NumAtoms, Progress * lProgress, long * PercentDone, 
+								  const std::vector<int> * const atomScreen, const std::vector<int> * const shellScreen, bool MPTask) {
 	float lGridMax = -1.0e20;
 	float lGridMin = 1.0e20;
 	float XGridValue, YGridValue, ZGridValue;
@@ -2097,6 +2851,7 @@ float Orb3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisS
 #ifdef __wxBuild__
 	wxStopWatch timer;
 	long CheckTime = timer.Time();
+	long selfTime = CheckTime;
 #endif
 	lGrid = Grid;
 	float PhaseChange = 1.0;
@@ -2131,6 +2886,9 @@ float Orb3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisS
 			for (iZPt=0; iZPt<NumZGridPoints; iZPt++) {
 				lGrid[n] = PhaseChange * CalculateMOAmplitude(XGridValue, YGridValue, ZGridValue,
 					Atoms, Basis, MOVector, NumAtoms,UseSphericalHarmonics());
+//				lGrid[n] = PhaseChange * CalculateMOAmplitude2(XGridValue, YGridValue, ZGridValue,
+//															  Atoms, Basis, MOVector, NumAtoms,
+//															  atomScreen, shellScreen, UseSphericalHarmonics());
 			
 				lGridMax = MAX(lGridMax, lGrid[n]);
 				lGridMin = MIN(lGridMin, lGrid[n]);
@@ -2142,8 +2900,563 @@ float Orb3DSurface::CalculateGrid(long xStart, long xEnd, mpAtom * Atoms, BasisS
 		XGridValue += XGridInc;
 	}
 	lGridMax = MAX(lGridMax, fabs(lGridMin));
+	wxString foo;
+	foo << wxT(" CalculateGrid sefltime for ") << (xEnd-xStart)*NumYGridPoints*NumZGridPoints <<
+	wxT(" points is ") << timer.Time() -selfTime;
+	wxLogMessage(foo);
 	return lGridMax;
 }
+float Orb3DSurface::CalculateGridStreamlined(long xStart, long xEnd, const std::vector<CPoint3D> & atomList, const BasisSet * const Basis,
+								  const std::vector<float> & reducedVector, long NumAtoms, Progress * lProgress, long * PercentDone,
+											 const std::vector<int> * const atomScreen, const std::vector<int> * const shellScreen, std::vector<int> & shellTypes, std::vector<int> & shellIndex, const std::vector<short> & shellsPerAtom, bool MPTask) {
+#ifdef __wxBuild__
+	wxStopWatch timer;
+	long CheckTime = timer.Time();
+	long selfTime = CheckTime;
+#endif
+	//Set up normalization constants for d,f,g functions
+//	float sqrt3 = sqrt(3.0);
+//	float onedsqrt3 = 1/sqrt3;
+//	float sqrt5 = sqrt(5.0);
+//	float sqrt7 = sqrt(7.0);
+//	float sqrt9 = 3.0;
+//	float sqrt11 = sqrt(11.0);
+//	float sqrt13 = sqrt(13.0);
+	//this is a test fucntion for optimization ideas. If useful need to break down some of them in to separate levels.
+	//Start by creating a sorted, reduced atom, shell and vector
+//	std::vector<CPoint3D> atomList;
+//	std::vector<short> shellsPerAtom;
+//	atomList.reserve(NumAtoms);
+//	shellsPerAtom.reserve(NumAtoms);
+//	std::vector<float> reducedVector2;
+//	reducedVector2.reserve(Basis->GetNumBasisFuncs(false));
+//	std::vector<int> shellTypes2;
+//	std::vector<int> shellIndex2;
+	const std::vector<BasisShell> & Shells=Basis->Shells;
+	int nShell = 0, ivec=0;
+	//this may seem redundant but doing it once here pulls some logic out of the loop over grid points so saves a lot later.
+/*	for (int iatom=0; iatom<NumAtoms; iatom++) {
+		int shellpatom=0;
+		for (long ishell=Basis->BasisMap[2*iatom]; ishell<=Basis->BasisMap[2*iatom+1]; ishell++) {
+			//Now multiply by the appropriate x, y, z factors
+			int	type = Shells[ishell].ShellType;
+			if (UseSphericalHarmonics()) type += 10;
+			if (((*shellScreen)[nShell])==0) {
+				shellTypes2.push_back(type);
+				shellIndex2.push_back(ishell);
+				shellpatom++;
+			}
+			switch (type) {
+				case LShell:
+				case SHLShell:
+					//The p part of the L shell must be handled seperately since it has two
+					//normalization factors for the same shell
+					if (((*shellScreen)[nShell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(MOVector[ivec+3]);
+					}
+					ivec += 4;
+					break;
+				case SShell:
+				case SHSShell:
+					if (((*shellScreen)[nShell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+					}
+					ivec += 1;
+					break;
+				case PShell:
+				case SHPShell:
+					if (((*shellScreen)[nShell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+					}
+					ivec += 3;
+					break;
+				case DShell:
+					if (((*shellScreen)[nShell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(sqrt3*MOVector[ivec+3]);
+						reducedVector.push_back(sqrt3*MOVector[ivec+4]);
+						reducedVector.push_back(sqrt3*MOVector[ivec+5]);
+					}
+					ivec += 6;
+					break;
+				case FShell:
+					if (((*shellScreen)[nShell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+3]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+4]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+5]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+6]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+7]);
+						reducedVector.push_back(sqrt5*MOVector[ivec+8]);
+						reducedVector.push_back(sqrt5*sqrt3*MOVector[ivec+9]);
+					}
+					ivec += 10;
+					break;
+				case GShell:
+					if (((*shellScreen)[nShell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+3]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+4]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+5]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+6]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+7]);
+						reducedVector.push_back(sqrt7*MOVector[ivec+8]);
+						reducedVector.push_back(sqrt7*sqrt5*onedsqrt3*MOVector[ivec+9]);
+						reducedVector.push_back(sqrt7*sqrt5*onedsqrt3*MOVector[ivec+10]);
+						reducedVector.push_back(sqrt7*sqrt5*onedsqrt3*MOVector[ivec+11]);
+						reducedVector.push_back(sqrt7*sqrt5*MOVector[ivec+12]);
+						reducedVector.push_back(sqrt7*sqrt5*MOVector[ivec+13]);
+						reducedVector.push_back(sqrt7*sqrt5*MOVector[ivec+14]);
+					}
+					ivec += 15;
+					break;
+				case HShell:
+					if (((*shellScreen)[nShell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+3]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+4]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+5]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+6]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+7]);
+						reducedVector.push_back(sqrt9*MOVector[ivec+8]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+9]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+10]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+11]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+12]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+13]);
+						reducedVector.push_back(sqrt9*sqrt7*onedsqrt3*MOVector[ivec+14]);
+						reducedVector.push_back(sqrt9*sqrt7*MOVector[ivec+15]);
+						reducedVector.push_back(sqrt9*sqrt7*MOVector[ivec+16]);
+						reducedVector.push_back(sqrt9*sqrt7*MOVector[ivec+17]);
+						reducedVector.push_back(sqrt9*sqrt7*sqrt5*onedsqrt3*MOVector[ivec+18]);
+						reducedVector.push_back(sqrt9*sqrt7*sqrt5*onedsqrt3*MOVector[ivec+19]);
+						reducedVector.push_back(sqrt9*sqrt7*sqrt5*onedsqrt3*MOVector[ivec+20]);
+					}
+					ivec += 21;
+					break;
+				case IShell:
+					if (((*shellScreen)[nShell])==0) {
+						reducedVector.push_back(MOVector[ivec]);
+						reducedVector.push_back(MOVector[ivec+1]);
+						reducedVector.push_back(MOVector[ivec+2]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+3]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+4]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+5]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+6]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+7]);
+						reducedVector.push_back(sqrt11*MOVector[ivec+8]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+9]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+10]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+11]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+12]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+13]);
+						reducedVector.push_back(sqrt11*sqrt3*MOVector[ivec+14]);
+						reducedVector.push_back(sqrt11*sqrt9*MOVector[ivec+15]);
+						reducedVector.push_back(sqrt11*sqrt9*MOVector[ivec+16]);
+						reducedVector.push_back(sqrt11*sqrt9*MOVector[ivec+17]);
+						reducedVector.push_back(sqrt11*(sqrt3*sqrt7/sqrt5)*MOVector[ivec+18]);
+						reducedVector.push_back(sqrt11*(sqrt3*sqrt7/sqrt5)*MOVector[ivec+19]);
+						reducedVector.push_back(sqrt11*(sqrt3*sqrt7/sqrt5)*MOVector[ivec+20]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+21]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+22]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+23]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+24]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+25]);
+						reducedVector.push_back(sqrt11*sqrt3*sqrt7*MOVector[ivec+26]);
+						reducedVector.push_back(sqrt11*sqrt5*sqrt7*MOVector[ivec+27]);
+					}
+					ivec += 28;
+					break;
+				case SHDShell:	//normallized except for common 1/sqrt(4pi)
+//					VectorSum = sqrt5*(sqrt3*(x*y*MOVector[ivec]+y*z*MOVector[ivec+1])+
+//									   0.5*(3*z2-r2)*MOVector[ivec+2]+
+//									   sqrt3*(x*z*MOVector[ivec+3]+0.5*(x2-y2)*MOVector[ivec+4]));
+					ivec += 5;
+					break;
+				case SHFShell:
+//					VectorSum = sqrt7*((sqrt5/sqrt(8.0))*(x*x2-3*x*y2)*MOVector[ivec]+
+//									   (sqrt5*sqrt3*0.5)*(x2-y2)*z*MOVector[ivec+1]+
+//									   (sqrt3/sqrt(8.0))*x*(5*z2-r2)*MOVector[ivec+2]+
+//									   0.5*z*(5*z2-3*r2)*MOVector[ivec+3]+
+//									   (sqrt3/sqrt(8.0))*y*(5*z2-r2)*MOVector[ivec+4]+
+//									   (sqrt5*sqrt3)*x*y*z*MOVector[ivec+5]+
+//									   (sqrt5/sqrt(8.0))*y*(3*x2-y2)*MOVector[ivec+6]);
+					ivec += 7;
+					break;
+				case SHGShell:
+//					VectorSum = 3*((sqrt5*sqrt7/8.0)*(x2*x2+y2*y2-6*x2*y2)*MOVector[ivec]+
+//								   (sqrt5*sqrt7/sqrt(8.0))*(x2-3*y2)*x*z*MOVector[ivec+1]+
+//								   (sqrt5/4)*(x2-y2)*(7*z2-r2)*MOVector[ivec+2]+
+//								   (sqrt5/sqrt(8.0))*x*z*(7*z2-3*r2)*MOVector[ivec+3]+
+//								   ((35*z2*z2-30*z2*r2+3*r2*r2)/8.0)*MOVector[ivec+4]+
+//								   (sqrt5/sqrt(8.0))*y*z*(7*z2-3*r2)*MOVector[ivec+5]+
+//								   (sqrt5/2)*x*y*(7*z2-r2)*MOVector[ivec+6]+
+//								   (sqrt5*sqrt7/sqrt(8.0))*y*z*(3*x2-y2)*MOVector[ivec+7]+
+//								   (sqrt5*sqrt7/2)*x*y*(x2-y2)*MOVector[ivec+8]);
+					ivec += 9;
+					break;
+				case SHHShell:
+				{
+//					VectorSum = sqrt11*0.5*((sqrt9*sqrt7/(4.0*sqrt(2.0)))*(x5+5.0*x*y4-10.0*x3*y2)*MOVector[ivec]+
+//											(sqrt5*sqrt7*sqrt9/4.0)*(x4-6.0*x2*y2+y4)*z*MOVector[ivec+1]+
+//											(sqrt5*sqrt7/(4.0*sqrt(2.0)))*(x3-3.0*x*y2)*(9*z2-r2)*MOVector[ivec+2]+
+//											(sqrt7*sqrt5*sqrt3/2.0)*(x2-y2)*(3*z3-z*r2)*MOVector[ivec+3]+
+//											(sqrt5*sqrt3/4.0)*x*(21*z4-14.0*z2*r2+r2*r2)*MOVector[ivec+4]+
+//											((63*z5-70*z3*r2+15*z*r2*r2)/4.0)*MOVector[ivec+5]+
+//											(sqrt5*sqrt3/4.0)*y*(21*z4-14.0*z2*r2+r2*r2)*MOVector[ivec+6]+
+//											(sqrt7*sqrt5*sqrt3)*x*y*z*(3*z2-r2)*MOVector[ivec+7]+
+//											(sqrt5*sqrt7/(4.0*sqrt(2.0)))*(3.0*x2*y-y3)*(9*z2-r2)*MOVector[ivec+8]+
+//											(sqrt5*sqrt7*sqrt9/4.0)*(x2*y-y3)*x*z*MOVector[ivec+9]+
+//											(sqrt9*sqrt7/(4.0*sqrt(2.0)))*(5*x4*y-10.0*x2*y3+y5)*MOVector[ivec+10]);
+					ivec += 11;
+				}
+					break;
+				case SHIShell:
+				{
+//					float x3 = x*x2;
+//					float x4 = x2*x2;
+//					float x6 = x3*x3;
+//					float y3 = y*y2;
+//					float y4 = y2*y2;
+//					float y6 = y3*y3;
+//					float z3 = z*z2;
+//					float z4 = z2*z2;
+//					float z6 = z3*z3;
+//					VectorSum = sqrt13*0.25*((sqrt11*sqrt7*sqrt3/(4.0*sqrt(2.0)))*(x6-15.0*x4*y2+15*x2*y4-y6)*MOVector[ivec]+
+//											 (sqrt7*sqrt9*sqrt11/sqrt(8.0))*x*z*(x4-10.0*x2*y2+5.0*y4)*z*MOVector[ivec+1]+
+//											 (sqrt7*sqrt9/4.0)*(x4-6.0*x2*y2+y4)*(11*z2-r2)*MOVector[ivec+2]+
+//											 (sqrt7*sqrt5*sqrt3/sqrt(8.0))*z*(11*z2-3*r2)*(x3-3.0*x*y2)*MOVector[ivec+3]+
+//											 (sqrt7*sqrt5*sqrt3/sqrt(32.0))*(x2-y2)*(33*z4-18.0*z2*r2+r2*r2)*MOVector[ivec+4]+
+//											 (sqrt7*sqrt3/2.0)*x*z*(33*z4-30.0*z2*r2+5.0*r2*r2)*MOVector[ivec+5]+
+//											 ((231*z6-315*z4*r2+105*z2*r2*r2-5.0*r2*r2*r2)/4.0)*MOVector[ivec+6]+
+//											 (sqrt7*sqrt3/2.0)*y*z*(33*z4-30.0*z2*r2+5.0*r2*r2)*MOVector[ivec+7]+
+//											 (sqrt7*sqrt5*sqrt3/sqrt(8.0))*x*y*(33*z4-18.0*z2*r2+r2*r2)*MOVector[ivec+8]+
+//											 (sqrt7*sqrt5*sqrt3/sqrt(8.0))*z*(11*z2-3*r2)*(3*x2*y-y3)*MOVector[ivec+9]+
+//											 (sqrt7*sqrt9)*x*y*(x2-y2)*(11*z2-r2)*MOVector[ivec+10]+
+//											 (sqrt7*sqrt9*sqrt11/sqrt(8.0))*(y4+5*x4-10*x2*y2)*y*z*MOVector[ivec+11]+
+//											 (sqrt11*sqrt7*sqrt3/sqrt(8.0))*x*y*(3*x4-10.0*x2*y2+3*y4)*MOVector[ivec+12]);
+					ivec += 13;
+				}
+					break;
+			}
+	 
+			nShell++;
+		}
+		if (((*atomScreen)[iatom])==0) {
+//			atomList[numReducedAtoms] = Atoms[iatom].Position;
+//			numReducedAtoms++;
+//			atomList.push_back(Atoms[iatom].Position);
+//			shellsPerAtom.push_back(shellpatom);
+		}
+	}*/
+ 
+	
+	float lGridMax = -1.0e20;
+	float lGridMin = 1.0e20;
+	float XGridValue, YGridValue, ZGridValue;
+	long	iXPt, iYPt, iZPt;
+	long n=xStart*(NumYGridPoints*NumZGridPoints);
+	float * lGrid;
+	lGrid = Grid;
+	float PhaseChange = 1.0;
+	if (GetPhaseChange()) PhaseChange = -1.0;
+	
+	float	x, y, z, x2, y2, z2, r2, VectorSum, expcr2, Amplitude=0.0;
+//	long skipcount=0, issuecount=0, okcount=0;
+	int NumPrims;
+	XGridValue = Origin.x + xStart * XGridInc;
+	for (iXPt=xStart; iXPt<xEnd; iXPt++) {
+		//Note the percent done for MP tasks such that the progress dlog can be updated
+		if (MPTask) *PercentDone = 100*(iXPt-xStart)/(xEnd-xStart);
+		YGridValue = Origin.y;
+		for (iYPt=0; iYPt<NumYGridPoints; iYPt++) {
+			if (!MPTask) {
+				//Give up the CPU and check for cancels if running cooperatively
+				if (!lProgress->UpdateProgress(100*iXPt/xEnd)) {	//User canceled so clean things up and abort
+					FreeGrid();
+					return 0.0;
+				}
+			}
+#ifdef __wxBuild__
+			else {
+				long tempTime  = timer.Time();
+				if ((tempTime - CheckTime) > 50) {
+					CheckTime = tempTime;
+					if ((wxThread::This())->TestDestroy()) {
+						//Getting here means the caller has requested a cancel so exit
+						return 0.0;
+					}
+				}
+			}
+#endif
+			ZGridValue = Origin.z;
+			for (iZPt=0; iZPt<NumZGridPoints; iZPt++) {
+				//				lGrid[n] = PhaseChange * CalculateMOAmplitude(XGridValue, YGridValue, ZGridValue,
+				//					Atoms, Basis, MOVector, NumAtoms,UseSphericalHarmonics());
+//				lGrid[n] = PhaseChange * CalculateMOAmplitude2(XGridValue, YGridValue, ZGridValue,
+//															   Atoms, Basis, MOVector, NumAtoms,
+//															   atomScreen, shellScreen, UseSphericalHarmonics());
+				
+				//loop over the atoms/shells
+				nShell=0;
+				ivec=0;
+				Amplitude=0.0;
+				for (long iatom=0; iatom<atomList.size(); iatom++) {
+					x = XGridValue - atomList[iatom].x*kAng2BohrConversion;
+					y = YGridValue - atomList[iatom].y*kAng2BohrConversion;
+					z = ZGridValue - atomList[iatom].z*kAng2BohrConversion;
+					x2 = x*x;
+					y2 = y*y;
+					z2 = z*z;
+					r2 = x2+y2+z2;
+					for (long ishell=0; ishell<shellsPerAtom[iatom]; ishell++) {
+						//Now multiply by the appropriate x, y, z factors
+						switch (shellTypes[nShell]) {
+							case LShell:
+							case SHLShell:
+								//The p part of the L shell must be handled seperately since it has two
+								//normalization factors for the same shell
+								VectorSum =	x*reducedVector[ivec+1]+y*reducedVector[ivec+2]+z*reducedVector[ivec+3];
+								if (fabs(VectorSum) > kShellScreenThreshold) {
+									NumPrims = Shells[shellIndex[nShell]].NumPrims;
+									expcr2 = 0.0;
+									for (long iprim=0; iprim<NumPrims; iprim++) {
+										float exptemp = -r2*Shells[shellIndex[nShell]].Exponent[iprim];
+										if (exptemp > kExpCutoff) {
+											expcr2 += Shells[shellIndex[nShell]].NormCoef[iprim+NumPrims]*
+											expf(exptemp);
+										}
+					//					float temp2 = expf(exptemp);
+//										if (exptemp < -100.0){
+//											skipcount++;
+//											if (temp2< 1.0e-20) okcount++;
+//										}
+//										expcr2 += Shells[shellIndex[nShell]].NormCoef[iprim+NumPrims]*
+//										expf(exptemp);
+//										expf(-r2*Shells[shellIndex[nShell]].Exponent[iprim]);
+									}
+									Amplitude += expcr2*VectorSum;
+								}
+								VectorSum = reducedVector[ivec];
+								ivec += 4;
+								break;
+							case SShell:
+							case SHSShell:
+								VectorSum = reducedVector[ivec];
+								ivec += 1;
+								break;
+							case PShell:
+							case SHPShell:
+								VectorSum = x*reducedVector[ivec];
+								VectorSum += y*reducedVector[ivec+1];
+								VectorSum += z*reducedVector[ivec+2];
+								ivec += 3;
+								break;
+							case DShell:
+								VectorSum = x2*reducedVector[ivec];
+								VectorSum += y2*reducedVector[ivec+1];
+								VectorSum += z2*reducedVector[ivec+2];
+								VectorSum += x*y*reducedVector[ivec+3];
+								VectorSum += x*z*reducedVector[ivec+4];
+								VectorSum += y*z*reducedVector[ivec+5];
+								ivec += 6;
+								break;
+							case FShell:
+								VectorSum = x*x2*reducedVector[ivec]+y*y2*reducedVector[ivec+1]+
+								z*z2*reducedVector[ivec+2]+x2*y*reducedVector[ivec+3]+
+															 x2*z*reducedVector[ivec+4]+x*y2*reducedVector[ivec+5]+
+															 y2*z*reducedVector[ivec+6]+x*z2*reducedVector[ivec+7]+
+															 y*z2*reducedVector[ivec+8]+x*y*z*reducedVector[ivec+9];
+								ivec += 10;
+								break;
+							case GShell:
+								VectorSum = x2*x2*reducedVector[ivec]+y2*y2*reducedVector[ivec+1]+
+								z2*z2*reducedVector[ivec+2]+
+								x*x2*y*reducedVector[ivec+3]+x*x2*z*reducedVector[ivec+4]+
+								 x*y*y2*reducedVector[ivec+5]+y*y2*z*reducedVector[ivec+6]+
+								 x*z*z2*reducedVector[ivec+7]+y*z*z2*reducedVector[ivec+8]+
+								 x2*y2*reducedVector[ivec+9]+
+												   x2*z2*reducedVector[ivec+10]+y2*z2*reducedVector[ivec+11]+
+										x2*y*z*reducedVector[ivec+12]+x*y2*z*reducedVector[ivec+13]+
+										x*y*z2*reducedVector[ivec+14];
+								ivec += 15;
+								break;
+							case HShell:
+								VectorSum = x*x2*x2*reducedVector[ivec]+y*y2*y2*reducedVector[ivec+1]+
+								z*z2*z2*reducedVector[ivec+2]+
+								x2*x2*y*reducedVector[ivec+3]+x2*x2*z*reducedVector[ivec+4]+
+									   x*y2*y2*reducedVector[ivec+5]+y2*y2*z*reducedVector[ivec+6]+
+									   x*z2*z2*reducedVector[ivec+7]+y*z2*z2*reducedVector[ivec+8]+
+									   x*x2*y2*reducedVector[ivec+9]+
+														 x*x2*z2*reducedVector[ivec+10]+x2*y2*y*reducedVector[ivec+11]+
+														 y2*y*z2*reducedVector[ivec+12]+x2*z*z2*reducedVector[ivec+13]+
+														 y2*z*z2*reducedVector[ivec+14]+
+											  x*x2*y*z*reducedVector[ivec+15]+x*y*y2*z*reducedVector[ivec+16]+
+											  x*y*z*z2*reducedVector[ivec+17]+
+											  x2*y2*z*reducedVector[ivec+18]+x2*y*z2*reducedVector[ivec+19]+
+															   x*y2*z2*reducedVector[ivec+20];
+								ivec += 21;
+								break;
+							case IShell:
+								VectorSum = x2*x2*x2*reducedVector[ivec]+y2*y2*y2*reducedVector[ivec+1]+
+								z2*z2*z2*reducedVector[ivec+2]+
+								x*x2*x2*y*reducedVector[ivec+3]+x*x2*x2*z*reducedVector[ivec+4]+
+										x*y*y2*y2*reducedVector[ivec+5]+y*y2*y2*z*reducedVector[ivec+6]+
+										x*z*z2*z2*reducedVector[ivec+7]+y*z*z2*z2*reducedVector[ivec+8]+
+										x2*x2*y2*reducedVector[ivec+9]+x2*x2*z2*reducedVector[ivec+10]+
+											   x2*y2*y2*reducedVector[ivec+11]+y2*y2*z2*reducedVector[ivec+12]+
+											   x2*z2*z2*reducedVector[ivec+13]+y2*z2*z2*reducedVector[ivec+14]+
+										x2*x2*y*z*reducedVector[ivec+15]+x*y2*y2*z*reducedVector[ivec+16]+
+											   x*y*z2*z2*reducedVector[ivec+17]+
+										x*x2*y*y2*reducedVector[ivec+18]+
+															 x*x2*z*z2*reducedVector[ivec+19]+y*y2*z*z2*reducedVector[ivec+20]+
+										x*x2*y2*z*reducedVector[ivec+21]+x*x2*y*z2*reducedVector[ivec+22]+
+													 x2*y*y2*z*reducedVector[ivec+23]+x*y*y2*z2*reducedVector[ivec+24]+
+													 x2*y*z*z2*reducedVector[ivec+25]+x*y2*z*z2*reducedVector[ivec+26]+
+										x2*y2*z2*reducedVector[ivec+27];
+								ivec += 28;
+								break;
+							case SHDShell:	//normallized except for common 1/sqrt(4pi)
+								VectorSum = (x*y*reducedVector[ivec]+y*z*reducedVector[ivec+1])+
+												   (3*z2-r2)*reducedVector[ivec+2]+
+												   (x*z*reducedVector[ivec+3]+(x2-y2)*reducedVector[ivec+4]);
+								ivec += 5;
+								break;
+							case SHFShell:
+								VectorSum = (x*x2-3*x*y2)*reducedVector[ivec]+
+											(x2-y2)*z*reducedVector[ivec+1]+
+											x*(5*z2-r2)*reducedVector[ivec+2]+
+											z*(5*z2-3*r2)*reducedVector[ivec+3]+
+											y*(5*z2-r2)*reducedVector[ivec+4]+
+											x*y*z*reducedVector[ivec+5]+
+											y*(3*x2-y2)*reducedVector[ivec+6];
+								ivec += 7;
+								break;
+							case SHGShell:
+								VectorSum = (x2*x2+y2*y2-6*x2*y2)*reducedVector[ivec]+
+											(x2-3*y2)*x*z*reducedVector[ivec+1]+
+											(7*z2-r2)*reducedVector[ivec+2]+
+											x*z*(7*z2-3*r2)*reducedVector[ivec+3]+
+											((35*z2*z2-30*z2*r2+3*r2*r2))*reducedVector[ivec+4]+
+											y*z*(7*z2-3*r2)*reducedVector[ivec+5]+
+											x*y*(7*z2-r2)*reducedVector[ivec+6]+
+											y*z*(3*x2-y2)*reducedVector[ivec+7]+
+											x*y*(x2-y2)*reducedVector[ivec+8];
+								ivec += 9;
+								break;
+							case SHHShell:
+							{
+								float x3 = x*x2;
+								float x4 = x2*x2;
+								float x5 = x2*x3;
+								float y3 = y*y2;
+								float y4 = y2*y2;
+								float y5 = y2*y3;
+								float z3 = z*z2;
+								float z4 = z2*z2;
+								float z5 = z2*z3;
+								VectorSum = ((x5+5.0*x*y4-10.0*x3*y2)*reducedVector[ivec]+
+											(x4-6.0*x2*y2+y4)*z*reducedVector[ivec+1]+
+											(x3-3.0*x*y2)*(9*z2-r2)*reducedVector[ivec+2]+
+											(x2-y2)*(3*z3-z*r2)*reducedVector[ivec+3]+
+											x*(21*z4-14.0*z2*r2+r2*r2)*reducedVector[ivec+4]+
+											(63*z5-70*z3*r2+15*z*r2*r2)*reducedVector[ivec+5]+
+											y*(21*z4-14.0*z2*r2+r2*r2)*reducedVector[ivec+6]+
+											x*y*z*(3*z2-r2)*reducedVector[ivec+7]+
+											(3.0*x2*y-y3)*(9*z2-r2)*reducedVector[ivec+8]+
+											(x2*y-y3)*x*z*reducedVector[ivec+9]+
+											(5*x4*y-10.0*x2*y3+y5)*reducedVector[ivec+10]);
+								ivec += 11;
+							}
+								break;
+							case SHIShell:
+							{
+								float x3 = x*x2;
+								float x4 = x2*x2;
+								float x6 = x3*x3;
+								float y3 = y*y2;
+								float y4 = y2*y2;
+								float y6 = y3*y3;
+								float z3 = z*z2;
+								float z4 = z2*z2;
+								float z6 = z3*z3;
+								VectorSum = ((x6-15.0*x4*y2+15*x2*y4-y6)*reducedVector[ivec]+
+											x*z*(x4-10.0*x2*y2+5.0*y4)*z*reducedVector[ivec+1]+
+											(x4-6.0*x2*y2+y4)*(11*z2-r2)*reducedVector[ivec+2]+
+											z*(11*z2-3*r2)*(x3-3.0*x*y2)*reducedVector[ivec+3]+
+											(x2-y2)*(33*z4-18.0*z2*r2+r2*r2)*reducedVector[ivec+4]+
+											x*z*(33*z4-30.0*z2*r2+5.0*r2*r2)*reducedVector[ivec+5]+
+											(231*z6-315*z4*r2+105*z2*r2*r2-5.0*r2*r2*r2)*reducedVector[ivec+6]+
+											y*z*(33*z4-30.0*z2*r2+5.0*r2*r2)*reducedVector[ivec+7]+
+											x*y*(33*z4-18.0*z2*r2+r2*r2)*reducedVector[ivec+8]+
+											z*(11*z2-3*r2)*(3*x2*y-y3)*reducedVector[ivec+9]+
+											x*y*(x2-y2)*(11*z2-r2)*reducedVector[ivec+10]+
+											(y4+5*x4-10*x2*y2)*y*z*reducedVector[ivec+11]+
+											x*y*(3*x4-10.0*x2*y2+3*y4)*reducedVector[ivec+12]);
+								ivec += 13;
+							}
+								break;
+						}
+						//Only calculate the exponential if the vector is large enough
+						if (fabs(VectorSum) > kShellScreenThreshold) {
+							expcr2 = 0.0;
+							//Form contracted exponential
+							int index = shellIndex[nShell];
+							for (long iprim=0; iprim<Shells[index].NumPrims; iprim++) {
+								float exptemp = -r2*Shells[shellIndex[nShell]].Exponent[iprim];
+								if (exptemp > kExpCutoff) {
+									expcr2 += Shells[shellIndex[nShell]].NormCoef[iprim]*
+									expf(exptemp);
+								}
+//								float temp2 = expf(exptemp);
+//								if (exptemp < -100.0){
+//									skipcount++;
+//									if (temp2< 1.0e-20) okcount++;
+//								}
+//								expcr2 += Shells[index].NormCoef[iprim]*
+//								expf(exptemp);
+//								expf(-r2*Shells[index].Exponent[iprim]);
+							}
+							Amplitude += expcr2*VectorSum;
+						}
+						nShell++;
+					}
+				}
+				lGrid[n] = Amplitude;
+				lGridMax = MAX(lGridMax, lGrid[n]);
+				lGridMin = MIN(lGridMin, lGrid[n]);
+				n++;
+				ZGridValue += ZGridInc;
+			}
+			YGridValue += YGridInc;
+		}
+		XGridValue += XGridInc;
+	}
+	lGridMax = MAX(lGridMax, fabs(lGridMin));
+//	wxString foo;
+//	foo << wxT(" CalculateGridStreamLined selftime for ") << (xEnd-xStart)*NumYGridPoints*NumZGridPoints <<
+//	wxT(" points is ") << timer.Time() -selfTime;
+//	wxLogMessage(foo);
+//	foo.clear();
+//	foo << "CalculateGridStreamLined possible exp skips " << skipcount << " out of total " << issuecount <<
+//	" ok count " << okcount;
+//	wxLogMessage(foo);
+	return lGridMax;
+}
+
 #ifdef powerc
 typedef struct TE3DGridData {
 	TEDensity3DSurface *	Surf;

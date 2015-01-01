@@ -55,8 +55,8 @@
 #endif
 
 extern WinPrefs * gPreferences;
-extern bool show_build_palette;
-extern BuilderDlg *build_palette;
+extern BuilderInterface * BuilderTool;
+extern WindowData	gWindowDefault;
 
 using namespace std;
 
@@ -266,6 +266,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	prefsDlg = NULL;
 	zMatCalcDlg = NULL;
 	
+	winData = gWindowDefault;
+		
 	pageSetupData = NULL;
 	printData = NULL;
 	myStatus = NULL;
@@ -349,7 +351,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 		OnToggleTool(foo);
 	}
 
-	SetClientSize(wxSize(400, 400));
+//	SetClientSize(wxSize(400, 400));
+	SetSize(winData.GetMolWinRect());
 
 	Show();
 }
@@ -395,9 +398,7 @@ MolDisplayWin::~MolDisplayWin() {
 #ifndef __WXMAC__
 	MpApp *app = (MpApp *) wxTheApp;
 	if (app->WindowCount() == 0) {
-		if (build_palette) {
-			build_palette->Destroy();
-		}
+		BuilderTool->ClosePalette();
 	}
 #endif
 }
@@ -652,6 +653,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuBar->Append(menuWindow, wxT("&Subwindow"));
 
 	menuHelp->Append(wxID_ABOUT, wxT("&About MacMolPlt..."), _T("Learn about MacMolPlt"));
+	menuHelp->Append(wxID_HELP, wxT("&MacMolPlt Manual..."), _T("Brief documentation"));
 	menuBar->Append(menuHelp, wxT("&Help"));
 }
 
@@ -698,22 +700,6 @@ void MolDisplayWin::AdjustMenus(void) {
 	else
 		menuViewStyle->Check(MMP_BALLANDSTICKMODE, true);
 
-	/* menuBuild->Check(MMP_SHOWBUILDTOOLS, show_build_palette); */
-	
-	/* This should be handled by an UpdateUI event handler now. */
-	/* if (MainData->cFrame->NumAtoms == 0) { */
-	/* } else { */
-		/* menuFile->Enable(MMP_NEWFRAME, true); */
-		/* menuEdit->Enable(wxID_COPY, true); */
-		/* menuEdit->Enable(MMP_COPYCOORDS, true); */
-		/* menuMolecule->Enable(MMP_ENERGYEDIT, true); */
-		/* menuMolecule->Enable(MMP_SETBONDLENGTH, true); */
-		/* menuMolecule->Enable(MMP_DETERMINEPG, true); */
-		/* menuMolecule->Enable(MMP_SYMADAPTCOORDS, true); */
-		/* menuFile->Enable(MMP_EXPORT, true); */
-		/* menuView->Enable(MMP_ANNOTATIONSSUBMENU, true); */
-	/* } */
-
 	if (MainData->NumFrames > 1 ) {
 		menuFile->Enable(MMP_DELETEFRAME, true);
 		menuView->Enable(MMP_ANIMATEFRAMES, true);
@@ -740,7 +726,7 @@ void MolDisplayWin::OnShowToolbarUpdate(wxUpdateUIEvent& event) {
 }
 
 void MolDisplayWin::OnShowBuildToolsUpdate(wxUpdateUIEvent& event) {
-	event.Check(show_build_palette);
+	event.Check(BuilderTool->IsPaletteVisible());
 }
 
 void MolDisplayWin::OnUndoUpdate( wxUpdateUIEvent& event ) {
@@ -1336,7 +1322,7 @@ void MolDisplayWin::menuFileSave(wxCommandEvent &event) {
 			Dirtify(false);
 			delete buffer;
 		}
-#ifdef __WXMAC__
+#ifdef __WXOSX_CARBON__
 		if (Prefs->CreateCustomIcon()) CreateCustomFileIcon(currFilePath);
 #endif
 		fclose(currFile);
@@ -1399,7 +1385,7 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 		if(buffer) {
 			delete buffer;
 		}
-#ifdef __WXMAC__
+#ifdef __WXOSX_CARBON__
 		if (Prefs->CreateCustomIcon()) CreateCustomFileIcon(filePath);
 #endif
 		currFilePath = filePath;
@@ -1409,7 +1395,7 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 	}
 }
 
-#ifdef __WXMAC__
+#ifdef __WXOSX_CARBON__
 OSErr	SendFinderAppleEvent( AliasHandle aliasH, AEEventID appleEventID );
 OSErr	SaveCustomIcon( const wxString & filename, IconFamilyHandle icnsH );
 //	This routine will set the custom icon in the file with
@@ -2003,7 +1989,7 @@ void MolDisplayWin::PasteText(void) {
 					return;
 				}
 				
-				/*Now interpert each of the lines*/
+				/*Now interpret each of the lines*/
 				for (iline=0; iline < NumLines; iline++) {
 					char LineText[kMaxLineLength];
 					
@@ -2114,25 +2100,51 @@ void MolDisplayWin::ShowToolbar(bool enable) {
 	if (Prefs->ToolbarShown()) {
 		toolbar = CreateToolBar(wxTB_HORIZONTAL | wxTB_FLAT | wxTB_TEXT);
 
+		//The original plain xpms
 #include "xpms/view.xpm"
 #include "xpms/rect_lasso.xpm"
 #include "xpms/hand.xpm"
 
-		// toolbar->SetMargins(5,5); 
+#if wxCHECK_VERSION(2, 8, 0)
+		wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
+		wxString pathname = gStdPaths.GetResourcesDir();
+#else
+		wxString pathname = gStdPaths.GetDataDir();
+#ifdef __WXMAC__
+		//wxWidgets has a funny idea of where the resources are stored. It locates them as "SharedSupport"
+		//but xcode is putting them in Resources.
+		pathname.Remove(pathname.Length() - 13);
+		pathname += wxT("Resources");
+#endif
+#endif
+		// toolbar->SetMargins(5,5);
 		toolbar->SetToolBitmapSize(wxSize(16, 15));
 
 		wxBitmap enabled_bmp;
 		wxBitmap enabled_bmp2;
 
-		enabled_bmp = wxBitmap(view_xpm);
+//		enabled_bmp = wxBitmap(view_xpm);
+		if (! enabled_bmp.LoadFile(pathname + wxT("/view.png"), wxBITMAP_TYPE_PNG))
+			enabled_bmp = wxBitmap(view_xpm);
+//		std::cout << "view w="<< enabled_bmp.GetWidth() << " h="<<enabled_bmp.GetHeight()<<std::endl;
+//		enabled_bmp.SetWidth(16);
+//		enabled_bmp.SetHeight(15);
 		toolbar->AddRadioTool(MMP_TOOL_ARROW, _("View"), enabled_bmp,
 			wxNullBitmap);
 
+//		std::cout << "lasso w="<< enabled_bmp.GetWidth() << " h="<<enabled_bmp.GetHeight()<<std::endl;
 		enabled_bmp = wxBitmap(rect_lasso_xpm);
+		enabled_bmp.SetWidth(16);
+		enabled_bmp.SetHeight(15);
 		toolbar->AddRadioTool(MMP_TOOL_LASSO, _("Select"), enabled_bmp,
 			wxNullBitmap);
 
 		enabled_bmp = wxBitmap(hand_xpm);
+//		enabled_bmp.LoadFile(pathname + wxT("/test.jpg"), wxBITMAP_TYPE_JPEG);
+//		std::cout << "hand w="<< enabled_bmp.GetWidth() << " h="<<enabled_bmp.GetHeight()<<std::endl;
+//		enabled_bmp.SetWidth(16);
+//		enabled_bmp.SetHeight(15);
+		
 		toolbar->AddRadioTool(MMP_TOOL_HAND, _("Edit"), enabled_bmp,
 			wxNullBitmap);
 
@@ -2159,8 +2171,8 @@ void MolDisplayWin::menuBuilderShowBuildTools(wxCommandEvent &event) {
 void MolDisplayWin::OnSaveStructureUpdate(wxUpdateUIEvent& event) {
 
 	// Only require some atoms to be selected in order to save a 
-	// prototype.
-	event.Enable(MainData->cFrame->GetNumAtomsSelected() > 0);
+	// prototype. A single atom as a prototype doesn't make sense.
+	event.Enable(MainData->cFrame->GetNumAtomsSelected() > 1);
 
 }
 
@@ -2252,8 +2264,10 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 	}
 
 	struc->nbonds = new_bonds.size();
-	struc->bonds = new Bond[struc->nbonds];
-	memcpy(struc->bonds, &(new_bonds[0]), sizeof(Bond) * struc->nbonds);
+	struc->bonds = new Bond[MAX(struc->nbonds,10)];
+	if (new_bonds.size() > 0) {
+		memcpy(struc->bonds, &(new_bonds[0]), sizeof(Bond) * struc->nbonds);
+	}
 	delete[] new_ids;
 
 	wxTextEntryDialog *dlg =
@@ -2268,7 +2282,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &event) {
 	struc->name = dlg->GetValue();
 
 	if (result == wxID_OK) {
-		build_palette->AddUserStructure(struc);
+		BuilderTool->AddUserStructure(struc);
 	} else {
 		delete struc;
 	}
@@ -2280,7 +2294,7 @@ std::map<std::string, EFrag>::const_iterator MolDisplayWin::FindFragmentDef(std:
 	result = MainData->efrags.find(fragName);
 	if (result == MainData->efrags.end()) {
 		//It's not in the existing list. Search in the builder library
-		Structure *struc = build_palette->FindFragment(fragName);
+		Structure *struc = BuilderTool->FindFragment(fragName);
 		if (struc) {
 			//found it. Add it to the current list of fragment definitions
 			MainData->efrags.insert(std::pair<std::string, EFrag>(struc->FragName, struc->frag_def));
@@ -2905,7 +2919,7 @@ void MolDisplayWin::KeyHandler(wxKeyEvent & event) {
 					// TODO: A temporary hack to register outside event.
 					event.m_x = -50;
 					event.m_y = -50;
-					build_palette->KeyHandler(event);
+					BuilderTool->KeyHandler(event);
 					/* return; //I don't think there is any reason to skip on this case? */
 				}
 				break;
@@ -3294,7 +3308,7 @@ void MolDisplayWin::UpdateFrameText(void) {
 		}
 	}
 	wxString ft;
-	ft.Printf(wxT(" Frame %d of %d"), MainData->GetCurrentFrame(), MainData->GetNumFrames());
+	ft.Printf(wxT(" Frame %ld of %ld"), MainData->GetCurrentFrame(), MainData->GetNumFrames());
 	output += ft;
 
 	myStatus->SetStatusText(output);
@@ -3527,7 +3541,7 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 	FinishOperation();				//Close the progress dialog, if opened
 
 	if (test && !append) {//Note test is left 0 if any exception occurs(which causes Window to be deleted)
-#ifdef __WXMAC__
+#ifdef __WXOSX_CARBON__
 	  if (gPreferences->ChangeFileType()) {
 		  // Looks like this is a good file so set the creator type for the neat icon
 		  FSRef mFSRef;
@@ -3621,7 +3635,8 @@ WindowData::WindowData(void) {
 	//These are all used for windows where -1 indicates the default value that
 	//causes wx to compute appropriate values
 	BondsVis = CoordsVis = EnergyVis = FreqVis = SurfacesVis = InputBVis = PrefVis = ZMatVis = false;
-	MolWinRect.x = MolWinRect.y = MolWinRect.width = MolWinRect.height = -1;
+	MolWinRect.x = MolWinRect.y = -1;
+	MolWinRect.width = MolWinRect.height = 450;
 	BondsWinRect.x = BondsWinRect.y = BondsWinRect.width = BondsWinRect.height = -1;
 	CoordsWinRect.x = CoordsWinRect.y = CoordsWinRect.width = CoordsWinRect.height = -1;
 	EnergyWinRect.x = EnergyWinRect.y = EnergyWinRect.width = EnergyWinRect.height = -1;
@@ -3706,6 +3721,14 @@ void MolDisplayWin::UpdateWindowData(void) {
 		winData.ZMatWindowVisible(true);
 		winData.SetZMatWinRect(zMatCalcDlg->GetRect());
 	} else winData.ZMatWindowVisible(false);
+}
+void MolDisplayWin::SetDefaultWindowData(void) {
+	//first make sure the data is up to date
+	UpdateWindowData();
+	//copy it onto to the defaults
+	gWindowDefault = winData;
+	//Now save the user preferences (no way to save only the window data)
+	gPreferences->WriteUserPrefs();
 }
 
 void MolDisplayWin::OnRotateTimer(wxTimerEvent& event) {
@@ -3875,19 +3898,6 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 				}
 			}
 			
-			// No matter what mouse button/key combination we have, we update
-			// any surfaces that depend on the screen plane.
-			if (UpdateSurface) {
-				lSurface = MainData->cFrame->SurfaceList;
-				while (lSurface) {
-					lSurface->RotateEvent(MainData);
-					lSurface = lSurface->GetNextSurface();
-				}
-			}
-
-			/* Update the window */
-			if (UpdateSurface) ReleaseLists();
-
 			// Remember previous mouse point for next iteration.
 			mouse_start = q;
 		}
@@ -3901,6 +3911,19 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 			rotate_timer.Start(33, false);
 		}
 	}
+	// No matter what mouse button/key combination we have, we update
+	// any surfaces that depend on the screen plane.
+	// This may update a little more than needed, but it needs to be here to handle the mouse wheel event
+	if (UpdateSurface) {
+		lSurface = MainData->cFrame->SurfaceList;
+		while (lSurface) {
+			lSurface->RotateEvent(MainData);
+			lSurface = lSurface->GetNextSurface();
+		}
+	}
+	
+	/* Update the window */
+	if (UpdateSurface) ReleaseLists();
 
 	// If the scene is actively being rotated, we call a function that sorts
 	// transparent triangles, draws the atoms and some rotation annotations.
@@ -4235,26 +4258,15 @@ void MolDisplayWin::Dirtify(bool is_dirty) {
 }
 
 void MolDisplayWin::ToggleBuilderPalette(void) {
-	show_build_palette = !show_build_palette;
-
 	// Have to make a top-level window for the miniframe to show the right
 	// toolbar under OS X.
 	wxGetApp().SetTopWindow(this);
 
-	if (show_build_palette) {
-		// if (build_palette) { 
-			build_palette->Show();
-			build_palette->Raise();
-		// } else { 
-			// wxRect window_rect = GetRect(); 
-			// build_palette = new BuilderDlg( 
-				// wxT("Builder Tools"), window_rect.x + window_rect.width, 
-				// window_rect.y + 22); 
-			// build_palette->Show(); 
-		// } 
+	if (!BuilderTool->IsPaletteVisible()) {
+		BuilderTool->ShowPalette(true);
 		wxGetApp().AdjustAllMenus();
 	} else {
-		build_palette->Hide();
+		BuilderTool->ShowPalette(false);
 	Dirtify();;
 	}
 } 

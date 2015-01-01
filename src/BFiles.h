@@ -143,12 +143,20 @@ class BufferFile {
 		TextFileType GetFileType(const char * fileName);
 		///Find the specified GAMESS group name " $GroupName ...". 
 		wxFileOffset FindGroup(const char * GroupName);
+		/** Search the file for the keywords FINAL and ENERGY on the same line until found, EOF,
+		 * or the limit is reached. Useful for GAMESS log files.
+		 * Returns true or false, the file position upon exit will be the start of "FINAL",
+		 * or the starting position if the keyword is not found.
+		 * @param Limit (optional) The file position limit (in bytes) to limit the search. -1 will
+		 *							search to the end of the file.
+		 */
+		bool LocateFinalEnergy(wxFileOffset Limit = -1);
 		/** Read NumBytes bytes from the file into the target string.
 		 * Note attempting to read past the end of the file will cause an exception to be thrown.
 		 * @param Target The pre-allocated buffer to read into which must be at least NumBytes+1 bytes long.
 		 * @param NumBytes The number of bytes to read.
 		 */
- 		long Read(Ptr Target, long NumBytes);
+		long Read(Ptr Target, long NumBytes);
 		/** Read characters up to the next end of line.
 		 * The EOL char is consumed, but not included in the Line. At most kMaxLineLength-1 chars will
 		 * be read so the pre-allocated Line buffer should be at least kMaxLineLength long.

@@ -31,17 +31,21 @@
 extern Boolean		gMPAware;
 extern long			gNumProcessors;
 
+//Clearly there is some work needed to support H and I functions
+//Some is dimensions and powers. Looks like Root6 in RysPol has been completely redone as well, though
+//that might not be necessary. Some expansion for the number of roots is needed.
 
-#define kMaxAngularMomentum		35	//s-g functions
+#define kMaxShellType				6	// 0 index, 6 gives I shell
+#define kMaxAngularMomentumSum		84	//s-g functions - 1+3+6+10+15+21(h)+(28(I)
 class AngularIndeces {
 	public:
-		short	x[kMaxAngularMomentum], y[kMaxAngularMomentum], z[kMaxAngularMomentum];
+		short	x[kMaxAngularMomentumSum], y[kMaxAngularMomentumSum], z[kMaxAngularMomentumSum];
 		AngularIndeces();
 };
 
 //setup arrays of x, y, z powers for each angular momenta (through g)
 AngularIndeces::AngularIndeces() {
-	for (long i=0; i<kMaxAngularMomentum; i++)
+	for (long i=0; i<kMaxAngularMomentumSum; i++)
 		x[i] = y[i] = z[i] = 0;
 	x[1] = y[2] = z[3] = 1;	//P x, y, z
 	x[4] = y[5] = z[6] = 2;	//D x2, y2, z2
@@ -55,6 +59,27 @@ AngularIndeces::AngularIndeces() {
 		y[29] = y[31] = y[33] = z[30] = z[31] = z[34] = 2;
 	x[25] = x[27] = x[33] = x[34] = y[23] = y[28] = y[32] = y[34] =
 		z[24] = z[26] = z[32] = z[33] = 1;
+	x[35] = y[36] = z[37] = 5;	//H x5, y5, z5
+	x[38] = x[39] = y[40] = y[41] = z[42] = z[43] = 4; //H x4y, x4z, xy4, y4z, xz4, yz4
+	y[38] = z[39] = x[40] = z[41] = x[42] = y[43] = 1;
+	x[44] = x[45] = y[46] = y[47] = z[48] = z[49] = 3; //H x3y2, x3z2, x2y3, y3z2, x2z3, y2z3
+	y[44] = z[45] = x[46] = z[47] = x[48] = y[49] = 2;
+	x[50] = y[51] = z[52] = 3;	//H x3yz, xy3z, xyz3
+	y[50] = z[50] = x[51] = z[51] = x[52] = y[52] = 1;
+	x[53] = y[53] = x[54] = z[54] = y[55] = z[55] = 2;	//H x2y2z, x2yz2, xy2z2
+	z[53] = y[54] = x[55] = 1;
+	x[56] = y[57] = z[58] = 6;	//I x6, y6, z6
+	x[59] = x[60] = y[61] = y[62] = z[63] = z[64] = 5;	//I x5y, x5z, xy5, y5z, xz5, yz5
+	y[59] = z[60] = x[61] = z[62] = x[63] = y[64] = 1;
+	x[65] = x[66] = y[67] = y[68] = z[69] = z[70] = 4;	//I x4y2, x4z2, x2y4, y4z2, x2z4, y2z4
+	y[65] = z[66] = x[67] = z[68] = x[69] = y[70] = 2;
+	x[71] = y[72] = z[73] = 4;	//I x4yz, xy4z, xyz4
+	y[71] = z[71] = x[72] = z[72] = x[73] = y[73] = 1;
+	x[74] = y[74] = x[75] = z[75] = y[76] = z[76] = 3;	//I x3y3, x3z3, y3z3
+	x[77] = x[78] = y[79] = y[80] = z[81] = z[82] = 3;	//I x3y2z, x3yz2, x2y3z, xy3z2, x2yz3, xy2z3
+	y[77] = z[78] = x[79] = z[80] = x[81] = y[82] = 2;
+	z[77] = y[78] = z[79] = x[80] = y[81] = x[82] = 1;
+	x[83] = y[83] = z[83] = 2;	//I x2y2z2
 }
 //NOTE: This routine assumes that the atomic coordinates are in Angstroms and are thus
 //converted to Bohr when used.
@@ -360,7 +385,7 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 				
 				//Create the actual thread
 				myThreads[i] = new MEP3DThread(&(DataPtrs[i]));
-				myThreads[i]->Create(32*1024);
+				myThreads[i]->Create(128*1024);
 				//and fire it off, note my class is always a joinable thread so we will wait on it eventually
 				myThreads[i]->Run();
 			}
@@ -405,7 +430,7 @@ void MEP3DSurface::CalculateMEPGrid(MoleculeData *lData, Progress * lProgress) {
 			}
 			
 			delete [] DataPtrs;
-			delete[] myThreads;
+			delete [] myThreads;
 		} else
 #endif
 		{
@@ -506,7 +531,7 @@ void Surf3DBase::CalculateSurfaceValues(MoleculeData *lData, Progress * lProgres
 			
 			//Create the actual thread
 			myThreads[i] = new TEDMEP3DThread(&(DataPtrs[i]));
-			myThreads[i]->Create(32*1024);
+			myThreads[i]->Create(128*1024);
 			//and fire it off, note my class is always a joinable thread so we will wait on it eventually
 			myThreads[i]->Run();
 		}
@@ -605,16 +630,20 @@ void Surf3DBase::CalculateSurfaceValuesGrid(MoleculeData * lData, Progress * lPr
 	}
 }
 
+#define kMaxShellTypeCubed	((kMaxShellType+1)*(kMaxShellType+1)*(kMaxShellType+1))
+#define kMaxAngFuncSquare	(28*28)		//Arrays dimensioned as the square of the max number of angular functions
+										// 28 is for max of I functions
 //Calculates the MEP value at the specified x,y,z coordinate
 float Frame::CalculateMEP(float X_value, float Y_value, float Z_value,
 		BasisSet *Basis, AODensity * TotalAODensity, GaussHermiteData * GHData,
 		float * ElectronicMEP, float * NuclearMEP) {
 	double	ElectronicPotential=0.0, NuclearPotential=0.0;	//results of the MEP calculation
-	long	iatom, jatom, iprim, jprim, iroot, ijx[225], ijy[225], ijz[225],
+	long	iatom, jatom, iprim, jprim, iroot, ijx[kMaxAngFuncSquare], ijy[kMaxAngFuncSquare], ijz[kMaxAngFuncSquare],
 			iang, jang, jmax, ij,nn, mm, NumJPrims, JPrimMax, TotalIShells, TotalJShells,
 			nx, ny, nz, in, jn, li, lj;
 	double	xi, yi, zi, xj, yj, zj, r2, temp;
-	double	xin[125], yin[125], zin[125], wint[225], dij[225];
+	double	xin[kMaxShellTypeCubed], yin[kMaxShellTypeCubed], zin[kMaxShellTypeCubed],
+			wint[kMaxAngFuncSquare], dij[kMaxAngFuncSquare];
 	Root	RysRoots;
 	GaussHermiteIntegral	GHInt;
 	AngularIndeces AngIndex;
@@ -677,9 +706,9 @@ float Frame::CalculateMEP(float X_value, float Y_value, float Z_value,
 					ij=0;
 					jmax = JAngMax;
 					for (iang=IAngMin; iang<IAngMax; iang++) {
-						nx = 5*AngIndex.x[iang];
-						ny = 5*AngIndex.y[iang];
-						nz = 5*AngIndex.z[iang];
+						nx = (kMaxShellType+1)*AngIndex.x[iang];
+						ny = (kMaxShellType+1)*AngIndex.y[iang];
+						nz = (kMaxShellType+1)*AngIndex.z[iang];
 
 						if (IequalsJ) jmax = iang+1;
 						for (jang=JAngMin; jang<jmax; jang++) {
@@ -689,7 +718,7 @@ float Frame::CalculateMEP(float X_value, float Y_value, float Z_value,
 							ij++;
 						}
 					}
-					for (iprim=0; iprim<225; iprim++) wint[iprim]=0.0;
+					for (iprim=0; iprim<kMaxAngFuncSquare; iprim++) wint[iprim]=0.0;
 
 					for (iprim=0; iprim<iprimMax; iprim++) {
 						float Ai = Shells[ishell].Exponent[iprim];
@@ -698,7 +727,7 @@ float Frame::CalculateMEP(float X_value, float Y_value, float Z_value,
 						for (jprim=0; jprim<JPrimMax; jprim++) {
 							float Aj = Shells[jshell].Exponent[jprim];
 							
-							float AiAj = Ai + Aj;
+							double AiAj = Ai + Aj;
 							double OneDAiAj = 1.0/AiAj;
 							double Fi = Pi212 * OneDAiAj;
 
@@ -773,9 +802,9 @@ float Frame::CalculateMEP(float X_value, float Y_value, float Z_value,
 										yin[jn] = GHInt.yIntegral;
 										zin[jn] = GHInt.zIntegral * WW;
 									}
-									in += 5;
+									in += (kMaxShellType+1);
 								}
-								mm += 25;
+								mm += ((kMaxShellType+1)*(kMaxShellType+1));
 							}	//Loop over orbital products
 							for (iang=0; iang<ij; iang++) {
 								nx = ijx[iang];
@@ -785,7 +814,7 @@ float Frame::CalculateMEP(float X_value, float Y_value, float Z_value,
 								mm = 0;
 								for (iroot=0; iroot<RysRoots.nRoots; iroot++) {
 									sum += xin[nx+mm] * yin[ny+mm] * zin[nz+mm];
-									mm += 25;
+									mm += ((kMaxShellType+1)*(kMaxShellType+1));
 								}
 								wint[iang] += sum*dij[iang];
 							}
@@ -866,6 +895,7 @@ AODensity * OrbitalRec::GetAODensity(BasisSet * lBasis, long NumAtoms) {
 			double onedsqrt3 = 1/sqrt3;
 			double sqrt5 = sqrt(5.0);
 			double sqrt7 = sqrt(7.0);
+			double sqrt11 = sqrt(11.0);
 			for (iatom=0; iatom < NumAtoms; iatom++) {
 				if (iatom > lBasis->MapLength) continue;
 				for (long ishell=lBasis->BasisMap[2*iatom]; ishell<=lBasis->BasisMap[2*iatom+1]; ishell++) {
@@ -901,17 +931,35 @@ AODensity * OrbitalRec::GetAODensity(BasisSet * lBasis, long NumAtoms) {
 										case 7:
 										case 19:
 										case 32:
+										case 50:	//H shell func 15 - x3yz
+										case 65:	//I shell func 10 - x4y2
+										case 71:	//I shell func 16 - x4yz
 											DensityFactorI *= sqrt3;
 										break;
 										case 13:
+										case 77:	//I shell func 22 - x3y2z
 											DensityFactorI *= sqrt5;
 										break;
 										case 23:
 											DensityFactorI *= sqrt7;
 										break;
 										case 29:
+										case 53:	//H shell func 18 - x2y2z
+										case 83:	//I shell func 27 - x2y2z2
 											DensityFactorI *= sqrt5*onedsqrt3;
 										break;
+										case 38:
+											DensityFactorI *= 3.0;	//sqrt(9) - H shell func 4, x4y
+											break;
+										case 44:
+											DensityFactorI *= sqrt7*onedsqrt3; //H shell 10, x3y2
+											break;
+										case 59:	//I shell func 4 - x5y
+											DensityFactorI *= sqrt11;
+											break;
+										case 74:	//I shell func 18 - x3y3
+											DensityFactorI *= sqrt7/(sqrt3*sqrt5);
+											break;
 									}
 								}
 								li = LocIindex + iang;
@@ -926,17 +974,35 @@ AODensity * OrbitalRec::GetAODensity(BasisSet * lBasis, long NumAtoms) {
 											case 7:
 											case 19:
 											case 32:
+											case 50:	//H shell func 15 - x3yz
+											case 65:	//I shell func 10 - x4y2
+											case 71:	//I shell func 16 - x4yz
 												DensityFactorJ *= sqrt3;
 											break;
 											case 13:
+											case 77:	//I shell func 22 - x3y2z
 												DensityFactorJ *= sqrt5;
 											break;
 											case 23:
 												DensityFactorJ *= sqrt7;
 											break;
 											case 29:
+											case 53:	//H shell func 18 - x2y2z
+											case 83:	//I shell func 27 - x2y2z2
 												DensityFactorJ *= sqrt5*onedsqrt3;
 											break;
+											case 38:
+												DensityFactorJ *= 3.0;	//sqrt(9) - H shell func 4, x4y
+												break;
+											case 44:
+												DensityFactorJ *= sqrt7*onedsqrt3; //H shell 10, x3y2
+												break;
+											case 59:	//I shell func 4 - x5y
+												DensityFactorJ *= sqrt11;
+												break;
+											case 74:	//I shell func 18 - x3y3
+												DensityFactorJ *= sqrt7/(sqrt3*sqrt5);
+												break;
 										}
 									}
 									Density[lj+in] *= DensityFactorJ;

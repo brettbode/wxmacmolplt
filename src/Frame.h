@@ -167,6 +167,12 @@ class Frame {
 		inline void SetBondOrder(long BondNum, BondOrder NewOrder) {Bonds[BondNum].Order = NewOrder;};
 		void ParseGAMESSGuessVectors(BufferFile * Buffer, long NumFuncs, TypeOfWavefunction t, Progress * lProgress);
 		void ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs, Progress * lProgress);
+		/** Parse the GAMESS CAS-SCF Diabatic Molecular Orbitals
+		 * @param Buffer the input buffer.
+		 * @param NumFuncs the number of basis functions.
+		 * @param lProgress the progress indicator.
+		 */
+		void ParseGAMESSMCSCFDiabaticVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs, Progress * lProgress);
 		void ParseGAMESSCIVectors(BufferFile * Buffer, long NumFuncs, Progress * lProgress);
 		/** Parse the GAMESS UHF natural orbitals and occupation numbers.
 		 * @param Buffer the input buffer.
@@ -180,6 +186,12 @@ class Frame {
 		 * @param lProgress the progress indicator.
 		 */
 		void ParseTDDFTNOs(BufferFile * Buffer, long NumFuncs, Progress * lProgress);
+		/** Parse the GAMESS EOM-CC natural orbitals and occupation numbers.
+		 * @param Buffer the input buffer.
+		 * @param NumFuncs the number of basis functions.
+		 * @param lProgress the progress indicator.
+		 */
+		void ParseGAMESSEOM_CC_Vectors(BufferFile * Buffer, long NumFuncs, Progress * lProgress);
 		void ParseGVBGIOrbitals(BufferFile * Buffer, const long & NumFuncs, Progress * lProgress);
 		OrbitalRec * ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs,
 			long NumBetaOrbs, const long & NumOccAlpha, const long & NumOccBeta, const TypeOfWavefunction & method, Progress * lProgress);

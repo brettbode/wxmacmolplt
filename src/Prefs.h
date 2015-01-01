@@ -470,6 +470,63 @@ class WinPrefs {
 		void SetLineWidth(int newVal) {lineWidth = newVal;};
 };
 
+//Simple class to save window visibility and positioning data
+class WindowData {
+public:
+	WindowData();
+	static void Validate(wxRect & t);
+	
+	void WriteXML(XMLElement * parent) const;
+	void ReadXML(XMLElement * parent);
+	
+	bool BondsWindowVisible() const {return BondsVis;}
+	void BondsWindowVisible(bool v) {BondsVis = v;}
+	bool CoordsWindowVisible() const {return CoordsVis;}
+	void CoordsWindowVisible(bool v) {CoordsVis = v;}
+	bool EnergyWindowVisible() const {return EnergyVis;}
+	void EnergyWindowVisible(bool v) {EnergyVis = v;}
+	bool FreqWindowVisible() const {return FreqVis;}
+	void FreqWindowVisible(bool v) {FreqVis = v;}
+	bool SurfacesWindowVisible() const {return SurfacesVis;}
+	void SurfacesWindowVisible(bool v) {SurfacesVis = v;}
+	bool InputBWindowVisible() const {return InputBVis;}
+	void InputBWindowVisible(bool v) {InputBVis = v;}
+	bool PrefsWindowVisible() const {return PrefVis;}
+	void PrefsWindowVisible(bool v) {PrefVis = v;}
+	bool ZMatWindowVisible() const {return ZMatVis;}
+	void ZMatWindowVisible(bool v) {ZMatVis = v;}
+	
+	const wxRect & GetMolWinRect() const {return MolWinRect;}
+	void SetMolWinRect(const wxRect & v) {MolWinRect = v;}
+	const wxRect & GetBondsWinRect() const {return BondsWinRect;}
+	void SetBondsWinRect(const wxRect & v) {BondsWinRect = v;}
+	const wxRect & GetCoordsWinRect() const {return CoordsWinRect;}
+	void SetCoordsWinRect(const wxRect & v) {CoordsWinRect = v;}
+	const wxRect & GetEnergyWinRect() const {return EnergyWinRect;}
+	void SetEnergyWinRect(const wxRect & v) {EnergyWinRect = v;}
+	const wxRect & GetFrequencyWinRect() const {return FreqWinRect;}
+	void SetFrequencyWinRect(const wxRect & v) {FreqWinRect = v;}
+	const wxRect & GetSurfacesWinRect() const {return SurfacesWinRect;}
+	void SetSurfacesWinRect(const wxRect & v) {SurfacesWinRect = v;}
+	const wxRect & GetInputBWinRect() const {return InputBuilderRect;}
+	void SetInputBWinRect(const wxRect & v) {InputBuilderRect = v;}
+	const wxRect & GetPrefsWinRect() const {return PreferenceWinRect;}
+	void SetPrefsWinRect(const wxRect & v) {PreferenceWinRect = v;}
+	const wxRect & GetZMatWinRect() const {return ZMatRect;}
+	void SetZMatWinRect(const wxRect & v) {ZMatRect = v;}
+private:
+	wxRect	MolWinRect;
+	wxRect	BondsWinRect;
+	wxRect	CoordsWinRect;
+	wxRect	EnergyWinRect;
+	wxRect	FreqWinRect;
+	wxRect	SurfacesWinRect;
+	wxRect	InputBuilderRect;
+	wxRect	PreferenceWinRect;
+	wxRect	ZMatRect;
+	bool	BondsVis, CoordsVis, EnergyVis, FreqVis, SurfacesVis, InputBVis, PrefVis, ZMatVis;
+};
+
 // New preferences classes below here..
 /*
 class FileOptions {
@@ -538,21 +595,6 @@ private:
                                         // bit 2 - rotate 2D map
                                         // bit 3 - show 2D hash marks
 public:
-};
-
-class MMPPrefs {
-private:
-    FileOptions             FileOpts;
-    std::vector<AtomOptions>    AtomPrefs;
-    CoordWindowOptions      CoordWinOpts;
-    BondsWindowOptions      BondsOpts;
-    MolDisplayOptions       MolDisOpts;
-    FrequencyWindowOptions  FreqOpts;
-    SurfaceWindowOptions    SurfaceOpts;
-public:
-    MMPPrefs(void);
-    MMPPrefs(const MMPPrefs * source);
-    ~MMPPrefs(void);
 };
 */
 

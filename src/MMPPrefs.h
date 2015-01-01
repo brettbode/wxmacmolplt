@@ -23,6 +23,7 @@ enum MMPPref_Element {
 	MMPPref_EnergyWinPrefs,
 	MMPPref_FreqWinPrefs,
 	MMPPref_SurfaceWinPrefs,
+	MMPPref_WindowDefaults,
 	
 	NumberMMPPrefElements
 };

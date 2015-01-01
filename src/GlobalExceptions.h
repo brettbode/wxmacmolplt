@@ -18,7 +18,7 @@
 #define __GLOBAL_EXCEPTIONS_H__
 
 //The following are for non-Mac systems
-#if defined(__wxBuild__) && !defined(__WXMAC__)
+#if defined(__wxBuild__) && !defined(__WXOSX_CARBON__)
 typedef long OSErr;
 const int noErr = 0;
 const int eofErr = -39;

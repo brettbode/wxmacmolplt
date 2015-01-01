@@ -36,8 +36,6 @@
 #undef AddAtom
 #endif
 
-extern BuilderDlg *build_palette;
-
 //notes on extending CML
 //anything can go inside the CML tag.
 //Molecule can be extended via scalar, array, matrix, list and metadata
@@ -59,7 +57,7 @@ long StructureGroup::WriteCMLFile(void) const {
 	XMLSetup();
 	XMLDocument *xDoc = new XMLDocument(CML_convert(CMLElement), true, "CML uri");
 	XMLElement *xmlRoot = xDoc->getDocumentRoot();
-	xmlRoot->addAttribute("xmlns", "http://www.xml-cml.org/schema/cml2/core");
+	xmlRoot->addAttribute("xmlns", "http://www.xml-cml.org/schema/schema24/schema.xsd");
 
 	XMLElement *MetaDataListXML = xmlRoot->addChildElement(CML_convert(MetaDataListElement));
 	XMLElement *el = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
@@ -299,7 +297,7 @@ long MoleculeData::WriteCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowDat
 			XMLElement * Ele = MetaDataListXML->addChildElement(CML_convert(MetaDataElement));
 			Ele->addAttribute(CML_convert(nameAttr), CML_convert(MMP_FragmentNameList));
 			for (unsigned int i=0; i<FragmentNames.size(); i++) {
-				XMLElement * FN = Ele->addChildElement(kFRAGNAMEXML, FragmentNames[i].c_str());
+				/*XMLElement * FN = */ Ele->addChildElement(kFRAGNAMEXML, FragmentNames[i].c_str());
 			}
 		}
 
@@ -1711,12 +1709,12 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::map<std::string, long> & 
 					sscanf(zcstr, "%f", &(atomPos.z));
 					AddAtom(atomType, atomPos);
 					if (n5 == 1) {
-						idList[idstr] = idList.size();
+						idList[idstr] = GetNumAtoms() - 1;
 					} else {
 						//This can't be matched in the future, but we have to add something to keep the numbering right
 						std::ostringstream t;
 						t << idList.size();
-						idList[t.str()] = idList.size();
+						idList[t.str()] = GetNumAtoms() - 1;
 					}
 				}
 			}
@@ -1861,11 +1859,11 @@ bool Frame::ParseAtomXML(XMLElement * atomXML, std::map<std::string, long> & idL
 	if (good) {	//grab the atom id, if present
 		const char * idresult = atomXML->getAttributeValue("id");
 		if (idresult != NULL) {
-			idList[idresult] = idList.size();
+			idList[idresult] = GetNumAtoms() - 1;
 		} else {
 			std::ostringstream t;
 			t << idList.size();
-			idList[t.str()] = idList.size();
+			idList[t.str()] = GetNumAtoms() - 1;
 		}
 	}
 	return good;

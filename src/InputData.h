@@ -139,8 +139,16 @@ enum CCRunType {
 	CC_CCSDT,
 	CC_RCC,
 	CC_CRCC,
+	CC_CRCCL,
+	CC_CCSDTQ,
+	CC_CRCCQ,
 	CC_EOMCCSD,
 	CC_CREOM,
+	CC_CREOML,
+	CC_IP_EOM2,
+	CC_IP_EOM3A,
+	CC_EA_EOM2,
+	CC_EA_EOM3A,
 	
 	NumCCTypes
 };
@@ -177,6 +185,7 @@ enum GAMESS_Localization {
 	GAMESS_BOYS_Localization,
 	GAMESS_RUEDNBRG_Localization,
 	GAMESS_POP_Localization,
+	GAMESS_SVD_Localization,
 	
 	NumGAMESSLocalizations
 };
@@ -544,7 +553,7 @@ typedef enum EFRAG_PolMethods {
 	SCF_PolMethod,
 	
 	NumEFragPolMethods
-};
+} EFRAG_PolMethods;
 typedef enum EFRAG_PositionTypes {
 	invalidEFragPositionType=0,
 	Optimize_Position,
@@ -552,7 +561,7 @@ typedef enum EFRAG_PositionTypes {
 	EFOPT_Position,
 	
 	NumEFragPositionTypes
-};
+} EFRAG_PositionTypes;
 
 /// EffectiveFragmentsGroup stores the options for the EFRAG group, but not the actual fragments
 class EffectiveFragmentsGroup {
@@ -628,7 +637,7 @@ class GuessGroup {
 		inline short GetGuess(void) const {return GuessType;};
 		const char * GetGuessText(void) const;
 		short SetGuess(const char *GuessText);
-		inline short SetGuess(short NewGuess) {if ((NewGuess<0)&&(NewGuess>5)) return -1; GuessType = NewGuess; return GetGuess();};
+		inline short SetGuess(short NewGuess) {if ((NewGuess<0)||(NewGuess>=NumberGuessTypes)) return -1; GuessType = NewGuess; return GetGuess();};
 		inline short GetVecSource(void) const {return VecSource;};
 		inline void SetVecSource(short NewVal) {if (NewVal>0) VecSource = NewVal;};
 		inline long GetNumOrbs(void) const {return NumOrbs;};

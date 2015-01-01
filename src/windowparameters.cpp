@@ -47,12 +47,10 @@ IMPLEMENT_DYNAMIC_CLASS( windowparameters, wxDialog )
 BEGIN_EVENT_TABLE( windowparameters, wxDialog )
 
 ////@begin windowparameters event table entries
-    EVT_RADIOBOX( ID_UNITSRADIOBOX, windowparameters::OnUnitsradioboxSelected )
-
-    EVT_BUTTON( wxID_APPLY, windowparameters::OnApplyClick )
-
-    EVT_BUTTON( wxID_OK, windowparameters::OnOkClick )
-
+	EVT_RADIOBOX( ID_UNITSRADIOBOX, windowparameters::OnUnitsradioboxSelected )
+	EVT_BUTTON( ID_SetDefaultButton, windowparameters::OnSetDefaultButtonClick )
+	EVT_BUTTON( wxID_APPLY, windowparameters::OnApplyClick )
+	EVT_BUTTON( wxID_OK, windowparameters::OnOkClick )
 ////@end windowparameters event table entries
 
 END_EVENT_TABLE()
@@ -77,26 +75,28 @@ windowparameters::windowparameters( wxWindow* parent, wxWindowID id, const wxStr
 bool windowparameters::Create( wxWindow* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin windowparameters member initialisation
-    mXWinSize = NULL;
-    mYWinSize = NULL;
-    mUnitRadios = NULL;
-    mWindowScale = NULL;
-    mXWinCenter = NULL;
-    mYWinCenter = NULL;
-    mZWinCenter = NULL;
-    mPsiEdit = NULL;
-    mPhiEdit = NULL;
-    mThetaEdit = NULL;
+	mXWinSize = NULL;
+	mYWinSize = NULL;
+	mUnitRadios = NULL;
+	mWindowScale = NULL;
+	mXWinCenter = NULL;
+	mYWinCenter = NULL;
+	mZWinCenter = NULL;
+	mPsiEdit = NULL;
+	mPhiEdit = NULL;
+	mThetaEdit = NULL;
 ////@end windowparameters member initialisation
 
 ////@begin windowparameters creation
-    SetExtraStyle(GetExtraStyle()|wxWS_EX_BLOCK_EVENTS);
-    wxDialog::Create( parent, id, caption, pos, size, style );
+	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
+	wxDialog::Create( parent, id, caption, pos, size, style );
 
-    CreateControls();
-    GetSizer()->Fit(this);
-    GetSizer()->SetSizeHints(this);
-    Centre();
+	CreateControls();
+	if (GetSizer())
+	{
+		GetSizer()->SetSizeHints(this);
+	}
+	Centre();
 ////@end windowparameters creation
     return true;
 }
@@ -108,100 +108,109 @@ bool windowparameters::Create( wxWindow* parent, wxWindowID id, const wxString& 
 void windowparameters::CreateControls()
 {    
 ////@begin windowparameters content construction
-    windowparameters* itemDialog1 = this;
+	windowparameters* itemDialog1 = this;
 
-    wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
-    itemDialog1->SetSizer(itemBoxSizer2);
+	wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
+	itemDialog1->SetSizer(itemBoxSizer2);
 
-    wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
-    itemBoxSizer3->Add(itemBoxSizer4, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxVERTICAL);
+	itemBoxSizer3->Add(itemBoxSizer4, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticText* itemStaticText5 = new wxStaticText( itemDialog1, wxID_STATIC, _("Window Size (screen space):"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer4->Add(itemStaticText5, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxStaticText* itemStaticText5 = new wxStaticText( itemDialog1, wxID_STATIC, _("Window Size (screen space):"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer4->Add(itemStaticText5, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer4->Add(itemBoxSizer6, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer4->Add(itemBoxSizer6, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    mXWinSize = new wxTextCtrl( itemDialog1, ID_XWINSIZEEDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer6->Add(mXWinSize, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mXWinSize = new wxTextCtrl( itemDialog1, ID_XWINSIZEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer6->Add(mXWinSize, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    mYWinSize = new wxTextCtrl( itemDialog1, ID_YWINSIZE, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer6->Add(mYWinSize, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mYWinSize = new wxTextCtrl( itemDialog1, ID_YWINSIZE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer6->Add(mYWinSize, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxString mUnitRadiosStrings[] = {
-        _("&pixels"),
-        _("&inches"),
-        _("&cm")
-    };
-    mUnitRadios = new wxRadioBox( itemDialog1, ID_UNITSRADIOBOX, _("units"), wxDefaultPosition, wxDefaultSize, 3, mUnitRadiosStrings, 1, wxRA_SPECIFY_COLS );
-    if (ShowToolTips())
-        mUnitRadios->SetToolTip(_("units for the x and y values to the left"));
-    itemBoxSizer3->Add(mUnitRadios, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxArrayString mUnitRadiosStrings;
+	mUnitRadiosStrings.Add(_("&pixels"));
+	mUnitRadiosStrings.Add(_("&inches"));
+	mUnitRadiosStrings.Add(_("&cm"));
+	mUnitRadios = new wxRadioBox( itemDialog1, ID_UNITSRADIOBOX, _("units"), wxDefaultPosition, wxDefaultSize, mUnitRadiosStrings, 1, wxRA_SPECIFY_COLS );
+	mUnitRadios->SetSelection(0);
+	if (windowparameters::ShowToolTips())
+		mUnitRadios->SetToolTip(_("units for the x and y values to the left"));
+	itemBoxSizer3->Add(mUnitRadios, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer10 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer10, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer10 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer10, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxStaticText* itemStaticText11 = new wxStaticText( itemDialog1, wxID_STATIC, _("Window Scale:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer10->Add(itemStaticText11, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxStaticText* itemStaticText11 = new wxStaticText( itemDialog1, wxID_STATIC, _("Window Scale:"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer10->Add(itemStaticText11, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    mWindowScale = new wxTextCtrl( itemDialog1, ID_WINSCALE, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer10->Add(mWindowScale, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mWindowScale = new wxTextCtrl( itemDialog1, ID_WINSCALE, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer10->Add(mWindowScale, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("Window Center:"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer2->Add(itemStaticText13, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("Window Center:"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer2->Add(itemStaticText13, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer14 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer14, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer14 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer14, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    mXWinCenter = new wxTextCtrl( itemDialog1, ID_XWINCENTER, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer14->Add(mXWinCenter, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mXWinCenter = new wxTextCtrl( itemDialog1, ID_XWINCENTER, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer14->Add(mXWinCenter, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    mYWinCenter = new wxTextCtrl( itemDialog1, ID_YWINCENTER, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer14->Add(mYWinCenter, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mYWinCenter = new wxTextCtrl( itemDialog1, ID_YWINCENTER, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer14->Add(mYWinCenter, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    mZWinCenter = new wxTextCtrl( itemDialog1, ID_ZWINCENTER, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer14->Add(mZWinCenter, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mZWinCenter = new wxTextCtrl( itemDialog1, ID_ZWINCENTER, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer14->Add(mZWinCenter, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticText* itemStaticText18 = new wxStaticText( itemDialog1, wxID_STATIC, _("Rotation Angles (degrees):"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer2->Add(itemStaticText18, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxStaticText* itemStaticText18 = new wxStaticText( itemDialog1, wxID_STATIC, _("Rotation Angles (degrees):"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer2->Add(itemStaticText18, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer19, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer19, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    mPsiEdit = new wxTextCtrl( itemDialog1, ID_PSIANGLEEDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer19->Add(mPsiEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mPsiEdit = new wxTextCtrl( itemDialog1, ID_PSIANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer19->Add(mPsiEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    mPhiEdit = new wxTextCtrl( itemDialog1, ID_PHIANGLEEDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer19->Add(mPhiEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mPhiEdit = new wxTextCtrl( itemDialog1, ID_PHIANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer19->Add(mPhiEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    mThetaEdit = new wxTextCtrl( itemDialog1, ID_THETAANGLEEDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer19->Add(mThetaEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mThetaEdit = new wxTextCtrl( itemDialog1, ID_THETAANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer19->Add(mThetaEdit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer23 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer23, 0, wxALIGN_RIGHT|wxALL, 5);
+	wxBoxSizer* itemBoxSizer23 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer23, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxButton* itemButton24 = new wxButton( itemDialog1, wxID_APPLY, _("&Apply"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer23->Add(itemButton24, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxStaticText* itemStaticText24 = new wxStaticText( itemDialog1, wxID_STATIC, _("Save the current window\nlayout as the default:"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT );
+	itemBoxSizer23->Add(itemStaticText24, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxButton* itemButton25 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer23->Add(itemButton25, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxButton* itemButton25 = new wxButton( itemDialog1, ID_SetDefaultButton, _("Set Default"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer23->Add(itemButton25, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxButton* itemButton26 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer23->Add(itemButton26, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer26 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer26, 0, wxALIGN_RIGHT|wxALL, 5);
 
-    // Set validators
-    mXWinSize->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & screenX) );
-    mYWinSize->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & screenY) );
-    mWindowScale->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & windowScale) );
-    mXWinCenter->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & XCenter) );
-    mYWinCenter->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & YCenter) );
-    mZWinCenter->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & ZCenter) );
-    mPsiEdit->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & psi) );
-    mPhiEdit->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & phi) );
-    mThetaEdit->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & theta) );
+	wxButton* itemButton27 = new wxButton( itemDialog1, wxID_APPLY, _("&Apply"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer26->Add(itemButton27, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxButton* itemButton28 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer26->Add(itemButton28, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxButton* itemButton29 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer26->Add(itemButton29, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	// Set validators
+	mXWinSize->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & screenX) );
+	mYWinSize->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & screenY) );
+	mWindowScale->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & windowScale) );
+	mXWinCenter->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & XCenter) );
+	mYWinCenter->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & YCenter) );
+	mZWinCenter->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & ZCenter) );
+	mPsiEdit->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & psi) );
+	mPhiEdit->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & phi) );
+	mThetaEdit->SetValidator( wxTextValidator(wxFILTER_NUMERIC, & theta) );
 ////@end windowparameters content construction
 
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
@@ -245,8 +254,8 @@ wxBitmap windowparameters::GetBitmapResource( const wxString& name )
 {
     // Bitmap retrieval
 ////@begin windowparameters bitmap retrieval
-    wxUnusedVar(name);
-    return wxNullBitmap;
+	wxUnusedVar(name);
+	return wxNullBitmap;
 ////@end windowparameters bitmap retrieval
 }
 
@@ -258,8 +267,8 @@ wxIcon windowparameters::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 ////@begin windowparameters icon retrieval
-    wxUnusedVar(name);
-    return wxNullIcon;
+	wxUnusedVar(name);
+	return wxNullIcon;
 ////@end windowparameters icon retrieval
 }
 /*!
@@ -440,3 +449,16 @@ void windowparameters::OnOkClick( wxCommandEvent& event )
 	}
     event.Skip();
 }
+
+
+/*!
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_SetDefaultButton
+ */
+
+void windowparameters::OnSetDefaultButtonClick( wxCommandEvent& event )
+{
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	parent->SetDefaultWindowData();
+	event.Skip();
+}
+

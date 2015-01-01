@@ -8,7 +8,8 @@ shared = resources/MacMolPlt.Prefs.xml \
     resources/shaders/perpixel_dirlight_v.glsl \
     resources/shaders/perpixel_dirlight_f.glsl \
     resources/shaders/shadows_v.glsl \
-    resources/shaders/shadows_f.glsl
+    resources/shaders/shadows_f.glsl \
+    resources/splash.jpg
 if HOST_IS_MSW
 bindata_DATA = $(shared)
 bindatadir = $(bindir)

@@ -1,3 +1,21 @@
+wxmacmolplt (7.5-1) precise; urgency=low
+
+  * New upstream version
+
+ -- Brett Bode <brett@scl.ameslab.gov>  Mon, 22 Jul 2013 09:18:13 -0500
+
+wxmacmolplt (7.4.4-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- root <root@debian.iprt.iastate.edu>  Wed,  8 Aug 2012 18:22:09 -0500
+
+wxmacmolplt (7.4.3-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- brett <brett@scl.ameslab.gov>  Mon, 30 Jan 2012 19:18:08 -0600
+
 wxmacmolplt (7.4.2-1) unstable; urgency=low
 
   * New upstream version

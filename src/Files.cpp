@@ -682,6 +682,12 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				}
 
 				Buffer->GetLine(Line);
+					//At some point GAMESS started printing out all fragment atoms instead of the first three,
+					//since the code above has already properly obtained the full fixed fragment geometry just
+					//skip the user provided set which could be incorrect.
+				while (((0>FindKeyWord(Line, "FRAGNAME", 8))&&(0>FindKeyWord(Line, "$END", 4)))) {
+					Buffer->GetLine(Line);
+				}
 			}
 		}
 
@@ -1806,9 +1812,12 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 	Buffer->GetLine(LineText);
 	MainData->SetDescription(LineText);
 
+	//Need to keep the single mode storage separated off as the AddAtom function will delete it
+	//from the Frame record otherwise.
+	VibRec * Mode1Vibs = NULL;
 	if (Mode == -1) {
-		MainData->cFrame->Vibs = new VibRec(1, fileAtoms);
-		if (!MainData->cFrame->Vibs) throw MemoryError();
+		Mode1Vibs = new VibRec(1, fileAtoms);
+		if (!Mode1Vibs) throw MemoryError();
 	}
 	Buffer->SkipnLines(nkinds);
 
@@ -1822,36 +1831,44 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 		Buffer->GetLine(LineText);
 		test = ParseCartLine(LineText, &AtomType, &Pos, &Vector, Mode);
 		
-		if (test==-1) {	//invalid atom type
+		if (AtomType==-1) {	//invalid atom type
+				//Choices would seem to be to punt and abort or change to some sort of valid type
 			wxLogMessage(_("Error: An invalid Atom Type was encountered in the atom list."));
+			if (Mode1Vibs) delete Mode1Vibs;
 			throw DataError();
-		} else if (test<0) {
+		} 
+		if (test<0) {
 			wxLogMessage(_("An error occured while reading the file. Open File Aborted!"));
+			if (Mode1Vibs) delete Mode1Vibs;
 			throw DataError();
 		}
 		if (AtomType > 115) {
 			if (Mode < 0) {
 				wxLogMessage(_("Error: Special Atom types may not be used with Normal Modes!"));
+				if (Mode1Vibs) delete Mode1Vibs;
 				throw DataError();
 			}
 			if (AtomType > 255) {
 				if (((AtomType - 255) < 1)||((AtomType - 255) > fileAtoms)) {
 					wxLogMessage(_("Invalid atom number detected in special atom list."));
+					if (Mode1Vibs) delete Mode1Vibs;
 					throw DataError();
 				}
 			}
 			if (!lFrame->AddSpecialAtom(Vector, j)) throw MemoryError();
 		}
 		if (Mode == -1) {	//mass weight the normal mode
-			lFrame->Vibs->NormMode[j].x = Vector.x*Prefs->GetSqrtAtomMass(AtomType-1);
-			lFrame->Vibs->NormMode[j].y = Vector.y*Prefs->GetSqrtAtomMass(AtomType-1);
-			lFrame->Vibs->NormMode[j].z = Vector.z*Prefs->GetSqrtAtomMass(AtomType-1);
+			Mode1Vibs->NormMode[j].x = Vector.x*Prefs->GetSqrtAtomMass(AtomType-1);
+			Mode1Vibs->NormMode[j].y = Vector.y*Prefs->GetSqrtAtomMass(AtomType-1);
+			Mode1Vibs->NormMode[j].z = Vector.z*Prefs->GetSqrtAtomMass(AtomType-1);
 		}
 		lFrame->AddAtom(AtomType, Pos);
 		MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.x));
 		MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.y));
 		MainData->MaxSize = MAX(MainData->MaxSize, fabs(Pos.z));
 	}
+	if (Mode1Vibs) lFrame->Vibs = Mode1Vibs;
+	
 	if (fileBonds > 0) {						/* read in the array of bonds */
 		long	ibond=-1, temp;
 		Buffer->GetLine(LineText);
@@ -1895,7 +1912,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 			return 1;
 		}
 	}
-	if (BondLength > 0.0) {
+	if ((BondLength > 0.0)||(Prefs->GetAutoBond())) {
 		Prefs->SetMaxBondLength(BondLength);
 		lFrame->SetBonds(Prefs, false);
 	}
@@ -2110,7 +2127,13 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 			} else
 				delete lbasis;
 		}
-		if (MainData->Basis) {	//look for orbitals if we have a basis set
+		bool sphericalHarmonics=false;
+		//Should look for [5D], [5D10F], [5D7F] to catch unsupported spherical harmonics
+		if (Buffer->LocateKeyWord("[5D]", 4, -1)||Buffer->LocateKeyWord("[5D7F]", 6, -1)) {
+			wxLogMessage(_("Spherical harmonic basis sets are not supported. Molecular orbitals will be skipped."));
+			sphericalHarmonics = true;
+		}
+		if (MainData->Basis && !sphericalHarmonics) {	//look for orbitals if we have a basis set
 			if (Buffer->LocateKeyWord("[MO]", 4, -1)) {
 				Buffer->SkipnLines(1);
 				lFrame->ReadMolDenOrbitals(Buffer, MainData->Basis->GetNumBasisFuncs(false));
@@ -2322,7 +2345,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 			throw DataError();
 		}
 		if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize))) {
-			wxLogMessage(_("Unable to interpert coordinates."));
+			wxLogMessage(_("Unable to interpret coordinates."));
 			throw DataError();
 		}
 		lFrame->toggleAbInitioVisibility();
@@ -2398,7 +2421,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	EnergyPos = -1;
 	NextFinalPos = -1;
 		//First Skip over all of the input card lines, the lines are near the beginning of the file and one after another
-	while (Buffer->LocateKeyWord("INPUT CARD>", 11, (Buffer->GetFilePos()+1000)))
+	while (Buffer->LocateKeyWord("INPUT CARD>", 11, (Buffer->GetFilePos()+50000)))
 		Buffer->SkipnLines(1);
 	wxFileOffset HeaderEndPos = Buffer->GetFilePos();	//We don't care about anything earlier than this pos.
 //	Buffer->LocateKeyWord("RUN TITLE", 9);	//find and skip over run title since
@@ -2414,7 +2437,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	if (Append) {
 		Buffer->LocateKeyWord("RUN TITLE", 9);	//find and skip over run title since
 		Buffer->SkipnLines(3);					//it can contain any arbitrary text
-		if (Buffer->LocateKeyWord("FINAL", 5)) {//locate initial energy since all options are before it
+		if (Buffer->LocateFinalEnergy()) {//locate initial energy since all options are before it
 			EnergyPos = Buffer->GetFilePos();
 			Buffer->SetFilePos(HeaderEndPos);
 		}
@@ -2529,13 +2552,17 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			{ throw UserCancel();}
 			int kw;
 			if (-1 < (kw = Buffer->LocateKeyWord(HeaderKeywords))) {
+				wxFileOffset keywordPosition = Buffer->GetFilePos();
 				switch (kw) {
 					case final:
 						headerDone = true;
 						EnergyPos = Buffer->GetFilePos();
 						break;
 					case headerEnd:
-						headerDone = true;
+						//Until recently this was printed out at the beginning of the header output - useless!
+						//To account for that only consider this done if we've found the coordinates
+						if (lFrame->NumAtoms > 0) headerDone = true;
+						Buffer->SkipnLines(1);
 						break;
 					case basisOptions:
 	//					KeyWordFound = Buffer->LocateKeyWord("BASIS OPTIONS", 13, EnergyPos);
@@ -2602,7 +2629,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 								throw DataError();
 							}
 							if (!ParseGLogLine(Buffer, lFrame, numlines, 0, &(MainData->MaxSize))) {
-								wxLogMessage(_("Unable to interpert coordinates."));
+								wxLogMessage(_("Unable to interpret coordinates."));
 								throw DataError();
 							}
 	//					}
@@ -2795,6 +2822,8 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 						return 0;
 						break;
 				}
+					//If still positioned at the keyword, must advance or there will be a loop.
+				if (keywordPosition == Buffer->GetFilePos()) Buffer->SkipnLines(1);
 			} else break;
 		}
 		if (lFrame->NumAtoms <= 0) {	//initial coordinates not found! Abort!
@@ -2828,7 +2857,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			return OpenGAMESSGlobOpLog(Buffer, NumOccAlpha, NumOccBeta, NumFragmentAtoms);
 
 		HeaderEndPos = Buffer->GetFilePos();
-		if (Buffer->LocateKeyWord("FINAL", 5)) {//locate initial energy
+		if (Buffer->LocateFinalEnergy()) {//locate initial energy
 			EnergyPos = Buffer->GetFilePos();
 			Buffer->SetFilePos(HeaderEndPos);
 		}
@@ -2914,7 +2943,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 				//Attempt to read in orbitals for first geometry
 			SavedPos = Buffer->GetFilePos();
 			NextFinalPos = -1;
-			if (Buffer->LocateKeyWord("FINAL", 5)) NextFinalPos = Buffer->GetFilePos();
+			if (Buffer->LocateFinalEnergy()) NextFinalPos = Buffer->GetFilePos();
 			Buffer->SetFilePos(SavedPos);
 			if (MainData->Basis) {
 				try {
@@ -3023,6 +3052,12 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 							38, NextFinalPos) && ReadMP2Orbitals) {
 							lFrame->ReadMP2Vectors(Buffer, DatBuffer, MainData->GetNumBasisFunctions(),
 								ProgressInd, &ReadMP2Orbitals);
+						}
+					}
+					if (MainData->InputOptions->Control->GetCCType()) {
+						if (Buffer->LocateKeyWord("EOM-CC NATURAL ORBITALS",
+												  23, NextFinalPos)) {
+							lFrame->ParseGAMESSEOM_CC_Vectors(Buffer, MainData->GetNumBasisFunctions(), ProgressInd);
 						}
 					}
 					if (MainData->InputOptions->Control->GetCIType()) {	//Look for CI Natural orbitals
@@ -3142,7 +3177,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			//If there isn't one then we are done with the geometries
 		if (Buffer->LocateKeyWord(OptKeywords) < 0) break;
 		StartPos = Buffer->GetFilePos();
-		if (Buffer->LocateKeyWord("FINAL", 5)) {	//Search for final and energy on the same line
+		if (Buffer->LocateFinalEnergy()) {	//Search for final and energy on the same line
 			Buffer->GetLine(LineText);				//since final also appears in LMO calcs.
 			LinePos = FindKeyWord(LineText, "ENERGY", 6);
 			if (LinePos > -1) {
@@ -3465,46 +3500,179 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 //Look for localized orbitals which appear only at the end of a log file
 	if (MainData->Basis) {
 		try {
+			enum {
+				CASSCFDiabatic=0,
+				FockLocalized,
+				DensityMatrixLocalized,
+				OrientedLocOrbs,
+				NonorthogLocOrbs,
+				PPASVDOrbs,
+				LocalizedOrbitals,
+				SVDExternalOrbs,
+				SplitQALocOrbs,
+				OrderedExternalLocOrbs
+			};
+			std::vector<std::pair <std::string, int> > LocOrbKeywords;
+			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) 
+				LocOrbKeywords.push_back(make_pair (std::string("CAS-SCF DIABATIC MOLECULAR ORBITALS"), (int) CASSCFDiabatic));
+			LocOrbKeywords.push_back(make_pair (std::string("FOCK OPERATOR FOR THE LOCALIZED ORBITALS"), (int) FockLocalized));
+			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF)
+				LocOrbKeywords.push_back(make_pair (std::string("DENSITY MATRIX FOR THE LOCALIZED ORBITALS"), (int) DensityMatrixLocalized));
+			LocOrbKeywords.push_back(make_pair (std::string("ORIENTED LOCALIZED ORBITALS"), (int) OrientedLocOrbs));
+			LocOrbKeywords.push_back(make_pair (std::string("NONORTHOGONAL PPA SVD LOCALIZED ORBITALS"), (int) NonorthogLocOrbs));
+			LocOrbKeywords.push_back(make_pair (std::string("PPA SVD LOCALIZED ORBITALS"), (int) PPASVDOrbs));
+//			LocOrbKeywords.push_back(make_pair (std::string("SVD EXTERNAL LOCALIZED ORBITALS"), (int) SVDExternalOrbs));
+			LocOrbKeywords.push_back(make_pair (std::string("SPLITQA LOCALIZED ORBITALS"), (int) SplitQALocOrbs));
+			LocOrbKeywords.push_back(make_pair (std::string("ORDERED EXTERNAL LOCALIZED ORBITALS"), (int) OrderedExternalLocOrbs));
+//Order is important, look for this last since it is a subset of some of the others
+			LocOrbKeywords.push_back(make_pair (std::string("LOCALIZED ORBITALS"), (int) LocalizedOrbitals));
+			
+			while (! Buffer->Eof()) {
+				int kw;
+				if (-1 < (kw = Buffer->LocateKeyWord(LocOrbKeywords))) {
+					wxFileOffset keywordPosition = Buffer->GetFilePos();
+					OrbitalRec * OrbSet;
+					switch (kw) {
+						case CASSCFDiabatic:
+							//MCSCF runs can potentially have diabatic orbitals at the end.
+							if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {
+								lFrame->ParseGAMESSMCSCFDiabaticVectors(Buffer, MainData->GetNumBasisFunctions(),
+																		OccupiedOrbCount, ProgressInd);
+							}
+							break;
+						case FockLocalized:
+							Buffer->SkipnLines(1);
+							break;
+						case OrientedLocOrbs:
+							Buffer->SkipnLines(2);
+							ProgressInd->ChangeText("Reading oriented localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							if (OrbSet != NULL) {
+								OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
+								if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
+									OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
+								}
+							}
+							break;
+						case NonorthogLocOrbs:
+							Buffer->SetFilePos(Buffer->FindBlankLine());
+							Buffer->SkipnLines(1);
+							ProgressInd->ChangeText("Reading Nonorthogonal PPA SVD localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							OrbSet->setOrbitalType(NonOrthogonalSVDLocalizedOrbital);
+							break;
+						case PPASVDOrbs:
+							Buffer->SetFilePos(Buffer->FindBlankLine());
+							Buffer->SkipnLines(1);
+							ProgressInd->ChangeText("Reading PPA SVD localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							OrbSet->setOrbitalType(PPASVDLocalizedOrbital);
+							break;
+						case LocalizedOrbitals:
+							Buffer->SkipnLines(2);
+							ProgressInd->ChangeText("Reading localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+																		  NumBetaUHFOrbs, ProgressInd, false);
+							if (OrbSet != NULL) {
+								OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
+								if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
+									OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
+								}
+							}
+							break;
+						case SVDExternalOrbs:
+							Buffer->SetFilePos(Buffer->FindBlankLine());
+							Buffer->SkipnLines(1);
+							ProgressInd->ChangeText("Reading SVD External localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							OrbSet->setOrbitalType(SVDExternalLocalizedOrbital);
+							break;
+						case SplitQALocOrbs:
+							Buffer->SetFilePos(Buffer->FindBlankLine());
+							Buffer->SkipnLines(1);
+							ProgressInd->ChangeText("Reading SplitQA localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							OrbSet->setOrbitalType(SplitQAExternalLocalizedOrbital);
+							break;
+						case OrderedExternalLocOrbs:
+							Buffer->SetFilePos(Buffer->FindBlankLine());
+							Buffer->SkipnLines(1);
+							ProgressInd->ChangeText("Reading Ordered External localized orbitals");
+							if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+							{ throw UserCancel();}
+							OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+															 NumBetaUHFOrbs, ProgressInd, true);
+							OrbSet->setOrbitalType(OrderedExternalLocalizedOrbital);
+							break;
+					}
+					//If still positioned at the keyword, must advance or there will be a loop.
+					if (keywordPosition == Buffer->GetFilePos()) Buffer->SkipnLines(1);
+				} else break;
+			}
+				//MCSCF runs can potentially have diabatic orbitals at the end.
+//			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {
+//				if (Buffer->LocateKeyWord("CAS-SCF DIABATIC MOLECULAR ORBITALS", 34)) {
+//					lFrame->ParseGAMESSMCSCFDiabaticVectors(Buffer, MainData->GetNumBasisFunctions(),
+//												OccupiedOrbCount, ProgressInd);
+//				}
+//			}
 				//GAMESS now punchs out the Fock operator for ruedenburg type localization
 				//which I need to skip if it is present
-			if (Buffer->LocateKeyWord("FOCK OPERATOR FOR THE LOCALIZED ORBITALS",40))
-				Buffer->SkipnLines(1);
-			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {
+//			if (Buffer->LocateKeyWord("FOCK OPERATOR FOR THE LOCALIZED ORBITALS",40))
+//				Buffer->SkipnLines(1);
+//			if (MainData->InputOptions->Control->GetSCFType()==GAMESS_MCSCF) {
 					//skip over the density matrix (present in Ruedenburg MCSCF runs)
-				if (Buffer->LocateKeyWord("DENSITY MATRIX FOR THE LOCALIZED ORBITALS",41))
-					Buffer->SkipnLines(1);
-			}
-			KeyWordFound = Buffer->LocateKeyWord("LOCALIZED ORBITALS",18);
-			if (KeyWordFound) {
-				Buffer->SkipnLines(2);
-				ProgressInd->ChangeText("Reading localized orbitals");
-				if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
-					{ throw UserCancel();}
-				OrbitalRec * OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
-					NumBetaUHFOrbs, ProgressInd, false);
-				if (OrbSet != NULL) {
-					OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
-					if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
-						OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
-					}
-				}
-				// There may also be oriented localized orbitals
-				KeyWordFound = Buffer->LocateKeyWord("ORIENTED LOCALIZED ORBITALS",27);
-				if (KeyWordFound) {
-					Buffer->SkipnLines(2);
-					ProgressInd->ChangeText("Reading oriented localized orbitals");
-					if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
-						{ throw UserCancel();}
-					OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
-						NumBetaUHFOrbs, ProgressInd, true);
-					if (OrbSet != NULL) {
-						OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
-						if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
-							OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
-						}
-					}
-				}
-			}
+//				if (Buffer->LocateKeyWord("DENSITY MATRIX FOR THE LOCALIZED ORBITALS",41))
+//					Buffer->SkipnLines(1);
+//			}
+//			KeyWordFound = Buffer->LocateKeyWord("LOCALIZED ORBITALS",18);
+//			if (KeyWordFound) {
+//				Buffer->SkipnLines(2);
+//				ProgressInd->ChangeText("Reading localized orbitals");
+//				if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+//					{ throw UserCancel();}
+//				OrbitalRec * OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+//					NumBetaUHFOrbs, ProgressInd, false);
+//				if (OrbSet != NULL) {
+//					OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
+//					if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
+//						OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
+//					}
+//				}
+//				// There may also be oriented localized orbitals
+//				KeyWordFound = Buffer->LocateKeyWord("ORIENTED LOCALIZED ORBITALS",27);
+//				if (KeyWordFound) {
+//					Buffer->SkipnLines(2);
+//					ProgressInd->ChangeText("Reading oriented localized orbitals");
+//					if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
+//						{ throw UserCancel();}
+//					OrbSet = lFrame->ParseGAMESSLMOs(Buffer, MainData->GetNumBasisFunctions(), MainData->GetNumBasisFunctions(),
+//						NumBetaUHFOrbs, ProgressInd, true);
+//					if (OrbSet != NULL) {
+//						OrbSet->setOrbitalWavefunctionType((TypeOfWavefunction)MainData->InputOptions->Control->GetSCFType());
+//						if (MainData->InputOptions->Control->GetSCFType() != GAMESS_MCSCF) {
+//							OrbSet->SetOrbitalOccupancy(NumOccAlpha, NumOccBeta);
+//						}
+//					}
+//				}
+//			}
 		}
 		catch (std::bad_alloc) {
 			MessageAlert("Insufficient memory to read in the localized orbitals.");
@@ -3556,21 +3724,26 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 	iatom = lFrame->GetNumAtoms();
 	
 	//First read in the fragment names which are separate from the coordinates
-	while (Buffer->LocateKeyWord("COORDINATES FOR FRAGMENT", 24, Buffer->GetFilePos()+200)) {
+	//I am not sure why I originally pulled it as "FOR", but GAMESS hasn't used it for some time.
+	//	"COORDINATES FOR FRAGMENT"
+	while (Buffer->LocateKeyWord("COORDINATES OF FRAGMENT", 23, Buffer->GetFilePos()+200)) {
 		if (Buffer->LocateKeyWord("NAMED", 5, Buffer->GetFilePos()+80)) {
 			Buffer->GetLine(Line);
 			sscanf(&(Line[5]), "%s", Label);
 			FragmentNames.push_back(std::string(Label));
 		} else Buffer->SkipnLines(1);
 	}
+	while (Buffer->LocateKeyWord("READING POTENTIAL PARAMETERS FOR FRAGMENT", 40, Buffer->GetFilePos()+200)) {
+		Buffer->SkipnLines(1);
+	}
 
-	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS", 32, Buffer->GetFilePos()+1000)) {
+	if (Buffer->LocateKeyWord("TOTAL NUMBER OF MULTIPOLE POINTS", 32, Buffer->GetFilePos()+10000)) {
 		Buffer->GetLine(Line);
 		sscanf(&(Line[32]), " =%ld", &NumMultipoles);
 	}
 		//Mike finally fixed the spelling of coordinates
-	if ((NumMultipoles>0) && (Buffer->LocateKeyWord("MULTIPOLE COORDINATES", 20, Buffer->GetFilePos()+1000) ||
-			Buffer->LocateKeyWord("MULTIPOLE CORDINATES", 19, Buffer->GetFilePos()+1000))) {
+	if ((NumMultipoles>0) && (Buffer->LocateKeyWord("MULTIPOLE COORDINATES", 20, Buffer->GetFilePos()+10000) ||
+			Buffer->LocateKeyWord("MULTIPOLE CORDINATES", 19, Buffer->GetFilePos()+10000))) {
 		Buffer->SkipnLines(3);
 		SetupFrameMemory(lFrame->NumAtoms + 10, 0);
 		bool workingFragment=false;
@@ -3980,16 +4153,25 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 					sscanf(&(LineText[Pos+5]), "%f", &xvalue);
 				}
 			} else {
-				ReadLongKeyword(LineText, "NAT", &NumAIAtoms);
-				ReadLongKeyword(LineText, "NFRG", &NumFragments);
-				ReadLongKeyword(LineText, "NQMMM", &NumMDAtoms);
+				if (!ReadLongKeyword(LineText, "NAT", &NumAIAtoms))
+					wxLogMessage(_("Unable to locate NAT (ab initio atom count)."));
+				if (!ReadLongKeyword(LineText, "NFRG", &NumFragments))
+					wxLogMessage(_("Unable to locate NFRG (fragment count)."));
+				if (!ReadLongKeyword(LineText, "NQMMM", &NumMDAtoms))
+					wxLogMessage(_("Unable to locate NQMM (MM atom count)."));
+
 				//second line is the x-axis and total energy, either ttotal or stotal
 				//STOTAL=   1.49848 sqrt(amu)*bohr   tot. E=      -91.6219797490 Hartree
 				Buffer->GetLine(LineText);
-				if (runType == IRCRun)
-					ReadFloatKeyword(LineText, "STOTAL", &xvalue);
-				else	//MD and DRC spell it TTOTAL
-					ReadFloatKeyword(LineText, "TTOTAL", &xvalue);
+				if (runType == IRCRun) {
+					if (!ReadFloatKeyword(LineText, "STOTAL", &xvalue)) {
+						wxLogMessage(_("Unable to locate STOTAL in IRC data packet. Unable to position this packet in the sequence."));
+					}
+				} else {	//MD and DRC spell it TTOTAL
+					if (!ReadFloatKeyword(LineText, "TTOTAL", &xvalue)) {
+						wxLogMessage(_("Unable to locate TOTAL in trajectory data packet. Unable to position this packet in the sequence."));
+					}
+				}
 				ReadDoubleKeyword(LineText, "TOT. E", totE);
 			}
 
@@ -4024,6 +4206,8 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 					double kinE;
 					if (ReadDoubleKeyword(LineText, "KIN. E", kinE))
 						lFrame->SetEnergy(kinE, KineticEnergy);
+					else
+						wxLogMessage(_("Unable to parse the kinetic energy while reading a molecular dynamics trajectory file. The file format may not be correct."));
 				}
 
 				//setup the frame for the antipated atom count
@@ -5773,6 +5957,9 @@ long SetAtomType(const unsigned char *TestLabel) {
 				case 'f':			/* Californium */
 					result = 98;
 					break;
+				case 'n':			/* Copernicium */
+					result = 112;
+					break;
 				default:			/* Carbon */
 					result = 6;
 					break;
@@ -6028,7 +6215,7 @@ long SetAtomType(const unsigned char *TestLabel) {
 				case 'a':			/* Radium */
 					result = 88;
 					break;
-				case 'f':
+				case 'f':			/* Rutherfordium */
 					result = 104;
 					break;
 			}
@@ -6077,11 +6264,14 @@ long SetAtomType(const unsigned char *TestLabel) {
 				case 'y':/* Dysprosium */
 					result = 66;
 					break;
-				case 'b':
+				case 'b':	/* Dubnium */
 					result = 105;
 					break;
 				case 's':	//Darmstadtium
 					result = 110;
+					break;
+				default:	//Deuterium
+					result = 1;
 					break;
 			}
 			break;
@@ -6094,7 +6284,7 @@ long SetAtomType(const unsigned char *TestLabel) {
 		case '*':	/*special atom types for special vectors*/
 			switch (label[1]) {
 				case 'c':	/*Charge centroids with dipole vectors*/
-					if (label[2]=='B' || label[2]=='b')
+					if (TestLabel[2]=='B' || TestLabel[2]=='b')
 						result = 117;
 					else
 						result = 116;
