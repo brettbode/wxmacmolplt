@@ -16,7 +16,7 @@
 				8B2998F50E48FA7D00624A73 /* CopyFiles */,
 			);
 			dependencies = (
-				8B2998A70E48F7BA00624A73 /* PBXTargetDependency */,
+				8B1E97741A5622AA00CE0CE5 /* PBXTargetDependency */,
 			);
 			name = "Dist directory";
 			productName = "Dist directory";
@@ -666,12 +666,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		8B2998A60E48F7BA00624A73 /* PBXContainerItemProxy */ = {
+		8B1E97731A5622AA00CE0CE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1652D9FF09D0AE7200B7783F /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B3B8ADF0A770A280041EA88;
-			remoteInfo = "wxMacMolPlt Universal";
+			remoteGlobalIDString = 8B29D61C12B934BD0049477F;
+			remoteInfo = "wxMacMolPlt-2.9 cocoa";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -2302,10 +2302,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		8B2998A70E48F7BA00624A73 /* PBXTargetDependency */ = {
+		8B1E97741A5622AA00CE0CE5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8B3B8ADF0A770A280041EA88 /* wxMacMolPlt Universal */;
-			targetProxy = 8B2998A60E48F7BA00624A73 /* PBXContainerItemProxy */;
+			target = 8B29D61C12B934BD0049477F /* wxMacMolPlt-2.9 cocoa */;
+			targetProxy = 8B1E97731A5622AA00CE0CE5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -2653,6 +2653,7 @@
 		8B2998A30E48F78300624A73 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2664,6 +2665,7 @@
 		8B2998A40E48F78300624A73 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
