@@ -2157,7 +2157,7 @@ void InputBuilderWindow::SetupMOGuessItems() {
 			if ((tempVec<=0)||(tempVec > (Orbs->size() + 2))) tempVec = 2;
 			std::vector<OrbitalRec *>::const_iterator OrbSet = Orbs->begin();
 			while (OrbSet != Orbs->end()) {	//Build the popup menu
-				mMOSourceChoice->Append(wxString((*OrbSet)->getOrbitalTypeText()));
+				mMOSourceChoice->Append(wxString((*OrbSet)->getOrbitalTypeText(), wxConvUTF8));
 				OrbSet++;
 			}
 		} else {	//No orbs so the only choice is by hand later

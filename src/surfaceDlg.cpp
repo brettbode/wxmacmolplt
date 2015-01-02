@@ -512,7 +512,7 @@ int OrbSurfacePane::getOrbSetForOrbPane(vector<wxString>& choice) {
 					item = numitems+1;	//target beta set
 			} 
 			else {
-				choice.push_back(wxString((*OrbSet)->getOrbitalTypeText()));
+				choice.push_back(wxString((*OrbSet)->getOrbitalTypeText(), wxConvUTF8));
 			}
 			numitems++;
 			OrbSetCount++;
@@ -3065,7 +3065,7 @@ void BaseSurfacePane::BuildOrbSetPopup(void) {
 		unsigned long	OrbSetCount = 0;
 		while (OrbSet != Orbs->end()) {
 			if ((*OrbSet)->TotalDensityPossible()) {
-				mOrbSetChoice->Append(wxString((*OrbSet)->getOrbitalTypeText()));
+				mOrbSetChoice->Append(wxString((*OrbSet)->getOrbitalTypeText(), wxConvUTF8));
 			}
 			if (TargetOrbSet < 0) {
 				if (((*OrbSet)->getOrbitalType() != GuessOrbital) ||

@@ -386,7 +386,7 @@ const char * OrbitalRec::getOrbitalTypeText(void) const {
 			return "VB2000 Molecular Orbitals";
 //		default:
 	}
-	return wxString(_T("Molecular Orbitals"));
+	return "Molecular Orbitals";
 }
 //		IO routines
 //Call with the file positioned to the $Vec line
