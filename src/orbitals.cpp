@@ -392,6 +392,7 @@ const char * OrbitalRec::getOrbitalTypeText(void) const {
 //Call with the file positioned to the $Vec line
 void OrbitalRec::ReadVecGroup(BufferFile * Buffer, const long & NumBasisFuncs, const TypeOfWavefunction & Type) {
 		char	Line[kMaxLineLength], itext[4], jtext[4];
+	TypeOfOrbital OrbType=unknownOrbitalType;
 //Read $vec label lines
 	NumBasisFunctions = NumBasisFuncs;
 	long VecPos = Buffer->GetFilePos() - 2;
@@ -410,6 +411,16 @@ void OrbitalRec::ReadVecGroup(BufferFile * Buffer, const long & NumBasisFuncs, c
 		Buffer->SetFilePos(back3Pos);
 		Buffer->Read((Ptr) Label, LabelLength-1);	//note: buffer position should be back at $vec
 		Label[LabelLength-1] = 0;	//make it a proper C string
+		
+		//Attempt to parse the Label for keywords to indicate the wavefunction and type of vectors
+		if (-1 < FindKeyWord(Line, "VB2000 VB ORBITALS", 17))
+			OrbType = VB2000VBOrbital;
+		else if (-1 < FindKeyWord(Line, "VB2000 INITIAL ORBITALS", 22))
+			OrbType = VB2000InitialOrbital;
+		else if (-1 < FindKeyWord(Line, "VB2000 LMOS", 11))
+			OrbType = VB2000LocalizedMolecularOrbital;
+		else if (-1 < FindKeyWord(Line, "VB2000 MOS", 10))
+			OrbType = VB2000MolecularOrbital;
 	}
 //read in the vectors in the GAMESS format (I2,I3,5E15.8)
 	Buffer->SetFilePos(VecPos+2);
@@ -479,6 +490,7 @@ void OrbitalRec::ReadVecGroup(BufferFile * Buffer, const long & NumBasisFuncs, c
 		if (EnergyB) {delete [] EnergyB; EnergyB = NULL;}
 		if (SymTypeB) {delete [] SymTypeB; SymTypeB = NULL;}
 	}
+	setOrbitalType(OrbType);
 }
 //This function must be called at the start of the $VEC line
 void OrbitalRec::ReadUHFVECOccupancies(BufferFile & Buffer) {
