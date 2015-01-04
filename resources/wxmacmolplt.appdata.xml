@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2015 Brett Bode <MMP.Guy@gmail.com> -->
+<component type="desktop">
+ <id>wxmacmolplt.desktop</id>
+ <metadata_license>CC0-1.0</metadata_license>
+ <project_license>GPL-2.0+</project_license>
+ <name>wxmacmolplt</name>
+ <summary>Molecular modelling program</summary>
+ <description>
+<P>wxMacMolPlt is a cross-platform (Mac OS X, Linux and Windows) gui for 
+preparing, submitting and visualizing input and output for the GAMESS 
+quantum chemistry package. Features include a graphical molecule builder, 
+GAMESS input generation, animation of output and visualization of molecules, 
+normal modes, orbitals and other properties.
+
+<p>See the included html manual or the homepage for more details.
+<P>
+ <screenshots>
+  <screenshot type="default">
+   <image>http://wiki.wxmacmolplt.googlecode.com/git/images/annotation.jpg</image>
+   <caption>A simple sample showing the molecular display and an annotation.</caption>
+  </screenshot>
+ </screenshots>
+ <url type="homepage">https://code.google.com/p/wxmacmolplt/</url>
+ <updatecontact>MMP.Guy@gmail.com</updatecontact>
+</component>
