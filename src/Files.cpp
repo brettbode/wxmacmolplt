@@ -2096,7 +2096,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 		if (lFrame->NumAtoms > 0) lFrame = MainData->AddFrame(lFrame->NumAtoms, 0);
 		//ugh why does everybody have to create their own cartesian format...
 		Buffer->GetLine(LineText);
-		while ((LineText[0] != '[')&&(Buffer->GetFilePos()<Buffer->GetFileSize())) {
+		while ((FindKeyWord(LineText, "[", 1) < 0)&&(Buffer->GetFilePos()<Buffer->GetFileSize())) {
 			char	token[kMaxLineLength];
 			long atomNum, junk;
 			CPoint3D pos;
