@@ -1172,10 +1172,10 @@ void SetupMOScreens(const BasisSet * const Basis, const float * const MOVector, 
 			AtomScreen.push_back(atomSkip);
 		if (!computeAtom) atomCounter++;
 	}
-	wxString foo;
-	foo << wxT(" Screens: saved ") << shellCounter << wxT(" out of ")  << nshell << wxT(" shells") <<
-	wxT(" and ") << atomCounter << wxT(" out of ") << NumAtoms << wxT(" atoms");
-	wxLogMessage(foo);
+//	wxString foo;
+//	foo << wxT(" Screens: saved ") << shellCounter << wxT(" out of ")  << nshell << wxT(" shells") <<
+//	wxT(" and ") << atomCounter << wxT(" out of ") << NumAtoms << wxT(" atoms");
+//	wxLogMessage(foo);
 	//Set up normalization constants for d,f,g functions
 	float sqrt3 = sqrt(3.0);
 	float onedsqrt3 = 1/sqrt3;
@@ -1187,6 +1187,7 @@ void SetupMOScreens(const BasisSet * const Basis, const float * const MOVector, 
 	//Use the screening arrays to create reduced vectors of atoms/MOVector
 	//this may seem redundant but doing it once here pulls some logic out of the loop over grid points so saves a lot later.
 	nshell = 0;
+	ivec = 0;
 	for (int iatom=0; iatom<NumAtoms; iatom++) {
 		int shellpatom=0;
 		for (long ishell=Basis->BasisMap[2*iatom]; ishell<=Basis->BasisMap[2*iatom+1]; ishell++) {
@@ -2748,8 +2749,8 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 		lProgress->ResetTimes();
 	} else 
 #endif
-//#ifdef __wxBuild__
-#if 0
+#ifdef __wxBuild__
+//#if 0
 		if (wxThread::GetCPUCount() > 1) {
 			int myCPUCount = wxThread::GetCPUCount();
 			//Ok we have multiple CPUs so create a worker thread for each CPU and split up the grid calculation
@@ -2831,17 +2832,17 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 			long selfTime = CheckTime;
 #endif
 			long junk;	//just a placeholder, not used for cooperative tasks
-			GridMax = CalculateGrid(0,NumXGridPoints,lFrame->Atoms, Basis, MOVector,
-									lFrame->NumAtoms, lProgress, &junk, &AtomScreen, &ShellScreen, false);
-			wxString foo2;
-			CheckTime =timer.Time();
-			foo2 << wxT(" CalculateGrid selftime is ") << CheckTime -selfTime << wxT(" GridMax = ") << GridMax;
-			wxLogMessage(foo2);
+//			GridMax = CalculateGrid(0,NumXGridPoints,lFrame->Atoms, Basis, MOVector,
+//									lFrame->NumAtoms, lProgress, &junk, &AtomScreen, &ShellScreen, false);
+//			wxString foo2;
+//			CheckTime =timer.Time();
+//			foo2 << wxT(" CalculateGrid selftime is ") << CheckTime -selfTime << wxT(" GridMax = ") << GridMax;
+//			wxLogMessage(foo2);
 			GridMax = CalculateGridStreamlined(0,NumXGridPoints, atomList, Basis, reducedVector,
 					lFrame->NumAtoms, lProgress, &junk, &AtomScreen, &ShellScreen, shellTypes, shellIndex, shellsPerAtom, false);
-			wxString foo;
-			foo << wxT(" CalculateGridStreamLined selftime is ") << timer.Time() -CheckTime << wxT(" GridMax = ") << GridMax;
-			wxLogMessage(foo);
+//			wxString foo;
+//			foo << wxT(" CalculateGridStreamLined selftime is ") << timer.Time() -CheckTime << wxT(" GridMax = ") << GridMax;
+//			wxLogMessage(foo);
 	}
 		//Unlock the grid handle and return
 	if (Options & 1) delete [] MOVector;
@@ -2912,10 +2913,10 @@ float Orb3DSurface::CalculateGrid(long xStart, long xEnd, const mpAtom * const A
 		XGridValue += XGridInc;
 	}
 	lGridMax = MAX(lGridMax, fabs(lGridMin));
-	wxString foo;
-	foo << wxT(" CalculateGrid sefltime for ") << (xEnd-xStart)*NumYGridPoints*NumZGridPoints <<
-	wxT(" points is ") << timer.Time() -selfTime;
-	wxLogMessage(foo);
+//	wxString foo;
+//	foo << wxT(" CalculateGrid sefltime for ") << (xEnd-xStart)*NumYGridPoints*NumZGridPoints <<
+//	wxT(" points is ") << timer.Time() -selfTime;
+//	wxLogMessage(foo);
 	return lGridMax;
 }
 float Orb3DSurface::CalculateGridStreamlined(long xStart, long xEnd, const std::vector<CPoint3D> & atomList, const BasisSet * const Basis,
