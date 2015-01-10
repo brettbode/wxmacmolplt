@@ -993,6 +993,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		long nFunc;	
 		char IType[5];
 		float Sc;
+		Buffer->SkipnLines(1);
+		startOfSection = Buffer->GetFilePos();
 		
 		// count total number of shells in Basis section by counting
 		// the number of lines formatted according to the sscanf below
@@ -1023,7 +1025,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 		if (MainData->Basis == NULL) error = true;
 		
 		// go back to the line right after $BASIS so we can parse the data
-		Buffer->BackupnLines(linesInBasis-1); 
+		Buffer->SetFilePos(startOfSection);
 		// reiterate through Basis section to get and save BasisSet data
 		while (iShell < nShells && iAtom < nAtoms && !error) {
 			Buffer->GetLine(Line);
@@ -1112,14 +1114,14 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 							// file isn't formatted perfectly; eg, there is a blank line after $END
 							break;
 						}
-						// else throw an error? but "else error = true;" causes incorrect behavior
-						else if (0==strncmp(Line,"\0", kMaxLineLength))
-							break;
 						else {
 							error = true;
 						}
-					} else 
+					} else { // likely hit a blank line
+						MainData->Basis->BasisMap[2*iAtom+1]=iShell;
+						++iAtom;
 						stopReadingShell = true;
+					}
 				}
 				// move on to next shell in next iteration
 				++iShell;
@@ -1140,13 +1142,13 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			if (MainData->Basis != NULL) delete MainData->Basis;
 			MainData->Basis = NULL;
 			MessageAlert("Error while reading. No basis set created.");
-		}
-		else 
+		} else {
 			BasisDone = true;
-		MainData->Basis->NuclearChargesAreValid(true);
+			MainData->Basis->NuclearChargesAreValid(true);
+		}
 	}
 	// now look for Alpha Coefficients (Orbitals; depends on BasisSet)
-	if (BasisDone&&(Buffer->LocateKeyWord("$COEFF_ALPHA", 12))) {
+	if (BasisDone&&(MainData->Basis != NULL)&&(Buffer->LocateKeyWord("$COEFF_ALPHA", 12))) {
 		Buffer->GetLine(Line); // skip $COEFF_ALPHA line
 		bool error = false;
 		char tmpStr[5];
