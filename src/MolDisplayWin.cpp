@@ -49,6 +49,9 @@
 #include <wx/display.h>
 #include <wx/stdpaths.h>
 #include <wx/toolbar.h>
+#if wxCHECK_VERSION(2,9,0)
+#include <wx/quantize.h>
+#endif
 
 #ifdef __WXMSW__
 #include <stdio.h>
@@ -1009,6 +1012,24 @@ void MolDisplayWin::menuFileImport(wxCommandEvent &event) {
 		}
 	}
 }
+enum {
+	mmp_bmp=0,
+	mmp_png,
+	mmp_jpg,
+#if wxCHECK_VERSION(2,9,0)
+	mmp_gif,
+#endif
+	mmp_tiff,
+	mmp_data,
+	mmp_mdl,
+	mmp_xmol,
+	mmp_eneg,
+	mmp_vrml,
+	mmp_pov,
+	mmp_freq,
+	mmp_qt,
+	mmp_ming
+};
 void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 	wxFileDialog        *fileDlg = NULL;
 	ExportOptionsDialog *exportOptionsDlg = NULL;
@@ -1019,6 +1040,10 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 	wxString   wildcards(wxT("Windows Bitmap (*.bmp)|*.bmp")
 						 wxT("|Portable Network Graphics (*.png)|*.png")
 						 wxT("|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg")
+#if wxCHECK_VERSION(2,9,0)
+						 wxT("|GIF (*.gif)|*.gif")
+#endif
+						 wxT("|TIFF (*.tiff)|*.tiff")
 						 wxT("|GAMESS $DATA group (*.inp)|*.inp")
 						 wxT("|MDL MolFile|*.mol")
 						 wxT("|XMOL (*.xyz)|*.xyz")
@@ -1066,26 +1091,42 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 		Prefs->CylindersForLines(true);
 		filepath = fileDlg->GetPath();
 		index    = fileDlg->GetFilterIndex();
-		if (index <= 2) {
+		if (index < mmp_data) {
 			switch(index) {
-				case 0:
+				case mmp_bmp:
 					type = wxBITMAP_TYPE_BMP;
 					if(!filepath.Lower().Matches(wxT("*.bmp"))) {
 						filepath.Append(wxT(".bmp"));
 					}
 					break;
-				case 1:
+				case mmp_png:
 					type = wxBITMAP_TYPE_PNG;
 					if(!filepath.Lower().Matches(wxT("*.png"))) {
 						filepath.Append(wxT(".png"));
 					}
 					break;
-				case 2:
+				case mmp_jpg:
 					type = wxBITMAP_TYPE_JPEG;
 					if(!filepath.Lower().Matches(wxT("*.jpg")) &&
 					   !filepath.Lower().Matches(wxT("*.jpeg"))) {
 
 						filepath.Append(wxT(".jpg"));
+					}
+					break;
+#if wxCHECK_VERSION(2,9,0)
+				case mmp_gif:
+					type = wxBITMAP_TYPE_GIF;
+					if(!filepath.Lower().Matches(wxT("*.gif"))) {
+						
+						filepath.Append(wxT(".gif"));
+					}
+					break;
+#endif
+				case mmp_tiff:
+					type = wxBITMAP_TYPE_TIFF;
+					if(!filepath.Lower().Matches(wxT("*.tiff"))) {
+						
+						filepath.Append(wxT(".tiff"));
 					}
 					break;
 			}
@@ -1124,6 +1165,14 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 						exportImage.SetMaskColour(red, green, blue);
 					}
 				}
+#if wxCHECK_VERSION(2,9,0)
+				if (type == wxBITMAP_TYPE_GIF) {
+					wxQuantize::Quantize(exportImage, exportImage);
+					if (exportImage.HasAlpha()) {
+						exportImage.ConvertAlphaToMask();
+					}
+				}
+#endif
 				exportImage.SaveFile(filepath, (wxBitmapType) type);
 				memDC.SelectObject(wxNullBitmap); // bmp has now been
 												  // destroyed.
@@ -1150,17 +1199,17 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 
 					bool AllFrames = false;
 					switch (index) {
-						case 3:
+						case mmp_data:
 							if (MainData->GetNumFrames()>1) {
 								AllFrames = (wxMessageBox(wxT("Should all geometries (frames) be included\?"),
 														  wxT(""), wxYES_NO | wxICON_QUESTION) == wxYES);
 							}
 							ExportGAMESS(buffer, AllFrames);
 							break;
-						case 4:
+						case mmp_mdl:
 							WriteMDLMolFile(buffer);
 							break;
-						case 5:
+						case mmp_xmol:
 						{
 							if (MainData->GetNumFrames()>1) {
 								AllFrames = (wxMessageBox(wxT("Should all geometries (frames) be included\?"),
@@ -1181,20 +1230,20 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 							WriteXYZFile(buffer, AllFrames, AllModes, AnimateMode);
 						}
 							break;
-						case 6:
+						case mmp_eneg:
 							if (MainData->GetNumFrames()>1) {
 								AllFrames = (wxMessageBox(wxT("Should all geometries (frames) be included\?"),
 														  wxT(""), wxYES_NO | wxICON_QUESTION) == wxYES);
 							}
 							WriteTabbedEnergies(buffer, AllFrames);
 							break;
-						case 7:
+						case mmp_vrml:
 							WriteVRMLFile(buffer);
 							break;
-						case 8:
+						case mmp_pov:
 							WritePOVFile(buffer);
 							break;
-						case 9:
+						case mmp_freq:
 							WriteFrequencies(buffer);
 							break;
 					}
