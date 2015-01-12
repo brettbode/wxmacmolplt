@@ -1018,8 +1018,8 @@ enum {
 	mmp_jpg,
 #if wxCHECK_VERSION(2,9,0)
 	mmp_gif,
-#endif
 	mmp_tiff,
+#endif
 	mmp_data,
 	mmp_mdl,
 	mmp_xmol,
@@ -1042,8 +1042,8 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 						 wxT("|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg")
 #if wxCHECK_VERSION(2,9,0)
 						 wxT("|GIF (*.gif)|*.gif")
-#endif
 						 wxT("|TIFF (*.tiff)|*.tiff")
+#endif
 						 wxT("|GAMESS $DATA group (*.inp)|*.inp")
 						 wxT("|MDL MolFile|*.mol")
 						 wxT("|XMOL (*.xyz)|*.xyz")
@@ -1121,7 +1121,6 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 						filepath.Append(wxT(".gif"));
 					}
 					break;
-#endif
 				case mmp_tiff:
 					type = wxBITMAP_TYPE_TIFF;
 					if(!filepath.Lower().Matches(wxT("*.tiff"))) {
@@ -1129,6 +1128,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 						filepath.Append(wxT(".tiff"));
 					}
 					break;
+#endif
 			}
 			exportOptionsDlg = new ExportOptionsDialog(this);
 			exportOptionsDlg->setFileType(type);

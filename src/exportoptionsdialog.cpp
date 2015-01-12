@@ -189,7 +189,11 @@ void ExportOptionsDialog::CreateControls()
 
 void ExportOptionsDialog::setFileType(int ft) {
     filetype = ft;
-    if((filetype == wxBITMAP_TYPE_PNG) || (filetype == wxBITMAP_TYPE_GIF) || (filetype == wxBITMAP_TYPE_TIFF)) {
+    if((filetype == wxBITMAP_TYPE_PNG)
+#if wxCHECK_VERSION(2,9,0)
+	   || (filetype == wxBITMAP_TYPE_GIF) || (filetype == wxBITMAP_TYPE_TIFF)
+#endif
+	   ) {
         resTBGCheck->Enable(true);
     }
     else {
