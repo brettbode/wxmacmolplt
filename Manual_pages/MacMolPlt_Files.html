@@ -21,10 +21,10 @@
 				<li><A HREF="#GAMESSInput">GAMESS input files</A>
 				<LI><A HREF="#mol_files">MolPlt .mol files</A>
       
-      <LI><A HREF="#pdb">Protein Data Bank .pdb files</A>
-				<li><a href="#molden">MolDen format files</a>
-			</UL>
-   
+		<LI><A HREF="#pdb">Protein Data Bank .pdb files</A>
+		<LI><A HREF="#molden">MolDen format files</A>
+		<LI><A HREF="#mkl">Molekel MKL format files</A>
+	</UL> 
    <LI>Import only - through the Import file dialog
    
    <UL>
@@ -34,7 +34,7 @@
    <LI>Output only - through Export dialog or the input builder
    
    <UL>
-				<LI><A HREF="#image">BMP, PNG or JPEG image</A>
+				<LI><A HREF="#image">BMP, PNG, JPEG, GIF or TIFF image</A>
 				<li><a href="#movies">Flash or QuickTime movies</a>
 				<li><a href="#povray">POV-Ray scene descriptions</a>
 				<LI>tab-delimited energies
@@ -320,9 +320,12 @@ will automatically punch out a $ZMAT group.</P>
 <HR WIDTH="70%">
 <A NAME="image"></A>images</H4>
 		<P>The current display window can be exported in several image formats
-including Windows bitmap, portable network graphics, and JPEG. You will
-also be given the option of specifying the size (resolution) of the exported
-image. This can be used to generate hi-res images suitable for printing.
+including Windows bitmap, portable network graphics, JPEG, GIF and TIFF. You 
+will also be given the option of specifying the size (resolution) of the 
+exported image. This can be used to generate hi-res images suitable for 
+printing. Optionally the background color can be included as a transparency
+in image formats that support an alpha channel. Note: GIF and TIFF formats
+are only available in builds based on wxWidgets 2.9 and newer.
 </P>
 		<h4>
 			<hr width="70%">
@@ -339,7 +342,8 @@ image. This can be used to generate hi-res images suitable for printing.
 		<p>CML is a text XML based format that provides a great deal of flexibility and extensibility. MacMolPlt should be able to read most any CML1 or CML2 format file with three coordinate data. MacMolPlt can also export to CML2 format. Currently only atoms and bonds are exported or parsed.</p>
 <p>As of version 5.6 a signficantly extended CML format has become the sole
 supported save file format. This format has the advantage of being completely
-cross platform and is thus fully supported on both PPC and Intel machines.</p>
+cross platform and is thus fully supported on various processors and operating
+systems.</p>
 		<h4>
 			<HR WIDTH="70%">
 			<A NAME="MDL"></A>MDL MolFiles</h4>
@@ -355,6 +359,8 @@ on <A HREF="http://en.wikipedia.org/wiki/MDL_Molfile">MDL's file format</A>.</P>
 		</H4>
 		<h4><a name="molden"></a>MolDen format files</h4>
 		<p>MolDen format files are a loosely doucmented text file format supported by several applications. MacMolPlt should be able to read most information, including orbitals and multiple geometries. Note that STO type basis sets are not supported.</p>
+		<h4><a name="mkl"></a>Molekel MKL files</h4>
+		<p>A parser for Molekel MKL (.mkl) files. Included are coordinates, basis set and orbitals.</p>
 		<h4>
 			<hr width="70%">
 		</h4>
