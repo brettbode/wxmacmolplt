@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=ISO-8859-1">
+		<meta name="generator" content="Adobe GoLive 6">
+		<title>MacMolPlt Tutorial</title>
+	</head>
+	<body bgcolor="#ffffff">
+		<div align="center">
+			<h3>MacMolPlt Tutorial</h3>
+		</div>
+		<p>This page is a quick walkthrough of the major features of MacMolPlt to give you a quick introduction to the program and its capabilities.</p>
+		<p>Begin by opening up the MacMolPlt application and choosing Open File from the File menu. Open the water.log sample GAMESS file from the samples directory. The samples directory will be in the same location as the executable for Windows and Mac, but in /usr/local/share/wxMacMolPlt on Linux. Once you have the water.log file open you will see a 3D view of a water molecule.</p>
+		<p>Click anywhere in the molecule display window and drag. This will rotate the molecule display. The circle represents a virtual 3D trackball with the mouse representing the point of contact with that sphere. When the mouse is inside the circle you will get X and Y rotation. When outside the circle you get pure Z rotation. </p>
+		<p>Try holding down the shift key while rotating to zoom or the Command (Control) key to translate the molecule. If you have a multibutton mouse the scroll wheel will also zoom and the right button translate.</p>
+		<p>Under the &quot;SubWindow&quot; menu are a list of different data views for the current file. In the Bonds window you can add and remove bonds and set the bond order. In the coordinates window you can add and remove atoms and specify thier coordinates. Note that you can also list the coordinates as a Z-Matrix.</p>
+		<p>The Energy plot window will plot each frame's energy. For the water example there is only one frame so it's not that interesting.</p>
+		<p>The Frequencies window contains a list of the vibrational frequencies and a plot of the frequency versus its intensity. You can click on the plot to choose a frequency to display. Once you have a frequency display go back to the molecule display window and choose animate mode.</p>
+		<p>In the Surfaces window you can create 2D and 3D plot of orbitals, total electron densities, molecular electrostatic potentials and density differences. Open the Surfaces window and add a 3D orbital. Choose the orbital to plot from the list on the left, then click Update. You can change the isosurface contour value, contour colors (double click on the color to change), and more.</p>
+		<p>The input builder window allows you to setup a GAMESS input deck based on the current coordinates. Many of the input builder items have tooltips designed to help you understand the option and what flag in the GAMESS input file will be set. When you are ready click &quot;Write File&quot; to generate a GAMESS input file.</p>
+		<p>The Preferences window allows you to customize many of the options within MacMolPlt. These include atom and bond colors. Style of molecular display, display quality and background color. You can also setup the energy plot window to plot more than one energy or even structural parameters such as a bond length or angle. The preferences you specify with the window opened from the &quot;Subwindow&quot; menu is file specific. To change the global default preferences use the preferences menu item under the Edit menu (under the MacMolPlt menu on the Mac).</p>
+		<p>If you save the file an extended CML file will be created that preserves all the current information to the file including all preferences, rotation, etc.</p>
+	</body>
+</html>

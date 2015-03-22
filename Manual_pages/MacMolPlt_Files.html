@@ -1,0 +1,450 @@
+<!--This file created 1/1/99 8:14 PM by Claris Home Page version 2.0-->
+<HTML>
+<HEAD>
+   <TITLE>MacMolPlt Files</TITLE>
+   <META NAME=GENERATOR CONTENT="Claris Home Page 2.0">
+   <X-SAS-WINDOW TOP=66 BOTTOM=600 LEFT=8 RIGHT=538>
+</HEAD>
+<BODY>
+
+<H1><CENTER>MacMolPlt Files</CENTER></H1>
+
+<H3>MacMolPlt supports the following file types:</H3>
+
+<UL>
+   <LI>Input only - through Open and Append file dialogs
+   
+   <UL>
+      <LI><A HREF="#GAMESSLog">GAMESS log files</A>
+      
+      <LI><A HREF="#GAMESSIRC">GAMESS irc files</A>
+				<li><A HREF="#GAMESSInput">GAMESS input files</A>
+				<LI><A HREF="#mol_files">MolPlt .mol files</A>
+      
+		<LI><A HREF="#pdb">Protein Data Bank .pdb files</A>
+		<LI><A HREF="#molden">MolDen format files</A>
+		<LI><A HREF="#mkl">Molekel MKL format files</A>
+	</UL> 
+   <LI>Import only - through the Import file dialog
+   
+   <UL>
+      <LI><A HREF="#datfiles">GAMESS .dat file</A>
+   </UL>
+   
+   <LI>Output only - through Export dialog or the input builder
+   
+   <UL>
+				<LI><A HREF="#image">BMP, PNG, JPEG, GIF or TIFF image</A>
+				<li><a href="#movies">Flash or QuickTime movies</a>
+				<li><a href="#povray">POV-Ray scene descriptions</a>
+				<LI>tab-delimited energies
+
+			</UL>
+   
+   <LI>Input and Output capable
+   
+   <UL>
+	<li><A HREF="#CML">Chemical Markup Language (CML) files</A>
+	<LI><A HREF="#MDL">MDL MolFiles</A>
+      
+      <LI><A HREF="#XYZ">XMol style XYZ files</A>
+      
+      <LI><A HREF="#SurfExport">2D and 3D general Surface format</A>
+      (import/export only)
+   </UL>
+</UL>
+
+<H3>
+<HR>
+Input only formats:</H3>
+
+<P>The following text format files can be read in directly with MacMolPlt via the Open and Append menus. MacMolPlt will automatically determine the type of file by looking first for a file extension. If it finds .PDB or .XYZ then it treats the files as Protein Data Bank and XMol XYZ files. If these extenstions are not found then it searchs the file for certain phrases such as &quot;GAMESS version&quot; for log files, &quot;IRC information packet&quot; for IRC files and &quot;NATOMS=&quot; on the first line of .mol files. In general MacMolPlt automatically determines the file type based first on the file extension and then based on the file content. If MacMolPlt appears to be having trouble determining the file type try appending the appropriate file extension from the above list.</P>
+
+<H3>Output only formats:</H3>
+
+<P>MacMolPlt is capable of exporting to several file formats. Most
+export formats are accessed through the Export Menu item. This menu
+command will bring up a file dialog allowing you to name the target
+file and choose the export format.</P>
+
+<H4>
+<HR WIDTH="70%">
+<A NAME="GAMESSLog"></A>GAMESS log files</H4>
+
+<P>GAMESS log file means any type of GAMESS log file. MacMolPlt reads
+geometry points, energies, frequencies (if any), orbitals, and other
+related information. MacMolPlt can only read IRC points out of log
+files created with the April 20, 1995 version and later (previous
+versions did not write out a full set of coordinates). You may append
+log files similarly to IRC files (see IRC notes below). Beginning
+with version 3.0 MacMolPlt reads in the basis set (meaning
+coefficients and exponents) and molecular orbital vectors (including
+localized orbitals if present). This has the effect of increasing the
+file size when the log file is saved. Each frame is searched for
+orbitals, but GAMESS does not normally punch orbitals to the log file
+for points other that the first and last point of a file. If you wish
+to view orbitals for other points you can either Import the $Vec
+group from the .Dat file or set the NPRT=1 option in either the
+$STATPT group or the $IRC group to force GAMESS to punch orbitals for
+every point. This will not permit computing a total electron density
+for MCSCF wavefunctions since GAMESS does not print the MCSCF natural
+orbitals and occupation numbers except for the first and last points.
+Note: MacMolPlt looks for certain phrases in the file to locate each
+piece of information, thus I do not advise editing log files as you
+might prevent MacMolPlt from correctly reading the file.</P>
+
+<P>GAMESS log files containing effective fragment coordinates are
+also now supported. For log files with frequency information and
+fragments you must have a GAMESS version from September 1997 or later
+which prints frequency information for fragments just like any other
+atom (instead of translations and torques). Note: the January 6, 1998
+version of GAMESS changed the way optimizations print out
+coordinates. Thus you will need MacMolPlt 4.6 or later to read the
+new style of output.</P>
+
+<H4>
+<HR WIDTH="70%">
+<A NAME="GAMESSIRC"></A>GAMESS IRC files</H4>
+
+<P>GAMESS IRC (usually with a .irc extension) are punched out by
+GAMESS for any IRC or DRC type run. These files contain a minimum
+amount of information about each geometry point and are thus the most
+compact way to store the IRC or DRC information. MacMolPlt can read
+in all types of IRC files and keeps the coordinates, energy, IRC
+distance or DRC time. You may append further geometry points from
+other files. This feature is designed to make it easy to piece
+together multiple pieces of an IRC or DRC. Geometry points will be
+ordered according to the IRC distance or DRC time regardless of their
+position in the files. Any duplicate points (duplicate means equal
+IRC distance or DRC time) will be skipped. On IRC's you may wish to
+change the sign of the IRC points on one side of the Transition
+state. If you wish to piece
+together multiple IRC's from multiple transition states you will need
+to offset the second and subsequent transition states from the first
+(defined as point 0). To calculate the
+offset distance add the maximum IRC distance for the forward IRC from
+the first TS to the maximum IRC distance for the IRC in the reverse
+direction from the second TS.
+To flip the sign or offset the values there is a 2nd dialog that pops up
+after the append file selection dialog. The Append File option will allow
+the selection of multiple files to append at once, but the settings for the
+offset and flip are applied uniformaly to all selected files.
+These features should make it easy to
+create a seamless IRC from one minimum to another.</P>
+
+<H4>
+<HR WIDTH="70%">
+<A NAME="mol_files"></A>MolPlt .mol files</H4>
+
+<P>MacMolPlt reads ASCII data files in a method similar to, but not
+the same as the free format input method used in MOLPLT. Free format
+input allows you to enter data without regard to what column it is in
+or what case it is. A blank space, a tab, or an equals sign can be
+used to separate data fields. An example of a keyword input item is
+DELTA=0.05, which is two data items, the first (DELTA) being the
+keyword telling what the data is, the second (0.05) being the actual
+value. Because you can give keywords in any order you like,
+"DELTA=0.05 NOPLOTS" and "NOPLOTS DELTA=0.05" are the same. In other
+circumstances, you will be expected to input a set of data items
+without a keyword. You must give these data items in the order
+expected by the program. If a read site expects an integer and you
+give a floating point number, it will be truncated. If the read site
+expects a floating point number, you can give it in several forms:
+10.0, +10.0, 10, and 1.0E1 are all floating point tens. If you give
+less data than expected, an error will occur (in other words,
+trailing zeros in "3 0 0 0"will not be filled in if you just type
+"3").</P>
+
+<P><B>Part 1:</B> NATOMS=&lt;natoms&gt; [NBONDS=0] [BNDLENGTH=2.0]
+[MODE=0] [NKINDS=&lt;nkinds&gt;]</P>
+
+<UL>
+   <LI>NATOMS gives the total number of atoms.
+   
+   <LI>NBONDS gives the total number of bonds. If this value is given
+   as 0, all atom pairs which are closer than BNDLENGTH are
+   considered bonded. If greater than zero, a BONDATOMS card will be
+   read.
+   
+   <LI>BNDLENGTH gives the maximum distance which is considered
+   bonding.
+   
+   <LI>MODE indicates the style of normal coordinate input. The
+   default means no normal mode is being drawn. Enter -1 to give a
+   single mode on the same card as the atomic coordinates. Enter a
+   positive number to plot that particular mode from a deck of modes
+   as punched by GAMESS by a RUNTYP=HESSIAN.
+   
+   <LI>NKINDS MacMolPlt doesn't use NKINDS, but expects part 3 to be
+   present if NKINDS is set.
+</UL>
+
+<P><B>Part 2:</B> &lt;title&gt;</P>
+
+<UL>
+   <LI>&lt;title&gt; can be up to 80 characters. It is currently
+   ignored, but it must be at least a blank line.
+</UL>
+
+<P><B>Part 3:</B></P>
+
+<UL>
+   <LI>&lt;nkinds&gt; lines that are ignored
+</UL>
+
+<P><B>Part 4:</B> &lt;atom&gt; &lt;x&gt; &lt;y&gt; &lt;z&gt;
+[&lt;dx&gt; &lt;dy&gt; &lt;dz&gt;]</P>
+
+<UL>
+   <LI>Repeat this card NATOMS times (once for each atom of course)
+   
+   <UL>
+      <LI>&lt;atom&gt; is the chemical symbol of this atom.
+      
+      <LI>&lt;x&gt;, &lt;y&gt;, &lt;z&gt; are the Cartesian
+      coordinates of this atom.
+      
+      <LI>&lt;dx&gt; &lt;dy&gt; &lt;dz&gt; are the normal mode
+      displacements of this atom, in Cartesian coordinates. Give
+      these values only if MODE=-1.
+   </UL>
+</UL>
+
+<P><B>Part 5:</B> BONDATOMS &lt;iatom&gt; &lt;jatom&gt;</P>
+
+<UL>
+   <LI>The keyword BONDATOMS is followed by a list of atom pairs
+   which are to be connected by sticks. This can be on more than one
+   line. Skip this card if &lt;nbonds&gt; is zero.
+</UL>
+
+<P><B>&nbsp;</B></P>
+
+<P><B>Part 6:</B></P>
+
+<UL>
+   <LI>This is given only if MODE is positive. The input is given in
+   EXACTLY the format it was punched by GAMESS, starting with a card
+   that says "ATOMIC MASSES". It is smart to leave all the modes in
+   the input deck, so that you can draw any one of them. Normal modes
+   are drawn in mass weighted Cartesians, but must be entered in
+   Cartesian coordinates.
+</UL>
+
+<P>A sample .mol file is:</P>
+
+<P>Example input</P>
+
+<PRE>NATOMS=  14   NKINDS=   4    NBONDS=  14 MODE=-1
+TiH2ethSiH4-Transition State #1         freq=-122.8
+C    1  .30
+TI   8  .51
+H    5  .23
+SI   6  .48
+C       1.337665    1.279412    0.001392  0.22066  0.06268  0.00967
+C      -0.124205    1.362164   -0.001731  0.28546  0.13557 -0.00664
+Ti      0.934914   -0.714544   -0.000306  0.07972  0.07543 -0.00194
+Si     -1.848838   -0.163114    0.000363 -0.07748 -0.19922  0.00070
+H       1.846560    1.585021   -0.899870  0.29077 -0.06884  0.00590
+H       1.842378    1.584093    0.905346  0.26746 -0.08094  0.03085
+H      -0.548065    1.798772   -0.891198  0.19759 -0.00337 -0.02735
+H      -0.551623    1.800156    0.885339  0.17598 -0.00445  0.0043
+H      -2.323342   -0.813825   -1.242937  0.33602 -0.17918  0.08437
+H      -2.598203    1.124432   -0.004376  0.31162  0.01070 -0.02841
+H      -2.314463   -0.802227    1.252755 -0.25060 -0.09815 -0.00814
+H      -0.634063   -1.467347   -0.000927 -0.14727  0.12827 -0.02397
+H       1.658771   -1.326577   -1.446235 -0.28643 -0.05401 -0.05408
+H       1.656909   -1.328383    1.445790 -0.30601 -0.06866  0.05343
+BONDATOMS    2   1     3   1     3  12     4   9     5   1     6   1   &gt;
+   7   2     8   2     13  3     4  10     4  11     3  14     4  12   &gt;
+   2   4</PRE>
+
+<P>This might result in the following image (depending on color
+preferences and atom sizes):</P>
+
+<P><CENTER><IMG SRC="sample-mol.jpg" WIDTH=291 HEIGHT=235
+X-SAS-UseImageWidth X-SAS-UseImageHeight ALIGN=bottom></CENTER></P>
+
+<H4>
+<HR WIDTH="70%">
+<A NAME="pdb"></A>Protein Data Bank .pdb files</H4>
+
+<P>MacMolPlt has a very simple minded ability to read in PDB
+files. What this means is that MacMolPlt will read in most (all?) PDB
+files and will read in all (including duplicates and HETATM's) atoms
+as generic atoms (ie. C, N, O instead of C<SUB><FONT
+FACE="Symbol">a</FONT></SUB>, C<SUB><FONT
+FACE="Symbol">b</FONT></SUB>, etc...). No connection or other special
+information will be read, just the basic atom types and positions. If
+you don't want to see duplicate atoms or HETATM's then you will have
+delete them by hand before reading the file... If the file contains
+multiple models they will be separated into different frames.</P>
+
+<H4>
+<HR WIDTH="70%">
+<A NAME="datfiles"></A>GAMESS dat files</H4>
+
+<P>Once you have read in molecule with a basis set (usually from a
+GAMESS log file) you may use the Import menu item to read $VEC groups
+from the associated .Dat file. MacMolPlt can not determine which $VEC
+group goes with which frame or even if the $VEC group goes with the
+current molecule. Thus when importing a $VEC group you will be
+presented with a list of the $VEC groups found in the file and asked
+to choose the one to import to the current frame. Note that the file
+does not have to be a .dat file punched by GAMESS, it can be any text
+file containing a complete $VEC group.</P>
+
+<H4>
+<HR WIDTH="70%">
+<A NAME="GAMESSInput"></A>GAMESS input files</H4>
+
+<P>There are a couple of ways to create GAMESS input format files.
+The first, but limited method, is to use the Export menu item and
+choose the GAMESS $DATA group format. This will punch the coordinates
+for the current (or all) frame out to a text file using the GAMESS
+COORD=CART format. This can be handy if you want to run single points
+on a series of geometries from an IRC or DRC.</P>
+
+<P>The second method is to use the MacMolPlt input builder. The input
+builder allows you to choose many GAMESS options and then, by
+clicking the Write File button, write a GAMESS input file out to
+disk. The input builder is far from complete, but does allow you to
+create simple GAMESS input files quite easily. One nice feature is
+that if you define a set of internal coordinates in the Coordinates
+window and set the number of Z-matrix variables correctly MacMolPlt
+will automatically punch out a $ZMAT group.</P>
+
+<P>MacMolPlt can read in GAMESS input files, but does not preserve all of the GAMESS options. It does correctly handle most of the supported coordinate formats for both input and output including CART, UNIQUE, and ZMAT.</P>
+
+<H4>
+<HR WIDTH="70%">
+<A NAME="image"></A>images</H4>
+		<P>The current display window can be exported in several image formats
+including Windows bitmap, portable network graphics, JPEG, GIF and TIFF. You 
+will also be given the option of specifying the size (resolution) of the 
+exported image. This can be used to generate hi-res images suitable for 
+printing. Optionally the background color can be included as a transparency
+in image formats that support an alpha channel. Note: GIF and TIFF formats
+are only available in builds based on wxWidgets 2.9 and newer.
+</P>
+		<h4>
+			<hr width="70%">
+			<a name="movies"></a>Movies</h4>
+		<p>The current molecular display, with an optional energy plot, can be exported to a movie suitable for use on a web site, in a presentation, etc. Currently two formats are supported. On MacOS X only you can export to a QuickTime movie (by default in mpeg4 format). On all platforms you may also choose to use the Shockwave Flash format. In both cases the resulting movie will look best at the same size as the display window that created it.</p>
+		<h4>
+			<hr width="70%">
+			<a name="povray"></a>POV-Ray</h4>
+		<p>The current molecular display can be exported to POV-Ray's scene description language (SDL) for high quality raytracing.  Only atoms, atomic symbol labels, bonds, and surfaces are exported at this time.  The camera transformation and surface geometry used for the current frame are retained in the SDL file.  (Atoms and bonds are rendered parametrically using sphere and cylinder primitives, but surfaces are modeled as polygonal meshes.)  The lighting parameters for the atoms, bonds, and surfaces can be adjusted using the SDL macros AtomBondFinish and SurfaceFinish at the top of the exported file.
+      </p>
+		<h4>
+			<hr width="70%">
+			<a name="CML"></a>Chemical Markup Language (CML)</h4>
+		<p>CML is a text XML based format that provides a great deal of flexibility and extensibility. MacMolPlt should be able to read most any CML1 or CML2 format file with three coordinate data. MacMolPlt can also export to CML2 format. Currently only atoms and bonds are exported or parsed.</p>
+<p>As of version 5.6 a signficantly extended CML format has become the sole
+supported save file format. This format has the advantage of being completely
+cross platform and is thus fully supported on various processors and operating
+systems.</p>
+		<h4>
+			<HR WIDTH="70%">
+			<A NAME="MDL"></A>MDL MolFiles</h4>
+		<P>MDL MolFiles are cross-platfrom text files which may contain
+various details about molecular structures. This is the native format
+of the ISIS program and is read by many others. MacMolPlt will
+read/export MolFiles containing basic structures and bonding
+information only. Further information about this format can be found
+on <A HREF="http://en.wikipedia.org/wiki/MDL_Molfile">MDL's file format</A>.</P>
+
+<H4>
+			<HR WIDTH="70%">
+		</H4>
+		<h4><a name="molden"></a>MolDen format files</h4>
+		<p>MolDen format files are a loosely doucmented text file format supported by several applications. MacMolPlt should be able to read most information, including orbitals and multiple geometries. Note that STO type basis sets are not supported.</p>
+		<h4><a name="mkl"></a>Molekel MKL files</h4>
+		<p>A parser for Molekel MKL (.mkl) files. Included are coordinates, basis set and orbitals.</p>
+		<h4>
+			<hr width="70%">
+		</h4>
+		<h4><A NAME="XYZ"></A>XMol style XYZ files</h4>
+		<P>MacMolPlt can read and write (via the export menu) XMol style XYZ
+files. The XYZ format is a very simple format for storing molecular
+structures and can have multiple frames. The basic format is:</P>
+
+<P>1st line MUST contain the number of atoms<BR>
+
+1 line label<BR>
+
+One line for each atom given in the format:<BR>
+
+H 1.0 1.0 1.0</P>
+
+<P>If you want multiple frames simple concatinate the data from
+individual frame together with no intervening blank lines or other
+data. The format also allows for display of one normal mode. To do so
+simple append the offset vector to the end of each atom line.
+MacMolPlt can also export an XYZ file containing multiple frames for
+the purpose of animating a normal mode. The animation will consist of
+20 frames and will vary depending on the displayed vector length. In
+addition the normal mode will be included as long as it is currently
+visible. An example file with two frames and an optional normal mode
+is:</P>
+
+<PRE>3
+Frame 1 CH2
+C 0.0000 0.0000 -0.0899
+H -0.8929 0.0000 0.5353
+H 0.8929 0.0000 0.5353
+3
+Frame 2 H2O
+O 0.0000 0.0000 0.0372 0.0000 0.0000 0.2644
+H 0.0000 -0.7581 -0.5986 0.0000 0.4331 -0.5267
+H 0.0000 0.7581 -0.5986 0.0000 -0.4331 -0.5267</PRE>
+
+<H4>
+<HR WIDTH="70%">
+<A NAME="SurfExport"></A>2D and 3D Surfaces (Import and Export)</H4>
+
+<P>MacMolPlt implements a simple format for importing and exporting
+2D and 3D surface data. To export a surface first create a surface
+and make sure that the surface is updated so that the grid data is
+available for export. Then choose the Export menu command and the
+Surface export format. MacMolPlt will then export the surface grid
+data to the file you specify (this is useful to check the input
+format as well). To import a 2D or 3D surface create a new
+<A HREF="MacMolPlt_Surfaces.html">General 2D or 3D</A> surface. From
+the surface dialog you can then choose the file containing the grid
+data. The format for the 2D and 3D files are similar but there are a
+couple of differences. Floating point numbers may be given in a
+variety of formats and the grid data may contain any number of values
+per line. The units for the coordinate system should normally be 
+angstroms.</P>
+
+<P>For 2D planes the format is:</P>
+
+<P>1Line Label<BR>
+
+30 # grid points<BR>
+
+-4.165882 -4.306789 0.839681 //Origin of the 2D grid<BR>
+
+0.297019 0.000000 0.000000 //X inc vector<BR>
+
+0.000000 0.297019 0.000000 //Y inc vector<BR>
+
+-0.000018 -0.000021... (# of grid points squared grid values)</P>
+
+<P>For 3D surfaces:</P>
+
+<P>1 Line label<BR>
+
+35 12 41 //nx ny nz<BR>
+
+-4.687880 -1.587537 -5.059790 //Origin of the 3D grid<BR>
+
+0.280144 0.288642 0.275207 //x increment, y inc, z inc/
+grid(x(y(z)))<BR>
+
+0.000000 0.000000... (nx*ny*nz grid values)</P>
+
+<P>&nbsp;</P>
+</BODY>
+</HTML>

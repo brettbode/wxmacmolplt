@@ -1,0 +1,93 @@
+<!--This file created 3/17/99 10:57 AM by Claris Home Page version 2.0-->
+<HTML>
+
+	<HEAD>
+   <TITLE>MacMolPlt Windows</TITLE>
+</HEAD>
+
+	<body>
+		<p>The most important windows in MacMolPlt are:</p>
+		<ul>
+			<li><a href="#MD">Main Display</a>
+			<li><a href="#Coords">Coordinates</a>
+			<li><a href="#Bonds">Bonds</a>
+			<li><a href="#EPlot">Energy Plot</a>
+			<li><a href="#frequencies">Frequencies</a>
+			<li><a href="#IB">Input Builder</a>
+			<li><a href="#Surfaces">Surfaces</a>
+			<li><a href="#Preferences">Preferences</a>
+		</ul>
+		<p>Each of these windows can be opened or brought to the front (the Main Display window can not be closed without closing the file) through the subwindow menu. Each file that is opened has its own set of windows.</p>
+		<h3>
+			<hr>
+			Main Display<a name="MD"></a>:</h3>
+		<p>The main display is the master window for each file (or unsaved set of data). It is where the molecule is displayed along with normal modes and surfaces. At the bottom of the window on the left MacMolPlt prints out the energy and/or the current frequency. On the left is a scroll bar which indicates which frame in a series of frames is being displayed. In the main part of the window is the molecule display.</p>
+		<p>Mouse control: (On the Mac the command key is the usual Apple key, on Windows and Linux it is the control key)</p>
+		<ul>
+			<li>Left click on an atom or bond to select (hold down the command key and left click on additional atoms to increase the number of selected atoms)
+			<li>Left click and drag anywhere in the molecule display to rotate
+			<li>Use the scroll wheel to zoom or hold the shift key down while dragging with the left mouse button down
+			<li>Drag with the right mouse button down to translate (or hold the control key down while draggin with the left button
+			<li>Hold both the shift and command keys down while dragging with the left key to translate into/out of the screen
+			<li>Right click on bonds or annotations to get a popup menu of actions
+			<li>Right click on a selected atom to get a popup menu of annotations
+		</ul>
+		<p>There are many options effecting the molecule display. These options can be found under the View menu or in the Preferences window. These options include ball and stick versus wire frame style display (You can get a space filling display with ball and stick mode by increasing the atom size in the preferences), atom labels (symbol and/or serial number), normal mode display, zoom, orientation and more.</p>
+		<p>There are several annotation you can add to the molecule display. These including marking an atom (to make it stand out), displaying the length between two atoms, displaying the angle between three atoms and displaying the dihedral angle formed by four atoms. In each case select the approriate number of atom(s) then either right click on one of the selected atoms or choose the action from the Annotations submenu under the View menu. To delete an annotation right click on it or choose the Delete All Anotations item in the Annotations submenu.</p>
+		<p>You can copy and paste image directly from MacMolPlt into other applications, however For better printout I suggest use the <a href="MacMolPlt_Files.html#image">image export</a> option with a resolution of 300 dpi and then import the file into the other application. This will provide good quality when printed out later.</p>
+		<p>Note that the following keys have special functions:</p>
+		<ul>
+			<li>Right Arrow: Advance to next frame
+			<li>Left Arrow: Go to previous frame
+			<li>Left '[': Display previous frequency
+			<li>right ']': Display next frequency
+		</ul>
+		<h3>
+			<hr>
+			Coordinates<a name="Coords"></a>:<img src="Coords_Win.gif" width=539 height=212 x-sas-useimagewidth x-sas-useimageheight align=right></h3>
+		<p>The coordinates window displays the current set of coordinates for the current frame. The coordinates can be displayed as cartesian coords or as gaussian style internal coordinates (as shown above). To edit any value simply <b>double click</b> on that value. The Main Display will be updated as soon as you finish typing and hit return or tab or click outside the edit field. The controls at the top of the window do the following (in order from left to right):</p>
+		<ul>
+			<li>New: creates a new hydrogen atom at the origin which you can then edit into any atom type and position you like.
+			<li>Delete: deletes the selected atom(s).
+			<li>Bond Update: Updates the bond list by reapplying the auto-bond operation.
+			<li>Stick Coords: (the little hammer) Changes the current rotated orientation to the reference orientation (ie the one whose coordinates are displayed in the cartesian coordinates view).
+			<li>The pull down menu selects the coordinate view mode (either cartesian or gaussian style internals)
+		</ul>
+		<h3>
+			<hr>
+			Bonds<a name="Bonds"></a>:<img src="Bonds_Win.gif" width=405 height=213 x-sas-useimagewidth x-sas-useimageheight align=bottom></h3>
+		<p>The bonds window allows you to add or delete bonds or change the bond type. The bond type has no signicance to MacMolPlt other than the color and pattern used to display the bond. The color and pattern for each bond type can be modified in the <a href="#Preferences">Preferences window</a>.</p>
+		<h3>
+			<hr>
+			Energy Plot<a name="EPlot"></a>:</h3>
+		<p>The energy plot is a simple window to display the energy for each frame relative to that for all other frames. Look in the preferences dialog for options to plot the kintic or potential energy and the MP2 and total energy. In addition you can plot functions of a geometrical parameter such as a bond length or bond angle, or the RMS or Maximum gradient. You can also change the energy units and define a reference energy to use as the zero energy. Colors and indicator size can also be defined. When you export energies you actually export any information currently displayed in the displayed units. Thus, you can obtain a list of bond lengths or bond angles by plotting them and then exporting the data.</p>
+		<h3>
+			<hr>
+			Frequencies<a name="Frequencies"></a>:</h3>
+		<p>The frequency plot is a simple line graph showing the infrared intensity versus the frequency. If the intensity is not known then all frequencies are plotted with an intensity of 1.0. Note that you can also export the list of frequencies and intensities.</p>
+		<h3>
+			<hr>
+			Input Builder<a name="IB"></a>:<img src="IB_Win.gif" width=600 height=412 x-sas-useimagewidth x-sas-useimageheight align=bottom></h3>
+		<p>The Input Builder window allows you to setup many of the options needed to create a simple GAMESS input file. Many of the GAMESS groups and options are not yet present, especially for more advanced options. There is balloon help for most options, so the best way to get started is to turn on balloon help and then look around at the different items. All of the options which are visible are implemented, but there may be options which are unavailable in the input builder, but still needed to get a correct GAMESS run.</p>
+		<p>The basic design of the input builder window is that the most important input options (the required groups) are listed at the top left of the window. These are groups that you should always check before creating an input deck. The second list contains groups for which the defaults are generally adequate (thus they are optional). These lists are not constant. New groups are added and removed depending on options you select. For instance, if you select an MP2 wavefunction type then an optional MP2 group will be added to the optional groups list.</p>
+		<p>Once you have selected all of the options that you need you can click the &quot;write file&quot; button, which will prompt for a file name to write the GAMESS input file. All of the options which you have set will be written to the file, but options which are unchanged from their GAMESS defaults are skipped. The coordinates for the current frame will be punched out into the $DATA group. You should examine the resulting input file and make sure that all required options are present.</p>
+		<h3>
+			<hr>
+			Surfaces<a name="Surfaces"></a>:<img src="2D_Orbital_Dialog.gif" width=630 height=586 x-sas-useimagewidth x-sas-useimageheight align=right></h3>
+		<p>The surfaces window allows the create/deletion and modification of all supported surface types. For information on specific surface options refer <a href="MacMolPlt_Surfaces.html">Surfaces Page</a>. There are several controls common to all surface types. The common functions are:</p>
+		<ul>
+			<li>Surface List: Lists all of the defined surfaces for the current frame. Click on the menu to select from the current surfaces.
+			<li>Add: prompts you for the type of surface to add and then creates a new surface.
+			<li>Delete: Deletes the surface that is currently selected.
+			<li>Update: Applies any changes to the current surface and updates the data and then the display.
+			<li>Surface Title: This is an edit field which is a simple text label for the selected surface. This label will appear in the Surface list at the bottom of the window.
+			<li>Visible: If checked the surface will be visible in the main display window. If not the surface will not be displayed. This is useful when you want to have a surface defined, but temporarily hidden.
+			<li>All Frames: When checked the selected surface will be applied to all frames that have the correct data available. (ie you can animate orbitals when this is checked!) Note that for 3D surfaces the grid is calculated for each frame, contoured and then imediately disposed. Thus check this box after you are satisfied with all of the settings for the surface.
+		</ul>
+		<h3>
+			<hr>
+			Preferences<a name="Preferences"></a>:</h3>
+		<p>A great many features in MacMolPlt are customizable. Each file has its own set of preferences which are inherited from the global default preferences (set using the Default Preferences menu item in the Edit menu). You can then modify these preferences to suit your own taste. These include atom colors and patterns, atom sizes, etc</p>
+	</body>
+
+</HTML>
