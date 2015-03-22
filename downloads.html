@@ -1,4 +1,4 @@
-<H2>Introduction</H2>
+<H2>Downloading wxMacMolPlt</H2>
 <p>
 wxMacMolPlt is available as a source code tar file and as pre-built binaries for Mac OS X, Windows and several varieties of Linux. If a pre-built binary is available for your platform please try it first to avoid any issues with the build process.
 <p>
@@ -15,3 +15,77 @@ Want to know when a new version is available? <a href="mailto:macmolplt-announce
    wxMacMolPlt 7.5 for Mac OS X 10.7 or newer (64 bit only) - Does not include QuickTime support, but may function better on the latest OS versions</a>
   <LI>Do you need a binary for a PPC based system or an older OS? Please let <a href="mailto:MMP.Guy@gmail.com">me</a> know.
 </UL>
+<H3>Windows</H3>
+<UL>
+  <LI><a href="http://wxmacmolplt.googlecode.com/files/wxMacMolPlt-7.5.msi">
+    32-bit binary for Windows (v 7.5) packaged as a Windows msi installer package (simply download and double click to install)</a>
+  <LI>If you can not run an installer on your system here is a 
+<a href="http://wxmacmolplt.googlecode.com/files/wxMacMolPlt-7.5.zip">plain zip archive</a>. If the wxMacMolPlt.exe file fails to launch with a message saying the configuration is invalid you need to install the VS8 runtime libraries. Just run the 
+<a href="http://wxmacmolplt.googlecode.com/files/vcredist_x86.exe">file linked here</a>.
+</UL>
+<H3>Linux</H3>
+<UL>
+  <LI>Here is a source distribution primarily targeted at Linux: 
+   <a href="http://wxmacmolplt.googlecode.com/files/wxmacmolplt-7.5.tar.gz">wxmacmolplt 7.5</a>.
+</UL>
+Binaries are available for a variety of Linux distribution. Often a binary rpm can be used on a version or two newer than the one on which it was created.
+<UL>
+  <LI><a href="http://wxmacmolplt.googlecode.com/files/wxmacmolplt-7.5-1.f16.x86_64.rpm">Fedora 16 - x86_64 architecture</a>
+  <LI><a href="http://wxmacmolplt.googlecode.com/files/wxmacmolplt-7.5-1.opensuse10.x86_64.rpm">openSUSE 10.3 - x86_64 architecture</a>
+  <LI><a href="http://wxmacmolplt.googlecode.com/files/wxmacmolplt-7.5-1.opensuse.i586.rpm">openSUSE 10.3 - 32 bit x86 architecture</a>
+  <LI><a href="http://wxmacmolplt.googlecode.com/files/wxmacmolplt-7.5-1.centos62.x86_64.rpm">CentOS 6.2 - x86_64 architecture</a>
+</UL>
+<H3>Debian/Ubuntu Linux</H3>
+Currently the packages are only available from our own repository. To obtain them add the following lines to your /etc/apt/sources.list:
+
+Debian squeeze that includes libming1 instead of libming0
+<UL><LI>deb http://www.scl.ameslab.gov/MacMolPlt/debian squeeze main
+<LI>deb-src http://www.scl.ameslab.gov/MacMolPlt/debian squeeze main
+</UL>
+or wheezy that uses wx 2.8.12 and libglew1.6
+<UL>
+<LI>deb http://www.scl.ameslab.gov/MacMolPlt/debian wheezy main
+<LI>deb-src http://www.scl.ameslab.gov/MacMolPlt/debian wheezy main
+</UL>
+For Ubuntu 10.04 and later there is a mismatch between Debian squeeze and Ubuntu libglew versions (Debian is newer surprisingly) so here is a build that works on Ubuntu:
+<UL>
+<LI>deb http://www.scl.ameslab.gov/MacMolPlt/debian lucid main
+<LI>deb-src http://www.scl.ameslab.gov/MacMolPlt/debian lucid main
+</UL>
+For Ubuntu 12.04 and later:
+<UL>
+<LI>deb http://www.scl.ameslab.gov/MacMolPlt/debian precise main
+<LI>deb-src http://www.scl.ameslab.gov/MacMolPlt/debian precise main
+</UL>
+Then apt-get update. You should then be able to install using apt-get install wxmacmolplt for i386 and amd64 architectures. For other architectures you can build a binary package and install with
+<UL>
+<LI>apt-get build-dep wxmacmolplt
+<LI>apt-get -b source wxmacmolplt
+<LI>dpkg -i wxmacmolpltx.x.x.deb
+</UL>
+Note this will download and build in the current directory. Once you have installed the .deb file you can remove everything from the current directory. If you are running an older Debian or Ubuntu system you will need to follow the building from source directions below.
+
+<H2>Source Code</H2>
+If none of those work for you download the source code and follow the instructions below or in the INSTALL file contained in the source tar file. The prerequisites for building MacMolPlt from source are a working C++ compiler (g++ preferred) and a wxWidgets (version 2.6.3 or newer, but 2.8 or newer recommended) install including the development pieces. You can test for a working wxWidgets install using wx-config --version. If the response is 2.6.3 or greater you should be fine and you can go directly to building MacMolPlt below. If you have hardware supporting stereo display (quad-buffered OpenGL) you may wish to grab the latest wxWidgets 2.9 prerelease to enable stereo support in MacMolPlt. If your Linux distribution does not offer a prebuilt wxWidgets package, usually named something like wxGTK or libwxgtk version 2.6.3 or newer then you will have to first build and install wxWidgets. Follow these steps to build wxWidgets:
+<p>
+Download the latest wxWidgets source (2.6.3 through 3.0.2 have worked in the past). Unpack the archive and cd into the top level directory.
+<P>
+Configure wx to use OpenGL and unicode:<br>
+./configure --with-gtk --with-opengl --enable-unicode<BR>
+make<BR>
+make install<BR>
+<p>
+Note: You can install wx into a non-system directory, but that directory will need to be added to your shared library path or shared libraries disabled in the build (--disable-shared). If you get an error in the MacMolPlt configure step saying your wxWidgets build lacks OpenGL support first make sure that the directory where the shared libraries is installed is in /etc/ld.so.conf and then run ldconfig. You should only need to do that once.
+<p>
+Building MacMolPlt. This should be very straightforward.
+<p>
+./configure
+<p>
+If your wxWidgets install is not on your path add --with-wx-config=/path/to/wx-config<br>
+To install somewhere other than /usr/local add --prefix=/path/to/top/dir
+<p>
+make<br>
+
+make install
+<p>
+Note: The "make install" step is required as there are a couple of resource files that the application needs at run time to be fully functional.
