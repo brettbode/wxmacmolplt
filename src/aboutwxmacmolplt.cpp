@@ -114,9 +114,9 @@ void AboutwxMacMolPlt::CreateControls()
 	itemBoxSizer6->Add(itemStaticText7, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 #if wxCHECK_VERSION(2, 8, 0)
-	wxHyperlinkCtrl* itemHyperlinkCtrl8 = new wxHyperlinkCtrl( itemDialog1, ID_HYPERLINKCTRL2, _("wxMacMolPlt home"), _T("http://code.google.com/p/wxmacmolplt/"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	wxHyperlinkCtrl* itemHyperlinkCtrl8 = new wxHyperlinkCtrl( itemDialog1, ID_HYPERLINKCTRL2, _("wxMacMolPlt home"), _T("http://brettbode.github.io/wxmacmolplt/"), DefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
 #else
-	wxStaticText* itemHyperlinkCtrl8 = new wxStaticText( itemDialog1, ID_HYPERLINKCTRL2, _("http://code.google.com/p/wxmacmolplt/"), wxDefaultPosition, wxDefaultSize);
+	wxStaticText* itemHyperlinkCtrl8 = new wxStaticText( itemDialog1, ID_HYPERLINKCTRL2, _("http://brettbode.github.io/wxmacmolplt/"), wxDefaultPosition, wxDefaultSize);
 #endif
 	itemBoxSizer6->Add(itemHyperlinkCtrl8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
