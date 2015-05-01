@@ -473,7 +473,7 @@ class Orb3DSurface : public Surf3DBase, public OrbSurfBase {
 							const std::vector<int> * const atomScreen, const std::vector<int> * const shellScreen, bool MPTask);
 	float CalculateGridStreamlined(long xStart, long xEnd, const std::vector<CPoint3D> & atomList, const BasisSet * const Basis,
 						const std::vector<float> & reducedVector, long NumAtoms, Progress * lProgress, long * PercentDone,
-								   const std::vector<int> * const atomScreen, const std::vector<int> * const shellScreen, 	std::vector<int> & shellTypes, std::vector<int> & shellIndex, const std::vector<short> & shellsPerAtom, bool MPTask);
+								   const std::vector<int> * const atomScreen, const std::vector<int> * const shellScreen, 	const std::vector<int> & shellTypes, const std::vector<int> & shellIndex, const std::vector<short> & shellsPerAtom, bool MPTask);
 		void UpdateData(Orb3DSurface * Original);
 };
 class Orb2DSurface : public Surf2DBase, public OrbSurfBase {
