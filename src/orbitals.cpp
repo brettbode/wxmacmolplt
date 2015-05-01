@@ -2558,6 +2558,7 @@ static OSErr CalcGrid(Orb3DGridData * Data) {
 }
 #endif
 #ifdef __wxBuild__
+//#define UseSimpleCode
 typedef struct Orb3DGridData {
 	Orb3DSurface *	Surf;
 	long	xStart;
@@ -2570,7 +2571,13 @@ typedef struct Orb3DGridData {
 	long		PercentDone;
 	const std::vector<int> * atomScreen;
 	const std::vector<int> * shellScreen;
+	const std::vector<int> * shellIndex;
+	const std::vector<int> * shellTypes;
+	const std::vector<short> * shellsPerAtom;
+	const std::vector<float> * reducedVector;
+	const std::vector<CPoint3D> * atomList;
 } Orb3DGridData;
+
 //derive a class from wxThread that we will use to create the child threads
 class Orb3DThread : public wxThread {
 public:
@@ -2586,10 +2593,20 @@ Orb3DThread::Orb3DThread(Orb3DGridData * data) : wxThread(wxTHREAD_JOINABLE) {
 	myData = data;
 }
 void * Orb3DThread::Entry() {
+#ifdef UseSimpleCode
 	myData->GridMax = myData->Surf->CalculateGrid(myData->xStart, myData->xEnd, myData->Atoms, myData->Basis,
 												  myData->MOVector, myData->NumAtoms, NULL, &(myData->PercentDone),
 												  myData->atomScreen, myData->shellScreen,
 												  true);
+#else
+	myData->GridMax = myData->Surf->CalculateGridStreamlined(myData->xStart, myData->xEnd,
+															 *(myData->atomList), myData->Basis,
+															 *(myData->reducedVector), myData->NumAtoms,
+															 NULL, &(myData->PercentDone),
+															 myData->atomScreen, myData->shellScreen,
+															 *(myData->shellTypes), *(myData->shellIndex),
+															 *(myData->shellsPerAtom), true);
+#endif
 	myData->PercentDone = 100;
 	return NULL;
 }
@@ -2774,6 +2791,11 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 				DataPtrs[i].PercentDone = 0;
 				DataPtrs[i].atomScreen = &AtomScreen;
 				DataPtrs[i].shellScreen = &ShellScreen;
+				DataPtrs[i].atomList = &atomList;
+				DataPtrs[i].shellsPerAtom = &shellsPerAtom;
+				DataPtrs[i].reducedVector = &reducedVector;
+				DataPtrs[i].shellTypes = &shellTypes;
+				DataPtrs[i].shellIndex = &shellIndex;
 				
 				//Create the actual thread
 				myThreads[i] = new Orb3DThread(&(DataPtrs[i]));
@@ -2827,22 +2849,25 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 #endif
 		{
 #ifdef __wxBuild__
-			wxStopWatch timer;
-			long CheckTime = timer.Time();
-			long selfTime = CheckTime;
+//			wxStopWatch timer;
+//			long CheckTime = timer.Time();
+//			long selfTime = CheckTime;
 #endif
 			long junk;	//just a placeholder, not used for cooperative tasks
-//			GridMax = CalculateGrid(0,NumXGridPoints,lFrame->Atoms, Basis, MOVector,
-//									lFrame->NumAtoms, lProgress, &junk, &AtomScreen, &ShellScreen, false);
+#ifdef UseSimpleCode
+			GridMax = CalculateGrid(0,NumXGridPoints,lFrame->Atoms, Basis, MOVector,
+									lFrame->NumAtoms, lProgress, &junk, &AtomScreen, &ShellScreen, false);
 //			wxString foo2;
 //			CheckTime =timer.Time();
 //			foo2 << wxT(" CalculateGrid selftime is ") << CheckTime -selfTime << wxT(" GridMax = ") << GridMax;
-//			wxLogMessage(foo2);
+#else
+			//			wxLogMessage(foo2);
 			GridMax = CalculateGridStreamlined(0,NumXGridPoints, atomList, Basis, reducedVector,
 					lFrame->NumAtoms, lProgress, &junk, &AtomScreen, &ShellScreen, shellTypes, shellIndex, shellsPerAtom, false);
 //			wxString foo;
 //			foo << wxT(" CalculateGridStreamLined selftime is ") << timer.Time() -CheckTime << wxT(" GridMax = ") << GridMax;
 //			wxLogMessage(foo);
+#endif
 	}
 		//Unlock the grid handle and return
 	if (Options & 1) delete [] MOVector;
@@ -2864,7 +2889,7 @@ float Orb3DSurface::CalculateGrid(long xStart, long xEnd, const mpAtom * const A
 #ifdef __wxBuild__
 	wxStopWatch timer;
 	long CheckTime = timer.Time();
-	long selfTime = CheckTime;
+//	long selfTime = CheckTime;
 #endif
 	lGrid = Grid;
 	float PhaseChange = 1.0;
@@ -2921,11 +2946,11 @@ float Orb3DSurface::CalculateGrid(long xStart, long xEnd, const mpAtom * const A
 }
 float Orb3DSurface::CalculateGridStreamlined(long xStart, long xEnd, const std::vector<CPoint3D> & atomList, const BasisSet * const Basis,
 								  const std::vector<float> & reducedVector, long NumAtoms, Progress * lProgress, long * PercentDone,
-											 const std::vector<int> * const atomScreen, const std::vector<int> * const shellScreen, std::vector<int> & shellTypes, std::vector<int> & shellIndex, const std::vector<short> & shellsPerAtom, bool MPTask) {
+											 const std::vector<int> * const atomScreen, const std::vector<int> * const shellScreen, const std::vector<int> & shellTypes, const std::vector<int> & shellIndex, const std::vector<short> & shellsPerAtom, bool MPTask) {
 #ifdef __wxBuild__
 	wxStopWatch timer;
 	long CheckTime = timer.Time();
-	long selfTime = CheckTime;
+//	long selfTime = CheckTime;
 #endif
 	//Set up normalization constants for d,f,g functions
 //	float sqrt3 = sqrt(3.0);
