@@ -4944,7 +4944,7 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 					break;
 				case FailedOpt:	//optimization failed. 
 					if (state == 1) {
-						sprintf(LineText, "Geometry optimization incomplete for frame %d", MainData->GetNumFrames()-1);
+						sprintf(LineText, "Geometry optimization incomplete for frame %ld", MainData->GetNumFrames()-1);
 						MessageAlert(LineText);
 						
 						if (Buffer->LocateKeyWord("COORDINATES OF ALL ATOMS ARE (ANGS)", 35)) {
@@ -4995,7 +4995,7 @@ void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
 		MainData->cFrame = MainData->Frames;
 		for (int iframe=0; iframe<MainData->GetNumFrames(); ++iframe) {
 			char		text[kMaxLineLength];
-			sprintf(text, "! Frame # %ld", iframe+1);
+			sprintf(text, "! Frame # %d", iframe+1);
 			Buffer->WriteLine(text, true);
 
 			MainData->SetCurrentFrame(iframe);
