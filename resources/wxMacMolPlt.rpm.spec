@@ -5,15 +5,15 @@
 #%define debug_package %{nil}
 #%define __check_files %{nil}
 Name: wxmacmolplt
-Version: 7.5.0
+Version: 7.6.0
 Release: 1%{?dist}
 Summary: A graphics program for plotting 3-D molecular structures and normal modes
 Group: Applications/Engineering
 License: GPLv2+
-URL: http://www.scl.ameslab.gov/~brett/MacMolPlt/
+URL: http://brettbode.github.io/wxmacmolplt/
 #Prefix: %{prefix}
 #Source: wxmacmolplt-%{version}.tar.gz  
-Source: http://www.scl.ameslab.gov/~brett/MacMolPlt/download/wxmacmolplt-%{version}.tar.gz
+Source: https://bintray.com/artifact/download/brettbode/generic/wxmacmolplt-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 #BuildRoot: %{_tmppath}/wxmacmolplt-%{version}-root
 BuildRequires: desktop-file-utils
