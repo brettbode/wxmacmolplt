@@ -17,10 +17,10 @@ normal modes, orbitals and other properties.
 <P>
  <screenshots>
   <screenshot type="default">
-   <image>http://wiki.wxmacmolplt.googlecode.com/git/images/annotation.jpg</image>
+   <image>http://brettbode.github.io/wxmacmolplt/annotation.jpg</image>
    <caption>A simple sample showing the molecular display and an annotation.</caption>
   </screenshot>
  </screenshots>
- <url type="homepage">https://code.google.com/p/wxmacmolplt/</url>
+ <url type="homepage">http://brettbode.github.io/wxmacmolplt/</url>
  <updatecontact>MMP.Guy@gmail.com</updatecontact>
 </component>
