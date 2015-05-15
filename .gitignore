@@ -24,6 +24,9 @@ AUTHORS
 NEWS
 config.log
 config.status
+src/wxMacMolPlt.pjd.bak
+wxMacMolPlt.xcodeproj/project.xcworkspace/
+wxMacMolPlt.xcodeproj/xcuserdata/
 
 # generated files from dialog blocks not actually used
 src/displayprefs.cpp
