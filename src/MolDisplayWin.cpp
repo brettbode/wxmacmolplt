@@ -3545,12 +3545,13 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 			default:    //Should only get here for unknown file types.
 			{
 				Buffer->SetFilePos(0);
-				char test[4];
-				Buffer->Read(test, sizeof(char) * 4);
+				char test[kMaxLineLength];
+				Buffer->Read(test, sizeof(char) * kMaxLineLength);
 				if (strcmp(test, "BMBm") == 0 || strcmp(test, "mBMB") == 0) {
 					if (append) MessageAlert("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
 					else AbortOpen("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
 				} else {
+					if (FindKeyWord(test, "\rtf", 4)) wxLogMessage(_("This file appears to be an RTF file. MacMolPlt requires all text files to be in the plain text format."));
 					if (!append)
 						AbortOpen("Unable to determine the file type.");
 					else
