@@ -1441,6 +1441,10 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 		wxFileName fn(filePath);
 		SetTitle(fn.GetFullName());
 		fclose(currFile);
+		//update the window titles for any open subwindows
+		if (coordsWindow) {
+			coordsWindow->UpdateWindowTitle();
+		}
 	}
 }
 

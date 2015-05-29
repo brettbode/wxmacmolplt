@@ -193,6 +193,7 @@ public:
 	void UpdateControls(void);
 	bool ProcessEvent(wxEvent& event);
 	void UpdateSelection(bool mode);
+	void UpdateWindowTitle(void);
 	
 ////@begin CoordinatesWindow member variables
 	wxButton* deleteButton;

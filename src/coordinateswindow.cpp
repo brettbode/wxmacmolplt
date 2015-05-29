@@ -171,7 +171,18 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
 	}
 	Centre();
 ////@end CoordinatesWindow creation
-    return true;
+	UpdateWindowTitle();
+
+	return true;
+}
+
+/*!
+ * Update the Window title in the event the file is saved
+ */
+void CoordinatesWindow::UpdateWindowTitle() {
+	wxString foo = Parent->GetTitle();
+	foo += _(" ") + SYMBOL_COORDINATESWINDOW_TITLE;
+	SetTitle(foo);
 }
 
 /*!
