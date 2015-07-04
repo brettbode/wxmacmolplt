@@ -110,7 +110,17 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
 	/* }  */
 	Centre();
 ////@end SurfacesWindow creation
+	UpdateWindowTitle();
 	return true;
+}
+
+/*!
+ * Update the Window title in the event the file is saved
+ */
+void SurfacesWindow::UpdateWindowTitle(void) {
+	wxString foo = Parent->GetTitle();
+	foo += _(" ") + SYMBOL_SURFACESWINDOW_TITLE;
+	SetTitle(foo);
 }
 
 

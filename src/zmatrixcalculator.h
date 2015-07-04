@@ -124,6 +124,9 @@ public:
     /// Should we show tooltips?
     static bool ShowToolTips();
 
+	/// Change the window title when the file name changes
+	void UpdateWindowTitle(void);
+	
 ////@begin ZMatrixCalculator member variables
     wxTextCtrl* mAtom1Edit;
     wxTextCtrl* mAtom2Edit;

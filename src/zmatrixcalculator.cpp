@@ -103,7 +103,18 @@ bool ZMatrixCalculator::Create( wxWindow* parent, wxWindowID id, const wxString&
     }
     Centre();
 ////@end ZMatrixCalculator creation
+	UpdateWindowTitle();
     return true;
+}
+
+/*!
+ * Update the Window title in the event the file is saved
+ */
+void ZMatrixCalculator::UpdateWindowTitle(void) {
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	wxString foo = parent->GetTitle();
+	foo += _(" ") + SYMBOL_ZMATRIXCALCULATOR_TITLE;
+	SetTitle(foo);
 }
 
 /*!

@@ -1442,8 +1442,29 @@ void MolDisplayWin::menuFileSave_as(wxCommandEvent &event) {
 		SetTitle(fn.GetFullName());
 		fclose(currFile);
 		//update the window titles for any open subwindows
+		if (bondsWindow) {
+			bondsWindow->UpdateWindowTitle();
+		}
 		if (coordsWindow) {
 			coordsWindow->UpdateWindowTitle();
+		}
+		if (energyPlotWindow) {
+			energyPlotWindow->UpdateWindowTitle();
+		}
+		if (frequenciesWindow) {
+			frequenciesWindow->UpdateWindowTitle();
+		}
+		if (inputBuilderWindow) {
+			inputBuilderWindow->UpdateWindowTitle();
+		}
+		if (surfacesWindow) {
+			surfacesWindow->UpdateWindowTitle();
+		}
+		if (zMatCalcDlg) {
+			zMatCalcDlg->UpdateWindowTitle();
+		}
+		if (prefsDlg) {
+			prefsDlg->UpdateWindowTitle();
 		}
 	}
 }

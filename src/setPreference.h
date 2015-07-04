@@ -57,6 +57,7 @@ class QD3DPrefsPane;
 #define ID_REVERT 30003
 #define ID_APPLY 30004
 ////@end control identifiers
+#define SYMBOL_GLOBALPREFERENCE_TITLE _("Global Preferences...")
 
 /*!
  * SetPreference class declaration
@@ -78,6 +79,10 @@ public:
     /// wxEVT_CLOSE_WINDOW event handler for ID_COORDINATESDIALOG
     void OnCloseWindow( wxCloseEvent& event );
     void OnCancel( wxCommandEvent& event );
+
+	/// Change the window title when the file name changes
+	void UpdateWindowTitle(void);
+
 ////@begin setPreference event handler declarations
 
     void OnSetFont(wxCommandEvent& event);

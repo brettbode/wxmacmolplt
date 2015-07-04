@@ -103,7 +103,18 @@ bool BondsDlg::Create( MolDisplayWin* parent, wxWindowID id, const wxString& cap
 	}
 	Centre();
 ////@end BondsDlg creation
+	UpdateWindowTitle();
+
     return true;
+}
+
+/*!
+ * Update the Window title in the event the file is saved
+ */
+void BondsDlg::UpdateWindowTitle(void) {
+	wxString foo = Parent->GetTitle();
+	foo += _(" ") + SYMBOL_BONDSDLG_TITLE;
+	SetTitle(foo);
 }
 
 /*!

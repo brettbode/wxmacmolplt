@@ -526,6 +526,9 @@ public:
     /// Should we show tooltips?
     static bool ShowToolTips();
 
+	/// Change the window title when the file name changes
+	void UpdateWindowTitle(void);
+	
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ENQUEUEBUTTON
 	void OnEnqueueButtonClick( wxCommandEvent& event );
     

@@ -97,6 +97,9 @@ public:
 	// DialogBlocks doesn't know about ChoiceBookEvents so I need this outside of its code.
 	void OnSurflistbookPageChanged( wxChoicebookEvent& event );
 
+	/// Change the window title when the file name changes
+	void UpdateWindowTitle(void);
+	
 ////@begin SurfacesWindow member function declarations
 
 	MolDisplayWin * GetParent() const { return Parent ; }

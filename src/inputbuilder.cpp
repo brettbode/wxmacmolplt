@@ -397,10 +397,21 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
 	}
 	Centre();
 ////@end InputBuilderWindow creation
+	UpdateWindowTitle();
 
     SetupItems();
     
     return true;
+}
+
+/*!
+ * Update the Window title in the event the file is saved
+ */
+void InputBuilderWindow::UpdateWindowTitle(void) {
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	wxString foo = parent->GetTitle();
+	foo += _(" ") + SYMBOL_INPUTBUILDERWINDOW_TITLE;
+	SetTitle(foo);
 }
 
 /*!

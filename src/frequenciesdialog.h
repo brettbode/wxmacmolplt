@@ -144,6 +144,9 @@ public:
     /// Should we show tooltips?
     static bool ShowToolTips();
 
+	/// Change the window title when the file name changes
+	void UpdateWindowTitle(void);
+	
 ////@begin FrequenciesDialog member variables
 	wxMenu* editMenu;
 	wxListBox* mFreqListBox;

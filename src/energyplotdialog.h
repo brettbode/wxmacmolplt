@@ -105,6 +105,10 @@ public:
 
 	/// Retrieves icon resources
 	wxIcon GetIconResource( const wxString& name );
+
+	/// Change the window title when the file name changes
+	void UpdateWindowTitle(void);
+	
 ////@end EnergyPlotDialog member function declarations
 
     void FrameChanged(void);

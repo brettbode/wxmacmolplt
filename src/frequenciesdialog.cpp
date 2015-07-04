@@ -100,10 +100,21 @@ bool FrequenciesDialog::Create( wxWindow* parent, wxWindowID id, const wxString&
 	}
 	Centre();
 ////@end FrequenciesDialog creation
+	UpdateWindowTitle();
 
     RegenData();
 
     return true;
+}
+
+/*!
+ * Update the Window title in the event the file is saved
+ */
+void FrequenciesDialog::UpdateWindowTitle(void) {
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	wxString foo = parent->GetTitle();
+	foo += _(" ") + SYMBOL_FREQUENCIESDIALOG_TITLE;
+	SetTitle(foo);
 }
 
 /*!

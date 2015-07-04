@@ -95,11 +95,22 @@ bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& 
 	}
 	Centre();
 ////@end EnergyPlotDialog creation
+	UpdateWindowTitle();
 
     // Add data to epGraph
     RegenData();
     
     return true;
+}
+
+/*!
+ * Update the Window title in the event the file is saved
+ */
+void EnergyPlotDialog::UpdateWindowTitle(void) {
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	wxString foo = parent->GetTitle();
+	foo += _(" ") + SYMBOL_ENERGYPLOTDIALOG_TITLE;
+	SetTitle(foo);
 }
 
 /*!

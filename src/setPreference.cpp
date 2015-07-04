@@ -167,10 +167,22 @@ bool setPreference::create( MolDisplayWin* parent, wxWindowID id, const wxString
 	// Instead set the fixed size below.
 	SetSize(MINIMUM_WINDOW_PREF_SIZE);
 #endif
-	
+	UpdateWindowTitle();
     return true;
 }
 
+/*!
+ * Update the Window title in the event the file is saved
+ */
+void setPreference::UpdateWindowTitle(void) {
+	if (mIsGlobal) {
+		SetTitle(SYMBOL_GLOBALPREFERENCE_TITLE);
+	} else {
+		wxString foo = mParent->GetTitle();
+		foo += _(" ") + SYMBOL_SETPREFERENCE_TITLE;
+		SetTitle(foo);
+	}
+}
 
 /*!
 * wxEVT_CLOSE_WINDOW event handler for ID_DIALOG

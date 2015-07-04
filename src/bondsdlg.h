@@ -42,7 +42,7 @@ class MolDisplayWin;
 #define ID_CHOICE 10022
 #define ID_BONDGRID 10020
 #define SYMBOL_BONDSDLG_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
-#define SYMBOL_BONDSDLG_TITLE _("BondsDlg")
+#define SYMBOL_BONDSDLG_TITLE _("Bonds")
 #define SYMBOL_BONDSDLG_IDNAME ID_BONDSDIALOG
 #define SYMBOL_BONDSDLG_SIZE wxDefaultSize
 #define SYMBOL_BONDSDLG_POSITION wxDefaultPosition
@@ -126,6 +126,10 @@ public:
 	void UpdateControls(void);
 
 	void UpdateSelection(bool mode);
+	
+	/// Change the window title when the file name changes
+	void UpdateWindowTitle(void);
+	
 ////@begin BondsDlg member variables
 	wxButton* AddBtn;
 	wxButton* DeleteBtn;
