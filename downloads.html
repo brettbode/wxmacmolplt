@@ -71,7 +71,9 @@ Then apt-get update. You should then be able to install using apt-get install wx
 <LI>dpkg -i wxmacmolpltx.x.x.deb
 </UL>
 Note this will download and build in the current directory. Once you have installed the .deb file you can remove everything from the current directory. If you are running an older Debian or Ubuntu system you will need to follow the building from source directions below.
-
+<p>Note: Many newer Debian/Ubuntu distros are requiring signed packages by
+default. Since I do not have a recognized key these are unsigned so you may need
+to add "--allow-unauthenticated" to your apt-get command.</P>
 <H2>Source Code</H2>
 If none of those work for you download the source code and follow the instructions below or in the INSTALL file contained in the source tar file. The prerequisites for building MacMolPlt from source are a working C++ compiler (g++ preferred) and a wxWidgets (version 2.6.3 or newer, but 2.8 or newer recommended) install including the development pieces. You can test for a working wxWidgets install using wx-config --version. If the response is 2.6.3 or greater you should be fine and you can go directly to building MacMolPlt below. If you have hardware supporting stereo display (quad-buffered OpenGL) you may wish to grab the latest wxWidgets 3.x release to enable stereo support in MacMolPlt. If your Linux distribution does not offer a prebuilt wxWidgets package, usually named something like wxGTK or libwxgtk version 2.6.3 or newer then you will have to first build and install wxWidgets. Follow these steps to build wxWidgets:
 <p>
