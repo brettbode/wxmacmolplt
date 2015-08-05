@@ -1110,8 +1110,8 @@ void MoleculeData::SetModelRotation(float Psi, float Phi, float Theta) {
 	EulerAnglesToMatrix(TotalRotation, Psi, Phi, Theta);
 	SetModelCenter(&Center);
 }
-void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs) {
-	if (!DeterminePrincipleOrientation(TotalRotation, Centroid, Prefs, 1.0E-4)) {
+void MoleculeData::RotateToPrincipleOrientation(WinPrefs * Prefs, double precision) {
+	if (!DeterminePrincipleOrientation(TotalRotation, Centroid, Prefs, precision)) {
 		MessageAlert("Unable to determine the proper symmetry adapted rotation. This"
 					 " may mean your selected point group is incorrect.");
 	}

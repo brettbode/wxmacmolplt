@@ -168,8 +168,9 @@ class MoleculeData {
 		/**
 		 * Rotate/translate the reference coordinates into the principle orientation.
 		 * @param Prefs The current window preferences
+		 * @param precision The tolerance for slop in the coordinates (ex 1.0D-5)
 		 */
-		void RotateToPrincipleOrientation(WinPrefs * Prefs);
+		void RotateToPrincipleOrientation(WinPrefs * Prefs, double precision=1.0E-4);
 		/**
 		 * Determine the set of point groups satisfied by the current set of coordinates.
 		 * @param pgFlags One flag per point group indicating whether the coordinates satisfy the point group.

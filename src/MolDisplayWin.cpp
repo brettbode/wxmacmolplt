@@ -2796,7 +2796,7 @@ void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &event) {
 			if (! MainData->InputOptions) MainData->InputOptions = new InputData;
 			MainData->InputOptions->Data->SetPointGroup(temp);
 			MainData->InputOptions->Data->SetPointGroupOrder(order);
-			MainData->RotateToPrincipleOrientation(Prefs);
+			MainData->RotateToPrincipleOrientation(Prefs, dlg->GetTolerance());
 			MainData->StickCoordinates();
 			//update the list of symmetry unique atoms
 			MainData->GenerateSymmetryUniqueAtoms(dlg->GetTolerance());
