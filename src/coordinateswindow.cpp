@@ -640,7 +640,11 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 		if (val.ToLong(&atomnum)) {	//number instead of symbol
 			if ((atomnum < 1)||(atomnum>107)) atomnum = -1;//Not a correct Atomic #
 		} else {
-            const char *tmpChar = val.ToAscii();
+			//I am not quite following the docs on wxString coversion to ascii c str
+			//ToAscii doesn't seem to convert to ascii in a unicode build
+      //      const char *tmpChar = val.ToAscii();
+			//mb_str is the recommend method and seems to work
+			const char *  tmpChar = val.mb_str();
 			atomnum = ::SetAtomType((const unsigned char *)tmpChar);//Change the symbol to Atomic #
 			if ((atomnum < 1)||(atomnum>107)) atomnum = -1;//Not a correct Atomic label
 		}
