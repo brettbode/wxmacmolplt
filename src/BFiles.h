@@ -20,7 +20,7 @@
 #include <string>
 
 #define	kBufferSize		262144		///<default file buffer size (for BufferFile internal buffer)
-#define kMaxLineLength	180			///<arbitrary Max line length (should handle 132 col lines), used throughout the program
+#define kMaxLineLength	256			///<arbitrary Max line length (should handle 132 col lines), used throughout the program
 
 /// enum of file types supported/returned by BufferFile::GetFileType.
 typedef enum TextFileType {

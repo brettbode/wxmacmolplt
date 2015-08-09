@@ -440,7 +440,15 @@ long BufferFile::GetLine(char * Line)
 		LineChars++;
 		BufferPos ++;
 		if ((BufferStart+BufferPos)>=ByteCount) break;	//End of file reached, assume EOL
-		if (LineChars>=(kMaxLineLength-2)) break;	//Make sure we don't overrun the Line buffer
+		if (LineChars>=(kMaxLineLength-2)) { //Make sure we don't overrun the Line buffer
+			wxLogMessage(_("Warning: the maximum line length has been exceeded, skipping the rest of a very long line!"));
+			while ((Buffer[BufferPos] != 13)&&(Buffer[BufferPos] != 10)) {
+				BufferPos ++;
+				if ((BufferStart+BufferPos)>=ByteCount) break;	//End of file reached, assume EOL
+				if (BufferPos>=BufferSize) AdvanceBuffer();
+			}
+			break;
+		}
 		if (BufferPos>=BufferSize) AdvanceBuffer();
 	}
 	if ((BufferPos+BufferStart)<ByteCount) {
