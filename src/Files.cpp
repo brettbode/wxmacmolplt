@@ -5793,7 +5793,7 @@ long ParseGLogLine(BufferFile * Buffer, Frame * lFrame, long numExpected, long T
 } /*ParseGLogLine*/
 long ParseCartLine(char *Line, long *atomtype, CPoint3D *coord, CPoint3D *offset, long Mode)
 {	long	iscanerr=0, junk;
-	unsigned char Label[kMaxLineLength];
+	unsigned char Label[kMaxLineLength]="\0";
 
 	if (!sscanf(Line, "%s", Label)) return -1;
 	if ((Label[0] > 47)&&(Label[0] < 58)) {	/*A number? must be Gaussian style (bleah)*/
@@ -5850,7 +5850,7 @@ long ParseCartLine(char *Line, long *atomtype, CPoint3D *coord, CPoint3D *offset
 					}
 				}
 				*atomtype = SetAtomType(Label);
-			} else return -iscanerr;
+			} else return iscanerr;	//return the error code
 		}
 	}
 	return iscanerr;
