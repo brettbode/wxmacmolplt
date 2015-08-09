@@ -1290,7 +1290,7 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 				for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital energies
 					ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(Energy[iorb+jorb]),&nChar);
 					if (ScanErr <= 0) {
-						wxLogWarning(_("Error parsing the energy for orbital %d. Using last energy and continuing."), iorb+jorb);
+						wxLogWarning(_("Error parsing the energy for orbital %ld. Using last energy and continuing."), iorb+jorb);
 						if ((iorb+jorb)>0) Energy[iorb+jorb] = Energy[iorb+jorb-1];
 						jorb++;
 						while (jorb <imaxorb) {
