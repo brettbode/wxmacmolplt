@@ -71,11 +71,13 @@ bool MpApp::OnInit() {
 	//It has become apparent that wx is not determining the install prefix
 	//correctly on linux. So set it here as a workaround
 	// Ok I don't know how else to get the wxStandardPaths class?
-	wxStandardPaths * paths = (wxStandardPaths * ) &gStdPaths;
-	if (strcmp(INSTALL_PREFIX, "NONE"))
-		paths->SetInstallPrefix(wxString(INSTALL_PREFIX,wxConvUTF8));
-	else
-		paths->SetInstallPrefix(wxString("/usr/local",wxConvUTF8));
+	//Tested on Debian with both wx 2.8 and 3.0, this did not seem to be needed.
+	//Need to test with rpms and then relocate an rpm to see if it succeeds.
+//	wxStandardPaths * paths = (wxStandardPaths * ) &gStdPaths;
+//	if (strcmp(INSTALL_PREFIX, "NONE"))
+//		paths->SetInstallPrefix(wxString(INSTALL_PREFIX,wxConvUTF8));
+//	else
+//		paths->SetInstallPrefix(wxString("/usr/local",wxConvUTF8));
 #endif
 #ifdef __FORCE_SINGLE_INSTANCE__
 #ifndef __WXMAC__
