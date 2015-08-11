@@ -60,6 +60,11 @@ BEGIN_EVENT_TABLE( EnergyPlotDialog, wxFrame )
 	// approach using the Char_hook
 //	EVT_KEY_DOWN (EnergyPlotDialog::KeyHandler)
 	EVT_CHAR_HOOK (EnergyPlotDialog::KeyHandler)
+
+	EVT_MENU( wxID_COPY, EnergyPlotDialog::OnCopyClick )
+
+	EVT_AXIS_DCLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphAxisDClick)
+	EVT_GRAPH_CLICK(ID_EPGRAPH, EnergyPlotDialog::OnEpgraphGraphClick)
 END_EVENT_TABLE()
 
 /*!
