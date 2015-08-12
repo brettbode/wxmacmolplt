@@ -2017,69 +2017,79 @@ OrbitalRec * Frame::ParseGAMESSLMOs(BufferFile * Buffer, long NumFuncs, long Num
 //	}
 	return TargetSet;
 }
-void Frame::ParseGVBGIOrbitals(BufferFile * Buffer, const long & NumFuncs, Progress * lProgress) {
-	long	iorb=0, imaxorb, TestOrb, LinePos, ScanErr, jorb, NumOrbs;
+void Frame::ParseGVBGIOrbitals(BufferFile * Buffer, const long & NumFuncs, const long & NumGVBPairs, Progress * lProgress) {
+	long	iorb, imaxorb, TestOrb, LinePos, ScanErr, jorb, NumOrbs;
 	int		nChar;
 	char	Line[kMaxLineLength+1];
-	Buffer->SkipnLines(2);
 	NumOrbs = NumFuncs;
 
-	OrbitalRec * OrbSet = NULL;
-	
-	try {
-		OrbSet = new OrbitalRec(NumFuncs, 0, NumFuncs);
-		OrbSet->setOrbitalWavefunctionType(GVB);
-		OrbSet->setOrbitalType(NaturalOrbital);
-		
-		float * Vectors = OrbSet->Vectors;
-		if (OrbSet->Energy) {
-			delete [] OrbSet->Energy;
-			OrbSet->Energy = NULL;
+	for (long iPair=0; iPair<NumGVBPairs; iPair++) {
+		// the next non-blank line should be "PAIR n"
+		if (!Buffer->LocateKeyWord("PAIR", 4, Buffer->GetFilePos() + 250)) {
+			wxLogMessage(_("Unable to locate an expected set of GVB pair orbitals. Skipped."));
+			break;	//If PAIR does not appear in the next few lines something is incorrect
 		}
-		if (OrbSet->SymType) {	//symmetry labels are not printed for NO's
-			delete [] OrbSet->SymType;
-			OrbSet->SymType = NULL;
-		}
+		Buffer->SkipnLines(2);
 
-		while (iorb<NumOrbs) {
-				// Allow a little backgrounding and user cancels
-			if (!lProgress->UpdateProgress(Buffer->GetPercentRead())) {
-				delete OrbSet;
-				return;
+		OrbitalRec * OrbSet = NULL;
+		iorb=0;
+		
+		try {
+			OrbSet = new OrbitalRec(NumFuncs, 0, NumFuncs);
+			OrbSet->setOrbitalWavefunctionType(GVB);
+			OrbSet->setOrbitalType(NaturalOrbital);
+			
+			float * Vectors = OrbSet->Vectors;
+			if (OrbSet->Energy) {
+				delete [] OrbSet->Energy;
+				OrbSet->Energy = NULL;
 			}
-			imaxorb = MIN(10, NumOrbs-iorb);	//Max of 10 orbitals per line
-			Buffer->GetLine(Line);
-			LinePos = 0;
-			for (jorb=0; jorb<imaxorb; jorb++) {
-				ScanErr = sscanf(&(Line[LinePos]), "%ld%n", &TestOrb, &nChar);
-				if (ScanErr && (TestOrb==jorb+iorb+1)) LinePos += nChar;
-				else {
-					imaxorb = jorb;
-					if (jorb==0) {	//No more orbitals found
-						imaxorb = 0;
-						NumOrbs = iorb;
+			if (OrbSet->SymType) {	//symmetry labels are not printed for NO's
+				delete [] OrbSet->SymType;
+				OrbSet->SymType = NULL;
+			}
+
+			while (iorb<NumOrbs) {
+					// Allow a little backgrounding and user cancels
+				if (!lProgress->UpdateProgress(Buffer->GetPercentRead())) {
+					delete OrbSet;
+					return;
+				}
+				imaxorb = MIN(10, NumOrbs-iorb);	//Max of 10 orbitals per line
+				Buffer->GetLine(Line);
+				LinePos = 0;
+				for (jorb=0; jorb<imaxorb; jorb++) {
+					ScanErr = sscanf(&(Line[LinePos]), "%ld%n", &TestOrb, &nChar);
+					if (ScanErr && (TestOrb==jorb+iorb+1)) LinePos += nChar;
+					else {
+						imaxorb = jorb;
+						if (jorb==0) {	//No more orbitals found
+							imaxorb = 0;
+							NumOrbs = iorb;
+						}
+						break;
 					}
-					break;
+				}
+				Buffer->SkipnLines(1);
+				if (imaxorb > 0) {
+						//read in the vector block
+					ReadGAMESSlogVectors(Buffer, &(Vectors[iorb*NumFuncs]), NumFuncs, imaxorb);
+					iorb += imaxorb;
+					Buffer->SkipnLines(1);	//Skip blank line between blocks
 				}
 			}
-			Buffer->SkipnLines(1);
-			if (imaxorb > 0) {
-					//read in the vector block
-				ReadGAMESSlogVectors(Buffer, &(Vectors[iorb*NumFuncs]), NumFuncs, imaxorb);
-				iorb += imaxorb;
-				Buffer->SkipnLines(1);	//Skip blank line between blocks
+		}
+		catch (...) {
+			if (OrbSet) {
+				delete OrbSet;
+				OrbSet = NULL;
 			}
 		}
-	}
-	catch (...) {
-		if (OrbSet) {
-			delete OrbSet;
-			OrbSet = NULL;
+		if (OrbSet != NULL) {
+			OrbSet->ReSize(NumOrbs, 0);
+			Orbs.push_back(OrbSet);
 		}
-	}
-	if (OrbSet != NULL) {
-		OrbSet->ReSize(NumOrbs, 0);
-		Orbs.push_back(OrbSet);
+		Buffer->BackupnLines(2);
 	}
 }
 

@@ -192,7 +192,13 @@ class Frame {
 		 * @param lProgress the progress indicator.
 		 */
 		void ParseGAMESSEOM_CC_Vectors(BufferFile * Buffer, long NumFuncs, Progress * lProgress);
-		void ParseGVBGIOrbitals(BufferFile * Buffer, const long & NumFuncs, Progress * lProgress);
+		/** Parse the GAMESS GVB Pair orbitals.
+		 * @param Buffer the input buffer.
+		 * @param NumFuncs the number of basis functions.
+		 * @param NumGVBPairs the number of GVB orbital pairs.
+		 * @param lProgress the progress indicator.
+		 */
+		void ParseGVBGIOrbitals(BufferFile * Buffer, const long & NumFuncs, const long & NumGVBPairs, Progress * lProgress);
 		OrbitalRec * ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs,
 			long NumBetaOrbs, const long & NumOccAlpha, const long & NumOccBeta, const TypeOfWavefunction & method, Progress * lProgress);
 		OrbitalRec * ParseGAMESSLMOs(BufferFile * Buffer, long NumFuncs, long NumAlphaOrbs,

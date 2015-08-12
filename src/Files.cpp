@@ -2409,7 +2409,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	Frame *			lpFrame;
 	long			test=0, numlines=0, OccupiedOrbCount=0, NumFragmentAtoms=0,
 					NumOccAlpha=0, NumOccBeta=0, NumBetaUHFOrbs=0, LinePos,
-					NumCoreOrbs, NumOpenOrbs, NumGVBPairOrbs,
+					NumCoreOrbs, NumOpenOrbs, NumGVBPairs,
 					ReadMP2Orbitals=1;
 	wxFileOffset	EnergyPos, NextFinalPos, SavedPos, StartPos;
 	float			*Occupancy = NULL;
@@ -2798,7 +2798,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 								sscanf(LineText, " NORB   =%ld NCO    =%ld", &test, &NumCoreOrbs);
 								NumOccAlpha = test;
 								Buffer->GetLine(LineText);
-								sscanf(LineText, " NPAIR  =%ld NSETO  =%ld", &NumGVBPairOrbs, &NumOpenOrbs);
+								sscanf(LineText, " NPAIR  =%ld NSETO  =%ld", &NumGVBPairs, &NumOpenOrbs);
 //							}
 							Occupancy = new float[MainData->GetNumBasisFunctions()];
 							if (!Occupancy) throw MemoryError();
@@ -2981,7 +2981,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 					} else {
 						if (MainData->InputOptions->Control->GetSCFType() == GAMESS_GVB) {
 							if (Buffer->LocateKeyWord("PAIR INFORMATION", 16, NextFinalPos)) {
-								ReadGVBOccupancy(Buffer, NumGVBPairOrbs, MainData->GetNumBasisFunctions(),
+								ReadGVBOccupancy(Buffer, NumGVBPairs, MainData->GetNumBasisFunctions(),
 									Occupancy);
 							}
 						}
@@ -3033,7 +3033,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 						KeyWordFound = Buffer->LocateKeyWord("GI ORBITALS", 11, NextFinalPos);
 						if (KeyWordFound && ((NextFinalPos<0)||(NextFinalPos>Buffer->GetFilePos()))) {
 							Buffer->SkipnLines(4);
-							lFrame->ParseGVBGIOrbitals(Buffer, MainData->GetNumBasisFunctions(), ProgressInd);
+							lFrame->ParseGVBGIOrbitals(Buffer, MainData->GetNumBasisFunctions(), NumGVBPairs, ProgressInd);
 						}
 					} else if (MainData->InputOptions->Control->GetSCFType() == GAMESS_UHF) {
 						if (Buffer->LocateKeyWord("UHF NATURAL ORBITALS AND OCCUPATION NUMBERS",
@@ -3391,7 +3391,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 					} else {
 						if (MainData->InputOptions->Control->GetSCFType() == GAMESS_GVB) {
 							if (Buffer->LocateKeyWord("PAIR INFORMATION", 16, NextFinalPos)) {
-								ReadGVBOccupancy(Buffer, NumGVBPairOrbs, MainData->GetNumBasisFunctions(),
+								ReadGVBOccupancy(Buffer, NumGVBPairs, MainData->GetNumBasisFunctions(),
 									Occupancy);
 							}
 						}
@@ -3701,13 +3701,13 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	}
 	return 1;
 }	/*OpenGAMESSlog*/
-bool ReadGVBOccupancy(BufferFile * Buffer, long NumPairOrbs, long MaxOrbs, float * Occupancy) {
+bool ReadGVBOccupancy(BufferFile * Buffer, long NumPairs, long MaxOrbs, float * Occupancy) {
 		char Line[kMaxLineLength];
 		long	junk, Orb1, Orb2;
 		float	junkf, Occ1, Occ2;
-	if ((NumPairOrbs <= 0)||(!Occupancy)) return false;	//no GVB pairs or no memory
+	if ((NumPairs <= 0)||(!Occupancy)) return false;	//no GVB pairs or no memory
 	Buffer->SkipnLines(4);
-	for (long i=0; i<NumPairOrbs; ++i) {
+	for (long i=0; i<NumPairs; ++i) {
 		Buffer->GetLine(Line);
 		sscanf(Line, "%ld %ld %ld %f %f %f %f", &junk, &Orb1, &Orb2, &junkf, &junkf,
 			&Occ1, &Occ2);
