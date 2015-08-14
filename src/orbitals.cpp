@@ -327,7 +327,7 @@ const char * OrbitalRec::getOrbitalTypeText(void) const {
 					return "UHF Natural Orbitals";
 					break;
 				case GVB:
-					return "GVB GI Orbitals";
+					return "Overlapping GVB Pair";
 					break;
 				case MCSCF:
 					return "MCSCF Natural Orbitals";
