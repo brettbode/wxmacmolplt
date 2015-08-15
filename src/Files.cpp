@@ -2806,13 +2806,32 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 							for (test=0; test<NumCoreOrbs; ++test) Occupancy[test] = 2.0f;
 							if (NumOpenOrbs > 0) {	//Parse the occupancies of the open shells
 								if (Buffer->LocateKeyWord("F VECTOR (OCCUPANCIES)", 23)) {
-									long nSkip = 3;
-									if (NumCoreOrbs > 0) nSkip = 4;	//skip the one line for all doubly occupied core orbs
-									Buffer->SkipnLines(nSkip);
-									for (nSkip=0; nSkip<NumOpenOrbs; ++nSkip) {
+									//Next find the first row indicating the doubly occupied orbitals
+									Buffer->SkipnLines(1);
+									bool foundPos=false;
+									int lineCount=0;
+									while (!foundPos) {
+										int test;
 										Buffer->GetLine(LineText);
-										sscanf(LineText, "%ld %f", &test, &(Occupancy[NumCoreOrbs + nSkip]));
-										Occupancy[NumCoreOrbs + nSkip] *= 2;	//occupancies are listed as % of orbital filled
+										sscanf(LineText, "%d", &test);
+										if (test == 1) {	//If there are no cores then the first line is needed below.
+											if (NumCoreOrbs<=0) {
+												Buffer->BackupnLines(1);
+											}
+											foundPos = true;
+										}
+										lineCount++;
+										if (lineCount > 10) {
+											wxLogMessage(_("Warning: Unable to parse GVB F Vector Occupancies."));
+											break;
+										}
+									}
+									if (foundPos) {
+										for (int nOrb=0; nOrb<NumOpenOrbs; ++nOrb) {
+											Buffer->GetLine(LineText);
+											sscanf(LineText, "%ld %f", &test, &(Occupancy[NumCoreOrbs + nOrb]));
+											Occupancy[NumCoreOrbs + nOrb] *= 2;	//occupancies are listed as % of orbital filled
+										}
 									}
 								}
 							}
