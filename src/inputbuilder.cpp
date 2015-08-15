@@ -2928,6 +2928,7 @@ void InputBuilderWindow::OnEnqueueButtonClick( wxCommandEvent& event )
 #ifdef __WXMAC__
 	pid_t pid = fork();
 	if (pid == 0) {
+		//My guess is that ToAscii needs to be replaced with mb_str for this to work.
 		execlp("open", "open", "-a", "gamessq",
 				(const char *)file.GetFullPath().ToAscii(), NULL);
 		exit(1);
