@@ -11,7 +11,7 @@ Summary: A graphics program for plotting 3-D molecular structures and normal mod
 Group: Applications/Engineering
 License: GPLv2+
 URL: http://brettbode.github.io/wxmacmolplt/
-#Prefix: %{prefix}
+Prefix: %{prefix}
 #Source: wxmacmolplt-%{version}.tar.gz  
 Source: https://bintray.com/artifact/download/brettbode/generic/wxmacmolplt-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
