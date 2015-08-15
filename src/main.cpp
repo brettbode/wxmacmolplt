@@ -142,7 +142,8 @@ bool MpApp::OnInit() {
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 
 		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2006-2012 ")
-					   wxT("Version %s, %s"), wxMacMolPlt_VERSION, date);
+					   wxT("Version %s, "), wxT(wxMacMolPlt_VERSION));
+		msg += date;
 		wxLogMessage(msg); 
 		return false; 
 	} 
@@ -532,7 +533,8 @@ bool MpAppNoGUI::OnInit() {
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 
 		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2008-2012 ")
-					   wxT("Version %s, %s"), wxMacMolPlt_VERSION, date);
+					   wxT("Version %s, "), wxT(wxMacMolPlt_VERSION));
+		msg += date;
 		wxLogMessage(msg); 
 		return false; 
 	} 
