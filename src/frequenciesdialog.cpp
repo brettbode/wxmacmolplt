@@ -113,7 +113,7 @@ bool FrequenciesDialog::Create( wxWindow* parent, wxWindowID id, const wxString&
 void FrequenciesDialog::UpdateWindowTitle(void) {
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	wxString foo = parent->GetTitle();
-	foo += _(" ") + SYMBOL_FREQUENCIESDIALOG_TITLE;
+	foo += wxString(_(" ")) + wxString(SYMBOL_FREQUENCIESDIALOG_TITLE);
 	SetTitle(foo);
 }
 

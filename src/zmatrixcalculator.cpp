@@ -113,7 +113,7 @@ bool ZMatrixCalculator::Create( wxWindow* parent, wxWindowID id, const wxString&
 void ZMatrixCalculator::UpdateWindowTitle(void) {
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	wxString foo = parent->GetTitle();
-	foo += _(" ") + SYMBOL_ZMATRIXCALCULATOR_TITLE;
+	foo += wxString(_(" ")) + wxString(SYMBOL_ZMATRIXCALCULATOR_TITLE);
 	SetTitle(foo);
 }
 

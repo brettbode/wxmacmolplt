@@ -410,7 +410,7 @@ bool InputBuilderWindow::Create( wxWindow* parent, wxWindowID id, const wxString
 void InputBuilderWindow::UpdateWindowTitle(void) {
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	wxString foo = parent->GetTitle();
-	foo += _(" ") + SYMBOL_INPUTBUILDERWINDOW_TITLE;
+	foo += wxString(_(" ")) + wxString(SYMBOL_INPUTBUILDERWINDOW_TITLE);
 	SetTitle(foo);
 }
 

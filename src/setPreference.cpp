@@ -179,7 +179,7 @@ void setPreference::UpdateWindowTitle(void) {
 		SetTitle(SYMBOL_GLOBALPREFERENCE_TITLE);
 	} else {
 		wxString foo = mParent->GetTitle();
-		foo += _(" ") + SYMBOL_SETPREFERENCE_TITLE;
+		foo += wxString(_(" ")) + wxString(SYMBOL_SETPREFERENCE_TITLE);
 		SetTitle(foo);
 	}
 }

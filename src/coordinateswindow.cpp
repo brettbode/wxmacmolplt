@@ -181,7 +181,7 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
  */
 void CoordinatesWindow::UpdateWindowTitle(void) {
 	wxString foo = Parent->GetTitle();
-	foo += _(" ") + SYMBOL_COORDINATESWINDOW_TITLE;
+	foo += wxString(_(" ")) + wxString(SYMBOL_COORDINATESWINDOW_TITLE);
 	SetTitle(foo);
 }
 

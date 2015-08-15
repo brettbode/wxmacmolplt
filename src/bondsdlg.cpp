@@ -113,7 +113,7 @@ bool BondsDlg::Create( MolDisplayWin* parent, wxWindowID id, const wxString& cap
  */
 void BondsDlg::UpdateWindowTitle(void) {
 	wxString foo = Parent->GetTitle();
-	foo += _(" ") + SYMBOL_BONDSDLG_TITLE;
+	foo += wxString(_(" ")) + wxString(SYMBOL_BONDSDLG_TITLE);
 	SetTitle(foo);
 }
 

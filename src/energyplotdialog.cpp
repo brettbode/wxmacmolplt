@@ -114,7 +114,7 @@ bool EnergyPlotDialog::Create( wxWindow* parent, wxWindowID id, const wxString& 
 void EnergyPlotDialog::UpdateWindowTitle(void) {
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	wxString foo = parent->GetTitle();
-	foo += _(" ") + SYMBOL_ENERGYPLOTDIALOG_TITLE;
+	foo += wxString(_(" ")) + wxString(SYMBOL_ENERGYPLOTDIALOG_TITLE);
 	SetTitle(foo);
 }
 

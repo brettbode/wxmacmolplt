@@ -119,7 +119,7 @@ bool SurfacesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxStrin
  */
 void SurfacesWindow::UpdateWindowTitle(void) {
 	wxString foo = Parent->GetTitle();
-	foo += _(" ") + SYMBOL_SURFACESWINDOW_TITLE;
+	foo += wxString(_(" ")) + wxString(SYMBOL_SURFACESWINDOW_TITLE);
 	SetTitle(foo);
 }
 
