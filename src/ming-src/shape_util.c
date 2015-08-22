@@ -226,7 +226,7 @@ void SWFShape_drawArc(SWFShape shape, double r, double startAngle, double endAng
 
 	// Normalize the angles
 	double delta = endAngle - startAngle;
-	if ( abs(delta) >= 360)
+	if ( ((delta>0)?delta:(-delta)) >= 360)
 		delta = 360;
 	else if (delta < 0)
 		delta += 360;
