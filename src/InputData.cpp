@@ -2551,6 +2551,7 @@ void SCFGroup::InitData(void) {
 	SOGTolerance = EnErrThresh = DEMCutoff = DampCutoff = 0.0;
 	ConvCriteria = MaxDIISEq = MVOCharge = 0;
 	Punch = Options1 = ConverganceFlags = 0;
+	GVBNumCoreOrbs = GVBNumOpenShells = GVBNumPairs = 0;
 		//default Direct SCF to true. This is not the GAMESS default
 		//but is better in most cases.
 	SetDirectSCF(true);
@@ -2583,6 +2584,7 @@ void SCFGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	if (IData->Control->GetSCFType() > 4) return;	//not relavent to the selected SCF type
 	if (ConvCriteria > 0) test = true;
 	if (GetDirectSCF()) test = true;
+	if (IData->Control->GetSCFType() == GAMESS_GVB) test = true;
 	
 	if (!test) return;
 
@@ -2614,6 +2616,30 @@ void SCFGroup::WriteToFile(BufferFile *File, InputData *IData) {
 		sprintf(Out, "UHFNOS=.TRUE. ");
 		File->WriteLine(Out, false);
 	}
+	//GVB related items if this is a GVB run
+	if (IData->Control->GetSCFType() == GAMESS_GVB) {
+		sprintf(Out, "NCO=%ld", GVBNumCoreOrbs);
+		File->WriteLine(Out, false);
+		if (GVBNumPairs>0) {
+			sprintf(Out, "NPAIR=%ld", GVBNumPairs);
+			File->WriteLine(Out, false);
+		}
+		if (GVBNumOpenShells>0) {
+			sprintf(Out, "NSETO=%ld", GVBNumOpenShells);
+			File->WriteLine(Out, false);
+			File->WriteLine("NO=", false);
+			std::ostringstream temp;
+			for (long i=0; i< GVBNumOpenShells; i++) {
+				if (i != 0) temp << ",";
+				if (i < GVBOpenShellDeg.size()) {
+					temp << GVBOpenShellDeg[i];
+				} else {
+					temp << "0";	//default value
+				}
+			}
+			File->WriteLine(temp.str().c_str(), false);
+		}
+	}
 
 	File->WriteLine("$END", true);
 }
@@ -2634,6 +2660,26 @@ void SCFGroup::WriteXML(XMLElement * parent) const {
 	if (GetDIIS()) Ele->addChildElement(CML_convert(MMP_IOSGDIIS), trueXML);
 	if (GetSOSCF()) Ele->addChildElement(CML_convert(MMP_IOSGSOSCF), trueXML);
 	if (GetDEM()) Ele->addChildElement(CML_convert(MMP_IOSGDEM), trueXML);
+	if (GetGVBNumCoreOrbs()>0) {
+		snprintf(line, kMaxLineLength, "%d", GetGVBNumCoreOrbs());
+		Ele->addChildElement(CML_convert(MMP_IOSGGVBNumCoreOrbs), line);
+	}
+	if (GetGVBNumPairs()>0) {
+		snprintf(line, kMaxLineLength, "%d", GetGVBNumPairs());
+		Ele->addChildElement(CML_convert(MMP_IOSGGVBNumPairs), line);
+	}
+	if (GetGVBNumOpenShells()>0) {
+		snprintf(line, kMaxLineLength, "%d", GetGVBNumOpenShells());
+		Ele->addChildElement(CML_convert(MMP_IOSGGVBNumOpenShells), line);
+		std::ostringstream temp;
+		for (long i=0; i< GVBOpenShellDeg.size(); i++) {
+			if (i != 0) temp << " ";
+			if (i < GVBOpenShellDeg.size()) {
+				temp << GVBOpenShellDeg[i];
+			}
+		}
+		Ele->addChildElement(CML_convert(MMP_IOSGGVBOpenShellDeg), temp.str().c_str());
+	}
 }
 void SCFGroup::ReadXML(XMLElement * parent) {
 	XMLElementList * children = parent->getChildren();
@@ -2643,10 +2689,10 @@ void SCFGroup::ReadXML(XMLElement * parent) {
 			MMP_IOSCFGroupNS item;
 			if (child && CML_convert(child->getName(), item)) {
 				bool tb;
+				long temp;
 				switch (item) {
 					case MMP_IOSGConvCriteria:
 					{
-						long temp;
 						if (child->getLongValue(temp)) {
 							SetConvergance(temp);
 						}
@@ -2691,6 +2737,22 @@ void SCFGroup::ReadXML(XMLElement * parent) {
 					case MMP_IOSGDEM:
 						if (child->getBoolValue(tb))
 							SetDEM(tb);
+						break;
+					case MMP_IOSGGVBNumCoreOrbs:
+						if (child->getLongValue(temp))
+							SetGVBNumCoreOrbs(temp);
+						break;
+					case MMP_IOSGGVBNumPairs:
+						if (child->getLongValue(temp))
+							SetGVBNumPairs(temp);
+						break;
+					case MMP_IOSGGVBNumOpenShells:
+						if (child->getLongValue(temp))
+							SetGVBNumOpenShells(temp);
+						break;
+					case MMP_IOSGGVBOpenShellDeg:
+						//This implies that this item must follow the NumOpenShells item.
+						child->getLongArray(GVBNumOpenShells, GVBOpenShellDeg);
 						break;
 				}
 			}

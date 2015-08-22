@@ -917,6 +917,42 @@ long XMLElement::getLongArray(const long & count, long * array) const {
 	}
 	return readsofar;
 }
+long XMLElement::getLongArray(const long & numExpected, std::vector<long> & array) {
+	long readsofar=0;
+	long temp;
+	if (value!=NULL) {
+		long pos=0;
+		int nchar;
+		char line[kMaxCopyBuffer+1];
+		for (; readsofar<numExpected; readsofar++) {
+			nchar = 0;
+			int itemCount = 0;
+			while ((value[pos] == ' ')&&(value[pos]!='\0')) pos++;
+			while ((value[pos] != ' ')&&(value[pos]!='\0')&&(nchar<kMaxCopyBuffer)) {
+				line[nchar] = value[pos];
+				nchar++;
+				pos++;
+			}
+			line[nchar] = '\0';
+			if (nchar < kMaxCopyBuffer) {
+				itemCount = sscanf(line, "%ld", &temp);
+			} else {
+				// The following should be equivelent but is slow for very large strings
+				// Switch to this code if the copy didn't fit in the buffer for some reason
+				pos -= nchar;
+				itemCount = sscanf(&(value[pos]), "%ld%n",
+								   &(array[readsofar]), &nchar);
+				pos += nchar;
+			}
+			if (itemCount == 1) {
+				array.push_back(temp);
+			} else {	//Just break and return what we have read in so far
+				break;
+			}
+		}
+	}
+	return readsofar;
+}
 void XMLElement::addAttribute(const char * n, const long & v) {
 	std::ostringstream bf;
 	bf << v;

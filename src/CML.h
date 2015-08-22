@@ -382,6 +382,10 @@ enum MMP_IOSCFGroupNS {
 	MMP_IOSGDIIS,
 	MMP_IOSGSOSCF,
 	MMP_IOSGDEM,
+	MMP_IOSGGVBNumCoreOrbs,
+	MMP_IOSGGVBNumPairs,
+	MMP_IOSGGVBNumOpenShells,
+	MMP_IOSGGVBOpenShellDeg,
 	
 	NumberMMPIOSCFGroupItems
 };

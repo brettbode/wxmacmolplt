@@ -665,6 +665,10 @@ class SCFGroup {
 		float	EnErrThresh;		//DIIS error threshold
 		float	DEMCutoff;			//DEM limit
 		float	DampCutoff;			//Damping limit
+		long	GVBNumCoreOrbs;		///< GVB NCO - Number Core Orbitals
+		long	GVBNumOpenShells;	///< GVB NSETO - Number of open shells
+		long	GVBNumPairs;		///< GVP NPAIR - Number of overlapping orbital pairs
+		std::vector<long> GVBOpenShellDeg;	///< GVB NO - Array of shell degeneracies (NSETO shells)
 		short	ConvCriteria;		//Convergance cutoff 10^(-n)
 		short	MaxDIISEq;			//Max size of the DIIS linear equations
 		short	MVOCharge;			//Modified Virtual Orbital Charge
@@ -704,6 +708,13 @@ class SCFGroup {
 		void SetDEM(bool State) {ConverganceFlags = (ConverganceFlags & 0xBF) + (State ? 64 : 0);};
 		short GetConvergance(void) const {return ConvCriteria;};
 		short SetConvergance(short NewConv);
+		long GetGVBNumCoreOrbs(void) const {return GVBNumCoreOrbs;};
+		void SetGVBNumCoreOrbs(const long & nco) {GVBNumCoreOrbs = nco;};
+		long GetGVBNumOpenShells(void) const {return GVBNumOpenShells;};
+		void SetGVBNumOpenShells(const long & no) {GVBNumOpenShells = no;};
+		long GetGVBNumPairs(void) const {return GVBNumPairs;};
+		void SetGVBNumPairs(const long & npairs) {GVBNumPairs = npairs;};
+		std::vector<long> & GetGVBOpenShellDeg(void) {return GVBOpenShellDeg;};
 		SCFGroup(void);
 		SCFGroup(SCFGroup *Copy);
 		void InitData(void);

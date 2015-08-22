@@ -158,6 +158,14 @@ class XMLElement {
 		long getFloatArray(const long & count, float * array) const;
 		long getFloatArray(const long & count, std::vector<float> & array) const;
 		long getLongArray(const long & count, long * array) const;
+		/** Read an array of long values into a vector.
+		 * The array is assumed to be space separated.
+		 * The return value is the number of items read in and stored in the vector.
+		 * All items are appended to the vector.
+		 * @param numExpected How many values are expected, at most this many will be read.
+		 * @param array The vector to which the values will be appended.
+		 */
+		long getLongArray(const long & numExpected, std::vector<long> & array);
 		const char * getAttributeValue(const char * name) const;
 		bool getAttributeValue(const char * name, long & newvalue) const;
 		bool getAttributeValue(const char * name, float & newvalue) const;
