@@ -715,6 +715,8 @@ class SCFGroup {
 		long GetGVBNumPairs(void) const {return GVBNumPairs;};
 		void SetGVBNumPairs(const long & npairs) {GVBNumPairs = npairs;};
 		std::vector<long> & GetGVBOpenShellDeg(void) {return GVBOpenShellDeg;};
+		void AddGVBOpenShellDeg(const long & d) {GVBOpenShellDeg.push_back(d);};
+		long GetGVBOpenShellDeg(const long & d) {return ((d<GVBOpenShellDeg.size())?GVBOpenShellDeg[d]:0);};
 		SCFGroup(void);
 		SCFGroup(SCFGroup *Copy);
 		void InitData(void);

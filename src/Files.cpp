@@ -2791,15 +2791,33 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			//			}
 						break;
 					case GVBOptions:
-//						if (MainData->InputOptions->Control->GetSCFType()==GAMESS_GVB) { // Parse the GVB input parameters
-//							if (Buffer->LocateKeyWord("ROHF-GVB INPUT PARAMETERS", 26, EnergyPos)) {
-								Buffer->SkipnLines(3);
-								Buffer->GetLine(LineText);
-								sscanf(LineText, " NORB   =%ld NCO    =%ld", &test, &NumCoreOrbs);
-								NumOccAlpha = test;
-								Buffer->GetLine(LineText);
-								sscanf(LineText, " NPAIR  =%ld NSETO  =%ld", &NumGVBPairs, &NumOpenOrbs);
-//							}
+						Buffer->SkipnLines(3);
+						Buffer->GetLine(LineText);
+						sscanf(LineText, " NORB   =%ld NCO    =%ld", &test, &NumCoreOrbs);
+						MainData->InputOptions->SCF->SetGVBNumCoreOrbs(NumCoreOrbs);
+						NumOccAlpha = test;
+						Buffer->GetLine(LineText);
+						sscanf(LineText, " NPAIR  =%ld NSETO  =%ld", &NumGVBPairs, &NumOpenOrbs);
+						MainData->InputOptions->SCF->SetGVBNumPairs(NumGVBPairs);
+						MainData->InputOptions->SCF->SetGVBNumOpenShells(NumOpenOrbs);
+						if (NumOpenOrbs>0) {
+							//If there are Open Shells we need to parse the degeneracy of each shell
+							//This is a space separated list starting with NO =
+							//In theory it could be more than a line, but that is highly unlikely
+							Buffer->GetLine(LineText);
+							int nchar = 0;
+							if (sscanf(LineText, " NO   =%n", &nchar) == 0) {
+								for (int ishell=0; ishell<NumOpenOrbs; ishell++) {
+									int nchar2=0;
+									long shellDeg;
+									if (sscanf(&(LineText[nchar]), "%ld%n", &shellDeg, &nchar2) == 1) {
+										nchar += nchar2;
+										MainData->InputOptions->SCF->AddGVBOpenShellDeg(shellDeg);
+									} else
+										break;
+								}
+							}
+						}
 							Occupancy = new float[MainData->GetNumBasisFunctions()];
 							if (!Occupancy) throw MemoryError();
 							for (test=0; test<MainData->GetNumBasisFunctions(); ++test) Occupancy[test] = 0.0f;
@@ -2827,10 +2845,15 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 										}
 									}
 									if (foundPos) {
-										for (int nOrb=0; nOrb<NumOpenOrbs; ++nOrb) {
+										int iorb = NumCoreOrbs;
+										for (int nShell=0; nShell<NumOpenOrbs; ++nShell) {
 											Buffer->GetLine(LineText);
-											sscanf(LineText, "%ld %f", &test, &(Occupancy[NumCoreOrbs + nOrb]));
-											Occupancy[NumCoreOrbs + nOrb] *= 2;	//occupancies are listed as % of orbital filled
+											float occTemp;
+											sscanf(LineText, "%ld %f", &test, &occTemp);
+											for (int jj=0; jj<MainData->InputOptions->SCF->GetGVBOpenShellDeg(nShell); jj++) {
+												Occupancy[iorb] = occTemp * 2;	//occupancies are listed as % of orbital filled
+												iorb++;
+											}
 										}
 									}
 								}

@@ -43,7 +43,7 @@ InputData::InputData(void) {
 	Data = new DataGroup;
 	StatPt = new StatPtGroup;
 	Guess = new GuessGroup;
-	SCF = NULL;
+	SCF = new SCFGroup;
 	MP2 = NULL;
 	Hessian = NULL;
 }
@@ -55,9 +55,9 @@ InputData::InputData(InputData *Copy) {
 	Data = new DataGroup(Copy->Data);
 	StatPt = new StatPtGroup(Copy->StatPt);
 	if (Copy->Guess) Guess = new GuessGroup(Copy->Guess);
-	else Guess = NULL;
+	else Guess = new GuessGroup;
 	if (Copy->SCF) SCF = new SCFGroup(Copy->SCF);
-	else SCF = NULL;
+	else SCF = new SCFGroup;
 	if (Copy->MP2) MP2 = new MP2Group(Copy->MP2);
 	else MP2 = NULL;
 	if (Copy->Hessian) Hessian = new HessianGroup(Copy->Hessian);
