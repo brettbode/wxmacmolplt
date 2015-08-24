@@ -1081,6 +1081,27 @@ void AnnotationDihedral::WriteXML(XMLElement * parent) const {
 	Elem->addAttribute(kAnnAtom3XML, atoms[2]);
 	Elem->addAttribute(kAnnAtom4XML, atoms[3]);
 }
+XMLElement * XMLElement::AddLongArray(const std::vector<long> & array, const char * name, const char * title, long count) {
+	XMLElement * result=NULL;
+	long num = count;
+	if (num>array.size()) num = array.size();
+	if (num<0) num = array.size();
+	if (num<1) return result; //If the array is empty there is nothing to add!
+	std::ostringstream temp;
+	for (long i=0; i< num; i++) {
+		if (i != 0) temp << " ";
+		if (i < array.size()) {
+			temp << array[i];
+		}
+	}
+	result = addChildElement(name, temp.str().c_str());
+	result->addAttribute(CML_convert(dataTypeAttr), "xsd:integer"); //required for the array XML element
+	result->addAttribute(CML_convert(titleAttr), title);
+	temp.clear();
+	temp << num;
+	result->addAttribute(CML_convert(sizeAttr), num);
+	return result;
+}
 
 #pragma mark -
 
@@ -3573,6 +3594,16 @@ const char * CML_convert(MMP_IOSCFGroupNS t)
 			return "SOSCF";
 		case MMP_IOSGDEM:
 			return "DEM";
+		case MMP_IOSGGVBNumCoreOrbs:
+			return "GVBCoreObitalCount";
+		case MMP_IOSGGVBNumPairs:
+			return "GVBPairCount";
+		case MMP_IOSGGVBNumOpenShells:
+			return "GVBOpenShellCount";
+		case MMP_IOSGGVBOpenShellDeg:
+			return "GVBOpenShellDegeneracy";
+		case MMP_IOSCFArrayElement:
+			return "array";
 		default:
             return "invalid";
     }

@@ -194,6 +194,12 @@ class XMLElement {
 		 * @param value The bool value to write as the text content of the element
 		 */
 		XMLElement * addBoolChildElement(const char * name, bool value);
+		/** Create an array element of long values from the provided vector.
+		 * @param array The vector containing the values.
+		 * @param name The title of the new element
+		 * @param count How many values should be output, if ommitted the entire vector.
+		 */
+		XMLElement * AddLongArray(const std::vector<long> & array, const char * name, const char * title, long count=-1);
 		int getElementCount(const char * elementName) const;
 		void ParseNamespaceTags(std::vector<std::string> & tagNames, std::vector<int> & tagIds);
 		void StripNamespaceTags(void);

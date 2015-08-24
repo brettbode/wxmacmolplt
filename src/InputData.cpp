@@ -2604,13 +2604,13 @@ void SCFGroup::WriteToFile(BufferFile *File, InputData *IData) {
 		sprintf(Out, "NCONV=%d ", ConvCriteria);
 		File->WriteLine(Out, false);
 	}
-	if (GetDIIS()) File->WriteLine("DIIS=.T.", false);
-	if (GetSOSCF()) File->WriteLine("SOSCF=.T.", false);
-	if (GetExtrapolation()) File->WriteLine("EXTRAP=.T.", false);
-	if (GetDamp()) File->WriteLine("DAMP=.T.", false);
-	if (GetShift()) File->WriteLine("SHIFT=.T.", false);
-	if (GetRestriction()) File->WriteLine("RSTRCT=.T.", false);
-	if (GetDEM()) File->WriteLine("DEM=.T.", false);
+	if (GetDIIS()) File->WriteLine("DIIS=.T. ", false);
+	if (GetSOSCF()) File->WriteLine("SOSCF=.T. ", false);
+	if (GetExtrapolation()) File->WriteLine("EXTRAP=.T. ", false);
+	if (GetDamp()) File->WriteLine("DAMP=.T. ", false);
+	if (GetShift()) File->WriteLine("SHIFT=.T. ", false);
+	if (GetRestriction()) File->WriteLine("RSTRCT=.T. ", false);
+	if (GetDEM()) File->WriteLine("DEM=.T. ", false);
 		//UHF Natural Orbitals
 	if (GetUHFNO()) {
 		sprintf(Out, "UHFNOS=.TRUE. ");
@@ -2618,14 +2618,14 @@ void SCFGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	}
 	//GVB related items if this is a GVB run
 	if (IData->Control->GetSCFType() == GAMESS_GVB) {
-		sprintf(Out, "NCO=%ld", GVBNumCoreOrbs);
+		sprintf(Out, "NCO=%ld ", GVBNumCoreOrbs);
 		File->WriteLine(Out, false);
 		if (GVBNumPairs>0) {
-			sprintf(Out, "NPAIR=%ld", GVBNumPairs);
+			sprintf(Out, "NPAIR=%ld ", GVBNumPairs);
 			File->WriteLine(Out, false);
 		}
 		if (GVBNumOpenShells>0) {
-			sprintf(Out, "NSETO=%ld", GVBNumOpenShells);
+			sprintf(Out, "NSETO=%ld ", GVBNumOpenShells);
 			File->WriteLine(Out, false);
 			File->WriteLine("NO=", false);
 			std::ostringstream temp;
@@ -2637,6 +2637,7 @@ void SCFGroup::WriteToFile(BufferFile *File, InputData *IData) {
 					temp << "0";	//default value
 				}
 			}
+			temp << " ";
 			File->WriteLine(temp.str().c_str(), false);
 		}
 	}
@@ -2671,14 +2672,7 @@ void SCFGroup::WriteXML(XMLElement * parent) const {
 	if (GetGVBNumOpenShells()>0) {
 		snprintf(line, kMaxLineLength, "%d", GetGVBNumOpenShells());
 		Ele->addChildElement(CML_convert(MMP_IOSGGVBNumOpenShells), line);
-		std::ostringstream temp;
-		for (long i=0; i< GVBOpenShellDeg.size(); i++) {
-			if (i != 0) temp << " ";
-			if (i < GVBOpenShellDeg.size()) {
-				temp << GVBOpenShellDeg[i];
-			}
-		}
-		Ele->addChildElement(CML_convert(MMP_IOSGGVBOpenShellDeg), temp.str().c_str());
+		Ele->AddLongArray(GVBOpenShellDeg, CML_convert(MMP_IOSCFArrayElement), CML_convert(MMP_IOSGGVBOpenShellDeg));
 	}
 }
 void SCFGroup::ReadXML(XMLElement * parent) {
@@ -2750,10 +2744,20 @@ void SCFGroup::ReadXML(XMLElement * parent) {
 						if (child->getLongValue(temp))
 							SetGVBNumOpenShells(temp);
 						break;
-					case MMP_IOSGGVBOpenShellDeg:
-						//This implies that this item must follow the NumOpenShells item.
-						child->getLongArray(GVBNumOpenShells, GVBOpenShellDeg);
+					case MMP_IOSCFArrayElement:
+						//Check the title attribute, but there should be only one array
+						CML_convert(child->getAttributeValue(CML_convert(titleAttr)),item);
+						if (item == MMP_IOSGGVBOpenShellDeg) {
+							//This implies that this item must follow the NumOpenShells item.
+							child->getLongArray(GVBNumOpenShells, GVBOpenShellDeg);
+						}
 						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_("Skipping unknown XML Element: %s"), child->getName());
+						wxLogMessage(msg);
+					}
 				}
 			}
 		}

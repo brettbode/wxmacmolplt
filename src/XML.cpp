@@ -917,6 +917,7 @@ long XMLElement::getLongArray(const long & count, long * array) const {
 	}
 	return readsofar;
 }
+
 long XMLElement::getLongArray(const long & numExpected, std::vector<long> & array) {
 	long readsofar=0;
 	long temp;
