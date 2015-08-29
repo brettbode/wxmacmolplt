@@ -1101,10 +1101,12 @@ void SetupMOScreens(const BasisSet * const Basis, const float * const MOVector, 
 					std::vector<short> & shellsPerAtom, std::vector<float> & reducedVector, std::vector<int> & shellTypes, std::vector<int> &shellIndex, bool UseSphericalHarmonics) {
 	long ivec = 0, nshell=0;
 	long shellCounter=0, atomCounter=0;
+	long atomCount = NumAtoms;
+	if (atomCount > (Basis->BasisMap.size()/2)) atomCount = Basis->BasisMap.size()/2;
 	float VectorSum;
 	const std::vector<BasisShell> & Shells=Basis->Shells;
 	AtomScreen.reserve(NumAtoms);
-	for (long iatom=0; iatom<NumAtoms; iatom++) {
+	for (long iatom=0; iatom<atomCount; iatom++) {
 		bool computeAtom = false;
 		int atomSkip=0;
 		for (long ishell=Basis->BasisMap[2*iatom]; ishell<=Basis->BasisMap[2*iatom+1]; ishell++) {
@@ -1188,7 +1190,7 @@ void SetupMOScreens(const BasisSet * const Basis, const float * const MOVector, 
 	//this may seem redundant but doing it once here pulls some logic out of the loop over grid points so saves a lot later.
 	nshell = 0;
 	ivec = 0;
-	for (int iatom=0; iatom<NumAtoms; iatom++) {
+	for (int iatom=0; iatom<atomCount; iatom++) {
 		int shellpatom=0;
 		for (long ishell=Basis->BasisMap[2*iatom]; ishell<=Basis->BasisMap[2*iatom+1]; ishell++) {
 			//Now multiply by the appropriate x, y, z factors
