@@ -711,10 +711,12 @@ class SCFGroup {
 		long GetGVBNumCoreOrbs(void) const {return GVBNumCoreOrbs;};
 		void SetGVBNumCoreOrbs(const long & nco) {GVBNumCoreOrbs = nco;};
 		long GetGVBNumOpenShells(void) const {return GVBNumOpenShells;};
-		void SetGVBNumOpenShells(const long & no) {GVBNumOpenShells = no;};
+		void SetGVBNumOpenShells(const long & no);
 		long GetGVBNumPairs(void) const {return GVBNumPairs;};
 		void SetGVBNumPairs(const long & npairs) {GVBNumPairs = npairs;};
 		std::vector<long> & GetGVBOpenShellDeg(void) {return GVBOpenShellDeg;};
+		void ClearGVBOpenShellDeg(void) {GVBOpenShellDeg.clear();};
+		void SetGVBNODegValue(int index, long value);
 		void AddGVBOpenShellDeg(const long & d) {GVBOpenShellDeg.push_back(d);};
 		long GetGVBOpenShellDeg(const long & d) {return ((d<GVBOpenShellDeg.size())?GVBOpenShellDeg[d]:0);};
 		SCFGroup(void);

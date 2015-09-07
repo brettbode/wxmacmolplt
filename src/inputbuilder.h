@@ -92,6 +92,11 @@ class wxSpinCtrl;
 #define ID_PLBALANCE_RADIOBOX 10130
 #define ID_EXTERNDATAREP_CHECKBOX 10131
 #define ID_PARALL_CHECK 10243
+#define ID_GVBPANEL 10002
+#define ID_GVB_NCOEDIT 10003
+#define ID_GVB_PAIRSEDIT 10004
+#define ID_GVB_NSETOEDIT 10005
+#define ID_GVB_NOEDIT 10006
 #define ID_IBDFTPANEL 10181
 #define ID_DFTMETHOD_CHOICE 10183
 #define ID_GRID_FUNCTIONAL_CHOICE 10184
@@ -174,6 +179,7 @@ enum {
     CONTROL_PANE,
     DATA_PANE,
     SYSTEM_PANE,
+	GVB_PANE,
     DFT_PANE,
 	FMO_Pane,
     MOGUESS_PANE,
@@ -346,6 +352,18 @@ public:
 
 	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PARALL_CHECK
 	void OnParallCheckClick( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_GVB_NCOEDIT
+	void OnGVBNCOEditTextUpdated( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_GVB_PAIRSEDIT
+	void OnGVBPairsEditTextUpdated( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_GVB_NSETOEDIT
+	void OnGVBNSetOeditTextUpdated( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_GVB_NOEDIT
+	void OnGVBNOeditTextUpdated( wxCommandEvent& event );
 
 	/// wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_DFTMETHOD_CHOICE
 	void OnDftmethodChoiceSelected( wxCommandEvent& event );
@@ -537,7 +555,8 @@ public:
     void SetupControlItems();
     void SetupDataItems();
     void SetupSystemItems();
-    void SetupDFTItems();
+	void SetupGVBItems();
+	void SetupDFTItems();
 	void SetupFMOItems();
     void SetupMOGuessItems();
     void SetupHessOptsItems();
@@ -595,6 +614,11 @@ public:
 	wxRadioBox* plBalanceRadio;
 	wxCheckBox* externDataRepCheck;
 	wxCheckBox* mSGParallCheck;
+	wxTextCtrl* mGVB_NCOEdit;
+	wxTextCtrl* mGVB_PairsEdit;
+	wxTextCtrl* mGVB_NSETOEdit;
+	wxStaticText* mGVB_NOStatic;
+	wxTextCtrl* mGVB_NOEdit;
 	wxUglyChoice* dftMethodChoice;
 	wxBoxSizer* funcSizer;
 	wxUglyChoice* dftGridFuncChoice;

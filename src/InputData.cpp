@@ -2748,6 +2748,7 @@ void SCFGroup::ReadXML(XMLElement * parent) {
 						//Check the title attribute, but there should be only one array
 						CML_convert(child->getAttributeValue(CML_convert(titleAttr)),item);
 						if (item == MMP_IOSGGVBOpenShellDeg) {
+							GVBOpenShellDeg.clear();
 							//This implies that this item must follow the NumOpenShells item.
 							child->getLongArray(GVBNumOpenShells, GVBOpenShellDeg);
 						}
@@ -2762,6 +2763,19 @@ void SCFGroup::ReadXML(XMLElement * parent) {
 			}
 		}
 		delete children;
+	}
+}
+void SCFGroup::SetGVBNumOpenShells(const long &no) {
+	if (no >= 0) {
+		GVBNumOpenShells = no;
+		for (int i=GVBOpenShellDeg.size(); i<GVBNumOpenShells; i++) {
+			GVBOpenShellDeg.push_back(0);	//The GAMESS default is 0, maybe 1 is a better default?
+		}
+	}
+}
+void SCFGroup::SetGVBNODegValue(int index, long value) {
+	if ((index >= 0)&&(value >= 0)&&(index < GVBOpenShellDeg.size())) {
+		GVBOpenShellDeg[index] = value;
 	}
 }
 #pragma mark MP2Group
