@@ -233,6 +233,26 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				MainData->InputOptions->SCF->SetConvergance(nAtoms);
 			if (ReadBooleanKeyword(Line, "UHFNOS", &BoolTest))
 				MainData->InputOptions->SCF->SetUHFNO(BoolTest);
+			if (ReadLongKeyword(Line, "NCO", &nAtoms))
+				MainData->InputOptions->SCF->SetGVBNumCoreOrbs(nAtoms);
+			if (ReadLongKeyword(Line, "NPAIR", &nAtoms))
+				MainData->InputOptions->SCF->SetGVBNumPairs(nAtoms);
+			if (ReadLongKeyword(Line, "NSETO", &nAtoms))
+				MainData->InputOptions->SCF->SetGVBNumOpenShells(nAtoms);
+			if (ReadStringKeyword(Line, "NO(1)", token)) {
+				int nchar = 0;
+				int tlen = strlen(token);
+				MainData->InputOptions->SCF->ClearGVBOpenShellDeg();
+				while (nchar < tlen) {
+					int nchar2=0;
+					long shellDeg;
+					if (sscanf(&(token[nchar]), "%ld%n", &shellDeg, &nchar2) == 1) {
+						nchar += nchar2+1;
+						MainData->InputOptions->SCF->AddGVBOpenShellDeg(shellDeg);
+					} else
+						break;
+				}
+			}
 			
 			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
 														//scan for multiple occurances of this group
@@ -2799,7 +2819,6 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 						Buffer->GetLine(LineText);
 						sscanf(LineText, " NPAIR  =%ld NSETO  =%ld", &NumGVBPairs, &NumOpenOrbs);
 						MainData->InputOptions->SCF->SetGVBNumPairs(NumGVBPairs);
-						MainData->InputOptions->SCF->SetGVBNumOpenShells(NumOpenOrbs);
 						if (NumOpenOrbs>0) {
 							//If there are Open Shells we need to parse the degeneracy of each shell
 							//This is a space separated list starting with NO =
@@ -2817,6 +2836,8 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 										break;
 								}
 							}
+							//Set this after reading in NO so no need to clear the NO array
+							MainData->InputOptions->SCF->SetGVBNumOpenShells(NumOpenOrbs);
 						}
 							Occupancy = new float[MainData->GetNumBasisFunctions()];
 							if (!Occupancy) throw MemoryError();
