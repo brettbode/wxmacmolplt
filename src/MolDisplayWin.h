@@ -357,6 +357,7 @@ class MolDisplayWin : public wxFrame {
 		void menuViewShrink_10(wxCommandEvent &event);
 		void menuViewEnlarge_10(wxCommandEvent &event);
 		void menuViewCenter(wxCommandEvent &event);
+		void menuViewToggleAutoRotation(wxCommandEvent &event);
 		void menuViewRotateInPlace(const Matrix4D new_m);
 		void menuViewRotateTo_X_axis(wxCommandEvent &event);
 		void menuViewRotateTo_Y_axis(wxCommandEvent &event);

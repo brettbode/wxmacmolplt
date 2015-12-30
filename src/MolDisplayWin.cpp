@@ -97,6 +97,7 @@ enum MMP_EventID {
 	MMP_ADDDIHEDRALANNOTATION,
 	MMP_DELETEALLANNOTATIONS,
 	MMP_CENTER,
+	MMP_AUTOROTATE,
 	MMP_ROTATESUBMENU,
 	MMP_ROTATETOXAXIS,
 	MMP_ROTATETOYAXIS,
@@ -564,6 +565,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuView->Append(MMP_SHRINK10, wxT("&Shrink 10%\tCtrl-down"), _T("Reduce size by 10%"));
 	menuView->Append(MMP_ENLARGE10, wxT("&Enlarge 10%\tCtrl-up"), _T("Enlarge size by 10%"));
 	menuView->Append(MMP_CENTER, wxT("&Center View"), _T("Center the molecule in the window"));
+	menuView->Append(MMP_AUTOROTATE, wxT("Start AutoRotation"), _T("Start/Stop the molecule autorotation"));
 	
 	menuViewRotate = new wxMenu;
 	menuView->Append(MMP_ROTATESUBMENU, wxT("&Rotate ..."), menuViewRotate);
@@ -2417,6 +2419,9 @@ void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
 	MainData->CenterModelWindow();
 	ResetModel(false);
 	Dirtify();
+}
+void MolDisplayWin::menuViewToggleAutoRotation(wxCommandEvent &event) {
+//	toggle the autorotation flag and start/stop the timer.
 }
 void MolDisplayWin::OnModeAnimation(wxTimerEvent & event) {
 	if (ModeAnimationData) {
@@ -4419,6 +4424,7 @@ EVT_UPDATE_UI (MMP_ANNOTATIONSSUBMENU,   MolDisplayWin::OnAnnotationLengthUpdate
 	EVT_MENU (MMP_SHRINK10,         MolDisplayWin::menuViewShrink_10)
 	EVT_MENU (MMP_ENLARGE10,        MolDisplayWin::menuViewEnlarge_10)
 	EVT_MENU (MMP_CENTER,           MolDisplayWin::menuViewCenter)
+	EVT_MENU (MMP_AUTOROTATE,       MolDisplayWin::menuViewToggleAutoRotation)
 	EVT_MENU (MMP_ROTATETOXAXIS,    MolDisplayWin::menuViewRotateTo_X_axis)
 	EVT_MENU (MMP_ROTATETOYAXIS,    MolDisplayWin::menuViewRotateTo_Y_axis)
 	EVT_MENU (MMP_ROTATETOZAXIS,    MolDisplayWin::menuViewRotateTo_Z_axis)
