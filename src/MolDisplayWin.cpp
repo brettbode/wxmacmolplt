@@ -339,6 +339,10 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	SetMenuBar(menuBar);
 	/* SizeChanged(); */
 	glCanvas->SetFocus();
+		
+		//init the inertia for the autorotation to something reasonable
+	inertia.x = 5;
+	inertia.y = 5;
 	
 	/* Show(true); */
 	AdjustMenus();
@@ -850,6 +854,13 @@ void MolDisplayWin::OnShowPatternUpdate( wxUpdateUIEvent& event ) {
 void MolDisplayWin::OnEFPWireFrameUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(MainData->FragmentNames.size()>0);
 	event.Check(Prefs->ShowEFPWireFrame());
+}
+void MolDisplayWin::OnAutoRotationUpdate( wxUpdateUIEvent& event ) {
+	if (rotate_timer.IsRunning()) {
+		event.SetText(wxT("Stop AutoRotation"));
+	} else {
+		event.SetText(wxT("Start AutoRotation"));
+	}
 }
 void MolDisplayWin::OnShowPointGroupUpdate( wxUpdateUIEvent& event ) {
 	event.Enable(false);
@@ -2421,7 +2432,11 @@ void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
 	Dirtify();
 }
 void MolDisplayWin::menuViewToggleAutoRotation(wxCommandEvent &event) {
-//	toggle the autorotation flag and start/stop the timer.
+	if (rotate_timer.IsRunning()) {
+		rotate_timer.Stop();
+	} else {
+		rotate_timer.Start(33, false);
+	}
 }
 void MolDisplayWin::OnModeAnimation(wxTimerEvent & event) {
 	if (ModeAnimationData) {
@@ -3871,9 +3886,9 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 		if (mouse_start.x == 0 && mouse_start.y == 0) {
 			mouse_start = ScreenToClient(wxGetMousePosition());
 		}
-
-		inertia.x = 0;
-		inertia.y = 0;
+		//not sure that the following clear is needed.
+	//	inertia.x = 0;
+	//	inertia.y = 0;
 		if (rotate_timer.IsRunning()) {
 			rotate_timer.Stop();
 		}
@@ -4425,6 +4440,7 @@ EVT_UPDATE_UI (MMP_ANNOTATIONSSUBMENU,   MolDisplayWin::OnAnnotationLengthUpdate
 	EVT_MENU (MMP_ENLARGE10,        MolDisplayWin::menuViewEnlarge_10)
 	EVT_MENU (MMP_CENTER,           MolDisplayWin::menuViewCenter)
 	EVT_MENU (MMP_AUTOROTATE,       MolDisplayWin::menuViewToggleAutoRotation)
+	EVT_UPDATE_UI (MMP_AUTOROTATE,   MolDisplayWin::OnAutoRotationUpdate)
 	EVT_MENU (MMP_ROTATETOXAXIS,    MolDisplayWin::menuViewRotateTo_X_axis)
 	EVT_MENU (MMP_ROTATETOYAXIS,    MolDisplayWin::menuViewRotateTo_Y_axis)
 	EVT_MENU (MMP_ROTATETOZAXIS,    MolDisplayWin::menuViewRotateTo_Z_axis)
