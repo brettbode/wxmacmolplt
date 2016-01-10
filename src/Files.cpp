@@ -5963,6 +5963,9 @@ long SetAtomType(const unsigned char *TestLabel) {
 				case 'r':			/* Lawrencium */
 					result = 103;
 					break;
+				case 'v':			/* Livermorium */
+					result = 116;
+					break;
 			}
 			break;
 		case 'B':
@@ -6079,6 +6082,9 @@ long SetAtomType(const unsigned char *TestLabel) {
 				case 'm':			/* Fermium */
 					result = 100;
 					break;
+				case 'l':			/* Flerovium */
+					result = 114;
+					break;
 				default:			/* Fluorine */
 					result = 9;
 					break;
@@ -6154,7 +6160,7 @@ long SetAtomType(const unsigned char *TestLabel) {
 				case 'm':			/* Samarium */
 					result = 62;
 					break;
-				case 'g':
+				case 'g':			/* Seaborgium */
 					result = 106;
 					break;
 				default:			/* Sulfur */

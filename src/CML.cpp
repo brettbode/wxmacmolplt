@@ -4237,19 +4237,19 @@ const char * CML_TypetoName(short t) {
 		case 109:
 			return "Mt";
 		case 110:
-			return "Uun";
+			return "Ds";
 		case 111:
-			return "Uuu";
+			return "Rg";
 		case 112:
-			return "Uub";
+			return "Cn";
 		case 113:
 			return "Uut";
 		case 114:
-			return "Uuq";
+			return "Fl";
 		case 115:
 			return "Uup";
 		case 116:
-			return "Uuh";
+			return "Lv";
 		case 117:
 			return "Uus";
 		case 118:

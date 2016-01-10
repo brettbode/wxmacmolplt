@@ -331,25 +331,25 @@
 <Atom Number="107" Size="143" Mass="16.1864" Label="Bh">
 <Color red="0" green="0" blue="0" pattern="31"></Color>
 </Atom>
-<Atom Number="108" Size="140" Mass="16.2788" Label="Hs">
+<Atom Number="108" Size="134" Mass="16.2788" Label="Hs">
 <Color red="0" green="0" blue="0" pattern="32"></Color>
 </Atom>
-<Atom Number="109" Size="140" Mass="16.3095" Label="Mt">
+<Atom Number="109" Size="129" Mass="16.3095" Label="Mt">
 <Color red="0" green="0" blue="0" pattern="33"></Color>
 </Atom>
-<Atom Number="110" Size="140" Mass="16.7631" Label="Ds">
+<Atom Number="110" Size="128" Mass="16.7631" Label="Ds">
 <Color red="0" green="0" blue="0" pattern="34"></Color>
 </Atom>
-<Atom Number="111" Size="140" Mass="16.4924" Label="Rg">
+<Atom Number="111" Size="121" Mass="16.4924" Label="Rg">
 <Color red="0" green="0" blue="0" pattern="35"></Color>
 </Atom>
-<Atom Number="112" Size="145" Mass="16.8819" Label="Cn">
+<Atom Number="112" Size="122" Mass="16.8819" Label="Cn">
 <Color red="0" green="0" blue="0" pattern="36"></Color>
 </Atom>
-<Atom Number="113" Size="150" Mass="0" Label="un">
+<Atom Number="113" Size="130" Mass="16.911" Label="Uut">
 <Color red="0" green="0" blue="0" pattern="37"></Color>
 </Atom>
-<Atom Number="114" Size="147" Mass="0" Label="un">
+<Atom Number="114" Size="175" Mass="17" Label="Fl">
 <Color red="0" green="0" blue="0" pattern="0"></Color>
 </Atom>
 <Atom Number="115" Size="30" Mass="0" Label="G">
