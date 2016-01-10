@@ -80,7 +80,7 @@ void WinPrefs::CopyAtomPrefs(WinPrefs * Orig) {
 	memcpy((Ptr) AtomColors, Orig->AtomColors, kMaxAtomTypes*sizeof(RGBColor));
 	memcpy((Ptr) AtomPatterns, Orig->AtomPatterns, kMaxAtomTypes*sizeof(short));
 	memcpy((Ptr) AtomLabels, Orig->AtomLabels, kMaxAtomTypes*3*sizeof(char));
-	memcpy((Ptr) AtomSizes, Orig->AtomSizes, kMaxAtomTypes*sizeof(int));
+	memcpy((Ptr) AtomSizes, Orig->AtomSizes, kMaxAtomTypes*sizeof(long));
 	memcpy((Ptr) AtomMasses, Orig->AtomMasses, kMaxAtomTypes*sizeof(float));
 }
 
@@ -275,6 +275,8 @@ WinPrefs::WinPrefs(void) {
 		BondColors[i].red = BondColors[i].green = BondColors[i].blue = 0;
 		BondPatterns[i]=0;
 	}
+	// The following sets a few basic defaults in case no preferences file is found. Normally
+	// this will be overwritten by reading the global preferences file and then the user prefs.
 	AtomLabels[0][0] = 'H';
 	AtomSizes[0] = 37;
 	AtomMasses[0] = 1.0039;
