@@ -7,24 +7,24 @@ dnl AC_REVISION
 AM_MAINTAINER_MODE
 
 AC_CANONICAL_HOST
-LIBGL=
+GLU_LIBS=
 HOST=
 case "${host}" in
    *msvc*)
       HOST=MSW 
-      LIBGL="-lopengl32 -lglu32"
+      GLU_LIBS="-lopengl32 -lglu32"
       ;;
    *darwin*)
       HOST=OSX 
-      LIBGL="-framework OpenGL"
+      GLU_LIBS="-framework OpenGL"
       ;;
    *)
       HOST=LINUX
-      LIBGL="-lGL -lGLU"
+      PKG_CHECK_MODULES([GLU], [glu], [], [GLU_LIBS="-lGL -lGLU"])
       ;;
 esac
 AM_CONDITIONAL(HOST_IS_MSW, [test "x$HOST" == xMSW])
-AC_SUBST([LIBGL])
+AC_SUBST([GLU_LIBS])
 
 #
 # There isn't a reliable way to know we should use the Apple OpenGL framework
@@ -53,13 +53,18 @@ AC_ARG_WITH(ming,
                           using the ming library; (default=yes)]],
 [],
 [with_ming=yes])
-LIBMING=
+
+MING_LIBS=
+
 AS_IF([test "x$with_ming" != xno],
 [AC_CHECK_LIB([ming], [Ming_init],
-    [AC_SUBST([LIBMING], ["-lming"]) AC_DEFINE([HAVE_LIBMING])],
+    [PKG_CHECK_MODULES([MING], [libming], [], [MING_LIBS="-lming"])
+     AC_DEFINE([HAVE_LIBMING])],
     [if test "x$with_ming" != xyes ; then
         AC_MSG_FAILURE([--with-ming was given, but test for ming failed])
     fi], -lpng)])
+
+AC_SUBST([MING_LIBS])
 
 AC_ARG_WITH(glew,
 [[  --with-glew             Use the system provided glew library instead of 
@@ -67,16 +72,18 @@ AC_ARG_WITH(glew,
 [],
 [with_glew=check])
 
-LIBGLEW=
+GLEW_LIBS=
 
 AS_IF([test "x$with_glew" != xno],
       [AC_CHECK_LIB([GLEW], [glewInit],
-    [AC_SUBST([LIBGLEW], ["-lGLEW"]) AC_DEFINE([SYSTEM_GLEW])],
+    [PKG_CHECK_MODULES([GLEW], [glew], [], [GLEW_LIBS="-lGLEW"])
+     AC_DEFINE([SYSTEM_GLEW])],
     [if test "x$with_glew" = xyes; then
         AC_MSG_FAILURE([--with-glew was given, but test for glew failed])
     fi])])
 
-AM_CONDITIONAL([SYSTEM_GLEW], [test $LIBGLEW = "-lGLEW"])
+AM_CONDITIONAL([SYSTEM_GLEW], [test "x$ac_cv_lib_GLEW_glewInit" = xyes])
+AC_SUBST([GLEW_LIBS])
 
 WXCONFIG=wx-config
 AC_ARG_WITH(wx-config,
