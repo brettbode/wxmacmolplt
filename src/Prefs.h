@@ -202,6 +202,7 @@ class WinPrefs {
 		char *			RendererName;
 		Boolean			RotateMode, AnimateMode, AutoBondFlag, HHBondFlag, SetCreator;
 		bool			FitToPage, CenterOnPage, FrameOnPage, SymbolLabels, NumberLabels, ShowSymOps,
+						AutoRotating,		///< Is the window set to auto-rotate?
 						AllowAutoRotation;	///< Flag to enable/disable autorotation
 		EnergyOptions	EnergyPlotOptions;
 		GraphOptions	PlotOptions;
@@ -209,7 +210,7 @@ class WinPrefs {
 		FrequencyWindowOptions	FreqWinOpts;
 		bool show_toolbar;
 		int shader_mode;
-		int lineWidth;
+		int lineWidth, autoSpeedX, autoSpeedY, autoSpeedZ;
 
 	public:
 		WinPrefs(void);
@@ -286,8 +287,16 @@ class WinPrefs {
 		inline void ShowSymmetryOperators(bool v) {ShowSymOps = v;};
 		/// Flag to determine wether to allow the auto rotate feature
 		inline bool AutoRotationEnabled(void) const {return AllowAutoRotation;};
-		/// Set function to allow auto rotation
+		/// Set function to allow auto rotation via the click and drag method
 		inline void EnableAutoRotation(bool v) {AllowAutoRotation = v;};
+		/// Is the window set to be auto-rotating
+		inline bool isAutoRotating(void) const {return AutoRotating;};
+		/// Set function for the auto rotation feature
+		inline void SetAutoRotating(bool v) {AutoRotating = v;};
+		/// Set the x, y and z components for the auto rotation direction
+		inline void SetAutoRotationVector(int x, int y, int z) {autoSpeedX = x; autoSpeedY = y; autoSpeedZ = z;};
+		/// Get the components for the auto rotation vector
+		inline void GetAutoRotationVector(int & x, int & y, int & z) {x = autoSpeedX; y = autoSpeedY; z = autoSpeedZ;};
 		//Note the meaning of the Native EOL bit is reversed
 		inline bool NativeEOLChar(void) const {return ((BitOptions & (1<<11))?false:true); };
 		inline void NativeEOLChar(bool newVal) {BitOptions = (BitOptions & 0xFFFFF7FF) + (newVal?0:(1<<11));};

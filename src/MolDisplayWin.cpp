@@ -341,8 +341,8 @@ MolDisplayWin::MolDisplayWin(const wxString &title,
 	glCanvas->SetFocus();
 		
 		//init the inertia for the autorotation to something reasonable
-	inertia.x = 5;
-	inertia.y = 5;
+	inertia.x = 1;
+	inertia.y = 1;
 	
 	/* Show(true); */
 	AdjustMenus();
@@ -2434,8 +2434,12 @@ void MolDisplayWin::menuViewCenter(wxCommandEvent &event) {
 void MolDisplayWin::menuViewToggleAutoRotation(wxCommandEvent &event) {
 	if (rotate_timer.IsRunning()) {
 		rotate_timer.Stop();
+		Prefs->SetAutoRotating(false);
 	} else {
+		int z;
+		Prefs->GetAutoRotationVector(inertia.x, inertia.y, z);
 		rotate_timer.Start(33, false);
+		Prefs->SetAutoRotating(true);
 	}
 }
 void MolDisplayWin::OnModeAnimation(wxTimerEvent & event) {
@@ -3708,6 +3712,7 @@ long MolDisplayWin::OpenCMLFile(BufferFile * Buffer, bool readPrefs, bool readWi
 				//I don't think the prefs window should reopen automatically?
 			if (winData.PrefsWindowVisible()) winData.PrefsWindowVisible(false);
 			if (winData.ZMatWindowVisible()) menuWindowZMatrixCalc(foo);
+			if (Prefs->isAutoRotating()) menuViewToggleAutoRotation(foo);
 			Raise();
 		}
 	} else
@@ -3831,9 +3836,9 @@ void MolDisplayWin::OnRotateTimer(wxTimerEvent& event) {
 	wxMouseEvent mouse_event = wxMouseEvent(wxEVT_MOTION);
 	mouse_event.m_leftDown = true;
 	Rotate(mouse_event);
-	if (!Prefs->AutoRotationEnabled()) {
-		rotate_timer.Stop();
-	}
+//	if (!Prefs->AutoRotationEnabled()) {
+//		rotate_timer.Stop();
+//	}
 }
 
 void MolDisplayWin::Rotate(wxMouseEvent &event) {
@@ -3891,6 +3896,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	//	inertia.y = 0;
 		if (rotate_timer.IsRunning()) {
 			rotate_timer.Stop();
+			Prefs->SetAutoRotating(false);
 		}
 	}
 	
@@ -4004,6 +4010,8 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	else if (event.LeftUp() && Prefs->AutoRotationEnabled()) {
 		if (abs(inertia.x) > 3 || abs(inertia.y) > 3) {
 			rotate_timer.Start(33, false);
+			Prefs->SetAutoRotating(true);
+			Prefs->SetAutoRotationVector(inertia.x, inertia.y, 0);
 		}
 	}
 	// No matter what mouse button/key combination we have, we update

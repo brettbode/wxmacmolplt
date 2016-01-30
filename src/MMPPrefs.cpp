@@ -325,6 +325,9 @@ WinPrefs::WinPrefs(void) {
 	show_toolbar = false;
 	shader_mode = 0;
 	AllowAutoRotation = true;
+	AutoRotating = false;
+	autoSpeedX = autoSpeedY = 1;
+	autoSpeedZ = 0;
 	lineWidth = 1;
 }
 
@@ -624,12 +627,20 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 			{
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AnimateTime), longVal))
 					SetAnimateTime(longVal);
-				if (child->getAttributeValue(MMPPref_convert(MMP_ShowToolbar), boolVal)) {
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowToolbar), boolVal)) {
 					show_toolbar = boolVal;
 				}
-				if (child->getAttributeValue(MMPPref_convert(MMP_AutoRotateEnabled), boolVal)) {
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotateEnabled), boolVal)) {
 					AllowAutoRotation = boolVal;
 				}
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotating), boolVal))
+					AutoRotating = boolVal;
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotationX), longVal))
+					autoSpeedX = longVal;
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotationY), longVal))
+					autoSpeedY = longVal;
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotationZ), longVal))
+					autoSpeedZ = longVal;
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DAtomQuality), longVal))
 					SetQD3DAtomQuality(longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_BondWidth), floatVal))
@@ -1012,8 +1023,12 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	std::ostringstream outbuf;
 	XMLElement * molElement = root->addChildElement(MMPPref_convert(MMPPref_MolDisplayPrefs));
 
-	molElement->addBoolAttribute(MMPPref_convert(MMP_ShowToolbar), show_toolbar);
-	molElement->addBoolAttribute(MMPPref_convert(MMP_AutoRotateEnabled), AllowAutoRotation);
+	molElement->addBoolAttribute(MMPPref_convert(MMPMolDisplay_ShowToolbar), show_toolbar);
+	molElement->addBoolAttribute(MMPPref_convert(MMPMolDisplay_AutoRotateEnabled), AllowAutoRotation);
+	molElement->addBoolAttribute(MMPPref_convert(MMPMolDisplay_AutoRotating), AutoRotating);
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_AutoRotationX), autoSpeedX);
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_AutoRotationY), autoSpeedY);
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_AutoRotationZ), autoSpeedZ);
 	outbuf << GetAnimateTime();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_AnimateTime), outbuf.str().c_str());
 	outbuf.str("");
@@ -1436,7 +1451,7 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "BondOrder";
         case MMPMolDisplay_AnimateTime:
             return "AnimationDelay";
-        case MMP_ShowToolbar:
+        case MMPMolDisplay_ShowToolbar:
             return "ShowToolbar";
 		case MMPMolDisplay_3DAtomQuality:
             return "Atom3DQuality";
@@ -1498,8 +1513,16 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "ShowSymmetryOperators";
         case MMPMolDisplay_ShowAtomPatterns:
             return "ShowAtomPatterns";
-        case MMP_AutoRotateEnabled:
+        case MMPMolDisplay_AutoRotateEnabled:
             return "AutoRotationAllowed";
+		case MMPMolDisplay_AutoRotating:
+			return "AutoRotating";
+		case MMPMolDisplay_AutoRotationX:
+			return "AutoRotationSpeedX";
+		case MMPMolDisplay_AutoRotationY:
+			return "AutoRotationSpeedY";
+		case MMPMolDisplay_AutoRotationZ:
+			return "AutoRotationSpeedZ";
 		default:
             return "invalid";
     }
