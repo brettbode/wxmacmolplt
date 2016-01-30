@@ -248,7 +248,7 @@ void setPreference::userDefaults( wxCommandEvent& WXUNUSED(event) ) {
 
 }
 
-void setPreference::OnApply( wxCommandEvent& WXUNUSED(event) ) {
+void setPreference::OnApply( wxCommandEvent& event ) {
 	saveCurrPrefs(currPanel);
 
 	if (!mIsGlobal) {

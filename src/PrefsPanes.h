@@ -273,6 +273,7 @@ class QD3DPrefsPane : public PrefsPane {
 
 		void OnShaderChoice(wxCommandEvent& event);
 		void OnSliderUpdate( wxCommandEvent &event );
+		void OnSpinChange(wxSpinEvent & event);
 
 	private:
 		wxFlexGridSizer *mMainSizer;

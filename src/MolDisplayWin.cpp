@@ -3835,10 +3835,9 @@ void MolDisplayWin::OnRotateTimer(wxTimerEvent& event) {
 
 	wxMouseEvent mouse_event = wxMouseEvent(wxEVT_MOTION);
 	mouse_event.m_leftDown = true;
+	int z;
+	Prefs->GetAutoRotationVector(inertia.x, inertia.y, z);
 	Rotate(mouse_event);
-//	if (!Prefs->AutoRotationEnabled()) {
-//		rotate_timer.Stop();
-//	}
 }
 
 void MolDisplayWin::Rotate(wxMouseEvent &event) {

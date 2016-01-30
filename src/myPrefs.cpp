@@ -74,6 +74,8 @@
 #define ID_ATOM_LABEL_SLIDER	5039
 #define ID_ANNOTATION_SLIDER	5040
 #define ID_SHADER_CHOICE 5041
+#define ID_3D_AUTOROTATIONX_SPIN 5042
+#define ID_3D_AUTOROTATIONY_SPIN 5043
 
 #include "GlobalExceptions.h"
 #include "MyTypes.h"
@@ -84,6 +86,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <wx/colordlg.h>
+#include <wx/spinctrl.h>
 
 using namespace std;
 
@@ -151,6 +154,8 @@ BEGIN_EVENT_TABLE(QD3DPrefsPane, wxPanel)
 	EVT_SLIDER(ID_LINE_WIDTH_SLIDER, QD3DPrefsPane::OnSliderUpdate)
 	EVT_SLIDER(ID_DEPTH_CUEING_SLIDER, QD3DPrefsPane::OnSliderUpdate)
 	EVT_CHOICE(ID_SHADER_CHOICE, QD3DPrefsPane::OnShaderChoice)
+	EVT_SPINCTRL(ID_3D_AUTOROTATIONX_SPIN, QD3DPrefsPane::OnSpinChange)
+	EVT_SPINCTRL(ID_3D_AUTOROTATIONY_SPIN, QD3DPrefsPane::OnSpinChange)
 END_EVENT_TABLE()
 
 PrefsPane::PrefsPane(MolDisplayWin* targetWindow,
@@ -1167,7 +1172,7 @@ void SurfacePrefsPane::OnCheckBox(wxCommandEvent& event) {
 QD3DPrefsPane::QD3DPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent, WinPrefs* targetPrefs, Boolean GlobalPrefs)
 	: PrefsPane(targetWindow, targetPrefs, kQD3DPrefsPane, GlobalPrefs, parent) {
 
-	mMainSizer = new wxFlexGridSizer(9, 2, 6, 0);
+	mMainSizer = new wxFlexGridSizer(11, 2, 5, 0);
 	mMainSizer->AddGrowableCol(0);
 	mMainSizer->AddGrowableCol(1);
 
@@ -1251,6 +1256,21 @@ void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
 	mAutoRotateCheck->SetValue(mTargetPrefs->AutoRotationEnabled());
 	mMainSizer->Add(new wxStaticText(this, wxID_ANY, wxT("")), 0, rflags, 3);
 	mMainSizer->Add(mAutoRotateCheck, 0, lflags, 3);
+	mAutoRotateCheck->SetToolTip(_("Check to enable drag and release in the main display to start auto-rotation"));
+
+	int xv,yv,zv;
+	mTargetPrefs->GetAutoRotationVector(xv, yv, zv);
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _("Rotation speed in X")), 0, rflags, 3);
+	wxSpinCtrl  * mspin = new wxSpinCtrl(this, ID_3D_AUTOROTATIONX_SPIN);
+	mspin->SetRange(-100, 100);
+	mspin->SetValue(xv);
+	mMainSizer->Add(mspin, 0, lflags, 3);
+	
+	mMainSizer->Add(new wxStaticText(this, wxID_ANY, _("Rotation speed in Y")), 0, rflags, 3);
+	mspin = new wxSpinCtrl(this, ID_3D_AUTOROTATIONY_SPIN);
+	mspin->SetRange(-100, 100);
+	mspin->SetValue(yv);
+	mMainSizer->Add(mspin, 0, lflags, 3);
 }
 
 void QD3DPrefsPane::saveToTempPrefs() {
@@ -1277,4 +1297,18 @@ void QD3DPrefsPane::OnSliderUpdate(wxCommandEvent &event) {
 		mTargetPrefs->SetQD3DLineWidth((float)(mSld[4]->GetValue())/10000);
 	if (id == ID_DEPTH_CUEING_SLIDER)
 		mTargetPrefs->SetGLFOV((float)(mSld[5]->GetValue()));
+}
+
+void QD3DPrefsPane::OnSpinChange(wxSpinEvent & event) {
+	int id = event.GetId();
+	int val = event.GetValue();
+	
+	int xv, yv, zv;
+	mTargetPrefs->GetAutoRotationVector(xv, yv, zv);
+	if (id == ID_3D_AUTOROTATIONX_SPIN) {
+		xv = val;
+	} else { //other option is Y
+		yv = val;
+	}
+	mTargetPrefs->SetAutoRotationVector(xv, yv, zv);
 }
