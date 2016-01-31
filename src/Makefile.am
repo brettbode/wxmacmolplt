@@ -80,7 +80,7 @@ wxmacmolplt_SOURCES += glew.cpp glew.h glxew.h wglew.h
 endif
 
 AM_CXXFLAGS = $(WX_CXXFLAGS)
-wxmacmolplt_LDADD = $(WX_LIBS) $(LIBMING) $(LIBGL) $(LIBGLEW)
+wxmacmolplt_LDADD = $(WX_LIBS) $(MING_LIBS) $(GLU_LIBS) $(GLEW_LIBS)
 wxmacmolplt_LDFLAGS = $(WX_CXXFLAGS)
 EXTRA_DIST = wxMacMolPlt.pjd xpms/arrow.xpm \
 	xpms/hand.xpm xpms/rect_lasso.xpm xpms/view.xpm
