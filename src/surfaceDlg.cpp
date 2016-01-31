@@ -536,6 +536,9 @@ void OrbSurfacePane::makeMOList() {
 		//validate Frame and orbitals and skip if AOs are chosen
 	if (lFrame && (Orbs->size() > 0) && !(OrbOptions&1)) {
 		OrbitalRec * lMOs = NULL;
+		//defaultOrb will be a bit sloppy and set more often to position the list in the active space
+		//HOMOOrb will be set when there is a clear Orb (RHF, UHF,...)
+		long defaultOrb = -1, HOMOOrb = -1;
 
 		if ((TargetSet < Orbs->size())&&(TargetSet >= 0)) 
 			lMOs = (*Orbs)[TargetSet];
@@ -552,17 +555,31 @@ void OrbSurfacePane::makeMOList() {
 				SymLabel = lMOs->SymType;
 				Energy = lMOs->Energy;
 				OccNum = lMOs->OrbOccupation;
+				defaultOrb = lMOs->getNumOccupiedAlphaOrbitals()-1;
 			} else {
 				NumMOs=lMOs->NumBetaOrbs;
 				SymLabel = lMOs->SymTypeB;
 				Energy = lMOs->EnergyB;
 				OccNum = lMOs->OrbOccupationB;
+				defaultOrb = lMOs->getNumOccupiedBetaOrbitals()-1;
 			}
 
 			char* oneSymLabel;
+			if ((lMOs->getOrbitalWavefunctionType() == RHF)|| (lMOs->getOrbitalWavefunctionType() == UHF)||
+				(lMOs->getOrbitalWavefunctionType() == ROHF)) HOMOOrb = defaultOrb;
+			if (OccNum) {
+				long i=0;
+				while ((OccNum[i] > 0.85)&&(i<NumMOs)) {
+					defaultOrb = i;
+					i++;
+				}
+			}
 
 			for (int theCell = 0; theCell < NumMOs; theCell++) {
-				tmpStr.Printf(wxT("<table width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), theCell+1); 
+				if (theCell != HOMOOrb)
+					tmpStr.Printf(wxT("<table width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), theCell+1);
+				else
+					tmpStr.Printf(wxT("<table style=\"background:#80BFFF\" width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), theCell+1);
 
 				tmpStr.Append(wxT("<td width=\"40%%\">"));
 				if (SymLabel) {	//Add the symetry of the orb, if known
@@ -638,6 +655,7 @@ void OrbSurfacePane::makeMOList() {
 			}
 		}
 		mMOList->DoneAppending();
+		if (defaultOrb >= 0) mMOList->SetSelection(defaultOrb);
 	}
 }
 
@@ -1328,6 +1346,11 @@ void Orbital2DSurfPane::CreateControls() {
 
 	mMOList = new FormattedListBox(this, ID_ATOM_LIST, wxLB_SINGLE | wxLB_ALWAYS_SB);
 	makeMOList();
+	if (PlotOrb < 0) { // If there is no previous selection & we have MOs pull the default out of the MOList
+		if (!(OrbOptions&1)) {//MOs
+			PlotOrb = mMOList->GetSelection();
+		}
+	}
 
 		/* wxListBox(this, ID_ATOM_LIST, */
 			/* wxDefaultPosition, wxSize(150,180), */
@@ -1844,6 +1867,11 @@ void Orbital3DSurfPane::CreateControls() {
 
 	mMOList = new FormattedListBox(this, ID_ATOM_LIST, wxLB_SINGLE);
 	makeMOList();
+	if (PlotOrb < 0) { // If there is no previous selection & we have MOs pull the default out of the MOList
+		if (!(OrbOptions&1)) {//MOs
+			PlotOrb = mMOList->GetSelection();
+		}
+	}
 
 	/* vector<wxString> choices3; */
 	mOrbCoef = new FormattedListBox(this, ID_ORB_COEF, wxLB_SINGLE);
