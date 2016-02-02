@@ -86,7 +86,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <wx/colordlg.h>
-#include <wx/spinctrl.h>
 
 using namespace std;
 

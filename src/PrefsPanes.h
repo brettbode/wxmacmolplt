@@ -22,6 +22,7 @@
 #include <wx/bookctrl.h>
 #include <wx/fontdlg.h>
 #include "MolDisplayWin.h"
+#include <wx/spinctrl.h>
 ////@end includes
 
 class colorArea;
