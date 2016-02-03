@@ -2069,7 +2069,7 @@ void InputBuilderWindow::SetupGVBItems() {
 			if (i>0) degString << " ";
 			degString << t[i];
 		}
-		mGVB_NOEdit->SetValue(degString.str());
+		mGVB_NOEdit->SetValue(wxString(degString.str().c_str(), wxConvUTF8));
 	} else {
 		mGVB_NOEdit->Show(false);
 		mGVB_NOStatic->Show(false);
@@ -4097,7 +4097,7 @@ void InputBuilderWindow::OnGVBNSetOeditTextUpdated( wxCommandEvent& event )
 				if (i>0) degString << " ";
 				degString << t[i];
 			}
-			mGVB_NOEdit->SetValue(degString.str());
+			mGVB_NOEdit->SetValue(wxString(degString.str().c_str(), wxConvUTF8));
 		} else {
 			mGVB_NOEdit->Show(false);
 			mGVB_NOStatic->Show(false);
@@ -4115,7 +4115,7 @@ void InputBuilderWindow::OnGVBNSetOeditTextUpdated( wxCommandEvent& event )
 void InputBuilderWindow::OnGVBNOeditTextUpdated( wxCommandEvent& event )
 {
 	wxString temp = mGVB_NOEdit->GetValue();
-	std::istringstream buf(temp.ToStdString());
+	std::istringstream buf((const char *)temp.mb_str(wxConvUTF8));
 	int count=0;
 	long val;
 	

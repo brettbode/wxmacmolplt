@@ -1300,7 +1300,7 @@ void QD3DPrefsPane::OnSliderUpdate(wxCommandEvent &event) {
 
 void QD3DPrefsPane::OnSpinChange(wxSpinEvent & event) {
 	int id = event.GetId();
-	int val = event.GetValue();
+	int val = event.GetPosition();
 	
 	int xv, yv, zv;
 	mTargetPrefs->GetAutoRotationVector(xv, yv, zv);
