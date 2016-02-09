@@ -5,7 +5,7 @@
 #%define debug_package %{nil}
 #%define __check_files %{nil}
 Name: wxmacmolplt
-Version: 7.6.1
+Version: 7.6.2
 Release: 1%{?dist}
 Summary: A graphics program for plotting 3-D molecular structures and normal modes
 Group: Applications/Engineering
