@@ -56,7 +56,11 @@ BEGIN_EVENT_TABLE( BondsDlg, wxDialog )
 
 	EVT_CHOICE( ID_CHOICE, BondsDlg::OnChoiceSelected )
 
+#if wxCHECK_VERSION(3, 0, 0)
+	EVT_GRID_CELL_CHANGED( BondsDlg::OnCellChange )
+#else
 	EVT_GRID_CELL_CHANGE( BondsDlg::OnCellChange )
+#endif
 	EVT_GRID_SELECT_CELL( BondsDlg::OnSelectCell )
 	EVT_GRID_RANGE_SELECT( BondsDlg::OnRangeSelect )
 
@@ -232,7 +236,7 @@ void BondsDlg::ResetList(void) {
 			}
 			bondGrid->SetCellValue(i, 3, buf);
 			bondGrid->SetReadOnly(i, 3, true);
-			bondGrid->SetCellAlignment(wxALIGN_CENTRE, i, 3);
+			bondGrid->SetCellAlignment(i, 3, wxALIGN_CENTRE, wxALIGN_CENTRE);
 			if (b->GetSelectState()) bondGrid->SelectRow(i, true);
 		}
 	}
@@ -335,7 +339,7 @@ void BondsDlg::OnAddClick( wxCommandEvent& event )
 		}
 		bondGrid->SetCellValue(nbonds, 3, buf);
 		bondGrid->SetReadOnly(nbonds, 3, true);
-		bondGrid->SetCellAlignment(wxALIGN_CENTRE, nbonds, 3);
+		bondGrid->SetCellAlignment(nbonds, 3, wxALIGN_CENTRE, wxALIGN_CENTRE);
 		lFrame->SetBondSelectState(nbonds, true);
 		bondGrid->SelectRow(nbonds, true);
 		bondGrid->SetGridCursor(nbonds, 0);

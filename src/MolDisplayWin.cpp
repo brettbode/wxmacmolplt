@@ -3262,7 +3262,11 @@ void MolDisplayWin::AtomsChanged(bool updateCoordsWin, bool updateDisplay) {
 
 	if (InSymmetryEditMode()) {
 		RegenerateSymmetryDependent();
+#if wxCHECK_VERSION(3, 0, 0)
+		MainData->SymmetrizeCoordinates(wxGetMouseState().LeftIsDown());
+#else
 		MainData->SymmetrizeCoordinates(wxGetMouseState().LeftDown());
+#endif
 	}
 
 	if (updateCoordsWin && coordsWindow) coordsWindow->FrameChanged();

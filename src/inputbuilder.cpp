@@ -104,7 +104,11 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 	EVT_CHOICE( ID_GRIDFREE_FUNCTIONAL_CHOICE, InputBuilderWindow::OnGridfreeFunctionalChoiceSelected )
 	EVT_CHECKBOX( ID_FMOACTIVECHECK, InputBuilderWindow::OnFMOActiveCheckClick )
 	EVT_TEXT( ID_FMOFRAGCOUNT, InputBuilderWindow::OnFMOFragCountTextUpdated )
+#if wxCHECK_VERSION(3, 0, 0)
+	EVT_GRID_CELL_CHANGED( InputBuilderWindow::OnFMOFragIdCellChange )
+#else
 	EVT_GRID_CELL_CHANGE( InputBuilderWindow::OnFMOFragIdCellChange )
+#endif
 	EVT_BUTTON( ID_FMOFRAGBUTTON, InputBuilderWindow::OnFMOFragButtonClick )
 	EVT_CHOICE( ID_INITGUESS_CHOICE, InputBuilderWindow::OnInitguessChoiceSelected )
 	EVT_CHOICE( ID_MOGUESS_VECSOURCE_CHOICE, InputBuilderWindow::OnMoguessVecsourceChoiceSelected )

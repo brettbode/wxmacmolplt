@@ -112,7 +112,11 @@ BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 
 	EVT_CHOICE( ID_COORDCHOICE1, CoordinatesWindow::OnCoordchoice1Selected )
 
+#if wxCHECK_VERSION(3, 0, 0)
+	EVT_GRID_CELL_CHANGED( CoordinatesWindow::OnCellChange )
+#else
 	EVT_GRID_CELL_CHANGE( CoordinatesWindow::OnCellChange )
+#endif
 	EVT_GRID_SELECT_CELL( CoordinatesWindow::OnSelectCell )
 	EVT_GRID_RANGE_SELECT( CoordinatesWindow::OnRangeSelect )
 
