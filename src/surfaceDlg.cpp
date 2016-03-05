@@ -1793,8 +1793,8 @@ void Orbital3DSurfPane::CreateControls() {
 			wxDefaultSize);
 
 	mGridSizeSld = new wxSlider(this, ID_GRID_SIZE_SLIDER, 
-			(short) (100*mTarget->GetGridSize()), 1, 300,
-			wxDefaultPosition, wxSize(155,wxDefaultCoord),
+			(short) (100*mTarget->GetGridSize()), 1, 500,
+			wxDefaultPosition, wxSize(CONTOUR_WIDTH,wxDefaultCoord),
 			wxSL_AUTOTICKS | wxSL_LABELS);
 	/* mContourValSld = new wxSlider(this, ID_CONTOUR_VALUE_SLIDER,  */
 			/* (short)(100*(mTarget->GetContourValue()/((fabs(GridMax)>=0.001)?GridMax:0.25))),  */
