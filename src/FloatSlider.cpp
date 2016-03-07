@@ -49,8 +49,10 @@ FloatSlider::FloatSlider(wxWindow *parent,
 	val_box = new wxTextCtrl(this, ID_VAL_BOX, label, wxDefaultPosition,
 							 wxSize(70, wxDefaultCoord), wxTE_PROCESS_ENTER);
 
-	label.Printf(wxT("%.3f"), max);
-	max_label = new wxStaticText(this, wxID_ANY, label);
+	// For the max value need to setup the width to be the max width we expect and then prevent resize.
+	// With resize the field seems to shrink down ok, but not enlarge leading to clipping.
+	label.Printf(wxT("%05.3f"), max);
+	max_label = new wxStaticText(this, wxID_ANY, label, wxDefaultPosition, wxDefaultSize, wxST_NO_AUTORESIZE | wxALIGN_RIGHT);
 
 	hsizer->Add(min_label,
 				wxSizerFlags().Align(wxALIGN_CENTER_VERTICAL).Left());
@@ -260,13 +262,13 @@ void FloatSlider::SetMin(float min) {
  * Assign slider's maximum value.
  * @param max New maximum.
  */
-void FloatSlider::SetMax(float max) {
+void FloatSlider::SetMax(float newmax) {
 
-	this->max = max;
-	wxString str;
-	str.Printf(wxT("%.3g"), max);
-	max_label->SetLabel(str);
+	this->max = newmax;
+	wxString lstr;
+	lstr.Printf(wxT("%.3g"), newmax);
 
+	max_label->SetLabelText(lstr);
 }
 
 /* ------------------------------------------------------------------------- */
