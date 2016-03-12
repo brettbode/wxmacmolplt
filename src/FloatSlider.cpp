@@ -65,6 +65,9 @@ FloatSlider::FloatSlider(wxWindow *parent,
 	SetMinSize(size);
 	/* SetSizer(vsizer); */
 	SetSizerAndFit(vsizer);
+	
+	//reset the max text since the above output does not necessarily match the SetMax function.
+	SetMax(max);
 
 	// Only the text control contains the current value since the slider tracks
 	// ints only (and we want floats).  So, for the most part, the text control
