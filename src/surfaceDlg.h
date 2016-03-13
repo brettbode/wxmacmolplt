@@ -153,12 +153,12 @@ class SurfacesWindow;
 #define wxCLOSE_BOX 0x1000
 #endif
 
-/*!
- * The base class for all the surface types for the Surfaces Window ListBook.
- * This class contains and manages the controls common to all surfaces such
- * as title, visibility, update button, etc.
- */
 
+/*!
+ * The FormattedListBox class is used to display the AO and MO lists and allows things like 
+ * super and sub scripts and item colorization. The wx class is abstract so this is a thin wrapper
+ * that tracks the items and provides the OnGetItem call that is needed by the base class.
+ */
 class FormattedListBox : public wxHtmlListBox {
 	public:
 		FormattedListBox()
@@ -176,6 +176,7 @@ class FormattedListBox : public wxHtmlListBox {
 #endif
 		}
 
+		/// Add the specified item to the end of the list.
 		void Append(const wxString& item) {
 			items.push_back(item);
 			// This was causing too many refreshes for some reason.
@@ -183,14 +184,21 @@ class FormattedListBox : public wxHtmlListBox {
 			/* SetItemCount(items.size()); */
 		}
 
+		/// Call when changes to the list are completed and you want the list refreshed.
 		void DoneAppending() {
 			SetItemCount(items.size());
 		}
 
+		/** OnGetItem is required by the wxHtmlListBox base class to provide the base class with the text for
+		 * each row in the table as needed.
+		 * @param n The row for which to return the formatted text string
+		 * @return The formatted string for the requested row.
+		 */
 		wxString OnGetItem(size_t n) const {
 			return items[n];
 		}
 
+		/// Remove all items in the list and clear the display.
 		void Clear() {
 			wxHtmlListBox::Clear();
 			items.clear();
@@ -204,6 +212,7 @@ class FormattedListBox : public wxHtmlListBox {
 		}
 
 	private:
+		/// items contains the formatted text for each row in the table
 		std::vector<wxString> items;
 
 	/* DECLARE_DYNAMIC_CLASS(FormattedListBox) */
@@ -211,6 +220,11 @@ class FormattedListBox : public wxHtmlListBox {
 	DECLARE_EVENT_TABLE()
 };
 
+/*!
+ * The base class for all the surface types for the Surfaces Window ListBook.
+ * This class contains and manages the controls common to all surfaces such
+ * as title, visibility, update button, etc.
+ */
 class BaseSurfacePane : public wxPanel
 {
 	/* DECLARE_CLASS(BaseSurfacePane) */
@@ -223,33 +237,33 @@ public:
 
 	bool Create(wxWindow* parent, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
 
-	virtual void TargetToPane() = 0;	//< Call to update the display with new data in the target surface.
-	virtual void refreshControls() = 0;	//< Updates the control state, call when data changes.
-	virtual bool UpdateNeeded(void) = 0;	//< Should the update button be activated?
+	virtual void TargetToPane() = 0;	///< Call to update the display with new data in the target surface.
+	virtual void refreshControls() = 0;	///< Updates the control state, call when data changes.
+	virtual bool UpdateNeeded(void) = 0;	///< Should the update button be activated?
 
-	void SetVisibility(bool state);	//< Toggle the surface visibility.
+	void SetVisibility(bool state);	///< Toggle the surface visibility.
 
 	void OnCheckAllFrames(wxCommandEvent& event);
 	void OnCheckVisible(wxCommandEvent& event);
 	void OnChangeTitle(wxCommandEvent& event);
 
-	void setAllFrames(bool state);	//< Should the surface be applied to all frames?
+	void setAllFrames(bool state);	///< Should the surface be applied to all frames?
 
-	bool GetVisibility(void) const {return Visible;};	//< Is the surface visible?
-	bool GetAllFrames(void) const {return AllFrames;};	//< Is the surface applies to all frames?
+	bool GetVisibility(void) const {return Visible;};	///< Is the surface visible?
+	bool GetAllFrames(void) const {return AllFrames;};	///< Is the surface applies to all frames?
 
 	const wxString GetSurfaceName() const;
 
-	void SetUpdateTest(bool test);	//< Set flag to force an update (overrides the automatic tests).
-	void setUpdateButton();			//< Updates the state of the update button comparing the current and saved states.
+	void SetUpdateTest(bool test);	///< Set flag to force an update (overrides the automatic tests).
+	void setUpdateButton();			///< Updates the state of the update button comparing the current and saved states.
 	/**
 		Call when the page becomes the active page. Right now this just makes sure the
 		update button is the default button.
 	 */
 	void PageIsNowActive(void);
-	Surface * GetTargetSurface(void) const {return mTarget;};	//< Return a pointer to the surface data.
+	Surface * GetTargetSurface(void) const {return mTarget;};	///< Return a pointer to the surface data.
 
-	void OnGridPointSld(wxCommandEvent &event);	//< Call back when the grid points slider is changed.
+	void OnGridPointSld(wxCommandEvent &event);	///< Call back when the grid points slider is changed.
 	/**
 	 * Call back for the Set Param button.
 	 * Displays the appropriate surface parameters dialog.
@@ -260,38 +274,43 @@ public:
 		Prompts the user for a file name, then exports the surface to that file.
 	 */
 	void OnExport(wxCommandEvent &event);
+	/// Builds the menu of choices from the orbitals available for the current frame.
 	void BuildOrbSetPopup(void);
+	/// Called when the user changes the targeted orbital set.
 	void OnOrbSetChoice(wxCommandEvent &event);
 
 protected:
-	wxBoxSizer* mainSizer;	//< A primary BoxSizer for the page.
+	wxBoxSizer* mainSizer;	///< A primary BoxSizer for the page.
 
-	wxSlider* mNumGridPntSld;
-	wxButton* mSetParamBut;
-	wxButton* mExportBut;
-	wxButton* mUpdateBut;
+	wxSlider* mNumGridPntSld;	///< A slider representing the number of grid points
+	wxButton* mSetParamBut;		///< Button to call the manual set parameters dialog
+	wxButton* mExportBut;		///< Button to export the surface to a file
+	wxButton* mUpdateBut;		///< Button to refresh the surface display, recomputing as needed.
 
-	bool Visible;			//< Should the surface be visible?
-	bool AllFrames;			//< flag to apply the surface to all frames.
-	bool UpdateTest;		//< flag to force an update.
-	long NumGridPoints;
-	bool SwitchFixGrid;
-	long TargetOrbSet;
-	wxChoice* mOrbSetChoice;
-	wxTextCtrl* surfTitleEdit;
-	wxCheckBox* visibleCheck;
-	wxCheckBox* allFrameCheck;
+	bool Visible;			///< Should the surface be visible?
+	bool AllFrames;			///< flag to apply the surface to all frames.
+	bool UpdateTest;		///< flag to force an update.
+	long NumGridPoints;		///< The number of grid points to be computed for the surface
+	bool SwitchFixGrid;		///< Indicates the grid parameters have changed so the grid must be recomputed.
+	long TargetOrbSet;		///< Which set of orbitals should be used?
+	wxChoice* mOrbSetChoice;	///< Popup menu allowing the using to select the target orbital set.
+	wxTextCtrl* surfTitleEdit;	///< Edit Text field for the title of the surface.
+	wxCheckBox* visibleCheck;	///< Check box allowing the user to hide the surface without deleting it.
+	wxCheckBox* allFrameCheck;	///< CheckBox causing the surface to be applied to all frames in the file.
 
-	SurfacesWindow * owner;	//< Our parent window.
+	SurfacesWindow * owner;	///< Our parent window.
 
  private:
-	void CreateControls();	//< Create the controls (currently just the main sizer).
+	void CreateControls();	///< Create the controls (currently just the main sizer).
 
-	Surface* mTarget;	//< Pointer to the target surface.
+	Surface* mTarget;	///< Pointer to the target surface.
 
     DECLARE_EVENT_TABLE()
 };
 
+/*!
+ * A utility class handling items common to orbital surfaces.
+ */
 class OrbSurfacePane {
 	public:
 		OrbSurfacePane() {}
@@ -301,30 +320,38 @@ class OrbSurfacePane {
 	protected:
 		bool UpdateEvent(); 
 
-		//put code that is common for orbital panels
+		/// Build the molecular orbital list for the current set of orbitals
 		void makeMOList();
+		/// Build the atomic orbital list including the currently selected MO vector (if any)
 		void makeAOList();
+		/** Build the item list for the orbital set selector. This is different from the similar
+		 * base class function in that for orbitals we allow separately selecting alpha and beta spin orbitals.
+		 */
 		int getOrbSetForOrbPane(std::vector<wxString>& choice);
 		int orbSetChangeEvt(int item, SurfacesWindow * owner);
+		/// Toggles the MO list between displaying orbital energies (0) and occupation numbers (non zero)
 		void setFlagOnOrbFormatChange(int itemtype);
-
+		/// Called when viewing AOs and the user makes a selection
 		void OnAtomicOrbitalChoice(wxCommandEvent& event);
 
-		long TargetSet;
-		long OrbOptions; //from mac version
-		long OrbColumnEnergyOrOccupation;
-		long SphericalHarmonics;
-		long PlotOrb;
-		bool PhaseChange;
-		bool coefIsEnabled;
-		FormattedListBox *mMOList;
-		FormattedListBox *mOrbCoef;
+		long TargetSet;					///< The targeted orbital set
+		long OrbOptions;				///< Modifies the targeted orbital set to choose alpha/beta orbitals
+		long OrbColumnEnergyOrOccupation;	///< Selects orbital energy or occupation number display in the MO list
+		long SphericalHarmonics;		///< Should spherical harmonic AOs be used
+		long PlotOrb;					///< The selected orbital (can be either MO or AO)
+		bool PhaseChange;				///< Flip the phase of the orbital
+		bool coefIsEnabled;				///< True if targeting AOs (I think)
+		FormattedListBox *mMOList;		///< The MO list
+		FormattedListBox *mOrbCoef;		///< The AO list
 
 	private:
 		OrbSurfBase* mTarget;
 		SurfacesWindow * myowner;
 };
 
+/*!
+ * A utility class handling items common to one dimensional surfaces.
+ */
 class Surface1DPane : public BaseSurfacePane {
 
 	public:
@@ -332,7 +359,9 @@ class Surface1DPane : public BaseSurfacePane {
 		Surface1DPane(wxWindow* parent, Surf1DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
 		~Surface1DPane();
 
+		/// Event handler for a change in the positive color well
 		void OnPosColorChange(wxCommandEvent & event);
+		/// Event handler for a change in the negative color well
 		void OnNegColorChange(wxCommandEvent & event);
 		void OnChangeEndpoint(wxCommandEvent &event);
 		void OnIdle(wxIdleEvent& WXUNUSED(event));
@@ -372,59 +401,65 @@ class Surface1DPane : public BaseSurfacePane {
 };
 
 /*!
- * 2D class declaration
+ * A utility class handling items common to two dimensional surfaces.
  */
-
 class Surface2DPane : public BaseSurfacePane {
   /* DECLARE_CLASS(Surface2DPane) */
 
  public:
-  Surface2DPane() {}
-  Surface2DPane(wxWindow* parent, Surf2DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
-  ~Surface2DPane();
+	Surface2DPane() {}
+	Surface2DPane(wxWindow* parent, Surf2DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
+	~Surface2DPane();
 
-  void OnPosColorChange(wxCommandEvent & event);
-  void OnNegColorChange(wxCommandEvent & event);
-  void OnShowZeroChk(wxCommandEvent &event);
-  void OnDashChk(wxCommandEvent& event);
-  void OnUsePlaneChk(wxCommandEvent &event);
-  void OnDisplayPlaneChk(wxCommandEvent &event);
-  void OnContourValueText(wxCommandEvent &event);
-  void SetContourValueText(void);
-  void OnNumContoursText(wxCommandEvent &event);
-  void SetNumContoursText(void);
-  void OnIdle(wxIdleEvent& WXUNUSED(event));
-  void OnSetPlane(wxCommandEvent &event);
-  void OnSetParam(wxCommandEvent &event);
+	/// Event handler for a change in the positive color well
+	void OnPosColorChange(wxCommandEvent & event);
+	/// Event handler for a change in the negative color well
+	void OnNegColorChange(wxCommandEvent & event);
+	/// Event handler for a change in the show zero contour check box
+	void OnShowZeroChk(wxCommandEvent &event);
+	/// Event handler for a change in the dash line check box
+	void OnDashChk(wxCommandEvent& event);
+	/// Event handler for a change in the use plane of screen check box
+	void OnUsePlaneChk(wxCommandEvent &event);
+	/// Event handler for a change in the show plotting plane check box.
+	void OnDisplayPlaneChk(wxCommandEvent &event);
+	/// Event handler for a change in the maximum contour value edit field
+	void OnContourValueText(wxCommandEvent &event);
+	/// Outputs the MaxContourValue variable to the Max value to contour edit field
+	void SetContourValueText(void);
+	/// Event handler for a change in the number of counters edit field
+	void OnNumContoursText(wxCommandEvent &event);
+	/// Outputs the NumContours variable to the corresponding edit field
+	void SetNumContoursText(void);
+	/// Grabs the current state of edit fields and sets the update button if needed
+	void OnIdle(wxIdleEvent& WXUNUSED(event));
+	/// Event handler for the Set plane button. Opens the set plane dialog.
+	void OnSetPlane(wxCommandEvent &event);
+	/// Event handler for the Set Paramters button. Opens the manual plane setting dialog.
+	void OnSetParam(wxCommandEvent &event);
 
  protected:
+	wxTextCtrl* mNumContourText;		///< Edit control for the number of contours
+	wxTextCtrl* mContourValText;		///< Edit control for the maximum value to contour
+	wxCheckBox* mShowZeroCheck;			///< Show zero contour check box
+	wxCheckBox* mDashCheck;				///< Dash negative contours check box
+	wxCheckBox* mUsePlaneChk;			///< Use plane of screen as plotting plane check box
+	wxCheckBox* mDisplayPlaneCheck;		///< Show plotting plane check box
+	colorArea* mOrbColor1;				///< Control for setting the positive color
+	colorArea* mOrbColor2;				///< Control for setting the negative color
+	RGBColor PosColor;					///< local copy of positive color (pushed to the surface upon update)
+	RGBColor NegColor;					///< local copy of negative color (pushed to the surface upon update)
 
-  wxStaticText* mNumContourLabel;
-  wxStaticText* mContourValLabel;
-  wxTextCtrl* mNumContourText;
-  wxTextCtrl* mContourValText;
-  wxCheckBox* mShowZeroCheck;
-  wxCheckBox* mDashCheck;
-  wxCheckBox* mUsePlaneChk;
-  wxCheckBox* mDisplayPlaneCheck;
-  wxButton* mSetPlaneBut;
-  colorArea* mOrbColor1;
-  colorArea* mOrbColor2;
-  RGBColor PosColor;
-  RGBColor NegColor;
-
-  long NumContours;
-  float MaxContourValue;
-  bool ShowZeroContour;
-  bool DashLines;
-  bool UseScreenPlane;
-  bool DisplayPlane;
-  wxString mMaxContourCountString;
-  wxString mMaxContourValueString;
+	long NumContours;					///< local copy of number of contours (pushed to the surface upon update)
+	float MaxContourValue;				///< local copy of Max value to contour (pushed to the surface upon update)
+	bool ShowZeroContour;				///< local copy of show zero contour (pushed to the surface upon update)
+	bool DashLines;						///< local copy of dash - lines (pushed to the surface upon update)
+	bool UseScreenPlane;				///< local copy of use screen plane (pushed to the surface upon update)
+	bool DisplayPlane;					///< local copy of show plotting plane (pushed to the surface upon update)
 
  private:
 
-  Surf2DBase* mTarget;
+  Surf2DBase* mTarget;					///< The corresponding target surface
 
   DECLARE_EVENT_TABLE()
 };
@@ -465,9 +500,7 @@ class Surface3DPane : public BaseSurfacePane {
 
 	protected:
 		wxSlider* mGridSizeSld;
-		/* wxSlider* mContourValSld; */
 		FloatSlider* mContourValSld;
-		/* wxTextCtrl* mContourValueEdit; */
 		wxStaticText* mGridMinText;
 		wxStaticText* mGridMaxText;
 		colorArea* mOrbColor1;
@@ -667,7 +700,6 @@ private:
     wxTextCtrl* mGenMultValue;
     wxCheckBox* mSquareCheck;
     wxCheckBox* mGenContourPosNegCheck;
-	wxString MultValueString;
 
     General3DSurface*	mTarget;
 	bool				ContourPosNeg;
@@ -716,7 +748,6 @@ private:
     wxCheckBox* mMultCheck;
     wxTextCtrl* mGenMultValue;
     wxCheckBox* mSquareCheck;
-	wxString MultValueString;
 	
     General2DSurface*	mTarget;
 	bool				useMultValue;

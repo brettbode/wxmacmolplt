@@ -1291,7 +1291,6 @@ void Orbital2DSurfPane::CreateControls() {
 			0, 10, 150,
 			wxDefaultPosition, wxSize(155,wxDefaultCoord),
 			wxSL_AUTOTICKS | wxSL_LABELS);
-	//set the initial value in the child object
 
 	mSetParamBut = new wxButton(this, ID_SET_PARAM_BUT, wxT("Set Parameters"), wxPoint(450, 160));
 	mExportBut = new wxButton(this, ID_SURFACE_EXPORT_BUT, wxT("Export"), wxPoint(450, 160));
@@ -1304,24 +1303,24 @@ void Orbital2DSurfPane::CreateControls() {
 	mUpdateBut = new wxButton(this, ID_SURFACE_UPDATE_BUT, wxT("Update"), wxPoint(450, 160));
 	upperSizer->Add(label0, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
-	mNumContourLabel = new wxStaticText(this, wxID_ANY,
+	wxStaticText* lNumContourLabel = new wxStaticText(this, wxID_ANY,
 			_T("Max # of contours:"),
 			wxDefaultPosition,
 			wxDefaultSize);
-	mContourValLabel = new wxStaticText(this, wxID_ANY,
+	wxStaticText* lContourValLabel = new wxStaticText(this, wxID_ANY,
 			_T("Max contour value:"),
 			wxDefaultPosition,
 			wxDefaultSize);
 
-	mNumContourText = new wxTextCtrl(this, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize);
+	mNumContourText = new wxTextCtrl(this, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 
-	mContourValText = new wxTextCtrl(this, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize);
+	mContourValText = new wxTextCtrl(this, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 
 	mShowZeroCheck = new wxCheckBox(this, ID_SHOW_ZERO_CHECKBOX, _T("Show zero contour"), wxPoint(340,130), wxDefaultSize);
 
 	mDashCheck = new wxCheckBox(this, ID_DASH_CHECKBOX, _T("Dash - contour"), wxPoint(340,130), wxDefaultSize);
 
-	mSetPlaneBut = new wxButton(this, ID_SET_PLANE_BUT, wxT("Set Plane"));
+	wxButton* lSetPlaneBut = new wxButton(this, ID_SET_PLANE_BUT, wxT("Set Plane"));
 
 	mTarget->GetPosColor(&PosColor);
 	mTarget->GetNegColor(&NegColor);
@@ -1334,15 +1333,16 @@ void Orbital2DSurfPane::CreateControls() {
 
 	mOrbSetChoice = new wxChoice(this, ID_ORB_CHOICE, wxPoint(10,10), wxSize(200,wxDefaultCoord), choices.size(), &choices.front());
 	mOrbSetChoice->SetSelection(itemSelect);
+	mOrbSetChoice->SetToolTip(_("Select the set of molecular orbitals or atomic orbitals to view."));
 	upperSizer->Add(mOrbSetChoice, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
 	mSphHarmonicsChk = new wxCheckBox(this, ID_SPH_HARMONICS_CHECKBOX, _T("Spherical Harmonics"), wxDefaultPosition, wxDefaultSize);
+	mSphHarmonicsChk->SetToolTip(_("Use spherical harmonics for the AOs. Only available for AOs."));
 
 	wxString choices1[] = {_T("Energy"), _T("Occupation #")};
 	mOrbFormatChoice = new wxChoice(this, ID_ORB_FORMAT_CHOICE, wxDefaultPosition, wxSize(120,wxDefaultCoord), 2, choices1);
 	mOrbFormatChoice->SetSelection(0);
-
-	/* vector<wxString> choices3; */
+	mOrbFormatChoice->SetToolTip(_("The MO list can display either the orbital energy or the occupation number."));
 
 	mMOList = new FormattedListBox(this, ID_ATOM_LIST, wxLB_SINGLE | wxLB_ALWAYS_SB);
 	makeMOList();
@@ -1352,12 +1352,6 @@ void Orbital2DSurfPane::CreateControls() {
 		}
 	}
 
-		/* wxListBox(this, ID_ATOM_LIST, */
-			/* wxDefaultPosition, wxSize(150,180), */
-			/* choices2.size(), &choices2.front(),  */
-			/* wxLB_SINGLE |wxLB_ALWAYS_SB); */
-
-	/* mOrbCoef = new wxListBox(this, ID_ORB_COEF, wxPoint(20,160), wxSize(170,200), choices3.size(), &choices3.front(), wxLB_SINGLE |wxLB_ALWAYS_SB); */
 	mOrbCoef = new FormattedListBox(this, ID_ORB_COEF, wxLB_SINGLE | wxLB_ALWAYS_SB);
 	makeAOList();
 
@@ -1374,13 +1368,13 @@ void Orbital2DSurfPane::CreateControls() {
 
 	wxString tmpStr;
 
-	rightMiddleSizer->Add(mNumContourLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
+	rightMiddleSizer->Add(lNumContourLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
 
 	tmpStr.Printf(wxT("%ld"), NumContours);
 	mNumContourText->SetValue(tmpStr);
 	rightMiddleSizer->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
 
-	rightMiddleSizer->Add(mContourValLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
+	rightMiddleSizer->Add(lContourValLabel, 0, wxALIGN_CENTER_VERTICAL | wxALL, 10);
 
 	tmpStr.Printf(wxT("%.2f"), MaxContourValue);
 	mContourValText->SetValue(tmpStr);
@@ -1409,12 +1403,14 @@ void Orbital2DSurfPane::CreateControls() {
 
 	mSubRightBot1Sizer = new wxBoxSizer(wxVERTICAL);
 	mUsePlaneChk = new wxCheckBox(this, ID_USE_PLANE_CHECKBOX, _T("Use plane of screen"), wxDefaultPosition);
+	mUsePlaneChk->SetToolTip(_("When checked the plotting plane is fixed to the plane of the screen and recomputed during rotation."));
 	mUsePlaneChk->SetValue(UseScreenPlane);
 	mDisplayPlaneCheck = new wxCheckBox(this, ID_DISPLAY_PLANE_CHECKBOX, _("Display Plotting Plane"), wxDefaultPosition, wxDefaultSize, 0);
 	mDisplayPlaneCheck->SetValue(DisplayPlane);
 	mDisplayPlaneCheck->SetToolTip(_("Display a translucent plane with border to indicate the plotting plane"));
 
 	mRevPhaseChk = new wxCheckBox(this, ID_REVERSE_PHASE_CHECKBOX, _T("Reverse Phase"), wxDefaultPosition);
+	mRevPhaseChk->SetToolTip(_("The phase of the orbital is arbitrary. Check the box to flip the coloring."));
 	mRevPhaseChk->SetValue(PhaseChange);
 	mDashCheck->SetValue(DashLines);
 	mShowZeroCheck->SetValue(ShowZeroContour);
@@ -1435,7 +1431,7 @@ void Orbital2DSurfPane::CreateControls() {
 
 	mSubRightBot3Sizer = new wxGridSizer(2,2,0,0);
 	mSubRightBot3Sizer->Add(mSetParamBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-	mSubRightBot3Sizer->Add(mSetPlaneBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	mSubRightBot3Sizer->Add(lSetPlaneBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	mSubRightBot3Sizer->Add(mExportBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	mSubRightBot3Sizer->Add(mUpdateBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	mUpdateBut->SetDefault();
@@ -1721,8 +1717,7 @@ void Orbital3DSurfPane::refreshControls() {
 	float GridMax = mTarget->GetGridMax();
 
 	mNumGridPntSld->SetValue(NumGridPoints);
-	mGridSizeSld->SetValue((short)(100*GridSize));
-	/* mContourValSld->SetValue((100*(ContourValue/((fabs(GridMax)>=0.001)?GridMax:0.25)))); */
+	mGridSizeSld->SetValue((short)sqrt((5000*5000)*(mTarget->GetGridSize()-.01)/(30-.01)));
 	mContourValSld->SetValue(ContourValue);
 	mContourValSld->SetMax(GridMax);
 	m3DRdoBox->SetSelection(1-UseSolidSurface);
@@ -1761,7 +1756,7 @@ void Orbital3DSurfPane::CreateControls() {
 			wxDefaultSize);
 
 	wxStaticText * label1 = new wxStaticText(this, wxID_ANY,
-			_T("Number of\n Grid Points:"),
+			_T("Number of \nGrid Points:"),
 			wxDefaultPosition,
 			wxDefaultSize);
 
@@ -1769,7 +1764,8 @@ void Orbital3DSurfPane::CreateControls() {
 			0, 10, 150,
 			wxDefaultPosition, wxSize(155,wxDefaultCoord),
 			wxSL_AUTOTICKS | wxSL_LABELS);
-	//set the initial value in the child object
+	if (ShowToolTips())
+		mNumGridPntSld->SetToolTip(_("Sets the resolution of the grid. Fewer points is faster while more points produces a high-resolution result."));
 
 	mSetParamBut = new wxButton(this, ID_SET_PARAM_BUT, wxT("Set Parameters"), wxPoint(450, 160));
 	mExportBut = new wxButton(this, ID_SURFACE_EXPORT_BUT, wxT("Export"), wxPoint(450, 160));
@@ -1792,20 +1788,18 @@ void Orbital3DSurfPane::CreateControls() {
 			wxDefaultPosition,
 			wxDefaultSize);
 
-	mGridSizeSld = new wxSlider(this, ID_GRID_SIZE_SLIDER, 
-			(short) (100*mTarget->GetGridSize()), 1, 500,
-			wxDefaultPosition, wxSize(CONTOUR_WIDTH,wxDefaultCoord),
-			wxSL_AUTOTICKS | wxSL_LABELS);
-	/* mContourValSld = new wxSlider(this, ID_CONTOUR_VALUE_SLIDER,  */
-			/* (short)(100*(mTarget->GetContourValue()/((fabs(GridMax)>=0.001)?GridMax:0.25))),  */
-			/* 0, 100, wxDefaultPosition,  */
-			/* wxSize(155,wxDefaultCoord)); */
+	mGridSizeSld = new wxSlider(this, ID_GRID_SIZE_SLIDER,
+								(short) sqrt((5000*5000)*(mTarget->GetGridSize()-.01)/(30-.01)), 1, 5000,
+								wxDefaultPosition, wxSize(CONTOUR_WIDTH,wxDefaultCoord));
+	if (ShowToolTips())
+		mGridSizeSld->SetToolTip(_("Adjusts the volume over which the grid is computed. Adjust to the right if your surface appears clipped."));
+
 	mContourValSld = new FloatSlider(this, ID_CONTOUR_VALUE_SLIDER,
 									 mTarget->GetContourValue() /
 									 	((fabs(GridMax)>=0.001)?GridMax:0.25),
 									 0.0f, 100.0f, FloatSlider::POW, wxSize(CONTOUR_WIDTH, wxDefaultCoord));
-
-	/* mContourValueEdit = new wxTextCtrl(this, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER); */
+	if (ShowToolTips())
+		mContourValSld->SetToolTip(_("Sets the value for the isosurface. Move to the right to produce a surface closer to the nucleus."));
 
 	wxStaticText * label4 = new wxStaticText(this, wxID_ANY,
 			_T("Transparency:"),
@@ -1850,20 +1844,28 @@ void Orbital3DSurfPane::CreateControls() {
 	mOrbSetChoice = new wxChoice(this, ID_ORB_CHOICE, wxPoint(10,10), wxSize(200,wxDefaultCoord), choices.size(), &choices.front());
 	mOrbSetChoice->SetSelection(itemSelect);
 	upperSizer->Add(mOrbSetChoice, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	if (ShowToolTips())
+		mOrbSetChoice->SetToolTip(_("Select the set of molecular orbitals or atomic orbitals to view."));
 
 	upperSizer->Add(10,10);
 
 	mRevPhaseChk = new wxCheckBox(this, ID_REVERSE_PHASE_CHECKBOX, _T("Reverse Phase"), wxDefaultPosition);
 	mRevPhaseChk->SetValue(PhaseChange);
+	if (ShowToolTips())
+		mRevPhaseChk->SetToolTip(_("The phase of the orbital is arbitrary. Check the box to flip the coloring."));
 
 	upperSizer->Add(mRevPhaseChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 
 	mSphHarmonicsChk = new wxCheckBox(this, ID_SPH_HARMONICS_CHECKBOX, _T("Spherical Harmonics"), wxDefaultPosition, wxDefaultSize);
 	mSphHarmonicsChk->Enable(coefIsEnabled);
+	if (ShowToolTips())
+		mSphHarmonicsChk->SetToolTip(_("Use spherical harmonics for the AOs. Only available for AOs."));
 
 	wxString choices1[] = {_T("Energy"), _T("Occupation #")};
 	mOrbFormatChoice = new wxChoice(this, ID_ORB_FORMAT_CHOICE, wxDefaultPosition, wxSize(120,wxDefaultCoord), 2, choices1);
 	mOrbFormatChoice->SetSelection(0);
+	if (ShowToolTips())
+		mRevPhaseChk->SetToolTip(_("When viewing molecular orbitals you may choose to include either the energy or the occupation number in the list."));
 
 	mMOList = new FormattedListBox(this, ID_ATOM_LIST, wxLB_SINGLE);
 	makeMOList();
@@ -1876,13 +1878,6 @@ void Orbital3DSurfPane::CreateControls() {
 	/* vector<wxString> choices3; */
 	mOrbCoef = new FormattedListBox(this, ID_ORB_COEF, wxLB_SINGLE);
 	makeAOList();
-
-	/* mMOList = new wxListBox(this, ID_ATOM_LIST, */
-			/* wxDefaultPosition, wxSize(160,180), */
-			/* choices2.size(), &choices2.front(),  */
-			/* wxLB_SINGLE |wxLB_ALWAYS_SB); */
-
-	/* mOrbCoef = new wxListBox(this, ID_ORB_COEF, wxPoint(20,160), wxSize(170,200), choices3.size(), &choices3.front(), wxLB_SINGLE |wxLB_ALWAYS_SB); */
 
 	mSphHarmonicsChk->SetValue(SphericalHarmonics);
 	upperLeftMiddleSizer->Add(mSphHarmonicsChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -1965,7 +1960,6 @@ void Orbital3DSurfPane::CreateControls() {
 	mSubRightBot5Sizer->Add(mUpdateBut, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	mUpdateBut->SetDefault();
 
-	/* rightBottomSizer->Add(mSubRightBot0Sizer); */
 	rightBottomSizer->Add(20, 20);
 	rightBottomSizer->Add(mSubRightBot1Sizer);
 	rightBottomSizer->Add(mSubRightBot2Sizer);
@@ -2133,7 +2127,7 @@ void Orbital3DSurfPane::OnContourValueSld(wxCommandEvent &event) {
 }
 
 void Orbital3DSurfPane::OnGridSizeSld(wxCommandEvent &event) {
-	GridSize = 0.01 * mGridSizeSld->GetValue();
+	GridSize = (30-.01) * (mGridSizeSld->GetValue()*mGridSizeSld->GetValue())/((5000*5000))+.01;
 	SwitchFixGrid = true;
 
 	setUpdateButton();
@@ -2487,11 +2481,10 @@ void General3DSurfPane::CreateControls() {
 		mMultCheck->SetToolTip(_("check to multiply the grid values by the value to the left as they are read in from file."));
 	itemBoxSizer8->Add(mMultCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mGenMultValue = new wxTextCtrl(Gen3DPanel, ID_GENMULTEDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
+	mGenMultValue = new wxTextCtrl(Gen3DPanel, ID_GENMULTEDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (ShowToolTips())
 		mGenMultValue->SetToolTip(_("Enter a value to multiply the grid by as it is read in from file."));
 	itemBoxSizer8->Add(mGenMultValue, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-	mGenMultValue->SetValidator(wxTextValidator(wxFILTER_NUMERIC, & MultValueString));
 
 	mSquareCheck = new wxCheckBox(Gen3DPanel, ID_GENSQUARECHECK, _("Square values as read in"), wxDefaultPosition, wxDefaultSize, 0);
 	mSquareCheck->SetValue(false);
@@ -2847,7 +2840,7 @@ void General2DSurfPane::CreateControls() {
 		mMultCheck->SetToolTip(_("check to multiply the grid values by the value to the left as they are read in from file."));
 	itemBoxSizer44->Add(mMultCheck, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mGenMultValue = new wxTextCtrl(Gen2DPanel, ID_GENMULTEDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
+	mGenMultValue = new wxTextCtrl(Gen2DPanel, ID_GENMULTEDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	if (ShowToolTips())
 		mGenMultValue->SetToolTip(_("Enter a value to multiply the grid by as it is read in from file."));
 	itemBoxSizer44->Add(mGenMultValue, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2861,7 +2854,7 @@ void General2DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText49 = new wxStaticText(Gen2DPanel, wxID_STATIC, _("Max # of contours:"), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer48->Add(itemStaticText49, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mNumContourText = new wxTextCtrl(Gen2DPanel, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
+	mNumContourText = new wxTextCtrl(Gen2DPanel, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	itemBoxSizer48->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer51 = new wxBoxSizer(wxHORIZONTAL);
@@ -2869,7 +2862,7 @@ void General2DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText52 = new wxStaticText(Gen2DPanel, wxID_STATIC, _("Max contour value:"), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer51->Add(itemStaticText52, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mContourValText = new wxTextCtrl(Gen2DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
+	mContourValText = new wxTextCtrl(Gen2DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	itemBoxSizer51->Add(mContourValText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer54 = new wxBoxSizer(wxHORIZONTAL);
@@ -2926,10 +2919,6 @@ void General2DSurfPane::CreateControls() {
 	if (ShowToolTips())
 		mUpdateBut->SetToolTip(_("Click to apply your changes to the molecule display."));
 	itemBoxSizer63->Add(mUpdateBut, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
-	mGenMultValue->SetValidator(wxTextValidator(wxFILTER_NUMERIC, & MultValueString));
-	mNumContourText->SetValidator(wxTextValidator(wxFILTER_NUMERIC, & mMaxContourCountString));
-	mContourValText->SetValidator(wxTextValidator(wxFILTER_NUMERIC, & mMaxContourValueString));
 }
 void General2DSurfPane::TargetToPane(void) {
 	mTarget->GetPosColor(&PosColor);
@@ -3429,7 +3418,7 @@ void TEDensity2DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText75 = new wxStaticText(TED2DPANEL, wxID_STATIC, _("Max. # of contours:"), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer74->Add(itemStaticText75, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mNumContourText = new wxTextCtrl(TED2DPANEL, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
+	mNumContourText = new wxTextCtrl(TED2DPANEL, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	itemBoxSizer74->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer77 = new wxBoxSizer(wxHORIZONTAL);
@@ -3437,7 +3426,7 @@ void TEDensity2DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText78 = new wxStaticText(TED2DPANEL, wxID_STATIC, _("Max. contour value:"), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer77->Add(itemStaticText78, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mContourValText = new wxTextCtrl(TED2DPANEL, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
+	mContourValText = new wxTextCtrl(TED2DPANEL, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	itemBoxSizer77->Add(mContourValText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	mUsePlaneChk = new wxCheckBox(TED2DPANEL, ID_USE_PLANE_CHECKBOX, _("Use plane of screen"), wxDefaultPosition, wxDefaultSize, 0);
@@ -3465,8 +3454,8 @@ void TEDensity2DSurfPane::CreateControls() {
 	mSetParamBut = new wxButton(TED2DPANEL, ID_SET_PARAM_BUT, _("Parameters..."), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer85->Add(mSetParamBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mSetPlaneBut = new wxButton(TED2DPANEL, ID_SET_PLANE_BUT, _("Set Plane..."), wxDefaultPosition, wxDefaultSize, 0);
-	itemBoxSizer85->Add(mSetPlaneBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxButton* lSetPlaneBut = new wxButton(TED2DPANEL, ID_SET_PLANE_BUT, _("Set Plane..."), wxDefaultPosition, wxDefaultSize, 0);
+	itemBoxSizer85->Add(lSetPlaneBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer88 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer84->Add(itemBoxSizer88, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -4111,7 +4100,7 @@ void MEP2DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText144 = new wxStaticText(MEP2DPanel, wxID_STATIC, _("Max. # of contours:"), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer143->Add(itemStaticText144, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mNumContourText = new wxTextCtrl(MEP2DPanel, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
+	mNumContourText = new wxTextCtrl(MEP2DPanel, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	itemBoxSizer143->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer146 = new wxBoxSizer(wxHORIZONTAL);
@@ -4119,7 +4108,7 @@ void MEP2DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText147 = new wxStaticText(MEP2DPanel, wxID_STATIC, _("Max. contour value:"), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer146->Add(itemStaticText147, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mContourValText = new wxTextCtrl(MEP2DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0);
+	mContourValText = new wxTextCtrl(MEP2DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	itemBoxSizer146->Add(mContourValText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	mUsePlaneChk = new wxCheckBox(MEP2DPanel, ID_USE_PLANE_CHECKBOX, _("Use plane of screen"), wxDefaultPosition, wxDefaultSize, 0);
@@ -4169,8 +4158,8 @@ void MEP2DSurfPane::CreateControls() {
 	mSetParamBut = new wxButton(MEP2DPanel, ID_SET_PARAM_BUT, _("Parameters..."), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer160->Add(mSetParamBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mSetPlaneBut = new wxButton(MEP2DPanel, ID_SET_PLANE_BUT, _("Set Plane..."), wxDefaultPosition, wxDefaultSize, 0);
-	itemBoxSizer160->Add(mSetPlaneBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxButton* lSetPlaneBut = new wxButton(MEP2DPanel, ID_SET_PLANE_BUT, _("Set Plane..."), wxDefaultPosition, wxDefaultSize, 0);
+	itemBoxSizer160->Add(lSetPlaneBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer163 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer159->Add(itemBoxSizer163, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
