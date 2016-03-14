@@ -977,8 +977,6 @@ Surface2DPane::Surface2DPane(wxWindow* parent, Surf2DBase* target,
 }
 
 Surface2DPane::~Surface2DPane() {
-	delete mOrbColor1;
-	if (mOrbColor2) delete mOrbColor2;
 }
 
 void Surface2DPane::OnPosColorChange(wxCommandEvent & event) {
@@ -1093,9 +1091,6 @@ Surface3DPane::Surface3DPane(wxWindow* parent, Surf3DBase* target,
 }
 
 Surface3DPane::~Surface3DPane() {
-	delete mOrbColor1;
-	delete mOrbColor2;
-	delete mTransparency;
 }
 
 void Surface3DPane::setContourValueSld() {
