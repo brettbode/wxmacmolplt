@@ -468,69 +468,85 @@ class Surface2DPane : public BaseSurfacePane {
 class Surface3DPane : public BaseSurfacePane {
 	/* DECLARE_CLASS(Surface3DPane) */
 
-	public:
-		Surface3DPane() {}
+public:
+	Surface3DPane() {}
 
-		Surface3DPane(wxWindow* parent, Surf3DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
-		~Surface3DPane();
+	Surface3DPane(wxWindow* parent, Surf3DBase* target, SurfacesWindow* Owner, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
+	~Surface3DPane();
 
-		void On3DRadioBox(wxCommandEvent& event);
-		void OnSmoothCheck(wxCommandEvent& event);
-		void OnContourValueEnter(wxCommandEvent& event);
-		virtual void OnUpdate(wxCommandEvent& event) = 0;
-		void OnFreeMem(wxCommandEvent& event);
-		void OnPosColorChange(wxCommandEvent & event);
-		void OnNegColorChange(wxCommandEvent & event);
-		void OnTransparencyChange(wxSpinEvent & event);
-		void OnIdle(wxIdleEvent& WXUNUSED(event));
-		void OnSetParam(wxCommandEvent &event);
-		void OnGridSizeSld(wxCommandEvent &event);
+	/// Event handler for the wire frame/solid surface radio buttons
+	void On3DRadioBox(wxCommandEvent& event);
+	/// Event handler for the smooth surface check box
+	void OnSmoothCheck(wxCommandEvent& event);
+	/// Event handler for the contour value edit field
+	void OnContourValueEnter(wxCommandEvent& event);
+	/// Pure virtual function for the surface update function
+	virtual void OnUpdate(wxCommandEvent& event) = 0;
+	/// Event handler for when the free memory button is pressed. Causes the grid to be released.
+	void OnFreeMem(wxCommandEvent& event);
+	/// Event handler for when the positive color is changed.
+	void OnPosColorChange(wxCommandEvent & event);
+	/// Event handler for when the negative color is changed.
+	void OnNegColorChange(wxCommandEvent & event);
+	/// Event handler for when the transparency color is changed.
+	void OnTransparencyChange(wxSpinEvent & event);
+	/// Call back that checks edit field values and sets update button if needed
+	void OnIdle(wxIdleEvent& WXUNUSED(event));
+	/// Called when the set parameters button is pushed to manually set the grid settings.
+	void OnSetParam(wxCommandEvent &event);
+	/// Called after the Grid Size slider is changed.
+	void OnGridSizeSld(wxCommandEvent &event);
+	/// Copy the class contour value to the slider control
+	void setContourValueSld();
+	/// Event handler for a change in the contour value slider.
+	void OnContourValueSld(wxCommandEvent &event);
+	/// Copies the class value for the maximum grid value to the contour value slider control
+	void SetContourMaxValueText(void);
+	/// Activate/setup MEP controls based on whether a MEP is possible for the current target orbital set.
+	void refreshMEPControls();
+	/// Call back for a change in the check box indicating the surface should be colored based on the MEP value.
+	void OnUseMEPCheck(wxCommandEvent &event);
+	/// Event handler for the check box indicating the use of an RGB color scheme versus bi-color scheme.
+	void OnRGBColorCheck(wxCommandEvent &event);
+	/// Event handler for the check box indicating that the color scheme should be inverted.
+	void OnInvertRGBCheck(wxCommandEvent &event);
+	/// Event handler for a change in the maximum MEP value to colorize edit
+	void OnMaxMEPValueText(wxCommandEvent &event);
+	/// Push the Max MEP value to the edit field
+	void SetMaxMEPValueText();
 
-		void setContourValueSld();
-		void SetContourValueText(void);
-		void OnContourValueSld(wxCommandEvent &event);
-		void SetContourMaxValueText(void);
-		void refreshMEPControls();
+protected:
+	wxSlider* mGridSizeSld;			///< The slider representing the grid volume muliplier
+	FloatSlider* mContourValSld;	///< The slider/edit field for setting the isosurface value
+	colorArea* mOrbColor1;			///< The color picker control for color 1 (positive)
+	colorArea* mOrbColor2;			///< The color picker control for color 2 (negative)
+	wxSpinCtrl *mTransparency;		///< Spin control for setting the percent transparency
+	wxRadioBox* m3DRdoBox;			///< The radio controls for setting wireframe versus solid mode
+	wxCheckBox* mSmoothChkBox;		///< Check box to trigger smoothing the surface with vertex normals
+	wxButton* mFreeMemBut;			///< Button to cause the grid to be freed up
 
-		void OnUseMEPCheck(wxCommandEvent &event);
-		void OnRGBColorCheck(wxCommandEvent &event);
-		void OnInvertRGBCheck(wxCommandEvent &event);
-		void OnMaxMEPValueText(wxCommandEvent &event);
-		void SetMaxMEPValueText();
+	float GridSize;					///< Local temp copy of the grid volume size multiplier
+	RGBColor PosColor;				///< Local temp copy of color 1 (positive)
+	RGBColor NegColor;				///< Local temp copy of color 2 (negative)
+	int Transparency;				///< Local temp copy of the percent transparency
+	bool UseNormals;				///< Local temp copy of the flag for vertex normals
+	bool UseSolidSurface;			///< Local temp flag for picking wireframe versus a solid surface
+	float ContourValue;				///< Local temp copy of the isosurface value
 
-	protected:
-		wxSlider* mGridSizeSld;
-		FloatSlider* mContourValSld;
-		wxStaticText* mGridMinText;
-		wxStaticText* mGridMaxText;
-		colorArea* mOrbColor1;
-		colorArea* mOrbColor2;
-		wxSpinCtrl *mTransparency;
-		wxRadioBox* m3DRdoBox;
-		wxCheckBox* mSmoothChkBox;
-		wxButton* mFreeMemBut;
+	wxCheckBox*	mColorSurfCheck;	///< Check box control for the option to colorize the surface by the MEP value
+	wxCheckBox*	mUseRGBColorCheck;	///< Check box for the MEP colorize by RGB or linear color space
+	wxCheckBox*	mInvertRGBCheck;	///< Check box to invert the MEP color mapping
+	wxTextCtrl*	mMaxMapEdit;		///< Cutoff for the MEP color mapping
+	bool UseMEP;					///< local temp copy of the colorize by MEP flag
+	bool UseRGBSurfaceColor;		///< local temp copy of the MEP colorization choice (RGB or linear)
+	bool InvertRGBSurfaceColor;		///< local temp copy of the invert MEP color map
+	float MaxMEPValue;				///< local temp copy of the MEP colorization value cutoff
 
-		float GridSize;
-		RGBColor PosColor;
-		RGBColor NegColor;
-		int Transparency;
-		bool UseNormals;
-		bool UseSolidSurface;
-		float ContourValue;
+private:
+	/// Called when there is a change to the contour value via the edit field portion of the slider control
+	void changeContourValue();
 
-		wxCheckBox*	mColorSurfCheck;
-		wxCheckBox*	mUseRGBColorCheck;
-		wxCheckBox*	mInvertRGBCheck;
-		wxTextCtrl*	mMaxMapEdit;
-		bool UseMEP;
-		bool UseRGBSurfaceColor;
-		bool InvertRGBSurfaceColor;
-		float MaxMEPValue;
-
-	private:
-		void changeContourValue();
-
-		Surf3DBase* mTarget;
+	Surf3DBase* mTarget;
 
 	DECLARE_EVENT_TABLE()
 }; 
@@ -538,50 +554,45 @@ class Surface3DPane : public BaseSurfacePane {
 class Orbital2DSurfPane : public Surface2DPane, public OrbSurfacePane {    
   /* DECLARE_CLASS(Orbital2DSurfPane) */
 
- public:
-    /// Constructors
-    Orbital2DSurfPane() { }
-    Orbital2DSurfPane(wxWindow* parent, Orb2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL2D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL2D_POSITION, const wxSize& size = SYMBOL_ORBITAL2D_SIZE, long style = SYMBOL_ORBITAL2D_STYLE);
-    ~Orbital2DSurfPane();
+public:
+	/// Constructors
+	Orbital2DSurfPane() { }
+	Orbital2DSurfPane(wxWindow* parent, Orb2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL2D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL2D_POSITION, const wxSize& size = SYMBOL_ORBITAL2D_SIZE, long style = SYMBOL_ORBITAL2D_STYLE);
+	~Orbital2DSurfPane();
 
-    virtual void TargetToPane();
-    virtual void refreshControls();
+	/// Copy the data from the target surface to the temporary variables for this window
+	virtual void TargetToPane();
+	/// Update the controls after changes to the data (such as after a surface update)
+	virtual void refreshControls();
 
-    void OnOrbSetChoice(wxCommandEvent &event);
-    void OnMOList(wxCommandEvent &event);
-    void OnOrbFormatChoice(wxCommandEvent &event);
-    void OnReversePhase(wxCommandEvent &event);
-    void OnSphHarmonicChk(wxCommandEvent &event);
-    void OnCoefList(wxCommandEvent &event);
+	/// Called upon a change to the orbital set selector
+	void OnOrbSetChoice(wxCommandEvent &event);
+	/// Called when a selection change is made in the molecular orbital list
+	void OnMOList(wxCommandEvent &event);
+	/// Called when a change is made to the selector for showing orbital energies or occupations
+	void OnOrbFormatChoice(wxCommandEvent &event);
+	/// Called when the reverse orbital phase check box is changed
+	void OnReversePhase(wxCommandEvent &event);
+	/// Called when the spherical harmonics check box is changed
+	void OnSphHarmonicChk(wxCommandEvent &event);
+	/// Called when a selection is changed in the atomic orbital list
+	void OnCoefList(wxCommandEvent &event);
 
- private:
-    virtual bool UpdateNeeded(void);
-    void CreateControls();
-    void OnUpdate(wxCommandEvent &event);
+private:
+	/// Routine tests the current window data against the target surface to determine if an update is needed
+	virtual bool UpdateNeeded(void);
+	/// Routine creates all the controls
+	void CreateControls();
+	/// Called when the update button is pressed. Processes all actions needed to update the target surface.
+	void OnUpdate(wxCommandEvent &event);
 
-    wxBoxSizer* upperSizer;
-    wxBoxSizer* middleSizer;
-    wxBoxSizer* bottomSizer;
-    wxBoxSizer* leftMiddleSizer;
-    wxBoxSizer* upperLeftMiddleSizer;
-    wxBoxSizer* lowerLeftMiddleSizer;
-    wxFlexGridSizer* rightMiddleSizer;
-    wxBoxSizer* leftBottomSizer;
-    wxBoxSizer* rightBottomSizer;
+	wxChoice* mOrbFormatChoice;			///< Choice control for orbital occupancy versus energies
+	wxCheckBox* mSphHarmonicsChk;		///< Spherical harmonics check box
+	wxCheckBox* mRevPhaseChk;			///< Reverse orbital phase checkbox
 
-    wxBoxSizer* mSubLeftBot1Sizer;
-    wxBoxSizer* mSubLeftBot2Sizer;
-    wxBoxSizer* mSubRightBot1Sizer;
-    wxBoxSizer* mSubRightBot2Sizer;
-    wxGridSizer* mSubRightBot3Sizer;
+	Orb2DSurface* mTarget;				///< The target surface
 
-    wxChoice* mOrbFormatChoice;
-    wxCheckBox* mSphHarmonicsChk;
-    wxCheckBox* mRevPhaseChk;
-
-    Orb2DSurface* mTarget;
-
-    DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 
 class Orbital3DSurfPane : public Surface3DPane, public OrbSurfacePane
@@ -589,68 +600,58 @@ class Orbital3DSurfPane : public Surface3DPane, public OrbSurfacePane
   /* DECLARE_CLASS(Orbital3DSurfPane) */
 
 public:
-    /// Constructors
-    Orbital3DSurfPane() { }
-    Orbital3DSurfPane(wxWindow* parent, Orb3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
-    ~Orbital3DSurfPane();
+	/// Constructors
+	Orbital3DSurfPane() { }
+	Orbital3DSurfPane(wxWindow* parent, Orb3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
+	~Orbital3DSurfPane();
 
-    virtual void TargetToPane();
-    virtual void refreshControls();
+	/// Copy the data from the target surface to the temporary variables for this window
+	virtual void TargetToPane();
+	/// Update the controls after changes to the data (such as after a surface update)
+	virtual void refreshControls();
 
-    /// Creates the controls and sizers
-    void CreateControls();
+	/// Creates the controls and sizers
+	void CreateControls();
 
-    void OnOrbFormatChoice(wxCommandEvent &event);
-    void OnMOList(wxCommandEvent &event);
-    void OnOrbSetChoice(wxCommandEvent &event);
-    void OnSphHarmonicChk(wxCommandEvent &event);
-    void OnReversePhase(wxCommandEvent &event);
-    void OnContourValueSld(wxCommandEvent &event);
-    void OnGridSizeSld(wxCommandEvent &event);
-    void OnUpdate(wxCommandEvent &event);
-    void OnCoefList(wxCommandEvent &event);
+	/// Called when a change is made to the selector for showing orbital energies or occupations
+	void OnOrbFormatChoice(wxCommandEvent &event);
+	/// Called when a selection change is made in the molecular orbital list
+	void OnMOList(wxCommandEvent &event);
+	/// Called upon a change to the orbital set selector
+	void OnOrbSetChoice(wxCommandEvent &event);
+	/// Called when the spherical harmonics check box is changed
+	void OnSphHarmonicChk(wxCommandEvent &event);
+	/// Called when the reverse orbital phase check box is changed
+	void OnReversePhase(wxCommandEvent &event);
+	/// Called when there is a change to the contour value slider
+	void OnContourValueSld(wxCommandEvent &event);
+	/// Called when there is a change to the Grid slize slider
+	void OnGridSizeSld(wxCommandEvent &event);
+	/// Called when the update button is pressed. Processes all actions needed to update the target surface.
+	void OnUpdate(wxCommandEvent &event);
+	/// Called when a selection is changed in the atomic orbital list
+	void OnCoefList(wxCommandEvent &event);
 
-////@begin Orbital3D member function declarations
+	////@begin Orbital3D member function declarations
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource(const wxString& name);
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource(const wxString& name);
 
-    /// Retrieves icon resources
-    wxIcon GetIconResource(const wxString& name);
-////@end Orbital3D member function declarations
+	/// Retrieves icon resources
+	wxIcon GetIconResource(const wxString& name);
+	////@end Orbital3D member function declarations
 
-    /// Should we show tooltips?
-    static bool ShowToolTips();
+private:
+	/// Routine tests the current window data against the target surface to determine if an update is needed
+	virtual bool UpdateNeeded(void);
 
- private:
-    virtual bool UpdateNeeded(void);
+	wxChoice* mOrbFormatChoice;			///< Choice control for orbital occupancy versus energies
+	wxCheckBox* mSphHarmonicsChk;		///< Spherical harmonics check box
+	wxCheckBox* mRevPhaseChk;			///< Reverse orbital phase checkbox
 
-    wxBoxSizer* upperSizer;
-    wxBoxSizer* middleSizer;
-    wxBoxSizer* bottomSizer;
-    wxBoxSizer* leftMiddleSizer;
-    wxBoxSizer* upperLeftMiddleSizer;
-    wxBoxSizer* lowerLeftMiddleSizer;
-    wxFlexGridSizer* rightMiddleSizer;
-    wxBoxSizer* leftBottomSizer;
-    wxBoxSizer* rightBottomSizer;
+	Orb3DSurface* mTarget;				///< The target surface
 
-    wxBoxSizer* mSubLeftBot1Sizer;
-    wxBoxSizer* mSubLeftBot2Sizer;
-    wxBoxSizer* mSubRightBot0Sizer;
-    wxBoxSizer* mSubRightBot1Sizer;
-    wxBoxSizer* mSubRightBot2Sizer;
-    wxBoxSizer* mSubRightBot3Sizer;
-    wxBoxSizer* mSubRightBot4Sizer;
-    wxGridSizer* mSubRightBot5Sizer;
-
-    wxChoice* mOrbFormatChoice;
-    wxCheckBox* mSphHarmonicsChk;
-    wxCheckBox* mRevPhaseChk;  
-
-    Orb3DSurface* mTarget;
-
-   DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 
 class General3DSurfPane : public Surface3DPane
@@ -658,56 +659,57 @@ class General3DSurfPane : public Surface3DPane
 	/* DECLARE_CLASS(General3DSurfPane) */
 	
 public:
-    /// Constructors
-    General3DSurfPane() { }
-    General3DSurfPane(wxWindow* parent, General3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
-    ~General3DSurfPane();
-	
-    virtual void TargetToPane();
-    virtual void refreshControls();
-	
-    /// Creates the controls and sizers
-    void CreateControls();
+	/// Constructors
+	General3DSurfPane() { }
+	General3DSurfPane(wxWindow* parent, General3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
+	~General3DSurfPane();
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource(const wxString& name);
-	
-    /// Retrieves icon resources
-    wxIcon GetIconResource(const wxString& name);
-	
-    /// Should we show tooltips?
-    static bool ShowToolTips();
-	
+	/// Copy the data from the target surface to the temporary variables for this window
+	virtual void TargetToPane();
+	/// Update the controls after changes to the data (such as after a surface update)
+	virtual void refreshControls();
+
+	/// Creates the controls and sizers
+	void CreateControls();
+
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource(const wxString& name);
+
+	/// Retrieves icon resources
+	wxIcon GetIconResource(const wxString& name);
+
 private:
 	/// Do the displayed values differ from the saved values.
 	virtual bool UpdateNeeded(void);
-	
+	/// Call back for the check box activating the multiplication function
 	void OnMultCheck(wxCommandEvent &event);
+	/// Call back for the check box requesting values be squared as read in
 	void OnSquareCheck(wxCommandEvent &event);
+	/// Call back for check box activating positive and negative contours with the same magnitude
 	void OnContourPosNegCheck(wxCommandEvent &event);
 	/// Call back function for when the file button is pressed.
-	
+
 	/// Prompts the user for the file and then attempts to read it in.
 	void OnFileButton(wxCommandEvent &event);
 	/// Call back function for when the Update button is pressed.
 	void OnUpdate(wxCommandEvent &event);
 	/// Call back function for changes in the counter value slider.
-    void OnContourValueSld(wxCommandEvent &event);
+	void OnContourValueSld(wxCommandEvent &event);
 	/// Call back function for when the text field is changed.
 	void OnMultValueEdit(wxCommandEvent& event);
-	
-    wxCheckBox* mMultCheck;
-    wxTextCtrl* mGenMultValue;
-    wxCheckBox* mSquareCheck;
-    wxCheckBox* mGenContourPosNegCheck;
 
-    General3DSurface*	mTarget;
-	bool				ContourPosNeg;
-	bool				useMultValue;
-	bool				squareValues;
-	float				MultValue;
-	
-    DECLARE_EVENT_TABLE()
+	wxCheckBox* mMultCheck;					///< Check box control activating multiplier scale factor
+	wxTextCtrl* mGenMultValue;				///< The edit control for the multiplier
+	wxCheckBox* mSquareCheck;				///< Check box for squaring the values
+	wxCheckBox* mGenContourPosNegCheck;		///< Check box for producing positive and negative contours
+
+	General3DSurface*	mTarget;			///< The target surface
+	bool				ContourPosNeg;		///< Should both positive and negative contours of the same magnitude be produced
+	bool				useMultValue;		///< Should the values be multiplied by MultValue?
+	bool				squareValues;		///< Should the values be squared as they are read in?
+	float				MultValue;			///< The value scale factor, if active
+
+	DECLARE_EVENT_TABLE()
 };
 
 class General2DSurfPane : public Surface2DPane
@@ -720,7 +722,9 @@ public:
     General2DSurfPane(wxWindow* parent, General2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
     ~General2DSurfPane();
 	
+	/// Copy the data from the target surface to the temporary variables for this window
     virtual void TargetToPane();
+	/// Update the controls after changes to the data (such as after a surface update)
     virtual void refreshControls();
 	
     /// Creates the controls and sizers
@@ -736,23 +740,29 @@ public:
     static bool ShowToolTips() {return true;};
 	
 private:
+	/// Do the displayed values differ from the saved values.
 	virtual bool UpdateNeeded(void);
-	
+	/// Call back for the check box activating the multiplication function
 	void OnMultCheck(wxCommandEvent &event);
+	/// Call back for the check box requesting values be squared as read in
 	void OnSquareCheck(wxCommandEvent &event);
+	/// Prompts the user for the file and then attempts to read it in.
 	void OnFileButton(wxCommandEvent &event);
+	/// Call back function for when the Update button is pressed.
 	void OnUpdate(wxCommandEvent &event);
+	/// Call back function for when the text field is changed.
 	void OnMultValueEnter(wxCommandEvent& event);
+	/// Pushes the local variable to the control
 	void SetMultValue(void);
 	
-    wxCheckBox* mMultCheck;
-    wxTextCtrl* mGenMultValue;
-    wxCheckBox* mSquareCheck;
-	
-    General2DSurface*	mTarget;
-	bool				useMultValue;
-	bool				squareValues;
-	float				MultValue;
+	wxCheckBox* mMultCheck;				///< Check box control activating multiplier scale factor
+	wxTextCtrl* mGenMultValue;			///< The edit control for the multiplier
+	wxCheckBox* mSquareCheck;			///< Check box for squaring the values
+
+	General2DSurface*	mTarget;		///< The target surface
+	bool				useMultValue;	///< Should the values be multiplied by MultValue?
+	bool				squareValues;	///< Should the values be squared as they are read in?
+	float				MultValue;		///< The value scale factor, if active
 	
     DECLARE_EVENT_TABLE()
 };
@@ -766,7 +776,9 @@ public:
     TEDensity1DSurfPane(wxWindow* parent, TEDensity1DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_TED1D_IDNAME, const wxPoint& pos = SYMBOL_TED1D_POSITION, const wxSize& size = SYMBOL_TED1D_SIZE, long style = SYMBOL_TED1D_STYLE);
     ~TEDensity1DSurfPane();
 	
+	/// Copy the data from the target surface to the temporary variables for this window
     virtual void TargetToPane();
+	/// Update the controls after changes to the data (such as after a surface update)
     virtual void refreshControls();
 	
     /// Creates the controls and sizers
@@ -782,11 +794,12 @@ public:
     static bool ShowToolTips() {return true;};
 	
 private:
+	/// Do the displayed values differ from the saved values.
 	virtual bool UpdateNeeded(void);
-
+	/// Call back function for when the Update button is pressed. Takes care of all needed computation, etc.
 	void OnUpdate(wxCommandEvent &event);
 
-    TEDensity1DSurface*	mTarget;
+	TEDensity1DSurface*	mTarget;		///< The target surface
 	
     DECLARE_EVENT_TABLE()
 };
@@ -801,7 +814,9 @@ public:
     TEDensity2DSurfPane(wxWindow* parent, TEDensity2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_TED2D_IDNAME, const wxPoint& pos = SYMBOL_TED2D_POSITION, const wxSize& size = SYMBOL_TED2D_SIZE, long style = SYMBOL_TED2D_STYLE);
     ~TEDensity2DSurfPane();
 	
+	/// Copy the data from the target surface to the temporary variables for this window
     virtual void TargetToPane();
+	/// Update the controls after changes to the data (such as after a surface update)
     virtual void refreshControls();
 	
     /// Creates the controls and sizers
@@ -817,11 +832,12 @@ public:
     static bool ShowToolTips() {return true;};
 	
 private:
+	/// Do the displayed values differ from the saved values.
 	virtual bool UpdateNeeded(void);
-
+	/// Call back function for when the Update button is pressed. Takes care of all needed computation, etc.
 	void OnUpdate(wxCommandEvent &event);
 
-    TEDensity2DSurface*	mTarget;
+	TEDensity2DSurface*	mTarget;		///< The target surface
 	
     DECLARE_EVENT_TABLE()
 };
