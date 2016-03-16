@@ -49,7 +49,6 @@ IMPLEMENT_CLASS(Surface2DPane, BaseSurfacePane)
 IMPLEMENT_CLASS(Surface3DPane, BaseSurfacePane)
 IMPLEMENT_CLASS(Orbital2DSurfPane, wxPanel)
 IMPLEMENT_CLASS(Orbital3DSurfPane, wxPanel)
-  //IMPLEMENT_CLASS(TEDensity2DSurfPane, wxPanel)
 IMPLEMENT_CLASS(General3DSurfPane, wxPanel)
 IMPLEMENT_CLASS(General2DSurfPane, wxPanel)
 IMPLEMENT_CLASS(TEDensity2DSurfPane, wxPanel)
@@ -3523,7 +3522,6 @@ void TEDensity3DSurfPane::TargetToPane(void) {
 
 void TEDensity3DSurfPane::refreshControls() {
 	mOrbSetChoice->SetSelection(TargetOrbSet);
-	/* SetContourValueText(); */
 	SetContourMaxValueText();
 	setContourValueSld();
 
@@ -3574,7 +3572,6 @@ bool TEDensity3DSurfPane::UpdateNeeded(void) {
 }
 void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	SetMaxMEPValueText();
-	/* SetContourValueText(); */
 
 	//only update the grid if needed
 	bool updateGrid=UpdateTest, updateContour=false, updateMEP=false;
@@ -3768,6 +3765,7 @@ void TEDensity3DSurfPane::CreateControls() {
 
 	mNumGridPntSld = new wxSlider(TED3DPanel, ID_GRID_POINT_SLIDER, 0, 10, 150, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_LABELS);
 	itemBoxSizer96->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mNumGridPntSld->SetToolTip(_("Sets the resolution of the grid. Fewer points is faster while more points produces a high-resolution result."));
 
 	wxBoxSizer* itemBoxSizer99 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer99, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
@@ -3776,6 +3774,7 @@ void TEDensity3DSurfPane::CreateControls() {
 
 	mGridSizeSld = new wxSlider(TED3DPanel, ID_GRID_SIZE_SLIDER, 0, 1, 300, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL);
 	itemBoxSizer99->Add(mGridSizeSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mGridSizeSld->SetToolTip(_("Adjusts the volume over which the grid is computed. Adjust to the right if your surface appears clipped."));
 
 	wxBoxSizer* itemBoxSizer102 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer102, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
@@ -3784,23 +3783,9 @@ void TEDensity3DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText104 = new wxStaticText(TED3DPanel, wxID_STATIC, _("Contour Value:"), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer103->Add(itemStaticText104, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	/* mContourValueEdit = new wxTextCtrl(TED3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0); */
-	/* itemBoxSizer103->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5); */
-
-	/* wxBoxSizer* itemBoxSizer106 = new wxBoxSizer(wxVERTICAL); */
-	/* itemBoxSizer102->Add(itemBoxSizer106, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3); */
-	/* mContourValSld = new wxSlider(TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL); */
 	mContourValSld = new FloatSlider(TED3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f, FloatSlider::POW, wxSize(CONTOUR_WIDTH, wxDefaultCoord));
 	itemBoxSizer102->Add(mContourValSld, 0, wxFIXED_MINSIZE | wxALIGN_CENTER_VERTICAL|wxALL, 3);
-	/* itemBoxSizer106->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1); */
-
-	/* wxBoxSizer* itemBoxSizer108 = new wxBoxSizer(wxHORIZONTAL); */
-	/* itemBoxSizer106->Add(itemBoxSizer108, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5); */
-	/* mGridMinText = new wxStaticText(TED3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT); */
-	/* itemBoxSizer108->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
-
-	/* mGridMaxText = new wxStaticText(TED3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT); */
-	/* itemBoxSizer108->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
+	mContourValSld->SetToolTip(_("Sets the value for the isosurface. Move to the right to produce a surface closer to the nucleus."));
 
 	wxStaticBoxSizer *mep_sizer = new wxStaticBoxSizer(wxHORIZONTAL, TED3DPanel, wxT("MEP"));
 	mainSizer->Add(mep_sizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1);
@@ -3967,6 +3952,7 @@ void MEP2DSurfPane::CreateControls() {
 
 	mNumGridPntSld = new wxSlider(MEP2DPanel, ID_GRID_POINT_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_LABELS);
 	itemBoxSizer140->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mNumGridPntSld->SetToolTip(_("Sets the resolution of the grid. Fewer points is faster while more points produces a high-resolution result."));
 
 	wxBoxSizer* itemBoxSizer143 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer143, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -3975,6 +3961,7 @@ void MEP2DSurfPane::CreateControls() {
 
 	mNumContourText = new wxTextCtrl(MEP2DPanel, ID_NUM_CONTOUR_TEXT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	itemBoxSizer143->Add(mNumContourText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mNumContourText->SetToolTip(_("Sets the number of contours between zero and the max value."));
 
 	wxBoxSizer* itemBoxSizer146 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer146, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -3983,6 +3970,7 @@ void MEP2DSurfPane::CreateControls() {
 
 	mContourValText = new wxTextCtrl(MEP2DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	itemBoxSizer146->Add(mContourValText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mContourValText->SetToolTip(_("The maximum value for a contour. The contour spacing is this value divided by the number of contours."));
 
 	mUsePlaneChk = new wxCheckBox(MEP2DPanel, ID_USE_PLANE_CHECKBOX, _("Use plane of screen"), wxDefaultPosition, wxDefaultSize, 0);
 	mUsePlaneChk->SetValue(false);
@@ -4234,7 +4222,6 @@ void MEP3DSurfPane::TargetToPane(void) {
 }
 void MEP3DSurfPane::refreshControls() {
 	mOrbSetChoice->SetSelection(TargetOrbSet);
-	/* SetContourValueText(); */
 	SetContourMaxValueText();
 	setContourValueSld();
 
@@ -4279,8 +4266,6 @@ bool MEP3DSurfPane::UpdateNeeded(void) {
 	return result;
 }
 void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
-	/* SetContourValueText(); */
-
 	//only update the grid if needed
 	bool updateGrid=UpdateTest, updateContour=false;
 	if (TargetOrbSet != mTarget->getTargetOrbSet()) {
@@ -4403,25 +4388,6 @@ void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	else
 		mFreeMemBut->Disable();
 
-	/*	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DFreeMem, target->GridAvailable());
-	//Setup the contour value and grid max text items
-	short	itemtype;
-	Handle	itemhandle;
-	Rect	itemrect;
-	GetDialogItem(SurfaceDlg, kSurfBaseItems+kTE3DValue, &itemtype, &itemhandle, &itemrect);
-	float ContourValue = target->GetContourValue(), GridMax = target->GetGridMax();
-	Str255	itemText;
-	sprintf((char *) &(itemText[1]), "%.4f", ContourValue);
-	itemText[0] = strlen((char *) &(itemText[1]));
-	SetDialogItemText(itemhandle, itemText);
-	GetDialogItem(SurfaceDlg, kSurfBaseItems+kTE3DMaxValue, &itemtype, &itemhandle, &itemrect);
-	sprintf((char *) &(itemText[1]), "%.4f", GridMax);
-	itemText[0] = strlen((char *) &(itemText[1]));
-	SetDialogItemText(itemhandle, itemText);
-	UpdateTest = false;
-	SetupContourSlider();
-	AbleDItem(SurfaceDlg, kSurfBaseItems+kTE3DExportButton, target->ExportPossible());
-	*/
 	SetContourMaxValueText();
 	setContourValueSld();
 	UpdateTest = false;
@@ -4456,6 +4422,7 @@ void MEP3DSurfPane::CreateControls() {
 
 	mNumGridPntSld = new wxSlider(MEP3DPanel, ID_GRID_POINT_SLIDER, 0, 10, 150, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_LABELS);
 	itemBoxSizer171->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mNumGridPntSld->SetToolTip(_("Sets the resolution of the grid. Fewer points is faster while more points produces a high-resolution result."));
 
 	wxBoxSizer* itemBoxSizer174 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer174, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
@@ -4464,6 +4431,7 @@ void MEP3DSurfPane::CreateControls() {
 
 	mGridSizeSld = new wxSlider(MEP3DPanel, ID_GRID_SIZE_SLIDER, 0, 1, 300, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL);
 	itemBoxSizer174->Add(mGridSizeSld, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	mGridSizeSld->SetToolTip(_("Adjusts the volume over which the grid is computed. Adjust to the right if your surface appears clipped."));
 
 	wxBoxSizer* itemBoxSizer177 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer177, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 3);
@@ -4472,23 +4440,9 @@ void MEP3DSurfPane::CreateControls() {
 	wxStaticText* itemStaticText179 = new wxStaticText(MEP3DPanel, wxID_STATIC, _("Contour Value:"), wxDefaultPosition, wxDefaultSize, 0);
 	itemBoxSizer178->Add(itemStaticText179, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	/* mContourValueEdit = new wxTextCtrl(MEP3DPanel, ID_CONTOUR_VALUE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, 0); */
-	/* itemBoxSizer178->Add(mContourValueEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5); */
-
-	/* wxBoxSizer* itemBoxSizer181 = new wxBoxSizer(wxVERTICAL); */
-	/* itemBoxSizer177->Add(itemBoxSizer181, 0, wxALIGN_CENTER_VERTICAL|wxALL, 3); */
-	/* mContourValSld = new wxSlider(MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0, 0, 100, wxDefaultPosition, wxSize(155,wxDefaultCoord), wxSL_HORIZONTAL); */
 	mContourValSld = new FloatSlider(MEP3DPanel, ID_CONTOUR_VALUE_SLIDER, 0.0f, 0.0f, 100.0f, FloatSlider::POW, wxSize(CONTOUR_WIDTH, wxDefaultCoord));
 	itemBoxSizer177->Add(mContourValSld, 0, wxFIXED_MINSIZE | wxALIGN_CENTER_VERTICAL|wxALL, 3);
-	/* itemBoxSizer181->Add(mContourValSld, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 1); */
-
-	/* wxBoxSizer* itemBoxSizer183 = new wxBoxSizer(wxHORIZONTAL); */
-	/* itemBoxSizer181->Add(itemBoxSizer183, 1, wxGROW|wxLEFT|wxTOP|wxBOTTOM, 5); */
-	/* mGridMinText = new wxStaticText(MEP3DPanel, ID_GENSURFGRIDMINTEXT, _("0"), wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT); */
-	/* itemBoxSizer183->Add(mGridMinText, 1, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
-
-	/* mGridMaxText = new wxStaticText(MEP3DPanel, ID_GRID_MAX_TEXT, _("1"), wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT); */
-	/* itemBoxSizer183->Add(mGridMaxText, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5); */
+	mContourValSld->SetToolTip(_("Sets the value for the isosurface. Move to the right to produce a surface closer to the nucleus."));
 
 	wxBoxSizer* itemBoxSizer186 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer186, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 0);
@@ -4587,23 +4541,24 @@ void Surface2DParamDlg::createControls() {
 	CPoint3D tempPt;
 	mTargetSurf->GetOrigin(&tempPt);
 
-	mainSizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer * mainSizer = new wxBoxSizer(wxVERTICAL);
 
-	firstTierSizer = new wxBoxSizer(wxHORIZONTAL);
-	secondTierSizer = new wxBoxSizer(wxHORIZONTAL);
-	thirdTierSizer = new wxBoxSizer(wxHORIZONTAL);
-	fourthTierSizer = new wxBoxSizer(wxHORIZONTAL);
-	fifthTierSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer * firstTierSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer * secondTierSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer * thirdTierSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer * fourthTierSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer * fifthTierSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	firstTierSizer->Add(new wxStaticText(this, wxID_ANY,
 				_T("Number of grid points:"),
 				wxDefaultPosition, wxDefaultSize), 
 			0, wxALIGN_LEFT | wxALL, 3);
 
-	numGridPoint = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
+	numGridPoint = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%ld"), mTargetSurf->GetNumGridPoints());
 	numGridPoint->SetValue(tmpStr);
 	firstTierSizer->Add(numGridPoint, 0, wxALL, 5);
+	numGridPoint->SetToolTip(_("The dimension of the 2D of grid."));
 
 	mainSizer->Add(firstTierSizer);
 
@@ -4614,17 +4569,20 @@ void Surface2DParamDlg::createControls() {
 				wxDefaultPosition, wxDefaultSize), 
 			0, wxALIGN_LEFT | wxALL, 3);
 
-	originText1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	originText1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.x);
 	originText1->SetValue(tmpStr);
+	originText1->SetToolTip(_("The x coordinate for the origin point of the grid."));
 
-	originText2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	originText2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.y);
 	originText2->SetValue(tmpStr);
+	originText2->SetToolTip(_("The y coordinate for the origin point of the grid."));
 
-	originText3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	originText3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.z);
 	originText3->SetValue(tmpStr);
+	originText3->SetToolTip(_("The z coordinate for the origin point of the grid."));
 
 	secondTierSizer->Add(originText1, 0, wxALL, 5);
 	secondTierSizer->Add(originText2, 0, wxALL, 5);
@@ -4639,17 +4597,20 @@ void Surface2DParamDlg::createControls() {
 				wxDefaultPosition, wxDefaultSize), 
 			0, wxALIGN_LEFT | wxALL, 3);
 
-	vectorAxis1x = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	vectorAxis1x = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.x);
 	vectorAxis1x->SetValue(tmpStr);
+	vectorAxis1x->SetToolTip(_("The x coordinate for vector 1 defining the grid. The length of the vector provides the increment between points."));
 
-	vectorAxis1y = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	vectorAxis1y = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.y);
 	vectorAxis1y->SetValue(tmpStr);
+	vectorAxis1y->SetToolTip(_("The y coordinate for vector 1 defining the grid. The length of the vector provides the increment between points."));
 
-	vectorAxis1z = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	vectorAxis1z = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.z);
 	vectorAxis1z->SetValue(tmpStr);
+	vectorAxis1z->SetToolTip(_("The z coordinate for vector 1 defining the grid. The length of the vector provides the increment between points."));
 
 	thirdTierSizer->Add(vectorAxis1x, 0, wxALL, 5);
 	thirdTierSizer->Add(vectorAxis1y, 0, wxALL, 5);
@@ -4664,17 +4625,20 @@ void Surface2DParamDlg::createControls() {
 				wxDefaultPosition, wxDefaultSize), 
 			0, wxALIGN_LEFT | wxALL, 3);
 
-	vectorAxis2x = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	vectorAxis2x = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.x);
 	vectorAxis2x->SetValue(tmpStr);
+	vectorAxis2x->SetToolTip(_("The x coordinate for vector 2 defining the grid. The length of the vector provides the increment between points."));
 
-	vectorAxis2y = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	vectorAxis2y = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.y);
 	vectorAxis2y->SetValue(tmpStr);
+	vectorAxis2y->SetToolTip(_("The y coordinate for vector 2 defining the grid. The length of the vector provides the increment between points."));
 
-	vectorAxis2z = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	vectorAxis2z = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.z);
 	vectorAxis2z->SetValue(tmpStr);
+	vectorAxis2z->SetToolTip(_("The z coordinate for vector 2 defining the grid. The length of the vector provides the increment between points."));
 
 	fourthTierSizer->Add(vectorAxis2x, 0, wxALL, 5);
 	fourthTierSizer->Add(vectorAxis2y, 0, wxALL, 5);
@@ -4682,10 +4646,14 @@ void Surface2DParamDlg::createControls() {
 
 	mainSizer->Add(fourthTierSizer);
 
-	okButton = new wxButton(this, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize);
-	cancelButton = new wxButton(this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize);
-	copyAllButton = new wxButton(this, ID_COPY_ALL, _("&Copy All"), wxDefaultPosition, wxDefaultSize);
-	pasteAllButton = new wxButton(this, ID_PASTE_ALL, _("&Paste All"), wxDefaultPosition, wxDefaultSize);
+	wxButton * okButton = new wxButton(this, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize);
+	okButton->SetToolTip(_("Click Ok to apply the current parameter values to the surface and close the dialog."));
+	wxButton * cancelButton = new wxButton(this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize);
+	cancelButton->SetToolTip(_("Click Cancel to abandon changes and close the dialog."));
+	wxButton * copyAllButton = new wxButton(this, ID_COPY_ALL, _("&Copy All"), wxDefaultPosition, wxDefaultSize);
+	copyAllButton->SetToolTip(_("Copy the current values to the clipboard."));
+	wxButton * pasteAllButton = new wxButton(this, ID_PASTE_ALL, _("&Paste All"), wxDefaultPosition, wxDefaultSize);
+	pasteAllButton->SetToolTip(_("Paste a set of parameters values from the clipboard."));
 
 	fifthTierSizer->Add(copyAllButton , 0, wxALL, 5);
 	fifthTierSizer->Add(pasteAllButton , 0, wxALL, 5);
@@ -4828,25 +4796,28 @@ void Surface3DParamDlg::createControls() {
 	wxString tmpStr;
 	CPoint3D tempPt;
 
-	mainSizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer * mainSizer = new wxBoxSizer(wxVERTICAL);
 
 	mainSizer->Add(new wxStaticText(this, wxID_ANY,
 				_T("Number of grid points (x, y, z):"),
 				wxDefaultPosition, wxDefaultSize), 
 			0, wxALIGN_LEFT | wxALL, 3);
 
-	firstTierSizer = new wxBoxSizer(wxHORIZONTAL);
-	numGridPoint1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
+	wxBoxSizer * firstTierSizer = new wxBoxSizer(wxHORIZONTAL);
+	numGridPoint1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%ld"), mTargetSurf->GetNumXGridPoints());
 	numGridPoint1->SetValue(tmpStr);
+	numGridPoint1->SetToolTip(_("The X dimension of the 3D rectangular grid."));
 
-	numGridPoint2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
+	numGridPoint2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%ld"), mTargetSurf->GetNumYGridPoints());
 	numGridPoint2->SetValue(tmpStr);
+	numGridPoint2->SetToolTip(_("The Y dimension of the 3D rectangular grid."));
 
-	numGridPoint3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize);
+	numGridPoint3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%ld"), mTargetSurf->GetNumZGridPoints());
 	numGridPoint3->SetValue(tmpStr);
+	numGridPoint3->SetToolTip(_("The Z dimension of the 3D rectangular grid."));
 
 	firstTierSizer->Add(numGridPoint1, 0, wxALL, 5);
 	firstTierSizer->Add(numGridPoint2, 0, wxALL, 5);
@@ -4859,21 +4830,24 @@ void Surface3DParamDlg::createControls() {
 				wxDefaultPosition, wxDefaultSize), 
 			0, wxALIGN_LEFT | wxALL, 3);
 
-	secondTierSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer * secondTierSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	mTargetSurf->GetOrigin(&tempPt);
 
-	originText1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	originText1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.x);
 	originText1->SetValue(tmpStr);
+	originText1->SetToolTip(_("The x coordinate for the origin point of the grid."));
 
-	originText2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	originText2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.y);
 	originText2->SetValue(tmpStr);
+	originText2->SetToolTip(_("The y coordinate for the origin point of the grid."));
 
-	originText3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	originText3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), tempPt.z);
 	originText3->SetValue(tmpStr);
+	originText3->SetToolTip(_("The z coordinate for the origin point of the grid."));
 
 	secondTierSizer->Add(originText1, 0, wxALL, 5);
 	secondTierSizer->Add(originText2, 0, wxALL, 5);
@@ -4886,18 +4860,21 @@ void Surface3DParamDlg::createControls() {
 				wxDefaultPosition, wxDefaultSize), 
 			0, wxALIGN_LEFT | wxALL, 3);
 
-	thirdTierSizer = new wxBoxSizer(wxHORIZONTAL);
-	gridIncText1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	wxBoxSizer * thirdTierSizer = new wxBoxSizer(wxHORIZONTAL);
+	gridIncText1 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), mTargetSurf->GetXGridInc());
 	gridIncText1->SetValue(tmpStr);
+	gridIncText1->SetToolTip(_("The increment in the X direction for the 3D grid."));
 
-	gridIncText2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	gridIncText2 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), mTargetSurf->GetYGridInc());
 	gridIncText2->SetValue(tmpStr);
+	gridIncText2->SetToolTip(_("The increment in the Y direction for the 3D grid."));
 
-	gridIncText3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25));
+	gridIncText3 = new wxTextCtrl(this, wxID_ANY, _T(""), wxDefaultPosition, wxSize(100, 25), 0, wxTextValidator(wxFILTER_NUMERIC));
 	tmpStr.Printf(wxT("%f"), mTargetSurf->GetZGridInc());
 	gridIncText3->SetValue(tmpStr);
+	gridIncText3->SetToolTip(_("The increment in the Z direction for the 3D grid."));
 
 	thirdTierSizer->Add(gridIncText1, 0, wxALL, 5);
 	thirdTierSizer->Add(gridIncText2, 0, wxALL, 5);
@@ -4905,11 +4882,15 @@ void Surface3DParamDlg::createControls() {
 
 	mainSizer->Add(thirdTierSizer);
 
-	fourthTierSizer = new wxBoxSizer(wxHORIZONTAL);
-	okButton = new wxButton(this, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize);
-	cancelButton = new wxButton(this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize);
-	copyAllButton = new wxButton(this, ID_COPY_ALL, _("&Copy All"), wxDefaultPosition, wxDefaultSize);
-	pasteAllButton = new wxButton(this, ID_PASTE_ALL, _("&Paste All"), wxDefaultPosition, wxDefaultSize);
+	wxBoxSizer * fourthTierSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxButton * okButton = new wxButton(this, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize);
+	okButton->SetToolTip(_("Click Ok to apply the current parameter values to the surface and close the dialog."));
+	wxButton * cancelButton = new wxButton(this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize);
+	cancelButton->SetToolTip(_("Click Cancel to abandon changes and close the dialog."));
+	wxButton * copyAllButton = new wxButton(this, ID_COPY_ALL, _("&Copy All"), wxDefaultPosition, wxDefaultSize);
+	copyAllButton->SetToolTip(_("Copy the current values to the clipboard."));
+	wxButton * pasteAllButton = new wxButton(this, ID_PASTE_ALL, _("&Paste All"), wxDefaultPosition, wxDefaultSize);
+	pasteAllButton->SetToolTip(_("Paste a set of parameters values from the clipboard."));
 
 	fourthTierSizer->Add(copyAllButton , 0, wxALL, 5);
 	fourthTierSizer->Add(pasteAllButton , 0, wxALL, 5);

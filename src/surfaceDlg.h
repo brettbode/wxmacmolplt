@@ -851,7 +851,9 @@ class TEDensity3DSurfPane : public Surface3DPane
 		TEDensity3DSurfPane(wxWindow* parent, TEDensity3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
 		~TEDensity3DSurfPane();
 
+		/// Copy the data from the target surface to the temporary variables for this window
 		virtual void TargetToPane();
+		/// Update the controls after changes to the data (such as after a surface update)
 		virtual void refreshControls();
 
 		/// Creates the controls and sizers
@@ -867,11 +869,12 @@ class TEDensity3DSurfPane : public Surface3DPane
 		static bool ShowToolTips() {return true;};
 
 	private:
+		/// Do the displayed values differ from the saved values.
 		virtual bool UpdateNeeded(void);
-
+		/// Call back function for when the Update button is pressed. Takes care of all needed computation, etc.
 		void OnUpdate(wxCommandEvent &event);
 
-		TEDensity3DSurface*	mTarget;
+		TEDensity3DSurface*	mTarget;		///< The target surface
 
 	DECLARE_EVENT_TABLE()
 };
@@ -885,7 +888,9 @@ public:
     MEP2DSurfPane(wxWindow* parent, MEP2DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
     ~MEP2DSurfPane();
 	
-    virtual void TargetToPane();
+	/// Copy the data from the target surface to the temporary variables for this window
+	virtual void TargetToPane();
+	/// Update the controls after changes to the data (such as after a surface update)
     virtual void refreshControls();
 	
     /// Creates the controls and sizers
@@ -901,11 +906,12 @@ public:
     static bool ShowToolTips() {return true;};
 	
 private:
-		virtual bool UpdateNeeded(void);
-	
+	/// Do the displayed values differ from the saved values.
+	virtual bool UpdateNeeded(void);
+	/// Call back function for when the Update button is pressed. Takes care of all needed computation, etc.
 	void OnUpdate(wxCommandEvent &event);
 	
-    MEP2DSurface*	mTarget;
+    MEP2DSurface*	mTarget;		///< The target surface
 	
     DECLARE_EVENT_TABLE()
 };
@@ -919,7 +925,9 @@ public:
     MEP3DSurfPane(wxWindow* parent, MEP3DSurface* target, SurfacesWindow* owner, wxWindowID id = SYMBOL_ORBITAL3D_IDNAME, const wxPoint& pos = SYMBOL_ORBITAL3D_POSITION, const wxSize& size = SYMBOL_ORBITAL3D_SIZE, long style = SYMBOL_ORBITAL3D_STYLE);
     ~MEP3DSurfPane();
 	
+	/// Copy the data from the target surface to the temporary variables for this window
     virtual void TargetToPane();
+	/// Update the controls after changes to the data (such as after a surface update)
     virtual void refreshControls();
 	
     /// Creates the controls and sizers
@@ -935,83 +943,96 @@ public:
     static bool ShowToolTips() {return true;};
 	
 private:
+	/// Do the displayed values differ from the saved values.
 	virtual bool UpdateNeeded(void);
-	
+	/// Call back function for when the Update button is pressed. Takes care of all needed computation, etc.
 	void OnUpdate(wxCommandEvent &event);
 
-    MEP3DSurface*	mTarget;
+    MEP3DSurface*	mTarget;		///< The target surface
 	
     DECLARE_EVENT_TABLE()
 };
 
-class Surface2DParamDlg : public wxFrame 
+/**
+ * A dialog to allow the user to manually setup the grid.
+ * Allows the user to directly setup the grid including the number of grid points,
+ * the origin and the two vectors defining the plane. The dialog presents the current
+ * grid allowing the user to copy all of the parameters to paste into a different surface.
+ */
+class Surface2DParamDlg : public wxFrame
 {
   /* DECLARE_CLASS(Surface2DParamDlg); */
 
- public:
-  Surface2DParamDlg(BaseSurfacePane * parent, Surf2DBase * targetSurface, wxWindowID id = ID_2D_PARAM_DIALOG, const wxString& caption = SYMBOL_2D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
+public:
+	Surface2DParamDlg(BaseSurfacePane * parent, Surf2DBase * targetSurface, wxWindowID id = ID_2D_PARAM_DIALOG, const wxString& caption = SYMBOL_2D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
 
-  ~Surface2DParamDlg(void) {}
+	~Surface2DParamDlg(void) {}
 
-  bool Create(wxWindowID id = ID_2D_PARAM_DIALOG, const wxString& caption = SYMBOL_2D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
+	bool Create(wxWindowID id = ID_2D_PARAM_DIALOG, const wxString& caption = SYMBOL_2D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
 
- private:
-  void createControls();
+private:
+	/// Setup the dialog controls
+	void createControls();
+	/// Called when the dialog is closed.
+	/// The current dialog values are read and applied to the surface.
+	void OnClose(wxCommandEvent &event);
+	/// Called when the dialog is closed without saving the values.
+	void OnCancel(wxCommandEvent &event);
+	/// Called to rollup the grid parameters and place them in the copy buffer.
+	void OnCopyAll(wxCommandEvent &event);
+	/// Pull saved values from the copy buffer and insert them into the dialog.
+	void OnPasteAll(wxCommandEvent &event);
+	/// Edit controls for each of the grid parameters.
+	wxTextCtrl *numGridPoint;
+	wxTextCtrl *originText1, *originText2, *originText3;
+	wxTextCtrl *vectorAxis1x, *vectorAxis1y, *vectorAxis1z;
+	wxTextCtrl *vectorAxis2x, *vectorAxis2y, *vectorAxis2z;
 
-  void OnClose(wxCommandEvent &event);
-  void OnCancel(wxCommandEvent &event);
-  void OnCopyAll(wxCommandEvent &event);
-  void OnPasteAll(wxCommandEvent &event);
+	BaseSurfacePane * mParent;		///< The calling window
+	Surf2DBase * mTargetSurf;		///< The target surface
 
-  wxBoxSizer* mainSizer;
-  wxBoxSizer *firstTierSizer, *secondTierSizer, *thirdTierSizer;
-  wxBoxSizer *fourthTierSizer, *fifthTierSizer;
-
-  wxTextCtrl *numGridPoint;
-  wxTextCtrl *originText1, *originText2, *originText3;
-  wxTextCtrl *vectorAxis1x, *vectorAxis1y, *vectorAxis1z;
-  wxTextCtrl *vectorAxis2x, *vectorAxis2y, *vectorAxis2z;
-  wxButton *okButton, *cancelButton, *copyAllButton, *pasteAllButton;
-
-  BaseSurfacePane * mParent;
-  Surf2DBase * mTargetSurf;
-
-  DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 
-
-class Surface3DParamDlg : public wxFrame 
+/**
+ * A dialog to allow the user to manually setup the 3D grid.
+ * Allows the user to directly setup the grid including the number of grid points in each direction,
+ * the origin and the increment in each direction. The dialog presents the current
+ * grid allowing the user to copy all of the parameters to paste into a different surface.
+ */
+class Surface3DParamDlg : public wxFrame
 {
   /* DECLARE_CLASS(Surface3DParamDlg); */
 
- public:
-  Surface3DParamDlg(BaseSurfacePane * parent, Surf3DBase * targetSurface, wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
+public:
+	Surface3DParamDlg(BaseSurfacePane * parent, Surf3DBase * targetSurface, wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
 
-  ~Surface3DParamDlg(void){}
+	~Surface3DParamDlg(void){}
 
-  bool Create(wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
-  
- private:
-  void createControls();
+	bool Create(wxWindowID id = ID_3D_PARAM_DIALOG, const wxString& caption = SYMBOL_3D_PARAM_TITLE, const wxPoint& pos = SYMBOL_PARAM_POSITION, const wxSize& size = SYMBOL_PARAM_SIZE, long style = wxDEFAULT_FRAME_STYLE);
+	
+private:
+	/// Setup the dialog controls
+	void createControls();
+	/// Called when the dialog is closed.
+	/// The current dialog values are read and applied to the surface.
+	void OnClose(wxCommandEvent &event);
+	/// Called when the dialog is closed without saving the values.
+	void OnCancel(wxCommandEvent &event);
+	/// Called to rollup the grid parameters and place them in the copy buffer.
+	void OnCopyAll(wxCommandEvent &event);
+	/// Pull saved values from the copy buffer and insert them into the dialog.
+	void OnPasteAll(wxCommandEvent &event);
+	/// Edit controls for each of the grid parameters.
 
-  void OnClose(wxCommandEvent &event);
-  void OnCancel(wxCommandEvent &event);
-  void OnCopyAll(wxCommandEvent &event);
-  void OnPasteAll(wxCommandEvent &event);
+	wxTextCtrl *numGridPoint1, *numGridPoint2, *numGridPoint3;
+	wxTextCtrl *originText1, *originText2, *originText3;
+	wxTextCtrl *gridIncText1, *gridIncText2, *gridIncText3;
 
-  wxBoxSizer* mainSizer;
-  wxBoxSizer *firstTierSizer, *secondTierSizer, *thirdTierSizer;
-  wxBoxSizer* fourthTierSizer;
+	BaseSurfacePane * mParent;		///< The calling window
+	Surf3DBase *	mTargetSurf;	///< The target surface
 
-  wxTextCtrl *numGridPoint1, *numGridPoint2, *numGridPoint3;
-  wxTextCtrl *originText1, *originText2, *originText3;
-  wxTextCtrl *gridIncText1, *gridIncText2, *gridIncText3;
-  wxButton *okButton, *cancelButton, *copyAllButton, *pasteAllButton;
-
-  BaseSurfacePane * mParent;
-  Surf3DBase *	mTargetSurf;
-
-  DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 
 #endif
