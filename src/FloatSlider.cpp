@@ -47,7 +47,7 @@ FloatSlider::FloatSlider(wxWindow *parent,
 		
 	label.Printf(wxT("%.3f"), val);
 	val_box = new wxTextCtrl(this, ID_VAL_BOX, label, wxDefaultPosition,
-							 wxSize(70, wxDefaultCoord), wxTE_PROCESS_ENTER);
+							 wxSize(70, wxDefaultCoord), wxTE_PROCESS_ENTER, wxTextValidator(wxFILTER_NUMERIC));
 
 	// For the max value need to setup the width to be the max width we expect and then prevent resize.
 	// With resize the field seems to shrink down ok, but not enlarge leading to clipping.
