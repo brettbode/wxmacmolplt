@@ -56,8 +56,8 @@ IMPLEMENT_CLASS(TEDensity3DSurfPane, wxPanel)
 IMPLEMENT_CLASS(MEP2DSurfPane, wxPanel)
 IMPLEMENT_CLASS(MEP3DSurfPane, wxPanel)
 
-IMPLEMENT_CLASS(Surface2DParamDlg, wxFrame)
-IMPLEMENT_CLASS(Surface3DParamDlg, wxFrame)
+IMPLEMENT_CLASS(Surface2DParamDlg, wxDialog)
+IMPLEMENT_CLASS(Surface3DParamDlg, wxDialog)
 IMPLEMENT_DYNAMIC_CLASS(FormattedListBox, wxHtmlListBox)
 #endif
 
@@ -180,16 +180,14 @@ BEGIN_EVENT_TABLE(MEP3DSurfPane, Surface3DPane)
 	EVT_BUTTON(ID_SURFACE_UPDATE_BUT, MEP3DSurfPane::OnUpdate)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(Surface2DParamDlg, wxFrame)
+BEGIN_EVENT_TABLE(Surface2DParamDlg, wxDialog)
   EVT_BUTTON(wxID_OK, Surface2DParamDlg::OnClose)
-  EVT_BUTTON(wxID_CANCEL, Surface2DParamDlg::OnCancel)
   EVT_BUTTON(ID_COPY_ALL, Surface2DParamDlg::OnCopyAll)
   EVT_BUTTON(ID_PASTE_ALL, Surface2DParamDlg::OnPasteAll)
 END_EVENT_TABLE()
 
-BEGIN_EVENT_TABLE(Surface3DParamDlg, wxFrame)
+BEGIN_EVENT_TABLE(Surface3DParamDlg, wxDialog)
   EVT_BUTTON(wxID_OK, Surface3DParamDlg::OnClose)
-  EVT_BUTTON(wxID_CANCEL, Surface3DParamDlg::OnCancel)
   EVT_BUTTON(ID_COPY_ALL, Surface3DParamDlg::OnCopyAll)
   EVT_BUTTON(ID_PASTE_ALL, Surface3DParamDlg::OnPasteAll)
 END_EVENT_TABLE()
@@ -1036,8 +1034,8 @@ void Surface2DPane::OnUsePlaneChk(wxCommandEvent &event) {
 }
 
 void Surface2DPane::OnSetParam(wxCommandEvent &event) {
-	Surface2DParamDlg* paramDlg = new Surface2DParamDlg(this, mTarget);
-	paramDlg->Show();
+	Surface2DParamDlg paramDlg(this, mTarget);
+	paramDlg.ShowModal();
 }
 
 void Surface2DPane::OnContourValueText(wxCommandEvent& event) {
@@ -1236,8 +1234,8 @@ void Surface3DPane::OnTransparencyChange(wxSpinEvent & event) {
 }
 
 void Surface3DPane::OnSetParam(wxCommandEvent &event) {
-	Surface3DParamDlg* paramDlg = new Surface3DParamDlg(this, mTarget);
-	paramDlg->Show();
+	Surface3DParamDlg paramDlg(this, mTarget);
+	paramDlg.ShowModal();
 }
 
 /*!
@@ -4525,7 +4523,7 @@ Surface2DParamDlg::Surface2DParamDlg(BaseSurfacePane * parent, Surf2DBase * targ
 }
 
 bool Surface2DParamDlg::Create(wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style) {
-	wxFrame::Create(mParent, id, caption, pos, size, style);
+	wxDialog::Create(mParent, id, caption, pos, size, style);
 
 	createControls();
 
@@ -4721,12 +4719,8 @@ void Surface2DParamDlg::OnClose(wxCommandEvent &event) {
 	mParent->TargetToPane();
 	mParent->refreshControls();
 	mParent->SetUpdateTest(true);
-
-	Destroy();
-}
-
-void Surface2DParamDlg::OnCancel(wxCommandEvent &event) {
-	Destroy();
+	//Pass the event up the chain to allow the dialog to be properly cleaned up
+	event.Skip();
 }
 
 /*!!! Use wxWidgets' config class to implement copyAll and pasteAll
@@ -4781,7 +4775,7 @@ Surface3DParamDlg::Surface3DParamDlg(BaseSurfacePane * parent, Surf3DBase * targ
 }
 
 bool Surface3DParamDlg::Create(wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style) {
-	wxFrame::Create(mParent, id, caption, pos, size, style);
+	wxDialog::Create(mParent, id, caption, pos, size, style);
 
 	createControls();
 
@@ -4966,11 +4960,7 @@ void Surface3DParamDlg::OnClose(wxCommandEvent &event) {
 	mParent->refreshControls();
 	mParent->SetUpdateTest(true);
 
-	Destroy();
-}
-
-void Surface3DParamDlg::OnCancel(wxCommandEvent &event) {
-	Destroy();
+	event.Skip();
 }
 
 /*!!! Use wxWidgets' config class to implement copyAll and pasteAll

@@ -958,8 +958,10 @@ private:
  * Allows the user to directly setup the grid including the number of grid points,
  * the origin and the two vectors defining the plane. The dialog presents the current
  * grid allowing the user to copy all of the parameters to paste into a different surface.
+ * While this dialog does maintain a connect to it's parent it is likely best to be run as a modal
+ * dialog.
  */
-class Surface2DParamDlg : public wxFrame
+class Surface2DParamDlg : public wxDialog
 {
   /* DECLARE_CLASS(Surface2DParamDlg); */
 
@@ -999,8 +1001,10 @@ private:
  * Allows the user to directly setup the grid including the number of grid points in each direction,
  * the origin and the increment in each direction. The dialog presents the current
  * grid allowing the user to copy all of the parameters to paste into a different surface.
+ * While this dialog does maintain a connect to it's parent it is likely best to be run as a modal
+ * dialog.
  */
-class Surface3DParamDlg : public wxFrame
+class Surface3DParamDlg : public wxDialog
 {
   /* DECLARE_CLASS(Surface3DParamDlg); */
 
@@ -1017,8 +1021,6 @@ private:
 	/// Called when the dialog is closed.
 	/// The current dialog values are read and applied to the surface.
 	void OnClose(wxCommandEvent &event);
-	/// Called when the dialog is closed without saving the values.
-	void OnCancel(wxCommandEvent &event);
 	/// Called to rollup the grid parameters and place them in the copy buffer.
 	void OnCopyAll(wxCommandEvent &event);
 	/// Pull saved values from the copy buffer and insert them into the dialog.
