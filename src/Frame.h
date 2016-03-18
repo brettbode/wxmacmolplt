@@ -170,6 +170,7 @@ class Frame {
 		/** Parse the GAMESS CAS-SCF Diabatic Molecular Orbitals
 		 * @param Buffer the input buffer.
 		 * @param NumFuncs the number of basis functions.
+		 * @param NumOrbs the expected number of orbitals (will not parse more than this number).
 		 * @param lProgress the progress indicator.
 		 */
 		void ParseGAMESSMCSCFDiabaticVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs, Progress * lProgress);

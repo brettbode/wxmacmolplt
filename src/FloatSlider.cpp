@@ -263,7 +263,7 @@ void FloatSlider::SetMin(float min) {
 
 /**
  * Assign slider's maximum value.
- * @param max New maximum.
+ * @param newmax New maximum.
  */
 void FloatSlider::SetMax(float newmax) {
 
