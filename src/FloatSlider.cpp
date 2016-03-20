@@ -271,7 +271,7 @@ void FloatSlider::SetMax(float newmax) {
 	wxString lstr;
 	lstr.Printf(wxT("%.3g"), newmax);
 
-	max_label->SetLabelText(lstr);
+	max_label->SetLabel(lstr);
 }
 
 /* ------------------------------------------------------------------------- */
