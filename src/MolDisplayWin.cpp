@@ -522,14 +522,14 @@ void MolDisplayWin::createMenuBar(void) {
 	menuMolecule->Append(MMP_INVERTNORMALMODE, wxT("&Invert Normal Mode"), _T("Multiply the normal mode by -1 to invert the direction of the vectors"));
 // TODO:  Create menu items for remaining menus
 
-	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"));
+	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"), _("View/edit the bonding within the molecule"));
 	menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"), _("View/edit cartesian or internal coordinates"));
 	menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"), _("A plot of the energy for each geometry"));
 	menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"), _("Plot the vibrational frequencies"));
 	menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"), _T("Generate a GAMESS input file"));
 	/* menuWindow->Append(MMP_INPUT_WIZARD, wxT("&Input Builder Wizard"), _T("Easily generate a GAMESS input file")); */
 	menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"), _T("Add/Edit/Remove various surface types"));
-	menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"));
+	menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"), _("Compute bond lengths/angles or dihedrals between any set of atoms"));
 	menuWindow->Append(MMP_LOCAL_PREFERENCES, wxT("Pr&eferences"), _T("Edit the preferences for this window"));
 
 	menuBar->Append(menuFile, wxT("&File"));
@@ -2980,6 +2980,11 @@ void MolDisplayWin::menuWindowBonds(wxCommandEvent &event) {
 	}
 	winData.BondsWindowVisible(true);
 }
+void MolDisplayWin::menuWindowMoleculeDisplay(wxCommandEvent &event) {
+	// This function is called by a menu item under a subwindow.
+	// Since this window always exists we just need to bring it to the front.
+	Raise();
+}
 void MolDisplayWin::CloseBondsWindow(void) {
 	if (bondsWindow) {
 		winData.SetBondsWinRect(bondsWindow->GetRect());
@@ -4389,6 +4394,7 @@ EVT_UPDATE_UI (MMP_ANNOTATIONSSUBMENU,   MolDisplayWin::OnAnnotationLengthUpdate
 	EVT_UPDATE_UI_RANGE(MMP_NEWFRAME, MMP_ANNOTATIONSSUBMENU,
 	                    MolDisplayWin::UpdateAtomsOptions)
 	EVT_UPDATE_UI(wxID_COPY,			MolDisplayWin::UpdateAtomsOptions)
+	EVT_MENU(MMP_MOLECULEDISPLAYWINDOW, MolDisplayWin::menuWindowMoleculeDisplay)
 	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
 	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)
 	EVT_MENU (MMP_ENERGYPLOTWINDOW,		MolDisplayWin::menuWindowEnergy_plot)

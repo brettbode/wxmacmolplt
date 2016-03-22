@@ -108,6 +108,7 @@ enum MMP_EventID {
 	MMP_ADDFRAMES,
 	MMP_DELETEFRAME,
 	MMP_IMPORTMENU,
+	MMP_MOLECULEDISPLAYWINDOW,
 	MMP_BONDSWINDOW,
 	MMP_COORDSWINDOW,
 	MMP_ENERGYPLOTWINDOW,
@@ -564,7 +565,10 @@ class MolDisplayWin : public wxFrame {
 		void UpdateAtomsOptions(wxUpdateUIEvent& event);
 		
 		//Commands to open (or raise) the various data subviews.
-		//void menuWindowMain_display(wxCommandEvent &event);
+	
+		/// Raise the main molecule display window.
+		/// Passed up from subwindows.
+		void menuWindowMoleculeDisplay(wxCommandEvent &event);
 		void menuWindowBonds(wxCommandEvent &event);
 		void menuWindowCoordinates(wxCommandEvent &event);
 		void menuWindowEnergy_plot(wxCommandEvent &event);
