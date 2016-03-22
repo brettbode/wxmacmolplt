@@ -168,7 +168,7 @@ void AboutwxMacMolPlt::CreateControls()
 		itemStaticText17->SetToolTip(_("Thanks even to Kurt..."));
 	itemBoxSizer2->Add(itemStaticText17, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	wxButton* itemButton18 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxButton* itemButton18 = new wxButton( itemDialog1, wxID_OK, _("&Close"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer2->Add(itemButton18, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 ////@end AboutwxMacMolPlt content construction

@@ -4646,9 +4646,9 @@ void Surface2DParamDlg::createControls() {
 
 	wxButton * okButton = new wxButton(this, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize);
 	okButton->SetToolTip(_("Click Ok to apply the current parameter values to the surface and close the dialog."));
-	wxButton * cancelButton = new wxButton(this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize);
+	wxButton * cancelButton = new wxButton(this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxDefaultSize);
 	cancelButton->SetToolTip(_("Click Cancel to abandon changes and close the dialog."));
-	wxButton * copyAllButton = new wxButton(this, ID_COPY_ALL, _("&Copy All"), wxDefaultPosition, wxDefaultSize);
+	wxButton * copyAllButton = new wxButton(this, ID_COPY_ALL, _("Cop&y All"), wxDefaultPosition, wxDefaultSize);
 	copyAllButton->SetToolTip(_("Copy the current values to the clipboard."));
 	wxButton * pasteAllButton = new wxButton(this, ID_PASTE_ALL, _("&Paste All"), wxDefaultPosition, wxDefaultSize);
 	pasteAllButton->SetToolTip(_("Paste a set of parameters values from the clipboard."));
@@ -4879,9 +4879,9 @@ void Surface3DParamDlg::createControls() {
 	wxBoxSizer * fourthTierSizer = new wxBoxSizer(wxHORIZONTAL);
 	wxButton * okButton = new wxButton(this, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize);
 	okButton->SetToolTip(_("Click Ok to apply the current parameter values to the surface and close the dialog."));
-	wxButton * cancelButton = new wxButton(this, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize);
+	wxButton * cancelButton = new wxButton(this, wxID_CANCEL, _("Cancel"), wxDefaultPosition, wxDefaultSize);
 	cancelButton->SetToolTip(_("Click Cancel to abandon changes and close the dialog."));
-	wxButton * copyAllButton = new wxButton(this, ID_COPY_ALL, _("&Copy All"), wxDefaultPosition, wxDefaultSize);
+	wxButton * copyAllButton = new wxButton(this, ID_COPY_ALL, _("Cop&y All"), wxDefaultPosition, wxDefaultSize);
 	copyAllButton->SetToolTip(_("Copy the current values to the clipboard."));
 	wxButton * pasteAllButton = new wxButton(this, ID_PASTE_ALL, _("&Paste All"), wxDefaultPosition, wxDefaultSize);
 	pasteAllButton->SetToolTip(_("Paste a set of parameters values from the clipboard."));
