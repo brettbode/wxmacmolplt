@@ -395,7 +395,8 @@ void MolDisplayWin::createMenuBar(void) {
 	menuEdit->AppendSeparator();
 	menuEdit->Append(wxID_CUT, wxT("Cu&t\tCtrl+X"));
 	menuEdit->Append(wxID_COPY, wxT("&Copy\tCtrl+C"), wxT("Copy the display as an image"));
-	menuEdit->Append(MMP_COPYCOORDS, wxT("Copy Coordinates"), wxT("Copy the current set of coordinates as plain text"));
+	menuEdit->Append(MMP_COPYCOORDS, wxT("Copy Coordinates"), wxT("Copy the current set of coordinates as plain text in GAMESS style"));
+	menuEdit->Append(MMP_COPYNWCOORDS, wxT("Copy NWChem Coordinates"), wxT("Copy the current set of coordinates as plain text in NWChem style"));
 	menuEdit->Append(wxID_PASTE, wxT("&Paste\tCtrl+V"));
 	menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
 	menuEdit->AppendSeparator();
@@ -553,6 +554,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuEdit->Enable(wxID_CUT, false);
 	/* menuEdit->Enable(wxID_COPY, false); */
 	menuEdit->Enable(MMP_COPYCOORDS, false);
+	menuEdit->Enable(MMP_COPYNWCOORDS, false);
 	/* menuEdit->Enable(wxID_CLEAR, false); */
 
 	menuView->Enable(MMP_SHOWMODE, false);
@@ -1781,13 +1783,16 @@ void MolDisplayWin::menuEditCopy(wxCommandEvent &event) {
 void MolDisplayWin::menuEditCopyCoordinates(wxCommandEvent &event) {
 	CopyCoordinates(0);
 }
+void MolDisplayWin::menuEditCopyNWChemCoordinates(wxCommandEvent &event) {
+	CopyCoordinates(2);
+}
 void MolDisplayWin::CopyCoordinates(short ctype) const {
 	//Now copy the coords
 	Frame *     lFrame = MainData->cFrame;
 	wxString textBuffer;
 	
 	try {
-		if (ctype == 0) {
+		if (ctype == 0) {	// GAMESS style atomic_symbol  atomic_number  x  y  z
 			wxString    Label;
 			for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
 				if (mHighliteState && !lFrame->Atoms[iatm].GetSelectState()) continue;
@@ -1799,7 +1804,7 @@ void MolDisplayWin::CopyCoordinates(short ctype) const {
 								 lFrame->Atoms[iatm].Position.z);
 				textBuffer.Append(Label);
 			}
-		} else if (ctype == 1) {
+		} else if (ctype == 1) {	// GAMESS style z-matrix
 			//Make a guess for the Handle size based on the # of atoms and the line format
 			long datalength = lFrame->NumAtoms*70*sizeof(char);
 			char * lText = new char[datalength+1];
@@ -1813,6 +1818,17 @@ void MolDisplayWin::CopyCoordinates(short ctype) const {
 			textBuffer = wxString(lText, wxConvUTF8);
 			delete Buffer;
 			delete [] lText;
+		} else if (ctype == 2) {
+			wxString    Label;
+			for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
+				if (mHighliteState && !lFrame->Atoms[iatm].GetSelectState()) continue;
+				Prefs->GetAtomLabel(lFrame->Atoms[iatm].GetType()-1, Label);
+				textBuffer.Append(Label);
+				Label.Printf(wxT("   %13.8f  %13.8f  %13.8f\r"),
+							 lFrame->Atoms[iatm].Position.x, lFrame->Atoms[iatm].Position.y,
+							 lFrame->Atoms[iatm].Position.z);
+				textBuffer.Append(Label);
+			}
 		}
 	}
 	catch (...) {   //The buffer length was probably exceeded, since this shouldn't happen
@@ -4286,6 +4302,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (wxID_CUT,             MolDisplayWin::menuEditCut)
 	EVT_MENU (wxID_COPY,            MolDisplayWin::menuEditCopy)
 	EVT_MENU (MMP_COPYCOORDS,       MolDisplayWin::menuEditCopyCoordinates)
+	EVT_MENU (MMP_COPYNWCOORDS,		MolDisplayWin::menuEditCopyNWChemCoordinates)
 	EVT_MENU (wxID_PASTE,           MolDisplayWin::menuEditPaste)
 	EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate)
 	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)

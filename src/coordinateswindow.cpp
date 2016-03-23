@@ -59,6 +59,7 @@ BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 
 	EVT_MENU( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemClick )
 	EVT_UPDATE_UI( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemUpdate )
+	EVT_UPDATE_UI( MMP_COPYNWCOORDS, CoordinatesWindow::OnCopyNWCoordsItemUpdate )
 
 	EVT_UPDATE_UI( wxID_PASTE, CoordinatesWindow::OnPasteUpdate )
 
@@ -186,6 +187,8 @@ void CoordinatesWindow::CreateControls()
 	lEditMenu->Enable(wxID_COPY, false);
 	lEditMenu->Append(MMP_COPYCOORDSITEM, _("Copy Coordinates"), _("Copy the full set of coordinates with the current coordinate type."), wxITEM_NORMAL);
 	lEditMenu->Enable(MMP_COPYCOORDSITEM, false);
+	lEditMenu->Append(MMP_COPYNWCOORDS, wxT("Copy NWChem Coordinates"), wxT("Copy the current set of coordinates as plain text in NWChem style"));
+	lEditMenu->Enable(MMP_COPYNWCOORDS, false);
 	lEditMenu->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
 	lEditMenu->Enable(wxID_PASTE, false);
 	lEditMenu->Append(wxID_CLEAR, _("&Delete\tDel"), _T(""), wxITEM_NORMAL);
@@ -1021,6 +1024,14 @@ void CoordinatesWindow::OnStickmenuUpdate( wxUpdateUIEvent& event )
  */
 
 void CoordinatesWindow::OnMmpCopycoordsitemUpdate( wxUpdateUIEvent& event )
+{
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	event.Enable((natoms>0));
+}
+
+void CoordinatesWindow::OnCopyNWCoordsItemUpdate( wxUpdateUIEvent& event )
 {
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();

@@ -98,6 +98,7 @@ enum MMP_EventID {
 	
 	MMP_NEWFRAME,
 	MMP_COPYCOORDS,
+	MMP_COPYNWCOORDS,
 	MMP_ENERGYEDIT,
 	MMP_SETBONDLENGTH,
 	MMP_DETERMINEPG,
@@ -426,7 +427,15 @@ class MolDisplayWin : public wxFrame {
 		void OnRedoUpdate( wxUpdateUIEvent& event );
 		void menuEditCut(wxCommandEvent &event);
 		void menuEditCopy(wxCommandEvent &event);
+		/// Callback for the GAMESS style copy coords menu item
 		void menuEditCopyCoordinates(wxCommandEvent &event);
+		/// Callback for the NWChem style copy coords menu item
+		void menuEditCopyNWChemCoordinates(wxCommandEvent &event);
+		/// Place a text copy of the coordinates into the copy buffer
+		/**
+		 * Creates a text copy of the coorindates and places on to the copy buffer.
+		 * @param[in] coordtype specifies GAMESS style cartesians (0), GAMESS Z-matrix (1) or NWChem style Cartesians(2)
+		 */
 		void CopyCoordinates(short coordtype) const;
 		void menuEditPaste(wxCommandEvent &event);
 		/// wxEVT_UPDATE_UI event handler for wxID_PASTE
