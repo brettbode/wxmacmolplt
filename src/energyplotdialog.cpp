@@ -135,6 +135,8 @@ void EnergyPlotDialog::CreateControls()
 	menuBar->Append(itemMenu3, _("&File"));
 	wxMenu* itemMenu7 = new wxMenu;
 	itemMenu7->Append(wxID_COPY, _("&Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
+	itemMenu7->AppendSeparator();
+	itemMenu7->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"), wxT("Edit the default preferences for new windows"));
 	menuBar->Append(itemMenu7, _("&Edit"));
 	itemFrame1->SetMenuBar(menuBar);
 
@@ -151,10 +153,22 @@ void EnergyPlotDialog::CreateControls()
 	itemBoxSizer11->Add(epGraph, 1, wxGROW|wxALL, 5);
 
 ////@end EnergyPlotDialog content construction
-    itemMenu7->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
-    wxMenu * menuHelp = new wxMenu;
-    menuHelp->Append(wxID_ABOUT, wxT("&About"));
-    menuBar->Append(menuHelp, wxT("&Help"));
+	
+	wxMenu * menuWindow = new wxMenu;
+	menuWindow->Append(MMP_MOLECULEDISPLAYWINDOW, wxT("&Molecule Display"), _("The primary molecule display"));
+	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"), _("View/edit the bonding within the molecule"));
+	menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"), _("View/edit cartesian or internal coordinates"));
+	menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"), _("Plot the vibrational frequencies"));
+	menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"), _T("Generate a GAMESS input file"));
+	menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"), _T("Add/Edit/Remove various surface types"));
+	menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"), _("Compute bond lengths/angles or dihedrals between any set of atoms"));
+	menuWindow->Append(MMP_LOCAL_PREFERENCES, wxT("Pr&eferences"), _T("Edit the preferences for this window"));
+	menuBar->Append(menuWindow, wxT("&Subwindow"));
+ 
+	wxMenu * menuHelp = new wxMenu;
+	menuHelp->Append(wxID_ABOUT, wxT("&About MacMolPlt..."), _T("Learn about MacMolPlt"));
+	menuHelp->Append(wxID_HELP, wxT("&MacMolPlt Manual..."), _T("Brief documentation"));
+	menuBar->Append(menuHelp, wxT("&Help"));
 }
 
 /*!
