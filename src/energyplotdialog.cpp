@@ -129,6 +129,8 @@ void EnergyPlotDialog::CreateControls()
 
 	wxMenuBar* menuBar = new wxMenuBar;
 	wxMenu* itemMenu3 = new wxMenu;
+	itemMenu3->Append(wxID_NEW, _("&New\tCtrl+N"), _T(""), wxITEM_NORMAL);
+	itemMenu3->Append(wxID_OPEN, _("&Open ...\tCtrl+O"), _T(""), wxITEM_NORMAL);
 	itemMenu3->Append(wxID_CLOSE, _("&Close Window\tCtrl+W"), wxEmptyString, wxITEM_NORMAL);
 	itemMenu3->AppendSeparator();
 	itemMenu3->Append(wxID_EXIT, _("&Quit\tCtrl+Q"), wxEmptyString, wxITEM_NORMAL);
