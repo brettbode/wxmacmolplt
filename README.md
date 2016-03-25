@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/miroi/wxmacmolplt.svg?branch=master)](https://travis-ci.org/miroi/wxmacmolplt)
+
 wxMacMolPlt is a wxWidgets rewrite of MacMolPlt by Brett Bode's research group at
 Iowa State University. The source code to this program is released under the 
 terms of the license file in this directory.
