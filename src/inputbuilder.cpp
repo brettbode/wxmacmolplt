@@ -1623,6 +1623,42 @@ void InputBuilderWindow::CreateControls()
 
 ////@end InputBuilderWindow content construction
 
+	wxMenuBar* menuBar = new wxMenuBar;
+	wxMenu* itemMenu3 = new wxMenu;
+	itemMenu3->Append(wxID_NEW, _("&New\tCtrl+N"), _T(""), wxITEM_NORMAL);
+	itemMenu3->Append(wxID_OPEN, _("&Open ...\tCtrl+O"), _T(""), wxITEM_NORMAL);
+	itemMenu3->Append(wxID_CLOSE, _("&Close\tCtrl+W"), _T(""), wxITEM_NORMAL);
+	menuBar->Append(itemMenu3, _("File"));
+	wxMenu* lEditMenu = new wxMenu;
+	lEditMenu->Append(wxID_UNDO, _("&Undo\tCtrl+Z"), _T(""), wxITEM_NORMAL);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_CUT, _("Cu&t\tCtrl+X"), _T(""), wxITEM_NORMAL);
+	lEditMenu->Append(wxID_COPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
+	lEditMenu->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
+	menuBar->Append(lEditMenu, _("Edit"));
+	
+	wxMenu * menuWindow = new wxMenu;
+	menuWindow->Append(MMP_MOLECULEDISPLAYWINDOW, wxT("&Molecule Display"), _("The primary molecule display"));
+	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"), _("View/edit the bonding within the molecule"));
+	menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"), _("View/edit cartesian or internal coordinates"));
+	menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"), _("A plot of the energy for each geometry"));
+	menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"), _("Plot the vibrational frequencies"));
+	menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"), _T("Add/Edit/Remove various surface types"));
+	menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"), _("Compute bond lengths/angles or dihedrals between any set of atoms"));
+	menuWindow->Append(MMP_LOCAL_PREFERENCES, wxT("Pr&eferences"), _T("Edit the preferences for this window"));
+	menuBar->Append(menuWindow, wxT("&Subwindow"));
+	
+	wxMenu * menuHelp = new wxMenu;
+	menuHelp->Append(wxID_ABOUT, wxT("&About MacMolPlt..."), _T("Learn about MacMolPlt"));
+	menuHelp->Append(wxID_HELP, wxT("&MacMolPlt Manual..."), _T("Brief documentation"));
+	menuBar->Append(menuHelp, wxT("&Help"));
+	
+	itemFrame1->SetMenuBar(menuBar);
+
     tabText[0] = wxT("Basis");
     tabText[1] = wxT("Control");
     tabText[2] = wxT("Data");
