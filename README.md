@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/miroi/wxmacmolplt.svg?branch=master)](https://travis-ci.org/miroi/wxmacmolplt)
+[![Build Status](https://travis-ci.org/brettbode/wxmacmolplt.svg?branch=master)](https://travis-ci.org/brettbode/wxmacmolplt) Build on trusty against wxWidgets 2.8
 
 wxMacMolPlt is a wxWidgets rewrite of MacMolPlt by Brett Bode's research group at
 Iowa State University. The source code to this program is released under the 
@@ -11,7 +11,7 @@ source on any OS you must have a C++ compiler such as g++ and an install
 of wxWidgets with OpenGL support enabled. wxWidgets 2.6 and later have been
 used in the past, but current testing is on 2.8 and later.
 Prebuilt packages of wx should also work and are generally preferrable.
-Newer versions such as 2.8.x and 3.0.x have been tested on many recent 
+Newer versions such as 2.8.x and 3.x have been tested on many recent 
 Linux distros and are preferred.
 
 For further build instructions refer the INSTALL file in this directory.
