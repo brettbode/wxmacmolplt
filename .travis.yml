@@ -14,8 +14,8 @@ script:
   - ls -lt $PWD/build/bin/wxmacmolplt
   # Error: Unable to initialize gtk, is DISPLAY set properly?
   # run only in alphanumerical mode
-  # miro: maybe some text-only self test ?
-  #- $PWD/build/bin/wxmacmolplt --self=0 ?
+  - $PWD/build/bin/wxmacmolplt --help
+  - $PWD/build/bin/wxmacmolplt --version
 
 # turn off email notifications
 notifications:

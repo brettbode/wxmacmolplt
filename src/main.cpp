@@ -148,12 +148,6 @@ bool MpApp::OnInit() {
 		return false; 
 	} 
 
-	// Check for debug level 
-	//	long debugLevel = 0; 
-	//	if (cmdParser.Found(wxT(ÒdÓ), & debugLevel)) 
-	//	{        
-	//	} 
-
 	// GLF needs to be initialized before any fonts are loaded.  The fonts
 	// are loaded in the GL canvas since the display lists need to be loaded
 	// in the right contexts.
@@ -471,10 +465,15 @@ IMPLEMENT_APP(MpApp)
 #else
 int main(int argc, char **argv) {
 
-	if (argc >= 2 &&
-		(strcmp(argv[1], "-b") == 0 ||
-		 strcmp(argv[1], "-v") == 0 ||
-		 strcmp(argv[1], "-h") == 0)) {
+	//For OS X and Linux the application can be started up in either regular GUI mode or in a
+	//command line mode (with very limited functionality). The choice depends on any command
+	//line arguments. If no arguments or file names (only) are given then choose the GUI mode
+	//which will open the specified files for display or an empty window. If there are any flags
+	//(-h/--help, -v/--version or -b/--batch) choose the headless mode. In both cases the command
+	//line arguments are parsed in the Init callback for the the wx App.
+	
+	//Since flags should come first just test the first character of the first argument
+	if (argc >= 2 && (argv[1][0] == '-')) {
 		/*MpAppNoGUI *guiless_app = */ new MpAppNoGUI;
 	} else {
 		/*MpApp *gui_app = */ new MpApp;
@@ -491,10 +490,9 @@ bool MpAppNoGUI::OnInit() {
 		{ wxCMD_LINE_SWITCH, "h", "help",
 							 "displays help on the command line parameters" }, 
 		{ wxCMD_LINE_SWITCH, "v", "version", "print version" }, 
-		{ wxCMD_LINE_OPTION, "b", "batch", "export POV-Ray scene",
-							 wxCMD_LINE_VAL_STRING }, 
+		{ wxCMD_LINE_OPTION, "b", "batch", "export POV-Ray scene", wxCMD_LINE_VAL_STRING},
 		{ wxCMD_LINE_PARAM, NULL, NULL, "input file",
-			wxCMD_LINE_VAL_STRING, wxCMD_LINE_OPTION_MANDATORY }, 
+			wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },
 		{ wxCMD_LINE_NONE } 
 	};
 #else
@@ -504,14 +502,17 @@ bool MpAppNoGUI::OnInit() {
 		{ wxCMD_LINE_SWITCH, wxT("v"), wxT("version"), wxT("print version") }, 
 		{ wxCMD_LINE_OPTION, wxT("b"), wxT("batch"), wxT("export POV-Ray scene") }, 
 		{ wxCMD_LINE_PARAM, NULL, NULL, wxT("input file"), 
-			wxCMD_LINE_VAL_STRING, wxCMD_LINE_OPTION_MANDATORY }, 
+			wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },
 		{ wxCMD_LINE_NONE } 
 	};
 #endif
 
     // Parse command line 
 	wxString cmdFilename; 
-	wxCmdLineParser cmdParser(cmd_line_desc, argc, argv); 
+	wxCmdLineParser cmdParser(cmd_line_desc, argc, argv);
+	cmdParser.SetLogo(wxT("MacMolPlt usage includes opening one or more files for display or specifying\n"
+						  "a single file for batch conversion to a POV file. The remaining options are\n"
+						  "given by themselves."));
 	int res; 
 
 	wxLogNull log; 
@@ -528,60 +529,64 @@ bool MpAppNoGUI::OnInit() {
 	// Check if the user asked for the version 
 	if (cmdParser.Found(wxT("v"))) { 
 #ifndef __WXMSW__ 
-		wxLog::SetActiveTarget(new wxLogStderr);
+//		wxLog::SetActiveTarget(new wxLogStderr);
 #endif 
 		wxString msg; 
 		wxString date(wxString::FromAscii(__DATE__)); 
-		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2008-2012 ")
+		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2008-2012, ")
 					   wxT("Version %s, "), wxT(wxMacMolPlt_VERSION));
+		msg += wxT("Built on ");
 		msg += date;
-		wxLogMessage(msg); 
-		return false; 
-	} 
+	//This is working for wx 3. So just go straight to stdout since we are running headless.
+//		wxLogMessage(msg);
+		std::cout << msg << std::endl;
+		return false;
+	}
+	
+	wxString pov_file;
+	if (cmdParser.Found(_T("b"), &pov_file)) {
+	//	std::cout << "pov_file.ToAscii(): " << pov_file.ToAscii() << std::endl;
 
 #ifdef __LINUX__
-	wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
+		wxStandardPathsBase& gStdPaths = wxStandardPaths::Get();
 
-	//It has become apparent that wx is not determining the install prefix
-	//correctly on linux. So set it here as a workaround
-	// Ok I don't know how else to get the wxStandardPaths class?
-	wxStandardPaths * paths = (wxStandardPaths * ) &gStdPaths;
-	if (strcmp(INSTALL_PREFIX, "NONE"))
-		paths->SetInstallPrefix(wxString(INSTALL_PREFIX, wxConvUTF8));
-	else
-		paths->SetInstallPrefix(wxString("/usr/local", wxConvUTF8));
+		//It has become apparent that wx is not determining the install prefix
+		//correctly on linux. So set it here as a workaround
+		// Ok I don't know how else to get the wxStandardPaths class?
+		wxStandardPaths * paths = (wxStandardPaths * ) &gStdPaths;
+		if (strcmp(INSTALL_PREFIX, "NONE"))
+			paths->SetInstallPrefix(wxString(INSTALL_PREFIX, wxConvUTF8));
+		else
+			paths->SetInstallPrefix(wxString("/usr/local", wxConvUTF8));
 #endif
 
-	gPreferences = new WinPrefs;
-	gPrefDefaults = new WinPrefs;
+		gPreferences = new WinPrefs;
+		gPrefDefaults = new WinPrefs;
 
-	gPrefDefaults->ReadDefaultPrefs();
-	*gPreferences = *gPrefDefaults;
-	gPreferences->ReadUserPrefs();
+		gPrefDefaults->ReadDefaultPrefs();
+		*gPreferences = *gPrefDefaults;
+		gPreferences->ReadUserPrefs();
 
-	// std::cout << "(int) rc: " << (int) rc << std::endl; 
-	// std::cout << "pov_file: " << pov_file << std::endl; 
+		// std::cout << "(int) rc: " << (int) rc << std::endl; 
+		// std::cout << "pov_file: " << pov_file << std::endl; 
 
-	MoleculeData *moldata = new MoleculeData(NULL);
-	FILE *f = fopen(cmdParser.GetParam(0).ToAscii(), "rb");
-	BufferFile *bfile = new BufferFile(f, false);
-	moldata->OpenCMLFile(bfile, gPreferences, NULL, NULL, true);
-	delete bfile;
-	fclose(f);
+		MoleculeData *moldata = new MoleculeData(NULL);
+		FILE *f = fopen(cmdParser.GetParam(0).ToAscii(), "rb");
+		BufferFile *bfile = new BufferFile(f, false);
+		moldata->OpenCMLFile(bfile, gPreferences, NULL, NULL, true);
+		delete bfile;
+		fclose(f);
 
-	wxString pov_file;
-	bool rc = cmdParser.Found(_T("b"), &pov_file);
-	std::cout << "rc: " << rc << std::endl;
-	std::cout << "pov_file.ToAscii(): " << pov_file.ToAscii() << std::endl;
-	f = fopen(pov_file.ToAscii(), "wb");
-	bfile = new BufferFile(f, true);
-	moldata->ExportPOV(bfile, gPreferences);
-	delete bfile;
-	fclose(f);
+		f = fopen(pov_file.ToAscii(), "wb");
+		bfile = new BufferFile(f, true);
+		moldata->ExportPOV(bfile, gPreferences);
+		delete bfile;
+		fclose(f);
 
-	delete gPreferences;
-	delete gPrefDefaults;
-	delete moldata;
+		delete gPreferences;
+		delete gPrefDefaults;
+		delete moldata;
+	}
 	return false;
 
 }
