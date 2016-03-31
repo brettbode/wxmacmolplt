@@ -484,6 +484,7 @@ int main(int argc, char **argv) {
 }
 
 bool MpAppNoGUI::OnInit() {
+	bool returnval=false;
 
 #if wxCHECK_VERSION(2, 9, 0)
 	static const wxCmdLineEntryDesc cmd_line_desc[] = { 
@@ -523,7 +524,7 @@ bool MpAppNoGUI::OnInit() {
 	if (res == -1 || res > 0 || cmdParser.Found(wxT("h"))) 
 	{ 
 		cmdParser.Usage(); 
-		return false; 
+		return !(res>0);
 	} 
 
 	// Check if the user asked for the version 
@@ -540,7 +541,7 @@ bool MpAppNoGUI::OnInit() {
 	//This is working for wx 3. So just go straight to stdout since we are running headless.
 //		wxLogMessage(msg);
 		std::cout << msg << std::endl;
-		return false;
+		return true;
 	}
 	
 	wxString pov_file;
@@ -586,8 +587,9 @@ bool MpAppNoGUI::OnInit() {
 		delete gPreferences;
 		delete gPrefDefaults;
 		delete moldata;
+		returnval = true;
 	}
-	return false;
+	return returnval;
 
 }
 
