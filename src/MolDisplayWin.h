@@ -44,6 +44,130 @@ typedef struct qtData qtData;
 typedef class MolStatusBar MolStatusBar;
 typedef class UndoSnapShot UndoSnapShot;
 
+//#define ID_LOCAL_PREFERENCES 501
+/** MMP_EventID contains a series of ids used mostly for menu items within the
+ * MolDisplayWin class. They are defined here so they can be reused for the same menus
+ * in subwindows of MolDisplayWin to allow the menu item to transparently be passed up
+ * to the parent window.
+ */
+enum MMP_EventID {
+	MMP_SHRINK10=wxID_HIGHEST+1,
+	MMP_ENLARGE10,
+	MMP_SHOWMODE,
+	MMP_PREVMODE,
+	MMP_NEXTMODE,
+	MMP_SHOWAXIS,
+	MMP_SHOWBUILDTOOLS,
+	MMP_SHOWSYMMETRYOPERATOR,
+	MMP_ATOMLABELSSUBMENU,
+	MMP_NO_ATOMLABEL,
+	MMP_SHOWATOMLABELS,
+	MMP_SHOWATOMNUMBER,
+	MMP_SHOWPATTERN,
+	MMP_BOTHATOMLABELS,
+	MMP_DISPLAYMODESUBMENU,
+	MMP_WIREFRAMEMODE,
+	MMP_BALLANDSTICKMODE,
+	MMP_EFP_WIREFRAME,
+	MMP_TOGGLEVISSUBMENU,
+	MMP_TOGGLEABINITIO,
+	MMP_TOGGLEMMATOMS,
+	MMP_TOGGLEEFPATOMS,
+	MMP_ADDMARKANNOTATION,
+	MMP_ADDLENGTHANNOTATION,
+	MMP_ADDANGLEANNOTATION,
+	MMP_ADDDIHEDRALANNOTATION,
+	MMP_DELETEALLANNOTATIONS,
+	MMP_CENTER,
+	MMP_AUTOROTATE,
+	MMP_ROTATESUBMENU,
+	MMP_ROTATETOXAXIS,
+	MMP_ROTATETOYAXIS,
+	MMP_ROTATETOZAXIS,
+	MMP_ROTATE180HOR,
+	MMP_ROTATE180VER,
+	MMP_ROTATEPRINC,
+	MMP_ROTATEOTHER,
+	MMP_CREATELLMPATH,
+	MMP_MINFRAMEMOVEMENTS,
+	MMP_CONVERTTOBOHR,
+	MMP_CONVERTTOANGSTROMS,
+	MMP_INVERTNORMALMODE,
+	MMP_ADDHYDROGENS,
+	MMP_DELETEHYDROGENS,
+	
+	MMP_NEWFRAME,
+	MMP_COPYCOORDS,
+	MMP_COPYNWCOORDS,
+	MMP_ENERGYEDIT,
+	MMP_SETBONDLENGTH,
+	MMP_DETERMINEPG,
+	MMP_SYMADAPTCOORDS,
+	MMP_EXPORT,
+	MMP_ANNOTATIONSSUBMENU,
+	
+	MMP_ADDFRAMES,
+	MMP_DELETEFRAME,
+	MMP_IMPORTMENU,
+	MMP_MOLECULEDISPLAYWINDOW,
+	MMP_BONDSWINDOW,
+	MMP_COORDSWINDOW,
+	MMP_ENERGYPLOTWINDOW,
+	MMP_FREQUENCIESWINDOW,
+	MMP_INPUTBUILDERWINDOW,
+	MMP_INPUT_WIZARD,
+	MMP_SURFACESWINDOW,
+	MMP_FRAMESCROLLBAR,
+	MMP_PRINTOPTIONS,
+	MMP_ANIMATEFRAMES,
+	MMP_ANIMATEFRAMESTIMER,
+	MMP_ANIMATEMODE,
+	MMP_ANIMATEMODETIMER,
+	MMP_STATUS_TIMER,
+	MMP_ROTATE_TIMER,
+	MMP_OFFSETMODE,
+	MMP_WINDOWPARAMETERS,
+	MMP_ZMATRIXCALC,
+	MMP_LOCAL_PREFERENCES,
+	MMP_SHOW_TOOLBAR,
+	MMP_CURPOINTGROUP,
+	MMP_POINTGROUPORDER,
+	MMP_PGC1,
+	MMP_PGCS,
+	MMP_PGCI,
+	MMP_PGCNH,
+	MMP_PGCNV,
+	MMP_PGCN,
+	MMP_PGS2N,
+	MMP_PGDND,
+	MMP_PGDNH,
+	MMP_PGDN,
+	MMP_PGTD,
+	MMP_PGTH,
+	MMP_PGT,
+	MMP_PGOH,
+	MMP_PGO,
+	MMP_PGORDER2,
+	MMP_PGORDER3,
+	MMP_PGORDER4,
+	MMP_PGORDER5,
+	MMP_PGORDER6,
+	MMP_PGORDER7,
+	MMP_PGORDER8,
+	MMP_TOOL_ARROW,
+	MMP_TOOL_LASSO,
+	MMP_TOOL_HAND,
+	MMP_SELECT_ALL,
+	MMP_SELECT_NONE,
+	MMP_SHOWBONDSITES,
+	MMP_SYMMETRY_EDIT,
+	/* MMP_SYMMETRY_REGEN, */
+	MMP_SAVESTRUCTURE,
+	MMP_SHOW_FULLSCREEN,
+	
+	Number_MMP_Ids
+};
+
 /**
 	Abstract class to hold snapshot data. All you can do with a snapshot is
 	create it and restore it.
@@ -303,7 +427,15 @@ class MolDisplayWin : public wxFrame {
 		void OnRedoUpdate( wxUpdateUIEvent& event );
 		void menuEditCut(wxCommandEvent &event);
 		void menuEditCopy(wxCommandEvent &event);
+		/// Callback for the GAMESS style copy coords menu item
 		void menuEditCopyCoordinates(wxCommandEvent &event);
+		/// Callback for the NWChem style copy coords menu item
+		void menuEditCopyNWChemCoordinates(wxCommandEvent &event);
+		/// Place a text copy of the coordinates into the copy buffer
+		/**
+		 * Creates a text copy of the coorindates and places on to the copy buffer.
+		 * @param[in] coordtype specifies GAMESS style cartesians (0), GAMESS Z-matrix (1) or NWChem style Cartesians(2)
+		 */
 		void CopyCoordinates(short coordtype) const;
 		void menuEditPaste(wxCommandEvent &event);
 		/// wxEVT_UPDATE_UI event handler for wxID_PASTE
@@ -442,7 +574,10 @@ class MolDisplayWin : public wxFrame {
 		void UpdateAtomsOptions(wxUpdateUIEvent& event);
 		
 		//Commands to open (or raise) the various data subviews.
-		//void menuWindowMain_display(wxCommandEvent &event);
+	
+		/// Raise the main molecule display window.
+		/// Passed up from subwindows.
+		void menuWindowMoleculeDisplay(wxCommandEvent &event);
 		void menuWindowBonds(wxCommandEvent &event);
 		void menuWindowCoordinates(wxCommandEvent &event);
 		void menuWindowEnergy_plot(wxCommandEvent &event);

@@ -47,7 +47,7 @@ FloatSlider::FloatSlider(wxWindow *parent,
 		
 	label.Printf(wxT("%.3f"), val);
 	val_box = new wxTextCtrl(this, ID_VAL_BOX, label, wxDefaultPosition,
-							 wxSize(70, wxDefaultCoord), wxTE_PROCESS_ENTER);
+							 wxSize(70, wxDefaultCoord), wxTE_PROCESS_ENTER, wxTextValidator(wxFILTER_NUMERIC));
 
 	// For the max value need to setup the width to be the max width we expect and then prevent resize.
 	// With resize the field seems to shrink down ok, but not enlarge leading to clipping.
@@ -65,6 +65,9 @@ FloatSlider::FloatSlider(wxWindow *parent,
 	SetMinSize(size);
 	/* SetSizer(vsizer); */
 	SetSizerAndFit(vsizer);
+	
+	//reset the max text since the above output does not necessarily match the SetMax function.
+	SetMax(max);
 
 	// Only the text control contains the current value since the slider tracks
 	// ints only (and we want floats).  So, for the most part, the text control
@@ -260,7 +263,7 @@ void FloatSlider::SetMin(float min) {
 
 /**
  * Assign slider's maximum value.
- * @param max New maximum.
+ * @param newmax New maximum.
  */
 void FloatSlider::SetMax(float newmax) {
 
@@ -268,7 +271,7 @@ void FloatSlider::SetMax(float newmax) {
 	wxString lstr;
 	lstr.Printf(wxT("%.3g"), newmax);
 
-	max_label->SetLabelText(lstr);
+	max_label->SetLabel(lstr);
 }
 
 /* ------------------------------------------------------------------------- */

@@ -93,13 +93,19 @@ public:
 	void OnDeleteClick( wxCommandEvent& event );
 
 ////@end SurfacesWindow event handler declarations
+
 	/// Event handler for page changes in the choice book.
-	// DialogBlocks doesn't know about ChoiceBookEvents so I need this outside of its code.
+	/// DialogBlocks doesn't know about ChoiceBookEvents so I need this outside of its code.
 	void OnSurflistbookPageChanged( wxChoicebookEvent& event );
 
 	/// Change the window title when the file name changes
 	void UpdateWindowTitle(void);
-	
+
+	/// Close the surfaces window
+	void OnCloseWindow( wxCloseEvent& event );
+	/// Menu handler for the close menu item
+	void OnCloseEvent( wxCommandEvent& event );
+
 ////@begin SurfacesWindow member function declarations
 
 	MolDisplayWin * GetParent() const { return Parent ; }
@@ -110,12 +116,13 @@ public:
 
 	/// Retrieves icon resources
 	wxIcon GetIconResource( const wxString& name );
+	
 ////@end SurfacesWindow member function declarations
 
 	/// Should we show tooltips?
 	static bool ShowToolTips();
 
-	void Reset(void);	//< Call to rebuild the dialog
+	void Reset(void);	///< Call to rebuild the dialog
 	
 	MoleculeData * GetMoleculeData(void) const {return Parent->GetData();};
 	WinPrefs * GetPrefs(void) const {return Parent->GetPrefs();};
@@ -132,7 +139,7 @@ private:
 ////@end SurfacesWindow member variables
     MoleculeData* mData;
     WinPrefs* mPrefs;
-	bool	setValueCalled;	//< Flag to enable a workaround for setvalue generating a text event.
+	bool	setValueCalled;	///< Flag to enable a workaround for setvalue generating a text event.
 	
 	///Display a dialog for the user to select the type of a new surface.
 	int selectSurfaceType();

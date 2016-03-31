@@ -640,7 +640,7 @@ class Surface {
 		/**
 		 * Exports surface data to our text file type	
 		 * This can effectively only be called by Surf2DBase objects
-		 * @param 2D Grid of data
+		 * @param Grid2D two dimensional grid of data
 		 * @param NumPoints number of grid points in both the x and y direction
 		 * @param Origin origin of the 3D cartesian grid
 		 * @param XInc increment vector in the X direction 

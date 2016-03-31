@@ -107,6 +107,9 @@ public:
 
 	/// wxEVT_UPDATE_UI event handler for MMP_COPYCOORDSITEM
 	void OnMmpCopycoordsitemUpdate( wxUpdateUIEvent& event );
+	
+	/// Update event handler for the copy NWChem style coordinates update menu item
+	void OnCopyNWCoordsItemUpdate( wxUpdateUIEvent& event );
 
 	/// wxEVT_UPDATE_UI event handler for wxID_PASTE
 	void OnPasteUpdate( wxUpdateUIEvent& event );

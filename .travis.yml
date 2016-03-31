@@ -1,0 +1,22 @@
+language: cpp
+sudo: required
+dist: trusty
+compiler:
+- g++
+install:
+  - sudo apt-get install libwxgtk2.8-dev libwxgtk2.8-dbg -y
+script:
+  - ./autogen.sh    
+  - mkdir $PWD/build
+  - ./configure --prefix=$PWD/build
+  - make -j4
+  - make all install
+  - ls -lt $PWD/build/bin/wxmacmolplt
+  # Error: Unable to initialize gtk, is DISPLAY set properly?
+  # run only in alphanumerical mode
+  - $PWD/build/bin/wxmacmolplt --help
+  - $PWD/build/bin/wxmacmolplt --version
+
+# turn off email notifications
+notifications:
+  email: false

@@ -92,9 +92,19 @@ public:
 
     /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
     void OnOK( wxCommandEvent& event );
-    void facDefaults( wxCommandEvent& WXUNUSED(event) );
-    void userDefaults( wxCommandEvent& WXUNUSED(event) );
+	/// Call back for when the factory defaults button is clicked.
+	/// The function copies the defaults for the current pane into the
+	/// temporary prefs for the pane.
+    void facDefaults( wxCommandEvent& event );
+	/// Call back for when the user defaults button is clicked.
+	/// The function copies the user defaults for the current pane into the
+	/// temporary prefs for the pane.
+    void userDefaults( wxCommandEvent& event );
+	/// Call back for the apply button. Pushes the prefs for the current pane
+	/// to the active prefs for the window.
     void OnApply( wxCommandEvent& event );
+	/// Call back for the revert button. Copies the active preferences for the
+	/// window back into the temporary prefs for the active pane.
     void OnRevert( wxCommandEvent& event );
 ////@end setPreference event handler declarations
 
