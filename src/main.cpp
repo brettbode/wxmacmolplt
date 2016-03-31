@@ -35,23 +35,23 @@ int glf_initialized = 0;
 
 #if wxCHECK_VERSION(2, 9, 0)
 static const wxCmdLineEntryDesc g_cmdLineDesc[] = { 
-	{ wxCMD_LINE_SWITCH, "h", "help",    "displays help on "
-										 "the command line parameters" }, 
-	{ wxCMD_LINE_SWITCH, "v", "version", "print version" }, 
-	{ wxCMD_LINE_PARAM,  NULL, NULL,     "input file", 
-		wxCMD_LINE_VAL_STRING,
-		wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE }, 
-	{ wxCMD_LINE_NONE } 
+	{ wxCMD_LINE_SWITCH, "h", "help",
+		"displays help on the command line parameters" },
+	{ wxCMD_LINE_SWITCH, "v", "version", "print version" },
+	{ wxCMD_LINE_OPTION, "b", "batch", "export POV-Ray scene", wxCMD_LINE_VAL_STRING},
+	{ wxCMD_LINE_PARAM, NULL, NULL, "input file",
+		wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },
+	{ wxCMD_LINE_NONE }
 };
 #else
 static const wxCmdLineEntryDesc g_cmdLineDesc[] = { 
-	{ wxCMD_LINE_SWITCH, wxT("h"), wxT("help"),    wxT("displays help on "
-													   "the command line parameters") }, 
-	{ wxCMD_LINE_SWITCH, wxT("v"), wxT("version"), wxT("print version") }, 
-	{ wxCMD_LINE_PARAM,  NULL, NULL,               wxT("input file"), 
-		wxCMD_LINE_VAL_STRING,
-		wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE }, 
-	{ wxCMD_LINE_NONE } 
+	{ wxCMD_LINE_SWITCH, wxT("h"), wxT("help"),
+		wxT("displays help on the command line parameters") },
+	{ wxCMD_LINE_SWITCH, wxT("v"), wxT("version"), wxT("print version") },
+	{ wxCMD_LINE_OPTION, wxT("b"), wxT("batch"), wxT("export POV-Ray scene") },
+	{ wxCMD_LINE_PARAM, NULL, NULL, wxT("input file"),
+		wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },
+	{ wxCMD_LINE_NONE }
 };
 #endif
 
@@ -121,12 +121,18 @@ bool MpApp::OnInit() {
     // Parse command line 
 	wxString cmdFilename; 
 	wxCmdLineParser cmdParser(g_cmdLineDesc, argc, argv); 
-	int res; 
+	cmdParser.SetLogo(wxT("MacMolPlt usage includes opening one or more files for display or specifying\n"
+						  "a single file for batch conversion to a POV file. The remaining options are\n"
+						  "given by themselves."));
+	int res;
 	{ 
 		wxLogNull log; 
 		// Pass false to suppress auto Usage() message 
 		res = cmdParser.Parse(false); 
-	} 
+	}
+	// These are left here just in case. Any calls with flags should be redirected to the noGUI version of
+	// apps onInit call.
+
 	// Check if the user asked for command-line help 
 	if (res == -1 || res > 0 || cmdParser.Found(wxT("h"))) 
 	{ 
@@ -180,6 +186,9 @@ bool MpApp::OnInit() {
 	
 	// Check for a project filename 
 	if (cmdParser.GetParamCount() > 0) {
+		//Interesingly it appears OS X is grabbing the command line file arguements and issuing
+		//Open file apple events for them. That duplicates this code so deactivate it for OS X.
+#ifndef __WXMAC__
 		for (int i = 0; i < cmdParser.GetParamCount(); ++i) {
 			cmdFilename = cmdParser.GetParam(i); 
 			// Under Windows when invoking via a document 
@@ -196,6 +205,7 @@ bool MpApp::OnInit() {
 				if (r>0) temp->Show();
 			}
 		}
+#endif
 	} else {
 		// Throw up a simple splash screen
 		// In theory the wx Splashscreen can be a fire and forget window that will simply destroy
@@ -486,31 +496,9 @@ int main(int argc, char **argv) {
 bool MpAppNoGUI::OnInit() {
 	bool returnval=false;
 
-#if wxCHECK_VERSION(2, 9, 0)
-	static const wxCmdLineEntryDesc cmd_line_desc[] = { 
-		{ wxCMD_LINE_SWITCH, "h", "help",
-							 "displays help on the command line parameters" }, 
-		{ wxCMD_LINE_SWITCH, "v", "version", "print version" }, 
-		{ wxCMD_LINE_OPTION, "b", "batch", "export POV-Ray scene", wxCMD_LINE_VAL_STRING},
-		{ wxCMD_LINE_PARAM, NULL, NULL, "input file",
-			wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },
-		{ wxCMD_LINE_NONE } 
-	};
-#else
-	static const wxCmdLineEntryDesc cmd_line_desc[] = { 
-		{ wxCMD_LINE_SWITCH, wxT("h"), wxT("help"), 
-							 wxT("displays help on the command line parameters") }, 
-		{ wxCMD_LINE_SWITCH, wxT("v"), wxT("version"), wxT("print version") }, 
-		{ wxCMD_LINE_OPTION, wxT("b"), wxT("batch"), wxT("export POV-Ray scene") }, 
-		{ wxCMD_LINE_PARAM, NULL, NULL, wxT("input file"), 
-			wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL | wxCMD_LINE_PARAM_MULTIPLE },
-		{ wxCMD_LINE_NONE } 
-	};
-#endif
-
     // Parse command line 
 	wxString cmdFilename; 
-	wxCmdLineParser cmdParser(cmd_line_desc, argc, argv);
+	wxCmdLineParser cmdParser(g_cmdLineDesc, argc, argv);
 	cmdParser.SetLogo(wxT("MacMolPlt usage includes opening one or more files for display or specifying\n"
 						  "a single file for batch conversion to a POV file. The remaining options are\n"
 						  "given by themselves."));
@@ -529,18 +517,19 @@ bool MpAppNoGUI::OnInit() {
 
 	// Check if the user asked for the version 
 	if (cmdParser.Found(wxT("v"))) { 
-#ifndef __WXMSW__ 
-//		wxLog::SetActiveTarget(new wxLogStderr);
-#endif 
-		wxString msg; 
+		wxString msg;
 		wxString date(wxString::FromAscii(__DATE__)); 
-		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2008-2012, ")
+		msg.Printf(wxT("wxMacMolPlt, (c) Iowa State University, 2008-2012,\n")
 					   wxT("Version %s, "), wxT(wxMacMolPlt_VERSION));
 		msg += wxT("Built on ");
 		msg += date;
-	//This is working for wx 3. So just go straight to stdout since we are running headless.
-//		wxLogMessage(msg);
-		std::cout << msg << std::endl;
+		msg += wxT("\n");
+		// This appears to be the best way to get the output to the console so it isn't lost when we exit.
+		wxMessageOutput* msgOut = wxMessageOutput::Get();
+		if ( msgOut )
+		{
+			msgOut->Printf( wxT("%s"), msg.c_str() );
+		}
 		return true;
 	}
 	
