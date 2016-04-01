@@ -121,9 +121,9 @@ bool MpApp::OnInit() {
     // Parse command line 
 	wxString cmdFilename; 
 	wxCmdLineParser cmdParser(g_cmdLineDesc, argc, argv); 
-	cmdParser.SetLogo(wxT("MacMolPlt usage includes opening one or more files for display or specifying\n"
-						  "a single file for batch conversion to a POV file. The remaining options are\n"
-						  "given by themselves."));
+	cmdParser.SetLogo(wxT("MacMolPlt usage includes opening one or more files for display or specifying\n")
+					  wxT("a single file for batch conversion to a POV file. The remaining options are\n")
+					  wxT("given by themselves."));
 	int res;
 	{ 
 		wxLogNull log; 
@@ -499,10 +499,10 @@ bool MpAppNoGUI::OnInit() {
     // Parse command line 
 	wxString cmdFilename; 
 	wxCmdLineParser cmdParser(g_cmdLineDesc, argc, argv);
-	cmdParser.SetLogo(wxT("MacMolPlt usage includes opening one or more files for display or specifying\n"
-						  "a single file for batch conversion to a POV file. The remaining options are\n"
-						  "given by themselves."));
-	int res; 
+	cmdParser.SetLogo(wxT("MacMolPlt usage includes opening one or more files for display or specifying\n")
+					  wxT("a single file for batch conversion to a POV file. The remaining options are\n")
+					  wxT("given by themselves."));
+	int res;
 
 	wxLogNull log; 
 	// Pass false to suppress auto Usage() message 
