@@ -1145,7 +1145,7 @@
 		<row><td>FavoritesFolder</td><td>TARGETDIR</td><td>.:FAVORI~1|Favorites</td><td/><td>0</td><td/></row>
 		<row><td>FontsFolder</td><td>TARGETDIR</td><td>.:Fonts</td><td/><td>0</td><td/></row>
 		<row><td>GlobalAssemblyCache</td><td>TARGETDIR</td><td>.:Global~1|GlobalAssemblyCache</td><td/><td>0</td><td/></row>
-		<row><td>INSTALLDIR</td><td>WXMACMOLPLT1</td><td>.</td><td/><td>0</td><td/></row>
+		<row><td>INSTALLDIR</td><td>WXMACMOLPLT2</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>ISCommonFilesFolder</td><td>CommonFilesFolder</td><td>Instal~1|InstallShield</td><td/><td>0</td><td/></row>
 		<row><td>ISMyCompanyDir</td><td>ProgramFilesFolder</td><td>MYCOMP~1|My Company Name</td><td/><td>0</td><td/></row>
 		<row><td>ISMyProductDir</td><td>ISMyCompanyDir</td><td>MYPROD~1|My Product Name</td><td/><td>0</td><td/></row>
@@ -1176,6 +1176,7 @@
 		<row><td>USERPROFILE</td><td>TARGETDIR</td><td>.:USERPR~1|UserProfile</td><td/><td>0</td><td/></row>
 		<row><td>WXMACMOLPLT</td><td>ISU</td><td>WXMACM~1|wxMacMolplt</td><td/><td>0</td><td/></row>
 		<row><td>WXMACMOLPLT1</td><td>ProgramFiles64Folder</td><td>WXMACM~1|wxMacMolPlt</td><td/><td>0</td><td/></row>
+		<row><td>WXMACMOLPLT2</td><td>ProgramFilesFolder</td><td>WXMACM~1|wxMacMolplt</td><td/><td>0</td><td/></row>
 		<row><td>WindowsFolder</td><td>TARGETDIR</td><td>.:Windows</td><td/><td>0</td><td/></row>
 		<row><td>WindowsVolume</td><td>TARGETDIR</td><td>.:WinRoot</td><td/><td>0</td><td/></row>
 	</table>
@@ -2698,7 +2699,7 @@
 		<col def="I2">Encoded</col>
 		<col def="S0">Comment</col>
 		<col def="I4">TimeStamp</col>
-		<row><td>COMPANY_NAME</td><td>1033</td><td>ISU</td><td>0</td><td/><td>2082669620</td></row>
+		<row><td>COMPANY_NAME</td><td>1033</td><td>ISUQTG</td><td>0</td><td/><td>-106658318</td></row>
 		<row><td>DN_AlwaysInstall</td><td>1033</td><td>Always Install</td><td>0</td><td/><td>1386456109</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_COLOR</td><td>1033</td><td>The color settings of your system are not adequate for running [ProductName].</td><td>0</td><td/><td>1386456109</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_OS</td><td>1033</td><td>The operating system is not adequate for running [ProductName].</td><td>0</td><td/><td>1386456109</td></row>
@@ -3799,9 +3800,11 @@
 		<row><td>IDS__TargetReq_DESC_RAM</td><td>1033</td><td>The amount of RAM is not adequate for running [ProductName].</td><td>0</td><td/><td>1386456109</td></row>
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>1386456109</td></row>
 		<row><td>ID_STRING1</td><td>1033</td><td/><td>0</td><td/><td>1386458157</td></row>
-		<row><td>ID_STRING2</td><td>1033</td><td>http://www.ISU.com</td><td>0</td><td/><td>2082669620</td></row>
+		<row><td>ID_STRING2</td><td>1033</td><td>http://www.msg.chem.iastate.edu</td><td>0</td><td/><td>-106631694</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>ISU</td><td>0</td><td/><td>2082669620</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>https://github.com/brettbode/wxmacmolplt/issues/</td><td>0</td><td/><td>1092902735</td></row>
+		<row><td>ID_STRING5</td><td>1033</td><td>http://brettbode.github.io/wxmacmolplt/</td><td>0</td><td/><td>-106658286</td></row>
+		<row><td>ID_STRING6</td><td>1033</td><td>WXMACM~1|wxMacMolPlt</td><td>0</td><td/><td>-106673869</td></row>
 		<row><td>IIDS_UITEXT_FeatureUninstalled</td><td>1033</td><td>This feature will remain uninstalled.</td><td>0</td><td/><td>1386456109</td></row>
 	</table>
 
@@ -3910,6 +3913,8 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I2">ISIconIndex</col>
 		<row><td>ARPPRODUCTICON.exe</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\OS Independent\setupicon.ico</td><td>0</td></row>
+		<row><td>_FB7AA362719C43C588293B1BE9F958B9.exe</td><td/><td>C:\wxmacmolplt\x64\Release\wxMacMolPlt.exe</td><td>0</td></row>
+		<row><td>_FD52DAE4F94C45668C264BF30BA50F78.exe</td><td/><td>C:\wxmacmolplt\x64\Release\wxMacMolPlt.exe</td><td>0</td></row>
 	</table>
 
 	<table name="IniFile">
@@ -4028,7 +4033,7 @@
 UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 			</td></row>
 		<row><td>DefaultProductConfiguration</td><td>Express</td></row>
-		<row><td>EnableSwidtag</td><td>1</td></row>
+		<row><td>EnableSwidtag</td><td>0</td></row>
 		<row><td>ISCompilerOption_CompileBeforeBuild</td><td>1</td></row>
 		<row><td>ISCompilerOption_Debug</td><td>0</td></row>
 		<row><td>ISCompilerOption_IncludePath</td><td/></row>
@@ -4042,7 +4047,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>ISTheme</td><td>InstallShield Blue.theme</td></row>
 		<row><td>ISUSLock</td><td>{BE7DAF2D-E439-4D0D-B5BA-4C88B0F63495}</td></row>
 		<row><td>ISUSSignature</td><td>{87EA21C6-1DA5-4249-A12B-A89D00F94082}</td></row>
-		<row><td>ISVisitedViews</td><td>viewAssistant,viewSetupTypes,viewSetupDesign,viewRealSetupDesign,viewSystemSearch,viewSupportFiles,viewCustomActions,viewInstallScriptStd,viewObjects,viewProject,viewAppV,viewUpgradePaths,viewISToday,viewAppFiles,viewDependencies,viewRelease</td></row>
+		<row><td>ISVisitedViews</td><td>viewAssistant,viewSetupTypes,viewSetupDesign,viewRealSetupDesign,viewSystemSearch,viewSupportFiles,viewCustomActions,viewInstallScriptStd,viewObjects,viewProject,viewAppV,viewUpgradePaths,viewISToday,viewAppFiles,viewDependencies,viewRelease,viewShortcuts,viewUI</td></row>
 		<row><td>Limited</td><td>1</td></row>
 		<row><td>LockPermissionMode</td><td>1</td></row>
 		<row><td>MsiExecCmdLineOptions</td><td/></row>
@@ -4352,6 +4357,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>ARPPRODUCTICON</td><td>ARPPRODUCTICON.exe</td><td/></row>
 		<row><td>ARPSIZE</td><td/><td/></row>
 		<row><td>ARPURLINFOABOUT</td><td>##ID_STRING2##</td><td/></row>
+		<row><td>ARPURLUPDATEINFO</td><td>##ID_STRING5##</td><td/></row>
 		<row><td>AgreeToLicense</td><td>No</td><td/></row>
 		<row><td>ApplicationUsers</td><td>AllUsers</td><td/></row>
 		<row><td>DWUSINTERVAL</td><td>30</td><td/></row>
@@ -4388,8 +4394,8 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>IS_SQLSERVER_USERNAME</td><td>sa</td><td/></row>
 		<row><td>InstallChoice</td><td>AR</td><td/></row>
 		<row><td>LAUNCHPROGRAM</td><td>1</td><td/></row>
-		<row><td>LAUNCHPROGRAMCOMPCODE</td><td>{CD093F20-22F3-47CC-8D90-8B9091A862E8}</td><td/></row>
-		<row><td>LAUNCHPROGRAMFILEKEY</td><td>wxmacmolplt.primary_output</td><td/></row>
+		<row><td>LAUNCHPROGRAMCOMPCODE</td><td>{0BA27EFB-3F0D-4B62-AD97-F75C5ECA6627}</td><td/></row>
+		<row><td>LAUNCHPROGRAMFILEKEY</td><td>wxmacmolplt_vc13.primary_out1</td><td/></row>
 		<row><td>LAUNCHREADME</td><td>1</td><td/></row>
 		<row><td>Manufacturer</td><td>##COMPANY_NAME##</td><td/></row>
 		<row><td>PIDKEY</td><td/><td/></row>
@@ -4417,7 +4423,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKAPPPOOLS</td><td>##IDS_PROGMSG_IIS_ROLLBACKAPPPOOLS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
-		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]wxMacMolPlt.Primary Output</td><td/></row>
+		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]wxMacMolPlt_vc13.Primary Output</td><td/></row>
 		<row><td>ProductCode</td><td>{948905EC-E337-4B97-AFB5-A8A9EAAB0C39}</td><td/></row>
 		<row><td>ProductName</td><td>wxMacMolPlt</td><td/></row>
 		<row><td>ProductVersion</td><td>7.6.2</td><td/></row>
@@ -4581,6 +4587,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<col def="S255">ISComments</col>
 		<col def="S255">ISShortcutName</col>
 		<col def="I4">ISAttributes</col>
+		<row><td>NewShortcut1</td><td>ProgramMenuFolder</td><td>##ID_STRING6##</td><td>wxMacMolPlt_vc13.Primary_Output1</td><td>AlwaysInstall</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="Signature">
