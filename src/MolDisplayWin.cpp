@@ -1954,6 +1954,9 @@ void MolDisplayWin::PasteText(void) {
 			wxString text = data.GetText();
 			char * tbuf = new char[text.Length()+1];
 			strncpy(tbuf, text.ToAscii(), text.Length()+1);
+			//Clean up the unicode to 7 bit ASCII conversion. WX replaces anything non
+			//7-bit with an '_' so convert those into spaces as the only possible guess.
+			for (int i=0; i<=text.Length(); i++) if (tbuf[i]=='_') tbuf[i] = ' ';
 			BufferFile * TextBuffer=NULL;
 			try {
 				TextBuffer = new BufferFile(tbuf, text.Length());
