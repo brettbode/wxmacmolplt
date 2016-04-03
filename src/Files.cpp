@@ -422,13 +422,18 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
 					while (Buffer->GetFilePos() < EndPos) {
 							CPoint3D	pos;
-							float		AtomType;
+							float		AtomType=-1;
 						Buffer->GetLine(Line);
 						if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 						{ throw UserCancel();}
 						pos.x = pos.y = pos.z = 0.0f;
-						sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
+						int linecount = sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
 						pos *= unitConversion;
+						if ((linecount!=5)||(AtomType<1)) {
+							wxString msg;
+							msg.Printf("Warning: Parsing issue with the line: %s", Line);
+							wxLogMessage(msg);
+						}
 						lFrame->AddAtom((long) AtomType, pos);
 						StartPos = Buffer->FindBlankLine();
 						if ((StartPos <= EndPos)&&(StartPos>-1)) {	//basis set is inlined in $DATA
@@ -483,12 +488,22 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
 			while (Buffer->GetFilePos() < EndPos) {
 				CPoint3D	pos;
-				float		AtomType;
+				float		AtomType=-1;
+				char		token2[kMaxLineLength];
 				Buffer->GetLine(Line);
 				if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 				{ throw UserCancel();}
 				pos.x = pos.y = pos.z = 0.0f;
-				sscanf(Line, "%s %f %f %f %f", token, &AtomType, &pos.x, &pos.y, &pos.z);
+				//The form is token (skip) atomic charge or symbol, x y z coords
+				int linecount = sscanf(Line, "%s %s %f %f %f", token, token2, &pos.x, &pos.y, &pos.z);
+				int inum = 1;
+				if (isnumber(token2[0])) inum = sscanf(token2, "%f", &AtomType);
+				else AtomType = SetAtomType((unsigned char *) token2);
+				if ((linecount!=5)||(AtomType<1)) {
+					wxString msg;
+					msg.Printf("Warning: Parsing issue with the line: %s", Line);
+					wxLogMessage(msg);
+				}
 				pos *= unitConversion;
 				lFrame->AddAtom((long) AtomType, pos);
 			}
