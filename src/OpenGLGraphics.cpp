@@ -1194,7 +1194,7 @@ void WinPrefs::ChangeColorVectorColor(void) const {
 	glColor3f(red, green, blue);
 }
 
-void WinPrefs::GetAtomColorInverse(long atomtype, float rgb[3]) {
+void WinPrefs::GetAtomColorInverse(long atomtype, float rgb[3]) const {
 	rgb[0] = 1.0f - AtomColors[atomtype-1].red / 65536.0f;
 	rgb[1] = 1.0f - AtomColors[atomtype-1].green / 65536.0f;
 	rgb[2] = 1.0f - AtomColors[atomtype-1].blue / 65536.0f;

@@ -44,35 +44,6 @@
 
 IMPLEMENT_DYNAMIC_CLASS( CoordinatesWindow, wxFrame )
 
-/*!
- * CoordinatesWindow event table definition
- */
-enum MMP_EventID {
-	MMP_SHRINK10=wxID_HIGHEST+1,
-	MMP_ENLARGE10,
-	MMP_SHOWMODE,
-	MMP_PREVMODE,
-	MMP_NEXTMODE,
-	MMP_SHOWAXIS,
-	MMP_CENTER,
-	MMP_ROTATESUBMENU,
-	MMP_ROTATETOXAXIS,
-	MMP_ROTATETOYAXIS,
-	MMP_ROTATETOZAXIS,
-	MMP_ROTATE180HOR,
-	MMP_ROTATE180VER,
-	MMP_ROTATEPRINC,
-	MMP_ROTATEOTHER,
-	MMP_CONVERTTOBOHR,
-	MMP_CONVERTTOANGSTROMS,
-	MMP_INVERTNORMALMODE,
-	MMP_COPYCOORDS,
-	MMP_BONDSWINDOW,
-	MMP_COORDSWINDOW,
-	
-	Number_MMP_Ids
-};
-
 BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 
 ////@begin CoordinatesWindow event table entries
@@ -88,6 +59,7 @@ BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 
 	EVT_MENU( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemClick )
 	EVT_UPDATE_UI( MMP_COPYCOORDSITEM, CoordinatesWindow::OnMmpCopycoordsitemUpdate )
+	EVT_UPDATE_UI( MMP_COPYNWCOORDS, CoordinatesWindow::OnCopyNWCoordsItemUpdate )
 
 	EVT_UPDATE_UI( wxID_PASTE, CoordinatesWindow::OnPasteUpdate )
 
@@ -112,7 +84,11 @@ BEGIN_EVENT_TABLE( CoordinatesWindow, wxFrame )
 
 	EVT_CHOICE( ID_COORDCHOICE1, CoordinatesWindow::OnCoordchoice1Selected )
 
+#if wxCHECK_VERSION(3, 0, 0)
+	EVT_GRID_CELL_CHANGED( CoordinatesWindow::OnCellChange )
+#else
 	EVT_GRID_CELL_CHANGE( CoordinatesWindow::OnCellChange )
+#endif
 	EVT_GRID_SELECT_CELL( CoordinatesWindow::OnSelectCell )
 	EVT_GRID_RANGE_SELECT( CoordinatesWindow::OnRangeSelect )
 
@@ -161,7 +137,8 @@ bool CoordinatesWindow::Create( MolDisplayWin* parent, wxWindowID id, const wxSt
 	needClearAll = true;
 
 ////@begin CoordinatesWindow creation
-	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
+//	I do not see why this was here.
+//	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
 	wxFrame::Create( parent, id, caption, pos, size, style );
 
 	CreateControls();
@@ -200,28 +177,50 @@ void CoordinatesWindow::CreateControls()
 	itemMenu3->Append(wxID_OPEN, _("&Open ...\tCtrl+O"), _T(""), wxITEM_NORMAL);
 	itemMenu3->Append(wxID_CLOSE, _("&Close\tCtrl+W"), _T(""), wxITEM_NORMAL);
 	menuBar->Append(itemMenu3, _("File"));
-	wxMenu* itemMenu7 = new wxMenu;
-	itemMenu7->Append(wxID_UNDO, _("&Undo\tCtrl+Z"), _T(""), wxITEM_NORMAL);
-	itemMenu7->Enable(wxID_UNDO, false);
-	itemMenu7->AppendSeparator();
-	itemMenu7->Append(wxID_CUT, _("Cu&t\tCtrl+X"), _T(""), wxITEM_NORMAL);
-	itemMenu7->Enable(wxID_CUT, false);
-	itemMenu7->Append(wxID_COPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
-	itemMenu7->Enable(wxID_COPY, false);
-	itemMenu7->Append(MMP_COPYCOORDSITEM, _("Copy Coordinates"), _("Copy the full set of coordinates with the current coordinate type."), wxITEM_NORMAL);
-	itemMenu7->Enable(MMP_COPYCOORDSITEM, false);
-	itemMenu7->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
-	itemMenu7->Enable(wxID_PASTE, false);
-	itemMenu7->Append(wxID_CLEAR, _("&Delete\tDel"), _T(""), wxITEM_NORMAL);
-	itemMenu7->Enable(wxID_CLEAR, false);
-	itemMenu7->AppendSeparator();
-	itemMenu7->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
-	itemMenu7->Enable(wxID_SELECTALL, false);
-	menuBar->Append(itemMenu7, _("Edit"));
+	wxMenu* lEditMenu = new wxMenu;
+	lEditMenu->Append(wxID_UNDO, _("&Undo\tCtrl+Z"), _T(""), wxITEM_NORMAL);
+	lEditMenu->Enable(wxID_UNDO, false);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_CUT, _("Cu&t\tCtrl+X"), _T(""), wxITEM_NORMAL);
+	lEditMenu->Enable(wxID_CUT, false);
+	lEditMenu->Append(wxID_COPY, _("&Copy\tCtrl+C"), _T(""), wxITEM_NORMAL);
+	lEditMenu->Enable(wxID_COPY, false);
+	lEditMenu->Append(MMP_COPYCOORDSITEM, _("Copy Coordinates"), _("Copy the full set of coordinates with the current coordinate type."), wxITEM_NORMAL);
+	lEditMenu->Enable(MMP_COPYCOORDSITEM, false);
+	lEditMenu->Append(MMP_COPYNWCOORDS, wxT("Copy NWChem Coordinates"), wxT("Copy the current set of coordinates as plain text in NWChem style"));
+	lEditMenu->Enable(MMP_COPYNWCOORDS, false);
+	lEditMenu->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
+	lEditMenu->Enable(wxID_PASTE, false);
+	lEditMenu->Append(wxID_CLEAR, _("&Delete\tDel"), _T(""), wxITEM_NORMAL);
+	lEditMenu->Enable(wxID_CLEAR, false);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
+	lEditMenu->Enable(wxID_SELECTALL, false);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
+	menuBar->Append(lEditMenu, _("Edit"));
+
 	wxMenu* itemMenu17 = new wxMenu;
 	itemMenu17->Append(ID_STICKMENU, _("Use Coordinates for Reference"), _("Makes the current rotated coordinates the reference coordinates."), wxITEM_NORMAL);
 	itemMenu17->Append(ID_REORDERCOORDITEM, _("&Change selected atoms order..."), _T(""), wxITEM_NORMAL);
 	menuBar->Append(itemMenu17, _("Coordinates"));
+
+	wxMenu * menuWindow = new wxMenu;
+	menuWindow->Append(MMP_MOLECULEDISPLAYWINDOW, wxT("&Molecule Display"), _("The primary molecule display"));
+	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"), _("View/edit the bonding within the molecule"));
+	menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"), _("A plot of the energy for each geometry"));
+	menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"), _("Plot the vibrational frequencies"));
+	menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"), _T("Generate a GAMESS input file"));
+	menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"), _T("Add/Edit/Remove various surface types"));
+	menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"), _("Compute bond lengths/angles or dihedrals between any set of atoms"));
+	menuWindow->Append(MMP_LOCAL_PREFERENCES, wxT("Pr&eferences"), _T("Edit the preferences for this window"));
+	menuBar->Append(menuWindow, wxT("&Subwindow"));
+	
+	wxMenu * menuHelp = new wxMenu;
+	menuHelp->Append(wxID_ABOUT, wxT("&About MacMolPlt..."), _T("Learn about MacMolPlt"));
+	menuHelp->Append(wxID_HELP, wxT("&MacMolPlt Manual..."), _T("Brief documentation"));
+	menuBar->Append(menuHelp, wxT("&Help"));
+
 	itemFrame1->SetMenuBar(menuBar);
 
 	wxBoxSizer* itemBoxSizer20 = new wxBoxSizer(wxVERTICAL);
@@ -1025,6 +1024,14 @@ void CoordinatesWindow::OnStickmenuUpdate( wxUpdateUIEvent& event )
  */
 
 void CoordinatesWindow::OnMmpCopycoordsitemUpdate( wxUpdateUIEvent& event )
+{
+	MoleculeData * MainData = Parent->GetData();
+	Frame * lFrame = MainData->GetCurrentFramePtr();
+	long natoms = lFrame->GetNumAtoms();
+	event.Enable((natoms>0));
+}
+
+void CoordinatesWindow::OnCopyNWCoordsItemUpdate( wxUpdateUIEvent& event )
 {
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();

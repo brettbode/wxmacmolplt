@@ -67,6 +67,7 @@ BEGIN_EVENT_TABLE( SurfacesWindow, wxFrame )
 	EVT_TEXT(ID_SURFTITLE, SurfacesWindow::OnChangeTitle)
 	EVT_BUTTON( wxID_ADD, SurfacesWindow::OnAddClick )
 	EVT_BUTTON( wxID_DELETE, SurfacesWindow::OnDeleteClick )
+	EVT_MENU( wxID_CLOSE, SurfacesWindow::OnCloseEvent )
 
 ////@end SurfacesWindow event table entries
 
@@ -184,6 +185,42 @@ void SurfacesWindow::CreateControls()
 
 ////@end SurfacesWindow content construction
 
+	wxMenuBar* menuBar = new wxMenuBar;
+	wxMenu* lFileMenu = new wxMenu;
+	lFileMenu->Append(wxID_NEW, wxT("&New\tCtrl+N"), _("Open a new empty window"));
+	lFileMenu->Append(wxID_OPEN, wxT("&Open ...\tCtrl+O"), wxT("Open a file into a new window"));
+	lFileMenu->Append(wxID_CLOSE, _("&Close Window\tCtrl+W"), wxEmptyString, wxITEM_NORMAL);
+	lFileMenu->AppendSeparator();
+	lFileMenu->Append(wxID_EXIT, _("&Quit\tCtrl+Q"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(lFileMenu, _("&File"));
+	wxMenu* lEditMenu = new wxMenu;
+	lEditMenu->Append(wxID_UNDO, _("&Undo\tCtrl+Z"), _T(""), wxITEM_NORMAL);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_COPY, _("&Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
+	lEditMenu->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
+	menuBar->Append(lEditMenu, _("&Edit"));
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
+
+	wxMenu * menuWindow = new wxMenu;
+	menuWindow->Append(MMP_MOLECULEDISPLAYWINDOW, wxT("&Molecule Display"), _("The primary molecule display"));
+	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"), _("View/edit the bonding within the molecule"));
+	menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"), _("View/edit cartesian or internal coordinates"));
+	menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"), _("A plot of the energy for each geometry"));
+	menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"), _("Plot the vibrational frequencies"));
+	menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"), _T("Generate a GAMESS input file"));
+	menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"), _("Compute bond lengths/angles or dihedrals between any set of atoms"));
+	menuWindow->Append(MMP_LOCAL_PREFERENCES, wxT("Pr&eferences"), _T("Edit the preferences for this window"));
+	menuBar->Append(menuWindow, wxT("&Subwindow"));
+
+	wxMenu * menuHelp = new wxMenu;
+	menuHelp->Append(wxID_ABOUT, wxT("&About MacMolPlt..."), _T("Learn about MacMolPlt"));
+	menuHelp->Append(wxID_HELP, wxT("&MacMolPlt Manual..."), _T("Brief documentation"));
+	menuBar->Append(menuHelp, wxT("&Help"));
+	itemFrame1->SetMenuBar(menuBar);
+	
 	Frame * lFrame = mData->GetCurrentFramePtr();
 	long NumSurfaces = lFrame->GetNumSurfaces();
 	if (NumSurfaces == 0) {
@@ -510,5 +547,15 @@ int SurfacesWindow::selectSurfaceType() {
 	
 	return -1;
 	
+}
+
+/*!
+ * wxEVT_CLOSE menu event handler for SurfacesWindow
+ */
+
+void SurfacesWindow::OnCloseEvent( wxCommandEvent& /* event */ )
+{
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	parent->CloseSurfacesWindow();
 }
 

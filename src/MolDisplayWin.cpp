@@ -63,128 +63,6 @@ extern WindowData	gWindowDefault;
 
 using namespace std;
 
-//I think these are only needed in this file.
-//They are custom ids used to tie the event table to the menus
-
-#define ID_LOCAL_PREFERENCES 501
-
-enum MMP_EventID {
-	MMP_SHRINK10=wxID_HIGHEST+1,
-	MMP_ENLARGE10,
-	MMP_SHOWMODE,
-	MMP_PREVMODE,
-	MMP_NEXTMODE,
-	MMP_SHOWAXIS,
-	MMP_SHOWBUILDTOOLS,
-	MMP_SHOWSYMMETRYOPERATOR,
-	MMP_ATOMLABELSSUBMENU,
-	MMP_NO_ATOMLABEL,
-	MMP_SHOWATOMLABELS,
-	MMP_SHOWATOMNUMBER,
-	MMP_SHOWPATTERN,
-	MMP_BOTHATOMLABELS,
-	MMP_DISPLAYMODESUBMENU,
-	MMP_WIREFRAMEMODE,
-	MMP_BALLANDSTICKMODE,
-	MMP_EFP_WIREFRAME,
-	MMP_TOGGLEVISSUBMENU,
-	MMP_TOGGLEABINITIO,
-	MMP_TOGGLEMMATOMS,
-	MMP_TOGGLEEFPATOMS,
-	MMP_ADDMARKANNOTATION,
-	MMP_ADDLENGTHANNOTATION,
-	MMP_ADDANGLEANNOTATION,
-	MMP_ADDDIHEDRALANNOTATION,
-	MMP_DELETEALLANNOTATIONS,
-	MMP_CENTER,
-	MMP_AUTOROTATE,
-	MMP_ROTATESUBMENU,
-	MMP_ROTATETOXAXIS,
-	MMP_ROTATETOYAXIS,
-	MMP_ROTATETOZAXIS,
-	MMP_ROTATE180HOR,
-	MMP_ROTATE180VER,
-	MMP_ROTATEPRINC,
-	MMP_ROTATEOTHER,
-	MMP_CREATELLMPATH,
-	MMP_MINFRAMEMOVEMENTS,
-	MMP_CONVERTTOBOHR,
-	MMP_CONVERTTOANGSTROMS,
-	MMP_INVERTNORMALMODE,
-	MMP_ADDHYDROGENS,
-	MMP_DELETEHYDROGENS,
-
-	// On when NumAtoms != 0.  LEAVE MMP_NEWFRAME FIRST AND
-	// MMP_ANNOTATIONSSUBMENU LAST!
-	MMP_NEWFRAME,
-	MMP_COPYCOORDS,
-	MMP_ENERGYEDIT,
-	MMP_SETBONDLENGTH,
-	MMP_DETERMINEPG,
-	MMP_SYMADAPTCOORDS,
-	MMP_EXPORT,
-	MMP_ANNOTATIONSSUBMENU,
-
-	MMP_ADDFRAMES,
-	MMP_DELETEFRAME,
-	MMP_IMPORTMENU,
-	MMP_BONDSWINDOW,
-	MMP_COORDSWINDOW,
-	MMP_ENERGYPLOTWINDOW,
-	MMP_FREQUENCIESWINDOW,
-	MMP_INPUTBUILDERWINDOW,
-	MMP_INPUT_WIZARD,
-	MMP_SURFACESWINDOW,
-	MMP_FRAMESCROLLBAR,
-	MMP_PRINTOPTIONS,
-	MMP_ANIMATEFRAMES,
-	MMP_ANIMATEFRAMESTIMER,
-	MMP_ANIMATEMODE,
-	MMP_ANIMATEMODETIMER,
-	MMP_STATUS_TIMER,
-	MMP_ROTATE_TIMER,
-	MMP_OFFSETMODE,
-	MMP_WINDOWPARAMETERS,
-	MMP_ZMATRIXCALC,
-	MMP_SHOW_TOOLBAR,
-	MMP_CURPOINTGROUP,
-	MMP_POINTGROUPORDER,
-	MMP_PGC1,
-	MMP_PGCS,
-	MMP_PGCI,
-	MMP_PGCNH,
-	MMP_PGCNV,
-	MMP_PGCN,
-	MMP_PGS2N,
-	MMP_PGDND,
-	MMP_PGDNH,
-	MMP_PGDN,
-	MMP_PGTD,
-	MMP_PGTH,
-	MMP_PGT,
-	MMP_PGOH,
-	MMP_PGO,
-	MMP_PGORDER2,
-	MMP_PGORDER3,
-	MMP_PGORDER4,
-	MMP_PGORDER5,
-	MMP_PGORDER6,
-	MMP_PGORDER7,
-	MMP_PGORDER8,
-	MMP_TOOL_ARROW,
-	MMP_TOOL_LASSO,
-	MMP_TOOL_HAND,
-	MMP_SELECT_ALL,
-	MMP_SELECT_NONE,
-	MMP_SHOWBONDSITES,
-	MMP_SYMMETRY_EDIT,
-	/* MMP_SYMMETRY_REGEN, */
-	MMP_SAVESTRUCTURE,
-	MMP_SHOW_FULLSCREEN,
-	
-	Number_MMP_Ids
-};
-
 //Local use class to hold data during the animation of normal modes
 class ModeAnimation {
 public:
@@ -517,7 +395,8 @@ void MolDisplayWin::createMenuBar(void) {
 	menuEdit->AppendSeparator();
 	menuEdit->Append(wxID_CUT, wxT("Cu&t\tCtrl+X"));
 	menuEdit->Append(wxID_COPY, wxT("&Copy\tCtrl+C"), wxT("Copy the display as an image"));
-	menuEdit->Append(MMP_COPYCOORDS, wxT("Copy Coordinates"), wxT("Copy the current set of coordinates as plain text"));
+	menuEdit->Append(MMP_COPYCOORDS, wxT("Copy Coordinates"), wxT("Copy the current set of coordinates as plain text in GAMESS style"));
+	menuEdit->Append(MMP_COPYNWCOORDS, wxT("Copy NWChem Coordinates"), wxT("Copy the current set of coordinates as plain text in NWChem style"));
 	menuEdit->Append(wxID_PASTE, wxT("&Paste\tCtrl+V"));
 	menuEdit->Append(wxID_CLEAR, wxT("&Delete\tDel"));
 	menuEdit->AppendSeparator();
@@ -644,15 +523,15 @@ void MolDisplayWin::createMenuBar(void) {
 	menuMolecule->Append(MMP_INVERTNORMALMODE, wxT("&Invert Normal Mode"), _T("Multiply the normal mode by -1 to invert the direction of the vectors"));
 // TODO:  Create menu items for remaining menus
 
-	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"));
+	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"), _("View/edit the bonding within the molecule"));
 	menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"), _("View/edit cartesian or internal coordinates"));
 	menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"), _("A plot of the energy for each geometry"));
 	menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"), _("Plot the vibrational frequencies"));
 	menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"), _T("Generate a GAMESS input file"));
 	/* menuWindow->Append(MMP_INPUT_WIZARD, wxT("&Input Builder Wizard"), _T("Easily generate a GAMESS input file")); */
 	menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"), _T("Add/Edit/Remove various surface types"));
-	menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"));
-	menuWindow->Append(ID_LOCAL_PREFERENCES, wxT("Pr&eferences"), _T("Edit the preferences for this window"));
+	menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"), _("Compute bond lengths/angles or dihedrals between any set of atoms"));
+	menuWindow->Append(MMP_LOCAL_PREFERENCES, wxT("Pr&eferences"), _T("Edit the preferences for this window"));
 
 	menuBar->Append(menuFile, wxT("&File"));
 	menuBar->Append(menuEdit, wxT("&Edit"));
@@ -675,6 +554,7 @@ void MolDisplayWin::ClearMenus(void) {
 	menuEdit->Enable(wxID_CUT, false);
 	/* menuEdit->Enable(wxID_COPY, false); */
 	menuEdit->Enable(MMP_COPYCOORDS, false);
+	menuEdit->Enable(MMP_COPYNWCOORDS, false);
 	/* menuEdit->Enable(wxID_CLEAR, false); */
 
 	menuView->Enable(MMP_SHOWMODE, false);
@@ -1903,13 +1783,16 @@ void MolDisplayWin::menuEditCopy(wxCommandEvent &event) {
 void MolDisplayWin::menuEditCopyCoordinates(wxCommandEvent &event) {
 	CopyCoordinates(0);
 }
+void MolDisplayWin::menuEditCopyNWChemCoordinates(wxCommandEvent &event) {
+	CopyCoordinates(2);
+}
 void MolDisplayWin::CopyCoordinates(short ctype) const {
 	//Now copy the coords
 	Frame *     lFrame = MainData->cFrame;
 	wxString textBuffer;
 	
 	try {
-		if (ctype == 0) {
+		if (ctype == 0) {	// GAMESS style atomic_symbol  atomic_number  x  y  z
 			wxString    Label;
 			for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
 				if (mHighliteState && !lFrame->Atoms[iatm].GetSelectState()) continue;
@@ -1921,7 +1804,7 @@ void MolDisplayWin::CopyCoordinates(short ctype) const {
 								 lFrame->Atoms[iatm].Position.z);
 				textBuffer.Append(Label);
 			}
-		} else if (ctype == 1) {
+		} else if (ctype == 1) {	// GAMESS style z-matrix
 			//Make a guess for the Handle size based on the # of atoms and the line format
 			long datalength = lFrame->NumAtoms*70*sizeof(char);
 			char * lText = new char[datalength+1];
@@ -1935,6 +1818,17 @@ void MolDisplayWin::CopyCoordinates(short ctype) const {
 			textBuffer = wxString(lText, wxConvUTF8);
 			delete Buffer;
 			delete [] lText;
+		} else if (ctype == 2) {
+			wxString    Label;
+			for (long iatm=0; iatm<lFrame->NumAtoms; iatm++) {
+				if (mHighliteState && !lFrame->Atoms[iatm].GetSelectState()) continue;
+				Prefs->GetAtomLabel(lFrame->Atoms[iatm].GetType()-1, Label);
+				textBuffer.Append(Label);
+				Label.Printf(wxT("   %13.8f  %13.8f  %13.8f\r"),
+							 lFrame->Atoms[iatm].Position.x, lFrame->Atoms[iatm].Position.y,
+							 lFrame->Atoms[iatm].Position.z);
+				textBuffer.Append(Label);
+			}
 		}
 	}
 	catch (...) {   //The buffer length was probably exceeded, since this shouldn't happen
@@ -2060,6 +1954,9 @@ void MolDisplayWin::PasteText(void) {
 			wxString text = data.GetText();
 			char * tbuf = new char[text.Length()+1];
 			strncpy(tbuf, text.ToAscii(), text.Length()+1);
+			//Clean up the unicode to 7 bit ASCII conversion. WX replaces anything non
+			//7-bit with an '_' so convert those into spaces as the only possible guess.
+			for (int i=0; i<=text.Length(); i++) if (tbuf[i]=='_') tbuf[i] = ' ';
 			BufferFile * TextBuffer=NULL;
 			try {
 				TextBuffer = new BufferFile(tbuf, text.Length());
@@ -2746,7 +2643,7 @@ void MolDisplayWin::menuPreferences(wxCommandEvent &event)
 
 	if ( id == wxID_PREFERENCES )
 		isGlobal = true;
-	else if ( id == ID_LOCAL_PREFERENCES )
+	else if ( id == MMP_LOCAL_PREFERENCES )
 		isGlobal = false;
 	else
 		MessageAlert("This shouldn't happen!");
@@ -3102,6 +2999,11 @@ void MolDisplayWin::menuWindowBonds(wxCommandEvent &event) {
 	}
 	winData.BondsWindowVisible(true);
 }
+void MolDisplayWin::menuWindowMoleculeDisplay(wxCommandEvent &event) {
+	// This function is called by a menu item under a subwindow.
+	// Since this window always exists we just need to bring it to the front.
+	Raise();
+}
 void MolDisplayWin::CloseBondsWindow(void) {
 	if (bondsWindow) {
 		winData.SetBondsWinRect(bondsWindow->GetRect());
@@ -3262,7 +3164,11 @@ void MolDisplayWin::AtomsChanged(bool updateCoordsWin, bool updateDisplay) {
 
 	if (InSymmetryEditMode()) {
 		RegenerateSymmetryDependent();
+#if wxCHECK_VERSION(3, 0, 0)
+		MainData->SymmetrizeCoordinates(wxGetMouseState().LeftIsDown());
+#else
 		MainData->SymmetrizeCoordinates(wxGetMouseState().LeftDown());
+#endif
 	}
 
 	if (updateCoordsWin && coordsWindow) coordsWindow->FrameChanged();
@@ -4399,6 +4305,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (wxID_CUT,             MolDisplayWin::menuEditCut)
 	EVT_MENU (wxID_COPY,            MolDisplayWin::menuEditCopy)
 	EVT_MENU (MMP_COPYCOORDS,       MolDisplayWin::menuEditCopyCoordinates)
+	EVT_MENU (MMP_COPYNWCOORDS,		MolDisplayWin::menuEditCopyNWChemCoordinates)
 	EVT_MENU (wxID_PASTE,           MolDisplayWin::menuEditPaste)
 	EVT_UPDATE_UI(wxID_PASTE,       MolDisplayWin::OnPasteUpdate)
 	EVT_MENU (wxID_CLEAR,           MolDisplayWin::menuEditClear)
@@ -4507,13 +4414,14 @@ EVT_UPDATE_UI (MMP_ANNOTATIONSSUBMENU,   MolDisplayWin::OnAnnotationLengthUpdate
 	EVT_UPDATE_UI_RANGE(MMP_NEWFRAME, MMP_ANNOTATIONSSUBMENU,
 	                    MolDisplayWin::UpdateAtomsOptions)
 	EVT_UPDATE_UI(wxID_COPY,			MolDisplayWin::UpdateAtomsOptions)
+	EVT_MENU(MMP_MOLECULEDISPLAYWINDOW, MolDisplayWin::menuWindowMoleculeDisplay)
 	EVT_MENU (MMP_BONDSWINDOW,			MolDisplayWin::menuWindowBonds)
 	EVT_MENU (MMP_COORDSWINDOW,			MolDisplayWin::menuWindowCoordinates)
 	EVT_MENU (MMP_ENERGYPLOTWINDOW,		MolDisplayWin::menuWindowEnergy_plot)
 	EVT_MENU (MMP_FREQUENCIESWINDOW,	MolDisplayWin::menuWindowFrequencies)
 	EVT_MENU (MMP_INPUTBUILDERWINDOW,	MolDisplayWin::menuWindowInput_builder)
 	EVT_MENU (MMP_SURFACESWINDOW,		MolDisplayWin::menuWindowSurfaces)
-	EVT_MENU (ID_LOCAL_PREFERENCES,		MolDisplayWin::menuPreferences)
+	EVT_MENU (MMP_LOCAL_PREFERENCES,		MolDisplayWin::menuPreferences)
 	EVT_MENU (MMP_ZMATRIXCALC,			MolDisplayWin::menuWindowZMatrixCalc)
 
 	EVT_TIMER(MMP_ANIMATEFRAMESTIMER, MolDisplayWin::OnFrameAnimationTimer)

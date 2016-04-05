@@ -272,7 +272,10 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	SWFText *frameNumText = NULL;
 	wxString frameNumStr;
 	
-	if(!MainData->cFrame->Vibs) return; // TODO: Should spit out a message.
+	if(!MainData->cFrame->Vibs) {
+		wxLogMessage(_("Error! No normal modes found when trying to create a normal mode animation. Aborted!"));
+		return;
+	}
 	Frame * lFrame = MainData->cFrame;
 	if (MainData->GetDrawMode()) {
 		savedrawmode=true;
@@ -285,13 +288,13 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	float VectorScale = Prefs->GetVectorScale();
 	CPoint3D *ModeOffset = new CPoint3D[lFrame->NumAtoms];
 	if(!ModeOffset) {
-		/* TODO:  Error message */
+		wxLogMessage(_("Unable to allocate memory for ModeOffset. Aborted!"));
 		return;
 	}
 	CPoint3D *SavedAtoms = new CPoint3D[lFrame->NumAtoms];
 	if(!SavedAtoms) {
-		/* TODO:  Error message */
-		delete ModeOffset;
+		wxLogMessage(_("Unable to allocate memory for SavedAtoms. Aborted!"));
+		delete[] ModeOffset;
 		return;
 	}
 	mpAtom *lAtoms = lFrame->Atoms;
@@ -311,7 +314,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	
 	fontFile = fopen(fontPath.mb_str(wxConvUTF8), "rb");
 	if(fontFile == NULL) {
-		/* TODO:  Display an error message */
+		wxLogMessage(_("Unable to open font file. Aborted!"));
 		/* OR, just disable drawing text */
 		return;
 	}

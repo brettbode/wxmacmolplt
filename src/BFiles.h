@@ -44,10 +44,10 @@ typedef enum TextFileType {
 /** case insensitive search for the keyword in the char string.
  * The return value is the position of the first character of the keyword on success or -1 on failure.
  * @param buffer A null-terminated character string to search in.
- * @param keyword The string to search for.
+ * @param keyin The string to search for.
  * @param numbyte The number of bytes in the keyword to match.
  */
-long FindKeyWord(const char *buffer, const char keyword[], long numbyte);
+long FindKeyWord(const char *buffer, const char keyin[], long numbyte);
 /** Search the null-terminated string for "Keyword = string".
  * The return value is 1 for success 0 for failure.
  * @param Line A null-terminated string to search in.

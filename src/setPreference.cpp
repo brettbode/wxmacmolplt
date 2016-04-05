@@ -223,7 +223,7 @@ void setPreference::OnOK( wxCommandEvent& event ) {
 	Close();
 }
 
-void setPreference::facDefaults( wxCommandEvent& WXUNUSED(event) ) {
+void setPreference::facDefaults( wxCommandEvent& /* event */ ) {
 
 	switch (currPanel) {
 		case 0: mPrefs->ReadAtomDefaults(); break;
@@ -241,7 +241,7 @@ void setPreference::facDefaults( wxCommandEvent& WXUNUSED(event) ) {
 
 }
 
-void setPreference::userDefaults( wxCommandEvent& WXUNUSED(event) ) { 
+void setPreference::userDefaults( wxCommandEvent& /* event */ ) {
 
 	copyCurrPrefs(currPanel, gPreferences);
 	updatePanels(currPanel);
@@ -261,7 +261,7 @@ void setPreference::OnApply( wxCommandEvent& event ) {
 
 }
 
-void setPreference::OnRevert( wxCommandEvent& WXUNUSED(event) )
+void setPreference::OnRevert( wxCommandEvent& /* event */ )
 {
   WinPrefs* newPrefs;
 
@@ -441,7 +441,7 @@ void setPreference::CreateInitialPages(wxBookCtrlBase *parent) {
     currPanel = 0;
 }
 
-void setPreference::OnSetFont(wxCommandEvent& WXUNUSED(event)) {
+void setPreference::OnSetFont(wxCommandEvent& /* event */) {
 	wxFontData data;
 	wxFontDialog dialog(this, data);
 

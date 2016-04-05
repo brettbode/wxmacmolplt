@@ -104,7 +104,7 @@ void AboutwxMacMolPlt::CreateControls()
 	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer2->Add(itemBoxSizer4, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	wxStaticText* itemStaticText5 = new wxStaticText( itemDialog1, wxID_STATIC, _("FreeWare--Please let me\nknow if you use MacMolPlt. If you\nwish to see further future\ndevelopment then let me know\nthat you use my program!"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText5 = new wxStaticText( itemDialog1, wxID_STATIC, _("FreeWare--Please let me\nknow if you use MacMolPlt. Your\ncomments help drive future enhancements!"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL );
 	itemBoxSizer4->Add(itemStaticText5, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer6 = new wxBoxSizer(wxVERTICAL);
@@ -151,16 +151,24 @@ void AboutwxMacMolPlt::CreateControls()
 #endif
 	itemBoxSizer13->Add(itemHyperlinkCtrl15, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	wxStaticText* itemStaticText16 = new wxStaticText( itemDialog1, wxID_STATIC, _("Please reference: Bode, B. M. and Gordon, M. S. J. Mol. Graphics and\nModeling, 1998, 16, 133-138."), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText16 = new wxStaticText( itemDialog1, wxID_STATIC, _("Please reference: Bode, B. M. and Gordon, M. S. J. Mol. Graphics and\nModeling, 1998, 16, 133-138."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL );
 	itemBoxSizer2->Add(itemStaticText16, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+//#if wxCHECK_VERSION(3, 0, 0)
+	//This is close to working, but the control is not resizing properly so cuts off part of the text.
+//	itemStaticText16->SetLabelMarkup(_("Please reference: Bode, B. M. and Gordon, M. S. <i>J. Mol. Graphics and\nModeling</i>, 1998, <b>16</b>, 133-138."));
+//#endif
+#if wxCHECK_VERSION(2, 8, 0)
+	wxHyperlinkCtrl* itemDOILink = new wxHyperlinkCtrl( itemDialog1, ID_HYPERLINKCTRL3, _("doi:10.1016/S1093-3263(99)00002-9"), _T("http://dx.doi.org/10.1016/S1093-3263(99)00002-9"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	itemBoxSizer2->Add(itemDOILink, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+#endif
 
-	wxStaticText* itemStaticText17 = new wxStaticText( itemDialog1, wxID_STATIC, _("The primary developer of MacMolPlt is Brett Bode with assistance from several talented students including Chris Johnson, Song Li, and Steven Schulteis.\n\nThanks to the Gordon Group at Iowa State University, Apple Computer and the National Science Foundation for providing programming support."), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText17 = new wxStaticText( itemDialog1, wxID_STATIC, _("The primary developer of MacMolPlt is Brett Bode with past contributions from several talented students including Chris Johnson, Song Li, and Steven Schulteis.\n\nThanks to the Gordon Group at Iowa State University, Apple Computer and the National Science Foundation for providing past programming support."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
 	itemStaticText17->Wrap(300);
 	if (ShowToolTips())
 		itemStaticText17->SetToolTip(_("Thanks even to Kurt..."));
 	itemBoxSizer2->Add(itemStaticText17, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	wxButton* itemButton18 = new wxButton( itemDialog1, wxID_OK, _("&OK"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxButton* itemButton18 = new wxButton( itemDialog1, wxID_OK, _("&Close"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer2->Add(itemButton18, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 ////@end AboutwxMacMolPlt content construction

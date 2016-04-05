@@ -195,8 +195,11 @@ class XMLElement {
 		 */
 		XMLElement * addBoolChildElement(const char * name, bool value);
 		/** Create an array element of long values from the provided vector.
+		 * Produces an element of the form:
+		 * \<name title="title" size="count">1 2 3 4\</name>
 		 * @param array The vector containing the values.
-		 * @param name The title of the new element
+		 * @param name The name of the new element
+		 * @param title The title attribute for the element
 		 * @param count How many values should be output, if ommitted the entire vector.
 		 */
 		XMLElement * AddLongArray(const std::vector<long> & array, const char * name, const char * title, long count=-1);

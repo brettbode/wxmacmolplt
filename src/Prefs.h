@@ -405,9 +405,6 @@ class WinPrefs {
 		inline short SetLabelFontID(short NewID) {return LabelFontID=NewID;};
 		inline short GetLabelSize(void) const {return LabelSize;};
 		inline short SetLabelSize(short NewValue) {return LabelSize=NewValue;};
-#ifndef __wxBuild__
-		inline void SetAtomColor(long AtomNum) {RGBForeColor(&(AtomColors[AtomNum]));};
-#endif
 		inline void SetAtomColor(long AtomNum, const RGBColor & color) {AtomColors[AtomNum] = color; };
 		inline bool ToolbarShown() const { return show_toolbar; }
 		/* inline bool ToggleToolbar() { show_toolbar = !show_toolbar; } */
@@ -433,20 +430,21 @@ class WinPrefs {
 		inline RGBColor * GetBackgroundColorLoc(void) {return &BackColor;};
 		inline void SetBackgroundColorLoc(const RGBColor & color) {BackColor = color;};
 		inline short * GetVectorPatternLoc(void) {return &VectorPattern;};
-#ifndef __wxBuild__
-		inline void SetBondColor(long BondOrder) {RGBForeColor(&(BondColors[BondOrder]));};
-#else
+		/// Changes the GL color to be the color for the specified bond order.
 		void ChangeColorBondColor(long BondOrder) const;
+		/// Changes the GL color to be the color for vectors
 		void ChangeColorVectorColor(void) const;
+		/// Changes the GL color to be the color for the specified element with the optional alpha.
 		void ChangeColorAtomColor(long atomtype, float alpha = 1.0) const;
-		void GetAtomColorInverse(long atomtype, float rgb[3]);
-#endif
+		/// Compute the color space inverse for the specified element.
+		/**
+		 * @param[in] atomtype The atomic number for the desired element
+		 * @param[out] rgb A vector of three floats (red, green, blue) that will contain the result upon exit.
+		 */
+		void GetAtomColorInverse(long atomtype, float rgb[3]) const;
 		inline void SetBondColor(long BondOrder, const RGBColor & color) {BondColors[BondOrder] = color;};
 		inline void SetVectorColor(const RGBColor & color) {VectorColor = color; };
 		void SetBondPattern(long BondOrder);
-#ifndef __wxBuild__
-		inline void SetVectorColor(void) const {RGBForeColor(&VectorColor);};
-#endif
 		void SetVectorPattern(void);
 		/// Obtain the normal mode length scale factor
 		inline float GetVectorScale(void) const {return VectorScale;};

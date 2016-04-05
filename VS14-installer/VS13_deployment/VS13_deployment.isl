@@ -340,10 +340,11 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>ISX_DEFAULTCOMPONENT</td><td>{653FBDC5-79E9-4093-8D5D-DFA875910D1E}</td><td>SAMPLES</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{02A00B92-BBE6-493E-A092-497F8C5F7539}</td><td>MANUAL_PAGES</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>ISX_DEFAULTCOMPONENT2</td><td>{BE1F2458-1471-4D5F-B7A7-3E1FEA59D23F}</td><td>INSTALLDIR</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>wxMacMolPlt_vc13.Primary_Output</td><td>{A157F119-D5AB-4F7E-9B2C-CDBBE8CE4801}</td><td>INSTALLDIR</td><td>2</td><td/><td>wxmacmolplt_vc13.primary_out</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT</td><td>{653FBDC5-79E9-4093-8D5D-DFA875910D1E}</td><td>SAMPLES</td><td>258</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT1</td><td>{02A00B92-BBE6-493E-A092-497F8C5F7539}</td><td>MANUAL_PAGES</td><td>258</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT2</td><td>{BE1F2458-1471-4D5F-B7A7-3E1FEA59D23F}</td><td>INSTALLDIR</td><td>258</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>ISX_DEFAULTCOMPONENT3</td><td>{81962DD3-6106-4036-8291-FC1F4D92E84B}</td><td>ProgramFiles64Folder</td><td>2</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>wxMacMolPlt_vc13.Primary_Output1</td><td>{0BA27EFB-3F0D-4B62-AD97-F75C5ECA6627}</td><td>INSTALLDIR</td><td>258</td><td/><td>wxmacmolplt_vc13.primary_out1</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -1053,6 +1054,7 @@
 	<table name="CreateFolder">
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>ProgramFiles64Folder</td><td>ISX_DEFAULTCOMPONENT3</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -1143,7 +1145,7 @@
 		<row><td>FavoritesFolder</td><td>TARGETDIR</td><td>.:FAVORI~1|Favorites</td><td/><td>0</td><td/></row>
 		<row><td>FontsFolder</td><td>TARGETDIR</td><td>.:Fonts</td><td/><td>0</td><td/></row>
 		<row><td>GlobalAssemblyCache</td><td>TARGETDIR</td><td>.:Global~1|GlobalAssemblyCache</td><td/><td>0</td><td/></row>
-		<row><td>INSTALLDIR</td><td>WXMACMOLPLT1</td><td>.</td><td/><td>0</td><td/></row>
+		<row><td>INSTALLDIR</td><td>WXMACMOLPLT2</td><td>.</td><td/><td>0</td><td/></row>
 		<row><td>ISCommonFilesFolder</td><td>CommonFilesFolder</td><td>Instal~1|InstallShield</td><td/><td>0</td><td/></row>
 		<row><td>ISMyCompanyDir</td><td>ProgramFilesFolder</td><td>MYCOMP~1|My Company Name</td><td/><td>0</td><td/></row>
 		<row><td>ISMyProductDir</td><td>ISMyCompanyDir</td><td>MYPROD~1|My Product Name</td><td/><td>0</td><td/></row>
@@ -1173,7 +1175,8 @@
 		<row><td>TemplateFolder</td><td>TARGETDIR</td><td>.:ShellNew</td><td/><td>0</td><td/></row>
 		<row><td>USERPROFILE</td><td>TARGETDIR</td><td>.:USERPR~1|UserProfile</td><td/><td>0</td><td/></row>
 		<row><td>WXMACMOLPLT</td><td>ISU</td><td>WXMACM~1|wxMacMolplt</td><td/><td>0</td><td/></row>
-		<row><td>WXMACMOLPLT1</td><td>ProgramFilesFolder</td><td>WXMACM~1|wxMacMolPlt</td><td/><td>0</td><td/></row>
+		<row><td>WXMACMOLPLT1</td><td>ProgramFiles64Folder</td><td>WXMACM~1|wxMacMolPlt</td><td/><td>0</td><td/></row>
+		<row><td>WXMACMOLPLT2</td><td>ProgramFilesFolder</td><td>WXMACM~1|wxMacMolplt</td><td/><td>0</td><td/></row>
 		<row><td>WindowsFolder</td><td>TARGETDIR</td><td>.:Windows</td><td/><td>0</td><td/></row>
 		<row><td>WindowsVolume</td><td>TARGETDIR</td><td>.:WinRoot</td><td/><td>0</td><td/></row>
 	</table>
@@ -1870,7 +1873,8 @@
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT1</td></row>
 		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT2</td></row>
-		<row><td>AlwaysInstall</td><td>wxMacMolPlt_vc13.Primary_Output</td></row>
+		<row><td>AlwaysInstall</td><td>ISX_DEFAULTCOMPONENT3</td></row>
+		<row><td>AlwaysInstall</td><td>wxMacMolPlt_vc13.Primary_Output1</td></row>
 	</table>
 
 	<table name="File">
@@ -1897,7 +1901,6 @@
 		<row><td>_d_ted.jpg</td><td>ISX_DEFAULTCOMPONENT1</td><td>3D_TED.jpg</td><td>0</td><td/><td/><td/><td>1</td><td>C:\wxmacmolplt\Manual_pages\3D_TED.jpg</td><td>1</td><td/></row>
 		<row><td>_d_ted_dialog.gif</td><td>ISX_DEFAULTCOMPONENT1</td><td>2D_TED~1.GIF|2D_TED_Dialog.gif</td><td>0</td><td/><td/><td/><td>1</td><td>C:\wxmacmolplt\Manual_pages\2D_TED_Dialog.gif</td><td>1</td><td/></row>
 		<row><td>_d_ted_dialog.gif1</td><td>ISX_DEFAULTCOMPONENT1</td><td>3D_TED~1.GIF|3D_TED_Dialog.gif</td><td>0</td><td/><td/><td/><td>1</td><td>C:\wxmacmolplt\Manual_pages\3D_TED_Dialog.gif</td><td>1</td><td/></row>
-		<row><td>_directory_history</td><td>ISX_DEFAULTCOMPONENT1</td><td>DIRECT~1|.directory_history</td><td>0</td><td/><td/><td/><td>1</td><td>C:\wxmacmolplt\Manual_pages\.directory_history</td><td>1</td><td/></row>
 		<row><td>amino_acids.cml</td><td>ISX_DEFAULTCOMPONENT2</td><td>AMINO_~1.CML|amino_acids.cml</td><td>0</td><td/><td/><td/><td>1</td><td>C:\wxmacmolplt\resources\amino_acids.cml</td><td>1</td><td/></row>
 		<row><td>arial1.bmf</td><td>ISX_DEFAULTCOMPONENT2</td><td>arial1.bmf</td><td>0</td><td/><td/><td/><td>1</td><td>C:\wxmacmolplt\resources\fonts\arial1.bmf</td><td>1</td><td/></row>
 		<row><td>arial1.glf</td><td>ISX_DEFAULTCOMPONENT2</td><td>arial1.glf</td><td>0</td><td/><td/><td/><td>1</td><td>C:\wxmacmolplt\resources\fonts\arial1.glf</td><td>1</td><td/></row>
@@ -1928,7 +1931,7 @@
 		<row><td>walkthrough.html</td><td>ISX_DEFAULTCOMPONENT1</td><td>WALKTH~1.HTM|WalkThrough.html</td><td>0</td><td/><td/><td/><td>1</td><td>C:\wxmacmolplt\Manual_pages\WalkThrough.html</td><td>1</td><td/></row>
 		<row><td>water.jpg</td><td>ISX_DEFAULTCOMPONENT1</td><td>water.jpg</td><td>0</td><td/><td/><td/><td>1</td><td>C:\wxmacmolplt\Manual_pages\water.jpg</td><td>1</td><td/></row>
 		<row><td>water.log</td><td>ISX_DEFAULTCOMPONENT</td><td>water.log</td><td>0</td><td/><td/><td/><td>1</td><td>C:\wxmacmolplt\samples\water.log</td><td>1</td><td/></row>
-		<row><td>wxmacmolplt_vc13.primary_out</td><td>wxMacMolPlt_vc13.Primary_Output</td><td>wxMacMolPlt_vc13.Primary Output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;wxMacMolPlt&gt;|Built</td><td>3</td><td/></row>
+		<row><td>wxmacmolplt_vc13.primary_out1</td><td>wxMacMolPlt_vc13.Primary_Output1</td><td>wxMacMolPlt_vc13.Primary Output</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;wxMacMolPlt&gt;|Built</td><td>3</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -2075,7 +2078,8 @@
 		<row><td>ISX_DEFAULTCOMPONENT</td><td/><td/><td>_A297F0F5_EB50_42CE_979D_529CFFF46795_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT1</td><td/><td/><td>_DD022928_D25C_4AF6_9874_58EC83E0A4A0_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>ISX_DEFAULTCOMPONENT2</td><td/><td/><td>_5444BAC3_D454_4476_99A2_F5FF5FE747F5_FILTER</td><td/><td/><td/><td/></row>
-		<row><td>wxMacMolPlt_vc13.Primary_Output</td><td/><td/><td>_756D45C9_6900_4897_A4C1_A37B253D3828_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>ISX_DEFAULTCOMPONENT3</td><td/><td/><td>_A7498A0B_E8ED_410D_BE4E_5DFA929F7248_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>wxMacMolPlt_vc13.Primary_Output1</td><td/><td/><td>_29126D5D_6075_4058_9E21_57AC57AD853E_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -2695,7 +2699,7 @@
 		<col def="I2">Encoded</col>
 		<col def="S0">Comment</col>
 		<col def="I4">TimeStamp</col>
-		<row><td>COMPANY_NAME</td><td>1033</td><td>ISU</td><td>0</td><td/><td>1789113968</td></row>
+		<row><td>COMPANY_NAME</td><td>1033</td><td>ISUQTG</td><td>0</td><td/><td>-106658318</td></row>
 		<row><td>DN_AlwaysInstall</td><td>1033</td><td>Always Install</td><td>0</td><td/><td>1386456109</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_COLOR</td><td>1033</td><td>The color settings of your system are not adequate for running [ProductName].</td><td>0</td><td/><td>1386456109</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_OS</td><td>1033</td><td>The operating system is not adequate for running [ProductName].</td><td>0</td><td/><td>1386456109</td></row>
@@ -3796,8 +3800,11 @@
 		<row><td>IDS__TargetReq_DESC_RAM</td><td>1033</td><td>The amount of RAM is not adequate for running [ProductName].</td><td>0</td><td/><td>1386456109</td></row>
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>1386456109</td></row>
 		<row><td>ID_STRING1</td><td>1033</td><td/><td>0</td><td/><td>1386458157</td></row>
-		<row><td>ID_STRING2</td><td>1033</td><td>http://www.ISU.com</td><td>0</td><td/><td>1789113968</td></row>
-		<row><td>ID_STRING3</td><td>1033</td><td>ISU</td><td>0</td><td/><td>1789113968</td></row>
+		<row><td>ID_STRING2</td><td>1033</td><td>http://www.msg.chem.iastate.edu</td><td>0</td><td/><td>-106631694</td></row>
+		<row><td>ID_STRING3</td><td>1033</td><td>ISU</td><td>0</td><td/><td>2082669620</td></row>
+		<row><td>ID_STRING4</td><td>1033</td><td>https://github.com/brettbode/wxmacmolplt/issues/</td><td>0</td><td/><td>1092902735</td></row>
+		<row><td>ID_STRING5</td><td>1033</td><td>http://brettbode.github.io/wxmacmolplt/</td><td>0</td><td/><td>-106658286</td></row>
+		<row><td>ID_STRING6</td><td>1033</td><td>WXMACM~1|wxMacMolPlt</td><td>0</td><td/><td>-106673869</td></row>
 		<row><td>IIDS_UITEXT_FeatureUninstalled</td><td>1033</td><td>This feature will remain uninstalled.</td><td>0</td><td/><td>1386456109</td></row>
 	</table>
 
@@ -3906,6 +3913,8 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I2">ISIconIndex</col>
 		<row><td>ARPPRODUCTICON.exe</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\OS Independent\setupicon.ico</td><td>0</td></row>
+		<row><td>_FB7AA362719C43C588293B1BE9F958B9.exe</td><td/><td>C:\wxmacmolplt\x64\Release\wxMacMolPlt.exe</td><td>0</td></row>
+		<row><td>_FD52DAE4F94C45668C264BF30BA50F78.exe</td><td/><td>C:\wxmacmolplt\x64\Release\wxMacMolPlt.exe</td><td>0</td></row>
 	</table>
 
 	<table name="IniFile">
@@ -4024,7 +4033,7 @@
 UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 			</td></row>
 		<row><td>DefaultProductConfiguration</td><td>Express</td></row>
-		<row><td>EnableSwidtag</td><td>1</td></row>
+		<row><td>EnableSwidtag</td><td>0</td></row>
 		<row><td>ISCompilerOption_CompileBeforeBuild</td><td>1</td></row>
 		<row><td>ISCompilerOption_Debug</td><td>0</td></row>
 		<row><td>ISCompilerOption_IncludePath</td><td/></row>
@@ -4038,7 +4047,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>ISTheme</td><td>InstallShield Blue.theme</td></row>
 		<row><td>ISUSLock</td><td>{BE7DAF2D-E439-4D0D-B5BA-4C88B0F63495}</td></row>
 		<row><td>ISUSSignature</td><td>{87EA21C6-1DA5-4249-A12B-A89D00F94082}</td></row>
-		<row><td>ISVisitedViews</td><td>viewAssistant,viewSetupTypes,viewSetupDesign,viewRealSetupDesign,viewSystemSearch,viewSupportFiles,viewCustomActions,viewInstallScriptStd,viewObjects</td></row>
+		<row><td>ISVisitedViews</td><td>viewAssistant,viewSetupTypes,viewSetupDesign,viewRealSetupDesign,viewSystemSearch,viewSupportFiles,viewCustomActions,viewInstallScriptStd,viewObjects,viewProject,viewAppV,viewUpgradePaths,viewISToday,viewAppFiles,viewDependencies,viewRelease,viewShortcuts,viewUI</td></row>
 		<row><td>Limited</td><td>1</td></row>
 		<row><td>LockPermissionMode</td><td>1</td></row>
 		<row><td>MsiExecCmdLineOptions</td><td/></row>
@@ -4343,10 +4352,12 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<col def="L0">Value</col>
 		<col def="S255">ISComments</col>
 		<row><td>ALLUSERS</td><td>1</td><td/></row>
+		<row><td>ARPHELPLINK</td><td>##ID_STRING4##</td><td/></row>
 		<row><td>ARPINSTALLLOCATION</td><td/><td/></row>
 		<row><td>ARPPRODUCTICON</td><td>ARPPRODUCTICON.exe</td><td/></row>
 		<row><td>ARPSIZE</td><td/><td/></row>
 		<row><td>ARPURLINFOABOUT</td><td>##ID_STRING2##</td><td/></row>
+		<row><td>ARPURLUPDATEINFO</td><td>##ID_STRING5##</td><td/></row>
 		<row><td>AgreeToLicense</td><td>No</td><td/></row>
 		<row><td>ApplicationUsers</td><td>AllUsers</td><td/></row>
 		<row><td>DWUSINTERVAL</td><td>30</td><td/></row>
@@ -4383,8 +4394,8 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>IS_SQLSERVER_USERNAME</td><td>sa</td><td/></row>
 		<row><td>InstallChoice</td><td>AR</td><td/></row>
 		<row><td>LAUNCHPROGRAM</td><td>1</td><td/></row>
-		<row><td>LAUNCHPROGRAMCOMPCODE</td><td>{CD093F20-22F3-47CC-8D90-8B9091A862E8}</td><td/></row>
-		<row><td>LAUNCHPROGRAMFILEKEY</td><td>wxmacmolplt.primary_output</td><td/></row>
+		<row><td>LAUNCHPROGRAMCOMPCODE</td><td>{0BA27EFB-3F0D-4B62-AD97-F75C5ECA6627}</td><td/></row>
+		<row><td>LAUNCHPROGRAMFILEKEY</td><td>wxmacmolplt_vc13.primary_out1</td><td/></row>
 		<row><td>LAUNCHREADME</td><td>1</td><td/></row>
 		<row><td>Manufacturer</td><td>##COMPANY_NAME##</td><td/></row>
 		<row><td>PIDKEY</td><td/><td/></row>
@@ -4412,10 +4423,10 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>PROGMSG_IIS_ROLLBACKAPPPOOLS</td><td>##IDS_PROGMSG_IIS_ROLLBACKAPPPOOLS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKVROOTS</td><td>##IDS_PROGMSG_IIS_ROLLBACKVROOTS##</td><td/></row>
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
-		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]wxMacMolPlt.Primary Output</td><td/></row>
-		<row><td>ProductCode</td><td>{033B4963-3E89-45D8-AE7F-AAADB3D4703E}</td><td/></row>
+		<row><td>PROGRAMFILETOLAUNCHATEND</td><td>[INSTALLDIR]wxMacMolPlt_vc13.Primary Output</td><td/></row>
+		<row><td>ProductCode</td><td>{948905EC-E337-4B97-AFB5-A8A9EAAB0C39}</td><td/></row>
 		<row><td>ProductName</td><td>wxMacMolPlt</td><td/></row>
-		<row><td>ProductVersion</td><td>7.6</td><td/></row>
+		<row><td>ProductVersion</td><td>7.6.2</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
@@ -4431,7 +4442,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<row><td>SecureCustomProperties</td><td>ISFOUNDNEWERPRODUCTVERSION;USERNAME;COMPANYNAME;ISX_SERIALNUM;SUPPORTDIR</td><td/></row>
 		<row><td>SelectedSetupType</td><td>##IDS__DisplayName_Typical##</td><td/></row>
 		<row><td>SetupType</td><td>Typical</td><td/></row>
-		<row><td>UpgradeCode</td><td>{8641691B-161A-4B96-A3DA-F284532DBB86}</td><td/></row>
+		<row><td>UpgradeCode</td><td>{B05D4C36-98EB-401E-BE47-D06DEDF11805}</td><td/></row>
 		<row><td>_IsMaintenance</td><td>Change</td><td/></row>
 		<row><td>_IsSetupTypeMin</td><td>Typical</td><td/></row>
 	</table>
@@ -4576,6 +4587,7 @@ UwBpAG4AZwBsAGUASQBtAGEAZwBlAAEARQB4AHAAcgBlAHMAcwA=
 		<col def="S255">ISComments</col>
 		<col def="S255">ISShortcutName</col>
 		<col def="I4">ISAttributes</col>
+		<row><td>NewShortcut1</td><td>ProgramMenuFolder</td><td>##ID_STRING6##</td><td>wxMacMolPlt_vc13.Primary_Output1</td><td>AlwaysInstall</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="Signature">
