@@ -497,7 +497,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				//The form is token (skip) atomic charge or symbol, x y z coords
 				int linecount = sscanf(Line, "%s %s %f %f %f", token, token2, &pos.x, &pos.y, &pos.z);
 				int inum = 1;
-				if (isnumber(token2[0])) inum = sscanf(token2, "%f", &AtomType);
+				if (isdigit(token2[0])) inum = sscanf(token2, "%f", &AtomType);
 				else AtomType = SetAtomType((unsigned char *) token2);
 				if ((linecount!=5)||(AtomType<1)) {
 					wxString msg;
