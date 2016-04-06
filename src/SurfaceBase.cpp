@@ -263,8 +263,8 @@ Surf2DBase::Surf2DBase(WinPrefs * Prefs) {
 	Grid = NULL;
 	GridAllocation = 0;
 	Origin.x = Origin.y = Origin.z = 0.0;
-	XInc.x = 0.1; XInc.y=XInc.z=0.0;
-	YInc.x=YInc.z=0.0; YInc.y=0.1;
+	XInc.x = 0.1f; XInc.y=XInc.z=0.0;
+	YInc.x=YInc.z=0.0; YInc.y=0.1f;
 
 	SurfaceOptions * lOpts = Prefs->GetSurfaceOptions();
 
@@ -374,11 +374,11 @@ void Surf2DBase::SetPlaneToScreenPlane(MoleculeData * MainData) {
 	InverseMatrix(MainData->TotalRotation, RotInverse);
 
 	CPoint3D	TestPoint, NewPoint1, NewPoint2;
-	TestPoint.x = -0.55*MainData->WindowSize;
-	TestPoint.y=-0.55*MainData->WindowSize; TestPoint.z=0.0;
+	TestPoint.x = -0.55f*MainData->WindowSize;
+	TestPoint.y=-0.55f*MainData->WindowSize; TestPoint.z=0.0;
 	BackRotate3DPt(RotInverse, TestPoint, &NewPoint1);
-	TestPoint.x = 0.55*MainData->WindowSize;
-	TestPoint.y=-0.55*MainData->WindowSize;
+	TestPoint.x = 0.55f*MainData->WindowSize;
+	TestPoint.y=-0.55f*MainData->WindowSize;
 	BackRotate3DPt(RotInverse, TestPoint, &NewPoint2);
 //	Origin.x = NewPoint1.x*kAng2BohrConversion;
 //	Origin.y = NewPoint1.y*kAng2BohrConversion;
@@ -393,8 +393,8 @@ void Surf2DBase::SetPlaneToScreenPlane(MoleculeData * MainData) {
 	XInc.x = (NewPoint2.x-NewPoint1.x)/NumPoints;
 	XInc.y = (NewPoint2.y-NewPoint1.y)/NumPoints;
 	XInc.z = (NewPoint2.z-NewPoint1.z)/NumPoints;
-	TestPoint.x = -0.55*MainData->WindowSize;
-	TestPoint.y=0.55*MainData->WindowSize;
+	TestPoint.x = -0.55f*MainData->WindowSize;
+	TestPoint.y=0.55f*MainData->WindowSize;
 	BackRotate3DPt(RotInverse, TestPoint, &NewPoint2);
 //	YInc.x = (NewPoint2.x-NewPoint1.x)*kAng2BohrConversion/NumPoints;
 //	YInc.y = (NewPoint2.y-NewPoint1.y)*kAng2BohrConversion/NumPoints;
@@ -612,7 +612,7 @@ long Surf2DBase::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 	long n;
 
 	if (lineWidth < 1e-6f) {
-		lineWidth = 0.005;
+		lineWidth = 0.005f;
 	}
 
 	float color[3];
@@ -801,13 +801,13 @@ Surf3DBase::Surf3DBase(WinPrefs * Prefs) {
 	NumGridPoints = lOpts->GetNumGridPoints();
 	NumXGridPoints = NumYGridPoints = NumZGridPoints = NumGridPoints;
 	Origin.x = Origin.y = Origin.z = 0.0;
-	XGridInc = YGridInc = ZGridInc = 0.1;
+	XGridInc = YGridInc = ZGridInc = 0.1f;
 	Mode = 2+4;	//init to a wireframe mode and contouring +/- values
 	lOpts->GetPosColor(&PosColor);
 	lOpts->GetNegColor(&NegColor);
 		//Init the transparency color to opaque
 	Transparency = 0;
-	ContourValue = 0.1;
+	ContourValue = 0.1f;
 	GridSize = lOpts->GetGridSize();
 }
 Surf3DBase::Surf3DBase(void) : Surface() {
@@ -1267,7 +1267,7 @@ void NormalizeNormalArray(CPoint3D * ContourNorm, long &NumVertices)
 {
 	for (long i=0; i<NumVertices; i++) {
 		CPoint3D * v = &(ContourNorm[i]);
-		float length = sqrt (v->x * v->x + v->y * v->y + v->z * v->z);
+		float length = (float) sqrt (v->x * v->x + v->y * v->y + v->z * v->z);
 		if (length > 0.0) {
 			v->x /= length;
 			v->y /= length;
@@ -1296,7 +1296,7 @@ void ComputeTriangleNormals(CPoint3D * Contour, CPoint3D *ContourNorm, long * Ve
 		float vy = -(pz*qx - px*qz);
 		float vz = -(px*qy - py*qx);
 
-		float len = 1.0/sqrt( vx*vx + vy*vy + vz*vz );
+		float len = (float) (1.0/sqrt( vx*vx + vy*vy + vz*vz ));
 		vx *= len;
 		vy *= len;
 		vz *= len;
@@ -1523,9 +1523,9 @@ long Surf3DBase::ExportPOVSurface(CPoint3D *Vertices, CPoint3D *Normals,
 	float alpha = 1.0, red, green, blue, xnorm, ynorm, znorm;
 	wxString tmpStr;
 
-	red = (float) SurfaceColor->red / 65536.0;
-	green = (float) SurfaceColor->green / 65536.0;
-	blue = (float) SurfaceColor->blue / 65536.0;
+	red = (float) SurfaceColor->red / 65536.0f;
+	green = (float) SurfaceColor->green / 65536.0f;
+	blue = (float) SurfaceColor->blue / 65536.0f;
 	red = MIN(red, 1.0);
 	blue = MIN(blue, 1.0);
 	green = MIN(green, 1.0);
@@ -1563,7 +1563,7 @@ long Surf3DBase::ExportPOVSurface(CPoint3D *Vertices, CPoint3D *Normals,
 			ynorm = -(pz*qx - px*qz);
 			znorm = -(px*qy - py*qx);
 
-			float len = 1.0f / sqrt(xnorm * xnorm + ynorm * ynorm + znorm * znorm);
+			float len = (float) (1.0 / sqrt(xnorm * xnorm + ynorm * ynorm + znorm * znorm));
 			xnorm *= len;
 			ynorm *= len;
 			znorm *= len;

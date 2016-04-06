@@ -2792,7 +2792,7 @@ void MP2Group::InitData(void) {
 	Method = AOInts = LMOMP2 = 0;
 	MP2Prop = false;
 }
-float MP2Group::SetIntCutoff(float NewCutoff) {
+double MP2Group::SetIntCutoff(double NewCutoff) {
 	if (NewCutoff > 0.0) CutOff = NewCutoff;
 	return CutOff;
 }

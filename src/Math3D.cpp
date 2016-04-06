@@ -113,13 +113,13 @@ void MatrixToEulerAngles(Matrix4D R, float * phi, float * psi, float * theta) {
 		double PhiMinusPsi = acos(cDiff);
 		if (sin(PhiMinusPsi)*sDiff < 0.0) PhiMinusPsi *= -1.0;
 
-		*psi = (PhiPlusPsi + PhiMinusPsi) * 0.5;
-		*phi = (PhiPlusPsi - PhiMinusPsi) * 0.5;
+		*psi = (float) ((PhiPlusPsi + PhiMinusPsi) * 0.5);
+		*phi = (float) ((PhiPlusPsi - PhiMinusPsi) * 0.5);
 	} else {	//otherwise we really only have 2 angles
 		if (R[0][0] > 1.0) R[0][0] = 1.0;
 		else if (R[0][0] < -1.0) R[0][0] = -1.0;
 
-		*psi = acos(R[0][0]);
+		*psi = (float) acos(R[0][0]);
 		if (sin(*psi)*R[1][0] < 0.0) *psi *= -1.0;
 		*phi = 0.0;
 	}
@@ -132,7 +132,7 @@ void MatrixToEulerAngles(Matrix4D R, float * phi, float * psi, float * theta) {
 	if (R[2][2] > 1.0) R[2][2] = 1.0;
 	else if (R[2][2] < -1.0) R[2][2] = -1.0;
 
-	*theta = acos(R[2][2]);
+	*theta = (float) acos(R[2][2]);
 	if (sin(*theta)*sin2 < 0.0) *theta *= -1.0;
 
 	double RadToDegree = 180.0/acos(-1.0);
@@ -150,15 +150,15 @@ void EulerAnglesToMatrix(Matrix4D rotMatrix, float phi, float psi, float theta) 
 	double cosTheta = cos(theta*degreeToRad);
 	double sinTheta = sin(theta*degreeToRad);
 
-	rotMatrix[0][0] = cosPsi*cosPhi-sinPsi*cosTheta*sinPhi;
-	rotMatrix[0][1] = -cosPsi*sinPhi-sinPsi*cosTheta*cosPhi;
-	rotMatrix[0][2] = sinPsi*sinTheta;
-	rotMatrix[1][0] = sinPsi*cosPhi+cosPsi*cosTheta*sinPhi;
-	rotMatrix[1][1] = -sinPsi*sinPhi+cosPsi*cosTheta*cosPhi;
-	rotMatrix[1][2] = -cosPsi*sinTheta;
-	rotMatrix[2][0] = sinTheta*sinPhi;
-	rotMatrix[2][1] = sinTheta*cosPhi;
-	rotMatrix[2][2] = cosTheta;
+	rotMatrix[0][0] = (float) (cosPsi*cosPhi-sinPsi*cosTheta*sinPhi);
+	rotMatrix[0][1] = (float) (-cosPsi*sinPhi-sinPsi*cosTheta*cosPhi);
+	rotMatrix[0][2] = (float) (sinPsi*sinTheta);
+	rotMatrix[1][0] = (float) (sinPsi*cosPhi+cosPsi*cosTheta*sinPhi);
+	rotMatrix[1][1] = (float) (-sinPsi*sinPhi+cosPsi*cosTheta*cosPhi);
+	rotMatrix[1][2] = (float) (-cosPsi*sinTheta);
+	rotMatrix[2][0] = (float) (sinTheta*sinPhi);
+	rotMatrix[2][1] = (float) (sinTheta*cosPhi);
+	rotMatrix[2][2] = (float) (cosTheta);
 }
 
 
@@ -214,9 +214,9 @@ void InverseMatrix(const Matrix4D A, Matrix4D AInverse) {
 	AInverse[2][1] = (A[0][1]*A[2][0]-A[0][0]*A[2][1])/DetA;
 	AInverse[2][2] = (A[0][0]*A[1][1]-A[0][1]*A[1][0])/DetA;
 	AInverse[0][3] = AInverse[1][3] = AInverse[2][3] = 0.0;
-	AInverse[3][0] = -1.0*A[3][0];
-	AInverse[3][1] = -1.0*A[3][1];
-	AInverse[3][2] = -1.0*A[3][2];
+	AInverse[3][0] = -1.0f*A[3][0];
+	AInverse[3][1] = -1.0f*A[3][1];
+	AInverse[3][2] = -1.0f*A[3][2];
 	AInverse[3][3] = A[3][3];
 }
 /*=================================================================================================
@@ -304,7 +304,7 @@ void SetRotationMatrix (Matrix4D rotationMatrix, const CPoint3D *op, const CPoin
 	}
 
 	Normalize3D(&a);
-	float degrees = acos(c) * 180.0f / kPi;
+	float degrees = (float) (acos(c) * 180.0 / kPi);
 	RotateAroundAxis(rotationMatrix, a, degrees);
 }
 
@@ -315,10 +315,10 @@ void RotateAroundAxis(Matrix4D m, const CPoint3D& axis, float degrees) {
    float sine;
    float cos_rec;
 
-   radians = degrees * kPi / 180.0f;
+   radians = (float)(degrees * kPi / 180.0);
 
-   sine = sin(radians);
-   cosine = cos(radians);
+   sine = (float) sin(radians);
+   cosine = (float) cos(radians);
    cos_rec = 1.0f - cosine;
 
    m[0][0] = cos_rec * axis.x * axis.x + cosine;

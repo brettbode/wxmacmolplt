@@ -232,12 +232,12 @@ void BuilderInterface::KeyHandler(wxKeyEvent& event) {
 		if (isalpha(key)) {
 			int id = -1;
 			if (secondKeytimer.Time() < 400) {
-				keyBuffer[1] = key;
+				keyBuffer[1] = (unsigned char) key;
 				//if less than three seconds try to interpret as the 2nd letter of a two letter element symbol
 				id = SetAtomType(keyBuffer);
 			}
 			if (id < 0) {	//interpret as the first letter of an element symbol
-				keyBuffer[0] = key;
+				keyBuffer[0] = (unsigned char) key;
 				keyBuffer[1] = '\0';
 				id = SetAtomType(keyBuffer);
 				secondKeytimer.Start();	//start the timer for a 2nd keystroke

@@ -81,16 +81,16 @@ const GLubyte stippleMask[128] = {
 	0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00, 0x00
 };
 
-GLfloat d_specular[] = {0.1, 0.1, 0.1, 1.0};
+GLfloat d_specular[] = {0.1f, 0.1f, 0.1f, 1.0};
 GLfloat d_shininess = 1.0;
-GLfloat d_diffuse[] = {0.02,0.02,0.02,0.8};
-GLfloat d_ambient[] = {0.1,0.1,0.1,0.8};
+GLfloat d_diffuse[] = {0.02f,0.02f,0.02f,0.8f};
+GLfloat d_ambient[] = {0.1f,0.1f,0.1f,0.8f};
 
 GLfloat l_emissive[] = {0.0, 0.0, 0.0, 1.0};
-GLfloat l_specular[] = {0.8, 0.8, 0.8, 1.0};
+GLfloat l_specular[] = {0.8f, 0.8f, 0.8f, 1.0};
 GLfloat l_shininess = 80.0;
-GLfloat l_diffuse[] = {0.2,0.2,0.2,0.8};
-GLfloat l_ambient[] = {0.1,0.1,0.1,0.8};
+GLfloat l_diffuse[] = {0.2f,0.2f,0.2f,0.8f};
+GLfloat l_ambient[] = {0.1f,0.1f,0.1f,0.8f};
 
 // ----------------------------------------------------------------------------
 // FUNCTION DEFINITIONS
@@ -139,8 +139,8 @@ void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
 	wxRect DisplayRect = glCanvas->GetRect();
 	long hsize = DisplayRect.GetWidth();
 	long vsize = DisplayRect.GetHeight();
-	glScalef(2.0 / hsize, -2.0 /  vsize, 1.0);
-	glTranslatef(-hsize / 2.0, -vsize / 2.0, 0.0);
+	glScalef(2.0f / hsize, -2.0f /  vsize, 1.0);
+	glTranslatef(-hsize / 2.0f, -vsize / 2.0f, 0.0);
 
 	glColor3fv(fg_color);
 

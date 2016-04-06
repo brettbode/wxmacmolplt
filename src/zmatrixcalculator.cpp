@@ -358,7 +358,7 @@ void ZMatrixCalculator::UpdateValues(void) {
 	else if (length3 < -1.0) length3 = -1.0;
 
 	// BondAngle is the angle between atoms 1, 2, and 3.
-	float BondAngle = acos(length3);
+	float BondAngle = (float) acos(length3);
 	BondAngle *= kRadToDegree;
 	
 	temp.Printf(wxT("%.5f"), BondAngle);
@@ -397,14 +397,14 @@ void ZMatrixCalculator::UpdateValues(void) {
 	float DotPK = -DotProduct3D(&UnitJK, &UnitKL);
 
 	if ((fabs(DotPJ) < 1.0)&&(fabs(DotPK) < 1.0)) {	//3 of the atom are linear, Bad!
-		float SinPJ = sqrt(1.0-DotPJ*DotPJ);
-		float SinPK = sqrt(1.0-DotPK*DotPK);
+		float SinPJ = (float) sqrt(1.0-DotPJ*DotPJ);
+		float SinPK = (float) sqrt(1.0-DotPK*DotPK);
 		float Dot = DotProduct3D(&Normal1, &Normal2)/(SinPJ*SinPK);
 		if (fabs(Dot) <= kCosErrorTolerance) {		//Bad value for a cos
 			if (Dot > 1.0) Dot += 1.0-Dot;
 			else if (Dot < -1.0) Dot -= 1.0+Dot;
-			float Dihedral = acos(Dot);
-			float Pi = acos(-1.0);
+			float Dihedral = (float) acos(Dot);
+			float Pi = (float) acos(-1.0);
 			if (fabs(Dihedral) < kZeroTolerance) Dihedral = 0.0;
 			else if (fabs(Dihedral-Pi) < kZeroTolerance) Dihedral = Pi;
 			float Sense = DotProduct3D(&Normal2, &offset1);

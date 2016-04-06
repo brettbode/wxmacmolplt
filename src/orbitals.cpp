@@ -1341,9 +1341,9 @@ void SetupMOScreens(const BasisSet * const Basis, const float * const MOVector, 
 					//									   sqrt3*(x*z*MOVector[ivec+3]+0.5*(x2-y2)*MOVector[ivec+4]));
 					reducedVector.push_back(sqrt5*sqrt3*MOVector[ivec]);
 					reducedVector.push_back(sqrt5*sqrt3*MOVector[ivec+1]);
-					reducedVector.push_back(sqrt5*0.5*MOVector[ivec+2]);
+					reducedVector.push_back(sqrt5*0.5f*MOVector[ivec+2]);
 					reducedVector.push_back(sqrt5*sqrt3*MOVector[ivec+3]);
-					reducedVector.push_back(sqrt5*sqrt3*0.5*MOVector[ivec+4]);
+					reducedVector.push_back(sqrt5*sqrt3*0.5f*MOVector[ivec+4]);
 					ivec += 5;
 					break;
 				case SHFShell:
@@ -1355,7 +1355,7 @@ void SetupMOScreens(const BasisSet * const Basis, const float * const MOVector, 
 					//									   (sqrt5*sqrt3)*x*y*z*MOVector[ivec+5]+
 					//									   (sqrt5/sqrt(8.0))*y*(3*x2-y2)*MOVector[ivec+6]);
 					reducedVector.push_back(sqrt7*(sqrt5/sqrt(8.0))*MOVector[ivec]);
-					reducedVector.push_back(sqrt7*(sqrt5*sqrt3*0.5)*MOVector[ivec+1]);
+					reducedVector.push_back(sqrt7*(sqrt5*sqrt3*0.5f)*MOVector[ivec+1]);
 					reducedVector.push_back(sqrt7*(sqrt3/sqrt(8.0))*MOVector[ivec+2]);
 					reducedVector.push_back(sqrt7*0.5*MOVector[ivec+3]);
 					reducedVector.push_back(sqrt7*(sqrt3/sqrt(8.0))*MOVector[ivec+4]);
