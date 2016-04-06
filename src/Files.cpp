@@ -84,7 +84,7 @@ void FileError::WriteError(void) {
 */
 long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 	char	Line[kMaxLineLength], token[kMaxLineLength], DFTTYP[kMaxLineLength]="";
-	short	scanerr;
+	int	scanerr;
 	long	nAtoms;
 	wxFileOffset StartPos, EndPos;
 	bool	BasisFound=false, BoolTest, EndOfGroup;
@@ -431,7 +431,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 						pos *= unitConversion;
 						if ((linecount!=5)||(AtomType<1)) {
 							wxString msg;
-							msg.Printf("Warning: Parsing issue with the line: %s", Line);
+							msg.Printf(_("Warning: Parsing issue with the line: %s"), Line);
 							wxLogMessage(msg);
 						}
 						lFrame->AddAtom((long) AtomType, pos);
@@ -501,7 +501,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				else AtomType = SetAtomType((unsigned char *) token2);
 				if ((linecount!=5)||(AtomType<1)) {
 					wxString msg;
-					msg.Printf("Warning: Parsing issue with the line: %s", Line);
+					msg.Printf(_("Warning: Parsing issue with the line: %s"), Line);
 					wxLogMessage(msg);
 				}
 				pos *= unitConversion;
