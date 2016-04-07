@@ -252,12 +252,12 @@ void SetBondLength::OnOkClick( wxCommandEvent& event )
 	wxString textVal = maxValueEdit->GetValue();
 	double val;
 	if (textVal.ToDouble(&val)) {
-		Prefs->SetMaxBondLength(val);
+		Prefs->SetMaxBondLength((float) val);
 	}
 	bool AutoBond = normalBondCheck->IsChecked();
 	Prefs->SetAutoBond(AutoBond);
 	if (AutoBond) {
-		Prefs->SetAutoBondScale(0.0001 * (float) (normalTolSlider->GetValue()));
+		Prefs->SetAutoBondScale(0.0001f * (float) (normalTolSlider->GetValue()));
 		Prefs->SetHHBondFlag(! hhCheck->IsChecked());
 		Prefs->DetermineBondOrder(guessBondCheck->IsChecked());
 		Prefs->AllowHydrogenBonds(hydrogenCheck->IsChecked());

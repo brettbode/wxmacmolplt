@@ -87,8 +87,8 @@ void PreviewCanvas::InitGL() {
 	glEnable(GL_CULL_FACE);
 	
 	GLfloat light_position[4];
-	GLfloat ambient_color[] = {0.2, 0.2, 0.2, 1.0};
-	GLfloat diffuse_color[] = {0.7, 0.7, 0.7, 1.0};
+	GLfloat ambient_color[] = {0.2f, 0.2f, 0.2f, 1.0f};
+	GLfloat diffuse_color[] = {0.7f, 0.7f, 0.7f, 1.0f};
 	GLfloat specular_color[] = {1.0, 1.0, 1.0, 1.0};
 	
 	light_position[0] = 0.0;
@@ -193,7 +193,7 @@ void PreviewCanvas::Render() {
 		// own ambient and diffuse color that we'll set later with glColor.
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
         glEnable(GL_COLOR_MATERIAL);
-		GLfloat l_specular[] = {0.8, 0.8, 0.8, 1.0};
+		GLfloat l_specular[] = {0.8f, 0.8f, 0.8f, 1.0f};
 		GLfloat l_shininess[] = {80.0};
 		glMaterialfv (GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 		glMaterialfv (GL_FRONT_AND_BACK, GL_SHININESS, l_shininess);

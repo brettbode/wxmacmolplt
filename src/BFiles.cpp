@@ -310,7 +310,7 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 				SkipnLines(3);
 				GetLine(line);
 					long t1, t2;
-				short scanerr = sscanf(line, "%3ld%3ld", &t1, &t2);
+				int scanerr = sscanf(line, "%3ld%3ld", &t1, &t2);
 				if ((scanerr==2)&&((t1>0)&&(t2>=0))) Type = kMDLMolFile;
 				else {
 					SetFilePos(EntryPos);

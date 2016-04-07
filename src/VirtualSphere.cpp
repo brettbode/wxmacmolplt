@@ -154,9 +154,9 @@ static void PointOnUnitSphere (const wxPoint &	p,
 	 * Points beyond the virtual sphere are normalized onto 
 	 * edge of the sphere (where z = 0). */
 	if (lengthSquared < 1.0) {
-		v->z = sqrt (1.0 - lengthSquared);
+		v->z = (float) sqrt (1.0 - lengthSquared);
 	} else {
-		length = sqrt (lengthSquared);
+		length = (float) sqrt (lengthSquared);
 		v->x /= length;
 		v->y /= length;
 		v->z = 0.0;

@@ -2382,9 +2382,9 @@ void InputBuilderWindow::SetupStatPointItems() {
 		mInitStepSizeEdit->Enable(true);
 		float tempf = TmpInputRec->StatPt->GetInitRadius();
 		if (tempf == 0.0) {
-			if (OptMethod == 5) tempf = 0.1;
-			else if (RunType == 6) tempf = 0.2;
-			else tempf = 0.3;
+			if (OptMethod == 5) tempf = 0.1f;
+			else if (RunType == 6) tempf = 0.2f;
+			else tempf = 0.3f;
 		}
 		temp.Printf(wxT("%g"), tempf);
 		mInitStepSizeEdit->SetValue(temp);
@@ -2395,7 +2395,7 @@ void InputBuilderWindow::SetupStatPointItems() {
 	//max step size
 	float tempf = TmpInputRec->StatPt->GetMaxRadius();
 	if (tempf == 0.0) {
-		if (RunType == 6) tempf = 0.3;
+		if (RunType == 6) tempf = 0.3f;
 		else tempf = 0.5;
 	}
 	temp.Printf(wxT("%g"), tempf);

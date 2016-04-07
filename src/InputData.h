@@ -741,8 +741,8 @@ class MP2Group {
 		MP2Group(MP2Group *Copy);
 		void InitData(void);
 
-		inline float GetIntCutoff(void) const {return CutOff;};
-		float SetIntCutoff(float NewCutOff);
+		inline double GetIntCutoff(void) const {return CutOff;};
+		double SetIntCutoff(double NewCutOff);
 		inline long GetNumCoreElectrons(void) const {return NumCoreElectrons;};
 		long SetNumCoreElectrons(long NewNum);
 		inline long GetMemory(void) const {return Memory;};

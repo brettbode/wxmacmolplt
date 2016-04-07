@@ -66,13 +66,13 @@ void BasisSet::GetShellIndexArray(long * IndexArray) const {
 }
 void BasisSet::Normalize(bool /*InputNormed*/, bool /*NormOutput*/) {
 //Set up the normalization constants: (2/pi)^3/4 * 2^n/n!!
-	float SNorm = sqrt(sqrt(pow(2.0/kPi, 3)));
-	float PNorm = SNorm*2;
-	float DNorm = PNorm*2/sqrt(3.0);
-	float FNorm = DNorm*2/sqrt(5.0);
-	float GNorm = FNorm*2/sqrt(7.0);
-	float HNorm = GNorm*2/sqrt(9.0);
-	float INorm = HNorm*2/sqrt(11.0);
+	double SNorm = sqrt(sqrt(pow(2.0/kPi, 3)));
+	double PNorm = SNorm*2;
+	double DNorm = PNorm*2/sqrt(3.0);
+	double FNorm = DNorm*2/sqrt(5.0);
+	double GNorm = FNorm*2/sqrt(7.0);
+	double HNorm = GNorm*2/sqrt(9.0);
+	double INorm = HNorm*2/sqrt(11.0);
 	for (long ishell=0; ishell<NumShells; ishell++) {
 		float	fExp;
 		long	NumPrims;
@@ -90,36 +90,36 @@ void BasisSet::Normalize(bool /*InputNormed*/, bool /*NormOutput*/) {
 				//for the xy, xxy, etc functions which must be multiplied by sqrt3, sqrt5 etc later
 			switch (ShellType) {
 				case LShell:
-					NormCoef[iprim+NumPrims] = PNorm*ExpNorm*ExpNorm2*InputCoef[iprim+NumPrims];
+					NormCoef[iprim+NumPrims] = (float) (PNorm*ExpNorm*ExpNorm2*InputCoef[iprim+NumPrims]);
 				case SShell:
-					NormCoef[iprim] = SNorm*ExpNorm*InputCoef[iprim];
+					NormCoef[iprim] = (float) (SNorm*ExpNorm*InputCoef[iprim]);
 				break;
 				case PShell:
-					NormCoef[iprim] = PNorm*ExpNorm*ExpNorm2*InputCoef[iprim];
+					NormCoef[iprim] = (float) (PNorm*ExpNorm*ExpNorm2*InputCoef[iprim]);
 				break;
 				case DShell:
-					NormCoef[iprim] = DNorm*fExp*ExpNorm*InputCoef[iprim];
+					NormCoef[iprim] = (float) (DNorm*fExp*ExpNorm*InputCoef[iprim]);
 				break;
 				case FShell:
-					NormCoef[iprim] = FNorm*fExp*ExpNorm*ExpNorm2*InputCoef[iprim];
+					NormCoef[iprim] = (float) (FNorm*fExp*ExpNorm*ExpNorm2*InputCoef[iprim]);
 				break;
 				case GShell:
-					NormCoef[iprim] = GNorm*fExp*fExp*ExpNorm*InputCoef[iprim];
+					NormCoef[iprim] = (float) (GNorm*fExp*fExp*ExpNorm*InputCoef[iprim]);
 				break;
 					//These two need to be checked!!!!
 				case HShell:
-					NormCoef[iprim] = HNorm*fExp*fExp*ExpNorm*ExpNorm2*InputCoef[iprim];
+					NormCoef[iprim] = (float) (HNorm*fExp*fExp*ExpNorm*ExpNorm2*InputCoef[iprim]);
 					break;
 				case IShell:
-					NormCoef[iprim] = INorm*fExp*fExp*fExp*ExpNorm*InputCoef[iprim];
+					NormCoef[iprim] = (float) (INorm*fExp*fExp*fExp*ExpNorm*InputCoef[iprim]);
 					break;
 			}
 		}
 	}
 }
 void BasisSet::WriteBasis(BufferFile * File, long AtomNum) const {
-	float PI = acos(-1.0);
-	float PI32 = PI * sqrt(PI);
+	double PI = acos(-1.0);
+	double PI32 = PI * sqrt(PI);
 	if ((AtomNum < MapLength)&&(AtomNum>=0)) {
 		long StartShell = BasisMap[2*AtomNum];
 		long EndShell = BasisMap[2*AtomNum + 1];
@@ -155,38 +155,38 @@ void BasisSet::WriteBasis(BufferFile * File, long AtomNum) const {
 			sprintf(Line, "    %c %d", ShellLabel, Shells[ishell].NumPrims);
 			File->WriteLine(Line, true);
 			for (iprim=0; iprim<Shells[ishell].NumPrims; iprim++) {
-				float EE = Shells[ishell].Exponent[iprim] * Shells[ishell].Exponent[iprim];
-				float FACS = PI32/(EE*sqrt(EE));
-				float FACP =   0.5*FACS/EE;
-				float FACD =   0.75*FACS/(EE*EE);
-				float FACF =   1.875*FACS/(EE*EE*EE);
-				float FACG =   6.5625*FACS/(EE*EE*EE*EE);
-				float FACH =  29.53125*FACS/(EE*EE*EE*EE*EE);
-				float FACI = 162.421875*FACS/(EE*EE*EE*EE*EE*EE);
+				double EE = Shells[ishell].Exponent[iprim] * Shells[ishell].Exponent[iprim];
+				double FACS = PI32/(EE*sqrt(EE));
+				double FACP =   0.5*FACS/EE;
+				double FACD =   0.75*FACS/(EE*EE);
+				double FACF =   1.875*FACS/(EE*EE*EE);
+				double FACG =   6.5625*FACS/(EE*EE*EE*EE);
+				double FACH =  29.53125*FACS/(EE*EE*EE*EE*EE);
+				double FACI = 162.421875*FACS/(EE*EE*EE*EE*EE*EE);
 				float backconv, backl;
 				switch (Shells[ishell].ShellType) {
 					case LShell:
-						backl = sqrt(FACP);
+						backl = (float) sqrt(FACP);
 					case SShell:
-						backconv = sqrt(FACS);
+						backconv = (float) sqrt(FACS);
 					break;
 					case PShell:
-						backconv = sqrt(FACP);
+						backconv = (float) sqrt(FACP);
 					break;
 					case DShell:
-						backconv = sqrt(FACD);
+						backconv = (float) sqrt(FACD);
 					break;
 					case FShell:
-						backconv = sqrt(FACF);
+						backconv = (float) sqrt(FACF);
 					break;
 					case GShell:
-						backconv = sqrt(FACG);
+						backconv = (float) sqrt(FACG);
 					break;
 					case HShell:
-						backconv = sqrt(FACH);
+						backconv = (float) sqrt(FACH);
 						break;
 					case IShell:
-						backconv = sqrt(FACI);
+						backconv = (float) sqrt(FACI);
 						break;
 				}
 				sprintf(Line, "        %ld %f %f", iprim+1, Shells[ishell].Exponent[iprim],
@@ -916,7 +916,7 @@ BasisSet * BasisSet::ParseGAMESSBasisSet(BufferFile * Buffer, long NumAtoms, con
 				throw DataError();
 		}
 		Basis->Shells.push_back(foo);
-		Basis->Shells[ishell].NumPrims = NumPrims;
+		Basis->Shells[ishell].NumPrims = (short) NumPrims;
 		Basis->Shells[ishell].ShellType = ShellType;
 		std::vector<float> & Exponent = Basis->Shells[ishell].Exponent;
 		std::vector<float> & NormCoef = Basis->Shells[ishell].NormCoef;
@@ -1087,7 +1087,7 @@ bool BasisSet::ReadMolDenBasisSet(BufferFile * Buffer, long NumAtoms) {
 				
 				BasisShell t;
 				Shells.push_back(t);
-				Shells[shellCount].NumPrims = numPrims;
+				Shells[shellCount].NumPrims = (short) numPrims;
 				Shells[shellCount].ShellType = ShellType;
 				std::vector<float> & Exponent = Shells[shellCount].Exponent;
 				std::vector<float> & NormCoef = Shells[shellCount].NormCoef;

@@ -140,10 +140,10 @@ void MpGLCanvas::initGL(void) {
 	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	glPolygonOffset (1.0, 1.0);
 	
-	GLfloat mat_specular[] = {0.8, 0.8, 0.8, 1.0};
+	GLfloat mat_specular[] = {0.8f, 0.8f, 0.8f, 1.0f};
 	GLfloat mat_shininess[] = {80.0};
-	GLfloat mat_diffuse[] = {0.2,0.2,0.2,0.8};
-	GLfloat mat_ambient[] = {0.1,0.1,0.1,0.8};
+	GLfloat mat_diffuse[] = {0.2f,0.2f,0.2f,0.8f};
+	GLfloat mat_ambient[] = {0.1f,0.1f,0.1f,0.8f};
 
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
