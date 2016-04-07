@@ -369,6 +369,16 @@ void CoordinatesWindow::FrameChanged(void) {
 			coordGrid->InsertRows(0, natoms - coordGrid->GetNumberRows(), true);
 		coordGrid->ClearSelection();
 		wxString buf;
+		Internals * internals = NULL;
+		MOPacInternals * mInts = NULL;
+		//If using internal coordinates set them up and update the stored values.
+		if (CoordType != 0) {
+			internals = MainData->GetInternalCoordinates();
+			if (internals)
+				mInts = internals->GetMOPacStyle();
+			if (mInts)
+				mInts->CartesiansToInternals(MainData);
+		}
 		for (long i=0; i<natoms; i++) {
 			buf.Printf(wxT("%ld"), (i+1));
 			coordGrid->SetRowLabelValue(i, buf);
@@ -385,33 +395,29 @@ void CoordinatesWindow::FrameChanged(void) {
 				buf.Printf(wxT("%f"), pos.z);
 				coordGrid->SetCellValue(i, 3, buf);
 			} else {
-				Internals * internals = MainData->GetInternalCoordinates();
-				MOPacInternals * mInts = NULL;
-				if (internals)
-					mInts = internals->GetMOPacStyle();
 				if (mInts) {
-					mInts->CartesiansToInternals(MainData);
 					if (i>0) {
 						buf.Printf(wxT("%ld"), mInts->GetConnection(i,0)+1);
 						coordGrid->SetCellValue(i, 1, buf);
-						coordGrid->SetReadOnly(i, 1, false);
+		// These SetReadOnly to false calls seem to be both unnecessary and very costly
+		//				coordGrid->SetReadOnly(i, 1, false);
 						buf.Printf(wxT("%f"), mInts->GetValue(i,0));
 						coordGrid->SetCellValue(i, 2, buf);
-						coordGrid->SetReadOnly(i, 2, false);
+		//				coordGrid->SetReadOnly(i, 2, false);
 						if (i>1) {
 							buf.Printf(wxT("%ld"), mInts->GetConnection(i,1)+1);
 							coordGrid->SetCellValue(i, 3, buf);
-							coordGrid->SetReadOnly(i, 3, false);
+		//					coordGrid->SetReadOnly(i, 3, false);
 							buf.Printf(wxT("%.2f"), mInts->GetValue(i,1));
 							coordGrid->SetCellValue(i, 4, buf);
-							coordGrid->SetReadOnly(i, 4, false);
+		//					coordGrid->SetReadOnly(i, 4, false);
 							if (i>2) {
 								buf.Printf(wxT("%ld"), mInts->GetConnection(i,2)+1);
 								coordGrid->SetCellValue(i, 5, buf);
-								coordGrid->SetReadOnly(i, 5, false);
+		//						coordGrid->SetReadOnly(i, 5, false);
 								buf.Printf(wxT("%.2f"), mInts->GetValue(i,2));
 								coordGrid->SetCellValue(i, 6, buf);
-								coordGrid->SetReadOnly(i, 6, false);
+		//						coordGrid->SetReadOnly(i, 6, false);
 							} else {
 								for (int j=5; j<7; j++)
 									coordGrid->SetReadOnly(i, j, true);
@@ -615,8 +621,9 @@ void CoordinatesWindow::OnCoordchoice1Selected( wxCommandEvent& event )
 					return;
 				}
 				mInts->GuessInit(MainData);
-			} else 
-				mInts->CartesiansToInternals(MainData);
+			} //else
+			//This is unnecessary as it is aleady done in FrameChanged()
+			//	mInts->CartesiansToInternals(MainData);
 		}
 		SetupGridColumns();
 		FrameChanged();
