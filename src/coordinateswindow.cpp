@@ -323,7 +323,7 @@ void CoordinatesWindow::SetupGridColumns(void) {
 	long natoms = lFrame->GetNumAtoms();
 	bool temp = false;
 	if (natoms>0) temp = lFrame->GetAtomSelection(0);
-	coordGrid->Freeze();
+	coordGrid->BeginBatch();
 	if (coordGrid->GetNumberRows() > 0)
 		coordGrid->DeleteRows(0, coordGrid->GetNumberRows(), true);
 	coordGrid->DeleteCols(0, coordGrid->GetNumberCols(), true);
@@ -349,7 +349,7 @@ void CoordinatesWindow::SetupGridColumns(void) {
 		coordGrid->ClearSelection();
 		lFrame->SetAtomSelection(0, temp);
 	}
-	coordGrid->Thaw();
+	coordGrid->EndBatch();
 	needClearAll = save;
 }
 
@@ -359,7 +359,7 @@ void CoordinatesWindow::FrameChanged(void) {
 	long natoms = lFrame->GetNumAtoms();
 	bool save = needClearAll;
 	needClearAll = false;
-	coordGrid->Freeze();
+	coordGrid->BeginBatch();
 	//clear off any extra rows
 	if (coordGrid->GetNumberRows() > natoms)
 		coordGrid->DeleteRows(0, coordGrid->GetNumberRows()-natoms, true);
@@ -434,7 +434,7 @@ void CoordinatesWindow::FrameChanged(void) {
 			}
 		}
 	}
-	coordGrid->Thaw();
+	coordGrid->EndBatch();
 	needClearAll = save;
 }
 
@@ -442,6 +442,7 @@ void CoordinatesWindow::SizeCols(wxSize & s) {
 	if (coordGrid->GetNumberCols()<=0) return;
 	int width = s.GetWidth() - 66;	//subtract off the row labels and scroll
 	if (CoordType == 0) {
+		if (coordGrid->GetNumberCols()<4) return;
 		int a = (int) (width/6.0);
 		int b = (int) ((width-a)/3.0);
 		coordGrid->SetColSize(0, a);
@@ -449,6 +450,11 @@ void CoordinatesWindow::SizeCols(wxSize & s) {
 		coordGrid->SetColSize(2, b);
 		coordGrid->SetColSize(3, width-(a+2*b));
 	} else {
+		//Apparently this is getting called while deleting rows before redoing the number of columns
+		//So punt here if the number of columns doesn't match the expected number.
+		if (coordGrid->GetNumberCols()<7) {
+			return;
+		}
 		int a = (width/3)/4;
 		int b = (2*width/3)/3;
 		coordGrid->SetColSize(0, a);
