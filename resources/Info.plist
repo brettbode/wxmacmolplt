@@ -2,10 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
+	<key>CFBundleDisplayName</key>
+	<string></string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -90,10 +90,12 @@
 			<string>Editor</string>
 		</dict>
 	</array>
+	<key>CFBundleExecutable</key>
+	<string></string>
 	<key>CFBundleIconFile</key>
 	<string>MacMolPlt.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>gov.ameslab.wxMacMolplt</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleLongVersionString</key>
@@ -108,13 +110,11 @@
 	<string>BMBm</string>
 	<key>CFBundleVersion</key>
 	<string>7.6.2</string>
-	<key>CFBundleDisplayName</key>
-	<string></string>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>LSPrefersCarbon</key>
 	<string></string>
-	<key>CFBundleExecutable</key>
-	<string></string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 </dict>
 </plist>
