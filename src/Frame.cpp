@@ -640,6 +640,8 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 	for (iatm=0; iatm<NumAtoms; iatm++) {
 		iType = Atoms[iatm].GetType();
 		if (iType > 115) continue;
+		long iSize = Prefs->GetAtomSize(iType-1);
+		CPoint3D iPos = Atoms[iatm].Position;
 		bool iSelectState = !Atoms[iatm].GetSelectState();
 		for (jatm=iatm+1; jatm<NumAtoms; jatm++) {
 			if (selectedOnly && iSelectState && !Atoms[jatm].GetSelectState())
@@ -648,9 +650,7 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 			if (HHBondFlag)	/*if both atoms are H's don't allow bonds if HHBondFlag is set*/
 				if ((iType == 1)&&(jType == 1)) continue;
 			if (jType > 115) continue;
-			offset.x = Atoms[iatm].Position.x - Atoms[jatm].Position.x;
-			offset.y = Atoms[iatm].Position.y - Atoms[jatm].Position.y;
-			offset.z = Atoms[iatm].Position.z - Atoms[jatm].Position.z;
+			offset = iPos - Atoms[jatm].Position;
 			distance = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
 			//We'll compare the squares of the distances to avoid the sqrt
 	//		distance = offset.Magnitude();
@@ -658,10 +658,8 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 			if (distance <= MaxBondLength) {
 				newBond = true;
 				lOrder = kSingleBond;
-			}
-			if (AutoBond && !newBond) {
-				AutoDist = AutoScale*((float) (Prefs->GetAtomSize(iType-1) + 
-					Prefs->GetAtomSize(jType-1)));
+			} else if (AutoBond && !newBond) {
+				AutoDist = AutoScale*((float) (iSize + Prefs->GetAtomSize(jType-1)));
 				AutoDist *= AutoDist;
 				if (distance <= AutoDist) {
 					newBond = true;
@@ -706,6 +704,7 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 			if (iType != 1) continue;	//Loop over hydrogens
 			if (selectedOnly && !Atoms[iatm].GetSelectState()) continue;
 			float iSize = AutoScale * ((float) (Prefs->GetAtomSize(iType-1)));
+			CPoint3D iPos = Atoms[iatm].Position;
 			bondsToI.clear();
 			for (long i=0; i<NumBonds; i++) {
 				if ((Bonds[i].Atom1 == iatm)||(Bonds[i].Atom2 == iatm)) bondsToI.push_back(i);
@@ -727,9 +726,7 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 				}
 				if (!ijbond) {	//can't be an existing bond
 					newBond = false;
-					offset.x = Atoms[iatm].Position.x - Atoms[jatm].Position.x;
-					offset.y = Atoms[iatm].Position.y - Atoms[jatm].Position.y;
-					offset.z = Atoms[iatm].Position.z - Atoms[jatm].Position.z;
+					offset = iPos - Atoms[jatm].Position;
 					distance = offset.x*offset.x + offset.y*offset.y + offset.z*offset.z;
 			//		distance = offset.Magnitude();
 	//				AutoDist = AutoScale*((float) (Prefs->GetAtomSize(iType-1) + 
