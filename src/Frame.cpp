@@ -589,15 +589,17 @@ long Frame::GetNumElectrons(void) const {
  * anywhere.
  * @param Prefs Preferences used to determining bonding sensitivity.
  * @param KeepOldBonds Flag indicating which bonds to leave alone.
+ * @param ProgressInd A progress window to indicate long operational status
  * @param selectedOnly Flag indicating which atoms' bonds to consider.
 */
-void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
+void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, Progress * ProgressInd, bool selectedOnly) {
 
 	long		iatm, jatm, maxbonds;
 	CPoint3D	offset;
 	float		distance, AutoDist=-1.0;
 	bool		newBond=true;
 
+	if (ProgressInd) ProgressInd->ChangeText("Determining bonding...");
 	maxbonds = NumAtoms*8;
 	Bond * OldBonds = Bonds;
 	long NumOldBonds = NumBonds;
@@ -637,7 +639,18 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 	MaxBondLength *= MaxBondLength;
 	BondOrder lOrder;
 	long iType, jType;
+	float workTotal = 100.0f/NumAtoms;
+	if (AutoBond && Prefs->AllowHydrogenBonds()) workTotal /= 3.0f;
 	for (iatm=0; iatm<NumAtoms; iatm++) {
+		if (ProgressInd) {
+			if (!ProgressInd->UpdateProgress((float) iatm*workTotal)) {
+				delete [] Bonds;
+				Bonds = OldBonds;
+				NumBonds = NumOldBonds;
+				BondAllocation = OldBondAllocation;
+				return;
+			}
+		}
 		iType = Atoms[iatm].GetType();
 		if (iType > 115) continue;
 		long iSize = Prefs->GetAtomSize(iType-1);
@@ -699,6 +712,15 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 		//list later.
 		std::vector<long> bondsToI, bondsToJ;
 		for (iatm=0; iatm<NumAtoms; iatm++) {
+			if (ProgressInd) {
+				if (!ProgressInd->UpdateProgress((float) (2*iatm+NumAtoms)*workTotal)) {
+					delete [] Bonds;
+					Bonds = OldBonds;
+					NumBonds = NumOldBonds;
+					BondAllocation = OldBondAllocation;
+					return;
+				}
+			}
 			iType = Atoms[iatm].GetType();
 			//only consider H bonds with N, O, F, P, S, Cl, Se, and Br
 			if (iType != 1) continue;	//Loop over hydrogens

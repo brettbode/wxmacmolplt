@@ -1615,8 +1615,10 @@ void MoleculeData::CreateLLM(long NumPts, WinPrefs * Prefs) {
 			NewFrame->Atoms[iatm].Position.z = NewFrame2->Atoms[iatm].Position.z + offset[iatm].z;
 		}
 		NewFrame->NumAtoms = NumAtoms;
-		if (Prefs->GetAutoBond())
-			NewFrame->SetBonds(Prefs, false);
+		if (Prefs->GetAutoBond()) {
+			Progress lProg;
+			NewFrame->SetBonds(Prefs, false, &lProg);
+		}
 		NewFrame2 = NewFrame;
 	}
 	delete [] offset;
@@ -1646,6 +1648,7 @@ void MoleculeData::CreateInternalLLM(long NumPts, WinPrefs * Prefs) {
 	float * OffsetValues = new float[3*NumAtoms];
 	float * StartValues = new float[3*NumAtoms];
 	if (!OffsetValues || !StartValues) throw MemoryError();
+	Progress * lProg = new Progress;
 		//Make sure the internals are up to date for the first frame
 	lInternals->CartesiansToInternals(this);
 		long i, part;
@@ -1704,14 +1707,13 @@ void MoleculeData::CreateInternalLLM(long NumPts, WinPrefs * Prefs) {
 		lInternals->InternalsToCartesians(this, Prefs, 0);
 
 		if (Prefs->GetAutoBond())
-			NewFrame->SetBonds(Prefs, false);
+			NewFrame->SetBonds(Prefs, false, lProg);
 		NewFrame2 = NewFrame;
 	}
 	cFrame = lFrame;	//reset the current frame pointer
 	CurrentFrame = SavedFrameNum;
 	delete [] OffsetValues;
 	delete [] StartValues;
-	Progress * lProg = new Progress;
 	if (lProg) {
 		LinearLeastSquaresFit(lProg);
 		delete lProg;

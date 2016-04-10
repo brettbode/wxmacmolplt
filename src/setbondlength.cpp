@@ -264,7 +264,8 @@ void SetBondLength::OnOkClick( wxCommandEvent& event )
 	}
 				
 	Frame * lFrame = MainData->GetCurrentFramePtr();
-	lFrame->SetBonds(Prefs, keepOldBondsCheck->IsChecked());
+	Progress lProg;
+	lFrame->SetBonds(Prefs, keepOldBondsCheck->IsChecked(), &lProg);
 	
 	Parent->ResetAllWindows();
 	

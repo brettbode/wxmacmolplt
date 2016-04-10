@@ -1879,7 +1879,7 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &event) {
 									}
 									MainData->AtomAdded();//update global structures after all atoms are added
 									if (Prefs->GetAutoBond())
-										MainData->cFrame->SetBonds(Prefs, false);
+										MainData->cFrame->SetBonds(Prefs, false, ProgressInd);
 									mHighliteState = true;
 								} else {
 									tdatap->cFrame->PreviousFrame = MainData->cFrame->PreviousFrame;
@@ -2019,7 +2019,7 @@ void MolDisplayWin::PasteText(void) {
 				MainData->cFrame->SetAtomSelection(i, true);
 			}
 			if (Prefs->GetAutoBond())
-				MainData->cFrame->SetBonds(Prefs, false);
+				MainData->cFrame->SetBonds(Prefs, false, ProgressInd);
 			//Now reset the display to take into account the new atoms
 			if (initialAtomCount == 0) {
 				MainData->CenterModelWindow();

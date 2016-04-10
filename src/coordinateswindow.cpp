@@ -579,7 +579,8 @@ void CoordinatesWindow::OnBondbuttonClick( wxCommandEvent& event )
 	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
-	lFrame->SetBonds(Prefs, true);
+	Progress lProg;
+	lFrame->SetBonds(Prefs, true, &lProg);
 	Parent->BondsChanged();
 }
 

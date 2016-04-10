@@ -1154,7 +1154,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 									firstFrame = false;
 									lFrame->ReadCMLMolecule(child);
 									if (UseAutoBond && (result < 10))	//setup bonds, if needed
-										lFrame->SetBonds(Prefs, true);
+										lFrame->SetBonds(Prefs, true, ProgressInd);
 									break;
 								case MatrixElement:
 								{	//The only Matrix element we expect here is the rotation matrix
@@ -1391,7 +1391,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 					case MoleculeElement:
 						lFrame->ReadCMLMolecule(root);
 						if (UseAutoBond && (result<10))	//setup bonds, if needed
-							lFrame->SetBonds(Prefs, true);
+							lFrame->SetBonds(Prefs, true, ProgressInd);
 						if (result <= 0) result = 1;
 					break;
 					default:
