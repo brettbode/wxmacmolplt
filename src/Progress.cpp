@@ -3,15 +3,6 @@
  *     see the LICENSE file in the top level directory
  */
 
-/***************************************
- * Progress.cpp
- *
- * Created:       10-31-2006  Steven Schulteis
- * Last Modified: 3-26-2006	  Brett Bode
-***************************************/
-
-//These provide the basics of what is needed. Cancel hasn't been tested!
-
 #include "Globals.h"
 #include "Progress.h"
 
@@ -20,7 +11,6 @@ Progress::Progress(void) {
 	ResetTimes();
 	NextTime = RunTime;
 	ScaleFactor = 1.0;
-	SavedPercentDone = 0;
 	progDlg = NULL;
 }
 
@@ -34,9 +24,9 @@ bool Progress::UpdateProgress(float Percent) {
 	bool result = true;
 	long PercentDone = BaseValue + (long)(Percent * ScaleFactor);
 	long ctime = timer.Time();
-		//This check is probably not really needed, but it keeps us from calling
-		//the update function (which call Yield) too frequently.
 	if (progDlg) {
+		//This check is probably not really needed, but it keeps us from calling
+		//the update function (which calls Yield) too frequently.
 		if (ctime > NextTime) {
 			result = progDlg->Update(PercentDone, tempLabel);
 			NextTime = ctime + SleepTime;
@@ -48,7 +38,6 @@ bool Progress::UpdateProgress(float Percent) {
 		result = progDlg->Update(PercentDone, tempLabel);
 		NextTime = ctime + SleepTime;
 	}
-	SavedPercentDone = PercentDone;
     return result;
 }
 void Progress::ChangeText(const char *newText) {
@@ -57,7 +46,7 @@ void Progress::ChangeText(const char *newText) {
 }
 
 void Progress::ResetTimes(void) {
-	RunTime = 200;
-	SleepTime = 10;
+	RunTime = kInitialProgressDisplayDelay;
+	SleepTime = kProgessDialogSleepTime;
 }
 
