@@ -46,10 +46,10 @@ IMPLEMENT_DYNAMIC_CLASS( ZMatrixCalculator, wxDialog )
  * ZMatrixCalculator event table definition
  */
 
-BEGIN_EVENT_TABLE( ZMatrixCalculator, wxDialog )
+BEGIN_EVENT_TABLE( ZMatrixCalculator, wxFrame )
 
 ////@begin ZMatrixCalculator event table entries
-	EVT_CLOSE( ZMatrixCalculator::OnCloseWindow )
+	EVT_MENU( wxID_CLOSE, ZMatrixCalculator::OnCloseEvent )
 	EVT_TEXT( ID_ATOM1EDIT, ZMatrixCalculator::OnAtom1editUpdated )
 	EVT_TEXT( ID_ATOM2EDIT, ZMatrixCalculator::OnAtom2editUpdated )
 	EVT_TEXT( ID_ATOM3EDIT, ZMatrixCalculator::OnAtom3editUpdated )
@@ -88,8 +88,7 @@ bool ZMatrixCalculator::Create( wxWindow* parent, wxWindowID id, const wxString&
 ////@end ZMatrixCalculator member initialisation
 
 ////@begin ZMatrixCalculator creation
-	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
-	wxDialog::Create( parent, id, caption, pos, size, style );
+	wxFrame::Create( parent, id, caption, pos, size, style );
 
 	CreateControls();
 	if (GetSizer())
@@ -120,17 +119,21 @@ void ZMatrixCalculator::CreateControls()
 {    
 ////@begin ZMatrixCalculator content construction
 	ZMatrixCalculator* itemDialog1 = this;
+	wxBoxSizer* itemBoxSizer1 = new wxBoxSizer(wxVERTICAL);
+	itemDialog1->SetSizer(itemBoxSizer1);
+	wxPanel* itemPanel3 = new wxPanel( itemDialog1, ID_PANEL7, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	itemBoxSizer1->Add(itemPanel3, 1, wxGROW, 0);
 
 	wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
-	itemDialog1->SetSizer(itemBoxSizer2);
+	itemPanel3->SetSizer(itemBoxSizer2);
 
 	wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	wxStaticText* itemStaticText4 = new wxStaticText( itemDialog1, wxID_STATIC, _("Primary Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText4 = new wxStaticText( itemPanel3, wxID_STATIC, _("Primary Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer3->Add(itemStaticText4, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mAtom1Edit = new wxTextCtrl( itemDialog1, ID_ATOM1EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mAtom1Edit = new wxTextCtrl( itemPanel3, ID_ATOM1EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	if (ZMatrixCalculator::ShowToolTips())
 		mAtom1Edit->SetToolTip(_("Enter the index of the atom you want to define."));
 	itemBoxSizer3->Add(mAtom1Edit, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -141,10 +144,10 @@ void ZMatrixCalculator::CreateControls()
 	wxBoxSizer* itemBoxSizer7 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer6->Add(itemBoxSizer7, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	wxStaticText* itemStaticText8 = new wxStaticText( itemDialog1, wxID_STATIC, _("Second Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText8 = new wxStaticText( itemPanel3, wxID_STATIC, _("Second Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer7->Add(itemStaticText8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mAtom2Edit = new wxTextCtrl( itemDialog1, ID_ATOM2EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mAtom2Edit = new wxTextCtrl( itemPanel3, ID_ATOM2EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	if (ZMatrixCalculator::ShowToolTips())
 		mAtom2Edit->SetToolTip(_("Enter the index of the atom defining the bond."));
 	itemBoxSizer7->Add(mAtom2Edit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -152,10 +155,10 @@ void ZMatrixCalculator::CreateControls()
 	wxBoxSizer* itemBoxSizer10 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer6->Add(itemBoxSizer10, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	wxStaticText* itemStaticText11 = new wxStaticText( itemDialog1, wxID_STATIC, _("Third Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText11 = new wxStaticText( itemPanel3, wxID_STATIC, _("Third Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer10->Add(itemStaticText11, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mAtom3Edit = new wxTextCtrl( itemDialog1, ID_ATOM3EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mAtom3Edit = new wxTextCtrl( itemPanel3, ID_ATOM3EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	if (ZMatrixCalculator::ShowToolTips())
 		mAtom3Edit->SetToolTip(_("Enter the index of the atom defining the bond angle with atom 2 and 1."));
 	itemBoxSizer10->Add(mAtom3Edit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -163,10 +166,10 @@ void ZMatrixCalculator::CreateControls()
 	wxBoxSizer* itemBoxSizer13 = new wxBoxSizer(wxVERTICAL);
 	itemBoxSizer6->Add(itemBoxSizer13, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	wxStaticText* itemStaticText14 = new wxStaticText( itemDialog1, wxID_STATIC, _("Fourth Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText14 = new wxStaticText( itemPanel3, wxID_STATIC, _("Fourth Atom:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer13->Add(itemStaticText14, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mAtom4Edit = new wxTextCtrl( itemDialog1, ID_ATOM4EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	mAtom4Edit = new wxTextCtrl( itemPanel3, ID_ATOM4EDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	if (ZMatrixCalculator::ShowToolTips())
 		mAtom4Edit->SetToolTip(_("Enter the atom index defining the dihedral angle with atoms 3-2-1."));
 	itemBoxSizer13->Add(mAtom4Edit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
@@ -180,28 +183,28 @@ void ZMatrixCalculator::CreateControls()
 	wxBoxSizer* itemBoxSizer18 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer17->Add(itemBoxSizer18, 0, wxALIGN_RIGHT|wxALL, 5);
 
-	wxStaticText* itemStaticText19 = new wxStaticText( itemDialog1, wxID_STATIC, _("Bond Length:"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText19 = new wxStaticText( itemPanel3, wxID_STATIC, _("Bond Length:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer18->Add(itemStaticText19, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mBondLength = new wxTextCtrl( itemDialog1, ID_BONDLENGTHEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	mBondLength = new wxTextCtrl( itemPanel3, ID_BONDLENGTHEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
 	itemBoxSizer18->Add(mBondLength, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer21 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer17->Add(itemBoxSizer21, 0, wxALIGN_RIGHT|wxALL, 5);
 
-	wxStaticText* itemStaticText22 = new wxStaticText( itemDialog1, wxID_STATIC, _("Bond Angle:"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText22 = new wxStaticText( itemPanel3, wxID_STATIC, _("Bond Angle:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer21->Add(itemStaticText22, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mBondAngle = new wxTextCtrl( itemDialog1, ID_BONDANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	mBondAngle = new wxTextCtrl( itemPanel3, ID_BONDANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
 	itemBoxSizer21->Add(mBondAngle, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer24 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer17->Add(itemBoxSizer24, 0, wxALIGN_RIGHT|wxALL, 5);
 
-	wxStaticText* itemStaticText25 = new wxStaticText( itemDialog1, wxID_STATIC, _("Dihedral Angle:"), wxDefaultPosition, wxDefaultSize, 0 );
+	wxStaticText* itemStaticText25 = new wxStaticText( itemPanel3, wxID_STATIC, _("Dihedral Angle:"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer24->Add(itemStaticText25, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-	mDihedralAngle = new wxTextCtrl( itemDialog1, ID_DIHEDRALANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
+	mDihedralAngle = new wxTextCtrl( itemPanel3, ID_DIHEDRALANGLEEDIT, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_READONLY );
 	itemBoxSizer24->Add(mDihedralAngle, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	// Set validators
@@ -210,6 +213,43 @@ void ZMatrixCalculator::CreateControls()
 	mAtom3Edit->SetValidator( wxTextValidator(wxFILTER_DIGITS) );
 	mAtom4Edit->SetValidator( wxTextValidator(wxFILTER_DIGITS) );
 ////@end ZMatrixCalculator content construction
+
+	wxMenuBar* menuBar = new wxMenuBar;
+	wxMenu* lFileMenu = new wxMenu;
+	lFileMenu->Append(wxID_NEW, wxT("&New\tCtrl+N"), _("Open a new empty window"));
+	lFileMenu->Append(wxID_OPEN, wxT("&Open ...\tCtrl+O"), wxT("Open a file into a new window"));
+	lFileMenu->Append(wxID_CLOSE, _("&Close Window\tCtrl+W"), wxEmptyString, wxITEM_NORMAL);
+	lFileMenu->AppendSeparator();
+	lFileMenu->Append(wxID_EXIT, _("&Quit\tCtrl+Q"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(lFileMenu, _("&File"));
+	wxMenu* lEditMenu = new wxMenu;
+	lEditMenu->Append(wxID_UNDO, _("&Undo\tCtrl+Z"), _T(""), wxITEM_NORMAL);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_COPY, _("&Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
+	lEditMenu->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
+	menuBar->Append(lEditMenu, _("&Edit"));
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
+	
+	wxMenu * menuWindow = new wxMenu;
+	menuWindow->Append(MMP_MOLECULEDISPLAYWINDOW, wxT("&Molecule Display"), _("The primary molecule display"));
+	menuWindow->Append(MMP_BONDSWINDOW, wxT("&Bonds"), _("View/edit the bonding within the molecule"));
+	menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"), _("View/edit cartesian or internal coordinates"));
+	menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"), _("A plot of the energy for each geometry"));
+	menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"), _("Plot the vibrational frequencies"));
+	menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"), _T("Generate a GAMESS input file"));
+	menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"), _T("Add/Edit/Remove various surface types"));
+	menuWindow->Append(MMP_LOCAL_PREFERENCES, wxT("Pr&eferences"), _T("Edit the preferences for this window"));
+	menuBar->Append(menuWindow, wxT("&Subwindow"));
+	
+	wxMenu * menuHelp = new wxMenu;
+	menuHelp->Append(wxID_ABOUT, wxT("&About MacMolPlt..."), _T("Learn about MacMolPlt"));
+	menuHelp->Append(wxID_HELP, wxT("&MacMolPlt Manual..."), _T("Brief documentation"));
+	menuBar->Append(menuHelp, wxT("&Help"));
+	itemDialog1->SetMenuBar(menuBar);
+
 	mAtom1Edit->SetFocus();
 }
 
@@ -420,10 +460,10 @@ void ZMatrixCalculator::UpdateValues(void) {
 	}
 }
 /*!
- * wxEVT_CLOSE_WINDOW event handler for ID_MYDIALOG6
+ * wxEVT_CLOSE event handler for ZMatrixCalculator
  */
 
-void ZMatrixCalculator::OnCloseWindow( wxCloseEvent& event )
+void ZMatrixCalculator::OnCloseEvent( wxCommandEvent& /* event */)
 {
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	parent->CloseZMatrixCalc();

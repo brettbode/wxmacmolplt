@@ -101,8 +101,6 @@ public:
 	/// Change the window title when the file name changes
 	void UpdateWindowTitle(void);
 
-	/// Close the surfaces window
-	void OnCloseWindow( wxCloseEvent& event );
 	/// Menu handler for the close menu item
 	void OnCloseEvent( wxCommandEvent& event );
 

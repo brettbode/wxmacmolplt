@@ -44,7 +44,8 @@
 #define ID_BONDLENGTHEDIT 10196
 #define ID_BONDANGLEEDIT 10197
 #define ID_DIHEDRALANGLEEDIT 10198
-#define SYMBOL_ZMATRIXCALCULATOR_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
+#define ID_PANEL7 10199
+#define SYMBOL_ZMATRIXCALCULATOR_STYLE wxCAPTION|wxSYSTEM_MENU|wxCLOSE_BOX|wxTAB_TRAVERSAL
 #define SYMBOL_ZMATRIXCALCULATOR_TITLE _("Z-Matrix Calculator")
 #define SYMBOL_ZMATRIXCALCULATOR_IDNAME ID_MYDIALOG6
 #define SYMBOL_ZMATRIXCALCULATOR_SIZE wxSize(400, 300)
@@ -63,7 +64,7 @@
  * ZMatrixCalculator class declaration
  */
 
-class ZMatrixCalculator: public wxDialog
+class ZMatrixCalculator: public wxFrame
 {    
     DECLARE_DYNAMIC_CLASS( ZMatrixCalculator )
     DECLARE_EVENT_TABLE()
@@ -81,9 +82,6 @@ public:
 
 ////@begin ZMatrixCalculator event handler declarations
 
-	/// wxEVT_CLOSE_WINDOW event handler for ID_MYDIALOG6
-	void OnCloseWindow( wxCloseEvent& event );
-
 	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM1EDIT
 	void OnAtom1editUpdated( wxCommandEvent& event );
 
@@ -97,6 +95,8 @@ public:
 	void OnAtom4editUpdated( wxCommandEvent& event );
 
 ////@end ZMatrixCalculator event handler declarations
+	/// Menu handler for the close menu item
+	void OnCloseEvent( wxCommandEvent& event );
 
 ////@begin ZMatrixCalculator member function declarations
 
