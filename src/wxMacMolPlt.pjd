@@ -12953,6 +12953,14 @@ mass-weighted cartesian space as shown."</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Stretch factor">0</long>
+            <long name="proxy-Border">5</long>
+            <bool name="proxy-wxLEFT">1</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
+            <bool name="proxy-wxTOP">1</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -29316,10 +29324,6 @@ layout as the default:"</string>
           <string name="app-kind">"Standard"</string>
           <long name="use-xrc">0</long>
           <long name="working-mode">0</long>
-          <string name="variable-0">"atom1|wxString|Atom1|"</string>
-          <string name="variable-1">"atom2|wxString|Atom2|"</string>
-          <string name="variable-2">"atom3|wxString|Atom3|"</string>
-          <string name="variable-3">"atom4|wxString|Atom4|"</string>
           <string name="event-handler-0">"wxEVT_CLOSE_WINDOW|OnCloseWindow"</string>
           <string name="proxy-Id name">"ID_MYDIALOG6"</string>
           <long name="proxy-Id value">10191</long>
@@ -29394,14 +29398,6 @@ layout as the default:"</string>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Member variable name">""</string>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Stretch factor">0</long>
-            <long name="proxy-Border">5</long>
-            <bool name="proxy-wxLEFT">1</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
-            <bool name="proxy-wxTOP">1</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
@@ -29530,15 +29526,15 @@ layout as the default:"</string>
                 <string name="proxy-Initial value">""</string>
                 <long name="proxy-Max length">0</long>
                 <string name="proxy-Help text">""</string>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"Enter the index of the atom you want to define."</string>
                 <string name="proxy-Background colour">""</string>
                 <string name="proxy-Foreground colour">""</string>
                 <string name="proxy-Font">""</string>
                 <bool name="proxy-Hidden">0</bool>
                 <bool name="proxy-Enabled">1</bool>
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
-                <string name="proxy-Data variable">"atom1"</string>
-                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC, &amp; %VARIABLE%)"</string>
+                <string name="proxy-Data variable">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_DIGITS)"</string>
                 <string name="proxy-Data source">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data class implementation filename">""</string>
@@ -29589,7 +29585,6 @@ layout as the default:"</string>
                 <bool name="proxy-wxRESERVE_SPACE_EVEN_IF_HIDDEN">0</bool>
                 <string name="proxy-Custom arguments">""</string>
                 <string name="proxy-Custom ctor arguments">""</string>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
               </document>
             </document>
             <document>
@@ -29741,15 +29736,15 @@ layout as the default:"</string>
                   <string name="proxy-Initial value">""</string>
                   <long name="proxy-Max length">0</long>
                   <string name="proxy-Help text">""</string>
-                  <string name="proxy-Tooltip text">""</string>
+                  <string name="proxy-Tooltip text">"Enter the index of the atom defining the bond."</string>
                   <string name="proxy-Background colour">""</string>
                   <string name="proxy-Foreground colour">""</string>
                   <string name="proxy-Font">""</string>
                   <bool name="proxy-Hidden">0</bool>
                   <bool name="proxy-Enabled">1</bool>
                   <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
-                  <string name="proxy-Data variable">"atom2"</string>
-                  <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC, &amp; %VARIABLE%)"</string>
+                  <string name="proxy-Data variable">""</string>
+                  <string name="proxy-Data validator">"wxTextValidator(wxFILTER_DIGITS)"</string>
                   <string name="proxy-Data source">""</string>
                   <string name="proxy-Data class name">""</string>
                   <string name="proxy-Data class implementation filename">""</string>
@@ -29800,7 +29795,6 @@ layout as the default:"</string>
                   <bool name="proxy-wxRESERVE_SPACE_EVEN_IF_HIDDEN">0</bool>
                   <string name="proxy-Custom arguments">""</string>
                   <string name="proxy-Custom ctor arguments">""</string>
-                  <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 </document>
               </document>
               <document>
@@ -29912,7 +29906,7 @@ layout as the default:"</string>
                   <long name="locked">0</long>
                   <string name="created">"30/6/2006"</string>
                   <string name="proxy-type">"wbTextCtrlProxy"</string>
-                  <string name="event-handler-0">"wxEVT_COMMAND_TEXT_UPDATED|OnAtom3editUpdated"</string>
+                  <string name="event-handler-0">"wxEVT_COMMAND_TEXT_UPDATED|OnAtom3editUpdated|||ZMatrixCalculator"</string>
                   <string name="proxy-Id name">"ID_ATOM3EDIT"</string>
                   <long name="proxy-Id value">10194</long>
                   <string name="proxy-Name">""</string>
@@ -29926,15 +29920,15 @@ layout as the default:"</string>
                   <string name="proxy-Initial value">""</string>
                   <long name="proxy-Max length">0</long>
                   <string name="proxy-Help text">""</string>
-                  <string name="proxy-Tooltip text">""</string>
+                  <string name="proxy-Tooltip text">"Enter the index of the atom defining the bond angle with atom 2 and 1."</string>
                   <string name="proxy-Background colour">""</string>
                   <string name="proxy-Foreground colour">""</string>
                   <string name="proxy-Font">""</string>
                   <bool name="proxy-Hidden">0</bool>
                   <bool name="proxy-Enabled">1</bool>
                   <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
-                  <string name="proxy-Data variable">"atom3"</string>
-                  <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC, &amp; %VARIABLE%)"</string>
+                  <string name="proxy-Data variable">""</string>
+                  <string name="proxy-Data validator">"wxTextValidator(wxFILTER_DIGITS)"</string>
                   <string name="proxy-Data source">""</string>
                   <string name="proxy-Data class name">""</string>
                   <string name="proxy-Data class implementation filename">""</string>
@@ -29985,7 +29979,6 @@ layout as the default:"</string>
                   <bool name="proxy-wxRESERVE_SPACE_EVEN_IF_HIDDEN">0</bool>
                   <string name="proxy-Custom arguments">""</string>
                   <string name="proxy-Custom ctor arguments">""</string>
-                  <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 </document>
               </document>
               <document>
@@ -30111,15 +30104,15 @@ layout as the default:"</string>
                   <string name="proxy-Initial value">""</string>
                   <long name="proxy-Max length">0</long>
                   <string name="proxy-Help text">""</string>
-                  <string name="proxy-Tooltip text">""</string>
+                  <string name="proxy-Tooltip text">"Enter the atom index defining the dihedral angle with atoms 3-2-1."</string>
                   <string name="proxy-Background colour">""</string>
                   <string name="proxy-Foreground colour">""</string>
                   <string name="proxy-Font">""</string>
                   <bool name="proxy-Hidden">0</bool>
                   <bool name="proxy-Enabled">1</bool>
                   <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
-                  <string name="proxy-Data variable">"atom4"</string>
-                  <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC, &amp; %VARIABLE%)"</string>
+                  <string name="proxy-Data variable">""</string>
+                  <string name="proxy-Data validator">"wxTextValidator(wxFILTER_DIGITS)"</string>
                   <string name="proxy-Data source">""</string>
                   <string name="proxy-Data class name">""</string>
                   <string name="proxy-Data class implementation filename">""</string>
@@ -30170,7 +30163,6 @@ layout as the default:"</string>
                   <bool name="proxy-wxRESERVE_SPACE_EVEN_IF_HIDDEN">0</bool>
                   <string name="proxy-Custom arguments">""</string>
                   <string name="proxy-Custom ctor arguments">""</string>
-                  <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 </document>
               </document>
             </document>
@@ -30407,7 +30399,6 @@ layout as the default:"</string>
                     <bool name="proxy-wxRESERVE_SPACE_EVEN_IF_HIDDEN">0</bool>
                     <string name="proxy-Custom arguments">""</string>
                     <string name="proxy-Custom ctor arguments">""</string>
-                    <bool name="proxy-wxTE_LINEWRAP">0</bool>
                   </document>
                 </document>
                 <document>
