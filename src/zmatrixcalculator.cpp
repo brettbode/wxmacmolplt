@@ -208,10 +208,17 @@ void ZMatrixCalculator::CreateControls()
 	itemBoxSizer24->Add(mDihedralAngle, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	// Set validators
+#if wxCHECK_VERSION(3, 0, 0)
 	mAtom1Edit->SetValidator( wxTextValidator(wxFILTER_DIGITS) );
 	mAtom2Edit->SetValidator( wxTextValidator(wxFILTER_DIGITS) );
 	mAtom3Edit->SetValidator( wxTextValidator(wxFILTER_DIGITS) );
 	mAtom4Edit->SetValidator( wxTextValidator(wxFILTER_DIGITS) );
+#else
+	mAtom1Edit->SetValidator( wxTextValidator(wxFILTER_NUMERIC) );
+	mAtom2Edit->SetValidator( wxTextValidator(wxFILTER_NUMERIC) );
+	mAtom3Edit->SetValidator( wxTextValidator(wxFILTER_NUMERIC) );
+	mAtom4Edit->SetValidator( wxTextValidator(wxFILTER_NUMERIC) );
+#endif
 ////@end ZMatrixCalculator content construction
 
 	wxMenuBar* menuBar = new wxMenuBar;
