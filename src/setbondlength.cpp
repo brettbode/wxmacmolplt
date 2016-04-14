@@ -126,7 +126,7 @@ void SetBondLength::CreateControls()
     keepOldBondsCheck = new wxCheckBox( itemDialog1, ID_KEEPOLDCHECKBOX, _("Keep old bonds"), wxDefaultPosition, wxDefaultSize, 0 );
     keepOldBondsCheck->SetValue(false);
     if (ShowToolTips())
-        keepOldBondsCheck->SetToolTip(_("When checked bonds are only appended the current set"));
+        keepOldBondsCheck->SetToolTip(_("When checked bonds are only appended to the current set"));
     itemBoxSizer5->Add(keepOldBondsCheck, 0, wxALIGN_LEFT|wxALL, 5);
 
     normalBondCheck = new wxCheckBox( itemDialog1, ID_NORMALCHECKBOX, _("Use \"normal\" bond length criteria"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -189,6 +189,8 @@ void SetBondLength::CreateControls()
 	wxString buf;
 	buf.Printf(wxT("%.2f"),Prefs->GetMaxBondLength());
 	maxValueEdit->SetValue(buf);
+	// Set validator
+	maxValueEdit->SetValidator( wxTextValidator(wxFILTER_NUMERIC) );
 }
 
 /*!
