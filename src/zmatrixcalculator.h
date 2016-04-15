@@ -97,6 +97,8 @@ public:
 ////@end ZMatrixCalculator event handler declarations
 	/// Menu handler for the close menu item
 	void OnCloseEvent( wxCommandEvent& event );
+	/// wxEVT_CLOSE_WINDOW event handler for ZMatrixCalculator
+	void OnCloseWindow( wxCloseEvent& event );
 
 ////@begin ZMatrixCalculator member function declarations
 

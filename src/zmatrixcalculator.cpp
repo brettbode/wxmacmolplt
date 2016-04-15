@@ -40,7 +40,7 @@
  * ZMatrixCalculator type definition
  */
 
-IMPLEMENT_DYNAMIC_CLASS( ZMatrixCalculator, wxDialog )
+IMPLEMENT_DYNAMIC_CLASS( ZMatrixCalculator, wxFrame )
 
 /*!
  * ZMatrixCalculator event table definition
@@ -49,6 +49,7 @@ IMPLEMENT_DYNAMIC_CLASS( ZMatrixCalculator, wxDialog )
 BEGIN_EVENT_TABLE( ZMatrixCalculator, wxFrame )
 
 ////@begin ZMatrixCalculator event table entries
+	EVT_CLOSE( ZMatrixCalculator::OnCloseWindow )
 	EVT_MENU( wxID_CLOSE, ZMatrixCalculator::OnCloseEvent )
 	EVT_TEXT( ID_ATOM1EDIT, ZMatrixCalculator::OnAtom1editUpdated )
 	EVT_TEXT( ID_ATOM2EDIT, ZMatrixCalculator::OnAtom2editUpdated )
@@ -465,6 +466,15 @@ void ZMatrixCalculator::UpdateValues(void) {
 			mDihedralAngle->SetValue(temp);
 		}
 	}
+}
+/*!
+ * wxEVT_CLOSE_WINDOW event handler for ZMatrixCalculator
+ */
+
+void ZMatrixCalculator::OnCloseWindow( wxCloseEvent& event )
+{
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	parent->CloseZMatrixCalc();
 }
 /*!
  * wxEVT_CLOSE event handler for ZMatrixCalculator
