@@ -283,7 +283,6 @@
           <bool name="proxy-wxSUNKEN_BORDER">0</bool>
           <bool name="proxy-wxSYSTEM_MENU">1</bool>
           <bool name="proxy-wxTAB_TRAVERSAL">0</bool>
-          <bool name="proxy-wxTHICK_FRAME">0</bool>
           <bool name="proxy-wxWANTS_CHARS">0</bool>
           <bool name="proxy-wxWS_EX_BLOCK_EVENTS">1</bool>
           <bool name="proxy-wxWS_EX_TRANSIENT">0</bool>
@@ -310,21 +309,13 @@
             <long name="is-transient">0</long>
             <long name="locked">0</long>
             <long name="owns-file">1</long>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Border">5</long>
             <string name="proxy-Member variable name">""</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
-            <long name="proxy-Stretch factor">0</long>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
-            <bool name="proxy-wxLEFT">1</bool>
             <bool name="proxy-wxRESERVE_SPACE_EVEN_IF_HIDDEN">0</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
-            <bool name="proxy-wxTOP">1</bool>
             <string name="title">"wxBoxSizer V"</string>
             <long name="title-mode">0</long>
             <string name="type">"dialog-control-document"</string>
@@ -526,7 +517,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -546,7 +537,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"Enter the index for an atom to define point 1."</string>
                 <long name="proxy-Width">50</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -570,7 +561,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
@@ -684,7 +674,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -704,7 +694,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"The x-coordinate for point 1."</string>
                 <long name="proxy-Width">-1</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -728,7 +718,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
@@ -770,7 +759,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -790,7 +779,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"The y-coordinate for point 1."</string>
                 <long name="proxy-Width">-1</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -814,7 +803,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
@@ -856,7 +844,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -876,7 +864,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"The z-coordinate for point 1."</string>
                 <long name="proxy-Width">-1</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -900,7 +888,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
@@ -1014,7 +1001,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -1034,7 +1021,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"Enter the index for an atom to define point 2."</string>
                 <long name="proxy-Width">50</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -1058,7 +1045,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
@@ -1172,7 +1158,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -1192,7 +1178,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"The x-coordinate for point 2."</string>
                 <long name="proxy-Width">-1</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -1216,7 +1202,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
@@ -1258,7 +1243,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -1278,7 +1263,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"The y-coordinate for point 2."</string>
                 <long name="proxy-Width">-1</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -1302,7 +1287,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
@@ -1344,7 +1328,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -1364,7 +1348,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"The z-coordinate for point 2."</string>
                 <long name="proxy-Width">-1</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -1388,7 +1372,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
@@ -1502,7 +1485,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -1522,7 +1505,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"Enter the index for an atom to define point 3."</string>
                 <long name="proxy-Width">50</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -1546,7 +1529,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
@@ -1660,7 +1642,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -1680,7 +1662,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"The x-coordinate for point 3."</string>
                 <long name="proxy-Width">-1</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -1704,7 +1686,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
@@ -1746,7 +1727,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -1766,7 +1747,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"The y-coordinate for point 3."</string>
                 <long name="proxy-Width">-1</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -1790,7 +1771,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
@@ -1832,7 +1812,7 @@
                 <string name="proxy-Data class manager window">""</string>
                 <string name="proxy-Data class name">""</string>
                 <string name="proxy-Data source">""</string>
-                <string name="proxy-Data validator">""</string>
+                <string name="proxy-Data validator">"wxTextValidator(wxFILTER_NUMERIC)"</string>
                 <string name="proxy-Data variable">""</string>
                 <bool name="proxy-Enabled">1</bool>
                 <bool name="proxy-External implementation">1</bool>
@@ -1852,7 +1832,7 @@
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                 <bool name="proxy-Separate files">0</bool>
                 <long name="proxy-Stretch factor">0</long>
-                <string name="proxy-Tooltip text">""</string>
+                <string name="proxy-Tooltip text">"The z-coordinate for point 3."</string>
                 <long name="proxy-Width">-1</long>
                 <bool name="proxy-wxADJUST_MINSIZE">0</bool>
                 <bool name="proxy-wxBORDER_THEME">0</bool>
@@ -1876,7 +1856,6 @@
                 <bool name="proxy-wxTE_CENTRE">0</bool>
                 <bool name="proxy-wxTE_CHARWRAP">0</bool>
                 <bool name="proxy-wxTE_LEFT">0</bool>
-                <bool name="proxy-wxTE_LINEWRAP">0</bool>
                 <bool name="proxy-wxTE_MULTILINE">0</bool>
                 <bool name="proxy-wxTE_NOHIDESEL">0</bool>
                 <bool name="proxy-wxTE_PASSWORD">0</bool>
