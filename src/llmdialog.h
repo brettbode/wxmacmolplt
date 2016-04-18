@@ -2,11 +2,9 @@
 // Name:        llmdialog.h
 // Purpose:     
 // Author:      Brett Bode
-// Modified by: 
 // Created:     Tue  2 May 13:24:40 2006
-// RCS-ID:      
 // Copyright:   (c) 2006 Iowa State University
-// Licence:     
+// Licence:     See the LICENSE file in the top level directory
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef _LLMDIALOG_H_
@@ -36,13 +34,13 @@
 
 ////@begin control identifiers
 #define ID_LLMDIALOG 10029
+#define ID_TEXTCTRL 10030
+#define ID_INTERNALSCHECKBOX 10031
 #define SYMBOL_LLMDIALOG_STYLE wxDEFAULT_DIALOG_STYLE|wxSYSTEM_MENU|wxSTAY_ON_TOP|wxCLOSE_BOX
 #define SYMBOL_LLMDIALOG_TITLE _("LLMDialog")
 #define SYMBOL_LLMDIALOG_IDNAME ID_LLMDIALOG
 #define SYMBOL_LLMDIALOG_SIZE wxSize(400, 300)
 #define SYMBOL_LLMDIALOG_POSITION wxDefaultPosition
-#define ID_TEXTCTRL 10030
-#define ID_INTERNALSCHECKBOX 10031
 ////@end control identifiers
 
 /*!
@@ -75,34 +73,30 @@ public:
 
 ////@begin LLMDialog event handler declarations
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TEXTCTRL
-    void OnTextctrlUpdated( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
-    void OnOkClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
+	void OnOkClick( wxCommandEvent& event );
 
 ////@end LLMDialog event handler declarations
 
 ////@begin LLMDialog member function declarations
 
-    MolDisplayWin * GetParent() const { return Parent ; }
-    void SetParent(MolDisplayWin * value) { Parent = value ; }
+	MolDisplayWin * GetParent() const { return Parent ; }
+	void SetParent(MolDisplayWin * value) { Parent = value ; }
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource( const wxString& name );
 
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+	/// Retrieves icon resources
+	wxIcon GetIconResource( const wxString& name );
 ////@end LLMDialog member function declarations
 
     /// Should we show tooltips?
     static bool ShowToolTips();
 
 ////@begin LLMDialog member variables
-    wxTextCtrl* numPointsEdit;
-    wxCheckBox* internalCheck;
-    MolDisplayWin * Parent;
-	wxString valid_string;
+	wxTextCtrl* numPointsEdit;
+	wxCheckBox* internalCheck;
+	MolDisplayWin * Parent;
 ////@end LLMDialog member variables
 };
 
