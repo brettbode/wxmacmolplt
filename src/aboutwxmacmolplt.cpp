@@ -127,8 +127,6 @@ void AboutwxMacMolPlt::CreateControls()
 	itemBoxSizer9->Add(itemBoxSizer10, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxStaticText* itemStaticText11 = new wxStaticText( itemDialog1, wxID_STATIC, _("Please take the:"), wxDefaultPosition, wxDefaultSize, 0 );
-	if (ShowToolTips())
-		itemStaticText11->SetToolTip(_("Just send an email"));
 	itemBoxSizer10->Add(itemStaticText11, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 #if wxCHECK_VERSION(2, 8, 0)
@@ -137,7 +135,10 @@ void AboutwxMacMolPlt::CreateControls()
 	wxStaticText* itemHyperlinkCtrl12 = new wxStaticText( itemDialog1, ID_HYPERLINKCTRL1, _("http://www.msg.chem.iastate.edu/GAMESS/download/MacMolPlt/MacMolPltSurvey.html"), wxDefaultPosition, wxDefaultSize);
 #endif
 	itemBoxSizer10->Add(itemHyperlinkCtrl12, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-
+#if wxCHECK_VERSION(2, 8, 0)
+	wxHyperlinkCtrl* itemHyperlinkCtrl121 = new wxHyperlinkCtrl( itemDialog1, ID_HYPERLINKCTRL2, _("Submit a bug report or enhancement request"), _T("https://github.com/brettbode/wxmacmolplt/issues"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	itemBoxSizer9->Add(itemHyperlinkCtrl121, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+#endif
 	wxBoxSizer* itemBoxSizer13 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer9->Add(itemBoxSizer13, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
@@ -165,7 +166,7 @@ void AboutwxMacMolPlt::CreateControls()
 	wxStaticText* itemStaticText17 = new wxStaticText( itemDialog1, wxID_STATIC, _("The primary developer of MacMolPlt is Brett Bode with past contributions from several talented students including Chris Johnson, Song Li, and Steven Schulteis. Please see the contributors list in GitHub for the most recent contributions.\n\nThanks to the Gordon Group at Iowa State University, Apple Computer and the National Science Foundation for providing past programming support."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
 	itemStaticText17->Wrap(300);
 	if (ShowToolTips())
-		itemStaticText17->SetToolTip(_("Thanks even to Kurt..."));
+		itemStaticText17->SetToolTip(_("Thanks also to all who have submitted comments, questions and suggestions!"));
 	itemBoxSizer2->Add(itemStaticText17, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxButton* itemButton18 = new wxButton( itemDialog1, wxID_OK, _("&Close"), wxDefaultPosition, wxDefaultSize, 0 );
