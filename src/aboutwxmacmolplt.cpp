@@ -162,7 +162,7 @@ void AboutwxMacMolPlt::CreateControls()
 	itemBoxSizer2->Add(itemDOILink, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 #endif
 
-	wxStaticText* itemStaticText17 = new wxStaticText( itemDialog1, wxID_STATIC, _("The primary developer of MacMolPlt is Brett Bode with past contributions from several talented students including Chris Johnson, Song Li, and Steven Schulteis.\n\nThanks to the Gordon Group at Iowa State University, Apple Computer and the National Science Foundation for providing past programming support."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
+	wxStaticText* itemStaticText17 = new wxStaticText( itemDialog1, wxID_STATIC, _("The primary developer of MacMolPlt is Brett Bode with past contributions from several talented students including Chris Johnson, Song Li, and Steven Schulteis. Please see the contributors list in GitHub for the most recent contributions.\n\nThanks to the Gordon Group at Iowa State University, Apple Computer and the National Science Foundation for providing past programming support."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE_HORIZONTAL);
 	itemStaticText17->Wrap(300);
 	if (ShowToolTips())
 		itemStaticText17->SetToolTip(_("Thanks even to Kurt..."));
