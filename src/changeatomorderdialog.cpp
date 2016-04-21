@@ -51,10 +51,8 @@ BEGIN_EVENT_TABLE( ChangeAtomOrderDialog, wxDialog )
 
 ////@begin ChangeAtomOrderDialog event table entries
 	EVT_TEXT( ID_TEXTCTRL5, ChangeAtomOrderDialog::OnTextctrl5Updated )
-
 	EVT_BUTTON( wxID_OK, ChangeAtomOrderDialog::OnOkClick )
 	EVT_UPDATE_UI( wxID_OK, ChangeAtomOrderDialog::OnOkUpdate )
-
 ////@end ChangeAtomOrderDialog event table entries
 
 END_EVENT_TABLE()
@@ -138,7 +136,7 @@ void ChangeAtomOrderDialog::CreateControls()
 	itemStaticText3->Wrap(250);
 	itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	indexEdit = new wxTextCtrl( itemDialog1, ID_TEXTCTRL5, _T(""), wxDefaultPosition, wxDefaultSize, 0 );
+	indexEdit = new wxTextCtrl( itemDialog1, ID_TEXTCTRL5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer2->Add(indexEdit, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxStaticText* itemStaticText5 = new wxStaticText( itemDialog1, wxID_STATIC, _("Any other selected atoms will be inserted in order after the first atom."), wxDefaultPosition, wxDefaultSize, 0 );
@@ -155,6 +153,8 @@ void ChangeAtomOrderDialog::CreateControls()
 	itemButton8->SetDefault();
 	itemBoxSizer6->Add(itemButton8, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
+	// Set validators
+	indexEdit->SetValidator( wxTextValidator(wxFILTER_NUMERIC) );
 ////@end ChangeAtomOrderDialog content construction
 }
 

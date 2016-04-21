@@ -48,9 +48,7 @@ BEGIN_EVENT_TABLE( FMOFragmentationDialog, wxDialog )
 
 ////@begin FMOFragmentationDialog event table entries
 	EVT_TEXT( ID_NUMFRAGEDIT, FMOFragmentationDialog::OnNumFragEditTextUpdated )
-
 	EVT_BUTTON( wxID_OK, FMOFragmentationDialog::OnFMOFragButtonClick )
-
 ////@end FMOFragmentationDialog event table entries
 
 END_EVENT_TABLE()
@@ -151,6 +149,8 @@ void FMOFragmentationDialog::CreateControls()
 	itemButton9->SetDefault();
 	itemBoxSizer7->Add(itemButton9, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
+	// Set validators
+	mNumFragEdit->SetValidator( wxTextValidator(wxFILTER_NUMERIC) );
 ////@end FMOFragmentationDialog content construction
 	mNumFragEdit->SetValue(wxT("1"));
 }

@@ -20,6 +20,7 @@
  */
 
 ////@begin includes
+#include "wx/valtext.h"
 ////@end includes
 
 /*!
