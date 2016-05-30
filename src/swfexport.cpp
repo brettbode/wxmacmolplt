@@ -106,12 +106,18 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 	fontPath += wxT("Resources");
 #endif
 #endif
+#ifdef __WXMSW__
+	fontPath += wxT("\\BsVeraSans.fdb");
+#else
 	fontPath += wxT("/BsVeraSans.fdb");
+#endif
 	FILE *fontFile = fopen(fontPath.mb_str(wxConvUTF8), "rb");
 	if(fontFile == NULL) {
 		delete movie;
-		/* TODO:  Display an error message */
-		/* OR, just disable drawing text */
+		wxLogMessage(_("Unable to locate the SWF font file. Aborted!"));
+		wxString fp = _("Looking for : ");
+		fp += fontPath;
+		wxLogMessage(fp);
 		return;
 	}
 	SWFFont *font = new SWFFont(fontFile);

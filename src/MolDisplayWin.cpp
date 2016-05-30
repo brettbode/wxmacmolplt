@@ -945,6 +945,9 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 						 wxT("|POV-Ray (*.pov)|*.pov"));
 	bool vibs = false;
 	int itemCount = 9;
+#if wxCHECK_VERSION(2,9,0)
+	itemCount = 11;
+#endif
 	if (MainData->cFrame->GetNumberNormalModes() > 0) {
 		vibs = true;
 		wildcards.Append(wxT("|Frequencies (*.txt)|*.txt"));
