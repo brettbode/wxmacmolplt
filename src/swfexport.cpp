@@ -196,7 +196,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 			delete epBitmap;
 		}
 		
-		frameNumStr = wxString::Format(wxT("%d/%d"), i, MainData->NumFrames);
+		frameNumStr = wxString::Format(wxT("%ld/%ld"), i, MainData->NumFrames);
 		frameNumText = new SWFText();
 		frameNumText->setFont(font);
 		frameNumText->setHeight(24);

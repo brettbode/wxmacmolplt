@@ -708,6 +708,11 @@ class MolDisplayWin : public wxFrame {
 		 @param Buffer A buffer to write the output to.
 		 */
 		void WritePOVFile(BufferFile *Buffer);
+		/**
+		 Export a series of frames or normal mode animation to an animated GIF file.
+		 @param filepath The target name for the file
+		 */
+		void WriteGIFMovie(wxString & filepath);
 #ifdef __MAC_USE_QUICKTIME__
 		//quicktime movie export
 		void WriteQTMovie(wxString & filepath);

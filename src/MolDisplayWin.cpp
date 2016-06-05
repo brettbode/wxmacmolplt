@@ -947,6 +947,12 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 	int itemCount = 9;
 #if wxCHECK_VERSION(2,9,0)
 	itemCount = 11;
+	int animGIFIndex = -1;
+	if ((MainData->GetNumFrames() > 1)||vibs) {
+		wildcards.Append(wxT("|Animated GIF (*.gif)|*.gif"));
+		animGIFIndex = itemCount;
+		itemCount++;
+	}
 #endif
 	if (MainData->cFrame->GetNumberNormalModes() > 0) {
 		vibs = true;
@@ -1075,6 +1081,10 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 			}
 			exportOptionsDlg->Destroy();
 		}
+#if wxCHECK_VERSION(2,9,0)
+		else if (index == animGIFIndex)
+			WriteGIFMovie(filepath);
+#endif
 #ifdef __MAC_USE_QUICKTIME__
 		else if (index == QTindex)
 			//quicktime movie export

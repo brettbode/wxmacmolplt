@@ -17,6 +17,8 @@
 #include "myFiles.h"
 #include "InputData.h"
 #include "Prefs.h"
+#include <wx/wfstream.h>
+#include <wx/anidecod.h>
 
 extern WinPrefs *	gPreferences;
 
@@ -92,3 +94,49 @@ BufferFile * OpenDatFile(void) {
 	return Buffer;
 }
 
+#if wxCHECK_VERSION(2,9,0)
+#include <wx/quantize.h>
+void MolDisplayWin::WriteGIFMovie(wxString & filepath) {
+	wxImageArray images;
+	long AnimateTime = 10*Prefs->GetAnimateTime();
+	
+	for(int i = 1; i <= MainData->NumFrames; ++i) {
+//		if(!ProgressInd->UpdateProgress((float)i)) {
+//			goto CLEANUP;
+//		}
+		
+		MainData->SetCurrentFrame(i);
+		
+		Surface *temp = MainData->cFrame->SurfaceList;
+		while(temp) {
+			temp->RotateEvent(MainData);
+			temp = temp->GetNextSurface();
+		}
+		MainData->ResetRotation();
+		ReleaseLists();
+		DrawGL();
+		
+		wxImage frame = glCanvas->getImage(0, 0);
+		wxQuantize::Quantize(frame, frame);
+		if (frame.HasAlpha()) {
+			frame.ConvertAlphaToMask();
+		}
+		//Hmm does any memory need to be freed up later?
+		images.push_back(frame);
+	}
+	
+	if(!filepath.Lower().Matches(wxT("*.gif"))) {
+		
+		filepath.Append(wxT(".gif"));
+	}
+	wxFileOutputStream outFile(filepath);
+	if (outFile.IsOk()) {
+//	bool wxGIFHandler::SaveAnimation(const wxImageArray& images,
+//									 wxOutputStream *stream, bool verbose, int delayMilliSecs)
+		wxGIFHandler * gfhandler = (wxGIFHandler *) wxImage::FindHandler(wxBITMAP_TYPE_GIF);
+		gfhandler->SaveAnimation(images, &outFile, true, AnimateTime);
+	} else {
+		wxLogMessage(_("Unable to open the requested file. Aborted!"));
+	}
+}
+#endif
