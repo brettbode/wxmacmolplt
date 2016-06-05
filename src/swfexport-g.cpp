@@ -123,14 +123,14 @@ void SWFExport::CreateControls()
 	wxArrayString mMovieTypeStrings;
 	mMovieTypeStrings.Add(_("&Frame Animation"));
 	mMovieTypeStrings.Add(_("&Normal Mode animation"));
-	mMovieType = new wxRadioBox( itemDialog1, ID_SWF_MOVIE_RADIO, _("Radiobox"), wxDefaultPosition, wxDefaultSize, mMovieTypeStrings, 0, wxRA_SPECIFY_ROWS );
+	mMovieType = new wxRadioBox( itemDialog1, ID_SWF_MOVIE_RADIO, _("Animation Type"), wxDefaultPosition, wxDefaultSize, mMovieTypeStrings, 0, wxRA_SPECIFY_ROWS );
 	mMovieType->SetSelection(0);
 	itemBoxSizer2->Add(mMovieType, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	mEPlotCheck = new wxCheckBox( itemDialog1, ID_EPLOT_CHECK, _("Include Energy Plot"), wxDefaultPosition, wxDefaultSize, 0 );
 	mEPlotCheck->SetValue(false);
 	if (ShowToolTips())
-		mEPlotCheck->SetToolTip(_("click to display the energy plot next to the animation for the frame animation."));
+		mEPlotCheck->SetToolTip(_("Click to display the energy plot next to the animation for the frame animation."));
 	itemBoxSizer2->Add(mEPlotCheck, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxHORIZONTAL);
