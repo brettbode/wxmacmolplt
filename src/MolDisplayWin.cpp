@@ -930,6 +930,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 	wxMemoryDC memDC;
 	wxImage    exportImage;
 	wxBitmap  *bmp;
+	int animGIFIndex = -1;
 	wxString   wildcards(wxT("Windows Bitmap (*.bmp)|*.bmp")
 						 wxT("|Portable Network Graphics (*.png)|*.png")
 						 wxT("|JPEG (*.jpeg;*.jpg)|*.jpeg;*.jpg")
@@ -947,7 +948,6 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 	int itemCount = 9;
 #if wxCHECK_VERSION(2,9,0)
 	itemCount = 11;
-	int animGIFIndex = -1;
 	if ((MainData->GetNumFrames() > 1)||vibs) {
 		wildcards.Append(wxT("|Animated GIF (*.gif)|*.gif"));
 		animGIFIndex = itemCount;
@@ -993,7 +993,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 		Prefs->CylindersForLines(true);
 		filepath = fileDlg->GetPath();
 		index    = fileDlg->GetFilterIndex();
-		if (index < mmp_data) {
+		if ((index < mmp_data) || (index == animGIFIndex)) {
 			switch(index) {
 				case mmp_bmp:
 					type = wxBITMAP_TYPE_BMP;
@@ -1034,56 +1034,74 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 			}
 			exportOptionsDlg = new ExportOptionsDialog(this);
 			exportOptionsDlg->setFileType(type);
-			if(exportOptionsDlg->ShowModal() == wxID_OK) {
-				bmp = new wxBitmap(exportOptionsDlg->getWidth(),
-				                                               exportOptionsDlg->getHeight());
-				memDC.SelectObject(*bmp);
-				Prefs->SetLineWidth(exportOptionsDlg->getImageRatio());
-				glCanvas->GenerateHiResImageForExport(&memDC);
-				Prefs->SetLineWidth(1);
-				exportImage = bmp->ConvertToImage();
-				if(exportOptionsDlg->getTransparency()) {
-					// This gets really hairy, since there isn't a good way to
-					// determine what the actual value of the background color
-					// ends up being after it's pumped through both GL and WX.
-					//
-					// In the end we just compare our "ideal" value with the
-					// upper left corner of the image.  If the two are
-					// reasonably close, we use the value from the corner.
-
-					RGBColor *bgColor = Prefs->GetBackgroundColorLoc();
-					unsigned char red, green, blue;
-					short dRed, dGreen, dBlue;
-
-					red = exportImage.GetRed(0, 0);
-					green = exportImage.GetGreen(0, 0);
-					blue = exportImage.GetBlue(0, 0);
-
-					dRed = abs((short)((bgColor->red) >> 8) - red);
-					dGreen = abs((short)((bgColor->green) >> 8) - green);
-					dBlue = abs((short)((bgColor->blue) >> 8) - blue);
-
-					if(dRed < 3 && dGreen < 3 && dBlue < 3) {
-						exportImage.SetMaskColour(red, green, blue);
-					}
-				}
 #if wxCHECK_VERSION(2,9,0)
-				if (type == wxBITMAP_TYPE_GIF) {
-					wxQuantize::Quantize(exportImage, exportImage);
-					if (exportImage.HasAlpha()) {
-						exportImage.ConvertAlphaToMask();
-					}
+			if (index == animGIFIndex) {
+				if (MainData->GetNumFrames() > 1) {
+					exportOptionsDlg->EnableFrameMovie(true);
+					exportOptionsDlg->SetMovieChoice(0);
+				} else {
+					exportOptionsDlg->EnableFrameMovie(false);
+					exportOptionsDlg->SetMovieChoice(1);
 				}
+				exportOptionsDlg->EnableModeMovie((MainData->cFrame->GetNumberNormalModes() > 0));
+			}
 #endif
-				exportImage.SaveFile(filepath, (wxBitmapType) type);
-				memDC.SelectObject(wxNullBitmap); // bmp has now been
-												  // destroyed.
+			if(exportOptionsDlg->ShowModal() == wxID_OK) {
+#if wxCHECK_VERSION(2,9,0)
+				if (index == animGIFIndex) {
+					WriteGIFMovie(filepath, exportOptionsDlg);
+				} else
+#endif
+				{
+					bmp = new wxBitmap(exportOptionsDlg->getWidth(),
+																   exportOptionsDlg->getHeight());
+					memDC.SelectObject(*bmp);
+					Prefs->SetLineWidth(exportOptionsDlg->getImageRatio());
+					glCanvas->GenerateHiResImageForExport(&memDC);
+					Prefs->SetLineWidth(1);
+					exportImage = bmp->ConvertToImage();
+					if(exportOptionsDlg->getTransparency()) {
+						// This gets really hairy, since there isn't a good way to
+						// determine what the actual value of the background color
+						// ends up being after it's pumped through both GL and WX.
+						//
+						// In the end we just compare our "ideal" value with the
+						// upper left corner of the image.  If the two are
+						// reasonably close, we use the value from the corner.
+
+						RGBColor *bgColor = Prefs->GetBackgroundColorLoc();
+						unsigned char red, green, blue;
+						short dRed, dGreen, dBlue;
+
+						red = exportImage.GetRed(0, 0);
+						green = exportImage.GetGreen(0, 0);
+						blue = exportImage.GetBlue(0, 0);
+
+						dRed = abs((short)((bgColor->red) >> 8) - red);
+						dGreen = abs((short)((bgColor->green) >> 8) - green);
+						dBlue = abs((short)((bgColor->blue) >> 8) - blue);
+
+						if(dRed < 3 && dGreen < 3 && dBlue < 3) {
+							exportImage.SetMaskColour(red, green, blue);
+						}
+					}
+#if wxCHECK_VERSION(2,9,0)
+					if (type == wxBITMAP_TYPE_GIF) {
+						wxQuantize::Quantize(exportImage, exportImage);
+						if (exportImage.HasAlpha()) {
+							exportImage.ConvertAlphaToMask();
+						}
+					}
+#endif
+					exportImage.SaveFile(filepath, (wxBitmapType) type);
+					memDC.SelectObject(wxNullBitmap); // bmp has now been
+				}									  // destroyed.
 			}
 			exportOptionsDlg->Destroy();
 		}
 #if wxCHECK_VERSION(2,9,0)
-		else if (index == animGIFIndex)
-			WriteGIFMovie(filepath);
+//		else if (index == animGIFIndex)
+//			WriteGIFMovie(filepath);
 #endif
 #ifdef __MAC_USE_QUICKTIME__
 		else if (index == QTindex)

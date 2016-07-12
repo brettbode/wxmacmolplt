@@ -43,6 +43,8 @@ typedef class setPreference setPreference;
 typedef struct qtData qtData;
 typedef class MolStatusBar MolStatusBar;
 typedef class UndoSnapShot UndoSnapShot;
+//typedef class ExportOptionsDialog ExportOptionsDialog;
+class ExportOptionsDialog;
 
 //#define ID_LOCAL_PREFERENCES 501
 /** MMP_EventID contains a series of ids used mostly for menu items within the
@@ -711,8 +713,9 @@ class MolDisplayWin : public wxFrame {
 		/**
 		 Export a series of frames or normal mode animation to an animated GIF file.
 		 @param filepath The target name for the file
+		 @param dlg The export options dialog to be used to retrieve the various movie setup options
 		 */
-		void WriteGIFMovie(wxString & filepath);
+		void WriteGIFMovie(wxString & filepath, const ExportOptionsDialog & dlg);
 #ifdef __MAC_USE_QUICKTIME__
 		//quicktime movie export
 		void WriteQTMovie(wxString & filepath);

@@ -17,6 +17,7 @@
 #include "myFiles.h"
 #include "InputData.h"
 #include "Prefs.h"
+#include "exportoptionsdialog.h"
 #include <wx/wfstream.h>
 #include <wx/anidecod.h>
 
@@ -96,33 +97,40 @@ BufferFile * OpenDatFile(void) {
 
 #if wxCHECK_VERSION(2,9,0)
 #include <wx/quantize.h>
-void MolDisplayWin::WriteGIFMovie(wxString & filepath) {
+
+//TODO: offer a normal mode animation
+//		offer to add an energy plot to the frame animation
+//		Add progress indicator
+void MolDisplayWin::WriteGIFMovie(wxString & filepath, const ExportOptionsDialog & dlg) {
 	wxImageArray images;
 	long AnimateTime = 10*Prefs->GetAnimateTime();
 	
-	for(int i = 1; i <= MainData->NumFrames; ++i) {
-//		if(!ProgressInd->UpdateProgress((float)i)) {
-//			goto CLEANUP;
-//		}
-		
-		MainData->SetCurrentFrame(i);
-		
-		Surface *temp = MainData->cFrame->SurfaceList;
-		while(temp) {
-			temp->RotateEvent(MainData);
-			temp = temp->GetNextSurface();
+	if (dlg.GetMovieChoice() == 0) {
+		for(int i = 1; i <= MainData->NumFrames; ++i) {
+	//		if(!ProgressInd->UpdateProgress((float)i)) {
+	//			goto CLEANUP;
+	//		}
+			
+			MainData->SetCurrentFrame(i);
+			
+			Surface *temp = MainData->cFrame->SurfaceList;
+			while(temp) {
+				temp->RotateEvent(MainData);
+				temp = temp->GetNextSurface();
+			}
+			MainData->ResetRotation();
+			ReleaseLists();
+			DrawGL();
+			
+			wxImage frame = glCanvas->getImage(0, 0);
+			wxQuantize::Quantize(frame, frame);
+			if (frame.HasAlpha()) {
+				frame.ConvertAlphaToMask();
+			}
+			//Hmm does any memory need to be freed up later?
+			images.push_back(frame);
 		}
-		MainData->ResetRotation();
-		ReleaseLists();
-		DrawGL();
-		
-		wxImage frame = glCanvas->getImage(0, 0);
-		wxQuantize::Quantize(frame, frame);
-		if (frame.HasAlpha()) {
-			frame.ConvertAlphaToMask();
-		}
-		//Hmm does any memory need to be freed up later?
-		images.push_back(frame);
+	} else { //normal mode movie
 	}
 	
 	if(!filepath.Lower().Matches(wxT("*.gif"))) {
