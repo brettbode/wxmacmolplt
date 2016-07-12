@@ -45,6 +45,8 @@ class wxSpinCtrl;
 #define ID_RESWIDTHSPIN 10051
 #define ID_RESHEIGHTSPIN 10049
 #define ID_CHECKBOX3 10260
+#define ID_ANIMATIONRADIO 10000
+#define ID_ENERGYPLOTCHECK 10001
 #define SYMBOL_EXPORTOPTIONSDIALOG_STYLE wxDEFAULT_DIALOG_STYLE|wxCAPTION|wxSYSTEM_MENU|wxSTAY_ON_TOP
 #define SYMBOL_EXPORTOPTIONSDIALOG_TITLE _("Export Options")
 #define SYMBOL_EXPORTOPTIONSDIALOG_IDNAME ID_EXPORTOPTIONSDIALOG
@@ -94,6 +96,9 @@ public:
 	/// wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_CHECKBOX3
 	void OnCheckbox3Click( wxCommandEvent& event );
 
+	/// wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_ANIMATIONRADIO
+	void OnAnimationradioSelected( wxCommandEvent& event );
+
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
 	void OnOkClick( wxCommandEvent& event );
 
@@ -107,7 +112,17 @@ public:
     bool getTransparency() const { return transparency; }
 	/// returns the ratio between the desired image and the screen size
 	int getImageRatio() const;
-    
+	/// Set the type of movie to export
+	void SetMovieChoice(int v);
+	/// Call to enable/disable selecting a frame movie
+	void EnableFrameMovie(bool v);
+	/// Call to enable/disable selecting a normal mode movie
+	void EnableModeMovie(bool b);
+	/// Return the user selected movie type
+	int GetMovieChoice(void) const;
+	/// Return the user selection for adding the energy plot to the movie
+	bool AddEnergyPlot(void) const;
+	
     void setFileType(int ft);
 
     /// Retrieves bitmap resources
@@ -138,6 +153,8 @@ private:
     wxSpinCtrl      *resHeightSpin;
     wxPanel         *panelRes;
     wxCheckBox      *resTBGCheck;
+	wxRadioBox		*mMovieType;
+	wxCheckBox		*mEPlotCheck;
 };
 
 #endif

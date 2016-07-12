@@ -154,13 +154,13 @@ void SetScreenPlane::CreateControls()
 	itemDialog1->SetSizer(itemBoxSizer2);
 
 	wxStaticText* itemStaticText3 = new wxStaticText( itemDialog1, wxID_STATIC, _("Enter 3 points to define the screen plane:"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxFlexGridSizer* itemFlexGridSizer4 = new wxFlexGridSizer(3, 6, 0, 0);
 	itemBoxSizer2->Add(itemFlexGridSizer4, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxStaticText* itemStaticText5 = new wxStaticText( itemDialog1, wxID_STATIC, _("Atom 1"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemFlexGridSizer4->Add(itemStaticText5, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemFlexGridSizer4->Add(itemStaticText5, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	Atom1Ctl = new wxTextCtrl( itemDialog1, ID_ATOM1, wxEmptyString, wxDefaultPosition, wxSize(50, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
@@ -168,7 +168,7 @@ void SetScreenPlane::CreateControls()
 	itemFlexGridSizer4->Add(Atom1Ctl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxStaticText* itemStaticText7 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 1"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemFlexGridSizer4->Add(itemStaticText7, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemFlexGridSizer4->Add(itemStaticText7, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	Pt1XCtl = new wxTextCtrl( itemDialog1, ID_PT1X, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	if (SetScreenPlane::ShowToolTips())
@@ -186,7 +186,7 @@ void SetScreenPlane::CreateControls()
 	itemFlexGridSizer4->Add(Pt1ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxStaticText* itemStaticText11 = new wxStaticText( itemDialog1, wxID_STATIC, _("Atom 2"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemFlexGridSizer4->Add(itemStaticText11, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemFlexGridSizer4->Add(itemStaticText11, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	Atom2Ctl = new wxTextCtrl( itemDialog1, ID_ATOM2, wxEmptyString, wxDefaultPosition, wxSize(50, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
@@ -194,7 +194,7 @@ void SetScreenPlane::CreateControls()
 	itemFlexGridSizer4->Add(Atom2Ctl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxStaticText* itemStaticText13 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 2"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemFlexGridSizer4->Add(itemStaticText13, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemFlexGridSizer4->Add(itemStaticText13, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	Pt2XCtl = new wxTextCtrl( itemDialog1, ID_PT2X, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	if (SetScreenPlane::ShowToolTips())
@@ -212,7 +212,7 @@ void SetScreenPlane::CreateControls()
 	itemFlexGridSizer4->Add(Pt2ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxStaticText* itemStaticText17 = new wxStaticText( itemDialog1, wxID_STATIC, _("Atom 3"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemFlexGridSizer4->Add(itemStaticText17, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemFlexGridSizer4->Add(itemStaticText17, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	Atom3Ctl = new wxTextCtrl( itemDialog1, ID_ATOM3, wxEmptyString, wxDefaultPosition, wxSize(50, -1), 0 );
 	if (SetScreenPlane::ShowToolTips())
@@ -220,7 +220,7 @@ void SetScreenPlane::CreateControls()
 	itemFlexGridSizer4->Add(Atom3Ctl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxStaticText* itemStaticText19 = new wxStaticText( itemDialog1, wxID_STATIC, _("or point 3"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemFlexGridSizer4->Add(itemStaticText19, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemFlexGridSizer4->Add(itemStaticText19, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	Pt3XCtl = new wxTextCtrl( itemDialog1, ID_PT3X, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	if (SetScreenPlane::ShowToolTips())
@@ -238,7 +238,7 @@ void SetScreenPlane::CreateControls()
 	itemFlexGridSizer4->Add(Pt3ZCtl, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxStaticText* itemStaticText23 = new wxStaticText( itemDialog1, wxID_STATIC, _("or choose a symbolic plane"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer2->Add(itemStaticText23, 0, wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE, 5);
+	itemBoxSizer2->Add(itemStaticText23, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer24 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer2->Add(itemBoxSizer24, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
