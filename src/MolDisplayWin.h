@@ -715,7 +715,7 @@ class MolDisplayWin : public wxFrame {
 		 @param filepath The target name for the file
 		 @param dlg The export options dialog to be used to retrieve the various movie setup options
 		 */
-		void WriteGIFMovie(wxString & filepath, const ExportOptionsDialog & dlg);
+		void WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg);
 #ifdef __MAC_USE_QUICKTIME__
 		//quicktime movie export
 		void WriteQTMovie(wxString & filepath);

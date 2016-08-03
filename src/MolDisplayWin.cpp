@@ -948,17 +948,19 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 	int itemCount = 9;
 #if wxCHECK_VERSION(2,9,0)
 	itemCount = 11;
-	if ((MainData->GetNumFrames() > 1)||vibs) {
-		wildcards.Append(wxT("|Animated GIF (*.gif)|*.gif"));
-		animGIFIndex = itemCount;
-		itemCount++;
-	}
 #endif
 	if (MainData->cFrame->GetNumberNormalModes() > 0) {
 		vibs = true;
 		wildcards.Append(wxT("|Frequencies (*.txt)|*.txt"));
 		itemCount++;
 	}
+#if wxCHECK_VERSION(2,9,0)
+	if ((MainData->GetNumFrames() > 1)||vibs) {
+		wildcards.Append(wxT("|Animated GIF (*.gif)|*.gif"));
+		animGIFIndex = itemCount;
+		itemCount++;
+	}
+#endif
 #ifdef __MAC_USE_QUICKTIME__
 	int QTindex = -1;
 	if ((MainData->GetNumFrames() > 1)||vibs) {
@@ -1036,6 +1038,7 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 			exportOptionsDlg->setFileType(type);
 #if wxCHECK_VERSION(2,9,0)
 			if (index == animGIFIndex) {
+				exportOptionsDlg->EnableModeMovie((MainData->cFrame->GetNumberNormalModes() > 0));
 				if (MainData->GetNumFrames() > 1) {
 					exportOptionsDlg->EnableFrameMovie(true);
 					exportOptionsDlg->SetMovieChoice(0);
@@ -1043,7 +1046,6 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 					exportOptionsDlg->EnableFrameMovie(false);
 					exportOptionsDlg->SetMovieChoice(1);
 				}
-				exportOptionsDlg->EnableModeMovie((MainData->cFrame->GetNumberNormalModes() > 0));
 			}
 #endif
 			if(exportOptionsDlg->ShowModal() == wxID_OK) {
@@ -1077,9 +1079,9 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 						green = exportImage.GetGreen(0, 0);
 						blue = exportImage.GetBlue(0, 0);
 
-						dRed = abs((short)((bgColor->red) >> 8) - red);
-						dGreen = abs((short)((bgColor->green) >> 8) - green);
-						dBlue = abs((short)((bgColor->blue) >> 8) - blue);
+						dRed = (short) abs((short)((bgColor->red) >> 8) - red);
+						dGreen = (short) abs((short)((bgColor->green) >> 8) - green);
+						dBlue = (short) abs((short)((bgColor->blue) >> 8) - blue);
 
 						if(dRed < 3 && dGreen < 3 && dBlue < 3) {
 							exportImage.SetMaskColour(red, green, blue);
