@@ -271,14 +271,17 @@ class mpAtom {
 		void SetDefaultLonePairCount(void);
 };
 
+/**
+ * The BondOrder defines the accepted bond orders within the program. Most self-explanatory.
+ */
 enum BondOrder {
 	kHydrogenBond,
 	kSingleBond,
 	kDoubleBond,
 	kTripleBond,
 	kAromaticBond,
-	kMixedBonds,
-	kUnknownBond
+	kMixedBonds,	///< This one should only apply to the selecion of multiple bonds.
+	kUnknownBond	///< Fallback, should be unused
 };
 
 class Bond {

@@ -268,6 +268,9 @@ void BondsDlg::ResetList(void) {
 				case kAromaticBond:
 					buf.Printf(wxT("%s"), _T("Aromatic"));
 					break;
+				default: ;// unknown and mixed are not applied to individual bonds
+					buf.Printf(wxT("%s"), _T("Unknown"));
+					wxLogMessage(_("BondsDlg::ResetList: unknown or mixed bond type for bond"));
 			}
 			bondGrid->SetCellValue(i, 3, buf);
 			bondGrid->SetReadOnly(i, 3, true);
@@ -371,6 +374,9 @@ void BondsDlg::OnAddClick( wxCommandEvent& event )
 			case kAromaticBond:
 				buf.Printf(wxT("%s"), _T("Aromatic"));
 				break;
+			default: ;// unknown and mixed are not applied to individual bonds
+				buf.Printf(wxT("%s"), _T("Unknown"));
+				wxLogMessage(_("BondsDlg::OnAddClick: unknown or mixed bond type for bond"));
 		}
 		bondGrid->SetCellValue(nbonds, 3, buf);
 		bondGrid->SetReadOnly(nbonds, 3, true);
@@ -441,6 +447,9 @@ void BondsDlg::OnChoiceSelected( wxCommandEvent& event )
 					lFrame->SetBondOrder(i, kAromaticBond);
 					order.Printf(wxT("%s"), _T("Aromatic"));
 					break;
+				default: ;// unknown and mixed are not applied to individual bonds
+					order.Printf(wxT("%s"), _T("Unknown"));
+					wxLogMessage(_("BondsDlg::OnChoiceSelected: unknown or mixed bond type for bond"));
 			}
 			bondGrid->SetCellValue(i, 3, order);
 		}
