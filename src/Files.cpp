@@ -728,7 +728,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			}
 		}
 
-		lFrame->SetBonds(Prefs, true, false);
+		lFrame->SetBonds(Prefs, true, NULL, false);
 
 	}
 	if (MainData->InputOptions->FMO.IsFMOActive()) {

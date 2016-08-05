@@ -3182,7 +3182,7 @@ void MolDisplayWin::RegenerateSymmetryDependent() {
 	MainData->GenerateSymmetryDependentAtoms(false);
 
 	// We changed the atoms, so we better update the bonds.
-	lFrame->SetBonds(Prefs, true, false);
+	lFrame->SetBonds(Prefs, true, ProgressInd, false);
 
 }
 
@@ -3448,7 +3448,7 @@ void MolDisplayWin::AbortOpen(const char * msg) {
 	} else
 #endif
 	{
-		if (this) Close(true);
+		Close(true);
 	}
 	
 	if (msg != NULL) MessageAlert(msg);
