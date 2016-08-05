@@ -111,7 +111,7 @@ void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg
 	try {
 		ProgressInd = new Progress;
 		if (!ProgressInd) throw MemoryError();
-		ProgressInd->ChangeText("Creating Animated GIF...");
+		ProgressInd->ChangeText("Creating Animated GIF... Patience...");
 			//Setup a memory draw context to buffer each image at the full resolution
 		bmp = new wxBitmap(dlg->getWidth(),
 						   dlg->getHeight());
@@ -232,6 +232,18 @@ void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg
 			
 			for(long i = 0; i < (4 * AnimationSpeed); i++) {
 				if(!ProgressInd->UpdateProgress((float)i)) {
+					for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
+						lAtoms[iatm].Position = SavedAtoms[iatm];
+					}
+					MainData->ResetRotation();
+					
+					MainData->SetDrawMode(savedrawmode);
+					ReleaseLists();
+					DrawGL();
+					
+					delete [] ModeOffset;
+					delete [] SavedAtoms;
+
 					throw UserCancel();
 				}
 				if((npoint == AnimationSpeed) || (npoint == -AnimationSpeed)) {
