@@ -18,6 +18,7 @@
 #include "InputData.h"
 #include "Prefs.h"
 #include "exportoptionsdialog.h"
+#include "energyplotdialog.h"
 #include <wx/wfstream.h>
 #include <wx/anidecod.h>
 
@@ -98,26 +99,47 @@ BufferFile * OpenDatFile(void) {
 #if wxCHECK_VERSION(2,9,0)
 #include <wx/quantize.h>
 
-//TODO:
-//		offer to add an energy plot to the frame animation
 void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg) {
 	wxImageArray images;
 	long AnimateTime = 10*Prefs->GetAnimateTime();
-	wxBitmap  *bmp=NULL;
-	wxMemoryDC memDC;
+	bool killEPlotWin=false, includeEP = false;
+	int savedEPlotWidth, savedEPlotHeight;
+	wxBitmap  *bmp=NULL, *ePlotbmp=NULL;
+	wxMemoryDC memDC, ePlotmemDC;
+	long saveFrame = MainData->GetCurrentFrame();
+
 	try {
 		ProgressInd = new Progress;
 		if (!ProgressInd) throw MemoryError();
 		ProgressInd->ChangeText("Creating Animated GIF...");
-
+			//Setup a memory draw context to buffer each image at the full resolution
 		bmp = new wxBitmap(dlg->getWidth(),
 						   dlg->getHeight());
 		memDC.SelectObject(*bmp);
+			//Set the line width appropriate to the resolution (reset at the end)
 		Prefs->SetLineWidth(dlg->getImageRatio());
 
-		if (dlg->GetMovieChoice() == 0) {
-			long saveFrame = MainData->GetCurrentFrame();
+		if (dlg->GetMovieChoice() == 0) {	//Multi-frame animation
 			ProgressInd->SetScaleFactor(100.0f / MainData->NumFrames);
+			includeEP = dlg->AddEnergyPlot();
+			
+			if(includeEP) {	//Add the energy plot to the movie
+				if(!energyPlotWindow) {	//If the energy plot window is not open, temporarily open it
+					energyPlotWindow = new EnergyPlotDialog(this);
+					killEPlotWin = true;
+				}
+				else {
+					energyPlotWindow->GetSize(&savedEPlotWidth, &savedEPlotHeight);
+				}
+				energyPlotWindow->SetSize(dlg->getHeight(), dlg->getHeight());
+				energyPlotWindow->Show(true);
+				energyPlotWindow->Update();
+				//Setup a draw context for the extended image size including the energy plot
+				ePlotbmp = new wxBitmap(dlg->getWidth()+dlg->getHeight(),
+										dlg->getHeight());
+				ePlotmemDC.SelectObject(*ePlotbmp);
+			}
+
 			for(int i = 1; i <= MainData->NumFrames; ++i) {
 				if(!ProgressInd->UpdateProgress((float)i)) {
 					throw UserCancel();
@@ -133,31 +155,42 @@ void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg
 				MainData->ResetRotation();
 				ReleaseLists();
 				DrawGL();
-				
+					//Generate the possibly hi-res image
 				glCanvas->GenerateHiResImageForExport(&memDC);
-				wxImage frame = bmp->ConvertToImage();
+				wxImage frame;
+				
+				if(dlg->AddEnergyPlot()) {
+						//update the energy plot, copy it, then copy both bitmaps to the extended buffer
+					energyPlotWindow->FrameChanged();
+					wxBitmap *epBitmap = NULL;
+					energyPlotWindow->CopyToBitMap(&epBitmap);
+					if(epBitmap == NULL) {
+						wxLogMessage(_("Error! Unable to copy energy plot. Aborted!"));
+						throw UserCancel();
+					}
+					ePlotmemDC.Clear();
+					ePlotmemDC.DrawBitmap(*bmp, 0, 0);
+					ePlotmemDC.DrawBitmap(*epBitmap, dlg->getWidth(), 0);
+					//finally create the image off of the extended bitmap.
+					frame = ePlotbmp->ConvertToImage();
+					delete epBitmap;
+				} else	// or standard bitmap
+					frame = bmp->ConvertToImage();
+					//GIFs require this step to reduce the colors
 				wxQuantize::Quantize(frame, frame);
 				if (frame.HasAlpha()) {
 					frame.ConvertAlphaToMask();
 				}
-				//Hmm does any memory need to be freed up later?
 				images.push_back(frame);
 			}
-			ChangeFrames(saveFrame);
 		} else { //normal mode movie
-			long width;
-			long height;
 			bool savedrawmode=false;
 			long AnimateTime = 10*Prefs->GetAnimateTime();
 			if(!MainData->cFrame->Vibs) {
 				wxLogMessage(_("Error! No normal modes found when trying to create a normal mode animation. Aborted!"));
-				return;
+				throw UserCancel();
 			}
 			Frame * lFrame = MainData->cFrame;
-			if (MainData->GetDrawMode()) {
-				savedrawmode=true;
-				if(!Prefs->GetAnimateMode()) MainData->SetDrawMode(false);
-			}
 			
 			long cmode = (lFrame->NumAtoms) * (lFrame->Vibs->CurrentMode);
 			long AnimationSpeed = Prefs->GetAnimationSpeed();
@@ -166,14 +199,19 @@ void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg
 			CPoint3D *ModeOffset = new CPoint3D[lFrame->NumAtoms];
 			if(!ModeOffset) {
 				wxLogMessage(_("Unable to allocate memory for ModeOffset. Aborted!"));
-				return;
+				throw UserCancel();
 			}
 			CPoint3D *SavedAtoms = new CPoint3D[lFrame->NumAtoms];
 			if(!SavedAtoms) {
 				wxLogMessage(_("Unable to allocate memory for SavedAtoms. Aborted!"));
 				delete[] ModeOffset;
-				return;
+				throw UserCancel();
 			}
+			if (MainData->GetDrawMode()) {
+				savedrawmode=true;
+				if(!Prefs->GetAnimateMode()) MainData->SetDrawMode(false);
+			}
+
 			mpAtom *lAtoms = lFrame->Atoms;
 			long iatm;
 			for(iatm = 0; iatm < (lFrame->NumAtoms); ++iatm) {
@@ -186,8 +224,6 @@ void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg
 			DrawGL();
 			
 			if(AnimateTime < 1) AnimateTime = 1;
-			
-			getCanvasSize(&width, &height);
 			
 			long npoint = 0;
 			long inc = 1;
@@ -210,18 +246,9 @@ void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg
 				if (frame.HasAlpha()) {
 					frame.ConvertAlphaToMask();
 				}
-				//Hmm does any memory need to be freed up later?
+
 				images.push_back(frame);
 				
-	//			frameNumStr = wxString::Format(wxT("%d/%d"), i+1, (4 * AnimationSpeed));
-	//			frameNumText = new SWFText();
-	//			frameNumText->setFont(font);
-	//			frameNumText->setHeight(24);
-	//			frameNumText->setColor(0x00, 0x00, 0x00); /* TODO:  Get from wxMMP config */
-	//			frameNumText->moveTo(0,
-	//								 height - ((24.0 / 1024.0) * font->getAscent() + 3));
-	//			frameNumText->addString(frameNumStr.mb_str(wxConvUTF8));
-
 				for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
 					lAtoms[iatm].Position.x += offsetFactor * (ModeOffset[iatm].x);
 					lAtoms[iatm].Position.y += offsetFactor * (ModeOffset[iatm].y);
@@ -231,14 +258,6 @@ void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg
 				MainData->ResetRotation();
 				ReleaseLists();
 				DrawGL();
-
-	//			wxImage frame = glCanvas->getImage(0, 0);
-	//			wxQuantize::Quantize(frame, frame);
-	//			if (frame.HasAlpha()) {
-	//				frame.ConvertAlphaToMask();
-	//			}
-	//			//Hmm does any memory need to be freed up later?
-	//			images.push_back(frame);
 			}
 
 			for (iatm=0; iatm<(lFrame->NumAtoms); iatm++) {
@@ -249,16 +268,18 @@ void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg
 			MainData->SetDrawMode(savedrawmode);
 			ReleaseLists();
 			DrawGL();
+			
+			delete [] ModeOffset;
+			delete [] SavedAtoms;
 		}
 		
+		//Series of frames is complete, now save to the requested file.
 		if(!filepath.Lower().Matches(wxT("*.gif"))) {
 			
 			filepath.Append(wxT(".gif"));
 		}
 		wxFileOutputStream outFile(filepath);
 		if (outFile.IsOk()) {
-	//	bool wxGIFHandler::SaveAnimation(const wxImageArray& images,
-	//									 wxOutputStream *stream, bool verbose, int delayMilliSecs)
 			wxGIFHandler * gfhandler = (wxGIFHandler *) wxImage::FindHandler(wxBITMAP_TYPE_GIF);
 			gfhandler->SaveAnimation(images, &outFile, true, AnimateTime);
 		} else {
@@ -269,10 +290,23 @@ void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg
 		//User canceled, just cleanup and exit
 	}
 
+	//Cleanup any memory and reset the windows to their entry state
 	delete ProgressInd;
 	ProgressInd = NULL;
 	Prefs->SetLineWidth(1);
 	memDC.SelectObject(wxNullBitmap); // bmp has now been destroyed
+	ePlotmemDC.SelectObject(wxNullBitmap);
+	if(includeEP) {
+		if(killEPlotWin) {
+			delete energyPlotWindow;
+			energyPlotWindow = NULL;
+		}
+		else {
+			energyPlotWindow->SetSize(savedEPlotWidth, savedEPlotHeight);
+			energyPlotWindow->FrameChanged();
+		}
+	}
+	ChangeFrames(saveFrame);
 	
 }
 #endif
