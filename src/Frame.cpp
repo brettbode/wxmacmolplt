@@ -2261,10 +2261,11 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 				long LineLength = strlen(LineText);
 				for (unsigned long icol=0; icol<NumVibs; icol++) {
 					if (LinePos<LineLength) {
-						sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
+						token[0]='\0';
+						int iscan = sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
 						LinePos += nchar;
 						long test = strlen(token);
-						if ((nchar>0)&&(test>0)) {
+						if ((iscan>0)&&(nchar>0)&&(test>0)) {
 							if (LineText[LinePos+1] == 'I') {
 								token[test] = 'i';
 								test++;
@@ -2286,10 +2287,11 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					long LineLength = strlen(LineText);
 					for (unsigned long icol=0; icol<NumVibs; icol++) {
 						if (LinePos<LineLength) {
-							sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
+							token[0]='\0';
+							int iscan = sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
 							LinePos += nchar;
 							long test = strlen(token);
-							if ((nchar>0)&&(test>0)) {
+							if ((iscan>0)&&(nchar>0)&&(test>0)) {
 								lVibs->Symmetry.push_back(std::string(token));
 							} else NumVibs = icol;
 						} else NumVibs = icol;
@@ -2399,7 +2401,8 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					float lmass = Prefs->GetSqrtAtomMass(Atoms[test].GetType()-1);
 					for (ifreq=LastPass; ifreq<imode; ifreq++) {
 						cmode = test + ifreq*NumAtoms;
-						sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).x), &nchar);
+						int iscan = sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).x), &nchar);
+						if (iscan <= 0) throw DataError();
 						LinePos += nchar;
 						(lVibs->NormMode[cmode]).x *= lmass;
 					}
@@ -2407,7 +2410,8 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					LinePos = 20;
 					for (ifreq=LastPass; ifreq<imode; ifreq++) {
 						cmode = test + ifreq*NumAtoms;
-						sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).y), &nchar);
+						int iscan = sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).y), &nchar);
+						if (iscan <= 0) throw DataError();
 						LinePos += nchar;
 						(lVibs->NormMode[cmode]).y *= lmass;
 					}
@@ -2415,7 +2419,8 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					LinePos = 20;
 					for (ifreq=LastPass; ifreq<imode; ifreq++) {
 						cmode = test + ifreq*NumAtoms;
-						sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).z), &nchar);
+						int iscan = sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).z), &nchar);
+						if (iscan <= 0) throw DataError();
 						LinePos += nchar;
 						(lVibs->NormMode[cmode]).z *= lmass;
 					}
