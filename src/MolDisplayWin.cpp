@@ -1101,10 +1101,6 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &event) {
 			}
 			exportOptionsDlg->Destroy();
 		}
-#if wxCHECK_VERSION(2,9,0)
-//		else if (index == animGIFIndex)
-//			WriteGIFMovie(filepath);
-#endif
 #ifdef __MAC_USE_QUICKTIME__
 		else if (index == QTindex)
 			//quicktime movie export
