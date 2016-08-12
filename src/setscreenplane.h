@@ -23,6 +23,7 @@
  */
 #include <wx/textctrl.h>
 ////@begin includes
+#include "wx/valtext.h"
 ////@end includes
 
 /*!
@@ -93,84 +94,84 @@ public:
 
 ////@begin SetScreenPlane event handler declarations
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM1
-    void OnAtom1Updated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM1
+	void OnAtom1Updated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT1X
-    void OnPt1xUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT1X
+	void OnPt1xUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT1Y
-    void OnPt1yUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT1Y
+	void OnPt1yUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT1Z
-    void OnPt1zUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT1Z
+	void OnPt1zUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM2
-    void OnAtom2Updated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM2
+	void OnAtom2Updated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT2X
-    void OnPt2xUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT2X
+	void OnPt2xUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT2Y
-    void OnPt2yUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT2Y
+	void OnPt2yUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT2Z
-    void OnPt2zUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT2Z
+	void OnPt2zUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM3
-    void OnAtom3Updated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM3
+	void OnAtom3Updated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT3X
-    void OnPt3xUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT3X
+	void OnPt3xUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT3Y
-    void OnPt3yUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT3Y
+	void OnPt3yUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT3Z
-    void OnPt3zUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_PT3Z
+	void OnPt3zUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_XY
-    void OnXyClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_XY
+	void OnXyClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_YX
-    void OnYxClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_YX
+	void OnYxClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_XZ
-    void OnXzClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_XZ
+	void OnXzClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ZX
-    void OnZxClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ZX
+	void OnZxClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_YZ
-    void OnYzClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_YZ
+	void OnYzClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ZY
-    void OnZyClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ZY
+	void OnZyClick( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
-    void OnOkClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
+	void OnOkClick( wxCommandEvent& event );
 
 ////@end SetScreenPlane event handler declarations
 
 ////@begin SetScreenPlane member function declarations
 
-    int GetAtom1() const { return atom1 ; }
-    void SetAtom1(int value) { atom1 = value ; }
+	int GetAtom1() const { return atom1 ; }
+	void SetAtom1(int value) { atom1 = value ; }
 
-    int GetAtom2() const { return atom2 ; }
-    void SetAtom2(int value) { atom2 = value ; }
+	int GetAtom2() const { return atom2 ; }
+	void SetAtom2(int value) { atom2 = value ; }
 
-    int GetAtom3() const { return atom3 ; }
-    void SetAtom3(int value) { atom3 = value ; }
+	int GetAtom3() const { return atom3 ; }
+	void SetAtom3(int value) { atom3 = value ; }
 
-    MolDisplayWin * GetParent() const { return parent ; }
-    void SetParent(MolDisplayWin * value) { parent = value ; }
+	MolDisplayWin * GetParent() const { return parent ; }
+	void SetParent(MolDisplayWin * value) { parent = value ; }
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource( const wxString& name );
 
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+	/// Retrieves icon resources
+	wxIcon GetIconResource( const wxString& name );
 ////@end SetScreenPlane member function declarations
 	void setPlaneValues(void);
 
@@ -179,22 +180,22 @@ public:
 
     CPoint3D PlanePts[3];
 ////@begin SetScreenPlane member variables
-    wxTextCtrl* Atom1Ctl;
-    wxTextCtrl* Pt1XCtl;
-    wxTextCtrl* Pt1YCtl;
-    wxTextCtrl* Pt1ZCtl;
-    wxTextCtrl* Atom2Ctl;
-    wxTextCtrl* Pt2XCtl;
-    wxTextCtrl* Pt2YCtl;
-    wxTextCtrl* Pt2ZCtl;
-    wxTextCtrl* Atom3Ctl;
-    wxTextCtrl* Pt3XCtl;
-    wxTextCtrl* Pt3YCtl;
-    wxTextCtrl* Pt3ZCtl;
-    int atom1;
-    int atom2;
-    int atom3;
-    MolDisplayWin * parent;
+	wxTextCtrl* Atom1Ctl;
+	wxTextCtrl* Pt1XCtl;
+	wxTextCtrl* Pt1YCtl;
+	wxTextCtrl* Pt1ZCtl;
+	wxTextCtrl* Atom2Ctl;
+	wxTextCtrl* Pt2XCtl;
+	wxTextCtrl* Pt2YCtl;
+	wxTextCtrl* Pt2ZCtl;
+	wxTextCtrl* Atom3Ctl;
+	wxTextCtrl* Pt3XCtl;
+	wxTextCtrl* Pt3YCtl;
+	wxTextCtrl* Pt3ZCtl;
+	int atom1;
+	int atom2;
+	int atom3;
+	MolDisplayWin * parent;
 ////@end SetScreenPlane member variables
 };
 

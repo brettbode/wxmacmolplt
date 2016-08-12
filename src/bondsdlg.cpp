@@ -2,10 +2,9 @@
 // Name:        bondsdlg.cpp
 // Purpose:     Provide a dialog to allow the user to inspect and change the bond list
 // Author:      Brett Bode
-// Modified by: 
 // Created:     Thu 13 Apr 16:02:45 2006
 // Copyright:   (c) 2006 Iowa State University
-// Licence:     
+// Licence:     See the LICENSE file in the top level directory
 /////////////////////////////////////////////////////////////////////////////
 
 #if defined(__GNUG__) && !defined(NO_GCC_PRAGMA)
@@ -39,16 +38,17 @@
  * BondsDlg type definition
  */
 
-IMPLEMENT_DYNAMIC_CLASS( BondsDlg, wxDialog )
+IMPLEMENT_DYNAMIC_CLASS( BondsDlg, wxFrame )
 
 /*!
  * BondsDlg event table definition
  */
 
-BEGIN_EVENT_TABLE( BondsDlg, wxDialog )
+BEGIN_EVENT_TABLE( BondsDlg, wxFrame )
 
 ////@begin BondsDlg event table entries
 	EVT_CLOSE( BondsDlg::OnCloseWindow )
+	EVT_MENU( wxID_CLOSE, BondsDlg::OnCloseEvent )
 
 	EVT_BUTTON( wxID_ADD, BondsDlg::OnAddClick )
 
@@ -97,8 +97,7 @@ bool BondsDlg::Create( MolDisplayWin* parent, wxWindowID id, const wxString& cap
     Parent = parent;
 
 ////@begin BondsDlg creation
-	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
-	wxDialog::Create( parent, id, caption, pos, size, style );
+	wxFrame::Create( parent, id, caption, pos, size, style );
 
 	CreateControls();
 	if (GetSizer())
@@ -189,6 +188,42 @@ void BondsDlg::CreateControls()
 	wxSize s(50, 150);
 	bondGrid->SetMinSize(s);
 	ResetList();
+
+	wxMenuBar* menuBar = new wxMenuBar;
+	wxMenu* lFileMenu = new wxMenu;
+	lFileMenu->Append(wxID_NEW, wxT("&New\tCtrl+N"), _("Open a new empty window"));
+	lFileMenu->Append(wxID_OPEN, wxT("&Open ...\tCtrl+O"), wxT("Open a file into a new window"));
+	lFileMenu->Append(wxID_CLOSE, _("&Close Window\tCtrl+W"), wxEmptyString, wxITEM_NORMAL);
+	lFileMenu->AppendSeparator();
+	lFileMenu->Append(wxID_EXIT, _("&Quit\tCtrl+Q"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(lFileMenu, _("&File"));
+	wxMenu* lEditMenu = new wxMenu;
+	lEditMenu->Append(wxID_UNDO, _("&Undo\tCtrl+Z"), _T(""), wxITEM_NORMAL);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_COPY, _("&Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
+	lEditMenu->Append(wxID_PASTE, _("&Paste\tCtrl+V"), _T(""), wxITEM_NORMAL);
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_SELECTALL, _("&Select all\tCtrl+A"), _T(""), wxITEM_NORMAL);
+	menuBar->Append(lEditMenu, _("&Edit"));
+	lEditMenu->AppendSeparator();
+	lEditMenu->Append(wxID_PREFERENCES, wxT("Global Pr&eferences"));
+	
+	wxMenu * menuWindow = new wxMenu;
+	menuWindow->Append(MMP_MOLECULEDISPLAYWINDOW, wxT("&Molecule Display"), _("The primary molecule display"));
+	menuWindow->Append(MMP_COORDSWINDOW, wxT("&Coordinates"), _("View/edit cartesian or internal coordinates"));
+	menuWindow->Append(MMP_ENERGYPLOTWINDOW, wxT("&Energy Plot"), _("A plot of the energy for each geometry"));
+	menuWindow->Append(MMP_FREQUENCIESWINDOW, wxT("&Frequencies"), _("Plot the vibrational frequencies"));
+	menuWindow->Append(MMP_INPUTBUILDERWINDOW, wxT("&Input Builder"), _T("Generate a GAMESS input file"));
+	menuWindow->Append(MMP_SURFACESWINDOW, wxT("&Surfaces"), _T("Add/Edit/Remove various surface types"));
+	menuWindow->Append(MMP_ZMATRIXCALC, wxT("&Z-Matrix Calculator"), _("Compute bond lengths/angles or dihedrals between any set of atoms"));
+	menuWindow->Append(MMP_LOCAL_PREFERENCES, wxT("Pr&eferences"), _T("Edit the preferences for this window"));
+	menuBar->Append(menuWindow, wxT("&Subwindow"));
+	
+	wxMenu * menuHelp = new wxMenu;
+	menuHelp->Append(wxID_ABOUT, wxT("&About MacMolPlt..."), _T("Learn about MacMolPlt"));
+	menuHelp->Append(wxID_HELP, wxT("&MacMolPlt Manual..."), _T("Brief documentation"));
+	menuBar->Append(menuHelp, wxT("&Help"));
+	itemDialog1->SetMenuBar(menuBar);
 }
 
 void BondsDlg::ResetList(void) {
@@ -233,6 +268,9 @@ void BondsDlg::ResetList(void) {
 				case kAromaticBond:
 					buf.Printf(wxT("%s"), _T("Aromatic"));
 					break;
+				default: ;// unknown and mixed are not applied to individual bonds
+					buf.Printf(wxT("%s"), _T("Unknown"));
+					wxLogMessage(_("BondsDlg::ResetList: unknown or mixed bond type for bond"));
 			}
 			bondGrid->SetCellValue(i, 3, buf);
 			bondGrid->SetReadOnly(i, 3, true);
@@ -336,6 +374,9 @@ void BondsDlg::OnAddClick( wxCommandEvent& event )
 			case kAromaticBond:
 				buf.Printf(wxT("%s"), _T("Aromatic"));
 				break;
+			default: ;// unknown and mixed are not applied to individual bonds
+				buf.Printf(wxT("%s"), _T("Unknown"));
+				wxLogMessage(_("BondsDlg::OnAddClick: unknown or mixed bond type for bond"));
 		}
 		bondGrid->SetCellValue(nbonds, 3, buf);
 		bondGrid->SetReadOnly(nbonds, 3, true);
@@ -406,6 +447,9 @@ void BondsDlg::OnChoiceSelected( wxCommandEvent& event )
 					lFrame->SetBondOrder(i, kAromaticBond);
 					order.Printf(wxT("%s"), _T("Aromatic"));
 					break;
+				default: ;// unknown and mixed are not applied to individual bonds
+					order.Printf(wxT("%s"), _T("Unknown"));
+					wxLogMessage(_("BondsDlg::OnChoiceSelected: unknown or mixed bond type for bond"));
 			}
 			bondGrid->SetCellValue(i, 3, order);
 		}
@@ -470,6 +514,15 @@ void BondsDlg::OnRangeSelect( wxGridRangeSelectEvent& event )
 void BondsDlg::OnCloseWindow( wxCloseEvent& event )
 {
 	Parent->CloseBondsWindow();
+}
+/*!
+ * wxEVT_CLOSE event handler for BondsDlg
+ */
+
+void BondsDlg::OnCloseEvent( wxCommandEvent& /* event */)
+{
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	parent->CloseBondsWindow();
 }
 
 

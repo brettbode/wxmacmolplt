@@ -37,11 +37,6 @@
 
 ////@begin control identifiers
 #define ID_MYDIALOG6 10191
-#define SYMBOL_ZMATRIXCALCULATOR_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
-#define SYMBOL_ZMATRIXCALCULATOR_TITLE _("Z-Matrix Calculator")
-#define SYMBOL_ZMATRIXCALCULATOR_IDNAME ID_MYDIALOG6
-#define SYMBOL_ZMATRIXCALCULATOR_SIZE wxSize(400, 300)
-#define SYMBOL_ZMATRIXCALCULATOR_POSITION wxDefaultPosition
 #define ID_ATOM1EDIT 10192
 #define ID_ATOM2EDIT 10193
 #define ID_ATOM3EDIT 10194
@@ -49,6 +44,12 @@
 #define ID_BONDLENGTHEDIT 10196
 #define ID_BONDANGLEEDIT 10197
 #define ID_DIHEDRALANGLEEDIT 10198
+#define ID_PANEL7 10199
+#define SYMBOL_ZMATRIXCALCULATOR_STYLE wxCAPTION|wxSYSTEM_MENU|wxCLOSE_BOX|wxTAB_TRAVERSAL
+#define SYMBOL_ZMATRIXCALCULATOR_TITLE _("Z-Matrix Calculator")
+#define SYMBOL_ZMATRIXCALCULATOR_IDNAME ID_MYDIALOG6
+#define SYMBOL_ZMATRIXCALCULATOR_SIZE wxSize(400, 300)
+#define SYMBOL_ZMATRIXCALCULATOR_POSITION wxDefaultPosition
 ////@end control identifiers
 
 /*!
@@ -63,7 +64,7 @@
  * ZMatrixCalculator class declaration
  */
 
-class ZMatrixCalculator: public wxDialog
+class ZMatrixCalculator: public wxFrame
 {    
     DECLARE_DYNAMIC_CLASS( ZMatrixCalculator )
     DECLARE_EVENT_TABLE()
@@ -81,42 +82,31 @@ public:
 
 ////@begin ZMatrixCalculator event handler declarations
 
-    /// wxEVT_CLOSE_WINDOW event handler for ID_MYDIALOG6
-    void OnCloseWindow( wxCloseEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM1EDIT
+	void OnAtom1editUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM1EDIT
-    void OnAtom1editUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM2EDIT
+	void OnAtom2editUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM2EDIT
-    void OnAtom2editUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM3EDIT
+	void OnAtom3editUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM3EDIT
-    void OnAtom3editUpdated( wxCommandEvent& event );
-
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM4EDIT
-    void OnAtom4editUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_ATOM4EDIT
+	void OnAtom4editUpdated( wxCommandEvent& event );
 
 ////@end ZMatrixCalculator event handler declarations
+	/// Menu handler for the close menu item
+	void OnCloseEvent( wxCommandEvent& event );
+	/// wxEVT_CLOSE_WINDOW event handler for ZMatrixCalculator
+	void OnCloseWindow( wxCloseEvent& event );
 
 ////@begin ZMatrixCalculator member function declarations
 
-    wxString GetAtom1() const { return atom1 ; }
-    void SetAtom1(wxString value) { atom1 = value ; }
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource( const wxString& name );
 
-    wxString GetAtom2() const { return atom2 ; }
-    void SetAtom2(wxString value) { atom2 = value ; }
-
-    wxString GetAtom3() const { return atom3 ; }
-    void SetAtom3(wxString value) { atom3 = value ; }
-
-    wxString GetAtom4() const { return atom4 ; }
-    void SetAtom4(wxString value) { atom4 = value ; }
-
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
-
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+	/// Retrieves icon resources
+	wxIcon GetIconResource( const wxString& name );
 ////@end ZMatrixCalculator member function declarations
 	
 	void UpdateValues(void);
@@ -128,17 +118,13 @@ public:
 	void UpdateWindowTitle(void);
 	
 ////@begin ZMatrixCalculator member variables
-    wxTextCtrl* mAtom1Edit;
-    wxTextCtrl* mAtom2Edit;
-    wxTextCtrl* mAtom3Edit;
-    wxTextCtrl* mAtom4Edit;
-    wxTextCtrl* mBondLength;
-    wxTextCtrl* mBondAngle;
-    wxTextCtrl* mDihedralAngle;
-    wxString atom1;
-    wxString atom2;
-    wxString atom3;
-    wxString atom4;
+	wxTextCtrl* mAtom1Edit;
+	wxTextCtrl* mAtom2Edit;
+	wxTextCtrl* mAtom3Edit;
+	wxTextCtrl* mAtom4Edit;
+	wxTextCtrl* mBondLength;
+	wxTextCtrl* mBondAngle;
+	wxTextCtrl* mDihedralAngle;
 ////@end ZMatrixCalculator member variables
 };
 

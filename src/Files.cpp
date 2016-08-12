@@ -472,7 +472,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					MainData->ParseMOPACZMatrix(Buffer, nAtoms, Prefs);
 				}
 				if (Prefs->GetAutoBond())	//setup bonds, if needed
-					lFrame->SetBonds(Prefs, false);
+					lFrame->SetBonds(Prefs, false, ProgressInd);
 			}
 		}
 	}
@@ -485,6 +485,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 		Buffer->SetFilePos(StartPos);
 		nAtoms = Buffer->GetNumLines(EndPos - StartPos);
 		if (nAtoms > 0) {
+			ProgressInd->ChangeText("Reading FMO Coordinates...");
 			if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
 			while (Buffer->GetFilePos() < EndPos) {
 				CPoint3D	pos;
@@ -507,8 +508,9 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				pos *= unitConversion;
 				lFrame->AddAtom((long) AtomType, pos);
 			}
-			if (Prefs->GetAutoBond())	//setup bonds, if needed
-				lFrame->SetBonds(Prefs, false);
+			if (Prefs->GetAutoBond()) {	//setup bonds, if needed
+				lFrame->SetBonds(Prefs, false, ProgressInd);
+			}
 		}
 	}
 	Buffer->SetFilePos(0);	//restart search from beginning of file
@@ -726,7 +728,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			}
 		}
 
-		lFrame->SetBonds(Prefs, true, false);
+		lFrame->SetBonds(Prefs, true, NULL, false);
 
 	}
 	if (MainData->InputOptions->FMO.IsFMOActive()) {
@@ -891,7 +893,7 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 				}
 				if (!modelFound) break;
 				if (Prefs->GetAutoBond())	//setup bonds, if needed
-					lFrame->SetBonds(Prefs, false);
+					lFrame->SetBonds(Prefs, false, ProgressInd);
 				lFrame = MainData->AddFrame(lFrame->GetNumAtoms(), lFrame->GetNumBonds());
 			}
 			long atomTest = FindKeyWord(Line, "ATOM", 4);
@@ -933,7 +935,7 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 			}
 		}
 		if (Prefs->GetAutoBond())	//setup bonds, if needed
-			lFrame->SetBonds(Prefs, false);
+			lFrame->SetBonds(Prefs, false, ProgressInd);
 	}
 	return 1;
 }
@@ -1012,7 +1014,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			if (Buffer->GetFilePos() < endOfSection) Buffer->SkipnLines(1);
 			//setup bonds, if needed
 			if (Prefs->GetAutoBond() && (nAtoms > 0))
-				lFrame->SetBonds(Prefs, false);
+				lFrame->SetBonds(Prefs, false, ProgressInd);
 		}
 	} // Coords done
 
@@ -1680,7 +1682,7 @@ long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, TextFileType fileType) {
 	mInts->InternalsToCartesians(MainData, Prefs, 0);
 	// Setup bonds, if needed													
 	if (Prefs->GetAutoBond())
-		lFrame->SetBonds(Prefs, true);
+		lFrame->SetBonds(Prefs, true, ProgressInd);
 	return 1;	// OpenMOPACFile success
 }
 
@@ -1756,7 +1758,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 				}
 				if (lVibs) lFrame->Vibs = lVibs;
 				if (Prefs->GetAutoBond())	//setup bonds, if needed
-					lFrame->SetBonds(Prefs, false);
+					lFrame->SetBonds(Prefs, false, ProgressInd);
 			}
 			wxFileOffset cPos = Buffer->GetFilePos();
 			wxFileOffset fileLength = Buffer->GetFileLength();
@@ -1951,7 +1953,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 	}
 	if ((BondLength > 0.0)||(Prefs->GetAutoBond())) {
 		Prefs->SetMaxBondLength(BondLength);
-		lFrame->SetBonds(Prefs, false);
+		lFrame->SetBonds(Prefs, false, ProgressInd);
 	}
 	if (Mode > 0) {
 		nkinds = 3*(lFrame->NumAtoms);		/* In general there will be 3N normal modes */
@@ -2052,7 +2054,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 						}
 					}
 					if (Prefs->GetAutoBond())
-						lFrame->SetBonds(Prefs, false);
+						lFrame->SetBonds(Prefs, false, ProgressInd);
 				} else break;
 			}
 		} else if (FindKeyWord(LineText, "ZMAT", 4) >= 0) {	//GAMESS-UK style z matrix
@@ -2068,7 +2070,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 					MainData->ParseGAMESSUKZMatrix(Buffer, Prefs);
 					if (lFrame->NumAtoms == 0) break;
 					if (Prefs->GetAutoBond())
-						lFrame->SetBonds(Prefs, false);
+						lFrame->SetBonds(Prefs, false, ProgressInd);
 				} else break;
 			}
 		}	//else there is some undocumented type...
@@ -2150,7 +2152,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 		}
 		Buffer->SetFilePos(0);
 		if (Prefs->GetAutoBond())
-			lFrame->SetBonds(Prefs, false);
+			lFrame->SetBonds(Prefs, false, ProgressInd);
 		//Now look for a basis set
 		//MacMolPlt only supports GTOs so we don't even look for the STO keyword
 		if (Buffer->LocateKeyWord("[GTO]", 5, -1)) {
@@ -2199,7 +2201,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 		Buffer->SetFilePos(0);
 		if (lFrame->NumAtoms > 0) {
 			if (Prefs->GetAutoBond())
-				lFrame->SetBonds(Prefs, false);
+				lFrame->SetBonds(Prefs, false, ProgressInd);
 			if (Buffer->LocateKeyWord("[FREQ]", 6, -1)) {
 				lFrame->ParseMolDenFrequencies(Buffer, Prefs);
 			}
@@ -2388,7 +2390,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 		lFrame->toggleAbInitioVisibility();
 	}
 	if (Prefs->GetAutoBond())
-		lFrame->SetBonds(Prefs, false);
+		lFrame->SetBonds(Prefs, false, ProgressInd);
 	//attempt to read in the atomic basis set
 	if (Buffer->LocateKeyWord("ATOMIC BASIS SET", 16)) {
 		ProgressInd->ChangeText("Reading atomic basis set");
@@ -2911,7 +2913,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			throw DataError();
 		}
 		if (Prefs->GetAutoBond())
-			lFrame->SetBonds(Prefs, false);
+			lFrame->SetBonds(Prefs, false, ProgressInd);
 		
 		if (!controlOptionsFound) wxLogMessage(_("Unable to locate run options. Attempting to continue"));
 		
@@ -3424,7 +3426,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			}
 
 			if (Prefs->GetAutoBond())
-				lFrame->SetBonds(Prefs, false);
+				lFrame->SetBonds(Prefs, false, ProgressInd);
 //			NextFinalPos = -1;
 			Buffer->SetFilePos(EnergyPos);
 //			long SavedPos = Buffer->GetFilePos();
@@ -4483,7 +4485,7 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 				}
 
 				if (Prefs->GetAutoBond())
-					lFrame->SetBonds(Prefs, false);
+					lFrame->SetBonds(Prefs, false, ProgressInd);
 			}
 		} else
 			++ nSkip;
@@ -4527,7 +4529,7 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 		ParseGLogLine(Buffer, lFrame, NumAtoms, 0, &(MainData->MaxSize));
 
 		if (Prefs->GetAutoBond())
-			lFrame->SetBonds(Prefs, false);
+			lFrame->SetBonds(Prefs, false, ProgressInd);
 	}
 	NumAtoms = lFrame->NumAtoms;
 	KeyWordFound = Buffer->LocateKeyWord("POINT=", 6);
@@ -4560,7 +4562,7 @@ long MolDisplayWin::OpenGAMESSIRC(BufferFile * Buffer, bool Append, long flip, f
 				if (ParseGLogLine(Buffer, lFrame, NumAtoms, 0, &(MainData->MaxSize)) <= 0) break;
 
 				if (Prefs->GetAutoBond())
-					lFrame->SetBonds(Prefs, false);
+					lFrame->SetBonds(Prefs, false, ProgressInd);
 			}
 		} else
 			++nSkip;
@@ -4645,7 +4647,7 @@ long MolDisplayWin::OpenGAMESSIRCLog(BufferFile * Buffer, long flip, float offse
 					}
 				}
 				if (Prefs->GetAutoBond())
-					lFrame->SetBonds(Prefs, false);
+					lFrame->SetBonds(Prefs, false, ProgressInd);
 			}
 		} else
 			++ nSkip;
@@ -4767,7 +4769,7 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 		ParseGLogLine(Buffer, lFrame, NumAtoms, 2, &(MainData->MaxSize));
 
 		if (Prefs->GetAutoBond())
-			lFrame->SetBonds(Prefs, false);
+			lFrame->SetBonds(Prefs, false, ProgressInd);
 
 		KeyWordFound = Buffer->LocateKeyWord(Etext, Elength);
 	}
@@ -4806,7 +4808,7 @@ long MolDisplayWin::OpenGAMESSDRC(BufferFile * Buffer, bool LogFile, bool Append
 			if (ParseGLogLine(Buffer, lFrame, NumAtoms, 2, &(MainData->MaxSize)) < 0) break;
 
 			if (Prefs->GetAutoBond())
-				lFrame->SetBonds(Prefs, false);
+				lFrame->SetBonds(Prefs, false, ProgressInd);
 		} else
 			++nskip;
 		KeyWordFound = Buffer->LocateKeyWord(Etext, Elength);
@@ -4948,7 +4950,7 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 							}
 						}
 						if (Prefs->GetAutoBond())
-							lFrame->SetBonds(Prefs, false);
+							lFrame->SetBonds(Prefs, false, ProgressInd);
 					} else {
 						wxLogMessage(_("Unexpected set of coordinates! Skipping and attempting to continue"));
 						Buffer->SkipnLines(1);
@@ -4989,7 +4991,7 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 							}
 						}
 						if (Prefs->GetAutoBond())
-							lFrame->SetBonds(Prefs, false);
+							lFrame->SetBonds(Prefs, false, ProgressInd);
 					} else Buffer->SkipnLines(1);
 					break;
 				case Orbitals: // Set of Orbitals
@@ -5039,7 +5041,7 @@ long MolDisplayWin::OpenGAMESSGlobOpLog(BufferFile * Buffer,
 								}
 							}
 							if (Prefs->GetAutoBond())
-								lFrame->SetBonds(Prefs, false);
+								lFrame->SetBonds(Prefs, false, ProgressInd);
 						}
 					} else Buffer->SkipnLines(1);
 					break;

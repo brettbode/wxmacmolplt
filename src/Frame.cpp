@@ -589,15 +589,17 @@ long Frame::GetNumElectrons(void) const {
  * anywhere.
  * @param Prefs Preferences used to determining bonding sensitivity.
  * @param KeepOldBonds Flag indicating which bonds to leave alone.
+ * @param ProgressInd A progress window to indicate long operational status
  * @param selectedOnly Flag indicating which atoms' bonds to consider.
 */
-void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
+void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, Progress * ProgressInd, bool selectedOnly) {
 
 	long		iatm, jatm, maxbonds;
 	CPoint3D	offset;
 	float		distance, AutoDist=-1.0;
 	bool		newBond=true;
 
+	if (ProgressInd) ProgressInd->ChangeText("Determining bonding...");
 	maxbonds = NumAtoms*8;
 	Bond * OldBonds = Bonds;
 	long NumOldBonds = NumBonds;
@@ -637,9 +639,22 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 	MaxBondLength *= MaxBondLength;
 	BondOrder lOrder;
 	long iType, jType;
+	float workTotal = 100.0f/NumAtoms;
+	if (AutoBond && Prefs->AllowHydrogenBonds()) workTotal /= 3.0f;
 	for (iatm=0; iatm<NumAtoms; iatm++) {
+		if (ProgressInd) {
+			if (!ProgressInd->UpdateProgress((float) iatm*workTotal)) {
+				delete [] Bonds;
+				Bonds = OldBonds;
+				NumBonds = NumOldBonds;
+				BondAllocation = OldBondAllocation;
+				return;
+			}
+		}
 		iType = Atoms[iatm].GetType();
 		if (iType > 115) continue;
+		long iSize = Prefs->GetAtomSize(iType-1);
+		CPoint3D iPos = Atoms[iatm].Position;
 		bool iSelectState = !Atoms[iatm].GetSelectState();
 		for (jatm=iatm+1; jatm<NumAtoms; jatm++) {
 			if (selectedOnly && iSelectState && !Atoms[jatm].GetSelectState())
@@ -648,9 +663,7 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 			if (HHBondFlag)	/*if both atoms are H's don't allow bonds if HHBondFlag is set*/
 				if ((iType == 1)&&(jType == 1)) continue;
 			if (jType > 115) continue;
-			offset.x = Atoms[iatm].Position.x - Atoms[jatm].Position.x;
-			offset.y = Atoms[iatm].Position.y - Atoms[jatm].Position.y;
-			offset.z = Atoms[iatm].Position.z - Atoms[jatm].Position.z;
+			offset = iPos - Atoms[jatm].Position;
 			distance = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
 			//We'll compare the squares of the distances to avoid the sqrt
 	//		distance = offset.Magnitude();
@@ -658,10 +671,8 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 			if (distance <= MaxBondLength) {
 				newBond = true;
 				lOrder = kSingleBond;
-			}
-			if (AutoBond && !newBond) {
-				AutoDist = AutoScale*((float) (Prefs->GetAtomSize(iType-1) + 
-					Prefs->GetAtomSize(jType-1)));
+			} else if (AutoBond && !newBond) {
+				AutoDist = AutoScale*((float) (iSize + Prefs->GetAtomSize(jType-1)));
 				AutoDist *= AutoDist;
 				if (distance <= AutoDist) {
 					newBond = true;
@@ -701,11 +712,21 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 		//list later.
 		std::vector<long> bondsToI, bondsToJ;
 		for (iatm=0; iatm<NumAtoms; iatm++) {
+			if (ProgressInd) {
+				if (!ProgressInd->UpdateProgress((float) (2*iatm+NumAtoms)*workTotal)) {
+					delete [] Bonds;
+					Bonds = OldBonds;
+					NumBonds = NumOldBonds;
+					BondAllocation = OldBondAllocation;
+					return;
+				}
+			}
 			iType = Atoms[iatm].GetType();
 			//only consider H bonds with N, O, F, P, S, Cl, Se, and Br
 			if (iType != 1) continue;	//Loop over hydrogens
 			if (selectedOnly && !Atoms[iatm].GetSelectState()) continue;
 			float iSize = AutoScale * ((float) (Prefs->GetAtomSize(iType-1)));
+			CPoint3D iPos = Atoms[iatm].Position;
 			bondsToI.clear();
 			for (long i=0; i<NumBonds; i++) {
 				if ((Bonds[i].Atom1 == iatm)||(Bonds[i].Atom2 == iatm)) bondsToI.push_back(i);
@@ -727,9 +748,7 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, bool selectedOnly) {
 				}
 				if (!ijbond) {	//can't be an existing bond
 					newBond = false;
-					offset.x = Atoms[iatm].Position.x - Atoms[jatm].Position.x;
-					offset.y = Atoms[iatm].Position.y - Atoms[jatm].Position.y;
-					offset.z = Atoms[iatm].Position.z - Atoms[jatm].Position.z;
+					offset = iPos - Atoms[jatm].Position;
 					distance = offset.x*offset.x + offset.y*offset.y + offset.z*offset.z;
 			//		distance = offset.Magnitude();
 	//				AutoDist = AutoScale*((float) (Prefs->GetAtomSize(iType-1) + 
@@ -2242,10 +2261,11 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 				long LineLength = strlen(LineText);
 				for (unsigned long icol=0; icol<NumVibs; icol++) {
 					if (LinePos<LineLength) {
-						sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
+						token[0]='\0';
+						int iscan = sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
 						LinePos += nchar;
 						long test = strlen(token);
-						if ((nchar>0)&&(test>0)) {
+						if ((iscan>0)&&(nchar>0)&&(test>0)) {
 							if (LineText[LinePos+1] == 'I') {
 								token[test] = 'i';
 								test++;
@@ -2267,10 +2287,11 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					long LineLength = strlen(LineText);
 					for (unsigned long icol=0; icol<NumVibs; icol++) {
 						if (LinePos<LineLength) {
-							sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
+							token[0]='\0';
+							int iscan = sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
 							LinePos += nchar;
 							long test = strlen(token);
-							if ((nchar>0)&&(test>0)) {
+							if ((iscan>0)&&(nchar>0)&&(test>0)) {
 								lVibs->Symmetry.push_back(std::string(token));
 							} else NumVibs = icol;
 						} else NumVibs = icol;
@@ -2380,7 +2401,8 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					float lmass = Prefs->GetSqrtAtomMass(Atoms[test].GetType()-1);
 					for (ifreq=LastPass; ifreq<imode; ifreq++) {
 						cmode = test + ifreq*NumAtoms;
-						sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).x), &nchar);
+						int iscan = sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).x), &nchar);
+						if (iscan <= 0) throw DataError();
 						LinePos += nchar;
 						(lVibs->NormMode[cmode]).x *= lmass;
 					}
@@ -2388,7 +2410,8 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					LinePos = 20;
 					for (ifreq=LastPass; ifreq<imode; ifreq++) {
 						cmode = test + ifreq*NumAtoms;
-						sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).y), &nchar);
+						int iscan = sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).y), &nchar);
+						if (iscan <= 0) throw DataError();
 						LinePos += nchar;
 						(lVibs->NormMode[cmode]).y *= lmass;
 					}
@@ -2396,7 +2419,8 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					LinePos = 20;
 					for (ifreq=LastPass; ifreq<imode; ifreq++) {
 						cmode = test + ifreq*NumAtoms;
-						sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).z), &nchar);
+						int iscan = sscanf(&(LineText[LinePos]), "%f%n", &((lVibs->NormMode[cmode]).z), &nchar);
+						if (iscan <= 0) throw DataError();
 						LinePos += nchar;
 						(lVibs->NormMode[cmode]).z *= lmass;
 					}

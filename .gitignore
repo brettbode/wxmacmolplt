@@ -48,3 +48,5 @@ src/surfaces.h
 ehthumbs.db
 Icon?
 Thumbs.db
+# temporary vim swap file
+*.swp

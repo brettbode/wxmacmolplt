@@ -481,6 +481,13 @@ int main(int argc, char **argv) {
 	//which will open the specified files for display or an empty window. If there are any flags
 	//(-h/--help, -v/--version or -b/--batch) choose the headless mode. In both cases the command
 	//line arguments are parsed in the Init callback for the the wx App.
+#ifdef __WXMAC__
+	//It appears that older MacOS X versions are tacking on a -psn_0_#### (process serial number) when
+	//launched from the finder. This screws up the following logic so need to catch and fix.
+	if (argc > 1) {
+		if (!strncmp("-psn",argv[1], 4)) argc = 1;
+	}
+#endif
 	
 	//Since flags should come first just test the first character of the first argument
 	if (argc >= 2 && (argv[1][0] == '-')) {

@@ -60,7 +60,7 @@ class MolDisplayWin;
  * BondsDlg class declaration
  */
 
-class BondsDlg: public wxDialog
+class BondsDlg: public wxFrame
 {    
     DECLARE_DYNAMIC_CLASS( BondsDlg )
     DECLARE_EVENT_TABLE()
@@ -115,6 +115,8 @@ public:
 	/// Retrieves icon resources
 	wxIcon GetIconResource( const wxString& name );
 ////@end BondsDlg member function declarations
+	/// Menu handler for the close menu item
+	void OnCloseEvent( wxCommandEvent& event );
 
     /// Should we show tooltips?
     static bool ShowToolTips();

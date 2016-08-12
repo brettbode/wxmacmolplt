@@ -1487,7 +1487,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 					deSelectAll = true;
 					SelectObj(selected_type, selected, deSelectAll);
 
-					lFrame->SetBonds(Prefs, true, true);
+					lFrame->SetBonds(Prefs, true, NULL, true);
 					MolWin->AtomsChanged(true, false);
 					MolWin->ReleaseLists();
 					MolWin->AdjustMenus();
@@ -1672,7 +1672,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						initialFragAtom++;
 					}
 				}
-				lFrame->SetBonds(Prefs, true, true);
+				lFrame->SetBonds(Prefs, true, NULL, true);
 				MolWin->ReleaseLists();
 			} else {
 				SelectObj(selected_type, selected, deSelectAll);
@@ -2154,7 +2154,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 	}
 
 	lFrame->SetTargetAtom(selected);
-	lFrame->SetBonds(Prefs, true, true);
+	lFrame->SetBonds(Prefs, true, NULL, true);
 	did_edit = true;
 	MolWin->AtomsChanged(true, true);
 	selected = lFrame->GetTargetAtom();
@@ -2982,7 +2982,7 @@ void MpGLCanvas::PasteAtMouse(wxCommandEvent& event) {
 		lFrame->SetAtomPosition(i, pos + offset);
 	}
 	
-	lFrame->SetBonds(Prefs, true, true);
+	lFrame->SetBonds(Prefs, true, NULL, true);
 	MolWin->BondsChanged();
 
 }

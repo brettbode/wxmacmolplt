@@ -21,6 +21,7 @@
  */
 
 ////@begin includes
+#include "wx/valtext.h"
 ////@end includes
 
 /*!
@@ -36,15 +37,15 @@
 
 ////@begin control identifiers
 #define ID_MYDIALOG3 10060
+#define ID_TEXTCTRL2 10061
+#define ID_MP2Text 10064
+#define ID_TEXTCTRL3 10062
+#define ID_TEXTCTRL4 10063
 #define SYMBOL_FRAMEENERGY_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX
 #define SYMBOL_FRAMEENERGY_TITLE _("Frame Energy")
 #define SYMBOL_FRAMEENERGY_IDNAME ID_MYDIALOG3
 #define SYMBOL_FRAMEENERGY_SIZE wxSize(400, 300)
 #define SYMBOL_FRAMEENERGY_POSITION wxDefaultPosition
-#define ID_TEXTCTRL2 10061
-#define ID_MP2Text 10064
-#define ID_TEXTCTRL3 10062
-#define ID_TEXTCTRL4 10063
 ////@end control identifiers
 
 /*!
@@ -77,32 +78,32 @@ public:
 
 ////@begin FrameEnergy event handler declarations
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
-    void OnOkClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
+	void OnOkClick( wxCommandEvent& event );
 
 ////@end FrameEnergy event handler declarations
 
 ////@begin FrameEnergy member function declarations
 
-    MolDisplayWin * GetParent() const { return Parent ; }
-    void SetParent(MolDisplayWin * value) { Parent = value ; }
+	MolDisplayWin * GetParent() const { return Parent ; }
+	void SetParent(MolDisplayWin * value) { Parent = value ; }
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource( const wxString& name );
 
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+	/// Retrieves icon resources
+	wxIcon GetIconResource( const wxString& name );
 ////@end FrameEnergy member function declarations
 
     /// Should we show tooltips?
     static bool ShowToolTips();
 
 ////@begin FrameEnergy member variables
-    wxTextCtrl* TEedit;
-    wxTextCtrl* MP2edit;
-    wxTextCtrl* KEedit;
-    wxTextCtrl* TimeEdit;
-    MolDisplayWin * Parent;
+	wxTextCtrl* TEedit;
+	wxTextCtrl* MP2edit;
+	wxTextCtrl* KEedit;
+	wxTextCtrl* TimeEdit;
+	MolDisplayWin * Parent;
 ////@end FrameEnergy member variables
 };
 

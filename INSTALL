@@ -2,21 +2,23 @@ Currently wxMacMolPlt includes build files and has been tested on Mac OS X,
 Linux and Windows. Since most people building from source will be running
 Linux this file focuses on the build instructions for Linux. To build from
 source on any OS you must have a C++ compiler such as g++ and an install
-of wxWidgets with OpenGL support enabled. wxWidgets 2.6 through 3.0.x 
-have worked in the past, but only 2.8 and later are currently tested.
-Prebuilt packages should also work.  If you are building on
-Fedora Core 5 or 6 first install the wxGTK-2.6.3, wxGTK-gl-2.6.3 and
-wxGTK-devel-2.6.3 rpms. With those three rpms installed you should have no
-trouble building or running wxMacMolPlt. Newer distros generally include a
-2.8 based wx and are preferred.
+of wxWidgets with OpenGL support enabled. wxWidgets 2.6 through 3.x 
+have worked in the past, but only 2.8 and later are currently tested and
+wxWidgets 2.6.x is likely to no longer build.
+Before building wxWidgets from source please check for prebuilt packages for
+your OS as those should be preferred to avoid installation issues. Either
+2.8.x or 3.x packages should be fine, but if you have a choice prefer the
+newer 3.x packages.
 
 If your distribution does not offer a prebuilt wxWidgets package you will need
 to grab the latest source copy from www.wxwidgets.org and install it. You 
 should be able to do this using the following (opengl is required, unicode is
-optional, but should be used if you use non ascii chars in your file system):
+optional in 2.8, but should be used if you use non ascii chars in your file system):
    ./configure --with-gtk --with-opengl --enable-unicode
    make
    make install
+
+On 3.x versions of wx those flags are likely the default, but don't hurt.
 
 Optional: MacMolPlt includes the ability to use the Ming library to export
 animations to Flash movies. The configure script checks for the presence of
@@ -33,7 +35,7 @@ If you have installed wxWidgets in a non-standard location you can add
 --with-wx-config=/path/to/wx
 to the ./configure step. The make install step is important as it installs two
 required resource files in addition to the binary. Once installed you should
-be able to run MacMolPlt by typing "wxMacMolPlt".
+be able to run MacMolPlt by typing "wxmacmolplt".
 
 If you get an error during the MacMolPlt configure step saying that your wx
 build lacks OpenGL support the problem may be that you need the location of
@@ -41,6 +43,11 @@ the wxWidgets shared libraries in your ld path. First as root try running:
   ldconfig
 Then retry the configure step. If that still doesn't work check that the file
 /etc/ld.so.conf contains the path to the directory containing your wxWidgets
-libraries. Then rerun ldconfig. Alternatively you can build static wxWidgets
-libraries by adding "--disable-shared" to the wxWidgets configure step.
+libraries. Then rerun ldconfig. You can also add the library path to your
+LD_LIBRARY_PATH environment variable. Alternatively you can build static 
+wxWidgets libraries by adding "--disable-shared" to the wxWidgets configure 
+step.
 
+The project files for Visual Studio and XCode are not included in the source
+distribution tar file, but are in the repository. They would require some
+modification for a different user.
