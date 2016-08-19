@@ -129,7 +129,7 @@ class MpApp : public wxApp {
 		/**
 		 * Event sent on Macs when double click a document
 		 *
-		 * @param the filename to open
+		 * @param fileName to open
 		 */
 		void MacOpenFile(const wxString & fileName);
 #endif

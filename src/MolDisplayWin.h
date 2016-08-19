@@ -202,7 +202,7 @@ private:
 	Bond *		Bonds;		///< Saved bond list
 	long		NumAtoms;	///< atom count
 	long		NumBonds;	///< bond count
-	std::vector<std::string> FragmentNames;	//< Effective Fragment name for each fragment (FRAGNAME)
+	std::vector<std::string> FragmentNames;	///< Effective Fragment name for each fragment (FRAGNAME)
 	Internals * IntCoords;	///< Set of internal coordinate definitions
 };
 

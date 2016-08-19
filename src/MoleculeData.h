@@ -129,7 +129,7 @@ class MoleculeData {
 		bool ParseFMOIds(BufferFile * Buffer, const long & NumAtoms, const wxFileOffset & EndOfGroup);
 		/**
 		 * Write the FMO array to XML
-		 * @param parent
+		 * @param parent The enclosing XML element
 		 */
 		void WriteFMOIdsToXML(XMLElement * parent);
 		/**

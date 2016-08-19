@@ -619,7 +619,7 @@ class Surface {
 		/**
 		 * Exports surface data to our text file type	
 		 * This can effectively only be called by Surf3DBase objects
-		 * @param Grid3D
+		 * @param Grid3D The 3D array of grid points
 		 * @param nx number of grid points on the X axis
 		 * @param ny number of grid points on the Y axis
 		 * @param nz number of grid points on the Z axis

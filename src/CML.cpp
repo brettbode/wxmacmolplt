@@ -471,7 +471,7 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 	bool	AtomAttributes=false;
 	for (int i=0; i<NumAtoms; i++) {
 			//output CML2 style atom information of the form:
-			//<atom id="a1" elementType="C" x3="-0.0167" y3="1.3781" z3="0.0096"/>
+			//   <atom id="a1" elementType="C" x3="-0.0167" y3="1.3781" z3="0.0096"/>
 		XMLElement * atomEle = AArrayElement->addChildElement(CML_convert(AtomElement));
 			//id's are used to reference the atoms later for bonding, I will generate
 			//simple ids 'a' + index number (the CML spec discourages the use of all numeric ids)
@@ -494,7 +494,7 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 	if (NumBonds > 0) {
 		XMLElement * bondArrayEle = molElement->addChildElement(CML_convert(BondArrayElement));
 		for (int j=0; j<NumBonds; j++) {
-				//<bond id="b1" atomRefs2="a1 a2" order="S"/>
+				// <bond id="b1" atomRefs2="a1 a2" order="S"/>
 				//CML only specifies single, double, triple, and aromatic bonds
 				//Need to handle hydrogen bonds as an extension
 			if ((Bonds[j].Order == kHydrogenBond)||(Bonds[j].Order > kAromaticBond)) {
@@ -554,7 +554,7 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 		if (NonCMLBonds) {
 			XMLElement * bondArrayEle = listElement->addChildElement(CML_convert(MMP_BondArrayElement));
 			for (int j=0; j<NumBonds; j++) {
-				//<bond id="b1" atomRefs2="a1 a2" order="S"/>
+				// <bond id="b1" atomRefs2="a1 a2" order="S"/>
 				//CML only specifies single, double, triple, and aromatic bonds
 				//Need to handle hydrogen bonds as an extension
 				if ((Bonds[j].Order >= kSingleBond)&&(Bonds[j].Order <= kTripleBond)) {
@@ -1803,7 +1803,7 @@ bool Frame::ParseAtomXML(XMLElement * atomXML, std::map<std::string, long> & idL
 	bool	good=false;
 	
 	//Look for CML2 stuff first, all attributes
-	//<atom id="a1" elementType="C" x3="-0.0167" y3="1.3781" z3="0.0096"/>
+	// <atom id="a1" elementType="C" x3="-0.0167" y3="1.3781" z3="0.0096"/>
 
 	const char * et = atomXML->getAttributeValue(CML_convert(elementTypeAttr));
 	if (et != NULL) {	//I think the presence of "elementType" as an attribute should signal CML2
@@ -1821,10 +1821,10 @@ bool Frame::ParseAtomXML(XMLElement * atomXML, std::map<std::string, long> & idL
 			}
 		}
 	} else {	//parse CML1 style like:
-				//<string builtin="elementType">C</string>
-				//<float builtin="x3">1.1709</float>
-				//<float builtin="y3">2.0855</float>
-				//<float builtin="z3">0.0021</float>
+				// <string builtin="elementType">C</string>
+				// <float builtin="x3">1.1709</float>
+				// <float builtin="y3">2.0855</float>
+				// <float builtin="z3">0.0021</float>
 		XMLElementList * strList = atomXML->getElementsByName("string");
 		if (strList->length() > 0) {
 			for (int i=0; i< strList->length(); i++) {
@@ -1990,7 +1990,7 @@ void Frame::ParseBondArrayXML(XMLElement * arrayXML, const std::map<std::string,
 }
 
 bool Frame::ParseBondXML(XMLElement * bondXML, const std::map<std::string, long> & idList) {
-	//<bond id="a1" atomRefs2="a1 a2" order="S"/>
+	// <bond id="a1" atomRefs2="a1 a2" order="S"/>
 	
 	const char * et = bondXML->getAttributeValue(CML_convert(atomRefs2Attr));
 	if (et != NULL) {
@@ -2022,11 +2022,11 @@ bool Frame::ParseBondXML(XMLElement * bondXML, const std::map<std::string, long>
 			}
 		}
 	} else { // CML1 style bond info
-			//<bond>
-			//<string builtin="atomRef">a1</string>
-			//<string builtin="atomRef">a2</string>
-			//<string builtin="order">1</string>
-			//</bond>
+			// <bond>
+			//   <string builtin="atomRef">a1</string>
+			//   <string builtin="atomRef">a2</string>
+			//   <string builtin="order">1</string>
+			// </bond>
 		XMLElementList * strList = bondXML->getElementsByName("string");
 		if (strList->length() > 0) {
 			long id1, id2, nrefs=0;
