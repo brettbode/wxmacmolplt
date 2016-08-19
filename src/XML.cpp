@@ -732,11 +732,11 @@ bool XMLElement::getAttributeValue(const char * target, float & result) const {
 	const char * val = getAttributeValue(target);
 	if (val) {
 		if (strlen(val)>0) {
-			float temp;
+			double temp;
 			char * end;
 			temp = strtod(val, &end);
 			if (end[0] == '\0') { 
-				result = temp;
+				result = (float) temp;
 				success = true;
 			}
 			//		sscanf(val, "%f", &temp);

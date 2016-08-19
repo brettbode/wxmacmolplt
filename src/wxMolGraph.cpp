@@ -244,7 +244,7 @@ void wxMolGraph::autoScaleY(int axis) {
         pad = (max - min) / 10.0;
         max += pad;
         min -= pad;
-        if(!(max - min)) {
+        if((max - min)<=0.0) {	//The range just needs to be non-zero
             max += 1.0;
             min -= 1.0;
         }
@@ -303,7 +303,7 @@ void wxMolGraph::autoScaleX(void) {
         pad = (max - min) / 10.0;
         max += pad;
         min -= pad;
-        if(!(max - min)) {
+        if((max - min)<=0.0) {	//The range just needs to be nonzero
             max += 1.0;
             min -= 1.0;
         }

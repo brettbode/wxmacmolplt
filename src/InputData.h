@@ -599,7 +599,7 @@ class EffectiveFragmentsGroup {
 		void PositionIsDefault(bool v) {flags = (flags & 0xF7) + (v ? 8 : 0);};
 		bool SetPositionType(const char * v);
 		EFRAG_PositionTypes PositionMethod(void) const {return (EFRAG_PositionTypes)(((flags & 48)>>4)+1);};
-		void PositionMethod(EFRAG_PositionTypes v) {flags = (flags & 0xCF) + ((v-1)<<4);PositionIsDefault(false);};
+		void PositionMethod(EFRAG_PositionTypes v) {flags = (flags & 0xCF) + (((char)v-1)<<4);PositionIsDefault(false);};
 		long GetMaxMOs(void) const {return MaxMOs;};
 		void SetMaxMOs(long v) {MaxMOs = v;};
 		long GetNumBufferMOs(void) const {return NumBufferMOs;};

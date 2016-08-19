@@ -212,9 +212,9 @@ void MoleculeData::CenterModelWindow(void) {
 		lFrame = lFrame->GetNextFrame();
 	}
 //The center is now just half of the min plus the max
-	Centroid.x = (XMax+XMin)*0.5;
-	Centroid.y = (YMax+YMin)*0.5;
-	Centroid.z = (ZMax+ZMin)*0.5;
+	Centroid.x = (XMax+XMin)*0.5f;
+	Centroid.y = (YMax+YMin)*0.5f;
+	Centroid.z = (ZMax+ZMin)*0.5f;
 //Recompute the maximum width of the molecule
 	MaxSize = MAX((XMax-XMin), (YMax-YMin));
 	MaxSize = MAX(MaxSize, (ZMax-ZMin));
@@ -512,7 +512,7 @@ void MoleculeData::LinearLeastSquaresFit(Progress * lProgress) {
 		bool	Done;
 		for (long ipass=0; ipass<4; ipass++) {
 			if (ipass<3) {
-				RotAngle = 10.0;	TransAmount=0.1;
+				RotAngle = 10.0f;	TransAmount=0.1f;
 				if (ipass == 0) iOptAtoms = MIN(2, lFrame->NumAtoms);
 				else if (ipass == 1) iOptAtoms = MIN(3, lFrame->NumAtoms);
 				else iOptAtoms = lFrame->NumAtoms;
@@ -538,7 +538,7 @@ void MoleculeData::LinearLeastSquaresFit(Progress * lProgress) {
 								SquaresValue = NewSquareValue;
 								CopyMatrix (TempRotMat, FitMatrix);
 							} else {
-								ApplyRotation(TempRotMat, ii, -2.0*RotAngle);
+								ApplyRotation(TempRotMat, ii, -2.0f*RotAngle);
 								for (int i=0; i<iOptAtoms; i++)
 									Rotate3DPt(TempRotMat, l2Frame->Atoms[i].Position, &(RotCoords[i]));
 								NewSquareValue = CalculateSquaresValue(iOptAtoms, lFrame->Atoms, RotCoords);
