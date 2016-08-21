@@ -801,8 +801,8 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 		long		AtomType;
 		int			con1, con2, con3;
 		Buffer->GetLine(Line);
-		int readCount = sscanf(Line, "%s %d %s %d %s %d %s", token, &con1, bondText, &con2, &angleText, &con3,
-							   &dihedralText);
+		int readCount = sscanf(Line, "%255s %d %255s %d %255s %d %255s", token, &con1, bondText, &con2, angleText, &con3,
+							   dihedralText);
 		if (readCount < 1) break;	//failed to parse anything??
 		AtomType = SetAtomType((unsigned char *) token);
 		if (AtomType < 0) break;
@@ -924,7 +924,7 @@ void MoleculeData::ParseGAMESSUKZMatrix(BufferFile * Buffer, WinPrefs * Prefs) {
 			int readCount = sscanf(Line, "%s %lf", token, &value);
 			if (readCount!=2) break;
 			std::pair<std::string, double> myVal(token, value);
-			std::pair<std::map<std::string, double>::iterator, bool> p = valueMap.insert(myVal);
+			/*std::pair<std::map<std::string, double>::iterator, bool> p = */ valueMap.insert(myVal);
 			if (! myVal.second) {	//We have hit a duplicate value
 				MessageAlert("Duplicate keys detected in the value list");
 			}
@@ -940,7 +940,7 @@ void MoleculeData::ParseGAMESSUKZMatrix(BufferFile * Buffer, WinPrefs * Prefs) {
 			int readCount = sscanf(Line, "%s %lf", token, &value);
 			if (readCount!=2) break;
 			std::pair<std::string, double> myVal(token, value);
-			std::pair<std::map<std::string, double>::iterator, bool> p = valueMap.insert(myVal);
+			/*std::pair<std::map<std::string, double>::iterator, bool> p = */ valueMap.insert(myVal);
 			if (! myVal.second) {	//We have hit a duplicate value
 				MessageAlert("Duplicate keys detected in the value list");
 			}
@@ -957,8 +957,8 @@ void MoleculeData::ParseGAMESSUKZMatrix(BufferFile * Buffer, WinPrefs * Prefs) {
 		long		AtomType;
 		int			con1, con2, con3;
 		Buffer->GetLine(Line);
-		int readCount = sscanf(Line, "%s %d %s %d %s %d %s", token, &con1, bondText, &con2, &angleText, &con3,
-							   &dihedralText);
+		int readCount = sscanf(Line, "%255s %d %255s %d %255s %d %255s", token, &con1, bondText, &con2, angleText, &con3,
+							   dihedralText);
 		if (readCount < 1) break;	//failed to parse anything??
 		AtomType = SetAtomType((unsigned char *) token);
 		if (AtomType < 0) break;
@@ -1942,7 +1942,7 @@ long MoleculeData::CreateFMOFragmentation(const int & NumMolecules, std::vector<
 		fragCenters.reserve(NextId);
 		for (long ifrag=0; ifrag<NextId; ++ifrag) {
 			fragCenters.push_back(CPoint3D(0,0,0));
-			long atmcount;
+			long atmcount=0;
 			for (long iatom=0; iatom<cFrame->GetNumAtoms(); ++iatom) {
 				if (newFragmentation[iatom] == (ifrag+1)) {
 					fragCenters[ifrag].x += cFrame->Atoms[iatom].Position.x;
@@ -2186,8 +2186,8 @@ void MoleculeData::ExportPOV(BufferFile *Buffer, WinPrefs *Prefs) {
 
 			sprintf(tmpStr,
 					"object {\n"
-					"   Atom_%03d\n"
-					"   Center_Trans(Atom_%03d, x + y)\n"
+					"   Atom_%03ld\n"
+					"   Center_Trans(Atom_%03ld, x + y)\n"
 					"   scale <0.25, 0.25, 1.0>\n"
 					"   translate <%f, %f, %f>\n"
 					"   no_shadow\n"

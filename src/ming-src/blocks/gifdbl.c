@@ -9,12 +9,14 @@
 
 SWFDBLBitmapData newSWFDBLBitmapData_fromGifInput(SWFInput input)
 {
+	(void) input;
 	SWF_error("newSWFDBLBitmapData_fromGifInput can't be used (no gif compiled into this build of Ming).\n");
 	return NULL;
 }
 
 SWFDBLBitmapData newSWFDBLBitmapData_fromGifFile(const char * fileName)
 {
+	(void) fileName;
 	SWF_error("newSWFDBLBitmapData_fromGifFile can't be used (no gif compiled into this build of Ming).\n");
 	return NULL;
 }

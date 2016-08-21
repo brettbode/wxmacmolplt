@@ -384,7 +384,9 @@ const char * OrbitalRec::getOrbitalTypeText(void) const {
 			return "VB2000 Localized Molecular Orbitals";
 		case VB2000MolecularOrbital:
 			return "VB2000 Molecular Orbitals";
-//		default:
+		default:
+			wxLogMessage(_T("Unhandled orbital type in GetOrbitalTypeText"));
+			break;
 	}
 	return "Molecular Orbitals";
 }

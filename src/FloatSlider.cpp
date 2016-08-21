@@ -107,6 +107,7 @@ void FloatSlider::OnSliderChange(wxCommandEvent& event) {
  * @param event The text change event.
  */
 void FloatSlider::OnTextChange(wxCommandEvent& event) {
+	(void)event;
 
 	// Slider control needs updating too.
 	SyncSlider();

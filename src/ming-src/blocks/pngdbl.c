@@ -7,12 +7,14 @@
 
 SWFDBLBitmapData newSWFDBLBitmapData_fromPngInput(SWFInput input)
 {
+	(void) input;
 	SWF_warn("newSWFDBLBitmapData_fromPngInput can't be used (no png compiled into this build of Ming).\n");
 	return NULL;
 }
 
 SWFDBLBitmapData newSWFDBLBitmapData_fromPngFile(const char * fileName)
 {
+	(void) fileName;
 	SWF_warn("newSWFDBLBitmapData_fromPngFile can't be used (no png compiled into this build of Ming).\n");
 	return NULL;
 }

@@ -231,7 +231,7 @@ void MOPacInternals::UpdateInternalValuesAtom(MoleculeData * MainData, long theA
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	if ((theAtom <= 0)||(theAtom*3 > Count)) return;	//sanity check
 	long BondedAtom, AngleAtom, DihedralAtom;
-	float BondLength, BondAngle, Dihedral;
+	float BondLength, BondAngle, Dihedral=0.0;
 	CPoint3D BondVector, offset2, offset3;
 	//Bond Length
 	BondedAtom = ConnectionAtoms[3*theAtom];

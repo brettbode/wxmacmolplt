@@ -358,6 +358,7 @@ void SetScreenPlane::setPlaneValues(void) {
 
 void SetScreenPlane::OnOkClick( wxCommandEvent& event )
 {
+	(void)event;
 	MoleculeData * MainData = parent->GetData();
 	if (MainData->SetScreenPlane(PlanePts))
 		parent->ResetModel(false);
@@ -371,6 +372,7 @@ void SetScreenPlane::OnOkClick( wxCommandEvent& event )
 
 void SetScreenPlane::OnAtom1Updated( wxCommandEvent& event )
 {
+	(void)event;
 	if ((Atom1Ctl->GetLineLength(0)>0)&&Atom1Ctl->IsModified()) {
 		bool validAtom = false;
 		wxString text = Atom1Ctl->GetValue();
@@ -407,6 +409,7 @@ void SetScreenPlane::OnAtom1Updated( wxCommandEvent& event )
 
 void SetScreenPlane::OnPt1xUpdated( wxCommandEvent& event )
 {
+	(void)event;
 	if (Pt1XCtl->IsModified()) {
 		bool valid = false;
 		wxString text = Pt1XCtl->GetValue();
@@ -430,6 +433,7 @@ void SetScreenPlane::OnPt1xUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnPt1yUpdated( wxCommandEvent& event )
 {
+	(void)event;
 	if (Pt1YCtl->IsModified()) {
 		bool valid = false;
 		wxString text = Pt1YCtl->GetValue();
@@ -453,6 +457,7 @@ void SetScreenPlane::OnPt1yUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnPt1zUpdated( wxCommandEvent& event )
 {
+	(void)event;
 	if (Pt1ZCtl->IsModified()) {
 		bool valid = false;
 		wxString text = Pt1ZCtl->GetValue();
@@ -476,6 +481,7 @@ void SetScreenPlane::OnPt1zUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnAtom2Updated( wxCommandEvent& event )
 {
+	(void)event;
 	if ((Atom2Ctl->GetLineLength(0)>0)&&Atom2Ctl->IsModified()) {
 		bool validAtom = false;
 		wxString text = Atom2Ctl->GetValue();
@@ -512,6 +518,7 @@ void SetScreenPlane::OnAtom2Updated( wxCommandEvent& event )
 
 void SetScreenPlane::OnPt2xUpdated( wxCommandEvent& event )
 {
+	(void)event;
 	if (Pt2XCtl->IsModified()) {
 		bool valid = false;
 		wxString text = Pt2XCtl->GetValue();
@@ -535,6 +542,7 @@ void SetScreenPlane::OnPt2xUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnPt2yUpdated( wxCommandEvent& event )
 {
+	(void)event;
 	if (Pt2YCtl->IsModified()) {
 		bool valid = false;
 		wxString text = Pt2YCtl->GetValue();
@@ -558,6 +566,7 @@ void SetScreenPlane::OnPt2yUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnPt2zUpdated( wxCommandEvent& event )
 {
+	(void)event;
 	if (Pt2ZCtl->IsModified()) {
 		bool valid = false;
 		wxString text = Pt2ZCtl->GetValue();
@@ -581,6 +590,7 @@ void SetScreenPlane::OnPt2zUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnAtom3Updated( wxCommandEvent& event )
 {
+	(void)event;
 	if ((Atom3Ctl->GetLineLength(0)>0)&&Atom3Ctl->IsModified()) {
 		bool validAtom = false;
 		wxString text = Atom3Ctl->GetValue();
@@ -617,6 +627,7 @@ void SetScreenPlane::OnAtom3Updated( wxCommandEvent& event )
 
 void SetScreenPlane::OnPt3xUpdated( wxCommandEvent& event )
 {
+	(void)event;
 	if (Pt3XCtl->IsModified()) {
 		bool valid = false;
 		wxString text = Pt3XCtl->GetValue();
@@ -640,6 +651,7 @@ void SetScreenPlane::OnPt3xUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnPt3yUpdated( wxCommandEvent& event )
 {
+	(void)event;
 	if (Pt3YCtl->IsModified()) {
 		bool valid = false;
 		wxString text = Pt3YCtl->GetValue();
@@ -663,6 +675,7 @@ void SetScreenPlane::OnPt3yUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnPt3zUpdated( wxCommandEvent& event )
 {
+	(void)event;
 	if (Pt3ZCtl->IsModified()) {
 		bool valid = false;
 		wxString text = Pt3ZCtl->GetValue();
@@ -686,6 +699,7 @@ void SetScreenPlane::OnPt3zUpdated( wxCommandEvent& event )
 
 void SetScreenPlane::OnXyClick( wxCommandEvent& event )
 {
+	(void)event;
 	atom1 = atom2 = atom3 = -1;
 	for (int i=0; i<3; i++)
 		PlanePts[i].x = PlanePts[i].y = PlanePts[i].z = 0.0;
@@ -702,6 +716,7 @@ void SetScreenPlane::OnXyClick( wxCommandEvent& event )
 
 void SetScreenPlane::OnYxClick( wxCommandEvent& event )
 {
+	(void)event;
 	atom1 = atom2 = atom3 = -1;
 	for (int i=0; i<3; i++)
 		PlanePts[i].x = PlanePts[i].y = PlanePts[i].z = 0.0;
@@ -718,6 +733,7 @@ void SetScreenPlane::OnYxClick( wxCommandEvent& event )
 
 void SetScreenPlane::OnXzClick( wxCommandEvent& event )
 {
+	(void)event;
 	atom1 = atom2 = atom3 = -1;
 	for (int i=0; i<3; i++)
 		PlanePts[i].x = PlanePts[i].y = PlanePts[i].z = 0.0;
@@ -735,6 +751,7 @@ void SetScreenPlane::OnXzClick( wxCommandEvent& event )
 
 void SetScreenPlane::OnZxClick( wxCommandEvent& event )
 {
+	(void)event;
 	atom1 = atom2 = atom3 = -1;
 	for (int i=0; i<3; i++)
 		PlanePts[i].x = PlanePts[i].y = PlanePts[i].z = 0.0;
@@ -751,6 +768,7 @@ void SetScreenPlane::OnZxClick( wxCommandEvent& event )
 
 void SetScreenPlane::OnYzClick( wxCommandEvent& event )
 {
+	(void)event;
 	atom1 = atom2 = atom3 = -1;
 	for (int i=0; i<3; i++)
 		PlanePts[i].x = PlanePts[i].y = PlanePts[i].z = 0.0;
@@ -767,6 +785,7 @@ void SetScreenPlane::OnYzClick( wxCommandEvent& event )
 
 void SetScreenPlane::OnZyClick( wxCommandEvent& event )
 {
+	(void)event;
 	atom1 = atom2 = atom3 = -1;
 	for (int i=0; i<3; i++)
 		PlanePts[i].x = PlanePts[i].y = PlanePts[i].z = 0.0;

@@ -2308,7 +2308,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					float	rmass;
 					for (long icol=0; icol<tVib; icol++) {
 						if (LinePos<LineLength) {
-							test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
+							test = sscanf(&(LineText[LinePos]), "%255s%n", token, &nchar);
 							LinePos += nchar;
 							if (test) {
 								if (token[0] != '*') {
@@ -2328,7 +2328,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					float	Inten;
 					for (long icol=0; icol<tVib; icol++) {
 						if (LinePos<LineLength) {
-							test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
+							test = sscanf(&(LineText[LinePos]), "%255s%n", token, &nchar);
 							LinePos += nchar;
 							if (test) {
 								if (token[0] != '*') {
@@ -2353,7 +2353,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					float	raman;
 					for (long icol=0; icol<tVib; icol++) {
 						if (LinePos<LineLength) {
-							test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
+							test = sscanf(&(LineText[LinePos]), "%255s%n", token, &nchar);
 							LinePos += nchar;
 							if (test) {
 								if (token[0] != '*') {
@@ -2376,7 +2376,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					float	depol;
 					for (long icol=0; icol<tVib; icol++) {
 						if (LinePos<LineLength) {
-							test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
+							test = sscanf(&(LineText[LinePos]), "%255s%n", token, &nchar);
 							LinePos += nchar;
 							if (test) {
 								if (token[0] != '*') {

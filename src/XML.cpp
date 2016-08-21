@@ -1162,7 +1162,7 @@ int XMLElement::getElementCount(const char * name) const {
 	return count;
 }
 
-void XMLElement::ParseNamespaceTags(std::vector<std::string> & tagNames, std::vector<int> & tagIds) {
+void XMLElement::ParseNamespaceTags(std::vector<std::string> & /*tagNames*/, std::vector<int> & /*tagIds*/) {
 //	int numLocalTags = 0;	//keep track of ids defined in this element as
 							//they must be removed before exiting
 		//Search for namespace definition attributes first

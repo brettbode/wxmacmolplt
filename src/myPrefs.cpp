@@ -157,9 +157,9 @@ BEGIN_EVENT_TABLE(QD3DPrefsPane, wxPanel)
 	EVT_SPINCTRL(ID_3D_AUTOROTATIONY_SPIN, QD3DPrefsPane::OnSpinChange)
 END_EVENT_TABLE()
 
-PrefsPane::PrefsPane(MolDisplayWin* targetWindow,
+PrefsPane::PrefsPane(MolDisplayWin* /*targetWindow*/,
 					 WinPrefs* targetPrefs,
-					 short PaneID,
+					 short /*PaneID*/,
 					 Boolean GlobalPrefs,
 					 wxBookCtrlBase *parent)
 	: wxPanel(parent, -1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER) { 
@@ -218,7 +218,7 @@ AtomPrefsPane::~AtomPrefsPane() {
 
 }
 
-void AtomPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+void AtomPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 
 	for (int i = 0; i < NUM_ATOM_LABELS; i++) {
 		mMainSizer->Add(new wxStaticText(scroll_win, wxID_ANY, mLabels[i],
@@ -298,7 +298,7 @@ BondPrefsPane::~BondPrefsPane() {
 	delete mNormColorArea;
 }
 
-void BondPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+void BondPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	mChkAnim = new wxCheckBox(this, ID_SHOW_NORMAL_MODE_ANIMATION, _T("Show Normal Mode During Animation"), wxDefaultPosition);
 	mChkAnim->SetValue(mTargetPrefs->GetAnimateMode());
 	mChkRotation = new wxCheckBox(this, ID_SHOW_NORMAL_MODE_ROTATION, _T("Show Normal Mode During Rotation"), wxDefaultPosition);
@@ -422,7 +422,7 @@ DisplayPrefsPane::DisplayPrefsPane(MolDisplayWin* targetWindow,
 }
 
 #include <iostream>
-void DisplayPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+void DisplayPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	if (mTargetPrefs->DrawBallnStick() && !mTargetPrefs->DrawWireFrame())
 		mRdoBox->SetSelection(0);
 	else if (!mTargetPrefs->DrawBallnStick() && mTargetPrefs->DrawWireFrame())
@@ -488,10 +488,10 @@ void DisplayPrefsPane::OnCheckBox(wxCommandEvent &event) {
 	if (event.GetId() == ID_COLOR_BONDS_BY_ATOM_COLOR)
 		mTargetPrefs->ColorBondHalves(mChkColor->GetValue());
 }
-void DisplayPrefsPane::OnAtomLabelSlider(wxCommandEvent &event) {
+void DisplayPrefsPane::OnAtomLabelSlider(wxCommandEvent &/*event*/) {
 	mTargetPrefs->SetAtomLabelSize((float)(mAtomLabelSizeSlider->GetValue())/100.0);
 }
-void DisplayPrefsPane::OnAnnotationLabelSlider(wxCommandEvent &event) {
+void DisplayPrefsPane::OnAnnotationLabelSlider(wxCommandEvent &/*event*/) {
 	mTargetPrefs->SetAnnotationLabelSize((float)(mAnnotationLabelSizeSlider->GetValue())/100.0);
 }
 
@@ -538,7 +538,7 @@ EnergyPrefsPane::~EnergyPrefsPane() {
 	if (mY2pt) delete mY2pt;
 }
 
-void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	EnergyOptions * lEOpts = mTargetPrefs->GetEnergyOptions();
 	GraphOptions * lPOpts = mTargetPrefs->GetGraphOptions();
 	//Setup the slider for the E plot point size
@@ -771,7 +771,7 @@ void EnergyPrefsPane::OnRadio(wxCommandEvent& event) {
 	GraphOptions * lPOpts = mTargetPrefs->GetGraphOptions();
 
 	if (event.GetId() == ID_UNIT_RADIOBOX) {
-		EnergyUnit lunit;
+		EnergyUnit lunit=kDefault;
 
 		if (tmpStr.Cmp(_T("Default")) == 0)
 			lunit = kDefault;
@@ -815,7 +815,7 @@ FilePrefsPane::FilePrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent
 	SetSizer(mMainSizer);
 }
 
-void FilePrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+void FilePrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	wxBoxSizer* UpperSizer = new wxBoxSizer(wxVERTICAL);
 	mMainSizer->Add(UpperSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
@@ -944,7 +944,7 @@ ScalingPrefsPane::ScalingPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *
 
 }
 
-void ScalingPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+void ScalingPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	mSld[0] = new wxSlider(this, ID_ATOM_SIZE_SLIDER, 
 			(int)(mTargetPrefs->GetAtomScale()*10000+0.5), 
 			0, 250, wxDefaultPosition, 
@@ -995,7 +995,7 @@ StereoPrefsPane::StereoPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *pa
 	}
 }
 
-void StereoPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+void StereoPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 
 #if wxCHECK_VERSION(2,9,0)
 	int attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16,
@@ -1058,7 +1058,7 @@ SurfacePrefsPane::~SurfacePrefsPane() {
 	delete mSurfColor[1];
 }
 
-void SurfacePrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+void SurfacePrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	SurfaceOptions * lSOpts = mTargetPrefs->GetSurfaceOptions();
 
 	mLeftSizer->Add(new wxStaticText(this, wxID_ANY, _T("Surface Colors:")), 0, wxALIGN_CENTER | wxALL, 3);
@@ -1179,7 +1179,7 @@ QD3DPrefsPane::QD3DPrefsPane(MolDisplayWin* targetWindow, wxBookCtrlBase *parent
 
 }
 
-void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* targetWindow) {
+void QD3DPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 
 	int rflags = wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL;
 	int lflags = wxALIGN_CENTER_VERTICAL | wxALIGN_LEFT | wxALL;

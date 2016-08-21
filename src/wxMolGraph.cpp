@@ -493,11 +493,11 @@ wxSize wxMolGraph::DoGetBestSize() const {
     return wxSize( w, h );
 }
 
-void wxMolGraph::onSize(wxSizeEvent &event) {
+void wxMolGraph::onSize(wxSizeEvent &/*event*/) {
     Refresh();
 }
 
-void wxMolGraph::onPaint(wxPaintEvent &event) {
+void wxMolGraph::onPaint(wxPaintEvent &/*event*/) {
     wxPaintDC dc(this);
     draw(dc);
 }
@@ -886,6 +886,6 @@ void wxMolGraph::onMotion(wxMouseEvent &event) {
     }
 }
 
-void wxMolGraph::onLeaveWindow(wxMouseEvent &event) {
+void wxMolGraph::onLeaveWindow(wxMouseEvent &/*event*/) {
 }
 

@@ -838,7 +838,7 @@ long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
  */
 long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 	char Line[kMaxLineLength];
-	long	nAtoms, nModels;
+	long	nAtoms, nModels = 0;
 	short	scanerr;
 
 	ProgressInd->ChangeText("Reading PDB file...");
@@ -1044,8 +1044,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				lineBytes = strlen(Line);
 				bytesRead = 0;
 				while (bytesRead < lineBytes) {
-					scanCount = sscanf(&(Line[bytesRead]), 	"%ld %[lLsSpPdDfF] %f%n", 
-								&nFunc, &IType, &Sc, &bytesConsumed);
+					scanCount = sscanf(&(Line[bytesRead]), 	"%ld %4[lLsSpPdDfF] %f%n",
+								&nFunc, IType, &Sc, &bytesConsumed);
 					if (scanCount == 3) { 
 						bytesRead+=bytesConsumed;
 						++nShells;
@@ -1068,8 +1068,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 			Buffer->GetLine(Line);
 			
 			// we only use IType read; nFunc is redundant; Sc(ale Factor) we don't use
-			scanCount = sscanf(Line, "%ld %[lLsSpPdDfF] %f%n", 
-								&nFunc, &IType, &Sc, &bytesConsumed);
+			scanCount = sscanf(Line, "%ld %4[lLsSpPdDfF] %f%n",
+								&nFunc, IType, &Sc, &bytesConsumed);
 			if (3==scanCount) {
 				// create this BasisShell in the BasisSet
 				MainData->Basis->Shells.push_back(BasisShell());	
@@ -1111,7 +1111,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				bool stopReadingShell = false;
 				while ( !stopReadingShell ) {
 					Buffer->GetLine(Line);
-					if (3==sscanf(Line, "%ld %[lLsSpPdDfF] %f", &nFunc, &IType, &Sc)) {
+					if (3==sscanf(Line, "%ld %4[lLsSpPdDfF] %f", &nFunc, IType, &Sc)) {
 						Buffer->BackupnLines(1);
 						break;
 					}
@@ -1131,7 +1131,7 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 					} 
 					// We've found the end of this Atom's Basis Set, end of the $BASIS section
 					// or else we've hit an error
-					else if (1==sscanf(Line, "%s%n", &tmpStr, &bytesConsumed)) {
+					else if (1==sscanf(Line, "%4s%n", tmpStr, &bytesConsumed)) {
 						if (2==bytesConsumed && 0==strncmp(tmpStr, "$$", 3)) { 
 							// add ending shell of this atom to BasisMap
 							MainData->Basis->BasisMap[2*iAtom+1]=iShell;
@@ -1589,7 +1589,7 @@ long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, TextFileType fileType) {
 	// Count the number of Atoms
 	while (Buffer->GetFilePos()	< Buffer->GetFileLength()) {
 		Buffer->GetLine(Line);
-		scanCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", &symbol, &bondLength, 
+		scanCount = sscanf(Line, "%3s %f %d %f %d %f %d %d %d %d", symbol, &bondLength,
 					&j1, &bondAngle, &j2, &bondDihedral, &j3, &con1, &con2, &con3);
 		// The last atom in the list may be a duplicate of the
 		// first atom in the list and needs to be ignored
@@ -1623,7 +1623,7 @@ long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, TextFileType fileType) {
 		con2 = -1;
 		con3 = -1;
 		Buffer->GetLine(Line);
-		scanCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", &symbol, &bondLength, 
+		scanCount = sscanf(Line, "%3s %f %d %f %d %f %d %d %d %d", symbol, &bondLength, 
 					&j1, &bondAngle, &j2, &bondDihedral, &j3, &con1, &con2, &con3);
 		if (scanCount < 1) { 
 			error = true;

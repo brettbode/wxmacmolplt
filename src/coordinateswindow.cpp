@@ -533,6 +533,7 @@ wxIcon CoordinatesWindow::GetIconResource( const wxString& name )
 
 void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
@@ -554,6 +555,7 @@ void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
@@ -576,6 +578,7 @@ void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnBondbuttonClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
@@ -590,6 +593,7 @@ void CoordinatesWindow::OnBondbuttonClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnStickbuttonClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	MainData->StickCoordinates();
@@ -603,6 +607,7 @@ void CoordinatesWindow::OnStickbuttonClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnCoordchoice1Selected( wxCommandEvent& event )
 {
+	(void)event;
 	int temp = coordTypeChoice->GetSelection();
 	if (temp != CoordType) {
 		CoordType = temp;
@@ -886,6 +891,7 @@ void CoordinatesWindow::OnSize( wxSizeEvent& event )
 
 void CoordinatesWindow::OnCloseWindow( wxCloseEvent& event )
 {
+	(void)event;
 	Parent->CloseCoordsWindow();
 }
 /*!
@@ -904,6 +910,7 @@ void CoordinatesWindow::OnCopyUpdate( wxUpdateUIEvent& event )
 
 void CoordinatesWindow::OnCloseClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CloseCoordsWindow();
 }
 
@@ -950,6 +957,7 @@ bool CoordinatesWindow::ProcessEvent(wxEvent& event)
 
 void CoordinatesWindow::OnMmpCopycoordsitemClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CopyCoordinates(CoordType);
 }
 
@@ -987,6 +995,7 @@ void CoordinatesWindow::OnClearUpdate( wxUpdateUIEvent& event )
 
 void CoordinatesWindow::OnSelectallClick( wxCommandEvent& event )
 {
+	(void)event;
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
@@ -1067,6 +1076,7 @@ void CoordinatesWindow::OnActivate(wxActivateEvent & event) {
 
 void CoordinatesWindow::OnReordercoorditemClick( wxCommandEvent& event )
 {
+	(void)event;
 	ChangeAtomOrderDialog * dlg = new ChangeAtomOrderDialog(Parent);
 	dlg->ShowModal();
 	dlg->Destroy();

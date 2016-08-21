@@ -173,6 +173,9 @@ SWFSprite_addBlock(SWFSprite sprite, SWFBlock block)
 void
 SWFSprite_getDependencies(SWFSprite sprite, SWFCharacter** deps, int* nDeps)
 {
+	(void) sprite;
+	(void) deps;
+	(void) nDeps;
 }
 
 /*

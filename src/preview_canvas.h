@@ -24,7 +24,7 @@ class PreviewCanvas : public wxGLCanvas {
 		void SetStructure(Structure *structure);
 
 	private:
-		void OnErase(wxEraseEvent& event) {}
+		void OnErase(wxEraseEvent& /*event*/) {}
 		void OnPaint(wxPaintEvent& event);
 		void OnSize(wxSizeEvent& event);
 		void OnIdle(wxIdleEvent& event);

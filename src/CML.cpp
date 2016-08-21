@@ -1357,6 +1357,12 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 																						delete t;
 																				}
 																					break;
+																				default:
+																				{
+																					wxString msg;
+																					msg.Printf(_T("Unknown CML element in OpenCMLFile: %s"), child->getName());
+																					wxLogMessage(msg);
+																				}
 																			}
 																		}
 																	}
@@ -1374,12 +1380,25 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 														case MMP_WindowData:
 															if (wData) wData->ReadXML(mdchild);
 															break;
+														default:
+														{
+															wxString msg;
+															msg.Printf(_T("Unknown CML element in OpenCMLFile: %s"), child->getName());
+															wxLogMessage(msg);
+														}
 													}
 												}
 											}
 											mdchild = mdchild->getNextChild();
 										}
 									}
+								}
+									break;
+								default:
+								{
+									wxString msg;
+									msg.Printf(_T("Unknown CML element in OpenCMLFile: %s"), child->getName());
+									wxLogMessage(msg);
 								}
 									break;
 							}
@@ -1486,6 +1505,13 @@ void WindowData::ReadXML(XMLElement * parent) {
 					if (child->getAttributeValue(VISIBLE_XML,temp))
 						ZMatVis = temp;
 						break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in WindowData::ReadXML: %s"), child->getName());
+					wxLogMessage(msg);
+				}
+					break;
 			}
 		}
 	}
@@ -1563,6 +1589,13 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
 														IRCPt = temp;
 												}
 													break;
+												default:
+												{
+													wxString msg;
+													msg.Printf(_T("Unknown CML element in Frame::ReadCMLMolecule: %s"), child->getName());
+													wxLogMessage(msg);
+												}
+													break;
 											}
 										}
 									}
@@ -1598,10 +1631,24 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
 									if (newSurf) AppendSurface(newSurf);
 								}
 									break;
+								default:
+								{
+									wxString msg;
+									msg.Printf(_T("Unknown CML element in Frame::ReadCMLMolecule: %s"), child->getName());
+									wxLogMessage(msg);
+								}
+									break;
 							}
 						}
 					}
 					delete listChildren;
+				}
+					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in Frame::ReadCMLMolecule: %s"), child->getName());
+					wxLogMessage(msg);
 				}
 					break;
 			}
@@ -1640,6 +1687,13 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::map<std::string, long> & 
 										case atomIdAttr:
 											idresult = child->getValue();
 											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in Frame::ParseAtomArray: %s"), child->getName());
+											wxLogMessage(msg);
+										}
+											break;
 									}
 								}
 							}
@@ -1661,12 +1715,26 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::map<std::string, long> & 
 										case Z3Attr:
 											zcoord = child->getValue();
 											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in Frame::ParseAtomArray: %s"), child->getName());
+											wxLogMessage(msg);
+										}
+											break;
 									}
 								}
 							}
 						}
 							break;
 						case IntegerArrayElement:
+							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unknown CML element in Frame::ParseAtomArray: %s"), child->getName());
+							wxLogMessage(msg);
+						}
 							break;
 					}
 				}
@@ -1854,7 +1922,13 @@ bool Frame::ParseAtomXML(XMLElement * atomXML, std::map<std::string, long> & idL
 												case Z3Attr:
 													zcoord = flElem->getValue();
 													break;
-										//		default:
+												default:
+												{
+													wxString msg;
+													msg.Printf(_T("Unknown CML element in Frame::ParseAtomXML: %s"), flElem->getName());
+													wxLogMessage(msg);
+												}
+													break;
 											}
 										}
 									}
@@ -1924,9 +1998,23 @@ void Frame::ParseBondArrayXML(XMLElement * arrayXML, const std::map<std::string,
 										case orderAttr:
 											ordrref = child->getValue();
 											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in Frame::ParseBondrray: %s"), child->getName());
+											wxLogMessage(msg);
+										}
+											break;
 									}
 								}
 							}
+						}
+							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unknown CML element in Frame::ParseBondArray: %s"), child->getName());
+							wxLogMessage(msg);
 						}
 							break;
 					}
@@ -2069,6 +2157,13 @@ bool Frame::ParseBondXML(XMLElement * bondXML, const std::map<std::string, long>
 							case orderAttr:
 								CML_convert(value, b);
 								break;
+							default:
+							{
+								wxString msg;
+								msg.Printf(_T("Unknown CML element in Frame::ParseBondXML: %s"), child->getName());
+								wxLogMessage(msg);
+							}
+								break;
 						}
 					}
 				}
@@ -2145,6 +2240,13 @@ MOPacInternals::MOPacInternals(XMLElement * parent) {
 							}
 						}
 							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unknown CML element in MOPacInternals::MOPacInternals: %s"), child->getName());
+							wxLogMessage(msg);
+						}
+							break;
 					}
 				}
 			}
@@ -2206,6 +2308,13 @@ BasisSet * BasisSet::ReadXML(XMLElement * parent) {
 												pos += nchar;
 											}
 											target->goodCharges = true;
+										}
+											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in BasisSet::ReadXML: %s"), child->getName());
+											wxLogMessage(msg);
 										}
 											break;
 									}
@@ -2279,6 +2388,13 @@ void BasisShell::ReadXML(XMLElement * parent) {
 									}
 								}
 									break;
+								default:
+								{
+									wxString msg;
+									msg.Printf(_T("Unknown CML element in BasisShell::ReadXML: %s"), child->getName());
+									wxLogMessage(msg);
+								}
+									break;
 							}
 						}
 					}
@@ -2309,6 +2425,13 @@ void GradientData::ReadXML(XMLElement * grad) {
 										break;
 									case MMP_MaxGradient:
 										if (child->getDoubleValue(temp)) Maximum = temp;
+										break;
+									default:
+									{
+										wxString msg;
+										msg.Printf(_T("Unknown CML element in GradientData::ReadXML: %s"), child->getName());
+										wxLogMessage(msg);
+									}
 										break;
 								}
 							}
@@ -2341,6 +2464,13 @@ void GradientData::ReadXML(XMLElement * grad) {
 									}
 								}
 								break;
+							default:
+							{
+								wxString msg;
+								msg.Printf(_T("Unknown CML element in GradientData::ReadXML: %s"), child->getName());
+								wxLogMessage(msg);
+							}
+								break;
 						}
 					}
 				}
@@ -2368,6 +2498,13 @@ void VibRec::ReadXML(XMLElement * vibs, const long & NumAtoms) {
 										long temp;
 										case MMP_CurrentMode:
 											if (child->getLongValue(temp)) CurrentMode = temp;
+											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in VibRec::ReadXML: %s"), child->getName());
+											wxLogMessage(msg);
+										}
 											break;
 									}
 								}
@@ -2525,7 +2662,21 @@ void VibRec::ReadXML(XMLElement * vibs, const long & NumAtoms) {
 											}
 										}
 											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in VibRec::ReadXML: %s"), child->getName());
+											wxLogMessage(msg);
+										}
+											break;
 									}
+								}
+									break;
+								default:
+								{
+									wxString msg;
+									msg.Printf(_T("Unknown CML element in VibRec::ReadXML: %s"), child->getName());
+									wxLogMessage(msg);
 								}
 									break;
 							}
@@ -2744,6 +2895,13 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 										}
 									}
 								}
+							}
+								break;
+							default:
+							{
+								wxString msg;
+								msg.Printf(_T("Unknown CML element in OrbitalRec::ReadXML: %s"), child->getName());
+								wxLogMessage(msg);
 							}
 								break;
 						}

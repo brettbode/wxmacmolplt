@@ -310,14 +310,14 @@ void BaseSurfacePane::PageIsNowActive(void) {
 	if (mUpdateBut) mUpdateBut->SetDefault();
 }
 
-void BaseSurfacePane::OnGridPointSld(wxCommandEvent &event) {
+void BaseSurfacePane::OnGridPointSld(wxCommandEvent &/*event*/) {
 	NumGridPoints = mNumGridPntSld->GetValue();
 	SwitchFixGrid = true;
 
 	setUpdateButton();
 }
 
-void BaseSurfacePane::OnExport(wxCommandEvent &event) {
+void BaseSurfacePane::OnExport(wxCommandEvent &/*event*/) {
 	FILE *currFile = NULL;
 	BufferFile *buffer = NULL;
 	wxString dropFilter;
@@ -879,17 +879,17 @@ Surface1DPane::~Surface1DPane() {
 	if (mOrbColor2) delete mOrbColor2;
 }
 
-void Surface1DPane::OnPosColorChange(wxCommandEvent & event) {
+void Surface1DPane::OnPosColorChange(wxCommandEvent & /*event*/) {
 	mOrbColor1->getColor(&PosColor);
 	setUpdateButton();
 }
 
-void Surface1DPane::OnNegColorChange(wxCommandEvent & event) {
+void Surface1DPane::OnNegColorChange(wxCommandEvent & /*event*/) {
 	mOrbColor2->getColor(&NegColor);
 	setUpdateButton();
 }
 
-void Surface1DPane::OnChangeClamp(wxCommandEvent &event) {
+void Surface1DPane::OnChangeClamp(wxCommandEvent &/*event*/) {
 
 	double dval;
 
@@ -900,7 +900,7 @@ void Surface1DPane::OnChangeClamp(wxCommandEvent &event) {
 
 }
 
-void Surface1DPane::OnChangeScale(wxCommandEvent &event) {
+void Surface1DPane::OnChangeScale(wxCommandEvent &/*event*/) {
 
 	double dval;
 
@@ -911,7 +911,7 @@ void Surface1DPane::OnChangeScale(wxCommandEvent &event) {
 
 }
 
-void Surface1DPane::OnChangeEndpoint(wxCommandEvent &event) {
+void Surface1DPane::OnChangeEndpoint(wxCommandEvent &/*event*/) {
 	bool ok;
 	bool any_ok;
 	double dval;
@@ -976,11 +976,11 @@ Surface2DPane::Surface2DPane(wxWindow* parent, Surf2DBase* target,
 Surface2DPane::~Surface2DPane() {
 }
 
-void Surface2DPane::OnPosColorChange(wxCommandEvent & event) {
+void Surface2DPane::OnPosColorChange(wxCommandEvent & /*event*/) {
 	mOrbColor1->getColor(&PosColor);
 	setUpdateButton();
 }
-void Surface2DPane::OnNegColorChange(wxCommandEvent & event) {
+void Surface2DPane::OnNegColorChange(wxCommandEvent & /*event*/) {
 	mOrbColor2->getColor(&NegColor);
 	setUpdateButton();
 }
@@ -1009,36 +1009,36 @@ void Surface2DPane::OnIdle(wxIdleEvent& WXUNUSED(event)) {
 	}
 }
 
-void Surface2DPane::OnDashChk(wxCommandEvent& event) {
+void Surface2DPane::OnDashChk(wxCommandEvent& /*event*/) {
 	DashLines = mDashCheck->GetValue();
 	setUpdateButton();
 }
 
-void Surface2DPane::OnShowZeroChk(wxCommandEvent &event) {
+void Surface2DPane::OnShowZeroChk(wxCommandEvent &/*event*/) {
 	ShowZeroContour = mShowZeroCheck->GetValue();
 	setUpdateButton();
 }
-void Surface2DPane::OnDisplayPlaneChk(wxCommandEvent &event) {
+void Surface2DPane::OnDisplayPlaneChk(wxCommandEvent &/*event*/) {
 	DisplayPlane = mDisplayPlaneCheck->GetValue();
 	setUpdateButton();
 }
 
-void Surface2DPane::OnSetPlane(wxCommandEvent &event) {
+void Surface2DPane::OnSetPlane(wxCommandEvent &/*event*/) {
 	SetScreenPlane * temp = new SetScreenPlane(owner->GetParent());
 	temp->Show();
 }
 
-void Surface2DPane::OnUsePlaneChk(wxCommandEvent &event) {
+void Surface2DPane::OnUsePlaneChk(wxCommandEvent &/*event*/) {
 	UseScreenPlane = mUsePlaneChk->GetValue();
 	setUpdateButton();
 }
 
-void Surface2DPane::OnSetParam(wxCommandEvent &event) {
+void Surface2DPane::OnSetParam(wxCommandEvent &/*event*/) {
 	Surface2DParamDlg paramDlg(this, mTarget);
 	paramDlg.ShowModal();
 }
 
-void Surface2DPane::OnContourValueText(wxCommandEvent& event) {
+void Surface2DPane::OnContourValueText(wxCommandEvent& /*event*/) {
 	//Contour Value edit text has changed, convert the text
 	double newVal=0.0;
 
@@ -1055,7 +1055,7 @@ void Surface2DPane::SetContourValueText(void) {
 	mContourValText->SetValue(tmpStr);
 }
 
-void Surface2DPane::OnNumContoursText(wxCommandEvent& event) {
+void Surface2DPane::OnNumContoursText(wxCommandEvent& /*event*/) {
 	//Num contours edit text has changed, convert the text
 	long newVal=-1;
 
@@ -1121,7 +1121,7 @@ void Surface3DPane::refreshMEPControls() {
 
 }
 
-void Surface3DPane::On3DRadioBox(wxCommandEvent& event) {
+void Surface3DPane::On3DRadioBox(wxCommandEvent& /*event*/) {
 	UseSolidSurface = 1-m3DRdoBox->GetSelection();
 
 	if (UseSolidSurface)
@@ -1132,7 +1132,7 @@ void Surface3DPane::On3DRadioBox(wxCommandEvent& event) {
 	setUpdateButton();
 }
 
-void Surface3DPane::OnSmoothCheck(wxCommandEvent& event) {
+void Surface3DPane::OnSmoothCheck(wxCommandEvent& /*event*/) {
 	UseNormals = mSmoothChkBox->GetValue();
 
 	setUpdateButton();
@@ -1160,12 +1160,12 @@ void Surface3DPane::SetContourMaxValueText(void) {
 	mContourValSld->SetMax(mTarget->GetGridMax());
 }
 
-void Surface3DPane::OnContourValueSld(wxCommandEvent &event) {
+void Surface3DPane::OnContourValueSld(wxCommandEvent &/*event*/) {
 	ContourValue = mContourValSld->GetValue();
 	setUpdateButton();
 }
 
-void Surface3DPane::OnGridSizeSld(wxCommandEvent &event) {
+void Surface3DPane::OnGridSizeSld(wxCommandEvent &/*event*/) {
 	GridSize = 0.01 * mGridSizeSld->GetValue();
 	setUpdateButton();
 }
@@ -1186,22 +1186,22 @@ void Surface3DPane::OnIdle(wxIdleEvent& WXUNUSED(event)) {
 	}
 
 }
-void Surface3DPane::OnUseMEPCheck(wxCommandEvent &event) {
+void Surface3DPane::OnUseMEPCheck(wxCommandEvent &/*event*/) {
 	UseMEP = mColorSurfCheck->GetValue();
 	refreshControls();
 	setUpdateButton();
 }
-void Surface3DPane::OnRGBColorCheck(wxCommandEvent &event) {
+void Surface3DPane::OnRGBColorCheck(wxCommandEvent &/*event*/) {
 	UseRGBSurfaceColor = mUseRGBColorCheck->GetValue();
 	refreshControls();
 	setUpdateButton();
 }
-void Surface3DPane::OnInvertRGBCheck(wxCommandEvent &event) {
+void Surface3DPane::OnInvertRGBCheck(wxCommandEvent &/*event*/) {
 	InvertRGBSurfaceColor = mInvertRGBCheck->GetValue();
 	//	refreshControls();
 	setUpdateButton();
 }
-void Surface3DPane::OnMaxMEPValueText(wxCommandEvent& event) {
+void Surface3DPane::OnMaxMEPValueText(wxCommandEvent& /*event*/) {
 	double newVal=0.0;
 	wxString temp = mMaxMapEdit->GetValue();
 
@@ -1215,16 +1215,16 @@ void Surface3DPane::SetMaxMEPValueText() {
 	temp.Printf(wxT("%.4f"), MaxMEPValue);
 	mMaxMapEdit->SetValue(temp);
 }
-void Surface3DPane::OnFreeMem(wxCommandEvent& event) {
+void Surface3DPane::OnFreeMem(wxCommandEvent& /*event*/) {
 	mTarget->FreeGrid();
 	mFreeMemBut->Disable();
 }
 
-void Surface3DPane::OnPosColorChange(wxCommandEvent & event) {
+void Surface3DPane::OnPosColorChange(wxCommandEvent & /*event*/) {
 	mOrbColor1->getColor(&PosColor);
 	setUpdateButton();
 }
-void Surface3DPane::OnNegColorChange(wxCommandEvent & event) {
+void Surface3DPane::OnNegColorChange(wxCommandEvent & /*event*/) {
 	mOrbColor2->getColor(&NegColor);
 	setUpdateButton();
 }
@@ -1233,7 +1233,7 @@ void Surface3DPane::OnTransparencyChange(wxSpinEvent & event) {
 	setUpdateButton();
 }
 
-void Surface3DPane::OnSetParam(wxCommandEvent &event) {
+void Surface3DPane::OnSetParam(wxCommandEvent &/*event*/) {
 	Surface3DParamDlg paramDlg(this, mTarget);
 	paramDlg.ShowModal();
 }
@@ -1497,7 +1497,7 @@ bool Orbital2DSurfPane::UpdateNeeded(void) {
 	return result;
 }
 
-void Orbital2DSurfPane::OnUpdate(wxCommandEvent &event) {
+void Orbital2DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 	SetNumContoursText();
 	SetContourValueText();
 
@@ -1597,7 +1597,7 @@ void Orbital2DSurfPane::refreshControls() {
 	mOrbColor2->setColor(&NegColor);
 }
 
-void Orbital2DSurfPane::OnOrbSetChoice(wxCommandEvent &event) {
+void Orbital2DSurfPane::OnOrbSetChoice(wxCommandEvent &/*event*/) {
 	int item = mOrbSetChoice->GetSelection()+1;
 	int itemtype = orbSetChangeEvt(item, owner);
 
@@ -1652,20 +1652,20 @@ void Orbital2DSurfPane::OnMOList(wxCommandEvent &event) {
 	setUpdateButton();  
 }
 
-void Orbital2DSurfPane::OnOrbFormatChoice(wxCommandEvent &event) {
+void Orbital2DSurfPane::OnOrbFormatChoice(wxCommandEvent &/*event*/) {
 	int itemtype = mOrbFormatChoice->GetSelection();
 	setFlagOnOrbFormatChange(itemtype);
 
 	makeMOList();
 }
 
-void Orbital2DSurfPane::OnReversePhase(wxCommandEvent &event) {
+void Orbital2DSurfPane::OnReversePhase(wxCommandEvent &/*event*/) {
 	PhaseChange = mRevPhaseChk->GetValue();
 
 	setUpdateButton();
 }
 
-void Orbital2DSurfPane::OnSphHarmonicChk(wxCommandEvent &event) {
+void Orbital2DSurfPane::OnSphHarmonicChk(wxCommandEvent &/*event*/) {
 	SphericalHarmonics = mSphHarmonicsChk->GetValue();
 	mMOList->Clear();
 	PlotOrb = -1;
@@ -1996,14 +1996,14 @@ bool Orbital3DSurfPane::UpdateNeeded(void) {
 	return result;
 }
 
-void Orbital3DSurfPane::OnOrbFormatChoice(wxCommandEvent &event) {
+void Orbital3DSurfPane::OnOrbFormatChoice(wxCommandEvent &/*event*/) {
 	int itemtype = mOrbFormatChoice->GetSelection();
 	setFlagOnOrbFormatChange(itemtype);
 
 	makeMOList();
 }
 
-void Orbital3DSurfPane::OnOrbSetChoice(wxCommandEvent &event) {
+void Orbital3DSurfPane::OnOrbSetChoice(wxCommandEvent &/*event*/) {
 	int item = mOrbSetChoice->GetSelection()+1;
 	int itemtype = orbSetChangeEvt(item, owner);
 
@@ -2058,7 +2058,7 @@ void Orbital3DSurfPane::OnMOList(wxCommandEvent &event) {
 	setUpdateButton();  
 }
 
-void Orbital3DSurfPane::OnSphHarmonicChk(wxCommandEvent &event) {
+void Orbital3DSurfPane::OnSphHarmonicChk(wxCommandEvent &/*event*/) {
 	SphericalHarmonics = mSphHarmonicsChk->GetValue();
 	mMOList->Clear();
 	PlotOrb = -1;
@@ -2067,26 +2067,26 @@ void Orbital3DSurfPane::OnSphHarmonicChk(wxCommandEvent &event) {
 	makeAOList();
 }
 
-void Orbital3DSurfPane::OnReversePhase(wxCommandEvent &event) {
+void Orbital3DSurfPane::OnReversePhase(wxCommandEvent &/*event*/) {
 	PhaseChange = mRevPhaseChk->GetValue();
 
 	setUpdateButton();
 }
 
-void Orbital3DSurfPane::OnContourValueSld(wxCommandEvent &event) {
+void Orbital3DSurfPane::OnContourValueSld(wxCommandEvent &/*event*/) {
 	ContourValue = mContourValSld->GetValue();
 
 	setUpdateButton();
 }
 
-void Orbital3DSurfPane::OnGridSizeSld(wxCommandEvent &event) {
+void Orbital3DSurfPane::OnGridSizeSld(wxCommandEvent &/*event*/) {
 	GridSize = (30-.01) * (mGridSizeSld->GetValue()*mGridSizeSld->GetValue())/((5000*5000))+.01;
 	SwitchFixGrid = true;
 
 	setUpdateButton();
 }
 
-void Orbital3DSurfPane::OnUpdate(wxCommandEvent &event) {
+void Orbital3DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 	bool updateGrid=UpdateTest;
 	bool updateContour=false;
 
@@ -2537,7 +2537,7 @@ bool General3DSurfPane::UpdateNeeded(void) {
 	}
 	return result;
 }
-void General3DSurfPane::OnUpdate(wxCommandEvent &event) {
+void General3DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 	SetMaxMEPValueText();
 
 	bool updateMEP=false;
@@ -2595,20 +2595,20 @@ void General3DSurfPane::OnUpdate(wxCommandEvent &event) {
 	setUpdateButton();
 	owner->SurfaceUpdated();
 }
-void General3DSurfPane::OnMultCheck(wxCommandEvent &event) {
+void General3DSurfPane::OnMultCheck(wxCommandEvent &/*event*/) {
 	useMultValue = mMultCheck->GetValue();
 	setUpdateButton();
 }
-void General3DSurfPane::OnSquareCheck(wxCommandEvent &event) {
+void General3DSurfPane::OnSquareCheck(wxCommandEvent &/*event*/) {
 	squareValues = mSquareCheck->GetValue();
 	setUpdateButton();
 }
-void General3DSurfPane::OnContourPosNegCheck(wxCommandEvent &event) {
+void General3DSurfPane::OnContourPosNegCheck(wxCommandEvent &/*event*/) {
 	ContourPosNeg = mGenContourPosNegCheck->GetValue();
 	refreshControls();
 	setUpdateButton();
 }
-void General3DSurfPane::OnContourValueSld(wxCommandEvent &event) {
+void General3DSurfPane::OnContourValueSld(wxCommandEvent &/*event*/) {
 	float GridMax = mTarget->GetGridMax();
 	float GridMin = mTarget->GetGridMin();
 	if (ContourPosNeg) GridMin = 0.0;
@@ -2619,7 +2619,7 @@ void General3DSurfPane::OnContourValueSld(wxCommandEvent &event) {
 
 	setUpdateButton();
 }
-void General3DSurfPane::OnMultValueEdit(wxCommandEvent& event) {
+void General3DSurfPane::OnMultValueEdit(wxCommandEvent& /*event*/) {
 	double newVal=0.0;
 	wxString temp = mGenMultValue->GetValue();
 
@@ -2628,7 +2628,7 @@ void General3DSurfPane::OnMultValueEdit(wxCommandEvent& event) {
 	}
 	setUpdateButton();
 }
-void General3DSurfPane::OnFileButton(wxCommandEvent& event) {
+void General3DSurfPane::OnFileButton(wxCommandEvent& /*event*/) {
 	mTarget->ReadGrid(squareValues, useMultValue, MultValue);
 	UpdateTest = true;
 	refreshControls();
@@ -2819,7 +2819,7 @@ bool General2DSurfPane::UpdateNeeded(void) {
 	}
 	return result;
 }
-void General2DSurfPane::OnUpdate(wxCommandEvent &event) {
+void General2DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 	SetNumContoursText();
 	SetContourValueText();
 
@@ -2861,7 +2861,7 @@ void General2DSurfPane::SetMultValue(void) {
 	mGenMultValue->SetValue(temp);
 }
 
-void General2DSurfPane::OnFileButton(wxCommandEvent& event) {
+void General2DSurfPane::OnFileButton(wxCommandEvent& /*event*/) {
 	//Push out the current validated MultValue before we use it
 	SetMultValue();
 
@@ -2871,15 +2871,15 @@ void General2DSurfPane::OnFileButton(wxCommandEvent& event) {
 	setUpdateButton();
 }
 
-void General2DSurfPane::OnMultCheck(wxCommandEvent &event) {
+void General2DSurfPane::OnMultCheck(wxCommandEvent &/*event*/) {
 	useMultValue = mMultCheck->GetValue();
 	setUpdateButton();
 }
-void General2DSurfPane::OnSquareCheck(wxCommandEvent &event) {
+void General2DSurfPane::OnSquareCheck(wxCommandEvent &/*event*/) {
 	squareValues = mSquareCheck->GetValue();
 	setUpdateButton();
 }
-void General2DSurfPane::OnMultValueEnter(wxCommandEvent& event) {
+void General2DSurfPane::OnMultValueEnter(wxCommandEvent& /*event*/) {
 	double newVal=0.0;
 	wxString temp = mGenMultValue->GetValue();
 
@@ -2962,7 +2962,7 @@ void BaseSurfacePane::BuildOrbSetPopup(void) {
 		}
 	}
 }
-void BaseSurfacePane::OnOrbSetChoice(wxCommandEvent &event) {
+void BaseSurfacePane::OnOrbSetChoice(wxCommandEvent &/*event*/) {
 	TargetOrbSet = mOrbSetChoice->GetSelection();
 	setUpdateButton();
 }	
@@ -3141,7 +3141,7 @@ bool TEDensity1DSurfPane::UpdateNeeded(void) {
 	return result;
 }
 
-void TEDensity1DSurfPane::OnUpdate(wxCommandEvent &event) {
+void TEDensity1DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 
 	bool updateGrid = UpdateTest;
 	if (TargetOrbSet != mTarget->getTargetOrbSet()) {
@@ -3375,7 +3375,7 @@ bool TEDensity2DSurfPane::UpdateNeeded(void) {
 	return result;
 }
 
-void TEDensity2DSurfPane::OnUpdate(wxCommandEvent &event) {
+void TEDensity2DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 	SetNumContoursText();
 	SetContourValueText();
 
@@ -3568,7 +3568,7 @@ bool TEDensity3DSurfPane::UpdateNeeded(void) {
 	}
 	return result;
 }
-void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &event) {
+void TEDensity3DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 	SetMaxMEPValueText();
 
 	//only update the grid if needed
@@ -4073,7 +4073,7 @@ bool MEP2DSurfPane::UpdateNeeded(void) {
 	}
 	return result;
 }
-void MEP2DSurfPane::OnUpdate(wxCommandEvent &event) {
+void MEP2DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 	SetNumContoursText();
 	SetContourValueText();
 
@@ -4263,7 +4263,7 @@ bool MEP3DSurfPane::UpdateNeeded(void) {
 	}
 	return result;
 }
-void MEP3DSurfPane::OnUpdate(wxCommandEvent &event) {
+void MEP3DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 	//only update the grid if needed
 	bool updateGrid=UpdateTest, updateContour=false;
 	if (TargetOrbSet != mTarget->getTargetOrbSet()) {
@@ -4727,7 +4727,7 @@ void Surface2DParamDlg::OnClose(wxCommandEvent &event) {
   instead of operating on a file directly
   */
 
-void Surface2DParamDlg::OnCopyAll(wxCommandEvent &event) {
+void Surface2DParamDlg::OnCopyAll(wxCommandEvent &/*event*/) {
 	wxConfigBase *pConfig = wxConfigBase::Get();
 
 	pConfig->Write(_T("/Parameters/Surface2D/NumGridPoints"), numGridPoint->GetValue());
@@ -4746,7 +4746,7 @@ void Surface2DParamDlg::OnCopyAll(wxCommandEvent &event) {
 
 }
 
-void Surface2DParamDlg::OnPasteAll(wxCommandEvent &event) {
+void Surface2DParamDlg::OnPasteAll(wxCommandEvent &/*event*/) {
 	wxConfigBase *pConfig = wxConfigBase::Get();
 
 	pConfig->SetPath(_T("/Parameters/Surface2D"));
@@ -4967,7 +4967,7 @@ void Surface3DParamDlg::OnClose(wxCommandEvent &event) {
   instead of operating on a file directly
   */
 
-void Surface3DParamDlg::OnCopyAll(wxCommandEvent &event) {
+void Surface3DParamDlg::OnCopyAll(wxCommandEvent &/*event*/) {
 	wxConfigBase *pConfig = wxConfigBase::Get();
 
 	pConfig->Write(_T("/Parameters/Surface3D/NumGridPointsX"), numGridPoint1->GetValue());
@@ -4984,7 +4984,7 @@ void Surface3DParamDlg::OnCopyAll(wxCommandEvent &event) {
 
 }
 
-void Surface3DParamDlg::OnPasteAll(wxCommandEvent &event) {
+void Surface3DParamDlg::OnPasteAll(wxCommandEvent &/*event*/) {
 	wxConfigBase *pConfig = wxConfigBase::Get();
 
 	pConfig->SetPath(_T("/Parameters/Surface3D"));
@@ -5002,7 +5002,7 @@ void Surface3DParamDlg::OnPasteAll(wxCommandEvent &event) {
 	gridIncText3->SetValue(pConfig->Read(_T("ZInc")));
 }
 
-void OrbSurfacePane::OnAtomicOrbitalChoice(wxCommandEvent& event) {
+void OrbSurfacePane::OnAtomicOrbitalChoice(wxCommandEvent& /*event*/) {
 
 	if (!coefIsEnabled) {
 		mOrbCoef->SetSelection(wxNOT_FOUND);

@@ -328,7 +328,7 @@ void MpApp::destroyMainFrame(MolDisplayWin *frame) {
 #endif
 }
 
-void MpApp::menuFileQuit(wxCommandEvent &event) {
+void MpApp::menuFileQuit(wxCommandEvent &/*event*/) {
 	//Need to loop over open files, prompting to save if needed
 	//then exit
 	std::list<MolDisplayWin *>::iterator win = MolWinList.begin();
@@ -384,11 +384,11 @@ void MpApp::menuPreferences(wxCommandEvent & WXUNUSED(event)) {
         gPrefDlg->Show();
     }
 }
-void MpApp::menuFileNew(wxCommandEvent &event) {
+void MpApp::menuFileNew(wxCommandEvent &/*event*/) {
     createMainFrame();
 }
 
-void MpApp::menuFileOpen(wxCommandEvent &event) {
+void MpApp::menuFileOpen(wxCommandEvent &/*event*/) {
 	//First need to use an open file dialog
 	wxString filename = wxFileSelector(wxT("Choose a file to open"));
 	//If the user chooses a file, create a window and have it process it.

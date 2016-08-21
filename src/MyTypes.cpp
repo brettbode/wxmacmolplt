@@ -166,13 +166,13 @@ bool AnnotationMarker::isEquivalent(const int natoms, const int *new_list) const
 
 /* ------------------------------------------------------------------------- */
 
-float AnnotationMarker::getParam(const Frame& frame) const {
+float AnnotationMarker::getParam(const Frame& /*frame*/) const {
 	return 0.0f;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void AnnotationMarker::setParam(Frame& frame, float value) {
+void AnnotationMarker::setParam(Frame& /*frame*/, float /*value*/) {
 }
 
 /* ------------------------------------------------------------------------- */

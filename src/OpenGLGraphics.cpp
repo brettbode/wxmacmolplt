@@ -1203,7 +1203,7 @@ void WinPrefs::GetAtomColorInverse(long atomtype, float rgb[3]) const {
 void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 									 const mpAtom& atom2,
 									 const WinPrefs& Prefs,
-									 GLUquadric *quadric, GLuint sphere_list,
+									 GLUquadric */*quadric*/, GLuint sphere_list,
 									 bool highlighting_on) {
 	CPoint3D	v1, v2, offset;
 
@@ -1457,10 +1457,12 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 		case GAMESS_O:
 			break;
 			*/
+		default:	//The rest are not implemented.
+			break;
 	}
 }
 
-long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs *Prefs, myGLTriangle *, unsigned int shader_program) {
+long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs */*Prefs*/, myGLTriangle *, unsigned int /*shader_program*/) {
 
 	if (Visible) {
 		// Update the grid if needed, then display
@@ -1596,7 +1598,7 @@ long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs *Prefs, myGLTriangle 
 	return 0;
 }
 
-long Surf2DBase::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program) {
+long Surf2DBase::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle *, unsigned int /*shader_program*/) {
 	if (Visible) {
 			//Update the grid if needed, then contour and display
 		if (!Grid) Update(MainData);
@@ -1822,7 +1824,7 @@ long General3DSurface::getTriangleCount(void) const {
 	return result;
 }
 
-long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
+long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int /*shader_program*/) {
 	long result=0;
 	if (Visible) {
 		if (ContourHndl && VertexList) {
@@ -1854,7 +1856,7 @@ long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLT
 	}
 	return result;
 }
-long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
+long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int /*shader_program*/) {
 	long result = 0;
 	if (Visible) {
 		if (ContourHndl && VertexList) {
@@ -1877,7 +1879,7 @@ long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myG
 	}
 	return result;
 }
-long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
+long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int /*shader_program*/) {
 	long result=0;
 	if (Visible && (PlotOrb>=0)) {
 		if (ContourHndl && VertexList) {
@@ -1910,7 +1912,7 @@ long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTrian
 	}
 	return result;
 }
-long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
+long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int /*shader_program*/) {
 	long result=0;
 	if (Visible) {
 		if (ContourHndl && VertexList) {
@@ -2249,7 +2251,7 @@ void CreateCylinderFromLine(GLUquadricObj *qobj, const CPoint3D& lineStart, cons
 
 void DashedQuadFromLine(const CPoint3D& pt1,
 						const CPoint3D& pt2, float width, float m[16],
-						const CPoint3D& x_world, float offset,
+						const CPoint3D& /*x_world*/, float offset,
 						GLuint length_anno_tex_id,
 						const WinPrefs * Prefs, bool draw_label) {
 
@@ -3321,8 +3323,8 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					CPoint3D cross2;
 					CPoint3D equat2;
 					CPoint3D equat3;
-					int axial_id;
-					int equat_id;
+					int axial_id=0;
+					int equat_id=1;
 					Matrix4D rotate_mat;
 
 					if (dot12 < -0.75) {
@@ -3353,9 +3355,9 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				else if (fabs(dot12) < 0.25f || fabs(dot13) < 0.25f ||
 						 fabs(dot23) < 0.25f) {
 
-					int axial_id;
-					int equat1_id;
-					int equat2_id;
+					int axial_id=0;
+					int equat1_id=1;
+					int equat2_id=2;
 
 					if (fabs(dot12) < 0.25) {
 						equat1_id = 2;

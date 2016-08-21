@@ -111,7 +111,7 @@ public:
 	virtual bool containsAtom(const int atom_id) const;
 	virtual bool containsFragment(const mpAtom *atom_list) const;
 	virtual void adjustIds(const int atom_id, int offset = -1);
-	virtual bool isEquivalent(const int natoms, const int *new_list) const {
+	virtual bool isEquivalent(const int /*natoms*/, const int */*new_list*/) const {
 		return false;
 	}
 	virtual int getAtom(const int index) const;
@@ -686,7 +686,7 @@ class Surface {
 		static Surface * ReadSurface(XMLElement * parent);
 		long WriteSurface(BufferFile * Buffer);
 		virtual void Export(BufferFile * Buffer, exportFileType eft);
-		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer) {
+		virtual long ExportPOV(MoleculeData */*lData*/, WinPrefs */*Prefs*/, BufferFile */*Buffer*/) {
 			return 0;
 		}
 	//	void ExportToFile(void);

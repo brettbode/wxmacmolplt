@@ -265,6 +265,7 @@ class SWFBlock
 {
  public:
   virtual c_SWFBlock getBlock() = 0;
+	virtual ~SWFBlock(void) {};
 };
 
 /*  SWFCharacter  */
@@ -276,6 +277,7 @@ class SWFCharacter : public SWFBlock
  public:
   c_SWFCharacter character;
 
+	virtual ~SWFCharacter(void) {};
     float getWidth()
     { return SWFCharacter_getWidth(this->character); }
 

@@ -345,6 +345,7 @@ wxIcon BondsDlg::GetIconResource( const wxString& name )
 
 void BondsDlg::OnAddClick( wxCommandEvent& event )
 {
+	(void)event;
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long nbonds = lFrame->GetNumBonds();
@@ -397,6 +398,7 @@ void BondsDlg::OnAddClick( wxCommandEvent& event )
 
 void BondsDlg::OnDeleteClick( wxCommandEvent& event )
 {
+	(void)event;
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long nbonds = lFrame->GetNumBonds();
@@ -418,6 +420,7 @@ void BondsDlg::OnDeleteClick( wxCommandEvent& event )
 
 void BondsDlg::OnChoiceSelected( wxCommandEvent& event )
 {
+	(void)event;
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long nbonds = lFrame->GetNumBonds();
@@ -513,6 +516,7 @@ void BondsDlg::OnRangeSelect( wxGridRangeSelectEvent& event )
 
 void BondsDlg::OnCloseWindow( wxCloseEvent& event )
 {
+	(void)event;
 	Parent->CloseBondsWindow();
 }
 /*!

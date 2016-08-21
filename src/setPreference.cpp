@@ -190,6 +190,7 @@ void setPreference::UpdateWindowTitle(void) {
 
 void setPreference::OnCloseWindow( wxCloseEvent& event )
 {
+	(void)event;
 	if (mIsGlobal) {
 		MpApp & app = wxGetApp();
 		app.CloseGlobalPrefs();
@@ -202,6 +203,7 @@ void setPreference::OnCloseWindow( wxCloseEvent& event )
  */
 
 void setPreference::OnCancel( wxCommandEvent& event ) {
+	(void)event;
 	Close();
 }
 /*!
@@ -209,6 +211,7 @@ void setPreference::OnCancel( wxCommandEvent& event ) {
  */
 
 void setPreference::OnOK( wxCommandEvent& event ) {
+	(void)event;
 
 	saveCurrPrefs(currPanel);
 
@@ -249,6 +252,7 @@ void setPreference::userDefaults( wxCommandEvent& /* event */ ) {
 }
 
 void setPreference::OnApply( wxCommandEvent& event ) {
+	(void)event;
 	saveCurrPrefs(currPanel);
 
 	if (!mIsGlobal) {

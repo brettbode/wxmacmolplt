@@ -329,6 +329,7 @@ void writeSWFVideoStreamToMethod(SWFBlock block, SWFByteOutputMethod method, voi
 
 
 int completeSWFVideoStream(SWFBlock block) {
+	(void) block;
 	return VIDEOFRAME_BLOCK_SIZE;
 }
 

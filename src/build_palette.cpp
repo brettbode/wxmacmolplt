@@ -728,7 +728,7 @@ void BuilderDlg::KeyHandler(wxKeyEvent& event) {
 
 /* ------------------------------------------------------------------------- */
 
-void BuilderDlg::OnClose(wxCloseEvent& event) {
+void BuilderDlg::OnClose(wxCloseEvent& /*event*/) {
 	BuilderTool->ClosePalette();
 }
 
@@ -865,6 +865,7 @@ std::ostream& operator<<(std::ostream& stream, const Structure& s) {
  */
 
 void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
+	(void)event;
 
 	int id = mStructureChoice->GetSelection();
 
@@ -887,6 +888,7 @@ void BuilderDlg::DeleteStructure(wxCommandEvent& event) {
  */
 
 void BuilderDlg::RenameStructure(wxCommandEvent& event) {
+	(void)event;
 
 	int id = mStructureChoice->GetSelection();
 
@@ -1048,6 +1050,7 @@ void BuilderDlg::UpdateRenameStructures(wxUpdateUIEvent& event) {
  */
 
 void BuilderDlg::ChangeStructureGroup(wxCommandEvent& event) {
+	(void)event;
 
 	if (canvas) {
 		canvas->SetStructure(NULL);

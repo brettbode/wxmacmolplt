@@ -468,6 +468,12 @@ Orb2DSurface::Orb2DSurface(XMLElement * sxml) {
 				case MMP_OrbSurfBase:
 					OrbSurfBase::ReadXML(child);
 					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in parsing Orb2DSurface: %s"), child->getName());
+					wxLogMessage(msg);
+				}
 			}
 		}
 		child = child->getNextChild();
@@ -492,6 +498,13 @@ Orb3DSurface::Orb3DSurface(XMLElement * sxml) {
 				case MMP_OrbSurfBase:
 					OrbSurfBase::ReadXML(child);
 					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in Orb3DSurface::Orb3DSurface: %s"), child->getName());
+					wxLogMessage(msg);
+				}
+					break;
 			}
 		}
 		child = child->getNextChild();
@@ -511,6 +524,13 @@ General2DSurface::General2DSurface(XMLElement * sxml) {
 			switch (type) {
 				case MMP_2DSurface:
 					Surf2DBase::Read2DXML(child);
+					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in General2DSurface::General2DSurface: %s"), child->getName());
+					wxLogMessage(msg);
+				}
 					break;
 			}
 		}
@@ -532,6 +552,13 @@ General3DSurface::General3DSurface(XMLElement * sxml) {
 			switch (type) {
 				case MMP_3DSurface:
 					Surf3DBase::Read3DXML(child);
+					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in General3DSurface::General3DSurface: %s"), child->getName());
+					wxLogMessage(msg);
+				}
 					break;
 			}
 		}
@@ -566,6 +593,14 @@ TEDensity1DSurface::TEDensity1DSurface(XMLElement * sxml) {
 					if (child->getLongValue(tl))
 						OrbSet = tl;
 				}
+					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in TEDensity1DSurface::TEDensity1DSurface: %s"), child->getName());
+					wxLogMessage(msg);
+				}
+					break;
 			}
 		}
 		child = child->getNextChild();
@@ -599,6 +634,14 @@ TEDensity2DSurface::TEDensity2DSurface(XMLElement * sxml) {
 					if (child->getLongValue(tl))
 						OrbSet = tl;
 				}
+					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in TEDensity2DSurface::TEDensity2DSurface: %s"), child->getName());
+					wxLogMessage(msg);
+				}
+					break;
 			}
 		}
 		child = child->getNextChild();
@@ -643,6 +686,13 @@ TEDensity3DSurface::TEDensity3DSurface(XMLElement * sxml) {
 						OrbSet = tl;
 				}
 					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in TEDensity3DSurface::TEDensity3DSurface: %s"), child->getName());
+					wxLogMessage(msg);
+				}
+					break;
 			}
 		}
 		child = child->getNextChild();
@@ -674,6 +724,14 @@ MEP2DSurface::MEP2DSurface(XMLElement * sxml) {
 					if (child->getLongValue(tl))
 						OrbSet = tl;
 				}
+					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in MEP2DSurface::MEP2DSurface: %s"), child->getName());
+					wxLogMessage(msg);
+				}
+					break;
 			}
 		}
 		child = child->getNextChild();
@@ -704,6 +762,13 @@ MEP3DSurface::MEP3DSurface(XMLElement * sxml) {
 					long tl;
 					if (child->getLongValue(tl))
 						OrbSet = tl;
+				}
+					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in MEP3DSurface::MEP3DSurface: %s"), child->getName());
+					wxLogMessage(msg);
 				}
 					break;
 			}
@@ -836,6 +901,13 @@ void Surf1DBase::Read1DXML(XMLElement *parent) {
 						long test = child->getFloatArray(count, Grid);
 						if (test != count) FreeGrid();
 					}
+					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in Surf1DBase::Read1DXML: %s"), child->getName());
+					wxLogMessage(msg);
+				}
 					break;
 			}
 		}
@@ -1014,6 +1086,13 @@ void Surf2DBase::Read2DXML(XMLElement * parent) {
 						long test = child->getFloatArray(count, Grid);
 						if (test != count) FreeGrid();
 					}
+					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in Surf2DBase::Read2DXML: %s"), child->getName());
+					wxLogMessage(msg);
+				}
 					break;
 			}
 		}
@@ -1293,6 +1372,13 @@ void Surf3DBase::Read3DXML(XMLElement * parent) {
 						if (test != NumVertices) FreeList();
 					}
 					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in Surf3DBase::Read3DXML: %s"), child->getName());
+					wxLogMessage(msg);
+				}
+					break;
 			}
 		}
 		child = child->getNextChild();
@@ -1353,6 +1439,13 @@ void OrbSurfBase::ReadXML(XMLElement * parent) {
 					if (child->getBoolValue(tb))
 						SetOrbOccDisplay(tb);
 					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in OrbSurfBase::ReadXML: %s"), child->getName());
+					wxLogMessage(msg);
+				}
+					break;
 			}
 		}
 		child = child->getNextChild();
@@ -1387,6 +1480,13 @@ bool Surface::ReadXML(XMLElement * parent) {
 				{
 					const char * c = child->getValue();
 					if (c) SetLabel(c);
+				}
+					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in Surface::ReadXML: %s"), child->getName());
+					wxLogMessage(msg);
 				}
 					break;
 			}
@@ -1431,6 +1531,13 @@ Surface * Surface::ReadSurface(XMLElement * parent) {
 						break;
 					case kGeneral2DSurface:
 						result = new General2DSurface(parent);
+						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_T("Unknown CML surface element in Surface::ReadSurface: %s"), surftype);
+						wxLogMessage(msg);
+					}
 						break;
 				}
 			}

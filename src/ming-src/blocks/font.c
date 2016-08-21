@@ -602,6 +602,9 @@ void
 SWFFontCharacter_exportCharacterRange(SWFFontCharacter font,
 						 unsigned short start, unsigned short end)
 {
+	(void) font;
+	(void) start;
+	(void) end;
 	// insert the char into font's codeTable if it isn't already there
 
 	//int p = findCodeValue(start, font->codeTable, 0, font->nGlyphs);

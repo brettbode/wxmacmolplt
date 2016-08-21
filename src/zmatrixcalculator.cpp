@@ -471,7 +471,7 @@ void ZMatrixCalculator::UpdateValues(void) {
  * wxEVT_CLOSE_WINDOW event handler for ZMatrixCalculator
  */
 
-void ZMatrixCalculator::OnCloseWindow( wxCloseEvent& event )
+void ZMatrixCalculator::OnCloseWindow( wxCloseEvent& /*event*/ )
 {
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	parent->CloseZMatrixCalc();

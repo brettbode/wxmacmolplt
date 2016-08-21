@@ -111,7 +111,7 @@ void PreviewCanvas::InitGL() {
 
 /* ------------------------------------------------------------------------- */
 
-void PreviewCanvas::OnPaint(wxPaintEvent& event) {
+void PreviewCanvas::OnPaint(wxPaintEvent& /*event*/) {
 
 	wxPaintDC paintDC(this);
 	Render();
@@ -120,7 +120,7 @@ void PreviewCanvas::OnPaint(wxPaintEvent& event) {
 
 /* ------------------------------------------------------------------------- */
    
-void PreviewCanvas::OnSize(wxSizeEvent& event) {
+void PreviewCanvas::OnSize(wxSizeEvent& /*event*/) {
 	
 	/* wxGLCanvas::OnSize(event); */
 
@@ -476,7 +476,7 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 
 // --------------------------------------------------------------------------- 
 
-void PreviewCanvas::OnMiddleMouseUp(wxMouseEvent& event) {
+void PreviewCanvas::OnMiddleMouseUp(wxMouseEvent& /*event*/) {
 
 	if (HasCapture()) {
 		ReleaseMouse();

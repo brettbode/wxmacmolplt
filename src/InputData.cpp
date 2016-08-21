@@ -34,7 +34,8 @@
 #include <cctype>
 #include <sstream>
 
-	//InputData functions
+
+//InputData functions
 InputData::InputData(void) {
 	//Always create Control, System, Basis, and Data groups
 	Control = new ControlGroup;
@@ -170,6 +171,12 @@ void InputData::ReadXML(XMLElement * parent, MoleculeData * p) {
 									case MMP_IOFMOGroupElement:
 										FMO.ReadXML(child, p);
 										break;
+									default:
+									{
+										wxString msg;
+										msg.Printf(_T("Unknown CML element: %s"), child->getName());
+										wxLogMessage(msg);
+									}
 								}
 							}
 						}
@@ -239,6 +246,8 @@ const char * ControlGroup::GAMESSSCFTypeToText(GAMESS_SCFType t) {
 			return "MCSCF";
 		case GAMESS_NO_SCF:
 			return "NONE";
+		default: //Fall through to the invalid
+			wxLogMessage("Attempt to convert invalid GAMESS SCF Type");
 	}
 	return "invalid";
 }
@@ -534,6 +543,8 @@ const char * ControlGroup::GAMESSLocalizationToText(GAMESS_Localization t) {
 			return "POP";
 		case GAMESS_SVD_Localization:
 			return "SVD";
+		default:
+			wxLogMessage(_T("Attempt to convert invalid GAMESS Localization"));
 	}
 	return "invalid";
 }
@@ -549,6 +560,8 @@ const char * ControlGroup::GetFriendText(FriendType f) {
 			return "GAUSSIAN";
 		case Friend_ALL:
 			return "ALL";
+		default:
+			wxLogMessage(_T("Attempt to convert invalid Friend text"));
 	}
 	return "invalid";	//Getting to here indicates a bad value
 }
@@ -779,6 +792,12 @@ void ControlGroup::ReadXML(XMLElement * parent) {
 						if (child->getBoolValue(tb))
 							SetNormP(tb);
 						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_T("Unknown control group CML element: %s"), child->getName());
+						wxLogMessage(msg);
+					}
 				}
 			}
 		}
@@ -998,6 +1017,8 @@ const char * MemoryUnitToText(const MemoryUnit & mu) {
 			return "Gwords";
 		case gigaBytesUnit:
 			return "GB";
+		default:
+			wxLogMessage(_T("Attempt to convert invalid memory unit"));
 	}
 	return "invalid";
 }
@@ -1027,6 +1048,8 @@ const char * TimeUnitToText(const TimeUnit & tu) {
 			return "years";
 		case milleniaUnit:
 			return "millenia";
+		default:
+			wxLogMessage(_T("Attempt to convert invalid time unit"));
 	}
 	return "invalid";
 }
@@ -1066,12 +1089,14 @@ float SystemGroup::GetConvertedTime(void) const {
 		case secondUnit:
 			factor = 60.0f;
 		break;
+		default:
+			wxLogMessage(_T("Attempt to use Convert invalid time unit"));
 	}
 	result *= factor;
 	return result;
 }
 long SystemGroup::SetConvertedTime(float NewTime) {
-	long	result, factor = 1;
+	long	result=-1, factor = 1;
 
 	switch (TimeUnits) {
 		case milleniaUnit:
@@ -1090,6 +1115,8 @@ long SystemGroup::SetConvertedTime(float NewTime) {
 		case secondUnit:
 			result = (long)(NewTime/60.0);
 		break;
+		default:
+			wxLogMessage(_T("Attempt to set time with invalid unit"));
 	}
 	if (result >= 0) TimeLimit = result;
 	return TimeLimit;
@@ -1109,6 +1136,9 @@ double SystemGroup::GetConvertedMem(void) const {
 	else result = 1000000;
 
 	switch (MemUnits) {
+		case wordsUnit:
+			factor = 1.0;
+			break;
 		case bytesUnit:
 			factor = 8.0;
 		break;
@@ -1118,24 +1148,38 @@ double SystemGroup::GetConvertedMem(void) const {
 		case megaBytesUnit:
 			factor = 8.0/(1024*1024);
 		break;
+		case gigaWordsUnit:
+			factor = 1.0/1000000000.0;
+		break;
+		case gigaBytesUnit:
+			factor = 8.0/(1024*1024*1024);
+		break;
+		default:
+			wxLogMessage(_T("Attempt to convert memory with invalid unit"));
 	}
 	result *= factor;
 	return result;
 }
 double SystemGroup::SetConvertedMem(double NewMem) {
-	double	result, factor = 1;
+	double	result=-1, factor = 1;
 
 	switch (MemUnits) {
+		case gigaBytesUnit:
+			factor *= 1024;
 		case megaBytesUnit:
 			factor *= 1024*1024;
 		case bytesUnit:
 			result = (long)(factor*NewMem/8.0);
 		break;
+		case gigaWordsUnit:
+			factor *= 1000;
 		case megaWordsUnit:
 			factor *= 1000000;
 		case wordsUnit:
 			result = (long)(factor*NewMem);
 		break;
+		default:
+			wxLogMessage(_T("Attempt to set memory with invalid unit"));
 	}
 	if (result >= 0) Memory = result;
 	return Memory;
@@ -1154,6 +1198,9 @@ double SystemGroup::GetConvertedMemDDI(void) const {
 	result = MemDDI;	//memDDI is stored in MW
 	
 	switch (MemDDIUnits) {
+		case megaWordsUnit:
+			factor = 1.0;
+			break;
 		case megaBytesUnit:
 			factor = 8.0;
 			break;
@@ -1163,6 +1210,8 @@ double SystemGroup::GetConvertedMemDDI(void) const {
 		case gigaBytesUnit:
 			factor = 8.0/(1000.0);
 			break;
+		default:
+			wxLogMessage(_T("Unhandled memory unit in GetConvertedMemDDI"));
 	}
 	result *= factor;
 	return result;
@@ -1171,6 +1220,9 @@ double SystemGroup::SetConvertedMemDDI(double NewMem) {
 	double	result, factor = 1;
 	
 	switch (MemDDIUnits) {
+		case megaWordsUnit:
+			factor = 1.0;
+			break;
 		case megaBytesUnit:
 			factor = 1.0/8.0;
 			break;
@@ -1180,6 +1232,8 @@ double SystemGroup::SetConvertedMemDDI(double NewMem) {
 		case gigaBytesUnit:
 			factor = 1000.0/8.0;
 			break;
+		default:
+			wxLogMessage(_T("Unhandled memory unit in SetConvertedMemDDI"));
 	}
 	result = NewMem*factor;
 	if (result >= 0) MemDDI = result;
@@ -1325,6 +1379,12 @@ void SystemGroup::ReadXML(XMLElement * parent) {
 						if (child->getBoolValue(tb))
 							SetParallel(tb);
 						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_T("Unknown system group CML element: %s"), child->getName());
+						wxLogMessage(msg);
+					}
 				}
 			}
 		}
@@ -1392,6 +1452,8 @@ void BasisGroup::InitData(void) {
 }
 const char * BasisGroup::GAMESSBasisSetToText(GAMESS_BasisSet bs) {
 	switch (bs) {
+		case GAMESS_BS_None:
+			break; //Let this one fall through and return invalid
 		case GAMESS_BS_MINI:
 			return "MINI";
 		case GAMESS_BS_MIDI:
@@ -1560,6 +1622,8 @@ const char * BasisGroup::GAMESSBasisSetToText(GAMESS_BasisSet bs) {
 			return "PM3";
 		case GAMESS_BS_RM1:
 			return "RM1";
+		default:
+			wxLogMessage(_T("Unknown basis set encountered in GAMESSBasisSetToText"));
 	}
 	return "invalid";
 }
@@ -1684,6 +1748,8 @@ const char * BasisGroup::PolarToText(GAMESS_BS_Polarization p) {
 			return "HUZINAGA";
 		case GAMESS_BS_Hondo7_Polar:
 			return "HONDO7";
+		default:
+			wxLogMessage(_T("Unknown Polarization option in PolarToText"));
 	}
 	return "invalid";
 }
@@ -1699,6 +1765,8 @@ const char * BasisGroup::GAMESSECPToText(GAMESS_BS_ECPotential p) {
 			return "HW";
 		case GAMESS_BS_ECP_MCP:
 			return "MCP";
+		default:
+			wxLogMessage(_T("Unknown ECP type in GAMESSECPToText"));
 	}
 	return "invalid";
 }
@@ -1832,6 +1900,12 @@ void BasisGroup::ReadXML(XMLElement * parent) {
 						if (child->getBoolValue(tb))
 							CheckBasis(tb);
 						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_T("Unknown Basis group CML element: %s"), child->getName());
+						wxLogMessage(msg);
+					}
 				}
 			}
 		}
@@ -1942,6 +2016,8 @@ const char * DataGroup::GetGAMESSPointGroupText(GAMESSPointGroup p) {
 			return "OH";
 		case GAMESS_O:
 			return "O";
+		default:
+			wxLogMessage(_T("Unknown point group in GetGAMESSPointGroupText"));
 	}
 	return "invalid";
 }
@@ -2030,6 +2106,8 @@ const char * DataGroup::GetCoordTypeText(CoordinateType t) {
 			return "ZMT";
 		case ZMTMPCCoordType:
 			return "ZMTMPC";
+		default:
+			wxLogMessage(_T("Unknown coord type in GetCoordTypeText"));
 	}
 	return "invalid";
 }
@@ -2315,6 +2393,12 @@ void DataGroup::ReadXML(XMLElement * parent) {
 						if (child->getBoolValue(tb))
 							SetUseSym(tb);
 						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_T("Unknown data group CML element: %s"), child->getName());
+						wxLogMessage(msg);
+					}
 				}
 			}
 		}
@@ -2531,6 +2615,12 @@ void GuessGroup::ReadXML(XMLElement * parent) {
 						if (child->getDoubleValue(temp)) MOTolEquil = temp;
 					}
 						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_T("Unknown guess group CML element: %s"), child->getName());
+						wxLogMessage(msg);
+					}
 				}
 			}
 		}
@@ -2662,15 +2752,15 @@ void SCFGroup::WriteXML(XMLElement * parent) const {
 	if (GetSOSCF()) Ele->addChildElement(CML_convert(MMP_IOSGSOSCF), trueXML);
 	if (GetDEM()) Ele->addChildElement(CML_convert(MMP_IOSGDEM), trueXML);
 	if (GetGVBNumCoreOrbs()>0) {
-		snprintf(line, kMaxLineLength, "%d", GetGVBNumCoreOrbs());
+		snprintf(line, kMaxLineLength, "%ld", GetGVBNumCoreOrbs());
 		Ele->addChildElement(CML_convert(MMP_IOSGGVBNumCoreOrbs), line);
 	}
 	if (GetGVBNumPairs()>0) {
-		snprintf(line, kMaxLineLength, "%d", GetGVBNumPairs());
+		snprintf(line, kMaxLineLength, "%ld", GetGVBNumPairs());
 		Ele->addChildElement(CML_convert(MMP_IOSGGVBNumPairs), line);
 	}
 	if (GetGVBNumOpenShells()>0) {
-		snprintf(line, kMaxLineLength, "%d", GetGVBNumOpenShells());
+		snprintf(line, kMaxLineLength, "%ld", GetGVBNumOpenShells());
 		Ele->addChildElement(CML_convert(MMP_IOSGGVBNumOpenShells), line);
 		Ele->AddLongArray(GVBOpenShellDeg, CML_convert(MMP_IOSCFArrayElement), CML_convert(MMP_IOSGGVBOpenShellDeg));
 	}
@@ -2968,6 +3058,12 @@ void MP2Group::ReadXML(XMLElement * parent) {
 							SetMP2Prop(tb);
 					}
 						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_T("Unknown MP2 group CML element: %s"), child->getName());
+						wxLogMessage(msg);
+					}
 				}
 			}
 		}
@@ -3084,6 +3180,12 @@ void HessianGroup::ReadXML(XMLElement * parent) {
 						if (child->getBoolValue(tb))
 							SetVibAnalysis(tb);
 						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_T("Unknown hessian group CML element: %s"), child->getName());
+						wxLogMessage(msg);
+					}
 				}
 			}
 		}
@@ -3297,6 +3399,8 @@ const char * DFTGroup::GetDFTGridFuncText(DFTFunctionalsGrid type) {
 			return "M08-HX";
 		case DFT_Grid_M08_SO:
 			return "M08-SO";
+		default:
+			wxLogMessage(_T("Invalid DFT Grid functional in GetDFTGridFuncText"));
 	}
 	return "invalid";
 }
@@ -3344,6 +3448,8 @@ const char * DFTGroup::GetDFTGridFreeFuncText(DFTFunctionalsGridFree type) {
 			return "WS";
 		case DFT_GridFree_WIGEXP:
 			return "WIGEXP";
+		default:
+			wxLogMessage(_T("Invalid DFT func in GetDFTGridFreeText"));
 	}
 	return "invalid";
 }
@@ -3502,6 +3608,12 @@ void DFTGroup::ReadXML(XMLElement * parent) {
 						if (child->getBoolValue(tb))
 							SetThree(tb);
 						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_T("Unknown DFT group CML element: %s"), child->getName());
+						wxLogMessage(msg);
+					}
 				}
 			}
 		}
@@ -3524,6 +3636,8 @@ const char * EffectiveFragmentsGroup::ConvertPolMethodToText(EFRAG_PolMethods t)
 			return "FRGSCF";
 		case SCF_PolMethod:
 			return "SCF";
+		default:
+			wxLogMessage(_T("Invalid Pol Method in ConvertPolMethodToText"));
 	}
 	return "invalid";
 }
@@ -3535,6 +3649,8 @@ const char * EffectiveFragmentsGroup::ConvertPositionMethodToText(EFRAG_Position
 			return "FIXED";
 		case EFOPT_Position:
 			return "EFOPT";
+		default:
+			wxLogMessage(_T("Invalid position method in ConvertPositionMethodToText"));
 	}
 	return "invalid";
 }
@@ -3694,6 +3810,12 @@ void FMOGroup::ReadXML(XMLElement * parent, MoleculeData * MainData) {
 						}
 					}
 						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_T("Unknown FMO group CML element: %s"), child->getName());
+						wxLogMessage(msg);
+					}
 				}
 			} else if (child && CML_convert(child->getName(), cmlitem)) {
 				MainData->ReadFMOIdsFromXML(child);
@@ -3760,6 +3882,8 @@ const char * StatPtGroup::GetMethodText(OptMethod type) {
 			return "SCHLEGEL";
 		case StatPt_OptMethod_ConOpt:
 			return "CONOPT";
+		default:
+			wxLogMessage(_T("Invalid method in GetMethodText"));
 	}
 	return "invalid";
 }
@@ -3780,6 +3904,8 @@ const char * StatPtGroup::GetHessUpdateMethodText(HessUpdateMethod type) {
 			return "READ";
 		case StatPt_HessUpdateMethod_Calc:
 			return "CALC";
+		default:
+			wxLogMessage(_T("Invalid hess update in GetHessUpdateMethodText"));
 	}
 	return "invalid";
 }
@@ -3994,6 +4120,12 @@ void StatPtGroup::ReadXML(XMLElement * parent) {
 						if (child->getBoolValue(tb))
 							SetHessFlag(tb);
 						break;
+					default:
+					{
+						wxString msg;
+						msg.Printf(_T("Unknown StatPt group CML element: %s"), child->getName());
+						wxLogMessage(msg);
+					}
 				}
 			}
 		}
@@ -4159,3 +4291,4 @@ void OrbitalRec::WriteVecGroup(BufferFile * File, const long & NumBasisFuncs, co
 //finish off the group
 	File->WriteLine(" $END", true);
 }
+

@@ -12,7 +12,7 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
                            const wxSize &size,
                            int n,
                            const wxString choices[],
-                           long style) :
+                           long /*style*/) :
                   wxPanel(parent,
                           id,
                           pos,
@@ -64,7 +64,7 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
                            const wxPoint &pos,
                            const wxSize &size,
                            const wxArrayString & choices,
-                           long style) :
+                           long /*style*/) :
 						wxPanel(parent,
 								id,
 								pos,
@@ -238,7 +238,7 @@ wxString wxUglyChoice::GetStringSelection() const {
     return m_menu.GetLabel(item[selection]);
 }
 
-void wxUglyChoice::onButtonClick(wxCommandEvent &event) {
+void wxUglyChoice::onButtonClick(wxCommandEvent & /*event*/) {
     PopupMenu(&m_menu);
 }
 

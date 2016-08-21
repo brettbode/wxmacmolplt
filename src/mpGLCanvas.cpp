@@ -205,6 +205,8 @@ void MpGLCanvas::SetPrefs(WinPrefs *newPrefs) {
 }
 
 wxImage MpGLCanvas::getImage(const int width, const int height) {
+	(void)width;
+	(void)height;
 
 #if wxCHECK_VERSION(2,9,0)
 	SetCurrent(*context);
@@ -250,6 +252,7 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 									Progress * progress, bool Center,
 									bool frame) {
 
+	(void)progress;
 #if wxCHECK_VERSION(2,9,0)
 	SetCurrent(*context);
 #else
@@ -523,7 +526,7 @@ void MpGLCanvas::SetProjection(float aspect_ratio) {
 
 }
 
-void MpGLCanvas::eventSize(wxSizeEvent &event) {
+void MpGLCanvas::eventSize(wxSizeEvent &/*event*/) {
 
 #if !wxCHECK_VERSION(2,9,0)
 	wxGLCanvas::OnSize(event);
@@ -541,6 +544,7 @@ void MpGLCanvas::eventSize(wxSizeEvent &event) {
  */
 void MpGLCanvas::eventPaint(wxPaintEvent &event) {
 
+	(void)event;
 	wxPaintDC paintDC(this); // wx requires this. I hope it goes away soon.
 	Draw();
 
@@ -731,6 +735,7 @@ void MpGLCanvas::Draw() {
 }
 
 void MpGLCanvas::eventErase(wxEraseEvent &event) {
+	(void)event;
 	// Don't mess with this.  It's supposed to be empty.
 	// This avoids flashing on Windows.
 }
@@ -2420,6 +2425,7 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 	// It's assumed that at least 4 atoms are selected when this function is
 	// called.
 
+	(void)event;
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
@@ -2609,6 +2615,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
  * @param event The contextual menu event triggering the change.
  */
 void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
+	(void)event;
 
 	MolWin->CreateFrameSnapShot();
 	mMainData->cFrame->SetAtomType(selected, BuilderTool->GetSelectedElement());
@@ -2853,6 +2860,7 @@ void MpGLCanvas::annoPopupMenu(int x, int y) {
 }
 
 void MpGLCanvas::SetAnnotationParameter(wxCommandEvent& event) {
+	(void)event;
 
 	wxTextEntryDialog *dlg;
 	double new_value;
@@ -2895,6 +2903,7 @@ void MpGLCanvas::SetAnnotationParameter(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::ConstrainToAnnotation(wxCommandEvent& event) {
+	(void)event;
 
 	if (mMainData->GetConstrainAnnotation() != selected) {
 		mMainData->ConstrainToAnnotation(selected);
@@ -2905,6 +2914,7 @@ void MpGLCanvas::ConstrainToAnnotation(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
+	(void)event;
 
 	Annotation * t = mMainData->Annotations[selected];
 	mMainData->Annotations.erase(mMainData->Annotations.begin() + selected);
@@ -3102,6 +3112,7 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
+	(void)event;
 	
 	MolWin->CreateFrameSnapShot();
 	// Delete the selected bond
@@ -3116,6 +3127,7 @@ void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::AddPlaneNormal(wxCommandEvent& event) {
+	(void)event;
 
 	Frame *lFrame = mMainData->cFrame;
 	CPoint3D pos1;
@@ -3184,6 +3196,7 @@ void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
+	(void)event;
 	Frame *  lFrame = mMainData->cFrame;
 
 	Frame * cFrame = mMainData->Frames;
@@ -3205,6 +3218,7 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
+	(void)event;
 	MolWin->CreateFrameSnapShot();
 	Frame * lFrame = mMainData->cFrame;
 
@@ -3239,6 +3253,7 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
+	(void)event;
 
 	MolWin->CreateFrameSnapShot();
 	Frame * lFrame = mMainData->Frames;
@@ -3318,6 +3333,7 @@ void MpGLCanvas::ConnectSelectedToSite(int src_atom, int src_site,
 }
 
 void MpGLCanvas::ConvertEFPToAllElec(wxCommandEvent& event) {
+	(void)event;
 	Frame *lFrame = mMainData->cFrame;
 	//Convert all atoms in the selected effective fragment to all electron atoms.
 	if (lFrame->Atoms[selected].IsEffectiveFragment()) {
@@ -3357,12 +3373,14 @@ void MpGLCanvas::ConvertEFPToAllElec(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::OnIdleEvent(wxIdleEvent& event) {
+	(void)event;
 //	draw();
 //	event.RequestMore();
 }
 
 #if wxCHECK_VERSION(2, 8, 0)
 void MpGLCanvas::eventMouseCaptureLost(wxMouseCaptureLostEvent& event) {
+	(void)event;
 	ReleaseMouse();
 }
 #endif

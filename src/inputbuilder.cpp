@@ -1720,7 +1720,7 @@ wxIcon InputBuilderWindow::GetIconResource( const wxString& name )
  * wxEVT_CLOSE_WINDOW event handler for ID_INPUTBUILDERWINDOW
  */
 
-void InputBuilderWindow::OnCloseWindow( wxCloseEvent& event )
+void InputBuilderWindow::OnCloseWindow( wxCloseEvent& /*event*/ )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->CloseInputBuilderWindow();
@@ -2516,7 +2516,7 @@ void InputBuilderWindow::SetupSummaryItems() {
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_BASIS_CHOICE
  */
 
-void InputBuilderWindow::OnBasisChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnBasisChoiceSelected( wxCommandEvent& /*event*/ )
 {
     short BasisValue = 0;
     short NumGauss   = 0;
@@ -2554,7 +2554,7 @@ void InputBuilderWindow::OnBasisChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_ECPT_CHOICE
  */
 
-void InputBuilderWindow::OnEcptChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnEcptChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Basis->SetECPPotential(ecpTypeChoice->GetSelection());
 }
@@ -2564,7 +2564,7 @@ void InputBuilderWindow::OnEcptChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_POLAR_CHOICE
  */
 
-void InputBuilderWindow::OnPolarChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnPolarChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Basis->SetPolar((GAMESS_BS_Polarization)(polarChoice->GetSelection() + 1));
 }
@@ -2594,7 +2594,7 @@ void InputBuilderWindow::OnDiffsCheckboxClick( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMD_CHOICE
  */
 
-void InputBuilderWindow::OnNumdChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnNumdChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Basis->SetNumDFuncs(numDChoice->GetSelection());
     SetupItems();
@@ -2605,7 +2605,7 @@ void InputBuilderWindow::OnNumdChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMF_CHOICE
  */
 
-void InputBuilderWindow::OnNumfChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnNumfChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Basis->SetNumFFuncs(numFChoice->GetSelection());
     SetupItems();
@@ -2616,7 +2616,7 @@ void InputBuilderWindow::OnNumfChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_NUMP_CHOICE
  */
 
-void InputBuilderWindow::OnNumpChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnNumpChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Basis->SetNumPFuncs(numPChoice->GetSelection());
     SetupItems();
@@ -2625,7 +2625,7 @@ void InputBuilderWindow::OnNumpChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_RUN_CHOICE
  */
 
-void InputBuilderWindow::OnRunChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnRunChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Control->SetRunType((TypeOfRun)(runChoice->GetSelection() + 1));
     SetupItems();
@@ -2636,7 +2636,7 @@ void InputBuilderWindow::OnRunChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_SCF_CHOICE
  */
 
-void InputBuilderWindow::OnScfChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnScfChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Control->SetSCFType((GAMESS_SCFType)(scfChoice->GetSelection() + 1));
 	setPaneVisible(SCFOPTS_PANE, ShowSCFOpts());
@@ -2648,7 +2648,7 @@ void InputBuilderWindow::OnScfChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_LOCAL_CHOICE
  */
 
-void InputBuilderWindow::OnLocalChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnLocalChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Control->SetLocal((GAMESS_Localization)(localChoice->GetSelection()));
     SetupItems();
@@ -2684,7 +2684,7 @@ void InputBuilderWindow::OnDftCheckboxClick( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CI_CHOICE
  */
 
-void InputBuilderWindow::OnCiChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnCiChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Control->SetCIType((CIRunType)(ciChoice->GetSelection()));
     SetupItems();
@@ -2695,7 +2695,7 @@ void InputBuilderWindow::OnCiChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_CC_CHOICE
  */
 
-void InputBuilderWindow::OnCcChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnCcChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Control->SetCCType((CCRunType)(ccChoice->GetSelection()));
     SetupItems();
@@ -2706,7 +2706,7 @@ void InputBuilderWindow::OnCcChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_EXE_CHOICE
  */
 
-void InputBuilderWindow::OnExeChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnExeChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Control->SetExeType(exeChoice->GetSelection());
 	SetupMiscPrefsItems();
@@ -2717,7 +2717,7 @@ void InputBuilderWindow::OnExeChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_CANCEL
  */
 
-void InputBuilderWindow::OnCancelClick( wxCommandEvent& event )
+void InputBuilderWindow::OnCancelClick( wxCommandEvent& /*event*/ )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->CloseInputBuilderWindow();
@@ -2743,7 +2743,7 @@ void InputBuilderWindow::FrameChanged(void) {
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
  */
 
-void InputBuilderWindow::OnOkClick( wxCommandEvent& event )
+void InputBuilderWindow::OnOkClick( wxCommandEvent& /*event*/ )
 {
 	SaveData();
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
@@ -2756,7 +2756,7 @@ void InputBuilderWindow::OnOkClick( wxCommandEvent& event )
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_DEFAULTSBUTTON
  */
 
-void InputBuilderWindow::OnDefaultsbuttonClick( wxCommandEvent& event )
+void InputBuilderWindow::OnDefaultsbuttonClick( wxCommandEvent& /*event*/ )
 {
     switch(getCurrentPane()) {
         case BASIS_PANE:
@@ -2809,7 +2809,7 @@ void InputBuilderWindow::OnDefaultsbuttonClick( wxCommandEvent& event )
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_REVERTBUTTON
  */
 
-void InputBuilderWindow::OnRevertbuttonClick( wxCommandEvent& event )
+void InputBuilderWindow::OnRevertbuttonClick( wxCommandEvent& /*event*/ )
 {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	MoleculeData * MainData = ((MolDisplayWin *)parent)->GetData();
@@ -2898,7 +2898,7 @@ void InputBuilderWindow::OnRevertbuttonClick( wxCommandEvent& event )
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ADVANCEDBUTTON
  */
 
-void InputBuilderWindow::OnAdvancedButtonClicked( wxCommandEvent& event )
+void InputBuilderWindow::OnAdvancedButtonClicked( wxCommandEvent& /*event*/ )
 {
 
 	// User wants to go to advanced mode.
@@ -2937,7 +2937,7 @@ void InputBuilderWindow::OnAdvancedButtonClicked( wxCommandEvent& event )
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_WRITEFILEBUTTON
  */
 
-void InputBuilderWindow::OnWritefilebuttonClick( wxCommandEvent& event )
+void InputBuilderWindow::OnWritefilebuttonClick( wxCommandEvent& /*event*/ )
 {
 	SaveData();
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
@@ -2948,7 +2948,7 @@ void InputBuilderWindow::OnWritefilebuttonClick( wxCommandEvent& event )
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ENQUEUEBUTTON
  */
 
-void InputBuilderWindow::OnEnqueueButtonClick( wxCommandEvent& event )
+void InputBuilderWindow::OnEnqueueButtonClick( wxCommandEvent& /*event*/ )
 {
 	wxFileName file(wxFileName::CreateTempFileName(wxT("wxMacMolPltData_")));
 	file.SetExt(wxT("inp"));
@@ -2997,7 +2997,7 @@ int InputBuilderWindow::getCurrentPane() {
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_COORD_CHOICE
  */
 
-void InputBuilderWindow::OnCoordChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnCoordChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Data->SetCoordType((CoordinateType)(coordTypeChoice->GetSelection() + 1));
     SetupItems();
@@ -3008,7 +3008,7 @@ void InputBuilderWindow::OnCoordChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_UNIT_CHOICE
  */
 
-void InputBuilderWindow::OnUnitChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnUnitChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->Data->SetUnits(unitChoice->GetSelection());
 }
@@ -3492,7 +3492,7 @@ void InputBuilderWindow::OnFdiffCheckClick( wxCommandEvent& event )
  * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_UHF_NO_CHECK
  */
 
-void InputBuilderWindow::OnUhfNoCheckClick( wxCommandEvent& event )
+void InputBuilderWindow::OnUhfNoCheckClick( wxCommandEvent& /*event*/ )
 {
 	TmpInputRec->SCF->SetUHFNO(mUHFNOCheck->GetValue());
  //   event.Skip();
@@ -3528,7 +3528,7 @@ void InputBuilderWindow::OnInitHessRadioSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHECKBOX_CLICKED event handler for ID_PRINTORBS_CHECK
  */
 
-void InputBuilderWindow::OnPrintorbsCheckClick( wxCommandEvent& event )
+void InputBuilderWindow::OnPrintorbsCheckClick( wxCommandEvent& /*event*/ )
 {
 	TmpInputRec->StatPt->SetAlwaysPrintOrbs(mPrintOrbsCheck->GetValue());
  //   event.Skip();
@@ -3836,7 +3836,7 @@ void InputBuilderWindow::OnMp2aostorageRadioSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_DFTMETHOD_CHOICE
  */
 
-void InputBuilderWindow::OnDftmethodChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnDftmethodChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->DFT.SetMethodGrid(!(dftMethodChoice->GetSelection()));
     SetupItems();
@@ -3847,7 +3847,7 @@ void InputBuilderWindow::OnDftmethodChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_FUNCTIONAL_CHOICE
  */
 
-void InputBuilderWindow::OnGridFunctionalChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnGridFunctionalChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->DFT.SetFunctional(dftGridFuncChoice->GetSelection() + 1);
 }
@@ -3857,7 +3857,7 @@ void InputBuilderWindow::OnGridFunctionalChoiceSelected( wxCommandEvent& event )
  * wxEVT_COMMAND_CHOICE_SELECTED event handler for ID_GRIDFREE_FUNCTIONAL_CHOICE
  */
 
-void InputBuilderWindow::OnGridfreeFunctionalChoiceSelected( wxCommandEvent& event )
+void InputBuilderWindow::OnGridfreeFunctionalChoiceSelected( wxCommandEvent& /*event*/ )
 {
     TmpInputRec->DFT.SetFunctional(dftGridFreeFuncChoice->GetSelection() + 1);
 }

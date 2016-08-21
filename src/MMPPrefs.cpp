@@ -739,6 +739,12 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 								}
 							}
 							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unhandled CML element in ReadMMPPrefs: %s"), child->getName());
+							wxLogMessage(msg);
+						}
 					}
 				}
 				delete molChildren;
@@ -844,6 +850,12 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 						case MMPEnergyOpt_PEColor:
 							clr = EnergyPlotOptions.GetPEColor();
 							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unknown CML element in ReadMMPPrefs: %s"), child->getName());
+							wxLogMessage(msg);
+						}
 					}
 					if (echild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
 						clr->red = (unsigned short)(floatVal*65535.0);
@@ -921,6 +933,12 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 						case MMPSurfWin_NegColor:
 							SurfaceOpts.SetNegColor(&temp);
 							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unknown CML element in ReadMMPPrefs: %s"), child->getName());
+							wxLogMessage(msg);
+						}
 					}
 				}
 				delete molChildren;
@@ -929,6 +947,12 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 			case MMPPref_WindowDefaults:
 				gWindowDefault.ReadXML(child);
 				break;
+			default:
+			{
+				wxString msg;
+				msg.Printf(_T("Unknown CML element in ReadMMPPrefs: %s"), child->getName());
+				wxLogMessage(msg);
+			}
 		}
 	}
 	delete children;
