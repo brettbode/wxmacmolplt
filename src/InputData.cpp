@@ -247,7 +247,7 @@ const char * ControlGroup::GAMESSSCFTypeToText(GAMESS_SCFType t) {
 		case GAMESS_NO_SCF:
 			return "NONE";
 		default: //Fall through to the invalid
-			wxLogMessage("Attempt to convert invalid GAMESS SCF Type");
+			wxLogMessage(_T("Attempt to convert invalid GAMESS SCF Type"));
 	}
 	return "invalid";
 }
