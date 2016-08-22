@@ -526,10 +526,12 @@ void MpGLCanvas::SetProjection(float aspect_ratio) {
 
 }
 
-void MpGLCanvas::eventSize(wxSizeEvent &/*event*/) {
+void MpGLCanvas::eventSize(wxSizeEvent &event) {
 
 #if !wxCHECK_VERSION(2,9,0)
 	wxGLCanvas::OnSize(event);
+#else
+	(void) event;
 #endif
 	GetClientSize(&width, &height);
 	Update();
