@@ -97,7 +97,7 @@ enum MMP_EventID {
 	MMP_INVERTNORMALMODE,
 	MMP_ADDHYDROGENS,
 	MMP_DELETEHYDROGENS,
-	
+		// The following is grouped together to be used in an UPDATE_UI_RANGE with the same handler
 	MMP_NEWFRAME,
 	MMP_COPYCOORDS,
 	MMP_COPYNWCOORDS,
