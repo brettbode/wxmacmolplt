@@ -120,18 +120,20 @@ class MpGLCanvas : public wxGLCanvas {
 		void HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 						   const wxPoint& prev_pt);
 
-		int selected;           // Id of object clicked on, -1 if invalid
-		int selected_type;      // Type of object clicked on
-		int selected_site;      // Id of bond site clicked on, -1 if no site
-		wxPoint curr_mouse;     // Current mouse position
-		wxPoint prev_mouse;     // Previous mouse position
-		int first_site_clicked; // Id of bonding site clicked on by user
-		int first_atom_clicked; // Atom connected to clicked on site
-		int width;              // Width of canvas in pixels
-		int height;             // Height of canvas in pixels
-		int ndrag_events;       // Number of drag events in current drag
-		bool is_depth_zooming;  // True if user is changing atom's depth
-		bool window_just_focused; // Flag indicating window getting focus
+		int selected;           ///< Id of object clicked on, -1 if invalid
+		int selected_type;      ///< Type of object clicked on
+		int selected_site;      ///< Id of bond site clicked on, -1 if no site
+		int selectedBondAtom1;	///< index of atom 1 of a selected bond
+		int selectedBondAtom2;	///< index of atom 2 of a selected bond
+		wxPoint curr_mouse;     ///< Current mouse position
+		wxPoint prev_mouse;     ///< Previous mouse position
+		int first_site_clicked; ///< Id of bonding site clicked on by user
+		int first_atom_clicked; ///< Atom connected to clicked on site
+		int width;              ///< Width of canvas in pixels
+		int height;             ///< Height of canvas in pixels
+		int ndrag_events;       ///< Number of drag events in current drag
+		bool is_depth_zooming;  ///< True if user is changing atom's depth
+		bool window_just_focused; ///< Flag indicating window getting focus
 		wxStopWatch mouse_activate_timer;
 		bool ignore_next_up;
 		bool is_lassoing;

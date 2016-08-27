@@ -2063,8 +2063,8 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 		// The axis of rotation is a vector from one atom of the
 		// bond to the other.
 
-		lFrame->GetAtomPosition(lFrame->GetBondAtom(selected, 1), pivot_pt);
-		lFrame->GetAtomPosition(lFrame->GetBondAtom(selected, 2), other_pt);
+		lFrame->GetAtomPosition(selectedBondAtom1, pivot_pt);
+		lFrame->GetAtomPosition(selectedBondAtom2, other_pt);
 		axis = other_pt	- pivot_pt;
 		Normalize3D(&axis);
 
@@ -2311,6 +2311,10 @@ void MpGLCanvas::testPicking(int x, int y) {
 			}
 		}
 		j += buff[j] + 3;
+	}
+	if (selected_type == MMP_BOND) {
+		selectedBondAtom1 = mMainData->cFrame->GetBondAtom(selected, 1);
+		selectedBondAtom2 = mMainData->cFrame->GetBondAtom(selected, 2);
 	}
 
 #if 0
