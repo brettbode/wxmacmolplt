@@ -3762,6 +3762,8 @@ const char * CML_convert(MMP_IOSCFGroupNS t)
 			return "GVBOpenShellDegeneracy";
 		case MMP_IOSCFArrayElement:
 			return "array";
+		case MMP_IOSCFNPREOArrayElement:
+			return "NPREOArray";
 		default:
             return "invalid";
     }

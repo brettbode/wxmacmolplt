@@ -2764,6 +2764,10 @@ void SCFGroup::WriteXML(XMLElement * parent) const {
 		Ele->addChildElement(CML_convert(MMP_IOSGGVBNumOpenShells), line);
 		Ele->AddLongArray(GVBOpenShellDeg, CML_convert(MMP_IOSCFArrayElement), CML_convert(MMP_IOSGGVBOpenShellDeg));
 	}
+	if (NPREOVector.size()>0) {
+		Ele->AddLongArray(NPREOVector, CML_convert(MMP_IOSCFArrayElement), CML_convert(MMP_IOSCFNPREOArrayElement));
+	}
+
 }
 void SCFGroup::ReadXML(XMLElement * parent) {
 	XMLElementList * children = parent->getChildren();
@@ -2841,6 +2845,9 @@ void SCFGroup::ReadXML(XMLElement * parent) {
 							GVBOpenShellDeg.clear();
 							//This implies that this item must follow the NumOpenShells item.
 							child->getLongArray(GVBNumOpenShells, GVBOpenShellDeg);
+						} else if (item == MMP_IOSCFNPREOArrayElement) {
+							NPREOVector.clear();
+							child->getLongArray(4, NPREOVector);
 						}
 						break;
 					default:
@@ -3466,14 +3473,14 @@ const char * DFTGroup::GetFunctionalText(void) const {
 }
 short DFTGroup::SetFunctional(const char * DFT_Type) {
 	if (MethodGrid()) {
-		for (int i=0; i<NumberGRIDDFTFuncs; i++) {
+		for (int i=invalidDFTGrid+1; i<NumberGRIDDFTFuncs; i++) {
 			if (!strcasecmp(DFT_Type, GetDFTGridFuncText((DFTFunctionalsGrid) i))) {
 				SetFunctional((DFTFunctionalsGrid) i);
 				break;
 			}
 		}
 	} else {
-		for (int i=0; i<NumberDFTGridFreeFuncs; i++) {
+		for (int i=invalidDFTGridFreeType+1; i<NumberDFTGridFreeFuncs; i++) {
 			if (!strcasecmp(DFT_Type, GetDFTGridFreeFuncText((DFTFunctionalsGridFree) i))) {
 				SetFunctional((DFTFunctionalsGridFree) i);
 				break;

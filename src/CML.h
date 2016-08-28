@@ -387,6 +387,7 @@ enum MMP_IOSCFGroupNS {
 	MMP_IOSGGVBNumOpenShells,
 	MMP_IOSGGVBOpenShellDeg,
 	MMP_IOSCFArrayElement,
+	MMP_IOSCFNPREOArrayElement,
 	
 	NumberMMPIOSCFGroupItems
 };

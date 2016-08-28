@@ -253,6 +253,25 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 						break;
 				}
 			}
+			if (ReadStringKeyword(Line, "NPREO(1)", token)) { //npreo should have 2 or 4 integer elements
+				int nchar = 0;
+				int tlen = strlen(token);
+				int npreoValues=0;
+				MainData->InputOptions->SCF->ClearNPREOArray();
+				while (nchar < tlen) {
+					int nchar2=0;
+					long npreoVal;
+					if (sscanf(&(token[nchar]), "%ld%n", &npreoVal, &nchar2) == 1) {
+						nchar += nchar2+1;
+						MainData->InputOptions->SCF->AddNPREOValue(npreoVal);
+						npreoValues++;
+					} else
+						break;
+				}
+				if ((npreoValues!=2)&&(npreoValues!=4)) {
+					wxLogMessage(_T("Unexpected number of NPREO values encountered!"));
+				}
+			}
 			
 			if (-1 < FindKeyWord(Line, "$END", 4)) {	//End of this group
 														//scan for multiple occurances of this group

@@ -669,6 +669,7 @@ class SCFGroup {
 		long	GVBNumOpenShells;	///< GVB NSETO - Number of open shells
 		long	GVBNumPairs;		///< GVP NPAIR - Number of overlapping orbital pairs
 		std::vector<long> GVBOpenShellDeg;	///< GVB NO - Array of shell degeneracies (NSETO shells)
+		std::vector<long> NPREOVector;	///< NPREO orbital/energy printout options
 		short	ConvCriteria;		//Convergance cutoff 10^(-n)
 		short	MaxDIISEq;			//Max size of the DIIS linear equations
 		short	MVOCharge;			//Modified Virtual Orbital Charge
@@ -719,6 +720,10 @@ class SCFGroup {
 		void SetGVBNODegValue(int index, long value);
 		void AddGVBOpenShellDeg(const long & d) {GVBOpenShellDeg.push_back(d);};
 		long GetGVBOpenShellDeg(const long & d) {return ((d<GVBOpenShellDeg.size())?GVBOpenShellDeg[d]:0);};
+			/// ClearNPREOArry zeros out the array
+		void ClearNPREOArray(void) {NPREOVector.clear();};
+			/// Add a value to the end of the NPREO array
+		void AddNPREOValue(const long & d) {NPREOVector.push_back(d);};
 		SCFGroup(void);
 		SCFGroup(SCFGroup *Copy);
 		void InitData(void);
