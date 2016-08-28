@@ -311,7 +311,7 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	mUpperSizer->Add(mChkAnim, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 	mUpperSizer->Add(mChkRotation, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 	mSldSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Mode Scaling:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-	mSldSizer->Add(mSldScale, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	mSldSizer->Add(mSldScale, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	mUpperSizer->Add(mSldSizer);
 
 	wxString choices[] = { _T("Hydrogen Bonds"),
@@ -552,10 +552,10 @@ void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	tmp.Printf(wxT("%d"), lEOpts->GetNumDigits());
 	mNumDigitsArea = new wxTextCtrl(this, wxID_ANY, tmp, wxDefaultPosition, wxDefaultSize);
 
-	mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("E. Plot Ball Size:"))), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("E. Plot Ball Size:"))), 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	mUpperSizer->Add(mSldBallSize, 0, wxALIGN_LEFT | wxALL, 3);
 	mUpperSizer->Add(30, 30);
-	mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("# digits"))), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	mUpperSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("# digits"))), 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	mUpperSizer->Add(mNumDigitsArea, 0, wxALIGN_CENTER | wxALL, 3);
 
 	mEColor = new colorArea(this, 0, lEOpts->GetTEColor());
@@ -680,16 +680,16 @@ void EnergyPrefsPane::setHiddenCtrls() {
 		mAtomText[1] = new wxTextCtrl(this, wxID_ANY, tmp);
 	}
 
-	mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 1:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
+	mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 1:"))), 0, wxALIGN_CENTER | wxALL, 3);
 	mRight1BottomSizer->Add(mAtomText[0], wxALIGN_CENTER | wxALL, 3);
-	mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 2:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
+	mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 2:"))), 0, wxALIGN_CENTER | wxALL, 3);
 	mRight1BottomSizer->Add(mAtomText[1], wxALIGN_CENTER | wxALL, 3);
 
 	if (!mAtomText[2]) {
 		tmp.Printf(wxT("%ld"), lPOpts->Get3rdAtom()+1);
 		mAtomText[2] = new wxTextCtrl(this, wxID_ANY, tmp);
 	}
-	mRight2BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 3:"))), 0, wxALIGN_CENTER | wxALIGN_RIGHT | wxALL, 3);
+	mRight2BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 3:"))), 0, wxALIGN_CENTER | wxALL, 3);
 	mRight2BottomSizer->Add(mAtomText[2], wxALIGN_CENTER | wxALL, 3);
 
 	mRightBottomSizer->Add(mRight1BottomSizer);
@@ -871,7 +871,7 @@ void FilePrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 
 	wxBoxSizer* LowerSizer = new wxBoxSizer(wxHORIZONTAL);
 	mMainSizer->Add(LowerSizer, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 2);
-	LowerSizer->Add(new wxStaticText(this, wxID_ANY, _T("Auto-Bond Tolerance:")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	LowerSizer->Add(new wxStaticText(this, wxID_ANY, _T("Auto-Bond Tolerance:")), 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	LowerSizer->Add(mSldTol, 0, wxALIGN_LEFT | wxALL, 3);
 
 	wxBoxSizer* BottomSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -880,7 +880,7 @@ void FilePrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	tmp.Printf(wxT("%ld"), mTargetPrefs->GetDRCSkip());
 	mPointSkip = new wxTextCtrl(this, wxID_ANY, tmp);
 
-	BottomSizer->Add(new wxStaticText(this, wxID_ANY, _T("When reading a DRC file how many\n points should be skipped between\n points read in? (0 reads every point)")), 0, wxALIGN_CENTER_VERTICAL | wxALIGN_RIGHT | wxALL, 3);
+	BottomSizer->Add(new wxStaticText(this, wxID_ANY, _T("When reading a DRC file how many\n points should be skipped between\n points read in? (0 reads every point)")), 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	BottomSizer->Add(mPointSkip, 0, wxALIGN_CENTER | wxALL, 3);
 }
 

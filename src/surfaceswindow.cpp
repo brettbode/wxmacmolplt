@@ -168,7 +168,7 @@ void SurfacesWindow::CreateControls()
 
 	book = new wxChoicebook(this, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxNB_TOP); // | wxSUNKEN_BORDER);
 
-	itemBoxSizer2->Add(book, 2, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 2);
+	itemBoxSizer2->Add(book, 2, wxALL | wxEXPAND, 2);
 
 	wxBoxSizer* itemBoxSizer11 = new wxBoxSizer(wxHORIZONTAL);
 

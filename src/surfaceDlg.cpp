@@ -248,7 +248,7 @@ void BaseSurfacePane::CreateControls() {
 
 	wxBoxSizer *box_sizer = new wxBoxSizer(wxHORIZONTAL);
 
-	box_sizer->Add(new wxStaticText(this, wxID_ANY, _T("Name:")), 0, wxALIGN_CENTER_VERTICAL | wxLEFT | wxALIGN_RIGHT, 5);
+	box_sizer->Add(new wxStaticText(this, wxID_ANY, _T("Name:")), 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 5);
 
 	wxString tmp_str(GetTargetSurface()->GetLabel(), wxConvUTF8);
 	surfTitleEdit = new wxTextCtrl(this, ID_SURFTITLE, tmp_str, wxDefaultPosition, wxSize(250, -1), 0);
@@ -1381,17 +1381,17 @@ void Orbital2DSurfPane::CreateControls() {
 	SubLeftBot1Sizer->Add(new wxStaticText(this, wxID_ANY,
 				_T("Select Orb:"),
 				wxDefaultPosition,
-				wxDefaultSize), 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+				wxDefaultSize), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-	SubLeftBot1Sizer->Add(mOrbFormatChoice, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	SubLeftBot1Sizer->Add(mOrbFormatChoice, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-	SubLeftBot1Sizer->Add(mMOList, 1, wxGROW | wxEXPAND | wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	SubLeftBot1Sizer->Add(mMOList, 1, wxGROW | wxEXPAND | wxALL, 3);
 
 	SubLeftBot2Sizer->Add(new wxStaticText(this, wxID_ANY,
 				_T("Orbital vector: \nAtom Orbital Coef"),
 				wxDefaultPosition,
-				wxDefaultSize), 0, wxALIGN_CENTER_VERTICAL | wxALL, 1);
-	SubLeftBot2Sizer->Add(mOrbCoef, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL | wxALL, 3);
+				wxDefaultSize), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 1);
+	SubLeftBot2Sizer->Add(mOrbCoef, 1, wxEXPAND | wxALL, 3);
 
 	leftBottomSizer->Add(SubLeftBot1Sizer, 1, wxEXPAND | wxALL, 5);
 	leftBottomSizer->Add(SubLeftBot2Sizer, 1, wxEXPAND | wxALL, 5);
@@ -1410,11 +1410,11 @@ void Orbital2DSurfPane::CreateControls() {
 	mDashCheck->SetValue(DashLines);
 	mShowZeroCheck->SetValue(ShowZeroContour);
 
-	SubRightBot1Sizer->Add(mUsePlaneChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-	SubRightBot1Sizer->Add(mDisplayPlaneCheck, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-	SubRightBot1Sizer->Add(mShowZeroCheck, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-	SubRightBot1Sizer->Add(mDashCheck, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-	SubRightBot1Sizer->Add(mRevPhaseChk, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	SubRightBot1Sizer->Add(mUsePlaneChk, 0, wxALIGN_LEFT | wxALL, 3);
+	SubRightBot1Sizer->Add(mDisplayPlaneCheck, 0, wxALIGN_LEFT | wxALL, 3);
+	SubRightBot1Sizer->Add(mShowZeroCheck, 0, wxALIGN_LEFT | wxALL, 3);
+	SubRightBot1Sizer->Add(mDashCheck, 0, wxALIGN_LEFT | wxALL, 3);
+	SubRightBot1Sizer->Add(mRevPhaseChk, 0, wxALIGN_LEFT | wxALL, 3);
 
 	wxBoxSizer * SubRightBot2Sizer = new wxBoxSizer(wxHORIZONTAL);
 	SubRightBot2Sizer->Add(new wxStaticText(this, wxID_ANY,
@@ -1887,17 +1887,17 @@ void Orbital3DSurfPane::CreateControls() {
 	SubLeftBot1Sizer->Add(new wxStaticText(this, wxID_ANY,
 				_T("Select Orb:"),
 				wxDefaultPosition,
-				wxDefaultSize), 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+				wxDefaultSize), 0, wxALL, 3);
 
-	SubLeftBot1Sizer->Add(mOrbFormatChoice, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	SubLeftBot1Sizer->Add(mOrbFormatChoice, 0, wxALL, 3);
 
-	SubLeftBot1Sizer->Add(mMOList, 1, wxGROW | wxEXPAND | wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	SubLeftBot1Sizer->Add(mMOList, 1, wxGROW | wxEXPAND | wxALL, 3);
 
 	SubLeftBot2Sizer->Add(new wxStaticText(this, wxID_ANY,
 				_T("Orbital vector: \nAtom Orbital Coef"),
 				wxDefaultPosition,
-				wxDefaultSize), 0, wxALIGN_CENTER_VERTICAL | wxALL, 1);
-	SubLeftBot2Sizer->Add(mOrbCoef, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL | wxALL, 3);
+				wxDefaultSize), 0, wxALL, 1);
+	SubLeftBot2Sizer->Add(mOrbCoef, 1, wxEXPAND | wxALL, 3);
 
 	leftBottomSizer->Add(SubLeftBot1Sizer, 1, wxEXPAND | wxALL, 5);
 	leftBottomSizer->Add(SubLeftBot2Sizer, 1, wxEXPAND | wxALL, 5);
@@ -1938,11 +1938,11 @@ void Orbital3DSurfPane::CreateControls() {
 	middleSizer->Add(leftMiddleSizer, 0, wxALL | wxALIGN_CENTER, 10);
 	middleSizer->Add(45,10);
 	middleSizer->Add(rightMiddleSizer, 0, wxALL | wxALIGN_CENTER, 10);
-	bottomSizer->Add(leftBottomSizer, 1, wxEXPAND | wxALL | wxALIGN_CENTER, 3);
+	bottomSizer->Add(leftBottomSizer, 1, wxEXPAND | wxALL, 3);
 	bottomSizer->Add(rightBottomSizer, 0, wxALL | wxALIGN_TOP, 3);
 	mainSizer->Add(upperSizer, 0, wxALIGN_CENTER);
 	mainSizer->Add(middleSizer, 0, wxALIGN_CENTER);
-	mainSizer->Add(bottomSizer, 1, wxEXPAND | wxALIGN_CENTER);
+	mainSizer->Add(bottomSizer, 1, wxEXPAND);
 
 	if (PlotOrb >= 0) {
 		if (OrbOptions&1) {//AOs
@@ -3019,13 +3019,13 @@ void TEDensity1DSurfPane::CreateControls() {
 	mainSizer->Add(itemBoxSizer81, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, _("Clamp Value")));
 	clamp_box = new wxTextCtrl(TED1DPANEL, ID_3D_MAX_MAP_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-	itemBoxSizer81->Add(clamp_box, 0, wxALIGN_CENTER_HORIZONTAL);
+	itemBoxSizer81->Add(clamp_box, 0, wxALIGN_CENTER_VERTICAL);
 
 	itemBoxSizer81 = new wxBoxSizer(wxHORIZONTAL);
 	mainSizer->Add(itemBoxSizer81, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 	itemBoxSizer81->Add(new wxStaticText(TED1DPANEL, wxID_STATIC, _("Scale Factor")));
 	scale_box = new wxTextCtrl(TED1DPANEL, ID_SCALE_EDIT, _T(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
-	itemBoxSizer81->Add(scale_box, 0, wxALIGN_CENTER_HORIZONTAL);
+	itemBoxSizer81->Add(scale_box, 0, wxALIGN_CENTER_VERTICAL);
 
 	wxFlexGridSizer* flex_sizer = new wxFlexGridSizer(2, 4, 0, 0);
 	mainSizer->Add(flex_sizer, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 5);

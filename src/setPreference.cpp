@@ -368,7 +368,7 @@ void setPreference::RecreateBooks() {
 
 	m_choiceBook = new wxChoicebook(m_panel, ID_NOTEBOOK, wxDefaultPosition, wxSize(10,10), wxCHB_DEFAULT);
 
-	m_sizer->Add(m_choiceBook, 5, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 4);                    
+	m_sizer->Add(m_choiceBook, 5, wxALL | wxEXPAND, 4);                    
 
 	if (oldBook) {
 		int sel = oldBook->GetSelection();
