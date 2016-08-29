@@ -1256,7 +1256,7 @@ void Frame::ParseGAMESSMCSCFDiabaticVectors(BufferFile * Buffer, long NumFuncs,
 OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs,
 		long NumBetaOrbs, const long & NumOccAlpha, const long & NumOccBeta,
 		const TypeOfWavefunction & method, Progress * lProgress) {
-	long	iorb=0, imaxorb, maxfuncs, TestOrb, LinePos, ScanErr, jorb;
+	long	iorb=0, imaxorb, maxfuncs, TestOrb, LinePos, ScanErr, jorb, OrbitalOffset=0;
 	int		nChar;
 	float	*Vectors, *Energy;
 	char	*SymType, Line[kMaxLineLength+1];
@@ -1286,7 +1286,15 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 			LinePos = 0;
 			for (jorb=0; jorb<imaxorb; jorb++) {
 				ScanErr = sscanf(&(Line[LinePos]), "%ld%n", &TestOrb, &nChar);
-				if (ScanErr && (TestOrb==jorb+iorb+1)) LinePos += nChar;
+				//Dmitri's npreo option skips printing of the first n orbitals. Need to handle a case
+				//where the orbital printout doesn't start at 1.
+				if ((iorb+jorb+1)==1) {
+					if (ScanErr && (TestOrb > 1)) {
+						OrbitalOffset = TestOrb - 1;
+						OrbSet->setStartingOrbitalOffset(OrbitalOffset);
+					}
+				}
+				if (ScanErr && (TestOrb==jorb+iorb+OrbitalOffset+1)) LinePos += nChar;
 				else {
 					imaxorb = jorb;
 					if (jorb==0) {	//No more orbitals found

@@ -541,23 +541,24 @@ bool ConvertTypeOfOrbital(const char * s, TypeOfOrbital & t);
 
 class OrbitalRec {
 	public:
-		float *			Vectors;			//Eigenvectors (Alpha set in UHF, Natural Orbs in MCSCF)
-		float *			VectorsB;			//Eigenvectors (Beta set in UHF, Optimized MOs in MCSCF)
-		float *			Energy;				//Orbital Energies (Alpha set in UHF, Natural Orbs in MCSCF)
-		float *			EnergyB;			//Orbital Energies (Beta set in UHF, Optimized MOs in MCSCF)
-		float *			OrbOccupation;		//Orbital occupation numbers
-		float *			OrbOccupationB;		//Orbital occupation numbers for Beta set
-		char *			SymType;			//Symmetry of each MO (Alpha set in UHF, Natural Orbs in MCSCF)
-		char *			SymTypeB;			//Symmetry of each MO (Beta set in UHF, Optimized MOs in MCSCF)
-		AODensity *		TotalAODensity;		//AO Density corresponding to these orbitals
-		long			NumAlphaOrbs;		//# alpha orbitals (or total # of orbitals)
-		long			NumBetaOrbs;		//# beta orbitals or MCSCF optimized orbs, 0 otherwise
-		long			NumOccupiedAlphaOrbs;	//# occupied orbs, normally just the
-		long			NumOccupiedBetaOrbs;	//# of e's except for ECP runs
-		long			NumBasisFunctions;	//This should be constant reflecting one dimension of the vectors
-		char *			Label;				//label lines from a $vec group	
-		TypeOfWavefunction	BaseWavefunction;	//RHF, UHF, ...
-		TypeOfOrbital	OrbitalType;		//Optimized, Natural, localized...
+		float *			Vectors;			///< Eigenvectors (Alpha set in UHF, Natural Orbs in MCSCF)
+		float *			VectorsB;			///< Eigenvectors (Beta set in UHF, Optimized MOs in MCSCF)
+		float *			Energy;				///< Orbital Energies (Alpha set in UHF, Natural Orbs in MCSCF)
+		float *			EnergyB;			///< Orbital Energies (Beta set in UHF, Optimized MOs in MCSCF)
+		float *			OrbOccupation;		///< Orbital occupation numbers
+		float *			OrbOccupationB;		///< Orbital occupation numbers for Beta set
+		char *			SymType;			///< Symmetry of each MO (Alpha set in UHF, Natural Orbs in MCSCF)
+		char *			SymTypeB;			///< Symmetry of each MO (Beta set in UHF, Optimized MOs in MCSCF)
+		AODensity *		TotalAODensity;		///< AO Density corresponding to these orbitals
+		long			NumAlphaOrbs;		///< # alpha orbitals (or total # of orbitals)
+		long			NumBetaOrbs;		///< # beta orbitals or MCSCF optimized orbs, 0 otherwise
+		long			NumOccupiedAlphaOrbs;	///< # occupied orbs, normally just the
+		long			NumOccupiedBetaOrbs;	///< # of e's except for ECP runs
+		long			NumBasisFunctions;	///< This should be constant reflecting one dimension of the vectors
+		long			StartingOffset;		///< An offset for the starting orbital, if greater than 0
+		char *			Label;				///< label lines from a $vec group
+		TypeOfWavefunction	BaseWavefunction;	///< RHF, UHF, ...
+		TypeOfOrbital	OrbitalType;		///< Optimized, Natural, localized...
 		
 		OrbitalRec(long nAlphaOrbs=0, long nBetaOrbs=0, long nBasis=0);
 		OrbitalRec(BufferFile *Buffer, long code, long length);
@@ -587,6 +588,8 @@ class OrbitalRec {
 		void SetOccupancy(float * Occ, long nVec);
 		void SetOrbitalOccupancy(const long & alpha, const long & beta);
 		bool TotalDensityPossible(void) const;
+		inline long getStartingOrbitalOffset(void) const {return StartingOffset;};
+		void setStartingOrbitalOffset(long v) {StartingOffset = v;};
 };
 
 typedef class SurfacePane SurfacePane;

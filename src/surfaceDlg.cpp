@@ -560,6 +560,7 @@ void OrbSurfacePane::makeMOList() {
 				OccNum = lMOs->OrbOccupationB;
 				defaultOrb = lMOs->getNumOccupiedBetaOrbitals()-1;
 			}
+			int OrbOffset = lMOs->getStartingOrbitalOffset();
 
 			char* oneSymLabel;
 			if ((lMOs->getOrbitalWavefunctionType() == RHF)|| (lMOs->getOrbitalWavefunctionType() == UHF)||
@@ -574,9 +575,9 @@ void OrbSurfacePane::makeMOList() {
 
 			for (int theCell = 0; theCell < NumMOs; theCell++) {
 				if (theCell != HOMOOrb)
-					tmpStr.Printf(wxT("<table width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), theCell+1);
+					tmpStr.Printf(wxT("<table width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), theCell+OrbOffset+1);
 				else
-					tmpStr.Printf(wxT("<table style=\"background:#80BFFF\" width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), theCell+1);
+					tmpStr.Printf(wxT("<table style=\"background:#80BFFF\" width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), theCell+OrbOffset+1);
 
 				tmpStr.Append(wxT("<td width=\"40%%\">"));
 				if (SymLabel) {	//Add the symetry of the orb, if known

@@ -687,6 +687,11 @@ void OrbitalRec::WriteXML(XMLElement * parent) const {
 		bbuf << NumBasisFunctions;
 		orbElem->addAttribute(CML_convert(MMP_NumBasisFunctions), bbuf.str().c_str());
 	}
+	if (StartingOffset>0) {
+		std::ostringstream bbuf;
+		bbuf << StartingOffset;
+		orbElem->addAttribute(CML_convert(MMP_StartingOrbOffset), bbuf.str().c_str());
+	}
 	if (Vectors) {
 		std::ostringstream fbuf;
 		for (int i=0; i<NumAlphaOrbs; i++) {
@@ -2702,6 +2707,7 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 		orbset->getAttributeValue(CML_convert(MMP_NumOccAlphaOrbs), NumOccupiedAlphaOrbs);
 		orbset->getAttributeValue(CML_convert(MMP_NumOccBetaOrbs), NumOccupiedBetaOrbs);
 		orbset->getAttributeValue(CML_convert(MMP_NumBasisFunctions), NumBasisFunctions);
+		orbset->getAttributeValue(CML_convert(MMP_StartingOrbOffset), StartingOffset);
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
 			CML_Element childtype;
@@ -3443,6 +3449,8 @@ const char * CML_convert(MMP_OrbitalSetNS t)
             return "BetaOccupied";
         case MMP_NumBasisFunctions:
             return "NumberBasisFunctions";
+		case MMP_StartingOrbOffset:
+			return "StartingOrbitalOffset";
 		case MMP_OrbVectors:
 			return "Vectors";
 		case MMP_BetaOrbVectors:

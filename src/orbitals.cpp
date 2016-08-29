@@ -163,6 +163,7 @@ OrbitalRec::OrbitalRec(long nAlphaOrbs, long nBetaOrbs, long nBasis) {
 	NumAlphaOrbs = nAlphaOrbs;
 	NumBetaOrbs = nBetaOrbs;
 	NumOccupiedAlphaOrbs = NumOccupiedBetaOrbs = 0;
+	StartingOffset = 0;
 	NumBasisFunctions = nBasis;
 	OrbitalType = unknownOrbitalType;
 	BaseWavefunction = unknownWavefunction;
@@ -175,6 +176,7 @@ OrbitalRec::OrbitalRec(BufferFile *Buffer, long code, long length) {
 	TotalAODensity = NULL;
 	NumOccupiedAlphaOrbs = NumOccupiedBetaOrbs = 0;
 	NumBasisFunctions = 0;
+	StartingOffset = 0;
 	Label = NULL;
 	OrbitalType = unknownOrbitalType;
 	BaseWavefunction = unknownWavefunction;
