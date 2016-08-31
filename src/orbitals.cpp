@@ -1081,15 +1081,15 @@ void OrbitalRec::SetOccupancy(float * Occ, long numVec) {
 	for (long i=0; i<numVec; i++) OrbOccupation[i] = Occ[i];
 }
 void OrbitalRec::SetOrbitalOccupancy(const long & alpha, const long & beta) {
-	if ((alpha >= 0)&&(alpha <= NumAlphaOrbs)) NumOccupiedAlphaOrbs = alpha;
+	if ((alpha >= 0)&&(alpha <= (NumAlphaOrbs+StartingOffset))) NumOccupiedAlphaOrbs = alpha;
 		//The following doesn't guarentee the beta value is within the limits, but there
 		//should never be more beta orbitals than alpha, but ROHF wavefunctions have only
 		//one set of vectors, yet have separate occupaction counts.
-	if ((beta >= 0)&&(beta <= MAX(NumAlphaOrbs, NumBetaOrbs))) NumOccupiedBetaOrbs = beta;
+	if ((beta >= 0)&&(beta <= (MAX(NumAlphaOrbs, NumBetaOrbs)+StartingOffset))) NumOccupiedBetaOrbs = beta;
 }
 bool OrbitalRec::TotalDensityPossible(void) const {
-	return ((getNumOccupiedAlphaOrbitals() > 0)||
-			(OrbOccupation != NULL));	//Is this a good enough test?
+	return (((getNumOccupiedAlphaOrbitals() > 0)||
+			(OrbOccupation != NULL))&&(StartingOffset<=0));	//Is this a good enough test?
 }
 
 //This cutoff is in the ballpark. moving it up or down a factor of ten doesn't effect the timing much

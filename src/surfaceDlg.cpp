@@ -552,13 +552,13 @@ void OrbSurfacePane::makeMOList() {
 				SymLabel = lMOs->SymType;
 				Energy = lMOs->Energy;
 				OccNum = lMOs->OrbOccupation;
-				defaultOrb = lMOs->getNumOccupiedAlphaOrbitals()-1;
+				defaultOrb = lMOs->getNumOccupiedAlphaOrbitals()-lMOs->getStartingOrbitalOffset()-1;
 			} else {
 				NumMOs=lMOs->NumBetaOrbs;
 				SymLabel = lMOs->SymTypeB;
 				Energy = lMOs->EnergyB;
 				OccNum = lMOs->OrbOccupationB;
-				defaultOrb = lMOs->getNumOccupiedBetaOrbitals()-1;
+				defaultOrb = lMOs->getNumOccupiedBetaOrbitals()-lMOs->getStartingOrbitalOffset()-1;
 			}
 			int OrbOffset = lMOs->getStartingOrbitalOffset();
 
@@ -572,6 +572,7 @@ void OrbSurfacePane::makeMOList() {
 					i++;
 				}
 			}
+			HOMOOrb -= lMOs->getStartingOrbitalOffset();
 
 			for (int theCell = 0; theCell < NumMOs; theCell++) {
 				if (theCell != HOMOOrb)
@@ -622,22 +623,22 @@ void OrbSurfacePane::makeMOList() {
 					else {	
 						//attempt to set the occupation based on the wavefunction type
 						if (lMOs->getOrbitalWavefunctionType() == RHF) {
-							if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
+							if (theCell<(lMOs->getNumOccupiedAlphaOrbitals()-lMOs->getStartingOrbitalOffset()))
 								temp.Printf(wxT("2"));
 							else 
 								temp.Printf(wxT("0"));
 						} else if (lMOs->getOrbitalWavefunctionType() == ROHF) {
 							temp.Printf(wxT("0"));
-							if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
+							if (theCell<(lMOs->getNumOccupiedBetaOrbitals()-lMOs->getStartingOrbitalOffset()))
 								temp.Printf(wxT("2")); // TODO Append?
-							else if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
+							else if (theCell<(lMOs->getNumOccupiedAlphaOrbitals()-lMOs->getStartingOrbitalOffset()))
 								temp.Printf(wxT("1"));
 						} else if (lMOs->getOrbitalWavefunctionType() == UHF) {
 							temp.Printf(wxT("0"));
 							if (Alpha) {
-								if (theCell<lMOs->getNumOccupiedAlphaOrbitals()) 
+								if (theCell<(lMOs->getNumOccupiedAlphaOrbitals()-lMOs->getStartingOrbitalOffset()))
 									temp.Printf(wxT("1"));
-							} else if (theCell<lMOs->getNumOccupiedBetaOrbitals()) 
+							} else if (theCell<(lMOs->getNumOccupiedBetaOrbitals()-lMOs->getStartingOrbitalOffset()))
 								temp.Printf(wxT("1"));
 						} else {	//MCSCF or CI occupations can't be guessed
 							temp.Printf(wxT("??"));
