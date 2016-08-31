@@ -1811,11 +1811,11 @@ void Orbital3DSurfPane::CreateControls() {
 			wxSP_ARROW_KEYS, 0, 100, 0);
 	mTransparency->SetValue(Transparency);
 
-	wxString radiochoices[] = {_T("Solid"), _T("Wire Frame")};
-	m3DRdoBox = new wxRadioBox(this, ID_3D_RADIOBOX, _T(""), wxDefaultPosition, wxDefaultSize, WXSIZEOF(radiochoices), radiochoices, 1, wxRA_SPECIFY_ROWS);
+	wxString radiochoices[] = {_("Solid"), _("Wire Frame")};
+	m3DRdoBox = new wxRadioBox(this, ID_3D_RADIOBOX, _("Surface Display"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(radiochoices), radiochoices, 1, wxRA_SPECIFY_ROWS);
 	m3DRdoBox->SetSelection(1-UseSolidSurface);
 
-	mSmoothChkBox = new wxCheckBox(this, ID_SMOOTH_CHECKBOX, _T("Smooth"), wxPoint(340,130), wxDefaultSize);
+	mSmoothChkBox = new wxCheckBox(this, ID_SMOOTH_CHECKBOX, _("Smooth"), wxPoint(340,130), wxDefaultSize);
 	mSmoothChkBox->SetValue(UseNormals);
 
 	if (UseSolidSurface)
