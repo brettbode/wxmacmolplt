@@ -2675,6 +2675,7 @@ void SCFGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	if (ConvCriteria > 0) test = true;
 	if (GetDirectSCF()) test = true;
 	if (IData->Control->GetSCFType() == GAMESS_GVB) test = true;
+	if (NPREOVector.size() > 0) test = true;
 	
 	if (!test) return;
 
@@ -2701,6 +2702,15 @@ void SCFGroup::WriteToFile(BufferFile *File, InputData *IData) {
 	if (GetShift()) File->WriteLine("SHIFT=.T. ", false);
 	if (GetRestriction()) File->WriteLine("RSTRCT=.T. ", false);
 	if (GetDEM()) File->WriteLine("DEM=.T. ", false);
+		//reduced orbital printout, can either have two or four values
+	if (NPREOVector.size() > 0) {
+		if (NPREOVector.size() == 2) {
+			sprintf(Out, "NPREO(1)=%ld,%ld ", NPREOVector[0], NPREOVector[1]);
+		} else {
+			sprintf(Out, "NPREO(1)=%ld,%ld,%ld,%ld ", NPREOVector[0], NPREOVector[1], NPREOVector[2], NPREOVector[3]);
+		}
+		File->WriteLine(Out, false);
+	}
 		//UHF Natural Orbitals
 	if (GetUHFNO()) {
 		sprintf(Out, "UHFNOS=.TRUE. ");
