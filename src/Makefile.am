@@ -55,6 +55,7 @@ wxmacmolplt_SOURCES =                                  \
     Progress.cpp               Progress.h              \
     RysPolynomial.cpp          RysPolynomial.h         \
     setbondlength.cpp          setbondlength.h         \
+    selectfiletype.cpp         selectfiletype.h        \
     setPreference.cpp          setPreference.h         \
     setscreenplane.cpp         setscreenplane.h        \
     SurfaceBase.cpp                                    \

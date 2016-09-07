@@ -583,6 +583,11 @@
 		8B3B8B1A0A770A280041EA88 /* windowparameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17D760A5328210059B71F /* windowparameters.cpp */; };
 		8B3B8B1B0A770A280041EA88 /* zmatrixcalculator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BF17DA20A55D0910059B71F /* zmatrixcalculator.cpp */; };
 		8B3B8B1C0A770A280041EA88 /* glf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B899C0A6EAD7E0041EA88 /* glf.cpp */; };
+		8B3B8C761D7CDBB3007C1E15 /* selectfiletype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B8C741D7CDBB3007C1E15 /* selectfiletype.cpp */; };
+		8B3B8C771D7D1399007C1E15 /* selectfiletype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B8C741D7CDBB3007C1E15 /* selectfiletype.cpp */; };
+		8B3B8C781D7D139A007C1E15 /* selectfiletype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B8C741D7CDBB3007C1E15 /* selectfiletype.cpp */; };
+		8B3B8C791D7D139B007C1E15 /* selectfiletype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B8C741D7CDBB3007C1E15 /* selectfiletype.cpp */; };
+		8B3B8C7A1D7D139C007C1E15 /* selectfiletype.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B8C741D7CDBB3007C1E15 /* selectfiletype.cpp */; };
 		8B3EAF191C8A810000AD26F0 /* bindoc.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DAC809D0B43700B7783F /* bindoc.icns */; };
 		8B3EAF1A1C8A810000AD26F0 /* MacMolPlt.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACA09D0B43700B7783F /* MacMolPlt.icns */; };
 		8B3EAF1B1C8A810000AD26F0 /* prefs.icns in Resources */ = {isa = PBXBuildFile; fileRef = 1652DACB09D0B43700B7783F /* prefs.icns */; };
@@ -1149,6 +1154,8 @@
 		8B3B89720A6EAB540041EA88 /* glf.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = glf.h; path = src/glf.h; sourceTree = "<group>"; };
 		8B3B899C0A6EAD7E0041EA88 /* glf.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = glf.cpp; path = src/glf.cpp; sourceTree = "<group>"; };
 		8B3B8B210A770A280041EA88 /* wxMacMolPlt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wxMacMolPlt.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8B3B8C741D7CDBB3007C1E15 /* selectfiletype.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = selectfiletype.cpp; path = src/selectfiletype.cpp; sourceTree = "<group>"; };
+		8B3B8C751D7CDBB3007C1E15 /* selectfiletype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = selectfiletype.h; path = src/selectfiletype.h; sourceTree = "<group>"; };
 		8B3EAFB51C8A810000AD26F0 /* wxMacMolPlt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wxMacMolPlt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8B45D25D0A700DB60005269A /* arial1.glf */ = {isa = PBXFileReference; lastKnownFileType = file; name = arial1.glf; path = resources/fonts/arial1.glf; sourceTree = "<group>"; };
 		8B4BB4400A0A7C9D00FE9CC6 /* appendframesoptions.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = appendframesoptions.cpp; path = src/appendframesoptions.cpp; sourceTree = "<group>"; };
@@ -1603,6 +1610,8 @@
 				1652DA4C09D0B12600B7783F /* myFiles.h */,
 				8B600B720B8F35C400084AF2 /* qtexport.cpp */,
 				8B600B730B8F35C400084AF2 /* qtexport.h */,
+				8B3B8C741D7CDBB3007C1E15 /* selectfiletype.cpp */,
+				8B3B8C751D7CDBB3007C1E15 /* selectfiletype.h */,
 				8B33B7B50BF8DBEB0056C79E /* swfexport-g.cpp */,
 				8BEA48E80BFA0BE900C660A3 /* swfexport.cpp */,
 				8B33B7B60BF8DBEB0056C79E /* swfexport.h */,
@@ -2009,6 +2018,7 @@
 				8B33B8A00BF8ED280056C79E /* error.c in Sources */,
 				8B33B8A10BF8ED280056C79E /* fileattrs.c in Sources */,
 				8B33B8A20BF8ED280056C79E /* fillstyle.c in Sources */,
+				8B3B8C761D7CDBB3007C1E15 /* selectfiletype.cpp in Sources */,
 				8B33B8A30BF8ED280056C79E /* filter.c in Sources */,
 				8B33B8A40BF8ED280056C79E /* flv.c in Sources */,
 				8B33B8A50BF8ED280056C79E /* font.c in Sources */,
@@ -2152,6 +2162,7 @@
 				8B162E530D75C12600975533 /* error.c in Sources */,
 				8B162E540D75C12600975533 /* fileattrs.c in Sources */,
 				8B162E550D75C12600975533 /* fillstyle.c in Sources */,
+				8B3B8C781D7D139A007C1E15 /* selectfiletype.cpp in Sources */,
 				8B162E560D75C12600975533 /* filter.c in Sources */,
 				8B162E570D75C12600975533 /* flv.c in Sources */,
 				8B162E580D75C12600975533 /* font.c in Sources */,
@@ -2295,6 +2306,7 @@
 				8B29D67A12B934BD0049477F /* error.c in Sources */,
 				8B29D67B12B934BD0049477F /* fileattrs.c in Sources */,
 				8B29D67C12B934BD0049477F /* fillstyle.c in Sources */,
+				8B3B8C791D7D139B007C1E15 /* selectfiletype.cpp in Sources */,
 				8B29D67D12B934BD0049477F /* filter.c in Sources */,
 				8B29D67E12B934BD0049477F /* flv.c in Sources */,
 				8B29D67F12B934BD0049477F /* font.c in Sources */,
@@ -2438,6 +2450,7 @@
 				8B33B9020BF8ED280056C79E /* error.c in Sources */,
 				8B33B9030BF8ED280056C79E /* fileattrs.c in Sources */,
 				8B33B9040BF8ED280056C79E /* fillstyle.c in Sources */,
+				8B3B8C771D7D1399007C1E15 /* selectfiletype.cpp in Sources */,
 				8B33B9050BF8ED280056C79E /* filter.c in Sources */,
 				8B33B9060BF8ED280056C79E /* flv.c in Sources */,
 				8B33B9070BF8ED280056C79E /* font.c in Sources */,
@@ -2581,6 +2594,7 @@
 				8B3EAF741C8A810000AD26F0 /* error.c in Sources */,
 				8B3EAF751C8A810000AD26F0 /* fileattrs.c in Sources */,
 				8B3EAF761C8A810000AD26F0 /* fillstyle.c in Sources */,
+				8B3B8C7A1D7D139C007C1E15 /* selectfiletype.cpp in Sources */,
 				8B3EAF771C8A810000AD26F0 /* filter.c in Sources */,
 				8B3EAF781C8A810000AD26F0 /* flv.c in Sources */,
 				8B3EAF791C8A810000AD26F0 /* font.c in Sources */,

@@ -24,7 +24,7 @@
 
 /// enum of file types supported/returned by BufferFile::GetFileType.
 typedef enum TextFileType {
-	kUnknown,
+	kUnknown=0,
 	kMolType,
 	kGAMESSlogType,
 	kGAMESSIRCType,

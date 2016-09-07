@@ -39,6 +39,7 @@
 #include "zmatrixcalculator.h"
 #include "symmetrypointgroupdlg.h"
 #include "setPreference.h"
+#include "selectfiletype.h"
 #include "MyTypes.h"
 #include <wx/clipbrd.h>
 #include <wx/dataobj.h>
@@ -3472,6 +3473,27 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 		
 		// Attempt to identify the file type by looking for key words
 		type = Buffer->GetFileType((const char *) fileName.mb_str(wxConvUTF8));
+		if (type == kUnknown) {
+			Buffer->SetFilePos(0);
+			char test[kMaxLineLength];
+			Buffer->Read(test, sizeof(char) * 20);
+			test[20] = '\0';
+			if (strcmp(test, "BMBm") == 0 || strcmp(test, "mBMB") == 0) {
+				if (append) MessageAlert("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
+				else AbortOpen("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
+			} else {
+				if (FindKeyWord(test, "\rtf", 4)>=0) wxLogMessage(_("This file appears to be an RTF file. MacMolPlt requires all text files to be in the plain text format."));
+				else {
+					SelectFileType lSelector(this);
+					
+					lSelector.LoadFile(fileName);
+					int rcode = lSelector.ShowModal();
+					if (rcode == wxID_OK) {
+						type = (TextFileType) lSelector.GetFileType();
+					}
+				}
+			}
+		}
 		BeginOperation();
 		switch (type) {
 			case kMolType:
@@ -3528,19 +3550,21 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 				break;
 			default:    //Should only get here for unknown file types.
 			{
-				Buffer->SetFilePos(0);
-				char test[kMaxLineLength];
-				Buffer->Read(test, sizeof(char) * kMaxLineLength);
-				if (strcmp(test, "BMBm") == 0 || strcmp(test, "mBMB") == 0) {
-					if (append) MessageAlert("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
-					else AbortOpen("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
-				} else {
-					if (FindKeyWord(test, "\rtf", 4)) wxLogMessage(_("This file appears to be an RTF file. MacMolPlt requires all text files to be in the plain text format."));
-					if (!append)
-						AbortOpen("Unable to determine the file type.");
-					else
-						MessageAlert("Unable to determine the file type.");
-				}
+//				Buffer->SetFilePos(0);
+//				char test[kMaxLineLength];
+//				Buffer->Read(test, sizeof(char) * kMaxLineLength);
+//				if (strcmp(test, "BMBm") == 0 || strcmp(test, "mBMB") == 0) {
+//					if (append) MessageAlert("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
+//					else AbortOpen("Version 6 and later does not support the MacMolPlt binary format. Please convert to CML with version 5.6 and try again.");
+//				} else {
+//					if (FindKeyWord(test, "\rtf", 4)) wxLogMessage(_("This file appears to be an RTF file. MacMolPlt requires all text files to be in the plain text format."));
+				if (!append)
+					AbortOpen(NULL);
+//					if (!append)
+//						AbortOpen("Unable to determine the file type.");
+//					else
+//						MessageAlert("Unable to determine the file type.");
+//				}
 			}
 		}
 	}

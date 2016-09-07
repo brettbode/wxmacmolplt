@@ -256,11 +256,14 @@ void BufferFile::SetFilePos(wxFileOffset NewPos) {
 }
 // GetFileType will attempt to determine the type of text file we are dealing
 // with (ex: GAMESS log, GAMESS IRC ...) return Unknown when matching fails
-// the argument is really a pascal string
 TextFileType BufferFile::GetFileType(const char * fileName) {
 	wxFileOffset EntryPos = GetFilePos(), FileSize=ByteCount;
 	TextFileType	Type=kUnknown;
 
+	//Test for a non-ascii file (could be binary or unicode)
+	for (int i=0; i<BufferSize; i++) {
+		if ((Buffer[i] < 9)||(Buffer[i] > 126)) return kUnknown;
+	}
 	ByteCount = BufferSize;
 		//Check file extention first
 	if (fileName != NULL) {
