@@ -129,8 +129,7 @@ void SelectFileType::CreateControls()
 	itemStaticText3->Wrap(500);
 	itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-	mFileText = new wxTextCtrl( itemDialog1, ID_FILEDISPLAYTEXTCTRL, wxEmptyString, wxDefaultPosition, wxSize(-1, 300), wxTE_MULTILINE );
-	mFileText->Enable(false);
+	mFileText = new wxTextCtrl( itemDialog1, ID_FILEDISPLAYTEXTCTRL, wxEmptyString, wxDefaultPosition, wxSize(-1, 300), wxTE_MULTILINE|wxTE_READONLY );
 	itemBoxSizer2->Add(mFileText, 0, wxGROW|wxALL, 5);
 
 	wxBoxSizer* itemBoxSizer5 = new wxBoxSizer(wxHORIZONTAL);

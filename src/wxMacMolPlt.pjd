@@ -43287,7 +43287,7 @@ layout as the default:"</string>
               <string name="proxy-Data source">""</string>
               <string name="proxy-Data validator">""</string>
               <string name="proxy-Data variable">""</string>
-              <bool name="proxy-Enabled">0</bool>
+              <bool name="proxy-Enabled">1</bool>
               <bool name="proxy-External implementation">1</bool>
               <string name="proxy-Font">""</string>
               <string name="proxy-Foreground colour">""</string>
@@ -43334,7 +43334,7 @@ layout as the default:"</string>
               <bool name="proxy-wxTE_PASSWORD">0</bool>
               <bool name="proxy-wxTE_PROCESS_ENTER">0</bool>
               <bool name="proxy-wxTE_PROCESS_TAB">0</bool>
-              <bool name="proxy-wxTE_READONLY">0</bool>
+              <bool name="proxy-wxTE_READONLY">1</bool>
               <bool name="proxy-wxTE_RICH">0</bool>
               <bool name="proxy-wxTE_RICH2">0</bool>
               <bool name="proxy-wxTE_RIGHT">0</bool>
