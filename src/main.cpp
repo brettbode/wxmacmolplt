@@ -273,7 +273,7 @@ int MpApp::OnExit() {
 		glfClose();
 		glf_initialized = 0;
 	}
-	
+
     return 0;
 }
 
@@ -342,9 +342,15 @@ void MpApp::menuFileQuit(wxCommandEvent &/*event*/) {
 			return;
 		}
 	}
+#ifdef __WXMAC__
+	if (menuHolder)
+		menuHolder->Close();
+	SetExitOnFrameDelete(true);
+#endif
 	
 	//This looks like it has the desired effect, but not sure if it is the "correct" way to exit
-	ExitMainLoop();
+//	ExitMainLoop();
+//	wxExit();
 }
 
 void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {

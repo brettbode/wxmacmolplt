@@ -1569,6 +1569,31 @@ void MolDisplayWin::FileClose(wxCloseEvent &event) {
 			}
 		}
 	}
+	//Close all of the subwindows before the main window
+	if (bondsWindow) {
+		CloseBondsWindow();
+	}
+	if (coordsWindow) {
+		CloseCoordsWindow();
+	}
+	if (energyPlotWindow) {
+		CloseEnergy_plotWindow();
+	}
+	if (frequenciesWindow) {
+		CloseFrequenciesWindow();
+	}
+	if (inputBuilderWindow) {
+		CloseInputBuilderWindow();
+	}
+	if (surfacesWindow) {
+		CloseSurfacesWindow();
+	}
+	if (zMatCalcDlg) {
+		CloseZMatrixCalc();
+	}
+	if (prefsDlg) {
+		ClosePrefsWindow();
+	}
 	MpApp & app = wxGetApp();
 	//Once we decide to close the window it may be system dependant whether we 
 	//leave an empty window up. On the Mac the window is always destroyed.
