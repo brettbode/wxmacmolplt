@@ -3152,8 +3152,6 @@
 				OTHER_LDFLAGS = (
 					"-L$(HOME)/software/wx/wx-3.0-cocoa-release/lib",
 					"-framework",
-					QuickTime,
-					"-framework",
 					IOKit,
 					"-framework",
 					Carbon,
@@ -3471,8 +3469,6 @@
 				);
 				OTHER_LDFLAGS = (
 					"-L$(HOME)/software/wx/wx-3.1-release/lib",
-					"-framework",
-					QuickTime,
 					"-framework",
 					IOKit,
 					"-framework",
