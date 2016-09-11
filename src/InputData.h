@@ -1127,8 +1127,20 @@ class InputData {
 		InputData(void);
 		InputData(InputData *Copy);
 		~InputData(void);
-		//! Write out an input file for another program (GAMESS etc)
+		/** Output a GAMESS input file after prompting the user for the name of the output file.
+		 * The return value is negative for a user cancel, 0 for failure, positive for success.
+		 * @param lData The main molecule data record
+		 * @param owner The main document window
+		 */
 		long WriteInputFile(MoleculeData * lData, MolDisplayWin * owner);
+		/** Output a GAMESS input file to a temporary file and open a window to allowing editing of that file.
+		 * The user can then save to a file name of their choice or discard.
+		 * The data in this window is independent of the originating document when this call returns.
+		 * The return value is negative for a user cancel, 0 for failure, positive for success.
+		 * @param lData The main molecule data record
+		 * @param owner The main document window
+		 */
+		long WriteEditInputFile(MoleculeData * lData, MolDisplayWin * owner);
 
 		//! Write out an input file for another program (GAMESS etc)
 		long WriteInputFile(const wxString &filePath, MoleculeData * lData, MolDisplayWin * owner);

@@ -21,6 +21,7 @@
 #include "energyplotdialog.h"
 #include <wx/wfstream.h>
 #include <wx/anidecod.h>
+#include <wx/filename.h>
 
 extern WinPrefs *	gPreferences;
 
@@ -38,6 +39,17 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
 	
     if(!filePath.IsEmpty()) {
 		return WriteInputFile(filePath, lData, owner);
+	}
+	return -1;
+}
+
+//Output the GAMESS input file to a temp file, then open a text editor for the user.
+long InputData::WriteEditInputFile(MoleculeData * lData, MolDisplayWin * owner) {
+	wxFile * t=NULL;
+	wxString tempfile = wxFileName::CreateTempFileName(wxString(_("MacMolPlt_temp_")), t);
+	wxLogMessage(tempfile);
+	if(!tempfile.IsEmpty()) {
+		return WriteInputFile(tempfile, lData, owner);
 	}
 	return -1;
 }

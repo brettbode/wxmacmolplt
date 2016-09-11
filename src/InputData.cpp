@@ -4175,6 +4175,11 @@ void MoleculeData::WriteInputFile(MolDisplayWin * owner) {
 		InputOptions->WriteInputFile(this, owner);
 	}
 }
+void MoleculeData::WriteEditInputFile(MolDisplayWin * owner) {
+	if (InputOptions) {
+		InputOptions->WriteEditInputFile(this, owner);
+	}
+}
 void MOPacInternals::WriteZMATToFile(BufferFile * File) {
 	char	Out[133];
 

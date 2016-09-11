@@ -259,7 +259,16 @@ class MoleculeData {
 		long GetNumElectrons(void) const;
 		short GetMultiplicity(void) const;
 		inline long GetMaximumAtomCount(void) const {return MaxAtoms;};
+		/** Output a GAMESS input file after prompting the user for the name of the output file.
+		 * @param owner The main document window
+		 */
 		void WriteInputFile(MolDisplayWin * owner);
+		/** Output a GAMESS input file to a temporary file and open a window to allowing editing of that file.
+		 * The user can then save to a file name of their choice or discard.
+		 * The data in this window is independent of the originating document when this call returns.
+		 * @param owner The main document window
+		 */
+		void WriteEditInputFile(MolDisplayWin * owner);
 		InputData * GetInputData(void);
 		InputData * SetInputData(InputData * NewData);
 		/**

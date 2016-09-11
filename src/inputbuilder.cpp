@@ -155,6 +155,8 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 	EVT_BUTTON( ID_DEFAULTSBUTTON, InputBuilderWindow::OnDefaultsbuttonClick )
 	EVT_BUTTON( ID_REVERTBUTTON, InputBuilderWindow::OnRevertbuttonClick )
 	EVT_BUTTON( ID_WRITEFILEBUTTON, InputBuilderWindow::OnWritefilebuttonClick )
+        EVT_BUTTON( ID_WRITE_EDIT_BUTTON, InputBuilderWindow::OnWriteEditButtonClick )
+
 	EVT_BUTTON( ID_ADVANCEDBUTTON, InputBuilderWindow::OnAdvancedButtonClicked )
 	EVT_BUTTON( wxID_CANCEL, InputBuilderWindow::OnCancelClick )
 	EVT_BUTTON( wxID_OK, InputBuilderWindow::OnOkClick )
@@ -1606,6 +1608,11 @@ void InputBuilderWindow::CreateControls()
 	writeBtn = new wxButton( itemPanel3, ID_WRITEFILEBUTTON, _("Write File"), wxDefaultPosition, wxDefaultSize, 0 );
 	itemBoxSizer239->Add(writeBtn, 0, wxALIGN_CENTER_VERTICAL|wxLEFT|wxTOP|wxBOTTOM, 5);
 
+        wxButton* lWriteEditButton = new wxButton( itemPanel3, ID_WRITE_EDIT_BUTTON, _("Edit and Save"), wxDefaultPosition, wxDefaultSize, 0 );
+        if (InputBuilderWindow::ShowToolTips())
+                lWriteEditButton->SetToolTip(_("Open the created input file in a text editor allowing you to save the result."));
+        itemBoxSizer239->Add(lWriteEditButton, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
 	advanced_button = new wxButton( itemPanel3, ID_ADVANCEDBUTTON, _("Advanced"), wxDefaultPosition, wxDefaultSize, 0 );
 	advanced_button->Show(false);
 	itemBoxSizer239->Add(advanced_button, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
@@ -2945,6 +2952,17 @@ void InputBuilderWindow::OnWritefilebuttonClick( wxCommandEvent& /*event*/ )
 }
 
 /*!
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_WRITE_EDIT_BUTTON
+ */
+
+void InputBuilderWindow::OnWriteEditButtonClick( wxCommandEvent& /*event*/ )
+{
+	SaveData();
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	parent->GetData()->WriteEditInputFile(parent);
+}
+
+/*!
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ENQUEUEBUTTON
  */
 
@@ -4166,4 +4184,3 @@ void InputBuilderWindow::OnGVBNOeditTextUpdated( wxCommandEvent& event )
 	}
 	event.Skip();
 }
-
