@@ -16,6 +16,7 @@
 #include "BFiles.h"
 #include "myFiles.h"
 #include "InputData.h"
+#include "inputfileeditor.h"
 #include "Prefs.h"
 #include "exportoptionsdialog.h"
 #include "energyplotdialog.h"
@@ -47,9 +48,16 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
 long InputData::WriteEditInputFile(MoleculeData * lData, MolDisplayWin * owner) {
 	wxFile * t=NULL;
 	wxString tempfile = wxFileName::CreateTempFileName(wxString(_("MacMolPlt_temp_")), t);
-	wxLogMessage(tempfile);
+
 	if(!tempfile.IsEmpty()) {
-		return WriteInputFile(tempfile, lData, owner);
+		long result = WriteInputFile(tempfile, lData, owner);
+		InputFileEditor * leditor = new InputFileEditor(owner);
+		if (leditor) {
+			leditor->LoadFile(tempfile);
+			leditor->Layout();
+			leditor->Show();
+		}
+		return result;
 	}
 	return -1;
 }

@@ -801,6 +801,11 @@
 		8BBD950112C99DC50063AAF3 /* fdbfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD94FE12C99DC50063AAF3 /* fdbfont.c */; };
 		8BBD950312C99DC50063AAF3 /* fdbfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD94FE12C99DC50063AAF3 /* fdbfont.c */; };
 		8BBD950412C99DC50063AAF3 /* fdbfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 8BBD94FE12C99DC50063AAF3 /* fdbfont.c */; };
+		8BCFA4931D85ACF50009BBCD /* inputfileeditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BCFA4911D85ACF50009BBCD /* inputfileeditor.cpp */; };
+		8BCFA4941D85AD2B0009BBCD /* inputfileeditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BCFA4911D85ACF50009BBCD /* inputfileeditor.cpp */; };
+		8BCFA4951D85AD2C0009BBCD /* inputfileeditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BCFA4911D85ACF50009BBCD /* inputfileeditor.cpp */; };
+		8BCFA4961D85AD2D0009BBCD /* inputfileeditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BCFA4911D85ACF50009BBCD /* inputfileeditor.cpp */; };
+		8BCFA4971D85AD2E0009BBCD /* inputfileeditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BCFA4911D85ACF50009BBCD /* inputfileeditor.cpp */; };
 		8BD0AB0609D5B62800FCE797 /* OpenGLGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */; };
 		8BD0ABF209D610E500FCE797 /* MacMolPlt.Prefs.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */; };
 		8BDC58C20CB2A965000BE0A6 /* changeatomorderdialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */; };
@@ -1202,6 +1207,8 @@
 		8BBD94FA12C99C0B0063AAF3 /* mingpp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mingpp.h; sourceTree = "<group>"; };
 		8BBD94FE12C99DC50063AAF3 /* fdbfont.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fdbfont.c; path = blocks/fdbfont.c; sourceTree = "<group>"; };
 		8BBD94FF12C99DC50063AAF3 /* fdbfont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fdbfont.h; path = blocks/fdbfont.h; sourceTree = "<group>"; };
+		8BCFA4911D85ACF50009BBCD /* inputfileeditor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = inputfileeditor.cpp; path = src/inputfileeditor.cpp; sourceTree = "<group>"; };
+		8BCFA4921D85ACF50009BBCD /* inputfileeditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = inputfileeditor.h; path = src/inputfileeditor.h; sourceTree = "<group>"; };
 		8BD0AB0509D5B62800FCE797 /* OpenGLGraphics.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = OpenGLGraphics.cpp; path = src/OpenGLGraphics.cpp; sourceTree = "<group>"; };
 		8BD0ABBA09D60BD500FCE797 /* MacMolPlt.Prefs.xml */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.xml; name = MacMolPlt.Prefs.xml; path = resources/MacMolPlt.Prefs.xml; sourceTree = "<group>"; };
 		8BDC58C00CB2A965000BE0A6 /* changeatomorderdialog.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = changeatomorderdialog.cpp; path = src/changeatomorderdialog.cpp; sourceTree = "<group>"; };
@@ -1607,6 +1614,8 @@
 				8B6AF3090A13EAC8004D2E5F /* exportoptionsdialog.cpp */,
 				8B6AF30A0A13EAC8004D2E5F /* exportoptionsdialog.h */,
 				1652DA3109D0B12600B7783F /* Files.cpp */,
+				8BCFA4911D85ACF50009BBCD /* inputfileeditor.cpp */,
+				8BCFA4921D85ACF50009BBCD /* inputfileeditor.h */,
 				1652DA4C09D0B12600B7783F /* myFiles.h */,
 				8B600B720B8F35C400084AF2 /* qtexport.cpp */,
 				8B600B730B8F35C400084AF2 /* qtexport.h */,
@@ -1983,6 +1992,7 @@
 				8B1DA3F10A2BE373009DFD94 /* frameenergy.cpp in Sources */,
 				8B1DA4750A2E189B009DFD94 /* setPreference.cpp in Sources */,
 				8B1DA4830A2E6A18009DFD94 /* frequenciesdialog.cpp in Sources */,
+				8BCFA4931D85ACF50009BBCD /* inputfileeditor.cpp in Sources */,
 				8B1DA4840A2E6A18009DFD94 /* myPrefs.cpp in Sources */,
 				8B4FB3D40A3093470014F6B5 /* surfaceswindow.cpp in Sources */,
 				8B279CFF0A4B6F0D00994DD5 /* colorArea.cpp in Sources */,
@@ -2127,6 +2137,7 @@
 				8B162E300D75C12600975533 /* frameenergy.cpp in Sources */,
 				8B162E310D75C12600975533 /* setPreference.cpp in Sources */,
 				8B162E320D75C12600975533 /* frequenciesdialog.cpp in Sources */,
+				8BCFA4961D85AD2D0009BBCD /* inputfileeditor.cpp in Sources */,
 				8B162E330D75C12600975533 /* myPrefs.cpp in Sources */,
 				8B162E340D75C12600975533 /* surfaceswindow.cpp in Sources */,
 				8B162E350D75C12600975533 /* colorArea.cpp in Sources */,
@@ -2271,6 +2282,7 @@
 				8B29D65712B934BD0049477F /* frameenergy.cpp in Sources */,
 				8B29D65812B934BD0049477F /* setPreference.cpp in Sources */,
 				8B29D65912B934BD0049477F /* frequenciesdialog.cpp in Sources */,
+				8BCFA4951D85AD2C0009BBCD /* inputfileeditor.cpp in Sources */,
 				8B29D65A12B934BD0049477F /* myPrefs.cpp in Sources */,
 				8B29D65B12B934BD0049477F /* surfaceswindow.cpp in Sources */,
 				8B29D65C12B934BD0049477F /* colorArea.cpp in Sources */,
@@ -2415,6 +2427,7 @@
 				8B3B8B110A770A280041EA88 /* frameenergy.cpp in Sources */,
 				8B3B8B120A770A280041EA88 /* setPreference.cpp in Sources */,
 				8B3B8B130A770A280041EA88 /* frequenciesdialog.cpp in Sources */,
+				8BCFA4971D85AD2E0009BBCD /* inputfileeditor.cpp in Sources */,
 				8B3B8B140A770A280041EA88 /* myPrefs.cpp in Sources */,
 				8B3B8B150A770A280041EA88 /* surfaceswindow.cpp in Sources */,
 				8B3B8B160A770A280041EA88 /* colorArea.cpp in Sources */,
@@ -2559,6 +2572,7 @@
 				8B3EAF511C8A810000AD26F0 /* frameenergy.cpp in Sources */,
 				8B3EAF521C8A810000AD26F0 /* setPreference.cpp in Sources */,
 				8B3EAF531C8A810000AD26F0 /* frequenciesdialog.cpp in Sources */,
+				8BCFA4941D85AD2B0009BBCD /* inputfileeditor.cpp in Sources */,
 				8B3EAF541C8A810000AD26F0 /* myPrefs.cpp in Sources */,
 				8B3EAF551C8A810000AD26F0 /* surfaceswindow.cpp in Sources */,
 				8B3EAF561C8A810000AD26F0 /* colorArea.cpp in Sources */,

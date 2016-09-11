@@ -33,6 +33,7 @@ wxmacmolplt_SOURCES =                                  \
     InputData.cpp              InputData.h             \
     InputWizard.cpp            InputWizard.h           \
     Internals.cpp              Internals.h             \
+    inputfileeditor.cpp        inputfileeditor.h       \
     llmdialog.cpp              llmdialog.h             \
     main.cpp                   main.h                  \
     Math3D.cpp                 Math3D.h                \
