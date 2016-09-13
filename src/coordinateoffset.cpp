@@ -47,12 +47,9 @@ IMPLEMENT_DYNAMIC_CLASS( CoordinateOffset, wxDialog )
 BEGIN_EVENT_TABLE( CoordinateOffset, wxDialog )
 
 ////@begin CoordinateOffset event table entries
-    EVT_SLIDER( ID_SLIDER, CoordinateOffset::OnSliderUpdated )
-
-    EVT_TEXT( ID_TEXTCTRL1, CoordinateOffset::OnTextctrl1Updated )
-
-    EVT_BUTTON( wxID_OK, CoordinateOffset::OnOkClick )
-
+	EVT_SLIDER( ID_SLIDER, CoordinateOffset::OnSliderUpdated )
+	EVT_TEXT( ID_TEXTCTRL1, CoordinateOffset::OnTextctrl1Updated )
+	EVT_BUTTON( wxID_OK, CoordinateOffset::OnOkClick )
 ////@end CoordinateOffset event table entries
 
 END_EVENT_TABLE()
@@ -89,22 +86,22 @@ CoordinateOffset::~CoordinateOffset(void) {
 bool CoordinateOffset::Create( MolDisplayWin* parent, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
 {
 ////@begin CoordinateOffset member initialisation
-    Parent = NULL;
-    slider = NULL;
-    editField = NULL;
+	Parent = NULL;
+	slider = NULL;
+	editField = NULL;
 ////@end CoordinateOffset member initialisation
 	Parent = parent;
 
 ////@begin CoordinateOffset creation
-    SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
-    wxDialog::Create( parent, id, caption, pos, size, style );
+	SetExtraStyle(wxWS_EX_BLOCK_EVENTS);
+	wxDialog::Create( parent, id, caption, pos, size, style );
 
-    CreateControls();
-    if (GetSizer())
-    {
-        GetSizer()->SetSizeHints(this);
-    }
-    Centre();
+	CreateControls();
+	if (GetSizer())
+	{
+		GetSizer()->SetSizeHints(this);
+	}
+	Centre();
 ////@end CoordinateOffset creation
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
@@ -124,42 +121,43 @@ bool CoordinateOffset::Create( MolDisplayWin* parent, wxWindowID id, const wxStr
 void CoordinateOffset::CreateControls()
 {    
 ////@begin CoordinateOffset content construction
-    CoordinateOffset* itemDialog1 = this;
+	CoordinateOffset* itemDialog1 = this;
 
-    wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
-    itemDialog1->SetSizer(itemBoxSizer2);
+	wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
+	itemDialog1->SetSizer(itemBoxSizer2);
 
-    wxStaticText* itemStaticText3 = new wxStaticText( itemDialog1, wxID_STATIC, _("Move the slider to offset the coordinates\nalong the chosen normal mode. Note the offset\nwill be performed in cartesian space rather than\nmass-weighted cartesian space as shown."), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxStaticText* itemStaticText3 = new wxStaticText( itemDialog1, wxID_STATIC, _("Move the slider to offset the coordinates\nalong the chosen normal mode. Note the offset\nwill be performed in cartesian space rather than\nmass-weighted cartesian space as shown."), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer2->Add(itemStaticText3, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer4, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer4, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    slider = new wxSlider( itemDialog1, ID_SLIDER, 0, -100, 100, wxDefaultPosition, wxSize(100, 20), wxSL_HORIZONTAL );
-    if (ShowToolTips())
-        slider->SetToolTip(_("Adjust the slider to adjust the magnitude of the offset"));
-    itemBoxSizer4->Add(slider, 1, wxALIGN_CENTER_VERTICAL|wxALL | wxEXPAND, 5);
+	slider = new wxSlider( itemDialog1, ID_SLIDER, 0, -100, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
+	if (CoordinateOffset::ShowToolTips())
+		slider->SetToolTip(_("Adjust the slider to adjust the magnitude of the offset"));
+	itemBoxSizer4->Add(slider, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    editField = new wxTextCtrl(itemDialog1, ID_TEXTCTRL1, wxT(""), wxDefaultPosition, wxDefaultSize, 0, wxTextValidator(wxFILTER_NUMERIC, &valid_string));
-    if (ShowToolTips())
-        editField->SetToolTip(_("Type in a specific value for the offset percentage"));
-    itemBoxSizer4->Add(editField, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
-	editField->SetValue(_("0.0"));
+	editField = new wxTextCtrl( itemDialog1, ID_TEXTCTRL1, _("0.0"), wxDefaultPosition, wxDefaultSize, 0 );
+	if (CoordinateOffset::ShowToolTips())
+		editField->SetToolTip(_("Type in a specific value for the offset percentage"));
+	itemBoxSizer4->Add(editField, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxStaticText* itemStaticText7 = new wxStaticText( itemDialog1, wxID_STATIC, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemBoxSizer4->Add(itemStaticText7, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxStaticText* itemStaticText7 = new wxStaticText( itemDialog1, wxID_STATIC, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemBoxSizer4->Add(itemStaticText7, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxBoxSizer* itemBoxSizer8 = new wxBoxSizer(wxHORIZONTAL);
-    itemBoxSizer2->Add(itemBoxSizer8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
+	wxBoxSizer* itemBoxSizer8 = new wxBoxSizer(wxHORIZONTAL);
+	itemBoxSizer2->Add(itemBoxSizer8, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 
-    wxButton* itemButton9 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemButton9->SetDefault();
-    itemBoxSizer8->Add(itemButton9, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxButton* itemButton9 = new wxButton( itemDialog1, wxID_CANCEL, _("&Cancel"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemButton9->SetDefault();
+	itemBoxSizer8->Add(itemButton9, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
-    wxButton* itemButton10 = new wxButton( itemDialog1, wxID_OK, _("Copy Coordinates"), wxDefaultPosition, wxDefaultSize, 0 );
-    itemButton10->SetDefault();
-    itemBoxSizer8->Add(itemButton10, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	wxButton* itemButton10 = new wxButton( itemDialog1, wxID_OK, _("Copy Coordinates"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemButton10->SetDefault();
+	itemBoxSizer8->Add(itemButton10, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
+	// Set validators
+	editField->SetValidator( wxTextValidator(wxFILTER_NUMERIC) );
 ////@end CoordinateOffset content construction
 }
 
@@ -180,8 +178,8 @@ wxBitmap CoordinateOffset::GetBitmapResource( const wxString& name )
 {
     // Bitmap retrieval
 ////@begin CoordinateOffset bitmap retrieval
-    wxUnusedVar(name);
-    return wxNullBitmap;
+	wxUnusedVar(name);
+	return wxNullBitmap;
 ////@end CoordinateOffset bitmap retrieval
 }
 
@@ -193,8 +191,8 @@ wxIcon CoordinateOffset::GetIconResource( const wxString& name )
 {
     // Icon retrieval
 ////@begin CoordinateOffset icon retrieval
-    wxUnusedVar(name);
-    return wxNullIcon;
+	wxUnusedVar(name);
+	return wxNullIcon;
 ////@end CoordinateOffset icon retrieval
 }
 /*!
