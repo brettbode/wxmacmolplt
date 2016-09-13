@@ -536,6 +536,9 @@ public:
 
 ////@end InputBuilderWindow event handler declarations
 
+	/// Handler for when the window is raised, Stops running animations
+	void OnActivate(wxActivateEvent & event);
+	
 ////@begin InputBuilderWindow member function declarations
 
 	/// Retrieves bitmap resources

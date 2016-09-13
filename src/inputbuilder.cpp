@@ -161,6 +161,7 @@ BEGIN_EVENT_TABLE( InputBuilderWindow, wxFrame )
 	EVT_BUTTON( wxID_CANCEL, InputBuilderWindow::OnCancelClick )
 	EVT_BUTTON( wxID_OK, InputBuilderWindow::OnOkClick )
 ////@end InputBuilderWindow event table entries
+	EVT_ACTIVATE(InputBuilderWindow::OnActivate)
 	EVT_BUTTON( ID_ENQUEUEBUTTON, InputBuilderWindow::OnEnqueueButtonClick )
 END_EVENT_TABLE()
 
@@ -4181,6 +4182,14 @@ void InputBuilderWindow::OnGVBNOeditTextUpdated( wxCommandEvent& event )
 		buf >> val;
 		if (val >= 0) TmpInputRec->SCF->SetGVBNODegValue(count, val);
 		count++;
+	}
+	event.Skip();
+}
+
+void InputBuilderWindow::OnActivate(wxActivateEvent & event) {
+	if (event.GetActive()) {
+		MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+		parent->StopAnimations();
 	}
 	event.Skip();
 }

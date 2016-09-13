@@ -71,6 +71,7 @@ BEGIN_EVENT_TABLE( SurfacesWindow, wxFrame )
 
 ////@end SurfacesWindow event table entries
 
+	EVT_ACTIVATE(SurfacesWindow::OnActivate)
 	EVT_CHOICEBOOK_PAGE_CHANGED(ID_SURFLISTBOOK, SurfacesWindow::OnSurflistbookPageChanged )
 
 END_EVENT_TABLE()
@@ -560,5 +561,13 @@ void SurfacesWindow::OnCloseEvent( wxCommandEvent& /* event */ )
 {
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	parent->CloseSurfacesWindow();
+}
+
+void SurfacesWindow::OnActivate(wxActivateEvent & event) {
+	if (event.GetActive()) {
+		MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+		parent->StopAnimations();
+	}
+	event.Skip();
 }
 

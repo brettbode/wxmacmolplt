@@ -302,7 +302,7 @@ void MolDisplayWin::eventSize(wxSizeEvent &event) {
 }
 
 void MolDisplayWin::OnMenuOpen(wxMenuEvent & event) {
-	StopAnimations();
+//	StopAnimations();
 	event.Skip();
 }
 
@@ -316,7 +316,7 @@ void MolDisplayWin::OnActivate(wxActivateEvent & event) {
 		window_just_focused = true;
 		glCanvas->eventWindowActivated(event);
 	} else {
-		StopAnimations();
+//		StopAnimations();
 	}
 	event.Skip();
 }
@@ -799,14 +799,17 @@ void MolDisplayWin::OnMoleculeCreateLLMPathUpdate( wxUpdateUIEvent& event ) {
 
 /* File menu */
 void MolDisplayWin::menuFileAppendNewFrame(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	MainData->AddFrame(10,0);
 	ResetAllWindows();
 }
 void MolDisplayWin::menuFileDeleteFrame(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	MainData->DeleteFrame();
 	ResetAllWindows();
 }
 void MolDisplayWin::menuFileImport(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	//First need to use an open file dialog
 	wxString filename = wxFileSelector(wxT("Choose a GAMESS .DAT file to import a $VEC group"));
 	//We are looking for $ VEC groups. Scan to see how many are there. If more than 1 the user will
@@ -947,6 +950,8 @@ void MolDisplayWin::menuFileExport(wxCommandEvent &/*event*/) {
 						 wxT("|POV-Ray (*.pov)|*.pov"));
 	bool vibs = false;
 	int itemCount = 9;
+		//Many of the exports are specific to a single frame so need to make sure a frame animation or a mode animation is stopped.
+	StopAnimations();
 #if wxCHECK_VERSION(2,9,0)
 	itemCount = 11;
 #endif
@@ -1652,6 +1657,7 @@ void MolDisplayWin::menuFilePrint_preview(wxCommandEvent &event) {
 	if (printData == NULL || pageSetupData == NULL) menuFilePage_setup(event);
 	if (printData == NULL || pageSetupData == NULL) return;
 
+	StopAnimations();
 	wxPrintDialogData printDialogData(*printData);
 	wxString title(_T("MacMolPlt printout"));
 	wxPrintPreview * preview = new wxPrintPreview(new MolPrintOut(this, title),
@@ -1673,6 +1679,7 @@ void MolDisplayWin::menuFilePrint(wxCommandEvent &event) {
 	if (printData == NULL || pageSetupData == NULL) menuFilePage_setup(event);
 	if (printData == NULL || pageSetupData == NULL) return;
 	
+	StopAnimations();
 	wxPrintDialogData printDialogData(*printData);
 	wxPrinter printer(&printDialogData);
 	wxString title(_T("MacMolPlt printout"));
@@ -1802,6 +1809,7 @@ void MolDisplayWin::menuEditCut(wxCommandEvent &/*event*/) {
 }
 
 void MolDisplayWin::menuEditCopy(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	//Put the image onto the clipboard
 	if (wxTheClipboard->Open()) {
 		wxDataObjectComposite * comp = new wxDataObjectComposite();
@@ -1836,9 +1844,11 @@ void MolDisplayWin::menuEditCopy(wxCommandEvent &/*event*/) {
 }
 
 void MolDisplayWin::menuEditCopyCoordinates(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	CopyCoordinates(0);
 }
 void MolDisplayWin::menuEditCopyNWChemCoordinates(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	CopyCoordinates(2);
 }
 void MolDisplayWin::CopyCoordinates(short ctype) const {
@@ -1897,6 +1907,7 @@ void MolDisplayWin::CopyCoordinates(short ctype) const {
 }
 
 void MolDisplayWin::menuEditPaste(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	if (wxTheClipboard->Open()) {
 		if (wxTheClipboard->IsSupported(_("CML"))) {
 			wxCMLDataObject cmlObject;
@@ -1995,6 +2006,7 @@ void MolDisplayWin::menuEditPaste(wxCommandEvent &/*event*/) {
 	}
 }
 void MolDisplayWin::PasteText(void) {
+	StopAnimations();
 	//relax this restriction later (while in build mode)
 	if ((MainData->cFrame->NumAtoms != 0)&&!InEditMode()) return;    //Do not allow pasting if there are already atoms in this frame
 	if (wxTheClipboard->Open()) {
@@ -2217,6 +2229,7 @@ void MolDisplayWin::OnSaveStructureUpdate(wxUpdateUIEvent& event) {
 
 void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &/*event*/) {
 
+	StopAnimations();
 	Frame *frame = MainData->cFrame;
 	mpAtom *atoms = frame->Atoms;
 	Bond *bonds = frame->Bonds;
@@ -2374,6 +2387,7 @@ void MolDisplayWin::menuViewNextNormalMode(wxCommandEvent &/*event*/) {
 	}
 }
 void MolDisplayWin::menuViewOffsetAlongMode(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	CoordinateOffset * co = new CoordinateOffset(this);
 	co->ShowModal();
 	co->Destroy();
@@ -2672,18 +2686,21 @@ void MolDisplayWin::menuViewRotate180_vertical(wxCommandEvent &/*event*/) {
 }
 
 void MolDisplayWin::menuViewRotatePrinciple_orientation(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	MainData->RotateToPrincipleOrientation(Prefs);
 	ResetView();
 	Dirtify();
 }
 
 void MolDisplayWin::menuViewRotateOther(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	MainData->Centroid = MainData->MolCentroid;
 	SetScreenPlane * temp = new SetScreenPlane(this);
 	temp->Show();
 }
 
 void MolDisplayWin::menuMoleculeSetBondLength(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	//The set bond length dialog does the work
 	SetBondLength * dlg = new SetBondLength(this);
 	dlg->ShowModal();
@@ -2724,6 +2741,7 @@ void MolDisplayWin::ClosePrefsWindow(void) {
 }
 
 void MolDisplayWin::menuMoleculeSetFrameEnergy(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	FrameEnergy * dlg = new FrameEnergy(this);
 	dlg->ShowModal();
 	dlg->Destroy();
@@ -2735,6 +2753,7 @@ void MolDisplayWin::menuMoleculeSetFrameEnergy(wxCommandEvent &/*event*/) {
 }
 
 void MolDisplayWin::menuMoleculeCreateLLMPath(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	//The create LLM dialog does the work
 	LLMDialog * llm = new LLMDialog(this);
 	llm->ShowModal();
@@ -2742,6 +2761,7 @@ void MolDisplayWin::menuMoleculeCreateLLMPath(wxCommandEvent &/*event*/) {
 	Dirtify();
 }
 void MolDisplayWin::menuMoleculeMinimizeFrameMovements(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	BeginOperation();
 	MainData->LinearLeastSquaresFit(ProgressInd);
 	FinishOperation();
@@ -2762,6 +2782,7 @@ void MolDisplayWin::menuSetPointGroupOrder(wxCommandEvent &event) {
 	Dirtify();
 }
 void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	SymmetryPointGroupDlg * dlg = new SymmetryPointGroupDlg(this);
 	if (dlg->ShowModal() != wxID_CANCEL) {
 		//retrieve the selection and set the point group
@@ -2786,6 +2807,7 @@ void MolDisplayWin::menuMoleculeDetermineSym(wxCommandEvent &/*event*/) {
 	dlg->Destroy();
 }
 void MolDisplayWin::menuMoleculeSymCoords(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	MainData->RotateToPrincipleOrientation(Prefs);
 	MainData->StickCoordinates();
 	if (coordsWindow) coordsWindow->FrameChanged();
@@ -2793,18 +2815,21 @@ void MolDisplayWin::menuMoleculeSymCoords(wxCommandEvent &/*event*/) {
 	Dirtify();
 }
 void MolDisplayWin::menuMoleculeConvertToBohr(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	CreateFrameSnapShot();
 	MainData->UnitConversion(0);
 	ResetAllWindows();
 	Dirtify();
 }
 void MolDisplayWin::menuMoleculeConvertToAngstroms(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	CreateFrameSnapShot();
 	MainData->UnitConversion(1);
 	ResetAllWindows();
 	Dirtify();
 }
 void MolDisplayWin::menuMoleculeInvertNormalMode(wxCommandEvent &/*event*/) {
+	StopAnimations();
 	MainData->InvertMode();
 	ResetModel(false);
 	Dirtify();
@@ -3048,6 +3073,7 @@ void MolDisplayWin::menuWindowBonds(wxCommandEvent &/*event*/) {
 	if (bondsWindow) { //need to bring it to the front...
 		bondsWindow->Raise();
 	} else {
+		StopAnimations();	//Need to stop animations or a mode animation will cause the bond lengths to be incorrect
 		bondsWindow = new BondsDlg(this);
 		bondsWindow->SetSize(winData.GetBondsWinRect());
 		bondsWindow->Show();
@@ -4508,7 +4534,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_SIZE(MolDisplayWin::eventSize)
 	EVT_KEY_DOWN (MolDisplayWin::KeyHandler)
 	EVT_KEY_UP (MolDisplayWin::KeyUpHandler)
-	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen)
+//	EVT_MENU_OPEN(MolDisplayWin::OnMenuOpen)
 	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 	EVT_ACTIVATE(MolDisplayWin::OnActivate)
 	EVT_TOOL_RANGE(MMP_TOOL_ARROW, MMP_TOOL_HAND, MolDisplayWin::OnToggleTool)
