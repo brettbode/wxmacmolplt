@@ -137,7 +137,7 @@ void AboutwxMacMolPlt::CreateControls()
 	itemBoxSizer10->Add(itemHyperlinkCtrl12, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
 #if wxCHECK_VERSION(2, 8, 0)
 	wxHyperlinkCtrl* itemHyperlinkCtrl121 = new wxHyperlinkCtrl( itemDialog1, ID_HYPERLINKCTRL2, _("Submit a bug report or enhancement request"), _T("https://github.com/brettbode/wxmacmolplt/issues"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	itemBoxSizer9->Add(itemHyperlinkCtrl121, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	itemBoxSizer9->Add(itemHyperlinkCtrl121, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
 #endif
 	wxBoxSizer* itemBoxSizer13 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer9->Add(itemBoxSizer13, 0, wxALIGN_CENTER_HORIZONTAL|wxALL, 5);
