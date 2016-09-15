@@ -314,8 +314,10 @@ void MpApp::AdjustAllMenus(void) {
 }
 
 void MpApp::CloseGlobalPrefs(void) {
-	gPrefDlg->Destroy();
-	gPrefDlg = NULL;
+	if (gPrefDlg) {
+		gPrefDlg->Destroy();
+		gPrefDlg = NULL;
+	}
 }
 
 void MpApp::destroyMainFrame(MolDisplayWin *frame) {
@@ -342,6 +344,7 @@ void MpApp::menuFileQuit(wxCommandEvent &/*event*/) {
 			return;
 		}
 	}
+	CloseGlobalPrefs();
 #ifdef __WXMAC__
 	if (menuHolder)
 		menuHolder->Close();
