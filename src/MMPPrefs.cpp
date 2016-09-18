@@ -94,6 +94,8 @@ void WinPrefs::ReadBondDefaults(void) {
 	RotateMode = gPrefDefaults->RotateMode;
 	VectorScale = gPrefDefaults->VectorScale;
 	AnimateMode = gPrefDefaults->AnimateMode;
+	GradientScale = gPrefDefaults->GetGradientScale();
+	GradientColor = gPrefDefaults->GradientColor;
 }
 
 void WinPrefs::CopyBondPrefs(WinPrefs * Orig) {
@@ -104,6 +106,8 @@ void WinPrefs::CopyBondPrefs(WinPrefs * Orig) {
 	RotateMode = Orig->GetRotateMode();
 	VectorScale = Orig->GetVectorScale();
 	AnimateMode = Orig->GetAnimateMode();
+	GradientScale = Orig->GetGradientScale();
+	memcpy(&GradientColor, Orig->GetGradientColorLoc(), sizeof(RGBColor));
 }
 
 void WinPrefs::CopyDisplayPrefs(WinPrefs * Orig) {
@@ -307,6 +311,8 @@ WinPrefs::WinPrefs(void) {
 	
 	VectorColor.red = 65532;
 	VectorColor.blue = VectorColor.green = 0;
+	GradientColor.green = 65000;
+	GradientColor.red = GradientColor.blue = 0;
 	AnimateTime = 7;
 	DRCnFileSkip = 0;
 	BitOptions = 0;
@@ -316,6 +322,8 @@ WinPrefs::WinPrefs(void) {
 	AtomScale = 0.005;
 	AutoBondScale = 0.011;
 	MaxBondLength = 0.0;
+	GradientScale = 0.5;
+	ShowGradient = false;
 	AnnotationLabelSize = AtomLabelSize = 1.0;
 	BackColor.red = BackColor.green = BackColor.blue = 65532;
 	FitToPage = FrameOnPage = false;
@@ -651,6 +659,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					SetGLFOV(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_VectorScale), floatVal))
 					SetVectorScale(floatVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_GradientScale), floatVal))
+					SetGradientScale(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DFillBrightness), floatVal))
 					SetQD3DFillBrightness(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DPointBrightness), floatVal))
@@ -700,6 +710,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					ShowSymmetryOperators(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowAtomPatterns), boolVal))
 					Show2DPattern(boolVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_DisplayGradient), boolVal))
+					DisplayGradient(boolVal);
 				XMLElementList * molChildren = child->getChildren();
 				for (int im=0; im<molChildren->length(); im++) {
 					XMLElement * molchild = molChildren->item(im);
@@ -723,6 +735,14 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 								VectorColor.blue = (unsigned short)(floatVal*65535.0);
 							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_Pattern), longVal))
 								VectorPattern = longVal;
+							break;
+						case MMPMolDisplay_GradientColor:
+							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
+								GradientColor.red = (unsigned short)(floatVal*65535.0);
+							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), floatVal))
+								GradientColor.green = (unsigned short)(floatVal*65535.0);
+							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), floatVal))
+								GradientColor.blue = (unsigned short)(floatVal*65535.0);
 							break;
 						case MMPMolDisplay_BondColor:
 							if (molchild->getAttributeValue(MMPPref_convert(MMPMolDisplay_BondOrder), longVal)) {
@@ -1071,6 +1091,9 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	outbuf << GetVectorScale();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_VectorScale), outbuf.str().c_str());
 	outbuf.str("");
+	outbuf << GetGradientScale();
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_GradientScale), outbuf.str().c_str());
+	outbuf.str("");
 	outbuf << GetQD3DFillBrightness();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_3DFillBrightness), outbuf.str().c_str());
 	outbuf.str("");
@@ -1108,6 +1131,7 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowAtomNumbers), (ShowAtomNumberLabels()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowSymmetryOps), (ShowSymmetryOperators()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowAtomPatterns), (Show2DPattern()?trueXML:falseXML));
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_DisplayGradient), (DisplayGradient()?trueXML:falseXML));
 	
 	XMLElement * color = molElement->addChildElement(MMPPref_convert(MMPMolDisplay_BackColor));
 	outbuf.str("");
@@ -1133,7 +1157,18 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	outbuf.str("");
 	outbuf << VectorPattern;
 	color->addAttribute(MMPPref_convert(MMPPref_Pattern), outbuf.str().c_str());
-	
+
+	color = molElement->addChildElement(MMPPref_convert(MMPMolDisplay_GradientColor));
+	outbuf.str("");
+	outbuf << (GradientColor.red/65535.0);
+	color->addAttribute(MMPPref_convert(MMPPref_ColorRed), outbuf.str().c_str());
+	outbuf.str("");
+	outbuf << (GradientColor.green/65535.0);
+	color->addAttribute(MMPPref_convert(MMPPref_ColorGreen), outbuf.str().c_str());
+	outbuf.str("");
+	outbuf << (GradientColor.blue/65535.0);
+	color->addAttribute(MMPPref_convert(MMPPref_ColorBlue), outbuf.str().c_str());
+
 	for (int i=0; i<kMaxBondTypes; i++) {
 		color = molElement->addChildElement(MMPPref_convert(MMPMolDisplay_BondColor));
 		outbuf.str("");
@@ -1469,6 +1504,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "BackgroundColor";
         case MMPMolDisplay_VectorColor:
             return "VectorColor";
+		case MMPMolDisplay_GradientColor:
+			return "GradientColor";
         case MMPMolDisplay_BondColor:
             return "BondColor";
         case MMPMolDisplay_BondOrder:
@@ -1487,6 +1524,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "FieldOfView";
         case MMPMolDisplay_VectorScale:
             return "VectorScale";
+		case MMPMolDisplay_GradientScale:
+			return "GradientScaleFactor";
         case MMPMolDisplay_3DFillBrightness:
             return "FillBrightness3D";
         case MMPMolDisplay_3DPointBrightness:
@@ -1547,6 +1586,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
 			return "AutoRotationSpeedY";
 		case MMPMolDisplay_AutoRotationZ:
 			return "AutoRotationSpeedZ";
+		case MMPMolDisplay_DisplayGradient:
+			return "DisplayGradient";
 		default:
             return "invalid";
     }

@@ -81,6 +81,7 @@ enum MMPMolDisplayElments {
 	invalid_MMPMolDisplayElement=0,
 	MMPMolDisplay_BackColor,
 	MMPMolDisplay_VectorColor,
+	MMPMolDisplay_GradientColor,
 	MMPMolDisplay_BondColor,
 	MMPMolDisplay_BondOrder,
 	MMPMolDisplay_AnimateTime,
@@ -89,6 +90,7 @@ enum MMPMolDisplayElments {
 	MMPMolDisplay_AtomScale,
 	MMPMolDisplay_GLFOV,
 	MMPMolDisplay_VectorScale,
+	MMPMolDisplay_GradientScale,
 	MMPMolDisplay_3DFillBrightness,
 	MMPMolDisplay_3DPointBrightness,
 	MMPMolDisplay_3DLineWidth,
@@ -120,6 +122,7 @@ enum MMPMolDisplayElments {
 	MMPMolDisplay_AutoRotationX,
 	MMPMolDisplay_AutoRotationY,
 	MMPMolDisplay_AutoRotationZ,
+	MMPMolDisplay_DisplayGradient,
 	
 	NumberMMPMolDisplayElements
 };

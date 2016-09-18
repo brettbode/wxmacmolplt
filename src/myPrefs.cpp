@@ -76,6 +76,7 @@
 #define ID_SHADER_CHOICE 5041
 #define ID_3D_AUTOROTATIONX_SPIN 5042
 #define ID_3D_AUTOROTATIONY_SPIN 5043
+#define ID_GRADIENT_SCALING_SLIDER 5044
 
 #include "GlobalExceptions.h"
 #include "MyTypes.h"
@@ -94,6 +95,7 @@ extern short gAppResRef;
 BEGIN_EVENT_TABLE(BondPrefsPane, wxPanel)
 	EVT_CHOICE(ID_BOND_MODE_CHOICE, BondPrefsPane::OnChoice)
 	EVT_SLIDER(ID_NORMAL_MODE_SCALING_SLIDER, BondPrefsPane::OnSliderUpdate)
+	EVT_SLIDER(ID_GRADIENT_SCALING_SLIDER, BondPrefsPane::OnGradientSliderUpdate)
 	EVT_CHECKBOX(ID_SHOW_NORMAL_MODE_ANIMATION, BondPrefsPane::OnToggleAnim)
 	EVT_CHECKBOX(ID_SHOW_NORMAL_MODE_ROTATION, BondPrefsPane::OnToggleRotation)
 END_EVENT_TABLE()
@@ -281,24 +283,21 @@ BondPrefsPane::BondPrefsPane(MolDisplayWin* targetWindow,
 							 Boolean Global)
 	: PrefsPane(targetWindow, targetPrefs, kBondPrefsPane, Global, parent) {
 
-	/* Create(parent, -1, wxDefaultPosition, wxDefaultSize,wxSUNKEN_BORDER); */
-
-	mMainSizer = new wxBoxSizer(wxVERTICAL);
-	mUpperSizer = new wxBoxSizer(wxVERTICAL);
-	mSldSizer = new wxBoxSizer(wxHORIZONTAL);
-	mBox = new wxStaticBoxSizer(wxHORIZONTAL, this);
-	mInnerSizer = new wxFlexGridSizer(3, 2, 0, 0);
-	mLowerSizer = new wxBoxSizer(wxVERTICAL);
-
-	SetSizer(mMainSizer);
 }
 
 BondPrefsPane::~BondPrefsPane() {
-	delete mColorArea;
-	delete mNormColorArea;
 }
 
 void BondPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
+	wxBoxSizer* lMainSizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer* lUpperSizer = new wxBoxSizer(wxVERTICAL);
+	wxFlexGridSizer* lSldSizer = new wxFlexGridSizer(2, 2, 0, 0);
+	wxStaticBoxSizer* lBox = new wxStaticBoxSizer(wxHORIZONTAL, this, _T("Bond and Arrow Colors"));
+	wxBoxSizer* lLowerSizer = new wxBoxSizer(wxVERTICAL);
+	wxFlexGridSizer* lInnerSizer = new wxFlexGridSizer(4, 2, 0, 0);
+	
+	SetSizer(lMainSizer);
+
 	mChkAnim = new wxCheckBox(this, ID_SHOW_NORMAL_MODE_ANIMATION, _T("Show Normal Mode During Animation"), wxDefaultPosition);
 	mChkAnim->SetValue(mTargetPrefs->GetAnimateMode());
 	mChkRotation = new wxCheckBox(this, ID_SHOW_NORMAL_MODE_ROTATION, _T("Show Normal Mode During Rotation"), wxDefaultPosition);
@@ -307,12 +306,17 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	mSldScale = new wxSlider(this, ID_NORMAL_MODE_SCALING_SLIDER, 
 				(int)(mTargetPrefs->GetVectorScale()*10 - 1), 0, 25,
 							 wxDefaultPosition, wxSize(155,wxDefaultCoord));
+	mGradientSlider = new wxSlider(this, ID_GRADIENT_SCALING_SLIDER,
+							 (int)(mTargetPrefs->GetGradientScale()*10 - 1), 0, 250,
+							 wxDefaultPosition, wxSize(155,wxDefaultCoord));
 
-	mUpperSizer->Add(mChkAnim, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-	mUpperSizer->Add(mChkRotation, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-	mSldSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Mode Scaling:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-	mSldSizer->Add(mSldScale, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-	mUpperSizer->Add(mSldSizer);
+	lUpperSizer->Add(mChkAnim, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	lUpperSizer->Add(mChkRotation, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	lSldSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Mode Scaling:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	lSldSizer->Add(mSldScale, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	lSldSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Energy first derivative scaling:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	lSldSizer->Add(mGradientSlider, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
+	lUpperSizer->Add(lSldSizer);
 
 	wxString choices[] = { _T("Hydrogen Bonds"),
 						_T("Single Bonds"),
@@ -323,33 +327,42 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	mBondChoice->SetSelection(1);
 	mChoiceId = 1;
 
-	mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT(""))), 0, wxALIGN_RIGHT | wxALL, 3);
-	mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Color"))), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
-	mInnerSizer->Add(mBondChoice, 0, wxALIGN_RIGHT | wxALL, 3);
+	lInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT(""))), 0, wxALIGN_RIGHT | wxALL, 3);
+	lInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Color"))), 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	lInnerSizer->Add(mBondChoice, 0, wxALIGN_RIGHT | wxALL, 3);
 
 	mColorArea = new colorArea(this, 1, mTargetPrefs->GetBondColorLoc(1));
 
 	mNormColorArea = new colorArea(this, 3, mTargetPrefs->GetVectorColorLoc());
 
-	mInnerSizer->Add(mColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	lInnerSizer->Add(mColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-	mInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Modes:"))), 0, wxALIGN_RIGHT | wxALL, 3);
-	mInnerSizer->Add(mNormColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	lInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Modes:"))), 0, wxALIGN_RIGHT | wxALL, 3);
+	lInnerSizer->Add(mNormColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-	mBox->Add(mInnerSizer);
-	mLowerSizer->Add(mBox);
+	lInnerSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Energy first deriviative:"))), 0, wxALIGN_RIGHT | wxALL, 3);
+	mGradientColorArea = new colorArea(this, 4, mTargetPrefs->GetGradientColorLoc());
+	lInnerSizer->Add(mGradientColorArea, 1, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 
-	mMainSizer->Add(mUpperSizer, 0, wxALIGN_CENTER | wxALL, 3);
-	mMainSizer->Add(mLowerSizer, 0, wxALIGN_CENTER | wxALL, 3);
+	lBox->Add(lInnerSizer);
+	lLowerSizer->Add(lBox);
+
+	lMainSizer->Add(lUpperSizer, 0, wxALIGN_CENTER | wxALL, 3);
+	lMainSizer->Add(lLowerSizer, 0, wxALIGN_CENTER | wxALL, 3);
 }
 
 void BondPrefsPane::saveToTempPrefs() {
 	mColorArea->getColor(mTargetPrefs->GetBondColorLoc(mChoiceId));
 	mNormColorArea->getColor(mTargetPrefs->GetVectorColorLoc());
+	mGradientColorArea->getColor(mTargetPrefs->GetGradientColorLoc());
 }
 
 void BondPrefsPane::OnSliderUpdate(wxCommandEvent &WXUNUSED(event)) {
 	mTargetPrefs->SetVectorScale((float)(0.1*(mSldScale->GetValue()+1)));
+}
+
+void BondPrefsPane::OnGradientSliderUpdate(wxCommandEvent & WXUNUSED(event)) {
+	mTargetPrefs->SetGradientScale((float)(0.1*(mGradientSlider->GetValue()+1)));
 }
 
 void BondPrefsPane::OnToggleAnim(wxCommandEvent& WXUNUSED(event)) {
@@ -612,7 +625,7 @@ void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 
 		wxString choices2[] = {_T("None"), _T("Kinetic Energy"), _T("RMS Grad"), _T("Max. Grad"), _T("Bond Length"), _T("Bond Angle") };
 
-		mRdoMisc = new wxRadioBox(this, ID_MISC_RADIOBOX, _T(""), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices2), choices2, 1, wxRA_SPECIFY_COLS);
+		mRdoMisc = new wxRadioBox(this, ID_MISC_RADIOBOX, _T("Secondary Axis"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices2), choices2, 1, wxRA_SPECIFY_COLS);
 
 		if (lEOpts->PlotOther())
 			mRdoMisc->SetSelection(0);
