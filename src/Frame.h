@@ -244,6 +244,13 @@ class Frame {
 		//
 		inline int GetTargetAtom() const { return targeted_atom; }
 		inline void SetTargetAtom(int id) { targeted_atom = id; }
+		/// Test to see if the gradient vector is avalable for use for display
+		bool GradientVectorAvailable(void) const;
+		/* Retrive the gradient vector for theAtom, returns true if successful
+		 * @param theAtom the atom to pull from the array
+		 * @param GradientVector upon return contains the gradient vector for theAtom
+		 */
+		bool RetrieveAtomGradient(long theAtom, CPoint3D & gradVector) const;
 };
 
 #endif

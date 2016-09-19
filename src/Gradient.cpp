@@ -134,3 +134,10 @@ bool GradientData::ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms,
 
 	return result;
 }
+bool GradientData::RetrieveAtomGradient(long theAtom, CPoint3D & GradientVector) const {
+	if ((CartesianGradient!=NULL)&&(theAtom<CartAllocation)) {
+		GradientVector = CartesianGradient[theAtom];
+		return true;
+	}
+	return false;
+}

@@ -411,6 +411,7 @@ void MolDisplayWin::createMenuBar(void) {
 	menuView->Append(MMP_OFFSETMODE, wxT("&Offset along mode..."), wxT("Generate a new set of coordinates by moving along the current mode"));
 	menuView->Append(MMP_PREVMODE, wxT("&Previous Normal Mode\tCtrl+["));
 	menuView->Append(MMP_NEXTMODE, wxT("Ne&xt Normal &Mode\tCtrl+]"));
+	menuView->AppendCheckItem(MMP_SHOWGRADIENT, wxT("Show Energy Gradient\tCtrl+G"));
 	menuView->AppendSeparator();
 	menuView->AppendCheckItem(MMP_SHOWAXIS, wxT("Show Ax&is"), wxT("Display the cartesian axis"));
 	menuView->AppendCheckItem(MMP_SHOWSYMMETRYOPERATOR, _("Show S&ymmetry Operators"), _("Overlays the symmetry operators for the current point group. Not all point groups are supported."));
@@ -605,6 +606,7 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuView->Enable(MMP_OFFSETMODE, true);
 		menuMolecule->Enable(MMP_INVERTNORMALMODE, true);
 	}
+	menuView->Enable(MMP_SHOWGRADIENT, MainData->GradientVectorAvailable());
 }
 
 void MolDisplayWin::OnSaveUpdate(wxUpdateUIEvent& event) {
@@ -2392,6 +2394,12 @@ void MolDisplayWin::menuViewOffsetAlongMode(wxCommandEvent &/*event*/) {
 	co->ShowModal();
 	co->Destroy();
 }
+void MolDisplayWin::menuViewShowGradient(wxCommandEvent &/*event*/) {
+	Prefs->DisplayGradient(1-Prefs->DisplayGradient());
+	ResetModel(false);
+	Dirtify();
+}
+
 void MolDisplayWin::menuViewCenter(wxCommandEvent &/*event*/) {
 	MainData->CenterModelWindow();
 	ResetModel(false);
@@ -4426,6 +4434,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_OFFSETMODE,       MolDisplayWin::menuViewOffsetAlongMode)
 	EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
 	EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
+	EVT_MENU (MMP_SHOWGRADIENT,     MolDisplayWin::menuViewShowGradient)
 	EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
 	EVT_MENU (MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::menuViewShowSymmetryOperators)
 	EVT_UPDATE_UI(MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::OnShowSymOpsUpdate )

@@ -627,6 +627,7 @@ bool MoleculeData::TotalDensityPossible(void) const {
 	}
 	return result;
 }
+bool MoleculeData::GradientVectorAvailable(void) const {return cFrame->GradientVectorAvailable();};
 bool MoleculeData::MEPCalculationPossible(void) const {
 	bool result = false;
 	if (Basis) {

@@ -356,6 +356,8 @@ class MoleculeData {
 		 @param FragmentId the new fragment id for the targeted atom
 		 */
 		void SetFMOFragmentId(const long & AtomId, const long & FragmentId);
+		/// Test to see if the gradient vector is available which would allow displaying that vector
+		bool GradientVectorAvailable(void) const;
 };
 
 #endif

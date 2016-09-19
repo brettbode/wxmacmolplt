@@ -258,6 +258,18 @@ void Frame::ReadGradient(BufferFile * Buffer, wxFileOffset SearchLength) {
 
 	Buffer->SetFilePos(SavedPos);	//reset position so other code isn't broken
 }
+bool Frame::GradientVectorAvailable(void) const {
+	bool result = false;
+	if (Gradient) {
+		result = Gradient->GradientVectorAvailable(NumAtoms);
+	}
+	return result;
+}
+bool Frame::RetrieveAtomGradient(long theAtom, CPoint3D & gradVector) const {
+	if (Gradient) return Gradient->RetrieveAtomGradient(theAtom, gradVector);
+	return false;
+}
+
 float Frame::GetRMSGradient(void) const {
 	float result=-1.0f;
 	if (Gradient) {

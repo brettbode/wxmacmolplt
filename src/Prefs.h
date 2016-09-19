@@ -464,7 +464,7 @@ class WinPrefs {
 		inline float GetGradientScale(void) const {return GradientScale;};
 		/// Set the gradient length scale factor
 		inline float SetGradientScale(float NewValue) {
-			if ((NewValue >= 0.0)&&(NewValue<= 2000000.0)) GradientScale = NewValue;
+			if ((NewValue >= 0.01)&&(NewValue<= 2000000.0)) GradientScale = NewValue;
 			return GradientScale;};
 		inline unsigned char * GetAtomLabelLoc(void) {return &(AtomLabels[0][0]);};
 		void GetAtomLabel(long AtomNum, Str255 text);

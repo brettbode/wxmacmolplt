@@ -1166,8 +1166,65 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 			}
 		}
 	}
-	gluDeleteQuadric(core_obj);	//finally delete the quadric object
 
+	if (MainData->GradientVectorAvailable() && Prefs->DisplayGradient()) { //Add the gradient arrows, if active
+		float VectorScale = Prefs->GetGradientScale();
+		
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
+		Prefs->ChangeColorGradientColor();
+		
+		CPoint3D NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
+		for (long iatom=0; iatom<NumAtoms; iatom++) {
+			
+			if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
+			CPoint3D NMode;
+			lFrame->RetrieveAtomGradient(iatom, NMode);
+			NMode *= VectorScale;
+			float length = NMode.Magnitude();
+			if (length > 0.1) {
+				CPoint3D NModeVector;
+				Matrix4D rotMat;
+				NModeVector.x = NMode.x/length;
+				NModeVector.y = NMode.y/length;
+				NModeVector.z = NMode.z/length;
+				float VectorWidth = (0.03 + 0.005*length);
+				//Set up vectors for the shaft of the normal mode
+				CPoint3D VStart;
+				long curAtomType = lAtoms[iatom].Type - 1;
+				
+				float radius;
+				if (Prefs->DrawWireFrame()) radius = 0.0;
+				else radius = AtomScale*Prefs->GetAtomSize(curAtomType);
+				VStart.x = lAtoms[iatom].Position.x + NModeVector.x*0.95*radius;
+				VStart.y = lAtoms[iatom].Position.y + NModeVector.y*0.95*radius;
+				VStart.z = lAtoms[iatom].Position.z + NModeVector.z*0.95*radius;
+				float HeadRadius = 2 * VectorWidth;
+				if (2*HeadRadius > length) HeadRadius = length/2.0;
+				// float HeadRatio = (length-HeadRadius)/length;
+				GLfloat ShaftLength = length - HeadRadius;
+				
+				SetRotationMatrix(rotMat, &NormStart, &NModeVector);
+				rotMat[3][0] = VStart.x;
+				rotMat[3][1] = VStart.y;
+				rotMat[3][2] = VStart.z;
+				glPushMatrix();
+				glMultMatrixf((const GLfloat *) &rotMat);
+				
+				gluCylinder(core_obj, VectorWidth, VectorWidth, ShaftLength, (long)(Quality), (long)(0.5*Quality));
+				glPopMatrix();
+				rotMat[3][0] = VStart.x + NModeVector.x * ShaftLength;
+				rotMat[3][1] = VStart.y + NModeVector.y * ShaftLength;
+				rotMat[3][2] = VStart.z + NModeVector.z * ShaftLength;
+				glPushMatrix();
+				glMultMatrixf((const GLfloat *) &rotMat);
+				gluDisk(core_obj, 0.0, 2*VectorWidth, (long)(Quality), 2);
+				gluCylinder(core_obj, 2*VectorWidth, 0.0, HeadRadius, (long)(Quality), 3);
+				glPopMatrix();
+			}
+		}
+	}
+	gluDeleteQuadric(core_obj);	//finally delete the quadric object
 }
 
 void WinPrefs::ChangeColorBondColor(long order) const {
