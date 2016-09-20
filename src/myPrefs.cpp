@@ -307,7 +307,7 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 				(int)(mTargetPrefs->GetVectorScale()*10 - 1), 0, 25,
 							 wxDefaultPosition, wxSize(155,wxDefaultCoord));
 	mGradientSlider = new wxSlider(this, ID_GRADIENT_SCALING_SLIDER,
-							 (int)(mTargetPrefs->GetGradientScale() - 1), 0, 2500,
+							 (int)(mTargetPrefs->GetGradientScale() - 1), 0, 100,
 							 wxDefaultPosition, wxSize(155,wxDefaultCoord));
 
 	lUpperSizer->Add(mChkAnim, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);

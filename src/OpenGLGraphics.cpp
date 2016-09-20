@@ -28,6 +28,7 @@
 #include "Progress.h"
 #include "patterns.h"
 #include "Files.h"
+#include "Gradient.h"
 
 // ----------------------------------------------------------------------------
 // FUNCTION PROTOTYPES
@@ -1169,6 +1170,10 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 	if (MainData->GradientVectorAvailable() && Prefs->DisplayGradient()) { //Add the gradient arrows, if active
 		float VectorScale = Prefs->GetGradientScale();
+//		float GradMax = sqrt(1.0/lFrame->Gradient->GetMaximum());
+//		float GradMax = lFrame->Gradient->GetMaximum()*10000.0;
+		float GradMax = 0.1/sqrt(lFrame->Gradient->GetMaximum());
+		VectorScale *= GradMax;
 		
 		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);

@@ -322,7 +322,7 @@ WinPrefs::WinPrefs(void) {
 	AtomScale = 0.005;
 	AutoBondScale = 0.011;
 	MaxBondLength = 0.0;
-	GradientScale = 0.5;
+	GradientScale = 50.0;
 	ShowGradient = false;
 	AnnotationLabelSize = AtomLabelSize = 1.0;
 	BackColor.red = BackColor.green = BackColor.blue = 65532;
