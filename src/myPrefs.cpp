@@ -678,10 +678,10 @@ void EnergyPrefsPane::setHiddenCtrls() {
 		mRightBottomSizer = new wxBoxSizer(wxVERTICAL);
 
 	if (!mRight1BottomSizer)
-		mRight1BottomSizer = new wxGridSizer(2,3, 0,0);
+		mRight1BottomSizer = new wxGridSizer(2,2, 0,0);
 
 	if (!mRight2BottomSizer)
-		mRight2BottomSizer = new wxGridSizer(2,1, 0,0);
+		mRight2BottomSizer = new wxGridSizer(1,2, 0,0);
 
 	wxString tmp;
 	if (!mAtomText[0]) {
@@ -693,17 +693,17 @@ void EnergyPrefsPane::setHiddenCtrls() {
 		mAtomText[1] = new wxTextCtrl(this, wxID_ANY, tmp);
 	}
 
-	mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 1:"))), 0, wxALIGN_CENTER | wxALL, 3);
-	mRight1BottomSizer->Add(mAtomText[0], wxALIGN_CENTER | wxALL, 3);
-	mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 2:"))), 0, wxALIGN_CENTER | wxALL, 3);
-	mRight1BottomSizer->Add(mAtomText[1], wxALIGN_CENTER | wxALL, 3);
+	mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 1:"))), 0, wxALIGN_RIGHT | wxALL, 3);
+	mRight1BottomSizer->Add(mAtomText[0], wxALIGN_LEFT | wxALL, 3);
+	mRight1BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 2:"))), 0, wxALIGN_RIGHT | wxALL, 3);
+	mRight1BottomSizer->Add(mAtomText[1], wxALIGN_LEFT | wxALL, 3);
 
 	if (!mAtomText[2]) {
 		tmp.Printf(wxT("%ld"), lPOpts->Get3rdAtom()+1);
 		mAtomText[2] = new wxTextCtrl(this, wxID_ANY, tmp);
 	}
-	mRight2BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 3:"))), 0, wxALIGN_CENTER | wxALL, 3);
-	mRight2BottomSizer->Add(mAtomText[2], wxALIGN_CENTER | wxALL, 3);
+	mRight2BottomSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Atom 3:"))), 0, wxALIGN_RIGHT | wxALL, 3);
+	mRight2BottomSizer->Add(mAtomText[2], wxALIGN_LEFT | wxALL, 3);
 
 	mRightBottomSizer->Add(mRight1BottomSizer);
 	mRightBottomSizer->Add(mRight2BottomSizer);
@@ -777,6 +777,7 @@ void EnergyPrefsPane::OnRadio(wxCommandEvent& event) {
 		if (tmpStr.Cmp(_T("Bond Angle")) == 0)
 			mRightBottomSizer->Show(mRight2BottomSizer, true, true);
 
+		mRightBottomSizer->Layout();
 		mMainSizer->Layout();
 	}
 
