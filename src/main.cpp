@@ -344,16 +344,14 @@ void MpApp::menuFileQuit(wxCommandEvent &/*event*/) {
 			return;
 		}
 	}
-	CloseGlobalPrefs();
+		//Closeout all global scope windows here!
+	CloseGlobalPrefs();	//Make sure the global prefs window is closed
 #ifdef __WXMAC__
+	//Close the Mac menu bar holder and clear for exit.
 	if (menuHolder)
 		menuHolder->Close();
 	SetExitOnFrameDelete(true);
 #endif
-	
-	//This looks like it has the desired effect, but not sure if it is the "correct" way to exit
-//	ExitMainLoop();
-//	wxExit();
 }
 
 void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {
