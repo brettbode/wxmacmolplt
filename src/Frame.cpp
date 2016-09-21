@@ -238,15 +238,23 @@ bool Frame::IncreaseAtomAllocation(long NumAdditional) {
 }
 void Frame::ReadGradient(BufferFile * Buffer, wxFileOffset SearchLength) {
 	wxFileOffset SavedPos = Buffer->GetFilePos(), npos;
-	bool	Style=true;
+	bool	found=false;
+	int		Style = 1;
 
-	if (Buffer->LocateKeyWord(" NSERCH", 7, SearchLength)) {	//Search for gradient data at the end 
-		Gradient = new GradientData;			//of a frame of data
+	if (Buffer->LocateKeyWord(" NSERCH", 7, SearchLength)) {	//Search for gradient data at the end of an optimization point
+		found = true;
+	} else if (Buffer->LocateKeyWord("UNITS ARE HARTREE/BOHR    E'X", 29, SearchLength)) {
+		Buffer->BackupnLines(6);
+		Style = 2;
+		found = true;
+	}
+	if (found) {
+		Gradient = new GradientData;
 		if (Gradient) {
 			npos = Buffer->GetFilePos();
 			if (Buffer->LocateKeyWord("COORDINATES (BOHR)                         GRADIENT (HARTREE/BOHR)",
 					60, SearchLength)) {
-				Style=false;
+				Style=0;
 				Buffer->SetFilePos(npos);
 			}
 			if (!Gradient->ParseGAMESSGradient(Buffer, NumAtoms, SearchLength, Style)) {

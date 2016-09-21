@@ -28,7 +28,7 @@ class GradientData {
 		void SetRMS(float v) {RMS = v;};
 		void SetMaximum(float v) {Maximum = v;};
 		bool ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms, wxFileOffset SearchLength,
-			bool Style);
+			int Style);
 		/* Retrive the gradient vector for theAtom, returns true if successful
 		 * @param theAtom the atom to pull from the array
 		 * @param GradientVector upon return contains the gradient vector for theAtom
