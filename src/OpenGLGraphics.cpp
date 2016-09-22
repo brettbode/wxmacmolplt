@@ -1172,7 +1172,9 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		float VectorScale = Prefs->GetGradientScale();
 //		float GradMax = sqrt(1.0/lFrame->Gradient->GetMaximum());
 //		float GradMax = lFrame->Gradient->GetMaximum()*10000.0;
-		float GradMax = 0.1/sqrt(lFrame->Gradient->GetMaximum());
+		float GradMax = 0.01/lFrame->Gradient->GetMaximum();
+		float widthFactor = 5.0 + log10f(lFrame->Gradient->GetMaximum());
+		if (widthFactor < 0.0) widthFactor = 0.0;
 		VectorScale *= GradMax;
 		
 		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
@@ -1193,7 +1195,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				NModeVector.x = NMode.x/length;
 				NModeVector.y = NMode.y/length;
 				NModeVector.z = NMode.z/length;
-				float VectorWidth = (0.03 + 0.005*length);
+				float VectorWidth = (0.02+0.03*widthFactor + 0.005*length);
 				//Set up vectors for the shaft of the normal mode
 				CPoint3D VStart;
 				long curAtomType = lAtoms[iatom].Type - 1;
