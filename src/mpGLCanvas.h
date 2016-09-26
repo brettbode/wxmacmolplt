@@ -193,7 +193,7 @@ class MpGLCanvas : public wxGLCanvas {
 		// HUH: I don't know why this needs scope resolved, but it does.
 		void SetCurrent() { wxGLCanvas::SetCurrent(*context); }
 		// And defining the above seems to hide the following from wxGLCanvas.
-		void SetCurrent(wxGLContext& context) { wxGLCanvas::SetCurrent(context); }
+		void SetCurrent(wxGLContext& myContext) { wxGLCanvas::SetCurrent(myContext); }
 #endif
 		  
 		/**

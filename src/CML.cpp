@@ -519,12 +519,12 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 		}
 		if (AtomAttributes) {
 			//Store non-standard attributes of atoms such as selection, effective fragment id, SIMOMM type
-			XMLElement * AArrayElement = listElement->addChildElement(CML_convert(MMP_AtomAttrArrayElement));
+			XMLElement * AtomArrayElement = listElement->addChildElement(CML_convert(MMP_AtomAttrArrayElement));
 			for (int i=0; i<NumAtoms; i++) {
 				if (Atoms[i].GetSelectState() || Atoms[i].IsSIMOMMAtom() || Atoms[i].IsEffectiveFragment()
 					|| Atoms[i].GetInvisibility() || Atoms[i].IsSymmetryUnique() ||
 					Atoms[i].GetCoordinationNumber() || Atoms[i].GetLonePairCount()) {
-					XMLElement * atomEle = AArrayElement->addChildElement(CML_convert(AtomElement));
+					XMLElement * atomEle = AtomArrayElement->addChildElement(CML_convert(AtomElement));
 					snprintf(line, kMaxLineLength, "a%d", i);
 					atomEle->addAttribute(CML_convert(IdAttr), line);
 					if (Atoms[i].GetSelectState())
@@ -850,74 +850,74 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 	modes->addAttribute(CML_convert(rowsAttr), line);
 	
 	if (!Symmetry.empty()) {
-		std::ostringstream freqbuf;
-		char line[kMaxLineLength];
+		std::ostringstream symmetryBuf;
+		char countline[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
-			if (i>0) freqbuf << " ";
-			freqbuf << Symmetry[i];
+			if (i>0) symmetryBuf << " ";
+			symmetryBuf << Symmetry[i];
 		}
 		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
-													  freqbuf.str().c_str());
+													  symmetryBuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_Symmetry));
-		snprintf(line, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), line);
+		snprintf(countline, kMaxLineLength, "%ld", NumModes);
+		modes->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!Intensities.empty()) {
-		std::ostringstream freqbuf;
-		char line[kMaxLineLength];
+		std::ostringstream intensitybuf;
+		char countline[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
-			if (i>0) freqbuf << " ";
-			freqbuf << Intensities[i];
+			if (i>0) intensitybuf << " ";
+			intensitybuf << Intensities[i];
 		}
 		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
-													 freqbuf.str().c_str());
+													 intensitybuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_VibIntensity));
-		snprintf(line, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), line);
+		snprintf(countline, kMaxLineLength, "%ld", NumModes);
+		modes->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!ReducedMass.empty()) {
-		std::ostringstream freqbuf;
-		char line[kMaxLineLength];
+		std::ostringstream reducedMassbuf;
+		char countline[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
-			if (i>0) freqbuf << " ";
-			freqbuf << ReducedMass[i];
+			if (i>0) reducedMassbuf << " ";
+			reducedMassbuf << ReducedMass[i];
 		}
 		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
-													 freqbuf.str().c_str());
+													 reducedMassbuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_ReducedMass));
-		snprintf(line, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), line);
+		snprintf(countline, kMaxLineLength, "%ld", NumModes);
+		modes->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!RamanIntensity.empty()) {
-		std::ostringstream freqbuf;
-		char line[kMaxLineLength];
+		std::ostringstream ramanIntensitybuf;
+		char countline[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
-			if (i>0) freqbuf << " ";
-			freqbuf << RamanIntensity[i];
+			if (i>0) ramanIntensitybuf << " ";
+			ramanIntensitybuf << RamanIntensity[i];
 		}
 		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
-													 freqbuf.str().c_str());
+													 ramanIntensitybuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_RamanIntensity));
-		snprintf(line, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), line);
+		snprintf(countline, kMaxLineLength, "%ld", NumModes);
+		modes->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!Depolarization.empty()) {
-		std::ostringstream freqbuf;
-		char line[kMaxLineLength];
+		std::ostringstream depolarizationbuf;
+		char countline[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
-			if (i>0) freqbuf << " ";
-			freqbuf << Depolarization[i];
+			if (i>0) depolarizationbuf << " ";
+			depolarizationbuf << Depolarization[i];
 		}
 		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
-													 freqbuf.str().c_str());
+													 depolarizationbuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_Depolarization));
-		snprintf(line, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), line);
+		snprintf(countline, kMaxLineLength, "%ld", NumModes);
+		modes->addAttribute(CML_convert(sizeAttr), countline);
 	}
 }
 void Internals::WriteXML(XMLElement * parent) const {
@@ -1086,7 +1086,7 @@ void AnnotationDihedral::WriteXML(XMLElement * parent) const {
 	Elem->addAttribute(kAnnAtom3XML, atoms[2]);
 	Elem->addAttribute(kAnnAtom4XML, atoms[3]);
 }
-XMLElement * XMLElement::AddLongArray(const std::vector<long> & array, const char * name, const char * title, long count) {
+XMLElement * XMLElement::AddLongArray(const std::vector<long> & array, const char * myname, const char * title, long count) {
 	XMLElement * result=NULL;
 	long num = count;
 	if (num>array.size()) num = array.size();
@@ -1099,7 +1099,7 @@ XMLElement * XMLElement::AddLongArray(const std::vector<long> & array, const cha
 			temp << array[i];
 		}
 	}
-	result = addChildElement(name, temp.str().c_str());
+	result = addChildElement(myname, temp.str().c_str());
 	result->addAttribute(CML_convert(dataTypeAttr), "xsd:integer"); //required for the array XML element
 	result->addAttribute(CML_convert(titleAttr), title);
 	temp.clear();
@@ -1173,9 +1173,9 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 												const char * val = child->getValue();
 												if (val) {
 													int pos=0, nchar;
-													for (int i=0; i<4; i++) {
+													for (int tri=0; tri<4; tri++) {
 														for (int j=0; j<4; j++) {
-															sscanf(&(val[pos]),"%f%n", &(TotalRotation[j][i]), &nchar);
+															sscanf(&(val[pos]),"%f%n", &(TotalRotation[j][tri]), &nchar);
 															pos += nchar;
 														}
 													}

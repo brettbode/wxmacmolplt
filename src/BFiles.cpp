@@ -378,8 +378,8 @@ bool BufferFile::LocateFinalEnergy(wxFileOffset Limit) {
 	while (LocateKeyWord("FINAL", 5, Limit)) {
 		wxFileOffset FINALPos = GetFilePos();
 		GetLine(LineText);
-		int LinePos = FindKeyWord(LineText, "ENERGY", 6);
-		if (LinePos > -1) {	//Found energy on the same line
+		int myLinePos = FindKeyWord(LineText, "ENERGY", 6);
+		if (myLinePos > -1) {	//Found energy on the same line
 			SetFilePos(FINALPos);
 			result = true;
 			break;

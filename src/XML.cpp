@@ -672,10 +672,10 @@ XMLElement * XMLElement::addChildElement(const char * elementName,
 	appendChild(*result);
 	return result;
 }
-XMLElement * XMLElement::addBoolChildElement(const char * name, bool value) {
+XMLElement * XMLElement::addBoolChildElement(const char * myName, bool myValue) {
 	XMLElement * result=NULL;
-	if (value) result = addChildElement(name, trueXML);
-	else result = addChildElement(name, falseXML);
+	if (myValue) result = addChildElement(myName, trueXML);
+	else result = addChildElement(myName, falseXML);
 	return result;
 }
 XMLElement * XMLElement::addChildElementToFront(const char * elementName, const char * elementValue)
@@ -964,11 +964,11 @@ void XMLElement::addFloatAttribute(const char * n, const float & v) {
 	bf << v;
 	addAttribute(n, bf.str().c_str());
 }
-void XMLElement::addBoolAttribute(const char * n, bool value) {
-	if (value)
-		addAttribute(n, trueXML);
+void XMLElement::addBoolAttribute(const char * attrName, bool myValue) {
+	if (myValue)
+		addAttribute(attrName, trueXML);
 	else
-		addAttribute(n, falseXML);
+		addAttribute(attrName, falseXML);
 }
 #define WXRECT_X_XML	"x"
 #define WXRECT_Y_XML	"y"
@@ -1123,7 +1123,7 @@ XMLElementList * XMLElement::getChildren(void) {
 	return result;
 }
 
-XMLElementList * XMLElement::getElementsByName(const char * name) const {
+XMLElementList * XMLElement::getElementsByName(const char * myName) const {
 	XMLElementList * result=NULL;
 	
 	XMLElement * le = firstChild;
@@ -1137,7 +1137,7 @@ XMLElementList * XMLElement::getElementsByName(const char * name) const {
 		le = firstChild;
 		count = 0;
 		while (le != NULL) {
-			if (le->isName(name)) {
+			if (le->isName(myName)) {
 				list[count] = le;
 				count++;
 			}
@@ -1148,13 +1148,13 @@ XMLElementList * XMLElement::getElementsByName(const char * name) const {
 	return result;
 }
 
-int XMLElement::getElementCount(const char * name) const {
+int XMLElement::getElementCount(const char * myName) const {
 	XMLElement * le = firstChild;
 	int count = 0;
 	le = firstChild;
 	count = 0;
 	while (le != NULL) {
-		if (le->isName(name)) {
+		if (le->isName(myName)) {
 			count++;
 		}
 		le = le->getNextChild();

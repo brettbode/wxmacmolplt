@@ -334,11 +334,11 @@ class Bond {
 
 class EFragAtom {
 	public:
-		EFragAtom(const std::string& label, const CPoint3D& coords,
-				  int atomic_num)
-			: label(label),
-			  coords(coords),
-			  atomic_num(atomic_num) {
+		EFragAtom(const std::string& mylabel, const CPoint3D& mycoords,
+				  int myatomic_num)
+			: label(mylabel),
+			  coords(mycoords),
+			  atomic_num(myatomic_num) {
 		}
 
 		const CPoint3D& GetCoords() const {

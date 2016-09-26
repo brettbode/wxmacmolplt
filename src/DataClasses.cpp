@@ -238,8 +238,8 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 				double cosb = cos(beta);
 				double sinb = sin(beta);
 				//replicate all the preceding operations with an x/y rotation
-				int count = operations.size()/9;
-				for (int i=0; i<count; i++) {
+				int operationcount = operations.size()/9;
+				for (int i=0; i<operationcount; i++) {
 					operations.push_back(cosb*operations[9*i]+sinb*operations[9*i+1]);
 					operations.push_back(-(-sinb*operations[9*i]+cosb*operations[9*i+1]));
 					operations.push_back(operations[9*i+2]);
