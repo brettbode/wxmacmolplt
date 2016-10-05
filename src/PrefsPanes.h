@@ -87,12 +87,15 @@ class BondPrefsPane : public PrefsPane {
 		void OnSliderUpdate( wxCommandEvent &event);
 		/// Event handler for the Gradient scaling slider
 		void OnGradientSliderUpdate(wxCommandEvent & event);
+		/// Event Handler for Gradient display radio box
+		void OnGradientRadioUpdate(wxCommandEvent & event);
 		void OnToggleAnim(wxCommandEvent& event);
 		void OnToggleRotation(wxCommandEvent& event);
 
 	private:
 		wxCheckBox* mChkAnim;
 		wxCheckBox* mChkRotation;
+		wxRadioBox* mGradientBox;
 		wxSlider* mSldScale;
 		wxSlider* mGradientSlider;
 		wxChoice* mBondChoice;

@@ -460,6 +460,8 @@ class MolDisplayWin : public wxFrame {
 		void menuViewOffsetAlongMode(wxCommandEvent &event);
 		void menuViewAnimateMode(wxCommandEvent &event);
 		void menuViewAnimateFrames(wxCommandEvent &event);
+		/// Update UI event handler for the Show Gradient menu item.
+		void OnViewGradientUpdate(wxUpdateUIEvent& event);
 		/// Event handler for the user toggling the show Gradient menu item.
 		void menuViewShowGradient(wxCommandEvent &event);
 		//void menuViewShow_special_atoms(wxCommandEvent &event);

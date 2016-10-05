@@ -77,6 +77,7 @@
 #define ID_3D_AUTOROTATIONX_SPIN 5042
 #define ID_3D_AUTOROTATIONY_SPIN 5043
 #define ID_GRADIENT_SCALING_SLIDER 5044
+#define ID_GRADIENT_DISPLAY_BOX 5045
 
 #include "GlobalExceptions.h"
 #include "MyTypes.h"
@@ -98,6 +99,7 @@ BEGIN_EVENT_TABLE(BondPrefsPane, wxPanel)
 	EVT_SLIDER(ID_GRADIENT_SCALING_SLIDER, BondPrefsPane::OnGradientSliderUpdate)
 	EVT_CHECKBOX(ID_SHOW_NORMAL_MODE_ANIMATION, BondPrefsPane::OnToggleAnim)
 	EVT_CHECKBOX(ID_SHOW_NORMAL_MODE_ROTATION, BondPrefsPane::OnToggleRotation)
+	EVT_RADIOBOX(ID_GRADIENT_DISPLAY_BOX, BondPrefsPane::OnGradientRadioUpdate)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(DisplayPrefsPane, wxPanel)
@@ -302,7 +304,19 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	mChkAnim->SetValue(mTargetPrefs->GetAnimateMode());
 	mChkRotation = new wxCheckBox(this, ID_SHOW_NORMAL_MODE_ROTATION, _T("Show Normal Mode During Rotation"), wxDefaultPosition);
 	mChkRotation->SetValue(mTargetPrefs->GetRotateMode());
-
+	
+	wxString gradientheader;
+	if (PrefsAreGlobal()) gradientheader = wxString(_T("Default Energy First Derivative Display"));
+	else gradientheader = wxString(_T("Energy First Derivative Display"));
+	wxString gradientchoices[] = {_T("None"), _T("Energy First Derivative (Gradient)"), _T("(-) Energy First Derivative (Force)")};
+	mGradientBox = new wxRadioBox(this, ID_GRADIENT_DISPLAY_BOX, gradientheader, wxDefaultPosition, wxDefaultSize, WXSIZEOF(gradientchoices), gradientchoices, 0, wxRA_SPECIFY_ROWS);
+	if (mTargetPrefs->DisplayGradient()) {
+		if (mTargetPrefs->InvertGradient()) mGradientBox->SetSelection(2);
+		else mGradientBox->SetSelection(1);
+	} else {
+		mGradientBox->SetSelection(0);
+	}
+	
 	mSldScale = new wxSlider(this, ID_NORMAL_MODE_SCALING_SLIDER, 
 				(int)(mTargetPrefs->GetVectorScale()*10 - 1), 0, 25,
 							 wxDefaultPosition, wxSize(155,wxDefaultCoord));
@@ -312,6 +326,7 @@ void BondPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 
 	lUpperSizer->Add(mChkAnim, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 	lUpperSizer->Add(mChkRotation, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
+	lUpperSizer->Add(mGradientBox, 0, wxALIGN_CENTER_HORIZONTAL | wxALL, 3);
 	lSldSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Normal Mode Scaling:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	lSldSizer->Add(mSldScale, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	lSldSizer->Add(new wxStaticText(this, wxID_ANY, wxString(wxT("Energy first derivative scaling:"))) ,0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -363,6 +378,22 @@ void BondPrefsPane::OnSliderUpdate(wxCommandEvent &WXUNUSED(event)) {
 
 void BondPrefsPane::OnGradientSliderUpdate(wxCommandEvent & WXUNUSED(event)) {
 	mTargetPrefs->SetGradientScale((float)((mGradientSlider->GetValue()+1)));
+}
+void BondPrefsPane::OnGradientRadioUpdate(wxCommandEvent &event) {
+	switch (event.GetSelection()) {
+		case 0:
+			mTargetPrefs->DisplayGradient(false);
+			mTargetPrefs->InvertGradient(false);
+			break;
+		case 1:
+			mTargetPrefs->DisplayGradient(true);
+			mTargetPrefs->InvertGradient(false);
+			break;
+		case 2:
+			mTargetPrefs->DisplayGradient(true);
+			mTargetPrefs->InvertGradient(true);
+			break;
+	}
 }
 
 void BondPrefsPane::OnToggleAnim(wxCommandEvent& WXUNUSED(event)) {

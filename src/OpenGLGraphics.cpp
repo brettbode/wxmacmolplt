@@ -1176,6 +1176,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		float widthFactor = 5.0 + log10f(lFrame->Gradient->GetMaximum());
 		if (widthFactor < 0.0) widthFactor = 0.0;
 		VectorScale *= GradMax;
+		if (Prefs->InvertGradient()) VectorScale *= -1.0;
 		
 		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);

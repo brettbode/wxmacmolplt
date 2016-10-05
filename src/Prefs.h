@@ -203,6 +203,7 @@ class WinPrefs {
 		Boolean			RotateMode, AnimateMode, AutoBondFlag, HHBondFlag, SetCreator;
 		bool			FitToPage, CenterOnPage, FrameOnPage, SymbolLabels, NumberLabels, ShowSymOps,
 						ShowGradient,		///< Toggle display of gradient
+						FlipGradient,		///< Invert the gradient to display the force
 						AutoRotating,		///< Is the window set to auto-rotate?
 						AllowAutoRotation;	///< Flag to enable/disable autorotation
 		EnergyOptions	EnergyPlotOptions;
@@ -286,10 +287,14 @@ class WinPrefs {
 		inline void ShowAtomNumberLabels(bool v) {NumberLabels = v;};
 		inline bool ShowSymmetryOperators(void) const {return ShowSymOps;};
 		inline void ShowSymmetryOperators(bool v) {ShowSymOps = v;};
-		/// Flag to determine wether to show the first derivative of the energy (gradient)
+		/// Flag to determine whether to show the first derivative of the energy (gradient)
 		inline bool DisplayGradient(void) const {return ShowGradient;};
-		/// Set function to for display of the first derivative of the energy
+		/// Set function for display of the first derivative of the energy
 		inline void DisplayGradient(bool v) {ShowGradient = v;};
+		/// Flag to for inverting (-1) the first derivative of the energy to show the force
+		inline bool InvertGradient(void) const {return FlipGradient;};
+		/// Set function for inverting of the first derivative of the energy to show the force
+		inline void InvertGradient(bool v) {FlipGradient = v;};
 		/// Flag to determine wether to allow the auto rotate feature
 		inline bool AutoRotationEnabled(void) const {return AllowAutoRotation;};
 		/// Set function to allow auto rotation via the click and drag method

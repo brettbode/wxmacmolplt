@@ -606,7 +606,6 @@ void MolDisplayWin::AdjustMenus(void) {
 		menuView->Enable(MMP_OFFSETMODE, true);
 		menuMolecule->Enable(MMP_INVERTNORMALMODE, true);
 	}
-	menuView->Enable(MMP_SHOWGRADIENT, MainData->GradientVectorAvailable());
 }
 
 void MolDisplayWin::OnSaveUpdate(wxUpdateUIEvent& event) {
@@ -2393,6 +2392,16 @@ void MolDisplayWin::menuViewOffsetAlongMode(wxCommandEvent &/*event*/) {
 	CoordinateOffset * co = new CoordinateOffset(this);
 	co->ShowModal();
 	co->Destroy();
+}
+void MolDisplayWin::OnViewGradientUpdate(wxUpdateUIEvent& event) {
+	event.Enable(false);
+	event.Check(false);
+	event.SetText(_T("Show Energy Gradient\tCtrl+G"));
+	if (MainData->GradientVectorAvailable()) {
+		event.Enable(true);
+		event.Check(Prefs->DisplayGradient());
+		if (Prefs->InvertGradient()) event.SetText(_T("Show Force\tCtrl+G"));
+	}
 }
 void MolDisplayWin::menuViewShowGradient(wxCommandEvent &/*event*/) {
 	Prefs->DisplayGradient(1-Prefs->DisplayGradient());
@@ -4434,6 +4443,7 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_OFFSETMODE,       MolDisplayWin::menuViewOffsetAlongMode)
 	EVT_MENU (MMP_PREVMODE,         MolDisplayWin::menuViewPrevNormalMode)
 	EVT_MENU (MMP_NEXTMODE,         MolDisplayWin::menuViewNextNormalMode)
+	EVT_UPDATE_UI(MMP_SHOWGRADIENT, MolDisplayWin::OnViewGradientUpdate )
 	EVT_MENU (MMP_SHOWGRADIENT,     MolDisplayWin::menuViewShowGradient)
 	EVT_MENU (MMP_SHOWAXIS,         MolDisplayWin::menuViewShowAxis)
 	EVT_MENU (MMP_SHOWSYMMETRYOPERATOR, MolDisplayWin::menuViewShowSymmetryOperators)
