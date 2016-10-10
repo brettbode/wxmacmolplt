@@ -712,6 +712,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					Show2DPattern(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_DisplayGradient), boolVal))
 					DisplayGradient(boolVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_InvertGradient), boolVal))
+					InvertGradient(boolVal);
 				XMLElementList * molChildren = child->getChildren();
 				for (int im=0; im<molChildren->length(); im++) {
 					XMLElement * molchild = molChildren->item(im);
@@ -1132,6 +1134,7 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowSymmetryOps), (ShowSymmetryOperators()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowAtomPatterns), (Show2DPattern()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_DisplayGradient), (DisplayGradient()?trueXML:falseXML));
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_InvertGradient), (InvertGradient()?trueXML:falseXML));
 	
 	XMLElement * color = molElement->addChildElement(MMPPref_convert(MMPMolDisplay_BackColor));
 	outbuf.str("");
@@ -1588,6 +1591,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
 			return "AutoRotationSpeedZ";
 		case MMPMolDisplay_DisplayGradient:
 			return "DisplayGradient";
+		case MMPMolDisplay_InvertGradient:
+			return "InvertGradient";
 		default:
             return "invalid";
     }

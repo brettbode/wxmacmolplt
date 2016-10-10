@@ -123,6 +123,7 @@ enum MMPMolDisplayElments {
 	MMPMolDisplay_AutoRotationY,
 	MMPMolDisplay_AutoRotationZ,
 	MMPMolDisplay_DisplayGradient,
+	MMPMolDisplay_InvertGradient,
 	
 	NumberMMPMolDisplayElements
 };
