@@ -153,6 +153,7 @@ public:
     QD3DPrefsPane* qd3dPanel;
 
     MolDisplayWin * mParent;
+	WinPrefs* mParentPrefs;
     WinPrefs* mPrefs;
     bool mIsGlobal;
 
