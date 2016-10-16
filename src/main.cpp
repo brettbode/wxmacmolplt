@@ -345,7 +345,10 @@ void MpApp::menuFileQuit(wxCommandEvent &/*event*/) {
 		}
 	}
 		//Closeout all global scope windows here!
-	CloseGlobalPrefs();	//Make sure the global prefs window is closed
+		//Global preferences window
+	CloseGlobalPrefs();
+		//Build tools pallette
+	if (BuilderTool) BuilderTool->ClosePalette();
 #ifdef __WXMAC__
 	//Close the Mac menu bar holder and clear for exit.
 	if (menuHolder)
