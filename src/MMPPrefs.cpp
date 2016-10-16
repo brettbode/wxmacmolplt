@@ -94,6 +94,8 @@ void WinPrefs::ReadBondDefaults(void) {
 	RotateMode = gPrefDefaults->RotateMode;
 	VectorScale = gPrefDefaults->VectorScale;
 	AnimateMode = gPrefDefaults->AnimateMode;
+	ShowGradient = gPreferences->DisplayGradient();
+	FlipGradient = gPreferences->InvertGradient();
 	GradientScale = gPrefDefaults->GetGradientScale();
 	GradientColor = gPrefDefaults->GradientColor;
 }
@@ -106,6 +108,8 @@ void WinPrefs::CopyBondPrefs(WinPrefs * Orig) {
 	RotateMode = Orig->GetRotateMode();
 	VectorScale = Orig->GetVectorScale();
 	AnimateMode = Orig->GetAnimateMode();
+	ShowGradient = Orig->DisplayGradient();
+	FlipGradient = Orig->InvertGradient();
 	GradientScale = Orig->GetGradientScale();
 	memcpy(&GradientColor, Orig->GetGradientColorLoc(), sizeof(RGBColor));
 }
@@ -202,6 +206,7 @@ void WinPrefs::CopyQD3DPrefs(WinPrefs * Orig) {
 	BackColor = Orig->BackColor;
 	shader_mode = Orig->GetShaderMode();
 	AllowAutoRotation = Orig->AutoRotationEnabled();
+	Orig->GetAutoRotationVector(autoSpeedX, autoSpeedY, autoSpeedZ);
 }
 
 #ifdef __wxBuild__
