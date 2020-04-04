@@ -95,7 +95,7 @@
 	<key>CFBundleIconFile</key>
 	<string>MacMolPlt.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>gov.ameslab.wxMacMolplt</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleLongVersionString</key>
