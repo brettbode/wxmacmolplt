@@ -91,11 +91,11 @@ void Surface::RotateSurface(Matrix4D /*RotationMatrix*/) {
   * BufferFile operations.
 */
 void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
-		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
+		float XInc, float YInc, float ZInc, const char * inLabel, BufferFile * Buffer) const {
 	char Line[kMaxLineLength];
 	if (!Grid3D) return;
 		//punch out the provided surface label
-	Buffer->WriteLine(Label, true);
+	Buffer->WriteLine(inLabel, true);
 		//Write out the number of grid points in each direction
 	sprintf(Line, "%ld %ld %ld   //nx ny nz", nx,ny,nz);
 	Buffer->WriteLine(Line, true);	// true means add a system-appropriate EOL
@@ -138,8 +138,8 @@ void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CP
   * to make parsing the file easier.  See the BufferFile object for valid
   * BufferFile operations.
 */
-void Surface::Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
-		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
+void Surface::Export3DCCP4(const float * /*Grid3D*/, long /*nx*/, long /*ny*/, long /*nz*/, const CPoint3D * /*Origin*/,
+		float /*XInc*/, float /*YInc*/, float /*ZInc*/, const char * /*Label*/, BufferFile * /*Buffer*/) const {
 
 }
 
@@ -159,8 +159,8 @@ void Surface::Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, cons
   * to make parsing the file easier.  See the BufferFile object for valid
   * BufferFile operations.
 */
-void Surface::Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
-		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
+void Surface::Export3DCNS(const float * Grid3D, long /*nx*/, long /*ny*/, long /*nz*/, const CPoint3D * /*Origin*/,
+		float /*XInc*/, float /*YInc*/, float /*ZInc*/, const char * /*Label*/, BufferFile * Buffer) const {
 	if(!Grid3D) return;			// we'll only export if this is a 3D surface
 	
 	char Line[kMaxLineLength];
@@ -650,7 +650,7 @@ long Surf2DBase::ExportPOV(MoleculeData */*MainData*/, WinPrefs *Prefs,
 					YGridValue += YGridInc.y;
 					ZGridValue += YGridInc.z;
 					n++;
-					for (int i=0; i<4; i++) HasPoint[i]=false;
+					for (int ii=0; ii<4; ii++) HasPoint[ii]=false;
 					
 					TestPoint1 = lGrid[n]-ContourValue;
 					TestPoint2 = lGrid[n-1]-ContourValue;

@@ -1752,7 +1752,7 @@ void Surf2DBase::Contour2DGrid3DGL(MoleculeData * , WinPrefs * Prefs)
 					YGridValue += YGridInc.y;
 					ZGridValue += YGridInc.z;
 					n++;
-					for (int i=0; i<4; i++) HasPoint[i]=false;
+					for (int ii=0; ii<4; ii++) HasPoint[ii]=false;
 					
 					TestPoint1 = lGrid[n]-ContourValue;
 					TestPoint2 = lGrid[n-1]-ContourValue;

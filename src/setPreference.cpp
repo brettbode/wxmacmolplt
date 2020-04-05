@@ -375,7 +375,7 @@ void setPreference::RecreateBooks() {
 
 	if (oldBook) {
 		int sel = oldBook->GetSelection();
-		int count = oldBook->GetPageCount();
+		size_t count = oldBook->GetPageCount();
 
 		for (int n = 0; n < count; n++) {
 			wxString str = oldBook->GetPageText(n);

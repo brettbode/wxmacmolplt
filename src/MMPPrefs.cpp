@@ -722,9 +722,9 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				XMLElementList * molChildren = child->getChildren();
 				for (int im=0; im<molChildren->length(); im++) {
 					XMLElement * molchild = molChildren->item(im);
-					MMPMolDisplayElments elName;
-					MMPPref_convert(molchild->getName(), elName);
-					switch (elName) {
+					MMPMolDisplayElments elName2;
+					MMPPref_convert(molchild->getName(), elName2);
+					switch (elName2) {
 						case MMPMolDisplay_BackColor:
 							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
 								BackColor.red = (unsigned short)(floatVal*65535.0);
@@ -861,10 +861,10 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				XMLElementList * eChildren = child->getChildren();
 				for (int im=0; im<eChildren->length(); im++) {
 					XMLElement * echild = eChildren->item(im);
-					MMPEnergyOptions elName;
-					MMPPref_convert(echild->getName(), elName);
+					MMPEnergyOptions elName2;
+					MMPPref_convert(echild->getName(), elName2);
 					RGBColor * clr;
-					switch (elName) {
+					switch (elName2) {
 						case MMPEnergyOpt_TEColor:
 							clr = EnergyPlotOptions.GetTEColor();
 							break;
@@ -944,8 +944,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				XMLElementList * molChildren = child->getChildren();
 				for (int im=0; im<molChildren->length(); im++) {
 					XMLElement * molchild = molChildren->item(im);
-					MMPSurfaceWinElements elName;
-					MMPPref_convert(molchild->getName(), elName);
+					MMPSurfaceWinElements elName2;
+					MMPPref_convert(molchild->getName(), elName2);
 					RGBColor temp;
 					if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
 						temp.red = (unsigned short)(floatVal*65535.0);
@@ -953,7 +953,7 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 						temp.green = (unsigned short)(floatVal*65535.0);
 					if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), floatVal))
 						temp.blue = (unsigned short)(floatVal*65535.0);
-					switch (elName) {
+					switch (elName2) {
 						case MMPSurfWin_PosColor:
 							SurfaceOpts.SetPosColor(&temp);
 							break;

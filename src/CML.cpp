@@ -1453,7 +1453,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 void WindowData::ReadXML(XMLElement * parent) {
 	XMLElementList * children = parent->getChildren();
 	bool temp;
-	for (long i=0; i < children->length(); i++) {
+	for (int i=0; i < children->length(); i++) {
 		XMLElement * child = children->item(i);
 		MMP_WindowDataNS childName;
 		if (CML_convert(child->getName(), childName)) {
@@ -1527,7 +1527,7 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
 	
 	std::map<std::string, long> idList; //map of ids to atom index
 	XMLElementList * children = mol->getChildren();
-	for (long i=0; i < children->length(); i++) {
+	for (int i=0; i < children->length(); i++) {
 		XMLElement * child = children->item(i);
 		CML_Element childname;
 		if (CML_convert(child->getName(), childname)) {
@@ -2087,7 +2087,7 @@ bool Frame::ParseBondXML(XMLElement * bondXML, const std::map<std::string, long>
 	
 	const char * et = bondXML->getAttributeValue(CML_convert(atomRefs2Attr));
 	if (et != NULL) {
-		int len = strlen(et);
+		size_t len = strlen(et);
 		if (len > 0) {
 			const char * order = bondXML->getAttributeValue(CML_convert(orderAttr));
 			BondOrder b = kSingleBond;
@@ -2848,10 +2848,10 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 												delete [] SymType;
 												SymType = NULL;
 											}
-											int len = strlen(sym);
+											size_t len = strlen(sym);
 											SymType = new char[5*NumAlphaOrbs];
 											long pos = 0;
-											for (int i=0; i<NumAlphaOrbs; i++) {
+											for (long i=0; i<NumAlphaOrbs; i++) {
 												int n=0;
 												while (sym[pos] != ' ') {
 													SymType[n+5*i] = sym[pos];
@@ -2881,21 +2881,21 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 												delete [] SymTypeB;
 												SymTypeB = NULL;
 											}
-											int len = strlen(sym);
+											size_t len = strlen(sym);
 											SymTypeB = new char[5*NumBetaOrbs];
 											long pos = 0;
-											for (int i=0; i<NumBetaOrbs; i++) {
+											for (long ii=0; ii<NumBetaOrbs; ii++) {
 												int n=0;
 												while (sym[pos] != ' ') {
-													SymTypeB[n+5*i] = sym[pos];
+													SymTypeB[n+5*ii] = sym[pos];
 													pos++;
 													n++;
 													if (pos >= len) {
-														i = NumBetaOrbs;
+														ii = NumBetaOrbs;
 														break;
 													}
 												}
-												SymTypeB[n+5*i] = '\0';
+												SymTypeB[n+5*ii] = '\0';
 												while (sym[pos]==' ') pos++;
 											}
 										}

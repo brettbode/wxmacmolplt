@@ -88,7 +88,7 @@ public:
 	double	value;
 	TypeOfEnergy	type;
 	
-	EnergyValue(void) {value = 0.0, type=PlainEnergy;};
+	EnergyValue(void) {value = 0.0; type=PlainEnergy;};
 	EnergyValue(double v, TypeOfEnergy t) {value=v; type=t;};
 	double GetEnergy(void) const {return value;};
 	TypeOfEnergy GetType(void) const {return type;};

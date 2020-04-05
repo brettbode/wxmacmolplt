@@ -241,7 +241,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 				MainData->InputOptions->SCF->SetGVBNumOpenShells(nAtoms);
 			if (ReadStringKeyword(Line, "NO(1)", token)) {
 				int nchar = 0;
-				int tlen = strlen(token);
+				size_t tlen = strlen(token);
 				MainData->InputOptions->SCF->ClearGVBOpenShellDeg();
 				while (nchar < tlen) {
 					int nchar2=0;
@@ -255,7 +255,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			}
 			if (ReadStringKeyword(Line, "NPREO(1)", token)) { //npreo should have 2 or 4 integer elements
 				int nchar = 0;
-				int tlen = strlen(token);
+				size_t tlen = strlen(token);
 				int npreoValues=0;
 				MainData->InputOptions->SCF->ClearNPREOArray();
 				while (nchar < tlen) {
@@ -899,7 +899,7 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 			//and it always reads in all atoms including duplicates
 		while (Buffer->GetFilePos() < Buffer->GetFileLength()) {
 			Buffer->GetLine(Line);
-			int LineLength = strlen(Line);
+			size_t LineLength = strlen(Line);
 				//Only read in the first model in a file
 			if (0==FindKeyWord(Line, "ENDMDL", 6)) {
 				bool modelFound=false;

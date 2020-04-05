@@ -88,7 +88,7 @@ XMLDocument::XMLDocument(const char * rootName,  bool custom, const char * uriRe
 	useCustom = custom;
 	
 	if (uriReq != NULL) {
-		int n = strlen(uriReq);
+		size_t n = strlen(uriReq);
 		uri = new char[n+1];
 		strncpy(uri, uriReq, n);
 	} else {	//add a default uri
@@ -286,7 +286,7 @@ XMLAttribute::XMLAttribute(const char * n, const char * v) {
 	next = NULL;
 	namespaceID = 0;
 	if (n != NULL) {
-		int i = strlen(n);
+		size_t i = strlen(n);
 		name = new char[i+1];
 		strcpy(name, n);
 		if (v != NULL) {
@@ -312,7 +312,7 @@ void XMLAttribute::setName(char * n) {
 			delete [] name;
 			name = NULL;
 		}
-		int i = strlen(n);
+		size_t i = strlen(n);
 		name = new char [i+1];
 		strcpy(name, n);
 	}
@@ -324,7 +324,7 @@ void XMLAttribute::setValue(char * v) {
 			delete [] value;
 			value = NULL;
 		}
-		int i = strlen(v);
+		size_t i = strlen(v);
 		value = new char [i+1];
 		strcpy(value, v);
 	}
@@ -485,7 +485,7 @@ XMLElement::XMLElement(const char * n, const char * v) {
 	Initialize();
 	
 	if (n != NULL) {
-		int i = strlen(n) + 1;
+		size_t i = strlen(n) + 1;
 		name = new char[i];
 		strcpy(name, n);
 		if (v != NULL) {
@@ -1000,16 +1000,16 @@ void XMLElement::addwxRectAttribute(const wxRect & v) {
 void XMLElement::getwxRectAttribute(wxRect & v) const {
 	long temp;
 	if (getAttributeValue(WXRECT_X_XML, temp)) {
-		v.x = temp;
+		v.x = (int) temp;
 	}
 	if (getAttributeValue(WXRECT_Y_XML, temp)) {
-		v.y = temp;
+		v.y = (int) temp;
 	}
 	if (getAttributeValue(WXRECT_WIDTH_XML, temp)) {
-		if (temp > 0) v.width = temp;
+		if (temp > 0) v.width = (int) temp;
 	}
 	if (getAttributeValue(WXRECT_HEIGHT_XML, temp)) {
-		if (temp > 0) v.height = temp;
+		if (temp > 0) v.height = (int) temp;
 	}
 }
 void XMLElement::addAttribute(const char * n, const char * v) {
@@ -1214,7 +1214,7 @@ std::ostream & operator << (std::ostream & target, const XMLElement & toWrite) {
 		target << ">";
 		if (toWrite.getValue() != NULL) {
 			const char * value = toWrite.getValue();
-			int len = strlen(value);
+			size_t len = strlen(value);
 			for (int i=0; i<len; i++) {
 				switch (value[i]) {
 					case '&':

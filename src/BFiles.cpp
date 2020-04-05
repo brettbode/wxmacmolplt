@@ -267,7 +267,7 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 	ByteCount = BufferSize;
 		//Check file extention first
 	if (fileName != NULL) {
-		int len = strlen(fileName);
+		size_t len = strlen(fileName);
 		if (len > 4) {
 			const char * temp = &(fileName[len-4]);
 			if (-1<FindKeyWord(temp, ".XYZ", 4)) Type = kXYZType;
@@ -378,7 +378,7 @@ bool BufferFile::LocateFinalEnergy(wxFileOffset Limit) {
 	while (LocateKeyWord("FINAL", 5, Limit)) {
 		wxFileOffset FINALPos = GetFilePos();
 		GetLine(LineText);
-		int myLinePos = FindKeyWord(LineText, "ENERGY", 6);
+		long myLinePos = FindKeyWord(LineText, "ENERGY", 6);
 		if (myLinePos > -1) {	//Found energy on the same line
 			SetFilePos(FINALPos);
 			result = true;

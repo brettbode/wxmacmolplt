@@ -1572,7 +1572,7 @@ void Frame::ParseGAMESSCIVectors(BufferFile * Buffer, long NumFuncs, Progress * 
 				//Determine the style of the orbital output
 			Buffer->SkipnLines(1);
 			Buffer->GetLine(Line);
-			int t = strlen(Line);
+			size_t t = strlen(Line);
 			if (t > 5) Style=true;
 			Buffer->SetFilePos(begPos);
 
@@ -2312,14 +2312,14 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					if ((imode == NumVibs)&&(lVibs->Symmetry.empty())) {
 						lVibs->Symmetry.reserve(NumModes);
 					}
-					long LineLength = strlen(LineText);
+					long LineLength2 = strlen(LineText);
 					for (unsigned long icol=0; icol<NumVibs; icol++) {
-						if (LinePos<LineLength) {
+						if (LinePos<LineLength2) {
 							token[0]='\0';
 							int iscan = sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
 							LinePos += nchar;
-							long test = strlen(token);
-							if ((iscan>0)&&(nchar>0)&&(test>0)) {
+							long tokenLen = strlen(token);
+							if ((iscan>0)&&(nchar>0)&&(tokenLen>0)) {
 								lVibs->Symmetry.push_back(std::string(token));
 							} else NumVibs = icol;
 						} else NumVibs = icol;

@@ -1373,15 +1373,15 @@ bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result,
 				for (int atm=0; atm<cFrame->GetNumAtoms(); atm++) {
 					CPoint3D test;
 					Rotate3DPt(permuteMatrix, RotCoords[atm], &test);
-					CPoint3D result;
-					symOps.ApplyOperator(test, result, iOp);
+					CPoint3D OpResult;
+					symOps.ApplyOperator(test, OpResult, iOp);
 					bool match = false;
 					for (int testatom=0; testatom<cFrame->GetNumAtoms(); testatom++) {
 						if (cFrame->Atoms[atm].GetType() != cFrame->Atoms[testatom].GetType())
 							continue;
 						CPoint3D testpt;
 						Rotate3DPt(permuteMatrix, RotCoords[testatom], &testpt);
-						CPoint3D offset = result - testpt;
+						CPoint3D offset = OpResult - testpt;
 							//test the difference in position. They should be quite close!
 						if (offset.Magnitude() < precision) {
 							match = true;

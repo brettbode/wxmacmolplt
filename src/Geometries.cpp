@@ -52,19 +52,19 @@ Matrix2D::Matrix2D(const int nrows, const int ncols, const float *data) {
 
 // --------------------------------------------------------------------------- 
 
-void Matrix2D::Init(const int nrows, const int ncols, const float *data) {
+void Matrix2D::Init(const int inrows, const int incols, const float *indata) {
 
-	this->nrows = nrows;
-	this->ncols = ncols;
-
-	if (this->data) {
-		delete this->data;
-	}
-
-	this->data = new float[nrows * ncols];
+	nrows = inrows;
+	ncols = incols;
 
 	if (data) {
-		memcpy(this->data, data, sizeof(float) * nrows * ncols);
+		delete data;
+	}
+
+	data = new float[nrows * ncols];
+
+	if (indata) {
+		memcpy(data, indata, sizeof(float) * nrows * ncols);
 	}
 }
 
