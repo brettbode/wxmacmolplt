@@ -583,9 +583,8 @@ bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset 
  * returns the int of the string/int pair or -1 if none are found. The buffer is left
  * at the start of the found keyword or the starting position if none are found.
  */
-int BufferFile::LocateKeyWord(const std::vector<std::pair<std::string, int> > & keywords, int NumKeywords, wxFileOffset Limit) {
+int BufferFile::LocateKeyWord(const std::vector<std::pair<std::string, int> > & keywords, wxFileOffset Limit) {
 	int result=-1;
-	if (NumKeywords < 0) NumKeywords = keywords.size();
 	wxFileOffset OldPosition = GetFilePos();
 	char	LineText[kMaxLineLength + 1];
 	bool	KeyWordFound=false;

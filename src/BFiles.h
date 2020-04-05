@@ -193,7 +193,7 @@ class BufferFile {
 		 * @param Limit (optional) The file position limit (in bytes) to limit the search. -1 will
 		 *							search to the end of the file.
 		 */
-		int LocateKeyWord(const std::vector< std::pair <std::string, int> > & keywords, int NumKeywords=-1, wxFileOffset Limit = -1);
+		int LocateKeyWord(const std::vector< std::pair <std::string, int> > & keywords, wxFileOffset Limit = -1);
 		/** Obtain the position of the next blank line.
 		 * The return value is the position. The file position is unchanged upon exit.
 		 */
