@@ -225,7 +225,7 @@ void WinPrefs::GetAtomLabel(long AtomNum, wxString& text) const {
 
 void WinPrefs::SetAtomLabel(long AtomNum, const wxString& text) 
 {
-  int TextLength = text.Length();
+  size_t TextLength = text.Length();
   int pos=0;
 
   if (TextLength > 3) TextLength = 3;		//truncate labels longer than 3 char
@@ -639,7 +639,7 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 			case MMPPref_MolDisplayPrefs:
 			{
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AnimateTime), longVal))
-					SetAnimateTime(longVal);
+					SetAnimateTime((int) longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowToolbar), boolVal)) {
 					show_toolbar = boolVal;
 				}
@@ -649,11 +649,11 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotating), boolVal))
 					AutoRotating = boolVal;
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotationX), longVal))
-					autoSpeedX = longVal;
+					autoSpeedX = (int) longVal;
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotationY), longVal))
-					autoSpeedY = longVal;
+					autoSpeedY = (int) longVal;
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotationZ), longVal))
-					autoSpeedZ = longVal;
+					autoSpeedZ = (int) longVal;
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DAtomQuality), longVal))
 					SetQD3DAtomQuality(longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_BondWidth), floatVal))
@@ -686,7 +686,7 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_RotateMode), boolVal))
 					SetRotateMode(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShaderMode), longVal))
-					SetShaderMode(longVal);
+					SetShaderMode((int) longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AnimateMode), boolVal))
 					SetAnimateMode(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowAngles), boolVal))
@@ -753,7 +753,7 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 							break;
 						case MMPMolDisplay_BondColor:
 							if (molchild->getAttributeValue(MMPPref_convert(MMPMolDisplay_BondOrder), longVal)) {
-								int bondOrder = longVal - 1;
+								int bondOrder = int (longVal - 1);
 								if ((bondOrder>=0)&&(bondOrder<kMaxBondTypes)) {
 									if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
 										BondColors[bondOrder].red = (unsigned short)(floatVal*65535.0);

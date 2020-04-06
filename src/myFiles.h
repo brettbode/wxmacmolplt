@@ -17,6 +17,6 @@ BufferFile * OpenDatFile(void);
 long LocateKeyWord(const char *Buffer, const char * KeyWord, long length, long bytecount);
 long ParseGLogLine(BufferFile * Buffer, Frame * lFrame, long numExpected, long Type, float *maxsize);
 long ParseCartLine(char *Line, long *atomtype, CPoint3D *coord, CPoint3D *offset, long Mode);
-long SetAtomType(const unsigned char *TestLabel);
+int SetAtomType(const unsigned char *TestLabel);
 
 #endif

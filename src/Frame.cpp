@@ -129,7 +129,7 @@ Frame * Frame::GetNextFrame(void) { return NextFrame; }
 
 Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
 
-mpAtom *Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition,
+mpAtom *Frame::AddAtom(int AtomType, const CPoint3D & AtomPosition,
 					   long index) {
 
 	/* AtomType is the atom's atomic number, starting with hydrogen at 1. It is used to index the

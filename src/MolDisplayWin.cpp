@@ -2593,7 +2593,7 @@ void MolDisplayWin::menuViewToggleEFPAtomsVis(wxCommandEvent &/*event*/) {
 }
 
 void MolDisplayWin::menuViewAnimateFrames(wxCommandEvent &/*event*/) {
-	long AnimateTime = 10*Prefs->GetAnimateTime();
+	int AnimateTime = 10*Prefs->GetAnimateTime();
 	if (AnimateTime < 1) AnimateTime = 1;
 	if (m_timer.IsRunning()) {
 		m_timer.Stop();
@@ -3876,7 +3876,7 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	int dx, dy;
 	Matrix4D rotationMatrix, tempcopyMatrix;
 	wxRect sphereRect;
-	long hsize, vsize, width, hoffset, sphereRadius;
+	int hsize, vsize, width, hoffset, sphereRadius;
 	Surface *lSurface;
 	bool UpdateSurface = false;
 
@@ -3898,9 +3898,9 @@ void MolDisplayWin::Rotate(wxMouseEvent &event) {
 	sphereCenter.x = hsize/2;
 	sphereCenter.y = vsize/2;
 	if (sphereCenter.x >= sphereCenter.y)
-		sphereRadius   = (long)((float) (sphereCenter.x)*0.9);
+		sphereRadius   = ((float) (sphereCenter.x)*0.9);
 	else
-		sphereRadius   = (long)((float) (sphereCenter.y)*0.9);
+		sphereRadius   = ((float) (sphereCenter.y)*0.9);
 	hoffset = sphereCenter.x;
 	hsize = MAX(hsize, vsize);
 	sphereRect.SetHeight(sphereRadius);

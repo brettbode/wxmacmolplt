@@ -182,7 +182,8 @@ class WinPrefs {
 	private:
 		RGBColor		AtomColors[kMaxAtomTypes], BondColors[kMaxBondTypes], VectorColor, BackColor,
 						GradientColor;	///< Color to be used for gradient vectors
-		long			AtomSizes[kMaxAtomTypes], AnimateTime, DRCnFileSkip,
+		int				AnimateTime;	///< Delay between images in a normal mode animation
+		long			AtomSizes[kMaxAtomTypes], DRCnFileSkip,
 						QD3DAtomQuality, BitOptions;
 				//bit 1: prompt4save, bit 2: show angles, bit 3: use QD3D hardware
 				//bit 4: Stereo, bit 5: color bond halves, bit6: Wireframe mode
@@ -378,9 +379,9 @@ class WinPrefs {
 		inline float GetGLFOV(void) const {return GLFOV;};
 		inline float SetGLFOV(float NewValue) {return GLFOV=((NewValue>0)&&(NewValue<90)?NewValue:30);};
 		/// Obtain the inter frame time delay for frame animations
-		inline long GetAnimateTime(void) const {return AnimateTime;};
+		inline int GetAnimateTime(void) const {return AnimateTime;};
 		/// Set the interframe delay for frame animations (values should be between 0 and 120).
-		inline long SetAnimateTime(long NewValue) {
+		inline int SetAnimateTime(int NewValue) {
 			if ((NewValue>=0)&&(NewValue<120)) AnimateTime=NewValue;
 			return AnimateTime;};
 		/// Obtain the normal mode animation quality value

@@ -1001,7 +1001,7 @@ void ScalingPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 			wxSize(155,wxDefaultCoord));
 
 	mSld[2] = new wxSlider(this, ID_FRAME_DELAY_SLIDER, 
-			(int)(mTargetPrefs->GetAnimateTime()), 
+		mTargetPrefs->GetAnimateTime(), 
 			0, 120, wxDefaultPosition, 
 			wxSize(155,wxDefaultCoord));
 

@@ -117,7 +117,7 @@ class Frame {
 		bool SetAtomType(long theAtom, short atmType);
 		bool GetAtomPosition(long theAtom, CPoint3D & p) const;
 		bool SetAtomPosition(long theAtom, const CPoint3D & p);
-		mpAtom * AddAtom(long AtomType, const CPoint3D & AtomPosition, long index=-1);
+		mpAtom * AddAtom(int AtomType, const CPoint3D & AtomPosition, long index=-1);
 		mpAtom *AddAtom(const mpAtom& atm, long index=-1, const CPoint3D *pos = NULL);
 		bool IncreaseAtomAllocation(long NumAdditional);
 		//BondExists returns the id of the bond, -1 otherwise

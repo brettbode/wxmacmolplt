@@ -495,7 +495,7 @@ void MolDisplayWin::WriteQTMovie(wxString & filepath) {
 void MolDisplayWin::CreateFrameMovie(GWorldPtr lgWorld, Handle CompressedData,
 									 const qtData & myqtData, bool IncludeEPlot) {
 	OSErr	myErr;
-	long AnimateTime = Prefs->GetAnimateTime();
+	int AnimateTime = Prefs->GetAnimateTime();
 	if (AnimateTime <= 0) AnimateTime = 1;
 	long SavedFrameNum = MainData->GetCurrentFrame();
 	Rect	lDisplayRect = myqtData.DisplayRect;

@@ -110,7 +110,7 @@ class MpApp : public wxApp {
 		/**
 		 * Returns the open window count
 		 */
-		int WindowCount(void) const {return MolWinList.size();};
+		int WindowCount(void) const {return ((int) MolWinList.size());};
 
 
         void menuFileQuit(wxCommandEvent &event);

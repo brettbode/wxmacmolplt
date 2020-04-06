@@ -121,7 +121,7 @@ BufferFile * OpenDatFile(void) {
 
 void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg) {
 	wxImageArray images;
-	long AnimateTime = 10*Prefs->GetAnimateTime();
+	int AnimateTime = 10*Prefs->GetAnimateTime();
 	bool killEPlotWin=false, includeEP = false;
 	int savedEPlotWidth, savedEPlotHeight;
 	wxBitmap  *bmp=NULL, *ePlotbmp=NULL;
@@ -205,7 +205,6 @@ void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg
 			}
 		} else { //normal mode movie
 			bool savedrawmode=false;
-			long AnimateTime = 10*Prefs->GetAnimateTime();
 			if(!MainData->cFrame->Vibs) {
 				wxLogMessage(_("Error! No normal modes found when trying to create a normal mode animation. Aborted!"));
 				throw UserCancel();

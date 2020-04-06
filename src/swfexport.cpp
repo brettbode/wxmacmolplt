@@ -91,7 +91,7 @@ void MolDisplayWin::CreateFrameMovie(wxString &filePath,
 	SWFDisplayItem *di2 = NULL;
 	long width;
 	long height;
-	long AnimateTime = 10*Prefs->GetAnimateTime();
+	int AnimateTime = 10*Prefs->GetAnimateTime();
 	bool killEPlotWin = false;
 	int savedEPlotWidth, savedEPlotHeight;
 	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
@@ -255,7 +255,7 @@ void MolDisplayWin::CreateModeMovie(wxString &filePath) {
 	SWFDisplayItem *textDI = NULL;
 	long width;
 	long height;
-	long AnimateTime = 10*Prefs->GetAnimateTime();
+	int AnimateTime = 10*Prefs->GetAnimateTime();
 	wxStandardPathsBase & gStdPaths = wxStandardPaths::Get();
 #if wxCHECK_VERSION(2, 8, 0)
 	wxString fontPath = gStdPaths.GetResourcesDir();

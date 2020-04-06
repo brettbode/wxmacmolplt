@@ -1895,7 +1895,7 @@ void InputBuilderWindow::SetupControlItems() {
     bool dft = TmpInputRec->Control->UseDFT();
     short ci = TmpInputRec->Control->GetCIType();
     CCRunType cc = TmpInputRec->Control->GetCCType();
-    long scft = TmpInputRec->Control->GetSCFType();
+    int scft = TmpInputRec->Control->GetSCFType();
     long NumElectrons = parent->GetData()->GetNumElectrons();
     
     int itemValue = 0;
@@ -2106,9 +2106,9 @@ void InputBuilderWindow::SetupGVBItems() {
 		mGVB_NOEdit->Show(true);
 		mGVB_NOStatic->Show(true);
 		std::vector<long> t = TmpInputRec->SCF->GetGVBOpenShellDeg();
-		int num = t.size();
+		std::vector<long>::size_type num = t.size();
 		if (TmpInputRec->SCF->GetGVBNumOpenShells() > num) {	//This shouldn't happen?
-			for (int i=num; i<TmpInputRec->SCF->GetGVBNumOpenShells(); i++)
+			for (long i=num; i<TmpInputRec->SCF->GetGVBNumOpenShells(); i++)
 				t.push_back(0);
 		} else if (TmpInputRec->SCF->GetGVBNumOpenShells() > num)
 			num =TmpInputRec->SCF->GetGVBNumOpenShells();

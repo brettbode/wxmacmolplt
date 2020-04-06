@@ -5954,9 +5954,9 @@ long ParseCartLine(char *Line, long *atomtype, CPoint3D *coord, CPoint3D *offset
 	}
 	return iscanerr;
 } /*ParseCartLine*/
-long SetAtomType(const unsigned char *TestLabel) {
+int SetAtomType(const unsigned char *TestLabel) {
 	char	label[2];
-	long result = -1;
+	int result = -1;
 
 	label[0] = TestLabel[0];	label[1]=TestLabel[1];
 	if ((label[0]>96)&&(label[0]<123)) label[0] = label[0] - 32;	/* Make the first character upper case */
@@ -6406,7 +6406,7 @@ long SetAtomType(const unsigned char *TestLabel) {
 					result = 119;
 					break;
 				default:	/*This should only be used for *# cases*/
-					sscanf((char *)&(label[1]), "%ld", &result);
+					sscanf((char *)&(label[1]), "%d", &result);
 			}
 			break;
 	}

@@ -1779,7 +1779,7 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::map<std::string, long> & 
 			long xpos=0, ypos=0, zpos=0, etpos=0, idpos=0;
 
 			bool done=false;
-			long atomType=0;
+			int atomType=0;
 			CPoint3D atomPos;
 			while (!done) {
 				int n1 = sscanf(&(xcoord[xpos]), "%s%n", xcstr, &nchar);
@@ -1871,7 +1871,7 @@ void Frame::ParseAtomAttributeArrayXML(XMLElement * arrayXML, const std::map<std
 }
 
 bool Frame::ParseAtomXML(XMLElement * atomXML, std::map<std::string, long> & idList) {
-	long atomType=0;
+	int atomType=0;
 	CPoint3D atomPos;
 	bool	good=false;
 	
