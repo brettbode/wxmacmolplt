@@ -5398,7 +5398,7 @@ void MolDisplayWin::WriteVRMLFile(BufferFile * Buffer) {
 
 	long NumAtoms = lFrame->NumAtoms;
 	float AtomScale = Prefs->GetAtomScale();
-	long curAtomType;
+	int curAtomType;
 	RGBColor * AtomColor;
 	wxString tmpStr;
 	float red, green, blue;

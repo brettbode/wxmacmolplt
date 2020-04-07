@@ -253,7 +253,7 @@ class mpAtom {
 		// of selected atoms is properly accounted for.
 		bool SetSelectState(bool State) {flags = (flags & 0xFD) + (State?2:0); return GetSelectState();};
 
-		inline long GetType(void) const {return Type;};
+		inline short GetType(void) const {return Type;};
 		inline bool SetType(short atmType) {if ((atmType>0)&&(atmType<107)) {Type = atmType; return true;} return false;};
 		inline bool IsEffectiveFragment(void) const {return ((flags & (1<<2))?true:false);};
 		inline void IsEffectiveFragment(bool state) {flags = (flags & 0xFB) + (state ? (1<<2) : 0);};

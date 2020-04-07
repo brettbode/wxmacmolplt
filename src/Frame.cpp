@@ -658,7 +658,7 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, Progress * ProgressInd,
 	float MaxBondLength = Prefs->GetMaxBondLength();
 	MaxBondLength *= MaxBondLength;
 	BondOrder lOrder;
-	long iType, jType;
+	int iType, jType;
 	float workTotal = 100.0f/NumAtoms;
 	if (AutoBond && Prefs->AllowHydrogenBonds()) workTotal /= 3.0f;
 	for (iatm=0; iatm<NumAtoms; iatm++) {

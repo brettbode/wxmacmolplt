@@ -156,8 +156,8 @@ void PreviewCanvas::Render() {
 	sphere_list = glGenLists(1);
 	glNewList(sphere_list, GL_COMPILE);
 	gluQuadricTexture(quadric, GL_TRUE);
-	gluSphere(quadric, 1.0f, (long) (1.5f * gPreferences->GetQD3DAtomQuality()),
-			  (long) (gPreferences->GetQD3DAtomQuality()));
+	gluSphere(quadric, 1.0f, (int) (1.5f * gPreferences->GetQD3DAtomQuality()),
+			  (int) (gPreferences->GetQD3DAtomQuality()));
 	glEndList();
 
 	RGBColor *BackgroundColor = gPreferences->GetBackgroundColorLoc();

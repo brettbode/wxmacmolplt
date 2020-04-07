@@ -328,7 +328,7 @@ class MoleculeData {
 		void PruneUnusedFragments();
 		void GetRotationMatrix(Matrix4D copy);
 		const Matrix4D& GetRotationMatrix() const;
-		int GetAnnotationCount(void) const {return Annotations.size();};
+		int GetAnnotationCount(void) const {return (int) Annotations.size();};
 		void DeleteAllAnnotations(void);
 		void ConstrainToAnnotation(int anno_id) {
 			constrain_anno_id = anno_id;

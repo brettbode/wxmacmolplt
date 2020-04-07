@@ -2015,7 +2015,7 @@ void MoleculeData::ExportPOV(BufferFile *Buffer, WinPrefs *Prefs) {
 
 	long NumAtoms = lFrame->NumAtoms;
 	float AtomScale = Prefs->GetAtomScale();
-	long curAtomType;
+	int curAtomType;
 	RGBColor * AtomColor;
 	float red, green, blue;
 	char tmpStr[500];
@@ -2187,8 +2187,8 @@ void MoleculeData::ExportPOV(BufferFile *Buffer, WinPrefs *Prefs) {
 
 			sprintf(tmpStr,
 					"object {\n"
-					"   Atom_%03ld\n"
-					"   Center_Trans(Atom_%03ld, x + y)\n"
+					"   Atom_%03d\n"
+					"   Center_Trans(Atom_%03d, x + y)\n"
 					"   scale <0.25, 0.25, 1.0>\n"
 					"   translate <%f, %f, %f>\n"
 					"   no_shadow\n"

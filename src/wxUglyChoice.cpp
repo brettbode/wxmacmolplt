@@ -186,7 +186,7 @@ bool wxUglyChoice::IsEmpty() const {
 }
 
 int wxUglyChoice::GetCount() const {
-    return item.size();
+    return (int) item.size();
 }
 
 void wxUglyChoice::SetToolTip(const wxString& tip) {

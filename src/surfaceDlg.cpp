@@ -699,7 +699,7 @@ void OrbSurfacePane::makeAOList() {
 						char label[63];
 						wxString tmpStr;
 						aChoice.Printf(wxT("<table width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr>")); 
-						int nchar = 0;
+//						int nchar = 0;
 						//punch out the atom # and symbol if this is the 1st function for this atom
 
 						if ((ishell==minshell)&&(theCell==ifunc)) {
@@ -725,7 +725,7 @@ void OrbSurfacePane::makeAOList() {
 
 						jfunc = theCell-ifunc;
 						BasisPtr->Shells[ishell].GetLabel(label, jfunc, SphericalHarmonics);
-						nchar = strlen(label);
+//						nchar = strlen(label);
 
 						tmpStr.Printf(_T("<td width=\"%d%%\">"), percents[2]);
 						aChoice.Append(tmpStr);

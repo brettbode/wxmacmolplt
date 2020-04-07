@@ -138,8 +138,8 @@ void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
 	glPushMatrix();
 	glLoadIdentity();
 	wxRect DisplayRect = glCanvas->GetRect();
-	long hsize = DisplayRect.GetWidth();
-	long vsize = DisplayRect.GetHeight();
+	int hsize = DisplayRect.GetWidth();
+	int vsize = DisplayRect.GetHeight();
 	glScalef(2.0f / hsize, -2.0f /  vsize, 1.0);
 	glTranslatef(-hsize / 2.0f, -vsize / 2.0f, 0.0);
 
@@ -158,14 +158,14 @@ void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
 	//Draw the trackball outline
 	if (ShowTrackball) {
 		wxPoint sphereCenter;
-		long sphereRadius; 
+		int sphereRadius;
 		sphereCenter.x = hsize / 2; 
 		sphereCenter.y = vsize / 2;
 		if (sphereCenter.x >= sphereCenter.y)
-			sphereRadius   = (long) (((float) sphereCenter.x) * 0.9);
+			sphereRadius   = (int) (((float) sphereCenter.x) * 0.9);
 		else
-			sphereRadius   = (long) (((float) sphereCenter.y) * 0.9);
-		long NumDivisions = (long) (20.0 * (1.0 + sphereRadius / 200.0));
+			sphereRadius   = (int) (((float) sphereCenter.y) * 0.9);
+		int NumDivisions = (int) (20.0 * (1.0 + sphereRadius / 200.0));
 		float divarc = (2 * kPi) / NumDivisions;
 
 		glLineWidth(1);
@@ -832,7 +832,7 @@ void MolDisplayWin::DrawLabel() {
 	glfStringCentering(true);
 
 	wxString atomLabel;
-	long CurrentAtomType;
+	int CurrentAtomType;
 	CPoint3D origPt, transPt;
 	if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) {
 		glLoadName(MMP_ATOM);
@@ -974,7 +974,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 			if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
 			if (Prefs->ShowEFPWireFrame()&&lAtoms[iatom].IsEffectiveFragment()) continue;
-			long curAtomType = lAtoms[iatom].GetType() - 1;
+			int curAtomType = lAtoms[iatom].GetType() - 1;
 
 			float radius = AtomScale * Prefs->GetAtomSize(curAtomType);
 			if (radius < 0.01) continue;	//skip really small spheres
@@ -995,7 +995,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glColor3fv(fg_color);
 				glEnable(GL_POLYGON_STIPPLE);
 				glPolygonStipple(stippleMask);
-				gluSphere(core_obj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
+				gluSphere(core_obj, radius*1.01, (GLint)(1.5*Quality), (GLint)(Quality));
 				glDisable(GL_POLYGON_STIPPLE);
 				glPopMatrix(); // molecule origin
 				continue;
@@ -1154,15 +1154,15 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glPushMatrix();
 				glMultMatrixf((const GLfloat *) &rotMat);
 
-				gluCylinder(core_obj, VectorWidth, VectorWidth, ShaftLength, (long)(Quality), (long)(0.5*Quality));
+				gluCylinder(core_obj, VectorWidth, VectorWidth, ShaftLength, (GLint)(Quality), (GLint)(0.5*Quality));
 				glPopMatrix();
 				rotMat[3][0] = VStart.x + NModeVector.x * ShaftLength;
 				rotMat[3][1] = VStart.y + NModeVector.y * ShaftLength;
 				rotMat[3][2] = VStart.z + NModeVector.z * ShaftLength;
 				glPushMatrix();
 				glMultMatrixf((const GLfloat *) &rotMat);
-				gluDisk(core_obj, 0.0, 2*VectorWidth, (long)(Quality), 2);
-				gluCylinder(core_obj, 2*VectorWidth, 0.0, HeadRadius, (long)(Quality), 3);
+				gluDisk(core_obj, 0.0, 2*VectorWidth, (GLint)(Quality), 2);
+				gluCylinder(core_obj, 2*VectorWidth, 0.0, HeadRadius, (GLint)(Quality), 3);
 				glPopMatrix();
 			}
 		}
@@ -1219,15 +1219,15 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glPushMatrix();
 				glMultMatrixf((const GLfloat *) &rotMat);
 				
-				gluCylinder(core_obj, VectorWidth, VectorWidth, ShaftLength, (long)(Quality), (long)(0.5*Quality));
+				gluCylinder(core_obj, VectorWidth, VectorWidth, ShaftLength, (GLint)(Quality), (GLint)(0.5*Quality));
 				glPopMatrix();
 				rotMat[3][0] = VStart.x + NModeVector.x * ShaftLength;
 				rotMat[3][1] = VStart.y + NModeVector.y * ShaftLength;
 				rotMat[3][2] = VStart.z + NModeVector.z * ShaftLength;
 				glPushMatrix();
 				glMultMatrixf((const GLfloat *) &rotMat);
-				gluDisk(core_obj, 0.0, 2*VectorWidth, (long)(Quality), 2);
-				gluCylinder(core_obj, 2*VectorWidth, 0.0, HeadRadius, (long)(Quality), 3);
+				gluDisk(core_obj, 0.0, 2*VectorWidth, (GLint)(Quality), 2);
+				gluCylinder(core_obj, 2*VectorWidth, 0.0, HeadRadius, (GLint)(Quality), 3);
 				glPopMatrix();
 			}
 		}
@@ -4056,8 +4056,8 @@ void DrawPipeSpheres(const WinPrefs& Prefs, float length, float scale_factor,
 void DrawPipeCylinder(float length, GLUquadric *quadric, unsigned int ncaps,
 					  GLuint sphere_list, float radius, long quality) {
 
-	gluCylinder(quadric, radius, radius, length, quality,
-				(long) (0.5f * quality));
+	gluCylinder(quadric, radius, radius, length, (GLint) quality,
+				(GLint) (0.5f * quality));
 
 	// Draw sphere at end0 if requested.
 	if (ncaps & 1) {

@@ -632,7 +632,7 @@ void IssueVertexOcta(float *verts,
 		verts[vidx_map.size() * 3 + 0] = v.x;
 		verts[vidx_map.size() * 3 + 1] = v.y;
 		verts[vidx_map.size() * 3 + 2] = v.z;
-		vidx_map.insert(std::pair<std::string, int>(outs.str(), vidx_map.size()));
+		vidx_map.insert(std::pair<std::string, int>(outs.str(), (int) vidx_map.size()));
 	}
 
 }
