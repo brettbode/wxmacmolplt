@@ -2187,7 +2187,7 @@ void InputBuilderWindow::SetupFMOItems() {
 void InputBuilderWindow::SetupMOGuessItems() {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 
-	long GuessType = TmpInputRec->Guess->GetGuess();
+	short GuessType = TmpInputRec->Guess->GetGuess();
 	MoleculeData * MainData = parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();

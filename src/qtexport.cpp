@@ -258,7 +258,7 @@ int QTExport::GetKeyFrameRate(void) const {
 	long result = 0;
 	wxString val = mKeyFrameEdit->GetValue();
 	val.ToLong(&result);
-	return result;
+	return (int) result;
 }
 
 #ifdef __MAC_USE_QUICKTIME__

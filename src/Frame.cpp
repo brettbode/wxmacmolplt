@@ -1483,7 +1483,7 @@ void Frame::ReadMolDenOrbitals(BufferFile * Buffer, long NumFuncs) {
 					done = true;
 					break;
 				}
-				int p;
+				long p;
 				if ((p=FindKeyWord(Line, "ENE=", 4))>=0) {
 					ConvertExponentStyle(Line);
 					sscanf(&(Line[p+4]),"%f", &energy);
@@ -1683,7 +1683,7 @@ void Frame::ParseGAMESSEOM_CC_Vectors(BufferFile * Buffer, long NumFuncs, Progre
 			//Determine the style of the orbital output
 			Buffer->SkipnLines(1);
 			Buffer->GetLine(Line);
-			int t = strlen(Line);
+			size_t t = strlen(Line);
 			if (t > 5) Style=true;
 			Buffer->SetFilePos(begPos);
 			
