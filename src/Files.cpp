@@ -453,7 +453,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 							msg.Printf(_("Warning: Parsing issue with the line: %s"), Line);
 							wxLogMessage(msg);
 						}
-						lFrame->AddAtom((long) AtomType, pos);
+						lFrame->AddAtom(AtomType, pos);
 						StartPos = Buffer->FindBlankLine();
 						if ((StartPos <= EndPos)&&(StartPos>-1)) {	//basis set is inlined in $DATA
 							Buffer->SetFilePos(StartPos);	//just skip over it
@@ -525,7 +525,7 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 					wxLogMessage(msg);
 				}
 				pos *= unitConversion;
-				lFrame->AddAtom((long) AtomType, pos);
+				lFrame->AddAtom(AtomType, pos);
 			}
 			if (Prefs->GetAutoBond()) {	//setup bonds, if needed
 				lFrame->SetBonds(Prefs, false, ProgressInd);
@@ -561,8 +561,8 @@ long MolDisplayWin::OpenGAMESSInput(BufferFile * Buffer) {
 			mpAtom *atm;
 			CPoint3D dst_locs[3];
 			CPoint3D pos;
-			int fstart;
-			int match[3] = {0, 0, 0};
+			long fstart;
+			long match[3] = {0, 0, 0};
 			CPoint3D src_locs[3];
 			std::string labels[3];
 			long fragNum;
@@ -824,7 +824,7 @@ long MolDisplayWin::OpenMDLMolFile(BufferFile * Buffer) {
 		scanerr += sscanf(partC, "%10f", &tPt.z);
 		scanerr += sscanf(&(Line[31]), "%3s", token);
 		if (scanerr == 4) {
-				long AtomType;
+				int AtomType;
 			AtomType = SetAtomType((unsigned char *) token);
 			lFrame->AddAtom(AtomType, tPt);
 		} else break;
@@ -875,8 +875,9 @@ long MolDisplayWin::OpenPDBFile(BufferFile * Buffer) {
 			//allocate memory for the atoms
 		if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
 
-			CPoint3D Pos;
-			long AtomType, LinePos;
+		CPoint3D Pos;
+		long LinePos;
+		int AtomType;
 		nAtoms = 0;
 			//Scan for Atom or hetAtm lines
 			//Format is: a6,i5,2x,a4,a3,2x,i4,4x,3F8.3,2f6.2
@@ -977,7 +978,8 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 	// counters for line-by-line text input:
 	// # of tokens sucessfully read in a sscanf call, # bytes total in line, 
 	// current position in line, and the # of bytes read through one sscanf call
-	int scanCount, lineBytes, bytesRead, bytesConsumed;
+	int scanCount, bytesConsumed;
+	long lineBytes, bytesRead;
 	// flags to indicate $KEYWORD section completion and order-of-dependency
 	// following.  Also used to enforce data parsing in-order (doesn't guarantee
 	// that the file's data was in-order, only that it is parsed in-order)
@@ -1011,14 +1013,14 @@ long MolDisplayWin::OpenMKLFile(BufferFile * Buffer){
 				lFrame = MainData->AddFrame(nAtoms, 0);
 			for (long i=0; i<nAtoms; ++i) {
 				CPoint3D Pos;
-				long AtomType;
+				int AtomType;
 				if (Buffer->GetFilePos() >= endOfFramePos) {
 					nAtoms = i;
 					break;
 				}
 				Buffer->GetLine(Line);
 				//parse line for atom type and x,y,z positions
-				scanCount = sscanf(Line,"%ld %f %f %f",&AtomType,&Pos.x,&Pos.y,&Pos.z);
+				scanCount = sscanf(Line,"%d %f %f %f",&AtomType,&Pos.x,&Pos.y,&Pos.z);
 				if (scanCount == 0) {
 					nAtoms = i;
 					break;
@@ -1580,8 +1582,8 @@ long MolDisplayWin::OpenMOPACFile(BufferFile * Buffer, TextFileType fileType) {
 	char		symbol[4];	// This could probably safely be 2-3 chars long
 	float		bondLength = -0.1f, bondAngle = 0.0f, bondDihedral = 0.0f;
 	// sane defaults to avoid accessing unassigned variables
-	long		AtomType = -1, nAtoms = 0;
-	int			j1 = -1, j2 = -1, j3 = -1, con1, con2, con3;
+	long		nAtoms = 0;
+	int			j1 = -1, j2 = -1, j3 = -1, con1, con2, con3, AtomType = -1;
 	bool		error = false;
 
 	ProgressInd->ChangeText("Reading MOPAC file...");
@@ -1736,7 +1738,7 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 			if (RdPoint) {
 				VibRec * lVibs = NULL;
 				for (i=0; i<nAtoms; ++i) {
-						long AtomType, test;
+						int AtomType, test;
 						CPoint3D Pos, Vector;
 
 					Buffer->GetLine(Line);
@@ -1816,8 +1818,8 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 	long				j,ii, nkinds=0, catm, iscanerr=0, LineLength, LinePos=0, fileAtoms=0,
 						fileBonds=0;
-	int					nchar;
-	long				test=0, Mode=0;
+	int					test=0, nchar;
+	long				Mode=0;
 	float				BondLength=0.0f;
 	char				LineText[kMaxLineLength+1], KeyWord[kMaxLineLength+1], token[5];
 
@@ -1881,7 +1883,7 @@ long MolDisplayWin::OpenMolPltFile(BufferFile *Buffer) {
 
 // read in the coords and atomtypes
 	for (j=0; j<fileAtoms; ++j) {			// loop over the number of atoms
-			long AtomType;
+			int AtomType;
 			CPoint3D Pos, Vector;
 
 		if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
@@ -2057,7 +2059,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 						lFrame = MainData->AddFrame(atmCount, 0);
 						lFrame->time = t+1;
 					}
-					int epos = FindKeyWord(LineText, "done:", 5);
+					long epos = FindKeyWord(LineText, "done:", 5);
 					if (epos > 0) {
 						sscanf(&(LineText[epos+5]), "%lf", &(lFrame->Energy));
 					}
@@ -2067,7 +2069,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 						Buffer->GetLine(LineText);
 						int rdcount = sscanf(LineText, "%s %f %f %f", token, &(pos.x), &(pos.y), &(pos.z));
 						if (rdcount == 4) {
-							long atomnum = SetAtomType(token);
+							int atomnum = SetAtomType(token);
 							if (atomnum>0)
 								lFrame->AddAtom(atomnum, pos);
 						}
@@ -2156,10 +2158,10 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 		Buffer->GetLine(LineText);
 		while ((FindKeyWord(LineText, "[", 1) < 0)&&(Buffer->GetFilePos()<Buffer->GetFileSize())) {
 			char	token[kMaxLineLength];
-			long atomNum, junk;
+			int atomNum, junk;
 			CPoint3D pos;
 			//name # atomic_# x y z
-			int count = sscanf(LineText, "%s %ld %ld %f %f %f", token, &junk, &atomNum,
+			int count = sscanf(LineText, "%s %d %d %f %f %f", token, &junk, &atomNum,
 							   &(pos.x), &(pos.y), &(pos.z));
 			pos *= unitConv;
 			if ((count == 6)&&((atomNum>0)&&(atomNum<120))) {
@@ -2211,7 +2213,7 @@ long MolDisplayWin::OpenMoldenFile(BufferFile * Buffer) {
 			int rdcount = sscanf(LineText, "%s %f %f %f", token, &(pos.x), &(pos.y), &(pos.z));
 			pos *= kBohr2AngConversion;
 			if (rdcount == 4) {
-				long atomnum = SetAtomType(token);
+				int atomnum = SetAtomType(token);
 				if (atomnum>0)
 					lFrame->AddAtom(atomnum, pos);
 			}
@@ -2340,7 +2342,7 @@ long MoleculeData::ParseTinkerCoordinates(BufferFile *Buffer) {
 			wxLogMessage(_("Error encountered while parsing coordinates."));
 			throw DataError();
 		}
-		long atomtype = SetAtomType(Label);
+		int atomtype = SetAtomType(Label);
 		mpAtom * newAtom = lFrame->AddAtom(atomtype, position);
 		if (newAtom) newAtom->IsSIMOMMAtom(true);
 	}
@@ -2382,7 +2384,7 @@ long MolDisplayWin::ParseSIMMOMLogFile(BufferFile *Buffer, long EnergyPos) {
 			wxLogMessage(_("Error encountered while parsing coordinates."));
 			throw DataError();
 		}
-		long atomtype = SetAtomType(Label);
+		int atomtype = SetAtomType(Label);
 		mpAtom * newAtom = lFrame->AddAtom(atomtype, position);
 		if (newAtom) newAtom->IsSIMOMMAtom(true);
 	}
@@ -2902,12 +2904,12 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 										}
 									}
 									if (foundPos) {
-										int iorb = NumCoreOrbs;
-										for (int nShell=0; nShell<NumOpenOrbs; ++nShell) {
+										long iorb = NumCoreOrbs;
+										for (long nShell=0; nShell<NumOpenOrbs; ++nShell) {
 											Buffer->GetLine(LineText);
 											float occTemp;
 											sscanf(LineText, "%ld %f", &test, &occTemp);
-											for (int jj=0; jj<MainData->InputOptions->SCF->GetGVBOpenShellDeg(nShell); jj++) {
+											for (long jj=0; jj<MainData->InputOptions->SCF->GetGVBOpenShellDeg(nShell); jj++) {
 												Occupancy[iorb] = occTemp * 2;	//occupancies are listed as % of orbital filled
 												iorb++;
 											}
@@ -3024,7 +3026,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			Buffer->GetLine(LineText);
 			LinePos = FindKeyWord(LineText, "ENERGY", 6);
 			if (LinePos > -1) {
-				int k = sscanf(&(LineText[LinePos+10]), "%lf", &(lFrame->Energy));
+				long k = sscanf(&(LineText[LinePos+10]), "%lf", &(lFrame->Energy));
 				if (k == 0) {	//Crappy fragment output is different
 					k = FindKeyWord(&(LineText[LinePos]), "=", 1);
 					if (LinePos > -1)
@@ -3284,7 +3286,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 			if (LinePos > -1) {
 				EnergyPos = Buffer->GetFilePos();
 				KeyWordFound = true;
-				int k = sscanf(&(LineText[LinePos+10]), "%lf", &FrameEnergy);
+				long k = sscanf(&(LineText[LinePos+10]), "%lf", &FrameEnergy);
 				if (k == 0) {	//Crappy fragment output is different
 					k = FindKeyWord(&(LineText[LinePos]), "=", 1);
 					if (LinePos > -1)
@@ -3862,7 +3864,7 @@ long MoleculeData::ReadInitialFragmentCoords(BufferFile * Buffer) {
 					//may or may not be present, then try to avoid non-atom positions which most of
 					//the time have negative charge and often seem to start with 'B'.
 				if (eCharge>0.5 || nCharge > 0.5) {
-					long AtomType = -1;
+					int AtomType = -1;
 					if (std::toupper(Label[0]) == 'B') {
 						//a 'B' almost always not an atom
 						if (workingFragment) workingFragment=false;	//flag to indicate end of fragment
@@ -3917,7 +3919,7 @@ void MoleculeData::ReadFragmentCoordinates(BufferFile * Buffer, long NumFragment
 		if (-1<LocateKeyWord(Line, "FRAGNAME=",9, strlen(Line))) {++FragmentNumber; continue;}
 		int iscan = sscanf(Line, "%s%f%f%f", Label, &Pos.x, &Pos.y, &Pos.z);
 		if (iscan == 4) {
-			long AtomType = -1;
+			int AtomType = -1;
 			if ((Label[0] == 'Z') || (Label[0] == 'z')) {	//z represents an atom pos
 				Label[0] = Label[1];
 				if (std::isalpha(Label[2])) {
@@ -4249,7 +4251,7 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 				Buffer->BackupnLines(2);	//Need the first line for GlobOp files
 				Buffer->GetLine(LineText);
 				ReadDoubleKeyword(LineText, "ENERGY", totE);
-				int Pos = FindKeyWord(LineText, "POINT", 5);
+				long Pos = FindKeyWord(LineText, "POINT", 5);
 				if (Pos >= 0) {
 					sscanf(&(LineText[Pos+5]), "%f", &xvalue);
 				}
@@ -4338,8 +4340,8 @@ long MolDisplayWin::OpenGAMESSTRJ(BufferFile * Buffer, bool Append, long flip, f
 						mpAtom *atm;
 						CPoint3D dst_locs[3];
 						CPoint3D pos;
-						int fstart;
-						int match[3] = {0, 0, 0};
+						long fstart;
+						long match[3] = {0, 0, 0};
 						CPoint3D src_locs[3];
 						std::string labels[3];
 						long fragNum, fragmentsfound=0;
@@ -5885,19 +5887,19 @@ long ParseGLogLine(BufferFile * Buffer, Frame * lFrame, long numExpected, long T
 			*maxsize = MAX(*maxsize, Position.y);
 			*maxsize = MAX(*maxsize, Position.z);
 			if (temp == 0) temp = 115;
-			lFrame->AddAtom((long) temp, Position);
+			lFrame->AddAtom(temp, Position);
 		} else break;
 	}
 	return iatm;
 } /*ParseGLogLine*/
-long ParseCartLine(char *Line, long *atomtype, CPoint3D *coord, CPoint3D *offset, long Mode)
-{	long	iscanerr=0, junk;
+int ParseCartLine(char *Line, int *atomtype, CPoint3D *coord, CPoint3D *offset, long Mode)
+{	int	iscanerr=0, junk;
 	unsigned char Label[kMaxLineLength]="\0";
 
 	if (!sscanf(Line, "%s", Label)) return -1;
 	if ((Label[0] > 47)&&(Label[0] < 58)) {	/*A number? must be Gaussian style (bleah)*/
 			float arg6;
-		iscanerr = sscanf(Line, "%ld%ld%f%f%f%f",&junk, atomtype, &(coord->x),
+		iscanerr = sscanf(Line, "%d%d%f%f%f%f",&junk, atomtype, &(coord->x),
 			&(coord->y), &(coord->z), &arg6);
 			//G98 adds an integer column for the 'atomic type' which is normally 0???
 		if (iscanerr == 6) {
@@ -5935,7 +5937,7 @@ long ParseCartLine(char *Line, long *atomtype, CPoint3D *coord, CPoint3D *offset
 			}
 		} else {			
 			if (iscanerr == 5) {	/*looks like GAMESS unit=bohr format --  label  Atomic_num  x, y, z*/
-				*atomtype = (long) coord->x;
+				*atomtype = coord->x;
 				coord->x = coord->y;
 				coord->y = coord->z;
 				coord->z = tempx;

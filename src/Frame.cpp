@@ -143,12 +143,12 @@ mpAtom *Frame::AddAtom(int AtomType, const CPoint3D & AtomPosition,
 		if ((index<=-1)||(index>=NumAtoms)) {//Add to the end of the list
 			index = NumAtoms;
 		} else {	//insert the atom into the middle of the list
-			for (int i=NumAtoms; i>index; i--) {
+			for (long i=NumAtoms; i>index; i--) {
 				Atoms[i] = Atoms[i-1];
 			}
 
 			// Adjust bonds that connect higher-numbered atoms.
-			for (int i = 0; i < NumBonds; ++i) {
+			for (long i = 0; i < NumBonds; ++i) {
 				if (Bonds[i].Atom1 >= index) Bonds[i].Atom1++;
 				if (Bonds[i].Atom2 >= index) Bonds[i].Atom2++;
 			}

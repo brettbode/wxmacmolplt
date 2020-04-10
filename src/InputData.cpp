@@ -2875,7 +2875,7 @@ void SCFGroup::ReadXML(XMLElement * parent) {
 void SCFGroup::SetGVBNumOpenShells(const long &no) {
 	if (no >= 0) {
 		GVBNumOpenShells = no;
-		for (int i=GVBOpenShellDeg.size(); i<GVBNumOpenShells; i++) {
+		for (int i=(int) GVBOpenShellDeg.size(); i<GVBNumOpenShells; i++) {
 			GVBOpenShellDeg.push_back(0);	//The GAMESS default is 0, maybe 1 is a better default?
 		}
 	}

@@ -108,13 +108,13 @@ public:
 			   long atom3_id = -1, long atom4_id = -1);
 	virtual ~Annotation() {};
 	
-	virtual bool containsAtom(const int atom_id) const;
+	virtual bool containsAtom(const long atom_id) const;
 	virtual bool containsFragment(const mpAtom *atom_list) const;
-	virtual void adjustIds(const int atom_id, int offset = -1);
+	virtual void adjustIds(const long atom_id, int offset = -1);
 	virtual bool isEquivalent(const int /*natoms*/, const int */*new_list*/) const {
 		return false;
 	}
-	virtual int getAtom(const int index) const;
+	virtual long getAtom(const long index) const;
 	virtual int getType() const;
 
 	// Define these in subclasses.

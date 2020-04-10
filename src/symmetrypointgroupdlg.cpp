@@ -542,7 +542,7 @@ void SymmetryPointGroupDlg::setup (void) {
 
 bool SymmetryPointGroupDlg::GetSelectedPointGroup(GAMESSPointGroup & pg, int & order) const {
 	bool result = false;
-	int selectedItem = selection;
+	int selectedItem = (int) selection;
 	int itemCount = 1;
 	order = 1;
 	pg = GAMESS_C1;

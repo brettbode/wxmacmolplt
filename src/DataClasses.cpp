@@ -203,7 +203,7 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 		if ((pg == GAMESS_CNH) || (pg == GAMESS_DNH)) {
 			//Add the sigma-H plane (z=0) by repeating the rotations
 			//and inverting the z coordinate
-			int count = operations.size()/9;
+			int count = (int) operations.size()/9;
 			for (int i=0; i<count; i++) {
 				operations.push_back(operations[9*i]);
 				operations.push_back(operations[9*i+1]);
@@ -219,7 +219,7 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 		}
 		if ((pg >= GAMESS_DND) && (pg <= GAMESS_DN)) {
 			//Dn, DnH and DnD have a two fold axis as the x axis
-			int count = operations.size()/9;
+			int count = (int) operations.size()/9;
 			for (int i=0; i<count; i++) {
 				operations.push_back(operations[9*i]);
 				operations.push_back(-operations[9*i+1]);
@@ -238,7 +238,7 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 				double cosb = cos(beta);
 				double sinb = sin(beta);
 				//replicate all the preceding operations with an x/y rotation
-				int operationcount = operations.size()/9;
+				int operationcount = (int) operations.size()/9;
 				for (int i=0; i<operationcount; i++) {
 					operations.push_back(cosb*operations[9*i]+sinb*operations[9*i+1]);
 					operations.push_back(-(-sinb*operations[9*i]+cosb*operations[9*i+1]));
@@ -256,7 +256,7 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 		}
 		if (pg == GAMESS_CNV) {
 			//sigma V plane is XZ plane
-			int count = operations.size()/9;
+			int count = (int) operations.size()/9;
 			for (int i=0; i<count; i++) {
 				operations.push_back(operations[9*i]);
 				operations.push_back(-operations[9*i+1]);
@@ -286,7 +286,7 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 		double beta = pi2/(2.0*((double) pgOrder));
 		double cosb = cos(beta);
 		double sinb = sin(beta);
-		int count = operations.size()/9;
+		int count = (int) operations.size()/9;
 		for (int i=0; i<count; i++) {
 			operations.push_back(cosb*operations[9*i]+sinb*operations[9*i+1]);
 			operations.push_back(-sinb*operations[9*i]+cosb*operations[9*i+1]);
@@ -323,7 +323,7 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 		//Done with T continue on for others
 		if (pg == GAMESS_TH) {
 			//TH is finished off with a direct product with CI
-			int count = operations.size();
+			int count = (int) operations.size();
 			for (int i=0; i<count; i++) {
 				operations.push_back( - operations[i]);
 			}
@@ -345,7 +345,7 @@ SymmetryOps::SymmetryOps(GAMESSPointGroup pg, short pgOrder) {
 			}
 			if (pg == GAMESS_OH) {
 				//OH is a direct product of O and CI
-				int count = operations.size();
+				int count = (int) operations.size();
 				for (int i=0; i<count; i++) {
 					operations.push_back( - operations[i]);
 				}

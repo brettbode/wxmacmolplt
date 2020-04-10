@@ -2013,7 +2013,8 @@ void MolDisplayWin::PasteText(void) {
 	if (wxTheClipboard->Open()) {
 		if (wxTheClipboard->IsSupported(wxDF_TEXT)) {
 			if (InEditMode()) CreateFrameSnapShot();
-			long        iline, test, Type;
+			long        iline;
+			int			test, Type;
 			CPoint3D    Position, offset;
 			long initialAtomCount = MainData->cFrame->NumAtoms;
 			
@@ -2240,7 +2241,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &/*event*/) {
 	int *new_ids;
 	int natoms_selected = frame->GetNumAtomsSelected();
 	bool has_abinitio = false, has_efrag = false;
-	int fragId = -1;
+	long fragId = -1;
 
 	// Don't bother adding a prototype if nothing's selected.
 	if (!natoms_selected) {
@@ -3238,7 +3239,7 @@ void MolDisplayWin::RegenerateSymmetryDependent() {
 	Frame *lFrame = MainData->GetCurrentFramePtr();
 	mpAtom *lAtoms = lFrame->Atoms;
 
-	for (int i = lFrame->GetNumAtoms() - 1; i >= 0; i--) {
+	for (long i = lFrame->GetNumAtoms() - 1; i >= 0; i--) {
 		if (!lAtoms[i].IsSymmetryUnique()) {
 			MainData->DeleteAtom(i, false);
 		}
@@ -3314,7 +3315,7 @@ void MolDisplayWin::ChangeFrames(long NewFrame) {
 		if (frequenciesWindow) frequenciesWindow->FrameChanged();
 		if (surfacesWindow) surfacesWindow->Reset();
 		if (zMatCalcDlg) zMatCalcDlg->UpdateValues();
-		myStatus->SetScrollBarValue(MainData->CurrentFrame-1);
+		myStatus->SetScrollBarValue((int) MainData->CurrentFrame-1);
 	}
 }
 
@@ -3460,7 +3461,7 @@ void MolDisplayWin::ResetModel(bool Center) {
 	}
 	ReleaseLists();
 	// Reset the frame scroll bar
-	myStatus->SetScrollBar(MainData->CurrentFrame-1, MainData->NumFrames);
+	myStatus->SetScrollBar((int)MainData->CurrentFrame-1, (int)MainData->NumFrames);
 	UpdateFrameText();
 
 	glCanvas->Draw();
