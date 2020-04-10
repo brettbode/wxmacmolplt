@@ -155,14 +155,14 @@ public:
 
 ////@begin SetScreenPlane member function declarations
 
-	int GetAtom1() const { return atom1 ; }
-	void SetAtom1(int value) { atom1 = value ; }
+	long GetAtom1() const { return atom1 ; }
+	void SetAtom1(long value) { atom1 = value ; }
 
-	int GetAtom2() const { return atom2 ; }
-	void SetAtom2(int value) { atom2 = value ; }
+	long GetAtom2() const { return atom2 ; }
+	void SetAtom2(long value) { atom2 = value ; }
 
-	int GetAtom3() const { return atom3 ; }
-	void SetAtom3(int value) { atom3 = value ; }
+	long GetAtom3() const { return atom3 ; }
+	void SetAtom3(long value) { atom3 = value ; }
 
 	MolDisplayWin * GetParent() const { return parent ; }
 	void SetParent(MolDisplayWin * value) { parent = value ; }
@@ -192,9 +192,9 @@ public:
 	wxTextCtrl* Pt3XCtl;
 	wxTextCtrl* Pt3YCtl;
 	wxTextCtrl* Pt3ZCtl;
-	int atom1;
-	int atom2;
-	int atom3;
+	long atom1;
+	long atom2;
+	long atom3;
 	MolDisplayWin * parent;
 ////@end SetScreenPlane member variables
 };
