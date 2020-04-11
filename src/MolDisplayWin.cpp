@@ -290,7 +290,7 @@ MolDisplayWin::~MolDisplayWin() {
 #endif
 }
 
-void MolDisplayWin::getCanvasSize(long *width, long *height) {
+void MolDisplayWin::getCanvasSize(int *width, int *height) {
 	int w, h;
 	glCanvas->GetClientSize(&w, &h);
 	*width = w;

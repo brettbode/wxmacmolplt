@@ -135,10 +135,10 @@ public:
     static bool ShowToolTips();
 
 private:
-    long width;
-    long height;
-    long screenWidth;
-    long screenHeight;
+    int width;
+    int height;
+    int screenWidth;
+    int screenHeight;
     double H2Wratio;
     int filetype;
     bool transparency;

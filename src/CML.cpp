@@ -2982,7 +2982,7 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 
 	attr = el->getAttributeValue(CML_convert(sizeAttr));
 	if (!attr) return false;
-	sscanf(attr, "%d", &natoms);
+	sscanf(attr, "%ld", &natoms);
 	if (!natoms) return true;
 
 	atoms = new mpAtom[natoms];
@@ -3033,7 +3033,7 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 
 	attr = el->getAttributeValue(CML_convert(sizeAttr));
 	if (!attr) return false;
-	sscanf(attr, "%d", &nbonds);
+	sscanf(attr, "%ld", &nbonds);
 
 	// Nothing else to do if there aren't any bonds.
 	if (!nbonds) return true;

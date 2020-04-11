@@ -1202,7 +1202,7 @@ void SetupMOScreens(const BasisSet * const Basis, const float * const MOVector, 
 			if (UseSphericalHarmonics) type += 10;
 			if ((ShellScreen[nshell])==0) {
 				shellTypes.push_back(type);
-				shellIndex.push_back(ishell);
+				shellIndex.push_back((int)ishell);
 				shellpatom++;
 			}
 			switch (type) {

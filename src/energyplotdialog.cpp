@@ -297,7 +297,7 @@ void EnergyPlotDialog::RegenData(void) {
     epGraph->setPrecision(eOpts->GetNumDigits());
     epGraph->autoScaleY(MG_AXIS_Y1);
     epGraph->autoScaleY(MG_AXIS_Y2);
-    epGraph->setSelection(0, mData->CurrentFrame - 1);
+    epGraph->setSelection(0, (int)mData->CurrentFrame - 1);
 }
 
 /*!

@@ -400,7 +400,7 @@ class MolDisplayWin : public wxFrame {
 		 * @param width A pointer to an integer that will be set to the width
 		 * @param height A pointer to an integer that will be set to the height
 		 */
-		void getCanvasSize(long *width, long *height);
+		void getCanvasSize(int *width, int *height);
 
 		//Call to update the menu bar itesm for the current data
 		void AdjustMenus();

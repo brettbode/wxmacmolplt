@@ -237,8 +237,8 @@ void FrequenciesDialog::FrameChanged(void) {
 
 void FrequenciesDialog::ModeChanged(void) {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
-    fGraph->setSelection(0, parent->GetData()->cFrame->Vibs->GetCurrentMode());
-	mFreqListBox->SetSelection(parent->GetData()->cFrame->Vibs->GetCurrentMode());
+    fGraph->setSelection(0, (int) parent->GetData()->cFrame->Vibs->GetCurrentMode());
+	mFreqListBox->SetSelection((int) parent->GetData()->cFrame->Vibs->GetCurrentMode());
     Refresh();
 }
 
@@ -285,8 +285,8 @@ void FrequenciesDialog::RegenData(void) {
 	else
 		fGraph->setAxisLabel(MG_AXIS_Y1, _("IR Intensity"));
 	fGraph->setAxisLabel(MG_AXIS_X, _("Frequency"));
-    fGraph->setSelection(0, Vibs->GetCurrentMode());
-	mFreqListBox->SetSelection(Vibs->GetCurrentMode());
+    fGraph->setSelection(0, (int) Vibs->GetCurrentMode());
+	mFreqListBox->SetSelection((int) Vibs->GetCurrentMode());
 }
 
 void FrequenciesDialog::OnCloseWindow( wxCloseEvent& event )

@@ -311,13 +311,21 @@
             <long name="is-transient">0</long>
             <long name="locked">0</long>
             <long name="owns-file">1</long>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Border">5</long>
             <string name="proxy-Member variable name">""</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+            <long name="proxy-Stretch factor">0</long>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+            <bool name="proxy-wxLEFT">1</bool>
             <bool name="proxy-wxRESERVE_SPACE_EVEN_IF_HIDDEN">0</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
+            <bool name="proxy-wxTOP">1</bool>
             <string name="title">"wxBoxSizer V"</string>
             <long name="title-mode">0</long>
             <string name="type">"dialog-control-document"</string>
@@ -6079,6 +6087,7 @@ points read in:"</string>
           <string name="icon-name">"dialog"</string>
           <string name="id-prefix">""</string>
           <string name="id-suffix">""</string>
+          <string name="identifier">"itemDialog1"</string>
           <long name="is-transient">0</long>
           <long name="locked">0</long>
           <long name="owns-file">1</long>
@@ -6149,35 +6158,28 @@ points read in:"</string>
           <bool name="use-id-prefix">0</bool>
           <bool name="use-id-suffix">0</bool>
           <long name="use-xrc">0</long>
-          <string name="variable-0">"filetype|int|Filetype||0"</string>
-          <string name="variable-1">"height|int|Height||0"</string>
-          <string name="variable-2">"screenHeight|long|ScreenHeight||0"</string>
-          <string name="variable-3">"screenWidth|long|ScreenWidth||0"</string>
-          <string name="variable-4">"transparency|bool|Transparency||0"</string>
-          <string name="variable-5">"width|int|Width||0"</string>
+          <string name="variable-0">"filetype|int|Filetype||0|0|"</string>
+          <string name="variable-1">"height|int|Height||0|0|"</string>
+          <string name="variable-2">"screenHeight|int|ScreenHeight||0|0|"</string>
+          <string name="variable-3">"screenWidth|int|ScreenWidth||0|0|"</string>
+          <string name="variable-4">"transparency|bool|Transparency||0|0|"</string>
+          <string name="variable-5">"width|int|Width||0|0|"</string>
           <long name="working-mode">0</long>
           <document>
             <string name="proxy-type">"wbBoxSizerProxy"</string>
             <string name="filename">""</string>
             <string name="icon-name">"sizer"</string>
+            <string name="identifier">"itemBoxSizer2"</string>
             <long name="is-transient">0</long>
             <long name="locked">0</long>
             <long name="owns-file">1</long>
-            <string name="proxy-AlignH">"Centre"</string>
-            <string name="proxy-AlignV">"Centre"</string>
-            <long name="proxy-Border">5</long>
             <string name="proxy-Member variable name">""</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
-            <long name="proxy-Stretch factor">0</long>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
-            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
-            <bool name="proxy-wxLEFT">1</bool>
             <bool name="proxy-wxRESERVE_SPACE_EVEN_IF_HIDDEN">0</bool>
-            <bool name="proxy-wxRIGHT">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
-            <bool name="proxy-wxTOP">1</bool>
             <string name="title">"wxBoxSizer V"</string>
             <long name="title-mode">0</long>
             <string name="type">"dialog-control-document"</string>
@@ -6186,6 +6188,7 @@ points read in:"</string>
               <string name="created">"22/5/2006"</string>
               <string name="filename">""</string>
               <string name="icon-name">"panel"</string>
+              <string name="identifier">"itemPanel3"</string>
               <long name="is-transient">0</long>
               <long name="locked">0</long>
               <long name="owns-file">1</long>
@@ -6261,6 +6264,7 @@ points read in:"</string>
                 <string name="created">"22/5/2006"</string>
                 <string name="filename">""</string>
                 <string name="icon-name">"sizer"</string>
+                <string name="identifier">"itemBoxSizer4"</string>
                 <long name="is-transient">0</long>
                 <long name="locked">0</long>
                 <long name="owns-file">1</long>
@@ -6288,6 +6292,7 @@ points read in:"</string>
                   <string name="event-handler-0">"wxEVT_COMMAND_CHOICE_SELECTED|OnResChoiceSelected"</string>
                   <string name="filename">""</string>
                   <string name="icon-name">"choice"</string>
+                  <string name="identifier">"itemChoice5"</string>
                   <long name="is-transient">0</long>
                   <long name="locked">0</long>
                   <long name="owns-file">1</long>
@@ -6349,6 +6354,7 @@ points read in:"</string>
                   <string name="created">"22/5/2006"</string>
                   <string name="filename">""</string>
                   <string name="icon-name">"sizer"</string>
+                  <string name="identifier">"itemBoxSizer6"</string>
                   <long name="is-transient">0</long>
                   <long name="locked">0</long>
                   <long name="owns-file">1</long>
@@ -6375,6 +6381,7 @@ points read in:"</string>
                     <string name="created">"22/5/2006"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"statictext"</string>
+                    <string name="identifier">"itemStaticText7"</string>
                     <long name="is-transient">0</long>
                     <long name="locked">0</long>
                     <long name="owns-file">1</long>
@@ -6448,6 +6455,7 @@ points read in:"</string>
                     <string name="event-handler-0">"wxEVT_COMMAND_SPINCTRL_UPDATED|OnReswidthspinUpdated"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"spinctrl"</string>
+                    <string name="identifier">"itemSpinCtrl8"</string>
                     <long name="is-transient">0</long>
                     <long name="locked">0</long>
                     <long name="owns-file">1</long>
@@ -6519,6 +6527,7 @@ points read in:"</string>
                     <string name="created">"22/5/2006"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"statictext"</string>
+                    <string name="identifier">"itemStaticText9"</string>
                     <long name="is-transient">0</long>
                     <long name="locked">0</long>
                     <long name="owns-file">1</long>
@@ -6592,6 +6601,7 @@ points read in:"</string>
                   <string name="created">"22/5/2006"</string>
                   <string name="filename">""</string>
                   <string name="icon-name">"sizer"</string>
+                  <string name="identifier">"itemBoxSizer10"</string>
                   <long name="is-transient">0</long>
                   <long name="locked">0</long>
                   <long name="owns-file">1</long>
@@ -6618,6 +6628,7 @@ points read in:"</string>
                     <string name="created">"22/5/2006"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"statictext"</string>
+                    <string name="identifier">"itemStaticText11"</string>
                     <long name="is-transient">0</long>
                     <long name="locked">0</long>
                     <long name="owns-file">1</long>
@@ -6691,6 +6702,7 @@ points read in:"</string>
                     <string name="event-handler-0">"wxEVT_COMMAND_SPINCTRL_UPDATED|OnResheightspinUpdated|||"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"spinctrl"</string>
+                    <string name="identifier">"itemSpinCtrl12"</string>
                     <long name="is-transient">0</long>
                     <long name="locked">0</long>
                     <long name="owns-file">1</long>
@@ -6762,6 +6774,7 @@ points read in:"</string>
                     <string name="created">"22/5/2006"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"statictext"</string>
+                    <string name="identifier">"itemStaticText13"</string>
                     <long name="is-transient">0</long>
                     <long name="locked">0</long>
                     <long name="owns-file">1</long>
@@ -6836,6 +6849,7 @@ points read in:"</string>
                   <string name="event-handler-0">"wxEVT_COMMAND_CHECKBOX_CLICKED|OnCheckbox3Click|NONE||"</string>
                   <string name="filename">""</string>
                   <string name="icon-name">"checkbox"</string>
+                  <string name="identifier">"itemCheckBox14"</string>
                   <long name="is-transient">0</long>
                   <long name="locked">0</long>
                   <long name="owns-file">1</long>
@@ -6902,6 +6916,7 @@ points read in:"</string>
               <string name="proxy-type">"wbBoxSizerProxy"</string>
               <string name="filename">""</string>
               <string name="icon-name">"sizer"</string>
+              <string name="identifier">"itemBoxSizer15"</string>
               <long name="is-transient">0</long>
               <long name="locked">0</long>
               <long name="owns-file">1</long>
@@ -6928,6 +6943,7 @@ points read in:"</string>
                 <string name="event-handler-0">"wxEVT_COMMAND_RADIOBOX_SELECTED|OnAnimationradioSelected|NONE||ExportOptionsDialog"</string>
                 <string name="filename">""</string>
                 <string name="icon-name">"radiobox"</string>
+                <string name="identifier">"itemRadioBox16"</string>
                 <long name="is-transient">0</long>
                 <long name="locked">0</long>
                 <long name="owns-file">1</long>
@@ -6992,6 +7008,7 @@ points read in:"</string>
                 <string name="proxy-type">"wbCheckBoxProxy"</string>
                 <string name="filename">""</string>
                 <string name="icon-name">"checkbox"</string>
+                <string name="identifier">"itemCheckBox17"</string>
                 <long name="is-transient">0</long>
                 <long name="locked">0</long>
                 <long name="owns-file">1</long>
@@ -7058,6 +7075,7 @@ points read in:"</string>
               <string name="created">"22/5/2006"</string>
               <string name="filename">""</string>
               <string name="icon-name">"sizer"</string>
+              <string name="identifier">"itemStdDialogButtonSizer18"</string>
               <long name="is-transient">0</long>
               <long name="locked">0</long>
               <long name="owns-file">1</long>
@@ -7092,6 +7110,7 @@ points read in:"</string>
                 <string name="event-handler-0">"wxEVT_COMMAND_BUTTON_CLICKED|OnOkClick"</string>
                 <string name="filename">""</string>
                 <string name="icon-name">"dialogcontrol"</string>
+                <string name="identifier">"itemButton19"</string>
                 <long name="is-transient">0</long>
                 <long name="locked">1</long>
                 <long name="owns-file">1</long>
@@ -7159,6 +7178,7 @@ points read in:"</string>
                 <string name="created">"22/5/2006"</string>
                 <string name="filename">""</string>
                 <string name="icon-name">"dialogcontrol"</string>
+                <string name="identifier">"itemButton20"</string>
                 <long name="is-transient">0</long>
                 <long name="locked">1</long>
                 <long name="owns-file">1</long>

@@ -560,9 +560,9 @@ void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
-	for (int i=(natoms-1); i>=0; i--) {
+	for (long i=(natoms-1); i>=0; i--) {
 		if (lFrame->GetAtomSelection(i)) {
-			int j = MainData->DeleteAtom(i);
+			long j = MainData->DeleteAtom(i);
 			//restart the scan if more than 1 atom is removed.
 			if ((j==0)&&(i!=0)) i = natoms-1;
 		}
