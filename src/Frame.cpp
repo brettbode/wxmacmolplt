@@ -189,7 +189,7 @@ mpAtom * Frame::AddAtom(const mpAtom& atm, long index, const CPoint3D *pos) {
 		if ((index<=-1)||(index>=NumAtoms)) {//Add to the end of the list
 			index = NumAtoms;
 		} else {	//insert the atom into the middle of the list
-			for (int i=NumAtoms; i>index; i--) {
+			for (long i=NumAtoms; i>index; i--) {
 				Atoms[i] = Atoms[i-1];
 			}
 
@@ -587,7 +587,7 @@ bool Frame::GetAtomSelection(long atom_id) const {
 		Atoms[atom_id].GetSelectState();
 }
 
-int Frame::GetNumAtomsSelected(void) const {
+long Frame::GetNumAtomsSelected(void) const {
 	return natoms_selected;
 }
 
@@ -934,7 +934,7 @@ void Frame::ParseGAMESSGuessVectors(BufferFile * Buffer, long NumFuncs, TypeOfWa
 	//finally the MCSCF guess appears to have all zero occupation #'s.
 	float * Occupancies=NULL;
 	char	Line[kMaxLineLength+1];
-	int NumOrbs = NumFuncs;
+	long NumOrbs = NumFuncs;
 	//occupancies are printed out when using HCORE or Huekel guess types
 	if (Buffer->LocateKeyWord("ASSIGNED OCCUPANCIES", 20)) {
 		Buffer->SkipnLines(2);
@@ -942,7 +942,7 @@ void Frame::ParseGAMESSGuessVectors(BufferFile * Buffer, long NumFuncs, TypeOfWa
 		for (int i=0; i<NumFuncs; i++) Occupancies[i] = 0.0;
 		int iorb = 0;
 		while (iorb < NumOrbs) {
-			int imaxorb = MIN(10, NumOrbs-iorb);	//Max of 10 orbitals per line
+			long imaxorb = MIN(10, NumOrbs-iorb);	//Max of 10 orbitals per line
 			Buffer->GetLine(Line);
 			int LinePos = 0;
 			for (int jorb=0; jorb<imaxorb; jorb++) {
@@ -2545,7 +2545,7 @@ void Frame::ParseMolDenFrequencies(BufferFile * Buffer, WinPrefs * Prefs) {
 					}
 					for (int j=0; j<NumAtoms; j++) {
 						Buffer->GetLine(LineText);
-						int imode = j + i*NumAtoms;
+						long imode = j + i*NumAtoms;
 						check = sscanf(LineText, "%f %f %f", &(lVibs->NormMode[imode].x), &(lVibs->NormMode[imode].y),
 									   &(lVibs->NormMode[imode].z));
 						float lmass = Prefs->GetSqrtAtomMass(Atoms[j].GetType()-1);
@@ -2567,21 +2567,21 @@ void Frame::ParseMolDenFrequencies(BufferFile * Buffer, WinPrefs * Prefs) {
 }
 
 void Frame::toggleMMAtomVisibility(void) {
-	for (int i=0; i<NumAtoms; i++) {
+	for (long i=0; i<NumAtoms; i++) {
 		if (Atoms[i].IsSIMOMMAtom()) 
 			Atoms[i].SetInvisibility(true-Atoms[i].GetInvisibility());
 	}
 }
 
 void Frame::toggleAbInitioVisibility(void) {
-	for (int i=0; i<NumAtoms; i++) {
+	for (long i=0; i<NumAtoms; i++) {
 		if (! (Atoms[i].IsSIMOMMAtom())) 
 			Atoms[i].SetInvisibility(true-Atoms[i].GetInvisibility());
 	}
 }
 
 void Frame::toggleEFPVisibility(void) {
-	for (int i=0; i<NumAtoms; i++) {
+	for (long i=0; i<NumAtoms; i++) {
 		if (Atoms[i].IsEffectiveFragment()) 
 			Atoms[i].SetInvisibility(true-Atoms[i].GetInvisibility());
 	}
@@ -2591,19 +2591,19 @@ void Frame::resetAllSelectState() {
 	
 	// Typically, atom selection should be done through SetAtomSelection, but
 	// we can simulate the effect here.
-	for (int i = 0; i < NumAtoms; i++)
+	for (long i = 0; i < NumAtoms; i++)
 		Atoms[i].SetSelectState(false);
 	natoms_selected = 0;
 
-	for (int i = 0; i < NumBonds; i++)
+	for (long i = 0; i < NumBonds; i++)
 		Bonds[i].SetSelectState(false);
 }
 
-int Frame::GetAtomNumBonds(int atom_id) const {
+long Frame::GetAtomNumBonds(long atom_id) const {
 
-	int num_bonds = 0;
+	long num_bonds = 0;
 
-	for (int i = 0; i < NumBonds; i++) {
+	for (long i = 0; i < NumBonds; i++) {
 		if (Bonds[i].Atom1 == atom_id || Bonds[i].Atom2 == atom_id) {
 			if (Bonds[i].Order > kHydrogenBond) num_bonds++;
 		}

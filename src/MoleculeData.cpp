@@ -299,7 +299,7 @@ void MoleculeData::NewAtom(const mpAtom& atom, bool updateGlobal, long index, co
 	if (updateGlobal) AtomAdded();
 }
 
-void MoleculeData::NewAtom(long AtomType, const CPoint3D & AtomPosition, bool updateGlobal, long index) {
+void MoleculeData::NewAtom(int AtomType, const CPoint3D & AtomPosition, bool updateGlobal, long index) {
 	cFrame->AddAtom(AtomType, AtomPosition, index);
 
 	// Adjust annotations that connect higher-numbered atoms.
@@ -799,7 +799,7 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 		char		token[kMaxLineLength], Line[kMaxLineLength], bondText[kMaxLineLength],
 					angleText[kMaxLineLength], dihedralText[kMaxLineLength];
 		float		bondLength, bondAngle, bondDihedral;
-		long		AtomType;
+		int			AtomType;
 		int			con1, con2, con3;
 		Buffer->GetLine(Line);
 		int readCount = sscanf(Line, "%255s %d %255s %d %255s %d %255s", token, &con1, bondText, &con2, angleText, &con3,
@@ -955,7 +955,7 @@ void MoleculeData::ParseGAMESSUKZMatrix(BufferFile * Buffer, WinPrefs * Prefs) {
 		char		token[kMaxLineLength], bondText[kMaxLineLength],
 			angleText[kMaxLineLength], dihedralText[kMaxLineLength];
 		float		bondLength, bondAngle, bondDihedral;
-		long		AtomType;
+		int			AtomType;
 		int			con1, con2, con3;
 		Buffer->GetLine(Line);
 		int readCount = sscanf(Line, "%255s %d %255s %d %255s %d %255s", token, &con1, bondText, &con2, angleText, &con3,
@@ -1053,7 +1053,7 @@ void MoleculeData::ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, W
 		CPoint3D	pos = CPoint3D(0.0f, 0.0f, 0.0f);	//This is just a placeholder
 		char		token[kMaxLineLength], Line[kMaxLineLength];
 		float		bondLength, bondAngle, bondDihedral;
-		long		AtomType;
+		int			AtomType;
 		int			j1, j2, j3, con1, con2, con3;
 		Buffer->GetLine(Line);
 		int readCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", token, &bondLength, &j1, &bondAngle, &j2,
@@ -1746,7 +1746,7 @@ long MoleculeData::GetNumBonds(void) const {
 }
 long MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
 	long offset = AtomNum;
-	int fragId = -1;
+	long fragId = -1;
 	if (cFrame->Atoms[AtomNum].IsEffectiveFragment()) fragId = cFrame->Atoms[AtomNum].GetFragmentNumber();
 	if (allFrames) {
 		Frame * lFrame = Frames;
@@ -1784,7 +1784,7 @@ long MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
 		}
 		//remove the fragment name from the name list
 		std::vector<std::string>::iterator iter = FragmentNames.begin();
-		for (int i=1; i<fragId; i++) ++iter;
+		for (long i=1; i<fragId; i++) ++iter;
 		FragmentNames.erase(iter);
 		offset = 0;	//Have the caller rescan the whole list to be safe.
 	}

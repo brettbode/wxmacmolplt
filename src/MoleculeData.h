@@ -278,7 +278,7 @@ class MoleculeData {
 		 * @param updateGlobal Update the global arrays and structures (needed at some point)
 		 * @param index Insert the atom in the atom list at the specified index (-1 for the end)
 		 */
-		void NewAtom(long AtomType, const CPoint3D & Position, bool updateGlobal=true, long index=-1);
+		void NewAtom(int AtomType, const CPoint3D & Position, bool updateGlobal=true, long index=-1);
 		/**
 		 * Add a new atom as a copy of atom
 		 * @param atom The atom to copy

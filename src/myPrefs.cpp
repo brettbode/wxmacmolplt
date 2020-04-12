@@ -1129,7 +1129,7 @@ void SurfacePrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 	mLeftSizer->Add(new wxStaticText(this, wxID_ANY, _T("Def. # of Grid Points")), 0, wxALIGN_LEFT | wxALL, 3);
 
 	mSldGridPoint = new wxSlider(this, ID_NUM_GRID_POINT_SLIDER, 
-			lSOpts->GetNumGridPoints(), 10, 150,
+			(int) lSOpts->GetNumGridPoints(), 10, 150,
 			wxDefaultPosition, wxSize(155,wxDefaultCoord),
 			wxSL_AUTOTICKS | wxSL_LABELS);
 
