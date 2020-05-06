@@ -520,7 +520,7 @@ wxPanel *BuilderDlg::GetPeriodicPanel(void) {
 	sizer->Add(lcoord_num_label, wxGBPosition(1, 2), wxGBSpan(1, 6), lflags);
 
 	wxString coordinationChoices[] = {_T("0"), _T("1"), _T("2"), _T("3"), _T("4"), _T("5"), _T("6")};
-	mCoordinationChoice = new wxChoice(periodic_panel, kPeriodicCoordinationChoice, wxPoint(-1, -1),
+	mCoordinationChoice = new wxChoice(myPeriodic_panel, kPeriodicCoordinationChoice, wxPoint(-1, -1),
 									   wxSize(-1, -1), 7, coordinationChoices);
 	sizer->Add(mCoordinationChoice, wxGBPosition(1, 8), wxGBSpan(1, 4), rflags);
 	mCoordinationChoice->Connect(wxEVT_CHAR,
