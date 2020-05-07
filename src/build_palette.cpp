@@ -264,11 +264,8 @@ void BuilderInterface::TabChanged(int index) {
 	currentTab = index;
 }
 void BuilderInterface::AddUserStructure(Structure *structure) {
-	
-	int i;
-	
 	if (structure->FragName.size() <= 0) {
-		for (i = structure->natoms - 1; i >= 0; i--) {
+		for (long i = structure->natoms - 1; i >= 0; i--) {
 			if (structure->atoms[i].Type == 1) {
 				structure->SetPruneAtom(i);
 				break;
@@ -277,7 +274,7 @@ void BuilderInterface::AddUserStructure(Structure *structure) {
 	}
 	targetList = kNUM_STRUC_GROUPS - 1;
 	StructureGroups[targetList]->structures.push_back(structure);
-	selectedStructure = StructureGroups[targetList]->structures.size() - 1;
+	selectedStructure = (int) StructureGroups[targetList]->structures.size() - 1;
 	
 	SaveStructures();
 	
@@ -979,9 +976,9 @@ void BuilderDlg::TabChanged(wxNotebookEvent& event) {
  * @param atom_id Index into atoms array of atom to prune.
  */
 
-void Structure::SetPruneAtom(int atom_id) {
+void Structure::SetPruneAtom(long atom_id) {
 
-	int i;
+	long i;
 
 	// Do nothing if id is out of range.
 	if (atom_id < 0 || atom_id >= natoms) {

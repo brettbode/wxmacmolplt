@@ -58,7 +58,7 @@ class Structure {
 
 		void WriteXML(XMLElement *parent) const;
 		bool ReadXML(XMLElement *struc_el);
-		void SetPruneAtom(int atom_id);
+		void SetPruneAtom(long atom_id);
 
 	private:
 };
