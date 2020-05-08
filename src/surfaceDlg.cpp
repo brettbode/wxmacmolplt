@@ -560,7 +560,7 @@ void OrbSurfacePane::makeMOList() {
 				OccNum = lMOs->OrbOccupationB;
 				defaultOrb = lMOs->getNumOccupiedBetaOrbitals()-lMOs->getStartingOrbitalOffset()-1;
 			}
-			int OrbOffset = lMOs->getStartingOrbitalOffset();
+			int OrbOffset = (int) lMOs->getStartingOrbitalOffset();
 
 			char* oneSymLabel;
 			if ((lMOs->getOrbitalWavefunctionType() == RHF)|| (lMOs->getOrbitalWavefunctionType() == UHF)||
@@ -654,7 +654,7 @@ void OrbSurfacePane::makeMOList() {
 			}
 		}
 		mMOList->DoneAppending();
-		if (defaultOrb >= 0) mMOList->SetSelection(defaultOrb);
+		if (defaultOrb >= 0) mMOList->SetSelection((int) defaultOrb);
 	}
 }
 
@@ -1328,7 +1328,7 @@ void Orbital2DSurfPane::CreateControls() {
 	vector<wxString> choices;
 	int itemSelect = getOrbSetForOrbPane(choices) - 1;
 
-	mOrbSetChoice = new wxChoice(this, ID_ORB_CHOICE, wxPoint(10,10), wxSize(200,wxDefaultCoord), choices.size(), &choices.front());
+	mOrbSetChoice = new wxChoice(this, ID_ORB_CHOICE, wxPoint(10,10), wxSize(200,wxDefaultCoord), (int) choices.size(), &choices.front());
 	mOrbSetChoice->SetSelection(itemSelect);
 	mOrbSetChoice->SetToolTip(_("Select the set of molecular orbitals or atomic orbitals to view."));
 	upperSizer->Add(mOrbSetChoice, wxALIGN_CENTER_VERTICAL | wxALL, 3);
@@ -1358,7 +1358,7 @@ void Orbital2DSurfPane::CreateControls() {
 
 	lowerLeftMiddleSizer->Add(label1, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	lowerLeftMiddleSizer->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-	mNumGridPntSld->SetValue(NumGridPoints);
+	mNumGridPntSld->SetValue((int) NumGridPoints);
 
 	leftMiddleSizer->Add(upperLeftMiddleSizer, 0, wxALL, 3);
 	leftMiddleSizer->Add(lowerLeftMiddleSizer, 0, wxALL, 3);
@@ -1447,9 +1447,9 @@ void Orbital2DSurfPane::CreateControls() {
 
 	if (PlotOrb >= 0) {
 		if (OrbOptions&1)	//AOs
-			mOrbCoef->SetSelection(PlotOrb);
+			mOrbCoef->SetSelection((int) PlotOrb);
 		else //MOs
-			mMOList->SetSelection(PlotOrb);
+			mMOList->SetSelection((int) PlotOrb);
 	}
 }
 
@@ -1583,7 +1583,7 @@ void Orbital2DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 void Orbital2DSurfPane::refreshControls() {
 	wxString tmpStr;
 
-	mNumGridPntSld->SetValue(NumGridPoints);
+	mNumGridPntSld->SetValue((int) NumGridPoints);
 	mSphHarmonicsChk->SetValue(SphericalHarmonics); 
 
 	SetNumContoursText();
@@ -1713,7 +1713,7 @@ void Orbital3DSurfPane::TargetToPane(void) {
 void Orbital3DSurfPane::refreshControls() {
 	float GridMax = mTarget->GetGridMax();
 
-	mNumGridPntSld->SetValue(NumGridPoints);
+	mNumGridPntSld->SetValue((int) NumGridPoints);
 	mGridSizeSld->SetValue((short)sqrt((5000*5000)*(mTarget->GetGridSize()-.01)/(30-.01)));
 	mContourValSld->SetValue(ContourValue);
 	mContourValSld->SetMax(GridMax);
@@ -1835,7 +1835,7 @@ void Orbital3DSurfPane::CreateControls() {
 	vector<wxString> choices;
 	int itemSelect = getOrbSetForOrbPane(choices) - 1;
 
-	mOrbSetChoice = new wxChoice(this, ID_ORB_CHOICE, wxPoint(10,10), wxSize(200,wxDefaultCoord), choices.size(), &choices.front());
+	mOrbSetChoice = new wxChoice(this, ID_ORB_CHOICE, wxPoint(10,10), wxSize(200,wxDefaultCoord), (int) choices.size(), &choices.front());
 	mOrbSetChoice->SetSelection(itemSelect);
 	upperSizer->Add(mOrbSetChoice, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	mOrbSetChoice->SetToolTip(_("Select the set of molecular orbitals or atomic orbitals to view."));
@@ -1873,7 +1873,7 @@ void Orbital3DSurfPane::CreateControls() {
 
 	lowerLeftMiddleSizer->Add(label1, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
 	lowerLeftMiddleSizer->Add(mNumGridPntSld, 0, wxALIGN_CENTER_VERTICAL | wxALL, 3);
-	mNumGridPntSld->SetValue(NumGridPoints);
+	mNumGridPntSld->SetValue((int) NumGridPoints);
 
 	leftMiddleSizer->Add(upperLeftMiddleSizer, 0, wxALL, 3);
 	leftMiddleSizer->Add(lowerLeftMiddleSizer, 0, wxALL, 3);
@@ -1949,11 +1949,11 @@ void Orbital3DSurfPane::CreateControls() {
 	if (PlotOrb >= 0) {
 		if (OrbOptions&1) {//AOs
 			if (mOrbCoef->GetItemCount()) {
-				mOrbCoef->SetSelection(PlotOrb);
+				mOrbCoef->SetSelection((int) PlotOrb);
 			}
 		} else { //MOs
 			if (mMOList->GetItemCount()) {
-				mMOList->SetSelection(PlotOrb);
+				mMOList->SetSelection((int) PlotOrb);
 			}
 		}
 	}
@@ -3222,9 +3222,9 @@ void TEDensity1DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 }
 
 void TEDensity1DSurfPane::refreshControls() {
-	mOrbSetChoice->SetSelection(TargetOrbSet);
+	mOrbSetChoice->SetSelection((int) TargetOrbSet);
 	/* mOrbColor1->setColor(&PosColor); */
-	mNumGridPntSld->SetValue(NumGridPoints);
+	mNumGridPntSld->SetValue((int) NumGridPoints);
 
 	clamp_box->SetValue(wxString::Format(wxT("%f"), mTarget->GetMaxValue()));
 	scale_box->SetValue(wxString::Format(wxT("%f"), mTarget->GetScale()));
@@ -3445,13 +3445,13 @@ void TEDensity2DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 }
 
 void TEDensity2DSurfPane::refreshControls() {
-	mOrbSetChoice->SetSelection(TargetOrbSet);
+	mOrbSetChoice->SetSelection((int) TargetOrbSet);
 	SetNumContoursText();
 	SetContourValueText();
 
 	mOrbColor1->setColor(&PosColor);
 
-	mNumGridPntSld->SetValue(NumGridPoints);
+	mNumGridPntSld->SetValue((int) NumGridPoints);
 
 	mUsePlaneChk->SetValue(UseScreenPlane);
 	mDisplayPlaneCheck->SetValue(DisplayPlane);
@@ -3521,7 +3521,7 @@ void TEDensity3DSurfPane::TargetToPane(void) {
 }
 
 void TEDensity3DSurfPane::refreshControls() {
-	mOrbSetChoice->SetSelection(TargetOrbSet);
+	mOrbSetChoice->SetSelection((int) TargetOrbSet);
 	SetContourMaxValueText();
 	setContourValueSld();
 
@@ -3530,7 +3530,7 @@ void TEDensity3DSurfPane::refreshControls() {
 	mTransparency->SetValue(Transparency);
 
 	refreshMEPControls();
-	mNumGridPntSld->SetValue(NumGridPoints);
+	mNumGridPntSld->SetValue((int) NumGridPoints);
 	mGridSizeSld->SetValue((short)(100*GridSize));
 
 	m3DRdoBox->SetSelection(1-UseSolidSurface);
@@ -4148,14 +4148,14 @@ void MEP2DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {
 	owner->SurfaceUpdated();
 }
 void MEP2DSurfPane::refreshControls() {
-	mOrbSetChoice->SetSelection(TargetOrbSet);
+	mOrbSetChoice->SetSelection((int) TargetOrbSet);
 	SetNumContoursText();
 	SetContourValueText();
 
 	mOrbColor1->setColor(&PosColor);
 	mOrbColor2->setColor(&NegColor);
 
-	mNumGridPntSld->SetValue(NumGridPoints);
+	mNumGridPntSld->SetValue((int) NumGridPoints);
 
 	mUsePlaneChk->SetValue(UseScreenPlane);
 	mShowZeroCheck->SetValue(ShowZeroContour);
@@ -4221,7 +4221,7 @@ void MEP3DSurfPane::TargetToPane(void) {
 	UpdateTest = false;
 }
 void MEP3DSurfPane::refreshControls() {
-	mOrbSetChoice->SetSelection(TargetOrbSet);
+	mOrbSetChoice->SetSelection((int) TargetOrbSet);
 	SetContourMaxValueText();
 	setContourValueSld();
 
@@ -4229,7 +4229,7 @@ void MEP3DSurfPane::refreshControls() {
 	mOrbColor2->setColor(&NegColor);
 	mTransparency->SetValue(Transparency);
 
-	mNumGridPntSld->SetValue(NumGridPoints);
+	mNumGridPntSld->SetValue((int) NumGridPoints);
 	mGridSizeSld->SetValue((short)(100*GridSize));
 
 	m3DRdoBox->SetSelection(1-UseSolidSurface);
