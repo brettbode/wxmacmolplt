@@ -220,7 +220,7 @@ void FMOFragmentationDialog::OnNumFragEditTextUpdated( wxCommandEvent& event )
 	event.Skip();
 }
 
-int FMOFragmentationDialog::GetMolCount(void) {
+long FMOFragmentationDialog::GetMolCount(void) {
 	wxString textVal = mNumFragEdit->GetValue();
 	long test = 1;
 	textVal.ToLong(&test);

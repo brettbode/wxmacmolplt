@@ -91,7 +91,7 @@ public:
 ////@end FMOFragmentationDialog member function declarations
 	
 	/// Retreive the # non-bonded molecules per fragment
-	int GetMolCount(void);
+	long GetMolCount(void);
 
 	/// Should we show tooltips?
 	static bool ShowToolTips();
