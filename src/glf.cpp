@@ -1051,7 +1051,7 @@ void glfPrint(char *s, int lenght)
 
 void glfPrintString(char *s)
 {
-	glfPrint(s, strlen(s));
+	glfPrint(s, (int) strlen(s));
 }
 
 void glfPrintChar(char s)
@@ -1632,7 +1632,7 @@ void glfDrawBString(const char *s)
 		glPushMatrix();
 		glTranslatef(-temp_trans/2, 0, 0);
 	}
-	glCallLists(strlen(s), GL_UNSIGNED_BYTE, (unsigned char *)s);
+	glCallLists((GLsizei) strlen(s), GL_UNSIGNED_BYTE, (unsigned char *)s);
 	if (m_bitmap_string_center == GL_TRUE)	glPopMatrix();
 }
 
@@ -1690,7 +1690,7 @@ void glfDrawBMaskString(const char *s)
 		glPushMatrix();
 		glTranslatef(-temp_trans/2, 0, 0);
 	}
-	glCallLists(strlen(s), GL_UNSIGNED_BYTE, (unsigned char *)s);
+	glCallLists((GLsizei) strlen(s), GL_UNSIGNED_BYTE, (unsigned char *)s);
 	if (m_bitmap_string_center == GL_TRUE)	glPopMatrix();
 
 	glPopAttrib();
@@ -1706,7 +1706,7 @@ void glfDrawBMaskString(const char *s)
 		glPushMatrix();
 		glTranslatef(-temp_trans/2, 0, 0);
 	}
-	glCallLists(strlen(s), GL_UNSIGNED_BYTE, (unsigned char *)s);
+	glCallLists((GLsizei) strlen(s), GL_UNSIGNED_BYTE, (unsigned char *)s);
 	if (m_bitmap_string_center == GL_TRUE)	glPopMatrix();
 	glPopMatrix();
 
