@@ -31,7 +31,7 @@ wxMolGraph::wxMolGraph(wxWindow       *parent,
 }
 
 int wxMolGraph::addXSet(vector<double> xData, bool selectable) {
-    int index = data.size();
+    int index = (int) data.size();
     int selected = 0;
 
     vector< YSettings > emptyYSettingsGroup;
@@ -70,7 +70,7 @@ int wxMolGraph::addYSet(YSet yData,
                         wxColour color,
                         int shape,
                         int size) {
-    int index = data[xSet].second.size();
+    int index = (int) data[xSet].second.size();
     YSettings newYSettings;
 
     newYSettings.visible = true;
@@ -836,7 +836,7 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
                     data[i].first.second = 0;
                 }
                 else if(x >= *(data[i].first.first.end() - 1)) {
-                    data[i].first.second = data[i].first.first.size() - 1;
+                    data[i].first.second = (int) data[i].first.first.size() - 1;
                 }
                 else {
                     for(j = 0; j < data[i].first.first.size() - 1; j++) {
