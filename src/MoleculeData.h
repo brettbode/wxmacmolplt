@@ -37,7 +37,7 @@ class MoleculeData {
 		friend class DataGroup;
 	private:
 		std::vector<Annotation *> Annotations;	///< Set of annotations
-		int constrain_anno_id;
+		long constrain_anno_id;
 		CPoint3D	*RotCoords;				///< The currently displayed, rotated coordinates in 2D mode
 		Frame *		cFrame;					///< pointer to the currently drawn frame
 		Frame *		Frames;					///< pointer to the first frame
@@ -330,10 +330,10 @@ class MoleculeData {
 		const Matrix4D& GetRotationMatrix() const;
 		int GetAnnotationCount(void) const {return (int) Annotations.size();};
 		void DeleteAllAnnotations(void);
-		void ConstrainToAnnotation(int anno_id) {
+		void ConstrainToAnnotation(long anno_id) {
 			constrain_anno_id = anno_id;
 		}
-		int GetConstrainAnnotation(void) {
+		long GetConstrainAnnotation(void) {
 			return constrain_anno_id;
 		}
 		void RemoveAnnotationConstraint(void) { constrain_anno_id = -1; }

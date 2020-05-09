@@ -111,7 +111,7 @@ public:
 	virtual bool containsAtom(const long atom_id) const;
 	virtual bool containsFragment(const mpAtom *atom_list) const;
 	virtual void adjustIds(const long atom_id, int offset = -1);
-	virtual bool isEquivalent(const int /*natoms*/, const int */*new_list*/) const {
+	virtual bool isEquivalent(const long /*natoms*/, const long */*new_list*/) const {
 		return false;
 	}
 	virtual long getAtom(const long index) const;
@@ -136,7 +136,7 @@ public:
 	~AnnotationLength() {};
 	
 	void draw(const MolDisplayWin * win) const;
-	bool isEquivalent(const int natoms, const int *new_list) const;
+	bool isEquivalent(const long natoms, const long *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
 	float getParam(const Frame& frame) const;
@@ -149,7 +149,7 @@ public:
 	AnnotationMarker(const long atom_id = -1);
 	~AnnotationMarker() {};
 	void draw(const MolDisplayWin * win) const;
-	bool isEquivalent(const int natoms, const int *new_list) const;
+	bool isEquivalent(const long natoms, const long *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
 	float getParam(const Frame& frame) const;
@@ -163,7 +163,7 @@ public:
 					const long atom3_id = -1);
 	~AnnotationAngle() {};
 	void draw(const MolDisplayWin * win) const;
-	bool isEquivalent(const int natoms, const int *new_list) const;
+	bool isEquivalent(const long natoms, const long *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
 	float getParam(const Frame& frame) const;
@@ -177,7 +177,7 @@ public:
 					   const long atom3_id = -1, const long atom4_id = -1);
 	~AnnotationDihedral(void) {};
 	void draw(const MolDisplayWin * win) const;
-	bool isEquivalent(const int natoms, const int *new_list) const;
+	bool isEquivalent(const long natoms, const long *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
 	float getParam(const Frame& frame) const;

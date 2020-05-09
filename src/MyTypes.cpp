@@ -95,7 +95,7 @@ AnnotationLength::AnnotationLength(const long atom1_id, const long atom2_id)
 
 /* ------------------------------------------------------------------------- */
 
-bool AnnotationLength::isEquivalent(const int natoms, const int *new_list) const {
+bool AnnotationLength::isEquivalent(const long natoms, const long *new_list) const {
 	return natoms == 2 &&
 		   ((new_list[0] == atoms[0] && new_list[1] == atoms[1]) ||
 			(new_list[1] == atoms[0] && new_list[0] == atoms[1]));
@@ -160,7 +160,7 @@ AnnotationMarker::AnnotationMarker(const long atom_id)
 
 /* ------------------------------------------------------------------------- */
 
-bool AnnotationMarker::isEquivalent(const int natoms, const int *new_list) const {
+bool AnnotationMarker::isEquivalent(const long natoms, const long *new_list) const {
 	return natoms == 1 && new_list[0] == atoms[0];
 }
 
@@ -184,7 +184,7 @@ AnnotationAngle::AnnotationAngle(const long atom1_id, const long atom2_id,
 
 /* --------------------------------------------------------------------- */
 
-bool AnnotationAngle::isEquivalent(const int natoms, const int *new_list) const {
+bool AnnotationAngle::isEquivalent(const long natoms, const long *new_list) const {
 	return natoms == 3 && new_list[1] == atoms[1] &&
 		   ((new_list[0] == atoms[0] && new_list[2] == atoms[2]) ||
 			(new_list[2] == atoms[0] && new_list[0] == atoms[2]));
@@ -306,7 +306,7 @@ AnnotationDihedral::AnnotationDihedral(const long atom1_id,
 
 /* ------------------------------------------------------------------------- */
 
-bool AnnotationDihedral::isEquivalent(const int natoms, const int *new_list) const {
+bool AnnotationDihedral::isEquivalent(const long natoms, const long *new_list) const {
 	return natoms == 4 &&
 			new_list[2] == atoms[2] &&
 			new_list[1] == atoms[1] &&

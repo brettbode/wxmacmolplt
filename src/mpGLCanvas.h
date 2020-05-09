@@ -105,13 +105,13 @@ class MpGLCanvas : public wxGLCanvas {
 		void bondPopupMenu(int x, int y);
 		void annoPopupMenu(int x, int y);
 		void measurePopupMenu(int x, int y);
-		int select_stack[4];
-		int select_stack_top;
+		long select_stack[4];
+		long select_stack_top;
 
 		void ShowBlankPopup(int x, int y);
 		void PasteAtMouse(wxCommandEvent& event);
 
-		void ConstrainPosition(const int anno_id, double x, double y,
+		void ConstrainPosition(const long anno_id, double x, double y,
 							   double z);
 		void ChangeAtom(wxCommandEvent& event);
 		void ChangeCoordinationNumber(wxCommandEvent& event);
@@ -120,15 +120,15 @@ class MpGLCanvas : public wxGLCanvas {
 		void HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 						   const wxPoint& prev_pt);
 
-		int selected;           ///< Id of object clicked on, -1 if invalid
+		long selected;          ///< Id of object clicked on, -1 if invalid
 		int selected_type;      ///< Type of object clicked on
 		int selected_site;      ///< Id of bond site clicked on, -1 if no site
-		int selectedBondAtom1;	///< index of atom 1 of a selected bond
-		int selectedBondAtom2;	///< index of atom 2 of a selected bond
+		long selectedBondAtom1;	///< index of atom 1 of a selected bond
+		long selectedBondAtom2;	///< index of atom 2 of a selected bond
 		wxPoint curr_mouse;     ///< Current mouse position
 		wxPoint prev_mouse;     ///< Previous mouse position
 		int first_site_clicked; ///< Id of bonding site clicked on by user
-		int first_atom_clicked; ///< Atom connected to clicked on site
+		long first_atom_clicked; ///< Atom connected to clicked on site
 		int width;              ///< Width of canvas in pixels
 		int height;             ///< Height of canvas in pixels
 		int ndrag_events;       ///< Number of drag events in current drag
@@ -140,8 +140,8 @@ class MpGLCanvas : public wxGLCanvas {
 		bool do_stereo;
 
 		void AddPlaneNormal(wxCommandEvent& event);
-		void ConnectSelectedToSite(int src_atom, int src_site,
-								   int dst_atom, int dst_site);
+		void ConnectSelectedToSite(long src_atom, int src_site,
+								   long dst_atom, int dst_site);
 		void OnIdleEvent(wxIdleEvent& event);
 		void SavePrototype(wxCommandEvent& event);
 		/**
@@ -302,12 +302,12 @@ class MpGLCanvas : public wxGLCanvas {
 		//implementation of the correspondent popup-menu selection
 			
 		void testPicking(int x, int y);
-		void SelectObj(int selected_type, int select_id, bool mode);
+		void SelectObj(int selected_type, long select_id, bool mode);
 		void findReal3DCoord(GLdouble x, GLdouble y, GLdouble z, GLdouble& realX, GLdouble& realY, GLdouble& realZ);
 		void findWinCoord(GLfloat x, GLfloat y, GLfloat z, GLdouble& winX, GLdouble& winY, GLdouble& winZ);
 		/* MpGLCanvas *GetParent(void) { return parent; } */
 		WinPrefs *GetPrefs(void) { return Prefs; }
-		int NumberSelectedAtoms(void) const {return select_stack_top;};
+		long NumberSelectedAtoms(void) const {return select_stack_top;};
 		void insertAnnotationMenuItems(wxMenu& menu);
 		void ConstrainToAnnotation(wxCommandEvent& event);
 		void SetAnnotationParameter(wxCommandEvent& event);
