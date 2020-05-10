@@ -502,10 +502,9 @@ void AnnotationLength::draw(const MolDisplayWin * win) const {
 	x_eye.z = 0.0f;
 	Rotate3DPt(mv_inv, x_eye, &x_world);
 
-	int bond_id;
 	float bond_size;
 
-	bond_id = cFrame->BondExists(atoms[0], atoms[1]);
+	long bond_id = cFrame->BondExists(atoms[0], atoms[1]);
 
 	// If a bond exists between the two atoms, we need to push out the
 	// length label accordingly.
@@ -878,7 +877,7 @@ void MolDisplayWin::DrawLabel() {
 
 			glColor3f(1-red, 1-green, 1-blue);
 			glScalef((0.1+0.08*radius)*LabelSize, (0.1+0.08*radius)*LabelSize, 1);
-			glLoadName(iatom+1);
+			glLoadName(GLuint(iatom+1));
 			glfDrawSolidString(atomLabel.mb_str(wxConvUTF8));
 			glPopMatrix();
 		}
@@ -1001,7 +1000,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				continue;
 			}
 
-			glLoadName(iatom + 1);
+			glLoadName(GLuint(iatom + 1));
 			draw_subdued = mHighliteState && !lAtoms[iatom].GetSelectState();
 			  
 			if (draw_subdued) {
@@ -1084,7 +1083,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		if (!InSymmetryEditMode() ||
 			(lAtoms[lBonds[ibond].Atom1].IsSymmetryUnique() &&
 			 lAtoms[lBonds[ibond].Atom2].IsSymmetryUnique())) {
-			glLoadName(ibond + 1);
+			glLoadName(GLuint(ibond + 1));
 		} else {
 			glLoadName(0);
 		}
@@ -1337,7 +1336,7 @@ void MolDisplayWin::AddAxisGL(void) {
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
 
-	long Quality = (long)(Prefs->GetQD3DAtomQuality());
+	int Quality = Prefs->GetQD3DAtomQuality();
 	float VectorWidth = 0.02;
 
 	CPoint3D vector = CPoint3D(1.0f, 0.0f, 0.0f);
@@ -1543,7 +1542,7 @@ long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs */*Prefs*/, myGLTrian
 	}
 
 	glLoadName(MMP_1DSURFACE);
-	glPushName(GetSurfaceID()+1);
+	glPushName((GLuint) GetSurfaceID()+1);
 
 	glPushName(1);
 
@@ -3033,7 +3032,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	
 	short coordination = lAtoms[iatom].GetCoordinationNumber();
 	std::vector<Bond *> bonds;
-	int bonded_atoms[6];
+	long bonded_atoms[6];
 	CPoint3D vecs[6];
 	unsigned int i;
 

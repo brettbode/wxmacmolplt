@@ -183,8 +183,9 @@ class WinPrefs {
 		RGBColor		AtomColors[kMaxAtomTypes], BondColors[kMaxBondTypes], VectorColor, BackColor,
 						GradientColor;	///< Color to be used for gradient vectors
 		int				AnimateTime;	///< Delay between images in a normal mode animation
+		int				QD3DAtomQuality;///<Number of divisions used when creating pipes and spheres. A larger value provides a smoother surface.
 		long			AtomSizes[kMaxAtomTypes], DRCnFileSkip,
-						QD3DAtomQuality, BitOptions;
+						BitOptions;
 				//bit 1: prompt4save, bit 2: show angles, bit 3: use QD3D hardware
 				//bit 4: Stereo, bit 5: color bond halves, bit6: Wireframe mode
 				//bit 7: Outline bonds, bit 8: Use cylinders for lines
@@ -350,9 +351,9 @@ class WinPrefs {
 			if ((NewValue>=0.001)&&(NewValue<=0.2)) BondWidth=NewValue;
 			return BondWidth;};
 		///Obtain the atom (ie sphere) quality for the 3D display
-		inline long GetQD3DAtomQuality(void) const {return QD3DAtomQuality;};
+		inline int GetQD3DAtomQuality(void) const {return QD3DAtomQuality;};
 		///Set the # of divisions for 3D spheres (ie the quality). values should be between 2 and 40
-		inline long SetQD3DAtomQuality(long NewValue) {
+		inline int SetQD3DAtomQuality(int NewValue) {
 			if ((NewValue >= 2)&&(NewValue <= 40)) QD3DAtomQuality = NewValue;
 			return QD3DAtomQuality;};
 		/// Obtain the fill light brightness
