@@ -1888,7 +1888,7 @@ void MoleculeData::PruneUnusedFragments() {
 
 }
 
-long MoleculeData::CreateFMOFragmentation(const int & NumMolecules, std::vector<long> & newFragmentation) {
+long MoleculeData::CreateFMOFragmentation(const long & NumMolecules, std::vector<long> & newFragmentation) {
 	//Create an FMO fragment list by breaking up the system into non-bonded pieces (H-bonds are ignored)
 	
 	long result = 0;

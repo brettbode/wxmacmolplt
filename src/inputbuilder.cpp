@@ -2162,7 +2162,7 @@ void InputBuilderWindow::SetupFMOItems() {
 		MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 		MoleculeData * MainData = parent->GetData();
 		Frame * cFrame = MainData->GetCurrentFramePtr();
-		mFMOFragList->InsertRows(0, cFrame->GetNumAtoms(), true);
+		mFMOFragList->InsertRows(0, (int) cFrame->GetNumAtoms(), true);
 		
 		//Test to see if the fragment list is initialized, if not init it
 		if (FMOFragmentIds.size() < cFrame->GetNumAtoms()) {
@@ -2174,7 +2174,7 @@ void InputBuilderWindow::SetupFMOItems() {
 		for (long i=0; i<cFrame->GetNumAtoms(); i++) {
 			wxString foo;
 			foo.Printf(wxT("%ld"), FMOFragmentIds[i]);
-			mFMOFragList->SetCellValue(i, 0, foo);
+			mFMOFragList->SetCellValue((int)i, 0, foo);
 		}
 	} else {
 		mFMOCheck->SetValue(false);
@@ -2215,7 +2215,7 @@ void InputBuilderWindow::SetupMOGuessItems() {
 		}
 		mMOSourceChoice->SetSelection(tempVec-1);
 
-		int numOrbs = TmpInputRec->Guess->GetNumOrbs();
+		long numOrbs = TmpInputRec->Guess->GetNumOrbs();
 		if (!numOrbs) {	//Obtain the # of orbs if from a local set
 			if (Orbs->size() > 0) {
 				if (tempVec > 1) {
@@ -2226,7 +2226,7 @@ void InputBuilderWindow::SetupMOGuessItems() {
 			}
 		}
 		wxString noText;
-		noText.Printf(wxT("%d"), numOrbs);
+		noText.Printf(wxT("%ld"), numOrbs);
 		mVecOrbCountText->SetValue(noText);
 	} else {
 		mMOSourceChoice->Enable(false);
@@ -4049,7 +4049,7 @@ void InputBuilderWindow::OnFMOFragButtonClick( wxCommandEvent& event )
 	if (fragDialog.ShowModal() == wxID_OK) {
 		//retrieve the # nonbonded atoms and call the fragmentation routine
 		MoleculeData * MainData = parent->GetData();
-		int count = fragDialog.GetMolCount();
+		long count = fragDialog.GetMolCount();
 		long fragcount = MainData->CreateFMOFragmentation(count, FMOFragmentIds);
 		TmpInputRec->FMO.SetNumberFragments(fragcount);
 		SetupFMOItems();
@@ -4145,12 +4145,12 @@ void InputBuilderWindow::OnGVBNSetOeditTextUpdated( wxCommandEvent& event )
 			mGVB_NOEdit->Show(true);
 			mGVB_NOStatic->Show(true);
 			std::vector<long> t = TmpInputRec->SCF->GetGVBOpenShellDeg();
-			int num = t.size();
+			int num = (int) t.size();
 			if (TmpInputRec->SCF->GetGVBNumOpenShells() > num) {	//This shouldn't happen?
 				for (int i=num; i<TmpInputRec->SCF->GetGVBNumOpenShells(); i++)
 					t.push_back(0);
 			} else if (TmpInputRec->SCF->GetGVBNumOpenShells() < num)
-				num =TmpInputRec->SCF->GetGVBNumOpenShells();
+				num = (int)TmpInputRec->SCF->GetGVBNumOpenShells();
 			std::ostringstream degString;
 			for (int i=0; i<num; i++) {
 				if (i>0) degString << " ";
