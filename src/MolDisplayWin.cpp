@@ -2239,7 +2239,7 @@ void MolDisplayWin::menuBuilderSaveStructure(wxCommandEvent &/*event*/) {
 	int si = 0;
 	int ai, bi;
 	int *new_ids;
-	int natoms_selected = frame->GetNumAtomsSelected();
+	long natoms_selected = frame->GetNumAtomsSelected();
 	bool has_abinitio = false, has_efrag = false;
 	long fragId = -1;
 

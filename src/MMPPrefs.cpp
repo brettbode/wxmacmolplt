@@ -655,7 +655,7 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotationZ), longVal))
 					autoSpeedZ = (int) longVal;
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DAtomQuality), longVal))
-					SetQD3DAtomQuality(longVal);
+					SetQD3DAtomQuality((int) longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_BondWidth), floatVal))
 					SetQD3DBondWidth(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AtomScale), floatVal))
