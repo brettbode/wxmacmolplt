@@ -237,7 +237,7 @@ void BondsDlg::ResetList(void) {
 	if (nbonds > 0) {
 		bool temp = lFrame->GetBondSelectState(0);
 		//Add back the new ones
-		bondGrid->InsertRows(0, nbonds, true);
+		bondGrid->InsertRows(0, (int)nbonds, true);
 		bondGrid->HideCellEditControl();
 		bondGrid->ClearSelection();
 		lFrame->SetBondSelectState(0, temp);
@@ -246,12 +246,12 @@ void BondsDlg::ResetList(void) {
 		for (long i=0; i<nbonds; i++) {
 			Bond * b = lFrame->GetBondLoc(i);
 			buf.Printf(wxT("%ld"), (b->Atom1 + 1));
-			bondGrid->SetCellValue(i, 0, buf);
+			bondGrid->SetCellValue((int)i, 0, buf);
 			buf.Printf(wxT("%ld"), (b->Atom2 + 1));
-			bondGrid->SetCellValue(i, 1, buf);
+			bondGrid->SetCellValue((int)i, 1, buf);
 			buf.Printf(wxT("%f"), lFrame->GetBondLength(i));
-			bondGrid->SetCellValue(i, 2, buf);
-			bondGrid->SetReadOnly(i, 2, true);
+			bondGrid->SetCellValue((int)i, 2, buf);
+			bondGrid->SetReadOnly((int)i, 2, true);
 			switch (lFrame->GetBondOrder(i)) {
 				case kHydrogenBond:
 					buf.Printf(wxT("%s"), _T("Hydrogen"));
@@ -272,10 +272,10 @@ void BondsDlg::ResetList(void) {
 					buf.Printf(wxT("%s"), _T("Unknown"));
 					wxLogMessage(_("BondsDlg::ResetList: unknown or mixed bond type for bond"));
 			}
-			bondGrid->SetCellValue(i, 3, buf);
-			bondGrid->SetReadOnly(i, 3, true);
-			bondGrid->SetCellAlignment(i, 3, wxALIGN_CENTRE, wxALIGN_CENTRE);
-			if (b->GetSelectState()) bondGrid->SelectRow(i, true);
+			bondGrid->SetCellValue((int)i, 3, buf);
+			bondGrid->SetReadOnly((int)i, 3, true);
+			bondGrid->SetCellAlignment((int)i, 3, wxALIGN_CENTRE, wxALIGN_CENTRE);
+			if (b->GetSelectState()) bondGrid->SelectRow((int)i, true);
 		}
 	}
 	UpdateControls();
@@ -353,12 +353,12 @@ void BondsDlg::OnAddClick( wxCommandEvent& event )
 		wxString buf;
 		bondGrid->AppendRows(1);
 		buf.Printf(wxT("%d"), 1);
-		bondGrid->SetCellValue(nbonds, 0, buf);
+		bondGrid->SetCellValue((int)nbonds, 0, buf);
 		buf.Printf(wxT("%d"), 2);
-		bondGrid->SetCellValue(nbonds, 1, buf);
+		bondGrid->SetCellValue((int)nbonds, 1, buf);
 		buf.Printf(wxT("%f"), lFrame->GetBondLength(nbonds));
-		bondGrid->SetCellValue(nbonds, 2, buf);
-		bondGrid->SetReadOnly(nbonds, 2, true);
+		bondGrid->SetCellValue((int)nbonds, 2, buf);
+		bondGrid->SetReadOnly((int)nbonds, 2, true);
 		switch (lFrame->GetBondOrder(nbonds)) {
 			case kHydrogenBond:
 				buf.Printf(wxT("%s"), _T("Hydrogen"));
@@ -379,13 +379,13 @@ void BondsDlg::OnAddClick( wxCommandEvent& event )
 				buf.Printf(wxT("%s"), _T("Unknown"));
 				wxLogMessage(_("BondsDlg::OnAddClick: unknown or mixed bond type for bond"));
 		}
-		bondGrid->SetCellValue(nbonds, 3, buf);
-		bondGrid->SetReadOnly(nbonds, 3, true);
-		bondGrid->SetCellAlignment(nbonds, 3, wxALIGN_CENTRE, wxALIGN_CENTRE);
+		bondGrid->SetCellValue((int)nbonds, 3, buf);
+		bondGrid->SetReadOnly((int)nbonds, 3, true);
+		bondGrid->SetCellAlignment((int)nbonds, 3, wxALIGN_CENTRE, wxALIGN_CENTRE);
 		lFrame->SetBondSelectState(nbonds, true);
-		bondGrid->SelectRow(nbonds, true);
-		bondGrid->SetGridCursor(nbonds, 0);
-		bondGrid->MakeCellVisible(nbonds, 0);
+		bondGrid->SelectRow((int)nbonds, true);
+		bondGrid->SetGridCursor((int)nbonds, 0);
+		bondGrid->MakeCellVisible((int)nbonds, 0);
 		bondGrid->ShowCellEditControl();
 	}
 	UpdateControls();
@@ -402,11 +402,11 @@ void BondsDlg::OnDeleteClick( wxCommandEvent& event )
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long nbonds = lFrame->GetNumBonds();
-	for (int i=(nbonds-1); i>=0; i--) {
+	for (long i=(nbonds-1); i>=0; i--) {
 		Bond * b = lFrame->GetBondLoc(i);
 		if (b->GetSelectState()) {
 			lFrame->DeleteBond(i);
-			bondGrid->DeleteRows(i, 1, true);
+			bondGrid->DeleteRows((int)i, 1, true);
 		}
 	}
 	bondGrid->ClearSelection();
@@ -584,7 +584,7 @@ void BondsDlg::UpdateSelection(bool mode)
   if (nbonds != bondGrid->GetNumberRows())
     {
       ResetList();
-      bondGrid->MakeCellVisible(nbonds-1, 0);
+      bondGrid->MakeCellVisible((int)(nbonds-1), 0);
     }
 
   if (mode)
@@ -592,7 +592,7 @@ void BondsDlg::UpdateSelection(bool mode)
 
   for (long i=0; i<nbonds; i++) 
     if (lFrame->GetBondSelectState(i))
-      bondGrid->SelectRow(i, true);
+      bondGrid->SelectRow((int)i, true);
 
   Layout();
 }
