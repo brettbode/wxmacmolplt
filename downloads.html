@@ -25,8 +25,8 @@ newer OS levels.
   <LI><a href="https://uofi.box.com/s/s9t91bhgpete0xydwsgmgfyqrjf8g1l7">
     32-bit binary for Windows (v 7.7) packaged as a Windows msi installer package (simply download and double click to install)</a> (Ignore the warning from box.com)
   <LI>If you can not run an installer on your system here is a 
-<a href="https://uofi.box.com/shared/static/r0jifp0tg0gjc5y51rl9i1dumq3q46nm.zip">plain zip archive</a>. If the wxMacMolPlt.exe file fails to launch with a message saying the configuration is invalid you need to install the VS8 runtime libraries. Just run the 
-<a href="https://bintray.com/artifact/download/brettbode/generic/vcredist_x86.exe">file linked here</a>.
+<a href="https://uofi.box.com/shared/static/r0jifp0tg0gjc5y51rl9i1dumq3q46nm.zip">plain zip archive</a>. If the wxMacMolPlt.exe file fails to launch with a message saying the configuration is invalid you need to install the
+<a href="https://www.microsoft.com/en-us/download/details.aspx?id=40784">VS8 runtime libraries</a> which are available as a free download from Microsoft.
 </UL>
 <H3>Windows 64 bit</H3>
 This 64 bit binary is built on Windows 8 with VS2013 on wx 3.0.2. 
@@ -54,6 +54,7 @@ Binaries are available for a variety of Linux distribution. Often a binary rpm c
 -->
   <LI><a href="https://uofi.box.com/shared/static/jraeges5db6ll1qb6bq4v0rd4319xlaq.rpm">CentOS 6.2 - x86_64 architecture</a>
 </UL>
+<!--
 <H3>Debian/Ubuntu Linux</H3>
 <b>Please note that the shutdown of the long time home of MacMolPlt means that the Debian repo is now on a new site!</b> Currently the packages are only available from our own repository. I believe that the following choices will work on the latest releases of Ubuntu and Debian. If you have an issue or need a build for an older release just make a request via the <a href="https://github.com/brettbode/wxmacmolplt/issues">issues tab</a>. To obtain them add the following line (pick the one appropriate for your OS version) to your /etc/apt/sources.list:
 <P>
@@ -83,17 +84,18 @@ like to build your own debian bianry package grab the source tarball, unpack it.
 
 Similarly you can use the wxMacMolPlt.rpm.spec file in the resources directory as input to rpmbuild to build a binary rpm package.
 <p>
-<!--For other architectures you can build a binary package and install with
+<!-For other architectures you can build a binary package and install with
 <UL>
 <LI>apt-get build-dep wxmacmolplt
 <LI>apt-get -b source wxmacmolplt
 <LI>dpkg -i wxmacmolpltx.x.x.deb
 </UL>
 Note this will download and build in the current directory. Once you have installed the .deb file you can remove everything from the current directory. If you are running an older Debian or Ubuntu system you will need to follow the building from source directions below.
--->
+->
 <p>Note: Many newer Debian/Ubuntu distros are requiring signed packages by
 default. Since I do not have a recognized key these are unsigned so you may need
 to add "--allow-unauthenticated" to your apt-get command.</P>
+-->
 <H2>Source Code</H2>
 If none of those work for you download the source code and follow the instructions below or in the INSTALL file contained in the source tar file. The prerequisites for building MacMolPlt from source are a working C++ compiler (g++ preferred) and a wxWidgets (version 2.6.3 or newer, but 2.8 or newer recommended) install including the development pieces. You can test for a working wxWidgets install using wx-config --version. If the response is 2.6.3 or greater you should be fine and you can go directly to building MacMolPlt below. If you have hardware supporting stereo display (quad-buffered OpenGL) you may wish to grab the latest wxWidgets 3.x release to enable stereo support in MacMolPlt. If your Linux distribution does not offer a prebuilt wxWidgets package, usually named something like wxGTK or libwxgtk version 2.6.3 or newer then you will have to first build and install wxWidgets. Follow these steps to build wxWidgets:
 <p>
