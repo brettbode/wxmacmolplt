@@ -16,7 +16,7 @@
 				8B2998F50E48FA7D00624A73 /* CopyFiles */,
 			);
 			dependencies = (
-				8B1E97741A5622AA00CE0CE5 /* PBXTargetDependency */,
+				8B3BFA7B2443CCE900CCFD92 /* PBXTargetDependency */,
 			);
 			name = "Dist directory";
 			productName = "Dist directory";
@@ -827,12 +827,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		8B1E97731A5622AA00CE0CE5 /* PBXContainerItemProxy */ = {
+		8B3BFA7A2443CCE900CCFD92 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 1652D9FF09D0AE7200B7783F /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8B29D61C12B934BD0049477F;
-			remoteInfo = "wxMacMolPlt-2.9 cocoa";
+			remoteGlobalIDString = 8B3EAF171C8A810000AD26F0;
+			remoteInfo = "wxMacMolPlt-3.1";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -942,7 +942,7 @@
 		1652DA4C09D0B12600B7783F /* myFiles.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = myFiles.h; path = src/myFiles.h; sourceTree = "<group>"; };
 		1652DA4D09D0B12600B7783F /* MyTypes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MyTypes.h; path = src/MyTypes.h; sourceTree = "<group>"; };
 		1652DA4E09D0B12600B7783F /* orbitals.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = orbitals.cpp; path = src/orbitals.cpp; sourceTree = "<group>"; };
-		1652DA4F09D0B12600B7783F /* Prefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Prefs.h; path = src/Prefs.h; sourceTree = "<group>"; };
+		1652DA4F09D0B12600B7783F /* Prefs.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Prefs.h; path = src/Prefs.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		1652DA5009D0B12600B7783F /* Progress.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Progress.cpp; path = src/Progress.cpp; sourceTree = "<group>"; };
 		1652DA5109D0B12600B7783F /* Progress.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Progress.h; path = src/Progress.h; sourceTree = "<group>"; };
 		1652DA5209D0B12600B7783F /* RysPolynomial.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = RysPolynomial.cpp; path = src/RysPolynomial.cpp; sourceTree = "<group>"; };
@@ -1807,7 +1807,8 @@
 				LastUpgradeCheck = 1140;
 				TargetAttributes = {
 					8B3EAF171C8A810000AD26F0 = {
-						DevelopmentTeam = L4WQC2EXSW;
+						DevelopmentTeam = F28F22W7P9;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -2679,10 +2680,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		8B1E97741A5622AA00CE0CE5 /* PBXTargetDependency */ = {
+		8B3BFA7B2443CCE900CCFD92 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 8B29D61C12B934BD0049477F /* wxMacMolPlt-3.0 cocoa */;
-			targetProxy = 8B1E97731A5622AA00CE0CE5 /* PBXContainerItemProxy */;
+			target = 8B3EAF171C8A810000AD26F0 /* wxMacMolPlt-3.1 */;
+			targetProxy = 8B3BFA7A2443CCE900CCFD92 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -3430,10 +3431,11 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = NO;
 				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = L4WQC2EXSW;
+				DEVELOPMENT_TEAM = F28F22W7P9;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_CW_ASM_SYNTAX = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -3470,9 +3472,10 @@
 				);
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				OBJROOT = "$(SYMROOT)";
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CODE_SIGN_FLAGS = "";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-I$(HOME)/software/wx/wx-3.1-debug/lib/wx/include/osx_cocoa-unicode-static-3.1/",
 					"-I$(HOME)/software/wx/wx-3.1-debug/include/wx-3.1",
@@ -3513,9 +3516,12 @@
 					OpenGL,
 					"-framework",
 					AGL,
+					"-framework",
+					QuartzCore,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = gov.ameslab.wxMacMolplt;
 				PRODUCT_NAME = wxMacMolPlt;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
@@ -3535,10 +3541,12 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
-				DEVELOPMENT_TEAM = L4WQC2EXSW;
+				DEVELOPMENT_TEAM = F28F22W7P9;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_CW_ASM_SYNTAX = NO;
 				GCC_ENABLE_PASCAL_STRINGS = NO;
@@ -3562,9 +3570,10 @@
 				);
 				INFOPLIST_FILE = resources/Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				OBJROOT = "$(SYMROOT)";
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CODE_SIGN_FLAGS = "--timestamp";
 				OTHER_CPLUSPLUSFLAGS = (
 					"-I$(HOME)/software/wx/wx-3.1-release/lib/wx/include/osx_cocoa-unicode-static-3.1/",
 					"-I$(HOME)/software/wx/wx-3.1-release/include/wx-3.1",
@@ -3604,9 +3613,12 @@
 					OpenGL,
 					"-framework",
 					AGL,
+					"-framework",
+					QuartzCore,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = gov.ameslab.wxMacMolplt;
 				PRODUCT_NAME = wxMacMolPlt;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 				VALID_ARCHS = x86_64;
