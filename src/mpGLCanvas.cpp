@@ -2665,14 +2665,14 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 	if (selected_type == MMP_ATOM) {
 		wxString aLabel, nItem;
 		Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType()-1, nItem);
-		aLabel.Printf(wxT(" (%d)"), (selected+1));
+		aLabel.Printf(wxT(" (%ld)"), (selected+1));
 		nItem.Append(aLabel);
 		item = menu.Append(wxID_ANY, nItem);
 		item->Enable(false);
 		
 		if (lFrame->Atoms[selected].IsEffectiveFragment()) {
 			wxString flabel(mMainData->FragmentNames[lFrame->Atoms[selected].GetFragmentNumber()-1].c_str(), wxConvUTF8);
-			aLabel.Printf(wxT("EFP (%d) "), lFrame->Atoms[selected].GetFragmentNumber(), (selected+1));
+			aLabel.Printf(wxT("EFP (%ld) "), lFrame->Atoms[selected].GetFragmentNumber(), (selected+1));
 			aLabel.Append(flabel);
 			item = menu.Append(wxID_ANY, aLabel);
 			item->Enable(false);
@@ -2715,11 +2715,11 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 				if (lFrame->GetBondLength(select_stack[0], select_stack[1], &length)) {
 					wxString lengthString, name;
 					Prefs->GetAtomLabel(lFrame->Atoms[select_stack[0]].GetType()-1, lengthString);
-					name.Printf(wxT(" (%d) to "), (select_stack[0]+1));
+					name.Printf(wxT(" (%ld) to "), (select_stack[0]+1));
 					lengthString.Append(name);
 					Prefs->GetAtomLabel(lFrame->Atoms[select_stack[1]].GetType()-1, name);
 					lengthString.Append(name);
-					name.Printf(wxT(" (%d)"), (select_stack[1]+1));
+					name.Printf(wxT(" (%ld)"), (select_stack[1]+1));
 					lengthString.Append(name);
 					item = menu.Append(wxID_ANY, lengthString);
 					item->Enable(false);
