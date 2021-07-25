@@ -409,7 +409,7 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 	edgePassWidth  = (canvasWidth  * numPassesX) - dcWidth;
 	edgePassHeight = (canvasHeight * numPassesY) - dcHeight;
 
-	pixels = (GLbyte *)malloc(canvasWidth * canvasHeight * 3 * sizeof(GLbyte));
+	pixels = (GLbyte *)new unsigned char[3 * canvasHeight * canvasWidth * sizeof(GLbyte)];
 
 	glReadBuffer(GL_BACK);
 
