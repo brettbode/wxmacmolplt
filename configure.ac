@@ -1,4 +1,4 @@
-AC_INIT(wxmacmolplt, 7.7, MMP.Guy@gmail.com)
+AC_INIT(wxmacmolplt, 7.7.1, MMP.Guy@gmail.com)
 AC_CONFIG_SRCDIR(src/main.cpp)
 AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE([1.9 foreign])
