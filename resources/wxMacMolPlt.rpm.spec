@@ -5,20 +5,22 @@
 #%define debug_package %{nil}
 #%define __check_files %{nil}
 Name: wxmacmolplt
-Version: 7.7
+Version: 7.7.1
 Release: 1%{?dist}
 Summary: A graphics program for plotting 3-D molecular structures and normal modes
 Group: Applications/Engineering
 License: GPLv2+
 URL: http://brettbode.github.io/wxmacmolplt/
 Prefix: %{prefix}
-#Source: wxmacmolplt-%{version}.tar.gz  
-Source: https://bintray.com/artifact/download/brettbode/generic/wxmacmolplt-%{version}.tar.gz
+Source: wxmacmolplt-%{version}.tar.gz  
+#Source: https://brettbode.github.io/wxmacmolplt/downloads.html
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 #BuildRoot: %{_tmppath}/wxmacmolplt-%{version}-root
 BuildRequires: desktop-file-utils
 BuildRequires: glew-devel
-BuildRequires: wxGTK-devel >= 2.6.3
+#Note wx 3 is preferred, but some versions of Fedora/RHEL7/CentOS7 lacked a wx-config symlink.
+#BuildRequires: wxGTK-devel >= 2.8.4
+BuildRequires: wxGTK3-devel >= 3.0.4
 #FC
 Requires: hicolor-icon-theme
 #Requires: wxGTK >= 2.6.3 wxGTK-gl >= 2.6.3
