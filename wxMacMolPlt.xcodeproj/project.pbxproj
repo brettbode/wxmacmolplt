@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -1263,9 +1263,6 @@
 			attributes = {
 				LastUpgradeCheck = 1250;
 				TargetAttributes = {
-					8B29D61C12B934BD0049477F = {
-						DevelopmentTeam = F28F22W7P9;
-					};
 					8B3EAF171C8A810000AD26F0 = {
 						DevelopmentTeam = F28F22W7P9;
 						ProvisioningStyle = Manual;
@@ -1273,7 +1270,7 @@
 				};
 			};
 			buildConfigurationList = 1652DA0009D0AE7200B7783F /* Build configuration list for PBXProject "wxMacMolPlt" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -1688,7 +1685,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "src/ming-src/";
-				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -1734,7 +1730,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "src/ming-src/";
-				VALID_ARCHS = "x86_64 i386";
 			};
 			name = Release;
 		};
@@ -1849,7 +1844,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = gov.ameslab.wxMacMolplt;
 				PRODUCT_NAME = wxMacMolPlt;
 				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1926,7 +1920,6 @@
 				PRODUCT_NAME = wxMacMolPlt;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
-				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2036,7 +2029,6 @@
 				PRODUCT_NAME = wxMacMolPlt;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
-				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2134,7 +2126,6 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
-				VALID_ARCHS = x86_64;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
