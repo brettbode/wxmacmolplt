@@ -256,15 +256,18 @@ void BufferFile::SetFilePos(wxFileOffset NewPos) {
 }
 // GetFileType will attempt to determine the type of text file we are dealing
 // with (ex: GAMESS log, GAMESS IRC ...) return Unknown when matching fails
-// the argument is really a pascal string
 TextFileType BufferFile::GetFileType(const char * fileName) {
 	wxFileOffset EntryPos = GetFilePos(), FileSize=ByteCount;
 	TextFileType	Type=kUnknown;
 
+	//Test for a non-ascii file (could be binary or unicode)
+	for (int i=0; i<BufferSize; i++) {
+		if ((Buffer[i] < 9)||(Buffer[i] > 126)) return kUnknown;
+	}
 	ByteCount = BufferSize;
 		//Check file extention first
 	if (fileName != NULL) {
-		int len = strlen(fileName);
+		size_t len = strlen(fileName);
 		if (len > 4) {
 			const char * temp = &(fileName[len-4]);
 			if (-1<FindKeyWord(temp, ".XYZ", 4)) Type = kXYZType;
@@ -375,8 +378,8 @@ bool BufferFile::LocateFinalEnergy(wxFileOffset Limit) {
 	while (LocateKeyWord("FINAL", 5, Limit)) {
 		wxFileOffset FINALPos = GetFilePos();
 		GetLine(LineText);
-		int LinePos = FindKeyWord(LineText, "ENERGY", 6);
-		if (LinePos > -1) {	//Found energy on the same line
+		long myLinePos = FindKeyWord(LineText, "ENERGY", 6);
+		if (myLinePos > -1) {	//Found energy on the same line
 			SetFilePos(FINALPos);
 			result = true;
 			break;
@@ -580,9 +583,8 @@ bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset 
  * returns the int of the string/int pair or -1 if none are found. The buffer is left
  * at the start of the found keyword or the starting position if none are found.
  */
-int BufferFile::LocateKeyWord(const std::vector<std::pair<std::string, int> > & keywords, int NumKeywords, wxFileOffset Limit) {
+int BufferFile::LocateKeyWord(const std::vector<std::pair<std::string, int> > & keywords, wxFileOffset Limit) {
 	int result=-1;
-	if (NumKeywords < 0) NumKeywords = keywords.size();
 	wxFileOffset OldPosition = GetFilePos();
 	char	LineText[kMaxLineLength + 1];
 	bool	KeyWordFound=false;

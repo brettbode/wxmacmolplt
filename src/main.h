@@ -110,7 +110,7 @@ class MpApp : public wxApp {
 		/**
 		 * Returns the open window count
 		 */
-		int WindowCount(void) const {return MolWinList.size();};
+		int WindowCount(void) const {return ((int) MolWinList.size());};
 
 
         void menuFileQuit(wxCommandEvent &event);
@@ -129,7 +129,7 @@ class MpApp : public wxApp {
 		/**
 		 * Event sent on Macs when double click a document
 		 *
-		 * @param the filename to open
+		 * @param fileName to open
 		 */
 		void MacOpenFile(const wxString & fileName);
 #endif

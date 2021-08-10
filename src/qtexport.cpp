@@ -258,7 +258,7 @@ int QTExport::GetKeyFrameRate(void) const {
 	long result = 0;
 	wxString val = mKeyFrameEdit->GetValue();
 	val.ToLong(&result);
-	return result;
+	return (int) result;
 }
 
 #ifdef __MAC_USE_QUICKTIME__
@@ -495,7 +495,7 @@ void MolDisplayWin::WriteQTMovie(wxString & filepath) {
 void MolDisplayWin::CreateFrameMovie(GWorldPtr lgWorld, Handle CompressedData,
 									 const qtData & myqtData, bool IncludeEPlot) {
 	OSErr	myErr;
-	long AnimateTime = Prefs->GetAnimateTime();
+	int AnimateTime = Prefs->GetAnimateTime();
 	if (AnimateTime <= 0) AnimateTime = 1;
 	long SavedFrameNum = MainData->GetCurrentFrame();
 	Rect	lDisplayRect = myqtData.DisplayRect;

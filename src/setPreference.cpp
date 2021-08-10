@@ -67,7 +67,7 @@ setPreference::setPreference( )
 
 setPreference::~setPreference( )
 {
-  //delete mPrefs;
+	delete mPrefs;
 }
 
 setPreference::setPreference( MolDisplayWin* parent, bool isGlobal, wxWindowID id, const wxString& caption, const wxPoint& pos, const wxSize& size, long style )
@@ -77,9 +77,12 @@ setPreference::setPreference( MolDisplayWin* parent, bool isGlobal, wxWindowID i
 	mParent = parent;
 
 	if (isGlobal)
-		mPrefs = gPreferences;
+		mParentPrefs = gPreferences;
 	else
-		mPrefs = parent->GetPrefs();
+		mParentPrefs = parent->GetPrefs();
+	
+	mPrefs = new WinPrefs();
+	*mPrefs = *mParentPrefs;
 
 	create(parent, id, caption, pos, size, style);
 }
@@ -190,6 +193,7 @@ void setPreference::UpdateWindowTitle(void) {
 
 void setPreference::OnCloseWindow( wxCloseEvent& event )
 {
+	(void)event;
 	if (mIsGlobal) {
 		MpApp & app = wxGetApp();
 		app.CloseGlobalPrefs();
@@ -202,6 +206,7 @@ void setPreference::OnCloseWindow( wxCloseEvent& event )
  */
 
 void setPreference::OnCancel( wxCommandEvent& event ) {
+	(void)event;
 	Close();
 }
 /*!
@@ -209,6 +214,7 @@ void setPreference::OnCancel( wxCommandEvent& event ) {
  */
 
 void setPreference::OnOK( wxCommandEvent& event ) {
+	(void)event;
 
 	saveCurrPrefs(currPanel);
 
@@ -249,6 +255,7 @@ void setPreference::userDefaults( wxCommandEvent& /* event */ ) {
 }
 
 void setPreference::OnApply( wxCommandEvent& event ) {
+	(void)event;
 	saveCurrPrefs(currPanel);
 
 	if (!mIsGlobal) {
@@ -364,11 +371,11 @@ void setPreference::RecreateBooks() {
 
 	m_choiceBook = new wxChoicebook(m_panel, ID_NOTEBOOK, wxDefaultPosition, wxSize(10,10), wxCHB_DEFAULT);
 
-	m_sizer->Add(m_choiceBook, 5, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 4);                    
+	m_sizer->Add(m_choiceBook, 5, wxALL | wxEXPAND, 4);                    
 
 	if (oldBook) {
 		int sel = oldBook->GetSelection();
-		int count = oldBook->GetPageCount();
+		size_t count = oldBook->GetPageCount();
 
 		for (int n = 0; n < count; n++) {
 			wxString str = oldBook->GetPageText(n);

@@ -94,6 +94,10 @@ void WinPrefs::ReadBondDefaults(void) {
 	RotateMode = gPrefDefaults->RotateMode;
 	VectorScale = gPrefDefaults->VectorScale;
 	AnimateMode = gPrefDefaults->AnimateMode;
+	ShowGradient = gPreferences->DisplayGradient();
+	FlipGradient = gPreferences->InvertGradient();
+	GradientScale = gPrefDefaults->GetGradientScale();
+	GradientColor = gPrefDefaults->GradientColor;
 }
 
 void WinPrefs::CopyBondPrefs(WinPrefs * Orig) {
@@ -104,6 +108,10 @@ void WinPrefs::CopyBondPrefs(WinPrefs * Orig) {
 	RotateMode = Orig->GetRotateMode();
 	VectorScale = Orig->GetVectorScale();
 	AnimateMode = Orig->GetAnimateMode();
+	ShowGradient = Orig->DisplayGradient();
+	FlipGradient = Orig->InvertGradient();
+	GradientScale = Orig->GetGradientScale();
+	memcpy(&GradientColor, Orig->GetGradientColorLoc(), sizeof(RGBColor));
 }
 
 void WinPrefs::CopyDisplayPrefs(WinPrefs * Orig) {
@@ -198,6 +206,7 @@ void WinPrefs::CopyQD3DPrefs(WinPrefs * Orig) {
 	BackColor = Orig->BackColor;
 	shader_mode = Orig->GetShaderMode();
 	AllowAutoRotation = Orig->AutoRotationEnabled();
+	Orig->GetAutoRotationVector(autoSpeedX, autoSpeedY, autoSpeedZ);
 }
 
 #ifdef __wxBuild__
@@ -216,7 +225,7 @@ void WinPrefs::GetAtomLabel(long AtomNum, wxString& text) const {
 
 void WinPrefs::SetAtomLabel(long AtomNum, const wxString& text) 
 {
-  int TextLength = text.Length();
+  size_t TextLength = text.Length();
   int pos=0;
 
   if (TextLength > 3) TextLength = 3;		//truncate labels longer than 3 char
@@ -307,6 +316,8 @@ WinPrefs::WinPrefs(void) {
 	
 	VectorColor.red = 65532;
 	VectorColor.blue = VectorColor.green = 0;
+	GradientColor.green = 65000;
+	GradientColor.red = GradientColor.blue = 0;
 	AnimateTime = 7;
 	DRCnFileSkip = 0;
 	BitOptions = 0;
@@ -316,6 +327,8 @@ WinPrefs::WinPrefs(void) {
 	AtomScale = 0.005;
 	AutoBondScale = 0.011;
 	MaxBondLength = 0.0;
+	GradientScale = 50.0;
+	ShowGradient = false;
 	AnnotationLabelSize = AtomLabelSize = 1.0;
 	BackColor.red = BackColor.green = BackColor.blue = 65532;
 	FitToPage = FrameOnPage = false;
@@ -626,7 +639,7 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 			case MMPPref_MolDisplayPrefs:
 			{
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AnimateTime), longVal))
-					SetAnimateTime(longVal);
+					SetAnimateTime((int) longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowToolbar), boolVal)) {
 					show_toolbar = boolVal;
 				}
@@ -636,13 +649,13 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotating), boolVal))
 					AutoRotating = boolVal;
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotationX), longVal))
-					autoSpeedX = longVal;
+					autoSpeedX = (int) longVal;
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotationY), longVal))
-					autoSpeedY = longVal;
+					autoSpeedY = (int) longVal;
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AutoRotationZ), longVal))
-					autoSpeedZ = longVal;
+					autoSpeedZ = (int) longVal;
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DAtomQuality), longVal))
-					SetQD3DAtomQuality(longVal);
+					SetQD3DAtomQuality((int) longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_BondWidth), floatVal))
 					SetQD3DBondWidth(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AtomScale), floatVal))
@@ -651,6 +664,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					SetGLFOV(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_VectorScale), floatVal))
 					SetVectorScale(floatVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_GradientScale), floatVal))
+					SetGradientScale(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DFillBrightness), floatVal))
 					SetQD3DFillBrightness(floatVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_3DPointBrightness), floatVal))
@@ -671,7 +686,7 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_RotateMode), boolVal))
 					SetRotateMode(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShaderMode), longVal))
-					SetShaderMode(longVal);
+					SetShaderMode((int) longVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_AnimateMode), boolVal))
 					SetAnimateMode(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowAngles), boolVal))
@@ -700,12 +715,16 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 					ShowSymmetryOperators(boolVal);
 				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_ShowAtomPatterns), boolVal))
 					Show2DPattern(boolVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_DisplayGradient), boolVal))
+					DisplayGradient(boolVal);
+				if (child->getAttributeValue(MMPPref_convert(MMPMolDisplay_InvertGradient), boolVal))
+					InvertGradient(boolVal);
 				XMLElementList * molChildren = child->getChildren();
 				for (int im=0; im<molChildren->length(); im++) {
 					XMLElement * molchild = molChildren->item(im);
-					MMPMolDisplayElments elName;
-					MMPPref_convert(molchild->getName(), elName);
-					switch (elName) {
+					MMPMolDisplayElments elName2;
+					MMPPref_convert(molchild->getName(), elName2);
+					switch (elName2) {
 						case MMPMolDisplay_BackColor:
 							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
 								BackColor.red = (unsigned short)(floatVal*65535.0);
@@ -724,9 +743,17 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_Pattern), longVal))
 								VectorPattern = longVal;
 							break;
+						case MMPMolDisplay_GradientColor:
+							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
+								GradientColor.red = (unsigned short)(floatVal*65535.0);
+							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorGreen), floatVal))
+								GradientColor.green = (unsigned short)(floatVal*65535.0);
+							if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), floatVal))
+								GradientColor.blue = (unsigned short)(floatVal*65535.0);
+							break;
 						case MMPMolDisplay_BondColor:
 							if (molchild->getAttributeValue(MMPPref_convert(MMPMolDisplay_BondOrder), longVal)) {
-								int bondOrder = longVal - 1;
+								int bondOrder = int (longVal - 1);
 								if ((bondOrder>=0)&&(bondOrder<kMaxBondTypes)) {
 									if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
 										BondColors[bondOrder].red = (unsigned short)(floatVal*65535.0);
@@ -739,6 +766,12 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 								}
 							}
 							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unhandled CML element in ReadMMPPrefs: %s"), child->getName());
+							wxLogMessage(msg);
+						}
 					}
 				}
 				delete molChildren;
@@ -828,10 +861,10 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				XMLElementList * eChildren = child->getChildren();
 				for (int im=0; im<eChildren->length(); im++) {
 					XMLElement * echild = eChildren->item(im);
-					MMPEnergyOptions elName;
-					MMPPref_convert(echild->getName(), elName);
+					MMPEnergyOptions elName2;
+					MMPPref_convert(echild->getName(), elName2);
 					RGBColor * clr;
-					switch (elName) {
+					switch (elName2) {
 						case MMPEnergyOpt_TEColor:
 							clr = EnergyPlotOptions.GetTEColor();
 							break;
@@ -844,6 +877,12 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 						case MMPEnergyOpt_PEColor:
 							clr = EnergyPlotOptions.GetPEColor();
 							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unknown CML element in ReadMMPPrefs: %s"), child->getName());
+							wxLogMessage(msg);
+						}
 					}
 					if (echild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
 						clr->red = (unsigned short)(floatVal*65535.0);
@@ -905,8 +944,8 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 				XMLElementList * molChildren = child->getChildren();
 				for (int im=0; im<molChildren->length(); im++) {
 					XMLElement * molchild = molChildren->item(im);
-					MMPSurfaceWinElements elName;
-					MMPPref_convert(molchild->getName(), elName);
+					MMPSurfaceWinElements elName2;
+					MMPPref_convert(molchild->getName(), elName2);
 					RGBColor temp;
 					if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorRed), floatVal))
 						temp.red = (unsigned short)(floatVal*65535.0);
@@ -914,13 +953,19 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 						temp.green = (unsigned short)(floatVal*65535.0);
 					if (molchild->getAttributeValue(MMPPref_convert(MMPPref_ColorBlue), floatVal))
 						temp.blue = (unsigned short)(floatVal*65535.0);
-					switch (elName) {
+					switch (elName2) {
 						case MMPSurfWin_PosColor:
 							SurfaceOpts.SetPosColor(&temp);
 							break;
 						case MMPSurfWin_NegColor:
 							SurfaceOpts.SetNegColor(&temp);
 							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unknown CML element in ReadMMPPrefs: %s"), child->getName());
+							wxLogMessage(msg);
+						}
 					}
 				}
 				delete molChildren;
@@ -929,6 +974,12 @@ long WinPrefs::ReadMMPPrefs(XMLElement * root) {
 			case MMPPref_WindowDefaults:
 				gWindowDefault.ReadXML(child);
 				break;
+			default:
+			{
+				wxString msg;
+				msg.Printf(_T("Unknown CML element in ReadMMPPrefs: %s"), child->getName());
+				wxLogMessage(msg);
+			}
 		}
 	}
 	delete children;
@@ -1047,6 +1098,9 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	outbuf << GetVectorScale();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_VectorScale), outbuf.str().c_str());
 	outbuf.str("");
+	outbuf << GetGradientScale();
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_GradientScale), outbuf.str().c_str());
+	outbuf.str("");
 	outbuf << GetQD3DFillBrightness();
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_3DFillBrightness), outbuf.str().c_str());
 	outbuf.str("");
@@ -1084,6 +1138,8 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowAtomNumbers), (ShowAtomNumberLabels()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowSymmetryOps), (ShowSymmetryOperators()?trueXML:falseXML));
 	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_ShowAtomPatterns), (Show2DPattern()?trueXML:falseXML));
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_DisplayGradient), (DisplayGradient()?trueXML:falseXML));
+	molElement->addAttribute(MMPPref_convert(MMPMolDisplay_InvertGradient), (InvertGradient()?trueXML:falseXML));
 	
 	XMLElement * color = molElement->addChildElement(MMPPref_convert(MMPMolDisplay_BackColor));
 	outbuf.str("");
@@ -1109,7 +1165,18 @@ long WinPrefs::WriteMMPPrefs(XMLElement * root) const {
 	outbuf.str("");
 	outbuf << VectorPattern;
 	color->addAttribute(MMPPref_convert(MMPPref_Pattern), outbuf.str().c_str());
-	
+
+	color = molElement->addChildElement(MMPPref_convert(MMPMolDisplay_GradientColor));
+	outbuf.str("");
+	outbuf << (GradientColor.red/65535.0);
+	color->addAttribute(MMPPref_convert(MMPPref_ColorRed), outbuf.str().c_str());
+	outbuf.str("");
+	outbuf << (GradientColor.green/65535.0);
+	color->addAttribute(MMPPref_convert(MMPPref_ColorGreen), outbuf.str().c_str());
+	outbuf.str("");
+	outbuf << (GradientColor.blue/65535.0);
+	color->addAttribute(MMPPref_convert(MMPPref_ColorBlue), outbuf.str().c_str());
+
 	for (int i=0; i<kMaxBondTypes; i++) {
 		color = molElement->addChildElement(MMPPref_convert(MMPMolDisplay_BondColor));
 		outbuf.str("");
@@ -1445,6 +1512,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "BackgroundColor";
         case MMPMolDisplay_VectorColor:
             return "VectorColor";
+		case MMPMolDisplay_GradientColor:
+			return "GradientColor";
         case MMPMolDisplay_BondColor:
             return "BondColor";
         case MMPMolDisplay_BondOrder:
@@ -1463,6 +1532,8 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
             return "FieldOfView";
         case MMPMolDisplay_VectorScale:
             return "VectorScale";
+		case MMPMolDisplay_GradientScale:
+			return "GradientScaleFactor";
         case MMPMolDisplay_3DFillBrightness:
             return "FillBrightness3D";
         case MMPMolDisplay_3DPointBrightness:
@@ -1523,6 +1594,10 @@ const char * MMPPref_convert(MMPMolDisplayElments t)
 			return "AutoRotationSpeedY";
 		case MMPMolDisplay_AutoRotationZ:
 			return "AutoRotationSpeedZ";
+		case MMPMolDisplay_DisplayGradient:
+			return "DisplayGradient";
+		case MMPMolDisplay_InvertGradient:
+			return "InvertGradient";
 		default:
             return "invalid";
     }

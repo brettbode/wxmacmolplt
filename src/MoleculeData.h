@@ -37,7 +37,7 @@ class MoleculeData {
 		friend class DataGroup;
 	private:
 		std::vector<Annotation *> Annotations;	///< Set of annotations
-		int constrain_anno_id;
+		long constrain_anno_id;
 		CPoint3D	*RotCoords;				///< The currently displayed, rotated coordinates in 2D mode
 		Frame *		cFrame;					///< pointer to the currently drawn frame
 		Frame *		Frames;					///< pointer to the first frame
@@ -129,7 +129,7 @@ class MoleculeData {
 		bool ParseFMOIds(BufferFile * Buffer, const long & NumAtoms, const wxFileOffset & EndOfGroup);
 		/**
 		 * Write the FMO array to XML
-		 * @param parent
+		 * @param parent The enclosing XML element
 		 */
 		void WriteFMOIdsToXML(XMLElement * parent);
 		/**
@@ -259,7 +259,16 @@ class MoleculeData {
 		long GetNumElectrons(void) const;
 		short GetMultiplicity(void) const;
 		inline long GetMaximumAtomCount(void) const {return MaxAtoms;};
+		/** Output a GAMESS input file after prompting the user for the name of the output file.
+		 * @param owner The main document window
+		 */
 		void WriteInputFile(MolDisplayWin * owner);
+		/** Output a GAMESS input file to a temporary file and open a window to allowing editing of that file.
+		 * The user can then save to a file name of their choice or discard.
+		 * The data in this window is independent of the originating document when this call returns.
+		 * @param owner The main document window
+		 */
+		void WriteEditInputFile(MolDisplayWin * owner);
 		InputData * GetInputData(void);
 		InputData * SetInputData(InputData * NewData);
 		/**
@@ -269,7 +278,7 @@ class MoleculeData {
 		 * @param updateGlobal Update the global arrays and structures (needed at some point)
 		 * @param index Insert the atom in the atom list at the specified index (-1 for the end)
 		 */
-		void NewAtom(long AtomType, const CPoint3D & Position, bool updateGlobal=true, long index=-1);
+		void NewAtom(int AtomType, const CPoint3D & Position, bool updateGlobal=true, long index=-1);
 		/**
 		 * Add a new atom as a copy of atom
 		 * @param atom The atom to copy
@@ -319,12 +328,12 @@ class MoleculeData {
 		void PruneUnusedFragments();
 		void GetRotationMatrix(Matrix4D copy);
 		const Matrix4D& GetRotationMatrix() const;
-		int GetAnnotationCount(void) const {return Annotations.size();};
+		int GetAnnotationCount(void) const {return (int) Annotations.size();};
 		void DeleteAllAnnotations(void);
-		void ConstrainToAnnotation(int anno_id) {
+		void ConstrainToAnnotation(long anno_id) {
 			constrain_anno_id = anno_id;
 		}
-		int GetConstrainAnnotation(void) {
+		long GetConstrainAnnotation(void) {
 			return constrain_anno_id;
 		}
 		void RemoveAnnotationConstraint(void) { constrain_anno_id = -1; }
@@ -334,7 +343,7 @@ class MoleculeData {
 		 @param NumMolecules The number of non-bonded molecules to group together in the same FMO fragment
 		 @param newFragmentation The resulting fragmentation vector
 		 */
-		long CreateFMOFragmentation(const int & NumMolecules, std::vector<long> & newFragmentation);
+		long CreateFMOFragmentation(const long & NumMolecules, std::vector<long> & newFragmentation);
 		/**
 		 Returns the FMO fragment number for the selected atom
 		 @param AtomId the index of the desired atom
@@ -347,6 +356,8 @@ class MoleculeData {
 		 @param FragmentId the new fragment id for the targeted atom
 		 */
 		void SetFMOFragmentId(const long & AtomId, const long & FragmentId);
+		/// Test to see if the gradient vector is available which would allow displaying that vector
+		bool GradientVectorAvailable(void) const;
 };
 
 #endif

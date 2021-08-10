@@ -599,7 +599,7 @@ class EffectiveFragmentsGroup {
 		void PositionIsDefault(bool v) {flags = (flags & 0xF7) + (v ? 8 : 0);};
 		bool SetPositionType(const char * v);
 		EFRAG_PositionTypes PositionMethod(void) const {return (EFRAG_PositionTypes)(((flags & 48)>>4)+1);};
-		void PositionMethod(EFRAG_PositionTypes v) {flags = (flags & 0xCF) + ((v-1)<<4);PositionIsDefault(false);};
+		void PositionMethod(EFRAG_PositionTypes v) {flags = (flags & 0xCF) + (((char)v-1)<<4);PositionIsDefault(false);};
 		long GetMaxMOs(void) const {return MaxMOs;};
 		void SetMaxMOs(long v) {MaxMOs = v;};
 		long GetNumBufferMOs(void) const {return NumBufferMOs;};
@@ -669,6 +669,7 @@ class SCFGroup {
 		long	GVBNumOpenShells;	///< GVB NSETO - Number of open shells
 		long	GVBNumPairs;		///< GVP NPAIR - Number of overlapping orbital pairs
 		std::vector<long> GVBOpenShellDeg;	///< GVB NO - Array of shell degeneracies (NSETO shells)
+		std::vector<long> NPREOVector;	///< NPREO orbital/energy printout options
 		short	ConvCriteria;		//Convergance cutoff 10^(-n)
 		short	MaxDIISEq;			//Max size of the DIIS linear equations
 		short	MVOCharge;			//Modified Virtual Orbital Charge
@@ -719,6 +720,10 @@ class SCFGroup {
 		void SetGVBNODegValue(int index, long value);
 		void AddGVBOpenShellDeg(const long & d) {GVBOpenShellDeg.push_back(d);};
 		long GetGVBOpenShellDeg(const long & d) {return ((d<GVBOpenShellDeg.size())?GVBOpenShellDeg[d]:0);};
+			/// ClearNPREOArry zeros out the array
+		void ClearNPREOArray(void) {NPREOVector.clear();};
+			/// Add a value to the end of the NPREO array
+		void AddNPREOValue(const long & d) {NPREOVector.push_back(d);};
 		SCFGroup(void);
 		SCFGroup(SCFGroup *Copy);
 		void InitData(void);
@@ -1122,8 +1127,20 @@ class InputData {
 		InputData(void);
 		InputData(InputData *Copy);
 		~InputData(void);
-		//! Write out an input file for another program (GAMESS etc)
+		/** Output a GAMESS input file after prompting the user for the name of the output file.
+		 * The return value is negative for a user cancel, 0 for failure, positive for success.
+		 * @param lData The main molecule data record
+		 * @param owner The main document window
+		 */
 		long WriteInputFile(MoleculeData * lData, MolDisplayWin * owner);
+		/** Output a GAMESS input file to a temporary file and open a window to allowing editing of that file.
+		 * The user can then save to a file name of their choice or discard.
+		 * The data in this window is independent of the originating document when this call returns.
+		 * The return value is negative for a user cancel, 0 for failure, positive for success.
+		 * @param lData The main molecule data record
+		 * @param owner The main document window
+		 */
+		long WriteEditInputFile(MoleculeData * lData, MolDisplayWin * owner);
 
 		//! Write out an input file for another program (GAMESS etc)
 		long WriteInputFile(const wxString &filePath, MoleculeData * lData, MolDisplayWin * owner);

@@ -273,7 +273,7 @@ int MpApp::OnExit() {
 		glfClose();
 		glf_initialized = 0;
 	}
-	
+
     return 0;
 }
 
@@ -314,8 +314,10 @@ void MpApp::AdjustAllMenus(void) {
 }
 
 void MpApp::CloseGlobalPrefs(void) {
-	gPrefDlg->Destroy();
-	gPrefDlg = NULL;
+	if (gPrefDlg) {
+		gPrefDlg->Destroy();
+		gPrefDlg = NULL;
+	}
 }
 
 void MpApp::destroyMainFrame(MolDisplayWin *frame) {
@@ -328,7 +330,7 @@ void MpApp::destroyMainFrame(MolDisplayWin *frame) {
 #endif
 }
 
-void MpApp::menuFileQuit(wxCommandEvent &event) {
+void MpApp::menuFileQuit(wxCommandEvent &/*event*/) {
 	//Need to loop over open files, prompting to save if needed
 	//then exit
 	std::list<MolDisplayWin *>::iterator win = MolWinList.begin();
@@ -342,9 +344,17 @@ void MpApp::menuFileQuit(wxCommandEvent &event) {
 			return;
 		}
 	}
-	
-	//This looks like it has the desired effect, but not sure if it is the "correct" way to exit
-	ExitMainLoop();
+		//Closeout all global scope windows here!
+		//Global preferences window
+	CloseGlobalPrefs();
+		//Build tools pallette
+	if (BuilderTool) BuilderTool->ClosePalette();
+#ifdef __WXMAC__
+	//Close the Mac menu bar holder and clear for exit.
+	if (menuHolder)
+		menuHolder->Close();
+	SetExitOnFrameDelete(true);
+#endif
 }
 
 void MpApp::menuHelpAbout(wxCommandEvent & WXUNUSED(event)) {
@@ -384,11 +394,11 @@ void MpApp::menuPreferences(wxCommandEvent & WXUNUSED(event)) {
         gPrefDlg->Show();
     }
 }
-void MpApp::menuFileNew(wxCommandEvent &event) {
+void MpApp::menuFileNew(wxCommandEvent &/*event*/) {
     createMainFrame();
 }
 
-void MpApp::menuFileOpen(wxCommandEvent &event) {
+void MpApp::menuFileOpen(wxCommandEvent &/*event*/) {
 	//First need to use an open file dialog
 	wxString filename = wxFileSelector(wxT("Choose a file to open"));
 	//If the user chooses a file, create a window and have it process it.

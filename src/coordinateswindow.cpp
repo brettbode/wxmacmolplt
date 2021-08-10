@@ -362,11 +362,11 @@ void CoordinatesWindow::FrameChanged(void) {
 	coordGrid->BeginBatch();
 	//clear off any extra rows
 	if (coordGrid->GetNumberRows() > natoms)
-		coordGrid->DeleteRows(0, coordGrid->GetNumberRows()-natoms, true);
+		coordGrid->DeleteRows(0, (int)(coordGrid->GetNumberRows()-natoms), true);
 	coordGrid->HideCellEditControl();
 	if (natoms > 0) {
 		if (coordGrid->GetNumberRows() < natoms)
-			coordGrid->InsertRows(0, natoms - coordGrid->GetNumberRows(), true);
+			coordGrid->InsertRows(0, (int)(natoms - coordGrid->GetNumberRows()), true);
 		coordGrid->ClearSelection();
 		wxString buf;
 		Internals * internals = NULL;
@@ -381,54 +381,54 @@ void CoordinatesWindow::FrameChanged(void) {
 		}
 		for (long i=0; i<natoms; i++) {
 			buf.Printf(wxT("%ld"), (i+1));
-			coordGrid->SetRowLabelValue(i, buf);
+			coordGrid->SetRowLabelValue((int)i, buf);
 			Prefs->GetAtomLabel(lFrame->GetAtomType(i)-1, buf);
-			coordGrid->SetCellValue(i, 0, buf);
-			if (lFrame->GetAtomSelection(i)) coordGrid->SelectRow(i, true);
+			coordGrid->SetCellValue((int)i, 0, buf);
+			if (lFrame->GetAtomSelection(i)) coordGrid->SelectRow((int)i, true);
 			if (CoordType == 0) {
 				CPoint3D pos;
-				lFrame->GetAtomPosition(i, pos);
+				lFrame->GetAtomPosition((int)i, pos);
 				buf.Printf(wxT("%f"), pos.x);
-				coordGrid->SetCellValue(i, 1, buf);
+				coordGrid->SetCellValue((int)i, 1, buf);
 				buf.Printf(wxT("%f"), pos.y);
-				coordGrid->SetCellValue(i, 2, buf);
+				coordGrid->SetCellValue((int)i, 2, buf);
 				buf.Printf(wxT("%f"), pos.z);
-				coordGrid->SetCellValue(i, 3, buf);
+				coordGrid->SetCellValue((int)i, 3, buf);
 			} else {
 				if (mInts) {
 					if (i>0) {
 						buf.Printf(wxT("%ld"), mInts->GetConnection(i,0)+1);
-						coordGrid->SetCellValue(i, 1, buf);
+						coordGrid->SetCellValue((int)i, 1, buf);
 		// These SetReadOnly to false calls seem to be both unnecessary and very costly
 		//				coordGrid->SetReadOnly(i, 1, false);
 						buf.Printf(wxT("%f"), mInts->GetValue(i,0));
-						coordGrid->SetCellValue(i, 2, buf);
+						coordGrid->SetCellValue((int)i, 2, buf);
 		//				coordGrid->SetReadOnly(i, 2, false);
 						if (i>1) {
 							buf.Printf(wxT("%ld"), mInts->GetConnection(i,1)+1);
-							coordGrid->SetCellValue(i, 3, buf);
+							coordGrid->SetCellValue((int)i, 3, buf);
 		//					coordGrid->SetReadOnly(i, 3, false);
 							buf.Printf(wxT("%.2f"), mInts->GetValue(i,1));
-							coordGrid->SetCellValue(i, 4, buf);
+							coordGrid->SetCellValue((int)i, 4, buf);
 		//					coordGrid->SetReadOnly(i, 4, false);
 							if (i>2) {
 								buf.Printf(wxT("%ld"), mInts->GetConnection(i,2)+1);
-								coordGrid->SetCellValue(i, 5, buf);
+								coordGrid->SetCellValue((int)i, 5, buf);
 		//						coordGrid->SetReadOnly(i, 5, false);
 								buf.Printf(wxT("%.2f"), mInts->GetValue(i,2));
-								coordGrid->SetCellValue(i, 6, buf);
+								coordGrid->SetCellValue((int)i, 6, buf);
 		//						coordGrid->SetReadOnly(i, 6, false);
 							} else {
 								for (int j=5; j<7; j++)
-									coordGrid->SetReadOnly(i, j, true);
+									coordGrid->SetReadOnly((int)i, j, true);
 							}
 						} else {
 							for (int j=3; j<7; j++)
-								coordGrid->SetReadOnly(i, j, true);
+								coordGrid->SetReadOnly((int)i, j, true);
 						}
 					} else {
 						for (int j=1; j<7; j++)
-							coordGrid->SetReadOnly(i, j, true);
+							coordGrid->SetReadOnly((int)i, j, true);
 					}
 				}
 			}
@@ -476,13 +476,13 @@ void CoordinatesWindow::UpdateSelection(bool mode) {
 	needClearAll = mode;
 
 	std::vector<int> selected_ids;
-	int visibleRow = 0;
+	long visibleRow = 0;
 
 	for (long i=0; i<natoms; i++) 
-	if (lFrame->GetAtomSelection(i)) {
-		selected_ids.push_back(i);
-		visibleRow = i;
-	}
+		if (lFrame->GetAtomSelection(i)) {
+			selected_ids.push_back((int)i);
+			visibleRow = i;
+		}
 	//remember the selected atom before clearing selections
 
 	if (natoms != coordGrid->GetNumberRows()) {
@@ -497,7 +497,7 @@ void CoordinatesWindow::UpdateSelection(bool mode) {
 		coordGrid->SelectRow(selected_ids[i], true);
 
 	Layout();
-	coordGrid->MakeCellVisible(visibleRow, 0);
+	coordGrid->MakeCellVisible((int)visibleRow, 0);
 
 	needClearAll = true;
 }
@@ -533,19 +533,20 @@ wxIcon CoordinatesWindow::GetIconResource( const wxString& name )
 
 void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
-	for (int i=0; i<natoms; i++) lFrame->SetAtomSelection(i, false);
+	for (long i=0; i<natoms; i++) lFrame->SetAtomSelection(i, false);
 	CPoint3D p = CPoint3D(0.0f, 0.0f, 0.0);
 	MainData->NewAtom(1, p);
 	lFrame->SetAtomSelection(natoms, true);
 	Parent->FrameChanged();
 	FrameChanged();
-	coordGrid->SelectRow(natoms, true);
-	coordGrid->SetGridCursor(natoms, 0);
-	coordGrid->MakeCellVisible(natoms, 0);
+	coordGrid->SelectRow((int)natoms, true);
+	coordGrid->SetGridCursor((int)natoms, 0);
+	coordGrid->MakeCellVisible((int)natoms, 0);
 }
 
 /*!
@@ -554,13 +555,14 @@ void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
-	for (int i=(natoms-1); i>=0; i--) {
+	for (long i=(natoms-1); i>=0; i--) {
 		if (lFrame->GetAtomSelection(i)) {
-			int j = MainData->DeleteAtom(i);
+			long j = MainData->DeleteAtom(i);
 			//restart the scan if more than 1 atom is removed.
 			if ((j==0)&&(i!=0)) i = natoms-1;
 		}
@@ -576,6 +578,7 @@ void CoordinatesWindow::OnDeleteClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnBondbuttonClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
@@ -590,6 +593,7 @@ void CoordinatesWindow::OnBondbuttonClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnStickbuttonClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	MainData->StickCoordinates();
@@ -603,6 +607,7 @@ void CoordinatesWindow::OnStickbuttonClick( wxCommandEvent& event )
 
 void CoordinatesWindow::OnCoordchoice1Selected( wxCommandEvent& event )
 {
+	(void)event;
 	int temp = coordTypeChoice->GetSelection();
 	if (temp != CoordType) {
 		CoordType = temp;
@@ -886,6 +891,7 @@ void CoordinatesWindow::OnSize( wxSizeEvent& event )
 
 void CoordinatesWindow::OnCloseWindow( wxCloseEvent& event )
 {
+	(void)event;
 	Parent->CloseCoordsWindow();
 }
 /*!
@@ -904,6 +910,7 @@ void CoordinatesWindow::OnCopyUpdate( wxUpdateUIEvent& event )
 
 void CoordinatesWindow::OnCloseClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CloseCoordsWindow();
 }
 
@@ -950,6 +957,7 @@ bool CoordinatesWindow::ProcessEvent(wxEvent& event)
 
 void CoordinatesWindow::OnMmpCopycoordsitemClick( wxCommandEvent& event )
 {
+	(void)event;
 	Parent->CopyCoordinates(CoordType);
 }
 
@@ -987,6 +995,7 @@ void CoordinatesWindow::OnClearUpdate( wxUpdateUIEvent& event )
 
 void CoordinatesWindow::OnSelectallClick( wxCommandEvent& event )
 {
+	(void)event;
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
 	long natoms = lFrame->GetNumAtoms();
@@ -1067,6 +1076,7 @@ void CoordinatesWindow::OnActivate(wxActivateEvent & event) {
 
 void CoordinatesWindow::OnReordercoorditemClick( wxCommandEvent& event )
 {
+	(void)event;
 	ChangeAtomOrderDialog * dlg = new ChangeAtomOrderDialog(Parent);
 	dlg->ShowModal();
 	dlg->Destroy();

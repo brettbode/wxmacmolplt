@@ -98,6 +98,11 @@ SWFBitmap newSWFBitmap_fromRawImg(unsigned char *raw,
                                   SWFRawImgFmt srcFmt, SWFBitmapFmt dstFmt,
                                   unsigned short width, unsigned short height)
 {
+	(void) raw;
+	(void) dstFmt;
+	(void) srcFmt;
+	(void) width;
+	(void) height;
 #if USE_ZLIB
 	struct dbl_data image;
 	uLongf insize, outsize;

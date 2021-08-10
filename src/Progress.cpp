@@ -22,7 +22,7 @@ Progress::~Progress(void) {
 
 bool Progress::UpdateProgress(float Percent) {
 	bool result = true;
-	long PercentDone = BaseValue + (long)(Percent * ScaleFactor);
+	int PercentDone = (int) (BaseValue + (long)(Percent * ScaleFactor));
 	long ctime = timer.Time();
 	if (progDlg) {
 		//This check is probably not really needed, but it keeps us from calling

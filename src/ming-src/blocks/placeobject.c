@@ -398,6 +398,7 @@ SWFPlaceObject2Block_addAction(SWFPlaceObject2Block block,
 void 
 SWFPlaceObject2Block_setCacheFlag(SWFPlaceObject2Block block, int flag)
 {
+	(void) flag;
 	setPlaceObjectVersion(block, 3);
 	block->hasCacheFlag = 1;
 }

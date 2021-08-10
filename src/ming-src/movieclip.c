@@ -215,6 +215,7 @@ SWFMovieClip_add(SWFMovieClip clip, SWFBlock block)
 void
 SWFMovieClip_remove(SWFMovieClip clip, SWFDisplayItem item)
 {
+	(void) clip;
 	SWFDisplayItem_remove(item);
 }
 

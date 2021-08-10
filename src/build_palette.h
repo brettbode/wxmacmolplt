@@ -43,14 +43,14 @@ class Structure {
 
 	public:
 		mpAtom *atoms;
-		int natoms;
+		long natoms;
 		Bond *bonds;
-		int nbonds;
+		long nbonds;
 		std::string FragName;
 		std::string frag_def;
 		wxString name;
-		int atom_to_prune;
-		int link_atom;
+		long atom_to_prune;
+		long link_atom;
 		int link_site;
 
 		Structure();
@@ -58,7 +58,7 @@ class Structure {
 
 		void WriteXML(XMLElement *parent) const;
 		bool ReadXML(XMLElement *struc_el);
-		void SetPruneAtom(int atom_id);
+		void SetPruneAtom(long atom_id);
 
 	private:
 };

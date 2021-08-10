@@ -36,8 +36,8 @@
 
 extern WinPrefs *gPreferences;
 
-Frame::Frame(MolDisplayWin *MolWin) {
-	this->MolWin = MolWin;
+Frame::Frame(MolDisplayWin * myMolWin) {
+	MolWin = myMolWin;
 	Energy = 0.0;
 	time = 0.0;
 	IRCPt = 0;
@@ -129,7 +129,7 @@ Frame * Frame::GetNextFrame(void) { return NextFrame; }
 
 Frame * Frame::GetPreviousFrame(void) { return PreviousFrame; }
 
-mpAtom *Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition,
+mpAtom *Frame::AddAtom(int AtomType, const CPoint3D & AtomPosition,
 					   long index) {
 
 	/* AtomType is the atom's atomic number, starting with hydrogen at 1. It is used to index the
@@ -143,12 +143,12 @@ mpAtom *Frame::AddAtom(long AtomType, const CPoint3D & AtomPosition,
 		if ((index<=-1)||(index>=NumAtoms)) {//Add to the end of the list
 			index = NumAtoms;
 		} else {	//insert the atom into the middle of the list
-			for (int i=NumAtoms; i>index; i--) {
+			for (long i=NumAtoms; i>index; i--) {
 				Atoms[i] = Atoms[i-1];
 			}
 
 			// Adjust bonds that connect higher-numbered atoms.
-			for (int i = 0; i < NumBonds; ++i) {
+			for (long i = 0; i < NumBonds; ++i) {
 				if (Bonds[i].Atom1 >= index) Bonds[i].Atom1++;
 				if (Bonds[i].Atom2 >= index) Bonds[i].Atom2++;
 			}
@@ -189,7 +189,7 @@ mpAtom * Frame::AddAtom(const mpAtom& atm, long index, const CPoint3D *pos) {
 		if ((index<=-1)||(index>=NumAtoms)) {//Add to the end of the list
 			index = NumAtoms;
 		} else {	//insert the atom into the middle of the list
-			for (int i=NumAtoms; i>index; i--) {
+			for (long i=NumAtoms; i>index; i--) {
 				Atoms[i] = Atoms[i-1];
 			}
 
@@ -238,15 +238,23 @@ bool Frame::IncreaseAtomAllocation(long NumAdditional) {
 }
 void Frame::ReadGradient(BufferFile * Buffer, wxFileOffset SearchLength) {
 	wxFileOffset SavedPos = Buffer->GetFilePos(), npos;
-	bool	Style=true;
+	bool	found=false;
+	int		Style = 1;
 
-	if (Buffer->LocateKeyWord(" NSERCH", 7, SearchLength)) {	//Search for gradient data at the end 
-		Gradient = new GradientData;			//of a frame of data
+	if (Buffer->LocateKeyWord(" NSERCH", 7, SearchLength)) {	//Search for gradient data at the end of an optimization point
+		found = true;
+	} else if (Buffer->LocateKeyWord("UNITS ARE HARTREE/BOHR    E'X", 29, SearchLength)) {
+		Buffer->BackupnLines(6);
+		Style = 2;
+		found = true;
+	}
+	if (found) {
+		Gradient = new GradientData;
 		if (Gradient) {
 			npos = Buffer->GetFilePos();
 			if (Buffer->LocateKeyWord("COORDINATES (BOHR)                         GRADIENT (HARTREE/BOHR)",
 					60, SearchLength)) {
-				Style=false;
+				Style=0;
 				Buffer->SetFilePos(npos);
 			}
 			if (!Gradient->ParseGAMESSGradient(Buffer, NumAtoms, SearchLength, Style)) {
@@ -258,6 +266,18 @@ void Frame::ReadGradient(BufferFile * Buffer, wxFileOffset SearchLength) {
 
 	Buffer->SetFilePos(SavedPos);	//reset position so other code isn't broken
 }
+bool Frame::GradientVectorAvailable(void) const {
+	bool result = false;
+	if (Gradient) {
+		result = Gradient->GradientVectorAvailable(NumAtoms);
+	}
+	return result;
+}
+bool Frame::RetrieveAtomGradient(long theAtom, CPoint3D & gradVector) const {
+	if (Gradient) return Gradient->RetrieveAtomGradient(theAtom, gradVector);
+	return false;
+}
+
 float Frame::GetRMSGradient(void) const {
 	float result=-1.0f;
 	if (Gradient) {
@@ -567,7 +587,7 @@ bool Frame::GetAtomSelection(long atom_id) const {
 		Atoms[atom_id].GetSelectState();
 }
 
-int Frame::GetNumAtomsSelected(void) const {
+long Frame::GetNumAtomsSelected(void) const {
 	return natoms_selected;
 }
 
@@ -638,7 +658,7 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, Progress * ProgressInd,
 	float MaxBondLength = Prefs->GetMaxBondLength();
 	MaxBondLength *= MaxBondLength;
 	BondOrder lOrder;
-	long iType, jType;
+	int iType, jType;
 	float workTotal = 100.0f/NumAtoms;
 	if (AutoBond && Prefs->AllowHydrogenBonds()) workTotal /= 3.0f;
 	for (iatm=0; iatm<NumAtoms; iatm++) {
@@ -766,10 +786,10 @@ void Frame::SetBonds(WinPrefs *Prefs, bool KeepOldBonds, Progress * ProgressInd,
 						//atoms which are bonded to the same atom
 						for (long i=0; i<NumAtoms; i++) {
 							long ib = -1;
-							std::vector<long>::const_iterator it_i;
-							for (it_i = bondsToI.begin(); it_i < bondsToI.end(); it_i++) {
-								if (*it_i == i) {
-									ib = *it_i;
+							std::vector<long>::const_iterator it_iBond;
+							for (it_iBond = bondsToI.begin(); it_iBond < bondsToI.end(); it_iBond++) {
+								if (*it_iBond == i) {
+									ib = *it_iBond;
 									break;
 								}
 							}
@@ -914,7 +934,7 @@ void Frame::ParseGAMESSGuessVectors(BufferFile * Buffer, long NumFuncs, TypeOfWa
 	//finally the MCSCF guess appears to have all zero occupation #'s.
 	float * Occupancies=NULL;
 	char	Line[kMaxLineLength+1];
-	int NumOrbs = NumFuncs;
+	long NumOrbs = NumFuncs;
 	//occupancies are printed out when using HCORE or Huekel guess types
 	if (Buffer->LocateKeyWord("ASSIGNED OCCUPANCIES", 20)) {
 		Buffer->SkipnLines(2);
@@ -922,7 +942,7 @@ void Frame::ParseGAMESSGuessVectors(BufferFile * Buffer, long NumFuncs, TypeOfWa
 		for (int i=0; i<NumFuncs; i++) Occupancies[i] = 0.0;
 		int iorb = 0;
 		while (iorb < NumOrbs) {
-			int imaxorb = MIN(10, NumOrbs-iorb);	//Max of 10 orbitals per line
+			long imaxorb = MIN(10, NumOrbs-iorb);	//Max of 10 orbitals per line
 			Buffer->GetLine(Line);
 			int LinePos = 0;
 			for (int jorb=0; jorb<imaxorb; jorb++) {
@@ -965,7 +985,7 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 	long	iorb, imaxorb=0, NumNOrbs=0, NumOptOrbs=0, TestOrb,
 			ScanErr, LinePos, jorb;
 	int		nChar;
-	float	*Vectors, *Energy, *OccNums;
+	float	*Vectors, *lEnergy, *OccNums;
 	char	*SymType, Line[kMaxLineLength+1];
 
 	long StartPos = Buffer->GetFilePos(), NOrbPos, OptOrbPos;
@@ -1002,7 +1022,7 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 			OrbSet->setOrbitalWavefunctionType(MCSCF);
 			OrbSet->setOrbitalType(NaturalOrbital);
 			Vectors = OrbSet->Vectors;
-			Energy = OrbSet->Energy;
+			lEnergy = OrbSet->Energy;
 			SymType = OrbSet->SymType;
 			bool SymmetriesFound = true;
 			OccNums = OrbSet->OrbOccupation = new float [NumNOrbs];
@@ -1041,11 +1061,11 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 					//first read in the orbital energy/occupation number of each orbital
 				LinePos = 0;
 				for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital energies
-					ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(Energy[iorb+jorb]),&nChar);
+					ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(lEnergy[iorb+jorb]),&nChar);
 					if (ScanErr<=0) throw DataError();	//Looks like the MO's are not complete
-					if (Energy[iorb+jorb] >= 0.0) {	//Only core orbital energies are printed
-						if (OccNums) OccNums[iorb+jorb] = Energy[iorb+jorb];
-						Energy[iorb+jorb] = 0.0;
+					if (lEnergy[iorb+jorb] >= 0.0) {	//Only core orbital energies are printed
+						if (OccNums) OccNums[iorb+jorb] = lEnergy[iorb+jorb];
+						lEnergy[iorb+jorb] = 0.0;
 					} else if (OccNums) OccNums[iorb+jorb] = 2.0;
 					LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
 				}
@@ -1086,7 +1106,7 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 		if (NumOptOrbs) {
 			OrbSet = new OrbitalRec(NumOptOrbs, 0, maxfuncs);
 			Vectors = OrbSet->Vectors;
-			Energy = OrbSet->Energy;
+			lEnergy = OrbSet->Energy;
 			SymType = OrbSet->SymType;
 			OrbSet->setOrbitalWavefunctionType(MCSCF);
 			OrbSet->setOrbitalType(OptimizedOrbital);
@@ -1121,7 +1141,7 @@ void Frame::ParseGAMESSMCSCFVectors(BufferFile * Buffer, long NumFuncs,
 				Buffer->GetLine(Line);
 				LinePos = 0;
 				for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital energies
-					ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(Energy[iorb+jorb]),&nChar);
+					ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(lEnergy[iorb+jorb]),&nChar);
 					if (ScanErr<=0) throw DataError();	//Looks like the MO's are not complete
 					LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
 				}
@@ -1157,7 +1177,7 @@ void Frame::ParseGAMESSMCSCFDiabaticVectors(BufferFile * Buffer, long NumFuncs,
 	long	iorb, imaxorb=0, NumNOrbs=0, TestOrb,
 	ScanErr, LinePos, jorb;
 	int		nChar;
-	float	*Vectors, *Energy, *OccNums;
+	float	*Vectors, *lEnergy, *OccNums;
 	char	*SymType, Line[kMaxLineLength+1];
 	
 	long maxfuncs = NumFuncs;	//Always true
@@ -1169,7 +1189,7 @@ void Frame::ParseGAMESSMCSCFDiabaticVectors(BufferFile * Buffer, long NumFuncs,
 		OrbSet->setOrbitalWavefunctionType(MCSCF);
 		OrbSet->setOrbitalType(DiabaticMolecularOrbital);
 		Vectors = OrbSet->Vectors;
-		Energy = OrbSet->Energy;
+		lEnergy = OrbSet->Energy;
 		SymType = OrbSet->SymType;
 		bool SymmetriesFound = true;
 		OccNums = OrbSet->OrbOccupation = new float [NumNOrbs];
@@ -1208,11 +1228,11 @@ void Frame::ParseGAMESSMCSCFDiabaticVectors(BufferFile * Buffer, long NumFuncs,
 			//first read in the orbital energy/occupation number of each orbital
 			LinePos = 0;
 			for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital energies
-				ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(Energy[iorb+jorb]),&nChar);
+				ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(lEnergy[iorb+jorb]),&nChar);
 				if (ScanErr<=0) throw DataError();	//Looks like the MO's are not complete
-				if (Energy[iorb+jorb] >= 0.0) {	//Only core orbital energies are printed
-					if (OccNums) OccNums[iorb+jorb] = Energy[iorb+jorb];
-					Energy[iorb+jorb] = 0.0;
+				if (lEnergy[iorb+jorb] >= 0.0) {	//Only core orbital energies are printed
+					if (OccNums) OccNums[iorb+jorb] = lEnergy[iorb+jorb];
+					lEnergy[iorb+jorb] = 0.0;
 				} else if (OccNums) OccNums[iorb+jorb] = 2.0;
 				LinePos+=nChar;		//nChar contains the number of char's read by sscanf including spaces
 			}
@@ -1256,9 +1276,9 @@ void Frame::ParseGAMESSMCSCFDiabaticVectors(BufferFile * Buffer, long NumFuncs,
 OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, long NumOrbs,
 		long NumBetaOrbs, const long & NumOccAlpha, const long & NumOccBeta,
 		const TypeOfWavefunction & method, Progress * lProgress) {
-	long	iorb=0, imaxorb, maxfuncs, TestOrb, LinePos, ScanErr, jorb;
+	long	iorb=0, imaxorb, maxfuncs, TestOrb, LinePos, ScanErr, jorb, OrbitalOffset=0;
 	int		nChar;
-	float	*Vectors, *Energy;
+	float	*Vectors, *lEnergy;
 	char	*SymType, Line[kMaxLineLength+1];
 	bool	energyError=false;
 
@@ -1267,7 +1287,7 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 	try {
 		OrbSet = new OrbitalRec(NumOrbs, (NumBetaOrbs?NumOrbs:0), NumFuncs);
 		Vectors = OrbSet->Vectors;
-		Energy = OrbSet->Energy;
+		lEnergy = OrbSet->Energy;
 		SymType = OrbSet->SymType;
 		OrbSet->setOrbitalWavefunctionType(RHF);
 		OrbSet->setOrbitalType(OptimizedOrbital);
@@ -1286,7 +1306,15 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 			LinePos = 0;
 			for (jorb=0; jorb<imaxorb; jorb++) {
 				ScanErr = sscanf(&(Line[LinePos]), "%ld%n", &TestOrb, &nChar);
-				if (ScanErr && (TestOrb==jorb+iorb+1)) LinePos += nChar;
+				//Dmitri's npreo option skips printing of the first n orbitals. Need to handle a case
+				//where the orbital printout doesn't start at 1.
+				if ((iorb+jorb+1)==1) {
+					if (ScanErr && (TestOrb > 1)) {
+						OrbitalOffset = TestOrb - 1;
+						OrbSet->setStartingOrbitalOffset(OrbitalOffset);
+					}
+				}
+				if (ScanErr && (TestOrb==jorb+iorb+OrbitalOffset+1)) LinePos += nChar;
 				else {
 					imaxorb = jorb;
 					if (jorb==0) {	//No more orbitals found
@@ -1307,13 +1335,13 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 				if (strlen(Line) <= 0) Buffer->GetLine(Line);
 				LinePos = 0;
 				for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital energies
-					ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(Energy[iorb+jorb]),&nChar);
+					ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(lEnergy[iorb+jorb]),&nChar);
 					if (ScanErr <= 0) {
 						wxLogWarning(_("Error parsing the energy for orbital %ld. Using last energy and continuing."), iorb+jorb);
-						if ((iorb+jorb)>0) Energy[iorb+jorb] = Energy[iorb+jorb-1];
+						if ((iorb+jorb)>0) lEnergy[iorb+jorb] = lEnergy[iorb+jorb-1];
 						jorb++;
 						while (jorb <imaxorb) {
-							Energy[iorb+jorb] = Energy[iorb+jorb-1];
+							lEnergy[iorb+jorb] = lEnergy[iorb+jorb-1];
 							jorb++;
 						}
 						energyError = true;
@@ -1342,7 +1370,7 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 		if (NumBetaOrbs) {
 			OrbSet->setOrbitalWavefunctionType(UHF);
 			Vectors = OrbSet->VectorsB;
-			Energy = OrbSet->EnergyB;
+			lEnergy = OrbSet->EnergyB;
 			SymType = OrbSet->SymTypeB;
 			Buffer->BackupnLines(2);
 			if (!Buffer->LocateKeyWord("BETA SET",8)) throw DataError();
@@ -1382,13 +1410,13 @@ OrbitalRec * Frame::ParseGAMESSEigenVectors(BufferFile * Buffer, long NumFuncs, 
 					if (strlen(Line) <= 0) Buffer->GetLine(Line);
 					LinePos = 0;
 					for (jorb=0; jorb<imaxorb; jorb++) {//Grab the orbital energies
-						ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(Energy[iorb+jorb]),&nChar);
+						ScanErr = sscanf(&(Line[LinePos]), "%f%n", &(lEnergy[iorb+jorb]),&nChar);
 						if (ScanErr <= 0) {
 							wxLogWarning(_("Error parsing the energy for orbital %d. Using last energy and continuing."), iorb+jorb);
-							if ((iorb+jorb)>0) Energy[iorb+jorb] = Energy[iorb+jorb-1];
+							if ((iorb+jorb)>0) lEnergy[iorb+jorb] = lEnergy[iorb+jorb-1];
 							jorb++;
 							while (jorb <imaxorb) {
-								Energy[iorb+jorb] = Energy[iorb+jorb-1];
+								lEnergy[iorb+jorb] = lEnergy[iorb+jorb-1];
 								jorb++;
 							}
 						}
@@ -1455,7 +1483,7 @@ void Frame::ReadMolDenOrbitals(BufferFile * Buffer, long NumFuncs) {
 					done = true;
 					break;
 				}
-				int p;
+				long p;
 				if ((p=FindKeyWord(Line, "ENE=", 4))>=0) {
 					ConvertExponentStyle(Line);
 					sscanf(&(Line[p+4]),"%f", &energy);
@@ -1544,7 +1572,7 @@ void Frame::ParseGAMESSCIVectors(BufferFile * Buffer, long NumFuncs, Progress * 
 				//Determine the style of the orbital output
 			Buffer->SkipnLines(1);
 			Buffer->GetLine(Line);
-			int t = strlen(Line);
+			size_t t = strlen(Line);
 			if (t > 5) Style=true;
 			Buffer->SetFilePos(begPos);
 
@@ -1655,7 +1683,7 @@ void Frame::ParseGAMESSEOM_CC_Vectors(BufferFile * Buffer, long NumFuncs, Progre
 			//Determine the style of the orbital output
 			Buffer->SkipnLines(1);
 			Buffer->GetLine(Line);
-			int t = strlen(Line);
+			size_t t = strlen(Line);
 			if (t > 5) Style=true;
 			Buffer->SetFilePos(begPos);
 			
@@ -2264,12 +2292,12 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 						token[0]='\0';
 						int iscan = sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
 						LinePos += nchar;
-						long test = strlen(token);
-						if ((iscan>0)&&(nchar>0)&&(test>0)) {
+						long tokenlength = strlen(token);
+						if ((iscan>0)&&(nchar>0)&&(tokenlength>0)) {
 							if (LineText[LinePos+1] == 'I') {
-								token[test] = 'i';
-								test++;
-								token[test]=0;
+								token[tokenlength] = 'i';
+								tokenlength++;
+								token[tokenlength]=0;
 							}
 							lVibs->Frequencies.push_back(std::string(token));
 							LinePos+=2;
@@ -2284,14 +2312,14 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					if ((imode == NumVibs)&&(lVibs->Symmetry.empty())) {
 						lVibs->Symmetry.reserve(NumModes);
 					}
-					long LineLength = strlen(LineText);
+					long LineLength2 = strlen(LineText);
 					for (unsigned long icol=0; icol<NumVibs; icol++) {
-						if (LinePos<LineLength) {
+						if (LinePos<LineLength2) {
 							token[0]='\0';
 							int iscan = sscanf(&(LineText[LinePos]), "%s%n", token, &nchar);
 							LinePos += nchar;
-							long test = strlen(token);
-							if ((iscan>0)&&(nchar>0)&&(test>0)) {
+							long tokenLen = strlen(token);
+							if ((iscan>0)&&(nchar>0)&&(tokenLen>0)) {
 								lVibs->Symmetry.push_back(std::string(token));
 							} else NumVibs = icol;
 						} else NumVibs = icol;
@@ -2308,7 +2336,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					float	rmass;
 					for (long icol=0; icol<tVib; icol++) {
 						if (LinePos<LineLength) {
-							test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
+							test = sscanf(&(LineText[LinePos]), "%255s%n", token, &nchar);
 							LinePos += nchar;
 							if (test) {
 								if (token[0] != '*') {
@@ -2328,7 +2356,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					float	Inten;
 					for (long icol=0; icol<tVib; icol++) {
 						if (LinePos<LineLength) {
-							test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
+							test = sscanf(&(LineText[LinePos]), "%255s%n", token, &nchar);
 							LinePos += nchar;
 							if (test) {
 								if (token[0] != '*') {
@@ -2353,7 +2381,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					float	raman;
 					for (long icol=0; icol<tVib; icol++) {
 						if (LinePos<LineLength) {
-							test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
+							test = sscanf(&(LineText[LinePos]), "%255s%n", token, &nchar);
 							LinePos += nchar;
 							if (test) {
 								if (token[0] != '*') {
@@ -2376,7 +2404,7 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 					float	depol;
 					for (long icol=0; icol<tVib; icol++) {
 						if (LinePos<LineLength) {
-							test = sscanf(&(LineText[LinePos]), "%s%n", &token, &nchar);
+							test = sscanf(&(LineText[LinePos]), "%255s%n", token, &nchar);
 							LinePos += nchar;
 							if (test) {
 								if (token[0] != '*') {
@@ -2517,7 +2545,7 @@ void Frame::ParseMolDenFrequencies(BufferFile * Buffer, WinPrefs * Prefs) {
 					}
 					for (int j=0; j<NumAtoms; j++) {
 						Buffer->GetLine(LineText);
-						int imode = j + i*NumAtoms;
+						long imode = j + i*NumAtoms;
 						check = sscanf(LineText, "%f %f %f", &(lVibs->NormMode[imode].x), &(lVibs->NormMode[imode].y),
 									   &(lVibs->NormMode[imode].z));
 						float lmass = Prefs->GetSqrtAtomMass(Atoms[j].GetType()-1);
@@ -2539,21 +2567,21 @@ void Frame::ParseMolDenFrequencies(BufferFile * Buffer, WinPrefs * Prefs) {
 }
 
 void Frame::toggleMMAtomVisibility(void) {
-	for (int i=0; i<NumAtoms; i++) {
+	for (long i=0; i<NumAtoms; i++) {
 		if (Atoms[i].IsSIMOMMAtom()) 
 			Atoms[i].SetInvisibility(true-Atoms[i].GetInvisibility());
 	}
 }
 
 void Frame::toggleAbInitioVisibility(void) {
-	for (int i=0; i<NumAtoms; i++) {
+	for (long i=0; i<NumAtoms; i++) {
 		if (! (Atoms[i].IsSIMOMMAtom())) 
 			Atoms[i].SetInvisibility(true-Atoms[i].GetInvisibility());
 	}
 }
 
 void Frame::toggleEFPVisibility(void) {
-	for (int i=0; i<NumAtoms; i++) {
+	for (long i=0; i<NumAtoms; i++) {
 		if (Atoms[i].IsEffectiveFragment()) 
 			Atoms[i].SetInvisibility(true-Atoms[i].GetInvisibility());
 	}
@@ -2563,19 +2591,19 @@ void Frame::resetAllSelectState() {
 	
 	// Typically, atom selection should be done through SetAtomSelection, but
 	// we can simulate the effect here.
-	for (int i = 0; i < NumAtoms; i++)
+	for (long i = 0; i < NumAtoms; i++)
 		Atoms[i].SetSelectState(false);
 	natoms_selected = 0;
 
-	for (int i = 0; i < NumBonds; i++)
+	for (long i = 0; i < NumBonds; i++)
 		Bonds[i].SetSelectState(false);
 }
 
-int Frame::GetAtomNumBonds(int atom_id) const {
+long Frame::GetAtomNumBonds(long atom_id) const {
 
-	int num_bonds = 0;
+	long num_bonds = 0;
 
-	for (int i = 0; i < NumBonds; i++) {
+	for (long i = 0; i < NumBonds; i++) {
 		if (Bonds[i].Atom1 == atom_id || Bonds[i].Atom2 == atom_id) {
 			if (Bonds[i].Order > kHydrogenBond) num_bonds++;
 		}

@@ -104,6 +104,9 @@ public:
 	/// Menu handler for the close menu item
 	void OnCloseEvent( wxCommandEvent& event );
 
+	/// Handler for when the window is raised, Stops running animations
+	void OnActivate(wxActivateEvent & event);
+
 ////@begin SurfacesWindow member function declarations
 
 	MolDisplayWin * GetParent() const { return Parent ; }

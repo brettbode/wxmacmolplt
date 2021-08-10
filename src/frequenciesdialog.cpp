@@ -237,8 +237,8 @@ void FrequenciesDialog::FrameChanged(void) {
 
 void FrequenciesDialog::ModeChanged(void) {
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
-    fGraph->setSelection(0, parent->GetData()->cFrame->Vibs->GetCurrentMode());
-	mFreqListBox->SetSelection(parent->GetData()->cFrame->Vibs->GetCurrentMode());
+    fGraph->setSelection(0, (int) parent->GetData()->cFrame->Vibs->GetCurrentMode());
+	mFreqListBox->SetSelection((int) parent->GetData()->cFrame->Vibs->GetCurrentMode());
     Refresh();
 }
 
@@ -285,12 +285,13 @@ void FrequenciesDialog::RegenData(void) {
 	else
 		fGraph->setAxisLabel(MG_AXIS_Y1, _("IR Intensity"));
 	fGraph->setAxisLabel(MG_AXIS_X, _("Frequency"));
-    fGraph->setSelection(0, Vibs->GetCurrentMode());
-	mFreqListBox->SetSelection(Vibs->GetCurrentMode());
+    fGraph->setSelection(0, (int) Vibs->GetCurrentMode());
+	mFreqListBox->SetSelection((int) Vibs->GetCurrentMode());
 }
 
 void FrequenciesDialog::OnCloseWindow( wxCloseEvent& event )
 {
+	(void)event;
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->CloseFrequenciesWindow();
 }
@@ -303,6 +304,7 @@ void FrequenciesDialog::OnFreqcopyClick( wxCommandEvent& event )
 {
     int width = 0;
     int height = 0;
+	(void)event;
     fGraph->GetClientSize(&width, &height);
     wxBitmap tempBmp(width, height);
     wxMemoryDC tempDC;
@@ -324,6 +326,7 @@ void FrequenciesDialog::OnFreqcopyClick( wxCommandEvent& event )
 
 void FrequenciesDialog::OnCustomGraphClick( wxCommandEvent& event )
 {
+	(void)event;
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     MoleculeData *MainData = parent->GetData();
 
@@ -338,6 +341,7 @@ void FrequenciesDialog::OnCustomGraphClick( wxCommandEvent& event )
 
 void FrequenciesDialog::OnPrevmodeClick( wxCommandEvent& event )
 {
+	(void)event;
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     MoleculeData *MainData = parent->GetData();
 	if (MainData->cFrame->Vibs) {
@@ -353,6 +357,7 @@ void FrequenciesDialog::OnPrevmodeClick( wxCommandEvent& event )
 
 void FrequenciesDialog::OnNextmodeClick( wxCommandEvent& event )
 {
+	(void)event;
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	MoleculeData *MainData = parent->GetData();
 	if (MainData->cFrame->Vibs) {
@@ -388,6 +393,7 @@ void FrequenciesDialog::OnFreqlistboxSelected( wxCommandEvent& event )
 
 void FrequenciesDialog::OnMenuirintenClick( wxCommandEvent& event )
 {
+	(void)event;
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	WinPrefs * Prefs = parent->GetPrefs();
 	FrequencyWindowOptions * fprefs = Prefs->GetFrequencyWindowOptions();
@@ -404,7 +410,8 @@ void FrequenciesDialog::OnMenuirintenClick( wxCommandEvent& event )
 
 void FrequenciesDialog::OnMenuramanintenClick( wxCommandEvent& event )
 {
-    MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+	(void)event;
+	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	WinPrefs * Prefs = parent->GetPrefs();
 	FrequencyWindowOptions * fprefs = Prefs->GetFrequencyWindowOptions();
 	
@@ -419,6 +426,7 @@ void FrequenciesDialog::OnMenuramanintenClick( wxCommandEvent& event )
  */
 void FrequenciesDialog::OnMenuzoominClick( wxCommandEvent& event )
 {
+	(void)event;
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	WinPrefs * Prefs = parent->GetPrefs();
 	FrequencyWindowOptions * fprefs = Prefs->GetFrequencyWindowOptions();
@@ -436,6 +444,7 @@ void FrequenciesDialog::OnMenuzoominClick( wxCommandEvent& event )
 
 void FrequenciesDialog::OnMenuzoomoutClick( wxCommandEvent& event )
 {
+	(void)event;
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	WinPrefs * Prefs = parent->GetPrefs();
 	FrequencyWindowOptions * fprefs = Prefs->GetFrequencyWindowOptions();
@@ -482,6 +491,7 @@ void FrequenciesDialog::OnNextmodeUpdate( wxUpdateUIEvent& event )
 
 void FrequenciesDialog::OnCloseEvent( wxCommandEvent& event )
 {
+	(void)event;
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->CloseFrequenciesWindow();
 }

@@ -82,7 +82,7 @@ void ChooseDialog::Create(wxWindow *parent, wxWindowID id, wxString& message,
 
 // --------------------------------------------------------------------------- 
 
-void ChooseDialog::OnMouse(wxMouseEvent& event) {
+void ChooseDialog::OnMouse(wxMouseEvent& /*event*/) {
 	return;
 }
 

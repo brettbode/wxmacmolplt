@@ -111,7 +111,7 @@ void PreviewCanvas::InitGL() {
 
 /* ------------------------------------------------------------------------- */
 
-void PreviewCanvas::OnPaint(wxPaintEvent& event) {
+void PreviewCanvas::OnPaint(wxPaintEvent& /*event*/) {
 
 	wxPaintDC paintDC(this);
 	Render();
@@ -120,7 +120,7 @@ void PreviewCanvas::OnPaint(wxPaintEvent& event) {
 
 /* ------------------------------------------------------------------------- */
    
-void PreviewCanvas::OnSize(wxSizeEvent& event) {
+void PreviewCanvas::OnSize(wxSizeEvent& /*event*/) {
 	
 	/* wxGLCanvas::OnSize(event); */
 
@@ -156,8 +156,8 @@ void PreviewCanvas::Render() {
 	sphere_list = glGenLists(1);
 	glNewList(sphere_list, GL_COMPILE);
 	gluQuadricTexture(quadric, GL_TRUE);
-	gluSphere(quadric, 1.0f, (long) (1.5f * gPreferences->GetQD3DAtomQuality()),
-			  (long) (gPreferences->GetQD3DAtomQuality()));
+	gluSphere(quadric, 1.0f, (int) (1.5f * gPreferences->GetQD3DAtomQuality()),
+			  (int) (gPreferences->GetQD3DAtomQuality()));
 	glEndList();
 
 	RGBColor *BackgroundColor = gPreferences->GetBackgroundColorLoc();
@@ -365,8 +365,8 @@ int PreviewCanvas::Pick() {
 
 	sphere_list = glGenLists(1);
 	glNewList(sphere_list, GL_COMPILE);
-	gluSphere(quadric, 1.0f, (long) (1.5f * gPreferences->GetQD3DAtomQuality()),
-			  (long) (gPreferences->GetQD3DAtomQuality()));
+	gluSphere(quadric, 1.0f, (GLint) (1.5f * gPreferences->GetQD3DAtomQuality()),
+			  (GLint) (gPreferences->GetQD3DAtomQuality()));
 	glEndList();
 
 	glRenderMode(GL_SELECT);
@@ -476,7 +476,7 @@ void PreviewCanvas::OnMouseDrag(wxMouseEvent& event) {
 
 // --------------------------------------------------------------------------- 
 
-void PreviewCanvas::OnMiddleMouseUp(wxMouseEvent& event) {
+void PreviewCanvas::OnMiddleMouseUp(wxMouseEvent& /*event*/) {
 
 	if (HasCapture()) {
 		ReleaseMouse();

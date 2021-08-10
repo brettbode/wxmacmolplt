@@ -21,6 +21,7 @@
  */
 
 ////@begin includes
+#include "wx/valtext.h"
 ////@end includes
 
 /*!
@@ -76,30 +77,30 @@ public:
 
 ////@begin CoordinateOffset event handler declarations
 
-    /// wxEVT_COMMAND_SLIDER_UPDATED event handler for ID_SLIDER
-    void OnSliderUpdated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_SLIDER_UPDATED event handler for ID_SLIDER
+	void OnSliderUpdated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TEXTCTRL1
-    void OnTextctrl1Updated( wxCommandEvent& event );
+	/// wxEVT_COMMAND_TEXT_UPDATED event handler for ID_TEXTCTRL1
+	void OnTextctrl1Updated( wxCommandEvent& event );
 
-    /// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
-    void OnOkClick( wxCommandEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_OK
+	void OnOkClick( wxCommandEvent& event );
 
 ////@end CoordinateOffset event handler declarations
 
 ////@begin CoordinateOffset member function declarations
 
-    MolDisplayWin * GetParent() const { return Parent ; }
-    void SetParent(MolDisplayWin * value) { Parent = value ; }
+	MolDisplayWin * GetParent() const { return Parent ; }
+	void SetParent(MolDisplayWin * value) { Parent = value ; }
 
-    std::vector<CPoint3D> GetOrigCoords() const { return origCoords ; }
-    void SetOrigCoords(std::vector<CPoint3D> value) { origCoords = value ; }
+	std::vector<CPoint3D> GetOrigCoords() const { return origCoords ; }
+	void SetOrigCoords(std::vector<CPoint3D> value) { origCoords = value ; }
 
-    /// Retrieves bitmap resources
-    wxBitmap GetBitmapResource( const wxString& name );
+	/// Retrieves bitmap resources
+	wxBitmap GetBitmapResource( const wxString& name );
 
-    /// Retrieves icon resources
-    wxIcon GetIconResource( const wxString& name );
+	/// Retrieves icon resources
+	wxIcon GetIconResource( const wxString& name );
 ////@end CoordinateOffset member function declarations
 
     /// Should we show tooltips?
@@ -108,11 +109,10 @@ public:
 	void ApplyOffset(float offset);
 
 ////@begin CoordinateOffset member variables
-    wxSlider* slider;
-    wxTextCtrl* editField;
-    MolDisplayWin * Parent;
-    std::vector<CPoint3D> origCoords;
-	wxString valid_string;
+	wxSlider* slider;
+	wxTextCtrl* editField;
+	MolDisplayWin * Parent;
+	std::vector<CPoint3D> origCoords;
 ////@end CoordinateOffset member variables
 };
 

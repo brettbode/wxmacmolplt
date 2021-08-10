@@ -69,7 +69,7 @@ void Surface::Draw2D(MoleculeData * /*lData*/, long /*hoffset*/, long /*voffset*
 }
 void Surface::Update(MoleculeData * /*lData*/) {
 }
-void Surface::Export(BufferFile * Buffer, exportFileType eft) {
+void Surface::Export(BufferFile * Buffer, exportFileType /*eft*/) {
 	Buffer->Write("Export not supported for the chosen surface type", true);
 }
 void Surface::RotateSurface(Matrix4D /*RotationMatrix*/) {
@@ -77,7 +77,7 @@ void Surface::RotateSurface(Matrix4D /*RotationMatrix*/) {
 /**
   * Exports surface data to our text file type	
   * This can effectively only be called by Surf3DBase objects
-  * @param Grid3D
+  * @param Grid3D The 3D array of grid points
   * @param nx number of grid points on the X axis
   * @param ny number of grid points on the Y axis
   * @param nz number of grid points on the Z axis
@@ -91,11 +91,11 @@ void Surface::RotateSurface(Matrix4D /*RotationMatrix*/) {
   * BufferFile operations.
 */
 void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
-		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
+		float XInc, float YInc, float ZInc, const char * inLabel, BufferFile * Buffer) const {
 	char Line[kMaxLineLength];
 	if (!Grid3D) return;
 		//punch out the provided surface label
-	Buffer->WriteLine(Label, true);
+	Buffer->WriteLine(inLabel, true);
 		//Write out the number of grid points in each direction
 	sprintf(Line, "%ld %ld %ld   //nx ny nz", nx,ny,nz);
 	Buffer->WriteLine(Line, true);	// true means add a system-appropriate EOL
@@ -125,7 +125,7 @@ void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CP
 /**
   * Exports surface data to CCP4 file type	
   * This can effectively only be called by Surf3DBase objects
-  * @param Grid3D
+  * @param Grid3D The 3D array of grid points
   * @param nx number of grid points on the X axis
   * @param ny number of grid points on the Y axis
   * @param nz number of grid points on the Z axis
@@ -138,15 +138,15 @@ void Surface::Export3D(const float * Grid3D, long nx, long ny, long nz, const CP
   * to make parsing the file easier.  See the BufferFile object for valid
   * BufferFile operations.
 */
-void Surface::Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
-		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
+void Surface::Export3DCCP4(const float * /*Grid3D*/, long /*nx*/, long /*ny*/, long /*nz*/, const CPoint3D * /*Origin*/,
+		float /*XInc*/, float /*YInc*/, float /*ZInc*/, const char * /*Label*/, BufferFile * /*Buffer*/) const {
 
 }
 
 /**
   * Exports surface data to CNS electron density map file type	
   * This can effectively only be called by Surf3DBase objects
-  * @param Grid3D
+  * @param Grid3D The 3D array of grid points
   * @param nx number of grid points on the X axis
   * @param ny number of grid points on the Y axis
   * @param nz number of grid points on the Z axis
@@ -159,8 +159,8 @@ void Surface::Export3DCCP4(const float * Grid3D, long nx, long ny, long nz, cons
   * to make parsing the file easier.  See the BufferFile object for valid
   * BufferFile operations.
 */
-void Surface::Export3DCNS(const float * Grid3D, long nx, long ny, long nz, const CPoint3D * Origin,
-		float XInc, float YInc, float ZInc, const char * Label, BufferFile * Buffer) const {
+void Surface::Export3DCNS(const float * Grid3D, long /*nx*/, long /*ny*/, long /*nz*/, const CPoint3D * /*Origin*/,
+		float /*XInc*/, float /*YInc*/, float /*ZInc*/, const char * /*Label*/, BufferFile * Buffer) const {
 	if(!Grid3D) return;			// we'll only export if this is a 3D surface
 	
 	char Line[kMaxLineLength];
@@ -354,7 +354,7 @@ void Surf1DBase::Export(BufferFile * Buffer, exportFileType /*eft*/) {
 	if (ival) 	Buffer->WriteLine("", true);
 }
 
-void Surf2DBase::Export(BufferFile * Buffer, exportFileType eft) {
+void Surf2DBase::Export(BufferFile * Buffer, exportFileType /*eft*/) {
 	float * lGrid;
 	char * label = GetLabel();
 	lGrid = Grid;
@@ -403,7 +403,7 @@ void Surf2DBase::SetPlaneToScreenPlane(MoleculeData * MainData) {
 	YInc.y = (NewPoint2.y-NewPoint1.y)/NumPoints;
 	YInc.z = (NewPoint2.z-NewPoint1.z)/NumPoints;
 }
-void Surf2DBase::Contour2DGrid(MoleculeData * lData, long hoffset, long voffset, float scale) {
+void Surf2DBase::Contour2DGrid(MoleculeData * /*lData*/, long /*hoffset*/, long /*voffset*/, float /*scale*/) {
 	if (!GridAvailable()) return;
 //For now just ifdef out the entire routine for the wxWidgets build
 #ifndef __wxBuild__
@@ -586,7 +586,7 @@ void Surf2DBase::Contour2DGrid(MoleculeData * lData, long hoffset, long voffset,
 #endif	//end of wxBuild ifdef
 }
 
-long Surf2DBase::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
+long Surf2DBase::ExportPOV(MoleculeData */*MainData*/, WinPrefs *Prefs,
 						   BufferFile *Buffer) {
 	// Scan the Grid producing the contours
 	float TestPoint1, TestPoint2, TestPoint3, TestPoint4, XGridValue, YGridValue, ZGridValue;
@@ -650,7 +650,7 @@ long Surf2DBase::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 					YGridValue += YGridInc.y;
 					ZGridValue += YGridInc.z;
 					n++;
-					for (int i=0; i<4; i++) HasPoint[i]=false;
+					for (int ii=0; ii<4; ii++) HasPoint[ii]=false;
 					
 					TestPoint1 = lGrid[n]-ContourValue;
 					TestPoint2 = lGrid[n-1]-ContourValue;
@@ -1380,7 +1380,7 @@ void Surf3DBase::AdjustSurfaceNormals(void) {
 
 /* ------------------------------------------------------------------------- */
 
-long General3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
+long General3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs */*Prefs*/,
 								 BufferFile *Buffer) {
 
 	long result=0;
@@ -1418,7 +1418,7 @@ long General3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 
 /* ------------------------------------------------------------------------- */
 
-long TEDensity3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
+long TEDensity3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs */*Prefs*/,
 								   BufferFile *Buffer) {
 
 	long result = 0;
@@ -1444,7 +1444,7 @@ long TEDensity3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 
 /* ------------------------------------------------------------------------- */
 
-long Orb3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
+long Orb3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs */*Prefs*/,
 							 BufferFile *Buffer) {
 
 	long result=0;
@@ -1477,7 +1477,7 @@ long Orb3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
 
 /* ------------------------------------------------------------------------- */
 
-long MEP3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs *Prefs,
+long MEP3DSurface::ExportPOV(MoleculeData *MainData, WinPrefs */*Prefs*/,
 							 BufferFile *Buffer) {
 
 	long result=0;
@@ -1513,7 +1513,7 @@ long Surf3DBase::ExportPOVSurface(CPoint3D *Vertices, CPoint3D *Normals,
 								  long *vList, long NumTriangles,
 								  RGBColor *SurfaceColor, float *SurfaceValue,
 								  RGBColor *NColor, float MaxSurfaceValue,
-								  MoleculeData *MainData, BufferFile *Buffer) {
+								  MoleculeData */*MainData*/, BufferFile *Buffer) {
 
 	if (!NumTriangles) {
 		return 0;

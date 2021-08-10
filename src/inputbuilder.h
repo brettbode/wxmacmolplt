@@ -164,6 +164,7 @@ class wxSpinCtrl;
 #define ID_DEFAULTSBUTTON 10228
 #define ID_REVERTBUTTON 10090
 #define ID_WRITEFILEBUTTON 10073
+#define ID_WRITE_EDIT_BUTTON 10074
 #define ID_ADVANCEDBUTTON 10270
 #define SYMBOL_INPUTBUILDERWINDOW_STYLE wxCAPTION|wxSYSTEM_MENU|wxCLOSE_BOX|wxTAB_TRAVERSAL
 #define SYMBOL_INPUTBUILDERWINDOW_TITLE _("Input Builder")
@@ -521,6 +522,9 @@ public:
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_WRITEFILEBUTTON
 	void OnWritefilebuttonClick( wxCommandEvent& event );
 
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_WRITE_EDIT_BUTTON
+	void OnWriteEditButtonClick( wxCommandEvent& event );
+
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_ADVANCEDBUTTON
 	void OnAdvancedButtonClicked( wxCommandEvent& event );
 
@@ -532,6 +536,9 @@ public:
 
 ////@end InputBuilderWindow event handler declarations
 
+	/// Handler for when the window is raised, Stops running animations
+	void OnActivate(wxActivateEvent & event);
+	
 ////@begin InputBuilderWindow member function declarations
 
 	/// Retrieves bitmap resources

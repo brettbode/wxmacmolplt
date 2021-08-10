@@ -275,7 +275,7 @@ wxIcon windowparameters::GetIconResource( const wxString& name )
  * wxEVT_COMMAND_RADIOBOX_SELECTED event handler for ID_RADIOBOX4
  */
 
-void windowparameters::OnUnitsradioboxSelected( wxCommandEvent& event )
+void windowparameters::OnUnitsradioboxSelected( wxCommandEvent& /*event*/ )
 {
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	int width, height;
@@ -432,7 +432,7 @@ bool windowparameters::Apply(void) {
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_APPLY
  */
 
-void windowparameters::OnApplyClick( wxCommandEvent& event )
+void windowparameters::OnApplyClick( wxCommandEvent& /*event*/ )
 {
 	Apply();
 }

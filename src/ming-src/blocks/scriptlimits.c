@@ -37,6 +37,7 @@ writeSWFScriptLimitsToMethod(SWFBlock block, SWFByteOutputMethod method, void* d
 static int
 completeSWFScriptLimits(SWFBlock block)
 {
+	(void) block;
 	return 4;
 }
 

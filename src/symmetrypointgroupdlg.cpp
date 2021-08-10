@@ -542,7 +542,7 @@ void SymmetryPointGroupDlg::setup (void) {
 
 bool SymmetryPointGroupDlg::GetSelectedPointGroup(GAMESSPointGroup & pg, int & order) const {
 	bool result = false;
-	int selectedItem = selection;
+	int selectedItem = (int) selection;
 	int itemCount = 1;
 	order = 1;
 	pg = GAMESS_C1;
@@ -998,7 +998,7 @@ void SymmetryPointGroupDlg::OnListctrl1Selected( wxListEvent& event )
  * wxEVT_COMMAND_SLIDER_UPDATED event handler for ID_SLIDER1
  */
 
-void SymmetryPointGroupDlg::OnSlider1Updated( wxCommandEvent& event ) {
+void SymmetryPointGroupDlg::OnSlider1Updated( wxCommandEvent& /*event*/ ) {
 	int val = mSlider->GetValue();
 	if (val < 0) tolerance = pow(10.0, val);
 	else tolerance = 0.1 * (val+2);

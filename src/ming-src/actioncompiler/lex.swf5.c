@@ -3385,7 +3385,7 @@ YY_BUFFER_STATE swf5_scan_buffer  (char * base, yy_size_t  size )
 
 /** Setup the input buffer state to scan a string. The next call to swf5lex() will
  * scan from a @e copy of @a str.
- * @param str a NUL-terminated string to scan
+ * @param yystr a NUL-terminated string to scan
  * 
  * @return the newly allocated buffer state object.
  * @note If you want to scan bytes that may contain NUL values, then use
@@ -3399,8 +3399,8 @@ YY_BUFFER_STATE swf5_scan_string (yyconst char * yystr )
 
 /** Setup the input buffer state to scan the given bytes. The next call to swf5lex() will
  * scan from a @e copy of @a bytes.
- * @param bytes the byte buffer to scan
- * @param len the number of bytes in the buffer pointed to by @a bytes.
+ * @param yybytes the byte buffer to scan
+ * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
  * 
  * @return the newly allocated buffer state object.
  */
@@ -3544,7 +3544,7 @@ char *swf5get_text  (void)
 }
 
 /** Set the current line number.
- * @param line_number
+ * @param line_number the line number
  * 
  */
 void swf5set_lineno (int  line_number )

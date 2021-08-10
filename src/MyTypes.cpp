@@ -35,7 +35,7 @@ Annotation::Annotation(const unsigned int natoms,
 
 /* ------------------------------------------------------------------------- */
 
-bool Annotation::containsAtom(const int atom_id) const {
+bool Annotation::containsAtom(const long atom_id) const {
 
 	unsigned int i;
 	for (i = 0; i < natoms; i++) {
@@ -49,7 +49,7 @@ bool Annotation::containsAtom(const int atom_id) const {
 
 /* ------------------------------------------------------------------------- */
 
-void Annotation::adjustIds(const int atom_id, int offset) {
+void Annotation::adjustIds(const long atom_id, int offset) {
 
 	unsigned int i;
 	for (i = 0; i < natoms; i++) {
@@ -60,7 +60,7 @@ void Annotation::adjustIds(const int atom_id, int offset) {
 
 /* ------------------------------------------------------------------------- */
 
-int Annotation::getAtom(const int index) const {
+long Annotation::getAtom(const long index) const {
 
 	if (index < 0 || index >= natoms) return -1;
 	return atoms[index];
@@ -95,7 +95,7 @@ AnnotationLength::AnnotationLength(const long atom1_id, const long atom2_id)
 
 /* ------------------------------------------------------------------------- */
 
-bool AnnotationLength::isEquivalent(const int natoms, const int *new_list) const {
+bool AnnotationLength::isEquivalent(const long natoms, const long *new_list) const {
 	return natoms == 2 &&
 		   ((new_list[0] == atoms[0] && new_list[1] == atoms[1]) ||
 			(new_list[1] == atoms[0] && new_list[0] == atoms[1]));
@@ -160,19 +160,19 @@ AnnotationMarker::AnnotationMarker(const long atom_id)
 
 /* ------------------------------------------------------------------------- */
 
-bool AnnotationMarker::isEquivalent(const int natoms, const int *new_list) const {
+bool AnnotationMarker::isEquivalent(const long natoms, const long *new_list) const {
 	return natoms == 1 && new_list[0] == atoms[0];
 }
 
 /* ------------------------------------------------------------------------- */
 
-float AnnotationMarker::getParam(const Frame& frame) const {
+float AnnotationMarker::getParam(const Frame& /*frame*/) const {
 	return 0.0f;
 }
 
 /* ------------------------------------------------------------------------- */
 
-void AnnotationMarker::setParam(Frame& frame, float value) {
+void AnnotationMarker::setParam(Frame& /*frame*/, float /*value*/) {
 }
 
 /* ------------------------------------------------------------------------- */
@@ -184,7 +184,7 @@ AnnotationAngle::AnnotationAngle(const long atom1_id, const long atom2_id,
 
 /* --------------------------------------------------------------------- */
 
-bool AnnotationAngle::isEquivalent(const int natoms, const int *new_list) const {
+bool AnnotationAngle::isEquivalent(const long natoms, const long *new_list) const {
 	return natoms == 3 && new_list[1] == atoms[1] &&
 		   ((new_list[0] == atoms[0] && new_list[2] == atoms[2]) ||
 			(new_list[2] == atoms[0] && new_list[0] == atoms[2]));
@@ -306,7 +306,7 @@ AnnotationDihedral::AnnotationDihedral(const long atom1_id,
 
 /* ------------------------------------------------------------------------- */
 
-bool AnnotationDihedral::isEquivalent(const int natoms, const int *new_list) const {
+bool AnnotationDihedral::isEquivalent(const long natoms, const long *new_list) const {
 	return natoms == 4 &&
 			new_list[2] == atoms[2] &&
 			new_list[1] == atoms[1] &&

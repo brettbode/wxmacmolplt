@@ -71,6 +71,7 @@ BEGIN_EVENT_TABLE( SurfacesWindow, wxFrame )
 
 ////@end SurfacesWindow event table entries
 
+	EVT_ACTIVATE(SurfacesWindow::OnActivate)
 	EVT_CHOICEBOOK_PAGE_CHANGED(ID_SURFLISTBOOK, SurfacesWindow::OnSurflistbookPageChanged )
 
 END_EVENT_TABLE()
@@ -168,7 +169,7 @@ void SurfacesWindow::CreateControls()
 
 	book = new wxChoicebook(this, ID_SURFLISTBOOK, wxDefaultPosition, wxDefaultSize, wxNB_TOP); // | wxSUNKEN_BORDER);
 
-	itemBoxSizer2->Add(book, 2, wxALIGN_CENTER_VERTICAL | wxALL | wxEXPAND, 2);
+	itemBoxSizer2->Add(book, 2, wxALL | wxEXPAND, 2);
 
 	wxBoxSizer* itemBoxSizer11 = new wxBoxSizer(wxHORIZONTAL);
 
@@ -236,7 +237,7 @@ void SurfacesWindow::CreateControls()
 	}
 }
 
-void SurfacesWindow::OnChangeTitle(wxCommandEvent& event) {
+void SurfacesWindow::OnChangeTitle(wxCommandEvent& /*event*/) {
 
 	BaseSurfacePane* tempPane = (BaseSurfacePane *) book->GetCurrentPage();
 	if (tempPane) {
@@ -375,6 +376,9 @@ void SurfacesWindow::Reset(void) {
 					case kGeneral3DSurface:
 						tempPane = new General3DSurfPane(book, dynamic_cast<General3DSurface*>(lSurf), this);
 						break;
+					default:
+						wxLogMessage(_T("Unhandled surface type in SurfaceWindow::Reset"));
+						return;
 				}
 				wxString temp(lSurf->GetLabel(), wxConvUTF8);
 				tempPane->Fit();
@@ -394,7 +398,7 @@ void SurfacesWindow::Reset(void) {
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_DELETE
  */
 
-void SurfacesWindow::OnDeleteClick( wxCommandEvent& event ) {
+void SurfacesWindow::OnDeleteClick( wxCommandEvent& /*event*/ ) {
 	Frame * lFrame = mData->GetCurrentFramePtr();
 	
 	int targetSurf = book->GetSelection();
@@ -456,7 +460,7 @@ wxIcon SurfacesWindow::GetIconResource( const wxString& name )
 /*!
  * wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED event handler for ID_SURFLISTBOOK
  */
-void SurfacesWindow::OnSurflistbookPageChanged(wxChoicebookEvent& event) {
+void SurfacesWindow::OnSurflistbookPageChanged(wxChoicebookEvent& /*event*/) {
 
 	BaseSurfacePane* tempPane = dynamic_cast<BaseSurfacePane *>(book->GetCurrentPage());
 	if (tempPane) {
@@ -472,7 +476,7 @@ void SurfacesWindow::OnSurflistbookPageChanged(wxChoicebookEvent& event) {
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
  */
 
-void SurfacesWindow::OnAddClick( wxCommandEvent& event )
+void SurfacesWindow::OnAddClick( wxCommandEvent& /*event*/ )
 {
 	int surfTypeId = selectSurfaceType();
 	if (surfTypeId > 0) {
@@ -557,5 +561,13 @@ void SurfacesWindow::OnCloseEvent( wxCommandEvent& /* event */ )
 {
 	MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
 	parent->CloseSurfacesWindow();
+}
+
+void SurfacesWindow::OnActivate(wxActivateEvent & event) {
+	if (event.GetActive()) {
+		MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
+		parent->StopAnimations();
+	}
+	event.Skip();
 }
 

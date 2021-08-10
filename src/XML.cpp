@@ -88,7 +88,7 @@ XMLDocument::XMLDocument(const char * rootName,  bool custom, const char * uriRe
 	useCustom = custom;
 	
 	if (uriReq != NULL) {
-		int n = strlen(uriReq);
+		size_t n = strlen(uriReq);
 		uri = new char[n+1];
 		strncpy(uri, uriReq, n);
 	} else {	//add a default uri
@@ -286,7 +286,7 @@ XMLAttribute::XMLAttribute(const char * n, const char * v) {
 	next = NULL;
 	namespaceID = 0;
 	if (n != NULL) {
-		int i = strlen(n);
+		size_t i = strlen(n);
 		name = new char[i+1];
 		strcpy(name, n);
 		if (v != NULL) {
@@ -312,7 +312,7 @@ void XMLAttribute::setName(char * n) {
 			delete [] name;
 			name = NULL;
 		}
-		int i = strlen(n);
+		size_t i = strlen(n);
 		name = new char [i+1];
 		strcpy(name, n);
 	}
@@ -324,7 +324,7 @@ void XMLAttribute::setValue(char * v) {
 			delete [] value;
 			value = NULL;
 		}
-		int i = strlen(v);
+		size_t i = strlen(v);
 		value = new char [i+1];
 		strcpy(value, v);
 	}
@@ -485,7 +485,7 @@ XMLElement::XMLElement(const char * n, const char * v) {
 	Initialize();
 	
 	if (n != NULL) {
-		int i = strlen(n) + 1;
+		size_t i = strlen(n) + 1;
 		name = new char[i];
 		strcpy(name, n);
 		if (v != NULL) {
@@ -672,10 +672,10 @@ XMLElement * XMLElement::addChildElement(const char * elementName,
 	appendChild(*result);
 	return result;
 }
-XMLElement * XMLElement::addBoolChildElement(const char * name, bool value) {
+XMLElement * XMLElement::addBoolChildElement(const char * myName, bool myValue) {
 	XMLElement * result=NULL;
-	if (value) result = addChildElement(name, trueXML);
-	else result = addChildElement(name, falseXML);
+	if (myValue) result = addChildElement(myName, trueXML);
+	else result = addChildElement(myName, falseXML);
 	return result;
 }
 XMLElement * XMLElement::addChildElementToFront(const char * elementName, const char * elementValue)
@@ -732,11 +732,11 @@ bool XMLElement::getAttributeValue(const char * target, float & result) const {
 	const char * val = getAttributeValue(target);
 	if (val) {
 		if (strlen(val)>0) {
-			float temp;
+			double temp;
 			char * end;
 			temp = strtod(val, &end);
 			if (end[0] == '\0') { 
-				result = temp;
+				result = (float) temp;
 				success = true;
 			}
 			//		sscanf(val, "%f", &temp);
@@ -964,11 +964,11 @@ void XMLElement::addFloatAttribute(const char * n, const float & v) {
 	bf << v;
 	addAttribute(n, bf.str().c_str());
 }
-void XMLElement::addBoolAttribute(const char * n, bool value) {
-	if (value)
-		addAttribute(n, trueXML);
+void XMLElement::addBoolAttribute(const char * attrName, bool myValue) {
+	if (myValue)
+		addAttribute(attrName, trueXML);
 	else
-		addAttribute(n, falseXML);
+		addAttribute(attrName, falseXML);
 }
 #define WXRECT_X_XML	"x"
 #define WXRECT_Y_XML	"y"
@@ -1000,16 +1000,16 @@ void XMLElement::addwxRectAttribute(const wxRect & v) {
 void XMLElement::getwxRectAttribute(wxRect & v) const {
 	long temp;
 	if (getAttributeValue(WXRECT_X_XML, temp)) {
-		v.x = temp;
+		v.x = (int) temp;
 	}
 	if (getAttributeValue(WXRECT_Y_XML, temp)) {
-		v.y = temp;
+		v.y = (int) temp;
 	}
 	if (getAttributeValue(WXRECT_WIDTH_XML, temp)) {
-		if (temp > 0) v.width = temp;
+		if (temp > 0) v.width = (int) temp;
 	}
 	if (getAttributeValue(WXRECT_HEIGHT_XML, temp)) {
-		if (temp > 0) v.height = temp;
+		if (temp > 0) v.height = (int) temp;
 	}
 }
 void XMLElement::addAttribute(const char * n, const char * v) {
@@ -1123,7 +1123,7 @@ XMLElementList * XMLElement::getChildren(void) {
 	return result;
 }
 
-XMLElementList * XMLElement::getElementsByName(const char * name) const {
+XMLElementList * XMLElement::getElementsByName(const char * myName) const {
 	XMLElementList * result=NULL;
 	
 	XMLElement * le = firstChild;
@@ -1137,7 +1137,7 @@ XMLElementList * XMLElement::getElementsByName(const char * name) const {
 		le = firstChild;
 		count = 0;
 		while (le != NULL) {
-			if (le->isName(name)) {
+			if (le->isName(myName)) {
 				list[count] = le;
 				count++;
 			}
@@ -1148,13 +1148,13 @@ XMLElementList * XMLElement::getElementsByName(const char * name) const {
 	return result;
 }
 
-int XMLElement::getElementCount(const char * name) const {
+int XMLElement::getElementCount(const char * myName) const {
 	XMLElement * le = firstChild;
 	int count = 0;
 	le = firstChild;
 	count = 0;
 	while (le != NULL) {
-		if (le->isName(name)) {
+		if (le->isName(myName)) {
 			count++;
 		}
 		le = le->getNextChild();
@@ -1162,7 +1162,7 @@ int XMLElement::getElementCount(const char * name) const {
 	return count;
 }
 
-void XMLElement::ParseNamespaceTags(std::vector<std::string> & tagNames, std::vector<int> & tagIds) {
+void XMLElement::ParseNamespaceTags(std::vector<std::string> & /*tagNames*/, std::vector<int> & /*tagIds*/) {
 //	int numLocalTags = 0;	//keep track of ids defined in this element as
 							//they must be removed before exiting
 		//Search for namespace definition attributes first
@@ -1214,7 +1214,7 @@ std::ostream & operator << (std::ostream & target, const XMLElement & toWrite) {
 		target << ">";
 		if (toWrite.getValue() != NULL) {
 			const char * value = toWrite.getValue();
-			int len = strlen(value);
+			size_t len = strlen(value);
 			for (int i=0; i<len; i++) {
 				switch (value[i]) {
 					case '&':

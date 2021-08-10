@@ -77,7 +77,7 @@ long GradientData::Write(BufferFile * Buffer) {
 #endif
 //Buffer should be positioned at the nserch line
 bool GradientData::ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms,
-		wxFileOffset SearchLength, bool Style) {
+		wxFileOffset SearchLength, int Style) {
 	bool result = false;
 	char	Line[kMaxLineLength], token[kMaxLineLength];
 	float	nucCharge;
@@ -91,12 +91,19 @@ bool GradientData::ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms,
 		result = true;
 		if (Style) {	//new style gradient output sans actual coordinates
 			Buffer->SkipnLines(7);
+			int lscantarget = 6;
+			if (Style == 2) lscantarget = 5;
 			for (iline=0; iline<NumAtoms; iline++) {
 				Buffer->GetLine(Line);
-				scanerr = sscanf(Line, "%ld %s %f %f %f %f", &test, token, &nucCharge,
-					&(CartesianGradient[iline].x), &(CartesianGradient[iline].y),
-					&(CartesianGradient[iline].z));
-				if ((scanerr != 6)||(test!=(iline+1))) {
+				if (Style == 1)
+					scanerr = sscanf(Line, "%ld %s %f %f %f %f", &test, token, &nucCharge,
+									 &(CartesianGradient[iline].x), &(CartesianGradient[iline].y),
+									 &(CartesianGradient[iline].z));
+				else if (Style == 2)
+					scanerr = sscanf(Line, "%ld %s %f %f %f", &test, token,
+									 &(CartesianGradient[iline].x), &(CartesianGradient[iline].y),
+									 &(CartesianGradient[iline].z));
+				if ((scanerr != lscantarget)||(test!=(iline+1))) {
 					delete [] CartesianGradient;
 					CartesianGradient = NULL;
 					CartAllocation = 0;
@@ -128,9 +135,24 @@ bool GradientData::ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms,
 	//read in the maximum and rms gradient
 	if (Buffer->LocateKeyWord("MAXIMUM GRADIENT", 16, SearchLength)) {
 		Buffer->GetLine(Line);
-		scanerr = sscanf(Line, "MAXIMUM GRADIENT = %f RMS GRADIENT = %f", &Maximum, &RMS);
-		if (scanerr == 2) result = true;
+		scanerr = sscanf(Line, "MAXIMUM GRADIENT = %f", &Maximum);
+		if (scanerr == 1) result = true;
+		Buffer->BackupnLines(2);
 	}
+	if (result && Buffer->LocateKeyWord("RMS GRADIENT", 12, SearchLength)) {
+		Buffer->GetLine(Line);
+		scanerr = sscanf(Line, "RMS GRADIENT = %f", &RMS);
+		if (scanerr == 1) result = true;
+		else result = false;
+	}
+	
 
 	return result;
+}
+bool GradientData::RetrieveAtomGradient(long theAtom, CPoint3D & GradientVector) const {
+	if ((CartesianGradient!=NULL)&&(theAtom<CartAllocation)) {
+		GradientVector = CartesianGradient[theAtom];
+		return true;
+	}
+	return false;
 }

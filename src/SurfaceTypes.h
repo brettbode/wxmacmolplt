@@ -28,6 +28,7 @@ class OrbSurfBase {
 							//local orbitals, bit 4 - selects alpha or beta orbitals
 	public:
 		OrbSurfBase(void) {PlotOrb=-1; TargetSet = -1; Options=0;};
+		virtual ~OrbSurfBase(void) {};
 		inline long GetTargetOrb(void) const {return PlotOrb;};
 		inline void SetTargetOrb(long NewTarget) {PlotOrb = NewTarget;};
 		inline long GetTargetSet(void) const { return TargetSet;};

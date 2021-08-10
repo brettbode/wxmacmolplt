@@ -31,7 +31,7 @@ wxMolGraph::wxMolGraph(wxWindow       *parent,
 }
 
 int wxMolGraph::addXSet(vector<double> xData, bool selectable) {
-    int index = data.size();
+    int index = (int) data.size();
     int selected = 0;
 
     vector< YSettings > emptyYSettingsGroup;
@@ -70,7 +70,7 @@ int wxMolGraph::addYSet(YSet yData,
                         wxColour color,
                         int shape,
                         int size) {
-    int index = data[xSet].second.size();
+    int index = (int) data[xSet].second.size();
     YSettings newYSettings;
 
     newYSettings.visible = true;
@@ -244,7 +244,7 @@ void wxMolGraph::autoScaleY(int axis) {
         pad = (max - min) / 10.0;
         max += pad;
         min -= pad;
-        if(!(max - min)) {
+        if((max - min)<=0.0) {	//The range just needs to be non-zero
             max += 1.0;
             min -= 1.0;
         }
@@ -303,7 +303,7 @@ void wxMolGraph::autoScaleX(void) {
         pad = (max - min) / 10.0;
         max += pad;
         min -= pad;
-        if(!(max - min)) {
+        if((max - min)<=0.0) {	//The range just needs to be nonzero
             max += 1.0;
             min -= 1.0;
         }
@@ -493,11 +493,11 @@ wxSize wxMolGraph::DoGetBestSize() const {
     return wxSize( w, h );
 }
 
-void wxMolGraph::onSize(wxSizeEvent &event) {
+void wxMolGraph::onSize(wxSizeEvent &/*event*/) {
     Refresh();
 }
 
-void wxMolGraph::onPaint(wxPaintEvent &event) {
+void wxMolGraph::onPaint(wxPaintEvent &/*event*/) {
     wxPaintDC dc(this);
     draw(dc);
 }
@@ -836,7 +836,7 @@ void wxMolGraph::onLeftClick(wxMouseEvent &event) {
                     data[i].first.second = 0;
                 }
                 else if(x >= *(data[i].first.first.end() - 1)) {
-                    data[i].first.second = data[i].first.first.size() - 1;
+                    data[i].first.second = (int) data[i].first.first.size() - 1;
                 }
                 else {
                     for(j = 0; j < data[i].first.first.size() - 1; j++) {
@@ -886,6 +886,6 @@ void wxMolGraph::onMotion(wxMouseEvent &event) {
     }
 }
 
-void wxMolGraph::onLeaveWindow(wxMouseEvent &event) {
+void wxMolGraph::onLeaveWindow(wxMouseEvent &/*event*/) {
 }
 

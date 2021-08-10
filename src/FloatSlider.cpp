@@ -107,6 +107,7 @@ void FloatSlider::OnSliderChange(wxCommandEvent& event) {
  * @param event The text change event.
  */
 void FloatSlider::OnTextChange(wxCommandEvent& event) {
+	(void)event;
 
 	// Slider control needs updating too.
 	SyncSlider();
@@ -269,7 +270,7 @@ void FloatSlider::SetMax(float newmax) {
 
 	this->max = newmax;
 	wxString lstr;
-	lstr.Printf(wxT("%.3g"), newmax);
+	lstr.Printf(wxT("%05.3f"), newmax);
 
 	max_label->SetLabel(lstr);
 }

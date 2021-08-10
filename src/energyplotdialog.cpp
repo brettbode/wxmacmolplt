@@ -297,7 +297,7 @@ void EnergyPlotDialog::RegenData(void) {
     epGraph->setPrecision(eOpts->GetNumDigits());
     epGraph->autoScaleY(MG_AXIS_Y1);
     epGraph->autoScaleY(MG_AXIS_Y2);
-    epGraph->setSelection(0, mData->CurrentFrame - 1);
+    epGraph->setSelection(0, (int)mData->CurrentFrame - 1);
 }
 
 /*!
@@ -306,6 +306,7 @@ void EnergyPlotDialog::RegenData(void) {
 
 void EnergyPlotDialog::OnEpgraphGraphClick( wxCommandEvent& event )
 {
+	(void)event;
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     
     parent->ChangeFrames(epGraph->getSelection(0) + 1);
@@ -317,6 +318,7 @@ void EnergyPlotDialog::OnEpgraphGraphClick( wxCommandEvent& event )
 
 void EnergyPlotDialog::OnEpgraphAxisDClick( wxCommandEvent& event )
 {
+	(void)event;
 ////@begin wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH in EnergyPlotDialog.
 ////@end wxEVT_AXIS_DCLICK event handler for ID_EPGRAPH in EnergyPlotDialog. 
 }
@@ -328,6 +330,7 @@ void EnergyPlotDialog::OnEpgraphAxisDClick( wxCommandEvent& event )
 
 void EnergyPlotDialog::OnCloseEvent( wxCommandEvent& event )
 {
+	(void)event;
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->CloseEnergy_plotWindow();
 }
@@ -339,6 +342,7 @@ void EnergyPlotDialog::OnCloseEvent( wxCommandEvent& event )
 
 void EnergyPlotDialog::OnCopyClick( wxCommandEvent& event )
 {
+	(void)event;
     int width = 0;
     int height = 0;
     epGraph->GetClientSize(&width, &height);
@@ -391,6 +395,7 @@ void EnergyPlotDialog::KeyHandler(wxKeyEvent & event) {
 
 void EnergyPlotDialog::OnCloseWindow( wxCloseEvent& event )
 {
+	(void)event;
     MolDisplayWin *parent = (MolDisplayWin *)this->GetParent();
     parent->CloseEnergy_plotWindow();
 }

@@ -28,7 +28,16 @@ class GradientData {
 		void SetRMS(float v) {RMS = v;};
 		void SetMaximum(float v) {Maximum = v;};
 		bool ParseGAMESSGradient(BufferFile * Buffer, long NumAtoms, wxFileOffset SearchLength,
-			bool Style);
+			int Style);
+		/* Retrive the gradient vector for theAtom, returns true if successful
+		 * @param theAtom the atom to pull from the array
+		 * @param GradientVector upon return contains the gradient vector for theAtom
+		 */
+		bool RetrieveAtomGradient(long theAtom, CPoint3D & GradientVector) const;
+		/* Test to see if the gradient vector is available for display.
+		 * @param NumAtoms the number of atoms for the coordinates to confirm the gradient vector is the same length
+		 */
+		bool GradientVectorAvailable(long NumAtoms) const {return ((CartesianGradient!=NULL)&&(CartAllocation==NumAtoms));};
 #ifndef __wxBuild__
 		long GetSize(BufferFile * Buffer);
 		long Write(BufferFile * Buffer);

@@ -33,6 +33,7 @@ wxmacmolplt_SOURCES =                                  \
     InputData.cpp              InputData.h             \
     InputWizard.cpp            InputWizard.h           \
     Internals.cpp              Internals.h             \
+    inputfileeditor.cpp        inputfileeditor.h       \
     llmdialog.cpp              llmdialog.h             \
     main.cpp                   main.h                  \
     Math3D.cpp                 Math3D.h                \
@@ -55,6 +56,7 @@ wxmacmolplt_SOURCES =                                  \
     Progress.cpp               Progress.h              \
     RysPolynomial.cpp          RysPolynomial.h         \
     setbondlength.cpp          setbondlength.h         \
+    selectfiletype.cpp         selectfiletype.h        \
     setPreference.cpp          setPreference.h         \
     setscreenplane.cpp         setscreenplane.h        \
     SurfaceBase.cpp                                    \

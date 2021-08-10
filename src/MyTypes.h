@@ -88,7 +88,7 @@ public:
 	double	value;
 	TypeOfEnergy	type;
 	
-	EnergyValue(void) {value = 0.0, type=PlainEnergy;};
+	EnergyValue(void) {value = 0.0; type=PlainEnergy;};
 	EnergyValue(double v, TypeOfEnergy t) {value=v; type=t;};
 	double GetEnergy(void) const {return value;};
 	TypeOfEnergy GetType(void) const {return type;};
@@ -108,13 +108,13 @@ public:
 			   long atom3_id = -1, long atom4_id = -1);
 	virtual ~Annotation() {};
 	
-	virtual bool containsAtom(const int atom_id) const;
+	virtual bool containsAtom(const long atom_id) const;
 	virtual bool containsFragment(const mpAtom *atom_list) const;
-	virtual void adjustIds(const int atom_id, int offset = -1);
-	virtual bool isEquivalent(const int natoms, const int *new_list) const {
+	virtual void adjustIds(const long atom_id, int offset = -1);
+	virtual bool isEquivalent(const long /*natoms*/, const long */*new_list*/) const {
 		return false;
 	}
-	virtual int getAtom(const int index) const;
+	virtual long getAtom(const long index) const;
 	virtual int getType() const;
 
 	// Define these in subclasses.
@@ -136,7 +136,7 @@ public:
 	~AnnotationLength() {};
 	
 	void draw(const MolDisplayWin * win) const;
-	bool isEquivalent(const int natoms, const int *new_list) const;
+	bool isEquivalent(const long natoms, const long *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
 	float getParam(const Frame& frame) const;
@@ -149,7 +149,7 @@ public:
 	AnnotationMarker(const long atom_id = -1);
 	~AnnotationMarker() {};
 	void draw(const MolDisplayWin * win) const;
-	bool isEquivalent(const int natoms, const int *new_list) const;
+	bool isEquivalent(const long natoms, const long *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
 	float getParam(const Frame& frame) const;
@@ -163,7 +163,7 @@ public:
 					const long atom3_id = -1);
 	~AnnotationAngle() {};
 	void draw(const MolDisplayWin * win) const;
-	bool isEquivalent(const int natoms, const int *new_list) const;
+	bool isEquivalent(const long natoms, const long *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
 	float getParam(const Frame& frame) const;
@@ -177,7 +177,7 @@ public:
 					   const long atom3_id = -1, const long atom4_id = -1);
 	~AnnotationDihedral(void) {};
 	void draw(const MolDisplayWin * win) const;
-	bool isEquivalent(const int natoms, const int *new_list) const;
+	bool isEquivalent(const long natoms, const long *new_list) const;
 	void WriteXML(XMLElement * parent) const;
 	bool ReadXML(XMLElement * p);
 	float getParam(const Frame& frame) const;
@@ -253,7 +253,7 @@ class mpAtom {
 		// of selected atoms is properly accounted for.
 		bool SetSelectState(bool State) {flags = (flags & 0xFD) + (State?2:0); return GetSelectState();};
 
-		inline long GetType(void) const {return Type;};
+		inline short GetType(void) const {return Type;};
 		inline bool SetType(short atmType) {if ((atmType>0)&&(atmType<107)) {Type = atmType; return true;} return false;};
 		inline bool IsEffectiveFragment(void) const {return ((flags & (1<<2))?true:false);};
 		inline void IsEffectiveFragment(bool state) {flags = (flags & 0xFB) + (state ? (1<<2) : 0);};
@@ -334,11 +334,11 @@ class Bond {
 
 class EFragAtom {
 	public:
-		EFragAtom(const std::string& label, const CPoint3D& coords,
-				  int atomic_num)
-			: label(label),
-			  coords(coords),
-			  atomic_num(atomic_num) {
+		EFragAtom(const std::string& mylabel, const CPoint3D& mycoords,
+				  int myatomic_num)
+			: label(mylabel),
+			  coords(mycoords),
+			  atomic_num(myatomic_num) {
 		}
 
 		const CPoint3D& GetCoords() const {
@@ -541,23 +541,24 @@ bool ConvertTypeOfOrbital(const char * s, TypeOfOrbital & t);
 
 class OrbitalRec {
 	public:
-		float *			Vectors;			//Eigenvectors (Alpha set in UHF, Natural Orbs in MCSCF)
-		float *			VectorsB;			//Eigenvectors (Beta set in UHF, Optimized MOs in MCSCF)
-		float *			Energy;				//Orbital Energies (Alpha set in UHF, Natural Orbs in MCSCF)
-		float *			EnergyB;			//Orbital Energies (Beta set in UHF, Optimized MOs in MCSCF)
-		float *			OrbOccupation;		//Orbital occupation numbers
-		float *			OrbOccupationB;		//Orbital occupation numbers for Beta set
-		char *			SymType;			//Symmetry of each MO (Alpha set in UHF, Natural Orbs in MCSCF)
-		char *			SymTypeB;			//Symmetry of each MO (Beta set in UHF, Optimized MOs in MCSCF)
-		AODensity *		TotalAODensity;		//AO Density corresponding to these orbitals
-		long			NumAlphaOrbs;		//# alpha orbitals (or total # of orbitals)
-		long			NumBetaOrbs;		//# beta orbitals or MCSCF optimized orbs, 0 otherwise
-		long			NumOccupiedAlphaOrbs;	//# occupied orbs, normally just the
-		long			NumOccupiedBetaOrbs;	//# of e's except for ECP runs
-		long			NumBasisFunctions;	//This should be constant reflecting one dimension of the vectors
-		char *			Label;				//label lines from a $vec group	
-		TypeOfWavefunction	BaseWavefunction;	//RHF, UHF, ...
-		TypeOfOrbital	OrbitalType;		//Optimized, Natural, localized...
+		float *			Vectors;			///< Eigenvectors (Alpha set in UHF, Natural Orbs in MCSCF)
+		float *			VectorsB;			///< Eigenvectors (Beta set in UHF, Optimized MOs in MCSCF)
+		float *			Energy;				///< Orbital Energies (Alpha set in UHF, Natural Orbs in MCSCF)
+		float *			EnergyB;			///< Orbital Energies (Beta set in UHF, Optimized MOs in MCSCF)
+		float *			OrbOccupation;		///< Orbital occupation numbers
+		float *			OrbOccupationB;		///< Orbital occupation numbers for Beta set
+		char *			SymType;			///< Symmetry of each MO (Alpha set in UHF, Natural Orbs in MCSCF)
+		char *			SymTypeB;			///< Symmetry of each MO (Beta set in UHF, Optimized MOs in MCSCF)
+		AODensity *		TotalAODensity;		///< AO Density corresponding to these orbitals
+		long			NumAlphaOrbs;		///< # alpha orbitals (or total # of orbitals)
+		long			NumBetaOrbs;		///< # beta orbitals or MCSCF optimized orbs, 0 otherwise
+		long			NumOccupiedAlphaOrbs;	///< # occupied orbs, normally just the
+		long			NumOccupiedBetaOrbs;	///< # of e's except for ECP runs
+		long			NumBasisFunctions;	///< This should be constant reflecting one dimension of the vectors
+		long			StartingOffset;		///< An offset for the starting orbital, if greater than 0
+		char *			Label;				///< label lines from a $vec group
+		TypeOfWavefunction	BaseWavefunction;	///< RHF, UHF, ...
+		TypeOfOrbital	OrbitalType;		///< Optimized, Natural, localized...
 		
 		OrbitalRec(long nAlphaOrbs=0, long nBetaOrbs=0, long nBasis=0);
 		OrbitalRec(BufferFile *Buffer, long code, long length);
@@ -587,6 +588,8 @@ class OrbitalRec {
 		void SetOccupancy(float * Occ, long nVec);
 		void SetOrbitalOccupancy(const long & alpha, const long & beta);
 		bool TotalDensityPossible(void) const;
+		inline long getStartingOrbitalOffset(void) const {return StartingOffset;};
+		void setStartingOrbitalOffset(long v) {StartingOffset = v;};
 };
 
 typedef class SurfacePane SurfacePane;
@@ -619,7 +622,7 @@ class Surface {
 		/**
 		 * Exports surface data to our text file type	
 		 * This can effectively only be called by Surf3DBase objects
-		 * @param Grid3D
+		 * @param Grid3D The 3D array of grid points
 		 * @param nx number of grid points on the X axis
 		 * @param ny number of grid points on the Y axis
 		 * @param nz number of grid points on the Z axis
@@ -686,7 +689,7 @@ class Surface {
 		static Surface * ReadSurface(XMLElement * parent);
 		long WriteSurface(BufferFile * Buffer);
 		virtual void Export(BufferFile * Buffer, exportFileType eft);
-		virtual long ExportPOV(MoleculeData *lData, WinPrefs *Prefs, BufferFile *Buffer) {
+		virtual long ExportPOV(MoleculeData */*lData*/, WinPrefs */*Prefs*/, BufferFile */*Buffer*/) {
 			return 0;
 		}
 	//	void ExportToFile(void);

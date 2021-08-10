@@ -54,6 +54,7 @@ writeSWFFileAttributesToMethod(SWFBlock block, SWFByteOutputMethod method, void*
 static int
 completeSWFFileAttributes(SWFBlock block)
 {
+	(void) block;
 	return 4;
 }
 

@@ -471,7 +471,7 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 	bool	AtomAttributes=false;
 	for (int i=0; i<NumAtoms; i++) {
 			//output CML2 style atom information of the form:
-			//<atom id="a1" elementType="C" x3="-0.0167" y3="1.3781" z3="0.0096"/>
+			//   <atom id="a1" elementType="C" x3="-0.0167" y3="1.3781" z3="0.0096"/>
 		XMLElement * atomEle = AArrayElement->addChildElement(CML_convert(AtomElement));
 			//id's are used to reference the atoms later for bonding, I will generate
 			//simple ids 'a' + index number (the CML spec discourages the use of all numeric ids)
@@ -494,7 +494,7 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 	if (NumBonds > 0) {
 		XMLElement * bondArrayEle = molElement->addChildElement(CML_convert(BondArrayElement));
 		for (int j=0; j<NumBonds; j++) {
-				//<bond id="b1" atomRefs2="a1 a2" order="S"/>
+				// <bond id="b1" atomRefs2="a1 a2" order="S"/>
 				//CML only specifies single, double, triple, and aromatic bonds
 				//Need to handle hydrogen bonds as an extension
 			if ((Bonds[j].Order == kHydrogenBond)||(Bonds[j].Order > kAromaticBond)) {
@@ -519,12 +519,12 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 		}
 		if (AtomAttributes) {
 			//Store non-standard attributes of atoms such as selection, effective fragment id, SIMOMM type
-			XMLElement * AArrayElement = listElement->addChildElement(CML_convert(MMP_AtomAttrArrayElement));
+			XMLElement * AtomArrayElement = listElement->addChildElement(CML_convert(MMP_AtomAttrArrayElement));
 			for (int i=0; i<NumAtoms; i++) {
 				if (Atoms[i].GetSelectState() || Atoms[i].IsSIMOMMAtom() || Atoms[i].IsEffectiveFragment()
 					|| Atoms[i].GetInvisibility() || Atoms[i].IsSymmetryUnique() ||
 					Atoms[i].GetCoordinationNumber() || Atoms[i].GetLonePairCount()) {
-					XMLElement * atomEle = AArrayElement->addChildElement(CML_convert(AtomElement));
+					XMLElement * atomEle = AtomArrayElement->addChildElement(CML_convert(AtomElement));
 					snprintf(line, kMaxLineLength, "a%d", i);
 					atomEle->addAttribute(CML_convert(IdAttr), line);
 					if (Atoms[i].GetSelectState())
@@ -554,7 +554,7 @@ long Frame::WriteCMLFrame(XMLElement * parent, bool AllData) {
 		if (NonCMLBonds) {
 			XMLElement * bondArrayEle = listElement->addChildElement(CML_convert(MMP_BondArrayElement));
 			for (int j=0; j<NumBonds; j++) {
-				//<bond id="b1" atomRefs2="a1 a2" order="S"/>
+				// <bond id="b1" atomRefs2="a1 a2" order="S"/>
 				//CML only specifies single, double, triple, and aromatic bonds
 				//Need to handle hydrogen bonds as an extension
 				if ((Bonds[j].Order >= kSingleBond)&&(Bonds[j].Order <= kTripleBond)) {
@@ -686,6 +686,11 @@ void OrbitalRec::WriteXML(XMLElement * parent) const {
 		std::ostringstream bbuf;
 		bbuf << NumBasisFunctions;
 		orbElem->addAttribute(CML_convert(MMP_NumBasisFunctions), bbuf.str().c_str());
+	}
+	if (StartingOffset>0) {
+		std::ostringstream bbuf;
+		bbuf << StartingOffset;
+		orbElem->addAttribute(CML_convert(MMP_StartingOrbOffset), bbuf.str().c_str());
 	}
 	if (Vectors) {
 		std::ostringstream fbuf;
@@ -845,74 +850,74 @@ void VibRec::WriteXML(XMLElement * parent, long NumAtoms) const {
 	modes->addAttribute(CML_convert(rowsAttr), line);
 	
 	if (!Symmetry.empty()) {
-		std::ostringstream freqbuf;
-		char line[kMaxLineLength];
+		std::ostringstream symmetryBuf;
+		char countline[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
-			if (i>0) freqbuf << " ";
-			freqbuf << Symmetry[i];
+			if (i>0) symmetryBuf << " ";
+			symmetryBuf << Symmetry[i];
 		}
 		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
-													  freqbuf.str().c_str());
+													  symmetryBuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_Symmetry));
-		snprintf(line, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), line);
+		snprintf(countline, kMaxLineLength, "%ld", NumModes);
+		modes->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!Intensities.empty()) {
-		std::ostringstream freqbuf;
-		char line[kMaxLineLength];
+		std::ostringstream intensitybuf;
+		char countline[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
-			if (i>0) freqbuf << " ";
-			freqbuf << Intensities[i];
+			if (i>0) intensitybuf << " ";
+			intensitybuf << Intensities[i];
 		}
 		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
-													 freqbuf.str().c_str());
+													 intensitybuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_VibIntensity));
-		snprintf(line, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), line);
+		snprintf(countline, kMaxLineLength, "%ld", NumModes);
+		modes->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!ReducedMass.empty()) {
-		std::ostringstream freqbuf;
-		char line[kMaxLineLength];
+		std::ostringstream reducedMassbuf;
+		char countline[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
-			if (i>0) freqbuf << " ";
-			freqbuf << ReducedMass[i];
+			if (i>0) reducedMassbuf << " ";
+			reducedMassbuf << ReducedMass[i];
 		}
 		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
-													 freqbuf.str().c_str());
+													 reducedMassbuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_ReducedMass));
-		snprintf(line, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), line);
+		snprintf(countline, kMaxLineLength, "%ld", NumModes);
+		modes->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!RamanIntensity.empty()) {
-		std::ostringstream freqbuf;
-		char line[kMaxLineLength];
+		std::ostringstream ramanIntensitybuf;
+		char countline[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
-			if (i>0) freqbuf << " ";
-			freqbuf << RamanIntensity[i];
+			if (i>0) ramanIntensitybuf << " ";
+			ramanIntensitybuf << RamanIntensity[i];
 		}
 		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
-													 freqbuf.str().c_str());
+													 ramanIntensitybuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_RamanIntensity));
-		snprintf(line, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), line);
+		snprintf(countline, kMaxLineLength, "%ld", NumModes);
+		modes->addAttribute(CML_convert(sizeAttr), countline);
 	}
 	if (!Depolarization.empty()) {
-		std::ostringstream freqbuf;
-		char line[kMaxLineLength];
+		std::ostringstream depolarizationbuf;
+		char countline[kMaxLineLength];
 		for (int i=0; i<NumModes; i++) {
-			if (i>0) freqbuf << " ";
-			freqbuf << Depolarization[i];
+			if (i>0) depolarizationbuf << " ";
+			depolarizationbuf << Depolarization[i];
 		}
 		XMLElement * modes = vibElem->addChildElement(CML_convert(ArrayElement),
-													 freqbuf.str().c_str());
+													 depolarizationbuf.str().c_str());
 		modes->addAttribute(CML_convert(dataTypeAttr), "xsd:decimal");//required for the matrix XML element
 		modes->addAttribute(CML_convert(titleAttr), CML_convert(MMP_Depolarization));
-		snprintf(line, kMaxLineLength, "%ld", NumModes);
-		modes->addAttribute(CML_convert(sizeAttr), line);
+		snprintf(countline, kMaxLineLength, "%ld", NumModes);
+		modes->addAttribute(CML_convert(sizeAttr), countline);
 	}
 }
 void Internals::WriteXML(XMLElement * parent) const {
@@ -1081,7 +1086,7 @@ void AnnotationDihedral::WriteXML(XMLElement * parent) const {
 	Elem->addAttribute(kAnnAtom3XML, atoms[2]);
 	Elem->addAttribute(kAnnAtom4XML, atoms[3]);
 }
-XMLElement * XMLElement::AddLongArray(const std::vector<long> & array, const char * name, const char * title, long count) {
+XMLElement * XMLElement::AddLongArray(const std::vector<long> & array, const char * myname, const char * title, long count) {
 	XMLElement * result=NULL;
 	long num = count;
 	if (num>array.size()) num = array.size();
@@ -1094,7 +1099,7 @@ XMLElement * XMLElement::AddLongArray(const std::vector<long> & array, const cha
 			temp << array[i];
 		}
 	}
-	result = addChildElement(name, temp.str().c_str());
+	result = addChildElement(myname, temp.str().c_str());
 	result->addAttribute(CML_convert(dataTypeAttr), "xsd:integer"); //required for the array XML element
 	result->addAttribute(CML_convert(titleAttr), title);
 	temp.clear();
@@ -1168,9 +1173,9 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 												const char * val = child->getValue();
 												if (val) {
 													int pos=0, nchar;
-													for (int i=0; i<4; i++) {
+													for (int tri=0; tri<4; tri++) {
 														for (int j=0; j<4; j++) {
-															sscanf(&(val[pos]),"%f%n", &(TotalRotation[j][i]), &nchar);
+															sscanf(&(val[pos]),"%f%n", &(TotalRotation[j][tri]), &nchar);
 															pos += nchar;
 														}
 													}
@@ -1357,6 +1362,12 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 																						delete t;
 																				}
 																					break;
+																				default:
+																				{
+																					wxString msg;
+																					msg.Printf(_T("Unknown CML element in OpenCMLFile: %s"), child->getName());
+																					wxLogMessage(msg);
+																				}
 																			}
 																		}
 																	}
@@ -1374,12 +1385,25 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 														case MMP_WindowData:
 															if (wData) wData->ReadXML(mdchild);
 															break;
+														default:
+														{
+															wxString msg;
+															msg.Printf(_T("Unknown CML element in OpenCMLFile: %s"), child->getName());
+															wxLogMessage(msg);
+														}
 													}
 												}
 											}
 											mdchild = mdchild->getNextChild();
 										}
 									}
+								}
+									break;
+								default:
+								{
+									wxString msg;
+									msg.Printf(_T("Unknown CML element in OpenCMLFile: %s"), child->getName());
+									wxLogMessage(msg);
 								}
 									break;
 							}
@@ -1429,7 +1453,7 @@ long MoleculeData::OpenCMLFile(BufferFile * Buffer, WinPrefs * Prefs, WindowData
 void WindowData::ReadXML(XMLElement * parent) {
 	XMLElementList * children = parent->getChildren();
 	bool temp;
-	for (long i=0; i < children->length(); i++) {
+	for (int i=0; i < children->length(); i++) {
 		XMLElement * child = children->item(i);
 		MMP_WindowDataNS childName;
 		if (CML_convert(child->getName(), childName)) {
@@ -1486,6 +1510,13 @@ void WindowData::ReadXML(XMLElement * parent) {
 					if (child->getAttributeValue(VISIBLE_XML,temp))
 						ZMatVis = temp;
 						break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in WindowData::ReadXML: %s"), child->getName());
+					wxLogMessage(msg);
+				}
+					break;
 			}
 		}
 	}
@@ -1496,7 +1527,7 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
 	
 	std::map<std::string, long> idList; //map of ids to atom index
 	XMLElementList * children = mol->getChildren();
-	for (long i=0; i < children->length(); i++) {
+	for (int i=0; i < children->length(); i++) {
 		XMLElement * child = children->item(i);
 		CML_Element childname;
 		if (CML_convert(child->getName(), childname)) {
@@ -1563,6 +1594,13 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
 														IRCPt = temp;
 												}
 													break;
+												default:
+												{
+													wxString msg;
+													msg.Printf(_T("Unknown CML element in Frame::ReadCMLMolecule: %s"), child->getName());
+													wxLogMessage(msg);
+												}
+													break;
 											}
 										}
 									}
@@ -1598,10 +1636,24 @@ bool Frame::ReadCMLMolecule(XMLElement * mol) {
 									if (newSurf) AppendSurface(newSurf);
 								}
 									break;
+								default:
+								{
+									wxString msg;
+									msg.Printf(_T("Unknown CML element in Frame::ReadCMLMolecule: %s"), child->getName());
+									wxLogMessage(msg);
+								}
+									break;
 							}
 						}
 					}
 					delete listChildren;
+				}
+					break;
+				default:
+				{
+					wxString msg;
+					msg.Printf(_T("Unknown CML element in Frame::ReadCMLMolecule: %s"), child->getName());
+					wxLogMessage(msg);
 				}
 					break;
 			}
@@ -1640,6 +1692,13 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::map<std::string, long> & 
 										case atomIdAttr:
 											idresult = child->getValue();
 											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in Frame::ParseAtomArray: %s"), child->getName());
+											wxLogMessage(msg);
+										}
+											break;
 									}
 								}
 							}
@@ -1661,12 +1720,26 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::map<std::string, long> & 
 										case Z3Attr:
 											zcoord = child->getValue();
 											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in Frame::ParseAtomArray: %s"), child->getName());
+											wxLogMessage(msg);
+										}
+											break;
 									}
 								}
 							}
 						}
 							break;
 						case IntegerArrayElement:
+							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unknown CML element in Frame::ParseAtomArray: %s"), child->getName());
+							wxLogMessage(msg);
+						}
 							break;
 					}
 				}
@@ -1706,7 +1779,7 @@ void Frame::ParseAtomArray(XMLElement * arrayXML, std::map<std::string, long> & 
 			long xpos=0, ypos=0, zpos=0, etpos=0, idpos=0;
 
 			bool done=false;
-			long atomType=0;
+			int atomType=0;
 			CPoint3D atomPos;
 			while (!done) {
 				int n1 = sscanf(&(xcoord[xpos]), "%s%n", xcstr, &nchar);
@@ -1798,12 +1871,12 @@ void Frame::ParseAtomAttributeArrayXML(XMLElement * arrayXML, const std::map<std
 }
 
 bool Frame::ParseAtomXML(XMLElement * atomXML, std::map<std::string, long> & idList) {
-	long atomType=0;
+	int atomType=0;
 	CPoint3D atomPos;
 	bool	good=false;
 	
 	//Look for CML2 stuff first, all attributes
-	//<atom id="a1" elementType="C" x3="-0.0167" y3="1.3781" z3="0.0096"/>
+	// <atom id="a1" elementType="C" x3="-0.0167" y3="1.3781" z3="0.0096"/>
 
 	const char * et = atomXML->getAttributeValue(CML_convert(elementTypeAttr));
 	if (et != NULL) {	//I think the presence of "elementType" as an attribute should signal CML2
@@ -1821,10 +1894,10 @@ bool Frame::ParseAtomXML(XMLElement * atomXML, std::map<std::string, long> & idL
 			}
 		}
 	} else {	//parse CML1 style like:
-				//<string builtin="elementType">C</string>
-				//<float builtin="x3">1.1709</float>
-				//<float builtin="y3">2.0855</float>
-				//<float builtin="z3">0.0021</float>
+				// <string builtin="elementType">C</string>
+				// <float builtin="x3">1.1709</float>
+				// <float builtin="y3">2.0855</float>
+				// <float builtin="z3">0.0021</float>
 		XMLElementList * strList = atomXML->getElementsByName("string");
 		if (strList->length() > 0) {
 			for (int i=0; i< strList->length(); i++) {
@@ -1854,7 +1927,13 @@ bool Frame::ParseAtomXML(XMLElement * atomXML, std::map<std::string, long> & idL
 												case Z3Attr:
 													zcoord = flElem->getValue();
 													break;
-										//		default:
+												default:
+												{
+													wxString msg;
+													msg.Printf(_T("Unknown CML element in Frame::ParseAtomXML: %s"), flElem->getName());
+													wxLogMessage(msg);
+												}
+													break;
 											}
 										}
 									}
@@ -1924,9 +2003,23 @@ void Frame::ParseBondArrayXML(XMLElement * arrayXML, const std::map<std::string,
 										case orderAttr:
 											ordrref = child->getValue();
 											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in Frame::ParseBondrray: %s"), child->getName());
+											wxLogMessage(msg);
+										}
+											break;
 									}
 								}
 							}
+						}
+							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unknown CML element in Frame::ParseBondArray: %s"), child->getName());
+							wxLogMessage(msg);
 						}
 							break;
 					}
@@ -1990,11 +2083,11 @@ void Frame::ParseBondArrayXML(XMLElement * arrayXML, const std::map<std::string,
 }
 
 bool Frame::ParseBondXML(XMLElement * bondXML, const std::map<std::string, long> & idList) {
-	//<bond id="a1" atomRefs2="a1 a2" order="S"/>
+	// <bond id="a1" atomRefs2="a1 a2" order="S"/>
 	
 	const char * et = bondXML->getAttributeValue(CML_convert(atomRefs2Attr));
 	if (et != NULL) {
-		int len = strlen(et);
+		size_t len = strlen(et);
 		if (len > 0) {
 			const char * order = bondXML->getAttributeValue(CML_convert(orderAttr));
 			BondOrder b = kSingleBond;
@@ -2022,11 +2115,11 @@ bool Frame::ParseBondXML(XMLElement * bondXML, const std::map<std::string, long>
 			}
 		}
 	} else { // CML1 style bond info
-			//<bond>
-			//<string builtin="atomRef">a1</string>
-			//<string builtin="atomRef">a2</string>
-			//<string builtin="order">1</string>
-			//</bond>
+			// <bond>
+			//   <string builtin="atomRef">a1</string>
+			//   <string builtin="atomRef">a2</string>
+			//   <string builtin="order">1</string>
+			// </bond>
 		XMLElementList * strList = bondXML->getElementsByName("string");
 		if (strList->length() > 0) {
 			long id1, id2, nrefs=0;
@@ -2068,6 +2161,13 @@ bool Frame::ParseBondXML(XMLElement * bondXML, const std::map<std::string, long>
 								break;
 							case orderAttr:
 								CML_convert(value, b);
+								break;
+							default:
+							{
+								wxString msg;
+								msg.Printf(_T("Unknown CML element in Frame::ParseBondXML: %s"), child->getName());
+								wxLogMessage(msg);
+							}
 								break;
 						}
 					}
@@ -2145,6 +2245,13 @@ MOPacInternals::MOPacInternals(XMLElement * parent) {
 							}
 						}
 							break;
+						default:
+						{
+							wxString msg;
+							msg.Printf(_T("Unknown CML element in MOPacInternals::MOPacInternals: %s"), child->getName());
+							wxLogMessage(msg);
+						}
+							break;
 					}
 				}
 			}
@@ -2206,6 +2313,13 @@ BasisSet * BasisSet::ReadXML(XMLElement * parent) {
 												pos += nchar;
 											}
 											target->goodCharges = true;
+										}
+											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in BasisSet::ReadXML: %s"), child->getName());
+											wxLogMessage(msg);
 										}
 											break;
 									}
@@ -2279,6 +2393,13 @@ void BasisShell::ReadXML(XMLElement * parent) {
 									}
 								}
 									break;
+								default:
+								{
+									wxString msg;
+									msg.Printf(_T("Unknown CML element in BasisShell::ReadXML: %s"), child->getName());
+									wxLogMessage(msg);
+								}
+									break;
 							}
 						}
 					}
@@ -2309,6 +2430,13 @@ void GradientData::ReadXML(XMLElement * grad) {
 										break;
 									case MMP_MaxGradient:
 										if (child->getDoubleValue(temp)) Maximum = temp;
+										break;
+									default:
+									{
+										wxString msg;
+										msg.Printf(_T("Unknown CML element in GradientData::ReadXML: %s"), child->getName());
+										wxLogMessage(msg);
+									}
 										break;
 								}
 							}
@@ -2341,6 +2469,13 @@ void GradientData::ReadXML(XMLElement * grad) {
 									}
 								}
 								break;
+							default:
+							{
+								wxString msg;
+								msg.Printf(_T("Unknown CML element in GradientData::ReadXML: %s"), child->getName());
+								wxLogMessage(msg);
+							}
+								break;
 						}
 					}
 				}
@@ -2368,6 +2503,13 @@ void VibRec::ReadXML(XMLElement * vibs, const long & NumAtoms) {
 										long temp;
 										case MMP_CurrentMode:
 											if (child->getLongValue(temp)) CurrentMode = temp;
+											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in VibRec::ReadXML: %s"), child->getName());
+											wxLogMessage(msg);
+										}
 											break;
 									}
 								}
@@ -2525,7 +2667,21 @@ void VibRec::ReadXML(XMLElement * vibs, const long & NumAtoms) {
 											}
 										}
 											break;
+										default:
+										{
+											wxString msg;
+											msg.Printf(_T("Unknown CML element in VibRec::ReadXML: %s"), child->getName());
+											wxLogMessage(msg);
+										}
+											break;
 									}
+								}
+									break;
+								default:
+								{
+									wxString msg;
+									msg.Printf(_T("Unknown CML element in VibRec::ReadXML: %s"), child->getName());
+									wxLogMessage(msg);
 								}
 									break;
 							}
@@ -2551,6 +2707,7 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 		orbset->getAttributeValue(CML_convert(MMP_NumOccAlphaOrbs), NumOccupiedAlphaOrbs);
 		orbset->getAttributeValue(CML_convert(MMP_NumOccBetaOrbs), NumOccupiedBetaOrbs);
 		orbset->getAttributeValue(CML_convert(MMP_NumBasisFunctions), NumBasisFunctions);
+		orbset->getAttributeValue(CML_convert(MMP_StartingOrbOffset), StartingOffset);
 		for (int i=0; i<children->length(); i++) {
 			XMLElement * child = children->item(i);
 			CML_Element childtype;
@@ -2691,10 +2848,10 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 												delete [] SymType;
 												SymType = NULL;
 											}
-											int len = strlen(sym);
+											size_t len = strlen(sym);
 											SymType = new char[5*NumAlphaOrbs];
 											long pos = 0;
-											for (int i=0; i<NumAlphaOrbs; i++) {
+											for (long i=0; i<NumAlphaOrbs; i++) {
 												int n=0;
 												while (sym[pos] != ' ') {
 													SymType[n+5*i] = sym[pos];
@@ -2724,26 +2881,33 @@ bool OrbitalRec::ReadXML(XMLElement * orbset) {
 												delete [] SymTypeB;
 												SymTypeB = NULL;
 											}
-											int len = strlen(sym);
+											size_t len = strlen(sym);
 											SymTypeB = new char[5*NumBetaOrbs];
 											long pos = 0;
-											for (int i=0; i<NumBetaOrbs; i++) {
+											for (long ii=0; ii<NumBetaOrbs; ii++) {
 												int n=0;
 												while (sym[pos] != ' ') {
-													SymTypeB[n+5*i] = sym[pos];
+													SymTypeB[n+5*ii] = sym[pos];
 													pos++;
 													n++;
 													if (pos >= len) {
-														i = NumBetaOrbs;
+														ii = NumBetaOrbs;
 														break;
 													}
 												}
-												SymTypeB[n+5*i] = '\0';
+												SymTypeB[n+5*ii] = '\0';
 												while (sym[pos]==' ') pos++;
 											}
 										}
 									}
 								}
+							}
+								break;
+							default:
+							{
+								wxString msg;
+								msg.Printf(_T("Unknown CML element in OrbitalRec::ReadXML: %s"), child->getName());
+								wxLogMessage(msg);
 							}
 								break;
 						}
@@ -2818,7 +2982,7 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 
 	attr = el->getAttributeValue(CML_convert(sizeAttr));
 	if (!attr) return false;
-	sscanf(attr, "%d", &natoms);
+	sscanf(attr, "%ld", &natoms);
 	if (!natoms) return true;
 
 	atoms = new mpAtom[natoms];
@@ -2869,7 +3033,7 @@ bool Structure::ReadXML(XMLElement *struc_el) {
 
 	attr = el->getAttributeValue(CML_convert(sizeAttr));
 	if (!attr) return false;
-	sscanf(attr, "%d", &nbonds);
+	sscanf(attr, "%ld", &nbonds);
 
 	// Nothing else to do if there aren't any bonds.
 	if (!nbonds) return true;
@@ -3285,6 +3449,8 @@ const char * CML_convert(MMP_OrbitalSetNS t)
             return "BetaOccupied";
         case MMP_NumBasisFunctions:
             return "NumberBasisFunctions";
+		case MMP_StartingOrbOffset:
+			return "StartingOrbitalOffset";
 		case MMP_OrbVectors:
 			return "Vectors";
 		case MMP_BetaOrbVectors:
@@ -3604,6 +3770,8 @@ const char * CML_convert(MMP_IOSCFGroupNS t)
 			return "GVBOpenShellDegeneracy";
 		case MMP_IOSCFArrayElement:
 			return "array";
+		case MMP_IOSCFNPREOArrayElement:
+			return "NPREOArray";
 		default:
             return "invalid";
     }

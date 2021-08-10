@@ -81,24 +81,25 @@ class BondPrefsPane : public PrefsPane {
 		virtual void SetupPaneItems(MolDisplayWin* targetWindow);
 		virtual void saveToTempPrefs();
 
+		/// Event handler for the bond order choice
 		void OnChoice( wxCommandEvent &event );
+		/// Event handler for the normal mode sclaing slider
 		void OnSliderUpdate( wxCommandEvent &event);
+		/// Event handler for the Gradient scaling slider
+		void OnGradientSliderUpdate(wxCommandEvent & event);
+		/// Event Handler for Gradient display radio box
+		void OnGradientRadioUpdate(wxCommandEvent & event);
 		void OnToggleAnim(wxCommandEvent& event);
 		void OnToggleRotation(wxCommandEvent& event);
 
 	private:
-		wxBoxSizer* mMainSizer;
-		wxBoxSizer* mUpperSizer;
-		wxBoxSizer* mSldSizer;
-		wxStaticBoxSizer* mBox;
-		wxBoxSizer* mLowerSizer;
-		wxFlexGridSizer* mInnerSizer;
-
 		wxCheckBox* mChkAnim;
 		wxCheckBox* mChkRotation;
+		wxRadioBox* mGradientBox;
 		wxSlider* mSldScale;
+		wxSlider* mGradientSlider;
 		wxChoice* mBondChoice;
-		colorArea *mColorArea, *mNormColorArea;
+		colorArea *mColorArea, *mNormColorArea, *mGradientColorArea;
 
 		int mChoiceId;
 

@@ -95,17 +95,17 @@
 	<key>CFBundleIconFile</key>
 	<string>MacMolPlt.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>gov.ameslab.wxMacMolplt</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleLongVersionString</key>
-	<string>v 7.7</string>
+	<string>v 7.7.1</string>
 	<key>CFBundleName</key>
 	<string>wxMacMolPlt</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>7.7</string>
+	<string>7.7.1</string>
 	<key>CFBundleSignature</key>
 	<string>BMBm</string>
 	<key>CFBundleSupportedPlatforms</key>
@@ -113,7 +113,7 @@
 		<string>MacOSX</string>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>7.7</string>
+	<string>7.7.1</string>
 	<key>DTCompiler</key>
 	<string>com.apple.compilers.llvm.clang.1_0</string>
 	<key>DTPlatformBuild</key>

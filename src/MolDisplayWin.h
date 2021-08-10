@@ -58,6 +58,7 @@ enum MMP_EventID {
 	MMP_SHOWMODE,
 	MMP_PREVMODE,
 	MMP_NEXTMODE,
+	MMP_SHOWGRADIENT,
 	MMP_SHOWAXIS,
 	MMP_SHOWBUILDTOOLS,
 	MMP_SHOWSYMMETRYOPERATOR,
@@ -97,7 +98,7 @@ enum MMP_EventID {
 	MMP_INVERTNORMALMODE,
 	MMP_ADDHYDROGENS,
 	MMP_DELETEHYDROGENS,
-	
+		// The following is grouped together to be used in an UPDATE_UI_RANGE with the same handler
 	MMP_NEWFRAME,
 	MMP_COPYCOORDS,
 	MMP_COPYNWCOORDS,
@@ -202,7 +203,7 @@ private:
 	Bond *		Bonds;		///< Saved bond list
 	long		NumAtoms;	///< atom count
 	long		NumBonds;	///< bond count
-	std::vector<std::string> FragmentNames;	//< Effective Fragment name for each fragment (FRAGNAME)
+	std::vector<std::string> FragmentNames;	///< Effective Fragment name for each fragment (FRAGNAME)
 	Internals * IntCoords;	///< Set of internal coordinate definitions
 };
 
@@ -399,7 +400,7 @@ class MolDisplayWin : public wxFrame {
 		 * @param width A pointer to an integer that will be set to the width
 		 * @param height A pointer to an integer that will be set to the height
 		 */
-		void getCanvasSize(long *width, long *height);
+		void getCanvasSize(int *width, int *height);
 
 		//Call to update the menu bar itesm for the current data
 		void AdjustMenus();
@@ -459,6 +460,10 @@ class MolDisplayWin : public wxFrame {
 		void menuViewOffsetAlongMode(wxCommandEvent &event);
 		void menuViewAnimateMode(wxCommandEvent &event);
 		void menuViewAnimateFrames(wxCommandEvent &event);
+		/// Update UI event handler for the Show Gradient menu item.
+		void OnViewGradientUpdate(wxUpdateUIEvent& event);
+		/// Event handler for the user toggling the show Gradient menu item.
+		void menuViewShowGradient(wxCommandEvent &event);
 		//void menuViewShow_special_atoms(wxCommandEvent &event);
 		//void menuVeiwShow_hydrogen_labels(wxCommandEvent &event);
 		void menuViewShowAxis(wxCommandEvent &event);

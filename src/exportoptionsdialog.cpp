@@ -266,6 +266,7 @@ wxIcon ExportOptionsDialog::GetIconResource( const wxString& name )
 
 void ExportOptionsDialog::OnResChoiceSelected( wxCommandEvent& event )
 {
+	(void)event;
     switch(resChoice->GetSelection()) {
         case 0:
             width = screenWidth;
@@ -291,13 +292,14 @@ void ExportOptionsDialog::OnResChoiceSelected( wxCommandEvent& event )
 
 void ExportOptionsDialog::OnReswidthspinUpdated( wxSpinEvent& event )
 {
-    long tempWidth = 0;
+    int tempWidth = 0;
+	(void)event;
 
     resChoice->SetSelection(2);
     tempWidth = resWidthSpin->GetValue();
     if(height != -1) {
         width = -1;
-        height = (long)(tempWidth * H2Wratio);
+        height = tempWidth * H2Wratio;
         resHeightSpin->SetValue(height);
     }
     width = tempWidth;
@@ -309,13 +311,14 @@ void ExportOptionsDialog::OnReswidthspinUpdated( wxSpinEvent& event )
 
 void ExportOptionsDialog::OnResheightspinUpdated( wxSpinEvent& event )
 {
-    long tempHeight = 0;
+    int tempHeight = 0;
+	(void)event;
 
     resChoice->SetSelection(2);
     tempHeight = resHeightSpin->GetValue();
     if(width != -1) {
         height = -1;
-        width = (long)(tempHeight / H2Wratio);
+        width = tempHeight / H2Wratio;
         resWidthSpin->SetValue(width);
     }
     height = tempHeight;
@@ -329,6 +332,7 @@ void ExportOptionsDialog::OnResheightspinUpdated( wxSpinEvent& event )
 
 void ExportOptionsDialog::OnCheckbox3Click( wxCommandEvent& event )
 {
+	(void)event;
     transparency = resTBGCheck->GetValue();
 }
 

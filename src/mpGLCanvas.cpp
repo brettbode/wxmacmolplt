@@ -205,6 +205,8 @@ void MpGLCanvas::SetPrefs(WinPrefs *newPrefs) {
 }
 
 wxImage MpGLCanvas::getImage(const int width, const int height) {
+	(void)width;
+	(void)height;
 
 #if wxCHECK_VERSION(2,9,0)
 	SetCurrent(*context);
@@ -250,6 +252,7 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 									Progress * progress, bool Center,
 									bool frame) {
 
+	(void)progress;
 #if wxCHECK_VERSION(2,9,0)
 	SetCurrent(*context);
 #else
@@ -336,8 +339,8 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
 			glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
-			wxCoord x = ipass*width + hOffset;
-			wxCoord y = jpass*height + vOffset;
+			wxCoord x = wxCoord(ipass*width + hOffset);
+			wxCoord y = wxCoord(jpass*height + vOffset);
 			//I am not sure this is the best way to do this, but it
 			//converts the pixels to a wxImage, flips it vertically to get
 			//it into the right orientation, then converts it to a bitmap
@@ -359,7 +362,7 @@ void MpGLCanvas::GenerateHiResImage(wxDC * dc, const float & ScaleFactor,
 		lpen.SetWidth((int)ScaleFactor);
 		dc->SetBrush(*wxTRANSPARENT_BRUSH);
 		dc->SetPen(lpen);
-		dc->DrawRectangle(hOffset, vOffset, ScaledWidth, ScaledHeight);
+		dc->DrawRectangle((wxCoord)hOffset, (wxCoord)vOffset, ScaledWidth, ScaledHeight);
 	}
 	 MolWin->ReleaseLists();
 }
@@ -406,7 +409,7 @@ void MpGLCanvas::GenerateHiResImageForExport(wxDC *dc) {
 	edgePassWidth  = (canvasWidth  * numPassesX) - dcWidth;
 	edgePassHeight = (canvasHeight * numPassesY) - dcHeight;
 
-	pixels = (GLbyte *)malloc(canvasWidth * canvasHeight * 3 * sizeof(GLbyte));
+	pixels = (GLbyte *)new unsigned char[3 * canvasHeight * canvasWidth * sizeof(GLbyte)];
 
 	glReadBuffer(GL_BACK);
 
@@ -527,6 +530,8 @@ void MpGLCanvas::eventSize(wxSizeEvent &event) {
 
 #if !wxCHECK_VERSION(2,9,0)
 	wxGLCanvas::OnSize(event);
+#else
+	(void) event;
 #endif
 	GetClientSize(&width, &height);
 	Update();
@@ -541,6 +546,7 @@ void MpGLCanvas::eventSize(wxSizeEvent &event) {
  */
 void MpGLCanvas::eventPaint(wxPaintEvent &event) {
 
+	(void)event;
 	wxPaintDC paintDC(this); // wx requires this. I hope it goes away soon.
 	Draw();
 
@@ -731,11 +737,12 @@ void MpGLCanvas::Draw() {
 }
 
 void MpGLCanvas::eventErase(wxEraseEvent &event) {
+	(void)event;
 	// Don't mess with this.  It's supposed to be empty.
 	// This avoids flashing on Windows.
 }
 
-void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
+void MpGLCanvas::ConstrainPosition(const long anno_id, double x, double y,
 								   double z) {
 
 	Frame *lFrame = mMainData->cFrame;
@@ -759,9 +766,9 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
 		// the two atoms.
 		case MP_ANNOTATION_LENGTH: {
 
-			int shifter_id;          // The id of the atom being moved 
+			long shifter_id;		// The id of the atom being moved
 			CPoint3D shifter_pos;    //   and its position.
-			int anchor_id;           // The id of the anchored atom 
+			long anchor_id;			// The id of the anchored atom
 			CPoint3D anchor_pos;     //   and its position.
 			float len;               // Length of vector between two atoms.
 			CPoint3D bond_vec;       // Vector from anchor atom to shift atom.
@@ -835,11 +842,11 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
 		// the circle.
 		case MP_ANNOTATION_ANGLE: {
 
-			int atom1_id;         // ID of one non-vertex atom
+			long atom1_id;         // ID of one non-vertex atom
 			CPoint3D atom1_pos;   //   and its position.
-			int atom2_id;         // ID of other non-vertex atom
+			long atom2_id;         // ID of other non-vertex atom
 			CPoint3D atom2_pos;   //   and its position.
-			int vertex_id;        // ID of vertex atom 
+			long vertex_id;        // ID of vertex atom
 			CPoint3D vertex_pos;  //   and its position.
 			CPoint3D vec1;        // Vector from vertex atom to atom1.
 			CPoint3D vec2;        // Vector from vertex atom to atom2.
@@ -963,10 +970,10 @@ void MpGLCanvas::ConstrainPosition(const int anno_id, double x, double y,
 		case MP_ANNOTATION_DIHEDRAL: {
 
 			CPoint3D shifted_pos;
-			int atom1_id;
-			int atom2_id;
-			int atom3_id;
-			int atom4_id;
+			long atom1_id;
+			long atom2_id;
+			long atom3_id;
+			long atom4_id;
 			CPoint3D atom1_pos;
 			CPoint3D atom2_pos;
 			CPoint3D atom3_pos;
@@ -1318,12 +1325,12 @@ void MpGLCanvas::eventMouseDragging(wxMouseEvent& event) {
 		} else if (selected_type == MMP_ATOM) {
 			wxString info, id;
 			Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType() - 1, info);
-			id.Printf(wxT(" (%d)"), selected + 1);
+			id.Printf(wxT(" (%ld)"), selected + 1);
 			info.Append(id);
 			MolWin->SetStatusText(info);
 		} else if (selected_type == MMP_BOND) {
 			wxString msg;
-			msg.Printf(_("Bond (%d)"), selected + 1);
+			msg.Printf(_("Bond (%ld)"), selected + 1);
 			MolWin->SetStatusText(msg);
 		} else {
 			MolWin->UpdateFrameText();
@@ -1495,7 +1502,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 				} else {
 
 					mpAtom new_atom;
-					int prev_natoms = lFrame->NumAtoms;
+					long prev_natoms = lFrame->NumAtoms;
 					Structure *structure;
 
 					structure = BuilderTool->GetSelectedStructure();
@@ -1620,11 +1627,11 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 						mouse_pos = CPoint3D(mouse_x, mouse_y, mouse_z);
 						offset = mouse_pos - pos;
 
-						int prev_natoms = lFrame->NumAtoms;
+						long prev_natoms = lFrame->NumAtoms;
 
 						lFrame->resetAllSelectState();
 						MolWin->SetHighliteMode(true);
-						int fragId=-1;
+						long fragId=-1;
 
 						if (structure->FragName.size() > 0) {
 							fragId = mMainData->FragmentNames.size() + 1;
@@ -1714,7 +1721,7 @@ void MpGLCanvas::eventMouseLeftWentUp(wxMouseEvent& event) {
 			}
 			
 			if (okay_to_continue) {
-				int ibond = lFrame->BondExists(first_atom_clicked, selected);
+				long ibond = lFrame->BondExists(first_atom_clicked, selected);
 				MolWin->CreateFrameSnapShot();
 				if (ibond >= 0) {
 					int t = lFrame->GetBondOrder(ibond);
@@ -1992,7 +1999,7 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 
 			// Screen plane translation can be restricted by an annotation
 			// constraint.
-			int constrain_anno_id = mMainData->GetConstrainAnnotation();
+			long constrain_anno_id = mMainData->GetConstrainAnnotation();
 			if (!event.ShiftDown() &&
 			    !event.MiddleIsDown() &&
 			    constrain_anno_id != -1 &&
@@ -2056,8 +2063,8 @@ void MpGLCanvas::HandleEditing(wxMouseEvent& event, const wxPoint& curr_pt,
 		// The axis of rotation is a vector from one atom of the
 		// bond to the other.
 
-		lFrame->GetAtomPosition(lFrame->GetBondAtom(selected, 1), pivot_pt);
-		lFrame->GetAtomPosition(lFrame->GetBondAtom(selected, 2), other_pt);
+		lFrame->GetAtomPosition(selectedBondAtom1, pivot_pt);
+		lFrame->GetAtomPosition(selectedBondAtom2, other_pt);
 		axis = other_pt	- pivot_pt;
 		Normalize3D(&axis);
 
@@ -2305,6 +2312,10 @@ void MpGLCanvas::testPicking(int x, int y) {
 		}
 		j += buff[j] + 3;
 	}
+	if (selected_type == MMP_BOND) {
+		selectedBondAtom1 = mMainData->cFrame->GetBondAtom(selected, 1);
+		selectedBondAtom2 = mMainData->cFrame->GetBondAtom(selected, 2);
+	}
 
 #if 0
 	std::cout << "selected_type: " << selected_type << std::endl;
@@ -2314,7 +2325,7 @@ void MpGLCanvas::testPicking(int x, int y) {
 
 }
 
-void MpGLCanvas::SelectObj(int selected_type, int select_id, bool unselect_all) {
+void MpGLCanvas::SelectObj(int selected_type, long select_id, bool unselect_all) {
 
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
@@ -2420,6 +2431,7 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 	// It's assumed that at least 4 atoms are selected when this function is
 	// called.
 
+	(void)event;
 	Frame *lFrame = mMainData->cFrame;
 	long NumAtoms = lFrame->NumAtoms;
 	mpAtom *lAtoms = lFrame->Atoms;
@@ -2445,7 +2457,7 @@ void MpGLCanvas::FitToPlane(wxCommandEvent& event) {
 	centroid *= (1.0f / atoms.size());
 
 	// Now store all selected atoms' coordinates in a matrix.
-	locs = Matrix2D(atoms.size(), 3);
+	locs = Matrix2D((int) atoms.size(), 3);
 	for (atom = atoms.begin(), i = 0; atom != atoms.end(); atom++, i++) {
 		locs.data[i * 3 + 0] = (*atom)->Position.x - centroid.x;
 		locs.data[i * 3 + 1] = (*atom)->Position.y - centroid.y;
@@ -2609,6 +2621,7 @@ void MpGLCanvas::interactPopupMenu(int x, int y, bool isAtom) {
  * @param event The contextual menu event triggering the change.
  */
 void MpGLCanvas::ChangeAtom(wxCommandEvent& event) {
+	(void)event;
 
 	MolWin->CreateFrameSnapShot();
 	mMainData->cFrame->SetAtomType(selected, BuilderTool->GetSelectedElement());
@@ -2652,14 +2665,14 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 	if (selected_type == MMP_ATOM) {
 		wxString aLabel, nItem;
 		Prefs->GetAtomLabel(lFrame->Atoms[selected].GetType()-1, nItem);
-		aLabel.Printf(wxT(" (%d)"), (selected+1));
+		aLabel.Printf(wxT(" (%ld)"), (selected+1));
 		nItem.Append(aLabel);
 		item = menu.Append(wxID_ANY, nItem);
 		item->Enable(false);
 		
 		if (lFrame->Atoms[selected].IsEffectiveFragment()) {
 			wxString flabel(mMainData->FragmentNames[lFrame->Atoms[selected].GetFragmentNumber()-1].c_str(), wxConvUTF8);
-			aLabel.Printf(wxT("EFP (%d) "), lFrame->Atoms[selected].GetFragmentNumber(), (selected+1));
+			aLabel.Printf(wxT("EFP (%ld) "), lFrame->Atoms[selected].GetFragmentNumber(), (selected+1));
 			aLabel.Append(flabel);
 			item = menu.Append(wxID_ANY, aLabel);
 			item->Enable(false);
@@ -2702,11 +2715,11 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 				if (lFrame->GetBondLength(select_stack[0], select_stack[1], &length)) {
 					wxString lengthString, name;
 					Prefs->GetAtomLabel(lFrame->Atoms[select_stack[0]].GetType()-1, lengthString);
-					name.Printf(wxT(" (%d) to "), (select_stack[0]+1));
+					name.Printf(wxT(" (%ld) to "), (select_stack[0]+1));
 					lengthString.Append(name);
 					Prefs->GetAtomLabel(lFrame->Atoms[select_stack[1]].GetType()-1, name);
 					lengthString.Append(name);
-					name.Printf(wxT(" (%d)"), (select_stack[1]+1));
+					name.Printf(wxT(" (%ld)"), (select_stack[1]+1));
 					lengthString.Append(name);
 					item = menu.Append(wxID_ANY, lengthString);
 					item->Enable(false);
@@ -2730,7 +2743,7 @@ void MpGLCanvas::insertAnnotationMenuItems(wxMenu& menu) {
 				
 				menu.AppendSeparator();
 				wxMenu * submenu = new wxMenu();
-				int bond_id = lFrame->BondExists(select_stack[0],
+				long bond_id = lFrame->BondExists(select_stack[0],
 												select_stack[1]);
 
 				if (bond_id < 0) {
@@ -2853,6 +2866,7 @@ void MpGLCanvas::annoPopupMenu(int x, int y) {
 }
 
 void MpGLCanvas::SetAnnotationParameter(wxCommandEvent& event) {
+	(void)event;
 
 	wxTextEntryDialog *dlg;
 	double new_value;
@@ -2895,6 +2909,7 @@ void MpGLCanvas::SetAnnotationParameter(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::ConstrainToAnnotation(wxCommandEvent& event) {
+	(void)event;
 
 	if (mMainData->GetConstrainAnnotation() != selected) {
 		mMainData->ConstrainToAnnotation(selected);
@@ -2905,12 +2920,13 @@ void MpGLCanvas::ConstrainToAnnotation(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::DeleteAnnotation(wxCommandEvent& event) {
+	(void)event;
 
 	Annotation * t = mMainData->Annotations[selected];
 	mMainData->Annotations.erase(mMainData->Annotations.begin() + selected);
 	delete t;
 
-	int constrain_anno_id = mMainData->GetConstrainAnnotation();
+	long constrain_anno_id = mMainData->GetConstrainAnnotation();
 	if (constrain_anno_id != -1) {
 		/* If we're deleting an annotation that appears earlier in the
 		 * annotation list, we need to shift the id of the constrained
@@ -2946,7 +2962,7 @@ void MpGLCanvas::PasteAtMouse(wxCommandEvent& event) {
 	// its fellow atoms are placed relatively.
 
 	Frame *lFrame = mMainData->cFrame;
-	int new_atom_idx = lFrame->NumAtoms;
+	long new_atom_idx = lFrame->NumAtoms;
 	CPoint3D pos;
 	CPoint3D offset;
 	CPoint3D mouse_pos;
@@ -2977,7 +2993,7 @@ void MpGLCanvas::PasteAtMouse(wxCommandEvent& event) {
 	offset = mouse_pos - pos;
 
 	// Now we offset all the new atoms.
-	for (int i = new_atom_idx; i < lFrame->NumAtoms; i++) {
+	for (long i = new_atom_idx; i < lFrame->NumAtoms; i++) {
 		lFrame->GetAtomPosition(i, pos);
 		lFrame->SetAtomPosition(i, pos + offset);
 	}
@@ -3086,7 +3102,7 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 		}
 		MolWin->BondsChanged();
 	} else if (select_stack_top == 2) { //new bond
-		int bond_id = lFrame->BondExists(select_stack[0], select_stack[1]);
+		long bond_id = lFrame->BondExists(select_stack[0], select_stack[1]);
 		if (bond_id >= 0) {
 			bond = &(lFrame->Bonds[bond_id]);
 			bond->Order = order;
@@ -3102,6 +3118,7 @@ void MpGLCanvas::ChangeBonding(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
+	(void)event;
 	
 	MolWin->CreateFrameSnapShot();
 	// Delete the selected bond
@@ -3116,6 +3133,7 @@ void MpGLCanvas::DeleteBond(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::AddPlaneNormal(wxCommandEvent& event) {
+	(void)event;
 
 	Frame *lFrame = mMainData->cFrame;
 	CPoint3D pos1;
@@ -3184,6 +3202,7 @@ void MpGLCanvas::AddAnnotation(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
+	(void)event;
 	Frame *  lFrame = mMainData->cFrame;
 
 	Frame * cFrame = mMainData->Frames;
@@ -3205,6 +3224,7 @@ void MpGLCanvas::On_Apply_All(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
+	(void)event;
 	MolWin->CreateFrameSnapShot();
 	Frame * lFrame = mMainData->cFrame;
 
@@ -3212,7 +3232,7 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 
 		// If the clicked-on atom is selected, delete all selected atoms.
 		if (lFrame->GetAtomSelection(selected)) {
-			for (int i = 0; i < lFrame->NumAtoms; i++) {
+			for (long i = 0; i < lFrame->NumAtoms; i++) {
 				if (lFrame->GetAtomSelection(i)) {
 					 i = mMainData->DeleteAtom(i);
 					// Deleting an atom will shift its successor to current
@@ -3239,6 +3259,7 @@ void MpGLCanvas::On_Delete_Single_Frame(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
+	(void)event;
 
 	MolWin->CreateFrameSnapShot();
 	Frame * lFrame = mMainData->Frames;
@@ -3269,8 +3290,8 @@ void MpGLCanvas::On_Delete_All_Frames(wxCommandEvent& event) {
  * @param dst_atom Index of atom within selected set to bond to src_atom.
  * @param dst_site Index of bonding site on dst_atom to bond selection to.
  */
-void MpGLCanvas::ConnectSelectedToSite(int src_atom, int src_site,
-									   int dst_atom, int dst_site) {
+void MpGLCanvas::ConnectSelectedToSite(long src_atom, int src_site,
+									   long dst_atom, int dst_site) {
 	CPoint3D atom_pos;
 	CPoint3D new_atom_pos;
 	CPoint3D offset;
@@ -3318,13 +3339,14 @@ void MpGLCanvas::ConnectSelectedToSite(int src_atom, int src_site,
 }
 
 void MpGLCanvas::ConvertEFPToAllElec(wxCommandEvent& event) {
+	(void)event;
 	Frame *lFrame = mMainData->cFrame;
 	//Convert all atoms in the selected effective fragment to all electron atoms.
 	if (lFrame->Atoms[selected].IsEffectiveFragment()) {
 		MolWin->CreateFrameSnapShot();
-		int fragId = lFrame->Atoms[selected].GetFragmentNumber();
-		int firstatm=-1;
-		for (int iatom=0; iatom<lFrame->GetNumAtoms(); iatom++) {
+		long fragId = lFrame->Atoms[selected].GetFragmentNumber();
+		long firstatm=-1;
+		for (long iatom=0; iatom<lFrame->GetNumAtoms(); iatom++) {
 			if (lFrame->Atoms[iatom].IsEffectiveFragment()) {
 				if (lFrame->Atoms[iatom].GetFragmentNumber() == fragId) {
 					if (firstatm < 0) firstatm = iatom;
@@ -3335,17 +3357,17 @@ void MpGLCanvas::ConvertEFPToAllElec(wxCommandEvent& event) {
 		}
 		//indexing is now up to date, pop the fragname out of the list
 		std::vector<std::string>::iterator iter = mMainData->FragmentNames.begin();
-		for (int i=1; i<fragId; i++) ++iter;
+		for (long i=1; i<fragId; i++) ++iter;
 		mMainData->FragmentNames.erase(iter);
 		//data is update, but need to make sure this does leave mixed all-electron and fragment blocks
 		if (firstatm > 0 && lFrame->Atoms[firstatm-1].IsEffectiveFragment()) {
-			int firstfrag = -1;
-			for (int i=0; i<lFrame->GetNumAtoms(); i++)
+			long firstfrag = -1;
+			for (long i=0; i<lFrame->GetNumAtoms(); i++)
 				if (lFrame->Atoms[i].IsEffectiveFragment()) {
 					firstfrag = i;
 					break;
 				}
-			for (int i=firstfrag; i<lFrame->GetNumAtoms(); i++) {
+			for (long i=firstfrag; i<lFrame->GetNumAtoms(); i++) {
 				if (!lFrame->Atoms[i].IsEffectiveFragment()) {
 					mMainData->ReorderAtomList(i, firstfrag);
 					firstfrag++;
@@ -3357,12 +3379,14 @@ void MpGLCanvas::ConvertEFPToAllElec(wxCommandEvent& event) {
 }
 
 void MpGLCanvas::OnIdleEvent(wxIdleEvent& event) {
+	(void)event;
 //	draw();
 //	event.RequestMore();
 }
 
 #if wxCHECK_VERSION(2, 8, 0)
 void MpGLCanvas::eventMouseCaptureLost(wxMouseCaptureLostEvent& event) {
+	(void)event;
 	ReleaseMouse();
 }
 #endif

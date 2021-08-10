@@ -163,6 +163,7 @@ OrbitalRec::OrbitalRec(long nAlphaOrbs, long nBetaOrbs, long nBasis) {
 	NumAlphaOrbs = nAlphaOrbs;
 	NumBetaOrbs = nBetaOrbs;
 	NumOccupiedAlphaOrbs = NumOccupiedBetaOrbs = 0;
+	StartingOffset = 0;
 	NumBasisFunctions = nBasis;
 	OrbitalType = unknownOrbitalType;
 	BaseWavefunction = unknownWavefunction;
@@ -175,6 +176,7 @@ OrbitalRec::OrbitalRec(BufferFile *Buffer, long code, long length) {
 	TotalAODensity = NULL;
 	NumOccupiedAlphaOrbs = NumOccupiedBetaOrbs = 0;
 	NumBasisFunctions = 0;
+	StartingOffset = 0;
 	Label = NULL;
 	OrbitalType = unknownOrbitalType;
 	BaseWavefunction = unknownWavefunction;
@@ -384,7 +386,9 @@ const char * OrbitalRec::getOrbitalTypeText(void) const {
 			return "VB2000 Localized Molecular Orbitals";
 		case VB2000MolecularOrbital:
 			return "VB2000 Molecular Orbitals";
-//		default:
+		default:
+			wxLogMessage(_T("Unhandled orbital type in GetOrbitalTypeText"));
+			break;
 	}
 	return "Molecular Orbitals";
 }
@@ -437,13 +441,13 @@ void OrbitalRec::ReadVecGroup(BufferFile * Buffer, const long & NumBasisFuncs, c
 		OrbCount = 0;
 		for (; nOrbs<NumBasisFuncs; nOrbs++) {	//loop over orbitals, can be up to NumBasisFuncs
 			nLine = 1;							//but may be limited to Occupied Orbs
-			Buffer->GetLine(Line); n=5, linevec=0;
+			Buffer->GetLine(Line); n=5; linevec=0;
 				//If we have hit a $end then terminate
 			if (-1<FindKeyWord(Line, "$END", 4)) break;
 			OrbCount++;
 			if (OrbCount>99) OrbCount = 0;	//Account for the fact that GAMESS doesn't correctly punch orb # when > 100 (%2d)
-			itext[0] = Line[0], itext[1]=Line[1], itext[2]='\0';
-			jtext[0] = Line[2], jtext[1]=Line[3], jtext[2]=Line[4], jtext[3]='\0';
+			itext[0] = Line[0]; itext[1]=Line[1]; itext[2]='\0';
+			jtext[0] = Line[2]; jtext[1]=Line[3]; jtext[2]=Line[4]; jtext[3]='\0';
 			nScan = sscanf(itext, "%d", &i);
 			nScan += sscanf(jtext, "%d", &j);
 				//The above 4 lines accomplish the following correctly since scanf consumes leading whitespace
@@ -454,8 +458,8 @@ void OrbitalRec::ReadVecGroup(BufferFile * Buffer, const long & NumBasisFuncs, c
 				if(linevec>=5) {	//5 values per line
 					Buffer->GetLine(Line); n=5; linevec=0; nLine++;
 					if (nLine>999) nLine = 0;	//That's a big vec!
-					itext[0] = Line[0], itext[1]=Line[1], itext[2]='\0';
-					jtext[0] = Line[2], jtext[1]=Line[3], jtext[2]=Line[4], jtext[3]='\0';
+					itext[0] = Line[0]; itext[1]=Line[1]; itext[2]='\0';
+					jtext[0] = Line[2]; jtext[1]=Line[3]; jtext[2]=Line[4]; jtext[3]='\0';
 					nScan = sscanf(itext, "%d", &i);
 					nScan += sscanf(jtext, "%d", &j);
 					if ((i!=OrbCount)||(j!=nLine)||(nScan!=2)) throw DataError();
@@ -527,7 +531,7 @@ void OrbitalRec::setLabel(const char * str) {
 		Label = NULL;
 	}
 	if (str) {
-		int len = strlen(str);
+		size_t len = strlen(str);
 		Label = new char[len+1];
 		strncpy(Label, str, len);
 	}
@@ -1077,15 +1081,15 @@ void OrbitalRec::SetOccupancy(float * Occ, long numVec) {
 	for (long i=0; i<numVec; i++) OrbOccupation[i] = Occ[i];
 }
 void OrbitalRec::SetOrbitalOccupancy(const long & alpha, const long & beta) {
-	if ((alpha >= 0)&&(alpha <= NumAlphaOrbs)) NumOccupiedAlphaOrbs = alpha;
+	if ((alpha >= 0)&&(alpha <= (NumAlphaOrbs+StartingOffset))) NumOccupiedAlphaOrbs = alpha;
 		//The following doesn't guarentee the beta value is within the limits, but there
 		//should never be more beta orbitals than alpha, but ROHF wavefunctions have only
 		//one set of vectors, yet have separate occupaction counts.
-	if ((beta >= 0)&&(beta <= MAX(NumAlphaOrbs, NumBetaOrbs))) NumOccupiedBetaOrbs = beta;
+	if ((beta >= 0)&&(beta <= (MAX(NumAlphaOrbs, NumBetaOrbs)+StartingOffset))) NumOccupiedBetaOrbs = beta;
 }
 bool OrbitalRec::TotalDensityPossible(void) const {
-	return ((getNumOccupiedAlphaOrbitals() > 0)||
-			(OrbOccupation != NULL));	//Is this a good enough test?
+	return (((getNumOccupiedAlphaOrbitals() > 0)||
+			(OrbOccupation != NULL))&&(StartingOffset<=0));	//Is this a good enough test?
 }
 
 //This cutoff is in the ballpark. moving it up or down a factor of ten doesn't effect the timing much
@@ -1198,7 +1202,7 @@ void SetupMOScreens(const BasisSet * const Basis, const float * const MOVector, 
 			if (UseSphericalHarmonics) type += 10;
 			if ((ShellScreen[nshell])==0) {
 				shellTypes.push_back(type);
-				shellIndex.push_back(ishell);
+				shellIndex.push_back((int)ishell);
 				shellpatom++;
 			}
 			switch (type) {
@@ -2881,7 +2885,7 @@ void Orb3DSurface::CalculateMOGrid(MoleculeData *lData, Progress * lProgress) {
 }
 float Orb3DSurface::CalculateGrid(long xStart, long xEnd, const mpAtom * const Atoms, const BasisSet * const Basis,
 		const float * const MOVector, long NumAtoms, Progress * lProgress, long * PercentDone, 
-								  const std::vector<int> * const atomScreen, const std::vector<int> * const shellScreen, bool MPTask) {
+								  const std::vector<int> * const /*atomScreen*/, const std::vector<int> * const /*shellScreen*/, bool MPTask) {
 	float lGridMax = -1.0e20;
 	float lGridMin = 1.0e20;
 	float XGridValue, YGridValue, ZGridValue;
@@ -2947,8 +2951,8 @@ float Orb3DSurface::CalculateGrid(long xStart, long xEnd, const mpAtom * const A
 	return lGridMax;
 }
 float Orb3DSurface::CalculateGridStreamlined(long xStart, long xEnd, const std::vector<CPoint3D> & atomList, const BasisSet * const Basis,
-								  const std::vector<float> & reducedVector, long NumAtoms, Progress * lProgress, long * PercentDone,
-											 const std::vector<int> * const atomScreen, const std::vector<int> * const shellScreen, const std::vector<int> & shellTypes, const std::vector<int> & shellIndex, const std::vector<short> & shellsPerAtom, bool MPTask) {
+								  const std::vector<float> & reducedVector, long /*NumAtoms*/, Progress * lProgress, long * PercentDone,
+											 const std::vector<int> * const /*atomScreen*/, const std::vector<int> * const /*shellScreen*/, const std::vector<int> & shellTypes, const std::vector<int> & shellIndex, const std::vector<short> & shellsPerAtom, bool MPTask) {
 #ifdef __wxBuild__
 	wxStopWatch timer;
 	long CheckTime = timer.Time();

@@ -204,6 +204,7 @@ enum MMP_OrbitalSetNS {
 	MMP_NumOccAlphaOrbs,
 	MMP_NumOccBetaOrbs,
 	MMP_NumBasisFunctions,
+	MMP_StartingOrbOffset,
 	MMP_OrbVectors,
 	MMP_BetaOrbVectors,
 	MMP_OrbEnergies,
@@ -387,6 +388,7 @@ enum MMP_IOSCFGroupNS {
 	MMP_IOSGGVBNumOpenShells,
 	MMP_IOSGGVBOpenShellDeg,
 	MMP_IOSCFArrayElement,
+	MMP_IOSCFNPREOArrayElement,
 	
 	NumberMMPIOSCFGroupItems
 };

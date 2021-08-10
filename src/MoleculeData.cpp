@@ -212,9 +212,9 @@ void MoleculeData::CenterModelWindow(void) {
 		lFrame = lFrame->GetNextFrame();
 	}
 //The center is now just half of the min plus the max
-	Centroid.x = (XMax+XMin)*0.5;
-	Centroid.y = (YMax+YMin)*0.5;
-	Centroid.z = (ZMax+ZMin)*0.5;
+	Centroid.x = (XMax+XMin)*0.5f;
+	Centroid.y = (YMax+YMin)*0.5f;
+	Centroid.z = (ZMax+ZMin)*0.5f;
 //Recompute the maximum width of the molecule
 	MaxSize = MAX((XMax-XMin), (YMax-YMin));
 	MaxSize = MAX(MaxSize, (ZMax-ZMin));
@@ -299,7 +299,7 @@ void MoleculeData::NewAtom(const mpAtom& atom, bool updateGlobal, long index, co
 	if (updateGlobal) AtomAdded();
 }
 
-void MoleculeData::NewAtom(long AtomType, const CPoint3D & AtomPosition, bool updateGlobal, long index) {
+void MoleculeData::NewAtom(int AtomType, const CPoint3D & AtomPosition, bool updateGlobal, long index) {
 	cFrame->AddAtom(AtomType, AtomPosition, index);
 
 	// Adjust annotations that connect higher-numbered atoms.
@@ -512,7 +512,7 @@ void MoleculeData::LinearLeastSquaresFit(Progress * lProgress) {
 		bool	Done;
 		for (long ipass=0; ipass<4; ipass++) {
 			if (ipass<3) {
-				RotAngle = 10.0;	TransAmount=0.1;
+				RotAngle = 10.0f;	TransAmount=0.1f;
 				if (ipass == 0) iOptAtoms = MIN(2, lFrame->NumAtoms);
 				else if (ipass == 1) iOptAtoms = MIN(3, lFrame->NumAtoms);
 				else iOptAtoms = lFrame->NumAtoms;
@@ -538,7 +538,7 @@ void MoleculeData::LinearLeastSquaresFit(Progress * lProgress) {
 								SquaresValue = NewSquareValue;
 								CopyMatrix (TempRotMat, FitMatrix);
 							} else {
-								ApplyRotation(TempRotMat, ii, -2.0*RotAngle);
+								ApplyRotation(TempRotMat, ii, -2.0f*RotAngle);
 								for (int i=0; i<iOptAtoms; i++)
 									Rotate3DPt(TempRotMat, l2Frame->Atoms[i].Position, &(RotCoords[i]));
 								NewSquareValue = CalculateSquaresValue(iOptAtoms, lFrame->Atoms, RotCoords);
@@ -627,6 +627,7 @@ bool MoleculeData::TotalDensityPossible(void) const {
 	}
 	return result;
 }
+bool MoleculeData::GradientVectorAvailable(void) const {return cFrame->GradientVectorAvailable();};
 bool MoleculeData::MEPCalculationPossible(void) const {
 	bool result = false;
 	if (Basis) {
@@ -798,11 +799,11 @@ void MoleculeData::ParseZMatrix(BufferFile * Buffer, const long & nAtoms, WinPre
 		char		token[kMaxLineLength], Line[kMaxLineLength], bondText[kMaxLineLength],
 					angleText[kMaxLineLength], dihedralText[kMaxLineLength];
 		float		bondLength, bondAngle, bondDihedral;
-		long		AtomType;
+		int			AtomType;
 		int			con1, con2, con3;
 		Buffer->GetLine(Line);
-		int readCount = sscanf(Line, "%s %d %s %d %s %d %s", token, &con1, bondText, &con2, &angleText, &con3,
-							   &dihedralText);
+		int readCount = sscanf(Line, "%255s %d %255s %d %255s %d %255s", token, &con1, bondText, &con2, angleText, &con3,
+							   dihedralText);
 		if (readCount < 1) break;	//failed to parse anything??
 		AtomType = SetAtomType((unsigned char *) token);
 		if (AtomType < 0) break;
@@ -924,7 +925,7 @@ void MoleculeData::ParseGAMESSUKZMatrix(BufferFile * Buffer, WinPrefs * Prefs) {
 			int readCount = sscanf(Line, "%s %lf", token, &value);
 			if (readCount!=2) break;
 			std::pair<std::string, double> myVal(token, value);
-			std::pair<std::map<std::string, double>::iterator, bool> p = valueMap.insert(myVal);
+			/*std::pair<std::map<std::string, double>::iterator, bool> p = */ valueMap.insert(myVal);
 			if (! myVal.second) {	//We have hit a duplicate value
 				MessageAlert("Duplicate keys detected in the value list");
 			}
@@ -940,7 +941,7 @@ void MoleculeData::ParseGAMESSUKZMatrix(BufferFile * Buffer, WinPrefs * Prefs) {
 			int readCount = sscanf(Line, "%s %lf", token, &value);
 			if (readCount!=2) break;
 			std::pair<std::string, double> myVal(token, value);
-			std::pair<std::map<std::string, double>::iterator, bool> p = valueMap.insert(myVal);
+			/*std::pair<std::map<std::string, double>::iterator, bool> p = */ valueMap.insert(myVal);
 			if (! myVal.second) {	//We have hit a duplicate value
 				MessageAlert("Duplicate keys detected in the value list");
 			}
@@ -954,11 +955,11 @@ void MoleculeData::ParseGAMESSUKZMatrix(BufferFile * Buffer, WinPrefs * Prefs) {
 		char		token[kMaxLineLength], bondText[kMaxLineLength],
 			angleText[kMaxLineLength], dihedralText[kMaxLineLength];
 		float		bondLength, bondAngle, bondDihedral;
-		long		AtomType;
+		int			AtomType;
 		int			con1, con2, con3;
 		Buffer->GetLine(Line);
-		int readCount = sscanf(Line, "%s %d %s %d %s %d %s", token, &con1, bondText, &con2, &angleText, &con3,
-							   &dihedralText);
+		int readCount = sscanf(Line, "%255s %d %255s %d %255s %d %255s", token, &con1, bondText, &con2, angleText, &con3,
+							   dihedralText);
 		if (readCount < 1) break;	//failed to parse anything??
 		AtomType = SetAtomType((unsigned char *) token);
 		if (AtomType < 0) break;
@@ -1052,7 +1053,7 @@ void MoleculeData::ParseMOPACZMatrix(BufferFile * Buffer, const long & nAtoms, W
 		CPoint3D	pos = CPoint3D(0.0f, 0.0f, 0.0f);	//This is just a placeholder
 		char		token[kMaxLineLength], Line[kMaxLineLength];
 		float		bondLength, bondAngle, bondDihedral;
-		long		AtomType;
+		int			AtomType;
 		int			j1, j2, j3, con1, con2, con3;
 		Buffer->GetLine(Line);
 		int readCount = sscanf(Line, "%s %f %d %f %d %f %d %d %d %d", token, &bondLength, &j1, &bondAngle, &j2,
@@ -1372,15 +1373,15 @@ bool MoleculeData::DeterminePrincipleOrientation(Matrix4D result,
 				for (int atm=0; atm<cFrame->GetNumAtoms(); atm++) {
 					CPoint3D test;
 					Rotate3DPt(permuteMatrix, RotCoords[atm], &test);
-					CPoint3D result;
-					symOps.ApplyOperator(test, result, iOp);
+					CPoint3D OpResult;
+					symOps.ApplyOperator(test, OpResult, iOp);
 					bool match = false;
 					for (int testatom=0; testatom<cFrame->GetNumAtoms(); testatom++) {
 						if (cFrame->Atoms[atm].GetType() != cFrame->Atoms[testatom].GetType())
 							continue;
 						CPoint3D testpt;
 						Rotate3DPt(permuteMatrix, RotCoords[testatom], &testpt);
-						CPoint3D offset = result - testpt;
+						CPoint3D offset = OpResult - testpt;
 							//test the difference in position. They should be quite close!
 						if (offset.Magnitude() < precision) {
 							match = true;
@@ -1745,7 +1746,7 @@ long MoleculeData::GetNumBonds(void) const {
 }
 long MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
 	long offset = AtomNum;
-	int fragId = -1;
+	long fragId = -1;
 	if (cFrame->Atoms[AtomNum].IsEffectiveFragment()) fragId = cFrame->Atoms[AtomNum].GetFragmentNumber();
 	if (allFrames) {
 		Frame * lFrame = Frames;
@@ -1783,7 +1784,7 @@ long MoleculeData::DeleteAtom(long AtomNum, bool allFrames) {
 		}
 		//remove the fragment name from the name list
 		std::vector<std::string>::iterator iter = FragmentNames.begin();
-		for (int i=1; i<fragId; i++) ++iter;
+		for (long i=1; i<fragId; i++) ++iter;
 		FragmentNames.erase(iter);
 		offset = 0;	//Have the caller rescan the whole list to be safe.
 	}
@@ -1887,7 +1888,7 @@ void MoleculeData::PruneUnusedFragments() {
 
 }
 
-long MoleculeData::CreateFMOFragmentation(const int & NumMolecules, std::vector<long> & newFragmentation) {
+long MoleculeData::CreateFMOFragmentation(const long & NumMolecules, std::vector<long> & newFragmentation) {
 	//Create an FMO fragment list by breaking up the system into non-bonded pieces (H-bonds are ignored)
 	
 	long result = 0;
@@ -1942,7 +1943,7 @@ long MoleculeData::CreateFMOFragmentation(const int & NumMolecules, std::vector<
 		fragCenters.reserve(NextId);
 		for (long ifrag=0; ifrag<NextId; ++ifrag) {
 			fragCenters.push_back(CPoint3D(0,0,0));
-			long atmcount;
+			long atmcount=0;
 			for (long iatom=0; iatom<cFrame->GetNumAtoms(); ++iatom) {
 				if (newFragmentation[iatom] == (ifrag+1)) {
 					fragCenters[ifrag].x += cFrame->Atoms[iatom].Position.x;
@@ -2014,7 +2015,7 @@ void MoleculeData::ExportPOV(BufferFile *Buffer, WinPrefs *Prefs) {
 
 	long NumAtoms = lFrame->NumAtoms;
 	float AtomScale = Prefs->GetAtomScale();
-	long curAtomType;
+	int curAtomType;
 	RGBColor * AtomColor;
 	float red, green, blue;
 	char tmpStr[500];

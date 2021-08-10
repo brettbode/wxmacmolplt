@@ -28,6 +28,7 @@
 #include "Progress.h"
 #include "patterns.h"
 #include "Files.h"
+#include "Gradient.h"
 
 // ----------------------------------------------------------------------------
 // FUNCTION PROTOTYPES
@@ -137,8 +138,8 @@ void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
 	glPushMatrix();
 	glLoadIdentity();
 	wxRect DisplayRect = glCanvas->GetRect();
-	long hsize = DisplayRect.GetWidth();
-	long vsize = DisplayRect.GetHeight();
+	int hsize = DisplayRect.GetWidth();
+	int vsize = DisplayRect.GetHeight();
 	glScalef(2.0f / hsize, -2.0f /  vsize, 1.0);
 	glTranslatef(-hsize / 2.0f, -vsize / 2.0f, 0.0);
 
@@ -157,14 +158,14 @@ void MolDisplayWin::ShowRotation(bool ShowAngles, bool ShowTrackball) {
 	//Draw the trackball outline
 	if (ShowTrackball) {
 		wxPoint sphereCenter;
-		long sphereRadius; 
+		int sphereRadius;
 		sphereCenter.x = hsize / 2; 
 		sphereCenter.y = vsize / 2;
 		if (sphereCenter.x >= sphereCenter.y)
-			sphereRadius   = (long) (((float) sphereCenter.x) * 0.9);
+			sphereRadius   = (int) (((float) sphereCenter.x) * 0.9);
 		else
-			sphereRadius   = (long) (((float) sphereCenter.y) * 0.9);
-		long NumDivisions = (long) (20.0 * (1.0 + sphereRadius / 200.0));
+			sphereRadius   = (int) (((float) sphereCenter.y) * 0.9);
+		int NumDivisions = (int) (20.0 * (1.0 + sphereRadius / 200.0));
 		float divarc = (2 * kPi) / NumDivisions;
 
 		glLineWidth(1);
@@ -501,10 +502,9 @@ void AnnotationLength::draw(const MolDisplayWin * win) const {
 	x_eye.z = 0.0f;
 	Rotate3DPt(mv_inv, x_eye, &x_world);
 
-	int bond_id;
 	float bond_size;
 
-	bond_id = cFrame->BondExists(atoms[0], atoms[1]);
+	long bond_id = cFrame->BondExists(atoms[0], atoms[1]);
 
 	// If a bond exists between the two atoms, we need to push out the
 	// length label accordingly.
@@ -831,7 +831,7 @@ void MolDisplayWin::DrawLabel() {
 	glfStringCentering(true);
 
 	wxString atomLabel;
-	long CurrentAtomType;
+	int CurrentAtomType;
 	CPoint3D origPt, transPt;
 	if (!Prefs->DrawWireFrame() || Prefs->ColorBondHalves()) {
 		glLoadName(MMP_ATOM);
@@ -877,7 +877,7 @@ void MolDisplayWin::DrawLabel() {
 
 			glColor3f(1-red, 1-green, 1-blue);
 			glScalef((0.1+0.08*radius)*LabelSize, (0.1+0.08*radius)*LabelSize, 1);
-			glLoadName(iatom+1);
+			glLoadName(GLuint(iatom+1));
 			glfDrawSolidString(atomLabel.mb_str(wxConvUTF8));
 			glPopMatrix();
 		}
@@ -973,7 +973,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 
 			if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
 			if (Prefs->ShowEFPWireFrame()&&lAtoms[iatom].IsEffectiveFragment()) continue;
-			long curAtomType = lAtoms[iatom].GetType() - 1;
+			int curAtomType = lAtoms[iatom].GetType() - 1;
 
 			float radius = AtomScale * Prefs->GetAtomSize(curAtomType);
 			if (radius < 0.01) continue;	//skip really small spheres
@@ -994,13 +994,13 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glColor3fv(fg_color);
 				glEnable(GL_POLYGON_STIPPLE);
 				glPolygonStipple(stippleMask);
-				gluSphere(core_obj, radius*1.01, (long)(1.5*Quality), (long)(Quality));
+				gluSphere(core_obj, radius*1.01, (GLint)(1.5*Quality), (GLint)(Quality));
 				glDisable(GL_POLYGON_STIPPLE);
 				glPopMatrix(); // molecule origin
 				continue;
 			}
 
-			glLoadName(iatom + 1);
+			glLoadName(GLuint(iatom + 1));
 			draw_subdued = mHighliteState && !lAtoms[iatom].GetSelectState();
 			  
 			if (draw_subdued) {
@@ -1083,7 +1083,7 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 		if (!InSymmetryEditMode() ||
 			(lAtoms[lBonds[ibond].Atom1].IsSymmetryUnique() &&
 			 lAtoms[lBonds[ibond].Atom2].IsSymmetryUnique())) {
-			glLoadName(ibond + 1);
+			glLoadName(GLuint(ibond + 1));
 		} else {
 			glLoadName(0);
 		}
@@ -1153,21 +1153,85 @@ void MolDisplayWin::DrawMoleculeCoreGL(void) {
 				glPushMatrix();
 				glMultMatrixf((const GLfloat *) &rotMat);
 
-				gluCylinder(core_obj, VectorWidth, VectorWidth, ShaftLength, (long)(Quality), (long)(0.5*Quality));
+				gluCylinder(core_obj, VectorWidth, VectorWidth, ShaftLength, (GLint)(Quality), (GLint)(0.5*Quality));
 				glPopMatrix();
 				rotMat[3][0] = VStart.x + NModeVector.x * ShaftLength;
 				rotMat[3][1] = VStart.y + NModeVector.y * ShaftLength;
 				rotMat[3][2] = VStart.z + NModeVector.z * ShaftLength;
 				glPushMatrix();
 				glMultMatrixf((const GLfloat *) &rotMat);
-				gluDisk(core_obj, 0.0, 2*VectorWidth, (long)(Quality), 2);
-				gluCylinder(core_obj, 2*VectorWidth, 0.0, HeadRadius, (long)(Quality), 3);
+				gluDisk(core_obj, 0.0, 2*VectorWidth, (GLint)(Quality), 2);
+				gluCylinder(core_obj, 2*VectorWidth, 0.0, HeadRadius, (GLint)(Quality), 3);
+				glPopMatrix();
+			}
+		}
+	}
+
+	if (MainData->GradientVectorAvailable() && Prefs->DisplayGradient()) { //Add the gradient arrows, if active
+		float VectorScale = Prefs->GetGradientScale();
+//		float GradMax = sqrt(1.0/lFrame->Gradient->GetMaximum());
+//		float GradMax = lFrame->Gradient->GetMaximum()*10000.0;
+		float GradMax = 0.01/lFrame->Gradient->GetMaximum();
+		float widthFactor = 5.0 + log10f(lFrame->Gradient->GetMaximum());
+		if (widthFactor < 0.0) widthFactor = 0.0;
+		VectorScale *= GradMax;
+		if (Prefs->InvertGradient()) VectorScale *= -1.0;
+		
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
+		glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
+		Prefs->ChangeColorGradientColor();
+		
+		CPoint3D NormStart = CPoint3D(0.0f, 0.0f, 1.0f);
+		for (long iatom=0; iatom<NumAtoms; iatom++) {
+			
+			if (lAtoms[iatom].GetInvisibility()) continue;	//Atom is invisible so skip
+			CPoint3D NMode;
+			lFrame->RetrieveAtomGradient(iatom, NMode);
+			NMode *= VectorScale;
+			float length = NMode.Magnitude();
+			if (length > 0.1) {
+				CPoint3D NModeVector;
+				Matrix4D rotMat;
+				NModeVector.x = NMode.x/length;
+				NModeVector.y = NMode.y/length;
+				NModeVector.z = NMode.z/length;
+				float VectorWidth = (0.02+0.03*widthFactor + 0.005*length);
+				//Set up vectors for the shaft of the normal mode
+				CPoint3D VStart;
+				long curAtomType = lAtoms[iatom].Type - 1;
+				
+				float radius;
+				if (Prefs->DrawWireFrame()) radius = 0.0;
+				else radius = AtomScale*Prefs->GetAtomSize(curAtomType);
+				VStart.x = lAtoms[iatom].Position.x + NModeVector.x*0.95*radius;
+				VStart.y = lAtoms[iatom].Position.y + NModeVector.y*0.95*radius;
+				VStart.z = lAtoms[iatom].Position.z + NModeVector.z*0.95*radius;
+				float HeadRadius = 2 * VectorWidth;
+				if (2*HeadRadius > length) HeadRadius = length/2.0;
+				// float HeadRatio = (length-HeadRadius)/length;
+				GLfloat ShaftLength = length - HeadRadius;
+				
+				SetRotationMatrix(rotMat, &NormStart, &NModeVector);
+				rotMat[3][0] = VStart.x;
+				rotMat[3][1] = VStart.y;
+				rotMat[3][2] = VStart.z;
+				glPushMatrix();
+				glMultMatrixf((const GLfloat *) &rotMat);
+				
+				gluCylinder(core_obj, VectorWidth, VectorWidth, ShaftLength, (GLint)(Quality), (GLint)(0.5*Quality));
+				glPopMatrix();
+				rotMat[3][0] = VStart.x + NModeVector.x * ShaftLength;
+				rotMat[3][1] = VStart.y + NModeVector.y * ShaftLength;
+				rotMat[3][2] = VStart.z + NModeVector.z * ShaftLength;
+				glPushMatrix();
+				glMultMatrixf((const GLfloat *) &rotMat);
+				gluDisk(core_obj, 0.0, 2*VectorWidth, (GLint)(Quality), 2);
+				gluCylinder(core_obj, 2*VectorWidth, 0.0, HeadRadius, (GLint)(Quality), 3);
 				glPopMatrix();
 			}
 		}
 	}
 	gluDeleteQuadric(core_obj);	//finally delete the quadric object
-
 }
 
 void WinPrefs::ChangeColorBondColor(long order) const {
@@ -1194,6 +1258,14 @@ void WinPrefs::ChangeColorVectorColor(void) const {
 	glColor3f(red, green, blue);
 }
 
+void WinPrefs::ChangeColorGradientColor(void) const {
+	float red, green, blue;
+	red = GradientColor.red/65536.0;
+	green = GradientColor.green/65536.0;
+	blue = GradientColor.blue/65536.0;
+	glColor3f(red, green, blue);
+}
+
 void WinPrefs::GetAtomColorInverse(long atomtype, float rgb[3]) const {
 	rgb[0] = 1.0f - AtomColors[atomtype-1].red / 65536.0f;
 	rgb[1] = 1.0f - AtomColors[atomtype-1].green / 65536.0f;
@@ -1203,7 +1275,7 @@ void WinPrefs::GetAtomColorInverse(long atomtype, float rgb[3]) const {
 void MolDisplayWin::DrawHydrogenBond(const Bond& bond, const mpAtom& atom1,
 									 const mpAtom& atom2,
 									 const WinPrefs& Prefs,
-									 GLUquadric *quadric, GLuint sphere_list,
+									 GLUquadric */*quadric*/, GLuint sphere_list,
 									 bool highlighting_on) {
 	CPoint3D	v1, v2, offset;
 
@@ -1264,7 +1336,7 @@ void MolDisplayWin::AddAxisGL(void) {
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, l_specular);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 30.0f);
 
-	long Quality = (long)(Prefs->GetQD3DAtomQuality());
+	int Quality = Prefs->GetQD3DAtomQuality();
 	float VectorWidth = 0.02;
 
 	CPoint3D vector = CPoint3D(1.0f, 0.0f, 0.0f);
@@ -1457,10 +1529,12 @@ void MolDisplayWin::AddSymmetryOperators(void) {
 		case GAMESS_O:
 			break;
 			*/
+		default:	//The rest are not implemented.
+			break;
 	}
 }
 
-long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs *Prefs, myGLTriangle *, unsigned int shader_program) {
+long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs */*Prefs*/, myGLTriangle *, unsigned int /*shader_program*/) {
 
 	if (Visible) {
 		// Update the grid if needed, then display
@@ -1468,7 +1542,7 @@ long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs *Prefs, myGLTriangle 
 	}
 
 	glLoadName(MMP_1DSURFACE);
-	glPushName(GetSurfaceID()+1);
+	glPushName((GLuint) GetSurfaceID()+1);
 
 	glPushName(1);
 
@@ -1596,7 +1670,7 @@ long Surf1DBase::Draw3DGL(MoleculeData *MainData, WinPrefs *Prefs, myGLTriangle 
 	return 0;
 }
 
-long Surf2DBase::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle *, unsigned int shader_program) {
+long Surf2DBase::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle *, unsigned int /*shader_program*/) {
 	if (Visible) {
 			//Update the grid if needed, then contour and display
 		if (!Grid) Update(MainData);
@@ -1677,7 +1751,7 @@ void Surf2DBase::Contour2DGrid3DGL(MoleculeData * , WinPrefs * Prefs)
 					YGridValue += YGridInc.y;
 					ZGridValue += YGridInc.z;
 					n++;
-					for (int i=0; i<4; i++) HasPoint[i]=false;
+					for (int ii=0; ii<4; ii++) HasPoint[ii]=false;
 					
 					TestPoint1 = lGrid[n]-ContourValue;
 					TestPoint2 = lGrid[n-1]-ContourValue;
@@ -1822,7 +1896,7 @@ long General3DSurface::getTriangleCount(void) const {
 	return result;
 }
 
-long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
+long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int /*shader_program*/) {
 	long result=0;
 	if (Visible) {
 		if (ContourHndl && VertexList) {
@@ -1854,7 +1928,7 @@ long General3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLT
 	}
 	return result;
 }
-long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
+long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int /*shader_program*/) {
 	long result = 0;
 	if (Visible) {
 		if (ContourHndl && VertexList) {
@@ -1877,7 +1951,7 @@ long TEDensity3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myG
 	}
 	return result;
 }
-long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
+long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int /*shader_program*/) {
 	long result=0;
 	if (Visible && (PlotOrb>=0)) {
 		if (ContourHndl && VertexList) {
@@ -1910,7 +1984,7 @@ long Orb3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTrian
 	}
 	return result;
 }
-long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int shader_program) {
+long MEP3DSurface::Draw3DGL(MoleculeData * MainData, WinPrefs * Prefs, myGLTriangle * transpTri, unsigned int /*shader_program*/) {
 	long result=0;
 	if (Visible) {
 		if (ContourHndl && VertexList) {
@@ -2249,7 +2323,7 @@ void CreateCylinderFromLine(GLUquadricObj *qobj, const CPoint3D& lineStart, cons
 
 void DashedQuadFromLine(const CPoint3D& pt1,
 						const CPoint3D& pt2, float width, float m[16],
-						const CPoint3D& x_world, float offset,
+						const CPoint3D& /*x_world*/, float offset,
 						GLuint length_anno_tex_id,
 						const WinPrefs * Prefs, bool draw_label) {
 
@@ -2958,7 +3032,7 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 	
 	short coordination = lAtoms[iatom].GetCoordinationNumber();
 	std::vector<Bond *> bonds;
-	int bonded_atoms[6];
+	long bonded_atoms[6];
 	CPoint3D vecs[6];
 	unsigned int i;
 
@@ -3321,8 +3395,8 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 					CPoint3D cross2;
 					CPoint3D equat2;
 					CPoint3D equat3;
-					int axial_id;
-					int equat_id;
+					int axial_id=0;
+					int equat_id=1;
 					Matrix4D rotate_mat;
 
 					if (dot12 < -0.75) {
@@ -3353,9 +3427,9 @@ void MolDisplayWin::DrawBondingSites(long iatom, float radius, GLUquadricObj *qo
 				else if (fabs(dot12) < 0.25f || fabs(dot13) < 0.25f ||
 						 fabs(dot23) < 0.25f) {
 
-					int axial_id;
-					int equat1_id;
-					int equat2_id;
+					int axial_id=0;
+					int equat1_id=1;
+					int equat2_id=2;
 
 					if (fabs(dot12) < 0.25) {
 						equat1_id = 2;
@@ -3981,8 +4055,8 @@ void DrawPipeSpheres(const WinPrefs& Prefs, float length, float scale_factor,
 void DrawPipeCylinder(float length, GLUquadric *quadric, unsigned int ncaps,
 					  GLuint sphere_list, float radius, long quality) {
 
-	gluCylinder(quadric, radius, radius, length, quality,
-				(long) (0.5f * quality));
+	gluCylinder(quadric, radius, radius, length, (GLint) quality,
+				(GLint) (0.5f * quality));
 
 	// Draw sphere at end0 if requested.
 	if (ncaps & 1) {

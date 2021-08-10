@@ -162,8 +162,6 @@ class GraphOptions {
 
 class FrequencyWindowOptions {
 private:
-    //Only thing I can think of is store the size and position for the window
-//    Rect    FreqWindowRect;
 	float	YScaleFactor;
 	bool	ShowRaman;
 	bool	ShowIR;
@@ -182,9 +180,12 @@ typedef class wxString wxString;
 
 class WinPrefs {
 	private:
-		RGBColor		AtomColors[kMaxAtomTypes], BondColors[kMaxBondTypes], VectorColor, BackColor;
-		long			AtomSizes[kMaxAtomTypes], AnimateTime, DRCnFileSkip,
-						QD3DAtomQuality, BitOptions;
+		RGBColor		AtomColors[kMaxAtomTypes], BondColors[kMaxBondTypes], VectorColor, BackColor,
+						GradientColor;	///< Color to be used for gradient vectors
+		int				AnimateTime;	///< Delay between images in a normal mode animation
+		int				QD3DAtomQuality;///<Number of divisions used when creating pipes and spheres. A larger value provides a smoother surface.
+		long			AtomSizes[kMaxAtomTypes], DRCnFileSkip,
+						BitOptions;
 				//bit 1: prompt4save, bit 2: show angles, bit 3: use QD3D hardware
 				//bit 4: Stereo, bit 5: color bond halves, bit6: Wireframe mode
 				//bit 7: Outline bonds, bit 8: Use cylinders for lines
@@ -195,13 +196,16 @@ class WinPrefs {
 
 		float			AtomMasses[kMaxAtomTypes], AutoBondScale, BondWidth, AtomScale,
 						GLFOV, VectorScale, QD3DFillBrightness, QD3DPointBrightness,
-						MaxBondLength, QD3DLineWidth, AtomLabelSize, AnnotationLabelSize;
+						MaxBondLength, QD3DLineWidth, AtomLabelSize, AnnotationLabelSize,
+						GradientScale;		///< Scalefactor for the gradient display vectors
 		short			AtomPatterns[kMaxAtomTypes], LabelFontID, LabelSize, VectorPattern,
 						BondPatterns[kMaxBondTypes], AnimationSpeed, StereoOffset;
 		unsigned char	AtomLabels[kMaxAtomTypes][3];
 		char *			RendererName;
 		Boolean			RotateMode, AnimateMode, AutoBondFlag, HHBondFlag, SetCreator;
 		bool			FitToPage, CenterOnPage, FrameOnPage, SymbolLabels, NumberLabels, ShowSymOps,
+						ShowGradient,		///< Toggle display of gradient
+						FlipGradient,		///< Invert the gradient to display the force
 						AutoRotating,		///< Is the window set to auto-rotate?
 						AllowAutoRotation;	///< Flag to enable/disable autorotation
 		EnergyOptions	EnergyPlotOptions;
@@ -285,6 +289,14 @@ class WinPrefs {
 		inline void ShowAtomNumberLabels(bool v) {NumberLabels = v;};
 		inline bool ShowSymmetryOperators(void) const {return ShowSymOps;};
 		inline void ShowSymmetryOperators(bool v) {ShowSymOps = v;};
+		/// Flag to determine whether to show the first derivative of the energy (gradient)
+		inline bool DisplayGradient(void) const {return ShowGradient;};
+		/// Set function for display of the first derivative of the energy
+		inline void DisplayGradient(bool v) {ShowGradient = v;};
+		/// Flag to for inverting (-1) the first derivative of the energy to show the force
+		inline bool InvertGradient(void) const {return FlipGradient;};
+		/// Set function for inverting of the first derivative of the energy to show the force
+		inline void InvertGradient(bool v) {FlipGradient = v;};
 		/// Flag to determine wether to allow the auto rotate feature
 		inline bool AutoRotationEnabled(void) const {return AllowAutoRotation;};
 		/// Set function to allow auto rotation via the click and drag method
@@ -339,9 +351,9 @@ class WinPrefs {
 			if ((NewValue>=0.001)&&(NewValue<=0.2)) BondWidth=NewValue;
 			return BondWidth;};
 		///Obtain the atom (ie sphere) quality for the 3D display
-		inline long GetQD3DAtomQuality(void) const {return QD3DAtomQuality;};
+		inline int GetQD3DAtomQuality(void) const {return QD3DAtomQuality;};
 		///Set the # of divisions for 3D spheres (ie the quality). values should be between 2 and 40
-		inline long SetQD3DAtomQuality(long NewValue) {
+		inline int SetQD3DAtomQuality(int NewValue) {
 			if ((NewValue >= 2)&&(NewValue <= 40)) QD3DAtomQuality = NewValue;
 			return QD3DAtomQuality;};
 		/// Obtain the fill light brightness
@@ -368,9 +380,9 @@ class WinPrefs {
 		inline float GetGLFOV(void) const {return GLFOV;};
 		inline float SetGLFOV(float NewValue) {return GLFOV=((NewValue>0)&&(NewValue<90)?NewValue:30);};
 		/// Obtain the inter frame time delay for frame animations
-		inline long GetAnimateTime(void) const {return AnimateTime;};
+		inline int GetAnimateTime(void) const {return AnimateTime;};
 		/// Set the interframe delay for frame animations (values should be between 0 and 120).
-		inline long SetAnimateTime(long NewValue) {
+		inline int SetAnimateTime(int NewValue) {
 			if ((NewValue>=0)&&(NewValue<120)) AnimateTime=NewValue;
 			return AnimateTime;};
 		/// Obtain the normal mode animation quality value
@@ -427,6 +439,7 @@ class WinPrefs {
 		inline RGBColor * GetBondColorLoc(long BondOrder) {return &(BondColors[BondOrder]);};
 		inline short * GetBondPatternLoc(long BondOrder) {return &(BondPatterns[BondOrder]);};
 		inline RGBColor * GetVectorColorLoc(void) {return &VectorColor;};
+		inline RGBColor * GetGradientColorLoc(void) {return &GradientColor;};
 		inline RGBColor * GetBackgroundColorLoc(void) {return &BackColor;};
 		inline void SetBackgroundColorLoc(const RGBColor & color) {BackColor = color;};
 		inline short * GetVectorPatternLoc(void) {return &VectorPattern;};
@@ -434,6 +447,8 @@ class WinPrefs {
 		void ChangeColorBondColor(long BondOrder) const;
 		/// Changes the GL color to be the color for vectors
 		void ChangeColorVectorColor(void) const;
+		/// Changes the GL color to be the color for the gradient
+		void ChangeColorGradientColor(void) const;
 		/// Changes the GL color to be the color for the specified element with the optional alpha.
 		void ChangeColorAtomColor(long atomtype, float alpha = 1.0) const;
 		/// Compute the color space inverse for the specified element.
@@ -452,6 +467,12 @@ class WinPrefs {
 		inline float SetVectorScale(float NewValue) {
 			if ((NewValue >= 0.1)&&(NewValue<= 2.5)) VectorScale = NewValue;
 			return VectorScale;};
+		/// Obtain the gradient vector length scale factor
+		inline float GetGradientScale(void) const {return GradientScale;};
+		/// Set the gradient length scale factor
+		inline float SetGradientScale(float NewValue) {
+			if ((NewValue >= 0.01)&&(NewValue<= 2000000.0)) GradientScale = NewValue;
+			return GradientScale;};
 		inline unsigned char * GetAtomLabelLoc(void) {return &(AtomLabels[0][0]);};
 		void GetAtomLabel(long AtomNum, Str255 text);
 #ifdef __wxBuild__

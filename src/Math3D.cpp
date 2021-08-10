@@ -68,7 +68,7 @@ void Rotate3DOffset(const Matrix4D rotationMatrix, const CPoint3D & incoord, CPo
 				    ( incoord.z)*rotationMatrix[2][2]);
 }
 void SortzBuffer(const CPoint3D coord[], long zBuffer[], long natoms)	{
-	int			itemp, iatm;
+	long		itemp, iatm;
 	bool		done=false;
 
 	do {

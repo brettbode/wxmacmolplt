@@ -79,9 +79,9 @@ class Frame {
 		Frame *		NextFrame;
 		Frame *		PreviousFrame;
 
-		int natoms_selected;
+		long		natoms_selected;
 		MolDisplayWin *MolWin;
-		int targeted_atom;
+		long		targeted_atom;
 
 	public:
 		Frame(MolDisplayWin *MolWin);
@@ -117,7 +117,7 @@ class Frame {
 		bool SetAtomType(long theAtom, short atmType);
 		bool GetAtomPosition(long theAtom, CPoint3D & p) const;
 		bool SetAtomPosition(long theAtom, const CPoint3D & p);
-		mpAtom * AddAtom(long AtomType, const CPoint3D & AtomPosition, long index=-1);
+		mpAtom * AddAtom(int AtomType, const CPoint3D & AtomPosition, long index=-1);
 		mpAtom *AddAtom(const mpAtom& atm, long index=-1, const CPoint3D *pos = NULL);
 		bool IncreaseAtomAllocation(long NumAdditional);
 		//BondExists returns the id of the bond, -1 otherwise
@@ -232,18 +232,25 @@ class Frame {
 		void resetAllSelectState();
 		bool SetAtomSelection(long atom_id, bool select_it);
 		bool GetAtomSelection(long atom_id) const;
-		int GetNumAtomsSelected(void) const;
-		int GetAtomNumBonds(int atom_id) const;
+		long GetNumAtomsSelected(void) const;
+		long GetAtomNumBonds(long atom_id) const;
 #ifdef USE_OPENBABEL
 		OBMol * ConvertToOBMol(void) const;
 		bool ConvertFromOBMol(const OBMol & mol);
 #endif
-		bool SetAtomOxidationNumber(int atom_id, int ox_num);
-		int GetAtomOxidationNumber(int atom_id);
+		bool SetAtomOxidationNumber(long atom_id, int ox_num);
+		long GetAtomOxidationNumber(long atom_id);
 
 		//
-		inline int GetTargetAtom() const { return targeted_atom; }
-		inline void SetTargetAtom(int id) { targeted_atom = id; }
+		inline long GetTargetAtom() const { return targeted_atom; }
+		inline void SetTargetAtom(long id) { targeted_atom = id; }
+		/// Test to see if the gradient vector is avalable for use for display
+		bool GradientVectorAvailable(void) const;
+		/* Retrive the gradient vector for theAtom, returns true if successful
+		 * @param theAtom the atom to pull from the array
+		 * @param GradientVector upon return contains the gradient vector for theAtom
+		 */
+		bool RetrieveAtomGradient(long theAtom, CPoint3D & gradVector) const;
 };
 
 #endif

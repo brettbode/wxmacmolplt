@@ -12,7 +12,7 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
                            const wxSize &size,
                            int n,
                            const wxString choices[],
-                           long style) :
+                           long /*style*/) :
                   wxPanel(parent,
                           id,
                           pos,
@@ -64,7 +64,7 @@ wxUglyChoice::wxUglyChoice(wxWindow* parent,
                            const wxPoint &pos,
                            const wxSize &size,
                            const wxArrayString & choices,
-                           long style) :
+                           long /*style*/) :
 						wxPanel(parent,
 								id,
 								pos,
@@ -115,14 +115,14 @@ wxUglyChoice::~wxUglyChoice() {
 
 }
 
-int wxUglyChoice::Append(const wxString &item) {
+int wxUglyChoice::Append(const wxString &anItem) {
     wxMenuItem *mi = NULL;
 
-    if(!item.IsEmpty()) {
+    if(!anItem.IsEmpty()) {
 #if 0 //wxHAS_RADIO_MENU_ITEMS
-        mi = m_menu.AppendRadioItem(wxID_ANY, item);
+        mi = m_menu.AppendRadioItem(wxID_ANY, anItem);
 #else
-        mi = m_menu.Append(wxID_ANY, item);
+        mi = m_menu.Append(wxID_ANY, anItem);
 #endif
         this->item.push_back(mi->GetId());
 
@@ -138,14 +138,14 @@ int wxUglyChoice::Append(const wxString &item) {
     return 0;
 }
 
-int wxUglyChoice::Insert(const wxString &item, int pos) {
+int wxUglyChoice::Insert(const wxString &anItem, int pos) {
     wxMenuItem *mi = NULL;
 
-    if(!item.IsEmpty()) {
+    if(!anItem.IsEmpty()) {
 #if 0 //wxHAS_RADIO_MENU_ITEMS
         mi = m_menu.InsertRadioItem(pos, wxID_ANY, item);
 #else
-        mi = m_menu.Insert(pos, wxID_ANY, item);
+        mi = m_menu.Insert(pos, wxID_ANY, anItem);
 #endif
         this->item.insert(this->item.begin() + pos, mi->GetId());
 
@@ -186,7 +186,7 @@ bool wxUglyChoice::IsEmpty() const {
 }
 
 int wxUglyChoice::GetCount() const {
-    return item.size();
+    return (int) item.size();
 }
 
 void wxUglyChoice::SetToolTip(const wxString& tip) {
@@ -238,7 +238,7 @@ wxString wxUglyChoice::GetStringSelection() const {
     return m_menu.GetLabel(item[selection]);
 }
 
-void wxUglyChoice::onButtonClick(wxCommandEvent &event) {
+void wxUglyChoice::onButtonClick(wxCommandEvent & /*event*/) {
     PopupMenu(&m_menu);
 }
 

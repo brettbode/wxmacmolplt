@@ -16,11 +16,13 @@
 #include "BFiles.h"
 #include "myFiles.h"
 #include "InputData.h"
+#include "inputfileeditor.h"
 #include "Prefs.h"
 #include "exportoptionsdialog.h"
 #include "energyplotdialog.h"
 #include <wx/wfstream.h>
 #include <wx/anidecod.h>
+#include <wx/filename.h>
 
 extern WinPrefs *	gPreferences;
 
@@ -38,6 +40,24 @@ long InputData::WriteInputFile(MoleculeData * lData, MolDisplayWin * owner) {
 	
     if(!filePath.IsEmpty()) {
 		return WriteInputFile(filePath, lData, owner);
+	}
+	return -1;
+}
+
+//Output the GAMESS input file to a temp file, then open a text editor for the user.
+long InputData::WriteEditInputFile(MoleculeData * lData, MolDisplayWin * owner) {
+	wxFile * t=NULL;
+	wxString tempfile = wxFileName::CreateTempFileName(wxString(_("MacMolPlt_temp_")), t);
+
+	if(!tempfile.IsEmpty()) {
+		long result = WriteInputFile(tempfile, lData, owner);
+		InputFileEditor * leditor = new InputFileEditor(owner);
+		if (leditor) {
+			leditor->LoadFile(tempfile);
+			leditor->Layout();
+			leditor->Show();
+		}
+		return result;
 	}
 	return -1;
 }
@@ -101,7 +121,7 @@ BufferFile * OpenDatFile(void) {
 
 void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg) {
 	wxImageArray images;
-	long AnimateTime = 10*Prefs->GetAnimateTime();
+	int AnimateTime = 10*Prefs->GetAnimateTime();
 	bool killEPlotWin=false, includeEP = false;
 	int savedEPlotWidth, savedEPlotHeight;
 	wxBitmap  *bmp=NULL, *ePlotbmp=NULL;
@@ -185,7 +205,6 @@ void MolDisplayWin::WriteGIFMovie(wxString & filepath, ExportOptionsDialog * dlg
 			}
 		} else { //normal mode movie
 			bool savedrawmode=false;
-			long AnimateTime = 10*Prefs->GetAnimateTime();
 			if(!MainData->cFrame->Vibs) {
 				wxLogMessage(_("Error! No normal modes found when trying to create a normal mode animation. Aborted!"));
 				throw UserCancel();

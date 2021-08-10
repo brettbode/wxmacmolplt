@@ -35,6 +35,7 @@ writeSWFTabIndexToMethod(SWFBlock block, SWFByteOutputMethod method, void* data)
 static int
 completeSWFTabIndex(SWFBlock block)
 {
+	(void) block;
 	return 4;
 }
 
