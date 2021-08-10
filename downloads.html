@@ -19,6 +19,20 @@ Want to know when a new version is available? <a href="mailto:macmolplt-announce
   <LI>The 7.7 binaries are signed, but not notarized. On the latest MacOS you will need to follow <a href="https://support.apple.com/en-us/HT202491">Apple's instructions for running an app that has not been notarized</a> the first time.
   <LI>Do you need a binary for a 32 bit x86 or PPC based system or an older OS? Please let <a href="mailto:MMP.Guy@gmail.com">me</a> know.
 </UL>
+<H3>Windows 64 bit</H3>
+This 64 bit binary is built on Windows 10 with VS2019 on wx 3.0.5. 
+The binary will ONLY run on 64 bit Windows systems (which should be most systems).
+<UL>
+<LI><a href="https://uofi.box.com/s/wa800qxhbq2r99m2b3dba9vkmnbd9j3y">
+	64-bit binary for Windows (v 7.7.1) packaged as a Windows installer binary</a> (Ignore the box.com warning)
+<LI><a href="https://uofi.box.com/shared/static/n73ncbb2op91hrbn0mn7yk5vo0ccjbsu.zip">
+	Same as the previous, but packaged as a zip file</a> (This provides a direct download link, but you will have to manually run the installer)
+<LI>For those that prefer not to run an installer here is the exact same binary
+as a <a href="https://uofi.box.com/shared/static/ogxqytflxr5m53wvkn1idfql8gbzm4uq.zip">plain zip archive</a>. 
+These appear to include the required runtime libraries in the package. However, 
+if the application fails to launch saying MSVCP140.dll is missing then you will need to download and install the <a href="https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0">Visual Studio 2019 runtime libraries</a>. 
+<!--If you have a machine where you are not allowed to install the Microsoft libraries you can simply copy msvcp120.dll and msvcr120.dll from another machine into the same directory as the wxmacmolplt executable. Windows will search for the dlls in the same directory as the executable as well as the system path.-->
+</UL>
 <H3>Windows 32 bit</H3>
 This 32 bit Windows binary is built on Windows 7 with VS2008 on wx 2.9.1. I 
 believe it will run on both 32 bit and 64 bit Windows systems both older and
@@ -29,18 +43,6 @@ newer OS levels.
   <LI>If you can not run an installer on your system here is a 
 <a href="https://uofi.box.com/shared/static/r0jifp0tg0gjc5y51rl9i1dumq3q46nm.zip">plain zip archive</a>. If the wxMacMolPlt.exe file fails to launch with a message saying the configuration is invalid you need to install the
 <a href="https://www.microsoft.com/en-us/download/details.aspx?id=40784">VS8 runtime libraries</a> which are available as a free download from Microsoft.
-</UL>
-<H3>Windows 64 bit</H3>
-This 64 bit binary is built on Windows 8 with VS2013 on wx 3.0.2. 
-The binary will ONLY run on 64 bit Windows systems.
-<UL>
-<LI><a href="https://uofi.box.com/s/hc31wcz0kcktmgdzyivkobihfq8xttf2">
-	64-bit binary for Windows (v 7.7) packaged as a Windows installer binary</a> (Ignore the box.com warning)
-<LI><a href="https://uofi.box.com/shared/static/k4x3lc5g1x3qhkn7qy3l8ismoj3qd9kd.zip">
-	Same as the previous, but packaged as a zip file</a> (This provides a direct download link, but you will have to manually run the installer)
-<LI>For those that prefer not to run an installer here is the exact same binary
-as a <a href="https://uofi.box.com/shared/static/ah3hq3omjz45jm882n5ye8tzg7tq7i6r.zip">plain zip archive</a>. 
-If the application fails to launch saying MSVCP120.dll is missing then you will need to download and install the <a href="http://www.microsoft.com/en-gb/download/details.aspx?id=40784">Visual Studio 2013 runtime libraries</a>. If you have a machine where you are not allowed to install the Microsoft libraries you can simply copy msvcp120.dll and msvcr120.dll from another machine into the same directory as the wxmacmolplt executable. Windows will search for the dlls in the same directory as the executable as well as the system path.
 </UL>
 <H3>Linux</H3>
 <UL>
