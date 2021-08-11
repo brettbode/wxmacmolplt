@@ -856,6 +856,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\inputfileeditor.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\src\Internals.cpp"
 				>
 			</File>
@@ -1081,6 +1085,10 @@
 			</File>
 			<File
 				RelativePath=".\src\ming-src\blocks\scriptlimits.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\selectfiletype.cpp"
 				>
 			</File>
 			<File
