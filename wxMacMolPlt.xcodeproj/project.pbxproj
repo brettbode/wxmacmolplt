@@ -733,6 +733,7 @@
 		8B9B485A0D0F3CF000CE0EDF /* organics.cml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = organics.cml; path = resources/organics.cml; sourceTree = "<group>"; };
 		8BA56C9F0DBFC97D00B8F40C /* FloatSlider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FloatSlider.cpp; path = src/FloatSlider.cpp; sourceTree = "<group>"; };
 		8BA56CA00DBFC97D00B8F40C /* FloatSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FloatSlider.h; path = src/FloatSlider.h; sourceTree = "<group>"; };
+		8BAA8EBB26BC441A00A78561 /* wxMacMolPltRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = wxMacMolPltRelease.entitlements; sourceTree = "<group>"; };
 		8BBD949212C996A20063AAF3 /* binary.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = binary.c; path = blocks/binary.c; sourceTree = "<group>"; };
 		8BBD949312C996A20063AAF3 /* scenedata.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = scenedata.c; path = blocks/scenedata.c; sourceTree = "<group>"; };
 		8BBD949412C996A20063AAF3 /* scenedata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scenedata.h; path = blocks/scenedata.h; sourceTree = "<group>"; };
@@ -785,6 +786,7 @@
 		1652D9FD09D0AE7200B7783F = {
 			isa = PBXGroup;
 			children = (
+				8BAA8EBB26BC441A00A78561 /* wxMacMolPltRelease.entitlements */,
 				1652DA2609D0B0E700B7783F /* source */,
 				8B33B7F30BF8EB4B0056C79E /* ming-src */,
 				1652DAC709D0B41400B7783F /* Resources */,
@@ -2046,7 +2048,8 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_NULLABLE_TO_NONNULL_CONVERSION = YES;
 				CLANG_WARN_SUSPICIOUS_IMPLICIT_CONVERSION = NO;
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_ENTITLEMENTS = wxMacMolPltRelease.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
