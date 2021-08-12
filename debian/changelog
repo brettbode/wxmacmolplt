@@ -1,8 +1,14 @@
-wxmacmolplt (7.7-1) Jessie; urgency=low
+wxmacmolplt (7.7.1-1) Jessie; urgency=low
 
   * New upstream version
 
- -- Brett Bode <MMP.Guy@gmail.com> Fri, 05 Aug 2016 12:09:57 -0500
+ -- Brett Bode <MMP.Guy@gmail.com>  Tue, 03 Aug 2021 15:24:40 -0500
+
+wxmacmolplt (7.7-1) precise; urgency=low
+
+  * New upstream version
+
+ -- Brett Bode <MMP.Guy@gmail.com>  Thu, 11 Aug 2016 17:14:02 -0500
 
 wxmacmolplt (7.6.2-1) Jessie; urgency=low
 

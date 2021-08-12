@@ -38,5 +38,5 @@ EXTRA_DIST = wxMacMolPlt.kdevelop LICENSE  \
     debian/changelog debian/compat debian/control debian/copyright \
     debian/dirs debian/docs debian/menu debian/rules \
     resources/wxmacmolplt.png resources/wxmacmolplt.desktop \
-	resources/wxmacmolplt.appdata.xml \
+	resources/wxmacmolplt.appdata.xml README \
     resources/fonts/COPYRIGHT.BITSTREAM
