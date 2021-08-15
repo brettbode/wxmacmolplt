@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/brettbode/wxmacmolplt.svg?branch=master)](https://travis-ci.org/brettbode/wxmacmolplt) Build on trusty against wxWidgets 2.8
+[![Build Status](https://travis-ci.com/brettbode/wxmacmolplt.svg?branch=main)](https://travis-ci.com/brettbode/wxmacmolplt) Build on trusty against wxWidgets 2.8
 
 wxMacMolPlt is a wxWidgets rewrite of MacMolPlt by Brett Bode's research group at
 Iowa State University. The source code to this program is released under the 
