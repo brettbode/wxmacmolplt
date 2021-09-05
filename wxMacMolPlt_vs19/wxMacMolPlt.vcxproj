@@ -1,0 +1,465 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F86B1C8B-B1FB-48B4-B145-DF0CA94DD026}</ProjectGuid>
+    <RootNamespace>wxMacMolPlt</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>16.0.31401.40</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>Debug\</OutDir>
+    <IntDir>Debug\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>Release\</OutDir>
+    <IntDir>Release\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>C:\wxMacMolPlt\src\ming-src\actioncompiler;C:\wxMacMolPlt\src\ming-src\blocks;C:\wxMacMolPlt\src\ming-src;C:\wxWidgets-2.9.5\lib\vc_lib\mswud;C:\wxWidgets-2.9.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0400;wxUSE_GUI=1;__WXDEBUG__;YY_NO_UNISTD_H;HAVE_LIBMING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wxmsw29ud_adv.lib;wxmsw29ud_gl.lib;wxmsw29ud_core.lib;wxmsw29ud_html.lib;wxbase29ud.lib;wxtiffd.lib;wxjpegd.lib;wxpngd.lib;wxzlibd.lib;wxregexud.lib;wxexpatd.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\wxWidgets-2.9.5\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>C:\Users\brett\source\repos\wxmacmolplt\src\ming-src\actioncompiler;C:\Users\brett\source\repos\wxmacmolplt\src\ming-src\blocks;C:\Users\brett\source\repos\wxmacmolplt\src\ming-src;C:\wxWidgets-3.0.5\lib\vc_x64_lib\mswud;C:\wxWidgets-3.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0400;wxUSE_GUI=1;__WXDEBUG__;YY_NO_UNISTD_H;HAVE_LIBMING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wxmsw30ud_adv.lib;wxmsw30ud_gl.lib;wxmsw30ud_core.lib;wxmsw30ud_html.lib;wxbase30ud.lib;wxtiffd.lib;wxjpegd.lib;wxpngd.lib;wxzlibd.lib;wxregexud.lib;wxexpatd.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\wxWidgets-3.0.5\lib\vc_x64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\wxMacMolPlt\src\ming-src\actioncompiler;C:\wxMacMolPlt\src\ming-src\blocks;C:\wxMacMolPlt\src\ming-src;C:\wxWidgets-3.0.5\lib\vc_lib\mswu;C:\wxWidgets-3.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x400;wxUSE_GUI=1;YY_NO_UNISTD_H;HAVE_LIBMING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wxmsw30u_adv.lib;wxmsw30u_gl.lib;wxmsw30u_core.lib;wxmsw30u_html.lib;wxbase30u.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\wxWidgets-3.0.5\lib\vc_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\brett\source\repos\wxmacmolplt\src\ming-src\actioncompiler;C:\Users\brett\source\repos\wxmacmolplt\src\ming-src\blocks;C:\Users\brett\source\repos\wxmacmolplt\src\ming-src;C:\wxWidgets-3.0.5\lib\vc_x64_lib\mswu;C:\wxWidgets-3.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x400;wxUSE_GUI=1;YY_NO_UNISTD_H;HAVE_LIBMING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wxmsw30u_adv.lib;wxmsw30u_gl.lib;wxmsw30u_core.lib;wxmsw30u_html.lib;wxbase30u.lib;wxtiff.lib;wxjpeg.lib;wxpng.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;winmm.lib;comctl32.lib;rpcrt4.lib;wsock32.lib;odbc32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\wxWidgets-3.0.5\lib\vc_x64_lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\resource.h" />
+    <ClInclude Include="..\src\aboutwxmacmolplt.h" />
+    <ClInclude Include="..\src\appendframesoptions.h" />
+    <ClInclude Include="..\src\AtomTypeList.h" />
+    <ClInclude Include="..\src\BasisSet.h" />
+    <ClInclude Include="..\src\BFiles.h" />
+    <ClInclude Include="..\src\bondsdlg.h" />
+    <ClInclude Include="..\src\build_palette.h" />
+    <ClInclude Include="..\src\cell_table.h" />
+    <ClInclude Include="..\src\changeatomorderdialog.h" />
+    <ClInclude Include="..\src\ChooseDialog.h" />
+    <ClInclude Include="..\src\choosevecgroup.h" />
+    <ClInclude Include="..\src\CML.h" />
+    <ClInclude Include="..\src\colorArea.h" />
+    <ClInclude Include="..\src\coordinateoffset.h" />
+    <ClInclude Include="..\src\coordinateswindow.h" />
+    <ClInclude Include="..\src\energyplotdialog.h" />
+    <ClInclude Include="..\src\exportoptionsdialog.h" />
+    <ClInclude Include="..\src\Files.h" />
+    <ClInclude Include="..\src\FloatSlider.h" />
+    <ClInclude Include="..\src\fmofragmentationdialog.h" />
+    <ClInclude Include="..\src\Frame.h" />
+    <ClInclude Include="..\src\frameenergy.h" />
+    <ClInclude Include="..\src\frequenciesdialog.h" />
+    <ClInclude Include="..\src\GaussHermite.h" />
+    <ClInclude Include="..\src\Geometries.h" />
+    <ClInclude Include="..\src\glew.h" />
+    <ClInclude Include="..\src\glf.h" />
+    <ClInclude Include="..\src\GlobalExceptions.h" />
+    <ClInclude Include="..\src\Globals.h" />
+    <ClInclude Include="..\src\glxew.h" />
+    <ClInclude Include="..\src\Gradient.h" />
+    <ClInclude Include="..\src\inputbuilder.h" />
+    <ClInclude Include="..\src\InputData.h" />
+    <ClInclude Include="..\src\inputfileeditor.h" />
+    <ClInclude Include="..\src\InputWizard.h" />
+    <ClInclude Include="..\src\Internals.h" />
+    <ClInclude Include="..\src\llmdialog.h" />
+    <ClInclude Include="..\src\main.h" />
+    <ClInclude Include="..\src\Math3D.h" />
+    <ClInclude Include="..\src\ming-src\actioncompiler\assembler.h" />
+    <ClInclude Include="..\src\ming-src\actioncompiler\compile.h" />
+    <ClInclude Include="..\src\ming-src\actioncompiler\swf4compiler.tab.h" />
+    <ClInclude Include="..\src\ming-src\actioncompiler\swf5compiler.tab.h" />
+    <ClInclude Include="..\src\ming-src\actiontypes.h" />
+    <ClInclude Include="..\src\ming-src\blocklist.h" />
+    <ClInclude Include="..\src\ming-src\blocks\action.h" />
+    <ClInclude Include="..\src\ming-src\blocks\bitmap.h" />
+    <ClInclude Include="..\src\ming-src\blocks\block.h" />
+    <ClInclude Include="..\src\ming-src\blocks\blocktypes.h" />
+    <ClInclude Include="..\src\ming-src\blocks\browserfont.h" />
+    <ClInclude Include="..\src\ming-src\blocks\button.h" />
+    <ClInclude Include="..\src\ming-src\blocks\character.h" />
+    <ClInclude Include="..\src\ming-src\blocks\cxform.h" />
+    <ClInclude Include="..\src\ming-src\blocks\dbl.h" />
+    <ClInclude Include="..\src\ming-src\blocks\error.h" />
+    <ClInclude Include="..\src\ming-src\blocks\exports.h" />
+    <ClInclude Include="..\src\ming-src\blocks\fdbfont.h" />
+    <ClInclude Include="..\src\ming-src\blocks\fileattrs.h" />
+    <ClInclude Include="..\src\ming-src\blocks\fillstyle.h" />
+    <ClInclude Include="..\src\ming-src\blocks\filter.h" />
+    <ClInclude Include="..\src\ming-src\blocks\flv.h" />
+    <ClInclude Include="..\src\ming-src\blocks\font.h" />
+    <ClInclude Include="..\src\ming-src\blocks\fontinfo.h" />
+    <ClInclude Include="..\src\ming-src\blocks\fromswf.h" />
+    <ClInclude Include="..\src\ming-src\blocks\gradient.h" />
+    <ClInclude Include="..\src\ming-src\blocks\imports.h" />
+    <ClInclude Include="..\src\ming-src\blocks\input.h" />
+    <ClInclude Include="..\src\ming-src\blocks\jpeg.h" />
+    <ClInclude Include="..\src\ming-src\blocks\libswf.h" />
+    <ClInclude Include="..\src\ming-src\blocks\linestyle.h" />
+    <ClInclude Include="..\src\ming-src\blocks\matrix.h" />
+    <ClInclude Include="..\src\ming-src\blocks\metadata.h" />
+    <ClInclude Include="..\src\ming-src\blocks\method.h" />
+    <ClInclude Include="..\src\ming-src\blocks\morph.h" />
+    <ClInclude Include="..\src\ming-src\blocks\mp3.h" />
+    <ClInclude Include="..\src\ming-src\blocks\output.h" />
+    <ClInclude Include="..\src\ming-src\blocks\outputblock.h" />
+    <ClInclude Include="..\src\ming-src\blocks\placeobject.h" />
+    <ClInclude Include="..\src\ming-src\blocks\protect.h" />
+    <ClInclude Include="..\src\ming-src\blocks\rect.h" />
+    <ClInclude Include="..\src\ming-src\blocks\scalinggrid.h" />
+    <ClInclude Include="..\src\ming-src\blocks\scenedata.h" />
+    <ClInclude Include="..\src\ming-src\blocks\scriptlimits.h" />
+    <ClInclude Include="..\src\ming-src\blocks\shape.h" />
+    <ClInclude Include="..\src\ming-src\blocks\sound.h" />
+    <ClInclude Include="..\src\ming-src\blocks\soundinstance.h" />
+    <ClInclude Include="..\src\ming-src\blocks\soundstream.h" />
+    <ClInclude Include="..\src\ming-src\blocks\sprite.h" />
+    <ClInclude Include="..\src\ming-src\blocks\swf.h" />
+    <ClInclude Include="..\src\ming-src\blocks\symbolclass.h" />
+    <ClInclude Include="..\src\ming-src\blocks\tabindex.h" />
+    <ClInclude Include="..\src\ming-src\blocks\text.h" />
+    <ClInclude Include="..\src\ming-src\blocks\textfield.h" />
+    <ClInclude Include="..\src\ming-src\blocks\ttffont.h" />
+    <ClInclude Include="..\src\ming-src\blocks\utf8.h" />
+    <ClInclude Include="..\src\ming-src\blocks\videostream.h" />
+    <ClInclude Include="..\src\ming-src\displaylist.h" />
+    <ClInclude Include="..\src\ming-src\fill.h" />
+    <ClInclude Include="..\src\ming-src\font_util.h" />
+    <ClInclude Include="..\src\ming-src\gc.h" />
+    <ClInclude Include="..\src\ming-src\libming.h" />
+    <ClInclude Include="..\src\ming-src\ming.h" />
+    <ClInclude Include="..\src\ming-src\mingpp.h" />
+    <ClInclude Include="..\src\ming-src\ming_config.h" />
+    <ClInclude Include="..\src\ming-src\movie.h" />
+    <ClInclude Include="..\src\ming-src\movieclip.h" />
+    <ClInclude Include="..\src\ming-src\position.h" />
+    <ClInclude Include="..\src\ming-src\shape_cubic.h" />
+    <ClInclude Include="..\src\ming-src\shape_util.h" />
+    <ClInclude Include="..\src\ming-src\text_util.h" />
+    <ClInclude Include="..\src\MMPPrefs.h" />
+    <ClInclude Include="..\src\mmp_gl.h" />
+    <ClInclude Include="..\src\MolDisplayWin.h" />
+    <ClInclude Include="..\src\MoleculeData.h" />
+    <ClInclude Include="..\src\mpGLCanvas.h" />
+    <ClInclude Include="..\src\myFiles.h" />
+    <ClInclude Include="..\src\MyTypes.h" />
+    <ClInclude Include="..\src\patterns.h" />
+    <ClInclude Include="..\src\Prefs.h" />
+    <ClInclude Include="..\src\PrefsPanes.h" />
+    <ClInclude Include="..\src\preview_canvas.h" />
+    <ClInclude Include="..\src\printoptions.h" />
+    <ClInclude Include="..\src\Progress.h" />
+    <ClInclude Include="..\src\qtexport.h" />
+    <ClInclude Include="..\src\RysPolynomial.h" />
+    <ClInclude Include="..\src\selectfiletype.h" />
+    <ClInclude Include="..\src\setbondlength.h" />
+    <ClInclude Include="..\src\setPreference.h" />
+    <ClInclude Include="..\src\setscreenplane.h" />
+    <ClInclude Include="..\src\surfaceDlg.h" />
+    <ClInclude Include="..\src\surfaceswindow.h" />
+    <ClInclude Include="..\src\SurfaceTypes.h" />
+    <ClInclude Include="..\src\swfexport.h" />
+    <ClInclude Include="..\src\symmetrypointgroupdlg.h" />
+    <ClInclude Include="..\src\VirtualSphere.h" />
+    <ClInclude Include="..\src\wglew.h" />
+    <ClInclude Include="..\src\windowparameters.h" />
+    <ClInclude Include="..\src\wxMolGraph.h" />
+    <ClInclude Include="..\src\wxUglyChoice.h" />
+    <ClInclude Include="..\src\XML.hpp" />
+    <ClInclude Include="..\src\zmatrixcalculator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\wxMacMolPlt.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\aboutwxmacmolplt.cpp" />
+    <ClCompile Include="..\src\appendframesoptions.cpp" />
+    <ClCompile Include="..\src\AtomTypeList.cpp" />
+    <ClCompile Include="..\src\BasisSet.cpp" />
+    <ClCompile Include="..\src\BFiles.cpp" />
+    <ClCompile Include="..\src\bondsdlg.cpp" />
+    <ClCompile Include="..\src\build_palette.cpp" />
+    <ClCompile Include="..\src\changeatomorderdialog.cpp" />
+    <ClCompile Include="..\src\ChooseDialog.cpp" />
+    <ClCompile Include="..\src\choosevecgroup.cpp" />
+    <ClCompile Include="..\src\CML.cpp" />
+    <ClCompile Include="..\src\colorArea.cpp" />
+    <ClCompile Include="..\src\coordinateoffset.cpp" />
+    <ClCompile Include="..\src\coordinateswindow.cpp" />
+    <ClCompile Include="..\src\DataClasses.cpp" />
+    <ClCompile Include="..\src\energyplotdialog.cpp" />
+    <ClCompile Include="..\src\exportoptionsdialog.cpp" />
+    <ClCompile Include="..\src\Files.cpp" />
+    <ClCompile Include="..\src\FloatSlider.cpp" />
+    <ClCompile Include="..\src\fmofragmentationdialog.cpp" />
+    <ClCompile Include="..\src\Frame.cpp" />
+    <ClCompile Include="..\src\frameenergy.cpp" />
+    <ClCompile Include="..\src\frequenciesdialog.cpp" />
+    <ClCompile Include="..\src\GaussHermite.cpp" />
+    <ClCompile Include="..\src\Geometries.cpp" />
+    <ClCompile Include="..\src\glew.cpp" />
+    <ClCompile Include="..\src\glf.cpp" />
+    <ClCompile Include="..\src\Gradient.cpp" />
+    <ClCompile Include="..\src\inputbuilder.cpp" />
+    <ClCompile Include="..\src\InputData.cpp" />
+    <ClCompile Include="..\src\inputfileeditor.cpp" />
+    <ClCompile Include="..\src\InputWizard.cpp" />
+    <ClCompile Include="..\src\Internals.cpp" />
+    <ClCompile Include="..\src\llmdialog.cpp" />
+    <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Math3D.cpp" />
+    <ClCompile Include="..\src\MEP.cpp" />
+    <ClCompile Include="..\src\ming-src\actioncompiler\assembler.c" />
+    <ClCompile Include="..\src\ming-src\actioncompiler\compile.c" />
+    <ClCompile Include="..\src\ming-src\actioncompiler\compileaction.c" />
+    <ClCompile Include="..\src\ming-src\actioncompiler\lex.swf4.c" />
+    <ClCompile Include="..\src\ming-src\actioncompiler\lex.swf5.c" />
+    <ClCompile Include="..\src\ming-src\actioncompiler\listaction.c" />
+    <ClCompile Include="..\src\ming-src\actioncompiler\swf4compiler.tab.c" />
+    <ClCompile Include="..\src\ming-src\actioncompiler\swf5compiler.tab.c" />
+    <ClCompile Include="..\src\ming-src\blocklist.c" />
+    <ClCompile Include="..\src\ming-src\blocks\action.c" />
+    <ClCompile Include="..\src\ming-src\blocks\binary.c" />
+    <ClCompile Include="..\src\ming-src\blocks\bitmap.c" />
+    <ClCompile Include="..\src\ming-src\blocks\block.c" />
+    <ClCompile Include="..\src\ming-src\blocks\browserfont.c" />
+    <ClCompile Include="..\src\ming-src\blocks\button.c" />
+    <ClCompile Include="..\src\ming-src\blocks\character.c" />
+    <ClCompile Include="..\src\ming-src\blocks\cxform.c" />
+    <ClCompile Include="..\src\ming-src\blocks\dbl.c" />
+    <ClCompile Include="..\src\ming-src\blocks\error.c" />
+    <ClCompile Include="..\src\ming-src\blocks\fdbfont.c" />
+    <ClCompile Include="..\src\ming-src\blocks\fileattrs.c" />
+    <ClCompile Include="..\src\ming-src\blocks\fillstyle.c" />
+    <ClCompile Include="..\src\ming-src\blocks\filter.c" />
+    <ClCompile Include="..\src\ming-src\blocks\flv.c" />
+    <ClCompile Include="..\src\ming-src\blocks\font.c" />
+    <ClCompile Include="..\src\ming-src\blocks\fontinfo.c" />
+    <ClCompile Include="..\src\ming-src\blocks\fromswf.c" />
+    <ClCompile Include="..\src\ming-src\blocks\gifdbl.c" />
+    <ClCompile Include="..\src\ming-src\blocks\gradient.c" />
+    <ClCompile Include="..\src\ming-src\blocks\imports.c" />
+    <ClCompile Include="..\src\ming-src\blocks\input.c" />
+    <ClCompile Include="..\src\ming-src\blocks\jpeg.c" />
+    <ClCompile Include="..\src\ming-src\blocks\linestyle.c" />
+    <ClCompile Include="..\src\ming-src\blocks\matrix.c" />
+    <ClCompile Include="..\src\ming-src\blocks\metadata.c" />
+    <ClCompile Include="..\src\ming-src\blocks\method.c" />
+    <ClCompile Include="..\src\ming-src\blocks\morph.c" />
+    <ClCompile Include="..\src\ming-src\blocks\mp3.c" />
+    <ClCompile Include="..\src\ming-src\blocks\output.c" />
+    <ClCompile Include="..\src\ming-src\blocks\outputblock.c" />
+    <ClCompile Include="..\src\ming-src\blocks\placeobject.c" />
+    <ClCompile Include="..\src\ming-src\blocks\pngdbl.c" />
+    <ClCompile Include="..\src\ming-src\blocks\protect.c" />
+    <ClCompile Include="..\src\ming-src\blocks\rect.c" />
+    <ClCompile Include="..\src\ming-src\blocks\scalinggrid.c" />
+    <ClCompile Include="..\src\ming-src\blocks\scenedata.c" />
+    <ClCompile Include="..\src\ming-src\blocks\scriptlimits.c" />
+    <ClCompile Include="..\src\ming-src\blocks\shape.c" />
+    <ClCompile Include="..\src\ming-src\blocks\sound.c" />
+    <ClCompile Include="..\src\ming-src\blocks\soundinstance.c" />
+    <ClCompile Include="..\src\ming-src\blocks\soundstream.c" />
+    <ClCompile Include="..\src\ming-src\blocks\sprite.c" />
+    <ClCompile Include="..\src\ming-src\blocks\symbolclass.c" />
+    <ClCompile Include="..\src\ming-src\blocks\tabindex.c" />
+    <ClCompile Include="..\src\ming-src\blocks\text.c" />
+    <ClCompile Include="..\src\ming-src\blocks\textfield.c" />
+    <ClCompile Include="..\src\ming-src\blocks\ttffont.c" />
+    <ClCompile Include="..\src\ming-src\blocks\utf8.c" />
+    <ClCompile Include="..\src\ming-src\blocks\videostream.c" />
+    <ClCompile Include="..\src\ming-src\compat.c" />
+    <ClCompile Include="..\src\ming-src\displaylist.c" />
+    <ClCompile Include="..\src\ming-src\fill.c" />
+    <ClCompile Include="..\src\ming-src\font_util.c" />
+    <ClCompile Include="..\src\ming-src\gc.c" />
+    <ClCompile Include="..\src\ming-src\ming.c" />
+    <ClCompile Include="..\src\ming-src\movie.c" />
+    <ClCompile Include="..\src\ming-src\movieclip.c" />
+    <ClCompile Include="..\src\ming-src\position.c" />
+    <ClCompile Include="..\src\ming-src\shape_cubic.c" />
+    <ClCompile Include="..\src\ming-src\shape_util.c" />
+    <ClCompile Include="..\src\ming-src\text_util.c" />
+    <ClCompile Include="..\src\MMPPrefs.cpp" />
+    <ClCompile Include="..\src\MolDisplayWin.cpp" />
+    <ClCompile Include="..\src\MoleculeData.cpp" />
+    <ClCompile Include="..\src\mpGLCanvas.cpp" />
+    <ClCompile Include="..\src\myPrefs.cpp" />
+    <ClCompile Include="..\src\MyTypes.cpp" />
+    <ClCompile Include="..\src\OpenGLGraphics.cpp" />
+    <ClCompile Include="..\src\orbitals.cpp" />
+    <ClCompile Include="..\src\preview_canvas.cpp" />
+    <ClCompile Include="..\src\printoptions.cpp" />
+    <ClCompile Include="..\src\Progress.cpp" />
+    <ClCompile Include="..\src\qtexport.cpp" />
+    <ClCompile Include="..\src\RysPolynomial.cpp" />
+    <ClCompile Include="..\src\selectfiletype.cpp" />
+    <ClCompile Include="..\src\setbondlength.cpp" />
+    <ClCompile Include="..\src\setPreference.cpp" />
+    <ClCompile Include="..\src\setscreenplane.cpp" />
+    <ClCompile Include="..\src\SurfaceBase.cpp" />
+    <ClCompile Include="..\src\surfaceDlg.cpp" />
+    <ClCompile Include="..\src\surfaceswindow.cpp" />
+    <ClCompile Include="..\src\SurfWin.cpp" />
+    <ClCompile Include="..\src\swfexport-g.cpp" />
+    <ClCompile Include="..\src\swfexport.cpp" />
+    <ClCompile Include="..\src\symmetrypointgroupdlg.cpp" />
+    <ClCompile Include="..\src\VirtualSphere.cpp" />
+    <ClCompile Include="..\src\windowparameters.cpp" />
+    <ClCompile Include="..\src\wxFiles.cpp" />
+    <ClCompile Include="..\src\wxMolGraph.cpp" />
+    <ClCompile Include="..\src\wxUglyChoice.cpp" />
+    <ClCompile Include="..\src\XML.cpp" />
+    <ClCompile Include="..\src\zmatrixcalculator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\resources\MacMolPlt.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
