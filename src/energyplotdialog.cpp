@@ -220,7 +220,9 @@ void EnergyPlotDialog::RegenData(void) {
     MoleculeData  *mData = parent->GetData();
     EnergyOptions *eOpts = parent->GetPrefs()->GetEnergyOptions();
     GraphOptions  *gOpts = parent->GetPrefs()->GetGraphOptions();
-    
+	float   UnitFactor = 1.0;
+	if (eOpts->GetDisplayUnits() == kKCalPerMole) UnitFactor = kHartreeTokCalPMol;
+
     vector< double > xSetData;
     vector< pair< int, double > > totalEnergyData;
     vector< pair< int, double > > potentialEnergyData;
@@ -242,10 +244,10 @@ void EnergyPlotDialog::RegenData(void) {
     
     for(currFrame = mData->Frames, i = 0; currFrame != NULL; currFrame = currFrame->NextFrame, i++) {
         xSetData.push_back((double)(currFrame->time));
-        totalEnergyData.push_back(make_pair(i, currFrame->Energy));
-        potentialEnergyData.push_back(make_pair(i, currFrame->Energy - currFrame->GetKineticEnergy()));
-        mp2EnergyData.push_back(make_pair(i, currFrame->GetMP2Energy()));
-        kineticEnergyData.push_back(make_pair(i, currFrame->GetKineticEnergy()));
+        totalEnergyData.push_back(make_pair(i, currFrame->Energy*UnitFactor));
+        potentialEnergyData.push_back(make_pair(i, (currFrame->Energy - currFrame->GetKineticEnergy())*UnitFactor));
+        mp2EnergyData.push_back(make_pair(i, currFrame->GetMP2Energy()*UnitFactor));
+        kineticEnergyData.push_back(make_pair(i, currFrame->GetKineticEnergy()*UnitFactor));
         if(currFrame->Gradient != NULL) rmsGradData.push_back(make_pair(i, (double)(currFrame->Gradient->GetRMS())));
         if(currFrame->Gradient != NULL) maxGradData.push_back(make_pair(i, (double)(currFrame->Gradient->GetMaximum())));
 		float length;
@@ -260,7 +262,7 @@ void EnergyPlotDialog::RegenData(void) {
     epGraph->addYSet(totalEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetTEColor())), MG_SHAPE_CIRCLE, size);
     epGraph->addYSet(potentialEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetPEColor())), MG_SHAPE_CIRCLE, size);
     epGraph->addYSet(mp2EnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetMPColor())), MG_SHAPE_CIRCLE, size);
-    epGraph->addYSet(kineticEnergyData, 0, MG_AXIS_Y1, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
+    epGraph->addYSet(kineticEnergyData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
     epGraph->addYSet(rmsGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
     epGraph->addYSet(maxGradData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
     epGraph->addYSet(bondLenData, 0, MG_AXIS_Y2, MG_STYLE_POINT_LINE, RGB2WX(*(eOpts->GetKEColor())), MG_SHAPE_CIRCLE, size);
@@ -292,8 +294,11 @@ void EnergyPlotDialog::RegenData(void) {
     }
     
     
-    epGraph->setOffsetY(MG_AXIS_Y1, eOpts->GetY1Zero());
-    epGraph->setOffsetY(MG_AXIS_Y2, eOpts->GetY2Zero());
+    epGraph->setOffsetY(MG_AXIS_Y1, eOpts->GetY1Zero()*UnitFactor);
+	if (eOpts->PlotKEnergy())
+		epGraph->setOffsetY(MG_AXIS_Y2, eOpts->GetY2Zero()*UnitFactor);
+	else
+		epGraph->setOffsetY(MG_AXIS_Y2, eOpts->GetY2Zero());
     epGraph->setPrecision(eOpts->GetNumDigits());
     epGraph->autoScaleY(MG_AXIS_Y1);
     epGraph->autoScaleY(MG_AXIS_Y2);
