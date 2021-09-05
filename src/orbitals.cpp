@@ -1163,7 +1163,7 @@ void SetupMOScreens(const BasisSet * const Basis, const float * const MOVector, 
 			}
 			VectorSum = 0.0;
 			for (int ifunc=0; ifunc<numFunctions; ifunc++) {
-				VectorSum += MOVector[ivec];
+				VectorSum += fabs(MOVector[ivec]);
 				ivec++;
 			}
 			ShellScreen.push_back((fabs(VectorSum) > kShellScreenThreshold) ? 0 : numFunctions);
