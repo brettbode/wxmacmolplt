@@ -161,8 +161,9 @@ class BufferFile {
 		 * The EOL char is consumed, but not included in the Line. At most kMaxLineLength-1 chars will
 		 * be read so the pre-allocated Line buffer should be at least kMaxLineLength long.
 		 * @param Line The pre-allocated storage to read the line into.
+		 * @param warnOnLongLines Option to disable the long line warning message.
 		 */
- 		long GetLine(char * Line);
+ 		long GetLine(char * Line, bool warnOnLongLines = true);
 		/** Write out the null-terminated text string (minus the null terminator).
 		 * returns the actual number of characters written.
 		 * @param Text The null-terminated string to output.
@@ -184,7 +185,7 @@ class BufferFile {
 		 * @param Limit (optional) The file position limit (in bytes) to limit the search. -1 will
 		 *							search to the end of the file.
 		 */
-		bool LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset Limit = -1);
+		bool LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset Limit = -1, bool warnOnLongLines=true);
 		/** Search the file for the keywords provided in the vector of strings.
 		 * returns the int value of the string/int pair in the vector or -1 if none are found. The buffer is left
 		 * at the start of the found keyword or the starting position if none are found.
@@ -192,6 +193,7 @@ class BufferFile {
 		 * @param NumKeywords (optional) The nubmer of keywords to seach for, -1 searchs for all in the vector
 		 * @param Limit (optional) The file position limit (in bytes) to limit the search. -1 will
 		 *							search to the end of the file.
+		 * @param warnOnLongLines Option to disable the long line warning message.
 		 */
 		int LocateKeyWord(const std::vector< std::pair <std::string, int> > & keywords, wxFileOffset Limit = -1);
 		/** Obtain the position of the next blank line.

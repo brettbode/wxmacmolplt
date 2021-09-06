@@ -2481,7 +2481,7 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	EnergyPos = -1;
 	NextFinalPos = -1;
 		//First Skip over all of the input card lines, the lines are near the beginning of the file and one after another
-	while (Buffer->LocateKeyWord("INPUT CARD>", 11, (Buffer->GetFilePos()+50000)))
+	while (Buffer->LocateKeyWord("INPUT CARD>", 11, (Buffer->GetFilePos()+50000), false))
 		Buffer->SkipnLines(1);
 	wxFileOffset HeaderEndPos = Buffer->GetFilePos();	//We don't care about anything earlier than this pos.
 //	Buffer->LocateKeyWord("RUN TITLE", 9);	//find and skip over run title since

@@ -284,19 +284,19 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 	if ((GetFilePos() < kMaxLineLength) && LocateKeyWord("[MOLDEN FORMAT]", 14, kMaxLineLength))
 		Type = MolDenFile;
 	while ((ByteCount <= FileSize)&&(Type == kUnknown)) {
-		if (LocateKeyWord("GAMESS VERSION", 14, -1))
+		if (LocateKeyWord("GAMESS VERSION", 14, -1, false))
 			Type = kGAMESSlogType;
-		else if (LocateKeyWord("===== IRC DATA PACKET", 21, -1))
+		else if (LocateKeyWord("===== IRC DATA PACKET", 21, -1, false))
 			Type = kGAMESSTRJType;
-		else if (LocateKeyWord("===== DRC DATA PACKET", 21, -1))
+		else if (LocateKeyWord("===== DRC DATA PACKET", 21, -1, false))
 			Type = kGAMESSTRJType;
-		else if (LocateKeyWord("===== MD DATA PACKET", 20, -1))
+		else if (LocateKeyWord("===== MD DATA PACKET", 20, -1, false))
 			Type = kGAMESSTRJType;
-		else if (LocateKeyWord("IRC INFORMATION PACKET", 22, -1))
+		else if (LocateKeyWord("IRC INFORMATION PACKET", 22, -1, false))
 			Type = kGAMESSIRCType;
-		else if (LocateKeyWord("VELOCITY (BOHR/FS)", 18, -1))
+		else if (LocateKeyWord("VELOCITY (BOHR/FS)", 18, -1, false))
 			Type = kGAMESSDRCType;
-		else if (LocateKeyWord("GAMESS (US) VERSION", 19, -1))
+		else if (LocateKeyWord("GAMESS (US) VERSION", 19, -1, false))
 			Type = kGAMESSlogType;
 		else if ((GetFilePos() < kMaxLineLength) && LocateKeyWord("NATOMS", 6, kMaxLineLength))
 			Type = kMolType;
@@ -305,19 +305,19 @@ TextFileType BufferFile::GetFileType(const char * fileName) {
 		else if (FindGroup("DATA")||FindGroup("CONTRL")) {
 			Type = kGAMESSInputType;
 			//technically molecule is lower case, but LocateKeyword requires upper case
-		} else if (LocateKeyWord("<MOLECULE>", 10, -1))
+		} else if (LocateKeyWord("<MOLECULE>", 10, -1, false))
 			Type = CMLFile;
 		else if (GetFilePos() < kMaxLineLength) {
 			try {
 					char line[kMaxLineLength];
 				SkipnLines(3);
-				GetLine(line);
+				GetLine(line, false);
 					long t1, t2;
 				int scanerr = sscanf(line, "%3ld%3ld", &t1, &t2);
 				if ((scanerr==2)&&((t1>0)&&(t2>=0))) Type = kMDLMolFile;
 				else {
 					SetFilePos(EntryPos);
-					GetLine(line);
+					GetLine(line, false);
 					long temp;
 					scanerr = sscanf(line, "%ld", &temp);
 					if ((scanerr==1)&&(temp>0)) Type = kXYZType;
@@ -433,7 +433,7 @@ long BufferFile::Read(Ptr Target, long NumBytes) {
  * @param Line A preallocated buffer into which the line from the file is copied.
  * @return The number of characters copied.
  */
-long BufferFile::GetLine(char * Line)
+long BufferFile::GetLine(char * Line, bool warnOnLongLines)
 {	long	LineChars=0;
 	if (BufferPos>=BufferSize) AdvanceBuffer();	//Just in case...
 	if ((BufferStart+BufferPos)>=ByteCount) throw FileError(eofErr);	//End of file reached
@@ -444,7 +444,8 @@ long BufferFile::GetLine(char * Line)
 		BufferPos ++;
 		if ((BufferStart+BufferPos)>=ByteCount) break;	//End of file reached, assume EOL
 		if (LineChars>=(kMaxLineLength-2)) { //Make sure we don't overrun the Line buffer
-			wxLogMessage(_("Warning: the maximum line length has been exceeded, skipping the rest of a very long line!"));
+			if (warnOnLongLines)
+				wxLogMessage(_("Warning: the maximum line length has been exceeded, skipping the rest of a very long line!"));
 			while ((Buffer[BufferPos] != 13)&&(Buffer[BufferPos] != 10)) {
 				BufferPos ++;
 				if ((BufferStart+BufferPos)>=ByteCount) break;	//End of file reached, assume EOL
@@ -556,7 +557,7 @@ wxFileOffset BufferFile::FindBlankLine(void) {
 //Search the file for the specified keyword until found, EOF, or the limit is
 //reached Returns true or false, the file position upon exit will be the start
 //of the keyword, or the starting position if the keyword is not found.
-bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset Limit) {
+bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset Limit, bool warnOnLongLines) {
 	wxFileOffset OldPosition = GetFilePos();
 	char	LineText[kMaxLineLength + 1];
 	bool	KeyWordFound=false;
@@ -569,7 +570,7 @@ bool BufferFile::LocateKeyWord(const char Keyword[], long NumByte, wxFileOffset 
 			break;
 		}
 		wxFileOffset lineStartPos = GetFilePos();
-		GetLine(LineText);
+		GetLine(LineText, warnOnLongLines);
 		long Start = FindKeyWord(LineText, Keyword, NumByte);
 		if (Start > -1) {	//Found it!
 			KeyWordFound = true;
