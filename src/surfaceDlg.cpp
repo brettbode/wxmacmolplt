@@ -525,6 +525,13 @@ void OrbSurfacePane::makeMOList() {
 	MoleculeData * mData = myowner->GetMoleculeData();
 	Frame * lFrame = mData->GetCurrentFramePtr();
 	const std::vector<OrbitalRec *> * Orbs = lFrame->GetOrbitalSetVector();
+	
+	//The wxHTMLListBox does seems to change the background to dark, but leaves
+	//the text color dark when entering dark mode so manually manage here.
+	wxSystemAppearance appearance = wxSystemSettings::GetAppearance();
+	wxString fontColor(_("<font color=\"#000000\">"));
+	if (appearance.IsDark())
+		fontColor.Printf(_("<font color=\"#FFFFFF\">"));
 
 	mMOList->Clear();
 
@@ -576,9 +583,9 @@ void OrbSurfacePane::makeMOList() {
 
 			for (int theCell = 0; theCell < NumMOs; theCell++) {
 				if (theCell != HOMOOrb)
-					tmpStr.Printf(wxT("<table width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), theCell+OrbOffset+1);
+					tmpStr.Printf(wxT("%s<table width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), fontColor.c_str(), theCell+OrbOffset+1);
 				else
-					tmpStr.Printf(wxT("<table style=\"background:#80BFFF\" width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), theCell+OrbOffset+1);
+					tmpStr.Printf(wxT("%s<table style=\"background:#80BFFF\" width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr><td width=\"20%%\" align=\"right\">%d&nbsp;</td>"), fontColor.c_str(), theCell+OrbOffset+1);
 
 				tmpStr.Append(wxT("<td width=\"40%%\">"));
 				if (SymLabel) {	//Add the symetry of the orb, if known
@@ -649,7 +656,7 @@ void OrbSurfacePane::makeMOList() {
 				}
 
 				tmpStr.Append(temp);
-				tmpStr.Append(wxT("&nbsp;</td></tr></table>"));
+				tmpStr.Append(wxT("&nbsp;</td></tr></table></font>"));
 				mMOList->Append(tmpStr);
 			}
 		}
@@ -666,6 +673,13 @@ void OrbSurfacePane::makeAOList() {
 
 	MoleculeData * mData = myowner->GetMoleculeData();
 	BasisSet * BasisPtr = mData->GetBasisSet();
+
+	//The wxHTMLListBox does seems to change the background to dark, but leaves
+	//the text color dark when entering dark mode so manually manage here.
+	wxSystemAppearance appearance = wxSystemSettings::GetAppearance();
+	wxString fontColor(_("<font color=\"#000000\">"));
+	if (appearance.IsDark())
+		fontColor.Printf(_("<font color=\"#FFFFFF\">"));
 
 	mOrbCoef->Clear();
 
@@ -698,7 +712,7 @@ void OrbSurfacePane::makeAOList() {
 
 						char label[63];
 						wxString tmpStr;
-						aChoice.Printf(wxT("<table width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr>")); 
+						aChoice.Printf(wxT("%s<table width=\"100%%\" cellspacing=\"1\" cellpadding=\"0\" border=\"0\"><tr>"), fontColor.c_str());
 //						int nchar = 0;
 						//punch out the atom # and symbol if this is the 1st function for this atom
 
@@ -794,7 +808,7 @@ void OrbSurfacePane::makeAOList() {
 				}
 				aChoice.Append(wxT("&nbsp;</td>"));
 			}
-			aChoice.Append(wxT("</tr></table>"));
+			aChoice.Append(wxT("</tr></table></font>"));
 			mOrbCoef->Append(aChoice);
 			/* choice.push_back(aChoice); */
 		}
