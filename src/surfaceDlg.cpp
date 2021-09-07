@@ -128,6 +128,7 @@ BEGIN_EVENT_TABLE(Orbital2DSurfPane, Surface2DPane)
 	EVT_CHECKBOX(ID_REVERSE_PHASE_CHECKBOX, Orbital2DSurfPane::OnReversePhase)
 	EVT_BUTTON(ID_SURFACE_UPDATE_BUT, Orbital2DSurfPane::OnUpdate)
 	EVT_CHECKBOX(ID_SPH_HARMONICS_CHECKBOX, Orbital2DSurfPane::OnSphHarmonicChk)
+	EVT_SYS_COLOUR_CHANGED(Orbital2DSurfPane::OnSystemAppearanceChange)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(Orbital3DSurfPane, Surface3DPane)
@@ -140,6 +141,7 @@ BEGIN_EVENT_TABLE(Orbital3DSurfPane, Surface3DPane)
 	EVT_SLIDER(ID_CONTOUR_VALUE_SLIDER, Orbital3DSurfPane::OnContourValueSld)
 	EVT_SLIDER(ID_GRID_SIZE_SLIDER, Orbital3DSurfPane::OnGridSizeSld)
 	EVT_BUTTON(ID_SURFACE_UPDATE_BUT, Orbital3DSurfPane::OnUpdate)
+	EVT_SYS_COLOUR_CHANGED(Orbital3DSurfPane::OnSystemAppearanceChange)
 END_EVENT_TABLE()
 
 BEGIN_EVENT_TABLE(General3DSurfPane, Surface3DPane)
@@ -1689,7 +1691,10 @@ void Orbital2DSurfPane::OnSphHarmonicChk(wxCommandEvent &/*event*/) {
 
 	makeAOList();
 }
-
+void Orbital2DSurfPane::OnSystemAppearanceChange(wxSysColourChangedEvent& /*event*/) {
+	makeMOList();
+	makeAOList();
+}
 /*!
  * Orbital3D class
  */
@@ -2100,6 +2105,11 @@ void Orbital3DSurfPane::OnGridSizeSld(wxCommandEvent &/*event*/) {
 	SwitchFixGrid = true;
 
 	setUpdateButton();
+}
+
+void Orbital3DSurfPane::OnSystemAppearanceChange(wxSysColourChangedEvent& /*event*/) {
+	makeMOList();
+	makeAOList();
 }
 
 void Orbital3DSurfPane::OnUpdate(wxCommandEvent &/*event*/) {

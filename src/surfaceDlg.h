@@ -577,6 +577,8 @@ public:
 	void OnSphHarmonicChk(wxCommandEvent &event);
 	/// Called when a selection is changed in the atomic orbital list
 	void OnCoefList(wxCommandEvent &event);
+	/// Called upon system appearance change
+	void OnSystemAppearanceChange(wxSysColourChangedEvent& event);
 
 private:
 	/// Routine tests the current window data against the target surface to determine if an update is needed
@@ -631,6 +633,8 @@ public:
 	void OnUpdate(wxCommandEvent &event);
 	/// Called when a selection is changed in the atomic orbital list
 	void OnCoefList(wxCommandEvent &event);
+	/// Called upon system appearance change
+	void OnSystemAppearanceChange(wxSysColourChangedEvent& event);
 
 	////@begin Orbital3D member function declarations
 
