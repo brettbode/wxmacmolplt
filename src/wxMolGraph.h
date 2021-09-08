@@ -347,8 +347,11 @@ class wxMolGraph : public wxControl {
      */
     wxSize DoGetBestSize() const;
 
-
-    void draw(wxDC &dc);
+	/**
+	 * Does that actual drawing into the specified draw context. If toScreen is true the system appearance
+	 * will be used to determine the light/dark mode.
+	 */
+    void draw(wxDC &dc, bool toScreen=true);
 
 
     /* EVENT HANDLERS */

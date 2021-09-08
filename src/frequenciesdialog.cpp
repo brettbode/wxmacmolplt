@@ -310,7 +310,7 @@ void FrequenciesDialog::OnFreqcopyClick( wxCommandEvent& event )
     wxMemoryDC tempDC;
 
     tempDC.SelectObject(tempBmp);
-    fGraph->draw(tempDC);
+    fGraph->draw(tempDC, false);
 
     if (wxTheClipboard->Open()) {
         wxTheClipboard->SetData(new wxBitmapDataObject(tempBmp));

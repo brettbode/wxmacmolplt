@@ -355,7 +355,7 @@ void EnergyPlotDialog::OnCopyClick( wxCommandEvent& event )
     wxMemoryDC tempDC;
 
     tempDC.SelectObject(tempBmp);
-    epGraph->draw(tempDC);
+    epGraph->draw(tempDC, false);
 
     if (wxTheClipboard->Open()) {
         wxTheClipboard->SetData(new wxBitmapDataObject(tempBmp));
@@ -373,7 +373,7 @@ void EnergyPlotDialog::CopyToBitMap(wxBitmap ** target) {
     wxMemoryDC tempDC;
 	
     tempDC.SelectObject(**target);
-    epGraph->draw(tempDC);
+    epGraph->draw(tempDC, false);
 
     tempDC.SelectObject(wxNullBitmap);
 }
