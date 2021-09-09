@@ -530,10 +530,12 @@ void OrbSurfacePane::makeMOList() {
 	
 	//The wxHTMLListBox does seems to change the background to dark, but leaves
 	//the text color dark when entering dark mode so manually manage here.
-	wxSystemAppearance appearance = wxSystemSettings::GetAppearance();
 	wxString fontColor(_("<font color=\"#000000\">"));
+#if wxCHECK_VERSION(3, 1, 3)
+	wxSystemAppearance appearance = wxSystemSettings::GetAppearance();
 	if (appearance.IsDark())
 		fontColor.Printf(_("<font color=\"#FFFFFF\">"));
+#endif
 
 	mMOList->Clear();
 
@@ -678,10 +680,12 @@ void OrbSurfacePane::makeAOList() {
 
 	//The wxHTMLListBox does seems to change the background to dark, but leaves
 	//the text color dark when entering dark mode so manually manage here.
-	wxSystemAppearance appearance = wxSystemSettings::GetAppearance();
 	wxString fontColor(_("<font color=\"#000000\">"));
+#if wxCHECK_VERSION(3, 1, 3)
+	wxSystemAppearance appearance = wxSystemSettings::GetAppearance();
 	if (appearance.IsDark())
 		fontColor.Printf(_("<font color=\"#FFFFFF\">"));
+#endif
 
 	mOrbCoef->Clear();
 

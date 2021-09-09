@@ -543,13 +543,16 @@ void wxMolGraph::draw(wxDC &dc, bool toScreen) {
     canvasSize.Set(x, y);
 
 	//Handle dark mode by inverting the black/white of the graph, if needed
+#if wxCHECK_VERSION(3, 1, 3)
 	wxSystemAppearance appearance = wxSystemSettings::GetAppearance();
-	if (!appearance.IsDark() || !toScreen) {
-		dc.SetPen(*wxBLACK_PEN);
-		dc.SetBackground(*wxWHITE_BRUSH);
-	} else {
+	if (appearance.IsDark() && toScreen) {
 		dc.SetPen(*wxWHITE_PEN);
 		dc.SetBackground(*wxBLACK_BRUSH);
+	} else
+#endif
+	{
+		dc.SetPen(*wxBLACK_PEN);
+		dc.SetBackground(*wxWHITE_BRUSH);
 	}
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
     dc.SetFont(*wxSWISS_FONT);
@@ -748,10 +751,12 @@ void wxMolGraph::draw(wxDC &dc, bool toScreen) {
                         }
     
                         dc.SetBrush(wxBrush(dataSettings[i][j].color));
-						if (!appearance.IsDark() || !toScreen)
-							dc.SetPen(wxPen(*wxBLACK));
-						else
+#if wxCHECK_VERSION(3, 1, 3)
+						if (appearance.IsDark() && toScreen)
 							dc.SetPen(wxPen(*wxWHITE));
+						else
+#endif
+							dc.SetPen(wxPen(*wxBLACK));
                         if(dataSettings[i][j].style & MG_STYLE_LINE) {
                             if(k + 1 < data[i].second[j].size()) {
                                 xCoord = data[i].first.first.at(data[i].second[j][k+1].first);
@@ -773,10 +778,12 @@ void wxMolGraph::draw(wxDC &dc, bool toScreen) {
                                 dc.SetPen(wxPen(*wxRED));
                             }
                             else {
-								if (!appearance.IsDark() || !toScreen)
-									dc.SetPen(wxPen(*wxBLACK));
-								else
+#if wxCHECK_VERSION(3, 1, 3)
+								if (appearance.IsDark() && toScreen)
 									dc.SetPen(wxPen(*wxWHITE));
+								else
+#endif
+									dc.SetPen(wxPen(*wxBLACK));
                             }
                             dc.DrawLine(x, y, x, yScaleMin);
                         }
