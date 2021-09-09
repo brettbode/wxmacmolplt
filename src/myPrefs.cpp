@@ -647,7 +647,7 @@ void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 
 		wxString choices[] = {_T("Default"), _T("kcal/mol")};
 
-		mRdoUnit = new wxRadioBox(this, ID_UNIT_RADIOBOX, _T("Unit"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 1, wxRA_SPECIFY_COLS);
+		mRdoUnit = new wxRadioBox(this, ID_UNIT_RADIOBOX, _T("Energy Unit"), wxDefaultPosition, wxDefaultSize, WXSIZEOF(choices), choices, 1, wxRA_SPECIFY_COLS);
 
 		if (lunit == kDefault)
 			mRdoUnit->SetSelection(0);
@@ -671,7 +671,7 @@ void EnergyPrefsPane::SetupPaneItems(MolDisplayWin* /*targetWindow*/) {
 		if (lPOpts->PlotBondAngle())
 			mRdoMisc->SetSelection(5);
 
-		mLeftBottomSizer->Add(mRdoUnit, 0, wxALIGN_CENTER | wxALL, 3);
+		mLeftBottomSizer->Add(mRdoUnit, 0, wxALIGN_LEFT | wxALL, 3);
 		mBottomSizer->Add(mLeftBottomSizer, 0, wxALL, 10);
 		mBottomSizer->Add(mRdoMisc, 0, wxALIGN_CENTER | wxALL, 10);
 
