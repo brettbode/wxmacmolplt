@@ -841,6 +841,8 @@ class MolDisplayWin : public wxFrame {
 		void ToggleBuilderPalette();
 		WinPrefs *GetPrefs() {return Prefs;}
 		bool JustFocused();
+		/// Called upon system appearance change
+		void OnSystemAppearanceChange(wxSysColourChangedEvent& event);
 };
 
 class MolPrintOut : public wxPrintout {

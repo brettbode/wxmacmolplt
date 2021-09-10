@@ -4403,6 +4403,12 @@ void MolDisplayWin::ToggleBuilderPalette(void) {
 	Dirtify();;
 	}
 } 
+void MolDisplayWin::OnSystemAppearanceChange(wxSysColourChangedEvent& event) {
+	glCanvas->SetCurrent();
+	DoPrefDependent();
+
+	event.Skip();
+}
 
 BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_MENU (MMP_NEWFRAME,         MolDisplayWin::menuFileAppendNewFrame)
@@ -4561,5 +4567,6 @@ BEGIN_EVENT_TABLE(MolDisplayWin, wxFrame)
 	EVT_KILL_FOCUS(MolDisplayWin::OnKillFocus)
 	EVT_ACTIVATE(MolDisplayWin::OnActivate)
 	EVT_TOOL_RANGE(MMP_TOOL_ARROW, MMP_TOOL_HAND, MolDisplayWin::OnToggleTool)
+	EVT_SYS_COLOUR_CHANGED(MolDisplayWin::OnSystemAppearanceChange)
 END_EVENT_TABLE()
 

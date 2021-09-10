@@ -4260,6 +4260,13 @@ void MolDisplayWin::DoPrefDependent() {
 	red = (float) BackgroundColor->red / 65536;
 	green = (float) BackgroundColor->green / 65536;
 	blue = (float) BackgroundColor->blue / 65536;
+	//Handle dark mode by inverting the black/white of the graph, if needed
+#if wxCHECK_VERSION(3, 1, 3)
+	wxSystemAppearance appearance = wxSystemSettings::GetAppearance();
+	if (appearance.IsDark() && (red > 0.99) && (green > 0.99) && (blue > 0.99)) {
+		red = green = blue = 0.0;
+	}
+#endif
 	glClearColor(red, green, blue, 1.0f);
 
 	// The foreground color is white or black, whichever has better contrast given
