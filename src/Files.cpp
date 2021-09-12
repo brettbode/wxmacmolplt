@@ -3599,6 +3599,12 @@ long MolDisplayWin::OpenGAMESSlog(BufferFile *Buffer, bool Append, long flip, fl
 	}
 		//Read in normal modes, if present
 	MainData->cFrame->ParseNormalModes(Buffer, ProgressInd, Prefs);
+	
+	//I am not sure if tdhfx and localized orbitals can be mixed and if so which
+	//would be last so this might should move later.
+	//TDHF extended mode runs produce Raman Intensities in completely separate output
+	if (MainData->InputOptions->Control->GetRunType() == TDHFXRun)
+		MainData->cFrame->ParseTDHFXRaman(Buffer, ProgressInd);
 
 //Look for localized orbitals which appear only at the end of a log file
 	if (MainData->Basis) {

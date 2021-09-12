@@ -19,6 +19,8 @@ current release before reporting it.</P>
 	<LI>Corrected the use of energy units in the energy plot window.
 	<LI>Added support for dark mode. This requires wx 3.1.3 or later (which is currently Mac only). This fixes
         view problems in the surfaces, frequency and energy plot windows. Frequency and energy plots use dark mode on the screen but always copy/export in light mode. The main display copies as is currently displayed. If you do not want the dark background in the main display set the background color to not quite white as the code will only flip to dark if the background is fully white.
+	<LI>Added parser for raman intensities from TDHFX output. Previously raman frequencies were only
+        parsed from RAMAN runtyp runs.
 </UL>
 <P>Version 7.7.1:</P>
 <UL>

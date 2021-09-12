@@ -2484,6 +2484,33 @@ void Frame::ParseNormalModes(BufferFile * Buffer, Progress * ProgressInd, WinPre
 		MessageAlert("Error parsing normal modes. Normal modes will be skipped.");
 	}
 }
+//Parse Raman intensities from TDHF extended output ala exam39
+void Frame::ParseTDHFXRaman(BufferFile * Buffer, Progress * ProgressInd) {
+	if (!Vibs) return;
+	if (Buffer->LocateKeyWord("RAMAN INTENSITY AT OMEGA", 24)) {
+		ProgressInd->ChangeText("Parsing TDHF Raman Intensities");
+		long NumModes = 6; //assume zeroes for trans/rotation modes
+		for (int i=0; i<6; i++) Vibs->RamanIntensity.push_back(0.0);
+		Buffer->SkipnLines(6);
+		// Parsing lines of the form:
+//		Freq  |Mult|  Intensity     (%)  |l-depol ratio|n-depol ratio
+// 	   	[cm^-1]|    |                     |             |
+		float	freq, mult, intensity;
+		while (NumModes<Vibs->NumModes) {
+			char LineText[kMaxLineLength];
+			Buffer->GetLine(LineText);
+			int c = sscanf(LineText, "%f|%f|%f", &freq, &mult, &intensity);
+			if (c == 3) {
+				intensity /= mult;
+				for (int i=0; i<mult; i++) Vibs->RamanIntensity.push_back(intensity);
+				NumModes += mult;
+			} else {
+				MessageAlert("Error parsing raman intensities. Aborting parsing of Raman information.");
+				return;
+			}
+		}
+	}
+}
 void Frame::ParseMolDenFrequencies(BufferFile * Buffer, WinPrefs * Prefs) {
 	try {//catch errors locally
 		if (Buffer->LocateKeyWord("[FREQ]", 6)) {

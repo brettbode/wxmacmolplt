@@ -219,6 +219,8 @@ class Frame {
 		inline VibRec * GetFrequencies(void) const {return Vibs;};
 		inline long GetNumberNormalModes(void) const {return ((Vibs!=NULL)?Vibs->GetNumModes():0);}
 		void ParseNormalModes(BufferFile * Buffer, Progress *, WinPrefs *);
+		/** Parse raman intensity information from TDHFX output */	
+		void ParseTDHFXRaman(BufferFile * Buffer, Progress *);
 		void ParseMolDenFrequencies(BufferFile * Buffer, WinPrefs *);
 		void DeleteOrbitals(void);
 		bool ReadCMLMolecule(XMLElement * molElement);
