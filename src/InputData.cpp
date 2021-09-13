@@ -348,8 +348,6 @@ const char * ControlGroup::GetGAMESSRunText(const TypeOfRun & r) {
 			return "G3MP2";
 		case PropRun:
 			return "PROP";
-		case MorokumaRun:
-			return "MOROKUMA";
 		case TransitnRun:
 			return "TRANSITN";
 		case SpinOrbitRun:
@@ -370,10 +368,24 @@ const char * ControlGroup::GetGAMESSRunText(const TypeOfRun & r) {
 			return "RAMAN";
 		case NMRRun:
 			return "NMR";
+		case EDARun:
+			return "EDARun";
 		case MakeEFPRun:
 			return "MAKEFP";
 		case FreeStateFMORun:
 			return "FMO0";
+		case FMOHESSRun:
+			return "FMOHESS";
+		case GAMMARun:
+			return "GAMMA";
+		case ConicalRun:
+			return "CONICAL";
+		case CompRun:
+			return "COMP";
+		case NACMERun:
+			return "NACME";
+		case QMEFPEARun:
+			return "QMEFPEA";
 		default:
 			return "unknown";
 	}

@@ -13237,7 +13237,7 @@ mass-weighted cartesian space as shown."</string>
                             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                             <bool name="proxy-Separate files">0</bool>
                             <long name="proxy-Stretch factor">0</long>
-                            <string name="proxy-Strings">"Energy|Gradient|Hessian|Optimization|Trudge|Saddle Point|Min. Energy Crossing|IRC|Molecular Dynamics|Gradient Extremal|DRC|Energy Surface|G3MP2|Properties|Morokuma|Radiative Transition mom.|Spin Orbit|Finite Electric Field|TDHF|extended TDHF|Global Optimization|VSCF|FMO Optimization|Raman Intensities|NMR|Make EFP|Free state FMO"</string>
+                            <string name="proxy-Strings">"Energy|Gradient|Hessian|Optimization|Trudge|Saddle Point|Min. Energy Crossing|IRC|Molecular Dynamics|Gradient Extremal|DRC|Energy Surface|G3MP2|Properties|Radiative Transition mom.|Spin Orbit|Finite Electric Field|TDHF|extended TDHF|Global Optimization|VSCF|FMO Optimization|Raman Intensities|NMR|Energy Decomp. Analysis|Make EFP|Free state FMO|FMO Hessian|GAMMA|Conical Intersection|Composite thermochemistry|Non-adiabatic coupling|QM/EFP Energy Analysis"</string>
                             <string name="proxy-Tooltip text">""</string>
                             <long name="proxy-Width">-1</long>
                             <bool name="proxy-wxADJUST_MINSIZE">0</bool>

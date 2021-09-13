@@ -586,7 +586,6 @@ void InputBuilderWindow::CreateControls()
 	runChoiceStrings.Add(_("Energy Surface"));
 	runChoiceStrings.Add(_("G3MP2"));
 	runChoiceStrings.Add(_("Properties"));
-	runChoiceStrings.Add(_("Morokuma"));
 	runChoiceStrings.Add(_("Radiative Transition mom."));
 	runChoiceStrings.Add(_("Spin Orbit"));
 	runChoiceStrings.Add(_("Finite Electric Field"));
@@ -597,8 +596,15 @@ void InputBuilderWindow::CreateControls()
 	runChoiceStrings.Add(_("FMO Optimization"));
 	runChoiceStrings.Add(_("Raman Intensities"));
 	runChoiceStrings.Add(_("NMR"));
+	runChoiceStrings.Add(_("Energy Decomp. Analysis"));
 	runChoiceStrings.Add(_("Make EFP"));
 	runChoiceStrings.Add(_("Free state FMO"));
+	runChoiceStrings.Add(_("FMO Hessian"));
+	runChoiceStrings.Add(_("GAMMA"));
+	runChoiceStrings.Add(_("Conical Intersection"));
+	runChoiceStrings.Add(_("Composite thermochemistry"));
+	runChoiceStrings.Add(_("Non-adiabatic coupling"));
+	runChoiceStrings.Add(_("QM/EFP Energy Analysis"));
 	runChoice = new wxUglyChoice( itemPanel27, ID_RUN_CHOICE, wxDefaultPosition, wxDefaultSize, runChoiceStrings, 0 );
 	runChoice->SetStringSelection(_("Energy"));
 	itemFlexGridSizer30->Add(runChoice, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxLEFT|wxRIGHT|wxTOP, 5);

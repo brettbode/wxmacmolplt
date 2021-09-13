@@ -101,7 +101,6 @@ enum TypeOfRun {
 	SurfaceRun,
 	G3MP2,
 	PropRun,
-	MorokumaRun,
 	TransitnRun,
 	SpinOrbitRun,
 	FFieldRun,
@@ -112,8 +111,15 @@ enum TypeOfRun {
 	OptFMORun,
 	RamanRun,
 	NMRRun,
+	EDARun,
 	MakeEFPRun,
 	FreeStateFMORun,
+	FMOHESSRun,
+	GAMMARun,
+	ConicalRun,
+	CompRun,
+	NACMERun,
+	QMEFPEARun,
 	
 	NumGAMESSRunTypes
 };
