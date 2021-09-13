@@ -3589,7 +3589,6 @@ long MolDisplayWin::OpenFile(wxString fileName, float offset, bool flip, bool ap
 					test = OpenGAMESSInput(Buffer);
 				break;
 			case kXYZType:
-				if (!append)
 					test = OpenXYZFile(Buffer);
 				break;
 			case kPDBType:

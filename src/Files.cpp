@@ -1721,14 +1721,17 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 		wxLogMessage(_("XYZ files must have an integer representing the number of atoms on the first line of the file."));
 		throw DataError();
 	}
+	Buffer->GetLine(Line);
 		//allocate memory for the atoms
 	if (lFrame->NumAtoms > 0) {	//If there are already atoms treat as an append
 		lFrame = MainData->AddFrame(nAtoms,0);
 	} else {
 		if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
-		Buffer->GetLine(Line);
 		MainData->SetDescription(Line);
 	}
+	double temp;
+	int c = sscanf(Line,"%lf", &temp);
+	if (c==1) lFrame->SetEnergy(temp);
 	long DRCnSkip = Prefs->GetDRCSkip(), nSkip=0;
 		bool Done=false;
 		bool RdPoint = true;
@@ -1793,6 +1796,8 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 						lFrame = MainData->AddFrame(nAtoms,0);
 						if (!lFrame) throw MemoryError();
 						Buffer->GetLine(Line);
+						c = sscanf(Line,"%lf", &temp);
+						if (c==1) lFrame->SetEnergy(temp);
 						if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 							{ throw UserCancel();}
 					} else {
@@ -5322,7 +5327,7 @@ void MolDisplayWin::WriteXYZFile(BufferFile * Buffer, bool AllFrames, bool AllMo
 				mpAtom * lAtoms = lFrame->Atoms;
 			sprintf(text, "%ld", lFrame->NumAtoms);
 			Buffer->WriteLine(text, true);
-			sprintf(text, "Frame %ld", i+1);
+			sprintf(text, "%lf Frame %ld", lFrame->Energy, i+1);
 			Buffer->WriteLine(text, true);
 			for (long j=0; j<lFrame->NumAtoms; ++j) {
 					Str255	Label;
