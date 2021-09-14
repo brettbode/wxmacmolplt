@@ -5126,11 +5126,12 @@ void MolDisplayWin::ExportGAMESS(BufferFile * Buffer, bool AllFrames) {
 			sprintf(text, "! Frame # %d", iframe+1);
 			Buffer->WriteLine(text, true);
 
-			MainData->SetCurrentFrame(iframe);
-
 			lInputOptions->Data->WriteToFile(Buffer, MainData, Prefs, basisTest);
+			
+			MainData->AdvanceFrame();
 		}
-		
+		MainData->CurrentFrame = 1;
+		MainData->cFrame = MainData->Frames;
 		MainData->SetCurrentFrame(savedFrame);
 
 		if ((lInputOptions->Data->GetCoordType() == ZMTCoordType)||
