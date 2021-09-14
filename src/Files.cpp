@@ -1729,9 +1729,17 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 		if (!MainData->SetupFrameMemory(nAtoms, 0)) throw MemoryError();
 		MainData->SetDescription(Line);
 	}
+	//Attempt to parse an energy from the title line, first as the first part of the line
 	double temp;
 	int c = sscanf(Line,"%lf", &temp);
 	if (c==1) lFrame->SetEnergy(temp);
+	else {
+		//if that fails look for VB2000 style output of the form:
+		//REACTOR RUN - POINT NUMBER 02    Energy =     -74.99581248
+		if (::ReadDoubleKeyword(Line, "ENERGY", temp)) {
+			lFrame->SetEnergy(temp);
+		}
+	}
 	long DRCnSkip = Prefs->GetDRCSkip(), nSkip=0;
 		bool Done=false;
 		bool RdPoint = true;
@@ -1796,8 +1804,16 @@ long MolDisplayWin::OpenXYZFile(BufferFile * Buffer) {
 						lFrame = MainData->AddFrame(nAtoms,0);
 						if (!lFrame) throw MemoryError();
 						Buffer->GetLine(Line);
+						//Attempt to parse an energy from the title line, first as the first part of the line
 						c = sscanf(Line,"%lf", &temp);
 						if (c==1) lFrame->SetEnergy(temp);
+						else {
+							//if that fails look for VB2000 style output of the form:
+							//REACTOR RUN - POINT NUMBER 02    Energy =     -74.99581248
+							if (::ReadDoubleKeyword(Line, "ENERGY", temp)) {
+								lFrame->SetEnergy(temp);
+							}
+						}
 						if (!ProgressInd->UpdateProgress(Buffer->PercentRead()))
 							{ throw UserCancel();}
 					} else {

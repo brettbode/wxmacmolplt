@@ -372,7 +372,7 @@ structures and can have multiple frames. The basic format is:</P>
 
 <P>1st line MUST contain the number of atoms<BR>
 
-1 line label, If this line begins with numeric text that can be parsed as a floating point number it will be assigned as the energy for the frame.<BR>
+1 line label, If this line begins with numeric text that can be parsed as a floating point number it will be assigned as the energy for the frame. Alternatively MacMolPlt will look for the output from VB2000 which is of the form "REACTOR RUN - POINT NUMBER 01    Energy =     -75.00340268". From that MacMolPlt is only looking for "Energy = #" and ignores the rest of the text.<BR>
 
 One line for each atom given in the format:<BR>
 
