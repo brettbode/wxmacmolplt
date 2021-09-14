@@ -362,11 +362,13 @@ void CoordinatesWindow::FrameChanged(void) {
 	coordGrid->BeginBatch();
 	//clear off any extra rows
 	if (coordGrid->GetNumberRows() > natoms)
-		coordGrid->DeleteRows(0, (int)(coordGrid->GetNumberRows()-natoms), true);
+		//Delete from the end of the list to avoid messing up read only cells if in internal coordinates mode
+		coordGrid->DeleteRows((int)(coordGrid->GetNumberRows()-(coordGrid->GetNumberRows()-natoms)), (int)(coordGrid->GetNumberRows()-natoms), true);
 	coordGrid->HideCellEditControl();
 	if (natoms > 0) {
 		if (coordGrid->GetNumberRows() < natoms)
-			coordGrid->InsertRows(0, (int)(natoms - coordGrid->GetNumberRows()), true);
+			//Add new rows to the end of the list to avoid pushing down readonly cells
+			coordGrid->InsertRows(coordGrid->GetNumberRows(), (int)(natoms - coordGrid->GetNumberRows()), true);
 		coordGrid->ClearSelection();
 		wxString buf;
 		Internals * internals = NULL;
@@ -531,9 +533,8 @@ wxIcon CoordinatesWindow::GetIconResource( const wxString& name )
  * wxEVT_COMMAND_BUTTON_CLICKED event handler for wxID_ADD
  */
 
-void CoordinatesWindow::OnAddClick( wxCommandEvent& event )
+void CoordinatesWindow::OnAddClick( wxCommandEvent& /*event */)
 {
-	(void)event;
 	Parent->CreateFrameSnapShot();
 	MoleculeData * MainData = Parent->GetData();
 	Frame * lFrame = MainData->GetCurrentFramePtr();
@@ -785,17 +786,17 @@ void CoordinatesWindow::OnCellChange( wxGridEvent& event )
 					mInts->CartesiansToInternals(MainData);
 						//Need to update the length and angles for this row
 					if (row>0) {
-						val.Printf(wxT("%d"), mInts->GetConnection(row,0)+1);
+						val.Printf(wxT("%ld"), mInts->GetConnection(row,0)+1);
 						coordGrid->SetCellValue(row, 1, val);
 						val.Printf(wxT("%f"), mInts->GetValue(row,0));
 						coordGrid->SetCellValue(row, 2, val);
 						if (row>1) {
-							val.Printf(wxT("%d"), mInts->GetConnection(row,1)+1);
+							val.Printf(wxT("%ld"), mInts->GetConnection(row,1)+1);
 							coordGrid->SetCellValue(row, 3, val);
 							val.Printf(wxT("%.2f"), mInts->GetValue(row,1));
 							coordGrid->SetCellValue(row, 4, val);
 							if (row>2) {
-								val.Printf(wxT("%d"), mInts->GetConnection(row,2)+1);
+								val.Printf(wxT("%ld"), mInts->GetConnection(row,2)+1);
 								coordGrid->SetCellValue(row, 5, val);
 								val.Printf(wxT("%.2f"), mInts->GetValue(row,2));
 								coordGrid->SetCellValue(row, 6, val);
