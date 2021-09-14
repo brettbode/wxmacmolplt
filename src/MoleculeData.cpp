@@ -1731,7 +1731,7 @@ void MoleculeData::SetCurrentFrame(long FrameNum) {
 		CurrentFrame = 1;
 	}
 	while (CurrentFrame < FrameNum) {
-		cFrame = cFrame->NextFrame;
+		if (cFrame->NextFrame) cFrame = cFrame->NextFrame;
 		CurrentFrame++;
 	}
 }
