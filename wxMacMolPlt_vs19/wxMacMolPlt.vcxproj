@@ -102,8 +102,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Users\brett\source\repos\wxmacmolplt\src\ming-src\actioncompiler;C:\Users\brett\source\repos\wxmacmolplt\src\ming-src\blocks;C:\Users\brett\source\repos\wxmacmolplt\src\ming-src;C:\wxWidgets-3.0.5\lib\vc_x64_lib\mswud;C:\wxWidgets-3.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0400;wxUSE_GUI=1;__WXDEBUG__;YY_NO_UNISTD_H;HAVE_LIBMING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\wxWidgets-3.0.5\lib\vc_x64_lib\mswud;C:\wxWidgets-3.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;WINVER=0x0400;wxUSE_GUI=1;__WXDEBUG__;YY_NO_UNISTD_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -147,8 +147,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\brett\source\repos\wxmacmolplt\src\ming-src\actioncompiler;C:\Users\brett\source\repos\wxmacmolplt\src\ming-src\blocks;C:\Users\brett\source\repos\wxmacmolplt\src\ming-src;C:\wxWidgets-3.0.5\lib\vc_x64_lib\mswu;C:\wxWidgets-3.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x400;wxUSE_GUI=1;YY_NO_UNISTD_H;HAVE_LIBMING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\wxWidgets-3.0.5\lib\vc_x64_lib\mswu;C:\wxWidgets-3.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;WINVER=0x400;wxUSE_GUI=1;YY_NO_UNISTD_H;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -209,77 +209,6 @@
     <ClInclude Include="..\src\llmdialog.h" />
     <ClInclude Include="..\src\main.h" />
     <ClInclude Include="..\src\Math3D.h" />
-    <ClInclude Include="..\src\ming-src\actioncompiler\assembler.h" />
-    <ClInclude Include="..\src\ming-src\actioncompiler\compile.h" />
-    <ClInclude Include="..\src\ming-src\actioncompiler\swf4compiler.tab.h" />
-    <ClInclude Include="..\src\ming-src\actioncompiler\swf5compiler.tab.h" />
-    <ClInclude Include="..\src\ming-src\actiontypes.h" />
-    <ClInclude Include="..\src\ming-src\blocklist.h" />
-    <ClInclude Include="..\src\ming-src\blocks\action.h" />
-    <ClInclude Include="..\src\ming-src\blocks\bitmap.h" />
-    <ClInclude Include="..\src\ming-src\blocks\block.h" />
-    <ClInclude Include="..\src\ming-src\blocks\blocktypes.h" />
-    <ClInclude Include="..\src\ming-src\blocks\browserfont.h" />
-    <ClInclude Include="..\src\ming-src\blocks\button.h" />
-    <ClInclude Include="..\src\ming-src\blocks\character.h" />
-    <ClInclude Include="..\src\ming-src\blocks\cxform.h" />
-    <ClInclude Include="..\src\ming-src\blocks\dbl.h" />
-    <ClInclude Include="..\src\ming-src\blocks\error.h" />
-    <ClInclude Include="..\src\ming-src\blocks\exports.h" />
-    <ClInclude Include="..\src\ming-src\blocks\fdbfont.h" />
-    <ClInclude Include="..\src\ming-src\blocks\fileattrs.h" />
-    <ClInclude Include="..\src\ming-src\blocks\fillstyle.h" />
-    <ClInclude Include="..\src\ming-src\blocks\filter.h" />
-    <ClInclude Include="..\src\ming-src\blocks\flv.h" />
-    <ClInclude Include="..\src\ming-src\blocks\font.h" />
-    <ClInclude Include="..\src\ming-src\blocks\fontinfo.h" />
-    <ClInclude Include="..\src\ming-src\blocks\fromswf.h" />
-    <ClInclude Include="..\src\ming-src\blocks\gradient.h" />
-    <ClInclude Include="..\src\ming-src\blocks\imports.h" />
-    <ClInclude Include="..\src\ming-src\blocks\input.h" />
-    <ClInclude Include="..\src\ming-src\blocks\jpeg.h" />
-    <ClInclude Include="..\src\ming-src\blocks\libswf.h" />
-    <ClInclude Include="..\src\ming-src\blocks\linestyle.h" />
-    <ClInclude Include="..\src\ming-src\blocks\matrix.h" />
-    <ClInclude Include="..\src\ming-src\blocks\metadata.h" />
-    <ClInclude Include="..\src\ming-src\blocks\method.h" />
-    <ClInclude Include="..\src\ming-src\blocks\morph.h" />
-    <ClInclude Include="..\src\ming-src\blocks\mp3.h" />
-    <ClInclude Include="..\src\ming-src\blocks\output.h" />
-    <ClInclude Include="..\src\ming-src\blocks\outputblock.h" />
-    <ClInclude Include="..\src\ming-src\blocks\placeobject.h" />
-    <ClInclude Include="..\src\ming-src\blocks\protect.h" />
-    <ClInclude Include="..\src\ming-src\blocks\rect.h" />
-    <ClInclude Include="..\src\ming-src\blocks\scalinggrid.h" />
-    <ClInclude Include="..\src\ming-src\blocks\scenedata.h" />
-    <ClInclude Include="..\src\ming-src\blocks\scriptlimits.h" />
-    <ClInclude Include="..\src\ming-src\blocks\shape.h" />
-    <ClInclude Include="..\src\ming-src\blocks\sound.h" />
-    <ClInclude Include="..\src\ming-src\blocks\soundinstance.h" />
-    <ClInclude Include="..\src\ming-src\blocks\soundstream.h" />
-    <ClInclude Include="..\src\ming-src\blocks\sprite.h" />
-    <ClInclude Include="..\src\ming-src\blocks\swf.h" />
-    <ClInclude Include="..\src\ming-src\blocks\symbolclass.h" />
-    <ClInclude Include="..\src\ming-src\blocks\tabindex.h" />
-    <ClInclude Include="..\src\ming-src\blocks\text.h" />
-    <ClInclude Include="..\src\ming-src\blocks\textfield.h" />
-    <ClInclude Include="..\src\ming-src\blocks\ttffont.h" />
-    <ClInclude Include="..\src\ming-src\blocks\utf8.h" />
-    <ClInclude Include="..\src\ming-src\blocks\videostream.h" />
-    <ClInclude Include="..\src\ming-src\displaylist.h" />
-    <ClInclude Include="..\src\ming-src\fill.h" />
-    <ClInclude Include="..\src\ming-src\font_util.h" />
-    <ClInclude Include="..\src\ming-src\gc.h" />
-    <ClInclude Include="..\src\ming-src\libming.h" />
-    <ClInclude Include="..\src\ming-src\ming.h" />
-    <ClInclude Include="..\src\ming-src\mingpp.h" />
-    <ClInclude Include="..\src\ming-src\ming_config.h" />
-    <ClInclude Include="..\src\ming-src\movie.h" />
-    <ClInclude Include="..\src\ming-src\movieclip.h" />
-    <ClInclude Include="..\src\ming-src\position.h" />
-    <ClInclude Include="..\src\ming-src\shape_cubic.h" />
-    <ClInclude Include="..\src\ming-src\shape_util.h" />
-    <ClInclude Include="..\src\ming-src\text_util.h" />
     <ClInclude Include="..\src\MMPPrefs.h" />
     <ClInclude Include="..\src\mmp_gl.h" />
     <ClInclude Include="..\src\MolDisplayWin.h" />
@@ -353,77 +282,6 @@
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Math3D.cpp" />
     <ClCompile Include="..\src\MEP.cpp" />
-    <ClCompile Include="..\src\ming-src\actioncompiler\assembler.c" />
-    <ClCompile Include="..\src\ming-src\actioncompiler\compile.c" />
-    <ClCompile Include="..\src\ming-src\actioncompiler\compileaction.c" />
-    <ClCompile Include="..\src\ming-src\actioncompiler\lex.swf4.c" />
-    <ClCompile Include="..\src\ming-src\actioncompiler\lex.swf5.c" />
-    <ClCompile Include="..\src\ming-src\actioncompiler\listaction.c" />
-    <ClCompile Include="..\src\ming-src\actioncompiler\swf4compiler.tab.c" />
-    <ClCompile Include="..\src\ming-src\actioncompiler\swf5compiler.tab.c" />
-    <ClCompile Include="..\src\ming-src\blocklist.c" />
-    <ClCompile Include="..\src\ming-src\blocks\action.c" />
-    <ClCompile Include="..\src\ming-src\blocks\binary.c" />
-    <ClCompile Include="..\src\ming-src\blocks\bitmap.c" />
-    <ClCompile Include="..\src\ming-src\blocks\block.c" />
-    <ClCompile Include="..\src\ming-src\blocks\browserfont.c" />
-    <ClCompile Include="..\src\ming-src\blocks\button.c" />
-    <ClCompile Include="..\src\ming-src\blocks\character.c" />
-    <ClCompile Include="..\src\ming-src\blocks\cxform.c" />
-    <ClCompile Include="..\src\ming-src\blocks\dbl.c" />
-    <ClCompile Include="..\src\ming-src\blocks\error.c" />
-    <ClCompile Include="..\src\ming-src\blocks\fdbfont.c" />
-    <ClCompile Include="..\src\ming-src\blocks\fileattrs.c" />
-    <ClCompile Include="..\src\ming-src\blocks\fillstyle.c" />
-    <ClCompile Include="..\src\ming-src\blocks\filter.c" />
-    <ClCompile Include="..\src\ming-src\blocks\flv.c" />
-    <ClCompile Include="..\src\ming-src\blocks\font.c" />
-    <ClCompile Include="..\src\ming-src\blocks\fontinfo.c" />
-    <ClCompile Include="..\src\ming-src\blocks\fromswf.c" />
-    <ClCompile Include="..\src\ming-src\blocks\gifdbl.c" />
-    <ClCompile Include="..\src\ming-src\blocks\gradient.c" />
-    <ClCompile Include="..\src\ming-src\blocks\imports.c" />
-    <ClCompile Include="..\src\ming-src\blocks\input.c" />
-    <ClCompile Include="..\src\ming-src\blocks\jpeg.c" />
-    <ClCompile Include="..\src\ming-src\blocks\linestyle.c" />
-    <ClCompile Include="..\src\ming-src\blocks\matrix.c" />
-    <ClCompile Include="..\src\ming-src\blocks\metadata.c" />
-    <ClCompile Include="..\src\ming-src\blocks\method.c" />
-    <ClCompile Include="..\src\ming-src\blocks\morph.c" />
-    <ClCompile Include="..\src\ming-src\blocks\mp3.c" />
-    <ClCompile Include="..\src\ming-src\blocks\output.c" />
-    <ClCompile Include="..\src\ming-src\blocks\outputblock.c" />
-    <ClCompile Include="..\src\ming-src\blocks\placeobject.c" />
-    <ClCompile Include="..\src\ming-src\blocks\pngdbl.c" />
-    <ClCompile Include="..\src\ming-src\blocks\protect.c" />
-    <ClCompile Include="..\src\ming-src\blocks\rect.c" />
-    <ClCompile Include="..\src\ming-src\blocks\scalinggrid.c" />
-    <ClCompile Include="..\src\ming-src\blocks\scenedata.c" />
-    <ClCompile Include="..\src\ming-src\blocks\scriptlimits.c" />
-    <ClCompile Include="..\src\ming-src\blocks\shape.c" />
-    <ClCompile Include="..\src\ming-src\blocks\sound.c" />
-    <ClCompile Include="..\src\ming-src\blocks\soundinstance.c" />
-    <ClCompile Include="..\src\ming-src\blocks\soundstream.c" />
-    <ClCompile Include="..\src\ming-src\blocks\sprite.c" />
-    <ClCompile Include="..\src\ming-src\blocks\symbolclass.c" />
-    <ClCompile Include="..\src\ming-src\blocks\tabindex.c" />
-    <ClCompile Include="..\src\ming-src\blocks\text.c" />
-    <ClCompile Include="..\src\ming-src\blocks\textfield.c" />
-    <ClCompile Include="..\src\ming-src\blocks\ttffont.c" />
-    <ClCompile Include="..\src\ming-src\blocks\utf8.c" />
-    <ClCompile Include="..\src\ming-src\blocks\videostream.c" />
-    <ClCompile Include="..\src\ming-src\compat.c" />
-    <ClCompile Include="..\src\ming-src\displaylist.c" />
-    <ClCompile Include="..\src\ming-src\fill.c" />
-    <ClCompile Include="..\src\ming-src\font_util.c" />
-    <ClCompile Include="..\src\ming-src\gc.c" />
-    <ClCompile Include="..\src\ming-src\ming.c" />
-    <ClCompile Include="..\src\ming-src\movie.c" />
-    <ClCompile Include="..\src\ming-src\movieclip.c" />
-    <ClCompile Include="..\src\ming-src\position.c" />
-    <ClCompile Include="..\src\ming-src\shape_cubic.c" />
-    <ClCompile Include="..\src\ming-src\shape_util.c" />
-    <ClCompile Include="..\src\ming-src\text_util.c" />
     <ClCompile Include="..\src\MMPPrefs.cpp" />
     <ClCompile Include="..\src\MolDisplayWin.cpp" />
     <ClCompile Include="..\src\MoleculeData.cpp" />
